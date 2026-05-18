@@ -373,37 +373,6 @@ const FreguesiaServicePage = () => {
           </div>
         </section>
 
-        {/* ═══ BENEFÍCIOS ═══ */}
-        {data.benefits && data.benefits.length > 0 && (
-          <section className="py-12 md:py-16 bg-[#12121e]">
-            <div className="container mx-auto px-5 sm:px-6 lg:px-8">
-              <div className="max-w-4xl mx-auto">
-                <div className="text-center mb-8">
-                  <div className="flex items-center justify-center gap-3 mb-3">
-                    <div className="h-px w-10 opacity-40" style={{ backgroundColor: "#D4AF37" }} />
-                    <p className="text-[10px] font-bold tracking-[0.28em] uppercase" style={{ color: "#D4AF37" }}>Vantagens</p>
-                    <div className="h-px w-10 opacity-40" style={{ backgroundColor: "#D4AF37" }} />
-                  </div>
-                  <h2 className="font-playfair text-2xl md:text-3xl font-bold text-white">
-                    Porquê escolher a Kyro em {data.name}
-                  </h2>
-                  {data.localSection && (
-                    <p className="mt-3 text-sm text-white/55 max-w-2xl mx-auto leading-relaxed">{data.localSection}</p>
-                  )}
-                </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                  {data.benefits.map((benefit, idx) => (
-                    <div key={idx} className="flex items-start gap-3 bg-white/5 rounded-2xl p-4 border border-white/10">
-                      <CheckCircle className="w-5 h-5 mt-0.5 shrink-0" style={{ color: "#D4AF37" }} />
-                      <span className="text-sm text-white/80 leading-relaxed">{benefit}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </section>
-        )}
-
         {/* ═══ REDE INTERNA ═══ */}
         <section className="py-12 md:py-16 bg-white">
           <div className="container mx-auto px-5 sm:px-6 lg:px-8">
@@ -468,6 +437,37 @@ const FreguesiaServicePage = () => {
           packSlugs={SERVICE_PACK_SLUGS[data.serviceSlug] ?? ["pack-sala-completa"]}
           city={data.municipioSlug}
         />
+
+        {/* ═══ BENEFÍCIOS ═══ */}
+        {data.benefits && data.benefits.length > 0 && (
+          <section className="py-12 md:py-16 bg-white">
+            <div className="container mx-auto px-5 sm:px-6 lg:px-8">
+              <div className="max-w-4xl mx-auto">
+                <div className="text-center mb-8">
+                  <div className="flex items-center justify-center gap-3 mb-3">
+                    <div className="h-px w-10 opacity-40" style={{ backgroundColor: "#D4AF37" }} />
+                    <p className="text-[10px] font-bold tracking-[0.28em] uppercase" style={{ color: "#D4AF37" }}>Vantagens</p>
+                    <div className="h-px w-10 opacity-40" style={{ backgroundColor: "#D4AF37" }} />
+                  </div>
+                  <h2 className="font-playfair text-2xl md:text-3xl font-bold text-[#1A1A2E]">
+                    Porquê escolher a Kyro em {data.name}
+                  </h2>
+                  {data.localSection && (
+                    <p className="mt-3 text-sm text-[#1A1A2E]/50 max-w-2xl mx-auto leading-relaxed">{data.localSection}</p>
+                  )}
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                  {data.benefits.map((benefit, idx) => (
+                    <div key={idx} className="flex items-start gap-3 bg-[#FDFDF9] rounded-2xl p-4 border border-[#E8E4DE]">
+                      <CheckCircle className="w-5 h-5 mt-0.5 shrink-0" style={{ color: "#D4AF37" }} />
+                      <span className="text-sm text-[#1A1A2E]/70 leading-relaxed">{benefit}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </section>
+        )}
 
         <script
           type="application/ld+json"
