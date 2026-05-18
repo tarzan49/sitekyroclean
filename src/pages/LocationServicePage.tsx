@@ -245,6 +245,9 @@ const LocationServicePage = () => {
                   <div className="h-px w-10 opacity-40" style={{ backgroundColor: "#D4AF37" }} />
                 </div>
                 <h2 className="font-playfair text-2xl md:text-3xl font-bold text-white">Como funciona</h2>
+                {data.howItWorks && (
+                  <p className="mt-4 text-sm text-white/60 max-w-2xl mx-auto leading-relaxed">{data.howItWorks}</p>
+                )}
               </div>
               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 md:gap-6">
                 {(data.serviceSlug === 'impermeabilizacao' ? IMPERMEABILIZACAO_STEPS : GENERIC_PROCESS_STEPS).map((step, idx) => (

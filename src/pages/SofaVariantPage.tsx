@@ -107,6 +107,14 @@ const SofaVariantPage = () => {
     document.querySelector('meta[property="og:description"]')?.setAttribute('content', data.metaDescription);
     document.querySelector('link[rel="canonical"]')
       ?.setAttribute('href', `https://www.cleansolutions.com.pt${data.canonical}`);
+    let robotsMeta = document.querySelector('meta[name="robots"]');
+    if (!robotsMeta) {
+      robotsMeta = document.createElement('meta');
+      robotsMeta.setAttribute('name', 'robots');
+      document.head.appendChild(robotsMeta);
+    }
+    robotsMeta.setAttribute('content', 'noindex, follow');
+    return () => { robotsMeta?.setAttribute('content', 'index, follow'); };
   }, [data]);
 
   if (!data || !parsed) {
