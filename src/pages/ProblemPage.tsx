@@ -65,7 +65,9 @@ const ProblemPage = () => {
 
   const relatedProblemLinks = getRelatedProblemLinks(data.relatedProblems);
 
-  const relatedCityData = data.relatedCities
+  const METRO_SLUGS = ["porto", "matosinhos", "maia", "vila-nova-de-gaia", "gondomar", "braga", "lisboa"];
+  const problemCitySlugs = Array.from(new Set([...METRO_SLUGS, ...data.relatedCities]));
+  const relatedCityData = problemCitySlugs
     .map(slug => cities.find(c => c.slug === slug))
     .filter(Boolean) as typeof cities[number][];
 
@@ -285,19 +287,16 @@ const ProblemPage = () => {
                     Disponível nestas cidades
                   </h3>
                   <div className="flex flex-wrap gap-2">
-                    {relatedCityData.map(city => {
-                      const primaryService = data.relatedServices[0];
-                      return (
-                        <Link
-                          key={city.slug}
-                          to={`/${primaryService}-${city.slug}`}
-                          className="inline-flex items-center gap-1.5 bg-white px-3 py-2 rounded-lg text-sm font-medium text-[#1A1A2E] border border-[#E8E4DE] hover:border-[#D4AF37]/35 hover:bg-[#D4AF37]/5 transition-all"
-                        >
-                          <MapPin className="w-3 h-3" style={{ color: "#D4AF37" }} />
-                          {city.name}
-                        </Link>
-                      );
-                    })}
+                    {relatedCityData.map(city => (
+                      <Link
+                        key={city.slug}
+                        to={`/${data.slug}-${city.slug}`}
+                        className="inline-flex items-center gap-1.5 bg-white px-3 py-2 rounded-lg text-sm font-medium text-[#1A1A2E] border border-[#E8E4DE] hover:border-[#D4AF37]/35 hover:bg-[#D4AF37]/5 transition-all"
+                      >
+                        <MapPin className="w-3 h-3" style={{ color: "#D4AF37" }} />
+                        {city.name}
+                      </Link>
+                    ))}
                   </div>
                 </div>
               )}

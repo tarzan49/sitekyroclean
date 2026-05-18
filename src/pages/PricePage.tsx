@@ -203,6 +203,16 @@ const PricePage = () => {
           <div className="container mx-auto px-4">
             <div className="max-w-4xl mx-auto space-y-8">
               <div>
+                <h3 className="text-lg font-bold text-[#1A1A2E] mb-3">Ver serviço completo</h3>
+                <Link
+                  to={`/${data.serviceSlug}-${data.citySlug}`}
+                  className="inline-flex items-center gap-2 bg-[#D4AF37]/10 border border-[#D4AF37]/30 px-4 py-2.5 rounded-xl text-sm font-semibold text-[#1A1A2E] hover:bg-[#D4AF37]/20 transition-all"
+                >
+                  <ArrowRight className="w-4 h-4 text-[#D4AF37]" />
+                  {data.serviceName} em {data.cityName} — página completa
+                </Link>
+              </div>
+              <div>
                 <h3 className="text-lg font-bold text-[#1A1A2E] mb-4">Preços noutras cidades</h3>
                 <div className="flex flex-wrap gap-2">
                   {nearbyCities.map(city => (
