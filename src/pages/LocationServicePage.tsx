@@ -6,6 +6,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import QuizButton from "@/components/QuizButton";
 import ServiceFAQSchema from "@/components/ServiceFAQSchema";
+import ServiceLocationSchema from "@/components/ServiceLocationSchema";
 import ServicePackBanner from "@/components/ServicePackBanner";
 import { getLocationServiceData, services, cities, getCityLinksForService } from "@/data/locationSeoData";
 import { municipiosComFreguesias } from "@/data/freguesiaSeoData";
@@ -117,8 +118,19 @@ const LocationServicePage = () => {
 
   const cityFreguesias = municipiosComFreguesias.find(m => m.slug === data.citySlug);
 
+  const resultDesc = RESULT_CONTENT[data.serviceSlug]?.(data.city)?.desc ?? data.metaDescription;
+  const serviceBaseUrl = services.find(s => s.slug === data.serviceSlug)?.baseRoute ?? `/${data.serviceSlug}`;
+
   return (
     <>
+      <ServiceLocationSchema
+        serviceName={data.service}
+        serviceBaseUrl={serviceBaseUrl}
+        placeName={data.city}
+        description={resultDesc}
+        pageUrl={location.pathname}
+        priceFrom={data.priceFrom}
+      />
       <Header />
       <main>
 

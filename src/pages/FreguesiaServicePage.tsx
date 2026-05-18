@@ -6,6 +6,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import QuizButton from "@/components/QuizButton";
 import ServiceFAQSchema from "@/components/ServiceFAQSchema";
+import ServiceLocationSchema from "@/components/ServiceLocationSchema";
 import ServicePackBanner from "@/components/ServicePackBanner";
 import { services } from "@/data/locationSeoData";
 import {
@@ -122,9 +123,20 @@ const FreguesiaServicePage = () => {
   const heroImgs = SERVICE_HERO_IMAGES[data.serviceSlug] ?? { d: heroSofaD, m: heroSofaM };
   const resultImg = SERVICE_RESULT_IMAGES[data.serviceSlug] ?? resultSofa;
   const resultLabel = data.serviceSlug === 'impermeabilizacao' ? 'impermeabilização' : 'limpeza';
+  const resultDesc = RESULT_CONTENT[data.serviceSlug]?.(data.name)?.desc ?? data.metaDescription;
+  const serviceBaseUrl = services.find(s => s.slug === data.serviceSlug)?.baseRoute ?? `/${data.serviceSlug}`;
 
   return (
     <>
+      <ServiceLocationSchema
+        serviceName={data.service}
+        serviceBaseUrl={serviceBaseUrl}
+        placeName={data.name}
+        parentPlace={data.municipio}
+        description={resultDesc}
+        pageUrl={location.pathname}
+        priceFrom={data.priceFrom}
+      />
       <Header />
       <main>
 
