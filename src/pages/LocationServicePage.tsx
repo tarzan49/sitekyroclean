@@ -10,6 +10,15 @@ import ServicePackBanner from "@/components/ServicePackBanner";
 import { getLocationServiceData, services, cities, getCityLinksForService } from "@/data/locationSeoData";
 import { municipiosComFreguesias } from "@/data/freguesiaSeoData";
 import { GENERIC_PROCESS_STEPS, IMPERMEABILIZACAO_STEPS } from "@/constants/serviceProcesses";
+
+const RESULT_CONTENT: Record<string, (city: string) => { desc: string; checks: string[] }> = {
+  'limpeza-sofas':     city => ({ desc: `Sofás de ${city} tratados com extração a quente: manchas, ácaros e odores eliminados. Tecido revitalizado e pronto a usar em 4 a 6 horas.`, checks: ['Remoção de 99% dos ácaros', 'Manchas antigas eliminadas', 'Pronto em 4–6h'] }),
+  'limpeza-colchoes':  city => ({ desc: `Colchões higienizados ao domicílio em ${city}: eliminação de ácaros, manchas de suor e odores para noites mais saudáveis. Seco no mesmo dia.`, checks: ['99% ácaros eliminados', 'Sem resíduos químicos', 'Seco no mesmo dia'] }),
+  'limpeza-tapetes':   city => ({ desc: `Tapetes de ${city} lavados em profundidade: fibras revitalizadas, cores recuperadas e alergénios eliminados. Recolha e entrega incluídas.`, checks: ['Fibras e cores revitalizadas', 'Alergénios eliminados', 'Recolha e entrega'] }),
+  'limpeza-cadeiras':  city => ({ desc: `Cadeiras estofadas em ${city} limpas com equipamento profissional: ideal para escritórios, restaurantes e residências. Resultado imediato.`, checks: ['Resultado imediato', 'Ideal para restaurantes', 'Sem resíduos'] }),
+  'limpeza-alcatifas': city => ({ desc: `Alcatifas de ${city} tratadas com extração profunda: poeira, ácaros e manchas removidos das fibras. Ideal para espaços comerciais e residências.`, checks: ['Extração profunda', 'Ideal para espaços comerciais', 'Seco rapidamente'] }),
+  'impermeabilizacao': city => ({ desc: `Proteção invisível aplicada em ${city} por especialistas: barreira duradoura contra líquidos e manchas. Totalmente ativa em 24 horas.`, checks: ['Barreira invisível e duradoura', 'Ativa em 24 horas', 'Proteção contra manchas'] }),
+};
 import { SERVICE_PACK_SLUGS } from "@/constants/servicePackSlugs";
 
 import heroSofaD              from "@/assets/hero-sofa-cleaning-new.webp";
@@ -286,17 +295,15 @@ const LocationServicePage = () => {
                     Resultado após {resultLabel} profissional
                   </h2>
                   <p className="text-white/70 text-sm md:text-base max-w-lg">
-                    {data.serviceSlug === 'impermeabilizacao' ? 'Proteção invisível aplicada por especialistas. Barreira duradoura contra líquidos e manchas.' : 'Extração profunda com equipamento profissional. Resultados visíveis no momento.'}
+                    {(RESULT_CONTENT[data.serviceSlug] ?? RESULT_CONTENT['limpeza-sofas'])(data.city).desc}
                   </p>
                   <div className="flex items-center gap-3 mt-4 flex-wrap">
-                    <div className="flex items-center gap-1.5">
-                      <CheckCircle className="w-4 h-4" style={{ color: "#D4AF37" }} />
-                      <span className="text-white/80 text-sm">Sem resíduos químicos</span>
-                    </div>
-                    <div className="flex items-center gap-1.5">
-                      <CheckCircle className="w-4 h-4" style={{ color: "#D4AF37" }} />
-                      <span className="text-white/80 text-sm">Seco em 4 a 6h</span>
-                    </div>
+                    {(RESULT_CONTENT[data.serviceSlug] ?? RESULT_CONTENT['limpeza-sofas'])(data.city).checks.map((check, i) => (
+                      <div key={i} className="flex items-center gap-1.5">
+                        <CheckCircle className="w-4 h-4" style={{ color: "#D4AF37" }} />
+                        <span className="text-white/80 text-sm">{check}</span>
+                      </div>
+                    ))}
                   </div>
                 </div>
               </div>
