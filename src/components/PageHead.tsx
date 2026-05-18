@@ -1,0 +1,289 @@
+import { useEffect } from "react";
+import { useLocation } from "react-router-dom";
+import { useTranslation } from "react-i18next";
+
+interface PageMeta {
+  title: string;
+  description: string;
+}
+
+const routeMeta: Record<string, { pt: PageMeta; en: PageMeta; es: PageMeta }> = {
+  "/": {
+    pt: {
+      title: "Kyro Clean Solutions – Limpeza Profunda & Impermeabilização de Estofos",
+      description: "Limpeza profunda de sofás, colchões, cadeiras e carpetes com extração profissional. Removemos manchas, odores e bactérias. Peça o seu orçamento.",
+    },
+    en: {
+      title: "Kyro Clean Solutions – Professional Deep Cleaning & Waterproofing",
+      description: "Professional deep cleaning of sofas, mattresses, chairs and carpets. We remove stains, odours and bacteria. Request your free quote.",
+    },
+    es: {
+      title: "Kyro Clean Solutions | Limpieza Profunda e Impermeabilización",
+      description: "Limpieza profunda profesional de sofás, colchones, sillas y alfombras. Eliminamos manchas, olores y bacterias. Solicite presupuesto.",
+    },
+  },
+  "/limpeza-sofas": {
+    pt: {
+      title: "Limpeza e Lavagem de Sofás ao Domicílio | Desde 39€ | Kyro Clean Solutions",
+      description: "Limpeza e lavagem profissional de sofás ao domicílio. Remoção de manchas, ácaros e odores com extração profissional. Resultados visíveis no momento. Porto, Lisboa e todo o país.",
+    },
+    en: {
+      title: "Sofa Cleaning & Washing Service | From €39 | Kyro Clean Solutions",
+      description: "Professional sofa cleaning and washing at your home. Stain, mite and odour removal with professional extraction equipment. Visible results on the spot.",
+    },
+    es: {
+      title: "Limpieza y Lavado de Sofás a Domicilio | Desde 39€ | Kyro Clean Solutions",
+      description: "Limpieza y lavado profesional de sofás a domicilio. Eliminación de manchas, ácaros y olores con extracción profesional.",
+    },
+  },
+  "/limpeza-colchoes": {
+    pt: {
+      title: "Limpeza e Higienização de Colchões | Desde 39€ | Kyro Clean Solutions",
+      description: "Higienização e lavagem profunda de colchões ao domicílio. Eliminamos ácaros, bactérias e odores para noites mais saudáveis. Porto, Lisboa e todo o país.",
+    },
+    en: {
+      title: "Mattress Cleaning & Sanitization | From €39 | Kyro Clean Solutions",
+      description: "Deep mattress cleaning and sanitization at your home. We eliminate mites, bacteria and odours for healthier nights.",
+    },
+    es: {
+      title: "Limpieza e Higienización de Colchones | Desde 39€ | Kyro Clean Solutions",
+      description: "Higienización y lavado profundo de colchones a domicilio. Eliminamos ácaros, bacterias y olores.",
+    },
+  },
+  "/limpeza-tapetes": {
+    pt: {
+      title: "Limpeza e Lavagem de Tapetes | Desde 5€/m² | Kyro Clean Solutions",
+      description: "Lavagem profissional de tapetes com extração profunda. Removemos sujidade, manchas e alergénios. Recolha e entrega disponível em todo o país.",
+    },
+    en: {
+      title: "Rug Cleaning & Washing | From €5/m² | Kyro Clean Solutions",
+      description: "Professional rug cleaning with deep professional extraction. We remove dirt, stains and allergens. Pick-up and delivery available.",
+    },
+    es: {
+      title: "Limpieza y Lavado de Alfombras | Desde 5€/m² | Kyro Clean Solutions",
+      description: "Lavado profesional de alfombras con extracción profunda. Eliminamos suciedad, manchas y alérgenos.",
+    },
+  },
+  "/limpeza-cadeiras": {
+    pt: {
+      title: "Limpeza e Lavagem de Cadeiras Estofadas | Desde 10€ | Kyro Clean Solutions",
+      description: "Limpeza e lavagem profissional de cadeiras estofadas ao domicílio. Ideal para escritórios, restaurantes e residências. Resultados no momento.",
+    },
+    en: {
+      title: "Upholstered Chair Cleaning | From €10 | Kyro Clean Solutions",
+      description: "Professional upholstered chair cleaning at your location. Ideal for offices, restaurants and homes. Instant results.",
+    },
+    es: {
+      title: "Limpieza y Lavado de Sillas Tapizadas | Desde 10€ | Kyro Clean Solutions",
+      description: "Limpieza profesional de sillas tapizadas a domicilio. Ideal para oficinas, restaurantes y hogares.",
+    },
+  },
+  "/limpeza-alcatifas": {
+    pt: {
+      title: "Limpeza e Lavagem de Alcatifas | Desde 3€/m² | Kyro Clean Solutions",
+      description: "Limpeza e lavagem profunda de alcatifas com extração profissional. Removemos sujidade acumulada e alergénios. Secagem rápida. Porto, Lisboa e todo o país.",
+    },
+    en: {
+      title: "Carpet Cleaning & Deep Wash | From €3/m² | Kyro Clean Solutions",
+      description: "Deep carpet cleaning and washing with professional extraction equipment. We remove accumulated dirt and allergens. Fast drying.",
+    },
+    es: {
+      title: "Limpieza y Lavado de Moquetas | Desde 3€/m² | Kyro Clean Solutions",
+      description: "Limpieza y lavado profundo de moquetas con extracción profesional. Eliminamos suciedad acumulada y alérgenos.",
+    },
+  },
+  "/impermeabilizacao": {
+    pt: {
+      title: "Impermeabilização de Estofos | Kyro Clean Solutions | Proteção até 10 anos",
+      description: "Impermeabilização profissional de sofás, cadeiras e tapetes. Proteção invisível contra manchas e líquidos com garantia até 10 anos.",
+    },
+    en: {
+      title: "Upholstery Waterproofing | Kyro Clean Solutions | Up to 10-Year Protection",
+      description: "Professional waterproofing for sofas, chairs and rugs. Invisible protection against stains and liquids with up to 10-year guarantee.",
+    },
+    es: {
+      title: "Impermeabilización de Tapizados | Kyro Clean Solutions | Protección hasta 10 años",
+      description: "Impermeabilización profesional de sofás, sillas y alfombras. Protección invisible contra manchas y líquidos.",
+    },
+  },
+  "/packs": {
+    pt: {
+      title: "Packs Limpeza + Impermeabilização | Kyro Clean Solutions | Até 15% Desconto",
+      description: "Packs exclusivos de limpeza e impermeabilização com até 15% de desconto. Proteja os seus estofos com o melhor preço.",
+    },
+    en: {
+      title: "Cleaning + Waterproofing Packs | Kyro Clean Solutions | Up to 15% Off",
+      description: "Exclusive cleaning and waterproofing packs with up to 15% discount. Protect your upholstery at the best price.",
+    },
+    es: {
+      title: "Packs Limpieza + Impermeabilización | Kyro Clean Solutions | Hasta 15% Descuento",
+      description: "Packs exclusivos de limpieza e impermeabilización con hasta 15% de descuento.",
+    },
+  },
+  "/blog": {
+    pt: {
+      title: "Blog Limpeza de Estofos | Dicas, Guias e Preços | Kyro Clean",
+      description: "Artigos especializados sobre limpeza de sofás, tapetes e colchões. Dicas profissionais, guias de manutenção e preços reais.",
+    },
+    en: {
+      title: "Upholstery Cleaning Blog | Tips, Guides & Prices | Kyro Clean",
+      description: "Expert articles on sofa, rug and mattress cleaning. Professional tips, maintenance guides and real prices.",
+    },
+    es: {
+      title: "Blog Limpieza de Tapizados | Consejos, Guías y Precios | Kyro Clean",
+      description: "Artículos especializados sobre limpieza de sofás, alfombras y colchones.",
+    },
+  },
+  "/perguntas-frequentes-limpeza-estofos": {
+    pt: {
+      title: "Perguntas Frequentes |Limpeza de Estofos | Kyro Clean Solutions",
+      description: "Respostas às 12 perguntas mais comuns sobre limpeza profissional de sofás, colchões e tapetes. Preços, duração, materiais e mais.",
+    },
+    en: {
+      title: "FAQ |Upholstery Cleaning | Kyro Clean Solutions",
+      description: "Answers to the 12 most common questions about professional sofa, mattress and rug cleaning.",
+    },
+    es: {
+      title: "Preguntas Frecuentes |Limpieza de Tapizados | Kyro Clean Solutions",
+      description: "Respuestas a las 12 preguntas más comunes sobre limpieza profesional.",
+    },
+  },
+  "/glossario-limpeza-estofos": {
+    pt: {
+      title: "Glossário de Limpeza de Estofos | Termos Técnicos | Kyro Clean",
+      description: "Dicionário completo com 15 termos técnicos de limpeza profissional de estofos. Saiba o que significa extração, impermeabilização e muito mais.",
+    },
+    en: {
+      title: "Upholstery Cleaning Glossary | Technical Terms | Kyro Clean",
+      description: "Complete dictionary with 15 technical terms for professional upholstery cleaning.",
+    },
+    es: {
+      title: "Glosario de Limpieza de Tapizados | Términos Técnicos | Kyro Clean",
+      description: "Diccionario completo con términos técnicos de limpieza profesional.",
+    },
+  },
+  "/politica-de-privacidade": {
+    pt: {
+      title: "Política de Privacidade | Kyro Clean Solutions",
+      description: "Consulte a Política de Privacidade da Kyro Clean Solutions. Saiba como recolhemos, utilizamos e protegemos os seus dados pessoais.",
+    },
+    en: {
+      title: "Privacy Policy | Kyro Clean Solutions",
+      description: "Read the Kyro Clean Solutions Privacy Policy. Learn how we collect, use and protect your personal data.",
+    },
+    es: {
+      title: "Política de Privacidad | Kyro Clean Solutions",
+      description: "Consulte la Política de Privacidad de Kyro Clean Solutions.",
+    },
+  },
+  "/faq": {
+    pt: {
+      title: "Perguntas Frequentes | Kyro Clean Solutions",
+      description: "Respostas às perguntas mais comuns sobre os nossos serviços de limpeza e impermeabilização de estofos.",
+    },
+    en: {
+      title: "FAQ | Kyro Clean Solutions",
+      description: "Answers to the most common questions about our upholstery cleaning and waterproofing services.",
+    },
+    es: {
+      title: "Preguntas Frecuentes | Kyro Clean Solutions",
+      description: "Respuestas a las preguntas más comunes sobre nuestros servicios de limpieza e impermeabilización.",
+    },
+  },
+  "/testemunhos": {
+    pt: {
+      title: "Testemunhos de Clientes | Kyro Clean Solutions | 5.0 Google",
+      description: "Veja o que dizem os nossos clientes. Avaliação 5.0 no Google com mais de 1000 clientes satisfeitos.",
+    },
+    en: {
+      title: "Client Testimonials | Kyro Clean Solutions | 5.0 Google",
+      description: "See what our clients say. 5.0 Google rating with over 1000 satisfied clients.",
+    },
+    es: {
+      title: "Testimonios de Clientes | Kyro Clean Solutions | 5.0 Google",
+      description: "Vea lo que dicen nuestros clientes. Valoración 5.0 en Google con más de 1000 clientes satisfechos.",
+    },
+  },
+  "/nosso-processo": {
+    pt: {
+      title: "O Nosso Processo | Kyro Clean Solutions",
+      description: "Conheça o nosso processo de limpeza profissional. Tecnologia avançada, produtos certificados e resultados garantidos.",
+    },
+    en: {
+      title: "Our Process | Kyro Clean Solutions",
+      description: "Learn about our professional cleaning process. Advanced technology, certified products and guaranteed results.",
+    },
+    es: {
+      title: "Nuestro Proceso | Kyro Clean Solutions",
+      description: "Conozca nuestro proceso de limpieza profesional. Tecnología avanzada, productos certificados y resultados garantizados.",
+    },
+  },
+};
+
+const DOMAIN = "https://www.cleansolutions.com.pt";
+
+const PageHead = () => {
+  const location = useLocation();
+  const { i18n } = useTranslation();
+  const lang = (i18n.language || "pt").substring(0, 2) as "pt" | "en" | "es";
+
+  useEffect(() => {
+    const path = location.pathname;
+    const meta = routeMeta[path]?.[lang] || routeMeta[path]?.pt;
+
+    if (meta) {
+      document.title = meta.title;
+
+      // Meta description
+      let descTag = document.querySelector('meta[name="description"]');
+      if (descTag) descTag.setAttribute("content", meta.description);
+
+      // OG tags
+      const ogTitle = document.querySelector('meta[property="og:title"]');
+      if (ogTitle) ogTitle.setAttribute("content", meta.title);
+      const ogDesc = document.querySelector('meta[property="og:description"]');
+      if (ogDesc) ogDesc.setAttribute("content", meta.description);
+      const ogUrl = document.querySelector('meta[property="og:url"]');
+      if (ogUrl) ogUrl.setAttribute("content", `${DOMAIN}${path}`);
+
+      // Twitter tags
+      const twTitle = document.querySelector('meta[name="twitter:title"]');
+      if (twTitle) twTitle.setAttribute("content", meta.title);
+      const twDesc = document.querySelector('meta[name="twitter:description"]');
+      if (twDesc) twDesc.setAttribute("content", meta.description);
+
+      // Canonical
+      let canonical = document.querySelector('link[rel="canonical"]');
+      if (canonical) canonical.setAttribute("href", `${DOMAIN}${path}`);
+    }
+
+    // Hreflang tags
+    const hreflangLangs = ["pt", "en", "es"];
+    // Remove old hreflang tags
+    document.querySelectorAll('link[hreflang]').forEach(el => el.remove());
+    
+    // Add new hreflang tags
+    hreflangLangs.forEach(lng => {
+      const link = document.createElement("link");
+      link.rel = "alternate";
+      link.hreflang = lng;
+      link.href = `${DOMAIN}${path}${lng !== "pt" ? `?lang=${lng}` : ""}`;
+      document.head.appendChild(link);
+    });
+
+    // x-default
+    const xDefault = document.createElement("link");
+    xDefault.rel = "alternate";
+    xDefault.setAttribute("hreflang", "x-default");
+    xDefault.href = `${DOMAIN}${path}`;
+    document.head.appendChild(xDefault);
+
+    return () => {
+      document.querySelectorAll('link[hreflang]').forEach(el => el.remove());
+    };
+  }, [location.pathname, lang]);
+
+  return null;
+};
+
+export default PageHead;

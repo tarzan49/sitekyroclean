@@ -1,0 +1,598 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer utilities {
+  .bg-kyro-green,
+  .bg-checker-dark {
+    background-color: #071a12;
+    background-image:
+      linear-gradient(45deg, rgba(212,175,55,0.04) 25%, transparent 25%),
+      linear-gradient(-45deg, rgba(212,175,55,0.04) 25%, transparent 25%),
+      linear-gradient(45deg, transparent 75%, rgba(212,175,55,0.04) 75%),
+      linear-gradient(-45deg, transparent 75%, rgba(212,175,55,0.04) 75%);
+    background-size: 28px 28px;
+    background-position: 0 0, 0 14px, 14px -14px, -14px 0px;
+  }
+
+  .bg-checker-modal {
+    background-color: #051510;
+    background-image:
+      linear-gradient(45deg, rgba(212,175,55,0.10) 25%, transparent 25%),
+      linear-gradient(-45deg, rgba(212,175,55,0.10) 25%, transparent 25%),
+      linear-gradient(45deg, transparent 75%, rgba(212,175,55,0.10) 75%),
+      linear-gradient(-45deg, transparent 75%, rgba(212,175,55,0.10) 75%);
+    background-size: 24px 24px;
+    background-position: 0 0, 0 12px, 12px -12px, -12px 0px;
+  }
+}
+
+/* Premium Design System - Clean Solutions
+   All colors MUST be HSL for consistency.
+*/
+
+@layer base {
+  :root {
+    /* ── Kyro Brand Palette ────────────────────────────────────────────────
+       Forest Green (uniform) + Gold (logo) + Cream Off-white (luxury base).
+       Dark sections (hero, black bar, overlays) keep their own hex values.
+    ── */
+    --background: 60 30% 99%;      /* #FDFDF9 — cream off-white, luxury feel  */
+    --foreground: 240 15% 15%;     /* near-black anthracite — max contrast     */
+
+    --card: 0 0% 100%;             /* pure white cards                         */
+    --card-foreground: 240 15% 15%;
+
+    --popover: 0 0% 100%;          /* pure white modals, dropdowns             */
+    --popover-foreground: 240 15% 15%;
+
+    --primary: 140 50% 20%;        /* Forest Green — #1A4E30                   */
+    --primary-foreground: 0 0% 98%;
+
+    --secondary: 140 25% 94%;      /* light green wash for secondary surfaces  */
+    --secondary-foreground: 140 50% 20%;
+
+    --muted: 140 15% 95%;          /* very light green-tinted muted            */
+    --muted-foreground: 240 12% 42%;
+
+    --accent: 47 50% 53%;          /* Gold — same as --gold                    */
+    --accent-foreground: 240 15% 15%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 140 15% 88%;         /* soft green-tinted border                 */
+    --input: 140 15% 88%;
+    --ring: 47 50% 53%;            /* gold focus ring                          */
+
+    /* Exposed as RGB for rgba() usage in JS/inline styles */
+    --brand-border-rgb: 26 78 48;
+
+    --radius: 0.75rem;
+
+    /* Premium Brand Colors */
+    --teal: 172 40% 18%;
+    --teal-dark: 172 45% 14%;
+    --gold: 47 50% 53%;
+    --gold-light: 47 55% 60%;
+    --navy: 190 45% 15%;
+    --turquoise: 172 40% 18%;
+    --forest-green: 140 50% 20%;   /* #1A4E30 — Forest Green principal         */
+    --forest-green-light: 140 40% 95%; /* very light green bg wash             */
+
+    /* Premium Gradients */
+    --gradient-teal: linear-gradient(135deg, hsl(172 40% 18%), hsl(172 45% 14%));
+    --gradient-turquoise: linear-gradient(135deg, hsl(172 40% 18%), hsl(172 45% 14%));
+    --gradient-overlay: linear-gradient(135deg, hsl(140 50% 20% / 0.85), hsl(140 55% 14% / 0.9));
+    --gradient-gold: linear-gradient(135deg, hsl(47 50% 53%), hsl(47 55% 60%));
+
+    /* Premium Shadows */
+    --shadow-soft: 0 2px 10px hsl(140 50% 20% / 0.08);
+    --shadow-medium: 0 4px 20px hsl(140 50% 20% / 0.12);
+    --shadow-large: 0 10px 40px hsl(140 50% 20% / 0.18);
+    --shadow-premium: 0 8px 30px hsl(140 50% 20% / 0.15), 0 2px 8px hsl(140 50% 20% / 0.1);
+
+    --transition-smooth: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: 'Inter', system-ui, sans-serif;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Kyro Typography System — Playfair for all section/page headings */
+  h1, h2 {
+    font-family: 'Playfair Display', Georgia, serif;
+    line-height: 1.4;
+    letter-spacing: 0.02em;
+  }
+
+  h3 {
+    font-family: 'Playfair Display', Georgia, serif;
+    line-height: 1.4;
+  }
+
+  /* Better touch targets on mobile - minimum 44px for accessibility */
+  button, a, [role="button"] {
+    @apply touch-manipulation;
+  }
+  
+  /* Ensure minimum touch target size for interactive elements on mobile */
+  @media (max-width: 768px) {
+    button, 
+    a, 
+    [role="button"],
+    input[type="checkbox"],
+    input[type="radio"],
+    select {
+      min-height: 44px;
+      min-width: 44px;
+    }
+    
+    /* Form inputs should be at least 48px tall for easy touch */
+    input[type="text"],
+    input[type="email"],
+    input[type="tel"],
+    input[type="number"],
+    textarea,
+    select {
+      min-height: 48px;
+      font-size: 16px; /* Prevents iOS zoom on focus */
+    }
+  }
+}
+
+/* ── Kyro base — unlayered, beats everything ────────────────────────────────
+   Cream off-white (#FDFDF9) as the luxury base. No purple anywhere.
+── */
+html,
+body,
+#root {
+  background-color: #FDFDF9 !important;
+}
+
+@layer utilities {
+  .card-premium {
+    border: 1px solid rgba(26, 78, 48, 0.10);
+  }
+  .card-mobile {
+    border: 1px solid rgba(26, 78, 48, 0.08);
+  }
+}
+
+/* Premium Typography */
+@layer utilities {
+  .text-premium-title {
+    @apply text-3xl md:text-4xl lg:text-5xl font-bold leading-tight tracking-tight;
+  }
+  
+  .text-premium-subtitle {
+    @apply text-lg md:text-xl font-semibold text-gold;
+  }
+  
+  .text-premium-body {
+    @apply text-base md:text-lg leading-relaxed;
+  }
+
+  .text-mobile-hero {
+    @apply text-3xl leading-tight;
+  }
+  
+  @screen md {
+    .text-mobile-hero {
+      @apply text-5xl leading-tight;
+    }
+  }
+  
+  .text-mobile-section {
+    @apply text-2xl leading-snug;
+  }
+  
+  @screen md {
+    .text-mobile-section {
+      @apply text-4xl leading-snug;
+    }
+  }
+  
+  /* Premium Button Styles */
+  .btn-premium {
+    @apply relative px-8 py-4 font-semibold rounded-xl transition-all duration-250 ease-out;
+    @apply hover:scale-[1.03] hover:shadow-lg active:scale-[0.98];
+  }
+  
+  .btn-mobile-cta {
+    @apply w-full py-5 px-6 text-base font-bold rounded-full;
+  }
+  
+  @screen sm {
+    .btn-mobile-cta {
+      @apply w-auto py-6 px-10 text-lg;
+    }
+  }
+  
+  /* Premium Card Styles */
+  .card-premium {
+    @apply bg-card rounded-xl md:rounded-2xl shadow-md hover:shadow-xl transition-all duration-250;
+  }
+  
+  .section-mobile {
+    @apply py-12 px-4;
+  }
+  
+  @screen md {
+    .section-mobile {
+      @apply py-16 px-4;
+    }
+  }
+  
+  .card-mobile {
+    @apply p-5 rounded-xl;
+  }
+  
+  @screen md {
+    .card-mobile {
+      @apply p-6 rounded-2xl;
+    }
+  }
+  
+  .touch-active {
+    @apply active:scale-[0.98] active:opacity-90 transition-transform duration-150;
+  }
+  
+  /* Gold underline decoration */
+  .gold-underline {
+    @apply relative inline-block;
+  }
+  
+  .gold-underline::after {
+    content: '';
+    @apply absolute bottom-0 left-0 w-full h-0.5 bg-gold rounded-full;
+    transform: scaleX(0);
+    transform-origin: bottom right;
+    transition: transform 0.3s ease;
+  }
+  
+  .gold-underline:hover::after {
+    transform: scaleX(1);
+    transform-origin: bottom left;
+  }
+}
+
+/* Premium Animations */
+@keyframes confetti-fall {
+  0% {
+    transform: translateY(-10px) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(100vh) rotate(720deg);
+    opacity: 0;
+  }
+}
+
+.animate-confetti-fall {
+  animation: confetti-fall linear forwards;
+}
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes pulse-border {
+  0%, 100% {
+    box-shadow: 0 0 8px rgba(212, 175, 55, 0.10);
+    border-color: rgba(212, 175, 55, 0.35);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(212, 175, 55, 0.28);
+    border-color: rgba(212, 175, 55, 0.75);
+  }
+}
+
+.animate-pulse-border {
+  animation: pulse-border 2s ease-in-out infinite;
+}
+
+@keyframes glow-pulse {
+  0%, 100% {
+    opacity: 0.5;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.05);
+  }
+}
+
+.animate-glow-pulse {
+  animation: glow-pulse 2s ease-in-out infinite;
+}
+
+/* Snow Animation */
+@keyframes snow {
+  0% {
+    transform: translateY(-10px) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(100vh) rotate(360deg);
+    opacity: 0.3;
+  }
+}
+
+.animate-snow {
+  animation: snow linear infinite;
+}
+
+/* Premium CTA Pulse Animation */
+@keyframes ctaPulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.04);
+  }
+}
+
+/* Subtle pulse for vibrant CTA */
+@keyframes pulse-subtle {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(190, 180, 125, 0.3), 0 10px 40px rgba(0,0,0,0.2);
+  }
+  50% {
+    box-shadow: 0 0 40px rgba(190, 180, 125, 0.5), 0 10px 50px rgba(0,0,0,0.3);
+  }
+}
+
+.animate-pulse-subtle {
+  animation: pulse-subtle 2s ease-in-out infinite;
+}
+
+/* ================================================
+   PREMIUM MICRO-INTERACTIONS & UX POLISH
+   ================================================ */
+
+/* Smooth button press feedback */
+@keyframes button-press {
+  0% { transform: scale(1); }
+  50% { transform: scale(0.97); }
+  100% { transform: scale(1); }
+}
+
+.btn-press {
+  @apply transition-all duration-150 ease-out;
+}
+
+.btn-press:active {
+  animation: button-press 0.15s ease-out;
+}
+
+/* Loading spinner with gold accent */
+@keyframes spin-gold {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.spinner-gold {
+  @apply w-5 h-5 border-2 border-gold/30 border-t-gold rounded-full;
+  animation: spin-gold 0.8s linear infinite;
+}
+
+/* Skeleton loading animation */
+@keyframes skeleton-loading {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.skeleton {
+  @apply bg-gradient-to-r from-secondary via-secondary/50 to-secondary bg-[length:200%_100%];
+  animation: skeleton-loading 1.5s ease-in-out infinite;
+}
+
+/* Fade slide in animation for modals and content */
+@keyframes fade-slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-slide-up {
+  animation: fade-slide-up 0.3s ease-out forwards;
+}
+
+/* Scale in animation for popups */
+@keyframes scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-scale-in {
+  animation: scale-in 0.2s ease-out forwards;
+}
+
+/* Success checkmark animation */
+@keyframes checkmark-draw {
+  0% { stroke-dashoffset: 100; }
+  100% { stroke-dashoffset: 0; }
+}
+
+.checkmark-animate {
+  stroke-dasharray: 100;
+  stroke-dashoffset: 100;
+  animation: checkmark-draw 0.5s ease-out 0.2s forwards;
+}
+
+/* Focus ring for accessibility */
+.focus-ring {
+  @apply focus:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 focus-visible:ring-offset-background;
+}
+
+/* Smooth scroll behavior */
+html {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Touch feedback for mobile */
+@media (hover: none) and (pointer: coarse) {
+  .touch-feedback {
+    @apply active:bg-black/5 active:scale-[0.98] transition-transform duration-100;
+  }
+  
+  button, a, [role="button"] {
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+
+/* Improved scrollbar for quiz modal - edge-aligned like native browsers */
+.quiz-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: hsl(var(--gold)) transparent;
+  /* Remove right padding so scrollbar aligns to edge */
+  padding-right: 0 !important;
+}
+
+.quiz-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.quiz-scrollbar::-webkit-scrollbar-track {
+  background: hsl(var(--muted) / 0.3);
+  border-radius: 0 0 0.75rem 0; /* Match modal border-radius on bottom-right */
+}
+
+.quiz-scrollbar::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, hsl(var(--gold)), hsl(var(--gold-light)));
+  border-radius: 3px;
+  border: none;
+}
+
+.quiz-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, hsl(var(--gold-light)), hsl(var(--gold)));
+}
+
+/* Inner content wrapper for quiz - provides left padding only */
+.quiz-content-inner {
+  padding-right: 1rem;
+}
+
+@media (min-width: 640px) {
+  .quiz-content-inner {
+    padding-right: 1.5rem;
+  }
+}
+
+/* Prevent layout shifts during loading */
+.aspect-video { aspect-ratio: 16 / 9; }
+.aspect-square { aspect-ratio: 1 / 1; }
+.aspect-hero { aspect-ratio: 16 / 10; }
+
+/* GPU acceleration for smooth animations */
+.gpu-accelerated {
+  transform: translateZ(0);
+  will-change: transform;
+  backface-visibility: hidden;
+}
+
+/* ── Scroll Focus Reveal ────────────────────────────────────────────────── */
+
+/* Base: transitions enabled once sr-ready is applied by JS */
+section.sr-ready {
+  will-change: opacity, filter;
+}
+
+section.sr-ready:not(.sr-no-transition) {
+  transition:
+    opacity  0.38s ease,
+    filter   0.38s ease,
+    transform 0.38s ease;
+}
+
+/* Active section — full focus */
+section.sr-active {
+  opacity: 1 !important;
+  filter: blur(0px) !important;
+  transform: translateY(0) !important;
+}
+
+/* Inactive sections — dimmed + blur */
+section.sr-inactive {
+  opacity: 0.45 !important;
+  filter: blur(1.2px) !important;
+}
+
+/* Desktop: slightly stronger effect */
+@media (min-width: 768px) {
+  section.sr-inactive {
+    opacity: 0.38 !important;
+    filter: blur(1.8px) !important;
+  }
+  section.sr-ready:not(.sr-no-transition) {
+    transition:
+      opacity  0.42s ease,
+      filter   0.42s ease,
+      transform 0.42s ease;
+  }
+}
+
+/* Respect reduced-motion: drop blur and transform, keep opacity only */
+@media (prefers-reduced-motion: reduce) {
+  section.sr-inactive {
+    filter: none !important;
+    transform: none !important;
+    opacity: 0.5 !important;
+  }
+  section.sr-active { filter: none !important; }
+  section.sr-ready:not(.sr-no-transition) {
+    transition: opacity 0.2s ease;
+  }
+}

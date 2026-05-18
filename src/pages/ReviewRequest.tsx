@@ -1,0 +1,119 @@
+import { useSearchParams } from "react-router-dom";
+import { Star, ExternalLink, MessageCircle, Heart } from "lucide-react";
+import { GOOGLE_REVIEW_URL } from "@/constants/google";
+
+const serviceLabels: Record<string, string> = {
+  sofa: "sofá",
+  colchao: "colchão",
+  tapete: "tapete",
+  cadeiras: "cadeiras",
+  alcatifa: "alcatifa",
+  impermeabilizacao: "impermeabilização",
+};
+
+const ReviewRequest = () => {
+  const [params] = useSearchParams();
+  const nome = params.get("nome") || "Cliente";
+  const cidade = params.get("cidade") || "Porto";
+  const servicoRaw = params.get("servico") || "sofa";
+  const servico = serviceLabels[servicoRaw] ?? servicoRaw;
+
+  const googleReviewUrl = GOOGLE_REVIEW_URL;
+
+  const schema = {
+    "@context": "https://schema.org",
+    "@type": "LocalBusiness",
+    "name": "Kyro Clean Solutions",
+    "url": "https://www.cleansolutions.com.pt",
+    "telephone": "+351925530647",
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingValue": "5.0",
+      "bestRating": "5",
+      "worstRating": "1",
+      "reviewCount": "50",
+    },
+  };
+
+  return (
+    <div className="min-h-screen flex items-center justify-center px-4 py-12 relative overflow-hidden bg-checker-dark">
+      <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[400px] h-[250px] rounded-full pointer-events-none" style={{ background: "radial-gradient(ellipse, rgba(16,185,129,0.08) 0%, transparent 70%)" }} />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+      />
+
+      <div className="relative z-10 w-full max-w-sm flex flex-col items-center text-center">
+
+        {/* Heart animation */}
+        <div className="relative mb-6">
+          <div className="absolute inset-0 rounded-full bg-gold/10 animate-ping" style={{ animationDuration: "2.5s" }} />
+          <div className="relative w-20 h-20 rounded-full bg-gradient-to-br from-gold/20 to-gold/5 border border-gold/30 flex items-center justify-center shadow-[0_0_40px_rgba(212,175,55,0.18)]">
+            <Heart className="w-9 h-9 text-gold fill-gold/30" />
+          </div>
+        </div>
+
+        {/* Brand */}
+        <p className="text-gold text-[10px] font-bold tracking-[0.28em] uppercase mb-3">
+          KYRO CLEAN SOLUTIONS
+        </p>
+
+        {/* Personalized message */}
+        <h1 className="font-playfair text-2xl font-bold text-white leading-snug mb-3">
+          Obrigado, {nome}!
+        </h1>
+        <p className="text-white/60 text-base leading-relaxed mb-8">
+          Foi um prazer limpar o seu <span className="text-white font-semibold">{servico}</span> em <span className="text-white font-semibold">{cidade}</span>.
+          Esperamos que tenha ficado completamente satisfeito!
+        </p>
+
+        {/* Stars */}
+        <div className="flex items-center justify-center gap-1 mb-3">
+          {[...Array(5)].map((_, i) => (
+            <Star key={i} className="w-7 h-7 text-gold fill-gold" />
+          ))}
+        </div>
+        <p className="text-white/40 text-xs mb-8">
+          A sua opinião ajuda mais clientes em {cidade} a encontrar-nos
+        </p>
+
+        {/* Google Review CTA */}
+        <a
+          href={googleReviewUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="w-full flex items-center justify-center gap-3 bg-white hover:bg-white/90 active:bg-white/80 text-[#1a1a2e] font-bold text-base h-14 rounded-2xl transition-all active:scale-[0.98] touch-manipulation shadow-[0_4px_24px_rgba(255,255,255,0.12)] mb-4"
+        >
+          <svg viewBox="0 0 24 24" className="w-5 h-5 flex-shrink-0" aria-hidden="true">
+            <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/>
+            <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+            <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66 2.84z" fill="#FBBC05"/>
+            <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+          </svg>
+          Deixar avaliação no Google
+          <ExternalLink className="w-4 h-4 opacity-60" />
+        </a>
+
+        {/* WhatsApp fallback */}
+        <a
+          href="https://wa.me/351925530647"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="w-full flex items-center justify-center gap-2 bg-white/5 hover:bg-white/10 border border-white/10 text-white/70 text-sm h-11 rounded-xl transition-colors touch-manipulation"
+        >
+          <MessageCircle className="w-4 h-4 text-[#25D366]" />
+          Ou partilhar feedback por WhatsApp
+        </a>
+
+        {/* Incentive note */}
+        <p className="text-white/25 text-[11px] mt-8 leading-relaxed max-w-xs">
+          A sua avaliação ajuda outros clientes em {cidade} a tomar uma decisão informada
+          e permite-nos continuar a melhorar o serviço. Demora menos de 1 minuto.
+        </p>
+      </div>
+    </div>
+  );
+};
+
+
+export default ReviewRequest;

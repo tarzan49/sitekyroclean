@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="pt">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Kyro Clean" />
+  <meta name="msvalidate.01" content="7A85986180F9F6BB2E5789D519F80386" />
+  
+  <!-- Critical CSS & Preloads for LCP optimization -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Inter:wght@300;400;500;600;700&display=swap">
+  
+  <!-- DNS prefetch for external resources -->
+  <link rel="dns-prefetch" href="https://www.googletagmanager.com">
+  <link rel="dns-prefetch" href="https://www.google-analytics.com">
+  
+  <!-- Critical hero image preload for LCP (Slide 0 — desktop e mobile) -->
+  <link rel="preload" as="image" href="/images/fotos%20hero/imagemvinhopc.webp" fetchpriority="high" media="(min-width: 768px)">
+  <link rel="preload" as="image" href="/images/fotos%20hero/imagemvinhoiphone.webp" fetchpriority="high" media="(max-width: 767px)">
+  
+  <!-- Critical inline CSS for faster FCP -->
+  <style>
+    /* Prevent layout shift */
+    html, body { margin: 0; padding: 0; }
+    #root { min-height: 100vh; }
+    /* Critical loading state */
+    .loading-skeleton { background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; }
+    @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
+  </style>
+  
+  <!-- Google tag (gtag.js) - GA4 + Google Ads -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-T45T5FBNC3"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    // GDPR Consent Mode v2 — default denied until user accepts
+    gtag('consent', 'default', {
+      analytics_storage: 'denied',
+      ad_storage: 'denied',
+      ad_user_data: 'denied',
+      ad_personalization: 'denied',
+      wait_for_update: 500
+    });
+    gtag('config', 'G-T45T5FBNC3');
+    gtag('config', 'AW-17779872363');
+  </script>
+  
+  <title>Limpeza de Sofás Porto | Higienização de Estofos – Kyro Clean Solutions</title>
+  <meta name="description" content="Limpeza de Sofás Porto e Higienização de Estofos ao domicílio. Eliminamos 99% de bactérias, ácaros e manchas com produtos certificados. Orçamento grátis em 30 segundos. Serve Porto, Matosinhos, Gaia e Grande Porto.">
+  
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://www.cleansolutions.com.pt/" />
+  
+  
+  <meta property="og:image" content="https://storage.googleapis.com/gpt-engineer-file-uploads/rrUI7PPgwCVOW219vDV91NUrcw13/social-images/social-1774368098278-ChatGPT_Image_Mar_24,_2026,_04_01_20_PM.webp">
+  <meta property="og:locale" content="pt_PT" />
+  <meta property="og:site_name" content="Kyro Clean Solutions" />
+  
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:site" content="@KyroClean" />
+  
+  
+  <meta name="twitter:image" content="https://storage.googleapis.com/gpt-engineer-file-uploads/rrUI7PPgwCVOW219vDV91NUrcw13/social-images/social-1774368098278-ChatGPT_Image_Mar_24,_2026,_04_01_20_PM.webp">
+
+  <!-- Favicon and theme -->
+  <link rel="manifest" href="/manifest.json" />
+  <link rel="icon" type="image/png" sizes="48x48" href="/favicon.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="/favicon-192.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="/favicon-512.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <meta name="theme-color" content="#071a12">
+  <link rel="canonical" href="https://www.cleansolutions.com.pt/">
+
+  <!-- Structured Data - LocalBusiness -->
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "LocalBusiness",
+      "name": "Kyro Clean Solutions",
+      "image": "https://www.cleansolutions.com.pt/assets/kyro-logo.png",
+      "@id": "https://www.cleansolutions.com.pt",
+      "url": "https://www.cleansolutions.com.pt",
+      "telephone": "+351925530647",
+      "email": "cleansolutions.pt25@gmail.com",
+      "priceRange": "€€",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "R. de António Cardoso 263",
+        "addressLocality": "Porto",
+        "postalCode": "4150-081",
+        "addressCountry": "PT"
+      },
+      "geo": {
+        "@type": "GeoCoordinates",
+        "latitude": 41.1579,
+        "longitude": -8.6291
+      },
+      "openingHoursSpecification": {
+        "@type": "OpeningHoursSpecification",
+        "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+        "opens": "08:00",
+        "closes": "00:00"
+      },
+      "sameAs": ["https://www.instagram.com/kyroclean.pt", "https://www.facebook.com/kyroclean", "https://www.cleansolutions.com.pt"],
+      "areaServed": [
+        {"@type": "City", "name": "Porto"},
+        {"@type": "City", "name": "Matosinhos"},
+        {"@type": "City", "name": "Maia"},
+        {"@type": "City", "name": "Vila Nova de Gaia"},
+        {"@type": "City", "name": "Gondomar"},
+        {"@type": "City", "name": "Valongo"},
+        {"@type": "City", "name": "Póvoa de Varzim"},
+        {"@type": "City", "name": "Vila do Conde"},
+        {"@type": "City", "name": "Braga"},
+        {"@type": "City", "name": "Guimarães"},
+        {"@type": "City", "name": "Lisboa"},
+        {"@type": "City", "name": "Cascais"},
+        {"@type": "City", "name": "Oeiras"},
+        {"@type": "City", "name": "Sintra"},
+        {"@type": "Country", "name": "Portugal"}
+      ],
+      "hasOfferCatalog": {
+        "@type": "OfferCatalog",
+        "name": "Serviços de Limpeza Profissional",
+        "itemListElement": [
+          {"@type": "Offer", "itemOffered": {"@type": "Service", "name": "Limpeza de Sofás", "description": "Limpeza profunda de sofás com remoção de manchas, ácaros e odores"}},
+          {"@type": "Offer", "itemOffered": {"@type": "Service", "name": "Limpeza de Colchões", "description": "Higienização profunda de colchões com eliminação de ácaros"}},
+          {"@type": "Offer", "itemOffered": {"@type": "Service", "name": "Limpeza de Carpetes", "description": "Limpeza profissional de carpetes com remoção de sujidade"}},
+          {"@type": "Offer", "itemOffered": {"@type": "Service", "name": "Limpeza de Cadeiras", "description": "Limpeza profissional de cadeiras estofadas"}},
+          {"@type": "Offer", "itemOffered": {"@type": "Service", "name": "Limpeza de Alcatifas", "description": "Limpeza profunda de alcatifas e tapetes"}},
+          {"@type": "Offer", "itemOffered": {"@type": "Service", "name": "Impermeabilização", "description": "Proteção contra manchas e líquidos para estofos"}}
+        ]
+      },
+      "aggregateRating": {"@type": "AggregateRating", "ratingValue": "5", "reviewCount": "51"}
+    }
+  </script>
+
+  <!-- Structured Data - WebSite -->
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "Kyro Clean Solutions",
+      "url": "https://www.cleansolutions.com.pt"
+    }
+  </script>
+
+  <!-- Structured Data - BreadcrumbList -->
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {"@type": "ListItem", "position": 1, "name": "Início", "item": "https://www.cleansolutions.com.pt"},
+        {"@type": "ListItem", "position": 2, "name": "Limpeza e Lavagem de Sofás", "item": "https://www.cleansolutions.com.pt/limpeza-sofas"},
+        {"@type": "ListItem", "position": 3, "name": "Limpeza e Lavagem de Colchões", "item": "https://www.cleansolutions.com.pt/limpeza-colchoes"},
+        {"@type": "ListItem", "position": 4, "name": "Limpeza e Lavagem de Tapetes", "item": "https://www.cleansolutions.com.pt/limpeza-tapetes"},
+        {"@type": "ListItem", "position": 5, "name": "Limpeza e Lavagem de Cadeiras", "item": "https://www.cleansolutions.com.pt/limpeza-cadeiras"},
+        {"@type": "ListItem", "position": 6, "name": "Limpeza e Lavagem de Alcatifas", "item": "https://www.cleansolutions.com.pt/limpeza-alcatifas"},
+        {"@type": "ListItem", "position": 7, "name": "Impermeabilização", "item": "https://www.cleansolutions.com.pt/impermeabilizacao"},
+        {"@type": "ListItem", "position": 8, "name": "Packs", "item": "https://www.cleansolutions.com.pt/packs"}
+      ]
+    }
+  </script>
+
+  <!-- Structured Data - Service -->
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Service",
+      "serviceType": "Limpeza Profissional de Estofos",
+      "provider": {
+        "@type": "LocalBusiness",
+        "name": "Kyro Clean Solutions",
+        "url": "https://www.cleansolutions.com.pt"
+      },
+      "areaServed": {"@type": "Country", "name": "Portugal"},
+      "hasOfferCatalog": {
+        "@type": "OfferCatalog",
+        "name": "Serviços Kyro Clean Solutions",
+        "itemListElement": [
+          {"@type": "Offer", "itemOffered": {"@type": "Service", "name": "Limpeza de Sofás"}, "priceSpecification": {"@type": "PriceSpecification", "price": "39", "priceCurrency": "EUR"}},
+          {"@type": "Offer", "itemOffered": {"@type": "Service", "name": "Limpeza de Cadeiras"}, "priceSpecification": {"@type": "PriceSpecification", "price": "10", "priceCurrency": "EUR"}},
+          {"@type": "Offer", "itemOffered": {"@type": "Service", "name": "Limpeza de Colchões"}, "priceSpecification": {"@type": "PriceSpecification", "price": "29", "priceCurrency": "EUR"}}
+        ]
+      }
+    }
+  </script>
+  <meta property="og:title" content="Limpeza de Sofás Porto | Higienização de Estofos – Kyro Clean Solutions">
+  <meta name="twitter:title" content="Limpeza de Sofás Porto | Higienização de Estofos – Kyro Clean Solutions">
+  <meta property="og:description" content="Limpeza de Sofás Porto e Higienização de Estofos ao domicílio. Eliminamos 99% de bactérias, ácaros e manchas. Orçamento grátis em 30 segundos. Serve Porto, Matosinhos, Gaia e Grande Porto.">
+  <meta name="twitter:description" content="Limpeza de Sofás Porto e Higienização de Estofos ao domicílio. Eliminamos 99% de bactérias, ácaros e manchas. Orçamento grátis em 30 segundos. Serve Porto, Matosinhos, Gaia e Grande Porto.">
+</head>
+
+<body>
+  <div id="root"></div>
+  <script type="module" src="/src/main.tsx"></script>
+</body>
+
+</html>

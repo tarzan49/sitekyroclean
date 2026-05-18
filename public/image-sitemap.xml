@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+  <url>
+    <loc>https://www.cleansolutions.pt/</loc>
+    <image:image>
+      <image:loc>https://www.cleansolutions.pt/assets/logo.webp</image:loc>
+      <image:caption>Logotipo Clean Solutions – Limpeza Profissional de Estofos Portugal</image:caption>
+      <image:title>Clean Solutions Logo</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://www.cleansolutions.pt/assets/hero-background.jpg</image:loc>
+      <image:caption>Técnico Clean Solutions a limpar sofá – Limpeza profissional de estofos</image:caption>
+      <image:title>Técnico Clean Solutions a limpar sofá</image:title>
+    </image:image>
+  </url>
+  
+  <url>
+    <loc>https://www.cleansolutions.pt/limpeza-sofas</loc>
+    <image:image>
+      <image:loc>https://www.cleansolutions.pt/assets/hero-sofa-cleaning-new.png</image:loc>
+      <image:caption>Limpeza de Sofás Profissional – Antes e Depois – Clean Solutions Portugal</image:caption>
+      <image:title>Limpeza de Sofás – Resultado Profissional</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://www.cleansolutions.pt/assets/sofa-antes.jpg</image:loc>
+      <image:caption>Sofá antes da limpeza profissional Clean Solutions</image:caption>
+      <image:title>Sofá Antes da Limpeza</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://www.cleansolutions.pt/assets/sofa-depois.jpg</image:loc>
+      <image:caption>Sofá depois da limpeza profissional Clean Solutions – Resultado visível</image:caption>
+      <image:title>Sofá Depois da Limpeza</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://www.cleansolutions.pt/assets/before-after-sofa.jpg</image:loc>
+      <image:caption>Limpeza de Sofás – Antes e Depois – Clean Solutions Portugal</image:caption>
+      <image:title>Antes e Depois Limpeza de Sofás</image:title>
+    </image:image>
+  </url>
+  
+  <url>
+    <loc>https://www.cleansolutions.pt/limpeza-colchoes</loc>
+    <image:image>
+      <image:loc>https://www.cleansolutions.pt/assets/hero-mattress-cleaning-new.png</image:loc>
+      <image:caption>Limpeza de Colchões Profissional – Clean Solutions Portugal</image:caption>
+      <image:title>Limpeza de Colchões</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://www.cleansolutions.pt/assets/service-mattress-new.jpg</image:loc>
+      <image:caption>Colchão a ser higienizado com extração profissional – Clean Solutions</image:caption>
+      <image:title>Higienização de Colchão com Extração</image:title>
+    </image:image>
+  </url>
+  
+  <url>
+    <loc>https://www.cleansolutions.pt/limpeza-tapetes</loc>
+    <image:image>
+      <image:loc>https://www.cleansolutions.pt/assets/hero-rug-cleaning-new.png</image:loc>
+      <image:caption>Limpeza de Carpetes Profissional – Clean Solutions Portugal</image:caption>
+      <image:title>Limpeza de Carpetes</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://www.cleansolutions.pt/assets/tapete-antes.jpg</image:loc>
+      <image:caption>Carpete antes da limpeza profissional Clean Solutions</image:caption>
+      <image:title>Carpete Antes da Limpeza</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://www.cleansolutions.pt/assets/tapete-depois.jpg</image:loc>
+      <image:caption>Carpete depois da limpeza profissional Clean Solutions – Cores renovadas</image:caption>
+      <image:title>Carpete Depois da Limpeza</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://www.cleansolutions.pt/assets/before-after-carpet.jpg</image:loc>
+      <image:caption>Limpeza de Carpetes – Antes e Depois – Clean Solutions Portugal</image:caption>
+      <image:title>Antes e Depois Limpeza de Carpetes</image:title>
+    </image:image>
+  </url>
+  
+  <url>
+    <loc>https://www.cleansolutions.pt/limpeza-cadeiras</loc>
+    <image:image>
+      <image:loc>https://www.cleansolutions.pt/assets/hero-chair-cleaning-new.png</image:loc>
+      <image:caption>Limpeza de Cadeiras Profissional – Clean Solutions Portugal</image:caption>
+      <image:title>Limpeza de Cadeiras</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://www.cleansolutions.pt/assets/cadeira-antes.jpg</image:loc>
+      <image:caption>Cadeira antes da limpeza profissional Clean Solutions</image:caption>
+      <image:title>Cadeira Antes da Limpeza</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://www.cleansolutions.pt/assets/cadeira-depois.jpg</image:loc>
+      <image:caption>Cadeira depois da limpeza profissional Clean Solutions</image:caption>
+      <image:title>Cadeira Depois da Limpeza</image:title>
+    </image:image>
+  </url>
+  
+  <url>
+    <loc>https://www.cleansolutions.pt/impermeabilizacao</loc>
+    <image:image>
+      <image:loc>https://www.cleansolutions.pt/assets/hero-waterproofing.jpg</image:loc>
+      <image:caption>Impermeabilização de Estofos com gotas a repelir água – Clean Solutions</image:caption>
+      <image:title>Impermeabilização de Estofos</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://www.cleansolutions.pt/assets/service-waterproof.jpg</image:loc>
+      <image:caption>Impermeabilização de estofos – Proteção contra manchas e líquidos</image:caption>
+      <image:title>Tratamento de Impermeabilização</image:title>
+    </image:image>
+  </url>
+  
+  <url>
+    <loc>https://www.cleansolutions.pt/limpeza-alcatifas</loc>
+    <image:image>
+      <image:loc>https://www.cleansolutions.pt/assets/hero-carpet-cleaning-new.png</image:loc>
+      <image:caption>Limpeza de Alcatifas Profissional – Clean Solutions Portugal</image:caption>
+      <image:title>Limpeza de Alcatifas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://www.cleansolutions.pt/assets/professional-rug-cleaning.png</image:loc>
+      <image:caption>Limpeza profissional de alcatifa Clean Solutions</image:caption>
+      <image:title>Limpeza Profissional de Alcatifa</image:title>
+    </image:image>
+  </url>
+</urlset>
