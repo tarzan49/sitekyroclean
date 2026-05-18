@@ -5,10 +5,32 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import QuizButton from "@/components/QuizButton";
 import ServiceFAQSchema from "@/components/ServiceFAQSchema";
+import ServiceLocationSchema from "@/components/ServiceLocationSchema";
 import { getProblemBySlug, getRelatedProblemLinks } from "@/data/problemSeoData";
 import { cities, services } from "@/data/locationSeoData";
 import { getAllProblemCityRoutes, type ProblemCityRoute } from "@/data/problemCitySeoData";
 import { getProblemHeroImage } from "@/lib/problemHeroImages";
+
+function getCityContext(problemSlug: string, cityName: string, cityDesc: string): string {
+  const base = `Em ${cityName}, ${cityDesc}`;
+  if (problemSlug.includes("mancha"))
+    return `${base}, as manchas nos estofos agravam-se com a humidade atlântica e o ritmo de vida agitado. A penetração nas fibras ocorre em horas — tratamento profissional é mais eficaz quanto mais rápido for aplicado.`;
+  if (problemSlug.includes("acar"))
+    return `${base}, o clima húmido favorece a multiplicação de ácaros em sofás, colchões e tapetes. Uma higienização profissional elimina 99% dos ácaros na primeira sessão, sem produtos tóxicos.`;
+  if (problemSlug.includes("odor") || problemSlug.includes("cheiro"))
+    return `${base}, os odores persistem mais tempo nas fibras devido à humidade do ar. Ventilação doméstica não chega — a extração profunda é o único método que elimina o cheiro na raiz.`;
+  if (problemSlug.includes("pelo"))
+    return `${base}, os pelos de animais acumulam-se rapidamente em estofos e alcatifas. A extração profissional remove pelos, dander e alérgenos associados que os aspiradores domésticos não alcançam.`;
+  if (problemSlug.includes("urina"))
+    return `${base}, os acidentes de animais e crianças requerem tratamento imediato para evitar danos permanentes nas fibras e odores persistentes. O nosso serviço de urgência está disponível ao domicílio.`;
+  if (problemSlug.includes("mofo") || problemSlug.includes("bolor"))
+    return `${base}, a humidade elevada favorece o aparecimento de mofo em estofos e tapetes. O tratamento profissional elimina o fungo na raiz e aplica proteção preventiva contra recorrência.`;
+  if (problemSlug.includes("alerg"))
+    return `${base}, as alergias são amplificadas pela acumulação de alérgenos nos estofos. A higienização reduz drasticamente os níveis de ácaros e partículas alergénicas no ambiente doméstico.`;
+  if (problemSlug.includes("impermeabil"))
+    return `${base}, a impermeabilização cria uma barreira invisível contra líquidos e manchas, essencial num clima com chuva frequente. A proteção ativa em 24 horas e dura meses.`;
+  return `${base}, a higienização regular dos estofos é fundamental para manter um ambiente saudável. O serviço ao domicílio da Kyro elimina o problema na raiz, com resultados visíveis no mesmo dia.`;
+}
 
 const ProblemCityPage = () => {
   const { pathname } = useLocation();
@@ -52,15 +74,25 @@ const ProblemCityPage = () => {
     .map(slug => services.find(s => s.slug === slug))
     .filter(Boolean) as typeof services[number][];
   const nearbyCities = cities.filter(c => c.slug !== city.slug).slice(0, 6);
+  const priceFrom = relatedServiceData[0]?.priceFrom ?? "39€";
+  const cityContext = getCityContext(problem.slug, city.name, city.description);
 
   // Localize FAQs to city
   const localFaqs = problem.faqs.map(faq => ({
     question: faq.question.includes(city.name) ? faq.question : `${faq.question.replace('?', '')} em ${city.name}?`,
-    answer: faq.answer,
+    answer: faq.answer.includes(city.name) ? faq.answer : `${faq.answer} ${city.name.includes("Porto") ? "No Porto e Grande Porto, o" : `Em ${city.name}, o`} nosso técnico desloca-se ao domicílio.`,
   }));
 
   return (
     <>
+      <ServiceLocationSchema
+        serviceName={problem.h1}
+        serviceBaseUrl={`/problemas/${problem.slug}`}
+        placeName={city.name}
+        description={`${problem.intro.split('.')[0]} em ${city.name}. Serviço profissional ao domicílio.`}
+        pageUrl={pathname}
+        priceFrom={priceFrom}
+      />
       <Header />
       <main>
         {/* Hero */}
@@ -124,7 +156,8 @@ const ProblemCityPage = () => {
                   </div>
                   <h2 className="font-playfair text-xl md:text-2xl font-bold text-[#1A1A2E]">O Problema em {city.name}</h2>
                 </div>
-                <p className="text-sm md:text-base text-[#1A1A2E]/60 leading-relaxed">{problem.problemDetail}</p>
+                <p className="text-sm md:text-base text-[#1A1A2E]/60 leading-relaxed mb-3">{problem.problemDetail}</p>
+                <p className="text-sm text-[#1A1A2E]/50 leading-relaxed italic border-t border-[#E8E4DE] pt-3">{cityContext}</p>
               </div>
               <div className="rounded-2xl p-6 md:p-8 shadow-sm border" style={{ background: "#071a12", borderColor: "rgba(212,175,55,0.25)" }}>
                 <div className="flex items-center gap-3 mb-4">

@@ -310,31 +310,40 @@ const ProblemPage = () => {
           dangerouslySetInnerHTML={{
             __html: JSON.stringify({
               "@context": "https://schema.org",
-              "@type": "BreadcrumbList",
-              "itemListElement": [
-                { "@type": "ListItem", "position": 1, "name": "Início", "item": "https://www.cleansolutions.com.pt/" },
-                { "@type": "ListItem", "position": 2, "name": "Problemas", "item": "https://www.cleansolutions.com.pt/problemas" },
-                { "@type": "ListItem", "position": 3, "name": data.h1, "item": `https://www.cleansolutions.com.pt/problemas/${slug}` },
+              "@graph": [
+                {
+                  "@type": ["LocalBusiness", "CleaningService"],
+                  "@id": "https://www.cleansolutions.com.pt/#business",
+                  "name": "Kyro Clean Solutions",
+                  "url": "https://www.cleansolutions.com.pt",
+                  "telephone": "+351925530647",
+                  "email": "cleansolutions.pt25@gmail.com",
+                  "priceRange": "€€",
+                  "address": {
+                    "@type": "PostalAddress",
+                    "streetAddress": "R. de António Cardoso 263",
+                    "addressLocality": "Porto",
+                    "postalCode": "4150-081",
+                    "addressCountry": "PT",
+                  },
+                  "aggregateRating": { "@type": "AggregateRating", "ratingValue": "5.0", "bestRating": "5", "worstRating": "1", "reviewCount": "50", "ratingCount": "50" },
+                },
+                {
+                  "@type": "WebPage",
+                  "name": data.title,
+                  "description": data.metaDescription,
+                  "url": `https://www.cleansolutions.com.pt/problemas/${slug}`,
+                  "provider": { "@id": "https://www.cleansolutions.com.pt/#business" },
+                },
+                {
+                  "@type": "BreadcrumbList",
+                  "itemListElement": [
+                    { "@type": "ListItem", "position": 1, "name": "Início", "item": "https://www.cleansolutions.com.pt/" },
+                    { "@type": "ListItem", "position": 2, "name": "Problemas", "item": "https://www.cleansolutions.com.pt/problemas" },
+                    { "@type": "ListItem", "position": 3, "name": data.h1, "item": `https://www.cleansolutions.com.pt/problemas/${slug}` },
+                  ],
+                },
               ],
-            }),
-          }}
-        />
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              "@context": "https://schema.org",
-              "@type": "WebPage",
-              "name": data.title,
-              "description": data.metaDescription,
-              "url": `https://www.cleansolutions.com.pt/problemas/${slug}`,
-              "provider": {
-                "@type": "LocalBusiness",
-                "name": "Kyro Clean Solutions",
-                "url": "https://www.cleansolutions.com.pt",
-                "telephone": "+351925530647",
-                "aggregateRating": { "@type": "AggregateRating", "ratingValue": "5.0", "reviewCount": "50" },
-              },
             }),
           }}
         />

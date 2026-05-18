@@ -87,7 +87,7 @@ const problemSlugs = [
   "manchas-tinta-sofa","sofa-amarelado","limpeza-sofa-microfibra",
   "limpeza-cabeceira-cama","limpeza-sofa-chenille","limpeza-puff",
   "manchas-suor-sofa","limpeza-colchao-bebe","limpeza-sofa-hotel",
-  "limpeza-cortinas","acaros-tapete","como-limpar-sofa",
+  "limpeza-cortinas","acaros-tapete",
   "limpeza-sofa-perto-de-mim","limpeza-sofa-antes-depois",
   "impermeabilizar-tapete","limpeza-sofa-seco"
 ];
@@ -146,7 +146,6 @@ const problemRelatedCities: Record<string, string[]> = {
   "limpeza-sofa-hotel": ["porto","braga","lisboa"],
   "limpeza-cortinas": ["porto","matosinhos","maia"],
   "acaros-tapete": ["porto","maia","braga"],
-  "como-limpar-sofa": ["porto","matosinhos","vila-nova-de-gaia"],
   "limpeza-sofa-perto-de-mim": ["porto","matosinhos","maia"],
   "limpeza-sofa-antes-depois": ["porto","vila-nova-de-gaia","braga"],
   "impermeabilizar-tapete": ["porto","maia","matosinhos"],

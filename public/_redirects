@@ -1,1 +1,8 @@
-/* /index.html 200
+# ── Soft 404 fixes ───────────────────────────────────────────────────────────
+/como-limpar-sofa-*                          /limpeza-sofas-:splat                  301
+/limpeza-carpetes                            /limpeza-tapetes                       301
+/pack-quarto-completo-porto-miragaia         /pack-quarto-completo-porto            301
+/pack-sofa-e-colchao-lousada-*               /pack-sofa-e-colchao-porto             301
+
+# ── SPA fallback (must be last) ───────────────────────────────────────────────
+/*                                           /index.html                            200

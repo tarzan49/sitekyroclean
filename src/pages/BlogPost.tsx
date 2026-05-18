@@ -35,6 +35,15 @@ const BlogPost = () => {
   const post = useMemo(() => getPostBySlug(slug), [slug]);
   const allPosts = useMemo(() => getAllPosts(), []);
 
+  useEffect(() => {
+    if (!post) return;
+    document.title = post.metaTitle;
+    document.querySelector('meta[name="description"]')?.setAttribute("content", post.metaDescription);
+    document.querySelector('meta[property="og:title"]')?.setAttribute("content", post.metaTitle);
+    document.querySelector('meta[property="og:description"]')?.setAttribute("content", post.metaDescription);
+    document.querySelector('link[rel="canonical"]')?.setAttribute("href", `https://www.cleansolutions.com.pt/blog/${post.slug}`);
+  }, [post]);
+
   if (!post) {
     return (
       <>
@@ -55,15 +64,6 @@ const BlogPost = () => {
   const formattedDate = new Date(post.publishDate).toLocaleDateString("pt-PT", {
     day: "numeric", month: "long", year: "numeric",
   });
-
-  useEffect(() => {
-    if (!post) return;
-    document.title = post.metaTitle;
-    document.querySelector('meta[name="description"]')?.setAttribute("content", post.metaDescription);
-    document.querySelector('meta[property="og:title"]')?.setAttribute("content", post.metaTitle);
-    document.querySelector('meta[property="og:description"]')?.setAttribute("content", post.metaDescription);
-    document.querySelector('link[rel="canonical"]')?.setAttribute("href", `https://www.cleansolutions.com.pt/blog/${post.slug}`);
-  }, [post]);
 
   const jsonLd = {
     "@context": "https://schema.org",
