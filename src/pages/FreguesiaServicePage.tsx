@@ -15,6 +15,7 @@ import {
   getNearbyFreguesias,
   generateFreguesiaContent,
 } from "@/data/freguesiaSeoData";
+import { getAllProblems } from "@/data/problemSeoData";
 import { GENERIC_PROCESS_STEPS, IMPERMEABILIZACAO_STEPS } from "@/constants/serviceProcesses";
 
 const RESULT_CONTENT: Record<string, (place: string) => { desc: string; checks: string[] }> = {
@@ -64,6 +65,8 @@ const SERVICE_RESULT_IMAGES: Record<string, string> = {
   "impermeabilizacao": resultImpermeabilizacao,
 };
 
+
+const METRO_CITIES = new Set(["porto", "matosinhos", "maia", "vila-nova-de-gaia", "gondomar", "braga", "lisboa"]);
 
 function parseFreguesiaRoute(pathname: string): { serviceSlug: string; citySlug: string; freguesiaSlug: string } | null {
   const path = pathname.replace(/^\//, '');
@@ -120,6 +123,18 @@ const FreguesiaServicePage = () => {
 
   const nearbyFreguesias = getNearbyFreguesias(data.municipioSlug, data.nearby);
   const otherServices = services.filter(s => s.slug !== data.serviceSlug);
+
+  const municipioProblems = useMemo(() => {
+    if (!data) return [];
+    return getAllProblems()
+      .filter(p =>
+        p.visible &&
+        p.relatedServices.includes(data.serviceSlug) &&
+        (METRO_CITIES.has(data.municipioSlug) || p.relatedCities.includes(data.municipioSlug))
+      )
+      .slice(0, 5)
+      .map(p => ({ slug: p.slug, keyword: p.keyword }));
+  }, [data]);
   const heroImgs = SERVICE_HERO_IMAGES[data.serviceSlug] ?? { d: heroSofaD, m: heroSofaM };
   const resultImg = SERVICE_RESULT_IMAGES[data.serviceSlug] ?? resultSofa;
   const resultLabel = data.serviceSlug === 'impermeabilizacao' ? 'impermeabilização' : 'limpeza';
@@ -428,6 +443,25 @@ const FreguesiaServicePage = () => {
                   Ver todos os serviços em {data.municipio}
                 </Link>
               </div>
+
+              {municipioProblems.length > 0 && (
+                <div>
+                  <h3 className="text-lg md:text-xl font-playfair font-bold text-[#1A1A2E] mb-4">
+                    Problemas que resolvemos em {data.municipio}
+                  </h3>
+                  <div className="flex flex-wrap gap-2">
+                    {municipioProblems.map(p => (
+                      <Link
+                        key={p.slug}
+                        to={`/${p.slug}-${data.municipioSlug}`}
+                        className="inline-flex items-center gap-1.5 bg-[#FDFDF9] px-3 py-2 rounded-lg text-sm font-medium text-[#1A1A2E] border border-[#E8E4DE] hover:border-[#D4AF37]/35 hover:bg-[#D4AF37]/5 transition-all"
+                      >
+                        {p.keyword}
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </section>

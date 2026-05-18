@@ -1,4 +1,5 @@
 # ── Soft 404 fixes ───────────────────────────────────────────────────────────
+/limpeza-sofas-paranhos                      /limpeza-sofas-porto-paranhos          301
 /como-limpar-sofa-*                          /limpeza-sofas-:splat                  301
 /limpeza-carpetes                            /limpeza-tapetes                       301
 /pack-quarto-completo-porto-miragaia         /pack-quarto-completo-porto            301

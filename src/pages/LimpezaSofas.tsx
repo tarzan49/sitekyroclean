@@ -6,6 +6,7 @@ import GlobalPromoBanner from "@/components/GlobalPromoBanner";
 import Footer from "@/components/Footer";
 import BeforeAfterSlider from "@/components/BeforeAfterSlider";
 import RelatedServices from "@/components/RelatedServices";
+import ServiceCityLinks from "@/components/ServiceCityLinks";
 import ServicePackBanner from "@/components/ServicePackBanner";
 import ServiceFAQSchema from "@/components/ServiceFAQSchema";
 import ServiceSchema from "@/components/ServiceSchema";
@@ -138,7 +139,10 @@ const LimpezaSofas = () => {
         {/* 9 ── PACKS COM DESCONTO ─────────────────────────────────── */}
         <ServicePackBanner packSlugs={["pack-sofa-e-colchao", "pack-sofa-impermeabilizacao"]} variant="dark" />
 
-        {/* 10 ── UPSELL: SERVIÇOS COMPLEMENTARES (lavender) ──────── */}
+        {/* 10 ── CIDADES ────────────────────────────────────────── */}
+        <ServiceCityLinks serviceSlug="limpeza-sofas" serviceLabel="Limpeza de Sofás" />
+
+        {/* 11 ── UPSELL: SERVIÇOS COMPLEMENTARES (lavender) ──────── */}
         <RelatedServices currentService="sofas" />
 
         <ServiceSchema

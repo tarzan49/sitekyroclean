@@ -9,6 +9,7 @@ import Header from "@/components/Header";
 import GlobalPromoBanner from "@/components/GlobalPromoBanner";
 import Footer from "@/components/Footer";
 import RelatedServices from "@/components/RelatedServices";
+import ServiceCityLinks from "@/components/ServiceCityLinks";
 import ServicePackBanner from "@/components/ServicePackBanner";
 import ServiceSchema from "@/components/ServiceSchema";
 import ServiceHero from "@/components/ServiceHero";
@@ -135,6 +136,7 @@ const Impermeabilizacao = () => {
 
         {/* 9 ── UPSELL: SERVIÇOS COMPLEMENTARES (lavender) ───────── */}
         <ServicePackBanner packSlugs={["pack-sofa-impermeabilizacao", "pack-quarto-completo"]} variant="dark" />
+        <ServiceCityLinks serviceSlug="impermeabilizacao" serviceLabel="Impermeabilização de Estofos" />
         <RelatedServices currentService="impermeabilizacao" />
 
         <ServiceSchema

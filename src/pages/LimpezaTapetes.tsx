@@ -6,6 +6,7 @@ import GlobalPromoBanner from "@/components/GlobalPromoBanner";
 import Footer from "@/components/Footer";
 import BeforeAfterSlider from "@/components/BeforeAfterSlider";
 import RelatedServices from "@/components/RelatedServices";
+import ServiceCityLinks from "@/components/ServiceCityLinks";
 import ServicePackBanner from "@/components/ServicePackBanner";
 import ServiceFAQSchema from "@/components/ServiceFAQSchema";
 import ServiceSchema from "@/components/ServiceSchema";
@@ -137,6 +138,7 @@ const LimpezaTapetes = () => {
 
         {/* 9 ── UPSELL: SERVIÇOS COMPLEMENTARES (lavender) ───────── */}
         <ServicePackBanner packSlugs={["pack-sala-completa"]} variant="dark" />
+        <ServiceCityLinks serviceSlug="limpeza-tapetes" serviceLabel="Limpeza de Tapetes" />
         <RelatedServices currentService="tapetes" />
 
         <ServiceSchema

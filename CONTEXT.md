@@ -495,7 +495,71 @@ Step 5 — Seletor de vaga/calendário
 
 ---
 
-## Possíveis próximas tarefas
+## Tudo o que foi feito — Sessão 4 (2026-05-18)
+
+### Deploy & Infraestrutura
+
+27. **GitHub + Cloudflare Pages — pipeline de auto-deploy configurado**
+    - Projeto sem remote → criado repo no GitHub
+    - Segredo (Cloudflare API token) estava em `.claude/settings.local.json` no histórico git
+    - Fix: criado orphan branch para eliminar todo o histórico contendo o segredo
+    - `.gitignore` atualizado: `.claude/`, `.env*`, `package-lock.json`
+    - `package.json`: adicionado `"packageManager": "npm@10.9.2"`, removidos `@rollup/rollup-win32-x64-msvc` e `@swc/core-win32-x64-msvc` (Windows-only, falham no Linux)
+    - `.npmrc`: `legacy-peer-deps=true` (antes tinha `omit=optional` que impedia o rollup Linux de instalar)
+    - Cloudflare Pages build command: `npm run build`, output dir: `dist`
+
+28. **`public/_redirects` criado**
+    - Conteúdo: `/* /index.html 200`
+    - Causa raiz do site em branco: Cloudflare Pages sem este ficheiro devolvia 404 em qualquer rota React
+    - Cloudflare "Always Use HTTPS" ativado (estava desligado → HTTP não redirecionava para HTTPS)
+
+### SEO — Google Search Console
+
+29. **Problema de indexação: 3000/3500 páginas não indexadas**
+    - 2813 "Discovered not indexed" = crawl budget esgotado (domínio novo)
+    - 109 "Crawled not indexed" = conteúdo demasiado thin
+    - 57 erros 5xx = causados pelo `_redirects` em falta (agora corrigido)
+    - 88 erros 403 = rotas sem dados correspondentes → 404s aceitáveis
+
+30. **Noindex nas 1570 Keyword Variant pages (`SofaVariantPage.tsx`)**
+    - Adicionado `useEffect` que injeta `<meta name="robots" content="noindex, follow">`
+    - Objetivo: liberar crawl budget para as 942 páginas de localidade/freguesia com conteúdo real
+    - Cleanup: reverte o meta para `index, follow` ao desmontar o componente
+
+31. **Conteúdo único adicionado a `LocationServicePage.tsx`**
+    - `RESULT_CONTENT` — object com `desc` e `checks` únicos por serviço+cidade
+    - Secção "Como Funciona" — parágrafo `data.howItWorks` (inclui nome da cidade)
+    - Secção "Benefícios" nova (fundo `#12121e`, grid de cards com `data.benefits`)
+    - Cobertura com `data.localSection` na secção de área de serviço
+
+32. **Conteúdo único adicionado a `FreguesiaServicePage.tsx`** (mesmo padrão)
+    - `RESULT_CONTENT` com `data.name` (nome da freguesia)
+    - Secção "Benefícios" antes da "REDE INTERNA"
+    - `data.howItWorks` e `data.localSection` incorporados
+
+---
+
+## Estado atual do site (2026-05-18)
+
+- **URL ao vivo:** cleansolutions.com.pt (Cloudflare Pages, HTTPS)
+- **GitHub repo:** conectado, auto-deploy a cada push para main
+- **Admin panel:** `/admin/panel` (password protegido)
+- **Google Search Console:** 10 sitemaps submetidos, indexação em progresso
+- **Último commit:** `e8cd427` — "seo: add benefits + localSection sections to location and freguesia pages"
+
+---
+
+## Próximas tarefas SEO (por prioridade)
+
+1. Schema markup `LocalBusiness` + `Service` por página (structured data único por localidade)
+2. Revisão de conteúdo das `ProblemCityPage` (465 páginas de problema)
+3. Backlinks & autoridade de domínio (guest posts, diretórios, Google Business Profile)
+4. Blog — artigos long-tail ("como limpar sofá em casa", "limpeza colchões porto")
+5. Swipe/drag touch no carrossel mobile
+
+---
+
+## Possíveis próximas tarefas (funcionalidades)
 
 - Verificar que a imagem `/images/services/sofa.png` existe (usada no card de upsell de Sofá)
 - Animação `animate-fade-in` — verificar se a classe existe no tailwind.config ou definir em globals.css

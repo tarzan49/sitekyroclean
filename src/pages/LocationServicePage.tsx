@@ -10,6 +10,7 @@ import ServiceLocationSchema from "@/components/ServiceLocationSchema";
 import ServicePackBanner from "@/components/ServicePackBanner";
 import { getLocationServiceData, services, cities, getCityLinksForService } from "@/data/locationSeoData";
 import { municipiosComFreguesias } from "@/data/freguesiaSeoData";
+import { getAllProblems } from "@/data/problemSeoData";
 import { GENERIC_PROCESS_STEPS, IMPERMEABILIZACAO_STEPS } from "@/constants/serviceProcesses";
 
 const RESULT_CONTENT: Record<string, (city: string) => { desc: string; checks: string[] }> = {
@@ -59,6 +60,8 @@ const resultImages: Record<string, string> = {
   "impermeabilizacao": resultImpermeabilizacao,
 };
 
+
+const METRO_CITIES = new Set(["porto", "matosinhos", "maia", "vila-nova-de-gaia", "gondomar", "braga", "lisboa"]);
 
 function parseLocationRoute(pathname: string): { serviceSlug: string; citySlug: string } | null {
   const path = pathname.replace(/^\//, '');
@@ -120,6 +123,18 @@ const LocationServicePage = () => {
 
   const resultDesc = RESULT_CONTENT[data.serviceSlug]?.(data.city)?.desc ?? data.metaDescription;
   const serviceBaseUrl = services.find(s => s.slug === data.serviceSlug)?.baseRoute ?? `/${data.serviceSlug}`;
+
+  const relatedProblems = useMemo(() => {
+    if (!data) return [];
+    return getAllProblems()
+      .filter(p =>
+        p.visible &&
+        p.relatedServices.includes(data.serviceSlug) &&
+        (METRO_CITIES.has(data.citySlug) || p.relatedCities.includes(data.citySlug))
+      )
+      .slice(0, 5)
+      .map(p => ({ slug: p.slug, keyword: p.keyword }));
+  }, [data]);
 
   return (
     <>
@@ -414,6 +429,23 @@ const LocationServicePage = () => {
                         className="text-xs font-semibold text-[#1A1A2E]/60 hover:text-[#D4AF37] transition-colors"
                       >
                         {svc.name}
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {relatedProblems.length > 0 && (
+                <div className="mt-6 pt-5 border-t border-[#E8E4DE]">
+                  <p className="text-xs text-[#1A1A2E]/50 mb-3">Problemas que resolvemos em {data.city}:</p>
+                  <div className="flex flex-wrap justify-center gap-3">
+                    {relatedProblems.map(p => (
+                      <Link
+                        key={p.slug}
+                        to={`/${p.slug}-${data.citySlug}`}
+                        className="text-xs text-[#1A1A2E]/60 hover:text-[#D4AF37] transition-colors font-medium"
+                      >
+                        {p.keyword}
                       </Link>
                     ))}
                   </div>

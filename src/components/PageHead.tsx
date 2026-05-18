@@ -10,16 +10,16 @@ interface PageMeta {
 const routeMeta: Record<string, { pt: PageMeta; en: PageMeta; es: PageMeta }> = {
   "/": {
     pt: {
-      title: "Kyro Clean Solutions – Limpeza Profunda & Impermeabilização de Estofos",
-      description: "Limpeza profunda de sofás, colchões, cadeiras e carpetes com extração profissional. Removemos manchas, odores e bactérias. Peça o seu orçamento.",
+      title: "Kyro Clean Solutions | Limpeza de Sofás, Colchões e Tapetes ao Domicílio",
+      description: "O seu sofá, colchão ou tapete como novo em 4h — ao domicílio, sem sair de casa. Avaliação 5.0 Google. Extração profissional. Porto, Gaia, Lisboa e todo o país. Orçamento grátis.",
     },
     en: {
-      title: "Kyro Clean Solutions – Professional Deep Cleaning & Waterproofing",
-      description: "Professional deep cleaning of sofas, mattresses, chairs and carpets. We remove stains, odours and bacteria. Request your free quote.",
+      title: "Kyro Clean Solutions | Professional Sofa, Mattress & Rug Cleaning at Home",
+      description: "Your sofa, mattress or rug like new in 4h — at your home, no hassle. 5.0 Google rating. Professional extraction. Porto, Lisbon and nationwide. Free quote.",
     },
     es: {
-      title: "Kyro Clean Solutions | Limpieza Profunda e Impermeabilización",
-      description: "Limpieza profunda profesional de sofás, colchones, sillas y alfombras. Eliminamos manchas, olores y bacterias. Solicite presupuesto.",
+      title: "Kyro Clean Solutions | Limpieza de Sofás, Colchones y Alfombras a Domicilio",
+      description: "Su sofá, colchón o alfombra como nuevo en 4h — a domicilio, sin salir de casa. Valoración 5.0 Google. Extracción profesional. Presupuesto gratis.",
     },
   },
   "/limpeza-sofas": {
