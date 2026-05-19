@@ -1970,6 +1970,7 @@ ${formData.description || 'Sem observações adicionais'}
                         <p className="text-xs text-white/35 mb-4">Indique a área aproximada em m²</p>
                         <input
                           type="number"
+                          inputMode="decimal"
                           min="0.5"
                           step="0.5"
                           placeholder="Ex: 4"
