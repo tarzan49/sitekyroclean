@@ -18,15 +18,19 @@ import imgAlergias      from "@/assets/hero-p-alergias-sofa.webp";
 import imgSofaResultado from "@/assets/galeria-sofa-resultado.webp";
 
 const HERO_MAP: Record<string, string> = {
-  "quanto-custa-limpar-sofa-profissional":   imgSofaTecido,
-  "como-tirar-manchas-sofa-tecido":          imgManchasVinho,
-  "impermeabilizacao-sofa-vale-pena":        imgSofaDesgast,
-  "acaros-sofas-colchoes-riscos-saude":      imgAcarosColchao,
-  "quanto-custa-limpar-colchao-profissional":imgColchaoStd,
+  "quanto-custa-limpar-sofa-profissional":      imgSofaTecido,
+  "como-tirar-manchas-sofa-tecido":             imgManchasVinho,
+  "impermeabilizacao-sofa-vale-pena":           imgSofaDesgast,
+  "acaros-sofas-colchoes-riscos-saude":         imgAcarosColchao,
+  "quanto-custa-limpar-colchao-profissional":   imgColchaoStd,
   "limpeza-tapetes-profissional-guia-completo": imgTapetes,
-  "limpeza-cadeiras-estofadas-precos-guia":  imgCadeiras,
-  "doencas-causadas-estofos-sujos":          imgAlergias,
-  "como-preparar-casa-visita-tecnico":       imgSofaResultado,
+  "limpeza-cadeiras-estofadas-precos-guia":     imgCadeiras,
+  "doencas-causadas-estofos-sujos":             imgAlergias,
+  "como-preparar-casa-visita-tecnico":          imgSofaResultado,
+  "como-limpar-sofa-veludo":                    imgSofaTecido,
+  "como-tirar-cheiro-sofa":                     imgSofaDesgast,
+  "limpeza-alcatifa-escritorio":                imgTapetes,
+  "guia-acaros-em-casa":                        imgAcarosSofa,
 };
 
 const BlogPost = () => {

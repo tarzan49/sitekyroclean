@@ -551,6 +551,237 @@ const posts: BlogPost[] = [
       "como-tirar-manchas-sofa-tecido",
     ],
   },
+
+  // ─── Artigo 10 ───────────────────────────────────────────────────────
+  {
+    slug: "como-limpar-sofa-veludo",
+    title: "Como limpar sofá de veludo sem estragar: guia passo a passo",
+    metaTitle: "Como Limpar Sofá de Veludo | Guia Sem Estragar o Tecido",
+    metaDescription: "Sofá de veludo com manchas ou pelo achatado? Aprende as técnicas certas e os erros que destroem o veludo. Quando o profissional é indispensável.",
+    publishDate: "2026-05-19",
+    updatedDate: "2026-05-19",
+    author: "Equipa Kyro Clean",
+    readingTime: 6,
+    category: "Dicas",
+    heroAlt: "Sofá de veludo azul com textura visível — limpeza profissional",
+    intro: "O veludo é um dos tecidos mais elegantes para sofás mas também um dos mais exigentes na manutenção. A boa notícia é que, com a técnica certa, consegues manter o aspeto impecável sem danificar a fibra. A má notícia: os erros mais comuns — esfregarem com pano molhado — são também os mais difíceis de reverter.",
+    sections: [
+      {
+        heading: "Porque é que o veludo exige cuidado especial?",
+        body: "O veludo é composto por fios cortados que formam uma superfície macia com direção definida (o 'pelo'). Qualquer pressão errada ou líquido excessivo achata esse pelo permanentemente, criando marcas escuras que não saem com aspirador. Ao contrário do tecido liso, o veludo não 'perdoa' — um erro de limpeza pode ser irreversível.\n\nA maioria dos sofás de veludo modernos é feita de veludo de poliéster ou viscose, mais resistente que o veludo de seda, mas igualmente sensível à técnica de limpeza.",
+      },
+      {
+        heading: "Limpeza de rotina: o que fazer semanalmente",
+        body: "1. **Aspiração suave**: Use um acessório macio sem escovas rotativas. Passe sempre na direção do pelo (geralmente de cima para baixo ou da frente para trás). Aspirar contra o pelo levanta as fibras mas não as danifica se for feito suavemente.\n\n2. **Restaurar o pelo achatado**: Se houver zonas achatadas por uso ou pressão, passe um pano de microfibra seco na direção contrária do pelo para levantar as fibras, depois passe na direção certa para alinhar.\n\n3. **Vaporizador caseiro com cuidado**: Uma passagem rápida de vapor a 20-25 cm de distância levanta o pelo. Nunca aplique diretamente — o excesso de humidade deixa marcas de água.",
+        tip: "Escove sempre na direção do pelo. Se não souber qual é, observe o reflexo da luz — a direção que brilha mais é a direção do pelo.",
+      },
+      {
+        heading: "Como tratar manchas no veludo",
+        body: "A regra mais importante: **nunca esfregue**. O movimento de fricção achata o pelo e expande a mancha.\n\n**Para manchas secas** (poeira, migalhas): aspire suavemente com acessório sem escovas.\n\n**Para manchas líquidas frescas**:\n1. Absorva com pano branco seco usando pressão vertical (sem movimentos laterais)\n2. Deixe secar completamente ao ar\n3. Depois de seco, passe vapor suave para restaurar o pelo\n\n**Para manchas difíceis** (vinho, café, gordura):\n1. Não aplique água em excesso — uma camada fina de bicarbonato seco pode absorver líquidos gordurosos\n2. Para manchas de tânica (vinho, chá): água fria com uma gota de detergente suave, aplicada com espátula ou cartão, sem esfregar\n3. Se a mancha não sair com estes passos, pare — qualquer tentativa adicional agrava o dano",
+        tip: "Guarda sempre um pedaço de tecido de retalho do mesmo veludo para testar produtos antes de aplicar no sofá.",
+      },
+      {
+        heading: "Quando o profissional é a única opção",
+        body: "Existem situações em que a limpeza caseira do veludo vai inevitavelmente piorar o problema:\n\n- **Manchas de urina ou vinho antigas**: a proteína e os taninos penetraram nas fibras — produtos caseiros suficientes para remover a mancha superficial não chegam à profundidade onde está o odor e a cor\n- **Pelo achatado em grandes áreas**: por uso intenso ou mancha de água — só extração profissional a vapor controlada restaura o pelo uniformemente\n- **Sofás de veludo de seda ou veludo com conteúdo de viscose acima de 50%**: materiais que reagem mal a qualquer humidade — requerem limpeza a seco profissional\n\nA Kyro Clean trata veludo com extração profissional de baixa humidade, que limpa em profundidade sem saturar as fibras e restaura o pelo com vapor controlado após a secagem.",
+      },
+    ],
+    faq: [
+      {
+        q: "Posso usar bicarbonato para limpar sofá de veludo?",
+        a: "Bicarbonato seco pode ser usado para absorver líquidos gordurosos ou neutralizar odores ligeiros — aplique, aguarde 30 minutos e aspire suavemente. Nunca use bicarbonato húmido nem o esfregue no tecido.",
+      },
+      {
+        q: "O veludo achatado por uso tem solução?",
+        a: "Na maioria dos casos sim. Vapor suave a distância (20-25 cm) e escovagem suave na direção contrária do pelo restauram as fibras achatadas por pressão. Para zonas muito desgastadas, limpeza profissional com vapor controlado é mais eficaz.",
+      },
+      {
+        q: "Qual o melhor produto doméstico para limpar veludo?",
+        a: "Água fria com uma gota de detergente suave sem fragrância forte é o mais seguro. Aplicado com pano húmido (não encharcado) e sem fricção. Para tudo o resto, os riscos superam os benefícios e recomendamos limpeza profissional.",
+      },
+      {
+        q: "Com que frequência devo limpar um sofá de veludo?",
+        a: "Aspiração suave semanalmente e restauração do pelo com vapor mensalmente. Limpeza profissional a cada 12-18 meses ou sempre que surgir uma mancha que a limpeza caseira não resolve.",
+      },
+    ],
+    relatedService: { label: "Limpeza profissional de sofás", href: "/limpeza-sofas" },
+    relatedPosts: [
+      "quanto-custa-limpar-sofa-profissional",
+      "como-tirar-manchas-sofa-tecido",
+    ],
+  },
+
+  // ─── Artigo 11 ───────────────────────────────────────────────────────
+  {
+    slug: "como-tirar-cheiro-sofa",
+    title: "Como tirar o cheiro do sofá: causas e soluções que realmente funcionam",
+    metaTitle: "Como Tirar o Cheiro do Sofá | Causas e Soluções 2025",
+    metaDescription: "Sofá com mau cheiro que não passa? Descobre as causas, os métodos que funcionam em casa e quando é necessária limpeza profissional para eliminar odores na raiz.",
+    publishDate: "2026-05-19",
+    updatedDate: "2026-05-19",
+    author: "Equipa Kyro Clean",
+    readingTime: 7,
+    category: "Dicas",
+    heroAlt: "Sofá de tecido bege — eliminação profissional de odores",
+    intro: "Um sofá com mau cheiro não é apenas desconfortável — é um sinal de que algo está acumulado nas fibras que não é visível mas está presente. Suor, gordura corporal, comida, animais de estimação ou simplesmente humidade: cada tipo de odor tem a sua causa e a sua solução. Este guia explica o que funciona e o que apenas mascara o problema.",
+    sections: [
+      {
+        heading: "Identificar a causa do cheiro é o primeiro passo",
+        body: "O método de tratamento correto depende do tipo de odor. Os mais comuns em sofás portugueses:\n\n**Cheiro a humidade/bolor**: causado por acumulação de humidade nas camadas internas — frequente em casas mal ventiladas ou após derrame não seco corretamente. É o mais difícil de eliminar em casa.\n\n**Cheiro a suor/gordura corporal**: acumulação de óleos naturais da pele e suor ao longo do tempo, especialmente em zonas de contacto frequente (encostos e assentos).\n\n**Cheiro a animal**: combinação de pelos, dander, saliva e possíveis acidentes de urina — penetra profundamente nas fibras.\n\n**Cheiro a fumo de tabaco**: os compostos do fumo aderem às fibras e são dos mais difíceis de neutralizar com produtos domésticos.\n\n**Cheiro a comida**: geralmente mais superficial e mais fácil de tratar, exceto gorduras que penetram nas fibras.",
+      },
+      {
+        heading: "Métodos domésticos: o que funciona (e o que não funciona)",
+        body: "**Bicarbonato de sódio — funciona para odores superficiais**\nPolvilhe generosamente sobre todo o sofá. Deixe atuar 12 a 24 horas (quanto mais tempo, melhor). Aspire completamente. O bicarbonato absorve ácidos e compostos voláteis responsáveis por odores ligeiros.\n\n**Vinagre branco diluído — funciona para cheiro a animal e comida**\nMisture água e vinagre branco em proporção 2:1 num spray. Aplique levemente (o tecido não deve ficar encharcado) e deixe secar ao ar. O ácido acético neutraliza compostos alcalinos. O cheiro a vinagre desaparece completamente após a secagem.\n\n**Arejamento intensivo — funciona para odores ligeiros**\nColoque o sofá numa divisão com ventilação cruzada durante 24-48 horas. Eficaz para cheiro a fechado ou produtos de limpeza.\n\n**O que NÃO funciona:**\n- Sprays perfumados de supermercado — mascaram o odor temporariamente (horas a dias)\n- Spray de álcool em excesso — pode danificar o tecido e não elimina o odor na raiz\n- Vapor doméstico em tecidos grossos — humedece mas não aspira, podendo piorar o cheiro a bolor",
+        tip: "Deixe o sofá secar completamente após qualquer tratamento húmido. Humidade residual é a principal causa de cheiro a bolor secundário.",
+      },
+      {
+        heading: "Quando os métodos caseiros não chegam",
+        body: "Há situações em que o odor tem origem nas camadas internas do sofá — o enchimento, a espuma ou o tecido inferior — e nenhum tratamento superficial vai eliminar o problema:\n\n- **Cheiro a urina (pessoas ou animais)**: os compostos de ácido úrico cristalizam nas fibras ao secar e reativam com a humidade. Precisam de tratamento enzimático específico que quebra os cristais — não disponível em produtos domésticos normais.\n- **Cheiro a bolor**: o fungo está nas camadas internas. A limpeza superficial não alcança o problema.\n- **Cheiro a fumo forte**: os compostos do tabaco penetram profundamente e requerem extração com água quente para remoção mecânica.\n- **Odores persistentes após vários tratamentos**: sinal de que a origem está mais funda do que a superfície do tecido.\n\nA extração profissional a quente é o único método que injeta e aspira líquido até às camadas profundas do tecido, removendo os compostos que causam o odor — não apenas cobrindo-os.",
+      },
+      {
+        heading: "Após a limpeza: como prevenir o regresso dos odores",
+        body: "Manter o sofá sem cheiro a longo prazo depende de hábitos simples:\n\n1. **Ventilação regular** — abra as janelas diariamente, especialmente em dias secos\n2. **Capas de sofá laváveis** — protegem das gorduras corporais e são fáceis de lavar\n3. **Impermeabilização profissional** — cria uma barreira que impede líquidos e gorduras de penetrar nas fibras\n4. **Limpeza profissional anual** — remove a acumulação que os métodos domésticos não alcançam antes que se torne um problema de odor",
+      },
+    ],
+    faq: [
+      {
+        q: "O bicarbonato de sódio elimina o cheiro de urina do sofá?",
+        a: "Parcialmente. O bicarbonato absorve odores superficiais e neutros, mas os cristais de ácido úrico da urina requerem tratamento enzimático específico. Para urina, o tratamento enzimático profissional é o único que elimina o odor definitivamente.",
+      },
+      {
+        q: "Quanto tempo demora a eliminar o cheiro de sofá?",
+        a: "Depende do tipo e profundidade do odor. Bicarbonato de sódio precisa de 12-24 horas. Tratamento profissional elimina o odor no momento, com 2-4 horas para secagem completa.",
+      },
+      {
+        q: "O sofá pode ficar com cheiro após limpeza profissional?",
+        a: "Não é comum. Se surgir um ligeiro cheiro a limpo nos primeiros dias, é normal — desaparece completamente após secagem total (24-48h com ventilação). Um cheiro persistente após limpeza profissional é raro e deve ser comunicado ao serviço.",
+      },
+      {
+        q: "O amaciador de roupa pode ser usado para perfumar o sofá?",
+        a: "Não recomendamos. O amaciador pode deixar resíduos no tecido que atraem sujidade e podem alterar a textura de alguns tecidos. Use bicarbonato ou vinagre diluído para tratamentos caseiros.",
+      },
+    ],
+    relatedService: { label: "Limpeza profissional de sofás com desodorização", href: "/limpeza-sofas" },
+    relatedPosts: [
+      "acaros-sofas-colchoes-riscos-saude",
+      "como-tirar-manchas-sofa-tecido",
+    ],
+  },
+
+  // ─── Artigo 12 ───────────────────────────────────────────────────────
+  {
+    slug: "limpeza-alcatifa-escritorio",
+    title: "Limpeza de alcatifa em escritório: frequência, métodos e custos",
+    metaTitle: "Limpeza de Alcatifa em Escritório | Guia para Empresas 2025",
+    metaDescription: "Guia completo para empresas sobre limpeza de alcatifas: frequência recomendada, diferença entre limpeza de rotina e profissional, e quanto custa. AVAC incluso.",
+    publishDate: "2026-05-19",
+    updatedDate: "2026-05-19",
+    author: "Equipa Kyro Clean",
+    readingTime: 6,
+    category: "Empresas",
+    heroAlt: "Alcatifa de escritório — limpeza profissional por extração",
+    intro: "As alcatifas de escritório acumulam sujidade a um ritmo muito superior às domésticas. Um espaço com 20 pessoas acumula tantos poluentes numa alcatifa em 3 meses como uma alcatifa doméstica em 1 ano. Para gestores de instalações e responsáveis de escritório, perceber quando e como fazer a limpeza correta é fundamental — tanto para a imagem da empresa como para a saúde dos colaboradores.",
+    sections: [
+      {
+        heading: "Quanto sujidade acumula uma alcatifa de escritório?",
+        body: "Estudos de qualidade do ar interior mostram que as alcatifas retêm até 10 vezes o seu peso em sujidade antes de parecerem visivelmente sujas. Isso inclui:\n\n- **Partículas trazidas do exterior**: poeira, pólen, areia e resíduos de sola de sapato\n- **Resíduos orgânicos internos**: células mortas de pele, cabelo, migalhas de comida\n- **Poluentes químicos**: compostos voláteis de tinteiros, carpetes novas, ar condicionado\n- **Ácaros e bactérias**: que se alimentam dos resíduos orgânicos acumulados\n\nA camada visível de sujidade representa apenas 15-20% do total — o resto está nas camadas internas da fibra e no suporte.",
+        tip: "Uma alcatifa de escritório com mau aspeto geralmente já atingiu 5-8 vezes a sua capacidade de retenção de sujidade — o que significa que há muito mais que não se vê.",
+      },
+      {
+        heading: "Frequência recomendada de limpeza",
+        body: "**Limpeza de rotina (aspiração)**\n- Escritórios de baixo tráfego (1-5 pessoas): 2x por semana\n- Tráfego médio (5-20 pessoas): diariamente\n- Alto tráfego (20+ pessoas ou espaço de atendimento): 2x por dia em zonas de passagem\n\n**Limpeza intermédia (pré-tratamento de manchas)**\n- Trate manchas imediatamente após ocorrerem — 80% das manchas de café e comida saem com tratamento imediato\n\n**Limpeza profissional por extração**\n- Escritórios de baixo tráfego: anualmente\n- Tráfego médio: cada 6 meses\n- Alto tráfego ou serviço de atendimento ao público: cada 3-4 meses\n- Após derrame grave ou evento: imediatamente\n\nAlgumas seguradoras de edifícios comerciais e fabricantes de alcatifas exigem registo de limpezas profissionais para manter a garantia e cobertura.",
+      },
+      {
+        heading: "Limpeza de rotina vs. extração profissional: qual a diferença?",
+        body: "A confusão mais comum é pensar que aspiração regular substitui a limpeza profissional. Não substitui — complementa.\n\n**O que a aspiração faz**: remove partículas superficiais e sólidas. Mantém a aparência aceitável e reduz acumulação de alergénios superficiais.\n\n**O que a aspiração não faz**: não remove gorduras e proteínas aderidas às fibras, não elimina bactérias nem ácaros nas camadas internas, não restaura a cor e textura originais.\n\n**O que a extração profissional faz**: injeta água quente a alta pressão nas fibras e aspira imediatamente, removendo gorduras, proteínas, bactérias e sujidade das camadas mais profundas. Restaura a cor e textura original e aumenta significativamente a vida útil da alcatifa.\n\nUma alcatifa limpa profissionalmente regularmente dura 2 a 3 vezes mais que uma apenas aspirada — reduzindo o custo de substituição que pode chegar a 15-40€/m² de alcatifa comercial.",
+      },
+      {
+        heading: "Quanto custa a limpeza profissional de alcatifa para escritório?",
+        body: "O preço da limpeza profissional de alcatifa comercial em Portugal varia conforme a área:\n\n| Área | Preço médio por m² |\n|------|-------------------|\n| Até 50 m² | 3,50€ – 4,50€/m² |\n| 50 – 200 m² | 2,50€ – 3,50€/m² |\n| Acima de 200 m² | 1,80€ – 2,50€/m² |\n\nEspaços com manchas intensas, colas ou resíduos específicos podem ter sobrecusto de pré-tratamento.\n\nA maioria das empresas profissionais trabalha fora do horário de expediente (tarde, noite ou fim de semana) para não interromper a atividade — inclua esta condição no pedido de orçamento.",
+        tip: "Peça contratos de limpeza semestral ou anual — habitualmente com 10-15% de desconto face ao preço por intervenção avulsa.",
+      },
+    ],
+    faq: [
+      {
+        q: "A alcatifa pode ser usada logo após a limpeza profissional?",
+        a: "Recomendamos aguardar 2-4 horas mínimo, de preferência 6-8 horas. A ventilação acelera a secagem. Para alto tráfego, agende a limpeza no fim do dia para ter uma noite completa de secagem.",
+      },
+      {
+        q: "A limpeza profissional remove manchas antigas de café e comida?",
+        a: "Na grande maioria dos casos, sim. Manchas tratadas profissionalmente nos primeiros 24 horas saem quase sempre. Manchas com semanas ou meses podem requerer pré-tratamento adicional mas ainda são tratáveis.",
+      },
+      {
+        q: "Que tipo de alcatifa beneficia mais da limpeza profissional?",
+        a: "Alcatifas de pelo cortado (a mais comum em escritórios) beneficiam mais da extração, pois a sujidade acumula-se nas bases das fibras. Alcatifas de loop pile (laçaria) acumulam menos sujidade nas fibras mas mais no suporte.",
+      },
+      {
+        q: "Existe algum risco de dano na alcatifa durante a limpeza profissional?",
+        a: "Com profissionais certificados, o risco é mínimo. Antes de iniciar, o técnico verifica o tipo de fibra e testa a solidez das cores. Fibras naturais como lã requerem tratamento mais delicado mas são igualmente tratáveis.",
+      },
+    ],
+    relatedService: { label: "Limpeza profissional de alcatifas", href: "/limpeza-alcatifas" },
+    relatedPosts: [
+      "limpeza-tapetes-profissional-guia-completo",
+      "doencas-causadas-estofos-sujos",
+    ],
+  },
+
+  // ─── Artigo 13 ───────────────────────────────────────────────────────
+  {
+    slug: "guia-acaros-em-casa",
+    title: "Ácaros em casa: o guia completo para identificar, eliminar e prevenir",
+    metaTitle: "Ácaros em Casa: Como Eliminar de Vez | Guia Completo 2025",
+    metaDescription: "Tudo sobre ácaros do pó em casa: onde vivem, que danos causam, como testá-los e como eliminar de vez. Guia para famílias com alergias e crianças.",
+    publishDate: "2026-05-19",
+    updatedDate: "2026-05-19",
+    author: "Equipa Kyro Clean",
+    readingTime: 8,
+    category: "Saúde",
+    heroAlt: "Colchão e sofá — focos principais de ácaros do pó em casa",
+    intro: "Os ácaros do pó são responsáveis por cerca de 50% das alergias respiratórias em Portugal. São invisíveis a olho nu mas vivem em milhões nos sofás, colchões e tapetes da maioria das casas. Este guia explica o que são, onde se encontram em maior concentração, que sintomas causam e — mais importante — como os eliminar de forma eficaz e duradoura.",
+    sections: [
+      {
+        heading: "O que são ácaros do pó e onde vivem?",
+        body: "Os ácaros do pó (Dermatophagoides pteronyssinus e D. farinae) são artrópodes microscópicos de 0,2 a 0,3 mm que se alimentam de células mortas de pele humana e animal. Não mordem, não transmitem doenças diretamente, mas os seus excrementos e fragmentos corporais são potentes alérgenos respiratórios.\n\n**Onde se concentram em maior número:**\n- **Colchões**: entre 100.000 a 2 milhões de ácaros por colchão de casal adulto não higienizado\n- **Sofás e estofados**: segundo maior foco, especialmente encostos e assentos\n- **Tapetes e alcatifas**: proporcionam temperatura e humidade ideais para reprodução\n- **Almofadas e edredons**: renovam-se com facilidade mas acumulam rapidamente\n\n**Condições que favorecem proliferação:**\n- Temperatura entre 20-30°C (a de uma casa portuguesa média)\n- Humidade relativa acima de 50-60%\n- Abundância de células mortas de pele (inevitável em ambientes habitados)",
+        tip: "Um colchão de 10 anos pode pesar 2 kg a mais do que quando novo — grande parte desse peso são ácaros, seus excrementos e células mortas de pele.",
+      },
+      {
+        heading: "Sintomas de alergia a ácaros: como reconhecer",
+        body: "A alergia a ácaros é frequentemente confundida com constipações frequentes ou rinite sazonal. A diferença chave é que os sintomas de alergia a ácaros são **perenes** (presentes todo o ano) e agravam-se dentro de casa, especialmente durante a noite e ao acordar.\n\n**Sintomas mais comuns:**\n- Espirros em série, especialmente de manhã\n- Nariz entupido ou com corrimento aquoso persistente\n- Comichão nos olhos, nariz e palato\n- Tosse seca ou pieira, especialmente deitado\n- Olhos vermelhos e lacrimejantes\n- Em casos graves: crises de asma\n\n**Sinal forte de alergia a ácaros**: os sintomas melhoram nas férias (especialmente em altitude ou junto ao mar) e agravam ao regressar a casa.",
+      },
+      {
+        heading: "Métodos de controlo: o que funciona e o que não chega",
+        body: "**Medidas de primeira linha (reduzem exposição mas não eliminam)**\n- Capas anti-ácaros de membrana impermeável para colchão e almofadas\n- Lavar roupa de cama a 60°C (mata 100% dos ácaros)\n- Aspiração frequente com filtro HEPA\n- Reduzir humidade interior com desumidificador\n- Remover tapetes em quartos de pessoas alérgicas\n\n**O que não funciona:**\n- Sprays acaricidas de supermercado — eficácia temporária e presença de produtos químicos no ambiente\n- Aspiradores comuns sem filtro HEPA — devolvem os ácaros ao ar durante a aspiração\n- Congelamento de almofadas — mata ácaros mas não remove os alérgenos (excrementos) já presentes\n\n**Eliminação eficaz e duradoura:**\nA extração profissional com água quente a alta temperatura é o único método validado para eliminar até 99% dos ácaros e seus alérgenos das camadas internas de colchões e estofados. O calor da água quente mata os ácaros e a aspiração mecânica remove fisicamente os corpos e excrementos — que são os principais alérgenos.",
+      },
+      {
+        heading: "Frequência recomendada de higienização profissional",
+        body: "A frequência ideal depende da sensibilidade dos habitantes e das condições da casa:\n\n**Caso geral (sem alergias diagnosticadas)**: higienização de colchão e sofá uma vez por ano — manutenção preventiva que prolonga a vida útil do estofado e mantém a carga de ácaros abaixo do limiar de sensibilização.\n\n**Com alergias diagnosticadas ou crianças pequenas**: cada 6 meses para colchões, cada 6-12 meses para sofás. Pode ser necessário mais frequente em fase aguda.\n\n**Após entrada de animal de estimação em casa**: higienização imediata e depois cada 6 meses, combinada com impermeabilização para dificultar penetração de pelos e dander.\n\nA Kyro Clean utiliza extração a vapor com temperatura acima de 60°C — limiar térmico de mortalidade dos ácaros — combinada com produtos hipoalergénicos certificados que não deixam resíduos.",
+        tip: "Após a higienização profissional, aplique imediatamente capa anti-ácaros certificada no colchão — protege o investimento da limpeza e mantém os novos ácaros à superfície onde são facilmente removidos pela lavagem.",
+      },
+    ],
+    faq: [
+      {
+        q: "Como saber se tenho muitos ácaros em casa?",
+        a: "A forma mais simples é pelos sintomas: se acordas com espirros e nariz entupido mas melhoram ao longo do dia e pioram dentro de casa, é um sinal forte. Existem também testes de alergia (feitos por alergologista) e kits de teste ambiental de ácaros disponíveis em farmácias.",
+      },
+      {
+        q: "Os ácaros desaparecem no verão?",
+        a: "Não — na maioria de Portugal, as condições de temperatura e humidade são ideais para ácaros durante todo o ano. O verão pode trazer alguma redução junto à costa, mas a população recupara rapidamente no outono.",
+      },
+      {
+        q: "Lavar o colchão profissionalmente substitui a capa anti-ácaros?",
+        a: "São complementares, não alternativos. A higienização elimina os ácaros e alérgenos existentes. A capa anti-ácaros previne a recolonização e facilita a gestão a longo prazo. Use os dois em conjunto para melhor resultado.",
+      },
+      {
+        q: "A limpeza profissional de ácaros é segura para crianças e bebés?",
+        a: "Sim. Os produtos que utilizamos são hipoalergénicos, certificados e sem fragrâncias agressivas. O sofá ou colchão fica pronto a usar após 2-4 horas de secagem, sem resíduos no tecido.",
+      },
+    ],
+    relatedService: { label: "Higienização anti-ácaros de colchões e sofás", href: "/limpeza-colchoes" },
+    relatedPosts: [
+      "acaros-sofas-colchoes-riscos-saude",
+      "doencas-causadas-estofos-sujos",
+    ],
+  },
 ];
 
 export function getAllPosts(): BlogPost[] {

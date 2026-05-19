@@ -287,7 +287,15 @@ export function generateSitemaps(outDir: string) {
     'como-tirar-manchas-sofa-tecido',
     'impermeabilizacao-sofa-vale-pena',
     'acaros-sofas-colchoes-riscos-saude',
+    'quanto-custa-limpar-colchao-profissional',
+    'limpeza-tapetes-profissional-guia-completo',
+    'limpeza-cadeiras-estofadas-precos-guia',
+    'doencas-causadas-estofos-sujos',
     'como-preparar-casa-visita-tecnico',
+    'como-limpar-sofa-veludo',
+    'como-tirar-cheiro-sofa',
+    'limpeza-alcatifa-escritorio',
+    'guia-acaros-em-casa',
   ];
   const resourceUrls: string[] = [
     xmlUrl('/perguntas-frequentes-limpeza-estofos', 'monthly', '0.8'),
