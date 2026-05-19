@@ -41,8 +41,8 @@ const ServiceLocationSchema = ({ serviceName, serviceBaseUrl, placeName, parentP
           "ratingValue": "5.0",
           "bestRating": "5",
           "worstRating": "1",
-          "reviewCount": "50",
-          "ratingCount": "50",
+          "reviewCount": "51",
+          "ratingCount": "51",
         },
       },
       {

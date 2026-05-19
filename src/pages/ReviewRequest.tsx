@@ -31,7 +31,7 @@ const ReviewRequest = () => {
       "ratingValue": "5.0",
       "bestRating": "5",
       "worstRating": "1",
-      "reviewCount": "50",
+      "reviewCount": "51",
     },
   };
 

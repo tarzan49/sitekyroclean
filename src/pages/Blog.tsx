@@ -9,6 +9,7 @@ import imgSofaTecido    from "@/assets/hero-p-limpeza-sofa-tecido.webp";
 import imgManchasVinho  from "@/assets/hero-p-manchas-vinho-sofa.webp";
 import imgSofaDesgast   from "@/assets/hero-p-sofa-desgastado.webp";
 import imgAcarosColchao from "@/assets/hero-p-acaros-colchao.webp";
+import imgAcarosSofa    from "@/assets/hero-p-acaros-sofa.webp";
 import imgColchaoStd    from "@/assets/hero-p-limpeza-colchao-std.webp";
 import imgTapetes       from "@/assets/hero-p-limpeza-tapetes.webp";
 import imgCadeiras      from "@/assets/hero-p-limpeza-cadeiras.webp";
@@ -25,6 +26,10 @@ const HERO_MAP: Record<string, string> = {
   "limpeza-cadeiras-estofadas-precos-guia":     imgCadeiras,
   "doencas-causadas-estofos-sujos":             imgAlergias,
   "como-preparar-casa-visita-tecnico":          imgSofaResultado,
+  "como-limpar-sofa-veludo":                    imgSofaTecido,
+  "como-tirar-cheiro-sofa":                     imgSofaDesgast,
+  "limpeza-alcatifa-escritorio":                imgTapetes,
+  "guia-acaros-em-casa":                        imgAcarosSofa,
 };
 
 const posts = getAllPosts();
@@ -33,10 +38,20 @@ const Blog = () => {
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "Blog",
+    "@id": "https://www.cleansolutions.com.pt/blog#blog",
     "name": "Blog Kyro Clean Solutions",
     "description": "Dicas, guias e informação sobre limpeza profissional de sofás, colchões, tapetes e estofos.",
-    "url": "https://cleansolutions.com.pt/blog",
-    "publisher": { "@type": "Organization", "name": "Kyro Clean Solutions" },
+    "url": "https://www.cleansolutions.com.pt/blog",
+    "inLanguage": "pt-PT",
+    "publisher": { "@id": "https://www.cleansolutions.com.pt/#business" },
+    "blogPost": posts.map(p => ({
+      "@type": "BlogPosting",
+      "headline": p.title,
+      "url": `https://www.cleansolutions.com.pt/blog/${p.slug}`,
+      "datePublished": p.publishDate,
+      "dateModified": p.updatedDate,
+      "author": { "@id": "https://www.cleansolutions.com.pt/#business" },
+    })),
   };
 
   const breadcrumbJsonLd = {

@@ -447,14 +447,16 @@ const ProblemPage = () => {
                     "postalCode": "4150-081",
                     "addressCountry": "PT",
                   },
-                  "aggregateRating": { "@type": "AggregateRating", "ratingValue": "5.0", "bestRating": "5", "worstRating": "1", "reviewCount": "50", "ratingCount": "50" },
+                  "aggregateRating": { "@type": "AggregateRating", "ratingValue": "5.0", "bestRating": "5", "worstRating": "1", "reviewCount": "51", "ratingCount": "51" },
                 },
                 {
                   "@type": "WebPage",
+                  "@id": `https://www.cleansolutions.com.pt/problemas/${slug}#webpage`,
                   "name": data.title,
                   "description": data.metaDescription,
                   "url": `https://www.cleansolutions.com.pt/problemas/${slug}`,
-                  "provider": { "@id": "https://www.cleansolutions.com.pt/#business" },
+                  "publisher": { "@id": "https://www.cleansolutions.com.pt/#business" },
+                  "isPartOf": { "@id": "https://www.cleansolutions.com.pt/#website" },
                 },
                 {
                   "@type": "BreadcrumbList",

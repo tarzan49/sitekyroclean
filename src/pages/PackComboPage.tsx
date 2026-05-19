@@ -72,13 +72,7 @@ const PackComboPage = () => {
     "name": `${pack.name} em ${city.name}`,
     "description": pack.description,
     "url": pageUrl,
-    "provider": {
-      "@type": "LocalBusiness",
-      "name": "Kyro Clean Solutions",
-      "url": "https://www.cleansolutions.com.pt",
-      "telephone": "+351925530647",
-      "aggregateRating": { "@type": "AggregateRating", "ratingValue": "5.0", "reviewCount": "50" },
-    },
+    "provider": { "@id": "https://www.cleansolutions.com.pt/#business" },
     "areaServed": { "@type": "City", "name": city.name },
     "offers": {
       "@type": "Offer",
