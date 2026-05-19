@@ -1322,11 +1322,15 @@ ${formData.description || 'Sem observações adicionais'}
 
           {/* Animated price ticker
               — hidden: step 2 (treatment selector, sem qtds), step 5 (calendar)
-              — visível: step 3 (quantidades) e step 4 (contacto) quando totalPrice > 0 */}
-          {(totalPrice > 0 || hasSobOrcamento) && (showUpsell || (currentStep !== 1 && currentStep !== 2 && currentStep !== 5)) && (
+              — visível: step 3 (quantidades) e step 4 (contacto) quando totalPrice > 0
+              — também visível em step 1 quando há custo de deslocação */}
+          {(totalPrice > 0 || hasSobOrcamento) && (showUpsell || finalTravelCost > 0 || (currentStep !== 1 && currentStep !== 2 && currentStep !== 5)) && (
             <div className="sticky top-0 z-20 text-white flex items-center justify-between py-3 border-b border-white/[0.16] -mx-5 sm:-mx-6 px-5 sm:px-6 animate-fade-in" style={{ background: "#071a12" }}>
               <span className="text-xs text-white/40 font-medium">
-                Estimativa <span className="text-[10px] text-white/20">(IVA incl.)</span>
+                {calculateServicePrice === 0 && finalTravelCost > 0
+                  ? <span>Deslocação <span className="text-white/20 text-[10px]">({formData.location})</span></span>
+                  : <>Estimativa <span className="text-[10px] text-white/20">(IVA incl.)</span></>
+                }
               </span>
               <div className="flex items-center gap-3 pr-8">
                 {(packDiscountActive || isDiscountActive) && totalPrice > 0 && (
