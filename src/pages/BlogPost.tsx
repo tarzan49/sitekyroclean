@@ -69,47 +69,59 @@ const BlogPost = () => {
     day: "numeric", month: "long", year: "numeric",
   });
 
+  const BASE_URL = "https://www.cleansolutions.com.pt";
+  const pageUrl = `${BASE_URL}/blog/${post.slug}`;
+
   const jsonLd = {
     "@context": "https://schema.org",
-    "@type": "BlogPosting",
-    "headline": post.title,
-    "description": post.metaDescription,
-    "datePublished": post.publishDate,
-    "dateModified": post.updatedDate,
-    "author": { "@type": "Organization", "name": "Kyro Clean Solutions" },
-    "publisher": {
-      "@type": "Organization",
-      "name": "Kyro Clean Solutions",
-      "logo": { "@type": "ImageObject", "url": "https://cleansolutions.com.pt/logo.png" },
-    },
-    "mainEntityOfPage": { "@type": "WebPage", "@id": `https://cleansolutions.com.pt/blog/${post.slug}` },
-  };
-
-  const faqJsonLd = {
-    "@context": "https://schema.org",
-    "@type": "FAQPage",
-    "mainEntity": post.faq.map(f => ({
-      "@type": "Question",
-      "name": f.q,
-      "acceptedAnswer": { "@type": "Answer", "text": f.a },
-    })),
-  };
-
-  const breadcrumbJsonLd = {
-    "@context": "https://schema.org",
-    "@type": "BreadcrumbList",
-    "itemListElement": [
-      { "@type": "ListItem", "position": 1, "name": "Início", "item": "https://cleansolutions.com.pt/" },
-      { "@type": "ListItem", "position": 2, "name": "Blog", "item": "https://cleansolutions.com.pt/blog" },
-      { "@type": "ListItem", "position": 3, "name": post.title, "item": `https://cleansolutions.com.pt/blog/${post.slug}` },
+    "@graph": [
+      {
+        "@type": "WebPage",
+        "@id": `${pageUrl}#webpage`,
+        "url": pageUrl,
+        "name": post.title,
+        "description": post.metaDescription,
+        "inLanguage": "pt-PT",
+        "isPartOf": { "@id": `${BASE_URL}/#website` },
+        "publisher": { "@id": `${BASE_URL}/#business` },
+        "breadcrumb": { "@id": `${pageUrl}#breadcrumb` },
+      },
+      {
+        "@type": "BreadcrumbList",
+        "@id": `${pageUrl}#breadcrumb`,
+        "itemListElement": [
+          { "@type": "ListItem", "position": 1, "name": "Início", "item": BASE_URL },
+          { "@type": "ListItem", "position": 2, "name": "Blog", "item": `${BASE_URL}/blog` },
+          { "@type": "ListItem", "position": 3, "name": post.title, "item": pageUrl },
+        ],
+      },
+      {
+        "@type": "BlogPosting",
+        "@id": `${pageUrl}#blogpost`,
+        "headline": post.title,
+        "description": post.metaDescription,
+        "datePublished": post.publishDate,
+        "dateModified": post.updatedDate,
+        "inLanguage": "pt-PT",
+        "author": { "@id": `${BASE_URL}/#business` },
+        "publisher": { "@id": `${BASE_URL}/#business` },
+        "mainEntityOfPage": { "@id": `${pageUrl}#webpage` },
+        ...(heroImg && { "image": heroImg }),
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": post.faq.map(f => ({
+          "@type": "Question",
+          "name": f.q,
+          "acceptedAnswer": { "@type": "Answer", "text": f.a },
+        })),
+      },
     ],
   };
 
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
 
       <Header />
 
