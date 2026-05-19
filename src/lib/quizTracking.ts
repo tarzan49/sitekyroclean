@@ -13,7 +13,13 @@ const SESSION_ID = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
 
 const IS_LOCALHOST =
   typeof window !== "undefined" &&
-  (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1");
+  (
+    window.location.hostname === "localhost" ||
+    window.location.hostname === "127.0.0.1" ||
+    window.location.hostname.startsWith("192.168.") ||
+    window.location.hostname.startsWith("10.") ||
+    window.location.hostname === "::1"
+  );
 
 function getUTMParam(name: string): string | null {
   if (typeof window === "undefined") return null;

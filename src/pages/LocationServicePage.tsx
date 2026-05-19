@@ -9,6 +9,7 @@ import ServiceFAQSchema from "@/components/ServiceFAQSchema";
 import ServiceLocationSchema from "@/components/ServiceLocationSchema";
 import ServicePackBanner from "@/components/ServicePackBanner";
 import { getLocationServiceData, services, cities, getCityLinksForService } from "@/data/locationSeoData";
+import { QuizLocationProvider } from "@/context/QuizLocationContext";
 import { municipiosComFreguesias } from "@/data/freguesiaSeoData";
 import { getAllProblems } from "@/data/problemSeoData";
 import { GENERIC_PROCESS_STEPS, IMPERMEABILIZACAO_STEPS } from "@/constants/serviceProcesses";
@@ -201,7 +202,7 @@ const LocationServicePage = () => {
   }, [data]);
 
   return (
-    <>
+    <QuizLocationProvider value={data.city}>
       <ServiceLocationSchema
         serviceName={data.service}
         serviceBaseUrl={serviceBaseUrl}
@@ -643,7 +644,7 @@ const LocationServicePage = () => {
         <ServiceFAQSchema faqs={data.faqs} />
       </main>
       <Footer />
-    </>
+    </QuizLocationProvider>
   );
 };
 

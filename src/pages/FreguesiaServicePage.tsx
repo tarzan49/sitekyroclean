@@ -9,6 +9,7 @@ import ServiceFAQSchema from "@/components/ServiceFAQSchema";
 import ServiceLocationSchema from "@/components/ServiceLocationSchema";
 import ServicePackBanner from "@/components/ServicePackBanner";
 import { services } from "@/data/locationSeoData";
+import { QuizLocationProvider } from "@/context/QuizLocationContext";
 import {
   municipiosComFreguesias,
   getFreguesia,
@@ -142,7 +143,7 @@ const FreguesiaServicePage = () => {
   const serviceBaseUrl = services.find(s => s.slug === data.serviceSlug)?.baseRoute ?? `/${data.serviceSlug}`;
 
   return (
-    <>
+    <QuizLocationProvider value={data.municipio}>
       <ServiceLocationSchema
         serviceName={data.service}
         serviceBaseUrl={serviceBaseUrl}
@@ -505,7 +506,7 @@ const FreguesiaServicePage = () => {
 
       </main>
       <Footer />
-    </>
+    </QuizLocationProvider>
   );
 };
 
