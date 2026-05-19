@@ -362,7 +362,7 @@ function content_impermeabilizacao_sofa(loc: string, ctx: string): ContentBlock 
       { step: 4, title: 'Secagem e ativação', description: 'A barreira ativa-se na secagem: sofá pronto a usar em 2 a 4 horas.' },
     ],
     faqs: [
-      { question: `Quanto custa impermeabilizar um sofá em ${loc}?`, answer: `O preço começa a partir de 49€ para sofás de 1 lugar, 59€ para 2 lugares e 69€ para 3 lugares. O pack limpeza + impermeabilização começa em 89€ para 1 lugar, com desconto em relação aos serviços separados. Orçamento gratuito em ${loc}.` },
+      { question: `Quanto custa impermeabilizar um sofá em ${loc}?`, answer: `O preço começa a partir de 49€ para sofás de 1 lugar, 69€ para 2 lugares e 89€ para 3 lugares. O pack limpeza + impermeabilização começa em 89€ para 1 lugar, com desconto em relação aos serviços separados. Orçamento gratuito em ${loc}.` },
       { question: `Quanto tempo dura a impermeabilização do sofá em ${loc}?`, answer: 'Com uso normal e manutenção regular, a proteção dura de 2 a 5 anos. Em famílias com crianças ou animais, recomendamos reaplicação ao fim de 2 anos.' },
       { question: 'A impermeabilização altera o toque ou a cor do tecido?', answer: 'Não. O tratamento de nano-partículas é completamente invisível e não altera a maciez, a cor nem a textura do tecido.' },
       { question: `Posso impermeabilizar o sofá sem o limpar antes em ${loc}?`, answer: `Recomendamos vivamente a limpeza antes da impermeabilização. Aplicar em tecido sujo reduz significativamente a eficácia da barreira. A Kyro oferece o pack limpeza + impermeabilização com desconto em ${loc}.` },

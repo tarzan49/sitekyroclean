@@ -170,7 +170,7 @@ const posts: BlogPost[] = [
       },
       {
         heading: "Quanto custa impermeabilizar um sofá?",
-        body: "O custo da impermeabilização de sofá é 49€ (1 lugar), 59€ (2 lugares) e 69€ (3 lugares). Para colchões: 45€ (solteiro), 50€ (casal) e 55€ (king). Quando contratada em pack com a limpeza, o total é mais baixo do que os dois serviços separados.\n\nConsiderando que pode poupar uma limpeza extra por ano e prolonga significativamente a vida do tecido, o retorno do investimento é claro para a maioria dos clientes.",
+        body: "O custo da impermeabilização de sofá é 49€ (1 lugar), 69€ (2 lugares) e 89€ (3 lugares). Para colchões: 45€ (solteiro), 50€ (casal) e 55€ (king). Quando contratada em pack com a limpeza, o total é mais baixo do que os dois serviços separados.\n\nConsiderando que pode poupar uma limpeza extra por ano e prolonga significativamente a vida do tecido, o retorno do investimento é claro para a maioria dos clientes.",
       },
     ],
     faq: [

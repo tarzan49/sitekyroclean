@@ -103,8 +103,8 @@ const allFaqs: FAQ[] = [
   {
     id: "quanto-custa-impermeabilizacao",
     question: "Quanto custa impermeabilizar um sofá ou colchão?",
-    answer: <>A <Link to="/impermeabilizacao" className="text-gold hover:underline font-medium">impermeabilização profissional</Link> para sofás custa <strong>49€ (1 lugar), 59€ (2 lugares) e 69€ (3 lugares)</strong>. Para colchões: 45€ (solteiro), 50€ (casal) e 55€ (king). Quando contratada em pack com a limpeza, o total é mais baixo do que os dois serviços separados. A impermeabilização cria uma barreira invisível nas fibras que impede a absorção de líquidos durante 12 a 18 meses, especialmente recomendada em casas com crianças ou animais.</>,
-    plainAnswer: "Impermeabilização sofá: 49€ (1 lugar), 59€ (2 lugares), 69€ (3 lugares). Colchão: 45€ (solteiro), 50€ (casal), 55€ (king). Pack limpeza+impermeabilização tem desconto. Efeito dura 12 a 18 meses.",
+    answer: <>A <Link to="/impermeabilizacao" className="text-gold hover:underline font-medium">impermeabilização profissional</Link> para sofás custa <strong>49€ (1 lugar), 69€ (2 lugares) e 89€ (3 lugares)</strong>. Para colchões: 45€ (solteiro), 50€ (casal) e 55€ (king). Quando contratada em pack com a limpeza, o total é mais baixo do que os dois serviços separados. A impermeabilização cria uma barreira invisível nas fibras que impede a absorção de líquidos durante 12 a 18 meses, especialmente recomendada em casas com crianças ou animais.</>,
+    plainAnswer: "Impermeabilização sofá: 49€ (1 lugar), 69€ (2 lugares), 89€ (3 lugares). Colchão: 45€ (solteiro), 50€ (casal), 55€ (king). Pack limpeza+impermeabilização tem desconto. Efeito dura 12 a 18 meses.",
   },
   {
     id: "diferenca-tapete-alcatifa",
