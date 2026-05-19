@@ -1608,7 +1608,7 @@ ${formData.description || 'Sem observações adicionais'}
                             />
                           </div>
                           <p className={cn("text-[10px] text-center mt-2 font-semibold transition-colors", reached ? "text-gold" : "text-white/35")}>
-                            {reached ? '🎉 Desconto de 10% ativado!' : `Faltam apenas ${faltam}€ para 10% de desconto`}
+                            {reached ? 'Desconto de 10% ativado!' : `Faltam apenas ${faltam}€ para 10% de desconto`}
                           </p>
                         </div>
                       );
@@ -1750,12 +1750,9 @@ ${formData.description || 'Sem observações adicionais'}
                     {/* Sofa config */}
                     {pendingUpsellId === 'sofa' && (
                       <div className="w-full max-w-xs mx-auto">
-                        <picture>
-                          <source srcSet="/images/services/sofa.webp" type="image/webp" />
-                          <img src="/images/services/sofa.png" alt="Sofá" className="w-16 h-14 object-cover rounded-xl mx-auto mb-2" loading="lazy" />
-                        </picture>
-                        <h3 className="font-playfair text-lg font-bold text-white mb-1">Sofá</h3>
-                        <p className="text-xs text-white/35 mb-3">Selecione tamanho e quantidade</p>
+                        <p className="text-gold text-[10px] font-bold tracking-[0.28em] uppercase mb-1 text-center w-full">ARTIGO EXTRA</p>
+                        <h3 className="font-playfair text-xl font-bold text-white mb-1 text-center">Sofá</h3>
+                        <p className="text-xs text-white/35 mb-3 text-center">Selecione tamanho e quantidade</p>
                         <div className="flex flex-col gap-2 mb-3">
                           {sofaPrices.filter(o => typeof o.cleaningPrice === 'number').map(opt => {
                             const item = pendingSofaItems.find(i => i.sizeId === opt.id);
@@ -1875,12 +1872,9 @@ ${formData.description || 'Sem observações adicionais'}
                     {/* Mattress config */}
                     {pendingUpsellId === 'mattress' && (
                       <div className="w-full max-w-xs mx-auto">
-                        <picture>
-                          <source srcSet="/images/services/colchao.webp" type="image/webp" />
-                          <img src="/images/services/colchao.png" alt="Colchão" className="w-16 h-14 object-cover rounded-xl mx-auto mb-2" loading="lazy" />
-                        </picture>
-                        <h3 className="font-playfair text-lg font-bold text-white mb-1">Colchão</h3>
-                        <p className="text-xs text-white/35 mb-3">Selecione tamanho e quantidade</p>
+                        <p className="text-gold text-[10px] font-bold tracking-[0.28em] uppercase mb-1 text-center w-full">ARTIGO EXTRA</p>
+                        <h3 className="font-playfair text-xl font-bold text-white mb-1 text-center">Colchão</h3>
+                        <p className="text-xs text-white/35 mb-3 text-center">Selecione tamanho e quantidade</p>
                         <div className="flex flex-col gap-2 mb-4">
                           {mattressPrices.map(opt => {
                             const item = pendingMattressItems.find(i => i.sizeId === opt.id);
@@ -1962,12 +1956,9 @@ ${formData.description || 'Sem observações adicionais'}
                     {/* Carpet config */}
                     {pendingUpsellId === 'carpet' && (
                       <div className="w-full max-w-xs mx-auto">
-                        <picture>
-                          <source srcSet="/images/services/tapete.webp" type="image/webp" />
-                          <img src="/images/services/tapete.png" alt="Tapete" className="w-16 h-14 object-cover rounded-xl mx-auto mb-2" loading="lazy" />
-                        </picture>
-                        <h3 className="font-playfair text-lg font-bold text-white mb-1">Área do Tapete</h3>
-                        <p className="text-xs text-white/35 mb-4">Indique a área aproximada em m²</p>
+                        <p className="text-gold text-[10px] font-bold tracking-[0.28em] uppercase mb-1 text-center w-full">ARTIGO EXTRA</p>
+                        <h3 className="font-playfair text-xl font-bold text-white mb-1 text-center">Tapete</h3>
+                        <p className="text-xs text-white/35 mb-4 text-center">Indique a área aproximada em m²</p>
                         <input
                           type="number"
                           inputMode="decimal"
@@ -2002,7 +1993,8 @@ ${formData.description || 'Sem observações adicionais'}
                       const totalChairPrice = basePrice + waterproofPrice;
                       return (
                         <div className="w-full max-w-xs mx-auto">
-                          <h3 className="font-playfair text-lg font-bold text-white text-center mb-1">Cadeiras</h3>
+                          <p className="text-gold text-[10px] font-bold tracking-[0.28em] uppercase mb-1 text-center w-full">ARTIGO EXTRA</p>
+                          <h3 className="font-playfair text-xl font-bold text-white text-center mb-1">Cadeiras</h3>
 
                           {/* Price display — prominent at top */}
                           <div className={cn(
@@ -2189,6 +2181,7 @@ ${formData.description || 'Sem observações adicionais'}
                 className="flex-1"
               >
                 <div className="w-full max-w-sm">
+                  <p className="text-gold text-[10px] font-bold tracking-[0.28em] uppercase mb-1 text-center">CONTACTO</p>
                   <h2 className="font-playfair text-xl sm:text-2xl font-bold text-white text-center mb-1 leading-[1.3]">
                     Os seus dados
                   </h2>

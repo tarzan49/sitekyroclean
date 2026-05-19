@@ -31,8 +31,9 @@ const QuizStep1Service = ({ selectedService, onSelect }: QuizStep1ServiceProps) 
     <div
       style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}
     >
-      <h2 className="font-playfair text-lg sm:text-xl font-bold text-white mb-3 text-center w-full uppercase tracking-wide">
-        O que precisas de limpar?
+      <p className="text-gold text-[10px] font-bold tracking-[0.28em] uppercase mb-1 text-center w-full">SERVIÇO</p>
+      <h2 className="font-playfair text-xl sm:text-2xl font-bold text-white mb-3 text-center w-full">
+        O que precisa de limpar?
       </h2>
 
       <div className="grid grid-cols-2 gap-3 w-full max-w-xs sm:max-w-sm">
