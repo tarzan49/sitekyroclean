@@ -125,7 +125,7 @@ const QuizForm = ({ isOpen, onClose, initialLocation, problema }: QuizFormProps)
   const [showUpsell, setShowUpsell] = useState(false);
   const [upsellShown, setUpsellShown] = useState(false);
   const [upsellItems, setUpsellItems] = useState<UpsellItemConfig[]>([]);
-  const [upsellSubStep, setUpsellSubStep] = useState<'select' | 'config'>('select');
+  const [upsellSubStep, setUpsellSubStep] = useState<'prompt' | 'select' | 'config'>('prompt');
   const [pendingUpsellId, setPendingUpsellId] = useState<string | null>(null);
   const [pendingSofaItems, setPendingSofaItems] = useState<SofaItem[]>([]);
   const [pendingMattressItems, setPendingMattressItems] = useState<MattressItem[]>([]);
@@ -529,7 +529,8 @@ const QuizForm = ({ isOpen, onClose, initialLocation, problema }: QuizFormProps)
       // Upsell intercept: always show Pack Família when going forward from step 3
       // (re-shows if user clicked Voltar from Pack back to quantities)
       if (currentStep === 3) {
-        setUpsellShown(true); // marks that upsell has been shown (used by handlePrev from step 4)
+        setUpsellShown(true);
+        setUpsellSubStep('prompt');
         setShowUpsell(true);
         return;
       }
@@ -538,8 +539,9 @@ const QuizForm = ({ isOpen, onClose, initialLocation, problema }: QuizFormProps)
   };
 
   const handlePrev = () => {
-    // If on step 4 (contact) and upsell was shown, go back to upsell
+    // If on step 4 (contact) and upsell was shown, go back to upsell item selector
     if (currentStep === 4 && upsellShown) {
+      setUpsellSubStep('select');
       setShowUpsell(true);
       return;
     }
@@ -1565,56 +1567,88 @@ ${formData.description || 'Sem observações adicionais'}
             {showUpsell && (
               <div className="flex-1 flex flex-col w-full items-center">
 
-                {/* SUB-STEP: Select items */}
-                {upsellSubStep === 'select' && (
-                  <div className="flex flex-col w-full items-center text-center">
-                    <Users className="w-8 h-8 mb-2 text-gold/60" />
-                    <p className="text-gold text-[10px] font-bold tracking-[0.28em] uppercase mb-1">PACK FAMÍLIA</p>
-                    <h2 className="font-playfair text-xl sm:text-2xl font-bold text-white mb-1 leading-[1.3]">
-                      {packDiscountActive ? 'Desconto de 10% ativado!' : 'Quer adicionar mais artigos?'}
+                {/* SUB-STEP: Yes/No prompt */}
+                {upsellSubStep === 'prompt' && (
+                  <div className="flex flex-col w-full items-center text-center py-2">
+                    {/* Icon with glow */}
+                    <div className="relative mb-4">
+                      <div className="w-16 h-16 rounded-full bg-gold/10 border border-gold/25 flex items-center justify-center shadow-[0_0_32px_rgba(212,175,55,0.18)]">
+                        <Users className="w-7 h-7 text-gold" />
+                      </div>
+                    </div>
+
+                    <p className="text-gold text-[10px] font-bold tracking-[0.28em] uppercase mb-2">PACK FAMÍLIA</p>
+                    <h2 className="font-playfair text-2xl sm:text-3xl font-bold text-white mb-3 leading-[1.2]">
+                      Tem mais artigos<br />para limpar?
                     </h2>
-                    <p className="text-xs text-white/45 max-w-[280px] mx-auto mb-4 leading-relaxed">
-                      {packDiscountActive
-                        ? <span className="text-gold font-bold">Desconto de 10% aplicado automaticamente ao seu pedido.</span>
-                        : <>Pedidos acima de{' '}<span className="text-gold font-bold">200€</span>{' '}têm 10% de desconto automático.</>
-                      }
+                    <p className="text-[13px] text-white/50 max-w-[255px] mx-auto mb-5 leading-relaxed">
+                      Pedidos acima de <span className="text-gold font-bold">200€</span> têm{' '}
+                      <span className="text-gold font-bold">10% de desconto</span> automático — quanto mais adicionar, mais poupa.
                     </p>
 
-                    {/* Discount tracker — 200€ threshold */}
+                    {/* Progress bar to 200€ */}
                     {(() => {
-                      const PACK_THRESHOLD = 200;
-                      const thresholdMet = totalPrice >= PACK_THRESHOLD;
-                      const unlockedPack = packDiscountActive;
-                      const progressPct = Math.min(totalPrice / PACK_THRESHOLD * 100, 100);
-                      const faltam = Math.max(0, Math.ceil(PACK_THRESHOLD - totalPrice));
-                      const msg = unlockedPack
-                        ? 'Desconto de 10% ativado automaticamente!'
-                        : faltam > 0
-                          ? `Faltam apenas ${faltam}€ para o desconto de 10%`
-                          : 'Desconto de 10% ativado!';
+                      const THRESHOLD = 200;
+                      const pct = Math.min(totalPrice / THRESHOLD * 100, 100);
+                      const faltam = Math.max(0, Math.ceil(THRESHOLD - totalPrice));
+                      const reached = totalPrice >= THRESHOLD;
                       return (
                         <div className={cn(
-                          "w-full max-w-xs mx-auto mb-4 rounded-2xl border px-4 py-3 transition-all duration-500",
-                          unlockedPack ? "bg-[#252931] border-gold/35" : thresholdMet ? "bg-[#252931] border-white/[0.15]" : "bg-[#252931] border-white/[0.16]"
+                          "w-full max-w-xs mx-auto mb-6 rounded-2xl border px-4 py-3 transition-all duration-500",
+                          reached ? "bg-[#1a2a1a] border-gold/40" : "bg-[#252931] border-white/[0.10]"
                         )}>
-                          <div className="flex justify-between text-[10px] font-bold uppercase tracking-wider mb-1">
-                            <span className={cn("transition-colors tabular-nums", totalPrice > 0 ? "text-gold/70" : "text-white/25")}>
-                              {totalPrice > 0 ? `${Math.round(totalPrice)}€ no carrinho` : 'Carrinho vazio'}
-                            </span>
-                            <span className={cn("transition-colors", unlockedPack ? "text-gold" : "text-white/25")}>≥200€ → 10%</span>
+                          <div className="flex justify-between text-[10px] font-bold uppercase tracking-wider mb-2">
+                            <span className="text-gold/70 tabular-nums">{Math.round(totalPrice)}€ no carrinho</span>
+                            <span className={reached ? "text-gold" : "text-white/25"}>≥200€ → −10%</span>
                           </div>
-                          <div className="h-2 bg-white/[0.08] rounded-full overflow-hidden">
+                          <div className="h-2.5 bg-white/[0.07] rounded-full overflow-hidden">
                             <div
-                              className={cn("h-full transition-all duration-700", unlockedPack ? "bg-gradient-to-r from-[#C9A84C] via-[#f5e27a] to-[#C9A84C]" : "bg-gradient-to-r from-gold/60 to-gold")}
-                              style={{ width: `${progressPct}%` }}
+                              className={cn("h-full rounded-full transition-all duration-700", reached ? "bg-gradient-to-r from-[#C9A84C] via-[#f5e27a] to-[#C9A84C]" : "bg-gradient-to-r from-gold/50 to-gold")}
+                              style={{ width: `${Math.max(pct, 4)}%` }}
                             />
                           </div>
-                          <p className={cn("text-[10px] text-center mt-2 font-medium transition-colors", unlockedPack ? "text-gold font-bold" : thresholdMet ? "text-white/60" : "text-white/35")}>
-                            {msg}
+                          <p className={cn("text-[10px] text-center mt-2 font-semibold transition-colors", reached ? "text-gold" : "text-white/35")}>
+                            {reached ? '🎉 Desconto de 10% ativado!' : `Faltam apenas ${faltam}€ para 10% de desconto`}
                           </p>
                         </div>
                       );
                     })()}
+
+                    {/* SIM — dominant gold CTA */}
+                    <button
+                      onClick={() => setUpsellSubStep('select')}
+                      className="w-full max-w-xs h-14 bg-gradient-to-r from-gold to-[#d4c57b] hover:from-[#d4c57b] hover:to-gold text-[#12121e] font-black text-[15px] tracking-wide rounded-xl shadow-[0_4px_36px_rgba(212,175,55,0.45)] touch-manipulation active:scale-[0.98] transition-all flex items-center justify-center gap-2.5 mb-3"
+                    >
+                      <Check className="w-5 h-5" />
+                      Sim, quero adicionar
+                    </button>
+
+                    {/* NÃO — subdued ghost */}
+                    <button
+                      onClick={() => { setShowUpsell(false); setCurrentStep(4); }}
+                      className="w-full max-w-xs h-11 flex items-center justify-center gap-1.5 text-white/35 hover:text-white/60 text-sm font-medium transition-colors touch-manipulation"
+                    >
+                      Não, seguir assim
+                      <ChevronRight className="w-4 h-4" />
+                    </button>
+
+                    <p className="text-[9px] text-white/15 mt-4">Sem compromisso · Pode remover artigos a qualquer momento</p>
+                  </div>
+                )}
+
+                {/* SUB-STEP: Select items */}
+                {upsellSubStep === 'select' && (
+                  <div className="flex flex-col w-full items-center text-center">
+                    <p className="text-gold text-[10px] font-bold tracking-[0.28em] uppercase mb-1">PACK FAMÍLIA</p>
+                    <h2 className="font-playfair text-xl sm:text-2xl font-bold text-white mb-1 leading-[1.3]">
+                      {packDiscountActive ? 'Desconto de 10% ativado!' : 'Que artigo quer adicionar?'}
+                    </h2>
+                    <p className="text-xs text-white/45 max-w-[280px] mx-auto mb-4 leading-relaxed">
+                      {packDiscountActive
+                        ? <span className="text-gold font-bold">Desconto de 10% aplicado automaticamente.</span>
+                        : <>Faltam <span className="text-gold font-bold">{Math.max(0, Math.ceil(200 - totalPrice))}€</span> para 10% de desconto.</>
+                      }
+                    </p>
 
                     {/* Already added upsell items */}
                     {upsellItems.length > 0 && (
@@ -1645,54 +1679,41 @@ ${formData.description || 'Sem observações adicionais'}
                       </div>
                     )}
 
-                    {/* Cards for available services to add */}
-                    {(() => {
-                      const available = ([
+                    {/* Cards — always all 4 options */}
+                    <div className="grid grid-cols-2 gap-2 w-full max-w-xs mx-auto mb-4">
+                      {([
                         { id: 'sofa',     img: '/images/services/sofa.webp',    label: 'Sofá',     sublabel: 'a partir de 49€' },
                         { id: 'mattress', img: '/images/services/colchao.webp', label: 'Colchão',  sublabel: 'a partir de 39€' },
                         { id: 'carpet',   img: '/images/services/tapete.webp',  label: 'Tapete',   sublabel: 'a partir de 5€/m²' },
                         { id: 'chairs',   img: '/images/services/cadeira.webp', label: 'Cadeiras', sublabel: '15€/cadeira' },
-                      ] as const).filter(o => {
-                        if (o.id === formData.service) return false;
-                        if (o.id === 'mattress') {
-                          const usedSizes = upsellItems.filter(u => u.id === 'mattress').map(u => u.mattressSize);
-                          return mattressPrices.some(p => !usedSizes.includes(p.id));
-                        }
-                        return true;
-                      });
-                      if (available.length === 0) return null;
-                      return (
-                        <div className={cn("grid gap-2 w-full max-w-xs mx-auto mb-4", available.length >= 3 ? "grid-cols-3" : available.length === 2 ? "grid-cols-2" : "grid-cols-1")}>
-                          {available.map(opt => (
-                            <button
-                              key={opt.id}
-                              onClick={() => {
-                                setPendingUpsellId(opt.id);
-                                setPendingSofaItems([]);
-                                setPendingMattressItems([]);
-                                setPendingUpsellChaiseLongueQty(0);
-                                setPendingCarpetArea('');
-                                setPendingChairQty('');
-                                setPendingChairQtyNum(1);
-                                setPendingWaterproof(false);
-                                setUpsellSubStep('config');
-                              }}
-                              className="relative overflow-hidden rounded-2xl border border-white/[0.12] aspect-square shadow-lg hover:border-gold/50 hover:shadow-[0_0_14px_rgba(212,175,55,0.25)] active:scale-[0.97] transition-all duration-200 touch-manipulation"
-                            >
-                              <picture>
-                                <source srcSet={opt.img} type="image/webp" />
-                                <img src={opt.img.replace('.webp', '.png')} alt={opt.label} className="absolute inset-0 w-full h-full object-cover" loading="lazy" />
-                              </picture>
-                              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
-                              <div className="absolute inset-x-0 bottom-0 p-2 z-10 text-center">
-                                <p className="text-[11px] font-bold text-white leading-tight">{opt.label}</p>
-                                <p className="text-[9px] text-gold/80 leading-none mt-0.5">{opt.sublabel}</p>
-                              </div>
-                            </button>
-                          ))}
-                        </div>
-                      );
-                    })()}
+                      ] as const).map(opt => (
+                        <button
+                          key={opt.id}
+                          onClick={() => {
+                            setPendingUpsellId(opt.id);
+                            setPendingSofaItems([]);
+                            setPendingMattressItems([]);
+                            setPendingUpsellChaiseLongueQty(0);
+                            setPendingCarpetArea('');
+                            setPendingChairQty('');
+                            setPendingChairQtyNum(1);
+                            setPendingWaterproof(false);
+                            setUpsellSubStep('config');
+                          }}
+                          className="relative overflow-hidden rounded-2xl border border-white/[0.12] aspect-square shadow-lg hover:border-gold/50 hover:shadow-[0_0_14px_rgba(212,175,55,0.25)] active:scale-[0.97] transition-all duration-200 touch-manipulation"
+                        >
+                          <picture>
+                            <source srcSet={opt.img} type="image/webp" />
+                            <img src={opt.img.replace('.webp', '.png')} alt={opt.label} className="absolute inset-0 w-full h-full object-cover" loading="lazy" />
+                          </picture>
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
+                          <div className="absolute inset-x-0 bottom-0 p-2 z-10 text-center">
+                            <p className="text-[11px] font-bold text-white leading-tight">{opt.label}</p>
+                            <p className="text-[9px] text-gold/80 leading-none mt-0.5">{opt.sublabel}</p>
+                          </div>
+                        </button>
+                      ))}
+                    </div>
 
                     <p className="text-[9px] text-white/20 text-center mb-3">Desconto não acumulável com outras promoções</p>
 
@@ -2132,7 +2153,7 @@ ${formData.description || 'Sem observações adicionais'}
                       <ChevronRight className="w-4 h-4" />
                     </button>
                     <button
-                      onClick={() => { setShowSummary(false); setShowUpsell(true); }}
+                      onClick={() => { setShowSummary(false); setUpsellSubStep('select'); setShowUpsell(true); }}
                       className="flex items-center justify-center gap-1 text-xs text-white/30 hover:text-white/55 transition-colors py-2 touch-manipulation"
                     >
                       <ChevronLeft className="w-3.5 h-3.5" />
