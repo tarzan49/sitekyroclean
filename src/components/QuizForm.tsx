@@ -18,7 +18,6 @@ import {
   initialFormData,
   sofaPrices,
   mattressPrices,
-  sofaChaisePrice,
   locationPrices,
 } from './quiz';
 
@@ -33,7 +32,6 @@ interface UpsellItemConfig {
   label: string;
   waterproof?: boolean;
   waterproofPrice?: number;
-  chaiseLongue?: boolean;
 }
 
 // ── Step-2 item types (previously in sub-component files) ─────────────────
@@ -148,7 +146,6 @@ const QuizForm = ({ isOpen, onClose, initialLocation, problema }: QuizFormProps)
   const [pendingUpsellId, setPendingUpsellId] = useState<string | null>(null);
   const [pendingSofaItems, setPendingSofaItems] = useState<SofaItem[]>([]);
   const [pendingMattressItems, setPendingMattressItems] = useState<MattressItem[]>([]);
-  const [pendingUpsellChaiseLongueQty, setPendingUpsellChaiseLongueQty] = useState(0);
   const [pendingCarpetArea, setPendingCarpetArea] = useState('');
   const [pendingChairQty, setPendingChairQty] = useState('');
   const [pendingChairQtyNum, setPendingChairQtyNum] = useState(1);
@@ -157,7 +154,6 @@ const QuizForm = ({ isOpen, onClose, initialLocation, problema }: QuizFormProps)
   const [timerFlash, setTimerFlash] = useState(false);
   const [sofaItems, setSofaItems] = useState<SofaItem[]>([]);
   const [mattressItems, setMattressItems] = useState<MattressItem[]>([]);
-  const [chaiseLongueQty, setChaiseLongueQty] = useState(0);
   const [confettiActive, setConfettiActive] = useState(false);
   const prevTotalRef = useRef(0);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -219,9 +215,6 @@ const QuizForm = ({ isOpen, onClose, initialLocation, problema }: QuizFormProps)
           const unitPrice = item.packEnabled ? bothP : baseP;
           if (unitPrice > 0) price += unitPrice * item.qty;
         });
-        if (chaiseLongueQty > 0 && hasSofas) {
-          price += chaiseLongueQty * sofaChaisePrice.cleaning;
-        }
         break;
       }
 
@@ -616,7 +609,6 @@ const QuizForm = ({ isOpen, onClose, initialLocation, problema }: QuizFormProps)
           .filter(Boolean) as string[];
         if (sofaLines.length > 0) details.push(...sofaLines);
         if (sofaItems.some(i => i.packEnabled && i.qty > 0)) details.push('+ Proteção Total VIP');
-        if (chaiseLongueQty > 0) details.push(`+${chaiseLongueQty}x Chaise Longue (+${chaiseLongueQty * sofaChaisePrice.cleaning}€)`);
         break;
       }
       case 'carpet':
@@ -803,9 +795,6 @@ ${formData.description || 'Sem observações adicionais'}
             : typeof opt.cleaningPrice === 'number' ? (opt.cleaningPrice as number) : null;
           receiptLines.push({ label: `Sofá ${opt.label}${item.packEnabled ? ' + Impermeab.' : ''}`, qty: item.qty, unitPrice: unit, total: unit !== null ? unit * item.qty : null });
         });
-        if (chaiseLongueQty > 0 && sofaItems.some(i => i.qty > 0)) {
-          receiptLines.push({ label: 'Chaise Longue', qty: chaiseLongueQty, unitPrice: sofaChaisePrice.cleaning, total: chaiseLongueQty * sofaChaisePrice.cleaning });
-        }
       } else if (formData.service === 'mattress') {
         mattressItems.filter(i => i.qty > 0).forEach(item => {
           const opt = mattressPrices.find(p => p.id === item.sizeId);
@@ -937,7 +926,6 @@ ${formData.description || 'Sem observações adicionais'}
     setPendingUpsellId(null);
     setPendingSofaItems([]);
     setPendingMattressItems([]);
-    setPendingUpsellChaiseLongueQty(0);
     setPendingCarpetArea('');
     setPendingChairQty('');
     setPendingChairQtyNum(1);
@@ -946,7 +934,6 @@ ${formData.description || 'Sem observações adicionais'}
     setTimerFlash(false);
     setSofaItems([]);
     setMattressItems([]);
-    setChaiseLongueQty(0);
     setConfettiActive(false);
   };
 
@@ -1040,21 +1027,6 @@ ${formData.description || 'Sem observações adicionais'}
             })}
           </div>
           {has4Plus && <input type="number" inputMode="numeric" pattern="[0-9]*" placeholder="Nº de lugares (ex: 5)" className="w-full max-w-sm bg-white/[0.06] border border-white/15 focus:border-gold focus:outline-none text-white placeholder:text-white/25 rounded-xl h-12 px-4 text-base transition-colors" onChange={(e) => updateFormData({ description: `Sofá com ${e.target.value} lugares` })} />}
-          <div className={cn('w-full max-w-sm rounded-xl border-2 transition-all duration-200', chaiseLongueQty > 0 ? 'border-gold/60 bg-[#1a2a1a] shadow-[0_0_10px_rgba(212,175,55,0.18)]' : 'border-gold/20 bg-[#1a2a1a]')}>
-            <div className="flex items-center justify-between px-4 py-3">
-              <div className="flex-1 min-w-0 mr-3">
-                <span className={cn('text-sm font-semibold', chaiseLongueQty > 0 ? 'text-white' : 'text-white/50')}>Chaise Longue</span>
-                <div className="mt-0.5">
-                  <span className={cn('text-sm font-bold tabular-nums', chaiseLongueQty > 0 ? 'text-gold' : 'text-white/30')}>+{sofaChaisePrice.cleaning}€/un.</span>
-                </div>
-              </div>
-              <div className="flex items-center gap-2 flex-shrink-0">
-                <button onClick={() => setChaiseLongueQty(q => Math.max(0, q - 1))} disabled={chaiseLongueQty === 0} className="w-8 h-8 rounded-lg border border-white/20 bg-white/[0.05] text-white font-bold text-base flex items-center justify-center disabled:opacity-20 active:scale-95 transition-all touch-manipulation hover:border-gold/50">−</button>
-                <span className={cn('w-6 text-center font-bold tabular-nums text-sm', chaiseLongueQty > 0 ? 'text-gold' : 'text-white/30')}>{chaiseLongueQty}</span>
-                <button onClick={() => setChaiseLongueQty(q => q + 1)} className="w-8 h-8 rounded-lg border border-white/20 bg-white/[0.05] text-white font-bold text-base flex items-center justify-center active:scale-95 transition-all touch-manipulation hover:border-gold/50">+</button>
-              </div>
-            </div>
-          </div>
           <p className="text-[9px] text-white/20 text-center tracking-wide uppercase">Valores com IVA incluído</p>
         </div>
       );
@@ -1802,7 +1774,6 @@ ${formData.description || 'Sem observações adicionais'}
                             setPendingUpsellId(opt.id);
                             setPendingSofaItems([]);
                             setPendingMattressItems([]);
-                            setPendingUpsellChaiseLongueQty(0);
                             setPendingCarpetArea('');
                             setPendingChairQty('');
                             setPendingChairQtyNum(1);
@@ -1917,35 +1888,11 @@ ${formData.description || 'Sem observações adicionais'}
                             );
                           })}
                         </div>
-                        {/* Chaise Longue add-on */}
-                        {(() => {
-                          const hasSofas = pendingSofaItems.some(i => i.qty > 0);
-                          const anyPack = pendingSofaItems.some(i => i.packEnabled && i.qty > 0);
-                          const chaiseUnitPrice = anyPack ? sofaChaisePrice.cleaning + sofaChaisePrice.waterproofing : sofaChaisePrice.cleaning;
-                          return (
-                            <div className={cn('w-full rounded-xl border-2 transition-all duration-200 mb-3', pendingUpsellChaiseLongueQty > 0 ? 'border-gold/60 bg-[#1a2a1a] shadow-[0_0_10px_rgba(212,175,55,0.18)]' : 'border-gold/20 bg-[#1a2a1a]')}>
-                              <div className="flex items-center justify-between px-4 py-3">
-                                <div className="flex-1 min-w-0 mr-3">
-                                  <span className={cn('text-sm font-semibold', hasSofas && pendingUpsellChaiseLongueQty > 0 ? 'text-white' : 'text-white/50')}>Chaise Longue</span>
-                                  <div className="mt-0.5">
-                                    <span className={cn('text-sm font-bold tabular-nums', hasSofas && pendingUpsellChaiseLongueQty > 0 ? 'text-gold' : 'text-white/30')}>+{chaiseUnitPrice}€/un.</span>
-                                  </div>
-                                </div>
-                                <div className="flex items-center gap-2 flex-shrink-0">
-                                  <button onClick={() => { if (hasSofas) setPendingUpsellChaiseLongueQty(q => Math.max(0, q - 1)); }} disabled={pendingUpsellChaiseLongueQty === 0 || !hasSofas} className="w-8 h-8 rounded-lg border border-white/20 bg-white/[0.05] text-white font-bold text-base flex items-center justify-center disabled:opacity-20 active:scale-95 transition-all touch-manipulation hover:border-gold/50">−</button>
-                                  <span className={cn('w-6 text-center font-bold tabular-nums text-sm', hasSofas && pendingUpsellChaiseLongueQty > 0 ? 'text-gold' : 'text-white/30')}>{pendingUpsellChaiseLongueQty}</span>
-                                  <button onClick={() => { if (hasSofas) setPendingUpsellChaiseLongueQty(q => q + 1); }} disabled={!hasSofas} className="w-8 h-8 rounded-lg border border-white/20 bg-white/[0.05] text-white font-bold text-base flex items-center justify-center active:scale-95 transition-all touch-manipulation hover:border-gold/50 disabled:opacity-20">+</button>
-                                </div>
-                              </div>
-                            </div>
-                          );
-                        })()}
                         <button
                           disabled={!pendingSofaItems.some(i => i.qty > 0)}
                           onClick={() => {
                             const isWaterproofBase = formData.serviceType === 'waterproofing';
                             const anyPack = pendingSofaItems.some(i => i.packEnabled && i.qty > 0);
-                            const chaiseUnitP = anyPack ? sofaChaisePrice.cleaning + sofaChaisePrice.waterproofing : sofaChaisePrice.cleaning;
                             pendingSofaItems.filter(i => i.qty > 0).forEach(item => {
                               const opt = sofaPrices.find(p => p.id === item.sizeId)!;
                               const isSobItem = typeof opt.cleaningPrice !== 'number';
@@ -1966,16 +1913,6 @@ ${formData.description || 'Sem observações adicionais'}
                                 waterproofPrice: packExtra,
                               }]);
                             });
-                            if (pendingUpsellChaiseLongueQty > 0) {
-                              setUpsellItems(prev => [...prev, {
-                                id: 'sofa-chaise',
-                                qty: pendingUpsellChaiseLongueQty,
-                                price: pendingUpsellChaiseLongueQty * chaiseUnitP,
-                                label: `${pendingUpsellChaiseLongueQty}× Chaise Longue${anyPack ? ' + Pack' : ''}`,
-                                chaiseLongue: true,
-                              }]);
-                            }
-                            setPendingUpsellChaiseLongueQty(0);
                             setUpsellSubStep('select');
                           }}
                           className="w-full h-12 bg-gradient-to-r from-gold to-[#d4c57b] hover:from-[#d4c57b] hover:to-gold text-[#12121e] font-bold rounded-xl disabled:opacity-35 touch-manipulation active:scale-[0.98] transition-all"
