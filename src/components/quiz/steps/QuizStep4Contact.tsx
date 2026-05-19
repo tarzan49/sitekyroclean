@@ -4,23 +4,24 @@
  * Collects name, phone, optional email, and optional photo uploads.
  */
 
-import { useRef } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import { Camera, Trophy, Lock, ThumbsUp } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import type { QuizFormData } from '@/components/quiz/QuizTypes';
 
 interface QuizStep4ContactProps {
   formData: QuizFormData;
-  /** Updates a subset of formData fields. */
   updateFormData: (updates: Partial<QuizFormData>) => void;
 }
 
-/**
- * Contact data collection step.
- * Name and phone are required; email and photos are optional.
- */
 const QuizStep4Contact = ({ formData, updateFormData }: QuizStep4ContactProps) => {
   const photoInputRef = useRef<HTMLInputElement>(null);
+  // Prevent iOS Safari from auto-focusing inputs on mount (which opens keyboard before user sees the page)
+  const [inputsActive, setInputsActive] = useState(false);
+  useEffect(() => {
+    const t = setTimeout(() => setInputsActive(true), 350);
+    return () => clearTimeout(t);
+  }, []);
 
   return (
     <div
@@ -60,6 +61,8 @@ const QuizStep4Contact = ({ formData, updateFormData }: QuizStep4ContactProps) =
             <Input
               placeholder="O seu nome"
               value={formData.name}
+              readOnly={!inputsActive}
+              onClick={() => setInputsActive(true)}
               onChange={e => updateFormData({ name: e.target.value })}
               className="text-base h-13 bg-white/[0.06] border-white/15 text-white placeholder:text-white/20 focus-visible:ring-gold rounded-xl"
             />
@@ -70,6 +73,8 @@ const QuizStep4Contact = ({ formData, updateFormData }: QuizStep4ContactProps) =
               type="tel"
               placeholder="9xx xxx xxx"
               value={formData.phone}
+              readOnly={!inputsActive}
+              onClick={() => setInputsActive(true)}
               onChange={e => updateFormData({ phone: e.target.value })}
               className="text-base h-13 bg-white/[0.06] border-white/15 text-white placeholder:text-white/20 focus-visible:ring-gold rounded-xl"
             />
