@@ -146,6 +146,11 @@ const LimpezaColchoes = () => {
           description="Higienização profissional de colchões no Porto. Eliminação de ácaros, bactérias e odores."
           url="/limpeza-colchoes"
           priceFrom="39€"
+          reviews={[
+            { author: "Fernando G.", city: "Rio Tinto", text: "Excelente trabalho no meu colchão. Tinha alergia constante e depois da limpeza melhorou imenso. Super recomendo!", date: "2025-01-28" },
+            { author: "Sofia P.", city: "Guimarães", text: "Fantástico! O colchão estava com manchas difíceis e conseguiram remover tudo. Muito satisfeita com o resultado.", date: "2025-03-10" },
+            { author: "Daniela R.", city: "Famalicão", text: "Contratei para limpar os colchões das crianças. Ficaram super higiénicos e sem aquele cheiro a humidade. Adorei!", date: "2025-04-15" },
+          ]}
         />
       </main>
       <Footer />

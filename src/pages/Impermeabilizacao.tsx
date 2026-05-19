@@ -143,7 +143,12 @@ const Impermeabilizacao = () => {
           serviceName="Impermeabilização de Estofos"
           description="Impermeabilização profissional de sofás, tapetes e cadeiras no Porto. Proteção até 10 anos."
           url="/impermeabilizacao"
-          priceFrom="25€"
+          priceFrom="49€"
+          reviews={[
+            { author: "Ricardo A.", city: "Póvoa de Varzim", text: "A impermeabilização do sofá foi perfeita. Agora sinto-me muito mais tranquilo com crianças em casa. Recomendo vivamente!", date: "2025-02-05" },
+            { author: "João P.", city: "Vila Nova de Gaia", text: "Cheiro fresco e sensação incrível. A equipa é profissional, rápida e super cuidadosa. Recomendo!", date: "2025-01-12" },
+            { author: "Pedro R.", city: "Maia", text: "Rapidez e qualidade ao mesmo nível. Em 3 horas o sofá estava limpo e seco. Impressionante!", date: "2025-03-30" },
+          ]}
         />
       </main>
       <Footer />

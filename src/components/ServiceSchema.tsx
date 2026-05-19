@@ -1,5 +1,12 @@
 const BASE_URL = "https://www.cleansolutions.com.pt";
 
+interface ServiceReview {
+  author: string;
+  city: string;
+  text: string;
+  date: string;
+}
+
 interface ServiceSchemaProps {
   serviceName: string;
   description: string;
@@ -7,11 +14,22 @@ interface ServiceSchemaProps {
   priceFrom: string;
   imageUrl?: string;
   breadcrumbLabel?: string;
+  reviews?: ServiceReview[];
 }
 
-const ServiceSchema = ({ serviceName, description, url, priceFrom, imageUrl, breadcrumbLabel }: ServiceSchemaProps) => {
+const ServiceSchema = ({ serviceName, description, url, priceFrom, imageUrl, breadcrumbLabel, reviews }: ServiceSchemaProps) => {
   const fullUrl = `${BASE_URL}${url}`;
   const priceNumeric = priceFrom.replace(/[^0-9]/g, '') || "39";
+
+  const reviewNodes = (reviews ?? []).map((r, i) => ({
+    "@type": "Review",
+    "@id": `${fullUrl}#review-${i + 1}`,
+    "reviewRating": { "@type": "Rating", "ratingValue": "5", "bestRating": "5", "worstRating": "1" },
+    "author": { "@type": "Person", "name": r.author, "address": { "@type": "PostalAddress", "addressLocality": r.city, "addressCountry": "PT" } },
+    "reviewBody": r.text,
+    "datePublished": r.date,
+    "itemReviewed": { "@id": `${fullUrl}#service` },
+  }));
 
   const schema = {
     "@context": "https://schema.org",
@@ -34,6 +52,30 @@ const ServiceSchema = ({ serviceName, description, url, priceFrom, imageUrl, bre
           { "@type": "ListItem", "position": 1, "name": "Início", "item": BASE_URL },
           { "@type": "ListItem", "position": 2, "name": breadcrumbLabel || serviceName, "item": fullUrl },
         ],
+      },
+      {
+        "@type": ["LocalBusiness", "CleaningService"],
+        "@id": `${BASE_URL}/#business`,
+        "name": "Kyro Clean Solutions",
+        "url": BASE_URL,
+        "telephone": "+351925530647",
+        "email": "cleansolutions.pt25@gmail.com",
+        "priceRange": "€€",
+        "address": {
+          "@type": "PostalAddress",
+          "streetAddress": "R. de António Cardoso 263",
+          "addressLocality": "Porto",
+          "postalCode": "4150-081",
+          "addressCountry": "PT",
+        },
+        "aggregateRating": {
+          "@type": "AggregateRating",
+          "ratingValue": "5.0",
+          "bestRating": "5",
+          "worstRating": "1",
+          "reviewCount": "51",
+          "ratingCount": "51",
+        },
       },
       {
         "@type": "Service",
@@ -62,7 +104,11 @@ const ServiceSchema = ({ serviceName, description, url, priceFrom, imageUrl, bre
           "availability": "https://schema.org/InStock",
           "validFrom": "2025-01-01",
         },
+        ...(reviewNodes.length > 0 && {
+          "review": reviewNodes.map(r => ({ "@id": r["@id"] })),
+        }),
       },
+      ...reviewNodes,
     ],
   };
 

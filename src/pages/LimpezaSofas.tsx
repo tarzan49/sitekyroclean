@@ -150,6 +150,11 @@ const LimpezaSofas = () => {
           description="Limpeza e lavagem profissional de sofás ao domicílio no Porto. Remoção de manchas, ácaros e odores."
           url="/limpeza-sofas"
           priceFrom="39€"
+          reviews={[
+            { author: "Maria S.", city: "Porto", text: "Parece novo outra vez. O meu sofá tinha 8 anos e achei que ia ter de comprar um novo. A Clean Solutions devolveu-lhe a vida!", date: "2025-03-15" },
+            { author: "Rui T.", city: "Espinho", text: "Tinham-me dito que a nódoa de vinho não saía. A Clean Solutions provou o contrário! Sofá como novo.", date: "2025-04-02" },
+            { author: "Beatriz C.", city: "Oeiras", text: "Serviço rápido e eficiente. O meu sofá de pele ficou perfeito. Voltarei a contratar com certeza!", date: "2025-02-18" },
+          ]}
         />
       </main>
       <Footer />
