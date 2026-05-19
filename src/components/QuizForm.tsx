@@ -100,6 +100,12 @@ function calcChairClean(qty: number): number | null {
   if (qty <= 6) return 52.5 + (qty - 3) * 15;
   return 97.5 + (qty - 6) * 12.5;
 }
+// Waterproofing only: 1-6: 15€/un · 7-9: 12.5€/un · 10+: sob orçamento
+function calcChairWaterproof(qty: number): number | null {
+  if (qty <= 0 || qty >= 10) return null;
+  if (qty <= 6) return qty * 15;
+  return qty * 12.5;
+}
 function fmtN(n: number): string { return n % 1 === 0 ? `${n}€` : `${n.toFixed(1).replace('.', ',')}€`; }
 
 interface QuizFormProps {
@@ -227,11 +233,11 @@ const QuizForm = ({ isOpen, onClose, initialLocation, problema }: QuizFormProps)
       case 'chairs': {
         const chairQty = parseInt(formData.chairQuantity);
         if (!isNaN(chairQty) && chairQty > 0) {
-          const cleanP = calcChairClean(chairQty) ?? 0;
-          price = cleanP;
-          if (formData.chairWaterproofing && price > 0) {
-            price += chairQty * 10;
-          }
+          price = calcChairClean(chairQty) ?? 0;
+        }
+        const wQty = formData.chairWaterproofQty;
+        if (wQty > 0) {
+          price += calcChairWaterproof(wQty) ?? 0;
         }
         break;
       }
@@ -291,7 +297,9 @@ const QuizForm = ({ isOpen, onClose, initialLocation, problema }: QuizFormProps)
       }
       case 'chairs': {
         const chairQty = parseInt(formData.chairQuantity);
-        return isNaN(chairQty) || chairQty <= 0 || chairQty >= 10;
+        const cleanSob = isNaN(chairQty) || chairQty <= 0 || chairQty >= 10;
+        const waterSob = formData.chairWaterproofQty >= 10;
+        return cleanSob || waterSob;
       }
       case 'carpet': {
         const area = parseFloat(formData.carpetArea);
@@ -617,11 +625,12 @@ const QuizForm = ({ isOpen, onClose, initialLocation, problema }: QuizFormProps)
       }
       case 'chairs':
         if (formData.chairQuantity) {
-          const cQty = parseInt(formData.chairQuantity);
           details.push(`${formData.chairQuantity} cadeira(s): Limpeza`);
-          if (formData.chairWaterproofing && !isNaN(cQty) && cQty > 0 && cQty <= 10) {
-            const wTotal = cQty * 10;
-            details.push(`Impermeabilização de ${formData.chairQuantity} cadeira(s): ${wTotal % 1 === 0 ? wTotal : wTotal.toFixed(2).replace('.', ',')}€`);
+          const wQty = formData.chairWaterproofQty;
+          if (wQty > 0) {
+            const wTotal = calcChairWaterproof(wQty);
+            const wStr = wTotal !== null ? `${wTotal % 1 === 0 ? wTotal : wTotal.toFixed(1).replace('.', ',')}€` : 'Sob orçamento';
+            details.push(`Impermeabilização de ${wQty} cadeira(s): ${wStr}`);
           }
         }
         break;
@@ -797,10 +806,14 @@ ${formData.description || 'Sem observações adicionais'}
       } else if (formData.service === 'chairs') {
         const cQty = parseInt(formData.chairQuantity);
         if (!isNaN(cQty) && cQty > 0) {
-          const unitChair = cQty <= 3 ? 17.5 : cQty <= 6 ? 15 : 12.5;
-          const totalChairClean = cQty <= 3 ? cQty * 17.5 : cQty <= 6 ? Math.max(3 * 17.5, cQty * 15) : Math.max(6 * 15, cQty * 12.5);
-          receiptLines.push({ label: 'Cadeiras', qty: cQty, unitPrice: unitChair, total: totalChairClean });
-          if (formData.chairWaterproofing) receiptLines.push({ label: 'Impermeabilização Cadeiras', qty: cQty, unitPrice: 10, total: cQty * 10 });
+          const cleanTotal = calcChairClean(cQty);
+          receiptLines.push({ label: 'Limpeza Cadeiras', qty: cQty, unitPrice: cleanTotal !== null ? Math.round(cleanTotal / cQty * 10) / 10 : null, total: cleanTotal });
+          const wQty = formData.chairWaterproofQty;
+          if (wQty > 0) {
+            const wTotal = calcChairWaterproof(wQty);
+            const wUnit = wQty <= 6 ? 15 : wQty <= 9 ? 12.5 : null;
+            receiptLines.push({ label: 'Impermeabilização Cadeiras', qty: wQty, unitPrice: wUnit, total: wTotal });
+          }
         }
       } else if (formData.service === 'carpet') {
         receiptLines.push({ label: `Tapete ${formData.carpetArea}m²`, qty: 1, unitPrice: calculateServicePrice || null, total: calculateServicePrice || null });
@@ -1163,7 +1176,6 @@ ${formData.description || 'Sem observações adicionais'}
       const validQty = !isNaN(qty) && qty > 0;
       const activeTierIdx = validQty ? chairActiveTier(qty) : -1;
       const cleanPrice = validQty ? calcChairClean(qty) : null;
-      const waterRate = validQty && qty < 10 ? 10 : null;
       const sob = validQty && qty >= 10;
       return (
         <div className="flex flex-col gap-2.5 overflow-hidden items-center w-full">
@@ -1197,21 +1209,53 @@ ${formData.description || 'Sem observações adicionais'}
               <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs font-bold text-gold/45 pointer-events-none">cadeiras</span>
             </div>
           </div>
-          {validQty && !sob && (
-            <button onClick={() => updateFormData({ chairWaterproofing: !formData.chairWaterproofing })} className={cn('relative w-full max-w-sm mx-auto rounded-xl border-2 px-3.5 py-2.5 text-left transition-all duration-300 touch-manipulation active:scale-[0.99]', formData.chairWaterproofing ? 'border-gold bg-[#252931] shadow-[0_0_16px_rgba(212,175,55,0.22)]' : 'border-white/[0.12] bg-[#252931] hover:border-gold/40')}>
-              <span className="absolute -top-2.5 right-3 bg-gradient-to-r from-gold to-[#d4c57b] text-[#12121e] text-[8px] font-black px-2 py-0.5 rounded-full tracking-widest uppercase shadow-md">RECOMENDADO</span>
-              <div className="flex items-center gap-3">
-                <Shield className={cn('w-5 h-5 flex-shrink-0', formData.chairWaterproofing ? 'text-gold' : 'text-white/30')} />
-                <div className="flex-1 min-w-0">
-                  <p className={cn('text-sm font-bold leading-snug', formData.chairWaterproofing ? 'text-white' : 'text-white/75')}>Proteger contra manchas e líquidos?</p>
-                  <p className={cn('text-[10px] mt-0.5', formData.chairWaterproofing ? 'text-white/50' : 'text-white/30')}>Impermeabilização · {waterRate !== null ? `+${fmtN(waterRate)}/un.` : 'Sob orçamento'}</p>
+          {(() => {
+            const wQty = formData.chairWaterproofQty;
+            const wActive = wQty > 0;
+            const wSob = wQty >= 10;
+            const wPrice = calcChairWaterproof(wQty);
+            const wDisplay = wSob
+              ? 'Sob orçamento'
+              : wPrice !== null
+                ? `${wPrice % 1 === 0 ? wPrice : wPrice.toFixed(1).replace('.', ',')}€`
+                : null;
+            return (
+              <div className={cn('relative w-full max-w-sm mx-auto rounded-2xl border-2 px-4 py-3 transition-all duration-300', wActive ? 'border-gold bg-[#252931] shadow-[0_0_16px_rgba(212,175,55,0.18)]' : 'border-white/[0.12] bg-[#252931]')}>
+                <span className="absolute -top-2.5 right-3 bg-gradient-to-r from-gold to-[#d4c57b] text-[#12121e] text-[8px] font-black px-2 py-0.5 rounded-full tracking-widest uppercase shadow-md">RECOMENDADO</span>
+                <div className="flex items-center gap-3 mb-3">
+                  <Shield className={cn('w-5 h-5 flex-shrink-0', wActive ? 'text-gold' : 'text-white/30')} />
+                  <div className="flex-1 min-w-0">
+                    <p className={cn('text-sm font-bold leading-snug', wActive ? 'text-white' : 'text-white/75')}>Impermeabilização</p>
+                    <p className={cn('text-[10px] mt-0.5', wActive ? 'text-gold/70' : 'text-white/30')}>
+                      1–6 cad.: 15€/un · 7–9 cad.: 12,5€/un · 10+: sob orçamento
+                    </p>
+                  </div>
                 </div>
-                <div className={cn('w-10 h-5 rounded-full border-2 flex items-center transition-all duration-300 flex-shrink-0 px-0.5', formData.chairWaterproofing ? 'border-gold bg-gold/20' : 'border-white/20 bg-white/[0.05]')}>
-                  <div className={cn('w-4 h-4 rounded-full transition-all duration-300', formData.chairWaterproofing ? 'bg-gold translate-x-[18px]' : 'bg-white/30 translate-x-0')} />
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <button
+                      onClick={() => updateFormData({ chairWaterproofQty: Math.max(0, wQty - 1), chairWaterproofing: wQty - 1 > 0 })}
+                      disabled={wQty === 0}
+                      className="w-10 h-10 rounded-xl border-2 border-white/20 bg-white/[0.05] text-white font-bold text-xl flex items-center justify-center disabled:opacity-20 active:scale-95 transition-all touch-manipulation hover:border-gold/50"
+                    >−</button>
+                    <span className={cn('text-2xl font-black w-8 text-center tabular-nums leading-none', wActive ? 'text-gold' : 'text-white/30')}>{wQty}</span>
+                    <button
+                      onClick={() => updateFormData({ chairWaterproofQty: wQty + 1, chairWaterproofing: true })}
+                      className="w-10 h-10 rounded-xl border-2 border-white/20 bg-white/[0.05] text-white font-bold text-xl flex items-center justify-center active:scale-95 transition-all touch-manipulation hover:border-gold/50"
+                    >+</button>
+                  </div>
+                  <div className="text-right">
+                    {wActive ? (
+                      <p className={cn('font-bold text-base tabular-nums', wSob ? 'text-white/50 text-sm' : 'text-gold')}>{wDisplay}</p>
+                    ) : (
+                      <p className="text-[11px] text-white/25">Não incluir</p>
+                    )}
+                    {wActive && !wSob && <p className="text-[9px] text-white/30">{wQty} cadeira{wQty > 1 ? 's' : ''}</p>}
+                  </div>
                 </div>
               </div>
-            </button>
-          )}
+            );
+          })()}
         </div>
       );
     }
@@ -1506,7 +1550,7 @@ ${formData.description || 'Sem observações adicionais'}
                 <QuizStep1Service
                   selectedService={formData.service}
                   onSelect={(service) => {
-                    updateFormData({ service, serviceType: service === 'carpet' ? 'cleaning' : '', sofaSize: '', mattressSize: '', chairType: '', carpetArea: '', chairWaterproofing: false });
+                    updateFormData({ service, serviceType: service === 'carpet' ? 'cleaning' : '', sofaSize: '', mattressSize: '', chairType: '', carpetArea: '', chairWaterproofing: false, chairWaterproofQty: 0 });
                     setSofaItems([]);
                     setMattressItems([]);
                     setUpsellItems([]);

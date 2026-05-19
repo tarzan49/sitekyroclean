@@ -8,6 +8,7 @@ export interface QuizFormData {
   chairType: string;
   chairQuantity: string;
   chairWaterproofing: boolean;
+  chairWaterproofQty: number;
   location: string;
   otherLocation: string;
   timing: string;
@@ -30,6 +31,7 @@ export const initialFormData: QuizFormData = {
   chairType: '',
   chairQuantity: '',
   chairWaterproofing: false,
+  chairWaterproofQty: 0,
   location: '',
   otherLocation: '',
   timing: '',
