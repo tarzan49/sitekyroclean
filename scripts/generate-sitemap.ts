@@ -207,7 +207,7 @@ export function generateSitemaps(outDir: string) {
     xmlUrl('/nosso-processo', 'monthly', '0.6'),
     xmlUrl('/promocoes', 'weekly', '0.7'),
     xmlUrl('/areas-de-servico', 'monthly', '0.7'),
-    xmlUrl('/antes-depois', 'monthly', '0.7'),
+    xmlUrl('/antes-depois-limpeza', 'monthly', '0.7'),
   ];
 
   // 2. Location pages (service × city)

@@ -57,6 +57,30 @@ const BeforeAfterPage = () => {
 
   return (
     <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "WebPage",
+            "@id": "https://www.cleansolutions.com.pt/antes-depois-limpeza#webpage",
+            "url": "https://www.cleansolutions.com.pt/antes-depois-limpeza",
+            "name": "Antes e Depois | Resultados de Limpeza Profissional | Kyro Clean Solutions",
+            "description": "Veja os resultados reais da limpeza profissional de sofás, colchões, tapetes e cadeiras. Antes e depois de cada serviço. Resultados visíveis no momento.",
+            "inLanguage": "pt-PT",
+            "isPartOf": { "@id": "https://www.cleansolutions.com.pt/#website" },
+            "publisher": { "@id": "https://www.cleansolutions.com.pt/#business" },
+            "breadcrumb": { "@id": "https://www.cleansolutions.com.pt/antes-depois-limpeza#breadcrumb" },
+          },
+          {
+            "@type": "BreadcrumbList",
+            "@id": "https://www.cleansolutions.com.pt/antes-depois-limpeza#breadcrumb",
+            "itemListElement": [
+              { "@type": "ListItem", "position": 1, "name": "Início", "item": "https://www.cleansolutions.com.pt" },
+              { "@type": "ListItem", "position": 2, "name": "Antes e Depois", "item": "https://www.cleansolutions.com.pt/antes-depois-limpeza" },
+            ],
+          },
+        ],
+      }) }} />
       <Header />
       <main>
         {/* Hero */}
@@ -123,7 +147,7 @@ const BeforeAfterPage = () => {
                         ))}
                       </div>
                     </div>
-                    <p className="text-sm text-[#777]">50+ avaliações no Google</p>
+                    <p className="text-sm text-[#777]">51 avaliações no Google</p>
                   </div>
                 </div>
                 <div className="h-px sm:h-12 sm:w-px w-full bg-[#1A4E30]/10" />
