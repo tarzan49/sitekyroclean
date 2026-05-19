@@ -143,9 +143,23 @@ const PackComboPage = () => {
 
               <div className="w-10 h-px mb-5 opacity-50" style={{ backgroundColor: "#D4AF37" }} />
 
-              <p className="text-base md:text-lg text-white/70 leading-relaxed max-w-2xl">
+              <p className="text-base md:text-lg text-white/70 leading-relaxed max-w-2xl mb-5">
                 {pack.tagline}
               </p>
+
+              <div className="flex flex-wrap gap-2">
+                <span className="flex items-center gap-2 text-sm font-semibold text-white bg-white/10 border border-white/15 px-4 py-2 rounded-full">
+                  <CheckCircle className="w-4 h-4 flex-shrink-0" style={{ color: "#D4AF37" }} />
+                  {pack.service1}
+                </span>
+                <span className="flex items-center gap-2 text-sm font-semibold text-white bg-white/10 border border-white/15 px-4 py-2 rounded-full">
+                  <CheckCircle className="w-4 h-4 flex-shrink-0" style={{ color: "#D4AF37" }} />
+                  {pack.service2}
+                </span>
+                <span className="flex items-center gap-2 text-sm text-white/60 bg-white/5 border border-white/10 px-4 py-2 rounded-full">
+                  1 única visita · {city.name}
+                </span>
+              </div>
             </div>
           </div>
         </section>
@@ -162,7 +176,11 @@ const PackComboPage = () => {
                 <h2 className="font-playfair text-xl md:text-2xl font-bold text-[#1A1A2E]">
                   Configure o seu pack
                 </h2>
-                <p className="text-sm text-[#1A1A2E]/50 mt-1">Selecione as opções abaixo para ver o preço exacto</p>
+                <p className="text-sm text-[#1A1A2E]/50 mt-1 mb-4">Selecione as opções abaixo para ver o preço exacto</p>
+                <div className="inline-flex items-center gap-3 bg-kyro-green/8 border border-kyro-green/20 rounded-xl px-5 py-3 text-sm text-[#1A1A2E]/70">
+                  <CheckCircle className="w-4 h-4 flex-shrink-0 text-kyro-green" />
+                  <span>Este pack inclui: <strong className="text-[#1A1A2E]">{pack.service1}</strong> + <strong className="text-[#1A1A2E]">{pack.service2}</strong></span>
+                </div>
               </div>
 
               {/* Selectors */}
