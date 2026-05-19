@@ -298,6 +298,9 @@ export function generateSitemaps(outDir: string) {
     'como-tirar-cheiro-sofa',
     'limpeza-alcatifa-escritorio',
     'guia-acaros-em-casa',
+    'limpeza-sofa-animais-domesticos',
+    'como-manter-sofa-limpo-entre-limpezas',
+    'impermeabilizacao-tapete-guia',
   ];
   const resourceUrls: string[] = [
     xmlUrl('/perguntas-frequentes-limpeza-estofos', 'monthly', '0.8'),

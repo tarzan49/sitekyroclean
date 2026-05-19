@@ -782,6 +782,174 @@ const posts: BlogPost[] = [
       "doencas-causadas-estofos-sujos",
     ],
   },
+  {
+    slug: "limpeza-sofa-animais-domesticos",
+    title: "Sofá com animais domésticos: como limpar e eliminar pelos, odores e ácaros",
+    metaTitle: "Limpeza de Sofá com Animais Domésticos | Guia Completo | Kyro Clean",
+    metaDescription: "Guia completo para limpar sofás com cães e gatos: como remover pelos, odores de urina e ácaros de animais. Dicas profissionais e soluções duradouras.",
+    publishDate: "2026-05-19",
+    updatedDate: "2026-05-19",
+    author: "Equipa Kyro Clean",
+    readingTime: 7,
+    category: "Guias",
+    heroAlt: "Sofá com pelos de animais antes da limpeza profissional",
+    intro: "Cães e gatos são parte da família — mas os seus sofás pagam um preço alto por isso. Pelos incrustados nas fibras, odores de urina difíceis de eliminar e ácaros associados a animais são os problemas mais comuns que tratamos. Este guia diz-te o que funciona e o que não funciona.",
+    sections: [
+      {
+        heading: "O problema real: não é só pelo",
+        body: "Os pelos são o que se vê, mas não são o maior problema. Por baixo deles acumulam-se:\n\n**Ácaros dermatophagoides** — os ácaros mais comuns em casa alimentam-se de pele morta (de humanos e animais). Um sofá com animal de estimação pode ter densidades de ácaros 3× a 5× superiores ao normal.\n\n**Dander** (caspa animal) — micropartículas de pele seca e saliva que se depositam no tecido e são um dos principais desencadeadores de alergias e asma. Não é visível a olho nu.\n\n**Odores de urina** — quando um animal urina no sofá, a urina penetra pelas fibras até à espuma. Limpar a superfície remove o odor temporariamente, mas o ácido úrico cristaliza na espuma e regressa com a humidade.\n\n**Sebáceos e gordura** — o óleo natural do pelo dos animais deixa manchas amareladas no encosto e nos apoios de braço.",
+        tip: "Se o teu sofá tem cheiro a animal mesmo depois de limpar, o problema está na espuma, não no tecido. Só extração profissional com equipamento de injeção e sucção resolve definitivamente.",
+      },
+      {
+        heading: "Como limpar em casa (manutenção semanal)",
+        body: "Para manutenção entre limpezas profissionais:\n\n**Pelos:** usa uma luva de borracha húmida ou rolo de pelo. Aspira com acessório de estofos pelo menos 2× por semana. Escova o animal antes de o deixar subir ao sofá.\n\n**Odores quotidianos:** bicarbonato de sódio aplicado sobre o tecido durante 15-20 minutos e depois aspirado absorve os odores do dia-a-dia sem danificar as fibras.\n\n**Manchas de urina frescas:** absorve com toalhetes sem esfregar. Aplica uma mistura de água e vinagre branco (50/50) sobre o local. Nunca uses água a ferver — cristaliza as proteínas e fixa a mancha.\n\n**O que não fazer:** limpadores com amoníaco intensificam o odor de urina; lixívia danifica as fibras e pode deixar manchas permanentes.",
+      },
+      {
+        heading: "Quando a limpeza profissional é obrigatória",
+        body: "Existem situações em que a limpeza caseira não é suficiente:\n\n**Urina antiga ou repetida** — se o animal urina no mesmo local mais do que uma vez, o ácido úrico cristaliza em profundidade. A extração profissional com produto enzimático específico é a única solução que elimina definitivamente o odor.\n\n**Dander e ácaros** — os alérgenos de animais só são removidos eficazmente por extração a vapor a temperatura superior a 60°C, que mata os ácaros e remove o dander das fibras mais profundas.\n\n**Sebáceos** — as manchas amarelas no encosto requerem pré-tratamento com solvente específico antes da extração.\n\nA Kyro Clean trata anualmente centenas de sofás com animais de estimação. O protocolo inclui pré-tratamento enzimático, extração a quente e bactericida certificado. Resultado: sofá sem odor, sem dander e com contagem de ácaros reduzida em mais de 95%.",
+      },
+      {
+        heading: "Impermeabilização: a solução preventiva",
+        body: "Após a limpeza profissional, recomendamos sempre impermeabilização para donos de animais. O tratamento cria uma barreira invisível nas fibras que:\n\n— Impede que a urina penetre até à espuma (dá tempo para limpar)\n— Facilita a remoção de pelos (não aderem tanto às fibras tratadas)\n— Reduz a absorção de odores e gordura animal\n\nO efeito dura 12 a 18 meses com uso normal. Para famílias com animais, recomendamos limpeza + impermeabilização anual como manutenção preventiva. O custo do pack é significativamente inferior ao de substituir o sofá antecipadamente.",
+      },
+    ],
+    faq: [
+      {
+        q: "Conseguem eliminar completamente o cheiro a urina de gato do sofá?",
+        a: "Sim, na grande maioria dos casos. Usamos produto enzimático específico para urina de felinos que quebra as moléculas de ácido úrico em profundidade. Em casos de urina muito antiga ou repetida no mesmo local, o resultado é de 85-95% de eliminação. Após o tratamento, recomendamos impermeabilização para prevenir recorrência.",
+      },
+      {
+        q: "A limpeza remove os alérgenos de cão e gato?",
+        a: "Sim. A extração a vapor a alta temperatura remove o dander (caspa animal) e mata os ácaros associados a animais de estimação. Clientes com alergias reportam melhoria significativa dos sintomas nas semanas seguintes à limpeza profissional.",
+      },
+      {
+        q: "Quantas vezes por ano devo limpar o sofá com animais em casa?",
+        a: "Para famílias com animais domésticos, recomendamos limpeza profissional a cada 6 a 12 meses, dependendo do número de animais e se dormem no sofá habitualmente. Com impermeabilização incluída, o intervalo pode ser de 12 meses.",
+      },
+      {
+        q: "O processo de limpeza é seguro para os animais?",
+        a: "Sim. Os produtos que utilizamos são hipoalergénicos, biodegradáveis e sem compostos tóxicos para animais. Recomendamos que o animal fique afastado do sofá durante as 2-3 horas de secagem, por conforto e para não afetar o resultado.",
+      },
+    ],
+    relatedService: { label: "Limpeza profissional de sofás — remove pelos, odores e ácaros", href: "/limpeza-sofas" },
+    relatedPosts: [
+      "acaros-sofas-colchoes-riscos-saude",
+      "como-tirar-cheiro-sofa",
+      "guia-acaros-em-casa",
+    ],
+  },
+  {
+    slug: "como-manter-sofa-limpo-entre-limpezas",
+    title: "Como manter o sofá limpo entre limpezas profissionais",
+    metaTitle: "Como Manter o Sofá Limpo | Dicas de Manutenção | Kyro Clean",
+    metaDescription: "Aprende a manter o sofá limpo entre limpezas profissionais: rotina semanal, como tratar manchas imediatamente e o que nunca deves fazer ao limpar o sofá.",
+    publishDate: "2026-05-19",
+    updatedDate: "2026-05-19",
+    author: "Equipa Kyro Clean",
+    readingTime: 5,
+    category: "Manutenção",
+    heroAlt: "Sofá limpo e bem cuidado em sala moderna",
+    intro: "Uma limpeza profissional anual é o padrão para prolongar a vida do sofá. Mas o que acontece nos outros 11 meses? Com uma rotina simples de manutenção, o sofá mantém-se com bom aspeto e a limpeza profissional seguinte é mais eficaz e mais económica.",
+    sections: [
+      {
+        heading: "Rotina semanal: 10 minutos que fazem diferença",
+        body: "O maior inimigo do sofá não são as manchas — é a acumulação progressiva de pó, pele morta e sujidade que se incrusta nas fibras ao longo do tempo.\n\n**Aspiração:** aspira o sofá semanalmente com acessório de estofos. Inclui as costuras, os vincos e a zona por baixo das almofadas (onde se acumula 40% da sujidade). Para veludo e alcântara, usa bocal suave e aspira no sentido do pelo.\n\n**Almofadas:** vira e bate as almofadas semanalmente para distribuir o enchimento e evitar que deformem permanentemente.\n\n**Encosto e apoios de braço:** são as zonas com mais contacto corporal — passa um pano húmido (bem espremido) nestas superfícies para remover gordura e suor antes que se incruste.",
+        tip: "Nunca uses pano molhado em veludo ou boucle. Usa apenas aspiração suave para estes materiais.",
+      },
+      {
+        heading: "Como agir imediatamente numa mancha",
+        body: "Os primeiros 5 minutos depois de uma mancha são decisivos. A maioria das manchas permanentes poderia ter sido evitada com a ação certa nesse período:\n\n**1. Absorve, não esfregas** — usa um pano branco limpo ou papel absorvente pressionando de fora para dentro. Esfregar espalha a mancha e incrusta-a nas fibras.\n\n**2. Água fria em primeiro lugar** — para a maioria das manchas (exceto gordura e tinta), água fria aplicada com pano é o primeiro passo. Nunca água quente — coagula as proteínas e fixa manchas de sangue, urina e alimentos.\n\n**3. Testa sempre num local escondido** — qualquer produto de limpeza deve ser testado numa zona discreta do tecido durante 5 minutos antes de aplicar na mancha. Alguns tecidos descoram com certos produtos.\n\n**4. Seca o mais rápido possível** — depois de tratar, passa um pano seco e abre janelas. Humidade prolongada favorece o crescimento de fungos nas fibras.",
+      },
+      {
+        heading: "Produtos que funcionam e o que evitar",
+        body: "**Funcionam bem:**\n— Água fria (para manchas frescas de maioria dos alimentos)\n— Bicarbonato de sódio (absorve odores, aplicar e aspirar após 20 min)\n— Produto específico para estofos comprado em loja (testar antes)\n— Mistura água + vinagre branco (50/50) para odores quotidianos\n\n**Nunca uses:**\n— Lixívia ou água com lixívia — descolora permanentemente\n— Água quente — fixa manchas orgânicas\n— Esponja abrasiva — danifica as fibras superficiais\n— Amaciador de roupa — deixa resíduo pegajoso que atrai mais sujidade\n— Álcool em excesso sobre veludo ou alcântara — deforma as fibras\n\n**Atenção especial:** produtos com amoníaco (muitos limpa-vidros, por exemplo) intensificam o odor de urina. Se tens animais em casa, verifica sempre os ingredientes.",
+      },
+      {
+        heading: "Quando vale a pena chamar um profissional entre limpezas?",
+        body: "Existem situações em que esperar pela limpeza anual pode ser um erro:\n\n— **Urina de animal** — quanto mais tempo passa, mais difícil é eliminar o odor\n— **Mancha de vinho ou café** — se não saiu completamente em casa, o profissional ainda consegue remover se for tratado nas primeiras semanas\n— **Odor persistente** — bolor, tabaco ou cheiro a húmido indicam crescimento de fungos que requerem tratamento específico\n— **Antes de uma ocasião especial** — casamento, nascimento, visita importante\n\nUma limpeza intercalar não é sinal de que o sofá está em mau estado — é manutenção preventiva que prolonga a sua vida.",
+      },
+    ],
+    faq: [
+      {
+        q: "Com que frequência devo aspirar o sofá?",
+        a: "Semanalmente em condições normais. Com animais domésticos ou crianças pequenas, 2 a 3 vezes por semana. A aspiração regular previne que o pó e a pele morta se incrusteme nas fibras, tornando a limpeza profissional anual mais eficaz.",
+      },
+      {
+        q: "Posso usar toalhitas húmidas para limpar o sofá no dia a dia?",
+        a: "Depende do tecido. Em microfibra e tecidos sintéticos resistentes, sim — mas escolhe toalhitas sem álcool e sem fragrâncias fortes. Em veludo, alcântara, linho e couro genuíno, não. Estes materiais requerem produtos específicos.",
+      },
+      {
+        q: "O que fazer se o sofá ficar com cheiro a húmido depois de limpar?",
+        a: "O cheiro a húmido indica que o tecido ficou demasiado molhado e pode haver crescimento de fungos. Abre janelas para maximizar a ventilação e usa ventoinha apontada ao sofá. Se o cheiro persistir após 24 horas, contacta um profissional — pode ser necessário tratamento anti-fúngico.",
+      },
+      {
+        q: "Quando devo fazer a primeira limpeza profissional de um sofá novo?",
+        a: "Recomendamos entre 6 meses a 1 ano após a compra, mesmo sem manchas visíveis. O sofá novo acumula pó, pele morta e ácaros desde o primeiro dia. A impermeabilização aplicada logo após a primeira limpeza é particularmente eficaz num sofá em bom estado.",
+      },
+    ],
+    relatedService: { label: "Limpeza profissional de sofás ao domicílio", href: "/limpeza-sofas" },
+    relatedPosts: [
+      "quanto-custa-limpar-sofa-profissional",
+      "impermeabilizacao-sofa-vale-pena",
+      "limpeza-sofa-animais-domesticos",
+    ],
+  },
+  {
+    slug: "impermeabilizacao-tapete-guia",
+    title: "Impermeabilização de tapetes: vale a pena? Quanto custa e quanto dura?",
+    metaTitle: "Impermeabilização de Tapetes | Vale a Pena? Guia 2026 | Kyro Clean",
+    metaDescription: "Guia completo sobre impermeabilização de tapetes: como funciona, quanto dura, quanto custa e para que tipos de tapete é recomendada. Preços reais.",
+    publishDate: "2026-05-19",
+    updatedDate: "2026-05-19",
+    author: "Equipa Kyro Clean",
+    readingTime: 5,
+    category: "Impermeabilização",
+    heroAlt: "Gota de água sobre tapete impermeabilizado com efeito lótus",
+    intro: "Um tapete de qualidade pode custar centenas ou milhares de euros. A impermeabilização protege esse investimento por uma fração do preço. Mas vale mesmo a pena? Para que tipos de tapete funciona e quanto dura o tratamento? Aqui tens as respostas.",
+    sections: [
+      {
+        heading: "Como funciona a impermeabilização de tapetes",
+        body: "A impermeabilização de tapetes aplica uma solução protetora que penetra nas fibras e cria uma barreira hidrofóbica invisível. Quando um líquido contacta com a superfície tratada, forma gotas em vez de ser absorvido — o chamado efeito lótus.\n\nNa Kyro Clean usamos produtos de base fluoropolimérica certificados para uso em têxteis domésticos, sem odor após secagem e seguros para crianças e animais de estimação. O processo demora entre 30 e 60 minutos (incluindo secagem) e pode ser aplicado no mesmo dia da limpeza.\n\nO que a impermeabilização protege:\n— Vinho, sumo e bebidas em geral\n— Café, chá e leite\n— Molhos e alimentos líquidos\n— Urina de animais (dá tempo para limpar antes da absorção)\n— Sujidade superficial e partículas de pó",
+        tip: "A impermeabilização não é uma barreira total — se deixares o líquido mais de 2 a 3 minutos sem limpar, ele penetrará nas fibras. Atua rapidamente quando acontece um derrame.",
+      },
+      {
+        heading: "Para que tipos de tapete é recomendada?",
+        body: "**Tapetes sintéticos (polipropileno, nylon, poliéster):** ideais para impermeabilização — as fibras aceitam bem o tratamento e o efeito dura até 18 meses.\n\n**Tapetes de lã:** compatíveis e recomendados, especialmente em áreas de passagem. A lã é naturalmente um pouco hidrófoba, e a impermeabilização amplifica essa proteção.\n\n**Tapetes de sisal e juta:** recomendado com produto específico para fibras naturais. Estas fibras são muito absorbentes, pelo que a proteção é especialmente útil.\n\n**Tapetes persas e artesanais:** deve ser avaliado caso a caso. As fibras naturais e tintas naturais destes tapetes podem reagir de forma diferente. Fazemos sempre teste de compatibilidade antes do tratamento.\n\n**Tapetes de couro:** não recomendado (requerem produto específico para couro, não o mesmo tratamento têxtil).",
+      },
+      {
+        heading: "Quanto custa e quanto dura?",
+        body: "O preço da impermeabilização de tapetes varia com a dimensão:\n\n| Dimensão | Preço estimado |\n|---|---|\n| Tapete pequeno (até 2m²) | 15€ a 20€ |\n| Tapete médio (2-4m²) | 20€ a 35€ |\n| Tapete grande (4-8m²) | 35€ a 55€ |\n| Tapete XXL (8m² ou mais) | a partir de 55€ |\n\nAplicada após limpeza (pack limpeza + impermeabilização): desconto de 15% a 20% face ao valor separado.\n\n**Duração:** 12 a 18 meses em condições normais. Em áreas de elevada passagem (corredor de entrada, sala de jantar) o tratamento pode durar menos — 8 a 12 meses. A frequência de lavagem também influencia: cada limpeza profunda remove progressivamente o tratamento.",
+      },
+      {
+        heading: "Sinais de que o tapete precisa de nova impermeabilização",
+        body: "Como saber se o tratamento ainda está ativo? Faz o teste da gota:\n\n**Teste rápido:** verte uma colher de chá de água sobre o tapete. Se as gotas permanecem na superfície arredondadas (efeito lótus), o tratamento está ativo. Se a água se espalha e é absorvida rapidamente, é altura de renovar.\n\n**Outros sinais:**\n— Manchas de líquidos aparecem imediatamente após o derrame\n— O tapete parece absorver sujidade superficial mais facilmente\n— Após mais de 18 meses do último tratamento\n\nO momento ideal para renovar a impermeabilização é logo após uma limpeza profissional — aplicar sobre tapete limpo maximiza a eficácia e a durabilidade do tratamento.",
+      },
+    ],
+    faq: [
+      {
+        q: "A impermeabilização altera o aspeto ou a textura do tapete?",
+        a: "Não. O tratamento é completamente invisível após secagem. A textura, as cores e o toque do tapete mantêm-se inalterados. Após secagem completa (1 a 2 horas), não é possível distinguir um tapete tratado de um não tratado.",
+      },
+      {
+        q: "Posso impermeabilizar o tapete sem o limpar primeiro?",
+        a: "Não recomendamos. A impermeabilização aplicada sobre sujidade ou pó será menos eficaz e durará menos. O correto é sempre limpar profissionalmente primeiro e aplicar o tratamento imediatamente a seguir, com o tapete ainda fresco.",
+      },
+      {
+        q: "A impermeabilização é segura para crianças que brincam no tapete?",
+        a: "Sim. Os produtos que utilizamos são certificados, hipoalergénicos e sem solventes tóxicos. Após secagem completa (cerca de 1 hora), o tapete é completamente seguro. Não há odor residual nem nenhum composto nocivo nas fibras.",
+      },
+      {
+        q: "Posso impermeabilizar o tapete eu próprio com produto de loja?",
+        a: "Existem sprays de impermeabilização no mercado, mas a eficácia é muito inferior à aplicação profissional. Os produtos profissionais penetram nas fibras de forma uniforme; os sprays domésticos tendem a criar uma camada superficial desigual que se perde mais rapidamente. Para tapetes de valor, recomendamos sempre aplicação profissional.",
+      },
+    ],
+    relatedService: { label: "Impermeabilização profissional de tapetes e sofás", href: "/impermeabilizacao" },
+    relatedPosts: [
+      "impermeabilizacao-sofa-vale-pena",
+      "limpeza-tapetes-profissional-guia-completo",
+      "limpeza-alcatifa-escritorio",
+    ],
+  },
 ];
 
 export function getAllPosts(): BlogPost[] {

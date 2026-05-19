@@ -30,6 +30,9 @@ const HERO_MAP: Record<string, string> = {
   "como-tirar-cheiro-sofa":                     imgSofaDesgast,
   "limpeza-alcatifa-escritorio":                imgTapetes,
   "guia-acaros-em-casa":                        imgAcarosSofa,
+  "limpeza-sofa-animais-domesticos":            imgAcarosSofa,
+  "como-manter-sofa-limpo-entre-limpezas":      imgSofaTecido,
+  "impermeabilizacao-tapete-guia":              imgTapetes,
 };
 
 const posts = getAllPosts();
