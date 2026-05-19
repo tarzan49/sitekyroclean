@@ -22,7 +22,9 @@ const ServiceSchema = ({ serviceName, description, url, priceFrom, imageUrl, bre
         "url": fullUrl,
         "name": `${serviceName} | Kyro Clean Solutions`,
         "description": description,
+        "inLanguage": "pt-PT",
         "isPartOf": { "@id": `${BASE_URL}/#website` },
+        "publisher": { "@id": `${BASE_URL}/#business` },
         "breadcrumb": { "@id": `${fullUrl}#breadcrumb` },
       },
       {
