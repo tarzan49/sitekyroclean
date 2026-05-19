@@ -1253,14 +1253,14 @@ ${formData.description || 'Sem observações adicionais'}
   };
 
   const modalContent = (
-    <div ref={quizOverlayRef} className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center backdrop-blur-lg sm:p-4 landscape:p-1 landscape:sm:p-4" style={{ background: "rgba(5,21,16,0.82)" }} role="dialog" aria-modal="true" aria-labelledby="quiz-title">
+    <div ref={quizOverlayRef} className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center sm:backdrop-blur-lg sm:p-4 landscape:sm:p-4" style={{ background: "rgba(5,21,16,0.82)" }} role="dialog" aria-modal="true" aria-labelledby="quiz-title">
       <div
         ref={quizCardRef}
         className={cn(
-          "relative w-full sm:max-w-lg sm:rounded-2xl rounded-t-2xl shadow-[0_8px_60px_rgba(0,0,0,0.6),inset_0_1px_0_rgba(255,255,255,0.07)] border border-white/[0.18] overflow-hidden animate-scale-in flex flex-col gpu-accelerated bg-checker-modal",
+          "relative w-full sm:max-w-lg sm:rounded-2xl shadow-[0_8px_60px_rgba(0,0,0,0.6),inset_0_1px_0_rgba(255,255,255,0.07)] sm:border border-white/[0.18] overflow-hidden animate-scale-in flex flex-col gpu-accelerated bg-checker-modal",
           currentStep === totalSteps
-            ? "sm:h-auto h-auto max-h-[96dvh]"
-            : "h-[96dvh] sm:h-auto sm:max-h-[92dvh] landscape:max-h-[98dvh]"
+            ? "sm:h-auto h-[100dvh]"
+            : "h-[100dvh] sm:h-auto sm:max-h-[92dvh] landscape:sm:max-h-[98dvh]"
         )}>
 
         <ConfettiGold active={confettiActive} />
