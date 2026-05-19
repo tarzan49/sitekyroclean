@@ -266,8 +266,8 @@ const QuizForm = ({ isOpen, onClose, initialLocation, problema }: QuizFormProps)
   const totalPrice = calculateServicePrice + upsellItemsTotal + finalTravelCost + hypoSurcharge;
   // True when the user has qty>0 of the "4+ lugares" sofa (no fixed price → custom quote)
   const hasSobOrcamento = sofaItems.some(i => i.sizeId === '4+-lugares' && i.qty > 0);
-  // Pack 10% activates when ≥1 upsell item AND total > 200€
-  const packDiscountActive = upsellItems.length > 0 && totalPrice > 200;
+  // Pack 10% activates automatically when total ≥ 200€
+  const packDiscountActive = totalPrice >= 200;
   const packDiscountPct = packDiscountActive ? 0.10 : 0;
   const serviceOnlyTotal = calculateServicePrice + upsellItemsTotal + hypoSurcharge;
   const discountedPrice = isDiscountActive && totalPrice > 0
@@ -423,15 +423,15 @@ const QuizForm = ({ isOpen, onClose, initialLocation, problema }: QuizFormProps)
     setTimerFlash(true);
     const id = setTimeout(() => setTimerFlash(false), 2500);
     return () => clearTimeout(id);
-  }, [packDiscountActive, upsellItems.length]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [packDiscountActive]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Confetti when pack discount activates (upsell added + total > 100€)
+  // Confetti when pack discount activates (total ≥ 200€)
   useEffect(() => {
     if (packDiscountActive && !prevTotalRef.current) {
       setConfettiActive(true);
       toast({
-        title: 'Pack Família Ativado! 10% de Desconto!',
-        description: 'Desconto de 10% aplicado ao seu pedido.',
+        title: 'Desconto de 10% ativado!',
+        description: 'O seu pedido atingiu 200€ — desconto aplicado automaticamente.',
         duration: 4000,
       });
       const id = setTimeout(() => setConfettiActive(false), 4500);
@@ -1272,7 +1272,7 @@ ${formData.description || 'Sem observações adicionais'}
               <span className="flex items-center gap-1.5">
                 <Check className={cn("w-4 h-4 flex-shrink-0 text-gold", timerFlash && "animate-bounce")} />
                 <span className={cn("font-bold", timerFlash ? "text-gold animate-pulse" : "text-gold/90")}>
-                  Pack Família: 10% Ativado!
+                  Desconto de 10% ativado!
                 </span>
               </span>
               <span className="font-mono bg-gold/20 px-2 py-0.5 rounded text-sm tabular-nums font-black text-gold">
@@ -1597,12 +1597,12 @@ ${formData.description || 'Sem observações adicionais'}
                     <Users className="w-8 h-8 mb-2 text-gold/60" />
                     <p className="text-gold text-[10px] font-bold tracking-[0.28em] uppercase mb-1">PACK FAMÍLIA</p>
                     <h2 className="font-playfair text-xl sm:text-2xl font-bold text-white mb-1 leading-[1.3]">
-                      {packDiscountActive ? 'Pack Família: 10% Ativado!' : 'Quer adicionar mais artigos?'}
+                      {packDiscountActive ? 'Desconto de 10% ativado!' : 'Quer adicionar mais artigos?'}
                     </h2>
                     <p className="text-xs text-white/45 max-w-[280px] mx-auto mb-4 leading-relaxed">
                       {packDiscountActive
-                        ? <span className="text-gold font-bold">Desconto de 10% aplicado ao seu pedido.</span>
-                        : <>Adicione mais 1 artigo e ganhe{' '}<span className="text-gold font-bold">10% de desconto</span>{' '}<span className="text-white/40">(pedidos &gt; 200€)</span></>
+                        ? <span className="text-gold font-bold">Desconto de 10% aplicado automaticamente ao seu pedido.</span>
+                        : <>Pedidos acima de{' '}<span className="text-gold font-bold">200€</span>{' '}têm 10% de desconto automático.</>
                       }
                     </p>
 
@@ -1610,18 +1610,14 @@ ${formData.description || 'Sem observações adicionais'}
                     {(() => {
                       const PACK_THRESHOLD = 200;
                       const thresholdMet = totalPrice >= PACK_THRESHOLD;
-                      const hasUpsell = upsellItems.length > 0;
-                      const unlockedPack = packDiscountActive; // thresholdMet && hasUpsell
-                      // Progress bar: shows path to 200€; freezes at 100% when threshold met
+                      const unlockedPack = packDiscountActive;
                       const progressPct = Math.min(totalPrice / PACK_THRESHOLD * 100, 100);
                       const faltam = Math.max(0, Math.ceil(PACK_THRESHOLD - totalPrice));
                       const msg = unlockedPack
-                        ? 'Pack Família: 10% de desconto ativado!'
-                        : thresholdMet && !hasUpsell
-                          ? 'Valor atingido: adicione 1 artigo extra para ativar o Pack Família!'
-                          : faltam > 0
-                            ? `Faltam apenas ${faltam}€ para ativar o Pack Família (+1 artigo)`
-                            : 'Adicione 1 artigo extra para ativar o Pack Família';
+                        ? 'Desconto de 10% ativado automaticamente!'
+                        : faltam > 0
+                          ? `Faltam apenas ${faltam}€ para o desconto de 10%`
+                          : 'Desconto de 10% ativado!';
                       return (
                         <div className={cn(
                           "w-full max-w-xs mx-auto mb-4 rounded-2xl border px-4 py-3 transition-all duration-500",
@@ -1631,7 +1627,7 @@ ${formData.description || 'Sem observações adicionais'}
                             <span className={cn("transition-colors tabular-nums", totalPrice > 0 ? "text-gold/70" : "text-white/25")}>
                               {totalPrice > 0 ? `${Math.round(totalPrice)}€ no carrinho` : 'Carrinho vazio'}
                             </span>
-                            <span className={cn("transition-colors", unlockedPack ? "text-gold" : thresholdMet ? "text-white/50" : "text-white/25")}>+1 artigo → 10%</span>
+                            <span className={cn("transition-colors", unlockedPack ? "text-gold" : "text-white/25")}>≥200€ → 10%</span>
                           </div>
                           <div className="h-2 bg-white/[0.08] rounded-full overflow-hidden">
                             <div
