@@ -2341,26 +2341,24 @@ ${formData.description || 'Sem observações adicionais'}
             <p className="text-center text-[11px] text-white/30 font-medium -mt-0.5">
               Sem compromisso · Grátis · Respondemos em menos de 1h
             </p>
-            <Button
-              variant="ghost"
+            <button
               onClick={handlePrev}
-              className="w-full h-7 text-xs text-white/20 hover:text-white/45 touch-manipulation"
+              className="w-full h-7 text-xs text-white/20 hover:text-white/45 active:text-white/45 active:bg-transparent touch-manipulation bg-transparent border-none outline-none"
             >
-              <ChevronLeft className="w-3.5 h-3.5 mr-1" />
+              <ChevronLeft className="w-3.5 h-3.5 mr-1 inline" />
               Voltar
-            </Button>
+            </button>
           </div>
         ) : (
           <div className="flex items-center justify-center gap-4 w-full">
             {currentStep > firstStep && (
-              <Button
-                variant="outline"
+              <button
                 onClick={handlePrev}
-                className="h-12 px-6 min-w-[120px] flex-shrink-0 bg-transparent border-white/[0.15] text-white/60 hover:text-white/90 hover:border-white/30 touch-manipulation active:scale-[0.98] rounded-xl"
+                className="h-12 px-6 min-w-[120px] flex-shrink-0 bg-transparent border border-white/[0.15] text-white/60 hover:text-white/90 hover:border-white/30 active:bg-transparent active:scale-[0.98] touch-manipulation rounded-xl flex items-center justify-center transition-all"
               >
                 <ChevronLeft className="w-4 h-4 mr-1" />
                 Voltar
-              </Button>
+              </button>
             )}
             <Button
               onClick={handleNext}
