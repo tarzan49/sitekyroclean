@@ -1253,12 +1253,14 @@ ${formData.description || 'Sem observações adicionais'}
   };
 
   const modalContent = (
-    <div ref={quizOverlayRef} className="fixed inset-0 z-[100] flex items-center justify-center backdrop-blur-lg p-2 sm:p-4 landscape:p-1 landscape:sm:p-4" style={{ background: "rgba(5,21,16,0.82)" }} role="dialog" aria-modal="true" aria-labelledby="quiz-title">
+    <div ref={quizOverlayRef} className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center backdrop-blur-lg sm:p-4 landscape:p-1 landscape:sm:p-4" style={{ background: "rgba(5,21,16,0.82)" }} role="dialog" aria-modal="true" aria-labelledby="quiz-title">
       <div
         ref={quizCardRef}
         className={cn(
-          "relative w-full sm:max-w-lg rounded-2xl shadow-[0_8px_60px_rgba(0,0,0,0.6),inset_0_1px_0_rgba(255,255,255,0.07)] border border-white/[0.18] overflow-hidden animate-scale-in flex flex-col gpu-accelerated bg-checker-modal",
-          currentStep === totalSteps ? "h-auto" : "max-h-[92dvh] landscape:max-h-[98dvh]"
+          "relative w-full sm:max-w-lg sm:rounded-2xl rounded-t-2xl shadow-[0_8px_60px_rgba(0,0,0,0.6),inset_0_1px_0_rgba(255,255,255,0.07)] border border-white/[0.18] overflow-hidden animate-scale-in flex flex-col gpu-accelerated bg-checker-modal",
+          currentStep === totalSteps
+            ? "sm:h-auto h-auto max-h-[96dvh]"
+            : "h-[96dvh] sm:h-auto sm:max-h-[92dvh] landscape:max-h-[98dvh]"
         )}>
 
         <ConfettiGold active={confettiActive} />
@@ -1675,7 +1677,7 @@ ${formData.description || 'Sem observações adicionais'}
                         Voltar
                       </button>
                       <button
-                        onClick={() => { setShowUpsell(false); setCurrentStep(4); }}
+                        onClick={() => { (document.activeElement as HTMLElement)?.blur(); setShowUpsell(false); setCurrentStep(4); }}
                         className="flex-1 h-11 flex items-center justify-center gap-1.5 text-white/45 hover:text-white/75 hover:border-white/30 text-sm font-medium transition-all touch-manipulation border border-white/[0.15] bg-transparent rounded-xl active:scale-[0.98]"
                       >
                         Não, seguir assim
@@ -1806,7 +1808,7 @@ ${formData.description || 'Sem observações adicionais'}
                         Voltar
                       </button>
                       <button
-                        onClick={() => { setShowUpsell(false); setCurrentStep(4); }}
+                        onClick={() => { (document.activeElement as HTMLElement)?.blur(); setShowUpsell(false); setCurrentStep(4); }}
                         className="flex-1 h-12 bg-gradient-to-r from-gold to-[#d4c57b] hover:from-[#d4c57b] hover:to-gold text-[#12121e] font-bold rounded-xl shadow-[0_4px_28px_rgba(212,175,55,0.40)] touch-manipulation active:scale-[0.98] transition-all flex items-center justify-center gap-2"
                       >
                         {upsellItems.length > 0 ? 'Continuar com Pack' : 'Continuar'}
