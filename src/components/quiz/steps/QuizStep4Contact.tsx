@@ -67,6 +67,9 @@ const QuizStep4Contact = ({ formData, updateFormData }: QuizStep4ContactProps) =
               placeholder="O seu nome"
               value={formData.name}
               readOnly={!inputsActive}
+              autoComplete="off"
+              autoCorrect="off"
+              autoCapitalize="words"
               onFocus={e => {
                 if (!inputsActive) { e.target.blur(); return; }
                 setTimeout(() => e.target.scrollIntoView({ block: 'center', behavior: 'smooth' }), 350);
@@ -83,6 +86,7 @@ const QuizStep4Contact = ({ formData, updateFormData }: QuizStep4ContactProps) =
               placeholder="9xx xxx xxx"
               value={formData.phone}
               readOnly={!inputsActive}
+              autoComplete="off"
               onFocus={e => {
                 if (!inputsActive) { e.target.blur(); return; }
                 setTimeout(() => e.target.scrollIntoView({ block: 'center', behavior: 'smooth' }), 350);
