@@ -489,41 +489,8 @@ const LocationServicePage = () => {
           </section>
         )}
 
-        {/* ═══ SCHEMAS ═══ */}
+        {/* FAQ schema — ServiceLocationSchema already provides Service + BreadcrumbList */}
         <ServiceFAQSchema faqs={data.faqs} />
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              "@context": "https://schema.org",
-              "@type": "BreadcrumbList",
-              "itemListElement": [
-                { "@type": "ListItem", "position": 1, "name": "Início", "item": "https://www.cleansolutions.com.pt/" },
-                { "@type": "ListItem", "position": 2, "name": data.service, "item": `https://www.cleansolutions.com.pt${services.find(s => s.slug === data.serviceSlug)?.baseRoute || '/'}` },
-                { "@type": "ListItem", "position": 3, "name": data.city, "item": `https://www.cleansolutions.com.pt${location.pathname}` },
-              ],
-            }),
-          }}
-        />
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              "@context": "https://schema.org",
-              "@type": "Service",
-              "name": `${data.service} em ${data.city}`,
-              "description": data.metaDescription,
-              "provider": {
-                "@type": "LocalBusiness",
-                "name": "Kyro Clean Solutions",
-                "telephone": "+351925530647",
-                "aggregateRating": { "@type": "AggregateRating", "ratingValue": "5.0", "reviewCount": "50" },
-              },
-              "areaServed": { "@type": "City", "name": data.city },
-              "serviceType": data.service,
-            }),
-          }}
-        />
       </main>
       <Footer />
     </>

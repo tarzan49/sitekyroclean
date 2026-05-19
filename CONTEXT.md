@@ -539,23 +539,64 @@ Step 5 — Seletor de vaga/calendário
 
 ---
 
-## Estado atual do site (2026-05-18)
+## Tudo o que foi feito — Sessão 5 (2026-05-19)
+
+### SEO Authority & Internal Linking
+
+33. **Bot Fight Mode desligado** (Cloudflare Dashboard → Security → Bots)
+    - Estava ativo → causava 403 nos 88 crawls do Googlebot → corrigido
+
+34. **Redirect Paranhos** em `public/_redirects`
+    - `/limpeza-sofas-paranhos` → `/limpeza-sofas-porto-paranhos 301`
+    - URL incorreta tinha sido sugerida em sessão anterior
+
+35. **`index.html` + `PageHead.tsx` — título brand-first**
+    - Antes: "Limpeza de Sofás Porto | ... Kyro Clean Solutions" (brand no fim, cortado pelo Google)
+    - Depois: "Kyro Clean Solutions | Limpeza de Sofás, Colchões e Tapetes ao Domicílio"
+    - `PageHead.tsx` rota "/" sincronizada; OG tags e Twitter tags também atualizadas
+
+36. **`LocalBusinessSchema.tsx` — reescrito com @graph**
+    - `@id: "https://www.cleansolutions.com.pt/#business"` para cross-reference com ServiceLocationSchema (942 páginas)
+    - `WebSite` schema + `SearchAction` (sitelinks search box)
+    - `logo`, `image` fields adicionados
+    - `sameAs` inclui Google Maps URL via `GOOGLE_MAPS_URL` de `src/constants/google.ts`
+
+37. **`ServiceCityLinks.tsx` — novo componente reutilizável**
+    - Links para todas as cidades com slug de serviço → `/limpeza-sofas-porto`, etc.
+    - Adicionado em todas as 6 páginas de serviço principais
+
+38. **Internal linking — LocationServicePage + FreguesiaServicePage**
+    - Links para problem×city pages (`/mancha-sofa-porto`, etc.) na secção "Área de Serviço"
+    - Filtro: METRO_CITIES + relatedCities do problema
+
+39. **`ProblemPage.tsx` — city links corrigidos**
+    - Antes: apontavam para `/serviço-cidade` (errado)
+    - Depois: apontam para `/problema-cidade` (correto)
+    - Expandido: metro cities completas + relatedCities (não só relatedCities)
+
+40. **`PricePage.tsx` — link para service×city page**
+    - Link proeminente "página completa" adicionado na secção de internal links
+
+---
+
+## Estado atual do site (2026-05-19)
 
 - **URL ao vivo:** cleansolutions.com.pt (Cloudflare Pages, HTTPS)
 - **GitHub repo:** conectado, auto-deploy a cada push para main
 - **Admin panel:** `/admin/panel` (password protegido)
-- **Google Search Console:** 10 sitemaps submetidos, indexação em progresso
-- **Último commit:** `e8cd427` — "seo: add benefits + localSection sections to location and freguesia pages"
+- **Google Search Console:** 10 sitemaps submetidos; Bot Fight Mode agora OFF → crawl desbloqueado
+- **Bot Fight Mode:** OFF (corrigido nesta sessão)
 
 ---
 
 ## Próximas tarefas SEO (por prioridade)
 
-1. Schema markup `LocalBusiness` + `Service` por página (structured data único por localidade)
-2. Revisão de conteúdo das `ProblemCityPage` (465 páginas de problema)
-3. Backlinks & autoridade de domínio (guest posts, diretórios, Google Business Profile)
-4. Blog — artigos long-tail ("como limpar sofá em casa", "limpeza colchões porto")
-5. Swipe/drag touch no carrossel mobile
+1. Re-indexação manual no GSC para páginas que estavam 403: `/limpeza-colchoes`, `/limpeza-sofas-vila-nova-de-gaia`, `/limpeza-alcatifas-porto`, `/limpeza-tapetes-lisboa`
+2. Google Business Profile: adicionar fotos (antes/depois), categorias secundárias, posts semanais
+3. Diretórios PT: Habitissimo.pt, Fixando.pt, Páginas Amarelas, Bing Places, Yelp PT, Facebook Business, LinkedIn
+4. Adicionar Instagram/Facebook URLs ao `sameAs` do LocalBusinessSchema (comment já está no código)
+5. `VITE_ADMIN_PASSWORD=kyro@admin2025` — variável de ambiente no Cloudflare Pages (user faz manualmente)
+6. Blog — artigos long-tail ("como limpar sofá em casa", "limpeza colchões porto")
 
 ---
 

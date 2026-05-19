@@ -47,8 +47,13 @@ const ProblemCityPage = () => {
     if (problem && city) {
       const title = `${problem.h1} em ${city.name} | Kyro Clean Solutions`;
       document.title = title;
+      const metaDesc = `${problem.h1} em ${city.name}: serviço profissional ao domicílio. ${problem.metaDescription.split('.')[0]}. Orçamento grátis em menos de 2 horas.`;
       const desc = document.querySelector('meta[name="description"]');
-      if (desc) desc.setAttribute("content", `${problem.metaDescription.split('.')[0]} em ${city.name}. Serviço profissional ao domicílio. Orçamento grátis.`);
+      if (desc) desc.setAttribute("content", metaDesc);
+      const ogTitle = document.querySelector('meta[property="og:title"]');
+      if (ogTitle) ogTitle.setAttribute("content", title);
+      const ogDesc = document.querySelector('meta[property="og:description"]');
+      if (ogDesc) ogDesc.setAttribute("content", metaDesc);
       const canonical = document.querySelector('link[rel="canonical"]');
       if (canonical) canonical.setAttribute("href", `https://www.cleansolutions.com.pt${pathname}`);
     }
@@ -73,14 +78,22 @@ const ProblemCityPage = () => {
   const relatedServiceData = problem.relatedServices
     .map(slug => services.find(s => s.slug === slug))
     .filter(Boolean) as typeof services[number][];
-  const nearbyCities = cities.filter(c => c.slug !== city.slug).slice(0, 6);
   const priceFrom = relatedServiceData[0]?.priceFrom ?? "39€";
   const cityContext = getCityContext(problem.slug, city.name, city.description);
 
-  // Localize FAQs to city
+  // Only show nearby cities that actually have a route for this problem
+  const METRO_SLUGS = ["porto", "matosinhos", "maia", "vila-nova-de-gaia", "gondomar", "braga", "lisboa"];
+  const validCitySlugs = new Set([...METRO_SLUGS, ...problem.relatedCities]);
+  const nearbyCities = cities
+    .filter(c => c.slug !== city.slug && validCitySlugs.has(c.slug))
+    .slice(0, 6);
+
+  // Localize FAQs: keep questions intact for featured snippets, add city to answers
   const localFaqs = problem.faqs.map(faq => ({
-    question: faq.question.includes(city.name) ? faq.question : `${faq.question.replace('?', '')} em ${city.name}?`,
-    answer: faq.answer.includes(city.name) ? faq.answer : `${faq.answer} ${city.name.includes("Porto") ? "No Porto e Grande Porto, o" : `Em ${city.name}, o`} nosso técnico desloca-se ao domicílio.`,
+    question: faq.question,
+    answer: faq.answer.includes(city.name)
+      ? faq.answer
+      : `${faq.answer} Prestamos este serviço ao domicílio em ${city.name} e arredores.`,
   }));
 
   return (
@@ -125,8 +138,12 @@ const ProblemCityPage = () => {
                 {problem.h1} em {city.name}
               </h1>
               <div className="w-10 h-px mb-5 opacity-50" style={{ backgroundColor: "#D4AF37" }} />
-              <p className="text-base md:text-lg text-white/70 leading-relaxed mb-8 max-w-2xl">
+              <p className="text-base md:text-lg text-white/70 leading-relaxed mb-5 max-w-2xl">
                 {problem.intro.replace(/no Porto|ao domicílio/g, `em ${city.name}`)}
+              </p>
+
+              <p className="text-sm font-semibold mb-6" style={{ color: "#D4AF37" }}>
+                A partir de {priceFrom} · Resultado no mesmo dia · Serviço ao domicílio em {city.name}
               </p>
 
               <div className="flex flex-wrap items-center gap-3">
