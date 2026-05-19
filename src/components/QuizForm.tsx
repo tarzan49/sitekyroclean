@@ -2301,9 +2301,20 @@ ${formData.description || 'Sem observações adicionais'}
                         placeholder="O seu nome"
                         value={formData.name}
                         onChange={(e) => updateFormData({ name: e.target.value })}
-                        autoComplete="name"
+                        autoComplete="off"
+                        autoCorrect="off"
                         autoCapitalize="words"
-                        autoFocus
+                        onFocus={(e) => {
+                          setTimeout(() => {
+                            const sc = scrollContainerRef.current;
+                            if (!sc) return;
+                            const scRect = sc.getBoundingClientRect();
+                            const elRect = e.target.getBoundingClientRect();
+                            if (elRect.bottom > scRect.bottom - 16) {
+                              sc.scrollBy({ top: elRect.bottom - scRect.bottom + 24, behavior: 'smooth' });
+                            }
+                          }, 400);
+                        }}
                         className="text-base h-13 bg-[#1a2a1a] border-gold/25 text-white placeholder:text-white/20 focus-visible:ring-gold rounded-xl"
                       />
                     </div>
@@ -2314,8 +2325,19 @@ ${formData.description || 'Sem observações adicionais'}
                         placeholder="9xx xxx xxx"
                         value={formData.phone}
                         onChange={(e) => updateFormData({ phone: e.target.value })}
-                        autoComplete="tel"
+                        autoComplete="off"
                         inputMode="numeric"
+                        onFocus={(e) => {
+                          setTimeout(() => {
+                            const sc = scrollContainerRef.current;
+                            if (!sc) return;
+                            const scRect = sc.getBoundingClientRect();
+                            const elRect = e.target.getBoundingClientRect();
+                            if (elRect.bottom > scRect.bottom - 16) {
+                              sc.scrollBy({ top: elRect.bottom - scRect.bottom + 24, behavior: 'smooth' });
+                            }
+                          }, 400);
+                        }}
                         className="text-base h-13 bg-[#1a2a1a] border-gold/25 text-white placeholder:text-white/20 focus-visible:ring-gold rounded-xl"
                       />
                     </div>
