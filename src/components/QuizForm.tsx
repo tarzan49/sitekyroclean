@@ -1253,14 +1253,12 @@ ${formData.description || 'Sem observações adicionais'}
   };
 
   const modalContent = (
-    <div ref={quizOverlayRef} className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center sm:backdrop-blur-lg sm:p-4 landscape:sm:p-4" style={{ background: "rgba(5,21,16,0.82)" }} role="dialog" aria-modal="true" aria-labelledby="quiz-title">
+    <div ref={quizOverlayRef} className="fixed inset-0 z-[100] sm:flex sm:items-center sm:justify-center sm:backdrop-blur-lg sm:p-4" style={{ background: "rgba(5,21,16,0.82)" }} role="dialog" aria-modal="true" aria-labelledby="quiz-title">
       <div
         ref={quizCardRef}
         className={cn(
           "relative w-full sm:max-w-lg sm:rounded-2xl shadow-[0_8px_60px_rgba(0,0,0,0.6),inset_0_1px_0_rgba(255,255,255,0.07)] sm:border border-white/[0.18] overflow-hidden animate-scale-in flex flex-col gpu-accelerated bg-checker-modal",
-          currentStep === totalSteps
-            ? "sm:h-auto h-[100dvh]"
-            : "h-[100dvh] sm:h-auto sm:max-h-[92dvh] landscape:sm:max-h-[98dvh]"
+          "h-full sm:h-auto sm:max-h-[92dvh]"
         )}>
 
         <ConfettiGold active={confettiActive} />
