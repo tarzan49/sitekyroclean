@@ -58,6 +58,7 @@ const MarcaSofaPage = lazy(() => import("./pages/MarcaSofaPage"));
 const Blog = lazy(() => import("./pages/Blog"));
 const BlogPost = lazy(() => import("./pages/BlogPost"));
 const PoliticaPrivacidade = lazy(() => import("./pages/PoliticaPrivacidade"));
+const Testemunhos = lazy(() => import("./pages/Testemunhos"));
 
 // Loading fallback component
 const PageLoader = () => (
@@ -194,6 +195,7 @@ const AppRoutes = () => {
                 <Route path="/perguntas-frequentes-limpeza-estofos" element={<FAQEstofos />} />
                 <Route path="/glossario-limpeza-estofos" element={<GlossarioEstofos />} />
                 {/* Legal */}
+                <Route path="/testemunhos" element={<Testemunhos />} />
                 <Route path="/politica-de-privacidade" element={<PoliticaPrivacidade />} />
                 {/* Admin — painel único */}
                 <Route path="/admin/panel" element={<AdminPanel />} />
