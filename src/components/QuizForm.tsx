@@ -86,17 +86,19 @@ function calcCarpetPrice(area: number): number | null {
 const CHAIR_TIERS = [
   { label: 'Até 3', sublabel: 'cadeiras', rate: 17.5 },
   { label: '4 a 6', sublabel: 'cadeiras', rate: 15 },
-  { label: '7 a 10', sublabel: 'cadeiras', rate: 12.5 },
-  { label: '+10',   sublabel: 'cadeiras', rate: null },
+  { label: '7 a 9', sublabel: 'cadeiras', rate: 12.5 },
+  { label: '10+',   sublabel: 'cadeiras', rate: null },
 ];
 function chairActiveTier(qty: number): number {
-  if (qty <= 3) return 0; if (qty <= 6) return 1; if (qty <= 10) return 2; return 3;
+  if (qty <= 3) return 0; if (qty <= 6) return 1; if (qty <= 9) return 2; return 3;
 }
+// Bracket pricing: each tier's rate only applies to chairs in that bracket
+// 1-3: 17.5€/each · 4-6: 15€/each · 7-9: 12.5€/each · 10+: sob orçamento
 function calcChairClean(qty: number): number | null {
-  if (qty <= 0 || qty > 10) return null;
-  if (qty <= 3)  return qty * 17.5;
-  if (qty <= 6)  return Math.max(52.5, qty * 15);
-  return Math.max(90, qty * 12.5);
+  if (qty <= 0 || qty >= 10) return null;
+  if (qty <= 3) return qty * 17.5;
+  if (qty <= 6) return 52.5 + (qty - 3) * 15;
+  return 97.5 + (qty - 6) * 12.5;
 }
 function fmtN(n: number): string { return n % 1 === 0 ? `${n}€` : `${n.toFixed(1).replace('.', ',')}€`; }
 
@@ -225,10 +227,8 @@ const QuizForm = ({ isOpen, onClose, initialLocation, problema }: QuizFormProps)
       case 'chairs': {
         const chairQty = parseInt(formData.chairQuantity);
         if (!isNaN(chairQty) && chairQty > 0) {
-          if (chairQty <= 3) price = chairQty * 17.5;
-          else if (chairQty <= 6) price = Math.max(3 * 17.5, chairQty * 15);
-          else if (chairQty <= 10) price = Math.max(6 * 15, chairQty * 12.5);
-          else price = 0; // >10 → sob orçamento
+          const cleanP = calcChairClean(chairQty) ?? 0;
+          price = cleanP;
           if (formData.chairWaterproofing && price > 0) {
             price += chairQty * 10;
           }
@@ -291,7 +291,7 @@ const QuizForm = ({ isOpen, onClose, initialLocation, problema }: QuizFormProps)
       }
       case 'chairs': {
         const chairQty = parseInt(formData.chairQuantity);
-        return isNaN(chairQty) || chairQty <= 0 || chairQty > 10;
+        return isNaN(chairQty) || chairQty <= 0 || chairQty >= 10;
       }
       case 'carpet': {
         const area = parseFloat(formData.carpetArea);
@@ -1163,8 +1163,8 @@ ${formData.description || 'Sem observações adicionais'}
       const validQty = !isNaN(qty) && qty > 0;
       const activeTierIdx = validQty ? chairActiveTier(qty) : -1;
       const cleanPrice = validQty ? calcChairClean(qty) : null;
-      const waterRate = validQty && qty <= 10 ? 10 : null;
-      const sob = validQty && qty > 10;
+      const waterRate = validQty && qty < 10 ? 10 : null;
+      const sob = validQty && qty >= 10;
       return (
         <div className="flex flex-col gap-2.5 overflow-hidden items-center w-full">
           <p className="text-gold text-[10px] font-bold tracking-[0.28em] uppercase mb-0.5 text-center w-full">O QUE PRECISA?</p>
@@ -1976,17 +1976,8 @@ ${formData.description || 'Sem observações adicionais'}
                           placeholder="Ex: 4"
                           value={pendingCarpetArea}
                           onChange={e => setPendingCarpetArea(e.target.value)}
-                          className="w-full h-12 px-4 text-lg font-bold text-center bg-white/[0.06] border border-white/15 focus:border-gold focus:outline-none rounded-xl transition-colors text-white placeholder:text-white/25 mb-1"
+                          className="w-full h-12 px-4 text-lg font-bold text-center bg-white/[0.06] border border-white/15 focus:border-gold focus:outline-none rounded-xl transition-colors text-white placeholder:text-white/25 mb-3"
                         />
-                        <p className="text-[10px] text-white/25 mb-3">
-                          {(() => {
-                            const a = parseFloat(pendingCarpetArea);
-                            if (!pendingCarpetArea || isNaN(a) || a <= 0) return 'Insira a área em m²';
-                            if (a > 15) return 'Área > 15m² → Sob orçamento';
-                            const price = a <= 5 ? a * 10 : a <= 10 ? a * 8 : a * 7;
-                            return `Estimativa: ${Math.round(price * 100) / 100}€`;
-                          })()}
-                        </p>
                         <button
                           disabled={!pendingCarpetArea || isNaN(parseFloat(pendingCarpetArea)) || parseFloat(pendingCarpetArea) <= 0}
                           onClick={() => {
@@ -2003,59 +1994,85 @@ ${formData.description || 'Sem observações adicionais'}
                     )}
 
                     {/* Chairs config */}
-                    {pendingUpsellId === 'chairs' && (
-                      <div className="w-full max-w-xs mx-auto">
-                        <picture>
-                          <source srcSet="/images/services/cadeira.webp" type="image/webp" />
-                          <img src="/images/services/cadeira.png" alt="Cadeiras" className="w-16 h-14 object-cover rounded-xl mx-auto mb-2" loading="lazy" />
-                        </picture>
-                        <h3 className="font-playfair text-lg font-bold text-white mb-1">Cadeiras</h3>
-                        <p className="text-xs text-white/35 mb-3">Quantas cadeiras quer limpar?</p>
+                    {pendingUpsellId === 'chairs' && (() => {
+                      const qty = pendingChairQtyNum;
+                      const sobOrç = qty >= 10;
+                      const basePrice = calcChairClean(qty) ?? 0;
+                      const waterproofPrice = pendingWaterproof && !sobOrç ? qty * 10 : 0;
+                      const totalChairPrice = basePrice + waterproofPrice;
+                      return (
+                        <div className="w-full max-w-xs mx-auto">
+                          <h3 className="font-playfair text-lg font-bold text-white text-center mb-1">Cadeiras</h3>
 
-                        {/* Qty stepper */}
-                        <div className="flex items-center justify-center gap-4 mb-2">
-                          <button onClick={() => setPendingChairQtyNum(q => Math.max(1, q - 1))} className="w-9 h-9 rounded-lg border border-white/20 bg-white/[0.05] text-white font-bold text-lg flex items-center justify-center active:scale-95 touch-manipulation hover:border-gold/50">−</button>
-                          <span className="text-2xl font-black text-gold w-8 text-center tabular-nums">{pendingChairQtyNum}</span>
-                          <button onClick={() => setPendingChairQtyNum(q => Math.min(10, q + 1))} className="w-9 h-9 rounded-lg border border-white/20 bg-white/[0.05] text-white font-bold text-lg flex items-center justify-center active:scale-95 touch-manipulation hover:border-gold/50">+</button>
-                        </div>
-                        <p className="text-[10px] text-gold/70 text-center mb-4">
-                          {(() => {
-                            const qty = pendingChairQtyNum;
-                            const price = qty <= 3 ? qty * 17.5 : qty <= 6 ? qty * 15 : qty * 12.5;
-                            return `${qty} cadeira${qty > 1 ? 's' : ''} → ${price}€`;
-                          })()}
-                        </p>
-                        {/* Waterproofing */}
-                        <button
-                          onClick={() => setPendingWaterproof(w => !w)}
-                          className={cn(
-                            "w-full flex items-center gap-3 px-4 py-3 rounded-xl border-2 transition-all touch-manipulation mb-4",
-                            pendingWaterproof ? "border-gold bg-[#252931] shadow-[0_0_10px_rgba(212,175,55,0.15)]" : "border-white/[0.16] bg-[#252931] hover:border-gold/35"
+                          {/* Price display — prominent at top */}
+                          <div className={cn(
+                            "w-full rounded-2xl border px-5 py-4 text-center mb-5 transition-all duration-300",
+                            sobOrç ? "bg-[#252931] border-white/15" : "bg-[#1a2a1a] border-gold/30 shadow-[0_0_20px_rgba(212,175,55,0.10)]"
+                          )}>
+                            <p className="text-[10px] text-white/35 uppercase tracking-wider mb-1">Estimativa total</p>
+                            <p className={cn("font-playfair text-4xl font-black leading-none mb-1", sobOrç ? "text-white/60 text-2xl" : "text-gold")}>
+                              {sobOrç ? 'Sob orçamento' : `${totalChairPrice % 1 === 0 ? totalChairPrice : totalChairPrice.toFixed(1).replace('.', ',')}€`}
+                            </p>
+                            <p className="text-[10px] text-white/30">
+                              {sobOrç ? 'Entraremos em contacto para combinar' : `${qty} cadeira${qty > 1 ? 's' : ''}${pendingWaterproof ? ' + impermeabilização' : ''}`}
+                            </p>
+                          </div>
+
+                          {/* Stepper — big and touch-friendly */}
+                          <p className="text-[10px] text-white/40 uppercase tracking-wider text-center mb-2">Quantidade</p>
+                          <div className="flex items-center justify-center gap-6 mb-5">
+                            <button
+                              onClick={() => setPendingChairQtyNum(q => Math.max(1, q - 1))}
+                              disabled={qty <= 1}
+                              className="w-14 h-14 rounded-2xl border-2 border-white/20 bg-white/[0.05] text-white font-bold text-2xl flex items-center justify-center disabled:opacity-25 active:scale-95 transition-all touch-manipulation hover:border-gold/50"
+                            >−</button>
+                            <span className="text-4xl font-black text-gold w-10 text-center tabular-nums leading-none">{qty}</span>
+                            <button
+                              onClick={() => setPendingChairQtyNum(q => q + 1)}
+                              className="w-14 h-14 rounded-2xl border-2 border-white/20 bg-white/[0.05] text-white font-bold text-2xl flex items-center justify-center active:scale-95 transition-all touch-manipulation hover:border-gold/50"
+                            >+</button>
+                          </div>
+
+                          {/* Waterproofing — only when < 10 chairs */}
+                          {!sobOrç && (
+                            <button
+                              onClick={() => setPendingWaterproof(w => !w)}
+                              className={cn(
+                                "w-full flex items-center gap-3 px-4 py-3 rounded-xl border-2 transition-all touch-manipulation mb-4",
+                                pendingWaterproof ? "border-gold bg-[#252931] shadow-[0_0_10px_rgba(212,175,55,0.15)]" : "border-white/[0.16] bg-[#252931] hover:border-gold/35"
+                              )}
+                            >
+                              <div className={cn("w-5 h-5 rounded-md border-2 flex items-center justify-center flex-shrink-0 transition-all", pendingWaterproof ? "border-gold bg-gold" : "border-white/30")}>
+                                {pendingWaterproof && <Check className="w-3 h-3 text-[#12121e]" />}
+                              </div>
+                              <div className="text-left flex-1">
+                                <p className="text-sm font-bold text-white">Adicionar Impermeabilização</p>
+                                <p className="text-[10px] text-white/40">+10€/cadeira: proteção duradoura</p>
+                              </div>
+                              <span className="text-gold font-bold text-sm flex-shrink-0">+{qty * 10}€</span>
+                            </button>
                           )}
-                        >
-                          <div className={cn("w-5 h-5 rounded-md border-2 flex items-center justify-center flex-shrink-0 transition-all", pendingWaterproof ? "border-gold bg-gold" : "border-white/30")}>
-                            {pendingWaterproof && <Check className="w-3 h-3 text-[#12121e]" />}
-                          </div>
-                          <div className="text-left flex-1">
-                            <p className="text-sm font-bold text-white">Adicionar Impermeabilização</p>
-                            <p className="text-[10px] text-white/40">+10€/cadeira: proteção duradoura</p>
-                          </div>
-                          <span className="text-gold font-bold text-sm flex-shrink-0">+{pendingChairQtyNum * 10}€</span>
-                        </button>
-                        <button
-                          onClick={() => {
-                            const qty = pendingChairQtyNum;
-                            const base = qty <= 3 ? qty * 17.5 : qty <= 6 ? qty * 15 : qty * 12.5;
-                            const waterproofPrice = pendingWaterproof ? qty * 10 : 0;
-                            setUpsellItems(prev => [...prev, { id: 'chairs', chairQty: String(qty), qty, price: base + waterproofPrice, label: `${qty} Cadeira${qty > 1 ? 's' : ''}`, waterproof: pendingWaterproof, waterproofPrice }]);
-                            setUpsellSubStep('select');
-                          }}
-                          className="w-full h-12 bg-gradient-to-r from-gold to-[#d4c57b] hover:from-[#d4c57b] hover:to-gold text-[#12121e] font-bold rounded-xl disabled:opacity-35 touch-manipulation active:scale-[0.98] transition-all"
-                        >
-                          Adicionar {pendingChairQtyNum} Cadeira{pendingChairQtyNum > 1 ? 's' : ''}
-                        </button>
-                      </div>
-                    )}
+
+                          <button
+                            onClick={() => {
+                              setUpsellItems(prev => [...prev, {
+                                id: 'chairs',
+                                chairQty: String(qty),
+                                qty,
+                                price: sobOrç ? 0 : totalChairPrice,
+                                label: `${qty} Cadeira${qty > 1 ? 's' : ''}`,
+                                waterproof: pendingWaterproof && !sobOrç,
+                                waterproofPrice: pendingWaterproof && !sobOrç ? waterproofPrice : 0,
+                              }]);
+                              setUpsellSubStep('select');
+                            }}
+                            className="w-full h-12 bg-gradient-to-r from-gold to-[#d4c57b] hover:from-[#d4c57b] hover:to-gold text-[#12121e] font-bold rounded-xl touch-manipulation active:scale-[0.98] transition-all"
+                          >
+                            {sobOrç ? `Adicionar ${qty} Cadeiras (sob orçamento)` : `Adicionar ${qty} Cadeira${qty > 1 ? 's' : ''}`}
+                          </button>
+                        </div>
+                      );
+                    })()}
                   </div>
                 )}
               </div>
