@@ -13,6 +13,7 @@ import imgMicrofibra  from "@/assets/hero-p-sofa-microfibras.webp";
 import imgHotel       from "@/assets/hero-p-limpeza-sofa-hotel.webp";
 import imgChenille    from "@/assets/hero-p-sofa-chenille.webp";
 import imgStd         from "@/assets/hero-p-limpeza-sofa-std.webp";
+import heroSofa       from "@/assets/hero-sofa-cleaning-new.webp";
 
 const MARCA_HERO: Record<string, string> = {
   "natuzzi":         imgPele,       // couro genuíno italiano
@@ -69,48 +70,63 @@ const MarcaSofaPage = () => {
     document.querySelector('link[rel="canonical"]')?.setAttribute("href", pageUrl);
   }, [pageTitle, pageDesc, pageUrl]);
 
-  const schema = {
+  const jsonLd = {
     "@context": "https://schema.org",
-    "@type": "Service",
-    "name": `Limpeza de Sofá ${marca.name} em ${city.name}`,
-    "description": pageDesc,
-    "url": pageUrl,
-    "provider": { "@id": "https://www.cleansolutions.com.pt/#business" },
-    "areaServed": { "@type": "City", "name": city.name },
-    "offers": {
-      "@type": "Offer",
-      "availability": "https://schema.org/InStock",
-      "areaServed": { "@type": "City", "name": city.name },
-      "priceSpecification": {
-        "@type": "PriceSpecification",
-        "minPrice": String(marca.minPrice),
-        "maxPrice": String(marca.maxPrice),
-        "priceCurrency": "EUR",
+    "@graph": [
+      {
+        "@type": "WebPage",
+        "@id": `${pageUrl}#webpage`,
+        "url": pageUrl,
+        "name": pageTitle,
+        "description": pageDesc,
+        "inLanguage": "pt-PT",
+        "isPartOf": { "@id": "https://www.cleansolutions.com.pt/#website" },
+        "publisher": { "@id": "https://www.cleansolutions.com.pt/#business" },
+        "breadcrumb": { "@id": `${pageUrl}#breadcrumb` },
       },
-    },
-  };
-
-  return (
-    <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({
-        "@context": "https://schema.org",
+      {
+        "@type": "BreadcrumbList",
+        "@id": `${pageUrl}#breadcrumb`,
+        "itemListElement": [
+          { "@type": "ListItem", "position": 1, "name": "Início", "item": "https://www.cleansolutions.com.pt/" },
+          { "@type": "ListItem", "position": 2, "name": "Limpeza de Sofás", "item": "https://www.cleansolutions.com.pt/limpeza-sofas" },
+          { "@type": "ListItem", "position": 3, "name": `Sofá ${marca.name} em ${city.name}`, "item": pageUrl },
+        ],
+      },
+      {
+        "@type": "Service",
+        "@id": `${pageUrl}#service`,
+        "name": `Limpeza de Sofá ${marca.name} em ${city.name}`,
+        "description": pageDesc,
+        "url": pageUrl,
+        "provider": { "@id": "https://www.cleansolutions.com.pt/#business" },
+        "areaServed": { "@type": "City", "name": city.name },
+        "offers": {
+          "@type": "Offer",
+          "availability": "https://schema.org/InStock",
+          "areaServed": { "@type": "City", "name": city.name },
+          "priceSpecification": {
+            "@type": "PriceSpecification",
+            "minPrice": String(marca.minPrice),
+            "maxPrice": String(marca.maxPrice),
+            "priceCurrency": "EUR",
+          },
+        },
+      },
+      {
         "@type": "FAQPage",
         "mainEntity": marca.faqs.map(faq => ({
           "@type": "Question",
           "name": faq.question,
           "acceptedAnswer": { "@type": "Answer", "text": faq.answer },
         })),
-      }) }} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({
-        "@context": "https://schema.org",
-        "@type": "BreadcrumbList",
-        "itemListElement": [
-          { "@type": "ListItem", "position": 1, "name": "Início", "item": "https://www.cleansolutions.com.pt/" },
-          { "@type": "ListItem", "position": 2, "name": "Limpeza de Sofás", "item": "https://www.cleansolutions.com.pt/limpeza-sofas" },
-          { "@type": "ListItem", "position": 3, "name": `Sofá ${marca.name} em ${city.name}`, "item": pageUrl },
-        ],
-      }) }} />
+      },
+    ],
+  };
+
+  return (
+    <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
 
       <Header />
       <main>
