@@ -452,14 +452,17 @@ const ProblemPage = () => {
                 {
                   "@type": "WebPage",
                   "@id": `https://www.cleansolutions.com.pt/problemas/${slug}#webpage`,
+                  "url": `https://www.cleansolutions.com.pt/problemas/${slug}`,
                   "name": data.title,
                   "description": data.metaDescription,
-                  "url": `https://www.cleansolutions.com.pt/problemas/${slug}`,
+                  "inLanguage": "pt-PT",
                   "publisher": { "@id": "https://www.cleansolutions.com.pt/#business" },
                   "isPartOf": { "@id": "https://www.cleansolutions.com.pt/#website" },
+                  "breadcrumb": { "@id": `https://www.cleansolutions.com.pt/problemas/${slug}#breadcrumb` },
                 },
                 {
                   "@type": "BreadcrumbList",
+                  "@id": `https://www.cleansolutions.com.pt/problemas/${slug}#breadcrumb`,
                   "itemListElement": [
                     { "@type": "ListItem", "position": 1, "name": "Início", "item": "https://www.cleansolutions.com.pt/" },
                     { "@type": "ListItem", "position": 2, "name": "Problemas", "item": "https://www.cleansolutions.com.pt/problemas" },
