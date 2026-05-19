@@ -169,21 +169,25 @@ const QuizForm = ({ isOpen, onClose, initialLocation, problema }: QuizFormProps)
   const totalSteps = 4;
 
   // ── KEYBOARD-AWARE CARD HEIGHT ─────────────────────────────────────────────
-  // Only adjusts the card max-height so it fits above the keyboard.
-  // Scroll behaviour is handled directly in onFocus on the input.
+  // Shrinks the card to the visual viewport height when the iOS keyboard opens,
+  // so inputs are always visible above the keyboard.
   useEffect(() => {
     const vv = window.visualViewport;
     if (!vv) return;
     const onResize = () => {
       const card = quizCardRef.current;
       if (!card) return;
-      const kbHeight = window.innerHeight - vv.height - vv.offsetTop;
-      card.style.maxHeight = kbHeight > 80 ? `${vv.height * 0.96}px` : '';
+      const isMobile = window.innerWidth < 640;
+      if (!isMobile) { card.style.height = ''; return; }
+      const kbVisible = vv.height < window.innerHeight * 0.85;
+      card.style.height = kbVisible ? `${vv.height}px` : '';
     };
     vv.addEventListener('resize', onResize);
+    vv.addEventListener('scroll', onResize);
     return () => {
       vv.removeEventListener('resize', onResize);
-      if (quizCardRef.current) quizCardRef.current.style.maxHeight = '';
+      vv.removeEventListener('scroll', onResize);
+      if (quizCardRef.current) quizCardRef.current.style.height = '';
     };
   }, []);
 

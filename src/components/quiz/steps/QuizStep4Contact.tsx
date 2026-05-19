@@ -67,7 +67,10 @@ const QuizStep4Contact = ({ formData, updateFormData }: QuizStep4ContactProps) =
               placeholder="O seu nome"
               value={formData.name}
               readOnly={!inputsActive}
-              onFocus={e => { if (!inputsActive) { e.target.blur(); } else { setInputsActive(true); } }}
+              onFocus={e => {
+                if (!inputsActive) { e.target.blur(); return; }
+                setTimeout(() => e.target.scrollIntoView({ block: 'center', behavior: 'smooth' }), 350);
+              }}
               onClick={() => setInputsActive(true)}
               onChange={e => updateFormData({ name: e.target.value })}
               className="text-base h-13 bg-white/[0.06] border-white/15 text-white placeholder:text-white/20 focus-visible:ring-gold rounded-xl"
@@ -80,7 +83,10 @@ const QuizStep4Contact = ({ formData, updateFormData }: QuizStep4ContactProps) =
               placeholder="9xx xxx xxx"
               value={formData.phone}
               readOnly={!inputsActive}
-              onFocus={e => { if (!inputsActive) { e.target.blur(); } else { setInputsActive(true); } }}
+              onFocus={e => {
+                if (!inputsActive) { e.target.blur(); return; }
+                setTimeout(() => e.target.scrollIntoView({ block: 'center', behavior: 'smooth' }), 350);
+              }}
               onClick={() => setInputsActive(true)}
               onChange={e => updateFormData({ phone: e.target.value })}
               className="text-base h-13 bg-white/[0.06] border-white/15 text-white placeholder:text-white/20 focus-visible:ring-gold rounded-xl"
