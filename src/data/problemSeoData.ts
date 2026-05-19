@@ -712,7 +712,7 @@ const problemDefinitions: ProblemPage[] = [
       "Prolonga vida do sofá",
     ],
     faqs: [
-      { question: "Quanto custa impermeabilizar o sofá?", answer: "A impermeabilização de sofás começa a partir de 25€ para sofás de 2 lugares. Packs com limpeza + impermeabilização têm desconto até 15%." },
+      { question: "Quanto custa impermeabilizar o sofá?", answer: "A impermeabilização de sofás custa 49€ (1 lugar), 69€ (2 lugares) e 89€ (3 lugares). O pack limpeza + impermeabilização começa em 89€ para 1 lugar." },
       { question: "A impermeabilização altera o tecido?", answer: "Não. O nosso produto é completamente invisível e não altera a cor, textura, toque ou respirabilidade do tecido." },
       { question: "Quanto tempo dura a impermeabilização?", answer: "A nossa impermeabilização profissional dura entre 5 a 10 anos, dependendo do uso e tipo de tecido." },
     ],
@@ -734,7 +734,7 @@ const problemDefinitions: ProblemPage[] = [
     h1: "Quanto Custa Limpar um Sofá Profissionalmente?",
     intro: "Está a pesquisar preços de limpeza de sofá? Os preços da Kyro Clean Solutions começam a partir de 39€ para sofás de 2 lugares, com opções de impermeabilização e packs com desconto.",
     problemDetail: "Os preços de limpeza de sofá variam conforme vários fatores: tamanho do sofá (2, 3 ou mais lugares), tipo de tecido, estado de sujidade, tipo de manchas e serviços adicionais como impermeabilização. Muitas empresas não são transparentes com preços, mas na Kyro acreditamos em transparência.",
-    solutionDetail: "Oferecemos preços transparentes e competitivos: sofá de 2 lugares desde 39€, sofá de 3 lugares desde 49€, sofá em L desde 59€. Impermeabilização adicional desde 25€. Packs de limpeza + impermeabilização com desconto até 15%. Orçamento personalizado gratuito e sem compromisso.",
+    solutionDetail: "Oferecemos preços transparentes e competitivos: sofá de 2 lugares desde 39€, sofá de 3 lugares desde 49€, sofá em L desde 59€. Impermeabilização adicional desde 49€. Packs de limpeza + impermeabilização com desconto. Orçamento personalizado gratuito e sem compromisso.",
     benefits: [
       "Preços transparentes desde 39€",
       "Orçamento gratuito sem compromisso",

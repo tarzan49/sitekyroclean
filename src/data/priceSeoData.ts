@@ -26,7 +26,7 @@ const priceTables: Record<string, { item: string; price: string; note?: string }
     { item: "Sofá em L", price: "Desde 69€" },
     { item: "Sofá cama", price: "Desde 59€" },
     { item: "Chaise longue", price: "Desde 15€", note: "add-on" },
-    { item: "Impermeabilização", price: "Desde 25€", note: "add-on recomendado" },
+    { item: "Impermeabilização", price: "Desde 49€", note: "add-on recomendado" },
   ],
   "limpeza-colchoes": [
     { item: "Colchão Solteiro", price: "Desde 39€" },
@@ -129,7 +129,7 @@ const priceFaqs: Record<string, { question: string; answer: string }[]> = {
     { question: "Quanto custa limpar alcatifas em {city}?", answer: "A limpeza de alcatifas em {city} começa a partir de 3€/m². O preço depende da área total e estado da alcatifa." },
   ],
   "impermeabilizacao": [
-    { question: "Quanto custa impermeabilizar um sofá em {city}?", answer: "A impermeabilização de sofás em {city} começa a partir de 25€ para sofás de 2-3 lugares. Recomendamos combinar com limpeza para melhor resultado e preço especial." },
+    { question: "Quanto custa impermeabilizar um sofá em {city}?", answer: "A impermeabilização de sofás em {city} custa 49€ (1 lugar), 69€ (2 lugares) e 89€ (3 lugares). Recomendamos combinar com limpeza para melhor resultado e preço especial." },
     { question: "A impermeabilização vale a pena?", answer: "Sim. A impermeabilização protege contra manchas de líquidos e prolonga a vida útil do estofamento. É especialmente recomendada para famílias com crianças ou animais." },
   ],
 };

@@ -177,7 +177,7 @@ const BeforeAfterPage = () => {
                   { name: "Limpeza de Tapetes",  link: "/limpeza-tapetes",  price: "Desde 5€/m²" },
                   { name: "Limpeza de Cadeiras", link: "/limpeza-cadeiras", price: "Desde 10€" },
                   { name: "Limpeza de Alcatifas",link: "/limpeza-alcatifas",price: "Desde 3€/m²" },
-                  { name: "Impermeabilização",   link: "/impermeabilizacao",price: "Desde 25€" },
+                  { name: "Impermeabilização",   link: "/impermeabilizacao",price: "Desde 49€" },
                 ].map(svc => (
                   <Link
                     key={svc.link}

@@ -193,7 +193,7 @@ export const packs: PackCombo[] = [
           { id: '1-lugar',   label: '1 Lugar',    sublabel: 'Sofá pequeno / poltrona', price: 98,  packPrice: 89  },
           { id: '2-lugares', label: '2 Lugares',  sublabel: 'Sofá standard',           price: 138, packPrice: 129 },
           { id: '3-lugares', label: '3 Lugares',  sublabel: 'Sofá grande / familiar',  price: 168, packPrice: 149 },
-          { id: '3l-chaise', label: '3L + Chaise',sublabel: 'Com chaise longue',        price: 188, packPrice: 169 },
+          { id: '3l-chaise', label: '3L + Chaise',sublabel: 'Com chaise longue',        price: 188, packPrice: 159 },
         ],
       },
     ],
