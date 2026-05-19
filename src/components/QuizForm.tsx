@@ -548,7 +548,10 @@ const QuizForm = ({ isOpen, onClose, initialLocation, problema }: QuizFormProps)
         setShowUpsell(true);
         return;
       }
-      if (nextStep <= totalSteps) setCurrentStep(nextStep);
+      if (nextStep <= totalSteps) {
+        (document.activeElement as HTMLElement)?.blur();
+        setCurrentStep(nextStep);
+      }
     }
   };
 

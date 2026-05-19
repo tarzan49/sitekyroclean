@@ -16,10 +16,13 @@ interface QuizStep4ContactProps {
 
 const QuizStep4Contact = ({ formData, updateFormData }: QuizStep4ContactProps) => {
   const photoInputRef = useRef<HTMLInputElement>(null);
-  // Prevent iOS Safari from auto-focusing inputs on mount (which opens keyboard before user sees the page)
+  const focusTrapRef = useRef<HTMLDivElement>(null);
   const [inputsActive, setInputsActive] = useState(false);
+
   useEffect(() => {
-    const t = setTimeout(() => setInputsActive(true), 350);
+    // Steal focus immediately to an invisible div so iOS doesn't auto-open keyboard
+    focusTrapRef.current?.focus({ preventScroll: true });
+    const t = setTimeout(() => setInputsActive(true), 600);
     return () => clearTimeout(t);
   }, []);
 
@@ -28,6 +31,8 @@ const QuizStep4Contact = ({ formData, updateFormData }: QuizStep4ContactProps) =
       style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}
       className="flex-1"
     >
+      {/* Invisible focus trap — absorbs iOS auto-focus so keyboard doesn't open on mount */}
+      <div ref={focusTrapRef} tabIndex={-1} aria-hidden="true" className="sr-only" />
       <div className="w-full max-w-sm">
         <h2 className="font-playfair text-xl sm:text-2xl font-bold text-white text-center mb-1 leading-[1.3]">
           Os seus dados
@@ -62,6 +67,7 @@ const QuizStep4Contact = ({ formData, updateFormData }: QuizStep4ContactProps) =
               placeholder="O seu nome"
               value={formData.name}
               readOnly={!inputsActive}
+              onFocus={e => { if (!inputsActive) { e.target.blur(); } else { setInputsActive(true); } }}
               onClick={() => setInputsActive(true)}
               onChange={e => updateFormData({ name: e.target.value })}
               className="text-base h-13 bg-white/[0.06] border-white/15 text-white placeholder:text-white/20 focus-visible:ring-gold rounded-xl"
@@ -74,6 +80,7 @@ const QuizStep4Contact = ({ formData, updateFormData }: QuizStep4ContactProps) =
               placeholder="9xx xxx xxx"
               value={formData.phone}
               readOnly={!inputsActive}
+              onFocus={e => { if (!inputsActive) { e.target.blur(); } else { setInputsActive(true); } }}
               onClick={() => setInputsActive(true)}
               onChange={e => updateFormData({ phone: e.target.value })}
               className="text-base h-13 bg-white/[0.06] border-white/15 text-white placeholder:text-white/20 focus-visible:ring-gold rounded-xl"
