@@ -63,6 +63,70 @@ const resultImages: Record<string, string> = {
 
 const METRO_CITIES = new Set(["porto", "matosinhos", "maia", "vila-nova-de-gaia", "gondomar", "braga", "lisboa"]);
 
+const PRICE_TABLE: Record<string, { item: string; price: string; highlight?: boolean }[]> = {
+  'limpeza-sofas': [
+    { item: 'Sofá 1 lugar',            price: '49€' },
+    { item: 'Sofá 2 lugares',          price: '69€', highlight: true },
+    { item: 'Sofá 3 lugares',          price: '79€' },
+    { item: 'Chaise longue (add-on)',  price: '+10€' },
+    { item: 'Sofá modular / em L',     price: 'Sob orçamento' },
+  ],
+  'limpeza-colchoes': [
+    { item: 'Colchão solteiro',        price: '39€' },
+    { item: 'Colchão casal',           price: '49€', highlight: true },
+    { item: 'Colchão king / queen',    price: '59€' },
+  ],
+  'limpeza-tapetes': [
+    { item: 'Tapete até 5 m²',         price: '10€/m²' },
+    { item: 'Tapete 5 – 15 m²',        price: '7€/m²', highlight: true },
+    { item: 'Tapete +15 m²',           price: 'Sob orçamento' },
+  ],
+  'limpeza-cadeiras': [
+    { item: '1 cadeira (tampo)',        price: '15€' },
+    { item: '1 cadeira (completa)',     price: '20€', highlight: true },
+    { item: '6+ cadeiras',             price: '10€/un' },
+  ],
+  'limpeza-alcatifas': [
+    { item: 'Até 50 m²',               price: '3€/m²', highlight: true },
+    { item: '+50 m²',                  price: 'Sob orçamento' },
+  ],
+  'impermeabilizacao': [
+    { item: 'Sofá 1 lugar',            price: '49€' },
+    { item: 'Sofá 2 lugares',          price: '69€', highlight: true },
+    { item: 'Sofá 3 lugares',          price: '89€' },
+    { item: 'Colchão solteiro',        price: '45€' },
+    { item: 'Colchão casal',           price: '50€' },
+    { item: 'Tapetes',                 price: '7€/m²' },
+  ],
+};
+
+const SERVICE_TESTIMONIALS: Record<string, { name: string; city: string; text: string }[]> = {
+  'limpeza-sofas': [
+    { name: "Maria S.", city: "Porto", text: "O meu sofá tinha 8 anos e achei que ia ter de comprar um novo. Resultado incrível — como novo em poucas horas!" },
+    { name: "Rui T.", city: "Espinho", text: "Tinham-me dito que a nódoa de vinho não saía. A Kyro provou o contrário! Sofá impecável." },
+  ],
+  'limpeza-colchoes': [
+    { name: "Fernando G.", city: "Rio Tinto", text: "Tinha alergia constante à noite. Depois da limpeza do colchão melhorou imenso. Super recomendo!" },
+    { name: "Daniela R.", city: "Famalicão", text: "Limparam os colchões das crianças. Ficaram super higiénicos e sem aquele cheiro a humidade." },
+  ],
+  'limpeza-tapetes': [
+    { name: "Sandra V.", city: "Paredes", text: "O tapete da sala recuperou cores que já nem me lembrava que tinha. Fiquei completamente impressionada!" },
+    { name: "Miguel S.", city: "Cascais", text: "Limparam tapetes persas antigos com todo o cuidado. Resultado impecável, como novos." },
+  ],
+  'limpeza-cadeiras': [
+    { name: "Teresa F.", city: "Lisboa", text: "As cadeiras da sala de jantar ficaram como novas. Atendimento excelente do início ao fim." },
+    { name: "Helena M.", city: "Ermesinde", text: "As cadeiras do escritório ficaram impecáveis. Equipa pontual e muito profissional." },
+  ],
+  'limpeza-alcatifas': [
+    { name: "Carlos M.", city: "Braga", text: "Serviço de excelência! A alcatifa do escritório ficou impecável. Profissionais muito competentes e pontuais." },
+    { name: "António F.", city: "Vila do Conde", text: "Limparam todo o recheio do AL e os hóspedes notaram logo a diferença. Obrigado!" },
+  ],
+  'impermeabilizacao': [
+    { name: "Ricardo A.", city: "Póvoa de Varzim", text: "A impermeabilização foi perfeita. Agora estou muito mais tranquilo com crianças em casa. Recomendo vivamente!" },
+    { name: "João P.", city: "Vila Nova de Gaia", text: "Cheiro fresco e sensação incrível. Equipa profissional, rápida e super cuidadosa." },
+  ],
+};
+
 function parseLocationRoute(pathname: string): { serviceSlug: string; citySlug: string } | null {
   const path = pathname.replace(/^\//, '');
   for (const service of services) {
@@ -270,6 +334,47 @@ const LocationServicePage = () => {
           </div>
         </section>
 
+        {/* ═══ TABELA DE PREÇOS ═══ */}
+        {PRICE_TABLE[data.serviceSlug] && (
+          <section className="py-12 md:py-14 bg-white border-t border-[#E8E4DE]">
+            <div className="container mx-auto px-5 sm:px-6 lg:px-8">
+              <div className="max-w-2xl mx-auto">
+                <div className="text-center mb-6">
+                  <div className="flex items-center justify-center gap-3 mb-3">
+                    <div className="h-px w-10 opacity-40" style={{ backgroundColor: "#D4AF37" }} />
+                    <p className="text-[10px] font-bold tracking-[0.28em] uppercase" style={{ color: "#D4AF37" }}>Preços em {data.city}</p>
+                    <div className="h-px w-10 opacity-40" style={{ backgroundColor: "#D4AF37" }} />
+                  </div>
+                  <h2 className="font-playfair text-2xl md:text-3xl font-bold text-[#1A1A2E]">
+                    Quanto custa {data.service.toLowerCase()} em {data.city}?
+                  </h2>
+                </div>
+                <div className="rounded-2xl overflow-hidden border border-[#E8E4DE] shadow-sm">
+                  {PRICE_TABLE[data.serviceSlug].map((row, i) => (
+                    <div
+                      key={i}
+                      className={[
+                        "flex items-center justify-between px-5 py-3.5 text-sm",
+                        i % 2 === 0 ? "bg-[#FDFDF9]" : "bg-white",
+                        row.highlight ? "border-l-2" : "",
+                      ].join(" ")}
+                      style={row.highlight ? { borderLeftColor: "#D4AF37" } : {}}
+                    >
+                      <span className={row.highlight ? "font-semibold text-[#1A1A2E]" : "text-[#1A1A2E]/70"}>{row.item}</span>
+                      <span className="font-bold tabular-nums" style={{ color: "#D4AF37" }}>{row.price}</span>
+                    </div>
+                  ))}
+                </div>
+                <div className="flex items-center justify-center gap-4 mt-4 text-xs text-[#1A1A2E]/45 flex-wrap">
+                  <span className="flex items-center gap-1"><CheckCircle className="w-3.5 h-3.5" style={{ color: "#D4AF37" }} /> Deslocação incluída na área de {data.city}</span>
+                  <span className="flex items-center gap-1"><CheckCircle className="w-3.5 h-3.5" style={{ color: "#D4AF37" }} /> Orçamento gratuito e sem compromisso</span>
+                  <span className="flex items-center gap-1"><CheckCircle className="w-3.5 h-3.5" style={{ color: "#D4AF37" }} /> IVA incluído</span>
+                </div>
+              </div>
+            </div>
+          </section>
+        )}
+
         {/* ═══ COMO FUNCIONA ═══ */}
         <section className="py-12 md:py-16 relative overflow-hidden bg-checker-dark">
           <div className="container mx-auto px-5 sm:px-6 lg:px-8 relative z-10">
@@ -369,6 +474,51 @@ const LocationServicePage = () => {
                     </AccordionItem>
                   ))}
                 </Accordion>
+              </div>
+            </div>
+          </section>
+        )}
+
+        {/* ═══ TESTEMUNHOS ═══ */}
+        {SERVICE_TESTIMONIALS[data.serviceSlug] && (
+          <section className="py-12 md:py-14 bg-[#FDFDF9] border-t border-[#E8E4DE]">
+            <div className="container mx-auto px-5 sm:px-6 lg:px-8">
+              <div className="max-w-3xl mx-auto">
+                <div className="text-center mb-6">
+                  <div className="flex items-center justify-center gap-3 mb-3">
+                    <div className="h-px w-10 opacity-40" style={{ backgroundColor: "#D4AF37" }} />
+                    <p className="text-[10px] font-bold tracking-[0.28em] uppercase" style={{ color: "#D4AF37" }}>Avaliações reais</p>
+                    <div className="h-px w-10 opacity-40" style={{ backgroundColor: "#D4AF37" }} />
+                  </div>
+                  <h2 className="font-playfair text-xl md:text-2xl font-bold text-[#1A1A2E]">O que dizem os nossos clientes</h2>
+                </div>
+                <div className="grid sm:grid-cols-2 gap-4 mb-6">
+                  {SERVICE_TESTIMONIALS[data.serviceSlug].map((t, i) => (
+                    <div key={i} className="bg-white rounded-2xl p-5 border border-[#E8E4DE] shadow-sm">
+                      <div className="flex gap-0.5 mb-3">
+                        {[...Array(5)].map((_, j) => <Star key={j} className="w-3.5 h-3.5 fill-[#D4AF37]" style={{ color: "#D4AF37" }} />)}
+                      </div>
+                      <p className="text-sm text-[#1A1A2E]/65 leading-relaxed italic mb-3">"{t.text}"</p>
+                      <div className="flex items-center gap-2">
+                        <div className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold text-white" style={{ background: "#D4AF37" }}>
+                          {t.name.charAt(0)}
+                        </div>
+                        <div>
+                          <p className="text-xs font-bold text-[#1A1A2E]">{t.name}</p>
+                          <p className="text-[10px] text-[#1A1A2E]/40">{t.city}</p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                {/* Garantia */}
+                <div className="rounded-2xl px-6 py-4 flex items-center justify-between gap-4 flex-wrap" style={{ background: "#071a12", border: "1px solid rgba(212,175,55,0.2)" }}>
+                  <div>
+                    <p className="text-xs font-bold uppercase tracking-widest mb-0.5" style={{ color: "#D4AF37" }}>Garantia Kyro Clean</p>
+                    <p className="text-sm text-white/80 font-medium">Resultado garantido ou devolvemos o dinheiro.</p>
+                  </div>
+                  <QuizButton />
+                </div>
               </div>
             </div>
           </section>

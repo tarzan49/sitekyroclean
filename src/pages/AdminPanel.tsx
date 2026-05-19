@@ -103,6 +103,12 @@ interface QuizEvent {
   city: string | null;
   value: number | null;
   service_type: string | null;
+  page_path: string | null;
+  referrer: string | null;
+  utm_source: string | null;
+  utm_medium: string | null;
+  utm_campaign: string | null;
+  device: string | null;
 }
 
 interface QuizMetrics {
@@ -115,6 +121,10 @@ interface QuizMetrics {
   stepFunnel: { step: number; label: string; count: number; rate: number }[];
   todayStarts: number;
   weekStarts: number;
+  cityBreakdown: { city: string; count: number }[];
+  pageBreakdown: { path: string; count: number }[];
+  deviceBreakdown: { device: string; count: number }[];
+  sourceBreakdown: { source: string; count: number }[];
 }
 
 // ── Tabs ─────────────────────────────────────────────────────────────────────
@@ -198,10 +208,30 @@ const AdminPanel = () => {
       completes.forEach(e => { if (e.service) serviceCounts[e.service] = (serviceCounts[e.service] ?? 0) + 1; });
       const topService = Object.entries(serviceCounts).sort((a, b) => b[1] - a[1])[0]?.[0] ?? "—";
 
-      // Top city
+      // Top city + full breakdown
       const cityCounts: Record<string, number> = {};
-      completes.forEach(e => { if (e.city) cityCounts[e.city] = (cityCounts[e.city] ?? 0) + 1; });
-      const topCity = Object.entries(cityCounts).sort((a, b) => b[1] - a[1])[0]?.[0] ?? "—";
+      events.filter(e => e.action !== "abandon").forEach(e => { if (e.city) cityCounts[e.city] = (cityCounts[e.city] ?? 0) + 1; });
+      const sortedCities = Object.entries(cityCounts).sort((a, b) => b[1] - a[1]);
+      const topCity = sortedCities[0]?.[0] ?? "—";
+      const cityBreakdown = sortedCities.slice(0, 10).map(([city, count]) => ({ city, count }));
+
+      // Page path breakdown (which page triggered quiz open)
+      const pathCounts: Record<string, number> = {};
+      starts.forEach(e => { const p = e.page_path ?? "/"; pathCounts[p] = (pathCounts[p] ?? 0) + 1; });
+      const pageBreakdown = Object.entries(pathCounts).sort((a, b) => b[1] - a[1]).slice(0, 10).map(([path, count]) => ({ path, count }));
+
+      // Device breakdown
+      const deviceCounts: Record<string, number> = {};
+      starts.forEach(e => { const d = e.device ?? "unknown"; deviceCounts[d] = (deviceCounts[d] ?? 0) + 1; });
+      const deviceBreakdown = Object.entries(deviceCounts).sort((a, b) => b[1] - a[1]).map(([device, count]) => ({ device, count }));
+
+      // Source breakdown (utm_source or inferred from referrer)
+      const sourceCounts: Record<string, number> = {};
+      starts.forEach(e => {
+        const src = e.utm_source ?? (e.referrer?.includes("google") ? "google" : e.referrer ? "referral" : "direto");
+        sourceCounts[src] = (sourceCounts[src] ?? 0) + 1;
+      });
+      const sourceBreakdown = Object.entries(sourceCounts).sort((a, b) => b[1] - a[1]).map(([source, count]) => ({ source, count }));
 
       // Step funnel (steps 0-4)
       const STEP_LABELS = ["Localização", "Serviço", "Tipo", "Quantidades", "Contacto"];
@@ -221,6 +251,10 @@ const AdminPanel = () => {
         stepFunnel,
         todayStarts,
         weekStarts,
+        cityBreakdown,
+        pageBreakdown,
+        deviceBreakdown,
+        sourceBreakdown,
       });
     } catch (e: unknown) {
       setMetricsError(e instanceof Error ? e.message : "Erro ao carregar métricas. Cria a tabela quiz_events no Supabase primeiro.");
@@ -228,6 +262,13 @@ const AdminPanel = () => {
       setMetricsLoading(false);
     }
   }, []);
+
+  const resetMetrics = async () => {
+    if (!confirm("Apagar TODOS os dados de métricas do quiz? Esta ação é irreversível.")) return;
+    await (supabase as any).from("quiz_events").delete().neq("id", "00000000-0000-0000-0000-000000000000");
+    setMetrics(null);
+    fetchMetrics();
+  };
 
   // Load data when tab changes
   useEffect(() => {
@@ -604,16 +645,25 @@ const AdminPanel = () => {
             <div className="flex items-center justify-between">
               <div>
                 <h2 className="text-lg font-bold text-navy">Métricas do Quiz</h2>
-                <p className="text-sm text-gray-500">Funil de conversão e dados de comportamento</p>
+                <p className="text-sm text-gray-500">Funil de conversão e dados de comportamento · localhost excluído</p>
               </div>
-              <button
-                onClick={fetchMetrics}
-                disabled={metricsLoading}
-                className="flex items-center gap-1.5 px-3 py-2 text-xs font-medium rounded-lg border border-gray-200 text-navy hover:border-navy/30 transition-colors disabled:opacity-50"
-              >
-                <RefreshCw className={`w-3.5 h-3.5 ${metricsLoading ? "animate-spin" : ""}`} />
-                Atualizar
-              </button>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={fetchMetrics}
+                  disabled={metricsLoading}
+                  className="flex items-center gap-1.5 px-3 py-2 text-xs font-medium rounded-lg border border-gray-200 text-navy hover:border-navy/30 transition-colors disabled:opacity-50"
+                >
+                  <RefreshCw className={`w-3.5 h-3.5 ${metricsLoading ? "animate-spin" : ""}`} />
+                  Atualizar
+                </button>
+                <button
+                  onClick={resetMetrics}
+                  className="flex items-center gap-1.5 px-3 py-2 text-xs font-medium rounded-lg border border-red-200 text-red-600 hover:bg-red-50 transition-colors"
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                  Apagar dados
+                </button>
+              </div>
             </div>
 
             {metricsError && (
@@ -693,11 +743,106 @@ const AdminPanel = () => {
                   </div>
                 )}
 
+                {/* Breakdown grid */}
+                {metrics.totalStarts > 0 && (
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                    {/* Cities */}
+                    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+                      <h3 className="text-sm font-semibold text-navy mb-3 flex items-center gap-2">
+                        <Map className="w-4 h-4 text-gold" /> Cidades dos clientes
+                      </h3>
+                      <div className="space-y-2">
+                        {metrics.cityBreakdown.length === 0 && <p className="text-xs text-gray-400">Sem dados de cidade ainda</p>}
+                        {metrics.cityBreakdown.map(({ city, count }) => (
+                          <div key={city} className="flex items-center justify-between">
+                            <span className="text-sm text-navy/80 capitalize">{city}</span>
+                            <div className="flex items-center gap-2">
+                              <div className="w-20 h-1.5 rounded-full bg-gray-100 overflow-hidden">
+                                <div className="h-full rounded-full bg-gold" style={{ width: `${(count / (metrics.cityBreakdown[0]?.count || 1)) * 100}%` }} />
+                              </div>
+                              <span className="text-xs text-gray-400 w-6 text-right">{count}</span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Pages that triggered quiz open */}
+                    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+                      <h3 className="text-sm font-semibold text-navy mb-3 flex items-center gap-2">
+                        <Globe className="w-4 h-4 text-gold" /> Páginas que abrem o quiz
+                      </h3>
+                      <div className="space-y-2">
+                        {metrics.pageBreakdown.length === 0 && <p className="text-xs text-gray-400">Sem dados de página ainda (requer colunas novas no Supabase)</p>}
+                        {metrics.pageBreakdown.map(({ path, count }) => (
+                          <div key={path} className="flex items-center justify-between gap-2">
+                            <span className="text-xs text-navy/70 truncate font-mono">{path}</span>
+                            <div className="flex items-center gap-2 flex-shrink-0">
+                              <div className="w-16 h-1.5 rounded-full bg-gray-100 overflow-hidden">
+                                <div className="h-full rounded-full bg-kyro-green/60" style={{ width: `${(count / (metrics.pageBreakdown[0]?.count || 1)) * 100}%` }} />
+                              </div>
+                              <span className="text-xs text-gray-400 w-5 text-right">{count}</span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Device */}
+                    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+                      <h3 className="text-sm font-semibold text-navy mb-3 flex items-center gap-2">
+                        <Users className="w-4 h-4 text-gold" /> Dispositivo
+                      </h3>
+                      <div className="space-y-2">
+                        {metrics.deviceBreakdown.length === 0 && <p className="text-xs text-gray-400">Sem dados de dispositivo ainda</p>}
+                        {metrics.deviceBreakdown.map(({ device, count }) => {
+                          const total = metrics.deviceBreakdown.reduce((a, d) => a + d.count, 0);
+                          return (
+                            <div key={device} className="flex items-center justify-between">
+                              <span className="text-sm text-navy/80 capitalize">{device}</span>
+                              <div className="flex items-center gap-2">
+                                <div className="w-20 h-1.5 rounded-full bg-gray-100 overflow-hidden">
+                                  <div className="h-full rounded-full bg-blue-400" style={{ width: `${(count / total) * 100}%` }} />
+                                </div>
+                                <span className="text-xs text-gray-400 w-12 text-right">{count} ({Math.round((count / total) * 100)}%)</span>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    {/* Source */}
+                    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+                      <h3 className="text-sm font-semibold text-navy mb-3 flex items-center gap-2">
+                        <TrendingUp className="w-4 h-4 text-gold" /> Origem do tráfego
+                      </h3>
+                      <div className="space-y-2">
+                        {metrics.sourceBreakdown.length === 0 && <p className="text-xs text-gray-400">Sem dados de origem ainda</p>}
+                        {metrics.sourceBreakdown.map(({ source, count }) => {
+                          const total = metrics.sourceBreakdown.reduce((a, d) => a + d.count, 0);
+                          return (
+                            <div key={source} className="flex items-center justify-between">
+                              <span className="text-sm text-navy/80 capitalize">{source}</span>
+                              <div className="flex items-center gap-2">
+                                <div className="w-20 h-1.5 rounded-full bg-gray-100 overflow-hidden">
+                                  <div className="h-full rounded-full bg-purple-400" style={{ width: `${(count / total) * 100}%` }} />
+                                </div>
+                                <span className="text-xs text-gray-400 w-12 text-right">{count} ({Math.round((count / total) * 100)}%)</span>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  </div>
+                )}
+
                 {metrics.totalStarts === 0 && (
                   <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-12 text-center">
                     <Clock className="w-12 h-12 text-gray-300 mx-auto mb-3" />
                     <p className="text-navy font-semibold">Sem dados ainda</p>
-                    <p className="text-sm text-gray-400 mt-1">Os eventos do quiz aparecem aqui assim que alguém iniciar o quiz.</p>
+                    <p className="text-sm text-gray-400 mt-1">Os eventos do quiz aparecem aqui assim que alguém iniciar o quiz (em produção, não em localhost).</p>
                   </div>
                 )}
               </>
@@ -709,10 +854,14 @@ const AdminPanel = () => {
                 <Activity className="w-4 h-4 text-gold" />
                 Como funciona o tracking
               </h3>
-              <p className="text-xs text-gray-500">
+              <p className="text-xs text-gray-500 mb-2">
                 O quiz regista eventos na tabela <code className="bg-gray-100 px-1 rounded">quiz_events</code> do Supabase
-                em cada step: início (action=start), avanço (action=complete por step), e abandono (action=abandon).
-                Ativa o tracking adicionando <code className="bg-gray-100 px-1 rounded">trackQuizEvent()</code> no QuizForm.tsx.
+                em cada step. <strong>Localhost está excluído</strong> — só conta tráfego real de produção.
+                Novos campos: <code className="bg-gray-100 px-1 rounded">page_path</code>, <code className="bg-gray-100 px-1 rounded">device</code>, <code className="bg-gray-100 px-1 rounded">utm_source</code>, <code className="bg-gray-100 px-1 rounded">referrer</code>.
+              </p>
+              <p className="text-xs text-amber-600 font-medium">
+                Para ativar os novos campos, corre no Supabase SQL Editor:
+                <code className="block bg-amber-50 border border-amber-200 rounded p-2 mt-1 font-mono text-[11px] whitespace-pre">ALTER TABLE quiz_events{'\n'}  ADD COLUMN IF NOT EXISTS page_path text,{'\n'}  ADD COLUMN IF NOT EXISTS referrer text,{'\n'}  ADD COLUMN IF NOT EXISTS utm_source text,{'\n'}  ADD COLUMN IF NOT EXISTS utm_medium text,{'\n'}  ADD COLUMN IF NOT EXISTS utm_campaign text,{'\n'}  ADD COLUMN IF NOT EXISTS device text;</code>
               </p>
             </div>
           </div>
