@@ -1,11 +1,11 @@
-/**
+﻿/**
  * QuizStep4Contact.tsx
  * Step 4 of the Kyro quiz: contact information form.
  * Collects name, phone, optional email, and optional photo uploads.
  */
 
 import { useRef } from 'react';
-import { Camera } from 'lucide-react';
+import { Camera, Trophy, Lock, ThumbsUp } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import type { QuizFormData } from '@/components/quiz/QuizTypes';
 
@@ -32,12 +32,27 @@ const QuizStep4Contact = ({ formData, updateFormData }: QuizStep4ContactProps) =
           Os seus dados
         </h2>
         <p className="text-center text-[11px] text-white/30 mb-5">
-          Preenche em segundos — o pedido é enviado automaticamente.
+          Preenche em segundos, o pedido é enviado automaticamente.
         </p>
 
-        <p className="text-center text-xs text-green-300/80 bg-green-900/20 border border-green-500/20 rounded-xl px-3 py-2 mb-5 font-medium">
-          4 pessoas pediram orçamento no Porto nas últimas 2 horas
+        <p className="flex items-center justify-center gap-2 text-center text-xs text-green-300/80 bg-green-900/20 border border-green-500/20 rounded-xl px-3 py-2 mb-5 font-medium">
+          <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse flex-shrink-0" />
+          Agenda quase cheia, confirme agora para garantir o seu horário
         </p>
+
+        {/* Trust strip */}
+        <div className="flex items-center justify-center gap-4 mb-5">
+          {([
+            { Icon: Trophy,   text: 'N.º1 no Porto'      },
+            { Icon: Lock,     text: 'Dados Seguros'       },
+            { Icon: ThumbsUp, text: 'Sem compromisso'     },
+          ] as const).map(({ Icon, text }) => (
+            <div key={text} className="flex flex-col items-center gap-1">
+              <Icon className="w-4 h-4 text-gold/70" strokeWidth={2} />
+              <span className="text-[10px] text-white/40 font-semibold leading-none text-center">{text}</span>
+            </div>
+          ))}
+        </div>
 
         <div className="flex flex-col gap-4">
           <div>

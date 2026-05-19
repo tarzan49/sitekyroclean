@@ -1,7 +1,7 @@
-import { useState, useEffect, useRef, lazy, Suspense } from "react";
+﻿import { useState, useEffect, useRef, lazy, Suspense } from "react";
 
 const QuizForm = lazy(() => import('./QuizFormLazy'));
-import { Phone, MessageCircle } from "lucide-react";
+import { Phone, MessageCircle, Trophy, Shield, Clock, CheckCircle } from "lucide-react";
 import GoogleReviewsBadge from "@/components/GoogleReviewsBadge";
 import { trackCallClick } from "@/lib/analytics";
 
@@ -9,7 +9,7 @@ import { trackCallClick } from "@/lib/analytics";
 const imgStainDesktop = '/images/fotos%20hero/imagemvinhopc.webp';
 const imgStainMobile  = '/images/fotos%20hero/imagemvinhoiphone.webp';
 
-// Slide brand — fotos originais Kyro (colchão de casal PC · sofá texturizado mobile)
+// Slide brand, fotos originais Kyro (colchão de casal PC · sofá texturizado mobile)
 const imgHeroDesktop = '/images/fotos%20hero/novafotoheropc.webp';
 const imgHeroMobile  = '/images/fotos%20hero/imagemiphoneheronova.webp';
 
@@ -25,12 +25,12 @@ interface Slide {
   cta: string;
 }
 
-// Badge style is uniform across all slides — Kyro gold/amber
+// Badge style is uniform across all slides, Kyro gold/amber
 const BADGE_CLS = 'text-amber-200 bg-amber-400/[0.18] border-amber-400/40';
 
 // 2 slides: dor imediata (Vinho) + proposta de marca (Brand)
 const SLIDES: Slide[] = [
-  // ── Slide 0 — Vinho (urgência imediata — a dor mais aguda)
+  // ── Slide 0, Vinho (urgência imediata, a dor mais aguda)
   {
     imgDesktop:  imgStainDesktop,
     imgMobile:   imgStainMobile,
@@ -41,7 +41,7 @@ const SLIDES: Slide[] = [
     agitation: 'Não entre em pânico. Não esfregue! Pode estragar as fibras para sempre. Nós removemos a mancha e salvamos o seu tecido hoje.',
     cta: 'Ver preço agora',
   },
-  // ── Slide 1 — Brand (âncora para visitantes sem problema específico)
+  // ── Slide 1, Brand (âncora para visitantes sem problema específico)
   {
     imgDesktop:  imgHeroDesktop,
     imgMobile:   imgHeroMobile,
@@ -139,7 +139,7 @@ const Hero = () => {
         onMouseEnter={() => setPaused(true)}
         onMouseLeave={() => setPaused(false)}
       >
-        {/* ── Stacked backgrounds — cross-fade via opacity ── */}
+        {/* ── Stacked backgrounds, cross-fade via opacity ── */}
         {SLIDES.map((s, i) => (
           <div
             key={i}
@@ -177,10 +177,10 @@ const Hero = () => {
           </div>
         ))}
 
-        {/* ── Base dark gradient — left side (content area) ── */}
+        {/* ── Base dark gradient, left side (content area) ── */}
         <div className="absolute inset-0 z-[1] bg-gradient-to-r from-[#0B2F2A]/88 via-[#0B2F2A]/55 to-transparent pointer-events-none" />
         <div className="md:hidden absolute inset-0 z-[1] bg-kyro-green/72 pointer-events-none" />
-        {/* ── Bottom gradient — guarantees trust block legibility on any photo ── */}
+        {/* ── Bottom gradient, guarantees trust block legibility on any photo ── */}
         <div className="absolute inset-x-0 bottom-0 z-[1] h-48 bg-gradient-to-t from-black/75 via-black/20 to-transparent pointer-events-none" />
 
         {/* ── Content ── */}
@@ -197,7 +197,7 @@ const Hero = () => {
               }}
             >
               {current === 3 ? (
-                /* ── Luxury brand badge — Slide 0 only ── */
+                /* ── Luxury brand badge, Slide 0 only ── */
                 <div className="flex flex-col gap-1">
                   {/* Fine gold rule above */}
                   <div className="w-7 h-px bg-gradient-to-r from-gold to-transparent" />
@@ -209,14 +209,14 @@ const Hero = () => {
                   </span>
                 </div>
               ) : (
-                /* ── Standard text badge — all other slides ── */
+                /* ── Standard text badge, all other slides ── */
                 <p className="text-[10px] font-bold tracking-[0.28em] uppercase" style={{ color: "#D4AF37" }}>
                   {slide.tag}
                 </p>
               )}
             </div>
 
-            {/* H1 — Problem */}
+            {/* H1, Problem */}
             <h1
               className="font-playfair text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold text-white leading-[1.25] mb-3 md:mb-5 whitespace-pre-line"
               style={{
@@ -228,7 +228,7 @@ const Hero = () => {
               {slide.problem}
             </h1>
 
-            {/* Subheadline — Agitation */}
+            {/* Subheadline, Agitation */}
             <p
               className="text-sm sm:text-base md:text-lg lg:text-xl text-white/90 leading-relaxed mb-6 md:mb-8 max-w-xl"
               style={{
@@ -240,18 +240,33 @@ const Hero = () => {
               {slide.agitation}
             </p>
 
+            {/* Trust badges */}
+            <div className="flex flex-wrap items-center gap-2 mb-5">
+              {([
+                { Icon: Trophy,      label: 'N.º1 no Porto'        },
+                { Icon: Shield,      label: 'Qualidade Garantida'   },
+                { Icon: Clock,       label: 'Resposta em menos de 1h'         },
+                { Icon: CheckCircle, label: 'Orçamento Gratuito'   },
+              ] as const).map(({ Icon, label }) => (
+                <div key={label} className="flex items-center gap-1.5 bg-black/30 border border-white/[0.14] rounded-full px-2.5 py-1 backdrop-blur-sm">
+                  <Icon className="w-3 h-3 text-gold flex-shrink-0" strokeWidth={2.5} />
+                  <span className="text-white/85 text-[11px] font-semibold leading-none">{label}</span>
+                </div>
+              ))}
+            </div>
+
             {/* CTAs */}
             <div className="flex flex-col gap-2.5 w-full max-w-sm">
 
-              {/* ── PRIMARY — Golden fill button (the only filled button) ── */}
+              {/* ── PRIMARY, Golden fill button (the only filled button) ── */}
               <div className="relative group">
-                {/* Soft ambient halo — subtle, not distracting */}
+                {/* Soft ambient halo, subtle, not distracting */}
                 <div className="absolute -inset-1.5 rounded-full bg-gradient-to-r from-[#C9A84C]/50 to-[#E8D070]/40 opacity-30 blur-lg group-hover:opacity-55 transition-opacity duration-400 pointer-events-none" />
 
                 <button
                   onClick={handleOpenQuiz}
                   className={[
-                    // Layout — Mobile First: 58px tall, full width
+                    // Layout, Mobile First: 58px tall, full width
                     'relative w-full rounded-full font-bold text-[#12121e] touch-manipulation',
                     'h-[58px] md:h-[52px] px-8 text-base md:text-[17px]',
                     // Gold gradient fill
@@ -261,7 +276,7 @@ const Hero = () => {
                     // Hover: lift
                     'hover:shadow-[0_10px_32px_rgba(201,168,76,0.60),0_4px_10px_rgba(0,0,0,0.32),inset_0_1px_0_rgba(255,255,255,0.36)]',
                     'hover:scale-[1.025]',
-                    // Click feedback — feels like a real physical button press
+                    // Click feedback, feels like a real physical button press
                     'active:scale-[0.95] active:shadow-[0_2px_8px_rgba(201,168,76,0.30),inset_0_2px_4px_rgba(0,0,0,0.18)]',
                     'transition-all duration-150',
                     // Periodic glow pulse
@@ -272,7 +287,7 @@ const Hero = () => {
                 </button>
               </div>
 
-              {/* ── SECONDARY — WhatsApp (transparent, elegant link style) ── */}
+              {/* ── SECONDARY, WhatsApp (transparent, elegant link style) ── */}
               <a
                 href={`https://wa.me/351925530647?text=${encodeURIComponent('Olá, gostaria de saber mais sobre os vossos serviços de higienização.')}`}
                 target="_blank"
@@ -288,7 +303,7 @@ const Hero = () => {
                 {/* Google Reviews Badge */}
                 <GoogleReviewsBadge variant="light" className="shadow-[0_2px_12px_rgba(0,0,0,0.4)]" />
 
-                {/* Phone number — bold, pure white, tel: link */}
+                {/* Phone number, bold, pure white, tel: link */}
                 <a
                   href="tel:925530647"
                   onClick={() => trackCallClick('hero_phone_link')}
@@ -356,7 +371,7 @@ const Hero = () => {
             </div>
           </div>
 
-          {/* Desktop sticky removido — o header já tem o botão sempre visível */}
+          {/* Desktop sticky removido, o header já tem o botão sempre visível */}
         </>
       )}
     </>

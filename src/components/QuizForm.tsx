@@ -1,10 +1,10 @@
-import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
+﻿import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { X, ChevronRight, ChevronLeft, Check, MessageSquare, Euro, Flame, MapPin, Users, Camera, Shield, AlertTriangle, Star } from 'lucide-react';
+import { X, ChevronRight, ChevronLeft, Check, MessageSquare, Euro, Flame, MapPin, Users, Camera, Shield, AlertTriangle, Star, Droplets } from 'lucide-react';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
@@ -75,36 +75,47 @@ function carpetActiveTier(area: number): number {
   if (area <= 5) return 0; if (area <= 10) return 1; if (area <= 15) return 2; return 3;
 }
 function calcCarpetPrice(area: number): number | null {
-  if (area <= 0) return null;
+  if (area <= 0 || area > 15) return null;
   if (area <= 5)  return area * 10;
-  if (area <= 10) return Math.max(50, area * 8);
-  if (area <= 15) return Math.max(80, area * 7);
-  return null;
+  if (area <= 10) return 50 + (area - 5) * 8;
+  return 90 + (area - 10) * 7;
 }
 
 // ── Chair constants ───────────────────────────────────────────────────────
 const CHAIR_TIERS = [
-  { label: 'Até 3', sublabel: 'cadeiras', rate: 17.5 },
-  { label: '4 a 6', sublabel: 'cadeiras', rate: 15 },
-  { label: '7 a 9', sublabel: 'cadeiras', rate: 12.5 },
-  { label: '10+',   sublabel: 'cadeiras', rate: null },
+  { label: '1ª a 3ª', sublabel: 'cadeira', rate: 17.5 },
+  { label: '4ª a 6ª', sublabel: 'cadeira', rate: 12.5 },
+  { label: '7ª a 9ª', sublabel: 'cadeira', rate: 10 },
+  { label: '10+',     sublabel: 'cadeiras', rate: null },
 ];
 function chairActiveTier(qty: number): number {
   if (qty <= 3) return 0; if (qty <= 6) return 1; if (qty <= 9) return 2; return 3;
 }
+const CHAIR_WATERPROOF_TIERS = [
+  { label: '1 a 4', sublabel: 'cadeiras', rate: 15 },
+  { label: '5 a 6', sublabel: 'cadeiras', rate: 12.5 },
+  { label: '7 a 9', sublabel: 'cadeiras', rate: 10 },
+  { label: '10+',   sublabel: 'cadeiras', rate: null },
+];
+function chairWaterproofActiveTier(qty: number): number {
+  if (qty <= 4) return 0; if (qty <= 6) return 1; if (qty <= 9) return 2; return 3;
+}
 // Bracket pricing: each tier's rate only applies to chairs in that bracket
-// 1-3: 17.5€/each · 4-6: 15€/each · 7-9: 12.5€/each · 10+: sob orçamento
+// 1-3: 17.5€/each · 4-6: 12.5€/each · 7-9: 10€/each · 10+: sob orçamento
+// Totals: 3=52.5 · 4=65 · 6=90 · 7=100 · 9=120 (always increases)
 function calcChairClean(qty: number): number | null {
   if (qty <= 0 || qty >= 10) return null;
   if (qty <= 3) return qty * 17.5;
-  if (qty <= 6) return 52.5 + (qty - 3) * 15;
-  return 97.5 + (qty - 6) * 12.5;
+  if (qty <= 6) return 52.5 + (qty - 3) * 12.5;
+  return 90 + (qty - 6) * 10;
 }
-// Waterproofing only: 1-6: 15€/un · 7-9: 12.5€/un · 10+: sob orçamento
+// Waterproofing bracket pricing: 1-4: 15€/un · 5-6: 12.5€/un · 7-9: 10€/un · 10+: sob orçamento
+// Totals: 4=60 · 5=72.5 · 6=85 · 7=95 · 9=115 (always increases)
 function calcChairWaterproof(qty: number): number | null {
   if (qty <= 0 || qty >= 10) return null;
-  if (qty <= 6) return qty * 15;
-  return qty * 12.5;
+  if (qty <= 4) return qty * 15;
+  if (qty <= 6) return 60 + (qty - 4) * 12.5;
+  return 85 + (qty - 6) * 10;
 }
 function fmtN(n: number): string { return n % 1 === 0 ? `${n}€` : `${n.toFixed(1).replace('.', ',')}€`; }
 
@@ -233,11 +244,15 @@ const QuizForm = ({ isOpen, onClose, initialLocation, problema }: QuizFormProps)
       case 'chairs': {
         const chairQty = parseInt(formData.chairQuantity);
         if (!isNaN(chairQty) && chairQty > 0) {
-          price = calcChairClean(chairQty) ?? 0;
+          price = formData.serviceType === 'waterproofing'
+            ? (calcChairWaterproof(chairQty) ?? 0)
+            : (calcChairClean(chairQty) ?? 0);
         }
-        const wQty = formData.chairWaterproofQty;
-        if (wQty > 0) {
-          price += calcChairWaterproof(wQty) ?? 0;
+        const addonQty = formData.chairWaterproofQty;
+        if (addonQty > 0) {
+          price += formData.serviceType === 'waterproofing'
+            ? (calcChairClean(addonQty) ?? 0)
+            : (calcChairWaterproof(addonQty) ?? 0);
         }
         break;
       }
@@ -245,15 +260,12 @@ const QuizForm = ({ isOpen, onClose, initialLocation, problema }: QuizFormProps)
       case 'carpet': {
         const carpetArea = parseFloat(formData.carpetArea);
         if (!isNaN(carpetArea) && carpetArea > 0) {
-          if (carpetArea <= 5) price = carpetArea * 10;
-          else if (carpetArea <= 10) price = Math.max(5 * 10, carpetArea * 8);
-          else if (carpetArea <= 15) price = Math.max(10 * 8, carpetArea * 7);
-          else price = 0; // >15m² → sob orçamento
+          price = calcCarpetPrice(carpetArea) ?? 0;
         }
         break;
       }
     }
-    
+
     return price;
   }, [formData, sofaItems, mattressItems]);
 
@@ -267,18 +279,21 @@ const QuizForm = ({ isOpen, onClose, initialLocation, problema }: QuizFormProps)
   const finalTravelCost = isFreeTravel ? 0 : travelCost;
   const hypoSurcharge = 0;
 
-  const upsellItemsTotal = upsellItems.reduce((sum, item) => sum + item.price, 0);
-  const totalPrice = calculateServicePrice + upsellItemsTotal + finalTravelCost + hypoSurcharge;
+  const safePrice = (n: number) => (isNaN(n) || n == null) ? 0 : n;
+  const upsellItemsTotal = upsellItems.reduce((sum, item) => sum + safePrice(item.price), 0);
+  const totalPrice = safePrice(calculateServicePrice) + safePrice(upsellItemsTotal) + safePrice(finalTravelCost) + safePrice(hypoSurcharge);
   // True when the user has qty>0 of the "4+ lugares" sofa (no fixed price → custom quote)
   const hasSobOrcamento = sofaItems.some(i => i.sizeId === '4+-lugares' && i.qty > 0);
-  // Pack 10% activates automatically when total ≥ 200€
-  const packDiscountActive = totalPrice >= 200;
+  // Any upsell item with price=0 is a SOB item (chairs ≥10, carpet >15m², sofa 4+ lugares)
+  const hasUpsellSobItem = upsellItems.some(i => i.price === 0);
+  // Pack 10% activates: cart ≥200€ in known prices, OR cart >100€ + any SOB item (upsell or main service)
+  const packDiscountActive = totalPrice >= 200 || (totalPrice > 100 && (hasUpsellSobItem || hasSobOrcamento));
   const packDiscountPct = packDiscountActive ? 0.10 : 0;
   const serviceOnlyTotal = calculateServicePrice + upsellItemsTotal + hypoSurcharge;
   const discountedPrice = isDiscountActive && totalPrice > 0
     ? Math.round(serviceOnlyTotal * 0.95) + finalTravelCost
     : Math.round(totalPrice);
-  // Pack discount (10%) supersedes timer discount (5%) — never accumulate
+  // Pack discount (10%) supersedes timer discount (5%), never accumulate
   const packDiscountedPrice = packDiscountActive && totalPrice > 0
     ? Math.round(serviceOnlyTotal * (1 - packDiscountPct)) + finalTravelCost
     : discountedPrice;
@@ -369,7 +384,7 @@ const QuizForm = ({ isOpen, onClose, initialLocation, problema }: QuizFormProps)
     if (stored) {
       expiryMs = parseInt(stored, 10);
       if (isNaN(expiryMs) || expiryMs <= now) {
-        // Expired — start fresh
+        // Expired, start fresh
         expiryMs = now + TIMER_DURATION * 1000;
         localStorage.setItem(TIMER_KEY, String(expiryMs));
       }
@@ -410,10 +425,10 @@ const QuizForm = ({ isOpen, onClose, initialLocation, problema }: QuizFormProps)
   };
 
   const socialProofMessages = [
-    `12 pessoas pediram orçamento em ${formData.location || 'Porto'} hoje`,
-    `Alguém acabou de reservar em ${formData.location || 'Porto'}`,
-    `Técnicos disponíveis na sua zona hoje`,
-    `Satisfação 5.0, mais de 50 avaliações verificadas`,
+    `4 pessoas de ${formData.location || 'Porto'} pediram orçamento nas últimas 2 horas`,
+    `Alguém de ${formData.location || 'Porto'} acabou de reservar, agenda a fechar`,
+    `Agenda quase cheia esta semana em ${formData.location || 'Porto'}, garanta já`,
+    `Mais de 50 clientes satisfeitos · Avaliação 5.0 no Google`,
   ];
 
   useEffect(() => {
@@ -432,13 +447,16 @@ const QuizForm = ({ isOpen, onClose, initialLocation, problema }: QuizFormProps)
     return () => clearTimeout(id);
   }, [packDiscountActive]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Confetti when pack discount activates (total ≥ 200€)
+  // Confetti when pack discount activates (total ≥ 200€ or SOB trigger)
   useEffect(() => {
     if (packDiscountActive && !prevTotalRef.current) {
       setConfettiActive(true);
+      const viaSob = totalPrice < 200 && hasUpsellSobItem;
       toast({
         title: 'Desconto de 10% ativado!',
-        description: 'O seu pedido atingiu 200€ — desconto aplicado automaticamente.',
+        description: viaSob
+          ? 'Ao adicionar um artigo de valor elevado, ativou o desconto de Pack automaticamente.'
+          : 'O seu pedido atingiu 200€, desconto aplicado automaticamente.',
         duration: 4000,
       });
       const id = setTimeout(() => setConfettiActive(false), 4500);
@@ -475,12 +493,7 @@ const QuizForm = ({ isOpen, onClose, initialLocation, problema }: QuizFormProps)
   const canProceedStep3 = () => {
     switch (formData.service) {
       case 'sofa': {
-        const hasQty = sofaItems.some(i => i.qty > 0);
-        if (!hasQty) return false;
-        if (sofaItems.some(i => i.sizeId === '4+-lugares' && i.qty > 0)) {
-          return formData.description.trim().length >= 3;
-        }
-        return true;
+        return sofaItems.some(i => i.qty > 0);
       }
       case 'carpet': {
         const a = parseFloat(formData.carpetArea);
@@ -718,7 +731,7 @@ ${formData.description || 'Sem observações adicionais'}
       // Generate unique booking ID
       const bookingId = Math.random().toString(36).substr(2, 8).toUpperCase();
 
-      // Persist lead to Supabase CRM (silent fail — Formspree is the primary capture)
+      // Persist lead to Supabase CRM (silent fail, Formspree is the primary capture)
       try {
         const { supabase } = await import('@/lib/supabase');
         const upsellNotes = upsellItems.length > 0
@@ -988,7 +1001,7 @@ ${formData.description || 'Sem observações adicionais'}
               const upsellLabel = isWaterproofBase ? 'Adicionar Higienização Profunda' : 'Adicionar Proteção Total VIP';
               const upsellSub = isWaterproofBase ? `+${packDelta}€/un. · Limpeza profunda incluída` : `+${packDelta}€/un. · Impermeabilização completa`;
               return (
-                <div key={option.id} className={cn('rounded-xl border-2 transition-all duration-200 overflow-hidden', isActive && packOn ? 'border-gold bg-[#252931] shadow-[0_0_12px_rgba(212,175,55,0.20)]' : isActive ? 'border-gold/50 bg-[#252931] shadow-[0_0_8px_rgba(212,175,55,0.10)]' : 'border-white/[0.18] bg-[#252931]')}>
+                <div key={option.id} className={cn('rounded-xl border-2 transition-all duration-200 overflow-hidden', isActive && packOn ? 'border-gold bg-[#1a2a1a] shadow-[0_0_12px_rgba(212,175,55,0.20)]' : isActive ? 'border-gold/50 bg-[#1a2a1a] shadow-[0_0_8px_rgba(212,175,55,0.10)]' : 'border-gold/20 bg-[#1a2a1a]')}>
                   <div className="flex items-center justify-between px-4 py-3">
                     <div className="flex-1 min-w-0 mr-3">
                       <span className="text-sm font-semibold text-white">{option.label}</span>
@@ -1010,7 +1023,7 @@ ${formData.description || 'Sem observações adicionais'}
                   </div>
                   {isActive && !isSob && basePrice !== null && (
                     <div className="px-4 pb-3">
-                      <button onClick={() => setSofaItems(sofaTogglePack(sofaItems, option.id))} className={cn('w-full flex items-center gap-2.5 px-3 py-2 rounded-lg border transition-all duration-200 touch-manipulation', packOn ? 'border-gold/50 bg-gold/[0.08]' : 'border-white/10 bg-[#252931] hover:border-gold/30')}>
+                      <button onClick={() => setSofaItems(sofaTogglePack(sofaItems, option.id))} className={cn('w-full flex items-center gap-2.5 px-3 py-2 rounded-lg border transition-all duration-200 touch-manipulation', packOn ? 'border-gold/50 bg-gold/[0.08]' : 'border-gold/15 bg-[#1a2a1a] hover:border-gold/40')}>
                         <Shield className={cn('w-4 h-4 flex-shrink-0', packOn ? 'text-gold' : 'text-white/25')} />
                         <div className="flex-1 text-left">
                           <p className={cn('text-[11px] font-bold leading-none', packOn ? 'text-white' : 'text-white/50')}>{upsellLabel}</p>
@@ -1026,8 +1039,8 @@ ${formData.description || 'Sem observações adicionais'}
               );
             })}
           </div>
-          {has4Plus && <input placeholder="Indica quantos lugares tem o sofá" className="w-full max-w-sm bg-white/[0.06] border border-white/15 focus:border-gold focus:outline-none text-white placeholder:text-white/25 rounded-xl h-11 px-4 text-sm transition-colors" onChange={(e) => updateFormData({ description: `Sofá com ${e.target.value} lugares` })} />}
-          <div className={cn('w-full max-w-sm rounded-xl border-2 transition-all duration-200', chaiseLongueQty > 0 ? 'border-gold/60 bg-[#252931] shadow-[0_0_10px_rgba(212,175,55,0.18)]' : 'border-white/[0.18] bg-[#252931]')}>
+          {has4Plus && <input type="number" inputMode="numeric" pattern="[0-9]*" placeholder="Nº de lugares (ex: 5)" className="w-full max-w-sm bg-white/[0.06] border border-white/15 focus:border-gold focus:outline-none text-white placeholder:text-white/25 rounded-xl h-12 px-4 text-base transition-colors" onChange={(e) => updateFormData({ description: `Sofá com ${e.target.value} lugares` })} />}
+          <div className={cn('w-full max-w-sm rounded-xl border-2 transition-all duration-200', chaiseLongueQty > 0 ? 'border-gold/60 bg-[#1a2a1a] shadow-[0_0_10px_rgba(212,175,55,0.18)]' : 'border-gold/20 bg-[#1a2a1a]')}>
             <div className="flex items-center justify-between px-4 py-3">
               <div className="flex-1 min-w-0 mr-3">
                 <span className={cn('text-sm font-semibold', chaiseLongueQty > 0 ? 'text-white' : 'text-white/50')}>Chaise Longue</span>
@@ -1070,7 +1083,7 @@ ${formData.description || 'Sem observações adicionais'}
                 ? `${packDelta !== null ? `+${packDelta}€/un.` : '+?€/un.'} · Limpeza profunda incluída`
                 : `${packDelta !== null ? `+${packDelta}€/un.` : '+?€/un.'} · Proteção até 10 anos`;
               return (
-                <div key={option.id} className={cn('rounded-xl border-2 transition-all duration-200 overflow-hidden', isActive && packOn ? 'border-gold bg-[#252931] shadow-[0_0_12px_rgba(212,175,55,0.20)]' : isActive ? 'border-gold/50 bg-[#252931] shadow-[0_0_8px_rgba(212,175,55,0.10)]' : 'border-white/[0.18] bg-[#252931]')}>
+                <div key={option.id} className={cn('rounded-xl border-2 transition-all duration-200 overflow-hidden', isActive && packOn ? 'border-gold bg-[#1a2a1a] shadow-[0_0_12px_rgba(212,175,55,0.20)]' : isActive ? 'border-gold/50 bg-[#1a2a1a] shadow-[0_0_8px_rgba(212,175,55,0.10)]' : 'border-gold/20 bg-[#1a2a1a]')}>
                   <div className="flex items-center justify-between px-4 py-3">
                     <div className="flex-1 min-w-0 mr-3">
                       <span className="text-sm font-semibold text-white">{option.label}</span>
@@ -1090,7 +1103,7 @@ ${formData.description || 'Sem observações adicionais'}
                   </div>
                   {isActive && basePrice !== null && (
                     <div className="px-4 pb-3">
-                      <button onClick={() => setMattressItems(mattressTogglePack(mattressItems, option.id))} className={cn('w-full flex items-center gap-2.5 px-3 py-2 rounded-lg border transition-all duration-200 touch-manipulation', packOn ? 'border-gold/50 bg-gold/[0.08]' : 'border-white/10 bg-[#252931] hover:border-gold/30')}>
+                      <button onClick={() => setMattressItems(mattressTogglePack(mattressItems, option.id))} className={cn('w-full flex items-center gap-2.5 px-3 py-2 rounded-lg border transition-all duration-200 touch-manipulation', packOn ? 'border-gold/50 bg-gold/[0.08]' : 'border-gold/15 bg-[#1a2a1a] hover:border-gold/40')}>
                         <Shield className={cn('w-4 h-4 flex-shrink-0', packOn ? 'text-gold' : 'text-white/25')} />
                         <div className="flex-1 text-left">
                           <p className={cn('text-[11px] font-bold leading-none', packOn ? 'text-white' : 'text-white/50')}>{upsellLabel}</p>
@@ -1115,147 +1128,151 @@ ${formData.description || 'Sem observações adicionais'}
     if (formData.service === 'carpet') {
       const areaNum = parseFloat(formData.carpetArea);
       const validArea = !isNaN(areaNum) && areaNum > 0;
-      const activeTierIdx = validArea ? carpetActiveTier(areaNum) : -1;
       const calculatedPrice = validArea ? calcCarpetPrice(areaNum) : null;
+      const sob = validArea && areaNum > 15;
       return (
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: '100%', textAlign: 'center' }} className="gap-3 py-1">
+        <div className="flex flex-col gap-3 overflow-hidden items-center w-full">
           <p className="text-gold text-[10px] font-bold tracking-[0.28em] uppercase mb-0.5 text-center w-full">O QUE PRECISA?</p>
           <h2 className="font-playfair text-lg sm:text-xl font-bold text-white text-center w-full">Detalhes do Tapete</h2>
-          <div className="w-full max-w-[320px]">
-            <p className="text-[9px] font-bold text-white/50 uppercase tracking-widest text-center mb-2">Tabela de preços por m² · IVA incl.</p>
-            <div className="grid grid-cols-2 gap-1.5">
-              {CARPET_TIERS.map((tier, idx) => {
-                const isActive = activeTierIdx === idx;
-                return (
-                  <div key={idx} className={cn('flex flex-col items-center justify-center py-2.5 px-2 rounded-xl border-2 text-center transition-all duration-200', isActive ? 'border-gold bg-[#252931] shadow-[0_0_16px_rgba(212,175,55,0.26)] scale-[1.02]' : 'border-white/[0.18] bg-[#252931]')}>
-                    <span className={cn('text-[10px] font-black uppercase tracking-wide leading-none mb-0.5', isActive ? 'text-gold' : 'text-white')}>{tier.label}</span>
-                    <span className={cn('text-[9px] leading-none mb-1.5', isActive ? 'text-white/80' : 'text-white/50')}>{tier.sublabel}</span>
-                    {tier.rate !== null ? (
-                      <div className="flex items-end gap-0.5 leading-none">
-                        <span className={cn('font-playfair text-2xl font-bold tabular-nums leading-none', isActive ? 'text-gold' : 'text-white/70')}>{tier.rate}€</span>
-                        <span className={cn('text-[9px] font-semibold pb-0.5', isActive ? 'text-gold/70' : 'text-white/40')}>/m²</span>
-                      </div>
-                    ) : <span className={cn('font-playfair text-sm font-bold', isActive ? 'text-gold' : 'text-white/60')}>Orçamento</span>}
-                    {isActive && <span className="mt-1 text-[7px] font-black uppercase tracking-widest text-gold/80 bg-gold/10 px-1.5 py-0.5 rounded-full leading-none">ativo</span>}
-                  </div>
-                );
-              })}
-            </div>
+
+          {/* Price box, identical style to chairs */}
+          <div className={cn(
+            "w-full max-w-xs rounded-2xl border px-5 py-4 text-center transition-all duration-300",
+            sob ? "bg-[#1a2a1a] border-white/20"
+              : validArea ? "bg-[#1a2a1a] border-gold/30 shadow-[0_0_20px_rgba(212,175,55,0.10)]"
+              : "bg-[#1a2a1a] border-gold/15"
+          )}>
+            <p className="text-[10px] text-white/35 uppercase tracking-wider mb-1">Estimativa total</p>
+            {validArea ? (
+              <>
+                <p className={cn("font-playfair font-black leading-none mb-1", sob ? "text-white/50 text-2xl" : "text-gold text-4xl")}>
+                  {sob ? 'Sob orçamento' : `${calculatedPrice !== null ? Math.round(calculatedPrice) : '—'}€`}
+                </p>
+                <p className="text-[10px] text-white/30">
+                  {sob ? 'Entraremos em contacto para combinar' : `${areaNum} m²`}
+                </p>
+              </>
+            ) : (
+              <p className="text-white/25 text-sm font-medium py-1">Insira a área para ver o preço</p>
+            )}
           </div>
-          <div className="w-full max-w-[320px]">
-            <label className="block text-[10px] font-bold text-white uppercase tracking-wider text-center mb-1.5">Área total de todos os tapetes (m²)</label>
+
+          {/* Input */}
+          <div className="w-full max-w-xs">
+            <label className="block text-[10px] font-bold text-white/40 uppercase tracking-wider text-center mb-1.5">Área total de todos os tapetes</label>
             <div className="relative">
-              <Input type="number" inputMode="decimal" min="0" step="0.5" placeholder="Soma total (ex: 12)..." value={formData.carpetArea} onChange={(e) => updateFormData({ carpetArea: e.target.value })} className={cn('text-lg font-bold bg-white/[0.07] text-white placeholder:text-white/25 h-11 pr-12 rounded-xl border-2 transition-all duration-300 focus-visible:ring-0 focus-visible:ring-offset-0', validArea ? 'border-gold shadow-[0_0_12px_rgba(212,175,55,0.18)]' : 'border-white/20')} />
+              <Input type="number" inputMode="decimal" min="0" step="0.5" placeholder="Ex: 12" value={formData.carpetArea} onChange={(e) => updateFormData({ carpetArea: e.target.value })} className={cn('text-lg font-bold bg-[#1a2a1a] text-white placeholder:text-white/25 h-11 pr-12 rounded-xl border-2 transition-all duration-300 focus-visible:ring-0 focus-visible:ring-offset-0', validArea ? 'border-gold shadow-[0_0_12px_rgba(212,175,55,0.18)]' : 'border-gold/25')} />
               <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-sm font-bold text-gold/60 pointer-events-none">m²</span>
             </div>
-            <p className="text-[10px] text-white/40 text-center mt-1 leading-snug">Se tiver vários tapetes, insira a soma total das áreas.</p>
+            <p className="text-[10px] text-white/35 text-center mt-1 leading-snug">Se tiver vários tapetes, insira a soma total das áreas.</p>
           </div>
-          {validArea && (
-            <div className={cn('w-full max-w-[320px] rounded-xl border-2 px-4 py-2.5 transition-all duration-300', calculatedPrice !== null ? 'bg-[#071a12] border-gold shadow-[0_0_14px_rgba(212,175,55,0.18)]' : 'bg-[#0a2218] border-white/15')}>
-              {calculatedPrice !== null ? (
-                <div className="flex items-center justify-between gap-2">
-                  <div className="flex flex-col text-left">
-                    <span className="text-[9px] font-black uppercase tracking-widest text-white/60 leading-none mb-0.5">Estimativa</span>
-                    <span className="text-xs font-semibold text-white">{areaNum} m² × {CARPET_TIERS[activeTierIdx].rate}€/m²</span>
-                  </div>
-                  <div className="text-right">
-                    <span className="font-playfair text-2xl font-bold text-gold tabular-nums block leading-none">{Math.round(calculatedPrice)}€</span>
-                    <span className="text-[8px] text-white/30 uppercase tracking-wide leading-none">IVA incl.</span>
-                  </div>
-                </div>
-              ) : <p className="text-[10px] font-bold text-white/60 uppercase tracking-wider text-center py-0.5">+15 m²: orçamento personalizado</p>}
-            </div>
-          )}
+
+          {/* Tier hint, compact single line */}
+          <p className="text-[9px] text-white/30 text-center leading-snug">
+            ≤5m²: 10€/m² · ≤10m²: 8€/m² · ≤15m²: 7€/m² · +15m²: sob orçamento
+          </p>
         </div>
       );
     }
 
     // ── CADEIRAS ───────────────────────────────────────────────────────────
     if (formData.service === 'chairs') {
-      const qty = parseInt(formData.chairQuantity);
-      const validQty = !isNaN(qty) && qty > 0;
-      const activeTierIdx = validQty ? chairActiveTier(qty) : -1;
-      const cleanPrice = validQty ? calcChairClean(qty) : null;
-      const sob = validQty && qty >= 10;
+      const isWaterproofPrimary = formData.serviceType === 'waterproofing';
+      const qty = Math.max(1, parseInt(formData.chairQuantity) || 1);
+      const sob = qty >= 10;
+      const primaryPrice = isWaterproofPrimary ? calcChairWaterproof(qty) : calcChairClean(qty);
+      const addonEnabled = formData.chairWaterproofing;
+      const addonPrice = isWaterproofPrimary ? calcChairClean(qty) : calcChairWaterproof(qty);
+      const totalPrice = (primaryPrice ?? 0) + (addonEnabled && !sob ? (addonPrice ?? 0) : 0);
+      const addonLabel = isWaterproofPrimary ? 'Adicionar Higienização' : 'Adicionar Impermeabilização';
+      const addonRateHint = isWaterproofPrimary
+        ? (qty <= 3 ? '17,5' : qty <= 6 ? '12,5' : '10')
+        : (qty <= 6 ? '15' : '12,5');
+
+      const setChairQty = (newQty: number) => {
+        const clamped = Math.max(1, newQty);
+        updateFormData({
+          chairQuantity: String(clamped),
+          chairType: 'bulk_full',
+          ...(addonEnabled ? { chairWaterproofQty: clamped } : {}),
+        });
+      };
+
+      const toggleAddon = () => {
+        const next = !addonEnabled;
+        updateFormData({ chairWaterproofing: next, chairWaterproofQty: next ? qty : 0 });
+      };
+
       return (
-        <div className="flex flex-col gap-2.5 overflow-hidden items-center w-full">
+        <div className="flex flex-col gap-3 overflow-hidden items-center w-full">
           <p className="text-gold text-[10px] font-bold tracking-[0.28em] uppercase mb-0.5 text-center w-full">O QUE PRECISA?</p>
           <h2 className="font-playfair text-lg sm:text-xl font-bold text-white text-center w-full">Detalhes das Cadeiras</h2>
-          <div className="w-full max-w-sm mx-auto">
-            <p className="text-[9px] font-bold text-white/35 uppercase tracking-widest text-center mb-1.5">Limpeza + Higienização por cadeira</p>
-            <div className="grid grid-cols-2 gap-1.5">
-              {CHAIR_TIERS.map((tier, idx) => {
-                const isActive = activeTierIdx === idx;
-                return (
-                  <div key={idx} className={cn('flex flex-col items-center justify-center py-2 px-2 rounded-xl border-2 text-center transition-all duration-250', isActive ? 'border-gold bg-[#252931] shadow-[0_0_14px_rgba(212,175,55,0.25)] scale-[1.02]' : 'border-white/[0.16] bg-[#252931]')}>
-                    <span className={cn('text-[9px] font-black uppercase tracking-wide leading-none mb-0.5', isActive ? 'text-gold/90' : 'text-white/30')}>{tier.label}</span>
-                    <span className={cn('text-[8px] leading-none mb-1', isActive ? 'text-white/45' : 'text-white/15')}>{tier.sublabel}</span>
-                    {tier.rate !== null ? (
-                      <div className="flex items-end gap-0.5 leading-none">
-                        <span className={cn('font-playfair text-xl font-bold tabular-nums leading-none', isActive ? 'text-gold' : 'text-white/35')}>{fmtN(tier.rate)}</span>
-                        <span className={cn('text-[9px] font-semibold pb-0.5', isActive ? 'text-gold/55' : 'text-white/20')}>/un.</span>
-                      </div>
-                    ) : <span className={cn('font-playfair text-sm font-bold', isActive ? 'text-gold' : 'text-white/30')}>Orçamento</span>}
-                    {isActive && <span className="mt-0.5 text-[7px] font-black uppercase tracking-widest text-gold/65 bg-gold/10 px-1.5 py-0.5 rounded-full leading-none">ativo</span>}
-                  </div>
-                );
-              })}
-            </div>
+
+          {/* Price box, identical to upsell */}
+          <div className={cn(
+            "w-full max-w-xs rounded-2xl border px-5 py-4 text-center transition-all duration-300",
+            sob ? "bg-[#1a2a1a] border-white/20" : "bg-[#1a2a1a] border-gold/30 shadow-[0_0_20px_rgba(212,175,55,0.10)]"
+          )}>
+            <p className="text-[10px] text-white/35 uppercase tracking-wider mb-1">Estimativa total</p>
+            <p className={cn("font-playfair font-black leading-none mb-1", sob ? "text-white/60 text-2xl" : "text-gold text-4xl")}>
+              {sob ? 'Sob orçamento' : `${totalPrice % 1 === 0 ? totalPrice : totalPrice.toFixed(1).replace('.', ',')}€`}
+            </p>
+            <p className="text-[10px] text-white/30">
+              {sob
+                ? 'Entraremos em contacto para combinar'
+                : `${qty} cadeira${qty > 1 ? 's' : ''}${addonEnabled ? (isWaterproofPrimary ? ' + higienização' : ' + impermeabilização') : ''}`}
+            </p>
           </div>
-          <div className="w-full max-w-sm mx-auto">
-            <label className="block text-[10px] font-bold text-white/40 uppercase tracking-wider text-center mb-1">Quantas cadeiras deseja higienizar?</label>
-            <div className="relative">
-              <Input type="number" inputMode="numeric" min="1" step="1" placeholder="Ex: 5..." value={formData.chairQuantity} onChange={(e) => updateFormData({ chairQuantity: e.target.value, chairType: 'bulk_full' })} className={cn('text-lg font-bold bg-white/[0.07] text-white placeholder:text-white/20 h-11 pr-16 rounded-xl border-2 transition-all duration-300 focus-visible:ring-0 focus-visible:ring-offset-0', validQty ? 'border-gold shadow-[0_0_12px_rgba(212,175,55,0.16)]' : 'border-gold/40')} />
-              <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs font-bold text-gold/45 pointer-events-none">cadeiras</span>
-            </div>
+
+          {/* Stepper, big and touch-friendly, identical to upsell */}
+          <p className="text-[10px] text-white/40 uppercase tracking-wider text-center">Quantidade</p>
+          <div className="flex items-center justify-center gap-6">
+            <button
+              onClick={() => setChairQty(qty - 1)}
+              disabled={qty <= 1}
+              className="w-14 h-14 rounded-2xl border-2 border-white/20 bg-white/[0.05] text-white font-bold text-2xl flex items-center justify-center disabled:opacity-25 active:scale-95 transition-all touch-manipulation hover:border-gold/50"
+            >−</button>
+            <span className="text-4xl font-black text-gold w-10 text-center tabular-nums leading-none">{qty}</span>
+            <button
+              onClick={() => setChairQty(qty + 1)}
+              className="w-14 h-14 rounded-2xl border-2 border-white/20 bg-white/[0.05] text-white font-bold text-2xl flex items-center justify-center active:scale-95 transition-all touch-manipulation hover:border-gold/50"
+            >+</button>
           </div>
-          {(() => {
-            const wQty = formData.chairWaterproofQty;
-            const wActive = wQty > 0;
-            const wSob = wQty >= 10;
-            const wPrice = calcChairWaterproof(wQty);
-            const wDisplay = wSob
-              ? 'Sob orçamento'
-              : wPrice !== null
-                ? `${wPrice % 1 === 0 ? wPrice : wPrice.toFixed(1).replace('.', ',')}€`
-                : null;
-            return (
-              <div className={cn('relative w-full max-w-sm mx-auto rounded-2xl border-2 px-4 py-3 transition-all duration-300', wActive ? 'border-gold bg-[#252931] shadow-[0_0_16px_rgba(212,175,55,0.18)]' : 'border-white/[0.12] bg-[#252931]')}>
-                <span className="absolute -top-2.5 right-3 bg-gradient-to-r from-gold to-[#d4c57b] text-[#12121e] text-[8px] font-black px-2 py-0.5 rounded-full tracking-widest uppercase shadow-md">RECOMENDADO</span>
-                <div className="flex items-center gap-3 mb-3">
-                  <Shield className={cn('w-5 h-5 flex-shrink-0', wActive ? 'text-gold' : 'text-white/30')} />
-                  <div className="flex-1 min-w-0">
-                    <p className={cn('text-sm font-bold leading-snug', wActive ? 'text-white' : 'text-white/75')}>Impermeabilização</p>
-                    <p className={cn('text-[10px] mt-0.5', wActive ? 'text-gold/70' : 'text-white/30')}>
-                      1–6 cad.: 15€/un · 7–9 cad.: 12,5€/un · 10+: sob orçamento
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <button
-                      onClick={() => updateFormData({ chairWaterproofQty: Math.max(0, wQty - 1), chairWaterproofing: wQty - 1 > 0 })}
-                      disabled={wQty === 0}
-                      className="w-10 h-10 rounded-xl border-2 border-white/20 bg-white/[0.05] text-white font-bold text-xl flex items-center justify-center disabled:opacity-20 active:scale-95 transition-all touch-manipulation hover:border-gold/50"
-                    >−</button>
-                    <span className={cn('text-2xl font-black w-8 text-center tabular-nums leading-none', wActive ? 'text-gold' : 'text-white/30')}>{wQty}</span>
-                    <button
-                      onClick={() => updateFormData({ chairWaterproofQty: wQty + 1, chairWaterproofing: true })}
-                      className="w-10 h-10 rounded-xl border-2 border-white/20 bg-white/[0.05] text-white font-bold text-xl flex items-center justify-center active:scale-95 transition-all touch-manipulation hover:border-gold/50"
-                    >+</button>
-                  </div>
-                  <div className="text-right">
-                    {wActive ? (
-                      <p className={cn('font-bold text-base tabular-nums', wSob ? 'text-white/50 text-sm' : 'text-gold')}>{wDisplay}</p>
-                    ) : (
-                      <p className="text-[11px] text-white/25">Não incluir</p>
-                    )}
-                    {wActive && !wSob && <p className="text-[9px] text-white/30">{wQty} cadeira{wQty > 1 ? 's' : ''}</p>}
-                  </div>
-                </div>
+
+          {/* Progressive pricing info line */}
+          {!sob && (
+            <p className="text-[9px] text-white/30 text-center leading-snug">
+              {isWaterproofPrimary
+                ? '1ª–4ª: 15€ · 5ª–6ª: 12,5€ · 7ª–9ª: 10€ por cadeira'
+                : '1ª–3ª: 17,5€ · 4ª–6ª: 12,5€ · 7ª–9ª: 10€ por cadeira'}
+            </p>
+          )}
+
+          {/* Add-on toggle, identical style to upsell, service swapped by serviceType */}
+          {!sob && (
+            <button
+              onClick={toggleAddon}
+              className={cn(
+                "w-full max-w-xs flex items-center gap-3 px-4 py-3 rounded-xl border-2 transition-all touch-manipulation",
+                addonEnabled
+                  ? "border-gold bg-[#1a2a1a] shadow-[0_0_10px_rgba(212,175,55,0.15)]"
+                  : "border-gold/20 bg-[#1a2a1a] hover:border-gold/40"
+              )}
+            >
+              <div className={cn("w-5 h-5 rounded-md border-2 flex items-center justify-center flex-shrink-0 transition-all", addonEnabled ? "border-gold bg-gold" : "border-white/30")}>
+                {addonEnabled && <Check className="w-3 h-3 text-[#12121e]" />}
               </div>
-            );
-          })()}
+              <div className="text-left flex-1">
+                <p className="text-sm font-bold text-white">{addonLabel}</p>
+                <p className="text-[10px] text-white/40">{addonRateHint}€/cadeira</p>
+              </div>
+              <span className="text-gold font-bold text-sm flex-shrink-0">
+                +{addonPrice !== null
+                  ? `${addonPrice % 1 === 0 ? addonPrice : addonPrice.toFixed(1).replace('.', ',')}€`
+                  : 'orçamento'}
+              </span>
+            </button>
+          )}
         </div>
       );
     }
@@ -1264,7 +1281,7 @@ ${formData.description || 'Sem observações adicionais'}
   };
 
   const modalContent = (
-    <div ref={quizOverlayRef} className="fixed inset-0 z-[100] flex items-center justify-center backdrop-blur-lg p-4 landscape:p-1 landscape:sm:p-4" style={{ background: "rgba(5,21,16,0.82)" }} role="dialog" aria-modal="true" aria-labelledby="quiz-title">
+    <div ref={quizOverlayRef} className="fixed inset-0 z-[100] flex items-center justify-center backdrop-blur-lg p-2 sm:p-4 landscape:p-1 landscape:sm:p-4" style={{ background: "rgba(5,21,16,0.82)" }} role="dialog" aria-modal="true" aria-labelledby="quiz-title">
       <div
         ref={quizCardRef}
         className={cn(
@@ -1276,9 +1293,15 @@ ${formData.description || 'Sem observações adicionais'}
 
         {/* Header */}
         <div className="px-5 sm:px-6 pt-3 sm:pt-5 pb-2 sm:pb-3 landscape:pt-2 landscape:pb-1.5 flex items-center justify-between flex-shrink-0 border-b border-white/[0.06]">
-          <span id="quiz-title" className="text-gold text-[10px] font-bold tracking-[0.28em] uppercase">
-            ORÇAMENTO RÁPIDO · KYRO
-          </span>
+          <div id="quiz-title" className="flex items-center gap-2 flex-wrap">
+            <span className="text-gold text-[10px] font-bold tracking-[0.28em] uppercase">
+              ORÇAMENTO RÁPIDO · KYRO
+            </span>
+            <span className="flex items-center gap-1 bg-gold/10 border border-gold/25 rounded-full px-2 py-0.5">
+              <Star className="w-2.5 h-2.5 text-gold fill-gold flex-shrink-0" />
+              <span className="text-[9px] font-black text-gold/90 uppercase tracking-wider leading-none">N.º1 Porto</span>
+            </span>
+          </div>
           <button
             onClick={handleClose}
             className="p-2 hover:bg-white/10 active:bg-white/20 rounded-full transition-colors touch-manipulation"
@@ -1288,7 +1311,7 @@ ${formData.description || 'Sem observações adicionais'}
           </button>
         </div>
 
-        {/* Urgency bar — hidden in landscape */}
+        {/* Urgency bar, hidden in landscape */}
         <div className={cn(
           "text-white text-xs font-semibold px-4 py-1.5 flex items-center justify-between flex-shrink-0 transition-all duration-500 landscape:hidden landscape:sm:flex",
           packDiscountActive
@@ -1343,15 +1366,15 @@ ${formData.description || 'Sem observações adicionais'}
         <div
           ref={scrollContainerRef}
           className={cn(
-            "flex flex-col overflow-x-hidden flex-1 quiz-scrollbar px-5 sm:px-6",
-            "min-h-[200px] sm:min-h-[380px] landscape:min-h-[120px] overflow-y-auto"
+            "flex flex-col overflow-x-hidden flex-1 quiz-scrollbar px-4 sm:px-6",
+            "min-h-[200px] sm:min-h-[380px] landscape:min-h-[120px] overflow-y-auto pb-2"
           )}
         >
 
           {/* Animated price ticker
-              — hidden: step 2 (treatment selector, sem qtds)
-              — visível: step 3 (quantidades) e step 4 (contacto) quando totalPrice > 0
-              — também visível em step 1 quando há custo de deslocação */}
+             , hidden: step 2 (treatment selector, sem qtds)
+             , visível: step 3 (quantidades) e step 4 (contacto) quando totalPrice > 0
+             , também visível em step 1 quando há custo de deslocação */}
           {(totalPrice > 0 || hasSobOrcamento) && (showUpsell || finalTravelCost > 0 || (currentStep !== 1 && currentStep !== 2)) && (
             <div className="sticky top-0 z-20 text-white flex items-center justify-between py-3 border-b border-white/[0.16] -mx-5 sm:-mx-6 px-5 sm:px-6 animate-fade-in" style={{ background: "#071a12" }}>
               <span className="text-xs text-white/40 font-medium">
@@ -1389,7 +1412,7 @@ ${formData.description || 'Sem observações adicionais'}
 
           <div className="flex flex-col py-3 sm:py-5 w-full items-center text-center">
 
-            {/* Step 0 — Location Autocomplete VIP */}
+            {/* Step 0, Location Autocomplete VIP */}
             {/* Context banner when quiz opened from a problem page */}
             {problema && (
               <div className="w-full max-w-sm mx-auto mb-4 bg-gold/10 border border-gold/30 rounded-xl px-4 py-3 text-center">
@@ -1416,7 +1439,7 @@ ${formData.description || 'Sem observações adicionais'}
 
                 {!formData.location && (
                   <div className="w-full max-w-sm">
-                    {/* Full-background city image cards — hidden while typing */}
+                    {/* Full-background city image cards, hidden while typing */}
                     {!locationQuery && <div className="flex flex-col gap-2 mb-3">
                       {[
                         { city: 'Porto',  img: '/cities/porto.webp'  },
@@ -1431,7 +1454,7 @@ ${formData.description || 'Sem observações adicionais'}
                               updateFormData({ location: city });
                               setLocationQuery(city);
                               setLocationFadeIn(true);
-                              // Auto-advance to service selection — no extra tap needed
+                              // Auto-advance to service selection, no extra tap needed
                               setCurrentStep(1);
                             }}
                             className={cn(
@@ -1465,7 +1488,7 @@ ${formData.description || 'Sem observações adicionais'}
                       })}
                     </div>}
 
-                    <div className="w-full rounded-2xl border-2 border-white/20 bg-[#252931] px-4 py-3 mb-1">
+                    <div className="w-full rounded-2xl border-2 border-gold/25 bg-[#1a2a1a] px-4 py-3 mb-1">
                       {!locationQuery && <p className="text-[11px] text-white/50 text-center mb-2 font-medium">
                         Não encontra a sua cidade?
                       </p>}
@@ -1498,7 +1521,7 @@ ${formData.description || 'Sem observações adicionais'}
                           }}
                           autoComplete="off"
                           inputMode="search"
-                          className="w-full h-11 pl-9 pr-4 text-base bg-[#252931] border border-white/15 focus:border-gold focus:outline-none rounded-xl transition-colors text-white placeholder:text-white/30"
+                          className="w-full h-11 pl-9 pr-4 text-base bg-[#1a2a1a] border border-gold/25 focus:border-gold focus:outline-none rounded-xl transition-colors text-white placeholder:text-white/30"
                         />
                       </div>
                     </div>
@@ -1511,7 +1534,7 @@ ${formData.description || 'Sem observações adicionais'}
                   return (
                     <div className="w-full max-w-sm mx-auto mb-2">
                       {matches.length > 0 ? (
-                        <div className="border border-white/[0.16] rounded-xl overflow-hidden mb-4 bg-[#252931]">
+                        <div className="border border-gold/20 rounded-xl overflow-hidden mb-4 bg-[#1a2a1a]">
                           {matches.map((city) => (
                             <button
                               key={city}
@@ -1544,7 +1567,7 @@ ${formData.description || 'Sem observações adicionais'}
               </div>
             )}
 
-            {/* Step 1 — Service Selector */}
+            {/* Step 1, Service Selector */}
             {currentStep === 1 && (
               <div className="w-full flex flex-col items-center">
                 <QuizStep1Service
@@ -1563,11 +1586,13 @@ ${formData.description || 'Sem observações adicionais'}
 
             {/* Step 2 - Service Type */}
             {currentStep === 2 && (() => {
-              const cleanPrice = formData.service === 'mattress' ? 39 : 49;
+              const cleanPrice = formData.service === 'mattress' ? 39
+                : formData.service === 'chairs' ? undefined
+                : 49;
               const waterPrice = formData.service === 'sofa' ? 49
                 : formData.service === 'mattress' ? 45
                 : undefined;
-              // No Pack card on step 2 — upsell is inline per-item in step 3
+              // No Pack card on step 2, upsell is inline per-item in step 3
               const packPrice = undefined;
               const waterDesc = formData.service === 'mattress'
                 ? 'Ideal para colchões novos ou recém-limpos.'
@@ -1607,27 +1632,20 @@ ${formData.description || 'Sem observações adicionais'}
               </div>
             )}
 
-            {/* Upsell Step — multi-item pack with sub-step config */}
+            {/* Upsell Step, multi-item pack with sub-step config */}
             {showUpsell && (
               <div className="flex-1 flex flex-col w-full items-center">
 
                 {/* SUB-STEP: Yes/No prompt */}
                 {upsellSubStep === 'prompt' && (
                   <div className="flex flex-col w-full items-center text-center py-2">
-                    {/* Icon with glow */}
-                    <div className="relative mb-4">
-                      <div className="w-16 h-16 rounded-full bg-gold/10 border border-gold/25 flex items-center justify-center shadow-[0_0_32px_rgba(212,175,55,0.18)]">
-                        <Users className="w-7 h-7 text-gold" />
-                      </div>
-                    </div>
-
                     <p className="text-gold text-[10px] font-bold tracking-[0.28em] uppercase mb-2">PACK FAMÍLIA</p>
                     <h2 className="font-playfair text-2xl sm:text-3xl font-bold text-white mb-3 leading-[1.2]">
                       Tem mais artigos<br />para limpar?
                     </h2>
                     <p className="text-[13px] text-white/50 max-w-[255px] mx-auto mb-5 leading-relaxed">
                       Pedidos acima de <span className="text-gold font-bold">200€</span> têm{' '}
-                      <span className="text-gold font-bold">10% de desconto</span> automático — quanto mais adicionar, mais poupa.
+                      <span className="text-gold font-bold">10% de desconto</span> automático, quanto mais adicionar, mais poupa.
                     </p>
 
                     {/* Progress bar to 200€ */}
@@ -1636,29 +1654,38 @@ ${formData.description || 'Sem observações adicionais'}
                       const pct = Math.min(totalPrice / THRESHOLD * 100, 100);
                       const faltam = Math.max(0, Math.ceil(THRESHOLD - totalPrice));
                       const reached = totalPrice >= THRESHOLD;
+                      const glowOpacity = (pct / 100 * 0.75).toFixed(2);
+                      const glowRadius = Math.round(pct / 10);
                       return (
-                        <div className={cn(
-                          "w-full max-w-xs mx-auto mb-6 rounded-2xl border px-4 py-3 transition-all duration-500",
-                          reached ? "bg-[#1a2a1a] border-gold/40" : "bg-[#252931] border-white/[0.10]"
-                        )}>
-                          <div className="flex justify-between text-[10px] font-bold uppercase tracking-wider mb-2">
-                            <span className="text-gold/70 tabular-nums">{Math.round(totalPrice)}€ no carrinho</span>
-                            <span className={reached ? "text-gold" : "text-white/25"}>≥200€ → −10%</span>
+                        <div className="w-full max-w-xs mx-auto mb-6">
+                          <div className="flex justify-between items-center mb-2">
+                            <span className="text-[10px] text-gold/60 tabular-nums font-semibold">{Math.round(totalPrice)}€ no carrinho</span>
+                            <span className={cn("text-[10px] font-bold uppercase tracking-wider transition-colors", reached ? "text-gold" : "text-white/25")}>200€ → −10%</span>
                           </div>
-                          <div className="h-2.5 bg-white/[0.07] rounded-full overflow-hidden">
+                          <div className="h-1 bg-gold/10 rounded-full overflow-hidden">
                             <div
-                              className={cn("h-full rounded-full transition-all duration-700", reached ? "bg-gradient-to-r from-[#C9A84C] via-[#f5e27a] to-[#C9A84C]" : "bg-gradient-to-r from-gold/50 to-gold")}
-                              style={{ width: `${Math.max(pct, 4)}%` }}
+                              className={cn(
+                                "h-full rounded-full transition-all duration-700",
+                                reached
+                                  ? "bg-gradient-to-r from-gold/50 via-[#f5e27a] to-gold"
+                                  : "bg-gradient-to-r from-gold/15 to-gold"
+                              )}
+                              style={{
+                                width: `${Math.max(pct, 2)}%`,
+                                boxShadow: reached
+                                  ? '0 0 8px rgba(212,175,55,0.95)'
+                                  : `0 0 ${glowRadius}px rgba(212,175,55,${glowOpacity})`,
+                              }}
                             />
                           </div>
                           <p className={cn("text-[10px] text-center mt-2 font-semibold transition-colors", reached ? "text-gold" : "text-white/35")}>
-                            {reached ? 'Desconto de 10% ativado!' : `Faltam apenas ${faltam}€ para 10% de desconto`}
+                            {reached ? 'Desconto de 10% ativado!' : `Faltam ${faltam}€ para 10% de desconto`}
                           </p>
                         </div>
                       );
                     })()}
 
-                    {/* SIM — dominant gold CTA */}
+                    {/* SIM, dominant gold CTA */}
                     <button
                       onClick={() => setUpsellSubStep('select')}
                       className="w-full max-w-xs h-14 bg-gradient-to-r from-gold to-[#d4c57b] hover:from-[#d4c57b] hover:to-gold text-[#12121e] font-black text-[15px] tracking-wide rounded-xl shadow-[0_4px_36px_rgba(212,175,55,0.45)] touch-manipulation active:scale-[0.98] transition-all flex items-center justify-center gap-2.5 mb-3"
@@ -1667,16 +1694,24 @@ ${formData.description || 'Sem observações adicionais'}
                       Sim, quero adicionar
                     </button>
 
-                    {/* NÃO — subdued ghost */}
-                    <button
-                      onClick={() => { setShowUpsell(false); setCurrentStep(4); }}
-                      className="w-full max-w-xs h-11 flex items-center justify-center gap-1.5 text-white/35 hover:text-white/60 text-sm font-medium transition-colors touch-manipulation"
-                    >
-                      Não, seguir assim
-                      <ChevronRight className="w-4 h-4" />
-                    </button>
+                    <div className="w-full max-w-xs flex items-center gap-3">
+                      <button
+                        onClick={() => { setShowUpsell(false); }}
+                        className="h-11 px-4 flex-shrink-0 flex items-center gap-1.5 rounded-xl border border-white/[0.15] bg-transparent text-white/45 hover:text-white/75 hover:border-white/30 touch-manipulation active:scale-[0.98] transition-all text-sm"
+                      >
+                        <ChevronLeft className="w-4 h-4" />
+                        Voltar
+                      </button>
+                      <button
+                        onClick={() => { setShowUpsell(false); setCurrentStep(4); }}
+                        className="flex-1 h-11 flex items-center justify-center gap-1.5 text-white/45 hover:text-white/75 hover:border-white/30 text-sm font-medium transition-all touch-manipulation border border-white/[0.15] bg-transparent rounded-xl active:scale-[0.98]"
+                      >
+                        Não, seguir assim
+                        <ChevronRight className="w-4 h-4" />
+                      </button>
+                    </div>
 
-                    <p className="text-[9px] text-white/15 mt-4">Sem compromisso · Pode remover artigos a qualquer momento</p>
+                    <p className="text-[9px] text-white/15 mt-3">Sem compromisso · Pode remover artigos a qualquer momento</p>
                   </div>
                 )}
 
@@ -1687,12 +1722,42 @@ ${formData.description || 'Sem observações adicionais'}
                     <h2 className="font-playfair text-xl sm:text-2xl font-bold text-white mb-1 leading-[1.3]">
                       {packDiscountActive ? 'Desconto de 10% ativado!' : 'Que artigo quer adicionar?'}
                     </h2>
-                    <p className="text-xs text-white/45 max-w-[280px] mx-auto mb-4 leading-relaxed">
-                      {packDiscountActive
-                        ? <span className="text-gold font-bold">Desconto de 10% aplicado automaticamente.</span>
-                        : <>Faltam <span className="text-gold font-bold">{Math.max(0, Math.ceil(200 - totalPrice))}€</span> para 10% de desconto.</>
-                      }
-                    </p>
+                    {/* Progress bar, same logic as prompt step */}
+                    {(() => {
+                      const THRESHOLD = 200;
+                      const pct = Math.min(totalPrice / THRESHOLD * 100, 100);
+                      const faltam = Math.max(0, Math.ceil(THRESHOLD - totalPrice));
+                      const reached = totalPrice >= THRESHOLD;
+                      const glowOpacity = (pct / 100 * 0.75).toFixed(2);
+                      const glowRadius = Math.round(pct / 10);
+                      return (
+                        <div className="w-full max-w-xs mx-auto mb-4">
+                          <div className="flex justify-between items-center mb-2">
+                            <span className="text-[10px] text-gold/60 tabular-nums font-semibold">{Math.round(totalPrice)}€ no carrinho</span>
+                            <span className={cn("text-[10px] font-bold uppercase tracking-wider transition-colors", reached ? "text-gold" : "text-white/25")}>200€ → −10%</span>
+                          </div>
+                          <div className="h-1 bg-gold/10 rounded-full overflow-hidden">
+                            <div
+                              className={cn(
+                                "h-full rounded-full transition-all duration-700",
+                                reached
+                                  ? "bg-gradient-to-r from-gold/50 via-[#f5e27a] to-gold"
+                                  : "bg-gradient-to-r from-gold/15 to-gold"
+                              )}
+                              style={{
+                                width: `${Math.max(pct, 2)}%`,
+                                boxShadow: reached
+                                  ? '0 0 8px rgba(212,175,55,0.95)'
+                                  : `0 0 ${glowRadius}px rgba(212,175,55,${glowOpacity})`,
+                              }}
+                            />
+                          </div>
+                          <p className={cn("text-[10px] text-center mt-2 font-semibold transition-colors", reached ? "text-gold" : "text-white/35")}>
+                            {reached ? 'Desconto de 10% ativado!' : `Faltam ${faltam}€ para 10% de desconto`}
+                          </p>
+                        </div>
+                      );
+                    })()}
 
                     {/* Already added upsell items */}
                     {upsellItems.length > 0 && (
@@ -1723,7 +1788,7 @@ ${formData.description || 'Sem observações adicionais'}
                       </div>
                     )}
 
-                    {/* Cards — always all 4 options */}
+                    {/* Cards, always all 4 options */}
                     <div className="grid grid-cols-2 gap-2 w-full max-w-xs mx-auto mb-4">
                       {([
                         { id: 'sofa',     img: '/images/services/sofa.webp',    label: 'Sofá',     sublabel: 'a partir de 49€' },
@@ -1763,7 +1828,7 @@ ${formData.description || 'Sem observações adicionais'}
 
                     <div className="w-full max-w-xs mx-auto flex items-center gap-3">
                       <button
-                        onClick={() => { setShowUpsell(false); setCurrentStep(3); }}
+                        onClick={() => setUpsellSubStep('prompt')}
                         className="h-12 px-5 flex-shrink-0 flex items-center gap-1.5 rounded-xl border border-white/[0.15] bg-transparent text-white/55 hover:text-white/85 hover:border-white/30 touch-manipulation active:scale-[0.98] transition-all"
                       >
                         <ChevronLeft className="w-4 h-4" />
@@ -1794,31 +1859,37 @@ ${formData.description || 'Sem observações adicionais'}
                     {/* Sofa config */}
                     {pendingUpsellId === 'sofa' && (
                       <div className="w-full max-w-xs mx-auto">
-                        <p className="text-gold text-[10px] font-bold tracking-[0.28em] uppercase mb-1 text-center w-full">ARTIGO EXTRA</p>
-                        <h3 className="font-playfair text-xl font-bold text-white mb-1 text-center">Sofá</h3>
-                        <p className="text-xs text-white/35 mb-3 text-center">Selecione tamanho e quantidade</p>
+                        <p className="text-gold text-[11px] font-bold tracking-[0.28em] uppercase mb-0.5 text-center w-full">ARTIGO EXTRA</p>
+                        <h3 className="font-playfair text-xl font-bold text-white mb-3 text-center">Detalhes do(s) Sofá(s)</h3>
                         <div className="flex flex-col gap-2 mb-3">
-                          {sofaPrices.filter(o => typeof o.cleaningPrice === 'number').map(opt => {
+                          {sofaPrices.map(opt => {
                             const item = pendingSofaItems.find(i => i.sizeId === opt.id);
                             const qty = item?.qty ?? 0;
                             const packOn = item?.packEnabled ?? false;
                             const isActive = qty > 0;
-                            const cleanP = opt.cleaningPrice as number;
-                            const bothP = typeof opt.bothPrice === 'number' ? (opt.bothPrice as number) : cleanP + 40;
+                            const isSob = typeof opt.cleaningPrice !== 'number';
+                            const isWaterproofBase = formData.serviceType === 'waterproofing';
+                            const cleanP = isSob ? null : (opt.cleaningPrice as number);
+                            const waterP = typeof opt.waterproofingPrice === 'number' ? (opt.waterproofingPrice as number) : null;
+                            const baseP = isWaterproofBase ? waterP : cleanP;
+                            const bothP = typeof opt.bothPrice === 'number' ? (opt.bothPrice as number) : (baseP !== null ? baseP + 40 : null);
                             const origP = typeof opt.originalBothPrice === 'number' ? (opt.originalBothPrice as number) : null;
-                            const delta = bothP - cleanP;
-                            const dp = packOn ? bothP : cleanP;
+                            const packDelta = baseP !== null && bothP !== null ? bothP - baseP : 40;
+                            const dp = packOn && bothP !== null ? bothP : baseP;
+                            const upsellLabel = isWaterproofBase ? 'Adicionar Higienização Profunda' : 'Adicionar Proteção Total VIP';
+                            const upsellSub = isWaterproofBase ? `+${packDelta}€/un. · Limpeza profunda incluída` : `+${packDelta}€/un. · Impermeabilização completa`;
                             return (
-                              <div key={opt.id} className={cn('rounded-xl border-2 transition-all duration-200 overflow-hidden', isActive && packOn ? 'border-gold bg-[#252931] shadow-[0_0_10px_rgba(212,175,55,0.18)]' : isActive ? 'border-gold/50 bg-[#252931]' : 'border-white/[0.18] bg-[#252931]')}>
+                              <div key={opt.id} className={cn('rounded-xl border-2 transition-all duration-200 overflow-hidden', isActive && packOn ? 'border-gold bg-[#1a2a1a] shadow-[0_0_12px_rgba(212,175,55,0.20)]' : isActive ? 'border-gold/50 bg-[#1a2a1a] shadow-[0_0_8px_rgba(212,175,55,0.10)]' : 'border-gold/20 bg-[#1a2a1a]')}>
                                 <div className="flex items-center justify-between px-4 py-3">
                                   <div className="flex-1 min-w-0 mr-3">
                                     <span className="text-sm font-semibold text-white">{opt.label}</span>
                                     <div className="flex items-center gap-1.5 mt-0.5">
+                                      {isActive && packOn && <span className="text-[9px] bg-gold/15 text-gold/80 px-1.5 py-0.5 rounded-full font-bold leading-none">PACK</span>}
                                       {isActive && packOn && origP !== null && (
                                         <span className="text-sm text-white/30 line-through tabular-nums">{origP}€</span>
                                       )}
-                                      <span className={cn('text-sm font-bold tabular-nums', isActive ? (packOn ? 'text-gold' : 'text-white/80') : 'text-white/40')}>
-                                        {dp}€/un.{qty > 1 ? ` × ${qty} = ${dp * qty}€` : ''}
+                                      <span className={cn('text-sm font-bold tabular-nums', isSob ? isActive ? 'text-white/70' : 'text-white/35' : isActive ? (packOn ? 'text-gold' : 'text-white/80') : 'text-white/40')}>
+                                        {isSob ? 'Sob Orçamento' : dp !== null ? `${dp}€/un.${qty > 1 ? ` × ${qty} = ${dp * qty}€` : ''}` : ''}
                                       </span>
                                     </div>
                                   </div>
@@ -1830,11 +1901,11 @@ ${formData.description || 'Sem observações adicionais'}
                                 </div>
                                 {isActive && (
                                   <div className="px-4 pb-3">
-                                    <button onClick={() => setPendingSofaItems(sofaTogglePack(pendingSofaItems, opt.id))} className={cn('w-full flex items-center gap-2.5 px-3 py-2 rounded-lg border transition-all duration-200 touch-manipulation', packOn ? 'border-gold/50 bg-gold/[0.08]' : 'border-white/10 bg-[#252931] hover:border-gold/30')}>
+                                    <button onClick={() => setPendingSofaItems(sofaTogglePack(pendingSofaItems, opt.id))} className={cn('w-full flex items-center gap-2.5 px-3 py-2 rounded-lg border transition-all duration-200 touch-manipulation', packOn ? 'border-gold/50 bg-gold/[0.08]' : 'border-gold/15 bg-[#1a2a1a] hover:border-gold/40')}>
                                       <Shield className={cn('w-4 h-4 flex-shrink-0', packOn ? 'text-gold' : 'text-white/25')} />
                                       <div className="flex-1 text-left">
-                                        <p className={cn('text-[11px] font-bold leading-none', packOn ? 'text-white' : 'text-white/50')}>Impermeabilização completa</p>
-                                        <p className={cn('text-[9px] mt-0.5 leading-none', packOn ? 'text-gold/60' : 'text-white/25')}>+{delta}€/un. · Proteção contra manchas e líquidos</p>
+                                        <p className={cn('text-[11px] font-bold leading-none', packOn ? 'text-white' : 'text-white/50')}>{upsellLabel}</p>
+                                        <p className={cn('text-[9px] mt-0.5 leading-none', packOn ? 'text-gold/60' : 'text-white/25')}>{isSob ? 'Preço sob orçamento · Incluído na proposta' : upsellSub}</p>
                                       </div>
                                       <div className={cn('w-8 h-4 rounded-full border flex items-center px-0.5 transition-all duration-300 flex-shrink-0', packOn ? 'border-gold bg-gold/20' : 'border-white/20 bg-white/[0.05]')}>
                                         <div className={cn('w-3 h-3 rounded-full transition-all duration-300', packOn ? 'bg-gold translate-x-[14px]' : 'bg-white/30 translate-x-0')} />
@@ -1852,7 +1923,7 @@ ${formData.description || 'Sem observações adicionais'}
                           const anyPack = pendingSofaItems.some(i => i.packEnabled && i.qty > 0);
                           const chaiseUnitPrice = anyPack ? sofaChaisePrice.cleaning + sofaChaisePrice.waterproofing : sofaChaisePrice.cleaning;
                           return (
-                            <div className={cn('w-full rounded-xl border-2 transition-all duration-200 mb-3', pendingUpsellChaiseLongueQty > 0 ? 'border-gold/60 bg-[#252931] shadow-[0_0_10px_rgba(212,175,55,0.18)]' : 'border-white/[0.18] bg-[#252931]')}>
+                            <div className={cn('w-full rounded-xl border-2 transition-all duration-200 mb-3', pendingUpsellChaiseLongueQty > 0 ? 'border-gold/60 bg-[#1a2a1a] shadow-[0_0_10px_rgba(212,175,55,0.18)]' : 'border-gold/20 bg-[#1a2a1a]')}>
                               <div className="flex items-center justify-between px-4 py-3">
                                 <div className="flex-1 min-w-0 mr-3">
                                   <span className={cn('text-sm font-semibold', hasSofas && pendingUpsellChaiseLongueQty > 0 ? 'text-white' : 'text-white/50')}>Chaise Longue</span>
@@ -1872,23 +1943,27 @@ ${formData.description || 'Sem observações adicionais'}
                         <button
                           disabled={!pendingSofaItems.some(i => i.qty > 0)}
                           onClick={() => {
+                            const isWaterproofBase = formData.serviceType === 'waterproofing';
                             const anyPack = pendingSofaItems.some(i => i.packEnabled && i.qty > 0);
                             const chaiseUnitP = anyPack ? sofaChaisePrice.cleaning + sofaChaisePrice.waterproofing : sofaChaisePrice.cleaning;
                             pendingSofaItems.filter(i => i.qty > 0).forEach(item => {
                               const opt = sofaPrices.find(p => p.id === item.sizeId)!;
-                              const cleanP = opt.cleaningPrice as number;
-                              const bothP = typeof opt.bothPrice === 'number' ? (opt.bothPrice as number) : cleanP + 40;
-                              const unitPrice = item.packEnabled ? bothP : cleanP;
-                              const total = unitPrice * item.qty;
-                              const waterproofExtra = item.packEnabled ? (bothP - cleanP) * item.qty : 0;
+                              const isSobItem = typeof opt.cleaningPrice !== 'number';
+                              const cleanP = isSobItem ? null : (opt.cleaningPrice as number);
+                              const waterP = typeof opt.waterproofingPrice === 'number' ? (opt.waterproofingPrice as number) : null;
+                              const baseP = isWaterproofBase ? waterP : cleanP;
+                              const bothP = typeof opt.bothPrice === 'number' ? (opt.bothPrice as number) : (baseP !== null ? baseP + 40 : null);
+                              const unitPrice = item.packEnabled && bothP !== null ? bothP : baseP;
+                              const total = unitPrice !== null ? unitPrice * item.qty : 0;
+                              const packExtra = item.packEnabled && bothP !== null && baseP !== null ? (bothP - baseP) * item.qty : 0;
                               setUpsellItems(prev => [...prev, {
                                 id: 'sofa',
                                 sofaSize: item.sizeId,
                                 qty: item.qty,
                                 price: total,
-                                label: `${item.qty}× Sofá ${opt.label}${item.packEnabled ? ' + Impermeab.' : ''}`,
+                                label: `${item.qty}× Sofá ${opt.label}${item.packEnabled ? ' + Pack' : ''}`,
                                 waterproof: item.packEnabled,
-                                waterproofPrice: waterproofExtra,
+                                waterproofPrice: packExtra,
                               }]);
                             });
                             if (pendingUpsellChaiseLongueQty > 0) {
@@ -1896,7 +1971,7 @@ ${formData.description || 'Sem observações adicionais'}
                                 id: 'sofa-chaise',
                                 qty: pendingUpsellChaiseLongueQty,
                                 price: pendingUpsellChaiseLongueQty * chaiseUnitP,
-                                label: `${pendingUpsellChaiseLongueQty}× Chaise Longue${anyPack ? ' + Impermeab.' : ''}`,
+                                label: `${pendingUpsellChaiseLongueQty}× Chaise Longue${anyPack ? ' + Pack' : ''}`,
                                 chaiseLongue: true,
                               }]);
                             }
@@ -1929,7 +2004,7 @@ ${formData.description || 'Sem observações adicionais'}
                             const bothP = typeof opt.bothPrice === 'number' ? (opt.bothPrice as number) : null;
                             const dp = cleanP !== null ? (packOn && bothP !== null ? bothP : cleanP) : null;
                             return (
-                              <div key={opt.id} className={cn('rounded-xl border-2 transition-all duration-200 overflow-hidden', isActive && packOn ? 'border-gold bg-[#252931] shadow-[0_0_10px_rgba(212,175,55,0.18)]' : isActive ? 'border-gold/50 bg-[#252931]' : 'border-white/[0.18] bg-[#252931]')}>
+                              <div key={opt.id} className={cn('rounded-xl border-2 transition-all duration-200 overflow-hidden', isActive && packOn ? 'border-gold bg-[#1a2a1a] shadow-[0_0_10px_rgba(212,175,55,0.18)]' : isActive ? 'border-gold/50 bg-[#1a2a1a]' : 'border-gold/20 bg-[#1a2a1a]')}>
                                 <div className="flex items-center justify-between px-4 py-3">
                                   <div className="flex-1 min-w-0 mr-3">
                                     <span className="text-sm font-semibold text-white">{opt.label}</span>
@@ -1947,7 +2022,7 @@ ${formData.description || 'Sem observações adicionais'}
                                 </div>
                                 {isActive && cleanP !== null && (
                                   <div className="px-4 pb-3">
-                                    <button onClick={() => setPendingMattressItems(mattressTogglePack(pendingMattressItems, opt.id))} className={cn('w-full flex items-center gap-2.5 px-3 py-2 rounded-lg border transition-all duration-200 touch-manipulation', packOn ? 'border-gold/50 bg-gold/[0.08]' : 'border-white/10 bg-[#252931] hover:border-gold/30')}>
+                                    <button onClick={() => setPendingMattressItems(mattressTogglePack(pendingMattressItems, opt.id))} className={cn('w-full flex items-center gap-2.5 px-3 py-2 rounded-lg border transition-all duration-200 touch-manipulation', packOn ? 'border-gold/50 bg-gold/[0.08]' : 'border-gold/15 bg-[#1a2a1a] hover:border-gold/40')}>
                                       <Shield className={cn('w-4 h-4 flex-shrink-0', packOn ? 'text-gold' : 'text-white/25')} />
                                       <div className="flex-1 text-left">
                                         <p className={cn('text-[11px] font-bold leading-none', packOn ? 'text-white' : 'text-white/50')}>Adicionar Impermeabilização</p>
@@ -1998,35 +2073,66 @@ ${formData.description || 'Sem observações adicionais'}
                     )}
 
                     {/* Carpet config */}
-                    {pendingUpsellId === 'carpet' && (
-                      <div className="w-full max-w-xs mx-auto">
-                        <p className="text-gold text-[10px] font-bold tracking-[0.28em] uppercase mb-1 text-center w-full">ARTIGO EXTRA</p>
-                        <h3 className="font-playfair text-xl font-bold text-white mb-1 text-center">Tapete</h3>
-                        <p className="text-xs text-white/35 mb-4 text-center">Indique a área aproximada em m²</p>
-                        <input
-                          type="number"
-                          inputMode="decimal"
-                          min="0.5"
-                          step="0.5"
-                          placeholder="Ex: 4"
-                          value={pendingCarpetArea}
-                          onChange={e => setPendingCarpetArea(e.target.value)}
-                          className="w-full h-12 px-4 text-lg font-bold text-center bg-white/[0.06] border border-white/15 focus:border-gold focus:outline-none rounded-xl transition-colors text-white placeholder:text-white/25 mb-3"
-                        />
-                        <button
-                          disabled={!pendingCarpetArea || isNaN(parseFloat(pendingCarpetArea)) || parseFloat(pendingCarpetArea) <= 0}
-                          onClick={() => {
-                            const area = parseFloat(pendingCarpetArea);
-                            const base = area > 15 ? 0 : area <= 5 ? area * 10 : area <= 10 ? area * 8 : area * 7;
-                            setUpsellItems(prev => [...prev, { id: 'carpet', carpetArea: pendingCarpetArea, price: Math.round(base * 100) / 100, label: `Tapete ${pendingCarpetArea}m²` }]);
-                            setUpsellSubStep('select');
-                          }}
-                          className="w-full h-12 bg-gradient-to-r from-gold to-[#d4c57b] hover:from-[#d4c57b] hover:to-gold text-[#12121e] font-bold rounded-xl disabled:opacity-35 touch-manipulation active:scale-[0.98] transition-all"
-                        >
-                          Adicionar Tapete
-                        </button>
-                      </div>
-                    )}
+                    {pendingUpsellId === 'carpet' && (() => {
+                      const uArea = parseFloat(pendingCarpetArea);
+                      const uValid = !isNaN(uArea) && uArea > 0;
+                      const uSob = uValid && uArea > 15;
+                      const uPrice = uValid && !uSob ? calcCarpetPrice(uArea) : null;
+                      return (
+                        <div className="w-full max-w-xs mx-auto">
+                          <p className="text-gold text-[10px] font-bold tracking-[0.28em] uppercase mb-1 text-center w-full">ARTIGO EXTRA</p>
+                          <h3 className="font-playfair text-xl font-bold text-white mb-3 text-center">Tapete</h3>
+
+                          {/* Price box */}
+                          <div className={cn(
+                            "w-full rounded-2xl border px-5 py-4 text-center transition-all duration-300 mb-4",
+                            uSob ? "bg-[#1a2a1a] border-white/20"
+                              : uValid ? "bg-[#1a2a1a] border-gold/30 shadow-[0_0_20px_rgba(212,175,55,0.10)]"
+                              : "bg-[#1a2a1a] border-gold/15"
+                          )}>
+                            <p className="text-[10px] text-white/35 uppercase tracking-wider mb-1">Estimativa total</p>
+                            {uValid ? (
+                              <>
+                                <p className={cn("font-playfair font-black leading-none mb-1", uSob ? "text-white/50 text-2xl" : "text-gold text-4xl")}>
+                                  {uSob ? 'Sob orçamento' : `${uPrice !== null ? Math.round(uPrice) : '—'}€`}
+                                </p>
+                                <p className="text-[10px] text-white/30">
+                                  {uSob ? 'Entraremos em contacto para combinar' : `${uArea} m²`}
+                                </p>
+                              </>
+                            ) : (
+                              <p className="text-white/25 text-sm font-medium py-1">Insira a área para ver o preço</p>
+                            )}
+                          </div>
+
+                          <label className="block text-[10px] font-bold text-white/40 uppercase tracking-wider text-center mb-1.5">Área do tapete</label>
+                          <input
+                            type="number"
+                            inputMode="decimal"
+                            min="0.5"
+                            step="0.5"
+                            placeholder="Ex: 4"
+                            value={pendingCarpetArea}
+                            onChange={e => setPendingCarpetArea(e.target.value)}
+                            className="w-full h-12 px-4 text-lg font-bold text-center bg-[#1a2a1a] border border-gold/25 focus:border-gold focus:outline-none rounded-xl transition-colors text-white placeholder:text-white/25 mb-1"
+                          />
+                          <p className="text-[9px] text-white/30 text-center mb-4">≤5m²: 10€/m² · ≤10m²: 8€/m² · ≤15m²: 7€/m² · +15m²: sob orçamento</p>
+
+                          <button
+                            disabled={!pendingCarpetArea || isNaN(parseFloat(pendingCarpetArea)) || parseFloat(pendingCarpetArea) <= 0}
+                            onClick={() => {
+                              const area = parseFloat(pendingCarpetArea);
+                              const base = area > 15 ? 0 : calcCarpetPrice(area) ?? 0;
+                              setUpsellItems(prev => [...prev, { id: 'carpet', carpetArea: pendingCarpetArea, price: Math.round(base * 100) / 100, label: `Tapete ${pendingCarpetArea}m²` }]);
+                              setUpsellSubStep('select');
+                            }}
+                            className="w-full h-12 bg-gradient-to-r from-gold to-[#d4c57b] hover:from-[#d4c57b] hover:to-gold text-[#12121e] font-bold rounded-xl disabled:opacity-35 touch-manipulation active:scale-[0.98] transition-all"
+                          >
+                            Adicionar Tapete
+                          </button>
+                        </div>
+                      );
+                    })()}
 
                     {/* Chairs config */}
                     {pendingUpsellId === 'chairs' && (() => {
@@ -2040,10 +2146,10 @@ ${formData.description || 'Sem observações adicionais'}
                           <p className="text-gold text-[10px] font-bold tracking-[0.28em] uppercase mb-1 text-center w-full">ARTIGO EXTRA</p>
                           <h3 className="font-playfair text-xl font-bold text-white text-center mb-1">Cadeiras</h3>
 
-                          {/* Price display — prominent at top */}
+                          {/* Price display, prominent at top */}
                           <div className={cn(
                             "w-full rounded-2xl border px-5 py-4 text-center mb-5 transition-all duration-300",
-                            sobOrç ? "bg-[#252931] border-white/15" : "bg-[#1a2a1a] border-gold/30 shadow-[0_0_20px_rgba(212,175,55,0.10)]"
+                            sobOrç ? "bg-[#1a2a1a] border-white/20" : "bg-[#1a2a1a] border-gold/30 shadow-[0_0_20px_rgba(212,175,55,0.10)]"
                           )}>
                             <p className="text-[10px] text-white/35 uppercase tracking-wider mb-1">Estimativa total</p>
                             <p className={cn("font-playfair text-4xl font-black leading-none mb-1", sobOrç ? "text-white/60 text-2xl" : "text-gold")}>
@@ -2054,7 +2160,7 @@ ${formData.description || 'Sem observações adicionais'}
                             </p>
                           </div>
 
-                          {/* Stepper — big and touch-friendly */}
+                          {/* Stepper, big and touch-friendly */}
                           <p className="text-[10px] text-white/40 uppercase tracking-wider text-center mb-2">Quantidade</p>
                           <div className="flex items-center justify-center gap-6 mb-5">
                             <button
@@ -2069,13 +2175,13 @@ ${formData.description || 'Sem observações adicionais'}
                             >+</button>
                           </div>
 
-                          {/* Waterproofing — only when < 10 chairs */}
+                          {/* Waterproofing, only when < 10 chairs */}
                           {!sobOrç && (
                             <button
                               onClick={() => setPendingWaterproof(w => !w)}
                               className={cn(
                                 "w-full flex items-center gap-3 px-4 py-3 rounded-xl border-2 transition-all touch-manipulation mb-4",
-                                pendingWaterproof ? "border-gold bg-[#252931] shadow-[0_0_10px_rgba(212,175,55,0.15)]" : "border-white/[0.16] bg-[#252931] hover:border-gold/35"
+                                pendingWaterproof ? "border-gold bg-[#1a2a1a] shadow-[0_0_10px_rgba(212,175,55,0.15)]" : "border-gold/20 bg-[#1a2a1a] hover:border-gold/40"
                               )}
                             >
                               <div className={cn("w-5 h-5 rounded-md border-2 flex items-center justify-center flex-shrink-0 transition-all", pendingWaterproof ? "border-gold bg-gold" : "border-white/30")}>
@@ -2114,14 +2220,14 @@ ${formData.description || 'Sem observações adicionais'}
               </div>
             )}
 
-            {/* Order Summary — removed, flow goes directly to contact */}
+            {/* Order Summary, removed, flow goes directly to contact */}
             {false && (
               <div className="flex-1 flex flex-col w-full items-center">
                 <div className="w-full max-w-sm mx-auto">
                   <div className="text-center mb-4">
                   </div>
 
-                  <div className="bg-[#252931] border border-white/[0.16] rounded-2xl overflow-hidden mb-3">
+                  <div className="bg-[#1a2a1a] border border-gold/20 rounded-2xl overflow-hidden mb-3">
                     {/* Main service */}
                     <div className="flex justify-between items-center px-4 py-3 border-b border-white/[0.06]">
                       <div className="flex-1 min-w-0 mr-3">
@@ -2239,8 +2345,9 @@ ${formData.description || 'Sem observações adicionais'}
                     </div>
                     <span className="text-[11px] text-white/40">51 avaliações Google · 5.0</span>
                   </div>
-                  <p className="text-center text-xs text-green-300 bg-[#0a2218] border border-green-500/50 rounded-xl px-3 py-2 mb-5 font-bold shadow-[0_0_10px_rgba(34,197,94,0.10)]">
-                    🔴 4 pessoas pediram orçamento no Porto nas últimas 2 horas
+                  <p className="flex items-center justify-center gap-2 text-center text-xs text-green-300 bg-[#0a2218] border border-green-500/50 rounded-xl px-3 py-2 mb-5 font-bold shadow-[0_0_10px_rgba(34,197,94,0.10)]">
+                    <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse flex-shrink-0" />
+                    Agenda quase cheia, confirme agora para garantir o seu horário
                   </p>
 
                   <div className="flex flex-col gap-4">
@@ -2253,7 +2360,7 @@ ${formData.description || 'Sem observações adicionais'}
                         autoComplete="name"
                         autoCapitalize="words"
                         autoFocus
-                        className="text-base h-13 bg-[#252931] border-white/15 text-white placeholder:text-white/20 focus-visible:ring-gold rounded-xl"
+                        className="text-base h-13 bg-[#1a2a1a] border-gold/25 text-white placeholder:text-white/20 focus-visible:ring-gold rounded-xl"
                       />
                     </div>
                     <div>
@@ -2265,7 +2372,7 @@ ${formData.description || 'Sem observações adicionais'}
                         onChange={(e) => updateFormData({ phone: e.target.value })}
                         autoComplete="tel"
                         inputMode="numeric"
-                        className="text-base h-13 bg-[#252931] border-white/15 text-white placeholder:text-white/20 focus-visible:ring-gold rounded-xl"
+                        className="text-base h-13 bg-[#1a2a1a] border-gold/25 text-white placeholder:text-white/20 focus-visible:ring-gold rounded-xl"
                       />
                     </div>
   </div>
@@ -2279,7 +2386,7 @@ ${formData.description || 'Sem observações adicionais'}
 
     {/* Footer */}
     {currentStep <= totalSteps && !showUpsell && (
-      <div className="px-4 sm:px-5 pb-4 sm:pb-5 pt-3 flex flex-col gap-2 flex-shrink-0 border-t border-white/[0.05] items-center">
+      <div className="px-4 sm:px-5 pt-3 flex flex-col gap-2 flex-shrink-0 border-t border-white/[0.05] items-center" style={{ paddingBottom: 'max(1rem, env(safe-area-inset-bottom))' }}>
         {currentStep === totalSteps ? (
           <div className="flex flex-col gap-2 w-full">
             {totalPrice > 0 && (
@@ -2335,9 +2442,10 @@ ${formData.description || 'Sem observações adicionais'}
     )}
 
     {/* Rotating social proof bar */}
-    <div className="border-t border-orange-500/30 px-4 py-2.5 text-center flex-shrink-0 bg-[#1a0f05]">
+    <div className="border-t border-orange-500/30 px-4 py-2 text-center flex-shrink-0 bg-[#1a0f05] flex items-center justify-center gap-1.5">
+      <span className="w-1.5 h-1.5 rounded-full bg-orange-400 animate-pulse flex-shrink-0" />
       <p className="text-[11px] text-orange-300/90 font-semibold transition-all duration-700">
-        🔥 {socialProofMessages[socialProofIdx]}
+        {socialProofMessages[socialProofIdx]}
       </p>
     </div>
 

@@ -34,6 +34,14 @@ const HERO_MAP: Record<string, string> = {
   "limpeza-sofa-animais-domesticos":            imgAcarosSofa,
   "como-manter-sofa-limpo-entre-limpezas":      imgSofaTecido,
   "impermeabilizacao-tapete-guia":              imgTapetes,
+  "higienizacao-vs-impermeabilizacao-sofa":     imgSofaDesgast,
+  "com-que-frequencia-limpar-sofa":             imgSofaTecido,
+  "sinais-sofa-precisa-limpeza-profissional":   imgManchasVinho,
+  "como-limpar-sofa-microfibra":                imgSofaTecido,
+  "limpeza-sofa-bebe-crianca":                  imgAlergias,
+  "limpeza-colchao-bebe-crianca":               imgAcarosColchao,
+  "o-que-e-extracao-a-vapor-estofos":           imgSofaResultado,
+  "mitos-limpeza-estofos":                      imgSofaDesgast,
 };
 
 const BlogPost = () => {

@@ -1,4 +1,4 @@
-import { Sparkles, Shield, Star, Check } from 'lucide-react';
+﻿import { Sparkles, Shield, Star, Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface ServiceTypeSelectorProps {
@@ -23,6 +23,8 @@ const ServiceTypeSelector = ({
       id: 'cleaning' as const,
       icon: Sparkles,
       title: 'Higienização Profunda',
+      badge: 'MAIS PEDIDO',
+      badgeStyle: 'gold' as const,
       desc: 'Remoção de manchas, odores e ácaros.',
       price: cleaningPrice,
       recommended: false,
@@ -31,6 +33,8 @@ const ServiceTypeSelector = ({
       id: 'waterproofing' as const,
       icon: Shield,
       title: 'Impermeabilização Premium',
+      badge: 'RECOMENDADO',
+      badgeStyle: 'silver' as const,
       desc: waterproofingDesc,
       price: waterproofingPrice,
       recommended: false,
@@ -39,6 +43,8 @@ const ServiceTypeSelector = ({
       id: 'both' as const,
       icon: Star,
       title: 'PACK PROTEÇÃO TOTAL',
+      badge: undefined,
+      badgeStyle: undefined,
       desc: 'Limpeza Profunda + Impermeabilização Premium',
       subdesc: 'A melhor qualidade do mercado com desconto de pack apenas hoje.',
       price: packPrice,
@@ -59,11 +65,11 @@ const ServiceTypeSelector = ({
               "relative w-full flex items-center gap-3.5 px-4 py-3.5 rounded-xl border-2 text-left transition-all duration-200 touch-manipulation active:scale-[0.98]",
               opt.recommended
                 ? isSelected
-                  ? "border-[#D4AF37] shadow-[0_0_28px_rgba(212,175,55,0.30)] bg-[#252931]"
-                  : "border-[#D4AF37]/50 bg-[#252931] hover:border-[#D4AF37]/75 ring-1 ring-gold/20"
+                  ? "border-[#D4AF37] shadow-[0_0_28px_rgba(212,175,55,0.30)] bg-[#1a2a1a]"
+                  : "border-[#D4AF37]/50 bg-[#1a2a1a] hover:border-[#D4AF37]/75 ring-1 ring-gold/20"
                 : isSelected
-                  ? "border-gold bg-[#252931] shadow-[0_0_16px_rgba(212,175,55,0.16)]"
-                  : "border-white/25 bg-[#252931] hover:border-gold/40 hover:bg-[#222833]",
+                  ? "border-gold bg-[#1a2a1a] shadow-[0_0_16px_rgba(212,175,55,0.16)]"
+                  : "border-gold/20 bg-[#1a2a1a] hover:border-gold/45",
               opt.recommended && "mt-2"
             )}
           >
@@ -74,29 +80,36 @@ const ServiceTypeSelector = ({
               </span>
             )}
 
-            {/* Icon */}
-            <div className={cn(
-              "w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 transition-colors",
-              opt.recommended
-                ? isSelected ? "bg-gold/20" : "bg-gold/[0.10]"
-                : isSelected ? "bg-gold/20" : "bg-white/[0.12]"
-            )}>
-              <Icon className={cn(
-                "w-5 h-5",
-                opt.recommended
-                  ? isSelected ? "text-gold" : "text-gold/70"
-                  : isSelected ? "text-gold" : "text-white/40"
-              )} />
-            </div>
+            {/* Icon, only for recommended pack */}
+            {opt.recommended && (
+              <div className={cn(
+                "w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 transition-colors",
+                isSelected ? "bg-gold/20" : "bg-gold/[0.10]"
+              )}>
+                <Icon className={cn("w-5 h-5", isSelected ? "text-gold" : "text-gold/70")} />
+              </div>
+            )}
 
             {/* Text */}
             <div className="flex-1 min-w-0">
-              <p className={cn(
-                "text-sm font-bold leading-snug",
-                isSelected ? "text-white" : opt.recommended ? "text-white/90" : "text-white/80"
-              )}>
-                {opt.title}
-              </p>
+              <div className="flex items-center gap-1.5 flex-wrap">
+                <p className={cn(
+                  "text-sm font-bold leading-snug",
+                  isSelected ? "text-white" : opt.recommended ? "text-white/90" : "text-white/80"
+                )}>
+                  {opt.title}
+                </p>
+                {opt.badge && (
+                  <span className={cn(
+                    "text-[7px] font-black tracking-widest uppercase px-1.5 py-0.5 rounded-full leading-none flex-shrink-0",
+                    opt.badgeStyle === 'gold'
+                      ? "bg-gold/15 text-gold/90"
+                      : "bg-white/10 text-white/50"
+                  )}>
+                    {opt.badge}
+                  </span>
+                )}
+              </div>
               <p className={cn(
                 "text-[11px] mt-0.5 leading-snug",
                 isSelected ? "text-white/65" : "text-white/40"

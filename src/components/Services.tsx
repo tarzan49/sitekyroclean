@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+﻿import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useEffect, useRef, useState, useCallback } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
@@ -75,7 +75,7 @@ const ServiceCard = ({ service, prominence }: CardProps) => {
       }}
       tabIndex={isHero ? 0 : -1}
     >
-      {/* Full-bleed image — mobile version below 768px */}
+      {/* Full-bleed image, mobile version below 768px */}
       <picture className="absolute inset-0 w-full h-full">
         <source media="(max-width: 767px)" srcSet={service.imageM} type="image/webp" />
         <source media="(min-width: 768px)" srcSet={service.image} type="image/webp" />
@@ -88,7 +88,7 @@ const ServiceCard = ({ service, prominence }: CardProps) => {
         />
       </picture>
 
-      {/* Base gradient — warm deep green, no purple tint */}
+      {/* Base gradient, warm deep green, no purple tint */}
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
@@ -96,7 +96,7 @@ const ServiceCard = ({ service, prominence }: CardProps) => {
             "linear-gradient(to top, rgba(4,16,11,0.97) 0%, rgba(4,16,11,0.82) 22%, rgba(4,16,11,0.44) 50%, rgba(4,16,11,0.10) 72%, transparent 100%)",
         }}
       />
-      {/* Hover lift — subtle gold warmth on hover */}
+      {/* Hover lift, subtle gold warmth on hover */}
       <div
         className="absolute inset-0 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-500"
         style={{
@@ -185,7 +185,7 @@ const Services = () => {
     return () => ro.disconnect();
   }, []);
 
-  /* Left-aligned translateX — simple and predictable */
+  /* Left-aligned translateX, simple and predictable */
   const translateX = -(offsetIndex * (cardWidth + GAP));
 
   /* Navigate ±1 */
@@ -198,7 +198,7 @@ const Services = () => {
      onTransitionEnd fires for every CSS transition that ends, INCLUDING
      child elements (scale, opacity, box-shadow). We MUST check that
      the event originates from the track itself AND is the 'transform'
-     property — otherwise the silent jump fires incorrectly.           */
+     property, otherwise the silent jump fires incorrectly.           */
   const handleTransitionEnd = useCallback(
     (e: React.TransitionEvent<HTMLDivElement>) => {
       // Ignore bubbled events from children
@@ -292,7 +292,7 @@ const Services = () => {
         onTouchStart={() => setIsPaused(true)}
         onTouchEnd={()   => setIsPaused(false)}
       >
-        {/* Track — translateX only; NO other transitions here so transitionend is clean */}
+        {/* Track, translateX only; NO other transitions here so transitionend is clean */}
         <div
           className="flex"
           style={{
@@ -333,7 +333,7 @@ const Services = () => {
           onClick={() => navigate(-1)}
           aria-label="Serviço anterior"
           className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 z-10
-                     w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center
+                     w-11 h-11 rounded-full flex items-center justify-center
                      border border-[#D4AF37]/25 text-[#D4AF37]/80
                      hover:border-[#D4AF37]/55 hover:text-[#D4AF37]
                      active:scale-95 transition-all duration-200"
@@ -351,7 +351,7 @@ const Services = () => {
           onClick={() => navigate(1)}
           aria-label="Próximo serviço"
           className="absolute right-3 sm:right-4 top-1/2 -translate-y-1/2 z-10
-                     w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center
+                     w-11 h-11 rounded-full flex items-center justify-center
                      border border-[#D4AF37]/25 text-[#D4AF37]/80
                      hover:border-[#D4AF37]/55 hover:text-[#D4AF37]
                      active:scale-95 transition-all duration-200"

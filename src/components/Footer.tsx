@@ -9,7 +9,7 @@ const Footer = () => {
   const { t } = useTranslation();
 
   return (
-    <footer className="bg-kyro-green text-white pt-6 md:pt-8 pb-24">
+    <footer className="bg-kyro-green text-white pt-6 md:pt-8 pb-24" style={{ paddingBottom: 'max(6rem, calc(6rem + env(safe-area-inset-bottom)))' }}>
       <div className="container mx-auto px-4">
         {/* Logo Section */}
         <div className="text-center mb-4 md:mb-5">
@@ -178,7 +178,7 @@ const Footer = () => {
               </p>
               <Link
                 to="/politica-de-privacidade"
-                className="text-xs text-[#1A1A2E]/55 hover:text-turquoise transition-colors underline underline-offset-2"
+                className="text-xs text-[#1A1A2E]/55 hover:text-turquoise active:text-turquoise transition-colors underline underline-offset-2"
               >
                 Política de Privacidade
               </Link>
