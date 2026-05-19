@@ -21,6 +21,26 @@ const ServiceLocationSchema = ({ serviceName, serviceBaseUrl, placeName, parentP
     "@context": "https://schema.org",
     "@graph": [
       {
+        "@type": "WebPage",
+        "@id": `${fullUrl}#webpage`,
+        "url": fullUrl,
+        "name": `${serviceName} em ${placeName} | Kyro Clean Solutions`,
+        "description": description,
+        "inLanguage": "pt-PT",
+        "isPartOf": { "@id": `${base}/#website` },
+        "publisher": { "@id": `${base}/#business` },
+        "breadcrumb": { "@id": `${fullUrl}#breadcrumb` },
+      },
+      {
+        "@type": "BreadcrumbList",
+        "@id": `${fullUrl}#breadcrumb`,
+        "itemListElement": [
+          { "@type": "ListItem", "position": 1, "name": "Início", "item": base },
+          { "@type": "ListItem", "position": 2, "name": serviceName, "item": `${base}${serviceBaseUrl}` },
+          { "@type": "ListItem", "position": 3, "name": placeName, "item": fullUrl },
+        ],
+      },
+      {
         "@type": ["LocalBusiness", "CleaningService"],
         "@id": `${base}/#business`,
         "name": "Kyro Clean Solutions",
@@ -47,6 +67,7 @@ const ServiceLocationSchema = ({ serviceName, serviceBaseUrl, placeName, parentP
       },
       {
         "@type": "Service",
+        "@id": `${fullUrl}#service`,
         "name": `${serviceName} em ${placeName}`,
         "description": description,
         "url": fullUrl,
@@ -60,14 +81,6 @@ const ServiceLocationSchema = ({ serviceName, serviceBaseUrl, placeName, parentP
           "availability": "https://schema.org/InStock",
           "validFrom": "2025-01-01",
         },
-      },
-      {
-        "@type": "BreadcrumbList",
-        "itemListElement": [
-          { "@type": "ListItem", "position": 1, "name": "Início", "item": base },
-          { "@type": "ListItem", "position": 2, "name": serviceName, "item": `${base}${serviceBaseUrl}` },
-          { "@type": "ListItem", "position": 3, "name": placeName, "item": fullUrl },
-        ],
       },
     ],
   };
