@@ -176,18 +176,46 @@ const routeMeta: Record<string, { pt: PageMeta; en: PageMeta; es: PageMeta }> = 
       description: "Consulte la Política de Privacidad de Kyro Clean Solutions.",
     },
   },
-  "/faq": {
+  "/antes-depois-limpeza": {
     pt: {
-      title: "Perguntas Frequentes | Kyro Clean Solutions",
-      description: "Respostas às perguntas mais comuns sobre os nossos serviços de limpeza e impermeabilização de estofos.",
+      title: "Antes e Depois | Resultados Reais de Limpeza Profissional | Kyro Clean",
+      description: "Veja os resultados reais da limpeza profissional de sofás, colchões, tapetes e cadeiras. Antes e depois de cada serviço. Sem filtros, sem retoques.",
     },
     en: {
-      title: "FAQ | Kyro Clean Solutions",
-      description: "Answers to the most common questions about our upholstery cleaning and waterproofing services.",
+      title: "Before & After | Real Professional Cleaning Results | Kyro Clean",
+      description: "See the real results of professional sofa, mattress, rug and chair cleaning. Before and after each service. No filters, no retouching.",
     },
     es: {
-      title: "Preguntas Frecuentes | Kyro Clean Solutions",
-      description: "Respuestas a las preguntas más comunes sobre nuestros servicios de limpieza e impermeabilización.",
+      title: "Antes y Después | Resultados Reales de Limpieza Profesional | Kyro Clean",
+      description: "Vea los resultados reales de la limpieza profesional de sofás, colchones, alfombras y sillas.",
+    },
+  },
+  "/areas-de-servico": {
+    pt: {
+      title: "Áreas de Serviço | Porto, Lisboa e Todo o País | Kyro Clean Solutions",
+      description: "Serviços de limpeza profissional de estofos disponíveis em todo o país. Porto, Gaia, Matosinhos, Lisboa, Braga e muito mais.",
+    },
+    en: {
+      title: "Service Areas | Porto, Lisbon & Nationwide | Kyro Clean Solutions",
+      description: "Professional upholstery cleaning services available nationwide. Porto, Gaia, Matosinhos, Lisbon, Braga and more.",
+    },
+    es: {
+      title: "Áreas de Servicio | Porto, Lisboa y Todo el País | Kyro Clean Solutions",
+      description: "Servicios de limpieza profesional de tapizados disponibles en todo el país.",
+    },
+  },
+  "/guia-de-packs": {
+    pt: {
+      title: "Guia de Packs de Limpeza | Kyro Clean Solutions",
+      description: "Escolha o pack de limpeza ideal para a sua casa. Packs com desconto para sofá, colchão, tapetes e mais. Orçamento grátis.",
+    },
+    en: {
+      title: "Cleaning Packs Guide | Kyro Clean Solutions",
+      description: "Choose the ideal cleaning pack for your home. Discounted packs for sofa, mattress, rugs and more. Free quote.",
+    },
+    es: {
+      title: "Guía de Packs de Limpieza | Kyro Clean Solutions",
+      description: "Elija el pack de limpieza ideal para su hogar. Packs con descuento para sofá, colchón, alfombras y más.",
     },
   },
   "/testemunhos": {
