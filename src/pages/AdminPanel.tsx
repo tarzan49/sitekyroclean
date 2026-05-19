@@ -185,6 +185,7 @@ const AdminPanel = () => {
           totalStarts: 0, totalCompletes: 0, completionRate: 0,
           avgValue: 0, topService: "—", topCity: "—",
           stepFunnel: [], todayStarts: 0, weekStarts: 0,
+          cityBreakdown: [], pageBreakdown: [], deviceBreakdown: [], sourceBreakdown: [],
         });
         return;
       }
