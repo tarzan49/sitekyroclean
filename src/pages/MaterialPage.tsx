@@ -70,6 +70,12 @@ const MaterialPage = () => {
         : `https://www.cleansolutions.com.pt${pathname}`;
       const canonical = document.querySelector('link[rel="canonical"]');
       if (canonical) canonical.setAttribute("href", canonicalUrl);
+      const ogTitle = document.querySelector('meta[property="og:title"]');
+      if (ogTitle) ogTitle.setAttribute("content", data.title);
+      const ogDesc = document.querySelector('meta[property="og:description"]');
+      if (ogDesc) ogDesc.setAttribute("content", data.metaDescription);
+      const ogUrl = document.querySelector('meta[property="og:url"]');
+      if (ogUrl) ogUrl.setAttribute("content", `https://www.cleansolutions.com.pt${pathname}`);
     }
   }, [pathname, data, isCityVariant, citySlug]);
 
@@ -334,17 +340,78 @@ const MaterialPage = () => {
                   </div>
                 </div>
               )}
+
+              {isCityVariant && (
+                <div>
+                  <h3 className="font-playfair text-lg font-bold text-[#1A1A2E] mb-4 flex items-center gap-2">
+                    <MapPin className="w-5 h-5" style={{ color: "#D4AF37" }} />
+                    Também disponível em
+                  </h3>
+                  <div className="flex flex-wrap gap-2">
+                    {cities.filter(c => c.slug !== citySlug).slice(0, 8).map(city => (
+                      <Link key={city.slug} to={`/${data.slug}-${city.slug}`}
+                        className="inline-flex items-center gap-1.5 bg-white px-3 py-2 rounded-lg text-sm font-medium text-[#1A1A2E] border border-[#E8E4DE] hover:border-[#D4AF37]/35 hover:bg-[#D4AF37]/5 transition-all">
+                        <MapPin className="w-3 h-3" style={{ color: "#D4AF37" }} />
+                        {city.name}
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </section>
 
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({
           "@context": "https://schema.org",
-          "@type": "WebPage",
-          "name": data.title,
-          "description": data.metaDescription,
-          "url": `https://www.cleansolutions.com.pt${pathname}`,
-          "publisher": { "@id": "https://www.cleansolutions.com.pt/#business" },
+          "@graph": [
+            {
+              "@type": "WebPage",
+              "@id": `https://www.cleansolutions.com.pt${pathname}#webpage`,
+              "url": `https://www.cleansolutions.com.pt${pathname}`,
+              "name": data.title,
+              "description": data.metaDescription,
+              "inLanguage": "pt-PT",
+              "isPartOf": { "@id": "https://www.cleansolutions.com.pt/#website" },
+              "publisher": { "@id": "https://www.cleansolutions.com.pt/#business" },
+              "breadcrumb": { "@id": `https://www.cleansolutions.com.pt${pathname}#breadcrumb` },
+            },
+            {
+              "@type": "BreadcrumbList",
+              "@id": `https://www.cleansolutions.com.pt${pathname}#breadcrumb`,
+              "itemListElement": [
+                { "@type": "ListItem", "position": 1, "name": "Início", "item": "https://www.cleansolutions.com.pt" },
+                { "@type": "ListItem", "position": 2, "name": data.serviceName, "item": `https://www.cleansolutions.com.pt/${data.serviceSlug}` },
+                { "@type": "ListItem", "position": 3, "name": data.name, "item": `https://www.cleansolutions.com.pt/${data.slug}` },
+                ...(isCityVariant && cityName ? [{ "@type": "ListItem", "position": 4, "name": cityName, "item": `https://www.cleansolutions.com.pt${pathname}` }] : []),
+              ],
+            },
+            {
+              "@type": "Service",
+              "@id": `https://www.cleansolutions.com.pt${pathname}#service`,
+              "name": data.title,
+              "description": data.metaDescription,
+              "url": `https://www.cleansolutions.com.pt${pathname}`,
+              "provider": { "@id": "https://www.cleansolutions.com.pt/#business" },
+              "areaServed": isCityVariant && cityName
+                ? { "@type": "City", "name": cityName }
+                : [
+                    { "@type": "City", "name": "Porto" },
+                    { "@type": "City", "name": "Matosinhos" },
+                    { "@type": "City", "name": "Maia" },
+                    { "@type": "City", "name": "Vila Nova de Gaia" },
+                    { "@type": "City", "name": "Gondomar" },
+                    { "@type": "City", "name": "Braga" },
+                    { "@type": "City", "name": "Lisboa" },
+                  ],
+              "offers": {
+                "@type": "Offer",
+                "priceCurrency": "EUR",
+                "price": servicePrice.replace(/[^0-9]/g, ""),
+                "availability": "https://schema.org/InStock",
+              },
+            },
+          ],
         }) }} />
       </main>
       <Footer />

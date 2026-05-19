@@ -19,6 +19,16 @@ const Packs = () => {
 
   return (
     <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({
+        "@context": "https://schema.org",
+        "@type": "WebPage",
+        "@id": "https://www.cleansolutions.com.pt/packs#webpage",
+        "url": "https://www.cleansolutions.com.pt/packs",
+        "name": "Packs de Limpeza com Desconto | Kyro Clean Solutions",
+        "inLanguage": "pt-PT",
+        "isPartOf": { "@id": "https://www.cleansolutions.com.pt/#website" },
+        "publisher": { "@id": "https://www.cleansolutions.com.pt/#business" },
+      }) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumb) }} />
       <Header />
       <main>

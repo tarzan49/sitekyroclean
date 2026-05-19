@@ -195,6 +195,16 @@ const FAQEstofos = () => {
 
   return (
     <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({
+        "@context": "https://schema.org",
+        "@type": "WebPage",
+        "@id": `${PAGE_URL}#webpage`,
+        "url": PAGE_URL,
+        "name": "Perguntas Frequentes: Limpeza de Estofos, Tapetes e Alcatifas | Kyro Clean Solutions",
+        "inLanguage": "pt-PT",
+        "isPartOf": { "@id": "https://www.cleansolutions.com.pt/#website" },
+        "publisher": { "@id": "https://www.cleansolutions.com.pt/#business" },
+      }) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
 

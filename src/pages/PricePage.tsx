@@ -269,42 +269,54 @@ const PricePage = () => {
           </div>
         </section>
 
-        {/* WebPage + Service + Offer with PriceSpecification schema */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
             __html: JSON.stringify({
               "@context": "https://schema.org",
-              "@type": "WebPage",
-              "name": data.title,
-              "description": data.metaDescription,
-              "url": `https://www.cleansolutions.com.pt${pathname}`,
-            }),
-          }}
-        />
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              "@context": "https://schema.org",
-              "@type": "Service",
-              "name": `${data.serviceName} em ${data.cityName}`,
-              "description": data.metaDescription,
-              "url": `https://www.cleansolutions.com.pt${pathname}`,
-              "provider": { "@id": "https://www.cleansolutions.com.pt/#business" },
-              "areaServed": { "@type": "City", "name": data.cityName },
-              "offers": {
-                "@type": "Offer",
-                "availability": "https://schema.org/InStock",
-                "areaServed": { "@type": "City", "name": data.cityName },
-                "priceSpecification": {
-                  "@type": "PriceSpecification",
-                  "minPrice": data.priceTable[0]?.price.replace(/[^0-9]/g, "") ?? "15",
-                  "maxPrice": data.priceTable[data.priceTable.length - 1]?.price.replace(/[^0-9]/g, "") ?? "80",
-                  "priceCurrency": "EUR",
-                  "description": `Preço de ${data.serviceName} em ${data.cityName}, IVA incluído`,
+              "@graph": [
+                {
+                  "@type": "WebPage",
+                  "@id": `https://www.cleansolutions.com.pt${pathname}#webpage`,
+                  "url": `https://www.cleansolutions.com.pt${pathname}`,
+                  "name": data.title,
+                  "description": data.metaDescription,
+                  "inLanguage": "pt-PT",
+                  "isPartOf": { "@id": "https://www.cleansolutions.com.pt/#website" },
+                  "publisher": { "@id": "https://www.cleansolutions.com.pt/#business" },
+                  "breadcrumb": { "@id": `https://www.cleansolutions.com.pt${pathname}#breadcrumb` },
                 },
-              },
+                {
+                  "@type": "BreadcrumbList",
+                  "@id": `https://www.cleansolutions.com.pt${pathname}#breadcrumb`,
+                  "itemListElement": [
+                    { "@type": "ListItem", "position": 1, "name": "Início", "item": "https://www.cleansolutions.com.pt" },
+                    { "@type": "ListItem", "position": 2, "name": data.serviceName, "item": `https://www.cleansolutions.com.pt/${data.serviceSlug}` },
+                    { "@type": "ListItem", "position": 3, "name": `Preços em ${data.cityName}`, "item": `https://www.cleansolutions.com.pt${pathname}` },
+                  ],
+                },
+                {
+                  "@type": "Service",
+                  "@id": `https://www.cleansolutions.com.pt${pathname}#service`,
+                  "name": `${data.serviceName} em ${data.cityName}`,
+                  "description": data.metaDescription,
+                  "url": `https://www.cleansolutions.com.pt${pathname}`,
+                  "provider": { "@id": "https://www.cleansolutions.com.pt/#business" },
+                  "areaServed": { "@type": "City", "name": data.cityName },
+                  "offers": {
+                    "@type": "Offer",
+                    "availability": "https://schema.org/InStock",
+                    "areaServed": { "@type": "City", "name": data.cityName },
+                    "priceSpecification": {
+                      "@type": "PriceSpecification",
+                      "minPrice": data.priceTable[0]?.price.replace(/[^0-9]/g, "") ?? "15",
+                      "maxPrice": data.priceTable[data.priceTable.length - 1]?.price.replace(/[^0-9]/g, "") ?? "80",
+                      "priceCurrency": "EUR",
+                      "description": `Preço de ${data.serviceName} em ${data.cityName}, IVA incluído`,
+                    },
+                  },
+                },
+              ],
             }),
           }}
         />
