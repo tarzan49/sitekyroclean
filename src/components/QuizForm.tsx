@@ -2188,7 +2188,7 @@ ${formData.description || 'Sem observações adicionais'}
                         value={formData.phone}
                         onChange={(e) => updateFormData({ phone: e.target.value })}
                         autoComplete="tel"
-                        inputMode="tel"
+                        inputMode="numeric"
                         className="text-base h-13 bg-[#252931] border-white/15 text-white placeholder:text-white/20 focus-visible:ring-gold rounded-xl"
                       />
                     </div>
