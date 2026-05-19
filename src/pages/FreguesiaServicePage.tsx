@@ -210,7 +210,7 @@ const FreguesiaServicePage = () => {
                 </div>
 
                 <div className="flex flex-wrap items-center gap-3">
-                  <QuizButton />
+                  <QuizButton initialLocation={data.municipio} />
                   <a
                     href="https://wa.me/351925530647"
                     target="_blank"

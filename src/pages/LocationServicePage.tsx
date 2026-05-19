@@ -266,7 +266,7 @@ const LocationServicePage = () => {
                 </div>
 
                 <div className="flex flex-wrap gap-3">
-                  <QuizButton />
+                  <QuizButton initialLocation={data.city} />
                   <a
                     href="https://wa.me/351925530647"
                     target="_blank"
@@ -517,7 +517,7 @@ const LocationServicePage = () => {
                     <p className="text-xs font-bold uppercase tracking-widest mb-0.5" style={{ color: "#D4AF37" }}>Garantia Kyro Clean</p>
                     <p className="text-sm text-white/80 font-medium">Resultado garantido ou devolvemos o dinheiro.</p>
                   </div>
-                  <QuizButton />
+                  <QuizButton initialLocation={data.city} />
                 </div>
               </div>
             </div>

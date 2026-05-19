@@ -6,9 +6,10 @@ interface QuizButtonProps {
   className?: string;
   problema?: string;
   ctaLabel?: string;
+  initialLocation?: string;
 }
 
-const QuizButton = ({ className = '', problema, ctaLabel }: QuizButtonProps) => {
+const QuizButton = ({ className = '', problema, ctaLabel, initialLocation }: QuizButtonProps) => {
   const { t } = useTranslation();
   const [isQuizOpen, setIsQuizOpen] = useState(false);
 
@@ -41,7 +42,7 @@ const QuizButton = ({ className = '', problema, ctaLabel }: QuizButtonProps) => 
         </button>
       </div>
 
-      <QuizForm isOpen={isQuizOpen} onClose={() => setIsQuizOpen(false)} problema={problema} />
+      <QuizForm isOpen={isQuizOpen} onClose={() => setIsQuizOpen(false)} problema={problema} initialLocation={initialLocation} />
     </>
   );
 };
