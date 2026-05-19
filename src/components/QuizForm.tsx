@@ -14,7 +14,6 @@ import ConfettiGold from './quiz/ConfettiGold';
 import {
   QuizStep1Service,
   ServiceTypeSelector,
-  QuizStepCalendar,
   QuizFormData,
   initialFormData,
   sofaPrices,
@@ -152,7 +151,7 @@ const QuizForm = ({ isOpen, onClose, initialLocation, problema }: QuizFormProps)
     location: initialLocation || '',
   }));
 
-  const totalSteps = 5;
+  const totalSteps = 4;
 
   // ── KEYBOARD-AWARE CARD HEIGHT ─────────────────────────────────────────────
   // Only adjusts the card max-height so it fits above the keyboard.
@@ -494,7 +493,7 @@ const QuizForm = ({ isOpen, onClose, initialLocation, problema }: QuizFormProps)
   const needsLocationStep = !initialLocation;
   const firstStep = needsLocationStep ? 0 : 1;
 
-  // Step order: [0-Location?], 1-Service, 2-ServiceType, 3-Config, [Upsell], 4-Contact, 5-Calendar
+  // Step order: [0-Location?], 1-Service, 2-ServiceType, 3-Config, [Upsell], 4-Contact (submit)
   const canProceed = () => {
     switch (currentStep) {
       case 0: return formData.location !== '' && formData.location !== 'other';
@@ -502,7 +501,6 @@ const QuizForm = ({ isOpen, onClose, initialLocation, problema }: QuizFormProps)
       case 2: return formData.serviceType !== '';
       case 3: return canProceedStep3();
       case 4: return formData.name.trim() !== '' && formData.phone.trim() !== '';
-      case 5: return formData.selectedSlot !== '';
       default: return false;
     }
   };
@@ -664,8 +662,6 @@ const QuizForm = ({ isOpen, onClose, initialLocation, problema }: QuizFormProps)
       ? `${packDiscountedPrice}€ (IVA incl., ${packPctLabel})`
       : totalPrice > 0 ? `${totalPrice}€ (IVA incl.)` : 'Sob orçamento';
     
-    const slotLabel = formatSelectedSlot(formData.selectedSlot);
-
     const message = `
 [QUIZ RÁPIDO - Kyro Clean Solutions]
 
@@ -675,7 +671,6 @@ Detalhes: ${detailsSummary}
 Localização: ${finalLocation}
 Deslocação: ${isFreeTravel ? 'Grátis (pedido >150€)' : `${finalTravelCost}€`}
 VALOR TOTAL (IVA incl.): ${priceText}
-Vaga escolhida: ${slotLabel}
 Contacto preferido: WhatsApp
 
 Observações:
@@ -687,7 +682,6 @@ ${formData.description || 'Sem observações adicionais'}
       const formPayload = new FormData();
       formPayload.append('name', formData.name);
       formPayload.append('phone', formData.phone);
-      if (formData.email.trim()) formPayload.append('email', formData.email);
       formPayload.append('location', finalLocation);
       formPayload.append('message', message);
       formPayload.append('subject', `Pedido de orçamento - ${serviceLabel}`);
@@ -728,13 +722,11 @@ ${formData.description || 'Sem observações adicionais'}
         await supabase.from('leads').insert({
           name: formData.name,
           phone: formData.phone,
-          email: formData.email || null,
           service: crmServiceLabel,
           service_type: serviceTypeLabel,
           details: detailsSummary,
           location: finalLocation,
           value: priceText,
-          slot: formatSelectedSlot(formData.selectedSlot),
           booking_id: bookingId,
           message: message,
           status: 'pending',
@@ -748,13 +740,6 @@ ${formData.description || 'Sem observações adicionais'}
       sessionStorage.setItem('kyro_booking_id', bookingId);
 
       // Build WA URL for optional support button on Obrigado page
-      const [slotDay, slotTime] = (() => {
-        if (!formData.selectedSlot) return ['', ''];
-        const [dIdx, tIdx] = formData.selectedSlot.split('-').map(Number);
-        const d = new Date(); d.setDate(d.getDate() + dIdx);
-        const times = ['09:00', '14:00', '17:00'];
-        return [`${d.getDate()}/${d.getMonth() + 1}/${d.getFullYear()}`, times[tIdx] ?? ''];
-      })();
       const finalPriceText = packDiscountActive && totalPrice > 0
         ? `${packDiscountedPrice}€ (Pack -${Math.round(packDiscountPct * 100)}%)`
         : discountedPrice > 0
@@ -779,7 +764,6 @@ ${formData.description || 'Sem observações adicionais'}
         `▸ Extras: ${waExtrasText}\n` +
         `▸ Localização: ${finalLocation}\n` +
         `▸ Valor Total: ${waTotalPrice}\n` +
-        `▸ Vaga Pretendida: ${slotDay} às ${slotTime}\n` +
         `▸ Código de Reserva: #${bookingId}\n\n` +
         `Aguardo contacto para validação final.`
       );
@@ -847,7 +831,6 @@ ${formData.description || 'Sem observações adicionais'}
         price: finalPriceText,
         service: `${serviceLabel}${serviceTypeLabel ? `: ${serviceTypeLabel}` : ''}`,
         location: finalLocation,
-        email: formData.email,
       }));
 
       resetForm();
@@ -860,7 +843,6 @@ ${formData.description || 'Sem observações adicionais'}
         `Olá! Tentei pedir orçamento pelo site mas houve um erro.\n\n` +
         `Nome: ${formData.name}\n` +
         `Tel: ${formData.phone}\n` +
-        (formData.email ? `Email: ${formData.email}\n` : '') +
         `Serviço: ${serviceLabel} - ${serviceTypeLabel}\n` +
         `Detalhes: ${detailsSummary}\n` +
         `Local: ${finalLocation}\n` +
@@ -1260,14 +1242,14 @@ ${formData.description || 'Sem observações adicionais'}
           </button>
         </div>
 
-        {/* Urgency bar — no pack info on calendar step, hidden in landscape */}
+        {/* Urgency bar — hidden in landscape */}
         <div className={cn(
           "text-white text-xs font-semibold px-4 py-1.5 flex items-center justify-between flex-shrink-0 transition-all duration-500 landscape:hidden landscape:sm:flex",
-          packDiscountActive && currentStep !== 5
+          packDiscountActive
             ? timerFlash ? "bg-gold/25" : "bg-gold/12"
             : countdown === 0 ? "bg-white/[0.09]" : countdown < 120 ? "bg-red-900/50" : "bg-amber-900/35"
         )}>
-          {packDiscountActive && currentStep !== 5 ? (
+          {packDiscountActive ? (
             <>
               <span className="flex items-center gap-1.5">
                 <Check className={cn("w-4 h-4 flex-shrink-0 text-gold", timerFlash && "animate-bounce")} />
@@ -1321,10 +1303,10 @@ ${formData.description || 'Sem observações adicionais'}
         >
 
           {/* Animated price ticker
-              — hidden: step 2 (treatment selector, sem qtds), step 5 (calendar)
+              — hidden: step 2 (treatment selector, sem qtds)
               — visível: step 3 (quantidades) e step 4 (contacto) quando totalPrice > 0
               — também visível em step 1 quando há custo de deslocação */}
-          {(totalPrice > 0 || hasSobOrcamento) && (showUpsell || finalTravelCost > 0 || (currentStep !== 1 && currentStep !== 2 && currentStep !== 5)) && (
+          {(totalPrice > 0 || hasSobOrcamento) && (showUpsell || finalTravelCost > 0 || (currentStep !== 1 && currentStep !== 2)) && (
             <div className="sticky top-0 z-20 text-white flex items-center justify-between py-3 border-b border-white/[0.16] -mx-5 sm:-mx-6 px-5 sm:px-6 animate-fade-in" style={{ background: "#071a12" }}>
               <span className="text-xs text-white/40 font-medium">
                 {calculateServicePrice === 0 && finalTravelCost > 0
@@ -1578,18 +1560,6 @@ ${formData.description || 'Sem observações adicionais'}
                 {renderStep2()}
               </div>
             )}
-
-            {/* Step 5 - Calendar */}
-            {currentStep === 5 && !showUpsell && (
-              <div className="w-full flex flex-col items-center">
-                <QuizStepCalendar
-                  selectedSlot={formData.selectedSlot}
-                  onSelect={(slot) => updateFormData({ selectedSlot: slot })}
-                  cityName={formData.location || 'Porto'}
-                />
-              </div>
-            )}
-
 
             {/* Upsell Step — multi-item pack with sub-step config */}
             {showUpsell && (
