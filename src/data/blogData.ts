@@ -1449,6 +1449,192 @@ const posts: BlogPost[] = [
       "o-que-e-extracao-a-vapor-estofos",
     ],
   },
+
+  {
+    slug: "limpeza-sofa-couro",
+    title: "Limpeza de sofá de couro: guia completo e preços 2025",
+    metaTitle: "Limpeza Sofá de Couro: Guia e Preços 2025 | Kyro Clean",
+    metaDescription: "Como limpar sofá de couro em casa e quando chamar um profissional. Produtos certos, técnicas seguras e preços reais para couro, pele e couro sintético.",
+    publishDate: "2026-05-20",
+    updatedDate: "2026-05-20",
+    author: "Equipa Kyro Clean",
+    readingTime: 7,
+    category: "Dicas",
+    heroAlt: "Sofá de couro castanho a ser limpo com produto especializado",
+    intro: "O sofá de couro é elegante e durável, mas exige cuidados específicos que muitos proprietários desconhecem. Usar o produto errado pode secar, rachar ou descolorir o couro de forma irreversível. Este guia mostra-te o que podes fazer em casa e quando é indispensável chamar um profissional.",
+    sections: [
+      {
+        heading: "Couro genuíno, pele sintética ou couro reconstituído: qual o teu?",
+        body: "Antes de qualquer limpeza, identifica o material:\n\n**Couro genuíno (full grain / top grain)**: tem marcas naturais, textura irregular e fica mais macio com o tempo. Absorve produtos e precisa de hidratação regular.\n\n**Couro reconstituído (bonded leather)**: feito de resíduos de couro colados. Parece couro genuíno mas descasca passados 3 a 5 anos. Muito comum em sofás de preço médio.\n\n**Couro sintético (PU / faux leather)**: completamente artificial. Mais resistente à humidade mas pode rachar com produtos incorretos.\n\nPara distinguir: o couro genuíno aquece ao toque; o sintético permanece frio. O genuíno tem odor característico; o sintético cheira a plástico.",
+        tip: "Verifica a etiqueta por baixo do assento. Geralmente indica o material e o código de limpeza (S, W, WS ou X).",
+      },
+      {
+        heading: "Limpeza de manutenção: o que podes fazer em casa",
+        body: "Para manutenção regular do sofá de couro:\n\n1. **Aspira semanalmente** com bocal suave para remover pó e partículas que riscam o couro.\n2. **Limpa com pano de microfibra húmido** (água morna, sem detergente) para sujidade ligeira.\n3. **Aplica creme hidratante de couro** a cada 3 a 6 meses para evitar que seque e rache. Marcas como Leather Master ou Collonil são de referência.\n4. **Remove manchas frescas** imediatamente com pano absorvente seco, sem esfregar.\n\nO que nunca deves usar: produtos à base de álcool, acetona, lixívia, vinagre ou detergentes domésticos comuns. Todos estes destroem o tratamento superficial do couro.",
+      },
+      {
+        heading: "Manchas difíceis: vinho, gordura, tinta e urina",
+        body: "**Vinho e sumos**: absorve o excesso imediatamente com pano seco. Aplica produto de limpeza de couro com pH neutro. Nunca sal nem água com vinagre.\n\n**Gordura (pizza, manteiga)**: bicarbonato de sódio seco deixado 20 minutos absorve parte da gordura. Depois, limpeza com produto neutro específico para couro.\n\n**Tinta de esferográfica**: um produto específico de remoção de tinta para couro é a única opção segura. Produtos caseiros (acetona, álcool) mancharão permanentemente.\n\n**Urina (animais ou crianças)**: absorve imediatamente. Trata com produto enzimático especial para couro. O ácido úrico da urina dissolve o tratamento superficial do couro se não for tratado rapidamente.\n\nNota importante: manchas com mais de 24 horas em couro genuíno raramente saem completamente com limpeza doméstica.",
+        tip: "Para manchas de tinta em couro, testa sempre o produto numa zona oculta antes de aplicar na área visível.",
+      },
+      {
+        heading: "Quando chamar um profissional: sinais que não deves ignorar",
+        body: "Algumas situações exigem tratamento profissional:\n\n**Descoloração generalizada**: o couro perde a pigmentação com o tempo e exposição solar. Um profissional pode repigmentar e restaurar a cor original.\n\n**Couro seco e com rachas**: fissuras profundas podem ser tratadas com reparação de couro profissional antes que se agravem.\n\n**Manchas persistentes**: manchas de gordura antiga, tinta ou urina que não respondem ao tratamento doméstico.\n\n**Odor persistente**: odores a animal ou humidade que penetraram nas camadas do couro.\n\nO custo de uma limpeza profissional de sofá de couro (entre 60€ e 100€) é muito inferior ao custo de substituição do sofá (tipicamente 800€ a 3000€).",
+      },
+      {
+        heading: "Preços de limpeza profissional de sofá de couro em Portugal",
+        body: "Os preços da Kyro Clean para sofás de couro seguem a mesma tabela que para outros materiais:\n\n- Sofá de 1 lugar: a partir de 49€\n- Sofá de 2 lugares: a partir de 69€\n- Sofá de 3 lugares: a partir de 79€\n- Chaise longue: +10€\n\nO processo para couro inclui: limpeza com produto de pH neutro específico para couro, condicionamento das fibras, hidratação e proteção. Não usamos extração a vapor em couro genuíno, o calor e a humidade excessiva danificam o material.",
+      },
+    ],
+    faq: [
+      {
+        q: "Posso usar vinagre para limpar sofá de couro?",
+        a: "Não. O vinagre tem pH ácido que danifica o tratamento superficial do couro genuíno, causando descoloração e ressecamento. Usa sempre produtos com pH neutro formulados especificamente para couro.",
+      },
+      {
+        q: "O meu sofá de couro está a descascar, podem reparar?",
+        a: "Se o sofá é de couro genuíno, um profissional pode restaurar a superfície. Se for couro reconstituído (bonded leather), o descasque é estrutural e irreversível, a substituição do revestimento é a única solução.",
+      },
+      {
+        q: "Com que frequência devo limpar o sofá de couro profissionalmente?",
+        a: "Recomendamos limpeza profissional anual para manutenção e hidratação do couro. Em casas com animais de estimação ou crianças, a cada 6 meses.",
+      },
+      {
+        q: "A limpeza profissional danifica o couro?",
+        a: "Não, desde que o profissional use produtos e técnicas adequadas ao tipo de couro. Na Kyro Clean identificamos sempre o material antes de começar e adaptamos o processo.",
+      },
+    ],
+    relatedService: { label: "Ver preços de limpeza de sofás", href: "/limpeza-sofas" },
+    relatedPosts: [
+      "quanto-custa-limpar-sofa-profissional",
+      "sinais-sofa-precisa-limpeza-profissional",
+      "impermeabilizacao-sofa-vale-pena",
+    ],
+  },
+
+  {
+    slug: "como-tirar-manchas-urina-colchao",
+    title: "Como tirar manchas de urina do colchão: guia passo a passo",
+    metaTitle: "Como Tirar Manchas de Urina do Colchão | Guia 2025",
+    metaDescription: "Guia passo a passo para remover manchas e odor de urina do colchão em casa. Soluções para manchas frescas, secas e antigas. Quando é necessária limpeza profissional.",
+    publishDate: "2026-05-20",
+    updatedDate: "2026-05-20",
+    author: "Equipa Kyro Clean",
+    readingTime: 6,
+    category: "Dicas",
+    heroAlt: "Colchão a ser tratado com produto enzimático para remoção de manchas",
+    intro: "Acidentes acontecem, seja com crianças em fase de controlo de esfíncteres, com idosos, ou com animais de estimação. A urina no colchão é uma das situações mais urgentes porque o ácido úrico penetra nas fibras rapidamente e o odor torna-se persistente se não for tratado corretamente. Este guia mostra o que fazer.",
+    sections: [
+      {
+        heading: "Porque é tão difícil remover urina do colchão",
+        body: "A urina tem três componentes problemáticos:\n\n**Ureia**: dissolve-se facilmente em água mas deixa manchas amareladas quando seca.\n\n**Ácido úrico**: cria cristais insolúveis nas fibras que libertam odor quando expostos à humidade (por isso o cheiro volta nos dias húmidos mesmo depois de limpar).\n\n**Bactérias**: proliferam nos nutrientes da urina, agravando o odor ao longo do tempo.\n\nOs produtos de limpeza domésticos comuns eliminam a mancha visível mas não destroem os cristais de ácido úrico. Só os **produtos enzimáticos** (que contêm enzimas proteolíticas e uricolíticas) quebram estes cristais definitivamente.",
+        tip: "Se o colchão ainda cheira após limpeza doméstica, é sinal de que os cristais de ácido úrico não foram eliminados. Só tratamento enzimático resolve.",
+      },
+      {
+        heading: "Mancha fresca: age nos primeiros 30 minutos",
+        body: "Se apanhares a mancha fresca, tens uma grande vantagem. Faz isto por ordem:\n\n1. **Absorve** o máximo de líquido com toalhas absorventes brancas. Pressiona firmemente, nunca esfregues.\n2. **Repete** com toalhas secas até não sair mais líquido.\n3. **Mistura** na solução: 240ml de água fria + 3 colheres de sopa de bicarbonato de sódio + 1 colher de sopa de detergente de loiça líquido.\n4. **Aplica** a mistura na área afetada com esponja, em movimentos do exterior para o interior.\n5. **Deixa atuar** 10 minutos.\n6. **Absorve** a humidade com toalhas secas e pressão.\n7. **Polvilha** bicarbonato de sódio seco sobre a área e deixa 8 horas ou toda a noite para neutralizar o odor.\n8. **Aspira** o bicarbonato.\n\nEste método funciona bem para manchas completamente frescas sem penetração profunda.",
+      },
+      {
+        heading: "Mancha seca ou antiga: o que realmente funciona",
+        body: "Para manchas secas, os produtos domésticos são insuficientes. O que podes tentar:\n\n**Produto enzimático de supermercado** (Anti-Olor Bac, Bio Kleen, etc.): aplica generosamente, cobre com película aderente para manter húmido durante 8 horas. Aspira depois. Funciona para manchas com menos de 1 semana.\n\n**Peróxido de hidrogénio a 3%**: mistura com uma gota de detergente de loiça e aplica na mancha. Tem efeito branqueador que pode clarear manchas amareladas. Atenção: pode clarificar tecidos coloridos.\n\n**Manchas com mais de 2 semanas**: os cristais de ácido úrico estão completamente solidificados nas fibras. A limpeza profissional com equipamento de extração a quente e produtos enzimáticos concentrados é a única solução eficaz.",
+        tip: "Nunca uses água quente em manchas de urina. O calor fixa as proteínas e os cristais de ácido úrico nas fibras, tornando a remoção permanente impossível.",
+      },
+      {
+        heading: "Eliminar o odor definitivamente",
+        body: "O odor é frequentemente o problema principal, mesmo depois da mancha visual desaparecer.\n\nO bicarbonato de sódio é o melhor aliado doméstico para neutralizar odores: polvilha generosamente, deixa 12 horas e aspira.\n\nO vinagre branco (pH ácido) pode ajudar no odor mas não elimina os cristais de ácido úrico.\n\nO que nunca funciona permanentemente: perfumes, ambientadores ou produtos que mascaram o odor. Em dias de humidade o cheiro volta porque os cristais ficam ativados pela humidade.\n\n**A única solução definitiva** para odor persistente é um tratamento enzimático profissional com extração. O equipamento de extração profissional injeta o produto a pressão nas fibras e aspira os resíduos, incluindo os cristais dissolvidos.",
+      },
+      {
+        heading: "Preços de limpeza profissional de colchão",
+        body: "A Kyro Clean trata colchões com urina com um processo de 2 etapas: aplicação de produto enzimático concentrado seguida de extração a quente.\n\nPreços:\n- Colchão solteiro: a partir de 49€\n- Colchão de casal: a partir de 59€\n- King size / queen size: a partir de 69€\n\nO colchão fica seco em 2 a 4 horas. Recomendamos sempre impermeabilização após a limpeza para prevenir futuras infiltrações.",
+      },
+    ],
+    faq: [
+      {
+        q: "O colchão com mancha de urina pode ser salvo?",
+        a: "Na maioria dos casos sim. Manchas frescas têm taxa de remoção superior a 95%. Manchas antigas com mais de 1 mês são mais difíceis mas geralmente removíveis com tratamento enzimático profissional.",
+      },
+      {
+        q: "Porque volta o cheiro de urina quando o colchão fica húmido?",
+        a: "Os cristais de ácido úrico na urina reativam-se com a humidade, libertando odor. Produtos domésticos eliminam a mancha visível mas não destroem estes cristais. Só um produto enzimático específico os elimina definitivamente.",
+      },
+      {
+        q: "Quanto tempo depois da limpeza posso usar o colchão?",
+        a: "Após limpeza profissional, o colchão fica utilizável em 2 a 4 horas com ventilação adequada.",
+      },
+      {
+        q: "Vale a pena impermeabilizar o colchão após a limpeza?",
+        a: "Altamente recomendado, especialmente em quartos de crianças ou idosos. A impermeabilização cria uma barreira que impede a penetração de líquidos nas fibras, facilitando enormemente a limpeza de acidentes futuros.",
+      },
+    ],
+    relatedService: { label: "Ver preços de limpeza de colchões", href: "/limpeza-colchoes" },
+    relatedPosts: [
+      "quanto-custa-limpar-colchao-profissional",
+      "limpeza-colchao-bebe-crianca",
+      "impermeabilizacao-tapete-guia",
+    ],
+  },
+
+  {
+    slug: "quanto-custa-limpar-alcatifa",
+    title: "Quanto custa limpar uma alcatifa profissionalmente? Preços 2025",
+    metaTitle: "Preço Limpeza de Alcatifa 2025 | Guia Completo | Kyro Clean",
+    metaDescription: "Preços reais de limpeza profissional de alcatifas em Portugal: por m², por divisão e por tipo. O que está incluído, tempo de secagem e como pedir orçamento.",
+    publishDate: "2026-05-20",
+    updatedDate: "2026-05-20",
+    author: "Equipa Kyro Clean",
+    readingTime: 5,
+    category: "Preços",
+    heroAlt: "Técnico a limpar alcatifa de escritório com máquina de extração profissional",
+    intro: "A alcatifa é um dos revestimentos mais difíceis de manter limpa porque acumula pó, ácaros, gordura e partículas em profundidade que a aspiração regular não remove. A limpeza profissional por extração é a única forma de higienizar verdadeiramente. Mas quanto custa? Aqui encontras os preços reais e o que tens de saber antes de pedir orçamento.",
+    sections: [
+      {
+        heading: "Preços por metro quadrado em Portugal (2025)",
+        body: "A limpeza profissional de alcatifas é calculada por área. Os preços da Kyro Clean:\n\n- Até 20m²: 7€ a 10€ por m² (dependendo do estado)\n- De 20m² a 50m²: 6€ a 8€ por m²\n- Mais de 50m² (escritórios, comércio): orçamento personalizado com desconto de volume\n\n**Exemplos práticos:**\n- Sala com alcatifa de 15m²: 105€ a 150€\n- T2 completo com alcatifa (40m²): 240€ a 320€\n- Escritório de 80m²: orçamento personalizado (geralmente abaixo de 5€/m²)\n\nA deslocação está incluída para a área do Porto. Para outros concelhos aplica-se uma taxa de deslocação.",
+        tip: "Mede a área antes de pedir orçamento: comprimento × largura de cada divisão com alcatifa. Inclui zonas sob mobiliário que também são limpas.",
+      },
+      {
+        heading: "O que está incluído no preço",
+        body: "Uma limpeza profissional de alcatifa completa inclui:\n\n**Pré-aspiração**: remoção de partículas soltas, pelos e pó antes da limpeza húmida.\n\n**Pré-tratamento de manchas**: identificação e tratamento individual das manchas mais resistentes com produtos específicos.\n\n**Extração a quente**: injeção de água a alta temperatura com agente de limpeza nas fibras, seguida de aspiração imediata da água suja. Remove sujidade, ácaros e bactérias.\n\n**Bactericida e desodorizante**: aplicação de produto que elimina microrganismos e neutraliza odores.\n\n**Resultado final**: alcatifa higienizada, sem cheiro e seca em 2 a 6 horas dependendo da espessura.",
+      },
+      {
+        heading: "Fatores que influenciam o preço",
+        body: "Além da área, outros fatores afetam o custo final:\n\n**Estado de sujidade**: alcatifas com gordura acumulada, bolor ou manchas antigas requerem pré-tratamentos adicionais que aumentam o tempo de trabalho.\n\n**Tipo de fibra**: alcatifas de lã natural exigem produtos e técnicas específicos. Fibras sintéticas (nylon, polipropileno) toleram processo padrão.\n\n**Acesso e mobiliário**: alcatifas em divisões com muito mobiliário que não pode ser movido têm áreas menos acessíveis.\n\n**Frequência**: clientes com limpeza regular semestral ou anual beneficiam de preços mais baixos porque o estado de sujidade é menor.\n\n**Localização**: taxas de deslocação adicionais fora do Porto.",
+      },
+      {
+        heading: "Alcatifa de escritório: diferenças face à residencial",
+        body: "As alcatifas de escritório têm características específicas:\n\n- **Área maior** (tipicamente 50 a 500m²) com preços unitários mais baixos\n- **Uso mais intenso** com mais passagem e sujidade de sapatos\n- **Manchas de café** e comida mais frequentes\n- **Necessidade de minimizar tempo de inatividade**: limpeza geralmente feita ao fim de semana ou fora do horário de trabalho\n\nPara escritórios, a Kyro Clean oferece contratos de manutenção semestral com desconto. O custo de manutenção regular é significativamente inferior ao de uma limpeza de recuperação em alcatifas muito deterioradas.\n\nLimpeza de alcatifa de escritório é também dedutível fiscalmente como despesa de manutenção das instalações.",
+        tip: "Alcatifas de escritório devem ser limpas no mínimo uma vez por ano. Em zonas de entrada e corredores, a cada 6 meses.",
+      },
+      {
+        heading: "Tapete vs alcatifa: qual a diferença para efeitos de preço?",
+        body: "A distinção é importante para o orçamento:\n\n**Tapete**: peça solta com dimensões definidas, colocada sobre o pavimento. Pode ser movido, sacudido e tratado individualmente.\n\n**Alcatifa**: revestimento de piso fixo ou semi-fixo que cobre toda ou parte de uma divisão.\n\nOs preços são calculados por m² em ambos os casos, mas o processo de limpeza difere:\n- Tapetes são tratados ao local com possibilidade de movimentação\n- Alcatifas são sempre limpas no local, sem remoção\n\nPara tapetes pequenos (até 2m²), a Kyro Clean tem preços mínimos de 25€ por peça.",
+      },
+    ],
+    faq: [
+      {
+        q: "Quanto tempo seca uma alcatifa após limpeza profissional?",
+        a: "Entre 2 a 6 horas dependendo da espessura da alcatifa, temperatura ambiente e ventilação. Alcatifas finas de escritório secam em 2 horas; alcatifas espessas residenciais podem demorar 4 a 6 horas.",
+      },
+      {
+        q: "Podem limpar a alcatifa sem tirar os móveis?",
+        a: "Sim. Limpamos à volta do mobiliário e sob peças que possam ser ligeiramente movidas. Peças pesadas como estantes ficam no lugar. O resultado é igualmente eficaz nas áreas acessíveis.",
+      },
+      {
+        q: "A limpeza profissional encolhe a alcatifa?",
+        a: "Não, quando realizada por profissionais com equipamento adequado. O risco de encolhimento existe apenas com lã natural tratada com excesso de água fria. O equipamento de extração a quente controla a quantidade de humidade.",
+      },
+      {
+        q: "Vale a pena limpar uma alcatifa muito velha?",
+        a: "Depende do estado das fibras. Se as fibras estiverem desgastadas e achatadas, a limpeza não restaura a textura mas elimina sujidade e ácaros. Se estiver apenas suja, sim, vale definitivamente a pena limpar.",
+      },
+    ],
+    relatedService: { label: "Ver preços de limpeza de alcatifas", href: "/limpeza-alcatifas" },
+    relatedPosts: [
+      "limpeza-tapetes-profissional-guia-completo",
+      "limpeza-alcatifa-escritorio",
+      "guia-acaros-em-casa",
+    ],
+  },
 ];
 
 export function getAllPosts(): BlogPost[] {

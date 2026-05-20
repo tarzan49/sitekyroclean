@@ -41,6 +41,9 @@ const HERO_MAP: Record<string, string> = {
   "limpeza-colchao-bebe-crianca":               imgAcarosColchao,
   "o-que-e-extracao-a-vapor-estofos":           imgSofaResultado,
   "mitos-limpeza-estofos":                      imgSofaDesgast,
+  "limpeza-sofa-couro":                         imgSofaDesgast,
+  "como-tirar-manchas-urina-colchao":           imgAcarosColchao,
+  "quanto-custa-limpar-alcatifa":               imgTapetes,
 };
 
 const posts = getAllPosts();
