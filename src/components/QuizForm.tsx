@@ -186,38 +186,27 @@ const QuizForm = ({ isOpen, onClose, initialLocation, problema }: QuizFormProps)
     };
   }, []);
 
-  // ── KEYBOARD-AWARE CARD HEIGHT ─────────────────────────────────────────────
-  // Shrinks the card to the visual viewport height when the iOS keyboard opens.
-  // Also compensates for vv.offsetTop (iOS sometimes shifts the visual viewport
-  // vertically when keyboard opens, even with body scroll locked).
+  // ── KEYBOARD-AWARE SCROLL PADDING ─────────────────────────────────────────
+  // When iOS keyboard opens, adds padding-bottom to the scroll container so
+  // inputs can be scrolled above the keyboard. The card stays full-height
+  // (no height shrinking) to avoid transparent gaps showing the hero behind.
   useEffect(() => {
     const vv = window.visualViewport;
     if (!vv) return;
     const onResize = () => {
-      const card = quizCardRef.current;
-      if (!card) return;
+      const sc = scrollContainerRef.current;
+      if (!sc) return;
       const isMobile = window.innerWidth < 640;
-      if (!isMobile) {
-        card.style.height = '';
-        card.style.transform = '';
-        return;
-      }
-      const kbVisible = vv.height < window.innerHeight * 0.85;
-      if (kbVisible) {
-        card.style.height = `${vv.height}px`;
-        card.style.transform = vv.offsetTop > 1 ? `translateY(${Math.round(vv.offsetTop)}px)` : '';
-      } else {
-        card.style.height = '';
-        card.style.transform = '';
-      }
+      if (!isMobile) { sc.style.paddingBottom = ''; return; }
+      const kbHeight = window.innerHeight - vv.height - vv.offsetTop;
+      sc.style.paddingBottom = kbHeight > 50 ? `${kbHeight}px` : '';
     };
     vv.addEventListener('resize', onResize);
     vv.addEventListener('scroll', onResize);
     return () => {
       vv.removeEventListener('resize', onResize);
       vv.removeEventListener('scroll', onResize);
-      const card = quizCardRef.current;
-      if (card) { card.style.height = ''; card.style.transform = ''; }
+      if (scrollContainerRef.current) scrollContainerRef.current.style.paddingBottom = '';
     };
   }, []);
 
