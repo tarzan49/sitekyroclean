@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+﻿import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { ChevronDown, ChevronRight, MessageCircle, Phone, Star } from "lucide-react";
 import Header from "@/components/Header";
@@ -37,7 +37,7 @@ const allFaqs: FAQ[] = [
   {
     id: "manchas-vinho-sangue-gordura",
     question: "Conseguem tirar manchas de vinho, sangue e gordura?",
-    answer: <>Sim. A taxa de remoção da Kyro Clean é <strong>superior a 95% para manchas de vinho tinto, sangue, café, gordura e urina</strong> quando o tratamento é feito dentro de 6 meses após a mancha. Usamos pré-tratamento enzimático específico por tipo: enzimas proteolíticas para sangue, enzimas lipolíticas para gordura, oxidantes controlados para vinho. Manchas antigas com mais de 1 ano oxidam nas fibras e a taxa de remoção desce para 60% a 80% — ainda assim, o resultado é sempre significativamente melhor que o estado inicial. Para casos duvidosos, envie uma foto via <a href="https://wa.me/351925530647" target="_blank" rel="noopener noreferrer" className="text-gold hover:underline font-medium">WhatsApp (925 530 647)</a> e damos uma estimativa honesta antes de agendar.</>,
+    answer: <>Sim. A taxa de remoção da Kyro Clean é <strong>superior a 95% para manchas de vinho tinto, sangue, café, gordura e urina</strong> quando o tratamento é feito dentro de 6 meses após a mancha. Usamos pré-tratamento enzimático específico por tipo: enzimas proteolíticas para sangue, enzimas lipolíticas para gordura, oxidantes controlados para vinho. Manchas antigas com mais de 1 ano oxidam nas fibras e a taxa de remoção desce para 60% a 80%, ainda assim, o resultado é sempre significativamente melhor que o estado inicial. Para casos duvidosos, envie uma foto via <a href="https://wa.me/351925530647" target="_blank" rel="noopener noreferrer" className="text-gold hover:underline font-medium">WhatsApp (925 530 647)</a> e damos uma estimativa honesta antes de agendar.</>,
     plainAnswer: "Taxa de remoção superior a 95% para manchas de vinho, sangue, café, gordura e urina tratadas até 6 meses. Pré-tratamento enzimático específico por tipo de mancha. Manchas com mais de 1 ano: 60% a 80% de remoção.",
   },
   {
@@ -55,7 +55,7 @@ const allFaqs: FAQ[] = [
   {
     id: "frequencia-limpeza-sofa",
     question: "Com que frequência devo limpar o meu sofá?",
-    answer: <>A recomendação profissional baseada em estudos de microbiologia doméstica: <strong>1 vez por ano</strong> em casas sem animais e sem crianças; <strong>2 vezes por ano</strong> com animais de estimação ou crianças até 6 anos; <strong>a cada 6 meses</strong> para pessoas com alergias, rinite ou asma (os ácaros atingem concentração problemática em 3 meses de uso normal). Sofás de uso comercial intensivo devem ser tratados a cada 3 meses. A <Link to="/impermeabilizacao" className="text-gold hover:underline font-medium">impermeabilização</Link> após cada limpeza alonga o intervalo seguro entre serviços ao criar uma barreira invisível que impede a penetração de líquidos e sujidade nas fibras — reduzindo a frequência necessária de limpeza profunda.</>,
+    answer: <>A recomendação profissional baseada em estudos de microbiologia doméstica: <strong>1 vez por ano</strong> em casas sem animais e sem crianças; <strong>2 vezes por ano</strong> com animais de estimação ou crianças até 6 anos; <strong>a cada 6 meses</strong> para pessoas com alergias, rinite ou asma (os ácaros atingem concentração problemática em 3 meses de uso normal). Sofás de uso comercial intensivo devem ser tratados a cada 3 meses. A <Link to="/impermeabilizacao" className="text-gold hover:underline font-medium">impermeabilização</Link> após cada limpeza alonga o intervalo seguro entre serviços ao criar uma barreira invisível que impede a penetração de líquidos e sujidade nas fibras, reduzindo a frequência necessária de limpeza profunda.</>,
     plainAnswer: "1 vez/ano: casas sem animais/crianças. 2 vezes/ano: com animais ou crianças. A cada 6 meses: alergias/asma. Cada 3 meses: uso comercial. A impermeabilização após limpeza alonga o intervalo entre serviços.",
   },
   {
@@ -114,23 +114,37 @@ const allFaqs: FAQ[] = [
   },
 ];
 
-const faqSchema = {
+const combinedSchema = {
   "@context": "https://schema.org",
-  "@type": "FAQPage",
-  mainEntity: allFaqs.map((f) => ({
-    "@type": "Question",
-    name: f.question,
-    acceptedAnswer: { "@type": "Answer", text: f.plainAnswer },
-  })),
-};
-
-const breadcrumbSchema = {
-  "@context": "https://schema.org",
-  "@type": "BreadcrumbList",
-  itemListElement: [
-    { "@type": "ListItem", position: 1, name: "Início", item: DOMAIN },
-    { "@type": "ListItem", position: 2, name: "Recursos", item: `${DOMAIN}/blog` },
-    { "@type": "ListItem", position: 3, name: "Perguntas Frequentes", item: PAGE_URL },
+  "@graph": [
+    {
+      "@type": "WebPage",
+      "@id": `${PAGE_URL}#webpage`,
+      "url": PAGE_URL,
+      "name": "Perguntas Frequentes: Limpeza de Estofos, Tapetes e Alcatifas | Kyro Clean Solutions",
+      "inLanguage": "pt-PT",
+      "isPartOf": { "@id": `${DOMAIN}/#website` },
+      "publisher": { "@id": `${DOMAIN}/#business` },
+      "breadcrumb": { "@id": `${PAGE_URL}#breadcrumb` },
+    },
+    {
+      "@type": "FAQPage",
+      "@id": `${PAGE_URL}#faqpage`,
+      "mainEntity": allFaqs.map((f) => ({
+        "@type": "Question",
+        "name": f.question,
+        "acceptedAnswer": { "@type": "Answer", "text": f.plainAnswer },
+      })),
+    },
+    {
+      "@type": "BreadcrumbList",
+      "@id": `${PAGE_URL}#breadcrumb`,
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Início", "item": DOMAIN },
+        { "@type": "ListItem", "position": 2, "name": "Recursos", "item": `${DOMAIN}/blog` },
+        { "@type": "ListItem", "position": 3, "name": "Perguntas Frequentes", "item": PAGE_URL },
+      ],
+    },
   ],
 };
 
@@ -195,18 +209,7 @@ const FAQEstofos = () => {
 
   return (
     <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({
-        "@context": "https://schema.org",
-        "@type": "WebPage",
-        "@id": `${PAGE_URL}#webpage`,
-        "url": PAGE_URL,
-        "name": "Perguntas Frequentes: Limpeza de Estofos, Tapetes e Alcatifas | Kyro Clean Solutions",
-        "inLanguage": "pt-PT",
-        "isPartOf": { "@id": "https://www.cleansolutions.com.pt/#website" },
-        "publisher": { "@id": "https://www.cleansolutions.com.pt/#business" },
-      }) }} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(combinedSchema) }} />
 
       <div className="min-h-screen bg-[#FDFDF9]">
         <Header />
@@ -242,7 +245,7 @@ const FAQEstofos = () => {
               ))}
             </div>
 
-            {/* Sticky sidebar — desktop only */}
+            {/* Sticky sidebar, desktop only */}
             <aside className="hidden lg:flex flex-col gap-4 w-64 flex-shrink-0 sticky top-24">
 
               {/* CTA card */}
@@ -306,7 +309,7 @@ const FAQEstofos = () => {
             </aside>
           </div>
 
-          {/* Mobile CTA — below FAQ list */}
+          {/* Mobile CTA, below FAQ list */}
           <div className="lg:hidden mt-8 bg-kyro-green rounded-2xl p-6 text-center">
             <p className="font-playfair text-white font-bold text-lg mb-1">Orçamento gratuito</p>
             <p className="text-white/50 text-sm mb-5">30 segundos · Sem compromisso</p>

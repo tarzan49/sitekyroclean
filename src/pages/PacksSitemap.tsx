@@ -12,20 +12,10 @@ const PACK_COLORS: Record<string, string> = {
 };
 
 const PacksSitemap = () => {
-  const breadcrumb = {
+  const schema = {
     "@context": "https://schema.org",
-    "@type": "BreadcrumbList",
-    itemListElement: [
-      { "@type": "ListItem", position: 1, name: "Início", item: "https://www.cleansolutions.com.pt/" },
-      { "@type": "ListItem", position: 2, name: "Packs", item: "https://www.cleansolutions.com.pt/packs" },
-      { "@type": "ListItem", position: 3, name: "Guia de Packs", item: "https://www.cleansolutions.com.pt/guia-de-packs" },
-    ],
-  };
-
-  return (
-    <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({
-        "@context": "https://schema.org",
+    "@graph": [
+      {
         "@type": "WebPage",
         "@id": "https://www.cleansolutions.com.pt/guia-de-packs#webpage",
         "url": "https://www.cleansolutions.com.pt/guia-de-packs",
@@ -33,8 +23,23 @@ const PacksSitemap = () => {
         "inLanguage": "pt-PT",
         "isPartOf": { "@id": "https://www.cleansolutions.com.pt/#website" },
         "publisher": { "@id": "https://www.cleansolutions.com.pt/#business" },
-      }) }} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumb) }} />
+        "breadcrumb": { "@id": "https://www.cleansolutions.com.pt/guia-de-packs#breadcrumb" },
+      },
+      {
+        "@type": "BreadcrumbList",
+        "@id": "https://www.cleansolutions.com.pt/guia-de-packs#breadcrumb",
+        "itemListElement": [
+          { "@type": "ListItem", "position": 1, "name": "Início", "item": "https://www.cleansolutions.com.pt/" },
+          { "@type": "ListItem", "position": 2, "name": "Packs", "item": "https://www.cleansolutions.com.pt/packs" },
+          { "@type": "ListItem", "position": 3, "name": "Guia de Packs", "item": "https://www.cleansolutions.com.pt/guia-de-packs" },
+        ],
+      },
+    ],
+  };
+
+  return (
+    <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }} />
       <Header />
       <main>
 
