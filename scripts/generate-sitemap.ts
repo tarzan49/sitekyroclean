@@ -9,7 +9,7 @@
 import fs from 'fs';
 import path from 'path';
 
-const BASE_URL = 'https://cleansolutions.com.pt';
+const BASE_URL = 'https://www.cleansolutions.com.pt';
 const TODAY = new Date().toISOString().split('T')[0];
 
 // ─── Data (mirrors src/data/) ────────────────────────────────────
@@ -301,6 +301,17 @@ export function generateSitemaps(outDir: string) {
     'limpeza-sofa-animais-domesticos',
     'como-manter-sofa-limpo-entre-limpezas',
     'impermeabilizacao-tapete-guia',
+    'higienizacao-vs-impermeabilizacao-sofa',
+    'com-que-frequencia-limpar-sofa',
+    'sinais-sofa-precisa-limpeza-profissional',
+    'como-limpar-sofa-microfibra',
+    'limpeza-sofa-bebe-crianca',
+    'limpeza-colchao-bebe-crianca',
+    'o-que-e-extracao-a-vapor-estofos',
+    'mitos-limpeza-estofos',
+    'limpeza-sofa-couro',
+    'como-tirar-manchas-urina-colchao',
+    'quanto-custa-limpar-alcatifa',
   ];
   const resourceUrls: string[] = [
     xmlUrl('/perguntas-frequentes-limpeza-estofos', 'monthly', '0.8'),
