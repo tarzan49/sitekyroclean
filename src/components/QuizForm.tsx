@@ -188,6 +188,8 @@ const QuizForm = ({ isOpen, onClose, initialLocation, problema }: QuizFormProps)
 
   // ── KEYBOARD-AWARE CARD HEIGHT ─────────────────────────────────────────────
   // Shrinks the card to the visual viewport height when the iOS keyboard opens.
+  // Also compensates for vv.offsetTop (iOS sometimes shifts the visual viewport
+  // vertically when keyboard opens, even with body scroll locked).
   useEffect(() => {
     const vv = window.visualViewport;
     if (!vv) return;
@@ -195,16 +197,27 @@ const QuizForm = ({ isOpen, onClose, initialLocation, problema }: QuizFormProps)
       const card = quizCardRef.current;
       if (!card) return;
       const isMobile = window.innerWidth < 640;
-      if (!isMobile) { card.style.height = ''; return; }
+      if (!isMobile) {
+        card.style.height = '';
+        card.style.transform = '';
+        return;
+      }
       const kbVisible = vv.height < window.innerHeight * 0.85;
-      card.style.height = kbVisible ? `${vv.height}px` : '';
+      if (kbVisible) {
+        card.style.height = `${vv.height}px`;
+        card.style.transform = vv.offsetTop > 1 ? `translateY(${Math.round(vv.offsetTop)}px)` : '';
+      } else {
+        card.style.height = '';
+        card.style.transform = '';
+      }
     };
     vv.addEventListener('resize', onResize);
     vv.addEventListener('scroll', onResize);
     return () => {
       vv.removeEventListener('resize', onResize);
       vv.removeEventListener('scroll', onResize);
-      if (quizCardRef.current) quizCardRef.current.style.height = '';
+      const card = quizCardRef.current;
+      if (card) { card.style.height = ''; card.style.transform = ''; }
     };
   }, []);
 
@@ -1281,7 +1294,7 @@ ${formData.description || 'Sem observações adicionais'}
       <div
         ref={quizCardRef}
         className={cn(
-          "relative w-full sm:max-w-lg sm:rounded-2xl shadow-[0_8px_60px_rgba(0,0,0,0.6),inset_0_1px_0_rgba(255,255,255,0.07)] sm:border border-white/[0.18] overflow-hidden animate-scale-in flex flex-col gpu-accelerated bg-checker-modal",
+          "relative w-full sm:max-w-lg sm:rounded-2xl shadow-[0_8px_60px_rgba(0,0,0,0.6),inset_0_1px_0_rgba(255,255,255,0.07)] sm:border border-white/[0.18] overflow-hidden animate-scale-in flex flex-col sm:gpu-accelerated bg-checker-modal",
           "h-full sm:h-auto sm:max-h-[92dvh]"
         )}>
 
