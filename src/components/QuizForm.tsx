@@ -1388,9 +1388,9 @@ ${formData.description || 'Sem observações adicionais'}
                 {totalPrice > 0 && (
                   <span className="text-xl font-bold tabular-nums" style={{ color: '#D4AF37' }}>
                     {packDiscountActive
-                      ? `${Math.round(displayPrice * (1 - packDiscountPct))}€`
+                      ? `${Math.round((displayPrice - finalTravelCost) * (1 - packDiscountPct) + finalTravelCost)}€`
                       : isDiscountActive
-                        ? `${Math.round(displayPrice * 0.95)}€`
+                        ? `${Math.round((displayPrice - finalTravelCost) * 0.95 + finalTravelCost)}€`
                         : `${Math.round(displayPrice)}€`}
                   </span>
                 )}
@@ -1427,33 +1427,75 @@ ${formData.description || 'Sem observações adicionais'}
                 style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%', textAlign: 'center' }}
                 className="flex-1"
               >
-                {/* Title hidden while searching — frees space so input + results fit above keyboard */}
+                {/* Compact title — hidden while searching to free space for results */}
                 {!locationQuery && (
                   <>
-                    <p className="text-gold text-[10px] font-bold tracking-[0.28em] uppercase mb-2">LOCALIZAÇÃO</p>
-                    <h2 className="font-playfair text-xl sm:text-2xl font-bold text-white mb-1 leading-[1.3]">
+                    <p className="text-gold text-[10px] font-bold tracking-[0.28em] uppercase mb-1">LOCALIZAÇÃO</p>
+                    <h2 className="font-playfair text-lg sm:text-2xl font-bold text-white mb-1 leading-tight">
                       Onde está localizado?
                     </h2>
-                    <p className="text-xs text-white/35 mb-3">
-                      Para calcular deslocação e disponibilidade da equipa.
+                    <p className="text-[11px] text-white/35 mb-3">
+                      Para calcular deslocação e disponibilidade.
                     </p>
                   </>
                 )}
 
                 {!formData.location && (
-                  <div className="w-full max-w-sm">
-                    {/* Search input — always at TOP so scrollTop=0 always shows it */}
-                    <div className="relative mb-3">
+                  <div className="w-full max-w-sm flex flex-col gap-2.5">
+
+                    {/* MOBILE: city cards first, search below.
+                        DESKTOP (sm+): search first, city cards below. */}
+
+                    {/* City cards — order-first on mobile, order-last on desktop */}
+                    {!locationQuery && (
+                      <div className="flex flex-col gap-2 order-first sm:order-last">
+                        {[
+                          { city: 'Porto',  img: '/cities/porto.webp'  },
+                          { city: 'Lisboa', img: '/cities/lisboa.webp' },
+                          { city: 'Braga',  img: '/cities/braga.webp'  },
+                        ].map(({ city, img }) => {
+                          const isSelected = formData.location === city;
+                          return (
+                            <button
+                              key={city}
+                              onClick={() => {
+                                updateFormData({ location: city });
+                                setLocationQuery(city);
+                                setLocationFadeIn(true);
+                                setCurrentStep(1);
+                              }}
+                              className={cn(
+                                "relative w-full h-[64px] sm:h-[72px] rounded-2xl overflow-hidden transition-all duration-200 touch-manipulation active:scale-[0.98]",
+                                isSelected
+                                  ? "ring-4 ring-gold shadow-[0_0_24px_rgba(212,175,55,0.45)]"
+                                  : "hover:ring-2 hover:ring-gold/40 shadow-[0_2px_12px_rgba(0,0,0,0.4)]"
+                              )}
+                            >
+                              <img src={img} alt={city} className="absolute inset-0 w-full h-full object-cover" />
+                              <div className="absolute inset-0 bg-black/55" />
+                              <div className="relative z-10 flex flex-col items-center justify-center h-full gap-0.5">
+                                <span className="font-playfair text-xl font-bold text-white drop-shadow-md">{city}</span>
+                                <span className="text-xs text-white/80 drop-shadow-sm">
+                                  {locationPrices[city] === 0 ? 'Deslocação incluída' : `+${locationPrices[city]}€ deslocação`}
+                                </span>
+                              </div>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    )}
+
+                    {/* Search input — order-last on mobile (below cards), order-first on desktop */}
+                    <div className="relative order-last sm:order-first">
                       <MapPin className="absolute left-3.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-white/30 pointer-events-none" />
                       <input
                         ref={locationInputRef}
                         type="text"
-                        placeholder="Pesquisar cidade..."
+                        placeholder="Pesquisar outra cidade..."
                         value={locationQuery}
                         onChange={(e) => {
                           setLocationQuery(e.target.value);
                           setLocationFadeIn(false);
-                          // Reset scroll after results render so input + first results are always visible
                           setTimeout(() => {
                             if (scrollContainerRef.current) scrollContainerRef.current.scrollTop = 0;
                           }, 30);
@@ -1467,12 +1509,12 @@ ${formData.description || 'Sem observações adicionais'}
                         }}
                         autoComplete="off"
                         inputMode="search"
-                        className="w-full h-12 pl-9 pr-4 text-base bg-white/[0.06] border border-white/15 focus:border-gold focus:outline-none rounded-xl transition-colors text-white placeholder:text-white/30"
+                        className="w-full h-11 pl-9 pr-4 text-sm bg-white/[0.05] border border-white/[0.12] focus:border-gold focus:outline-none rounded-xl transition-colors text-white placeholder:text-white/30"
                       />
                     </div>
 
-                    {/* Search results — inline below input, replacing city cards */}
-                    {locationQuery.length >= 1 ? (() => {
+                    {/* Search results — shown instead of city cards while typing */}
+                    {locationQuery.length >= 1 && (() => {
                       const q = locationQuery.toLowerCase();
                       const matches = Object.keys(locationPrices).filter(c => c.toLowerCase().includes(q)).slice(0, 6);
                       return matches.length > 0 ? (
@@ -1500,44 +1542,7 @@ ${formData.description || 'Sem observações adicionais'}
                           Cidade não encontrada. Tente "Porto", "Braga", "Maia"...
                         </p>
                       );
-                    })() : (
-                      /* City cards — only when not searching */
-                      <div className="flex flex-col gap-2">
-                        {[
-                          { city: 'Porto',  img: '/cities/porto.webp'  },
-                          { city: 'Lisboa', img: '/cities/lisboa.webp' },
-                          { city: 'Braga',  img: '/cities/braga.webp'  },
-                        ].map(({ city, img }) => {
-                          const isSelected = formData.location === city;
-                          return (
-                            <button
-                              key={city}
-                              onClick={() => {
-                                updateFormData({ location: city });
-                                setLocationQuery(city);
-                                setLocationFadeIn(true);
-                                setCurrentStep(1);
-                              }}
-                              className={cn(
-                                "relative w-full h-[72px] rounded-2xl overflow-hidden transition-all duration-200 touch-manipulation active:scale-[0.98]",
-                                isSelected
-                                  ? "ring-4 ring-gold shadow-[0_0_24px_rgba(212,175,55,0.45)]"
-                                  : "hover:ring-2 hover:ring-gold/40 shadow-[0_2px_12px_rgba(0,0,0,0.4)]"
-                              )}
-                            >
-                              <img src={img} alt={city} className="absolute inset-0 w-full h-full object-cover" />
-                              <div className="absolute inset-0 bg-black/55" />
-                              <div className="relative z-10 flex flex-col items-center justify-center h-full gap-0.5">
-                                <span className="font-playfair text-xl font-bold text-white drop-shadow-md">{city}</span>
-                                <span className="text-xs text-white/80 drop-shadow-sm">
-                                  {locationPrices[city] === 0 ? 'Deslocação incluída' : `+${locationPrices[city]}€ deslocação`}
-                                </span>
-                              </div>
-                            </button>
-                          );
-                        })}
-                      </div>
-                    )}
+                    })()}
                   </div>
                 )}
               </div>
