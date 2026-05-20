@@ -21,15 +21,17 @@ const ServiceSchema = ({ serviceName, description, url, priceFrom, imageUrl, bre
   const fullUrl = `${BASE_URL}${url}`;
   const priceNumeric = priceFrom.replace(/[^0-9]/g, '') || "39";
 
-  const reviewNodes = (reviews ?? []).map((r, i) => ({
+  // Reviews inline (no @id, no itemReviewed — context is the Service node itself)
+  const reviewNodes = (reviews ?? []).map((r) => ({
     "@type": "Review",
-    "@id": `${fullUrl}#review-${i + 1}`,
     "reviewRating": { "@type": "Rating", "ratingValue": "5", "bestRating": "5", "worstRating": "1" },
     "author": { "@type": "Person", "name": r.author, "address": { "@type": "PostalAddress", "addressLocality": r.city, "addressCountry": "PT" } },
     "reviewBody": r.text,
     "datePublished": r.date,
-    "itemReviewed": { "@id": `${fullUrl}#service` },
   }));
+
+  const hasReviews = reviewNodes.length > 0;
+  const avgRating = "5.0";
 
   const schema = {
     "@context": "https://schema.org",
@@ -104,11 +106,18 @@ const ServiceSchema = ({ serviceName, description, url, priceFrom, imageUrl, bre
           "availability": "https://schema.org/InStock",
           "validFrom": "2025-01-01",
         },
-        ...(reviewNodes.length > 0 && {
-          "review": reviewNodes.map(r => ({ "@id": r["@id"] })),
+        ...(hasReviews && {
+          "aggregateRating": {
+            "@type": "AggregateRating",
+            "ratingValue": avgRating,
+            "bestRating": "5",
+            "worstRating": "1",
+            "reviewCount": String(reviewNodes.length),
+            "ratingCount": String(reviewNodes.length),
+          },
+          "review": reviewNodes,
         }),
       },
-      ...reviewNodes,
     ],
   };
 
