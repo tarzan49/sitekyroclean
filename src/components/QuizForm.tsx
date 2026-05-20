@@ -2347,8 +2347,8 @@ ${formData.description || 'Sem observações adicionais'}
       </div>
     </div>
 
-    {/* Footer */}
-    {currentStep <= totalSteps && !showUpsell && (
+    {/* Footer — hidden on step 0 (auto-advances on city selection) */}
+    {currentStep <= totalSteps && !showUpsell && currentStep > 0 && (
       <div className="px-4 sm:px-5 pt-3 flex flex-col gap-2 flex-shrink-0 border-t border-white/[0.05] items-center" style={{ paddingBottom: 'max(1rem, env(safe-area-inset-bottom))' }}>
         {currentStep === totalSteps ? (
           <div className="flex flex-col gap-2 w-full">
@@ -2376,27 +2376,28 @@ ${formData.description || 'Sem observações adicionais'}
             </button>
           </div>
         ) : (
+          /* Steps 1–2 auto-advance on card tap — only show Voltar (subtle).
+             Step 3+ needs Continuar (steppers / area input require explicit confirm). */
           <div className="flex items-center justify-center gap-4 w-full">
             {currentStep > firstStep && (
               <button
                 onClick={handlePrev}
-                className="h-12 px-6 min-w-[120px] flex-shrink-0 bg-transparent border border-white/[0.15] text-white/60 hover:text-white/90 hover:border-white/30 active:bg-transparent active:scale-[0.98] touch-manipulation rounded-xl flex items-center justify-center transition-all"
+                className="h-10 px-5 flex-shrink-0 bg-transparent border border-white/[0.12] text-white/45 hover:text-white/75 hover:border-white/25 active:bg-transparent active:scale-[0.98] touch-manipulation rounded-xl flex items-center justify-center transition-all text-sm"
               >
-                <ChevronLeft className="w-4 h-4 mr-1" />
+                <ChevronLeft className="w-3.5 h-3.5 mr-1" />
                 Voltar
               </button>
             )}
-            <Button
-              onClick={handleNext}
-              disabled={!canProceed()}
-              className={cn(
-                "h-12 bg-gradient-to-r from-gold to-[#d4c57b] hover:from-[#d4c57b] hover:to-gold text-[#12121e] font-bold touch-manipulation active:scale-[0.98] disabled:opacity-35 rounded-xl shadow-[0_4px_28px_rgba(212,175,55,0.40)] hover:shadow-[0_4px_36px_rgba(212,175,55,0.55)] transition-shadow flex-shrink-0",
-                currentStep > firstStep ? "px-8 min-w-[150px]" : "w-full max-w-[280px]"
-              )}
-            >
-              Continuar
-              <ChevronRight className="w-4 h-4 ml-1" />
-            </Button>
+            {currentStep >= 3 && (
+              <Button
+                onClick={handleNext}
+                disabled={!canProceed()}
+                className="h-12 px-8 min-w-[150px] flex-shrink-0 bg-gradient-to-r from-gold to-[#d4c57b] hover:from-[#d4c57b] hover:to-gold text-[#12121e] font-bold touch-manipulation active:scale-[0.98] disabled:opacity-35 rounded-xl shadow-[0_4px_28px_rgba(212,175,55,0.40)] transition-shadow"
+              >
+                Continuar
+                <ChevronRight className="w-4 h-4 ml-1" />
+              </Button>
+            )}
           </div>
         )}
       </div>
