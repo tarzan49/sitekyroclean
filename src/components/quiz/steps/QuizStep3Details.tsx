@@ -1,4 +1,4 @@
-/**
+﻿/**
  * QuizStep3Details.tsx
  * Step 3 of the Kyro quiz: service-specific quantity/detail configuration.
  * Handles Sofá, Colchão, Tapete, and Cadeiras variants.
@@ -349,7 +349,7 @@ const QuizStep3Details = ({
                 </div>
               </div>
             ) : (
-              <p className="text-[10px] font-bold text-white/60 uppercase tracking-wider text-center py-0.5 flex items-center justify-center gap-1"><Mail className="w-3.5 h-3.5" />+15 m² — orçamento personalizado</p>
+              <p className="text-[10px] font-bold text-white/60 uppercase tracking-wider text-center py-0.5 flex items-center justify-center gap-1"><Mail className="w-3.5 h-3.5" />+15 m², orçamento personalizado</p>
             )}
           </div>
         )}

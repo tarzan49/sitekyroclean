@@ -1,4 +1,4 @@
-import { useMemo, useEffect } from "react";
+﻿import { useMemo, useEffect } from "react";
 import { useLocation, Link } from "react-router-dom";
 import { CheckCircle, XCircle, Star, ArrowRight, Search, Sparkles, Droplets, Wind, Phone, MessageCircle } from "lucide-react";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
@@ -59,7 +59,7 @@ const MarcaSofaPage = () => {
 
   const { marca, city } = data;
   const pageUrl = `https://www.cleansolutions.com.pt${pathname}`;
-  const pageTitle = `Limpeza Sofá ${marca.name} em ${city.name} — Especialistas | Kyro Clean`;
+  const pageTitle = `Limpeza Sofá ${marca.name} em ${city.name}, Especialistas | Kyro Clean`;
   const pageDesc = `Especialistas em limpeza de sofás ${marca.name} em ${city.name}. ${marca.material}. ${marca.estimatedPriceRange}. Serviço ao domicílio.`;
 
   useEffect(() => {
@@ -145,7 +145,7 @@ const MarcaSofaPage = () => {
                 <span>/</span>
                 <Link to="/limpeza-sofas" className="hover:text-white/80">Limpeza de Sofás</Link>
                 <span>/</span>
-                <span className="text-white/70">Sofá {marca.name} — {city.name}</span>
+                <span className="text-white/70">Sofá {marca.name}, {city.name}</span>
               </nav>
 
               <p className="text-[10px] font-bold tracking-[0.28em] uppercase mb-5" style={{ color: "#D4AF37" }}>Especialistas em {marca.name}</p>

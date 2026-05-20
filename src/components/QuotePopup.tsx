@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+﻿import { useState, useEffect, useCallback } from 'react';
 import { X, Phone, Star, Sparkles, Clock, ShieldCheck } from 'lucide-react';
 import QuizForm from './QuizFormLazy';
 import { usePopupStorage } from '@/hooks/usePopupStorage';
@@ -152,7 +152,7 @@ const QuotePopup = () => {
             </div>
           </div>
 
-          {/* Primary CTA — standard site button */}
+          {/* Primary CTA, standard site button */}
           <div className="relative group/btn mb-3">
             <div className="absolute -inset-1 bg-gradient-to-r from-gold/40 via-gold/60 to-gold/40 rounded-2xl blur-md opacity-60 group-hover/btn:opacity-90 transition-opacity" />
             <button

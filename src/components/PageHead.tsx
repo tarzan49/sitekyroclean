@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+﻿import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
@@ -11,15 +11,15 @@ const routeMeta: Record<string, { pt: PageMeta; en: PageMeta; es: PageMeta }> = 
   "/": {
     pt: {
       title: "Kyro Clean Solutions | Limpeza de Sofás, Colchões e Tapetes ao Domicílio",
-      description: "O seu sofá, colchão ou tapete como novo em 4h — ao domicílio, sem sair de casa. Avaliação 5.0 Google. Extração profissional. Porto, Gaia, Lisboa e todo o país. Orçamento grátis.",
+      description: "O seu sofá, colchão ou tapete como novo em 4h, ao domicílio, sem sair de casa. Avaliação 5.0 Google. Extração profissional. Porto, Gaia, Lisboa e todo o país. Orçamento grátis.",
     },
     en: {
       title: "Kyro Clean Solutions | Professional Sofa, Mattress & Rug Cleaning at Home",
-      description: "Your sofa, mattress or rug like new in 4h — at your home, no hassle. 5.0 Google rating. Professional extraction. Porto, Lisbon and nationwide. Free quote.",
+      description: "Your sofa, mattress or rug like new in 4h, at your home, no hassle. 5.0 Google rating. Professional extraction. Porto, Lisbon and nationwide. Free quote.",
     },
     es: {
       title: "Kyro Clean Solutions | Limpieza de Sofás, Colchones y Alfombras a Domicilio",
-      description: "Su sofá, colchón o alfombra como nuevo en 4h — a domicilio, sin salir de casa. Valoración 5.0 Google. Extracción profesional. Presupuesto gratis.",
+      description: "Su sofá, colchón o alfombra como nuevo en 4h, a domicilio, sin salir de casa. Valoración 5.0 Google. Extracción profesional. Presupuesto gratis.",
     },
   },
   "/limpeza-sofas": {

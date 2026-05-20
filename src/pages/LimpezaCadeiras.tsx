@@ -1,4 +1,4 @@
-import { useTranslation } from "react-i18next";
+﻿import { useTranslation } from "react-i18next";
 import { Shield, Heart, Sparkles } from "lucide-react";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import Header from "@/components/Header";
@@ -52,7 +52,7 @@ const expertTips = [
   },
   {
     title: "Quantas bactérias existem realmente nas suas cadeiras?",
-    summary: "Cadeiras de escritório e de jantar são um dos objetos mais contaminados da casa. Os números vão surpreendê-lo — e motivá-lo a agir.",
+    summary: "Cadeiras de escritório e de jantar são um dos objetos mais contaminados da casa. Os números vão surpreendê-lo, e motivá-lo a agir.",
   },
   {
     title: "Veludo, couro, linho: qual é a sua cadeira mais difícil de limpar?",

@@ -1,4 +1,4 @@
-import { lazy, Suspense } from "react";
+﻿import { lazy, Suspense } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -90,11 +90,11 @@ const packComboRoutes = getAllPackComboRoutes();
 const marcaSofaRoutes = getAllMarcaSofaRoutes();
 
 // ── Page transition config ────────────────────────────────────────────────────
-// Pure opacity only — NO y/transform.
+// Pure opacity only, NO y/transform.
 // Reason: any CSS transform on a wrapper creates a new stacking context,
 // which breaks position:fixed children (sticky CTAs, headers, progress bar).
 // With opacity-only, stacking context only exists when opacity < 1, which is
-// only during the brief exit (user already navigated away) — not perceptible.
+// only during the brief exit (user already navigated away), not perceptible.
 const pageVariants = {
   initial: { opacity: 0 },
   animate: { opacity: 1 },
@@ -106,14 +106,14 @@ const pageTransition = {
   ease: 'easeInOut' as const,
 };
 
-// ── Inner router component — must be inside <BrowserRouter> to use useLocation
+// ── Inner router component, must be inside <BrowserRouter> to use useLocation
 const AppRoutes = () => {
   const location = useLocation();
   useScrollReveal();
 
   return (
     <>
-      {/* Gold progress bar — fires on every route change */}
+      {/* Gold progress bar, fires on every route change */}
       <TopProgressBar />
 
       <ScrollToTop />
@@ -156,7 +156,7 @@ const AppRoutes = () => {
                   <Route key={route.path} path={route.path} element={<FreguesiaServicePage />} />
                 ))}
                 {/* Keyword variant pages: higienização/lavagem × all services × all locations */}
-                {/* MUST be before problemCityRoutes — slugs like "higienizacao-colchao" and "lavagem-tapetes" */}
+                {/* MUST be before problemCityRoutes, slugs like "higienizacao-colchao" and "lavagem-tapetes" */}
                 {/* in problemSeoData generate identical paths that would shadow these routes otherwise */}
                 {keywordVariantRoutes.map(route => (
                   <Route key={route.path} path={route.path} element={<SofaVariantPage />} />
@@ -197,7 +197,7 @@ const AppRoutes = () => {
                 {/* Legal */}
                 <Route path="/testemunhos" element={<Testemunhos />} />
                 <Route path="/politica-de-privacidade" element={<PoliticaPrivacidade />} />
-                {/* Admin — painel único */}
+                {/* Admin, painel único */}
                 <Route path="/admin/panel" element={<AdminPanel />} />
                 <Route path="/areas-de-servico" element={<AreasDeServico />} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

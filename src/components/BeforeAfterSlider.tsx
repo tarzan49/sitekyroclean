@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback, useEffect } from "react";
+﻿import { useState, useRef, useCallback, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 
 interface BeforeAfterSliderProps {
@@ -69,7 +69,7 @@ const BeforeAfterSlider = ({
     setSliderPosition(Math.min(Math.max(pct, 0), 100));
   }, [orientation]);
 
-  // Mouse events (desktop) — fine as synthetic
+  // Mouse events (desktop), fine as synthetic
   const handleMouseDown = (e: React.MouseEvent) => {
     isDraggingRef.current = true;
     setIsDragging(true);
@@ -83,7 +83,7 @@ const BeforeAfterSlider = ({
     setIsDragging(false);
   };
 
-  // Touch events — must be non-passive to call preventDefault and block page scroll
+  // Touch events, must be non-passive to call preventDefault and block page scroll
   useEffect(() => {
     const el = containerRef.current;
     if (!el) return;

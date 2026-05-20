@@ -1,4 +1,4 @@
-import { ArrowRight, Lightbulb } from "lucide-react";
+﻿import { ArrowRight, Lightbulb } from "lucide-react";
 
 export interface ServiceProblem {
   question: string;
@@ -36,7 +36,7 @@ const ServiceProblemsGrid = ({
           </h2>
         </div>
 
-        {/* "Sabia que" — dark contrast card */}
+        {/* "Sabia que", dark contrast card */}
         {sabiaQue && (
           <div
             className="mb-8 rounded-2xl overflow-hidden"
@@ -68,7 +68,7 @@ const ServiceProblemsGrid = ({
                 key={i}
                 className="group relative flex flex-col overflow-hidden rounded-[20px] shadow-md min-h-[380px] transition-all duration-300 hover:shadow-2xl hover:ring-1 hover:ring-[#D4AF37]/35"
               >
-                {/* Background photo — full colour, subtle zoom on hover */}
+                {/* Background photo, full colour, subtle zoom on hover */}
                 <div
                   className="absolute inset-0 bg-cover bg-center transition-transform duration-700 ease-out group-hover:scale-[1.04]"
                   style={{ backgroundImage: `url(${p.image})` }}
@@ -77,7 +77,7 @@ const ServiceProblemsGrid = ({
                 {/* Layered overlay: vignette bottom, slight warm tint */}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/88 via-black/38 to-black/8" />
 
-                {/* Numbered index — editorial gold top-right */}
+                {/* Numbered index, editorial gold top-right */}
                 <div className="absolute top-4 right-4 z-10">
                   <span
                     className="font-mono text-[10px] font-bold tracking-[0.25em]"

@@ -1,4 +1,4 @@
-import { useTranslation } from 'react-i18next';
+﻿import { useTranslation } from 'react-i18next';
 import { Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -52,7 +52,7 @@ const QuizStep1Service = ({ selectedService, onSelect }: QuizStep1ServiceProps) 
                   : "hover:ring-2 hover:ring-gold/35 shadow-[0_2px_10px_rgba(0,0,0,0.4)]"
               )}
             >
-              {/* Background image — dimmed on certain services */}
+              {/* Background image, dimmed on certain services */}
               <picture>
                 <source srcSet={SERVICE_IMAGES[option.id]} type="image/webp" />
                 <img
@@ -78,7 +78,7 @@ const QuizStep1Service = ({ selectedService, onSelect }: QuizStep1ServiceProps) 
                 <div className="absolute top-0 inset-x-0 h-[2px] bg-gradient-to-r from-transparent via-gold to-transparent" />
               )}
 
-              {/* Label — anchored to bottom */}
+              {/* Label, anchored to bottom */}
               <div className="absolute inset-x-0 bottom-0 z-10 flex flex-col items-center pb-2.5 px-2">
                 <span className="font-playfair text-sm font-bold text-white text-center leading-tight"
                   style={{ textShadow: '0 1px 6px rgba(0,0,0,0.9)' }}>

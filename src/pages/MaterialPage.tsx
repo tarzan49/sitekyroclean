@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from "react";
+﻿import { useEffect, useMemo } from "react";
 import { useLocation, Link } from "react-router-dom";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { ArrowRight, MapPin, CheckCircle, Search, Droplets, Sparkles, Wind, Phone, MessageCircle } from "lucide-react";
@@ -124,7 +124,7 @@ const MaterialPage = () => {
                 <span>/</span>
                 <Link to={`/${data.serviceSlug}`} className="hover:text-white/80 transition-colors">{data.serviceName}</Link>
                 <span>/</span>
-                <span className="text-white/70">{data.name}{cityName ? ` — ${cityName}` : ""}</span>
+                <span className="text-white/70">{data.name}{cityName ? `, ${cityName}` : ""}</span>
               </nav>
 
               <p className="text-[10px] font-bold tracking-[0.28em] uppercase mb-4" style={{ color: "#D4AF37" }}>

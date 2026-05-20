@@ -1,4 +1,4 @@
-import { useMemo, useEffect, useState } from "react";
+﻿import { useMemo, useEffect, useState } from "react";
 import { useLocation, Link } from "react-router-dom";
 import { CheckCircle, Star, ArrowRight, Shield, Zap, MessageCircle, ChevronDown } from "lucide-react";
 import Header from "@/components/Header";
@@ -55,7 +55,7 @@ const PackComboPage = () => {
 
   const pageUrl = `https://www.cleansolutions.com.pt${pathname}`;
   const fromPriceText = prices ? `${prices.packTotal}€` : `a calcular`;
-  const pageTitle = `${pack.name} em ${city.name} — Desde ${fromPriceText} | Kyro Clean`;
+  const pageTitle = `${pack.name} em ${city.name}, Desde ${fromPriceText} | Kyro Clean`;
   const pageDesc = `${pack.description} Poupe até 20% em relação ao preço individual. Serviço ao domicílio em ${city.name}.`;
 
   useEffect(() => {
@@ -104,7 +104,7 @@ const PackComboPage = () => {
           "priceSpecification": {
             "@type": "PriceSpecification",
             "priceCurrency": "EUR",
-            "description": `Pack ${pack.name} — preço com desconto, IVA incluído`,
+            "description": `Pack ${pack.name}, preço com desconto, IVA incluído`,
           },
         },
       },
@@ -130,7 +130,7 @@ const PackComboPage = () => {
                 <span>/</span>
                 <Link to="/packs" className="hover:text-white/80">Packs</Link>
                 <span>/</span>
-                <span className="text-white/70">{pack.name} — {city.name}</span>
+                <span className="text-white/70">{pack.name}, {city.name}</span>
               </nav>
 
               <p className="text-[10px] font-bold tracking-[0.28em] uppercase mb-4" style={{ color: "#D4AF37" }}>
@@ -284,7 +284,7 @@ const PackComboPage = () => {
                 >
                   <MessageCircle className="w-5 h-5 flex-shrink-0" />
                   {allSelected
-                    ? `Reservar via WhatsApp — ${prices?.packTotal ?? ''}€`
+                    ? `Reservar via WhatsApp, ${prices?.packTotal ?? ''}€`
                     : 'Selecione as opções acima'}
                 </a>
 
@@ -307,7 +307,7 @@ const PackComboPage = () => {
               </p>
               <div className="grid grid-cols-3 gap-4 text-center">
                 {[
-                  { n: '1', title: 'Envie o pack', desc: 'Clique no botão WhatsApp — a mensagem já vem preenchida com os detalhes.' },
+                  { n: '1', title: 'Envie o pack', desc: 'Clique no botão WhatsApp, a mensagem já vem preenchida com os detalhes.' },
                   { n: '2', title: 'Confirmamos', desc: 'Respondemos em menos de 15 min a confirmar data e horário.' },
                   { n: '3', title: 'Tratamos de tudo', desc: 'A equipa desloca-se e executa ambos os serviços na mesma visita.' },
                 ].map(step => (

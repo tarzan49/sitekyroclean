@@ -1,4 +1,4 @@
-import { useTranslation } from "react-i18next";
+﻿import { useTranslation } from "react-i18next";
 import { Shield, Heart, Sparkles } from "lucide-react";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import Header from "@/components/Header";
@@ -52,7 +52,7 @@ const expertTips = [
   },
   {
     title: "Posso usar vapor para limpar o sofá em casa?",
-    summary: "O vapor pode danificar tecidos sensíveis se não for usado corretamente. Saiba quando é — e quando não é — seguro aplicar.",
+    summary: "O vapor pode danificar tecidos sensíveis se não for usado corretamente. Saiba quando é, e quando não é, seguro aplicar.",
   },
   {
     title: "Com que frequência devo limpar o sofá profissionalmente?",

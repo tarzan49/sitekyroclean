@@ -1,4 +1,4 @@
-import { useTranslation } from 'react-i18next';
+﻿import { useTranslation } from 'react-i18next';
 import { Sofa, Sparkles, BedDouble, Armchair, LayoutGrid, HelpCircle, Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Textarea } from '@/components/ui/textarea';
@@ -89,7 +89,7 @@ const QuizStep2Other = ({ formData, onUpdate }: QuizStep2OtherProps) => {
         </div>
       )}
 
-      {/* Description — required only when 'other' is checked */}
+      {/* Description, required only when 'other' is checked */}
       {hasOtherSelected && (
         <div className="w-full max-w-sm mx-auto space-y-2">
           <label className="block text-xs font-bold text-white/40 uppercase tracking-wider text-center">

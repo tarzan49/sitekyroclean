@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { X, Star } from 'lucide-react';
 import { createPortal } from 'react-dom';
 
@@ -38,7 +38,7 @@ const ExitIntentPopup = () => {
       }
     };
 
-    // Activate after 10s — avoids firing on accidental mouse movements
+    // Activate after 10s, avoids firing on accidental mouse movements
     const timer = setTimeout(() => {
       activated = true;
       document.addEventListener('mouseleave', onMouseLeave);
@@ -100,7 +100,7 @@ const ExitIntentPopup = () => {
           </h2>
 
           <p className="text-sm text-white/50 leading-relaxed mb-5">
-            Peça um orçamento gratuito em menos de 60 segundos — sem compromisso, sem visita prévia.
+            Peça um orçamento gratuito em menos de 60 segundos, sem compromisso, sem visita prévia.
           </p>
 
           {/* Stars */}
@@ -118,7 +118,7 @@ const ExitIntentPopup = () => {
             onClick={openQuiz}
             className="w-full h-12 bg-gradient-to-r from-gold to-[#d4c57b] text-[#12121e] font-black text-sm rounded-xl touch-manipulation active:scale-[0.98] shadow-[0_4px_20px_rgba(212,175,55,0.35)] mb-3"
           >
-            Ver o meu preço — é grátis
+            Ver o meu preço, é grátis
           </button>
 
           <button

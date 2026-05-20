@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from "react";
+﻿import { useEffect, useMemo } from "react";
 import { useLocation, Link } from "react-router-dom";
 import { ArrowRight, CheckCircle, MapPin, AlertTriangle, Lightbulb, Phone, MessageCircle } from "lucide-react";
 import Header from "@/components/Header";
@@ -14,11 +14,11 @@ import { getProblemHeroImage } from "@/lib/problemHeroImages";
 function getCityContext(problemSlug: string, cityName: string, cityDesc: string): string {
   const base = `Em ${cityName}, ${cityDesc}`;
   if (problemSlug.includes("mancha"))
-    return `${base}, as manchas nos estofos agravam-se com a humidade atlântica e o ritmo de vida agitado. A penetração nas fibras ocorre em horas — tratamento profissional é mais eficaz quanto mais rápido for aplicado.`;
+    return `${base}, as manchas nos estofos agravam-se com a humidade atlântica e o ritmo de vida agitado. A penetração nas fibras ocorre em horas, tratamento profissional é mais eficaz quanto mais rápido for aplicado.`;
   if (problemSlug.includes("acar"))
     return `${base}, o clima húmido favorece a multiplicação de ácaros em sofás, colchões e tapetes. Uma higienização profissional elimina 99% dos ácaros na primeira sessão, sem produtos tóxicos.`;
   if (problemSlug.includes("odor") || problemSlug.includes("cheiro"))
-    return `${base}, os odores persistem mais tempo nas fibras devido à humidade do ar. Ventilação doméstica não chega — a extração profunda é o único método que elimina o cheiro na raiz.`;
+    return `${base}, os odores persistem mais tempo nas fibras devido à humidade do ar. Ventilação doméstica não chega, a extração profunda é o único método que elimina o cheiro na raiz.`;
   if (problemSlug.includes("pelo"))
     return `${base}, os pelos de animais acumulam-se rapidamente em estofos e alcatifas. A extração profissional remove pelos, dander e alérgenos associados que os aspiradores domésticos não alcançam.`;
   if (problemSlug.includes("urina"))

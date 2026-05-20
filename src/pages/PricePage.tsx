@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from "react";
+﻿import { useEffect, useMemo } from "react";
 import { useLocation, Link } from "react-router-dom";
 import { Star, ArrowRight, CheckCircle, MapPin, Phone, MessageCircle } from "lucide-react";
 import Header from "@/components/Header";
@@ -209,7 +209,7 @@ const PricePage = () => {
                   className="inline-flex items-center gap-2 bg-[#D4AF37]/10 border border-[#D4AF37]/30 px-4 py-2.5 rounded-xl text-sm font-semibold text-[#1A1A2E] hover:bg-[#D4AF37]/20 transition-all"
                 >
                   <ArrowRight className="w-4 h-4 text-[#D4AF37]" />
-                  {data.serviceName} em {data.cityName} — página completa
+                  {data.serviceName} em {data.cityName}, página completa
                 </Link>
               </div>
               <div>

@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+﻿import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { ArrowRight } from "lucide-react";
 import { services } from "@/data/locationSeoData";
@@ -68,7 +68,7 @@ const RelatedServices = ({ currentService }: RelatedServicesProps) => {
             Aproveite a visita para tratar de mais peças
           </h2>
           <p className="text-[#1A1A2E]/50 text-sm mt-1.5">
-            Incluímos tudo na mesma deslocação — sem custo adicional de transporte.
+            Incluímos tudo na mesma deslocação, sem custo adicional de transporte.
           </p>
           <div className="w-12 h-px mx-auto mt-3" style={{ backgroundColor: '#D4AF37', opacity: 0.4 }} />
         </div>

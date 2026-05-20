@@ -1,9 +1,9 @@
-import { useEffect, useState } from "react";
+﻿import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 
 /**
  * Ultra-thin gold progress bar at the top of the screen.
- * Triggers on every route change — simulates NProgress without any dependency.
+ * Triggers on every route change, simulates NProgress without any dependency.
  */
 const TopProgressBar = () => {
   const location = useLocation();

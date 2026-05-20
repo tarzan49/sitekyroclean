@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+﻿import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { ShieldCheck, HandCoins, Droplets, Star, CheckCircle } from "lucide-react";
 import guaranteeImage from "@/assets/guarantee-technician.webp";
@@ -65,7 +65,7 @@ const GuaranteeSection = () => {
               <div className="absolute inset-0 bg-gradient-to-t from-[#0B2F2A]/70 via-[#0B2F2A]/10 to-transparent" />
             </div>
 
-            {/* Metallic gold "Qualidade Garantida" seal — top LEFT */}
+            {/* Metallic gold "Qualidade Garantida" seal, top LEFT */}
             <div className="absolute top-5 left-5 z-10 group/seal">
               <div
                 className="flex items-center gap-2 rounded-2xl px-4 py-2.5 transition-all duration-300 group-hover/seal:scale-[1.03]"
@@ -88,7 +88,7 @@ const GuaranteeSection = () => {
               </div>
             </div>
 
-            {/* Rating badge — bottom */}
+            {/* Rating badge, bottom */}
             <div className="absolute bottom-6 left-6 right-6 z-10">
               <div
                 className="rounded-2xl px-5 py-4 border border-white/15"

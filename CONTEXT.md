@@ -579,6 +579,30 @@ Step 5 — Seletor de vaga/calendário
 
 ---
 
+## Tudo o que foi feito — Sessão 7 (2026-05-19)
+
+### Quiz Cadeiras — Layout Upsell + Preços Dinâmicos
+
+41. **Step 2 (ServiceTypeSelector) — preço errado em cadeiras corrigido**
+    - `cleaningPrice` estava hardcoded a `49` para todos os serviços não-colchão
+    - Para cadeiras → agora `undefined` → ServiceTypeSelector não mostra nenhum "a partir de"
+    - Correto: preço de cadeiras depende da quantidade, não faz sentido mostrar preço fixo
+
+42. **Step 3 cadeiras — layout reescrito para ser idêntico ao upsell**
+    - Antes: tier-grid (4 caixas de preço) + input de texto + stepper separado de add-on
+    - Depois: price box no topo + stepper grande (w-14 h-14 / text-4xl) + toggle card de add-on
+    - Mesmo layout pixel-a-pixel do bloco `pendingUpsellId === 'chairs'`
+
+43. **Dinâmico por `formData.serviceType`:**
+    - `serviceType === 'waterproofing'` → preços primários = `calcChairWaterproof(qty)` | add-on = "Adicionar Higienização" com `calcChairClean`
+    - Caso contrário → preços primários = `calcChairClean(qty)` | add-on = "Adicionar Impermeabilização" com `calcChairWaterproof`
+
+44. **Sync de `chairWaterproofQty`:** quando qty muda via stepper e toggle está ativo, `chairWaterproofQty` atualiza automaticamente (para `calculateServicePrice` funcionar)
+
+45. **`Droplets` importado** de lucide-react (ícone para add-on de higienização)
+
+---
+
 ## Estado atual do site (2026-05-19)
 
 - **URL ao vivo:** cleansolutions.com.pt (Cloudflare Pages, HTTPS)

@@ -1,4 +1,4 @@
-import { Star } from "lucide-react";
+﻿import { Star } from "lucide-react";
 import ServiceSchedulingBar from "./ServiceSchedulingBar";
 
 import sofaD        from "@/assets/service-sofa-new.webp";
@@ -41,7 +41,7 @@ const ServiceHero = ({
   return (
     <section className="relative pt-24 md:pt-28 pb-16 md:pb-24 overflow-hidden min-h-[540px] md:min-h-[620px] flex items-end">
 
-      {/* ── Full-bleed background image — mobile version below 768px ── */}
+      {/* ── Full-bleed background image, mobile version below 768px ── */}
       {imgs && (
         <picture className="absolute inset-0 w-full h-full" aria-hidden="true">
           <source media="(max-width: 767px)" srcSet={imgs.m} type="image/webp" />

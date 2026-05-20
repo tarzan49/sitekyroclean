@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+﻿import { Link } from "react-router-dom";
 import { Home, Phone, ArrowRight, Sofa, BedDouble, Sparkles, BookOpen } from "lucide-react";
 import { trackCallClick } from "@/lib/analytics";
 
@@ -41,7 +41,7 @@ const NotFound = () => (
         Página não encontrada
       </p>
       <h2 className="font-playfair text-2xl md:text-3xl font-bold text-white mb-3 leading-snug">
-        Esta página foi limpa — e não deixou rasto.
+        Esta página foi limpa, e não deixou rasto.
       </h2>
       <p className="text-white/50 text-base max-w-md mx-auto mb-10 leading-relaxed">
         O endereço que procura não existe ou foi movido. Mas podemos ajudá-lo a encontrar o que precisa.

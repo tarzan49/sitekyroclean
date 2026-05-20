@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+﻿import { Link } from "react-router-dom";
 import { ArrowRight, CheckCircle, MessageCircle, Tag } from "lucide-react";
 import { packs, packCities, getFromPrice, getDefaultSelections, calcPackPrices, buildWhatsAppUrl } from "@/data/packComboData";
 
@@ -42,14 +42,14 @@ const ServicePackBanner = ({ packSlugs, city = "porto" }: Props) => {
         <div className="text-center mb-10">
           <span className="inline-flex items-center gap-1.5 text-[10px] font-bold bg-gold/10 text-gold border border-gold/25 px-3 py-1 rounded-full mb-4 uppercase tracking-widest">
             <Tag className="w-3 h-3" />
-            Packs com Desconto — 20% off
+            Packs com Desconto, 20% off
           </span>
           <h2 className="font-playfair text-2xl md:text-3xl font-bold text-white mb-2">
             Complete com um Pack e Poupe Mais
           </h2>
           <p className="text-white/50 text-sm max-w-md mx-auto">
             Ao adicionar outro serviço na mesma visita, tem 20% de desconto imediato.
-            Reserve directamente via WhatsApp — respondemos em menos de 15 min.
+            Reserve directamente via WhatsApp, respondemos em menos de 15 min.
           </p>
         </div>
 

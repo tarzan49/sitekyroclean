@@ -1,4 +1,4 @@
-import { Component, ReactNode } from 'react';
+﻿import { Component, ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { RefreshCw, Home, MessageCircle, AlertTriangle } from 'lucide-react';
 
@@ -62,7 +62,7 @@ class ErrorBoundary extends Component<Props, State> {
             </h1>
 
             <p className="text-white/50 text-base max-w-sm mx-auto mb-10 leading-relaxed">
-              Ocorreu um erro inesperado. Pedimos desculpa pelo incómodo — pode tentar recarregar ou voltar ao início.
+              Ocorreu um erro inesperado. Pedimos desculpa pelo incómodo, pode tentar recarregar ou voltar ao início.
             </p>
 
             {/* CTAs */}

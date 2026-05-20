@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+﻿import { useState, useMemo } from "react";
 import { Flame, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -80,7 +80,7 @@ const QuizStepCalendar = ({ selectedSlot, onSelect, cityName = "Porto" }: QuizSt
         </div>
       </div>
 
-      {/* Calendar grid — 7 cols, no overflow */}
+      {/* Calendar grid, 7 cols, no overflow */}
       <div className="w-full">
         <div className="grid grid-cols-7 gap-1">
           {days.map((day, dayIdx) => {
@@ -150,7 +150,7 @@ const QuizStepCalendar = ({ selectedSlot, onSelect, cityName = "Porto" }: QuizSt
 
       {selectedSlot && (
         <p className="text-center text-xs text-green-300/80 bg-green-900/20 border border-green-500/20 rounded-xl px-3 py-2 mt-3 font-medium">
-          <Check className="w-3.5 h-3.5 inline mr-1 text-green-300" strokeWidth={2.5} />Vaga reservada — confirme os seus dados no próximo passo
+          <Check className="w-3.5 h-3.5 inline mr-1 text-green-300" strokeWidth={2.5} />Vaga reservada, confirme os seus dados no próximo passo
         </p>
       )}
 

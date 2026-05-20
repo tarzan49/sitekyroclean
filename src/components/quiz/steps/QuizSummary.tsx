@@ -1,4 +1,4 @@
-/**
+﻿/**
  * QuizSummary.tsx
  * Order summary / review screen shown before final submission.
  * Currently rendered inside a {false && ...} guard in the orchestrator
@@ -118,7 +118,7 @@ const QuizSummary = ({
           <div className="flex justify-between items-center px-4 py-3 border-b border-white/[0.06]">
             <div className="flex-1 min-w-0 mr-3">
               <p className="text-sm font-bold text-white truncate">
-                {serviceLabel}{serviceTypeLabel ? ` — ${serviceTypeLabel}` : ''}
+                {serviceLabel}{serviceTypeLabel ? `, ${serviceTypeLabel}` : ''}
               </p>
               <p className="text-[10px] text-white/35 truncate">{buildFirstDetailLine()}</p>
             </div>

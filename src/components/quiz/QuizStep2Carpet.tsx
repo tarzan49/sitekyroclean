@@ -1,4 +1,4 @@
-import { Mail } from 'lucide-react';
+﻿import { Mail } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 import { QuizFormData } from './QuizTypes';
@@ -169,7 +169,7 @@ const QuizStep2Carpet = ({ formData, onUpdate }: QuizStep2CarpetProps) => {
             </div>
           ) : (
             <p className="text-[10px] font-bold text-white/60 uppercase tracking-wider text-center py-0.5">
-              <Mail className="w-3.5 h-3.5 inline mr-1" />+15 m² — orçamento personalizado
+              <Mail className="w-3.5 h-3.5 inline mr-1" />+15 m², orçamento personalizado
             </p>
           )}
         </div>

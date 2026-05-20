@@ -1,4 +1,4 @@
-import { Shield } from 'lucide-react';
+﻿import { Shield } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { sofaPrices, sofaChaisePrice, QuizFormData, SofaItem } from './QuizTypes';
 
@@ -104,7 +104,7 @@ const QuizStep2Sofa = ({ formData, onUpdate, sofaItems, onSofaItemsChange }: Qui
                 </div>
               </div>
 
-              {/* Per-item pack toggle — only shown when qty > 0 and not sob orçamento */}
+              {/* Per-item pack toggle, only shown when qty > 0 and not sob orçamento */}
               {isActive && !isSob && bothPrice !== null && cleanPrice !== null && (
                 <div className="px-4 pb-3">
                   <button
@@ -151,7 +151,7 @@ const QuizStep2Sofa = ({ formData, onUpdate, sofaItems, onSofaItemsChange }: Qui
         />
       )}
 
-      {/* Chaise Longue toggle — grayed out until a sofa is selected */}
+      {/* Chaise Longue toggle, grayed out until a sofa is selected */}
       <button
         onClick={() => { if (hasSofas) onUpdate({ sofaHasChaise: !formData.sofaHasChaise }); }}
         className={cn(

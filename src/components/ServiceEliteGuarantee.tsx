@@ -1,4 +1,4 @@
-import { CheckCircle, Award, Leaf } from "lucide-react";
+﻿import { CheckCircle, Award, Leaf } from "lucide-react";
 
 const ITEMS = [
   {
@@ -14,7 +14,7 @@ const ITEMS = [
   {
     icon: Leaf,
     title: "Segurança Total",
-    body: "Produtos 100% seguros, certificados e não tóxicos — para crianças, bebés e animais.",
+    body: "Produtos 100% seguros, certificados e não tóxicos, para crianças, bebés e animais.",
   },
 ];
 

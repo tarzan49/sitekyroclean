@@ -1,4 +1,4 @@
-import { Shield, Heart, Sparkles } from "lucide-react";
+﻿import { Shield, Heart, Sparkles } from "lucide-react";
 
 export interface BenefitItem {
   icon: typeof Shield;
@@ -18,7 +18,7 @@ const DEFAULT_BENEFITS: BenefitItem[] = [
     icon: Heart,
     label: "Saúde",
     title: "Ambiente mais saudável",
-    body: "Eliminação de 99,9% de ácaros, bactérias e alergénios. Respirar melhor em casa começa com superfícies realmente limpas — não apenas visualmente.",
+    body: "Eliminação de 99,9% de ácaros, bactérias e alergénios. Respirar melhor em casa começa com superfícies realmente limpas, não apenas visualmente.",
   },
   {
     icon: Sparkles,

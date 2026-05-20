@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+﻿import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { ShieldCheck, HandCoins, Droplets, Star } from "lucide-react";
 import QuizButton from "./QuizButton";
@@ -167,7 +167,7 @@ const HowItWorks = () => {
         </div>
       </div>
 
-      {/* Bottom strip — full width, centered */}
+      {/* Bottom strip, full width, centered */}
       <div
         className={`border-t border-white/[0.06] py-5 px-6 flex flex-col items-center gap-4 transition-all duration-700 ${isVisible ? 'opacity-100' : 'opacity-0'}`}
         style={{ transitionDelay: '600ms' }}

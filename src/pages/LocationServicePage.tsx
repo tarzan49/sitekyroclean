@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from "react";
+﻿import { useEffect, useMemo } from "react";
 import { useLocation, Link } from "react-router-dom";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { MapPin, Phone, Star, CheckCircle, MessageCircle } from "lucide-react";
@@ -103,7 +103,7 @@ const PRICE_TABLE: Record<string, { item: string; price: string; highlight?: boo
 
 const SERVICE_TESTIMONIALS: Record<string, { name: string; city: string; text: string }[]> = {
   'limpeza-sofas': [
-    { name: "Maria S.", city: "Porto", text: "O meu sofá tinha 8 anos e achei que ia ter de comprar um novo. Resultado incrível — como novo em poucas horas!" },
+    { name: "Maria S.", city: "Porto", text: "O meu sofá tinha 8 anos e achei que ia ter de comprar um novo. Resultado incrível, como novo em poucas horas!" },
     { name: "Rui T.", city: "Espinho", text: "Tinham-me dito que a nódoa de vinho não saía. A Kyro provou o contrário! Sofá impecável." },
   ],
   'limpeza-colchoes': [
@@ -640,7 +640,7 @@ const LocationServicePage = () => {
           </section>
         )}
 
-        {/* FAQ schema — ServiceLocationSchema already provides Service + BreadcrumbList */}
+        {/* FAQ schema, ServiceLocationSchema already provides Service + BreadcrumbList */}
         <ServiceFAQSchema faqs={data.faqs} />
       </main>
       <Footer />
