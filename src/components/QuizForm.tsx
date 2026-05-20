@@ -1408,7 +1408,7 @@ ${formData.description || 'Sem observações adicionais'}
             </div>
           )}
 
-          <div className="flex flex-col py-3 sm:py-5 w-full items-center text-center">
+          <div className="flex flex-col py-3 sm:py-5 w-full items-center text-center min-h-full shrink-0 justify-center">
 
             {/* Step 0, Location Autocomplete VIP */}
             {/* Context banner when quiz opened from a problem page */}
@@ -1425,7 +1425,6 @@ ${formData.description || 'Sem observações adicionais'}
               <div
                 ref={locationSectionRef}
                 style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%', textAlign: 'center' }}
-                className="flex-1"
               >
                 {/* Compact title — hidden while searching to free space for results */}
                 {!locationQuery && (
@@ -1509,7 +1508,7 @@ ${formData.description || 'Sem observações adicionais'}
                         }}
                         autoComplete="off"
                         inputMode="search"
-                        className="w-full h-11 pl-9 pr-4 text-sm bg-white/[0.05] border border-white/[0.12] focus:border-gold focus:outline-none rounded-xl transition-colors text-white placeholder:text-white/30"
+                        className="w-full h-12 pl-9 pr-4 text-sm bg-[#1a2a1a] border border-gold/20 focus:border-gold focus:outline-none rounded-xl transition-colors text-white placeholder:text-white/30"
                       />
                     </div>
 
@@ -1579,7 +1578,7 @@ ${formData.description || 'Sem observações adicionais'}
                 ? 'Ideal para colchões novos ou recém-limpos.'
                 : undefined;
               return (
-                <div className="flex-1 flex flex-col gap-4 w-full max-w-sm self-center items-center text-center">
+                <div className="flex flex-col gap-4 w-full max-w-sm self-center items-center text-center">
                   <div>
                     <p className="text-gold text-[10px] font-bold tracking-[0.28em] uppercase mb-1">O QUE PRECISA?</p>
                     <h2 className="font-playfair text-lg sm:text-xl font-bold text-white text-center w-full">
@@ -1608,7 +1607,7 @@ ${formData.description || 'Sem observações adicionais'}
 
             {/* Step 3 - Config (hidden while Pack Família overlay is active) */}
             {currentStep === 3 && !showUpsell && (
-              <div className="flex-1 flex flex-col w-full items-center text-center overflow-y-auto">
+              <div className="flex flex-col w-full items-center text-center">
                 {renderStep2()}
               </div>
             )}
@@ -2274,7 +2273,6 @@ ${formData.description || 'Sem observações adicionais'}
             {currentStep === 4 && !showUpsell && (
               <div
                 style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}
-                className="flex-1"
               >
                 <div className="w-full max-w-sm">
                   <p className="text-gold text-[10px] font-bold tracking-[0.28em] uppercase mb-1 text-center">CONTACTO</p>
