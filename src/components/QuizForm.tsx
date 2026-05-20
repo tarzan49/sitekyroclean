@@ -1029,9 +1029,9 @@ ${formData.description || 'Sem observações adicionais'}
                       </div>
                     </div>
                     <div className="flex items-center gap-2 flex-shrink-0">
-                      <button onClick={() => setSofaItems(sofaSetQty(sofaItems, option.id, qty - 1))} disabled={qty === 0} className="w-8 h-8 rounded-lg border border-white/20 bg-white/[0.05] text-white font-bold text-base flex items-center justify-center disabled:opacity-20 active:scale-95 transition-all touch-manipulation hover:border-gold/50">−</button>
-                      <span className={cn('w-6 text-center font-bold tabular-nums text-sm', isActive ? (packOn ? 'text-gold' : 'text-white/80') : 'text-white/30')}>{qty}</span>
-                      <button onClick={() => setSofaItems(sofaSetQty(sofaItems, option.id, qty + 1))} className="w-8 h-8 rounded-lg border border-white/20 bg-white/[0.05] text-white font-bold text-base flex items-center justify-center active:scale-95 transition-all touch-manipulation hover:border-gold/50">+</button>
+                      <button onClick={() => setSofaItems(sofaSetQty(sofaItems, option.id, qty - 1))} disabled={qty === 0} className="w-11 h-11 rounded-xl border border-white/20 bg-white/[0.05] text-white font-bold text-xl flex items-center justify-center disabled:opacity-20 active:scale-95 transition-all touch-manipulation hover:border-gold/50">−</button>
+                      <span className={cn('w-7 text-center font-bold tabular-nums text-base', isActive ? (packOn ? 'text-gold' : 'text-white/80') : 'text-white/30')}>{qty}</span>
+                      <button onClick={() => setSofaItems(sofaSetQty(sofaItems, option.id, qty + 1))} className="w-11 h-11 rounded-xl border border-white/20 bg-white/[0.05] text-white font-bold text-xl flex items-center justify-center active:scale-95 transition-all touch-manipulation hover:border-gold/50">+</button>
                     </div>
                   </div>
                   {isActive && !isSob && basePrice !== null && (
@@ -1040,7 +1040,7 @@ ${formData.description || 'Sem observações adicionais'}
                         <Shield className={cn('w-4 h-4 flex-shrink-0', packOn ? 'text-gold' : 'text-white/25')} />
                         <div className="flex-1 text-left">
                           <p className={cn('text-[11px] font-bold leading-none', packOn ? 'text-white' : 'text-white/50')}>{upsellLabel}</p>
-                          <p className={cn('text-[9px] mt-0.5 leading-none', packOn ? 'text-gold/60' : 'text-white/25')}>{upsellSub}</p>
+                          <p className={cn('text-[11px] mt-0.5 leading-none', packOn ? 'text-gold/60' : 'text-white/25')}>{upsellSub}</p>
                         </div>
                         <div className={cn('w-8 h-4 rounded-full border flex items-center px-0.5 transition-all duration-300 flex-shrink-0', packOn ? 'border-gold bg-gold/20' : 'border-white/20 bg-white/[0.05]')}>
                           <div className={cn('w-3 h-3 rounded-full transition-all duration-300', packOn ? 'bg-gold translate-x-[14px]' : 'bg-white/30 translate-x-0')} />
@@ -1053,7 +1053,7 @@ ${formData.description || 'Sem observações adicionais'}
             })}
           </div>
           {has4Plus && <input type="number" inputMode="numeric" pattern="[0-9]*" placeholder="Nº de lugares (ex: 5)" className="w-full max-w-sm bg-white/[0.06] border border-white/15 focus:border-gold focus:outline-none text-white placeholder:text-white/25 rounded-xl h-12 px-4 text-base transition-colors" onChange={(e) => updateFormData({ description: `Sofá com ${e.target.value} lugares` })} />}
-          <p className="text-[9px] text-white/20 text-center tracking-wide uppercase">Valores com IVA incluído</p>
+          <p className="text-xs text-white/20 text-center tracking-wide uppercase">Valores com IVA incluído</p>
         </div>
       );
     }
@@ -1094,9 +1094,9 @@ ${formData.description || 'Sem observações adicionais'}
                       </div>
                     </div>
                     <div className="flex items-center gap-2 flex-shrink-0">
-                      <button onClick={() => setMattressItems(mattressSetQty(mattressItems, option.id, qty - 1))} disabled={qty === 0} className="w-8 h-8 rounded-lg border border-white/20 bg-white/[0.05] text-white font-bold text-base flex items-center justify-center disabled:opacity-20 active:scale-95 transition-all touch-manipulation hover:border-gold/50">−</button>
-                      <span className={cn('w-6 text-center font-bold tabular-nums text-sm', isActive ? (packOn ? 'text-gold' : 'text-white/80') : 'text-white/30')}>{qty}</span>
-                      <button onClick={() => setMattressItems(mattressSetQty(mattressItems, option.id, qty + 1))} className="w-8 h-8 rounded-lg border border-white/20 bg-white/[0.05] text-white font-bold text-base flex items-center justify-center active:scale-95 transition-all touch-manipulation hover:border-gold/50">+</button>
+                      <button onClick={() => setMattressItems(mattressSetQty(mattressItems, option.id, qty - 1))} disabled={qty === 0} className="w-11 h-11 rounded-xl border border-white/20 bg-white/[0.05] text-white font-bold text-xl flex items-center justify-center disabled:opacity-20 active:scale-95 transition-all touch-manipulation hover:border-gold/50">−</button>
+                      <span className={cn('w-7 text-center font-bold tabular-nums text-base', isActive ? (packOn ? 'text-gold' : 'text-white/80') : 'text-white/30')}>{qty}</span>
+                      <button onClick={() => setMattressItems(mattressSetQty(mattressItems, option.id, qty + 1))} className="w-11 h-11 rounded-xl border border-white/20 bg-white/[0.05] text-white font-bold text-xl flex items-center justify-center active:scale-95 transition-all touch-manipulation hover:border-gold/50">+</button>
                     </div>
                   </div>
                   {isActive && basePrice !== null && (
@@ -1105,7 +1105,7 @@ ${formData.description || 'Sem observações adicionais'}
                         <Shield className={cn('w-4 h-4 flex-shrink-0', packOn ? 'text-gold' : 'text-white/25')} />
                         <div className="flex-1 text-left">
                           <p className={cn('text-[11px] font-bold leading-none', packOn ? 'text-white' : 'text-white/50')}>{upsellLabel}</p>
-                          <p className={cn('text-[9px] mt-0.5 leading-none', packOn ? 'text-gold/60' : 'text-white/25')}>{upsellSub}</p>
+                          <p className={cn('text-[11px] mt-0.5 leading-none', packOn ? 'text-gold/60' : 'text-white/25')}>{upsellSub}</p>
                         </div>
                         <div className={cn('w-8 h-4 rounded-full border flex items-center px-0.5 transition-all duration-300 flex-shrink-0', packOn ? 'border-gold bg-gold/20' : 'border-white/20 bg-white/[0.05]')}>
                           <div className={cn('w-3 h-3 rounded-full transition-all duration-300', packOn ? 'bg-gold translate-x-[14px]' : 'bg-white/30 translate-x-0')} />
@@ -1117,7 +1117,7 @@ ${formData.description || 'Sem observações adicionais'}
               );
             })}
           </div>
-          <p className="text-[9px] text-white/20 text-center tracking-wide uppercase">Valores com IVA incluído</p>
+          <p className="text-xs text-white/20 text-center tracking-wide uppercase">Valores com IVA incluído</p>
         </div>
       );
     }
@@ -1147,7 +1147,7 @@ ${formData.description || 'Sem observações adicionais'}
                   {sob ? 'Sob orçamento' : `${calculatedPrice !== null ? Math.round(calculatedPrice) : '—'}€`}
                 </p>
                 <p className="text-[10px] text-white/30">
-                  {sob ? 'Entraremos em contacto para combinar' : `${areaNum} m²`}
+                  {sob ? 'O nosso especialista entra em contacto' : `${areaNum} m²`}
                 </p>
               </>
             ) : (
@@ -1157,16 +1157,16 @@ ${formData.description || 'Sem observações adicionais'}
 
           {/* Input */}
           <div className="w-full max-w-xs">
-            <label className="block text-[10px] font-bold text-white/40 uppercase tracking-wider text-center mb-1.5">Área total de todos os tapetes</label>
+            <label className="block text-xs font-bold text-white/40 uppercase tracking-wider text-center mb-1.5">Área total de todos os tapetes</label>
             <div className="relative">
               <Input type="number" inputMode="decimal" min="0" step="0.5" placeholder="Ex: 12" value={formData.carpetArea} onChange={(e) => updateFormData({ carpetArea: e.target.value })} className={cn('text-lg font-bold bg-[#1a2a1a] text-white placeholder:text-white/25 h-11 pr-12 rounded-xl border-2 transition-all duration-300 focus-visible:ring-0 focus-visible:ring-offset-0', validArea ? 'border-gold shadow-[0_0_12px_rgba(212,175,55,0.18)]' : 'border-gold/25')} />
               <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-sm font-bold text-gold/60 pointer-events-none">m²</span>
             </div>
-            <p className="text-[10px] text-white/35 text-center mt-1 leading-snug">Se tiver vários tapetes, insira a soma total das áreas.</p>
+            <p className="text-xs text-white/35 text-center mt-1 leading-snug">Se tiver vários tapetes, insira a soma total das áreas.</p>
           </div>
 
           {/* Tier hint, compact single line */}
-          <p className="text-[9px] text-white/30 text-center leading-snug">
+          <p className="text-xs text-white/30 text-center leading-snug">
             ≤5m²: 10€/m² · ≤10m²: 8€/m² · ≤15m²: 7€/m² · +15m²: sob orçamento
           </p>
         </div>
@@ -1217,13 +1217,13 @@ ${formData.description || 'Sem observações adicionais'}
             </p>
             <p className="text-[10px] text-white/30">
               {sob
-                ? 'Entraremos em contacto para combinar'
+                ? 'O nosso especialista entra em contacto'
                 : `${qty} cadeira${qty > 1 ? 's' : ''}${addonEnabled ? (isWaterproofPrimary ? ' + higienização' : ' + impermeabilização') : ''}`}
             </p>
           </div>
 
           {/* Stepper, big and touch-friendly, identical to upsell */}
-          <p className="text-[10px] text-white/40 uppercase tracking-wider text-center">Quantidade</p>
+          <p className="text-xs text-white/40 uppercase tracking-wider text-center">Quantidade</p>
           <div className="flex items-center justify-center gap-6">
             <button
               onClick={() => setChairQty(qty - 1)}
@@ -1239,7 +1239,7 @@ ${formData.description || 'Sem observações adicionais'}
 
           {/* Progressive pricing info line */}
           {!sob && (
-            <p className="text-[9px] text-white/30 text-center leading-snug">
+            <p className="text-xs text-white/30 text-center leading-snug">
               {isWaterproofPrimary
                 ? '1ª–4ª: 15€ · 5ª–6ª: 12,5€ · 7ª–9ª: 10€ por cadeira'
                 : '1ª–3ª: 17,5€ · 4ª–6ª: 12,5€ · 7ª–9ª: 10€ por cadeira'}
@@ -1262,7 +1262,7 @@ ${formData.description || 'Sem observações adicionais'}
               </div>
               <div className="text-left flex-1">
                 <p className="text-sm font-bold text-white">{addonLabel}</p>
-                <p className="text-[10px] text-white/40">{addonRateHint}€/cadeira</p>
+                <p className="text-xs text-white/40">{addonRateHint}€/cadeira</p>
               </div>
               <span className="text-gold font-bold text-sm flex-shrink-0">
                 +{addonPrice !== null
@@ -1408,7 +1408,7 @@ ${formData.description || 'Sem observações adicionais'}
             </div>
           )}
 
-          <div className="flex flex-col py-3 sm:py-5 w-full items-center text-center min-h-full shrink-0 justify-center">
+          <div className="flex flex-col py-3 sm:py-5 w-full items-center text-center">
 
             {/* Step 0, Location Autocomplete VIP */}
             {/* Context banner when quiz opened from a problem page */}
@@ -1425,6 +1425,7 @@ ${formData.description || 'Sem observações adicionais'}
               <div
                 ref={locationSectionRef}
                 style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%', textAlign: 'center' }}
+                className="flex-1"
               >
                 {/* Compact title — hidden while searching to free space for results */}
                 {!locationQuery && (
@@ -1442,12 +1443,37 @@ ${formData.description || 'Sem observações adicionais'}
                 {!formData.location && (
                   <div className="w-full max-w-sm flex flex-col gap-2.5">
 
-                    {/* MOBILE: city cards first, search below.
-                        DESKTOP (sm+): search first, city cards below. */}
+                    {/* Search input — always first */}
+                    <div className="relative">
+                      <MapPin className="absolute left-3.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-white/30 pointer-events-none" />
+                      <input
+                        ref={locationInputRef}
+                        type="text"
+                        placeholder="Pesquisar outra cidade..."
+                        value={locationQuery}
+                        onChange={(e) => {
+                          setLocationQuery(e.target.value);
+                          setLocationFadeIn(false);
+                          setTimeout(() => {
+                            if (scrollContainerRef.current) scrollContainerRef.current.scrollTop = 0;
+                          }, 30);
+                        }}
+                        onFocus={() => {
+                          const reset = () => { if (scrollContainerRef.current) scrollContainerRef.current.scrollTop = 0; };
+                          reset();
+                          setTimeout(reset, 100);
+                          setTimeout(reset, 300);
+                          setTimeout(reset, 500);
+                        }}
+                        autoComplete="off"
+                        inputMode="search"
+                        className="w-full h-12 pl-9 pr-4 text-sm bg-[#1a2a1a] border border-gold/20 focus:border-gold focus:outline-none rounded-xl transition-colors text-white placeholder:text-white/30"
+                      />
+                    </div>
 
-                    {/* City cards — order-first on mobile, order-last on desktop */}
+                    {/* City cards — visible when not typing */}
                     {!locationQuery && (
-                      <div className="flex flex-col gap-2 order-first sm:order-last">
+                      <div className="flex flex-col gap-2">
                         {[
                           { city: 'Porto',  img: '/cities/porto.webp'  },
                           { city: 'Lisboa', img: '/cities/lisboa.webp' },
@@ -1483,34 +1509,6 @@ ${formData.description || 'Sem observações adicionais'}
                         })}
                       </div>
                     )}
-
-                    {/* Search input — order-last on mobile (below cards), order-first on desktop */}
-                    <div className="relative order-last sm:order-first">
-                      <MapPin className="absolute left-3.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-white/30 pointer-events-none" />
-                      <input
-                        ref={locationInputRef}
-                        type="text"
-                        placeholder="Pesquisar outra cidade..."
-                        value={locationQuery}
-                        onChange={(e) => {
-                          setLocationQuery(e.target.value);
-                          setLocationFadeIn(false);
-                          setTimeout(() => {
-                            if (scrollContainerRef.current) scrollContainerRef.current.scrollTop = 0;
-                          }, 30);
-                        }}
-                        onFocus={() => {
-                          const reset = () => { if (scrollContainerRef.current) scrollContainerRef.current.scrollTop = 0; };
-                          reset();
-                          setTimeout(reset, 100);
-                          setTimeout(reset, 300);
-                          setTimeout(reset, 500);
-                        }}
-                        autoComplete="off"
-                        inputMode="search"
-                        className="w-full h-12 pl-9 pr-4 text-sm bg-[#1a2a1a] border border-gold/20 focus:border-gold focus:outline-none rounded-xl transition-colors text-white placeholder:text-white/30"
-                      />
-                    </div>
 
                     {/* Search results — shown instead of city cards while typing */}
                     {locationQuery.length >= 1 && (() => {
@@ -1578,7 +1576,7 @@ ${formData.description || 'Sem observações adicionais'}
                 ? 'Ideal para colchões novos ou recém-limpos.'
                 : undefined;
               return (
-                <div className="flex flex-col gap-4 w-full max-w-sm self-center items-center text-center">
+                <div className="flex-1 flex flex-col gap-4 w-full max-w-sm self-center items-center text-center">
                   <div>
                     <p className="text-gold text-[10px] font-bold tracking-[0.28em] uppercase mb-1">O QUE PRECISA?</p>
                     <h2 className="font-playfair text-lg sm:text-xl font-bold text-white text-center w-full">
@@ -1598,7 +1596,7 @@ ${formData.description || 'Sem observações adicionais'}
                     packPrice={packPrice}
                     waterproofingDesc={waterDesc}
                   />
-                  <p className="text-[9px] text-white/20 uppercase tracking-widest text-center mt-1">
+                  <p className="text-xs text-white/20 uppercase tracking-widest text-center mt-1">
                     Todos os valores incluem IVA à taxa legal em vigor
                   </p>
                 </div>
@@ -1607,7 +1605,7 @@ ${formData.description || 'Sem observações adicionais'}
 
             {/* Step 3 - Config (hidden while Pack Família overlay is active) */}
             {currentStep === 3 && !showUpsell && (
-              <div className="flex flex-col w-full items-center text-center">
+              <div className="flex-1 flex flex-col w-full items-center text-center overflow-y-auto">
                 {renderStep2()}
               </div>
             )}
@@ -1684,14 +1682,14 @@ ${formData.description || 'Sem observações adicionais'}
                       </button>
                       <button
                         onClick={() => { (document.activeElement as HTMLElement)?.blur(); setShowUpsell(false); setCurrentStep(4); }}
-                        className="flex-1 h-11 flex items-center justify-center gap-1.5 text-white/45 hover:text-white/75 hover:border-white/30 text-sm font-medium transition-all touch-manipulation border border-white/[0.15] bg-transparent rounded-xl active:scale-[0.98]"
+                        className="flex-1 h-12 flex items-center justify-center gap-1.5 text-white font-bold transition-all touch-manipulation border border-white/30 bg-white/[0.08] hover:bg-white/[0.14] rounded-xl active:scale-[0.98] text-sm"
                       >
                         Não, seguir assim
                         <ChevronRight className="w-4 h-4" />
                       </button>
                     </div>
 
-                    <p className="text-[9px] text-white/15 mt-3">Sem compromisso · Pode remover artigos a qualquer momento</p>
+                    <p className="text-xs text-white/20 mt-3">Sem compromisso · Pode remover artigos a qualquer momento</p>
                   </div>
                 )}
 
@@ -1797,13 +1795,13 @@ ${formData.description || 'Sem observações adicionais'}
                           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
                           <div className="absolute inset-x-0 bottom-0 p-2 z-10 text-center">
                             <p className="text-[11px] font-bold text-white leading-tight">{opt.label}</p>
-                            <p className="text-[9px] text-gold/80 leading-none mt-0.5">{opt.sublabel}</p>
+                            <p className="text-[11px] text-gold/80 leading-none mt-0.5">{opt.sublabel}</p>
                           </div>
                         </button>
                       ))}
                     </div>
 
-                    <p className="text-[9px] text-white/20 text-center mb-3">Desconto não acumulável com outras promoções</p>
+                    <p className="text-xs text-white/25 text-center mb-3">Desconto não acumulável com outras promoções</p>
 
                     <div className="w-full max-w-xs mx-auto flex items-center gap-3">
                       <button
@@ -1884,7 +1882,7 @@ ${formData.description || 'Sem observações adicionais'}
                                       <Shield className={cn('w-4 h-4 flex-shrink-0', packOn ? 'text-gold' : 'text-white/25')} />
                                       <div className="flex-1 text-left">
                                         <p className={cn('text-[11px] font-bold leading-none', packOn ? 'text-white' : 'text-white/50')}>{upsellLabel}</p>
-                                        <p className={cn('text-[9px] mt-0.5 leading-none', packOn ? 'text-gold/60' : 'text-white/25')}>{isSob ? 'Preço sob orçamento · Incluído na proposta' : upsellSub}</p>
+                                        <p className={cn('text-[11px] mt-0.5 leading-none', packOn ? 'text-gold/60' : 'text-white/25')}>{isSob ? 'Preço sob orçamento · Incluído na proposta' : upsellSub}</p>
                                       </div>
                                       <div className={cn('w-8 h-4 rounded-full border flex items-center px-0.5 transition-all duration-300 flex-shrink-0', packOn ? 'border-gold bg-gold/20' : 'border-white/20 bg-white/[0.05]')}>
                                         <div className={cn('w-3 h-3 rounded-full transition-all duration-300', packOn ? 'bg-gold translate-x-[14px]' : 'bg-white/30 translate-x-0')} />
@@ -1971,7 +1969,7 @@ ${formData.description || 'Sem observações adicionais'}
                                       <Shield className={cn('w-4 h-4 flex-shrink-0', packOn ? 'text-gold' : 'text-white/25')} />
                                       <div className="flex-1 text-left">
                                         <p className={cn('text-[11px] font-bold leading-none', packOn ? 'text-white' : 'text-white/50')}>Adicionar Impermeabilização</p>
-                                        <p className={cn('text-[9px] mt-0.5 leading-none', packOn ? 'text-gold/60' : 'text-white/25')}>
+                                        <p className={cn('text-[11px] mt-0.5 leading-none', packOn ? 'text-gold/60' : 'text-white/25')}>
                                           {bothP !== null ? `+${(bothP - cleanP) * qty}€` : '+30€/un.'} · Proteção até 10 anos
                                         </p>
                                       </div>
@@ -2042,7 +2040,7 @@ ${formData.description || 'Sem observações adicionais'}
                                   {uSob ? 'Sob orçamento' : `${uPrice !== null ? Math.round(uPrice) : '—'}€`}
                                 </p>
                                 <p className="text-[10px] text-white/30">
-                                  {uSob ? 'Entraremos em contacto para combinar' : `${uArea} m²`}
+                                  {uSob ? 'O nosso especialista entra em contacto' : `${uArea} m²`}
                                 </p>
                               </>
                             ) : (
@@ -2061,7 +2059,7 @@ ${formData.description || 'Sem observações adicionais'}
                             onChange={e => setPendingCarpetArea(e.target.value)}
                             className="w-full h-12 px-4 text-lg font-bold text-center bg-[#1a2a1a] border border-gold/25 focus:border-gold focus:outline-none rounded-xl transition-colors text-white placeholder:text-white/25 mb-1"
                           />
-                          <p className="text-[9px] text-white/30 text-center mb-4">≤5m²: 10€/m² · ≤10m²: 8€/m² · ≤15m²: 7€/m² · +15m²: sob orçamento</p>
+                          <p className="text-xs text-white/30 text-center mb-4">≤5m²: 10€/m² · ≤10m²: 8€/m² · ≤15m²: 7€/m² · +15m²: sob orçamento</p>
 
                           <button
                             disabled={!pendingCarpetArea || isNaN(parseFloat(pendingCarpetArea)) || parseFloat(pendingCarpetArea) <= 0}
@@ -2101,7 +2099,7 @@ ${formData.description || 'Sem observações adicionais'}
                               {sobOrç ? 'Sob orçamento' : `${totalChairPrice % 1 === 0 ? totalChairPrice : totalChairPrice.toFixed(1).replace('.', ',')}€`}
                             </p>
                             <p className="text-[10px] text-white/30">
-                              {sobOrç ? 'Entraremos em contacto para combinar' : `${qty} cadeira${qty > 1 ? 's' : ''}${pendingWaterproof ? ' + impermeabilização' : ''}`}
+                              {sobOrç ? 'O nosso especialista entra em contacto' : `${qty} cadeira${qty > 1 ? 's' : ''}${pendingWaterproof ? ' + impermeabilização' : ''}`}
                             </p>
                           </div>
 
@@ -2134,7 +2132,7 @@ ${formData.description || 'Sem observações adicionais'}
                               </div>
                               <div className="text-left flex-1">
                                 <p className="text-sm font-bold text-white">Adicionar Impermeabilização</p>
-                                <p className="text-[10px] text-white/40">+10€/cadeira: proteção duradoura</p>
+                                <p className="text-xs text-white/40">+10€/cadeira: proteção duradoura</p>
                               </div>
                               <span className="text-gold font-bold text-sm flex-shrink-0">+{qty * 10}€</span>
                             </button>
@@ -2247,7 +2245,7 @@ ${formData.description || 'Sem observações adicionais'}
                     </div>
                   </div>
 
-                  <p className="text-[9px] text-white/20 text-center mb-4">Valor inclui IVA à taxa legal. Sujeito a confirmação presencial.</p>
+                  <p className="text-xs text-white/25 text-center mb-4">Valor inclui IVA à taxa legal. Sujeito a confirmação presencial.</p>
 
                   <div className="flex flex-col gap-2">
                     <button
@@ -2273,6 +2271,7 @@ ${formData.description || 'Sem observações adicionais'}
             {currentStep === 4 && !showUpsell && (
               <div
                 style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}
+                className="flex-1"
               >
                 <div className="w-full max-w-sm">
                   <p className="text-gold text-[10px] font-bold tracking-[0.28em] uppercase mb-1 text-center">CONTACTO</p>

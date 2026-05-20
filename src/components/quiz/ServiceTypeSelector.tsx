@@ -1,4 +1,5 @@
-﻿import { Sparkles, Shield, Star, Check } from 'lucide-react';
+﻿import type React from 'react';
+import { Sparkles, Shield, Star, Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface ServiceTypeSelectorProps {
@@ -10,6 +11,19 @@ interface ServiceTypeSelectorProps {
   waterproofingDesc?: string;
 }
 
+interface OptionConfig {
+  id: 'cleaning' | 'waterproofing' | 'both';
+  icon: React.ElementType;
+  title: string;
+  subtitle?: string;
+  badge?: string;
+  badgeStyle?: 'gold' | 'silver';
+  desc: string;
+  subdesc?: string;
+  price?: number;
+  recommended: boolean;
+}
+
 const ServiceTypeSelector = ({
   selectedType,
   onSelect,
@@ -18,7 +32,7 @@ const ServiceTypeSelector = ({
   packPrice,
   waterproofingDesc = 'Ideal para estofos novos ou recém-limpos.',
 }: ServiceTypeSelectorProps) => {
-  const options = [
+  const options: OptionConfig[] = [
     {
       id: 'cleaning' as const,
       icon: Sparkles,
@@ -32,7 +46,8 @@ const ServiceTypeSelector = ({
     {
       id: 'waterproofing' as const,
       icon: Shield,
-      title: 'Impermeabilização Premium',
+      title: 'Proteção Anti-Manchas',
+      subtitle: 'Impermeabilização Premium',
       badge: 'RECOMENDADO',
       badgeStyle: 'silver' as const,
       desc: waterproofingDesc,
@@ -110,8 +125,16 @@ const ServiceTypeSelector = ({
                   </span>
                 )}
               </div>
+              {opt.subtitle && (
+                <p className={cn(
+                  "text-[10px] leading-none mt-0.5 font-medium",
+                  isSelected ? "text-gold/70" : "text-gold/40"
+                )}>
+                  {opt.subtitle}
+                </p>
+              )}
               <p className={cn(
-                "text-[11px] mt-0.5 leading-snug",
+                "text-xs mt-0.5 leading-snug",
                 isSelected ? "text-white/65" : "text-white/40"
               )}>
                 {opt.desc}
