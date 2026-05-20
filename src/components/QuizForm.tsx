@@ -172,6 +172,7 @@ const QuizForm = ({ isOpen, onClose, initialLocation, problema }: QuizFormProps)
   // Prevents iOS Safari from scrolling the page when an input inside the modal
   // is focused, which would cause position:fixed elements to shift off-screen.
   useEffect(() => {
+    if (!isOpen) return;
     const scrollY = window.scrollY;
     document.body.style.position = 'fixed';
     document.body.style.top = `-${scrollY}px`;
@@ -184,7 +185,7 @@ const QuizForm = ({ isOpen, onClose, initialLocation, problema }: QuizFormProps)
       document.body.style.overflowY = '';
       window.scrollTo(0, scrollY);
     };
-  }, []);
+  }, [isOpen]);
 
   // ── KEYBOARD-AWARE SCROLL PADDING ─────────────────────────────────────────
   // When iOS keyboard opens, adds padding-bottom to the scroll container so
@@ -362,19 +363,9 @@ const QuizForm = ({ isOpen, onClose, initialLocation, problema }: QuizFormProps)
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen]);
 
-  // Lock body scroll when quiz is open
+  // Notify other components of quiz open/close state
   useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = 'hidden';
-      window.dispatchEvent(new CustomEvent('quizStateChange', { detail: { isOpen: true } }));
-    } else {
-      document.body.style.overflow = '';
-      window.dispatchEvent(new CustomEvent('quizStateChange', { detail: { isOpen: false } }));
-    }
-
-    return () => {
-      document.body.style.overflow = '';
-    };
+    window.dispatchEvent(new CustomEvent('quizStateChange', { detail: { isOpen } }));
   }, [isOpen]);
 
   // Exit intent: warn before page unload
