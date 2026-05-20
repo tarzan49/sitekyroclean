@@ -1,4 +1,4 @@
-import { Phone, Mail, MapPin } from "lucide-react";
+﻿import { Phone, Mail, MapPin } from "lucide-react";
 import { GOOGLE_MAPS_URL } from "@/constants/google";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -187,7 +187,7 @@ const Footer = () => {
               <h4 className="text-xs md:text-sm font-semibold mb-2 text-center md:text-right">{t('footer.followUs')}</h4>
               <div className="flex gap-3 justify-center md:justify-end">
                 <a
-                  href="https://www.cleansolutions.com.pt"
+                  href="https://cleansolutions.com.pt"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-11 h-11 bg-turquoise hover:bg-turquoise-light active:bg-turquoise-light rounded-full flex items-center justify-center transition-colors touch-manipulation"

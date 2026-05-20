@@ -1,4 +1,4 @@
-const BASE_URL = "https://www.cleansolutions.com.pt";
+﻿const BASE_URL = "https://cleansolutions.com.pt";
 
 interface ServiceReview {
   author: string;

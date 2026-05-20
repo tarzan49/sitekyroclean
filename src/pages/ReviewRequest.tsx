@@ -1,4 +1,4 @@
-import { useSearchParams } from "react-router-dom";
+﻿import { useSearchParams } from "react-router-dom";
 import { Star, ExternalLink, MessageCircle, Heart } from "lucide-react";
 import { GOOGLE_REVIEW_URL } from "@/constants/google";
 
@@ -24,7 +24,7 @@ const ReviewRequest = () => {
     "@context": "https://schema.org",
     "@type": "LocalBusiness",
     "name": "Kyro Clean Solutions",
-    "url": "https://www.cleansolutions.com.pt",
+    "url": "https://cleansolutions.com.pt",
     "telephone": "+351925530647",
     "aggregateRating": {
       "@type": "AggregateRating",

@@ -124,7 +124,7 @@ const ProblemPage = () => {
       const ogDesc = document.querySelector('meta[property="og:description"]');
       if (ogDesc) ogDesc.setAttribute("content", data.metaDescription);
       const canonical = document.querySelector('link[rel="canonical"]');
-      if (canonical) canonical.setAttribute("href", `https://www.cleansolutions.com.pt/problemas/${slug}`);
+      if (canonical) canonical.setAttribute("href", `https://cleansolutions.com.pt/problemas/${slug}`);
     }
   }, [slug, data]);
 
@@ -434,9 +434,9 @@ const ProblemPage = () => {
               "@graph": [
                 {
                   "@type": ["LocalBusiness", "CleaningService"],
-                  "@id": "https://www.cleansolutions.com.pt/#business",
+                  "@id": "https://cleansolutions.com.pt/#business",
                   "name": "Kyro Clean Solutions",
-                  "url": "https://www.cleansolutions.com.pt",
+                  "url": "https://cleansolutions.com.pt",
                   "telephone": "+351925530647",
                   "email": "cleansolutions.pt25@gmail.com",
                   "priceRange": "€€",
@@ -451,22 +451,22 @@ const ProblemPage = () => {
                 },
                 {
                   "@type": "WebPage",
-                  "@id": `https://www.cleansolutions.com.pt/problemas/${slug}#webpage`,
-                  "url": `https://www.cleansolutions.com.pt/problemas/${slug}`,
+                  "@id": `https://cleansolutions.com.pt/problemas/${slug}#webpage`,
+                  "url": `https://cleansolutions.com.pt/problemas/${slug}`,
                   "name": data.title,
                   "description": data.metaDescription,
                   "inLanguage": "pt-PT",
-                  "publisher": { "@id": "https://www.cleansolutions.com.pt/#business" },
-                  "isPartOf": { "@id": "https://www.cleansolutions.com.pt/#website" },
-                  "breadcrumb": { "@id": `https://www.cleansolutions.com.pt/problemas/${slug}#breadcrumb` },
+                  "publisher": { "@id": "https://cleansolutions.com.pt/#business" },
+                  "isPartOf": { "@id": "https://cleansolutions.com.pt/#website" },
+                  "breadcrumb": { "@id": `https://cleansolutions.com.pt/problemas/${slug}#breadcrumb` },
                 },
                 {
                   "@type": "BreadcrumbList",
-                  "@id": `https://www.cleansolutions.com.pt/problemas/${slug}#breadcrumb`,
+                  "@id": `https://cleansolutions.com.pt/problemas/${slug}#breadcrumb`,
                   "itemListElement": [
-                    { "@type": "ListItem", "position": 1, "name": "Início", "item": "https://www.cleansolutions.com.pt/" },
-                    { "@type": "ListItem", "position": 2, "name": "Problemas", "item": "https://www.cleansolutions.com.pt/problemas" },
-                    { "@type": "ListItem", "position": 3, "name": data.h1, "item": `https://www.cleansolutions.com.pt/problemas/${slug}` },
+                    { "@type": "ListItem", "position": 1, "name": "Início", "item": "https://cleansolutions.com.pt/" },
+                    { "@type": "ListItem", "position": 2, "name": "Problemas", "item": "https://cleansolutions.com.pt/problemas" },
+                    { "@type": "ListItem", "position": 3, "name": data.h1, "item": `https://cleansolutions.com.pt/problemas/${slug}` },
                   ],
                 },
               ],

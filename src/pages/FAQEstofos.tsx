@@ -5,7 +5,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import QuizButton from "@/components/QuizButton";
 
-const DOMAIN = "https://www.cleansolutions.com.pt";
+const DOMAIN = "https://cleansolutions.com.pt";
 const PAGE_URL = `${DOMAIN}/perguntas-frequentes-limpeza-estofos`;
 
 interface FAQ {

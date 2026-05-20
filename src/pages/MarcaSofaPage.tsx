@@ -58,7 +58,7 @@ const MarcaSofaPage = () => {
   }
 
   const { marca, city } = data;
-  const pageUrl = `https://www.cleansolutions.com.pt${pathname}`;
+  const pageUrl = `https://cleansolutions.com.pt${pathname}`;
   const pageTitle = `Limpeza Sofá ${marca.name} em ${city.name}, Especialistas | Kyro Clean`;
   const pageDesc = `Especialistas em limpeza de sofás ${marca.name} em ${city.name}. ${marca.material}. ${marca.estimatedPriceRange}. Serviço ao domicílio.`;
 
@@ -80,16 +80,16 @@ const MarcaSofaPage = () => {
         "name": pageTitle,
         "description": pageDesc,
         "inLanguage": "pt-PT",
-        "isPartOf": { "@id": "https://www.cleansolutions.com.pt/#website" },
-        "publisher": { "@id": "https://www.cleansolutions.com.pt/#business" },
+        "isPartOf": { "@id": "https://cleansolutions.com.pt/#website" },
+        "publisher": { "@id": "https://cleansolutions.com.pt/#business" },
         "breadcrumb": { "@id": `${pageUrl}#breadcrumb` },
       },
       {
         "@type": "BreadcrumbList",
         "@id": `${pageUrl}#breadcrumb`,
         "itemListElement": [
-          { "@type": "ListItem", "position": 1, "name": "Início", "item": "https://www.cleansolutions.com.pt/" },
-          { "@type": "ListItem", "position": 2, "name": "Limpeza de Sofás", "item": "https://www.cleansolutions.com.pt/limpeza-sofas" },
+          { "@type": "ListItem", "position": 1, "name": "Início", "item": "https://cleansolutions.com.pt/" },
+          { "@type": "ListItem", "position": 2, "name": "Limpeza de Sofás", "item": "https://cleansolutions.com.pt/limpeza-sofas" },
           { "@type": "ListItem", "position": 3, "name": `Sofá ${marca.name} em ${city.name}`, "item": pageUrl },
         ],
       },
@@ -99,7 +99,7 @@ const MarcaSofaPage = () => {
         "name": `Limpeza de Sofá ${marca.name} em ${city.name}`,
         "description": pageDesc,
         "url": pageUrl,
-        "provider": { "@id": "https://www.cleansolutions.com.pt/#business" },
+        "provider": { "@id": "https://cleansolutions.com.pt/#business" },
         "areaServed": { "@type": "City", "name": city.name },
         "offers": {
           "@type": "Offer",

@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+﻿import { Link } from "react-router-dom";
 import { ArrowRight, Map } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -17,21 +17,21 @@ const PacksSitemap = () => {
     "@graph": [
       {
         "@type": "WebPage",
-        "@id": "https://www.cleansolutions.com.pt/guia-de-packs#webpage",
-        "url": "https://www.cleansolutions.com.pt/guia-de-packs",
+        "@id": "https://cleansolutions.com.pt/guia-de-packs#webpage",
+        "url": "https://cleansolutions.com.pt/guia-de-packs",
         "name": "Guia de Packs de Limpeza | Kyro Clean Solutions",
         "inLanguage": "pt-PT",
-        "isPartOf": { "@id": "https://www.cleansolutions.com.pt/#website" },
-        "publisher": { "@id": "https://www.cleansolutions.com.pt/#business" },
-        "breadcrumb": { "@id": "https://www.cleansolutions.com.pt/guia-de-packs#breadcrumb" },
+        "isPartOf": { "@id": "https://cleansolutions.com.pt/#website" },
+        "publisher": { "@id": "https://cleansolutions.com.pt/#business" },
+        "breadcrumb": { "@id": "https://cleansolutions.com.pt/guia-de-packs#breadcrumb" },
       },
       {
         "@type": "BreadcrumbList",
-        "@id": "https://www.cleansolutions.com.pt/guia-de-packs#breadcrumb",
+        "@id": "https://cleansolutions.com.pt/guia-de-packs#breadcrumb",
         "itemListElement": [
-          { "@type": "ListItem", "position": 1, "name": "Início", "item": "https://www.cleansolutions.com.pt/" },
-          { "@type": "ListItem", "position": 2, "name": "Packs", "item": "https://www.cleansolutions.com.pt/packs" },
-          { "@type": "ListItem", "position": 3, "name": "Guia de Packs", "item": "https://www.cleansolutions.com.pt/guia-de-packs" },
+          { "@type": "ListItem", "position": 1, "name": "Início", "item": "https://cleansolutions.com.pt/" },
+          { "@type": "ListItem", "position": 2, "name": "Packs", "item": "https://cleansolutions.com.pt/packs" },
+          { "@type": "ListItem", "position": 3, "name": "Guia de Packs", "item": "https://cleansolutions.com.pt/guia-de-packs" },
         ],
       },
     ],

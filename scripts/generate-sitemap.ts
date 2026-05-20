@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Sitemap Generator for Kyro Clean Solutions
  * Generates a Sitemap Index + sub-sitemaps covering all ~1700+ URLs
  * 
@@ -9,7 +9,7 @@
 import fs from 'fs';
 import path from 'path';
 
-const BASE_URL = 'https://www.cleansolutions.com.pt';
+const BASE_URL = 'https://cleansolutions.com.pt';
 const TODAY = new Date().toISOString().split('T')[0];
 
 // ─── Data (mirrors src/data/) ────────────────────────────────────

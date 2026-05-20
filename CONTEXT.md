@@ -1,4 +1,4 @@
-# Kyro Clean Solutions — Full Project Context
+﻿# Kyro Clean Solutions — Full Project Context
 
 > Cola isto no início de uma nova conversa para retomar o trabalho sem perder nada.
 
@@ -556,7 +556,7 @@ Step 5 — Seletor de vaga/calendário
     - `PageHead.tsx` rota "/" sincronizada; OG tags e Twitter tags também atualizadas
 
 36. **`LocalBusinessSchema.tsx` — reescrito com @graph**
-    - `@id: "https://www.cleansolutions.com.pt/#business"` para cross-reference com ServiceLocationSchema (942 páginas)
+    - `@id: "https://cleansolutions.com.pt/#business"` para cross-reference com ServiceLocationSchema (942 páginas)
     - `WebSite` schema + `SearchAction` (sitelinks search box)
     - `logo`, `image` fields adicionados
     - `sameAs` inclui Google Maps URL via `GOOGLE_MAPS_URL` de `src/constants/google.ts`

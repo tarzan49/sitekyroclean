@@ -1,7 +1,7 @@
-import { cities } from "@/data/locationSeoData";
+﻿import { cities } from "@/data/locationSeoData";
 import { GOOGLE_MAPS_URL } from "@/constants/google";
 
-const BASE_URL = "https://www.cleansolutions.com.pt";
+const BASE_URL = "https://cleansolutions.com.pt";
 
 const LocalBusinessSchema = () => {
   const schema = {

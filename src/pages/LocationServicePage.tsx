@@ -155,7 +155,7 @@ const LocationServicePage = () => {
       const ogDesc = document.querySelector('meta[property="og:description"]');
       if (ogDesc) ogDesc.setAttribute("content", data.metaDescription);
       const canonical = document.querySelector('link[rel="canonical"]');
-      if (canonical) canonical.setAttribute("href", `https://www.cleansolutions.com.pt${location.pathname}`);
+      if (canonical) canonical.setAttribute("href", `https://cleansolutions.com.pt${location.pathname}`);
     }
   }, [location.pathname, data]);
 

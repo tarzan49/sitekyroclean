@@ -1,11 +1,11 @@
-import { useEffect } from "react";
+﻿import { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { BookOpen, ArrowRight, ChevronRight } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import QuizButton from "@/components/QuizButton";
 
-const DOMAIN = "https://www.cleansolutions.com.pt";
+const DOMAIN = "https://cleansolutions.com.pt";
 const PAGE_URL = `${DOMAIN}/glossario-limpeza-estofos`;
 
 interface Term {

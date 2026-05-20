@@ -66,8 +66,8 @@ const MaterialPage = () => {
       const desc = document.querySelector('meta[name="description"]');
       if (desc) desc.setAttribute("content", data.metaDescription);
       const canonicalUrl = isCityVariant
-        ? `https://www.cleansolutions.com.pt/${data.serviceSlug}-${citySlug}`
-        : `https://www.cleansolutions.com.pt${pathname}`;
+        ? `https://cleansolutions.com.pt/${data.serviceSlug}-${citySlug}`
+        : `https://cleansolutions.com.pt${pathname}`;
       const canonical = document.querySelector('link[rel="canonical"]');
       if (canonical) canonical.setAttribute("href", canonicalUrl);
       const ogTitle = document.querySelector('meta[property="og:title"]');
@@ -75,7 +75,7 @@ const MaterialPage = () => {
       const ogDesc = document.querySelector('meta[property="og:description"]');
       if (ogDesc) ogDesc.setAttribute("content", data.metaDescription);
       const ogUrl = document.querySelector('meta[property="og:url"]');
-      if (ogUrl) ogUrl.setAttribute("content", `https://www.cleansolutions.com.pt${pathname}`);
+      if (ogUrl) ogUrl.setAttribute("content", `https://cleansolutions.com.pt${pathname}`);
     }
   }, [pathname, data, isCityVariant, citySlug]);
 
@@ -367,32 +367,32 @@ const MaterialPage = () => {
           "@graph": [
             {
               "@type": "WebPage",
-              "@id": `https://www.cleansolutions.com.pt${pathname}#webpage`,
-              "url": `https://www.cleansolutions.com.pt${pathname}`,
+              "@id": `https://cleansolutions.com.pt${pathname}#webpage`,
+              "url": `https://cleansolutions.com.pt${pathname}`,
               "name": data.title,
               "description": data.metaDescription,
               "inLanguage": "pt-PT",
-              "isPartOf": { "@id": "https://www.cleansolutions.com.pt/#website" },
-              "publisher": { "@id": "https://www.cleansolutions.com.pt/#business" },
-              "breadcrumb": { "@id": `https://www.cleansolutions.com.pt${pathname}#breadcrumb` },
+              "isPartOf": { "@id": "https://cleansolutions.com.pt/#website" },
+              "publisher": { "@id": "https://cleansolutions.com.pt/#business" },
+              "breadcrumb": { "@id": `https://cleansolutions.com.pt${pathname}#breadcrumb` },
             },
             {
               "@type": "BreadcrumbList",
-              "@id": `https://www.cleansolutions.com.pt${pathname}#breadcrumb`,
+              "@id": `https://cleansolutions.com.pt${pathname}#breadcrumb`,
               "itemListElement": [
-                { "@type": "ListItem", "position": 1, "name": "Início", "item": "https://www.cleansolutions.com.pt" },
-                { "@type": "ListItem", "position": 2, "name": data.serviceName, "item": `https://www.cleansolutions.com.pt/${data.serviceSlug}` },
-                { "@type": "ListItem", "position": 3, "name": data.name, "item": `https://www.cleansolutions.com.pt/${data.slug}` },
-                ...(isCityVariant && cityName ? [{ "@type": "ListItem", "position": 4, "name": cityName, "item": `https://www.cleansolutions.com.pt${pathname}` }] : []),
+                { "@type": "ListItem", "position": 1, "name": "Início", "item": "https://cleansolutions.com.pt" },
+                { "@type": "ListItem", "position": 2, "name": data.serviceName, "item": `https://cleansolutions.com.pt/${data.serviceSlug}` },
+                { "@type": "ListItem", "position": 3, "name": data.name, "item": `https://cleansolutions.com.pt/${data.slug}` },
+                ...(isCityVariant && cityName ? [{ "@type": "ListItem", "position": 4, "name": cityName, "item": `https://cleansolutions.com.pt${pathname}` }] : []),
               ],
             },
             {
               "@type": "Service",
-              "@id": `https://www.cleansolutions.com.pt${pathname}#service`,
+              "@id": `https://cleansolutions.com.pt${pathname}#service`,
               "name": data.title,
               "description": data.metaDescription,
-              "url": `https://www.cleansolutions.com.pt${pathname}`,
-              "provider": { "@id": "https://www.cleansolutions.com.pt/#business" },
+              "url": `https://cleansolutions.com.pt${pathname}`,
+              "provider": { "@id": "https://cleansolutions.com.pt/#business" },
               "areaServed": isCityVariant && cityName
                 ? { "@type": "City", "name": cityName }
                 : [

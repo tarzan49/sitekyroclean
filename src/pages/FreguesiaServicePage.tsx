@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from "react";
+﻿import { useEffect, useMemo } from "react";
 import { useLocation, Link } from "react-router-dom";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { CheckCircle, MapPin, ArrowRight, Phone, Star, MessageCircle } from "lucide-react";
@@ -103,7 +103,7 @@ const FreguesiaServicePage = () => {
       const descTag = document.querySelector('meta[name="description"]');
       if (descTag) descTag.setAttribute("content", data.metaDescription);
       const canonical = document.querySelector('link[rel="canonical"]');
-      if (canonical) canonical.setAttribute("href", `https://www.cleansolutions.com.pt${location.pathname}`);
+      if (canonical) canonical.setAttribute("href", `https://cleansolutions.com.pt${location.pathname}`);
     }
   }, [location.pathname, data]);
 

@@ -1,4 +1,4 @@
-interface Props {
+﻿interface Props {
   serviceName: string;
   serviceBaseUrl: string;
   placeName: string;
@@ -10,7 +10,7 @@ interface Props {
 
 const ServiceLocationSchema = ({ serviceName, serviceBaseUrl, placeName, parentPlace, description, pageUrl, priceFrom }: Props) => {
   const priceNum = /\d+/.exec(priceFrom)?.[0] ?? "39";
-  const base = "https://www.cleansolutions.com.pt";
+  const base = "https://cleansolutions.com.pt";
   const fullUrl = `${base}${pageUrl}`;
 
   const areaServed = parentPlace

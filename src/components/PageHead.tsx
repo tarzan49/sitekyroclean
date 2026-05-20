@@ -248,7 +248,7 @@ const routeMeta: Record<string, { pt: PageMeta; en: PageMeta; es: PageMeta }> = 
   },
 };
 
-const DOMAIN = "https://www.cleansolutions.com.pt";
+const DOMAIN = "https://cleansolutions.com.pt";
 
 const PageHead = () => {
   const location = useLocation();

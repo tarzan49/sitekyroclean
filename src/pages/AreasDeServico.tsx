@@ -1,4 +1,4 @@
-import { useState } from "react";
+﻿import { useState } from "react";
 import { Link } from "react-router-dom";
 import { MapPin, ArrowRight, Phone, ChevronDown } from "lucide-react";
 import Header from "@/components/Header";
@@ -178,21 +178,21 @@ const AreasDeServico = () => {
               "@graph": [
                 {
                   "@type": "WebPage",
-                  "@id": "https://www.cleansolutions.com.pt/areas-de-servico#webpage",
-                  "url": "https://www.cleansolutions.com.pt/areas-de-servico",
+                  "@id": "https://cleansolutions.com.pt/areas-de-servico#webpage",
+                  "url": "https://cleansolutions.com.pt/areas-de-servico",
                   "name": "Áreas de Serviço | Kyro Clean Solutions",
                   "description": `Serviços de limpeza profissional em ${stats.municipios} municípios e ${stats.freguesias} freguesias da Área Metropolitana do Porto e Lisboa.`,
                   "inLanguage": "pt-PT",
-                  "isPartOf": { "@id": "https://www.cleansolutions.com.pt/#website" },
-                  "publisher": { "@id": "https://www.cleansolutions.com.pt/#business" },
-                  "breadcrumb": { "@id": "https://www.cleansolutions.com.pt/areas-de-servico#breadcrumb" },
+                  "isPartOf": { "@id": "https://cleansolutions.com.pt/#website" },
+                  "publisher": { "@id": "https://cleansolutions.com.pt/#business" },
+                  "breadcrumb": { "@id": "https://cleansolutions.com.pt/areas-de-servico#breadcrumb" },
                 },
                 {
                   "@type": "BreadcrumbList",
-                  "@id": "https://www.cleansolutions.com.pt/areas-de-servico#breadcrumb",
+                  "@id": "https://cleansolutions.com.pt/areas-de-servico#breadcrumb",
                   "itemListElement": [
-                    { "@type": "ListItem", "position": 1, "name": "Início", "item": "https://www.cleansolutions.com.pt/" },
-                    { "@type": "ListItem", "position": 2, "name": "Áreas de Serviço", "item": "https://www.cleansolutions.com.pt/areas-de-servico" },
+                    { "@type": "ListItem", "position": 1, "name": "Início", "item": "https://cleansolutions.com.pt/" },
+                    { "@type": "ListItem", "position": 2, "name": "Áreas de Serviço", "item": "https://cleansolutions.com.pt/areas-de-servico" },
                   ],
                 },
               ],

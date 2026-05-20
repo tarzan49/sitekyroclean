@@ -1,4 +1,4 @@
-// Handles all keyword variant pages:
+﻿// Handles all keyword variant pages:
 // /higienizacao-[service]-[city-or-parish]
 // /lavagem-[service]-[city-or-parish]
 // Canonical always points to the equivalent limpeza page.
@@ -106,7 +106,7 @@ const SofaVariantPage = () => {
     document.querySelector('meta[property="og:title"]')?.setAttribute('content', data.title);
     document.querySelector('meta[property="og:description"]')?.setAttribute('content', data.metaDescription);
     document.querySelector('link[rel="canonical"]')
-      ?.setAttribute('href', `https://www.cleansolutions.com.pt${data.canonical}`);
+      ?.setAttribute('href', `https://cleansolutions.com.pt${data.canonical}`);
     let robotsMeta = document.querySelector('meta[name="robots"]');
     if (!robotsMeta) {
       robotsMeta = document.createElement('meta');

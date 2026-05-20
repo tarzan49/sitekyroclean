@@ -54,7 +54,7 @@ const PackComboPage = () => {
     [pack, city, selections, prices]
   );
 
-  const pageUrl = `https://www.cleansolutions.com.pt${pathname}`;
+  const pageUrl = `https://cleansolutions.com.pt${pathname}`;
   const fromPriceText = prices ? `${prices.packTotal}€` : `a calcular`;
   const pageTitle = `${pack.name} em ${city.name}, Desde ${fromPriceText} | Kyro Clean`;
   const pageDesc = `${pack.description} Poupe até 20% em relação ao preço individual. Serviço ao domicílio em ${city.name}.`;
@@ -77,16 +77,16 @@ const PackComboPage = () => {
         "name": pageTitle,
         "description": pageDesc,
         "inLanguage": "pt-PT",
-        "isPartOf": { "@id": "https://www.cleansolutions.com.pt/#website" },
-        "publisher": { "@id": "https://www.cleansolutions.com.pt/#business" },
+        "isPartOf": { "@id": "https://cleansolutions.com.pt/#website" },
+        "publisher": { "@id": "https://cleansolutions.com.pt/#business" },
         "breadcrumb": { "@id": `${pageUrl}#breadcrumb` },
       },
       {
         "@type": "BreadcrumbList",
         "@id": `${pageUrl}#breadcrumb`,
         "itemListElement": [
-          { "@type": "ListItem", "position": 1, "name": "Início", "item": "https://www.cleansolutions.com.pt/" },
-          { "@type": "ListItem", "position": 2, "name": "Packs", "item": "https://www.cleansolutions.com.pt/packs" },
+          { "@type": "ListItem", "position": 1, "name": "Início", "item": "https://cleansolutions.com.pt/" },
+          { "@type": "ListItem", "position": 2, "name": "Packs", "item": "https://cleansolutions.com.pt/packs" },
           { "@type": "ListItem", "position": 3, "name": `${pack.name} em ${city.name}`, "item": pageUrl },
         ],
       },
@@ -96,7 +96,7 @@ const PackComboPage = () => {
         "name": `${pack.name} em ${city.name}`,
         "description": pack.description,
         "url": pageUrl,
-        "provider": { "@id": "https://www.cleansolutions.com.pt/#business" },
+        "provider": { "@id": "https://cleansolutions.com.pt/#business" },
         "areaServed": { "@type": "City", "name": city.name },
         "offers": {
           "@type": "Offer",

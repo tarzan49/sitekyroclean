@@ -24,7 +24,7 @@ const PricePage = () => {
       const desc = document.querySelector('meta[name="description"]');
       if (desc) desc.setAttribute("content", data.metaDescription);
       // Canonical points to the main LocationServicePage to consolidate link equity
-      const canonicalUrl = `https://www.cleansolutions.com.pt/${data.serviceSlug}-${data.citySlug}`;
+      const canonicalUrl = `https://cleansolutions.com.pt/${data.serviceSlug}-${data.citySlug}`;
       const canonical = document.querySelector('link[rel="canonical"]');
       if (canonical) canonical.setAttribute("href", canonicalUrl);
     }
@@ -277,31 +277,31 @@ const PricePage = () => {
               "@graph": [
                 {
                   "@type": "WebPage",
-                  "@id": `https://www.cleansolutions.com.pt${pathname}#webpage`,
-                  "url": `https://www.cleansolutions.com.pt${pathname}`,
+                  "@id": `https://cleansolutions.com.pt${pathname}#webpage`,
+                  "url": `https://cleansolutions.com.pt${pathname}`,
                   "name": data.title,
                   "description": data.metaDescription,
                   "inLanguage": "pt-PT",
-                  "isPartOf": { "@id": "https://www.cleansolutions.com.pt/#website" },
-                  "publisher": { "@id": "https://www.cleansolutions.com.pt/#business" },
-                  "breadcrumb": { "@id": `https://www.cleansolutions.com.pt${pathname}#breadcrumb` },
+                  "isPartOf": { "@id": "https://cleansolutions.com.pt/#website" },
+                  "publisher": { "@id": "https://cleansolutions.com.pt/#business" },
+                  "breadcrumb": { "@id": `https://cleansolutions.com.pt${pathname}#breadcrumb` },
                 },
                 {
                   "@type": "BreadcrumbList",
-                  "@id": `https://www.cleansolutions.com.pt${pathname}#breadcrumb`,
+                  "@id": `https://cleansolutions.com.pt${pathname}#breadcrumb`,
                   "itemListElement": [
-                    { "@type": "ListItem", "position": 1, "name": "Início", "item": "https://www.cleansolutions.com.pt" },
-                    { "@type": "ListItem", "position": 2, "name": data.serviceName, "item": `https://www.cleansolutions.com.pt/${data.serviceSlug}` },
-                    { "@type": "ListItem", "position": 3, "name": `Preços em ${data.cityName}`, "item": `https://www.cleansolutions.com.pt${pathname}` },
+                    { "@type": "ListItem", "position": 1, "name": "Início", "item": "https://cleansolutions.com.pt" },
+                    { "@type": "ListItem", "position": 2, "name": data.serviceName, "item": `https://cleansolutions.com.pt/${data.serviceSlug}` },
+                    { "@type": "ListItem", "position": 3, "name": `Preços em ${data.cityName}`, "item": `https://cleansolutions.com.pt${pathname}` },
                   ],
                 },
                 {
                   "@type": "Service",
-                  "@id": `https://www.cleansolutions.com.pt${pathname}#service`,
+                  "@id": `https://cleansolutions.com.pt${pathname}#service`,
                   "name": `${data.serviceName} em ${data.cityName}`,
                   "description": data.metaDescription,
-                  "url": `https://www.cleansolutions.com.pt${pathname}`,
-                  "provider": { "@id": "https://www.cleansolutions.com.pt/#business" },
+                  "url": `https://cleansolutions.com.pt${pathname}`,
+                  "provider": { "@id": "https://cleansolutions.com.pt/#business" },
                   "areaServed": { "@type": "City", "name": data.cityName },
                   "offers": {
                     "@type": "Offer",

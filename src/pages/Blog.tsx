@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+﻿import { Link } from "react-router-dom";
 import { Clock, ArrowRight, ChevronRight, User } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -54,37 +54,37 @@ const Blog = () => {
     "@graph": [
       {
         "@type": "WebPage",
-        "@id": "https://www.cleansolutions.com.pt/blog#webpage",
-        "url": "https://www.cleansolutions.com.pt/blog",
+        "@id": "https://cleansolutions.com.pt/blog#webpage",
+        "url": "https://cleansolutions.com.pt/blog",
         "name": "Blog | Kyro Clean Solutions",
         "inLanguage": "pt-PT",
-        "isPartOf": { "@id": "https://www.cleansolutions.com.pt/#website" },
-        "publisher": { "@id": "https://www.cleansolutions.com.pt/#business" },
-        "breadcrumb": { "@id": "https://www.cleansolutions.com.pt/blog#breadcrumb" },
+        "isPartOf": { "@id": "https://cleansolutions.com.pt/#website" },
+        "publisher": { "@id": "https://cleansolutions.com.pt/#business" },
+        "breadcrumb": { "@id": "https://cleansolutions.com.pt/blog#breadcrumb" },
       },
       {
         "@type": "Blog",
-        "@id": "https://www.cleansolutions.com.pt/blog#blog",
+        "@id": "https://cleansolutions.com.pt/blog#blog",
         "name": "Blog Kyro Clean Solutions",
         "description": "Dicas, guias e informação sobre limpeza profissional de sofás, colchões, tapetes e estofos.",
-        "url": "https://www.cleansolutions.com.pt/blog",
+        "url": "https://cleansolutions.com.pt/blog",
         "inLanguage": "pt-PT",
-        "publisher": { "@id": "https://www.cleansolutions.com.pt/#business" },
+        "publisher": { "@id": "https://cleansolutions.com.pt/#business" },
         "blogPost": posts.map(p => ({
           "@type": "BlogPosting",
           "headline": p.title,
-          "url": `https://www.cleansolutions.com.pt/blog/${p.slug}`,
+          "url": `https://cleansolutions.com.pt/blog/${p.slug}`,
           "datePublished": p.publishDate,
           "dateModified": p.updatedDate,
-          "author": { "@id": "https://www.cleansolutions.com.pt/#business" },
+          "author": { "@id": "https://cleansolutions.com.pt/#business" },
         })),
       },
       {
         "@type": "BreadcrumbList",
-        "@id": "https://www.cleansolutions.com.pt/blog#breadcrumb",
+        "@id": "https://cleansolutions.com.pt/blog#breadcrumb",
         "itemListElement": [
-          { "@type": "ListItem", "position": 1, "name": "Início", "item": "https://www.cleansolutions.com.pt/" },
-          { "@type": "ListItem", "position": 2, "name": "Blog", "item": "https://www.cleansolutions.com.pt/blog" },
+          { "@type": "ListItem", "position": 1, "name": "Início", "item": "https://cleansolutions.com.pt/" },
+          { "@type": "ListItem", "position": 2, "name": "Blog", "item": "https://cleansolutions.com.pt/blog" },
         ],
       },
     ],

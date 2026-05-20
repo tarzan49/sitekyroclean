@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+﻿import { Link } from "react-router-dom";
 import { CheckCircle, ArrowRight, Tag, Map } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -13,20 +13,20 @@ const Packs = () => {
     "@graph": [
       {
         "@type": "WebPage",
-        "@id": "https://www.cleansolutions.com.pt/packs#webpage",
-        "url": "https://www.cleansolutions.com.pt/packs",
+        "@id": "https://cleansolutions.com.pt/packs#webpage",
+        "url": "https://cleansolutions.com.pt/packs",
         "name": "Packs de Limpeza com Desconto | Kyro Clean Solutions",
         "inLanguage": "pt-PT",
-        "isPartOf": { "@id": "https://www.cleansolutions.com.pt/#website" },
-        "publisher": { "@id": "https://www.cleansolutions.com.pt/#business" },
-        "breadcrumb": { "@id": "https://www.cleansolutions.com.pt/packs#breadcrumb" },
+        "isPartOf": { "@id": "https://cleansolutions.com.pt/#website" },
+        "publisher": { "@id": "https://cleansolutions.com.pt/#business" },
+        "breadcrumb": { "@id": "https://cleansolutions.com.pt/packs#breadcrumb" },
       },
       {
         "@type": "BreadcrumbList",
-        "@id": "https://www.cleansolutions.com.pt/packs#breadcrumb",
+        "@id": "https://cleansolutions.com.pt/packs#breadcrumb",
         "itemListElement": [
-          { "@type": "ListItem", "position": 1, "name": "Início", "item": "https://www.cleansolutions.com.pt/" },
-          { "@type": "ListItem", "position": 2, "name": "Packs", "item": "https://www.cleansolutions.com.pt/packs" },
+          { "@type": "ListItem", "position": 1, "name": "Início", "item": "https://cleansolutions.com.pt/" },
+          { "@type": "ListItem", "position": 2, "name": "Packs", "item": "https://cleansolutions.com.pt/packs" },
         ],
       },
     ],

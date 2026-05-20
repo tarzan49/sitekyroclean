@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+﻿import { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Star, ArrowRight, Phone, MessageCircle } from "lucide-react";
 import Header from "@/components/Header";
@@ -52,7 +52,7 @@ const BeforeAfterPage = () => {
     const desc = document.querySelector('meta[name="description"]');
     if (desc) desc.setAttribute("content", "Veja os resultados reais da limpeza profissional de sofás, colchões, tapetes e cadeiras. Antes e depois de cada serviço. Resultados visíveis no momento.");
     const canonical = document.querySelector('link[rel="canonical"]');
-    if (canonical) canonical.setAttribute("href", "https://www.cleansolutions.com.pt/antes-depois-limpeza");
+    if (canonical) canonical.setAttribute("href", "https://cleansolutions.com.pt/antes-depois-limpeza");
   }, []);
 
   return (
@@ -62,21 +62,21 @@ const BeforeAfterPage = () => {
         "@graph": [
           {
             "@type": "WebPage",
-            "@id": "https://www.cleansolutions.com.pt/antes-depois-limpeza#webpage",
-            "url": "https://www.cleansolutions.com.pt/antes-depois-limpeza",
+            "@id": "https://cleansolutions.com.pt/antes-depois-limpeza#webpage",
+            "url": "https://cleansolutions.com.pt/antes-depois-limpeza",
             "name": "Antes e Depois | Resultados de Limpeza Profissional | Kyro Clean Solutions",
             "description": "Veja os resultados reais da limpeza profissional de sofás, colchões, tapetes e cadeiras. Antes e depois de cada serviço. Resultados visíveis no momento.",
             "inLanguage": "pt-PT",
-            "isPartOf": { "@id": "https://www.cleansolutions.com.pt/#website" },
-            "publisher": { "@id": "https://www.cleansolutions.com.pt/#business" },
-            "breadcrumb": { "@id": "https://www.cleansolutions.com.pt/antes-depois-limpeza#breadcrumb" },
+            "isPartOf": { "@id": "https://cleansolutions.com.pt/#website" },
+            "publisher": { "@id": "https://cleansolutions.com.pt/#business" },
+            "breadcrumb": { "@id": "https://cleansolutions.com.pt/antes-depois-limpeza#breadcrumb" },
           },
           {
             "@type": "BreadcrumbList",
-            "@id": "https://www.cleansolutions.com.pt/antes-depois-limpeza#breadcrumb",
+            "@id": "https://cleansolutions.com.pt/antes-depois-limpeza#breadcrumb",
             "itemListElement": [
-              { "@type": "ListItem", "position": 1, "name": "Início", "item": "https://www.cleansolutions.com.pt" },
-              { "@type": "ListItem", "position": 2, "name": "Antes e Depois", "item": "https://www.cleansolutions.com.pt/antes-depois-limpeza" },
+              { "@type": "ListItem", "position": 1, "name": "Início", "item": "https://cleansolutions.com.pt" },
+              { "@type": "ListItem", "position": 2, "name": "Antes e Depois", "item": "https://cleansolutions.com.pt/antes-depois-limpeza" },
             ],
           },
         ],

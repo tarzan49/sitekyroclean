@@ -1,4 +1,4 @@
-import { useMemo, useEffect } from "react";
+﻿import { useMemo, useEffect } from "react";
 import { useLocation, Link } from "react-router-dom";
 import { Clock, ArrowRight, ChevronRight, Calendar, User, Lightbulb } from "lucide-react";
 import Header from "@/components/Header";
@@ -59,7 +59,7 @@ const BlogPost = () => {
     document.querySelector('meta[name="description"]')?.setAttribute("content", post.metaDescription);
     document.querySelector('meta[property="og:title"]')?.setAttribute("content", post.metaTitle);
     document.querySelector('meta[property="og:description"]')?.setAttribute("content", post.metaDescription);
-    document.querySelector('link[rel="canonical"]')?.setAttribute("href", `https://www.cleansolutions.com.pt/blog/${post.slug}`);
+    document.querySelector('link[rel="canonical"]')?.setAttribute("href", `https://cleansolutions.com.pt/blog/${post.slug}`);
   }, [post]);
 
   if (!post) {
@@ -83,7 +83,7 @@ const BlogPost = () => {
     day: "numeric", month: "long", year: "numeric",
   });
 
-  const BASE_URL = "https://www.cleansolutions.com.pt";
+  const BASE_URL = "https://cleansolutions.com.pt";
   const pageUrl = `${BASE_URL}/blog/${post.slug}`;
 
   const jsonLd = {
