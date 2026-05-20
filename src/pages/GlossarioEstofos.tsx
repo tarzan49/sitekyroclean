@@ -125,28 +125,43 @@ const terms: Term[] = [
   },
 ];
 
-const glossarySchema = {
+const combinedSchema = {
   "@context": "https://schema.org",
-  "@type": "DefinedTermSet",
-  name: "Glossário de Limpeza de Estofos | Kyro Clean Solutions",
-  description: "16 termos técnicos sobre limpeza profissional de sofás, colchões, tapetes, alcatifas e estofos em Portugal, explicados pela Kyro Clean Solutions.",
-  url: PAGE_URL,
-  definedTerm: terms.map((t) => ({
-    "@type": "DefinedTerm",
-    name: t.term,
-    description: t.definition,
-    inDefinedTermSet: PAGE_URL,
-    url: `${PAGE_URL}#${t.id}`,
-  })),
-};
-
-const breadcrumbSchema = {
-  "@context": "https://schema.org",
-  "@type": "BreadcrumbList",
-  itemListElement: [
-    { "@type": "ListItem", position: 1, name: "Início", item: DOMAIN },
-    { "@type": "ListItem", position: 2, name: "Recursos", item: `${DOMAIN}/blog` },
-    { "@type": "ListItem", position: 3, name: "Glossário", item: PAGE_URL },
+  "@graph": [
+    {
+      "@type": "WebPage",
+      "@id": `${PAGE_URL}#webpage`,
+      "url": PAGE_URL,
+      "name": "Glossário de Limpeza de Estofos: 16 Termos Técnicos | Kyro Clean Solutions",
+      "inLanguage": "pt-PT",
+      "isPartOf": { "@id": `${DOMAIN}/#website` },
+      "publisher": { "@id": `${DOMAIN}/#business` },
+      "breadcrumb": { "@id": `${PAGE_URL}#breadcrumb` },
+    },
+    {
+      "@type": "DefinedTermSet",
+      "@id": `${PAGE_URL}#glossary`,
+      "name": "Glossário de Limpeza de Estofos | Kyro Clean Solutions",
+      "description": "16 termos técnicos sobre limpeza profissional de sofás, colchões, tapetes, alcatifas e estofos em Portugal, explicados pela Kyro Clean Solutions.",
+      "url": PAGE_URL,
+      "inLanguage": "pt-PT",
+      "definedTerm": terms.map((t) => ({
+        "@type": "DefinedTerm",
+        "name": t.term,
+        "description": t.definition,
+        "inDefinedTermSet": PAGE_URL,
+        "url": `${PAGE_URL}#${t.id}`,
+      })),
+    },
+    {
+      "@type": "BreadcrumbList",
+      "@id": `${PAGE_URL}#breadcrumb`,
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Início", "item": DOMAIN },
+        { "@type": "ListItem", "position": 2, "name": "Recursos", "item": `${DOMAIN}/blog` },
+        { "@type": "ListItem", "position": 3, "name": "Glossário", "item": PAGE_URL },
+      ],
+    },
   ],
 };
 
@@ -164,18 +179,7 @@ const GlossarioEstofos = () => {
 
   return (
     <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({
-        "@context": "https://schema.org",
-        "@type": "WebPage",
-        "@id": `${PAGE_URL}#webpage`,
-        "url": PAGE_URL,
-        "name": "Glossário de Limpeza de Estofos: 16 Termos Técnicos | Kyro Clean Solutions",
-        "inLanguage": "pt-PT",
-        "isPartOf": { "@id": "https://www.cleansolutions.com.pt/#website" },
-        "publisher": { "@id": "https://www.cleansolutions.com.pt/#business" },
-      }) }} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(glossarySchema) }} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(combinedSchema) }} />
 
       <div className="min-h-screen bg-[#f4f5f7]">
         <Header />

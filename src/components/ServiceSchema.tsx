@@ -105,6 +105,7 @@ const ServiceSchema = ({ serviceName, description, url, priceFrom, imageUrl, bre
           "price": priceNumeric,
           "availability": "https://schema.org/InStock",
           "validFrom": "2025-01-01",
+          "priceValidUntil": "2026-12-31",
         },
         ...(hasReviews && {
           "aggregateRating": {

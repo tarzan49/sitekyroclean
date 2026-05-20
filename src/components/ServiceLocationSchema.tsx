@@ -80,6 +80,7 @@ const ServiceLocationSchema = ({ serviceName, serviceBaseUrl, placeName, parentP
           "price": priceNum,
           "availability": "https://schema.org/InStock",
           "validFrom": "2025-01-01",
+          "priceValidUntil": "2026-12-31",
         },
       },
     ],
