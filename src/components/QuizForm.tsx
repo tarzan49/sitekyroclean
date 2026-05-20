@@ -168,9 +168,26 @@ const QuizForm = ({ isOpen, onClose, initialLocation, problema }: QuizFormProps)
 
   const totalSteps = 4;
 
+  // ── LOCK BODY SCROLL WHILE QUIZ IS OPEN ───────────────────────────────────
+  // Prevents iOS Safari from scrolling the page when an input inside the modal
+  // is focused, which would cause position:fixed elements to shift off-screen.
+  useEffect(() => {
+    const scrollY = window.scrollY;
+    document.body.style.position = 'fixed';
+    document.body.style.top = `-${scrollY}px`;
+    document.body.style.width = '100%';
+    document.body.style.overflowY = 'scroll';
+    return () => {
+      document.body.style.position = '';
+      document.body.style.top = '';
+      document.body.style.width = '';
+      document.body.style.overflowY = '';
+      window.scrollTo(0, scrollY);
+    };
+  }, []);
+
   // ── KEYBOARD-AWARE CARD HEIGHT ─────────────────────────────────────────────
-  // Shrinks the card to the visual viewport height when the iOS keyboard opens,
-  // so inputs are always visible above the keyboard.
+  // Shrinks the card to the visual viewport height when the iOS keyboard opens.
   useEffect(() => {
     const vv = window.visualViewport;
     if (!vv) return;
