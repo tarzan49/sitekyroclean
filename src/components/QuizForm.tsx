@@ -704,7 +704,7 @@ Detalhes: ${detailsSummary}
 Localização: ${finalLocation}
 Deslocação: ${isFreeTravel ? 'Grátis (pedido >150€)' : `${finalTravelCost}€`}
 VALOR TOTAL (IVA incl.): ${priceText}
-Contacto preferido: WhatsApp
+Contacto preferido: WhatsApp${formData.email ? `\nEmail: ${formData.email}` : ''}
 
 Observações:
 ${formData.description || 'Sem observações adicionais'}
@@ -715,6 +715,7 @@ ${formData.description || 'Sem observações adicionais'}
       const formPayload = new FormData();
       formPayload.append('name', formData.name);
       formPayload.append('phone', formData.phone);
+      if (formData.email) formPayload.append('email', formData.email);
       formPayload.append('location', finalLocation);
       formPayload.append('message', message);
       formPayload.append('subject', `Pedido de orçamento - ${serviceLabel}`);
@@ -755,6 +756,7 @@ ${formData.description || 'Sem observações adicionais'}
         await supabase.from('leads').insert({
           name: formData.name,
           phone: formData.phone,
+          email: formData.email || null,
           service: crmServiceLabel,
           service_type: serviceTypeLabel,
           details: detailsSummary,
@@ -2331,7 +2333,30 @@ ${formData.description || 'Sem observações adicionais'}
                         className="text-base h-13 bg-[#1a2a1a] border-gold/25 text-white placeholder:text-white/20 focus-visible:ring-gold rounded-xl"
                       />
                     </div>
-  </div>
+                    <div>
+                      <label className="block text-[11px] font-bold text-white/50 uppercase tracking-wider mb-1.5">Email <span className="text-white/25 normal-case font-normal">(opcional)</span></label>
+                      <Input
+                        type="email"
+                        placeholder="o.seu@email.com"
+                        value={formData.email}
+                        onChange={(e) => updateFormData({ email: e.target.value })}
+                        autoComplete="off"
+                        inputMode="email"
+                        onFocus={(e) => {
+                          setTimeout(() => {
+                            const sc = scrollContainerRef.current;
+                            if (!sc) return;
+                            const scRect = sc.getBoundingClientRect();
+                            const elRect = e.target.getBoundingClientRect();
+                            if (elRect.bottom > scRect.bottom - 16) {
+                              sc.scrollBy({ top: elRect.bottom - scRect.bottom + 24, behavior: 'smooth' });
+                            }
+                          }, 400);
+                        }}
+                        className="text-base h-13 bg-[#1a2a1a] border-gold/25 text-white placeholder:text-white/20 focus-visible:ring-gold rounded-xl"
+                      />
+                    </div>
+                  </div>
 </div>
 </div>
 )}
