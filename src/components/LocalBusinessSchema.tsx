@@ -63,7 +63,6 @@ const LocalBusinessSchema = () => {
           "reviewCount": "51",
           "ratingCount": "51",
         },
-        // Add Instagram/Facebook URLs here when created: "https://www.instagram.com/kyrocleansolutions", etc.
         "sameAs": [
           BASE_URL,
           GOOGLE_MAPS_URL,
@@ -89,14 +88,6 @@ const LocalBusinessSchema = () => {
         "description": "Limpeza profissional de estofos ao domicílio em Portugal",
         "publisher": { "@id": `${BASE_URL}/#business` },
         "inLanguage": "pt-PT",
-        "potentialAction": {
-          "@type": "SearchAction",
-          "target": {
-            "@type": "EntryPoint",
-            "urlTemplate": `${BASE_URL}/?s={search_term_string}`,
-          },
-          "query-input": "required name=search_term_string",
-        },
       },
     ],
   };

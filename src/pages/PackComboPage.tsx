@@ -8,6 +8,7 @@ import {
   getPackByCityAndId,
   calcPackPrices,
   getDefaultSelections,
+  getFromPrice,
   buildWhatsAppUrl,
 } from "@/data/packComboData";
 
@@ -100,12 +101,11 @@ const PackComboPage = () => {
         "offers": {
           "@type": "Offer",
           "availability": "https://schema.org/InStock",
+          "priceCurrency": "EUR",
+          "price": String(getFromPrice(pack)),
+          "priceValidUntil": "2026-12-31",
+          "validFrom": "2025-01-01",
           "areaServed": { "@type": "City", "name": city.name },
-          "priceSpecification": {
-            "@type": "PriceSpecification",
-            "priceCurrency": "EUR",
-            "description": `Pack ${pack.name}, preço com desconto, IVA incluído`,
-          },
         },
       },
     ],
