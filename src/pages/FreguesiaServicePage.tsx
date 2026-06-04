@@ -107,6 +107,18 @@ const FreguesiaServicePage = () => {
     }
   }, [location.pathname, data]);
 
+  const municipioProblems = useMemo(() => {
+    if (!data) return [];
+    return getAllProblems()
+      .filter(p =>
+        p.visible &&
+        p.relatedServices.includes(data.serviceSlug) &&
+        (METRO_CITIES.has(data.municipioSlug) || p.relatedCities.includes(data.municipioSlug))
+      )
+      .slice(0, 5)
+      .map(p => ({ slug: p.slug, keyword: p.keyword }));
+  }, [data]);
+
   if (!data) {
     return (
       <>
@@ -124,18 +136,6 @@ const FreguesiaServicePage = () => {
 
   const nearbyFreguesias = getNearbyFreguesias(data.municipioSlug, data.nearby);
   const otherServices = services.filter(s => s.slug !== data.serviceSlug);
-
-  const municipioProblems = useMemo(() => {
-    if (!data) return [];
-    return getAllProblems()
-      .filter(p =>
-        p.visible &&
-        p.relatedServices.includes(data.serviceSlug) &&
-        (METRO_CITIES.has(data.municipioSlug) || p.relatedCities.includes(data.municipioSlug))
-      )
-      .slice(0, 5)
-      .map(p => ({ slug: p.slug, keyword: p.keyword }));
-  }, [data]);
   const heroImgs = SERVICE_HERO_IMAGES[data.serviceSlug] ?? { d: heroSofaD, m: heroSofaM };
   const resultImg = SERVICE_RESULT_IMAGES[data.serviceSlug] ?? resultSofa;
   const resultLabel = data.serviceSlug === 'impermeabilizacao' ? 'impermeabilização' : 'limpeza';

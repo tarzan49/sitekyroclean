@@ -27,6 +27,30 @@ const PackComboPage = () => {
     if (data) setSelections(getDefaultSelections(data.pack));
   }, [data]);
 
+  const prices = useMemo(
+    () => data ? calcPackPrices(data.pack, selections) : null,
+    [data, selections]
+  );
+
+  const waUrl = useMemo(
+    () => prices && data ? buildWhatsAppUrl(data.pack, data.city, selections, prices) : `https://wa.me/351925530647`,
+    [data, selections, prices]
+  );
+
+  const pageUrl = `https://cleansolutions.com.pt${pathname}`;
+  const fromPriceText = prices ? `${prices.packTotal}€` : `a calcular`;
+  const pageTitle = data ? `${data.pack.name} em ${data.city.name}, Desde ${fromPriceText} | Kyro Clean` : '';
+  const pageDesc = data ? `${data.pack.description} Poupe até 20% em relação ao preço individual. Serviço ao domicílio em ${data.city.name}.` : '';
+
+  useEffect(() => {
+    if (!data) return;
+    document.title = pageTitle;
+    document.querySelector('meta[name="description"]')?.setAttribute("content", pageDesc);
+    document.querySelector('meta[property="og:title"]')?.setAttribute("content", pageTitle);
+    document.querySelector('meta[property="og:description"]')?.setAttribute("content", pageDesc);
+    document.querySelector('link[rel="canonical"]')?.setAttribute("href", pageUrl);
+  }, [pageTitle, pageDesc, pageUrl, data]);
+
   if (!data) {
     return (
       <>
@@ -43,29 +67,6 @@ const PackComboPage = () => {
   }
 
   const { pack, city } = data;
-
-  const prices = useMemo(
-    () => calcPackPrices(pack, selections),
-    [pack, selections]
-  );
-
-  const waUrl = useMemo(
-    () => prices ? buildWhatsAppUrl(pack, city, selections, prices) : `https://wa.me/351925530647`,
-    [pack, city, selections, prices]
-  );
-
-  const pageUrl = `https://cleansolutions.com.pt${pathname}`;
-  const fromPriceText = prices ? `${prices.packTotal}€` : `a calcular`;
-  const pageTitle = `${pack.name} em ${city.name}, Desde ${fromPriceText} | Kyro Clean`;
-  const pageDesc = `${pack.description} Poupe até 20% em relação ao preço individual. Serviço ao domicílio em ${city.name}.`;
-
-  useEffect(() => {
-    document.title = pageTitle;
-    document.querySelector('meta[name="description"]')?.setAttribute("content", pageDesc);
-    document.querySelector('meta[property="og:title"]')?.setAttribute("content", pageTitle);
-    document.querySelector('meta[property="og:description"]')?.setAttribute("content", pageDesc);
-    document.querySelector('link[rel="canonical"]')?.setAttribute("href", pageUrl);
-  }, [pageTitle, pageDesc, pageUrl]);
 
   const jsonLd = {
     "@context": "https://schema.org",

@@ -263,7 +263,7 @@ const PageHead = () => {
       document.title = meta.title;
 
       // Meta description
-      let descTag = document.querySelector('meta[name="description"]');
+      const descTag = document.querySelector('meta[name="description"]');
       if (descTag) descTag.setAttribute("content", meta.description);
 
       // OG tags
@@ -281,7 +281,7 @@ const PageHead = () => {
       if (twDesc) twDesc.setAttribute("content", meta.description);
 
       // Canonical
-      let canonical = document.querySelector('link[rel="canonical"]');
+      const canonical = document.querySelector('link[rel="canonical"]');
       if (canonical) canonical.setAttribute("href", `${DOMAIN}${path}`);
     }
 

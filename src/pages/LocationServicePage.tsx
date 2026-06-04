@@ -173,6 +173,18 @@ const LocationServicePage = () => {
     }
   }, [location.pathname, data]);
 
+  const relatedProblems = useMemo(() => {
+    if (!data) return [];
+    return getAllProblems()
+      .filter(p =>
+        p.visible &&
+        p.relatedServices.includes(data.serviceSlug) &&
+        (METRO_CITIES.has(data.citySlug) || p.relatedCities.includes(data.citySlug))
+      )
+      .slice(0, 5)
+      .map(p => ({ slug: p.slug, keyword: p.keyword }));
+  }, [data]);
+
   if (!data) {
     return (
       <>
@@ -202,18 +214,6 @@ const LocationServicePage = () => {
 
   const resultDesc = RESULT_CONTENT[data.serviceSlug]?.(data.city)?.desc ?? data.metaDescription;
   const serviceBaseUrl = services.find(s => s.slug === data.serviceSlug)?.baseRoute ?? `/${data.serviceSlug}`;
-
-  const relatedProblems = useMemo(() => {
-    if (!data) return [];
-    return getAllProblems()
-      .filter(p =>
-        p.visible &&
-        p.relatedServices.includes(data.serviceSlug) &&
-        (METRO_CITIES.has(data.citySlug) || p.relatedCities.includes(data.citySlug))
-      )
-      .slice(0, 5)
-      .map(p => ({ slug: p.slug, keyword: p.keyword }));
-  }, [data]);
 
   return (
     <QuizLocationProvider value={data.city}>

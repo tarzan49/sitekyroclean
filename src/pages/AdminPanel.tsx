@@ -156,6 +156,7 @@ const AdminPanel = () => {
     setErrorsLoading(true);
     setErrorsError(null);
     try {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const { data, error } = await (supabase as any)
         .from("error_logs")
         .select("*")
@@ -175,6 +176,7 @@ const AdminPanel = () => {
     setMetricsLoading(true);
     setMetricsError(null);
     try {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const { data, error } = await (supabase as any)
         .from("quiz_events")
         .select("*")
@@ -285,6 +287,7 @@ const AdminPanel = () => {
 
   const resetMetrics = async () => {
     if (!confirm("Apagar TODOS os dados de métricas do quiz? Esta ação é irreversível.")) return;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { error } = await (supabase as any)
       .from("quiz_events")
       .delete()
@@ -307,12 +310,14 @@ const AdminPanel = () => {
 
   // ── Delete error log ────────────────────────────────────────────────────────
   const deleteError = async (id: string) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     await (supabase as any).from("error_logs").delete().eq("id", id);
     setErrors(prev => prev.filter(e => e.id !== id));
   };
 
   const clearAllErrors = async () => {
     if (!confirm("Apagar todos os logs de erro?")) return;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     await (supabase as any).from("error_logs").delete().neq("id", "00000000-0000-0000-0000-000000000000");
     setErrors([]);
   };

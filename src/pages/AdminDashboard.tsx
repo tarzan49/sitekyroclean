@@ -84,7 +84,7 @@ function isStale(lead: Lead): boolean {
 }
 
 function parseValue(v: string): number {
-  const m = v.match(/[\d,\.]+/);
+  const m = v.match(/[\d,.]+/);
   return m ? parseFloat(m[0].replace(',', '.')) : 0;
 }
 

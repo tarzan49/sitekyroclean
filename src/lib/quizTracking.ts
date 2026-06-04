@@ -30,6 +30,7 @@ function getDevice(): "mobile" | "tablet" | "desktop" {
 
 async function insertEvent(payload: Record<string, unknown>) {
   try {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     await (supabase as any).from("quiz_events").insert(payload);
   } catch {
     // fire-and-forget

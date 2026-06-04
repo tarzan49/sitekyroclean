@@ -43,6 +43,19 @@ const MarcaSofaPage = () => {
     return getMarcaByCityAndSlug(route.marcaSlug, route.citySlug);
   }, [pathname]);
 
+  const pageUrl = `https://cleansolutions.com.pt${pathname}`;
+  const pageTitle = data ? `Limpeza Sofá ${data.marca.name} em ${data.city.name}, Especialistas | Kyro Clean` : '';
+  const pageDesc = data ? `Especialistas em limpeza de sofás ${data.marca.name} em ${data.city.name}. ${data.marca.material}. ${data.marca.estimatedPriceRange}. Serviço ao domicílio.` : '';
+
+  useEffect(() => {
+    if (!data) return;
+    document.title = pageTitle;
+    document.querySelector('meta[name="description"]')?.setAttribute("content", pageDesc);
+    document.querySelector('meta[property="og:title"]')?.setAttribute("content", pageTitle);
+    document.querySelector('meta[property="og:description"]')?.setAttribute("content", pageDesc);
+    document.querySelector('link[rel="canonical"]')?.setAttribute("href", pageUrl);
+  }, [pageTitle, pageDesc, pageUrl, data]);
+
   if (!data) {
     return (
       <>
@@ -59,17 +72,6 @@ const MarcaSofaPage = () => {
   }
 
   const { marca, city } = data;
-  const pageUrl = `https://cleansolutions.com.pt${pathname}`;
-  const pageTitle = `Limpeza Sofá ${marca.name} em ${city.name}, Especialistas | Kyro Clean`;
-  const pageDesc = `Especialistas em limpeza de sofás ${marca.name} em ${city.name}. ${marca.material}. ${marca.estimatedPriceRange}. Serviço ao domicílio.`;
-
-  useEffect(() => {
-    document.title = pageTitle;
-    document.querySelector('meta[name="description"]')?.setAttribute("content", pageDesc);
-    document.querySelector('meta[property="og:title"]')?.setAttribute("content", pageTitle);
-    document.querySelector('meta[property="og:description"]')?.setAttribute("content", pageDesc);
-    document.querySelector('link[rel="canonical"]')?.setAttribute("href", pageUrl);
-  }, [pageTitle, pageDesc, pageUrl]);
 
   const jsonLd = {
     "@context": "https://schema.org",

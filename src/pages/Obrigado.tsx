@@ -38,7 +38,7 @@ const Obrigado = () => {
       if (raw) setReceipt(JSON.parse(raw));
       const wa = sessionStorage.getItem("kyro_wa_url");
       if (wa) setWaUrl(wa);
-    } catch {}
+    } catch { /* ignore parse errors */ }
   }, []);
 
   const isSobOrcamento = receipt ? receipt.total === 0 : false;

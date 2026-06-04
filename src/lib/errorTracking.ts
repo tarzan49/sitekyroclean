@@ -10,6 +10,7 @@ async function logError(payload: {
   severity: "error" | "warning" | "unhandled_rejection";
 }) {
   try {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     await (supabase as any).from("error_logs").insert({
       ...payload,
       user_agent: navigator.userAgent,
@@ -36,7 +37,7 @@ export function initErrorTracking() {
   window.addEventListener("unhandledrejection", (event) => {
     const reason = event.reason;
     logError({
-      message: reason?.message ?? String(reason) ?? "Unhandled promise rejection",
+      message: reason?.message ?? String(reason),
       source: null,
       url: window.location.href,
       line_number: null,
