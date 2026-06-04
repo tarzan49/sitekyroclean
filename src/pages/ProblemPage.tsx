@@ -253,10 +253,10 @@ const ProblemPage = () => {
                 {data.intro}
               </p>
 
-              <div className="flex gap-3 w-fit">
+              <div className="flex gap-3 max-w-xs sm:max-w-sm">
                 <div className="relative flex-1">
                   <div className="absolute -inset-1.5 rounded-full bg-gold/40 opacity-30 blur-lg pointer-events-none" />
-                  <QuizButton className="relative w-full" buttonClassName="h-[52px] !py-0" problema={slug} ctaLabel={getProblemCtaLabel(slug ?? "")} />
+                  <QuizButton className="relative w-full" buttonClassName="h-[52px] !py-0 w-full" problema={slug} ctaLabel={getProblemCtaLabel(slug ?? "")} />
                 </div>
                 <a
                   href={`https://wa.me/351925530647?text=${encodeURIComponent(buildProblemWaMessage(slug ?? ""))}`}
@@ -415,7 +415,7 @@ const ProblemPage = () => {
             <p className="text-white/60 mb-6 text-base">
               Resposta em menos de 2 horas · Sem compromisso
             </p>
-            <div className="flex gap-3 justify-center mx-auto w-fit">
+            <div className="flex gap-3 justify-center mx-auto max-w-xs sm:max-w-sm">
               <div className="relative flex-1">
                 <div className="absolute -inset-1.5 rounded-full bg-gold/40 opacity-30 blur-lg pointer-events-none" />
                 <QuizButton className="relative w-full" problema={slug} ctaLabel={getProblemCtaLabel(slug ?? "")} />
