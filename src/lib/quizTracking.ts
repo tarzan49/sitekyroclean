@@ -11,15 +11,9 @@ import { supabase } from "@/integrations/supabase/client";
 
 const SESSION_ID = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
 
-const IS_LOCALHOST =
+const IS_PRODUCTION =
   typeof window !== "undefined" &&
-  (
-    window.location.hostname === "localhost" ||
-    window.location.hostname === "127.0.0.1" ||
-    window.location.hostname.startsWith("192.168.") ||
-    window.location.hostname.startsWith("10.") ||
-    window.location.hostname === "::1"
-  );
+  window.location.hostname === "cleansolutions.com.pt";
 
 function getUTMParam(name: string): string | null {
   if (typeof window === "undefined") return null;
@@ -42,7 +36,7 @@ export async function trackQuizEvent(params: {
   value?: number;
   service_type?: string;
 }) {
-  if (IS_LOCALHOST) return;
+  if (!IS_PRODUCTION) return;
   try {
     await (supabase as any).from("quiz_events").insert({
       session_id: SESSION_ID,
