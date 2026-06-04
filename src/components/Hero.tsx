@@ -356,21 +356,16 @@ const Hero = () => {
               showStickyCTA ? 'translate-y-0' : 'translate-y-full'
             }`}
           >
-            <div className="flex gap-2">
-              <button
-                onClick={handleOpenQuiz}
-                className="flex-1 bg-gradient-to-r from-[#C9A84C] via-[#E8D070] to-[#C9A84C] text-[#1A1A2E] font-bold text-sm py-3.5 h-auto rounded-full shadow-lg animate-cta-glow"
-              >
-                Orçamento rápido (30 seg)
-              </button>
-              <a
-                href="tel:925530647"
-                onClick={() => trackCallClick('hero_sticky_mobile')}
-                className="flex items-center justify-center gap-1.5 px-4 text-white font-semibold text-sm border border-white/25 rounded-full hover:bg-white/10 transition-colors"
-              >
-                <Phone className="w-4 h-4 text-gold animate-phone-shake" strokeWidth={2.5} />
-              </a>
-            </div>
+            <a
+              href={`https://wa.me/351925530647?text=${encodeURIComponent('Olá! Gostaria de pedir um orçamento para limpeza de estofos.')}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => trackWhatsAppClick('hero_sticky_mobile')}
+              className="flex items-center justify-center gap-3 w-full h-14 rounded-2xl bg-[#25D366] shadow-[0_4px_24px_rgba(37,211,102,0.50)] active:scale-[0.98] transition-all touch-manipulation"
+            >
+              <MessageCircle className="w-5 h-5 text-white flex-shrink-0" strokeWidth={2} />
+              <span className="text-white font-black text-base tracking-wide">Falar no WhatsApp</span>
+            </a>
           </div>
 
           {/* Desktop sticky removido, o header já tem o botão sempre visível */}
