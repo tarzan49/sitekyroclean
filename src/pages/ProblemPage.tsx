@@ -9,6 +9,7 @@ import ServiceFAQSchema from "@/components/ServiceFAQSchema";
 import { getProblemBySlug, getRelatedProblemLinks } from "@/data/problemSeoData";
 import { services, cities } from "@/data/locationSeoData";
 import { getProblemHeroImage } from "@/lib/problemHeroImages";
+import { trackWhatsAppClick } from "@/lib/quizTracking";
 
 const CATEGORY_TIPS: Record<string, { title: string; steps: string[]; warning: string }> = {
   manchas: {
@@ -93,6 +94,74 @@ const CATEGORY_TIPS: Record<string, { title: string; steps: string[]; warning: s
     warning: "Uso antes de secar completamente pode causar marcas de água no tecido",
   },
 };
+
+function buildProblemWaMessage(slug: string): string {
+  const s = slug ?? '';
+  if (s.includes('urgente'))
+    return `Olá! Preciso de limpeza urgente. Têm disponibilidade ainda hoje ou amanhã?`;
+  if (s.includes('urina'))
+    return `Olá! Tenho urina no meu ${s.includes('colchao') ? 'colchão' : 'sofá'} e preciso de tratamento urgente. Qual é o preço e disponibilidade?`;
+  if (s.includes('manchas-vinho'))
+    return `Olá! Tenho uma mancha de vinho no sofá e preciso de ajuda. Qual é o preço?`;
+  if (s.includes('manchas-cafe'))
+    return `Olá! Tenho manchas de café no sofá. Podem ajudar? Qual é o preço?`;
+  if (s.includes('manchas-gordura'))
+    return `Olá! Tenho manchas de gordura no sofá. Qual é o serviço adequado e o preço?`;
+  if (s.includes('manchas-sangue'))
+    return `Olá! Tenho manchas de sangue no colchão e preciso de ajuda urgente. Qual é o preço?`;
+  if (s.includes('mancha')) {
+    const item = s.includes('colchao') ? 'colchão' : s.includes('tapete') ? 'tapete' : 'sofá';
+    return `Olá! Tenho manchas no meu ${item} e preciso de remoção profissional. Qual é o preço?`;
+  }
+  if (s.includes('cheiro') || s.includes('odor')) {
+    const item = s.includes('colchao') ? 'colchão' : s.includes('tapete') ? 'tapete' : 'sofá';
+    return `Olá! O meu ${item} tem maus cheiros persistentes. Qual é o serviço e o preço?`;
+  }
+  if (s.includes('acar')) {
+    const item = s.includes('colchao') ? 'colchão' : 'sofá';
+    return `Olá! Preciso de eliminação de ácaros do meu ${item}. Qual é o serviço e o preço?`;
+  }
+  if (s.includes('alerg')) {
+    const item = s.includes('colchao') ? 'colchão' : 'sofá';
+    return `Olá! Tenho alergias e preciso de higienização profissional do meu ${item}. Qual é o preço?`;
+  }
+  if (s.includes('pelos')) {
+    const item = s.includes('tapete') ? 'tapete' : 'sofá';
+    return `Olá! O meu ${item} tem pelos de animais. Qual é o vosso serviço e preço?`;
+  }
+  if (s.includes('mofo') || s.includes('bolor')) {
+    const item = s.includes('alcatifa') ? 'alcatifa' : 'tapete';
+    return `Olá! O meu ${item} tem mofo/bolor. Qual é o serviço e preço para remoção?`;
+  }
+  if (s.includes('impermeabiliz'))
+    return `Olá! Quero impermeabilizar o meu sofá. Qual é o preço e disponibilidade?`;
+  if (s.includes('pele'))
+    return `Olá! Tenho um sofá de pele que precisa de limpeza e tratamento. Qual é o preço?`;
+  if (s.includes('veludo'))
+    return `Olá! Tenho um sofá de veludo que precisa de limpeza profissional. Qual é o preço?`;
+  if (s.includes('persa'))
+    return `Olá! Tenho um tapete persa que precisa de lavagem especializada. Qual é o preço?`;
+  if (s.includes('tapete-la') || (s.includes('tapete') && s.includes('-la')))
+    return `Olá! Tenho um tapete de lã que precisa de lavagem profissional. Qual é o preço?`;
+  if (s.includes('preco') || s.includes('custa') || s.includes('quanto')) {
+    const item = s.includes('colchao') ? 'colchão' : s.includes('tapete') ? 'tapete' : 'sofá';
+    return `Olá! Gostaria de saber o preço de limpeza profissional de ${item}. Podem dar-me um orçamento?`;
+  }
+  if (s.includes('cadeira'))
+    return `Olá! Preciso de limpeza profissional de cadeiras. Qual é o preço e disponibilidade?`;
+  if (s.includes('alcatifa'))
+    return `Olá! Preciso de limpeza profissional de alcatifas. Qual é o preço?`;
+  const item = s.includes('colchao') ? 'colchão' : s.includes('tapete') ? 'tapete' : 'sofá';
+  return `Olá! Preciso de limpeza profissional para o meu ${item}. Qual é o preço e quando têm disponibilidade?`;
+}
+
+function getProblemWaBtnLabel(slug: string): string {
+  const s = slug ?? '';
+  if (s.includes('urgente')) return 'Contactar agora';
+  if (s.includes('impermeabiliz')) return 'Impermeabilizar agora';
+  if (s.includes('preco') || s.includes('custa')) return 'Pedir orçamento';
+  return 'Falar agora';
+}
 
 function getProblemCtaLabel(slug: string): string {
   if (slug.includes("mancha")) return "Eliminar manchas agora";
@@ -196,16 +265,20 @@ const ProblemPage = () => {
                 {data.intro}
               </p>
 
-              <div className="flex flex-wrap items-center gap-3">
-                <QuizButton problema={slug} ctaLabel={getProblemCtaLabel(slug ?? "")} />
+              <div className="flex gap-3 max-w-sm">
+                <div className="relative flex-1">
+                  <div className="absolute -inset-1.5 rounded-full bg-gold/40 opacity-30 blur-lg pointer-events-none" />
+                  <QuizButton className="relative w-full" problema={slug} ctaLabel={getProblemCtaLabel(slug ?? "")} />
+                </div>
                 <a
-                  href="https://wa.me/351925530647"
+                  href={`https://wa.me/351925530647?text=${encodeURIComponent(buildProblemWaMessage(slug ?? ""))}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center justify-center gap-2 px-5 py-2.5 border border-white/20 rounded-full text-white/75 font-medium text-sm hover:bg-white/[0.07] hover:border-white/35 hover:text-white transition-all duration-200"
+                  onClick={() => trackWhatsAppClick(`problem_hero_${slug}`)}
+                  className="relative flex-1 inline-flex items-center justify-center gap-2 h-[52px] px-5 rounded-full font-black text-sm text-white bg-gradient-to-r from-[#1DA851] via-[#25D366] to-[#1DA851] shadow-[0_6px_22px_rgba(37,211,102,0.42),0_2px_6px_rgba(0,0,0,0.28),inset_0_1px_0_rgba(255,255,255,0.20),inset_0_-2px_0_rgba(0,0,0,0.12)] hover:shadow-[0_10px_32px_rgba(37,211,102,0.60),0_2px_6px_rgba(0,0,0,0.28),inset_0_1px_0_rgba(255,255,255,0.20),inset_0_-2px_0_rgba(0,0,0,0.12)] hover:scale-[1.025] active:scale-[0.95] transition-all duration-200 touch-manipulation"
                 >
-                  <MessageCircle className="w-[18px] h-[18px] text-[#25D366] flex-shrink-0" strokeWidth={2} />
-                  WhatsApp
+                  <MessageCircle className="w-[18px] h-[18px] text-white flex-shrink-0" strokeWidth={2} />
+                  {getProblemWaBtnLabel(slug ?? "")}
                 </a>
               </div>
             </div>
@@ -354,7 +427,22 @@ const ProblemPage = () => {
             <p className="text-white/60 mb-6 text-base">
               Resposta em menos de 2 horas · Sem compromisso
             </p>
-            <QuizButton problema={slug} ctaLabel={getProblemCtaLabel(slug ?? "")} />
+            <div className="flex gap-3 justify-center max-w-sm mx-auto">
+              <div className="relative flex-1">
+                <div className="absolute -inset-1.5 rounded-full bg-gold/40 opacity-30 blur-lg pointer-events-none" />
+                <QuizButton className="relative w-full" problema={slug} ctaLabel={getProblemCtaLabel(slug ?? "")} />
+              </div>
+              <a
+                href={`https://wa.me/351925530647?text=${encodeURIComponent(buildProblemWaMessage(slug ?? ""))}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => trackWhatsAppClick(`problem_cta_${slug}`)}
+                className="relative flex-1 inline-flex items-center justify-center gap-2 h-[52px] px-5 rounded-full font-black text-sm text-white bg-gradient-to-r from-[#1DA851] via-[#25D366] to-[#1DA851] shadow-[0_6px_22px_rgba(37,211,102,0.42),0_2px_6px_rgba(0,0,0,0.28),inset_0_1px_0_rgba(255,255,255,0.20),inset_0_-2px_0_rgba(0,0,0,0.12)] hover:shadow-[0_10px_32px_rgba(37,211,102,0.60),0_2px_6px_rgba(0,0,0,0.28),inset_0_1px_0_rgba(255,255,255,0.20),inset_0_-2px_0_rgba(0,0,0,0.12)] hover:scale-[1.025] active:scale-[0.95] transition-all duration-200 touch-manipulation"
+              >
+                <MessageCircle className="w-[18px] h-[18px] text-white flex-shrink-0" strokeWidth={2} />
+                {getProblemWaBtnLabel(slug ?? "")}
+              </a>
+            </div>
           </div>
         </section>
 
