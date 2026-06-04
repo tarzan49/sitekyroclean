@@ -2,9 +2,8 @@
 import { trackWhatsAppClick } from "@/lib/quizTracking";
 
 const QuizForm = lazy(() => import('./QuizFormLazy'));
-import { Phone, MessageCircle, Trophy, Shield, Clock, CheckCircle } from "lucide-react";
+import { MessageCircle, Trophy, Shield, Clock, CheckCircle } from "lucide-react";
 import GoogleReviewsBadge from "@/components/GoogleReviewsBadge";
-import { trackCallClick } from "@/lib/analytics";
 
 // Public static assets (URL-encoded for folder names with spaces)
 const imgStainDesktop = '/images/fotos%20hero/imagemvinhopc.webp';
@@ -307,13 +306,15 @@ const Hero = () => {
 
                 {/* Phone number, bold, pure white, tel: link */}
                 <a
-                  href="tel:925530647"
-                  onClick={() => trackCallClick('hero_phone_link')}
-                  className="flex items-center gap-1.5 text-white hover:text-gold transition-colors duration-150"
+                  href={`https://wa.me/351925530647?text=${encodeURIComponent('Olá, gostaria de pedir um orçamento para limpeza de estofos.')}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => trackWhatsAppClick('hero_phone_link')}
+                  className="flex items-center gap-1.5 text-white hover:text-[#25D366] transition-colors duration-150"
                   style={{ textShadow: '0px 2px 4px rgba(0,0,0,0.80)' }}
                 >
-                  <Phone className="w-3.5 h-3.5 text-gold animate-phone-shake flex-shrink-0" strokeWidth={2.5} />
-                  <span className="text-sm font-bold tracking-wide">925 530 647</span>
+                  <MessageCircle className="w-3.5 h-3.5 text-[#25D366] flex-shrink-0" strokeWidth={2.5} />
+                  <span className="text-sm font-bold tracking-wide">Enviar mensagem</span>
                 </a>
               </div>
             </div>
@@ -364,11 +365,13 @@ const Hero = () => {
                 Orçamento rápido (30 seg)
               </button>
               <a
-                href="tel:925530647"
-                onClick={() => trackCallClick('hero_sticky_mobile')}
-                className="flex items-center justify-center gap-1.5 px-4 text-white font-semibold text-sm border border-white/25 rounded-full hover:bg-white/10 transition-colors"
+                href={`https://wa.me/351925530647?text=${encodeURIComponent('Olá, gostaria de pedir um orçamento para limpeza de estofos.')}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => trackWhatsAppClick('hero_sticky_mobile')}
+                className="flex items-center justify-center gap-1.5 px-4 text-white font-semibold text-sm border border-[#25D366]/40 rounded-full hover:bg-[#25D366]/10 transition-colors"
               >
-                <Phone className="w-4 h-4 text-gold animate-phone-shake" strokeWidth={2.5} />
+                <MessageCircle className="w-4 h-4 text-[#25D366]" strokeWidth={2.5} />
               </a>
             </div>
           </div>
