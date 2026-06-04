@@ -69,7 +69,7 @@ const ServiceTypeSelector = ({
 
   return (
     <div className="flex flex-col gap-2.5 w-full max-w-sm mx-auto self-center">
-      {options.filter(opt => opt.id !== 'both' || packPrice !== undefined).map((opt) => {
+      {options.filter(opt => (opt.id !== 'both' || packPrice !== undefined) && (opt.id !== 'waterproofing' || waterproofingPrice !== undefined)).map((opt) => {
         const Icon = opt.icon;
         const isSelected = selectedType === opt.id;
         return (

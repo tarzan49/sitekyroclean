@@ -1100,20 +1100,6 @@ ${formData.description || 'Sem observações adicionais'}
                       <button onClick={() => setMattressItems(mattressSetQty(mattressItems, option.id, qty + 1))} className="w-11 h-11 rounded-xl border border-white/20 bg-white/[0.05] text-white font-bold text-xl flex items-center justify-center active:scale-95 transition-all touch-manipulation hover:border-gold/50">+</button>
                     </div>
                   </div>
-                  {isActive && basePrice !== null && (
-                    <div className="px-4 pb-3">
-                      <button onClick={() => setMattressItems(mattressTogglePack(mattressItems, option.id))} className={cn('w-full flex items-center gap-2.5 px-3 py-2 rounded-lg border transition-all duration-200 touch-manipulation', packOn ? 'border-gold/50 bg-gold/[0.08]' : 'border-gold/15 bg-[#1a2a1a] hover:border-gold/40')}>
-                        <Shield className={cn('w-4 h-4 flex-shrink-0', packOn ? 'text-gold' : 'text-white/25')} />
-                        <div className="flex-1 text-left">
-                          <p className={cn('text-[11px] font-bold leading-none', packOn ? 'text-white' : 'text-white/50')}>{upsellLabel}</p>
-                          <p className={cn('text-[11px] mt-0.5 leading-none', packOn ? 'text-gold/60' : 'text-white/25')}>{upsellSub}</p>
-                        </div>
-                        <div className={cn('w-8 h-4 rounded-full border flex items-center px-0.5 transition-all duration-300 flex-shrink-0', packOn ? 'border-gold bg-gold/20' : 'border-white/20 bg-white/[0.05]')}>
-                          <div className={cn('w-3 h-3 rounded-full transition-all duration-300', packOn ? 'bg-gold translate-x-[14px]' : 'bg-white/30 translate-x-0')} />
-                        </div>
-                      </button>
-                    </div>
-                  )}
                 </div>
               );
             })}
@@ -1552,12 +1538,13 @@ ${formData.description || 'Sem observações adicionais'}
                 <QuizStep1Service
                   selectedService={formData.service}
                   onSelect={(service) => {
-                    updateFormData({ service, serviceType: service === 'carpet' ? 'cleaning' : '', sofaSize: '', mattressSize: '', chairType: '', carpetArea: '', chairWaterproofing: false, chairWaterproofQty: 0 });
+                    const skipServiceType = service === 'carpet' || service === 'mattress';
+                    updateFormData({ service, serviceType: skipServiceType ? 'cleaning' : '', sofaSize: '', mattressSize: '', chairType: '', carpetArea: '', chairWaterproofing: false, chairWaterproofQty: 0 });
                     setSofaItems([]);
                     setMattressItems([]);
                     setUpsellItems([]);
                     setUpsellShown(false);
-                    setTimeout(() => setCurrentStep(service === 'carpet' ? 3 : 2), 180);
+                    setTimeout(() => setCurrentStep(skipServiceType ? 3 : 2), 180);
                   }}
                 />
               </div>
