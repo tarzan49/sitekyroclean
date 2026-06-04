@@ -106,11 +106,11 @@ function calcChairClean(qty: number): number | null {
   if (qty <= 6) return 52.5 + (qty - 3) * 12.5;
   return 90 + (qty - 6) * 10;
 }
-// Flat-rate per bracket: 1-4: 17.5€/un · 5-10: 15€/un · 11+: sob orçamento
+// Progressive: first 4 at 17.5€ each, each above 4 at 15€ each, 11+: sob orçamento
 function calcChairWaterproof(qty: number): number | null {
   if (qty <= 0 || qty > 10) return null;
   if (qty <= 4) return qty * 17.5;
-  return qty * 15;
+  return 4 * 17.5 + (qty - 4) * 15;
 }
 function fmtN(n: number): string { return n % 1 === 0 ? `${n}€` : `${n.toFixed(1).replace('.', ',')}€`; }
 
