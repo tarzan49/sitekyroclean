@@ -139,6 +139,7 @@ const QuizForm = ({ isOpen, onClose, initialLocation, problema }: QuizFormProps)
   const photoInputRef = useRef<HTMLInputElement>(null);
   const [showExitIntent, setShowExitIntent] = useState(false);
   const [exitIntentFired, setExitIntentFired] = useState(false);
+  const [exitIntentUnlocked, setExitIntentUnlocked] = useState(false);
   const [showUpsell, setShowUpsell] = useState(false);
   const [upsellShown, setUpsellShown] = useState(false);
   const [upsellItems, setUpsellItems] = useState<UpsellItemConfig[]>([]);
@@ -472,6 +473,12 @@ const QuizForm = ({ isOpen, onClose, initialLocation, problema }: QuizFormProps)
     }
     if (!packDiscountActive) prevTotalRef.current = 0;
   }, [packDiscountActive]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Unlock exit intent popup after 40s on site
+  useEffect(() => {
+    const id = setTimeout(() => setExitIntentUnlocked(true), 40000);
+    return () => clearTimeout(id);
+  }, []);
 
   // Scroll to top on every step/overlay transition
   useEffect(() => {
@@ -938,6 +945,7 @@ ${formData.description || 'Sem observações adicionais'}
     setSocialProofIdx(0);
     setShowExitIntent(false);
     setExitIntentFired(false);
+    setExitIntentUnlocked(false);
     setShowUpsell(false);
     setUpsellShown(false);
     setUpsellItems([]);
@@ -957,6 +965,11 @@ ${formData.description || 'Sem observações adicionais'}
   };
 
   const handleClose = () => {
+    if (exitIntentUnlocked && !exitIntentFired && currentStep > 0) {
+      setShowExitIntent(true);
+      setExitIntentFired(true);
+      return;
+    }
     resetForm();
     onClose();
   };
@@ -2424,6 +2437,39 @@ ${formData.description || 'Sem observações adicionais'}
       </p>
     </div>
 
+    {showExitIntent && (
+      <div className="absolute inset-0 z-50 flex items-center justify-center backdrop-blur-md rounded-t-3xl sm:rounded-2xl" style={{ background: "rgba(5,21,16,0.92)" }}>
+        <div className="px-7 py-8 text-center max-w-xs mx-auto">
+          <AlertTriangle className="w-12 h-12 text-gold mb-4 mx-auto" />
+          <h3 className="font-playfair text-2xl font-bold text-white mb-3 leading-tight">
+            ESPERE!
+          </h3>
+          <p className="text-sm text-white/65 mb-2 leading-relaxed">
+            Se sair agora, perde a sua vaga e o desconto de{' '}
+            <span className="text-gold font-bold">5%</span>.
+          </p>
+          {isDiscountActive && (
+            <p className="text-xs text-gold/70 mb-5 font-mono bg-gold/10 px-3 py-1.5 rounded-lg inline-block">
+              Desconto expira em {formatCountdown(countdown)}
+            </p>
+          )}
+          <div className="flex flex-col gap-3 mt-5">
+            <Button
+              onClick={() => setShowExitIntent(false)}
+              className="w-full h-12 bg-gradient-to-r from-gold to-[#d4c57b] hover:from-[#d4c57b] hover:to-gold text-[#12121e] font-black rounded-xl shadow-[0_0_20px_rgba(212,175,55,0.3)] touch-manipulation active:scale-[0.98]"
+            >
+              Continuar e Guardar Desconto
+            </Button>
+            <button
+              onClick={confirmClose}
+              className="text-xs text-white/20 hover:text-white/45 py-2 transition-colors"
+            >
+              Sair mesmo assim
+            </button>
+          </div>
+        </div>
+      </div>
+    )}
   </div>
 </div>
   );
