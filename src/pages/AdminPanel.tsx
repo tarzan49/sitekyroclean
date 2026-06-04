@@ -311,15 +311,24 @@ const AdminPanel = () => {
   // ── Delete error log ────────────────────────────────────────────────────────
   const deleteError = async (id: string) => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    await (supabase as any).from("error_logs").delete().eq("id", id);
+    const { error } = await (supabase as any).from("error_logs").delete().eq("id", id);
+    if (error) {
+      alert(`Erro ao apagar: ${error.message}\n\nSolução: vai ao Supabase Dashboard → SQL Editor e corre:\nCREATE POLICY "allow_delete" ON public.error_logs FOR DELETE USING (true);`);
+      return;
+    }
     setErrors(prev => prev.filter(e => e.id !== id));
   };
 
   const clearAllErrors = async () => {
     if (!confirm("Apagar todos os logs de erro?")) return;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    await (supabase as any).from("error_logs").delete().neq("id", "00000000-0000-0000-0000-000000000000");
+    const { error } = await (supabase as any).from("error_logs").delete().neq("id", "00000000-0000-0000-0000-000000000000");
+    if (error) {
+      alert(`Erro ao apagar: ${error.message}\n\nSolução: vai ao Supabase Dashboard → SQL Editor e corre:\nCREATE POLICY "allow_delete" ON public.error_logs FOR DELETE USING (true);`);
+      return;
+    }
     setErrors([]);
+    alert("Logs apagados com sucesso.");
   };
 
   // ── Auth gate ─────────────────────────────────────────────────────────────
