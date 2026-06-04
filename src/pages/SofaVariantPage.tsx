@@ -92,6 +92,27 @@ const SERVICE_LABEL: Record<ServiceKey, string> = {
   alcatifas: 'Alcatifas',
 };
 
+const QUIZ_CTA: Record<VariantKey, string> = {
+  higienizacao:      'Ver o meu preço — grátis',
+  lavagem:           'Ver o meu preço — grátis',
+  impermeabilizacao: 'Proteger agora — ver preço',
+};
+
+const WA_BTN_LABEL: Record<VariantKey, string> = {
+  higienizacao:      'Higienizar agora',
+  lavagem:           'Lavar agora',
+  impermeabilizacao: 'Proteger agora',
+};
+
+function buildWaMessage(variantKey: VariantKey, serviceKey: ServiceKey, locationName: string): string {
+  const svc = SERVICE_LABEL[serviceKey].toLowerCase();
+  if (variantKey === 'impermeabilizacao') {
+    return `Olá! Tenho interesse em impermeabilizar o meu ${svc} em ${locationName}. Qual é o preço e quando têm disponibilidade?`;
+  }
+  const variant = VARIANT_LABEL[variantKey].toLowerCase();
+  return `Olá! Preciso de ${variant} profissional para o meu ${svc} em ${locationName}. Podem dar-me um orçamento e indicar a vossa disponibilidade?`;
+}
+
 const SofaVariantPage = () => {
   const location = useLocation();
   const parsed = useMemo(() => parseRoute(location.pathname), [location.pathname]);
@@ -198,17 +219,17 @@ const SofaVariantPage = () => {
                 <div className="flex gap-3">
                   <div className="relative flex-1">
                     <div className="absolute -inset-1.5 rounded-full bg-gold/40 opacity-30 blur-lg pointer-events-none" />
-                    <QuizButton className="relative w-full" />
+                    <QuizButton className="relative w-full" ctaLabel={QUIZ_CTA[data.variantKey]} />
                   </div>
                   <a
-                    href={`https://wa.me/351925530647?text=${encodeURIComponent(`Olá! Gostaria de pedir um orçamento para ${variantLabel.toLowerCase()} de ${SERVICE_LABEL[data.serviceKey].toLowerCase()} em ${data.locationName}.`)}`}
+                    href={`https://wa.me/351925530647?text=${encodeURIComponent(buildWaMessage(data.variantKey, data.serviceKey, data.locationName))}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     onClick={() => trackWhatsAppClick(`variant_hero_${parsed.variantKey}_${parsed.serviceKey}`)}
                     className="relative flex-1 inline-flex items-center justify-center gap-2 h-[52px] px-5 rounded-full font-black text-sm text-white bg-gradient-to-r from-[#1DA851] via-[#25D366] to-[#1DA851] shadow-[0_6px_22px_rgba(37,211,102,0.42),0_2px_6px_rgba(0,0,0,0.28),inset_0_1px_0_rgba(255,255,255,0.20),inset_0_-2px_0_rgba(0,0,0,0.12)] hover:shadow-[0_10px_32px_rgba(37,211,102,0.60),0_2px_6px_rgba(0,0,0,0.28),inset_0_1px_0_rgba(255,255,255,0.20),inset_0_-2px_0_rgba(0,0,0,0.12)] hover:scale-[1.025] active:scale-[0.95] transition-all duration-200 touch-manipulation"
                   >
                     <MessageCircle className="w-[18px] h-[18px] text-white flex-shrink-0" strokeWidth={2} />
-                    WhatsApp
+                    {WA_BTN_LABEL[data.variantKey]}
                   </a>
                 </div>
 
