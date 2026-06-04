@@ -288,17 +288,29 @@ const Hero = () => {
                 </button>
               </div>
 
-              {/* ── SECONDARY, WhatsApp (transparent, elegant link style) ── */}
-              <a
-                href={`https://wa.me/351925530647?text=${encodeURIComponent('Olá, gostaria de saber mais sobre os vossos serviços de higienização.')}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={() => trackWhatsAppClick('hero')}
-                className="flex items-center justify-center gap-2 w-full h-[48px] md:h-[44px] text-white/75 font-medium text-sm border border-white/20 rounded-full hover:bg-white/[0.07] hover:border-white/35 hover:text-white transition-all duration-200"
-              >
-                <MessageCircle className="w-[18px] h-[18px] text-[#25D366] flex-shrink-0" strokeWidth={2} />
-                <span>Prefiro falar por WhatsApp</span>
-              </a>
+              {/* ── SECONDARY, WhatsApp ── */}
+              <div className="relative group">
+                <div className="absolute -inset-1.5 rounded-full bg-[#25D366]/40 opacity-30 blur-lg group-hover:opacity-55 transition-opacity duration-400 pointer-events-none" />
+                <a
+                  href={`https://wa.me/351925530647?text=${encodeURIComponent('Olá, gostaria de saber mais sobre os vossos serviços de higienização.')}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => trackWhatsAppClick('hero')}
+                  className={[
+                    'relative flex items-center justify-center gap-2 w-full rounded-full font-bold text-white touch-manipulation',
+                    'h-[58px] md:h-[52px] px-8 text-base md:text-[17px]',
+                    'bg-gradient-to-r from-[#1DA851] via-[#25D366] to-[#1DA851]',
+                    'shadow-[0_6px_22px_rgba(37,211,102,0.42),0_2px_6px_rgba(0,0,0,0.28),inset_0_1px_0_rgba(255,255,255,0.20),inset_0_-2px_0_rgba(0,0,0,0.12)]',
+                    'hover:shadow-[0_10px_32px_rgba(37,211,102,0.60),0_4px_10px_rgba(0,0,0,0.32)]',
+                    'hover:scale-[1.025]',
+                    'active:scale-[0.95] active:shadow-[0_2px_8px_rgba(37,211,102,0.30),inset_0_2px_4px_rgba(0,0,0,0.18)]',
+                    'transition-all duration-150',
+                  ].join(' ')}
+                >
+                  <MessageCircle className="w-[18px] h-[18px] text-white flex-shrink-0" strokeWidth={2} />
+                  <span className="tracking-wide">Falar por WhatsApp</span>
+                </a>
+              </div>
 
               {/* ── TRUST micro-copy + phone anchor ── */}
               <div className="flex flex-col items-center gap-2 pt-2">
