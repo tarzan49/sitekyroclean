@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/lib/supabase';
 import { ArrowLeft, Upload, CheckCircle, XCircle, AlertCircle, Lock } from 'lucide-react';
 
-const ADMIN_PASSWORD = 'kyro@admin2025';
+const ADMIN_PASSWORD = (import.meta.env.VITE_ADMIN_PASSWORD as string) || 'kyro2025';
 const BATCH_SIZE = 25;
 
 // ── Helpers ───────────────────────────────────────────────────────────────────

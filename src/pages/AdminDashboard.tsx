@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { supabase, type Lead, type LeadStatus } from '@/lib/supabase';
 
 // ── Password gate ─────────────────────────────────────────────────────────────
-const ADMIN_PASSWORD = 'kyro@admin2025';
+const ADMIN_PASSWORD = (import.meta.env.VITE_ADMIN_PASSWORD as string) || 'kyro2025';
 
 // ── Status config — covers both quiz CRM statuses and legacy CSV Funil values ─
 const STATUS_MAP: Record<string, { label: string; color: string; dot: string }> = {

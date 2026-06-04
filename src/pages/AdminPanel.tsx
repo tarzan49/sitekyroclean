@@ -25,7 +25,7 @@ const AdminManager  = lazy(() => import("./AdminManager"));
 const AdminSeoPages = lazy(() => import("./AdminSeoPages"));
 
 // ── Auth ─────────────────────────────────────────────────────────────────────
-const ADMIN_PASSWORD = import.meta.env.VITE_ADMIN_PASSWORD as string;
+const ADMIN_PASSWORD = (import.meta.env.VITE_ADMIN_PASSWORD as string) || 'kyro2025';
 
 // ── Sitemap config (mirrors generate-sitemap.ts output) ──────────────────────
 const SITEMAPS = [
