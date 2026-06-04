@@ -219,7 +219,7 @@ const SofaVariantPage = () => {
                 <div className="flex gap-3">
                   <div className="relative flex-1">
                     <div className="absolute -inset-1.5 rounded-full bg-gold/40 opacity-30 blur-lg pointer-events-none" />
-                    <QuizButton className="relative w-full" ctaLabel={QUIZ_CTA[data.variantKey]} />
+                    <QuizButton className="relative w-full" buttonClassName="h-[52px] !py-0 w-full" ctaLabel={QUIZ_CTA[data.variantKey]} />
                   </div>
                   <a
                     href={`https://wa.me/351925530647?text=${encodeURIComponent(buildWaMessage(data.variantKey, data.serviceKey, data.locationName))}`}

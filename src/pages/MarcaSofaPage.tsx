@@ -173,7 +173,7 @@ const MarcaSofaPage = () => {
               <div className="flex gap-3 w-full sm:w-auto">
                 <div className="relative group flex-1 sm:flex-none">
                   <div className="absolute -inset-1.5 rounded-full bg-gradient-to-r from-[#C9A84C]/50 to-[#E8D070]/40 opacity-30 blur-lg group-hover:opacity-55 transition-opacity duration-400 pointer-events-none" />
-                  <QuizButton className="w-full" />
+                  <QuizButton className="w-full" buttonClassName="h-[52px] !py-0 w-full" />
                 </div>
                 <div className="relative group flex-1 sm:flex-none">
                   <div className="absolute -inset-1.5 rounded-full bg-[#25D366]/40 opacity-30 blur-lg group-hover:opacity-55 transition-opacity duration-400 pointer-events-none" />
