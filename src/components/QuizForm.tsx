@@ -1581,6 +1581,7 @@ ${formData.description || 'Sem observações adicionais'}
                     waterproofingPrice={waterPrice}
                     packPrice={packPrice}
                     waterproofingDesc={waterDesc}
+                    hideWaterproofing={formData.service === 'mattress'}
                   />
                   <p className="text-xs text-white/20 uppercase tracking-widest text-center mt-1">
                     Todos os valores incluem IVA à taxa legal em vigor

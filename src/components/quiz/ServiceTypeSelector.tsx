@@ -9,6 +9,7 @@ interface ServiceTypeSelectorProps {
   waterproofingPrice?: number;
   packPrice?: number;
   waterproofingDesc?: string;
+  hideWaterproofing?: boolean;
 }
 
 interface OptionConfig {
@@ -31,6 +32,7 @@ const ServiceTypeSelector = ({
   waterproofingPrice,
   packPrice,
   waterproofingDesc = 'Ideal para estofos novos ou recém-limpos.',
+  hideWaterproofing = false,
 }: ServiceTypeSelectorProps) => {
   const options: OptionConfig[] = [
     {
@@ -69,7 +71,7 @@ const ServiceTypeSelector = ({
 
   return (
     <div className="flex flex-col gap-2.5 w-full max-w-sm mx-auto self-center">
-      {options.filter(opt => (opt.id !== 'both' || packPrice !== undefined) && (opt.id !== 'waterproofing' || waterproofingPrice !== undefined)).map((opt) => {
+      {options.filter(opt => (opt.id !== 'both' || packPrice !== undefined) && (opt.id !== 'waterproofing' || !hideWaterproofing)).map((opt) => {
         const Icon = opt.icon;
         const isSelected = selectedType === opt.id;
         return (
