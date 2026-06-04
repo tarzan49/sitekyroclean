@@ -15,7 +15,6 @@ import PageHead from "@/components/PageHead";
 import TopProgressBar from "@/components/TopProgressBar";
 import WhatsAppButton from "@/components/WhatsAppButton";
 import MobileStickyBar from "@/components/MobileStickyBar";
-import ExitIntentPopup from "@/components/ExitIntentPopup";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
 import { getAllLocationRoutes } from "@/data/locationSeoData";
 import { getAllFreguesiaRoutes } from "@/data/freguesiaSeoData";
@@ -234,7 +233,6 @@ const App = () => (
         <AppRoutes />
         <WhatsAppButton />
         <MobileStickyBar />
-        <ExitIntentPopup />
         <CookieBanner />
         <Suspense fallback={null}><QuotePopup /></Suspense>
       </BrowserRouter>
