@@ -1,12 +1,24 @@
 ﻿import { useEffect, useMemo } from "react";
 import { useLocation, Link } from "react-router-dom";
-import { Star, ArrowRight, CheckCircle, MapPin, Phone, MessageCircle } from "lucide-react";
+import { Star, ArrowRight, CheckCircle, MapPin, MessageCircle } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import QuizButton from "@/components/QuizButton";
+import { trackWhatsAppClick } from "@/lib/quizTracking";
 import ServiceFAQSchema from "@/components/ServiceFAQSchema";
 import { getPricePageData, getAllPriceRoutes } from "@/data/priceSeoData";
 import { services, cities } from "@/data/locationSeoData";
+
+function buildPriceWaMessage(serviceSlug: string, cityName: string): string {
+  const city = ` em ${cityName}`;
+  if (serviceSlug.includes('sofa'))        return `Olá! Gostaria de saber o preço de limpeza de sofá${city}. Podem dar-me um orçamento?`;
+  if (serviceSlug.includes('colchao'))     return `Olá! Gostaria de saber o preço de higienização de colchão${city}. Qual é o orçamento?`;
+  if (serviceSlug.includes('tapete'))      return `Olá! Gostaria de saber o preço de lavagem de tapetes${city}. Qual é o orçamento?`;
+  if (serviceSlug.includes('cadeira'))     return `Olá! Gostaria de saber o preço de limpeza de cadeiras${city}. Qual é o orçamento?`;
+  if (serviceSlug.includes('alcatifa'))    return `Olá! Gostaria de saber o preço de limpeza de alcatifas${city}. Qual é o orçamento?`;
+  if (serviceSlug.includes('impermeabil')) return `Olá! Gostaria de saber o preço de impermeabilização${city}. Qual é o orçamento?`;
+  return `Olá! Gostaria de saber o preço do serviço${city}. Podem dar-me um orçamento?`;
+}
 
 const PricePage = () => {
   const { pathname } = useLocation();
@@ -71,16 +83,20 @@ const PricePage = () => {
               <p className="text-base md:text-lg text-[#1A1A2E]/55 leading-relaxed mb-6 max-w-3xl">
                 {data.intro}
               </p>
-              <div className="flex flex-wrap items-center gap-3">
-                <QuizButton />
+              <div className="flex gap-3 max-w-xs sm:max-w-sm">
+                <div className="relative flex-1">
+                  <div className="absolute -inset-1.5 rounded-full bg-gold/40 opacity-30 blur-lg pointer-events-none" />
+                  <QuizButton className="relative w-full" buttonClassName="h-[52px] !py-0 w-full" ctaLabel="Ver preço grátis" />
+                </div>
                 <a
-                  href="https://wa.me/351925530647"
+                  href={`https://wa.me/351925530647?text=${encodeURIComponent(buildPriceWaMessage(data.serviceSlug, data.cityName))}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center justify-center gap-2 px-5 py-2.5 border border-white/20 rounded-full text-white/75 font-medium text-sm hover:bg-white/[0.07] hover:border-white/35 hover:text-white transition-all duration-200"
+                  onClick={() => trackWhatsAppClick(`price_hero_${data.serviceSlug}_${data.citySlug}`)}
+                  className="relative flex-1 inline-flex items-center justify-center gap-2 h-[52px] px-5 rounded-full font-black text-sm text-white bg-gradient-to-r from-[#1DA851] via-[#25D366] to-[#1DA851] shadow-[0_6px_22px_rgba(37,211,102,0.42),0_2px_6px_rgba(0,0,0,0.28),inset_0_1px_0_rgba(255,255,255,0.20),inset_0_-2px_0_rgba(0,0,0,0.12)] hover:shadow-[0_10px_32px_rgba(37,211,102,0.60),0_2px_6px_rgba(0,0,0,0.28),inset_0_1px_0_rgba(255,255,255,0.20),inset_0_-2px_0_rgba(0,0,0,0.12)] hover:scale-[1.025] active:scale-[0.95] transition-all duration-200 touch-manipulation"
                 >
-                  <MessageCircle className="w-[18px] h-[18px] text-[#25D366] flex-shrink-0" strokeWidth={2} />
-                  WhatsApp: 925 530 647
+                  <MessageCircle className="w-[18px] h-[18px] text-white flex-shrink-0" strokeWidth={2} />
+                  Falar agora
                 </a>
               </div>
             </div>
@@ -255,15 +271,20 @@ const PricePage = () => {
             <p className="text-white/60 mb-6 text-base">
               Resposta em menos de 2 horas: sem compromisso.
             </p>
-            <div className="flex flex-wrap justify-center gap-3">
-              <QuizButton />
-              <a href="https://wa.me/351925530647" target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center gap-2 px-6 py-3 border border-white/20 rounded-full text-white/75 font-medium text-sm hover:bg-white/[0.07] hover:border-white/35 hover:text-white transition-all duration-200">
-                <MessageCircle className="w-[18px] h-[18px] text-[#25D366] flex-shrink-0" strokeWidth={2} />
-                WhatsApp
-              </a>
-              <a href="tel:+351925530647" className="inline-flex items-center gap-1.5 text-white/75 hover:text-gold font-medium text-sm transition-colors duration-150">
-                <Phone className="w-3.5 h-3.5 text-gold animate-phone-shake flex-shrink-0" strokeWidth={2.5} />
-                <span className="font-bold tracking-wide">Ligar agora</span>
+            <div className="flex gap-3 justify-center mx-auto max-w-xs sm:max-w-sm">
+              <div className="relative flex-1">
+                <div className="absolute -inset-1.5 rounded-full bg-gold/40 opacity-30 blur-lg pointer-events-none" />
+                <QuizButton className="relative w-full" buttonClassName="h-[52px] !py-0 w-full" ctaLabel="Ver preço grátis" />
+              </div>
+              <a
+                href={`https://wa.me/351925530647?text=${encodeURIComponent(buildPriceWaMessage(data.serviceSlug, data.cityName))}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => trackWhatsAppClick(`price_cta_${data.serviceSlug}_${data.citySlug}`)}
+                className="relative flex-1 inline-flex items-center justify-center gap-2 h-[52px] px-5 rounded-full font-black text-sm text-white bg-gradient-to-r from-[#1DA851] via-[#25D366] to-[#1DA851] shadow-[0_6px_22px_rgba(37,211,102,0.42),0_2px_6px_rgba(0,0,0,0.28),inset_0_1px_0_rgba(255,255,255,0.20),inset_0_-2px_0_rgba(0,0,0,0.12)] hover:shadow-[0_10px_32px_rgba(37,211,102,0.60),0_2px_6px_rgba(0,0,0,0.28),inset_0_1px_0_rgba(255,255,255,0.20),inset_0_-2px_0_rgba(0,0,0,0.12)] hover:scale-[1.025] active:scale-[0.95] transition-all duration-200 touch-manipulation"
+              >
+                <MessageCircle className="w-[18px] h-[18px] text-white flex-shrink-0" strokeWidth={2} />
+                Falar agora
               </a>
             </div>
           </div>

@@ -1,10 +1,11 @@
 ﻿import { useEffect, useMemo } from "react";
 import { useLocation, Link } from "react-router-dom";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { ArrowRight, MapPin, CheckCircle, Search, Droplets, Sparkles, Wind, Phone, MessageCircle } from "lucide-react";
+import { ArrowRight, MapPin, CheckCircle, Search, Droplets, Sparkles, Wind, MessageCircle } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import QuizButton from "@/components/QuizButton";
+import { trackWhatsAppClick } from "@/lib/quizTracking";
 import ServiceFAQSchema from "@/components/ServiceFAQSchema";
 import {
   getMaterialBySlug,
@@ -35,6 +36,23 @@ const MATERIAL_HERO: Record<string, string> = {
 };
 
 const STEP_ICONS = [Search, Droplets, Sparkles, Wind];
+
+function buildMaterialWaMessage(slug: string, cityName: string | null): string {
+  const city = cityName ? ` em ${cityName}` : '';
+  if (slug.includes('pele'))       return `Olá! Tenho um sofá de pele e preciso de limpeza e tratamento${city}. Qual é o preço?`;
+  if (slug.includes('veludo'))     return `Olá! Tenho um sofá de veludo e preciso de limpeza especializada${city}. Qual é o preço?`;
+  if (slug.includes('camurca'))    return `Olá! Tenho um sofá de camurça e preciso de limpeza profissional${city}. Qual é o preço?`;
+  if (slug.includes('microfibra')) return `Olá! Tenho um sofá de microfibra para limpar${city}. Qual é o preço?`;
+  if (slug.includes('linho'))      return `Olá! Tenho um sofá de linho para limpar${city}. Qual é o preço?`;
+  if (slug.includes('sintetico') && slug.includes('sofa')) return `Olá! Tenho um sofá sintético para limpar${city}. Qual é o preço?`;
+  if (slug.includes('sofa'))       return `Olá! Tenho um sofá de tecido e preciso de limpeza profissional${city}. Qual é o preço?`;
+  if (slug.includes('persa'))      return `Olá! Tenho um tapete persa e preciso de lavagem especializada${city}. Qual é o preço?`;
+  if (slug.includes('tapete-la') || (slug.includes('tapete') && slug.includes('-la')))
+                                   return `Olá! Tenho um tapete de lã para lavagem profissional${city}. Qual é o preço?`;
+  if (slug.includes('sisal'))      return `Olá! Tenho um tapete de sisal para limpar${city}. Qual é o preço?`;
+  if (slug.includes('tapete'))     return `Olá! Tenho um tapete sintético para limpar${city}. Qual é o preço?`;
+  return `Olá! Preciso de limpeza profissional${city}. Qual é o preço e disponibilidade?`;
+}
 
 const MaterialPage = () => {
   const { pathname } = useLocation();
@@ -152,16 +170,20 @@ const MaterialPage = () => {
                 </div>
               </div>
 
-              <div className="flex flex-wrap items-center gap-3">
-                <QuizButton />
+              <div className="flex gap-3 max-w-xs sm:max-w-sm">
+                <div className="relative flex-1">
+                  <div className="absolute -inset-1.5 rounded-full bg-gold/40 opacity-30 blur-lg pointer-events-none" />
+                  <QuizButton className="relative w-full" buttonClassName="h-[52px] !py-0 w-full" ctaLabel="Ver preço grátis" />
+                </div>
                 <a
-                  href="https://wa.me/351925530647"
+                  href={`https://wa.me/351925530647?text=${encodeURIComponent(buildMaterialWaMessage(data.slug, cityName))}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center justify-center gap-2 px-5 py-2.5 border border-white/20 rounded-full text-white/75 font-medium text-sm hover:bg-white/[0.07] hover:border-white/35 hover:text-white transition-all duration-200"
+                  onClick={() => trackWhatsAppClick(`material_hero_${data.slug}`)}
+                  className="relative flex-1 inline-flex items-center justify-center gap-2 h-[52px] px-5 rounded-full font-black text-sm text-white bg-gradient-to-r from-[#1DA851] via-[#25D366] to-[#1DA851] shadow-[0_6px_22px_rgba(37,211,102,0.42),0_2px_6px_rgba(0,0,0,0.28),inset_0_1px_0_rgba(255,255,255,0.20),inset_0_-2px_0_rgba(0,0,0,0.12)] hover:shadow-[0_10px_32px_rgba(37,211,102,0.60),0_2px_6px_rgba(0,0,0,0.28),inset_0_1px_0_rgba(255,255,255,0.20),inset_0_-2px_0_rgba(0,0,0,0.12)] hover:scale-[1.025] active:scale-[0.95] transition-all duration-200 touch-manipulation"
                 >
-                  <MessageCircle className="w-[18px] h-[18px] text-[#25D366] flex-shrink-0" strokeWidth={2} />
-                  WhatsApp
+                  <MessageCircle className="w-[18px] h-[18px] text-white flex-shrink-0" strokeWidth={2} />
+                  Falar agora
                 </a>
               </div>
             </div>
@@ -288,17 +310,20 @@ const MaterialPage = () => {
             <p className="text-white/60 mb-6 text-base">
               Desde {servicePrice} · Resposta em menos de 2 horas · Sem compromisso.
             </p>
-            <div className="flex flex-wrap justify-center gap-3">
-              <QuizButton />
-              <a href="https://wa.me/351925530647" target="_blank" rel="noopener noreferrer"
-                className="inline-flex items-center justify-center gap-2 px-6 py-3 border border-white/20 rounded-full text-white/75 font-medium text-sm hover:bg-white/[0.07] hover:border-white/35 hover:text-white transition-all duration-200">
-                <MessageCircle className="w-[18px] h-[18px] text-[#25D366] flex-shrink-0" strokeWidth={2} />
-                WhatsApp
-              </a>
-              <a href="tel:+351925530647"
-                className="inline-flex items-center gap-1.5 text-white/75 hover:text-gold font-medium text-sm transition-colors duration-150">
-                <Phone className="w-3.5 h-3.5 text-gold animate-phone-shake flex-shrink-0" strokeWidth={2.5} />
-                <span className="font-bold tracking-wide">Ligar agora</span>
+            <div className="flex gap-3 justify-center mx-auto max-w-xs sm:max-w-sm">
+              <div className="relative flex-1">
+                <div className="absolute -inset-1.5 rounded-full bg-gold/40 opacity-30 blur-lg pointer-events-none" />
+                <QuizButton className="relative w-full" buttonClassName="h-[52px] !py-0 w-full" ctaLabel="Ver preço grátis" />
+              </div>
+              <a
+                href={`https://wa.me/351925530647?text=${encodeURIComponent(buildMaterialWaMessage(data.slug, cityName))}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => trackWhatsAppClick(`material_cta_${data.slug}`)}
+                className="relative flex-1 inline-flex items-center justify-center gap-2 h-[52px] px-5 rounded-full font-black text-sm text-white bg-gradient-to-r from-[#1DA851] via-[#25D366] to-[#1DA851] shadow-[0_6px_22px_rgba(37,211,102,0.42),0_2px_6px_rgba(0,0,0,0.28),inset_0_1px_0_rgba(255,255,255,0.20),inset_0_-2px_0_rgba(0,0,0,0.12)] hover:shadow-[0_10px_32px_rgba(37,211,102,0.60),0_2px_6px_rgba(0,0,0,0.28),inset_0_1px_0_rgba(255,255,255,0.20),inset_0_-2px_0_rgba(0,0,0,0.12)] hover:scale-[1.025] active:scale-[0.95] transition-all duration-200 touch-manipulation"
+              >
+                <MessageCircle className="w-[18px] h-[18px] text-white flex-shrink-0" strokeWidth={2} />
+                Falar agora
               </a>
             </div>
           </div>
