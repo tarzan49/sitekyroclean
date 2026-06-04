@@ -164,19 +164,19 @@ function getProblemWaBtnLabel(slug: string): string {
 }
 
 function getProblemCtaLabel(slug: string): string {
-  if (slug.includes("mancha")) return "Eliminar manchas agora";
-  if (slug.includes("urina")) return "Tratar urgentemente";
-  if (slug.includes("cheiro") || slug.includes("odor")) return "Eliminar maus cheiros";
-  if (slug.includes("acar")) return "Eliminar ácaros agora";
-  if (slug.includes("alerg")) return "Resolver alergias agora";
-  if (slug.includes("pelos")) return "Remover pelos agora";
-  if (slug.includes("impermeabiliz")) return "Impermeabilizar agora";
-  if (slug.includes("mofo") || slug.includes("bolor")) return "Eliminar mofo agora";
-  if (slug.includes("urgente")) return "Agendar urgentemente";
-  if (slug.includes("quanto") || slug.includes("custa")) return "Ver preços e orçamento";
-  if (slug.includes("higieniz")) return "Agendar higienização";
-  if (slug.includes("lavagem") || slug.includes("limpeza")) return "Agendar limpeza agora";
-  return "Pedir orçamento grátis";
+  if (slug.includes("mancha")) return "Tirar manchas";
+  if (slug.includes("urina")) return "Ajuda urgente";
+  if (slug.includes("cheiro") || slug.includes("odor")) return "Tirar cheiros";
+  if (slug.includes("acar")) return "Eliminar ácaros";
+  if (slug.includes("alerg")) return "Tratar alergias";
+  if (slug.includes("pelos")) return "Remover pelos";
+  if (slug.includes("impermeabiliz")) return "Impermeabilizar";
+  if (slug.includes("mofo") || slug.includes("bolor")) return "Eliminar mofo";
+  if (slug.includes("urgente")) return "Agendar urgente";
+  if (slug.includes("quanto") || slug.includes("custa")) return "Ver orçamento";
+  if (slug.includes("higieniz")) return "Ver preço";
+  if (slug.includes("lavagem") || slug.includes("limpeza")) return "Agendar limpeza";
+  return "Ver orçamento";
 }
 
 const ProblemPage = () => {
@@ -265,7 +265,7 @@ const ProblemPage = () => {
                 {data.intro}
               </p>
 
-              <div className="flex gap-3 max-w-sm">
+              <div className="flex gap-3 w-fit">
                 <div className="relative flex-1">
                   <div className="absolute -inset-1.5 rounded-full bg-gold/40 opacity-30 blur-lg pointer-events-none" />
                   <QuizButton className="relative w-full" problema={slug} ctaLabel={getProblemCtaLabel(slug ?? "")} />
@@ -427,7 +427,7 @@ const ProblemPage = () => {
             <p className="text-white/60 mb-6 text-base">
               Resposta em menos de 2 horas · Sem compromisso
             </p>
-            <div className="flex gap-3 justify-center max-w-sm mx-auto">
+            <div className="flex gap-3 justify-center mx-auto w-fit">
               <div className="relative flex-1">
                 <div className="absolute -inset-1.5 rounded-full bg-gold/40 opacity-30 blur-lg pointer-events-none" />
                 <QuizButton className="relative w-full" problema={slug} ctaLabel={getProblemCtaLabel(slug ?? "")} />
