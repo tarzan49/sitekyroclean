@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { trackEvent } from "@/lib/analytics";
+import { trackWhatsAppClick } from "@/lib/quizTracking";
 
 const WhatsAppButton = () => {
   const [isQuizOpen, setIsQuizOpen] = useState(false);
@@ -25,10 +25,7 @@ const WhatsAppButton = () => {
   }, []);
 
   const handleClick = () => {
-    trackEvent('whatsapp_click', {
-      event_category: 'engagement',
-      event_label: 'floating_button',
-    });
+    trackWhatsAppClick('floating');
   };
 
   // Hide when quiz is open or sticky CTA is visible on mobile

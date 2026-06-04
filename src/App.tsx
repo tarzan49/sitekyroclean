@@ -1,4 +1,5 @@
-﻿import { lazy, Suspense } from "react";
+﻿import { lazy, Suspense, useEffect } from "react";
+import { trackSessionTime } from "@/lib/quizTracking";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -212,12 +213,24 @@ const AppRoutes = () => {
 };
 
 // ── Root app ──────────────────────────────────────────────────────────────────
+const SessionTracker = () => {
+  useEffect(() => {
+    const start = Date.now();
+    const send = () => trackSessionTime(Math.round((Date.now() - start) / 1000));
+    document.addEventListener("visibilitychange", () => { if (document.visibilityState === "hidden") send(); });
+    window.addEventListener("pagehide", send);
+    return () => { send(); };
+  }, []);
+  return null;
+};
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <Toaster />
       <Sonner />
       <BrowserRouter>
+        <SessionTracker />
         <AppRoutes />
         <WhatsAppButton />
         <MobileStickyBar />

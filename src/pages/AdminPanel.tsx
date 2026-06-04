@@ -125,6 +125,9 @@ interface QuizMetrics {
   pageBreakdown: { path: string; count: number }[];
   deviceBreakdown: { device: string; count: number }[];
   sourceBreakdown: { source: string; count: number }[];
+  waClicks: number;
+  waClicksBySource: { source: string; count: number }[];
+  avgSessionSeconds: number;
 }
 
 // ── Tabs ─────────────────────────────────────────────────────────────────────
@@ -186,6 +189,7 @@ const AdminPanel = () => {
           avgValue: 0, topService: "—", topCity: "—",
           stepFunnel: [], todayStarts: 0, weekStarts: 0,
           cityBreakdown: [], pageBreakdown: [], deviceBreakdown: [], sourceBreakdown: [],
+          waClicks: 0, waClicksBySource: [], avgSessionSeconds: 0,
         });
         return;
       }
@@ -242,6 +246,18 @@ const AdminPanel = () => {
         return { step, label, count, rate };
       });
 
+      // WhatsApp clicks
+      const waEvents = events.filter(e => e.action === "whatsapp_click");
+      const waSourceCounts: Record<string, number> = {};
+      waEvents.forEach(e => { const s = e.service ?? "unknown"; waSourceCounts[s] = (waSourceCounts[s] ?? 0) + 1; });
+      const waClicksBySource = Object.entries(waSourceCounts).sort((a, b) => b[1] - a[1]).map(([source, count]) => ({ source, count }));
+
+      // Average session time
+      const sessionEvents = events.filter(e => e.action === "session_time" && e.value != null);
+      const avgSessionSeconds = sessionEvents.length > 0
+        ? Math.round(sessionEvents.reduce((sum, e) => sum + (e.value ?? 0), 0) / sessionEvents.length)
+        : 0;
+
       setMetrics({
         totalStarts: starts.length,
         totalCompletes: completes.length,
@@ -256,6 +272,9 @@ const AdminPanel = () => {
         pageBreakdown,
         deviceBreakdown,
         sourceBreakdown,
+        waClicks: waEvents.length,
+        waClicksBySource,
+        avgSessionSeconds,
       });
     } catch (e: unknown) {
       setMetricsError(e instanceof Error ? e.message : "Erro ao carregar métricas. Cria a tabela quiz_events no Supabase primeiro.");
@@ -694,14 +713,16 @@ const AdminPanel = () => {
             {!metricsLoading && !metricsError && metrics && (
               <>
                 {/* KPI cards */}
-                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                   {[
                     { label: "Início hoje", value: metrics.todayStarts, icon: Activity, color: "text-blue-500" },
-                    { label: "Início esta semana", value: metrics.weekStarts, icon: TrendingUp, color: "text-purple-500" },
                     { label: "Total iniciados", value: metrics.totalStarts, icon: Users, color: "text-navy" },
                     { label: "Concluídos", value: metrics.totalCompletes, icon: CheckCircle, color: "text-green-500" },
                     { label: "Taxa conclusão", value: `${metrics.completionRate.toFixed(1)}%`, icon: Target, color: "text-gold" },
-                    { label: "Valor médio", value: `${metrics.avgValue.toFixed(0)}€`, icon: DollarSign, color: "text-emerald-600" },
+                    { label: "Valor médio orçamento", value: `${metrics.avgValue.toFixed(0)}€`, icon: DollarSign, color: "text-emerald-600" },
+                    { label: "Clicks WhatsApp", value: metrics.waClicks, icon: MessageCircle, color: "text-[#25D366]" },
+                    { label: "Tempo médio no site", value: metrics.avgSessionSeconds >= 60 ? `${Math.floor(metrics.avgSessionSeconds/60)}m ${metrics.avgSessionSeconds%60}s` : `${metrics.avgSessionSeconds}s`, icon: Clock, color: "text-purple-500" },
+                    { label: "Início esta semana", value: metrics.weekStarts, icon: TrendingUp, color: "text-purple-400" },
                   ].map((kpi, i) => (
                     <div key={i} className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 text-center">
                       <kpi.icon className={`w-5 h-5 mx-auto mb-2 ${kpi.color}`} />
@@ -710,6 +731,23 @@ const AdminPanel = () => {
                     </div>
                   ))}
                 </div>
+
+                {/* WhatsApp clicks por origem */}
+                {metrics.waClicksBySource.length > 0 && (
+                  <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+                    <h3 className="text-sm font-semibold text-navy mb-3 flex items-center gap-2">
+                      <MessageCircle className="w-4 h-4 text-[#25D366]" /> WhatsApp clicks por origem
+                    </h3>
+                    <div className="space-y-2">
+                      {metrics.waClicksBySource.map(({ source, count }) => (
+                        <div key={source} className="flex items-center justify-between">
+                          <span className="text-sm text-gray-600 capitalize">{source}</span>
+                          <span className="text-sm font-bold text-navy">{count}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
 
                 {/* Top service + city */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

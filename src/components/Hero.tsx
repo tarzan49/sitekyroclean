@@ -1,4 +1,5 @@
 ﻿import { useState, useEffect, useRef, lazy, Suspense } from "react";
+import { trackWhatsAppClick } from "@/lib/quizTracking";
 
 const QuizForm = lazy(() => import('./QuizFormLazy'));
 import { Phone, MessageCircle, Trophy, Shield, Clock, CheckCircle } from "lucide-react";
@@ -292,6 +293,7 @@ const Hero = () => {
                 href={`https://wa.me/351925530647?text=${encodeURIComponent('Olá, gostaria de saber mais sobre os vossos serviços de higienização.')}`}
                 target="_blank"
                 rel="noopener noreferrer"
+                onClick={() => trackWhatsAppClick('hero')}
                 className="flex items-center justify-center gap-2 w-full h-[48px] md:h-[44px] text-white/75 font-medium text-sm border border-white/20 rounded-full hover:bg-white/[0.07] hover:border-white/35 hover:text-white transition-all duration-200"
               >
                 <MessageCircle className="w-[18px] h-[18px] text-[#25D366] flex-shrink-0" strokeWidth={2} />

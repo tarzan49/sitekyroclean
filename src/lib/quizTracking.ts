@@ -28,6 +28,14 @@ function getDevice(): "mobile" | "tablet" | "desktop" {
   return "desktop";
 }
 
+async function insertEvent(payload: Record<string, unknown>) {
+  try {
+    await (supabase as any).from("quiz_events").insert(payload);
+  } catch {
+    // fire-and-forget
+  }
+}
+
 export async function trackQuizEvent(params: {
   step: number;
   action: "start" | "complete" | "abandon";
@@ -37,23 +45,47 @@ export async function trackQuizEvent(params: {
   service_type?: string;
 }) {
   if (!IS_PRODUCTION) return;
-  try {
-    await (supabase as any).from("quiz_events").insert({
-      session_id: SESSION_ID,
-      step: params.step,
-      action: params.action,
-      service: params.service ?? null,
-      city: params.city ?? null,
-      value: params.value ?? null,
-      service_type: params.service_type ?? null,
-      page_path: window.location.pathname,
-      referrer: document.referrer || null,
-      utm_source: getUTMParam("utm_source"),
-      utm_medium: getUTMParam("utm_medium"),
-      utm_campaign: getUTMParam("utm_campaign"),
-      device: getDevice(),
-    });
-  } catch {
-    // Never throw from tracking — it's fire-and-forget
-  }
+  await insertEvent({
+    session_id: SESSION_ID,
+    step: params.step,
+    action: params.action,
+    service: params.service ?? null,
+    city: params.city ?? null,
+    value: params.value ?? null,
+    service_type: params.service_type ?? null,
+    page_path: window.location.pathname,
+    referrer: document.referrer || null,
+    utm_source: getUTMParam("utm_source"),
+    utm_medium: getUTMParam("utm_medium"),
+    utm_campaign: getUTMParam("utm_campaign"),
+    device: getDevice(),
+  });
+}
+
+// source: 'floating' | 'hero' | 'contact' | 'obrigado' | etc.
+export async function trackWhatsAppClick(source: string) {
+  if (!IS_PRODUCTION) return;
+  await insertEvent({
+    session_id: SESSION_ID,
+    step: 0,
+    action: "whatsapp_click",
+    service: source,
+    page_path: window.location.pathname,
+    device: getDevice(),
+  });
+}
+
+// Called once per session on page hide/unload with seconds spent on site
+export async function trackSessionTime(seconds: number) {
+  if (!IS_PRODUCTION) return;
+  if (seconds < 2) return; // ignore instant bounces
+  await insertEvent({
+    session_id: SESSION_ID,
+    step: 0,
+    action: "session_time",
+    value: seconds,
+    page_path: window.location.pathname,
+    device: getDevice(),
+    referrer: document.referrer || null,
+  });
 }
