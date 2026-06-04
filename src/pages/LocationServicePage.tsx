@@ -1,10 +1,11 @@
 ﻿import { useEffect, useMemo } from "react";
 import { useLocation, Link } from "react-router-dom";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { MapPin, Phone, Star, CheckCircle, MessageCircle } from "lucide-react";
+import { MapPin, Star, CheckCircle, MessageCircle } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import QuizButton from "@/components/QuizButton";
+import { trackWhatsAppClick } from "@/lib/quizTracking";
 import ServiceFAQSchema from "@/components/ServiceFAQSchema";
 import ServiceLocationSchema from "@/components/ServiceLocationSchema";
 import ServicePackBanner from "@/components/ServicePackBanner";
@@ -127,6 +128,19 @@ const SERVICE_TESTIMONIALS: Record<string, { name: string; city: string; text: s
     { name: "João P.", city: "Vila Nova de Gaia", text: "Cheiro fresco e sensação incrível. Equipa profissional, rápida e super cuidadosa." },
   ],
 };
+
+function buildLocationWaMessage(serviceSlug: string, cityName: string): string {
+  const city = cityName;
+  switch (serviceSlug) {
+    case 'limpeza-sofas':     return `Olá! Preciso de limpeza profissional de sofá em ${city}. Qual é o preço e disponibilidade?`;
+    case 'limpeza-colchoes':  return `Olá! Preciso de higienização profissional de colchão em ${city}. Qual é o preço e disponibilidade?`;
+    case 'limpeza-tapetes':   return `Olá! Preciso de lavagem profissional de tapetes em ${city}. Qual é o preço e disponibilidade?`;
+    case 'limpeza-cadeiras':  return `Olá! Preciso de limpeza profissional de cadeiras em ${city}. Qual é o preço e disponibilidade?`;
+    case 'limpeza-alcatifas': return `Olá! Preciso de limpeza profissional de alcatifas em ${city}. Qual é o preço e disponibilidade?`;
+    case 'impermeabilizacao': return `Olá! Tenho interesse em impermeabilizar os meus estofos em ${city}. Qual é o preço e disponibilidade?`;
+    default:                  return `Olá! Gostaria de pedir um orçamento para ${city}. Qual é o preço e disponibilidade?`;
+  }
+}
 
 function parseLocationRoute(pathname: string): { serviceSlug: string; citySlug: string } | null {
   const path = pathname.replace(/^\//, '');
@@ -266,16 +280,26 @@ const LocationServicePage = () => {
                   <span className="text-white/60 text-xs font-medium">+1000 clientes</span>
                 </div>
 
-                <div className="flex flex-wrap gap-3">
-                  <QuizButton initialLocation={data.city} />
+                <div className="flex gap-3 max-w-md">
+                  {/* Quiz button */}
+                  <div className="relative flex-1 group">
+                    <div className="absolute -inset-1.5 rounded-full bg-gradient-to-r from-[#C9A84C]/50 to-[#E8D070]/40 opacity-30 blur-lg group-hover:opacity-55 transition-opacity duration-400 pointer-events-none" />
+                    <QuizButton
+                      initialLocation={data.city}
+                      ctaLabel="Ver preço grátis"
+                      buttonClassName="h-[52px] !py-0 w-full"
+                    />
+                  </div>
+                  {/* WhatsApp button */}
                   <a
-                    href="https://wa.me/351925530647"
+                    href={`https://wa.me/351925530647?text=${encodeURIComponent(buildLocationWaMessage(data.serviceSlug, data.city))}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center justify-center gap-2 px-5 py-2.5 border border-white/20 rounded-full text-white/75 font-medium text-sm hover:bg-white/[0.07] hover:border-white/35 hover:text-white transition-all duration-200"
+                    onClick={() => trackWhatsAppClick(`location_hero_${data.serviceSlug}_${data.citySlug}`)}
+                    className="relative flex-1 inline-flex items-center justify-center gap-2 h-[52px] px-5 rounded-full font-black text-sm text-white bg-gradient-to-r from-[#1DA851] via-[#25D366] to-[#1DA851] shadow-[0_6px_22px_rgba(37,211,102,0.42),0_2px_6px_rgba(0,0,0,0.28),inset_0_1px_0_rgba(255,255,255,0.20),inset_0_-2px_0_rgba(0,0,0,0.12)] hover:shadow-[0_10px_32px_rgba(37,211,102,0.60),0_2px_6px_rgba(0,0,0,0.28)] hover:scale-[1.025] active:scale-[0.95] transition-all duration-200"
                   >
-                    <MessageCircle className="w-[18px] h-[18px] text-[#25D366] flex-shrink-0" strokeWidth={2} />
-                    WhatsApp
+                    <MessageCircle className="w-[18px] h-[18px] text-white flex-shrink-0" strokeWidth={2} />
+                    Falar agora
                   </a>
                 </div>
 
