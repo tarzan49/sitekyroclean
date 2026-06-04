@@ -1,11 +1,12 @@
 ﻿import { useMemo, useEffect } from "react";
 import { useLocation, Link } from "react-router-dom";
-import { CheckCircle, XCircle, Star, ArrowRight, Search, Sparkles, Droplets, Wind, Phone, MessageCircle } from "lucide-react";
+import { CheckCircle, XCircle, Star, ArrowRight, Search, Sparkles, Droplets, Wind, MessageCircle } from "lucide-react";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import QuizButton from "@/components/QuizButton";
 import { getAllMarcaSofaRoutes, getMarcaByCityAndSlug } from "@/data/marcaSofaData";
+import { trackWhatsAppClick } from "@/lib/quizTracking";
 import imgPele        from "@/assets/hero-p-limpeza-sofa-pele.webp";
 import imgVeludo      from "@/assets/hero-p-limpeza-sofa-veludo.webp";
 import imgTecido      from "@/assets/hero-p-limpeza-sofa-tecido.webp";
@@ -169,13 +170,33 @@ const MarcaSofaPage = () => {
                 </div>
               </div>
 
-              <div className="flex flex-wrap items-center gap-3">
-                <QuizButton />
-                <a href="https://wa.me/351925530647" target="_blank" rel="noopener noreferrer"
-                  className="inline-flex items-center justify-center gap-2 px-5 py-2.5 border border-white/20 rounded-full text-white/75 font-medium text-sm hover:bg-white/[0.07] hover:border-white/35 hover:text-white transition-all duration-200">
-                  <MessageCircle className="w-[18px] h-[18px] text-[#25D366] flex-shrink-0" strokeWidth={2} />
-                  WhatsApp
-                </a>
+              <div className="flex gap-3 w-full sm:w-auto">
+                <div className="relative group flex-1 sm:flex-none">
+                  <div className="absolute -inset-1.5 rounded-full bg-gradient-to-r from-[#C9A84C]/50 to-[#E8D070]/40 opacity-30 blur-lg group-hover:opacity-55 transition-opacity duration-400 pointer-events-none" />
+                  <QuizButton className="w-full" />
+                </div>
+                <div className="relative group flex-1 sm:flex-none">
+                  <div className="absolute -inset-1.5 rounded-full bg-[#25D366]/40 opacity-30 blur-lg group-hover:opacity-55 transition-opacity duration-400 pointer-events-none" />
+                  <a
+                    href={`https://wa.me/351925530647?text=${encodeURIComponent(`Olá! Gostaria de pedir um orçamento para limpeza do meu sofá ${marca.name} em ${city.name}.`)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={() => trackWhatsAppClick(`marca_hero_${marca.slug}`)}
+                    className={[
+                      'relative flex items-center justify-center gap-2 w-full rounded-full font-bold text-white touch-manipulation',
+                      'bg-gradient-to-r from-[#1DA851] via-[#25D366] to-[#1DA851]',
+                      'shadow-[0_6px_22px_rgba(37,211,102,0.42),0_2px_6px_rgba(0,0,0,0.28),inset_0_1px_0_rgba(255,255,255,0.20),inset_0_-2px_0_rgba(0,0,0,0.12)]',
+                      'hover:shadow-[0_10px_32px_rgba(37,211,102,0.60),0_4px_10px_rgba(0,0,0,0.32)]',
+                      'hover:scale-[1.025] active:scale-[0.95]',
+                      'active:shadow-[0_2px_8px_rgba(37,211,102,0.30),inset_0_2px_4px_rgba(0,0,0,0.18)]',
+                      'transition-all duration-150',
+                      'px-8 py-3 text-sm',
+                    ].join(' ')}
+                  >
+                    <MessageCircle className="w-[18px] h-[18px] text-white flex-shrink-0" strokeWidth={2} />
+                    <span className="tracking-wide">WhatsApp</span>
+                  </a>
+                </div>
               </div>
             </div>
           </div>
@@ -291,18 +312,33 @@ const MarcaSofaPage = () => {
             <p className="text-white/60 mb-6">
               {marca.estimatedPriceRange} · Resposta em menos de 2 horas
             </p>
-            <div className="flex flex-wrap justify-center gap-3">
-              <QuizButton />
-              <a href="https://wa.me/351925530647" target="_blank" rel="noopener noreferrer"
-                className="inline-flex items-center justify-center gap-2 px-6 py-3 border border-white/20 rounded-full text-white/75 font-medium text-sm hover:bg-white/[0.07] hover:border-white/35 hover:text-white transition-all duration-200">
-                <MessageCircle className="w-[18px] h-[18px] text-[#25D366] flex-shrink-0" strokeWidth={2} />
-                WhatsApp
-              </a>
-              <a href="tel:+351925530647"
-                className="inline-flex items-center gap-1.5 text-white/75 hover:text-gold font-medium text-sm transition-colors duration-150">
-                <Phone className="w-3.5 h-3.5 text-gold animate-phone-shake flex-shrink-0" strokeWidth={2.5} />
-                <span className="font-bold tracking-wide">Ligar agora</span>
-              </a>
+            <div className="flex gap-3 justify-center w-full max-w-sm mx-auto">
+              <div className="relative group flex-1">
+                <div className="absolute -inset-1.5 rounded-full bg-gradient-to-r from-[#C9A84C]/50 to-[#E8D070]/40 opacity-30 blur-lg group-hover:opacity-55 transition-opacity duration-400 pointer-events-none" />
+                <QuizButton className="w-full" />
+              </div>
+              <div className="relative group flex-1">
+                <div className="absolute -inset-1.5 rounded-full bg-[#25D366]/40 opacity-30 blur-lg group-hover:opacity-55 transition-opacity duration-400 pointer-events-none" />
+                <a
+                  href={`https://wa.me/351925530647?text=${encodeURIComponent(`Olá! Gostaria de pedir um orçamento para limpeza do meu sofá ${marca.name} em ${city.name}.`)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => trackWhatsAppClick(`marca_cta_${marca.slug}`)}
+                  className={[
+                    'relative flex items-center justify-center gap-2 w-full rounded-full font-bold text-white touch-manipulation',
+                    'bg-gradient-to-r from-[#1DA851] via-[#25D366] to-[#1DA851]',
+                    'shadow-[0_6px_22px_rgba(37,211,102,0.42),0_2px_6px_rgba(0,0,0,0.28),inset_0_1px_0_rgba(255,255,255,0.20),inset_0_-2px_0_rgba(0,0,0,0.12)]',
+                    'hover:shadow-[0_10px_32px_rgba(37,211,102,0.60),0_4px_10px_rgba(0,0,0,0.32)]',
+                    'hover:scale-[1.025] active:scale-[0.95]',
+                    'active:shadow-[0_2px_8px_rgba(37,211,102,0.30),inset_0_2px_4px_rgba(0,0,0,0.18)]',
+                    'transition-all duration-150',
+                    'px-8 py-3 text-sm',
+                  ].join(' ')}
+                >
+                  <MessageCircle className="w-[18px] h-[18px] text-white flex-shrink-0" strokeWidth={2} />
+                  <span className="tracking-wide">WhatsApp</span>
+                </a>
+              </div>
             </div>
           </div>
         </section>
