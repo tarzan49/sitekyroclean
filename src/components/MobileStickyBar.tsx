@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
-import { MessageCircle } from 'lucide-react';
-import { trackWhatsAppClick } from '@/lib/quizTracking';
+import { Phone } from 'lucide-react';
 
 const MobileStickyBar = () => {
   const [visible, setVisible] = useState(false);
@@ -31,14 +30,11 @@ const MobileStickyBar = () => {
             Pedir Orçamento Grátis
           </button>
           <a
-            href={`https://wa.me/351925530647?text=${encodeURIComponent('Olá, gostaria de pedir um orçamento para limpeza de estofos.')}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            onClick={() => trackWhatsAppClick('sticky_bar')}
-            className="w-12 h-12 flex items-center justify-center bg-[#25D366]/20 border border-[#25D366]/30 rounded-xl flex-shrink-0 active:bg-[#25D366]/30 touch-manipulation"
-            aria-label="Contactar via WhatsApp"
+            href="tel:925530647"
+            className="w-12 h-12 flex items-center justify-center bg-white/[0.07] border border-white/10 rounded-xl flex-shrink-0 active:bg-white/10 touch-manipulation"
+            aria-label="Ligar agora"
           >
-            <MessageCircle className="w-5 h-5 text-[#25D366]" />
+            <Phone className="w-5 h-5 text-white/70" />
           </a>
         </div>
       </div>
