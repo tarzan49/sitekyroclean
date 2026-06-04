@@ -4,12 +4,13 @@ import QuizForm from './QuizFormLazy';
 
 interface QuizButtonProps {
   className?: string;
+  buttonClassName?: string;
   problema?: string;
   ctaLabel?: string;
   initialLocation?: string;
 }
 
-const QuizButton = ({ className = '', problema, ctaLabel, initialLocation }: QuizButtonProps) => {
+const QuizButton = ({ className = '', buttonClassName = '', problema, ctaLabel, initialLocation }: QuizButtonProps) => {
   const { t } = useTranslation();
   const [isQuizOpen, setIsQuizOpen] = useState(false);
 
@@ -36,6 +37,7 @@ const QuizButton = ({ className = '', problema, ctaLabel, initialLocation }: Qui
             'active:shadow-[0_2px_8px_rgba(201,168,76,0.30),inset_0_2px_4px_rgba(0,0,0,0.18)]',
             'transition-all duration-150 animate-cta-glow',
             'px-8 py-3 text-sm',
+            buttonClassName,
           ].join(' ')}
         >
           <span className="tracking-wide">{label}</span>
