@@ -539,7 +539,8 @@ const QuizForm = ({ isOpen, onClose, initialLocation, problema }: QuizFormProps)
 
   // Sofa & mattress now show their own 2-card step 2 (Higienização / Impermeabilização)
   const shouldSkipServiceType = formData.service === 'carpet'
-    || formData.service === 'chairs';
+    || formData.service === 'chairs'
+    || formData.service === 'mattress';
 
   const handleNext = () => {
     if (canProceed()) {
