@@ -957,11 +957,6 @@ ${formData.description || 'Sem observações adicionais'}
   };
 
   const handleClose = () => {
-    if (!exitIntentFired && currentStep > 0) {
-      setShowExitIntent(true);
-      setExitIntentFired(true);
-      return;
-    }
     resetForm();
     onClose();
   };
@@ -2429,40 +2424,6 @@ ${formData.description || 'Sem observações adicionais'}
       </p>
     </div>
 
-    {/* Exit Intent Overlay */}
-    {showExitIntent && (
-      <div className="absolute inset-0 z-50 flex items-center justify-center backdrop-blur-md rounded-t-3xl sm:rounded-2xl" style={{ background: "rgba(5,21,16,0.92)" }}>
-        <div className="px-7 py-8 text-center max-w-xs mx-auto">
-          <AlertTriangle className="w-12 h-12 text-gold mb-4 mx-auto" />
-          <h3 className="font-playfair text-2xl font-bold text-white mb-3 leading-tight">
-            ESPERE!
-          </h3>
-          <p className="text-sm text-white/65 mb-2 leading-relaxed">
-            Se sair agora, perde a sua vaga e o desconto de{' '}
-            <span className="text-gold font-bold">5%</span>.
-          </p>
-          {isDiscountActive && (
-            <p className="text-xs text-gold/70 mb-5 font-mono bg-gold/10 px-3 py-1.5 rounded-lg inline-block">
-              Desconto expira em {formatCountdown(countdown)}
-            </p>
-          )}
-          <div className="flex flex-col gap-3 mt-5">
-            <Button
-              onClick={() => setShowExitIntent(false)}
-              className="w-full h-12 bg-gradient-to-r from-gold to-[#d4c57b] hover:from-[#d4c57b] hover:to-gold text-[#12121e] font-black rounded-xl shadow-[0_0_20px_rgba(212,175,55,0.3)] touch-manipulation active:scale-[0.98]"
-            >
-              Continuar e Guardar Desconto
-            </Button>
-            <button
-              onClick={confirmClose}
-              className="text-xs text-white/20 hover:text-white/45 py-2 transition-colors"
-            >
-              Sair mesmo assim
-            </button>
-          </div>
-        </div>
-      </div>
-    )}
   </div>
 </div>
   );
