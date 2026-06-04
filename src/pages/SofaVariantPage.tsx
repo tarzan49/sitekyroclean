@@ -5,11 +5,12 @@
 
 import { useEffect, useMemo } from "react";
 import { useLocation, Link } from "react-router-dom";
-import { CheckCircle, ArrowRight, Star, MapPin, Phone, MessageCircle } from "lucide-react";
+import { CheckCircle, Star, MapPin, MessageCircle } from "lucide-react";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import QuizButton from "@/components/QuizButton";
+import { trackWhatsAppClick } from "@/lib/quizTracking";
 import ServiceFAQSchema from "@/components/ServiceFAQSchema";
 import ServicePackBanner from "@/components/ServicePackBanner";
 import {
@@ -194,23 +195,20 @@ const SofaVariantPage = () => {
                   <span className="text-white/60 text-xs font-medium">+1000 clientes</span>
                 </div>
 
-                <div className="flex flex-wrap gap-3">
-                  <QuizButton />
+                <div className="flex gap-3">
+                  <div className="relative flex-1">
+                    <div className="absolute -inset-1.5 rounded-full bg-gold/40 opacity-30 blur-lg pointer-events-none" />
+                    <QuizButton className="relative w-full" />
+                  </div>
                   <a
-                    href="https://wa.me/351925530647"
+                    href={`https://wa.me/351925530647?text=${encodeURIComponent(`Olá! Gostaria de pedir um orçamento para ${variantLabel.toLowerCase()} de ${SERVICE_LABEL[data.serviceKey].toLowerCase()} em ${data.locationName}.`)}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center justify-center gap-2 px-5 py-2.5 border border-white/20 rounded-full text-white/75 font-medium text-sm hover:bg-white/[0.07] hover:border-white/35 hover:text-white transition-all duration-200"
+                    onClick={() => trackWhatsAppClick(`variant_hero_${parsed.variantKey}_${parsed.serviceKey}`)}
+                    className="relative flex-1 inline-flex items-center justify-center gap-2 h-[52px] px-5 rounded-full font-black text-sm text-white bg-gradient-to-r from-[#1DA851] via-[#25D366] to-[#1DA851] shadow-[0_6px_22px_rgba(37,211,102,0.42),0_2px_6px_rgba(0,0,0,0.28),inset_0_1px_0_rgba(255,255,255,0.20),inset_0_-2px_0_rgba(0,0,0,0.12)] hover:shadow-[0_10px_32px_rgba(37,211,102,0.60),0_2px_6px_rgba(0,0,0,0.28),inset_0_1px_0_rgba(255,255,255,0.20),inset_0_-2px_0_rgba(0,0,0,0.12)] hover:scale-[1.025] active:scale-[0.95] transition-all duration-200 touch-manipulation"
                   >
-                    <MessageCircle className="w-[18px] h-[18px] text-[#25D366] flex-shrink-0" strokeWidth={2} />
+                    <MessageCircle className="w-[18px] h-[18px] text-white flex-shrink-0" strokeWidth={2} />
                     WhatsApp
-                  </a>
-                  <a
-                    href="tel:925530647"
-                    className="inline-flex items-center gap-1.5 text-white/75 hover:text-gold font-medium text-sm transition-colors duration-150"
-                  >
-                    <Phone className="w-3.5 h-3.5 text-gold animate-phone-shake flex-shrink-0" strokeWidth={2.5} />
-                    <span className="font-bold tracking-wide">Ligar</span>
                   </a>
                 </div>
 
