@@ -163,20 +163,8 @@ function getProblemWaBtnLabel(slug: string): string {
   return 'Falar agora';
 }
 
-function getProblemCtaLabel(slug: string): string {
-  if (slug.includes("mancha")) return "Tirar manchas";
-  if (slug.includes("urina")) return "Ajuda urgente";
-  if (slug.includes("cheiro") || slug.includes("odor")) return "Tirar cheiros";
-  if (slug.includes("acar")) return "Eliminar ácaros";
-  if (slug.includes("alerg")) return "Tratar alergias";
-  if (slug.includes("pelos")) return "Remover pelos";
-  if (slug.includes("impermeabiliz")) return "Impermeabilizar";
-  if (slug.includes("mofo") || slug.includes("bolor")) return "Eliminar mofo";
-  if (slug.includes("urgente")) return "Agendar urgente";
-  if (slug.includes("quanto") || slug.includes("custa")) return "Ver orçamento";
-  if (slug.includes("higieniz")) return "Ver preço";
-  if (slug.includes("lavagem") || slug.includes("limpeza")) return "Agendar limpeza";
-  return "Ver orçamento";
+function getProblemCtaLabel(_slug: string): string {
+  return "Ver preço grátis";
 }
 
 const ProblemPage = () => {
