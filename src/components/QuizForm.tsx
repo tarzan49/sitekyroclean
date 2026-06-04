@@ -90,13 +90,12 @@ function chairActiveTier(qty: number): number {
   if (qty <= 3) return 0; if (qty <= 6) return 1; if (qty <= 9) return 2; return 3;
 }
 const CHAIR_WATERPROOF_TIERS = [
-  { label: '1 a 4', sublabel: 'cadeiras', rate: 15 },
-  { label: '5 a 6', sublabel: 'cadeiras', rate: 12.5 },
-  { label: '7 a 9', sublabel: 'cadeiras', rate: 10 },
-  { label: '10+',   sublabel: 'cadeiras', rate: null },
+  { label: '1 a 4',  sublabel: 'cadeiras', rate: 17.5 },
+  { label: '5 a 10', sublabel: 'cadeiras', rate: 15 },
+  { label: '11+',    sublabel: 'cadeiras', rate: null },
 ];
 function chairWaterproofActiveTier(qty: number): number {
-  if (qty <= 4) return 0; if (qty <= 6) return 1; if (qty <= 9) return 2; return 3;
+  if (qty <= 4) return 0; if (qty <= 10) return 1; return 2;
 }
 // Bracket pricing: each tier's rate only applies to chairs in that bracket
 // 1-3: 17.5€/each · 4-6: 12.5€/each · 7-9: 10€/each · 10+: sob orçamento
@@ -107,13 +106,11 @@ function calcChairClean(qty: number): number | null {
   if (qty <= 6) return 52.5 + (qty - 3) * 12.5;
   return 90 + (qty - 6) * 10;
 }
-// Waterproofing bracket pricing: 1-4: 15€/un · 5-6: 12.5€/un · 7-9: 10€/un · 10+: sob orçamento
-// Totals: 4=60 · 5=72.5 · 6=85 · 7=95 · 9=115 (always increases)
+// Flat-rate per bracket: 1-4: 17.5€/un · 5-10: 15€/un · 11+: sob orçamento
 function calcChairWaterproof(qty: number): number | null {
-  if (qty <= 0 || qty >= 10) return null;
-  if (qty <= 4) return qty * 15;
-  if (qty <= 6) return 60 + (qty - 4) * 12.5;
-  return 85 + (qty - 6) * 10;
+  if (qty <= 0 || qty > 10) return null;
+  if (qty <= 4) return qty * 17.5;
+  return qty * 15;
 }
 function fmtN(n: number): string { return n % 1 === 0 ? `${n}€` : `${n.toFixed(1).replace('.', ',')}€`; }
 
@@ -331,7 +328,7 @@ const QuizForm = ({ isOpen, onClose, initialLocation, problema }: QuizFormProps)
       case 'chairs': {
         const chairQty = parseInt(formData.chairQuantity);
         const cleanSob = isNaN(chairQty) || chairQty <= 0 || chairQty >= 10;
-        const waterSob = formData.chairWaterproofQty >= 10;
+        const waterSob = formData.chairWaterproofQty > 10;
         return cleanSob || waterSob;
       }
       case 'carpet': {
