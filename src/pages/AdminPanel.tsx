@@ -266,9 +266,17 @@ const AdminPanel = () => {
 
   const resetMetrics = async () => {
     if (!confirm("Apagar TODOS os dados de métricas do quiz? Esta ação é irreversível.")) return;
-    await (supabase as any).from("quiz_events").delete().neq("id", "00000000-0000-0000-0000-000000000000");
+    const { error } = await (supabase as any)
+      .from("quiz_events")
+      .delete()
+      .gte("created_at", "2000-01-01");
+    if (error) {
+      alert(`Erro ao apagar: ${error.message}\n\nSolução: vai ao Supabase Dashboard → Table Editor → quiz_events → seleciona tudo → Delete rows.`);
+      return;
+    }
     setMetrics(null);
     fetchMetrics();
+    alert("Dados apagados com sucesso.");
   };
 
   // Load data when tab changes
