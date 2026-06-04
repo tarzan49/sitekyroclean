@@ -1,7 +1,7 @@
 ﻿import { useEffect, useMemo } from "react";
 import { useLocation, Link } from "react-router-dom";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { CheckCircle, MapPin, ArrowRight, Phone, Star, MessageCircle } from "lucide-react";
+import { CheckCircle, MapPin, ArrowRight, Star, MessageCircle } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import QuizButton from "@/components/QuizButton";
@@ -18,6 +18,19 @@ import {
 } from "@/data/freguesiaSeoData";
 import { getAllProblems } from "@/data/problemSeoData";
 import { GENERIC_PROCESS_STEPS, IMPERMEABILIZACAO_STEPS } from "@/constants/serviceProcesses";
+import { trackWhatsAppClick } from "@/lib/quizTracking";
+
+function buildFreguesiaWaMessage(serviceSlug: string, placeName: string): string {
+  switch (serviceSlug) {
+    case 'limpeza-sofas':     return `Olá! Preciso de limpeza profissional de sofá em ${placeName}. Qual é o preço e disponibilidade?`;
+    case 'limpeza-colchoes':  return `Olá! Preciso de higienização profissional de colchão em ${placeName}. Qual é o preço e disponibilidade?`;
+    case 'limpeza-tapetes':   return `Olá! Preciso de lavagem profissional de tapetes em ${placeName}. Qual é o preço e disponibilidade?`;
+    case 'limpeza-cadeiras':  return `Olá! Preciso de limpeza profissional de cadeiras em ${placeName}. Qual é o preço e disponibilidade?`;
+    case 'limpeza-alcatifas': return `Olá! Preciso de limpeza profissional de alcatifas em ${placeName}. Qual é o preço e disponibilidade?`;
+    case 'impermeabilizacao': return `Olá! Tenho interesse em impermeabilizar os meus estofos em ${placeName}. Qual é o preço e disponibilidade?`;
+    default:                  return `Olá! Gostaria de pedir um orçamento para ${placeName}. Qual é o preço e disponibilidade?`;
+  }
+}
 
 const RESULT_CONTENT: Record<string, (place: string) => { desc: string; checks: string[] }> = {
   'limpeza-sofas':     p => ({ desc: `Sofás de ${p} tratados com extração a quente: manchas, ácaros e odores eliminados. Tecido revitalizado e pronto a usar em 4 a 6 horas.`, checks: ['Remoção de 99% dos ácaros', 'Manchas antigas eliminadas', 'Pronto em 4–6h'] }),
@@ -210,23 +223,22 @@ const FreguesiaServicePage = () => {
                   <span className="text-white/60 text-xs font-medium">+1000 clientes</span>
                 </div>
 
-                <div className="flex flex-wrap items-center gap-3">
-                  <QuizButton initialLocation={data.municipio} />
+                <div className="flex gap-3 max-w-md">
+                  <QuizButton
+                    className="flex-1"
+                    initialLocation={data.municipio}
+                    ctaLabel="Ver preço grátis"
+                    buttonClassName="h-[52px] !py-0 w-full"
+                  />
                   <a
-                    href="https://wa.me/351925530647"
+                    href={`https://wa.me/351925530647?text=${encodeURIComponent(buildFreguesiaWaMessage(data.serviceSlug, data.name))}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center justify-center gap-2 px-5 py-2.5 border border-white/20 rounded-full text-white/75 font-medium text-sm hover:bg-white/[0.07] hover:border-white/35 hover:text-white transition-all duration-200"
+                    onClick={() => trackWhatsAppClick(`freguesia_hero_${data.serviceSlug}_${data.municipioSlug}`)}
+                    className="relative flex-1 inline-flex items-center justify-center gap-2 h-[52px] px-5 rounded-full font-black text-sm text-white bg-gradient-to-r from-[#1DA851] via-[#25D366] to-[#1DA851] shadow-[0_6px_22px_rgba(37,211,102,0.42),0_2px_6px_rgba(0,0,0,0.28),inset_0_1px_0_rgba(255,255,255,0.20),inset_0_-2px_0_rgba(0,0,0,0.12)] hover:shadow-[0_10px_32px_rgba(37,211,102,0.60),0_2px_6px_rgba(0,0,0,0.28)] hover:scale-[1.025] active:scale-[0.95] transition-all duration-200 touch-manipulation"
                   >
-                    <MessageCircle className="w-[18px] h-[18px] text-[#25D366] flex-shrink-0" strokeWidth={2} />
-                    WhatsApp
-                  </a>
-                  <a
-                    href="tel:925530647"
-                    className="inline-flex items-center gap-1.5 text-white/75 hover:text-gold font-medium text-sm transition-colors duration-150"
-                  >
-                    <Phone className="w-3.5 h-3.5 text-gold animate-phone-shake flex-shrink-0" strokeWidth={2.5} />
-                    <span className="font-bold tracking-wide">Ligar</span>
+                    <MessageCircle className="w-[18px] h-[18px] text-white flex-shrink-0" strokeWidth={2} />
+                    Falar agora
                   </a>
                 </div>
 

@@ -281,22 +281,18 @@ const LocationServicePage = () => {
                 </div>
 
                 <div className="flex gap-3 max-w-md">
-                  {/* Quiz button */}
-                  <div className="relative flex-1 group">
-                    <div className="absolute -inset-1.5 rounded-full bg-gradient-to-r from-[#C9A84C]/50 to-[#E8D070]/40 opacity-30 blur-lg group-hover:opacity-55 transition-opacity duration-400 pointer-events-none" />
-                    <QuizButton
-                      initialLocation={data.city}
-                      ctaLabel="Ver preço grátis"
-                      buttonClassName="h-[52px] !py-0 w-full"
-                    />
-                  </div>
-                  {/* WhatsApp button */}
+                  <QuizButton
+                    className="flex-1"
+                    initialLocation={data.city}
+                    ctaLabel="Ver preço grátis"
+                    buttonClassName="h-[52px] !py-0 w-full"
+                  />
                   <a
                     href={`https://wa.me/351925530647?text=${encodeURIComponent(buildLocationWaMessage(data.serviceSlug, data.city))}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     onClick={() => trackWhatsAppClick(`location_hero_${data.serviceSlug}_${data.citySlug}`)}
-                    className="relative flex-1 inline-flex items-center justify-center gap-2 h-[52px] px-5 rounded-full font-black text-sm text-white bg-gradient-to-r from-[#1DA851] via-[#25D366] to-[#1DA851] shadow-[0_6px_22px_rgba(37,211,102,0.42),0_2px_6px_rgba(0,0,0,0.28),inset_0_1px_0_rgba(255,255,255,0.20),inset_0_-2px_0_rgba(0,0,0,0.12)] hover:shadow-[0_10px_32px_rgba(37,211,102,0.60),0_2px_6px_rgba(0,0,0,0.28)] hover:scale-[1.025] active:scale-[0.95] transition-all duration-200"
+                    className="relative flex-1 inline-flex items-center justify-center gap-2 h-[52px] px-5 rounded-full font-black text-sm text-white bg-gradient-to-r from-[#1DA851] via-[#25D366] to-[#1DA851] shadow-[0_6px_22px_rgba(37,211,102,0.42),0_2px_6px_rgba(0,0,0,0.28),inset_0_1px_0_rgba(255,255,255,0.20),inset_0_-2px_0_rgba(0,0,0,0.12)] hover:shadow-[0_10px_32px_rgba(37,211,102,0.60),0_2px_6px_rgba(0,0,0,0.28)] hover:scale-[1.025] active:scale-[0.95] transition-all duration-200 touch-manipulation"
                   >
                     <MessageCircle className="w-[18px] h-[18px] text-white flex-shrink-0" strokeWidth={2} />
                     Falar agora
