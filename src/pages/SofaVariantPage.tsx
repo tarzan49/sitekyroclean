@@ -135,7 +135,7 @@ const SofaVariantPage = () => {
       robotsMeta.setAttribute('name', 'robots');
       document.head.appendChild(robotsMeta);
     }
-    robotsMeta.setAttribute('content', 'noindex, follow');
+    robotsMeta.setAttribute('content', 'index, follow');
     return () => { robotsMeta?.setAttribute('content', 'index, follow'); };
   }, [data]);
 

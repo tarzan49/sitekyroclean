@@ -1,11 +1,10 @@
 User-agent: *
 Allow: /
-Allow: /*?lang=en
-Allow: /*?lang=es
 Disallow: /admin/
 Disallow: /obrigado
 Disallow: /obrigado-pelo-servico
 Disallow: /api/
 Disallow: /*.json$
+Disallow: /*?lang=*
 
-Sitemap: https://www.cleansolutions.pt/sitemap.xml
+Sitemap: https://cleansolutions.com.pt/sitemap.xml
