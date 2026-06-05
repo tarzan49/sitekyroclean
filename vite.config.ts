@@ -18,6 +18,23 @@ function sitemapPlugin(): Plugin {
   };
 }
 
+// Static prerender plugin — injects per-route meta tags for Google indexing
+function prerenderPlugin(): Plugin {
+  return {
+    name: 'prerender-routes',
+    closeBundle: {
+      sequential: true,
+      async handler() {
+        const { prerenderRoutes } = await import('./scripts/prerender');
+        const outDir = path.resolve(__dirname, 'dist');
+        console.log('\n🔧 Prerendering routes...\n');
+        const n = prerenderRoutes(outDir);
+        console.log(`\n✅ Prerendered ${n} routes\n`);
+      },
+    },
+  };
+}
+
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
   server: {
@@ -27,6 +44,7 @@ export default defineConfig(({ mode }) => ({
   plugins: [
     react(),
     sitemapPlugin(),
+    prerenderPlugin(),
   ],
   resolve: {
     alias: {
