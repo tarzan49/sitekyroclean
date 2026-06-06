@@ -1,5 +1,6 @@
 ﻿import { useMemo, useEffect } from "react";
 import { useLocation, Link } from "react-router-dom";
+import { QuizLocationProvider, QuizServiceProvider } from "@/context/QuizLocationContext";
 import { CheckCircle, XCircle, Star, ArrowRight, Search, Sparkles, Droplets, Wind, MessageCircle } from "lucide-react";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import Header from "@/components/Header";
@@ -128,6 +129,8 @@ const MarcaSofaPage = () => {
   };
 
   return (
+    <QuizLocationProvider value={city.name}>
+    <QuizServiceProvider value="sofa">
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
 
@@ -175,7 +178,7 @@ const MarcaSofaPage = () => {
               <div className="flex gap-3 w-full sm:w-auto">
                 <div className="relative group flex-1 sm:flex-none">
                   <div className="absolute -inset-1.5 rounded-full bg-gradient-to-r from-[#C9A84C]/50 to-[#E8D070]/40 opacity-30 blur-lg group-hover:opacity-55 transition-opacity duration-400 pointer-events-none" />
-                  <QuizButton className="w-full" buttonClassName="h-[52px] !py-0 w-full" />
+                  <QuizButton className="w-full" buttonClassName="h-[52px] !py-0 w-full" initialLocation={city.name} initialService="sofa" />
                 </div>
                 <div className="relative group flex-1 sm:flex-none">
                   <div className="absolute -inset-1.5 rounded-full bg-[#25D366]/40 opacity-30 blur-lg group-hover:opacity-55 transition-opacity duration-400 pointer-events-none" />
@@ -317,7 +320,7 @@ const MarcaSofaPage = () => {
             <div className="flex gap-3 justify-center w-full max-w-sm mx-auto">
               <div className="relative group flex-1">
                 <div className="absolute -inset-1.5 rounded-full bg-gradient-to-r from-[#C9A84C]/50 to-[#E8D070]/40 opacity-30 blur-lg group-hover:opacity-55 transition-opacity duration-400 pointer-events-none" />
-                <QuizButton className="w-full" />
+                <QuizButton className="w-full" initialLocation={city.name} initialService="sofa" />
               </div>
               <div className="relative group flex-1">
                 <div className="absolute -inset-1.5 rounded-full bg-[#25D366]/40 opacity-30 blur-lg group-hover:opacity-55 transition-opacity duration-400 pointer-events-none" />
@@ -368,6 +371,8 @@ const MarcaSofaPage = () => {
       </main>
       <Footer />
     </>
+    </QuizServiceProvider>
+    </QuizLocationProvider>
   );
 };
 

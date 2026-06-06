@@ -118,14 +118,22 @@ interface QuizFormProps {
   isOpen: boolean;
   onClose: () => void;
   initialLocation?: string;
+  initialService?: string;
   problema?: string;
 }
 
-const QuizForm = ({ isOpen, onClose, initialLocation, problema }: QuizFormProps) => {
+function calcInitialStep(loc?: string, svc?: string): number {
+  if (!loc) return 0;
+  if (!svc) return 1;
+  const skipType = svc === 'carpet' || svc === 'mattress';
+  return skipType ? 3 : 2;
+}
+
+const QuizForm = ({ isOpen, onClose, initialLocation, initialService, problema }: QuizFormProps) => {
   const { t } = useTranslation();
   const { toast } = useToast();
   const navigate = useNavigate();
-  const [currentStep, setCurrentStep] = useState(() => initialLocation ? 1 : 0);
+  const [currentStep, setCurrentStep] = useState(() => calcInitialStep(initialLocation, initialService));
   const [locationQuery, setLocationQuery] = useState('');
   const [locationFadeIn, setLocationFadeIn] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -162,6 +170,8 @@ const QuizForm = ({ isOpen, onClose, initialLocation, problema }: QuizFormProps)
   const [formData, setFormData] = useState<QuizFormData>(() => ({
     ...initialFormData,
     location: initialLocation || '',
+    service: initialService || '',
+    serviceType: (initialService && initialService !== 'sofa' && initialService !== 'chairs') ? 'cleaning' : '',
   }));
 
   const totalSteps = 4;
@@ -301,16 +311,13 @@ const QuizForm = ({ isOpen, onClose, initialLocation, problema }: QuizFormProps)
   const hasSobOrcamento = sofaItems.some(i => i.sizeId === '4+-lugares' && i.qty > 0);
   // Any upsell item with price=0 is a SOB item (chairs ≥10, carpet >15m², sofa 4+ lugares)
   const hasUpsellSobItem = upsellItems.some(i => i.price === 0);
-  // Pack 10% activates: cart ≥200€ in known prices, OR cart >100€ + any SOB item (upsell or main service)
-  const packDiscountActive = totalPrice >= 200 || (totalPrice > 100 && (hasUpsellSobItem || hasSobOrcamento));
+  // Pack 10% activates: cart ≥149€ in known prices, OR cart >100€ + any SOB item
+  const packDiscountActive = totalPrice >= 149 || (totalPrice > 100 && (hasUpsellSobItem || hasSobOrcamento));
   const packDiscountPct = packDiscountActive ? 0.10 : 0;
   const serviceOnlyTotal = calculateServicePrice + upsellItemsTotal + hypoSurcharge;
-  const discountedPrice = isDiscountActive && totalPrice > 0
-    ? Math.round(serviceOnlyTotal * 0.95) + finalTravelCost
-    : Math.round(totalPrice);
-  // Pack discount (10%) supersedes timer discount (5%), never accumulate
+  const discountedPrice = Math.round(totalPrice);
   const packDiscountedPrice = packDiscountActive && totalPrice > 0
-    ? Math.round(serviceOnlyTotal * (1 - packDiscountPct)) + finalTravelCost
+    ? Math.round(serviceOnlyTotal * 0.9) + finalTravelCost
     : discountedPrice;
 
   // Determine if this request requires a custom quote (no fixed price available)
@@ -452,16 +459,16 @@ const QuizForm = ({ isOpen, onClose, initialLocation, problema }: QuizFormProps)
     return () => clearTimeout(id);
   }, [packDiscountActive]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Confetti when pack discount activates (total ≥ 200€ or SOB trigger)
+  // Confetti when pack discount activates (total ≥ 149€ or SOB trigger)
   useEffect(() => {
     if (packDiscountActive && !prevTotalRef.current) {
       setConfettiActive(true);
-      const viaSob = totalPrice < 200 && hasUpsellSobItem;
+      const viaSob = totalPrice < 149 && hasUpsellSobItem;
       toast({
         title: 'Desconto de 10% ativado!',
         description: viaSob
           ? 'Ao adicionar um artigo de valor elevado, ativou o desconto de Pack automaticamente.'
-          : 'O seu pedido atingiu 200€, desconto aplicado automaticamente.',
+          : 'Parabéns! Atingiu 149€ e tem 10% de desconto em todo o pedido.',
         duration: 4000,
       });
       const id = setTimeout(() => setConfettiActive(false), 4500);
@@ -469,7 +476,7 @@ const QuizForm = ({ isOpen, onClose, initialLocation, problema }: QuizFormProps)
       return () => clearTimeout(id);
     }
     if (!packDiscountActive) prevTotalRef.current = 0;
-  }, [packDiscountActive]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [packDiscountActive, totalPrice]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Unlock exit intent popup after 40s on site
   useEffect(() => {
@@ -523,7 +530,7 @@ const QuizForm = ({ isOpen, onClose, initialLocation, problema }: QuizFormProps)
 
   // Step 0 = location picker (only shown when no city pre-filled)
   const needsLocationStep = !initialLocation;
-  const firstStep = needsLocationStep ? 0 : 1;
+  const firstStep = calcInitialStep(initialLocation, initialService);
 
   // Step order: [0-Location?], 1-Service, 2-ServiceType, 3-Config, [Upsell], 4-Contact (submit)
   const canProceed = () => {
@@ -781,9 +788,9 @@ ${formData.description || 'Sem observações adicionais'}
 
       // Build WA URL for optional support button on Obrigado page
       const finalPriceText = packDiscountActive && totalPrice > 0
-        ? `${packDiscountedPrice}€ (Pack -${Math.round(packDiscountPct * 100)}%)`
-        : discountedPrice > 0
-          ? `${discountedPrice}€${isDiscountActive ? ` (5% desconto)` : ''}`
+        ? `${packDiscountedPrice}€ (Pack -10%)`
+        : totalPrice > 0
+          ? `${totalPrice}€`
           : 'Sob orçamento';
       const hypoText = hypoallergenic === true ? `\nProdutos Hipoalergénicos +${hypoSurcharge}€` : '';
       const waExtras: string[] = [];
@@ -791,9 +798,9 @@ ${formData.description || 'Sem observações adicionais'}
       if (hypoallergenic === true) waExtras.push(`Produtos Hipoalergénicos (+${hypoSurcharge}€)`);
       const waExtrasText = waExtras.length > 0 ? waExtras.join(' + ') : 'Sem extras';
       const waTotalPrice = packDiscountActive && totalPrice > 0
-        ? `${packDiscountedPrice}€ (Pack -${Math.round(packDiscountPct * 100)}%) (IVA incl.)`
-        : discountedPrice > 0
-          ? `${discountedPrice}€${isDiscountActive ? ' (desc. 5%)' : ''} (IVA incl.)`
+        ? `${packDiscountedPrice}€ (Pack -10%) (IVA incl.)`
+        : totalPrice > 0
+          ? `${totalPrice}€ (IVA incl.)`
           : 'Sob orçamento';
 
       const waText = encodeURIComponent(
@@ -853,13 +860,13 @@ ${formData.description || 'Sem observações adicionais'}
         }
       });
       if (finalTravelCost > 0) receiptLines.push({ label: `Deslocação: ${finalLocation}`, qty: 1, unitPrice: finalTravelCost, total: finalTravelCost });
-      const discountAmt = packDiscountActive ? Math.round((totalPrice - packDiscountedPrice) * 100) / 100 : isDiscountActive ? Math.round((totalPrice - discountedPrice) * 100) / 100 : 0;
+      const discountAmt = packDiscountActive ? Math.round((totalPrice - packDiscountedPrice) * 100) / 100 : 0;
       sessionStorage.setItem('kyro_receipt', JSON.stringify({
         lines: receiptLines,
         subtotal: totalPrice,
-        discountLabel: packDiscountActive ? `Pack Família −${Math.round(packDiscountPct * 100)}%` : isDiscountActive && totalPrice > 0 ? 'Desconto Agenda −5%' : null,
+        discountLabel: packDiscountActive ? `Pack Família −${Math.round(packDiscountPct * 100)}%` : null,
         discountAmount: discountAmt,
-        total: packDiscountActive ? packDiscountedPrice : isDiscountActive && totalPrice > 0 ? discountedPrice : totalPrice,
+        total: packDiscountActive ? packDiscountedPrice : totalPrice,
         location: finalLocation,
         slot: formatSelectedSlot(formData.selectedSlot),
         bookingId,
@@ -935,8 +942,13 @@ ${formData.description || 'Sem observações adicionais'}
   };
 
   const resetForm = () => {
-    setFormData({ ...initialFormData, location: initialLocation || '' });
-    setCurrentStep(initialLocation ? 1 : 0);
+    setFormData({
+      ...initialFormData,
+      location: initialLocation || '',
+      service: initialService || '',
+      serviceType: (initialService && initialService !== 'sofa' && initialService !== 'chairs') ? 'cleaning' : '',
+    });
+    setCurrentStep(calcInitialStep(initialLocation, initialService));
     setLocationQuery('');
     setLocationFadeIn(false);
     setHypoallergenic(null);
@@ -1318,7 +1330,7 @@ ${formData.description || 'Sem observações adicionais'}
               <span className="flex items-center gap-1.5">
                 <Flame className={cn("w-3.5 h-3.5 flex-shrink-0 text-gold", countdown < 120 && "animate-pulse")} />
                 <span className="text-white/60">
-                  {countdown < 120 ? "Urgente! Desconto expira em:" : "Alta procura. Valor com desconto garantido por:"}
+                  {countdown < 120 ? "Urgente! Vaga quase esgotada:" : "Alta procura. Vaga reservada por:"}
                 </span>
               </span>
               <span className={cn(
@@ -1367,16 +1379,14 @@ ${formData.description || 'Sem observações adicionais'}
                 }
               </span>
               <div className="flex items-center gap-3 pr-8">
-                {(packDiscountActive || isDiscountActive) && totalPrice > 0 && (
+                {packDiscountActive && totalPrice > 0 && (
                   <span className="text-sm text-white/25 line-through tabular-nums">{Math.round(displayPrice)}€</span>
                 )}
                 {totalPrice > 0 && (
                   <span className="text-xl font-bold tabular-nums" style={{ color: '#D4AF37' }}>
                     {packDiscountActive
-                      ? `${Math.round((displayPrice - finalTravelCost) * (1 - packDiscountPct) + finalTravelCost)}€`
-                      : isDiscountActive
-                        ? `${Math.round((displayPrice - finalTravelCost) * 0.95 + finalTravelCost)}€`
-                        : `${Math.round(displayPrice)}€`}
+                      ? `${Math.round((displayPrice - finalTravelCost) * 0.9 + finalTravelCost)}€`
+                      : `${Math.round(displayPrice)}€`}
                   </span>
                 )}
                 {hasSobOrcamento && (
@@ -1384,9 +1394,9 @@ ${formData.description || 'Sem observações adicionais'}
                     {totalPrice > 0 ? '+ Sob Orçamento' : 'Sob Orçamento'}
                   </span>
                 )}
-                {(packDiscountActive || isDiscountActive) && totalPrice > 0 && (
+                {packDiscountActive && totalPrice > 0 && (
                   <span className="text-[10px] font-bold bg-gold/15 text-gold px-2 py-0.5 rounded-full">
-                    {packDiscountActive ? `−${Math.round(packDiscountPct * 100)}% Pack` : '−5%'}
+                    −10% Pack
                   </span>
                 )}
               </div>
@@ -1472,7 +1482,7 @@ ${formData.description || 'Sem observações adicionais'}
                                 updateFormData({ location: city });
                                 setLocationQuery(city);
                                 setLocationFadeIn(true);
-                                setCurrentStep(1);
+                                setCurrentStep(calcInitialStep(city, initialService));
                               }}
                               className={cn(
                                 "relative w-full h-[64px] sm:h-[72px] rounded-2xl overflow-hidden transition-all duration-200 touch-manipulation active:scale-[0.98]",
@@ -1508,7 +1518,7 @@ ${formData.description || 'Sem observações adicionais'}
                                 updateFormData({ location: city });
                                 setLocationQuery(city);
                                 setLocationFadeIn(true);
-                                setCurrentStep(1);
+                                setCurrentStep(calcInitialStep(city, initialService));
                               }}
                               className="w-full flex items-center justify-between px-4 py-3.5 text-left hover:bg-gold/10 active:bg-gold/15 border-b border-white/[0.05] last:border-0 transition-colors touch-manipulation"
                             >
@@ -1606,16 +1616,15 @@ ${formData.description || 'Sem observações adicionais'}
                   <div className="flex flex-col w-full items-center text-center py-2">
                     <p className="text-gold text-[10px] font-bold tracking-[0.28em] uppercase mb-2">PACK FAMÍLIA</p>
                     <h2 className="font-playfair text-2xl sm:text-3xl font-bold text-white mb-3 leading-[1.2]">
-                      Tem mais artigos<br />para limpar?
+                      Uma visita.<br />Tudo limpo.
                     </h2>
-                    <p className="text-[13px] text-white/50 max-w-[255px] mx-auto mb-5 leading-relaxed">
-                      Pedidos acima de <span className="text-gold font-bold">200€</span> têm{' '}
-                      <span className="text-gold font-bold">10% de desconto</span> automático, quanto mais adicionar, mais poupa.
+                    <p className="text-[13px] text-white/50 max-w-[265px] mx-auto mb-5 leading-relaxed">
+                      O técnico já vai até si — aproveite para limpar tudo de uma vez. A partir de <span className="text-gold font-bold">149€</span> poupa <span className="text-gold font-bold">10% em todo o pedido</span> automaticamente.
                     </p>
 
-                    {/* Progress bar to 200€ */}
+                    {/* Progress bar to 149€ */}
                     {(() => {
-                      const THRESHOLD = 200;
+                      const THRESHOLD = 149;
                       const pct = Math.min(totalPrice / THRESHOLD * 100, 100);
                       const faltam = Math.max(0, Math.ceil(THRESHOLD - totalPrice));
                       const reached = totalPrice >= THRESHOLD;
@@ -1625,7 +1634,7 @@ ${formData.description || 'Sem observações adicionais'}
                         <div className="w-full max-w-xs mx-auto mb-6">
                           <div className="flex justify-between items-center mb-2">
                             <span className="text-[10px] text-gold/60 tabular-nums font-semibold">{Math.round(totalPrice)}€ no carrinho</span>
-                            <span className={cn("text-[10px] font-bold uppercase tracking-wider transition-colors", reached ? "text-gold" : "text-white/25")}>200€ → −10%</span>
+                            <span className={cn("text-[10px] font-bold uppercase tracking-wider transition-colors", reached ? "text-gold" : "text-white/25")}>149€ → −10%</span>
                           </div>
                           <div className="h-1 bg-gold/10 rounded-full overflow-hidden">
                             <div
@@ -1656,7 +1665,7 @@ ${formData.description || 'Sem observações adicionais'}
                       className="w-full max-w-xs h-14 bg-gradient-to-r from-gold to-[#d4c57b] hover:from-[#d4c57b] hover:to-gold text-[#12121e] font-black text-[15px] tracking-wide rounded-xl shadow-[0_4px_36px_rgba(212,175,55,0.45)] touch-manipulation active:scale-[0.98] transition-all flex items-center justify-center gap-2.5 mb-3"
                     >
                       <Check className="w-5 h-5" />
-                      Sim, quero adicionar
+                      Sim, quero poupar 10%
                     </button>
 
                     <div className="w-full max-w-xs flex items-center gap-3">
@@ -1689,7 +1698,7 @@ ${formData.description || 'Sem observações adicionais'}
                     </h2>
                     {/* Progress bar, same logic as prompt step */}
                     {(() => {
-                      const THRESHOLD = 200;
+                      const THRESHOLD = 149;
                       const pct = Math.min(totalPrice / THRESHOLD * 100, 100);
                       const faltam = Math.max(0, Math.ceil(THRESHOLD - totalPrice));
                       const reached = totalPrice >= THRESHOLD;
@@ -1699,7 +1708,7 @@ ${formData.description || 'Sem observações adicionais'}
                         <div className="w-full max-w-xs mx-auto mb-4">
                           <div className="flex justify-between items-center mb-2">
                             <span className="text-[10px] text-gold/60 tabular-nums font-semibold">{Math.round(totalPrice)}€ no carrinho</span>
-                            <span className={cn("text-[10px] font-bold uppercase tracking-wider transition-colors", reached ? "text-gold" : "text-white/25")}>200€ → −10%</span>
+                            <span className={cn("text-[10px] font-bold uppercase tracking-wider transition-colors", reached ? "text-gold" : "text-white/25")}>149€ → −10%</span>
                           </div>
                           <div className="h-1 bg-gold/10 rounded-full overflow-hidden">
                             <div
@@ -2263,7 +2272,7 @@ ${formData.description || 'Sem observações adicionais'}
           <div className="flex flex-col gap-2 w-full">
             {totalPrice > 0 && (
               <p className="text-center text-[10px] text-white/25 font-medium tracking-wide">
-                Preço final com IVA incluído: <span className="text-gold/60 font-bold">{packDiscountActive ? `${packDiscountedPrice}€` : isDiscountActive ? `${discountedPrice}€` : `${totalPrice}€`}</span>
+                Preço final com IVA incluído: <span className="text-gold/60 font-bold">{packDiscountActive ? `${packDiscountedPrice}€` : `${totalPrice}€`}</span>
               </p>
             )}
             <Button
@@ -2328,12 +2337,13 @@ ${formData.description || 'Sem observações adicionais'}
             ESPERE!
           </h3>
           <p className="text-sm text-white/65 mb-2 leading-relaxed">
-            Se sair agora, perde a sua vaga e o desconto de{' '}
-            <span className="text-gold font-bold">5%</span>.
+            {packDiscountActive
+              ? 'Se sair agora, perde a sua vaga e o desconto de 10% já ativado.'
+              : 'Se sair agora, perde a sua vaga reservada.'}
           </p>
           {isDiscountActive && (
             <p className="text-xs text-gold/70 mb-5 font-mono bg-gold/10 px-3 py-1.5 rounded-lg inline-block">
-              Desconto expira em {formatCountdown(countdown)}
+              Vaga reservada por {formatCountdown(countdown)}
             </p>
           )}
           <div className="flex flex-col gap-3 mt-5">
@@ -2341,7 +2351,7 @@ ${formData.description || 'Sem observações adicionais'}
               onClick={() => setShowExitIntent(false)}
               className="w-full h-12 bg-gradient-to-r from-gold to-[#d4c57b] hover:from-[#d4c57b] hover:to-gold text-[#12121e] font-black rounded-xl shadow-[0_0_20px_rgba(212,175,55,0.3)] touch-manipulation active:scale-[0.98]"
             >
-              Continuar e Guardar Desconto
+              {packDiscountActive ? 'Continuar e Guardar Desconto' : 'Continuar e Guardar Vaga'}
             </Button>
             <button
               onClick={confirmClose}

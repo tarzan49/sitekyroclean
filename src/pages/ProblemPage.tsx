@@ -1,5 +1,6 @@
 ﻿import { useEffect, useMemo } from "react";
 import { useParams, Link } from "react-router-dom";
+import { QuizServiceProvider } from "@/context/QuizLocationContext";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { CheckCircle, ArrowRight, AlertTriangle, Lightbulb, MapPin, MessageCircle } from "lucide-react";
 import Header from "@/components/Header";
@@ -8,6 +9,8 @@ import QuizButton from "@/components/QuizButton";
 import ServiceFAQSchema from "@/components/ServiceFAQSchema";
 import { getProblemBySlug, getRelatedProblemLinks } from "@/data/problemSeoData";
 import { services, cities } from "@/data/locationSeoData";
+import { SERVICE_TO_QUIZ } from "@/constants/serviceToQuiz";
+import { METRO_CITY_SLUGS } from "@/constants/metroCities";
 import { getProblemHeroImage } from "@/lib/problemHeroImages";
 import { trackWhatsAppClick } from "@/lib/quizTracking";
 
@@ -204,15 +207,17 @@ const ProblemPage = () => {
     .map(slug => services.find(s => s.slug === slug))
     .filter(Boolean) as typeof services[number][];
 
+  const quizService = SERVICE_TO_QUIZ[data.relatedServices[0]] ?? 'sofa';
+
   const relatedProblemLinks = getRelatedProblemLinks(data.relatedProblems);
 
-  const METRO_SLUGS = ["porto", "matosinhos", "maia", "vila-nova-de-gaia", "gondomar", "braga", "lisboa"];
-  const problemCitySlugs = Array.from(new Set([...METRO_SLUGS, ...data.relatedCities]));
+  const problemCitySlugs = Array.from(new Set([...METRO_CITY_SLUGS, ...data.relatedCities]));
   const relatedCityData = problemCitySlugs
     .map(slug => cities.find(c => c.slug === slug))
     .filter(Boolean) as typeof cities[number][];
 
   return (
+    <QuizServiceProvider value={quizService}>
     <>
       <Header />
       <main>
@@ -256,7 +261,7 @@ const ProblemPage = () => {
               <div className="flex gap-3 max-w-xs sm:max-w-sm">
                 <div className="relative flex-1">
                   <div className="absolute -inset-1.5 rounded-full bg-gold/40 opacity-30 blur-lg pointer-events-none" />
-                  <QuizButton className="relative w-full" buttonClassName="h-[52px] !py-0 w-full" problema={slug} ctaLabel={getProblemCtaLabel(slug ?? "")} />
+                  <QuizButton className="relative w-full" buttonClassName="h-[52px] !py-0 w-full" problema={slug} ctaLabel={getProblemCtaLabel(slug ?? "")} initialService={quizService} />
                 </div>
                 <a
                   href={`https://wa.me/351925530647?text=${encodeURIComponent(buildProblemWaMessage(slug ?? ""))}`}
@@ -418,7 +423,7 @@ const ProblemPage = () => {
             <div className="flex gap-3 justify-center mx-auto max-w-xs sm:max-w-sm">
               <div className="relative flex-1">
                 <div className="absolute -inset-1.5 rounded-full bg-gold/40 opacity-30 blur-lg pointer-events-none" />
-                <QuizButton className="relative w-full" problema={slug} ctaLabel={getProblemCtaLabel(slug ?? "")} />
+                <QuizButton className="relative w-full" problema={slug} ctaLabel={getProblemCtaLabel(slug ?? "")} initialService={quizService} />
               </div>
               <a
                 href={`https://wa.me/351925530647?text=${encodeURIComponent(buildProblemWaMessage(slug ?? ""))}`}
@@ -552,6 +557,7 @@ const ProblemPage = () => {
       </main>
       <Footer />
     </>
+    </QuizServiceProvider>
   );
 };
 

@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/hover-card";
 import { trackCallClick } from "@/lib/analytics";
 import QuizForm from "./QuizFormLazy";
-import { useQuizLocation } from "@/context/QuizLocationContext";
+import { useQuizLocation, useQuizService } from "@/context/QuizLocationContext";
 
 interface HeaderProps {
   onOpenQuiz?: () => void;
@@ -37,6 +37,7 @@ const Header = ({ onOpenQuiz }: HeaderProps) => {
   const navigate = useNavigate();
   const location = useLocation();
   const quizLocation = useQuizLocation();
+  const quizService = useQuizService();
 
   const openQuiz = () => {
     window.dispatchEvent(new CustomEvent('quizOpened'));
@@ -372,7 +373,7 @@ const Header = ({ onOpenQuiz }: HeaderProps) => {
       </div>
     </header>
 
-    <QuizForm isOpen={isQuizOpen} onClose={() => setIsQuizOpen(false)} initialLocation={quizLocation} />
+    <QuizForm isOpen={isQuizOpen} onClose={() => setIsQuizOpen(false)} initialLocation={quizLocation} initialService={quizService} />
     </>
   );
 };

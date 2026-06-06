@@ -1,5 +1,6 @@
 ﻿import { useEffect, useMemo } from "react";
 import { useLocation, Link } from "react-router-dom";
+import { QuizLocationProvider, QuizServiceProvider } from "@/context/QuizLocationContext";
 import { ArrowRight, CheckCircle, MapPin, AlertTriangle, Lightbulb, Phone, MessageCircle } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -8,6 +9,8 @@ import ServiceFAQSchema from "@/components/ServiceFAQSchema";
 import ServiceLocationSchema from "@/components/ServiceLocationSchema";
 import { getProblemBySlug, getRelatedProblemLinks } from "@/data/problemSeoData";
 import { cities, services } from "@/data/locationSeoData";
+import { SERVICE_TO_QUIZ } from "@/constants/serviceToQuiz";
+import { METRO_CITIES, METRO_CITY_SLUGS } from "@/constants/metroCities";
 import { getAllProblemCityRoutes, type ProblemCityRoute } from "@/data/problemCitySeoData";
 import { getProblemHeroImage } from "@/lib/problemHeroImages";
 
@@ -74,6 +77,8 @@ const ProblemCityPage = () => {
     );
   }
 
+  const quizService = SERVICE_TO_QUIZ[problem.relatedServices[0]] ?? 'sofa';
+
   const relatedProblemLinks = getRelatedProblemLinks(problem.relatedProblems);
   const relatedServiceData = problem.relatedServices
     .map(slug => services.find(s => s.slug === slug))
@@ -82,8 +87,7 @@ const ProblemCityPage = () => {
   const cityContext = getCityContext(problem.slug, city.name, city.description);
 
   // Only show nearby cities that actually have a route for this problem
-  const METRO_SLUGS = ["porto", "matosinhos", "maia", "vila-nova-de-gaia", "gondomar", "braga", "lisboa"];
-  const validCitySlugs = new Set([...METRO_SLUGS, ...problem.relatedCities]);
+  const validCitySlugs = new Set([...METRO_CITY_SLUGS, ...problem.relatedCities]);
   const nearbyCities = cities
     .filter(c => c.slug !== city.slug && validCitySlugs.has(c.slug))
     .slice(0, 6);
@@ -97,6 +101,8 @@ const ProblemCityPage = () => {
   }));
 
   return (
+    <QuizLocationProvider value={city.name}>
+    <QuizServiceProvider value={quizService}>
     <>
       <ServiceLocationSchema
         serviceName={problem.h1}
@@ -147,7 +153,7 @@ const ProblemCityPage = () => {
               </p>
 
               <div className="flex flex-wrap items-center gap-3">
-                <QuizButton />
+                <QuizButton initialLocation={city.name} initialService={quizService} />
                 <a
                   href="https://wa.me/351925530647"
                   target="_blank"
@@ -249,7 +255,7 @@ const ProblemCityPage = () => {
               Orçamento gratuito em menos de 2 horas · Sem compromisso.
             </p>
             <div className="flex flex-wrap justify-center gap-3">
-              <QuizButton />
+              <QuizButton initialLocation={city.name} initialService={quizService} />
               <a href="https://wa.me/351925530647" target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center gap-2 px-6 py-3 border border-white/20 rounded-full text-white/75 font-medium text-sm hover:bg-white/[0.07] hover:border-white/35 hover:text-white transition-all duration-200">
                 <MessageCircle className="w-[18px] h-[18px] text-[#25D366] flex-shrink-0" strokeWidth={2} />WhatsApp</a>
               <a href="tel:+351925530647" className="inline-flex items-center gap-1.5 text-white/75 hover:text-gold font-medium text-sm transition-colors duration-150">
@@ -309,6 +315,8 @@ const ProblemCityPage = () => {
       </main>
       <Footer />
     </>
+    </QuizServiceProvider>
+    </QuizLocationProvider>
   );
 };
 

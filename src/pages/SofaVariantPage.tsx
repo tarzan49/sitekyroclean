@@ -5,6 +5,7 @@
 
 import { useEffect, useMemo } from "react";
 import { useLocation, Link } from "react-router-dom";
+import { QuizLocationProvider, QuizServiceProvider } from "@/context/QuizLocationContext";
 import { CheckCircle, Star, MapPin, MessageCircle } from "lucide-react";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import Header from "@/components/Header";
@@ -13,6 +14,7 @@ import QuizButton from "@/components/QuizButton";
 import { trackWhatsAppClick } from "@/lib/quizTracking";
 import ServiceFAQSchema from "@/components/ServiceFAQSchema";
 import ServicePackBanner from "@/components/ServicePackBanner";
+import { SERVICEKEY_TO_QUIZ } from "@/constants/serviceToQuiz";
 import {
   getKeywordVariantData,
   type VariantKey,
@@ -154,11 +156,15 @@ const SofaVariantPage = () => {
     );
   }
 
+  const quizService = SERVICEKEY_TO_QUIZ[data.serviceKey];
+
   const variantLabel = VARIANT_LABEL[data.variantKey];
   const heroImgs = HERO_IMAGES[data.serviceKey];
   const resultImg = RESULT_IMAGES[data.serviceKey];
 
   return (
+    <QuizLocationProvider value={data.locationName}>
+    <QuizServiceProvider value={quizService}>
     <>
       <ServiceFAQSchema faqs={data.faqs} />
       <Header />
@@ -219,7 +225,7 @@ const SofaVariantPage = () => {
                 <div className="flex gap-3">
                   <div className="relative flex-1">
                     <div className="absolute -inset-1.5 rounded-full bg-gold/40 opacity-30 blur-lg pointer-events-none" />
-                    <QuizButton className="relative w-full" buttonClassName="h-[52px] !py-0 w-full" ctaLabel={QUIZ_CTA[data.variantKey]} />
+                    <QuizButton className="relative w-full" buttonClassName="h-[52px] !py-0 w-full" ctaLabel={QUIZ_CTA[data.variantKey]} initialLocation={data.locationName} initialService={quizService} />
                   </div>
                   <a
                     href={`https://wa.me/351925530647?text=${encodeURIComponent(buildWaMessage(data.variantKey, data.serviceKey, data.locationName))}`}
@@ -449,6 +455,8 @@ const SofaVariantPage = () => {
       </main>
       <Footer />
     </>
+    </QuizServiceProvider>
+    </QuizLocationProvider>
   );
 };
 

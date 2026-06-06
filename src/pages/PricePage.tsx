@@ -1,5 +1,6 @@
 ﻿import { useEffect, useMemo } from "react";
 import { useLocation, Link } from "react-router-dom";
+import { QuizLocationProvider, QuizServiceProvider } from "@/context/QuizLocationContext";
 import { Star, ArrowRight, CheckCircle, MapPin, MessageCircle } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -8,17 +9,9 @@ import { trackWhatsAppClick } from "@/lib/quizTracking";
 import ServiceFAQSchema from "@/components/ServiceFAQSchema";
 import { getPricePageData, getAllPriceRoutes } from "@/data/priceSeoData";
 import { services, cities } from "@/data/locationSeoData";
+import { SERVICE_TO_QUIZ } from "@/constants/serviceToQuiz";
+import { buildServiceWaMessage } from "@/lib/buildServiceWaMessage";
 
-function buildPriceWaMessage(serviceSlug: string, cityName: string): string {
-  const city = ` em ${cityName}`;
-  if (serviceSlug.includes('sofa'))        return `Olá! Gostaria de saber o preço de limpeza de sofá${city}. Podem dar-me um orçamento?`;
-  if (serviceSlug.includes('colchao'))     return `Olá! Gostaria de saber o preço de higienização de colchão${city}. Qual é o orçamento?`;
-  if (serviceSlug.includes('tapete'))      return `Olá! Gostaria de saber o preço de lavagem de tapetes${city}. Qual é o orçamento?`;
-  if (serviceSlug.includes('cadeira'))     return `Olá! Gostaria de saber o preço de limpeza de cadeiras${city}. Qual é o orçamento?`;
-  if (serviceSlug.includes('alcatifa'))    return `Olá! Gostaria de saber o preço de limpeza de alcatifas${city}. Qual é o orçamento?`;
-  if (serviceSlug.includes('impermeabil')) return `Olá! Gostaria de saber o preço de impermeabilização${city}. Qual é o orçamento?`;
-  return `Olá! Gostaria de saber o preço do serviço${city}. Podem dar-me um orçamento?`;
-}
 
 const PricePage = () => {
   const { pathname } = useLocation();
@@ -57,10 +50,14 @@ const PricePage = () => {
     );
   }
 
+  const quizService = SERVICE_TO_QUIZ[data.serviceSlug];
+
   const relatedServices = services.filter(s => s.slug !== data.serviceSlug).slice(0, 4);
   const nearbyCities = cities.filter(c => c.slug !== data.citySlug).slice(0, 6);
 
   return (
+    <QuizLocationProvider value={data.cityName}>
+    <QuizServiceProvider value={quizService}>
     <>
       <Header />
       <main>
@@ -86,10 +83,10 @@ const PricePage = () => {
               <div className="flex gap-3 max-w-xs sm:max-w-sm">
                 <div className="relative flex-1">
                   <div className="absolute -inset-1.5 rounded-full bg-gold/40 opacity-30 blur-lg pointer-events-none" />
-                  <QuizButton className="relative w-full" buttonClassName="h-[52px] !py-0 w-full" ctaLabel="Ver preço grátis" />
+                  <QuizButton className="relative w-full" buttonClassName="h-[52px] !py-0 w-full" ctaLabel="Ver preço grátis" initialLocation={data.cityName} initialService={quizService} />
                 </div>
                 <a
-                  href={`https://wa.me/351925530647?text=${encodeURIComponent(buildPriceWaMessage(data.serviceSlug, data.cityName))}`}
+                  href={`https://wa.me/351925530647?text=${encodeURIComponent(buildServiceWaMessage(data.serviceSlug, data.cityName))}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={() => trackWhatsAppClick(`price_hero_${data.serviceSlug}_${data.citySlug}`)}
@@ -183,7 +180,7 @@ const PricePage = () => {
                   <p className="text-sm text-[#1A1A2E]/55">clientes satisfeitos</p>
                 </div>
                 <div className="sm:ml-auto">
-                  <QuizButton />
+                  <QuizButton initialLocation={data.cityName} initialService={quizService} />
                 </div>
               </div>
             </div>
@@ -274,10 +271,10 @@ const PricePage = () => {
             <div className="flex gap-3 justify-center mx-auto max-w-xs sm:max-w-sm">
               <div className="relative flex-1">
                 <div className="absolute -inset-1.5 rounded-full bg-gold/40 opacity-30 blur-lg pointer-events-none" />
-                <QuizButton className="relative w-full" buttonClassName="h-[52px] !py-0 w-full" ctaLabel="Ver preço grátis" />
+                <QuizButton className="relative w-full" buttonClassName="h-[52px] !py-0 w-full" ctaLabel="Ver preço grátis" initialLocation={data.cityName} initialService={quizService} />
               </div>
               <a
-                href={`https://wa.me/351925530647?text=${encodeURIComponent(buildPriceWaMessage(data.serviceSlug, data.cityName))}`}
+                href={`https://wa.me/351925530647?text=${encodeURIComponent(buildServiceWaMessage(data.serviceSlug, data.cityName))}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={() => trackWhatsAppClick(`price_cta_${data.serviceSlug}_${data.citySlug}`)}
@@ -344,6 +341,8 @@ const PricePage = () => {
       </main>
       <Footer />
     </>
+    </QuizServiceProvider>
+    </QuizLocationProvider>
   );
 };
 

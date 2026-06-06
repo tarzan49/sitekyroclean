@@ -1,5 +1,5 @@
 ﻿import { useState, useEffect, useCallback } from 'react';
-import { X, Phone, Star, Sparkles, Clock, ShieldCheck } from 'lucide-react';
+import { X, Phone, Star, Clock, ShieldCheck } from 'lucide-react';
 import QuizForm from './QuizFormLazy';
 import { usePopupStorage } from '@/hooks/usePopupStorage';
 import { trackCallClick } from '@/lib/analytics';
@@ -113,7 +113,6 @@ const QuotePopup = () => {
           {/* Badge */}
           <div className="flex items-center justify-center gap-2 mb-5">
             <div className="flex items-center gap-1.5 bg-gold/10 border border-gold/25 rounded-full px-3.5 py-1.5">
-              <Sparkles className="w-3.5 h-3.5 text-gold" />
               <span className="text-gold text-[11px] font-bold tracking-widest uppercase">Orçamento Grátis</span>
             </div>
           </div>

@@ -2,6 +2,7 @@ import { useTranslation } from "react-i18next";
 import { Shield, Heart, Sparkles } from "lucide-react";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import Header from "@/components/Header";
+import { QuizServiceProvider } from "@/context/QuizLocationContext";
 import GlobalPromoBanner from "@/components/GlobalPromoBanner";
 import Footer from "@/components/Footer";
 import RelatedServices from "@/components/RelatedServices";
@@ -69,6 +70,7 @@ const LimpezaColchoes = () => {
   }));
 
   return (
+    <QuizServiceProvider value="mattress">
     <>
       <Header />
       <GlobalPromoBanner />
@@ -155,6 +157,7 @@ const LimpezaColchoes = () => {
       </main>
       <Footer />
     </>
+    </QuizServiceProvider>
   );
 };
 

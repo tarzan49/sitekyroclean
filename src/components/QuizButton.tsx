@@ -8,9 +8,10 @@ interface QuizButtonProps {
   problema?: string;
   ctaLabel?: string;
   initialLocation?: string;
+  initialService?: string;
 }
 
-const QuizButton = ({ className = '', buttonClassName = '', problema, ctaLabel, initialLocation }: QuizButtonProps) => {
+const QuizButton = ({ className = '', buttonClassName = '', problema, ctaLabel, initialLocation, initialService }: QuizButtonProps) => {
   const { t } = useTranslation();
   const [isQuizOpen, setIsQuizOpen] = useState(false);
 
@@ -44,7 +45,7 @@ const QuizButton = ({ className = '', buttonClassName = '', problema, ctaLabel, 
         </button>
       </div>
 
-      <QuizForm isOpen={isQuizOpen} onClose={() => setIsQuizOpen(false)} problema={problema} initialLocation={initialLocation} />
+      <QuizForm isOpen={isQuizOpen} onClose={() => setIsQuizOpen(false)} problema={problema} initialLocation={initialLocation} initialService={initialService} />
     </>
   );
 };

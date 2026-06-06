@@ -9,7 +9,7 @@ import ServiceFAQSchema from "@/components/ServiceFAQSchema";
 import ServiceLocationSchema from "@/components/ServiceLocationSchema";
 import ServicePackBanner from "@/components/ServicePackBanner";
 import { services } from "@/data/locationSeoData";
-import { QuizLocationProvider } from "@/context/QuizLocationContext";
+import { QuizLocationProvider, QuizServiceProvider } from "@/context/QuizLocationContext";
 import {
   municipiosComFreguesias,
   getFreguesia,
@@ -19,68 +19,11 @@ import {
 import { getAllProblems } from "@/data/problemSeoData";
 import { GENERIC_PROCESS_STEPS, IMPERMEABILIZACAO_STEPS } from "@/constants/serviceProcesses";
 import { trackWhatsAppClick } from "@/lib/quizTracking";
-
-function buildFreguesiaWaMessage(serviceSlug: string, placeName: string): string {
-  switch (serviceSlug) {
-    case 'limpeza-sofas':     return `Olá! Preciso de limpeza profissional de sofá em ${placeName}. Qual é o preço e disponibilidade?`;
-    case 'limpeza-colchoes':  return `Olá! Preciso de higienização profissional de colchão em ${placeName}. Qual é o preço e disponibilidade?`;
-    case 'limpeza-tapetes':   return `Olá! Preciso de lavagem profissional de tapetes em ${placeName}. Qual é o preço e disponibilidade?`;
-    case 'limpeza-cadeiras':  return `Olá! Preciso de limpeza profissional de cadeiras em ${placeName}. Qual é o preço e disponibilidade?`;
-    case 'limpeza-alcatifas': return `Olá! Preciso de limpeza profissional de alcatifas em ${placeName}. Qual é o preço e disponibilidade?`;
-    case 'impermeabilizacao': return `Olá! Tenho interesse em impermeabilizar os meus estofos em ${placeName}. Qual é o preço e disponibilidade?`;
-    default:                  return `Olá! Gostaria de pedir um orçamento para ${placeName}. Qual é o preço e disponibilidade?`;
-  }
-}
-
-const RESULT_CONTENT: Record<string, (place: string) => { desc: string; checks: string[] }> = {
-  'limpeza-sofas':     p => ({ desc: `Sofás de ${p} tratados com extração a quente: manchas, ácaros e odores eliminados. Tecido revitalizado e pronto a usar em 4 a 6 horas.`, checks: ['Remoção de 99% dos ácaros', 'Manchas antigas eliminadas', 'Pronto em 4–6h'] }),
-  'limpeza-colchoes':  p => ({ desc: `Colchões higienizados ao domicílio em ${p}: eliminação de ácaros, manchas de suor e odores. Seco no mesmo dia.`, checks: ['99% ácaros eliminados', 'Sem resíduos químicos', 'Seco no mesmo dia'] }),
-  'limpeza-tapetes':   p => ({ desc: `Tapetes de ${p} lavados em profundidade: fibras revitalizadas, cores recuperadas e alergénios eliminados.`, checks: ['Fibras e cores revitalizadas', 'Alergénios eliminados', 'Recolha e entrega'] }),
-  'limpeza-cadeiras':  p => ({ desc: `Cadeiras estofadas em ${p} limpas com equipamento profissional. Resultado imediato, ideal para escritórios e restaurantes.`, checks: ['Resultado imediato', 'Ideal para restaurantes', 'Sem resíduos'] }),
-  'limpeza-alcatifas': p => ({ desc: `Alcatifas de ${p} tratadas com extração profunda: poeira, ácaros e manchas removidos das fibras.`, checks: ['Extração profunda', 'Ideal para espaços comerciais', 'Seco rapidamente'] }),
-  'impermeabilizacao': p => ({ desc: `Proteção invisível aplicada em ${p}: barreira duradoura contra líquidos e manchas. Totalmente ativa em 24 horas.`, checks: ['Barreira invisível e duradoura', 'Ativa em 24 horas', 'Proteção contra manchas'] }),
-};
 import { SERVICE_PACK_SLUGS } from "@/constants/servicePackSlugs";
-
-import heroSofaD              from "@/assets/hero-sofa-cleaning-new.webp";
-import heroSofaM              from "@/assets/hero-sofa-cleaning-new-mobile.webp";
-import heroMattressD          from "@/assets/hero-mattress-cleaning-new.webp";
-import heroMattressM          from "@/assets/hero-mattress-cleaning-new-mobile.webp";
-import heroCarpetD            from "@/assets/hero-carpet-cleaning-new.webp";
-import heroCarpetM            from "@/assets/hero-carpet-cleaning-new-mobile.webp";
-import heroChairD             from "@/assets/hero-chair-cleaning-new.webp";
-import heroChairM             from "@/assets/hero-chair-cleaning-new-mobile.webp";
-import heroRugD               from "@/assets/hero-rug-cleaning-new.webp";
-import heroRugM               from "@/assets/hero-rug-cleaning-new-mobile.webp";
-import heroWaterproofD        from "@/assets/hero-waterproofing.webp";
-import heroWaterproofM        from "@/assets/hero-waterproofing-mobile.webp";
-import resultSofa              from "@/assets/galeria-sofa-depois.webp";
-import resultColchao           from "@/assets/galeria-colchao-depois.webp";
-import resultTapetes           from "@/assets/galeria-tapete-depois.webp";
-import resultCadeiras          from "@/assets/galeria-cadeira-depois.webp";
-import resultAlcatifas         from "@/assets/galeria-alcatifa-resultado.webp";
-import resultImpermeabilizacao from "@/assets/galeria-impermeabilizacao-depois.webp";
-
-const SERVICE_HERO_IMAGES: Record<string, { d: string; m: string }> = {
-  "limpeza-sofas":     { d: heroSofaD,       m: heroSofaM },
-  "limpeza-colchoes":  { d: heroMattressD,   m: heroMattressM },
-  "limpeza-tapetes":   { d: heroCarpetD,     m: heroCarpetM },
-  "limpeza-cadeiras":  { d: heroChairD,      m: heroChairM },
-  "limpeza-alcatifas": { d: heroRugD,        m: heroRugM },
-  "impermeabilizacao": { d: heroWaterproofD, m: heroWaterproofM },
-};
-
-const SERVICE_RESULT_IMAGES: Record<string, string> = {
-  "limpeza-sofas":    resultSofa,
-  "limpeza-colchoes": resultColchao,
-  "limpeza-tapetes":  resultTapetes,
-  "limpeza-cadeiras": resultCadeiras,
-  "limpeza-alcatifas": resultAlcatifas,
-  "impermeabilizacao": resultImpermeabilizacao,
-};
-
-
-const METRO_CITIES = new Set(["porto", "matosinhos", "maia", "vila-nova-de-gaia", "gondomar", "braga", "lisboa"]);
+import { SERVICE_TO_QUIZ } from "@/constants/serviceToQuiz";
+import { METRO_CITIES } from "@/constants/metroCities";
+import { SERVICE_HERO_IMAGES, SERVICE_RESULT_IMAGES, SERVICE_SERVICE_RESULT_CONTENT, SERVICE_HERO_FALLBACK, SERVICE_RESULT_FALLBACK } from "@/constants/serviceContent";
+import { buildServiceWaMessage } from "@/lib/buildServiceWaMessage";
 
 function parseFreguesiaRoute(pathname: string): { serviceSlug: string; citySlug: string; freguesiaSlug: string } | null {
   const path = pathname.replace(/^\//, '');
@@ -147,16 +90,19 @@ const FreguesiaServicePage = () => {
     );
   }
 
+  const quizService = SERVICE_TO_QUIZ[data.serviceSlug];
+
   const nearbyFreguesias = getNearbyFreguesias(data.municipioSlug, data.nearby);
   const otherServices = services.filter(s => s.slug !== data.serviceSlug);
-  const heroImgs = SERVICE_HERO_IMAGES[data.serviceSlug] ?? { d: heroSofaD, m: heroSofaM };
-  const resultImg = SERVICE_RESULT_IMAGES[data.serviceSlug] ?? resultSofa;
+  const heroImgs = SERVICE_HERO_IMAGES[data.serviceSlug] ?? SERVICE_HERO_FALLBACK;
+  const resultImg = SERVICE_RESULT_IMAGES[data.serviceSlug] ?? SERVICE_RESULT_FALLBACK;
   const resultLabel = data.serviceSlug === 'impermeabilizacao' ? 'impermeabilização' : 'limpeza';
-  const resultDesc = RESULT_CONTENT[data.serviceSlug]?.(data.name)?.desc ?? data.metaDescription;
+  const resultDesc = SERVICE_RESULT_CONTENT[data.serviceSlug]?.(data.name)?.desc ?? data.metaDescription;
   const serviceBaseUrl = services.find(s => s.slug === data.serviceSlug)?.baseRoute ?? `/${data.serviceSlug}`;
 
   return (
     <QuizLocationProvider value={data.municipio}>
+    <QuizServiceProvider value={quizService}>
       <ServiceLocationSchema
         serviceName={data.service}
         serviceBaseUrl={serviceBaseUrl}
@@ -227,11 +173,12 @@ const FreguesiaServicePage = () => {
                   <QuizButton
                     className="flex-1"
                     initialLocation={data.municipio}
+                    initialService={quizService}
                     ctaLabel="Ver preço grátis"
                     buttonClassName="h-[52px] !py-0 w-full"
                   />
                   <a
-                    href={`https://wa.me/351925530647?text=${encodeURIComponent(buildFreguesiaWaMessage(data.serviceSlug, data.name))}`}
+                    href={`https://wa.me/351925530647?text=${encodeURIComponent(buildServiceWaMessage(data.serviceSlug, data.name))}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     onClick={() => trackWhatsAppClick(`freguesia_hero_${data.serviceSlug}_${data.municipioSlug}`)}
@@ -350,10 +297,10 @@ const FreguesiaServicePage = () => {
                     Resultado após {resultLabel} profissional
                   </h2>
                   <p className="text-white/70 text-sm md:text-base max-w-lg">
-                    {(RESULT_CONTENT[data.serviceSlug] ?? RESULT_CONTENT['limpeza-sofas'])(data.name).desc}
+                    {(SERVICE_RESULT_CONTENT[data.serviceSlug] ?? SERVICE_RESULT_CONTENT['limpeza-sofas'])(data.name).desc}
                   </p>
                   <div className="flex items-center gap-3 mt-4 flex-wrap">
-                    {(RESULT_CONTENT[data.serviceSlug] ?? RESULT_CONTENT['limpeza-sofas'])(data.name).checks.map((check, i) => (
+                    {(SERVICE_RESULT_CONTENT[data.serviceSlug] ?? SERVICE_RESULT_CONTENT['limpeza-sofas'])(data.name).checks.map((check, i) => (
                       <div key={i} className="flex items-center gap-1.5">
                         <CheckCircle className="w-4 h-4" style={{ color: "#D4AF37" }} />
                         <span className="text-white/80 text-sm">{check}</span>
@@ -518,6 +465,7 @@ const FreguesiaServicePage = () => {
 
       </main>
       <Footer />
+    </QuizServiceProvider>
     </QuizLocationProvider>
   );
 };

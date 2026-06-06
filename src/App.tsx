@@ -45,6 +45,7 @@ const MaterialPage = lazy(() => import("./pages/MaterialPage"));
 const PricePage = lazy(() => import("./pages/PricePage"));
 const BeforeAfterPage = lazy(() => import("./pages/BeforeAfterPage"));
 const AdminPanel = lazy(() => import("./pages/AdminPanel"));
+const AdminDeslocacoes = lazy(() => import("./pages/AdminDeslocacoes"));
 const AreasDeServico = lazy(() => import("./pages/AreasDeServico"));
 const FreguesiaServicePage = lazy(() => import("./pages/FreguesiaServicePage"));
 const SofaVariantPage = lazy(() => import("./pages/SofaVariantPage"));
@@ -199,6 +200,7 @@ const AppRoutes = () => {
                 <Route path="/politica-de-privacidade" element={<PoliticaPrivacidade />} />
                 {/* Admin, painel único */}
                 <Route path="/admin/panel" element={<AdminPanel />} />
+                <Route path="/admin/deslocacoes" element={<AdminDeslocacoes />} />
                 <Route path="/areas-de-servico" element={<AreasDeServico />} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />

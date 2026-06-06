@@ -12,6 +12,7 @@ interface Props {
   isOpen: boolean;
   onClose: () => void;
   initialLocation?: string;
+  initialService?: string;
   problema?: string;
 }
 

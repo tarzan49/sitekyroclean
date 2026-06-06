@@ -95,32 +95,39 @@ export const chairPrices = {
 };
 
 export const locationPrices: Record<string, number> = {
+  // Zona 0 — Porto metropolitan core (grátis)
   'Porto': 0,
-  'Matosinhos': 5,
-  'Maia': 5,
+  'Matosinhos': 0,
+  // Zona 1 — Subúrbios imediatos, ~10-20 min
   'Vila Nova de Gaia': 5,
+  'Maia': 5,
   'Gondomar': 5,
-  'Valongo': 5,
-  'Trofa': 5,
-  'Santo Tirso': 5,
-  'Espinho': 5,
-  'Braga': 10,
-  'Guimarães': 10,
+  // Zona 2 — Grande Porto, ~20-30 min
+  'Valongo': 10,
+  'Espinho': 10,
   'Póvoa de Varzim': 10,
   'Vila do Conde': 10,
+  'Santo Tirso': 10,
+  'Trofa': 10,
   'Paredes': 10,
-  'Penafiel': 10,
-  'Lousada': 10,
-  'Paços de Ferreira': 10,
-  'Felgueiras': 10,
-  'Arouca': 10,
-  'Aveiro': 10,
-  'Lisboa': 15,
-  'Cascais': 15,
-  'Oeiras': 15,
-  'Sintra': 15,
-  'Almada': 15,
-  'Setúbal': 15,
+  // Zona 3 — Interior norte, ~35-45 min
+  'Penafiel': 15,
+  'Paços de Ferreira': 15,
+  'Felgueiras': 15,
+  'Lousada': 15,
+  // Zona 4 — Mais afastado, ~45-55 min
+  'Arouca': 20,
+  'Braga': 20,
+  'Aveiro': 20,
+  // Zona 5 — Minho, ~55-70 min
+  'Guimarães': 25,
+  // Zona Lisboa — deslocação especial
+  'Lisboa': 35,
+  'Cascais': 35,
+  'Oeiras': 35,
+  'Sintra': 35,
+  'Almada': 35,
+  'Setúbal': 40,
 };
 
 export const mattressWaterproofPrices: Record<string, number> = {

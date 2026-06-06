@@ -2,6 +2,7 @@
 import { Shield, Heart, Sparkles } from "lucide-react";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import Header from "@/components/Header";
+import { QuizServiceProvider } from "@/context/QuizLocationContext";
 import GlobalPromoBanner from "@/components/GlobalPromoBanner";
 import Footer from "@/components/Footer";
 import BeforeAfterSlider from "@/components/BeforeAfterSlider";
@@ -69,6 +70,7 @@ const LimpezaSofas = () => {
   }));
 
   return (
+    <QuizServiceProvider value="sofa">
     <>
       <Header />
       <GlobalPromoBanner />
@@ -159,6 +161,7 @@ const LimpezaSofas = () => {
       </main>
       <Footer />
     </>
+    </QuizServiceProvider>
   );
 };
 

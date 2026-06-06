@@ -12,12 +12,21 @@ const WA_MESSAGES: Record<string, string> = {
   "impermeabilizacao": "Olá! Tenho interesse em impermeabilizar os meus estofos. Qual é o preço e disponibilidade?",
 };
 
+const SERVICE_SLUG_TO_QUIZ: Record<string, string> = {
+  'limpeza-sofas': 'sofa',
+  'limpeza-colchoes': 'mattress',
+  'limpeza-tapetes': 'carpet',
+  'limpeza-cadeiras': 'chairs',
+  'limpeza-alcatifas': 'carpet',
+};
+
 interface ServiceSchedulingBarProps {
   serviceSlug: string;
   label?: string;
 }
 
 const ServiceSchedulingBar = ({ serviceSlug }: ServiceSchedulingBarProps) => {
+  const quizService = SERVICE_SLUG_TO_QUIZ[serviceSlug];
   const [isQuizOpen, setIsQuizOpen] = useState(false);
 
   const waMessage = WA_MESSAGES[serviceSlug] ?? "Olá! Gostaria de pedir um orçamento. Qual é o preço e disponibilidade?";
@@ -62,7 +71,7 @@ const ServiceSchedulingBar = ({ serviceSlug }: ServiceSchedulingBarProps) => {
         </a>
       </div>
 
-      <QuizForm isOpen={isQuizOpen} onClose={() => setIsQuizOpen(false)} />
+      <QuizForm isOpen={isQuizOpen} onClose={() => setIsQuizOpen(false)} initialService={quizService} />
     </>
   );
 };

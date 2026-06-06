@@ -10,60 +10,15 @@ import ServiceFAQSchema from "@/components/ServiceFAQSchema";
 import ServiceLocationSchema from "@/components/ServiceLocationSchema";
 import ServicePackBanner from "@/components/ServicePackBanner";
 import { getLocationServiceData, services, cities, getCityLinksForService } from "@/data/locationSeoData";
-import { QuizLocationProvider } from "@/context/QuizLocationContext";
+import { QuizLocationProvider, QuizServiceProvider } from "@/context/QuizLocationContext";
 import { municipiosComFreguesias } from "@/data/freguesiaSeoData";
 import { getAllProblems } from "@/data/problemSeoData";
 import { GENERIC_PROCESS_STEPS, IMPERMEABILIZACAO_STEPS } from "@/constants/serviceProcesses";
-
-const RESULT_CONTENT: Record<string, (city: string) => { desc: string; checks: string[] }> = {
-  'limpeza-sofas':     city => ({ desc: `Sofás de ${city} tratados com extração a quente: manchas, ácaros e odores eliminados. Tecido revitalizado e pronto a usar em 4 a 6 horas.`, checks: ['Remoção de 99% dos ácaros', 'Manchas antigas eliminadas', 'Pronto em 4–6h'] }),
-  'limpeza-colchoes':  city => ({ desc: `Colchões higienizados ao domicílio em ${city}: eliminação de ácaros, manchas de suor e odores para noites mais saudáveis. Seco no mesmo dia.`, checks: ['99% ácaros eliminados', 'Sem resíduos químicos', 'Seco no mesmo dia'] }),
-  'limpeza-tapetes':   city => ({ desc: `Tapetes de ${city} lavados em profundidade: fibras revitalizadas, cores recuperadas e alergénios eliminados. Recolha e entrega incluídas.`, checks: ['Fibras e cores revitalizadas', 'Alergénios eliminados', 'Recolha e entrega'] }),
-  'limpeza-cadeiras':  city => ({ desc: `Cadeiras estofadas em ${city} limpas com equipamento profissional: ideal para escritórios, restaurantes e residências. Resultado imediato.`, checks: ['Resultado imediato', 'Ideal para restaurantes', 'Sem resíduos'] }),
-  'limpeza-alcatifas': city => ({ desc: `Alcatifas de ${city} tratadas com extração profunda: poeira, ácaros e manchas removidos das fibras. Ideal para espaços comerciais e residências.`, checks: ['Extração profunda', 'Ideal para espaços comerciais', 'Seco rapidamente'] }),
-  'impermeabilizacao': city => ({ desc: `Proteção invisível aplicada em ${city} por especialistas: barreira duradoura contra líquidos e manchas. Totalmente ativa em 24 horas.`, checks: ['Barreira invisível e duradoura', 'Ativa em 24 horas', 'Proteção contra manchas'] }),
-};
 import { SERVICE_PACK_SLUGS } from "@/constants/servicePackSlugs";
-
-import heroSofaD              from "@/assets/hero-sofa-cleaning-new.webp";
-import heroSofaM              from "@/assets/hero-sofa-cleaning-new-mobile.webp";
-import heroMattressD          from "@/assets/hero-mattress-cleaning-new.webp";
-import heroMattressM          from "@/assets/hero-mattress-cleaning-new-mobile.webp";
-import heroCarpetD            from "@/assets/hero-carpet-cleaning-new.webp";
-import heroCarpetM            from "@/assets/hero-carpet-cleaning-new-mobile.webp";
-import heroChairD             from "@/assets/hero-chair-cleaning-new.webp";
-import heroChairM             from "@/assets/hero-chair-cleaning-new-mobile.webp";
-import heroRugD               from "@/assets/hero-rug-cleaning-new.webp";
-import heroRugM               from "@/assets/hero-rug-cleaning-new-mobile.webp";
-import heroWaterproofD        from "@/assets/hero-waterproofing.webp";
-import heroWaterproofM        from "@/assets/hero-waterproofing-mobile.webp";
-import resultSofa              from "@/assets/galeria-sofa-depois.webp";
-import resultColchao           from "@/assets/galeria-colchao-depois.webp";
-import resultTapetes           from "@/assets/galeria-tapete-depois.webp";
-import resultCadeiras          from "@/assets/galeria-cadeira-depois.webp";
-import resultAlcatifas         from "@/assets/galeria-alcatifa-resultado.webp";
-import resultImpermeabilizacao from "@/assets/galeria-impermeabilizacao-depois.webp";
-
-const heroImages: Record<string, { d: string; m: string }> = {
-  "limpeza-sofas":     { d: heroSofaD,       m: heroSofaM },
-  "limpeza-colchoes":  { d: heroMattressD,   m: heroMattressM },
-  "limpeza-tapetes":   { d: heroCarpetD,     m: heroCarpetM },
-  "limpeza-cadeiras":  { d: heroChairD,      m: heroChairM },
-  "limpeza-alcatifas": { d: heroRugD,        m: heroRugM },
-  "impermeabilizacao": { d: heroWaterproofD, m: heroWaterproofM },
-};
-
-const resultImages: Record<string, string> = {
-  "limpeza-sofas":    resultSofa,
-  "limpeza-colchoes": resultColchao,
-  "limpeza-tapetes":  resultTapetes,
-  "limpeza-cadeiras": resultCadeiras,
-  "limpeza-alcatifas": resultAlcatifas,
-  "impermeabilizacao": resultImpermeabilizacao,
-};
-
-
-const METRO_CITIES = new Set(["porto", "matosinhos", "maia", "vila-nova-de-gaia", "gondomar", "braga", "lisboa"]);
+import { SERVICE_TO_QUIZ } from "@/constants/serviceToQuiz";
+import { METRO_CITIES } from "@/constants/metroCities";
+import { SERVICE_HERO_IMAGES, SERVICE_RESULT_IMAGES, SERVICE_SERVICE_RESULT_CONTENT, SERVICE_HERO_FALLBACK, SERVICE_RESULT_FALLBACK } from "@/constants/serviceContent";
+import { buildServiceWaMessage } from "@/lib/buildServiceWaMessage";
 
 const PRICE_TABLE: Record<string, { item: string; price: string; highlight?: boolean }[]> = {
   'limpeza-sofas': [
@@ -129,18 +84,6 @@ const SERVICE_TESTIMONIALS: Record<string, { name: string; city: string; text: s
   ],
 };
 
-function buildLocationWaMessage(serviceSlug: string, cityName: string): string {
-  const city = cityName;
-  switch (serviceSlug) {
-    case 'limpeza-sofas':     return `Olá! Preciso de limpeza profissional de sofá em ${city}. Qual é o preço e disponibilidade?`;
-    case 'limpeza-colchoes':  return `Olá! Preciso de higienização profissional de colchão em ${city}. Qual é o preço e disponibilidade?`;
-    case 'limpeza-tapetes':   return `Olá! Preciso de lavagem profissional de tapetes em ${city}. Qual é o preço e disponibilidade?`;
-    case 'limpeza-cadeiras':  return `Olá! Preciso de limpeza profissional de cadeiras em ${city}. Qual é o preço e disponibilidade?`;
-    case 'limpeza-alcatifas': return `Olá! Preciso de limpeza profissional de alcatifas em ${city}. Qual é o preço e disponibilidade?`;
-    case 'impermeabilizacao': return `Olá! Tenho interesse em impermeabilizar os meus estofos em ${city}. Qual é o preço e disponibilidade?`;
-    default:                  return `Olá! Gostaria de pedir um orçamento para ${city}. Qual é o preço e disponibilidade?`;
-  }
-}
 
 function parseLocationRoute(pathname: string): { serviceSlug: string; citySlug: string } | null {
   const path = pathname.replace(/^\//, '');
@@ -200,8 +143,10 @@ const LocationServicePage = () => {
     );
   }
 
-  const heroImgs = heroImages[data.serviceSlug] ?? { d: heroSofaD, m: heroSofaM };
-  const resultImg = resultImages[data.serviceSlug] || resultColchao;
+  const quizService = SERVICE_TO_QUIZ[data.serviceSlug];
+
+  const heroImgs = SERVICE_HERO_IMAGES[data.serviceSlug] ?? SERVICE_HERO_FALLBACK;
+  const resultImg = SERVICE_RESULT_IMAGES[data.serviceSlug] ?? SERVICE_RESULT_FALLBACK;
   const resultLabel = data.serviceSlug === 'impermeabilizacao' ? 'impermeabilização' : 'limpeza';
   const otherServices = data.relatedServices
     .map(slug => {
@@ -212,11 +157,12 @@ const LocationServicePage = () => {
 
   const cityFreguesias = municipiosComFreguesias.find(m => m.slug === data.citySlug);
 
-  const resultDesc = RESULT_CONTENT[data.serviceSlug]?.(data.city)?.desc ?? data.metaDescription;
+  const resultDesc = SERVICE_RESULT_CONTENT[data.serviceSlug]?.(data.city)?.desc ?? data.metaDescription;
   const serviceBaseUrl = services.find(s => s.slug === data.serviceSlug)?.baseRoute ?? `/${data.serviceSlug}`;
 
   return (
     <QuizLocationProvider value={data.city}>
+    <QuizServiceProvider value={quizService}>
       <ServiceLocationSchema
         serviceName={data.service}
         serviceBaseUrl={serviceBaseUrl}
@@ -284,11 +230,12 @@ const LocationServicePage = () => {
                   <QuizButton
                     className="flex-1"
                     initialLocation={data.city}
+                    initialService={quizService}
                     ctaLabel="Ver preço grátis"
                     buttonClassName="h-[52px] !py-0 w-full"
                   />
                   <a
-                    href={`https://wa.me/351925530647?text=${encodeURIComponent(buildLocationWaMessage(data.serviceSlug, data.city))}`}
+                    href={`https://wa.me/351925530647?text=${encodeURIComponent(buildServiceWaMessage(data.serviceSlug, data.city))}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     onClick={() => trackWhatsAppClick(`location_hero_${data.serviceSlug}_${data.citySlug}`)}
@@ -448,10 +395,10 @@ const LocationServicePage = () => {
                     Resultado após {resultLabel} profissional
                   </h2>
                   <p className="text-white/70 text-sm md:text-base max-w-lg">
-                    {(RESULT_CONTENT[data.serviceSlug] ?? RESULT_CONTENT['limpeza-sofas'])(data.city).desc}
+                    {(SERVICE_RESULT_CONTENT[data.serviceSlug] ?? SERVICE_RESULT_CONTENT['limpeza-sofas'])(data.city).desc}
                   </p>
                   <div className="flex items-center gap-3 mt-4 flex-wrap">
-                    {(RESULT_CONTENT[data.serviceSlug] ?? RESULT_CONTENT['limpeza-sofas'])(data.city).checks.map((check, i) => (
+                    {(SERVICE_RESULT_CONTENT[data.serviceSlug] ?? SERVICE_RESULT_CONTENT['limpeza-sofas'])(data.city).checks.map((check, i) => (
                       <div key={i} className="flex items-center gap-1.5">
                         <CheckCircle className="w-4 h-4" style={{ color: "#D4AF37" }} />
                         <span className="text-white/80 text-sm">{check}</span>
@@ -538,7 +485,7 @@ const LocationServicePage = () => {
                     <p className="text-xs font-bold uppercase tracking-widest mb-0.5" style={{ color: "#D4AF37" }}>Garantia Kyro Clean</p>
                     <p className="text-sm text-white/80 font-medium">Resultado garantido ou devolvemos o dinheiro.</p>
                   </div>
-                  <QuizButton initialLocation={data.city} />
+                  <QuizButton initialLocation={data.city} initialService={quizService} />
                 </div>
               </div>
             </div>
@@ -664,6 +611,7 @@ const LocationServicePage = () => {
         <ServiceFAQSchema faqs={data.faqs} />
       </main>
       <Footer />
+    </QuizServiceProvider>
     </QuizLocationProvider>
   );
 };

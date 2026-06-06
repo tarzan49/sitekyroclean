@@ -1,11 +1,13 @@
 ﻿import { useEffect, useMemo } from "react";
 import { useLocation, Link } from "react-router-dom";
+import { QuizLocationProvider, QuizServiceProvider } from "@/context/QuizLocationContext";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { ArrowRight, MapPin, CheckCircle, Search, Droplets, Sparkles, Wind, MessageCircle } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import QuizButton from "@/components/QuizButton";
 import { trackWhatsAppClick } from "@/lib/quizTracking";
+import { SERVICE_TO_QUIZ } from "@/constants/serviceToQuiz";
 import ServiceFAQSchema from "@/components/ServiceFAQSchema";
 import {
   getMaterialBySlug,
@@ -73,6 +75,8 @@ const MaterialPage = () => {
     return cities.find(c => c.slug === citySlug)?.name ?? null;
   }, [isCityVariant, citySlug]);
 
+  const quizService = data ? SERVICE_TO_QUIZ[data.serviceSlug] : undefined;
+
   const servicePrice = useMemo(() => {
     if (!data) return "39€";
     return services.find(s => s.slug === data.serviceSlug)?.priceFrom ?? "39€";
@@ -119,6 +123,8 @@ const MaterialPage = () => {
   const materialLabel = data.name.toLowerCase().replace(" em ", " de ");
 
   return (
+    <QuizLocationProvider value={cityName ?? undefined}>
+    <QuizServiceProvider value={quizService}>
     <>
       <Header />
       <main>
@@ -173,7 +179,7 @@ const MaterialPage = () => {
               <div className="flex gap-3 max-w-xs sm:max-w-sm">
                 <div className="relative flex-1">
                   <div className="absolute -inset-1.5 rounded-full bg-gold/40 opacity-30 blur-lg pointer-events-none" />
-                  <QuizButton className="relative w-full" buttonClassName="h-[52px] !py-0 w-full" ctaLabel="Ver preço grátis" />
+                  <QuizButton className="relative w-full" buttonClassName="h-[52px] !py-0 w-full" ctaLabel="Ver preço grátis" initialLocation={cityName ?? undefined} initialService={quizService} />
                 </div>
                 <a
                   href={`https://wa.me/351925530647?text=${encodeURIComponent(buildMaterialWaMessage(data.slug, cityName))}`}
@@ -441,6 +447,8 @@ const MaterialPage = () => {
       </main>
       <Footer />
     </>
+    </QuizServiceProvider>
+    </QuizLocationProvider>
   );
 };
 
