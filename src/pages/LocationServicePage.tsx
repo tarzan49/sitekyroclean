@@ -13,6 +13,7 @@ import { getLocationServiceData, services, cities, getCityLinksForService } from
 import { QuizLocationProvider, QuizServiceProvider } from "@/context/QuizLocationContext";
 import { municipiosComFreguesias } from "@/data/freguesiaSeoData";
 import { getAllProblems } from "@/data/problemSeoData";
+import { getMaterialsByService } from "@/data/materialSeoData";
 import { GENERIC_PROCESS_STEPS, IMPERMEABILIZACAO_STEPS } from "@/constants/serviceProcesses";
 import { SERVICE_PACK_SLUGS } from "@/constants/servicePackSlugs";
 import { SERVICE_TO_QUIZ } from "@/constants/serviceToQuiz";
@@ -156,6 +157,10 @@ const LocationServicePage = () => {
     .filter(Boolean) as (typeof services[number] & { locationPath: string })[];
 
   const cityFreguesias = municipiosComFreguesias.find(m => m.slug === data.citySlug);
+
+  const materialLinks = getMaterialsByService(data.serviceSlug);
+
+  const MARCA_SLUGS = ['ikea', 'natuzzi', 'kave-home', 'leroy-merlin', 'moviflor', 'conforama', 'el-corte-ingles', 'roche-bobois'];
 
   const resultDesc = SERVICE_RESULT_CONTENT[data.serviceSlug]?.(data.city)?.desc ?? data.metaDescription;
   const serviceBaseUrl = services.find(s => s.slug === data.serviceSlug)?.baseRoute ?? `/${data.serviceSlug}`;
@@ -564,6 +569,40 @@ const LocationServicePage = () => {
                         className="text-xs text-[#1A1A2E]/60 hover:text-[#D4AF37] transition-colors font-medium"
                       >
                         {p.keyword}
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {materialLinks.length > 0 && (
+                <div className="mt-6 pt-5 border-t border-[#E8E4DE]">
+                  <p className="text-xs text-[#1A1A2E]/50 mb-3">Por tipo de material em {data.city}:</p>
+                  <div className="flex flex-wrap justify-center gap-3">
+                    {materialLinks.map(m => (
+                      <Link
+                        key={m.slug}
+                        to={`/${m.slug}-${data.citySlug}`}
+                        className="text-xs text-[#1A1A2E]/60 hover:text-[#D4AF37] transition-colors font-medium"
+                      >
+                        {m.name}
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {data.serviceSlug === 'limpeza-sofas' && (
+                <div className="mt-6 pt-5 border-t border-[#E8E4DE]">
+                  <p className="text-xs text-[#1A1A2E]/50 mb-3">Marcas de sofá que limpamos em {data.city}:</p>
+                  <div className="flex flex-wrap justify-center gap-3">
+                    {MARCA_SLUGS.map(slug => (
+                      <Link
+                        key={slug}
+                        to={`/limpeza-sofa-${slug}-${data.citySlug}`}
+                        className="text-xs text-[#1A1A2E]/60 hover:text-[#D4AF37] transition-colors font-medium capitalize"
+                      >
+                        {slug.replace(/-/g, ' ')}
                       </Link>
                     ))}
                   </div>

@@ -352,6 +352,15 @@ const MarcaSofaPage = () => {
         <section className="py-10 bg-[#FDFDF9]">
           <div className="container mx-auto px-5 sm:px-6 lg:px-8">
             <div className="max-w-4xl mx-auto">
+              <div className="mb-6 pb-5 border-b border-[#E8E4DE]">
+                <p className="text-xs text-[#1A1A2E]/50 mb-2">Serviço completo de limpeza de sofás:</p>
+                <Link
+                  to={`/limpeza-sofas-${city.slug}`}
+                  className="text-sm font-semibold text-[#D4AF37] hover:underline"
+                >
+                  Limpeza de Sofás em {city.name} — Ver todos os materiais e preços
+                </Link>
+              </div>
               <h3 className="font-playfair text-lg font-bold text-[#1A1A2E] mb-4">Outras marcas que limpamos em {city.name}</h3>
               <div className="flex flex-wrap gap-2">
                 {["ikea", "natuzzi", "kave-home", "leroy-merlin", "moviflor", "conforama", "el-corte-ingles", "roche-bobois"]
