@@ -1,5 +1,5 @@
 # ── Trailing slash removal ────────────────────────────────────────────────────
-/:path+/                                     /:path                                 301
+/*/                                          /:splat                                301
 
 # ── Soft 404 fixes ───────────────────────────────────────────────────────────
 /limpeza-sofas-paranhos                      /limpeza-sofas-porto-paranhos          301
