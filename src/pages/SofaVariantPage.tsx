@@ -1,7 +1,7 @@
 ﻿// Handles all keyword variant pages:
 // /higienizacao-[service]-[city-or-parish]
 // /lavagem-[service]-[city-or-parish]
-// Canonical always points to the equivalent limpeza page.
+// Each page is self-canonical and independently indexable.
 
 import { useEffect, useMemo } from "react";
 import { useLocation, Link } from "react-router-dom";
@@ -130,7 +130,7 @@ const SofaVariantPage = () => {
     document.querySelector('meta[property="og:title"]')?.setAttribute('content', data.title);
     document.querySelector('meta[property="og:description"]')?.setAttribute('content', data.metaDescription);
     document.querySelector('link[rel="canonical"]')
-      ?.setAttribute('href', `https://cleansolutions.com.pt${data.canonical}`);
+      ?.setAttribute('href', `https://cleansolutions.com.pt${location.pathname}`);
     let robotsMeta = document.querySelector('meta[name="robots"]');
     if (!robotsMeta) {
       robotsMeta = document.createElement('meta');
