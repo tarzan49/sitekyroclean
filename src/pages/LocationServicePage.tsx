@@ -17,7 +17,7 @@ import { GENERIC_PROCESS_STEPS, IMPERMEABILIZACAO_STEPS } from "@/constants/serv
 import { SERVICE_PACK_SLUGS } from "@/constants/servicePackSlugs";
 import { SERVICE_TO_QUIZ } from "@/constants/serviceToQuiz";
 import { METRO_CITIES } from "@/constants/metroCities";
-import { SERVICE_HERO_IMAGES, SERVICE_RESULT_IMAGES, SERVICE_SERVICE_RESULT_CONTENT, SERVICE_HERO_FALLBACK, SERVICE_RESULT_FALLBACK } from "@/constants/serviceContent";
+import { SERVICE_HERO_IMAGES, SERVICE_RESULT_IMAGES, SERVICE_RESULT_CONTENT, SERVICE_HERO_FALLBACK, SERVICE_RESULT_FALLBACK } from "@/constants/serviceContent";
 import { buildServiceWaMessage } from "@/lib/buildServiceWaMessage";
 
 const PRICE_TABLE: Record<string, { item: string; price: string; highlight?: boolean }[]> = {

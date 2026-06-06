@@ -22,7 +22,7 @@ import { trackWhatsAppClick } from "@/lib/quizTracking";
 import { SERVICE_PACK_SLUGS } from "@/constants/servicePackSlugs";
 import { SERVICE_TO_QUIZ } from "@/constants/serviceToQuiz";
 import { METRO_CITIES } from "@/constants/metroCities";
-import { SERVICE_HERO_IMAGES, SERVICE_RESULT_IMAGES, SERVICE_SERVICE_RESULT_CONTENT, SERVICE_HERO_FALLBACK, SERVICE_RESULT_FALLBACK } from "@/constants/serviceContent";
+import { SERVICE_HERO_IMAGES, SERVICE_RESULT_IMAGES, SERVICE_RESULT_CONTENT, SERVICE_HERO_FALLBACK, SERVICE_RESULT_FALLBACK } from "@/constants/serviceContent";
 import { buildServiceWaMessage } from "@/lib/buildServiceWaMessage";
 
 function parseFreguesiaRoute(pathname: string): { serviceSlug: string; citySlug: string; freguesiaSlug: string } | null {
