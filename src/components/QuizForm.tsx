@@ -1134,7 +1134,7 @@ ${formData.description || 'Sem observações adicionais'}
               </div>
             )}
 
-            {/* Pack Família upsell (multi-step overlay) */
+            {/* Pack Família upsell (multi-step overlay) */}
             {showUpsell && (
               <QuizUpsellOverlay
                 formData={formData}
