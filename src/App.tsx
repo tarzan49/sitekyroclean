@@ -59,6 +59,8 @@ const MarcaSofaPage = lazy(() => import("./pages/MarcaSofaPage"));
 const Blog = lazy(() => import("./pages/Blog"));
 const BlogPost = lazy(() => import("./pages/BlogPost"));
 const PoliticaPrivacidade = lazy(() => import("./pages/PoliticaPrivacidade"));
+const TermosCondicoes = lazy(() => import("./pages/TermosCondicoes"));
+const PoliticaDevolucoes = lazy(() => import("./pages/PoliticaDevolucoes"));
 const Testemunhos = lazy(() => import("./pages/Testemunhos"));
 
 // Loading fallback component
@@ -198,6 +200,8 @@ const AppRoutes = () => {
                 {/* Legal */}
                 <Route path="/testemunhos" element={<Testemunhos />} />
                 <Route path="/politica-de-privacidade" element={<PoliticaPrivacidade />} />
+                <Route path="/termos-e-condicoes" element={<TermosCondicoes />} />
+                <Route path="/politica-de-devolucoes" element={<PoliticaDevolucoes />} />
                 {/* Admin, painel único */}
                 <Route path="/admin/panel" element={<AdminPanel />} />
                 <Route path="/admin/deslocacoes" element={<AdminDeslocacoes />} />

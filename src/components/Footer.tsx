@@ -176,12 +176,26 @@ const Footer = () => {
               <p className="text-xs md:text-sm text-[#1A1A2E]/40 text-center md:text-left">
                 {t('footer.copyright')}
               </p>
-              <Link
-                to="/politica-de-privacidade"
-                className="text-xs text-[#1A1A2E]/55 hover:text-turquoise active:text-turquoise transition-colors underline underline-offset-2"
-              >
-                Política de Privacidade
-              </Link>
+              <div className="flex flex-wrap gap-x-4 gap-y-1 justify-center md:justify-start">
+                <Link
+                  to="/politica-de-privacidade"
+                  className="text-xs text-[#1A1A2E]/55 hover:text-turquoise active:text-turquoise transition-colors underline underline-offset-2"
+                >
+                  Política de Privacidade
+                </Link>
+                <Link
+                  to="/termos-e-condicoes"
+                  className="text-xs text-[#1A1A2E]/55 hover:text-turquoise active:text-turquoise transition-colors underline underline-offset-2"
+                >
+                  Termos e Condições
+                </Link>
+                <Link
+                  to="/politica-de-devolucoes"
+                  className="text-xs text-[#1A1A2E]/55 hover:text-turquoise active:text-turquoise transition-colors underline underline-offset-2"
+                >
+                  Política de Devoluções
+                </Link>
+              </div>
             </div>
             <div>
               <h4 className="text-xs md:text-sm font-semibold mb-2 text-center md:text-right">{t('footer.followUs')}</h4>
