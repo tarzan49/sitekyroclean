@@ -36,7 +36,6 @@ export interface QuizLeadPayload {
   packDiscountedPrice: number;
   packDiscountPct: number;
   discountedPrice: number;
-  isDiscountActive: boolean;
   isFreeTravel: boolean;
   finalTravelCost: number;
 
@@ -150,7 +149,7 @@ function buildWaUrl(payload: QuizLeadPayload, bookingId: string): string {
   const {
     serviceLabel, serviceTypeLabel, detailsSummary, finalLocation,
     slotDay, slotTime, totalPrice, packDiscountActive, packDiscountedPrice,
-    packDiscountPct, discountedPrice, isDiscountActive, hypoallergenic, hypoSurcharge,
+    packDiscountPct, hypoallergenic, hypoSurcharge,
   } = payload;
 
   const waExtras: string[] = [];
@@ -161,8 +160,8 @@ function buildWaUrl(payload: QuizLeadPayload, bookingId: string): string {
   const waTotalPrice =
     packDiscountActive && totalPrice > 0
       ? `${packDiscountedPrice}€ (Pack -${Math.round(packDiscountPct * 100)}%) (IVA incl.)`
-      : discountedPrice > 0
-        ? `${discountedPrice}€${isDiscountActive ? ' (desc. 5%)' : ''} (IVA incl.)`
+      : totalPrice > 0
+        ? `${totalPrice}€ (IVA incl.)`
         : 'Sob orçamento';
 
   const waText = encodeURIComponent(
@@ -184,21 +183,19 @@ function buildWaUrl(payload: QuizLeadPayload, bookingId: string): string {
 function writeSessionStorage(payload: QuizLeadPayload, bookingId: string, waUrl: string): void {
   const {
     totalPrice, packDiscountActive, packDiscountedPrice, packDiscountPct,
-    discountedPrice, isDiscountActive, serviceLabel, serviceTypeLabel,
+    serviceLabel, serviceTypeLabel,
     finalLocation, email, receiptLines, slotLabel, name,
   } = payload;
 
   const discountAmt = packDiscountActive
     ? Math.round((totalPrice - packDiscountedPrice) * 100) / 100
-    : isDiscountActive
-      ? Math.round((totalPrice - discountedPrice) * 100) / 100
-      : 0;
+    : 0;
 
   const finalPriceText =
     packDiscountActive && totalPrice > 0
       ? `${packDiscountedPrice}€ (Pack -${Math.round(packDiscountPct * 100)}%)`
-      : discountedPrice > 0
-        ? `${discountedPrice}€${isDiscountActive ? ' (5% desconto)' : ''}`
+      : totalPrice > 0
+        ? `${totalPrice}€`
         : 'Sob orçamento';
 
   sessionStorage.setItem('kyro_booking_id', bookingId);
@@ -219,15 +216,9 @@ function writeSessionStorage(payload: QuizLeadPayload, bookingId: string, waUrl:
       subtotal: totalPrice,
       discountLabel: packDiscountActive
         ? `Pack Família −${Math.round(packDiscountPct * 100)}%`
-        : isDiscountActive && totalPrice > 0
-          ? 'Desconto Agenda −5%'
-          : null,
+        : null,
       discountAmount: discountAmt,
-      total: packDiscountActive
-        ? packDiscountedPrice
-        : isDiscountActive && totalPrice > 0
-          ? discountedPrice
-          : totalPrice,
+      total: packDiscountActive ? packDiscountedPrice : totalPrice,
       location: finalLocation,
       slot: slotLabel,
       bookingId,

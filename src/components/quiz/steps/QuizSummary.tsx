@@ -28,8 +28,6 @@ interface QuizSummaryProps {
   packDiscountActive: boolean;
   packDiscountPct: number;
   packDiscountedPrice: number;
-  isDiscountActive: boolean;
-  discountedPrice: number;
 
   /** Label for the selected service. */
   serviceLabel: string;
@@ -62,8 +60,6 @@ const QuizSummary = ({
   packDiscountActive,
   packDiscountPct,
   packDiscountedPrice,
-  isDiscountActive,
-  discountedPrice,
   serviceLabel,
   serviceTypeLabel,
   formattedSlot,
@@ -188,26 +184,15 @@ const QuizSummary = ({
               </span>
             </div>
           )}
-          {!packDiscountActive && isDiscountActive && totalPrice > 0 && (
-            <div className="flex justify-between items-center px-4 py-3 border-b border-white/[0.06] bg-gold/[0.05]">
-              <span className="text-sm text-gold font-bold">Desconto Urgência (5%)</span>
-              <span className="text-sm font-bold text-gold ml-3 flex-shrink-0">
-                −{(totalPrice - discountedPrice).toFixed(2).replace('.', ',')}€
-              </span>
-            </div>
-          )}
-
           {/* Total */}
           <div className="flex justify-between items-center px-4 py-4 bg-gold/[0.08]">
             <span className="text-base font-black text-white uppercase tracking-wide">Total</span>
             <span className="text-xl font-black text-gold tabular-nums">
-              {packDiscountActive
+              {packDiscountActive && totalPrice > 0
                 ? `${packDiscountedPrice}€`
-                : isDiscountActive && totalPrice > 0
-                  ? `${discountedPrice}€`
-                  : totalPrice > 0
-                    ? `${totalPrice}€`
-                    : 'Sob orçamento'}
+                : totalPrice > 0
+                  ? `${totalPrice}€`
+                  : 'Sob orçamento'}
             </span>
           </div>
         </div>

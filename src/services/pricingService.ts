@@ -254,37 +254,3 @@ export function isSobOrcamento(
   }
 }
 
-/**
- * Applies the 5% urgency (timer) discount when the timer is active.
- *
- * @param totalPrice      - Raw total price
- * @param isDiscountActive - Whether the countdown timer is still running
- * @returns Rounded discounted price
- */
-export function calcDiscountedPrice(totalPrice: number, isDiscountActive: boolean): number {
-  return isDiscountActive && totalPrice > 0
-    ? Math.round(totalPrice * 0.95)
-    : Math.round(totalPrice);
-}
-
-/**
- * Applies the Pack Família discount (10%) which supersedes the timer discount (5%).
- * Falls back to the discounted price when the pack is not active.
- *
- * @param totalPrice       - Raw total price
- * @param packDiscountActive - Whether the pack discount is active
- * @param packDiscountPct  - Pack discount fraction (e.g. 0.10)
- * @param isDiscountActive - Whether the urgency timer is still running
- * @returns Rounded final price
- */
-export function calcPackDiscountedPrice(
-  totalPrice: number,
-  packDiscountActive: boolean,
-  packDiscountPct: number,
-  isDiscountActive: boolean,
-): number {
-  if (packDiscountActive && totalPrice > 0) {
-    return Math.round(totalPrice * (1 - packDiscountPct));
-  }
-  return calcDiscountedPrice(totalPrice, isDiscountActive);
-}
