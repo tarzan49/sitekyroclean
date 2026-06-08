@@ -10,7 +10,6 @@ import { AnimatePresence, motion } from "framer-motion";
 import ScrollToTop from "@/components/ScrollToTop";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import CookieBanner from "@/components/CookieBanner";
-const QuotePopup = lazy(() => import("@/components/QuotePopup"));
 import PageHead from "@/components/PageHead";
 import TopProgressBar from "@/components/TopProgressBar";
 import WhatsAppButton from "@/components/WhatsAppButton";
@@ -26,7 +25,8 @@ import { getAllPackComboRoutes } from "@/data/packComboData";
 import { getAllMarcaSofaRoutes } from "@/data/marcaSofaData";
 
 // Critical path - load immediately
-import Index from "./pages/Index";
+import IndexV1 from "./pages/IndexV1";
+const Index = lazy(() => import("./pages/Index"));
 
 // Lazy load non-critical routes for better initial load
 const NotFound = lazy(() => import("./pages/NotFound"));
@@ -138,7 +138,8 @@ const AppRoutes = () => {
           <ErrorBoundary>
             <Suspense fallback={<PageLoader />}>
               <Routes location={location}>
-                <Route path="/" element={<Index />} />
+                <Route path="/" element={<IndexV1 />} />
+                <Route path="/mockup" element={<Index />} />
                 <Route path="/limpeza-sofas" element={<LimpezaSofas />} />
                 <Route path="/impermeabilizacao" element={<Impermeabilizacao />} />
                 <Route path="/limpeza-tapetes" element={<LimpezaTapetes />} />
@@ -240,7 +241,6 @@ const App = () => (
         <WhatsAppButton />
         <MobileStickyBar />
         <CookieBanner />
-        <Suspense fallback={null}><QuotePopup /></Suspense>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
