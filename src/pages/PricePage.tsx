@@ -1,7 +1,7 @@
-﻿import { useEffect, useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { useLocation, Link } from "react-router-dom";
 import { QuizLocationProvider, QuizServiceProvider } from "@/context/QuizLocationContext";
-import { Star, ArrowRight, CheckCircle, MapPin, MessageCircle } from "lucide-react";
+import { Star, ArrowRight, CheckCircle, MapPin, MessageCircle, Clock, Truck, ThumbsUp } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import QuizButton from "@/components/QuizButton";
@@ -11,7 +11,6 @@ import { getPricePageData, getAllPriceRoutes } from "@/data/priceSeoData";
 import { services, cities } from "@/data/locationSeoData";
 import { SERVICE_TO_QUIZ } from "@/constants/serviceToQuiz";
 import { buildServiceWaMessage } from "@/lib/buildServiceWaMessage";
-
 
 const PricePage = () => {
   const { pathname } = useLocation();
@@ -28,10 +27,8 @@ const PricePage = () => {
       document.title = data.title;
       const desc = document.querySelector('meta[name="description"]');
       if (desc) desc.setAttribute("content", data.metaDescription);
-      // Canonical points to the main LocationServicePage to consolidate link equity
-      const canonicalUrl = `https://cleansolutions.com.pt/${data.serviceSlug}-${data.citySlug}`;
       const canonical = document.querySelector('link[rel="canonical"]');
-      if (canonical) canonical.setAttribute("href", canonicalUrl);
+      if (canonical) canonical.setAttribute("href", `https://cleansolutions.com.pt${pathname}`);
     }
   }, [pathname, data]);
 
@@ -39,10 +36,10 @@ const PricePage = () => {
     return (
       <>
         <Header />
-        <main className="pt-28 pb-16 min-h-screen bg-background">
+        <main className="pt-28 pb-16 min-h-screen bg-[#FAFAF7]">
           <div className="container mx-auto px-4 text-center">
             <h1 className="text-3xl font-bold text-[#1A1A2E] mb-4">Página não encontrada</h1>
-            <Link to="/" className="text-gold hover:underline">Voltar ao início</Link>
+            <Link to="/" className="text-[#D4AF37] hover:underline">Voltar ao início</Link>
           </div>
         </main>
         <Footer />
@@ -51,9 +48,9 @@ const PricePage = () => {
   }
 
   const quizService = SERVICE_TO_QUIZ[data.serviceSlug];
-
   const relatedServices = services.filter(s => s.slug !== data.serviceSlug).slice(0, 4);
   const nearbyCities = cities.filter(c => c.slug !== data.citySlug).slice(0, 6);
+  const waHref = `https://wa.me/351925530647?text=${encodeURIComponent(buildServiceWaMessage(data.serviceSlug, data.cityName))}`;
 
   return (
     <QuizLocationProvider value={data.cityName}>
@@ -61,93 +58,172 @@ const PricePage = () => {
     <>
       <Header />
       <main>
-        {/* Hero */}
-        <section className="pt-24 md:pt-28 pb-10 md:pb-14 bg-background">
-          <div className="container mx-auto px-4">
-            <div className="max-w-4xl mx-auto">
-              <nav className="flex items-center gap-1.5 text-xs md:text-sm text-[#1A1A2E]/55 mb-6" aria-label="Breadcrumb">
-                <Link to="/" className="hover:text-[#1A1A2E] transition-colors">Início</Link>
+
+        {/* ── Hero ── */}
+        <section className="relative pt-24 md:pt-32 pb-16 md:pb-20 bg-[#071a12] overflow-hidden">
+          <div className="absolute inset-0 pointer-events-none">
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[400px] rounded-full bg-[#D4AF37]/[0.04] blur-3xl" />
+          </div>
+
+          <div className="container mx-auto px-4 relative">
+            <div className="max-w-3xl mx-auto text-center">
+              <nav className="flex items-center justify-center gap-1.5 text-xs text-white/30 mb-6" aria-label="Breadcrumb">
+                <Link to="/" className="hover:text-white/60 transition-colors">Início</Link>
                 <span>/</span>
-                <Link to={`/${data.serviceSlug}`} className="hover:text-[#1A1A2E] transition-colors">{data.serviceName}</Link>
+                <Link to={`/${data.serviceSlug}`} className="hover:text-white/60 transition-colors">{data.serviceName}</Link>
                 <span>/</span>
-                <span className="text-[#1A1A2E] font-medium">Preços em {data.cityName}</span>
+                <span className="text-white/50">Preços em {data.cityName}</span>
               </nav>
 
-              <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-[#1A1A2E] mb-5 leading-tight">
+              <div className="inline-flex items-center gap-2 bg-[#D4AF37]/10 border border-[#D4AF37]/25 rounded-full px-4 py-1.5 mb-6">
+                <div className="flex gap-0.5">
+                  {[...Array(5)].map((_, i) => (
+                    <Star key={i} className="w-3 h-3 fill-[#D4AF37] text-[#D4AF37]" />
+                  ))}
+                </div>
+                <span className="text-[#D4AF37] text-xs font-semibold tracking-wider uppercase">
+                  Tabela de Preços {new Date().getFullYear()}
+                </span>
+              </div>
+
+              <h1 className="font-playfair text-3xl md:text-5xl font-bold text-white mb-5 leading-tight">
                 {data.h1}
               </h1>
-              <div className="w-16 h-1 bg-gold rounded-full mb-5" />
-              <p className="text-base md:text-lg text-[#1A1A2E]/55 leading-relaxed mb-6 max-w-3xl">
-                {data.intro}
+              <p className="text-white/50 text-base md:text-lg mb-8 max-w-xl mx-auto leading-relaxed">
+                Preços transparentes, sem surpresas. Deslocação e equipamento profissional incluídos.
               </p>
-              <div className="flex gap-3 max-w-xs sm:max-w-sm">
+
+              <div className="flex gap-3 justify-center max-w-sm mx-auto">
                 <div className="relative flex-1">
-                  <div className="absolute -inset-1.5 rounded-full bg-gold/40 opacity-30 blur-lg pointer-events-none" />
-                  <QuizButton className="relative w-full" buttonClassName="h-[52px] !py-0 w-full" ctaLabel="Ver preço grátis" initialLocation={data.cityName} initialService={quizService} />
+                  <div className="absolute -inset-1.5 rounded-full bg-[#D4AF37]/40 opacity-30 blur-lg pointer-events-none" />
+                  <QuizButton
+                    className="relative w-full"
+                    buttonClassName="h-[52px] !py-0 w-full"
+                    ctaLabel="Ver preço grátis"
+                    initialLocation={data.cityName}
+                    initialService={quizService}
+                  />
                 </div>
                 <a
-                  href={`https://wa.me/351925530647?text=${encodeURIComponent(buildServiceWaMessage(data.serviceSlug, data.cityName))}`}
+                  href={waHref}
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={() => trackWhatsAppClick(`price_hero_${data.serviceSlug}_${data.citySlug}`)}
-                  className="relative flex-1 inline-flex items-center justify-center gap-2 h-[52px] px-5 rounded-full font-black text-sm text-white bg-gradient-to-r from-[#1DA851] via-[#25D366] to-[#1DA851] shadow-[0_6px_22px_rgba(37,211,102,0.42),0_2px_6px_rgba(0,0,0,0.28),inset_0_1px_0_rgba(255,255,255,0.20),inset_0_-2px_0_rgba(0,0,0,0.12)] hover:shadow-[0_10px_32px_rgba(37,211,102,0.60),0_2px_6px_rgba(0,0,0,0.28),inset_0_1px_0_rgba(255,255,255,0.20),inset_0_-2px_0_rgba(0,0,0,0.12)] hover:scale-[1.025] active:scale-[0.95] transition-all duration-200 touch-manipulation"
+                  className="flex-1 inline-flex items-center justify-center gap-2 h-[52px] px-5 rounded-full font-black text-sm text-white bg-gradient-to-r from-[#1DA851] via-[#25D366] to-[#1DA851] shadow-[0_6px_22px_rgba(37,211,102,0.42)] hover:scale-[1.025] active:scale-[0.95] transition-all duration-200 touch-manipulation"
                 >
-                  <MessageCircle className="w-[18px] h-[18px] text-white flex-shrink-0" strokeWidth={2} />
+                  <MessageCircle className="w-[18px] h-[18px] flex-shrink-0" strokeWidth={2} />
                   Falar agora
                 </a>
               </div>
-            </div>
-          </div>
-        </section>
 
-        {/* Price Table */}
-        <section className="py-12 md:py-16 bg-secondary/20">
-          <div className="container mx-auto px-4">
-            <div className="max-w-3xl mx-auto">
-              <h2 className="text-2xl md:text-3xl font-bold text-[#1A1A2E] mb-6 text-center">
-                Tabela de Preços
-              </h2>
-              <div className="bg-card rounded-2xl shadow-lg border border-border/30 overflow-x-auto">
-                <table className="w-full min-w-[320px]">
-                  <thead>
-                    <tr className="bg-navy text-primary-foreground">
-                      <th className="text-left px-3 md:px-6 py-4 font-semibold text-sm">Serviço</th>
-                      <th className="text-right px-3 md:px-6 py-4 font-semibold text-sm">Preço</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {data.priceTable.map((row, i) => (
-                      <tr key={i} className="border-t border-border/20 hover:bg-gold/5 transition-colors">
-                        <td className="px-3 md:px-6 py-4 text-sm text-foreground font-medium">
-                          {row.item}
-                          {row.note && <span className="ml-2 text-xs text-[#1A1A2E]/55">({row.note})</span>}
-                        </td>
-                        <td className="px-3 md:px-6 py-4 text-right text-sm font-bold text-[#1A1A2E]">{row.price}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-                <div className="px-6 py-4 bg-gold/5 border-t border-gold/20 text-center">
-                  <p className="text-sm text-[#1A1A2E]/55">
-                    Preços indicativos. Peça orçamento personalizado para preço exato.
-                  </p>
-                </div>
+              <div className="flex items-center justify-center gap-5 mt-8 flex-wrap">
+                <span className="flex items-center gap-1.5 text-white/35 text-xs">
+                  <Clock className="w-3.5 h-3.5" />Resposta em 2h
+                </span>
+                <span className="w-px h-3 bg-white/10" />
+                <span className="flex items-center gap-1.5 text-white/35 text-xs">
+                  <Truck className="w-3.5 h-3.5" />Deslocação incluída
+                </span>
+                <span className="w-px h-3 bg-white/10" />
+                <span className="flex items-center gap-1.5 text-white/35 text-xs">
+                  <ThumbsUp className="w-3.5 h-3.5" />Sem compromisso
+                </span>
               </div>
             </div>
           </div>
         </section>
 
-        {/* Price Factors */}
+        {/* ── Price Cards ── */}
+        <section className="py-14 md:py-20 bg-[#FAFAF7]">
+          <div className="container mx-auto px-4">
+            <div className="max-w-4xl mx-auto">
+              <div className="text-center mb-10">
+                <p className="text-xs font-semibold tracking-[0.25em] uppercase text-[#D4AF37] mb-2">
+                  Preços Kyro Clean Solutions
+                </p>
+                <h2 className="font-playfair text-2xl md:text-3xl font-bold text-[#1A1A2E]">
+                  Tabela de preços — {data.serviceName} em {data.cityName}
+                </h2>
+                <div className="w-12 h-0.5 bg-[#D4AF37] mx-auto mt-4" />
+              </div>
+
+              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+                {data.priceTable.map((row, i) => (
+                  <div
+                    key={i}
+                    className="bg-white rounded-2xl p-6 border border-[#1A1A2E]/6 shadow-sm hover:shadow-md hover:border-[#D4AF37]/25 transition-all duration-200 group"
+                  >
+                    <div className="w-8 h-0.5 bg-[#D4AF37] mb-4 group-hover:w-12 transition-all duration-300" />
+                    <p className="text-sm text-[#1A1A2E]/55 font-medium leading-snug mb-1">
+                      {row.item}
+                    </p>
+                    {row.note && (
+                      <span className="inline-block text-[10px] uppercase tracking-widest text-[#D4AF37]/70 font-semibold mb-3">
+                        {row.note}
+                      </span>
+                    )}
+                    <p className="font-playfair text-2xl font-bold text-[#1A1A2E] mt-2">
+                      {row.price}
+                    </p>
+                  </div>
+                ))}
+              </div>
+
+              <p className="text-center text-xs text-[#1A1A2E]/35">
+                Preços indicativos. O orçamento definitivo é confirmado antes de iniciar qualquer trabalho, sem surpresas.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* ── Trust Strip ── */}
+        <section className="py-12 bg-[#071a12]">
+          <div className="container mx-auto px-4">
+            <div className="max-w-4xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+              <div>
+                <div className="flex justify-center gap-0.5 mb-2">
+                  {[...Array(5)].map((_, i) => (
+                    <Star key={i} className="w-4 h-4 fill-[#D4AF37] text-[#D4AF37]" />
+                  ))}
+                </div>
+                <p className="text-white font-bold text-xl font-playfair">5.0</p>
+                <p className="text-white/35 text-xs mt-1">Google Reviews</p>
+              </div>
+              <div>
+                <p className="text-[#D4AF37] font-bold text-2xl font-playfair">+1000</p>
+                <p className="text-white/35 text-xs mt-1">Clientes satisfeitos</p>
+              </div>
+              <div>
+                <p className="text-white font-bold text-2xl font-playfair">1h</p>
+                <p className="text-white/35 text-xs mt-1">Duração média do serviço</p>
+              </div>
+              <div>
+                <p className="text-white font-bold text-2xl font-playfair">0€</p>
+                <p className="text-white/35 text-xs mt-1">Custos de deslocação</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ── Price Factors ── */}
         {data.factors.length > 0 && (
-          <section className="py-12 md:py-16 bg-background">
+          <section className="py-14 bg-[#FAFAF7]">
             <div className="container mx-auto px-4">
               <div className="max-w-4xl mx-auto">
-                <h2 className="text-2xl md:text-3xl font-bold text-[#1A1A2E] mb-6">O que influencia o preço?</h2>
+                <div className="text-center mb-8">
+                  <h2 className="font-playfair text-2xl md:text-3xl font-bold text-[#1A1A2E]">
+                    O que influencia o preço?
+                  </h2>
+                  <div className="w-12 h-0.5 bg-[#D4AF37] mx-auto mt-4" />
+                </div>
                 <div className="grid sm:grid-cols-2 gap-3">
                   {data.factors.map((factor, i) => (
-                    <div key={i} className="flex items-start gap-3 p-3 bg-card rounded-xl border border-border/20">
-                      <CheckCircle className="w-5 h-5 text-gold flex-shrink-0 mt-0.5" />
-                      <span className="text-sm text-foreground font-medium">{factor}</span>
+                    <div
+                      key={i}
+                      className="flex items-start gap-3 p-4 bg-white rounded-xl border border-[#1A1A2E]/6 shadow-sm"
+                    >
+                      <CheckCircle className="w-4 h-4 text-[#D4AF37] flex-shrink-0 mt-0.5" />
+                      <span className="text-sm text-[#1A1A2E]/75 font-medium">{factor}</span>
                     </div>
                   ))}
                 </div>
@@ -156,53 +232,31 @@ const PricePage = () => {
           </section>
         )}
 
-        {/* Trust */}
-        <section className="py-10 md:py-12 bg-secondary/20">
-          <div className="container mx-auto px-4">
-            <div className="max-w-4xl mx-auto">
-              <div className="bg-card rounded-2xl p-6 md:p-8 shadow-lg border border-border/30 flex flex-col sm:flex-row items-center gap-6">
-                <div className="flex items-center gap-3">
-                  <div>
-                    <div className="flex items-center gap-1.5">
-                      <span className="text-2xl font-bold text-[#1A1A2E]">5.0</span>
-                      <div className="flex gap-0.5">
-                        {[...Array(5)].map((_, i) => (
-                          <Star key={i} className="w-4 h-4 fill-gold text-gold" />
-                        ))}
-                      </div>
-                    </div>
-                    <p className="text-sm text-[#1A1A2E]/55">50+ avaliações no Google</p>
-                  </div>
-                </div>
-                <div className="h-px sm:h-12 sm:w-px w-full bg-border" />
-                <div className="text-center sm:text-left">
-                  <p className="text-3xl font-bold text-turquoise">+1000</p>
-                  <p className="text-sm text-[#1A1A2E]/55">clientes satisfeitos</p>
-                </div>
-                <div className="sm:ml-auto">
-                  <QuizButton initialLocation={data.cityName} initialService={quizService} />
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* FAQ */}
+        {/* ── FAQ ── */}
         {data.faqs.length > 0 && (
-          <section className="py-12 md:py-16 bg-background">
+          <section className="py-14 bg-white border-t border-[#1A1A2E]/5">
             <div className="container mx-auto px-4">
-              <div className="max-w-4xl mx-auto">
-                <h2 className="text-2xl md:text-3xl font-bold text-[#1A1A2E] mb-6 text-center">Perguntas sobre Preços</h2>
-                <div className="w-16 h-1 bg-gradient-to-r from-gold to-gold-light mx-auto rounded-full mb-8" />
+              <div className="max-w-3xl mx-auto">
+                <div className="text-center mb-10">
+                  <p className="text-xs font-semibold tracking-[0.25em] uppercase text-[#D4AF37] mb-2">
+                    Perguntas frequentes
+                  </p>
+                  <h2 className="font-playfair text-2xl md:text-3xl font-bold text-[#1A1A2E]">
+                    Dúvidas sobre preços
+                  </h2>
+                </div>
                 <ServiceFAQSchema faqs={data.faqs} />
-                <div className="space-y-4">
+                <div className="space-y-3">
                   {data.faqs.map((faq, i) => (
-                    <details key={i} className="bg-card rounded-2xl shadow-sm border border-border/30 px-6 group">
-                      <summary className="py-5 font-semibold text-[#1A1A2E] cursor-pointer list-none flex items-center justify-between text-base">
+                    <details
+                      key={i}
+                      className="group bg-[#FAFAF7] rounded-xl border border-[#1A1A2E]/6 px-6"
+                    >
+                      <summary className="py-5 font-semibold text-[#1A1A2E] cursor-pointer list-none flex items-center justify-between text-[15px]">
                         {faq.question}
-                        <ArrowRight className="w-4 h-4 text-[#1A1A2E]/55 group-open:rotate-90 transition-transform" />
+                        <ArrowRight className="w-4 h-4 text-[#D4AF37] group-open:rotate-90 transition-transform flex-shrink-0 ml-3" />
                       </summary>
-                      <p className="pb-5 text-[#1A1A2E]/55 leading-relaxed">{faq.answer}</p>
+                      <p className="pb-5 text-[#1A1A2E]/55 leading-relaxed text-sm">{faq.answer}</p>
                     </details>
                   ))}
                 </div>
@@ -211,45 +265,51 @@ const PricePage = () => {
           </section>
         )}
 
-        {/* Internal Links */}
-        <section className="py-12 md:py-16 bg-secondary/20">
+        {/* ── Internal Links ── */}
+        <section className="py-10 bg-[#FAFAF7] border-t border-[#1A1A2E]/5">
           <div className="container mx-auto px-4">
-            <div className="max-w-4xl mx-auto space-y-8">
+            <div className="max-w-4xl mx-auto space-y-6">
               <div>
-                <h3 className="text-lg font-bold text-[#1A1A2E] mb-3">Ver serviço completo</h3>
+                <h3 className="text-xs font-bold text-[#1A1A2E]/40 uppercase tracking-widest mb-3">
+                  Ver página completa do serviço
+                </h3>
                 <Link
                   to={`/${data.serviceSlug}-${data.citySlug}`}
-                  className="inline-flex items-center gap-2 bg-[#D4AF37]/10 border border-[#D4AF37]/30 px-4 py-2.5 rounded-xl text-sm font-semibold text-[#1A1A2E] hover:bg-[#D4AF37]/20 transition-all"
+                  className="inline-flex items-center gap-2 bg-white border border-[#D4AF37]/30 px-4 py-2.5 rounded-xl text-sm font-semibold text-[#1A4E30] hover:bg-[#D4AF37]/5 transition-all"
                 >
                   <ArrowRight className="w-4 h-4 text-[#D4AF37]" />
-                  {data.serviceName} em {data.cityName}, página completa
+                  {data.serviceName} em {data.cityName}
                 </Link>
               </div>
               <div>
-                <h3 className="text-lg font-bold text-[#1A1A2E] mb-4">Preços noutras cidades</h3>
+                <h3 className="text-xs font-bold text-[#1A1A2E]/40 uppercase tracking-widest mb-3">
+                  Preços noutras cidades
+                </h3>
                 <div className="flex flex-wrap gap-2">
                   {nearbyCities.map(city => (
                     <Link
                       key={city.slug}
                       to={`/preco-${data.serviceSlug}-${city.slug}`}
-                      className="inline-flex items-center gap-1.5 bg-card px-3 py-2 rounded-lg text-sm font-medium text-[#1A1A2E] border border-border/30 hover:border-gold/30 hover:bg-gold/5 transition-all"
+                      className="inline-flex items-center gap-1.5 bg-white px-3 py-2 rounded-lg text-sm font-medium text-[#1A1A2E]/65 border border-[#1A1A2E]/8 hover:border-[#D4AF37]/30 hover:text-[#1A1A2E] transition-all"
                     >
-                      <MapPin className="w-3 h-3 text-gold" />
+                      <MapPin className="w-3 h-3 text-[#D4AF37]" />
                       {city.name}
                     </Link>
                   ))}
                 </div>
               </div>
               <div>
-                <h3 className="text-lg font-bold text-[#1A1A2E] mb-4">Preços de outros serviços</h3>
+                <h3 className="text-xs font-bold text-[#1A1A2E]/40 uppercase tracking-widest mb-3">
+                  Outros serviços em {data.cityName}
+                </h3>
                 <div className="flex flex-wrap gap-2">
                   {relatedServices.map(svc => (
                     <Link
                       key={svc.slug}
                       to={`/preco-${svc.slug}-${data.citySlug}`}
-                      className="inline-flex items-center gap-1.5 bg-card px-3 py-2 rounded-lg text-sm font-medium text-[#1A1A2E] border border-border/30 hover:border-gold/30 hover:bg-gold/5 transition-all"
+                      className="inline-flex items-center gap-1.5 bg-white px-3 py-2 rounded-lg text-sm font-medium text-[#1A1A2E]/65 border border-[#1A1A2E]/8 hover:border-[#D4AF37]/30 hover:text-[#1A1A2E] transition-all"
                     >
-                      <ArrowRight className="w-3 h-3 text-gold" />
+                      <ArrowRight className="w-3 h-3 text-[#D4AF37]" />
                       {svc.name}
                     </Link>
                   ))}
@@ -259,28 +319,40 @@ const PricePage = () => {
           </div>
         </section>
 
-        {/* CTA */}
-        <section className="py-10 md:py-14 bg-kyro-green">
-          <div className="container mx-auto px-4 text-center">
-            <h2 className="text-xl md:text-3xl font-bold text-white mb-3">
-              Peça orçamento gratuito em {data.cityName}
+        {/* ── CTA ── */}
+        <section className="py-16 md:py-20 bg-[#071a12] relative overflow-hidden">
+          <div className="absolute inset-0 pointer-events-none">
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[300px] rounded-full bg-[#D4AF37]/[0.05] blur-3xl" />
+          </div>
+          <div className="container mx-auto px-4 text-center relative">
+            <p className="text-xs font-semibold tracking-[0.25em] uppercase text-[#D4AF37] mb-3">
+              Orçamento Grátis
+            </p>
+            <h2 className="font-playfair text-2xl md:text-4xl font-bold text-white mb-3">
+              Peça o seu orçamento em {data.cityName}
             </h2>
-            <p className="text-white/60 mb-6 text-base">
-              Resposta em menos de 2 horas: sem compromisso.
+            <p className="text-white/45 mb-8 text-sm md:text-base max-w-md mx-auto">
+              Resposta em menos de 2 horas. Sem compromisso, sem surpresas.
             </p>
             <div className="flex gap-3 justify-center mx-auto max-w-xs sm:max-w-sm">
               <div className="relative flex-1">
-                <div className="absolute -inset-1.5 rounded-full bg-gold/40 opacity-30 blur-lg pointer-events-none" />
-                <QuizButton className="relative w-full" buttonClassName="h-[52px] !py-0 w-full" ctaLabel="Ver preço grátis" initialLocation={data.cityName} initialService={quizService} />
+                <div className="absolute -inset-1.5 rounded-full bg-[#D4AF37]/40 opacity-30 blur-lg pointer-events-none" />
+                <QuizButton
+                  className="relative w-full"
+                  buttonClassName="h-[52px] !py-0 w-full"
+                  ctaLabel="Ver preço grátis"
+                  initialLocation={data.cityName}
+                  initialService={quizService}
+                />
               </div>
               <a
-                href={`https://wa.me/351925530647?text=${encodeURIComponent(buildServiceWaMessage(data.serviceSlug, data.cityName))}`}
+                href={waHref}
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={() => trackWhatsAppClick(`price_cta_${data.serviceSlug}_${data.citySlug}`)}
-                className="relative flex-1 inline-flex items-center justify-center gap-2 h-[52px] px-5 rounded-full font-black text-sm text-white bg-gradient-to-r from-[#1DA851] via-[#25D366] to-[#1DA851] shadow-[0_6px_22px_rgba(37,211,102,0.42),0_2px_6px_rgba(0,0,0,0.28),inset_0_1px_0_rgba(255,255,255,0.20),inset_0_-2px_0_rgba(0,0,0,0.12)] hover:shadow-[0_10px_32px_rgba(37,211,102,0.60),0_2px_6px_rgba(0,0,0,0.28),inset_0_1px_0_rgba(255,255,255,0.20),inset_0_-2px_0_rgba(0,0,0,0.12)] hover:scale-[1.025] active:scale-[0.95] transition-all duration-200 touch-manipulation"
+                className="flex-1 inline-flex items-center justify-center gap-2 h-[52px] px-5 rounded-full font-black text-sm text-white bg-gradient-to-r from-[#1DA851] via-[#25D366] to-[#1DA851] shadow-[0_6px_22px_rgba(37,211,102,0.42)] hover:scale-[1.025] active:scale-[0.95] transition-all duration-200 touch-manipulation"
               >
-                <MessageCircle className="w-[18px] h-[18px] text-white flex-shrink-0" strokeWidth={2} />
+                <MessageCircle className="w-[18px] h-[18px] flex-shrink-0" strokeWidth={2} />
                 Falar agora
               </a>
             </div>
@@ -328,7 +400,7 @@ const PricePage = () => {
                     "priceSpecification": {
                       "@type": "PriceSpecification",
                       "minPrice": data.priceTable[0]?.price.replace(/[^0-9]/g, "") ?? "15",
-                      "maxPrice": data.priceTable[data.priceTable.length - 1]?.price.replace(/[^0-9]/g, "") ?? "80",
+                      "maxPrice": data.priceTable[data.priceTable.length - 1]?.price.replace(/[^0-9]/g, "") ?? "99",
                       "priceCurrency": "EUR",
                       "description": `Preço de ${data.serviceName} em ${data.cityName}, IVA incluído`,
                     },

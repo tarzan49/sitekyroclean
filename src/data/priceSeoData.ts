@@ -20,18 +20,17 @@ export interface PricePageData {
 // Price tables per service
 const priceTables: Record<string, { item: string; price: string; note?: string }[]> = {
   "limpeza-sofas": [
-    { item: "Sofá 2 lugares", price: "Desde 39€" },
-    { item: "Sofá 3 lugares", price: "Desde 49€" },
-    { item: "Sofá 4-5 lugares", price: "Desde 59€" },
-    { item: "Sofá em L", price: "Desde 69€" },
-    { item: "Sofá cama", price: "Desde 59€" },
-    { item: "Chaise longue", price: "Desde 15€", note: "add-on" },
+    { item: "Sofá 1 lugar", price: "Desde 49€" },
+    { item: "Sofá 2 lugares", price: "Desde 69€" },
+    { item: "Sofá 3 lugares", price: "Desde 79€" },
+    { item: "Sofá 4-5 lugares", price: "Desde 89€" },
+    { item: "Sofá em L", price: "Desde 99€" },
     { item: "Impermeabilização", price: "Desde 49€", note: "add-on recomendado" },
   ],
   "limpeza-colchoes": [
-    { item: "Colchão Solteiro", price: "Desde 39€" },
-    { item: "Colchão Casal", price: "Desde 49€" },
-    { item: "Colchão King Size", price: "Desde 59€" },
+    { item: "Colchão Solteiro", price: "Desde 49€" },
+    { item: "Colchão Casal", price: "Desde 59€" },
+    { item: "Colchão King Size", price: "Desde 69€" },
     { item: "Colchão berço/criança", price: "Desde 29€" },
     { item: "Cabeceira estofada", price: "Desde 20€", note: "add-on" },
   ],
@@ -57,8 +56,9 @@ const priceTables: Record<string, { item: string; price: string; note?: string }
     { item: "Alcatifa +40m²", price: "Sob consulta" },
   ],
   "impermeabilizacao": [
-    { item: "Sofá 2-3 lugares", price: "Desde 25€" },
-    { item: "Sofá 4-5 lugares", price: "Desde 35€" },
+    { item: "Sofá 1 lugar", price: "Desde 49€" },
+    { item: "Sofá 2-3 lugares", price: "Desde 69€" },
+    { item: "Sofá 4-5 lugares", price: "Desde 89€" },
     { item: "Cadeiras (por unidade)", price: "Desde 8€" },
     { item: "Tapete (por m²)", price: "Desde 5€/m²" },
     { item: "Cabeceira", price: "Desde 15€" },
@@ -107,13 +107,13 @@ const priceFactors: Record<string, string[]> = {
 
 const priceFaqs: Record<string, { question: string; answer: string }[]> = {
   "limpeza-sofas": [
-    { question: "Quanto custa limpar um sofá em {city}?", answer: "A limpeza de sofás em {city} começa a partir de 39€ para sofás de 2 lugares. O preço final depende do tamanho, tipo de tecido e estado do sofá. Peça um orçamento grátis para saber o preço exato." },
+    { question: "Quanto custa limpar um sofá em {city}?", answer: "A limpeza de sofás em {city} começa a partir de 69€ para sofás de 2 lugares. O preço final depende do tamanho, tipo de tecido e estado do sofá. Peça um orçamento grátis para saber o preço exato." },
     { question: "O orçamento é gratuito?", answer: "Sim, todos os nossos orçamentos são 100% gratuitos e sem compromisso. Pode pedir por WhatsApp, telefone ou através do nosso formulário online." },
     { question: "Há custos adicionais de deslocação em {city}?", answer: "Não. A deslocação em {city} e arredores está incluída no preço do serviço. Não cobramos taxa de deslocação." },
     { question: "Oferecem descontos para múltiplas peças?", answer: "Sim! Se combinar vários serviços (ex: sofá + colchão + cadeiras) aplicamos desconto no valor total. Peça um orçamento personalizado." },
   ],
   "limpeza-colchoes": [
-    { question: "Quanto custa limpar um colchão em {city}?", answer: "A limpeza de colchões em {city} começa a partir de 39€ para colchões de solteiro e 49€ para colchões de casal. O preço depende do tamanho e estado do colchão." },
+    { question: "Quanto custa limpar um colchão em {city}?", answer: "A limpeza de colchões em {city} começa a partir de 49€ para colchões de solteiro e 59€ para colchões de casal. O preço depende do tamanho e estado do colchão." },
     { question: "O preço inclui anti-ácaros?", answer: "Sim, o nosso serviço standard inclui tratamento anti-ácaros. Para tratamentos intensivos, pode haver um suplemento." },
     { question: "A deslocação em {city} tem custo?", answer: "Não. A deslocação está incluída no preço do serviço em {city} e arredores." },
   ],
@@ -129,7 +129,7 @@ const priceFaqs: Record<string, { question: string; answer: string }[]> = {
     { question: "Quanto custa limpar alcatifas em {city}?", answer: "A limpeza de alcatifas em {city} começa a partir de 3€/m². O preço depende da área total e estado da alcatifa." },
   ],
   "impermeabilizacao": [
-    { question: "Quanto custa impermeabilizar um sofá em {city}?", answer: "A impermeabilização de sofás em {city} custa 49€ (1 lugar), 69€ (2 lugares) e 89€ (3 lugares). Recomendamos combinar com limpeza para melhor resultado e preço especial." },
+    { question: "Quanto custa impermeabilizar um sofá em {city}?", answer: "A impermeabilização de sofás em {city} custa desde 49€ (1 lugar), 69€ (2-3 lugares) e 89€ (4-5 lugares). Recomendamos combinar com limpeza para melhor resultado e preço especial." },
     { question: "A impermeabilização vale a pena?", answer: "Sim. A impermeabilização protege contra manchas de líquidos e prolonga a vida útil do estofamento. É especialmente recomendada para famílias com crianças ou animais." },
   ],
 };

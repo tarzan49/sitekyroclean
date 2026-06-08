@@ -109,16 +109,21 @@
     -moz-osx-font-smoothing: grayscale;
   }
 
-  /* Kyro Typography System — Playfair for all section/page headings */
+  /* Kyro Typography System — Cormorant Garamond for editorial premium feel */
   h1, h2 {
-    font-family: 'Playfair Display', Georgia, serif;
-    line-height: 1.4;
-    letter-spacing: 0.02em;
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    line-height: 1.1;
+    letter-spacing: -0.01em;
   }
 
   h3 {
-    font-family: 'Playfair Display', Georgia, serif;
-    line-height: 1.4;
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    line-height: 1.2;
+    letter-spacing: -0.005em;
+  }
+
+  h4, h5, h6 {
+    font-family: 'Cormorant Garamond', Georgia, serif;
   }
 
   /* Better touch targets on mobile - minimum 44px for accessibility */
@@ -171,16 +176,44 @@ body,
 
 /* Premium Typography */
 @layer utilities {
-  .text-premium-title {
-    @apply text-3xl md:text-4xl lg:text-5xl font-bold leading-tight tracking-tight;
+  /* Editorial headline — Cormorant 300, very large, tight leading */
+  .heading-editorial {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-weight: 300;
+    line-height: 1.05;
+    letter-spacing: -0.02em;
   }
-  
+
+  /* Refined headline — Cormorant 400, slightly less dramatic */
+  .heading-refined {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-weight: 400;
+    line-height: 1.1;
+    letter-spacing: -0.015em;
+  }
+
+  /* Label above headings — Inter small caps style */
+  .label-overline {
+    font-family: 'Inter', system-ui, sans-serif;
+    font-weight: 500;
+    font-size: 0.65rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+  }
+
+  .text-premium-title {
+    @apply text-4xl md:text-5xl lg:text-6xl leading-tight tracking-tight;
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-weight: 400;
+  }
+
   .text-premium-subtitle {
     @apply text-lg md:text-xl font-semibold text-gold;
   }
-  
+
   .text-premium-body {
     @apply text-base md:text-lg leading-relaxed;
+    font-weight: 300;
   }
 
   .text-mobile-hero {

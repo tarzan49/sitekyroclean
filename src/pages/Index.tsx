@@ -4,20 +4,19 @@ import Hero from "@/components/Hero";
 import SocialProofBar from "@/components/SocialProofBar";
 import LocalBusinessSchema from "@/components/LocalBusinessSchema";
 
-// Lazy load sections below the fold
-const HomepageBlogSection = lazy(() => import("@/components/HomepageBlogSection"));
-const Services = lazy(() => import("@/components/Services"));
+const ResultsSection     = lazy(() => import("@/components/ResultsSection"));
+const Services           = lazy(() => import("@/components/Services"));
 const PainPointsSolutions = lazy(() => import("@/components/PainPointsSolutions"));
-const HowItWorks = lazy(() => import("@/components/HowItWorks"));
-const Testimonials = lazy(() => import("@/components/Testimonials"));
-const HomepageFAQ = lazy(() => import("@/components/HomepageFAQ"));
-const FinalCTA = lazy(() => import("@/components/FinalCTA"));
-const Footer = lazy(() => import("@/components/Footer"));
+const HowItWorks         = lazy(() => import("@/components/HowItWorks"));
+const Testimonials       = lazy(() => import("@/components/Testimonials"));
+const HomepageFAQ        = lazy(() => import("@/components/HomepageFAQ"));
+const HomepageBlogSection = lazy(() => import("@/components/HomepageBlogSection"));
+const FinalCTA           = lazy(() => import("@/components/FinalCTA"));
+const Footer             = lazy(() => import("@/components/Footer"));
 
-// Simple loading placeholder
 const SectionLoader = () => (
-  <div className="py-8 flex justify-center">
-    <div className="w-8 h-8 border-2 border-gold border-t-transparent rounded-full animate-spin" />
+  <div className="py-12 flex justify-center">
+    <div className="w-6 h-6 border border-[#1A1A2E]/20 border-t-[#D4AF37] rounded-full animate-spin" />
   </div>
 );
 
@@ -30,58 +29,63 @@ const Index = () => {
     <div className="min-h-screen">
       <Header onOpenQuiz={handleOpenQuiz} />
       <main>
-        {/* 1. Hero: Proposta de valor + CTA primário */}
+        {/* Hero */}
         <Hero />
-        
-        {/* 2. Social Proof Bar: Validação imediata */}
+
+        {/* Social proof bar — immediate validation */}
         <SocialProofBar />
-        
-        {/* 3. Services: Amplitude + ancoragem de preços */}
+
+        {/* Results — visual proof before/after */}
+        <Suspense fallback={<SectionLoader />}>
+          <ResultsSection />
+        </Suspense>
+
+        {/* Services — scope + price anchoring */}
         <Suspense fallback={<SectionLoader />}>
           <Services />
         </Suspense>
 
-        {/* 5. Pain Points: Urgência emocional */}
+        {/* Pain points — emotional urgency */}
         <Suspense fallback={<SectionLoader />}>
           <PainPointsSolutions />
         </Suspense>
-        
-        {/* 6. Testimonials: Prova social */}
+
+        {/* Testimonials — social proof */}
         <div id="testemunhos" className="scroll-mt-16">
           <Suspense fallback={<SectionLoader />}>
             <Testimonials />
           </Suspense>
         </div>
 
-        {/* 7. How It Works + Qualidade Garantida */}
+        {/* Process + guarantees */}
         <div id="como-funciona" className="scroll-mt-16">
           <Suspense fallback={<SectionLoader />}>
             <HowItWorks />
           </Suspense>
         </div>
 
-        {/* 9. FAQ: Resolve objeções finais */}
+        {/* FAQ */}
         <div id="faq" className="scroll-mt-16">
           <Suspense fallback={<SectionLoader />}>
             <HomepageFAQ />
           </Suspense>
         </div>
-        
-        {/* 10. Blog: Freshness signal + internal links */}
+
+        {/* Blog */}
         <Suspense fallback={<SectionLoader />}>
           <HomepageBlogSection />
         </Suspense>
 
-        {/* 11. Final CTA: Captura indecisos */}
+        {/* Final CTA */}
         <Suspense fallback={<SectionLoader />}>
           <FinalCTA />
         </Suspense>
       </main>
-      
+
       <Suspense fallback={null}>
         <Footer />
       </Suspense>
-      
+
       <LocalBusinessSchema />
     </div>
   );
