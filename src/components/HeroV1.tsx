@@ -2,9 +2,8 @@
 import { trackWhatsAppClick } from "@/lib/quizTracking";
 
 const QuizForm = lazy(() => import('./QuizFormLazy'));
-import { Phone, MessageCircle, Trophy, Shield, Clock, CheckCircle } from "lucide-react";
+import { MessageCircle } from "lucide-react";
 import GoogleReviewsBadge from "@/components/GoogleReviewsBadge";
-import { trackCallClick } from "@/lib/analytics";
 
 // Public static assets (URL-encoded for folder names with spaces)
 const imgStainDesktop = '/images/fotos%20hero/imagemvinhopc.webp';
@@ -26,9 +25,6 @@ interface Slide {
   cta: string;
 }
 
-// Badge style is uniform across all slides, Kyro gold/amber
-const BADGE_CLS = 'text-amber-200 bg-amber-400/[0.18] border-amber-400/40';
-
 // 2 slides: dor imediata (Vinho) + proposta de marca (Brand)
 const SLIDES: Slide[] = [
   // ── Slide 0, Vinho (urgência imediata, a dor mais aguda)
@@ -37,7 +33,7 @@ const SLIDES: Slide[] = [
     imgMobile:   imgStainMobile,
     imgPosition: 'center 40%',
     tint: 'rgba(60, 5, 5, 0.45)',
-    tag: 'Emergência de Manchas',
+    tag: 'KYRO CLEAN SOLUTIONS',
     problem: 'Vinho entornado\nno sofá novo?',
     agitation: 'Não entre em pânico. Não esfregue! Pode estragar as fibras para sempre. Nós removemos a mancha e salvamos o seu tecido hoje.',
     cta: 'Ver preço agora',
@@ -197,24 +193,15 @@ const Hero = () => {
                 transition: `opacity ${TEXT_OUT_MS}ms ease, transform ${TEXT_OUT_MS}ms ease`,
               }}
             >
-              {current === 3 ? (
-                /* ── Luxury brand badge, Slide 0 only ── */
-                <div className="flex flex-col gap-1">
-                  {/* Fine gold rule above */}
-                  <div className="w-7 h-px bg-gradient-to-r from-gold to-transparent" />
-                  <span
-                    className="text-[10px] font-bold text-gold/90 tracking-[0.30em] uppercase"
-                    style={{ textShadow: '0 1px 6px rgba(0,0,0,0.6)' }}
-                  >
-                    {slide.tag}
-                  </span>
-                </div>
-              ) : (
-                /* ── Standard text badge, all other slides ── */
-                <p className="text-[10px] font-bold tracking-[0.28em] uppercase" style={{ color: "#D4AF37" }}>
+              <div className="flex flex-col gap-1">
+                <div className="w-7 h-px bg-gradient-to-r from-gold to-transparent" />
+                <span
+                  className="text-[10px] font-bold text-gold/90 tracking-[0.30em] uppercase"
+                  style={{ textShadow: '0 1px 6px rgba(0,0,0,0.6)' }}
+                >
                   {slide.tag}
-                </p>
-              )}
+                </span>
+              </div>
             </div>
 
             {/* H1, Problem */}
@@ -224,6 +211,7 @@ const Hero = () => {
                 opacity: textIn ? 1 : 0,
                 transform: textIn ? 'translateY(0)' : 'translateY(12px)',
                 transition: `opacity ${TEXT_OUT_MS + 60}ms ease, transform ${TEXT_OUT_MS + 60}ms ease`,
+                textShadow: '0 2px 16px rgba(0,0,0,0.65)',
               }}
             >
               {slide.problem}
@@ -231,33 +219,19 @@ const Hero = () => {
 
             {/* Subheadline, Agitation */}
             <p
-              className="text-sm sm:text-base md:text-lg lg:text-xl text-white/90 leading-relaxed mb-6 md:mb-8 max-w-xl"
+              className="text-sm sm:text-base md:text-lg lg:text-xl text-white leading-relaxed mb-6 md:mb-8 max-w-xl"
               style={{
                 opacity: textIn ? 1 : 0,
                 transform: textIn ? 'translateY(0)' : 'translateY(10px)',
                 transition: `opacity ${TEXT_OUT_MS + 120}ms ease, transform ${TEXT_OUT_MS + 120}ms ease`,
+                textShadow: '0 1px 10px rgba(0,0,0,0.55)',
               }}
             >
               {slide.agitation}
             </p>
 
-            {/* Trust badges */}
-            <div className="flex flex-wrap items-center gap-2 mb-5">
-              {([
-                { Icon: Trophy,      label: 'N.º1 no Porto'        },
-                { Icon: Shield,      label: 'Qualidade Garantida'   },
-                { Icon: Clock,       label: 'Resposta em menos de 1h'         },
-                { Icon: CheckCircle, label: 'Orçamento Gratuito'   },
-              ] as const).map(({ Icon, label }) => (
-                <div key={label} className="flex items-center gap-1.5 bg-black/30 border border-white/[0.14] rounded-full px-2.5 py-1 backdrop-blur-sm">
-                  <Icon className="w-3 h-3 text-gold flex-shrink-0" strokeWidth={2.5} />
-                  <span className="text-white/85 text-[11px] font-semibold leading-none">{label}</span>
-                </div>
-              ))}
-            </div>
-
             {/* CTAs */}
-            <div className="flex flex-col gap-2.5 w-full max-w-sm">
+            <div className="flex flex-col gap-2.5 w-full max-w-sm mt-8 md:mt-10">
 
               {/* ── PRIMARY, Golden fill button (the only filled button) ── */}
               <div className="relative group">
@@ -310,41 +284,15 @@ const Hero = () => {
                 </a>
               </div>
 
-              {/* ── TRUST micro-copy + phone anchor ── */}
-              <div className="flex flex-col items-center gap-2 pt-2">
-                {/* Google Reviews Badge */}
+              {/* Google Reviews Badge */}
+              <div className="flex justify-center pt-1">
                 <GoogleReviewsBadge variant="light" className="shadow-[0_2px_12px_rgba(0,0,0,0.4)]" />
-
-                {/* Phone number, bold, pure white, tel: link */}
-                <a
-                  href="tel:925530647"
-                  onClick={() => trackCallClick('hero_phone_link')}
-                  className="flex items-center gap-1.5 text-white hover:text-gold transition-colors duration-150"
-                  style={{ textShadow: '0px 2px 4px rgba(0,0,0,0.80)' }}
-                >
-                  <Phone className="w-3.5 h-3.5 text-gold animate-phone-shake flex-shrink-0" strokeWidth={2.5} />
-                  <span className="text-sm font-bold tracking-wide">925 530 647</span>
-                </a>
               </div>
             </div>
 
-            {/* ── Slide dots ── */}
-            <div className="flex items-center gap-2 mt-6">
-              {SLIDES.map((_, i) => (
-                <button
-                  key={i}
-                  onClick={() => goTo(i)}
-                  aria-label={`Slide ${i + 1}`}
-                  className="transition-all duration-300 rounded-full focus:outline-none"
-                  style={{
-                    width:  i === current ? '24px' : '8px',
-                    height: '8px',
-                    background: i === current ? '#C9A84C' : 'rgba(255,255,255,0.35)',
-                  }}
-                />
-              ))}
-              {/* Progress bar on active dot */}
-              <span className="ml-2 text-[11px] text-white/35 font-mono">
+            {/* ── Slide counter ── */}
+            <div className="mt-5">
+              <span className="text-[10px] text-white/25 font-mono tracking-widest">
                 {current + 1}/{SLIDES.length}
               </span>
             </div>
