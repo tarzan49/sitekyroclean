@@ -1,190 +1,153 @@
-﻿import { useEffect, useRef, useState } from "react";
-import { useTranslation } from "react-i18next";
-import { ShieldCheck, HandCoins, Droplets, Star } from "lucide-react";
-import QuizButton from "./QuizButton";
+import { useEffect, useRef, useState } from "react";
+import { ShieldCheck, HandCoins, Clock } from "lucide-react";
 
 const steps = [
   {
     number: "01",
-    titleKey: "howItWorks.step1.title",
-    titleFallback: "Peça orçamento",
-    descKey: "howItWorks.step1.description",
-    descFallback: "Quiz em 30 segundos. Preço imediato, sem compromisso.",
+    title: "Inspeção",
+    desc: "Avaliamos o tipo de tecido, manchas e grau de sujidade para selecionar o protocolo ideal.",
   },
   {
     number: "02",
-    titleKey: "howItWorks.step2.title",
-    titleFallback: "Agendamos a visita",
-    descKey: "howItWorks.step2.description",
-    descFallback: "Deslocamo-nos à sua casa na data que escolher.",
+    title: "Limpeza profunda",
+    desc: "Aplicamos produtos profissionais formulados para cada material, sem risco para o estofo.",
   },
   {
     number: "03",
-    titleKey: "howItWorks.step3.title",
-    titleFallback: "Resultados no momento",
-    descKey: "howItWorks.step3.description",
-    descFallback: "Estofos como novos no próprio dia da visita.",
+    title: "Extração",
+    desc: "Equipamento de alta pressão extrai sujidade, detergente e humidade em profundidade.",
+  },
+  {
+    number: "04",
+    title: "Secagem rápida",
+    desc: "Técnica acelerada. Os seus estofos ficam prontos a usar no próprio dia da visita.",
   },
 ];
 
 const guarantees = [
   {
     icon: ShieldCheck,
-    titleKey: "guarantee.item1.title",
-    titleFallback: "Satisfação garantida",
-    textKey: "guarantee.item1.text",
-    textFallback: "Se não ficou satisfeito, repetimos sem custos.",
+    title: "Satisfação garantida",
+    text: "Se não ficou satisfeito, repetimos sem custos.",
   },
   {
     icon: HandCoins,
-    titleKey: "guarantee.item2.title",
-    titleFallback: "Orçamento transparente",
-    textKey: "guarantee.item2.text",
-    textFallback: "O valor apresentado é o valor final. Sem surpresas.",
+    title: "Preço transparente",
+    text: "O valor apresentado é o final. Sem surpresas.",
   },
   {
-    icon: Droplets,
-    titleKey: "guarantee.item3.title",
-    titleFallback: "Proteção duradoura",
-    textKey: "guarantee.item3.text",
-    textFallback: "Impermeabilização com garantia até 10 anos.",
+    icon: Clock,
+    title: "Pontualidade",
+    text: "Chegamos na hora marcada. Sempre.",
   },
 ];
 
-const ITEM_MIN_H = "min-h-[72px]";
-
 const HowItWorks = () => {
-  const { t } = useTranslation();
-  const [isVisible, setIsVisible] = useState(false);
-  const sectionRef = useRef<HTMLDivElement>(null);
+  const [visible, setVisible] = useState(false);
+  const ref = useRef<HTMLElement>(null);
 
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => { if (entry.isIntersecting) { setIsVisible(true); observer.disconnect(); } },
+    const obs = new IntersectionObserver(
+      ([e]) => { if (e.isIntersecting) { setVisible(true); obs.disconnect(); } },
       { threshold: 0.08 }
     );
-    if (sectionRef.current) observer.observe(sectionRef.current);
-    return () => observer.disconnect();
+    if (ref.current) obs.observe(ref.current);
+    return () => obs.disconnect();
   }, []);
 
   return (
-    <section ref={sectionRef} className="overflow-hidden scroll-mt-16 bg-kyro-green">
+    <section ref={ref} className="py-20 md:py-28 bg-[#FAFAF7] scroll-mt-16 overflow-hidden">
+      <div className="max-w-7xl mx-auto px-6 md:px-10">
 
-      {/* Two columns */}
-      <div className="grid lg:grid-cols-2">
-
-        {/* LEFT: Como funciona */}
-        <div className="py-10 md:py-14 px-6 sm:px-10 lg:px-12 lg:border-r border-white/[0.06]">
-
-          {/* Header */}
-          <div className={`mb-8 transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-5'}`}>
-            <p className="text-[10px] font-bold tracking-[0.28em] uppercase mb-2.5" style={{ color: '#D4AF37' }}>
+        {/* Header */}
+        <div
+          className="mb-14 md:mb-20 transition-all duration-700"
+          style={{ opacity: visible ? 1 : 0, transform: visible ? 'translateY(0)' : 'translateY(20px)' }}
+        >
+          <div className="flex items-center gap-3 mb-5">
+            <div className="w-7 h-px bg-[#D4AF37]" />
+            <p className="text-[9px] font-semibold text-[#D4AF37] tracking-[0.35em] uppercase">
               O Nosso Processo
             </p>
-            <h2 className="font-playfair text-xl md:text-2xl font-bold text-white leading-tight">
-              {t('howItWorks.title', 'Como funciona')}
-            </h2>
           </div>
+          <h2
+            className="font-playfair font-light text-[#1A1A2E]"
+            style={{ fontSize: 'clamp(2.2rem, 4.5vw, 4rem)', lineHeight: 1.08, letterSpacing: '-0.02em' }}
+          >
+            Quatro passos.<br />
+            <em style={{ fontStyle: 'italic', color: '#1A4E30' }}>Resultados no próprio dia.</em>
+          </h2>
+        </div>
 
-          {/* Steps */}
-          <div>
+        {/* Steps */}
+        <div className="relative mb-20 md:mb-24">
+          {/* Horizontal connector line (desktop only) — sits at center of step boxes */}
+          <div
+            className="hidden md:block absolute left-0 right-0 h-px bg-[#1A1A2E]/8"
+            style={{ top: '1.5rem' }}
+          />
+
+          <div className="grid md:grid-cols-4 gap-10 md:gap-6">
             {steps.map((step, i) => (
               <div
                 key={i}
-                className={`flex gap-4 ${ITEM_MIN_H} transition-all duration-500 ${isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-5'}`}
-                style={{ transitionDelay: `${(i + 1) * 120}ms` }}
+                className="transition-all duration-700"
+                style={{
+                  opacity: visible ? 1 : 0,
+                  transform: visible ? 'translateY(0)' : 'translateY(24px)',
+                  transitionDelay: `${100 + i * 120}ms`,
+                }}
               >
-                <div className="flex flex-col items-center flex-shrink-0">
-                  <div
-                    className="w-8 h-8 rounded-full flex items-center justify-center border flex-shrink-0"
-                    style={{ borderColor: 'rgba(255,255,255,0.18)', background: 'rgba(255,255,255,0.06)' }}
-                  >
-                    <span className="font-mono text-[10px] font-bold text-white/50">{step.number}</span>
+                {/* Step box — sits on the connector line */}
+                <div className="relative z-10 mb-6">
+                  <div className="inline-flex items-center justify-center w-12 h-12 bg-[#FAFAF7] border border-[#1A1A2E]/10">
+                    <span className="font-playfair font-light text-[#1A4E30] text-lg leading-none">{step.number}</span>
                   </div>
-                  {i < steps.length - 1 && (
-                    <div
-                      className="w-px flex-1 mt-1.5 mb-1.5 min-h-[1rem]"
-                      style={{ background: 'linear-gradient(to bottom, rgba(255,255,255,0.15), transparent)' }}
-                    />
-                  )}
                 </div>
-                <div className="pb-5 last:pb-0">
-                  <h3 className="font-playfair text-sm md:text-base font-bold text-white mb-1 leading-snug">
-                    {t(step.titleKey, step.titleFallback)}
-                  </h3>
-                  <p className="text-white/50 text-[13px] leading-relaxed">
-                    {t(step.descKey, step.descFallback)}
-                  </p>
-                </div>
+
+                <h3
+                  className="font-playfair font-normal text-[#1A1A2E] mb-2"
+                  style={{ fontSize: 'clamp(1.05rem, 1.4vw, 1.2rem)', letterSpacing: '-0.01em' }}
+                >
+                  {step.title}
+                </h3>
+                <p className="text-[#1A1A2E]/45 leading-relaxed text-sm" style={{ fontWeight: 300 }}>
+                  {step.desc}
+                </p>
               </div>
             ))}
           </div>
         </div>
 
-        {/* RIGHT: Qualidade garantida */}
-        <div className="py-10 md:py-14 px-6 sm:px-10 lg:px-12">
-
-          {/* Header */}
-          <div className={`mb-8 transition-all duration-700 delay-150 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-5'}`}>
-            <p className="text-[10px] font-bold tracking-[0.28em] uppercase mb-2.5" style={{ color: '#D4AF37' }}>
-              A Nossa Promessa
-            </p>
-            <h2 className="font-playfair text-xl md:text-2xl font-bold text-white leading-tight">
-              Qualidade garantida
-            </h2>
-          </div>
-
-          {/* Guarantees */}
-          <div>
-            {guarantees.map((item, i) => {
-              const Icon = item.icon;
-              return (
-                <div key={i}>
-                  <div
-                    className={`flex items-start gap-3.5 ${ITEM_MIN_H} transition-all duration-500 ${isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-5'}`}
-                    style={{ transitionDelay: `${300 + i * 120}ms` }}
-                  >
-                    <div className="w-8 h-8 rounded-lg bg-gold/10 border border-gold/20 flex items-center justify-center flex-shrink-0 mt-0.5">
-                      <Icon className="w-3.5 h-3.5 text-gold" strokeWidth={1.5} />
-                    </div>
-                    <div className="pb-5">
-                      <h3 className="font-playfair font-semibold text-white text-[13px] md:text-sm mb-0.5">
-                        {t(item.titleKey, item.titleFallback)}
-                      </h3>
-                      <p className="text-white/45 text-[12px] md:text-[13px] leading-relaxed">
-                        {t(item.textKey, item.textFallback)}
-                      </p>
-                    </div>
-                  </div>
-                  {i < guarantees.length - 1 && (
-                    <div className="h-px bg-gradient-to-r from-transparent via-gold/12 to-transparent mb-0" />
-                  )}
+        {/* Guarantees */}
+        <div
+          className="border-t border-[#1A1A2E]/6 pt-14 grid md:grid-cols-3 gap-8 md:gap-12 transition-all duration-700"
+          style={{ opacity: visible ? 1 : 0, transitionDelay: '580ms' }}
+        >
+          {guarantees.map((g, i) => {
+            const Icon = g.icon;
+            return (
+              <div key={i} className="flex items-start gap-4">
+                <div className="w-9 h-9 border border-[#1A1A2E]/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <Icon className="w-4 h-4 text-[#1A4E30]" strokeWidth={1.5} />
                 </div>
-              );
-            })}
-          </div>
-
+                <div>
+                  <p
+                    className="font-playfair font-normal text-[#1A1A2E] mb-1"
+                    style={{ fontSize: '1rem', letterSpacing: '-0.01em' }}
+                  >
+                    {g.title}
+                  </p>
+                  <p className="text-[#1A1A2E]/40 text-sm leading-relaxed" style={{ fontWeight: 300 }}>
+                    {g.text}
+                  </p>
+                </div>
+              </div>
+            );
+          })}
         </div>
-      </div>
 
-      {/* Bottom strip, full width, centered */}
-      <div
-        className={`border-t border-white/[0.06] py-5 px-6 flex flex-col items-center gap-4 transition-all duration-700 ${isVisible ? 'opacity-100' : 'opacity-0'}`}
-        style={{ transitionDelay: '600ms' }}
-      >
-        <QuizButton />
-        <div className="flex items-center gap-3">
-          <div className="flex gap-0.5">
-            {[...Array(5)].map((_, i) => (
-              <Star key={i} className="w-3.5 h-3.5 fill-gold text-gold" />
-            ))}
-          </div>
-          <span className="text-white font-bold text-sm">5.0</span>
-          <div className="w-px h-4 bg-white/20" />
-          <span className="text-white/45 text-[12px]">+50 avaliações no Google</span>
-        </div>
       </div>
-
     </section>
   );
 };

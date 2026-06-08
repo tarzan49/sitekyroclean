@@ -26,12 +26,12 @@ const REVIEWS = [
   {
     name: "Francisco Peixoto",
     initial: "F",
-    text: "Limpeza e serviço impecável! Achei o estilo do vídeo antes e depois muito criativo também, dá a entender que sabem o que fazem 🙌🏻",
+    text: "Limpeza e serviço impecável! Achei o estilo do vídeo antes e depois muito criativo também, dá a entender que sabem o que fazem.",
   },
   {
     name: "Lumiere Restaurante",
     initial: "L",
-    text: "Somos um restaurante que prima pela qualidade e gostamos de contratar empresas de excelência com o mesmo reflexo! São eles que tornam o nosso ambiente mais limpo e charmoso! Recomendo 5⭐️",
+    text: "Somos um restaurante que prima pela qualidade e gostamos de contratar empresas de excelência com o mesmo reflexo! São eles que tornam o nosso ambiente mais limpo e charmoso! Recomendo.",
   },
   {
     name: "Jaime Guimarães",
@@ -52,22 +52,19 @@ const REVIEWS = [
 
 const Testimonials = () => {
   const [isVisible, setIsVisible] = useState(false);
-  const sectionRef = useRef<HTMLDivElement>(null);
+  const sectionRef = useRef<HTMLElement>(null);
   const [selectedIndex, setSelectedIndex] = useState(0);
 
   const [emblaRef, emblaApi] = useEmblaCarousel({
     loop: true,
     align: "start",
     slidesToScroll: 1,
-    breakpoints: {
-      "(min-width: 768px)": { slidesToScroll: 1 },
-    },
   });
 
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => { if (entry.isIntersecting) { setIsVisible(true); observer.disconnect(); } },
-      { threshold: 0.1 }
+      { threshold: 0.08 }
     );
     if (sectionRef.current) observer.observe(sectionRef.current);
     return () => observer.disconnect();
@@ -86,52 +83,64 @@ const Testimonials = () => {
 
   useEffect(() => {
     if (!emblaApi) return;
-    const timer = setInterval(() => emblaApi.scrollNext(), 3000);
+    const timer = setInterval(() => emblaApi.scrollNext(), 3500);
     return () => clearInterval(timer);
   }, [emblaApi]);
 
   return (
-    <section ref={sectionRef} className="py-24 bg-[#FDFDF9] overflow-hidden">
-      <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
+    <section ref={sectionRef} className="py-20 md:py-28 bg-[#FAFAF7] overflow-hidden">
+      <div className="max-w-7xl mx-auto px-6 md:px-10">
 
         {/* Header */}
-        <div className={`text-center mb-10 md:mb-14 transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-5'}`}>
-          <p className="text-[11px] font-semibold tracking-[0.28em] uppercase mb-3" style={{ color: '#D4AF37' }}>
-            O Que Dizem os Clientes
-          </p>
-          <h2 className="font-playfair text-2xl md:text-4xl font-bold text-[#1A1A2E] leading-[1.3]">
-            A confiança das famílias portuguesas
+        <div
+          className="mb-12 md:mb-16 transition-all duration-700"
+          style={{ opacity: isVisible ? 1 : 0, transform: isVisible ? 'translateY(0)' : 'translateY(20px)' }}
+        >
+          <div className="flex items-center gap-3 mb-5">
+            <div className="w-7 h-px bg-[#D4AF37]" />
+            <p className="text-[9px] font-semibold text-[#D4AF37] tracking-[0.35em] uppercase">
+              O Que Dizem os Clientes
+            </p>
+          </div>
+          <h2
+            className="font-playfair font-light text-[#1A1A2E]"
+            style={{ fontSize: 'clamp(2.2rem, 4.5vw, 4rem)', lineHeight: 1.08, letterSpacing: '-0.02em' }}
+          >
+            A confiança das<br />
+            <em style={{ fontStyle: 'italic', color: '#1A4E30' }}>famílias portuguesas.</em>
           </h2>
-          <div className="w-10 h-px mx-auto mt-5" style={{ backgroundColor: '#D4AF37', opacity: 0.5 }} />
         </div>
 
         {/* Carousel */}
-        <div className={`transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}>
+        <div
+          className="transition-all duration-700"
+          style={{ opacity: isVisible ? 1 : 0, transform: isVisible ? 'translateY(0)' : 'translateY(24px)', transitionDelay: '150ms' }}
+        >
           <div className="overflow-hidden" ref={emblaRef}>
-            <div className="flex gap-5 md:gap-7">
+            <div className="flex gap-4 md:gap-5">
               {REVIEWS.map((review, i) => (
                 <div
                   key={i}
-                  className="flex-none w-[85vw] md:w-[calc((100%-56px)/3)] flex flex-col gap-4 bg-[#FAFAF8] rounded-2xl p-6 md:p-7 border border-[#E8E4DE] shadow-sm min-h-[240px] md:min-h-[260px]"
+                  className="flex-none w-[82vw] md:w-[calc((100%-40px)/3)] flex flex-col gap-4 bg-white p-6 md:p-7 border border-[#1A1A2E]/6 min-h-[240px] md:min-h-[260px]"
                 >
                   {/* Stars */}
                   <div className="flex gap-0.5">
                     {[...Array(5)].map((_, s) => (
-                      <Star key={s} className="w-3.5 h-3.5 fill-[#D4AF37] text-[#D4AF37]" />
+                      <Star key={s} className="w-3 h-3 fill-[#D4AF37] text-[#D4AF37]" />
                     ))}
                   </div>
 
-                  {/* Text */}
-                  <p className="text-sm md:text-[15px] text-[#1A1A2E]/75 leading-relaxed flex-1">
+                  {/* Quote */}
+                  <p className="text-sm text-[#1A1A2E]/55 leading-relaxed flex-1" style={{ fontWeight: 300 }}>
                     "{review.text}"
                   </p>
 
                   {/* Author */}
-                  <div className="flex items-center gap-3 pt-3 border-t border-[#E8E4DE]">
-                    <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#0d3c47] to-[#1a5c6e] flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
+                  <div className="flex items-center gap-3 pt-4 border-t border-[#1A1A2E]/6">
+                    <div className="w-8 h-8 bg-[#1A4E30] flex items-center justify-center text-white text-[11px] font-medium flex-shrink-0">
                       {review.initial}
                     </div>
-                    <p className="text-sm font-semibold text-[#1A1A2E]">{review.name}</p>
+                    <p className="text-[12px] font-medium text-[#1A1A2E] tracking-wide">{review.name}</p>
                   </div>
                 </div>
               ))}
@@ -139,37 +148,40 @@ const Testimonials = () => {
           </div>
 
           {/* Controls */}
-          <div className="flex items-center justify-center gap-4 mt-8">
-            {/* Prev */}
+          <div className="flex items-center gap-4 mt-8">
             <button
               onClick={() => emblaApi?.scrollPrev()}
-              className="w-9 h-9 rounded-full border border-[#E8E4DE] bg-white flex items-center justify-center text-[#1A1A2E]/50 hover:text-[#1A1A2E] hover:border-[#D4AF37]/50 transition-all duration-200 flex-shrink-0"
+              className="w-9 h-9 border border-[#1A1A2E]/10 bg-white flex items-center justify-center text-[#1A1A2E]/35 hover:text-[#1A1A2E] hover:border-[#1A1A2E]/20 transition-all duration-200 flex-shrink-0"
               aria-label="Anterior"
             >
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                 <path d="m15 18-6-6 6-6"/>
               </svg>
             </button>
 
-            {/* Dots */}
-            <div className="flex gap-1.5">
+            {/* Dash indicators */}
+            <div className="flex gap-1.5 items-center">
               {REVIEWS.map((_, i) => (
                 <button
                   key={i}
                   onClick={() => emblaApi?.scrollTo(i)}
-                  className={`rounded-full transition-all duration-200 ${selectedIndex === i ? 'w-[5px] h-[2px] bg-[#D4AF37]' : 'w-[2px] h-[2px] bg-[#1A1A2E]/20 hover:bg-[#1A1A2E]/40'}`}
+                  className="transition-all duration-300"
+                  style={{
+                    width: selectedIndex === i ? '20px' : '4px',
+                    height: '1px',
+                    backgroundColor: selectedIndex === i ? '#D4AF37' : 'rgba(26,26,46,0.15)',
+                  }}
                   aria-label={`Ir para avaliação ${i + 1}`}
                 />
               ))}
             </div>
 
-            {/* Next */}
             <button
               onClick={() => emblaApi?.scrollNext()}
-              className="w-9 h-9 rounded-full border border-[#E8E4DE] bg-white flex items-center justify-center text-[#1A1A2E]/50 hover:text-[#1A1A2E] hover:border-[#D4AF37]/50 transition-all duration-200 flex-shrink-0"
+              className="w-9 h-9 border border-[#1A1A2E]/10 bg-white flex items-center justify-center text-[#1A1A2E]/35 hover:text-[#1A1A2E] hover:border-[#1A1A2E]/20 transition-all duration-200 flex-shrink-0"
               aria-label="Próximo"
             >
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                 <path d="m9 18 6-6-6-6"/>
               </svg>
             </button>
