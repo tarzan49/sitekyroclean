@@ -95,16 +95,148 @@ const Header = ({ onOpenQuiz }: HeaderProps) => {
     <header
       className="fixed top-0 left-0 right-0 z-50 bg-white shadow-sm"
     >
-      {/* Main Navigation - Velour Garments Style */}
       <div className="container mx-auto px-4 h-14 md:h-16 flex items-center justify-between">
-        
-        {/* LEFT: Menu Button (Mobile) / Nav (Desktop) */}
-        <div className="flex items-center">
-          {/* Mobile Menu Trigger - Clean hamburger */}
+
+        {/* LEFT: Logo (always) */}
+        <Link
+          to="/"
+          onClick={(e) => {
+            if (location.pathname === "/") {
+              e.preventDefault();
+              window.scrollTo({ top: 0, behavior: "smooth" });
+            }
+          }}
+          className="flex items-center flex-shrink-0"
+        >
+          <img
+            src={kyroLogo}
+            alt="Kyro Clean Solutions"
+            width={40}
+            height={40}
+            className="h-8 md:h-10 w-auto object-contain"
+            loading="eager"
+            decoding="async"
+            fetchPriority="high"
+          />
+        </Link>
+
+        {/* CENTER: Desktop nav (absolute so it doesn't push the CTAs) */}
+        <nav className="hidden md:flex items-center gap-6 absolute left-1/2 -translate-x-1/2">
+          {navLinks.map((link, index) => (
+            link.type === 'home' ? (
+              <button
+                key={index}
+                onClick={scrollToTop}
+                className={`relative text-sm font-medium transition-colors tracking-wide ${
+                  isHomePage ? 'text-[#0d3c47]' : 'text-[#0d3c47]/70 hover:text-[#0d3c47]'
+                }`}
+              >
+                {link.label}
+                {isHomePage && <span className="absolute left-0 -bottom-1 h-0.5 w-full bg-[#beb47d]" />}
+              </button>
+            ) : link.type === 'services' ? (
+              <HoverCard key={index} openDelay={0} closeDelay={100}>
+                <HoverCardTrigger asChild>
+                  <Link
+                    to="/#servicos"
+                    onClick={(e) => { e.preventDefault(); scrollToSection('servicos'); }}
+                    className={`relative text-sm font-medium transition-colors tracking-wide flex items-center gap-1 ${
+                      isServicePage ? 'text-[#0d3c47]' : 'text-[#0d3c47]/70 hover:text-[#0d3c47]'
+                    }`}
+                  >
+                    {link.label}
+                    <ChevronDown className="h-3 w-3" />
+                    {isServicePage && <span className="absolute left-0 -bottom-1 h-0.5 w-full bg-[#beb47d]" />}
+                  </Link>
+                </HoverCardTrigger>
+                <HoverCardContent className="w-48 p-2" align="start">
+                  <div className="flex flex-col gap-1">
+                    {serviceLinks.map((service) => (
+                      <Link
+                        key={service.to}
+                        to={service.to}
+                        className={`text-sm px-3 py-2 rounded-md transition-colors ${
+                          location.pathname === service.to
+                            ? 'bg-[#beb47d]/20 text-[#0d3c47] font-medium'
+                            : 'text-[#0d3c47]/80 hover:bg-[#0d3c47]/5 hover:text-[#0d3c47]'
+                        }`}
+                      >
+                        {service.label}
+                      </Link>
+                    ))}
+                  </div>
+                </HoverCardContent>
+              </HoverCard>
+            ) : link.type === 'anchor' ? (
+              <button
+                key={index}
+                onClick={() => scrollToSection(link.anchor)}
+                className="relative text-sm font-medium transition-colors tracking-wide text-[#0d3c47]/70 hover:text-[#0d3c47]"
+              >
+                {link.label}
+              </button>
+            ) : link.mobileOnly ? null : (
+              <Link
+                key={index}
+                to={link.to}
+                className={`relative text-sm font-medium transition-colors tracking-wide ${
+                  location.pathname === link.to ? 'text-[#0d3c47]' : 'text-[#0d3c47]/70 hover:text-[#0d3c47]'
+                }`}
+              >
+                {link.label}
+                {location.pathname === link.to && (
+                  <span className="absolute left-0 -bottom-1 h-0.5 w-full bg-[#beb47d]" />
+                )}
+              </Link>
+            )
+          ))}
+        </nav>
+
+        {/* RIGHT: Desktop CTAs + Mobile hamburger */}
+        <div className="flex items-center gap-3">
+          {/* Desktop CTA — Quiz (gold) */}
+          <div className="relative group hidden md:block">
+            <div className="absolute -inset-1.5 rounded-full bg-gradient-to-r from-[#C9A84C]/50 to-[#E8D070]/40 opacity-30 blur-lg group-hover:opacity-55 transition-opacity duration-400 pointer-events-none" />
+            <button
+              onClick={openQuiz}
+              className={[
+                'relative rounded-full font-bold text-[#12121e] touch-manipulation',
+                'px-5 py-2 text-sm',
+                'bg-gradient-to-r from-[#C9A84C] via-[#EDD96A] to-[#C9A84C]',
+                'shadow-[0_6px_22px_rgba(201,168,76,0.42),0_2px_6px_rgba(0,0,0,0.28),inset_0_1px_0_rgba(255,255,255,0.32),inset_0_-2px_0_rgba(0,0,0,0.12)]',
+                'hover:shadow-[0_10px_32px_rgba(201,168,76,0.60),0_4px_10px_rgba(0,0,0,0.32),inset_0_1px_0_rgba(255,255,255,0.36)]',
+                'hover:scale-[1.025] active:scale-[0.95]',
+                'active:shadow-[0_2px_8px_rgba(201,168,76,0.30),inset_0_2px_4px_rgba(0,0,0,0.18)]',
+                'transition-all duration-150',
+              ].join(' ')}
+            >
+              <span className="tracking-wide">{t('hero.newYear.ctaPrimary', 'Pedir orçamento rápido')}</span>
+            </button>
+          </div>
+
+          {/* Desktop CTA — WhatsApp (green) */}
+          <a
+            href={`https://wa.me/351925530647?text=${encodeURIComponent('Olá! Gostaria de pedir um orçamento para limpeza de estofos.')}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={[
+              'hidden md:flex items-center gap-1.5 rounded-full font-bold text-white touch-manipulation',
+              'px-4 py-2 text-sm',
+              'bg-[#25D366]',
+              'shadow-[0_3px_12px_rgba(37,211,102,0.35),0_1px_4px_rgba(0,0,0,0.15)]',
+              'hover:shadow-[0_5px_18px_rgba(37,211,102,0.52)] hover:scale-[1.025]',
+              'active:scale-[0.95] transition-all duration-150',
+            ].join(' ')}
+          >
+            <MessageCircle className="w-3.5 h-3.5 flex-shrink-0" strokeWidth={2} />
+            <span className="tracking-wide">WhatsApp</span>
+          </a>
+
+          {/* Mobile hamburger (RIGHT side) */}
           <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
             <SheetTrigger asChild className="md:hidden">
               <button
-                className="flex flex-col justify-center items-center w-12 h-12 -ml-2"
+                className="flex flex-col justify-center items-center w-10 h-10 -mr-1"
                 aria-label="Menu"
               >
                 <span className="block w-5 h-[1.5px] bg-[#0d3c47] mb-1"></span>
@@ -220,151 +352,6 @@ const Header = ({ onOpenQuiz }: HeaderProps) => {
               </div>
             </SheetContent>
           </Sheet>
-
-          {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center gap-6 ml-8">
-            {navLinks.map((link, index) => (
-              link.type === 'home' ? (
-                <button 
-                  key={index}
-                  onClick={scrollToTop} 
-                  className={`relative text-sm font-medium transition-colors tracking-wide ${
-                    isHomePage ? 'text-[#0d3c47]' : 'text-[#0d3c47]/70 hover:text-[#0d3c47]'
-                  }`}
-                >
-                  {link.label}
-                  {isHomePage && (
-                    <span className="absolute left-0 -bottom-1 h-0.5 w-full bg-[#beb47d]" />
-                  )}
-                </button>
-              ) : link.type === 'services' ? (
-                <HoverCard openDelay={0} closeDelay={100}>
-                  <HoverCardTrigger asChild>
-                    <Link 
-                      to="/#servicos"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        scrollToSection('servicos');
-                      }}
-                      className={`relative text-sm font-medium transition-colors tracking-wide flex items-center gap-1 ${
-                        isServicePage ? 'text-[#0d3c47]' : 'text-[#0d3c47]/70 hover:text-[#0d3c47]'
-                      }`}
-                    >
-                      {link.label}
-                      <ChevronDown className="h-3 w-3" />
-                      {isServicePage && (
-                        <span className="absolute left-0 -bottom-1 h-0.5 w-full bg-[#beb47d]" />
-                      )}
-                    </Link>
-                  </HoverCardTrigger>
-                  <HoverCardContent className="w-48 p-2" align="start">
-                    <div className="flex flex-col gap-1">
-                      {serviceLinks.map((service) => (
-                        <Link
-                          key={service.to}
-                          to={service.to}
-                          className={`text-sm px-3 py-2 rounded-md transition-colors ${
-                            location.pathname === service.to 
-                              ? 'bg-[#beb47d]/20 text-[#0d3c47] font-medium' 
-                              : 'text-[#0d3c47]/80 hover:bg-[#0d3c47]/5 hover:text-[#0d3c47]'
-                          }`}
-                        >
-                          {service.label}
-                        </Link>
-                      ))}
-                    </div>
-                  </HoverCardContent>
-                </HoverCard>
-              ) : link.type === 'anchor' ? (
-                <button
-                  key={index}
-                  onClick={() => scrollToSection(link.anchor)}
-                  className="relative text-sm font-medium transition-colors tracking-wide text-[#0d3c47]/70 hover:text-[#0d3c47]"
-                >
-                  {link.label}
-                </button>
-              ) : link.mobileOnly ? null : (
-                <Link
-                  key={index}
-                  to={link.to}
-                  className={`relative text-sm font-medium transition-colors tracking-wide ${
-                    location.pathname === link.to ? 'text-[#0d3c47]' : 'text-[#0d3c47]/70 hover:text-[#0d3c47]'
-                  }`}
-                >
-                  {link.label}
-                  {location.pathname === link.to && (
-                    <span className="absolute left-0 -bottom-1 h-0.5 w-full bg-[#beb47d]" />
-                  )}
-                </Link>
-              )
-            ))}
-          </nav>
-        </div>
-
-        {/* CENTER: Logo */}
-        <Link 
-          to="/" 
-          onClick={(e) => {
-            if (location.pathname === "/") {
-              e.preventDefault();
-              window.scrollTo({ top: 0, behavior: "smooth" });
-            }
-          }}
-          className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center"
-        >
-          <img 
-            src={kyroLogo} 
-            alt="Kyro Clean Solutions Logo"
-            width={40}
-            height={40}
-            className="h-8 md:h-10 w-auto object-contain"
-            loading="eager" 
-            decoding="async" 
-            fetchPriority="high" 
-          />
-        </Link>
-
-        {/* RIGHT: CTA + Language Selector */}
-        <div className="flex items-center gap-3">
-          {/* Desktop CTA — Quiz (gold) */}
-          <div className="relative group hidden md:block">
-            <div className="absolute -inset-1.5 rounded-full bg-gradient-to-r from-[#C9A84C]/50 to-[#E8D070]/40 opacity-30 blur-lg group-hover:opacity-55 transition-opacity duration-400 pointer-events-none" />
-            <button
-              onClick={openQuiz}
-              className={[
-                'relative rounded-full font-bold text-[#12121e] touch-manipulation',
-                'px-5 py-2 text-sm',
-                'bg-gradient-to-r from-[#C9A84C] via-[#EDD96A] to-[#C9A84C]',
-                'shadow-[0_6px_22px_rgba(201,168,76,0.42),0_2px_6px_rgba(0,0,0,0.28),inset_0_1px_0_rgba(255,255,255,0.32),inset_0_-2px_0_rgba(0,0,0,0.12)]',
-                'hover:shadow-[0_10px_32px_rgba(201,168,76,0.60),0_4px_10px_rgba(0,0,0,0.32),inset_0_1px_0_rgba(255,255,255,0.36)]',
-                'hover:scale-[1.025] active:scale-[0.95]',
-                'active:shadow-[0_2px_8px_rgba(201,168,76,0.30),inset_0_2px_4px_rgba(0,0,0,0.18)]',
-                'transition-all duration-150',
-              ].join(' ')}
-            >
-              <span className="tracking-wide">{t('hero.newYear.ctaPrimary', 'Pedir orçamento rápido')}</span>
-            </button>
-          </div>
-
-          {/* Desktop CTA — WhatsApp (green) */}
-          <a
-            href={`https://wa.me/351925530647?text=${encodeURIComponent('Olá! Gostaria de pedir um orçamento para limpeza de estofos.')}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className={[
-              'hidden md:flex items-center gap-1.5 rounded-full font-bold text-white touch-manipulation',
-              'px-4 py-2 text-sm',
-              'bg-[#25D366]',
-              'shadow-[0_3px_12px_rgba(37,211,102,0.35),0_1px_4px_rgba(0,0,0,0.15)]',
-              'hover:shadow-[0_5px_18px_rgba(37,211,102,0.52)] hover:scale-[1.025]',
-              'active:scale-[0.95] transition-all duration-150',
-            ].join(' ')}
-          >
-            <MessageCircle className="w-3.5 h-3.5 flex-shrink-0" strokeWidth={2} />
-            <span className="tracking-wide">WhatsApp</span>
-          </a>
-
-
         </div>
       </div>
     </header>
