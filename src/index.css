@@ -55,7 +55,7 @@
     --muted: 140 15% 95%;          /* very light green-tinted muted            */
     --muted-foreground: 240 12% 42%;
 
-    --accent: 46 65% 52%;          /* Gold — same as --gold                    */
+    --accent: 47 50% 53%;          /* Gold — same as --gold                    */
     --accent-foreground: 240 15% 15%;
 
     --destructive: 0 84.2% 60.2%;
@@ -63,7 +63,7 @@
 
     --border: 140 15% 88%;         /* soft green-tinted border                 */
     --input: 140 15% 88%;
-    --ring: 46 65% 52%;            /* gold focus ring                          */
+    --ring: 47 50% 53%;            /* gold focus ring                          */
 
     /* Exposed as RGB for rgba() usage in JS/inline styles */
     --brand-border-rgb: 26 78 48;
@@ -73,8 +73,8 @@
     /* Premium Brand Colors */
     --teal: 172 40% 18%;
     --teal-dark: 172 45% 14%;
-    --gold: 46 65% 52%;
-    --gold-light: 46 72% 62%;
+    --gold: 47 50% 53%;
+    --gold-light: 47 55% 60%;
     --navy: 190 45% 15%;
     --turquoise: 172 40% 18%;
     --forest-green: 140 50% 20%;   /* #1A4E30 — Forest Green principal         */
@@ -103,31 +103,27 @@
 
   body {
     @apply bg-background text-foreground;
-    font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+    font-family: 'Inter', system-ui, sans-serif;
     -webkit-tap-highlight-color: transparent;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
 
-  /* Kyro Typography System
-     h1 hero display → Cormorant Garamond (via font-cormorant class)
-     h2/h3 section headings → DM Serif Display (via font-playfair class, 221 instances)
-     body/UI → Plus Jakarta Sans
-  */
+  /* Kyro Typography System — Cormorant Garamond for editorial premium feel */
   h1, h2 {
-    font-family: 'DM Serif Display', Georgia, serif;
+    font-family: 'Cormorant Garamond', Georgia, serif;
     line-height: 1.1;
     letter-spacing: -0.01em;
   }
 
   h3 {
-    font-family: 'DM Serif Display', Georgia, serif;
+    font-family: 'Cormorant Garamond', Georgia, serif;
     line-height: 1.2;
     letter-spacing: -0.005em;
   }
 
   h4, h5, h6 {
-    font-family: 'DM Serif Display', Georgia, serif;
+    font-family: 'Cormorant Garamond', Georgia, serif;
   }
 
   /* Better touch targets on mobile - minimum 44px for accessibility */
@@ -180,26 +176,26 @@ body,
 
 /* Premium Typography */
 @layer utilities {
-  /* Editorial headline — Cormorant for hero/display moments */
+  /* Editorial headline — Cormorant 300, very large, tight leading */
   .heading-editorial {
     font-family: 'Cormorant Garamond', Georgia, serif;
-    font-weight: 600;
+    font-weight: 300;
     line-height: 1.05;
     letter-spacing: -0.02em;
   }
 
-  /* Refined headline — DM Serif Display for section headings */
+  /* Refined headline — Cormorant 400, slightly less dramatic */
   .heading-refined {
-    font-family: 'DM Serif Display', Georgia, serif;
+    font-family: 'Cormorant Garamond', Georgia, serif;
     font-weight: 400;
     line-height: 1.1;
-    letter-spacing: -0.01em;
+    letter-spacing: -0.015em;
   }
 
-  /* Label above headings — Plus Jakarta Sans small caps style */
+  /* Label above headings — Inter small caps style */
   .label-overline {
-    font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
-    font-weight: 600;
+    font-family: 'Inter', system-ui, sans-serif;
+    font-weight: 500;
     font-size: 0.65rem;
     letter-spacing: 0.22em;
     text-transform: uppercase;
@@ -207,7 +203,7 @@ body,
 
   .text-premium-title {
     @apply text-4xl md:text-5xl lg:text-6xl leading-tight tracking-tight;
-    font-family: 'DM Serif Display', Georgia, serif;
+    font-family: 'Cormorant Garamond', Georgia, serif;
     font-weight: 400;
   }
 

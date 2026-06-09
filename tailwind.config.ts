@@ -14,9 +14,8 @@ export default {
     },
     extend: {
       fontFamily: {
-        'playfair':  ['DM Serif Display', 'Georgia', 'serif'],
-        'cormorant': ['Cormorant Garamond', 'Georgia', 'serif'],
-        'sans':      ['Plus Jakarta Sans', 'system-ui', 'sans-serif'],
+        'playfair': ['Cormorant Garamond', 'Georgia', 'serif'],
+        'sans': ['Inter', 'system-ui', 'sans-serif'],
       },
       colors: {
         border: "hsl(var(--border))",
