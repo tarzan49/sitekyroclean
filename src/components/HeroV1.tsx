@@ -156,7 +156,7 @@ const Hero = () => {
                 <button
                   onClick={handleOpenQuiz}
                   className={[
-                    'relative w-full rounded-full font-bold text-[#12121e] touch-manipulation',
+                    'relative w-full font-bold text-[#12121e] touch-manipulation',
                     'h-[58px] md:h-[52px] px-8 text-base md:text-[17px]',
                     'bg-gradient-to-r from-[#C9A84C] via-[#EDD96A] to-[#C9A84C]',
                     'shadow-[0_6px_22px_rgba(201,168,76,0.42),0_2px_6px_rgba(0,0,0,0.28),inset_0_1px_0_rgba(255,255,255,0.32),inset_0_-2px_0_rgba(0,0,0,0.12)]',
@@ -166,7 +166,7 @@ const Hero = () => {
                     'transition-all duration-150',
                   ].join(' ')}
                 >
-                  <span className="tracking-wide">Calcular o meu preço</span>
+                  <span className="text-[13px] font-semibold tracking-[0.18em] uppercase">Calcular o meu preço</span>
                 </button>
               </div>
 
@@ -179,7 +179,7 @@ const Hero = () => {
                   rel="noopener noreferrer"
                   onClick={() => trackWhatsAppClick('hero')}
                   className={[
-                    'relative flex items-center justify-center gap-2 w-full rounded-full font-bold text-white touch-manipulation',
+                    'relative flex items-center justify-center gap-2 w-full font-bold text-white touch-manipulation',
                     'h-[58px] md:h-[52px] px-8 text-base md:text-[17px]',
                     'bg-gradient-to-r from-[#1DA851] via-[#25D366] to-[#1DA851]',
                     'shadow-[0_6px_22px_rgba(37,211,102,0.42),0_2px_6px_rgba(0,0,0,0.28),inset_0_1px_0_rgba(255,255,255,0.20),inset_0_-2px_0_rgba(0,0,0,0.12)]',
@@ -190,7 +190,7 @@ const Hero = () => {
                   ].join(' ')}
                 >
                   <MessageCircle className="w-[18px] h-[18px] text-white flex-shrink-0" strokeWidth={2} />
-                  <span className="tracking-wide">Falar por WhatsApp</span>
+                  <span className="text-[13px] font-semibold tracking-[0.18em] uppercase">Falar por WhatsApp</span>
                 </a>
               </div>
 

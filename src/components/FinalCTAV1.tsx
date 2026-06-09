@@ -25,12 +25,12 @@ const FinalCTA = () => {
 
             {/* CTA Button */}
             <div className="relative group w-full sm:w-auto">
-              <div className="absolute -inset-1.5 rounded-full bg-gradient-to-r from-[#C9A84C]/50 to-[#E8D070]/40 opacity-30 blur-lg group-hover:opacity-55 transition-opacity duration-400 pointer-events-none" />
+              <div className="absolute -inset-1.5 bg-gradient-to-r from-[#C9A84C]/50 to-[#E8D070]/40 opacity-30 blur-lg group-hover:opacity-55 transition-opacity duration-400 pointer-events-none" />
               <button
                 onClick={openQuiz}
                 className={[
-                  'relative w-full sm:w-auto rounded-full font-bold text-[#12121e] touch-manipulation',
-                  'px-8 py-3 text-sm',
+                  'relative w-full sm:w-auto font-bold text-[#12121e] touch-manipulation',
+                  'px-8 py-3',
                   'bg-gradient-to-r from-[#C9A84C] via-[#EDD96A] to-[#C9A84C]',
                   'shadow-[0_6px_22px_rgba(201,168,76,0.42),0_2px_6px_rgba(0,0,0,0.28),inset_0_1px_0_rgba(255,255,255,0.32),inset_0_-2px_0_rgba(0,0,0,0.12)]',
                   'hover:shadow-[0_10px_32px_rgba(201,168,76,0.60),0_4px_10px_rgba(0,0,0,0.32),inset_0_1px_0_rgba(255,255,255,0.36)]',
@@ -39,7 +39,7 @@ const FinalCTA = () => {
                   'transition-all duration-150',
                 ].join(' ')}
               >
-                <span className="tracking-wide">{t('finalCta.ctaPrimary', 'Orçamento rápido (30 seg)')}</span>
+                <span className="text-[13px] font-semibold tracking-[0.18em] uppercase">Calcular o meu preço</span>
               </button>
             </div>
 

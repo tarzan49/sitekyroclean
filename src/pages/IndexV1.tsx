@@ -1,5 +1,5 @@
 import { lazy, Suspense } from "react";
-import HeaderV1 from "@/components/HeaderV1";
+import Header from "@/components/Header";
 import HeroV1 from "@/components/HeroV1";
 import LocalBusinessSchema from "@/components/LocalBusinessSchema";
 
@@ -24,7 +24,7 @@ const IndexV1 = () => {
 
   return (
     <div className="min-h-screen">
-      <HeaderV1 onOpenQuiz={handleOpenQuiz} />
+      <Header onOpenQuiz={handleOpenQuiz} />
       <main>
         <HeroV1 />
 

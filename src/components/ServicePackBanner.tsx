@@ -113,11 +113,11 @@ const ServicePackBanner = ({ packSlugs, city = "porto" }: Props) => {
                       href={waUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="w-full h-11 flex items-center justify-center gap-2 rounded-xl font-bold text-sm text-white transition-all active:scale-[0.98] touch-manipulation"
+                      className="w-full h-11 flex items-center justify-center gap-2 font-bold text-white transition-all active:scale-[0.98] touch-manipulation"
                       style={{ background: "#25D366", boxShadow: "0 4px 16px rgba(37,211,102,0.25)" }}
                     >
                       <MessageCircle className="w-4 h-4 flex-shrink-0" />
-                      Reservar via WhatsApp
+                      <span className="text-[13px] font-semibold tracking-[0.18em] uppercase">Falar por WhatsApp</span>
                     </a>
                     <Link
                       to={`/${pack.slug}-${city}`}

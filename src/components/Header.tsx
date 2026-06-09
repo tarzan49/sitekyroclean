@@ -92,6 +92,10 @@ const Header = ({ onOpenQuiz }: HeaderProps) => {
         {/* ── CENTER: desktop nav ── */}
         <nav className="hidden md:flex items-center gap-7 mx-auto">
 
+          <button onClick={scrollToTop} className={navItem(location.pathname === '/')}>
+            Início
+          </button>
+
           <HoverCard openDelay={0} closeDelay={80}>
             <HoverCardTrigger asChild>
               <button

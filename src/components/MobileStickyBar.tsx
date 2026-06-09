@@ -27,10 +27,10 @@ const MobileStickyBar = () => {
             target="_blank"
             rel="noopener noreferrer"
             onClick={() => trackWhatsAppClick('sticky_bar')}
-            className="flex items-center justify-center gap-3 w-full h-14 rounded-2xl bg-[#25D366] shadow-[0_4px_24px_rgba(37,211,102,0.50)] active:scale-[0.98] transition-all touch-manipulation"
+            className="flex items-center justify-center gap-2.5 w-full h-14 bg-gradient-to-r from-[#1DA851] via-[#25D366] to-[#1DA851] shadow-[0_4px_24px_rgba(37,211,102,0.40)] active:scale-[0.98] transition-all touch-manipulation"
           >
-            <MessageCircle className="w-5 h-5 text-white flex-shrink-0" strokeWidth={2} />
-            <span className="text-white font-black text-base tracking-wide">Falar no WhatsApp</span>
+            <MessageCircle className="w-4 h-4 text-white flex-shrink-0" strokeWidth={2} />
+            <span className="text-white text-[13px] font-semibold tracking-[0.18em] uppercase">Falar por WhatsApp</span>
           </a>
         </div>
       </div>
