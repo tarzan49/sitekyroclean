@@ -41,14 +41,14 @@ const QuizStepContact = ({ formData, updateFormData, scrollContainerRef }: QuizS
           </div>
           <span className="text-[11px] text-white/40">51 avaliações Google · 5.0</span>
         </div>
-        <p className="flex items-center justify-center gap-2 text-center text-xs text-green-300 bg-[#0a2218] border border-green-500/50 rounded-xl px-3 py-2 mb-5 font-bold shadow-[0_0_10px_rgba(34,197,94,0.10)]">
-          <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse flex-shrink-0" />
-          Agenda quase cheia, confirme agora para garantir o seu horário
-        </p>
+        <div className="flex items-center gap-2 bg-gold/[0.07] border border-gold/20 rounded-xl px-3 py-2.5 mb-5">
+          <span className="w-2 h-2 rounded-full bg-gold/60 animate-pulse flex-shrink-0" />
+          <span className="text-[12px] text-white/60 font-semibold leading-snug">Alta procura. Confirme agora para garantir disponibilidade.</span>
+        </div>
 
         <div className="flex flex-col gap-4">
           <div>
-            <label className="block text-[11px] font-bold text-white/50 uppercase tracking-wider mb-1.5">Nome *</label>
+            <label className="block text-[11px] font-bold text-white/65 uppercase tracking-wider mb-1.5">Nome *</label>
             <Input
               placeholder="O seu nome"
               value={formData.name}
@@ -61,7 +61,7 @@ const QuizStepContact = ({ formData, updateFormData, scrollContainerRef }: QuizS
             />
           </div>
           <div>
-            <label className="block text-[11px] font-bold text-white/50 uppercase tracking-wider mb-1.5">Telemóvel / WhatsApp *</label>
+            <label className="block text-[11px] font-bold text-white/65 uppercase tracking-wider mb-1.5">Telemovel / WhatsApp *</label>
             <Input
               type="tel"
               placeholder="9xx xxx xxx"
@@ -74,7 +74,7 @@ const QuizStepContact = ({ formData, updateFormData, scrollContainerRef }: QuizS
             />
           </div>
           <div>
-            <label className="block text-[11px] font-bold text-white/50 uppercase tracking-wider mb-1.5">Email <span className="text-white/25 normal-case font-normal">(opcional)</span></label>
+            <label className="block text-[11px] font-bold text-white/65 uppercase tracking-wider mb-1.5">Email <span className="text-white/30 normal-case font-normal">(opcional)</span></label>
             <Input
               type="email"
               placeholder="o.seu@email.com"

@@ -181,8 +181,11 @@ const QuizStepConfig = ({
           <p className="text-[10px] text-white/35 uppercase tracking-wider mb-1">Estimativa total</p>
           {validArea ? (
             <>
-              <p className={cn('font-playfair font-black leading-none mb-1', sob ? 'text-white/50 text-2xl' : 'text-gold text-4xl')}>
-                {sob ? 'Sob orçamento' : `${calculatedPrice !== null ? Math.round(calculatedPrice) : '—'}€`}
+              <p
+                className={cn('font-playfair font-black leading-none mb-1', sob ? 'text-white/50 text-2xl' : 'text-gold text-4xl')}
+                style={!sob ? { textShadow: '0 0 28px rgba(212,175,55,0.55)' } : undefined}
+              >
+                {sob ? 'Sob orcamento' : `${calculatedPrice !== null ? Math.round(calculatedPrice) : '?'}€`}
               </p>
               <p className="text-[10px] text-white/30">
                 {sob ? 'O nosso especialista entra em contacto' : `${areaNum} m²`}
@@ -244,8 +247,11 @@ const QuizStepConfig = ({
           sob ? 'bg-[#1a2a1a] border-white/20' : 'bg-[#1a2a1a] border-gold/30 shadow-[0_0_20px_rgba(212,175,55,0.10)]'
         )}>
           <p className="text-[10px] text-white/35 uppercase tracking-wider mb-1">Estimativa total</p>
-          <p className={cn('font-playfair font-black leading-none mb-1', sob ? 'text-white/60 text-2xl' : 'text-gold text-4xl')}>
-            {sob ? 'Sob orçamento' : `${totalChairPrice % 1 === 0 ? totalChairPrice : totalChairPrice.toFixed(1).replace('.', ',')}€`}
+          <p
+            className={cn('font-playfair font-black leading-none mb-1', sob ? 'text-white/60 text-2xl' : 'text-gold text-4xl')}
+            style={!sob ? { textShadow: '0 0 28px rgba(212,175,55,0.55)' } : undefined}
+          >
+            {sob ? 'Sob orcamento' : `${totalChairPrice % 1 === 0 ? totalChairPrice : totalChairPrice.toFixed(1).replace('.', ',')}€`}
           </p>
           <p className="text-[10px] text-white/30">
             {sob

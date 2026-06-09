@@ -46,7 +46,7 @@ const QuizStep1Service = ({ selectedService, onSelect }: QuizStep1ServiceProps) 
               key={option.id}
               onClick={() => onSelect(option.id)}
               className={cn(
-                "relative h-[120px] rounded-2xl overflow-hidden transition-all duration-200 touch-manipulation active:scale-[0.97]",
+                "relative h-[148px] sm:h-[164px] rounded-2xl overflow-hidden transition-all duration-200 touch-manipulation active:scale-[0.97]",
                 isSelected
                   ? "ring-[3px] ring-gold shadow-[0_0_22px_rgba(212,175,55,0.45)]"
                   : "hover:ring-2 hover:ring-gold/35 shadow-[0_2px_10px_rgba(0,0,0,0.4)]"
@@ -80,8 +80,8 @@ const QuizStep1Service = ({ selectedService, onSelect }: QuizStep1ServiceProps) 
 
               {/* Label, anchored to bottom */}
               <div className="absolute inset-x-0 bottom-0 z-10 flex flex-col items-center pb-2.5 px-2">
-                <span className="font-playfair text-sm font-bold text-white text-center leading-tight"
-                  style={{ textShadow: '0 1px 6px rgba(0,0,0,0.9)' }}>
+                <span className="font-playfair text-[15px] font-bold text-white text-center leading-tight"
+                  style={{ textShadow: '0 1px 8px rgba(0,0,0,0.95)' }}>
                   {option.label}
                 </span>
                 {isSelected && (

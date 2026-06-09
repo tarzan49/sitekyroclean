@@ -1,25 +1,22 @@
 import { useTranslation } from "react-i18next";
 import { Shield, Heart, Sparkles } from "lucide-react";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import Header from "@/components/Header";
 import { QuizServiceProvider } from "@/context/QuizLocationContext";
 import GlobalPromoBanner from "@/components/GlobalPromoBanner";
 import Footer from "@/components/Footer";
-import RelatedServices from "@/components/RelatedServices";
 import ServiceCityLinks from "@/components/ServiceCityLinks";
-import ServicePackBanner from "@/components/ServicePackBanner";
-import ServiceFAQSchema from "@/components/ServiceFAQSchema";
+import ServiceFAQ from "@/components/ServiceFAQ";
 import ServiceSchema from "@/components/ServiceSchema";
 import ServiceHero from "@/components/ServiceHero";
 import ServiceAutoCarousel from "@/components/ServiceAutoCarousel";
 import ServiceExpertTips from "@/components/ServiceExpertTips";
 import ServiceBenefitsBar, { BenefitItem } from "@/components/ServiceBenefitsBar";
-import ServiceEliteGuarantee from "@/components/ServiceEliteGuarantee";
+import ServiceEliteGuarantee, { GuaranteeItem } from "@/components/ServiceEliteGuarantee";
+import { ExpertTip } from "@/components/ServiceExpertTips";
 import colchaoAntes from "@/assets/galeria-colchao-antes.webp";
 import colchaoDepois from "@/assets/galeria-colchao-depois.webp";
 import colchaoResultado from "@/assets/galeria-colchao-resultado.webp";
 import colchaoProcesso from "@/assets/galeria-colchao-processo.webp";
-import BeforeAfterSlider from "@/components/BeforeAfterSlider";
 
 const colchoesBenefits: BenefitItem[] = [
   {
@@ -42,22 +39,44 @@ const colchoesBenefits: BenefitItem[] = [
   },
 ];
 
-const expertTips = [
+const colchoesGuarantee: GuaranteeItem[] = [
+  {
+    label: "Satisfação",
+    title: "Resultado visível ou repetimos",
+    body: "Se a higienização não trouxer uma diferença clara, voltamos sem qualquer custo. Comprometemo-nos com o resultado, não apenas com o processo.",
+  },
+  {
+    label: "Higiene",
+    title: "Eliminação profunda de ácaros",
+    body: "Temperatura, pressão e produtos combinados garantem a eliminação de ácaros, fungos e bactérias em profundidade, não apenas na superfície do tecido.",
+  },
+  {
+    label: "Segurança",
+    title: "Pode dormir logo a seguir",
+    body: "Produtos hipoalergénicos sem resíduos tóxicos. O colchão fica seguro para crianças e pessoas com alergias desde a primeira noite após a secagem.",
+  },
+];
+
+const expertTips: ExpertTip[] = [
   {
     title: "O perigo invisível dos ácaros no seu colchão",
     summary: "O colchão acumula ácaros, células mortas e bactérias ao longo dos anos. Descubra o impacto real na qualidade do sono da sua família.",
+    url: "/blog/acaros-sofas-colchoes-riscos-saude",
   },
   {
     title: "Como a higienização melhora a qualidade do sono",
     summary: "Estudos mostram que dormir num colchão higienizado pode reduzir sintomas de alergias em até 80% após apenas uma semana.",
+    url: "/blog/quanto-custa-limpar-colchao-profissional",
   },
   {
     title: "Quanto tempo demora o colchão a secar?",
     summary: "Com equipamento de extração profissional, o colchão fica seco em 2 a 4 horas. Saiba como acelerar ainda mais o processo.",
+    url: "/blog/limpeza-colchao-bebe-crianca",
   },
   {
     title: "Vale a pena impermeabilizar o colchão?",
     summary: "A impermeabilização protege de acidentes e manchas futuras, aumentando significativamente a vida útil do colchão.",
+    url: "/blog/impermeabilizacao-sofa-vale-pena",
   },
 ];
 
@@ -75,74 +94,35 @@ const LimpezaColchoes = () => {
       <Header />
       <GlobalPromoBanner />
       <main>
-        {/* 1 ── HERO + SABIA QUE PILL ─────────────────────────────── */}
         <ServiceHero
-          title="Limpeza de Colchões"
+          title="Higienização Profissional de Colchões"
           subtitle="Higienização profunda que remove ácaros, bactérias e odores acumulados, promovendo um ambiente mais saudável e confortável."
           serviceSlug="limpeza-colchoes"
         />
-
-        {/* 2 ── BENEFÍCIOS REAIS (white) ───────────────────────────── */}
         <ServiceBenefitsBar
+          overline="A Ciência do Sono"
           heading="Por que higienizar o colchão profissionalmente muda tudo"
           benefits={colchoesBenefits}
           variant="light"
         />
-
-        {/* 3 ── GALERIA (dark green) ───────────────────────────────── */}
         <ServiceAutoCarousel
+          overline="Higiene Revelada"
+          beforeImage={colchaoAntes}
+          afterImage={colchaoDepois}
           slides={[
-            { node: <BeforeAfterSlider beforeImage={colchaoDepois} afterImage={colchaoAntes} orientation="horizontal" noFrame /> },
-            { src: colchaoResultado, label: "Resultado Final" },
+            { src: colchaoResultado, label: "Pormenor" },
             { src: colchaoProcesso, label: "Extração Profissional" },
           ]}
-          title="Resultados Reais"
           variant="dark"
         />
-
-        {/* 4 ── GARANTIA DE ELITE (light) ──────────────────────────── */}
-        <ServiceEliteGuarantee heading="A nossa promessa em cada higienização de colchão" variant="light" />
-
-        {/* 5 ── FAQ COMPACTO (dark green) ──────────────────────────── */}
-        <section className="py-8 md:py-12 bg-kyro-green">
-          <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
-            <div className="text-center mb-6 md:mb-8">
-              <p className="text-[11px] font-semibold tracking-[0.28em] uppercase mb-2" style={{ color: '#D4AF37' }}>
-                Dúvidas Frequentes
-              </p>
-              <h2 className="font-playfair text-xl md:text-2xl font-bold text-white">
-                {t("mattressCleaning.faq.title")}
-              </h2>
-              <div className="w-12 h-px mx-auto mt-3" style={{ backgroundColor: '#D4AF37', opacity: 0.4 }} />
-            </div>
-            <ServiceFAQSchema faqs={faqs} />
-            <Accordion type="single" collapsible className="max-w-3xl mx-auto space-y-3">
-              {faqs.map((faq, idx) => (
-                <AccordionItem
-                  key={idx}
-                  value={`item-${idx}`}
-                  className="bg-white/[0.04] border border-white/10 rounded-2xl px-5 transition-all duration-300 data-[state=open]:ring-1 data-[state=open]:ring-gold/25"
-                >
-                  <AccordionTrigger className="text-left text-[14px] md:text-[15px] font-semibold text-white py-4 hover:no-underline [&[data-state=open]>svg]:text-gold">
-                    {faq.question}
-                  </AccordionTrigger>
-                  <AccordionContent className="text-[13px] md:text-sm text-white/55 pb-5 leading-relaxed">
-                    {faq.answer}
-                  </AccordionContent>
-                </AccordionItem>
-              ))}
-            </Accordion>
-          </div>
-        </section>
-
-        {/* 6 ── DICAS DE ESPECIALISTA (white) ──────────────────────── */}
+        <ServiceEliteGuarantee
+          heading="A nossa promessa em cada higienização de colchão"
+          items={colchoesGuarantee}
+          variant="light"
+        />
+        <ServiceFAQ faqs={faqs} heading={t("mattressCleaning.faq.title")} />
         <ServiceExpertTips tips={expertTips} variant="light" />
-
-        {/* 9 ── UPSELL: SERVIÇOS COMPLEMENTARES (lavender) ───────── */}
-        <ServicePackBanner packSlugs={["pack-sofa-e-colchao", "pack-quarto-completo"]} variant="dark" />
         <ServiceCityLinks serviceSlug="limpeza-colchoes" serviceLabel="Limpeza de Colchões" />
-        <RelatedServices currentService="colchoes" />
-
         <ServiceSchema
           serviceName="Limpeza de Colchões"
           description="Higienização profissional de colchões no Porto. Eliminação de ácaros, bactérias e odores."

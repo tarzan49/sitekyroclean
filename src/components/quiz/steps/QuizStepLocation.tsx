@@ -82,18 +82,22 @@ const QuizStepLocation = ({
                       onCitySelect(city);
                     }}
                     className={cn(
-                      'relative w-full h-[64px] sm:h-[72px] rounded-2xl overflow-hidden transition-all duration-200 touch-manipulation active:scale-[0.98]',
+                      'relative w-full h-[92px] sm:h-[104px] rounded-2xl overflow-hidden transition-all duration-200 touch-manipulation active:scale-[0.98]',
                       isSelected
-                        ? 'ring-4 ring-gold shadow-[0_0_24px_rgba(212,175,55,0.45)]'
+                        ? 'ring-[3px] ring-gold shadow-[0_0_28px_rgba(212,175,55,0.50)]'
                         : 'hover:ring-2 hover:ring-gold/40 shadow-[0_2px_12px_rgba(0,0,0,0.4)]'
                     )}
                   >
                     <img src={img} alt={city} className="absolute inset-0 w-full h-full object-cover" />
-                    <div className="absolute inset-0 bg-black/55" />
-                    <div className="relative z-10 flex flex-col items-center justify-center h-full gap-0.5">
-                      <span className="font-playfair text-xl font-bold text-white drop-shadow-md">{city}</span>
-                      <span className="text-xs text-white/80 drop-shadow-sm">
-                        {locationPrices[city] === 0 ? 'Deslocação incluída' : `+${locationPrices[city]}€ deslocação`}
+                    <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-black/45 to-black/80" />
+                    {isSelected && <div className="absolute top-0 inset-x-0 h-[2px] bg-gradient-to-r from-transparent via-gold to-transparent" />}
+                    <div className="relative z-10 flex flex-col items-center justify-center h-full gap-1">
+                      <span className="font-playfair text-2xl font-bold text-white" style={{ textShadow: '0 1px 8px rgba(0,0,0,0.8)' }}>{city}</span>
+                      <span className={cn(
+                        'text-[11px] font-semibold drop-shadow-sm px-2.5 py-0.5 rounded-full',
+                        locationPrices[city] === 0 ? 'text-gold/90 bg-gold/10' : 'text-white/65'
+                      )}>
+                        {locationPrices[city] === 0 ? 'Deslocacao incluida' : `+${locationPrices[city]}€ deslocacao`}
                       </span>
                     </div>
                   </button>

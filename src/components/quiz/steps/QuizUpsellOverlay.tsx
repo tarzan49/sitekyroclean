@@ -491,8 +491,11 @@ const QuizUpsellOverlay = ({
                   sobOrç ? 'bg-[#1a2a1a] border-white/20' : 'bg-[#1a2a1a] border-gold/30 shadow-[0_0_20px_rgba(212,175,55,0.10)]'
                 )}>
                   <p className="text-[10px] text-white/35 uppercase tracking-wider mb-1">Estimativa total</p>
-                  <p className={cn('font-playfair text-4xl font-black leading-none mb-1', sobOrç ? 'text-white/60 text-2xl' : 'text-gold')}>
-                    {sobOrç ? 'Sob orçamento' : `${totalChairPrice % 1 === 0 ? totalChairPrice : totalChairPrice.toFixed(1).replace('.', ',')}€`}
+                  <p
+                    className={cn('font-playfair font-black leading-none mb-1', sobOrç ? 'text-white/60 text-2xl' : 'text-gold text-4xl')}
+                    style={!sobOrç ? { textShadow: '0 0 28px rgba(212,175,55,0.55)' } : undefined}
+                  >
+                    {sobOrç ? 'Sob orcamento' : `${totalChairPrice % 1 === 0 ? totalChairPrice : totalChairPrice.toFixed(1).replace('.', ',')}€`}
                   </p>
                   <p className="text-[10px] text-white/30">
                     {sobOrç ? 'O nosso especialista entra em contacto' : `${qty} cadeira${qty > 1 ? 's' : ''}${pendingWaterproof ? ' + impermeabilização' : ''}`}

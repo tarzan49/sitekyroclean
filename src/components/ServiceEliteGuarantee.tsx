@@ -1,95 +1,137 @@
-﻿import { CheckCircle, Award, Leaf } from "lucide-react";
+export interface GuaranteeItem {
+  label: string;
+  title: string;
+  body: string;
+}
 
-const ITEMS = [
+const DEFAULT_ITEMS: GuaranteeItem[] = [
   {
-    icon: CheckCircle,
-    title: "Satisfação 100%",
-    body: "Repetimos o serviço sem custos adicionais se o resultado não ficar completamente perfeito.",
+    label: "Satisfação",
+    title: "100% ou repetimos",
+    body: "Se o resultado não ficar completamente perfeito, repetimos o serviço sem custos adicionais. Sem condições, sem discussão.",
   },
   {
-    icon: Award,
-    title: "Garantia Kyro",
-    body: "Selo de qualidade garantida em todos os tecidos e superfícies que tratamos.",
+    label: "Qualidade",
+    title: "Selo Kyro em cada visita",
+    body: "Cada intervenção é executada com os mesmos padrões rigorosos, independentemente do tipo de estofo ou da dimensão do trabalho.",
   },
   {
-    icon: Leaf,
-    title: "Segurança Total",
-    body: "Produtos 100% seguros, certificados e não tóxicos, para crianças, bebés e animais.",
+    label: "Segurança",
+    title: "Seguro para toda a família",
+    body: "Produtos certificados, não tóxicos e testados. Crianças, bebés e animais podem regressar ao espaço imediatamente após a secagem.",
   },
 ];
 
 interface ServiceEliteGuaranteeProps {
   heading?: string;
+  subtitle?: string;
   variant?: "light" | "dark";
+  items?: GuaranteeItem[];
 }
 
 const ServiceEliteGuarantee = ({
   heading = "A nossa promessa em cada visita",
+  subtitle = "Cada serviço inclui a nossa garantia de satisfação total, sem compromissos nem letra pequena.",
   variant = "light",
+  items = DEFAULT_ITEMS,
 }: ServiceEliteGuaranteeProps) => {
   const dark = variant === "dark";
+  const textMain = dark ? "text-white" : "text-[#111111]";
+  const textSub  = dark ? "text-white/60" : "text-[#111111]/65";
+
+  const words = heading.trim().split(" ");
+  const goldWord = words.pop() ?? "";
+  const restHeading = words.join(" ");
+
   return (
-  <section className={`py-10 md:py-14 ${dark ? "bg-kyro-green" : "bg-[#FDFDF9]"}`}>
-    <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
-      <div className="max-w-4xl mx-auto">
+    <section className={`py-14 md:py-20 ${dark ? "bg-kyro-green" : "bg-[#FAFAF6]"}`}>
+      <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
 
-        {/* Header */}
-        <div className="text-center mb-7 md:mb-9">
-          <p
-            className="text-[11px] font-semibold tracking-[0.28em] uppercase mb-2"
-            style={{ color: "#D4AF37" }}
-          >
-            Garantia de Elite
-          </p>
-          <h2 className={`font-playfair text-xl md:text-2xl font-bold leading-snug ${dark ? "text-white" : "text-[#1A1A2E]"}`}>
-            {heading}
+        {/* Editorial header */}
+        <div className="mb-12 md:mb-16">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="h-px w-8 flex-shrink-0" style={{ backgroundColor: '#D4AF37', opacity: 0.65 }} />
+            <p className="text-[10px] font-bold tracking-[0.28em] uppercase" style={{ color: '#D4AF37', opacity: 0.85 }}>
+              Garantia de Elite
+            </p>
+          </div>
+          <h2 className={`font-playfair text-[1.85rem] sm:text-4xl md:text-[2.6rem] font-bold leading-[1.1] mb-4 ${textMain}`}>
+            {restHeading}{" "}
+            <em className="not-italic" style={{ color: '#D4AF37' }}>{goldWord}</em>
           </h2>
-          <div
-            className="w-12 h-px mx-auto mt-3"
-            style={{ backgroundColor: "#D4AF37", opacity: 0.4 }}
-          />
+          <p className={`text-sm md:text-[15px] leading-relaxed max-w-xl ${textSub}`}>
+            {subtitle}
+          </p>
         </div>
 
-        {/* 3-col grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-5">
-          {ITEMS.map((item, i) => {
-            const Icon = item.icon;
-            return (
-              <div
-                key={i}
-                className={`flex flex-row md:flex-col items-start md:items-center gap-4 md:gap-3 rounded-2xl p-5 md:p-6 md:text-center transition-all duration-300 ${
-                  dark
-                    ? "bg-white/[0.04] border border-white/10 hover:border-gold/30"
-                    : "bg-[#FFFFFF] shadow-sm border border-[rgba(212,175,55,0.12)] hover:border-gold/30 hover:shadow-md"
-                }`}
+        {/* Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5 md:gap-6">
+          {items.map((item, i) => (
+            <div
+              key={i}
+              className="relative flex flex-col overflow-hidden"
+              style={
+                dark
+                  ? {
+                      background: "rgba(255,255,255,0.04)",
+                      borderTop: "2px solid rgba(212,175,55,0.55)",
+                      borderRight: "1px solid rgba(255,255,255,0.06)",
+                      borderBottom: "1px solid rgba(255,255,255,0.06)",
+                      borderLeft: "1px solid rgba(255,255,255,0.06)",
+                    }
+                  : {
+                      background: "#ffffff",
+                      borderTop: "2px solid #D4AF37",
+                      boxShadow: "0 2px 24px rgba(0,0,0,0.07), 0 1px 4px rgba(0,0,0,0.04)",
+                    }
+              }
+            >
+              {/* Background number */}
+              <span
+                className="absolute top-3 right-4 font-playfair font-bold select-none pointer-events-none"
+                style={{
+                  fontSize: "6rem",
+                  color: dark ? "rgba(212,175,55,0.09)" : "rgba(212,175,55,0.07)",
+                  lineHeight: 1,
+                }}
               >
-                {/* Gold icon circle */}
-                <div
-                  className="flex-shrink-0 w-11 h-11 rounded-xl flex items-center justify-center"
-                  style={{
-                    background:
-                      "linear-gradient(135deg, rgba(201,168,76,0.14) 0%, rgba(240,220,138,0.08) 100%)",
-                    border: "1px solid rgba(201,168,76,0.30)",
-                  }}
-                >
-                  <Icon className="w-5 h-5 text-gold" strokeWidth={1.5} />
-                </div>
+                {String(i + 1).padStart(2, "0")}
+              </span>
 
-                <div>
-                  <h3 className={`font-playfair font-bold text-[14px] md:text-[15px] leading-snug mb-1 ${dark ? "text-white" : "text-[#1A1A2E]"}`}>
-                    {item.title}
-                  </h3>
-                  <p className={`text-[12px] leading-relaxed ${dark ? "text-white/50" : "text-[#1A1A2E]/55"}`}>
-                    {item.body}
-                  </p>
-                </div>
+              <div className="relative flex flex-col gap-4 p-7 md:p-8">
+                <p
+                  className="text-[10px] font-bold tracking-[0.26em] uppercase"
+                  style={{ color: "#D4AF37" }}
+                >
+                  {item.label}
+                </p>
+
+                <h3
+                  className={`font-playfair font-bold leading-snug ${textMain}`}
+                  style={{ fontSize: "1.25rem" }}
+                >
+                  {item.title}
+                </h3>
+
+                <div
+                  className="w-8 h-px"
+                  style={{
+                    background: dark
+                      ? "linear-gradient(90deg, rgba(212,175,55,0.7) 0%, rgba(212,175,55,0.1) 100%)"
+                      : "linear-gradient(90deg, #D4AF37 0%, rgba(212,175,55,0.2) 100%)",
+                  }}
+                />
+
+                <p className={`leading-relaxed ${textSub}`} style={{ fontSize: "14px" }}>
+                  {item.body}
+                </p>
               </div>
-            );
-          })}
+            </div>
+          ))}
         </div>
+
       </div>
-    </div>
-  </section>
+    </section>
   );
 };
 

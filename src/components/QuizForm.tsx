@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { X, ChevronRight, ChevronLeft, Check, Flame, AlertTriangle, Star } from 'lucide-react';
+import { X, ChevronRight, ChevronLeft, Check, Flame, AlertTriangle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import { trackQuizEvent } from '@/lib/quizTracking';
@@ -917,23 +917,39 @@ ${formData.description || 'Sem observações adicionais'}
         <ConfettiGold active={confettiActive} />
 
         {/* Header */}
-        <div className="px-5 sm:px-6 pt-3 sm:pt-5 pb-2 sm:pb-3 landscape:pt-2 landscape:pb-1.5 flex items-center justify-between flex-shrink-0 border-b border-white/[0.06]">
-          <div id="quiz-title" className="flex items-center gap-2 flex-wrap">
-            <span className="text-gold text-[10px] font-bold tracking-[0.28em] uppercase">
-              ORÇAMENTO RÁPIDO · KYRO
-            </span>
-            <span className="flex items-center gap-1 bg-gold/10 border border-gold/25 rounded-full px-2 py-0.5">
-              <Star className="w-2.5 h-2.5 text-gold fill-gold flex-shrink-0" />
-              <span className="text-[9px] font-black text-gold/90 uppercase tracking-wider leading-none">N.º1 Porto</span>
-            </span>
+        <div className="px-5 sm:px-6 pt-3 sm:pt-4 pb-2.5 sm:pb-3 landscape:pt-2 landscape:pb-1.5 grid grid-cols-[1fr_auto_1fr] items-center gap-2 flex-shrink-0">
+          <div id="quiz-title" className="flex items-center gap-2">
+            <span className="font-playfair text-[14px] font-bold text-white/90 leading-none">Kyro</span>
+            <span className="h-3 w-px bg-white/20 flex-shrink-0" />
+            <span className="text-[9px] font-bold tracking-[0.22em] uppercase text-gold/65">Orçamento</span>
           </div>
-          <button
-            onClick={handleClose}
-            className="p-2 hover:bg-white/10 active:bg-white/20 rounded-full transition-colors touch-manipulation"
-            aria-label="Fechar"
-          >
-            <X className="w-4 h-4 text-white/50" />
-          </button>
+          <div className="flex items-center justify-center gap-1.5">
+            {currentStep >= 1 && Array.from({ length: totalSteps }, (_, i) => {
+              const stepNum = i + 1;
+              return (
+                <div
+                  key={i}
+                  className={cn(
+                    "transition-all duration-300 rounded-full",
+                    currentStep > stepNum
+                      ? "w-4 h-[3px] bg-gold/50"
+                      : currentStep === stepNum
+                      ? "w-5 h-[3px] bg-gold"
+                      : "w-[5px] h-[5px] bg-white/15"
+                  )}
+                />
+              );
+            })}
+          </div>
+          <div className="flex justify-end">
+            <button
+              onClick={handleClose}
+              className="p-2 hover:bg-white/10 active:bg-white/20 rounded-full transition-colors touch-manipulation"
+              aria-label="Fechar"
+            >
+              <X className="w-4 h-4 text-white/40" />
+            </button>
+          </div>
         </div>
 
         {/* Urgency bar, hidden in landscape */}
@@ -941,7 +957,7 @@ ${formData.description || 'Sem observações adicionais'}
           "text-white text-xs font-semibold px-4 py-1.5 flex items-center justify-between flex-shrink-0 transition-all duration-500 landscape:hidden landscape:sm:flex",
           packDiscountActive
             ? timerFlash ? "bg-gold/25" : "bg-gold/12"
-            : countdown === 0 ? "bg-white/[0.09]" : countdown < 120 ? "bg-red-900/50" : "bg-amber-900/35"
+            : countdown === 0 ? "bg-white/[0.09]" : countdown < 120 ? "bg-amber-900/45" : "bg-amber-900/25"
         )}>
           {packDiscountActive ? (
             <>
@@ -960,12 +976,12 @@ ${formData.description || 'Sem observações adicionais'}
               <span className="flex items-center gap-1.5">
                 <Flame className={cn("w-3.5 h-3.5 flex-shrink-0 text-gold", countdown < 120 && "animate-pulse")} />
                 <span className="text-white/60">
-                  {countdown < 120 ? "Urgente! Vaga quase esgotada:" : "Alta procura. Vaga reservada por:"}
+                  {"Alta procura. Vaga reservada por:"}
                 </span>
               </span>
               <span className={cn(
                 "font-mono bg-white/10 px-2 py-0.5 rounded text-sm tabular-nums font-bold",
-                countdown < 120 ? "text-red-300" : "text-gold"
+                countdown < 120 ? "text-amber-300" : "text-gold"
               )}>
                 {formatCountdown(countdown)}
               </span>
@@ -976,7 +992,7 @@ ${formData.description || 'Sem observações adicionais'}
         </div>
 
         {/* Gold progress bar */}
-        <div className="h-[3px] bg-white/[0.05] flex-shrink-0 overflow-hidden">
+        <div className="h-[4px] bg-white/[0.04] flex-shrink-0 overflow-hidden">
           <div
             className="h-full bg-gradient-to-r from-gold/60 via-gold to-[#d4c57b] transition-all duration-500 ease-out"
             style={{ width: `${((currentStep === 0 ? 0.5 : currentStep) / totalSteps) * 100}%` }}
@@ -1220,7 +1236,7 @@ ${formData.description || 'Sem observações adicionais'}
               <Button
                 onClick={handleNext}
                 disabled={!canProceed()}
-                className="h-12 px-8 min-w-[150px] flex-shrink-0 bg-gradient-to-r from-gold to-[#d4c57b] hover:from-[#d4c57b] hover:to-gold text-[#12121e] font-bold touch-manipulation active:scale-[0.98] disabled:opacity-35 rounded-xl shadow-[0_4px_28px_rgba(212,175,55,0.40)] transition-shadow"
+                className="flex-1 h-12 bg-gradient-to-r from-gold to-[#d4c57b] hover:from-[#d4c57b] hover:to-gold text-[#12121e] font-bold touch-manipulation active:scale-[0.98] disabled:opacity-35 rounded-xl shadow-[0_4px_28px_rgba(212,175,55,0.40)] transition-shadow"
               >
                 Continuar
                 <ChevronRight className="w-4 h-4 ml-1" />
@@ -1232,9 +1248,9 @@ ${formData.description || 'Sem observações adicionais'}
     )}
 
     {/* Rotating social proof bar */}
-    <div className="border-t border-orange-500/30 px-4 py-2 text-center flex-shrink-0 bg-[#1a0f05] flex items-center justify-center gap-1.5">
-      <span className="w-1.5 h-1.5 rounded-full bg-orange-400 animate-pulse flex-shrink-0" />
-      <p className="text-[11px] text-orange-300/90 font-semibold transition-all duration-700">
+    <div className="border-t border-gold/[0.10] px-4 py-2 text-center flex-shrink-0 bg-[#061410] flex items-center justify-center gap-1.5">
+      <span className="w-1.5 h-1.5 rounded-full bg-gold/55 animate-pulse flex-shrink-0" />
+      <p className="text-[11px] text-white/45 font-medium transition-all duration-700">
         {socialProofMessages[socialProofIdx]}
       </p>
     </div>

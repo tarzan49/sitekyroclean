@@ -12,7 +12,6 @@ import ErrorBoundary from "@/components/ErrorBoundary";
 import CookieBanner from "@/components/CookieBanner";
 import PageHead from "@/components/PageHead";
 import TopProgressBar from "@/components/TopProgressBar";
-import WhatsAppButton from "@/components/WhatsAppButton";
 import MobileStickyBar from "@/components/MobileStickyBar";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
 import { getAllLocationRoutes } from "@/data/locationSeoData";
@@ -238,7 +237,7 @@ const App = () => (
       <BrowserRouter>
         <SessionTracker />
         <AppRoutes />
-        <WhatsAppButton />
+
         <MobileStickyBar />
         <CookieBanner />
       </BrowserRouter>
