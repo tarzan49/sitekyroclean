@@ -14,7 +14,7 @@ const STATS = [
   { value: '1000+', label: 'tapetes' },
 ];
 
-const MAPS_URL = 'https://www.google.com/maps/search/Kyro+Clean+Solutions+Porto';
+const MAPS_URL = 'https://share.google/nPsWWFXrUrF12rIXJ';
 
 const Hero = () => {
   const [isQuizOpen, setIsQuizOpen]       = useState(false);
