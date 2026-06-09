@@ -78,10 +78,13 @@ const HowItWorks = () => {
 
           {/* Header */}
           <div className={`mb-8 transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-5'}`}>
-            <p className="text-[10px] font-bold tracking-[0.28em] uppercase mb-2.5" style={{ color: '#D4AF37' }}>
-              O Nosso Processo
-            </p>
-            <h2 className="font-playfair text-xl md:text-2xl font-bold text-white leading-tight">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="h-px w-8" style={{ backgroundColor: '#D4AF37', opacity: 0.65 }} />
+              <p className="text-[10px] font-bold tracking-[0.28em] uppercase" style={{ color: '#D4AF37', opacity: 0.85 }}>
+                O NOSSO PROCESSO
+              </p>
+            </div>
+            <h2 className="font-playfair text-[1.6rem] md:text-[2rem] font-bold text-white leading-tight">
               {t('howItWorks.title', 'Como funciona')}
             </h2>
           </div>
@@ -126,10 +129,13 @@ const HowItWorks = () => {
 
           {/* Header */}
           <div className={`mb-8 transition-all duration-700 delay-150 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-5'}`}>
-            <p className="text-[10px] font-bold tracking-[0.28em] uppercase mb-2.5" style={{ color: '#D4AF37' }}>
-              A Nossa Promessa
-            </p>
-            <h2 className="font-playfair text-xl md:text-2xl font-bold text-white leading-tight">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="h-px w-8" style={{ backgroundColor: '#D4AF37', opacity: 0.65 }} />
+              <p className="text-[10px] font-bold tracking-[0.28em] uppercase" style={{ color: '#D4AF37', opacity: 0.85 }}>
+                A NOSSA PROMESSA
+              </p>
+            </div>
+            <h2 className="font-playfair text-[1.6rem] md:text-[2rem] font-bold text-white leading-tight">
               Qualidade garantida
             </h2>
           </div>
@@ -148,10 +154,10 @@ const HowItWorks = () => {
                       <Icon className="w-3.5 h-3.5 text-gold" strokeWidth={1.5} />
                     </div>
                     <div className="pb-5">
-                      <h3 className="font-playfair font-semibold text-white text-[13px] md:text-sm mb-0.5">
+                      <h3 className="font-playfair font-bold text-white text-sm md:text-base mb-0.5 leading-snug">
                         {t(item.titleKey, item.titleFallback)}
                       </h3>
-                      <p className="text-white/45 text-[12px] md:text-[13px] leading-relaxed">
+                      <p className="text-white/50 text-[13px] leading-relaxed">
                         {t(item.textKey, item.textFallback)}
                       </p>
                     </div>
