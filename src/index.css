@@ -526,6 +526,15 @@ html {
   }
 }
 
+/* Hide scrollbar — used for horizontal snap scroll sections */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
 /* Improved scrollbar for quiz modal - edge-aligned like native browsers */
 .quiz-scrollbar {
   scrollbar-width: thin;
