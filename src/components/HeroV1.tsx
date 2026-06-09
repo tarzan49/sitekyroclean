@@ -184,32 +184,34 @@ const Hero = () => {
                 </a>
               </div>
 
-              {/* Google Maps — inline, no pill */}
-              <a
-                href={MAPS_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-2 group w-fit"
-              >
-                <MapPin className="w-3 h-3 text-gold flex-shrink-0" strokeWidth={2} />
-                <div className="flex items-center gap-[3px]">
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="w-2.5 h-2.5 fill-[#D4AF37] text-[#D4AF37]" />
-                  ))}
-                </div>
-                <span className="text-white/65 text-[11px] font-semibold tracking-wide group-hover:text-white/90 transition-colors">
-                  5.0 · 58 avaliações Google
-                </span>
-              </a>
+              {/* Google Maps badge — pill, centered */}
+              <div className="flex justify-center pt-1">
+                <a
+                  href={MAPS_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 bg-black/30 border border-white/[0.14] rounded-full px-4 py-2 backdrop-blur-sm hover:bg-black/45 transition-colors group"
+                >
+                  <MapPin className="w-3.5 h-3.5 text-gold flex-shrink-0 group-hover:scale-110 transition-transform" strokeWidth={2} />
+                  <div className="flex items-center gap-0.5">
+                    {[...Array(5)].map((_, i) => (
+                      <Star key={i} className="w-2.5 h-2.5 fill-[#D4AF37] text-[#D4AF37]" />
+                    ))}
+                  </div>
+                  <span className="text-white/80 text-[11px] font-semibold tracking-wide">
+                    5.0 · 58 avaliações Google
+                  </span>
+                </a>
+              </div>
 
-              {/* Services — one line, dot separators */}
-              <div className="flex items-center flex-wrap gap-x-3 gap-y-1 pt-0.5">
+              {/* Services — forced single line */}
+              <div className="flex items-center flex-nowrap gap-x-2 overflow-hidden">
                 {SERVICES.map((s, i) => (
-                  <div key={i} className="flex items-baseline gap-1">
-                    <span className="text-[11px] font-bold" style={{ color: '#D4AF37' }}>{s.value}</span>
-                    <span className="text-[10px]" style={{ color: 'rgba(255,255,255,0.42)' }}>{s.label}</span>
+                  <div key={i} className="flex items-baseline gap-[3px] flex-shrink-0">
+                    <span className="text-[10px] font-bold" style={{ color: '#D4AF37' }}>{s.value}</span>
+                    <span className="text-[9px]" style={{ color: 'rgba(255,255,255,0.40)' }}>{s.label}</span>
                     {i < SERVICES.length - 1 && (
-                      <span className="text-white/18 text-[10px] ml-1.5">·</span>
+                      <span className="text-white/18 text-[9px] ml-1">·</span>
                     )}
                   </div>
                 ))}

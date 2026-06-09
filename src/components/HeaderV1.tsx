@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, MessageCircle } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import {
   Sheet,
@@ -211,7 +211,7 @@ const Header = ({ onOpenQuiz }: HeaderProps) => {
                       'py-4 px-6 text-base',
                       'bg-gradient-to-r from-[#C9A84C] via-[#EDD96A] to-[#C9A84C]',
                       'shadow-[0_6px_22px_rgba(201,168,76,0.42),0_2px_6px_rgba(0,0,0,0.28),inset_0_1px_0_rgba(255,255,255,0.32),inset_0_-2px_0_rgba(0,0,0,0.12)]',
-                      'active:scale-[0.95] transition-all duration-150 animate-cta-glow',
+                      'active:scale-[0.95] transition-all duration-150',
                     ].join(' ')}
                   >
                     <span className="tracking-wide">Pedir orçamento rápido</span>
@@ -310,7 +310,7 @@ const Header = ({ onOpenQuiz }: HeaderProps) => {
               window.scrollTo({ top: 0, behavior: "smooth" });
             }
           }}
-          className="absolute left-1/2 -translate-x-1/2 flex items-center"
+          className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center"
         >
           <img 
             src={kyroLogo} 
@@ -326,7 +326,7 @@ const Header = ({ onOpenQuiz }: HeaderProps) => {
 
         {/* RIGHT: CTA + Language Selector */}
         <div className="flex items-center gap-3">
-          {/* Desktop CTA Button */}
+          {/* Desktop CTA — Quiz (gold) */}
           <div className="relative group hidden md:block">
             <div className="absolute -inset-1.5 rounded-full bg-gradient-to-r from-[#C9A84C]/50 to-[#E8D070]/40 opacity-30 blur-lg group-hover:opacity-55 transition-opacity duration-400 pointer-events-none" />
             <button
@@ -339,12 +339,30 @@ const Header = ({ onOpenQuiz }: HeaderProps) => {
                 'hover:shadow-[0_10px_32px_rgba(201,168,76,0.60),0_4px_10px_rgba(0,0,0,0.32),inset_0_1px_0_rgba(255,255,255,0.36)]',
                 'hover:scale-[1.025] active:scale-[0.95]',
                 'active:shadow-[0_2px_8px_rgba(201,168,76,0.30),inset_0_2px_4px_rgba(0,0,0,0.18)]',
-                'transition-all duration-150 animate-cta-glow',
+                'transition-all duration-150',
               ].join(' ')}
             >
               <span className="tracking-wide">{t('hero.newYear.ctaPrimary', 'Pedir orçamento rápido')}</span>
             </button>
           </div>
+
+          {/* Desktop CTA — WhatsApp (green) */}
+          <a
+            href={`https://wa.me/351925530647?text=${encodeURIComponent('Olá! Gostaria de pedir um orçamento para limpeza de estofos.')}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={[
+              'hidden md:flex items-center gap-1.5 rounded-full font-bold text-white touch-manipulation',
+              'px-4 py-2 text-sm',
+              'bg-[#25D366]',
+              'shadow-[0_3px_12px_rgba(37,211,102,0.35),0_1px_4px_rgba(0,0,0,0.15)]',
+              'hover:shadow-[0_5px_18px_rgba(37,211,102,0.52)] hover:scale-[1.025]',
+              'active:scale-[0.95] transition-all duration-150',
+            ].join(' ')}
+          >
+            <MessageCircle className="w-3.5 h-3.5 flex-shrink-0" strokeWidth={2} />
+            <span className="tracking-wide">WhatsApp</span>
+          </a>
 
 
         </div>
