@@ -114,38 +114,48 @@ const ServiceCard = ({ service, prominence }: CardProps) => {
       )}
 
       {/* Badge */}
-      <div className="absolute top-3 right-3 z-10">
+      <div className="absolute top-3.5 left-4 z-10">
         <span
-          className="block text-[8px] font-bold uppercase tracking-[0.18em]"
-          style={{ color: "#F0DC8A", textShadow: "0 1px 4px rgba(0,0,0,0.8)" }}
+          className="block text-[9px] font-semibold uppercase tracking-[0.16em]"
+          style={{ color: "rgba(255,255,255,0.45)", textShadow: "0 1px 4px rgba(0,0,0,0.8)" }}
         >
           {service.badge}
         </span>
       </div>
 
       {/* Bottom info */}
-      <div className="absolute bottom-0 left-0 right-0 p-5 z-10">
-        <div className="flex items-center gap-3">
-          <div
-            className="w-9 h-9 flex-shrink-0 rounded-full overflow-hidden border border-gold/25"
-            style={{ backgroundColor: "rgba(20,20,36,0.75)", backdropFilter: "blur(4px)" }}
-          >
-            <img src={service.icon} alt="" loading="lazy" className="w-full h-full object-cover rounded-full" />
-          </div>
-          <div className="flex-1 min-w-0">
-            <h3
-              className="font-playfair text-[15px] md:text-[17px] font-bold leading-snug text-white group-hover:text-[#D4AF37] transition-colors duration-300"
-              style={{ textShadow: "0 1px 8px rgba(0,0,0,0.95), 0 2px 20px rgba(0,0,0,0.70)" }}
-            >
-              {t(service.titleKey)}
-            </h3>
-            <p
-              className="text-[11px] font-semibold tracking-wide mt-1"
-              style={{ color: "rgba(255,255,255,0.88)", textShadow: "0 1px 6px rgba(0,0,0,0.90)" }}
-            >
-              desde {t(service.priceKey)}
-            </p>
-          </div>
+      <div className="absolute bottom-0 left-0 right-0 px-5 pb-5 pt-8 z-10">
+        {/* Gold accent line */}
+        <div
+          className="mb-3 rounded-full"
+          style={{
+            width: isHero ? "28px" : "16px",
+            height: "1.5px",
+            backgroundColor: "#D4AF37",
+            opacity: isHero ? 0.85 : 0.45,
+            transition: `width ${SLIDE_MS}ms ease`,
+          }}
+        />
+        <h3
+          className="font-playfair font-bold leading-tight text-white group-hover:text-[#D4AF37] transition-colors duration-300"
+          style={{
+            fontSize: isHero ? "1.2rem" : "1rem",
+            textShadow: "0 1px 8px rgba(0,0,0,0.95), 0 2px 20px rgba(0,0,0,0.70)",
+            transition: `font-size ${SLIDE_MS}ms ease`,
+          }}
+        >
+          {t(service.titleKey)}
+        </h3>
+        <div className="flex items-center justify-between mt-2">
+          <p className="text-[11px] font-medium" style={{ color: "rgba(255,255,255,0.55)" }}>
+            a partir de{" "}
+            <span style={{ color: "#D4AF37", fontWeight: 700 }}>{t(service.priceKey)}</span>
+          </p>
+          {isHero && (
+            <span className="text-[10px] font-semibold tracking-wide text-white/40 group-hover:text-gold/70 transition-colors duration-300">
+              Ver serviço →
+            </span>
+          )}
         </div>
       </div>
     </Link>
@@ -272,14 +282,20 @@ const Services = () => {
     >
       {/* ── Header ── */}
       <div className="container mx-auto px-5 sm:px-6 lg:px-8">
-        <div className={`text-center mb-10 md:mb-16 transition-all duration-700 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-5"}`}>
-          <p className="text-[11px] font-semibold tracking-[0.28em] uppercase mb-3 md:mb-5" style={{ color: "#D4AF37" }}>
-            Serviços de Elite
-          </p>
-          <h2 className="font-playfair text-2xl md:text-4xl font-bold leading-[1.3] text-[#1A1A2E]">
-            A Excelência em Cuidado Têxtil.
+        <div className={`mb-10 md:mb-14 transition-all duration-700 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-5"}`}>
+          <div className="flex items-center gap-3 mb-5">
+            <div className="h-px w-8" style={{ backgroundColor: "#D4AF37", opacity: 0.65 }} />
+            <p className="text-[10px] font-bold tracking-[0.28em] uppercase" style={{ color: "#D4AF37", opacity: 0.85 }}>
+              OS NOSSOS SERVIÇOS
+            </p>
+          </div>
+          <h2 className="font-playfair text-[1.85rem] sm:text-4xl md:text-[2.6rem] font-bold leading-[1.1] text-[#1A1A2E] max-w-xl">
+            Cada estofo tratado{" "}
+            <em className="not-italic" style={{ color: "#D4AF37" }}>com precisão.</em>
           </h2>
-          <div className="w-12 h-px mx-auto mt-4 md:mt-8" style={{ backgroundColor: "#D4AF37", opacity: 0.45 }} />
+          <p className="mt-4 text-sm md:text-base text-[#1A1A2E]/50 max-w-lg leading-relaxed">
+            Sofás, colchões, tapetes, cadeiras e alcatifas — higienização profissional ao domicílio, resultado garantido no próprio dia.
+          </p>
         </div>
       </div>
 
