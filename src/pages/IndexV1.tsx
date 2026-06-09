@@ -1,7 +1,6 @@
 import { lazy, Suspense } from "react";
 import HeaderV1 from "@/components/HeaderV1";
 import HeroV1 from "@/components/HeroV1";
-import SocialProofBarV1 from "@/components/SocialProofBarV1";
 import LocalBusinessSchema from "@/components/LocalBusinessSchema";
 
 const HomepageBlogSection  = lazy(() => import("@/components/HomepageBlogSection"));
@@ -29,7 +28,6 @@ const IndexV1 = () => {
       <HeaderV1 onOpenQuiz={handleOpenQuiz} />
       <main>
         <HeroV1 />
-        <SocialProofBarV1 />
 
         <Suspense fallback={<SectionLoader />}>
           <Services />
