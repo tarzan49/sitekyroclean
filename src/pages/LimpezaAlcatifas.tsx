@@ -38,7 +38,7 @@ const alcatifasBenefits: BenefitItem[] = [
     icon: Sparkles,
     label: "Investimento",
     title: "Poupe na substituição",
-    body: "Uma alcatifa de qualidade custa entre 15€ e 80€/m². A limpeza profissional regular, a partir de 3€/m², prolonga-a de 8 para 20 anos, uma poupança de centenas a milhares de euros.",
+    body: "Uma alcatifa de qualidade custa entre 15€ e 80€/m². A limpeza profissional regular, a partir de 5€/m², prolonga-a de 8 para 20 anos, uma poupança de centenas a milhares de euros.",
   },
 ];
 
@@ -147,7 +147,7 @@ const LimpezaAlcatifas = () => {
           serviceName="Limpeza de Alcatifas"
           description="Limpeza profissional de alcatifas no Porto. Remoção de sujidade profunda."
           url="/limpeza-alcatifas"
-          priceFrom="3€/m²"
+          priceFrom="5€/m²"
           reviews={[
             { author: "Carlos M.", city: "Braga", text: "Serviço de excelência! A alcatifa do escritório ficou impecável. Profissionais muito competentes e pontuais.", date: "2025-01-20" },
             { author: "António F.", city: "Vila do Conde", text: "Trabalho cinco estrelas! Limparam todo o recheio do AL e os hóspedes notaram logo a diferença. Obrigado!", date: "2025-03-01" },
