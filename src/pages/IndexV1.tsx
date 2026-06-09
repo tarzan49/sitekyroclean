@@ -8,7 +8,6 @@ const Services             = lazy(() => import("@/components/Services"));
 const PainPointsSolutionsV1 = lazy(() => import("@/components/PainPointsSolutionsV1"));
 const HowItWorksV1         = lazy(() => import("@/components/HowItWorksV1"));
 const TestimonialsV1       = lazy(() => import("@/components/TestimonialsV1"));
-const HomepageFAQ          = lazy(() => import("@/components/HomepageFAQ"));
 const FinalCTAV1           = lazy(() => import("@/components/FinalCTAV1"));
 const Footer               = lazy(() => import("@/components/Footer"));
 
@@ -46,12 +45,6 @@ const IndexV1 = () => {
         <div id="como-funciona" className="scroll-mt-16">
           <Suspense fallback={<SectionLoader />}>
             <HowItWorksV1 />
-          </Suspense>
-        </div>
-
-        <div id="faq" className="scroll-mt-16">
-          <Suspense fallback={<SectionLoader />}>
-            <HomepageFAQ />
           </Suspense>
         </div>
 

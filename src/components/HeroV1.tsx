@@ -8,10 +8,14 @@ const imgDesktop = '/images/fotos%20hero/novafotoheropc.webp';
 const imgMobile  = '/images/fotos%20hero/imagemiphoneheronova.webp';
 
 const STATS = [
-  { value: '+1200', label: 'serviços' },
+  { value: '+1200', label: 'serviços realizados' },
+];
+
+const SERVICES = [
   { value: '800+',  label: 'sofás' },
   { value: '500+',  label: 'colchões' },
   { value: '1000+', label: 'tapetes' },
+  { value: '+1600', label: 'cadeiras' },
 ];
 
 const MAPS_URL = 'https://share.google/nPsWWFXrUrF12rIXJ';
@@ -198,6 +202,23 @@ const Hero = () => {
                     5.0 · 58 avaliações Google
                   </span>
                 </a>
+              </div>
+
+              {/* Service chips */}
+              <div className="flex flex-wrap justify-center gap-1.5 pt-0.5">
+                {SERVICES.map((s, i) => (
+                  <span
+                    key={i}
+                    className="flex items-center gap-[5px] px-3 py-[5px] rounded-full text-[10px]"
+                    style={{
+                      background: 'rgba(255,255,255,0.06)',
+                      border: '1px solid rgba(255,255,255,0.10)',
+                    }}
+                  >
+                    <span className="font-bold" style={{ color: '#D4AF37' }}>{s.value}</span>
+                    <span style={{ color: 'rgba(255,255,255,0.48)' }}>{s.label}</span>
+                  </span>
+                ))}
               </div>
 
             </div>
