@@ -232,6 +232,17 @@ const Header = ({ onOpenQuiz }: HeaderProps) => {
             <span className="tracking-wide">WhatsApp</span>
           </a>
 
+          {/* Mobile: WhatsApp pill (visible in bar) */}
+          <a
+            href={`https://wa.me/351925530647?text=${encodeURIComponent('Olá! Gostaria de pedir um orçamento para limpeza de estofos.')}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="md:hidden flex items-center gap-1.5 rounded-full font-bold text-white text-xs px-3 py-[7px] bg-[#25D366] shadow-[0_2px_8px_rgba(37,211,102,0.40)] active:scale-[0.97] transition-all touch-manipulation"
+          >
+            <MessageCircle className="w-3.5 h-3.5 flex-shrink-0" strokeWidth={2} />
+            <span>WhatsApp</span>
+          </a>
+
           {/* Mobile hamburger (RIGHT side) */}
           <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
             <SheetTrigger asChild className="md:hidden">
@@ -332,23 +343,30 @@ const Header = ({ onOpenQuiz }: HeaderProps) => {
                 ))}
               </nav>
 
-              {/* Mobile CTA - Quiz + Phone */}
-              <div className="p-4 border-t space-y-2">
-                <div className="relative group w-full">
-                  <div className="absolute -inset-1.5 rounded-full bg-gradient-to-r from-[#C9A84C]/50 to-[#E8D070]/40 opacity-30 blur-lg group-hover:opacity-55 transition-opacity duration-400 pointer-events-none" />
-                  <button
-                    onClick={() => { setMobileMenuOpen(false); openQuiz(); }}
-                    className={[
-                      'relative w-full rounded-full font-bold text-[#12121e] touch-manipulation',
-                      'py-4 px-6 text-base',
-                      'bg-gradient-to-r from-[#C9A84C] via-[#EDD96A] to-[#C9A84C]',
-                      'shadow-[0_6px_22px_rgba(201,168,76,0.42),0_2px_6px_rgba(0,0,0,0.28),inset_0_1px_0_rgba(255,255,255,0.32),inset_0_-2px_0_rgba(0,0,0,0.12)]',
-                      'active:scale-[0.95] transition-all duration-150',
-                    ].join(' ')}
-                  >
-                    <span className="tracking-wide">Pedir orçamento rápido</span>
-                  </button>
-                </div>
+              {/* Mobile drawer CTAs */}
+              <div className="p-4 border-t flex flex-col gap-2.5">
+                <button
+                  onClick={() => { setMobileMenuOpen(false); openQuiz(); }}
+                  className={[
+                    'w-full rounded-full font-bold text-[#12121e] touch-manipulation',
+                    'py-3.5 px-6 text-[15px]',
+                    'bg-gradient-to-r from-[#C9A84C] via-[#EDD96A] to-[#C9A84C]',
+                    'shadow-[0_4px_16px_rgba(201,168,76,0.38)]',
+                    'active:scale-[0.97] transition-all duration-150',
+                  ].join(' ')}
+                >
+                  Calcular o meu preço
+                </button>
+                <a
+                  href={`https://wa.me/351925530647?text=${encodeURIComponent('Olá! Gostaria de pedir um orçamento para limpeza de estofos.')}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="w-full flex items-center justify-center gap-2 rounded-full font-bold text-white touch-manipulation py-3.5 px-6 text-[15px] bg-[#25D366] shadow-[0_4px_16px_rgba(37,211,102,0.35)] active:scale-[0.97] transition-all duration-150"
+                >
+                  <MessageCircle className="w-4 h-4 flex-shrink-0" strokeWidth={2} />
+                  Falar por WhatsApp
+                </a>
               </div>
             </SheetContent>
           </Sheet>
