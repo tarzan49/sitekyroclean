@@ -111,22 +111,32 @@ const Hero = () => {
               <span style={{ color: '#D4AF37' }}>ao domicílio.</span>
             </h1>
 
-            {/* Stats row */}
-            <div className="flex flex-wrap items-center gap-x-3 gap-y-2 mb-5">
-              {STATS.map((s, i) => (
-                <div key={i} className="flex items-baseline gap-1">
-                  <span
-                    className="text-base md:text-lg font-bold text-gold"
-                    style={{ textShadow: '0 1px 8px rgba(0,0,0,0.5)' }}
-                  >
-                    {s.value}
-                  </span>
-                  <span className="text-[11px] md:text-xs text-white/65 font-medium">{s.label}</span>
-                  {i < STATS.length - 1 && (
-                    <span className="text-white/20 text-xs ml-1.5">·</span>
-                  )}
-                </div>
-              ))}
+            {/* Stats + Services row */}
+            <div className="flex flex-col md:flex-row md:items-baseline md:gap-x-3 gap-y-2 mb-5">
+              {/* Main stat */}
+              <div className="flex items-baseline gap-1 flex-shrink-0">
+                <span
+                  className="text-base md:text-lg font-bold text-gold"
+                  style={{ textShadow: '0 1px 8px rgba(0,0,0,0.5)' }}
+                >
+                  {STATS[0].value}
+                </span>
+                <span className="text-[11px] md:text-xs text-white/65 font-medium">{STATS[0].label}</span>
+              </div>
+              {/* Separator — desktop only */}
+              <span className="hidden md:block text-white/20 text-xs">·</span>
+              {/* Services — forced single line */}
+              <div className="flex items-center flex-nowrap gap-x-2">
+                {SERVICES.map((s, i) => (
+                  <div key={i} className="flex items-baseline gap-[3px] flex-shrink-0">
+                    <span className="text-[10px] font-bold" style={{ color: '#D4AF37' }}>{s.value}</span>
+                    <span className="text-[9px]" style={{ color: 'rgba(255,255,255,0.40)' }}>{s.label}</span>
+                    {i < SERVICES.length - 1 && (
+                      <span className="text-white/18 text-[9px] ml-1">·</span>
+                    )}
+                  </div>
+                ))}
+              </div>
             </div>
 
             {/* Subtitle */}
@@ -204,18 +214,6 @@ const Hero = () => {
                 </a>
               </div>
 
-              {/* Services — forced single line */}
-              <div className="flex items-center flex-nowrap gap-x-2 overflow-hidden">
-                {SERVICES.map((s, i) => (
-                  <div key={i} className="flex items-baseline gap-[3px] flex-shrink-0">
-                    <span className="text-[10px] font-bold" style={{ color: '#D4AF37' }}>{s.value}</span>
-                    <span className="text-[9px]" style={{ color: 'rgba(255,255,255,0.40)' }}>{s.label}</span>
-                    {i < SERVICES.length - 1 && (
-                      <span className="text-white/18 text-[9px] ml-1">·</span>
-                    )}
-                  </div>
-                ))}
-              </div>
 
             </div>
           </div>
