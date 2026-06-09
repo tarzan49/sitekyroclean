@@ -299,10 +299,54 @@ const Services = () => {
         </div>
       </div>
 
-      {/* ── Carousel ── */}
+      {/* ── Mobile Grid (2-col, shows all 6) ── */}
+      <div className={`block md:hidden px-5 grid grid-cols-2 gap-3 transition-opacity duration-700 ${isVisible ? "opacity-100" : "opacity-0"}`}>
+        {services.map((service, i) => (
+          <Link
+            key={i}
+            to={service.link}
+            className="relative overflow-hidden rounded-xl block"
+            style={{ height: 210 }}
+          >
+            <picture className="absolute inset-0 w-full h-full">
+              <img
+                src={service.imageM}
+                alt={service.altText}
+                loading="lazy"
+                decoding="async"
+                className="w-full h-full object-cover"
+              />
+            </picture>
+            <div
+              className="absolute inset-0 pointer-events-none"
+              style={{ background: "linear-gradient(to top, rgba(4,16,11,0.96) 0%, rgba(4,16,11,0.58) 42%, transparent 100%)" }}
+            />
+            <div className="absolute top-2.5 left-3">
+              <span
+                className="text-[8px] font-semibold uppercase tracking-[0.14em]"
+                style={{ color: "rgba(255,255,255,0.38)", textShadow: "0 1px 4px rgba(0,0,0,0.8)" }}
+              >
+                {service.badge}
+              </span>
+            </div>
+            <div className="absolute bottom-0 left-0 right-0 px-3 pb-3">
+              <div className="mb-1.5 rounded-full" style={{ width: "14px", height: "1.5px", backgroundColor: "#D4AF37", opacity: 0.60 }} />
+              <h3 className="font-playfair font-bold text-white leading-tight" style={{ fontSize: "0.88rem" }}>
+                {t(service.titleKey)}
+              </h3>
+              <p className="text-[10px] mt-1" style={{ color: "rgba(255,255,255,0.45)" }}>
+                a partir de <span style={{ color: "#D4AF37", fontWeight: 700 }}>{t(service.priceKey)}</span>
+              </p>
+            </div>
+            <div className="absolute inset-0 rounded-xl ring-1 ring-white/[0.06] pointer-events-none" />
+          </Link>
+        ))}
+      </div>
+
+      {/* ── Carousel (desktop/tablet only) ── */}
       <div
         ref={containerRef}
-        className={`relative w-full transition-opacity duration-700 ${isVisible ? "opacity-100" : "opacity-0"}`}
+        className={`hidden md:block relative w-full transition-opacity duration-700 ${isVisible ? "opacity-100" : "opacity-0"}`}
         onMouseEnter={() => setIsPaused(true)}
         onMouseLeave={() => setIsPaused(false)}
         onTouchStart={() => setIsPaused(true)}
@@ -381,22 +425,11 @@ const Services = () => {
         </button>
       </div>
 
-      {/* ── Dots ── */}
-      <div className="flex justify-center items-center gap-[7px] mt-7">
-        {services.map((_, i) => (
-          <button
-            key={i}
-            aria-label={`Ir para serviço ${i + 1}`}
-            onClick={() => { setAnimated(true); setOffsetIndex(CLONES + i); }}
-            className="rounded-full transition-all duration-300"
-            style={{
-              width:      i === realIndex ? 5 : 2,
-              height:     2,
-              background: i === realIndex ? "#D4AF37" : "rgba(212,175,55,0.20)",
-              boxShadow:  "none",
-            }}
-          />
-        ))}
+      {/* ── Counter (desktop only) ── */}
+      <div className="hidden md:flex justify-center mt-7">
+        <span className="text-[10px] text-[#1A1A2E]/30 font-mono tracking-widest">
+          {realIndex + 1}/{N}
+        </span>
       </div>
     </section>
   );
