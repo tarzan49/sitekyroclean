@@ -95,14 +95,17 @@ const Testimonials = () => {
       <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
 
         {/* Header */}
-        <div className={`text-center mb-10 md:mb-14 transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-5'}`}>
-          <p className="text-[11px] font-semibold tracking-[0.28em] uppercase mb-3" style={{ color: '#D4AF37' }}>
-            O Que Dizem os Clientes
-          </p>
-          <h2 className="font-playfair text-2xl md:text-4xl font-bold text-[#1A1A2E] leading-[1.3]">
-            A confiança das famílias portuguesas
+        <div className={`mb-10 md:mb-14 transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-5'}`}>
+          <div className="flex items-center gap-3 mb-5">
+            <div className="h-px w-8" style={{ backgroundColor: '#D4AF37', opacity: 0.65 }} />
+            <p className="text-[10px] font-bold tracking-[0.28em] uppercase" style={{ color: '#D4AF37', opacity: 0.85 }}>
+              O QUE DIZEM OS CLIENTES
+            </p>
+          </div>
+          <h2 className="font-playfair text-[1.85rem] sm:text-4xl md:text-[2.6rem] font-bold leading-[1.1] text-[#1A1A2E] max-w-xl">
+            A confiança das{" "}
+            <em className="not-italic" style={{ color: '#D4AF37' }}>famílias portuguesas</em>
           </h2>
-          <div className="w-10 h-px mx-auto mt-5" style={{ backgroundColor: '#D4AF37', opacity: 0.5 }} />
         </div>
 
         {/* Carousel */}
@@ -112,26 +115,56 @@ const Testimonials = () => {
               {REVIEWS.map((review, i) => (
                 <div
                   key={i}
-                  className="flex-none w-[85vw] md:w-[calc((100%-56px)/3)] flex flex-col gap-4 bg-[#FAFAF8] rounded-2xl p-6 md:p-7 border border-[#E8E4DE] shadow-sm min-h-[240px] md:min-h-[260px]"
+                  className="flex-none w-[85vw] md:w-[calc((100%-56px)/3)] flex flex-col rounded-2xl overflow-hidden"
+                  style={{
+                    background: "#071a12",
+                    border: "1px solid rgba(212,175,55,0.13)",
+                    boxShadow: "0 12px 40px rgba(0,0,0,0.18), 0 2px 8px rgba(0,0,0,0.10)",
+                    minHeight: 270,
+                  }}
                 >
-                  {/* Stars */}
-                  <div className="flex gap-0.5">
-                    {[...Array(5)].map((_, s) => (
-                      <Star key={s} className="w-3.5 h-3.5 fill-[#D4AF37] text-[#D4AF37]" />
-                    ))}
-                  </div>
+                  {/* Top gold hairline */}
+                  <div className="h-px w-full flex-shrink-0" style={{ background: "linear-gradient(90deg,transparent,rgba(212,175,55,0.40) 40%,rgba(212,175,55,0.40) 60%,transparent)" }} />
 
-                  {/* Text */}
-                  <p className="text-sm md:text-[15px] text-[#1A1A2E]/75 leading-relaxed flex-1">
-                    "{review.text}"
-                  </p>
-
-                  {/* Author */}
-                  <div className="flex items-center gap-3 pt-3 border-t border-[#E8E4DE]">
-                    <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#0d3c47] to-[#1a5c6e] flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
-                      {review.initial}
+                  <div className="flex flex-col flex-1 p-6 md:p-7">
+                    {/* Decorative quote */}
+                    <div
+                      className="font-playfair select-none mb-2 flex-shrink-0"
+                      style={{ fontSize: "4.5rem", lineHeight: 0.75, color: "rgba(212,175,55,0.13)" }}
+                    >
+                      "
                     </div>
-                    <p className="text-sm font-semibold text-[#1A1A2E]">{review.name}</p>
+
+                    {/* Stars */}
+                    <div className="flex gap-0.5 mb-3 flex-shrink-0">
+                      {[...Array(5)].map((_, s) => (
+                        <Star key={s} className="w-3 h-3 fill-[#D4AF37] text-[#D4AF37]" />
+                      ))}
+                    </div>
+
+                    {/* Text */}
+                    <p className="text-[13.5px] md:text-sm leading-relaxed flex-1 mb-5" style={{ color: "rgba(255,255,255,0.62)" }}>
+                      {review.text}
+                    </p>
+
+                    {/* Divider */}
+                    <div className="h-px w-full mb-4 flex-shrink-0" style={{ background: "rgba(212,175,55,0.14)" }} />
+
+                    {/* Author */}
+                    <div className="flex items-center gap-3 flex-shrink-0">
+                      <div
+                        className="w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-xs flex-shrink-0"
+                        style={{ background: "linear-gradient(135deg, #0d3c2a 0%, #1a6040 100%)" }}
+                      >
+                        {review.initial}
+                      </div>
+                      <div className="flex flex-col min-w-0">
+                        <span className="text-[13px] font-semibold text-white/90 truncate">{review.name}</span>
+                        <span className="text-[9.5px] font-medium tracking-wide" style={{ color: "rgba(212,175,55,0.52)" }}>
+                          Avaliação Google ✓
+                        </span>
+                      </div>
+                    </div>
                   </div>
                 </div>
               ))}
@@ -151,17 +184,10 @@ const Testimonials = () => {
               </svg>
             </button>
 
-            {/* Dots */}
-            <div className="flex gap-1.5">
-              {REVIEWS.map((_, i) => (
-                <button
-                  key={i}
-                  onClick={() => emblaApi?.scrollTo(i)}
-                  className={`rounded-full transition-all duration-200 ${selectedIndex === i ? 'w-[5px] h-[2px] bg-[#D4AF37]' : 'w-[2px] h-[2px] bg-[#1A1A2E]/20 hover:bg-[#1A1A2E]/40'}`}
-                  aria-label={`Ir para avaliação ${i + 1}`}
-                />
-              ))}
-            </div>
+            {/* Counter */}
+            <span className="text-[10px] text-[#1A1A2E]/30 font-mono tracking-widest">
+              {selectedIndex + 1}/{REVIEWS.length}
+            </span>
 
             {/* Next */}
             <button
