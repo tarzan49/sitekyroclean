@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Home, Droplets, Shield, AlertCircle, Calculator, ThumbsUp } from "lucide-react";
 import {
   Accordion,
   AccordionContent,
@@ -10,7 +9,6 @@ import {
 
 const faqs_data = [
   {
-    icon: Home,
     questionKey: "homeFaq.q1",
     questionDefault: "Fazem o serviço na minha casa? (Porto e arredores)",
     answerKey: "homeFaq.a1",
@@ -18,7 +16,6 @@ const faqs_data = [
       "Sim. Deslocamo-nos à sua casa ou escritório em todo o Grande Porto: Porto, Matosinhos, Vila Nova de Gaia, Maia, Gondomar, Valongo, Póvoa de Varzim e Vila do Conde. A deslocação está incluída no serviço, sem custos extra.",
   },
   {
-    icon: Droplets,
     questionKey: "homeFaq.q2",
     questionDefault: "Quanto tempo demora a secar? (Pode usar o sofá no mesmo dia?)",
     answerKey: "homeFaq.a2",
@@ -26,7 +23,6 @@ const faqs_data = [
       "Na maioria dos casos, o sofá fica seco entre 2 a 4 horas após o serviço. Com boa ventilação, pode utilizar o sofá no mesmo dia. Usamos equipamentos de extração de alta pressão que minimizam a humidade residual.",
   },
   {
-    icon: Shield,
     questionKey: "homeFaq.q3",
     questionDefault: "Os produtos são seguros para bebés e animais de estimação?",
     answerKey: "homeFaq.a3",
@@ -34,7 +30,6 @@ const faqs_data = [
       "Sim, totalmente. Utilizamos apenas produtos profissionais certificados e hipoalergénicos, seguros para crianças, bebés, cães, gatos e pessoas com alergias ou pele sensível.",
   },
   {
-    icon: AlertCircle,
     questionKey: "homeFaq.q4",
     questionDefault: "Conseguem remover manchas de urina, vinho ou café?",
     answerKey: "homeFaq.a4",
@@ -42,7 +37,6 @@ const faqs_data = [
       "Na grande maioria dos casos, sim. O nosso processo profissional elimina manchas de urina, vinho, café, gordura e outras substâncias orgânicas. Para manchas muito antigas ou tecidos específicos, avaliamos no local antes de garantir o resultado.",
   },
   {
-    icon: Calculator,
     questionKey: "homeFaq.q5",
     questionDefault: "Como é calculado o valor da limpeza?",
     answerKey: "homeFaq.a5",
@@ -50,7 +44,6 @@ const faqs_data = [
       "O preço depende do tipo de estofado (sofá, cadeira, colchão), número de lugares e tipo de tecido. A limpeza de sofás começa a partir de 39€. Peça um orçamento em 30 segundos: sem compromisso e sem surpresas.",
   },
   {
-    icon: ThumbsUp,
     questionKey: "homeFaq.q6",
     questionDefault: "O que acontece se eu não ficar satisfeito com o resultado?",
     answerKey: "homeFaq.a6",
@@ -74,7 +67,6 @@ const HomepageFAQ = () => {
   }, []);
 
   const faqs = faqs_data.map((f) => ({
-    icon: f.icon,
     question: t(f.questionKey, f.questionDefault),
     answer: t(f.answerKey, f.answerDefault),
   }));
@@ -103,48 +95,54 @@ const HomepageFAQ = () => {
         <div className="max-w-5xl mx-auto px-5 sm:px-6 lg:px-8">
 
           {/* Header */}
-          <div className={`text-center mb-10 md:mb-16 transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-5'}`}>
-            <p className="text-[11px] font-semibold tracking-[0.28em] uppercase mb-3" style={{ color: '#D4AF37' }}>
-              Respostas Rápidas
-            </p>
-            <h2 className="font-playfair text-2xl md:text-4xl font-bold text-[#1A1A2E] leading-[1.3]">
-              {t("homeFaq.title", "Perguntas frequentes")}
+          <div className={`mb-10 md:mb-14 transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-5'}`}>
+            <div className="flex items-center gap-3 mb-5">
+              <div className="h-px w-8" style={{ backgroundColor: '#D4AF37', opacity: 0.65 }} />
+              <p className="text-[10px] font-bold tracking-[0.28em] uppercase" style={{ color: '#D4AF37', opacity: 0.85 }}>
+                TIRE AS SUAS DÚVIDAS
+              </p>
+            </div>
+            <h2 className="font-playfair text-[1.85rem] sm:text-4xl md:text-[2.6rem] font-bold leading-[1.1] text-[#1A1A2E] max-w-xl">
+              Perguntas{" "}
+              <em className="not-italic" style={{ color: '#D4AF37' }}>frequentes</em>
             </h2>
-            <div className="w-10 h-px mx-auto mt-5" style={{ backgroundColor: '#D4AF37', opacity: 0.8 }} />
           </div>
 
           {/* 2-col grid */}
-          <div className={`grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
-            {faqs.map((faq, i) => {
-              const Icon = faq.icon;
-              return (
-                <div
-                  key={i}
-                  className="bg-white rounded-2xl shadow-sm overflow-hidden transition-all duration-500 border border-[rgba(26,78,48,0.08)]"
-                  style={{ transitionDelay: `${i * 60}ms` }}
-                >
-                  <Accordion type="single" collapsible>
-                    <AccordionItem value="item" className="border-none">
-                      <AccordionTrigger className="px-5 py-4 md:px-6 md:py-5 hover:no-underline group [&[data-state=open]]:ring-2 [&[data-state=open]]:ring-[#D4AF37]/50 rounded-2xl transition-all duration-200">
-                        <div className="flex items-center gap-3 text-left">
-                          <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 bg-[#E8F5EE]">
-                            <Icon className="w-4 h-4" style={{ color: '#1A4E30' }} />
-                          </div>
-                          <span className="text-sm md:text-[15px] font-semibold text-[#1A1A2E] leading-snug group-data-[state=open]:text-[#D4AF37] transition-colors duration-200">
-                            {faq.question}
-                          </span>
-                        </div>
-                      </AccordionTrigger>
-                      <AccordionContent className="px-5 md:px-6 pb-5">
-                        <p className="text-sm md:text-[15px] text-[#1A1A2E]/60 leading-relaxed pl-12">
+          <div className={`grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4 transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
+            {faqs.map((faq, i) => (
+              <div
+                key={i}
+                className="bg-white rounded-2xl overflow-hidden border border-[#1A1A2E]/[0.07] shadow-[0_2px_12px_rgba(0,0,0,0.05)] hover:shadow-[0_6px_24px_rgba(0,0,0,0.09)] transition-shadow duration-300"
+                style={{ transitionDelay: `${i * 55}ms` }}
+              >
+                <Accordion type="single" collapsible>
+                  <AccordionItem value="item" className="border-none">
+                    <AccordionTrigger className="px-5 py-5 md:px-6 hover:no-underline group [&_svg]:text-[#1A1A2E]/25 [&[data-state=open]_svg]:text-[#D4AF37]/70">
+                      <div className="flex items-start gap-4 text-left">
+                        <span
+                          className="font-mono text-[10px] font-bold flex-shrink-0 mt-[3px] transition-colors duration-200 group-data-[state=open]:opacity-100"
+                          style={{ color: 'rgba(212,175,55,0.50)' }}
+                        >
+                          {String(i + 1).padStart(2, '0')}
+                        </span>
+                        <span className="font-playfair font-bold text-[#1A1A2E] text-[1rem] md:text-[1.05rem] leading-snug group-data-[state=open]:text-[#1A1A2E]">
+                          {faq.question}
+                        </span>
+                      </div>
+                    </AccordionTrigger>
+                    <AccordionContent className="px-5 md:px-6 pb-5">
+                      <div className="pl-8">
+                        <div className="h-px mb-3" style={{ background: 'rgba(212,175,55,0.18)' }} />
+                        <p className="text-[13.5px] md:text-sm text-[#1A1A2E]/60 leading-relaxed">
                           {faq.answer}
                         </p>
-                      </AccordionContent>
-                    </AccordionItem>
-                  </Accordion>
-                </div>
-              );
-            })}
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
+                </Accordion>
+              </div>
+            ))}
           </div>
 
         </div>
