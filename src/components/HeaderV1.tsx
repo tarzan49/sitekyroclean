@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ChevronDown, Phone } from "lucide-react";
+import { ChevronDown } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import {
   Sheet,
@@ -217,14 +217,6 @@ const Header = ({ onOpenQuiz }: HeaderProps) => {
                     <span className="tracking-wide">Pedir orçamento rápido</span>
                   </button>
                 </div>
-                <a
-                  href="tel:925530647"
-                  onClick={() => trackCallClick('header_mobile_menu')}
-                  className="flex items-center justify-center gap-1.5 w-full text-[#0d3c47]/80 hover:text-[#0d3c47] font-medium py-3 px-6 text-sm transition-colors duration-150"
-                >
-                  <Phone className="w-3.5 h-3.5 text-gold animate-phone-shake flex-shrink-0" strokeWidth={2.5} />
-                  <span className="font-bold tracking-wide">Ligar Agora</span>
-                </a>
               </div>
             </SheetContent>
           </Sheet>
@@ -354,20 +346,6 @@ const Header = ({ onOpenQuiz }: HeaderProps) => {
             </button>
           </div>
 
-          {/* Desktop Phone */}
-          <a
-            href="tel:925530647"
-            onClick={() => trackCallClick('header_desktop')}
-            className="hidden lg:flex items-center gap-1.5 group"
-          >
-            <span className="flex items-center justify-center w-7 h-7 rounded-full bg-gold/10 border border-gold/25 group-hover:bg-gold/20 transition-colors">
-              <Phone className="w-3.5 h-3.5 text-gold animate-phone-shake flex-shrink-0" strokeWidth={2.5} />
-            </span>
-            <div className="flex flex-col leading-none">
-              <span className="text-[10px] font-semibold uppercase tracking-widest text-[#0d3c47]/45">Ligar agora</span>
-              <span className="text-sm font-bold text-[#0d3c47] group-hover:text-gold transition-colors tracking-wide">925 530 647</span>
-            </div>
-          </a>
 
         </div>
       </div>
