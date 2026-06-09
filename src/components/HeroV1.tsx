@@ -206,7 +206,7 @@ const Hero = () => {
 
             {/* H1, Problem */}
             <h1
-              className="font-playfair text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold text-white leading-[1.25] mb-3 md:mb-5 whitespace-pre-line"
+              className="font-cormorant text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-semibold text-white leading-[1.2] mb-3 md:mb-5 whitespace-pre-line"
               style={{
                 opacity: textIn ? 1 : 0,
                 transform: textIn ? 'translateY(0)' : 'translateY(12px)',
