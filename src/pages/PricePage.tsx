@@ -38,7 +38,7 @@ const PricePage = () => {
         <Header />
         <main className="pt-28 pb-16 min-h-screen bg-[#FAFAF7]">
           <div className="container mx-auto px-4 text-center">
-            <h1 className="text-3xl font-bold text-[#1A1A2E] mb-4">Página não encontrada</h1>
+            <h1 className="text-3xl font-bold text-[#111111] mb-4">Página não encontrada</h1>
             <Link to="/" className="text-[#D4AF37] hover:underline">Voltar ao início</Link>
           </div>
         </main>
@@ -141,8 +141,8 @@ const PricePage = () => {
                 <p className="text-xs font-semibold tracking-[0.25em] uppercase text-[#D4AF37] mb-2">
                   Preços Kyro Clean Solutions
                 </p>
-                <h2 className="font-playfair text-2xl md:text-3xl font-bold text-[#1A1A2E]">
-                  Tabela de preços — {data.serviceName} em {data.cityName}
+                <h2 className="font-playfair text-2xl md:text-3xl font-bold text-[#111111]">
+                  Tabela de preços: {data.serviceName} em {data.cityName}
                 </h2>
                 <div className="w-12 h-0.5 bg-[#D4AF37] mx-auto mt-4" />
               </div>
@@ -151,10 +151,10 @@ const PricePage = () => {
                 {data.priceTable.map((row, i) => (
                   <div
                     key={i}
-                    className="bg-white rounded-2xl p-6 border border-[#1A1A2E]/6 shadow-sm hover:shadow-md hover:border-[#D4AF37]/25 transition-all duration-200 group"
+                    className="bg-white rounded-2xl p-6 border border-[#111111]/6 shadow-sm hover:shadow-md hover:border-[#D4AF37]/25 transition-all duration-200 group"
                   >
                     <div className="w-8 h-0.5 bg-[#D4AF37] mb-4 group-hover:w-12 transition-all duration-300" />
-                    <p className="text-sm text-[#1A1A2E]/55 font-medium leading-snug mb-1">
+                    <p className="text-sm text-[#111111]/55 font-medium leading-snug mb-1">
                       {row.item}
                     </p>
                     {row.note && (
@@ -162,14 +162,14 @@ const PricePage = () => {
                         {row.note}
                       </span>
                     )}
-                    <p className="font-playfair text-2xl font-bold text-[#1A1A2E] mt-2">
+                    <p className="font-playfair text-2xl font-bold text-[#111111] mt-2">
                       {row.price}
                     </p>
                   </div>
                 ))}
               </div>
 
-              <p className="text-center text-xs text-[#1A1A2E]/35">
+              <p className="text-center text-xs text-[#111111]/35">
                 Preços indicativos. O orçamento definitivo é confirmado antes de iniciar qualquer trabalho, sem surpresas.
               </p>
             </div>
@@ -211,7 +211,7 @@ const PricePage = () => {
             <div className="container mx-auto px-4">
               <div className="max-w-4xl mx-auto">
                 <div className="text-center mb-8">
-                  <h2 className="font-playfair text-2xl md:text-3xl font-bold text-[#1A1A2E]">
+                  <h2 className="font-playfair text-2xl md:text-3xl font-bold text-[#111111]">
                     O que influencia o preço?
                   </h2>
                   <div className="w-12 h-0.5 bg-[#D4AF37] mx-auto mt-4" />
@@ -220,10 +220,10 @@ const PricePage = () => {
                   {data.factors.map((factor, i) => (
                     <div
                       key={i}
-                      className="flex items-start gap-3 p-4 bg-white rounded-xl border border-[#1A1A2E]/6 shadow-sm"
+                      className="flex items-start gap-3 p-4 bg-white rounded-xl border border-[#111111]/6 shadow-sm"
                     >
                       <CheckCircle className="w-4 h-4 text-[#D4AF37] flex-shrink-0 mt-0.5" />
-                      <span className="text-sm text-[#1A1A2E]/75 font-medium">{factor}</span>
+                      <span className="text-sm text-[#111111]/75 font-medium">{factor}</span>
                     </div>
                   ))}
                 </div>
@@ -234,14 +234,14 @@ const PricePage = () => {
 
         {/* ── FAQ ── */}
         {data.faqs.length > 0 && (
-          <section className="py-14 bg-white border-t border-[#1A1A2E]/5">
+          <section className="py-14 bg-white border-t border-[#111111]/5">
             <div className="container mx-auto px-4">
               <div className="max-w-3xl mx-auto">
                 <div className="text-center mb-10">
                   <p className="text-xs font-semibold tracking-[0.25em] uppercase text-[#D4AF37] mb-2">
                     Perguntas frequentes
                   </p>
-                  <h2 className="font-playfair text-2xl md:text-3xl font-bold text-[#1A1A2E]">
+                  <h2 className="font-playfair text-2xl md:text-3xl font-bold text-[#111111]">
                     Dúvidas sobre preços
                   </h2>
                 </div>
@@ -250,13 +250,13 @@ const PricePage = () => {
                   {data.faqs.map((faq, i) => (
                     <details
                       key={i}
-                      className="group bg-[#FAFAF7] rounded-xl border border-[#1A1A2E]/6 px-6"
+                      className="group bg-[#FAFAF7] rounded-xl border border-[#111111]/6 px-6"
                     >
-                      <summary className="py-5 font-semibold text-[#1A1A2E] cursor-pointer list-none flex items-center justify-between text-[15px]">
+                      <summary className="py-5 font-semibold text-[#111111] cursor-pointer list-none flex items-center justify-between text-[15px]">
                         {faq.question}
                         <ArrowRight className="w-4 h-4 text-[#D4AF37] group-open:rotate-90 transition-transform flex-shrink-0 ml-3" />
                       </summary>
-                      <p className="pb-5 text-[#1A1A2E]/55 leading-relaxed text-sm">{faq.answer}</p>
+                      <p className="pb-5 text-[#111111]/55 leading-relaxed text-sm">{faq.answer}</p>
                     </details>
                   ))}
                 </div>
@@ -266,11 +266,11 @@ const PricePage = () => {
         )}
 
         {/* ── Internal Links ── */}
-        <section className="py-10 bg-[#FAFAF7] border-t border-[#1A1A2E]/5">
+        <section className="py-10 bg-[#FAFAF7] border-t border-[#111111]/5">
           <div className="container mx-auto px-4">
             <div className="max-w-4xl mx-auto space-y-6">
               <div>
-                <h3 className="text-xs font-bold text-[#1A1A2E]/40 uppercase tracking-widest mb-3">
+                <h3 className="text-xs font-bold text-[#111111]/40 uppercase tracking-widest mb-3">
                   Ver página completa do serviço
                 </h3>
                 <Link
@@ -282,7 +282,7 @@ const PricePage = () => {
                 </Link>
               </div>
               <div>
-                <h3 className="text-xs font-bold text-[#1A1A2E]/40 uppercase tracking-widest mb-3">
+                <h3 className="text-xs font-bold text-[#111111]/40 uppercase tracking-widest mb-3">
                   Preços noutras cidades
                 </h3>
                 <div className="flex flex-wrap gap-2">
@@ -290,7 +290,7 @@ const PricePage = () => {
                     <Link
                       key={city.slug}
                       to={`/preco-${data.serviceSlug}-${city.slug}`}
-                      className="inline-flex items-center gap-1.5 bg-white px-3 py-2 rounded-lg text-sm font-medium text-[#1A1A2E]/65 border border-[#1A1A2E]/8 hover:border-[#D4AF37]/30 hover:text-[#1A1A2E] transition-all"
+                      className="inline-flex items-center gap-1.5 bg-white px-3 py-2 rounded-lg text-sm font-medium text-[#111111]/65 border border-[#111111]/8 hover:border-[#D4AF37]/30 hover:text-[#111111] transition-all"
                     >
                       <MapPin className="w-3 h-3 text-[#D4AF37]" />
                       {city.name}
@@ -299,7 +299,7 @@ const PricePage = () => {
                 </div>
               </div>
               <div>
-                <h3 className="text-xs font-bold text-[#1A1A2E]/40 uppercase tracking-widest mb-3">
+                <h3 className="text-xs font-bold text-[#111111]/40 uppercase tracking-widest mb-3">
                   Outros serviços em {data.cityName}
                 </h3>
                 <div className="flex flex-wrap gap-2">
@@ -307,7 +307,7 @@ const PricePage = () => {
                     <Link
                       key={svc.slug}
                       to={`/preco-${svc.slug}-${data.citySlug}`}
-                      className="inline-flex items-center gap-1.5 bg-white px-3 py-2 rounded-lg text-sm font-medium text-[#1A1A2E]/65 border border-[#1A1A2E]/8 hover:border-[#D4AF37]/30 hover:text-[#1A1A2E] transition-all"
+                      className="inline-flex items-center gap-1.5 bg-white px-3 py-2 rounded-lg text-sm font-medium text-[#111111]/65 border border-[#111111]/8 hover:border-[#D4AF37]/30 hover:text-[#111111] transition-all"
                     >
                       <ArrowRight className="w-3 h-3 text-[#D4AF37]" />
                       {svc.name}
@@ -402,7 +402,7 @@ const PricePage = () => {
                       "minPrice": data.priceTable[0]?.price.replace(/[^0-9]/g, "") ?? "15",
                       "maxPrice": data.priceTable[data.priceTable.length - 1]?.price.replace(/[^0-9]/g, "") ?? "99",
                       "priceCurrency": "EUR",
-                      "description": `Preço de ${data.serviceName} em ${data.cityName}, IVA incluído`,
+                      "description": `Preço de ${data.serviceName} em ${data.cityName}`,
                     },
                   },
                 },

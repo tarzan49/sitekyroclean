@@ -73,8 +73,8 @@ const allFaqs: FAQ[] = [
   {
     id: "como-pedir-orcamento-rapido",
     question: "Como faço um orçamento rápido?",
-    answer: <>O método mais rápido é o <strong>calculador online</strong>: responda a 4 perguntas (serviço, tamanho, localização, disponibilidade) e recebe o preço estimado em menos de 30 segundos, sem precisar de falar com ninguém e sem compromisso. Em alternativa: <strong>WhatsApp para 925 530 647</strong> com uma foto do sofá, resposta em menos de 15 minutos durante o horário de serviço (8h às 24h, segunda a sábado). Para empresas ou volumes, contacte diretamente para orçamento personalizado com desconto de volume. <strong>Não existem custos escondidos</strong>: o preço do orçamento é o preço final pago. O técnico não adiciona extras no local sem aprovação prévia. O serviço de <Link to="/limpeza-sofas" className="text-gold hover:underline font-medium">limpeza de sofás</Link> inclui deslocação, produto e IVA.</>,
-    plainAnswer: "Calculador online em 30 segundos (4 perguntas). Ou WhatsApp para 925 530 647 com foto, resposta em 15 minutos (8h às 24h, seg. a sáb.). Preço final sem extras. Inclui deslocação, produto e IVA.",
+    answer: <>O método mais rápido é o <strong>calculador online</strong>: responda a 4 perguntas (serviço, tamanho, localização, disponibilidade) e recebe o preço estimado em menos de 30 segundos, sem precisar de falar com ninguém e sem compromisso. Em alternativa: <strong>WhatsApp para 925 530 647</strong> com uma foto do sofá, resposta em menos de 15 minutos durante o horário de serviço (8h às 24h, segunda a sábado). Para empresas ou volumes, contacte diretamente para orçamento personalizado com desconto de volume. <strong>Não existem custos escondidos</strong>: o preço do orçamento é o preço final pago. O técnico não adiciona extras no local sem aprovação prévia. O serviço de <Link to="/limpeza-sofas" className="text-gold hover:underline font-medium">limpeza de sofás</Link> inclui deslocação e produto.</>,
+    plainAnswer: "Calculador online em 30 segundos (4 perguntas). Ou WhatsApp para 925 530 647 com foto, resposta em 15 minutos (8h às 24h, seg. a sáb.). Preço final sem extras. Inclui deslocação e produto.",
   },
   {
     id: "preco-colchao-solteiro",
@@ -161,17 +161,17 @@ const FAQItem = ({ faq, index, isOpen, onToggle }: {
       <span className="flex-shrink-0 w-7 h-7 rounded-lg bg-gold/10 border border-gold/20 flex items-center justify-center text-[11px] font-bold text-gold mt-0.5">
         {String(index + 1).padStart(2, "0")}
       </span>
-      <span className="flex-1 font-semibold text-[#1A1A2E] text-[15px] leading-snug pr-2">{faq.question}</span>
-      <ChevronDown className={`flex-shrink-0 w-5 h-5 transition-transform duration-200 mt-0.5 ${isOpen ? "rotate-180 text-gold" : "text-[#1A1A2E]/40"}`} />
+      <span className="flex-1 font-semibold text-[#111111] text-[15px] leading-snug pr-2">{faq.question}</span>
+      <ChevronDown className={`flex-shrink-0 w-5 h-5 transition-transform duration-200 mt-0.5 ${isOpen ? "rotate-180 text-gold" : "text-[#111111]/40"}`} />
     </button>
     {isOpen && (
       <div className="px-5 pb-5">
         <div className="pl-11">
           <div className="h-px bg-gray-100 mb-4" />
-          <div className="text-[#1A1A2E]/70 text-[15px] leading-relaxed">{faq.answer}</div>
+          <div className="text-[#111111]/70 text-[15px] leading-relaxed">{faq.answer}</div>
           <a
             href={`${PAGE_URL}#${faq.id}`}
-            className="inline-flex items-center gap-1 text-[10px] text-[#1A1A2E]/25 hover:text-gold transition-colors mt-3 font-mono"
+            className="inline-flex items-center gap-1 text-[10px] text-[#111111]/25 hover:text-gold transition-colors mt-3 font-mono"
             title="Link direto para esta resposta"
           >
             # permalink
@@ -289,7 +289,7 @@ const FAQEstofos = () => {
 
               {/* Related services */}
               <div className="bg-white rounded-2xl p-4 border border-[#E8E4DE]">
-                <p className="text-[10px] font-bold tracking-[0.25em] uppercase text-[#1A1A2E]/40 mb-3">
+                <p className="text-[10px] font-bold tracking-[0.25em] uppercase text-[#111111]/40 mb-3">
                   Serviços
                 </p>
                 <div className="space-y-1">
@@ -297,7 +297,7 @@ const FAQEstofos = () => {
                     <Link
                       key={s.to}
                       to={s.to}
-                      className="flex items-center gap-2 text-[13px] text-[#1A1A2E]/65 hover:text-[#D4AF37] transition-colors py-1.5 border-b border-[#E8E4DE] last:border-0"
+                      className="flex items-center gap-2 text-[13px] text-[#111111]/65 hover:text-[#D4AF37] transition-colors py-1.5 border-b border-[#E8E4DE] last:border-0"
                     >
                       <ChevronRight className="w-3 h-3 text-[#D4AF37]/50 flex-shrink-0" />
                       {s.label}

@@ -1,6 +1,6 @@
 import { supabase } from "@/integrations/supabase/client";
 
-async function logError(payload: {
+export async function logError(payload: {
   message: string;
   source?: string | null;
   url?: string | null;

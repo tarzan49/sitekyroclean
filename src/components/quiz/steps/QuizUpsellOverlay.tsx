@@ -108,7 +108,7 @@ const QuizUpsellOverlay = ({
             Uma visita.<br />Tudo limpo.
           </h2>
           <p className="text-[13px] text-white/50 max-w-[265px] mx-auto mb-5 leading-relaxed">
-            O técnico já vai até si — aproveite para limpar tudo de uma vez. A partir de <span className="text-gold font-bold">149€</span> poupa <span className="text-gold font-bold">10% em todo o pedido</span> automaticamente.
+            O técnico já vai até si, aproveite para limpar tudo de uma vez. A partir de <span className="text-gold font-bold">149€</span> poupa <span className="text-gold font-bold">10% em todo o pedido</span> automaticamente.
           </p>
           <PackProgressBar totalPrice={totalPrice} />
           <button
@@ -118,20 +118,20 @@ const QuizUpsellOverlay = ({
             <Check className="w-5 h-5" />
             Sim, quero poupar 10%
           </button>
-          <div className="w-full max-w-xs flex items-center gap-3">
-            <button
-              onClick={onBack}
-              className="h-11 px-4 flex-shrink-0 flex items-center gap-1.5 rounded-xl border border-white/[0.15] bg-transparent text-white/45 hover:text-white/75 hover:border-white/30 touch-manipulation active:scale-[0.98] transition-all text-sm"
-            >
-              <ChevronLeft className="w-4 h-4" />
-              Voltar
-            </button>
+          <div className="w-full max-w-xs flex flex-col items-center gap-2.5">
             <button
               onClick={onGoToContact}
-              className="flex-1 h-12 flex items-center justify-center gap-1.5 text-white font-bold transition-all touch-manipulation border border-white/30 bg-white/[0.08] hover:bg-white/[0.14] rounded-xl active:scale-[0.98] text-sm"
+              className="w-full h-12 flex items-center justify-center gap-1.5 text-white font-bold transition-all touch-manipulation border border-white/30 bg-white/[0.08] hover:bg-white/[0.14] rounded-xl active:scale-[0.98] text-sm"
             >
-              Não, seguir assim
+              Continuar sem o Pack
               <ChevronRight className="w-4 h-4" />
+            </button>
+            <button
+              onClick={onBack}
+              className="flex items-center gap-1 text-xs text-white/35 hover:text-white/60 active:text-white/60 transition-colors touch-manipulation py-1"
+            >
+              <ChevronLeft className="w-3.5 h-3.5" />
+              Voltar e alterar quantidades
             </button>
           </div>
           <p className="text-xs text-white/20 mt-3">Sem compromisso · Pode remover artigos a qualquer momento</p>
@@ -437,7 +437,7 @@ const QuizUpsellOverlay = ({
                   {uValid ? (
                     <>
                       <p className={cn('font-playfair font-black leading-none mb-1', uSob ? 'text-white/50 text-2xl' : 'text-gold text-4xl')}>
-                        {uSob ? 'Sob orçamento' : `${uPrice !== null ? Math.round(uPrice) : '—'}€`}
+                        {uSob ? 'Sob Orçamento' : `${uPrice !== null ? Math.round(uPrice) : '0'}€`}
                       </p>
                       <p className="text-[10px] text-white/30">
                         {uSob ? 'O nosso especialista entra em contacto' : `${uArea} m²`}
@@ -495,7 +495,7 @@ const QuizUpsellOverlay = ({
                     className={cn('font-playfair font-black leading-none mb-1', sobOrç ? 'text-white/60 text-2xl' : 'text-gold text-4xl')}
                     style={!sobOrç ? { textShadow: '0 0 28px rgba(212,175,55,0.55)' } : undefined}
                   >
-                    {sobOrç ? 'Sob orcamento' : `${totalChairPrice % 1 === 0 ? totalChairPrice : totalChairPrice.toFixed(1).replace('.', ',')}€`}
+                    {sobOrç ? 'Sob Orçamento' : `${totalChairPrice % 1 === 0 ? totalChairPrice : totalChairPrice.toFixed(1).replace('.', ',')}€`}
                   </p>
                   <p className="text-[10px] text-white/30">
                     {sobOrç ? 'O nosso especialista entra em contacto' : `${qty} cadeira${qty > 1 ? 's' : ''}${pendingWaterproof ? ' + impermeabilização' : ''}`}

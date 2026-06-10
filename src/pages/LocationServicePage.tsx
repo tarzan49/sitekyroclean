@@ -135,7 +135,7 @@ const LocationServicePage = () => {
         <Header />
         <main className="pt-28 pb-16 min-h-screen bg-white">
           <div className="container mx-auto px-4 text-center">
-            <h1 className="font-playfair text-3xl font-bold text-[#1A1A2E] mb-4">Página não encontrada</h1>
+            <h1 className="font-playfair text-3xl font-bold text-[#111111] mb-4">Página não encontrada</h1>
             <Link to="/" style={{ color: "#D4AF37" }} className="hover:underline">Voltar ao início</Link>
           </div>
         </main>
@@ -283,7 +283,7 @@ const LocationServicePage = () => {
                   <p className="text-[10px] font-bold tracking-[0.28em] uppercase" style={{ color: "#D4AF37" }}>O que resolvemos</p>
                   <div className="h-px w-10 opacity-40" style={{ backgroundColor: "#D4AF37" }} />
                 </div>
-                <h2 className="font-playfair text-2xl md:text-3xl font-bold text-[#1A1A2E]">
+                <h2 className="font-playfair text-2xl md:text-3xl font-bold text-[#111111]">
                   Problemas comuns em {data.city}
                 </h2>
               </div>
@@ -299,7 +299,7 @@ const LocationServicePage = () => {
                     >
                       <Star className="w-5 h-5" style={{ color: "#D4AF37" }} />
                     </div>
-                    <p className="text-sm font-semibold text-[#1A1A2E] leading-snug">{problem.title}</p>
+                    <p className="text-sm font-semibold text-[#111111] leading-snug">{problem.title}</p>
                   </div>
                 ))}
               </div>
@@ -318,7 +318,7 @@ const LocationServicePage = () => {
                     <p className="text-[10px] font-bold tracking-[0.28em] uppercase" style={{ color: "#D4AF37" }}>Preços em {data.city}</p>
                     <div className="h-px w-10 opacity-40" style={{ backgroundColor: "#D4AF37" }} />
                   </div>
-                  <h2 className="font-playfair text-2xl md:text-3xl font-bold text-[#1A1A2E]">
+                  <h2 className="font-playfair text-2xl md:text-3xl font-bold text-[#111111]">
                     Quanto custa {data.service.toLowerCase()} em {data.city}?
                   </h2>
                 </div>
@@ -333,15 +333,14 @@ const LocationServicePage = () => {
                       ].join(" ")}
                       style={row.highlight ? { borderLeftColor: "#D4AF37" } : {}}
                     >
-                      <span className={row.highlight ? "font-semibold text-[#1A1A2E]" : "text-[#1A1A2E]/70"}>{row.item}</span>
+                      <span className={row.highlight ? "font-semibold text-[#111111]" : "text-[#111111]/70"}>{row.item}</span>
                       <span className="font-bold tabular-nums" style={{ color: "#D4AF37" }}>{row.price}</span>
                     </div>
                   ))}
                 </div>
-                <div className="flex items-center justify-center gap-4 mt-4 text-xs text-[#1A1A2E]/45 flex-wrap">
+                <div className="flex items-center justify-center gap-4 mt-4 text-xs text-[#111111]/45 flex-wrap">
                   <span className="flex items-center gap-1"><CheckCircle className="w-3.5 h-3.5" style={{ color: "#D4AF37" }} /> Deslocação incluída na área de {data.city}</span>
                   <span className="flex items-center gap-1"><CheckCircle className="w-3.5 h-3.5" style={{ color: "#D4AF37" }} /> Orçamento gratuito e sem compromisso</span>
-                  <span className="flex items-center gap-1"><CheckCircle className="w-3.5 h-3.5" style={{ color: "#D4AF37" }} /> IVA incluído</span>
                 </div>
               </div>
             </div>
@@ -463,7 +462,7 @@ const LocationServicePage = () => {
                     <p className="text-[10px] font-bold tracking-[0.28em] uppercase" style={{ color: "#D4AF37" }}>Avaliações reais</p>
                     <div className="h-px w-10 opacity-40" style={{ backgroundColor: "#D4AF37" }} />
                   </div>
-                  <h2 className="font-playfair text-xl md:text-2xl font-bold text-[#1A1A2E]">O que dizem os nossos clientes</h2>
+                  <h2 className="font-playfair text-xl md:text-2xl font-bold text-[#111111]">O que dizem os nossos clientes</h2>
                 </div>
                 <div className="grid sm:grid-cols-2 gap-4 mb-6">
                   {SERVICE_TESTIMONIALS[data.serviceSlug].map((t, i) => (
@@ -471,14 +470,14 @@ const LocationServicePage = () => {
                       <div className="flex gap-0.5 mb-3">
                         {[...Array(5)].map((_, j) => <Star key={j} className="w-3.5 h-3.5 fill-[#D4AF37]" style={{ color: "#D4AF37" }} />)}
                       </div>
-                      <p className="text-sm text-[#1A1A2E]/65 leading-relaxed italic mb-3">"{t.text}"</p>
+                      <p className="text-sm text-[#111111]/65 leading-relaxed italic mb-3">"{t.text}"</p>
                       <div className="flex items-center gap-2">
                         <div className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold text-white" style={{ background: "#D4AF37" }}>
                           {t.name.charAt(0)}
                         </div>
                         <div>
-                          <p className="text-xs font-bold text-[#1A1A2E]">{t.name}</p>
-                          <p className="text-[10px] text-[#1A1A2E]/40">{t.city}</p>
+                          <p className="text-xs font-bold text-[#111111]">{t.name}</p>
+                          <p className="text-[10px] text-[#111111]/40">{t.city}</p>
                         </div>
                       </div>
                     </div>
@@ -506,11 +505,11 @@ const LocationServicePage = () => {
                 <p className="text-[10px] font-bold tracking-[0.28em] uppercase" style={{ color: "#D4AF37" }}>Cobertura</p>
                 <div className="h-px w-10 opacity-40" style={{ backgroundColor: "#D4AF37" }} />
               </div>
-              <h2 className="font-playfair text-2xl md:text-3xl font-bold text-[#1A1A2E] mb-4">
+              <h2 className="font-playfair text-2xl md:text-3xl font-bold text-[#111111] mb-4">
                 Servimos {data.city} e arredores
               </h2>
               {data.localSection && (
-                <p className="text-sm text-[#1A1A2E]/60 max-w-2xl mx-auto mb-6 leading-relaxed">{data.localSection}</p>
+                <p className="text-sm text-[#111111]/60 max-w-2xl mx-auto mb-6 leading-relaxed">{data.localSection}</p>
               )}
 
               {cityFreguesias && cityFreguesias.freguesias.length > 0 && (
@@ -519,7 +518,7 @@ const LocationServicePage = () => {
                     <Link
                       key={f.slug}
                       to={`/${data.serviceSlug}-${data.citySlug}-${f.slug}`}
-                      className="inline-flex items-center gap-1.5 bg-[#FDFDF9] px-3.5 py-2 rounded-full text-sm font-medium text-[#1A1A2E] border border-[#E8E4DE] hover:border-[#D4AF37]/40 hover:bg-[#D4AF37]/5 hover:shadow-sm transition-all"
+                      className="inline-flex items-center gap-1.5 bg-[#FDFDF9] px-3.5 py-2 rounded-full text-sm font-medium text-[#111111] border border-[#E8E4DE] hover:border-[#D4AF37]/40 hover:bg-[#D4AF37]/5 hover:shadow-sm transition-all"
                     >
                       <MapPin className="w-3 h-3" style={{ color: "#D4AF37" }} />
                       {f.name}
@@ -528,13 +527,13 @@ const LocationServicePage = () => {
                 </div>
               )}
 
-              <p className="text-xs text-[#1A1A2E]/50 mb-3">Também disponível em:</p>
+              <p className="text-xs text-[#111111]/50 mb-3">Também disponível em:</p>
               <div className="flex flex-wrap justify-center gap-3">
                 {getCityLinksForService(data.serviceSlug).filter(c => c.name !== data.city).slice(0, 6).map(city => (
                   <Link
                     key={city.name}
                     to={city.path}
-                    className="text-xs text-[#1A1A2E]/60 hover:text-[#D4AF37] transition-colors font-medium"
+                    className="text-xs text-[#111111]/60 hover:text-[#D4AF37] transition-colors font-medium"
                   >
                     {city.name}
                   </Link>
@@ -543,13 +542,13 @@ const LocationServicePage = () => {
 
               {otherServices.length > 0 && (
                 <div className="mt-8 pt-6 border-t border-[#E8E4DE]">
-                  <p className="text-xs text-[#1A1A2E]/50 mb-3">Outros serviços em {data.city}:</p>
+                  <p className="text-xs text-[#111111]/50 mb-3">Outros serviços em {data.city}:</p>
                   <div className="flex flex-wrap justify-center gap-3">
                     {otherServices.map(svc => (
                       <Link
                         key={svc.slug}
                         to={svc.locationPath}
-                        className="text-xs font-semibold text-[#1A1A2E]/60 hover:text-[#D4AF37] transition-colors"
+                        className="text-xs font-semibold text-[#111111]/60 hover:text-[#D4AF37] transition-colors"
                       >
                         {svc.name}
                       </Link>
@@ -560,13 +559,13 @@ const LocationServicePage = () => {
 
               {relatedProblems.length > 0 && (
                 <div className="mt-6 pt-5 border-t border-[#E8E4DE]">
-                  <p className="text-xs text-[#1A1A2E]/50 mb-3">Problemas que resolvemos em {data.city}:</p>
+                  <p className="text-xs text-[#111111]/50 mb-3">Problemas que resolvemos em {data.city}:</p>
                   <div className="flex flex-wrap justify-center gap-3">
                     {relatedProblems.map(p => (
                       <Link
                         key={p.slug}
                         to={`/${p.slug}-${data.citySlug}`}
-                        className="text-xs text-[#1A1A2E]/60 hover:text-[#D4AF37] transition-colors font-medium"
+                        className="text-xs text-[#111111]/60 hover:text-[#D4AF37] transition-colors font-medium"
                       >
                         {p.keyword}
                       </Link>
@@ -577,13 +576,13 @@ const LocationServicePage = () => {
 
               {materialLinks.length > 0 && (
                 <div className="mt-6 pt-5 border-t border-[#E8E4DE]">
-                  <p className="text-xs text-[#1A1A2E]/50 mb-3">Por tipo de material em {data.city}:</p>
+                  <p className="text-xs text-[#111111]/50 mb-3">Por tipo de material em {data.city}:</p>
                   <div className="flex flex-wrap justify-center gap-3">
                     {materialLinks.map(m => (
                       <Link
                         key={m.slug}
                         to={`/${m.slug}-${data.citySlug}`}
-                        className="text-xs text-[#1A1A2E]/60 hover:text-[#D4AF37] transition-colors font-medium"
+                        className="text-xs text-[#111111]/60 hover:text-[#D4AF37] transition-colors font-medium"
                       >
                         {m.name}
                       </Link>
@@ -594,13 +593,13 @@ const LocationServicePage = () => {
 
               {data.serviceSlug === 'limpeza-sofas' && (
                 <div className="mt-6 pt-5 border-t border-[#E8E4DE]">
-                  <p className="text-xs text-[#1A1A2E]/50 mb-3">Marcas de sofá que limpamos em {data.city}:</p>
+                  <p className="text-xs text-[#111111]/50 mb-3">Marcas de sofá que limpamos em {data.city}:</p>
                   <div className="flex flex-wrap justify-center gap-3">
                     {MARCA_SLUGS.map(slug => (
                       <Link
                         key={slug}
                         to={`/limpeza-sofa-${slug}-${data.citySlug}`}
-                        className="text-xs text-[#1A1A2E]/60 hover:text-[#D4AF37] transition-colors font-medium capitalize"
+                        className="text-xs text-[#111111]/60 hover:text-[#D4AF37] transition-colors font-medium capitalize"
                       >
                         {slug.replace(/-/g, ' ')}
                       </Link>
@@ -629,7 +628,7 @@ const LocationServicePage = () => {
                     <p className="text-[10px] font-bold tracking-[0.28em] uppercase" style={{ color: "#D4AF37" }}>Vantagens</p>
                     <div className="h-px w-10 opacity-40" style={{ backgroundColor: "#D4AF37" }} />
                   </div>
-                  <h2 className="font-playfair text-2xl md:text-3xl font-bold text-[#1A1A2E]">
+                  <h2 className="font-playfair text-2xl md:text-3xl font-bold text-[#111111]">
                     Porquê escolher a Kyro em {data.city}
                   </h2>
                 </div>
@@ -637,7 +636,7 @@ const LocationServicePage = () => {
                   {data.benefits.map((benefit, idx) => (
                     <div key={idx} className="flex items-start gap-3 bg-[#FDFDF9] rounded-2xl p-4 border border-[#E8E4DE]">
                       <CheckCircle className="w-5 h-5 mt-0.5 shrink-0" style={{ color: "#D4AF37" }} />
-                      <span className="text-sm text-[#1A1A2E]/70 leading-relaxed">{benefit}</span>
+                      <span className="text-sm text-[#111111]/70 leading-relaxed">{benefit}</span>
                     </div>
                   ))}
                 </div>

@@ -7,6 +7,7 @@ import { X, ChevronRight, ChevronLeft, Check, Flame, AlertTriangle } from 'lucid
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import { trackQuizEvent } from '@/lib/quizTracking';
+import { logError } from '@/lib/errorTracking';
 import { useQuizAnalytics } from '@/hooks/use-quiz-analytics';
 import ConfettiGold from './quiz/ConfettiGold';
 import {
@@ -38,6 +39,17 @@ function calcInitialStep(loc?: string, svc?: string): number {
   if (!svc) return 1;
   const skipType = svc === 'carpet' || svc === 'mattress';
   return skipType ? 3 : 2;
+}
+
+// sessionStorage can throw (e.g. Safari Private Browsing, restricted in-app browsers).
+// These values are only used to enrich the "Obrigado" page, so a failure here must
+// never block the success flow once the lead has already been sent to Formspree.
+function safeSessionSet(key: string, value: string) {
+  try {
+    sessionStorage.setItem(key, value);
+  } catch (e) {
+    console.warn(`[QuizForm] sessionStorage.setItem("${key}") failed:`, e);
+  }
 }
 
 const QuizForm = ({ isOpen, onClose, initialLocation, initialService, problema }: QuizFormProps) => {
@@ -641,18 +653,37 @@ ${formData.description || 'Sem observações adicionais'}
         formPayload.append(`foto_${i + 1}`, photo, photo.name);
       });
 
-      const response = await fetch('https://formspree.io/f/xreozzbp', {
-        method: 'POST',
-        headers: { 'Accept': 'application/json' },
-        body: formPayload,
-      });
+      // Submissions on mobile networks can fail transiently (timeouts, brief
+      // connection drops). Retry once before treating it as a real failure.
+      let response: Response;
+      try {
+        response = await fetch('https://formspree.io/f/xreozzbp', {
+          method: 'POST',
+          headers: { 'Accept': 'application/json' },
+          body: formPayload,
+        });
+      } catch (networkErr) {
+        console.warn('[QuizForm] Formspree fetch failed, retrying once:', networkErr);
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+        response = await fetch('https://formspree.io/f/xreozzbp', {
+          method: 'POST',
+          headers: { 'Accept': 'application/json' },
+          body: formPayload,
+        });
+      }
 
       console.log('[QuizForm] Formspree response status:', response.status);
 
       if (!response.ok) {
-        throw new Error('Erro ao enviar');
+        const errBody = await response.text().catch(() => '');
+        throw new Error(`Formspree ${response.status}: ${errBody.slice(0, 500)}`);
       }
 
+      // From here on, the lead has already been captured by Formspree.
+      // Anything below is just enrichment (CRM backup, analytics, data for the
+      // "Obrigado" page) - if any of it fails, log it but still treat the
+      // submission as successful so the user never sees a false error.
+      try {
       // Track successful submission
       trackSubmission();
 
@@ -690,7 +721,7 @@ ${formData.description || 'Sem observações adicionais'}
       } catch (supaErr) {
         console.warn('[CRM] Lead backup failed silently:', supaErr);
       }
-      sessionStorage.setItem('kyro_booking_id', bookingId);
+      safeSessionSet('kyro_booking_id', bookingId);
 
       // Build WA URL for optional support button on Obrigado page
       const finalPriceText = packDiscountActive && totalPrice > 0
@@ -713,7 +744,7 @@ ${formData.description || 'Sem observações adicionais'}
         `Olá Kyro Clean Solutions. Acabei de gerar um orçamento detalhado no site e pretendo confirmar o agendamento.\n\n` +
         `DADOS DO PEDIDO:\n` +
         `▸ Serviço: ${serviceLabel}\n` +
-        `▸ Item: ${detailsSummary || '—'}\n` +
+        `▸ Item: ${detailsSummary || 'N/D'}\n` +
         `▸ Extras: ${waExtrasText}\n` +
         `▸ Localização: ${finalLocation}\n` +
         `▸ Valor Total: ${waTotalPrice}\n` +
@@ -767,7 +798,7 @@ ${formData.description || 'Sem observações adicionais'}
       });
       if (finalTravelCost > 0) receiptLines.push({ label: `Deslocação: ${finalLocation}`, qty: 1, unitPrice: finalTravelCost, total: finalTravelCost });
       const discountAmt = packDiscountActive ? Math.round((totalPrice - packDiscountedPrice) * 100) / 100 : 0;
-      sessionStorage.setItem('kyro_receipt', JSON.stringify({
+      safeSessionSet('kyro_receipt', JSON.stringify({
         lines: receiptLines,
         subtotal: totalPrice,
         discountLabel: packDiscountActive ? `Pack Família −${Math.round(packDiscountPct * 100)}%` : null,
@@ -780,19 +811,35 @@ ${formData.description || 'Sem observações adicionais'}
       }));
 
       // Store for Obrigado page
-      sessionStorage.setItem('kyro_wa_url', `https://wa.me/351925530647?text=${waText}`);
-      sessionStorage.setItem('kyro_summary', JSON.stringify({
+      safeSessionSet('kyro_wa_url', `https://wa.me/351925530647?text=${waText}`);
+      safeSessionSet('kyro_summary', JSON.stringify({
         price: finalPriceText,
         service: `${serviceLabel}${serviceTypeLabel ? `: ${serviceTypeLabel}` : ''}`,
         location: finalLocation,
       }));
+      } catch (postSubmitError) {
+        console.warn('[QuizForm] Post-submit enrichment failed (lead already sent):', postSubmitError);
+        logError({
+          message: postSubmitError instanceof Error ? postSubmitError.message : String(postSubmitError),
+          source: 'QuizForm-post-submit',
+          severity: 'warning',
+          stack: postSubmitError instanceof Error ? postSubmitError.stack ?? null : null,
+        });
+      }
 
       resetForm();
       onClose();
       navigate('/obrigado');
     } catch (error) {
       console.error('[QuizForm] Submit error:', error);
-      
+
+      logError({
+        message: error instanceof Error ? error.message : String(error),
+        source: 'QuizForm-submit',
+        severity: 'error',
+        stack: error instanceof Error ? error.stack ?? null : null,
+      });
+
       const whatsappMessage = encodeURIComponent(
         `Olá! Tentei pedir orçamento pelo site mas houve um erro.\n\n` +
         `Nome: ${formData.name}\n` +
@@ -952,45 +999,6 @@ ${formData.description || 'Sem observações adicionais'}
           </div>
         </div>
 
-        {/* Urgency bar, hidden in landscape */}
-        <div className={cn(
-          "text-white text-xs font-semibold px-4 py-1.5 flex items-center justify-between flex-shrink-0 transition-all duration-500 landscape:hidden landscape:sm:flex",
-          packDiscountActive
-            ? timerFlash ? "bg-gold/25" : "bg-gold/12"
-            : countdown === 0 ? "bg-white/[0.09]" : countdown < 120 ? "bg-amber-900/45" : "bg-amber-900/25"
-        )}>
-          {packDiscountActive ? (
-            <>
-              <span className="flex items-center gap-1.5">
-                <Check className={cn("w-4 h-4 flex-shrink-0 text-gold", timerFlash && "animate-bounce")} />
-                <span className={cn("font-bold", timerFlash ? "text-gold animate-pulse" : "text-gold/90")}>
-                  Desconto de 10% ativado!
-                </span>
-              </span>
-              <span className="font-mono bg-gold/20 px-2 py-0.5 rounded text-sm tabular-nums font-black text-gold">
-                −{Math.round(packDiscountPct * 100)}%
-              </span>
-            </>
-          ) : countdown > 0 ? (
-            <>
-              <span className="flex items-center gap-1.5">
-                <Flame className={cn("w-3.5 h-3.5 flex-shrink-0 text-gold", countdown < 120 && "animate-pulse")} />
-                <span className="text-white/60">
-                  {"Alta procura. Vaga reservada por:"}
-                </span>
-              </span>
-              <span className={cn(
-                "font-mono bg-white/10 px-2 py-0.5 rounded text-sm tabular-nums font-bold",
-                countdown < 120 ? "text-amber-300" : "text-gold"
-              )}>
-                {formatCountdown(countdown)}
-              </span>
-            </>
-          ) : (
-            <span className="text-white/25 text-[11px] w-full text-center">Preço padrão em vigor</span>
-          )}
-        </div>
-
         {/* Gold progress bar */}
         <div className="h-[4px] bg-white/[0.04] flex-shrink-0 overflow-hidden">
           <div
@@ -1021,7 +1029,7 @@ ${formData.description || 'Sem observações adicionais'}
               <span className="text-xs text-white/40 font-medium">
                 {calculateServicePrice === 0 && finalTravelCost > 0
                   ? <span>Deslocação <span className="text-white/20 text-[10px]">({formData.location})</span></span>
-                  : <>Estimativa <span className="text-[10px] text-white/20">(IVA incl.)</span></>
+                  : 'Estimativa'
                 }
               </span>
               <div className="flex items-center gap-3 pr-8">
@@ -1129,9 +1137,6 @@ ${formData.description || 'Sem observações adicionais'}
                     waterproofingDesc={waterDesc}
                     hideWaterproofing={formData.service === 'mattress'}
                   />
-                  <p className="text-xs text-white/20 uppercase tracking-widest text-center mt-1">
-                    Todos os valores incluem IVA à taxa legal em vigor
-                  </p>
                 </div>
               );
             })()}
@@ -1173,7 +1178,7 @@ ${formData.description || 'Sem observações adicionais'}
                 totalPrice={totalPrice}
                 packDiscountActive={packDiscountActive}
                 onGoToContact={() => { (document.activeElement as HTMLElement)?.blur(); setShowUpsell(false); setCurrentStep(4); }}
-                onBack={() => setShowUpsell(false)}
+                onBack={() => { (document.activeElement as HTMLElement)?.blur(); setShowUpsell(false); setCurrentStep(3); }}
               />
             )}
 
@@ -1198,7 +1203,7 @@ ${formData.description || 'Sem observações adicionais'}
           <div className="flex flex-col gap-2 w-full">
             {totalPrice > 0 && (
               <p className="text-center text-[10px] text-white/25 font-medium tracking-wide">
-                Preço final com IVA incluído: <span className="text-gold/60 font-bold">{packDiscountActive ? `${packDiscountedPrice}€` : `${totalPrice}€`}</span>
+                Preço final: <span className="text-gold/60 font-bold">{packDiscountActive ? `${packDiscountedPrice}€` : `${totalPrice}€`}</span>
               </p>
             )}
             <Button
