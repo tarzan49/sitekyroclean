@@ -1,7 +1,14 @@
 ﻿/**
  * Static prerender for Kyro Clean Solutions
- * Generates dist/{route}/index.html with correct title/description/canonical
+ * Generates dist/{route}.html with correct title/description/canonical
  * for all ~3,500 programmatic SEO routes so Googlebot sees real meta tags.
+ *
+ * IMPORTANT: must emit flat {route}.html files, NOT {route}/index.html.
+ * Cloudflare Pages serves {route}.html directly for /{route} with no
+ * redirect, matching React Router's exact (no-trailing-slash) routes.
+ * A {route}/index.html directory instead triggers an automatic 308
+ * redirect to /{route}/, which React Router's routes don't match
+ * (causes a "Página não encontrada" / NotFound on every prerendered page).
  *
  * Runs as a Vite closeBundle plugin step (see vite.config.ts).
  * Can also run standalone: npx tsx scripts/prerender.ts
@@ -49,9 +56,9 @@ function injectMeta(template: string, title: string, desc: string, canonical: st
 
 function writeRoute(outDir: string, routePath: string, html: string): void {
   const rel = routePath.replace(/^\//, '');
-  const dir = path.join(outDir, rel);
-  fs.mkdirSync(dir, { recursive: true });
-  fs.writeFileSync(path.join(dir, 'index.html'), html, 'utf-8');
+  const filePath = path.join(outDir, `${rel}.html`);
+  fs.mkdirSync(path.dirname(filePath), { recursive: true });
+  fs.writeFileSync(filePath, html, 'utf-8');
 }
 
 // ─── Main ─────────────────────────────────────────────────────────────────
