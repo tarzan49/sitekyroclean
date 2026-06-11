@@ -8,18 +8,6 @@ interface Props {
   city?: string;
 }
 
-const CHECKER = {
-  background: "#071a12",
-  backgroundImage: [
-    "linear-gradient(45deg,rgba(212,175,55,0.04) 25%,transparent 25%)",
-    "linear-gradient(-45deg,rgba(212,175,55,0.04) 25%,transparent 25%)",
-    "linear-gradient(45deg,transparent 75%,rgba(212,175,55,0.04) 75%)",
-    "linear-gradient(-45deg,transparent 75%,rgba(212,175,55,0.04) 75%)",
-  ].join(","),
-  backgroundSize: "28px 28px",
-  backgroundPosition: "0 0,0 14px,14px -14px,-14px 0px",
-};
-
 const ServicePackBanner = ({ packSlugs, city = "porto" }: Props) => {
   const cityObj = packCities.find(c => c.slug === city) ?? packCities[0];
 
@@ -30,7 +18,7 @@ const ServicePackBanner = ({ packSlugs, city = "porto" }: Props) => {
   if (!relevantPacks.length) return null;
 
   return (
-    <section className="relative py-14 md:py-20 overflow-hidden" style={CHECKER}>
+    <section className="relative py-14 md:py-20 overflow-hidden bg-checker-dark">
       {/* Ambient glow */}
       <div
         className="absolute top-0 left-1/2 -translate-x-1/2 w-[min(600px,100vw)] h-[300px] rounded-full pointer-events-none"

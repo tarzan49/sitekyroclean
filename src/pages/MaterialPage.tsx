@@ -6,6 +6,7 @@ import { ArrowRight, MapPin, CheckCircle, Search, Droplets, Sparkles, Wind, Mess
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import QuizButton from "@/components/QuizButton";
+import TrustRatingBadge from "@/components/TrustRatingBadge";
 import { trackWhatsAppClick } from "@/lib/quizTracking";
 import { SERVICE_TO_QUIZ } from "@/constants/serviceToQuiz";
 import ServiceFAQSchema from "@/components/ServiceFAQSchema";
@@ -16,46 +17,18 @@ import {
   getRelatedMaterialLinks,
 } from "@/data/materialSeoData";
 import { cities, services } from "@/data/locationSeoData";
-import { SITE_URL, WHATSAPP_BASE, REVIEW_RATING, REVIEW_COUNT } from "@/constants/business";
-import heroSofa          from "@/assets/hero-sofa-cleaning-new.webp";
-import heroRug           from "@/assets/hero-rug-cleaning-new.webp";
-import heroCarpet        from "@/assets/hero-carpet-cleaning-new.webp";
-import sofaProcesso      from "@/assets/galeria-sofa-processo.webp";
-import sofaResultado     from "@/assets/galeria-sofa-resultado.webp";
-import sofaAntes         from "@/assets/galeria-sofa-antes.webp";
-
-const MATERIAL_HERO: Record<string, string> = {
-  "limpeza-sofa-tecido":      sofaProcesso,
-  "limpeza-sofa-veludo":      sofaAntes,
-  "limpeza-sofa-pele":        sofaResultado,
-  "limpeza-sofa-microfibra":  heroSofa,
-  "limpeza-sofa-linho":       heroSofa,
-  "limpeza-sofa-camurca":     sofaAntes,
-  "limpeza-sofa-sintetico":   heroSofa,
-  "limpeza-tapete-la":        heroRug,
-  "limpeza-tapete-persa":     heroRug,
-  "limpeza-tapete-sintetico": heroCarpet,
-  "limpeza-tapete-sisal":     heroCarpet,
-};
+import { SITE_URL, WHATSAPP_BASE } from "@/constants/business";
+import { buildMaterialWaMessage } from "@/lib/whatsappMessages";
+import { MATERIAL_HERO, MATERIAL_HERO_FALLBACK } from "@/data/materialHeroImages";
+import {
+  buildWebPageNode,
+  buildBreadcrumbNode,
+  buildServiceNode,
+  buildOfferNode,
+  DEFAULT_AREA_SERVED,
+} from "@/lib/seoSchema";
 
 const STEP_ICONS = [Search, Droplets, Sparkles, Wind];
-
-function buildMaterialWaMessage(slug: string, cityName: string | null): string {
-  const city = cityName ? ` em ${cityName}` : '';
-  if (slug.includes('pele'))       return `Olá! Tenho um sofá de pele e preciso de limpeza e tratamento${city}. Qual é o preço?`;
-  if (slug.includes('veludo'))     return `Olá! Tenho um sofá de veludo e preciso de limpeza especializada${city}. Qual é o preço?`;
-  if (slug.includes('camurca'))    return `Olá! Tenho um sofá de camurça e preciso de limpeza profissional${city}. Qual é o preço?`;
-  if (slug.includes('microfibra')) return `Olá! Tenho um sofá de microfibra para limpar${city}. Qual é o preço?`;
-  if (slug.includes('linho'))      return `Olá! Tenho um sofá de linho para limpar${city}. Qual é o preço?`;
-  if (slug.includes('sintetico') && slug.includes('sofa')) return `Olá! Tenho um sofá sintético para limpar${city}. Qual é o preço?`;
-  if (slug.includes('sofa'))       return `Olá! Tenho um sofá de tecido e preciso de limpeza profissional${city}. Qual é o preço?`;
-  if (slug.includes('persa'))      return `Olá! Tenho um tapete persa e preciso de lavagem especializada${city}. Qual é o preço?`;
-  if (slug.includes('tapete-la') || (slug.includes('tapete') && slug.includes('-la')))
-                                   return `Olá! Tenho um tapete de lã para lavagem profissional${city}. Qual é o preço?`;
-  if (slug.includes('sisal'))      return `Olá! Tenho um tapete de sisal para limpar${city}. Qual é o preço?`;
-  if (slug.includes('tapete'))     return `Olá! Tenho um tapete sintético para limpar${city}. Qual é o preço?`;
-  return `Olá! Preciso de limpeza profissional${city}. Qual é o preço e disponibilidade?`;
-}
 
 const MaterialPage = () => {
   const { pathname } = useLocation();
@@ -134,7 +107,7 @@ const MaterialPage = () => {
         <section className="relative pt-24 md:pt-28 pb-14 md:pb-20 overflow-hidden bg-checker-dark">
           <div className="absolute inset-0 overflow-hidden" aria-hidden="true">
             <img
-              src={MATERIAL_HERO[data.slug] ?? heroSofa}
+              src={MATERIAL_HERO[data.slug] ?? MATERIAL_HERO_FALLBACK}
               alt=""
               className="w-full h-full object-cover"
               loading="eager"
@@ -169,12 +142,7 @@ const MaterialPage = () => {
               {/* Price + Stars */}
               <div className="flex flex-wrap items-center gap-4 mb-8">
                 <span className="text-sm font-bold" style={{ color: "#D4AF37" }}>Desde {servicePrice}</span>
-                <div className="flex items-center gap-1.5">
-                  {[...Array(5)].map((_, i) => (
-                    <svg key={i} className="w-4 h-4" fill="#D4AF37" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>
-                  ))}
-                  <span className="text-sm text-white/60 ml-1">{REVIEW_RATING} · {REVIEW_COUNT}+ avaliações</span>
-                </div>
+                <TrustRatingBadge variant="compact" />
               </div>
 
               <div className="flex gap-3 max-w-xs sm:max-w-sm">
@@ -397,52 +365,24 @@ const MaterialPage = () => {
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({
           "@context": "https://schema.org",
           "@graph": [
-            {
-              "@type": "WebPage",
-              "@id": `${SITE_URL}${pathname}#webpage`,
-              "url": `${SITE_URL}${pathname}`,
-              "name": data.title,
-              "description": data.metaDescription,
-              "inLanguage": "pt-PT",
-              "isPartOf": { "@id": `${SITE_URL}/#website` },
-              "publisher": { "@id": `${SITE_URL}/#business` },
-              "breadcrumb": { "@id": `${SITE_URL}${pathname}#breadcrumb` },
-            },
-            {
-              "@type": "BreadcrumbList",
-              "@id": `${SITE_URL}${pathname}#breadcrumb`,
-              "itemListElement": [
-                { "@type": "ListItem", "position": 1, "name": "Início", "item": SITE_URL },
-                { "@type": "ListItem", "position": 2, "name": data.serviceName, "item": `${SITE_URL}/${data.serviceSlug}` },
-                { "@type": "ListItem", "position": 3, "name": data.name, "item": `${SITE_URL}/${data.slug}` },
-                ...(isCityVariant && cityName ? [{ "@type": "ListItem", "position": 4, "name": cityName, "item": `${SITE_URL}${pathname}` }] : []),
-              ],
-            },
-            {
-              "@type": "Service",
-              "@id": `${SITE_URL}${pathname}#service`,
-              "name": data.title,
-              "description": data.metaDescription,
-              "url": `${SITE_URL}${pathname}`,
-              "provider": { "@id": `${SITE_URL}/#business` },
-              "areaServed": isCityVariant && cityName
-                ? { "@type": "City", "name": cityName }
-                : [
-                    { "@type": "City", "name": "Porto" },
-                    { "@type": "City", "name": "Matosinhos" },
-                    { "@type": "City", "name": "Maia" },
-                    { "@type": "City", "name": "Vila Nova de Gaia" },
-                    { "@type": "City", "name": "Gondomar" },
-                    { "@type": "City", "name": "Braga" },
-                    { "@type": "City", "name": "Lisboa" },
-                  ],
-              "offers": {
-                "@type": "Offer",
-                "priceCurrency": "EUR",
-                "price": servicePrice.replace(/[^0-9]/g, ""),
-                "availability": "https://schema.org/InStock",
-              },
-            },
+            buildWebPageNode({
+              url: `${SITE_URL}${pathname}`,
+              name: data.title,
+              description: data.metaDescription,
+            }),
+            buildBreadcrumbNode(`${SITE_URL}${pathname}#breadcrumb`, [
+              { name: "Início", item: SITE_URL },
+              { name: data.serviceName, item: `${SITE_URL}/${data.serviceSlug}` },
+              { name: data.name, item: `${SITE_URL}/${data.slug}` },
+              ...(isCityVariant && cityName ? [{ name: cityName, item: `${SITE_URL}${pathname}` }] : []),
+            ]),
+            buildServiceNode({
+              url: `${SITE_URL}${pathname}`,
+              name: data.title,
+              description: data.metaDescription,
+              areaServed: isCityVariant && cityName ? { "@type": "City", name: cityName } : DEFAULT_AREA_SERVED,
+              offers: buildOfferNode(servicePrice.replace(/[^0-9]/g, "")),
+            }),
           ],
         }) }} />
       </main>

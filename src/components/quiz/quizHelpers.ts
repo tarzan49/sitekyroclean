@@ -1,4 +1,4 @@
-import type { SofaItem, MattressItem } from './QuizTypes';
+import type { SofaItem, MattressItem, PriceOption } from './QuizTypes';
 
 // ── Sofa helpers ─────────────────────────────────────────────────────────────
 export function sofaSetQty(items: SofaItem[], sizeId: string, newQty: number): SofaItem[] {
@@ -22,6 +22,34 @@ export function mattressSetQty(items: MattressItem[], sizeId: string, newQty: nu
 }
 export function mattressTogglePack(items: MattressItem[], sizeId: string): MattressItem[] {
   return items.map(i => i.sizeId === sizeId ? { ...i, packEnabled: !i.packEnabled } : i);
+}
+
+// ── Pack pricing (sofa + mattress) ────────────────────────────────────────────
+export interface PackPricing {
+  isSob: boolean;
+  basePrice: number | null;
+  packPrice: number | null;
+  packDelta: number | null;
+  displayPrice: number | null;
+}
+
+// fallbackDelta covers options without a fixed bothPrice (e.g. sofa "+40€" upsell);
+// mattress options always have a bothPrice, so they pass no fallback (null).
+export function calcPackPricing(
+  option: PriceOption,
+  packOn: boolean,
+  isWaterproofBase: boolean,
+  fallbackDelta: number | null = null,
+): PackPricing {
+  const isSob = typeof option.cleaningPrice !== 'number';
+  const cleanPrice = typeof option.cleaningPrice === 'number' ? option.cleaningPrice : null;
+  const waterPrice = typeof option.waterproofingPrice === 'number' ? option.waterproofingPrice : null;
+  const basePrice = isWaterproofBase ? waterPrice : cleanPrice;
+  const bothFullP = typeof option.bothPrice === 'number' ? option.bothPrice : null;
+  const packPrice = bothFullP ?? (fallbackDelta !== null && basePrice !== null ? basePrice + fallbackDelta : null);
+  const packDelta = packPrice !== null && basePrice !== null ? packPrice - basePrice : fallbackDelta;
+  const displayPrice = packOn && packPrice !== null ? packPrice : basePrice;
+  return { isSob, basePrice, packPrice, packDelta, displayPrice };
 }
 
 // ── Carpet ────────────────────────────────────────────────────────────────────

@@ -1,13 +1,8 @@
 ﻿import { useSearchParams } from "react-router-dom";
 import { Star, ExternalLink, MessageCircle, Heart } from "lucide-react";
 import { GOOGLE_REVIEW_URL } from "@/constants/google";
-import {
-  SITE_URL,
-  WHATSAPP_BASE,
-  PHONE_E164,
-  REVIEW_RATING,
-  REVIEW_COUNT,
-} from "@/constants/business";
+import { WHATSAPP_BASE } from "@/constants/business";
+import { buildLocalBusinessNode } from "@/lib/seoSchema";
 
 const serviceLabels: Record<string, string> = {
   sofa: "sofá",
@@ -29,17 +24,7 @@ const ReviewRequest = () => {
 
   const schema = {
     "@context": "https://schema.org",
-    "@type": "LocalBusiness",
-    "name": "Kyro Clean Solutions",
-    "url": SITE_URL,
-    "telephone": PHONE_E164,
-    "aggregateRating": {
-      "@type": "AggregateRating",
-      "ratingValue": REVIEW_RATING,
-      "bestRating": "5",
-      "worstRating": "1",
-      "reviewCount": REVIEW_COUNT,
-    },
+    ...buildLocalBusinessNode(),
   };
 
   return (

@@ -10,7 +10,7 @@ import ServiceFAQSchema from "@/components/ServiceFAQSchema";
 import { getPricePageData, getAllPriceRoutes } from "@/data/priceSeoData";
 import { services, cities } from "@/data/locationSeoData";
 import { SERVICE_TO_QUIZ } from "@/constants/serviceToQuiz";
-import { buildServiceWaMessage } from "@/lib/buildServiceWaMessage";
+import { buildServiceWaMessage } from "@/lib/whatsappMessages";
 import { SITE_URL, WHATSAPP_BASE, REVIEW_RATING } from "@/constants/business";
 
 const PricePage = () => {

@@ -1,10 +1,11 @@
 ﻿import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { ChevronDown, ChevronRight, MessageCircle, Phone, Star } from "lucide-react";
+import { ChevronDown, ChevronRight, MessageCircle, Phone } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import QuizButton from "@/components/QuizButton";
-import { SITE_URL, WHATSAPP_BASE, PHONE_E164, PHONE_DISPLAY, REVIEW_RATING, REVIEW_COUNT } from "@/constants/business";
+import TrustRatingBadge from "@/components/TrustRatingBadge";
+import { SITE_URL, WHATSAPP_BASE, PHONE_E164, PHONE_DISPLAY } from "@/constants/business";
 
 const PAGE_URL = `${SITE_URL}/perguntas-frequentes-limpeza-estofos`;
 
@@ -279,12 +280,7 @@ const FAQEstofos = () => {
                   </a>
                 </div>
                 {/* Rating */}
-                <div className="mt-4 pt-4 border-t border-white/10 flex items-center gap-2">
-                  <div className="flex gap-0.5">
-                    {[...Array(5)].map((_, i) => <Star key={i} className="w-3 h-3 fill-gold text-gold" />)}
-                  </div>
-                  <span className="text-white/50 text-[11px]">{REVIEW_RATING} · {REVIEW_COUNT}+ avaliações</span>
-                </div>
+                <TrustRatingBadge variant="pillSmall" />
               </div>
 
               {/* Related services */}

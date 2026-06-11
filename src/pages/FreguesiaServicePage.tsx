@@ -23,8 +23,9 @@ import { SERVICE_PACK_SLUGS } from "@/constants/servicePackSlugs";
 import { SERVICE_TO_QUIZ } from "@/constants/serviceToQuiz";
 import { METRO_CITIES } from "@/constants/metroCities";
 import { SERVICE_HERO_IMAGES, SERVICE_RESULT_IMAGES, SERVICE_RESULT_CONTENT, SERVICE_HERO_FALLBACK, SERVICE_RESULT_FALLBACK } from "@/constants/serviceContent";
-import { buildServiceWaMessage } from "@/lib/buildServiceWaMessage";
-import { SITE_URL, WHATSAPP_BASE, REVIEW_RATING, REVIEW_COUNT } from "@/constants/business";
+import { buildServiceWaMessage } from "@/lib/whatsappMessages";
+import { SITE_URL, WHATSAPP_BASE } from "@/constants/business";
+import TrustRatingBadge from "@/components/TrustRatingBadge";
 
 function parseFreguesiaRoute(pathname: string): { serviceSlug: string; citySlug: string; freguesiaSlug: string } | null {
   const path = pathname.replace(/^\//, '');
@@ -154,21 +155,7 @@ const FreguesiaServicePage = () => {
                   {data.intro.split('.')[0]}.
                 </p>
 
-                <div className="flex flex-wrap items-center gap-4 mb-8">
-                  <div className="flex items-center gap-1.5">
-                    <div className="flex gap-0.5">
-                      {[...Array(5)].map((_, i) => (
-                        <Star key={i} className="w-4 h-4 fill-[#D4AF37]" style={{ color: "#D4AF37" }} />
-                      ))}
-                    </div>
-                    <span className="text-white font-bold text-sm">{REVIEW_RATING}</span>
-                    <span className="text-white/50 text-xs">Google</span>
-                  </div>
-                  <div className="h-4 w-px bg-white/20" />
-                  <span className="text-white/60 text-xs font-medium">{REVIEW_COUNT}+ avaliações</span>
-                  <div className="h-4 w-px bg-white/20" />
-                  <span className="text-white/60 text-xs font-medium">+1000 clientes</span>
-                </div>
+                <TrustRatingBadge variant="hero" />
 
                 <div className="flex gap-3 max-w-md">
                   <QuizButton

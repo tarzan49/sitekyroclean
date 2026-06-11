@@ -1,8 +1,8 @@
 ﻿import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { ShieldCheck, HandCoins, Droplets, Star } from "lucide-react";
+import { ShieldCheck, HandCoins, Droplets } from "lucide-react";
 import QuizButton from "./QuizButton";
-import { REVIEW_RATING, REVIEW_COUNT } from "@/constants/business";
+import TrustRatingBadge from "@/components/TrustRatingBadge";
 
 const steps = [
   {
@@ -182,16 +182,7 @@ const HowItWorks = () => {
         style={{ transitionDelay: '600ms' }}
       >
         <QuizButton />
-        <div className="flex items-center gap-3">
-          <div className="flex gap-0.5">
-            {[...Array(5)].map((_, i) => (
-              <Star key={i} className="w-3.5 h-3.5 fill-gold text-gold" />
-            ))}
-          </div>
-          <span className="text-white font-bold text-sm">{REVIEW_RATING}</span>
-          <div className="w-px h-4 bg-white/20" />
-          <span className="text-white/45 text-[12px]">{REVIEW_COUNT}+ avaliações no Google</span>
-        </div>
+        <TrustRatingBadge variant="horizontal" />
       </div>
 
     </section>

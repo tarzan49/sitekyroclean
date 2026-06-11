@@ -7,6 +7,7 @@ import {
   sofaSetQty, sofaTogglePack,
   mattressSetQty, mattressTogglePack,
   calcCarpetPrice, calcChairClean, calcChairWaterproof,
+  calcPackPricing,
 } from '@/components/quiz/quizHelpers';
 
 interface QuizStepConfigProps {
@@ -41,15 +42,8 @@ const QuizStepConfig = ({
             const qty = item?.qty ?? 0;
             const packOn = item?.packEnabled ?? false;
             const isActive = qty > 0;
-            const isSob = typeof option.cleaningPrice !== 'number';
             const isWaterproofBase = formData.serviceType === 'waterproofing';
-            const cleanPrice = isSob ? null : (option.cleaningPrice as number);
-            const waterPrice = (!isSob && typeof option.waterproofingPrice === 'number') ? (option.waterproofingPrice as number) : null;
-            const basePrice = isWaterproofBase ? waterPrice : cleanPrice;
-            const bothFullP = !isSob && typeof option.bothPrice === 'number' ? (option.bothPrice as number) : null;
-            const packPrice = bothFullP ?? (basePrice !== null ? basePrice + 40 : null);
-            const packDelta = packPrice !== null && basePrice !== null ? packPrice - basePrice : 40;
-            const dp = packOn && packPrice !== null ? packPrice : basePrice;
+            const { isSob, basePrice, packDelta, displayPrice: dp } = calcPackPricing(option, packOn, isWaterproofBase, 40);
             const upsellLabel = isWaterproofBase ? 'Adicionar Higienização Profunda' : 'Adicionar Proteção Total VIP';
             const upsellSub = isWaterproofBase ? `+${packDelta}€/un. · Limpeza profunda incluída` : `+${packDelta}€/un. · Impermeabilização completa`;
             return (
@@ -109,12 +103,7 @@ const QuizStepConfig = ({
             const packOn = item?.packEnabled ?? false;
             const isActive = qty > 0;
             const isWaterproofBase = formData.serviceType === 'waterproofing';
-            const cleanPrice = typeof option.cleaningPrice === 'number' ? (option.cleaningPrice as number) : null;
-            const waterPrice = typeof option.waterproofingPrice === 'number' ? (option.waterproofingPrice as number) : null;
-            const basePrice = isWaterproofBase ? waterPrice : cleanPrice;
-            const packPrice = typeof option.bothPrice === 'number' ? (option.bothPrice as number) : null;
-            const dp = packOn && packPrice !== null ? packPrice : basePrice;
-            const packDelta = packPrice !== null && basePrice !== null ? packPrice - basePrice : null;
+            const { basePrice, packDelta, displayPrice: dp } = calcPackPricing(option, packOn, isWaterproofBase);
             const upsellLabel = isWaterproofBase ? 'Adicionar Higienização Profunda' : 'Adicionar Proteção Total VIP';
             const upsellSub = isWaterproofBase
               ? `${packDelta !== null ? `+${packDelta}€/un.` : '+?€/un.'} · Limpeza profunda incluída`

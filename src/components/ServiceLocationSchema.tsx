@@ -1,11 +1,12 @@
-﻿import {
-  SITE_URL,
-  PHONE_E164,
-  BUSINESS_EMAIL,
-  BUSINESS_ADDRESS,
-  REVIEW_RATING,
-  REVIEW_COUNT,
-} from "@/constants/business";
+import { SITE_URL } from "@/constants/business";
+import {
+  buildWebPageNode,
+  buildBreadcrumbNode,
+  buildLocalBusinessNode,
+  buildServiceNode,
+  buildOfferNode,
+  type AreaServed,
+} from "@/lib/seoSchema";
 
 interface Props {
   serviceName: string;
@@ -19,73 +20,30 @@ interface Props {
 
 const ServiceLocationSchema = ({ serviceName, serviceBaseUrl, placeName, parentPlace, description, pageUrl, priceFrom }: Props) => {
   const priceNum = /\d+/.exec(priceFrom)?.[0] ?? "39";
-  const base = SITE_URL;
-  const fullUrl = `${base}${pageUrl}`;
+  const fullUrl = `${SITE_URL}${pageUrl}`;
 
-  const areaServed = parentPlace
+  const areaServed: AreaServed = parentPlace
     ? [{ "@type": "City", "name": parentPlace }, { "@type": "Place", "name": placeName }]
     : { "@type": "City", "name": placeName };
 
   const schema = {
     "@context": "https://schema.org",
     "@graph": [
-      {
-        "@type": "WebPage",
-        "@id": `${fullUrl}#webpage`,
-        "url": fullUrl,
-        "name": `${serviceName} em ${placeName} | Kyro Clean Solutions`,
-        "description": description,
-        "inLanguage": "pt-PT",
-        "isPartOf": { "@id": `${base}/#website` },
-        "publisher": { "@id": `${base}/#business` },
-        "breadcrumb": { "@id": `${fullUrl}#breadcrumb` },
-      },
-      {
-        "@type": "BreadcrumbList",
-        "@id": `${fullUrl}#breadcrumb`,
-        "itemListElement": [
-          { "@type": "ListItem", "position": 1, "name": "Início", "item": base },
-          { "@type": "ListItem", "position": 2, "name": serviceName, "item": `${base}${serviceBaseUrl}` },
-          { "@type": "ListItem", "position": 3, "name": placeName, "item": fullUrl },
-        ],
-      },
-      {
-        "@type": ["LocalBusiness", "CleaningService"],
-        "@id": `${base}/#business`,
-        "name": "Kyro Clean Solutions",
-        "url": base,
-        "telephone": PHONE_E164,
-        "email": BUSINESS_EMAIL,
-        "priceRange": "€€",
-        "address": BUSINESS_ADDRESS,
-        "areaServed": areaServed,
-        "aggregateRating": {
-          "@type": "AggregateRating",
-          "ratingValue": REVIEW_RATING,
-          "bestRating": "5",
-          "worstRating": "1",
-          "reviewCount": REVIEW_COUNT,
-          "ratingCount": REVIEW_COUNT,
-        },
-      },
-      {
-        "@type": "Service",
-        "@id": `${fullUrl}#service`,
-        "name": `${serviceName} em ${placeName}`,
-        "description": description,
-        "url": fullUrl,
-        "provider": { "@id": `${base}/#business` },
-        "areaServed": areaServed,
-        "serviceType": serviceName,
-        "offers": {
-          "@type": "Offer",
-          "priceCurrency": "EUR",
-          "price": priceNum,
-          "availability": "https://schema.org/InStock",
-          "validFrom": "2025-01-01",
-          "priceValidUntil": "2026-12-31",
-        },
-      },
+      buildWebPageNode({ url: fullUrl, name: `${serviceName} em ${placeName} | Kyro Clean Solutions`, description }),
+      buildBreadcrumbNode(`${fullUrl}#breadcrumb`, [
+        { name: "Início", item: SITE_URL },
+        { name: serviceName, item: `${SITE_URL}${serviceBaseUrl}` },
+        { name: placeName, item: fullUrl },
+      ]),
+      buildLocalBusinessNode(areaServed),
+      buildServiceNode({
+        url: fullUrl,
+        name: `${serviceName} em ${placeName}`,
+        description,
+        areaServed,
+        serviceType: serviceName,
+        offers: buildOfferNode(priceNum, { validFrom: "2025-01-01", priceValidUntil: "2026-12-31" }),
+      }),
     ],
   };
 

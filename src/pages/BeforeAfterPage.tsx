@@ -1,11 +1,12 @@
 ﻿import { useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Star, ArrowRight, Phone, MessageCircle } from "lucide-react";
+import { ArrowRight, Phone, MessageCircle } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import QuizButton from "@/components/QuizButton";
 import BeforeAfterSlider from "@/components/BeforeAfterSlider";
-import { SITE_URL, WHATSAPP_BASE, PHONE_E164, REVIEW_RATING, REVIEW_COUNT } from "@/constants/business";
+import TrustRatingBadge from "@/components/TrustRatingBadge";
+import { SITE_URL, WHATSAPP_BASE, PHONE_E164 } from "@/constants/business";
 
 import sofaAntes from "@/assets/galeria-sofa-antes.webp";
 import sofaDepois from "@/assets/galeria-sofa-depois.webp";
@@ -139,17 +140,7 @@ const BeforeAfterPage = () => {
             <div className="max-w-4xl mx-auto">
               <div className="bg-white rounded-2xl p-6 md:p-8 shadow-sm border border-[#1A4E30]/10 flex flex-col sm:flex-row items-center gap-6">
                 <div className="flex items-center gap-3">
-                  <div>
-                    <div className="flex items-center gap-1.5">
-                      <span className="text-2xl font-bold text-[#111111]">{REVIEW_RATING}</span>
-                      <div className="flex gap-0.5">
-                        {[...Array(5)].map((_, i) => (
-                          <Star key={i} className="w-4 h-4 fill-[#D4AF37] text-[#D4AF37]" />
-                        ))}
-                      </div>
-                    </div>
-                    <p className="text-sm text-[#777]">{REVIEW_COUNT}+ avaliações no Google</p>
-                  </div>
+                  <TrustRatingBadge variant="card" />
                 </div>
                 <div className="h-px sm:h-12 sm:w-px w-full bg-[#1A4E30]/10" />
                 <div className="text-center sm:text-left">

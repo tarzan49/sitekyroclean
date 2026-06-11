@@ -12,6 +12,12 @@ import {
   buildWhatsAppUrl,
 } from "@/data/packComboData";
 import { SITE_URL, WHATSAPP_BASE, REVIEW_RATING, REVIEW_COUNT } from "@/constants/business";
+import {
+  buildWebPageNode,
+  buildBreadcrumbNode,
+  buildServiceNode,
+  buildOfferNode,
+} from "@/lib/seoSchema";
 
 const PackComboPage = () => {
   const { pathname } = useLocation();
@@ -72,44 +78,23 @@ const PackComboPage = () => {
   const jsonLd = {
     "@context": "https://schema.org",
     "@graph": [
-      {
-        "@type": "WebPage",
-        "@id": `${pageUrl}#webpage`,
-        "url": pageUrl,
-        "name": pageTitle,
-        "description": pageDesc,
-        "inLanguage": "pt-PT",
-        "isPartOf": { "@id": `${SITE_URL}/#website` },
-        "publisher": { "@id": `${SITE_URL}/#business` },
-        "breadcrumb": { "@id": `${pageUrl}#breadcrumb` },
-      },
-      {
-        "@type": "BreadcrumbList",
-        "@id": `${pageUrl}#breadcrumb`,
-        "itemListElement": [
-          { "@type": "ListItem", "position": 1, "name": "Início", "item": `${SITE_URL}/` },
-          { "@type": "ListItem", "position": 2, "name": "Packs", "item": `${SITE_URL}/packs` },
-          { "@type": "ListItem", "position": 3, "name": `${pack.name} em ${city.name}`, "item": pageUrl },
-        ],
-      },
-      {
-        "@type": "Service",
-        "@id": `${pageUrl}#service`,
-        "name": `${pack.name} em ${city.name}`,
-        "description": pack.description,
-        "url": pageUrl,
-        "provider": { "@id": `${SITE_URL}/#business` },
-        "areaServed": { "@type": "City", "name": city.name },
-        "offers": {
-          "@type": "Offer",
-          "availability": "https://schema.org/InStock",
-          "priceCurrency": "EUR",
-          "price": String(getFromPrice(pack)),
-          "priceValidUntil": "2026-12-31",
-          "validFrom": "2025-01-01",
-          "areaServed": { "@type": "City", "name": city.name },
-        },
-      },
+      buildWebPageNode({ url: pageUrl, name: pageTitle, description: pageDesc }),
+      buildBreadcrumbNode(`${pageUrl}#breadcrumb`, [
+        { name: "Início", item: `${SITE_URL}/` },
+        { name: "Packs", item: `${SITE_URL}/packs` },
+        { name: `${pack.name} em ${city.name}`, item: pageUrl },
+      ]),
+      buildServiceNode({
+        url: pageUrl,
+        name: `${pack.name} em ${city.name}`,
+        description: pack.description,
+        areaServed: { "@type": "City", name: city.name },
+        offers: buildOfferNode(String(getFromPrice(pack)), {
+          validFrom: "2025-01-01",
+          priceValidUntil: "2026-12-31",
+          areaServed: { "@type": "City", name: city.name },
+        }),
+      }),
     ],
   };
 

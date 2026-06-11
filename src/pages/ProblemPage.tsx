@@ -8,164 +8,22 @@ import Footer from "@/components/Footer";
 import QuizButton from "@/components/QuizButton";
 import ServiceFAQSchema from "@/components/ServiceFAQSchema";
 import { getProblemBySlug, getRelatedProblemLinks } from "@/data/problemSeoData";
+import { CATEGORY_TIPS } from "@/data/problemTipsData";
 import { services, cities } from "@/data/locationSeoData";
 import { SERVICE_TO_QUIZ } from "@/constants/serviceToQuiz";
 import { METRO_CITY_SLUGS } from "@/constants/metroCities";
 import { getProblemHeroImage } from "@/lib/problemHeroImages";
 import { trackWhatsAppClick } from "@/lib/quizTracking";
+import { buildProblemWaMessage } from "@/lib/whatsappMessages";
+import { SITE_URL, WHATSAPP_BASE } from "@/constants/business";
 import {
-  SITE_URL,
-  WHATSAPP_BASE,
-  PHONE_E164,
-  BUSINESS_EMAIL,
-  BUSINESS_ADDRESS,
-  REVIEW_RATING,
-  REVIEW_COUNT,
-} from "@/constants/business";
-
-const CATEGORY_TIPS: Record<string, { title: string; steps: string[]; warning: string }> = {
-  manchas: {
-    title: "O que fazer nos primeiros 5 minutos",
-    steps: [
-      "Absorva o excesso com pano branco seco, nunca esfregue",
-      "Aplique pressão suave do exterior para o interior da mancha",
-      "Não use água quente: fixa proteínas e taninos permanentemente nas fibras",
-    ],
-    warning: "Manchas com mais de 24 horas requerem extração profissional para remoção completa",
-  },
-  odores: {
-    title: "Ação imediata para neutralizar odores",
-    steps: [
-      "Ventile a divisão ao máximo durante pelo menos 2 horas",
-      "Bicarbonato de sódio seco sobre o tecido absorve odores temporariamente (30 min, depois aspire)",
-      "Evite produtos perfumados, mascaram o odor mas não o eliminam na raiz",
-    ],
-    warning: "Odores orgânicos (urina, suor, mofo) só são eliminados definitivamente com extração profissional",
-  },
-  saude: {
-    title: "Redução imediata da carga alergénica",
-    steps: [
-      "Aspire com filtro HEPA em movimentos lentos e sobrepostos (2 passagens)",
-      "Capa anti-ácaros reduz exposição mas não elimina os ácaros existentes",
-      "Mantenha humidade interior abaixo de 50%, ácaros proliferam acima desse valor",
-    ],
-    warning: "Eliminação permanente de 99% dos ácaros só é possível com extração profissional a vapor",
-  },
-  animais: {
-    title: "Controlo imediato com animais de estimação",
-    steps: [
-      "Remova pelos visíveis com fita adesiva ou luva de borracha húmida",
-      "Bicarbonato neutraliza o cheiro de animal temporariamente",
-      "Urina: absorva imediatamente e aplique solução de água e vinagre branco (50/50)",
-    ],
-    warning: "Dander e alérgenos de animais penetram nas fibras, só extração profissional os remove completamente",
-  },
-  urgencia: {
-    title: "Protocolo de emergência",
-    steps: [
-      "Absorva o máximo de líquido imediatamente com toalhas absorventes",
-      "Não aplique calor (secador), fixa manchas e odores nas fibras",
-      "Contacte um profissional nas primeiras 2-4 horas para melhores resultados",
-    ],
-    warning: "Após 24 horas, manchas e odores tornam-se significativamente mais difíceis de remover",
-  },
-  protecao: {
-    title: "Como preparar os estofos para impermeabilização",
-    steps: [
-      "Limpe profissionalmente antes de impermeabilizar, a sujidade bloqueia a proteção",
-      "Aguarde 24-48h após aplicação para ativação completa, evite uso intenso",
-      "Reaplique a cada 12-18 meses ou após cada limpeza profissional",
-    ],
-    warning: "Impermeabilização em tecido sujo é ineficaz, a ordem correta é sempre: limpar primeiro, proteger depois",
-  },
-  materiais: {
-    title: "Cuidados essenciais com materiais delicados",
-    steps: [
-      "Verifique a etiqueta: W (água), S (solvente), WS (ambos), X (só aspiração)",
-      "Teste qualquer produto numa zona não visível por 10 min antes de aplicar",
-      "Veludo e alcântara: nunca esfregue, use pano na direção da fibra apenas",
-    ],
-    warning: "Materiais delicados sem tratamento adequado perdem textura e cor permanentemente",
-  },
-  preco: {
-    title: "Como obter o orçamento mais preciso",
-    steps: [
-      "Fotografe o estado atual do estofado e envie pelo WhatsApp para orçamento mais exato",
-      "Compare sempre pelo método: extração profissional a quente ≠ shampooing superficial",
-      "Orçamentos que incluem deslocação, pré-tratamento e secagem são os mais completos",
-    ],
-    warning: "Preços abaixo de 25€ geralmente não incluem extração profissional real, o resultado é temporário",
-  },
-  metodo: {
-    title: "O que esperar de um serviço profissional de qualidade",
-    steps: [
-      "O técnico inspeciona o tipo de tecido e manchas antes de iniciar (sinal de profissionalismo)",
-      "Processo completo: 45 min a 3 horas conforme dimensão e estado do estofado",
-      "Deixe secar completamente antes de usar, 2 a 6 horas dependendo da ventilação",
-    ],
-    warning: "Uso antes de secar completamente pode causar marcas de água no tecido",
-  },
-};
-
-function buildProblemWaMessage(slug: string): string {
-  const s = slug ?? '';
-  if (s.includes('urgente'))
-    return `Olá! Preciso de limpeza urgente. Têm disponibilidade ainda hoje ou amanhã?`;
-  if (s.includes('urina'))
-    return `Olá! Tenho urina no meu ${s.includes('colchao') ? 'colchão' : 'sofá'} e preciso de tratamento urgente. Qual é o preço e disponibilidade?`;
-  if (s.includes('manchas-vinho'))
-    return `Olá! Tenho uma mancha de vinho no sofá e preciso de ajuda. Qual é o preço?`;
-  if (s.includes('manchas-cafe'))
-    return `Olá! Tenho manchas de café no sofá. Podem ajudar? Qual é o preço?`;
-  if (s.includes('manchas-gordura'))
-    return `Olá! Tenho manchas de gordura no sofá. Qual é o serviço adequado e o preço?`;
-  if (s.includes('manchas-sangue'))
-    return `Olá! Tenho manchas de sangue no colchão e preciso de ajuda urgente. Qual é o preço?`;
-  if (s.includes('mancha')) {
-    const item = s.includes('colchao') ? 'colchão' : s.includes('tapete') ? 'tapete' : 'sofá';
-    return `Olá! Tenho manchas no meu ${item} e preciso de remoção profissional. Qual é o preço?`;
-  }
-  if (s.includes('cheiro') || s.includes('odor')) {
-    const item = s.includes('colchao') ? 'colchão' : s.includes('tapete') ? 'tapete' : 'sofá';
-    return `Olá! O meu ${item} tem maus cheiros persistentes. Qual é o serviço e o preço?`;
-  }
-  if (s.includes('acar')) {
-    const item = s.includes('colchao') ? 'colchão' : 'sofá';
-    return `Olá! Preciso de eliminação de ácaros do meu ${item}. Qual é o serviço e o preço?`;
-  }
-  if (s.includes('alerg')) {
-    const item = s.includes('colchao') ? 'colchão' : 'sofá';
-    return `Olá! Tenho alergias e preciso de higienização profissional do meu ${item}. Qual é o preço?`;
-  }
-  if (s.includes('pelos')) {
-    const item = s.includes('tapete') ? 'tapete' : 'sofá';
-    return `Olá! O meu ${item} tem pelos de animais. Qual é o vosso serviço e preço?`;
-  }
-  if (s.includes('mofo') || s.includes('bolor')) {
-    const item = s.includes('alcatifa') ? 'alcatifa' : 'tapete';
-    return `Olá! O meu ${item} tem mofo/bolor. Qual é o serviço e preço para remoção?`;
-  }
-  if (s.includes('impermeabiliz'))
-    return `Olá! Quero impermeabilizar o meu sofá. Qual é o preço e disponibilidade?`;
-  if (s.includes('pele'))
-    return `Olá! Tenho um sofá de pele que precisa de limpeza e tratamento. Qual é o preço?`;
-  if (s.includes('veludo'))
-    return `Olá! Tenho um sofá de veludo que precisa de limpeza profissional. Qual é o preço?`;
-  if (s.includes('persa'))
-    return `Olá! Tenho um tapete persa que precisa de lavagem especializada. Qual é o preço?`;
-  if (s.includes('tapete-la') || (s.includes('tapete') && s.includes('-la')))
-    return `Olá! Tenho um tapete de lã que precisa de lavagem profissional. Qual é o preço?`;
-  if (s.includes('preco') || s.includes('custa') || s.includes('quanto')) {
-    const item = s.includes('colchao') ? 'colchão' : s.includes('tapete') ? 'tapete' : 'sofá';
-    return `Olá! Gostaria de saber o preço de limpeza profissional de ${item}. Podem dar-me um orçamento?`;
-  }
-  if (s.includes('cadeira'))
-    return `Olá! Preciso de limpeza profissional de cadeiras. Qual é o preço e disponibilidade?`;
-  if (s.includes('alcatifa'))
-    return `Olá! Preciso de limpeza profissional de alcatifas. Qual é o preço?`;
-  const item = s.includes('colchao') ? 'colchão' : s.includes('tapete') ? 'tapete' : 'sofá';
-  return `Olá! Preciso de limpeza profissional para o meu ${item}. Qual é o preço e quando têm disponibilidade?`;
-}
+  buildLocalBusinessNode,
+  buildWebPageNode,
+  buildBreadcrumbNode,
+  buildServiceNode,
+  buildOfferNode,
+  DEFAULT_AREA_SERVED,
+} from "@/lib/seoSchema";
 
 function getProblemWaBtnLabel(slug: string): string {
   const s = slug ?? '';
@@ -182,6 +40,10 @@ function getProblemCtaLabel(_slug: string): string {
 const ProblemPage = () => {
   const { slug } = useParams<{ slug: string }>();
   const data = useMemo(() => (slug ? getProblemBySlug(slug) : null), [slug]);
+  const relatedService = useMemo(
+    () => (data ? services.find(s => s.slug === data.relatedServices[0]) : undefined),
+    [data]
+  );
 
   useEffect(() => {
     if (data) {
@@ -522,37 +384,32 @@ const ProblemPage = () => {
             __html: JSON.stringify({
               "@context": "https://schema.org",
               "@graph": [
-                {
-                  "@type": ["LocalBusiness", "CleaningService"],
-                  "@id": `${SITE_URL}/#business`,
-                  "name": "Kyro Clean Solutions",
-                  "url": SITE_URL,
-                  "telephone": PHONE_E164,
-                  "email": BUSINESS_EMAIL,
-                  "priceRange": "€€",
-                  "address": BUSINESS_ADDRESS,
-                  "aggregateRating": { "@type": "AggregateRating", "ratingValue": REVIEW_RATING, "bestRating": "5", "worstRating": "1", "reviewCount": REVIEW_COUNT, "ratingCount": REVIEW_COUNT },
-                },
-                {
-                  "@type": "WebPage",
-                  "@id": `${SITE_URL}/problemas/${slug}#webpage`,
-                  "url": `${SITE_URL}/problemas/${slug}`,
-                  "name": data.title,
-                  "description": data.metaDescription,
-                  "inLanguage": "pt-PT",
-                  "publisher": { "@id": `${SITE_URL}/#business` },
-                  "isPartOf": { "@id": `${SITE_URL}/#website` },
-                  "breadcrumb": { "@id": `${SITE_URL}/problemas/${slug}#breadcrumb` },
-                },
-                {
-                  "@type": "BreadcrumbList",
-                  "@id": `${SITE_URL}/problemas/${slug}#breadcrumb`,
-                  "itemListElement": [
-                    { "@type": "ListItem", "position": 1, "name": "Início", "item": `${SITE_URL}/` },
-                    { "@type": "ListItem", "position": 2, "name": "Problemas", "item": `${SITE_URL}/problemas` },
-                    { "@type": "ListItem", "position": 3, "name": data.h1, "item": `${SITE_URL}/problemas/${slug}` },
-                  ],
-                },
+                buildLocalBusinessNode(),
+                buildWebPageNode({
+                  url: `${SITE_URL}/problemas/${slug}`,
+                  name: data.title,
+                  description: data.metaDescription,
+                }),
+                buildBreadcrumbNode(`${SITE_URL}/problemas/${slug}#breadcrumb`, [
+                  { name: "Início", item: `${SITE_URL}/` },
+                  { name: "Problemas", item: `${SITE_URL}/problemas` },
+                  { name: data.h1, item: `${SITE_URL}/problemas/${slug}` },
+                ]),
+                ...(relatedService
+                  ? [
+                      buildServiceNode({
+                        url: `${SITE_URL}/problemas/${slug}`,
+                        name: data.h1,
+                        description: data.metaDescription,
+                        serviceType: relatedService.name,
+                        areaServed: DEFAULT_AREA_SERVED,
+                        offers: buildOfferNode(relatedService.priceFrom.replace(/[^0-9]/g, ''), {
+                          validFrom: "2025-01-01",
+                          priceValidUntil: "2026-12-31",
+                        }),
+                      }),
+                    ]
+                  : []),
               ],
             }),
           }}

@@ -1,14 +1,21 @@
 ﻿import { useMemo, useEffect } from "react";
 import { useLocation, Link } from "react-router-dom";
 import { QuizLocationProvider, QuizServiceProvider } from "@/context/QuizLocationContext";
-import { CheckCircle, XCircle, Star, ArrowRight, Search, Sparkles, Droplets, Wind, MessageCircle } from "lucide-react";
+import { CheckCircle, XCircle, ArrowRight, Search, Sparkles, Droplets, Wind, MessageCircle } from "lucide-react";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import QuizButton from "@/components/QuizButton";
+import TrustRatingBadge from "@/components/TrustRatingBadge";
+import ServiceFAQSchema from "@/components/ServiceFAQSchema";
 import { getAllMarcaSofaRoutes, getMarcaByCityAndSlug } from "@/data/marcaSofaData";
 import { trackWhatsAppClick } from "@/lib/quizTracking";
-import { SITE_URL, WHATSAPP_BASE, REVIEW_RATING, REVIEW_COUNT } from "@/constants/business";
+import { SITE_URL, WHATSAPP_BASE } from "@/constants/business";
+import {
+  buildWebPageNode,
+  buildBreadcrumbNode,
+  buildServiceNode,
+} from "@/lib/seoSchema";
 import imgPele        from "@/assets/hero-p-limpeza-sofa-pele.webp";
 import imgVeludo      from "@/assets/hero-p-limpeza-sofa-veludo.webp";
 import imgTecido      from "@/assets/hero-p-limpeza-sofa-tecido.webp";
@@ -78,35 +85,18 @@ const MarcaSofaPage = () => {
   const jsonLd = {
     "@context": "https://schema.org",
     "@graph": [
-      {
-        "@type": "WebPage",
-        "@id": `${pageUrl}#webpage`,
-        "url": pageUrl,
-        "name": pageTitle,
-        "description": pageDesc,
-        "inLanguage": "pt-PT",
-        "isPartOf": { "@id": `${SITE_URL}/#website` },
-        "publisher": { "@id": `${SITE_URL}/#business` },
-        "breadcrumb": { "@id": `${pageUrl}#breadcrumb` },
-      },
-      {
-        "@type": "BreadcrumbList",
-        "@id": `${pageUrl}#breadcrumb`,
-        "itemListElement": [
-          { "@type": "ListItem", "position": 1, "name": "Início", "item": `${SITE_URL}/` },
-          { "@type": "ListItem", "position": 2, "name": "Limpeza de Sofás", "item": `${SITE_URL}/limpeza-sofas` },
-          { "@type": "ListItem", "position": 3, "name": `Sofá ${marca.name} em ${city.name}`, "item": pageUrl },
-        ],
-      },
-      {
-        "@type": "Service",
-        "@id": `${pageUrl}#service`,
-        "name": `Limpeza de Sofá ${marca.name} em ${city.name}`,
-        "description": pageDesc,
-        "url": pageUrl,
-        "provider": { "@id": `${SITE_URL}/#business` },
-        "areaServed": { "@type": "City", "name": city.name },
-        "offers": {
+      buildWebPageNode({ url: pageUrl, name: pageTitle, description: pageDesc }),
+      buildBreadcrumbNode(`${pageUrl}#breadcrumb`, [
+        { name: "Início", item: `${SITE_URL}/` },
+        { name: "Limpeza de Sofás", item: `${SITE_URL}/limpeza-sofas` },
+        { name: `Sofá ${marca.name} em ${city.name}`, item: pageUrl },
+      ]),
+      buildServiceNode({
+        url: pageUrl,
+        name: `Limpeza de Sofá ${marca.name} em ${city.name}`,
+        description: pageDesc,
+        areaServed: { "@type": "City", name: city.name },
+        offers: {
           "@type": "Offer",
           "availability": "https://schema.org/InStock",
           "areaServed": { "@type": "City", "name": city.name },
@@ -117,15 +107,7 @@ const MarcaSofaPage = () => {
             "priceCurrency": "EUR",
           },
         },
-      },
-      {
-        "@type": "FAQPage",
-        "mainEntity": marca.faqs.map(faq => ({
-          "@type": "Question",
-          "name": faq.question,
-          "acceptedAnswer": { "@type": "Answer", "text": faq.answer },
-        })),
-      },
+      }),
     ],
   };
 
@@ -170,10 +152,7 @@ const MarcaSofaPage = () => {
               {/* Price + Stars inline */}
               <div className="flex flex-wrap items-center gap-4 mb-8">
                 <span className="text-sm font-bold" style={{ color: "#D4AF37" }}>{marca.estimatedPriceRange}</span>
-                <div className="flex items-center gap-1.5">
-                  {[...Array(5)].map((_, i) => <Star key={i} className="w-4 h-4 fill-[#D4AF37]" style={{ color: "#D4AF37" }} />)}
-                  <span className="text-sm text-white/60 ml-1">{REVIEW_RATING} · {REVIEW_COUNT}+ avaliações</span>
-                </div>
+                <TrustRatingBadge variant="compact" />
               </div>
 
               <div className="flex gap-3 w-full sm:w-auto">
@@ -291,6 +270,7 @@ const MarcaSofaPage = () => {
               <h2 className="font-playfair text-2xl md:text-3xl font-bold text-[#111111] mb-8 text-center">
                 Perguntas sobre Sofás {marca.name}
               </h2>
+              <ServiceFAQSchema faqs={marca.faqs} />
               <Accordion type="single" collapsible className="space-y-4">
                 {marca.faqs.map((faq, i) => (
                   <AccordionItem key={i} value={`faq-${i}`}

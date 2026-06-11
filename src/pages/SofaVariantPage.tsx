@@ -22,7 +22,9 @@ import {
 } from "@/data/keywordVariantData";
 import { cities } from "@/data/locationSeoData";
 import { GENERIC_PROCESS_STEPS, IMPERMEABILIZACAO_STEPS } from "@/constants/serviceProcesses";
-import { SITE_URL, WHATSAPP_BASE, REVIEW_RATING, REVIEW_COUNT } from "@/constants/business";
+import { SITE_URL, WHATSAPP_BASE } from "@/constants/business";
+import TrustRatingBadge from "@/components/TrustRatingBadge";
+import { buildVariantWaMessage } from "@/lib/whatsappMessages";
 
 import heroSofaD      from "@/assets/hero-sofa-cleaning-new.webp";
 import heroSofaM      from "@/assets/hero-sofa-cleaning-new-mobile.webp";
@@ -106,15 +108,6 @@ const WA_BTN_LABEL: Record<VariantKey, string> = {
   lavagem:           'Lavar agora',
   impermeabilizacao: 'Proteger agora',
 };
-
-function buildWaMessage(variantKey: VariantKey, serviceKey: ServiceKey, locationName: string): string {
-  const svc = SERVICE_LABEL[serviceKey].toLowerCase();
-  if (variantKey === 'impermeabilizacao') {
-    return `Olá! Tenho interesse em impermeabilizar o meu ${svc} em ${locationName}. Qual é o preço e quando têm disponibilidade?`;
-  }
-  const variant = VARIANT_LABEL[variantKey].toLowerCase();
-  return `Olá! Preciso de ${variant} profissional para o meu ${svc} em ${locationName}. Podem dar-me um orçamento e indicar a vossa disponibilidade?`;
-}
 
 const SofaVariantPage = () => {
   const location = useLocation();
@@ -207,21 +200,7 @@ const SofaVariantPage = () => {
                   {data.intro.split('.')[0]}.
                 </p>
 
-                <div className="flex flex-wrap items-center gap-4 mb-8">
-                  <div className="flex items-center gap-1.5">
-                    <div className="flex gap-0.5">
-                      {[...Array(5)].map((_, i) => (
-                        <Star key={i} className="w-4 h-4 fill-[#D4AF37]" style={{ color: "#D4AF37" }} />
-                      ))}
-                    </div>
-                    <span className="text-white font-bold text-sm">{REVIEW_RATING}</span>
-                    <span className="text-white/50 text-xs">Google</span>
-                  </div>
-                  <div className="h-4 w-px bg-white/20" />
-                  <span className="text-white/60 text-xs font-medium">{REVIEW_COUNT}+ avaliações</span>
-                  <div className="h-4 w-px bg-white/20" />
-                  <span className="text-white/60 text-xs font-medium">+1000 clientes</span>
-                </div>
+                <TrustRatingBadge variant="hero" />
 
                 <div className="flex gap-3">
                   <div className="relative flex-1">
@@ -229,7 +208,7 @@ const SofaVariantPage = () => {
                     <QuizButton className="relative w-full" buttonClassName="h-[52px] !py-0 w-full" ctaLabel={QUIZ_CTA[data.variantKey]} initialLocation={data.locationName} initialService={quizService} />
                   </div>
                   <a
-                    href={`${WHATSAPP_BASE}?text=${encodeURIComponent(buildWaMessage(data.variantKey, data.serviceKey, data.locationName))}`}
+                    href={`${WHATSAPP_BASE}?text=${encodeURIComponent(buildVariantWaMessage(data.variantKey === 'impermeabilizacao', SERVICE_LABEL[data.serviceKey], VARIANT_LABEL[data.variantKey], data.locationName))}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     onClick={() => trackWhatsAppClick(`variant_hero_${parsed.variantKey}_${parsed.serviceKey}`)}

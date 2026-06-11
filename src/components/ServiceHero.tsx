@@ -1,8 +1,9 @@
 import { useState } from "react";
-import { Star, MapPin, MessageCircle } from "lucide-react";
+import { MessageCircle } from "lucide-react";
 import QuizForm from "./QuizFormLazy";
 import { trackWhatsAppClick } from "@/lib/quizTracking";
-import { WHATSAPP_BASE, REVIEW_RATING, REVIEW_COUNT } from "@/constants/business";
+import { WHATSAPP_BASE } from "@/constants/business";
+import TrustRatingBadge from "@/components/TrustRatingBadge";
 
 import sofaD        from "@/assets/service-sofa-new.webp";
 import sofaM        from "@/assets/service-sofa-new-mobile.webp";
@@ -42,8 +43,6 @@ const QUIZ_SERVICE: Record<string, string> = {
   "limpeza-cadeiras": "chairs",
   "limpeza-alcatifas":"carpet",
 };
-
-const MAPS_URL = "https://share.google/nPsWWFXrUrF12rIXJ";
 
 interface ServiceHeroProps {
   badge?: string;
@@ -189,22 +188,7 @@ const ServiceHero = ({
 
               {/* Google Maps pill */}
               <div className="flex justify-center pt-1">
-                <a
-                  href={MAPS_URL}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-2 bg-black/30 border border-white/[0.14] rounded-full px-4 py-2 backdrop-blur-sm hover:bg-black/45 transition-colors group"
-                >
-                  <MapPin className="w-3.5 h-3.5 text-gold flex-shrink-0 group-hover:scale-110 transition-transform" strokeWidth={2} />
-                  <div className="flex items-center gap-0.5">
-                    {[...Array(5)].map((_, i) => (
-                      <Star key={i} className="w-2.5 h-2.5 fill-[#D4AF37] text-[#D4AF37]" />
-                    ))}
-                  </div>
-                  <span className="text-white/80 text-[11px] font-semibold tracking-wide">
-                    {REVIEW_RATING} · {REVIEW_COUNT}+ avaliações Google
-                  </span>
-                </a>
+                <TrustRatingBadge variant="mapsLink" />
               </div>
 
             </div>
