@@ -75,13 +75,6 @@
     "trust2": "5.0★ no Google",
     "trust3": "+1000 clientes"
   },
-  "quotePopup": {
-    "badge": "Grátis",
-    "title": "Orçamento rápido",
-    "subtitle": "Responda em 30 segundos e receba resposta no WhatsApp.",
-    "cta": "Começar agora",
-    "footer": "Sem compromisso • Resposta rápida"
-  },
   "common": {
     "close": "Fechar",
     "callNow": "Ligue agora"
@@ -266,54 +259,6 @@
 "common": {
     "didYouKnow": "Sabia que?"
   },
-  "beforeAfter": {
-    "badge": "Antes e Depois",
-    "title": "O poder de uma limpeza profunda",
-    "subtitle": "Veja como um simples cuidado transforma a sua casa. A diferença começa aqui.",
-    "before": "Antes",
-    "after": "Depois",
-    "label": "Resultados Garantidos",
-    "contentTitle": "Transformação visível em cada limpeza",
-    "contentIntro": "Os nossos especialistas utilizam tecnologia avançada de extração para remover manchas, odores e alergénios. Veja a diferença com os seus próprios olhos.",
-    "benefit1": "Remoção profunda de manchas e sujidade",
-    "benefit2": "Eliminação de 99% de ácaros e bactérias",
-    "benefit3": "Secagem rápida em poucas horas",
-    "cta": "Pedir Orçamento Grátis",
-    "imageAlt": "Sofá antes e depois da limpeza profissional Kyro Clean Solutions",
-    "scratchHint": "Passe o dedo para revelar",
-    "revealed": "Transformação revelada!"
-  },
-"welcomePopup": {
-    "title": "Ganhe 10% de desconto na sua primeira limpeza.",
-    "subtitle": "Oferta exclusiva de boas-vindas para novos clientes.",
-    "codeInfo": "Para receber o desconto, basta indicar o código",
-    "codeLabel": "NATAL",
-    "codeInfoEnd": "quando pedir o seu orçamento.",
-    "cta": "Aproveitar desconto",
-    "dismiss": "Talvez mais tarde",
-    "expired": "Esta oferta já expirou.",
-    "expiredButton": "Oferta expirada",
-    "validFor": "Oferta válida por:"
-  },
-  "newsletterPopup": {
-    "title": "Receba 10% de desconto: oferta disponível por apenas 10 minutos",
-    "subtitle": "Subscreva a nossa newsletter nos próximos 10 minutos e receba o código CLEAN10 para usar no seu primeiro orçamento.",
-    "timerLabel": "Oferta expira em:",
-    "codeInfo": "Código de desconto exclusivo:",
-    "namePlaceholder": "Nome (opcional)",
-    "emailPlaceholder": "Email (obrigatório)",
-    "cta": "Subscrever e receber CLEAN10",
-    "submitting": "A processar...",
-    "dismiss": "Talvez mais tarde",
-    "supportText": "Oferta exclusiva para novos visitantes. Após a subscrição, o código é enviado automaticamente para o email.",
-    "successTitle": "Obrigado!",
-    "successDescription": "Verifique o seu email: enviámos o código CLEAN10.",
-    "codeReminder": "Use este código no seu primeiro orçamento",
-    "close": "Fechar",
-    "errorTitle": "Erro",
-    "errorDescription": "Não foi possível processar a subscrição. Tente novamente.",
-    "emailRequired": "Por favor, insira o seu email."
-  },
   "promoBanner": {
     "welcome": {
       "title": "10% desconto",
@@ -408,45 +353,6 @@
       }
     }
   },
-  "about": {
-    "badge": "Quem Somos",
-    "title": "",
-    "titleHighlight": "Referência em Higienização Premium",
-    "premiumSubtitle": "Jovens, profissionais e comprometidos com resultados extraordinários.",
-    "manifesto": {
-      "belief": {
-        "title": "O que acreditamos",
-        "text": "A Kyro Clean Solutions nasceu com um propósito claro: elevar a forma como as pessoas vivem o conforto, a higiene e o bem-estar no seu espaço."
-      },
-      "mission": {
-        "title": "A nossa missão",
-        "text": "Acreditamos que um espaço limpo não é um luxo. É saúde, tranquilidade e qualidade de vida, todos os dias."
-      },
-      "method": {
-        "title": "Como trabalhamos",
-        "text": "Unimos juventude, tecnologia e rigor profissional para criar transformações visíveis, com resultados reais desde o primeiro momento."
-      }
-    },
-    "imageAlt": "Equipa Kyro Clean Solutions a realizar limpeza profissional de sofá",
-    "imageBadge": "Equipa Kyro Clean Solutions em Ação",
-    "mapTitle": "Cobertura Nacional",
-    "mapSubtitle": "Do Norte ao Algarve, onde estiver, estamos consigo.",
-    "ctaButton": "Conheça o nosso processo premium",
-    "features": {
-      "feature1": {
-        "title": "Excelência Profissional & Tecnologia Avançada",
-        "description": "Equipas qualificadas e tecnologia adequada que garantem limpeza segura, eficaz e sem danificar os tecidos."
-      },
-      "feature2": {
-        "title": "Garantia Total & Relação de Confiança",
-        "description": "Transparência, compromisso e confiança. Se algo não ficou como esperado, voltamos sem custo adicional."
-      },
-      "feature3": {
-        "title": "Serviço Personalizado & Resultados Visíveis",
-        "description": "Cada serviço é ajustado ao seu espaço e ao seu tempo. Resultados que se veem e se sentem."
-      }
-    }
-  },
   "faq": {
     "title": "Perguntas Frequentes",
     "subtitle": "Encontre respostas às dúvidas mais frequentes sobre os nossos serviços de limpeza e manutenção de estofos, colchões, tapetes e cadeiras.",
@@ -534,127 +440,6 @@
     "instagram": {
       "text": "Desconto 5€",
       "subtext": "Faça vídeo review no Instagram Stories"
-    }
-  },
-  "slider": {
-    "before": "ANTES",
-    "after": "DEPOIS",
-    "instruction": "Arraste o slider para ver a transformação"
-  },
-  "clientTypes": {
-    "badge": "Os Nossos Clientes",
-    "title": "Soluções Para Cada Necessidade",
-    "tabs": {
-      "companies": "Empresas",
-      "residential": "Particulares",
-      "hospitality": "Hotelaria"
-    },
-    "ctaButton": "Saber mais sobre este serviço",
-    "companies": {
-      "label": "Serviços para Empresas",
-      "headline": "Protegemos a imagem do seu negócio.",
-      "intro": "Na Kyro Clean Solutions ajudamos empresas a manter espaços impecáveis que transmitem profissionalismo e cuidado.",
-      "benefit1": "Higienização profunda de cadeiras, sofás e carpetes de escritório",
-      "benefit2": "Agendamento flexível, adaptado ao horário da sua operação",
-      "benefit3": "Produtos seguros e tecnologia avançada sem interrupções",
-      "benefit4": "Manutenção regular para espaços sempre impecáveis",
-      "text1": "Na Kyro Clean Solutions ajudamos a proteger a imagem do seu negócio.",
-      "text2": "Fazemos limpeza e impermeabilização profissional de cadeiras, sofás, carpetes e colchões em escritórios, clínicas, lojas e restauração.",
-      "text3": "Trabalhamos com equipamentos de última geração, produtos seguros e horários ajustados à sua operação, para que o espaço esteja sempre impecável sem interromper o dia a dia da equipa."
-    },
-    "residential": {
-      "label": "Serviços para Particulares",
-      "headline": "A sua casa merece cuidado profissional.",
-      "intro": "Devolvemos vida, conforto e higiene aos seus estofos com limpeza profunda que remove manchas, odores e ácaros.",
-      "benefit1": "Remoção profunda de manchas, sujidade e odores acumulados",
-      "benefit2": "Eliminação de até 99% dos ácaros e bactérias",
-      "benefit3": "Tratamento de impermeabilização para proteção duradoura",
-      "benefit4": "Serviço rápido e conveniente na sua própria casa",
-      "text1": "Em casa, o seu sofá, cadeiras, colchões e tapetes merecem cuidado profissional.",
-      "text2": "A Kyro Clean Solutions realiza limpezas profundas que removem manchas, odores e ácaros, devolvendo o aspeto de quase novo aos seus estofos.",
-      "text3": "Além disso, oferecemos tratamento de impermeabilização: proteção invisível contra derrames e sujidade."
-    },
-    "hospitality": {
-      "label": "Serviços para Hotelaria",
-      "headline": "Limpeza à altura da experiência dos seus hóspedes.",
-      "intro": "Serviços discretos e rápidos de higienização para hotéis, alojamentos locais e espaços de acolhimento.",
-      "benefit1": "Intervenção discreta fora do horário de ocupação",
-      "benefit2": "Higienização completa de quartos, lobbies e áreas comuns",
-      "benefit3": "Resposta rápida para necessidades urgentes de limpeza",
-      "benefit4": "Padrão de limpeza que eleva a experiência do hóspede",
-      "text1": "No sector da hotelaria, a limpeza profissional é fundamental para a experiência dos hóspedes.",
-      "text2": "A Kyro Clean Solutions oferece serviços discretos e rápidos de higienização de carpetes, sofás, cadeiras e colchões em quartos, lobbies e espaços comuns.",
-      "text3": "Intervimos fora do horário de ocupação para minimizar interrupções, garantindo espaços sempre frescos e impecáveis."
-    },
-    "learnMore": "Saber Mais"
-  },
-  "promocoes": {
-    "title": "Promoções Especiais",
-    "subtitle": "Ganhe descontos e recompensas por partilhar a sua experiência connosco",
-    "instagram": {
-      "title": "Desconto 5€",
-      "badge": "Instagram Stories Review",
-      "step1": "Faça um vídeo review do serviço nos seus Instagram Stories",
-      "step2": "Identifique a nossa página",
-      "step2Account": "@cleansolutions.pt",
-      "step2End": "no vídeo",
-      "step3": "Clique no botão abaixo para nos avisar via WhatsApp",
-      "step4": "Receba 5€ de desconto imediatamente após validação",
-      "button": "Avisar via WhatsApp"
-    },
-    "affiliate": {
-      "title": "Ganhe até 100€ por cada recomendação validada",
-      "badge": "Kyro Clean Solutions Rewards",
-      "step1": "Indique amigos, familiares ou conhecidos",
-      "step2": "A pessoa recomendada recebe",
-      "step2Discount": "10% de desconto",
-      "step2End": "no primeiro serviço",
-      "step3": "Receba a sua recompensa automaticamente após a validação",
-      "step4": "Sem limite de recomendações!",
-      "disclaimer": "Recompensa: entre 10€ e 100€, conforme o valor do serviço contratado. Elegibilidade: serviços entre 150€ e 1500€. Pagamento: enviado após validação da recomendação.",
-      "placeholder": "Telefone ou @Instagram da pessoa recomendada",
-      "button": "Indicar via WhatsApp →",
-      "alertMessage": "Por favor, insira o número de telefone ou conta Instagram da pessoa que recomendou",
-      "emotional": "Porque um cliente satisfeito merece ser recompensado."
-    },
-    "tiers": {
-      "title": "Níveis Kyro Clean Solutions Rewards",
-      "level1": {
-        "name": "Kyro Partner",
-        "requirement": "Após 1 indicação",
-        "reward": "5% do valor do serviço",
-        "perk": "10% de desconto para o recomendado"
-      },
-      "level2": {
-        "name": "Kyro Elite",
-        "requirement": "Após 5 indicações",
-        "reward": "10% do valor do serviço",
-        "perk1": "Limpeza gratuita de almofada 1x/ano",
-        "perk2": "Suporte com prioridade"
-      },
-      "level3": {
-        "name": "Kyro VIP",
-        "requirement": "Após 10 indicações",
-        "reward": "15% do valor do serviço",
-        "perk1": "10% de desconto vitalício",
-        "perk2": "Impermeabilização pequena gratuita 1x/ano",
-        "perk3": "Atendimento prioritário"
-      },
-      "level4": {
-        "name": "Kyro Ambassador",
-        "requirement": "Após 25 indicações",
-        "reward": "20% do valor do serviço",
-        "perk1": "Sessão de limpeza anual gratuita",
-        "perk2": "Linha dedicada",
-        "perk3": "Convites para eventos",
-        "perk4": "Acesso antecipado a campanhas"
-      },
-      "note": "Todas as recompensas são calculadas automaticamente com base no valor final do serviço contratado pelo indicado. Os níveis são atualizados automaticamente conforme o número de indicações validadas."
-    },
-    "howItWorks": {
-      "title": "Como Funciona?",
-      "text1": "Escolha a promoção que prefere e clique no botão correspondente. Será redirecionado para o WhatsApp onde pode enviar-nos a informação necessária.",
-      "text2": "As promoções não são acumuláveis e estão sujeitas a confirmação. O desconto/pagamento é processado após validação."
     }
   },
   "footer": {
@@ -1525,23 +1310,5 @@
         "feature4": "Higienização antibacteriana e anti-alergénicos"
       }
     }
-  },
-  "whyChooseUs": {
-    "badge": "Porquê nós",
-    "title": "Porquê a Kyro Clean Solutions?",
-    "subtitle": "Factos concretos que nos distinguem. Sem promessas vazias.",
-    "item1": { "title": "Equipamento profissional de extração", "text": "Utilizamos equipamento de extração profissional de uso industrial. A mesma tecnologia que hotéis de 5 estrelas." },
-    "item2": { "title": "Produtos certificados e seguros", "text": "Todos os produtos são certificados e seguros para crianças, animais e pessoas com alergias." },
-    "item3": { "title": "Equipa formada e dedicada", "text": "Técnicos com formação especializada em limpeza têxtil. Cada serviço é tratado com rigor e atenção ao detalhe." },
-    "item4": { "title": "Garantia de satisfação", "text": "Se o resultado não corresponder às expectativas, repetimos o serviço sem qualquer custo adicional." }
-  },
-  "trustBadges": {
-    "certTitle": "Certificações e garantias",
-    "googleReviews": "Avaliações Google",
-    "areaTitle": "Onde atuamos",
-    "areaNote": "E muitas outras localidades. Contacte-nos para confirmar disponibilidade."
-  },
-  "testimonials2": {
-    "googleSubtitle": "5.0 ★ Avaliações reais no Google"
   }
 }

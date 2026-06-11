@@ -102,7 +102,7 @@ const HomepageFAQ = () => {
                 TIRE AS SUAS DÚVIDAS
               </p>
             </div>
-            <h2 className="font-playfair text-[1.85rem] sm:text-4xl md:text-[2.6rem] font-bold leading-[1.1] text-[#1A1A2E] max-w-xl">
+            <h2 className="font-playfair text-[1.85rem] sm:text-4xl md:text-[2.6rem] font-bold leading-[1.1] text-[#111111] max-w-xl">
               Perguntas{" "}
               <em className="not-italic" style={{ color: '#D4AF37' }}>frequentes</em>
             </h2>
@@ -113,12 +113,12 @@ const HomepageFAQ = () => {
             {faqs.map((faq, i) => (
               <div
                 key={i}
-                className="bg-white rounded-2xl overflow-hidden border border-[#1A1A2E]/[0.07] shadow-[0_2px_12px_rgba(0,0,0,0.05)] hover:shadow-[0_6px_24px_rgba(0,0,0,0.09)] transition-shadow duration-300"
+                className="bg-white rounded-2xl overflow-hidden border border-[#111111]/[0.07] shadow-[0_2px_12px_rgba(0,0,0,0.05)] hover:shadow-[0_6px_24px_rgba(0,0,0,0.09)] transition-shadow duration-300"
                 style={{ transitionDelay: `${i * 55}ms` }}
               >
                 <Accordion type="single" collapsible>
                   <AccordionItem value="item" className="border-none">
-                    <AccordionTrigger className="px-5 py-5 md:px-6 hover:no-underline group [&_svg]:text-[#1A1A2E]/25 [&[data-state=open]_svg]:text-[#D4AF37]/70">
+                    <AccordionTrigger className="px-5 py-5 md:px-6 hover:no-underline group [&_svg]:text-[#111111]/25 [&[data-state=open]_svg]:text-[#D4AF37]/70">
                       <div className="flex items-start gap-4 text-left">
                         <span
                           className="font-mono text-[10px] font-bold flex-shrink-0 mt-[3px] transition-colors duration-200 group-data-[state=open]:opacity-100"
@@ -126,7 +126,7 @@ const HomepageFAQ = () => {
                         >
                           {String(i + 1).padStart(2, '0')}
                         </span>
-                        <span className="font-playfair font-bold text-[#1A1A2E] text-[1rem] md:text-[1.05rem] leading-snug group-data-[state=open]:text-[#1A1A2E]">
+                        <span className="font-playfair font-bold text-[#111111] text-[1rem] md:text-[1.05rem] leading-snug group-data-[state=open]:text-[#111111]">
                           {faq.question}
                         </span>
                       </div>
@@ -134,7 +134,7 @@ const HomepageFAQ = () => {
                     <AccordionContent className="px-5 md:px-6 pb-5">
                       <div className="pl-8">
                         <div className="h-px mb-3" style={{ background: 'rgba(212,175,55,0.18)' }} />
-                        <p className="text-[13.5px] md:text-sm text-[#1A1A2E]/60 leading-relaxed">
+                        <p className="text-[13.5px] md:text-sm text-[#111111]/60 leading-relaxed">
                           {faq.answer}
                         </p>
                       </div>

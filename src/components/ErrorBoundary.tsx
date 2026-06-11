@@ -1,6 +1,7 @@
 ﻿import { Component, ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { RefreshCw, Home, MessageCircle, AlertTriangle } from 'lucide-react';
+import { WHATSAPP_BASE } from '@/constants/business';
 
 interface Props {
   children: ReactNode;
@@ -92,7 +93,7 @@ class ErrorBoundary extends Component<Props, State> {
             <p className="text-white/30 text-xs">
               Continua a ter problemas?{' '}
               <a
-                href="https://wa.me/351925530647"
+                href={WHATSAPP_BASE}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-1 text-[#25D366] hover:underline font-medium"

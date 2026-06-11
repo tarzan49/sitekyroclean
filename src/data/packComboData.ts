@@ -1,3 +1,5 @@
+import { WHATSAPP_BASE } from "../constants/business";
+
 // Pack/Combo SEO pages — targets "pack sofá e colchão porto", "limpeza completa sala porto"
 //
 // Pricing rules:
@@ -101,8 +103,7 @@ export function buildWhatsAppUrl(
   pack: PackCombo,
   city: { name: string },
   selections: Record<string, string>,
-  prices: PackPriceResult,
-  phone = '351925530647'
+  prices: PackPriceResult
 ): string {
   const lines = pack.selectors.map(sel => {
     const opt = sel.options.find(o => o.id === selections[sel.key]);
@@ -122,7 +123,7 @@ export function buildWhatsAppUrl(
     'Podem confirmar disponibilidade?',
   ].join('\n');
 
-  return `https://wa.me/${phone}?text=${encodeURIComponent(msg)}`;
+  return `${WHATSAPP_BASE}?text=${encodeURIComponent(msg)}`;
 }
 
 // ── Pack definitions ─────────────────────────────────────────────────────────
@@ -221,7 +222,7 @@ export const packs: PackCombo[] = [
     id: 'sala-completa',
     name: 'Pack Sala Completa',
     slug: 'pack-sala-completa',
-    tagline: 'Sofá + Tapete + Cadeiras numa única visita — 20% de desconto',
+    tagline: 'Sofá + Tapete + Cadeiras numa única visita: 20% de desconto',
     description: 'O pack mais popular da Kyro Clean. Sala de estar completamente renovada numa visita: sofá, tapete e cadeiras de jantar limpos ao mesmo tempo.',
     discountPct: 0.20,
     selectors: [

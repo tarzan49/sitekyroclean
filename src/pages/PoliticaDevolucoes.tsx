@@ -1,5 +1,6 @@
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import { BUSINESS_EMAIL, BUSINESS_EMAIL_HREF, WHATSAPP_BASE, PHONE_DISPLAY } from '@/constants/business';
 
 const Section = ({ title, children }: { title: string; children: React.ReactNode }) => (
   <section className="mb-8">
@@ -16,7 +17,7 @@ const PoliticaDevolucoes = () => (
       <div className="max-w-2xl mx-auto px-5 sm:px-6">
         <div className="pt-8 pb-6 border-b border-[#1A4E30]/10 mb-8">
           <p className="text-xs font-semibold tracking-[0.25em] uppercase text-[#D4AF37] mb-2">Kyro Clean Solutions</p>
-          <h1 className="font-playfair text-3xl sm:text-4xl font-bold text-[#1A1A2E] leading-tight">
+          <h1 className="font-playfair text-3xl sm:text-4xl font-bold text-[#111111] leading-tight">
             Política de Devoluções
           </h1>
           <p className="text-sm text-[#555] mt-3">Última atualização: junho de 2026</p>
@@ -27,7 +28,7 @@ const PoliticaDevolucoes = () => (
             A Kyro Clean Solutions presta serviços de limpeza e higienização profissional de estofos ao domicílio. Por se tratar de um <strong>serviço e não de um produto físico</strong>, não se aplicam devoluções após a conclusão da prestação.
           </p>
           <p>
-            Os resultados obtidos dependem do estado de conservação, idade, tipo de material e natureza da sujidade do estofo — fatores externos ao controlo da Kyro Clean Solutions. A variação de resultados em função destes fatores não constitui fundamento para reembolso.
+            Os resultados obtidos dependem do estado de conservação, idade, tipo de material e natureza da sujidade do estofo, fatores externos ao controlo da Kyro Clean Solutions. A variação de resultados em função destes fatores não constitui fundamento para reembolso.
           </p>
         </Section>
 
@@ -77,14 +78,14 @@ const PoliticaDevolucoes = () => (
           <ul className="list-none space-y-1.5 mt-2">
             <li>
               <strong>Email:</strong>{' '}
-              <a href="mailto:cleansolutions.pt25@gmail.com" className="text-[#1A4E30] underline underline-offset-2">
-                cleansolutions.pt25@gmail.com
+              <a href={BUSINESS_EMAIL_HREF} className="text-[#1A4E30] underline underline-offset-2">
+                {BUSINESS_EMAIL}
               </a>
             </li>
             <li>
               <strong>WhatsApp:</strong>{' '}
-              <a href="https://wa.me/351925530647" className="text-[#1A4E30] underline underline-offset-2">
-                +351 925 530 647
+              <a href={WHATSAPP_BASE} className="text-[#1A4E30] underline underline-offset-2">
+                +351 {PHONE_DISPLAY}
               </a>
             </li>
           </ul>

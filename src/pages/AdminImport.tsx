@@ -222,7 +222,7 @@ function buildRecords() {
       status: status.trim() || 'Contacto inicial',
       priority: priority.trim(),
       next_step: nextStep.trim(),
-      notes: noteParts.join(' — '),
+      notes: noteParts.join(' - '),
       phone,
       email: email || null,
       source: source.trim(),

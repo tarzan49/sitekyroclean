@@ -289,12 +289,12 @@ const Services = () => {
               OS NOSSOS SERVIÇOS
             </p>
           </div>
-          <h2 className="font-playfair text-[1.85rem] sm:text-4xl md:text-[2.6rem] font-bold leading-[1.1] text-[#1A1A2E] max-w-xl">
+          <h2 className="font-playfair text-[1.85rem] sm:text-4xl md:text-[2.6rem] font-bold leading-[1.1] text-[#111111] max-w-xl">
             Cada estofo tratado{" "}
             <em className="not-italic" style={{ color: "#D4AF37" }}>com precisão.</em>
           </h2>
-          <p className="mt-4 text-sm md:text-base text-[#1A1A2E]/50 max-w-lg leading-relaxed">
-            Sofás, colchões, tapetes, cadeiras e alcatifas — higienização profissional ao domicílio, resultado garantido no próprio dia.
+          <p className="mt-4 text-sm md:text-base text-[#111111]/50 max-w-lg leading-relaxed">
+            Sofás, colchões, tapetes, cadeiras e alcatifas: higienização profissional ao domicílio, resultado garantido no próprio dia.
           </p>
         </div>
       </div>
@@ -427,7 +427,7 @@ const Services = () => {
 
       {/* ── Counter (desktop only) ── */}
       <div className="hidden md:flex justify-center mt-7">
-        <span className="text-[10px] text-[#1A1A2E]/30 font-mono tracking-widest">
+        <span className="text-[10px] text-[#111111]/30 font-mono tracking-widest">
           {realIndex + 1}/{N}
         </span>
       </div>

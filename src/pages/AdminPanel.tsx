@@ -18,6 +18,7 @@ import { getAllKeywordVariantRoutes } from "@/data/keywordVariantData";
 import { getAllPackComboRoutes } from "@/data/packComboData";
 import { getAllMarcaSofaRoutes } from "@/data/marcaSofaData";
 import { getAllPosts } from "@/data/blogData";
+import { SITE_URL } from "@/constants/business";
 
 const AdminDashboard = lazy(() => import("./AdminDashboard"));
 const AdminImport   = lazy(() => import("./AdminImport"));
@@ -188,7 +189,7 @@ const AdminPanel = () => {
       if (events.length === 0) {
         setMetrics({
           totalStarts: 0, totalCompletes: 0, completionRate: 0,
-          avgValue: 0, topService: "—", topCity: "—",
+          avgValue: 0, topService: "-", topCity: "-",
           stepFunnel: [], todayStarts: 0, weekStarts: 0,
           cityBreakdown: [], pageBreakdown: [], deviceBreakdown: [], sourceBreakdown: [],
           waClicks: 0, waClicksBySource: [], avgSessionSeconds: 0,
@@ -213,13 +214,13 @@ const AdminPanel = () => {
       // Top service
       const serviceCounts: Record<string, number> = {};
       completes.forEach(e => { if (e.service) serviceCounts[e.service] = (serviceCounts[e.service] ?? 0) + 1; });
-      const topService = Object.entries(serviceCounts).sort((a, b) => b[1] - a[1])[0]?.[0] ?? "—";
+      const topService = Object.entries(serviceCounts).sort((a, b) => b[1] - a[1])[0]?.[0] ?? "-";
 
       // Top city + full breakdown
       const cityCounts: Record<string, number> = {};
       events.filter(e => e.action !== "abandon").forEach(e => { if (e.city) cityCounts[e.city] = (cityCounts[e.city] ?? 0) + 1; });
       const sortedCities = Object.entries(cityCounts).sort((a, b) => b[1] - a[1]);
-      const topCity = sortedCities[0]?.[0] ?? "—";
+      const topCity = sortedCities[0]?.[0] ?? "-";
       const cityBreakdown = sortedCities.slice(0, 10).map(([city, count]) => ({ city, count }));
 
       // Page path breakdown (which page triggered quiz open)
@@ -535,7 +536,7 @@ const AdminPanel = () => {
               </h3>
               <div className="space-y-2">
                 {[
-                  { label: "Google Search Console — Submeter sitemap", url: "https://search.google.com/search-console" },
+                  { label: "Google Search Console: Submeter sitemap", url: "https://search.google.com/search-console" },
                   { label: "Bing Webmaster Tools", url: "https://www.bing.com/webmasters" },
                   { label: "Google Rich Results Test", url: "https://search.google.com/test/rich-results" },
                 ].map(link => (
@@ -644,7 +645,7 @@ const AdminPanel = () => {
                             )}
                           </td>
                           <td className="px-4 py-3 hidden md:table-cell">
-                            <span className="text-xs text-gray-400 font-mono truncate max-w-[200px] block">{err.url ?? "—"}</span>
+                            <span className="text-xs text-gray-400 font-mono truncate max-w-[200px] block">{err.url ?? "-"}</span>
                           </td>
                           <td className="px-4 py-3 hidden lg:table-cell">
                             <span className="text-xs text-gray-400">
@@ -917,7 +918,7 @@ const AdminPanel = () => {
               </h3>
               <p className="text-xs text-gray-500 mb-2">
                 O quiz regista eventos na tabela <code className="bg-gray-100 px-1 rounded">quiz_events</code> do Supabase
-                em cada step. <strong>Localhost está excluído</strong> — só conta tráfego real de produção.
+                em cada step. <strong>Localhost está excluído</strong>: só conta tráfego real de produção.
                 Novos campos: <code className="bg-gray-100 px-1 rounded">page_path</code>, <code className="bg-gray-100 px-1 rounded">device</code>, <code className="bg-gray-100 px-1 rounded">utm_source</code>, <code className="bg-gray-100 px-1 rounded">referrer</code>.
               </p>
               <p className="text-xs text-amber-600 font-medium">
@@ -969,8 +970,6 @@ const AdminPanel = () => {
 };
 
 // ── Reviews WhatsApp Generator ────────────────────────────────────────────────
-const SITE_URL = "https://cleansolutions.com.pt";
-
 const serviceOptions = [
   { value: "sofa", label: "Sofá" },
   { value: "colchao", label: "Colchão" },

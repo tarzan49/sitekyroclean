@@ -1,4 +1,13 @@
-﻿interface Props {
+﻿import {
+  SITE_URL,
+  PHONE_E164,
+  BUSINESS_EMAIL,
+  BUSINESS_ADDRESS,
+  REVIEW_RATING,
+  REVIEW_COUNT,
+} from "@/constants/business";
+
+interface Props {
   serviceName: string;
   serviceBaseUrl: string;
   placeName: string;
@@ -10,7 +19,7 @@
 
 const ServiceLocationSchema = ({ serviceName, serviceBaseUrl, placeName, parentPlace, description, pageUrl, priceFrom }: Props) => {
   const priceNum = /\d+/.exec(priceFrom)?.[0] ?? "39";
-  const base = "https://cleansolutions.com.pt";
+  const base = SITE_URL;
   const fullUrl = `${base}${pageUrl}`;
 
   const areaServed = parentPlace
@@ -45,24 +54,18 @@ const ServiceLocationSchema = ({ serviceName, serviceBaseUrl, placeName, parentP
         "@id": `${base}/#business`,
         "name": "Kyro Clean Solutions",
         "url": base,
-        "telephone": "+351925530647",
-        "email": "cleansolutions.pt25@gmail.com",
+        "telephone": PHONE_E164,
+        "email": BUSINESS_EMAIL,
         "priceRange": "€€",
-        "address": {
-          "@type": "PostalAddress",
-          "streetAddress": "R. de António Cardoso 263",
-          "addressLocality": "Porto",
-          "postalCode": "4150-081",
-          "addressCountry": "PT",
-        },
+        "address": BUSINESS_ADDRESS,
         "areaServed": areaServed,
         "aggregateRating": {
           "@type": "AggregateRating",
-          "ratingValue": "5.0",
+          "ratingValue": REVIEW_RATING,
           "bestRating": "5",
           "worstRating": "1",
-          "reviewCount": "51",
-          "ratingCount": "51",
+          "reviewCount": REVIEW_COUNT,
+          "ratingCount": REVIEW_COUNT,
         },
       },
       {

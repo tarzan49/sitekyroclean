@@ -8,6 +8,14 @@ import { useTranslation } from "react-i18next";
 import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { quoteFormSchema } from "@/lib/validation";
+import {
+  WHATSAPP_BASE,
+  PHONE_TEL,
+  PHONE_DISPLAY,
+  BUSINESS_EMAIL,
+  BUSINESS_EMAIL_HREF,
+  BUSINESS_ADDRESS,
+} from "@/constants/business";
 
 const Contact = () => {
   const { toast } = useToast();
@@ -91,16 +99,16 @@ const Contact = () => {
           <div className="space-y-2">
             <p>Houve um problema. Contacte-nos diretamente:</p>
             <div className="flex gap-2 mt-2">
-              <a 
-                href={`https://wa.me/351925530647?text=${whatsappMessage}`}
+              <a
+                href={`${WHATSAPP_BASE}?text=${whatsappMessage}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-1 px-3 py-1.5 bg-green-600 text-white text-sm rounded-lg hover:bg-green-700"
               >
                 WhatsApp
               </a>
-              <a 
-                href={`mailto:cleansolutions.pt25@gmail.com?subject=Pedido%20Orçamento&body=${whatsappMessage}`}
+              <a
+                href={`mailto:${BUSINESS_EMAIL}?subject=Pedido%20Orçamento&body=${whatsappMessage}`}
                 className="inline-flex items-center gap-1 px-3 py-1.5 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700"
               >
                 Email
@@ -120,22 +128,22 @@ const Contact = () => {
     {
       icon: Phone,
       label: t('contact.phoneLabel'),
-      value: "925 530 647",
+      value: PHONE_DISPLAY,
       subtext: t('common.callNow'),
-      href: "tel:925530647",
+      href: `tel:${PHONE_TEL}`,
     },
     {
       icon: Mail,
       label: t('contact.emailLabel'),
-      value: "cleansolutions.pt25@gmail.com",
+      value: BUSINESS_EMAIL,
       subtext: t('common.sendEmail'),
-      href: "mailto:cleansolutions.pt25@gmail.com",
+      href: BUSINESS_EMAIL_HREF,
     },
     {
       icon: MapPin,
       label: t('contact.addressLabel'),
-      value: "R. de António Cardoso 263",
-      subtext: "4150-081 Porto",
+      value: BUSINESS_ADDRESS.streetAddress,
+      subtext: `${BUSINESS_ADDRESS.postalCode} ${BUSINESS_ADDRESS.addressLocality}`,
       href: null,
     },
     {
@@ -156,10 +164,10 @@ const Contact = () => {
             <MessageSquare className="h-5 w-5 text-gold" />
             <span className="text-gold font-semibold tracking-wide uppercase text-sm">{t('contact.badge')}</span>
           </div>
-          <h2 className="text-2xl md:text-4xl lg:text-5xl font-bold text-[#1A1A2E] mb-3">
+          <h2 className="text-2xl md:text-4xl lg:text-5xl font-bold text-[#111111] mb-3">
             Prepare o seu espaço para impressionar.
           </h2>
-          <p className="text-[#1A1A2E]/55 text-base md:text-lg max-w-2xl mx-auto leading-relaxed">
+          <p className="text-[#111111]/55 text-base md:text-lg max-w-2xl mx-auto leading-relaxed">
             A nossa equipa chega à hora marcada, com eficiência e atenção aos detalhes. Garantimos um serviço profissional adaptado ao seu ritmo e à sua casa.
           </p>
           <div className="w-24 h-1 bg-gradient-to-r from-gold to-gold-light mx-auto rounded-full mt-6"></div>
@@ -175,9 +183,9 @@ const Contact = () => {
                   <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-gold/20 to-gold/5 flex items-center justify-center mb-3">
                     <Icon className="w-6 h-6 text-gold" />
                   </div>
-                  <p className="text-xs text-[#1A1A2E]/55 font-medium uppercase tracking-wide mb-1">{item.label}</p>
-                  <p className="font-bold text-[#1A1A2E] text-sm leading-tight">{item.value}</p>
-                  <p className="text-xs text-[#1A1A2E]/55 mt-1">{item.subtext}</p>
+                  <p className="text-xs text-[#111111]/55 font-medium uppercase tracking-wide mb-1">{item.label}</p>
+                  <p className="font-bold text-[#111111] text-sm leading-tight">{item.value}</p>
+                  <p className="text-xs text-[#111111]/55 mt-1">{item.subtext}</p>
                 </div>
               );
               return item.href ? (
@@ -202,7 +210,7 @@ const Contact = () => {
               <form onSubmit={handleSubmit} className="relative bg-[#FFFFFF] p-6 md:p-8 rounded-[22px] shadow-xl space-y-5">
                 <div className="grid md:grid-cols-2 gap-5">
                   <div>
-                    <label className="text-sm font-semibold text-[#1A1A2E] mb-2 block">
+                    <label className="text-sm font-semibold text-[#111111] mb-2 block">
                       {t('contact.nameLabel')} <span className="text-red-500">{t('contact.required')}</span>
                     </label>
                     <Input
@@ -216,7 +224,7 @@ const Contact = () => {
                     />
                   </div>
                   <div>
-                    <label className="text-sm font-semibold text-[#1A1A2E] mb-2 block">
+                    <label className="text-sm font-semibold text-[#111111] mb-2 block">
                       {t('contact.phoneLabel')}
                     </label>
                     <Input
@@ -232,7 +240,7 @@ const Contact = () => {
 
                 <div className="grid md:grid-cols-2 gap-5">
                   <div>
-                    <label className="text-sm font-semibold text-[#1A1A2E] mb-2 block">
+                    <label className="text-sm font-semibold text-[#111111] mb-2 block">
                       {t('contact.emailLabel')} <span className="text-red-500">{t('contact.required')}</span>
                     </label>
                     <Input
@@ -246,7 +254,7 @@ const Contact = () => {
                     />
                   </div>
                   <div>
-                    <label className="text-sm font-semibold text-[#1A1A2E] mb-2 block">
+                    <label className="text-sm font-semibold text-[#111111] mb-2 block">
                       {t('contact.locationLabel')} <span className="text-red-500">{t('contact.required')}</span>
                     </label>
                     <Input
@@ -261,7 +269,7 @@ const Contact = () => {
                 </div>
 
                 <div>
-                  <label className="text-sm font-semibold text-[#1A1A2E] mb-2 block">
+                  <label className="text-sm font-semibold text-[#111111] mb-2 block">
                     {t('contact.messageLabel')} <span className="text-red-500">{t('contact.required')}</span>
                   </label>
                   <Textarea
@@ -275,7 +283,7 @@ const Contact = () => {
                   />
                 </div>
 
-                <p className="text-xs text-[#1A1A2E]/55 bg-secondary/30 p-3 rounded-xl">
+                <p className="text-xs text-[#111111]/55 bg-secondary/30 p-3 rounded-xl">
                   {t('contact.note')}
                 </p>
 
@@ -286,7 +294,7 @@ const Contact = () => {
                   <Button 
                     type="submit" 
                     disabled={isSubmitting}
-                    className="relative w-full bg-gradient-to-r from-gold to-[#d4c78d] hover:from-[#d4c78d] hover:to-gold text-[#1A1A2E] font-bold py-6 h-auto text-base md:text-lg rounded-xl shadow-lg transition-all duration-300 hover:scale-[1.02] hover:shadow-xl disabled:opacity-50"
+                    className="relative w-full bg-gradient-to-r from-gold to-[#d4c78d] hover:from-[#d4c78d] hover:to-gold text-[#111111] font-bold py-6 h-auto text-base md:text-lg rounded-xl shadow-lg transition-all duration-300 hover:scale-[1.02] hover:shadow-xl disabled:opacity-50"
                   >
                     <Send className="mr-2 h-5 w-5" />
                     {isSubmitting ? t('hero.form.submitting') : t('contact.submit')}
@@ -302,7 +310,7 @@ const Contact = () => {
               <div className="absolute -inset-2 bg-gradient-to-br from-gold/20 via-turquoise/20 to-gold/20 rounded-[28px] blur-lg opacity-40"></div>
               
               <div className="relative bg-[#FFFFFF] p-8 rounded-[22px] shadow-xl h-full">
-                <h3 className="text-xl font-bold text-[#1A1A2E] mb-6 flex items-center gap-2">
+                <h3 className="text-xl font-bold text-[#111111] mb-6 flex items-center gap-2">
                   <Sparkles className="w-5 h-5 text-gold" />
                   {t('contact.contactInfoTitle')}
                 </h3>
@@ -316,9 +324,9 @@ const Contact = () => {
                           <Icon className="w-6 h-6 text-gold" />
                         </div>
                         <div className="flex-1">
-                          <span className="text-xs text-[#1A1A2E]/55 font-medium uppercase tracking-wider">{item.label}</span>
-                          <p className="text-base font-bold text-[#1A1A2E] mt-1">{item.value}</p>
-                          <p className="text-sm text-[#1A1A2E]/55">{item.subtext}</p>
+                          <span className="text-xs text-[#111111]/55 font-medium uppercase tracking-wider">{item.label}</span>
+                          <p className="text-base font-bold text-[#111111] mt-1">{item.value}</p>
+                          <p className="text-sm text-[#111111]/55">{item.subtext}</p>
                         </div>
                       </div>
                     );
@@ -336,7 +344,7 @@ const Contact = () => {
 
                 {/* Trust Badge */}
                 <div className="mt-6 p-4 rounded-[18px] bg-gradient-to-r from-gold/10 to-turquoise/10 border border-gold/20">
-                  <p className="text-sm text-[#1A1A2E]/80 text-center font-medium">
+                  <p className="text-sm text-[#111111]/80 text-center font-medium">
                     {t('contact.trustBadge')}
                   </p>
                 </div>

@@ -11,6 +11,7 @@ import { getPricePageData, getAllPriceRoutes } from "@/data/priceSeoData";
 import { services, cities } from "@/data/locationSeoData";
 import { SERVICE_TO_QUIZ } from "@/constants/serviceToQuiz";
 import { buildServiceWaMessage } from "@/lib/buildServiceWaMessage";
+import { SITE_URL, WHATSAPP_BASE, REVIEW_RATING } from "@/constants/business";
 
 const PricePage = () => {
   const { pathname } = useLocation();
@@ -28,7 +29,7 @@ const PricePage = () => {
       const desc = document.querySelector('meta[name="description"]');
       if (desc) desc.setAttribute("content", data.metaDescription);
       const canonical = document.querySelector('link[rel="canonical"]');
-      if (canonical) canonical.setAttribute("href", `https://cleansolutions.com.pt${pathname}`);
+      if (canonical) canonical.setAttribute("href", `${SITE_URL}${pathname}`);
     }
   }, [pathname, data]);
 
@@ -50,7 +51,7 @@ const PricePage = () => {
   const quizService = SERVICE_TO_QUIZ[data.serviceSlug];
   const relatedServices = services.filter(s => s.slug !== data.serviceSlug).slice(0, 4);
   const nearbyCities = cities.filter(c => c.slug !== data.citySlug).slice(0, 6);
-  const waHref = `https://wa.me/351925530647?text=${encodeURIComponent(buildServiceWaMessage(data.serviceSlug, data.cityName))}`;
+  const waHref = `${WHATSAPP_BASE}?text=${encodeURIComponent(buildServiceWaMessage(data.serviceSlug, data.cityName))}`;
 
   return (
     <QuizLocationProvider value={data.cityName}>
@@ -186,7 +187,7 @@ const PricePage = () => {
                     <Star key={i} className="w-4 h-4 fill-[#D4AF37] text-[#D4AF37]" />
                   ))}
                 </div>
-                <p className="text-white font-bold text-xl font-playfair">5.0</p>
+                <p className="text-white font-bold text-xl font-playfair">{REVIEW_RATING}</p>
                 <p className="text-white/35 text-xs mt-1">Google Reviews</p>
               </div>
               <div>
@@ -367,31 +368,31 @@ const PricePage = () => {
               "@graph": [
                 {
                   "@type": "WebPage",
-                  "@id": `https://cleansolutions.com.pt${pathname}#webpage`,
-                  "url": `https://cleansolutions.com.pt${pathname}`,
+                  "@id": `${SITE_URL}${pathname}#webpage`,
+                  "url": `${SITE_URL}${pathname}`,
                   "name": data.title,
                   "description": data.metaDescription,
                   "inLanguage": "pt-PT",
-                  "isPartOf": { "@id": "https://cleansolutions.com.pt/#website" },
-                  "publisher": { "@id": "https://cleansolutions.com.pt/#business" },
-                  "breadcrumb": { "@id": `https://cleansolutions.com.pt${pathname}#breadcrumb` },
+                  "isPartOf": { "@id": `${SITE_URL}/#website` },
+                  "publisher": { "@id": `${SITE_URL}/#business` },
+                  "breadcrumb": { "@id": `${SITE_URL}${pathname}#breadcrumb` },
                 },
                 {
                   "@type": "BreadcrumbList",
-                  "@id": `https://cleansolutions.com.pt${pathname}#breadcrumb`,
+                  "@id": `${SITE_URL}${pathname}#breadcrumb`,
                   "itemListElement": [
-                    { "@type": "ListItem", "position": 1, "name": "Início", "item": "https://cleansolutions.com.pt" },
-                    { "@type": "ListItem", "position": 2, "name": data.serviceName, "item": `https://cleansolutions.com.pt/${data.serviceSlug}` },
-                    { "@type": "ListItem", "position": 3, "name": `Preços em ${data.cityName}`, "item": `https://cleansolutions.com.pt${pathname}` },
+                    { "@type": "ListItem", "position": 1, "name": "Início", "item": SITE_URL },
+                    { "@type": "ListItem", "position": 2, "name": data.serviceName, "item": `${SITE_URL}/${data.serviceSlug}` },
+                    { "@type": "ListItem", "position": 3, "name": `Preços em ${data.cityName}`, "item": `${SITE_URL}${pathname}` },
                   ],
                 },
                 {
                   "@type": "Service",
-                  "@id": `https://cleansolutions.com.pt${pathname}#service`,
+                  "@id": `${SITE_URL}${pathname}#service`,
                   "name": `${data.serviceName} em ${data.cityName}`,
                   "description": data.metaDescription,
-                  "url": `https://cleansolutions.com.pt${pathname}`,
-                  "provider": { "@id": "https://cleansolutions.com.pt/#business" },
+                  "url": `${SITE_URL}${pathname}`,
+                  "provider": { "@id": `${SITE_URL}/#business` },
                   "areaServed": { "@type": "City", "name": data.cityName },
                   "offers": {
                     "@type": "Offer",

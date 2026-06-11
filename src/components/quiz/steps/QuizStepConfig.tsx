@@ -92,7 +92,6 @@ const QuizStepConfig = ({
           })}
         </div>
         {has4Plus && <input type="number" inputMode="numeric" pattern="[0-9]*" placeholder="Nº de lugares (ex: 5)" className="w-full max-w-sm bg-white/[0.06] border border-white/15 focus:border-gold focus:outline-none text-white placeholder:text-white/25 rounded-xl h-12 px-4 text-base transition-colors" onChange={(e) => updateFormData({ description: `Sofá com ${e.target.value} lugares` })} />}
-        <p className="text-xs text-white/20 text-center tracking-wide uppercase">Valores com IVA incluído</p>
       </div>
     );
   }
@@ -157,7 +156,6 @@ const QuizStepConfig = ({
             );
           })}
         </div>
-        <p className="text-xs text-white/20 text-center tracking-wide uppercase">Valores com IVA incluído</p>
       </div>
     );
   }
@@ -185,7 +183,7 @@ const QuizStepConfig = ({
                 className={cn('font-playfair font-black leading-none mb-1', sob ? 'text-white/50 text-2xl' : 'text-gold text-4xl')}
                 style={!sob ? { textShadow: '0 0 28px rgba(212,175,55,0.55)' } : undefined}
               >
-                {sob ? 'Sob orcamento' : `${calculatedPrice !== null ? Math.round(calculatedPrice) : '?'}€`}
+                {sob ? 'Sob Orçamento' : `${calculatedPrice !== null ? Math.round(calculatedPrice) : '0'}€`}
               </p>
               <p className="text-[10px] text-white/30">
                 {sob ? 'O nosso especialista entra em contacto' : `${areaNum} m²`}
@@ -251,7 +249,7 @@ const QuizStepConfig = ({
             className={cn('font-playfair font-black leading-none mb-1', sob ? 'text-white/60 text-2xl' : 'text-gold text-4xl')}
             style={!sob ? { textShadow: '0 0 28px rgba(212,175,55,0.55)' } : undefined}
           >
-            {sob ? 'Sob orcamento' : `${totalChairPrice % 1 === 0 ? totalChairPrice : totalChairPrice.toFixed(1).replace('.', ',')}€`}
+            {sob ? 'Sob Orçamento' : `${totalChairPrice % 1 === 0 ? totalChairPrice : totalChairPrice.toFixed(1).replace('.', ',')}€`}
           </p>
           <p className="text-[10px] text-white/30">
             {sob

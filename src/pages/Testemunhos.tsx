@@ -80,7 +80,7 @@ const Testemunhos = () => {
           <div className="container mx-auto px-4 text-center">
             {/* Title with animation */}
             <h1 
-              className="text-3xl md:text-4xl lg:text-5xl font-bold mb-3 text-[#1A1A2E] animate-fade-in"
+              className="text-3xl md:text-4xl lg:text-5xl font-bold mb-3 text-[#111111] animate-fade-in"
               style={{ animationDelay: "0.1s" }}
             >
               {t('testimonials.pageTitle', 'O que dizem os nossos clientes')}
@@ -88,7 +88,7 @@ const Testemunhos = () => {
             
             {/* Subtitle */}
             <p 
-              className="text-base md:text-lg text-[#1A1A2E]/55 max-w-xl mx-auto mb-4 animate-fade-in"
+              className="text-base md:text-lg text-[#111111]/55 max-w-xl mx-auto mb-4 animate-fade-in"
               style={{ animationDelay: "0.2s" }}
             >
               {t('testimonials.subtitle')}
@@ -116,11 +116,11 @@ const Testemunhos = () => {
                 >
                   <div className="flex items-center justify-center gap-3 mb-2">
                     <stat.icon className="h-8 w-8 text-gold fill-gold/20" />
-                    <span className="text-4xl font-bold text-[#1A1A2E]">{stat.value}</span>
+                    <span className="text-4xl font-bold text-[#111111]">{stat.value}</span>
                   </div>
-                  <p className="text-[#1A1A2E]/55 font-medium">{stat.label}</p>
+                  <p className="text-[#111111]/55 font-medium">{stat.label}</p>
                   {stat.footnote && (
-                    <p className="text-xs text-[#1A1A2E]/40 mt-1">{stat.footnote}</p>
+                    <p className="text-xs text-[#111111]/40 mt-1">{stat.footnote}</p>
                   )}
                 </div>
               ))}
@@ -165,7 +165,7 @@ const Testemunhos = () => {
                       <Quote className="h-6 w-6 text-gold/30 mb-2" />
                       
                       {/* Testimonial text */}
-                      <p className="text-[#1A1A2E]/55 leading-relaxed mb-4">
+                      <p className="text-[#111111]/55 leading-relaxed mb-4">
                         {shouldTruncate && !isExpanded 
                           ? `${testimonial.text.substring(0, 180)}...` 
                           : testimonial.text
@@ -184,8 +184,8 @@ const Testemunhos = () => {
                       
                       {/* Client name and city - BELOW text */}
                       <div className="pt-3 border-t border-gray-100">
-                        <p className="font-semibold text-[#1A1A2E] text-sm">
-                          {testimonial.name} <span className="text-[#1A1A2E]/55 font-normal">·</span> <span className="text-[#1A1A2E]/55 font-normal">{testimonial.city}</span>
+                        <p className="font-semibold text-[#111111] text-sm">
+                          {testimonial.name} <span className="text-[#111111]/55 font-normal">·</span> <span className="text-[#111111]/55 font-normal">{testimonial.city}</span>
                         </p>
                       </div>
                     </div>

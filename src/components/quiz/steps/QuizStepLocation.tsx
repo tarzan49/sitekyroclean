@@ -97,7 +97,7 @@ const QuizStepLocation = ({
                         'text-[11px] font-semibold drop-shadow-sm px-2.5 py-0.5 rounded-full',
                         locationPrices[city] === 0 ? 'text-gold/90 bg-gold/10' : 'text-white/65'
                       )}>
-                        {locationPrices[city] === 0 ? 'Deslocacao incluida' : `+${locationPrices[city]}€ deslocacao`}
+                        {locationPrices[city] === 0 ? 'Deslocação incluída' : `+${locationPrices[city]}€ deslocação`}
                       </span>
                     </div>
                   </button>

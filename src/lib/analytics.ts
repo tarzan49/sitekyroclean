@@ -3,6 +3,8 @@
  * Comprehensive event tracking for quiz funnel, conversions, and Core Web Vitals
  */
 
+import { PHONE_TEL } from "@/constants/business";
+
 // ============================================
 // CORE EVENT TRACKING
 // ============================================
@@ -32,7 +34,7 @@ export function trackCallClick(location: string) {
   trackEvent('call_click', {
     event_category: 'engagement',
     event_label: location,
-    phone_number: '925530647',
+    phone_number: PHONE_TEL,
   });
 }
 

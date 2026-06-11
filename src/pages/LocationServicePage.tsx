@@ -20,6 +20,7 @@ import { SERVICE_TO_QUIZ } from "@/constants/serviceToQuiz";
 import { METRO_CITIES } from "@/constants/metroCities";
 import { SERVICE_HERO_IMAGES, SERVICE_RESULT_IMAGES, SERVICE_RESULT_CONTENT, SERVICE_HERO_FALLBACK, SERVICE_RESULT_FALLBACK } from "@/constants/serviceContent";
 import { buildServiceWaMessage } from "@/lib/buildServiceWaMessage";
+import { SITE_URL, WHATSAPP_BASE, REVIEW_RATING, REVIEW_COUNT } from "@/constants/business";
 
 const PRICE_TABLE: Record<string, { item: string; price: string; highlight?: boolean }[]> = {
   'limpeza-sofas': [
@@ -113,7 +114,7 @@ const LocationServicePage = () => {
       const ogDesc = document.querySelector('meta[property="og:description"]');
       if (ogDesc) ogDesc.setAttribute("content", data.metaDescription);
       const canonical = document.querySelector('link[rel="canonical"]');
-      if (canonical) canonical.setAttribute("href", `https://cleansolutions.com.pt${location.pathname}`);
+      if (canonical) canonical.setAttribute("href", `${SITE_URL}${location.pathname}`);
     }
   }, [location.pathname, data]);
 
@@ -222,11 +223,11 @@ const LocationServicePage = () => {
                         <Star key={i} className="w-4 h-4 fill-[#D4AF37]" style={{ color: "#D4AF37" }} />
                       ))}
                     </div>
-                    <span className="text-white font-bold text-sm">5.0</span>
+                    <span className="text-white font-bold text-sm">{REVIEW_RATING}</span>
                     <span className="text-white/50 text-xs">Google</span>
                   </div>
                   <div className="h-4 w-px bg-white/20" />
-                  <span className="text-white/60 text-xs font-medium">50+ avaliações</span>
+                  <span className="text-white/60 text-xs font-medium">{REVIEW_COUNT}+ avaliações</span>
                   <div className="h-4 w-px bg-white/20" />
                   <span className="text-white/60 text-xs font-medium">+1000 clientes</span>
                 </div>
@@ -240,7 +241,7 @@ const LocationServicePage = () => {
                     buttonClassName="h-[52px] !py-0 w-full"
                   />
                   <a
-                    href={`https://wa.me/351925530647?text=${encodeURIComponent(buildServiceWaMessage(data.serviceSlug, data.city))}`}
+                    href={`${WHATSAPP_BASE}?text=${encodeURIComponent(buildServiceWaMessage(data.serviceSlug, data.city))}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     onClick={() => trackWhatsAppClick(`location_hero_${data.serviceSlug}_${data.citySlug}`)}

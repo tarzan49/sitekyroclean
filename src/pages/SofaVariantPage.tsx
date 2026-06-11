@@ -22,6 +22,7 @@ import {
 } from "@/data/keywordVariantData";
 import { cities } from "@/data/locationSeoData";
 import { GENERIC_PROCESS_STEPS, IMPERMEABILIZACAO_STEPS } from "@/constants/serviceProcesses";
+import { SITE_URL, WHATSAPP_BASE, REVIEW_RATING, REVIEW_COUNT } from "@/constants/business";
 
 import heroSofaD      from "@/assets/hero-sofa-cleaning-new.webp";
 import heroSofaM      from "@/assets/hero-sofa-cleaning-new-mobile.webp";
@@ -95,9 +96,9 @@ const SERVICE_LABEL: Record<ServiceKey, string> = {
 };
 
 const QUIZ_CTA: Record<VariantKey, string> = {
-  higienizacao:      'Ver o meu preço — grátis',
-  lavagem:           'Ver o meu preço — grátis',
-  impermeabilizacao: 'Proteger agora — ver preço',
+  higienizacao:      'Ver o meu preço, grátis',
+  lavagem:           'Ver o meu preço, grátis',
+  impermeabilizacao: 'Proteger agora, ver preço',
 };
 
 const WA_BTN_LABEL: Record<VariantKey, string> = {
@@ -130,7 +131,7 @@ const SofaVariantPage = () => {
     document.querySelector('meta[property="og:title"]')?.setAttribute('content', data.title);
     document.querySelector('meta[property="og:description"]')?.setAttribute('content', data.metaDescription);
     document.querySelector('link[rel="canonical"]')
-      ?.setAttribute('href', `https://cleansolutions.com.pt${location.pathname}`);
+      ?.setAttribute('href', `${SITE_URL}${location.pathname}`);
     let robotsMeta = document.querySelector('meta[name="robots"]');
     if (!robotsMeta) {
       robotsMeta = document.createElement('meta');
@@ -147,7 +148,7 @@ const SofaVariantPage = () => {
         <Header />
         <main className="pt-28 pb-16 min-h-screen bg-white">
           <div className="container mx-auto px-4 text-center">
-            <h1 className="font-playfair text-3xl font-bold text-[#1A1A2E] mb-4">Página não encontrada</h1>
+            <h1 className="font-playfair text-3xl font-bold text-[#111111] mb-4">Página não encontrada</h1>
             <Link to="/" style={{ color: "#D4AF37" }} className="hover:underline">Voltar ao início</Link>
           </div>
         </main>
@@ -213,11 +214,11 @@ const SofaVariantPage = () => {
                         <Star key={i} className="w-4 h-4 fill-[#D4AF37]" style={{ color: "#D4AF37" }} />
                       ))}
                     </div>
-                    <span className="text-white font-bold text-sm">5.0</span>
+                    <span className="text-white font-bold text-sm">{REVIEW_RATING}</span>
                     <span className="text-white/50 text-xs">Google</span>
                   </div>
                   <div className="h-4 w-px bg-white/20" />
-                  <span className="text-white/60 text-xs font-medium">50+ avaliações</span>
+                  <span className="text-white/60 text-xs font-medium">{REVIEW_COUNT}+ avaliações</span>
                   <div className="h-4 w-px bg-white/20" />
                   <span className="text-white/60 text-xs font-medium">+1000 clientes</span>
                 </div>
@@ -228,7 +229,7 @@ const SofaVariantPage = () => {
                     <QuizButton className="relative w-full" buttonClassName="h-[52px] !py-0 w-full" ctaLabel={QUIZ_CTA[data.variantKey]} initialLocation={data.locationName} initialService={quizService} />
                   </div>
                   <a
-                    href={`https://wa.me/351925530647?text=${encodeURIComponent(buildWaMessage(data.variantKey, data.serviceKey, data.locationName))}`}
+                    href={`${WHATSAPP_BASE}?text=${encodeURIComponent(buildWaMessage(data.variantKey, data.serviceKey, data.locationName))}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     onClick={() => trackWhatsAppClick(`variant_hero_${parsed.variantKey}_${parsed.serviceKey}`)}
@@ -271,7 +272,7 @@ const SofaVariantPage = () => {
                   <p className="text-[10px] font-bold tracking-[0.28em] uppercase" style={{ color: "#D4AF37" }}>O que resolvemos</p>
                   <div className="h-px w-10 opacity-40" style={{ backgroundColor: "#D4AF37" }} />
                 </div>
-                <h2 className="font-playfair text-2xl md:text-3xl font-bold text-[#1A1A2E]">
+                <h2 className="font-playfair text-2xl md:text-3xl font-bold text-[#111111]">
                   Vantagens da {variantLabel} em {data.locationName}
                 </h2>
               </div>
@@ -287,7 +288,7 @@ const SofaVariantPage = () => {
                     >
                       <Star className="w-5 h-5" style={{ color: "#D4AF37" }} />
                     </div>
-                    <p className="text-sm font-semibold text-[#1A1A2E] leading-snug">{benefit}</p>
+                    <p className="text-sm font-semibold text-[#111111] leading-snug">{benefit}</p>
                   </div>
                 ))}
               </div>
@@ -405,17 +406,17 @@ const SofaVariantPage = () => {
                 <p className="text-[10px] font-bold tracking-[0.28em] uppercase" style={{ color: "#D4AF37" }}>Cobertura</p>
                 <div className="h-px w-10 opacity-40" style={{ backgroundColor: "#D4AF37" }} />
               </div>
-              <h2 className="font-playfair text-2xl md:text-3xl font-bold text-[#1A1A2E] mb-6">
+              <h2 className="font-playfair text-2xl md:text-3xl font-bold text-[#111111] mb-6">
                 Servimos {data.locationName} e arredores
               </h2>
 
-              <p className="text-xs text-[#1A1A2E]/50 mb-3">Também disponível em:</p>
+              <p className="text-xs text-[#111111]/50 mb-3">Também disponível em:</p>
               <div className="flex flex-wrap justify-center gap-3 mb-6">
                 {cities.filter(c => c.slug !== parsed.locationPart).slice(0, 6).map(city => (
                   <Link
                     key={city.slug}
                     to={`/${parsed.variantKey}-${parsed.serviceKey}-${city.slug}`}
-                    className="text-xs text-[#1A1A2E]/60 hover:text-[#D4AF37] transition-colors font-medium"
+                    className="text-xs text-[#111111]/60 hover:text-[#D4AF37] transition-colors font-medium"
                   >
                     {city.name}
                   </Link>
@@ -423,13 +424,13 @@ const SofaVariantPage = () => {
               </div>
 
               <div className="mt-2 pt-6 border-t border-[#E8E4DE]">
-                <p className="text-xs text-[#1A1A2E]/50 mb-3">Outros serviços em {data.locationName}:</p>
+                <p className="text-xs text-[#111111]/50 mb-3">Outros serviços em {data.locationName}:</p>
                 <div className="flex flex-wrap justify-center gap-3">
                   {(SERVICES.filter(s => s !== parsed.serviceKey) as ServiceKey[]).map(svcKey => (
                     <Link
                       key={svcKey}
                       to={`/${parsed.variantKey}-${svcKey}-${parsed.locationPart}`}
-                      className="text-xs font-semibold text-[#1A1A2E]/60 hover:text-[#D4AF37] transition-colors"
+                      className="text-xs font-semibold text-[#111111]/60 hover:text-[#D4AF37] transition-colors"
                     >
                       {variantLabel} de {SERVICE_LABEL[svcKey]}
                     </Link>

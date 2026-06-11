@@ -1,13 +1,13 @@
 import { locationPrices } from "@/components/quiz/QuizTypes";
 
 const zones = [
-  { label: "Zona 0 — Porto Core (Grátis)", price: 0, color: "bg-emerald-900/40 border-emerald-500/30" },
-  { label: "Zona 1 — Subúrbios imediatos (~10-20 min)", price: 5, color: "bg-blue-900/40 border-blue-500/30" },
-  { label: "Zona 2 — Grande Porto (~20-30 min)", price: 10, color: "bg-yellow-900/40 border-yellow-500/30" },
-  { label: "Zona 3 — Interior norte (~35-45 min)", price: 15, color: "bg-orange-900/40 border-orange-500/30" },
-  { label: "Zona 4 — Mais afastado (~45-55 min)", price: 20, color: "bg-red-900/40 border-red-500/30" },
-  { label: "Zona 5 — Minho (~55-70 min)", price: 25, color: "bg-purple-900/40 border-purple-500/30" },
-  { label: "Zona Lisboa — Deslocação especial", price: null, color: "bg-gray-800/60 border-gray-500/30" },
+  { label: "Zona 0: Porto Core (Grátis)", price: 0, color: "bg-emerald-900/40 border-emerald-500/30" },
+  { label: "Zona 1: Subúrbios imediatos (~10-20 min)", price: 5, color: "bg-blue-900/40 border-blue-500/30" },
+  { label: "Zona 2: Grande Porto (~20-30 min)", price: 10, color: "bg-yellow-900/40 border-yellow-500/30" },
+  { label: "Zona 3: Interior norte (~35-45 min)", price: 15, color: "bg-orange-900/40 border-orange-500/30" },
+  { label: "Zona 4: Mais afastado (~45-55 min)", price: 20, color: "bg-red-900/40 border-red-500/30" },
+  { label: "Zona 5: Minho (~55-70 min)", price: 25, color: "bg-purple-900/40 border-purple-500/30" },
+  { label: "Zona Lisboa: Deslocação especial", price: null, color: "bg-gray-800/60 border-gray-500/30" },
 ];
 
 const citiesByPrice = Object.entries(locationPrices).reduce<Record<number, string[]>>((acc, [city, price]) => {

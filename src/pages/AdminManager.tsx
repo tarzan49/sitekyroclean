@@ -384,7 +384,7 @@ const AdminManager = ({ embedded = false }: { embedded?: boolean }) => {
                   {isExpanded && (
                     <div className="border-t border-gold/10 bg-gold/[0.03] px-5 py-4">
                       <p className="text-[10px] font-bold text-navy/40 uppercase tracking-widest mb-3">
-                        Variantes SEO — {totalVariants.toLocaleString("pt-PT")} páginas no total
+                        Variantes SEO: {totalVariants.toLocaleString("pt-PT")} páginas no total
                       </p>
                       <div className="space-y-2">
                         {[

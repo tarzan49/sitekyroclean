@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { Phone, MapPin } from "lucide-react";
 import { trackCallClick } from "@/lib/analytics";
 import QuizForm from './QuizFormLazy';
+import { PHONE_TEL, PHONE_DISPLAY } from "@/constants/business";
 
 const FinalCTA = () => {
   const { t } = useTranslation();
@@ -49,12 +50,12 @@ const FinalCTA = () => {
             {/* Phone + Zone */}
             <div className="flex flex-col items-center sm:items-start gap-0.5">
               <a
-                href="tel:925530647"
+                href={`tel:${PHONE_TEL}`}
                 onClick={() => trackCallClick('final_cta')}
                 className="inline-flex items-center gap-1.5 text-white/70 hover:text-white text-sm font-medium transition-colors"
               >
                 <Phone className="h-3.5 w-3.5 flex-shrink-0" />
-                {t('finalCta.ctaCall', 'Ligue: 925 530 647')}
+                {t('finalCta.ctaCall', `Ligue: ${PHONE_DISPLAY}`)}
               </a>
               <span className="inline-flex items-center gap-1 text-white/35 text-[11px]">
                 <MapPin className="h-3 w-3 flex-shrink-0" />

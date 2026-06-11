@@ -1,4 +1,11 @@
-﻿const BASE_URL = "https://cleansolutions.com.pt";
+﻿import {
+  SITE_URL,
+  PHONE_E164,
+  BUSINESS_EMAIL,
+  BUSINESS_ADDRESS,
+  REVIEW_RATING,
+  REVIEW_COUNT,
+} from "@/constants/business";
 
 interface ServiceReview {
   author: string;
@@ -18,7 +25,7 @@ interface ServiceSchemaProps {
 }
 
 const ServiceSchema = ({ serviceName, description, url, priceFrom, imageUrl, breadcrumbLabel, reviews }: ServiceSchemaProps) => {
-  const fullUrl = `${BASE_URL}${url}`;
+  const fullUrl = `${SITE_URL}${url}`;
   const priceNumeric = priceFrom.replace(/[^0-9]/g, '') || "39";
 
   // Reviews inline (no @id, no itemReviewed — context is the Service node itself)
@@ -31,7 +38,7 @@ const ServiceSchema = ({ serviceName, description, url, priceFrom, imageUrl, bre
   }));
 
   const hasReviews = reviewNodes.length > 0;
-  const avgRating = "5.0";
+  const avgRating = REVIEW_RATING;
 
   const schema = {
     "@context": "https://schema.org",
@@ -43,40 +50,34 @@ const ServiceSchema = ({ serviceName, description, url, priceFrom, imageUrl, bre
         "name": `${serviceName} | Kyro Clean Solutions`,
         "description": description,
         "inLanguage": "pt-PT",
-        "isPartOf": { "@id": `${BASE_URL}/#website` },
-        "publisher": { "@id": `${BASE_URL}/#business` },
+        "isPartOf": { "@id": `${SITE_URL}/#website` },
+        "publisher": { "@id": `${SITE_URL}/#business` },
         "breadcrumb": { "@id": `${fullUrl}#breadcrumb` },
       },
       {
         "@type": "BreadcrumbList",
         "@id": `${fullUrl}#breadcrumb`,
         "itemListElement": [
-          { "@type": "ListItem", "position": 1, "name": "Início", "item": BASE_URL },
+          { "@type": "ListItem", "position": 1, "name": "Início", "item": SITE_URL },
           { "@type": "ListItem", "position": 2, "name": breadcrumbLabel || serviceName, "item": fullUrl },
         ],
       },
       {
         "@type": ["LocalBusiness", "CleaningService"],
-        "@id": `${BASE_URL}/#business`,
+        "@id": `${SITE_URL}/#business`,
         "name": "Kyro Clean Solutions",
-        "url": BASE_URL,
-        "telephone": "+351925530647",
-        "email": "cleansolutions.pt25@gmail.com",
+        "url": SITE_URL,
+        "telephone": PHONE_E164,
+        "email": BUSINESS_EMAIL,
         "priceRange": "€€",
-        "address": {
-          "@type": "PostalAddress",
-          "streetAddress": "R. de António Cardoso 263",
-          "addressLocality": "Porto",
-          "postalCode": "4150-081",
-          "addressCountry": "PT",
-        },
+        "address": BUSINESS_ADDRESS,
         "aggregateRating": {
           "@type": "AggregateRating",
-          "ratingValue": "5.0",
+          "ratingValue": REVIEW_RATING,
           "bestRating": "5",
           "worstRating": "1",
-          "reviewCount": "51",
-          "ratingCount": "51",
+          "reviewCount": REVIEW_COUNT,
+          "ratingCount": REVIEW_COUNT,
         },
       },
       {
@@ -86,7 +87,7 @@ const ServiceSchema = ({ serviceName, description, url, priceFrom, imageUrl, bre
         "description": description,
         "url": fullUrl,
         ...(imageUrl && { "image": imageUrl }),
-        "provider": { "@id": `${BASE_URL}/#business` },
+        "provider": { "@id": `${SITE_URL}/#business` },
         "areaServed": [
           { "@type": "City", "name": "Porto" },
           { "@type": "City", "name": "Matosinhos" },

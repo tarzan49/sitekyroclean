@@ -108,10 +108,10 @@ export const SectionLayout = ({
             {badge && (
               <div className="flex items-center justify-center gap-2 mb-3">
                 <BadgeIcon className="h-5 w-5 text-gold" />
-                <span className="text-[#1A1A2E] font-semibold tracking-wide">{badge}</span>
+                <span className="text-[#111111] font-semibold tracking-wide">{badge}</span>
               </div>
             )}
-            <h2 className="text-2xl md:text-4xl lg:text-5xl font-bold text-[#1A1A2E]">
+            <h2 className="text-2xl md:text-4xl lg:text-5xl font-bold text-[#111111]">
               {title}
               {titleHighlight && (
                 <>
@@ -120,7 +120,7 @@ export const SectionLayout = ({
               )}
             </h2>
             {subtitle && (
-              <p className="text-[#1A1A2E]/55 text-base md:text-lg max-w-2xl mx-auto mt-3">
+              <p className="text-[#111111]/55 text-base md:text-lg max-w-2xl mx-auto mt-3">
                 {subtitle}
               </p>
             )}
@@ -151,14 +151,14 @@ export const SectionLayout = ({
 
               {/* Content Title */}
               {contentTitle && (
-                <h3 className="text-2xl md:text-3xl font-bold text-[#1A1A2E] leading-tight">
+                <h3 className="text-2xl md:text-3xl font-bold text-[#111111] leading-tight">
                   {contentTitle}
                 </h3>
               )}
 
               {/* Intro */}
               {contentIntro && (
-                <p className="text-[#1A1A2E]/80 leading-relaxed">
+                <p className="text-[#111111]/80 leading-relaxed">
                   {contentIntro}
                 </p>
               )}
@@ -177,7 +177,7 @@ export const SectionLayout = ({
                         <div className="flex-shrink-0 w-6 h-6 rounded-full bg-turquoise/10 flex items-center justify-center mt-0.5">
                           <BenefitIcon className="w-3.5 h-3.5 text-turquoise" />
                         </div>
-                        <span className="text-[#1A1A2E]/80 text-sm md:text-base leading-relaxed">
+                        <span className="text-[#111111]/80 text-sm md:text-base leading-relaxed">
                           {benefit.text}
                         </span>
                       </li>
@@ -191,7 +191,7 @@ export const SectionLayout = ({
                 <div className="pt-2">
                   <Button 
                     onClick={handleCta}
-                    className="group bg-gradient-to-r from-gold to-[#d4c78d] hover:from-[#d4c78d] hover:to-gold text-[#1A1A2E] font-semibold px-6 py-3 h-auto rounded-full shadow-lg transition-all duration-300 hover:scale-[1.03] hover:shadow-xl"
+                    className="group bg-gradient-to-r from-gold to-[#d4c78d] hover:from-[#d4c78d] hover:to-gold text-[#111111] font-semibold px-6 py-3 h-auto rounded-full shadow-lg transition-all duration-300 hover:scale-[1.03] hover:shadow-xl"
                   >
                     <span>{ctaText}</span>
                     <ArrowRight className="ml-2 h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
@@ -258,7 +258,7 @@ export const UnifiedBenefitItem = ({ icon: Icon, title, description, index = 0, 
       <h3 className="text-gold font-semibold text-lg md:text-xl mb-2 tracking-wide">
         {title}
       </h3>
-      <p className="text-[#1A1A2E]/80 text-base md:text-lg leading-relaxed">
+      <p className="text-[#111111]/80 text-base md:text-lg leading-relaxed">
         {description}
       </p>
     </div>

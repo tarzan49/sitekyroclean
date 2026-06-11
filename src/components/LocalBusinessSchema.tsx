@@ -1,7 +1,14 @@
 ﻿import { cities } from "@/data/locationSeoData";
 import { GOOGLE_MAPS_URL } from "@/constants/google";
-
-const BASE_URL = "https://cleansolutions.com.pt";
+import {
+  SITE_URL,
+  PHONE_E164,
+  BUSINESS_EMAIL,
+  BUSINESS_ADDRESS,
+  BUSINESS_GEO,
+  REVIEW_RATING,
+  REVIEW_COUNT,
+} from "@/constants/business";
 
 const LocalBusinessSchema = () => {
   const schema = {
@@ -9,34 +16,24 @@ const LocalBusinessSchema = () => {
     "@graph": [
       {
         "@type": ["LocalBusiness", "CleaningService"],
-        "@id": `${BASE_URL}/#business`,
+        "@id": `${SITE_URL}/#business`,
         "name": "Kyro Clean Solutions",
         "description": "Serviço profissional de limpeza e lavagem de estofos, sofás, colchões, tapetes, cadeiras e alcatifas. Impermeabilização e remoção de manchas ao domicílio.",
-        "url": BASE_URL,
-        "telephone": "+351925530647",
-        "email": "cleansolutions.pt25@gmail.com",
+        "url": SITE_URL,
+        "telephone": PHONE_E164,
+        "email": BUSINESS_EMAIL,
         "priceRange": "€€",
         "currenciesAccepted": "EUR",
         "paymentAccepted": "Cash, Credit Card, MB Way, Bank Transfer",
         "logo": {
           "@type": "ImageObject",
-          "url": `${BASE_URL}/og-image.jpg`,
+          "url": `${SITE_URL}/og-image.jpg`,
           "width": 1200,
           "height": 630,
         },
-        "image": `${BASE_URL}/og-image.jpg`,
-        "address": {
-          "@type": "PostalAddress",
-          "streetAddress": "R. de António Cardoso 263",
-          "addressLocality": "Porto",
-          "postalCode": "4150-081",
-          "addressCountry": "PT",
-        },
-        "geo": {
-          "@type": "GeoCoordinates",
-          "latitude": 41.1496,
-          "longitude": -8.6109,
-        },
+        "image": `${SITE_URL}/og-image.jpg`,
+        "address": BUSINESS_ADDRESS,
+        "geo": BUSINESS_GEO,
         "areaServed": cities.map(city => ({
           "@type": "City",
           "name": city.name,
@@ -57,14 +54,14 @@ const LocalBusinessSchema = () => {
         ],
         "aggregateRating": {
           "@type": "AggregateRating",
-          "ratingValue": "5.0",
+          "ratingValue": REVIEW_RATING,
           "bestRating": "5",
           "worstRating": "1",
-          "reviewCount": "51",
-          "ratingCount": "51",
+          "reviewCount": REVIEW_COUNT,
+          "ratingCount": REVIEW_COUNT,
         },
         "sameAs": [
-          BASE_URL,
+          SITE_URL,
           GOOGLE_MAPS_URL,
         ],
         "hasOfferCatalog": {
@@ -82,11 +79,11 @@ const LocalBusinessSchema = () => {
       },
       {
         "@type": "WebSite",
-        "@id": `${BASE_URL}/#website`,
-        "url": BASE_URL,
+        "@id": `${SITE_URL}/#website`,
+        "url": SITE_URL,
         "name": "Kyro Clean Solutions",
         "description": "Limpeza profissional de estofos ao domicílio em Portugal",
-        "publisher": { "@id": `${BASE_URL}/#business` },
+        "publisher": { "@id": `${SITE_URL}/#business` },
         "inLanguage": "pt-PT",
       },
     ],

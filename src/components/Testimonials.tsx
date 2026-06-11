@@ -103,7 +103,7 @@ const Testimonials = () => {
             </p>
           </div>
           <h2
-            className="font-playfair font-light text-[#1A1A2E]"
+            className="font-playfair font-light text-[#111111]"
             style={{ fontSize: 'clamp(2.2rem, 4.5vw, 4rem)', lineHeight: 1.08, letterSpacing: '-0.02em' }}
           >
             A confiança das<br />
@@ -121,7 +121,7 @@ const Testimonials = () => {
               {REVIEWS.map((review, i) => (
                 <div
                   key={i}
-                  className="flex-none w-[82vw] md:w-[calc((100%-40px)/3)] flex flex-col gap-4 bg-white p-6 md:p-7 border border-[#1A1A2E]/6 min-h-[240px] md:min-h-[260px]"
+                  className="flex-none w-[82vw] md:w-[calc((100%-40px)/3)] flex flex-col gap-4 bg-white p-6 md:p-7 border border-[#111111]/6 min-h-[240px] md:min-h-[260px]"
                 >
                   {/* Stars */}
                   <div className="flex gap-0.5">
@@ -131,16 +131,16 @@ const Testimonials = () => {
                   </div>
 
                   {/* Quote */}
-                  <p className="text-sm text-[#1A1A2E]/55 leading-relaxed flex-1" style={{ fontWeight: 300 }}>
+                  <p className="text-sm text-[#111111]/55 leading-relaxed flex-1" style={{ fontWeight: 300 }}>
                     "{review.text}"
                   </p>
 
                   {/* Author */}
-                  <div className="flex items-center gap-3 pt-4 border-t border-[#1A1A2E]/6">
+                  <div className="flex items-center gap-3 pt-4 border-t border-[#111111]/6">
                     <div className="w-8 h-8 bg-[#1A4E30] flex items-center justify-center text-white text-[11px] font-medium flex-shrink-0">
                       {review.initial}
                     </div>
-                    <p className="text-[12px] font-medium text-[#1A1A2E] tracking-wide">{review.name}</p>
+                    <p className="text-[12px] font-medium text-[#111111] tracking-wide">{review.name}</p>
                   </div>
                 </div>
               ))}
@@ -151,7 +151,7 @@ const Testimonials = () => {
           <div className="flex items-center gap-4 mt-8">
             <button
               onClick={() => emblaApi?.scrollPrev()}
-              className="w-9 h-9 border border-[#1A1A2E]/10 bg-white flex items-center justify-center text-[#1A1A2E]/35 hover:text-[#1A1A2E] hover:border-[#1A1A2E]/20 transition-all duration-200 flex-shrink-0"
+              className="w-9 h-9 border border-[#111111]/10 bg-white flex items-center justify-center text-[#111111]/35 hover:text-[#111111] hover:border-[#111111]/20 transition-all duration-200 flex-shrink-0"
               aria-label="Anterior"
             >
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
@@ -178,7 +178,7 @@ const Testimonials = () => {
 
             <button
               onClick={() => emblaApi?.scrollNext()}
-              className="w-9 h-9 border border-[#1A1A2E]/10 bg-white flex items-center justify-center text-[#1A1A2E]/35 hover:text-[#1A1A2E] hover:border-[#1A1A2E]/20 transition-all duration-200 flex-shrink-0"
+              className="w-9 h-9 border border-[#111111]/10 bg-white flex items-center justify-center text-[#111111]/35 hover:text-[#111111] hover:border-[#111111]/20 transition-all duration-200 flex-shrink-0"
               aria-label="Próximo"
             >
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">

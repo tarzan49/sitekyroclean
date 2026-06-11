@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { MessageCircle } from 'lucide-react';
 import { trackWhatsAppClick } from '@/lib/quizTracking';
+import { WHATSAPP_BASE } from '@/constants/business';
 
 const MobileStickyBar = () => {
   const [visible, setVisible] = useState(false);
@@ -23,7 +24,7 @@ const MobileStickyBar = () => {
       <div className="bg-[#071a12]/95 backdrop-blur-md border-t border-white/[0.08] shadow-[0_-4px_24px_rgba(0,0,0,0.4)]">
         <div className="max-w-2xl mx-auto px-3 pt-2.5 pb-3">
           <a
-            href={`https://wa.me/351925530647?text=${encodeURIComponent('Olá! Gostaria de pedir um orçamento para limpeza de estofos.')}`}
+            href={`${WHATSAPP_BASE}?text=${encodeURIComponent('Olá! Gostaria de pedir um orçamento para limpeza de estofos.')}`}
             target="_blank"
             rel="noopener noreferrer"
             onClick={() => trackWhatsAppClick('sticky_bar')}

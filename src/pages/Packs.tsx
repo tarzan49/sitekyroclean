@@ -4,6 +4,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import QuizButton from "@/components/QuizButton";
 import { packs, packCities, getFromPrice } from "@/data/packComboData";
+import { SITE_URL } from "@/constants/business";
 
 const Packs = () => {
   const defaultCity = packCities[0];
@@ -13,20 +14,20 @@ const Packs = () => {
     "@graph": [
       {
         "@type": "WebPage",
-        "@id": "https://cleansolutions.com.pt/packs#webpage",
-        "url": "https://cleansolutions.com.pt/packs",
+        "@id": `${SITE_URL}/packs#webpage`,
+        "url": `${SITE_URL}/packs`,
         "name": "Packs de Limpeza com Desconto | Kyro Clean Solutions",
         "inLanguage": "pt-PT",
-        "isPartOf": { "@id": "https://cleansolutions.com.pt/#website" },
-        "publisher": { "@id": "https://cleansolutions.com.pt/#business" },
-        "breadcrumb": { "@id": "https://cleansolutions.com.pt/packs#breadcrumb" },
+        "isPartOf": { "@id": `${SITE_URL}/#website` },
+        "publisher": { "@id": `${SITE_URL}/#business` },
+        "breadcrumb": { "@id": `${SITE_URL}/packs#breadcrumb` },
       },
       {
         "@type": "BreadcrumbList",
-        "@id": "https://cleansolutions.com.pt/packs#breadcrumb",
+        "@id": `${SITE_URL}/packs#breadcrumb`,
         "itemListElement": [
-          { "@type": "ListItem", "position": 1, "name": "Início", "item": "https://cleansolutions.com.pt/" },
-          { "@type": "ListItem", "position": 2, "name": "Packs", "item": "https://cleansolutions.com.pt/packs" },
+          { "@type": "ListItem", "position": 1, "name": "Início", "item": `${SITE_URL}/` },
+          { "@type": "ListItem", "position": 2, "name": "Packs", "item": `${SITE_URL}/packs` },
         ],
       },
     ],
@@ -73,17 +74,17 @@ const Packs = () => {
                         <span className="text-xs font-bold text-green-700 bg-green-50 border border-green-200 px-2.5 py-1 rounded-full">
                           {savingsLabel}
                         </span>
-                        <span className="text-xs font-semibold text-[#1A1A2E]/30">
+                        <span className="text-xs font-semibold text-[#111111]/30">
                           {pack.selectors.length} {pack.selectors.length === 1 ? 'opção' : 'opções'}
                         </span>
                       </div>
                       <h2 className="font-playfair font-bold text-[#0d3c47] text-lg leading-snug mb-1">
                         {pack.name}
                       </h2>
-                      <p className="text-xs text-[#1A1A2E]/40 mb-4 leading-relaxed">{pack.tagline}</p>
+                      <p className="text-xs text-[#111111]/40 mb-4 leading-relaxed">{pack.tagline}</p>
                       <ul className="space-y-1.5 mb-5">
                         {pack.features.slice(0, 3).map(f => (
-                          <li key={f} className="flex items-start gap-2 text-sm text-[#1A1A2E]/60">
+                          <li key={f} className="flex items-start gap-2 text-sm text-[#111111]/60">
                             <CheckCircle className="w-3.5 h-3.5 text-gold flex-shrink-0 mt-0.5" />
                             {f}
                           </li>
@@ -104,7 +105,7 @@ const Packs = () => {
             </div>
 
             {/* City selector note */}
-            <p className="text-center text-sm text-[#1A1A2E]/40 mt-6">
+            <p className="text-center text-sm text-[#111111]/40 mt-6">
               Preços para {defaultCity.name} · Disponível também em{" "}
               {packCities.slice(1).map(c => c.name).join(", ")}
             </p>
@@ -113,7 +114,7 @@ const Packs = () => {
             <div className="flex justify-center mt-4">
               <Link
                 to="/guia-de-packs"
-                className="inline-flex items-center gap-2 text-xs font-semibold text-[#1A1A2E]/50 hover:text-gold transition-colors border border-[#E8E4DE] bg-white px-4 py-2 rounded-full"
+                className="inline-flex items-center gap-2 text-xs font-semibold text-[#111111]/50 hover:text-gold transition-colors border border-[#E8E4DE] bg-white px-4 py-2 rounded-full"
               >
                 <Map className="w-3.5 h-3.5" />
                 Ver todos os packs por cidade
@@ -125,7 +126,7 @@ const Packs = () => {
         {/* Why pack logic */}
         <section className="py-10 bg-white border-t border-[#E8E4DE]">
           <div className="max-w-4xl mx-auto px-5 sm:px-6 lg:px-8">
-            <h2 className="font-playfair text-2xl font-bold text-[#1A1A2E] text-center mb-8">
+            <h2 className="font-playfair text-2xl font-bold text-[#111111] text-center mb-8">
               Porquê escolher um pack?
             </h2>
             <div className="grid sm:grid-cols-3 gap-6">
@@ -147,8 +148,8 @@ const Packs = () => {
                   <div className="w-10 h-10 rounded-full flex items-center justify-center mx-auto mb-3 font-black text-[#071a12]" style={{ background: "#D4AF37" }}>
                     {i + 1}
                   </div>
-                  <h3 className="font-semibold text-[#1A1A2E] text-sm mb-1">{item.title}</h3>
-                  <p className="text-xs text-[#1A1A2E]/50 leading-relaxed">{item.desc}</p>
+                  <h3 className="font-semibold text-[#111111] text-sm mb-1">{item.title}</h3>
+                  <p className="text-xs text-[#111111]/50 leading-relaxed">{item.desc}</p>
                 </div>
               ))}
             </div>

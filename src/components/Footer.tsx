@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { trackCallClick } from "@/lib/analytics";
 import kyroLogo from "@/assets/kyro-logo.webp";
+import { SITE_URL, PHONE_TEL, PHONE_DISPLAY, BUSINESS_EMAIL_HREF, BUSINESS_EMAIL, BUSINESS_ADDRESS } from "@/constants/business";
 
 const Footer = () => {
   const { t } = useTranslation();
@@ -135,7 +136,7 @@ const Footer = () => {
                 <Link to="/problemas/impermeabilizar-sofa" className="hover:text-turquoise active:text-turquoise transition-colors py-1 touch-manipulation">Impermeabilizar Sofá</Link>
               </li>
             </ul>
-            <p className="text-sm text-[#1A1A2E]/25 leading-relaxed">
+            <p className="text-sm text-[#111111]/25 leading-relaxed">
               {t('footer.aboutText')}
             </p>
           </div>
@@ -144,13 +145,13 @@ const Footer = () => {
           <div>
             <h3 className="text-base md:text-lg font-bold mb-3 md:mb-4 text-white">{t('footer.contactTitle')}</h3>
             <div className="space-y-3 text-sm">
-              <a href="tel:925530647" onClick={() => trackCallClick('footer')} className="flex items-center gap-2 hover:text-turquoise active:text-turquoise transition-colors py-1 touch-manipulation">
+              <a href={`tel:${PHONE_TEL}`} onClick={() => trackCallClick('footer')} className="flex items-center gap-2 hover:text-turquoise active:text-turquoise transition-colors py-1 touch-manipulation">
                 <Phone className="h-4 w-4 text-turquoise flex-shrink-0" />
-                <span>925 530 647</span>
+                <span>{PHONE_DISPLAY}</span>
               </a>
-              <a href="mailto:cleansolutions.pt25@gmail.com" className="flex items-center gap-2 hover:text-turquoise active:text-turquoise transition-colors py-1 touch-manipulation">
+              <a href={BUSINESS_EMAIL_HREF} className="flex items-center gap-2 hover:text-turquoise active:text-turquoise transition-colors py-1 touch-manipulation">
                 <Mail className="h-4 w-4 text-turquoise flex-shrink-0" />
-                <span className="break-all">cleansolutions.pt25@gmail.com</span>
+                <span className="break-all">{BUSINESS_EMAIL}</span>
               </a>
               <a
                 href={GOOGLE_MAPS_URL}
@@ -160,8 +161,8 @@ const Footer = () => {
               >
                 <MapPin className="h-4 w-4 text-turquoise mt-0.5 flex-shrink-0" />
                 <div>
-                  <p>R. de António Cardoso 263</p>
-                  <p>4150-081 Porto</p>
+                  <p>{BUSINESS_ADDRESS.streetAddress}</p>
+                  <p>{BUSINESS_ADDRESS.postalCode} {BUSINESS_ADDRESS.addressLocality}</p>
                   <p className="text-xs text-turquoise/70 mt-0.5">Ver no Google Maps ↗</p>
                 </div>
               </a>
@@ -173,25 +174,25 @@ const Footer = () => {
         <div className="border-t border-white/10 pt-4">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <div className="flex flex-col items-center md:items-start gap-1">
-              <p className="text-xs md:text-sm text-[#1A1A2E]/40 text-center md:text-left">
+              <p className="text-xs md:text-sm text-[#111111]/40 text-center md:text-left">
                 {t('footer.copyright')}
               </p>
               <div className="flex flex-wrap gap-x-4 gap-y-1 justify-center md:justify-start">
                 <Link
                   to="/politica-de-privacidade"
-                  className="text-xs text-[#1A1A2E]/55 hover:text-turquoise active:text-turquoise transition-colors underline underline-offset-2"
+                  className="text-xs text-[#111111]/55 hover:text-turquoise active:text-turquoise transition-colors underline underline-offset-2"
                 >
                   Política de Privacidade
                 </Link>
                 <Link
                   to="/termos-e-condicoes"
-                  className="text-xs text-[#1A1A2E]/55 hover:text-turquoise active:text-turquoise transition-colors underline underline-offset-2"
+                  className="text-xs text-[#111111]/55 hover:text-turquoise active:text-turquoise transition-colors underline underline-offset-2"
                 >
                   Termos e Condições
                 </Link>
                 <Link
                   to="/politica-de-devolucoes"
-                  className="text-xs text-[#1A1A2E]/55 hover:text-turquoise active:text-turquoise transition-colors underline underline-offset-2"
+                  className="text-xs text-[#111111]/55 hover:text-turquoise active:text-turquoise transition-colors underline underline-offset-2"
                 >
                   Política de Devoluções
                 </Link>
@@ -201,7 +202,7 @@ const Footer = () => {
               <h4 className="text-xs md:text-sm font-semibold mb-2 text-center md:text-right">{t('footer.followUs')}</h4>
               <div className="flex gap-3 justify-center md:justify-end">
                 <a
-                  href="https://cleansolutions.com.pt"
+                  href={SITE_URL}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-11 h-11 bg-turquoise hover:bg-turquoise-light active:bg-turquoise-light rounded-full flex items-center justify-center transition-colors touch-manipulation"

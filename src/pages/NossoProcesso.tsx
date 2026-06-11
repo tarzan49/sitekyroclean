@@ -5,6 +5,7 @@ import Header from "@/components/Header";
 import GlobalPromoBanner from "@/components/GlobalPromoBanner";
 import Footer from "@/components/Footer";
 import { trackCallClick } from "@/lib/analytics";
+import { PHONE_TEL } from "@/constants/business";
 
 interface ProcessStep {
   icon: LucideIcon;
@@ -103,13 +104,13 @@ const NossoProcesso = () => {
             {/* Title with gold accent */}
             <div className="text-center mb-6 md:mb-8">
               <h1 
-                className="text-3xl md:text-4xl lg:text-5xl font-bold text-[#1A1A2E] mb-3 animate-fade-in"
+                className="text-3xl md:text-4xl lg:text-5xl font-bold text-[#111111] mb-3 animate-fade-in"
                 style={{ animationDelay: "0.1s" }}
               >
                 {t('process.title')}
               </h1>
               <p 
-                className="text-base md:text-lg text-[#1A1A2E]/55 max-w-2xl mx-auto mb-4 animate-fade-in"
+                className="text-base md:text-lg text-[#111111]/55 max-w-2xl mx-auto mb-4 animate-fade-in"
                 style={{ animationDelay: "0.2s" }}
               >
                 {t('process.subtitle')}
@@ -156,14 +157,14 @@ const NossoProcesso = () => {
                         <div className="bg-[#FFFFFF] p-5 md:p-6 rounded-xl border border-[rgba(26,78,48,0.10)] shadow-sm hover:shadow-lg hover:border-gold/30 transition-all duration-300 group">
                           {/* Title with gold underline on hover */}
                           <div className="mb-3">
-                            <h3 className="text-xl md:text-2xl font-bold text-[#1A1A2E] group-hover:text-[#1A1A2E]/90 transition-colors">
+                            <h3 className="text-xl md:text-2xl font-bold text-[#111111] group-hover:text-[#111111]/90 transition-colors">
                               {step.title}
                             </h3>
                             <p className="text-sm font-medium text-gold mt-1">
                               {step.subtitle}
                             </p>
                           </div>
-                          <p className="text-[#1A1A2E]/70 leading-relaxed text-base">
+                          <p className="text-[#111111]/70 leading-relaxed text-base">
                             {step.description}
                           </p>
                         </div>
@@ -190,7 +191,7 @@ const NossoProcesso = () => {
                   </p>
                   <div className="flex flex-col sm:flex-row gap-4 justify-center">
                     <a
-                      href="tel:925530647"
+                      href={`tel:${PHONE_TEL}`}
                       onClick={() => trackCallClick('nosso_processo_cta')}
                       className="inline-flex items-center justify-center px-8 py-3 bg-[#FFFFFF] text-teal font-semibold rounded-lg hover:bg-[#FDFDF9] transition-colors shadow-md"
                     >

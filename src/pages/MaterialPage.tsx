@@ -16,6 +16,7 @@ import {
   getRelatedMaterialLinks,
 } from "@/data/materialSeoData";
 import { cities, services } from "@/data/locationSeoData";
+import { SITE_URL, WHATSAPP_BASE, REVIEW_RATING, REVIEW_COUNT } from "@/constants/business";
 import heroSofa          from "@/assets/hero-sofa-cleaning-new.webp";
 import heroRug           from "@/assets/hero-rug-cleaning-new.webp";
 import heroCarpet        from "@/assets/hero-carpet-cleaning-new.webp";
@@ -88,8 +89,8 @@ const MaterialPage = () => {
       const desc = document.querySelector('meta[name="description"]');
       if (desc) desc.setAttribute("content", data.metaDescription);
       const canonicalUrl = isCityVariant
-        ? `https://cleansolutions.com.pt/${data.serviceSlug}-${citySlug}`
-        : `https://cleansolutions.com.pt${pathname}`;
+        ? `${SITE_URL}/${data.serviceSlug}-${citySlug}`
+        : `${SITE_URL}${pathname}`;
       const canonical = document.querySelector('link[rel="canonical"]');
       if (canonical) canonical.setAttribute("href", canonicalUrl);
       const ogTitle = document.querySelector('meta[property="og:title"]');
@@ -97,7 +98,7 @@ const MaterialPage = () => {
       const ogDesc = document.querySelector('meta[property="og:description"]');
       if (ogDesc) ogDesc.setAttribute("content", data.metaDescription);
       const ogUrl = document.querySelector('meta[property="og:url"]');
-      if (ogUrl) ogUrl.setAttribute("content", `https://cleansolutions.com.pt${pathname}`);
+      if (ogUrl) ogUrl.setAttribute("content", `${SITE_URL}${pathname}`);
     }
   }, [pathname, data, isCityVariant, citySlug]);
 
@@ -107,7 +108,7 @@ const MaterialPage = () => {
         <Header />
         <main className="pt-28 pb-16 min-h-screen bg-white">
           <div className="container mx-auto px-4 text-center">
-            <h1 className="font-playfair text-3xl font-bold text-[#1A1A2E] mb-4">Página não encontrada</h1>
+            <h1 className="font-playfair text-3xl font-bold text-[#111111] mb-4">Página não encontrada</h1>
             <Link to="/" style={{ color: "#D4AF37" }} className="hover:underline">Voltar ao início</Link>
           </div>
         </main>
@@ -172,7 +173,7 @@ const MaterialPage = () => {
                   {[...Array(5)].map((_, i) => (
                     <svg key={i} className="w-4 h-4" fill="#D4AF37" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>
                   ))}
-                  <span className="text-sm text-white/60 ml-1">5.0 · 50+ avaliações</span>
+                  <span className="text-sm text-white/60 ml-1">{REVIEW_RATING} · {REVIEW_COUNT}+ avaliações</span>
                 </div>
               </div>
 
@@ -182,7 +183,7 @@ const MaterialPage = () => {
                   <QuizButton className="relative w-full" buttonClassName="h-[52px] !py-0 w-full" ctaLabel="Ver preço grátis" initialLocation={cityName ?? undefined} initialService={quizService} />
                 </div>
                 <a
-                  href={`https://wa.me/351925530647?text=${encodeURIComponent(buildMaterialWaMessage(data.slug, cityName))}`}
+                  href={`${WHATSAPP_BASE}?text=${encodeURIComponent(buildMaterialWaMessage(data.slug, cityName))}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={() => trackWhatsAppClick(`material_hero_${data.slug}`)}
@@ -204,7 +205,7 @@ const MaterialPage = () => {
                 <div className="h-px w-10 opacity-40" style={{ backgroundColor: "#D4AF37" }} />
                 <p className="text-[10px] font-bold tracking-[0.28em] uppercase" style={{ color: "#D4AF37" }}>Material</p>
               </div>
-              <h2 className="font-playfair text-2xl md:text-3xl font-bold text-[#1A1A2E] mb-8">
+              <h2 className="font-playfair text-2xl md:text-3xl font-bold text-[#111111] mb-8">
                 O que saber sobre {materialLabel}
               </h2>
 
@@ -212,12 +213,12 @@ const MaterialPage = () => {
                 {/* Características */}
                 <div className="bg-white rounded-2xl p-6 md:p-8 shadow-sm border border-[#E8E4DE]">
                   <p className="text-[10px] font-bold tracking-[0.25em] uppercase mb-3" style={{ color: "#D4AF37" }}>Características</p>
-                  <h3 className="font-playfair text-lg font-bold text-[#1A1A2E] mb-4">Como é este material</h3>
+                  <h3 className="font-playfair text-lg font-bold text-[#111111] mb-4">Como é este material</h3>
                   <ul className="space-y-3">
                     {data.characteristics.map((c, i) => (
                       <li key={i} className="flex items-start gap-3">
                         <CheckCircle className="w-4 h-4 flex-shrink-0 mt-0.5" style={{ color: "#D4AF37" }} />
-                        <span className="text-sm text-[#1A1A2E]/60">{c}</span>
+                        <span className="text-sm text-[#111111]/60">{c}</span>
                       </li>
                     ))}
                   </ul>
@@ -283,7 +284,7 @@ const MaterialPage = () => {
                   <p className="text-[10px] font-bold tracking-[0.28em] uppercase" style={{ color: "#D4AF37" }}>Perguntas</p>
                   <div className="h-px w-10 opacity-40" style={{ backgroundColor: "#D4AF37" }} />
                 </div>
-                <h2 className="font-playfair text-2xl md:text-3xl font-bold text-[#1A1A2E] mb-8 text-center">Perguntas Frequentes</h2>
+                <h2 className="font-playfair text-2xl md:text-3xl font-bold text-[#111111] mb-8 text-center">Perguntas Frequentes</h2>
                 <ServiceFAQSchema faqs={data.faqs} />
                 <Accordion type="single" collapsible className="space-y-4">
                   {data.faqs.map((faq, i) => (
@@ -292,10 +293,10 @@ const MaterialPage = () => {
                       value={`faq-${i}`}
                       className="bg-white rounded-[18px] shadow-sm hover:shadow-md border border-[#E8E4DE] px-6 transition-all duration-300 data-[state=open]:shadow-md data-[state=open]:border-[#D4AF37]/30"
                     >
-                      <AccordionTrigger className="text-left text-base font-semibold text-[#1A1A2E] py-5 hover:no-underline [&[data-state=open]>svg]:text-[#D4AF37]">
+                      <AccordionTrigger className="text-left text-base font-semibold text-[#111111] py-5 hover:no-underline [&[data-state=open]>svg]:text-[#D4AF37]">
                         {faq.question}
                       </AccordionTrigger>
-                      <AccordionContent className="text-base text-[#1A1A2E]/60 pb-6 leading-relaxed">
+                      <AccordionContent className="text-base text-[#111111]/60 pb-6 leading-relaxed">
                         {faq.answer}
                       </AccordionContent>
                     </AccordionItem>
@@ -322,7 +323,7 @@ const MaterialPage = () => {
                 <QuizButton className="relative w-full" buttonClassName="h-[52px] !py-0 w-full" ctaLabel="Ver preço grátis" />
               </div>
               <a
-                href={`https://wa.me/351925530647?text=${encodeURIComponent(buildMaterialWaMessage(data.slug, cityName))}`}
+                href={`${WHATSAPP_BASE}?text=${encodeURIComponent(buildMaterialWaMessage(data.slug, cityName))}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={() => trackWhatsAppClick(`material_cta_${data.slug}`)}
@@ -341,11 +342,11 @@ const MaterialPage = () => {
             <div className="max-w-4xl mx-auto space-y-8">
               {relatedLinks.length > 0 && (
                 <div>
-                  <h3 className="font-playfair text-lg font-bold text-[#1A1A2E] mb-4">Outros materiais</h3>
+                  <h3 className="font-playfair text-lg font-bold text-[#111111] mb-4">Outros materiais</h3>
                   <div className="flex flex-wrap gap-2">
                     {relatedLinks.map(link => (
                       <Link key={link.path} to={link.path}
-                        className="inline-flex items-center gap-1.5 bg-white px-3 py-2 rounded-lg text-sm font-medium text-[#1A1A2E] border border-[#E8E4DE] hover:border-[#D4AF37]/35 hover:bg-[#D4AF37]/5 transition-all">
+                        className="inline-flex items-center gap-1.5 bg-white px-3 py-2 rounded-lg text-sm font-medium text-[#111111] border border-[#E8E4DE] hover:border-[#D4AF37]/35 hover:bg-[#D4AF37]/5 transition-all">
                         <ArrowRight className="w-3 h-3" style={{ color: "#D4AF37" }} />
                         {link.name}
                       </Link>
@@ -356,14 +357,14 @@ const MaterialPage = () => {
 
               {!isCityVariant && (
                 <div>
-                  <h3 className="font-playfair text-lg font-bold text-[#1A1A2E] mb-4 flex items-center gap-2">
+                  <h3 className="font-playfair text-lg font-bold text-[#111111] mb-4 flex items-center gap-2">
                     <MapPin className="w-5 h-5" style={{ color: "#D4AF37" }} />
                     Disponível nestas cidades
                   </h3>
                   <div className="flex flex-wrap gap-2">
                     {topCities.map(city => (
                       <Link key={city.slug} to={`/${data.slug}-${city.slug}`}
-                        className="inline-flex items-center gap-1.5 bg-white px-3 py-2 rounded-lg text-sm font-medium text-[#1A1A2E] border border-[#E8E4DE] hover:border-[#D4AF37]/35 hover:bg-[#D4AF37]/5 transition-all">
+                        className="inline-flex items-center gap-1.5 bg-white px-3 py-2 rounded-lg text-sm font-medium text-[#111111] border border-[#E8E4DE] hover:border-[#D4AF37]/35 hover:bg-[#D4AF37]/5 transition-all">
                         <MapPin className="w-3 h-3" style={{ color: "#D4AF37" }} />
                         {city.name}
                       </Link>
@@ -374,14 +375,14 @@ const MaterialPage = () => {
 
               {isCityVariant && (
                 <div>
-                  <h3 className="font-playfair text-lg font-bold text-[#1A1A2E] mb-4 flex items-center gap-2">
+                  <h3 className="font-playfair text-lg font-bold text-[#111111] mb-4 flex items-center gap-2">
                     <MapPin className="w-5 h-5" style={{ color: "#D4AF37" }} />
                     Também disponível em
                   </h3>
                   <div className="flex flex-wrap gap-2">
                     {cities.filter(c => c.slug !== citySlug).slice(0, 8).map(city => (
                       <Link key={city.slug} to={`/${data.slug}-${city.slug}`}
-                        className="inline-flex items-center gap-1.5 bg-white px-3 py-2 rounded-lg text-sm font-medium text-[#1A1A2E] border border-[#E8E4DE] hover:border-[#D4AF37]/35 hover:bg-[#D4AF37]/5 transition-all">
+                        className="inline-flex items-center gap-1.5 bg-white px-3 py-2 rounded-lg text-sm font-medium text-[#111111] border border-[#E8E4DE] hover:border-[#D4AF37]/35 hover:bg-[#D4AF37]/5 transition-all">
                         <MapPin className="w-3 h-3" style={{ color: "#D4AF37" }} />
                         {city.name}
                       </Link>
@@ -398,32 +399,32 @@ const MaterialPage = () => {
           "@graph": [
             {
               "@type": "WebPage",
-              "@id": `https://cleansolutions.com.pt${pathname}#webpage`,
-              "url": `https://cleansolutions.com.pt${pathname}`,
+              "@id": `${SITE_URL}${pathname}#webpage`,
+              "url": `${SITE_URL}${pathname}`,
               "name": data.title,
               "description": data.metaDescription,
               "inLanguage": "pt-PT",
-              "isPartOf": { "@id": "https://cleansolutions.com.pt/#website" },
-              "publisher": { "@id": "https://cleansolutions.com.pt/#business" },
-              "breadcrumb": { "@id": `https://cleansolutions.com.pt${pathname}#breadcrumb` },
+              "isPartOf": { "@id": `${SITE_URL}/#website` },
+              "publisher": { "@id": `${SITE_URL}/#business` },
+              "breadcrumb": { "@id": `${SITE_URL}${pathname}#breadcrumb` },
             },
             {
               "@type": "BreadcrumbList",
-              "@id": `https://cleansolutions.com.pt${pathname}#breadcrumb`,
+              "@id": `${SITE_URL}${pathname}#breadcrumb`,
               "itemListElement": [
-                { "@type": "ListItem", "position": 1, "name": "Início", "item": "https://cleansolutions.com.pt" },
-                { "@type": "ListItem", "position": 2, "name": data.serviceName, "item": `https://cleansolutions.com.pt/${data.serviceSlug}` },
-                { "@type": "ListItem", "position": 3, "name": data.name, "item": `https://cleansolutions.com.pt/${data.slug}` },
-                ...(isCityVariant && cityName ? [{ "@type": "ListItem", "position": 4, "name": cityName, "item": `https://cleansolutions.com.pt${pathname}` }] : []),
+                { "@type": "ListItem", "position": 1, "name": "Início", "item": SITE_URL },
+                { "@type": "ListItem", "position": 2, "name": data.serviceName, "item": `${SITE_URL}/${data.serviceSlug}` },
+                { "@type": "ListItem", "position": 3, "name": data.name, "item": `${SITE_URL}/${data.slug}` },
+                ...(isCityVariant && cityName ? [{ "@type": "ListItem", "position": 4, "name": cityName, "item": `${SITE_URL}${pathname}` }] : []),
               ],
             },
             {
               "@type": "Service",
-              "@id": `https://cleansolutions.com.pt${pathname}#service`,
+              "@id": `${SITE_URL}${pathname}#service`,
               "name": data.title,
               "description": data.metaDescription,
-              "url": `https://cleansolutions.com.pt${pathname}`,
-              "provider": { "@id": "https://cleansolutions.com.pt/#business" },
+              "url": `${SITE_URL}${pathname}`,
+              "provider": { "@id": `${SITE_URL}/#business` },
               "areaServed": isCityVariant && cityName
                 ? { "@type": "City", "name": cityName }
                 : [

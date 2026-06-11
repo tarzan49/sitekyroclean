@@ -97,7 +97,7 @@ const AdminSeoPages = ({ embedded = false }: { embedded?: boolean }) => {
       const variantLabel = VARIANT_LABEL[route.variantKey] ?? route.variantKey;
       pages.push({
         type: 'variant',
-        title: `${variantLabel} ${route.serviceKey} — ${route.locationPart}`,
+        title: `${variantLabel} ${route.serviceKey}: ${route.locationPart}`,
         url: route.path,
         keyword: `${route.variantKey} ${route.serviceKey} ${route.locationPart}`,
         visible: true,
@@ -192,8 +192,8 @@ const AdminSeoPages = ({ embedded = false }: { embedded?: boolean }) => {
           ].map((stat, i) => (
             <div key={i} className="bg-white rounded-xl p-4 border border-[#0B2F2A]/10 text-center">
               <stat.icon className="w-5 h-5 mx-auto mb-1 text-[#0B2F2A]/50" />
-              <p className="text-2xl font-bold text-[#1A1A2E]">{stat.value}</p>
-              <p className="text-xs text-[#1A1A2E]/50">{stat.label}</p>
+              <p className="text-2xl font-bold text-[#111111]">{stat.value}</p>
+              <p className="text-xs text-[#111111]/50">{stat.label}</p>
             </div>
           ))}
         </div>
@@ -212,7 +212,7 @@ const AdminSeoPages = ({ embedded = false }: { embedded?: boolean }) => {
           <select
             value={typeFilter}
             onChange={e => setTypeFilter(e.target.value as PageType | 'all')}
-            className="px-3 py-2 rounded-lg border border-[#0B2F2A]/20 bg-white text-sm text-[#1A1A2E]"
+            className="px-3 py-2 rounded-lg border border-[#0B2F2A]/20 bg-white text-sm text-[#111111]"
           >
             <option value="all">Todos os tipos</option>
             <option value="service">Serviço</option>
@@ -224,7 +224,7 @@ const AdminSeoPages = ({ embedded = false }: { embedded?: boolean }) => {
           <select
             value={categoryFilter}
             onChange={e => setCategoryFilter(e.target.value)}
-            className="px-3 py-2 rounded-lg border border-[#0B2F2A]/20 bg-white text-sm text-[#1A1A2E]"
+            className="px-3 py-2 rounded-lg border border-[#0B2F2A]/20 bg-white text-sm text-[#111111]"
           >
             <option value="all">Todas as categorias</option>
             {categories.map(cat => (
@@ -234,7 +234,7 @@ const AdminSeoPages = ({ embedded = false }: { embedded?: boolean }) => {
         </div>
 
         {/* Results count */}
-        <p className="text-sm text-[#1A1A2E]/50 mb-4">
+        <p className="text-sm text-[#111111]/50 mb-4">
           {filtered.length} de {allPages.length} páginas
         </p>
 
@@ -244,13 +244,13 @@ const AdminSeoPages = ({ embedded = false }: { embedded?: boolean }) => {
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-[#0B2F2A]/10 bg-[#FDFDF9]">
-                  <th className="text-left px-4 py-3 font-semibold text-[#1A1A2E]">Tipo</th>
-                  <th className="text-left px-4 py-3 font-semibold text-[#1A1A2E]">Título</th>
-                  <th className="text-left px-4 py-3 font-semibold text-[#1A1A2E] hidden md:table-cell">URL</th>
-                  <th className="text-left px-4 py-3 font-semibold text-[#1A1A2E] hidden lg:table-cell">Keyword</th>
-                  <th className="text-left px-4 py-3 font-semibold text-[#1A1A2E] hidden lg:table-cell">Categoria</th>
-                  <th className="text-center px-4 py-3 font-semibold text-[#1A1A2E] w-20">Visível</th>
-                  <th className="text-center px-4 py-3 font-semibold text-[#1A1A2E] w-16">Link</th>
+                  <th className="text-left px-4 py-3 font-semibold text-[#111111]">Tipo</th>
+                  <th className="text-left px-4 py-3 font-semibold text-[#111111]">Título</th>
+                  <th className="text-left px-4 py-3 font-semibold text-[#111111] hidden md:table-cell">URL</th>
+                  <th className="text-left px-4 py-3 font-semibold text-[#111111] hidden lg:table-cell">Keyword</th>
+                  <th className="text-left px-4 py-3 font-semibold text-[#111111] hidden lg:table-cell">Categoria</th>
+                  <th className="text-center px-4 py-3 font-semibold text-[#111111] w-20">Visível</th>
+                  <th className="text-center px-4 py-3 font-semibold text-[#111111] w-16">Link</th>
                 </tr>
               </thead>
               <tbody>
@@ -261,23 +261,23 @@ const AdminSeoPages = ({ embedded = false }: { embedded?: boolean }) => {
                         {typeLabels[page.type]}
                       </span>
                     </td>
-                    <td className="px-4 py-3 font-medium text-[#1A1A2E] max-w-[300px] truncate">
+                    <td className="px-4 py-3 font-medium text-[#111111] max-w-[300px] truncate">
                       {page.title}
                     </td>
-                    <td className="px-4 py-3 text-[#1A1A2E]/50 hidden md:table-cell font-mono text-xs max-w-[200px] truncate">
+                    <td className="px-4 py-3 text-[#111111]/50 hidden md:table-cell font-mono text-xs max-w-[200px] truncate">
                       {page.url}
                     </td>
-                    <td className="px-4 py-3 text-[#1A1A2E]/50 hidden lg:table-cell text-xs max-w-[180px] truncate">
+                    <td className="px-4 py-3 text-[#111111]/50 hidden lg:table-cell text-xs max-w-[180px] truncate">
                       {page.keyword}
                     </td>
-                    <td className="px-4 py-3 text-[#1A1A2E]/50 hidden lg:table-cell text-xs">
+                    <td className="px-4 py-3 text-[#111111]/50 hidden lg:table-cell text-xs">
                       {page.category}
                     </td>
                     <td className="px-4 py-3 text-center">
                       {page.visible ? (
                         <Eye className="w-4 h-4 text-[#0B2F2A] mx-auto" />
                       ) : (
-                        <EyeOff className="w-4 h-4 text-[#1A1A2E]/30 mx-auto" />
+                        <EyeOff className="w-4 h-4 text-[#111111]/30 mx-auto" />
                       )}
                     </td>
                     <td className="px-4 py-3 text-center">

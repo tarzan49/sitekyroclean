@@ -4,9 +4,9 @@ import { BookOpen, ArrowRight, ChevronRight } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import QuizButton from "@/components/QuizButton";
+import { SITE_URL } from "@/constants/business";
 
-const DOMAIN = "https://cleansolutions.com.pt";
-const PAGE_URL = `${DOMAIN}/glossario-limpeza-estofos`;
+const PAGE_URL = `${SITE_URL}/glossario-limpeza-estofos`;
 
 interface Term {
   id: string;
@@ -134,8 +134,8 @@ const combinedSchema = {
       "url": PAGE_URL,
       "name": "Glossário de Limpeza de Estofos: 16 Termos Técnicos | Kyro Clean Solutions",
       "inLanguage": "pt-PT",
-      "isPartOf": { "@id": `${DOMAIN}/#website` },
-      "publisher": { "@id": `${DOMAIN}/#business` },
+      "isPartOf": { "@id": `${SITE_URL}/#website` },
+      "publisher": { "@id": `${SITE_URL}/#business` },
       "breadcrumb": { "@id": `${PAGE_URL}#breadcrumb` },
     },
     {
@@ -157,8 +157,8 @@ const combinedSchema = {
       "@type": "BreadcrumbList",
       "@id": `${PAGE_URL}#breadcrumb`,
       "itemListElement": [
-        { "@type": "ListItem", "position": 1, "name": "Início", "item": DOMAIN },
-        { "@type": "ListItem", "position": 2, "name": "Recursos", "item": `${DOMAIN}/blog` },
+        { "@type": "ListItem", "position": 1, "name": "Início", "item": SITE_URL },
+        { "@type": "ListItem", "position": 2, "name": "Recursos", "item": `${SITE_URL}/blog` },
         { "@type": "ListItem", "position": 3, "name": "Glossário", "item": PAGE_URL },
       ],
     },
@@ -243,7 +243,7 @@ const GlossarioEstofos = () => {
                   </span>
                   <div className="flex-1 min-w-0">
                     <a href={`#${term.id}`} title="Link direto">
-                      <h2 className="font-playfair text-lg md:text-xl font-bold text-[#1A1A2E] leading-snug hover:text-gold transition-colors">
+                      <h2 className="font-playfair text-lg md:text-xl font-bold text-[#111111] leading-snug hover:text-gold transition-colors">
                         {term.term}
                       </h2>
                     </a>
@@ -251,17 +251,17 @@ const GlossarioEstofos = () => {
                 </div>
 
                 {/* Definition */}
-                <p className="text-[15px] text-[#1A1A2E]/70 leading-relaxed mb-4 pl-10">
+                <p className="text-[15px] text-[#111111]/70 leading-relaxed mb-4 pl-10">
                   {term.definition}
                 </p>
 
                 {/* Example */}
                 <div className="pl-10 mb-4">
                   <div className="bg-gray-50 border border-gray-100 rounded-xl px-4 py-3">
-                    <p className="text-[10px] font-bold text-[#1A1A2E]/50 uppercase tracking-widest mb-1.5">
+                    <p className="text-[10px] font-bold text-[#111111]/50 uppercase tracking-widest mb-1.5">
                       Exemplo prático
                     </p>
-                    <p className="text-sm text-[#1A1A2E]/60 leading-relaxed italic">{term.example}</p>
+                    <p className="text-sm text-[#111111]/60 leading-relaxed italic">{term.example}</p>
                   </div>
                 </div>
 
@@ -293,7 +293,7 @@ const GlossarioEstofos = () => {
 
           {/* ── Related links ── */}
           <div className="pt-6 border-t border-gray-200">
-            <p className="text-xs font-bold text-[#1A1A2E]/40 uppercase tracking-widest mb-3">Recursos relacionados</p>
+            <p className="text-xs font-bold text-[#111111]/40 uppercase tracking-widest mb-3">Recursos relacionados</p>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
               {[
                 { to: "/perguntas-frequentes-limpeza-estofos", label: "FAQ Estofos" },
@@ -302,7 +302,7 @@ const GlossarioEstofos = () => {
                 { to: "/limpeza-colchoes", label: "Limpeza de Colchões" },
               ].map(link => (
                 <Link key={link.to} to={link.to}
-                  className="flex items-center gap-2 text-sm text-[#1A1A2E]/70 hover:text-gold transition-colors px-3 py-2 rounded-xl border border-gray-200 hover:border-gold/20 bg-white">
+                  className="flex items-center gap-2 text-sm text-[#111111]/70 hover:text-gold transition-colors px-3 py-2 rounded-xl border border-gray-200 hover:border-gold/20 bg-white">
                   <ChevronRight className="w-3.5 h-3.5 text-gold/50 flex-shrink-0" />
                   {link.label}
                 </Link>

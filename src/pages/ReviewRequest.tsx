@@ -1,6 +1,13 @@
 ﻿import { useSearchParams } from "react-router-dom";
 import { Star, ExternalLink, MessageCircle, Heart } from "lucide-react";
 import { GOOGLE_REVIEW_URL } from "@/constants/google";
+import {
+  SITE_URL,
+  WHATSAPP_BASE,
+  PHONE_E164,
+  REVIEW_RATING,
+  REVIEW_COUNT,
+} from "@/constants/business";
 
 const serviceLabels: Record<string, string> = {
   sofa: "sofá",
@@ -24,14 +31,14 @@ const ReviewRequest = () => {
     "@context": "https://schema.org",
     "@type": "LocalBusiness",
     "name": "Kyro Clean Solutions",
-    "url": "https://cleansolutions.com.pt",
-    "telephone": "+351925530647",
+    "url": SITE_URL,
+    "telephone": PHONE_E164,
     "aggregateRating": {
       "@type": "AggregateRating",
-      "ratingValue": "5.0",
+      "ratingValue": REVIEW_RATING,
       "bestRating": "5",
       "worstRating": "1",
-      "reviewCount": "51",
+      "reviewCount": REVIEW_COUNT,
     },
   };
 
@@ -96,7 +103,7 @@ const ReviewRequest = () => {
 
         {/* WhatsApp fallback */}
         <a
-          href="https://wa.me/351925530647"
+          href={WHATSAPP_BASE}
           target="_blank"
           rel="noopener noreferrer"
           className="w-full flex items-center justify-center gap-2 bg-white/5 hover:bg-white/10 border border-white/10 text-white/70 text-sm h-11 rounded-xl transition-colors touch-manipulation"

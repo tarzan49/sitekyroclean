@@ -115,11 +115,11 @@ function exportCSV(leads: Lead[]) {
 function getSalesInsight(lead: Lead): { emoji: string; text: string; type: 'price' | 'ghost' | 'hot' } | null {
   const txt = `${lead.notes ?? ''} ${lead.next_step ?? ''}`.toLowerCase();
   if (/preço|caro|apreensiv|analis|pensar|cust|barato|desconto/.test(txt))
-    return { emoji: '', text: 'Objeção de preço — propor 10% desconto', type: 'price' };
+    return { emoji: '', text: 'Objeção de preço: propor 10% desconto', type: 'price' };
   if (/não respondeu|sem retorno|parou de respond|não quer mais|arquiv/.test(txt))
-    return { emoji: '', text: 'Sem resposta — considerar mudar para Frio', type: 'ghost' };
+    return { emoji: '', text: 'Sem resposta: considerar mudar para Frio', type: 'ghost' };
   if (/urgent|esta semana|hoje|confirmo|quer para/.test(txt))
-    return { emoji: '', text: 'Lead quente — ligar agora', type: 'hot' };
+    return { emoji: '', text: 'Lead quente: ligar agora', type: 'hot' };
   return null;
 }
 
@@ -493,7 +493,7 @@ const AdminDashboard = ({ embedded = false }: { embedded?: boolean }) => {
                 {staleLeads.length} lead{staleLeads.length !== 1 ? 's precisam' : ' precisa'} de follow-up
               </span>
               <span className="text-amber-300/60 text-xs ml-2">
-                {filterStaleOnly ? '— Clica para ver todos' : `— Status "Aguardar resposta" ou "Orçamento enviado" há mais de ${STALE_DAYS} dias`}
+                {filterStaleOnly ? 'Clica para ver todos' : `Status "Aguardar resposta" ou "Orçamento enviado" há mais de ${STALE_DAYS} dias`}
               </span>
             </div>
             <span className="text-amber-400 text-xs font-bold">{filterStaleOnly ? 'Ver todos ›' : 'Filtrar ›'}</span>
@@ -591,7 +591,7 @@ const AdminDashboard = ({ embedded = false }: { embedded?: boolean }) => {
                       </td>
                       {/* Assigned to */}
                       <td className="px-3 py-1.5 whitespace-nowrap">
-                        <span className="text-white/60 text-xs font-medium">{lead.assigned_to || '—'}</span>
+                        <span className="text-white/60 text-xs font-medium">{lead.assigned_to || '-'}</span>
                       </td>
                       {/* Client */}
                       <td className="px-3 py-1.5">
@@ -619,7 +619,7 @@ const AdminDashboard = ({ embedded = false }: { embedded?: boolean }) => {
                       {/* Service */}
                       <td className="px-3 py-1.5 max-w-[180px]">
                         {lead.service && lead.service !== 'Histórico' && (
-                          <p className="font-semibold text-white/90 text-xs">{lead.service}{lead.service_type ? ` — ${lead.service_type}` : ''}</p>
+                          <p className="font-semibold text-white/90 text-xs">{lead.service}{lead.service_type ? `: ${lead.service_type}` : ''}</p>
                         )}
                         {lead.details && <p className="text-white/40 text-[10px] mt-0.5 leading-snug">{lead.details}</p>}
                         {lead.slot && <p className="text-gold/50 text-[10px] mt-0.5 flex items-center gap-1"><CalendarDays className="w-3 h-3" />{lead.slot}</p>}
@@ -643,7 +643,7 @@ const AdminDashboard = ({ embedded = false }: { embedded?: boolean }) => {
                           className="text-[10px] font-bold px-1.5 py-0.5 rounded-lg border cursor-pointer focus:outline-none bg-[#1a1a2e] text-white border-white/20"
                           style={{ colorScheme: 'dark' }}
                         >
-                          <option value="" className="bg-[#1a1a2e] text-white">—</option>
+                          <option value="" className="bg-[#1a1a2e] text-white">-</option>
                           {FILTER_PRIORITIES.map(p => <option key={p.value} value={p.value} className="bg-[#1a1a2e] text-white">{p.label}</option>)}
                         </select>
                       </td>
@@ -664,7 +664,7 @@ const AdminDashboard = ({ embedded = false }: { embedded?: boolean }) => {
                       </td>
                       {/* Source */}
                       <td className="px-3 py-1.5 whitespace-nowrap">
-                        <span className="text-white/40 text-[10px]">{lead.source || '—'}</span>
+                        <span className="text-white/40 text-[10px]">{lead.source || '-'}</span>
                       </td>
                       {/* Next step + Notes */}
                       <td className="px-3 py-1.5 min-w-[200px]">
@@ -794,9 +794,9 @@ const AdminDashboard = ({ embedded = false }: { embedded?: boolean }) => {
               return (
                 <div className="bg-white/[0.03] border border-white/[0.06] rounded-xl px-3 py-2.5 mb-3 space-y-1">
                   <p className="text-[10px] text-white/40 uppercase tracking-wider font-bold mb-1">Preview</p>
-                  <p className="text-xs text-white"><span className="text-white/40">Nome:</span> {p.name || '—'}</p>
-                  <p className="text-xs text-white"><span className="text-white/40">Tel:</span> {p.phone || '—'}</p>
-                  <p className="text-xs text-white"><span className="text-white/40">Cidade:</span> {p.location || '—'}</p>
+                  <p className="text-xs text-white"><span className="text-white/40">Nome:</span> {p.name || '-'}</p>
+                  <p className="text-xs text-white"><span className="text-white/40">Tel:</span> {p.phone || '-'}</p>
+                  <p className="text-xs text-white"><span className="text-white/40">Cidade:</span> {p.location || '-'}</p>
                   {p.email && <p className="text-xs text-white"><span className="text-white/40">Email:</span> {p.email}</p>}
                 </div>
               );

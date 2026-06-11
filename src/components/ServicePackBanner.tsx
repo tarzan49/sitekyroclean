@@ -1,6 +1,7 @@
 ﻿import { Link } from "react-router-dom";
 import { ArrowRight, CheckCircle, MessageCircle, Tag } from "lucide-react";
 import { packs, packCities, getFromPrice, getDefaultSelections, calcPackPrices, buildWhatsAppUrl } from "@/data/packComboData";
+import { WHATSAPP_BASE } from "@/constants/business";
 
 interface Props {
   packSlugs: string[];
@@ -59,7 +60,7 @@ const ServicePackBanner = ({ packSlugs, city = "porto" }: Props) => {
             const defaults = getDefaultSelections(pack);
             const prices = calcPackPrices(pack, defaults);
             const fromPrice = getFromPrice(pack);
-            const waUrl = prices ? buildWhatsAppUrl(pack, cityObj, defaults, prices) : `https://wa.me/351925530647`;
+            const waUrl = prices ? buildWhatsAppUrl(pack, cityObj, defaults, prices) : WHATSAPP_BASE;
             const savingsLabel = pack.id === 'sofa-impermeabilizacao' ? 'Preço VIP' : 'Poupe 20%';
 
             return (

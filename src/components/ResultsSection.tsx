@@ -10,28 +10,28 @@ import chairsImg  from "@/assets/service-chairs-new.webp";
 
 const results = [
   {
-    label: "Sofá em tecido — Porto",
+    label: "Sofá em tecido, Porto",
     testimonial: "\"Ficou melhor do que quando comprei. Não acreditei.\"",
     client: "Ana S., Porto",
     img: sofaImg,
     link: "/antes-depois-limpeza",
   },
   {
-    label: "Colchão de casal — Matosinhos",
+    label: "Colchão de casal, Matosinhos",
     testimonial: "\"Eliminaram o cheiro completamente. Dormimos muito melhor.\"",
     client: "Ricardo M., Matosinhos",
     img: mattressImg,
     link: "/antes-depois-limpeza",
   },
   {
-    label: "Tapete persa — Vila Nova de Gaia",
+    label: "Tapete persa, Vila Nova de Gaia",
     testimonial: "\"Estava convicto que ia ter de deitar o tapete fora. Enganei-me.\"",
     client: "Luísa F., Gaia",
     img: carpetImg,
     link: "/antes-depois-limpeza",
   },
   {
-    label: "Cadeiras de jantar — Maia",
+    label: "Cadeiras de jantar, Maia",
     testimonial: "\"Trabalho impecável. Vieram a casa e terminaram em menos de 1 hora.\"",
     client: "João T., Maia",
     img: chairsImg,
@@ -73,13 +73,13 @@ const ResultsSection = () => {
           </div>
           <div className="max-w-2xl">
             <h2
-              className="font-playfair font-light text-[#1A1A2E] mb-5"
+              className="font-playfair font-light text-[#111111] mb-5"
               style={{ fontSize: 'clamp(2.2rem, 4.5vw, 4rem)', lineHeight: 1.08, letterSpacing: '-0.02em' }}
             >
               Transformações que<br />
               <em style={{ fontStyle: 'italic', color: '#1A4E30' }}>falam por si.</em>
             </h2>
-            <p className="text-[#1A1A2E]/45 leading-relaxed max-w-lg" style={{ fontWeight: 300, fontSize: '0.95rem' }}>
+            <p className="text-[#111111]/45 leading-relaxed max-w-lg" style={{ fontWeight: 300, fontSize: '0.95rem' }}>
               Não prometemos. Mostramos. Cada trabalho é fotografado antes e depois, sem filtros, sem edição.
             </p>
           </div>
@@ -112,11 +112,11 @@ const ResultsSection = () => {
               </div>
 
               {/* Caption */}
-              <p className="text-[10px] font-medium text-[#1A1A2E]/35 tracking-[0.18em] uppercase mb-3">{r.label}</p>
-              <p className="font-playfair font-light text-[#1A1A2E] text-lg md:text-xl leading-snug mb-2" style={{ letterSpacing: '-0.01em' }}>
+              <p className="text-[10px] font-medium text-[#111111]/35 tracking-[0.18em] uppercase mb-3">{r.label}</p>
+              <p className="font-playfair font-light text-[#111111] text-lg md:text-xl leading-snug mb-2" style={{ letterSpacing: '-0.01em' }}>
                 {r.testimonial}
               </p>
-              <p className="text-[10px] text-[#1A1A2E]/35 tracking-wide">{r.client}</p>
+              <p className="text-[10px] text-[#111111]/35 tracking-wide">{r.client}</p>
             </div>
           ))}
         </div>
@@ -128,7 +128,7 @@ const ResultsSection = () => {
         >
           <Link
             to="/antes-depois-limpeza"
-            className="inline-flex items-center gap-2.5 border border-[#1A1A2E]/15 text-[#1A1A2E] text-[10px] font-semibold tracking-[0.20em] uppercase px-7 py-4 hover:border-[#1A4E30] hover:text-[#1A4E30] transition-colors"
+            className="inline-flex items-center gap-2.5 border border-[#111111]/15 text-[#111111] text-[10px] font-semibold tracking-[0.20em] uppercase px-7 py-4 hover:border-[#1A4E30] hover:text-[#1A4E30] transition-colors"
           >
             Ver Galeria Completa
             <ArrowRight className="w-3.5 h-3.5" />

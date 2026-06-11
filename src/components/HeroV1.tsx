@@ -1,6 +1,7 @@
 import { useState, useEffect, lazy, Suspense } from "react";
 import { trackWhatsAppClick } from "@/lib/quizTracking";
 import { MessageCircle, MapPin, Star } from "lucide-react";
+import { WHATSAPP_BASE, REVIEW_RATING, REVIEW_COUNT } from "@/constants/business";
 
 const QuizForm = lazy(() => import('./QuizFormLazy'));
 
@@ -174,7 +175,7 @@ const Hero = () => {
               <div className="relative group">
                 <div className="absolute -inset-1.5 rounded-full bg-[#25D366]/40 opacity-30 blur-lg group-hover:opacity-55 transition-opacity duration-400 pointer-events-none" />
                 <a
-                  href={`https://wa.me/351925530647?text=${encodeURIComponent('Olá, gostaria de saber mais sobre os vossos serviços de higienização.')}`}
+                  href={`${WHATSAPP_BASE}?text=${encodeURIComponent('Olá, gostaria de saber mais sobre os vossos serviços de higienização.')}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={() => trackWhatsAppClick('hero')}
@@ -209,7 +210,7 @@ const Hero = () => {
                     ))}
                   </div>
                   <span className="text-white/80 text-[11px] font-semibold tracking-wide">
-                    5.0 · 58 avaliações Google
+                    {REVIEW_RATING} · {REVIEW_COUNT}+ avaliações Google
                   </span>
                 </a>
               </div>
@@ -232,7 +233,7 @@ const Hero = () => {
           }`}
         >
           <a
-            href={`https://wa.me/351925530647?text=${encodeURIComponent('Olá! Gostaria de pedir um orçamento para limpeza de estofos.')}`}
+            href={`${WHATSAPP_BASE}?text=${encodeURIComponent('Olá! Gostaria de pedir um orçamento para limpeza de estofos.')}`}
             target="_blank"
             rel="noopener noreferrer"
             onClick={() => trackWhatsAppClick('hero_sticky_mobile')}

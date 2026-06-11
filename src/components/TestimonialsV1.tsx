@@ -4,6 +4,51 @@ import useEmblaCarousel from "embla-carousel-react";
 
 const REVIEWS = [
   {
+    name: "Paulo Henrique Cavalcante Silverio",
+    initial: "P",
+    text: "Serviço impecável! Atendimento ótimo dos rapazes.",
+  },
+  {
+    name: "Beatriz Lança",
+    initial: "B",
+    text: "Fizeram um ótimo trabalho com um sofá super antigo e com alguma sujidade acumulada, recomendo muito!!!",
+  },
+  {
+    name: "Stephany Rios",
+    initial: "S",
+    text: "Fizeram um ótimo trabalho na limpeza do sofá. Vi o serviço a ser feito hoje e as manchas desapareceram logo após a limpeza. O sofá ficou com um aspeto renovado, limpo e com um cheiro muito agradável. Estou muito satisfeita com o trabalho e recomendo o serviço!",
+  },
+  {
+    name: "Guillermo Rumbos",
+    initial: "G",
+    text: "Ótimo trabalho.",
+  },
+  {
+    name: "Vitor Lucena",
+    initial: "V",
+    text: "Incrível trabalho, recomendo 5⭐️",
+  },
+  {
+    name: "Luisa Peixoto",
+    initial: "L",
+    text: "Excelente serviço.",
+  },
+  {
+    name: "João Abreu",
+    initial: "J",
+    text: "Ótimo serviço, 100% recomendado!!",
+  },
+  {
+    name: "PIFFEN",
+    initial: "P",
+    text: "Muito bom! Excelente serviço, sem dúvida irei voltar a contactar!",
+  },
+  {
+    name: "Manuel Reis",
+    initial: "M",
+    text: "Serviço 5 estrelas!",
+  },
+  {
     name: "Pedro Novais",
     initial: "P",
     text: "Serviço impecável! Dois jovens trabalhadores muito educados e profissionais fizeram a limpeza do meu sofá com grande cuidado e o resultado ficou excelente. Recomendo vivamente!",
@@ -37,11 +82,6 @@ const REVIEWS = [
     name: "Jaime Guimarães",
     initial: "J",
     text: "Recorri a esta empresa para a limpeza de um sofá e fiquei muito agradado com o resultado final e com a simpatia da equipa. Serviço 5 estrelas.",
-  },
-  {
-    name: "Vitor Lucena",
-    initial: "V",
-    text: "Profissionais! Deixaram o sofá como novo! Preço acessível e muito simpáticos. Recomendo muito.",
   },
   {
     name: "Clarinda Neves",
@@ -102,7 +142,7 @@ const Testimonials = () => {
               O QUE DIZEM OS CLIENTES
             </p>
           </div>
-          <h2 className="font-playfair text-[1.85rem] sm:text-4xl md:text-[2.6rem] font-bold leading-[1.1] text-[#1A1A2E] max-w-xl">
+          <h2 className="font-playfair text-[1.85rem] sm:text-4xl md:text-[2.6rem] font-bold leading-[1.1] text-[#111111] max-w-xl">
             A confiança das{" "}
             <em className="not-italic" style={{ color: '#D4AF37' }}>famílias portuguesas</em>
           </h2>
@@ -176,7 +216,7 @@ const Testimonials = () => {
             {/* Prev */}
             <button
               onClick={() => emblaApi?.scrollPrev()}
-              className="w-9 h-9 rounded-full border border-[#E8E4DE] bg-white flex items-center justify-center text-[#1A1A2E]/50 hover:text-[#1A1A2E] hover:border-[#D4AF37]/50 transition-all duration-200 flex-shrink-0"
+              className="w-9 h-9 rounded-full border border-[#E8E4DE] bg-white flex items-center justify-center text-[#111111]/50 hover:text-[#111111] hover:border-[#D4AF37]/50 transition-all duration-200 flex-shrink-0"
               aria-label="Anterior"
             >
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -185,14 +225,14 @@ const Testimonials = () => {
             </button>
 
             {/* Counter */}
-            <span className="text-[10px] text-[#1A1A2E]/30 font-mono tracking-widest">
+            <span className="text-[10px] text-[#111111]/30 font-mono tracking-widest">
               {selectedIndex + 1}/{REVIEWS.length}
             </span>
 
             {/* Next */}
             <button
               onClick={() => emblaApi?.scrollNext()}
-              className="w-9 h-9 rounded-full border border-[#E8E4DE] bg-white flex items-center justify-center text-[#1A1A2E]/50 hover:text-[#1A1A2E] hover:border-[#D4AF37]/50 transition-all duration-200 flex-shrink-0"
+              className="w-9 h-9 rounded-full border border-[#E8E4DE] bg-white flex items-center justify-center text-[#111111]/50 hover:text-[#111111] hover:border-[#D4AF37]/50 transition-all duration-200 flex-shrink-0"
               aria-label="Próximo"
             >
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

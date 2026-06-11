@@ -4,9 +4,9 @@ import { ChevronDown, ChevronRight, MessageCircle, Phone, Star } from "lucide-re
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import QuizButton from "@/components/QuizButton";
+import { SITE_URL, WHATSAPP_BASE, PHONE_E164, PHONE_DISPLAY, REVIEW_RATING, REVIEW_COUNT } from "@/constants/business";
 
-const DOMAIN = "https://cleansolutions.com.pt";
-const PAGE_URL = `${DOMAIN}/perguntas-frequentes-limpeza-estofos`;
+const PAGE_URL = `${SITE_URL}/perguntas-frequentes-limpeza-estofos`;
 
 interface FAQ {
   id: string;
@@ -37,7 +37,7 @@ const allFaqs: FAQ[] = [
   {
     id: "manchas-vinho-sangue-gordura",
     question: "Conseguem tirar manchas de vinho, sangue e gordura?",
-    answer: <>Sim. A taxa de remoção da Kyro Clean é <strong>superior a 95% para manchas de vinho tinto, sangue, café, gordura e urina</strong> quando o tratamento é feito dentro de 6 meses após a mancha. Usamos pré-tratamento enzimático específico por tipo: enzimas proteolíticas para sangue, enzimas lipolíticas para gordura, oxidantes controlados para vinho. Manchas antigas com mais de 1 ano oxidam nas fibras e a taxa de remoção desce para 60% a 80%, ainda assim, o resultado é sempre significativamente melhor que o estado inicial. Para casos duvidosos, envie uma foto via <a href="https://wa.me/351925530647" target="_blank" rel="noopener noreferrer" className="text-gold hover:underline font-medium">WhatsApp (925 530 647)</a> e damos uma estimativa honesta antes de agendar.</>,
+    answer: <>Sim. A taxa de remoção da Kyro Clean é <strong>superior a 95% para manchas de vinho tinto, sangue, café, gordura e urina</strong> quando o tratamento é feito dentro de 6 meses após a mancha. Usamos pré-tratamento enzimático específico por tipo: enzimas proteolíticas para sangue, enzimas lipolíticas para gordura, oxidantes controlados para vinho. Manchas antigas com mais de 1 ano oxidam nas fibras e a taxa de remoção desce para 60% a 80%, ainda assim, o resultado é sempre significativamente melhor que o estado inicial. Para casos duvidosos, envie uma foto via <a href={WHATSAPP_BASE} target="_blank" rel="noopener noreferrer" className="text-gold hover:underline font-medium">WhatsApp ({PHONE_DISPLAY})</a> e damos uma estimativa honesta antes de agendar.</>,
     plainAnswer: "Taxa de remoção superior a 95% para manchas de vinho, sangue, café, gordura e urina tratadas até 6 meses. Pré-tratamento enzimático específico por tipo de mancha. Manchas com mais de 1 ano: 60% a 80% de remoção.",
   },
   {
@@ -67,14 +67,14 @@ const allFaqs: FAQ[] = [
   {
     id: "garantia-satisfacao",
     question: "Têm garantia de satisfação?",
-    answer: <>Sim. A Kyro Clean oferece <strong>garantia de satisfação total</strong>: se o resultado não corresponder ao que foi acordado antes do serviço, voltamos ao domicílio sem custo adicional para corrigir o trabalho. A garantia cobre manchas identificadas e estimadas antes de começar. Para a acionar, basta contactar-nos nas <strong>48 horas</strong> após o serviço via <a href="https://wa.me/351925530647" target="_blank" rel="noopener noreferrer" className="text-gold hover:underline font-medium">WhatsApp (925 530 647)</a>. A nossa taxa de reclamações é inferior a 1%: mais de 99% dos clientes ficam satisfeitos na primeira visita, reflectido nas nossas <strong>mais de 50 avaliações 5 estrelas no Google</strong>. Somos honestos sobre o que conseguimos e não conseguimos remover antes de aceitar o trabalho: nunca prometer e não cumprir.</>,
-    plainAnswer: "Garantia de satisfação total: voltamos sem custo se o resultado não corresponder ao acordado. Acionar em 48h via WhatsApp. Taxa de reclamações inferior a 1%. Mais de 50 avaliações 5 estrelas no Google.",
+    answer: <>Sim. A Kyro Clean oferece <strong>garantia de satisfação total</strong>: se o resultado não corresponder ao que foi acordado antes do serviço, voltamos ao domicílio sem custo adicional para corrigir o trabalho. A garantia cobre manchas identificadas e estimadas antes de começar. Para a acionar, basta contactar-nos nas <strong>48 horas</strong> após o serviço via <a href={WHATSAPP_BASE} target="_blank" rel="noopener noreferrer" className="text-gold hover:underline font-medium">WhatsApp ({PHONE_DISPLAY})</a>. A nossa taxa de reclamações é inferior a 1%: mais de 99% dos clientes ficam satisfeitos na primeira visita, reflectido nas nossas <strong>mais de 60 avaliações 5 estrelas no Google</strong>. Somos honestos sobre o que conseguimos e não conseguimos remover antes de aceitar o trabalho: nunca prometer e não cumprir.</>,
+    plainAnswer: "Garantia de satisfação total: voltamos sem custo se o resultado não corresponder ao acordado. Acionar em 48h via WhatsApp. Taxa de reclamações inferior a 1%. Mais de 60 avaliações 5 estrelas no Google.",
   },
   {
     id: "como-pedir-orcamento-rapido",
     question: "Como faço um orçamento rápido?",
-    answer: <>O método mais rápido é o <strong>calculador online</strong>: responda a 4 perguntas (serviço, tamanho, localização, disponibilidade) e recebe o preço estimado em menos de 30 segundos, sem precisar de falar com ninguém e sem compromisso. Em alternativa: <strong>WhatsApp para 925 530 647</strong> com uma foto do sofá, resposta em menos de 15 minutos durante o horário de serviço (8h às 24h, segunda a sábado). Para empresas ou volumes, contacte diretamente para orçamento personalizado com desconto de volume. <strong>Não existem custos escondidos</strong>: o preço do orçamento é o preço final pago. O técnico não adiciona extras no local sem aprovação prévia. O serviço de <Link to="/limpeza-sofas" className="text-gold hover:underline font-medium">limpeza de sofás</Link> inclui deslocação e produto.</>,
-    plainAnswer: "Calculador online em 30 segundos (4 perguntas). Ou WhatsApp para 925 530 647 com foto, resposta em 15 minutos (8h às 24h, seg. a sáb.). Preço final sem extras. Inclui deslocação e produto.",
+    answer: <>O método mais rápido é o <strong>calculador online</strong>: responda a 4 perguntas (serviço, tamanho, localização, disponibilidade) e recebe o preço estimado em menos de 30 segundos, sem precisar de falar com ninguém e sem compromisso. Em alternativa: <strong>WhatsApp para {PHONE_DISPLAY}</strong> com uma foto do sofá, resposta em menos de 15 minutos durante o horário de serviço (8h às 24h, segunda a sábado). Para empresas ou volumes, contacte diretamente para orçamento personalizado com desconto de volume. <strong>Não existem custos escondidos</strong>: o preço do orçamento é o preço final pago. O técnico não adiciona extras no local sem aprovação prévia. O serviço de <Link to="/limpeza-sofas" className="text-gold hover:underline font-medium">limpeza de sofás</Link> inclui deslocação e produto.</>,
+    plainAnswer: `Calculador online em 30 segundos (4 perguntas). Ou WhatsApp para ${PHONE_DISPLAY} com foto, resposta em 15 minutos (8h às 24h, seg. a sáb.). Preço final sem extras. Inclui deslocação e produto.`,
   },
   {
     id: "preco-colchao-solteiro",
@@ -97,8 +97,8 @@ const allFaqs: FAQ[] = [
   {
     id: "quanto-custa-limpar-alcatifa",
     question: "Fazem limpeza de alcatifas? Qual é o preço?",
-    answer: <>Sim. A <Link to="/limpeza-alcatifas" className="text-gold hover:underline font-medium">limpeza de alcatifas</Link> é feita no local por extração a vapor, sem necessidade de remover o revestimento. O preço é calculado por metro quadrado conforme a área total a tratar. Para saber o preço exato da sua alcatifa, envie uma foto e a metragem via <a href="https://wa.me/351925530647" target="_blank" rel="noopener noreferrer" className="text-gold hover:underline font-medium">WhatsApp (925 530 647)</a> e respondemos em menos de 15 minutos. O serviço inclui pré-tratamento de manchas, extração a vapor e bactericida.</>,
-    plainAnswer: "Limpeza de alcatifas feita no local por extração a vapor. Preço por m² conforme área total. Envie foto e metragem via WhatsApp 925 530 647 para orçamento em 15 minutos. Inclui pré-tratamento, extração e bactericida.",
+    answer: <>Sim. A <Link to="/limpeza-alcatifas" className="text-gold hover:underline font-medium">limpeza de alcatifas</Link> é feita no local por extração a vapor, sem necessidade de remover o revestimento. O preço é calculado por metro quadrado conforme a área total a tratar. Para saber o preço exato da sua alcatifa, envie uma foto e a metragem via <a href={WHATSAPP_BASE} target="_blank" rel="noopener noreferrer" className="text-gold hover:underline font-medium">WhatsApp ({PHONE_DISPLAY})</a> e respondemos em menos de 15 minutos. O serviço inclui pré-tratamento de manchas, extração a vapor e bactericida.</>,
+    plainAnswer: `Limpeza de alcatifas feita no local por extração a vapor. Preço por m² conforme área total. Envie foto e metragem via WhatsApp ${PHONE_DISPLAY} para orçamento em 15 minutos. Inclui pré-tratamento, extração e bactericida.`,
   },
   {
     id: "quanto-custa-impermeabilizacao",
@@ -123,8 +123,8 @@ const combinedSchema = {
       "url": PAGE_URL,
       "name": "Perguntas Frequentes: Limpeza de Estofos, Tapetes e Alcatifas | Kyro Clean Solutions",
       "inLanguage": "pt-PT",
-      "isPartOf": { "@id": `${DOMAIN}/#website` },
-      "publisher": { "@id": `${DOMAIN}/#business` },
+      "isPartOf": { "@id": `${SITE_URL}/#website` },
+      "publisher": { "@id": `${SITE_URL}/#business` },
       "breadcrumb": { "@id": `${PAGE_URL}#breadcrumb` },
     },
     {
@@ -140,8 +140,8 @@ const combinedSchema = {
       "@type": "BreadcrumbList",
       "@id": `${PAGE_URL}#breadcrumb`,
       "itemListElement": [
-        { "@type": "ListItem", "position": 1, "name": "Início", "item": DOMAIN },
-        { "@type": "ListItem", "position": 2, "name": "Recursos", "item": `${DOMAIN}/blog` },
+        { "@type": "ListItem", "position": 1, "name": "Início", "item": SITE_URL },
+        { "@type": "ListItem", "position": 2, "name": "Recursos", "item": `${SITE_URL}/blog` },
         { "@type": "ListItem", "position": 3, "name": "Perguntas Frequentes", "item": PAGE_URL },
       ],
     },
@@ -262,7 +262,7 @@ const FAQEstofos = () => {
                 <QuizButton ctaLabel="Calcular preço" />
                 <div className="mt-3 flex flex-col gap-2">
                   <a
-                    href="https://wa.me/351925530647"
+                    href={WHATSAPP_BASE}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center justify-center gap-2 px-4 py-2.5 border border-white/20 rounded-full text-white/70 font-medium text-xs hover:bg-white/[0.07] hover:text-white transition-all"
@@ -271,11 +271,11 @@ const FAQEstofos = () => {
                     WhatsApp
                   </a>
                   <a
-                    href="tel:+351925530647"
+                    href={`tel:${PHONE_E164}`}
                     className="inline-flex items-center justify-center gap-1.5 text-white/55 hover:text-gold text-xs font-medium transition-colors"
                   >
                     <Phone className="w-3 h-3 text-gold flex-shrink-0" strokeWidth={2.5} />
-                    925 530 647
+                    {PHONE_DISPLAY}
                   </a>
                 </div>
                 {/* Rating */}
@@ -283,7 +283,7 @@ const FAQEstofos = () => {
                   <div className="flex gap-0.5">
                     {[...Array(5)].map((_, i) => <Star key={i} className="w-3 h-3 fill-gold text-gold" />)}
                   </div>
-                  <span className="text-white/50 text-[11px]">5.0 · +50 avaliações</span>
+                  <span className="text-white/50 text-[11px]">{REVIEW_RATING} · {REVIEW_COUNT}+ avaliações</span>
                 </div>
               </div>
 
@@ -316,7 +316,7 @@ const FAQEstofos = () => {
             <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
               <QuizButton ctaLabel="Calcular preço grátis" />
               <a
-                href="https://wa.me/351925530647"
+                href={WHATSAPP_BASE}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center justify-center gap-2 px-6 py-3 border border-white/20 rounded-full text-white/75 font-medium text-sm hover:bg-white/[0.07] hover:text-white transition-all"

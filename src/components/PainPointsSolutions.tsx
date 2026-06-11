@@ -78,13 +78,13 @@ const PainPointsSolutions = () => {
           </div>
           <div className="max-w-2xl">
             <h2
-              className="font-playfair font-light text-[#1A1A2E] mb-5"
+              className="font-playfair font-light text-[#111111] mb-5"
               style={{ fontSize: 'clamp(2.2rem, 4.5vw, 4rem)', lineHeight: 1.08, letterSpacing: '-0.02em' }}
             >
               O que os seus estofos<br />
               <em style={{ fontStyle: 'italic', color: '#1A4E30' }}>realmente escondem.</em>
             </h2>
-            <p className="text-[#1A1A2E]/45 leading-relaxed max-w-md" style={{ fontWeight: 300, fontSize: '0.95rem' }}>
+            <p className="text-[#111111]/45 leading-relaxed max-w-md" style={{ fontWeight: 300, fontSize: '0.95rem' }}>
               Problemas invisíveis que afetam a saúde e o conforto da sua família todos os dias.
             </p>
           </div>
@@ -155,7 +155,7 @@ const PainPointsSolutions = () => {
                 <p className="font-playfair font-light text-[#1A4E30] text-2xl md:text-3xl leading-none mb-1">
                   {s.value}
                 </p>
-                <p className="text-[9px] font-medium text-[#1A1A2E]/35 tracking-[0.20em] uppercase">
+                <p className="text-[9px] font-medium text-[#111111]/35 tracking-[0.20em] uppercase">
                   {s.label}
                 </p>
               </div>
@@ -164,7 +164,7 @@ const PainPointsSolutions = () => {
 
           <button
             onClick={openQuiz}
-            className="inline-flex items-center gap-2.5 border border-[#1A1A2E]/15 text-[#1A1A2E] text-[10px] font-semibold tracking-[0.20em] uppercase px-7 py-4 hover:border-[#1A4E30] hover:text-[#1A4E30] transition-colors self-start md:self-auto whitespace-nowrap touch-manipulation"
+            className="inline-flex items-center gap-2.5 border border-[#111111]/15 text-[#111111] text-[10px] font-semibold tracking-[0.20em] uppercase px-7 py-4 hover:border-[#1A4E30] hover:text-[#1A4E30] transition-colors self-start md:self-auto whitespace-nowrap touch-manipulation"
           >
             Proteja a sua família
             <ArrowRight className="w-3.5 h-3.5" />

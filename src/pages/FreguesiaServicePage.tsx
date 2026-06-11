@@ -24,6 +24,7 @@ import { SERVICE_TO_QUIZ } from "@/constants/serviceToQuiz";
 import { METRO_CITIES } from "@/constants/metroCities";
 import { SERVICE_HERO_IMAGES, SERVICE_RESULT_IMAGES, SERVICE_RESULT_CONTENT, SERVICE_HERO_FALLBACK, SERVICE_RESULT_FALLBACK } from "@/constants/serviceContent";
 import { buildServiceWaMessage } from "@/lib/buildServiceWaMessage";
+import { SITE_URL, WHATSAPP_BASE, REVIEW_RATING, REVIEW_COUNT } from "@/constants/business";
 
 function parseFreguesiaRoute(pathname: string): { serviceSlug: string; citySlug: string; freguesiaSlug: string } | null {
   const path = pathname.replace(/^\//, '');
@@ -59,7 +60,7 @@ const FreguesiaServicePage = () => {
       const descTag = document.querySelector('meta[name="description"]');
       if (descTag) descTag.setAttribute("content", data.metaDescription);
       const canonical = document.querySelector('link[rel="canonical"]');
-      if (canonical) canonical.setAttribute("href", `https://cleansolutions.com.pt${location.pathname}`);
+      if (canonical) canonical.setAttribute("href", `${SITE_URL}${location.pathname}`);
     }
   }, [location.pathname, data]);
 
@@ -81,7 +82,7 @@ const FreguesiaServicePage = () => {
         <Header />
         <main className="pt-28 pb-16 min-h-screen bg-white">
           <div className="container mx-auto px-4 text-center">
-            <h1 className="font-playfair text-3xl font-bold text-[#1A1A2E] mb-4">Página não encontrada</h1>
+            <h1 className="font-playfair text-3xl font-bold text-[#111111] mb-4">Página não encontrada</h1>
             <Link to="/" style={{ color: "#D4AF37" }} className="hover:underline">Voltar ao início</Link>
           </div>
         </main>
@@ -160,11 +161,11 @@ const FreguesiaServicePage = () => {
                         <Star key={i} className="w-4 h-4 fill-[#D4AF37]" style={{ color: "#D4AF37" }} />
                       ))}
                     </div>
-                    <span className="text-white font-bold text-sm">5.0</span>
+                    <span className="text-white font-bold text-sm">{REVIEW_RATING}</span>
                     <span className="text-white/50 text-xs">Google</span>
                   </div>
                   <div className="h-4 w-px bg-white/20" />
-                  <span className="text-white/60 text-xs font-medium">50+ avaliações</span>
+                  <span className="text-white/60 text-xs font-medium">{REVIEW_COUNT}+ avaliações</span>
                   <div className="h-4 w-px bg-white/20" />
                   <span className="text-white/60 text-xs font-medium">+1000 clientes</span>
                 </div>
@@ -178,7 +179,7 @@ const FreguesiaServicePage = () => {
                     buttonClassName="h-[52px] !py-0 w-full"
                   />
                   <a
-                    href={`https://wa.me/351925530647?text=${encodeURIComponent(buildServiceWaMessage(data.serviceSlug, data.name))}`}
+                    href={`${WHATSAPP_BASE}?text=${encodeURIComponent(buildServiceWaMessage(data.serviceSlug, data.name))}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     onClick={() => trackWhatsAppClick(`freguesia_hero_${data.serviceSlug}_${data.municipioSlug}`)}
@@ -221,7 +222,7 @@ const FreguesiaServicePage = () => {
                   <p className="text-[10px] font-bold tracking-[0.28em] uppercase" style={{ color: "#D4AF37" }}>O que resolvemos</p>
                   <div className="h-px w-10 opacity-40" style={{ backgroundColor: "#D4AF37" }} />
                 </div>
-                <h2 className="font-playfair text-2xl md:text-3xl font-bold text-[#1A1A2E]">
+                <h2 className="font-playfair text-2xl md:text-3xl font-bold text-[#111111]">
                   Problemas comuns em {data.name}
                 </h2>
               </div>
@@ -237,7 +238,7 @@ const FreguesiaServicePage = () => {
                     >
                       <Star className="w-5 h-5" style={{ color: "#D4AF37" }} />
                     </div>
-                    <p className="text-sm font-semibold text-[#1A1A2E] leading-snug">{problem.title}</p>
+                    <p className="text-sm font-semibold text-[#111111] leading-snug">{problem.title}</p>
                   </div>
                 ))}
               </div>
@@ -355,7 +356,7 @@ const FreguesiaServicePage = () => {
 
               {nearbyFreguesias.length > 0 && (
                 <div>
-                  <h3 className="text-lg md:text-xl font-playfair font-bold text-[#1A1A2E] mb-4 flex items-center gap-2">
+                  <h3 className="text-lg md:text-xl font-playfair font-bold text-[#111111] mb-4 flex items-center gap-2">
                     <MapPin className="w-5 h-5" style={{ color: "#D4AF37" }} />
                     Freguesias próximas
                   </h3>
@@ -364,7 +365,7 @@ const FreguesiaServicePage = () => {
                       <Link
                         key={f.slug}
                         to={`/${data.serviceSlug}-${data.municipioSlug}-${f.slug}`}
-                        className="inline-flex items-center gap-1.5 bg-[#FDFDF9] px-3 py-2 rounded-lg text-sm font-medium text-[#1A1A2E] border border-[#E8E4DE] hover:border-[#D4AF37]/35 hover:bg-[#D4AF37]/5 transition-all"
+                        className="inline-flex items-center gap-1.5 bg-[#FDFDF9] px-3 py-2 rounded-lg text-sm font-medium text-[#111111] border border-[#E8E4DE] hover:border-[#D4AF37]/35 hover:bg-[#D4AF37]/5 transition-all"
                       >
                         <MapPin className="w-3 h-3" style={{ color: "#D4AF37" }} />
                         {f.name}
@@ -375,7 +376,7 @@ const FreguesiaServicePage = () => {
               )}
 
               <div>
-                <h3 className="text-lg md:text-xl font-playfair font-bold text-[#1A1A2E] mb-4">Outros serviços em {data.name}</h3>
+                <h3 className="text-lg md:text-xl font-playfair font-bold text-[#111111] mb-4">Outros serviços em {data.name}</h3>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   {otherServices.map(svc => (
                     <Link
@@ -384,10 +385,10 @@ const FreguesiaServicePage = () => {
                       className="group flex items-center gap-3 bg-[#FDFDF9] rounded-xl p-4 shadow-sm hover:shadow-md border border-[#E8E4DE] hover:border-[#D4AF37]/30 transition-all"
                     >
                       <div className="flex-1">
-                        <span className="text-sm font-semibold text-[#1A1A2E] group-hover:text-[#D4AF37] transition-colors">{svc.name}</span>
-                        <span className="block text-xs text-[#1A1A2E]/50">Desde {svc.priceFrom}</span>
+                        <span className="text-sm font-semibold text-[#111111] group-hover:text-[#D4AF37] transition-colors">{svc.name}</span>
+                        <span className="block text-xs text-[#111111]/50">Desde {svc.priceFrom}</span>
                       </div>
-                      <ArrowRight className="w-4 h-4 text-[#1A1A2E]/30 group-hover:text-[#D4AF37] transition-all flex-shrink-0" />
+                      <ArrowRight className="w-4 h-4 text-[#111111]/30 group-hover:text-[#D4AF37] transition-all flex-shrink-0" />
                     </Link>
                   ))}
                 </div>
@@ -406,7 +407,7 @@ const FreguesiaServicePage = () => {
 
               {municipioProblems.length > 0 && (
                 <div>
-                  <h3 className="text-lg md:text-xl font-playfair font-bold text-[#1A1A2E] mb-4">
+                  <h3 className="text-lg md:text-xl font-playfair font-bold text-[#111111] mb-4">
                     Problemas que resolvemos em {data.municipio}
                   </h3>
                   <div className="flex flex-wrap gap-2">
@@ -414,7 +415,7 @@ const FreguesiaServicePage = () => {
                       <Link
                         key={p.slug}
                         to={`/${p.slug}-${data.municipioSlug}`}
-                        className="inline-flex items-center gap-1.5 bg-[#FDFDF9] px-3 py-2 rounded-lg text-sm font-medium text-[#1A1A2E] border border-[#E8E4DE] hover:border-[#D4AF37]/35 hover:bg-[#D4AF37]/5 transition-all"
+                        className="inline-flex items-center gap-1.5 bg-[#FDFDF9] px-3 py-2 rounded-lg text-sm font-medium text-[#111111] border border-[#E8E4DE] hover:border-[#D4AF37]/35 hover:bg-[#D4AF37]/5 transition-all"
                       >
                         {p.keyword}
                       </Link>
@@ -443,18 +444,18 @@ const FreguesiaServicePage = () => {
                     <p className="text-[10px] font-bold tracking-[0.28em] uppercase" style={{ color: "#D4AF37" }}>Vantagens</p>
                     <div className="h-px w-10 opacity-40" style={{ backgroundColor: "#D4AF37" }} />
                   </div>
-                  <h2 className="font-playfair text-2xl md:text-3xl font-bold text-[#1A1A2E]">
+                  <h2 className="font-playfair text-2xl md:text-3xl font-bold text-[#111111]">
                     Porquê escolher a Kyro em {data.name}
                   </h2>
                   {data.localSection && (
-                    <p className="mt-3 text-sm text-[#1A1A2E]/50 max-w-2xl mx-auto leading-relaxed">{data.localSection}</p>
+                    <p className="mt-3 text-sm text-[#111111]/50 max-w-2xl mx-auto leading-relaxed">{data.localSection}</p>
                   )}
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                   {data.benefits.map((benefit, idx) => (
                     <div key={idx} className="flex items-start gap-3 bg-[#FDFDF9] rounded-2xl p-4 border border-[#E8E4DE]">
                       <CheckCircle className="w-5 h-5 mt-0.5 shrink-0" style={{ color: "#D4AF37" }} />
-                      <span className="text-sm text-[#1A1A2E]/70 leading-relaxed">{benefit}</span>
+                      <span className="text-sm text-[#111111]/70 leading-relaxed">{benefit}</span>
                     </div>
                   ))}
                 </div>

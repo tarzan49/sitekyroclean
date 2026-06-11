@@ -5,6 +5,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import QuizButton from "@/components/QuizButton";
 import { getAllPosts, getPostBySlug, getRelatedPosts } from "@/data/blogData";
+import { SITE_URL } from "@/constants/business";
 
 import imgSofaTecido    from "@/assets/hero-p-limpeza-sofa-tecido.webp";
 import imgManchasVinho  from "@/assets/hero-p-manchas-vinho-sofa.webp";
@@ -59,7 +60,7 @@ const BlogPost = () => {
     document.querySelector('meta[name="description"]')?.setAttribute("content", post.metaDescription);
     document.querySelector('meta[property="og:title"]')?.setAttribute("content", post.metaTitle);
     document.querySelector('meta[property="og:description"]')?.setAttribute("content", post.metaDescription);
-    document.querySelector('link[rel="canonical"]')?.setAttribute("href", `https://cleansolutions.com.pt/blog/${post.slug}`);
+    document.querySelector('link[rel="canonical"]')?.setAttribute("href", `${SITE_URL}/blog/${post.slug}`);
   }, [post]);
 
   if (!post) {
@@ -68,7 +69,7 @@ const BlogPost = () => {
         <Header />
         <main className="min-h-screen flex items-center justify-center">
           <div className="text-center">
-            <h1 className="text-2xl font-bold text-[#1A1A2E] mb-4">Artigo não encontrado</h1>
+            <h1 className="text-2xl font-bold text-[#111111] mb-4">Artigo não encontrado</h1>
             <Link to="/blog" className="text-gold hover:underline">← Ver todos os artigos</Link>
           </div>
         </main>
@@ -83,8 +84,7 @@ const BlogPost = () => {
     day: "numeric", month: "long", year: "numeric",
   });
 
-  const BASE_URL = "https://cleansolutions.com.pt";
-  const pageUrl = `${BASE_URL}/blog/${post.slug}`;
+  const pageUrl = `${SITE_URL}/blog/${post.slug}`;
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -96,16 +96,16 @@ const BlogPost = () => {
         "name": post.title,
         "description": post.metaDescription,
         "inLanguage": "pt-PT",
-        "isPartOf": { "@id": `${BASE_URL}/#website` },
-        "publisher": { "@id": `${BASE_URL}/#business` },
+        "isPartOf": { "@id": `${SITE_URL}/#website` },
+        "publisher": { "@id": `${SITE_URL}/#business` },
         "breadcrumb": { "@id": `${pageUrl}#breadcrumb` },
       },
       {
         "@type": "BreadcrumbList",
         "@id": `${pageUrl}#breadcrumb`,
         "itemListElement": [
-          { "@type": "ListItem", "position": 1, "name": "Início", "item": BASE_URL },
-          { "@type": "ListItem", "position": 2, "name": "Blog", "item": `${BASE_URL}/blog` },
+          { "@type": "ListItem", "position": 1, "name": "Início", "item": SITE_URL },
+          { "@type": "ListItem", "position": 2, "name": "Blog", "item": `${SITE_URL}/blog` },
           { "@type": "ListItem", "position": 3, "name": post.title, "item": pageUrl },
         ],
       },
@@ -117,8 +117,8 @@ const BlogPost = () => {
         "datePublished": post.publishDate,
         "dateModified": post.updatedDate,
         "inLanguage": "pt-PT",
-        "author": { "@id": `${BASE_URL}/#business` },
-        "publisher": { "@id": `${BASE_URL}/#business` },
+        "author": { "@id": `${SITE_URL}/#business` },
+        "publisher": { "@id": `${SITE_URL}/#business` },
         "mainEntityOfPage": { "@id": `${pageUrl}#webpage` },
         ...(heroImg && { "image": heroImg }),
       },
@@ -199,10 +199,10 @@ const BlogPost = () => {
           <div className="space-y-10">
             {post.sections.map((section, i) => (
               <div key={i}>
-                <h2 className="font-playfair text-xl md:text-2xl font-bold text-[#1A1A2E] mb-4">
+                <h2 className="font-playfair text-xl md:text-2xl font-bold text-[#111111] mb-4">
                   {section.heading}
                 </h2>
-                <div className="text-[#1A1A2E]/70 leading-relaxed space-y-3">
+                <div className="text-[#111111]/70 leading-relaxed space-y-3">
                   {section.body.split("\n\n").map((para, j) => (
                     <p key={j} dangerouslySetInnerHTML={{
                       __html: para
@@ -213,8 +213,8 @@ const BlogPost = () => {
                 </div>
                 {section.tip && (
                   <div className="mt-4 bg-gold/8 border-l-4 border-gold rounded-r-xl px-4 py-3">
-                    <p className="text-sm text-[#1A1A2E]/80 leading-relaxed">
-                      <span className="inline-flex items-center gap-1 font-bold text-[#1A1A2E]"><Lightbulb className="w-3.5 h-3.5 text-gold" strokeWidth={1.5} /> Dica: </span>
+                    <p className="text-sm text-[#111111]/80 leading-relaxed">
+                      <span className="inline-flex items-center gap-1 font-bold text-[#111111]"><Lightbulb className="w-3.5 h-3.5 text-gold" strokeWidth={1.5} /> Dica: </span>
                       {section.tip}
                     </p>
                   </div>
@@ -238,15 +238,15 @@ const BlogPost = () => {
           {/* FAQ */}
           {post.faq.length > 0 && (
             <div className="mt-12">
-              <h2 className="font-playfair text-2xl font-bold text-[#1A1A2E] mb-6">Perguntas frequentes</h2>
+              <h2 className="font-playfair text-2xl font-bold text-[#111111] mb-6">Perguntas frequentes</h2>
               <div className="space-y-3">
                 {post.faq.map((item, i) => (
                   <details key={i} className="group bg-white border border-[#E8E4DE] rounded-xl shadow-sm overflow-hidden">
-                    <summary className="flex items-center justify-between px-5 py-4 cursor-pointer list-none font-semibold text-[#1A1A2E] text-sm hover:bg-[#FDFDF9] transition-colors">
+                    <summary className="flex items-center justify-between px-5 py-4 cursor-pointer list-none font-semibold text-[#111111] text-sm hover:bg-[#FDFDF9] transition-colors">
                       {item.q}
-                      <ChevronRight className="w-4 h-4 text-[#1A1A2E]/40 group-open:rotate-90 transition-transform flex-shrink-0 ml-2" />
+                      <ChevronRight className="w-4 h-4 text-[#111111]/40 group-open:rotate-90 transition-transform flex-shrink-0 ml-2" />
                     </summary>
-                    <div className="px-5 pb-4 pt-1 text-sm text-[#1A1A2E]/60 leading-relaxed border-t border-[#E8E4DE]/60">
+                    <div className="px-5 pb-4 pt-1 text-sm text-[#111111]/60 leading-relaxed border-t border-[#E8E4DE]/60">
                       {item.a}
                     </div>
                   </details>
@@ -261,7 +261,7 @@ const BlogPost = () => {
               to={post.relatedService.href}
               className="flex items-center justify-between bg-gold/10 border border-gold/20 rounded-2xl px-6 py-4 hover:bg-gold/15 transition-colors group"
             >
-              <span className="font-semibold text-[#1A1A2E]">{post.relatedService.label}</span>
+              <span className="font-semibold text-[#111111]">{post.relatedService.label}</span>
               <ArrowRight className="w-5 h-5 text-gold group-hover:translate-x-1 transition-transform" />
             </Link>
           </div>
@@ -271,7 +271,7 @@ const BlogPost = () => {
         {related.length > 0 && (
           <section className="bg-[#F5F4F0] border-t border-[#E8E4DE] py-12">
             <div className="container mx-auto px-4 max-w-3xl">
-              <h2 className="font-playfair text-xl font-bold text-[#1A1A2E] mb-6">Artigos relacionados</h2>
+              <h2 className="font-playfair text-xl font-bold text-[#111111] mb-6">Artigos relacionados</h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {related.map(p => (
                   <Link
@@ -280,10 +280,10 @@ const BlogPost = () => {
                     className="bg-white border border-[#E8E4DE] rounded-xl p-5 hover:border-gold/30 hover:shadow-md transition-all group"
                   >
                     <span className="text-xs font-bold text-gold bg-gold/10 px-2 py-0.5 rounded-full">{p.category}</span>
-                    <h3 className="font-semibold text-[#1A1A2E] text-sm mt-2 mb-1 leading-snug group-hover:text-gold transition-colors">
+                    <h3 className="font-semibold text-[#111111] text-sm mt-2 mb-1 leading-snug group-hover:text-gold transition-colors">
                       {p.title}
                     </h3>
-                    <span className="flex items-center gap-1 text-xs text-[#1A1A2E]/40">
+                    <span className="flex items-center gap-1 text-xs text-[#111111]/40">
                       <Clock className="w-3 h-3" /> {p.readingTime} min
                     </span>
                   </Link>

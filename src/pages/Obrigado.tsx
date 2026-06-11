@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { MessageCircle, ArrowLeft, Star, Check, Clock, MapPin, CalendarDays } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
+import { WHATSAPP_BASE } from "@/constants/business";
 
 interface ReceiptLine {
   label: string;
@@ -30,7 +31,7 @@ const fmt = (n: number | null) =>
 const Obrigado = () => {
   const navigate = useNavigate();
   const [receipt, setReceipt] = useState<ReceiptData | null>(null);
-  const [waUrl, setWaUrl] = useState("https://wa.me/351925530647");
+  const [waUrl, setWaUrl] = useState(WHATSAPP_BASE);
 
   useEffect(() => {
     try {
@@ -155,7 +156,7 @@ const Obrigado = () => {
                 <div className="flex justify-between items-center px-5 py-4">
                   <div>
                     <span className="text-sm font-black text-white uppercase tracking-wide">Total Estimado</span>
-                    <p className="text-[9px] text-white/25 uppercase tracking-wide mt-0.5">IVA incluído · Sujeito a confirmação</p>
+                    <p className="text-[9px] text-white/25 uppercase tracking-wide mt-0.5">Sujeito a confirmação</p>
                   </div>
                   <span className="font-playfair text-2xl font-bold text-gold tabular-nums">
                     {isSobOrcamento ? 'Sob orçamento' : fmt(receipt.total)}
@@ -211,7 +212,7 @@ const Obrigado = () => {
               ))}
             </div>
             <p className="text-white/30 text-xs text-center leading-snug">
-              Classificação 5.0 com base em mais de 50 avaliações verificadas no{' '}
+              Classificação 5.0 com base em mais de 60 avaliações verificadas no{' '}
               <a
                 href={GOOGLE_REVIEWS_URL}
                 target="_blank"

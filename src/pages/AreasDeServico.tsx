@@ -6,6 +6,7 @@ import Footer from "@/components/Footer";
 import QuizButton from "@/components/QuizButton";
 import { cities, services } from "@/data/locationSeoData";
 import { municipiosComFreguesias, getFreguesiaStats } from "@/data/freguesiaSeoData";
+import { SITE_URL, PHONE_TEL, PHONE_DISPLAY } from "@/constants/business";
 
 const ampCities = cities.filter((_, i) => i < 19); // AMP + Braga/Guimarães
 const lisboaCities = cities.filter((_, i) => i >= 19);
@@ -26,20 +27,20 @@ const AreasDeServico = () => {
                 <MapPin className="w-5 h-5 text-gold" />
                 <span className="text-gold font-semibold text-sm uppercase tracking-wide">Cobertura Nacional</span>
               </div>
-              <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-[#1A1A2E] mb-4">
+              <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-[#111111] mb-4">
                 Áreas de Serviço
               </h1>
               <div className="w-16 h-1 bg-gold rounded-full mx-auto mb-5" />
-              <p className="text-base md:text-lg text-[#1A1A2E]/55 leading-relaxed max-w-2xl mx-auto mb-4">
+              <p className="text-base md:text-lg text-[#111111]/55 leading-relaxed max-w-2xl mx-auto mb-4">
                 A Kyro Clean Solutions presta serviços de limpeza profissional de estofos ao domicílio em {stats.municipios} municípios e {stats.freguesias} freguesias.
               </p>
-              <p className="text-sm text-[#1A1A2E]/55 mb-6">
+              <p className="text-sm text-[#111111]/55 mb-6">
                 {stats.totalPages}+ páginas de serviço local
               </p>
               <div className="flex flex-wrap justify-center gap-3">
                 <QuizButton />
-                <a href="tel:925530647" className="inline-flex items-center gap-2 bg-secondary text-[#1A1A2E] font-semibold text-sm px-5 py-2.5 rounded-full border border-border/30 hover:bg-secondary/80 transition-colors">
-                  <Phone className="w-4 h-4" /> 925 530 647
+                <a href={`tel:${PHONE_TEL}`} className="inline-flex items-center gap-2 bg-secondary text-[#111111] font-semibold text-sm px-5 py-2.5 rounded-full border border-border/30 hover:bg-secondary/80 transition-colors">
+                  <Phone className="w-4 h-4" /> {PHONE_DISPLAY}
                 </a>
               </div>
             </div>
@@ -50,7 +51,7 @@ const AreasDeServico = () => {
         <section className="py-12 md:py-16 bg-secondary/20">
           <div className="container mx-auto px-4">
             <div className="max-w-5xl mx-auto">
-              <h2 className="text-2xl md:text-3xl font-bold text-[#1A1A2E] mb-8">
+              <h2 className="text-2xl md:text-3xl font-bold text-[#111111] mb-8">
                 <MapPin className="w-6 h-6 text-gold inline mr-2" />
                 Área Metropolitana do Porto
               </h2>
@@ -67,11 +68,11 @@ const AreasDeServico = () => {
                         <div className="flex items-center gap-3">
                           <MapPin className="w-4 h-4 text-turquoise flex-shrink-0" />
                           <div>
-                            <span className="text-base md:text-lg font-bold text-[#1A1A2E]">{m.name}</span>
-                            <span className="block text-xs text-[#1A1A2E]/55">{m.freguesias.length} freguesias</span>
+                            <span className="text-base md:text-lg font-bold text-[#111111]">{m.name}</span>
+                            <span className="block text-xs text-[#111111]/55">{m.freguesias.length} freguesias</span>
                           </div>
                         </div>
-                        <ChevronDown className={`w-5 h-5 text-[#1A1A2E]/55 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+                        <ChevronDown className={`w-5 h-5 text-[#111111]/55 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
                       </button>
 
                       {isOpen && (
@@ -79,13 +80,13 @@ const AreasDeServico = () => {
                           {/* Municipality service links */}
                           {cityExists && (
                             <div className="mb-4 pt-4">
-                              <p className="text-xs font-semibold text-[#1A1A2E]/55 uppercase tracking-wide mb-2">Serviços em {m.name}</p>
+                              <p className="text-xs font-semibold text-[#111111]/55 uppercase tracking-wide mb-2">Serviços em {m.name}</p>
                               <div className="flex flex-wrap gap-2">
                                 {services.map(svc => (
                                   <Link
                                     key={svc.slug}
                                     to={`/${svc.slug}-${m.slug}`}
-                                    className="inline-flex items-center gap-1.5 bg-gold/5 px-3 py-1.5 rounded-lg text-xs font-medium text-[#1A1A2E] border border-gold/20 hover:bg-gold/10 transition-colors"
+                                    className="inline-flex items-center gap-1.5 bg-gold/5 px-3 py-1.5 rounded-lg text-xs font-medium text-[#111111] border border-gold/20 hover:bg-gold/10 transition-colors"
                                   >
                                     <ArrowRight className="w-3 h-3 text-gold" />
                                     {svc.name}
@@ -96,13 +97,13 @@ const AreasDeServico = () => {
                           )}
 
                           {/* Freguesias */}
-                          <p className="text-xs font-semibold text-[#1A1A2E]/55 uppercase tracking-wide mb-2">Freguesias</p>
+                          <p className="text-xs font-semibold text-[#111111]/55 uppercase tracking-wide mb-2">Freguesias</p>
                           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
                             {m.freguesias.map(f => (
                               <Link
                                 key={f.slug}
                                 to={`/limpeza-sofas-${m.slug}-${f.slug}`}
-                                className="group flex items-center gap-1.5 bg-secondary/30 px-3 py-2 rounded-lg text-sm text-[#1A1A2E] hover:bg-gold/5 hover:border-gold/30 border border-transparent transition-all"
+                                className="group flex items-center gap-1.5 bg-secondary/30 px-3 py-2 rounded-lg text-sm text-[#111111] hover:bg-gold/5 hover:border-gold/30 border border-transparent transition-all"
                               >
                                 <MapPin className="w-3 h-3 text-gold flex-shrink-0" />
                                 <span className="group-hover:text-turquoise transition-colors truncate">{f.name}</span>
@@ -124,24 +125,24 @@ const AreasDeServico = () => {
           <section className="py-12 md:py-16 bg-background">
             <div className="container mx-auto px-4">
               <div className="max-w-5xl mx-auto">
-                <h2 className="text-2xl md:text-3xl font-bold text-[#1A1A2E] mb-8">
+                <h2 className="text-2xl md:text-3xl font-bold text-[#111111] mb-8">
                   <MapPin className="w-6 h-6 text-gold inline mr-2" />
                   Lisboa e Região
                 </h2>
                 <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
                   {lisboaCities.map(city => (
                     <div key={city.slug} className="bg-card rounded-xl p-5 shadow-sm border border-border/30 hover:shadow-md hover:border-gold/20 transition-all">
-                      <h3 className="text-lg font-bold text-[#1A1A2E] mb-3 flex items-center gap-2">
+                      <h3 className="text-lg font-bold text-[#111111] mb-3 flex items-center gap-2">
                         <MapPin className="w-4 h-4 text-turquoise" />
                         {city.name}
                       </h3>
-                      <p className="text-xs text-[#1A1A2E]/55 mb-3 capitalize">{city.description}</p>
+                      <p className="text-xs text-[#111111]/55 mb-3 capitalize">{city.description}</p>
                       <div className="space-y-1.5">
                         {services.map(svc => (
                           <Link
                             key={svc.slug}
                             to={`/${svc.slug}-${city.slug}`}
-                            className="group flex items-center gap-2 text-sm text-[#1A1A2E] hover:text-turquoise transition-colors"
+                            className="group flex items-center gap-2 text-sm text-[#111111] hover:text-turquoise transition-colors"
                           >
                             <ArrowRight className="w-3 h-3 text-gold group-hover:translate-x-0.5 transition-transform" />
                             {svc.name}
@@ -178,21 +179,21 @@ const AreasDeServico = () => {
               "@graph": [
                 {
                   "@type": "WebPage",
-                  "@id": "https://cleansolutions.com.pt/areas-de-servico#webpage",
-                  "url": "https://cleansolutions.com.pt/areas-de-servico",
+                  "@id": `${SITE_URL}/areas-de-servico#webpage`,
+                  "url": `${SITE_URL}/areas-de-servico`,
                   "name": "Áreas de Serviço | Kyro Clean Solutions",
                   "description": `Serviços de limpeza profissional em ${stats.municipios} municípios e ${stats.freguesias} freguesias da Área Metropolitana do Porto e Lisboa.`,
                   "inLanguage": "pt-PT",
-                  "isPartOf": { "@id": "https://cleansolutions.com.pt/#website" },
-                  "publisher": { "@id": "https://cleansolutions.com.pt/#business" },
-                  "breadcrumb": { "@id": "https://cleansolutions.com.pt/areas-de-servico#breadcrumb" },
+                  "isPartOf": { "@id": `${SITE_URL}/#website` },
+                  "publisher": { "@id": `${SITE_URL}/#business` },
+                  "breadcrumb": { "@id": `${SITE_URL}/areas-de-servico#breadcrumb` },
                 },
                 {
                   "@type": "BreadcrumbList",
-                  "@id": "https://cleansolutions.com.pt/areas-de-servico#breadcrumb",
+                  "@id": `${SITE_URL}/areas-de-servico#breadcrumb`,
                   "itemListElement": [
-                    { "@type": "ListItem", "position": 1, "name": "Início", "item": "https://cleansolutions.com.pt/" },
-                    { "@type": "ListItem", "position": 2, "name": "Áreas de Serviço", "item": "https://cleansolutions.com.pt/areas-de-servico" },
+                    { "@type": "ListItem", "position": 1, "name": "Início", "item": `${SITE_URL}/` },
+                    { "@type": "ListItem", "position": 2, "name": "Áreas de Serviço", "item": `${SITE_URL}/areas-de-servico` },
                   ],
                 },
               ],

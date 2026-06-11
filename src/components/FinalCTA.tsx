@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { WHATSAPP_BASE } from "@/constants/business";
 
 const FinalCTA = () => {
   const [visible, setVisible] = useState(false);
@@ -17,7 +18,7 @@ const FinalCTA = () => {
     window.dispatchEvent(new CustomEvent('openQuiz'));
   };
 
-  const waHref = `https://wa.me/351925530647?text=${encodeURIComponent('Olá, gostaria de pedir um orçamento para limpeza de estofos.')}`;
+  const waHref = `${WHATSAPP_BASE}?text=${encodeURIComponent('Olá, gostaria de pedir um orçamento para limpeza de estofos.')}`;
 
   return (
     <section

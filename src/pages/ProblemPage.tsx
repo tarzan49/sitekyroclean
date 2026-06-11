@@ -13,6 +13,15 @@ import { SERVICE_TO_QUIZ } from "@/constants/serviceToQuiz";
 import { METRO_CITY_SLUGS } from "@/constants/metroCities";
 import { getProblemHeroImage } from "@/lib/problemHeroImages";
 import { trackWhatsAppClick } from "@/lib/quizTracking";
+import {
+  SITE_URL,
+  WHATSAPP_BASE,
+  PHONE_E164,
+  BUSINESS_EMAIL,
+  BUSINESS_ADDRESS,
+  REVIEW_RATING,
+  REVIEW_COUNT,
+} from "@/constants/business";
 
 const CATEGORY_TIPS: Record<string, { title: string; steps: string[]; warning: string }> = {
   manchas: {
@@ -184,7 +193,7 @@ const ProblemPage = () => {
       const ogDesc = document.querySelector('meta[property="og:description"]');
       if (ogDesc) ogDesc.setAttribute("content", data.metaDescription);
       const canonical = document.querySelector('link[rel="canonical"]');
-      if (canonical) canonical.setAttribute("href", `https://cleansolutions.com.pt/problemas/${slug}`);
+      if (canonical) canonical.setAttribute("href", `${SITE_URL}/problemas/${slug}`);
     }
   }, [slug, data]);
 
@@ -194,7 +203,7 @@ const ProblemPage = () => {
         <Header />
         <main className="pt-28 pb-16 min-h-screen bg-white">
           <div className="container mx-auto px-4 text-center">
-            <h1 className="font-playfair text-3xl font-bold text-[#1A1A2E] mb-4">Página não encontrada</h1>
+            <h1 className="font-playfair text-3xl font-bold text-[#111111] mb-4">Página não encontrada</h1>
             <Link to="/" style={{ color: "#D4AF37" }} className="hover:underline">Voltar ao início</Link>
           </div>
         </main>
@@ -264,7 +273,7 @@ const ProblemPage = () => {
                   <QuizButton className="relative w-full" buttonClassName="h-[52px] !py-0 w-full" problema={slug} ctaLabel={getProblemCtaLabel(slug ?? "")} initialService={quizService} />
                 </div>
                 <a
-                  href={`https://wa.me/351925530647?text=${encodeURIComponent(buildProblemWaMessage(slug ?? ""))}`}
+                  href={`${WHATSAPP_BASE}?text=${encodeURIComponent(buildProblemWaMessage(slug ?? ""))}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={() => trackWhatsAppClick(`problem_hero_${slug}`)}
@@ -287,9 +296,9 @@ const ProblemPage = () => {
                   <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ backgroundColor: "rgba(212,175,55,0.08)", border: "1px solid rgba(212,175,55,0.2)" }}>
                     <AlertTriangle className="w-5 h-5" style={{ color: "#D4AF37" }} />
                   </div>
-                  <h2 className="font-playfair text-xl md:text-2xl font-bold text-[#1A1A2E]">O Problema</h2>
+                  <h2 className="font-playfair text-xl md:text-2xl font-bold text-[#111111]">O Problema</h2>
                 </div>
-                <p className="text-sm md:text-base text-[#1A1A2E]/60 leading-relaxed">
+                <p className="text-sm md:text-base text-[#111111]/60 leading-relaxed">
                   {data.problemDetail}
                 </p>
               </div>
@@ -384,7 +393,7 @@ const ProblemPage = () => {
                     <p className="text-[10px] font-bold tracking-[0.28em] uppercase" style={{ color: "#D4AF37" }}>Perguntas</p>
                     <div className="h-px w-10 opacity-40" style={{ backgroundColor: "#D4AF37" }} />
                   </div>
-                  <h2 className="font-playfair text-2xl md:text-3xl lg:text-4xl font-bold text-[#1A1A2E]">
+                  <h2 className="font-playfair text-2xl md:text-3xl lg:text-4xl font-bold text-[#111111]">
                     Perguntas Frequentes
                   </h2>
                 </div>
@@ -396,10 +405,10 @@ const ProblemPage = () => {
                       value={`faq-${idx}`}
                       className="bg-white rounded-[18px] shadow-sm hover:shadow-md border border-[#E8E4DE] px-6 transition-all duration-300 data-[state=open]:shadow-md data-[state=open]:border-[#D4AF37]/30"
                     >
-                      <AccordionTrigger className="text-left text-base md:text-lg font-semibold text-[#1A1A2E] py-5 hover:no-underline [&[data-state=open]>svg]:text-[#D4AF37]">
+                      <AccordionTrigger className="text-left text-base md:text-lg font-semibold text-[#111111] py-5 hover:no-underline [&[data-state=open]>svg]:text-[#D4AF37]">
                         {faq.question}
                       </AccordionTrigger>
-                      <AccordionContent className="text-base text-[#1A1A2E]/60 pb-6 leading-relaxed">
+                      <AccordionContent className="text-base text-[#111111]/60 pb-6 leading-relaxed">
                         {faq.answer}
                       </AccordionContent>
                     </AccordionItem>
@@ -426,7 +435,7 @@ const ProblemPage = () => {
                 <QuizButton className="relative w-full" problema={slug} ctaLabel={getProblemCtaLabel(slug ?? "")} initialService={quizService} />
               </div>
               <a
-                href={`https://wa.me/351925530647?text=${encodeURIComponent(buildProblemWaMessage(slug ?? ""))}`}
+                href={`${WHATSAPP_BASE}?text=${encodeURIComponent(buildProblemWaMessage(slug ?? ""))}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={() => trackWhatsAppClick(`problem_cta_${slug}`)}
@@ -446,7 +455,7 @@ const ProblemPage = () => {
 
               {relatedServiceData.length > 0 && (
                 <div>
-                  <h3 className="text-lg md:text-xl font-playfair font-bold text-[#1A1A2E] mb-4">Serviços relacionados</h3>
+                  <h3 className="text-lg md:text-xl font-playfair font-bold text-[#111111] mb-4">Serviços relacionados</h3>
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                     {relatedServiceData.map(svc => (
                       <Link
@@ -455,10 +464,10 @@ const ProblemPage = () => {
                         className="group flex items-center gap-3 bg-white rounded-xl p-4 shadow-sm hover:shadow-md border border-[#E8E4DE] hover:border-[#D4AF37]/30 transition-all"
                       >
                         <div className="flex-1">
-                          <span className="text-sm font-semibold text-[#1A1A2E] group-hover:text-[#D4AF37] transition-colors">{svc.name}</span>
-                          <span className="block text-xs text-[#1A1A2E]/50">Desde {svc.priceFrom}</span>
+                          <span className="text-sm font-semibold text-[#111111] group-hover:text-[#D4AF37] transition-colors">{svc.name}</span>
+                          <span className="block text-xs text-[#111111]/50">Desde {svc.priceFrom}</span>
                         </div>
-                        <ArrowRight className="w-4 h-4 text-[#1A1A2E]/30 group-hover:text-[#D4AF37] transition-colors flex-shrink-0" />
+                        <ArrowRight className="w-4 h-4 text-[#111111]/30 group-hover:text-[#D4AF37] transition-colors flex-shrink-0" />
                       </Link>
                     ))}
                   </div>
@@ -467,13 +476,13 @@ const ProblemPage = () => {
 
               {relatedProblemLinks.length > 0 && (
                 <div>
-                  <h3 className="text-lg md:text-xl font-playfair font-bold text-[#1A1A2E] mb-4">Problemas relacionados</h3>
+                  <h3 className="text-lg md:text-xl font-playfair font-bold text-[#111111] mb-4">Problemas relacionados</h3>
                   <div className="flex flex-wrap gap-2">
                     {relatedProblemLinks.map(link => (
                       <Link
                         key={link.path}
                         to={link.path}
-                        className="inline-flex items-center gap-1.5 bg-white px-3 py-2 rounded-lg text-sm font-medium text-[#1A1A2E] border border-[#E8E4DE] hover:border-[#D4AF37]/35 hover:bg-[#D4AF37]/5 transition-all"
+                        className="inline-flex items-center gap-1.5 bg-white px-3 py-2 rounded-lg text-sm font-medium text-[#111111] border border-[#E8E4DE] hover:border-[#D4AF37]/35 hover:bg-[#D4AF37]/5 transition-all"
                       >
                         <ArrowRight className="w-3 h-3" style={{ color: "#D4AF37" }} />
                         {link.name}
@@ -485,7 +494,7 @@ const ProblemPage = () => {
 
               {relatedCityData.length > 0 && (
                 <div>
-                  <h3 className="text-lg md:text-xl font-playfair font-bold text-[#1A1A2E] mb-4 flex items-center gap-2">
+                  <h3 className="text-lg md:text-xl font-playfair font-bold text-[#111111] mb-4 flex items-center gap-2">
                     <MapPin className="w-5 h-5" style={{ color: "#D4AF37" }} />
                     Disponível nestas cidades
                   </h3>
@@ -494,7 +503,7 @@ const ProblemPage = () => {
                       <Link
                         key={city.slug}
                         to={`/${data.slug}-${city.slug}`}
-                        className="inline-flex items-center gap-1.5 bg-white px-3 py-2 rounded-lg text-sm font-medium text-[#1A1A2E] border border-[#E8E4DE] hover:border-[#D4AF37]/35 hover:bg-[#D4AF37]/5 transition-all"
+                        className="inline-flex items-center gap-1.5 bg-white px-3 py-2 rounded-lg text-sm font-medium text-[#111111] border border-[#E8E4DE] hover:border-[#D4AF37]/35 hover:bg-[#D4AF37]/5 transition-all"
                       >
                         <MapPin className="w-3 h-3" style={{ color: "#D4AF37" }} />
                         {city.name}
@@ -515,39 +524,33 @@ const ProblemPage = () => {
               "@graph": [
                 {
                   "@type": ["LocalBusiness", "CleaningService"],
-                  "@id": "https://cleansolutions.com.pt/#business",
+                  "@id": `${SITE_URL}/#business`,
                   "name": "Kyro Clean Solutions",
-                  "url": "https://cleansolutions.com.pt",
-                  "telephone": "+351925530647",
-                  "email": "cleansolutions.pt25@gmail.com",
+                  "url": SITE_URL,
+                  "telephone": PHONE_E164,
+                  "email": BUSINESS_EMAIL,
                   "priceRange": "€€",
-                  "address": {
-                    "@type": "PostalAddress",
-                    "streetAddress": "R. de António Cardoso 263",
-                    "addressLocality": "Porto",
-                    "postalCode": "4150-081",
-                    "addressCountry": "PT",
-                  },
-                  "aggregateRating": { "@type": "AggregateRating", "ratingValue": "5.0", "bestRating": "5", "worstRating": "1", "reviewCount": "51", "ratingCount": "51" },
+                  "address": BUSINESS_ADDRESS,
+                  "aggregateRating": { "@type": "AggregateRating", "ratingValue": REVIEW_RATING, "bestRating": "5", "worstRating": "1", "reviewCount": REVIEW_COUNT, "ratingCount": REVIEW_COUNT },
                 },
                 {
                   "@type": "WebPage",
-                  "@id": `https://cleansolutions.com.pt/problemas/${slug}#webpage`,
-                  "url": `https://cleansolutions.com.pt/problemas/${slug}`,
+                  "@id": `${SITE_URL}/problemas/${slug}#webpage`,
+                  "url": `${SITE_URL}/problemas/${slug}`,
                   "name": data.title,
                   "description": data.metaDescription,
                   "inLanguage": "pt-PT",
-                  "publisher": { "@id": "https://cleansolutions.com.pt/#business" },
-                  "isPartOf": { "@id": "https://cleansolutions.com.pt/#website" },
-                  "breadcrumb": { "@id": `https://cleansolutions.com.pt/problemas/${slug}#breadcrumb` },
+                  "publisher": { "@id": `${SITE_URL}/#business` },
+                  "isPartOf": { "@id": `${SITE_URL}/#website` },
+                  "breadcrumb": { "@id": `${SITE_URL}/problemas/${slug}#breadcrumb` },
                 },
                 {
                   "@type": "BreadcrumbList",
-                  "@id": `https://cleansolutions.com.pt/problemas/${slug}#breadcrumb`,
+                  "@id": `${SITE_URL}/problemas/${slug}#breadcrumb`,
                   "itemListElement": [
-                    { "@type": "ListItem", "position": 1, "name": "Início", "item": "https://cleansolutions.com.pt/" },
-                    { "@type": "ListItem", "position": 2, "name": "Problemas", "item": "https://cleansolutions.com.pt/problemas" },
-                    { "@type": "ListItem", "position": 3, "name": data.h1, "item": `https://cleansolutions.com.pt/problemas/${slug}` },
+                    { "@type": "ListItem", "position": 1, "name": "Início", "item": `${SITE_URL}/` },
+                    { "@type": "ListItem", "position": 2, "name": "Problemas", "item": `${SITE_URL}/problemas` },
+                    { "@type": "ListItem", "position": 3, "name": data.h1, "item": `${SITE_URL}/problemas/${slug}` },
                   ],
                 },
               ],

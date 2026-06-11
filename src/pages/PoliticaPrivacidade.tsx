@@ -1,5 +1,6 @@
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import { BUSINESS_EMAIL, BUSINESS_EMAIL_HREF, PHONE_TEL, PHONE_DISPLAY, BUSINESS_ADDRESS } from '@/constants/business';
 
 const Section = ({ title, children }: { title: string; children: React.ReactNode }) => (
   <section className="mb-8">
@@ -16,7 +17,7 @@ const PoliticaPrivacidade = () => (
       <div className="max-w-2xl mx-auto px-5 sm:px-6">
         <div className="pt-8 pb-6 border-b border-[#1A4E30]/10 mb-8">
           <p className="text-xs font-semibold tracking-[0.25em] uppercase text-[#D4AF37] mb-2">Kyro Clean Solutions</p>
-          <h1 className="font-playfair text-3xl sm:text-4xl font-bold text-[#1A1A2E] leading-tight">
+          <h1 className="font-playfair text-3xl sm:text-4xl font-bold text-[#111111] leading-tight">
             Política de Privacidade
           </h1>
           <p className="text-sm text-[#555] mt-3">Última atualização: abril de 2026</p>
@@ -24,10 +25,10 @@ const PoliticaPrivacidade = () => (
 
         <Section title="1. Quem somos">
           <p>
-            A <strong>Kyro Clean Solutions</strong> é uma empresa de limpeza e higienização de estofos ao domicílio, sediada em R. de António Cardoso 263, 4150-081 Porto, Portugal.
+            A <strong>Kyro Clean Solutions</strong> é uma empresa de limpeza e higienização de estofos ao domicílio, sediada em {BUSINESS_ADDRESS.streetAddress}, {BUSINESS_ADDRESS.postalCode} {BUSINESS_ADDRESS.addressLocality}, Portugal.
           </p>
           <p>
-            Para efeitos do Regulamento Geral de Proteção de Dados (RGPD — Regulamento UE 2016/679), somos o <strong>responsável pelo tratamento</strong> dos dados pessoais recolhidos através deste website.
+            Para efeitos do Regulamento Geral de Proteção de Dados (RGPD, Regulamento UE 2016/679), somos o <strong>responsável pelo tratamento</strong> dos dados pessoais recolhidos através deste website.
           </p>
         </Section>
 
@@ -69,9 +70,9 @@ const PoliticaPrivacidade = () => (
         <Section title="5. Base legal">
           <p>O tratamento dos seus dados baseia-se em:</p>
           <ul className="list-disc pl-5 space-y-1.5">
-            <li><strong>Execução de contrato</strong> (Art. 6.º, n.º 1, al. b) do RGPD) — para processar o seu pedido de orçamento e prestar o serviço.</li>
-            <li><strong>Consentimento</strong> (Art. 6.º, n.º 1, al. a) do RGPD) — para cookies analíticos e comunicações de marketing.</li>
-            <li><strong>Interesses legítimos</strong> (Art. 6.º, n.º 1, al. f) do RGPD) — para melhorar o website e prevenir fraudes.</li>
+            <li><strong>Execução de contrato</strong> (Art. 6.º, n.º 1, al. b) do RGPD): para processar o seu pedido de orçamento e prestar o serviço.</li>
+            <li><strong>Consentimento</strong> (Art. 6.º, n.º 1, al. a) do RGPD): para cookies analíticos e comunicações de marketing.</li>
+            <li><strong>Interesses legítimos</strong> (Art. 6.º, n.º 1, al. f) do RGPD): para melhorar o website e prevenir fraudes.</li>
           </ul>
         </Section>
 
@@ -80,9 +81,9 @@ const PoliticaPrivacidade = () => (
             Não vendemos nem cedemos os seus dados pessoais a terceiros para fins comerciais. Os seus dados podem ser partilhados com:
           </p>
           <ul className="list-disc pl-5 space-y-1.5">
-            <li><strong>Google LLC</strong> — através do GA4, mediante consentimento, para análise de tráfego;</li>
-            <li><strong>Formspree</strong> — plataforma utilizada para receber pedidos de orçamento de forma segura;</li>
-            <li><strong>Supabase</strong> — base de dados segura onde os pedidos são armazenados temporariamente para gestão interna.</li>
+            <li><strong>Google LLC</strong>: através do GA4, mediante consentimento, para análise de tráfego;</li>
+            <li><strong>Formspree</strong>: plataforma utilizada para receber pedidos de orçamento de forma segura;</li>
+            <li><strong>Supabase</strong>: base de dados segura onde os pedidos são armazenados temporariamente para gestão interna.</li>
           </ul>
           <p>Todos os subprocessadores operam em conformidade com o RGPD e dispõem de salvaguardas adequadas.</p>
         </Section>
@@ -96,12 +97,12 @@ const PoliticaPrivacidade = () => (
         <Section title="8. Os seus direitos">
           <p>Ao abrigo do RGPD, tem os seguintes direitos:</p>
           <ul className="list-disc pl-5 space-y-1.5">
-            <li><strong>Acesso</strong> — solicitar uma cópia dos dados que guardamos sobre si;</li>
-            <li><strong>Retificação</strong> — corrigir dados incorretos ou incompletos;</li>
-            <li><strong>Eliminação</strong> — solicitar a eliminação dos seus dados ("direito a ser esquecido");</li>
-            <li><strong>Oposição</strong> — opor-se ao tratamento baseado em interesses legítimos;</li>
-            <li><strong>Portabilidade</strong> — receber os seus dados num formato estruturado e legível por máquina;</li>
-            <li><strong>Retirar o consentimento</strong> — a qualquer momento, sem prejuízo do tratamento já realizado.</li>
+            <li><strong>Acesso</strong>: solicitar uma cópia dos dados que guardamos sobre si;</li>
+            <li><strong>Retificação</strong>: corrigir dados incorretos ou incompletos;</li>
+            <li><strong>Eliminação</strong>: solicitar a eliminação dos seus dados ("direito a ser esquecido");</li>
+            <li><strong>Oposição</strong>: opor-se ao tratamento baseado em interesses legítimos;</li>
+            <li><strong>Portabilidade</strong>: receber os seus dados num formato estruturado e legível por máquina;</li>
+            <li><strong>Retirar o consentimento</strong>: a qualquer momento, sem prejuízo do tratamento já realizado.</li>
           </ul>
           <p>
             Para exercer qualquer um destes direitos, contacte-nos através do e-mail abaixo. Responderemos no prazo máximo de <strong>30 dias</strong>.
@@ -116,7 +117,7 @@ const PoliticaPrivacidade = () => (
 
         <Section title="10. Autoridade de controlo">
           <p>
-            Tem o direito de apresentar reclamação junto da autoridade de supervisão competente em Portugal: a <strong>CNPD — Comissão Nacional de Proteção de Dados</strong> (<a href="https://www.cnpd.pt" target="_blank" rel="noopener noreferrer" className="text-[#1A4E30] underline underline-offset-2 hover:text-[#D4AF37] transition-colors">www.cnpd.pt</a>).
+            Tem o direito de apresentar reclamação junto da autoridade de supervisão competente em Portugal: a <strong>CNPD, Comissão Nacional de Proteção de Dados</strong> (<a href="https://www.cnpd.pt" target="_blank" rel="noopener noreferrer" className="text-[#1A4E30] underline underline-offset-2 hover:text-[#D4AF37] transition-colors">www.cnpd.pt</a>).
           </p>
         </Section>
 
@@ -124,14 +125,14 @@ const PoliticaPrivacidade = () => (
           <p>Para qualquer questão relacionada com esta política ou para exercer os seus direitos, contacte o responsável pelo tratamento:</p>
           <div className="bg-[#f5f9f6] border border-[#1A4E30]/10 rounded-xl px-5 py-4 mt-2 space-y-1 text-sm">
             <p><strong>Kyro Clean Solutions</strong></p>
-            <p>R. de António Cardoso 263, 4150-081 Porto</p>
+            <p>{BUSINESS_ADDRESS.streetAddress}, {BUSINESS_ADDRESS.postalCode} {BUSINESS_ADDRESS.addressLocality}</p>
             <p>
               E-mail:{' '}
-              <a href="mailto:cleansolutions.pt25@gmail.com" className="text-[#1A4E30] underline underline-offset-2 hover:text-[#D4AF37] transition-colors">
-                cleansolutions.pt25@gmail.com
+              <a href={BUSINESS_EMAIL_HREF} className="text-[#1A4E30] underline underline-offset-2 hover:text-[#D4AF37] transition-colors">
+                {BUSINESS_EMAIL}
               </a>
             </p>
-            <p>Telefone: <a href="tel:925530647" className="text-[#1A4E30] underline underline-offset-2 hover:text-[#D4AF37] transition-colors">925 530 647</a></p>
+            <p>Telefone: <a href={`tel:${PHONE_TEL}`} className="text-[#1A4E30] underline underline-offset-2 hover:text-[#D4AF37] transition-colors">{PHONE_DISPLAY}</a></p>
           </div>
         </Section>
       </div>

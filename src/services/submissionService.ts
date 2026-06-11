@@ -9,6 +9,7 @@
 
 import { mattressPrices } from '@/components/quiz/QuizTypes';
 import type { UpsellItemConfig } from '@/components/quiz/QuizTypes';
+import { WHATSAPP_BASE } from '@/constants/business';
 
 // ── Payload type ─────────────────────────────────────────────────────────────
 
@@ -168,7 +169,7 @@ function buildWaUrl(payload: QuizLeadPayload, bookingId: string): string {
     `Olá Kyro Clean Solutions. Acabei de gerar um orçamento detalhado no site e pretendo confirmar o agendamento.\n\n` +
     `DADOS DO PEDIDO:\n` +
     `▸ Serviço: ${serviceLabel}\n` +
-    `▸ Item: ${detailsSummary || '—'}\n` +
+    `▸ Item: ${detailsSummary || 'N/D'}\n` +
     `▸ Extras: ${waExtrasText}\n` +
     `▸ Localização: ${finalLocation}\n` +
     `▸ Valor Total: ${waTotalPrice}\n` +
@@ -177,7 +178,7 @@ function buildWaUrl(payload: QuizLeadPayload, bookingId: string): string {
     `Aguardo contacto para validação final.`,
   );
 
-  return `https://wa.me/351925530647?text=${waText}`;
+  return `${WHATSAPP_BASE}?text=${waText}`;
 }
 
 function writeSessionStorage(payload: QuizLeadPayload, bookingId: string, waUrl: string): void {
@@ -204,7 +205,7 @@ function writeSessionStorage(payload: QuizLeadPayload, bookingId: string, waUrl:
     'kyro_summary',
     JSON.stringify({
       price: finalPriceText,
-      service: `${serviceLabel}${serviceTypeLabel ? ` — ${serviceTypeLabel}` : ''}`,
+      service: `${serviceLabel}${serviceTypeLabel ? `: ${serviceTypeLabel}` : ''}`,
       location: finalLocation,
       email,
     }),

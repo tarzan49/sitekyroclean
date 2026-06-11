@@ -16,6 +16,7 @@ import {
 import QuizForm from "./QuizFormLazy";
 import { useQuizLocation, useQuizService } from "@/context/QuizLocationContext";
 import { trackWhatsAppClick } from "@/lib/quizTracking";
+import { WHATSAPP_BASE } from "@/constants/business";
 
 interface HeaderProps {
   onOpenQuiz?: () => void;
@@ -65,17 +66,17 @@ const Header = ({ onOpenQuiz }: HeaderProps) => {
   };
 
   const isServicePage = serviceLinks.some(s => location.pathname === s.to);
-  const waHref = `https://wa.me/351925530647?text=${encodeURIComponent('Olá! Gostaria de pedir um orçamento para limpeza de estofos.')}`;
+  const waHref = `${WHATSAPP_BASE}?text=${encodeURIComponent('Olá! Gostaria de pedir um orçamento para limpeza de estofos.')}`;
 
   // Shared nav label style
   const navItem = (active: boolean) =>
     `text-[11px] font-medium tracking-[0.16em] uppercase transition-colors ${
-      active ? 'text-[#1A1A2E]' : 'text-[#1A1A2E]/45 hover:text-[#1A1A2E]'
+      active ? 'text-[#111111]' : 'text-[#111111]/45 hover:text-[#111111]'
     }`;
 
   return (
     <>
-    <header className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-[#1A1A2E]/8">
+    <header className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-[#111111]/8">
       <div className="mx-auto px-5 md:px-8 max-w-7xl h-14 md:h-[60px] flex items-center justify-between gap-4">
 
         {/* ── LEFT: logo text ── */}
@@ -84,7 +85,7 @@ const Header = ({ onOpenQuiz }: HeaderProps) => {
           onClick={(e) => {
             if (location.pathname === "/") { e.preventDefault(); window.scrollTo({ top: 0, behavior: "smooth" }); }
           }}
-          className="font-playfair text-base md:text-[17px] font-normal text-[#1A1A2E] tracking-tight shrink-0 leading-none"
+          className="font-playfair text-base md:text-[17px] font-normal text-[#111111] tracking-tight shrink-0 leading-none"
         >
           Kyro Clean Solutions
         </Link>
@@ -106,15 +107,15 @@ const Header = ({ onOpenQuiz }: HeaderProps) => {
                 <ChevronDown className="w-3 h-3 opacity-50" />
               </button>
             </HoverCardTrigger>
-            <HoverCardContent className="w-44 p-1.5 rounded-none border border-[#1A1A2E]/10 shadow-lg" align="center">
+            <HoverCardContent className="w-44 p-1.5 rounded-none border border-[#111111]/10 shadow-lg" align="center">
               {serviceLinks.map(s => (
                 <Link
                   key={s.to}
                   to={s.to}
                   className={`block text-[11px] tracking-[0.08em] uppercase px-3 py-2.5 transition-colors ${
                     location.pathname === s.to
-                      ? 'text-[#1A1A2E] bg-[#D4AF37]/10'
-                      : 'text-[#1A1A2E]/55 hover:text-[#1A1A2E] hover:bg-[#1A1A2E]/4'
+                      ? 'text-[#111111] bg-[#D4AF37]/10'
+                      : 'text-[#111111]/55 hover:text-[#111111] hover:bg-[#111111]/4'
                   }`}
                 >
                   {s.label}
@@ -146,7 +147,7 @@ const Header = ({ onOpenQuiz }: HeaderProps) => {
         <div className="hidden md:flex items-center gap-2.5 shrink-0">
           <button
             onClick={openQuiz}
-            className="border border-[#D4AF37] text-[#1A1A2E] text-[10px] font-semibold tracking-[0.18em] uppercase px-5 py-2.5 hover:bg-[#D4AF37]/6 transition-colors whitespace-nowrap"
+            className="border border-[#D4AF37] text-[#111111] text-[10px] font-semibold tracking-[0.18em] uppercase px-5 py-2.5 hover:bg-[#D4AF37]/6 transition-colors whitespace-nowrap"
           >
             Agendar limpeza
           </button>
@@ -155,7 +156,7 @@ const Header = ({ onOpenQuiz }: HeaderProps) => {
             target="_blank"
             rel="noopener noreferrer"
             onClick={() => trackWhatsAppClick('header_desktop')}
-            className="border border-[#25D366] text-[#1A1A2E] text-[10px] font-semibold tracking-[0.18em] uppercase px-4 py-2.5 hover:bg-[#25D366]/6 transition-colors flex items-center gap-2 whitespace-nowrap"
+            className="border border-[#25D366] text-[#111111] text-[10px] font-semibold tracking-[0.18em] uppercase px-4 py-2.5 hover:bg-[#25D366]/6 transition-colors flex items-center gap-2 whitespace-nowrap"
           >
             <MessageCircle className="w-3.5 h-3.5 text-[#25D366] flex-shrink-0" strokeWidth={2} />
             WhatsApp
@@ -183,17 +184,17 @@ const Header = ({ onOpenQuiz }: HeaderProps) => {
                 className="flex flex-col justify-center items-center w-10 h-10 gap-[5px]"
                 aria-label="Menu"
               >
-                <span className="block w-5 h-px bg-[#1A1A2E]" />
-                <span className="block w-5 h-px bg-[#1A1A2E]" />
-                <span className="block w-3.5 h-px bg-[#1A1A2E] self-start" />
+                <span className="block w-5 h-px bg-[#111111]" />
+                <span className="block w-5 h-px bg-[#111111]" />
+                <span className="block w-3.5 h-px bg-[#111111] self-start" />
               </button>
             </SheetTrigger>
 
             <SheetContent side="left" className="w-[270px] max-w-[90vw] p-0 flex flex-col rounded-none">
-              <SheetHeader className="px-6 py-5 border-b border-[#1A1A2E]/8">
+              <SheetHeader className="px-6 py-5 border-b border-[#111111]/8">
                 <SheetTitle className="text-left">
                   <Link to="/" onClick={() => setMobileMenuOpen(false)}>
-                    <span className="font-playfair text-base font-normal text-[#1A1A2E] leading-none">
+                    <span className="font-playfair text-base font-normal text-[#111111] leading-none">
                       Kyro Clean Solutions
                     </span>
                   </Link>
@@ -203,7 +204,7 @@ const Header = ({ onOpenQuiz }: HeaderProps) => {
               <nav className="flex-1 flex flex-col px-4 py-4 gap-0.5 overflow-y-auto">
                 <button
                   onClick={scrollToTop}
-                  className="text-left text-[11px] font-medium tracking-[0.16em] uppercase text-[#1A1A2E]/50 hover:text-[#1A1A2E] py-4 px-3 transition-colors"
+                  className="text-left text-[11px] font-medium tracking-[0.16em] uppercase text-[#111111]/50 hover:text-[#111111] py-4 px-3 transition-colors"
                 >
                   Início
                 </button>
@@ -211,7 +212,7 @@ const Header = ({ onOpenQuiz }: HeaderProps) => {
                 <div>
                   <button
                     onClick={() => setMobileServicesOpen(!mobileServicesOpen)}
-                    className="w-full text-left text-[11px] font-medium tracking-[0.16em] uppercase text-[#1A1A2E]/50 hover:text-[#1A1A2E] py-4 px-3 flex items-center justify-between transition-colors"
+                    className="w-full text-left text-[11px] font-medium tracking-[0.16em] uppercase text-[#111111]/50 hover:text-[#111111] py-4 px-3 flex items-center justify-between transition-colors"
                   >
                     Serviços
                     <ChevronDown className={`w-3.5 h-3.5 transition-transform ${mobileServicesOpen ? 'rotate-180' : ''}`} />
@@ -225,8 +226,8 @@ const Header = ({ onOpenQuiz }: HeaderProps) => {
                           onClick={() => setMobileMenuOpen(false)}
                           className={`block text-[11px] tracking-[0.08em] uppercase py-3 px-3 transition-colors ${
                             location.pathname === s.to
-                              ? 'text-[#1A1A2E]'
-                              : 'text-[#1A1A2E]/40 hover:text-[#1A1A2E]'
+                              ? 'text-[#111111]'
+                              : 'text-[#111111]/40 hover:text-[#111111]'
                           }`}
                         >
                           {s.label}
@@ -238,7 +239,7 @@ const Header = ({ onOpenQuiz }: HeaderProps) => {
 
                 <button
                   onClick={() => scrollToSection('testemunhos')}
-                  className="text-left text-[11px] font-medium tracking-[0.16em] uppercase text-[#1A1A2E]/50 hover:text-[#1A1A2E] py-4 px-3 transition-colors"
+                  className="text-left text-[11px] font-medium tracking-[0.16em] uppercase text-[#111111]/50 hover:text-[#111111] py-4 px-3 transition-colors"
                 >
                   Testemunhos
                 </button>
@@ -246,7 +247,7 @@ const Header = ({ onOpenQuiz }: HeaderProps) => {
                 <Link
                   to="/blog"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="text-[11px] font-medium tracking-[0.16em] uppercase text-[#1A1A2E]/50 hover:text-[#1A1A2E] py-4 px-3 transition-colors"
+                  className="text-[11px] font-medium tracking-[0.16em] uppercase text-[#111111]/50 hover:text-[#111111] py-4 px-3 transition-colors"
                 >
                   Blog
                 </Link>
@@ -254,16 +255,16 @@ const Header = ({ onOpenQuiz }: HeaderProps) => {
                 <Link
                   to="/perguntas-frequentes-limpeza-estofos"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="text-[11px] font-medium tracking-[0.16em] uppercase text-[#1A1A2E]/50 hover:text-[#1A1A2E] py-4 px-3 transition-colors"
+                  className="text-[11px] font-medium tracking-[0.16em] uppercase text-[#111111]/50 hover:text-[#111111] py-4 px-3 transition-colors"
                 >
                   FAQ
                 </Link>
               </nav>
 
-              <div className="px-4 pb-6 pt-3 border-t border-[#1A1A2E]/8 space-y-2.5">
+              <div className="px-4 pb-6 pt-3 border-t border-[#111111]/8 space-y-2.5">
                 <button
                   onClick={() => { setMobileMenuOpen(false); openQuiz(); }}
-                  className="w-full border border-[#D4AF37] text-[#1A1A2E] text-[10px] font-semibold tracking-[0.18em] uppercase py-3.5 hover:bg-[#D4AF37]/6 transition-colors"
+                  className="w-full border border-[#D4AF37] text-[#111111] text-[10px] font-semibold tracking-[0.18em] uppercase py-3.5 hover:bg-[#D4AF37]/6 transition-colors"
                 >
                   Agendar limpeza
                 </button>
@@ -272,7 +273,7 @@ const Header = ({ onOpenQuiz }: HeaderProps) => {
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={() => trackWhatsAppClick('header_mobile_menu')}
-                  className="w-full border border-[#25D366] text-[#1A1A2E] text-[10px] font-semibold tracking-[0.18em] uppercase py-3.5 hover:bg-[#25D366]/6 transition-colors flex items-center justify-center gap-2"
+                  className="w-full border border-[#25D366] text-[#111111] text-[10px] font-semibold tracking-[0.18em] uppercase py-3.5 hover:bg-[#25D366]/6 transition-colors flex items-center justify-center gap-2"
                 >
                   <MessageCircle className="w-3.5 h-3.5 text-[#25D366]" strokeWidth={2} />
                   WhatsApp

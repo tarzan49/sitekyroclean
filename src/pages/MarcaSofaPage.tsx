@@ -8,6 +8,7 @@ import Footer from "@/components/Footer";
 import QuizButton from "@/components/QuizButton";
 import { getAllMarcaSofaRoutes, getMarcaByCityAndSlug } from "@/data/marcaSofaData";
 import { trackWhatsAppClick } from "@/lib/quizTracking";
+import { SITE_URL, WHATSAPP_BASE, REVIEW_RATING, REVIEW_COUNT } from "@/constants/business";
 import imgPele        from "@/assets/hero-p-limpeza-sofa-pele.webp";
 import imgVeludo      from "@/assets/hero-p-limpeza-sofa-veludo.webp";
 import imgTecido      from "@/assets/hero-p-limpeza-sofa-tecido.webp";
@@ -44,7 +45,7 @@ const MarcaSofaPage = () => {
     return getMarcaByCityAndSlug(route.marcaSlug, route.citySlug);
   }, [pathname]);
 
-  const pageUrl = `https://cleansolutions.com.pt${pathname}`;
+  const pageUrl = `${SITE_URL}${pathname}`;
   const pageTitle = data ? `Limpeza Sofá ${data.marca.name} em ${data.city.name}, Especialistas | Kyro Clean` : '';
   const pageDesc = data ? `Especialistas em limpeza de sofás ${data.marca.name} em ${data.city.name}. ${data.marca.material}. ${data.marca.estimatedPriceRange}. Serviço ao domicílio.` : '';
 
@@ -63,7 +64,7 @@ const MarcaSofaPage = () => {
         <Header />
         <main className="pt-28 pb-16 min-h-screen bg-white">
           <div className="container mx-auto px-4 text-center">
-            <h1 className="font-playfair text-3xl font-bold text-[#1A1A2E] mb-4">Página não encontrada</h1>
+            <h1 className="font-playfair text-3xl font-bold text-[#111111] mb-4">Página não encontrada</h1>
             <Link to="/" style={{ color: "#D4AF37" }} className="hover:underline">Voltar ao início</Link>
           </div>
         </main>
@@ -84,16 +85,16 @@ const MarcaSofaPage = () => {
         "name": pageTitle,
         "description": pageDesc,
         "inLanguage": "pt-PT",
-        "isPartOf": { "@id": "https://cleansolutions.com.pt/#website" },
-        "publisher": { "@id": "https://cleansolutions.com.pt/#business" },
+        "isPartOf": { "@id": `${SITE_URL}/#website` },
+        "publisher": { "@id": `${SITE_URL}/#business` },
         "breadcrumb": { "@id": `${pageUrl}#breadcrumb` },
       },
       {
         "@type": "BreadcrumbList",
         "@id": `${pageUrl}#breadcrumb`,
         "itemListElement": [
-          { "@type": "ListItem", "position": 1, "name": "Início", "item": "https://cleansolutions.com.pt/" },
-          { "@type": "ListItem", "position": 2, "name": "Limpeza de Sofás", "item": "https://cleansolutions.com.pt/limpeza-sofas" },
+          { "@type": "ListItem", "position": 1, "name": "Início", "item": `${SITE_URL}/` },
+          { "@type": "ListItem", "position": 2, "name": "Limpeza de Sofás", "item": `${SITE_URL}/limpeza-sofas` },
           { "@type": "ListItem", "position": 3, "name": `Sofá ${marca.name} em ${city.name}`, "item": pageUrl },
         ],
       },
@@ -103,7 +104,7 @@ const MarcaSofaPage = () => {
         "name": `Limpeza de Sofá ${marca.name} em ${city.name}`,
         "description": pageDesc,
         "url": pageUrl,
-        "provider": { "@id": "https://cleansolutions.com.pt/#business" },
+        "provider": { "@id": `${SITE_URL}/#business` },
         "areaServed": { "@type": "City", "name": city.name },
         "offers": {
           "@type": "Offer",
@@ -171,7 +172,7 @@ const MarcaSofaPage = () => {
                 <span className="text-sm font-bold" style={{ color: "#D4AF37" }}>{marca.estimatedPriceRange}</span>
                 <div className="flex items-center gap-1.5">
                   {[...Array(5)].map((_, i) => <Star key={i} className="w-4 h-4 fill-[#D4AF37]" style={{ color: "#D4AF37" }} />)}
-                  <span className="text-sm text-white/60 ml-1">5.0 · 50+ avaliações</span>
+                  <span className="text-sm text-white/60 ml-1">{REVIEW_RATING} · {REVIEW_COUNT}+ avaliações</span>
                 </div>
               </div>
 
@@ -183,7 +184,7 @@ const MarcaSofaPage = () => {
                 <div className="relative group flex-1 sm:flex-none">
                   <div className="absolute -inset-1.5 rounded-full bg-[#25D366]/40 opacity-30 blur-lg group-hover:opacity-55 transition-opacity duration-400 pointer-events-none" />
                   <a
-                    href={`https://wa.me/351925530647?text=${encodeURIComponent(`Olá! Gostaria de pedir um orçamento para limpeza do meu sofá ${marca.name} em ${city.name}.`)}`}
+                    href={`${WHATSAPP_BASE}?text=${encodeURIComponent(`Olá! Gostaria de pedir um orçamento para limpeza do meu sofá ${marca.name} em ${city.name}.`)}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     onClick={() => trackWhatsAppClick(`marca_hero_${marca.slug}`)}
@@ -215,7 +216,7 @@ const MarcaSofaPage = () => {
                 <div className="h-px w-10 opacity-40" style={{ backgroundColor: "#D4AF37" }} />
                 <p className="text-[10px] font-bold tracking-[0.28em] uppercase" style={{ color: "#D4AF37" }}>Material</p>
               </div>
-              <h2 className="font-playfair text-2xl md:text-3xl font-bold text-[#1A1A2E] mb-8">
+              <h2 className="font-playfair text-2xl md:text-3xl font-bold text-[#111111] mb-8">
                 O que saber sobre o tecido {marca.name}
               </h2>
 
@@ -223,7 +224,7 @@ const MarcaSofaPage = () => {
                 {/* Material badge + description */}
                 <div className="bg-white rounded-2xl p-6 md:p-8 shadow-sm border border-[#E8E4DE]">
                   <p className="text-[10px] font-bold tracking-[0.28em] uppercase mb-4" style={{ color: "#D4AF37" }}>{marca.material}</p>
-                  <p className="text-sm md:text-base text-[#1A1A2E]/60 leading-relaxed">
+                  <p className="text-sm md:text-base text-[#111111]/60 leading-relaxed">
                     {marca.materialDescription}
                   </p>
                 </div>
@@ -287,17 +288,17 @@ const MarcaSofaPage = () => {
                 <p className="text-[10px] font-bold tracking-[0.28em] uppercase" style={{ color: "#D4AF37" }}>Perguntas</p>
                 <div className="h-px w-10 opacity-40" style={{ backgroundColor: "#D4AF37" }} />
               </div>
-              <h2 className="font-playfair text-2xl md:text-3xl font-bold text-[#1A1A2E] mb-8 text-center">
+              <h2 className="font-playfair text-2xl md:text-3xl font-bold text-[#111111] mb-8 text-center">
                 Perguntas sobre Sofás {marca.name}
               </h2>
               <Accordion type="single" collapsible className="space-y-4">
                 {marca.faqs.map((faq, i) => (
                   <AccordionItem key={i} value={`faq-${i}`}
                     className="bg-white rounded-[18px] shadow-sm hover:shadow-md border border-[#E8E4DE] px-6 transition-all duration-300 data-[state=open]:shadow-md data-[state=open]:border-[#D4AF37]/30">
-                    <AccordionTrigger className="text-left text-base font-semibold text-[#1A1A2E] py-5 hover:no-underline [&[data-state=open]>svg]:text-[#D4AF37]">
+                    <AccordionTrigger className="text-left text-base font-semibold text-[#111111] py-5 hover:no-underline [&[data-state=open]>svg]:text-[#D4AF37]">
                       {faq.question}
                     </AccordionTrigger>
-                    <AccordionContent className="text-sm text-[#1A1A2E]/60 pb-5 leading-relaxed">
+                    <AccordionContent className="text-sm text-[#111111]/60 pb-5 leading-relaxed">
                       {faq.answer}
                     </AccordionContent>
                   </AccordionItem>
@@ -325,7 +326,7 @@ const MarcaSofaPage = () => {
               <div className="relative group flex-1">
                 <div className="absolute -inset-1.5 rounded-full bg-[#25D366]/40 opacity-30 blur-lg group-hover:opacity-55 transition-opacity duration-400 pointer-events-none" />
                 <a
-                  href={`https://wa.me/351925530647?text=${encodeURIComponent(`Olá! Gostaria de pedir um orçamento para limpeza do meu sofá ${marca.name} em ${city.name}.`)}`}
+                  href={`${WHATSAPP_BASE}?text=${encodeURIComponent(`Olá! Gostaria de pedir um orçamento para limpeza do meu sofá ${marca.name} em ${city.name}.`)}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={() => trackWhatsAppClick(`marca_cta_${marca.slug}`)}
@@ -353,21 +354,21 @@ const MarcaSofaPage = () => {
           <div className="container mx-auto px-5 sm:px-6 lg:px-8">
             <div className="max-w-4xl mx-auto">
               <div className="mb-6 pb-5 border-b border-[#E8E4DE]">
-                <p className="text-xs text-[#1A1A2E]/50 mb-2">Serviço completo de limpeza de sofás:</p>
+                <p className="text-xs text-[#111111]/50 mb-2">Serviço completo de limpeza de sofás:</p>
                 <Link
                   to={`/limpeza-sofas-${city.slug}`}
                   className="text-sm font-semibold text-[#D4AF37] hover:underline"
                 >
-                  Limpeza de Sofás em {city.name} — Ver todos os materiais e preços
+                  Limpeza de Sofás em {city.name}: Ver todos os materiais e preços
                 </Link>
               </div>
-              <h3 className="font-playfair text-lg font-bold text-[#1A1A2E] mb-4">Outras marcas que limpamos em {city.name}</h3>
+              <h3 className="font-playfair text-lg font-bold text-[#111111] mb-4">Outras marcas que limpamos em {city.name}</h3>
               <div className="flex flex-wrap gap-2">
                 {["ikea", "natuzzi", "kave-home", "leroy-merlin", "moviflor", "conforama", "el-corte-ingles", "roche-bobois"]
                   .filter(slug => slug !== marca.slug)
                   .map(slug => (
                     <Link key={slug} to={`/limpeza-sofa-${slug}-${city.slug}`}
-                      className="inline-flex items-center gap-1.5 bg-white px-3 py-2 rounded-lg text-sm text-[#1A1A2E] border border-[#E8E4DE] hover:border-[#D4AF37]/35 hover:bg-[#D4AF37]/5 transition-all capitalize">
+                      className="inline-flex items-center gap-1.5 bg-white px-3 py-2 rounded-lg text-sm text-[#111111] border border-[#E8E4DE] hover:border-[#D4AF37]/35 hover:bg-[#D4AF37]/5 transition-all capitalize">
                       <ArrowRight className="w-3 h-3" style={{ color: "#D4AF37" }} />
                       {slug.replace(/-/g, " ")}
                     </Link>

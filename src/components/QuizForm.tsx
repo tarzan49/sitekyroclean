@@ -24,6 +24,7 @@ import QuizStepConfig from './quiz/steps/QuizStepConfig';
 import QuizUpsellOverlay from './quiz/steps/QuizUpsellOverlay';
 import QuizStepContact from './quiz/steps/QuizStepContact';
 import { calcCarpetPrice, calcChairClean, calcChairWaterproof } from './quiz/quizHelpers';
+import { WHATSAPP_BASE, BUSINESS_EMAIL } from '@/constants/business';
 
 
 interface QuizFormProps {
@@ -811,7 +812,7 @@ ${formData.description || 'Sem observações adicionais'}
       }));
 
       // Store for Obrigado page
-      safeSessionSet('kyro_wa_url', `https://wa.me/351925530647?text=${waText}`);
+      safeSessionSet('kyro_wa_url', `${WHATSAPP_BASE}?text=${waText}`);
       safeSessionSet('kyro_summary', JSON.stringify({
         price: finalPriceText,
         service: `${serviceLabel}${serviceTypeLabel ? `: ${serviceTypeLabel}` : ''}`,
@@ -857,16 +858,16 @@ ${formData.description || 'Sem observações adicionais'}
           <div className="space-y-2">
             <p>Houve um problema. Contacte-nos diretamente:</p>
             <div className="flex gap-2 mt-2">
-              <a 
-                href={`https://wa.me/351925530647?text=${whatsappMessage}`}
+              <a
+                href={`${WHATSAPP_BASE}?text=${whatsappMessage}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-1 px-3 py-1.5 bg-green-600 text-white text-sm rounded-lg hover:bg-green-700"
               >
                 WhatsApp
               </a>
-              <a 
-                href={`mailto:cleansolutions.pt25@gmail.com?subject=Pedido%20Orçamento&body=${whatsappMessage}`}
+              <a
+                href={`mailto:${BUSINESS_EMAIL}?subject=Pedido%20Orçamento&body=${whatsappMessage}`}
                 className="inline-flex items-center gap-1 px-3 py-1.5 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700"
               >
                 Email

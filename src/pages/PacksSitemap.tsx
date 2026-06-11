@@ -3,6 +3,7 @@ import { ArrowRight, Map } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { packs, packCities, getFromPrice } from "@/data/packComboData";
+import { SITE_URL } from "@/constants/business";
 
 const PACK_COLORS: Record<string, string> = {
   'sofa-colchao':          'bg-blue-50 border-blue-200 text-blue-700',
@@ -17,21 +18,21 @@ const PacksSitemap = () => {
     "@graph": [
       {
         "@type": "WebPage",
-        "@id": "https://cleansolutions.com.pt/guia-de-packs#webpage",
-        "url": "https://cleansolutions.com.pt/guia-de-packs",
+        "@id": `${SITE_URL}/guia-de-packs#webpage`,
+        "url": `${SITE_URL}/guia-de-packs`,
         "name": "Guia de Packs de Limpeza | Kyro Clean Solutions",
         "inLanguage": "pt-PT",
-        "isPartOf": { "@id": "https://cleansolutions.com.pt/#website" },
-        "publisher": { "@id": "https://cleansolutions.com.pt/#business" },
-        "breadcrumb": { "@id": "https://cleansolutions.com.pt/guia-de-packs#breadcrumb" },
+        "isPartOf": { "@id": `${SITE_URL}/#website` },
+        "publisher": { "@id": `${SITE_URL}/#business` },
+        "breadcrumb": { "@id": `${SITE_URL}/guia-de-packs#breadcrumb` },
       },
       {
         "@type": "BreadcrumbList",
-        "@id": "https://cleansolutions.com.pt/guia-de-packs#breadcrumb",
+        "@id": `${SITE_URL}/guia-de-packs#breadcrumb`,
         "itemListElement": [
-          { "@type": "ListItem", "position": 1, "name": "Início", "item": "https://cleansolutions.com.pt/" },
-          { "@type": "ListItem", "position": 2, "name": "Packs", "item": "https://cleansolutions.com.pt/packs" },
-          { "@type": "ListItem", "position": 3, "name": "Guia de Packs", "item": "https://cleansolutions.com.pt/guia-de-packs" },
+          { "@type": "ListItem", "position": 1, "name": "Início", "item": `${SITE_URL}/` },
+          { "@type": "ListItem", "position": 2, "name": "Packs", "item": `${SITE_URL}/packs` },
+          { "@type": "ListItem", "position": 3, "name": "Guia de Packs", "item": `${SITE_URL}/guia-de-packs` },
         ],
       },
     ],
@@ -89,15 +90,15 @@ const PacksSitemap = () => {
                         <span className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full border ${badgeClass}`}>
                           {savingsLabel}
                         </span>
-                        <span className="text-xs text-[#1A1A2E]/40">
+                        <span className="text-xs text-[#111111]/40">
                           {pack.selectors.length === 1 ? '1 opção configurável' : `${pack.selectors.length} opções configuráveis`}
                         </span>
                       </div>
-                      <h2 className="font-playfair text-xl font-bold text-[#1A1A2E]">{pack.name}</h2>
-                      <p className="text-sm text-[#1A1A2E]/50 mt-0.5">{pack.tagline}</p>
+                      <h2 className="font-playfair text-xl font-bold text-[#111111]">{pack.name}</h2>
+                      <p className="text-sm text-[#111111]/50 mt-0.5">{pack.tagline}</p>
                     </div>
                     <div className="text-right">
-                      <p className="text-xs text-[#1A1A2E]/35 mb-0.5">a partir de</p>
+                      <p className="text-xs text-[#111111]/35 mb-0.5">a partir de</p>
                       <p className="font-playfair text-2xl font-bold" style={{ color: "#D4AF37" }}>{fromPrice}€</p>
                     </div>
                   </div>
@@ -111,10 +112,10 @@ const PacksSitemap = () => {
                         className="group flex items-center justify-between px-4 py-3 bg-white rounded-xl border border-[#E8E4DE] hover:border-[#D4AF37]/40 hover:shadow-sm transition-all"
                       >
                         <div>
-                          <p className="text-sm font-semibold text-[#1A1A2E] group-hover:text-[#0d3c47]">{city.name}</p>
-                          <p className="text-[10px] text-[#1A1A2E]/35">desde {fromPrice}€</p>
+                          <p className="text-sm font-semibold text-[#111111] group-hover:text-[#0d3c47]">{city.name}</p>
+                          <p className="text-[10px] text-[#111111]/35">desde {fromPrice}€</p>
                         </div>
-                        <ArrowRight className="w-3.5 h-3.5 text-[#1A1A2E]/25 group-hover:text-gold group-hover:translate-x-0.5 transition-all flex-shrink-0" />
+                        <ArrowRight className="w-3.5 h-3.5 text-[#111111]/25 group-hover:text-gold group-hover:translate-x-0.5 transition-all flex-shrink-0" />
                       </Link>
                     ))}
                   </div>
@@ -130,15 +131,15 @@ const PacksSitemap = () => {
         {/* Quick reference table */}
         <section className="py-10 bg-white">
           <div className="max-w-5xl mx-auto px-5 sm:px-6 lg:px-8">
-            <h2 className="font-playfair text-xl font-bold text-[#1A1A2E] mb-6">Comparação rápida dos packs</h2>
+            <h2 className="font-playfair text-xl font-bold text-[#111111] mb-6">Comparação rápida dos packs</h2>
             <div className="overflow-x-auto rounded-2xl border border-[#E8E4DE]">
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-[#E8E4DE] bg-[#FDFDF9]">
-                    <th className="text-left px-5 py-3 font-bold text-[#1A1A2E]/60 text-xs uppercase tracking-wide">Pack</th>
-                    <th className="text-left px-5 py-3 font-bold text-[#1A1A2E]/60 text-xs uppercase tracking-wide">Serviços</th>
-                    <th className="text-left px-5 py-3 font-bold text-[#1A1A2E]/60 text-xs uppercase tracking-wide">Desconto</th>
-                    <th className="text-left px-5 py-3 font-bold text-[#1A1A2E]/60 text-xs uppercase tracking-wide">Desde</th>
+                    <th className="text-left px-5 py-3 font-bold text-[#111111]/60 text-xs uppercase tracking-wide">Pack</th>
+                    <th className="text-left px-5 py-3 font-bold text-[#111111]/60 text-xs uppercase tracking-wide">Serviços</th>
+                    <th className="text-left px-5 py-3 font-bold text-[#111111]/60 text-xs uppercase tracking-wide">Desconto</th>
+                    <th className="text-left px-5 py-3 font-bold text-[#111111]/60 text-xs uppercase tracking-wide">Desde</th>
                     <th className="px-5 py-3" />
                   </tr>
                 </thead>
@@ -148,10 +149,10 @@ const PacksSitemap = () => {
                     return (
                       <tr key={pack.id} className={i < packs.length - 1 ? "border-b border-[#E8E4DE]" : ""}>
                         <td className="px-5 py-4">
-                          <p className="font-semibold text-[#1A1A2E]">{pack.name}</p>
-                          <p className="text-[11px] text-[#1A1A2E]/40 mt-0.5 max-w-[200px]">{pack.tagline.split(':')[0]}</p>
+                          <p className="font-semibold text-[#111111]">{pack.name}</p>
+                          <p className="text-[11px] text-[#111111]/40 mt-0.5 max-w-[200px]">{pack.tagline.split(':')[0]}</p>
                         </td>
-                        <td className="px-5 py-4 text-[#1A1A2E]/60">
+                        <td className="px-5 py-4 text-[#111111]/60">
                           {pack.selectors.map(s => s.label).join(' + ')}
                         </td>
                         <td className="px-5 py-4">
@@ -182,12 +183,12 @@ const PacksSitemap = () => {
         {/* Back to packs */}
         <section className="py-8 bg-[#FDFDF9] border-t border-[#E8E4DE]">
           <div className="max-w-5xl mx-auto px-5 sm:px-6 lg:px-8 flex items-center justify-between flex-wrap gap-4">
-            <p className="text-sm text-[#1A1A2E]/50">
+            <p className="text-sm text-[#111111]/50">
               {packs.length * packCities.length} combinações disponíveis · Reserva via WhatsApp · Resposta em 15 min
             </p>
             <Link
               to="/packs"
-              className="inline-flex items-center gap-2 text-sm font-semibold text-[#1A1A2E] hover:text-gold transition-colors"
+              className="inline-flex items-center gap-2 text-sm font-semibold text-[#111111] hover:text-gold transition-colors"
             >
               <ArrowRight className="w-4 h-4 rotate-180" />
               Ver página de packs

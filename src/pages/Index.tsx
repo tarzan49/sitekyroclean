@@ -16,7 +16,7 @@ const Footer             = lazy(() => import("@/components/Footer"));
 
 const SectionLoader = () => (
   <div className="py-12 flex justify-center">
-    <div className="w-6 h-6 border border-[#1A1A2E]/20 border-t-[#D4AF37] rounded-full animate-spin" />
+    <div className="w-6 h-6 border border-[#111111]/20 border-t-[#D4AF37] rounded-full animate-spin" />
   </div>
 );
 

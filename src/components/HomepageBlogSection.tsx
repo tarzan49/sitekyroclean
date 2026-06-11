@@ -32,14 +32,14 @@ const HomepageBlogSection = () => {
                 DICAS & CONSELHOS
               </p>
             </div>
-            <h2 className="font-playfair text-[1.85rem] sm:text-4xl md:text-[2.6rem] font-bold leading-[1.1] text-[#1A1A2E]">
+            <h2 className="font-playfair text-[1.85rem] sm:text-4xl md:text-[2.6rem] font-bold leading-[1.1] text-[#111111]">
               Últimos{" "}
               <em className="not-italic" style={{ color: '#D4AF37' }}>artigos</em>
             </h2>
           </div>
           <Link
             to="/blog"
-            className="hidden md:flex items-center gap-1.5 text-[12px] font-medium text-[#1A1A2E]/40 hover:text-[#D4AF37] transition-colors duration-200 pb-0.5 border-b border-transparent hover:border-[#D4AF37]/30 flex-shrink-0"
+            className="hidden md:flex items-center gap-1.5 text-[12px] font-medium text-[#111111]/40 hover:text-[#D4AF37] transition-colors duration-200 pb-0.5 border-b border-transparent hover:border-[#D4AF37]/30 flex-shrink-0"
           >
             Ver todos <ArrowRight className="w-3 h-3" />
           </Link>
@@ -53,7 +53,7 @@ const HomepageBlogSection = () => {
           {/* Featured article */}
           <Link
             to={`/blog/${featured.slug}`}
-            className="group relative bg-white rounded-2xl overflow-hidden border border-[#1A1A2E]/[0.07] shadow-[0_2px_16px_rgba(0,0,0,0.06)] hover:shadow-[0_8px_32px_rgba(0,0,0,0.11)] transition-shadow duration-300 flex flex-col p-7 md:p-9"
+            className="group relative bg-white rounded-2xl overflow-hidden border border-[#111111]/[0.07] shadow-[0_2px_16px_rgba(0,0,0,0.06)] hover:shadow-[0_8px_32px_rgba(0,0,0,0.11)] transition-shadow duration-300 flex flex-col p-7 md:p-9"
           >
             <div className="flex items-center justify-between mb-5">
               <span className="text-[9px] font-bold tracking-[0.24em] uppercase" style={{ color: '#D4AF37', opacity: 0.90 }}>
@@ -66,16 +66,16 @@ const HomepageBlogSection = () => {
 
             <div className="h-px mb-6" style={{ background: 'linear-gradient(90deg, rgba(212,175,55,0.38), transparent)' }} />
 
-            <h3 className="font-playfair font-bold text-[#1A1A2E] text-[1.25rem] md:text-[1.45rem] leading-[1.2] mb-4 flex-1">
+            <h3 className="font-playfair font-bold text-[#111111] text-[1.25rem] md:text-[1.45rem] leading-[1.2] mb-4 flex-1">
               {featured.title}
             </h3>
 
-            <p className="text-[13.5px] text-[#1A1A2E]/55 leading-relaxed line-clamp-3 mb-6">
+            <p className="text-[13.5px] text-[#111111]/55 leading-relaxed line-clamp-3 mb-6">
               {featured.intro}
             </p>
 
             <div className="flex items-center justify-between mt-auto">
-              <span className="flex items-center gap-1.5 text-[11px] text-[#1A1A2E]/35">
+              <span className="flex items-center gap-1.5 text-[11px] text-[#111111]/35">
                 <Clock className="w-3 h-3" />
                 {featured.readingTime} min de leitura
               </span>
@@ -99,7 +99,7 @@ const HomepageBlogSection = () => {
               <Link
                 key={post.slug}
                 to={`/blog/${post.slug}`}
-                className="group relative bg-white rounded-2xl overflow-hidden border border-[#1A1A2E]/[0.07] shadow-[0_2px_12px_rgba(0,0,0,0.05)] hover:shadow-[0_6px_24px_rgba(0,0,0,0.10)] transition-shadow duration-300 flex flex-col flex-1 p-6"
+                className="group relative bg-white rounded-2xl overflow-hidden border border-[#111111]/[0.07] shadow-[0_2px_12px_rgba(0,0,0,0.05)] hover:shadow-[0_6px_24px_rgba(0,0,0,0.10)] transition-shadow duration-300 flex flex-col flex-1 p-6"
               >
                 <div className="flex items-center justify-between mb-4">
                   <span className="text-[9px] font-bold tracking-[0.24em] uppercase" style={{ color: '#D4AF37', opacity: 0.90 }}>
@@ -112,12 +112,12 @@ const HomepageBlogSection = () => {
 
                 <div className="h-px mb-4" style={{ background: 'linear-gradient(90deg, rgba(212,175,55,0.30), transparent)' }} />
 
-                <h3 className="font-playfair font-bold text-[#1A1A2E] text-[1rem] md:text-[1.05rem] leading-snug mb-3 flex-1">
+                <h3 className="font-playfair font-bold text-[#111111] text-[1rem] md:text-[1.05rem] leading-snug mb-3 flex-1">
                   {post.title}
                 </h3>
 
                 <div className="flex items-center justify-between mt-auto pt-1">
-                  <span className="flex items-center gap-1.5 text-[11px] text-[#1A1A2E]/35">
+                  <span className="flex items-center gap-1.5 text-[11px] text-[#111111]/35">
                     <Clock className="w-3 h-3" />
                     {post.readingTime} min
                   </span>
@@ -145,7 +145,7 @@ const HomepageBlogSection = () => {
         >
           <Link
             to="/blog"
-            className="inline-flex items-center gap-1.5 text-sm font-medium text-[#1A1A2E]/45 hover:text-[#D4AF37] transition-colors"
+            className="inline-flex items-center gap-1.5 text-sm font-medium text-[#111111]/45 hover:text-[#D4AF37] transition-colors"
           >
             Ver todos os artigos <ArrowRight className="w-3.5 h-3.5" />
           </Link>

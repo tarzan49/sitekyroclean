@@ -2,6 +2,7 @@
 import { useTranslation } from "react-i18next";
 import { ShieldCheck, HandCoins, Droplets, Star } from "lucide-react";
 import QuizButton from "./QuizButton";
+import { REVIEW_RATING, REVIEW_COUNT } from "@/constants/business";
 
 const steps = [
   {
@@ -84,8 +85,9 @@ const HowItWorks = () => {
                 O NOSSO PROCESSO
               </p>
             </div>
-            <h2 className="font-playfair text-[1.6rem] md:text-[2rem] font-bold text-white leading-tight">
-              {t('howItWorks.title', 'Como funciona')}
+            <h2 className="font-playfair text-[1.85rem] sm:text-4xl md:text-[2.6rem] font-bold text-white leading-[1.1]">
+              {t('howItWorks.title', 'Como')}{" "}
+              <em className="not-italic" style={{ color: '#D4AF37' }}>funciona</em>
             </h2>
           </div>
 
@@ -135,8 +137,9 @@ const HowItWorks = () => {
                 A NOSSA PROMESSA
               </p>
             </div>
-            <h2 className="font-playfair text-[1.6rem] md:text-[2rem] font-bold text-white leading-tight">
-              Qualidade garantida
+            <h2 className="font-playfair text-[1.85rem] sm:text-4xl md:text-[2.6rem] font-bold text-white leading-[1.1]">
+              Qualidade{" "}
+              <em className="not-italic" style={{ color: '#D4AF37' }}>garantida</em>
             </h2>
           </div>
 
@@ -185,9 +188,9 @@ const HowItWorks = () => {
               <Star key={i} className="w-3.5 h-3.5 fill-gold text-gold" />
             ))}
           </div>
-          <span className="text-white font-bold text-sm">5.0</span>
+          <span className="text-white font-bold text-sm">{REVIEW_RATING}</span>
           <div className="w-px h-4 bg-white/20" />
-          <span className="text-white/45 text-[12px]">+50 avaliações no Google</span>
+          <span className="text-white/45 text-[12px]">{REVIEW_COUNT}+ avaliações no Google</span>
         </div>
       </div>
 

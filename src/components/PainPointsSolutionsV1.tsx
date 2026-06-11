@@ -20,7 +20,7 @@ const CARDS = [
     image: painpointStains,
     alt: "Mancha de vinho no sofá",
     title: "Manchas que\nficam para sempre",
-    solution: "Extração profunda — resultado no próprio dia",
+    solution: "Extração profunda: resultado no próprio dia",
     pos: "center",
   },
   {
@@ -162,7 +162,7 @@ const PainPointsSolutions = () => {
             onClick={openQuiz}
             className="group inline-flex items-center gap-2 text-sm font-medium text-white/45 hover:text-gold transition-colors duration-300 border-b border-transparent hover:border-gold/35 pb-0.5"
           >
-            <span className="tracking-wide">Proteja a sua família — calcule o preço agora</span>
+            <span className="tracking-wide">Proteja a sua família, calcule o preço agora</span>
             <ArrowRight className="h-3.5 w-3.5 transition-transform duration-300 group-hover:translate-x-1.5" />
           </button>
         </div>

@@ -4,6 +4,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import QuizButton from "@/components/QuizButton";
 import { getAllPosts } from "@/data/blogData";
+import { SITE_URL } from "@/constants/business";
 
 import imgSofaTecido    from "@/assets/hero-p-limpeza-sofa-tecido.webp";
 import imgManchasVinho  from "@/assets/hero-p-manchas-vinho-sofa.webp";
@@ -54,37 +55,37 @@ const Blog = () => {
     "@graph": [
       {
         "@type": "WebPage",
-        "@id": "https://cleansolutions.com.pt/blog#webpage",
-        "url": "https://cleansolutions.com.pt/blog",
+        "@id": `${SITE_URL}/blog#webpage`,
+        "url": `${SITE_URL}/blog`,
         "name": "Blog | Kyro Clean Solutions",
         "inLanguage": "pt-PT",
-        "isPartOf": { "@id": "https://cleansolutions.com.pt/#website" },
-        "publisher": { "@id": "https://cleansolutions.com.pt/#business" },
-        "breadcrumb": { "@id": "https://cleansolutions.com.pt/blog#breadcrumb" },
+        "isPartOf": { "@id": `${SITE_URL}/#website` },
+        "publisher": { "@id": `${SITE_URL}/#business` },
+        "breadcrumb": { "@id": `${SITE_URL}/blog#breadcrumb` },
       },
       {
         "@type": "Blog",
-        "@id": "https://cleansolutions.com.pt/blog#blog",
+        "@id": `${SITE_URL}/blog#blog`,
         "name": "Blog Kyro Clean Solutions",
         "description": "Dicas, guias e informação sobre limpeza profissional de sofás, colchões, tapetes e estofos.",
-        "url": "https://cleansolutions.com.pt/blog",
+        "url": `${SITE_URL}/blog`,
         "inLanguage": "pt-PT",
-        "publisher": { "@id": "https://cleansolutions.com.pt/#business" },
+        "publisher": { "@id": `${SITE_URL}/#business` },
         "blogPost": posts.map(p => ({
           "@type": "BlogPosting",
           "headline": p.title,
-          "url": `https://cleansolutions.com.pt/blog/${p.slug}`,
+          "url": `${SITE_URL}/blog/${p.slug}`,
           "datePublished": p.publishDate,
           "dateModified": p.updatedDate,
-          "author": { "@id": "https://cleansolutions.com.pt/#business" },
+          "author": { "@id": `${SITE_URL}/#business` },
         })),
       },
       {
         "@type": "BreadcrumbList",
-        "@id": "https://cleansolutions.com.pt/blog#breadcrumb",
+        "@id": `${SITE_URL}/blog#breadcrumb`,
         "itemListElement": [
-          { "@type": "ListItem", "position": 1, "name": "Início", "item": "https://cleansolutions.com.pt/" },
-          { "@type": "ListItem", "position": 2, "name": "Blog", "item": "https://cleansolutions.com.pt/blog" },
+          { "@type": "ListItem", "position": 1, "name": "Início", "item": `${SITE_URL}/` },
+          { "@type": "ListItem", "position": 2, "name": "Blog", "item": `${SITE_URL}/blog` },
         ],
       },
     ],
@@ -142,12 +143,12 @@ const Blog = () => {
               </span>
             </div>
             <div className="p-6 md:p-8">
-              <h2 className="font-playfair text-2xl md:text-3xl font-bold text-[#1A1A2E] mb-3 group-hover:text-gold transition-colors leading-tight">
+              <h2 className="font-playfair text-2xl md:text-3xl font-bold text-[#111111] mb-3 group-hover:text-gold transition-colors leading-tight">
                 {featured.title}
               </h2>
-              <p className="text-[#1A1A2E]/60 leading-relaxed mb-5 line-clamp-2">{featured.intro}</p>
+              <p className="text-[#111111]/60 leading-relaxed mb-5 line-clamp-2">{featured.intro}</p>
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3 text-xs text-[#1A1A2E]/40">
+                <div className="flex items-center gap-3 text-xs text-[#111111]/40">
                   <span className="flex items-center gap-1">
                     <User className="w-3.5 h-3.5" />{featured.author}
                   </span>
@@ -184,12 +185,12 @@ const Blog = () => {
                   </span>
                 </div>
                 <div className="p-5 flex flex-col flex-1">
-                  <h2 className="font-playfair text-base font-bold text-[#1A1A2E] mb-2 group-hover:text-gold transition-colors leading-snug flex-1">
+                  <h2 className="font-playfair text-base font-bold text-[#111111] mb-2 group-hover:text-gold transition-colors leading-snug flex-1">
                     {post.title}
                   </h2>
-                  <p className="text-[#1A1A2E]/55 text-sm leading-relaxed mb-4 line-clamp-2">{post.intro}</p>
+                  <p className="text-[#111111]/55 text-sm leading-relaxed mb-4 line-clamp-2">{post.intro}</p>
                   <div className="flex items-center justify-between mt-auto">
-                    <span className="flex items-center gap-1 text-xs text-[#1A1A2E]/40">
+                    <span className="flex items-center gap-1 text-xs text-[#111111]/40">
                       <Clock className="w-3.5 h-3.5" /> {post.readingTime} min
                     </span>
                     <span className="flex items-center gap-1 text-xs font-semibold text-gold group-hover:gap-2 transition-all">

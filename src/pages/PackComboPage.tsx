@@ -11,6 +11,7 @@ import {
   getFromPrice,
   buildWhatsAppUrl,
 } from "@/data/packComboData";
+import { SITE_URL, WHATSAPP_BASE, REVIEW_RATING, REVIEW_COUNT } from "@/constants/business";
 
 const PackComboPage = () => {
   const { pathname } = useLocation();
@@ -33,11 +34,11 @@ const PackComboPage = () => {
   );
 
   const waUrl = useMemo(
-    () => prices && data ? buildWhatsAppUrl(data.pack, data.city, selections, prices) : `https://wa.me/351925530647`,
+    () => prices && data ? buildWhatsAppUrl(data.pack, data.city, selections, prices) : WHATSAPP_BASE,
     [data, selections, prices]
   );
 
-  const pageUrl = `https://cleansolutions.com.pt${pathname}`;
+  const pageUrl = `${SITE_URL}${pathname}`;
   const fromPriceText = prices ? `${prices.packTotal}€` : `a calcular`;
   const pageTitle = data ? `${data.pack.name} em ${data.city.name}, Desde ${fromPriceText} | Kyro Clean` : '';
   const pageDesc = data ? `${data.pack.description} Poupe até 20% em relação ao preço individual. Serviço ao domicílio em ${data.city.name}.` : '';
@@ -57,7 +58,7 @@ const PackComboPage = () => {
         <Header />
         <main className="pt-28 pb-16 min-h-screen bg-white">
           <div className="container mx-auto px-4 text-center">
-            <h1 className="font-playfair text-3xl font-bold text-[#1A1A2E] mb-4">Página não encontrada</h1>
+            <h1 className="font-playfair text-3xl font-bold text-[#111111] mb-4">Página não encontrada</h1>
             <Link to="/" style={{ color: "#D4AF37" }} className="hover:underline">Voltar ao início</Link>
           </div>
         </main>
@@ -78,16 +79,16 @@ const PackComboPage = () => {
         "name": pageTitle,
         "description": pageDesc,
         "inLanguage": "pt-PT",
-        "isPartOf": { "@id": "https://cleansolutions.com.pt/#website" },
-        "publisher": { "@id": "https://cleansolutions.com.pt/#business" },
+        "isPartOf": { "@id": `${SITE_URL}/#website` },
+        "publisher": { "@id": `${SITE_URL}/#business` },
         "breadcrumb": { "@id": `${pageUrl}#breadcrumb` },
       },
       {
         "@type": "BreadcrumbList",
         "@id": `${pageUrl}#breadcrumb`,
         "itemListElement": [
-          { "@type": "ListItem", "position": 1, "name": "Início", "item": "https://cleansolutions.com.pt/" },
-          { "@type": "ListItem", "position": 2, "name": "Packs", "item": "https://cleansolutions.com.pt/packs" },
+          { "@type": "ListItem", "position": 1, "name": "Início", "item": `${SITE_URL}/` },
+          { "@type": "ListItem", "position": 2, "name": "Packs", "item": `${SITE_URL}/packs` },
           { "@type": "ListItem", "position": 3, "name": `${pack.name} em ${city.name}`, "item": pageUrl },
         ],
       },
@@ -97,7 +98,7 @@ const PackComboPage = () => {
         "name": `${pack.name} em ${city.name}`,
         "description": pack.description,
         "url": pageUrl,
-        "provider": { "@id": "https://cleansolutions.com.pt/#business" },
+        "provider": { "@id": `${SITE_URL}/#business` },
         "areaServed": { "@type": "City", "name": city.name },
         "offers": {
           "@type": "Offer",
@@ -174,13 +175,13 @@ const PackComboPage = () => {
                 <p className="text-[10px] font-bold tracking-[0.28em] uppercase mb-2" style={{ color: "#D4AF37" }}>
                   Passo 1 de 2
                 </p>
-                <h2 className="font-playfair text-xl md:text-2xl font-bold text-[#1A1A2E]">
+                <h2 className="font-playfair text-xl md:text-2xl font-bold text-[#111111]">
                   Configure o seu pack
                 </h2>
-                <p className="text-sm text-[#1A1A2E]/50 mt-1 mb-4">Selecione as opções abaixo para ver o preço exacto</p>
-                <div className="inline-flex items-center gap-3 bg-kyro-green/8 border border-kyro-green/20 rounded-xl px-5 py-3 text-sm text-[#1A1A2E]/70">
+                <p className="text-sm text-[#111111]/50 mt-1 mb-4">Selecione as opções abaixo para ver o preço exacto</p>
+                <div className="inline-flex items-center gap-3 bg-kyro-green/8 border border-kyro-green/20 rounded-xl px-5 py-3 text-sm text-[#111111]/70">
                   <CheckCircle className="w-4 h-4 flex-shrink-0 text-kyro-green" />
-                  <span>Este pack inclui: <strong className="text-[#1A1A2E]">{pack.service1}</strong> + <strong className="text-[#1A1A2E]">{pack.service2}</strong></span>
+                  <span>Este pack inclui: <strong className="text-[#111111]">{pack.service1}</strong> + <strong className="text-[#111111]">{pack.service2}</strong></span>
                 </div>
               </div>
 
@@ -188,7 +189,7 @@ const PackComboPage = () => {
               <div className="space-y-5 mb-8">
                 {pack.selectors.map(sel => (
                   <div key={sel.key}>
-                    <p className="text-xs font-bold text-[#1A1A2E]/50 uppercase tracking-widest mb-2">{sel.label}</p>
+                    <p className="text-xs font-bold text-[#111111]/50 uppercase tracking-widest mb-2">{sel.label}</p>
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                       {sel.options.map(opt => {
                         const isSelected = selections[sel.key] === opt.id;
@@ -208,9 +209,9 @@ const PackComboPage = () => {
                                 <CheckCircle className="w-3 h-3 text-white" />
                               </span>
                             )}
-                            <span className="text-sm font-bold text-[#1A1A2E]">{opt.label}</span>
+                            <span className="text-sm font-bold text-[#111111]">{opt.label}</span>
                             {opt.sublabel && (
-                              <span className="text-[10px] text-[#1A1A2E]/40 mt-0.5 leading-snug">{opt.sublabel}</span>
+                              <span className="text-[10px] text-[#111111]/40 mt-0.5 leading-snug">{opt.sublabel}</span>
                             )}
                             <span className="text-xs font-semibold mt-2" style={{ color: "#D4AF37" }}>{opt.price}€</span>
                           </button>
@@ -231,13 +232,13 @@ const PackComboPage = () => {
                   <div className="px-5 py-4">
                     <p className="text-[9px] font-black uppercase tracking-widest text-white/30 mb-1">Individual</p>
                     <p className="text-xl font-bold text-white/35 line-through tabular-nums">
-                      {prices ? `${prices.individualTotal}€` : '—'}
+                      {prices ? `${prices.individualTotal}€` : '-'}
                     </p>
                   </div>
                   <div className="px-5 py-4" style={{ background: "rgba(212,175,55,0.06)" }}>
                     <p className="text-[9px] font-black uppercase tracking-widest mb-1" style={{ color: "#D4AF37" }}>Preço Pack</p>
                     <p className="font-playfair text-2xl font-bold tabular-nums" style={{ color: "#D4AF37" }}>
-                      {prices ? `${prices.packTotal}€` : '—'}
+                      {prices ? `${prices.packTotal}€` : '-'}
                     </p>
                   </div>
                 </div>
@@ -265,7 +266,7 @@ const PackComboPage = () => {
                 )}
 
                 <div className="px-5 pb-3 pt-1">
-                  <p className="text-[9px] text-white/20">IVA incluído · Sujeito a confirmação · Preço fixo após confirmar</p>
+                  <p className="text-[9px] text-white/20">Sujeito a confirmação · Preço fixo após confirmar</p>
                 </div>
               </div>
 
@@ -289,7 +290,7 @@ const PackComboPage = () => {
                     : 'Selecione as opções acima'}
                 </a>
 
-                <p className="text-center text-[10px] text-[#1A1A2E]/35">
+                <p className="text-center text-[10px] text-[#111111]/35">
                   A mensagem pré-preenchida inclui o pack, as opções selecionadas e o preço.
                   O responsável confirma em menos de 15 min.
                 </p>
@@ -316,8 +317,8 @@ const PackComboPage = () => {
                     <div className="w-8 h-8 rounded-full flex items-center justify-center text-sm font-black text-[#071a12]" style={{ background: "#D4AF37" }}>
                       {step.n}
                     </div>
-                    <p className="text-xs font-bold text-[#1A1A2E]">{step.title}</p>
-                    <p className="text-[11px] text-[#1A1A2E]/45 leading-snug">{step.desc}</p>
+                    <p className="text-xs font-bold text-[#111111]">{step.title}</p>
+                    <p className="text-[11px] text-[#111111]/45 leading-snug">{step.desc}</p>
                   </div>
                 ))}
               </div>
@@ -354,10 +355,10 @@ const PackComboPage = () => {
                 <div className="flex gap-0.5 mb-3">
                   {[...Array(5)].map((_, i) => <Star key={i} className="w-4 h-4 fill-[#D4AF37]" style={{ color: "#D4AF37" }} />)}
                 </div>
-                <p className="text-[#1A1A2E]/60 text-sm leading-relaxed italic mb-3">
+                <p className="text-[#111111]/60 text-sm leading-relaxed italic mb-3">
                   "{pack.testimonial.text}"
                 </p>
-                <p className="text-xs font-bold text-[#1A1A2E]">{pack.testimonial.author}</p>
+                <p className="text-xs font-bold text-[#111111]">{pack.testimonial.author}</p>
               </div>
 
               <div className="rounded-2xl p-6 shadow-sm border space-y-3" style={{ background: "#071a12", borderColor: "rgba(212,175,55,0.2)" }}>
@@ -366,7 +367,7 @@ const PackComboPage = () => {
                   { icon: Shield, text: "Garantia de satisfação 100%" },
                   { icon: Zap, text: `Serviço ao domicílio em ${city.name}` },
                   { icon: CheckCircle, text: "Produtos certificados e seguros" },
-                  { icon: Star, text: "5.0 · 50+ avaliações Google verificadas" },
+                  { icon: Star, text: `${REVIEW_RATING} · ${REVIEW_COUNT}+ avaliações Google verificadas` },
                 ].map((item, i) => (
                   <div key={i} className="flex items-center gap-3">
                     <item.icon className="w-4 h-4 flex-shrink-0" style={{ color: "#D4AF37" }} />
@@ -407,18 +408,18 @@ const PackComboPage = () => {
         <section className="py-10 bg-[#FDFDF9]">
           <div className="container mx-auto px-5 sm:px-6 lg:px-8">
             <div className="max-w-4xl mx-auto">
-              <h3 className="text-base font-playfair font-bold text-[#1A1A2E] mb-4">Serviços individuais</h3>
+              <h3 className="text-base font-playfair font-bold text-[#111111] mb-4">Serviços individuais</h3>
               <div className="flex flex-wrap gap-2">
-                <Link to={`/${pack.service1Slug}`} className="inline-flex items-center gap-1.5 bg-white px-3 py-2 rounded-lg text-sm text-[#1A1A2E] border border-[#E8E4DE] hover:border-[#D4AF37]/35 transition-all">
+                <Link to={`/${pack.service1Slug}`} className="inline-flex items-center gap-1.5 bg-white px-3 py-2 rounded-lg text-sm text-[#111111] border border-[#E8E4DE] hover:border-[#D4AF37]/35 transition-all">
                   <ArrowRight className="w-3 h-3" style={{ color: "#D4AF37" }} />{pack.service1}
                 </Link>
-                <Link to={`/${pack.service2Slug}`} className="inline-flex items-center gap-1.5 bg-white px-3 py-2 rounded-lg text-sm text-[#1A1A2E] border border-[#E8E4DE] hover:border-[#D4AF37]/35 transition-all">
+                <Link to={`/${pack.service2Slug}`} className="inline-flex items-center gap-1.5 bg-white px-3 py-2 rounded-lg text-sm text-[#111111] border border-[#E8E4DE] hover:border-[#D4AF37]/35 transition-all">
                   <ArrowRight className="w-3 h-3" style={{ color: "#D4AF37" }} />{pack.service2}
                 </Link>
-                <Link to={`/${pack.service1Slug}-${city.slug}`} className="inline-flex items-center gap-1.5 bg-white px-3 py-2 rounded-lg text-sm text-[#1A1A2E] border border-[#E8E4DE] hover:border-[#D4AF37]/35 transition-all">
+                <Link to={`/${pack.service1Slug}-${city.slug}`} className="inline-flex items-center gap-1.5 bg-white px-3 py-2 rounded-lg text-sm text-[#111111] border border-[#E8E4DE] hover:border-[#D4AF37]/35 transition-all">
                   <ArrowRight className="w-3 h-3" style={{ color: "#D4AF37" }} />{pack.service1} em {city.name}
                 </Link>
-                <Link to="/guia-de-packs" className="inline-flex items-center gap-1.5 bg-white px-3 py-2 rounded-lg text-sm text-[#1A1A2E] border border-[#E8E4DE] hover:border-[#D4AF37]/35 transition-all">
+                <Link to="/guia-de-packs" className="inline-flex items-center gap-1.5 bg-white px-3 py-2 rounded-lg text-sm text-[#111111] border border-[#E8E4DE] hover:border-[#D4AF37]/35 transition-all">
                   <ArrowRight className="w-3 h-3" style={{ color: "#D4AF37" }} />Todos os packs disponíveis
                 </Link>
               </div>

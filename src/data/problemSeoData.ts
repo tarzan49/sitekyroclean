@@ -938,7 +938,7 @@ const problemDefinitions: ProblemPage[] = [
     problemDetail: "Escolher a empresa certa para limpar os seus estofos é importante. Equipamento inadequado pode danificar tecidos, e produtos baratos podem deixar resíduos prejudiciais. Uma empresa profissional garante resultados seguros e eficazes.",
     solutionDetail: "A Kyro Clean Solutions utiliza equipamento de extração profissional, produtos certificados e tem técnicos formados. Oferecemos serviço ao domicílio em todo o Porto e Norte de Portugal, com garantia de satisfação.",
     benefits: [
-      "5.0 Google: 50 avaliações reais",
+      "5.0 Google: 60+ avaliações reais",
       "+1000 clientes satisfeitos",
       "Equipamento de extração profissional",
       "Produtos certificados e seguros",
@@ -1384,19 +1384,6 @@ export function getVisibleProblems(): ProblemPage[] {
 
 export function getProblemBySlug(slug: string): ProblemPage | null {
   return problemDefinitions.find(p => p.slug === slug) || null;
-}
-
-export function getProblemsByCategory(category: ProblemPage['category']): ProblemPage[] {
-  return problemDefinitions.filter(p => p.category === category && p.visible);
-}
-
-export function getAllProblemRoutes(): { path: string; slug: string }[] {
-  return problemDefinitions
-    .filter(p => p.visible)
-    .map(p => ({
-      path: `/problemas/${p.slug}`,
-      slug: p.slug,
-    }));
 }
 
 export function getRelatedProblemLinks(slugs: string[]): { name: string; path: string }[] {

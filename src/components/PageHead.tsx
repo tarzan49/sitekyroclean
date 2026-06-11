@@ -1,6 +1,7 @@
 ﻿import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { SITE_URL } from "@/constants/business";
 
 interface PageMeta {
   title: string;
@@ -248,8 +249,6 @@ const routeMeta: Record<string, { pt: PageMeta; en: PageMeta; es: PageMeta }> = 
   },
 };
 
-const DOMAIN = "https://cleansolutions.com.pt";
-
 const PageHead = () => {
   const location = useLocation();
   const { i18n } = useTranslation();
@@ -272,7 +271,7 @@ const PageHead = () => {
       const ogDesc = document.querySelector('meta[property="og:description"]');
       if (ogDesc) ogDesc.setAttribute("content", meta.description);
       const ogUrl = document.querySelector('meta[property="og:url"]');
-      if (ogUrl) ogUrl.setAttribute("content", `${DOMAIN}${path}`);
+      if (ogUrl) ogUrl.setAttribute("content", `${SITE_URL}${path}`);
 
       // Twitter tags
       const twTitle = document.querySelector('meta[name="twitter:title"]');
@@ -282,7 +281,7 @@ const PageHead = () => {
 
       // Canonical
       const canonical = document.querySelector('link[rel="canonical"]');
-      if (canonical) canonical.setAttribute("href", `${DOMAIN}${path}`);
+      if (canonical) canonical.setAttribute("href", `${SITE_URL}${path}`);
     }
 
     // Hreflang tags
@@ -295,7 +294,7 @@ const PageHead = () => {
       const link = document.createElement("link");
       link.rel = "alternate";
       link.hreflang = lng;
-      link.href = `${DOMAIN}${path}${lng !== "pt" ? `?lang=${lng}` : ""}`;
+      link.href = `${SITE_URL}${path}${lng !== "pt" ? `?lang=${lng}` : ""}`;
       document.head.appendChild(link);
     });
 
@@ -303,7 +302,7 @@ const PageHead = () => {
     const xDefault = document.createElement("link");
     xDefault.rel = "alternate";
     xDefault.setAttribute("hreflang", "x-default");
-    xDefault.href = `${DOMAIN}${path}`;
+    xDefault.href = `${SITE_URL}${path}`;
     document.head.appendChild(xDefault);
 
     return () => {
