@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { X, ChevronRight, ChevronLeft, Check, Flame, AlertTriangle } from 'lucide-react';
+import { X, ChevronRight, ChevronLeft, AlertTriangle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import { trackQuizEvent } from '@/lib/quizTracking';
@@ -50,7 +50,6 @@ const QuizForm = ({ isOpen, onClose, initialLocation, initialService, problema }
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(() => calcInitialStep(initialLocation, initialService));
   const [locationQuery, setLocationQuery] = useState('');
-  const [locationFadeIn, setLocationFadeIn] = useState(false);
   const [hypoallergenic, setHypoallergenic] = useState<boolean | null>(null);
   const [showExitIntent, setShowExitIntent] = useState(false);
   const [exitIntentFired, setExitIntentFired] = useState(false);
@@ -58,7 +57,6 @@ const QuizForm = ({ isOpen, onClose, initialLocation, initialService, problema }
   const [upsellShown, setUpsellShown] = useState(false);
   const [upsellItems, setUpsellItems] = useState<UpsellItemConfig[]>([]);
   const [upsellSubStep, setUpsellSubStep] = useState<'prompt' | 'select' | 'config'>('prompt');
-  const [showSummary, setShowSummary] = useState(false);
   const [sofaItems, setSofaItems] = useState<SofaItem[]>([]);
   const [mattressItems, setMattressItems] = useState<MattressItem[]>([]);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -129,7 +127,6 @@ const QuizForm = ({ isOpen, onClose, initialLocation, initialService, problema }
     serviceOnlyTotal,
     discountedPrice,
     packDiscountedPrice,
-    isSobOrcamento,
   } = useQuizPricing(formData, sofaItems, mattressItems, upsellItems);
 
   const {
@@ -216,8 +213,6 @@ const QuizForm = ({ isOpen, onClose, initialLocation, initialService, problema }
     }
   };
 
-  // Step 0 = location picker (only shown when no city pre-filled)
-  const needsLocationStep = !initialLocation;
   const firstStep = calcInitialStep(initialLocation, initialService);
 
   // Step order: [0-Location?], 1-Service, 2-ServiceType, 3-Config, [Upsell], 4-Contact (submit)

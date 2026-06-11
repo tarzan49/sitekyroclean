@@ -19,10 +19,6 @@ import { trackWhatsAppClick } from "@/lib/quizTracking";
 import { WHATSAPP_BASE } from "@/constants/business";
 import { useQuizLauncher } from "@/hooks/use-quiz-launcher";
 
-interface HeaderProps {
-  onOpenQuiz?: () => void;
-}
-
 const serviceLinks = [
   { to: '/limpeza-sofas',    label: 'Sofás' },
   { to: '/limpeza-colchoes', label: 'Colchões' },
@@ -33,7 +29,7 @@ const serviceLinks = [
   { to: '/antes-depois-limpeza', label: 'Antes e Depois' },
 ];
 
-const Header = ({ onOpenQuiz }: HeaderProps) => {
+const Header = () => {
   const [mobileMenuOpen, setMobileMenuOpen]     = useState(false);
   const [mobileServicesOpen, setMobileServicesOpen] = useState(false);
   const { isQuizOpen, openQuiz, closeQuiz } = useQuizLauncher();

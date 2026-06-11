@@ -1,4 +1,5 @@
 import { SITE_URL } from "@/constants/business";
+import { cities, DEFAULT_PRICE_FROM } from "@/data/locationSeoData";
 import {
   buildWebPageNode,
   buildBreadcrumbNode,
@@ -20,7 +21,7 @@ interface ServiceSchemaProps {
 
 const ServiceSchema = ({ serviceName, description, url, priceFrom, imageUrl, breadcrumbLabel, reviews }: ServiceSchemaProps) => {
   const fullUrl = `${SITE_URL}${url}`;
-  const priceNumeric = priceFrom.replace(/[^0-9]/g, '') || "39";
+  const priceNumeric = priceFrom.replace(/[^0-9]/g, '') || DEFAULT_PRICE_FROM.replace(/[^0-9]/g, '');
 
   const schema = {
     "@context": "https://schema.org",
@@ -38,14 +39,7 @@ const ServiceSchema = ({ serviceName, description, url, priceFrom, imageUrl, bre
         imageUrl,
         serviceType: serviceName,
         areaServed: [
-          { "@type": "City", "name": "Porto" },
-          { "@type": "City", "name": "Matosinhos" },
-          { "@type": "City", "name": "Maia" },
-          { "@type": "City", "name": "Vila Nova de Gaia" },
-          { "@type": "City", "name": "Gondomar" },
-          { "@type": "City", "name": "Braga" },
-          { "@type": "City", "name": "Guimarães" },
-          { "@type": "City", "name": "Lisboa" },
+          ...cities.map(city => ({ "@type": "City" as const, "name": city.name })),
           { "@type": "Country", "name": "Portugal" },
         ],
         offers: buildOfferNode(priceNumeric, { validFrom: "2025-01-01", priceValidUntil: "2026-12-31" }),

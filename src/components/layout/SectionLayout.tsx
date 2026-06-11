@@ -26,8 +26,7 @@ interface SectionLayoutProps {
   // CTA
   ctaText?: string;
   ctaAction?: () => void;
-  ctaLink?: string;
-  
+
   // Image
   image?: string;
   imageAlt?: string;
@@ -55,7 +54,6 @@ export const SectionLayout = ({
   benefits,
   ctaText,
   ctaAction,
-  ctaLink,
   image,
   imageAlt,
   reversed = false,

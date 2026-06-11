@@ -10,19 +10,6 @@ function getSections(): HTMLElement[] {
   );
 }
 
-/** Which section's center is closest to the viewport center */
-function getActiveIndex(sections: HTMLElement[]): number {
-  const mid = window.innerHeight / 2;
-  let best = 0;
-  let bestDist = Infinity;
-  sections.forEach((el, i) => {
-    const r = el.getBoundingClientRect();
-    const dist = Math.abs((r.top + r.bottom) / 2 - mid);
-    if (dist < bestDist) { bestDist = dist; best = i; }
-  });
-  return best;
-}
-
 function applyFocus(heroSection: HTMLElement | null, contentSections: HTMLElement[]) {
   // Hero section is always fully visible — never dimmed
   if (heroSection) {

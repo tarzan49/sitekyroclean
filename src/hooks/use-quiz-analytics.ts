@@ -4,8 +4,6 @@ import {
   trackQuizAbandonment,
   trackStepDuration,
   startStepTimer,
-  trackUpsellViewed,
-  trackUpsellAccepted,
   getDeviceType,
   QuizStep,
 } from '@/lib/analytics';
@@ -145,40 +143,4 @@ export function useQuizAnalytics({
   }, [currentStep, totalSteps, service, serviceType, location, timing, contactMethod, totalValue]);
 
   return { trackSubmission };
-}
-
-/**
- * Hook for tracking upsell interactions
- */
-export function useUpsellTracking(
-  service: string,
-  itemType: string,
-  upsellValue: number,
-  isVisible: boolean,
-  isAccepted: boolean
-) {
-  const hasTrackedView = useRef(false);
-  const hasTrackedAccept = useRef(false);
-
-  // Track upsell visibility
-  useEffect(() => {
-    if (isVisible && !hasTrackedView.current && upsellValue > 0) {
-      hasTrackedView.current = true;
-      trackUpsellViewed(service, itemType, upsellValue);
-    }
-  }, [isVisible, service, itemType, upsellValue]);
-
-  // Track upsell acceptance
-  useEffect(() => {
-    if (isAccepted && !hasTrackedAccept.current && upsellValue > 0) {
-      hasTrackedAccept.current = true;
-      trackUpsellAccepted(service, itemType, upsellValue);
-    }
-  }, [isAccepted, service, itemType, upsellValue]);
-
-  // Reset when item type changes
-  useEffect(() => {
-    hasTrackedView.current = false;
-    hasTrackedAccept.current = false;
-  }, [itemType]);
 }

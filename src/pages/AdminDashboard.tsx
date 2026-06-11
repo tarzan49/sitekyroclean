@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from 'react';
-import { MessageCircle, Download, RefreshCw, LogOut, TrendingUp, Users, Euro, Filter, Upload, Bell, Plus, Zap, X, Trash2, Check, Lock, Sparkles, AlertTriangle, CalendarDays, MapPin, Lightbulb, VolumeX, Flame, Droplets, RotateCcw } from 'lucide-react';
+import { MessageCircle, Download, RefreshCw, LogOut, TrendingUp, Users, Euro, Filter, Upload, Bell, Plus, Zap, X, Trash2, Check, Lock, AlertTriangle, CalendarDays, MapPin } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { supabase, type Lead, type LeadStatus } from '@/lib/supabase';
 
@@ -35,15 +35,6 @@ function getStatusCfg(s: string) { return STATUS_MAP[s] ?? DEFAULT_STATUS; }
 
 // Legacy alias for dropdown (quiz CRM statuses that can be assigned)
 const STATUS_CONFIG = STATUS_MAP;
-
-// ── Priority config ───────────────────────────────────────────────────────────
-const PRIORITY_MAP: Record<string, { label: string; color: string }> = {
-  'Urgente': { label: 'Urgente', color: 'bg-red-500/20 text-red-300 border-red-500/40' },
-  'Quente':  { label: 'Quente',  color: 'bg-orange-500/15 text-orange-300 border-orange-400/30' },
-  'Morno':   { label: 'Morno',   color: 'bg-amber-500/15 text-amber-300 border-amber-400/30' },
-  'Frio':    { label: 'Frio',    color: 'bg-sky-500/15 text-sky-300 border-sky-400/30' },
-  'Fechado': { label: 'Fechado', color: 'bg-green-500/15 text-green-300 border-green-400/30' },
-};
 
 // ── Simplified filter groups (dropdown) ──────────────────────────────────────
 const FILTER_STATUSES = [
@@ -204,7 +195,7 @@ const AdminDashboard = ({ embedded = false }: { embedded?: boolean }) => {
   // Filters
   const [filterStatus, setFilterStatus] = useState<string>('all');
   const [filterCity, setFilterCity] = useState('all');
-  const [filterAssigned, setFilterAssigned] = useState('all');
+  const [filterAssigned] = useState('all');
   const [filterPriority, setFilterPriority] = useState('all');
   const [filterStaleOnly, setFilterStaleOnly] = useState(false);
 

@@ -5,6 +5,7 @@ import { QuizServiceProvider } from "@/context/QuizLocationContext";
 import GlobalPromoBanner from "@/components/GlobalPromoBanner";
 import Footer from "@/components/Footer";
 import ServiceCityLinks from "@/components/ServiceCityLinks";
+import { DEFAULT_PRICE_FROM } from "@/data/locationSeoData";
 import ServiceFAQ from "@/components/ServiceFAQ";
 import ServiceSchema from "@/components/ServiceSchema";
 import ServiceHero from "@/components/ServiceHero";
@@ -127,7 +128,7 @@ const LimpezaSofas = () => {
           serviceName="Limpeza de Sofás"
           description="Limpeza e lavagem profissional de sofás ao domicílio no Porto. Remoção de manchas, ácaros e odores."
           url="/limpeza-sofas"
-          priceFrom="39€"
+          priceFrom={DEFAULT_PRICE_FROM}
           reviews={[
             { author: "Maria S.", city: "Porto", text: "Parece novo outra vez. O meu sofá tinha 8 anos e achei que ia ter de comprar um novo. A Clean Solutions devolveu-lhe a vida!", date: "2025-03-15" },
             { author: "Rui T.", city: "Espinho", text: "Tinham-me dito que a nódoa de vinho não saía. A Clean Solutions provou o contrário! Sofá como novo.", date: "2025-04-02" },

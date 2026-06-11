@@ -1,7 +1,7 @@
 ﻿import { useMemo, useEffect } from "react";
 import { useLocation, Link } from "react-router-dom";
 import { QuizLocationProvider, QuizServiceProvider } from "@/context/QuizLocationContext";
-import { CheckCircle, XCircle, ArrowRight, Search, Sparkles, Droplets, Wind, MessageCircle } from "lucide-react";
+import { XCircle, ArrowRight, Search, Sparkles, Droplets, Wind, MessageCircle } from "lucide-react";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";

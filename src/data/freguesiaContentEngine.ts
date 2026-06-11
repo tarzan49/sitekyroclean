@@ -8,7 +8,7 @@
 // ─── Hash / Seed ─────────────────────────────────────────────────
 
 /** Deterministic seed from a string: same slug always returns same number */
-export function getSeed(slug: string): number {
+function getSeed(slug: string): number {
   return slug.split('').reduce((acc, char, i) => acc + char.charCodeAt(0) * (i + 1), 0);
 }
 

@@ -1,7 +1,7 @@
 // Programmatic SEO: Material pages data engine
 // Targets searches like "limpeza sofa tecido", "limpeza sofa veludo porto"
 
-import { cities, services } from "./locationSeoData";
+import { cities } from "./locationSeoData";
 
 export interface MaterialDefinition {
   slug: string;

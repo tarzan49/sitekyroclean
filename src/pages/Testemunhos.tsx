@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from "react";
-import { Star, Sparkles, Quote, Trophy, Users, CheckCircle } from "lucide-react";
+import { Star, Quote, Trophy, Users, CheckCircle } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import Header from "@/components/Header";
 import GlobalPromoBanner from "@/components/GlobalPromoBanner";

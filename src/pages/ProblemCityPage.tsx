@@ -8,10 +8,10 @@ import QuizButton from "@/components/QuizButton";
 import ServiceFAQSchema from "@/components/ServiceFAQSchema";
 import ServiceLocationSchema from "@/components/ServiceLocationSchema";
 import { getProblemBySlug, getRelatedProblemLinks } from "@/data/problemSeoData";
-import { cities, services } from "@/data/locationSeoData";
+import { cities, services, DEFAULT_PRICE_FROM } from "@/data/locationSeoData";
 import { SERVICE_TO_QUIZ } from "@/constants/serviceToQuiz";
-import { METRO_CITIES, METRO_CITY_SLUGS } from "@/constants/metroCities";
-import { getAllProblemCityRoutes, type ProblemCityRoute } from "@/data/problemCitySeoData";
+import { METRO_CITY_SLUGS } from "@/constants/metroCities";
+import { getAllProblemCityRoutes } from "@/data/problemCitySeoData";
 import { getProblemHeroImage } from "@/lib/problemHeroImages";
 import { SITE_URL, WHATSAPP_BASE, PHONE_E164 } from "@/constants/business";
 
@@ -84,7 +84,7 @@ const ProblemCityPage = () => {
   const relatedServiceData = problem.relatedServices
     .map(slug => services.find(s => s.slug === slug))
     .filter(Boolean) as typeof services[number][];
-  const priceFrom = relatedServiceData[0]?.priceFrom ?? "39€";
+  const priceFrom = relatedServiceData[0]?.priceFrom ?? DEFAULT_PRICE_FROM;
   const cityContext = getCityContext(problem.slug, city.name, city.description);
 
   // Only show nearby cities that actually have a route for this problem

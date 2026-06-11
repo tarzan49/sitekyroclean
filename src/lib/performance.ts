@@ -1,27 +1,3 @@
-export const criticalStyles = `
-  .hero-placeholder {
-    background: linear-gradient(135deg, #0d3c47 0%, #1a5a5f 100%);
-    min-height: 100vh;
-  }
-`;
-
-export const preloadCriticalResources = (): void => {
-  const origins = [
-    'https://fonts.googleapis.com',
-    'https://fonts.gstatic.com',
-  ];
-
-  origins.forEach(origin => {
-    const link = document.createElement('link');
-    link.rel = 'preconnect';
-    link.href = origin;
-    link.crossOrigin = 'anonymous';
-    if (!document.head.querySelector(`link[href="${origin}"]`)) {
-      document.head.appendChild(link);
-    }
-  });
-};
-
 export const measureWebVitals = (): void => {
   if (typeof window === 'undefined') return;
 

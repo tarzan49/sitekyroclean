@@ -99,33 +99,6 @@ export function useQuizPricing(
     ? Math.round(serviceOnlyTotal * 0.9) + finalTravelCost
     : discountedPrice;
 
-  // Determine if this request requires a custom quote (no fixed price available)
-  const isSobOrcamento = useMemo(() => {
-    switch (formData.service) {
-      case 'sofa': {
-        // Only sob orçamento when 4+ lugares is selected (no fixed price)
-        if (!sofaItems.some(i => i.qty > 0)) return false;
-        return sofaItems.some(i => i.qty > 0 && i.sizeId === '4+-lugares');
-      }
-      case 'mattress': {
-        // All mattress sizes have fixed prices
-        return false;
-      }
-      case 'chairs': {
-        const chairQty = parseInt(formData.chairQuantity);
-        const cleanSob = isNaN(chairQty) || chairQty <= 0 || chairQty >= 10;
-        const waterSob = formData.chairWaterproofQty > 10;
-        return cleanSob || waterSob;
-      }
-      case 'carpet': {
-        const area = parseFloat(formData.carpetArea);
-        return isNaN(area) || area <= 0 || area > 15;
-      }
-      default:
-        return false;
-    }
-  }, [formData.service, formData.serviceType, formData.sofaSize, formData.mattressSize, formData.chairType, sofaItems, mattressItems]);
-
   return {
     calculateServicePrice,
     travelCost,
@@ -139,6 +112,5 @@ export function useQuizPricing(
     serviceOnlyTotal,
     discountedPrice,
     packDiscountedPrice,
-    isSobOrcamento,
   };
 }

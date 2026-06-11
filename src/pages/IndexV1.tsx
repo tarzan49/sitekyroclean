@@ -18,13 +18,9 @@ const SectionLoader = () => (
 );
 
 const IndexV1 = () => {
-  const handleOpenQuiz = () => {
-    window.dispatchEvent(new CustomEvent('openQuiz'));
-  };
-
   return (
     <div className="min-h-screen">
-      <Header onOpenQuiz={handleOpenQuiz} />
+      <Header />
       <main>
         <HeroV1 />
 

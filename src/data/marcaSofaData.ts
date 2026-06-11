@@ -273,7 +273,7 @@ export const marcas: MarcaSofa[] = [
   },
 ];
 
-export const marcaCities = [
+const marcaCities = [
   { name: "Porto", slug: "porto" },
   { name: "Lisboa", slug: "lisboa" },
   { name: "Braga", slug: "braga" },

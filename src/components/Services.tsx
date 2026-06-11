@@ -170,7 +170,6 @@ const Services = () => {
 
   const [isVisible,    setIsVisible]    = useState(false);
   const [cardWidth,    setCardWidth]    = useState(0);
-  const [containerW,   setContainerW]   = useState(0);
   const [visibleCount, setVisibleCount] = useState(3);
   const [offsetIndex,  setOffsetIndex]  = useState(CLONES);   // extended index
   const [animated,     setAnimated]     = useState(true);
@@ -185,7 +184,6 @@ const Services = () => {
       if (!containerRef.current) return;
       const w = containerRef.current.offsetWidth;
       const { visibleCount: vc, cardWidth: cw } = getLayout(w);
-      setContainerW(w);
       setCardWidth(cw);
       setVisibleCount(vc);
     };

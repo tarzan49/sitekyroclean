@@ -5,6 +5,7 @@ import { QuizServiceProvider } from "@/context/QuizLocationContext";
 import GlobalPromoBanner from "@/components/GlobalPromoBanner";
 import Footer from "@/components/Footer";
 import ServiceCityLinks from "@/components/ServiceCityLinks";
+import { DEFAULT_PRICE_FROM } from "@/data/locationSeoData";
 import ServiceFAQ from "@/components/ServiceFAQ";
 import ServiceSchema from "@/components/ServiceSchema";
 import ServiceHero from "@/components/ServiceHero";
@@ -127,7 +128,7 @@ const LimpezaColchoes = () => {
           serviceName="Limpeza de Colchões"
           description="Higienização profissional de colchões no Porto. Eliminação de ácaros, bactérias e odores."
           url="/limpeza-colchoes"
-          priceFrom="39€"
+          priceFrom={DEFAULT_PRICE_FROM}
           reviews={[
             { author: "Fernando G.", city: "Rio Tinto", text: "Excelente trabalho no meu colchão. Tinha alergia constante e depois da limpeza melhorou imenso. Super recomendo!", date: "2025-01-28" },
             { author: "Sofia P.", city: "Guimarães", text: "Fantástico! O colchão estava com manchas difíceis e conseguiram remover tudo. Muito satisfeita com o resultado.", date: "2025-03-10" },

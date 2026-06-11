@@ -1,7 +1,5 @@
 import { useState, useEffect, lazy, Suspense } from "react";
-import { trackWhatsAppClick } from "@/lib/quizTracking";
 import { ArrowRight } from "lucide-react";
-import { WHATSAPP_BASE } from "@/constants/business";
 import { useQuizLauncher } from "@/hooks/use-quiz-launcher";
 
 const QuizForm = lazy(() => import('./QuizFormLazy'));
@@ -38,8 +36,6 @@ const Hero = () => {
   const scrollToResults = () => {
     document.getElementById('resultados')?.scrollIntoView({ behavior: 'smooth' });
   };
-
-  const waHref = `${WHATSAPP_BASE}?text=${encodeURIComponent('Olá, gostaria de pedir um orçamento para limpeza de estofos.')}`;
 
   return (
     <>

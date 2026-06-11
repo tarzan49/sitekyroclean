@@ -20,6 +20,9 @@ export interface LocationService {
   priceFrom: string;
 }
 
+// Default "from" price shown when a specific service price isn't available
+export const DEFAULT_PRICE_FROM = "39€";
+
 // Cities configuration
 export const cities = [
   // Área Metropolitana do Porto: Primary

@@ -4,7 +4,7 @@ import { Clock, ArrowRight, ChevronRight, Calendar, User, Lightbulb } from "luci
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import QuizButton from "@/components/QuizButton";
-import { getAllPosts, getPostBySlug, getRelatedPosts } from "@/data/blogData";
+import { getPostBySlug, getRelatedPosts } from "@/data/blogData";
 import { SITE_URL } from "@/constants/business";
 
 import imgSofaTecido    from "@/assets/hero-p-limpeza-sofa-tecido.webp";

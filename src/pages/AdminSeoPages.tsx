@@ -2,7 +2,7 @@ import { useState, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { Search, ExternalLink, Eye, EyeOff, FileText, MapPin, AlertTriangle, Settings2, Zap } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { getAllProblems, problemCategories, type ProblemPage } from "@/data/problemSeoData";
+import { getAllProblems, problemCategories } from "@/data/problemSeoData";
 import { getAllLocationRoutes, services, cities } from "@/data/locationSeoData";
 import { getAllFreguesiaRoutes, municipiosComFreguesias } from "@/data/freguesiaSeoData";
 import { getAllKeywordVariantRoutes } from "@/data/keywordVariantData";

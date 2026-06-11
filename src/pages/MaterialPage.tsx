@@ -16,7 +16,7 @@ import {
   getMaterialCityData,
   getRelatedMaterialLinks,
 } from "@/data/materialSeoData";
-import { cities, services } from "@/data/locationSeoData";
+import { cities, services, DEFAULT_PRICE_FROM } from "@/data/locationSeoData";
 import { SITE_URL, WHATSAPP_BASE } from "@/constants/business";
 import { buildMaterialWaMessage } from "@/lib/whatsappMessages";
 import { MATERIAL_HERO, MATERIAL_HERO_FALLBACK } from "@/data/materialHeroImages";
@@ -52,8 +52,8 @@ const MaterialPage = () => {
   const quizService = data ? SERVICE_TO_QUIZ[data.serviceSlug] : undefined;
 
   const servicePrice = useMemo(() => {
-    if (!data) return "39€";
-    return services.find(s => s.slug === data.serviceSlug)?.priceFrom ?? "39€";
+    if (!data) return DEFAULT_PRICE_FROM;
+    return services.find(s => s.slug === data.serviceSlug)?.priceFrom ?? DEFAULT_PRICE_FROM;
   }, [data]);
 
   useEffect(() => {

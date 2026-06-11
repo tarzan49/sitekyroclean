@@ -1,4 +1,5 @@
 import { SITE_URL } from "@/constants/business";
+import { DEFAULT_PRICE_FROM } from "@/data/locationSeoData";
 import {
   buildWebPageNode,
   buildBreadcrumbNode,
@@ -19,7 +20,7 @@ interface Props {
 }
 
 const ServiceLocationSchema = ({ serviceName, serviceBaseUrl, placeName, parentPlace, description, pageUrl, priceFrom }: Props) => {
-  const priceNum = /\d+/.exec(priceFrom)?.[0] ?? "39";
+  const priceNum = /\d+/.exec(priceFrom)?.[0] ?? DEFAULT_PRICE_FROM.replace(/[^0-9]/g, '');
   const fullUrl = `${SITE_URL}${pageUrl}`;
 
   const areaServed: AreaServed = parentPlace
