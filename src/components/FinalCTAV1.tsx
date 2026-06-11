@@ -1,19 +1,13 @@
-import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Phone, MapPin } from "lucide-react";
 import { trackCallClick } from "@/lib/analytics";
 import QuizForm from './QuizFormLazy';
 import { PHONE_TEL, PHONE_DISPLAY } from "@/constants/business";
+import { useQuizLauncher } from "@/hooks/use-quiz-launcher";
 
 const FinalCTA = () => {
   const { t } = useTranslation();
-  const [isQuizOpen, setIsQuizOpen] = useState(false);
-
-  const openQuiz = () => {
-    window.dispatchEvent(new CustomEvent('quizOpened'));
-    sessionStorage.setItem('hasClickedQuote', '1');
-    setIsQuizOpen(true);
-  };
+  const { isQuizOpen, openQuiz, closeQuiz } = useQuizLauncher();
 
   return (
     <>
@@ -67,7 +61,7 @@ const FinalCTA = () => {
         </div>
       </section>
 
-      <QuizForm isOpen={isQuizOpen} onClose={() => setIsQuizOpen(false)} />
+      <QuizForm isOpen={isQuizOpen} onClose={closeQuiz} />
     </>
   );
 };

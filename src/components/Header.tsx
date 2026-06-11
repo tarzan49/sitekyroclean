@@ -17,6 +17,7 @@ import QuizForm from "./QuizFormLazy";
 import { useQuizLocation, useQuizService } from "@/context/QuizLocationContext";
 import { trackWhatsAppClick } from "@/lib/quizTracking";
 import { WHATSAPP_BASE } from "@/constants/business";
+import { useQuizLauncher } from "@/hooks/use-quiz-launcher";
 
 interface HeaderProps {
   onOpenQuiz?: () => void;
@@ -35,17 +36,11 @@ const serviceLinks = [
 const Header = ({ onOpenQuiz }: HeaderProps) => {
   const [mobileMenuOpen, setMobileMenuOpen]     = useState(false);
   const [mobileServicesOpen, setMobileServicesOpen] = useState(false);
-  const [isQuizOpen, setIsQuizOpen]             = useState(false);
+  const { isQuizOpen, openQuiz, closeQuiz } = useQuizLauncher();
   const navigate  = useNavigate();
   const location  = useLocation();
   const quizLocation = useQuizLocation();
   const quizService  = useQuizService();
-
-  const openQuiz = () => {
-    window.dispatchEvent(new CustomEvent('quizOpened'));
-    sessionStorage.setItem('hasClickedQuote', '1');
-    setIsQuizOpen(true);
-  };
 
   const scrollToSection = (id: string) => {
     setMobileMenuOpen(false);
@@ -288,7 +283,7 @@ const Header = ({ onOpenQuiz }: HeaderProps) => {
 
     <QuizForm
       isOpen={isQuizOpen}
-      onClose={() => setIsQuizOpen(false)}
+      onClose={closeQuiz}
       initialLocation={quizLocation}
       initialService={quizService}
     />

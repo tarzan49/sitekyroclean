@@ -1,29 +1,18 @@
 import { ChevronLeft, ChevronRight, Check, X, Shield } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { sofaPrices, mattressPrices } from '@/components/quiz/QuizTypes';
-import type { QuizFormData, SofaItem, MattressItem, UpsellItemConfig } from '@/components/quiz/QuizTypes';
+import type { QuizFormData, UpsellItemConfig } from '@/components/quiz/QuizTypes';
 import {
   sofaSetQty, sofaTogglePack,
   mattressSetQty, mattressTogglePack,
   calcCarpetPrice, calcChairClean,
 } from '@/components/quiz/quizHelpers';
+import { useUpsellSelection } from './useUpsellSelection';
 
 interface QuizUpsellOverlayProps {
   formData: Pick<QuizFormData, 'serviceType'>;
   upsellSubStep: 'prompt' | 'select' | 'config';
   setUpsellSubStep: (v: 'prompt' | 'select' | 'config') => void;
-  pendingUpsellId: string | null;
-  setPendingUpsellId: (v: string | null) => void;
-  pendingSofaItems: SofaItem[];
-  setPendingSofaItems: React.Dispatch<React.SetStateAction<SofaItem[]>>;
-  pendingMattressItems: MattressItem[];
-  setPendingMattressItems: React.Dispatch<React.SetStateAction<MattressItem[]>>;
-  pendingCarpetArea: string;
-  setPendingCarpetArea: (v: string) => void;
-  pendingChairQtyNum: number;
-  setPendingChairQtyNum: React.Dispatch<React.SetStateAction<number>>;
-  pendingWaterproof: boolean;
-  setPendingWaterproof: React.Dispatch<React.SetStateAction<boolean>>;
   upsellItems: UpsellItemConfig[];
   setUpsellItems: React.Dispatch<React.SetStateAction<UpsellItemConfig[]>>;
   totalPrice: number;
@@ -68,18 +57,6 @@ const QuizUpsellOverlay = ({
   formData,
   upsellSubStep,
   setUpsellSubStep,
-  pendingUpsellId,
-  setPendingUpsellId,
-  pendingSofaItems,
-  setPendingSofaItems,
-  pendingMattressItems,
-  setPendingMattressItems,
-  pendingCarpetArea,
-  setPendingCarpetArea,
-  pendingChairQtyNum,
-  setPendingChairQtyNum,
-  pendingWaterproof,
-  setPendingWaterproof,
   upsellItems,
   setUpsellItems,
   totalPrice,
@@ -88,14 +65,15 @@ const QuizUpsellOverlay = ({
   onBack,
 }: QuizUpsellOverlayProps) => {
 
-  const resetPending = () => {
-    setPendingUpsellId(null);
-    setPendingSofaItems([]);
-    setPendingMattressItems([]);
-    setPendingCarpetArea('');
-    setPendingChairQtyNum(1);
-    setPendingWaterproof(false);
-  };
+  const {
+    pendingUpsellId, setPendingUpsellId,
+    pendingSofaItems, setPendingSofaItems,
+    pendingMattressItems, setPendingMattressItems,
+    pendingCarpetArea, setPendingCarpetArea,
+    pendingChairQtyNum, setPendingChairQtyNum,
+    pendingWaterproof, setPendingWaterproof,
+    resetPending,
+  } = useUpsellSelection();
 
   return (
     <div className="flex-1 flex flex-col w-full items-center">

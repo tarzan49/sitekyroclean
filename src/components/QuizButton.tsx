@@ -1,5 +1,5 @@
-import { useState } from 'react';
 import QuizForm from './QuizFormLazy';
+import { useQuizLauncher } from "@/hooks/use-quiz-launcher";
 
 interface QuizButtonProps {
   className?: string;
@@ -11,15 +11,9 @@ interface QuizButtonProps {
 }
 
 const QuizButton = ({ className = '', buttonClassName = '', problema, ctaLabel, initialLocation, initialService }: QuizButtonProps) => {
-  const [isQuizOpen, setIsQuizOpen] = useState(false);
+  const { isQuizOpen, openQuiz, closeQuiz } = useQuizLauncher();
 
   const label = ctaLabel ?? 'Calcular o meu preço';
-
-  const openQuiz = () => {
-    window.dispatchEvent(new CustomEvent('quizOpened'));
-    sessionStorage.setItem('hasClickedQuote', '1');
-    setIsQuizOpen(true);
-  };
 
   return (
     <>
@@ -43,7 +37,7 @@ const QuizButton = ({ className = '', buttonClassName = '', problema, ctaLabel, 
         </button>
       </div>
 
-      <QuizForm isOpen={isQuizOpen} onClose={() => setIsQuizOpen(false)} problema={problema} initialLocation={initialLocation} initialService={initialService} />
+      <QuizForm isOpen={isQuizOpen} onClose={closeQuiz} problema={problema} initialLocation={initialLocation} initialService={initialService} />
     </>
   );
 };

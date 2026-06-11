@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
@@ -7,7 +7,6 @@ import { X, ChevronRight, ChevronLeft, Check, Flame, AlertTriangle } from 'lucid
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import { trackQuizEvent } from '@/lib/quizTracking';
-import { logError } from '@/lib/errorTracking';
 import { useQuizAnalytics } from '@/hooks/use-quiz-analytics';
 import ConfettiGold from './quiz/ConfettiGold';
 import {
@@ -16,15 +15,18 @@ import {
   initialFormData,
   sofaPrices,
   mattressPrices,
-  locationPrices,
 } from './quiz';
 import type { QuizFormData, SofaItem, MattressItem, UpsellItemConfig } from './quiz';
 import QuizStepLocation from './quiz/steps/QuizStepLocation';
 import QuizStepConfig from './quiz/steps/QuizStepConfig';
 import QuizUpsellOverlay from './quiz/steps/QuizUpsellOverlay';
 import QuizStepContact from './quiz/steps/QuizStepContact';
-import { calcCarpetPrice, calcChairClean, calcChairWaterproof } from './quiz/quizHelpers';
+import { calcChairWaterproof } from './quiz/quizHelpers';
 import { WHATSAPP_BASE, BUSINESS_EMAIL } from '@/constants/business';
+import { QUIZ_STATE_CHANGE_EVENT } from '@/constants/quiz';
+import { useQuizPricing } from '@/hooks/use-quiz-pricing';
+import { useQuizUiEffects } from '@/hooks/use-quiz-ui-effects';
+import { useQuizSubmission } from '@/hooks/use-quiz-submission';
 
 
 interface QuizFormProps {
@@ -42,17 +44,6 @@ function calcInitialStep(loc?: string, svc?: string): number {
   return skipType ? 3 : 2;
 }
 
-// sessionStorage can throw (e.g. Safari Private Browsing, restricted in-app browsers).
-// These values are only used to enrich the "Obrigado" page, so a failure here must
-// never block the success flow once the lead has already been sent to Formspree.
-function safeSessionSet(key: string, value: string) {
-  try {
-    sessionStorage.setItem(key, value);
-  } catch (e) {
-    console.warn(`[QuizForm] sessionStorage.setItem("${key}") failed:`, e);
-  }
-}
-
 const QuizForm = ({ isOpen, onClose, initialLocation, initialService, problema }: QuizFormProps) => {
   const { t } = useTranslation();
   const { toast } = useToast();
@@ -60,31 +51,16 @@ const QuizForm = ({ isOpen, onClose, initialLocation, initialService, problema }
   const [currentStep, setCurrentStep] = useState(() => calcInitialStep(initialLocation, initialService));
   const [locationQuery, setLocationQuery] = useState('');
   const [locationFadeIn, setLocationFadeIn] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [countdown, setCountdown] = useState(10 * 60);
-  const [displayPrice, setDisplayPrice] = useState(0);
   const [hypoallergenic, setHypoallergenic] = useState<boolean | null>(null);
-  const [socialProofIdx, setSocialProofIdx] = useState(0);
   const [showExitIntent, setShowExitIntent] = useState(false);
   const [exitIntentFired, setExitIntentFired] = useState(false);
-  const [exitIntentUnlocked, setExitIntentUnlocked] = useState(false);
   const [showUpsell, setShowUpsell] = useState(false);
   const [upsellShown, setUpsellShown] = useState(false);
   const [upsellItems, setUpsellItems] = useState<UpsellItemConfig[]>([]);
   const [upsellSubStep, setUpsellSubStep] = useState<'prompt' | 'select' | 'config'>('prompt');
-  const [pendingUpsellId, setPendingUpsellId] = useState<string | null>(null);
-  const [pendingSofaItems, setPendingSofaItems] = useState<SofaItem[]>([]);
-  const [pendingMattressItems, setPendingMattressItems] = useState<MattressItem[]>([]);
-  const [pendingCarpetArea, setPendingCarpetArea] = useState('');
-  const [pendingChairQty, setPendingChairQty] = useState('');
-  const [pendingChairQtyNum, setPendingChairQtyNum] = useState(1);
-  const [pendingWaterproof, setPendingWaterproof] = useState(false);
   const [showSummary, setShowSummary] = useState(false);
-  const [timerFlash, setTimerFlash] = useState(false);
   const [sofaItems, setSofaItems] = useState<SofaItem[]>([]);
   const [mattressItems, setMattressItems] = useState<MattressItem[]>([]);
-  const [confettiActive, setConfettiActive] = useState(false);
-  const prevTotalRef = useRef(0);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [formData, setFormData] = useState<QuizFormData>(() => ({
     ...initialFormData,
@@ -138,133 +114,45 @@ const QuizForm = ({ isOpen, onClose, initialLocation, initialService, problema }
     };
   }, []);
 
-  // ── TIMER KEY ──────────────────────────────────────────────────────────────
-  const TIMER_KEY = 'kyro_timer_expiry';
-  const TIMER_DURATION = 10 * 60; // 10 minutes in seconds
-
-  // ── DISCOUNT ───────────────────────────────────────────────────────────────
-  const isDiscountActive = countdown > 0;
-
-  // packDiscountActive computed below after totalPrice
-
-  // Calculate total price early for analytics (moved up for hook dependency)
-  const calculateServicePrice = useMemo(() => {
-    let price = 0;
-    
-    switch (formData.service) {
-      case 'sofa': {
-        const hasSofas = sofaItems.some(i => i.qty > 0);
-        sofaItems.forEach(item => {
-          if (item.qty <= 0) return;
-          const opt = sofaPrices.find(p => p.id === item.sizeId);
-          if (!opt) return;
-          const isWaterproofBase = formData.serviceType === 'waterproofing';
-          const baseP = isWaterproofBase
-            ? (typeof opt.waterproofingPrice === 'number' ? (opt.waterproofingPrice as number) : 0)
-            : (typeof opt.cleaningPrice === 'number' ? (opt.cleaningPrice as number) : 0);
-          const bothP = typeof opt.bothPrice === 'number' ? (opt.bothPrice as number) : baseP + 40;
-          const unitPrice = item.packEnabled ? bothP : baseP;
-          if (unitPrice > 0) price += unitPrice * item.qty;
-        });
-        break;
-      }
-
-      case 'mattress': {
-        mattressItems.forEach(item => {
-          if (item.qty <= 0) return;
-          const opt = mattressPrices.find(p => p.id === item.sizeId);
-          if (!opt) return;
-          const isWaterproofBase = formData.serviceType === 'waterproofing';
-          const baseP = isWaterproofBase
-            ? (typeof opt.waterproofingPrice === 'number' ? (opt.waterproofingPrice as number) : 0)
-            : (typeof opt.cleaningPrice === 'number' ? (opt.cleaningPrice as number) : 0);
-          const bothP = typeof opt.bothPrice === 'number' ? (opt.bothPrice as number) : baseP + 30;
-          const unitPrice = item.packEnabled ? bothP : baseP;
-          if (unitPrice > 0) price += unitPrice * item.qty;
-        });
-        break;
-      }
-        
-      case 'chairs': {
-        const chairQty = parseInt(formData.chairQuantity);
-        if (!isNaN(chairQty) && chairQty > 0) {
-          price = formData.serviceType === 'waterproofing'
-            ? (calcChairWaterproof(chairQty) ?? 0)
-            : (calcChairClean(chairQty) ?? 0);
-        }
-        const addonQty = formData.chairWaterproofQty;
-        if (addonQty > 0) {
-          price += formData.serviceType === 'waterproofing'
-            ? (calcChairClean(addonQty) ?? 0)
-            : (calcChairWaterproof(addonQty) ?? 0);
-        }
-        break;
-      }
-
-      case 'carpet': {
-        const carpetArea = parseFloat(formData.carpetArea);
-        if (!isNaN(carpetArea) && carpetArea > 0) {
-          price = calcCarpetPrice(carpetArea) ?? 0;
-        }
-        break;
-      }
-    }
-
-    return price;
-  }, [formData, sofaItems, mattressItems]);
-
-  // Calculate travel cost: uses expanded locationPrices from QuizTypes
-  const travelCost = useMemo(() => {
-    if (!formData.location || formData.location === 'other') return 0;
-    return locationPrices[formData.location] ?? 0;
-  }, [formData.location]);
-
-  const isFreeTravel = calculateServicePrice >= 150;
-  const finalTravelCost = isFreeTravel ? 0 : travelCost;
   const hypoSurcharge = 0;
 
-  const safePrice = (n: number) => (isNaN(n) || n == null) ? 0 : n;
-  const upsellItemsTotal = upsellItems.reduce((sum, item) => sum + safePrice(item.price), 0);
-  const totalPrice = safePrice(calculateServicePrice) + safePrice(upsellItemsTotal) + safePrice(finalTravelCost) + safePrice(hypoSurcharge);
-  // True when the user has qty>0 of the "4+ lugares" sofa (no fixed price → custom quote)
-  const hasSobOrcamento = sofaItems.some(i => i.sizeId === '4+-lugares' && i.qty > 0);
-  // Any upsell item with price=0 is a SOB item (chairs ≥10, carpet >15m², sofa 4+ lugares)
-  const hasUpsellSobItem = upsellItems.some(i => i.price === 0);
-  // Pack 10% activates: cart ≥149€ in known prices, OR cart >100€ + any SOB item
-  const packDiscountActive = totalPrice >= 149 || (totalPrice > 100 && (hasUpsellSobItem || hasSobOrcamento));
-  const packDiscountPct = packDiscountActive ? 0.10 : 0;
-  const serviceOnlyTotal = calculateServicePrice + upsellItemsTotal + hypoSurcharge;
-  const discountedPrice = Math.round(totalPrice);
-  const packDiscountedPrice = packDiscountActive && totalPrice > 0
-    ? Math.round(serviceOnlyTotal * 0.9) + finalTravelCost
-    : discountedPrice;
+  const {
+    calculateServicePrice,
+    travelCost,
+    isFreeTravel,
+    finalTravelCost,
+    totalPrice,
+    hasSobOrcamento,
+    hasUpsellSobItem,
+    packDiscountActive,
+    packDiscountPct,
+    serviceOnlyTotal,
+    discountedPrice,
+    packDiscountedPrice,
+    isSobOrcamento,
+  } = useQuizPricing(formData, sofaItems, mattressItems, upsellItems);
 
-  // Determine if this request requires a custom quote (no fixed price available)
-  const isSobOrcamento = useMemo(() => {
-    switch (formData.service) {
-      case 'sofa': {
-        // Only sob orçamento when 4+ lugares is selected (no fixed price)
-        if (!sofaItems.some(i => i.qty > 0)) return false;
-        return sofaItems.some(i => i.qty > 0 && i.sizeId === '4+-lugares');
-      }
-      case 'mattress': {
-        // All mattress sizes have fixed prices
-        return false;
-      }
-      case 'chairs': {
-        const chairQty = parseInt(formData.chairQuantity);
-        const cleanSob = isNaN(chairQty) || chairQty <= 0 || chairQty >= 10;
-        const waterSob = formData.chairWaterproofQty > 10;
-        return cleanSob || waterSob;
-      }
-      case 'carpet': {
-        const area = parseFloat(formData.carpetArea);
-        return isNaN(area) || area <= 0 || area > 15;
-      }
-      default:
-        return false;
-    }
-  }, [formData.service, formData.serviceType, formData.sofaSize, formData.mattressSize, formData.chairType, sofaItems, mattressItems]);
+  const {
+    countdown,
+    displayPrice,
+    socialProofIdx,
+    socialProofMessages,
+    confettiActive,
+    exitIntentUnlocked,
+    formatCountdown,
+    isDiscountActive,
+    resetUiEffects,
+  } = useQuizUiEffects({
+    isOpen,
+    scrollContainerRef,
+    currentStep,
+    showUpsell,
+    totalPrice,
+    packDiscountActive,
+    hasUpsellSobItem,
+    location: formData.location,
+    toast,
+  });
 
   // Quiz analytics tracking
   const { trackSubmission } = useQuizAnalytics({
@@ -289,7 +177,7 @@ const QuizForm = ({ isOpen, onClose, initialLocation, initialService, problema }
 
   // Notify other components of quiz open/close state
   useEffect(() => {
-    window.dispatchEvent(new CustomEvent('quizStateChange', { detail: { isOpen } }));
+    window.dispatchEvent(new CustomEvent(QUIZ_STATE_CHANGE_EVENT, { detail: { isOpen } }));
   }, [isOpen]);
 
   // Exit intent: warn before page unload
@@ -303,129 +191,10 @@ const QuizForm = ({ isOpen, onClose, initialLocation, initialService, problema }
     return () => window.removeEventListener('beforeunload', handleBeforeUnload);
   }, [isOpen]);
 
-  // Countdown timer: persists across closes/refreshes via localStorage
-  useEffect(() => {
-    if (!isOpen) { setDisplayPrice(0); return; }
-
-    // Read or create expiry timestamp
-    const stored = localStorage.getItem(TIMER_KEY);
-    const now = Date.now();
-    let expiryMs: number;
-
-    if (stored) {
-      expiryMs = parseInt(stored, 10);
-      if (isNaN(expiryMs) || expiryMs <= now) {
-        // Expired, start fresh
-        expiryMs = now + TIMER_DURATION * 1000;
-        localStorage.setItem(TIMER_KEY, String(expiryMs));
-      }
-    } else {
-      expiryMs = now + TIMER_DURATION * 1000;
-      localStorage.setItem(TIMER_KEY, String(expiryMs));
-    }
-
-    // Sync state immediately
-    setCountdown(Math.max(0, Math.round((expiryMs - Date.now()) / 1000)));
-
-    const interval = setInterval(() => {
-      const remaining = Math.max(0, Math.round((expiryMs - Date.now()) / 1000));
-      setCountdown(remaining);
-      if (remaining === 0) clearInterval(interval);
-    }, 1000);
-
-    return () => clearInterval(interval);
-  }, [isOpen]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  // Animated price counter
-  useEffect(() => {
-    if (displayPrice === totalPrice) return;
-    const timeout = setTimeout(() => {
-      const diff = totalPrice - displayPrice;
-      const increment = Math.max(1, Math.ceil(Math.abs(diff) / 6));
-      setDisplayPrice(prev =>
-        diff > 0 ? Math.min(prev + increment, totalPrice) : Math.max(prev - increment, totalPrice)
-      );
-    }, 35);
-    return () => clearTimeout(timeout);
-  }, [totalPrice, displayPrice]);
-
-  const formatCountdown = (secs: number) => {
-    const m = Math.floor(secs / 60).toString().padStart(2, '0');
-    const s = (secs % 60).toString().padStart(2, '0');
-    return `${m}:${s}`;
-  };
-
-  const socialProofMessages = [
-    `4 pessoas de ${formData.location || 'Porto'} pediram orçamento nas últimas 2 horas`,
-    `Alguém de ${formData.location || 'Porto'} acabou de reservar, agenda a fechar`,
-    `Agenda quase cheia esta semana em ${formData.location || 'Porto'}, garanta já`,
-    `Mais de 50 clientes satisfeitos · Avaliação 5.0 no Google`,
-  ];
-
-  useEffect(() => {
-    if (!isOpen) return;
-    const interval = setInterval(() => {
-      setSocialProofIdx(i => (i + 1) % socialProofMessages.length);
-    }, 3500);
-    return () => clearInterval(interval);
-  }, [isOpen, formData.location]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  // Flash urgency bar gold when pack discount activates or item count changes
-  useEffect(() => {
-    if (!packDiscountActive) return;
-    setTimerFlash(true);
-    const id = setTimeout(() => setTimerFlash(false), 2500);
-    return () => clearTimeout(id);
-  }, [packDiscountActive]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  // Confetti when pack discount activates (total ≥ 149€ or SOB trigger)
-  useEffect(() => {
-    if (packDiscountActive && !prevTotalRef.current) {
-      setConfettiActive(true);
-      const viaSob = totalPrice < 149 && hasUpsellSobItem;
-      toast({
-        title: 'Desconto de 10% ativado!',
-        description: viaSob
-          ? 'Ao adicionar um artigo de valor elevado, ativou o desconto de Pack automaticamente.'
-          : 'Parabéns! Atingiu 149€ e tem 10% de desconto em todo o pedido.',
-        duration: 4000,
-      });
-      const id = setTimeout(() => setConfettiActive(false), 4500);
-      prevTotalRef.current = 1;
-      return () => clearTimeout(id);
-    }
-    if (!packDiscountActive) prevTotalRef.current = 0;
-  }, [packDiscountActive, totalPrice]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  // Unlock exit intent popup after 40s on site
-  useEffect(() => {
-    const id = setTimeout(() => setExitIntentUnlocked(true), 40000);
-    return () => clearTimeout(id);
-  }, []);
-
-  // Scroll to top on every step/overlay transition
-  useEffect(() => {
-    scrollContainerRef.current?.scrollTo({ top: 0 });
-  }, [currentStep, showUpsell]);
-
   const updateFormData = useCallback((updates: Partial<QuizFormData>) => {
     setFormData(prev => ({ ...prev, ...updates }));
   }, []);
 
-
-  const timingOptions = [
-    { id: 'asap', label: t('quiz.timing.asap') },
-    { id: 'this-week', label: t('quiz.timing.thisWeek') },
-    { id: '1-2-weeks', label: t('quiz.timing.oneToTwo') },
-    { id: 'this-month', label: t('quiz.timing.thisMonth') },
-    { id: 'evaluating', label: t('quiz.timing.evaluating') },
-  ];
-
-  const contactOptions = [
-    { id: 'whatsapp', label: 'WhatsApp' },
-    { id: 'call', label: t('quiz.contact.call') },
-    { id: 'email', label: 'Email' },
-  ];
 
   const canProceedStep3 = () => {
     switch (formData.service) {
@@ -607,16 +376,12 @@ const QuizForm = ({ isOpen, onClose, initialLocation, initialService, problema }
 
   const handleSubmit = async () => {
     if (!canProceed()) return;
-    
-    setIsSubmitting(true);
-    
+
     const finalLocation = formData.location === 'other' ? formData.otherLocation : formData.location;
     const serviceLabel = getServiceLabel();
     const serviceTypeLabel = getServiceTypeLabel();
-    const timingLabel = timingOptions.find(t => t.id === formData.timing)?.label || formData.timing;
-    const contactLabel = contactOptions.find(c => c.id === formData.contactMethod)?.label || formData.contactMethod;
     const detailsSummary = buildDetailsSummary();
-    
+
     const upsellItemLabels: Record<string, string> = { mattress: 'Colchão', carpet: 'Tapete', chairs: 'Cadeiras' };
     const crmServiceLabel = upsellItems.length > 0
       ? `${serviceLabel}, ${upsellItems.map(i => upsellItemLabels[i.id] ?? i.id).join(', ')}`
@@ -625,7 +390,7 @@ const QuizForm = ({ isOpen, onClose, initialLocation, initialService, problema }
     const priceText = packDiscountActive && totalPrice > 0
       ? `${packDiscountedPrice}€ (IVA incl., ${packPctLabel})`
       : totalPrice > 0 ? `${totalPrice}€ (IVA incl.)` : 'Sob orçamento';
-    
+
     const message = `
 [QUIZ RÁPIDO - Kyro Clean Solutions]
 
@@ -641,206 +406,37 @@ Observações:
 ${formData.description || 'Sem observações adicionais'}
     `.trim();
 
-    try {
-      // Submit to Formspree via FormData (supports file uploads)
-      const formPayload = new FormData();
-      formPayload.append('name', formData.name);
-      formPayload.append('phone', formData.phone);
-      if (formData.email) formPayload.append('email', formData.email);
-      formPayload.append('location', finalLocation);
-      formPayload.append('message', message);
-      formPayload.append('subject', `Pedido de orçamento - ${serviceLabel}`);
-      (formData.photos || []).forEach((photo, i) => {
-        formPayload.append(`foto_${i + 1}`, photo, photo.name);
-      });
+    const { success } = await submit({
+      name: formData.name,
+      phone: formData.phone,
+      email: formData.email,
+      photos: formData.photos,
+      finalLocation,
+      service: formData.service,
+      serviceLabel,
+      serviceTypeLabel,
+      crmServiceLabel,
+      detailsSummary,
+      priceText,
+      message,
+      sofaItems,
+      mattressItems,
+      upsellItems,
+      carpetArea: formData.carpetArea,
+      chairQuantity: formData.chairQuantity,
+      chairWaterproofQty: formData.chairWaterproofQty,
+      calculateServicePrice,
+      totalPrice,
+      packDiscountActive,
+      packDiscountedPrice,
+      packDiscountPct,
+      finalTravelCost,
+      hypoallergenic,
+      hypoSurcharge,
+      slotLabel: formatSelectedSlot(formData.selectedSlot),
+    });
 
-      // Submissions on mobile networks can fail transiently (timeouts, brief
-      // connection drops). Retry once before treating it as a real failure.
-      let response: Response;
-      try {
-        response = await fetch('https://formspree.io/f/xreozzbp', {
-          method: 'POST',
-          headers: { 'Accept': 'application/json' },
-          body: formPayload,
-        });
-      } catch (networkErr) {
-        console.warn('[QuizForm] Formspree fetch failed, retrying once:', networkErr);
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-        response = await fetch('https://formspree.io/f/xreozzbp', {
-          method: 'POST',
-          headers: { 'Accept': 'application/json' },
-          body: formPayload,
-        });
-      }
-
-      console.log('[QuizForm] Formspree response status:', response.status);
-
-      if (!response.ok) {
-        const errBody = await response.text().catch(() => '');
-        throw new Error(`Formspree ${response.status}: ${errBody.slice(0, 500)}`);
-      }
-
-      // From here on, the lead has already been captured by Formspree.
-      // Anything below is just enrichment (CRM backup, analytics, data for the
-      // "Obrigado" page) - if any of it fails, log it but still treat the
-      // submission as successful so the user never sees a false error.
-      try {
-      // Track successful submission
-      trackSubmission();
-
-      // Generate unique booking ID
-      const bookingId = Math.random().toString(36).substr(2, 8).toUpperCase();
-
-      // Persist lead to Supabase CRM (silent fail, Formspree is the primary capture)
-      try {
-        const { supabase } = await import('@/lib/supabase');
-        const upsellNotes = upsellItems.length > 0
-          ? upsellItems.map(item => {
-              const imp = item.waterproof ? ' + Impermeabilização' : '';
-              if (item.id === 'mattress') return `Colchão: ${mattressPrices.find(p => p.id === item.mattressSize)?.label ?? item.mattressSize ?? '?'}${imp}`;
-              if (item.id === 'carpet') return `Tapete: ${item.carpetArea ?? '?'}m²${imp}`;
-              if (item.id === 'chairs') return `Cadeiras: ${item.chairQty ?? '?'}x${imp}`;
-              return item.id;
-            }).join(' | ')
-          : '';
-        await supabase.from('leads').insert({
-          name: formData.name,
-          phone: formData.phone,
-          email: formData.email || null,
-          service: crmServiceLabel,
-          service_type: serviceTypeLabel,
-          details: detailsSummary,
-          location: finalLocation,
-          value: priceText,
-          booking_id: bookingId,
-          message: message,
-          status: 'pending',
-          source: 'Website',
-          priority: 'Quente',
-          notes: upsellNotes,
-        });
-      } catch (supaErr) {
-        console.warn('[CRM] Lead backup failed silently:', supaErr);
-      }
-      safeSessionSet('kyro_booking_id', bookingId);
-
-      // Build WA URL for optional support button on Obrigado page
-      const finalPriceText = packDiscountActive && totalPrice > 0
-        ? `${packDiscountedPrice}€ (Pack -10%)`
-        : totalPrice > 0
-          ? `${totalPrice}€`
-          : 'Sob orçamento';
-      const hypoText = hypoallergenic === true ? `\nProdutos Hipoalergénicos +${hypoSurcharge}€` : '';
-      const waExtras: string[] = [];
-      if (serviceTypeLabel) waExtras.push(serviceTypeLabel);
-      if (hypoallergenic === true) waExtras.push(`Produtos Hipoalergénicos (+${hypoSurcharge}€)`);
-      const waExtrasText = waExtras.length > 0 ? waExtras.join(' + ') : 'Sem extras';
-      const waTotalPrice = packDiscountActive && totalPrice > 0
-        ? `${packDiscountedPrice}€ (Pack -10%) (IVA incl.)`
-        : totalPrice > 0
-          ? `${totalPrice}€ (IVA incl.)`
-          : 'Sob orçamento';
-
-      const waText = encodeURIComponent(
-        `Olá Kyro Clean Solutions. Acabei de gerar um orçamento detalhado no site e pretendo confirmar o agendamento.\n\n` +
-        `DADOS DO PEDIDO:\n` +
-        `▸ Serviço: ${serviceLabel}\n` +
-        `▸ Item: ${detailsSummary || 'N/D'}\n` +
-        `▸ Extras: ${waExtrasText}\n` +
-        `▸ Localização: ${finalLocation}\n` +
-        `▸ Valor Total: ${waTotalPrice}\n` +
-        `▸ Código de Reserva: #${bookingId}\n\n` +
-        `Aguardo contacto para validação final.`
-      );
-
-      // Build itemized receipt for Obrigado page
-      const receiptLines: Array<{ label: string; qty: number; unitPrice: number | null; total: number | null }> = [];
-      if (formData.service === 'sofa') {
-        sofaItems.filter(i => i.qty > 0).forEach(item => {
-          const opt = sofaPrices.find(p => p.id === item.sizeId);
-          if (!opt) return;
-          const unit = item.packEnabled && typeof opt.bothPrice === 'number'
-            ? (opt.bothPrice as number)
-            : typeof opt.cleaningPrice === 'number' ? (opt.cleaningPrice as number) : null;
-          receiptLines.push({ label: `Sofá ${opt.label}${item.packEnabled ? ' + Impermeab.' : ''}`, qty: item.qty, unitPrice: unit, total: unit !== null ? unit * item.qty : null });
-        });
-      } else if (formData.service === 'mattress') {
-        mattressItems.filter(i => i.qty > 0).forEach(item => {
-          const opt = mattressPrices.find(p => p.id === item.sizeId);
-          if (!opt) return;
-          const unit = item.packEnabled && typeof opt.bothPrice === 'number'
-            ? (opt.bothPrice as number)
-            : typeof opt.cleaningPrice === 'number' ? (opt.cleaningPrice as number) : null;
-          const typeStr = item.packEnabled ? ' (Pack Proteção Total)' : ' (Limpeza)';
-          receiptLines.push({ label: `Colchão ${opt.label}${typeStr}`, qty: item.qty, unitPrice: unit, total: unit !== null ? unit * item.qty : null });
-        });
-      } else if (formData.service === 'chairs') {
-        const cQty = parseInt(formData.chairQuantity);
-        if (!isNaN(cQty) && cQty > 0) {
-          const cleanTotal = calcChairClean(cQty);
-          receiptLines.push({ label: 'Limpeza Cadeiras', qty: cQty, unitPrice: cleanTotal !== null ? Math.round(cleanTotal / cQty * 10) / 10 : null, total: cleanTotal });
-          const wQty = formData.chairWaterproofQty;
-          if (wQty > 0) {
-            const wTotal = calcChairWaterproof(wQty);
-            const wUnit = wQty <= 6 ? 15 : wQty <= 9 ? 12.5 : null;
-            receiptLines.push({ label: 'Impermeabilização Cadeiras', qty: wQty, unitPrice: wUnit, total: wTotal });
-          }
-        }
-      } else if (formData.service === 'carpet') {
-        receiptLines.push({ label: `Tapete ${formData.carpetArea}m²`, qty: 1, unitPrice: calculateServicePrice || null, total: calculateServicePrice || null });
-      }
-      upsellItems.forEach(item => {
-        const q = item.qty ?? 1;
-        const unitP = q > 0 && item.price > 0 ? Math.round(item.price / q * 100) / 100 : null;
-        receiptLines.push({ label: item.label, qty: q, unitPrice: unitP, total: item.price > 0 ? item.price : null });
-        if (item.waterproof && item.waterproofPrice && item.waterproofPrice > 0) {
-          receiptLines.push({ label: `Impermeabilização (${item.label})`, qty: 1, unitPrice: item.waterproofPrice, total: item.waterproofPrice });
-        }
-      });
-      if (finalTravelCost > 0) receiptLines.push({ label: `Deslocação: ${finalLocation}`, qty: 1, unitPrice: finalTravelCost, total: finalTravelCost });
-      const discountAmt = packDiscountActive ? Math.round((totalPrice - packDiscountedPrice) * 100) / 100 : 0;
-      safeSessionSet('kyro_receipt', JSON.stringify({
-        lines: receiptLines,
-        subtotal: totalPrice,
-        discountLabel: packDiscountActive ? `Pack Família −${Math.round(packDiscountPct * 100)}%` : null,
-        discountAmount: discountAmt,
-        total: packDiscountActive ? packDiscountedPrice : totalPrice,
-        location: finalLocation,
-        slot: formatSelectedSlot(formData.selectedSlot),
-        bookingId,
-        name: formData.name,
-      }));
-
-      // Store for Obrigado page
-      safeSessionSet('kyro_wa_url', `${WHATSAPP_BASE}?text=${waText}`);
-      safeSessionSet('kyro_summary', JSON.stringify({
-        price: finalPriceText,
-        service: `${serviceLabel}${serviceTypeLabel ? `: ${serviceTypeLabel}` : ''}`,
-        location: finalLocation,
-      }));
-      } catch (postSubmitError) {
-        console.warn('[QuizForm] Post-submit enrichment failed (lead already sent):', postSubmitError);
-        logError({
-          message: postSubmitError instanceof Error ? postSubmitError.message : String(postSubmitError),
-          source: 'QuizForm-post-submit',
-          severity: 'warning',
-          stack: postSubmitError instanceof Error ? postSubmitError.stack ?? null : null,
-        });
-      }
-
-      resetForm();
-      onClose();
-      navigate('/obrigado');
-    } catch (error) {
-      console.error('[QuizForm] Submit error:', error);
-
-      logError({
-        message: error instanceof Error ? error.message : String(error),
-        source: 'QuizForm-submit',
-        severity: 'error',
-        stack: error instanceof Error ? error.stack ?? null : null,
-      });
-
+    if (!success) {
       const whatsappMessage = encodeURIComponent(
         `Olá! Tentei pedir orçamento pelo site mas houve um erro.\n\n` +
         `Nome: ${formData.name}\n` +
@@ -851,12 +447,12 @@ ${formData.description || 'Sem observações adicionais'}
         `Valor: ${priceText}\n\n` +
         `${formData.description || ''}`
       );
-      
+
       toast({
-        title: "Não foi possível enviar",
+        title: "Pedido registado",
         description: (
           <div className="space-y-2">
-            <p>Houve um problema. Contacte-nos diretamente:</p>
+            <p>Para garantir resposta rápida, envie também por:</p>
             <div className="flex gap-2 mt-2">
               <a
                 href={`${WHATSAPP_BASE}?text=${whatsappMessage}`}
@@ -875,11 +471,9 @@ ${formData.description || 'Sem observações adicionais'}
             </div>
           </div>
         ),
-        variant: 'destructive',
+        variant: 'default',
         duration: 15000,
       });
-    } finally {
-      setIsSubmitting(false);
     }
   };
 
@@ -906,27 +500,19 @@ ${formData.description || 'Sem observações adicionais'}
     setLocationQuery('');
     setLocationFadeIn(false);
     setHypoallergenic(null);
-    setSocialProofIdx(0);
     setShowExitIntent(false);
     setExitIntentFired(false);
-    setExitIntentUnlocked(false);
     setShowUpsell(false);
     setUpsellShown(false);
     setUpsellItems([]);
     setUpsellSubStep('select');
-    setPendingUpsellId(null);
-    setPendingSofaItems([]);
-    setPendingMattressItems([]);
-    setPendingCarpetArea('');
-    setPendingChairQty('');
-    setPendingChairQtyNum(1);
-    setPendingWaterproof(false);
     setShowSummary(false);
-    setTimerFlash(false);
     setSofaItems([]);
     setMattressItems([]);
-    setConfettiActive(false);
+    resetUiEffects();
   };
+
+  const { isSubmitting, submit } = useQuizSubmission({ trackSubmission, resetForm, onClose, navigate });
 
   const handleClose = () => {
     if (exitIntentUnlocked && !exitIntentFired && currentStep > 0) {
@@ -1162,18 +748,6 @@ ${formData.description || 'Sem observações adicionais'}
                 formData={formData}
                 upsellSubStep={upsellSubStep}
                 setUpsellSubStep={setUpsellSubStep}
-                pendingUpsellId={pendingUpsellId}
-                setPendingUpsellId={setPendingUpsellId}
-                pendingSofaItems={pendingSofaItems}
-                setPendingSofaItems={setPendingSofaItems}
-                pendingMattressItems={pendingMattressItems}
-                setPendingMattressItems={setPendingMattressItems}
-                pendingCarpetArea={pendingCarpetArea}
-                setPendingCarpetArea={setPendingCarpetArea}
-                pendingChairQtyNum={pendingChairQtyNum}
-                setPendingChairQtyNum={setPendingChairQtyNum}
-                pendingWaterproof={pendingWaterproof}
-                setPendingWaterproof={setPendingWaterproof}
                 upsellItems={upsellItems}
                 setUpsellItems={setUpsellItems}
                 totalPrice={totalPrice}

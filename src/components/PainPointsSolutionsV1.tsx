@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { ArrowRight } from "lucide-react";
 import QuizForm from './QuizFormLazy';
+import { useQuizLauncher } from "@/hooks/use-quiz-launcher";
 import painpointMites from "@/assets/painpoint-mites.webp";
 import painpointStains from "@/assets/painpoint-stains.webp";
 import painpointOdour from "@/assets/painpoint-odour.webp";
@@ -43,7 +44,7 @@ const CARDS = [
 
 const PainPointsSolutions = () => {
   const [isVisible, setIsVisible] = useState(false);
-  const [isQuizOpen, setIsQuizOpen] = useState(false);
+  const { isQuizOpen, openQuiz, closeQuiz } = useQuizLauncher();
   const sectionRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -54,12 +55,6 @@ const PainPointsSolutions = () => {
     if (sectionRef.current) observer.observe(sectionRef.current);
     return () => observer.disconnect();
   }, []);
-
-  const openQuiz = () => {
-    window.dispatchEvent(new CustomEvent('quizOpened'));
-    sessionStorage.setItem('hasClickedQuote', '1');
-    setIsQuizOpen(true);
-  };
 
   return (
     <section ref={sectionRef} className="py-14 md:py-20 bg-kyro-green">
@@ -169,7 +164,7 @@ const PainPointsSolutions = () => {
 
       </div>
 
-      <QuizForm isOpen={isQuizOpen} onClose={() => setIsQuizOpen(false)} />
+      <QuizForm isOpen={isQuizOpen} onClose={closeQuiz} />
     </section>
   );
 };

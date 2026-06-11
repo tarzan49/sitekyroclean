@@ -1,9 +1,9 @@
-import { useState } from "react";
 import { MessageCircle } from "lucide-react";
 import QuizForm from "./QuizFormLazy";
 import { trackWhatsAppClick } from "@/lib/quizTracking";
 import { WHATSAPP_BASE } from "@/constants/business";
 import TrustRatingBadge from "@/components/TrustRatingBadge";
+import { useQuizLauncher } from "@/hooks/use-quiz-launcher";
 
 import sofaD        from "@/assets/service-sofa-new.webp";
 import sofaM        from "@/assets/service-sofa-new-mobile.webp";
@@ -57,14 +57,8 @@ const ServiceHero = ({
   subtitle,
   serviceSlug,
 }: ServiceHeroProps) => {
-  const [isQuizOpen, setIsQuizOpen] = useState(false);
+  const { isQuizOpen, openQuiz, closeQuiz } = useQuizLauncher();
   const imgs = HERO_IMAGES[serviceSlug];
-
-  const openQuiz = () => {
-    window.dispatchEvent(new CustomEvent("quizOpened"));
-    sessionStorage.setItem("hasClickedQuote", "1");
-    setIsQuizOpen(true);
-  };
 
   const waUrl = `${WHATSAPP_BASE}?text=${encodeURIComponent(
     WA_MESSAGES[serviceSlug] ?? "Olá! Gostaria de pedir um orçamento."
@@ -198,7 +192,7 @@ const ServiceHero = ({
 
       <QuizForm
         isOpen={isQuizOpen}
-        onClose={() => setIsQuizOpen(false)}
+        onClose={closeQuiz}
         initialService={QUIZ_SERVICE[serviceSlug]}
       />
     </>

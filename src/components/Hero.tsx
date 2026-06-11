@@ -2,6 +2,7 @@ import { useState, useEffect, lazy, Suspense } from "react";
 import { trackWhatsAppClick } from "@/lib/quizTracking";
 import { ArrowRight } from "lucide-react";
 import { WHATSAPP_BASE } from "@/constants/business";
+import { useQuizLauncher } from "@/hooks/use-quiz-launcher";
 
 const QuizForm = lazy(() => import('./QuizFormLazy'));
 
@@ -9,21 +10,15 @@ const imgDesktop = '/images/fotos%20hero/novafotoheropc.webp';
 const imgMobile  = '/images/fotos%20hero/imagemiphoneheronova.webp';
 
 const Hero = () => {
-  const [isQuizOpen, setIsQuizOpen]       = useState(false);
+  const { isQuizOpen, openQuiz, closeQuiz } = useQuizLauncher();
   const [showStickyCTA, setShowStickyCTA] = useState(false);
   const [loaded, setLoaded]               = useState(false);
-
-  const openQuiz = () => {
-    window.dispatchEvent(new CustomEvent('quizOpened'));
-    sessionStorage.setItem('hasClickedQuote', '1');
-    setIsQuizOpen(true);
-  };
 
   useEffect(() => {
     window.addEventListener('openQuiz', openQuiz);
     const t = setTimeout(() => setLoaded(true), 80);
     return () => { window.removeEventListener('openQuiz', openQuiz); clearTimeout(t); };
-  }, []);
+  }, [openQuiz]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -175,7 +170,7 @@ const Hero = () => {
       )}
 
       <Suspense fallback={null}>
-        <QuizForm isOpen={isQuizOpen} onClose={() => setIsQuizOpen(false)} />
+        <QuizForm isOpen={isQuizOpen} onClose={closeQuiz} />
       </Suspense>
     </>
   );

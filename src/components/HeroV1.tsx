@@ -3,6 +3,7 @@ import { trackWhatsAppClick } from "@/lib/quizTracking";
 import { MessageCircle } from "lucide-react";
 import { WHATSAPP_BASE } from "@/constants/business";
 import TrustRatingBadge from "@/components/TrustRatingBadge";
+import { useQuizLauncher } from "@/hooks/use-quiz-launcher";
 
 const QuizForm = lazy(() => import('./QuizFormLazy'));
 
@@ -21,19 +22,13 @@ const SERVICES = [
 ];
 
 const Hero = () => {
-  const [isQuizOpen, setIsQuizOpen]       = useState(false);
+  const { isQuizOpen, openQuiz: handleOpenQuiz, closeQuiz } = useQuizLauncher();
   const [showStickyCTA, setShowStickyCTA] = useState(false);
-
-  const handleOpenQuiz = () => {
-    window.dispatchEvent(new CustomEvent('quizOpened'));
-    sessionStorage.setItem('hasClickedQuote', '1');
-    setIsQuizOpen(true);
-  };
 
   useEffect(() => {
     window.addEventListener('openQuiz', handleOpenQuiz);
     return () => window.removeEventListener('openQuiz', handleOpenQuiz);
-  }, []);
+  }, [handleOpenQuiz]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -205,7 +200,7 @@ const Hero = () => {
         </div>
 
         <Suspense fallback={null}>
-          <QuizForm isOpen={isQuizOpen} onClose={() => setIsQuizOpen(false)} />
+          <QuizForm isOpen={isQuizOpen} onClose={closeQuiz} />
         </Suspense>
       </section>
 

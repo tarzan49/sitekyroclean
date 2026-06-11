@@ -1,87 +1,56 @@
-/**
- * submissionService.ts
- * Handles the full quiz lead submission pipeline:
- *   1. Formspree HTTP POST (primary capture, supports file uploads)
- *   2. Supabase CRM insert (silent fallback — never blocks the happy path)
- *
- * Pure async function — no React, no hooks.
- */
-
-import { mattressPrices } from '@/components/quiz/QuizTypes';
-import type { UpsellItemConfig } from '@/components/quiz/QuizTypes';
+import { sofaPrices, mattressPrices } from '@/components/quiz/QuizTypes';
+import type { SofaItem, MattressItem, UpsellItemConfig } from '@/components/quiz/QuizTypes';
+import { calcChairClean, calcChairWaterproof } from '@/components/quiz/quizHelpers';
 import { WHATSAPP_BASE } from '@/constants/business';
+import { safeSessionSet } from '@/lib/safeStorage';
+import { logError } from '@/lib/errorTracking';
 
-// ── Payload type ─────────────────────────────────────────────────────────────
-
-/** All the data the submission pipeline needs. Assembled by the orchestrator. */
+/** All the data the submission pipeline needs. Assembled by useQuizSubmission. */
 export interface QuizLeadPayload {
-  // Contact
   name: string;
   phone: string;
   email: string;
-
-  // Resolved location string (already de-aliased, e.g. "Porto")
+  photos: File[];
   finalLocation: string;
 
-  // Human-readable labels (computed by orchestrator)
+  service: string;
   serviceLabel: string;
   serviceTypeLabel: string;
   crmServiceLabel: string;
-  timingLabel: string;
-  contactLabel: string;
   detailsSummary: string;
+  priceText: string;
+  message: string;
 
-  // Pricing
+  sofaItems: SofaItem[];
+  mattressItems: MattressItem[];
+  upsellItems: UpsellItemConfig[];
+  carpetArea: string;
+  chairQuantity: string;
+  chairWaterproofQty: number;
+  calculateServicePrice: number;
+
   totalPrice: number;
   packDiscountActive: boolean;
   packDiscountedPrice: number;
   packDiscountPct: number;
-  discountedPrice: number;
-  isFreeTravel: boolean;
   finalTravelCost: number;
 
-  // WA slot info
-  slotDay: string;
-  slotTime: string;
-  slotLabel: string;
-
-  // Files
-  photos: File[];
-
-  // Upsell items (for CRM notes & receipt)
-  upsellItems: UpsellItemConfig[];
-
-  // Receipt lines (built by orchestrator)
-  receiptLines: Array<{
-    label: string;
-    qty: number;
-    unitPrice: number | null;
-    total: number | null;
-  }>;
-
-  // Hypoallergenic surcharge (currently always 0, kept for future use)
-  hypoSurcharge: number;
   hypoallergenic: boolean | null;
+  hypoSurcharge: number;
 
-  // Description / observations
-  description: string;
-
-  // Full message body (pre-formatted by orchestrator)
-  message: string;
+  slotLabel: string;
 }
-
-// ── Private helpers ───────────────────────────────────────────────────────────
 
 function generateBookingId(): string {
   return Math.random().toString(36).substr(2, 8).toUpperCase();
 }
 
-async function postToFormspree(payload: QuizLeadPayload): Promise<void> {
+async function postToFormspree(payload: QuizLeadPayload): Promise<Response> {
   const { name, phone, email, photos, finalLocation, message, serviceLabel } = payload;
   const formPayload = new FormData();
   formPayload.append('name', name);
   formPayload.append('phone', phone);
-  if (email.trim()) formPayload.append('email', email);
+  if (email) formPayload.append('email', email);
   formPayload.append('location', finalLocation);
   formPayload.append('message', message);
   formPayload.append('subject', `Pedido de orçamento - ${serviceLabel}`);
@@ -89,42 +58,40 @@ async function postToFormspree(payload: QuizLeadPayload): Promise<void> {
     formPayload.append(`foto_${i + 1}`, photo, photo.name);
   });
 
-  const response = await fetch('https://formspree.io/f/xreozzbp', {
-    method: 'POST',
-    headers: { Accept: 'application/json' },
-    body: formPayload,
-  });
-
-  if (!response.ok) throw new Error('Erro ao enviar');
+  // Submissions on mobile networks can fail transiently (timeouts, brief
+  // connection drops). Retry once before treating it as a real failure.
+  try {
+    return await fetch('https://formspree.io/f/xreozzbp', {
+      method: 'POST',
+      headers: { Accept: 'application/json' },
+      body: formPayload,
+    });
+  } catch (networkErr) {
+    console.warn('[submissionService] Formspree fetch failed, retrying once:', networkErr);
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+    return await fetch('https://formspree.io/f/xreozzbp', {
+      method: 'POST',
+      headers: { Accept: 'application/json' },
+      body: formPayload,
+    });
+  }
 }
 
 async function insertCrmLead(payload: QuizLeadPayload, bookingId: string): Promise<void> {
   const {
     name, phone, email, crmServiceLabel, serviceTypeLabel, detailsSummary,
-    finalLocation, slotLabel, message, totalPrice, packDiscountActive,
-    packDiscountedPrice, packDiscountPct, upsellItems,
+    finalLocation, priceText, message, upsellItems,
   } = payload;
 
-  const priceText =
-    packDiscountActive && totalPrice > 0
-      ? `${packDiscountedPrice}€ (IVA incl., Pack -${Math.round(packDiscountPct * 100)}%)`
-      : totalPrice > 0
-        ? `${totalPrice}€ (IVA incl.)`
-        : 'Sob orçamento';
-
-  const upsellNotes =
-    upsellItems.length > 0
-      ? upsellItems
-          .map(item => {
-            const imp = item.waterproof ? ' + Impermeabilização' : '';
-            if (item.id === 'mattress')
-              return `Colchão: ${mattressPrices.find(p => p.id === item.mattressSize)?.label ?? item.mattressSize ?? '?'}${imp}`;
-            if (item.id === 'carpet') return `Tapete: ${item.carpetArea ?? '?'}m²${imp}`;
-            if (item.id === 'chairs') return `Cadeiras: ${item.chairQty ?? '?'}x${imp}`;
-            return item.id;
-          })
-          .join(' | ')
-      : '';
+  const upsellNotes = upsellItems.length > 0
+    ? upsellItems.map(item => {
+        const imp = item.waterproof ? ' + Impermeabilização' : '';
+        if (item.id === 'mattress') return `Colchão: ${mattressPrices.find(p => p.id === item.mattressSize)?.label ?? item.mattressSize ?? '?'}${imp}`;
+        if (item.id === 'carpet') return `Tapete: ${item.carpetArea ?? '?'}m²${imp}`;
+        if (item.id === 'chairs') return `Cadeiras: ${item.chairQty ?? '?'}x${imp}`;
+        return item.id;
+      }).join(' | ')
+    : '';
 
   const { supabase } = await import('@/lib/supabase');
   await supabase.from('leads').insert({
@@ -136,7 +103,6 @@ async function insertCrmLead(payload: QuizLeadPayload, bookingId: string): Promi
     details: detailsSummary,
     location: finalLocation,
     value: priceText,
-    slot: slotLabel,
     booking_id: bookingId,
     message,
     status: 'pending',
@@ -149,8 +115,7 @@ async function insertCrmLead(payload: QuizLeadPayload, bookingId: string): Promi
 function buildWaUrl(payload: QuizLeadPayload, bookingId: string): string {
   const {
     serviceLabel, serviceTypeLabel, detailsSummary, finalLocation,
-    slotDay, slotTime, totalPrice, packDiscountActive, packDiscountedPrice,
-    packDiscountPct, hypoallergenic, hypoSurcharge,
+    totalPrice, packDiscountActive, packDiscountedPrice, hypoallergenic, hypoSurcharge,
   } = payload;
 
   const waExtras: string[] = [];
@@ -158,12 +123,11 @@ function buildWaUrl(payload: QuizLeadPayload, bookingId: string): string {
   if (hypoallergenic === true) waExtras.push(`Produtos Hipoalergénicos (+${hypoSurcharge}€)`);
   const waExtrasText = waExtras.length > 0 ? waExtras.join(' + ') : 'Sem extras';
 
-  const waTotalPrice =
-    packDiscountActive && totalPrice > 0
-      ? `${packDiscountedPrice}€ (Pack -${Math.round(packDiscountPct * 100)}%) (IVA incl.)`
-      : totalPrice > 0
-        ? `${totalPrice}€ (IVA incl.)`
-        : 'Sob orçamento';
+  const waTotalPrice = packDiscountActive && totalPrice > 0
+    ? `${packDiscountedPrice}€ (Pack -10%) (IVA incl.)`
+    : totalPrice > 0
+      ? `${totalPrice}€ (IVA incl.)`
+      : 'Sob orçamento';
 
   const waText = encodeURIComponent(
     `Olá Kyro Clean Solutions. Acabei de gerar um orçamento detalhado no site e pretendo confirmar o agendamento.\n\n` +
@@ -173,79 +137,162 @@ function buildWaUrl(payload: QuizLeadPayload, bookingId: string): string {
     `▸ Extras: ${waExtrasText}\n` +
     `▸ Localização: ${finalLocation}\n` +
     `▸ Valor Total: ${waTotalPrice}\n` +
-    `▸ Vaga Pretendida: ${slotDay} às ${slotTime}\n` +
     `▸ Código de Reserva: #${bookingId}\n\n` +
-    `Aguardo contacto para validação final.`,
+    `Aguardo contacto para validação final.`
   );
 
   return `${WHATSAPP_BASE}?text=${waText}`;
 }
 
-function writeSessionStorage(payload: QuizLeadPayload, bookingId: string, waUrl: string): void {
+function buildReceiptLines(payload: QuizLeadPayload) {
   const {
-    totalPrice, packDiscountActive, packDiscountedPrice, packDiscountPct,
-    serviceLabel, serviceTypeLabel,
-    finalLocation, email, receiptLines, slotLabel, name,
+    service, sofaItems, mattressItems, upsellItems, carpetArea, chairQuantity,
+    chairWaterproofQty, calculateServicePrice, finalTravelCost, finalLocation,
   } = payload;
 
-  const discountAmt = packDiscountActive
-    ? Math.round((totalPrice - packDiscountedPrice) * 100) / 100
-    : 0;
+  const receiptLines: Array<{ label: string; qty: number; unitPrice: number | null; total: number | null }> = [];
 
-  const finalPriceText =
-    packDiscountActive && totalPrice > 0
-      ? `${packDiscountedPrice}€ (Pack -${Math.round(packDiscountPct * 100)}%)`
-      : totalPrice > 0
-        ? `${totalPrice}€`
-        : 'Sob orçamento';
-
-  sessionStorage.setItem('kyro_booking_id', bookingId);
-  sessionStorage.setItem('kyro_wa_url', waUrl);
-  sessionStorage.setItem(
-    'kyro_summary',
-    JSON.stringify({
-      price: finalPriceText,
-      service: `${serviceLabel}${serviceTypeLabel ? `: ${serviceTypeLabel}` : ''}`,
-      location: finalLocation,
-      email,
-    }),
-  );
-  sessionStorage.setItem(
-    'kyro_receipt',
-    JSON.stringify({
-      lines: receiptLines,
-      subtotal: totalPrice,
-      discountLabel: packDiscountActive
-        ? `Pack Família −${Math.round(packDiscountPct * 100)}%`
-        : null,
-      discountAmount: discountAmt,
-      total: packDiscountActive ? packDiscountedPrice : totalPrice,
-      location: finalLocation,
-      slot: slotLabel,
-      bookingId,
-      name,
-    }),
-  );
-}
-
-// ── Main function ─────────────────────────────────────────────────────────────
-
-/**
- * Submits the quiz lead to Formspree and (silently) to Supabase CRM.
- * On success, populates sessionStorage keys expected by the `/obrigado` page.
- * Throws on Formspree failure so the caller can show an error toast.
- */
-export async function submitQuizLead(payload: QuizLeadPayload): Promise<void> {
-  await postToFormspree(payload);
-
-  const bookingId = generateBookingId();
-
-  try {
-    await insertCrmLead(payload, bookingId);
-  } catch (supaErr) {
-    console.warn('[CRM] Lead backup failed silently:', supaErr);
+  if (service === 'sofa') {
+    sofaItems.filter(i => i.qty > 0).forEach(item => {
+      const opt = sofaPrices.find(p => p.id === item.sizeId);
+      if (!opt) return;
+      const unit = item.packEnabled && typeof opt.bothPrice === 'number'
+        ? (opt.bothPrice as number)
+        : typeof opt.cleaningPrice === 'number' ? (opt.cleaningPrice as number) : null;
+      receiptLines.push({ label: `Sofá ${opt.label}${item.packEnabled ? ' + Impermeab.' : ''}`, qty: item.qty, unitPrice: unit, total: unit !== null ? unit * item.qty : null });
+    });
+  } else if (service === 'mattress') {
+    mattressItems.filter(i => i.qty > 0).forEach(item => {
+      const opt = mattressPrices.find(p => p.id === item.sizeId);
+      if (!opt) return;
+      const unit = item.packEnabled && typeof opt.bothPrice === 'number'
+        ? (opt.bothPrice as number)
+        : typeof opt.cleaningPrice === 'number' ? (opt.cleaningPrice as number) : null;
+      const typeStr = item.packEnabled ? ' (Pack Proteção Total)' : ' (Limpeza)';
+      receiptLines.push({ label: `Colchão ${opt.label}${typeStr}`, qty: item.qty, unitPrice: unit, total: unit !== null ? unit * item.qty : null });
+    });
+  } else if (service === 'chairs') {
+    const cQty = parseInt(chairQuantity);
+    if (!isNaN(cQty) && cQty > 0) {
+      const cleanTotal = calcChairClean(cQty);
+      receiptLines.push({ label: 'Limpeza Cadeiras', qty: cQty, unitPrice: cleanTotal !== null ? Math.round(cleanTotal / cQty * 10) / 10 : null, total: cleanTotal });
+      const wQty = chairWaterproofQty;
+      if (wQty > 0) {
+        const wTotal = calcChairWaterproof(wQty);
+        const wUnit = wQty <= 6 ? 15 : wQty <= 9 ? 12.5 : null;
+        receiptLines.push({ label: 'Impermeabilização Cadeiras', qty: wQty, unitPrice: wUnit, total: wTotal });
+      }
+    }
+  } else if (service === 'carpet') {
+    receiptLines.push({ label: `Tapete ${carpetArea}m²`, qty: 1, unitPrice: calculateServicePrice || null, total: calculateServicePrice || null });
   }
 
-  const waUrl = buildWaUrl(payload, bookingId);
-  writeSessionStorage(payload, bookingId, waUrl);
+  upsellItems.forEach(item => {
+    const q = item.qty ?? 1;
+    const unitP = q > 0 && item.price > 0 ? Math.round(item.price / q * 100) / 100 : null;
+    receiptLines.push({ label: item.label, qty: q, unitPrice: unitP, total: item.price > 0 ? item.price : null });
+    if (item.waterproof && item.waterproofPrice && item.waterproofPrice > 0) {
+      receiptLines.push({ label: `Impermeabilização (${item.label})`, qty: 1, unitPrice: item.waterproofPrice, total: item.waterproofPrice });
+    }
+  });
+
+  if (finalTravelCost > 0) receiptLines.push({ label: `Deslocação: ${finalLocation}`, qty: 1, unitPrice: finalTravelCost, total: finalTravelCost });
+
+  return receiptLines;
+}
+
+function persistObrigadoData(payload: QuizLeadPayload, bookingId: string, waUrl: string): void {
+  const {
+    totalPrice, packDiscountActive, packDiscountedPrice, packDiscountPct,
+    serviceLabel, serviceTypeLabel, finalLocation, slotLabel, name,
+  } = payload;
+
+  const finalPriceText = packDiscountActive && totalPrice > 0
+    ? `${packDiscountedPrice}€ (Pack -10%)`
+    : totalPrice > 0
+      ? `${totalPrice}€`
+      : 'Sob orçamento';
+
+  const discountAmt = packDiscountActive ? Math.round((totalPrice - packDiscountedPrice) * 100) / 100 : 0;
+
+  safeSessionSet('kyro_booking_id', bookingId);
+  safeSessionSet('kyro_wa_url', waUrl);
+  safeSessionSet('kyro_summary', JSON.stringify({
+    price: finalPriceText,
+    service: `${serviceLabel}${serviceTypeLabel ? `: ${serviceTypeLabel}` : ''}`,
+    location: finalLocation,
+  }));
+  safeSessionSet('kyro_receipt', JSON.stringify({
+    lines: buildReceiptLines(payload),
+    subtotal: totalPrice,
+    discountLabel: packDiscountActive ? `Pack Família −${Math.round(packDiscountPct * 100)}%` : null,
+    discountAmount: discountAmt,
+    total: packDiscountActive ? packDiscountedPrice : totalPrice,
+    location: finalLocation,
+    slot: slotLabel,
+    bookingId,
+    name,
+  }));
+}
+
+/**
+ * Submits the quiz lead via two independent channels - Formspree (email
+ * notification) and Supabase (CRM record). Browser extensions/ad-blockers
+ * frequently block requests to formspree.io, so the lead must not be lost
+ * just because that one channel was blocked: the submission only counts as
+ * failed if BOTH channels fail. Whichever channel(s) succeed, we proceed to
+ * the "Obrigado" page (failures in the other channel are logged as warnings).
+ */
+export async function submitQuizLead(payload: QuizLeadPayload): Promise<void> {
+  const bookingId = generateBookingId();
+
+  const [formspreeResult, crmResult] = await Promise.allSettled([
+    postToFormspree(payload),
+    insertCrmLead(payload, bookingId),
+  ]);
+
+  const formspreeOk = formspreeResult.status === 'fulfilled' && formspreeResult.value.ok;
+  const crmOk = crmResult.status === 'fulfilled';
+
+  if (!formspreeOk && !crmOk) {
+    const formspreeErr = formspreeResult.status === 'rejected'
+      ? formspreeResult.reason
+      : `HTTP ${formspreeResult.value.status}`;
+    const crmErr = crmResult.status === 'rejected' ? crmResult.reason : 'unknown error';
+    throw new Error(`Formspree failed (${formspreeErr}) and CRM insert failed (${crmErr})`);
+  }
+
+  if (!formspreeOk) {
+    const reason = formspreeResult.status === 'rejected' ? formspreeResult.reason : `HTTP ${formspreeResult.value.status}`;
+    console.warn('[submissionService] Formspree failed, lead captured via CRM:', reason);
+    logError({
+      message: `Formspree submission failed: ${String(reason)}`,
+      source: 'QuizForm-post-submit',
+      severity: 'warning',
+      stack: null,
+    });
+  }
+
+  if (!crmOk) {
+    console.warn('[CRM] Lead backup failed, lead captured via Formspree:', crmResult.reason);
+    logError({
+      message: crmResult.reason instanceof Error ? crmResult.reason.message : String(crmResult.reason),
+      source: 'QuizForm-post-submit',
+      severity: 'warning',
+      stack: crmResult.reason instanceof Error ? crmResult.reason.stack ?? null : null,
+    });
+  }
+
+  try {
+    const waUrl = buildWaUrl(payload, bookingId);
+    persistObrigadoData(payload, bookingId, waUrl);
+  } catch (postSubmitError) {
+    console.warn('[submissionService] Post-submit enrichment failed (lead already sent):', postSubmitError);
+    logError({
+      message: postSubmitError instanceof Error ? postSubmitError.message : String(postSubmitError),
+      source: 'QuizForm-post-submit',
+      severity: 'warning',
+      stack: postSubmitError instanceof Error ? postSubmitError.stack ?? null : null,
+    });
+  }
 }

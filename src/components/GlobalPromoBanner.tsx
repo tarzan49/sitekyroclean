@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Sparkles } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
+import { QUIZ_STATE_CHANGE_EVENT } from "@/constants/quiz";
 
 const GlobalPromoBanner = () => {
   const location = useLocation();
@@ -12,8 +13,8 @@ const GlobalPromoBanner = () => {
       setIsQuizOpen(e.detail.isOpen);
     };
 
-    window.addEventListener('quizStateChange', handleQuizState as EventListener);
-    return () => window.removeEventListener('quizStateChange', handleQuizState as EventListener);
+    window.addEventListener(QUIZ_STATE_CHANGE_EVENT, handleQuizState as EventListener);
+    return () => window.removeEventListener(QUIZ_STATE_CHANGE_EVENT, handleQuizState as EventListener);
   }, []);
   
   // Don't show on /packs page or when quiz is open
