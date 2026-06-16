@@ -2,6 +2,14 @@
 @tailwind components;
 @tailwind utilities;
 
+@keyframes pageFadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+.page-fade-in {
+  animation: pageFadeIn 0.28s ease-in-out;
+}
+
 @layer utilities {
   .bg-kyro-green,
   .bg-checker-dark,

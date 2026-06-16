@@ -5,7 +5,6 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
-import { AnimatePresence, motion } from "framer-motion";
 
 import ScrollToTop from "@/components/ScrollToTop";
 import ErrorBoundary from "@/components/ErrorBoundary";
@@ -14,14 +13,7 @@ import PageHead from "@/components/PageHead";
 import TopProgressBar from "@/components/TopProgressBar";
 import MobileStickyBar from "@/components/MobileStickyBar";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
-import { getAllLocationRoutes } from "@/data/locationSeoData";
-import { getAllFreguesiaRoutes } from "@/data/freguesiaSeoData";
-import { getAllMaterialRoutes, getAllMaterialCityRoutes } from "@/data/materialSeoData";
-import { getAllPriceRoutes } from "@/data/priceSeoData";
 import { getAllProblemCityRoutes } from "@/data/problemCitySeoData";
-import { getAllKeywordVariantRoutes } from "@/data/keywordVariantData";
-import { getAllPackComboRoutes } from "@/data/packComboData";
-import { getAllMarcaSofaRoutes } from "@/data/marcaSofaData";
 
 // Critical path - load immediately
 import IndexV1 from "./pages/IndexV1";
@@ -36,7 +28,7 @@ const LimpezaCadeiras = lazy(() => import("./pages/LimpezaCadeiras"));
 const LimpezaAlcatifas = lazy(() => import("./pages/LimpezaAlcatifas"));
 const NossoProcesso = lazy(() => import("./pages/NossoProcesso"));
 const Obrigado = lazy(() => import("./pages/Obrigado"));
-const LocationServicePage = lazy(() => import("./pages/LocationServicePage"));
+const ServiceAreaRouter = lazy(() => import("./pages/ServiceAreaRouter"));
 const ProblemPage = lazy(() => import("./pages/ProblemPage"));
 const ProblemCityPage = lazy(() => import("./pages/ProblemCityPage"));
 const MaterialPage = lazy(() => import("./pages/MaterialPage"));
@@ -45,7 +37,7 @@ const BeforeAfterPage = lazy(() => import("./pages/BeforeAfterPage"));
 const AdminPanel = lazy(() => import("./pages/AdminPanel"));
 const AdminDeslocacoes = lazy(() => import("./pages/AdminDeslocacoes"));
 const AreasDeServico = lazy(() => import("./pages/AreasDeServico"));
-const FreguesiaServicePage = lazy(() => import("./pages/FreguesiaServicePage"));
+
 const SofaVariantPage = lazy(() => import("./pages/SofaVariantPage"));
 const ReviewRequest = lazy(() => import("./pages/ReviewRequest"));
 const FAQEstofos = lazy(() => import("./pages/FAQEstofos"));
@@ -79,33 +71,12 @@ const queryClient = new QueryClient({
   },
 });
 
-// Pre-generate all routes
-const locationRoutes = getAllLocationRoutes();
-const freguesiaRoutes = getAllFreguesiaRoutes();
-const materialRoutes = getAllMaterialRoutes();
-const materialCityRoutes = getAllMaterialCityRoutes();
-const priceRoutes = getAllPriceRoutes();
-const problemCityRoutes = getAllProblemCityRoutes();
-const keywordVariantRoutes = getAllKeywordVariantRoutes();
-const packComboRoutes = getAllPackComboRoutes();
-const marcaSofaRoutes = getAllMarcaSofaRoutes();
-
-// ── Page transition config ────────────────────────────────────────────────────
-// Pure opacity only, NO y/transform.
-// Reason: any CSS transform on a wrapper creates a new stacking context,
-// which breaks position:fixed children (sticky CTAs, headers, progress bar).
-// With opacity-only, stacking context only exists when opacity < 1, which is
-// only during the brief exit (user already navigated away), not perceptible.
-const pageVariants = {
-  initial: { opacity: 0 },
-  animate: { opacity: 1 },
-  exit:    { opacity: 0 },
-};
-
-const pageTransition = {
-  duration: 0.28,
-  ease: 'easeInOut' as const,
-};
+// Problem × City explicit routes — filter paths already covered by keyword variant patterns
+// (higienizacao-colchao and lavagem-tapetes are problem slugs that overlap with variant routes;
+// the keyword variant patterns /higienizacao-* and /lavagem-* handle those URLs)
+const problemCityRoutes = getAllProblemCityRoutes().filter(
+  r => !r.path.startsWith('/higienizacao-') && !r.path.startsWith('/lavagem-')
+);
 
 // ── Inner router component, must be inside <BrowserRouter> to use useLocation
 const AppRoutes = () => {
@@ -120,22 +91,10 @@ const AppRoutes = () => {
       <ScrollToTop />
       <PageHead />
 
-      <AnimatePresence mode="wait" initial={false}>
-        <motion.div
-          key={location.pathname}
-          variants={pageVariants}
-          initial="initial"
-          animate="animate"
-          exit="exit"
-          transition={pageTransition}
-          // transformTemplate removes framer-motion's default translateZ(0) GPU hint
-          // which would otherwise create a stacking context and break position:fixed children
-          transformTemplate={() => ''}
-          style={{ width: '100%', minHeight: '100vh' }}
-        >
+      <div key={location.pathname} className="page-fade-in" style={{ width: '100%', minHeight: '100vh' }}>
           <ErrorBoundary>
             <Suspense fallback={<PageLoader />}>
-              <Routes location={location}>
+              <Routes>
                 <Route path="/" element={<IndexV1 />} />
                 <Route path="/limpeza-sofas" element={<LimpezaSofas />} />
                 <Route path="/impermeabilizacao" element={<Impermeabilizacao />} />
@@ -148,46 +107,55 @@ const AppRoutes = () => {
                 <Route path="/packs" element={<Packs />} />
                 <Route path="/guia-de-packs" element={<PacksSitemap />} />
                 <Route path="/antes-depois-limpeza" element={<BeforeAfterPage />} />
-                {/* Location × Service SEO pages */}
-                {locationRoutes.map(route => (
-                  <Route key={route.path} path={route.path} element={<LocationServicePage />} />
-                ))}
-                {/* Freguesia SEO pages */}
-                {freguesiaRoutes.map(route => (
-                  <Route key={route.path} path={route.path} element={<FreguesiaServicePage />} />
-                ))}
-                {/* Keyword variant pages: higienização/lavagem × all services × all locations */}
-                {/* MUST be before problemCityRoutes, slugs like "higienizacao-colchao" and "lavagem-tapetes" */}
-                {/* in problemSeoData generate identical paths that would shadow these routes otherwise */}
-                {keywordVariantRoutes.map(route => (
-                  <Route key={route.path} path={route.path} element={<SofaVariantPage />} />
-                ))}
+                {/* Location × Service + Freguesia × Service: 942 routes → 6 splat patterns.
+                    ServiceAreaRouter checks if the * param is a known city slug;
+                    if yes → LocationServicePage, if no → FreguesiaServicePage. */}
+                <Route path="/limpeza-sofas-*" element={<ServiceAreaRouter />} />
+                <Route path="/limpeza-colchoes-*" element={<ServiceAreaRouter />} />
+                <Route path="/limpeza-tapetes-*" element={<ServiceAreaRouter />} />
+                <Route path="/limpeza-cadeiras-*" element={<ServiceAreaRouter />} />
+                <Route path="/limpeza-alcatifas-*" element={<ServiceAreaRouter />} />
+
+                {/* Keyword variant patterns — higienizacao/lavagem: no conflicts */}
+                <Route path="/higienizacao-*" element={<SofaVariantPage />} />
+                <Route path="/lavagem-*" element={<SofaVariantPage />} />
+                {/* Impermeabilizacao variants: more-specific patterns must come before the location catch-all */}
+                <Route path="/impermeabilizacao-sofa-*" element={<SofaVariantPage />} />
+                <Route path="/impermeabilizacao-colchao-*" element={<SofaVariantPage />} />
+                <Route path="/impermeabilizacao-tapetes-*" element={<SofaVariantPage />} />
+                <Route path="/impermeabilizacao-cadeiras-*" element={<SofaVariantPage />} />
+                <Route path="/impermeabilizacao-alcatifas-*" element={<SofaVariantPage />} />
+                {/* Impermeabilizacao × location/freguesia catch-all */}
+                <Route path="/impermeabilizacao-*" element={<ServiceAreaRouter />} />
+
                 {/* Problem SEO pages */}
                 <Route path="/problemas/:slug" element={<ProblemPage />} />
-                {/* Problem × City SEO pages */}
+                {/* Problem × City: explicit routes, conflicts with /higienizacao-* and /lavagem-* filtered out */}
                 {problemCityRoutes.map(route => (
                   <Route key={route.path} path={route.path} element={<ProblemCityPage />} />
                 ))}
-                {/* Material SEO pages */}
-                {materialRoutes.map(route => (
-                  <Route key={route.path} path={route.path} element={<MaterialPage />} />
+
+                {/* Marca Sofá brand patterns (more specific) before general material patterns */}
+                {['ikea', 'natuzzi', 'roche-bobois', 'conforama', 'el-corte-ingles', 'kave-home', 'leroy-merlin', 'moviflor'].map(brand => (
+                  <Route key={brand} path={`/limpeza-sofa-${brand}-*`} element={<MarcaSofaPage />} />
                 ))}
-                {/* Material × City SEO pages */}
-                {materialCityRoutes.map(route => (
-                  <Route key={route.path} path={route.path} element={<MaterialPage />} />
-                ))}
-                {/* Price SEO pages */}
-                {priceRoutes.map(route => (
-                  <Route key={route.path} path={route.path} element={<PricePage />} />
-                ))}
-                {/* Pack/Combo pages: 4 packs × 5 cities = 20 pages */}
-                {packComboRoutes.map(route => (
-                  <Route key={route.path} path={route.path} element={<PackComboPage />} />
-                ))}
-                {/* Marca Sofá pages: 8 brands × 10 cities = 80 pages */}
-                {marcaSofaRoutes.map(route => (
-                  <Route key={route.path} path={route.path} element={<MarcaSofaPage />} />
-                ))}
+                {/* Material pages: singular-prefix patterns (sofa/colchao/tapete/cadeira/alcatifa) */}
+                <Route path="/limpeza-sofa-*" element={<MaterialPage />} />
+                <Route path="/limpeza-colchao-*" element={<MaterialPage />} />
+                <Route path="/limpeza-tapete-*" element={<MaterialPage />} />
+                <Route path="/limpeza-cadeira-*" element={<MaterialPage />} />
+                <Route path="/limpeza-alcatifa-*" element={<MaterialPage />} />
+
+                {/* Price pages: service-specific patterns (avoids /preco-limpeza-sofa-* problem×city paths) */}
+                <Route path="/preco-limpeza-sofas-*" element={<PricePage />} />
+                <Route path="/preco-limpeza-colchoes-*" element={<PricePage />} />
+                <Route path="/preco-limpeza-tapetes-*" element={<PricePage />} />
+                <Route path="/preco-limpeza-cadeiras-*" element={<PricePage />} />
+                <Route path="/preco-limpeza-alcatifas-*" element={<PricePage />} />
+                <Route path="/preco-impermeabilizacao-*" element={<PricePage />} />
+
+                {/* Pack/Combo pages */}
+                <Route path="/pack-*" element={<PackComboPage />} />
                 {/* Resource pages */}
                 {/* Blog */}
                 <Route path="/blog" element={<Blog />} />
@@ -209,8 +177,7 @@ const AppRoutes = () => {
               </Routes>
             </Suspense>
           </ErrorBoundary>
-        </motion.div>
-      </AnimatePresence>
+        </div>
     </>
   );
 };
