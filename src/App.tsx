@@ -12,6 +12,14 @@ import PageHead from "@/components/PageHead";
 import TopProgressBar from "@/components/TopProgressBar";
 import MobileStickyBar from "@/components/MobileStickyBar";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
+import { getAllLocationRoutes } from "@/data/locationSeoData";
+import { getAllFreguesiaRoutes } from "@/data/freguesiaSeoData";
+import { getAllMaterialRoutes, getAllMaterialCityRoutes } from "@/data/materialSeoData";
+import { getAllPriceRoutes } from "@/data/priceSeoData";
+import { getAllProblemCityRoutes } from "@/data/problemCitySeoData";
+import { getAllKeywordVariantRoutes } from "@/data/keywordVariantData";
+import { getAllPackComboRoutes } from "@/data/packComboData";
+import { getAllMarcaSofaRoutes } from "@/data/marcaSofaData";
 
 // Critical path - load immediately
 import IndexV1 from "./pages/IndexV1";
@@ -26,7 +34,8 @@ const LimpezaCadeiras = lazy(() => import("./pages/LimpezaCadeiras"));
 const LimpezaAlcatifas = lazy(() => import("./pages/LimpezaAlcatifas"));
 const NossoProcesso = lazy(() => import("./pages/NossoProcesso"));
 const Obrigado = lazy(() => import("./pages/Obrigado"));
-const ServiceAreaRouter = lazy(() => import("./pages/ServiceAreaRouter"));
+const LocationServicePage = lazy(() => import("./pages/LocationServicePage"));
+const FreguesiaServicePage = lazy(() => import("./pages/FreguesiaServicePage"));
 const ProblemPage = lazy(() => import("./pages/ProblemPage"));
 const ProblemCityPage = lazy(() => import("./pages/ProblemCityPage"));
 const MaterialPage = lazy(() => import("./pages/MaterialPage"));
@@ -59,6 +68,22 @@ const PageLoader = () => (
 );
 
 
+// Pre-generate all explicit route lists (just path strings — cheap at module load)
+// React Router v6 requires * to follow /; patterns like /pack-* are treated as /pack-/*
+// and never match /pack-foo-bar. Explicit routes are the only reliable solution.
+const locationRoutes = getAllLocationRoutes();
+const frequesiaRoutes = getAllFreguesiaRoutes();
+const materialRoutes = getAllMaterialRoutes();
+const materialCityRoutes = getAllMaterialCityRoutes();
+const priceRoutes = getAllPriceRoutes();
+// Filter out higienizacao/lavagem prefixes: keywordVariantRoutes cover those paths first
+const problemCityRoutes = getAllProblemCityRoutes().filter(
+  r => !r.path.startsWith('/higienizacao-') && !r.path.startsWith('/lavagem-')
+);
+const keywordVariantRoutes = getAllKeywordVariantRoutes();
+const packComboRoutes = getAllPackComboRoutes();
+const marcaSofaRoutes = getAllMarcaSofaRoutes();
+
 // ── Inner router component, must be inside <BrowserRouter> to use useLocation
 const AppRoutes = () => {
   const location = useLocation();
@@ -88,88 +113,46 @@ const AppRoutes = () => {
                 <Route path="/packs" element={<Packs />} />
                 <Route path="/guia-de-packs" element={<PacksSitemap />} />
                 <Route path="/antes-depois-limpeza" element={<BeforeAfterPage />} />
-                {/* Location × Service + Freguesia × Service: 942 routes → 6 splat patterns.
-                    ServiceAreaRouter checks if the * param is a known city slug;
-                    if yes → LocationServicePage, if no → FreguesiaServicePage. */}
-                <Route path="/limpeza-sofas-*" element={<ServiceAreaRouter />} />
-                <Route path="/limpeza-colchoes-*" element={<ServiceAreaRouter />} />
-                <Route path="/limpeza-tapetes-*" element={<ServiceAreaRouter />} />
-                <Route path="/limpeza-cadeiras-*" element={<ServiceAreaRouter />} />
-                <Route path="/limpeza-alcatifas-*" element={<ServiceAreaRouter />} />
-
-                {/* Keyword variant patterns — higienizacao/lavagem: no conflicts */}
-                <Route path="/higienizacao-*" element={<SofaVariantPage />} />
-                <Route path="/lavagem-*" element={<SofaVariantPage />} />
-                {/* Impermeabilizacao variants: more-specific patterns must come before the location catch-all */}
-                <Route path="/impermeabilizacao-sofa-*" element={<SofaVariantPage />} />
-                <Route path="/impermeabilizacao-colchao-*" element={<SofaVariantPage />} />
-                <Route path="/impermeabilizacao-tapetes-*" element={<SofaVariantPage />} />
-                <Route path="/impermeabilizacao-cadeiras-*" element={<SofaVariantPage />} />
-                <Route path="/impermeabilizacao-alcatifas-*" element={<SofaVariantPage />} />
-                {/* Impermeabilizacao × location/freguesia catch-all */}
-                <Route path="/impermeabilizacao-*" element={<ServiceAreaRouter />} />
-
+                {/* Location × Service SEO pages: 150 explicit routes */}
+                {locationRoutes.map(route => (
+                  <Route key={route.path} path={route.path} element={<LocationServicePage />} />
+                ))}
+                {/* Freguesia × Service SEO pages: 792 explicit routes */}
+                {frequesiaRoutes.map(route => (
+                  <Route key={route.path} path={route.path} element={<FreguesiaServicePage />} />
+                ))}
+                {/* Keyword variant pages (higienizacao/lavagem/impermeabilizacao × service × location).
+                    Registered BEFORE problem×city to win on overlapping paths like
+                    /higienizacao-colchao-porto or /lavagem-tapetes-braga. */}
+                {keywordVariantRoutes.map(route => (
+                  <Route key={route.path} path={route.path} element={<SofaVariantPage />} />
+                ))}
                 {/* Problem SEO pages */}
                 <Route path="/problemas/:slug" element={<ProblemPage />} />
-                {/* Problem × City pattern routes — no data import needed.
-                    More-specific patterns before /limpeza-sofa-*, /limpeza-cadeiras-* etc. */}
-                <Route path="/manchas-*" element={<ProblemCityPage />} />
-                <Route path="/cheiro-*" element={<ProblemCityPage />} />
-                <Route path="/urina-*" element={<ProblemCityPage />} />
-                <Route path="/acaros-*" element={<ProblemCityPage />} />
-                <Route path="/alergias-*" element={<ProblemCityPage />} />
-                <Route path="/pelos-animais-*" element={<ProblemCityPage />} />
-                <Route path="/tapete-persa-*" element={<ProblemCityPage />} />
-                <Route path="/tapete-la-*" element={<ProblemCityPage />} />
-                <Route path="/mofo-*" element={<ProblemCityPage />} />
-                <Route path="/impermeabilizar-*" element={<ProblemCityPage />} />
-                <Route path="/preco-limpeza-sofa-*" element={<ProblemCityPage />} />
-                <Route path="/preco-limpeza-colchao-*" element={<ProblemCityPage />} />
-                <Route path="/preco-limpeza-tapete-*" element={<ProblemCityPage />} />
-                <Route path="/limpeza-profunda-*" element={<ProblemCityPage />} />
-                <Route path="/empresa-limpeza-estofos-*" element={<ProblemCityPage />} />
-                <Route path="/sofa-amarelado-*" element={<ProblemCityPage />} />
-                <Route path="/limpeza-cabeceira-cama-*" element={<ProblemCityPage />} />
-                <Route path="/limpeza-puff-*" element={<ProblemCityPage />} />
-                {/* Slugs that overlap /limpeza-sofa-*, /limpeza-colchao-*, /limpeza-cadeiras-*, /limpeza-alcatifas-* */}
-                <Route path="/limpeza-sofa-tecido-*" element={<ProblemCityPage />} />
-                <Route path="/limpeza-sofa-pele-*" element={<ProblemCityPage />} />
-                <Route path="/limpeza-sofa-veludo-*" element={<ProblemCityPage />} />
-                <Route path="/limpeza-sofa-bebe-*" element={<ProblemCityPage />} />
-                <Route path="/limpeza-sofa-urgente-*" element={<ProblemCityPage />} />
-                <Route path="/limpeza-sofa-domicilio-*" element={<ProblemCityPage />} />
-                <Route path="/limpeza-sofa-profissional-*" element={<ProblemCityPage />} />
-                <Route path="/limpeza-sofa-microfibra-*" element={<ProblemCityPage />} />
-                <Route path="/limpeza-sofa-chenille-*" element={<ProblemCityPage />} />
-                <Route path="/limpeza-sofa-hotel-*" element={<ProblemCityPage />} />
-                <Route path="/limpeza-sofa-perto-de-mim-*" element={<ProblemCityPage />} />
-                <Route path="/limpeza-sofa-antes-depois-*" element={<ProblemCityPage />} />
-                <Route path="/limpeza-colchao-urgente-*" element={<ProblemCityPage />} />
-                <Route path="/limpeza-colchao-bebe-*" element={<ProblemCityPage />} />
-                <Route path="/limpeza-cadeiras-escritorio-*" element={<ProblemCityPage />} />
-                <Route path="/limpeza-alcatifas-empresa-*" element={<ProblemCityPage />} />
-
-                {/* Marca Sofá brand patterns (more specific) before general material patterns */}
-                {['ikea', 'natuzzi', 'roche-bobois', 'conforama', 'el-corte-ingles', 'kave-home', 'leroy-merlin', 'moviflor'].map(brand => (
-                  <Route key={brand} path={`/limpeza-sofa-${brand}-*`} element={<MarcaSofaPage />} />
+                {/* Problem × City explicit routes (higienizacao-* and lavagem-* filtered out above) */}
+                {problemCityRoutes.map(route => (
+                  <Route key={route.path} path={route.path} element={<ProblemCityPage />} />
                 ))}
-                {/* Material pages: singular-prefix patterns (sofa/colchao/tapete/cadeira/alcatifa) */}
-                <Route path="/limpeza-sofa-*" element={<MaterialPage />} />
-                <Route path="/limpeza-colchao-*" element={<MaterialPage />} />
-                <Route path="/limpeza-tapete-*" element={<MaterialPage />} />
-                <Route path="/limpeza-cadeira-*" element={<MaterialPage />} />
-                <Route path="/limpeza-alcatifa-*" element={<MaterialPage />} />
-
-                {/* Price pages: service-specific patterns (avoids /preco-limpeza-sofa-* problem×city paths) */}
-                <Route path="/preco-limpeza-sofas-*" element={<PricePage />} />
-                <Route path="/preco-limpeza-colchoes-*" element={<PricePage />} />
-                <Route path="/preco-limpeza-tapetes-*" element={<PricePage />} />
-                <Route path="/preco-limpeza-cadeiras-*" element={<PricePage />} />
-                <Route path="/preco-limpeza-alcatifas-*" element={<PricePage />} />
-                <Route path="/preco-impermeabilizacao-*" element={<PricePage />} />
-
-                {/* Pack/Combo pages */}
-                <Route path="/pack-*" element={<PackComboPage />} />
+                {/* Marca Sofá pages: 8 brands × cities */}
+                {marcaSofaRoutes.map(route => (
+                  <Route key={route.path} path={route.path} element={<MarcaSofaPage />} />
+                ))}
+                {/* Material base pages */}
+                {materialRoutes.map(route => (
+                  <Route key={route.path} path={route.path} element={<MaterialPage />} />
+                ))}
+                {/* Material × City pages */}
+                {materialCityRoutes.map(route => (
+                  <Route key={route.path} path={route.path} element={<MaterialPage />} />
+                ))}
+                {/* Price pages */}
+                {priceRoutes.map(route => (
+                  <Route key={route.path} path={route.path} element={<PricePage />} />
+                ))}
+                {/* Pack/Combo pages: 4 packs × 5 cities = 20 pages */}
+                {packComboRoutes.map(route => (
+                  <Route key={route.path} path={route.path} element={<PackComboPage />} />
+                ))}
                 {/* Resource pages */}
                 {/* Blog */}
                 <Route path="/blog" element={<Blog />} />
