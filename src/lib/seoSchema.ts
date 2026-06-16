@@ -131,17 +131,15 @@ export function buildServiceNode(opts: {
     ...(opts.areaServed && { "areaServed": opts.areaServed }),
     ...(opts.serviceType && { "serviceType": opts.serviceType }),
     ...(opts.offers && { "offers": opts.offers }),
-    ...(hasReviews && {
-      "aggregateRating": {
-        "@type": "AggregateRating",
-        "ratingValue": REVIEW_RATING,
-        "bestRating": "5",
-        "worstRating": "1",
-        "reviewCount": String(reviewNodes.length),
-        "ratingCount": String(reviewNodes.length),
-      },
-      "review": reviewNodes,
-    }),
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingValue": REVIEW_RATING,
+      "bestRating": "5",
+      "worstRating": "1",
+      "reviewCount": REVIEW_COUNT,
+      "ratingCount": REVIEW_COUNT,
+    },
+    ...(hasReviews && { "review": reviewNodes }),
   };
 }
 
