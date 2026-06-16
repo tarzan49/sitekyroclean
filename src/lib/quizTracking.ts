@@ -1,5 +1,3 @@
-import { supabase } from "@/integrations/supabase/client";
-
 // Run this in Supabase SQL editor to add the new columns:
 // ALTER TABLE quiz_events
 //   ADD COLUMN IF NOT EXISTS page_path text,
@@ -30,6 +28,7 @@ function getDevice(): "mobile" | "tablet" | "desktop" {
 
 async function insertEvent(payload: Record<string, unknown>) {
   try {
+    const { supabase } = await import("@/integrations/supabase/client");
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     await (supabase as any).from("quiz_events").insert(payload);
   } catch {

@@ -3,7 +3,6 @@ import { trackSessionTime } from "@/lib/quizTracking";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 
 import ScrollToTop from "@/components/ScrollToTop";
@@ -13,7 +12,6 @@ import PageHead from "@/components/PageHead";
 import TopProgressBar from "@/components/TopProgressBar";
 import MobileStickyBar from "@/components/MobileStickyBar";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
-import { getAllProblemCityRoutes } from "@/data/problemCitySeoData";
 
 // Critical path - load immediately
 import IndexV1 from "./pages/IndexV1";
@@ -60,23 +58,6 @@ const PageLoader = () => (
   </div>
 );
 
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      staleTime: 1000 * 60 * 5,
-      gcTime: 1000 * 60 * 30,
-      refetchOnWindowFocus: false,
-      retry: 1,
-    },
-  },
-});
-
-// Problem × City explicit routes — filter paths already covered by keyword variant patterns
-// (higienizacao-colchao and lavagem-tapetes are problem slugs that overlap with variant routes;
-// the keyword variant patterns /higienizacao-* and /lavagem-* handle those URLs)
-const problemCityRoutes = getAllProblemCityRoutes().filter(
-  r => !r.path.startsWith('/higienizacao-') && !r.path.startsWith('/lavagem-')
-);
 
 // ── Inner router component, must be inside <BrowserRouter> to use useLocation
 const AppRoutes = () => {
@@ -130,10 +111,43 @@ const AppRoutes = () => {
 
                 {/* Problem SEO pages */}
                 <Route path="/problemas/:slug" element={<ProblemPage />} />
-                {/* Problem × City: explicit routes, conflicts with /higienizacao-* and /lavagem-* filtered out */}
-                {problemCityRoutes.map(route => (
-                  <Route key={route.path} path={route.path} element={<ProblemCityPage />} />
-                ))}
+                {/* Problem × City pattern routes — no data import needed.
+                    More-specific patterns before /limpeza-sofa-*, /limpeza-cadeiras-* etc. */}
+                <Route path="/manchas-*" element={<ProblemCityPage />} />
+                <Route path="/cheiro-*" element={<ProblemCityPage />} />
+                <Route path="/urina-*" element={<ProblemCityPage />} />
+                <Route path="/acaros-*" element={<ProblemCityPage />} />
+                <Route path="/alergias-*" element={<ProblemCityPage />} />
+                <Route path="/pelos-animais-*" element={<ProblemCityPage />} />
+                <Route path="/tapete-persa-*" element={<ProblemCityPage />} />
+                <Route path="/tapete-la-*" element={<ProblemCityPage />} />
+                <Route path="/mofo-*" element={<ProblemCityPage />} />
+                <Route path="/impermeabilizar-*" element={<ProblemCityPage />} />
+                <Route path="/preco-limpeza-sofa-*" element={<ProblemCityPage />} />
+                <Route path="/preco-limpeza-colchao-*" element={<ProblemCityPage />} />
+                <Route path="/preco-limpeza-tapete-*" element={<ProblemCityPage />} />
+                <Route path="/limpeza-profunda-*" element={<ProblemCityPage />} />
+                <Route path="/empresa-limpeza-estofos-*" element={<ProblemCityPage />} />
+                <Route path="/sofa-amarelado-*" element={<ProblemCityPage />} />
+                <Route path="/limpeza-cabeceira-cama-*" element={<ProblemCityPage />} />
+                <Route path="/limpeza-puff-*" element={<ProblemCityPage />} />
+                {/* Slugs that overlap /limpeza-sofa-*, /limpeza-colchao-*, /limpeza-cadeiras-*, /limpeza-alcatifas-* */}
+                <Route path="/limpeza-sofa-tecido-*" element={<ProblemCityPage />} />
+                <Route path="/limpeza-sofa-pele-*" element={<ProblemCityPage />} />
+                <Route path="/limpeza-sofa-veludo-*" element={<ProblemCityPage />} />
+                <Route path="/limpeza-sofa-bebe-*" element={<ProblemCityPage />} />
+                <Route path="/limpeza-sofa-urgente-*" element={<ProblemCityPage />} />
+                <Route path="/limpeza-sofa-domicilio-*" element={<ProblemCityPage />} />
+                <Route path="/limpeza-sofa-profissional-*" element={<ProblemCityPage />} />
+                <Route path="/limpeza-sofa-microfibra-*" element={<ProblemCityPage />} />
+                <Route path="/limpeza-sofa-chenille-*" element={<ProblemCityPage />} />
+                <Route path="/limpeza-sofa-hotel-*" element={<ProblemCityPage />} />
+                <Route path="/limpeza-sofa-perto-de-mim-*" element={<ProblemCityPage />} />
+                <Route path="/limpeza-sofa-antes-depois-*" element={<ProblemCityPage />} />
+                <Route path="/limpeza-colchao-urgente-*" element={<ProblemCityPage />} />
+                <Route path="/limpeza-colchao-bebe-*" element={<ProblemCityPage />} />
+                <Route path="/limpeza-cadeiras-escritorio-*" element={<ProblemCityPage />} />
+                <Route path="/limpeza-alcatifas-empresa-*" element={<ProblemCityPage />} />
 
                 {/* Marca Sofá brand patterns (more specific) before general material patterns */}
                 {['ikea', 'natuzzi', 'roche-bobois', 'conforama', 'el-corte-ingles', 'kave-home', 'leroy-merlin', 'moviflor'].map(brand => (
@@ -195,19 +209,17 @@ const SessionTracker = () => {
 };
 
 const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <SessionTracker />
-        <AppRoutes />
+  <TooltipProvider>
+    <Toaster />
+    <Sonner />
+    <BrowserRouter>
+      <SessionTracker />
+      <AppRoutes />
 
-        <MobileStickyBar />
-        <CookieBanner />
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
+      <MobileStickyBar />
+      <CookieBanner />
+    </BrowserRouter>
+  </TooltipProvider>
 );
 
 export default App;

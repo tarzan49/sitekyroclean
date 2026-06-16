@@ -1,5 +1,3 @@
-import { supabase } from "@/integrations/supabase/client";
-
 export async function logError(payload: {
   message: string;
   source?: string | null;
@@ -10,6 +8,7 @@ export async function logError(payload: {
   severity: "error" | "warning" | "unhandled_rejection";
 }) {
   try {
+    const { supabase } = await import("@/integrations/supabase/client");
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     await (supabase as any).from("error_logs").insert({
       ...payload,
