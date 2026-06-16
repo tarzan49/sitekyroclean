@@ -1342,7 +1342,7 @@ const problemDefinitions: ProblemPage[] = [
     h1: "Limpeza de Sofá Perto de Si: Serviço ao Domicílio",
     intro: "Procura limpeza de sofá perto de si? A Kyro Clean Solutions cobre Porto, Lisboa e todo o Norte de Portugal com serviço ao domicílio. A nossa equipa desloca-se até à sua casa com todo o equipamento.",
     problemDetail: "Quando pesquisa 'limpeza de sofá perto de mim', quer um serviço local, fiável e com boas avaliações. A Kyro Clean Solutions tem 5.0 no Google, +1000 clientes satisfeitos e cobertura em todo o Norte de Portugal e região de Lisboa.",
-    solutionDetail: "Atuamos em Porto, Matosinhos, Maia, Gaia, Gondomar, Valongo, Braga, Guimarães, Póvoa de Varzim, Vila do Conde, Lisboa, Cascais, Oeiras, Sintra, Almada e Setúbal. Deslocação incluída no preço.",
+    solutionDetail: "Atuamos no Porto e em Matosinhos, Maia, Gaia, Gondomar, Valongo, Braga, Guimarães, Póvoa de Varzim, Vila do Conde, Lisboa, Cascais, Oeiras, Sintra, Almada e Setúbal. Deslocação incluída no preço.",
     benefits: ["Cobertura Norte de Portugal + Lisboa", "5.0 Google", "+1000 clientes satisfeitos", "Deslocação incluída", "Desde 39€", "Resposta em 2 horas"],
     faqs: [
       { question: "Em que cidades fazem limpeza de sofá?", answer: "Servimos Porto e toda a área metropolitana, Braga, Guimarães, e região de Lisboa (Cascais, Oeiras, Sintra, Almada, Setúbal). Contacte-nos para confirmar disponibilidade na sua zona." },

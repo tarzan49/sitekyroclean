@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from "react";
-import { useTranslation } from "react-i18next";
 import {
   Accordion,
   AccordionContent,
@@ -53,7 +52,6 @@ const faqs_data = [
 ];
 
 const HomepageFAQ = () => {
-  const { t } = useTranslation();
   const [isVisible, setIsVisible] = useState(false);
   const sectionRef = useRef<HTMLDivElement>(null);
 
@@ -67,8 +65,8 @@ const HomepageFAQ = () => {
   }, []);
 
   const faqs = faqs_data.map((f) => ({
-    question: t(f.questionKey, f.questionDefault),
-    answer: t(f.answerKey, f.answerDefault),
+    question: f.questionDefault,
+    answer: f.answerDefault,
   }));
 
   const faqSchema = {

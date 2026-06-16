@@ -1,14 +1,11 @@
 ﻿import { Phone, Mail, MapPin } from "lucide-react";
 import { GOOGLE_MAPS_URL } from "@/constants/google";
 import { Link } from "react-router-dom";
-import { useTranslation } from "react-i18next";
 import { trackCallClick } from "@/lib/analytics";
 import kyroLogo from "@/assets/kyro-logo.webp";
 import { SITE_URL, PHONE_TEL, PHONE_DISPLAY, BUSINESS_EMAIL_HREF, BUSINESS_EMAIL, BUSINESS_ADDRESS } from "@/constants/business";
 
 const Footer = () => {
-  const { t } = useTranslation();
-
   return (
     <footer className="bg-kyro-green text-white pt-6 md:pt-8 pb-24" style={{ paddingBottom: 'max(6rem, calc(6rem + env(safe-area-inset-bottom)))' }}>
       <div className="container mx-auto px-4">
@@ -28,43 +25,43 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-5 md:gap-6 mb-5">
           {/* Services */}
           <div>
-            <h3 className="text-base md:text-lg font-bold mb-3 md:mb-4 text-white">{t('footer.servicesTitle')}</h3>
+            <h3 className="text-base md:text-lg font-bold mb-3 md:mb-4 text-white">Serviços Kyro Clean Solutions</h3>
             <ul className="space-y-2 md:space-y-2 text-sm">
               <li className="flex items-center gap-2">
                 <span className="text-turquoise">≡</span>
-                <Link to="/limpeza-sofas" className="hover:text-turquoise active:text-turquoise transition-colors py-1 touch-manipulation">{t('services.items.sofas.title')}</Link>
+                <Link to="/limpeza-sofas" className="hover:text-turquoise active:text-turquoise transition-colors py-1 touch-manipulation">Limpeza e Lavagem de Sofás</Link>
               </li>
               <li className="flex items-center gap-2">
                 <span className="text-turquoise">≡</span>
-                <Link to="/impermeabilizacao" className="hover:text-turquoise active:text-turquoise transition-colors py-1 touch-manipulation">{t('services.items.waterproofingSofas.title')}</Link>
+                <Link to="/impermeabilizacao" className="hover:text-turquoise active:text-turquoise transition-colors py-1 touch-manipulation">Impermeabilização de Sofás</Link>
               </li>
               <li className="flex items-center gap-2">
                 <span className="text-turquoise">≡</span>
-                <Link to="/limpeza-tapetes" className="hover:text-turquoise active:text-turquoise transition-colors py-1 touch-manipulation">{t('services.items.carpets.title')}</Link>
+                <Link to="/limpeza-tapetes" className="hover:text-turquoise active:text-turquoise transition-colors py-1 touch-manipulation">Limpeza e Lavagem de Tapetes</Link>
               </li>
               <li className="flex items-center gap-2">
                 <span className="text-turquoise">≡</span>
-                <Link to="/impermeabilizacao" className="hover:text-turquoise active:text-turquoise transition-colors py-1 touch-manipulation">{t('services.items.waterproofingCarpets.title')}</Link>
+                <Link to="/impermeabilizacao" className="hover:text-turquoise active:text-turquoise transition-colors py-1 touch-manipulation">Impermeabilização de Tapetes</Link>
               </li>
               <li className="flex items-center gap-2">
                 <span className="text-turquoise">≡</span>
-                <Link to="/limpeza-colchoes" className="hover:text-turquoise active:text-turquoise transition-colors py-1 touch-manipulation">{t('services.items.mattresses.title')}</Link>
+                <Link to="/limpeza-colchoes" className="hover:text-turquoise active:text-turquoise transition-colors py-1 touch-manipulation">Limpeza e Lavagem de Colchões</Link>
               </li>
               <li className="flex items-center gap-2">
                 <span className="text-turquoise">≡</span>
-                <Link to="/limpeza-cadeiras" className="hover:text-turquoise active:text-turquoise transition-colors py-1 touch-manipulation">{t('services.items.chairs.title')}</Link>
+                <Link to="/limpeza-cadeiras" className="hover:text-turquoise active:text-turquoise transition-colors py-1 touch-manipulation">Limpeza e Lavagem de Cadeiras</Link>
               </li>
               <li className="flex items-center gap-2">
                 <span className="text-turquoise">≡</span>
-                <Link to="/impermeabilizacao" className="hover:text-turquoise active:text-turquoise transition-colors py-1 touch-manipulation">{t('services.items.waterproofingChairs.title')}</Link>
+                <Link to="/impermeabilizacao" className="hover:text-turquoise active:text-turquoise transition-colors py-1 touch-manipulation">Impermeabilização de Cadeiras</Link>
               </li>
               <li className="flex items-center gap-2">
                 <span className="text-turquoise">≡</span>
-                <Link to="/limpeza-alcatifas" className="hover:text-turquoise active:text-turquoise transition-colors py-1 touch-manipulation">{t('services.items.headboards.title')}</Link>
+                <Link to="/limpeza-alcatifas" className="hover:text-turquoise active:text-turquoise transition-colors py-1 touch-manipulation">Limpeza e Lavagem de Alcatifas</Link>
               </li>
               <li className="flex items-center gap-2">
                 <span className="text-turquoise">≡</span>
-                <Link to="/impermeabilizacao" className="hover:text-turquoise active:text-turquoise transition-colors py-1 touch-manipulation">{t('services.items.waterproofingHeadboards.title')}</Link>
+                <Link to="/impermeabilizacao" className="hover:text-turquoise active:text-turquoise transition-colors py-1 touch-manipulation">Impermeabilização de Cabeceiras e Estrados</Link>
               </li>
             </ul>
           </div>
@@ -137,13 +134,13 @@ const Footer = () => {
               </li>
             </ul>
             <p className="text-sm text-[#111111]/25 leading-relaxed">
-              {t('footer.aboutText')}
+              Na Kyro Clean Solutions, unimos tecnologia, detalhe e dedicação para renovar sofás, colchões e tapetes, transformando o seu espaço num ambiente mais limpo e confortável.
             </p>
           </div>
 
           {/* Contacts */}
           <div>
-            <h3 className="text-base md:text-lg font-bold mb-3 md:mb-4 text-white">{t('footer.contactTitle')}</h3>
+            <h3 className="text-base md:text-lg font-bold mb-3 md:mb-4 text-white">Fale Connosco</h3>
             <div className="space-y-3 text-sm">
               <a href={`tel:${PHONE_TEL}`} onClick={() => trackCallClick('footer')} className="flex items-center gap-2 hover:text-turquoise active:text-turquoise transition-colors py-1 touch-manipulation">
                 <Phone className="h-4 w-4 text-turquoise flex-shrink-0" />
@@ -175,7 +172,7 @@ const Footer = () => {
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <div className="flex flex-col items-center md:items-start gap-1">
               <p className="text-xs md:text-sm text-[#111111]/40 text-center md:text-left">
-                {t('footer.copyright')}
+                © 2025 Kyro Clean Solutions. Todos os direitos reservados.
               </p>
               <div className="flex flex-wrap gap-x-4 gap-y-1 justify-center md:justify-start">
                 <Link
@@ -199,7 +196,7 @@ const Footer = () => {
               </div>
             </div>
             <div>
-              <h4 className="text-xs md:text-sm font-semibold mb-2 text-center md:text-right">{t('footer.followUs')}</h4>
+              <h4 className="text-xs md:text-sm font-semibold mb-2 text-center md:text-right">Siga-nos nas redes sociais</h4>
               <div className="flex gap-3 justify-center md:justify-end">
                 <a
                   href={SITE_URL}

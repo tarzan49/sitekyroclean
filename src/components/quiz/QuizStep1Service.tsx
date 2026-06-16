@@ -1,5 +1,4 @@
-﻿import { useTranslation } from 'react-i18next';
-import { Check } from 'lucide-react';
+﻿import { Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface QuizStep1ServiceProps {
@@ -18,13 +17,11 @@ const SERVICE_IMAGES: Record<string, string> = {
 const IMG_POSITION: Record<string, string> = {};
 
 const QuizStep1Service = ({ selectedService, onSelect }: QuizStep1ServiceProps) => {
-  const { t } = useTranslation();
-
   const serviceOptions = [
-    { id: 'sofa',     label: t('quiz.services.sofa') },
-    { id: 'mattress', label: t('quiz.services.mattress') },
-    { id: 'carpet',   label: t('quiz.services.carpet') },
-    { id: 'chairs',   label: t('quiz.services.chairs') },
+    { id: 'sofa',     label: 'Sofá' },
+    { id: 'mattress', label: 'Colchão' },
+    { id: 'carpet',   label: 'Tapete' },
+    { id: 'chairs',   label: 'Cadeiras' },
   ];
 
   return (

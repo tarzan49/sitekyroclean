@@ -1,4 +1,3 @@
-import { useTranslation } from "react-i18next";
 import { Shield, Heart, Sparkles } from "lucide-react";
 import Header from "@/components/Header";
 import { QuizServiceProvider } from "@/context/QuizLocationContext";
@@ -81,12 +80,11 @@ const expertTips: ExpertTip[] = [
 ];
 
 const LimpezaTapetes = () => {
-  const { t } = useTranslation();
-
-  const faqs = [1, 2, 3].map((n) => ({
-    question: t(`carpetCleaning.faq.question${n}`),
-    answer: t(`carpetCleaning.faq.answer${n}`),
-  }));
+  const faqs = [
+    { question: 'A limpeza profunda remove mesmo cheiros e manchas antigas?', answer: 'Conseguimos reduzir significativamente cheiros a humidade, animais e uso diário, e remover a grande maioria das manchas. Em alguns casos muito antigos ou já oxidado o tecido pode não voltar a 100%, mas explicamos sempre o cenário realista antes de avançar.' },
+    { question: 'A carpete precisa de ser retirada de casa para ser limpa?', answer: 'Na maioria dos casos, não. Fazemos a limpeza diretamente no local, com equipamento profissional de extração. Assim evitam-se deslocações, tempo de espera e riscos de danos no transporte.' },
+    { question: 'De quanto em quanto tempo devo limpar a carpete/tapete?', answer: 'Para uso doméstico, recomendamos uma limpeza profunda a cada 12 meses. Em casas com crianças, animais ou alergias, o ideal é a cada 6 a 9 meses. Em empresas, hotéis ou restaurantes, a frequência deve ser ajustada ao nível de tráfego (trimestral, semestral ou anual).' },
+  ];
 
   return (
     <QuizServiceProvider value="carpet">
@@ -120,7 +118,7 @@ const LimpezaTapetes = () => {
           items={tapetesGuarantee}
           variant="light"
         />
-        <ServiceFAQ faqs={faqs} heading={t("carpetCleaning.faq.title")} />
+        <ServiceFAQ faqs={faqs} heading="Perguntas Frequentes" variant="dark" />
         <ServiceExpertTips tips={expertTips} variant="light" />
         <ServiceCityLinks serviceSlug="limpeza-tapetes" serviceLabel="Limpeza de Tapetes" />
         <ServiceSchema

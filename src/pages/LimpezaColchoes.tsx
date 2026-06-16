@@ -1,4 +1,3 @@
-import { useTranslation } from "react-i18next";
 import { Shield, Heart, Sparkles } from "lucide-react";
 import Header from "@/components/Header";
 import { QuizServiceProvider } from "@/context/QuizLocationContext";
@@ -82,12 +81,11 @@ const expertTips: ExpertTip[] = [
 ];
 
 const LimpezaColchoes = () => {
-  const { t } = useTranslation();
-
-  const faqs = [1, 2, 3].map((n) => ({
-    question: t(`mattressCleaning.faq.question${n}`),
-    answer: t(`mattressCleaning.faq.answer${n}`),
-  }));
+  const faqs = [
+    { question: 'Para que serve a limpeza de colchões se uso sempre lençóis?', answer: 'Mesmo com lençóis, o colchão acumula ácaros, suor, poeiras e micro-resíduos ao longo do tempo. A limpeza profunda ajuda a reduzir alergias, problemas respiratórios e odores, aumentando o conforto e a higiene do sono.' },
+    { question: 'A limpeza elimina totalmente ácaros e bactérias?', answer: 'Reduzimos de forma muito significativa a carga de ácaros, microorganismos e partículas acumuladas, através de extração profunda e produtos específicos. Nenhum processo é capaz de garantir "0 ácaros", mas o impacto na qualidade do ar e na higiene do colchão é muito visível.' },
+    { question: 'Com que frequência devo limpar o colchão?', answer: 'Para uso doméstico, recomendamos uma limpeza profunda a cada 12 a 18 meses. Em casos de alergias, problemas respiratórios, crianças pequenas ou colchões muito utilizados (AL, hotéis), o ideal é encurtar o intervalo para 6 a 12 meses.' },
+  ];
 
   return (
     <QuizServiceProvider value="mattress">
@@ -121,7 +119,7 @@ const LimpezaColchoes = () => {
           items={colchoesGuarantee}
           variant="light"
         />
-        <ServiceFAQ faqs={faqs} heading={t("mattressCleaning.faq.title")} />
+        <ServiceFAQ faqs={faqs} heading="Perguntas Frequentes" variant="dark" />
         <ServiceExpertTips tips={expertTips} variant="light" />
         <ServiceCityLinks serviceSlug="limpeza-colchoes" serviceLabel="Limpeza de Colchões" />
         <ServiceSchema

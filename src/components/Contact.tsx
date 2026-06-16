@@ -4,7 +4,6 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { useTranslation } from "react-i18next";
 import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { quoteFormSchema } from "@/lib/validation";
@@ -19,7 +18,6 @@ import {
 
 const Contact = () => {
   const { toast } = useToast();
-  const { t } = useTranslation();
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
@@ -63,7 +61,7 @@ const Contact = () => {
       if (!validationResult.success) {
         const firstError = validationResult.error.errors[0];
         toast({
-          title: t('contact.validationError'),
+          title: 'Erro de Validação',
           description: firstError.message,
           variant: "destructive",
         });
@@ -127,29 +125,29 @@ const Contact = () => {
   const contactInfo = [
     {
       icon: Phone,
-      label: t('contact.phoneLabel'),
+      label: 'Telemóvel/Telefone',
       value: PHONE_DISPLAY,
-      subtext: t('common.callNow'),
+      subtext: 'Ligue-nos agora',
       href: `tel:${PHONE_TEL}`,
     },
     {
       icon: Mail,
-      label: t('contact.emailLabel'),
+      label: 'Email',
       value: BUSINESS_EMAIL,
-      subtext: t('common.sendEmail'),
+      subtext: 'Envie-nos um email',
       href: BUSINESS_EMAIL_HREF,
     },
     {
       icon: MapPin,
-      label: t('contact.addressLabel'),
+      label: 'Morada',
       value: BUSINESS_ADDRESS.streetAddress,
       subtext: `${BUSINESS_ADDRESS.postalCode} ${BUSINESS_ADDRESS.addressLocality}`,
       href: null,
     },
     {
       icon: Clock,
-      label: t('contact.scheduleTitle'),
-      value: t('contact.scheduleText'),
+      label: 'Horário',
+      value: 'Segunda a Sábado: 08:00 - 00:00',
       subtext: "Segunda a Sábado",
       href: null,
     },
@@ -162,7 +160,7 @@ const Contact = () => {
         <div className={`text-center mb-12 md:mb-16 transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-5'}`}>
           <div className="flex items-center justify-center gap-2 mb-4">
             <MessageSquare className="h-5 w-5 text-gold" />
-            <span className="text-gold font-semibold tracking-wide uppercase text-sm">{t('contact.badge')}</span>
+            <span className="text-gold font-semibold tracking-wide uppercase text-sm">Fale Connosco</span>
           </div>
           <h2 className="text-2xl md:text-4xl lg:text-5xl font-bold text-[#111111] mb-3">
             Prepare o seu espaço para impressionar.
@@ -211,7 +209,7 @@ const Contact = () => {
                 <div className="grid md:grid-cols-2 gap-5">
                   <div>
                     <label className="text-sm font-semibold text-[#111111] mb-2 block">
-                      {t('contact.nameLabel')} <span className="text-red-500">{t('contact.required')}</span>
+                      Nome <span className="text-red-500">*</span>
                     </label>
                     <Input
                       type="text"
@@ -220,12 +218,12 @@ const Contact = () => {
                       required
                       maxLength={100}
                       className="h-12 text-base border-border/50 focus:border-gold focus:ring-gold/20 rounded-xl"
-                      placeholder={t('contact.namePlaceholder')}
+                      placeholder="O seu nome completo"
                     />
                   </div>
                   <div>
                     <label className="text-sm font-semibold text-[#111111] mb-2 block">
-                      {t('contact.phoneLabel')}
+                      Telemóvel/Telefone
                     </label>
                     <Input
                       type="tel"
@@ -233,7 +231,7 @@ const Contact = () => {
                       onChange={(e) => setFormData({ ...formData, telefone: e.target.value })}
                       maxLength={20}
                       className="h-12 text-base border-border/50 focus:border-gold focus:ring-gold/20 rounded-xl"
-                      placeholder={t('contact.phonePlaceholder')}
+                      placeholder="912 345 678"
                     />
                   </div>
                 </div>
@@ -241,7 +239,7 @@ const Contact = () => {
                 <div className="grid md:grid-cols-2 gap-5">
                   <div>
                     <label className="text-sm font-semibold text-[#111111] mb-2 block">
-                      {t('contact.emailLabel')} <span className="text-red-500">{t('contact.required')}</span>
+                      Email <span className="text-red-500">*</span>
                     </label>
                     <Input
                       type="email"
@@ -250,12 +248,12 @@ const Contact = () => {
                       required
                       maxLength={254}
                       className="h-12 text-base border-border/50 focus:border-gold focus:ring-gold/20 rounded-xl"
-                      placeholder={t('contact.emailPlaceholder')}
+                      placeholder="seu@email.com"
                     />
                   </div>
                   <div>
                     <label className="text-sm font-semibold text-[#111111] mb-2 block">
-                      {t('contact.locationLabel')} <span className="text-red-500">{t('contact.required')}</span>
+                      Localidade <span className="text-red-500">*</span>
                     </label>
                     <Input
                       value={formData.localidade}
@@ -263,14 +261,14 @@ const Contact = () => {
                       required
                       maxLength={100}
                       className="h-12 text-base border-border/50 focus:border-gold focus:ring-gold/20 rounded-xl"
-                      placeholder={t('contact.locationPlaceholder')}
+                      placeholder="Ex: Porto, Lisboa, Braga..."
                     />
                   </div>
                 </div>
 
                 <div>
                   <label className="text-sm font-semibold text-[#111111] mb-2 block">
-                    {t('contact.messageLabel')} <span className="text-red-500">{t('contact.required')}</span>
+                    Mensagem <span className="text-red-500">*</span>
                   </label>
                   <Textarea
                     value={formData.mensagem}
@@ -279,12 +277,12 @@ const Contact = () => {
                     required
                     maxLength={2000}
                     className="text-base min-h-[120px] border-border/50 focus:border-gold focus:ring-gold/20 rounded-xl resize-none"
-                    placeholder={t('contact.messagePlaceholder')}
+                    placeholder="Descreva o que precisa..."
                   />
                 </div>
 
                 <p className="text-xs text-[#111111]/55 bg-secondary/30 p-3 rounded-xl">
-                  {t('contact.note')}
+                  - Para orçamentos de Tapetes e Colchões, favor indicar as medidas.
                 </p>
 
 
@@ -297,7 +295,7 @@ const Contact = () => {
                     className="relative w-full bg-gradient-to-r from-gold to-[#d4c78d] hover:from-[#d4c78d] hover:to-gold text-[#111111] font-bold py-6 h-auto text-base md:text-lg rounded-xl shadow-lg transition-all duration-300 hover:scale-[1.02] hover:shadow-xl disabled:opacity-50"
                   >
                     <Send className="mr-2 h-5 w-5" />
-                    {isSubmitting ? t('hero.form.submitting') : t('contact.submit')}
+                    {isSubmitting ? 'A enviar...' : 'Enviar Pedido'}
                   </Button>
                 </div>
               </form>
@@ -312,7 +310,7 @@ const Contact = () => {
               <div className="relative bg-[#FFFFFF] p-8 rounded-[22px] shadow-xl h-full">
                 <h3 className="text-xl font-bold text-[#111111] mb-6 flex items-center gap-2">
                   <Sparkles className="w-5 h-5 text-gold" />
-                  {t('contact.contactInfoTitle')}
+                  Informações de Contacto
                 </h3>
                 
                 <div className="space-y-4">
@@ -345,7 +343,7 @@ const Contact = () => {
                 {/* Trust Badge */}
                 <div className="mt-6 p-4 rounded-[18px] bg-gradient-to-r from-gold/10 to-turquoise/10 border border-gold/20">
                   <p className="text-sm text-[#111111]/80 text-center font-medium">
-                    {t('contact.trustBadge')}
+                    Resposta garantida em menos de 2 horas durante o horário de funcionamento.
                   </p>
                 </div>
               </div>

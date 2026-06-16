@@ -52,7 +52,6 @@ const BlogPost = () => {
   const location = useLocation();
   const slug = location.pathname.replace("/blog/", "");
   const post = useMemo(() => getPostBySlug(slug), [slug]);
-  const allPosts = useMemo(() => getAllPosts(), []);
 
   useEffect(() => {
     if (!post) return;

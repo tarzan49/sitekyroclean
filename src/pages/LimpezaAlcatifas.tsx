@@ -1,4 +1,3 @@
-import { useTranslation } from "react-i18next";
 import { Shield, Heart, Sparkles } from "lucide-react";
 import Header from "@/components/Header";
 import { QuizServiceProvider } from "@/context/QuizLocationContext";
@@ -81,12 +80,11 @@ const expertTips: ExpertTip[] = [
 ];
 
 const LimpezaAlcatifas = () => {
-  const { t } = useTranslation();
-
-  const faqs = [1, 2, 3].map((n) => ({
-    question: t(`rugCleaning.faq.question${n}`),
-    answer: t(`rugCleaning.faq.answer${n}`),
-  }));
+  const faqs = [
+    { question: 'A limpeza profunda substitui a aspiração do dia a dia?', answer: 'Não. A aspiração regular é essencial para remover o pó superficial. A nossa limpeza profunda atua onde o aspirador não chega: fibras internas, manchas entranhadas, resíduos de sujidade e gordura acumulada.' },
+    { question: 'A alcatifa pode encolher, ondular ou descolar com a limpeza?', answer: 'Usamos equipamentos adequados para alcatifas fixas, com controlo de humidade e extração forte, evitando excesso de água. Em condições normais, a alcatifa não encolhe nem ondula. Se houver alguma fragilidade estrutural prévia, sinalizamos antes.' },
+    { question: 'A limpeza ajuda mesmo em casos de alergias e má qualidade do ar?', answer: 'Sim. As alcatifas funcionam como "filtros" que retêm pó, ácaros e partículas. Quando não são limpas, tudo isso volta ao ar a cada passo. A limpeza profunda reduz estes agentes, contribuindo para um ambiente mais saudável, especialmente em casas com crianças, idosos ou pessoas alérgicas.' },
+  ];
 
   return (
     <QuizServiceProvider value="carpet">
@@ -120,7 +118,7 @@ const LimpezaAlcatifas = () => {
           items={alcatifasGuarantee}
           variant="light"
         />
-        <ServiceFAQ faqs={faqs} heading={t("rugCleaning.faq.title")} />
+        <ServiceFAQ faqs={faqs} heading="Perguntas Frequentes" variant="dark" />
         <ServiceExpertTips tips={expertTips} variant="light" />
         <ServiceCityLinks serviceSlug="limpeza-alcatifas" serviceLabel="Limpeza de Alcatifas" />
         <ServiceSchema

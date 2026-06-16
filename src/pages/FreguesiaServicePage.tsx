@@ -1,13 +1,16 @@
-﻿import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useLocation, Link } from "react-router-dom";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { CheckCircle, MapPin, ArrowRight, Star, MessageCircle } from "lucide-react";
+import { MapPin, Star, CheckCircle, MessageCircle, ArrowRight, Minus, Plus } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import QuizButton from "@/components/QuizButton";
-import ServiceFAQSchema from "@/components/ServiceFAQSchema";
+import QuizFormLazy from "@/components/QuizFormLazy";
+import SectionHeader from "@/components/SectionHeader";
 import ServiceLocationSchema from "@/components/ServiceLocationSchema";
+import ServiceFAQ from "@/components/ServiceFAQ";
 import ServicePackBanner from "@/components/ServicePackBanner";
+import TrustRatingBadge from "@/components/TrustRatingBadge";
+import { useQuizLauncher } from "@/hooks/use-quiz-launcher";
 import { services } from "@/data/locationSeoData";
 import { QuizLocationProvider, QuizServiceProvider } from "@/context/QuizLocationContext";
 import {
@@ -22,10 +25,16 @@ import { trackWhatsAppClick } from "@/lib/quizTracking";
 import { SERVICE_PACK_SLUGS } from "@/constants/servicePackSlugs";
 import { SERVICE_TO_QUIZ } from "@/constants/serviceToQuiz";
 import { METRO_CITIES } from "@/constants/metroCities";
-import { SERVICE_HERO_IMAGES, SERVICE_RESULT_IMAGES, SERVICE_RESULT_CONTENT, SERVICE_HERO_FALLBACK, SERVICE_RESULT_FALLBACK } from "@/constants/serviceContent";
+import { SERVICE_HERO_IMAGES, SERVICE_HERO_FALLBACK } from "@/constants/serviceContent";
 import { buildServiceWaMessage } from "@/lib/whatsappMessages";
 import { SITE_URL, WHATSAPP_BASE } from "@/constants/business";
-import TrustRatingBadge from "@/components/TrustRatingBadge";
+import { PRICE_TABLE, PRICE_TABLE_QUIZ_CONFIG, SERVICE_TESTIMONIALS, type PriceRowQuizConfig } from "@/data/locationPriceTestimonialsData";
+import { PROBLEM_IMAGES, PROBLEM_POOL_CTA, PRICE_HEADING_VERB } from "@/constants/problemCardHelpers";
+
+function getRowDefaultQty(config: PriceRowQuizConfig): number {
+  if (config.chairQty) return parseInt(config.chairQty, 10) || 1;
+  return 1;
+}
 
 function parseFreguesiaRoute(pathname: string): { serviceSlug: string; citySlug: string; freguesiaSlug: string } | null {
   const path = pathname.replace(/^\//, '');
@@ -54,6 +63,32 @@ const FreguesiaServicePage = () => {
     const content = generateFreguesiaContent(svc.name, svc.slug, svc.priceFrom, freguesia.name, freguesia.slug, freguesia.municipio);
     return { ...content, ...freguesia, service: svc.name, serviceSlug: svc.slug, priceFrom: svc.priceFrom };
   }, [parsed]);
+
+  const { isQuizOpen: isPriceQuizOpen, openQuiz: openPriceQuiz, closeQuiz: closePriceQuiz } = useQuizLauncher();
+  const { isQuizOpen: isProblemQuizOpen, openQuiz: openProblemQuiz, closeQuiz: closeProblemQuiz } = useQuizLauncher();
+  const [priceQuizConfig, setPriceQuizConfig] = useState<PriceRowQuizConfig | null>(null);
+  const [rowQuantities, setRowQuantities] = useState<Record<number, number>>({});
+
+  useEffect(() => {
+    setRowQuantities({});
+  }, [data?.serviceSlug]);
+
+  const adjustRowQty = (i: number, config: PriceRowQuizConfig, delta: number) => {
+    setRowQuantities(prev => {
+      const current = prev[i] ?? getRowDefaultQty(config);
+      return { ...prev, [i]: Math.max(1, current + delta) };
+    });
+  };
+
+  const handleSelectRow = (i: number, config: PriceRowQuizConfig) => {
+    const qty = rowQuantities[i] ?? getRowDefaultQty(config);
+    const resolved: PriceRowQuizConfig = { ...config };
+    if (config.sofaSizeId) resolved.sofaQty = qty;
+    if (config.mattressSizeId) resolved.mattressQty = qty;
+    if (config.chairQty) resolved.chairQty = String(qty);
+    setPriceQuizConfig(resolved);
+    openPriceQuiz();
+  };
 
   useEffect(() => {
     if (data) {
@@ -93,14 +128,38 @@ const FreguesiaServicePage = () => {
   }
 
   const quizService = SERVICE_TO_QUIZ[data.serviceSlug];
-
+  const heroImgs = SERVICE_HERO_IMAGES[data.serviceSlug] ?? SERVICE_HERO_FALLBACK;
   const nearbyFreguesias = getNearbyFreguesias(data.municipioSlug, data.nearby);
   const otherServices = services.filter(s => s.slug !== data.serviceSlug);
-  const heroImgs = SERVICE_HERO_IMAGES[data.serviceSlug] ?? SERVICE_HERO_FALLBACK;
-  const resultImg = SERVICE_RESULT_IMAGES[data.serviceSlug] ?? SERVICE_RESULT_FALLBACK;
-  const resultLabel = data.serviceSlug === 'impermeabilizacao' ? 'impermeabilização' : 'limpeza';
-  const resultDesc = SERVICE_RESULT_CONTENT[data.serviceSlug]?.(data.name)?.desc ?? data.metaDescription;
   const serviceBaseUrl = services.find(s => s.slug === data.serviceSlug)?.baseRoute ?? `/${data.serviceSlug}`;
+  const processSteps = data.serviceSlug === 'impermeabilizacao' ? IMPERMEABILIZACAO_STEPS : GENERIC_PROCESS_STEPS;
+
+  const h1Words = data.h1.trim().split(" ");
+  const h1Gold = h1Words.pop() ?? "";
+  const h1Rest = h1Words.join(" ");
+
+  const waUrl = `${WHATSAPP_BASE}?text=${encodeURIComponent(buildServiceWaMessage(data.serviceSlug, data.name))}`;
+
+  const serviceCategory = data.service.startsWith("Limpeza de ")
+    ? data.service.replace("Limpeza de ", "").toLowerCase()
+    : data.service.toLowerCase();
+
+  const snapshotStats = [
+    { value: "5.0 ★", label: "Avaliação Google" },
+    { value: data.priceFrom, label: `Desde, em ${data.name}` },
+    { value: nearbyFreguesias.length > 0 ? `${nearbyFreguesias.length}+` : "100%", label: nearbyFreguesias.length > 0 ? "Zonas próximas" : "Cobertura local" },
+    { value: "24h", label: "Tempo de resposta" },
+  ];
+
+  const problemImages = PROBLEM_IMAGES[data.serviceSlug] ?? [];
+  const problemCards = data.problems.map((problem, idx) => ({
+    title: problem.title,
+    description: problem.description,
+    alt: problem.description,
+    image: problemImages.length > 0 ? problemImages[idx % problemImages.length] : undefined,
+    cta: PROBLEM_POOL_CTA[problem.title] ?? "Pedir Orçamento",
+  })).filter(card => card.image);
+  const problemGridCols = problemCards.length >= 4 ? "lg:grid-cols-4" : "lg:grid-cols-3";
 
   return (
     <QuizLocationProvider value={data.municipio}>
@@ -110,7 +169,7 @@ const FreguesiaServicePage = () => {
         serviceBaseUrl={serviceBaseUrl}
         placeName={data.name}
         parentPlace={data.municipio}
-        description={resultDesc}
+        description={data.metaDescription}
         pageUrl={location.pathname}
         priceFrom={data.priceFrom}
       />
@@ -118,7 +177,7 @@ const FreguesiaServicePage = () => {
       <main>
 
         {/* ═══ HERO ═══ */}
-        <section className="relative pt-24 md:pt-28 pb-14 md:pb-20 overflow-hidden">
+        <section className="relative pt-24 md:pt-28 pb-16 md:pb-24 overflow-hidden">
           <div className="absolute inset-0" style={{ background: "#071a12" }} />
           <div className="absolute inset-0 overflow-hidden" aria-hidden="true">
             <picture className="w-full h-full">
@@ -135,62 +194,77 @@ const FreguesiaServicePage = () => {
                 <nav className="flex items-center gap-1.5 text-xs text-white/50 mb-6 flex-wrap" aria-label="Breadcrumb">
                   <Link to="/" className="hover:text-white/80 transition-colors">Início</Link>
                   <span>/</span>
+                  <Link to={serviceBaseUrl} className="hover:text-white/80 transition-colors">{data.service}</Link>
+                  <span>/</span>
                   <Link to={`/${data.serviceSlug}-${data.municipioSlug}`} className="hover:text-white/80 transition-colors">{data.municipio}</Link>
                   <span>/</span>
                   <span className="text-white/70">{data.name}</span>
                 </nav>
 
-                <div className="flex items-center gap-2 mb-4">
-                  <MapPin className="w-4 h-4" style={{ color: "#D4AF37" }} />
-                  <span className="text-[10px] font-bold tracking-[0.28em] uppercase" style={{ color: "#D4AF37" }}>
-                    {data.name}, {data.municipio}
-                  </span>
+                <div className="inline-flex items-start mb-5">
+                  <div className="flex flex-col gap-1">
+                    <div className="w-7 h-px bg-gradient-to-r from-gold to-transparent" />
+                    <span
+                      className="text-[10px] font-bold text-gold/90 tracking-[0.30em] uppercase"
+                      style={{ textShadow: "0 1px 6px rgba(0,0,0,0.6)" }}
+                    >
+                      {data.service} · {data.name}, {data.municipio}
+                    </span>
+                  </div>
                 </div>
 
-                <h1 className="font-playfair text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4 leading-[1.15]">
-                  {data.h1}
+                <h1
+                  className="font-playfair text-[1.75rem] sm:text-4xl md:text-5xl lg:text-6xl font-semibold text-white mb-4 leading-[1.12]"
+                  style={{ textShadow: "0 2px 16px rgba(0,0,0,0.65)" }}
+                >
+                  {h1Rest}{" "}<span style={{ color: "#D4AF37" }}>{h1Gold}</span>
                 </h1>
 
-                <p className="text-base md:text-lg text-white/70 leading-relaxed mb-6 max-w-lg">
+                <p className="text-sm sm:text-base md:text-lg text-white/70 leading-relaxed mb-6 max-w-lg">
                   {data.intro.split('.')[0]}.
                 </p>
 
-                <TrustRatingBadge variant="hero" />
+                <div className="mb-6">
+                  <TrustRatingBadge variant="hero" />
+                </div>
 
-                <div className="flex gap-3 max-w-md">
+                <div className="flex flex-col sm:flex-row gap-3 max-w-md">
                   <QuizButton
                     className="flex-1"
                     initialLocation={data.municipio}
                     initialService={quizService}
-                    ctaLabel="Ver preço grátis"
-                    buttonClassName="h-[52px] !py-0 w-full"
+                    buttonClassName="h-[58px] md:h-[52px] !py-0 w-full"
                   />
-                  <a
-                    href={`${WHATSAPP_BASE}?text=${encodeURIComponent(buildServiceWaMessage(data.serviceSlug, data.name))}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    onClick={() => trackWhatsAppClick(`freguesia_hero_${data.serviceSlug}_${data.municipioSlug}`)}
-                    className="relative flex-1 inline-flex items-center justify-center gap-2 h-[52px] px-5 rounded-full font-black text-sm text-white bg-gradient-to-r from-[#1DA851] via-[#25D366] to-[#1DA851] shadow-[0_6px_22px_rgba(37,211,102,0.42),0_2px_6px_rgba(0,0,0,0.28),inset_0_1px_0_rgba(255,255,255,0.20),inset_0_-2px_0_rgba(0,0,0,0.12)] hover:shadow-[0_10px_32px_rgba(37,211,102,0.60),0_2px_6px_rgba(0,0,0,0.28)] hover:scale-[1.025] active:scale-[0.95] transition-all duration-200 touch-manipulation"
-                  >
-                    <MessageCircle className="w-[18px] h-[18px] text-white flex-shrink-0" strokeWidth={2} />
-                    Falar agora
-                  </a>
+                  <div className="relative group flex-1">
+                    <div className="absolute -inset-1.5 bg-[#25D366]/40 opacity-30 blur-lg group-hover:opacity-55 transition-opacity duration-400 pointer-events-none" />
+                    <a
+                      href={waUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={() => trackWhatsAppClick(`freguesia_hero_${data.serviceSlug}_${data.municipioSlug}`)}
+                      className="relative flex items-center justify-center gap-2 w-full h-[58px] md:h-[52px] px-6 font-bold text-white touch-manipulation bg-gradient-to-r from-[#1DA851] via-[#25D366] to-[#1DA851] shadow-[0_6px_22px_rgba(37,211,102,0.42),0_2px_6px_rgba(0,0,0,0.28),inset_0_1px_0_rgba(255,255,255,0.20),inset_0_-2px_0_rgba(0,0,0,0.12)] hover:shadow-[0_10px_32px_rgba(37,211,102,0.60),0_4px_10px_rgba(0,0,0,0.32)] hover:scale-[1.025] active:scale-[0.95] transition-all duration-150"
+                    >
+                      <MessageCircle className="w-[18px] h-[18px] flex-shrink-0" strokeWidth={2} />
+                      <span className="text-[13px] font-semibold tracking-[0.18em] uppercase">Falar por WhatsApp</span>
+                    </a>
+                  </div>
                 </div>
 
-                <p className="text-white/40 text-xs mt-4">Desde {data.priceFrom} · Orçamento gratuito</p>
+                <p className="text-white/40 text-xs mt-4">Desde {data.priceFrom} · Orçamento gratuito · Sem compromisso</p>
               </div>
 
               <div className="hidden lg:block">
                 <div className="relative">
-                  <div className="absolute -inset-4 rounded-3xl blur-2xl opacity-20" style={{ background: "linear-gradient(135deg, #D4AF37, transparent)" }} />
+                  <div className="absolute -inset-4 blur-2xl opacity-20" style={{ background: "linear-gradient(135deg, #D4AF37, transparent)" }} />
                   <picture>
                     <source media="(max-width: 767px)" srcSet={heroImgs.m} type="image/webp" />
                     <source media="(min-width: 768px)" srcSet={heroImgs.d} type="image/webp" />
                     <img
-                    src={heroImgs.d}
-                    alt={`${data.service} em ${data.name}`}
-                    className="relative rounded-2xl w-full max-h-[400px] object-cover shadow-2xl"
-                    loading="eager"
+                      src={heroImgs.d}
+                      alt={`${data.service} profissional em ${data.name}`}
+                      className="relative w-full max-h-[440px] object-cover shadow-2xl"
+                      style={{ borderTop: "2px solid #D4AF37" }}
+                      loading="eager"
                     />
                   </picture>
                 </div>
@@ -199,160 +273,296 @@ const FreguesiaServicePage = () => {
           </div>
         </section>
 
-        {/* ═══ PROBLEMAS COMUNS ═══ */}
-        <section className="py-12 md:py-16 bg-[#FDFDF9]">
-          <div className="container mx-auto px-5 sm:px-6 lg:px-8">
-            <div className="max-w-4xl mx-auto">
-              <div className="text-center mb-8">
-                <div className="flex items-center justify-center gap-3 mb-3">
-                  <div className="h-px w-10 opacity-40" style={{ backgroundColor: "#D4AF37" }} />
-                  <p className="text-[10px] font-bold tracking-[0.28em] uppercase" style={{ color: "#D4AF37" }}>O que resolvemos</p>
-                  <div className="h-px w-10 opacity-40" style={{ backgroundColor: "#D4AF37" }} />
+        {/* ═══ LOCAL SNAPSHOT ═══ */}
+        <section style={{ backgroundColor: "#071a12" }}>
+          <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
+            <div className="grid grid-cols-2 md:grid-cols-4 divide-x divide-white/10">
+              {snapshotStats.map((s, i) => (
+                <div key={i} className="py-6 md:py-8 px-2 text-center">
+                  <p className="font-playfair font-bold text-2xl md:text-3xl leading-none mb-2" style={{ color: "#D4AF37" }}>{s.value}</p>
+                  <p className="text-[9px] font-medium text-white/40 tracking-[0.24em] uppercase">{s.label}</p>
                 </div>
-                <h2 className="font-playfair text-2xl md:text-3xl font-bold text-[#111111]">
-                  Problemas comuns em {data.name}
-                </h2>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* ═══ TABELA DE PREÇOS ═══ */}
+        {PRICE_TABLE[data.serviceSlug] && (
+          <section className="py-14 md:py-20 bg-[#FDFDF9]">
+            <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
+              <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
+                <div>
+                  <SectionHeader
+                    overline="Tabela de Preços"
+                    heading={`Quanto custa ${PRICE_HEADING_VERB[data.serviceSlug] ?? data.service.toLowerCase()} em`}
+                    goldWord={data.name}
+                    subtitle={`Preços fixos e transparentes, sem surpresas. Deslocação incluída em toda a área de ${data.municipio}. Orçamento gratuito antes de qualquer compromisso.`}
+                  />
+                  <QuizButton initialLocation={data.municipio} initialService={quizService} />
+                </div>
+                <div className="bg-white p-6 md:p-10" style={{ borderTop: "2px solid #D4AF37", boxShadow: "0 2px 24px rgba(0,0,0,0.07), 0 1px 4px rgba(0,0,0,0.04)" }}>
+                  <p className="flex items-center gap-2 text-xs font-bold text-[#111111]/55 mb-4">
+                    <span className="inline-flex items-center justify-center w-5 h-5 rounded-full flex-shrink-0" style={{ background: "rgba(212,175,55,0.12)" }}>
+                      <ArrowRight className="w-3 h-3" style={{ color: "#D4AF37" }} />
+                    </span>
+                    Escolha a quantidade e toque para pedir o seu orçamento
+                  </p>
+                  <div className="divide-y" style={{ borderColor: "rgba(17,17,17,0.06)" }}>
+                    {PRICE_TABLE[data.serviceSlug].map((row, i) => {
+                      const quizConfig = PRICE_TABLE_QUIZ_CONFIG[data.serviceSlug]?.[i] ?? null;
+                      if (!quizConfig) {
+                        return (
+                          <div key={i} className="flex items-baseline gap-3 py-3.5">
+                            <span className="text-[#111111]/70" style={{ fontSize: "14px" }}>{row.item}</span>
+                            <span className="flex-1 border-b border-dotted mb-1.5" style={{ borderColor: "rgba(17,17,17,0.15)" }} />
+                            <span className="font-playfair font-bold text-xl tabular-nums" style={{ color: "#D4AF37" }}>{row.price}</span>
+                          </div>
+                        );
+                      }
+                      const showStepper = Boolean(quizConfig.sofaSizeId || quizConfig.mattressSizeId || quizConfig.chairQty);
+                      const qty = rowQuantities[i] ?? getRowDefaultQty(quizConfig);
+                      return (
+                        <div
+                          key={i}
+                          role="button"
+                          tabIndex={0}
+                          onClick={() => handleSelectRow(i, quizConfig)}
+                          onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleSelectRow(i, quizConfig); } }}
+                          className="group flex items-center gap-3 py-2.5 rounded-xl cursor-pointer transition-colors hover:bg-[#FDFDF9]"
+                        >
+                          {showStepper && (
+                            <div
+                              onClick={(e) => e.stopPropagation()}
+                              className="flex items-center gap-1 rounded-full border px-1 py-1 flex-shrink-0"
+                              style={{ borderColor: "rgba(212,175,55,0.3)" }}
+                            >
+                              <button type="button" onClick={() => adjustRowQty(i, quizConfig, -1)} className="w-9 h-9 flex items-center justify-center rounded-full text-[#111111]/55 hover:bg-[rgba(212,175,55,0.12)] hover:text-[#a8841f] transition-colors" aria-label="Diminuir quantidade">
+                                <Minus className="w-4 h-4" />
+                              </button>
+                              <span className="w-7 text-center font-playfair text-lg font-bold tabular-nums text-[#111111]">{qty}</span>
+                              <button type="button" onClick={() => adjustRowQty(i, quizConfig, 1)} className="w-9 h-9 flex items-center justify-center rounded-full text-[#111111]/55 hover:bg-[rgba(212,175,55,0.12)] hover:text-[#a8841f] transition-colors" aria-label="Aumentar quantidade">
+                                <Plus className="w-4 h-4" />
+                              </button>
+                            </div>
+                          )}
+                          <span className="text-[#111111]/70" style={{ fontSize: "14px" }}>{row.item}</span>
+                          <span className="flex-1 border-b border-dotted mb-1.5" style={{ borderColor: "rgba(17,17,17,0.15)" }} />
+                          <span className="font-playfair font-bold text-xl tabular-nums" style={{ color: "#D4AF37" }}>{row.price}</span>
+                          <ArrowRight className="w-4 h-4 flex-shrink-0 text-[#111111]/20 group-hover:text-gold group-hover:translate-x-0.5 transition-all" />
+                        </div>
+                      );
+                    })}
+                  </div>
+                  <div className="flex items-center gap-2 mt-5 text-xs text-[#111111]/45">
+                    <CheckCircle className="w-3.5 h-3.5 flex-shrink-0" style={{ color: "#D4AF37" }} />
+                    <span>Deslocação incluída na área de {data.municipio}</span>
+                  </div>
+                </div>
               </div>
-              <div className={`grid gap-3 md:gap-4 ${data.problems.length === 3 ? 'sm:grid-cols-3 justify-items-center max-w-2xl mx-auto w-full' : 'grid-cols-2 md:grid-cols-4'}`}>
-                {data.problems.slice(0, 4).map((problem, idx) => (
+            </div>
+          </section>
+        )}
+
+        {priceQuizConfig && (
+          <QuizFormLazy
+            isOpen={isPriceQuizOpen}
+            onClose={closePriceQuiz}
+            initialLocation={data.municipio}
+            initialService={priceQuizConfig.service}
+            initialServiceType={priceQuizConfig.serviceType}
+            initialSofaSizeId={priceQuizConfig.sofaSizeId}
+            initialSofaQty={priceQuizConfig.sofaQty}
+            initialMattressSizeId={priceQuizConfig.mattressSizeId}
+            initialMattressQty={priceQuizConfig.mattressQty}
+            initialChairQty={priceQuizConfig.chairQty}
+            initialCarpetArea={priceQuizConfig.carpetArea}
+          />
+        )}
+
+        <QuizFormLazy
+          isOpen={isProblemQuizOpen}
+          onClose={closeProblemQuiz}
+          initialLocation={data.municipio}
+          initialService={quizService}
+        />
+
+        {/* ═══ PROBLEMAS QUE RESOLVEMOS ═══ */}
+        {problemCards.length > 0 && (
+          <section className="py-14 md:py-20 bg-kyro-green">
+            <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
+              <SectionHeader
+                overline="O Que Resolvemos"
+                heading={`Problemas de ${serviceCategory} que resolvemos em`}
+                goldWord={data.name}
+                light={false}
+              />
+              <div className={`flex gap-3 overflow-x-auto snap-x snap-mandatory scrollbar-hide pb-2 md:overflow-visible md:grid md:grid-cols-2 ${problemGridCols} md:gap-4 md:pb-0`}>
+                {problemCards.map((card, idx) => (
                   <div
                     key={idx}
-                    className="bg-white rounded-2xl p-5 text-center shadow-sm border border-[#E8E4DE] hover:shadow-md hover:border-[#D4AF37]/30 transition-all group"
+                    className="snap-start flex-none w-[78vw] sm:w-[54vw] md:w-auto relative overflow-hidden rounded-2xl group h-[400px] md:h-[440px]"
                   >
-                    <div
-                      className="w-12 h-12 rounded-xl flex items-center justify-center mx-auto mb-3 group-hover:opacity-80 transition-opacity"
-                      style={{ backgroundColor: "rgba(212,175,55,0.1)" }}
-                    >
-                      <Star className="w-5 h-5" style={{ color: "#D4AF37" }} />
+                    <img
+                      src={card.image as string}
+                      alt={card.alt}
+                      className="absolute inset-0 w-full h-full object-cover saturate-[0.55] group-hover:saturate-[0.85] group-hover:scale-[1.05] transition-all duration-700 ease-out"
+                      loading="lazy"
+                      decoding="async"
+                    />
+                    <div className="absolute top-0 left-0 right-0 z-10 p-5 md:p-6 pb-12 bg-gradient-to-b from-[#071a12]/90 via-[#071a12]/35 to-transparent">
+                      <div className="mb-2 rounded-full opacity-45 group-hover:opacity-90 transition-all duration-400" style={{ width: "20px", height: "1.5px", backgroundColor: "#D4AF37" }} />
+                      <h3 className="font-playfair font-bold text-white text-[1.05rem] md:text-[1.15rem] leading-[1.25]">{card.title}</h3>
                     </div>
-                    <p className="text-sm font-semibold text-[#111111] leading-snug">{problem.title}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* ═══ PROCESSO ═══ */}
-        <section className="py-12 md:py-16 relative overflow-hidden bg-checker-dark">
-          <div className="container mx-auto px-5 sm:px-6 lg:px-8 relative z-10">
-            <div className="max-w-4xl mx-auto">
-              <div className="text-center mb-10">
-                <div className="flex items-center justify-center gap-3 mb-3">
-                  <div className="h-px w-10 opacity-40" style={{ backgroundColor: "#D4AF37" }} />
-                  <p className="text-[10px] font-bold tracking-[0.28em] uppercase" style={{ color: "#D4AF37" }}>Processo</p>
-                  <div className="h-px w-10 opacity-40" style={{ backgroundColor: "#D4AF37" }} />
-                </div>
-                <h2 className="font-playfair text-2xl md:text-3xl font-bold text-white">Como funciona</h2>
-                {data.howItWorks && (
-                  <p className="mt-4 text-sm text-white/60 max-w-2xl mx-auto leading-relaxed">{data.howItWorks}</p>
-                )}
-              </div>
-              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 md:gap-6">
-                {(data.serviceSlug === 'impermeabilizacao' ? IMPERMEABILIZACAO_STEPS : GENERIC_PROCESS_STEPS).map((step, idx) => (
-                  <div key={idx} className="text-center">
-                    <div className="relative inline-block mb-4">
-                      <div
-                        className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto shadow-lg border border-gold/20"
-                        style={{ background: "rgba(212,175,55,0.1)" }}
+                    <div className="absolute bottom-0 left-0 right-0 z-10 p-5 md:p-6 pt-14 bg-gradient-to-t from-[#071a12] via-[#071a12]/75 to-transparent">
+                      <p className="text-white/65 text-xs leading-relaxed line-clamp-2 mb-4">{card.description}</p>
+                      <button
+                        type="button"
+                        onClick={openProblemQuiz}
+                        className="inline-flex items-center justify-center gap-1.5 min-w-[150px] rounded-full px-4 py-2.5 text-xs font-bold text-[#111111] transition-transform duration-300 group-hover:scale-[1.03]"
+                        style={{ background: "linear-gradient(to right, #C9A84C, #EDD96A, #C9A84C)", boxShadow: "0 3px 10px rgba(201,168,76,0.35)" }}
                       >
-                        <span className="font-playfair font-bold text-lg" style={{ color: "#D4AF37" }}>{step.step}</span>
-                      </div>
+                        {card.cta}
+                        <ArrowRight className="w-3.5 h-3.5" />
+                      </button>
                     </div>
-                    <p className="text-sm font-semibold text-white/80 mb-1">{step.label}</p>
-                    <p className="text-xs text-white/45 leading-relaxed">{step.desc}</p>
+                    <div className="absolute inset-0 rounded-2xl ring-1 ring-white/[0.06] group-hover:ring-gold/20 transition-all duration-400 pointer-events-none" />
                   </div>
                 ))}
               </div>
+              <p className="text-center text-[9px] text-white/18 tracking-[0.22em] uppercase mt-4 md:hidden">
+                deslize para ver mais →
+              </p>
             </div>
-          </div>
-        </section>
+          </section>
+        )}
 
-        {/* ═══ RESULTADO ═══ */}
-        <section className="py-12 md:py-16 bg-[#FDFDF9]">
-          <div className="container mx-auto px-5 sm:px-6 lg:px-8">
-            <div className="max-w-5xl mx-auto">
-              <div className="relative rounded-3xl overflow-hidden shadow-2xl">
-                <img
-                  src={resultImg}
-                  alt={`Resultado após ${data.service.toLowerCase()} em ${data.name}`}
-                  className="w-full h-[280px] md:h-[400px] object-cover"
-                  loading="lazy"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#071a12]/85 via-[#0B2F2A]/30 to-transparent" />
-                <div className="absolute bottom-0 left-0 right-0 p-6 md:p-10">
-                  <h2 className="font-playfair text-xl md:text-3xl font-bold text-white mb-2">
-                    Resultado após {resultLabel} profissional
-                  </h2>
-                  <p className="text-white/70 text-sm md:text-base max-w-lg">
-                    {(SERVICE_RESULT_CONTENT[data.serviceSlug] ?? SERVICE_RESULT_CONTENT['limpeza-sofas'])(data.name).desc}
-                  </p>
-                  <div className="flex items-center gap-3 mt-4 flex-wrap">
-                    {(SERVICE_RESULT_CONTENT[data.serviceSlug] ?? SERVICE_RESULT_CONTENT['limpeza-sofas'])(data.name).checks.map((check, i) => (
-                      <div key={i} className="flex items-center gap-1.5">
-                        <CheckCircle className="w-4 h-4" style={{ color: "#D4AF37" }} />
-                        <span className="text-white/80 text-sm">{check}</span>
-                      </div>
-                    ))}
+        {/* ═══ COMO FUNCIONA ═══ */}
+        <section className="py-14 md:py-20 bg-[#FDFDF9]">
+          <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
+            <SectionHeader
+              overline="Processo"
+              heading="Como funciona em"
+              goldWord={data.name}
+              subtitle={data.howItWorks}
+              light={true}
+            />
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-px" style={{ backgroundColor: "#E8E4DE" }}>
+              {[0, 1].map((colIdx) => {
+                const splitAt = Math.ceil(processSteps.length / 2);
+                const colSteps = colIdx === 0 ? processSteps.slice(0, splitAt) : processSteps.slice(splitAt);
+                const offset = colIdx === 0 ? 0 : splitAt;
+                return (
+                  <div key={colIdx} className="grid gap-px" style={{ backgroundColor: "#E8E4DE" }}>
+                    {colSteps.map((step, idx) => {
+                      const num = offset + idx;
+                      return (
+                        <div key={num} className="relative overflow-hidden flex items-start gap-4 p-5 md:p-6 bg-white" style={{ borderTop: "2px solid rgba(212,175,55,0.55)" }}>
+                          <span className="font-playfair font-bold flex-shrink-0 leading-none" style={{ fontSize: "1.75rem", color: "rgba(212,175,55,0.35)" }}>
+                            {String(num + 1).padStart(2, "0")}
+                          </span>
+                          <div>
+                            <p className="text-sm font-semibold text-[#111111] mb-1">{step.label}</p>
+                            <p className="text-xs text-[#111111]/55 leading-relaxed">{step.desc}</p>
+                          </div>
+                        </div>
+                      );
+                    })}
                   </div>
-                </div>
-              </div>
+                );
+              })}
             </div>
           </div>
         </section>
 
         {/* ═══ FAQ ═══ */}
-        <section className="py-12 md:py-16 relative overflow-hidden bg-checker-dark">
-          <div className="container mx-auto px-5 sm:px-6 lg:px-8 relative z-10">
-            <div className="max-w-3xl mx-auto">
-              <div className="text-center mb-8">
-                <div className="flex items-center justify-center gap-3 mb-3">
-                  <div className="h-px w-10 opacity-40" style={{ backgroundColor: "#D4AF37" }} />
-                  <p className="text-[10px] font-bold tracking-[0.28em] uppercase" style={{ color: "#D4AF37" }}>Perguntas</p>
-                  <div className="h-px w-10 opacity-40" style={{ backgroundColor: "#D4AF37" }} />
-                </div>
-                <h2 className="font-playfair text-2xl md:text-3xl font-bold text-white">
-                  Perguntas Frequentes
-                </h2>
-              </div>
-              <ServiceFAQSchema faqs={data.faqs} />
-              <Accordion type="single" collapsible className="space-y-4">
-                {data.faqs.map((faq, idx) => (
-                  <AccordionItem
-                    key={idx}
-                    value={`faq-${idx}`}
-                    className="bg-white/[0.04] rounded-[18px] border border-white/10 px-6 transition-all duration-300 data-[state=open]:border-[#D4AF37]/30"
-                  >
-                    <AccordionTrigger className="text-left text-sm font-semibold text-white py-5 hover:no-underline [&[data-state=open]>svg]:text-[#D4AF37]">
-                      {faq.question}
-                    </AccordionTrigger>
-                    <AccordionContent className="text-sm text-white/55 pb-5 leading-relaxed">
-                      {faq.answer}
-                    </AccordionContent>
-                  </AccordionItem>
+        {data.faqs && data.faqs.length > 0 && (
+          <ServiceFAQ faqs={data.faqs} heading={`Perguntas sobre ${data.service.toLowerCase()} em ${data.name}`} variant="dark" />
+        )}
+
+        {/* ═══ BENEFÍCIOS + TESTEMUNHOS ═══ */}
+        {data.benefits && data.benefits.length > 0 && (
+          <section className="py-14 md:py-20 bg-[#FDFDF9]">
+            <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
+              <SectionHeader
+                overline="Vantagens"
+                heading={`Porquê escolher a Kyro em`}
+                goldWord={data.name}
+                light={true}
+              />
+              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-px mb-10" style={{ backgroundColor: "#E8E4DE" }}>
+                {data.benefits.map((benefit, idx) => (
+                  <div key={idx} className="relative overflow-hidden flex items-start gap-3 p-6 md:p-7 bg-white" style={{ borderTop: "2px solid #D4AF37" }}>
+                    <span
+                      className="absolute bottom-2 right-3 font-playfair font-bold leading-none select-none pointer-events-none"
+                      style={{ fontSize: "5rem", color: "rgba(212,175,55,0.1)" }}
+                    >
+                      {String(idx + 1).padStart(2, "0")}
+                    </span>
+                    <CheckCircle className="relative w-5 h-5 mt-0.5 shrink-0" style={{ color: "#D4AF37" }} />
+                    <span className="relative text-sm text-[#111111]/65 leading-relaxed">{benefit}</span>
+                  </div>
                 ))}
-              </Accordion>
+              </div>
+
+              {SERVICE_TESTIMONIALS[data.serviceSlug] && (
+                <>
+                  <div className="flex items-center gap-3 mb-6">
+                    <div className="h-px w-8 flex-shrink-0" style={{ backgroundColor: "#D4AF37", opacity: 0.65 }} />
+                    <p className="text-[10px] font-bold tracking-[0.28em] uppercase" style={{ color: "#D4AF37", opacity: 0.85 }}>Avaliações Reais</p>
+                  </div>
+                  <div className="grid sm:grid-cols-2 gap-px" style={{ backgroundColor: "#E8E4DE" }}>
+                    {SERVICE_TESTIMONIALS[data.serviceSlug].map((t, i) => (
+                      <div key={i} className="relative overflow-hidden p-6 md:p-8 bg-white" style={{ borderTop: "2px solid #D4AF37" }}>
+                        <div className="relative flex gap-0.5 mb-4">
+                          {[...Array(5)].map((_, j) => <Star key={j} className="w-3.5 h-3.5 fill-[#D4AF37]" style={{ color: "#D4AF37" }} />)}
+                        </div>
+                        <p className="relative text-sm text-[#111111]/65 leading-relaxed italic mb-4">"{t.text}"</p>
+                        <div className="relative flex items-center gap-2">
+                          <div className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold text-white" style={{ background: "#D4AF37" }}>
+                            {t.name.charAt(0)}
+                          </div>
+                          <div>
+                            <p className="text-xs font-bold text-[#111111]">{t.name}</p>
+                            <p className="text-[10px] text-[#111111]/40">{t.city}</p>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </>
+              )}
             </div>
-          </div>
-        </section>
+          </section>
+        )}
 
-        {/* ═══ REDE INTERNA ═══ */}
-        <section className="py-12 md:py-16 bg-white">
-          <div className="container mx-auto px-5 sm:px-6 lg:px-8">
-            <div className="max-w-4xl mx-auto space-y-10">
+        {/* ═══ PACKS ═══ */}
+        <ServicePackBanner
+          packSlugs={SERVICE_PACK_SLUGS[data.serviceSlug] ?? ["pack-sala-completa"]}
+          city={data.municipioSlug}
+          variant="dark"
+        />
 
+        {/* ═══ COBERTURA / REDE INTERNA ═══ */}
+        <section className="py-14 md:py-20" style={{ backgroundColor: "#FDFDF9" }}>
+          <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
+            <SectionHeader
+              overline="Cobertura"
+              heading={`Área de serviço em`}
+              goldWord={data.name}
+              subtitle={data.localSection}
+            />
+
+            <div className="grid md:grid-cols-2 gap-x-12 gap-y-10">
               {nearbyFreguesias.length > 0 && (
                 <div>
-                  <h3 className="text-lg md:text-xl font-playfair font-bold text-[#111111] mb-4 flex items-center gap-2">
-                    <MapPin className="w-5 h-5" style={{ color: "#D4AF37" }} />
-                    Freguesias próximas
-                  </h3>
+                  <p className="text-[10px] font-bold tracking-[0.26em] uppercase mb-3" style={{ color: "#D4AF37" }}>Freguesias próximas</p>
                   <div className="flex flex-wrap gap-2">
                     {nearbyFreguesias.map(f => (
                       <Link
                         key={f.slug}
                         to={`/${data.serviceSlug}-${data.municipioSlug}-${f.slug}`}
-                        className="inline-flex items-center gap-1.5 bg-[#FDFDF9] px-3 py-2 rounded-lg text-sm font-medium text-[#111111] border border-[#E8E4DE] hover:border-[#D4AF37]/35 hover:bg-[#D4AF37]/5 transition-all"
+                        className="inline-flex items-center gap-1.5 bg-white px-3.5 py-2 rounded-full text-sm font-medium text-[#111111] border border-[#E8E4DE] hover:border-[#D4AF37]/40 hover:bg-[#D4AF37]/5 hover:shadow-sm transition-all"
                       >
                         <MapPin className="w-3 h-3" style={{ color: "#D4AF37" }} />
                         {f.name}
@@ -363,25 +573,38 @@ const FreguesiaServicePage = () => {
               )}
 
               <div>
-                <h3 className="text-lg md:text-xl font-playfair font-bold text-[#111111] mb-4">Outros serviços em {data.name}</h3>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <p className="text-[10px] font-bold tracking-[0.26em] uppercase mb-3" style={{ color: "#D4AF37" }}>Outros serviços em {data.name}</p>
+                <div className="flex flex-wrap gap-2">
                   {otherServices.map(svc => (
                     <Link
                       key={svc.slug}
                       to={`/${svc.slug}-${data.municipioSlug}-${data.slug}`}
-                      className="group flex items-center gap-3 bg-[#FDFDF9] rounded-xl p-4 shadow-sm hover:shadow-md border border-[#E8E4DE] hover:border-[#D4AF37]/30 transition-all"
+                      className="inline-flex items-center gap-1.5 bg-white px-3.5 py-2 rounded-full text-sm font-medium text-[#111111] border border-[#E8E4DE] hover:border-[#D4AF37]/40 hover:bg-[#D4AF37]/5 hover:shadow-sm transition-all"
                     >
-                      <div className="flex-1">
-                        <span className="text-sm font-semibold text-[#111111] group-hover:text-[#D4AF37] transition-colors">{svc.name}</span>
-                        <span className="block text-xs text-[#111111]/50">Desde {svc.priceFrom}</span>
-                      </div>
-                      <ArrowRight className="w-4 h-4 text-[#111111]/30 group-hover:text-[#D4AF37] transition-all flex-shrink-0" />
+                      {svc.name}
                     </Link>
                   ))}
                 </div>
               </div>
 
-              <div className="text-center">
+              {municipioProblems.length > 0 && (
+                <div>
+                  <p className="text-[10px] font-bold tracking-[0.26em] uppercase mb-3" style={{ color: "#D4AF37" }}>Problemas que resolvemos em {data.municipio}</p>
+                  <div className="flex flex-wrap gap-2">
+                    {municipioProblems.map(p => (
+                      <Link
+                        key={p.slug}
+                        to={`/${p.slug}-${data.municipioSlug}`}
+                        className="inline-flex items-center gap-1.5 bg-white px-3.5 py-2 rounded-full text-sm font-medium text-[#111111] border border-[#E8E4DE] hover:border-[#D4AF37]/40 hover:bg-[#D4AF37]/5 hover:shadow-sm transition-all"
+                      >
+                        {p.keyword}
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              <div className="flex items-center">
                 <Link
                   to={`/${data.serviceSlug}-${data.municipioSlug}`}
                   className="inline-flex items-center gap-2 text-sm font-semibold hover:underline transition-colors"
@@ -391,65 +614,9 @@ const FreguesiaServicePage = () => {
                   Ver todos os serviços em {data.municipio}
                 </Link>
               </div>
-
-              {municipioProblems.length > 0 && (
-                <div>
-                  <h3 className="text-lg md:text-xl font-playfair font-bold text-[#111111] mb-4">
-                    Problemas que resolvemos em {data.municipio}
-                  </h3>
-                  <div className="flex flex-wrap gap-2">
-                    {municipioProblems.map(p => (
-                      <Link
-                        key={p.slug}
-                        to={`/${p.slug}-${data.municipioSlug}`}
-                        className="inline-flex items-center gap-1.5 bg-[#FDFDF9] px-3 py-2 rounded-lg text-sm font-medium text-[#111111] border border-[#E8E4DE] hover:border-[#D4AF37]/35 hover:bg-[#D4AF37]/5 transition-all"
-                      >
-                        {p.keyword}
-                      </Link>
-                    ))}
-                  </div>
-                </div>
-              )}
             </div>
           </div>
         </section>
-
-        {/* ═══ PACKS ═══ */}
-        <ServicePackBanner
-          packSlugs={SERVICE_PACK_SLUGS[data.serviceSlug] ?? ["pack-sala-completa"]}
-          city={data.municipioSlug}
-        />
-
-        {/* ═══ BENEFÍCIOS ═══ */}
-        {data.benefits && data.benefits.length > 0 && (
-          <section className="py-12 md:py-16 bg-white">
-            <div className="container mx-auto px-5 sm:px-6 lg:px-8">
-              <div className="max-w-4xl mx-auto">
-                <div className="text-center mb-8">
-                  <div className="flex items-center justify-center gap-3 mb-3">
-                    <div className="h-px w-10 opacity-40" style={{ backgroundColor: "#D4AF37" }} />
-                    <p className="text-[10px] font-bold tracking-[0.28em] uppercase" style={{ color: "#D4AF37" }}>Vantagens</p>
-                    <div className="h-px w-10 opacity-40" style={{ backgroundColor: "#D4AF37" }} />
-                  </div>
-                  <h2 className="font-playfair text-2xl md:text-3xl font-bold text-[#111111]">
-                    Porquê escolher a Kyro em {data.name}
-                  </h2>
-                  {data.localSection && (
-                    <p className="mt-3 text-sm text-[#111111]/50 max-w-2xl mx-auto leading-relaxed">{data.localSection}</p>
-                  )}
-                </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                  {data.benefits.map((benefit, idx) => (
-                    <div key={idx} className="flex items-start gap-3 bg-[#FDFDF9] rounded-2xl p-4 border border-[#E8E4DE]">
-                      <CheckCircle className="w-5 h-5 mt-0.5 shrink-0" style={{ color: "#D4AF37" }} />
-                      <span className="text-sm text-[#111111]/70 leading-relaxed">{benefit}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </section>
-        )}
 
       </main>
       <Footer />

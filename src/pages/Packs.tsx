@@ -50,7 +50,7 @@ const Packs = () => {
             <div className="w-16 h-1 bg-gold rounded-full mx-auto mb-5" />
             <p className="text-white/70 max-w-xl mx-auto text-base md:text-lg leading-relaxed">
               Ao agendar vários serviços na mesma visita, paga menos e aproveita ao máximo a deslocação da equipa.
-              Todos os packs têm 20% de desconto sobre os preços individuais.
+              Todos os packs têm 10% de desconto sobre os preços individuais.
             </p>
           </div>
         </section>
@@ -61,7 +61,7 @@ const Packs = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
               {packs.map(pack => {
                 const fromPrice = getFromPrice(pack);
-                const savingsLabel = pack.id === 'sofa-impermeabilizacao' ? 'Preço VIP' : 'Poupe 20%';
+                const savingsLabel = pack.id === 'sofa-impermeabilizacao' ? 'Preço VIP' : 'Poupe 10%';
 
                 return (
                   <Link
@@ -124,7 +124,7 @@ const Packs = () => {
         </section>
 
         {/* Why pack logic */}
-        <section className="py-10 bg-white border-t border-[#E8E4DE]">
+        <section className="py-10 bg-[#FDFDF9] border-t border-[#E8E4DE]">
           <div className="max-w-4xl mx-auto px-5 sm:px-6 lg:px-8">
             <h2 className="font-playfair text-2xl font-bold text-[#111111] text-center mb-8">
               Porquê escolher um pack?
@@ -136,8 +136,8 @@ const Packs = () => {
                   desc: "A equipa trata de tudo na mesma deslocação. Poupa tempo e não precisa de remarcar.",
                 },
                 {
-                  title: "20% de desconto real",
-                  desc: "Todos os packs têm 20% de desconto calculado sobre os preços individuais de cada serviço.",
+                  title: "10% de desconto real",
+                  desc: "Todos os packs têm 10% de desconto calculado sobre os preços individuais de cada serviço.",
                 },
                 {
                   title: "Preço confirmado no WhatsApp",

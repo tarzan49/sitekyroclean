@@ -13,6 +13,13 @@ interface Props {
   onClose: () => void;
   initialLocation?: string;
   initialService?: string;
+  initialServiceType?: 'cleaning' | 'waterproofing' | 'both';
+  initialSofaSizeId?: string;
+  initialSofaQty?: number;
+  initialMattressSizeId?: string;
+  initialMattressQty?: number;
+  initialChairQty?: string;
+  initialCarpetArea?: string;
   problema?: string;
 }
 

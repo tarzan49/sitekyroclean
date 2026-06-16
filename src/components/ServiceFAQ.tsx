@@ -10,20 +10,23 @@ interface FAQItem {
 interface ServiceFAQProps {
   faqs: FAQItem[];
   heading?: string;
+  variant?: "light" | "dark";
 }
 
 const ServiceFAQ = ({
   faqs,
   heading = "Perguntas Frequentes",
+  variant = "light",
 }: ServiceFAQProps) => {
   const [open, setOpen] = useState<number | null>(0);
+  const light = variant === "light";
 
   const words = heading.trim().split(" ");
   const goldWord = words.pop() ?? "";
   const restHeading = words.join(" ");
 
   return (
-    <section className="py-14 md:py-20 bg-kyro-green">
+    <section className={`py-14 md:py-20 ${light ? "bg-[#FDFDF9]" : "bg-kyro-green"}`}>
       <ServiceFAQSchema faqs={faqs} />
       <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
 
@@ -35,7 +38,7 @@ const ServiceFAQ = ({
               Dúvidas Frequentes
             </p>
           </div>
-          <h2 className="font-playfair text-[1.85rem] sm:text-4xl md:text-[2.6rem] font-bold leading-[1.1] text-white">
+          <h2 className={`font-playfair text-[1.85rem] sm:text-4xl md:text-[2.6rem] font-bold leading-[1.1] ${light ? "text-[#111111]" : "text-white"}`}>
             {restHeading}{" "}
             <em className="not-italic" style={{ color: '#D4AF37' }}>{goldWord}</em>
           </h2>
@@ -49,7 +52,7 @@ const ServiceFAQ = ({
               <div
                 key={idx}
                 className="border-b"
-                style={{ borderColor: "rgba(255,255,255,0.08)" }}
+                style={{ borderColor: light ? "#E8E4DE" : "rgba(255,255,255,0.08)" }}
               >
                 <button
                   type="button"
@@ -70,7 +73,7 @@ const ServiceFAQ = ({
                     className="flex-1 font-semibold leading-snug"
                     style={{
                       fontSize: "15px",
-                      color: isOpen ? "#D4AF37" : "rgba(255,255,255,0.9)",
+                      color: isOpen ? "#D4AF37" : light ? "#111111" : "rgba(255,255,255,0.9)",
                       transition: "color 0.2s",
                     }}
                   >
@@ -80,7 +83,7 @@ const ServiceFAQ = ({
                   {/* Icon */}
                   <span
                     className="flex-shrink-0 mt-[2px] ml-2"
-                    style={{ color: isOpen ? "#D4AF37" : "rgba(255,255,255,0.3)", transition: "color 0.2s" }}
+                    style={{ color: isOpen ? "#D4AF37" : light ? "rgba(17,17,17,0.3)" : "rgba(255,255,255,0.3)", transition: "color 0.2s" }}
                   >
                     {isOpen
                       ? <Minus className="w-4 h-4" />
@@ -99,7 +102,7 @@ const ServiceFAQ = ({
                 >
                   <p
                     className="pl-9 pb-6 leading-relaxed"
-                    style={{ fontSize: "14px", color: "rgba(255,255,255,0.6)" }}
+                    style={{ fontSize: "14px", color: light ? "rgba(17,17,17,0.55)" : "rgba(255,255,255,0.6)" }}
                   >
                     {faq.answer}
                   </p>

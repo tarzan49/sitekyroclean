@@ -131,7 +131,7 @@ const Testimonials = () => {
   }, [emblaApi]);
 
   return (
-    <section ref={sectionRef} className="py-24 bg-[#FDFDF9] overflow-hidden">
+    <section ref={sectionRef} className="py-24 bg-kyro-green overflow-hidden">
       <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
 
         {/* Header */}
@@ -142,10 +142,13 @@ const Testimonials = () => {
               O QUE DIZEM OS CLIENTES
             </p>
           </div>
-          <h2 className="font-playfair text-[1.85rem] sm:text-4xl md:text-[2.6rem] font-bold leading-[1.1] text-[#111111] max-w-xl">
+          <h2 className="font-playfair text-[1.85rem] sm:text-4xl md:text-[2.6rem] font-bold leading-[1.1] text-white max-w-xl">
             A confiança das{" "}
             <em className="not-italic" style={{ color: '#D4AF37' }}>famílias portuguesas</em>
           </h2>
+          <p className="mt-4 text-[15px] leading-relaxed max-w-2xl text-white/50">
+            Mais de 1000 clientes em todo o país já confiaram os seus sofás, colchões e tapetes à Kyro Clean Solutions. Estas são as suas histórias.
+          </p>
         </div>
 
         {/* Carousel */}
@@ -155,55 +158,34 @@ const Testimonials = () => {
               {REVIEWS.map((review, i) => (
                 <div
                   key={i}
-                  className="flex-none w-[85vw] md:w-[calc((100%-56px)/3)] flex flex-col rounded-2xl overflow-hidden"
-                  style={{
-                    background: "#071a12",
-                    border: "1px solid rgba(212,175,55,0.13)",
-                    boxShadow: "0 12px 40px rgba(0,0,0,0.18), 0 2px 8px rgba(0,0,0,0.10)",
-                    minHeight: 270,
-                  }}
+                  className="flex-none w-[85vw] md:w-[calc((100%-56px)/3)] flex flex-col p-6 md:p-7 bg-white/[0.04] rounded-2xl overflow-hidden"
+                  style={{ borderTop: "2px solid #D4AF37", minHeight: 270 }}
                 >
-                  {/* Top gold hairline */}
-                  <div className="h-px w-full flex-shrink-0" style={{ background: "linear-gradient(90deg,transparent,rgba(212,175,55,0.40) 40%,rgba(212,175,55,0.40) 60%,transparent)" }} />
+                  {/* Stars */}
+                  <div className="flex gap-0.5 mb-4 flex-shrink-0">
+                    {[...Array(5)].map((_, s) => (
+                      <Star key={s} className="w-3.5 h-3.5 fill-[#D4AF37]" style={{ color: "#D4AF37" }} />
+                    ))}
+                  </div>
 
-                  <div className="flex flex-col flex-1 p-6 md:p-7">
-                    {/* Decorative quote */}
+                  {/* Text */}
+                  <p className="text-[13.5px] md:text-sm leading-relaxed italic flex-1 mb-5 text-white/65">
+                    "{review.text}"
+                  </p>
+
+                  {/* Author */}
+                  <div className="flex items-center gap-3 flex-shrink-0">
                     <div
-                      className="font-playfair select-none mb-2 flex-shrink-0"
-                      style={{ fontSize: "4.5rem", lineHeight: 0.75, color: "rgba(212,175,55,0.13)" }}
+                      className="w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-xs flex-shrink-0"
+                      style={{ background: "#D4AF37" }}
                     >
-                      "
+                      {review.initial}
                     </div>
-
-                    {/* Stars */}
-                    <div className="flex gap-0.5 mb-3 flex-shrink-0">
-                      {[...Array(5)].map((_, s) => (
-                        <Star key={s} className="w-3 h-3 fill-[#D4AF37] text-[#D4AF37]" />
-                      ))}
-                    </div>
-
-                    {/* Text */}
-                    <p className="text-[13.5px] md:text-sm leading-relaxed flex-1 mb-5" style={{ color: "rgba(255,255,255,0.62)" }}>
-                      {review.text}
-                    </p>
-
-                    {/* Divider */}
-                    <div className="h-px w-full mb-4 flex-shrink-0" style={{ background: "rgba(212,175,55,0.14)" }} />
-
-                    {/* Author */}
-                    <div className="flex items-center gap-3 flex-shrink-0">
-                      <div
-                        className="w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-xs flex-shrink-0"
-                        style={{ background: "linear-gradient(135deg, #0d3c2a 0%, #1a6040 100%)" }}
-                      >
-                        {review.initial}
-                      </div>
-                      <div className="flex flex-col min-w-0">
-                        <span className="text-[13px] font-semibold text-white/90 truncate">{review.name}</span>
-                        <span className="text-[9.5px] font-medium tracking-wide" style={{ color: "rgba(212,175,55,0.52)" }}>
-                          Avaliação Google ✓
-                        </span>
-                      </div>
+                    <div className="flex flex-col min-w-0">
+                      <span className="text-[13px] font-semibold text-white truncate">{review.name}</span>
+                      <span className="text-[9.5px] font-medium tracking-wide text-white/40">
+                        Avaliação Google ✓
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -216,7 +198,7 @@ const Testimonials = () => {
             {/* Prev */}
             <button
               onClick={() => emblaApi?.scrollPrev()}
-              className="w-9 h-9 rounded-full border border-[#E8E4DE] bg-white flex items-center justify-center text-[#111111]/50 hover:text-[#111111] hover:border-[#D4AF37]/50 transition-all duration-200 flex-shrink-0"
+              className="w-9 h-9 rounded-full border border-white/10 bg-white/[0.04] flex items-center justify-center text-white/50 hover:text-white hover:border-[#D4AF37]/40 transition-all duration-200 flex-shrink-0"
               aria-label="Anterior"
             >
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -225,14 +207,14 @@ const Testimonials = () => {
             </button>
 
             {/* Counter */}
-            <span className="text-[10px] text-[#111111]/30 font-mono tracking-widest">
+            <span className="text-[10px] text-white/30 font-mono tracking-widest">
               {selectedIndex + 1}/{REVIEWS.length}
             </span>
 
             {/* Next */}
             <button
               onClick={() => emblaApi?.scrollNext()}
-              className="w-9 h-9 rounded-full border border-[#E8E4DE] bg-white flex items-center justify-center text-[#111111]/50 hover:text-[#111111] hover:border-[#D4AF37]/50 transition-all duration-200 flex-shrink-0"
+              className="w-9 h-9 rounded-full border border-white/10 bg-white/[0.04] flex items-center justify-center text-white/50 hover:text-white hover:border-[#D4AF37]/40 transition-all duration-200 flex-shrink-0"
               aria-label="Próximo"
             >
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

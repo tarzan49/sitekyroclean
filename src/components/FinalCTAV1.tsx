@@ -1,4 +1,3 @@
-import { useTranslation } from "react-i18next";
 import { Phone, MapPin } from "lucide-react";
 import { trackCallClick } from "@/lib/analytics";
 import QuizForm from './QuizFormLazy';
@@ -6,7 +5,6 @@ import { PHONE_TEL, PHONE_DISPLAY } from "@/constants/business";
 import { useQuizLauncher } from "@/hooks/use-quiz-launcher";
 
 const FinalCTA = () => {
-  const { t } = useTranslation();
   const { isQuizOpen, openQuiz, closeQuiz } = useQuizLauncher();
 
   return (
@@ -49,7 +47,7 @@ const FinalCTA = () => {
                 className="inline-flex items-center gap-1.5 text-white/70 hover:text-white text-sm font-medium transition-colors"
               >
                 <Phone className="h-3.5 w-3.5 flex-shrink-0" />
-                {t('finalCta.ctaCall', `Ligue: ${PHONE_DISPLAY}`)}
+                {`Ligue: ${PHONE_DISPLAY}`}
               </a>
               <span className="inline-flex items-center gap-1 text-white/35 text-[11px]">
                 <MapPin className="h-3 w-3 flex-shrink-0" />

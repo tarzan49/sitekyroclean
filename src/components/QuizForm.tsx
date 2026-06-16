@@ -1,6 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { createPortal } from 'react-dom';
-import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { X, ChevronRight, ChevronLeft, AlertTriangle } from 'lucide-react';
@@ -34,21 +33,51 @@ interface QuizFormProps {
   onClose: () => void;
   initialLocation?: string;
   initialService?: string;
+  initialServiceType?: 'cleaning' | 'waterproofing' | 'both';
+  initialSofaSizeId?: string;
+  initialSofaQty?: number;
+  initialMattressSizeId?: string;
+  initialMattressQty?: number;
+  initialChairQty?: string;
+  initialCarpetArea?: string;
   problema?: string;
 }
 
-function calcInitialStep(loc?: string, svc?: string): number {
+function calcInitialStep(loc?: string, svc?: string, hasItem?: boolean): number {
   if (!loc) return 0;
   if (!svc) return 1;
+  if (hasItem) return 3;
   const skipType = svc === 'carpet' || svc === 'mattress';
   return skipType ? 3 : 2;
 }
 
-const QuizForm = ({ isOpen, onClose, initialLocation, initialService, problema }: QuizFormProps) => {
-  const { t } = useTranslation();
+const QuizForm = ({
+  isOpen, onClose, initialLocation, initialService, problema,
+  initialServiceType, initialSofaSizeId, initialSofaQty, initialMattressSizeId, initialMattressQty,
+  initialChairQty, initialCarpetArea,
+}: QuizFormProps) => {
   const { toast } = useToast();
   const navigate = useNavigate();
-  const [currentStep, setCurrentStep] = useState(() => calcInitialStep(initialLocation, initialService));
+  const hasInitialItem = Boolean(initialSofaSizeId || initialMattressSizeId || initialChairQty || initialCarpetArea);
+
+  // Builders for the pre-filled state when the quiz is opened directly from
+  // a price-table row (jump straight to step 3 with the item already configured).
+  const buildInitialFormData = (): QuizFormData => ({
+    ...initialFormData,
+    location: initialLocation || '',
+    service: initialService || '',
+    serviceType: initialServiceType
+      || ((initialService && initialService !== 'sofa' && initialService !== 'chairs') ? 'cleaning' : ''),
+    carpetArea: initialCarpetArea || '',
+    chairQuantity: initialChairQty || '',
+    chairType: initialChairQty ? 'bulk_full' : '',
+  });
+  const buildInitialSofaItems = (): SofaItem[] =>
+    initialSofaSizeId ? [{ sizeId: initialSofaSizeId, qty: initialSofaQty ?? 1, packEnabled: false }] : [];
+  const buildInitialMattressItems = (): MattressItem[] =>
+    initialMattressSizeId ? [{ sizeId: initialMattressSizeId, qty: initialMattressQty ?? 1, packEnabled: false }] : [];
+
+  const [currentStep, setCurrentStep] = useState(() => calcInitialStep(initialLocation, initialService, hasInitialItem));
   const [locationQuery, setLocationQuery] = useState('');
   const [hypoallergenic, setHypoallergenic] = useState<boolean | null>(null);
   const [showExitIntent, setShowExitIntent] = useState(false);
@@ -57,15 +86,11 @@ const QuizForm = ({ isOpen, onClose, initialLocation, initialService, problema }
   const [upsellShown, setUpsellShown] = useState(false);
   const [upsellItems, setUpsellItems] = useState<UpsellItemConfig[]>([]);
   const [upsellSubStep, setUpsellSubStep] = useState<'prompt' | 'select' | 'config'>('prompt');
-  const [sofaItems, setSofaItems] = useState<SofaItem[]>([]);
-  const [mattressItems, setMattressItems] = useState<MattressItem[]>([]);
+  const [sofaItems, setSofaItems] = useState<SofaItem[]>(buildInitialSofaItems);
+  const [mattressItems, setMattressItems] = useState<MattressItem[]>(buildInitialMattressItems);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
-  const [formData, setFormData] = useState<QuizFormData>(() => ({
-    ...initialFormData,
-    location: initialLocation || '',
-    service: initialService || '',
-    serviceType: (initialService && initialService !== 'sofa' && initialService !== 'chairs') ? 'cleaning' : '',
-  }));
+  const [formData, setFormData] = useState<QuizFormData>(buildInitialFormData);
+  const prevIsOpenRef = useRef(false);
 
   const totalSteps = 4;
 
@@ -172,6 +197,19 @@ const QuizForm = ({ isOpen, onClose, initialLocation, initialService, problema }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen]);
 
+  // Re-apply the initial* props whenever the quiz transitions closed → open.
+  // Needed because the component stays mounted between opens, so a single
+  // QuizForm instance can be re-launched with a different price-table item.
+  useEffect(() => {
+    if (isOpen && !prevIsOpenRef.current) {
+      setFormData(buildInitialFormData());
+      setSofaItems(buildInitialSofaItems());
+      setMattressItems(buildInitialMattressItems());
+      setCurrentStep(calcInitialStep(initialLocation, initialService, hasInitialItem));
+    }
+    prevIsOpenRef.current = isOpen;
+  });
+
   // Notify other components of quiz open/close state
   useEffect(() => {
     window.dispatchEvent(new CustomEvent(QUIZ_STATE_CHANGE_EVENT, { detail: { isOpen } }));
@@ -213,7 +251,7 @@ const QuizForm = ({ isOpen, onClose, initialLocation, initialService, problema }
     }
   };
 
-  const firstStep = calcInitialStep(initialLocation, initialService);
+  const firstStep = calcInitialStep(initialLocation, initialService, hasInitialItem);
 
   // Step order: [0-Location?], 1-Service, 2-ServiceType, 3-Config, [Upsell], 4-Contact (submit)
   const canProceed = () => {
@@ -282,7 +320,6 @@ const QuizForm = ({ isOpen, onClose, initialLocation, initialService, problema }
       if (prevStep === 0) {
         updateFormData({ location: '' });
         setLocationQuery('');
-        setLocationFadeIn(false);
       }
       setCurrentStep(prevStep);
     }
@@ -290,19 +327,19 @@ const QuizForm = ({ isOpen, onClose, initialLocation, initialService, problema }
 
   const getServiceLabel = () => {
     const labels: Record<string, string> = {
-      sofa: t('quiz.services.sofa'),
-      carpet: t('quiz.services.carpet'),
-      mattress: t('quiz.services.mattress'),
-      chairs: t('quiz.services.chairs'),
+      sofa: 'Sofá',
+      carpet: 'Tapete',
+      mattress: 'Colchão',
+      chairs: 'Cadeiras',
     };
     return labels[formData.service] || formData.service;
   };
 
   const getServiceTypeLabel = () => {
     const labels: Record<string, string> = {
-      cleaning: t('quiz.serviceType.cleaning', 'Limpeza'),
-      waterproofing: t('quiz.serviceType.waterproofing', 'Impermeabilização'),
-      both: t('quiz.serviceType.both', 'Limpeza + Impermeabilização'),
+      cleaning: 'Limpeza e Lavagem',
+      waterproofing: 'Impermeabilização',
+      both: 'Lavagem + Impermeabilização',
     };
     return labels[formData.serviceType] || '';
   };
@@ -485,15 +522,9 @@ ${formData.description || 'Sem observações adicionais'}
   };
 
   const resetForm = () => {
-    setFormData({
-      ...initialFormData,
-      location: initialLocation || '',
-      service: initialService || '',
-      serviceType: (initialService && initialService !== 'sofa' && initialService !== 'chairs') ? 'cleaning' : '',
-    });
-    setCurrentStep(calcInitialStep(initialLocation, initialService));
+    setFormData(buildInitialFormData());
+    setCurrentStep(calcInitialStep(initialLocation, initialService, hasInitialItem));
     setLocationQuery('');
-    setLocationFadeIn(false);
     setHypoallergenic(null);
     setShowExitIntent(false);
     setExitIntentFired(false);
@@ -501,9 +532,8 @@ ${formData.description || 'Sem observações adicionais'}
     setUpsellShown(false);
     setUpsellItems([]);
     setUpsellSubStep('select');
-    setShowSummary(false);
-    setSofaItems([]);
-    setMattressItems([]);
+    setSofaItems(buildInitialSofaItems());
+    setMattressItems(buildInitialMattressItems());
     resetUiEffects();
   };
 
@@ -515,8 +545,12 @@ ${formData.description || 'Sem observações adicionais'}
       setExitIntentFired(true);
       return;
     }
-    resetForm();
     onClose();
+    try {
+      resetForm();
+    } catch (err) {
+      console.warn('resetForm failed on close', err);
+    }
   };
 
   const confirmClose = () => {
@@ -529,8 +563,12 @@ ${formData.description || 'Sem observações adicionais'}
         value: totalPrice > 0 ? totalPrice : undefined,
       });
     }
-    resetForm();
     onClose();
+    try {
+      resetForm();
+    } catch (err) {
+      console.warn('resetForm failed on close', err);
+    }
   };
 
   if (!isOpen) return null;
@@ -660,8 +698,7 @@ ${formData.description || 'Sem observações adicionais'}
                 scrollContainerRef={scrollContainerRef}
                 onCitySelect={(city) => {
                   updateFormData({ location: city });
-                  setLocationFadeIn(true);
-                  setCurrentStep(calcInitialStep(city, initialService));
+                  setCurrentStep(calcInitialStep(city, initialService, hasInitialItem));
                 }}
               />
             )}

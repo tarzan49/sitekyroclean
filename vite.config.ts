@@ -68,10 +68,6 @@ export default defineConfig(({ mode }) => ({
           if (id.includes('node_modules/framer-motion')) {
             return 'vendor-framer';
           }
-          // i18next — localisation
-          if (id.includes('node_modules/i18next') || id.includes('node_modules/react-i18next')) {
-            return 'vendor-i18n';
-          }
           // Radix UI primitives
           if (id.includes('node_modules/@radix-ui')) {
             return 'vendor-radix';

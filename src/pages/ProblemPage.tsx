@@ -210,7 +210,7 @@ const ProblemPage = () => {
         {CATEGORY_TIPS[data.category] && (() => {
           const tips = CATEGORY_TIPS[data.category];
           return (
-            <section className="py-10 md:py-12 bg-white">
+            <section className="py-10 md:py-12 bg-[#FDFDF9]">
               <div className="container mx-auto px-5 sm:px-6 lg:px-8">
                 <div className="max-w-3xl mx-auto">
                   <div className="rounded-2xl p-6 md:p-8 border" style={{ backgroundColor: "#071a12", borderColor: "rgba(212,175,55,0.25)" }}>
@@ -246,7 +246,7 @@ const ProblemPage = () => {
 
         {/* ═══ FAQ ═══ */}
         {data.faqs.length > 0 && (
-          <section className="py-12 md:py-16 bg-white">
+          <section className="py-12 md:py-16 bg-[#FDFDF9]">
             <div className="container mx-auto px-5 sm:px-6 lg:px-8">
               <div className="max-w-4xl mx-auto">
                 <div className="text-center mb-8">

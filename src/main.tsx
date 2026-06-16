@@ -2,7 +2,6 @@ import { createRoot } from "react-dom/client";
 import { StrictMode } from "react";
 import App from "./App.tsx";
 import "./index.css";
-import "./i18n/config";
 import { initErrorTracking } from "./lib/errorTracking";
 import { restoreConsent } from "./lib/consent";
 

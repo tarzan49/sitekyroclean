@@ -1,13 +1,14 @@
 import { WHATSAPP_BASE } from "../constants/business";
+import { cityPrep } from "./locationSeoData";
 
 // Pack/Combo SEO pages — targets "pack sofá e colchão porto", "limpeza completa sala porto"
 //
 // Pricing rules:
-//   - Packs 1, 3, 4: 20% off the sum of individually selected component prices
+//   - Packs 1, 3, 4: 10% off the sum of individually selected component prices
 //   - Pack 2 (Sofá+Impermeabilização): fixed VIP pricing per option (matches quiz bothPrice)
 //     Individual price shown = what customer would pay on two separate visits
 //
-// Key constraint: packPrice is always >= 80% of individual services summed.
+// Key constraint: packPrice is always >= 90% of individual services summed.
 // This ensures profitability while showing a genuine saving to the customer.
 
 export interface PackOption {
@@ -30,7 +31,7 @@ export interface PackCombo {
   slug: string;
   tagline: string;
   description: string;
-  discountPct: number;        // 0.20 = 20%; ignored when all options have packPrice
+  discountPct: number;        // 0.10 = 10%; ignored when all options have packPrice
   selectors: PackSelector[];
   features: string[];
   testimonial: { text: string; author: string };
@@ -111,7 +112,7 @@ export function buildWhatsAppUrl(
   });
 
   const msg = [
-    `Olá Kyro Clean! Tenho interesse no *${pack.name}* em ${city.name}.`,
+    `Olá Kyro Clean! Tenho interesse no *${pack.name}* ${cityPrep(city.name)} ${city.name}.`,
     '',
     'Configuração escolhida:',
     ...lines,
@@ -134,8 +135,8 @@ export const packs: PackCombo[] = [
     name: 'Pack Sofá + Colchão',
     slug: 'pack-sofa-e-colchao',
     tagline: 'O pack mais completo para o teu quarto e sala',
-    description: 'Limpeza profissional do sofá e do colchão no mesmo dia. Uma visita, dois resultados, 20% de desconto garantido.',
-    discountPct: 0.20,
+    description: 'Limpeza profissional do sofá e do colchão no mesmo dia. Uma visita, dois resultados, 10% de desconto garantido.',
+    discountPct: 0.10,
     selectors: [
       {
         key: 'sofa',
@@ -193,8 +194,8 @@ export const packs: PackCombo[] = [
         options: [
           { id: '1-lugar',   label: '1 Lugar',    sublabel: 'Sofá pequeno / poltrona', price: 98,  packPrice: 89  },
           { id: '2-lugares', label: '2 Lugares',  sublabel: 'Sofá standard',           price: 138, packPrice: 129 },
-          { id: '3-lugares', label: '3 Lugares',  sublabel: 'Sofá grande / familiar',  price: 168, packPrice: 149 },
-          { id: '3l-chaise', label: '3L + Chaise',sublabel: 'Com chaise longue',        price: 188, packPrice: 159 },
+          { id: '3-lugares', label: '3 Lugares',  sublabel: 'Sofá grande / familiar',  price: 168, packPrice: 152 },
+          { id: '3l-chaise', label: '3L + Chaise',sublabel: 'Com chaise longue',        price: 188, packPrice: 170 },
         ],
       },
     ],
@@ -222,9 +223,9 @@ export const packs: PackCombo[] = [
     id: 'sala-completa',
     name: 'Pack Sala Completa',
     slug: 'pack-sala-completa',
-    tagline: 'Sofá + Tapete + Cadeiras numa única visita: 20% de desconto',
+    tagline: 'Sofá + Tapete + Cadeiras numa única visita: 10% de desconto',
     description: 'O pack mais popular da Kyro Clean. Sala de estar completamente renovada numa visita: sofá, tapete e cadeiras de jantar limpos ao mesmo tempo.',
-    discountPct: 0.20,
+    discountPct: 0.10,
     selectors: [
       {
         key: 'sofa',
@@ -262,7 +263,7 @@ export const packs: PackCombo[] = [
       'Desodorização completa do espaço',
       'Remoção de manchas e alergénios',
       'Resultados visíveis numa única visita',
-      '20% de desconto sobre preços individuais',
+      '10% de desconto sobre preços individuais',
       'Garantia de satisfação 100%',
     ],
     testimonial: {
@@ -281,7 +282,7 @@ export const packs: PackCombo[] = [
     slug: 'pack-quarto-completo',
     tagline: 'Colchão + Tapete: quarto livre de ácaros e alergénios',
     description: 'Higienização completa do quarto: colchão e tapete tratados na mesma visita. Ideal para quem sofre de alergias ou quer melhorar a qualidade do sono.',
-    discountPct: 0.20,
+    discountPct: 0.10,
     selectors: [
       {
         key: 'colchao',
@@ -308,7 +309,7 @@ export const packs: PackCombo[] = [
       'Limpeza de tapete de quarto',
       'Desodorização biológica',
       'Quarto fresco e livre de alergénios',
-      '20% de desconto sobre preços individuais',
+      '10% de desconto sobre preços individuais',
       'Garantia de satisfação 100%',
     ],
     testimonial: {

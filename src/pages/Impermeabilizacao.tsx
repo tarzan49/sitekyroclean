@@ -1,4 +1,3 @@
-import { useTranslation } from "react-i18next";
 import { Shield, Heart, Sparkles } from "lucide-react";
 import impermeabilizacaoAntes from "@/assets/galeria-impermeabilizacao-antes.webp";
 import impermeabilizacaoDepois from "@/assets/galeria-impermeabilizacao-depois.webp";
@@ -80,12 +79,13 @@ const expertTips: ExpertTip[] = [
 ];
 
 const Impermeabilizacao = () => {
-  const { t } = useTranslation();
-
-  const faqs = [1, 2, 3, 4, 5].map((n) => ({
-    question: t(`waterproofing.faq.question${n}`),
-    answer: t(`waterproofing.faq.answer${n}`),
-  }));
+  const faqs = [
+    { question: 'O que é exatamente a impermeabilização e como funciona?', answer: 'A impermeabilização cria uma camada de proteção invisível e respirável à volta das fibras do tecido. Líquidos e sujidade deixam de ser absorvidos com facilidade, formando gotas à superfície que podem ser limpas rapidamente antes de penetrarem no estofo.' },
+    { question: 'Quanto tempo dura a impermeabilização?', answer: 'O tratamento possui durabilidade técnica até 10 anos, desde que o tecido não seja sujeito a desgaste extremo. Para manter o efeito repelente visível no dia a dia, podem ser recomendadas reaplicações localizadas ou manutenções preventivas, sobretudo em zonas de maior uso.' },
+    { question: 'A impermeabilização é definitiva?', answer: 'O tratamento não cria uma película rígida nem permanente. A proteção mantém-se ativa ao longo dos anos, mas o seu desempenho pode ser reforçado com manutenção adequada.' },
+    { question: 'A impermeabilização precisa de manutenção?', answer: 'Sim. A manutenção preventiva permite preservar o nível máximo de proteção e prolongar a vida útil dos estofos. Recomendamos avaliações periódicas, especialmente em contextos de uso intensivo.' },
+    { question: 'A impermeabilização altera a cor, o toque ou o conforto do tecido?', answer: 'Não. O tecido mantém o mesmo aspeto e toque natural. O tratamento é hidrorrepelente e respirável, não criando película rígida. O que muda é a forma como reage a líquidos: em vez de serem rapidamente absorvidos, formam pequenas gotas à superfície, facilitando a limpeza imediata.' },
+  ];
 
   return (
     <>
@@ -118,7 +118,7 @@ const Impermeabilizacao = () => {
           items={impermeabilizacaoGuarantee}
           variant="light"
         />
-        <ServiceFAQ faqs={faqs} heading={t("waterproofing.faq.title")} />
+        <ServiceFAQ faqs={faqs} heading="Perguntas Frequentes" variant="dark" />
         <ServiceExpertTips tips={expertTips} variant="light" />
         <ServiceCityLinks serviceSlug="impermeabilizacao" serviceLabel="Impermeabilização de Estofos" />
         <ServiceSchema

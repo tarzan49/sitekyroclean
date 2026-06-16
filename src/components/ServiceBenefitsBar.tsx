@@ -47,7 +47,7 @@ const ServiceBenefitsBar = ({
   const restHeading = words.join(" ");
 
   return (
-    <section className={`py-14 md:py-20 ${light ? "bg-[#FAFAF6]" : "bg-kyro-green"}`}>
+    <section className={`py-14 md:py-20 ${light ? "bg-[#FDFDF9]" : "bg-kyro-green"}`}>
       <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
 
           {/* Editorial header */}

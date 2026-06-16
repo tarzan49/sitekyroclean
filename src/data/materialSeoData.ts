@@ -1,7 +1,7 @@
 // Programmatic SEO: Material pages data engine
 // Targets searches like "limpeza sofa tecido", "limpeza sofa veludo porto"
 
-import { cities } from "./locationSeoData";
+import { cities, cityPrep } from "./locationSeoData";
 
 export interface MaterialDefinition {
   slug: string;
@@ -441,14 +441,15 @@ export function getMaterialCityData(materialSlug: string, citySlug: string) {
   const mat = getMaterialBySlug(materialSlug);
   const city = cities.find(c => c.slug === citySlug);
   if (!mat || !city) return null;
+  const prep = cityPrep(city.name);
   return {
     ...mat,
     city: city.name,
     citySlug: city.slug,
     cityDescription: city.description,
-    title: `${mat.h1} em ${city.name} | Kyro Clean Solutions`,
-    metaDescription: `${mat.metaDescription.replace('. Orçamento grátis.', '')} em ${city.name}. Orçamento grátis.`,
-    h1: `${mat.h1} em ${city.name}`,
+    title: `${mat.h1} ${prep} ${city.name} | Kyro Clean Solutions`,
+    metaDescription: `${mat.metaDescription.replace('. Orçamento grátis.', '')} ${prep} ${city.name}. Orçamento grátis.`,
+    h1: `${mat.h1} ${prep} ${city.name}`,
   };
 }
 

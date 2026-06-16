@@ -9,6 +9,7 @@ import QuizButton from "@/components/QuizButton";
 import TrustRatingBadge from "@/components/TrustRatingBadge";
 import ServiceFAQSchema from "@/components/ServiceFAQSchema";
 import { getAllMarcaSofaRoutes, getMarcaByCityAndSlug } from "@/data/marcaSofaData";
+import { cityPrep } from "@/data/locationSeoData";
 import { trackWhatsAppClick } from "@/lib/quizTracking";
 import { SITE_URL, WHATSAPP_BASE } from "@/constants/business";
 import {
@@ -53,8 +54,8 @@ const MarcaSofaPage = () => {
   }, [pathname]);
 
   const pageUrl = `${SITE_URL}${pathname}`;
-  const pageTitle = data ? `Limpeza Sofá ${data.marca.name} em ${data.city.name}, Especialistas | Kyro Clean` : '';
-  const pageDesc = data ? `Especialistas em limpeza de sofás ${data.marca.name} em ${data.city.name}. ${data.marca.material}. ${data.marca.estimatedPriceRange}. Serviço ao domicílio.` : '';
+  const pageTitle = data ? `Limpeza Sofá ${data.marca.name} ${cityPrep(data.city.name)} ${data.city.name}, Especialistas | Kyro Clean` : '';
+  const pageDesc = data ? `Especialistas em limpeza de sofás ${data.marca.name} ${cityPrep(data.city.name)} ${data.city.name}. ${data.marca.material}. ${data.marca.estimatedPriceRange}. Serviço ao domicílio.` : '';
 
   useEffect(() => {
     if (!data) return;
@@ -81,6 +82,7 @@ const MarcaSofaPage = () => {
   }
 
   const { marca, city } = data;
+  const prep = cityPrep(city.name);
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -89,11 +91,11 @@ const MarcaSofaPage = () => {
       buildBreadcrumbNode(`${pageUrl}#breadcrumb`, [
         { name: "Início", item: `${SITE_URL}/` },
         { name: "Limpeza de Sofás", item: `${SITE_URL}/limpeza-sofas` },
-        { name: `Sofá ${marca.name} em ${city.name}`, item: pageUrl },
+        { name: `Sofá ${marca.name} ${prep} ${city.name}`, item: pageUrl },
       ]),
       buildServiceNode({
         url: pageUrl,
-        name: `Limpeza de Sofá ${marca.name} em ${city.name}`,
+        name: `Limpeza de Sofá ${marca.name} ${prep} ${city.name}`,
         description: pageDesc,
         areaServed: { "@type": "City", name: city.name },
         offers: {
@@ -140,7 +142,7 @@ const MarcaSofaPage = () => {
               <p className="text-[10px] font-bold tracking-[0.28em] uppercase mb-5" style={{ color: "#D4AF37" }}>Especialistas em {marca.name}</p>
 
               <h1 className="font-playfair text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4 leading-tight">
-                Limpeza de Sofá {marca.name} em {city.name}
+                Limpeza de Sofá {marca.name} {prep} {city.name}
               </h1>
 
               <div className="w-10 h-px mb-5 opacity-50" style={{ backgroundColor: "#D4AF37" }} />
@@ -163,7 +165,7 @@ const MarcaSofaPage = () => {
                 <div className="relative group flex-1 sm:flex-none">
                   <div className="absolute -inset-1.5 rounded-full bg-[#25D366]/40 opacity-30 blur-lg group-hover:opacity-55 transition-opacity duration-400 pointer-events-none" />
                   <a
-                    href={`${WHATSAPP_BASE}?text=${encodeURIComponent(`Olá! Gostaria de pedir um orçamento para limpeza do meu sofá ${marca.name} em ${city.name}.`)}`}
+                    href={`${WHATSAPP_BASE}?text=${encodeURIComponent(`Olá! Gostaria de pedir um orçamento para limpeza do meu sofá ${marca.name} ${prep} ${city.name}.`)}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     onClick={() => trackWhatsAppClick(`marca_hero_${marca.slug}`)}
@@ -293,7 +295,7 @@ const MarcaSofaPage = () => {
           <div className="container mx-auto px-5 sm:px-6 lg:px-8 text-center">
             <p className="text-[10px] font-bold tracking-[0.28em] uppercase mb-4" style={{ color: "#D4AF37" }}>Kyro Clean Solutions</p>
             <h2 className="font-playfair text-xl md:text-3xl font-bold text-white mb-3">
-              Peça orçamento para o seu sofá {marca.name} em {city.name}
+              Peça orçamento para o seu sofá {marca.name} {prep} {city.name}
             </h2>
             <p className="text-white/60 mb-6">
               {marca.estimatedPriceRange} · Resposta em menos de 2 horas

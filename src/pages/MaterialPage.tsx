@@ -16,7 +16,7 @@ import {
   getMaterialCityData,
   getRelatedMaterialLinks,
 } from "@/data/materialSeoData";
-import { cities, services, DEFAULT_PRICE_FROM } from "@/data/locationSeoData";
+import { cities, services, DEFAULT_PRICE_FROM, cityPrep } from "@/data/locationSeoData";
 import { SITE_URL, WHATSAPP_BASE } from "@/constants/business";
 import { buildMaterialWaMessage } from "@/lib/whatsappMessages";
 import { MATERIAL_HERO, MATERIAL_HERO_FALLBACK } from "@/data/materialHeroImages";
@@ -130,7 +130,7 @@ const MaterialPage = () => {
               </p>
 
               <h1 className="font-playfair text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-5 leading-tight">
-                {data.h1}{cityName ? ` em ${cityName}` : ""}
+                {data.h1}{cityName ? ` ${cityPrep(cityName)} ${cityName}` : ""}
               </h1>
 
               <div className="w-10 h-px mb-5 opacity-50" style={{ backgroundColor: "#D4AF37" }} />

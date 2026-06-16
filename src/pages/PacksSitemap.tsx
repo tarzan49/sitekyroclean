@@ -79,7 +79,7 @@ const PacksSitemap = () => {
             {packs.map(pack => {
               const fromPrice = getFromPrice(pack);
               const badgeClass = PACK_COLORS[pack.id] ?? 'bg-gray-50 border-gray-200 text-gray-600';
-              const savingsLabel = pack.id === 'sofa-impermeabilizacao' ? 'Preço VIP' : 'Poupe 20%';
+              const savingsLabel = pack.id === 'sofa-impermeabilizacao' ? 'Preço VIP' : 'Poupe 10%';
 
               return (
                 <div key={pack.id}>
@@ -129,7 +129,7 @@ const PacksSitemap = () => {
         </section>
 
         {/* Quick reference table */}
-        <section className="py-10 bg-white">
+        <section className="py-10 bg-[#FDFDF9]">
           <div className="max-w-5xl mx-auto px-5 sm:px-6 lg:px-8">
             <h2 className="font-playfair text-xl font-bold text-[#111111] mb-6">Comparação rápida dos packs</h2>
             <div className="overflow-x-auto rounded-2xl border border-[#E8E4DE]">
@@ -157,7 +157,7 @@ const PacksSitemap = () => {
                         </td>
                         <td className="px-5 py-4">
                           <span className="text-xs font-bold text-green-700 bg-green-50 border border-green-200 px-2 py-0.5 rounded-full">
-                            {pack.id === 'sofa-impermeabilizacao' ? 'VIP' : '20%'}
+                            {pack.id === 'sofa-impermeabilizacao' ? 'VIP' : '10%'}
                           </span>
                         </td>
                         <td className="px-5 py-4 font-bold tabular-nums" style={{ color: "#D4AF37" }}>

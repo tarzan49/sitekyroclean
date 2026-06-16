@@ -1,5 +1,5 @@
 import { SITE_URL } from "@/constants/business";
-import { DEFAULT_PRICE_FROM } from "@/data/locationSeoData";
+import { DEFAULT_PRICE_FROM, cityPrep } from "@/data/locationSeoData";
 import {
   buildWebPageNode,
   buildBreadcrumbNode,
@@ -23,6 +23,8 @@ const ServiceLocationSchema = ({ serviceName, serviceBaseUrl, placeName, parentP
   const priceNum = /\d+/.exec(priceFrom)?.[0] ?? DEFAULT_PRICE_FROM.replace(/[^0-9]/g, '');
   const fullUrl = `${SITE_URL}${pageUrl}`;
 
+  const prep = cityPrep(placeName);
+
   const areaServed: AreaServed = parentPlace
     ? [{ "@type": "City", "name": parentPlace }, { "@type": "Place", "name": placeName }]
     : { "@type": "City", "name": placeName };
@@ -30,7 +32,7 @@ const ServiceLocationSchema = ({ serviceName, serviceBaseUrl, placeName, parentP
   const schema = {
     "@context": "https://schema.org",
     "@graph": [
-      buildWebPageNode({ url: fullUrl, name: `${serviceName} em ${placeName} | Kyro Clean Solutions`, description }),
+      buildWebPageNode({ url: fullUrl, name: `${serviceName} ${prep} ${placeName} | Kyro Clean Solutions`, description }),
       buildBreadcrumbNode(`${fullUrl}#breadcrumb`, [
         { name: "Início", item: SITE_URL },
         { name: serviceName, item: `${SITE_URL}${serviceBaseUrl}` },
@@ -39,7 +41,7 @@ const ServiceLocationSchema = ({ serviceName, serviceBaseUrl, placeName, parentP
       buildLocalBusinessNode(areaServed),
       buildServiceNode({
         url: fullUrl,
-        name: `${serviceName} em ${placeName}`,
+        name: `${serviceName} ${prep} ${placeName}`,
         description,
         areaServed,
         serviceType: serviceName,

@@ -1,5 +1,4 @@
 import { Search, SprayCanIcon as Spray, Droplets, Wind, Shield, ClipboardCheck, LucideIcon } from "lucide-react";
-import { useTranslation } from "react-i18next";
 import { useRef, useEffect, useState } from "react";
 import Header from "@/components/Header";
 import GlobalPromoBanner from "@/components/GlobalPromoBanner";
@@ -52,8 +51,6 @@ const AnimatedCard = ({ children, delay }: { children: React.ReactNode; delay: n
 };
 
 const NossoProcesso = () => {
-  const { t } = useTranslation();
-
   const steps: ProcessStep[] = [
     {
       icon: Search,
@@ -107,13 +104,13 @@ const NossoProcesso = () => {
                 className="text-3xl md:text-4xl lg:text-5xl font-bold text-[#111111] mb-3 animate-fade-in"
                 style={{ animationDelay: "0.1s" }}
               >
-                {t('process.title')}
+                O Nosso Processo
               </h1>
               <p 
                 className="text-base md:text-lg text-[#111111]/55 max-w-2xl mx-auto mb-4 animate-fade-in"
                 style={{ animationDelay: "0.2s" }}
               >
-                {t('process.subtitle')}
+                Cada etapa pensada para garantir resultados excepcionais
               </p>
               <div 
                 className="w-16 h-0.5 bg-gold mx-auto animate-fade-in"
@@ -184,10 +181,10 @@ const NossoProcesso = () => {
                   <div className="absolute bottom-0 right-0 w-16 h-16 border-b-2 border-r-2 border-gold/50 rounded-br-2xl" />
                   
                   <h2 className="text-2xl md:text-3xl font-bold text-white mb-2">
-                    {t('process.cta.title')}
+                    Pronto para experimentar?
                   </h2>
                   <p className="text-white/90 mb-6 text-lg">
-                    {t('process.cta.subtitle')}
+                    Peça já o seu orçamento gratuito e permita-nos cuidar dos seus estofados com o máximo profissionalismo.
                   </p>
                   <div className="flex flex-col sm:flex-row gap-4 justify-center">
                     <a
@@ -195,13 +192,13 @@ const NossoProcesso = () => {
                       onClick={() => trackCallClick('nosso_processo_cta')}
                       className="inline-flex items-center justify-center px-8 py-3 bg-[#FFFFFF] text-teal font-semibold rounded-lg hover:bg-[#FDFDF9] transition-colors shadow-md"
                     >
-                      {t('process.cta.callNow')}
+                      Ligar Agora
                     </a>
                     <a
                       href="/#orcamento"
                       className="inline-flex items-center justify-center px-8 py-3 bg-gold text-white font-semibold rounded-lg hover:bg-gold/90 transition-colors shadow-md"
                     >
-                      {t('process.cta.getQuote')}
+                      Pedir Orçamento
                     </a>
                   </div>
                 </div>

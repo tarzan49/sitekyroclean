@@ -1,4 +1,3 @@
-import { useTranslation } from "react-i18next";
 import { Shield, Heart, Sparkles } from "lucide-react";
 import Header from "@/components/Header";
 import { QuizServiceProvider } from "@/context/QuizLocationContext";
@@ -81,12 +80,11 @@ const expertTips: ExpertTip[] = [
 ];
 
 const LimpezaCadeiras = () => {
-  const { t } = useTranslation();
-
-  const faqs = [1, 2, 3].map((n) => ({
-    question: t(`chairCleaning.faq.question${n}`),
-    answer: t(`chairCleaning.faq.answer${n}`),
-  }));
+  const faqs = [
+    { question: 'A limpeza de cadeiras é recomendada só quando estão muito manchadas?', answer: 'Não. Quanto mais cedo se intervém, melhores são os resultados e maior é a durabilidade do tecido. A limpeza regular evita acumulação de nódoas, cheiros e gordura corporal, mantendo o aspeto "como novo" por muito mais tempo.' },
+    { question: 'É seguro limpar cadeiras de tecido mais delicado (veludo, linho, etc.)?', answer: 'Sim. Antes de iniciar, avaliamos sempre o tipo de tecido e escolhemos produtos adequados. Em materiais mais delicados, ajustamos a pressão, a quantidade de água e os movimentos para garantir segurança máxima.' },
+    { question: 'Quanto tempo as cadeiras ficam fora de uso após a limpeza?', answer: 'Normalmente entre 3 e 6 horas, consoante o tecido e a ventilação do espaço. Quando terminamos o serviço, deixamos sempre orientações simples para acelerar a secagem (circular ar, abrir janelas, evitar sentar até estar seco).' },
+  ];
 
   return (
     <QuizServiceProvider value="chairs">
@@ -120,7 +118,7 @@ const LimpezaCadeiras = () => {
           items={cadeirasGuarantee}
           variant="light"
         />
-        <ServiceFAQ faqs={faqs} heading={t("chairCleaning.faq.title")} />
+        <ServiceFAQ faqs={faqs} heading="Perguntas Frequentes" variant="dark" />
         <ServiceExpertTips tips={expertTips} variant="light" />
         <ServiceCityLinks serviceSlug="limpeza-cadeiras" serviceLabel="Limpeza de Cadeiras" />
         <ServiceSchema

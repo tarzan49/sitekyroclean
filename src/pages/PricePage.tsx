@@ -8,7 +8,7 @@ import QuizButton from "@/components/QuizButton";
 import { trackWhatsAppClick } from "@/lib/quizTracking";
 import ServiceFAQSchema from "@/components/ServiceFAQSchema";
 import { getPricePageData, getAllPriceRoutes } from "@/data/priceSeoData";
-import { services, cities } from "@/data/locationSeoData";
+import { services, cities, cityPrep } from "@/data/locationSeoData";
 import { SERVICE_TO_QUIZ } from "@/constants/serviceToQuiz";
 import { buildServiceWaMessage } from "@/lib/whatsappMessages";
 import { SITE_URL, WHATSAPP_BASE, REVIEW_RATING } from "@/constants/business";
@@ -48,6 +48,7 @@ const PricePage = () => {
     );
   }
 
+  const prep = cityPrep(data.cityName);
   const quizService = SERVICE_TO_QUIZ[data.serviceSlug];
   const relatedServices = services.filter(s => s.slug !== data.serviceSlug).slice(0, 4);
   const nearbyCities = cities.filter(c => c.slug !== data.citySlug).slice(0, 6);
@@ -73,7 +74,7 @@ const PricePage = () => {
                 <span>/</span>
                 <Link to={`/${data.serviceSlug}`} className="hover:text-white/60 transition-colors">{data.serviceName}</Link>
                 <span>/</span>
-                <span className="text-white/50">Preços em {data.cityName}</span>
+                <span className="text-white/50">Preços {prep} {data.cityName}</span>
               </nav>
 
               <div className="inline-flex items-center gap-2 bg-[#D4AF37]/10 border border-[#D4AF37]/25 rounded-full px-4 py-1.5 mb-6">
@@ -143,7 +144,7 @@ const PricePage = () => {
                   Preços Kyro Clean Solutions
                 </p>
                 <h2 className="font-playfair text-2xl md:text-3xl font-bold text-[#111111]">
-                  Tabela de preços: {data.serviceName} em {data.cityName}
+                  Tabela de preços: {data.serviceName} {prep} {data.cityName}
                 </h2>
                 <div className="w-12 h-0.5 bg-[#D4AF37] mx-auto mt-4" />
               </div>
@@ -235,7 +236,7 @@ const PricePage = () => {
 
         {/* ── FAQ ── */}
         {data.faqs.length > 0 && (
-          <section className="py-14 bg-white border-t border-[#111111]/5">
+          <section className="py-14 bg-[#FDFDF9] border-t border-[#111111]/5">
             <div className="container mx-auto px-4">
               <div className="max-w-3xl mx-auto">
                 <div className="text-center mb-10">
@@ -279,7 +280,7 @@ const PricePage = () => {
                   className="inline-flex items-center gap-2 bg-white border border-[#D4AF37]/30 px-4 py-2.5 rounded-xl text-sm font-semibold text-[#1A4E30] hover:bg-[#D4AF37]/5 transition-all"
                 >
                   <ArrowRight className="w-4 h-4 text-[#D4AF37]" />
-                  {data.serviceName} em {data.cityName}
+                  {data.serviceName} {prep} {data.cityName}
                 </Link>
               </div>
               <div>
@@ -301,7 +302,7 @@ const PricePage = () => {
               </div>
               <div>
                 <h3 className="text-xs font-bold text-[#111111]/40 uppercase tracking-widest mb-3">
-                  Outros serviços em {data.cityName}
+                  Outros serviços {prep} {data.cityName}
                 </h3>
                 <div className="flex flex-wrap gap-2">
                   {relatedServices.map(svc => (
@@ -330,7 +331,7 @@ const PricePage = () => {
               Orçamento Grátis
             </p>
             <h2 className="font-playfair text-2xl md:text-4xl font-bold text-white mb-3">
-              Peça o seu orçamento em {data.cityName}
+              Peça o seu orçamento {prep} {data.cityName}
             </h2>
             <p className="text-white/45 mb-8 text-sm md:text-base max-w-md mx-auto">
               Resposta em menos de 2 horas. Sem compromisso, sem surpresas.
@@ -383,13 +384,13 @@ const PricePage = () => {
                   "itemListElement": [
                     { "@type": "ListItem", "position": 1, "name": "Início", "item": SITE_URL },
                     { "@type": "ListItem", "position": 2, "name": data.serviceName, "item": `${SITE_URL}/${data.serviceSlug}` },
-                    { "@type": "ListItem", "position": 3, "name": `Preços em ${data.cityName}`, "item": `${SITE_URL}${pathname}` },
+                    { "@type": "ListItem", "position": 3, "name": `Preços ${cityPrep(data.cityName)} ${data.cityName}`, "item": `${SITE_URL}${pathname}` },
                   ],
                 },
                 {
                   "@type": "Service",
                   "@id": `${SITE_URL}${pathname}#service`,
-                  "name": `${data.serviceName} em ${data.cityName}`,
+                  "name": `${data.serviceName} ${cityPrep(data.cityName)} ${data.cityName}`,
                   "description": data.metaDescription,
                   "url": `${SITE_URL}${pathname}`,
                   "provider": { "@id": `${SITE_URL}/#business` },
@@ -403,7 +404,7 @@ const PricePage = () => {
                       "minPrice": data.priceTable[0]?.price.replace(/[^0-9]/g, "") ?? "15",
                       "maxPrice": data.priceTable[data.priceTable.length - 1]?.price.replace(/[^0-9]/g, "") ?? "99",
                       "priceCurrency": "EUR",
-                      "description": `Preço de ${data.serviceName} em ${data.cityName}`,
+                      "description": `Preço de ${data.serviceName} ${cityPrep(data.cityName)} ${data.cityName}`,
                     },
                   },
                 },

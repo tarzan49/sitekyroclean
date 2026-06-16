@@ -20,7 +20,7 @@ import {
   type VariantKey,
   type ServiceKey,
 } from "@/data/keywordVariantData";
-import { cities } from "@/data/locationSeoData";
+import { cities, cityPrep } from "@/data/locationSeoData";
 import { GENERIC_PROCESS_STEPS, IMPERMEABILIZACAO_STEPS } from "@/constants/serviceProcesses";
 import { SITE_URL, WHATSAPP_BASE } from "@/constants/business";
 import TrustRatingBadge from "@/components/TrustRatingBadge";
@@ -153,6 +153,7 @@ const SofaVariantPage = () => {
   const quizService = SERVICEKEY_TO_QUIZ[data.serviceKey];
 
   const variantLabel = VARIANT_LABEL[data.variantKey];
+  const prep = cityPrep(data.locationName);
   const heroImgs = HERO_IMAGES[data.serviceKey];
   const resultImg = RESULT_IMAGES[data.serviceKey];
 
@@ -230,7 +231,7 @@ const SofaVariantPage = () => {
                     <source media="(min-width: 768px)" srcSet={heroImgs.d} type="image/webp" />
                     <img
                       src={heroImgs.d}
-                      alt={`${variantLabel} profissional em ${data.locationName}`}
+                      alt={`${variantLabel} profissional ${prep} ${data.locationName}`}
                       className="relative rounded-2xl w-full max-h-[400px] object-cover shadow-2xl"
                       loading="eager"
                     />
@@ -252,7 +253,7 @@ const SofaVariantPage = () => {
                   <div className="h-px w-10 opacity-40" style={{ backgroundColor: "#D4AF37" }} />
                 </div>
                 <h2 className="font-playfair text-2xl md:text-3xl font-bold text-[#111111]">
-                  Vantagens da {variantLabel} em {data.locationName}
+                  Vantagens da {variantLabel} {prep} {data.locationName}
                 </h2>
               </div>
               <div className={`grid gap-3 md:gap-4 ${data.benefits.length <= 3 ? 'sm:grid-cols-3 justify-items-center max-w-2xl mx-auto w-full' : 'grid-cols-2 md:grid-cols-4'}`}>
@@ -314,7 +315,7 @@ const SofaVariantPage = () => {
               <div className="relative rounded-3xl overflow-hidden shadow-2xl">
                 <img
                   src={resultImg}
-                  alt={`Resultado após ${variantLabel.toLowerCase()} em ${data.locationName}`}
+                  alt={`Resultado após ${variantLabel.toLowerCase()} ${prep} ${data.locationName}`}
                   className="w-full h-[280px] md:h-[400px] object-cover"
                   loading="lazy"
                 />
@@ -324,7 +325,7 @@ const SofaVariantPage = () => {
                     Resultado após {variantLabel.toLowerCase()} profissional
                   </h2>
                   <p className="text-white/70 text-sm md:text-base max-w-lg">
-                    Resultados visíveis no momento. Tratamento profissional ao domicílio em {data.locationName}.
+                    Resultados visíveis no momento. Tratamento profissional ao domicílio {prep} {data.locationName}.
                   </p>
                   <div className="flex items-center gap-3 mt-4 flex-wrap">
                     <div className="flex items-center gap-1.5">
@@ -377,7 +378,7 @@ const SofaVariantPage = () => {
         </section>
 
         {/* ═══ ÁREA DE SERVIÇO ═══ */}
-        <section className="py-12 md:py-14 bg-white">
+        <section className="py-12 md:py-14 bg-[#FDFDF9]">
           <div className="container mx-auto px-5 sm:px-6 lg:px-8">
             <div className="max-w-4xl mx-auto text-center">
               <div className="flex items-center justify-center gap-3 mb-3">
@@ -403,7 +404,7 @@ const SofaVariantPage = () => {
               </div>
 
               <div className="mt-2 pt-6 border-t border-[#E8E4DE]">
-                <p className="text-xs text-[#111111]/50 mb-3">Outros serviços em {data.locationName}:</p>
+                <p className="text-xs text-[#111111]/50 mb-3">Outros serviços {prep} {data.locationName}:</p>
                 <div className="flex flex-wrap justify-center gap-3">
                   {(SERVICES.filter(s => s !== parsed.serviceKey) as ServiceKey[]).map(svcKey => (
                     <Link
@@ -418,7 +419,7 @@ const SofaVariantPage = () => {
                     to={data.canonical}
                     className="text-xs font-semibold text-[#D4AF37] hover:text-[#b8962e] transition-colors"
                   >
-                    Ver limpeza profissional em {data.locationName}
+                    Ver limpeza profissional {prep} {data.locationName}
                   </Link>
                 </div>
               </div>

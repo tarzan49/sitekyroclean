@@ -28,15 +28,15 @@ const IndexV1 = () => {
           <Services />
         </Suspense>
 
-        <Suspense fallback={<SectionLoader />}>
-          <PainPointsSolutionsV1 />
-        </Suspense>
-
         <div id="testemunhos" className="scroll-mt-16">
           <Suspense fallback={<SectionLoader />}>
             <TestimonialsV1 />
           </Suspense>
         </div>
+
+        <Suspense fallback={<SectionLoader />}>
+          <PainPointsSolutionsV1 />
+        </Suspense>
 
         <div id="como-funciona" className="scroll-mt-16">
           <Suspense fallback={<SectionLoader />}>

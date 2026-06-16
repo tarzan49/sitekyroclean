@@ -1,7 +1,7 @@
 // Programmatic SEO: Price pages data engine
 // Targets searches like "preço limpeza sofá porto", "quanto custa limpar colchão"
 
-import { cities, services } from "./locationSeoData";
+import { cities, services, cityPrep } from "./locationSeoData";
 
 export interface PricePageData {
   serviceSlug: string;
@@ -143,9 +143,10 @@ export function getPricePageData(serviceSlug: string, citySlug: string): PricePa
 
   const table = priceTables[serviceSlug] || [];
   const factors = priceFactors[serviceSlug] || [];
+  const prep = cityPrep(city.name);
   const faqs = (priceFaqs[serviceSlug] || []).map(faq => ({
-    question: faq.question.replace(/\{city\}/g, city.name),
-    answer: faq.answer.replace(/\{city\}/g, city.name),
+    question: faq.question.replace(/em \{city\}/g, `${prep} ${city.name}`),
+    answer: faq.answer.replace(/em \{city\}/g, `${prep} ${city.name}`),
   }));
 
   return {
@@ -154,9 +155,9 @@ export function getPricePageData(serviceSlug: string, citySlug: string): PricePa
     citySlug: city.slug,
     cityName: city.name,
     title: `Preço ${service.name} ${city.name} | Tabela de Preços | Kyro Clean Solutions`,
-    metaDescription: `Preços de ${service.name.toLowerCase()} em ${city.name}. Tabela de preços atualizada. Desde ${service.priceFrom}. Orçamento gratuito e sem compromisso.`,
-    h1: `Preço de ${service.name} em ${city.name}`,
-    intro: `Consulte os preços de ${service.name.toLowerCase()} em ${city.name}. Todos os nossos preços incluem deslocação, equipamento de extração profissional e produtos certificados. Orçamento gratuito e sem compromisso.`,
+    metaDescription: `Preços de ${service.name.toLowerCase()} ${prep} ${city.name}. Tabela de preços atualizada. Desde ${service.priceFrom}. Orçamento gratuito e sem compromisso.`,
+    h1: `Preço de ${service.name} ${prep} ${city.name}`,
+    intro: `Consulte os preços de ${service.name.toLowerCase()} ${prep} ${city.name}. Todos os nossos preços incluem deslocação, equipamento de extração profissional e produtos certificados. Orçamento gratuito e sem compromisso.`,
     priceTable: table,
     factors,
     faqs,

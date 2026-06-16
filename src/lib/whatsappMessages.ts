@@ -1,3 +1,5 @@
+import { cityPrep } from "@/data/locationSeoData";
+
 /**
  * WhatsApp opening-message builders.
  * Each function returns the message body only; callers wrap it with
@@ -6,7 +8,7 @@
 
 /** Used on LocationServicePage, FreguesiaServicePage, PricePage, and MaterialPage. */
 export function buildServiceWaMessage(serviceSlug: string, placeName?: string | null): string {
-  const loc = placeName ? ` em ${placeName}` : '';
+  const loc = placeName ? ` ${cityPrep(placeName)} ${placeName}` : '';
   switch (serviceSlug) {
     case 'limpeza-sofas':
       return `Olá! Preciso de limpeza profissional de sofá${loc}. Qual é o preço e disponibilidade?`;
@@ -27,7 +29,7 @@ export function buildServiceWaMessage(serviceSlug: string, placeName?: string | 
 
 /** Used on MaterialPage. */
 export function buildMaterialWaMessage(slug: string, cityName: string | null): string {
-  const city = cityName ? ` em ${cityName}` : '';
+  const city = cityName ? ` ${cityPrep(cityName)} ${cityName}` : '';
   if (slug.includes('pele'))       return `Olá! Tenho um sofá de pele e preciso de limpeza e tratamento${city}. Qual é o preço?`;
   if (slug.includes('veludo'))     return `Olá! Tenho um sofá de veludo e preciso de limpeza especializada${city}. Qual é o preço?`;
   if (slug.includes('camurca'))    return `Olá! Tenho um sofá de camurça e preciso de limpeza profissional${city}. Qual é o preço?`;

@@ -2,7 +2,7 @@
 // higienizacao/lavagem × sofa/colchao/tapetes/cadeiras/alcatifas × all cities + parishes
 // Content generated on demand — no 1 570-entry array kept in memory at module load.
 
-import { cities } from './locationSeoData';
+import { cities, cityPrep } from './locationSeoData';
 import { municipiosComFreguesias } from './freguesiaSeoData';
 
 // ─── Types ─────────────────────────────────────────────────────────
@@ -465,6 +465,7 @@ function buildData(
   const variantLabel = VARIANT_LABEL[variantKey];
   const generator = GENERATORS[`${variantKey}-${serviceKey}`];
   const content = generator(locationName, locationCtx);
+  const prep = cityPrep(locationName);
   const canonicalBase = VARIANT_CANONICAL_BASE[variantKey] ?? svc.canonicalBase;
   const priceFrom = variantKey === 'impermeabilizacao'
     ? (svc.waterproofPriceFrom ?? svc.priceFrom)
@@ -477,9 +478,9 @@ function buildData(
     serviceKey,
     variantKey,
     canonical: `/${canonicalBase}-${canonicalSuffix}`,
-    title: `${variantLabel} de ${svc.label} em ${locationName} | Kyro Clean Solutions`,
+    title: `${variantLabel} de ${svc.label} ${prep} ${locationName} | Kyro Clean Solutions`,
     metaDescription: content.intro.slice(0, 155).trimEnd(),
-    h1: `${variantLabel} Profissional de ${svc.label} em ${locationName}`,
+    h1: `${variantLabel} Profissional de ${svc.label} ${prep} ${locationName}`,
     ...content,
     priceFrom,
   };

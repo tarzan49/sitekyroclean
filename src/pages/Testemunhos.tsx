@@ -1,6 +1,5 @@
 import { useEffect, useState, useRef } from "react";
 import { Star, Quote, Trophy, Users, CheckCircle } from "lucide-react";
-import { useTranslation } from "react-i18next";
 import Header from "@/components/Header";
 import GlobalPromoBanner from "@/components/GlobalPromoBanner";
 import Footer from "@/components/Footer";
@@ -13,8 +12,34 @@ interface TestimonialItem {
   rating?: number;
 }
 
+const TESTIMONIALS: TestimonialItem[] = [
+  { name: "Maria S.", city: "Porto", text: "Parece novo outra vez. O meu sofá tinha 8 anos e achei que ia ter de comprar um novo. A Clean Solutions devolveu-lhe a vida!", initial: "M" },
+  { name: "João P.", city: "Vila Nova de Gaia", text: "Cheiro fresco e sensação incrível. A equipa é profissional, rápida e super cuidadosa. Recomendo!", initial: "J" },
+  { name: "Ana C.", city: "Matosinhos", text: "O sofá da minha avó voltou a brilhar. Serviço impecável, produtos que não fazem mal ao ambiente. Adorei!", initial: "A" },
+  { name: "Pedro R.", city: "Maia", text: "Rapidez e qualidade ao mesmo nível. Em 3 horas o sofá estava limpo e seco. Impressionante!", initial: "P" },
+  { name: "Luís L.", city: "Gondomar", text: "Excelente serviço e profissionais! Deixaram tudo impecável e fizeram o trabalho com cuidado e simpatia.", initial: "L" },
+  { name: "Maria I.", city: "Valongo", text: "O meu sofá ficou muito limpinho, como novo. São muito cuidadosos, simpáticos e prestáveis. Agendar o serviço foi rápido e simples.", initial: "M" },
+  { name: "Carlos M.", city: "Braga", text: "Serviço de excelência! A alcatifa do escritório ficou impecável. Profissionais muito competentes e pontuais.", initial: "C" },
+  { name: "Sofia P.", city: "Guimarães", text: "Fantástico! O colchão estava com manchas difíceis e conseguiram remover tudo. Muito satisfeita com o resultado.", initial: "S" },
+  { name: "Ricardo A.", city: "Póvoa de Varzim", text: "A impermeabilização do sofá foi perfeita. Agora sinto-me muito mais tranquilo com crianças em casa. Recomendo vivamente!", initial: "R" },
+  { name: "Teresa F.", city: "Lisboa", text: "Adorei o serviço de limpeza das cadeiras da sala de jantar. Ficaram como novas e o atendimento foi excelente.", initial: "T" },
+  { name: "Miguel S.", city: "Cascais", text: "Profissionais de confiança! Limparam os tapetes persas antigos com todo o cuidado. Resultado impecável!", initial: "M" },
+  { name: "Beatriz C.", city: "Oeiras", text: "Serviço rápido e eficiente. O meu sofá de pele ficou perfeito. Voltarei a contratar com certeza!", initial: "B" },
+  { name: "Fernando G.", city: "Rio Tinto", text: "Excelente trabalho no meu colchão. Tinha alergia constante e depois da limpeza melhorou imenso. Super recomendo!", initial: "F" },
+  { name: "Helena M.", city: "Ermesinde", text: "As cadeiras do escritório ficaram impecáveis. Equipa pontual e muito profissional. Já agendei para o próximo semestre.", initial: "H" },
+  { name: "Rui T.", city: "Espinho", text: "Tinham-me dito que a nódoa de vinho não saía. A Clean Solutions provou o contrário! Sofá como novo.", initial: "R" },
+  { name: "Sandra V.", city: "Paredes", text: "Fiquei impressionada com a diferença. O tapete da sala recuperou cores que já nem me lembrava que tinha.", initial: "S" },
+  { name: "António F.", city: "Vila do Conde", text: "Trabalho cinco estrelas! Limparam todo o recheio do AL e os hóspedes notaram logo a diferença. Obrigado!", initial: "A" },
+  { name: "Catarina L.", city: "Viana do Castelo", text: "A alcatifa da escada estava muito suja e ficou impecável. Equipa super simpática e profissional.", initial: "C" },
+  { name: "Bruno N.", city: "Vila Real", text: "Vieram de propósito ao Norte e valeu cada cêntimo. O sofá cheirava mal há meses e agora está perfeito.", initial: "B" },
+  { name: "Daniela R.", city: "Famalicão", text: "Contratei para limpar os colchões das crianças. Ficaram super higiénicos e sem aquele cheiro a humidade. Adorei!", initial: "D" },
+  { name: "Nuno C.", city: "Amadora", text: "Serviço impecável do início ao fim. O sofá de 3 lugares ficou pronto em menos de 2 horas. Muito profissionais.", initial: "N" },
+  { name: "Inês A.", city: "Loures", text: "A minha mãe ficou encantada com o resultado. Limparam o sofá dela com muito cuidado e atenção ao detalhe.", initial: "I" },
+  { name: "Tiago M.", city: "Sintra", text: "Tinham uma mancha no sofá há anos que já nem tentávamos tirar. A Clean Solutions resolveu em minutos!", initial: "T" },
+  { name: "Patrícia D.", city: "Almada", text: "Excelente relação qualidade-preço. O colchão do quarto de hóspedes ficou completamente renovado.", initial: "P" },
+];
+
 const Testemunhos = () => {
-  const { t } = useTranslation();
   const [isVisible, setIsVisible] = useState(false);
   const [expandedCards, setExpandedCards] = useState<Set<number>>(new Set());
   const statsRef = useRef<HTMLDivElement>(null);
@@ -36,7 +61,7 @@ const Testemunhos = () => {
     return () => observer.disconnect();
   }, []);
 
-  const testimonials = t('testimonials.pageItems', { returnObjects: true }) as TestimonialItem[];
+  const testimonials = TESTIMONIALS;
 
   const toggleExpand = (index: number) => {
     const newExpanded = new Set(expandedCards);
@@ -52,20 +77,20 @@ const Testemunhos = () => {
     {
       icon: Star,
       value: "5.0",
-      label: t('testimonials.statsRating'),
+      label: "Avaliação média",
       delay: "0s"
     },
     {
       icon: Users,
       value: "+1000",
-      label: t('testimonials.statsServices'),
+      label: "nos últimos 365 dias",
       delay: "0.1s"
     },
     {
       icon: CheckCircle,
       value: "100%",
-      label: t('testimonials.statsSatisfaction'),
-      footnote: t('testimonials.statsFootnote'),
+      label: "Clientes satisfeitos*",
+      footnote: "*com base em feedback recolhido",
       delay: "0.2s"
     }
   ];
@@ -83,7 +108,7 @@ const Testemunhos = () => {
               className="text-3xl md:text-4xl lg:text-5xl font-bold mb-3 text-[#111111] animate-fade-in"
               style={{ animationDelay: "0.1s" }}
             >
-              {t('testimonials.pageTitle', 'O que dizem os nossos clientes')}
+              O que dizem os nossos clientes
             </h1>
             
             {/* Subtitle */}
@@ -91,7 +116,7 @@ const Testemunhos = () => {
               className="text-base md:text-lg text-[#111111]/55 max-w-xl mx-auto mb-4 animate-fade-in"
               style={{ animationDelay: "0.2s" }}
             >
-              {t('testimonials.subtitle')}
+              Histórias reais de clientes satisfeitos com os nossos serviços de limpeza.
             </p>
             
             {/* Golden line - thinner and elegant */}
@@ -178,7 +203,7 @@ const Testemunhos = () => {
                           onClick={() => toggleExpand(index)}
                           className="text-turquoise hover:text-turquoise/80 text-sm font-medium mb-3 transition-colors"
                         >
-                          {isExpanded ? t('testimonials.readLess') : t('testimonials.readMore')}
+                          {isExpanded ? "Ver menos" : "Ver mais"}
                         </button>
                       )}
                       
@@ -213,14 +238,14 @@ const Testemunhos = () => {
               className="text-2xl md:text-3xl lg:text-4xl font-bold mb-4 text-white animate-fade-in"
               style={{ animationDelay: "0.1s" }}
             >
-              {t('testimonials.ctaTitle')}
+              Quer fazer parte das nossas histórias de sucesso?
             </h2>
             
             <p 
               className="text-lg text-white/90 mb-8 max-w-2xl mx-auto animate-fade-in"
               style={{ animationDelay: "0.2s" }}
             >
-              {t('testimonials.ctaSubtitle')}
+              Solicite já o seu orçamento gratuito e junte-se aos nossos clientes satisfeitos.
             </p>
             
             <div className="relative group w-full md:w-auto animate-fade-in" style={{ animationDelay: "0.3s" }}>
@@ -239,7 +264,7 @@ const Testemunhos = () => {
                   'transition-all duration-150 animate-cta-glow',
                 ].join(' ')}
               >
-                <span className="tracking-wide">{t('testimonials.ctaButton')}</span>
+                <span className="tracking-wide">Pedir Orçamento Grátis</span>
               </a>
             </div>
           </div>

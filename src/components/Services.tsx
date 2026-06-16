@@ -1,5 +1,4 @@
 ﻿import { Link } from "react-router-dom";
-import { useTranslation } from "react-i18next";
 import { useEffect, useRef, useState, useCallback } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import sofaImg         from "@/assets/service-sofa-new.webp";
@@ -48,7 +47,7 @@ function heroOffset(vc: number): number {
 /* ─── ServiceCard ─────────────────────────────────────────────────── */
 interface CardProps {
   service: {
-    titleKey: string; priceKey: string;
+    title: string; price: string;
     image: string; imageM: string; icon: string;
     link: string; altText: string; badge: string;
   };
@@ -56,7 +55,6 @@ interface CardProps {
 }
 
 const ServiceCard = ({ service, prominence }: CardProps) => {
-  const { t } = useTranslation();
   const isHero = prominence === "hero";
   const isSide = prominence === "side";
 
@@ -144,12 +142,12 @@ const ServiceCard = ({ service, prominence }: CardProps) => {
             transition: `font-size ${SLIDE_MS}ms ease`,
           }}
         >
-          {t(service.titleKey)}
+          {service.title}
         </h3>
         <div className="flex items-center justify-between mt-2">
           <p className="text-[11px] font-medium" style={{ color: "rgba(255,255,255,0.55)" }}>
             a partir de{" "}
-            <span style={{ color: "#D4AF37", fontWeight: 700 }}>{t(service.priceKey)}</span>
+            <span style={{ color: "#D4AF37", fontWeight: 700 }}>{service.price}</span>
           </p>
           {isHero && (
             <span className="text-[10px] font-semibold tracking-wide text-white/40 group-hover:text-gold/70 transition-colors duration-300">
@@ -164,7 +162,6 @@ const ServiceCard = ({ service, prominence }: CardProps) => {
 
 /* ─── Main Section ────────────────────────────────────────────────── */
 const Services = () => {
-  const { t } = useTranslation();
   const sectionRef   = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -252,12 +249,12 @@ const Services = () => {
 
   /* Services */
   const services = [
-    { titleKey: "services.items.waterproofing.title", priceKey: "services.items.waterproofing.price", image: waterproofImg, imageM: waterproofImgM, icon: iconWaterproof, link: "/impermeabilizacao",  altText: "Impermeabilização de Estofos", badge: "Proteção invisível total"      },
-    { titleKey: "services.items.mattresses.title",    priceKey: "services.items.mattresses.price",    image: mattressImg,   imageM: mattressImgM,   icon: iconMattress,   link: "/limpeza-colchoes",   altText: "Limpeza de Colchões",          badge: "Durma em ambiente puro"         },
-    { titleKey: "services.items.sofas.title",         priceKey: "services.items.sofas.price",         image: sofaImg,       imageM: sofaImgM,       icon: iconSofa,       link: "/limpeza-sofas",      altText: "Limpeza de Sofás",             badge: "O seu sofá novo outra vez"      },
-    { titleKey: "services.items.chairs.title",        priceKey: "services.items.chairs.price",        image: chairsImg,     imageM: chairsImgM,     icon: iconChair,      link: "/limpeza-cadeiras",   altText: "Limpeza de Cadeiras",          badge: "Detalhe e higiene profunda"     },
-    { titleKey: "services.items.carpets.title",       priceKey: "services.items.carpets.price",       image: carpetImg,     imageM: carpetImgM,     icon: iconCarpet,     link: "/limpeza-tapetes",    altText: "Limpeza de Tapetes",           badge: "Cuidado delicado fibra a fibra" },
-    { titleKey: "services.items.rugs.title",          priceKey: "services.items.rugs.price",          image: rugsImg,       imageM: rugsImgM,       icon: iconRug,        link: "/limpeza-alcatifas",  altText: "Limpeza de Alcatifas",         badge: "Renovação total do espaço"      },
+    { title: "Impermeabilização",            price: "49€",    image: waterproofImg, imageM: waterproofImgM, icon: iconWaterproof, link: "/impermeabilizacao",  altText: "Impermeabilização de Estofos", badge: "Proteção invisível total"      },
+    { title: "Limpeza e Lavagem de Colchões", price: "39€",   image: mattressImg,   imageM: mattressImgM,   icon: iconMattress,   link: "/limpeza-colchoes",   altText: "Limpeza de Colchões",          badge: "Durma em ambiente puro"         },
+    { title: "Limpeza e Lavagem de Sofás",   price: "39€",    image: sofaImg,       imageM: sofaImgM,       icon: iconSofa,       link: "/limpeza-sofas",      altText: "Limpeza de Sofás",             badge: "O seu sofá novo outra vez"      },
+    { title: "Limpeza e Lavagem de Cadeiras", price: "10€",   image: chairsImg,     imageM: chairsImgM,     icon: iconChair,      link: "/limpeza-cadeiras",   altText: "Limpeza de Cadeiras",          badge: "Detalhe e higiene profunda"     },
+    { title: "Limpeza e Lavagem de Tapetes", price: "5€/m²",  image: carpetImg,     imageM: carpetImgM,     icon: iconCarpet,     link: "/limpeza-tapetes",    altText: "Limpeza de Tapetes",           badge: "Cuidado delicado fibra a fibra" },
+    { title: "Limpeza e Lavagem de Alcatifas", price: "5€/m²", image: rugsImg,      imageM: rugsImgM,       icon: iconRug,        link: "/limpeza-alcatifas",  altText: "Limpeza de Alcatifas",         badge: "Renovação total do espaço"      },
   ];
 
   /* Extended array for infinite loop: [last CLONES, ...all N, first CLONES] */
@@ -330,10 +327,10 @@ const Services = () => {
             <div className="absolute bottom-0 left-0 right-0 px-3 pb-3">
               <div className="mb-1.5 rounded-full" style={{ width: "14px", height: "1.5px", backgroundColor: "#D4AF37", opacity: 0.60 }} />
               <h3 className="font-playfair font-bold text-white leading-tight" style={{ fontSize: "0.88rem" }}>
-                {t(service.titleKey)}
+                {service.title}
               </h3>
               <p className="text-[10px] mt-1" style={{ color: "rgba(255,255,255,0.45)" }}>
-                a partir de <span style={{ color: "#D4AF37", fontWeight: 700 }}>{t(service.priceKey)}</span>
+                a partir de <span style={{ color: "#D4AF37", fontWeight: 700 }}>{service.price}</span>
               </p>
             </div>
             <div className="absolute inset-0 rounded-xl ring-1 ring-white/[0.06] pointer-events-none" />

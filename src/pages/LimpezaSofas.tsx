@@ -1,4 +1,3 @@
-import { useTranslation } from "react-i18next";
 import { Shield, Heart, Sparkles } from "lucide-react";
 import Header from "@/components/Header";
 import { QuizServiceProvider } from "@/context/QuizLocationContext";
@@ -82,12 +81,11 @@ const expertTips: ExpertTip[] = [
 ];
 
 const LimpezaSofas = () => {
-  const { t } = useTranslation();
-
-  const faqs = [1, 2, 3].map((n) => ({
-    question: t(`sofaCleaning.faq.question${n}`),
-    answer: t(`sofaCleaning.faq.answer${n}`),
-  }));
+  const faqs = [
+    { question: 'Quanto tempo demora a limpeza de um sofá?', answer: 'A duração depende do tamanho e do estado do sofá, mas, em média, varia entre 45 minutos e 2 horas. Trabalhamos com máquinas de extração profissional, por isso o processo é rápido, mas sem nunca comprometer o detalhe em cada zona do estofos.' },
+    { question: 'O sofá fica muito molhado? Quanto tempo leva a secar?', answer: 'Não. Usamos extração profunda com forte capacidade de sucção, o que retira a maior parte da água usada na limpeza. Em condições normais de ventilação, o sofá fica seco entre 4 e 8 horas. Em dias mais húmidos pode demorar um pouco mais, mas nunca deixamos o tecido encharcado.' },
+    { question: 'A limpeza pode danificar o tecido ou desbotar a cor?', answer: 'Pelo contrário: os produtos que utilizamos são específicos para estofos, com pH equilibrado e adequados a cada tipo de tecido. Fazemos sempre uma avaliação prévia e, se necessário, teste numa zona pouco visível. O objetivo é recuperar a cor e a textura original, sem danificar fibras.' },
+  ];
 
   return (
     <QuizServiceProvider value="sofa">
@@ -121,7 +119,7 @@ const LimpezaSofas = () => {
           items={sofaGuarantee}
           variant="light"
         />
-        <ServiceFAQ faqs={faqs} heading={t("sofaCleaning.faq.title")} />
+        <ServiceFAQ faqs={faqs} heading="Perguntas Frequentes" variant="dark" />
         <ServiceExpertTips tips={expertTips} variant="light" />
         <ServiceCityLinks serviceSlug="limpeza-sofas" serviceLabel="Limpeza de Sofás" />
         <ServiceSchema

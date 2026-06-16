@@ -1,33 +1,86 @@
-export const PRICE_TABLE: Record<string, { item: string; price: string; highlight?: boolean }[]> = {
+// Maps each PRICE_TABLE row (same serviceSlug + index) to a quiz prefill
+// config so clicking the row jumps straight to the quiz's Config step (3)
+// with that item pre-selected. `null` = row is not directly selectable
+// (e.g. add-ons, or items with no exact quiz equivalent).
+export type PriceRowQuizConfig = {
+  service: 'sofa' | 'mattress' | 'carpet' | 'chairs';
+  serviceType: 'cleaning' | 'waterproofing';
+  sofaSizeId?: string;
+  mattressSizeId?: string;
+  carpetArea?: string;
+  chairQty?: string;
+  // Set at click time from the row's quantity stepper (sofa/mattress qty, or chairQty override).
+  sofaQty?: number;
+  mattressQty?: number;
+};
+
+export const PRICE_TABLE_QUIZ_CONFIG: Record<string, (PriceRowQuizConfig | null)[]> = {
+  'limpeza-sofas': [
+    { service: 'sofa', serviceType: 'cleaning', sofaSizeId: '1-lugar' },
+    { service: 'sofa', serviceType: 'cleaning', sofaSizeId: '2-lugares' },
+    { service: 'sofa', serviceType: 'cleaning', sofaSizeId: '3-lugares' },
+    null,
+    { service: 'sofa', serviceType: 'cleaning', sofaSizeId: '4+-lugares' },
+  ],
+  'limpeza-colchoes': [
+    { service: 'mattress', serviceType: 'cleaning', mattressSizeId: 'solteiro' },
+    { service: 'mattress', serviceType: 'cleaning', mattressSizeId: 'casal' },
+    { service: 'mattress', serviceType: 'cleaning', mattressSizeId: 'king' },
+  ],
+  'limpeza-tapetes': [
+    { service: 'carpet', serviceType: 'cleaning', carpetArea: '5' },
+    { service: 'carpet', serviceType: 'cleaning', carpetArea: '12' },
+    { service: 'carpet', serviceType: 'cleaning', carpetArea: '20' },
+  ],
+  'limpeza-cadeiras': [
+    { service: 'chairs', serviceType: 'cleaning', chairQty: '1' },
+    { service: 'chairs', serviceType: 'cleaning', chairQty: '1' },
+    { service: 'chairs', serviceType: 'cleaning', chairQty: '6' },
+  ],
+  'limpeza-alcatifas': [
+    { service: 'carpet', serviceType: 'cleaning', carpetArea: '15' },
+    { service: 'carpet', serviceType: 'cleaning', carpetArea: '20' },
+  ],
+  'impermeabilizacao': [
+    { service: 'sofa', serviceType: 'waterproofing', sofaSizeId: '1-lugar' },
+    { service: 'sofa', serviceType: 'waterproofing', sofaSizeId: '2-lugares' },
+    { service: 'sofa', serviceType: 'waterproofing', sofaSizeId: '3-lugares' },
+    { service: 'mattress', serviceType: 'waterproofing', mattressSizeId: 'solteiro' },
+    { service: 'mattress', serviceType: 'waterproofing', mattressSizeId: 'casal' },
+    { service: 'carpet', serviceType: 'waterproofing', carpetArea: '12' },
+  ],
+};
+
+export const PRICE_TABLE: Record<string, { item: string; price: string }[]> = {
   'limpeza-sofas': [
     { item: 'Sofá 1 lugar',            price: '49€' },
-    { item: 'Sofá 2 lugares',          price: '69€', highlight: true },
+    { item: 'Sofá 2 lugares',          price: '69€' },
     { item: 'Sofá 3 lugares',          price: '79€' },
     { item: 'Chaise longue (add-on)',  price: '+10€' },
     { item: 'Sofá modular / em L',     price: 'Sob orçamento' },
   ],
   'limpeza-colchoes': [
     { item: 'Colchão solteiro',        price: '39€' },
-    { item: 'Colchão casal',           price: '49€', highlight: true },
+    { item: 'Colchão casal',           price: '49€' },
     { item: 'Colchão king / queen',    price: '59€' },
   ],
   'limpeza-tapetes': [
     { item: 'Tapete até 5 m²',         price: '10€/m²' },
-    { item: 'Tapete 5 – 15 m²',        price: '7€/m²', highlight: true },
+    { item: 'Tapete 5 – 15 m²',        price: '7€/m²' },
     { item: 'Tapete +15 m²',           price: 'Sob orçamento' },
   ],
   'limpeza-cadeiras': [
     { item: '1 cadeira (tampo)',        price: '15€' },
-    { item: '1 cadeira (completa)',     price: '20€', highlight: true },
+    { item: '1 cadeira (completa)',     price: '20€' },
     { item: '6+ cadeiras',             price: '10€/un' },
   ],
   'limpeza-alcatifas': [
-    { item: 'Até 50 m²',               price: '3€/m²', highlight: true },
+    { item: 'Até 50 m²',               price: '3€/m²' },
     { item: '+50 m²',                  price: 'Sob orçamento' },
   ],
   'impermeabilizacao': [
     { item: 'Sofá 1 lugar',            price: '49€' },
-    { item: 'Sofá 2 lugares',          price: '69€', highlight: true },
+    { item: 'Sofá 2 lugares',          price: '69€' },
     { item: 'Sofá 3 lugares',          price: '89€' },
     { item: 'Colchão solteiro',        price: '45€' },
     { item: 'Colchão casal',           price: '50€' },

@@ -8,7 +8,7 @@ import QuizButton from "@/components/QuizButton";
 import ServiceFAQSchema from "@/components/ServiceFAQSchema";
 import ServiceLocationSchema from "@/components/ServiceLocationSchema";
 import { getProblemBySlug, getRelatedProblemLinks } from "@/data/problemSeoData";
-import { cities, services, DEFAULT_PRICE_FROM } from "@/data/locationSeoData";
+import { cities, services, DEFAULT_PRICE_FROM, cityPrep, cityPrepCap } from "@/data/locationSeoData";
 import { SERVICE_TO_QUIZ } from "@/constants/serviceToQuiz";
 import { METRO_CITY_SLUGS } from "@/constants/metroCities";
 import { getAllProblemCityRoutes } from "@/data/problemCitySeoData";
@@ -16,7 +16,7 @@ import { getProblemHeroImage } from "@/lib/problemHeroImages";
 import { SITE_URL, WHATSAPP_BASE, PHONE_E164 } from "@/constants/business";
 
 function getCityContext(problemSlug: string, cityName: string, cityDesc: string): string {
-  const base = `Em ${cityName}, ${cityDesc}`;
+  const base = `${cityPrepCap(cityName)} ${cityName}, ${cityDesc}`;
   if (problemSlug.includes("mancha"))
     return `${base}, as manchas nos estofos agravam-se com a humidade atlântica e o ritmo de vida agitado. A penetração nas fibras ocorre em horas, tratamento profissional é mais eficaz quanto mais rápido for aplicado.`;
   if (problemSlug.includes("acar"))
@@ -49,9 +49,10 @@ const ProblemCityPage = () => {
 
   useEffect(() => {
     if (problem && city) {
-      const title = `${problem.h1} em ${city.name} | Kyro Clean Solutions`;
+      const prep = cityPrep(city.name);
+      const title = `${problem.h1} ${prep} ${city.name} | Kyro Clean Solutions`;
       document.title = title;
-      const metaDesc = `${problem.h1} em ${city.name}: serviço profissional ao domicílio. ${problem.metaDescription.split('.')[0]}. Orçamento grátis em menos de 2 horas.`;
+      const metaDesc = `${problem.h1} ${prep} ${city.name}: serviço profissional ao domicílio. ${problem.metaDescription.split('.')[0]}. Orçamento grátis em menos de 2 horas.`;
       const desc = document.querySelector('meta[name="description"]');
       if (desc) desc.setAttribute("content", metaDesc);
       const ogTitle = document.querySelector('meta[property="og:title"]');
@@ -78,6 +79,8 @@ const ProblemCityPage = () => {
     );
   }
 
+  const prep = cityPrep(city.name);
+  const Prep = cityPrepCap(city.name);
   const quizService = SERVICE_TO_QUIZ[problem.relatedServices[0]] ?? 'sofa';
 
   const relatedProblemLinks = getRelatedProblemLinks(problem.relatedProblems);
@@ -98,7 +101,7 @@ const ProblemCityPage = () => {
     question: faq.question,
     answer: faq.answer.includes(city.name)
       ? faq.answer
-      : `${faq.answer} Prestamos este serviço ao domicílio em ${city.name} e arredores.`,
+      : `${faq.answer} Prestamos este serviço ao domicílio ${prep} ${city.name} e arredores.`,
   }));
 
   return (
@@ -109,7 +112,7 @@ const ProblemCityPage = () => {
         serviceName={problem.h1}
         serviceBaseUrl={`/problemas/${problem.slug}`}
         placeName={city.name}
-        description={`${problem.intro.split('.')[0]} em ${city.name}. Serviço profissional ao domicílio.`}
+        description={`${problem.intro.split('.')[0]} ${prep} ${city.name}. Serviço profissional ao domicílio.`}
         pageUrl={pathname}
         priceFrom={priceFrom}
       />
@@ -138,19 +141,19 @@ const ProblemCityPage = () => {
               </nav>
 
               <p className="text-[10px] font-bold tracking-[0.28em] uppercase mb-4" style={{ color: "#D4AF37" }}>
-                Como resolver em {city.name}
+                Como resolver {prep} {city.name}
               </p>
 
               <h1 className="font-playfair text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-5 leading-tight">
-                {problem.h1} em {city.name}
+                {problem.h1} {prep} {city.name}
               </h1>
               <div className="w-10 h-px mb-5 opacity-50" style={{ backgroundColor: "#D4AF37" }} />
               <p className="text-base md:text-lg text-white/70 leading-relaxed mb-5 max-w-2xl">
-                {problem.intro.replace(/no Porto|ao domicílio/g, `em ${city.name}`)}
+                {problem.intro.replace(/no Porto|ao domicílio/g, `${prep} ${city.name}`)}
               </p>
 
               <p className="text-sm font-semibold mb-6" style={{ color: "#D4AF37" }}>
-                A partir de {priceFrom} · Resultado no mesmo dia · Serviço ao domicílio em {city.name}
+                A partir de {priceFrom} · Resultado no mesmo dia · Serviço ao domicílio {prep} {city.name}
               </p>
 
               <div className="flex flex-wrap items-center gap-3">
@@ -178,7 +181,7 @@ const ProblemCityPage = () => {
                   <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ backgroundColor: "rgba(212,175,55,0.08)", border: "1px solid rgba(212,175,55,0.2)" }}>
                     <AlertTriangle className="w-5 h-5" style={{ color: "#D4AF37" }} />
                   </div>
-                  <h2 className="font-playfair text-xl md:text-2xl font-bold text-[#111111]">O Problema em {city.name}</h2>
+                  <h2 className="font-playfair text-xl md:text-2xl font-bold text-[#111111]">O Problema {prep} {city.name}</h2>
                 </div>
                 <p className="text-sm md:text-base text-[#111111]/60 leading-relaxed mb-3">{problem.problemDetail}</p>
                 <p className="text-sm text-[#111111]/50 leading-relaxed italic border-t border-[#E8E4DE] pt-3">{cityContext}</p>
@@ -204,7 +207,7 @@ const ProblemCityPage = () => {
                 <div className="h-px w-10 opacity-40" style={{ backgroundColor: "#D4AF37" }} />
                 <p className="text-[10px] font-bold tracking-[0.28em] uppercase" style={{ color: "#D4AF37" }}>Vantagens</p>
               </div>
-              <h2 className="font-playfair text-2xl md:text-3xl font-bold text-white mb-6">Benefícios do nosso serviço em {city.name}</h2>
+              <h2 className="font-playfair text-2xl md:text-3xl font-bold text-white mb-6">Benefícios do nosso serviço {prep} {city.name}</h2>
               <div className="grid sm:grid-cols-2 gap-3">
                 {problem.benefits.map((b, i) => (
                   <div key={i} className="flex items-start gap-3 p-3 rounded-xl border" style={{ backgroundColor: "rgba(255,255,255,0.04)", borderColor: "rgba(255,255,255,0.08)" }}>
@@ -250,7 +253,7 @@ const ProblemCityPage = () => {
           <div className="container mx-auto px-5 sm:px-6 lg:px-8 text-center">
             <p className="text-[10px] font-bold tracking-[0.28em] uppercase mb-4" style={{ color: "#D4AF37" }}>Kyro Clean Solutions</p>
             <h2 className="font-playfair text-xl md:text-3xl font-bold text-white mb-3">
-              Resolva o problema em {city.name}
+              Resolva o problema {prep} {city.name}
             </h2>
             <p className="text-white/60 mb-6 text-base">
               Orçamento gratuito em menos de 2 horas · Sem compromisso.
@@ -273,11 +276,11 @@ const ProblemCityPage = () => {
             <div className="max-w-4xl mx-auto space-y-8">
               {relatedServiceData.length > 0 && (
                 <div>
-                  <h3 className="font-playfair text-lg md:text-xl font-bold text-[#111111] mb-4">Serviços em {city.name}</h3>
+                  <h3 className="font-playfair text-lg md:text-xl font-bold text-[#111111] mb-4">Serviços {prep} {city.name}</h3>
                   <div className="flex flex-wrap gap-2">
                     {relatedServiceData.map(svc => (
                       <Link key={svc.slug} to={`/${svc.slug}-${city.slug}`} className="inline-flex items-center gap-1.5 bg-white px-3 py-2 rounded-lg text-sm font-medium text-[#111111] border border-[#E8E4DE] hover:border-[#D4AF37]/35 hover:bg-[#D4AF37]/5 transition-all">
-                        <ArrowRight className="w-3 h-3" style={{ color: "#D4AF37" }} />{svc.name} em {city.name}
+                        <ArrowRight className="w-3 h-3" style={{ color: "#D4AF37" }} />{svc.name} {prep} {city.name}
                       </Link>
                     ))}
                   </div>

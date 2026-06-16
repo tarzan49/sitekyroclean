@@ -1,6 +1,5 @@
 ﻿import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
-import { useTranslation } from "react-i18next";
 import { SITE_URL } from "@/constants/business";
 
 interface PageMeta {
@@ -251,8 +250,7 @@ const routeMeta: Record<string, { pt: PageMeta; en: PageMeta; es: PageMeta }> = 
 
 const PageHead = () => {
   const location = useLocation();
-  const { i18n } = useTranslation();
-  const lang = (i18n.language || "pt").substring(0, 2) as "pt" | "en" | "es";
+  const lang = "pt" as "pt" | "en" | "es";
 
   useEffect(() => {
     const path = location.pathname;

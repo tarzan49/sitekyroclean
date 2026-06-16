@@ -1,5 +1,4 @@
 ﻿import { useEffect, useRef, useState } from "react";
-import { useTranslation } from "react-i18next";
 import { ShieldCheck, HandCoins, Droplets } from "lucide-react";
 import QuizButton from "./QuizButton";
 import TrustRatingBadge from "@/components/TrustRatingBadge";
@@ -55,7 +54,6 @@ const guarantees = [
 const ITEM_MIN_H = "min-h-[72px]";
 
 const HowItWorks = () => {
-  const { t } = useTranslation();
   const [isVisible, setIsVisible] = useState(false);
   const sectionRef = useRef<HTMLDivElement>(null);
 
@@ -86,7 +84,7 @@ const HowItWorks = () => {
               </p>
             </div>
             <h2 className="font-playfair text-[1.85rem] sm:text-4xl md:text-[2.6rem] font-bold text-white leading-[1.1]">
-              {t('howItWorks.title', 'Como')}{" "}
+              Como{" "}
               <em className="not-italic" style={{ color: '#D4AF37' }}>funciona</em>
             </h2>
           </div>
@@ -115,10 +113,10 @@ const HowItWorks = () => {
                 </div>
                 <div className="pb-5 last:pb-0">
                   <h3 className="font-playfair text-sm md:text-base font-bold text-white mb-1 leading-snug">
-                    {t(step.titleKey, step.titleFallback)}
+                    {step.titleFallback}
                   </h3>
                   <p className="text-white/50 text-[13px] leading-relaxed">
-                    {t(step.descKey, step.descFallback)}
+                    {step.descFallback}
                   </p>
                 </div>
               </div>
@@ -158,10 +156,10 @@ const HowItWorks = () => {
                     </div>
                     <div className="pb-5">
                       <h3 className="font-playfair font-bold text-white text-sm md:text-base mb-0.5 leading-snug">
-                        {t(item.titleKey, item.titleFallback)}
+                        {item.titleFallback}
                       </h3>
                       <p className="text-white/50 text-[13px] leading-relaxed">
-                        {t(item.textKey, item.textFallback)}
+                        {item.textFallback}
                       </p>
                     </div>
                   </div>

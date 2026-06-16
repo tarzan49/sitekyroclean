@@ -11,6 +11,7 @@ import {
   getFromPrice,
   buildWhatsAppUrl,
 } from "@/data/packComboData";
+import { cityPrep } from "@/data/locationSeoData";
 import { SITE_URL, WHATSAPP_BASE, REVIEW_RATING, REVIEW_COUNT } from "@/constants/business";
 import {
   buildWebPageNode,
@@ -46,8 +47,8 @@ const PackComboPage = () => {
 
   const pageUrl = `${SITE_URL}${pathname}`;
   const fromPriceText = prices ? `${prices.packTotal}€` : `a calcular`;
-  const pageTitle = data ? `${data.pack.name} em ${data.city.name}, Desde ${fromPriceText} | Kyro Clean` : '';
-  const pageDesc = data ? `${data.pack.description} Poupe até 20% em relação ao preço individual. Serviço ao domicílio em ${data.city.name}.` : '';
+  const pageTitle = data ? `${data.pack.name} ${cityPrep(data.city.name)} ${data.city.name}, Desde ${fromPriceText} | Kyro Clean` : '';
+  const pageDesc = data ? `${data.pack.description} Poupe até 10% em relação ao preço individual. Serviço ao domicílio ${cityPrep(data.city.name)} ${data.city.name}.` : '';
 
   useEffect(() => {
     if (!data) return;
@@ -74,6 +75,7 @@ const PackComboPage = () => {
   }
 
   const { pack, city } = data;
+  const prep = cityPrep(city.name);
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -82,11 +84,11 @@ const PackComboPage = () => {
       buildBreadcrumbNode(`${pageUrl}#breadcrumb`, [
         { name: "Início", item: `${SITE_URL}/` },
         { name: "Packs", item: `${SITE_URL}/packs` },
-        { name: `${pack.name} em ${city.name}`, item: pageUrl },
+        { name: `${pack.name} ${prep} ${city.name}`, item: pageUrl },
       ]),
       buildServiceNode({
         url: pageUrl,
-        name: `${pack.name} em ${city.name}`,
+        name: `${pack.name} ${prep} ${city.name}`,
         description: pack.description,
         areaServed: { "@type": "City", name: city.name },
         offers: buildOfferNode(String(getFromPrice(pack)), {
@@ -121,11 +123,11 @@ const PackComboPage = () => {
               </nav>
 
               <p className="text-[10px] font-bold tracking-[0.28em] uppercase mb-4" style={{ color: "#D4AF37" }}>
-                {pack.id === 'sofa-impermeabilizacao' ? 'Preço VIP · 1 visita' : `Poupe ${prices ? prices.savingsPct : 20}%`}
+                {pack.id === 'sofa-impermeabilizacao' ? 'Preço VIP · 1 visita' : `Poupe ${prices ? prices.savingsPct : 10}%`}
               </p>
 
               <h1 className="font-playfair text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4 leading-tight">
-                {pack.name} em {city.name}
+                {pack.name} {prep} {city.name}
               </h1>
 
               <div className="w-10 h-px mb-5 opacity-50" style={{ backgroundColor: "#D4AF37" }} />
@@ -286,7 +288,7 @@ const PackComboPage = () => {
         </section>
 
         {/* ═══ COMO FUNCIONA ═══ */}
-        <section className="py-10 bg-white border-t border-[#E8E4DE]">
+        <section className="py-10 bg-[#FDFDF9] border-t border-[#E8E4DE]">
           <div className="container mx-auto px-5 sm:px-6 lg:px-8">
             <div className="max-w-2xl mx-auto">
               <p className="text-[10px] font-bold tracking-[0.28em] uppercase mb-4 text-center" style={{ color: "#D4AF37" }}>
@@ -333,10 +335,10 @@ const PackComboPage = () => {
         </section>
 
         {/* ═══ TESTEMUNHO + GARANTIAS ═══ */}
-        <section className="py-10 md:py-12 bg-white">
+        <section className="py-10 md:py-12 bg-[#FDFDF9]">
           <div className="container mx-auto px-5 sm:px-6 lg:px-8">
             <div className="max-w-4xl mx-auto grid md:grid-cols-2 gap-4">
-              <div className="bg-[#FDFDF9] rounded-2xl p-6 shadow-sm border border-[#E8E4DE]">
+              <div className="bg-white rounded-2xl p-6 shadow-sm border border-[#E8E4DE]">
                 <div className="flex gap-0.5 mb-3">
                   {[...Array(5)].map((_, i) => <Star key={i} className="w-4 h-4 fill-[#D4AF37]" style={{ color: "#D4AF37" }} />)}
                 </div>
@@ -350,7 +352,7 @@ const PackComboPage = () => {
                 <h3 className="font-semibold text-white text-sm mb-1">Garantias incluídas</h3>
                 {[
                   { icon: Shield, text: "Garantia de satisfação 100%" },
-                  { icon: Zap, text: `Serviço ao domicílio em ${city.name}` },
+                  { icon: Zap, text: `Serviço ao domicílio ${prep} ${city.name}` },
                   { icon: CheckCircle, text: "Produtos certificados e seguros" },
                   { icon: Star, text: `${REVIEW_RATING} · ${REVIEW_COUNT}+ avaliações Google verificadas` },
                 ].map((item, i) => (
