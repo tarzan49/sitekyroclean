@@ -60,7 +60,7 @@ async function postToFormspree(payload: QuizLeadPayload): Promise<Response> {
 
   const doFetch = () => {
     const ctrl = new AbortController();
-    const timer = setTimeout(() => ctrl.abort(), 8000);
+    const timer = setTimeout(() => ctrl.abort(), 30000);
     return fetch('https://formspree.io/f/xreozzbp', {
       method: 'POST',
       headers: { Accept: 'application/json' },
@@ -72,9 +72,8 @@ async function postToFormspree(payload: QuizLeadPayload): Promise<Response> {
   try {
     return await doFetch();
   } catch (networkErr) {
-    if (networkErr instanceof Error && networkErr.name === 'AbortError') throw networkErr;
-    console.warn('[submissionService] Formspree fetch failed, retrying once:', networkErr);
-    await new Promise((resolve) => setTimeout(resolve, 200));
+    console.warn('[submissionService] Formspree first attempt failed, retrying once:', networkErr);
+    await new Promise((resolve) => setTimeout(resolve, 300));
     return await doFetch();
   }
 }
@@ -237,53 +236,38 @@ function persistObrigadoData(payload: QuizLeadPayload, bookingId: string, waUrl:
   }));
 }
 
-/**
- * Submits the quiz lead via two independent channels - Formspree (email
- * notification) and Supabase (CRM record). Browser extensions/ad-blockers
- * frequently block requests to formspree.io, so the lead must not be lost
- * just because that one channel was blocked: the submission only counts as
- * failed if BOTH channels fail. Whichever channel(s) succeed, we proceed to
- * the "Obrigado" page (failures in the other channel are logged as warnings).
- */
 export async function submitQuizLead(payload: QuizLeadPayload): Promise<void> {
   const bookingId = generateBookingId();
 
-  // CRM insert fires immediately in background — dynamic Supabase import +
-  // API latency (~3-4s on mobile) must never block the user-facing flow.
+  // Persist receipt + WA URL FIRST — synchronous, no network, so /obrigado
+  // always renders the full receipt even if both channels are still in-flight.
+  try {
+    const waUrl = buildWaUrl(payload, bookingId);
+    persistObrigadoData(payload, bookingId, waUrl);
+  } catch (persistErr) {
+    console.warn('[submissionService] persistObrigadoData failed:', persistErr);
+  }
+
+  // Both channels fire in background. React SPA navigation does not unload the
+  // page, so these requests complete even after the user reaches /obrigado.
   insertCrmLead(payload, bookingId).catch(err => {
     logError({
       message: err instanceof Error ? err.message : String(err),
-      source: 'QuizForm-post-submit',
+      source: 'QuizForm-crm',
       severity: 'warning',
       stack: err instanceof Error ? err.stack ?? null : null,
     });
   });
 
-  // Await only Formspree — with AbortController it resolves in ≤8s.
-  let formspreeOk = false;
-  try {
-    const res = await postToFormspree(payload);
-    formspreeOk = res.ok;
-    if (!formspreeOk) {
-      logError({ message: `Formspree HTTP ${res.status}`, source: 'QuizForm-post-submit', severity: 'warning', stack: null });
-    }
-  } catch (err) {
+  postToFormspree(payload).then(res => {
+    if (!res.ok) logError({ message: `Formspree HTTP ${res.status}`, source: 'QuizForm-formspree', severity: 'warning', stack: null });
+  }).catch(err => {
     logError({
       message: err instanceof Error ? err.message : String(err),
-      source: 'QuizForm-post-submit',
+      source: 'QuizForm-formspree',
       severity: 'warning',
       stack: err instanceof Error ? err.stack ?? null : null,
     });
-  }
-
-  if (!formspreeOk) {
-    throw new Error('Formspree submission failed — CRM may still capture the lead.');
-  }
-
-  try {
-    const waUrl = buildWaUrl(payload, bookingId);
-    persistObrigadoData(payload, bookingId, waUrl);
-  } catch (postSubmitError) {
-    console.warn('[submissionService] Post-submit enrichment failed (lead already sent):', postSubmitError);
-  }
+  });
+  // Returns immediately — caller navigates to /obrigado in <100ms
 }
