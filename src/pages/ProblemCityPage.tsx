@@ -52,7 +52,7 @@ const ProblemCityPage = () => {
       const prep = cityPrep(city.name);
       const title = `${problem.h1} ${prep} ${city.name} | Kyro Clean Solutions`;
       document.title = title;
-      const metaDesc = `${problem.h1} ${prep} ${city.name}: serviço profissional ao domicílio. ${problem.metaDescription.split('.')[0]}. Orçamento grátis em menos de 2 horas.`;
+      const metaDesc = `${problem.h1} ${prep} ${city.name}: serviço profissional ao domicílio. ${problem.metaDescription.split('.')[0]}. Orçamento grátis em menos de 30 minutos.`;
       const desc = document.querySelector('meta[name="description"]');
       if (desc) desc.setAttribute("content", metaDesc);
       const ogTitle = document.querySelector('meta[property="og:title"]');
@@ -256,7 +256,7 @@ const ProblemCityPage = () => {
               Resolva o problema {prep} {city.name}
             </h2>
             <p className="text-white/60 mb-6 text-base">
-              Orçamento gratuito em menos de 2 horas · Sem compromisso.
+              Orçamento gratuito em menos de 30 minutos · Sem compromisso.
             </p>
             <div className="flex flex-wrap justify-center gap-3">
               <QuizButton initialLocation={city.name} initialService={quizService} />

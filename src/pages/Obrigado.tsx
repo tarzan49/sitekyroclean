@@ -72,7 +72,7 @@ const Obrigado = () => {
             </h1>
             <div className="flex items-center gap-1.5 text-[11px] text-white/35">
               <Clock className="w-3.5 h-3.5" />
-              Especialista contacta em menos de 15 minutos
+              Especialista contacta em menos de 30 minutos
             </div>
           </div>
 

@@ -120,7 +120,7 @@ const PricePage = () => {
 
               <div className="flex items-center justify-center gap-5 mt-8 flex-wrap">
                 <span className="flex items-center gap-1.5 text-white/35 text-xs">
-                  <Clock className="w-3.5 h-3.5" />Resposta em 2h
+                  <Clock className="w-3.5 h-3.5" />Resposta em 30 min
                 </span>
                 <span className="w-px h-3 bg-white/10" />
                 <span className="flex items-center gap-1.5 text-white/35 text-xs">
@@ -334,7 +334,7 @@ const PricePage = () => {
               Peça o seu orçamento {prep} {data.cityName}
             </h2>
             <p className="text-white/45 mb-8 text-sm md:text-base max-w-md mx-auto">
-              Resposta em menos de 2 horas. Sem compromisso, sem surpresas.
+              Resposta em menos de 30 minutos. Sem compromisso, sem surpresas.
             </p>
             <div className="flex gap-3 justify-center mx-auto max-w-xs sm:max-w-sm">
               <div className="relative flex-1">

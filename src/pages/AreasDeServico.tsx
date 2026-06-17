@@ -164,7 +164,7 @@ const AreasDeServico = () => {
               Precisa de limpeza profissional na sua cidade?
             </h2>
             <p className="text-white/60 mb-6 text-base">
-              Peça o seu orçamento gratuito: resposta em menos de 2 horas.
+              Peça o seu orçamento gratuito: resposta em menos de 30 minutos.
             </p>
             <QuizButton />
           </div>

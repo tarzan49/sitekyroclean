@@ -821,7 +821,7 @@ ${formData.description || 'Sem observações adicionais'}
               {isSubmitting ? 'A enviar...' : 'FINALIZAR PEDIDO'}
             </Button>
             <p className="text-center text-[11px] text-white/30 font-medium -mt-0.5">
-              Sem compromisso · Grátis · Respondemos em menos de 1h
+              Sem compromisso · Grátis · Respondemos em menos de 30 min
             </p>
             <button
               onClick={handlePrev}

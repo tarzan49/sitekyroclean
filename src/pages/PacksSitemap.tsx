@@ -184,7 +184,7 @@ const PacksSitemap = () => {
         <section className="py-8 bg-[#FDFDF9] border-t border-[#E8E4DE]">
           <div className="max-w-5xl mx-auto px-5 sm:px-6 lg:px-8 flex items-center justify-between flex-wrap gap-4">
             <p className="text-sm text-[#111111]/50">
-              {packs.length * packCities.length} combinações disponíveis · Reserva via WhatsApp · Resposta em 15 min
+              {packs.length * packCities.length} combinações disponíveis · Reserva via WhatsApp · Resposta em menos de 30 min
             </p>
             <Link
               to="/packs"

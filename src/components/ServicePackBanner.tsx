@@ -36,7 +36,7 @@ const ServicePackBanner = ({ packSlugs, city = "porto", variant = "light" }: Pro
           </h2>
           <p className={`text-[15px] leading-relaxed max-w-2xl ${light ? "text-[#111111]/55" : "text-white/50"}`}>
             Ao adicionar outro serviço na mesma visita, tem 10% de desconto imediato.
-            Reserve directamente via WhatsApp, respondemos em menos de 15 min.
+            Reserve directamente via WhatsApp, respondemos em menos de 30 min.
           </p>
         </div>
 

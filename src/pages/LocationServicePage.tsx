@@ -159,7 +159,7 @@ const LocationServicePage = () => {
     freguesiaCount > 0
       ? { value: `${freguesiaCount}+`, label: "Zonas cobertas" }
       : { value: "100%", label: `Cobertura ${cityPrep} ${data.city}` },
-    { value: "24h", label: "Tempo de resposta" },
+    { value: "30min", label: "Tempo de resposta" },
   ];
 
   const processSteps = data.serviceSlug === 'impermeabilizacao' ? IMPERMEABILIZACAO_STEPS : GENERIC_PROCESS_STEPS;
@@ -320,7 +320,7 @@ const LocationServicePage = () => {
                         <p className="text-[9px] font-bold tracking-[0.26em] uppercase" style={{ color: "rgba(255,255,255,0.45)" }}>Orçamento Gratuito</p>
                       </div>
                       <p className="text-white font-semibold text-sm leading-snug">Toque para ver o preço exacto</p>
-                      <p className="text-xs mt-0.5" style={{ color: "rgba(255,255,255,0.38)" }}>Sem compromisso · Resposta em menos de 2h</p>
+                      <p className="text-xs mt-0.5" style={{ color: "rgba(255,255,255,0.38)" }}>Sem compromisso · Resposta em menos de 30 min</p>
                     </div>
                     {PRICE_TABLE[data.serviceSlug]?.[0] && (
                       <div className="flex-shrink-0 text-right">

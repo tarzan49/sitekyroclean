@@ -747,7 +747,7 @@ const problemDefinitions: ProblemPage[] = [
       { question: "Quanto custa limpar um sofá de 3 lugares?", answer: "A limpeza profissional de um sofá de 3 lugares começa a partir de 49€. O preço final depende do tipo de tecido e estado de sujidade." },
       { question: "A deslocação tem custo adicional?", answer: "Não. A deslocação está incluída no preço na área metropolitana do Porto e nas principais cidades onde operamos." },
       { question: "Existem packs com desconto?", answer: "Sim. Oferecemos packs de limpeza + impermeabilização com desconto até 15%. Também temos desconto para limpeza de múltiplos itens na mesma visita." },
-      { question: "Como posso pedir orçamento?", answer: "Peça orçamento gratuito através do nosso formulário online, WhatsApp ou telefone. Respondemos em menos de 2 horas." },
+      { question: "Como posso pedir orçamento?", answer: "Peça orçamento gratuito através do nosso formulário online, WhatsApp ou telefone. Respondemos em menos de 30 minutos." },
     ],
     relatedProblems: ["preco-limpeza-colchao", "preco-limpeza-tapete", "limpeza-profunda-sofa"],
     relatedServices: ["limpeza-sofas", "impermeabilizacao"],
@@ -1343,7 +1343,7 @@ const problemDefinitions: ProblemPage[] = [
     intro: "Procura limpeza de sofá perto de si? A Kyro Clean Solutions cobre Porto, Lisboa e todo o Norte de Portugal com serviço ao domicílio. A nossa equipa desloca-se até à sua casa com todo o equipamento.",
     problemDetail: "Quando pesquisa 'limpeza de sofá perto de mim', quer um serviço local, fiável e com boas avaliações. A Kyro Clean Solutions tem 5.0 no Google, +1000 clientes satisfeitos e cobertura em todo o Norte de Portugal e região de Lisboa.",
     solutionDetail: "Atuamos no Porto e em Matosinhos, Maia, Gaia, Gondomar, Valongo, Braga, Guimarães, Póvoa de Varzim, Vila do Conde, Lisboa, Cascais, Oeiras, Sintra, Almada e Setúbal. Deslocação incluída no preço.",
-    benefits: ["Cobertura Norte de Portugal + Lisboa", "5.0 Google", "+1000 clientes satisfeitos", "Deslocação incluída", "Desde 39€", "Resposta em 2 horas"],
+    benefits: ["Cobertura Norte de Portugal + Lisboa", "5.0 Google", "+1000 clientes satisfeitos", "Deslocação incluída", "Desde 39€", "Resposta em menos de 30 minutos"],
     faqs: [
       { question: "Em que cidades fazem limpeza de sofá?", answer: "Servimos Porto e toda a área metropolitana, Braga, Guimarães, e região de Lisboa (Cascais, Oeiras, Sintra, Almada, Setúbal). Contacte-nos para confirmar disponibilidade na sua zona." },
     ],

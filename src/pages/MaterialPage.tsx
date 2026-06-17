@@ -283,7 +283,7 @@ const MaterialPage = () => {
               Peça o seu orçamento gratuito
             </h2>
             <p className="text-white/60 mb-6 text-base">
-              Desde {servicePrice} · Resposta em menos de 2 horas · Sem compromisso.
+              Desde {servicePrice} · Resposta em menos de 30 minutos · Sem compromisso.
             </p>
             <div className="flex gap-3 justify-center mx-auto max-w-xs sm:max-w-sm">
               <div className="relative flex-1">

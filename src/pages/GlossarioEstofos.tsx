@@ -286,7 +286,7 @@ const GlossarioEstofos = () => {
             <div className="px-6 py-8 flex flex-col items-center text-center">
               <p className="text-[10px] font-bold tracking-[0.25em] uppercase text-gold/70 mb-2">PRONTO PARA AGENDAR?</p>
               <h2 className="font-playfair text-2xl font-bold text-white mb-2">Orçamento gratuito em 30 segundos</h2>
-              <p className="text-white/50 text-sm mb-6">Técnico contacta em menos de 15 minutos · Sem compromisso</p>
+              <p className="text-white/50 text-sm mb-6">Técnico contacta em menos de 30 minutos · Sem compromisso</p>
               <QuizButton ctaLabel="Calcular preço grátis" />
             </div>
           </div>

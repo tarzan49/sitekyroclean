@@ -298,7 +298,7 @@ const MarcaSofaPage = () => {
               Peça orçamento para o seu sofá {marca.name} {prep} {city.name}
             </h2>
             <p className="text-white/60 mb-6">
-              {marca.estimatedPriceRange} · Resposta em menos de 2 horas
+              {marca.estimatedPriceRange} · Resposta em menos de 30 minutos
             </p>
             <div className="flex gap-3 justify-center w-full max-w-sm mx-auto">
               <div className="relative group flex-1">

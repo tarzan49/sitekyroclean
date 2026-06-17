@@ -279,7 +279,7 @@ const PackComboPage = () => {
 
                 <p className="text-center text-[10px] text-[#111111]/35">
                   A mensagem pré-preenchida inclui o pack, as opções selecionadas e o preço.
-                  O responsável confirma em menos de 15 min.
+                  O responsável confirma em menos de 30 min.
                 </p>
               </div>
 
@@ -297,7 +297,7 @@ const PackComboPage = () => {
               <div className="grid grid-cols-3 gap-4 text-center">
                 {[
                   { n: '1', title: 'Envie o pack', desc: 'Clique no botão WhatsApp, a mensagem já vem preenchida com os detalhes.' },
-                  { n: '2', title: 'Confirmamos', desc: 'Respondemos em menos de 15 min a confirmar data e horário.' },
+                  { n: '2', title: 'Confirmamos', desc: 'Respondemos em menos de 30 min a confirmar data e horário.' },
                   { n: '3', title: 'Tratamos de tudo', desc: 'A equipa desloca-se e executa ambos os serviços na mesma visita.' },
                 ].map(step => (
                   <div key={step.n} className="flex flex-col items-center gap-2">
@@ -374,7 +374,7 @@ const PackComboPage = () => {
               Pronto para reservar?
             </h2>
             <p className="text-white/50 text-sm mb-6">
-              Configure acima e envie via WhatsApp. Confirmamos em menos de 15 min.
+              Configure acima e envie via WhatsApp. Confirmamos em menos de 30 min.
             </p>
             <a
               href="#configurador"
