@@ -310,89 +310,92 @@ const LocationServicePage = () => {
                     goldWord={data.city}
                     subtitle={`Preços fixos e transparentes, sem surpresas. Deslocação incluída em toda a área de ${data.city}. Orçamento gratuito antes de qualquer compromisso.`}
                   />
-                  <QuizButton initialLocation={data.city} initialService={quizService} />
                 </div>
-                <div className="bg-white p-6 md:p-10" style={{ borderTop: "2px solid #D4AF37", boxShadow: "0 2px 24px rgba(0,0,0,0.07), 0 1px 4px rgba(0,0,0,0.04)" }}>
-                  <p className="flex items-center gap-2 text-xs font-bold text-[#111111]/55 mb-4">
-                    <span className="inline-flex items-center justify-center w-5 h-5 rounded-full flex-shrink-0" style={{ background: "rgba(212,175,55,0.12)" }}>
-                      <ArrowRight className="w-3 h-3" style={{ color: "#D4AF37" }} />
-                    </span>
-                    Escolha a quantidade e toque para pedir o seu orçamento
-                  </p>
-                  <div className="divide-y" style={{ borderColor: "rgba(17,17,17,0.06)" }}>
-                    {PRICE_TABLE[data.serviceSlug].map((row, i) => {
-                      const quizConfig = PRICE_TABLE_QUIZ_CONFIG[data.serviceSlug]?.[i] ?? null;
-                      if (!quizConfig) {
+                <div className="rounded-2xl overflow-hidden" style={{ boxShadow: "0 8px 40px rgba(7,26,18,0.18), 0 2px 10px rgba(7,26,18,0.10)" }}>
+                  {/* ── Header verde do orçamento ── */}
+                  <div className="px-6 py-5 flex items-start justify-between gap-4" style={{ background: "#071a12" }}>
+                    <div>
+                      <div className="flex items-center gap-2 mb-1.5">
+                        <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: "#25D366" }} />
+                        <p className="text-[9px] font-bold tracking-[0.26em] uppercase" style={{ color: "rgba(255,255,255,0.45)" }}>Orçamento Gratuito</p>
+                      </div>
+                      <p className="text-white font-semibold text-sm leading-snug">Toque para ver o preço exacto</p>
+                      <p className="text-xs mt-0.5" style={{ color: "rgba(255,255,255,0.38)" }}>Sem compromisso · Resposta em menos de 2h</p>
+                    </div>
+                    {PRICE_TABLE[data.serviceSlug]?.[0] && (
+                      <div className="flex-shrink-0 text-right">
+                        <p className="text-xs" style={{ color: "rgba(255,255,255,0.30)" }}>Desde</p>
+                        <p className="font-playfair font-bold text-2xl leading-none" style={{ color: "#D4AF37" }}>{PRICE_TABLE[data.serviceSlug][0].price}</p>
+                      </div>
+                    )}
+                  </div>
+                  {/* ── Linhas de preço ── */}
+                  <div className="bg-white px-5 pt-1">
+                    <div className="divide-y" style={{ borderColor: "rgba(17,17,17,0.06)" }}>
+                      {PRICE_TABLE[data.serviceSlug].map((row, i) => {
+                        const quizConfig = PRICE_TABLE_QUIZ_CONFIG[data.serviceSlug]?.[i] ?? null;
+                        if (!quizConfig) {
+                          return (
+                            <div key={i} className="flex items-center gap-3 py-3.5">
+                              <span className="text-[#111111]/70" style={{ fontSize: "14px" }}>{row.item}</span>
+                              <span className="flex-1 border-b border-dotted mb-0.5" style={{ borderColor: "rgba(17,17,17,0.12)" }} />
+                              <span className="font-playfair font-bold text-xl tabular-nums" style={{ color: "#D4AF37" }}>{row.price}</span>
+                            </div>
+                          );
+                        }
+                        const showStepper = Boolean(quizConfig.sofaSizeId || quizConfig.mattressSizeId || quizConfig.chairQty);
+                        const qty = rowQuantities[i] ?? getRowDefaultQty(quizConfig);
                         return (
-                          <div key={i} className="flex items-baseline gap-3 py-3.5">
-                            <span
-                              className="text-[#111111]/70"
-                              style={{ fontSize: "14px" }}
-                            >
-                              {row.item}
-                            </span>
-                            <span className="flex-1 border-b border-dotted mb-1.5" style={{ borderColor: "rgba(17,17,17,0.15)" }} />
+                          <div
+                            key={i}
+                            role="button"
+                            tabIndex={0}
+                            onClick={() => handleSelectRow(i, quizConfig)}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter' || e.key === ' ') {
+                                e.preventDefault();
+                                handleSelectRow(i, quizConfig);
+                              }
+                            }}
+                            className="group flex items-center gap-3 py-3 rounded-xl cursor-pointer transition-colors hover:bg-[rgba(7,26,18,0.04)]"
+                          >
+                            {showStepper && (
+                              <div
+                                onClick={(e) => e.stopPropagation()}
+                                className="flex items-center gap-0.5 rounded-full border px-1 py-1 flex-shrink-0"
+                                style={{ borderColor: "rgba(7,26,18,0.15)" }}
+                              >
+                                <button
+                                  type="button"
+                                  onClick={() => adjustRowQty(i, quizConfig, -1)}
+                                  className="w-9 h-9 flex items-center justify-center rounded-full text-[#111111]/40 hover:bg-[rgba(7,26,18,0.08)] transition-colors"
+                                  aria-label="Diminuir quantidade"
+                                >
+                                  <Minus className="w-4 h-4" />
+                                </button>
+                                <span className="w-7 text-center font-playfair text-lg font-bold tabular-nums text-[#111111]">{qty}</span>
+                                <button
+                                  type="button"
+                                  onClick={() => adjustRowQty(i, quizConfig, 1)}
+                                  className="w-9 h-9 flex items-center justify-center rounded-full text-[#111111]/40 hover:bg-[rgba(7,26,18,0.08)] transition-colors"
+                                  aria-label="Aumentar quantidade"
+                                >
+                                  <Plus className="w-4 h-4" />
+                                </button>
+                              </div>
+                            )}
+                            <span className="text-[#111111]/70" style={{ fontSize: "14px" }}>{row.item}</span>
+                            <span className="flex-1 border-b border-dotted mb-0.5" style={{ borderColor: "rgba(17,17,17,0.12)" }} />
                             <span className="font-playfair font-bold text-xl tabular-nums" style={{ color: "#D4AF37" }}>{row.price}</span>
+                            <ArrowRight className="w-4 h-4 flex-shrink-0 text-[#111111]/20 group-hover:text-[#1DA851] group-hover:translate-x-0.5 transition-all" />
                           </div>
                         );
-                      }
-                      const showStepper = Boolean(quizConfig.sofaSizeId || quizConfig.mattressSizeId || quizConfig.chairQty);
-                      const qty = rowQuantities[i] ?? getRowDefaultQty(quizConfig);
-                      return (
-                        <div
-                          key={i}
-                          role="button"
-                          tabIndex={0}
-                          onClick={() => handleSelectRow(i, quizConfig)}
-                          onKeyDown={(e) => {
-                            if (e.key === 'Enter' || e.key === ' ') {
-                              e.preventDefault();
-                              handleSelectRow(i, quizConfig);
-                            }
-                          }}
-                          className="group flex items-center gap-3 py-2.5 rounded-xl cursor-pointer transition-colors hover:bg-[#FDFDF9]"
-                        >
-                          {showStepper && (
-                            <div
-                              onClick={(e) => e.stopPropagation()}
-                              className="flex items-center gap-1 rounded-full border px-1 py-1 flex-shrink-0"
-                              style={{ borderColor: "rgba(212,175,55,0.3)" }}
-                            >
-                              <button
-                                type="button"
-                                onClick={() => adjustRowQty(i, quizConfig, -1)}
-                                className="w-9 h-9 flex items-center justify-center rounded-full text-[#111111]/55 hover:bg-[rgba(212,175,55,0.12)] hover:text-[#a8841f] transition-colors"
-                                aria-label="Diminuir quantidade"
-                              >
-                                <Minus className="w-4 h-4" />
-                              </button>
-                              <span className="w-7 text-center font-playfair text-lg font-bold tabular-nums text-[#111111]">{qty}</span>
-                              <button
-                                type="button"
-                                onClick={() => adjustRowQty(i, quizConfig, 1)}
-                                className="w-9 h-9 flex items-center justify-center rounded-full text-[#111111]/55 hover:bg-[rgba(212,175,55,0.12)] hover:text-[#a8841f] transition-colors"
-                                aria-label="Aumentar quantidade"
-                              >
-                                <Plus className="w-4 h-4" />
-                              </button>
-                            </div>
-                          )}
-                          <span
-                            className="text-[#111111]/70"
-                            style={{ fontSize: "14px" }}
-                          >
-                            {row.item}
-                          </span>
-                          <span className="flex-1 border-b border-dotted mb-1.5" style={{ borderColor: "rgba(17,17,17,0.15)" }} />
-                          <span className="font-playfair font-bold text-xl tabular-nums" style={{ color: "#D4AF37" }}>{row.price}</span>
-                          <ArrowRight className="w-4 h-4 flex-shrink-0 text-[#111111]/20 group-hover:text-gold group-hover:translate-x-0.5 transition-all" />
-                        </div>
-                      );
-                    })}
-                  </div>
-                  <div className="flex items-center gap-2 mt-5 text-xs text-[#111111]/45">
-                    <CheckCircle className="w-3.5 h-3.5 flex-shrink-0" style={{ color: "#D4AF37" }} />
-                    <span>Deslocação incluída na área de {data.city}</span>
+                      })}
+                    </div>
+                    <div className="flex items-center gap-1.5 py-4 border-t" style={{ borderColor: "rgba(17,17,17,0.07)" }}>
+                      <CheckCircle className="w-3.5 h-3.5 flex-shrink-0" style={{ color: "#25D366" }} />
+                      <span className="text-xs" style={{ color: "rgba(17,17,17,0.45)" }}>Deslocação incluída na área de {data.city}</span>
+                    </div>
                   </div>
                 </div>
               </div>
