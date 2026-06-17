@@ -17,7 +17,7 @@ import { getAllFreguesiaRoutes } from "@/data/freguesiaSeoData";
 import { getAllMaterialRoutes, getAllMaterialCityRoutes } from "@/data/materialSeoData";
 import { getAllPriceRoutes } from "@/data/priceSeoData";
 import { getAllProblemCityRoutes } from "@/data/problemCitySeoData";
-import { getAllKeywordVariantRoutes } from "@/data/keywordVariantData";
+import { getAllKeywordVariantRoutes } from "@/data/keywordVariantRouteData";
 import { getAllPackComboRoutes } from "@/data/packComboData";
 import { getAllMarcaSofaRoutes } from "@/data/marcaSofaData";
 

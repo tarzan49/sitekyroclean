@@ -1,7 +1,7 @@
 // Programmatic SEO: Problem × City combinations
 // Targets searches like "tirar manchas sofá porto", "remover cheiro urina sofá matosinhos"
 
-import { getAllProblems } from "./problemSeoData";
+import { PROBLEM_ROUTE_SLUGS } from "./problemRouteData";
 import { cities } from "./locationSeoData";
 
 export interface ProblemCityRoute {
@@ -10,17 +10,15 @@ export interface ProblemCityRoute {
   citySlug: string;
 }
 
+const TOP_METRO = new Set(["porto", "matosinhos", "maia", "vila-nova-de-gaia", "gondomar", "braga", "lisboa"]);
+
 // Generate all problem × city routes
 export function getAllProblemCityRoutes(): ProblemCityRoute[] {
-  const problems = getAllProblems().filter(p => p.visible);
   const routes: ProblemCityRoute[] = [];
 
-  for (const problem of problems) {
-    // Only generate city pages for cities listed in the problem's relatedCities
-    // plus top metro cities for broader coverage
+  for (const problem of PROBLEM_ROUTE_SLUGS) {
     const targetCities = cities.filter(c =>
-      problem.relatedCities.includes(c.slug) ||
-      ["porto", "matosinhos", "maia", "vila-nova-de-gaia", "gondomar", "braga", "lisboa"].includes(c.slug)
+      problem.relatedCities.includes(c.slug) || TOP_METRO.has(c.slug)
     );
 
     for (const city of targetCities) {
