@@ -1,4 +1,3 @@
-import { Shield, Heart, Sparkles } from "lucide-react";
 import Header from "@/components/Header";
 import { QuizServiceProvider } from "@/context/QuizLocationContext";
 import GlobalPromoBanner from "@/components/GlobalPromoBanner";
@@ -10,34 +9,13 @@ import ServiceSchema from "@/components/ServiceSchema";
 import ServiceHero from "@/components/ServiceHero";
 import ServiceAutoCarousel from "@/components/ServiceAutoCarousel";
 import ServiceExpertTips from "@/components/ServiceExpertTips";
-import ServiceBenefitsBar, { BenefitItem } from "@/components/ServiceBenefitsBar";
+import ServicePriceSection from "@/components/ServicePriceSection";
 import ServiceEliteGuarantee, { GuaranteeItem } from "@/components/ServiceEliteGuarantee";
 import { ExpertTip } from "@/components/ServiceExpertTips";
 import sofaBeforeNew from "@/assets/galeria-sofa-antes.webp";
 import sofaAfterNew from "@/assets/galeria-sofa-depois.webp";
 import sofaResultado from "@/assets/galeria-sofa-resultado.webp";
 import sofaProcesso from "@/assets/galeria-sofa-processo.webp";
-
-const sofaBenefits: BenefitItem[] = [
-  {
-    icon: Shield,
-    label: "Durabilidade",
-    title: "Prolongue a vida do seu sofá",
-    body: "A sujidade acumulada nas fibras degrada o tecido de dentro para fora. Higienização regular evita o desgaste prematuro e pode duplicar a vida útil do sofá.",
-  },
-  {
-    icon: Heart,
-    label: "Saúde",
-    title: "Zero ácaros, zero alergénios",
-    body: "Um sofá adulto acumula até 10 milhões de ácaros. A extração a vapor elimina 99,9% desses microrganismos, criando um ambiente seguro para toda a família.",
-  },
-  {
-    icon: Sparkles,
-    label: "Resultado",
-    title: "Cores, cheiro e conforto novos",
-    body: "Manchas, odores de animais e sujidade de anos desaparecem numa única sessão. O sofá fica com o aspeto e o toque que tinha quando o trouxe para casa.",
-  },
-];
 
 const sofaGuarantee: GuaranteeItem[] = [
   {
@@ -98,12 +76,7 @@ const LimpezaSofas = () => {
           subtitle="Remoção eficaz de sujidade, manchas e alergénios, devolvendo higiene, conforto e uma aparência cuidada ao sofá."
           serviceSlug="limpeza-sofas"
         />
-        <ServiceBenefitsBar
-          overline="Porque Vale a Pena"
-          heading="Por que a limpeza profissional de sofás vale o investimento"
-          benefits={sofaBenefits}
-          variant="light"
-        />
+        <ServicePriceSection serviceSlug="limpeza-sofas" />
         <ServiceAutoCarousel
           overline="Antes e Depois"
           beforeImage={sofaBeforeNew}

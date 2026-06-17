@@ -1,4 +1,3 @@
-import { Shield, Heart, Sparkles } from "lucide-react";
 import impermeabilizacaoAntes from "@/assets/galeria-impermeabilizacao-antes.webp";
 import impermeabilizacaoDepois from "@/assets/galeria-impermeabilizacao-depois.webp";
 import impermeabilizacaoResultado from "@/assets/galeria-impermeabilizacao-resultado.webp";
@@ -12,30 +11,9 @@ import ServiceSchema from "@/components/ServiceSchema";
 import ServiceHero from "@/components/ServiceHero";
 import ServiceAutoCarousel from "@/components/ServiceAutoCarousel";
 import ServiceExpertTips from "@/components/ServiceExpertTips";
-import ServiceBenefitsBar, { BenefitItem } from "@/components/ServiceBenefitsBar";
+import ServicePriceSection from "@/components/ServicePriceSection";
 import ServiceEliteGuarantee, { GuaranteeItem } from "@/components/ServiceEliteGuarantee";
 import { ExpertTip } from "@/components/ServiceExpertTips";
-
-const impermeabilizacaoBenefits: BenefitItem[] = [
-  {
-    icon: Shield,
-    label: "Durabilidade",
-    title: "Proteção até 10 anos",
-    body: "A barreira de nano-partículas repele líquidos, gordura e sujidade sem alterar o toque ou a aparência do tecido. Uma única aplicação, proteção duradoura.",
-  },
-  {
-    icon: Heart,
-    label: "Saúde",
-    title: "Menos bactérias, mais higiene",
-    body: "Tecidos impermeabilizados retêm menos humidade e bactérias. O ambiente da sua casa fica mais seco, mais fresco e mais saudável a longo prazo.",
-  },
-  {
-    icon: Sparkles,
-    label: "Economia",
-    title: "Poupa centenas de euros",
-    body: "Substituir um sofá de qualidade custa entre 800€ e 3.000€. A impermeabilização custa uma fração e evita essa despesa por anos.",
-  },
-];
 
 const impermeabilizacaoGuarantee: GuaranteeItem[] = [
   {
@@ -97,12 +75,7 @@ const Impermeabilizacao = () => {
           subtitle="Proteção invisível que cria uma barreira contra líquidos e manchas, preservando o tecido sem alterar o toque ou a aparência."
           serviceSlug="impermeabilizacao"
         />
-        <ServiceBenefitsBar
-          overline="Proteção que Dura"
-          heading="Como a impermeabilização profissional protege o seu lar"
-          benefits={impermeabilizacaoBenefits}
-          variant="light"
-        />
+        <ServicePriceSection serviceSlug="impermeabilizacao" />
         <ServiceAutoCarousel
           overline="A Barreira Invisível"
           beforeImage={impermeabilizacaoAntes}

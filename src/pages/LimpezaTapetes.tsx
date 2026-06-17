@@ -1,4 +1,3 @@
-import { Shield, Heart, Sparkles } from "lucide-react";
 import Header from "@/components/Header";
 import { QuizServiceProvider } from "@/context/QuizLocationContext";
 import GlobalPromoBanner from "@/components/GlobalPromoBanner";
@@ -9,34 +8,13 @@ import ServiceSchema from "@/components/ServiceSchema";
 import ServiceHero from "@/components/ServiceHero";
 import ServiceAutoCarousel from "@/components/ServiceAutoCarousel";
 import ServiceExpertTips from "@/components/ServiceExpertTips";
-import ServiceBenefitsBar, { BenefitItem } from "@/components/ServiceBenefitsBar";
+import ServicePriceSection from "@/components/ServicePriceSection";
 import ServiceEliteGuarantee, { GuaranteeItem } from "@/components/ServiceEliteGuarantee";
 import { ExpertTip } from "@/components/ServiceExpertTips";
 import tapeteAntes from "@/assets/galeria-tapete-antes.webp";
 import tapeteDepois from "@/assets/galeria-tapete-depois.webp";
 import tapeteResultado from "@/assets/galeria-alcatifa-resultado.webp";
 import tapeteProcesso from "@/assets/galeria-tapete-processo.webp";
-
-const tapetesBenefits: BenefitItem[] = [
-  {
-    icon: Shield,
-    label: "Fibras",
-    title: "Fibras limpas, tapete duradouro",
-    body: "Partículas de areia e sujidade cortam as fibras como lâminas a cada passo. A extração profissional remove esses abrasivos e prolonga o tapete em anos.",
-  },
-  {
-    icon: Heart,
-    label: "Ar Interior",
-    title: "O tapete filtra o ar que respira",
-    body: "Os tapetes retêm até 4× mais poluentes do que o pavimento liso. Quando estão saturados, libertam essas partículas no ar. A limpeza regular mantém essa função protetora ativa.",
-  },
-  {
-    icon: Sparkles,
-    label: "Estética",
-    title: "Cores vivas, odores eliminados",
-    body: "Manchas de vinho, pelo de animais e resíduos orgânicos desaparecem numa única sessão. O tapete recupera a tonalidade original e o odor fresco de novo.",
-  },
-];
 
 const tapetesGuarantee: GuaranteeItem[] = [
   {
@@ -97,12 +75,7 @@ const LimpezaTapetes = () => {
           subtitle="Extração profunda que remove resíduos acumulados nas fibras, revitalizando o tapete e melhorando a qualidade do ar interior."
           serviceSlug="limpeza-tapetes"
         />
-        <ServiceBenefitsBar
-          overline="Fibra por Fibra"
-          heading="Por que a limpeza profissional de tapetes prolonga a vida das suas fibras"
-          benefits={tapetesBenefits}
-          variant="light"
-        />
+        <ServicePriceSection serviceSlug="limpeza-tapetes" />
         <ServiceAutoCarousel
           overline="A Transformação"
           beforeImage={tapeteAntes}

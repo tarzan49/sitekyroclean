@@ -1,4 +1,3 @@
-import { Shield, Heart, Sparkles } from "lucide-react";
 import Header from "@/components/Header";
 import { QuizServiceProvider } from "@/context/QuizLocationContext";
 import GlobalPromoBanner from "@/components/GlobalPromoBanner";
@@ -9,34 +8,13 @@ import ServiceSchema from "@/components/ServiceSchema";
 import ServiceHero from "@/components/ServiceHero";
 import ServiceAutoCarousel from "@/components/ServiceAutoCarousel";
 import ServiceExpertTips from "@/components/ServiceExpertTips";
-import ServiceBenefitsBar, { BenefitItem } from "@/components/ServiceBenefitsBar";
+import ServicePriceSection from "@/components/ServicePriceSection";
 import ServiceEliteGuarantee, { GuaranteeItem } from "@/components/ServiceEliteGuarantee";
 import { ExpertTip } from "@/components/ServiceExpertTips";
 import tapeteAntes from "@/assets/tapete-antes.webp";
 import tapeteDepois from "@/assets/tapete-depois.webp";
 import alcatifaResultado from "@/assets/galeria-alcatifa-resultado.webp";
 import alcatifaProcesso from "@/assets/galeria-alcatifa-processo.webp";
-
-const alcatifasBenefits: BenefitItem[] = [
-  {
-    icon: Shield,
-    label: "Saúde",
-    title: "Elimine o que o aspirador não alcança",
-    body: "A densidade das alcatifas retém até 10× mais poluentes do que pavimentos lisos. A extração a alta pressão remove fungos, ácaros e resíduos que nenhum aspirador consegue tocar.",
-  },
-  {
-    icon: Heart,
-    label: "Cobertura Total",
-    title: "Higiene em cada centímetro",
-    body: "Ao contrário de tapetes soltos, a alcatifa cobre toda a sala e acumula sujidade em toda ela. A nossa limpeza técnica garante tratamento uniforme, sem zonas descuidadas.",
-  },
-  {
-    icon: Sparkles,
-    label: "Investimento",
-    title: "Poupe na substituição",
-    body: "Uma alcatifa de qualidade custa entre 15€ e 80€/m². A limpeza profissional regular, a partir de 5€/m², prolonga-a de 8 para 20 anos, uma poupança de centenas a milhares de euros.",
-  },
-];
 
 const alcatifasGuarantee: GuaranteeItem[] = [
   {
@@ -97,12 +75,7 @@ const LimpezaAlcatifas = () => {
           subtitle="Limpeza técnica adaptada a grandes superfícies, garantindo higiene uniforme, frescura e preservação das fibras ao longo do tempo."
           serviceSlug="limpeza-alcatifas"
         />
-        <ServiceBenefitsBar
-          overline="Metro a Metro"
-          heading="Por que a limpeza profissional de alcatifas é um investimento, não um custo"
-          benefits={alcatifasBenefits}
-          variant="light"
-        />
+        <ServicePriceSection serviceSlug="limpeza-alcatifas" />
         <ServiceAutoCarousel
           overline="O Resultado Final"
           beforeImage={tapeteAntes}

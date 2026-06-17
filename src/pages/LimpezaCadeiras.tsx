@@ -1,4 +1,3 @@
-import { Shield, Heart, Sparkles } from "lucide-react";
 import Header from "@/components/Header";
 import { QuizServiceProvider } from "@/context/QuizLocationContext";
 import GlobalPromoBanner from "@/components/GlobalPromoBanner";
@@ -9,34 +8,13 @@ import ServiceSchema from "@/components/ServiceSchema";
 import ServiceHero from "@/components/ServiceHero";
 import ServiceAutoCarousel from "@/components/ServiceAutoCarousel";
 import ServiceExpertTips from "@/components/ServiceExpertTips";
-import ServiceBenefitsBar, { BenefitItem } from "@/components/ServiceBenefitsBar";
+import ServicePriceSection from "@/components/ServicePriceSection";
 import ServiceEliteGuarantee, { GuaranteeItem } from "@/components/ServiceEliteGuarantee";
 import { ExpertTip } from "@/components/ServiceExpertTips";
 import cadeiraAntes from "@/assets/galeria-cadeira-antes.webp";
 import cadeiraDepois from "@/assets/galeria-cadeira-depois.webp";
 import cadeiraResultado from "@/assets/galeria-cadeira-resultado.webp";
 import cadeiraProcesso from "@/assets/galeria-cadeira-processo.webp";
-
-const cadeirasBenefits: BenefitItem[] = [
-  {
-    icon: Shield,
-    label: "Higiene",
-    title: "Proteja quem senta à sua mesa",
-    body: "Cadeiras de jantar acumulam restos de comida, gordura e bactérias invisíveis em cada dobra do tecido. A limpeza profissional elimina os focos de contaminação que o olho não vê.",
-  },
-  {
-    icon: Heart,
-    label: "Durabilidade",
-    title: "Tecidos frescos por mais tempo",
-    body: "A sujidade embutida nas fibras causa desbotamento e deformação prematura. Tratar as cadeiras profissionalmente 1× por ano pode duplicar a vida do estofo.",
-  },
-  {
-    icon: Sparkles,
-    label: "Imagem",
-    title: "Um espaço que impressiona",
-    body: "Cadeiras limpas elevam toda a decoração da sala ou escritório. Recuperamos o aspeto original de veludo, linho, couro e microfibra sem danificar as fibras delicadas.",
-  },
-];
 
 const cadeirasGuarantee: GuaranteeItem[] = [
   {
@@ -97,12 +75,7 @@ const LimpezaCadeiras = () => {
           subtitle="Limpeza profissional que elimina sujidade do uso diário, ajudando a prolongar a vida do tecido e a manter a higiene do espaço."
           serviceSlug="limpeza-cadeiras"
         />
-        <ServiceBenefitsBar
-          overline="Cada Detalhe Importa"
-          heading="Por que a limpeza profissional de cadeiras transforma o seu espaço"
-          benefits={cadeirasBenefits}
-          variant="light"
-        />
+        <ServicePriceSection serviceSlug="limpeza-cadeiras" />
         <ServiceAutoCarousel
           overline="Do Uso ao Novo"
           beforeImage={cadeiraAntes}
