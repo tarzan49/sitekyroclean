@@ -505,15 +505,17 @@ const FreguesiaServicePage = () => {
               />
               <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-px mb-10" style={{ backgroundColor: "#E8E4DE" }}>
                 {data.benefits.map((benefit, idx) => (
-                  <div key={idx} className="relative overflow-hidden flex items-start gap-3 p-6 md:p-7 bg-white" style={{ borderTop: "2px solid #D4AF37" }}>
+                  <div key={idx} className="relative overflow-hidden bg-white p-6 md:p-7" style={{ borderTop: "2px solid #D4AF37" }}>
                     <span
-                      className="absolute bottom-2 right-3 font-playfair font-bold leading-none select-none pointer-events-none"
-                      style={{ fontSize: "5rem", color: "rgba(212,175,55,0.1)" }}
+                      className="absolute top-3 right-4 font-playfair font-bold leading-none select-none pointer-events-none"
+                      style={{ fontSize: "4.5rem", color: "rgba(212,175,55,0.07)" }}
                     >
                       {String(idx + 1).padStart(2, "0")}
                     </span>
-                    <CheckCircle className="relative w-5 h-5 mt-0.5 shrink-0" style={{ color: "#D4AF37" }} />
-                    <span className="relative text-sm text-[#111111]/65 leading-relaxed">{benefit}</span>
+                    <p className="relative text-[10px] font-bold tracking-[0.24em] uppercase mb-3" style={{ color: "#D4AF37" }}>
+                      {String(idx + 1).padStart(2, "0")}
+                    </p>
+                    <p className="relative text-sm text-[#111111]/70 leading-relaxed">{benefit}</p>
                   </div>
                 ))}
               </div>

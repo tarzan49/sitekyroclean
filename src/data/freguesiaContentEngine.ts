@@ -16,7 +16,8 @@ function pickN<T>(arr: readonly T[], seed: number, n: number): T[] {
   const copy = [...arr];
   const result: T[] = [];
   let s = seed;
-  for (let i = 0; i < Math.min(n, copy.length); i++) {
+  const count = Math.min(n, arr.length); // fixed: use original length, not shrinking copy
+  for (let i = 0; i < count; i++) {
     const idx = s % copy.length;
     result.push(copy.splice(idx, 1)[0]);
     s = s * 31 + 7;
