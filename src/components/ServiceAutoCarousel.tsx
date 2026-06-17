@@ -81,7 +81,7 @@ const ServiceAutoCarousel = ({
               {overline}
             </p>
           </div>
-          <h2 className={`font-playfair text-[2.1rem] sm:text-5xl md:text-[3.2rem] font-bold leading-[1.1] mb-4 ${textMain}`}>
+          <h2 className={`font-playfair text-[1.85rem] sm:text-4xl md:text-[2.6rem] font-bold leading-[1.1] mb-4 ${textMain}`}>
             {restTitle}{" "}
             <em className="not-italic" style={{ color: '#D4AF37' }}>{goldWord}</em>
           </h2>

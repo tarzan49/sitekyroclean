@@ -98,21 +98,64 @@ const LimpezaColchoes = () => {
           subtitle="Higienização profunda que remove ácaros, bactérias e odores acumulados, promovendo um ambiente mais saudável e confortável."
           serviceSlug="limpeza-colchoes"
         />
-        <ServiceBenefitsBar
-          overline="A Ciência do Sono"
-          heading="Por que higienizar o colchão profissionalmente muda tudo"
-          benefits={colchoesBenefits}
-          variant="light"
-        />
+
+        {/* Tabela de preços */}
+        <section className="py-14 md:py-20 bg-[#FDFDF9]">
+          <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="h-px w-8 flex-shrink-0" style={{ backgroundColor: '#D4AF37', opacity: 0.65 }} />
+              <p className="text-[10px] font-bold tracking-[0.28em] uppercase" style={{ color: '#D4AF37', opacity: 0.85 }}>Preços</p>
+            </div>
+            <h2 className="font-playfair text-[1.85rem] sm:text-4xl md:text-[2.6rem] font-bold leading-[1.1] mb-3 text-[#111111]">
+              Preços fixos e <em className="not-italic" style={{ color: '#D4AF37' }}>transparentes</em>
+            </h2>
+            <p className="text-sm md:text-[15px] leading-relaxed max-w-xl text-[#111111]/65 mb-10">
+              Sem surpresas. Orçamento confirmado antes de qualquer intervenção. Deslocação incluída em toda a área do Porto.
+            </p>
+            <div className="max-w-sm">
+              <div className="rounded-t-xl px-5 py-4" style={{ background: '#071a12' }}>
+                <p className="text-[10px] font-bold tracking-[0.22em] uppercase" style={{ color: 'rgba(212,175,55,0.85)' }}>Higienização de Colchões</p>
+              </div>
+              <div className="border-x border-b rounded-b-xl" style={{ borderColor: 'rgba(17,17,17,0.09)' }}>
+                {[
+                  { item: 'Colchão solteiro',      price: '39€' },
+                  { item: 'Colchão casal',          price: '49€' },
+                  { item: 'Colchão king / queen',   price: '59€' },
+                ].map((row, i, arr) => (
+                  <div
+                    key={i}
+                    className="flex items-center justify-between px-5 py-4"
+                    style={{ borderBottom: i < arr.length - 1 ? '1px solid rgba(17,17,17,0.07)' : undefined }}
+                  >
+                    <span className="text-sm text-[#111111]/80">{row.item}</span>
+                    <span className="font-playfair font-bold text-lg text-[#071a12]">{row.price}</span>
+                  </div>
+                ))}
+                <div className="px-5 py-3 rounded-b-xl" style={{ background: 'rgba(7,26,18,0.03)', borderTop: '1px solid rgba(17,17,17,0.07)' }}>
+                  <p className="text-[11px]" style={{ color: 'rgba(17,17,17,0.40)' }}>
+                    Impermeabilização: +45€ / +50€ / +55€ · IVA incluído
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
         <ServiceAutoCarousel
           overline="Higiene Revelada"
-          beforeImage={colchaoAntes}
-          afterImage={colchaoDepois}
+          beforeImage={colchaoDepois}
+          afterImage={colchaoAntes}
           slides={[
             { src: colchaoResultado, label: "Pormenor" },
             { src: colchaoProcesso, label: "Extração Profissional" },
           ]}
           variant="dark"
+        />
+        <ServiceBenefitsBar
+          overline="A Ciência do Sono"
+          heading="Por que higienizar o colchão profissionalmente muda tudo"
+          benefits={colchoesBenefits}
+          variant="light"
         />
         <ServiceEliteGuarantee
           heading="A nossa promessa em cada higienização de colchão"

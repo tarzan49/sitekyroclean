@@ -58,22 +58,24 @@ async function postToFormspree(payload: QuizLeadPayload): Promise<Response> {
     formPayload.append(`foto_${i + 1}`, photo, photo.name);
   });
 
-  // Submissions on mobile networks can fail transiently (timeouts, brief
-  // connection drops). Retry once before treating it as a real failure.
+  const doFetch = () => {
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), 8000);
+    return fetch('https://formspree.io/f/xreozzbp', {
+      method: 'POST',
+      headers: { Accept: 'application/json' },
+      body: formPayload,
+      signal: ctrl.signal,
+    }).finally(() => clearTimeout(timer));
+  };
+
   try {
-    return await fetch('https://formspree.io/f/xreozzbp', {
-      method: 'POST',
-      headers: { Accept: 'application/json' },
-      body: formPayload,
-    });
+    return await doFetch();
   } catch (networkErr) {
+    if (networkErr instanceof Error && networkErr.name === 'AbortError') throw networkErr;
     console.warn('[submissionService] Formspree fetch failed, retrying once:', networkErr);
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    return await fetch('https://formspree.io/f/xreozzbp', {
-      method: 'POST',
-      headers: { Accept: 'application/json' },
-      body: formPayload,
-    });
+    await new Promise((resolve) => setTimeout(resolve, 200));
+    return await doFetch();
   }
 }
 
@@ -246,41 +248,36 @@ function persistObrigadoData(payload: QuizLeadPayload, bookingId: string, waUrl:
 export async function submitQuizLead(payload: QuizLeadPayload): Promise<void> {
   const bookingId = generateBookingId();
 
-  const [formspreeResult, crmResult] = await Promise.allSettled([
-    postToFormspree(payload),
-    insertCrmLead(payload, bookingId),
-  ]);
+  // CRM insert fires immediately in background — dynamic Supabase import +
+  // API latency (~3-4s on mobile) must never block the user-facing flow.
+  insertCrmLead(payload, bookingId).catch(err => {
+    logError({
+      message: err instanceof Error ? err.message : String(err),
+      source: 'QuizForm-post-submit',
+      severity: 'warning',
+      stack: err instanceof Error ? err.stack ?? null : null,
+    });
+  });
 
-  const formspreeOk = formspreeResult.status === 'fulfilled' && formspreeResult.value.ok;
-  const crmOk = crmResult.status === 'fulfilled';
-
-  if (!formspreeOk && !crmOk) {
-    const formspreeErr = formspreeResult.status === 'rejected'
-      ? formspreeResult.reason
-      : `HTTP ${formspreeResult.value.status}`;
-    const crmErr = crmResult.status === 'rejected' ? crmResult.reason : 'unknown error';
-    throw new Error(`Formspree failed (${formspreeErr}) and CRM insert failed (${crmErr})`);
+  // Await only Formspree — with AbortController it resolves in ≤8s.
+  let formspreeOk = false;
+  try {
+    const res = await postToFormspree(payload);
+    formspreeOk = res.ok;
+    if (!formspreeOk) {
+      logError({ message: `Formspree HTTP ${res.status}`, source: 'QuizForm-post-submit', severity: 'warning', stack: null });
+    }
+  } catch (err) {
+    logError({
+      message: err instanceof Error ? err.message : String(err),
+      source: 'QuizForm-post-submit',
+      severity: 'warning',
+      stack: err instanceof Error ? err.stack ?? null : null,
+    });
   }
 
   if (!formspreeOk) {
-    const reason = formspreeResult.status === 'rejected' ? formspreeResult.reason : `HTTP ${formspreeResult.value.status}`;
-    console.warn('[submissionService] Formspree failed, lead captured via CRM:', reason);
-    logError({
-      message: `Formspree submission failed: ${String(reason)}`,
-      source: 'QuizForm-post-submit',
-      severity: 'warning',
-      stack: null,
-    });
-  }
-
-  if (!crmOk) {
-    console.warn('[CRM] Lead backup failed, lead captured via Formspree:', crmResult.reason);
-    logError({
-      message: crmResult.reason instanceof Error ? crmResult.reason.message : String(crmResult.reason),
-      source: 'QuizForm-post-submit',
-      severity: 'warning',
-      stack: crmResult.reason instanceof Error ? crmResult.reason.stack ?? null : null,
-    });
+    throw new Error('Formspree submission failed — CRM may still capture the lead.');
   }
 
   try {
@@ -288,11 +285,5 @@ export async function submitQuizLead(payload: QuizLeadPayload): Promise<void> {
     persistObrigadoData(payload, bookingId, waUrl);
   } catch (postSubmitError) {
     console.warn('[submissionService] Post-submit enrichment failed (lead already sent):', postSubmitError);
-    logError({
-      message: postSubmitError instanceof Error ? postSubmitError.message : String(postSubmitError),
-      source: 'QuizForm-post-submit',
-      severity: 'warning',
-      stack: postSubmitError instanceof Error ? postSubmitError.stack ?? null : null,
-    });
   }
 }
