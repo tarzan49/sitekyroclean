@@ -14,6 +14,7 @@ import QuizButton from "@/components/QuizButton";
 import { trackWhatsAppClick } from "@/lib/quizTracking";
 import ServiceFAQSchema from "@/components/ServiceFAQSchema";
 import ServicePackBanner from "@/components/ServicePackBanner";
+import ServicePriceSection from "@/components/ServicePriceSection";
 import { SERVICEKEY_TO_QUIZ } from "@/constants/serviceToQuiz";
 import {
   getKeywordVariantData,
@@ -69,6 +70,14 @@ const SERVICE_PACK_SLUGS: Record<ServiceKey, string[]> = {
 
 const VARIANTS: VariantKey[]  = ['higienizacao', 'lavagem', 'impermeabilizacao'];
 const SERVICES: ServiceKey[]  = ['sofa', 'colchao', 'tapetes', 'cadeiras', 'alcatifas'];
+
+const SERVICEKEY_TO_SLUG: Record<ServiceKey, string> = {
+  sofa:      'limpeza-sofas',
+  colchao:   'limpeza-colchoes',
+  tapetes:   'limpeza-tapetes',
+  cadeiras:  'limpeza-cadeiras',
+  alcatifas: 'limpeza-alcatifas',
+};
 
 function parseRoute(pathname: string): { variantKey: VariantKey; serviceKey: ServiceKey; locationPart: string } | null {
   const path = pathname.replace(/^\//, '');
@@ -241,6 +250,11 @@ const SofaVariantPage = () => {
             </div>
           </div>
         </section>
+
+        {/* ═══ TABELA DE PREÇOS ═══ */}
+        <ServicePriceSection
+          serviceSlug={parsed.variantKey === 'impermeabilizacao' ? 'impermeabilizacao' : SERVICEKEY_TO_SLUG[parsed.serviceKey]}
+        />
 
         {/* ═══ O QUE RESOLVEMOS ═══ */}
         <section className="py-12 md:py-16 bg-[#FDFDF9]">

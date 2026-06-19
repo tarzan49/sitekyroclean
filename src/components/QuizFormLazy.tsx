@@ -16,11 +16,15 @@ interface Props {
   initialServiceType?: 'cleaning' | 'waterproofing' | 'both';
   initialSofaSizeId?: string;
   initialSofaQty?: number;
+  initialSofaItems?: { sizeId: string; qty: number; chaiseLongue?: boolean }[];
   initialMattressSizeId?: string;
   initialMattressQty?: number;
+  initialMattressItems?: { sizeId: string; qty: number }[];
   initialChairQty?: string;
   initialCarpetArea?: string;
   problema?: string;
+  skipToUpsell?: boolean;
+  initialUpsellItems?: import('./quiz/QuizTypes').UpsellItemConfig[];
 }
 
 const QuizFormLazy = (props: Props) => (

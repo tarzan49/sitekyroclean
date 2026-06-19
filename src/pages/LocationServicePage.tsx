@@ -25,6 +25,7 @@ import { SITE_URL, WHATSAPP_BASE } from "@/constants/business";
 import TrustRatingBadge from "@/components/TrustRatingBadge";
 import SectionHeader from "@/components/SectionHeader";
 import { PRICE_TABLE, PRICE_TABLE_QUIZ_CONFIG, SERVICE_TESTIMONIALS, type PriceRowQuizConfig } from "@/data/locationPriceTestimonialsData";
+import { calcWidgetTotal, calcChairBracket, calcCarpetWidget, WIDGET_DISCOUNT_THRESHOLD } from "@/lib/priceWidgetCalc";
 import { PROBLEM_IMAGES, PROBLEM_CTA, PRICE_HEADING_VERB } from "@/constants/problemCardHelpers";
 
 
@@ -55,15 +56,17 @@ const LocationServicePage = () => {
   const { isQuizOpen: isProblemQuizOpen, openQuiz: openProblemQuiz, closeQuiz: closeProblemQuiz } = useQuizLauncher();
   const [priceQuizConfig, setPriceQuizConfig] = useState<PriceRowQuizConfig | null>(null);
   const [rowQuantities, setRowQuantities] = useState<Record<number, number>>({});
+  const [chaiseLongueAddon, setChaiseLongueAddon] = useState(0);
 
   useEffect(() => {
     setRowQuantities({});
+    setChaiseLongueAddon(0);
   }, [data?.serviceSlug]);
 
-  const adjustRowQty = (i: number, config: PriceRowQuizConfig, delta: number) => {
+  const adjustRowQty = (i: number, delta: number, min = 0, max = 99) => {
     setRowQuantities(prev => {
-      const current = prev[i] ?? getRowDefaultQty(config);
-      return { ...prev, [i]: Math.max(1, current + delta) };
+      const current = prev[i] ?? 0;
+      return { ...prev, [i]: Math.min(max, Math.max(min, current + delta)) };
     });
   };
 
@@ -73,6 +76,69 @@ const LocationServicePage = () => {
     if (config.sofaSizeId) resolved.sofaQty = qty;
     if (config.mattressSizeId) resolved.mattressQty = qty;
     if (config.chairQty) resolved.chairQty = String(qty);
+    setPriceQuizConfig(resolved);
+    openPriceQuiz();
+  };
+
+  const handlePriceTableContinue = () => {
+    if (!data) return;
+    const configs = PRICE_TABLE_QUIZ_CONFIG[data.serviceSlug] ?? [];
+    const svcType = data.serviceSlug === 'impermeabilizacao' ? 'waterproofing' : 'cleaning';
+
+    if (data.serviceSlug === 'limpeza-colchoes') {
+      const mattressItemsList = configs
+        .map((cfg, i) => cfg?.mattressSizeId ? { sizeId: cfg.mattressSizeId, qty: rowQuantities[i] ?? 0 } : null)
+        .filter((x): x is { sizeId: string; qty: number } => x !== null && x.qty > 0);
+      if (mattressItemsList.length === 0) return;
+      setPriceQuizConfig({ service: 'mattress', serviceType: 'cleaning', mattressItems: mattressItemsList });
+      openPriceQuiz();
+      return;
+    }
+
+    if (data.serviceSlug === 'limpeza-sofas' || data.serviceSlug === 'impermeabilizacao') {
+      const sofaItemsList = configs
+        .map((cfg, i) => cfg?.sofaSizeId ? { sizeId: cfg.sofaSizeId, qty: rowQuantities[i] ?? 0, chaiseLongue: false as boolean } : null)
+        .filter((x): x is { sizeId: string; qty: number; chaiseLongue: boolean } => x !== null && x.qty > 0);
+
+      if (chaiseLongueAddon > 0 && sofaItemsList.length > 0) sofaItemsList[0].chaiseLongue = true;
+
+      // Cadeiras seleccionadas como upsell items
+      const chairTotalQty = configs.reduce((sum, cfg, i) => cfg?.service === 'chairs' ? sum + (rowQuantities[i] ?? 0) : sum, 0);
+      const chairPrice = chairTotalQty > 0
+        ? (svcType === 'waterproofing'
+          ? (chairTotalQty <= 4 ? chairTotalQty * 17.5 : 4 * 17.5 + (chairTotalQty - 4) * 15)
+          : (chairTotalQty <= 3 ? chairTotalQty * 17.5 : chairTotalQty <= 6 ? 52.5 + (chairTotalQty - 3) * 12.5 : 90 + (chairTotalQty - 6) * 10))
+        : 0;
+      const chairUpsell = chairTotalQty > 0 ? [{
+        id: 'chairs', chairQty: String(chairTotalQty), qty: chairTotalQty,
+        price: Math.round(chairPrice * 10) / 10,
+        label: `${chairTotalQty} cadeira${chairTotalQty > 1 ? 's' : ''}`,
+        waterproof: svcType === 'waterproofing', waterproofPrice: 0,
+      }] : [];
+
+      if (sofaItemsList.length === 0 && chairTotalQty === 0) return;
+
+      if (sofaItemsList.length > 0) {
+        setPriceQuizConfig({ service: 'sofa', serviceType: svcType, sofaItems: sofaItemsList, initialUpsellItems: chairUpsell.length > 0 ? chairUpsell : undefined });
+      } else {
+        setPriceQuizConfig({ service: 'chairs', serviceType: svcType, chairQty: String(chairTotalQty) });
+      }
+      openPriceQuiz();
+      return;
+    }
+
+    // Outros serviços (tapetes, colchões, etc.)
+    const firstSelected = configs.findIndex((cfg, i) => cfg && (rowQuantities[i] ?? 0) > 0);
+    const idx = firstSelected >= 0 ? firstSelected : configs.findIndex(c => c !== null);
+    if (idx < 0 || !configs[idx]) return;
+    const cfg = configs[idx]!;
+    const qty = rowQuantities[idx] ?? 0;
+    if (qty <= 0) return;
+    const resolved: PriceRowQuizConfig = { ...cfg };
+    if (cfg.sofaSizeId)     resolved.sofaQty     = qty;
+    if (cfg.mattressSizeId) resolved.mattressQty  = qty;
+    if (cfg.chairQty)       resolved.chairQty     = String(qty);
+    if (cfg.service === 'carpet') resolved.carpetArea = String(qty);
     setPriceQuizConfig(resolved);
     openPriceQuiz();
   };
@@ -244,6 +310,7 @@ const LocationServicePage = () => {
                     className="flex-1"
                     initialLocation={data.city}
                     initialService={quizService}
+                    initialServiceType={data.serviceSlug === 'impermeabilizacao' ? 'waterproofing' : 'cleaning'}
                     buttonClassName="h-[58px] md:h-[52px] !py-0 w-full"
                   />
                   <div className="relative group flex-1">
@@ -312,89 +379,153 @@ const LocationServicePage = () => {
                   />
                 </div>
                 <div className="rounded-2xl overflow-hidden" style={{ boxShadow: "0 8px 40px rgba(7,26,18,0.18), 0 2px 10px rgba(7,26,18,0.10)" }}>
-                  {/* ── Header verde do orçamento ── */}
-                  <div className="px-6 py-5 flex items-start justify-between gap-4" style={{ background: "#071a12" }}>
-                    <div>
-                      <div className="flex items-center gap-2 mb-1.5">
-                        <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: "#25D366" }} />
-                        <p className="text-[9px] font-bold tracking-[0.26em] uppercase" style={{ color: "rgba(255,255,255,0.45)" }}>Orçamento Gratuito</p>
-                      </div>
-                      <p className="text-white font-semibold text-sm leading-snug">Toque para ver o preço exacto</p>
-                      <p className="text-xs mt-0.5" style={{ color: "rgba(255,255,255,0.38)" }}>Sem compromisso · Resposta em menos de 30 min</p>
+                  {/* ── Header verde ── */}
+                  <div className="px-6 py-5" style={{ background: "#071a12" }}>
+                    <div className="flex items-center gap-2 mb-1.5">
+                      <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: "#25D366" }} />
+                      <p className="text-[9px] font-bold tracking-[0.26em] uppercase" style={{ color: "rgba(255,255,255,0.45)" }}>Orçamento Gratuito</p>
                     </div>
-                    {PRICE_TABLE[data.serviceSlug]?.[0] && (
-                      <div className="flex-shrink-0 text-right">
-                        <p className="text-xs" style={{ color: "rgba(255,255,255,0.30)" }}>Desde</p>
-                        <p className="font-playfair font-bold text-2xl leading-none" style={{ color: "#D4AF37" }}>{PRICE_TABLE[data.serviceSlug][0].price}</p>
-                      </div>
-                    )}
+                    <p className="text-white font-semibold text-sm leading-snug">Escolha as quantidades e continue para o orçamento</p>
+                    <p className="text-xs mt-0.5" style={{ color: "rgba(255,255,255,0.38)" }}>Sem compromisso · Resposta em menos de 30 min</p>
                   </div>
-                  {/* ── Linhas de preço ── */}
+
+                  {/* ── Linhas de preço com steppers ── */}
                   <div className="bg-white px-5 pt-1">
                     <div className="divide-y" style={{ borderColor: "rgba(17,17,17,0.06)" }}>
                       {PRICE_TABLE[data.serviceSlug].map((row, i) => {
                         const quizConfig = PRICE_TABLE_QUIZ_CONFIG[data.serviceSlug]?.[i] ?? null;
+
+                        // Chaise longue add-on row (null config) — stepper próprio
                         if (!quizConfig) {
                           return (
                             <div key={i} className="flex items-center gap-3 py-3.5">
+                              <div
+                                className="flex items-center gap-0.5 rounded-full border px-1 py-1 flex-shrink-0"
+                                style={{ borderColor: "rgba(7,26,18,0.15)" }}
+                              >
+                                <button
+                                  type="button"
+                                  onClick={() => setChaiseLongueAddon(v => Math.max(0, v - 1))}
+                                  className="w-9 h-9 flex items-center justify-center rounded-full text-[#111111]/40 hover:bg-[rgba(7,26,18,0.08)] transition-colors"
+                                  aria-label="Remover chaise longue"
+                                >
+                                  <Minus className="w-4 h-4" />
+                                </button>
+                                <span className="w-7 text-center font-playfair text-lg font-bold tabular-nums text-[#111111]">{chaiseLongueAddon}</span>
+                                <button
+                                  type="button"
+                                  onClick={() => setChaiseLongueAddon(v => Math.min(1, v + 1))}
+                                  className="w-9 h-9 flex items-center justify-center rounded-full text-[#111111]/40 hover:bg-[rgba(7,26,18,0.08)] transition-colors"
+                                  aria-label="Adicionar chaise longue"
+                                >
+                                  <Plus className="w-4 h-4" />
+                                </button>
+                              </div>
                               <span className="text-[#111111]/70" style={{ fontSize: "14px" }}>{row.item}</span>
                               <span className="flex-1 border-b border-dotted mb-0.5" style={{ borderColor: "rgba(17,17,17,0.12)" }} />
                               <span className="font-playfair font-bold text-xl tabular-nums" style={{ color: "#D4AF37" }}>{row.price}</span>
                             </div>
                           );
                         }
-                        const showStepper = Boolean(quizConfig.sofaSizeId || quizConfig.mattressSizeId || quizConfig.chairQty);
-                        const qty = rowQuantities[i] ?? getRowDefaultQty(quizConfig);
-                        return (
-                          <div
-                            key={i}
-                            role="button"
-                            tabIndex={0}
-                            onClick={() => handleSelectRow(i, quizConfig)}
-                            onKeyDown={(e) => {
-                              if (e.key === 'Enter' || e.key === ' ') {
-                                e.preventDefault();
-                                handleSelectRow(i, quizConfig);
-                              }
-                            }}
-                            className="group flex items-center gap-3 py-3 rounded-xl cursor-pointer transition-colors hover:bg-[rgba(7,26,18,0.04)]"
-                          >
-                            {showStepper && (
-                              <div
-                                onClick={(e) => e.stopPropagation()}
-                                className="flex items-center gap-0.5 rounded-full border px-1 py-1 flex-shrink-0"
-                                style={{ borderColor: "rgba(7,26,18,0.15)" }}
-                              >
-                                <button
-                                  type="button"
-                                  onClick={() => adjustRowQty(i, quizConfig, -1)}
-                                  className="w-9 h-9 flex items-center justify-center rounded-full text-[#111111]/40 hover:bg-[rgba(7,26,18,0.08)] transition-colors"
-                                  aria-label="Diminuir quantidade"
-                                >
-                                  <Minus className="w-4 h-4" />
-                                </button>
-                                <span className="w-7 text-center font-playfair text-lg font-bold tabular-nums text-[#111111]">{qty}</span>
-                                <button
-                                  type="button"
-                                  onClick={() => adjustRowQty(i, quizConfig, 1)}
-                                  className="w-9 h-9 flex items-center justify-center rounded-full text-[#111111]/40 hover:bg-[rgba(7,26,18,0.08)] transition-colors"
-                                  aria-label="Aumentar quantidade"
-                                >
-                                  <Plus className="w-4 h-4" />
-                                </button>
+
+                        const qty = rowQuantities[i] ?? 0;
+                        const isCarpet = quizConfig.service === 'carpet';
+                        const isChair  = quizConfig.service === 'chairs';
+                        const isAlcatifa = data.serviceSlug === 'limpeza-alcatifas';
+                        const isWaterproof = data.serviceSlug === 'impermeabilizacao';
+                        const chairP  = isChair  && qty > 0 ? calcChairBracket(qty, isWaterproof) : undefined;
+                        const carpetP = isCarpet && qty > 0 ? calcCarpetWidget(qty, isAlcatifa)   : undefined;
+                        const dynamicPrice = chairP !== undefined
+                          ? (chairP === null ? 'Sob orçamento' : `${chairP}€`)
+                          : carpetP !== undefined
+                          ? (carpetP === null ? 'Sob orçamento' : `${Math.round(carpetP * 10) / 10}€`)
+                          : row.price;
+
+                        if (isCarpet) {
+                          return (
+                            <div key={i} className="py-3.5 space-y-1.5">
+                              <div className="flex items-center gap-3">
+                                <input
+                                  type="number" min={0} max={isAlcatifa ? 50 : 20}
+                                  value={qty || ''} placeholder="0"
+                                  onChange={e => {
+                                    const v = parseFloat(e.target.value) || 0;
+                                    setRowQuantities(prev => ({ ...prev, [i]: Math.max(0, v) }));
+                                  }}
+                                  className="w-20 text-center font-playfair text-lg font-bold rounded-xl border px-2 py-1.5 outline-none focus:border-gold transition-colors"
+                                  style={{ borderColor: qty > 0 ? "rgba(212,175,55,0.5)" : "rgba(7,26,18,0.15)", color: qty > 0 ? "#D4AF37" : "#111111" }}
+                                />
+                                <span className="text-[#111111]/55 text-sm">m²</span>
+                                <span className="flex-1 border-b border-dotted mb-0.5" style={{ borderColor: "rgba(17,17,17,0.12)" }} />
+                                <span className="font-playfair font-bold text-xl tabular-nums" style={{ color: "#D4AF37" }}>{dynamicPrice}</span>
                               </div>
-                            )}
-                            <span className="text-[#111111]/70" style={{ fontSize: "14px" }}>{row.item}</span>
+                              <p className="text-[11px] ml-1" style={{ color: "rgba(17,17,17,0.38)" }}>
+                                {isAlcatifa ? 'até 50m²: 3€/m² · +50m²: sob orçamento' : '≤5m²: 10€/m² · ≤10m²: 8€/m² · ≤15m²: 7€/m² · +15m²: sob orçamento'}
+                              </p>
+                            </div>
+                          );
+                        }
+
+                        return (
+                          <div key={i} className="flex items-center gap-3 py-3">
+                            <div className="flex items-center gap-0.5 rounded-full border px-1 py-1 flex-shrink-0" style={{ borderColor: qty > 0 ? "rgba(212,175,55,0.5)" : "rgba(7,26,18,0.15)" }}>
+                              <button type="button" onClick={() => adjustRowQty(i, -1)} className="w-9 h-9 flex items-center justify-center rounded-full text-[#111111]/40 hover:bg-[rgba(7,26,18,0.08)] transition-colors" aria-label="Diminuir"><Minus className="w-4 h-4" /></button>
+                              <span className="w-7 text-center font-playfair text-lg font-bold tabular-nums" style={{ color: qty > 0 ? "#D4AF37" : "#111111" }}>{qty}</span>
+                              <button type="button" onClick={() => adjustRowQty(i, 1)} className="w-9 h-9 flex items-center justify-center rounded-full text-[#111111]/40 hover:bg-[rgba(7,26,18,0.08)] transition-colors" aria-label="Aumentar"><Plus className="w-4 h-4" /></button>
+                            </div>
+                            <span className="transition-colors" style={{ fontSize: "14px", color: qty > 0 ? "#111111" : "rgba(17,17,17,0.55)" }}>{row.item}</span>
                             <span className="flex-1 border-b border-dotted mb-0.5" style={{ borderColor: "rgba(17,17,17,0.12)" }} />
-                            <span className="font-playfair font-bold text-xl tabular-nums" style={{ color: "#D4AF37" }}>{row.price}</span>
-                            <ArrowRight className="w-4 h-4 flex-shrink-0 text-[#111111]/20 group-hover:text-[#1DA851] group-hover:translate-x-0.5 transition-all" />
+                            <span className="font-playfair font-bold text-xl tabular-nums" style={{ color: "#D4AF37" }}>{dynamicPrice}</span>
                           </div>
                         );
                       })}
                     </div>
-                    <div className="flex items-center gap-1.5 py-4 border-t" style={{ borderColor: "rgba(17,17,17,0.07)" }}>
-                      <CheckCircle className="w-3.5 h-3.5 flex-shrink-0" style={{ color: "#25D366" }} />
-                      <span className="text-xs" style={{ color: "rgba(17,17,17,0.45)" }}>Deslocação incluída na área de {data.city}</span>
+
+                    {/* ── Footer: deslocação + total + botão Continuar ── */}
+                    <div className="pt-3 pb-5 border-t space-y-3" style={{ borderColor: "rgba(17,17,17,0.07)" }}>
+                      <div className="flex items-center gap-1.5">
+                        <CheckCircle className="w-3.5 h-3.5 flex-shrink-0" style={{ color: "#25D366" }} />
+                        <span className="text-xs" style={{ color: "rgba(17,17,17,0.45)" }}>Deslocação incluída na área de {data.city}</span>
+                      </div>
+                      {(() => {
+                        const total = calcWidgetTotal(data.serviceSlug, rowQuantities, chaiseLongueAddon);
+                        const discountActive = total >= WIDGET_DISCOUNT_THRESHOLD;
+                        const progress = Math.min(100, (total / WIDGET_DISCOUNT_THRESHOLD) * 100);
+                        const remaining = Math.ceil(WIDGET_DISCOUNT_THRESHOLD - total);
+                        const discountedTotal = Math.round(total * 0.9);
+                        return (
+                          <div className="space-y-2">
+                            {!discountActive && (
+                              <div>
+                                <div className="flex justify-between text-xs mb-1" style={{ color: "rgba(17,17,17,0.40)" }}>
+                                  <span>{total > 0 ? `Faltam ${remaining}€ para 10% de desconto` : `A partir de ${WIDGET_DISCOUNT_THRESHOLD}€ tem 10% de desconto`}</span>
+                                  {total > 0 && <span>{total}€ / {WIDGET_DISCOUNT_THRESHOLD}€</span>}
+                                </div>
+                                <div className="h-1.5 rounded-full overflow-hidden" style={{ background: "rgba(17,17,17,0.08)" }}>
+                                  <div className="h-full rounded-full transition-all duration-300" style={{ width: `${progress}%`, background: "linear-gradient(90deg,#C9A84C,#EDD96A)" }} />
+                                </div>
+                              </div>
+                            )}
+                            {total > 0 && (
+                              <div className="flex items-center justify-between rounded-xl px-4 py-3" style={{ background: discountActive ? "rgba(212,175,55,0.09)" : "rgba(17,17,17,0.03)" }}>
+                                <span className="text-sm font-medium" style={{ color: "#111111" }}>{discountActive ? "10% de desconto ativado!" : "Total estimado"}</span>
+                                <div className="flex items-baseline gap-2">
+                                  {discountActive && <span className="text-xs line-through" style={{ color: "rgba(17,17,17,0.35)" }}>{total}€</span>}
+                                  <span className="font-playfair font-bold text-xl" style={{ color: "#D4AF37" }}>{discountActive ? discountedTotal : total}€</span>
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })()}
+                      <button
+                        type="button"
+                        onClick={handlePriceTableContinue}
+                        className="w-full py-3.5 font-semibold text-[13px] tracking-[0.16em] uppercase transition-all active:scale-[0.98]"
+                        style={{ background: "linear-gradient(135deg, #C9A84C 0%, #EDD96A 50%, #C9A84C 100%)", color: "#071a12", boxShadow: "0 4px 20px rgba(212,175,55,0.35)" }}
+                      >
+                        Continuar para o orçamento →
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -410,12 +541,16 @@ const LocationServicePage = () => {
             initialLocation={data.city}
             initialService={priceQuizConfig.service}
             initialServiceType={priceQuizConfig.serviceType}
+            initialSofaItems={priceQuizConfig.sofaItems}
             initialSofaSizeId={priceQuizConfig.sofaSizeId}
             initialSofaQty={priceQuizConfig.sofaQty}
+            initialMattressItems={priceQuizConfig.mattressItems}
             initialMattressSizeId={priceQuizConfig.mattressSizeId}
             initialMattressQty={priceQuizConfig.mattressQty}
             initialChairQty={priceQuizConfig.chairQty}
             initialCarpetArea={priceQuizConfig.carpetArea}
+            initialUpsellItems={priceQuizConfig.initialUpsellItems}
+            skipToUpsell
           />
         )}
 

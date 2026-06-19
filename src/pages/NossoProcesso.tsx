@@ -1,7 +1,6 @@
 import { Search, SprayCanIcon as Spray, Droplets, Wind, Shield, ClipboardCheck, LucideIcon } from "lucide-react";
 import { useRef, useEffect, useState } from "react";
 import Header from "@/components/Header";
-import GlobalPromoBanner from "@/components/GlobalPromoBanner";
 import Footer from "@/components/Footer";
 import { trackCallClick } from "@/lib/analytics";
 import { PHONE_TEL } from "@/constants/business";
@@ -93,7 +92,6 @@ const NossoProcesso = () => {
   return (
     <>
       <Header />
-      <GlobalPromoBanner />
       <main>
         {/* Hero Section - Aligned with Packs page */}
         <section className="pt-24 md:pt-28 pb-8 md:pb-12 bg-background">

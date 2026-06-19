@@ -1,6 +1,5 @@
 import Header from "@/components/Header";
 import { QuizServiceProvider } from "@/context/QuizLocationContext";
-import GlobalPromoBanner from "@/components/GlobalPromoBanner";
 import Footer from "@/components/Footer";
 import ServiceCityLinks from "@/components/ServiceCityLinks";
 import { DEFAULT_PRICE_FROM } from "@/data/locationSeoData";
@@ -69,7 +68,6 @@ const LimpezaColchoes = () => {
     <QuizServiceProvider value="mattress">
     <>
       <Header />
-      <GlobalPromoBanner />
       <main>
         <ServiceHero
           title="Higienização Profissional de Colchões"

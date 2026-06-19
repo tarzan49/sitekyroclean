@@ -36,29 +36,40 @@ interface QuizFormProps {
   initialServiceType?: 'cleaning' | 'waterproofing' | 'both';
   initialSofaSizeId?: string;
   initialSofaQty?: number;
+  initialSofaItems?: { sizeId: string; qty: number; chaiseLongue?: boolean }[];
   initialMattressSizeId?: string;
   initialMattressQty?: number;
+  initialMattressItems?: { sizeId: string; qty: number }[];
   initialChairQty?: string;
   initialCarpetArea?: string;
   problema?: string;
+  skipToUpsell?: boolean;
+  initialUpsellItems?: UpsellItemConfig[];
 }
 
-function calcInitialStep(loc?: string, svc?: string, hasItem?: boolean): number {
+function calcInitialStep(loc?: string, svc?: string, hasItem?: boolean, skipUpsell?: boolean, hasSvcType?: boolean): number {
+  if (skipUpsell && loc && hasItem) return 4;
   if (!loc) return 0;
   if (!svc) return 1;
   if (hasItem) return 3;
-  const skipType = svc === 'carpet' || svc === 'mattress';
+  // Skip serviceType selector when already known or service doesn't need it
+  const skipType = svc === 'carpet' || svc === 'chairs' || hasSvcType;
   return skipType ? 3 : 2;
 }
 
 const QuizForm = ({
   isOpen, onClose, initialLocation, initialService, problema,
-  initialServiceType, initialSofaSizeId, initialSofaQty, initialMattressSizeId, initialMattressQty,
-  initialChairQty, initialCarpetArea,
+  initialServiceType, initialSofaSizeId, initialSofaQty, initialSofaItems,
+  initialMattressSizeId, initialMattressQty, initialMattressItems, initialChairQty, initialCarpetArea,
+  skipToUpsell, initialUpsellItems,
 }: QuizFormProps) => {
   const { toast } = useToast();
   const navigate = useNavigate();
-  const hasInitialItem = Boolean(initialSofaSizeId || initialMattressSizeId || initialChairQty || initialCarpetArea);
+  const hasInitialItem = Boolean(
+    initialSofaItems?.some(i => i.qty > 0) || initialSofaSizeId ||
+    initialMattressItems?.some(i => i.qty > 0) || initialMattressSizeId ||
+    initialChairQty || initialCarpetArea
+  );
 
   // Builders for the pre-filled state when the quiz is opened directly from
   // a price-table row (jump straight to step 3 with the item already configured).
@@ -72,19 +83,32 @@ const QuizForm = ({
     chairQuantity: initialChairQty || '',
     chairType: initialChairQty ? 'bulk_full' : '',
   });
-  const buildInitialSofaItems = (): SofaItem[] =>
-    initialSofaSizeId ? [{ sizeId: initialSofaSizeId, qty: initialSofaQty ?? 1, packEnabled: false }] : [];
-  const buildInitialMattressItems = (): MattressItem[] =>
-    initialMattressSizeId ? [{ sizeId: initialMattressSizeId, qty: initialMattressQty ?? 1, packEnabled: false }] : [];
+  const buildInitialSofaItems = (): SofaItem[] => {
+    if (initialSofaItems?.length) {
+      return initialSofaItems
+        .filter(i => i.qty > 0)
+        .map(i => ({ sizeId: i.sizeId, qty: i.qty, packEnabled: false, chaiseLongue: i.chaiseLongue }));
+    }
+    return initialSofaSizeId ? [{ sizeId: initialSofaSizeId, qty: initialSofaQty ?? 1, packEnabled: false }] : [];
+  };
+  const buildInitialMattressItems = (): MattressItem[] => {
+    if (initialMattressItems?.length) {
+      return initialMattressItems
+        .filter(i => i.qty > 0)
+        .map(i => ({ sizeId: i.sizeId, qty: i.qty, packEnabled: false }));
+    }
+    return initialMattressSizeId ? [{ sizeId: initialMattressSizeId, qty: initialMattressQty ?? 1, packEnabled: false }] : [];
+  };
 
-  const [currentStep, setCurrentStep] = useState(() => calcInitialStep(initialLocation, initialService, hasInitialItem));
+  const [currentStep, setCurrentStep] = useState(() => calcInitialStep(initialLocation, initialService, hasInitialItem, skipToUpsell, !!initialServiceType));
   const [locationQuery, setLocationQuery] = useState('');
   const [hypoallergenic, setHypoallergenic] = useState<boolean | null>(null);
   const [showExitIntent, setShowExitIntent] = useState(false);
   const [exitIntentFired, setExitIntentFired] = useState(false);
-  const [showUpsell, setShowUpsell] = useState(false);
-  const [upsellShown, setUpsellShown] = useState(false);
-  const [upsellItems, setUpsellItems] = useState<UpsellItemConfig[]>([]);
+  const startsAtUpsell = Boolean(skipToUpsell && initialLocation && hasInitialItem);
+  const [showUpsell, setShowUpsell] = useState(startsAtUpsell);
+  const [upsellShown, setUpsellShown] = useState(startsAtUpsell);
+  const [upsellItems, setUpsellItems] = useState<UpsellItemConfig[]>(initialUpsellItems ?? []);
   const [upsellSubStep, setUpsellSubStep] = useState<'prompt' | 'select' | 'config'>('prompt');
   const [sofaItems, setSofaItems] = useState<SofaItem[]>(buildInitialSofaItems);
   const [mattressItems, setMattressItems] = useState<MattressItem[]>(buildInitialMattressItems);
@@ -205,10 +229,24 @@ const QuizForm = ({
       setFormData(buildInitialFormData());
       setSofaItems(buildInitialSofaItems());
       setMattressItems(buildInitialMattressItems());
-      setCurrentStep(calcInitialStep(initialLocation, initialService, hasInitialItem));
+      const atUpsell = Boolean(skipToUpsell && initialLocation && hasInitialItem);
+      setShowUpsell(atUpsell);
+      setUpsellShown(atUpsell);
+      setUpsellItems(initialUpsellItems ?? []);
+      setCurrentStep(calcInitialStep(initialLocation, initialService, hasInitialItem, skipToUpsell, !!initialServiceType));
     }
     prevIsOpenRef.current = isOpen;
   });
+
+  // skipToUpsell + no location: after user picks city at step 0, jump straight to upsell
+  useEffect(() => {
+    if (skipToUpsell && hasInitialItem && formData.location && currentStep === 0) {
+      setCurrentStep(4);
+      setShowUpsell(true);
+      setUpsellShown(true);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [formData.location]);
 
   // Notify other components of quiz open/close state
   useEffect(() => {

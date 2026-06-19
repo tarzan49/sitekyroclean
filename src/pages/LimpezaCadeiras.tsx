@@ -1,6 +1,5 @@
 import Header from "@/components/Header";
 import { QuizServiceProvider } from "@/context/QuizLocationContext";
-import GlobalPromoBanner from "@/components/GlobalPromoBanner";
 import Footer from "@/components/Footer";
 import ServiceCityLinks from "@/components/ServiceCityLinks";
 import ServiceFAQ from "@/components/ServiceFAQ";
@@ -68,7 +67,6 @@ const LimpezaCadeiras = () => {
     <QuizServiceProvider value="chairs">
     <>
       <Header />
-      <GlobalPromoBanner />
       <main>
         <ServiceHero
           title="Higienização Profissional de Cadeiras"

@@ -5,8 +5,8 @@ import { WHATSAPP_BASE } from "@/constants/business";
 import TrustRatingBadge from "@/components/TrustRatingBadge";
 import { useQuizLauncher } from "@/hooks/use-quiz-launcher";
 
-import sofaD        from "@/assets/service-sofa-new.webp";
-import sofaM        from "@/assets/service-sofa-new-mobile.webp";
+import sofaD        from "@/assets/service-sofa-camurca.png";
+import sofaM        from "@/assets/service-sofa-camurca.png";
 import mattressD    from "@/assets/service-mattress-branded.webp";
 import mattressM    from "@/assets/service-mattress-branded-mobile.webp";
 import chairsD      from "@/assets/service-chairs-new.webp";

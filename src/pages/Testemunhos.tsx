@@ -1,7 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 import { Star, Quote, Trophy, Users, CheckCircle } from "lucide-react";
 import Header from "@/components/Header";
-import GlobalPromoBanner from "@/components/GlobalPromoBanner";
 import Footer from "@/components/Footer";
 
 interface TestimonialItem {
@@ -98,7 +97,6 @@ const Testemunhos = () => {
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      <GlobalPromoBanner />
       <main>
         {/* Hero Section - Aligned with Packs page */}
         <section className="pt-24 md:pt-28 pb-6 md:pb-8 bg-background">

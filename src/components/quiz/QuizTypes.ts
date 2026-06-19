@@ -64,7 +64,7 @@ export const sofaPrices: PriceOption[] = [
 ];
 
 // Chaise longue: preço fixo de 20€ (limpeza ou pack)
-export const sofaChaisePrice = { cleaning: 10, waterproofing: 0 };
+export const sofaChaisePrice = { cleaning: 10, waterproofing: 20 };
 
 // Mattress pricing
 // Limpeza:           39 / 49 / 59

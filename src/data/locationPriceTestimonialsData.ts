@@ -9,9 +9,11 @@ export type PriceRowQuizConfig = {
   mattressSizeId?: string;
   carpetArea?: string;
   chairQty?: string;
-  // Set at click time from the row's quantity stepper (sofa/mattress qty, or chairQty override).
   sofaQty?: number;
   mattressQty?: number;
+  sofaItems?: { sizeId: string; qty: number; chaiseLongue?: boolean }[];
+  mattressItems?: { sizeId: string; qty: number }[];
+  initialUpsellItems?: import('@/components/quiz/QuizTypes').UpsellItemConfig[];
 };
 
 export const PRICE_TABLE_QUIZ_CONFIG: Record<string, (PriceRowQuizConfig | null)[]> = {
@@ -29,25 +31,20 @@ export const PRICE_TABLE_QUIZ_CONFIG: Record<string, (PriceRowQuizConfig | null)
   ],
   'limpeza-tapetes': [
     { service: 'carpet', serviceType: 'cleaning', carpetArea: '5' },
-    { service: 'carpet', serviceType: 'cleaning', carpetArea: '12' },
-    { service: 'carpet', serviceType: 'cleaning', carpetArea: '20' },
   ],
   'limpeza-cadeiras': [
     { service: 'chairs', serviceType: 'cleaning', chairQty: '1' },
-    { service: 'chairs', serviceType: 'cleaning', chairQty: '1' },
-    { service: 'chairs', serviceType: 'cleaning', chairQty: '6' },
   ],
   'limpeza-alcatifas': [
     { service: 'carpet', serviceType: 'cleaning', carpetArea: '15' },
-    { service: 'carpet', serviceType: 'cleaning', carpetArea: '20' },
   ],
   'impermeabilizacao': [
     { service: 'sofa', serviceType: 'waterproofing', sofaSizeId: '1-lugar' },
     { service: 'sofa', serviceType: 'waterproofing', sofaSizeId: '2-lugares' },
     { service: 'sofa', serviceType: 'waterproofing', sofaSizeId: '3-lugares' },
-    { service: 'mattress', serviceType: 'waterproofing', mattressSizeId: 'solteiro' },
-    { service: 'mattress', serviceType: 'waterproofing', mattressSizeId: 'casal' },
-    { service: 'carpet', serviceType: 'waterproofing', carpetArea: '12' },
+    { service: 'sofa', serviceType: 'waterproofing', sofaSizeId: '4+-lugares' },
+    null, // chaise longue add-on
+    { service: 'chairs', serviceType: 'waterproofing', chairQty: '1' },
   ],
 };
 
@@ -57,7 +54,7 @@ export const PRICE_TABLE: Record<string, { item: string; price: string }[]> = {
     { item: 'Sofá 2 lugares',          price: '69€' },
     { item: 'Sofá 3 lugares',          price: '79€' },
     { item: 'Chaise longue (add-on)',  price: '+10€' },
-    { item: 'Sofá modular / em L',     price: 'Sob orçamento' },
+    { item: 'Sofá de 4+ lugares',        price: 'Sob orçamento' },
   ],
   'limpeza-colchoes': [
     { item: 'Colchão solteiro',        price: '39€' },
@@ -65,26 +62,21 @@ export const PRICE_TABLE: Record<string, { item: string; price: string }[]> = {
     { item: 'Colchão king / queen',    price: '59€' },
   ],
   'limpeza-tapetes': [
-    { item: 'Tapete até 5 m²',         price: '10€/m²' },
-    { item: 'Tapete 5 – 15 m²',        price: '7€/m²' },
-    { item: 'Tapete +15 m²',           price: 'Sob orçamento' },
+    { item: 'Tapetes (m²)',             price: '10€/m²' },
   ],
   'limpeza-cadeiras': [
-    { item: '1 cadeira (tampo)',        price: '15€' },
-    { item: '1 cadeira (completa)',     price: '20€' },
-    { item: '6+ cadeiras',             price: '10€/un' },
+    { item: 'Cadeiras',                 price: '17.5€/cad' },
   ],
   'limpeza-alcatifas': [
-    { item: 'Até 50 m²',               price: '3€/m²' },
-    { item: '+50 m²',                  price: 'Sob orçamento' },
+    { item: 'Alcatifas (m²)',           price: '3€/m²' },
   ],
   'impermeabilizacao': [
     { item: 'Sofá 1 lugar',            price: '49€' },
     { item: 'Sofá 2 lugares',          price: '69€' },
     { item: 'Sofá 3 lugares',          price: '89€' },
-    { item: 'Colchão solteiro',        price: '45€' },
-    { item: 'Colchão casal',           price: '50€' },
-    { item: 'Tapetes',                 price: '7€/m²' },
+    { item: 'Sofá de 4+ lugares',        price: 'Sob orçamento' },
+    { item: 'Chaise longue (add-on)',  price: '+20€' },
+    { item: 'Cadeiras',               price: '17.5€/cad' },
   ],
 };
 

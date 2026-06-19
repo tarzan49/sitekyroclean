@@ -8,9 +8,10 @@ interface QuizButtonProps {
   ctaLabel?: string;
   initialLocation?: string;
   initialService?: string;
+  initialServiceType?: 'cleaning' | 'waterproofing' | 'both';
 }
 
-const QuizButton = ({ className = '', buttonClassName = '', problema, ctaLabel, initialLocation, initialService }: QuizButtonProps) => {
+const QuizButton = ({ className = '', buttonClassName = '', problema, ctaLabel, initialLocation, initialService, initialServiceType }: QuizButtonProps) => {
   const { isQuizOpen, openQuiz, closeQuiz } = useQuizLauncher();
 
   const label = ctaLabel ?? 'Calcular o meu preço';
@@ -37,7 +38,7 @@ const QuizButton = ({ className = '', buttonClassName = '', problema, ctaLabel, 
         </button>
       </div>
 
-      <QuizForm isOpen={isQuizOpen} onClose={closeQuiz} problema={problema} initialLocation={initialLocation} initialService={initialService} />
+      <QuizForm isOpen={isQuizOpen} onClose={closeQuiz} problema={problema} initialLocation={initialLocation} initialService={initialService} initialServiceType={initialServiceType} />
     </>
   );
 };

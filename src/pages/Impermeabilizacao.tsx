@@ -3,7 +3,6 @@ import impermeabilizacaoDepois from "@/assets/galeria-impermeabilizacao-depois.w
 import impermeabilizacaoResultado from "@/assets/galeria-impermeabilizacao-resultado.webp";
 import impermeabilizacaoProcesso from "@/assets/galeria-impermeabilizacao-processo.webp";
 import Header from "@/components/Header";
-import GlobalPromoBanner from "@/components/GlobalPromoBanner";
 import Footer from "@/components/Footer";
 import ServiceCityLinks from "@/components/ServiceCityLinks";
 import ServiceFAQ from "@/components/ServiceFAQ";
@@ -68,7 +67,6 @@ const Impermeabilizacao = () => {
   return (
     <>
       <Header />
-      <GlobalPromoBanner />
       <main>
         <ServiceHero
           title="Impermeabilização Profissional de Estofos"

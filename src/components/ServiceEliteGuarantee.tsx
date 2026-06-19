@@ -2,6 +2,7 @@ export interface GuaranteeItem {
   label: string;
   title: string;
   body: string;
+  image?: string;
 }
 
 const DEFAULT_ITEMS: GuaranteeItem[] = [
@@ -66,68 +67,79 @@ const ServiceEliteGuarantee = ({
 
         {/* Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5 md:gap-6">
-          {items.map((item, i) => (
-            <div
-              key={i}
-              className="relative flex flex-col overflow-hidden"
-              style={
-                dark
-                  ? {
-                      background: "rgba(255,255,255,0.04)",
-                      borderTop: "2px solid rgba(212,175,55,0.55)",
-                      borderRight: "1px solid rgba(255,255,255,0.06)",
-                      borderBottom: "1px solid rgba(255,255,255,0.06)",
-                      borderLeft: "1px solid rgba(255,255,255,0.06)",
-                    }
-                  : {
-                      background: "#ffffff",
-                      borderTop: "2px solid #D4AF37",
-                      boxShadow: "0 2px 24px rgba(0,0,0,0.07), 0 1px 4px rgba(0,0,0,0.04)",
-                    }
-              }
-            >
-              {/* Background number */}
-              <span
-                className="absolute top-3 right-4 font-playfair font-bold select-none pointer-events-none"
-                style={{
-                  fontSize: "6rem",
-                  color: dark ? "rgba(212,175,55,0.09)" : "rgba(212,175,55,0.07)",
-                  lineHeight: 1,
-                }}
+          {items.map((item, i) => {
+            const hasImage = !!item.image;
+            const cardTextMain = hasImage ? "text-white" : textMain;
+            const cardTextSub  = hasImage ? "text-white/70" : textSub;
+
+            return (
+              <div
+                key={i}
+                className="relative flex flex-col overflow-hidden"
+                style={
+                  hasImage
+                    ? { borderTop: "2px solid rgba(212,175,55,0.7)", minHeight: "320px" }
+                    : dark
+                    ? {
+                        background: "rgba(255,255,255,0.04)",
+                        borderTop: "2px solid rgba(212,175,55,0.55)",
+                        borderRight: "1px solid rgba(255,255,255,0.06)",
+                        borderBottom: "1px solid rgba(255,255,255,0.06)",
+                        borderLeft: "1px solid rgba(255,255,255,0.06)",
+                      }
+                    : {
+                        background: "#ffffff",
+                        borderTop: "2px solid #D4AF37",
+                        boxShadow: "0 2px 24px rgba(0,0,0,0.07), 0 1px 4px rgba(0,0,0,0.04)",
+                      }
+                }
               >
-                {String(i + 1).padStart(2, "0")}
-              </span>
+                {/* Background image */}
+                {hasImage && (
+                  <>
+                    <img
+                      src={item.image}
+                      alt=""
+                      aria-hidden="true"
+                      className="absolute inset-0 w-full h-full object-cover"
+                    />
+                    <div
+                      className="absolute inset-0"
+                      style={{ background: "linear-gradient(160deg, rgba(7,26,18,0.35) 0%, rgba(7,26,18,0.82) 100%)" }}
+                    />
+                  </>
+                )}
 
-              <div className="relative flex flex-col gap-4 p-7 md:p-8">
-                <p
-                  className="text-[10px] font-bold tracking-[0.26em] uppercase"
-                  style={{ color: "#D4AF37" }}
-                >
-                  {item.label}
-                </p>
 
-                <h3
-                  className={`font-playfair font-bold leading-snug ${textMain}`}
-                  style={{ fontSize: "1.25rem" }}
-                >
-                  {item.title}
-                </h3>
+                <div className="relative flex flex-col gap-4 p-7 md:p-8">
+                  <p
+                    className="text-[10px] font-bold tracking-[0.26em] uppercase"
+                    style={{ color: "#D4AF37" }}
+                  >
+                    {item.label}
+                  </p>
 
-                <div
-                  className="w-8 h-px"
-                  style={{
-                    background: dark
-                      ? "linear-gradient(90deg, rgba(212,175,55,0.7) 0%, rgba(212,175,55,0.1) 100%)"
-                      : "linear-gradient(90deg, #D4AF37 0%, rgba(212,175,55,0.2) 100%)",
-                  }}
-                />
+                  <h3
+                    className={`font-playfair font-bold leading-snug ${cardTextMain}`}
+                    style={{ fontSize: "1.25rem" }}
+                  >
+                    {item.title}
+                  </h3>
 
-                <p className={`leading-relaxed ${textSub}`} style={{ fontSize: "14px" }}>
-                  {item.body}
-                </p>
+                  <div
+                    className="w-8 h-px"
+                    style={{
+                      background: "linear-gradient(90deg, rgba(212,175,55,0.8) 0%, rgba(212,175,55,0.15) 100%)",
+                    }}
+                  />
+
+                  <p className={`leading-relaxed ${cardTextSub}`} style={{ fontSize: "14px" }}>
+                    {item.body}
+                  </p>
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
 
       </div>
