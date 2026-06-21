@@ -88,6 +88,7 @@ const LimpezaCadeiras = () => {
             { src: cadeirasHero, label: "Extração Profissional" },
           ]}
           variant="dark"
+          rotateBeforeAfter
         />
         <ServiceEliteGuarantee
           heading="A nossa promessa em cada limpeza de cadeiras"

@@ -15,6 +15,7 @@ interface ServiceAutoCarouselProps {
   subtitle?: string;
   variant?: "light" | "dark";
   portraitImages?: boolean;
+  rotateBeforeAfter?: boolean;
 }
 
 const ServiceAutoCarousel = ({
@@ -26,6 +27,7 @@ const ServiceAutoCarousel = ({
   subtitle = "Transformações visíveis no próprio dia da intervenção. Sem químicos agressivos, sem esperas.",
   variant = "dark",
   portraitImages = false,
+  rotateBeforeAfter = false,
 }: ServiceAutoCarouselProps) => {
   const light = variant === "light";
   const textMain = light ? "text-[#111111]" : "text-white";
@@ -41,25 +43,45 @@ const ServiceAutoCarousel = ({
     labelSide = "left",
     objectPosition,
     mirror,
+    rotate90,
   }: {
     src: string;
     label: string;
     labelSide?: "left" | "right";
     objectPosition?: string;
     mirror?: boolean;
+    rotate90?: boolean;
   }) => (
     <div className={`relative overflow-hidden ${portraitImages ? 'aspect-[2/3]' : 'aspect-[3/2]'}`}>
-      <img
-        src={src}
-        alt={label}
-        loading="lazy"
-        decoding="async"
-        className="w-full h-full object-cover transition-transform duration-700 hover:scale-105"
-        style={{
-          ...(objectPosition ? { objectPosition } : {}),
-          ...(mirror ? { transform: "scaleX(-1)" } : {}),
-        }}
-      />
+      {rotate90 ? (
+        <img
+          src={src}
+          alt={label}
+          loading="lazy"
+          decoding="async"
+          style={{
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            width: '200%',
+            height: '200%',
+            objectFit: 'cover',
+            transform: 'translate(-50%, -50%) rotate(90deg)',
+          }}
+        />
+      ) : (
+        <img
+          src={src}
+          alt={label}
+          loading="lazy"
+          decoding="async"
+          className="w-full h-full object-cover transition-transform duration-700 hover:scale-105"
+          style={{
+            ...(objectPosition ? { objectPosition } : {}),
+            ...(mirror ? { transform: "scaleX(-1)" } : {}),
+          }}
+        />
+      )}
       <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent pointer-events-none" />
       <span
         className={`absolute bottom-3 font-bold tracking-[0.2em] uppercase text-white backdrop-blur-sm px-3 py-1.5 ${
@@ -100,8 +122,8 @@ const ServiceAutoCarousel = ({
         {beforeImage && afterImage ? (
           <div className="grid grid-cols-2 gap-1 md:gap-1.5 max-w-5xl">
             {/* Top row — before / after */}
-            <GalleryCell src={beforeImage} label="Antes" labelSide="left" />
-            <GalleryCell src={afterImage}  label="Depois" labelSide="right" />
+            <GalleryCell src={beforeImage} label="Antes" labelSide="left" rotate90={rotateBeforeAfter} />
+            <GalleryCell src={afterImage}  label="Depois" labelSide="right" rotate90={rotateBeforeAfter} />
             {/* Bottom row — extra photos */}
             {slides.slice(0, 2).map((slide, i) => (
               slide.src ? (
