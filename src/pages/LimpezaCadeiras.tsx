@@ -85,7 +85,7 @@ const LimpezaCadeiras = () => {
           afterImage={cadeiraDepois}
           slides={[
             { src: cadeiraResultado, label: "Pormenor" },
-            { src: cadeirasHero, label: "Extração Profissional" },
+            { src: cadeirasHero, label: "Extração" },
           ]}
           variant="dark"
           rotateBeforeAfter

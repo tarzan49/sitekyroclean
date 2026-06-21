@@ -83,7 +83,7 @@ const LimpezaAlcatifas = () => {
           afterImage={tapeteDepois}
           slides={[
             { src: alcatifaProcesso, label: "Pormenor" },
-            { src: '/images/alcatifas/v1.jpg', label: "Extração Profissional" },
+            { src: '/images/alcatifas/v1.jpg', label: "Extração" },
           ]}
           variant="dark"
         />

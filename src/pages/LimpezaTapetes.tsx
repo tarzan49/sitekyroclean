@@ -82,8 +82,8 @@ const LimpezaTapetes = () => {
           beforeImage={tapeteAntes}
           afterImage={tapeteDepois}
           slides={[
-            { src: '/images/tapetes/v2.png', label: "Técnico Especializado" },
-            { src: tapeteProcesso, label: "Extração Profissional" },
+            { src: '/images/tapetes/v2.png', label: "Técnico" },
+            { src: tapeteProcesso, label: "Extração" },
           ]}
           variant="dark"
         />
