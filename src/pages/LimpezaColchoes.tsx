@@ -86,7 +86,7 @@ const LimpezaColchoes = () => {
           afterImage={colchaoAntes}
           slides={[
             { src: '/images/colchoes/v3.png', label: "Pormenor" },
-            { src: colchaoProcesso, label: "Extração Profissional" },
+            { src: colchaoProcesso, label: "Extração" },
           ]}
           variant="dark"
         />

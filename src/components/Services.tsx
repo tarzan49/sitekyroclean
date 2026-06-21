@@ -111,8 +111,8 @@ const ServiceCard = ({ service, prominence }: CardProps) => {
         />
       )}
 
-      {/* Badge */}
-      <div className="absolute top-3.5 left-4 z-10">
+      {/* Badge — apenas desktop */}
+      <div className="hidden sm:block absolute top-3.5 left-4 z-10">
         <span
           className="block text-[9px] font-semibold uppercase tracking-[0.16em]"
           style={{ color: "rgba(255,255,255,0.45)", textShadow: "0 1px 4px rgba(0,0,0,0.8)" }}
@@ -316,7 +316,7 @@ const Services = () => {
               className="absolute inset-0 pointer-events-none"
               style={{ background: "linear-gradient(to top, rgba(4,16,11,0.96) 0%, rgba(4,16,11,0.58) 42%, transparent 100%)" }}
             />
-            <div className="absolute top-2.5 left-3">
+            <div className="hidden sm:block absolute top-2.5 left-3">
               <span
                 className="text-[8px] font-semibold uppercase tracking-[0.14em]"
                 style={{ color: "rgba(255,255,255,0.38)", textShadow: "0 1px 4px rgba(0,0,0,0.8)" }}
