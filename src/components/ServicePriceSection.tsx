@@ -80,7 +80,7 @@ export default function ServicePriceSection({ serviceSlug }: Props) {
   const total = calcWidgetTotal(serviceSlug, rowQuantities, chaiseLongueAddon);
   const discountActive = total >= WIDGET_DISCOUNT_THRESHOLD;
   const discountedTotal = Math.round(total * 0.9);
-  const hasSelection = total > 0;
+  const hasSelection = total > 0 || Object.values(rowQuantities).some(q => q > 0) || chaiseLongueAddon > 0;
 
   return (
     <section className="py-14 md:py-20 bg-[#FDFDF9]">
@@ -302,19 +302,17 @@ export default function ServicePriceSection({ serviceSlug }: Props) {
             <div className="bg-white px-5 pb-5 space-y-3">
 
               {/* Total block */}
-              {hasSelection && (
+              {hasSelection && total > 0 && (
                 <div
-                  className="flex items-center justify-between px-5 py-4 transition-all duration-300"
-                  style={{
-                    background: discountActive ? "rgba(212,175,55,0.08)" : "#071a12",
-                  }}
+                  className="flex items-center justify-between px-5 py-4"
+                  style={{ background: "#071a12" }}
                 >
                   <div>
-                    <p className="text-[10px] font-bold tracking-[0.18em] uppercase mb-0.5" style={{ color: discountActive ? "rgba(17,17,17,0.50)" : "rgba(255,255,255,0.40)" }}>
+                    <p className="text-[10px] font-bold tracking-[0.18em] uppercase mb-0.5" style={{ color: "rgba(255,255,255,0.40)" }}>
                       {discountActive ? "Total com desconto" : "Total estimado"}
                     </p>
                     {discountActive && (
-                      <p className="text-xs line-through" style={{ color: "rgba(17,17,17,0.35)" }}>{total}€</p>
+                      <p className="text-xs line-through" style={{ color: "rgba(255,255,255,0.30)" }}>{total}€</p>
                     )}
                   </div>
                   <span

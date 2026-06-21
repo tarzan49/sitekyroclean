@@ -535,6 +535,7 @@ const LocationServicePage = () => {
                       const discountActive = total >= WIDGET_DISCOUNT_THRESHOLD;
                       const discountedTotal = Math.round(total * 0.9);
                       const fee = locationPrices[data.city] ?? 0;
+                      const hasAnySelection = total > 0 || Object.values(rowQuantities).some(q => q > 0) || chaiseLongueAddon > 0;
                       return (
                         <div className="bg-white px-5 pt-3 pb-5 space-y-3">
                           {/* Deslocação */}
@@ -548,18 +549,18 @@ const LocationServicePage = () => {
                           {/* Total block */}
                           {total > 0 && (
                             <div
-                              className="flex items-center justify-between px-5 py-4 transition-all duration-300"
-                              style={{ background: discountActive ? "rgba(212,175,55,0.08)" : "#071a12" }}
+                              className="flex items-center justify-between px-5 py-4"
+                              style={{ background: "#071a12" }}
                             >
                               <div>
                                 <p
                                   className="text-[10px] font-bold tracking-[0.18em] uppercase mb-0.5"
-                                  style={{ color: discountActive ? "rgba(17,17,17,0.50)" : "rgba(255,255,255,0.40)" }}
+                                  style={{ color: "rgba(255,255,255,0.40)" }}
                                 >
                                   {discountActive ? "Total com desconto" : "Total estimado"}
                                 </p>
                                 {discountActive && (
-                                  <p className="text-xs line-through" style={{ color: "rgba(17,17,17,0.35)" }}>{total}€</p>
+                                  <p className="text-xs line-through" style={{ color: "rgba(255,255,255,0.30)" }}>{total}€</p>
                                 )}
                               </div>
                               <span
@@ -579,8 +580,8 @@ const LocationServicePage = () => {
                             style={{
                               background: "linear-gradient(135deg, #B8912A 0%, #EDD96A 50%, #B8912A 100%)",
                               color: "#071a12",
-                              boxShadow: total > 0 ? "0 6px 28px rgba(212,175,55,0.45)" : "none",
-                              opacity: total > 0 ? 1 : 0.6,
+                              boxShadow: hasAnySelection ? "0 6px 28px rgba(212,175,55,0.45)" : "none",
+                              opacity: hasAnySelection ? 1 : 0.6,
                             }}
                           >
                             Continuar para o orçamento
