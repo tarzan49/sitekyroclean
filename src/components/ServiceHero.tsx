@@ -15,8 +15,8 @@ import carpetD      from "@/assets/hero-carpet-v1.png";
 import carpetM      from "@/assets/hero-carpet-v1.png";
 import rugsD        from "@/assets/hero-alcatifa-v2.jpg";
 import rugsM        from "@/assets/hero-alcatifa-v2.jpg";
-import waterproofD  from "@/assets/hero-waterproofing.webp";
-import waterproofM  from "@/assets/hero-waterproofing-mobile.webp";
+import waterproofD  from "@/assets/hero-impermeabilizacao-v41.jpg";
+import waterproofM  from "@/assets/hero-impermeabilizacao-v41.jpg";
 
 const HERO_IMAGES: Record<string, { d: string; m: string }> = {
   "limpeza-sofas":     { d: sofaD,       m: sofaM },
