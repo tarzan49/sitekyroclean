@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { CheckCircle, Minus, Plus, Star, ArrowRight } from "lucide-react";
+import { CheckCircle, Minus, Plus, Star, ArrowRight, ExternalLink } from "lucide-react";
+import { GOOGLE_REVIEWS_SHORT_URL } from "@/constants/google";
 import { calcWidgetTotal, calcChairBracket, calcCarpetWidget, buildWidgetQuizConfig, WIDGET_DISCOUNT_THRESHOLD } from "@/lib/priceWidgetCalc";
 import { useQuizLauncher } from "@/hooks/use-quiz-launcher";
 import QuizFormLazy from "@/components/QuizFormLazy";
@@ -10,34 +11,34 @@ import { cn } from "@/lib/utils";
 
 const SERVICE_POINTS: Record<string, { stat?: string; title: string; desc: string }[]> = {
   'limpeza-sofas': [
-    { stat: '4–6h', title: 'Seco e pronto a usar', desc: 'O sofá fica pronto no próprio dia. Sem esperas, sem mudanças em casa.' },
-    { stat: '99%', title: 'Ácaros e alérgenos eliminados', desc: 'Extração a quente remove o que o aspirador nunca atinge.' },
-    { title: 'Resultado visível ou voltamos', desc: 'Se não ficar uma diferença clara, repetimos sem qualquer custo.' },
+    { stat: '2,5 kg', title: 'de sujidade acumulada por ano', desc: 'Células mortas, gordura e suor que o tecido absorve e retém — invisíveis, mas presentes. O aspirador não os tira.' },
+    { stat: '99,9%', title: 'eliminação de patogénicos', desc: 'A temperatura de extração profissional atinge profundidade e eficácia impossíveis para equipamento doméstico.' },
+    { title: 'Resultado visível ou voltamos', desc: 'Se a diferença não for clara, repetimos sem custo. É o nosso compromisso — sem letras pequenas, sem condições.' },
   ],
   'limpeza-colchoes': [
-    { stat: '99%', title: 'Ácaros e fungos eliminados', desc: 'Higienização profunda que vai além da superfície do tecido.' },
-    { title: 'Seguro para crianças e alérgicos', desc: 'Produtos hipoalergénicos sem resíduos. Pode dormir logo a seguir.' },
-    { stat: '<4h', title: 'Seco no mesmo dia', desc: 'Extração de alta potência. Pronto para usar no próprio dia da visita.' },
+    { stat: '2M+', title: 'ácaros num colchão de 5 anos', desc: 'O peso original pode dobrar em matéria orgânica. O que está a respirar todas as noites?' },
+    { stat: '40%', title: 'piora na qualidade do sono', desc: 'Alta concentração de ácaros degrada o sono mesmo sem sintomas visíveis — comprovado em estudos de polissonografia.' },
+    { title: 'Seguro essa mesma noite', desc: 'Produtos hipoalergénicos certificados sem resíduos. Pode dormir logo após a intervenção — sem esperar.' },
   ],
   'limpeza-tapetes': [
-    { title: 'Cores e fibras revitalizadas', desc: 'Protocolo adaptado ao tipo de fibra — sem risco de encolhimento ou desbotamento.' },
-    { title: 'Odores eliminados na raiz', desc: 'Enzimas de última geração destroem os compostos orgânicos, não os mascaram.' },
-    { title: 'Serviço ao domicílio, sem recolha', desc: 'O tapete é tratado no seu espaço. Sem deslocações, sem espera.' },
+    { stat: '8×', title: 'mais alérgenos que pavimento liso', desc: 'Tapetes retêm e libertam no ar partículas a cada passo — pólenes, ácaros e poluentes invisíveis.' },
+    { stat: '90%', title: 'da aparência original recuperada', desc: 'Tapetes considerados "inutilizáveis" ficam como novos com extração profissional a quente. Sem substituição.' },
+    { title: 'Ao domicílio, sem recolha, sem espera', desc: 'Tratado no seu espaço com equipamento profissional. Não precisa sair de casa nem aguardar entrega.' },
   ],
   'limpeza-cadeiras': [
-    { title: 'Protocolo específico por material', desc: 'Veludo, couro, linho ou tecido: nunca usamos um produto genérico.' },
-    { title: 'Cada costura, cada dobra', desc: 'Bicos específicos para zonas de difícil acesso onde se acumula gordura e bactérias.' },
-    { stat: '3–6h', title: 'Prontas a usar', desc: 'Resultado visível no próprio dia, sem paralisar o espaço.' },
+    { stat: '400×', title: 'mais bactérias que a sanita', desc: 'As zonas de contacto de cadeiras de jantar estão entre as superfícies mais contaminadas de uma casa.' },
+    { title: 'Protocolo por material, não genérico', desc: 'Veludo, couro, linho — cada tecido tem a sua abordagem. Nunca arriscamos o material errado no tecido errado.' },
+    { stat: '3–6h', title: 'e estão prontas', desc: 'Resultado no próprio dia. Sem paralisar a sua sala de jantar ou escritório por dias.' },
   ],
   'limpeza-alcatifas': [
-    { title: 'Metro a metro, sem exceção', desc: 'Mapeamos e dividimos em zonas — nenhum centímetro fica sem extração profissional.' },
-    { stat: '<6h', title: 'Transitável rapidamente', desc: 'Equipamento de alta extração minimiza a humidade residual.' },
-    { title: 'Alergénios e ácaros eliminados', desc: 'Tratamento em profundidade para ambientes mais saudáveis.' },
+    { stat: '1 kg/m²', title: 'de sujidade invisível acumulada', desc: 'Fibras compactadas retêm o que não se vê mas que respira todos os dias. Nem a aspiração profissional chega.' },
+    { stat: '2,5×', title: 'pior qualidade do ar sem limpeza', desc: 'Alcatifas sem manutenção anual degradam significativamente o ar interior — crítico em escritórios e quartos.' },
+    { title: 'Metro a metro, sem exceção', desc: 'Mapeamos o espaço e tratamos tudo — cantos, bordas e zonas sob mobília sem exception.' },
   ],
   'impermeabilizacao': [
-    { stat: '10 anos', title: 'Proteção ativa garantida', desc: 'Barreira molecular invisível contra líquidos e manchas.' },
-    { title: 'Sem alterar cor, toque ou aspeto', desc: 'Seca sem resíduos. Crianças e animais voltam logo após a secagem.' },
-    { title: 'Testado antes de sairmos', desc: 'Só concluímos o serviço quando a barreira está ativa e uniforme em toda a superfície.' },
+    { stat: '60s', title: 'para uma mancha ser permanente', desc: 'Sem proteção, o tecido absorve o vinho em menos de 60 segundos. Com nano-barreira, rola para o chão.' },
+    { stat: '10⁻⁹m', title: 'de proteção molecular', desc: 'Nano-partículas criam uma barreira a nível molecular invisível ao toque — não altera cor, textura nem respirabilidade do tecido.' },
+    { stat: '40%', title: 'mais vida útil para o estofo', desc: 'O custo da impermeabilização amortiza-se em menos de 12 meses face à substituição prematura do estofo.' },
   ],
 };
 
@@ -163,15 +164,22 @@ export default function ServicePriceSection({ serviceSlug }: Props) {
               <div style={{ borderTop: "1px solid rgba(17,17,17,0.08)" }} />
             </div>
 
-            {/* Google rating — apenas desktop */}
-            <div className="hidden lg:inline-flex mt-6 items-center gap-3 px-4 py-3 border" style={{ borderColor: "rgba(17,17,17,0.10)", background: "white" }}>
+            {/* Google rating clicável — apenas desktop */}
+            <a
+              href={GOOGLE_REVIEWS_SHORT_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hidden lg:inline-flex mt-6 items-center gap-3 px-4 py-3 border transition-all hover:shadow-md group"
+              style={{ borderColor: "rgba(17,17,17,0.10)", background: "white" }}
+            >
               <div className="flex gap-0.5">
                 {[...Array(5)].map((_, k) => <Star key={k} className="w-3.5 h-3.5 fill-[#D4AF37] text-[#D4AF37]" />)}
               </div>
               <div className="h-3.5 w-px" style={{ background: "rgba(17,17,17,0.12)" }} />
               <span className="text-sm font-semibold" style={{ color: "#111111" }}>5.0</span>
-              <span className="text-xs" style={{ color: "rgba(17,17,17,0.45)" }}>+60 avaliações Google</span>
-            </div>
+              <span className="text-xs" style={{ color: "rgba(17,17,17,0.45)" }}>+60 avaliações · Deixar avaliação</span>
+              <ExternalLink className="w-3 h-3 opacity-30 group-hover:opacity-60 transition-opacity" style={{ color: "#111111" }} />
+            </a>
           </div>
 
           {/* ── Widget ── */}

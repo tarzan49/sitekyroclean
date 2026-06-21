@@ -75,9 +75,9 @@ const HowItWorks = () => {
           </h2>
         </div>
 
-        {/* Right header */}
+        {/* Right header — oculto em mobile (os itens aparecem intercalados abaixo) */}
         <div
-          className={`px-6 sm:px-10 lg:px-14 py-10 md:py-14 transition-all duration-700 delay-150 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-5'}`}
+          className={`hidden lg:block px-6 sm:px-10 lg:px-14 py-10 md:py-14 transition-all duration-700 delay-150 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-5'}`}
         >
           <div className="flex items-center gap-3 mb-3">
             <div className="h-px w-8 flex-shrink-0" style={{ backgroundColor: '#D4AF37', opacity: 0.65 }} />

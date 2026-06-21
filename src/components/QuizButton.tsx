@@ -31,7 +31,7 @@ const QuizButton = ({ className = '', buttonClassName = '', problema, ctaLabel, 
             'hover:scale-[1.025] active:scale-[0.95]',
             'active:shadow-[0_2px_8px_rgba(201,168,76,0.30),inset_0_2px_4px_rgba(0,0,0,0.18)]',
             'transition-all duration-150',
-            'px-8 py-3',
+            'h-14 px-8',
             buttonClassName,
           ].join(' ')}
         >
