@@ -86,19 +86,6 @@ const QuizStepContact = ({ formData, updateFormData, scrollContainerRef }: QuizS
               className="text-base h-13 bg-[#1a2a1a] border-gold/25 text-white placeholder:text-white/20 focus-visible:ring-gold rounded-sm"
             />
           </div>
-          <div>
-            <label className="block text-[11px] font-bold text-white/65 uppercase tracking-wider mb-1.5">Email <span className="text-white/30 normal-case font-normal">(opcional)</span></label>
-            <Input
-              type="email"
-              placeholder="o.seu@email.com"
-              value={formData.email}
-              onChange={(e) => updateFormData({ email: e.target.value })}
-              autoComplete="off"
-              inputMode="email"
-              onFocus={(e) => scrollToVisible(e.target)}
-              className="text-base h-13 bg-[#1a2a1a] border-gold/25 text-white placeholder:text-white/20 focus-visible:ring-gold rounded-sm"
-            />
-          </div>
         </div>
       </div>
     </div>
