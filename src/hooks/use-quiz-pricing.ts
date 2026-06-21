@@ -80,8 +80,8 @@ export function useQuizPricing(
     return locationPrices[formData.location] ?? 0;
   }, [formData.location]);
 
-  const isFreeTravel = calculateServicePrice >= 150;
-  const finalTravelCost = isFreeTravel ? 0 : travelCost;
+  const isFreeTravel = travelCost === 0;
+  const finalTravelCost = travelCost;
 
   const safePrice = (n: number) => (isNaN(n) || n == null) ? 0 : n;
   const upsellItemsTotal = upsellItems.reduce((sum, item) => sum + safePrice(item.price), 0);

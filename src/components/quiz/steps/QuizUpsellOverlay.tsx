@@ -82,26 +82,51 @@ const QuizUpsellOverlay = ({
       {upsellSubStep === 'prompt' && (
         <div className="flex flex-col w-full items-center text-center py-2">
           <p className="text-gold text-[10px] font-bold tracking-[0.28em] uppercase mb-2">PACK FAMÍLIA</p>
-          <h2 className="font-playfair text-2xl sm:text-3xl font-bold text-white mb-3 leading-[1.2]">
-            Uma visita.<br />Tudo limpo.
-          </h2>
-          <p className="text-[13px] text-white/50 max-w-[265px] mx-auto mb-5 leading-relaxed">
-            O técnico já vai até si, aproveite para limpar tudo de uma vez. A partir de <span className="text-gold font-bold">149€</span> poupa <span className="text-gold font-bold">10% em todo o pedido</span> automaticamente.
-          </p>
-          <PackProgressBar totalPrice={totalPrice} />
-          <button
-            onClick={() => setUpsellSubStep('select')}
-            className="w-full max-w-xs h-14 bg-gradient-to-r from-gold to-[#d4c57b] hover:from-[#d4c57b] hover:to-gold text-[#12121e] font-black text-[15px] tracking-wide rounded-xl shadow-[0_4px_36px_rgba(212,175,55,0.45)] touch-manipulation active:scale-[0.98] transition-all flex items-center justify-center gap-2.5 mb-3"
-          >
-            <Check className="w-5 h-5" />
-            Sim, quero poupar 10%
-          </button>
+
+          {packDiscountActive ? (
+            /* ── Desconto já ativo: foco na conveniência da visita ── */
+            <>
+              <h2 className="font-playfair text-2xl sm:text-3xl font-bold text-white mb-3 leading-[1.2]">
+                O técnico já<br />vai até si.
+              </h2>
+              <p className="text-[13px] text-white/50 max-w-[265px] mx-auto mb-5 leading-relaxed">
+                Aproveite a deslocação para limpar mais artigos na mesma visita. O desconto de <span className="text-gold font-bold">10% aplica-se a tudo</span>.
+              </p>
+              <PackProgressBar totalPrice={totalPrice} />
+              <button
+                onClick={() => setUpsellSubStep('select')}
+                className="w-full max-w-xs h-14 bg-gradient-to-r from-gold to-[#d4c57b] hover:from-[#d4c57b] hover:to-gold text-[#12121e] font-black text-[15px] tracking-wide rounded-sm shadow-[0_4px_36px_rgba(212,175,55,0.45)] touch-manipulation active:scale-[0.98] transition-all flex items-center justify-center gap-2.5 mb-3"
+              >
+                Aproveitar a visita
+                <ChevronRight className="w-5 h-5" />
+              </button>
+            </>
+          ) : (
+            /* ── Desconto ainda não ativo: vender o Pack ── */
+            <>
+              <h2 className="font-playfair text-2xl sm:text-3xl font-bold text-white mb-3 leading-[1.2]">
+                Uma visita. Tudo limpo.
+              </h2>
+              <p className="text-[13px] text-white/50 max-w-[265px] mx-auto mb-5 leading-relaxed">
+                O técnico já vai até si, aproveite para limpar tudo de uma vez. A partir de <span className="text-gold font-bold">149€</span> poupa <span className="text-gold font-bold">10% em todo o pedido</span> automaticamente.
+              </p>
+              <PackProgressBar totalPrice={totalPrice} />
+              <button
+                onClick={() => setUpsellSubStep('select')}
+                className="w-full max-w-xs h-14 bg-gradient-to-r from-gold to-[#d4c57b] hover:from-[#d4c57b] hover:to-gold text-[#12121e] font-black text-[15px] tracking-wide rounded-sm shadow-[0_4px_36px_rgba(212,175,55,0.45)] touch-manipulation active:scale-[0.98] transition-all flex items-center justify-center gap-2.5 mb-3"
+              >
+                <Check className="w-5 h-5" />
+                Sim, quero poupar 10%
+              </button>
+            </>
+          )}
+
           <div className="w-full max-w-xs flex flex-col items-center gap-2.5">
             <button
               onClick={onGoToContact}
-              className="w-full h-12 flex items-center justify-center gap-1.5 text-white font-bold transition-all touch-manipulation border border-white/30 bg-white/[0.08] hover:bg-white/[0.14] rounded-xl active:scale-[0.98] text-sm"
+              className="w-full h-12 flex items-center justify-center gap-1.5 text-white font-bold transition-all touch-manipulation border border-white/30 bg-white/[0.08] hover:bg-white/[0.14] rounded-sm active:scale-[0.98] text-sm"
             >
-              Continuar sem o Pack
+              Continuar
               <ChevronRight className="w-4 h-4" />
             </button>
             <button
@@ -138,7 +163,7 @@ const QuizUpsellOverlay = ({
                   : '';
                 const waterproofStr = item.waterproof ? ' + Impermeab.' : '';
                 return (
-                  <div key={i} className="flex items-center justify-between px-3 py-2 bg-gold/[0.08] border border-gold/25 rounded-xl text-xs">
+                  <div key={i} className="flex items-center justify-between px-3 py-2 bg-gold/[0.08] border border-gold/25 rounded-sm text-xs">
                     <span className="text-white/80 font-medium">{labels[item.id] ?? item.id}{detail}{waterproofStr}</span>
                     <div className="flex items-center gap-2">
                       <span className="text-gold font-bold">{item.price > 0 ? `${item.price}€` : 'Sob orç.'}</span>
@@ -168,7 +193,7 @@ const QuizUpsellOverlay = ({
                   setPendingUpsellId(opt.id);
                   setUpsellSubStep('config');
                 }}
-                className="relative overflow-hidden rounded-2xl border border-white/[0.12] aspect-square shadow-lg hover:border-gold/50 hover:shadow-[0_0_14px_rgba(212,175,55,0.25)] active:scale-[0.97] transition-all duration-200 touch-manipulation"
+                className="relative overflow-hidden rounded-sm border border-white/[0.12] aspect-square shadow-lg hover:border-gold/50 hover:shadow-[0_0_14px_rgba(212,175,55,0.25)] active:scale-[0.97] transition-all duration-200 touch-manipulation"
               >
                 <picture>
                   <source srcSet={opt.img} type="image/webp" />
@@ -187,14 +212,14 @@ const QuizUpsellOverlay = ({
           <div className="w-full max-w-xs mx-auto flex items-center gap-3">
             <button
               onClick={() => setUpsellSubStep('prompt')}
-              className="h-12 px-5 flex-shrink-0 flex items-center gap-1.5 rounded-xl border border-white/[0.15] bg-transparent text-white/55 hover:text-white/85 hover:border-white/30 touch-manipulation active:scale-[0.98] transition-all"
+              className="h-12 px-5 flex-shrink-0 flex items-center gap-1.5 rounded-sm border border-white/[0.15] bg-transparent text-white/55 hover:text-white/85 hover:border-white/30 touch-manipulation active:scale-[0.98] transition-all"
             >
               <ChevronLeft className="w-4 h-4" />
               Voltar
             </button>
             <button
               onClick={onGoToContact}
-              className="flex-1 h-12 bg-gradient-to-r from-gold to-[#d4c57b] hover:from-[#d4c57b] hover:to-gold text-[#12121e] font-bold rounded-xl shadow-[0_4px_28px_rgba(212,175,55,0.40)] touch-manipulation active:scale-[0.98] transition-all flex items-center justify-center gap-2"
+              className="flex-1 h-12 bg-gradient-to-r from-gold to-[#d4c57b] hover:from-[#d4c57b] hover:to-gold text-[#12121e] font-bold rounded-sm shadow-[0_4px_28px_rgba(212,175,55,0.40)] touch-manipulation active:scale-[0.98] transition-all flex items-center justify-center gap-2"
             >
               {upsellItems.length > 0 ? 'Continuar com Pack' : 'Continuar'}
               <ChevronRight className="w-4 h-4" />
@@ -237,7 +262,7 @@ const QuizUpsellOverlay = ({
                   const upsellLabel = isWaterproofBase ? 'Adicionar Higienização Profunda' : 'Adicionar Proteção Total VIP';
                   const upsellSub = isWaterproofBase ? `+${packDelta}€/un. · Limpeza profunda incluída` : `+${packDelta}€/un. · Impermeabilização completa`;
                   return (
-                    <div key={opt.id} className={cn('rounded-xl border-2 transition-all duration-200 overflow-hidden', isActive && packOn ? 'border-gold bg-[#1a2a1a] shadow-[0_0_12px_rgba(212,175,55,0.20)]' : isActive ? 'border-gold/50 bg-[#1a2a1a] shadow-[0_0_8px_rgba(212,175,55,0.10)]' : 'border-gold/20 bg-[#1a2a1a]')}>
+                    <div key={opt.id} className={cn('rounded-sm border-2 transition-all duration-200 overflow-hidden', isActive && packOn ? 'border-gold bg-[#1a2a1a] shadow-[0_0_12px_rgba(212,175,55,0.20)]' : isActive ? 'border-gold/50 bg-[#1a2a1a] shadow-[0_0_8px_rgba(212,175,55,0.10)]' : 'border-gold/20 bg-[#1a2a1a]')}>
                       <div className="flex items-center justify-between px-4 py-3">
                         <div className="flex-1 min-w-0 mr-3">
                           <span className="text-sm font-semibold text-white">{opt.label}</span>
@@ -259,7 +284,7 @@ const QuizUpsellOverlay = ({
                       </div>
                       {isActive && (
                         <div className="px-4 pb-3">
-                          <button onClick={() => setPendingSofaItems(sofaTogglePack(pendingSofaItems, opt.id))} className={cn('w-full flex items-center gap-2.5 px-3 py-2 rounded-lg border transition-all duration-200 touch-manipulation', packOn ? 'border-gold/50 bg-gold/[0.08]' : 'border-gold/15 bg-[#1a2a1a] hover:border-gold/40')}>
+                          <button onClick={() => setPendingSofaItems(sofaTogglePack(pendingSofaItems, opt.id))} className={cn('w-full flex items-center gap-2.5 px-3 py-2 rounded-sm border transition-all duration-200 touch-manipulation', packOn ? 'border-gold/50 bg-gold/[0.08]' : 'border-gold/15 bg-[#1a2a1a] hover:border-gold/40')}>
                             <Shield className={cn('w-4 h-4 flex-shrink-0', packOn ? 'text-gold' : 'text-white/25')} />
                             <div className="flex-1 text-left">
                               <p className={cn('text-[11px] font-bold leading-none', packOn ? 'text-white' : 'text-white/50')}>{upsellLabel}</p>
@@ -301,7 +326,7 @@ const QuizUpsellOverlay = ({
                   });
                   setUpsellSubStep('select');
                 }}
-                className="w-full h-12 bg-gradient-to-r from-gold to-[#d4c57b] hover:from-[#d4c57b] hover:to-gold text-[#12121e] font-bold rounded-xl disabled:opacity-35 touch-manipulation active:scale-[0.98] transition-all"
+                className="w-full h-12 bg-gradient-to-r from-gold to-[#d4c57b] hover:from-[#d4c57b] hover:to-gold text-[#12121e] font-bold rounded-sm disabled:opacity-35 touch-manipulation active:scale-[0.98] transition-all"
               >
                 {(() => {
                   const total = pendingSofaItems.reduce((s, i) => s + i.qty, 0);
@@ -327,7 +352,7 @@ const QuizUpsellOverlay = ({
                   const bothP = typeof opt.bothPrice === 'number' ? (opt.bothPrice as number) : null;
                   const dp = cleanP !== null ? (packOn && bothP !== null ? bothP : cleanP) : null;
                   return (
-                    <div key={opt.id} className={cn('rounded-xl border-2 transition-all duration-200 overflow-hidden', isActive && packOn ? 'border-gold bg-[#1a2a1a] shadow-[0_0_10px_rgba(212,175,55,0.18)]' : isActive ? 'border-gold/50 bg-[#1a2a1a]' : 'border-gold/20 bg-[#1a2a1a]')}>
+                    <div key={opt.id} className={cn('rounded-sm border-2 transition-all duration-200 overflow-hidden', isActive && packOn ? 'border-gold bg-[#1a2a1a] shadow-[0_0_10px_rgba(212,175,55,0.18)]' : isActive ? 'border-gold/50 bg-[#1a2a1a]' : 'border-gold/20 bg-[#1a2a1a]')}>
                       <div className="flex items-center justify-between px-4 py-3">
                         <div className="flex-1 min-w-0 mr-3">
                           <span className="text-sm font-semibold text-white">{opt.label}</span>
@@ -345,7 +370,7 @@ const QuizUpsellOverlay = ({
                       </div>
                       {isActive && cleanP !== null && (
                         <div className="px-4 pb-3">
-                          <button onClick={() => setPendingMattressItems(mattressTogglePack(pendingMattressItems, opt.id))} className={cn('w-full flex items-center gap-2.5 px-3 py-2 rounded-lg border transition-all duration-200 touch-manipulation', packOn ? 'border-gold/50 bg-gold/[0.08]' : 'border-gold/15 bg-[#1a2a1a] hover:border-gold/40')}>
+                          <button onClick={() => setPendingMattressItems(mattressTogglePack(pendingMattressItems, opt.id))} className={cn('w-full flex items-center gap-2.5 px-3 py-2 rounded-sm border transition-all duration-200 touch-manipulation', packOn ? 'border-gold/50 bg-gold/[0.08]' : 'border-gold/15 bg-[#1a2a1a] hover:border-gold/40')}>
                             <Shield className={cn('w-4 h-4 flex-shrink-0', packOn ? 'text-gold' : 'text-white/25')} />
                             <div className="flex-1 text-left">
                               <p className={cn('text-[11px] font-bold leading-none', packOn ? 'text-white' : 'text-white/50')}>Adicionar Impermeabilização</p>
@@ -385,7 +410,7 @@ const QuizUpsellOverlay = ({
                   });
                   setUpsellSubStep('select');
                 }}
-                className="w-full h-12 bg-gradient-to-r from-gold to-[#d4c57b] hover:from-[#d4c57b] hover:to-gold text-[#12121e] font-bold rounded-xl disabled:opacity-35 touch-manipulation active:scale-[0.98] transition-all"
+                className="w-full h-12 bg-gradient-to-r from-gold to-[#d4c57b] hover:from-[#d4c57b] hover:to-gold text-[#12121e] font-bold rounded-sm disabled:opacity-35 touch-manipulation active:scale-[0.98] transition-all"
               >
                 {(() => {
                   const total = pendingMattressItems.reduce((s, i) => s + i.qty, 0);
@@ -406,7 +431,7 @@ const QuizUpsellOverlay = ({
                 <p className="text-gold text-[10px] font-bold tracking-[0.28em] uppercase mb-1 text-center w-full">ARTIGO EXTRA</p>
                 <h3 className="font-playfair text-xl font-bold text-white mb-3 text-center">Tapete</h3>
                 <div className={cn(
-                  'w-full rounded-2xl border px-5 py-4 text-center transition-all duration-300 mb-4',
+                  'w-full rounded-sm border px-5 py-4 text-center transition-all duration-300 mb-4',
                   uSob ? 'bg-[#1a2a1a] border-white/20'
                     : uValid ? 'bg-[#1a2a1a] border-gold/30 shadow-[0_0_20px_rgba(212,175,55,0.10)]'
                     : 'bg-[#1a2a1a] border-gold/15'
@@ -434,7 +459,7 @@ const QuizUpsellOverlay = ({
                   placeholder="Ex: 4"
                   value={pendingCarpetArea}
                   onChange={e => setPendingCarpetArea(e.target.value)}
-                  className="w-full h-12 px-4 text-lg font-bold text-center bg-[#1a2a1a] border border-gold/25 focus:border-gold focus:outline-none rounded-xl transition-colors text-white placeholder:text-white/25 mb-1"
+                  className="w-full h-12 px-4 text-lg font-bold text-center bg-[#1a2a1a] border border-gold/25 focus:border-gold focus:outline-none rounded-sm transition-colors text-white placeholder:text-white/25 mb-1"
                 />
                 <p className="text-xs text-white/30 text-center mb-4">≤5m²: 10€/m² · ≤10m²: 8€/m² · ≤15m²: 7€/m² · +15m²: sob orçamento</p>
                 <button
@@ -445,7 +470,7 @@ const QuizUpsellOverlay = ({
                     setUpsellItems(prev => [...prev, { id: 'carpet', carpetArea: pendingCarpetArea, price: Math.round(base * 100) / 100, label: `Tapete ${pendingCarpetArea}m²` }]);
                     setUpsellSubStep('select');
                   }}
-                  className="w-full h-12 bg-gradient-to-r from-gold to-[#d4c57b] hover:from-[#d4c57b] hover:to-gold text-[#12121e] font-bold rounded-xl disabled:opacity-35 touch-manipulation active:scale-[0.98] transition-all"
+                  className="w-full h-12 bg-gradient-to-r from-gold to-[#d4c57b] hover:from-[#d4c57b] hover:to-gold text-[#12121e] font-bold rounded-sm disabled:opacity-35 touch-manipulation active:scale-[0.98] transition-all"
                 >
                   Adicionar Tapete
                 </button>
@@ -465,7 +490,7 @@ const QuizUpsellOverlay = ({
                 <p className="text-gold text-[10px] font-bold tracking-[0.28em] uppercase mb-1 text-center w-full">ARTIGO EXTRA</p>
                 <h3 className="font-playfair text-xl font-bold text-white text-center mb-1">Cadeiras</h3>
                 <div className={cn(
-                  'w-full rounded-2xl border px-5 py-4 text-center mb-5 transition-all duration-300',
+                  'w-full rounded-sm border px-5 py-4 text-center mb-5 transition-all duration-300',
                   sobOrç ? 'bg-[#1a2a1a] border-white/20' : 'bg-[#1a2a1a] border-gold/30 shadow-[0_0_20px_rgba(212,175,55,0.10)]'
                 )}>
                   <p className="text-[10px] text-white/35 uppercase tracking-wider mb-1">Estimativa total</p>
@@ -484,19 +509,19 @@ const QuizUpsellOverlay = ({
                   <button
                     onClick={() => setPendingChairQtyNum(q => Math.max(1, q - 1))}
                     disabled={qty <= 1}
-                    className="w-14 h-14 rounded-2xl border-2 border-white/20 bg-white/[0.05] text-white font-bold text-2xl flex items-center justify-center disabled:opacity-25 active:scale-95 transition-all touch-manipulation hover:border-gold/50"
+                    className="w-14 h-14 rounded-sm border-2 border-white/20 bg-white/[0.05] text-white font-bold text-2xl flex items-center justify-center disabled:opacity-25 active:scale-95 transition-all touch-manipulation hover:border-gold/50"
                   >−</button>
                   <span className="text-4xl font-black text-gold w-10 text-center tabular-nums leading-none">{qty}</span>
                   <button
                     onClick={() => setPendingChairQtyNum(q => q + 1)}
-                    className="w-14 h-14 rounded-2xl border-2 border-white/20 bg-white/[0.05] text-white font-bold text-2xl flex items-center justify-center active:scale-95 transition-all touch-manipulation hover:border-gold/50"
+                    className="w-14 h-14 rounded-sm border-2 border-white/20 bg-white/[0.05] text-white font-bold text-2xl flex items-center justify-center active:scale-95 transition-all touch-manipulation hover:border-gold/50"
                   >+</button>
                 </div>
                 {!sobOrç && (
                   <button
                     onClick={() => setPendingWaterproof(w => !w)}
                     className={cn(
-                      'w-full flex items-center gap-3 px-4 py-3 rounded-xl border-2 transition-all touch-manipulation mb-4',
+                      'w-full flex items-center gap-3 px-4 py-3 rounded-sm border-2 transition-all touch-manipulation mb-4',
                       pendingWaterproof ? 'border-gold bg-[#1a2a1a] shadow-[0_0_10px_rgba(212,175,55,0.15)]' : 'border-gold/20 bg-[#1a2a1a] hover:border-gold/40'
                     )}
                   >
@@ -523,7 +548,7 @@ const QuizUpsellOverlay = ({
                     }]);
                     setUpsellSubStep('select');
                   }}
-                  className="w-full h-12 bg-gradient-to-r from-gold to-[#d4c57b] hover:from-[#d4c57b] hover:to-gold text-[#12121e] font-bold rounded-xl touch-manipulation active:scale-[0.98] transition-all"
+                  className="w-full h-12 bg-gradient-to-r from-gold to-[#d4c57b] hover:from-[#d4c57b] hover:to-gold text-[#12121e] font-bold rounded-sm touch-manipulation active:scale-[0.98] transition-all"
                 >
                   {sobOrç ? `Adicionar ${qty} Cadeiras (sob orçamento)` : `Adicionar ${qty} Cadeira${qty > 1 ? 's' : ''}`}
                 </button>

@@ -48,12 +48,12 @@ interface QuizFormProps {
 }
 
 function calcInitialStep(loc?: string, svc?: string, hasItem?: boolean, skipUpsell?: boolean, hasSvcType?: boolean): number {
-  if (skipUpsell && loc && hasItem) return 4;
+  if (skipUpsell && loc) return 4;
   if (!loc) return 0;
   if (!svc) return 1;
   if (hasItem) return 3;
   // Skip serviceType selector when already known or service doesn't need it
-  const skipType = svc === 'carpet' || svc === 'chairs' || hasSvcType;
+  const skipType = svc === 'carpet' || svc === 'chairs' || svc === 'mattress' || hasSvcType;
   return skipType ? 3 : 2;
 }
 
@@ -105,7 +105,7 @@ const QuizForm = ({
   const [hypoallergenic, setHypoallergenic] = useState<boolean | null>(null);
   const [showExitIntent, setShowExitIntent] = useState(false);
   const [exitIntentFired, setExitIntentFired] = useState(false);
-  const startsAtUpsell = Boolean(skipToUpsell && initialLocation && hasInitialItem);
+  const startsAtUpsell = Boolean(skipToUpsell && initialLocation);
   const [showUpsell, setShowUpsell] = useState(startsAtUpsell);
   const [upsellShown, setUpsellShown] = useState(startsAtUpsell);
   const [upsellItems, setUpsellItems] = useState<UpsellItemConfig[]>(initialUpsellItems ?? []);
@@ -229,7 +229,7 @@ const QuizForm = ({
       setFormData(buildInitialFormData());
       setSofaItems(buildInitialSofaItems());
       setMattressItems(buildInitialMattressItems());
-      const atUpsell = Boolean(skipToUpsell && initialLocation && hasInitialItem);
+      const atUpsell = Boolean(skipToUpsell && initialLocation);
       setShowUpsell(atUpsell);
       setUpsellShown(atUpsell);
       setUpsellItems(initialUpsellItems ?? []);
@@ -240,7 +240,7 @@ const QuizForm = ({
 
   // skipToUpsell + no location: after user picks city at step 0, jump straight to upsell
   useEffect(() => {
-    if (skipToUpsell && hasInitialItem && formData.location && currentStep === 0) {
+    if (skipToUpsell && formData.location && currentStep === 0) {
       setCurrentStep(4);
       setShowUpsell(true);
       setUpsellShown(true);
@@ -615,7 +615,7 @@ ${formData.description || 'Sem observações adicionais'}
     <div className="fixed inset-0 z-[100] sm:flex sm:items-center sm:justify-center sm:backdrop-blur-lg sm:p-4" style={{ background: "rgba(5,21,16,0.82)" }} role="dialog" aria-modal="true" aria-labelledby="quiz-title">
       <div
         className={cn(
-          "relative w-full sm:max-w-lg sm:rounded-2xl shadow-[0_8px_60px_rgba(0,0,0,0.6),inset_0_1px_0_rgba(255,255,255,0.07)] sm:border border-white/[0.18] overflow-hidden animate-scale-in flex flex-col sm:gpu-accelerated bg-checker-modal",
+          "relative w-full sm:max-w-lg sm:rounded-sm shadow-[0_8px_60px_rgba(0,0,0,0.6),inset_0_1px_0_rgba(255,255,255,0.07)] sm:border border-white/[0.18] overflow-hidden animate-scale-in flex flex-col sm:gpu-accelerated bg-checker-modal",
           "h-full sm:h-auto sm:max-h-[92dvh]"
         )}>
 
@@ -683,7 +683,8 @@ ${formData.description || 'Sem observações adicionais'}
              , visível: step 3 (quantidades) e step 4 (contacto) quando totalPrice > 0
              , também visível em step 1 quando há custo de deslocação */}
           {(totalPrice > 0 || hasSobOrcamento) && (showUpsell || finalTravelCost > 0 || (currentStep !== 1 && currentStep !== 2)) && (
-            <div className="sticky top-0 z-20 text-white flex items-center justify-between py-3 border-b border-white/[0.16] -mx-5 sm:-mx-6 px-5 sm:px-6 animate-fade-in" style={{ background: "#071a12" }}>
+            <div className="sticky top-0 z-20 text-white flex flex-col border-b border-white/[0.16] -mx-5 sm:-mx-6 animate-fade-in" style={{ background: "#071a12" }}>
+            <div className="flex items-center justify-between py-3 px-5 sm:px-6">
               <span className="text-xs text-white/40 font-medium">
                 {calculateServicePrice === 0 && finalTravelCost > 0
                   ? <span>Deslocação <span className="text-white/20 text-[10px]">({formData.location})</span></span>
@@ -713,6 +714,14 @@ ${formData.description || 'Sem observações adicionais'}
                 )}
               </div>
             </div>
+            <div className="flex items-center justify-center gap-2 px-5 py-2" style={{ borderTop: "1px solid rgba(212,175,55,0.14)", background: "rgba(212,175,55,0.04)" }}>
+              <span className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: "#D4AF37" }} />
+              <p className="text-[11px]" style={{ color: "rgba(255,255,255,0.62)", fontFamily: "Inter, system-ui, sans-serif" }}>
+                <span className="font-semibold">Alta procura</span>
+                {' · Confirme agora para garantir disponibilidade'}
+              </p>
+            </div>
+            </div>
           )}
 
           <div className="flex flex-col py-3 sm:py-5 w-full items-center text-center">
@@ -720,7 +729,7 @@ ${formData.description || 'Sem observações adicionais'}
             {/* Step 0, Location Autocomplete VIP */}
             {/* Context banner when quiz opened from a problem page */}
             {problema && (
-              <div className="w-full max-w-sm mx-auto mb-4 bg-gold/10 border border-gold/30 rounded-xl px-4 py-3 text-center">
+              <div className="w-full max-w-sm mx-auto mb-4 bg-gold/10 border border-gold/30 rounded-sm px-4 py-3 text-center">
                 <p className="text-gold text-xs font-bold mb-0.5">Detectámos o seu problema</p>
                 <p className="text-white/70 text-xs leading-relaxed">
                   Vamos encontrar a melhor solução para <span className="text-white font-semibold">{problema.replace(/-/g, ' ')}</span>.
@@ -736,7 +745,13 @@ ${formData.description || 'Sem observações adicionais'}
                 scrollContainerRef={scrollContainerRef}
                 onCitySelect={(city) => {
                   updateFormData({ location: city });
-                  setCurrentStep(calcInitialStep(city, initialService, hasInitialItem));
+                  if (skipToUpsell) {
+                    setCurrentStep(4);
+                    setShowUpsell(true);
+                    setUpsellShown(true);
+                  } else {
+                    setCurrentStep(calcInitialStep(city, initialService, hasInitialItem, false, !!initialServiceType));
+                  }
                 }}
               />
             )}
@@ -854,7 +869,7 @@ ${formData.description || 'Sem observações adicionais'}
             <Button
               onClick={handleSubmit}
               disabled={isSubmitting}
-              className="w-full h-14 bg-gradient-to-r from-gold to-[#d4c57b] hover:from-[#d4c57b] hover:to-gold text-[#12121e] font-black text-base tracking-wider uppercase touch-manipulation active:scale-[0.98] rounded-xl shadow-[0_0_32px_rgba(212,175,55,0.30)]"
+              className="w-full h-14 bg-gradient-to-r from-gold to-[#d4c57b] hover:from-[#d4c57b] hover:to-gold text-[#12121e] font-black text-base tracking-wider uppercase touch-manipulation active:scale-[0.98] rounded-sm shadow-[0_0_32px_rgba(212,175,55,0.30)]"
             >
               {isSubmitting ? 'A enviar...' : 'FINALIZAR PEDIDO'}
             </Button>
@@ -876,7 +891,7 @@ ${formData.description || 'Sem observações adicionais'}
             {currentStep > firstStep && (
               <button
                 onClick={handlePrev}
-                className="h-10 px-5 flex-shrink-0 bg-transparent border border-white/[0.12] text-white/45 hover:text-white/75 hover:border-white/25 active:bg-transparent active:scale-[0.98] touch-manipulation rounded-xl flex items-center justify-center transition-all text-sm"
+                className="h-10 px-5 flex-shrink-0 bg-transparent border border-white/[0.12] text-white/45 hover:text-white/75 hover:border-white/25 active:bg-transparent active:scale-[0.98] touch-manipulation rounded-sm flex items-center justify-center transition-all text-sm"
               >
                 <ChevronLeft className="w-3.5 h-3.5 mr-1" />
                 Voltar
@@ -886,7 +901,7 @@ ${formData.description || 'Sem observações adicionais'}
               <Button
                 onClick={handleNext}
                 disabled={!canProceed()}
-                className="flex-1 h-12 bg-gradient-to-r from-gold to-[#d4c57b] hover:from-[#d4c57b] hover:to-gold text-[#12121e] font-bold touch-manipulation active:scale-[0.98] disabled:opacity-35 rounded-xl shadow-[0_4px_28px_rgba(212,175,55,0.40)] transition-shadow"
+                className="flex-1 h-12 bg-gradient-to-r from-gold to-[#d4c57b] hover:from-[#d4c57b] hover:to-gold text-[#12121e] font-bold touch-manipulation active:scale-[0.98] disabled:opacity-35 rounded-sm shadow-[0_4px_28px_rgba(212,175,55,0.40)] transition-shadow"
               >
                 Continuar
                 <ChevronRight className="w-4 h-4 ml-1" />
@@ -925,7 +940,7 @@ ${formData.description || 'Sem observações adicionais'}
           <div className="flex flex-col gap-3 mt-5">
             <Button
               onClick={() => setShowExitIntent(false)}
-              className="w-full h-12 bg-gradient-to-r from-gold to-[#d4c57b] hover:from-[#d4c57b] hover:to-gold text-[#12121e] font-black rounded-xl shadow-[0_0_20px_rgba(212,175,55,0.3)] touch-manipulation active:scale-[0.98]"
+              className="w-full h-12 bg-gradient-to-r from-gold to-[#d4c57b] hover:from-[#d4c57b] hover:to-gold text-[#12121e] font-black rounded-sm shadow-[0_0_20px_rgba(212,175,55,0.3)] touch-manipulation active:scale-[0.98]"
             >
               {packDiscountActive ? 'Continuar e Guardar Desconto' : 'Continuar e Guardar Vaga'}
             </Button>

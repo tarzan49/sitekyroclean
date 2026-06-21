@@ -1,4 +1,5 @@
-import { PRICE_TABLE, PRICE_TABLE_QUIZ_CONFIG } from "@/data/locationPriceTestimonialsData";
+import { PRICE_TABLE, PRICE_TABLE_QUIZ_CONFIG, type PriceRowQuizConfig } from "@/data/locationPriceTestimonialsData";
+import type { UpsellItemConfig } from "@/components/quiz/QuizTypes";
 
 function parseRowPrice(price: string): number {
   if (price.includes('/m²') || price.toLowerCase().includes('orçamento')) return 0;
@@ -66,3 +67,68 @@ export function calcCarpetWidget(area: number, alcatifa = false): number | null 
 }
 
 export const WIDGET_DISCOUNT_THRESHOLD = 149;
+
+/**
+ * Constrói a config do quiz a partir do estado do widget.
+ * Funciona genericamente para qualquer serviço — não hardcoded por slug.
+ */
+export function buildWidgetQuizConfig(
+  serviceSlug: string,
+  rowQuantities: Record<number, number>,
+  chaiseLongueAddon: number
+): PriceRowQuizConfig | null {
+  const configs = PRICE_TABLE_QUIZ_CONFIG[serviceSlug] ?? [];
+  const isWaterproof = serviceSlug === 'impermeabilizacao';
+  const svcType: 'cleaning' | 'waterproofing' = isWaterproof ? 'waterproofing' : 'cleaning';
+
+  // Agrupar linhas seleccionadas por serviço
+  const sofaRows:    { sizeId: string; qty: number }[]     = [];
+  const mattressRows:{ sizeId: string; qty: number }[]     = [];
+  let   chairTotal = 0;
+  let   carpetArea = 0;
+  let   carpetCfg: PriceRowQuizConfig | null = null;
+
+  configs.forEach((cfg, i) => {
+    if (!cfg) return;
+    const qty = rowQuantities[i] ?? 0;
+    if (cfg.service === 'sofa'    && cfg.sofaSizeId    && qty > 0) sofaRows.push({ sizeId: cfg.sofaSizeId, qty });
+    if (cfg.service === 'mattress'&& cfg.mattressSizeId&& qty > 0) mattressRows.push({ sizeId: cfg.mattressSizeId, qty });
+    if (cfg.service === 'chairs'  && qty > 0) chairTotal += qty;
+    if (cfg.service === 'carpet'  && qty > 0) { carpetArea = qty; carpetCfg = cfg; }
+  });
+
+  // Sofás (primário) + cadeiras como upsell
+  if (sofaRows.length > 0) {
+    const sofaItems = sofaRows.map(r => ({ ...r, chaiseLongue: false as boolean }));
+    if (chaiseLongueAddon > 0) sofaItems[0].chaiseLongue = true;
+
+    const chairUpsell: UpsellItemConfig[] = chairTotal > 0 ? [{
+      id: 'chairs', chairQty: String(chairTotal), qty: chairTotal,
+      price: Math.round(((isWaterproof
+        ? (chairTotal <= 4 ? chairTotal * 17.5 : 4 * 17.5 + (chairTotal - 4) * 15)
+        : (chairTotal <= 3 ? chairTotal * 17.5 : chairTotal <= 6 ? 52.5 + (chairTotal - 3) * 12.5 : 90 + (chairTotal - 6) * 10)
+      )) * 10) / 10,
+      label: `${chairTotal} cadeira${chairTotal > 1 ? 's' : ''}`,
+      waterproof: isWaterproof, waterproofPrice: 0,
+    }] : [];
+
+    return { service: 'sofa', serviceType: svcType, sofaItems, initialUpsellItems: chairUpsell.length ? chairUpsell : undefined };
+  }
+
+  // Colchões
+  if (mattressRows.length > 0) {
+    return { service: 'mattress', serviceType: svcType, mattressItems: mattressRows };
+  }
+
+  // Cadeiras (sem sofás)
+  if (chairTotal > 0) {
+    return { service: 'chairs', serviceType: svcType, chairQty: String(chairTotal) };
+  }
+
+  // Tapetes / alcatifas
+  if (carpetArea > 0 && carpetCfg) {
+    return { ...(carpetCfg as PriceRowQuizConfig), carpetArea: String(carpetArea) };
+  }
+
+  return null;
+}

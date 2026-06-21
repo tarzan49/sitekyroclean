@@ -20,16 +20,19 @@ const tapetesGuarantee: GuaranteeItem[] = [
     label: "Manchas",
     title: "Manchas fora ou voltamos",
     body: "Garantimos a remoção de manchas tratáveis. Se não for possível, avaliamos sem custo e explicamos com exatidão o que aconteceu e quais as opções.",
+    image: "/images/tapetes/v1.png",
   },
   {
     label: "Fibras",
     title: "Fibras íntegras, cores preservadas",
     body: "Analisamos o tipo de fibra antes de qualquer intervenção. Técnica e produtos são adaptados para preservar a trama e a tonalidade original do tapete.",
+    image: "/images/tapetes/v2.png",
   },
   {
     label: "Odores",
     title: "Frescura que fica meses",
     body: "Enzimas de última geração eliminam os compostos orgânicos na raiz, incluindo odores de animais. O resultado não mascara o cheiro, destrói-o definitivamente.",
+    image: tapeteDepois,
   },
 ];
 
@@ -79,7 +82,7 @@ const LimpezaTapetes = () => {
           beforeImage={tapeteAntes}
           afterImage={tapeteDepois}
           slides={[
-            { src: tapeteResultado, label: "Técnico Especializado" },
+            { src: '/images/tapetes/v2.png', label: "Técnico Especializado" },
             { src: tapeteProcesso, label: "Extração Profissional" },
           ]}
           variant="dark"

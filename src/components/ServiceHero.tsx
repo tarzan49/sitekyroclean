@@ -7,12 +7,12 @@ import { useQuizLauncher } from "@/hooks/use-quiz-launcher";
 
 import sofaD        from "@/assets/service-sofa-camurca.png";
 import sofaM        from "@/assets/service-sofa-camurca.png";
-import mattressD    from "@/assets/service-mattress-branded.webp";
-import mattressM    from "@/assets/service-mattress-branded-mobile.webp";
+import mattressD    from "@/assets/hero-mattress-v6.png";
+import mattressM    from "@/assets/hero-mattress-v6.png";
 import chairsD      from "@/assets/service-chairs-new.webp";
 import chairsM      from "@/assets/service-chairs-new-mobile.webp";
-import carpetD      from "@/assets/service-carpet-new.webp";
-import carpetM      from "@/assets/service-carpet-new-mobile.webp";
+import carpetD      from "@/assets/hero-carpet-v1.png";
+import carpetM      from "@/assets/hero-carpet-v1.png";
 import rugsD        from "@/assets/service-rugs-new.webp";
 import rugsM        from "@/assets/service-rugs-new-mobile.webp";
 import waterproofD  from "@/assets/hero-waterproofing.webp";
@@ -79,8 +79,8 @@ const ServiceHero = ({
         <div className="absolute inset-0 z-0">
           {imgs && (
             <picture>
-              <source media="(max-width: 767px)" srcSet={imgs.m} type="image/webp" />
-              <source srcSet={imgs.d} type="image/webp" />
+              <source media="(max-width: 767px)" srcSet={imgs.m} />
+              <source srcSet={imgs.d} />
               <img
                 src={imgs.d}
                 alt=""

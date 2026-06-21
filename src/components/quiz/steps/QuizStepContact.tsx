@@ -36,7 +36,7 @@ const QuizStepContact = ({ formData, updateFormData, scrollContainerRef }: QuizS
           Preenche em segundos. O pedido é enviado automaticamente.
         </p>
 
-        <div className="relative flex items-center gap-4 bg-[#0c1d15] border border-gold/[0.15] rounded-2xl pl-5 pr-4 py-3.5 mb-3 overflow-hidden">
+        <div className="relative flex items-center gap-4 bg-[#0c1d15] border border-gold/[0.15] rounded-sm pl-5 pr-4 py-3.5 mb-3 overflow-hidden">
           <div className="absolute left-0 top-0 bottom-0 w-[3px] bg-gradient-to-b from-gold/20 via-gold to-gold/20" />
           <div className="flex flex-col items-center justify-center flex-shrink-0">
             <span className="font-playfair text-3xl font-black text-gold leading-none" style={{ textShadow: '0 0 18px rgba(212,175,55,0.35)' }}>5.0</span>
@@ -59,16 +59,6 @@ const QuizStepContact = ({ formData, updateFormData, scrollContainerRef }: QuizS
           </div>
         </div>
 
-        <div className="flex items-center gap-2.5 bg-gradient-to-r from-gold/[0.10] to-transparent border border-gold/[0.18] rounded-xl px-4 py-2.5 mb-5">
-          <span className="relative flex items-center justify-center w-2.5 h-2.5 flex-shrink-0">
-            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-gold/50" />
-            <span className="relative inline-flex w-1.5 h-1.5 rounded-full bg-gold" />
-          </span>
-          <p className="text-[12px] text-white/65 font-semibold leading-snug">
-            <span className="text-gold font-bold">Alta procura.</span> Confirme agora para garantir disponibilidade.
-          </p>
-        </div>
-
         <div className="flex flex-col gap-4">
           <div>
             <label className="block text-[11px] font-bold text-white/65 uppercase tracking-wider mb-1.5">Nome *</label>
@@ -80,7 +70,7 @@ const QuizStepContact = ({ formData, updateFormData, scrollContainerRef }: QuizS
               autoCorrect="off"
               autoCapitalize="words"
               onFocus={(e) => scrollToVisible(e.target)}
-              className="text-base h-13 bg-[#1a2a1a] border-gold/25 text-white placeholder:text-white/20 focus-visible:ring-gold rounded-xl"
+              className="text-base h-13 bg-[#1a2a1a] border-gold/25 text-white placeholder:text-white/20 focus-visible:ring-gold rounded-sm"
             />
           </div>
           <div>
@@ -93,7 +83,7 @@ const QuizStepContact = ({ formData, updateFormData, scrollContainerRef }: QuizS
               autoComplete="off"
               inputMode="numeric"
               onFocus={(e) => scrollToVisible(e.target)}
-              className="text-base h-13 bg-[#1a2a1a] border-gold/25 text-white placeholder:text-white/20 focus-visible:ring-gold rounded-xl"
+              className="text-base h-13 bg-[#1a2a1a] border-gold/25 text-white placeholder:text-white/20 focus-visible:ring-gold rounded-sm"
             />
           </div>
           <div>
@@ -106,7 +96,7 @@ const QuizStepContact = ({ formData, updateFormData, scrollContainerRef }: QuizS
               autoComplete="off"
               inputMode="email"
               onFocus={(e) => scrollToVisible(e.target)}
-              className="text-base h-13 bg-[#1a2a1a] border-gold/25 text-white placeholder:text-white/20 focus-visible:ring-gold rounded-xl"
+              className="text-base h-13 bg-[#1a2a1a] border-gold/25 text-white placeholder:text-white/20 focus-visible:ring-gold rounded-sm"
             />
           </div>
         </div>

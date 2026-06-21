@@ -79,7 +79,7 @@ const ServiceTypeSelector = ({
             key={opt.id}
             onClick={() => onSelect(opt.id)}
             className={cn(
-              "relative w-full flex items-center gap-3.5 px-4 py-3.5 rounded-xl border-2 text-left transition-all duration-200 touch-manipulation active:scale-[0.98]",
+              "relative w-full flex items-center gap-3.5 px-4 py-3.5 rounded-sm border-2 text-left transition-all duration-200 touch-manipulation active:scale-[0.98]",
               opt.recommended
                 ? isSelected
                   ? "border-[#D4AF37] shadow-[0_0_28px_rgba(212,175,55,0.30)] bg-[#1a2a1a]"
@@ -100,7 +100,7 @@ const ServiceTypeSelector = ({
             {/* Icon, only for recommended pack */}
             {opt.recommended && (
               <div className={cn(
-                "w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 transition-colors",
+                "w-10 h-10 rounded-sm flex items-center justify-center flex-shrink-0 transition-colors",
                 isSelected ? "bg-gold/20" : "bg-gold/[0.10]"
               )}>
                 <Icon className={cn("w-5 h-5", isSelected ? "text-gold" : "text-gold/70")} />

@@ -47,7 +47,7 @@ const QuizStepConfig = ({
             const upsellLabel = isWaterproofBase ? 'Adicionar Higienização Profunda' : 'Adicionar Proteção Total VIP';
             const upsellSub = isWaterproofBase ? `+${packDelta}€/un. · Limpeza profunda incluída` : `+${packDelta}€/un. · Impermeabilização completa`;
             return (
-              <div key={option.id} className={cn('rounded-xl border-2 transition-all duration-200 overflow-hidden', isActive && packOn ? 'border-gold bg-[#1a2a1a] shadow-[0_0_12px_rgba(212,175,55,0.20)]' : isActive ? 'border-gold/50 bg-[#1a2a1a] shadow-[0_0_8px_rgba(212,175,55,0.10)]' : 'border-gold/20 bg-[#1a2a1a]')}>
+              <div key={option.id} className={cn('rounded-sm border-2 transition-all duration-200 overflow-hidden', isActive && packOn ? 'border-gold bg-[#1a2a1a] shadow-[0_0_12px_rgba(212,175,55,0.20)]' : isActive ? 'border-gold/50 bg-[#1a2a1a] shadow-[0_0_8px_rgba(212,175,55,0.10)]' : 'border-gold/20 bg-[#1a2a1a]')}>
                 <div className="flex items-center justify-between px-4 py-3">
                   <div className="flex-1 min-w-0 mr-3">
                     <span className="text-sm font-semibold text-white">{option.label}</span>
@@ -62,14 +62,14 @@ const QuizStepConfig = ({
                     </div>
                   </div>
                   <div className="flex items-center gap-2 flex-shrink-0">
-                    <button onClick={() => setSofaItems(sofaSetQty(sofaItems, option.id, qty - 1))} disabled={qty === 0} className="w-11 h-11 rounded-xl border border-white/20 bg-white/[0.05] text-white font-bold text-xl flex items-center justify-center disabled:opacity-20 active:scale-95 transition-all touch-manipulation hover:border-gold/50">−</button>
+                    <button onClick={() => setSofaItems(sofaSetQty(sofaItems, option.id, qty - 1))} disabled={qty === 0} className="w-11 h-11 rounded-sm border border-white/20 bg-white/[0.05] text-white font-bold text-xl flex items-center justify-center disabled:opacity-20 active:scale-95 transition-all touch-manipulation hover:border-gold/50">−</button>
                     <span className={cn('w-7 text-center font-bold tabular-nums text-base', isActive ? (packOn ? 'text-gold' : 'text-white/80') : 'text-white/30')}>{qty}</span>
-                    <button onClick={() => setSofaItems(sofaSetQty(sofaItems, option.id, qty + 1))} className="w-11 h-11 rounded-xl border border-white/20 bg-white/[0.05] text-white font-bold text-xl flex items-center justify-center active:scale-95 transition-all touch-manipulation hover:border-gold/50">+</button>
+                    <button onClick={() => setSofaItems(sofaSetQty(sofaItems, option.id, qty + 1))} className="w-11 h-11 rounded-sm border border-white/20 bg-white/[0.05] text-white font-bold text-xl flex items-center justify-center active:scale-95 transition-all touch-manipulation hover:border-gold/50">+</button>
                   </div>
                 </div>
                 {isActive && !isSob && basePrice !== null && (
                   <div className="px-4 pb-3">
-                    <button onClick={() => setSofaItems(sofaTogglePack(sofaItems, option.id))} className={cn('w-full flex items-center gap-2.5 px-3 py-2 rounded-lg border transition-all duration-200 touch-manipulation', packOn ? 'border-gold/50 bg-gold/[0.08]' : 'border-gold/15 bg-[#1a2a1a] hover:border-gold/40')}>
+                    <button onClick={() => setSofaItems(sofaTogglePack(sofaItems, option.id))} className={cn('w-full flex items-center gap-2.5 px-3 py-2 rounded-sm border transition-all duration-200 touch-manipulation', packOn ? 'border-gold/50 bg-gold/[0.08]' : 'border-gold/15 bg-[#1a2a1a] hover:border-gold/40')}>
                       <Shield className={cn('w-4 h-4 flex-shrink-0', packOn ? 'text-gold' : 'text-white/25')} />
                       <div className="flex-1 text-left">
                         <p className={cn('text-[11px] font-bold leading-none', packOn ? 'text-white' : 'text-white/50')}>{upsellLabel}</p>
@@ -85,7 +85,7 @@ const QuizStepConfig = ({
             );
           })}
         </div>
-        {has4Plus && <input type="number" inputMode="numeric" pattern="[0-9]*" placeholder="Nº de lugares (ex: 5)" className="w-full max-w-sm bg-white/[0.06] border border-white/15 focus:border-gold focus:outline-none text-white placeholder:text-white/25 rounded-xl h-12 px-4 text-base transition-colors" onChange={(e) => updateFormData({ description: `Sofá com ${e.target.value} lugares` })} />}
+        {has4Plus && <input type="number" inputMode="numeric" pattern="[0-9]*" placeholder="Nº de lugares (ex: 5)" className="w-full max-w-sm bg-white/[0.06] border border-white/15 focus:border-gold focus:outline-none text-white placeholder:text-white/25 rounded-sm h-12 px-4 text-base transition-colors" onChange={(e) => updateFormData({ description: `Sofá com ${e.target.value} lugares` })} />}
       </div>
     );
   }
@@ -109,7 +109,7 @@ const QuizStepConfig = ({
               ? `${packDelta !== null ? `+${packDelta}€/un.` : '+?€/un.'} · Limpeza profunda incluída`
               : `${packDelta !== null ? `+${packDelta}€/un.` : '+?€/un.'} · Proteção até 10 anos`;
             return (
-              <div key={option.id} className={cn('rounded-xl border-2 transition-all duration-200 overflow-hidden', isActive && packOn ? 'border-gold bg-[#1a2a1a] shadow-[0_0_12px_rgba(212,175,55,0.20)]' : isActive ? 'border-gold/50 bg-[#1a2a1a] shadow-[0_0_8px_rgba(212,175,55,0.10)]' : 'border-gold/20 bg-[#1a2a1a]')}>
+              <div key={option.id} className={cn('rounded-sm border-2 transition-all duration-200 overflow-hidden', isActive && packOn ? 'border-gold bg-[#1a2a1a] shadow-[0_0_12px_rgba(212,175,55,0.20)]' : isActive ? 'border-gold/50 bg-[#1a2a1a] shadow-[0_0_8px_rgba(212,175,55,0.10)]' : 'border-gold/20 bg-[#1a2a1a]')}>
                 <div className="flex items-center justify-between px-4 py-3">
                   <div className="flex-1 min-w-0 mr-3">
                     <span className="text-sm font-semibold text-white">{option.label}</span>
@@ -122,14 +122,14 @@ const QuizStepConfig = ({
                     </div>
                   </div>
                   <div className="flex items-center gap-2 flex-shrink-0">
-                    <button onClick={() => setMattressItems(mattressSetQty(mattressItems, option.id, qty - 1))} disabled={qty === 0} className="w-11 h-11 rounded-xl border border-white/20 bg-white/[0.05] text-white font-bold text-xl flex items-center justify-center disabled:opacity-20 active:scale-95 transition-all touch-manipulation hover:border-gold/50">−</button>
+                    <button onClick={() => setMattressItems(mattressSetQty(mattressItems, option.id, qty - 1))} disabled={qty === 0} className="w-11 h-11 rounded-sm border border-white/20 bg-white/[0.05] text-white font-bold text-xl flex items-center justify-center disabled:opacity-20 active:scale-95 transition-all touch-manipulation hover:border-gold/50">−</button>
                     <span className={cn('w-7 text-center font-bold tabular-nums text-base', isActive ? (packOn ? 'text-gold' : 'text-white/80') : 'text-white/30')}>{qty}</span>
-                    <button onClick={() => setMattressItems(mattressSetQty(mattressItems, option.id, qty + 1))} className="w-11 h-11 rounded-xl border border-white/20 bg-white/[0.05] text-white font-bold text-xl flex items-center justify-center active:scale-95 transition-all touch-manipulation hover:border-gold/50">+</button>
+                    <button onClick={() => setMattressItems(mattressSetQty(mattressItems, option.id, qty + 1))} className="w-11 h-11 rounded-sm border border-white/20 bg-white/[0.05] text-white font-bold text-xl flex items-center justify-center active:scale-95 transition-all touch-manipulation hover:border-gold/50">+</button>
                   </div>
                 </div>
                 {isActive && (
                   <div className="px-4 pb-3">
-                    <button onClick={() => setMattressItems(mattressTogglePack(mattressItems, option.id))} className={cn('w-full flex items-center gap-2.5 px-3 py-2 rounded-lg border transition-all duration-200 touch-manipulation', packOn ? 'border-gold/50 bg-gold/[0.08]' : 'border-gold/15 bg-[#1a2a1a] hover:border-gold/40')}>
+                    <button onClick={() => setMattressItems(mattressTogglePack(mattressItems, option.id))} className={cn('w-full flex items-center gap-2.5 px-3 py-2 rounded-sm border transition-all duration-200 touch-manipulation', packOn ? 'border-gold/50 bg-gold/[0.08]' : 'border-gold/15 bg-[#1a2a1a] hover:border-gold/40')}>
                       <Shield className={cn('w-4 h-4 flex-shrink-0', packOn ? 'text-gold' : 'text-white/25')} />
                       <div className="flex-1 text-left">
                         <p className={cn('text-[11px] font-bold leading-none', packOn ? 'text-white' : 'text-white/50')}>{upsellLabel}</p>
@@ -160,7 +160,7 @@ const QuizStepConfig = ({
         <p className="text-gold text-[10px] font-bold tracking-[0.28em] uppercase mb-0.5 text-center w-full">O QUE PRECISA?</p>
         <h2 className="font-playfair text-lg sm:text-xl font-bold text-white text-center w-full">Detalhes do Tapete</h2>
         <div className={cn(
-          'w-full max-w-xs rounded-2xl border px-5 py-4 text-center transition-all duration-300',
+          'w-full max-w-xs rounded-sm border px-5 py-4 text-center transition-all duration-300',
           sob ? 'bg-[#1a2a1a] border-white/20'
             : validArea ? 'bg-[#1a2a1a] border-gold/30 shadow-[0_0_20px_rgba(212,175,55,0.10)]'
             : 'bg-[#1a2a1a] border-gold/15'
@@ -185,7 +185,7 @@ const QuizStepConfig = ({
         <div className="w-full max-w-xs">
           <label className="block text-xs font-bold text-white/40 uppercase tracking-wider text-center mb-1.5">Área total de todos os tapetes</label>
           <div className="relative">
-            <Input type="number" inputMode="decimal" min="0" step="0.5" placeholder="Ex: 12" value={formData.carpetArea} onChange={(e) => updateFormData({ carpetArea: e.target.value })} className={cn('text-lg font-bold bg-[#1a2a1a] text-white placeholder:text-white/25 h-11 pr-12 rounded-xl border-2 transition-all duration-300 focus-visible:ring-0 focus-visible:ring-offset-0', validArea ? 'border-gold shadow-[0_0_12px_rgba(212,175,55,0.18)]' : 'border-gold/25')} />
+            <Input type="number" inputMode="decimal" min="0" step="0.5" placeholder="Ex: 12" value={formData.carpetArea} onChange={(e) => updateFormData({ carpetArea: e.target.value })} className={cn('text-lg font-bold bg-[#1a2a1a] text-white placeholder:text-white/25 h-11 pr-12 rounded-sm border-2 transition-all duration-300 focus-visible:ring-0 focus-visible:ring-offset-0', validArea ? 'border-gold shadow-[0_0_12px_rgba(212,175,55,0.18)]' : 'border-gold/25')} />
             <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-sm font-bold text-gold/60 pointer-events-none">m²</span>
           </div>
           <p className="text-xs text-white/35 text-center mt-1 leading-snug">Se tiver vários tapetes, insira a soma total das áreas.</p>
@@ -230,7 +230,7 @@ const QuizStepConfig = ({
         <p className="text-gold text-[10px] font-bold tracking-[0.28em] uppercase mb-0.5 text-center w-full">O QUE PRECISA?</p>
         <h2 className="font-playfair text-lg sm:text-xl font-bold text-white text-center w-full">Detalhes das Cadeiras</h2>
         <div className={cn(
-          'w-full max-w-xs rounded-2xl border px-5 py-4 text-center transition-all duration-300',
+          'w-full max-w-xs rounded-sm border px-5 py-4 text-center transition-all duration-300',
           sob ? 'bg-[#1a2a1a] border-white/20' : 'bg-[#1a2a1a] border-gold/30 shadow-[0_0_20px_rgba(212,175,55,0.10)]'
         )}>
           <p className="text-[10px] text-white/35 uppercase tracking-wider mb-1">Estimativa total</p>
@@ -251,12 +251,12 @@ const QuizStepConfig = ({
           <button
             onClick={() => setChairQty(qty - 1)}
             disabled={qty <= 1}
-            className="w-14 h-14 rounded-2xl border-2 border-white/20 bg-white/[0.05] text-white font-bold text-2xl flex items-center justify-center disabled:opacity-25 active:scale-95 transition-all touch-manipulation hover:border-gold/50"
+            className="w-14 h-14 rounded-sm border-2 border-white/20 bg-white/[0.05] text-white font-bold text-2xl flex items-center justify-center disabled:opacity-25 active:scale-95 transition-all touch-manipulation hover:border-gold/50"
           >−</button>
           <span className="text-4xl font-black text-gold w-10 text-center tabular-nums leading-none">{qty}</span>
           <button
             onClick={() => setChairQty(qty + 1)}
-            className="w-14 h-14 rounded-2xl border-2 border-white/20 bg-white/[0.05] text-white font-bold text-2xl flex items-center justify-center active:scale-95 transition-all touch-manipulation hover:border-gold/50"
+            className="w-14 h-14 rounded-sm border-2 border-white/20 bg-white/[0.05] text-white font-bold text-2xl flex items-center justify-center active:scale-95 transition-all touch-manipulation hover:border-gold/50"
           >+</button>
         </div>
         {!sob && (
@@ -270,7 +270,7 @@ const QuizStepConfig = ({
           <button
             onClick={toggleAddon}
             className={cn(
-              'w-full max-w-xs flex items-center gap-3 px-4 py-3 rounded-xl border-2 transition-all touch-manipulation',
+              'w-full max-w-xs flex items-center gap-3 px-4 py-3 rounded-sm border-2 transition-all touch-manipulation',
               addonEnabled
                 ? 'border-gold bg-[#1a2a1a] shadow-[0_0_10px_rgba(212,175,55,0.15)]'
                 : 'border-gold/20 bg-[#1a2a1a] hover:border-gold/40'

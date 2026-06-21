@@ -1,6 +1,5 @@
 import { useRef } from 'react';
 import { MapPin } from 'lucide-react';
-import { cn } from '@/lib/utils';
 import { locationPrices } from '@/components/quiz/QuizTypes';
 
 interface QuizStepLocationProps {
@@ -30,10 +29,10 @@ const QuizStepLocation = ({
         <>
           <p className="text-gold text-[10px] font-bold tracking-[0.28em] uppercase mb-1">LOCALIZAÇÃO</p>
           <h2 className="font-playfair text-lg sm:text-2xl font-bold text-white mb-1 leading-tight">
-            Onde está localizado?
+            Vamos até si.
           </h2>
           <p className="text-[11px] text-white/35 mb-3">
-            Para calcular deslocação e disponibilidade.
+            Diga-nos onde está e calculamos disponibilidade e preço.
           </p>
         </>
       )}
@@ -45,7 +44,7 @@ const QuizStepLocation = ({
             <input
               ref={locationInputRef}
               type="text"
-              placeholder="Pesquisar outra cidade..."
+              placeholder="A sua cidade..."
               value={locationQuery}
               onChange={(e) => {
                 setLocationQuery(e.target.value);
@@ -65,46 +64,6 @@ const QuizStepLocation = ({
               className="w-full h-12 pl-9 pr-4 text-sm bg-[#1a2a1a] border border-gold/20 focus:border-gold focus:outline-none rounded-xl transition-colors text-white placeholder:text-white/30"
             />
           </div>
-
-          {!locationQuery && (
-            <div className="flex flex-col gap-2">
-              {[
-                { city: 'Porto',  img: '/cities/porto.webp'  },
-                { city: 'Lisboa', img: '/cities/lisboa.webp' },
-                { city: 'Braga',  img: '/cities/braga.webp'  },
-              ].map(({ city, img }) => {
-                const isSelected = location === city;
-                return (
-                  <button
-                    key={city}
-                    onClick={() => {
-                      setLocationQuery(city);
-                      onCitySelect(city);
-                    }}
-                    className={cn(
-                      'relative w-full h-[92px] sm:h-[104px] rounded-2xl overflow-hidden transition-all duration-200 touch-manipulation active:scale-[0.98]',
-                      isSelected
-                        ? 'ring-[3px] ring-gold shadow-[0_0_28px_rgba(212,175,55,0.50)]'
-                        : 'hover:ring-2 hover:ring-gold/40 shadow-[0_2px_12px_rgba(0,0,0,0.4)]'
-                    )}
-                  >
-                    <img src={img} alt={city} className="absolute inset-0 w-full h-full object-cover" />
-                    <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-black/45 to-black/80" />
-                    {isSelected && <div className="absolute top-0 inset-x-0 h-[2px] bg-gradient-to-r from-transparent via-gold to-transparent" />}
-                    <div className="relative z-10 flex flex-col items-center justify-center h-full gap-1">
-                      <span className="font-playfair text-2xl font-bold text-white" style={{ textShadow: '0 1px 8px rgba(0,0,0,0.8)' }}>{city}</span>
-                      <span className={cn(
-                        'text-[11px] font-semibold drop-shadow-sm px-2.5 py-0.5 rounded-full',
-                        locationPrices[city] === 0 ? 'text-gold/90 bg-gold/10' : 'text-white/65'
-                      )}>
-                        {locationPrices[city] === 0 ? 'Deslocação incluída' : `+${locationPrices[city]}€ deslocação`}
-                      </span>
-                    </div>
-                  </button>
-                );
-              })}
-            </div>
-          )}
 
           {locationQuery.length >= 1 && (() => {
             const q = locationQuery.toLowerCase();

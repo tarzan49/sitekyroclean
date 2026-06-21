@@ -105,7 +105,7 @@ const ServiceEliteGuarantee = ({
                     />
                     <div
                       className="absolute inset-0"
-                      style={{ background: "linear-gradient(160deg, rgba(7,26,18,0.35) 0%, rgba(7,26,18,0.82) 100%)" }}
+                      style={{ background: "linear-gradient(to bottom, rgba(7,26,18,0.82) 0%, rgba(7,26,18,0.55) 55%, rgba(7,26,18,0.82) 100%)" }}
                     />
                   </>
                 )}

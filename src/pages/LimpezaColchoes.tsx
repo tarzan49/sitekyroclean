@@ -21,16 +21,19 @@ const colchoesGuarantee: GuaranteeItem[] = [
     label: "Satisfação",
     title: "Resultado visível ou repetimos",
     body: "Se a higienização não trouxer uma diferença clara, voltamos sem qualquer custo. Comprometemo-nos com o resultado, não apenas com o processo.",
+    image: "/images/colchoes/v4.png",
   },
   {
     label: "Higiene",
     title: "Eliminação profunda de ácaros",
     body: "Temperatura, pressão e produtos combinados garantem a eliminação de ácaros, fungos e bactérias em profundidade, não apenas na superfície do tecido.",
+    image: "/images/colchoes/v5.png",
   },
   {
     label: "Segurança",
     title: "Pode dormir logo a seguir",
     body: "Produtos hipoalergénicos sem resíduos tóxicos. O colchão fica seguro para crianças e pessoas com alergias desde a primeira noite após a secagem.",
+    image: colchaoResultado,
   },
 ];
 
@@ -82,7 +85,7 @@ const LimpezaColchoes = () => {
           beforeImage={colchaoDepois}
           afterImage={colchaoAntes}
           slides={[
-            { src: colchaoResultado, label: "Pormenor" },
+            { src: '/images/colchoes/v3.png', label: "Pormenor" },
             { src: colchaoProcesso, label: "Extração Profissional" },
           ]}
           variant="dark"
