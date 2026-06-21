@@ -1,6 +1,16 @@
 // Location × Service SEO data for long-tail keyword targeting
 // Each city × service combination has unique content to avoid duplicate content penalties
-import { locationPrices } from '@/components/quiz/QuizTypes';
+// locationPrices duplicado aqui (sem import @/) para compatibilidade com scripts/prerender.ts (Node.js sem alias Vite)
+const locationPrices: Record<string, number> = {
+  'Porto': 0, 'Matosinhos': 0,
+  'Vila Nova de Gaia': 5, 'Maia': 5, 'Gondomar': 5,
+  'Valongo': 10, 'Espinho': 10, 'Póvoa de Varzim': 10, 'Vila do Conde': 10,
+  'Santo Tirso': 10, 'Trofa': 10, 'Paredes': 10,
+  'Penafiel': 15, 'Paços de Ferreira': 15, 'Felgueiras': 15, 'Lousada': 15,
+  'Arouca': 20, 'Braga': 20, 'Aveiro': 20,
+  'Guimarães': 25,
+  'Lisboa': 35, 'Cascais': 35, 'Oeiras': 35, 'Sintra': 35, 'Almada': 35, 'Setúbal': 40,
+};
 
 export interface LocationService {
   slug: string;
