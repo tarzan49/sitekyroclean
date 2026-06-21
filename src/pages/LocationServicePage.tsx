@@ -376,7 +376,7 @@ const LocationServicePage = () => {
                                   type="button"
                                   onClick={() => setChaiseLongueAddon(v => Math.max(0, v - 1))}
                                   className="w-10 h-10 flex items-center justify-center transition-all active:scale-95"
-                                  style={{ background: active ? "#071a12" : "#f0f0eb", color: active ? "white" : "rgba(17,17,17,0.40)" }}
+                                  style={{ background: "#071a12", color: "white", opacity: active ? 1 : 0, pointerEvents: active ? 'auto' : 'none' }}
                                   aria-label="Remover chaise longue"
                                 >
                                   <Minus className="w-4 h-4" />
@@ -469,8 +469,8 @@ const LocationServicePage = () => {
                                 onClick={() => adjustRowQty(i, -1)}
                                 disabled={qty === 0}
                                 aria-label="Diminuir"
-                                className="w-10 h-10 flex items-center justify-center transition-all active:scale-95 disabled:opacity-25"
-                                style={{ background: qty > 0 ? "#071a12" : "#f0f0eb", color: qty > 0 ? "white" : "rgba(17,17,17,0.40)" }}
+                                className="w-10 h-10 flex items-center justify-center transition-all active:scale-95"
+                                style={{ background: "#071a12", color: "white", opacity: qty > 0 ? 1 : 0, pointerEvents: qty > 0 ? 'auto' : 'none' }}
                               >
                                 <Minus className="w-4 h-4" />
                               </button>

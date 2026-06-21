@@ -7,8 +7,8 @@ import { useQuizLauncher } from "@/hooks/use-quiz-launcher";
 
 const QuizForm = lazy(() => import('./QuizFormLazy'));
 
-const imgDesktop = '/images/fotos%20hero/hero-veludo.png';
-const imgMobile  = '/images/fotos%20hero/hero-veludo.png';
+const imgDesktop = '/images/hero-sofa-v1.jpeg';
+const imgMobile  = '/images/hero-sofa-v1.jpeg';
 
 const STATS = [
   { value: '+1200', label: 'serviços realizados' },

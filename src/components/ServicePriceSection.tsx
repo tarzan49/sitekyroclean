@@ -166,7 +166,7 @@ export default function ServicePriceSection({ serviceSlug }: Props) {
                           onClick={() => setChaiseLongueAddon(v => Math.max(0, v - 1))}
                           aria-label="Remover"
                           className="w-10 h-10 flex items-center justify-center transition-all active:scale-95"
-                          style={{ background: active ? "#071a12" : "#f0f0eb", color: active ? "white" : "rgba(17,17,17,0.40)" }}
+                          style={{ background: "#071a12", color: "white", opacity: active ? 1 : 0, pointerEvents: active ? 'auto' : 'none' }}
                         >
                           <Minus className="w-4 h-4" />
                         </button>
