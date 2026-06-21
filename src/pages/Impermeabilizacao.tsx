@@ -19,7 +19,7 @@ const impermeabilizacaoGuarantee: GuaranteeItem[] = [
     label: "Eficácia",
     title: "Proteção testada, comprovada",
     body: "Cada aplicação é verificada com teste de repelência no final do processo. Só saímos quando a barreira está ativa e uniforme em toda a superfície tratada.",
-    image: "/images/impermeabilizacao/v1.png",
+    image: "/images/impermeabilizacao/v5.png",
   },
   {
     label: "Durabilidade",

@@ -316,7 +316,7 @@ const LocationServicePage = () => {
         {PRICE_TABLE[data.serviceSlug] && (
           <section className="py-14 md:py-20 bg-[#FDFDF9]">
             <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
-              <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
+              <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-start">
                 <div>
                   <SectionHeader
                     overline="Tabela de Preços"
@@ -325,60 +325,78 @@ const LocationServicePage = () => {
                     subtitle={`Preços fixos e transparentes, sem surpresas. ${(locationPrices[data.city] ?? 0) === 0 ? `Deslocação incluída em toda a área de ${data.city}.` : `Deslocação +${locationPrices[data.city]}€ a ${data.city}.`} Orçamento gratuito antes de qualquer compromisso.`}
                   />
                 </div>
-                <div className="rounded-2xl overflow-hidden" style={{ boxShadow: "0 8px 40px rgba(7,26,18,0.18), 0 2px 10px rgba(7,26,18,0.10)" }}>
-                  {/* ── Header verde ── */}
-                  <div className="px-6 py-5" style={{ background: "#071a12" }}>
-                    <div className="flex items-center gap-2 mb-1.5">
-                      <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: "#25D366" }} />
-                      <p className="text-[9px] font-bold tracking-[0.26em] uppercase" style={{ color: "rgba(255,255,255,0.45)" }}>Orçamento Gratuito</p>
+                <div className="overflow-hidden" style={{ boxShadow: "0 12px 50px rgba(7,26,18,0.16), 0 2px 8px rgba(7,26,18,0.08)" }}>
+                  {/* ── Header escuro ── */}
+                  <div className="px-6 py-6" style={{ background: "#071a12" }}>
+                    <div className="flex items-start justify-between mb-3">
+                      <div className="flex items-center gap-2">
+                        <span className="w-2 h-2 rounded-full" style={{ background: "#25D366" }} />
+                        <p className="text-[9px] font-bold tracking-[0.28em] uppercase" style={{ color: "rgba(255,255,255,0.40)" }}>Orçamento Gratuito</p>
+                      </div>
+                      <span className="text-[10px] font-semibold px-2 py-0.5" style={{ background: "rgba(212,175,55,0.12)", color: "#D4AF37" }}>Sem compromisso</span>
                     </div>
-                    <p className="text-white font-semibold text-sm leading-snug">Escolha as quantidades e continue para o orçamento</p>
-                    <p className="text-xs mt-0.5" style={{ color: "rgba(255,255,255,0.38)" }}>Sem compromisso · Resposta em menos de 30 min</p>
-                    {(() => {
-                      const fee = locationPrices[data.city] ?? 0;
-                      return (
-                        <p className="text-[10px] mt-2.5 pt-2.5" style={{ borderTop: "1px solid rgba(255,255,255,0.07)", color: fee === 0 ? "rgba(37,211,102,0.60)" : "rgba(255,255,255,0.28)" }}>
-                          {fee === 0 ? `Deslocação incluída em ${data.city}` : `+${fee}€ deslocação a ${data.city}`}
-                        </p>
-                      );
-                    })()}
+                    <h3 className="font-playfair text-xl font-bold text-white leading-snug mb-1">
+                      Calcule o seu preço agora
+                    </h3>
+                    <p className="text-xs" style={{ color: "rgba(255,255,255,0.38)" }}>
+                      Resposta em menos de 30 min · Deslocação ao domicílio
+                    </p>
+                    <div className="mt-3 pt-3" style={{ borderTop: "1px solid rgba(255,255,255,0.07)" }}>
+                      {(() => {
+                        const fee = locationPrices[data.city] ?? 0;
+                        return (
+                          <p className="text-[10px]" style={{ color: fee === 0 ? "rgba(37,211,102,0.60)" : "rgba(255,255,255,0.26)" }}>
+                            {fee === 0 ? `Deslocação incluída em ${data.city}` : `+${fee}€ deslocação a ${data.city}`}
+                          </p>
+                        );
+                      })()}
+                    </div>
                   </div>
 
                   {/* ── Linhas de preço com steppers ── */}
-                  <div className="bg-white px-5 pt-1">
-                    <div className="divide-y" style={{ borderColor: "rgba(17,17,17,0.06)" }}>
-                      {PRICE_TABLE[data.serviceSlug].map((row, i) => {
+                  <div className="bg-white">
+                    {PRICE_TABLE[data.serviceSlug].map((row, i) => {
                         const quizConfig = PRICE_TABLE_QUIZ_CONFIG[data.serviceSlug]?.[i] ?? null;
 
                         // Chaise longue add-on row (null config) — stepper próprio
                         if (!quizConfig) {
+                          const active = chaiseLongueAddon > 0;
                           return (
-                            <div key={i} className="flex items-center gap-3 py-3.5">
-                              <div
-                                className="flex items-center gap-0.5 rounded-full border px-1 py-1 flex-shrink-0"
-                                style={{ borderColor: "rgba(7,26,18,0.15)" }}
-                              >
+                            <div
+                              key={i}
+                              className="flex items-center gap-4 px-5 py-4 border-b transition-all duration-200"
+                              style={{
+                                borderBottomColor: "rgba(17,17,17,0.06)",
+                                borderLeft: active ? "3px solid #D4AF37" : "3px solid transparent",
+                                background: active ? "rgba(212,175,55,0.03)" : "transparent",
+                              }}
+                            >
+                              <div className="flex items-center gap-1 flex-shrink-0">
                                 <button
                                   type="button"
                                   onClick={() => setChaiseLongueAddon(v => Math.max(0, v - 1))}
-                                  className="w-9 h-9 flex items-center justify-center rounded-full text-[#111111]/40 hover:bg-[rgba(7,26,18,0.08)] transition-colors"
+                                  className="w-10 h-10 flex items-center justify-center transition-all active:scale-95"
+                                  style={{ background: active ? "#071a12" : "#f0f0eb", color: active ? "white" : "rgba(17,17,17,0.40)" }}
                                   aria-label="Remover chaise longue"
                                 >
                                   <Minus className="w-4 h-4" />
                                 </button>
-                                <span className="w-7 text-center font-playfair text-lg font-bold tabular-nums text-[#111111]">{chaiseLongueAddon}</span>
+                                <span
+                                  className="w-8 text-center font-playfair text-xl font-bold tabular-nums"
+                                  style={{ color: active ? "#D4AF37" : "rgba(17,17,17,0.20)" }}
+                                >{chaiseLongueAddon}</span>
                                 <button
                                   type="button"
                                   onClick={() => setChaiseLongueAddon(v => Math.min(1, v + 1))}
-                                  className="w-9 h-9 flex items-center justify-center rounded-full text-[#111111]/40 hover:bg-[rgba(7,26,18,0.08)] transition-colors"
+                                  className="w-10 h-10 flex items-center justify-center transition-all active:scale-95"
+                                  style={{ background: "#071a12", color: "white" }}
                                   aria-label="Adicionar chaise longue"
                                 >
                                   <Plus className="w-4 h-4" />
                                 </button>
                               </div>
-                              <span className="text-[#111111]/70" style={{ fontSize: "14px" }}>{row.item}</span>
-                              <span className="flex-1 border-b border-dotted mb-0.5" style={{ borderColor: "rgba(17,17,17,0.12)" }} />
-                              <span className="font-playfair font-bold text-xl tabular-nums" style={{ color: "#D4AF37" }}>{row.price}</span>
+                              <span className="flex-1 text-sm font-medium" style={{ color: active ? "#111111" : "rgba(17,17,17,0.55)" }}>{row.item}</span>
+                              <span className="font-playfair text-xl font-bold tabular-nums flex-shrink-0" style={{ color: active ? "#D4AF37" : "rgba(17,17,17,0.25)" }}>{row.price}</span>
                             </div>
                           );
                         }
@@ -398,7 +416,15 @@ const LocationServicePage = () => {
 
                         if (isCarpet) {
                           return (
-                            <div key={i} className="py-3.5 space-y-1.5">
+                            <div
+                              key={i}
+                              className="px-5 py-4 border-b transition-all duration-200"
+                              style={{
+                                borderBottomColor: "rgba(17,17,17,0.06)",
+                                borderLeft: qty > 0 ? "3px solid #D4AF37" : "3px solid transparent",
+                                background: qty > 0 ? "rgba(212,175,55,0.03)" : "transparent",
+                              }}
+                            >
                               <div className="flex items-center gap-3">
                                 <input
                                   type="number" min={0} max={isAlcatifa ? 50 : 20}
@@ -407,14 +433,20 @@ const LocationServicePage = () => {
                                     const v = parseFloat(e.target.value) || 0;
                                     setRowQuantities(prev => ({ ...prev, [i]: Math.max(0, v) }));
                                   }}
-                                  className="w-20 text-center font-playfair text-lg font-bold rounded-xl border px-2 py-1.5 outline-none focus:border-gold transition-colors"
-                                  style={{ borderColor: qty > 0 ? "rgba(212,175,55,0.5)" : "rgba(7,26,18,0.15)", color: qty > 0 ? "#D4AF37" : "#111111" }}
+                                  className="w-20 text-center font-playfair text-xl font-bold outline-none transition-colors"
+                                  style={{
+                                    borderBottom: `2px solid ${qty > 0 ? "#D4AF37" : "rgba(17,17,17,0.20)"}`,
+                                    color: qty > 0 ? "#D4AF37" : "#111111",
+                                    background: "transparent",
+                                  }}
                                 />
-                                <span className="text-[#111111]/55 text-sm">m²</span>
-                                <span className="flex-1 border-b border-dotted mb-0.5" style={{ borderColor: "rgba(17,17,17,0.12)" }} />
-                                {dynamicPrice !== null && <span className="font-playfair font-bold text-xl tabular-nums" style={{ color: "#D4AF37" }}>{dynamicPrice}</span>}
+                                <span className="text-sm font-medium" style={{ color: "rgba(17,17,17,0.50)" }}>m²</span>
+                                <span className="flex-1" />
+                                {dynamicPrice !== null && (
+                                  <span className="font-playfair text-xl font-bold tabular-nums" style={{ color: qty > 0 ? "#D4AF37" : "rgba(17,17,17,0.25)" }}>{dynamicPrice}</span>
+                                )}
                               </div>
-                              <p className="text-[11px] ml-1" style={{ color: "rgba(17,17,17,0.38)" }}>
+                              <p className="text-[11px] mt-1.5" style={{ color: "rgba(17,17,17,0.35)" }}>
                                 {isAlcatifa ? 'até 50m²: 3€/m² · +50m²: sob orçamento' : '≤5m²: 10€/m² · ≤10m²: 8€/m² · ≤15m²: 7€/m² · +15m²: sob orçamento'}
                               </p>
                             </div>
@@ -422,73 +454,145 @@ const LocationServicePage = () => {
                         }
 
                         return (
-                          <div key={i} className="flex items-center gap-3 py-3">
-                            <div className="flex items-center gap-0.5 rounded-full border px-1 py-1 flex-shrink-0" style={{ borderColor: qty > 0 ? "rgba(212,175,55,0.5)" : "rgba(7,26,18,0.15)" }}>
-                              <button type="button" onClick={() => adjustRowQty(i, -1)} className="w-9 h-9 flex items-center justify-center rounded-full text-[#111111]/40 hover:bg-[rgba(7,26,18,0.08)] transition-colors" aria-label="Diminuir"><Minus className="w-4 h-4" /></button>
-                              <span className="w-7 text-center font-playfair text-lg font-bold tabular-nums" style={{ color: qty > 0 ? "#D4AF37" : "#111111" }}>{qty}</span>
-                              <button type="button" onClick={() => adjustRowQty(i, 1)} className="w-9 h-9 flex items-center justify-center rounded-full text-[#111111]/40 hover:bg-[rgba(7,26,18,0.08)] transition-colors" aria-label="Aumentar"><Plus className="w-4 h-4" /></button>
+                          <div
+                            key={i}
+                            className="flex items-center gap-4 px-5 py-4 border-b transition-all duration-200"
+                            style={{
+                              borderBottomColor: "rgba(17,17,17,0.06)",
+                              borderLeft: qty > 0 ? "3px solid #D4AF37" : "3px solid transparent",
+                              background: qty > 0 ? "rgba(212,175,55,0.03)" : "transparent",
+                            }}
+                          >
+                            <div className="flex items-center gap-1 flex-shrink-0">
+                              <button
+                                type="button"
+                                onClick={() => adjustRowQty(i, -1)}
+                                disabled={qty === 0}
+                                aria-label="Diminuir"
+                                className="w-10 h-10 flex items-center justify-center transition-all active:scale-95 disabled:opacity-25"
+                                style={{ background: qty > 0 ? "#071a12" : "#f0f0eb", color: qty > 0 ? "white" : "rgba(17,17,17,0.40)" }}
+                              >
+                                <Minus className="w-4 h-4" />
+                              </button>
+                              <span
+                                className="w-8 text-center font-playfair text-xl font-bold tabular-nums"
+                                style={{ color: qty > 0 ? "#D4AF37" : "rgba(17,17,17,0.20)" }}
+                              >{qty}</span>
+                              <button
+                                type="button"
+                                onClick={() => adjustRowQty(i, 1)}
+                                aria-label="Aumentar"
+                                className="w-10 h-10 flex items-center justify-center transition-all active:scale-95"
+                                style={{ background: "#071a12", color: "white" }}
+                              >
+                                <Plus className="w-4 h-4" />
+                              </button>
                             </div>
-                            <span className="transition-colors" style={{ fontSize: "14px", color: qty > 0 ? "#111111" : "rgba(17,17,17,0.55)" }}>{row.item}</span>
-                            <span className="flex-1 border-b border-dotted mb-0.5" style={{ borderColor: "rgba(17,17,17,0.12)" }} />
-                            {dynamicPrice !== null && <span className="font-playfair font-bold text-xl tabular-nums" style={{ color: "#D4AF37" }}>{dynamicPrice}</span>}
+                            <span className="flex-1 text-sm font-medium transition-colors" style={{ color: qty > 0 ? "#111111" : "rgba(17,17,17,0.55)" }}>{row.item}</span>
+                            {dynamicPrice !== null && (
+                              <span className="font-playfair text-xl font-bold tabular-nums flex-shrink-0" style={{ color: qty > 0 ? "#D4AF37" : "rgba(17,17,17,0.25)" }}>{dynamicPrice}</span>
+                            )}
                           </div>
                         );
                       })}
-                    </div>
 
-                    {/* ── Footer: deslocação + total + botão Continuar ── */}
-                    <div className="pt-3 pb-5 border-t space-y-3" style={{ borderColor: "rgba(17,17,17,0.07)" }}>
-                      {(() => {
-                        const fee = locationPrices[data.city] ?? 0;
-                        return (
+                    {/* Discount bar */}
+                    {(() => {
+                      const total = calcWidgetTotal(data.serviceSlug, rowQuantities, chaiseLongueAddon);
+                      const reached = total >= WIDGET_DISCOUNT_THRESHOLD;
+                      const pct = Math.min(100, (total / WIDGET_DISCOUNT_THRESHOLD) * 100);
+                      const remaining = Math.ceil(WIDGET_DISCOUNT_THRESHOLD - total);
+                      return (
+                        <div className="px-5 py-3 border-t" style={{ borderColor: "rgba(17,17,17,0.07)" }}>
+                          {reached ? (
+                            <div className="flex items-center justify-between">
+                              <span className="text-xs font-semibold" style={{ color: "#D4AF37" }}>10% de desconto ativo</span>
+                              <span className="text-[10px] px-2 py-0.5 font-bold" style={{ background: "rgba(212,175,55,0.12)", color: "#D4AF37" }}>-10%</span>
+                            </div>
+                          ) : (
+                            <>
+                              <div className="flex items-center justify-between mb-1.5">
+                                <span className="text-[11px]" style={{ color: "rgba(17,17,17,0.45)" }}>
+                                  {total > 0 ? <><span className="font-semibold" style={{ color: "#111111" }}>Faltam {remaining}€</span> para 10% de desconto</> : 'Adicione 149€+ e poupe 10% em tudo'}
+                                </span>
+                                {total > 0 && <span className="text-[11px] font-semibold" style={{ color: "rgba(17,17,17,0.40)" }}>{total}€ / {WIDGET_DISCOUNT_THRESHOLD}€</span>}
+                              </div>
+                              <div className="h-1.5 overflow-hidden" style={{ background: "rgba(17,17,17,0.07)" }}>
+                                <div
+                                  className="h-full transition-all duration-500"
+                                  style={{ width: `${Math.max(pct, total > 0 ? 4 : 0)}%`, background: "linear-gradient(90deg,#B8912A,#EDD96A)" }}
+                                />
+                              </div>
+                            </>
+                          )}
+                        </div>
+                      );
+                    })()}
+
+                    {/* Total + CTA */}
+                    {(() => {
+                      const total = calcWidgetTotal(data.serviceSlug, rowQuantities, chaiseLongueAddon);
+                      const discountActive = total >= WIDGET_DISCOUNT_THRESHOLD;
+                      const discountedTotal = Math.round(total * 0.9);
+                      const fee = locationPrices[data.city] ?? 0;
+                      return (
+                        <div className="bg-white px-5 pt-3 pb-5 space-y-3">
+                          {/* Deslocação */}
                           <div className="flex items-center gap-1.5">
-                            <CheckCircle className="w-3.5 h-3.5 flex-shrink-0" style={{ color: fee === 0 ? "#25D366" : "rgba(17,17,17,0.25)" }} />
+                            <CheckCircle className="w-3.5 h-3.5" style={{ color: fee === 0 ? "#25D366" : "rgba(17,17,17,0.25)" }} />
                             <span className="text-xs" style={{ color: "rgba(17,17,17,0.45)" }}>
                               {fee === 0 ? `Deslocação incluída em ${data.city}` : `+${fee}€ deslocação a ${data.city}`}
                             </span>
                           </div>
-                        );
-                      })()}
-                      {(() => {
-                        const total = calcWidgetTotal(data.serviceSlug, rowQuantities, chaiseLongueAddon);
-                        const discountActive = total >= WIDGET_DISCOUNT_THRESHOLD;
-                        const progress = Math.min(100, (total / WIDGET_DISCOUNT_THRESHOLD) * 100);
-                        const remaining = Math.ceil(WIDGET_DISCOUNT_THRESHOLD - total);
-                        const discountedTotal = Math.round(total * 0.9);
-                        return (
-                          <div className="space-y-2">
-                            {!discountActive && (
+
+                          {/* Total block */}
+                          {total > 0 && (
+                            <div
+                              className="flex items-center justify-between px-5 py-4 transition-all duration-300"
+                              style={{ background: discountActive ? "rgba(212,175,55,0.08)" : "#071a12" }}
+                            >
                               <div>
-                                <div className="flex justify-between text-xs mb-1" style={{ color: "rgba(17,17,17,0.40)" }}>
-                                  <span>{total > 0 ? `Faltam ${remaining}€ para 10% de desconto` : `A partir de ${WIDGET_DISCOUNT_THRESHOLD}€ tem 10% de desconto`}</span>
-                                  {total > 0 && <span>{total}€ / {WIDGET_DISCOUNT_THRESHOLD}€</span>}
-                                </div>
-                                <div className="h-1.5 rounded-full overflow-hidden" style={{ background: "rgba(17,17,17,0.08)" }}>
-                                  <div className="h-full rounded-full transition-all duration-300" style={{ width: `${progress}%`, background: "linear-gradient(90deg,#C9A84C,#EDD96A)" }} />
-                                </div>
+                                <p
+                                  className="text-[10px] font-bold tracking-[0.18em] uppercase mb-0.5"
+                                  style={{ color: discountActive ? "rgba(17,17,17,0.50)" : "rgba(255,255,255,0.40)" }}
+                                >
+                                  {discountActive ? "Total com desconto" : "Total estimado"}
+                                </p>
+                                {discountActive && (
+                                  <p className="text-xs line-through" style={{ color: "rgba(17,17,17,0.35)" }}>{total}€</p>
+                                )}
                               </div>
-                            )}
-                            {total > 0 && (
-                              <div className="flex items-center justify-between rounded-xl px-4 py-3" style={{ background: discountActive ? "rgba(212,175,55,0.09)" : "rgba(17,17,17,0.03)" }}>
-                                <span className="text-sm font-medium" style={{ color: "#111111" }}>{discountActive ? "10% de desconto ativado!" : "Total estimado"}</span>
-                                <div className="flex items-baseline gap-2">
-                                  {discountActive && <span className="text-xs line-through" style={{ color: "rgba(17,17,17,0.35)" }}>{total}€</span>}
-                                  <span className="font-playfair font-bold text-xl" style={{ color: "#D4AF37" }}>{discountActive ? discountedTotal : total}€</span>
-                                </div>
-                              </div>
-                            )}
-                          </div>
-                        );
-                      })()}
-                      <button
-                        type="button"
-                        onClick={handlePriceTableContinue}
-                        className="w-full py-3.5 font-semibold text-[13px] tracking-[0.16em] uppercase transition-all active:scale-[0.98]"
-                        style={{ background: "linear-gradient(135deg, #C9A84C 0%, #EDD96A 50%, #C9A84C 100%)", color: "#071a12", boxShadow: "0 4px 20px rgba(212,175,55,0.35)" }}
-                      >
-                        Continuar para o orçamento →
-                      </button>
-                    </div>
+                              <span
+                                className="font-playfair font-bold tabular-nums"
+                                style={{ fontSize: "2rem", lineHeight: 1, color: "#D4AF37" }}
+                              >
+                                {discountActive ? discountedTotal : total}€
+                              </span>
+                            </div>
+                          )}
+
+                          {/* CTA */}
+                          <button
+                            type="button"
+                            onClick={handlePriceTableContinue}
+                            className="w-full h-14 flex items-center justify-center gap-3 font-bold text-[13px] tracking-[0.18em] uppercase transition-all active:scale-[0.98]"
+                            style={{
+                              background: "linear-gradient(135deg, #B8912A 0%, #EDD96A 50%, #B8912A 100%)",
+                              color: "#071a12",
+                              boxShadow: total > 0 ? "0 6px 28px rgba(212,175,55,0.45)" : "none",
+                              opacity: total > 0 ? 1 : 0.6,
+                            }}
+                          >
+                            Continuar para o orçamento
+                            <ArrowRight className="w-4 h-4 flex-shrink-0" />
+                          </button>
+
+                          <p className="text-center text-[10px]" style={{ color: "rgba(17,17,17,0.35)" }}>
+                            Sem cartão · Sem compromisso · 100% gratuito
+                          </p>
+                        </div>
+                      );
+                    })()}
                   </div>
                 </div>
               </div>
