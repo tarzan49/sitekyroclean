@@ -8,11 +8,47 @@ import { PRICE_TABLE, PRICE_TABLE_QUIZ_CONFIG, type PriceRowQuizConfig } from "@
 import { PRICE_HEADING_VERB } from "@/constants/problemCardHelpers";
 import { cn } from "@/lib/utils";
 
-const TRUST_BULLETS = [
-  "Preço confirmado antes de qualquer intervenção",
-  "Sem deslocações desnecessárias — fazemos tudo ao domicílio",
-  "Cancele ou remarque sem custos",
-];
+const SERVICE_POINTS: Record<string, { stat?: string; title: string; desc: string }[]> = {
+  'limpeza-sofas': [
+    { stat: '4–6h', title: 'Seco e pronto a usar', desc: 'O sofá fica pronto no próprio dia. Sem esperas, sem mudanças em casa.' },
+    { stat: '99%', title: 'Ácaros e alérgenos eliminados', desc: 'Extração a quente remove o que o aspirador nunca atinge.' },
+    { title: 'Resultado visível ou voltamos', desc: 'Se não ficar uma diferença clara, repetimos sem qualquer custo.' },
+  ],
+  'limpeza-colchoes': [
+    { stat: '99%', title: 'Ácaros e fungos eliminados', desc: 'Higienização profunda que vai além da superfície do tecido.' },
+    { title: 'Seguro para crianças e alérgicos', desc: 'Produtos hipoalergénicos sem resíduos. Pode dormir logo a seguir.' },
+    { stat: '<4h', title: 'Seco no mesmo dia', desc: 'Extração de alta potência. Pronto para usar no próprio dia da visita.' },
+  ],
+  'limpeza-tapetes': [
+    { title: 'Cores e fibras revitalizadas', desc: 'Protocolo adaptado ao tipo de fibra — sem risco de encolhimento ou desbotamento.' },
+    { title: 'Odores eliminados na raiz', desc: 'Enzimas de última geração destroem os compostos orgânicos, não os mascaram.' },
+    { title: 'Serviço ao domicílio, sem recolha', desc: 'O tapete é tratado no seu espaço. Sem deslocações, sem espera.' },
+  ],
+  'limpeza-cadeiras': [
+    { title: 'Protocolo específico por material', desc: 'Veludo, couro, linho ou tecido: nunca usamos um produto genérico.' },
+    { title: 'Cada costura, cada dobra', desc: 'Bicos específicos para zonas de difícil acesso onde se acumula gordura e bactérias.' },
+    { stat: '3–6h', title: 'Prontas a usar', desc: 'Resultado visível no próprio dia, sem paralisar o espaço.' },
+  ],
+  'limpeza-alcatifas': [
+    { title: 'Metro a metro, sem exceção', desc: 'Mapeamos e dividimos em zonas — nenhum centímetro fica sem extração profissional.' },
+    { stat: '<6h', title: 'Transitável rapidamente', desc: 'Equipamento de alta extração minimiza a humidade residual.' },
+    { title: 'Alergénios e ácaros eliminados', desc: 'Tratamento em profundidade para ambientes mais saudáveis.' },
+  ],
+  'impermeabilizacao': [
+    { stat: '10 anos', title: 'Proteção ativa garantida', desc: 'Barreira molecular invisível contra líquidos e manchas.' },
+    { title: 'Sem alterar cor, toque ou aspeto', desc: 'Seca sem resíduos. Crianças e animais voltam logo após a secagem.' },
+    { title: 'Testado antes de sairmos', desc: 'Só concluímos o serviço quando a barreira está ativa e uniforme em toda a superfície.' },
+  ],
+};
+
+const SERVICE_SUBTITLE: Record<string, string> = {
+  'limpeza-sofas':     'Preço fixo por tamanho e tratamento. Sem avaliação prévia, sem deslocações em vão.',
+  'limpeza-colchoes':  'Preço fixo por tamanho de colchão. Orçamento confirmado antes de qualquer intervenção.',
+  'limpeza-tapetes':   'Preço por m² calculado na hora. Sem surpresas, sem custos escondidos.',
+  'limpeza-cadeiras':  'Preço por cadeira com desconto progressivo em lotes. Confirmado antes de avançar.',
+  'limpeza-alcatifas': 'Preço por m² com desconto em grandes superfícies. Orçamento gratuito.',
+  'impermeabilizacao': 'Preço fixo, combinável com limpeza ou em separado. Sem compromisso.',
+};
 
 function DiscountBar({ total }: { total: number }) {
   const reached = total >= WIDGET_DISCOUNT_THRESHOLD;
@@ -93,21 +129,42 @@ export default function ServicePriceSection({ serviceSlug }: Props) {
               overline="Tabela de Preços"
               heading={heading}
               goldWord={goldWord}
-              subtitle="Preços fixos sem surpresas. Orçamento confirmado antes de qualquer intervenção."
+              subtitle={SERVICE_SUBTITLE[serviceSlug] ?? "Preços fixos sem surpresas. Orçamento confirmado antes de qualquer intervenção."}
             />
 
-            {/* Trust bullets — apenas desktop */}
-            <ul className="hidden lg:block mt-8 space-y-3">
-              {TRUST_BULLETS.map((b, i) => (
-                <li key={i} className="flex items-start gap-3">
-                  <CheckCircle className="w-4 h-4 flex-shrink-0 mt-0.5" style={{ color: "#25D366" }} />
-                  <span className="text-sm leading-relaxed" style={{ color: "rgba(17,17,17,0.65)" }}>{b}</span>
-                </li>
+            {/* Pontos de valor específicos por serviço — apenas desktop */}
+            <div className="hidden lg:flex flex-col gap-0 mt-10">
+              {(SERVICE_POINTS[serviceSlug] ?? []).map((point, i) => (
+                <div
+                  key={i}
+                  className="flex gap-5 py-5"
+                  style={{
+                    borderTop: i === 0 ? "1px solid rgba(17,17,17,0.08)" : "1px solid rgba(17,17,17,0.08)",
+                    borderLeft: "3px solid #D4AF37",
+                    paddingLeft: "16px",
+                    marginLeft: "0",
+                  }}
+                >
+                  <div className="flex-1">
+                    {point.stat && (
+                      <p className="font-playfair text-2xl font-bold leading-none mb-1" style={{ color: "#D4AF37" }}>
+                        {point.stat}
+                      </p>
+                    )}
+                    <p className="text-sm font-semibold leading-snug mb-0.5" style={{ color: "#111111" }}>
+                      {point.title}
+                    </p>
+                    <p className="text-[13px] leading-relaxed" style={{ color: "rgba(17,17,17,0.50)" }}>
+                      {point.desc}
+                    </p>
+                  </div>
+                </div>
               ))}
-            </ul>
+              <div style={{ borderTop: "1px solid rgba(17,17,17,0.08)" }} />
+            </div>
 
-            {/* Mini Google rating — apenas desktop */}
-            <div className="hidden lg:inline-flex mt-8 items-center gap-3 px-4 py-3 border" style={{ borderColor: "rgba(17,17,17,0.10)", background: "white" }}>
+            {/* Google rating — apenas desktop */}
+            <div className="hidden lg:inline-flex mt-6 items-center gap-3 px-4 py-3 border" style={{ borderColor: "rgba(17,17,17,0.10)", background: "white" }}>
               <div className="flex gap-0.5">
                 {[...Array(5)].map((_, k) => <Star key={k} className="w-3.5 h-3.5 fill-[#D4AF37] text-[#D4AF37]" />)}
               </div>
