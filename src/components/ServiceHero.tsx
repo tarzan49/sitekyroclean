@@ -7,14 +7,14 @@ import { useQuizLauncher } from "@/hooks/use-quiz-launcher";
 
 import sofaD        from "@/assets/service-sofa-camurca.png";
 import sofaM        from "@/assets/service-sofa-camurca.png";
-import mattressD    from "@/assets/hero-mattress-v6.png";
-import mattressM    from "@/assets/hero-mattress-v6.png";
+import mattressD    from "@/assets/hero-mattress-hero.jpeg";
+import mattressM    from "@/assets/hero-mattress-hero.jpeg";
 import chairsD      from "@/assets/service-chairs-new.webp";
 import chairsM      from "@/assets/service-chairs-new-mobile.webp";
 import carpetD      from "@/assets/hero-carpet-v1.png";
 import carpetM      from "@/assets/hero-carpet-v1.png";
-import rugsD        from "@/assets/hero-alcatifa-v2.jpg";
-import rugsM        from "@/assets/hero-alcatifa-v2.jpg";
+import rugsD        from "@/assets/hero-alcatifa-hero.jpeg";
+import rugsM        from "@/assets/hero-alcatifa-hero.jpeg";
 import waterproofD  from "@/assets/hero-impermeabilizacao-v41.jpg";
 import waterproofM  from "@/assets/hero-impermeabilizacao-v41.jpg";
 
