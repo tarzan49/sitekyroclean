@@ -14,6 +14,7 @@ interface ServiceAutoCarouselProps {
   heading?: string;
   subtitle?: string;
   variant?: "light" | "dark";
+  portraitImages?: boolean;
 }
 
 const ServiceAutoCarousel = ({
@@ -24,6 +25,7 @@ const ServiceAutoCarousel = ({
   heading = "Antes e depois da limpeza",
   subtitle = "Transformações visíveis no próprio dia da intervenção. Sem químicos agressivos, sem esperas.",
   variant = "dark",
+  portraitImages = false,
 }: ServiceAutoCarouselProps) => {
   const light = variant === "light";
   const textMain = light ? "text-[#111111]" : "text-white";
@@ -46,7 +48,7 @@ const ServiceAutoCarousel = ({
     objectPosition?: string;
     mirror?: boolean;
   }) => (
-    <div className="relative overflow-hidden aspect-[3/2]">
+    <div className={`relative overflow-hidden ${portraitImages ? 'aspect-[2/3]' : 'aspect-[3/2]'}`}>
       <img
         src={src}
         alt={label}

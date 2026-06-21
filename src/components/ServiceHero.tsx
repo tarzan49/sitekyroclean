@@ -13,8 +13,8 @@ import chairsD      from "@/assets/service-chairs-new.webp";
 import chairsM      from "@/assets/service-chairs-new-mobile.webp";
 import carpetD      from "@/assets/hero-carpet-v1.png";
 import carpetM      from "@/assets/hero-carpet-v1.png";
-import rugsD        from "@/assets/service-rugs-new.webp";
-import rugsM        from "@/assets/service-rugs-new-mobile.webp";
+import rugsD        from "@/assets/hero-alcatifa-v2.jpg";
+import rugsM        from "@/assets/hero-alcatifa-v2.jpg";
 import waterproofD  from "@/assets/hero-waterproofing.webp";
 import waterproofM  from "@/assets/hero-waterproofing-mobile.webp";
 

@@ -20,16 +20,19 @@ const cadeirasGuarantee: GuaranteeItem[] = [
     label: "Satisfação",
     title: "Cadeiras como novas ou voltamos",
     body: "Se o resultado não for evidente em cada peça, repetimos sem custos adicionais. Sem limitações de tecido nem de quantidade de cadeiras tratadas.",
+    image: "/images/cadeiras/v1.png",
   },
   {
     label: "Precisão",
     title: "Cada costura, cada dobra",
     body: "Cadeiras acumulam gordura e sujidade em zonas de difícil acesso. Tratamos cada detalhe com bicos específicos para garantir higiene em toda a peça.",
+    image: "/images/cadeiras/v2.png",
   },
   {
     label: "Tecido",
     title: "Veludo, couro, linho: todos seguros",
     body: "Cada material tem o seu protocolo próprio. Nunca aplicamos um produto genérico quando o tecido exige uma abordagem especializada e cuidadosa.",
+    image: cadeiraResultado,
   },
 ];
 

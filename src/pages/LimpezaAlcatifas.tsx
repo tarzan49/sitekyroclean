@@ -20,16 +20,19 @@ const alcatifasGuarantee: GuaranteeItem[] = [
     label: "Satisfação",
     title: "Higiene uniforme ou repetimos",
     body: "Garantimos cobertura total sem zonas esquecidas. Se alguma área ficar abaixo do esperado, voltamos e tratamos sem qualquer custo adicional.",
+    image: "/images/alcatifas/v3.png",
   },
   {
     label: "Cobertura",
     title: "Metro a metro, sem exceção",
     body: "Mapeamos a alcatifa antes de começar e dividimos em zonas de tratamento. Nenhum centímetro fica sem extração, mesmo em cantos e áreas sob mobília.",
+    image: "/images/alcatifas/v1.jpg",
   },
   {
     label: "Secagem",
     title: "Transitável em menos de 6 horas",
     body: "O nosso equipamento de alta extração minimiza a humidade residual. Em condições normais, a alcatifa está pronta a usar em menos de 6 horas.",
+    image: alcatifaProcesso,
   },
 ];
 
@@ -79,8 +82,8 @@ const LimpezaAlcatifas = () => {
           beforeImage={tapeteAntes}
           afterImage={tapeteDepois}
           slides={[
-            { src: alcatifaResultado, label: "Pormenor" },
-            { src: alcatifaProcesso, label: "Extração Profissional" },
+            { src: alcatifaProcesso, label: "Pormenor" },
+            { src: '/images/alcatifas/v1.jpg', label: "Extração Profissional" },
           ]}
           variant="dark"
         />
