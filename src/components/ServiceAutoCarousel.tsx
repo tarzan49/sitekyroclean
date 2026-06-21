@@ -52,18 +52,36 @@ const ServiceAutoCarousel = ({
     mirror?: boolean;
     portrait?: boolean;
   }) => (
-    <div className={`relative overflow-hidden ${portrait ? 'aspect-[2/3]' : portraitImages ? 'aspect-[2/3]' : 'aspect-[3/2]'}`}>
-      <img
-        src={src}
-        alt={label}
-        loading="lazy"
-        decoding="async"
-        className="w-full h-full object-cover transition-transform duration-700 hover:scale-105"
-        style={{
-          ...(objectPosition ? { objectPosition } : {}),
-          ...(mirror ? { transform: "scaleX(-1)" } : {}),
-        }}
-      />
+    <div className={`relative overflow-hidden ${portraitImages ? 'aspect-[2/3]' : 'aspect-[3/2]'}`}>
+      {portrait ? (
+        <img
+          src={src}
+          alt={label}
+          loading="lazy"
+          decoding="async"
+          style={{
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            width: '150%',
+            height: '150%',
+            objectFit: 'cover',
+            transform: 'translate(-50%, -50%) rotate(90deg)',
+          }}
+        />
+      ) : (
+        <img
+          src={src}
+          alt={label}
+          loading="lazy"
+          decoding="async"
+          className="w-full h-full object-cover transition-transform duration-700 hover:scale-105"
+          style={{
+            ...(objectPosition ? { objectPosition } : {}),
+            ...(mirror ? { transform: "scaleX(-1)" } : {}),
+          }}
+        />
+      )}
       <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent pointer-events-none" />
       <span
         className={`absolute bottom-3 font-bold tracking-[0.2em] uppercase text-white backdrop-blur-sm px-3 py-1.5 ${
