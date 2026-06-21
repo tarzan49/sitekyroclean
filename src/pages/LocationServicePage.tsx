@@ -387,7 +387,7 @@ const LocationServicePage = () => {
                                 >{chaiseLongueAddon}</span>
                                 <button
                                   type="button"
-                                  onClick={() => setChaiseLongueAddon(v => Math.min(1, v + 1))}
+                                  onClick={() => setChaiseLongueAddon(v => v + 1)}
                                   className="w-10 h-10 flex items-center justify-center transition-all active:scale-95"
                                   style={{ background: "#071a12", color: "white" }}
                                   aria-label="Adicionar chaise longue"

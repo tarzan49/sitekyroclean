@@ -335,7 +335,7 @@ const FreguesiaServicePage = () => {
                               <div className="flex items-center gap-0.5 rounded-full border px-1 py-1 flex-shrink-0" style={{ borderColor: "rgba(7,26,18,0.15)" }}>
                                 <button type="button" onClick={() => setChaiseLongueAddon(v => Math.max(0, v - 1))} className="w-9 h-9 flex items-center justify-center rounded-full text-[#111111]/40 hover:bg-[rgba(7,26,18,0.08)] transition-colors" aria-label="Remover"><Minus className="w-4 h-4" /></button>
                                 <span className="w-7 text-center font-playfair text-lg font-bold tabular-nums text-[#111111]">{chaiseLongueAddon}</span>
-                                <button type="button" onClick={() => setChaiseLongueAddon(v => Math.min(1, v + 1))} className="w-9 h-9 flex items-center justify-center rounded-full text-[#111111]/40 hover:bg-[rgba(7,26,18,0.08)] transition-colors" aria-label="Adicionar"><Plus className="w-4 h-4" /></button>
+                                <button type="button" onClick={() => setChaiseLongueAddon(v => v + 1)} className="w-9 h-9 flex items-center justify-center rounded-full text-[#111111]/40 hover:bg-[rgba(7,26,18,0.08)] transition-colors" aria-label="Adicionar"><Plus className="w-4 h-4" /></button>
                               </div>
                               <span className="text-[#111111]/70" style={{ fontSize: "14px" }}>{row.item}</span>
                               <span className="flex-1 border-b border-dotted mb-0.5" style={{ borderColor: "rgba(17,17,17,0.12)" }} />
