@@ -60,13 +60,10 @@ const ServiceAutoCarousel = ({
           loading="lazy"
           decoding="async"
           style={{
-            position: 'absolute',
-            top: '50%',
-            left: '50%',
-            width: '150%',
-            height: '150%',
-            objectFit: 'cover',
-            transform: 'translate(-50%, -50%) rotate(90deg)',
+            width: '100%',
+            height: '100%',
+            objectFit: 'contain',
+            transform: 'rotate(90deg)',
           }}
         />
       ) : (
