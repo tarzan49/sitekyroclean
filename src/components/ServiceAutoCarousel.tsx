@@ -62,8 +62,12 @@ const ServiceAutoCarousel = ({
       />
       <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent pointer-events-none" />
       <span
-        className={`absolute bottom-3 text-[10px] font-bold tracking-[0.2em] uppercase text-white bg-black/45 backdrop-blur-sm px-2.5 py-1 ${
+        className={`absolute bottom-3 font-bold tracking-[0.2em] uppercase text-white backdrop-blur-sm px-3 py-1.5 ${
           labelSide === "right" ? "right-3" : "left-3"
+        } ${
+          label === "Antes" ? "text-xs bg-red-900/70 border-l-2 border-red-400"
+          : label === "Depois" ? "text-xs bg-green-900/70 border-l-2 border-green-400"
+          : "text-[10px] bg-black/45"
         }`}
       >
         {label}

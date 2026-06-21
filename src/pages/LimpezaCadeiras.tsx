@@ -14,13 +14,13 @@ import cadeiraAntes from "@/assets/galeria-cadeira-antes.webp";
 import cadeiraDepois from "@/assets/galeria-cadeira-depois.webp";
 import cadeiraResultado from "@/assets/galeria-cadeira-resultado.webp";
 import cadeiraProcesso from "@/assets/galeria-cadeira-processo.webp";
+import cadeirasHero from "@/assets/service-chairs-new.webp";
 
 const cadeirasGuarantee: GuaranteeItem[] = [
   {
     label: "Satisfação",
     title: "Cadeiras como novas ou voltamos",
     body: "Se o resultado não for evidente em cada peça, repetimos sem custos adicionais. Sem limitações de tecido nem de quantidade de cadeiras tratadas.",
-    image: "/images/cadeiras/v1.png",
   },
   {
     label: "Precisão",
@@ -32,7 +32,7 @@ const cadeirasGuarantee: GuaranteeItem[] = [
     label: "Tecido",
     title: "Veludo, couro, linho: todos seguros",
     body: "Cada material tem o seu protocolo próprio. Nunca aplicamos um produto genérico quando o tecido exige uma abordagem especializada e cuidadosa.",
-    image: cadeiraResultado,
+    image: "/images/cadeiras/v1.png",
   },
 ];
 
@@ -83,7 +83,7 @@ const LimpezaCadeiras = () => {
           afterImage={cadeiraDepois}
           slides={[
             { src: cadeiraResultado, label: "Pormenor" },
-            { src: cadeiraProcesso, label: "Extração Profissional", mirror: true },
+            { src: cadeirasHero, label: "Extração Profissional" },
           ]}
           variant="dark"
         />
