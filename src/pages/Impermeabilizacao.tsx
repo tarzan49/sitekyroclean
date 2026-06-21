@@ -83,7 +83,7 @@ const Impermeabilizacao = () => {
           afterImage={impermeabilizacaoDepois}
           slides={[
             { src: impermeabilizacaoResultado, label: "Pormenor" },
-            { src: impermeabilizacaoProcesso, label: "Barreira Impermeável" },
+            { src: impermeabilizacaoProcesso, label: "Impermeável" },
           ]}
           variant="dark"
         />
