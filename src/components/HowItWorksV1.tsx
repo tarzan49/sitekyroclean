@@ -125,7 +125,7 @@ const HowItWorks = () => {
                 </span>
               </div>
               <div>
-                <h3 className="font-playfair text-[17px] font-bold text-white mb-1.5 leading-snug">
+                <h3 className="font-playfair text-xl font-bold text-white mb-1.5 leading-snug">
                   {step.titleFallback}
                 </h3>
                 <p className="text-white/50 text-[13px] leading-relaxed">
@@ -153,7 +153,7 @@ const HowItWorks = () => {
                 <Icon className="w-4 h-4" style={{ color: "#D4AF37" }} strokeWidth={1.5} />
               </div>
               <div>
-                <h3 className="font-playfair text-[17px] font-bold text-white mb-1.5 leading-snug">
+                <h3 className="font-playfair text-xl font-bold text-white mb-1.5 leading-snug">
                   {g.titleFallback}
                 </h3>
                 <p className="text-white/50 text-[13px] leading-relaxed">
