@@ -96,8 +96,8 @@ export default function ServicePriceSection({ serviceSlug }: Props) {
               subtitle="Preços fixos sem surpresas. Orçamento confirmado antes de qualquer intervenção."
             />
 
-            {/* Trust bullets */}
-            <ul className="mt-8 space-y-3">
+            {/* Trust bullets — apenas desktop */}
+            <ul className="hidden lg:block mt-8 space-y-3">
               {TRUST_BULLETS.map((b, i) => (
                 <li key={i} className="flex items-start gap-3">
                   <CheckCircle className="w-4 h-4 flex-shrink-0 mt-0.5" style={{ color: "#25D366" }} />
@@ -106,8 +106,8 @@ export default function ServicePriceSection({ serviceSlug }: Props) {
               ))}
             </ul>
 
-            {/* Mini Google rating */}
-            <div className="mt-8 inline-flex items-center gap-3 px-4 py-3 border" style={{ borderColor: "rgba(17,17,17,0.10)", background: "white" }}>
+            {/* Mini Google rating — apenas desktop */}
+            <div className="hidden lg:inline-flex mt-8 items-center gap-3 px-4 py-3 border" style={{ borderColor: "rgba(17,17,17,0.10)", background: "white" }}>
               <div className="flex gap-0.5">
                 {[...Array(5)].map((_, k) => <Star key={k} className="w-3.5 h-3.5 fill-[#D4AF37] text-[#D4AF37]" />)}
               </div>
