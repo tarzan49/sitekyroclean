@@ -3,6 +3,7 @@ export interface GuaranteeItem {
   title: string;
   body: string;
   image?: string;
+  mirror?: boolean;
 }
 
 const DEFAULT_ITEMS: GuaranteeItem[] = [
@@ -102,11 +103,18 @@ const ServiceEliteGuarantee = ({
                       alt=""
                       aria-hidden="true"
                       className="absolute inset-0 w-full h-full object-cover"
+                      style={item.mirror ? { transform: "scaleX(-1)" } : undefined}
                     />
                     <div
                       className="absolute inset-0"
                       style={{ background: "linear-gradient(to bottom, rgba(7,26,18,0.82) 0%, rgba(7,26,18,0.55) 55%, rgba(7,26,18,0.82) 100%)" }}
                     />
+                    {item.mirror && (
+                      <>
+                        <span className="absolute bottom-4 left-4 text-[9px] font-bold tracking-[0.22em] uppercase text-white/50 z-10">Antes</span>
+                        <span className="absolute bottom-4 right-4 text-[9px] font-bold tracking-[0.22em] uppercase text-white/50 z-10">Depois</span>
+                      </>
+                    )}
                   </>
                 )}
 

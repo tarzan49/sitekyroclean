@@ -21,6 +21,8 @@ const cadeirasGuarantee: GuaranteeItem[] = [
     label: "Satisfação",
     title: "Cadeiras como novas ou voltamos",
     body: "Se o resultado não for evidente em cada peça, repetimos sem custos adicionais. Sem limitações de tecido nem de quantidade de cadeiras tratadas.",
+    image: cadeiraProcesso,
+    mirror: true,
   },
   {
     label: "Precisão",
