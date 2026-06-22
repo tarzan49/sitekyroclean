@@ -133,29 +133,29 @@ export default function ServicePriceSection({ serviceSlug }: Props) {
               subtitle={SERVICE_SUBTITLE[serviceSlug] ?? "Preços fixos sem surpresas. Orçamento confirmado antes de qualquer intervenção."}
             />
 
-            {/* Pontos de valor específicos por serviço — apenas desktop */}
-            <div className="hidden lg:flex flex-col gap-0 mt-10">
+            {/* Pontos de valor específicos por serviço — mobile compacto + desktop completo */}
+            <div className="flex flex-col gap-0 mt-8 lg:mt-10">
               {(SERVICE_POINTS[serviceSlug] ?? []).map((point, i) => (
                 <div
                   key={i}
-                  className="flex gap-5 py-5"
+                  className="flex gap-4 lg:gap-5 py-4 lg:py-5"
                   style={{
-                    borderTop: i === 0 ? "1px solid rgba(17,17,17,0.08)" : "1px solid rgba(17,17,17,0.08)",
+                    borderTop: "1px solid rgba(17,17,17,0.08)",
                     borderLeft: "3px solid #D4AF37",
-                    paddingLeft: "16px",
-                    marginLeft: "0",
+                    paddingLeft: "14px",
                   }}
                 >
-                  <div className="flex-1">
+                  <div className="flex-1 min-w-0">
                     {point.stat && (
-                      <p className="font-playfair text-2xl font-bold leading-none mb-1" style={{ color: "#D4AF37" }}>
+                      <p className="font-playfair text-xl lg:text-2xl font-bold leading-none mb-1" style={{ color: "#D4AF37" }}>
                         {point.stat}
                       </p>
                     )}
                     <p className="text-sm font-semibold leading-snug mb-0.5" style={{ color: "#111111" }}>
                       {point.title}
                     </p>
-                    <p className="text-[13px] leading-relaxed" style={{ color: "rgba(17,17,17,0.50)" }}>
+                    {/* Descrição oculta em mobile para não sobrecarregar */}
+                    <p className="hidden lg:block text-[13px] leading-relaxed" style={{ color: "rgba(17,17,17,0.50)" }}>
                       {point.desc}
                     </p>
                   </div>
@@ -164,12 +164,12 @@ export default function ServicePriceSection({ serviceSlug }: Props) {
               <div style={{ borderTop: "1px solid rgba(17,17,17,0.08)" }} />
             </div>
 
-            {/* Google rating clicável — apenas desktop */}
+            {/* Google rating clicável — mobile + desktop */}
             <a
               href={GOOGLE_REVIEWS_SHORT_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="hidden lg:inline-flex mt-6 items-center gap-3 px-4 py-3 border transition-all hover:shadow-md group"
+              className="inline-flex mt-5 items-center gap-3 px-4 py-3 border transition-all hover:shadow-md group w-full lg:w-auto"
               style={{ borderColor: "rgba(17,17,17,0.10)", background: "white" }}
             >
               <div className="flex gap-0.5">
@@ -177,8 +177,8 @@ export default function ServicePriceSection({ serviceSlug }: Props) {
               </div>
               <div className="h-3.5 w-px" style={{ background: "rgba(17,17,17,0.12)" }} />
               <span className="text-sm font-semibold" style={{ color: "#111111" }}>5.0</span>
-              <span className="text-xs" style={{ color: "rgba(17,17,17,0.45)" }}>+60 avaliações · Deixar avaliação</span>
-              <ExternalLink className="w-3 h-3 opacity-30 group-hover:opacity-60 transition-opacity" style={{ color: "#111111" }} />
+              <span className="text-xs flex-1" style={{ color: "rgba(17,17,17,0.45)" }}>+60 avaliações · Deixar avaliação</span>
+              <ExternalLink className="w-3 h-3 opacity-30 group-hover:opacity-60 transition-opacity flex-shrink-0" style={{ color: "#111111" }} />
             </a>
           </div>
 
