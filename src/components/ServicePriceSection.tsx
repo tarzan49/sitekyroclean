@@ -174,8 +174,8 @@ export default function ServicePriceSection({ serviceSlug }: Props) {
     <section className="py-14 md:py-20 bg-[#FDFDF9]">
       <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
 
-        {/* ── Heading — sempre acima em mobile e desktop ── */}
-        <div className="mb-8 lg:mb-0">
+        {/* ── Heading mobile only — acima do widget ── */}
+        <div className="lg:hidden mb-8">
           <SectionHeader
             overline="Tabela de Preços"
             heading={heading}
@@ -186,8 +186,14 @@ export default function ServicePriceSection({ serviceSlug }: Props) {
 
         <div className="grid lg:grid-cols-2 gap-8 lg:gap-20 items-start">
 
-          {/* ── Coluna esquerda — desktop: trust + google ── */}
-          <div className="hidden lg:block lg:pt-4">
+          {/* ── Coluna esquerda — desktop: heading + trust + google alinhados com widget ── */}
+          <div className="hidden lg:block lg:pt-0">
+            <SectionHeader
+              overline="Tabela de Preços"
+              heading={heading}
+              goldWord={goldWord}
+              subtitle={SERVICE_SUBTITLE[serviceSlug] ?? "Preços fixos sem surpresas. Orçamento confirmado antes de qualquer intervenção."}
+            />
             <TrustPoints fullDesc />
           </div>
 

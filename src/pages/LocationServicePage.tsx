@@ -28,6 +28,7 @@ import { PRICE_TABLE, PRICE_TABLE_QUIZ_CONFIG, SERVICE_TESTIMONIALS, type PriceR
 import { calcWidgetTotal, calcChairBracket, calcCarpetWidget, buildWidgetQuizConfig, WIDGET_DISCOUNT_THRESHOLD } from "@/lib/priceWidgetCalc";
 import { locationPrices } from "@/components/quiz/QuizTypes";
 import { PROBLEM_IMAGES, PROBLEM_CTA, PRICE_HEADING_VERB } from "@/constants/problemCardHelpers";
+import { ServiceTrustDesktop, ServiceTrustMobile } from "@/components/ServiceTrustBlock";
 
 
 // Default quantity shown by a price-table row's stepper before the user adjusts it.
@@ -324,6 +325,10 @@ const LocationServicePage = () => {
                     goldWord={data.city}
                     subtitle={`Preços fixos e transparentes, sem surpresas. ${(locationPrices[data.city] ?? 0) === 0 ? `Deslocação incluída em toda a área de ${data.city}.` : `Deslocação +${locationPrices[data.city]}€ a ${data.city}.`} Orçamento gratuito antes de qualquer compromisso.`}
                   />
+                  {/* Trust facts — desktop only (variante 1) */}
+                  <div className="hidden lg:block">
+                    <ServiceTrustDesktop serviceSlug={data.serviceSlug} variant={1} />
+                  </div>
                 </div>
                 <div className="overflow-hidden" style={{ boxShadow: "0 12px 50px rgba(7,26,18,0.16), 0 2px 8px rgba(7,26,18,0.08)" }}>
                   {/* ── Header escuro ── */}
@@ -596,6 +601,10 @@ const LocationServicePage = () => {
                     })()}
                   </div>
                 </div>
+              </div>
+              {/* Trust mobile colapsável — abaixo do widget */}
+              <div className="lg:hidden">
+                <ServiceTrustMobile serviceSlug={data.serviceSlug} variant={1} />
               </div>
             </div>
           </section>

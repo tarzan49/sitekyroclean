@@ -32,6 +32,7 @@ import { PRICE_TABLE, PRICE_TABLE_QUIZ_CONFIG, SERVICE_TESTIMONIALS, type PriceR
 import { calcWidgetTotal, calcChairBracket, calcCarpetWidget, buildWidgetQuizConfig, WIDGET_DISCOUNT_THRESHOLD } from "@/lib/priceWidgetCalc";
 import { locationPrices } from "@/components/quiz/QuizTypes";
 import { PROBLEM_IMAGES, PROBLEM_POOL_CTA, PRICE_HEADING_VERB } from "@/constants/problemCardHelpers";
+import { ServiceTrustDesktop, ServiceTrustMobile } from "@/components/ServiceTrustBlock";
 
 function getRowDefaultQty(config: PriceRowQuizConfig): number {
   if (config.chairQty) return parseInt(config.chairQty, 10) || 1;
@@ -313,6 +314,9 @@ const FreguesiaServicePage = () => {
                     goldWord={data.name}
                     subtitle={`Preços fixos e transparentes, sem surpresas. ${(locationPrices[data.municipio] ?? 0) === 0 ? `Deslocação incluída em toda a área de ${data.municipio}.` : `Deslocação +${locationPrices[data.municipio]}€ a ${data.municipio}.`} Orçamento gratuito antes de qualquer compromisso.`}
                   />
+                  <div className="hidden lg:block">
+                    <ServiceTrustDesktop serviceSlug={data.serviceSlug} variant={2} />
+                  </div>
                 </div>
                 <div className="rounded-2xl overflow-hidden" style={{ boxShadow: "0 8px 40px rgba(7,26,18,0.18), 0 2px 10px rgba(7,26,18,0.10)" }}>
                   {/* ── Header verde ── */}
@@ -439,6 +443,9 @@ const FreguesiaServicePage = () => {
                     </div>
                   </div>
                 </div>
+              </div>
+              <div className="lg:hidden">
+                <ServiceTrustMobile serviceSlug={data.serviceSlug} variant={2} />
               </div>
             </div>
           </section>
