@@ -44,6 +44,48 @@ import resultTapetes     from "@/assets/galeria-tapete-depois.webp";
 import resultCadeiras    from "@/assets/galeria-cadeira-depois.webp";
 import resultAlcatifas   from "@/assets/galeria-alcatifa-resultado.webp";
 
+// Problem card backgrounds
+import imgAlergiasSofa     from "@/assets/hero-p-alergias-sofa.webp";
+import imgMauCheiro        from "@/assets/hero-p-mau-cheiro-sofa.webp";
+import imgFamiliaSofa      from "@/assets/hero-family-sofa.webp";
+import imgAlergiaColchao   from "@/assets/hero-p-alergias-colchao.webp";
+import imgMauCheiroColchao from "@/assets/hero-p-mau-cheiro-colchao.webp";
+import imgAcarosColchao    from "@/assets/hero-p-acaros-colchao.webp";
+import imgAcarosTapete     from "@/assets/hero-p-acaros-tapete.webp";
+import imgPelosTapete      from "@/assets/hero-p-pelos-tapete.webp";
+import imgManchaTapete     from "@/assets/hero-p-manchas-tapete.webp";
+import imgTapetePersa      from "@/assets/hero-p-tapete-persa.webp";
+import imgMofAlcatifa      from "@/assets/hero-p-mofo-alcatifa.webp";
+import imgLimpAlcatifas    from "@/assets/hero-p-limpeza-alcatifas.webp";
+import imgManchasCafe      from "@/assets/hero-p-manchas-cafe-sofa.webp";
+import imgSofaDesgastado   from "@/assets/hero-p-sofa-desgastado.webp";
+import imgManchasColchao   from "@/assets/hero-p-manchas-colchao.webp";
+import imgSangueColchao    from "@/assets/hero-p-sangue-colchao.webp";
+import imgWaterproofing    from "@/assets/hero-waterproofing.webp";
+import imgSofaVeludo       from "@/assets/hero-p-limpeza-sofa-veludo.webp";
+import imgLimpCadeiras     from "@/assets/hero-p-limpeza-cadeiras.webp";
+import imgLimpTapetes      from "@/assets/hero-p-limpeza-tapetes.webp";
+import imgCadeiraAntes     from "@/assets/galeria-cadeira-antes.webp";
+import imgCadeiraProcesso  from "@/assets/galeria-cadeira-processo.webp";
+import imgAlcatifaProcesso from "@/assets/galeria-alcatifa-processo.webp";
+import imgColchaoAntes     from "@/assets/galeria-colchao-antes.webp";
+
+const PROBLEM_IMAGES: Record<string, [string, string, string]> = {
+  'higienizacao-sofa':           [imgAlergiasSofa,    imgMauCheiro,        imgFamiliaSofa],
+  'higienizacao-colchao':        [imgAlergiaColchao,  imgMauCheiroColchao, imgAcarosColchao],
+  'higienizacao-tapetes':        [imgAcarosTapete,    imgPelosTapete,      imgMauCheiro],
+  'higienizacao-cadeiras':       [imgLimpCadeiras,    imgCadeiraProcesso,  imgCadeiraAntes],
+  'higienizacao-alcatifas':      [imgMofAlcatifa,     imgLimpAlcatifas,    imgAlcatifaProcesso],
+  'lavagem-sofa':                [imgManchasCafe,     imgSofaDesgastado,   imgMauCheiro],
+  'lavagem-colchao':             [imgManchasColchao,  imgSangueColchao,    imgMauCheiroColchao],
+  'lavagem-tapetes':             [imgManchaTapete,    imgLimpTapetes,      imgTapetePersa],
+  'lavagem-cadeiras':            [imgCadeiraAntes,    imgLimpCadeiras,     imgCadeiraProcesso],
+  'lavagem-alcatifas':           [imgMofAlcatifa,     imgAlcatifaProcesso, imgManchasCafe],
+  'impermeabilizacao-sofa':      [imgWaterproofing,   imgFamiliaSofa,      imgSofaVeludo],
+  'impermeabilizacao-colchao':   [imgManchasColchao,  imgColchaoAntes,     imgMauCheiroColchao],
+  'impermeabilizacao-cadeiras':  [imgCadeiraAntes,    imgLimpCadeiras,     imgCadeiraProcesso],
+};
+
 const HERO_IMAGES: Record<ServiceKey, { d: string; m: string }> = {
   sofa:      { d: heroSofaD,     m: heroSofaM },
   colchao:   { d: heroMattressD, m: heroMattressM },
@@ -166,6 +208,7 @@ const SofaVariantPage = () => {
   const prep = cityPrep(data.locationName);
   const heroImgs = HERO_IMAGES[data.serviceKey];
   const resultImg = RESULT_IMAGES[data.serviceKey];
+  const problemImgs = PROBLEM_IMAGES[`${data.variantKey}-${data.serviceKey}`];
 
   return (
     <QuizLocationProvider value={data.locationName}>
@@ -274,12 +317,24 @@ const SofaVariantPage = () => {
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 {data.problems.map((problem, idx) => (
-                  <div key={idx} className="bg-white/[0.05] border border-white/[0.10] p-6">
-                    <div className="w-9 h-9 flex items-center justify-center border border-[#D4AF37]/40 mb-4">
-                      <AlertTriangle className="w-4 h-4" style={{ color: "#D4AF37" }} />
+                  <div key={idx} className="relative overflow-hidden min-h-[300px] flex flex-col justify-end">
+                    {/* Background image */}
+                    {problemImgs?.[idx] && (
+                      <div
+                        className="absolute inset-0 bg-cover bg-center transition-transform duration-700 hover:scale-105"
+                        style={{ backgroundImage: `url(${problemImgs[idx]})` }}
+                      />
+                    )}
+                    {/* Overlay gradient */}
+                    <div className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(7,26,18,0.97) 0%, rgba(7,26,18,0.75) 45%, rgba(7,26,18,0.25) 100%)" }} />
+                    {/* Content */}
+                    <div className="relative z-10 p-6">
+                      <div className="w-8 h-8 flex items-center justify-center border border-[#D4AF37]/50 mb-3">
+                        <AlertTriangle className="w-3.5 h-3.5" style={{ color: "#D4AF37" }} />
+                      </div>
+                      <h3 className="text-white font-semibold text-[15px] mb-2 leading-snug">{problem.title}</h3>
+                      <p className="text-white/60 text-[13px] leading-relaxed">{problem.description}</p>
                     </div>
-                    <h3 className="text-white font-semibold text-[15px] mb-2 leading-snug">{problem.title}</h3>
-                    <p className="text-white/50 text-sm leading-relaxed">{problem.description}</p>
                   </div>
                 ))}
               </div>
