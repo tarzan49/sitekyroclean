@@ -14,6 +14,7 @@ import Footer from "@/components/Footer";
 import QuizButton from "@/components/QuizButton";
 import { trackWhatsAppClick } from "@/lib/quizTracking";
 import ServiceFAQSchema from "@/components/ServiceFAQSchema";
+import SectionHeader from "@/components/SectionHeader";
 import ServicePackBanner from "@/components/ServicePackBanner";
 import ServicePriceSection from "@/components/ServicePriceSection";
 import { SERVICEKEY_TO_QUIZ } from "@/constants/serviceToQuiz";
@@ -304,17 +305,13 @@ const SofaVariantPage = () => {
         <section className="py-12 md:py-16 bg-kyro-green">
           <div className="container mx-auto px-5 sm:px-6 lg:px-8">
             <div className="max-w-4xl mx-auto">
-              <div className="text-center mb-8">
-                <div className="flex items-center justify-center gap-3 mb-3">
-                  <div className="h-px w-10 opacity-40" style={{ backgroundColor: "#D4AF37" }} />
-                  <p className="text-[10px] font-bold tracking-[0.28em] uppercase" style={{ color: "#D4AF37" }}>Reconhece algum destes?</p>
-                  <div className="h-px w-10 opacity-40" style={{ backgroundColor: "#D4AF37" }} />
-                </div>
-                <h2 className="font-playfair text-2xl md:text-3xl font-bold text-white">
-                  Problemas que resolvemos no próprio dia
-                </h2>
-                <p className="mt-3 text-white/50 text-[15px]">Se reconhece algum destes cenários, temos a solução.</p>
-              </div>
+              <SectionHeader
+                overline="O Que Resolvemos"
+                heading={`Problemas que resolvemos ${prep}`}
+                goldWord={data.locationName}
+                subtitle="Se reconhece algum destes cenários, temos a solução no próprio dia."
+                light={false}
+              />
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 {data.problems.map((problem, idx) => (
                   <div key={idx} className="relative overflow-hidden min-h-[300px] flex flex-col justify-end">
@@ -346,19 +343,13 @@ const SofaVariantPage = () => {
         <section className="py-12 md:py-16 bg-[#FDFDF9]">
           <div className="container mx-auto px-5 sm:px-6 lg:px-8">
             <div className="max-w-4xl mx-auto">
-              <div className="text-center mb-8">
-                <div className="flex items-center justify-center gap-3 mb-3">
-                  <div className="h-px w-10 opacity-40" style={{ backgroundColor: "#D4AF37" }} />
-                  <p className="text-[10px] font-bold tracking-[0.28em] uppercase" style={{ color: "#D4AF37" }}>O que é</p>
-                  <div className="h-px w-10 opacity-40" style={{ backgroundColor: "#D4AF37" }} />
-                </div>
-                <h2 className="font-playfair text-2xl md:text-3xl font-bold text-[#111111]">
-                  Vantagens da {variantLabel} {prep} {data.locationName}
-                </h2>
-                <p className="mt-4 text-[15px] text-[#111111]/60 leading-relaxed max-w-2xl mx-auto">
-                  {data.whatIs}
-                </p>
-              </div>
+              <SectionHeader
+                overline="Vantagens"
+                heading={`${variantLabel} profissional ${prep}`}
+                goldWord={data.locationName}
+                subtitle={data.whatIs}
+                light={true}
+              />
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                 {data.benefits.map((benefit, idx) => (
                   <div key={idx} className="flex items-start gap-3 p-5 bg-white border border-[#E8E4DE]">
@@ -396,14 +387,12 @@ const SofaVariantPage = () => {
         <section className="py-12 md:py-16 relative overflow-hidden bg-checker-dark">
           <div className="container mx-auto px-5 sm:px-6 lg:px-8 relative z-10">
             <div className="max-w-4xl mx-auto">
-              <div className="text-center mb-10">
-                <div className="flex items-center justify-center gap-3 mb-3">
-                  <div className="h-px w-10 opacity-40" style={{ backgroundColor: "#D4AF37" }} />
-                  <p className="text-[10px] font-bold tracking-[0.28em] uppercase" style={{ color: "#D4AF37" }}>Processo</p>
-                  <div className="h-px w-10 opacity-40" style={{ backgroundColor: "#D4AF37" }} />
-                </div>
-                <h2 className="font-playfair text-2xl md:text-3xl font-bold text-white">Como funciona</h2>
-              </div>
+              <SectionHeader
+                overline="Processo"
+                heading="Como funciona a"
+                goldWord={variantLabel}
+                light={false}
+              />
               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 md:gap-6">
                 {(data.variantKey === 'impermeabilizacao' ? IMPERMEABILIZACAO_STEPS : GENERIC_PROCESS_STEPS).map((step, idx) => (
                   <div key={idx} className="text-center">
@@ -501,16 +490,12 @@ const SofaVariantPage = () => {
         <section className="py-12 md:py-16 relative overflow-hidden bg-checker-dark">
           <div className="container mx-auto px-5 sm:px-6 lg:px-8 relative z-10">
             <div className="max-w-3xl mx-auto">
-              <div className="text-center mb-8">
-                <div className="flex items-center justify-center gap-3 mb-3">
-                  <div className="h-px w-10 opacity-40" style={{ backgroundColor: "#D4AF37" }} />
-                  <p className="text-[10px] font-bold tracking-[0.28em] uppercase" style={{ color: "#D4AF37" }}>Perguntas</p>
-                  <div className="h-px w-10 opacity-40" style={{ backgroundColor: "#D4AF37" }} />
-                </div>
-                <h2 className="font-playfair text-2xl md:text-3xl font-bold text-white">
-                  Perguntas Frequentes
-                </h2>
-              </div>
+              <SectionHeader
+                overline="Perguntas"
+                heading="Perguntas"
+                goldWord="Frequentes"
+                light={false}
+              />
               <Accordion type="single" collapsible className="space-y-4">
                 {data.faqs.map((faq, i) => (
                   <AccordionItem
@@ -534,15 +519,13 @@ const SofaVariantPage = () => {
         {/* ═══ ÁREA DE SERVIÇO ═══ */}
         <section className="py-12 md:py-14 bg-[#FDFDF9]">
           <div className="container mx-auto px-5 sm:px-6 lg:px-8">
-            <div className="max-w-4xl mx-auto text-center">
-              <div className="flex items-center justify-center gap-3 mb-3">
-                <div className="h-px w-10 opacity-40" style={{ backgroundColor: "#D4AF37" }} />
-                <p className="text-[10px] font-bold tracking-[0.28em] uppercase" style={{ color: "#D4AF37" }}>Cobertura</p>
-                <div className="h-px w-10 opacity-40" style={{ backgroundColor: "#D4AF37" }} />
-              </div>
-              <h2 className="font-playfair text-2xl md:text-3xl font-bold text-[#111111] mb-6">
-                Servimos {data.locationName} e arredores
-              </h2>
+            <div className="max-w-4xl mx-auto">
+              <SectionHeader
+                overline="Cobertura"
+                heading={`Servimos ${data.locationName} e`}
+                goldWord="arredores"
+                light={true}
+              />
 
               <p className="text-xs text-[#111111]/50 mb-3">Também disponível em:</p>
               <div className="flex flex-wrap justify-center gap-3 mb-6">
