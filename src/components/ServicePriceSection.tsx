@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { CheckCircle, Minus, Plus, Star, ArrowRight, ExternalLink } from "lucide-react";
+import { CheckCircle, Minus, Plus, Star, ArrowRight, ExternalLink, ChevronDown } from "lucide-react";
 import { GOOGLE_REVIEWS_SHORT_URL } from "@/constants/google";
 import { calcWidgetTotal, calcChairBracket, calcCarpetWidget, buildWidgetQuizConfig, WIDGET_DISCOUNT_THRESHOLD } from "@/lib/priceWidgetCalc";
 import { useQuizLauncher } from "@/hooks/use-quiz-launcher";
@@ -118,72 +118,81 @@ export default function ServicePriceSection({ serviceSlug }: Props) {
   const discountActive = total >= WIDGET_DISCOUNT_THRESHOLD;
   const discountedTotal = Math.round(total * 0.9);
   const hasSelection = total > 0 || Object.values(rowQuantities).some(q => q > 0) || chaiseLongueAddon > 0;
+  const [infoOpen, setInfoOpen] = useState(false);
+
+  const TrustPoints = ({ fullDesc }: { fullDesc: boolean }) => (
+    <>
+      <div className="flex flex-col gap-0">
+        {(SERVICE_POINTS[serviceSlug] ?? []).map((point, i) => (
+          <div
+            key={i}
+            className="flex gap-4 py-4"
+            style={{
+              borderTop: "1px solid rgba(17,17,17,0.08)",
+              borderLeft: "3px solid #D4AF37",
+              paddingLeft: "14px",
+            }}
+          >
+            <div className="flex-1 min-w-0">
+              {point.stat && (
+                <p className="font-playfair text-xl font-bold leading-none mb-1" style={{ color: "#D4AF37" }}>
+                  {point.stat}
+                </p>
+              )}
+              <p className="text-sm font-semibold leading-snug mb-0.5" style={{ color: "#111111" }}>
+                {point.title}
+              </p>
+              {fullDesc && (
+                <p className="text-[13px] leading-relaxed" style={{ color: "rgba(17,17,17,0.50)" }}>
+                  {point.desc}
+                </p>
+              )}
+            </div>
+          </div>
+        ))}
+        <div style={{ borderTop: "1px solid rgba(17,17,17,0.08)" }} />
+      </div>
+      <a
+        href={GOOGLE_REVIEWS_SHORT_URL}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="inline-flex mt-4 items-center gap-3 px-4 py-3 border transition-all hover:shadow-md group w-full"
+        style={{ borderColor: "rgba(17,17,17,0.10)", background: "white" }}
+      >
+        <div className="flex gap-0.5">
+          {[...Array(5)].map((_, k) => <Star key={k} className="w-3.5 h-3.5 fill-[#D4AF37] text-[#D4AF37]" />)}
+        </div>
+        <div className="h-3.5 w-px" style={{ background: "rgba(17,17,17,0.12)" }} />
+        <span className="text-sm font-semibold" style={{ color: "#111111" }}>5.0</span>
+        <span className="text-xs flex-1" style={{ color: "rgba(17,17,17,0.45)" }}>+60 avaliações · Deixar avaliação</span>
+        <ExternalLink className="w-3 h-3 opacity-30 group-hover:opacity-60 transition-opacity flex-shrink-0" style={{ color: "#111111" }} />
+      </a>
+    </>
+  );
 
   return (
     <section className="py-14 md:py-20 bg-[#FDFDF9]">
       <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
-        <div className="grid lg:grid-cols-2 gap-10 lg:gap-20 items-start">
 
-          {/* ── Coluna esquerda — aparece 2ª em mobile (abaixo do widget) ── */}
-          <div className="order-2 lg:order-1 lg:pt-4">
-            <SectionHeader
-              overline="Tabela de Preços"
-              heading={heading}
-              goldWord={goldWord}
-              subtitle={SERVICE_SUBTITLE[serviceSlug] ?? "Preços fixos sem surpresas. Orçamento confirmado antes de qualquer intervenção."}
-            />
+        {/* ── Heading — sempre acima em mobile e desktop ── */}
+        <div className="mb-8 lg:mb-0">
+          <SectionHeader
+            overline="Tabela de Preços"
+            heading={heading}
+            goldWord={goldWord}
+            subtitle={SERVICE_SUBTITLE[serviceSlug] ?? "Preços fixos sem surpresas. Orçamento confirmado antes de qualquer intervenção."}
+          />
+        </div>
 
-            {/* Pontos de valor específicos por serviço — mobile compacto + desktop completo */}
-            <div className="flex flex-col gap-0 mt-8 lg:mt-10">
-              {(SERVICE_POINTS[serviceSlug] ?? []).map((point, i) => (
-                <div
-                  key={i}
-                  className="flex gap-4 lg:gap-5 py-4 lg:py-5"
-                  style={{
-                    borderTop: "1px solid rgba(17,17,17,0.08)",
-                    borderLeft: "3px solid #D4AF37",
-                    paddingLeft: "14px",
-                  }}
-                >
-                  <div className="flex-1 min-w-0">
-                    {point.stat && (
-                      <p className="font-playfair text-xl lg:text-2xl font-bold leading-none mb-1" style={{ color: "#D4AF37" }}>
-                        {point.stat}
-                      </p>
-                    )}
-                    <p className="text-sm font-semibold leading-snug mb-0.5" style={{ color: "#111111" }}>
-                      {point.title}
-                    </p>
-                    {/* Descrição oculta em mobile para não sobrecarregar */}
-                    <p className="hidden lg:block text-[13px] leading-relaxed" style={{ color: "rgba(17,17,17,0.50)" }}>
-                      {point.desc}
-                    </p>
-                  </div>
-                </div>
-              ))}
-              <div style={{ borderTop: "1px solid rgba(17,17,17,0.08)" }} />
-            </div>
+        <div className="grid lg:grid-cols-2 gap-8 lg:gap-20 items-start">
 
-            {/* Google rating clicável — mobile + desktop */}
-            <a
-              href={GOOGLE_REVIEWS_SHORT_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex mt-5 items-center gap-3 px-4 py-3 border transition-all hover:shadow-md group w-full lg:w-auto"
-              style={{ borderColor: "rgba(17,17,17,0.10)", background: "white" }}
-            >
-              <div className="flex gap-0.5">
-                {[...Array(5)].map((_, k) => <Star key={k} className="w-3.5 h-3.5 fill-[#D4AF37] text-[#D4AF37]" />)}
-              </div>
-              <div className="h-3.5 w-px" style={{ background: "rgba(17,17,17,0.12)" }} />
-              <span className="text-sm font-semibold" style={{ color: "#111111" }}>5.0</span>
-              <span className="text-xs flex-1" style={{ color: "rgba(17,17,17,0.45)" }}>+60 avaliações · Deixar avaliação</span>
-              <ExternalLink className="w-3 h-3 opacity-30 group-hover:opacity-60 transition-opacity flex-shrink-0" style={{ color: "#111111" }} />
-            </a>
+          {/* ── Coluna esquerda — desktop: trust + google ── */}
+          <div className="hidden lg:block lg:pt-4">
+            <TrustPoints fullDesc />
           </div>
 
-          {/* ── Widget — aparece 1º em mobile ── */}
-          <div className="order-1 lg:order-2 overflow-hidden" style={{ boxShadow: "0 12px 50px rgba(7,26,18,0.16), 0 2px 8px rgba(7,26,18,0.08)" }}>
+          {/* ── Widget ── */}
+          <div className="overflow-hidden" style={{ boxShadow: "0 12px 50px rgba(7,26,18,0.16), 0 2px 8px rgba(7,26,18,0.08)" }}>
 
             {/* Header escuro */}
             <div className="px-6 py-6" style={{ background: "#071a12" }}>
@@ -414,6 +423,28 @@ export default function ServicePriceSection({ serviceSlug }: Props) {
           </div>
 
         </div>
+
+        {/* ── Mobile: bloco colapsável abaixo do widget ── */}
+        <div className="lg:hidden mt-6">
+          <button
+            type="button"
+            onClick={() => setInfoOpen(v => !v)}
+            className="w-full flex items-center justify-between px-4 py-3.5 border transition-all"
+            style={{ borderColor: "rgba(17,17,17,0.12)", background: "white" }}
+          >
+            <span className="text-sm font-semibold" style={{ color: "#111111" }}>Porquê escolher a Kyro Clean?</span>
+            <ChevronDown
+              className="w-4 h-4 transition-transform duration-200 flex-shrink-0"
+              style={{ color: "#D4AF37", transform: infoOpen ? "rotate(180deg)" : "rotate(0deg)" }}
+            />
+          </button>
+          {infoOpen && (
+            <div className="border-x border-b px-4 pt-4 pb-2" style={{ borderColor: "rgba(17,17,17,0.12)" }}>
+              <TrustPoints fullDesc={false} />
+            </div>
+          )}
+        </div>
+
       </div>
 
       {activeConfig && (
