@@ -124,8 +124,8 @@ export default function ServicePriceSection({ serviceSlug }: Props) {
       <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
         <div className="grid lg:grid-cols-2 gap-10 lg:gap-20 items-start">
 
-          {/* ── Coluna esquerda ── */}
-          <div className="lg:pt-4">
+          {/* ── Coluna esquerda — aparece 2ª em mobile (abaixo do widget) ── */}
+          <div className="order-2 lg:order-1 lg:pt-4">
             <SectionHeader
               overline="Tabela de Preços"
               heading={heading}
@@ -182,8 +182,8 @@ export default function ServicePriceSection({ serviceSlug }: Props) {
             </a>
           </div>
 
-          {/* ── Widget ── */}
-          <div className="overflow-hidden" style={{ boxShadow: "0 12px 50px rgba(7,26,18,0.16), 0 2px 8px rgba(7,26,18,0.08)" }}>
+          {/* ── Widget — aparece 1º em mobile ── */}
+          <div className="order-1 lg:order-2 overflow-hidden" style={{ boxShadow: "0 12px 50px rgba(7,26,18,0.16), 0 2px 8px rgba(7,26,18,0.08)" }}>
 
             {/* Header escuro */}
             <div className="px-6 py-6" style={{ background: "#071a12" }}>
