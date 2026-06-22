@@ -6,7 +6,7 @@
 import { useEffect, useMemo } from "react";
 import { useLocation, Link } from "react-router-dom";
 import { QuizLocationProvider, QuizServiceProvider } from "@/context/QuizLocationContext";
-import { CheckCircle, Star, MapPin, MessageCircle, AlertTriangle } from "lucide-react";
+import { CheckCircle, Star, MapPin, MessageCircle } from "lucide-react";
 import { ServiceTrustDesktop, ServiceTrustMobile } from "@/components/ServiceTrustBlock";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import Header from "@/components/Header";
@@ -70,6 +70,12 @@ import imgCadeiraAntes     from "@/assets/galeria-cadeira-antes.webp";
 import imgCadeiraProcesso  from "@/assets/galeria-cadeira-processo.webp";
 import imgAlcatifaProcesso from "@/assets/galeria-alcatifa-processo.webp";
 import imgColchaoAntes     from "@/assets/galeria-colchao-antes.webp";
+
+const VARIANT_PROBLEM_LABELS: Record<VariantKey, [string, string, string]> = {
+  higienizacao:      ['Saúde',    'Higiene',  'Família'],
+  lavagem:           ['Manchas',  'Aspeto',   'Odores'],
+  impermeabilizacao: ['Proteção', 'Família',  'Material'],
+};
 
 const PROBLEM_IMAGES: Record<string, [string, string, string]> = {
   'higienizacao-sofa':           [imgAlergiasSofa,    imgMauCheiro,        imgFamiliaSofa],
@@ -210,6 +216,7 @@ const SofaVariantPage = () => {
   const heroImgs = HERO_IMAGES[data.serviceKey];
   const resultImg = RESULT_IMAGES[data.serviceKey];
   const problemImgs = PROBLEM_IMAGES[`${data.variantKey}-${data.serviceKey}`];
+  const problemLabels = VARIANT_PROBLEM_LABELS[data.variantKey];
 
   return (
     <QuizLocationProvider value={data.locationName}>
@@ -304,7 +311,7 @@ const SofaVariantPage = () => {
         {/* ═══ PROBLEMAS ═══ */}
         <section className="py-12 md:py-16 bg-kyro-green">
           <div className="container mx-auto px-5 sm:px-6 lg:px-8">
-            <div className="max-w-4xl mx-auto">
+            <div className="max-w-6xl mx-auto">
               <SectionHeader
                 overline="O Que Resolvemos"
                 heading={`Problemas que resolvemos ${prep}`}
@@ -312,25 +319,34 @@ const SofaVariantPage = () => {
                 subtitle="Se reconhece algum destes cenários, temos a solução no próprio dia."
                 light={false}
               />
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 md:gap-8">
                 {data.problems.map((problem, idx) => (
-                  <div key={idx} className="relative overflow-hidden min-h-[300px] flex flex-col justify-end">
+                  <div
+                    key={idx}
+                    className="relative overflow-hidden flex flex-col justify-end"
+                    style={{ minHeight: "400px", borderTop: "2px solid rgba(212,175,55,0.70)" }}
+                  >
                     {/* Background image */}
                     {problemImgs?.[idx] && (
                       <div
-                        className="absolute inset-0 bg-cover bg-center transition-transform duration-700 hover:scale-105"
+                        className="absolute inset-0 bg-cover bg-center"
                         style={{ backgroundImage: `url(${problemImgs[idx]})` }}
                       />
                     )}
-                    {/* Overlay gradient */}
-                    <div className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(7,26,18,0.97) 0%, rgba(7,26,18,0.75) 45%, rgba(7,26,18,0.25) 100%)" }} />
+                    {/* Gradient overlay */}
+                    <div className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(7,26,18,0.98) 0%, rgba(7,26,18,0.72) 50%, rgba(7,26,18,0.18) 100%)" }} />
                     {/* Content */}
-                    <div className="relative z-10 p-6">
-                      <div className="w-8 h-8 flex items-center justify-center border border-[#D4AF37]/50 mb-3">
-                        <AlertTriangle className="w-3.5 h-3.5" style={{ color: "#D4AF37" }} />
-                      </div>
-                      <h3 className="text-white font-semibold text-[15px] mb-2 leading-snug">{problem.title}</h3>
-                      <p className="text-white/60 text-[13px] leading-relaxed">{problem.description}</p>
+                    <div className="relative z-10 p-7 md:p-8 flex flex-col gap-4">
+                      <p className="text-[10px] font-bold tracking-[0.26em] uppercase" style={{ color: "#D4AF37" }}>
+                        {problemLabels[idx]}
+                      </p>
+                      <h3 className="font-playfair font-bold leading-snug text-white" style={{ fontSize: "1.25rem" }}>
+                        {problem.title}
+                      </h3>
+                      <div className="w-8 h-px" style={{ background: "linear-gradient(90deg, rgba(212,175,55,0.8) 0%, rgba(212,175,55,0.15) 100%)" }} />
+                      <p className="leading-relaxed text-white/70" style={{ fontSize: "14px" }}>
+                        {problem.description}
+                      </p>
                     </div>
                   </div>
                 ))}
