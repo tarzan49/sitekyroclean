@@ -321,8 +321,8 @@ const SofaVariantPage = () => {
                 {data.problems.map((problem, idx) => (
                   <div
                     key={idx}
-                    className="relative overflow-hidden flex flex-col justify-end"
-                    style={{ minHeight: "400px", borderTop: "2px solid rgba(212,175,55,0.70)" }}
+                    className="relative overflow-hidden flex flex-col justify-end min-h-[280px] sm:min-h-[400px]"
+                    style={{ borderTop: "2px solid rgba(212,175,55,0.70)" }}
                   >
                     {/* Background image */}
                     {problemImgs?.[idx] && (
@@ -362,20 +362,20 @@ const SofaVariantPage = () => {
                 subtitle={data.whatIs}
                 light={true}
               />
-              <div className="grid sm:grid-cols-2 gap-px mb-12" style={{ backgroundColor: "#E8E4DE" }}>
+              <div className="grid grid-cols-2 gap-px mb-12" style={{ backgroundColor: "#E8E4DE" }}>
                 {data.benefits.map((benefit, idx) => (
                   <div
                     key={idx}
-                    className="bg-white p-7 md:p-8"
+                    className="bg-white p-5 sm:p-7 md:p-8"
                     style={{ borderTop: "2px solid #D4AF37" }}
                   >
                     <p
-                      className="font-playfair font-bold mb-3 leading-none"
-                      style={{ fontSize: "2.25rem", color: "rgba(212,175,55,0.30)" }}
+                      className="font-playfair font-bold mb-2 leading-none text-3xl sm:text-[2.25rem]"
+                      style={{ color: "rgba(212,175,55,0.30)" }}
                     >
                       {String(idx + 1).padStart(2, "0")}
                     </p>
-                    <p className="text-[15px] font-semibold text-[#111111] leading-snug">{benefit}</p>
+                    <p className="text-[13px] sm:text-[15px] font-semibold text-[#111111] leading-snug">{benefit}</p>
                   </div>
                 ))}
               </div>
@@ -386,15 +386,15 @@ const SofaVariantPage = () => {
                   <div className="h-px w-8 flex-shrink-0" style={{ backgroundColor: "#D4AF37", opacity: 0.65 }} />
                   <p className="text-[10px] font-bold tracking-[0.28em] uppercase" style={{ color: "#D4AF37", opacity: 0.85 }}>Porque a Kyro Clean</p>
                 </div>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-px" style={{ backgroundColor: "#E8E4DE" }}>
+                <div className="grid grid-cols-3 gap-px" style={{ backgroundColor: "#E8E4DE" }}>
                   {[
-                    { stat: "< 30 min", label: "Resposta ao pedido de orçamento" },
-                    { stat: "5.0 ★",   label: "+60 avaliações verificadas no Google" },
-                    { stat: "100%",     label: "Resultado garantido ou repetimos sem custo" },
+                    { stat: "< 30 min", label: "Resposta ao orçamento" },
+                    { stat: "5.0 ★",   label: "+60 avaliações Google" },
+                    { stat: "100%",     label: "Garantia de resultado" },
                   ].map((item, i) => (
-                    <div key={i} className="bg-white p-6 md:p-7" style={{ borderTop: "2px solid #D4AF37" }}>
-                      <p className="font-playfair font-bold text-2xl mb-1" style={{ color: "#D4AF37" }}>{item.stat}</p>
-                      <p className="text-sm text-[#111111]/65 leading-snug">{item.label}</p>
+                    <div key={i} className="bg-white p-4 sm:p-6 md:p-7" style={{ borderTop: "2px solid #D4AF37" }}>
+                      <p className="font-playfair font-bold text-xl sm:text-2xl mb-1" style={{ color: "#D4AF37" }}>{item.stat}</p>
+                      <p className="text-[11px] sm:text-sm text-[#111111]/65 leading-snug">{item.label}</p>
                     </div>
                   ))}
                 </div>
