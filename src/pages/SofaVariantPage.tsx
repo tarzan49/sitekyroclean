@@ -252,6 +252,11 @@ const SofaVariantPage = () => {
           </div>
         </section>
 
+        {/* ═══ TABELA DE PREÇOS ═══ */}
+        <ServicePriceSection
+          serviceSlug={parsed.variantKey === 'impermeabilizacao' ? 'impermeabilizacao' : SERVICEKEY_TO_SLUG[parsed.serviceKey]}
+        />
+
         {/* ═══ PROBLEMAS ═══ */}
         <section className="py-12 md:py-16 bg-kyro-green">
           <div className="container mx-auto px-5 sm:px-6 lg:px-8">
@@ -281,11 +286,6 @@ const SofaVariantPage = () => {
             </div>
           </div>
         </section>
-
-        {/* ═══ TABELA DE PREÇOS ═══ */}
-        <ServicePriceSection
-          serviceSlug={parsed.variantKey === 'impermeabilizacao' ? 'impermeabilizacao' : SERVICEKEY_TO_SLUG[parsed.serviceKey]}
-        />
 
         {/* ═══ O QUE É + VANTAGENS ═══ */}
         <section className="py-12 md:py-16 bg-[#FDFDF9]">
