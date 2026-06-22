@@ -403,30 +403,38 @@ const SofaVariantPage = () => {
         </section>
 
         {/* ═══ PROCESSO ═══ */}
-        <section className="py-12 md:py-16 relative overflow-hidden bg-checker-dark">
-          <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8 relative z-10">
-              <SectionHeader
-                overline="Processo"
-                heading="Como funciona a"
-                goldWord={variantLabel}
-                light={false}
-              />
-              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 md:gap-6">
-                {(data.variantKey === 'impermeabilizacao' ? IMPERMEABILIZACAO_STEPS : GENERIC_PROCESS_STEPS).map((step, idx) => (
-                  <div key={idx} className="text-center">
-                    <div className="relative inline-block mb-4">
-                      <div
-                        className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto shadow-lg border border-gold/20"
-                        style={{ background: "rgba(212,175,55,0.1)" }}
-                      >
-                        <span className="font-playfair font-bold text-lg" style={{ color: "#D4AF37" }}>{step.step}</span>
-                      </div>
-                    </div>
-                    <p className="text-sm font-semibold text-white/80 mb-1">{step.label}</p>
-                    <p className="text-xs text-white/45 leading-relaxed">{step.desc}</p>
-                  </div>
-                ))}
+        <section className="bg-checker-dark">
+          <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8 pt-12 md:pt-16 pb-4">
+            <SectionHeader
+              overline="Processo"
+              heading="Como funciona a"
+              goldWord={variantLabel}
+              light={false}
+            />
+          </div>
+          <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8 pb-12 md:pb-16">
+            {(data.variantKey === 'impermeabilizacao' ? IMPERMEABILIZACAO_STEPS : GENERIC_PROCESS_STEPS).map((step, idx, arr) => (
+              <div
+                key={idx}
+                className="flex gap-5 py-7"
+                style={{ borderBottom: idx < arr.length - 1 ? "1px solid rgba(255,255,255,0.06)" : undefined }}
+              >
+                <div
+                  className="flex-shrink-0 w-11 h-11 flex items-center justify-center mt-0.5"
+                  style={{ border: "1px solid rgba(212,175,55,0.22)", background: "rgba(212,175,55,0.06)" }}
+                >
+                  <span className="font-mono text-[11px] font-bold" style={{ color: "rgba(212,175,55,0.70)" }}>
+                    {step.step}
+                  </span>
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-playfair text-lg sm:text-xl font-bold text-white mb-1.5 leading-snug">
+                    {step.label}
+                  </h3>
+                  <p className="text-white/50 text-[13px] leading-relaxed">{step.desc}</p>
+                </div>
               </div>
+            ))}
           </div>
         </section>
 
