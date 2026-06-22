@@ -25,6 +25,8 @@ export interface KeywordVariantData {
   benefits: string[];
   processSteps: { step: number; title: string; description: string }[];
   faqs: { question: string; answer: string }[];
+  problems: { title: string; description: string }[];
+  testimonial: { name: string; city: string; stars: number; text: string };
   priceFrom: string;
 }
 
@@ -34,6 +36,7 @@ interface ContentBlock {
   benefits: string[];
   processSteps: { step: number; title: string; description: string }[];
   faqs: { question: string; answer: string }[];
+  problems: { title: string; description: string }[];
 }
 
 // ─── Service metadata ──────────────────────────────────────────────
@@ -88,6 +91,11 @@ function content_higienizacao_sofa(loc: string, ctx: string): ContentBlock {
       { question: `A higienização é segura para bebés em ${loc}?`, answer: 'Sim. Usamos apenas produtos certificados e hipoalergénicos para uso doméstico. O sofá pode ser utilizado poucas horas após o tratamento.' },
       { question: `Quanto custa higienizar um sofá em ${loc}?`, answer: `Começa a partir de 49€ para sofás de 2 lugares. Peça orçamento gratuito, deslocamo-nos a ${loc} e toda a área envolvente.` },
     ],
+    problems: [
+      { title: "Alergias que pioram em casa", description: `Um sofá usado durante 3 anos pode conter mais de 15 milhões de ácaros nas fibras. São invisíveis, mas libertam-se ao sentar e agravam alergias respiratórias em ${loc}.` },
+      { title: "Odores que o aspirador não resolve", description: "Bactérias anaeróbias acumulam-se nas camadas profundas do tecido e produzem odores persistentes que nenhum spray doméstico elimina de raiz." },
+      { title: "Bebé ou criança em contacto direto com o tecido", description: "Crianças respiram mais próximo das fibras e são mais vulneráveis a alergénios. A higienização profissional cria um ambiente verdadeiramente seguro para os mais novos." },
+    ],
   };
 }
 
@@ -115,6 +123,11 @@ function content_higienizacao_colchao(loc: string, ctx: string): ContentBlock {
       { question: `A higienização é segura para grávidas e recém-nascidos em ${loc}?`, answer: 'Sim. Usamos produtos hipoalergénicos e certificados, sem compostos tóxicos. Certificado de segurança disponível.' },
       { question: 'A higienização remove o cheiro de suor do colchão?', answer: 'Sim. O processo inclui desodorização enzimática que elimina odores de suor, urina e humidade acumulados nas fibras.' },
       { question: `Quanto custa higienizar um colchão em ${loc}?`, answer: `Começa a partir de 39€ para colchão de solteiro. Peça orçamento gratuito, deslocamo-nos a ${loc} sem custos adicionais.` },
+    ],
+    problems: [
+      { title: "Acordar com olhos vermelhos ou nariz congestionado", description: `Os ácaros do colchão são a causa mais comum de rinite alérgica noturna em ${loc}. O corpo passa 8 horas em contacto direto com o foco de contaminação.` },
+      { title: "Cheiro a suor mesmo depois de arejar", description: "Bactérias anaeróbias nas camadas internas do colchão produzem odores que o arejamento não elimina. Só a extração profissional alcança essa profundidade." },
+      { title: "Criança ou idoso com alergias respiratórias", description: "São os grupos mais vulneráveis a ácaros e alergénios do colchão. A higienização regular é especialmente recomendada para quem acorda com sintomas noturnos." },
     ],
   };
 }
@@ -144,6 +157,11 @@ function content_higienizacao_tapetes(loc: string, ctx: string): ContentBlock {
       { question: 'A higienização remove os pelos do animal de estimação?', answer: 'Sim. O processo remove pelos, alergénios de animais e bactérias associadas, tornando o tapete seguro para toda a família.' },
       { question: `Quanto custa higienizar tapetes em ${loc}?`, answer: `A partir de 5€/m². Peça orçamento gratuito, deslocamo-nos a ${loc} com todo o equipamento necessário.` },
     ],
+    problems: [
+      { title: "Criança que brinca no chão com espirros frequentes", description: "O tapete concentra ácaros, pólen e fungos nas fibras. Quando a criança rasteja ou brinca, inalha estes alergénios em concentração máxima ao nível do chão." },
+      { title: "Animal de estimação que dorme no tapete", description: "Pelos, caspa e bactérias dos animais penetram nas fibras e multiplicam-se. A higienização remove alergénios de animais que a aspiração doméstica deixa para trás." },
+      { title: "Espirros frequentes ou comichão nos olhos em casa", description: "O tapete liberta alergénios ao ser pisado, criando uma nuvem invisível ao nível do chão. A higienização profunda reduz estes níveis em 99,9%." },
+    ],
   };
 }
 
@@ -171,6 +189,11 @@ function content_higienizacao_cadeiras(loc: string, ctx: string): ContentBlock {
       { question: `Fazem higienização de lotes de cadeiras em ${loc}?`, answer: `Sim. Deslocamo-nos a ${loc} para lotes de qualquer dimensão, desde 5 cadeiras de sala de jantar até centenas de cadeiras de escritório.` },
       { question: 'A higienização danifica o tecido das cadeiras?', answer: 'Não. Avaliamos sempre o tipo de tecido antes de iniciar. O bactericida é adaptado ao material: tecido, pele sintética, veludo ou mesh.' },
       { question: `Quanto custa higienizar cadeiras em ${loc}?`, answer: `A partir de 17,50€ por cadeira com descontos progressivos para lotes. Peça orçamento personalizado para o seu negócio em ${loc}.` },
+    ],
+    problems: [
+      { title: "Cadeiras de uso partilhado (restaurante, escritório)", description: `Cadeiras partilhadas por múltiplos utilizadores são superfícies de alto risco de transmissão de vírus e bactérias que a limpeza convencional não elimina em ${loc}.` },
+      { title: "Inspeção sanitária ou auditoria HACCP pendente", description: "A higienização com certificado é exigida em muitas inspeções para espaços alimentares e de saúde. Emitimos comprovativo após cada serviço para conformidade regulatória." },
+      { title: "Imagem profissional comprometida por cadeiras sujas", description: "Cadeiras com aspeto gorduroso ou manchado transmitem desleixo aos clientes. A higienização profissional devolve o aspeto cuidado e prolonga a vida do estofamento." },
     ],
   };
 }
@@ -200,6 +223,11 @@ function content_higienizacao_alcatifas(loc: string, ctx: string): ContentBlock 
       { question: 'Quanto tempo ficam as alcatifas molhadas?', answer: 'Com extração de alta sucção e ventilação adequada, as alcatifas ficam prontas em 2-4 horas.' },
       { question: `Qual o preço de higienização de alcatifas em ${loc}?`, answer: `A partir de 3€/m² com descontos por volume para grandes superfícies. Orçamento gratuito para o seu espaço em ${loc}.` },
     ],
+    problems: [
+      { title: "Cheiro a bafio ou mofo em dias húmidos", description: `Fungos proliferam nas fibras densas das alcatifas quando há humidade acumulada em ${loc}. A higienização com agentes antifúngicos elimina o problema na raiz, não o mascara.` },
+      { title: "Funcionários com sintomas respiratórios no espaço", description: "Alcatifas comerciais são o maior reservatório de alergénios em espaços fechados. A qualidade do ar interior melhora significativamente após higienização profissional." },
+      { title: "Auditoria de qualidade do ar ou certificação pendente", description: "Emitimos relatório de higienização com ficha técnica dos produtos, aceite em auditorias de qualidade do ar interior e certificações de espaços de trabalho." },
+    ],
   };
 }
 
@@ -227,6 +255,11 @@ function content_lavagem_sofa(loc: string, ctx: string): ContentBlock {
       { question: 'Quanto tempo fica o sofá húmido após a lavagem?', answer: 'Com extração de alta sucção, o sofá fica pronto em 4 a 6 horas. Em dias quentes com ventilação, pode secar mais rápido.' },
       { question: `A lavagem remove manchas de anos em ${loc}?`, answer: `Sim, na grande maioria dos casos. A extração profissional remove manchas antigas de café, vinho, gordura e líquidos. Manchas muito antigas podem precisar de tratamento adicional; avaliamos gratuitamente em ${loc}.` },
       { question: `Quanto custa a lavagem de sofá em ${loc}?`, answer: `A partir de 49€ para sofás de 2 lugares. Peça orçamento gratuito, deslocamo-nos a ${loc} sem compromisso.` },
+    ],
+    problems: [
+      { title: "Manchas de café, vinho ou gordura que não saem", description: `Líquidos penetram nas fibras em menos de 30 segundos e ligam-se ao tecido. A extração profissional a quente é o único método que os remove sem danificar o sofá em ${loc}.` },
+      { title: "Sofá com aspeto escuro e cores apagadas", description: "Sujidade acumulada cobre o fio original e faz o sofá parecer mais velho. A lavagem por extração remove esta camada e revela as cores e a maciez originais do tecido." },
+      { title: "Cheiro a estofo velho mesmo depois de aspirar", description: "A aspiração remove apenas sujidade superficial. Humidade e resíduos orgânicos nas fibras profundas produzem odores que só a extração aquosa elimina definitivamente." },
     ],
   };
 }
@@ -256,6 +289,11 @@ function content_lavagem_colchao(loc: string, ctx: string): ContentBlock {
       { question: 'Quanto tempo fica o colchão húmido?', answer: 'Com o nosso sistema de alta sucção, o colchão fica pronto a usar no mesmo dia, tipicamente em 4-6 horas.' },
       { question: `Quanto custa a lavagem de colchão em ${loc}?`, answer: `A partir de 39€ para colchão de solteiro. Peça orçamento gratuito, deslocamo-nos a ${loc} sem custos adicionais.` },
     ],
+    problems: [
+      { title: "Manchas amareladas de suor que resistiram a tudo", description: "A oxidação do suor cria manchas proteicas que se ligam às fibras com o tempo. A lavagem enzimática a quente é o único método que as remove eficazmente sem danificar o colchão." },
+      { title: "Mancha de urina com cheiro persistente", description: "A urina penetra fundo nas camadas do colchão. O pré-tratamento enzimático específico remove tanto a mancha visível como o odor das camadas internas, de forma definitiva." },
+      { title: "Colchão com odor intenso apesar do arejamento", description: "Sujidade orgânica acumulada nas fibras internas produz odores que o arejamento não elimina. A extração profissional alcança essas camadas profundas e devolvem a frescura." },
+    ],
   };
 }
 
@@ -283,6 +321,11 @@ function content_lavagem_tapetes(loc: string, ctx: string): ContentBlock {
       { question: 'Quanto tempo demora a lavagem e secagem do tapete?', answer: 'O processo completo demora 3-5 dias úteis dependendo do tipo e tamanho do tapete. Tapetes sintéticos secam mais rápido.' },
       { question: 'A lavagem restaura as cores originais do tapete?', answer: 'Sim. A lavagem por extração remove sujidade profunda que opaca as cores, revelando a vivacidade original das fibras naturais.' },
       { question: `Qual o preço de lavagem de tapetes em ${loc}?`, answer: `A partir de 5€/m². O preço final depende do tipo de tapete e estado de sujidade. Orçamento gratuito em ${loc}.` },
+    ],
+    problems: [
+      { title: "Manchas de café, molho ou vinho que ficaram", description: "As fibras absorvem líquidos em segundos. Quanto mais tempo passam, mais profundas ficam. A extração profissional remove a grande maioria das manchas antigas, mesmo de anos." },
+      { title: "Tapete com aspeto opaco e cores desbotadas", description: "A sujidade acumulada cria uma camada que apaga as cores naturais das fibras. A lavagem profissional revela as cores originais e a textura real do tapete." },
+      { title: "Tapete de qualidade com manchas que teme tratar em casa", description: "Tapetes persas, orientais ou de lã podem ser danificados por produtos errados. Avaliamos sempre antes de iniciar e usamos técnicas específicas por tipo de fibra." },
     ],
   };
 }
@@ -312,6 +355,11 @@ function content_lavagem_cadeiras(loc: string, ctx: string): ContentBlock {
       { question: 'Qual o desconto para lotes grandes de cadeiras?', answer: 'Até 3 cadeiras: 17,50€/cad. De 4 a 6: 15€/cad. Acima de 10: 12,50€/cad. Contacte-nos para orçamento para o seu espaço.' },
       { question: `Quanto custa lavar cadeiras em ${loc}?`, answer: `A partir de 12,50€ por cadeira em lotes grandes. Peça orçamento gratuito para o seu restaurante ou escritório em ${loc}.` },
     ],
+    problems: [
+      { title: "Cadeiras de jantar com manchas de comida acumuladas", description: "Gordura, molhos e bebidas acumulam-se nas fibras ao longo dos anos. A extração profissional remove estas manchas mesmo as mais antigas e profundas nas fibras." },
+      { title: "Cadeiras de escritório com aspeto sujo e desgastado", description: "Cadeiras desgastadas transmitem desleixo a clientes e visitantes. A lavagem profissional devolve um aspeto cuidado e prolonga significativamente a vida útil do estofamento." },
+      { title: "Manchas escuras nas zonas de contacto habitual", description: "O encosto e o assento ficam progressivamente mais escuros com o uso diário. A lavagem por extração remove esta sujidade compactada de forma profunda e eficaz." },
+    ],
   };
 }
 
@@ -339,6 +387,11 @@ function content_lavagem_alcatifas(loc: string, ctx: string): ContentBlock {
       { question: 'Fazem lavagem de alcatifas em hotéis e grandes espaços?', answer: `Sim. Temos equipamento industrial para qualquer dimensão. Já trabalhámos em hotéis, centros comerciais e escritórios abertos em ${loc}.` },
       { question: 'Fazem lavagem fora do horário de trabalho?', answer: `Sim. Trabalhamos à noite, ao fim de semana e em dias de menor movimento para minimizar a perturbação do negócio em ${loc}.` },
       { question: `Qual o preço de lavagem de alcatifas em ${loc}?`, answer: `A partir de 3€/m² com descontos por volume para superfícies acima de 50m². Orçamento gratuito para o seu espaço em ${loc}.` },
+    ],
+    problems: [
+      { title: "Manchas em zonas de passagem ou entrada", description: `Corredores e entradas acumulam sujidade de calçado que compacta nas fibras em ${loc}. A lavagem profissional remove esta sujidade que a aspiração já não consegue extrair.` },
+      { title: "Alcatifa com anos de sujidade compactada", description: "A aspiração regular não remove os resíduos que penetraram nas fibras ao longo do tempo. A lavagem por extração renova a alcatifa devolvendo o aspeto como novo." },
+      { title: "Derramamento recente de café ou bebida", description: "Quanto mais rápida a intervenção profissional, maior a probabilidade de remoção total. A extração a quente remove o derramamento antes de se tornar mancha permanente." },
     ],
   };
 }
@@ -368,6 +421,11 @@ function content_impermeabilizacao_sofa(loc: string, ctx: string): ContentBlock 
       { question: `Posso impermeabilizar o sofá sem o limpar antes em ${loc}?`, answer: `Recomendamos vivamente a limpeza antes da impermeabilização. Aplicar em tecido sujo reduz significativamente a eficácia da barreira. A Kyro oferece o pack limpeza + impermeabilização com desconto em ${loc}.` },
       { question: 'A impermeabilização funciona em veludo e tecidos delicados?', answer: 'Sim. Adaptamos o produto ao tipo de tecido. Para veludo, seda e tecidos delicados usamos formulações específicas que preservam a fibra.' },
     ],
+    problems: [
+      { title: "Sofá novo que quer proteger desde o início", description: "É muito mais fácil e económico proteger do que tratar manchas após o facto. Uma aplicação cria uma barreira invisível que dura 2 a 5 anos sem alterar o toque ou a cor." },
+      { title: "Família com crianças pequenas ou animais de estimação", description: "Acidentes são inevitáveis. Sem proteção, cada derramamento pode tornar-se uma mancha permanente. A impermeabilização repele líquidos antes de penetrarem nas fibras." },
+      { title: "Tecido delicado como veludo, pele ou microfibra", description: "Estes tecidos são difíceis de limpar sem danificar. Um erro de limpeza pode ser irreversível. A impermeabilização evita que o problema aconteça desde o início." },
+    ],
   };
 }
 
@@ -395,6 +453,11 @@ function content_impermeabilizacao_colchao(loc: string, ctx: string): ContentBlo
       { question: `Posso combinar higienização e impermeabilização em ${loc}?`, answer: `Sim, e é o que recomendamos. O pack higienização + impermeabilização garante um colchão limpo e protegido com desconto sobre os serviços separados. Disponível em ${loc} ao domicílio.` },
       { question: 'A impermeabilização é segura para recém-nascidos?', answer: 'Sim. Usamos produtos certificados, hipoalergénicos e sem compostos tóxicos. Após a secagem completa, o colchão é totalmente seguro para bebés.' },
       { question: 'Com que frequência devo reaplicar a impermeabilização?', answer: 'Para colchões de bebé ou crianças pequenas, recomendamos a cada 18-24 meses. Para adultos, a proteção dura 3 a 5 anos com uso normal.' },
+    ],
+    problems: [
+      { title: "Criança com incontinência noturna", description: "Cada acidente sem proteção é uma mancha nova e profunda no colchão. A barreira impermeável repele o líquido antes de penetrar, mantendo o colchão limpo e sem odores." },
+      { title: "Colchão de qualidade (viscoelástico, memory foam)", description: "Colchões de espuma não podem ser lavados por imersão. Uma mancha que penetra pode ser permanente. A impermeabilização profissional é a única proteção real eficaz." },
+      { title: "Suores noturnos frequentes", description: "O suor excessivo penetra nas fibras e deteriora o colchão de dentro para fora. A barreira impermeável protege as camadas internas e prolonga significativamente a vida útil." },
     ],
   };
 }
@@ -424,8 +487,38 @@ function content_impermeabilizacao_cadeiras(loc: string, ctx: string): ContentBl
       { question: `Fazem impermeabilização de lotes grandes de cadeiras em ${loc}?`, answer: `Sim. Deslocamo-nos a ${loc} para lotes de qualquer dimensão com preços progressivos. Trabalhamos fora do horário para não perturbar o funcionamento do restaurante ou escritório.` },
       { question: `Posso limpar as cadeiras normalmente após a impermeabilização?`, answer: 'Sim. A barreira facilita a limpeza: a maioria dos derrames pode ser removida com um pano húmido. Para sujidade acumulada, use produtos neutros sem solventes.' },
     ],
+    problems: [
+      { title: "Cadeiras de jantar usadas diariamente", description: "A mesa de jantar é a zona de maior risco para derrames. Sem proteção, uma taça de vinho ou molho pode danificar o tecido de forma permanente e irreversível." },
+      { title: "Veludo claro ou tecido de cor lisa", description: "Estas cadeiras mostram qualquer mancha de imediato. Sem impermeabilização, qualquer derrame cria uma marca visível que a limpeza doméstica não consegue remover." },
+      { title: "Cadeiras de design, vintage ou de valor", description: "A reposição pode ser impossível ou muito cara. A impermeabilização profissional protege o investimento com uma barreira invisível que não altera o aspeto nem o toque." },
+    ],
   };
 }
+
+// ─── Testimonials por serviço ──────────────────────────────────────
+
+const SERVICE_TESTIMONIALS: Record<ServiceKey, { name: string; city: string; stars: number; text: string }> = {
+  sofa: {
+    name: "Ana M.", city: "Porto", stars: 5,
+    text: "O sofá de veludo estava com manchas de anos que eu achei impossíveis de tirar. O António chegou, tratou com um cuidado incrível e ficou como novo. Nem parece o mesmo sofá.",
+  },
+  colchao: {
+    name: "Rui F.", city: "Braga", stars: 5,
+    text: "Nunca pensei que o meu colchão pudesse ter tantos ácaros. Os meus filhos têm alergias e a diferença foi imediata, dormem muito melhor. Serviço impecável e com muito cuidado.",
+  },
+  tapetes: {
+    name: "Sofia C.", city: "Lisboa", stars: 5,
+    text: "Tapete persa de família com manchas de mais de 10 anos. Ficou perfeito. Trabalharam com muito cuidado e conheciam claramente o que faziam com fibras delicadas.",
+  },
+  cadeiras: {
+    name: "João P.", city: "Vila Nova de Gaia", stars: 5,
+    text: "Tenho um restaurante com 32 cadeiras. Resultado profissional, cadeiras como novas. Os clientes já comentaram a limpeza do espaço. Voltarei certamente a contratar.",
+  },
+  alcatifas: {
+    name: "Dra. Carla V.", city: "Porto", stars: 5,
+    text: "Clínica com alcatifa em três salas de espera. Serviço profissional, com ficha técnica dos produtos. Ideal para as nossas auditorias sanitárias anuais.",
+  },
+};
 
 // ─── Generator map ─────────────────────────────────────────────────
 
@@ -482,6 +575,7 @@ function buildData(
     metaDescription: content.intro.slice(0, 155).trimEnd(),
     h1: `${variantLabel} Profissional de ${svc.label} ${prep} ${locationName}`,
     ...content,
+    testimonial: SERVICE_TESTIMONIALS[serviceKey],
     priceFrom,
   };
 }

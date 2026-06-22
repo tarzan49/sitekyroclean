@@ -380,8 +380,13 @@ export function prerenderRoutes(outDir: string): number {
         {
           h1: data.h1,
           intro: data.intro,
+          localSection: data.whatIs,
+          problems: data.problems,
           processSteps: data.processSteps,
+          benefits: data.benefits,
+          faqs: data.faqs,
         },
+        data.faqs?.length ? [buildFaqSchema(data.faqs)] : [],
       );
     }
     console.log(`  Keyword variant pages:   ${count - prev}`);
