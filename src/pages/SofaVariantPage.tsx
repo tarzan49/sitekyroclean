@@ -403,38 +403,51 @@ const SofaVariantPage = () => {
         </section>
 
         {/* ═══ PROCESSO ═══ */}
-        <section className="bg-checker-dark">
-          <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8 pt-12 md:pt-16 pb-4">
+        <section className="py-12 md:py-16 bg-kyro-green">
+          <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
             <SectionHeader
               overline="Processo"
               heading="Como funciona a"
               goldWord={variantLabel}
               light={false}
             />
-          </div>
-          <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8 pb-12 md:pb-16">
-            {(data.variantKey === 'impermeabilizacao' ? IMPERMEABILIZACAO_STEPS : GENERIC_PROCESS_STEPS).map((step, idx, arr) => (
-              <div
-                key={idx}
-                className="flex gap-5 py-7"
-                style={{ borderBottom: idx < arr.length - 1 ? "1px solid rgba(255,255,255,0.06)" : undefined }}
-              >
-                <div
-                  className="flex-shrink-0 w-11 h-11 flex items-center justify-center mt-0.5"
-                  style={{ border: "1px solid rgba(212,175,55,0.22)", background: "rgba(212,175,55,0.06)" }}
-                >
-                  <span className="font-mono text-[11px] font-bold" style={{ color: "rgba(212,175,55,0.70)" }}>
-                    {step.step}
-                  </span>
+            {(() => {
+              const steps = data.variantKey === 'impermeabilizacao' ? IMPERMEABILIZACAO_STEPS : GENERIC_PROCESS_STEPS;
+              const splitAt = Math.ceil(steps.length / 2);
+              return (
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-px" style={{ backgroundColor: "#E8E4DE" }}>
+                  {[0, 1].map((colIdx) => {
+                    const colSteps = colIdx === 0 ? steps.slice(0, splitAt) : steps.slice(splitAt);
+                    const offset = colIdx === 0 ? 0 : splitAt;
+                    return (
+                      <div key={colIdx} className="grid gap-px" style={{ backgroundColor: "#E8E4DE" }}>
+                        {colSteps.map((step, idx) => {
+                          const num = offset + idx;
+                          return (
+                            <div
+                              key={num}
+                              className="relative overflow-hidden flex items-start gap-4 p-5 md:p-6 bg-white"
+                              style={{ borderTop: "2px solid rgba(212,175,55,0.55)" }}
+                            >
+                              <span
+                                className="font-playfair font-bold flex-shrink-0 leading-none"
+                                style={{ fontSize: "1.75rem", color: "rgba(212,175,55,0.35)" }}
+                              >
+                                {String(num + 1).padStart(2, "0")}
+                              </span>
+                              <div>
+                                <p className="text-sm font-semibold text-[#111111] mb-1">{step.label}</p>
+                                <p className="text-xs text-[#111111]/55 leading-relaxed">{step.desc}</p>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    );
+                  })}
                 </div>
-                <div className="flex-1">
-                  <h3 className="font-playfair text-lg sm:text-xl font-bold text-white mb-1.5 leading-snug">
-                    {step.label}
-                  </h3>
-                  <p className="text-white/50 text-[13px] leading-relaxed">{step.desc}</p>
-                </div>
-              </div>
-            ))}
+              );
+            })()}
           </div>
         </section>
 
