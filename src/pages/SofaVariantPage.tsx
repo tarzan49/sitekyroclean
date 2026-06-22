@@ -7,7 +7,6 @@ import { useEffect, useMemo } from "react";
 import { useLocation, Link } from "react-router-dom";
 import { QuizLocationProvider, QuizServiceProvider } from "@/context/QuizLocationContext";
 import { CheckCircle, Star, MapPin, MessageCircle } from "lucide-react";
-import { ServiceTrustDesktop, ServiceTrustMobile } from "@/components/ServiceTrustBlock";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -363,42 +362,41 @@ const SofaVariantPage = () => {
                 subtitle={data.whatIs}
                 light={true}
               />
-              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-px mb-10" style={{ backgroundColor: "#E8E4DE" }}>
+              <div className="grid sm:grid-cols-2 gap-px mb-12" style={{ backgroundColor: "#E8E4DE" }}>
                 {data.benefits.map((benefit, idx) => (
                   <div
                     key={idx}
-                    className="relative overflow-hidden flex items-start gap-3 p-6 md:p-7 bg-white"
+                    className="bg-white p-7 md:p-8"
                     style={{ borderTop: "2px solid #D4AF37" }}
                   >
-                    <span
-                      className="absolute bottom-2 right-3 font-playfair font-bold leading-none select-none pointer-events-none"
-                      style={{ fontSize: "5rem", color: "rgba(212,175,55,0.10)" }}
+                    <p
+                      className="font-playfair font-bold mb-3 leading-none"
+                      style={{ fontSize: "2.25rem", color: "rgba(212,175,55,0.30)" }}
                     >
                       {String(idx + 1).padStart(2, "0")}
-                    </span>
-                    <CheckCircle className="relative w-5 h-5 mt-0.5 shrink-0" style={{ color: "#D4AF37" }} />
-                    <span className="relative text-sm text-[#111111]/65 leading-relaxed">{benefit}</span>
+                    </p>
+                    <p className="text-[15px] font-semibold text-[#111111] leading-snug">{benefit}</p>
                   </div>
                 ))}
               </div>
 
-              {/* Trust block */}
-              <div className="border-t border-[#E8E4DE] pt-6">
-                <div className="flex items-center gap-3 mb-4">
+              {/* Porque a Kyro Clean */}
+              <div className="border-t border-[#E8E4DE] pt-8">
+                <div className="flex items-center gap-3 mb-6">
                   <div className="h-px w-8 flex-shrink-0" style={{ backgroundColor: "#D4AF37", opacity: 0.65 }} />
                   <p className="text-[10px] font-bold tracking-[0.28em] uppercase" style={{ color: "#D4AF37", opacity: 0.85 }}>Porque a Kyro Clean</p>
                 </div>
-                <div className="hidden lg:block">
-                  <ServiceTrustDesktop
-                    serviceSlug={parsed.variantKey === 'impermeabilizacao' ? 'impermeabilizacao' : SERVICEKEY_TO_SLUG[parsed.serviceKey]}
-                    variant={2}
-                  />
-                </div>
-                <div className="lg:hidden">
-                  <ServiceTrustMobile
-                    serviceSlug={parsed.variantKey === 'impermeabilizacao' ? 'impermeabilizacao' : SERVICEKEY_TO_SLUG[parsed.serviceKey]}
-                    variant={2}
-                  />
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-px" style={{ backgroundColor: "#E8E4DE" }}>
+                  {[
+                    { stat: "< 30 min", label: "Resposta ao pedido de orçamento" },
+                    { stat: "5.0 ★",   label: "+60 avaliações verificadas no Google" },
+                    { stat: "100%",     label: "Resultado garantido ou repetimos sem custo" },
+                  ].map((item, i) => (
+                    <div key={i} className="bg-white p-6 md:p-7" style={{ borderTop: "2px solid #D4AF37" }}>
+                      <p className="font-playfair font-bold text-2xl mb-1" style={{ color: "#D4AF37" }}>{item.stat}</p>
+                      <p className="text-sm text-[#111111]/65 leading-snug">{item.label}</p>
+                    </div>
+                  ))}
                 </div>
               </div>
           </div>

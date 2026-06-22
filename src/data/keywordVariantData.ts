@@ -69,7 +69,7 @@ const SERVICES_FOR_VARIANT: Record<VariantKey, ServiceKey[]> = {
 function content_higienizacao_sofa(loc: string, ctx: string): ContentBlock {
   return {
     intro: `A higienização profissional do sofá em ${loc} vai além da limpeza visual: eliminamos os agentes patogénicos invisíveis que afetam a saúde da sua família. A Kyro Clean Solutions usa protocolos de sanitização certificados para remover ácaros, bactérias, fungos e alergénios acumulados nos tecidos em ${loc} e ${ctx}.`,
-    whatIs: `A higienização de sofá é um processo de sanitização profunda que elimina microrganismos patogénicos (ácaros, bactérias e fungos) que se acumulam nos tecidos com o uso diário. Ao contrário da limpeza convencional, a higienização usa agentes antimicrobianos certificados e aspiração HEPA para garantir um ambiente verdadeiramente saudável. Especialmente recomendada para famílias com bebés, crianças, idosos e alérgicos em ${loc}.`,
+    whatIs: `A higienização vai além de tirar o pó: elimina os ácaros, bactérias e fungos que vivem nos tecidos e que causam alergias, espirros e problemas respiratórios. Feita com produtos seguros para toda a família, é especialmente recomendada quando há bebés, crianças ou alérgicos em casa em ${loc}.`,
     benefits: [
       'Eliminação de 99,9% de ácaros, bactérias e vírus',
       'Sanitização certificada com agentes antimicrobianos',
@@ -102,7 +102,7 @@ function content_higienizacao_sofa(loc: string, ctx: string): ContentBlock {
 function content_higienizacao_colchao(loc: string, ctx: string): ContentBlock {
   return {
     intro: `Passamos um terço da vida no colchão, por isso a higienização profissional do colchão em ${loc} é essencial para a saúde do sono. A Kyro Clean Solutions elimina ácaros, bactérias e fungos com protocolos de sanitização certificados, garantindo noites mais saudáveis em ${loc} e ${ctx}.`,
-    whatIs: `A higienização de colchão elimina os microrganismos que proliferam enquanto dormimos: ácaros, bactérias, fungos e alergénios. Um colchão pode conter até 2 milhões de ácaros; a aspiração HEPA e o tratamento antimicrobiano certificado reduzem este número em 99,9%, melhorando a qualidade do sono e reduzindo alergias noturnas em ${loc}.`,
+    whatIs: `Passamos um terço da vida no colchão, por isso a higiene interna importa tanto como a externa. Este tratamento elimina os ácaros e bactérias das camadas profundas que causam alergias nocturnas, espirros de manhã e má qualidade de sono — sem produtos tóxicos, seguro para toda a família.`,
     benefits: [
       'Eliminação de 99,9% dos ácaros e bactérias do colchão',
       'Melhoria comprovada da qualidade do sono',
@@ -135,7 +135,7 @@ function content_higienizacao_colchao(loc: string, ctx: string): ContentBlock {
 function content_higienizacao_tapetes(loc: string, ctx: string): ContentBlock {
   return {
     intro: `Os tapetes da sua casa em ${loc} são um dos maiores reservatórios de alergénios no interior: acumulam ácaros, pólen, penas e bactérias nas suas fibras. A Kyro Clean Solutions oferece higienização profissional de tapetes em ${loc} e ${ctx}, tornando o chão seguro para crianças e alérgicos.`,
-    whatIs: `A higienização de tapetes vai além da lavagem convencional: usa agentes antimicrobianos certificados e aspiração HEPA para eliminar microrganismos que vivem nas fibras. Crianças que brincam no chão estão em contacto direto com estes alergénios. A higienização profissional em ${loc} remove 99,9% dos ácaros, bactérias e alergénios, melhorando a qualidade do ar interior.`,
+    whatIs: `O tapete retém nos seus fios o pólen, ácaros e bactérias que entram em casa com os sapatos ou com os animais de estimação. Este tratamento remove esses alergénios em profundidade, tornando o chão seguro para crianças que brincam e para quem sofre de alergias em ${loc}.`,
     benefits: [
       'Tapete seguro para crianças que brincam no chão',
       'Eliminação de 99,9% de ácaros e alergénios',
@@ -168,7 +168,7 @@ function content_higienizacao_tapetes(loc: string, ctx: string): ContentBlock {
 function content_higienizacao_cadeiras(loc: string, ctx: string): ContentBlock {
   return {
     intro: `A higienização de cadeiras estofadas em ${loc} é essencial para restaurantes, escritórios e clínicas que partilham superfícies entre múltiplos utilizadores. A Kyro Clean Solutions aplica bactericida certificado que elimina 99,9% dos microrganismos em cadeiras de uso partilhado em ${loc} e ${ctx}.`,
-    whatIs: `Cadeiras de uso partilhado (restaurante, escritório, sala de espera) acumulam bactérias, vírus e fungos que a limpeza convencional não elimina. A higienização profissional usa agentes bactericidas certificados compatíveis com normas HACCP, garantindo superfícies seguras para clientes e colaboradores em ${loc}. Ideal para certificações de higiene e inspeções sanitárias.`,
+    whatIs: `As cadeiras que partilhamos acumulam bactérias e vírus em silêncio — a limpeza habitual com pano não chega para os remover. Este tratamento elimina os germes das fibras com produtos certificados, essencial para restaurantes, escritórios e qualquer espaço onde várias pessoas se sentam na mesma cadeira em ${loc}.`,
     benefits: [
       'Bactericida certificado compatível com normas HACCP',
       'Ideal para restaurantes, escritórios e clínicas em ${loc}',
@@ -201,7 +201,7 @@ function content_higienizacao_cadeiras(loc: string, ctx: string): ContentBlock {
 function content_higienizacao_alcatifas(loc: string, ctx: string): ContentBlock {
   return {
     intro: `A higienização de alcatifas em ${loc} é crítica para hotéis, clínicas, escolas e espaços comerciais onde a saúde coletiva está em causa. A Kyro Clean Solutions aplica protocolos de sanitização certificados para grandes superfícies em ${loc} e ${ctx}, garantindo qualidade do ar interior e conformidade com normas de higiene.`,
-    whatIs: `Em grandes superfícies de alcatifa, os microrganismos multiplicam-se entre lavagens convencionais, comprometendo a qualidade do ar interior. A higienização profissional usa aspiração industrial HEPA e agentes antimicrobianos aprovados para uso em espaços públicos em ${loc}. Ideal para auditorias sanitárias e certificações de qualidade do ar.`,
+    whatIs: `As alcatifas de espaços comerciais acumulam nas fibras densas grandes quantidades de pó, bactérias e alergénios que pioram a qualidade do ar. Este tratamento elimina-os com produtos aprovados para espaços públicos, melhorando o ar do espaço e facilitando auditorias de higiene em ${loc}.`,
     benefits: [
       'Aprovado para espaços públicos, hotéis e clínicas',
       'Melhoria mensurável da qualidade do ar interior',
@@ -234,7 +234,7 @@ function content_higienizacao_alcatifas(loc: string, ctx: string): ContentBlock 
 function content_lavagem_sofa(loc: string, ctx: string): ContentBlock {
   return {
     intro: `Precisa de lavar o sofá em ${loc}? A Kyro Clean Solutions realiza lavagem profunda por extração profissional, o método mais eficaz para remover manchas, gorduras e resíduos acumulados nas fibras. Ao contrário da limpeza seca, a lavagem por extração penetra nas camadas profundas do tecido, devolvendo o sofá ao estado original em ${loc} e ${ctx}.`,
-    whatIs: `A lavagem de sofá por extração é o método profissional mais eficaz para renovar tecidos desgastados em ${loc}. A máquina de extração injeta solução quente nas fibras e aspira de volta toda a sujidade, manchas e gordura, incluindo resíduos impossíveis de remover com limpeza doméstica. O resultado é um sofá com aspeto renovado, cores revitalizadas e tecido macio.`,
+    whatIs: `A lavagem profissional é como uma limpeza por dentro do tecido: retira manchas, gordura acumulada e o escurecimento que o aspirador doméstico nunca consegue atingir. O sofá fica com as cores e o toque que tinha quando era novo — ao domicílio em ${loc}, sem mover o sofá.`,
     benefits: [
       'Extração profunda com equipamento profissional',
       'Remove manchas antigas que a limpeza seca não consegue',
@@ -267,7 +267,7 @@ function content_lavagem_sofa(loc: string, ctx: string): ContentBlock {
 function content_lavagem_colchao(loc: string, ctx: string): ContentBlock {
   return {
     intro: `Manchas de suor, urina ou outros líquidos no colchão em ${loc}? A Kyro Clean Solutions realiza lavagem profunda por extração que remove manchas acumuladas nas camadas profundas do colchão, renovando-o completamente. Serviço ao domicílio em ${loc} e ${ctx}.`,
-    whatIs: `A lavagem de colchão por extração remove manchas de suor, urina, sangue e outros líquidos que penetraram nas fibras com o uso diário. Ao contrário da simples higienização superficial, a lavagem profissional injeta solução quente e aspira toda a sujidade orgânica das camadas profundas do colchão em ${loc}, devolvendo-lhe o aspeto original e eliminando odores.`,
+    whatIs: `Com o uso diário, o colchão absorve suor, líquidos e manchas nas suas camadas profundas — e o arejamento não chega para os remover. Este tratamento extrai essas impurezas de dentro do colchão, devolve o aspeto original e elimina os odores na raiz, tudo ao domicílio em ${loc}.`,
     benefits: [
       'Remoção de manchas de suor, urina e sangue',
       'Extração profunda nas camadas interiores do colchão',
@@ -300,7 +300,7 @@ function content_lavagem_colchao(loc: string, ctx: string): ContentBlock {
 function content_lavagem_tapetes(loc: string, ctx: string): ContentBlock {
   return {
     intro: `Precisa de lavar tapetes em ${loc}? A Kyro Clean Solutions faz lavagem especializada de tapetes de todos os tipos (persas, orientais, modernos e de lã) com extração profissional e recolha ao domicílio em ${loc} e ${ctx}. Preços desde 5€/m².`,
-    whatIs: `A lavagem de tapetes por extração é o método profissional mais eficaz para renovar fibras desgastadas em ${loc}. A máquina de extração injeta solução quente e aspira a sujidade, manchas e gordura das fibras, restaurando cores e devolvendo o tapete ao seu estado original. Para tapetes persas e delicados, usamos técnicas e produtos específicos que preservam as fibras sem riscos.`,
+    whatIs: `A lavagem profissional retira a sujidade compactada que anos de aspiração deixaram para trás nas fibras, restaura as cores e o toque originais. Feita com produtos adaptados ao tipo de fibra — lã, seda, sintético ou persa — para que o tapete não corra riscos em ${loc}.`,
     benefits: [
       'Lavagem especializada para tapetes persas e orientais',
       'Restauração das cores e aspeto original',
@@ -333,7 +333,7 @@ function content_lavagem_tapetes(loc: string, ctx: string): ContentBlock {
 function content_lavagem_cadeiras(loc: string, ctx: string): ContentBlock {
   return {
     intro: `Lavagem de cadeiras estofadas em ${loc} para restaurantes, escritórios e residências. A Kyro Clean Solutions renova lotes de cadeiras com extração profissional, eliminando manchas e devolvendo um aspeto como novo. Serviço ao domicílio em ${loc} e ${ctx}.`,
-    whatIs: `A lavagem de cadeiras por extração remove manchas de gordura, alimentos, suor e líquidos acumulados no estofamento ao longo do uso. Em ${loc}, restaurantes e escritórios beneficiam especialmente deste serviço; cadeiras limpas transmitem cuidado e profissionalismo ao cliente. A extração profissional injeta solução quente nas fibras e aspira toda a sujidade em profundidade, com secagem rápida.`,
+    whatIs: `A lavagem profissional remove manchas de gordura, comida e suor que se acumularam nas fibras das cadeiras ao longo do tempo. Cadeiras com aspeto cuidado transmitem profissionalismo — e a secagem é rápida para que o espaço não fique parado. Feita ao domicílio em ${loc}.`,
     benefits: [
       'Ideal para lotes de cadeiras de restaurante e escritório',
       'Aspeto como novo: manchas e gorduras eliminadas',
@@ -366,7 +366,7 @@ function content_lavagem_cadeiras(loc: string, ctx: string): ContentBlock {
 function content_lavagem_alcatifas(loc: string, ctx: string): ContentBlock {
   return {
     intro: `Lavagem de alcatifas em ${loc} para hotéis, escritórios e grandes espaços comerciais. A Kyro Clean Solutions realiza extração profunda profissional em qualquer dimensão de alcatifa, com secagem rápida e mínima perturbação do negócio em ${loc} e ${ctx}.`,
-    whatIs: `A lavagem de alcatifas por extração profissional é o método mais eficaz para grandes superfícies em ${loc}. A máquina injeta solução aquecida nas fibras e aspira toda a sujidade acumulada, incluindo manchas de passagem frequente, derramamentos e resíduos que a aspiração convencional não remove. O resultado é uma alcatifa renovada com aspeto como novo e odores eliminados.`,
+    whatIs: `A lavagem profissional penetra nas camadas mais densas da alcatifa e remove a sujidade que anos de aspiração deixaram para trás — manchas de passagem, derramamentos e a sujidade invisível das fibras. O resultado é visível no mesmo dia, com secagem em 2 a 4 horas em ${loc}.`,
     benefits: [
       'Equipamento comercial para grandes superfícies',
       'Remove manchas de passagem e derramamentos',
@@ -399,7 +399,7 @@ function content_lavagem_alcatifas(loc: string, ctx: string): ContentBlock {
 function content_impermeabilizacao_sofa(loc: string, ctx: string): ContentBlock {
   return {
     intro: `A impermeabilização de sofás em ${loc} cria uma barreira invisível contra líquidos, manchas e gordura, protegendo o seu investimento por anos sem alterar o toque ou a aparência do tecido. A Kyro Clean Solutions aplica tratamento de nano-partículas certificado em ${loc} e ${ctx}, com resultados garantidos.`,
-    whatIs: `A impermeabilização profissional de sofás usa nano-partículas que penetram nas fibras e criam uma membrana repelente invisível. Qualquer líquido derramado (vinho, café, sumo ou água) forma gotas à superfície e pode ser removido com um simples pano, sem deixar mancha. Uma única aplicação em ${loc} protege o tecido durante 2 a 5 anos, reduzindo drasticamente o custo e a frequência de limpezas futuras.`,
+    whatIs: `Este tratamento cria uma barreira invisível no tecido do sofá: a próxima vez que cair café, vinho ou sumo, o líquido fica à superfície e limpa-se com um pano — sem mancha, sem stress. O toque e o aspeto do sofá ficam exactamente iguais, e a proteção dura anos em ${loc}.`,
     benefits: [
       'Barreira invisível contra líquidos, manchas e gordura',
       'Toque e aspeto do tecido 100% preservados',
@@ -432,7 +432,7 @@ function content_impermeabilizacao_sofa(loc: string, ctx: string): ContentBlock 
 function content_impermeabilizacao_colchao(loc: string, ctx: string): ContentBlock {
   return {
     intro: `A impermeabilização de colchões em ${loc} protege o seu investimento de derrames acidentais, suor e líquidos biológicos, preservando a higiene e prolongando a vida útil do colchão por anos. A Kyro Clean Solutions aplica tratamento certificado ao domicílio em ${loc} e ${ctx}.`,
-    whatIs: `A impermeabilização profissional do colchão cria uma barreira molecular que repele líquidos antes de penetrarem nas camadas internas. Especialmente indicada para colchões de crianças, bebés e idosos, protege de acidentes noturnos, suor excessivo e derrames. Em ${loc}, o tratamento é aplicado ao domicílio com o colchão no lugar, sem necessidade de transporte.`,
+    whatIs: `Este tratamento cria uma barreira no interior do colchão que repele líquidos antes de penetrarem — muito útil para colchões de crianças, idosos ou qualquer pessoa que queira proteger um colchão de qualidade. Aplicado ao domicílio em ${loc}, com o colchão no lugar, sem transportar nada.`,
     benefits: [
       'Proteção total contra acidentes noturnos de crianças e idosos',
       'Repele suor, líquidos biológicos e derrames',
@@ -465,7 +465,7 @@ function content_impermeabilizacao_colchao(loc: string, ctx: string): ContentBlo
 function content_impermeabilizacao_cadeiras(loc: string, ctx: string): ContentBlock {
   return {
     intro: `A impermeabilização de cadeiras estofadas em ${loc} protege o tecido de derramamentos, gordura e uso intensivo, ideal para restaurantes, escritórios e residências que querem cadeiras com aspeto cuidado por mais tempo. Kyro Clean Solutions ao domicílio em ${loc} e ${ctx}.`,
-    whatIs: `As cadeiras de jantar e de escritório sofrem derrames diários de líquidos, gordura e manchas de uso. A impermeabilização profissional cria uma barreira invisível nas fibras que repele estes agentes, facilitando a limpeza e prolongando a vida útil do estofamento. Em ${loc}, aplicamos ao domicílio em qualquer quantidade, de 2 cadeiras de sala de jantar a centenas de cadeiras de restaurante.`,
+    whatIs: `Uma aplicação cria uma barreira transparente nas fibras das cadeiras que repele líquidos e gordura. A limpeza do dia a dia fica reduzida a uma passagem de pano húmido, e o tecido mantém o aspeto cuidado por anos. Aplicamos ao domicílio em ${loc}, de 2 cadeiras a centenas.`,
     benefits: [
       'Tecido repele derramamentos, café e gordura',
       'Manutenção diária reduzida a uma simples passagem de pano',
