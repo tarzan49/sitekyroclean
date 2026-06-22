@@ -355,10 +355,10 @@ const SofaVariantPage = () => {
           </div>
         </section>
 
-        {/* ═══ O QUE É + VANTAGENS ═══ */}
+        {/* ═══ VANTAGENS ═══ */}
         <section className="py-12 md:py-16 bg-[#FDFDF9]">
           <div className="container mx-auto px-5 sm:px-6 lg:px-8">
-            <div className="max-w-4xl mx-auto">
+            <div className="max-w-5xl mx-auto">
               <SectionHeader
                 overline="Vantagens"
                 heading={`${variantLabel} profissional ${prep}`}
@@ -366,22 +366,31 @@ const SofaVariantPage = () => {
                 subtitle={data.whatIs}
                 light={true}
               />
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-px mb-10" style={{ backgroundColor: "#E8E4DE" }}>
                 {data.benefits.map((benefit, idx) => (
-                  <div key={idx} className="flex items-start gap-3 p-5 bg-white border border-[#E8E4DE]">
-                    <div className="flex-shrink-0 w-8 h-8 flex items-center justify-center border border-[#D4AF37]/30">
-                      <span className="font-playfair text-sm font-bold" style={{ color: "#D4AF37" }}>
-                        {String(idx + 1).padStart(2, '0')}
-                      </span>
-                    </div>
-                    <p className="text-sm font-semibold text-[#111111] leading-snug mt-1">{benefit}</p>
+                  <div
+                    key={idx}
+                    className="relative overflow-hidden flex items-start gap-3 p-6 md:p-7 bg-white"
+                    style={{ borderTop: "2px solid #D4AF37" }}
+                  >
+                    <span
+                      className="absolute bottom-2 right-3 font-playfair font-bold leading-none select-none pointer-events-none"
+                      style={{ fontSize: "5rem", color: "rgba(212,175,55,0.10)" }}
+                    >
+                      {String(idx + 1).padStart(2, "0")}
+                    </span>
+                    <CheckCircle className="relative w-5 h-5 mt-0.5 shrink-0" style={{ color: "#D4AF37" }} />
+                    <span className="relative text-sm text-[#111111]/65 leading-relaxed">{benefit}</span>
                   </div>
                 ))}
               </div>
 
               {/* Trust block */}
-              <div className="mt-8 border-t border-[#E8E4DE] pt-6">
-                <p className="text-[10px] font-bold tracking-[0.22em] uppercase text-[#111111]/40 mb-4">Porque a Kyro Clean</p>
+              <div className="border-t border-[#E8E4DE] pt-6">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="h-px w-8 flex-shrink-0" style={{ backgroundColor: "#D4AF37", opacity: 0.65 }} />
+                  <p className="text-[10px] font-bold tracking-[0.28em] uppercase" style={{ color: "#D4AF37", opacity: 0.85 }}>Porque a Kyro Clean</p>
+                </div>
                 <div className="hidden lg:block">
                   <ServiceTrustDesktop
                     serviceSlug={parsed.variantKey === 'impermeabilizacao' ? 'impermeabilizacao' : SERVICEKEY_TO_SLUG[parsed.serviceKey]}
