@@ -310,8 +310,7 @@ const SofaVariantPage = () => {
 
         {/* ═══ PROBLEMAS ═══ */}
         <section className="py-12 md:py-16 bg-kyro-green">
-          <div className="container mx-auto px-5 sm:px-6 lg:px-8">
-            <div className="max-w-6xl mx-auto">
+          <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
               <SectionHeader
                 overline="O Que Resolvemos"
                 heading={`Problemas que resolvemos ${prep}`}
@@ -351,14 +350,12 @@ const SofaVariantPage = () => {
                   </div>
                 ))}
               </div>
-            </div>
           </div>
         </section>
 
         {/* ═══ VANTAGENS ═══ */}
         <section className="py-12 md:py-16 bg-[#FDFDF9]">
-          <div className="container mx-auto px-5 sm:px-6 lg:px-8">
-            <div className="max-w-5xl mx-auto">
+          <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
               <SectionHeader
                 overline="Vantagens"
                 heading={`${variantLabel} profissional ${prep}`}
@@ -404,14 +401,12 @@ const SofaVariantPage = () => {
                   />
                 </div>
               </div>
-            </div>
           </div>
         </section>
 
         {/* ═══ PROCESSO ═══ */}
         <section className="py-12 md:py-16 relative overflow-hidden bg-checker-dark">
-          <div className="container mx-auto px-5 sm:px-6 lg:px-8 relative z-10">
-            <div className="max-w-4xl mx-auto">
+          <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8 relative z-10">
               <SectionHeader
                 overline="Processo"
                 heading="Como funciona a"
@@ -434,15 +429,13 @@ const SofaVariantPage = () => {
                   </div>
                 ))}
               </div>
-            </div>
           </div>
         </section>
 
         {/* ═══ RESULTADO ═══ */}
         <section className="py-12 md:py-16 bg-[#FDFDF9]">
-          <div className="container mx-auto px-5 sm:px-6 lg:px-8">
-            <div className="max-w-5xl mx-auto">
-              <div className="relative rounded-3xl overflow-hidden shadow-2xl">
+          <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
+              <div className="relative overflow-hidden shadow-2xl">
                 <img
                   src={resultImg}
                   alt={`Resultado após ${variantLabel.toLowerCase()} ${prep} ${data.locationName}`}
@@ -469,14 +462,13 @@ const SofaVariantPage = () => {
                   </div>
                 </div>
               </div>
-            </div>
           </div>
         </section>
 
         {/* ═══ TESTEMUNHO ═══ */}
         <section className="py-10 md:py-14 bg-white">
-          <div className="container mx-auto px-5 sm:px-6 lg:px-8">
-            <div className="max-w-3xl mx-auto">
+          <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
+            <div className="max-w-xl">
               <div className="border border-[#E8E4DE] p-8 md:p-10">
                 <div className="flex gap-0.5 mb-5">
                   {[...Array(data.testimonial.stars)].map((_, k) => (
@@ -513,38 +505,37 @@ const SofaVariantPage = () => {
 
         {/* ═══ FAQ ═══ */}
         <section className="py-12 md:py-16 relative overflow-hidden bg-checker-dark">
-          <div className="container mx-auto px-5 sm:px-6 lg:px-8 relative z-10">
-            <div className="max-w-3xl mx-auto">
+          <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8 relative z-10">
               <SectionHeader
                 overline="Perguntas"
                 heading="Perguntas"
                 goldWord="Frequentes"
                 light={false}
               />
-              <Accordion type="single" collapsible className="space-y-4">
-                {data.faqs.map((faq, i) => (
-                  <AccordionItem
-                    key={i}
-                    value={`faq-${i}`}
-                    className="bg-white/[0.04] rounded-[18px] border border-white/10 px-6 transition-all duration-300 data-[state=open]:border-[#D4AF37]/30"
-                  >
-                    <AccordionTrigger className="text-left text-sm font-semibold text-white py-5 hover:no-underline [&[data-state=open]>svg]:text-[#D4AF37]">
-                      {faq.question}
-                    </AccordionTrigger>
-                    <AccordionContent className="text-sm text-white/55 pb-5 leading-relaxed">
-                      {faq.answer}
-                    </AccordionContent>
-                  </AccordionItem>
-                ))}
-              </Accordion>
-            </div>
+              <div className="max-w-3xl">
+                <Accordion type="single" collapsible className="space-y-4">
+                  {data.faqs.map((faq, i) => (
+                    <AccordionItem
+                      key={i}
+                      value={`faq-${i}`}
+                      className="bg-white/[0.04] rounded-[18px] border border-white/10 px-6 transition-all duration-300 data-[state=open]:border-[#D4AF37]/30"
+                    >
+                      <AccordionTrigger className="text-left text-sm font-semibold text-white py-5 hover:no-underline [&[data-state=open]>svg]:text-[#D4AF37]">
+                        {faq.question}
+                      </AccordionTrigger>
+                      <AccordionContent className="text-sm text-white/55 pb-5 leading-relaxed">
+                        {faq.answer}
+                      </AccordionContent>
+                    </AccordionItem>
+                  ))}
+                </Accordion>
+              </div>
           </div>
         </section>
 
         {/* ═══ ÁREA DE SERVIÇO ═══ */}
         <section className="py-12 md:py-14 bg-[#FDFDF9]">
-          <div className="container mx-auto px-5 sm:px-6 lg:px-8">
-            <div className="max-w-4xl mx-auto">
+          <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
               <SectionHeader
                 overline="Cobertura"
                 heading={`Servimos ${data.locationName} e`}
@@ -553,7 +544,7 @@ const SofaVariantPage = () => {
               />
 
               <p className="text-xs text-[#111111]/50 mb-3">Também disponível em:</p>
-              <div className="flex flex-wrap justify-center gap-3 mb-6">
+              <div className="flex flex-wrap gap-3 mb-6">
                 {cities.filter(c => c.slug !== parsed.locationPart).slice(0, 6).map(city => (
                   <Link
                     key={city.slug}
@@ -565,9 +556,9 @@ const SofaVariantPage = () => {
                 ))}
               </div>
 
-              <div className="mt-2 pt-6 border-t border-[#E8E4DE]">
+              <div className="pt-6 border-t border-[#E8E4DE]">
                 <p className="text-xs text-[#111111]/50 mb-3">Outros serviços {prep} {data.locationName}:</p>
-                <div className="flex flex-wrap justify-center gap-3">
+                <div className="flex flex-wrap gap-3">
                   {(SERVICES.filter(s => s !== parsed.serviceKey) as ServiceKey[]).map(svcKey => (
                     <Link
                       key={svcKey}
@@ -585,7 +576,6 @@ const SofaVariantPage = () => {
                   </Link>
                 </div>
               </div>
-            </div>
           </div>
         </section>
 
