@@ -12,7 +12,6 @@ import Footer from "@/components/Footer";
 import QuizButton from "@/components/QuizButton";
 import { trackWhatsAppClick } from "@/lib/quizTracking";
 import ServiceFAQ from "@/components/ServiceFAQ";
-import SectionHeader from "@/components/SectionHeader";
 import ServicePackBanner from "@/components/ServicePackBanner";
 import ServicePriceSection from "@/components/ServicePriceSection";
 import { SERVICEKEY_TO_QUIZ } from "@/constants/serviceToQuiz";
@@ -100,6 +99,30 @@ const HERO_IMAGES: Record<ServiceKey, { d: string; m: string }> = {
 };
 
 
+
+// Heading local para keyword variant pages — linha gold 2px hardcoded,
+// sem depender da opacity subtil do SectionHeader global
+const VSHeader = ({ overline, heading, goldWord, subtitle, light = true }: {
+  overline: string; heading: string; goldWord: string; subtitle?: string; light?: boolean;
+}) => (
+  <div className="mb-10 md:mb-14">
+    <div className="flex items-center gap-3 mb-4">
+      <div className="h-0.5 w-8 flex-shrink-0" style={{ backgroundColor: "#D4AF37" }} />
+      <p className="text-[10px] font-bold tracking-[0.28em] uppercase" style={{ color: "#D4AF37" }}>
+        {overline}
+      </p>
+    </div>
+    <h2 className={`font-playfair text-[1.85rem] sm:text-4xl md:text-[2.6rem] font-bold leading-[1.1] ${light ? "text-[#111111]" : "text-white"}`}>
+      {heading}{" "}
+      <em className="not-italic" style={{ color: "#D4AF37" }}>{goldWord}</em>
+    </h2>
+    {subtitle && (
+      <p className={`mt-4 text-[15px] leading-relaxed max-w-2xl ${light ? "text-[#111111]/55" : "text-white/50"}`}>
+        {subtitle}
+      </p>
+    )}
+  </div>
+);
 
 const SERVICE_PACK_SLUGS: Record<ServiceKey, string[]> = {
   sofa:      ["pack-sofa-e-colchao", "pack-sofa-impermeabilizacao"],
@@ -300,7 +323,7 @@ const SofaVariantPage = () => {
         {/* ═══ PROBLEMAS ═══ */}
         <section className="py-12 md:py-16 bg-kyro-green">
           <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
-              <SectionHeader
+              <VSHeader
                 overline="O Que Resolvemos"
                 heading={`Problemas que resolvemos ${prep}`}
                 goldWord={data.locationName}
@@ -345,7 +368,7 @@ const SofaVariantPage = () => {
         {/* ═══ VANTAGENS ═══ */}
         <section className="py-12 md:py-16 bg-[#FDFDF9]">
           <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
-            <SectionHeader
+            <VSHeader
               overline="Vantagens"
               heading={`${variantLabel} profissional ${prep}`}
               goldWord={data.locationName}
@@ -368,7 +391,7 @@ const SofaVariantPage = () => {
         {/* ═══ PORQUE A KYRO CLEAN + AVALIAÇÕES ═══ */}
         <section className="py-12 md:py-16 bg-kyro-green">
           <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
-            <SectionHeader
+            <VSHeader
               overline="Porque a Kyro Clean"
               heading="A escolha certa para os seus"
               goldWord="estofos"
@@ -424,7 +447,7 @@ const SofaVariantPage = () => {
         {/* ═══ PROCESSO ═══ */}
         <section className="py-12 md:py-16 bg-white">
           <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
-            <SectionHeader
+            <VSHeader
               overline="Processo"
               heading="Como funciona a"
               goldWord={variantLabel}
@@ -486,7 +509,7 @@ const SofaVariantPage = () => {
         {/* ═══ COBERTURA ═══ */}
         <section className="py-12 md:py-16 bg-white">
           <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
-            <SectionHeader
+            <VSHeader
               overline="Cobertura"
               heading={`Área de serviço ${prep}`}
               goldWord={data.locationName}
