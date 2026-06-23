@@ -251,26 +251,48 @@ const SofaVariantPage = () => {
                   {data.intro.split('.')[0]}.
                 </p>
 
-                <TrustRatingBadge variant="hero" />
+                {/* CTAs — igual ao hero da homepage */}
+                <div className="flex flex-col gap-2.5 w-full max-w-sm">
 
-                <div className="flex gap-3">
-                  <div className="relative flex-1">
-                    <div className="absolute -inset-1.5 rounded-full bg-gold/40 opacity-30 blur-lg pointer-events-none" />
-                    <QuizButton className="relative w-full" buttonClassName="h-[52px] !py-0 w-full" ctaLabel={QUIZ_CTA[data.variantKey]} initialLocation={data.locationName} initialService={quizService} />
+                  {/* Gold */}
+                  <div className="relative group">
+                    <div className="absolute -inset-1.5 rounded-full bg-gradient-to-r from-[#C9A84C]/50 to-[#E8D070]/40 opacity-30 blur-lg group-hover:opacity-55 transition-opacity duration-400 pointer-events-none" />
+                    <QuizButton
+                      className="relative w-full"
+                      buttonClassName="h-[58px] md:h-[52px] !py-0 w-full"
+                      ctaLabel="Calcular o meu preço"
+                      initialLocation={data.locationName}
+                      initialService={quizService}
+                    />
                   </div>
-                  <a
-                    href={`${WHATSAPP_BASE}?text=${encodeURIComponent(buildVariantWaMessage(data.variantKey === 'impermeabilizacao', SERVICE_LABEL[data.serviceKey], VARIANT_LABEL[data.variantKey], data.locationName))}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    onClick={() => trackWhatsAppClick(`variant_hero_${parsed.variantKey}_${parsed.serviceKey}`)}
-                    className="relative flex-1 inline-flex items-center justify-center gap-2 h-[52px] px-5 rounded-full font-black text-sm text-white bg-gradient-to-r from-[#1DA851] via-[#25D366] to-[#1DA851] shadow-[0_6px_22px_rgba(37,211,102,0.42),0_2px_6px_rgba(0,0,0,0.28),inset_0_1px_0_rgba(255,255,255,0.20),inset_0_-2px_0_rgba(0,0,0,0.12)] hover:shadow-[0_10px_32px_rgba(37,211,102,0.60),0_2px_6px_rgba(0,0,0,0.28),inset_0_1px_0_rgba(255,255,255,0.20),inset_0_-2px_0_rgba(0,0,0,0.12)] hover:scale-[1.025] active:scale-[0.95] transition-all duration-200 touch-manipulation"
-                  >
-                    <MessageCircle className="w-[18px] h-[18px] text-white flex-shrink-0" strokeWidth={2} />
-                    {WA_BTN_LABEL[data.variantKey]}
-                  </a>
-                </div>
 
-                <p className="text-white/40 text-xs mt-4">Desde {data.priceFrom} · Orçamento gratuito</p>
+                  {/* WhatsApp */}
+                  <div className="relative group">
+                    <div className="absolute -inset-1.5 rounded-full bg-[#25D366]/40 opacity-30 blur-lg group-hover:opacity-55 transition-opacity duration-400 pointer-events-none" />
+                    <a
+                      href={`${WHATSAPP_BASE}?text=${encodeURIComponent(buildVariantWaMessage(data.variantKey === 'impermeabilizacao', SERVICE_LABEL[data.serviceKey], VARIANT_LABEL[data.variantKey], data.locationName))}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={() => trackWhatsAppClick(`variant_hero_${parsed.variantKey}_${parsed.serviceKey}`)}
+                      className={[
+                        'relative flex items-center justify-center gap-2 w-full font-bold text-white touch-manipulation',
+                        'h-[58px] md:h-[52px] px-8',
+                        'bg-gradient-to-r from-[#1DA851] via-[#25D366] to-[#1DA851]',
+                        'shadow-[0_6px_22px_rgba(37,211,102,0.42),0_2px_6px_rgba(0,0,0,0.28),inset_0_1px_0_rgba(255,255,255,0.20),inset_0_-2px_0_rgba(0,0,0,0.12)]',
+                        'hover:shadow-[0_10px_32px_rgba(37,211,102,0.60),0_4px_10px_rgba(0,0,0,0.32)]',
+                        'hover:scale-[1.025] active:scale-[0.95] transition-all duration-150',
+                      ].join(' ')}
+                    >
+                      <MessageCircle className="w-[18px] h-[18px] text-white flex-shrink-0" strokeWidth={2} />
+                      <span className="text-[13px] font-semibold tracking-[0.18em] uppercase">Falar por WhatsApp</span>
+                    </a>
+                  </div>
+
+                  <div className="flex justify-center pt-1">
+                    <TrustRatingBadge variant="mapsLink" />
+                  </div>
+
+                </div>
               </div>
 
               <div className="hidden lg:block">
