@@ -7,7 +7,6 @@ import { useEffect, useMemo } from "react";
 import { useLocation, Link } from "react-router-dom";
 import { QuizLocationProvider, QuizServiceProvider } from "@/context/QuizLocationContext";
 import { CheckCircle, Star, MapPin, MessageCircle } from "lucide-react";
-import SectionHeader from "@/components/SectionHeader";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import QuizButton from "@/components/QuizButton";
@@ -301,13 +300,16 @@ const SofaVariantPage = () => {
         {/* ═══ PROBLEMAS ═══ */}
         <section className="py-12 md:py-16 bg-kyro-green">
           <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
-              <SectionHeader
-                overline="O Que Resolvemos"
-                heading={`Problemas que resolvemos ${prep}`}
-                goldWord={data.locationName}
-                subtitle="Se reconhece algum destes cenários, temos a solução no próprio dia."
-                light={false}
-              />
+              <div className="mb-10 md:mb-14">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="h-px w-8 flex-shrink-0" style={{ backgroundColor: "#D4AF37", opacity: 0.65 }} />
+                  <p className="text-[10px] font-bold tracking-[0.28em] uppercase" style={{ color: "#D4AF37", opacity: 0.85 }}>O Que Resolvemos</p>
+                </div>
+                <h2 className="font-playfair text-[1.85rem] sm:text-4xl md:text-[2.6rem] font-bold leading-[1.1] text-white">
+                  {`Problemas que resolvemos ${prep}`}{" "}<em className="not-italic" style={{ color: "#D4AF37" }}>{data.locationName}</em>
+                </h2>
+                <p className="mt-4 text-[15px] leading-relaxed max-w-2xl text-white/50">Se reconhece algum destes cenários, temos a solução no próprio dia.</p>
+              </div>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 md:gap-8">
                 {data.problems.map((problem, idx) => (
                   <div
@@ -346,13 +348,16 @@ const SofaVariantPage = () => {
         {/* ═══ VANTAGENS ═══ */}
         <section className="py-12 md:py-16 bg-[#FDFDF9]">
           <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
-            <SectionHeader
-              overline="Vantagens"
-              heading={`${variantLabel} profissional ${prep}`}
-              goldWord={data.locationName}
-              subtitle={data.whatIs}
-              light={true}
-            />
+            <div className="mb-10 md:mb-14">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="h-px w-8 flex-shrink-0" style={{ backgroundColor: "#D4AF37", opacity: 0.65 }} />
+                <p className="text-[10px] font-bold tracking-[0.28em] uppercase" style={{ color: "#D4AF37", opacity: 0.85 }}>Vantagens</p>
+              </div>
+              <h2 className="font-playfair text-[1.85rem] sm:text-4xl md:text-[2.6rem] font-bold leading-[1.1] text-[#111111]">
+                {`${variantLabel} profissional ${prep}`}{" "}<em className="not-italic" style={{ color: "#D4AF37" }}>{data.locationName}</em>
+              </h2>
+              <p className="mt-4 text-[15px] leading-relaxed max-w-2xl text-[#111111]/55">{data.whatIs}</p>
+            </div>
             <div className="grid grid-cols-2 gap-px" style={{ backgroundColor: "#E8E4DE" }}>
               {data.benefits.map((benefit, idx) => (
                 <div key={idx} className="bg-white p-5 sm:p-7 md:p-8" style={{ borderTop: "2px solid #D4AF37" }}>
@@ -369,13 +374,16 @@ const SofaVariantPage = () => {
         {/* ═══ PORQUE A KYRO CLEAN + AVALIAÇÕES ═══ */}
         <section className="py-12 md:py-16 bg-kyro-green">
           <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
-            <SectionHeader
-              overline="Porque a Kyro Clean"
-              heading="A escolha certa para os seus"
-              goldWord="estofos"
-              subtitle="Rapidez no orçamento, garantia total no resultado e mais de 60 clientes satisfeitos confirmam-no."
-              light={false}
-            />
+            <div className="mb-10 md:mb-14">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="h-px w-8 flex-shrink-0" style={{ backgroundColor: "#D4AF37", opacity: 0.65 }} />
+                <p className="text-[10px] font-bold tracking-[0.28em] uppercase" style={{ color: "#D4AF37", opacity: 0.85 }}>Porque a Kyro Clean</p>
+              </div>
+              <h2 className="font-playfair text-[1.85rem] sm:text-4xl md:text-[2.6rem] font-bold leading-[1.1] text-white">
+                A escolha certa para os seus{" "}<em className="not-italic" style={{ color: "#D4AF37" }}>estofos</em>
+              </h2>
+              <p className="mt-4 text-[15px] leading-relaxed max-w-2xl text-white/50">Rapidez no orçamento, garantia total no resultado e mais de 60 clientes satisfeitos confirmam-no.</p>
+            </div>
 
             {/* 3 stats */}
             <div className="grid grid-cols-3 gap-px mb-10" style={{ backgroundColor: "rgba(255,255,255,0.06)" }}>
@@ -425,12 +433,15 @@ const SofaVariantPage = () => {
         {/* ═══ PROCESSO ═══ */}
         <section className="py-12 md:py-16 bg-white">
           <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
-            <SectionHeader
-              overline="Processo"
-              heading="Como funciona a"
-              goldWord={variantLabel}
-              light={true}
-            />
+            <div className="mb-10 md:mb-14">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="h-px w-8 flex-shrink-0" style={{ backgroundColor: "#D4AF37", opacity: 0.65 }} />
+                <p className="text-[10px] font-bold tracking-[0.28em] uppercase" style={{ color: "#D4AF37", opacity: 0.85 }}>Processo</p>
+              </div>
+              <h2 className="font-playfair text-[1.85rem] sm:text-4xl md:text-[2.6rem] font-bold leading-[1.1] text-[#111111]">
+                Como funciona a{" "}<em className="not-italic" style={{ color: "#D4AF37" }}>{variantLabel}</em>
+              </h2>
+            </div>
             {(() => {
               const steps = data.variantKey === 'impermeabilizacao' ? IMPERMEABILIZACAO_STEPS : GENERIC_PROCESS_STEPS;
               const splitAt = Math.ceil(steps.length / 2);
@@ -487,12 +498,15 @@ const SofaVariantPage = () => {
         {/* ═══ COBERTURA ═══ */}
         <section className="py-12 md:py-16 bg-white">
           <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
-            <SectionHeader
-              overline="Cobertura"
-              heading={`Área de serviço ${prep}`}
-              goldWord={data.locationName}
-              light={true}
-            />
+            <div className="mb-10 md:mb-14">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="h-px w-8 flex-shrink-0" style={{ backgroundColor: "#D4AF37", opacity: 0.65 }} />
+                <p className="text-[10px] font-bold tracking-[0.28em] uppercase" style={{ color: "#D4AF37", opacity: 0.85 }}>Cobertura</p>
+              </div>
+              <h2 className="font-playfair text-[1.85rem] sm:text-4xl md:text-[2.6rem] font-bold leading-[1.1] text-[#111111]">
+                {`Área de serviço ${prep}`}{" "}<em className="not-italic" style={{ color: "#D4AF37" }}>{data.locationName}</em>
+              </h2>
+            </div>
             <div className="grid md:grid-cols-2 gap-x-12 gap-y-10">
 
               {/* Zonas / Freguesias da cidade */}
