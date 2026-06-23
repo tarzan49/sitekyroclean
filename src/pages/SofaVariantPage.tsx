@@ -247,7 +247,7 @@ const SofaVariantPage = () => {
       <main>
 
         {/* ═══ HERO ═══ */}
-        <section className="relative pt-24 md:pt-28 pb-16 md:pb-24 overflow-hidden">
+        <section className="relative pt-24 md:pt-28 pb-24 md:pb-40 overflow-hidden min-h-[75vh] md:min-h-[85vh]">
           <div className="absolute inset-0" style={{ background: "#071a12" }} />
           <div className="absolute inset-0 overflow-hidden" aria-hidden="true">
             <img src={heroImg} alt={data.h1} className="w-full h-full object-cover" loading="eager" />
