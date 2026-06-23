@@ -318,7 +318,7 @@ const FreguesiaServicePage = () => {
                     <ServiceTrustDesktop serviceSlug={data.serviceSlug} variant={2} />
                   </div>
                 </div>
-                <div className="rounded-2xl overflow-hidden" style={{ boxShadow: "0 8px 40px rgba(7,26,18,0.18), 0 2px 10px rgba(7,26,18,0.10)" }}>
+                <div className="overflow-hidden" style={{ boxShadow: "0 12px 50px rgba(7,26,18,0.16), 0 2px 8px rgba(7,26,18,0.08)" }}>
                   {/* ── Header verde ── */}
                   <div className="px-6 py-5" style={{ background: "#071a12" }}>
                     <div className="flex items-center gap-2 mb-1.5">
