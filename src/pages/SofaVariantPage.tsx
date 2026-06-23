@@ -516,7 +516,7 @@ const SofaVariantPage = () => {
                       {mun.freguesias.slice(0, 8).map(f => (
                         <Link
                           key={f.slug}
-                          to={`/${SERVICEKEY_TO_SLUG[parsed.serviceKey]}-${parsed.locationPart}-${f.slug}`}
+                          to={`/${parsed.variantKey}-${parsed.serviceKey}-${parsed.locationPart}-${f.slug}`}
                           className="inline-flex items-center gap-1.5 bg-white px-3.5 py-2 rounded-full text-sm font-medium text-[#111111] border border-[#E8E4DE] hover:border-[#D4AF37]/40 hover:bg-[#D4AF37]/5 hover:shadow-sm transition-all"
                         >
                           <MapPin className="w-3 h-3 flex-shrink-0" style={{ color: "#D4AF37" }} />
@@ -537,7 +537,7 @@ const SofaVariantPage = () => {
                   {cities.filter(c => c.slug !== parsed.locationPart).slice(0, 8).map(city => (
                     <Link
                       key={city.slug}
-                      to={`/${SERVICEKEY_TO_SLUG[parsed.serviceKey]}-${city.slug}`}
+                      to={`/${parsed.variantKey}-${parsed.serviceKey}-${city.slug}`}
                       className="inline-flex items-center gap-1.5 bg-white px-3.5 py-2 rounded-full text-sm font-medium text-[#111111] border border-[#E8E4DE] hover:border-[#D4AF37]/40 hover:bg-[#D4AF37]/5 hover:shadow-sm transition-all"
                     >
                       {city.name}
