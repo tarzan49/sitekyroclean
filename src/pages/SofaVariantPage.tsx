@@ -345,80 +345,74 @@ const SofaVariantPage = () => {
         {/* ═══ VANTAGENS ═══ */}
         <section className="py-12 md:py-16 bg-[#FDFDF9]">
           <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
-              <SectionHeader
-                overline="Vantagens"
-                heading={`${variantLabel} profissional ${prep}`}
-                goldWord={data.locationName}
-                subtitle={data.whatIs}
-                light={true}
-              />
-              <div className="grid grid-cols-2 gap-px mb-12" style={{ backgroundColor: "#E8E4DE" }}>
-                {data.benefits.map((benefit, idx) => (
-                  <div
-                    key={idx}
-                    className="bg-white p-5 sm:p-7 md:p-8"
-                    style={{ borderTop: "2px solid #D4AF37" }}
-                  >
-                    <p
-                      className="font-playfair font-bold mb-2 leading-none text-3xl sm:text-[2.25rem]"
-                      style={{ color: "rgba(212,175,55,0.30)" }}
-                    >
-                      {String(idx + 1).padStart(2, "0")}
-                    </p>
-                    <p className="text-[13px] sm:text-[15px] font-semibold text-[#111111] leading-snug">{benefit}</p>
-                  </div>
-                ))}
-              </div>
-
-              {/* Porque a Kyro Clean */}
-              <div className="border-t border-[#E8E4DE] pt-8">
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="h-px w-8 flex-shrink-0" style={{ backgroundColor: "#D4AF37", opacity: 0.65 }} />
-                  <p className="text-[10px] font-bold tracking-[0.28em] uppercase" style={{ color: "#D4AF37", opacity: 0.85 }}>Porque a Kyro Clean</p>
+            <SectionHeader
+              overline="Vantagens"
+              heading={`${variantLabel} profissional ${prep}`}
+              goldWord={data.locationName}
+              subtitle={data.whatIs}
+              light={true}
+            />
+            <div className="grid grid-cols-2 gap-px" style={{ backgroundColor: "#E8E4DE" }}>
+              {data.benefits.map((benefit, idx) => (
+                <div key={idx} className="bg-white p-5 sm:p-7 md:p-8" style={{ borderTop: "2px solid #D4AF37" }}>
+                  <p className="font-playfair font-bold mb-2 leading-none text-3xl sm:text-[2.25rem]" style={{ color: "rgba(212,175,55,0.30)" }}>
+                    {String(idx + 1).padStart(2, "0")}
+                  </p>
+                  <p className="text-[13px] sm:text-[15px] font-semibold text-[#111111] leading-snug">{benefit}</p>
                 </div>
-                <div className="grid grid-cols-3 gap-px" style={{ backgroundColor: "#E8E4DE" }}>
-                  {[
-                    { stat: "< 30 min", label: "Resposta ao orçamento" },
-                    { stat: "5.0 ★",   label: "+60 avaliações Google" },
-                    { stat: "100%",     label: "Garantia de resultado" },
-                  ].map((item, i) => (
-                    <div key={i} className="bg-white p-4 sm:p-6 md:p-7" style={{ borderTop: "2px solid #D4AF37" }}>
-                      <p className="font-playfair font-bold text-xl sm:text-2xl mb-1" style={{ color: "#D4AF37" }}>{item.stat}</p>
-                      <p className="text-[11px] sm:text-sm text-[#111111]/65 leading-snug">{item.label}</p>
-                    </div>
-                  ))}
-                </div>
-              </div>
+              ))}
+            </div>
           </div>
         </section>
 
-        {/* ═══ AVALIAÇÕES ═══ */}
-        <section className="py-12 md:py-16 bg-[#FDFDF9]">
+        {/* ═══ PORQUE A KYRO CLEAN + AVALIAÇÕES ═══ */}
+        <section className="py-12 md:py-16 bg-kyro-green">
           <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
             <SectionHeader
-              overline="Avaliações reais"
-              heading={`O que dizem os clientes ${prep}`}
-              goldWord={data.locationName}
-              light={true}
+              overline="Porque a Kyro Clean"
+              heading="A escolha certa para os seus"
+              goldWord="estofos"
+              subtitle="Rapidez no orçamento, garantia total no resultado e mais de 60 clientes satisfeitos confirmam-no."
+              light={false}
             />
-            <div className="grid sm:grid-cols-2 gap-px" style={{ backgroundColor: "#E8E4DE" }}>
+
+            {/* 3 stats */}
+            <div className="grid grid-cols-3 gap-px mb-10" style={{ backgroundColor: "rgba(255,255,255,0.06)" }}>
+              {[
+                { stat: "< 30 min", label: "Resposta ao orçamento" },
+                { stat: "5.0 ★",   label: "+60 avaliações Google" },
+                { stat: "100%",     label: "Garantia de resultado" },
+              ].map((item, i) => (
+                <div key={i} className="p-5 sm:p-6 md:p-7" style={{ background: "rgba(255,255,255,0.04)", borderTop: "2px solid rgba(212,175,55,0.55)" }}>
+                  <p className="font-playfair font-bold text-xl sm:text-2xl mb-1" style={{ color: "#D4AF37" }}>{item.stat}</p>
+                  <p className="text-[11px] sm:text-sm text-white/55 leading-snug">{item.label}</p>
+                </div>
+              ))}
+            </div>
+
+            {/* Avaliações */}
+            <div className="flex items-center gap-3 mb-6">
+              <div className="h-0.5 w-8 flex-shrink-0" style={{ backgroundColor: "#D4AF37" }} />
+              <p className="text-[10px] font-bold tracking-[0.28em] uppercase" style={{ color: "#D4AF37" }}>Avaliações reais</p>
+            </div>
+            <div className="grid sm:grid-cols-2 gap-px" style={{ backgroundColor: "rgba(255,255,255,0.06)" }}>
               {data.testimonials.map((t, i) => (
                 <div
                   key={i}
-                  className="relative overflow-hidden flex flex-col p-6 md:p-8 bg-white"
-                  style={{ borderTop: "2px solid #D4AF37" }}
+                  className="flex flex-col p-6 md:p-8"
+                  style={{ background: "rgba(255,255,255,0.04)", borderTop: "2px solid rgba(212,175,55,0.45)" }}
                 >
                   <div className="flex gap-0.5 mb-4">
                     {[...Array(5)].map((_, j) => <Star key={j} className="w-3.5 h-3.5 fill-[#D4AF37]" style={{ color: "#D4AF37" }} />)}
                   </div>
-                  <p className="text-sm text-[#111111]/65 leading-relaxed italic flex-1 mb-5">"{t.text}"</p>
-                  <div className="flex items-center gap-2.5 mt-auto pt-4 border-t border-[#E8E4DE]">
+                  <p className="text-sm text-white/60 leading-relaxed italic flex-1 mb-5">"{t.text}"</p>
+                  <div className="flex items-center gap-2.5 mt-auto pt-4" style={{ borderTop: "1px solid rgba(255,255,255,0.08)" }}>
                     <div className="w-8 h-8 flex items-center justify-center text-xs font-bold text-white flex-shrink-0" style={{ background: "#D4AF37" }}>
                       {t.name.charAt(0)}
                     </div>
                     <div>
-                      <p className="text-xs font-bold text-[#111111]">{t.name}</p>
-                      <p className="text-[10px] text-[#111111]/40">{t.location}</p>
+                      <p className="text-xs font-bold text-white">{t.name}</p>
+                      <p className="text-[10px] text-white/40">{t.location}</p>
                     </div>
                   </div>
                 </div>
@@ -428,34 +422,31 @@ const SofaVariantPage = () => {
         </section>
 
         {/* ═══ PROCESSO ═══ */}
-        <section className="py-12 md:py-16 bg-kyro-green">
+        <section className="py-12 md:py-16 bg-white">
           <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
             <SectionHeader
               overline="Processo"
               heading="Como funciona a"
               goldWord={variantLabel}
-              light={false}
+              light={true}
             />
             {(() => {
               const steps = data.variantKey === 'impermeabilizacao' ? IMPERMEABILIZACAO_STEPS : GENERIC_PROCESS_STEPS;
               const splitAt = Math.ceil(steps.length / 2);
               return (
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-px" style={{ backgroundColor: "rgba(255,255,255,0.06)" }}>
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-px" style={{ backgroundColor: "#E8E4DE" }}>
                   {[0, 1].map((colIdx) => {
                     const colSteps = colIdx === 0 ? steps.slice(0, splitAt) : steps.slice(splitAt);
                     const offset = colIdx === 0 ? 0 : splitAt;
                     return (
-                      <div key={colIdx} className="grid gap-px" style={{ backgroundColor: "rgba(255,255,255,0.06)" }}>
+                      <div key={colIdx} className="grid gap-px" style={{ backgroundColor: "#E8E4DE" }}>
                         {colSteps.map((step, idx) => {
                           const num = offset + idx;
                           return (
                             <div
                               key={num}
-                              className="relative overflow-hidden flex items-start gap-4 p-5 md:p-6"
-                              style={{
-                                background: "rgba(255,255,255,0.04)",
-                                borderTop: "2px solid rgba(212,175,55,0.55)",
-                              }}
+                              className="relative overflow-hidden flex items-start gap-4 p-5 md:p-6 bg-white"
+                              style={{ borderTop: "2px solid rgba(212,175,55,0.55)" }}
                             >
                               <span
                                 className="font-playfair font-bold flex-shrink-0 leading-none"
@@ -464,8 +455,8 @@ const SofaVariantPage = () => {
                                 {String(num + 1).padStart(2, "0")}
                               </span>
                               <div>
-                                <p className="text-sm font-semibold text-white mb-1">{step.label}</p>
-                                <p className="text-xs text-white/50 leading-relaxed">{step.desc}</p>
+                                <p className="text-sm font-semibold text-[#111111] mb-1">{step.label}</p>
+                                <p className="text-xs text-[#111111]/50 leading-relaxed">{step.desc}</p>
                               </div>
                             </div>
                           );

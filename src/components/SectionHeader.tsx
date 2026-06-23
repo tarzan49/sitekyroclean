@@ -13,7 +13,7 @@ const SectionHeader = ({
 }) => (
   <div className="mb-10 md:mb-14">
     <div className="flex items-center gap-3 mb-4">
-      <div className="h-px w-8 flex-shrink-0" style={{ backgroundColor: "#D4AF37", opacity: 0.65 }} />
+      <div className="h-0.5 w-8 flex-shrink-0" style={{ backgroundColor: "#D4AF37" }} />
       <p className="text-[10px] font-bold tracking-[0.28em] uppercase" style={{ color: "#D4AF37", opacity: 0.85 }}>
         {overline}
       </p>
