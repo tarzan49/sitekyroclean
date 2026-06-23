@@ -415,29 +415,32 @@ const SofaVariantPage = () => {
               const steps = data.variantKey === 'impermeabilizacao' ? IMPERMEABILIZACAO_STEPS : GENERIC_PROCESS_STEPS;
               const splitAt = Math.ceil(steps.length / 2);
               return (
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-px" style={{ backgroundColor: "#E8E4DE" }}>
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-px" style={{ backgroundColor: "rgba(255,255,255,0.06)" }}>
                   {[0, 1].map((colIdx) => {
                     const colSteps = colIdx === 0 ? steps.slice(0, splitAt) : steps.slice(splitAt);
                     const offset = colIdx === 0 ? 0 : splitAt;
                     return (
-                      <div key={colIdx} className="grid gap-px" style={{ backgroundColor: "#E8E4DE" }}>
+                      <div key={colIdx} className="grid gap-px" style={{ backgroundColor: "rgba(255,255,255,0.06)" }}>
                         {colSteps.map((step, idx) => {
                           const num = offset + idx;
                           return (
                             <div
                               key={num}
-                              className="relative overflow-hidden flex items-start gap-4 p-5 md:p-6 bg-white"
-                              style={{ borderTop: "2px solid rgba(212,175,55,0.55)" }}
+                              className="relative overflow-hidden flex items-start gap-4 p-5 md:p-6"
+                              style={{
+                                background: "rgba(255,255,255,0.04)",
+                                borderTop: "2px solid rgba(212,175,55,0.55)",
+                              }}
                             >
                               <span
                                 className="font-playfair font-bold flex-shrink-0 leading-none"
-                                style={{ fontSize: "1.75rem", color: "rgba(212,175,55,0.35)" }}
+                                style={{ fontSize: "1.75rem", color: "rgba(212,175,55,0.45)" }}
                               >
                                 {String(num + 1).padStart(2, "0")}
                               </span>
                               <div>
-                                <p className="text-sm font-semibold text-[#111111] mb-1">{step.label}</p>
-                                <p className="text-xs text-[#111111]/55 leading-relaxed">{step.desc}</p>
+                                <p className="text-sm font-semibold text-white mb-1">{step.label}</p>
+                                <p className="text-xs text-white/50 leading-relaxed">{step.desc}</p>
                               </div>
                             </div>
                           );
