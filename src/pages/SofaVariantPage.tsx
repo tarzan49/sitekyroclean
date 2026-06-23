@@ -27,16 +27,6 @@ import { SITE_URL, WHATSAPP_BASE } from "@/constants/business";
 import TrustRatingBadge from "@/components/TrustRatingBadge";
 import { buildVariantWaMessage } from "@/lib/whatsappMessages";
 
-import heroSofaD      from "@/assets/hero-sofa-cleaning-new.webp";
-import heroSofaM      from "@/assets/hero-sofa-cleaning-new-mobile.webp";
-import heroMattressD  from "@/assets/hero-mattress-cleaning-new.webp";
-import heroMattressM  from "@/assets/hero-mattress-cleaning-new-mobile.webp";
-import heroCarpetD    from "@/assets/hero-carpet-cleaning-new.webp";
-import heroCarpetM    from "@/assets/hero-carpet-cleaning-new-mobile.webp";
-import heroChairD     from "@/assets/hero-chair-cleaning-new.webp";
-import heroChairM     from "@/assets/hero-chair-cleaning-new-mobile.webp";
-import heroRugD       from "@/assets/hero-rug-cleaning-new.webp";
-import heroRugM       from "@/assets/hero-rug-cleaning-new-mobile.webp";
 
 // Problem card backgrounds
 import imgAlergiasSofa     from "@/assets/hero-p-alergias-sofa.webp";
@@ -90,13 +80,54 @@ const PROBLEM_IMAGES: Record<string, [string, string, string]> = {
   'impermeabilizacao-cadeiras':  [imgCadeiraAntes,    imgLimpCadeiras,     imgCadeiraProcesso],
 };
 
-const HERO_IMAGES: Record<ServiceKey, { d: string; m: string }> = {
-  sofa:      { d: heroSofaD,     m: heroSofaM },
-  colchao:   { d: heroMattressD, m: heroMattressM },
-  tapetes:   { d: heroCarpetD,   m: heroCarpetM },
-  cadeiras:  { d: heroChairD,    m: heroChairM },
-  alcatifas: { d: heroRugD,      m: heroRugM },
+// Pool de heroes por serviço — rotação determinística por slug de localidade
+const HERO_POOL: Record<string, string[]> = {
+  sofa: [
+    '/images/variant-heroes/sofas/sofa-v1.jpeg',
+    '/images/variant-heroes/sofas/sofa-v2.jpeg',
+    '/images/variant-heroes/sofas/sofa-v3.jpeg',
+    '/images/variant-heroes/sofas/sofa-v4.jpeg',
+    '/images/variant-heroes/sofas/sofa-v5.jpeg',
+    '/images/variant-heroes/sofas/sofa-v6.jpeg',
+    '/images/variant-heroes/sofas/sofa-v7.jpeg',
+  ],
+  colchao: [
+    '/images/variant-heroes/colchoes/colchao-v1.png',
+    '/images/variant-heroes/colchoes/colchao-v2.png',
+    '/images/variant-heroes/colchoes/colchao-v3.png',
+    '/images/variant-heroes/colchoes/colchao-v4.png',
+    '/images/variant-heroes/colchoes/colchao-v5.png',
+    '/images/variant-heroes/colchoes/colchao-v6.png',
+  ],
+  tapetes: [
+    '/images/variant-heroes/tapetes/tapetes-v1.png',
+    '/images/variant-heroes/tapetes/tapetes-v2.png',
+  ],
+  cadeiras: [
+    '/images/variant-heroes/cadeiras/cadeiras-v1.png',
+    '/images/variant-heroes/cadeiras/cadeiras-v2.png',
+  ],
+  alcatifas: [
+    '/images/variant-heroes/alcatifas/alcatifas-v1.jpeg',
+    '/images/variant-heroes/alcatifas/alcatifas-v2.jpg',
+    '/images/variant-heroes/alcatifas/alcatifas-v3.jpg',
+    '/images/variant-heroes/alcatifas/alcatifas-v4.png',
+  ],
+  impermeabilizacao: [
+    '/images/variant-heroes/impermeabilizacao/impermeabilizacao-v1.png',
+    '/images/variant-heroes/impermeabilizacao/impermeabilizacao-v2.png',
+    '/images/variant-heroes/impermeabilizacao/impermeabilizacao-v3.png',
+    '/images/variant-heroes/impermeabilizacao/impermeabilizacao-v4.jpg',
+    '/images/variant-heroes/impermeabilizacao/impermeabilizacao-v5.png',
+  ],
 };
+
+function pickHero(serviceKey: string, variantKey: string, locationPart: string): string {
+  const poolKey = variantKey === 'impermeabilizacao' ? 'impermeabilizacao' : serviceKey;
+  const pool = HERO_POOL[poolKey] ?? HERO_POOL['sofa'];
+  const hash = locationPart.split('').reduce((a, c) => a + c.charCodeAt(0), 0);
+  return pool[hash % pool.length];
+}
 
 
 
@@ -204,7 +235,7 @@ const SofaVariantPage = () => {
 
   const variantLabel = VARIANT_LABEL[data.variantKey];
   const prep = cityPrep(data.locationName);
-  const heroImgs = HERO_IMAGES[data.serviceKey];
+  const heroImg = pickHero(data.serviceKey, data.variantKey, parsed.locationPart);
   const problemImgs = PROBLEM_IMAGES[`${data.variantKey}-${data.serviceKey}`];
   const problemLabels = VARIANT_PROBLEM_LABELS[data.variantKey];
 
@@ -219,11 +250,7 @@ const SofaVariantPage = () => {
         <section className="relative pt-24 md:pt-28 pb-16 md:pb-24 overflow-hidden">
           <div className="absolute inset-0" style={{ background: "#071a12" }} />
           <div className="absolute inset-0 overflow-hidden" aria-hidden="true">
-            <picture className="w-full h-full">
-              <source media="(max-width: 767px)" srcSet={heroImgs.m} type="image/webp" />
-              <source media="(min-width: 768px)" srcSet={heroImgs.d} type="image/webp" />
-              <img src={heroImgs.d} alt={data.h1} className="w-full h-full object-cover" loading="eager" />
-            </picture>
+            <img src={heroImg} alt={data.h1} className="w-full h-full object-cover" loading="eager" />
           </div>
           <div className="absolute inset-0" style={{ background: "linear-gradient(to bottom, rgba(7,26,18,0.42) 0%, rgba(7,26,18,0.65) 40%, rgba(7,26,18,0.88) 75%, rgba(7,26,18,0.97) 100%)" }} />
 
@@ -298,16 +325,12 @@ const SofaVariantPage = () => {
               <div className="hidden lg:block">
                 <div className="relative">
                   <div className="absolute -inset-4 rounded-3xl blur-2xl opacity-20" style={{ background: "linear-gradient(135deg, #D4AF37, transparent)" }} />
-                  <picture>
-                    <source media="(max-width: 767px)" srcSet={heroImgs.m} type="image/webp" />
-                    <source media="(min-width: 768px)" srcSet={heroImgs.d} type="image/webp" />
-                    <img
-                      src={heroImgs.d}
-                      alt={`${variantLabel} profissional ${prep} ${data.locationName}`}
-                      className="relative rounded-2xl w-full max-h-[400px] object-cover shadow-2xl"
-                      loading="eager"
-                    />
-                  </picture>
+                  <img
+                    src={heroImg}
+                    alt={`${variantLabel} profissional ${prep} ${data.locationName}`}
+                    className="relative rounded-2xl w-full max-h-[400px] object-cover shadow-2xl"
+                    loading="eager"
+                  />
                 </div>
               </div>
             </div>
