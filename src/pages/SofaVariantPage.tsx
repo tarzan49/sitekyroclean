@@ -393,8 +393,8 @@ const SofaVariantPage = () => {
 
             {/* Avaliações */}
             <div className="flex items-center gap-3 mb-6">
-              <div className="h-0.5 w-8 flex-shrink-0" style={{ backgroundColor: "#D4AF37" }} />
-              <p className="text-[10px] font-bold tracking-[0.28em] uppercase" style={{ color: "#D4AF37" }}>Avaliações reais</p>
+              <div className="h-px w-8 flex-shrink-0" style={{ backgroundColor: "#D4AF37", opacity: 0.65 }} />
+              <p className="text-[10px] font-bold tracking-[0.28em] uppercase" style={{ color: "#D4AF37", opacity: 0.85 }}>Avaliações reais</p>
             </div>
             <div className="grid sm:grid-cols-2 gap-px" style={{ backgroundColor: "rgba(255,255,255,0.06)" }}>
               {data.testimonials.map((t, i) => (
