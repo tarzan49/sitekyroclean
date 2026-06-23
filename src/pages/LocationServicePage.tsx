@@ -317,7 +317,7 @@ const LocationServicePage = () => {
         {PRICE_TABLE[data.serviceSlug] && (
           <section className="py-14 md:py-20 bg-[#FDFDF9]">
             <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
-              <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-start">
+              <div className="grid md:grid-cols-2 gap-10 md:gap-16 items-start">
                 <div>
                   <SectionHeader
                     overline="Tabela de Preços"
@@ -326,7 +326,7 @@ const LocationServicePage = () => {
                     subtitle={`Preços fixos e transparentes, sem surpresas. ${(locationPrices[data.city] ?? 0) === 0 ? `Deslocação incluída em toda a área de ${data.city}.` : `Deslocação +${locationPrices[data.city]}€ a ${data.city}.`} Orçamento gratuito antes de qualquer compromisso.`}
                   />
                   {/* Trust facts — desktop only (variante 1) */}
-                  <div className="hidden lg:block">
+                  <div className="hidden md:block">
                     <ServiceTrustDesktop serviceSlug={data.serviceSlug} variant={1} />
                   </div>
                 </div>

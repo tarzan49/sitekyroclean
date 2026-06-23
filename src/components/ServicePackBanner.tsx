@@ -121,10 +121,10 @@ const ServicePackBanner = ({ packSlugs, city = "porto", variant = "light" }: Pro
                     Quero este pack
                   </a>
                   <Link
-                    to={`/${pack.slug}-${city}`}
+                    to="/packs"
                     className={`text-xs text-center py-1.5 transition-colors hover:text-[#D4AF37] flex items-center justify-center gap-1 ${textSub}`}
                   >
-                    Ver o que está incluído <ArrowRight className="w-3 h-3" />
+                    Ver todos os packs <ArrowRight className="w-3 h-3" />
                   </Link>
                 </div>
               </div>
