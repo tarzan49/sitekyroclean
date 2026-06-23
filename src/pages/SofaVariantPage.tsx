@@ -485,57 +485,79 @@ const SofaVariantPage = () => {
           variant="dark"
         />
 
-        {/* ═══ ÁREA DE SERVIÇO ═══ */}
-        <section className="py-12 md:py-14 bg-[#FDFDF9]">
-          <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
-              <SectionHeader
-                overline="Cobertura"
-                heading={`Servimos ${data.locationName} e`}
-                goldWord="arredores"
-                light={true}
-              />
-
-              <p className="text-xs text-[#111111]/50 mb-3">Também disponível em:</p>
-              <div className="flex flex-wrap gap-3 mb-6">
-                {cities.filter(c => c.slug !== parsed.locationPart).slice(0, 6).map(city => (
-                  <Link
-                    key={city.slug}
-                    to={`/${parsed.variantKey}-${parsed.serviceKey}-${city.slug}`}
-                    className="text-xs text-[#111111]/60 hover:text-[#D4AF37] transition-colors font-medium"
-                  >
-                    {city.name}
-                  </Link>
-                ))}
-              </div>
-
-              <div className="pt-6 border-t border-[#E8E4DE]">
-                <p className="text-xs text-[#111111]/50 mb-3">Outros serviços {prep} {data.locationName}:</p>
-                <div className="flex flex-wrap gap-3">
-                  {(SERVICES.filter(s => s !== parsed.serviceKey) as ServiceKey[]).map(svcKey => (
-                    <Link
-                      key={svcKey}
-                      to={`/${parsed.variantKey}-${svcKey}-${parsed.locationPart}`}
-                      className="text-xs font-semibold text-[#111111]/60 hover:text-[#D4AF37] transition-colors"
-                    >
-                      {variantLabel} de {SERVICE_LABEL[svcKey]}
-                    </Link>
-                  ))}
-                  <Link
-                    to={data.canonical}
-                    className="text-xs font-semibold text-[#D4AF37] hover:text-[#b8962e] transition-colors"
-                  >
-                    Ver limpeza profissional {prep} {data.locationName}
-                  </Link>
-                </div>
-              </div>
-          </div>
-        </section>
-
         {/* ═══ PACKS ═══ */}
         <ServicePackBanner
           packSlugs={SERVICE_PACK_SLUGS[data.serviceKey] ?? ["pack-sala-completa"]}
           city={parsed.locationPart}
         />
+
+        {/* ═══ COBERTURA E LIGAÇÕES ═══ */}
+        <section className="py-10 md:py-14" style={{ background: "#071a12" }}>
+          <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
+            <div className="grid md:grid-cols-2 gap-10 md:gap-16 lg:gap-24">
+
+              {/* Cidades */}
+              <div>
+                <div className="flex items-center gap-3 mb-5">
+                  <div className="h-px w-8 flex-shrink-0" style={{ backgroundColor: '#D4AF37', opacity: 0.65 }} />
+                  <p className="text-[10px] font-bold tracking-[0.28em] uppercase" style={{ color: '#D4AF37', opacity: 0.85 }}>
+                    Cobertura nacional
+                  </p>
+                </div>
+                <p className="text-white font-semibold text-sm mb-5">
+                  {variantLabel} de {SERVICE_LABEL[data.serviceKey]} noutras cidades
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {cities.filter(c => c.slug !== parsed.locationPart).map(city => (
+                    <Link
+                      key={city.slug}
+                      to={`/${SERVICEKEY_TO_SLUG[parsed.serviceKey]}-${city.slug}`}
+                      className="text-[11px] text-white/45 hover:text-[#D4AF37] transition-colors px-2.5 py-1.5"
+                      style={{ border: "1px solid rgba(255,255,255,0.08)" }}
+                    >
+                      {city.name}
+                    </Link>
+                  ))}
+                </div>
+              </div>
+
+              {/* Outros serviços */}
+              <div>
+                <div className="flex items-center gap-3 mb-5">
+                  <div className="h-px w-8 flex-shrink-0" style={{ backgroundColor: '#D4AF37', opacity: 0.65 }} />
+                  <p className="text-[10px] font-bold tracking-[0.28em] uppercase" style={{ color: '#D4AF37', opacity: 0.85 }}>
+                    Outros serviços
+                  </p>
+                </div>
+                <p className="text-white font-semibold text-sm mb-5">
+                  Outros tratamentos {prep} {data.locationName}
+                </p>
+                <div className="flex flex-col">
+                  <Link
+                    to={data.canonical}
+                    className="flex items-center justify-between py-3 text-sm text-white/80 hover:text-[#D4AF37] transition-colors group"
+                    style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }}
+                  >
+                    <span>Limpeza profissional {prep} {data.locationName}</span>
+                    <span className="text-[#D4AF37]/40 group-hover:text-[#D4AF37] transition-colors ml-3">→</span>
+                  </Link>
+                  {(SERVICES.filter(s => s !== parsed.serviceKey) as ServiceKey[]).map(svcKey => (
+                    <Link
+                      key={svcKey}
+                      to={`/${SERVICEKEY_TO_SLUG[svcKey]}-${parsed.locationPart}`}
+                      className="flex items-center justify-between py-3 text-sm text-white/45 hover:text-[#D4AF37] transition-colors group"
+                      style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }}
+                    >
+                      <span>Limpeza de {SERVICE_LABEL[svcKey].toLowerCase()} {prep} {data.locationName}</span>
+                      <span className="text-white/15 group-hover:text-[#D4AF37] transition-colors ml-3">→</span>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </section>
 
       </main>
       <Footer />
