@@ -22,6 +22,7 @@ import {
   type ServiceKey,
 } from "@/data/keywordVariantData";
 import { cities, cityPrep } from "@/data/locationSeoData";
+import { municipiosComFreguesias } from "@/data/freguesiaSeoData";
 import { GENERIC_PROCESS_STEPS, IMPERMEABILIZACAO_STEPS } from "@/constants/serviceProcesses";
 import { SITE_URL, WHATSAPP_BASE } from "@/constants/business";
 import TrustRatingBadge from "@/components/TrustRatingBadge";
@@ -491,29 +492,53 @@ const SofaVariantPage = () => {
           city={parsed.locationPart}
         />
 
-        {/* ═══ COBERTURA E LIGAÇÕES ═══ */}
-        <section className="py-10 md:py-14" style={{ background: "#071a12" }}>
+        {/* ═══ COBERTURA ═══ */}
+        <section className="py-12 md:py-16 bg-white">
           <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
-            <div className="grid md:grid-cols-2 gap-10 md:gap-16 lg:gap-24">
+            <SectionHeader
+              overline="Cobertura"
+              heading={`Área de serviço ${prep}`}
+              goldWord={data.locationName}
+              light={true}
+            />
+            <div className="grid md:grid-cols-2 gap-x-12 gap-y-10">
 
-              {/* Cidades */}
+              {/* Zonas / Freguesias da cidade */}
+              {(() => {
+                const mun = municipiosComFreguesias.find(m => m.slug === parsed.locationPart);
+                if (!mun || !mun.freguesias.length) return null;
+                return (
+                  <div>
+                    <p className="text-[10px] font-bold tracking-[0.26em] uppercase mb-3" style={{ color: "#D4AF37" }}>
+                      Zonas {prep} {data.locationName}
+                    </p>
+                    <div className="flex flex-wrap gap-2">
+                      {mun.freguesias.slice(0, 8).map(f => (
+                        <Link
+                          key={f.slug}
+                          to={`/${SERVICEKEY_TO_SLUG[parsed.serviceKey]}-${parsed.locationPart}-${f.slug}`}
+                          className="inline-flex items-center gap-1.5 bg-white px-3.5 py-2 rounded-full text-sm font-medium text-[#111111] border border-[#E8E4DE] hover:border-[#D4AF37]/40 hover:bg-[#D4AF37]/5 hover:shadow-sm transition-all"
+                        >
+                          <MapPin className="w-3 h-3 flex-shrink-0" style={{ color: "#D4AF37" }} />
+                          {f.name}
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })()}
+
+              {/* Outras cidades */}
               <div>
-                <div className="flex items-center gap-3 mb-5">
-                  <div className="h-px w-8 flex-shrink-0" style={{ backgroundColor: '#D4AF37', opacity: 0.65 }} />
-                  <p className="text-[10px] font-bold tracking-[0.28em] uppercase" style={{ color: '#D4AF37', opacity: 0.85 }}>
-                    Cobertura nacional
-                  </p>
-                </div>
-                <p className="text-white font-semibold text-sm mb-5">
-                  {variantLabel} de {SERVICE_LABEL[data.serviceKey]} noutras cidades
+                <p className="text-[10px] font-bold tracking-[0.26em] uppercase mb-3" style={{ color: "#D4AF37" }}>
+                  Também disponível em
                 </p>
                 <div className="flex flex-wrap gap-2">
-                  {cities.filter(c => c.slug !== parsed.locationPart).map(city => (
+                  {cities.filter(c => c.slug !== parsed.locationPart).slice(0, 8).map(city => (
                     <Link
                       key={city.slug}
                       to={`/${SERVICEKEY_TO_SLUG[parsed.serviceKey]}-${city.slug}`}
-                      className="text-[11px] text-white/45 hover:text-[#D4AF37] transition-colors px-2.5 py-1.5"
-                      style={{ border: "1px solid rgba(255,255,255,0.08)" }}
+                      className="inline-flex items-center gap-1.5 bg-white px-3.5 py-2 rounded-full text-sm font-medium text-[#111111] border border-[#E8E4DE] hover:border-[#D4AF37]/40 hover:bg-[#D4AF37]/5 hover:shadow-sm transition-all"
                     >
                       {city.name}
                     </Link>
@@ -521,37 +546,28 @@ const SofaVariantPage = () => {
                 </div>
               </div>
 
-              {/* Outros serviços */}
+              {/* Outros serviços na mesma cidade */}
               <div>
-                <div className="flex items-center gap-3 mb-5">
-                  <div className="h-px w-8 flex-shrink-0" style={{ backgroundColor: '#D4AF37', opacity: 0.65 }} />
-                  <p className="text-[10px] font-bold tracking-[0.28em] uppercase" style={{ color: '#D4AF37', opacity: 0.85 }}>
-                    Outros serviços
-                  </p>
-                </div>
-                <p className="text-white font-semibold text-sm mb-5">
-                  Outros tratamentos {prep} {data.locationName}
+                <p className="text-[10px] font-bold tracking-[0.26em] uppercase mb-3" style={{ color: "#D4AF37" }}>
+                  Outros serviços {prep} {data.locationName}
                 </p>
-                <div className="flex flex-col">
-                  <Link
-                    to={data.canonical}
-                    className="flex items-center justify-between py-3 text-sm text-white/80 hover:text-[#D4AF37] transition-colors group"
-                    style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }}
-                  >
-                    <span>Limpeza profissional {prep} {data.locationName}</span>
-                    <span className="text-[#D4AF37]/40 group-hover:text-[#D4AF37] transition-colors ml-3">→</span>
-                  </Link>
+                <div className="flex flex-wrap gap-2">
                   {(SERVICES.filter(s => s !== parsed.serviceKey) as ServiceKey[]).map(svcKey => (
                     <Link
                       key={svcKey}
                       to={`/${SERVICEKEY_TO_SLUG[svcKey]}-${parsed.locationPart}`}
-                      className="flex items-center justify-between py-3 text-sm text-white/45 hover:text-[#D4AF37] transition-colors group"
-                      style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }}
+                      className="inline-flex items-center gap-1.5 bg-white px-3.5 py-2 rounded-full text-sm font-medium text-[#111111] border border-[#E8E4DE] hover:border-[#D4AF37]/40 hover:bg-[#D4AF37]/5 hover:shadow-sm transition-all"
                     >
-                      <span>Limpeza de {SERVICE_LABEL[svcKey].toLowerCase()} {prep} {data.locationName}</span>
-                      <span className="text-white/15 group-hover:text-[#D4AF37] transition-colors ml-3">→</span>
+                      {SERVICE_LABEL[svcKey]}
                     </Link>
                   ))}
+                  <Link
+                    to={data.canonical}
+                    className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full text-sm font-semibold border hover:shadow-sm transition-all"
+                    style={{ color: "#D4AF37", borderColor: "rgba(212,175,55,0.45)", background: "rgba(212,175,55,0.04)" }}
+                  >
+                    Página principal
+                  </Link>
                 </div>
               </div>
 
