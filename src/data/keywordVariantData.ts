@@ -26,7 +26,7 @@ export interface KeywordVariantData {
   processSteps: { step: number; title: string; description: string }[];
   faqs: { question: string; answer: string }[];
   problems: { title: string; description: string }[];
-  testimonial: { name: string; city: string; stars: number; text: string };
+  testimonials: { name: string; location: string; text: string }[];
   priceFrom: string;
 }
 
@@ -37,6 +37,7 @@ interface ContentBlock {
   processSteps: { step: number; title: string; description: string }[];
   faqs: { question: string; answer: string }[];
   problems: { title: string; description: string }[];
+  testimonials: { name: string; location: string; text: string }[];
 }
 
 // ─── Service metadata ──────────────────────────────────────────────
@@ -96,6 +97,10 @@ function content_higienizacao_sofa(loc: string, ctx: string): ContentBlock {
       { title: "Odores que o aspirador não resolve", description: "Bactérias anaeróbias acumulam-se nas camadas profundas do tecido e produzem odores persistentes que nenhum spray doméstico elimina de raiz." },
       { title: "Bebé ou criança em contacto direto com o tecido", description: "Crianças respiram mais próximo das fibras e são mais vulneráveis a alergénios. A higienização profissional cria um ambiente verdadeiramente seguro para os mais novos." },
     ],
+    testimonials: [
+      { name: "Mariana F.", location: "Porto", text: "O sofá estava num estado que eu já nem queria receber visitas. Depois da higienização ficou tão limpo que parecia ter saído da loja. Os meus filhos voltaram a sentar-se nele sem eu me preocupar." },
+      { name: "Ricardo M.", location: "Matosinhos", text: "Tenho dois gatos e o sofá cheirava de uma forma impossível. Depois do serviço o cheiro desapareceu por completo. Ainda não percebi como é possível, mas ficou impecável." },
+    ],
   };
 }
 
@@ -128,6 +133,10 @@ function content_higienizacao_colchao(loc: string, ctx: string): ContentBlock {
       { title: "Acordar com olhos vermelhos ou nariz congestionado", description: `Os ácaros do colchão são a causa mais comum de rinite alérgica noturna em ${loc}. O corpo passa 8 horas em contacto direto com o foco de contaminação.` },
       { title: "Cheiro a suor mesmo depois de arejar", description: "Bactérias anaeróbias nas camadas internas do colchão produzem odores que o arejamento não elimina. Só a extração profissional alcança essa profundidade." },
       { title: "Criança ou idoso com alergias respiratórias", description: "São os grupos mais vulneráveis a ácaros e alergénios do colchão. A higienização regular é especialmente recomendada para quem acorda com sintomas noturnos." },
+    ],
+    testimonials: [
+      { name: "Catarina L.", location: "Braga", text: "A minha filha tem asma e desde que higienizámos o colchão os sintomas de manhã melhoraram bastante. Não esperava uma diferença tão notória num objeto que parecia limpo." },
+      { name: "Paulo S.", location: "Vila Nova de Gaia", text: "Vieram no dia marcado, fizeram tudo em silêncio e foram embora. O colchão secou em menos tempo do que disseram. Resultado sem nada a apontar." },
     ],
   };
 }
@@ -162,6 +171,10 @@ function content_higienizacao_tapetes(loc: string, ctx: string): ContentBlock {
       { title: "Animal de estimação que dorme no tapete", description: "Pelos, caspa e bactérias dos animais penetram nas fibras e multiplicam-se. A higienização remove alergénios de animais que a aspiração doméstica deixa para trás." },
       { title: "Espirros frequentes ou comichão nos olhos em casa", description: "O tapete liberta alergénios ao ser pisado, criando uma nuvem invisível ao nível do chão. A higienização profunda reduz estes níveis em 99,9%." },
     ],
+    testimonials: [
+      { name: "Inês T.", location: "Lisboa", text: "Tapete persa de família com manchas que me recusava a tentar limpar em casa com medo de o estragar. Voltou a ficar como novo. Fico aliviada por não ter tentado sozinha." },
+      { name: "Jorge A.", location: "Setúbal", text: "Tapete da sala com sete anos de uso diário. As cores que eu já nem me lembrava que eram assim voltaram. Fiquei genuinamente surpreendido com o que estava debaixo da sujidade." },
+    ],
   };
 }
 
@@ -194,6 +207,10 @@ function content_higienizacao_cadeiras(loc: string, ctx: string): ContentBlock {
       { title: "Cadeiras de uso partilhado (restaurante, escritório)", description: `Cadeiras partilhadas por múltiplos utilizadores são superfícies de alto risco de transmissão de vírus e bactérias que a limpeza convencional não elimina em ${loc}.` },
       { title: "Inspeção sanitária ou auditoria HACCP pendente", description: "A higienização com certificado é exigida em muitas inspeções para espaços alimentares e de saúde. Emitimos comprovativo após cada serviço para conformidade regulatória." },
       { title: "Imagem profissional comprometida por cadeiras sujas", description: "Cadeiras com aspeto gorduroso ou manchado transmitem desleixo aos clientes. A higienização profissional devolve o aspeto cuidado e prolonga a vida do estofamento." },
+    ],
+    testimonials: [
+      { name: "Ana Beatriz C.", location: "Porto", text: "Restaurante com quarenta e duas cadeiras. Depois da higienização os clientes começaram a comentar o aspeto do espaço. Isso não acontecia há anos. Valeu completamente o investimento." },
+      { name: "Miguel F.", location: "Aveiro", text: "Escritório com doze cadeiras partilhadas. Era algo que adiava há tempo. Em meia manhã estava feito e as cadeiras ficaram como quando as comprei. Rápido e sem complicações." },
     ],
   };
 }
@@ -228,6 +245,10 @@ function content_higienizacao_alcatifas(loc: string, ctx: string): ContentBlock 
       { title: "Funcionários com sintomas respiratórios no espaço", description: "Alcatifas comerciais são o maior reservatório de alergénios em espaços fechados. A qualidade do ar interior melhora significativamente após higienização profissional." },
       { title: "Auditoria de qualidade do ar ou certificação pendente", description: "Emitimos relatório de higienização com ficha técnica dos produtos, aceite em auditorias de qualidade do ar interior e certificações de espaços de trabalho." },
     ],
+    testimonials: [
+      { name: "Dra. Sofia V.", location: "Porto", text: "Clínica com alcatifa em dois consultórios. Precisávamos de comprovativo para auditoria anual. Foram pontuais, profissionais e deixaram tudo em perfeitas condições." },
+      { name: "Nuno A.", location: "Braga", text: "Hotel com alcatifas em todo o corredor principal. Não queríamos fechar ao público por isso fizeram o trabalho de madrugada. De manhã estava tudo pronto e sem cheiro a produtos." },
+    ],
   };
 }
 
@@ -260,6 +281,10 @@ function content_lavagem_sofa(loc: string, ctx: string): ContentBlock {
       { title: "Manchas de café, vinho ou gordura que não saem", description: `Líquidos penetram nas fibras em menos de 30 segundos e ligam-se ao tecido. A extração profissional a quente é o único método que os remove sem danificar o sofá em ${loc}.` },
       { title: "Sofá com aspeto escuro e cores apagadas", description: "Sujidade acumulada cobre o fio original e faz o sofá parecer mais velho. A lavagem por extração remove esta camada e revela as cores e a maciez originais do tecido." },
       { title: "Cheiro a estofo velho mesmo depois de aspirar", description: "A aspiração remove apenas sujidade superficial. Humidade e resíduos orgânicos nas fibras profundas produzem odores que só a extração aquosa elimina definitivamente." },
+    ],
+    testimonials: [
+      { name: "Filipa O.", location: "Porto", text: "Mancha de vinho tinto de quase dois anos. Eu já tinha aceite que ia ficar ali para sempre. Depois da lavagem desapareceu. Continuo sem perceber como é possível mas não me importo." },
+      { name: "Bruno C.", location: "Vila Nova de Gaia", text: "Sofá de microfibra cinzenta que estava cada vez mais escuro com o uso. Depois da lavagem ficou da cor original. A diferença entre antes e depois é honestamente chocante." },
     ],
   };
 }
@@ -294,6 +319,10 @@ function content_lavagem_colchao(loc: string, ctx: string): ContentBlock {
       { title: "Mancha de urina com cheiro persistente", description: "A urina penetra fundo nas camadas do colchão. O pré-tratamento enzimático específico remove tanto a mancha visível como o odor das camadas internas, de forma definitiva." },
       { title: "Colchão com odor intenso apesar do arejamento", description: "Sujidade orgânica acumulada nas fibras internas produz odores que o arejamento não elimina. A extração profissional alcança essas camadas profundas e devolvem a frescura." },
     ],
+    testimonials: [
+      { name: "Marta P.", location: "Lisboa", text: "O meu filho teve um acidente no colchão quando era bebé e nunca consegui tirar a mancha por completo. Finalmente desapareceu. Devia ter feito isto muito antes." },
+      { name: "Tiago R.", location: "Coimbra", text: "Colchão novo há dois anos mas já com manchas amareladas de suor. Ficou como novo e o cheiro que havia também desapareceu. Não esperava um resultado tão completo." },
+    ],
   };
 }
 
@@ -326,6 +355,10 @@ function content_lavagem_tapetes(loc: string, ctx: string): ContentBlock {
       { title: "Manchas de café, molho ou vinho que ficaram", description: "As fibras absorvem líquidos em segundos. Quanto mais tempo passam, mais profundas ficam. A extração profissional remove a grande maioria das manchas antigas, mesmo de anos." },
       { title: "Tapete com aspeto opaco e cores desbotadas", description: "A sujidade acumulada cria uma camada que apaga as cores naturais das fibras. A lavagem profissional revela as cores originais e a textura real do tapete." },
       { title: "Tapete de qualidade com manchas que teme tratar em casa", description: "Tapetes persas, orientais ou de lã podem ser danificados por produtos errados. Avaliamos sempre antes de iniciar e usamos técnicas específicas por tipo de fibra." },
+    ],
+    testimonials: [
+      { name: "Leonor S.", location: "Porto", text: "Tapete da entrada da loja completamente escurecido de tráfego. Depois da lavagem as cores voltaram e os clientes começaram a notar. Contratei de novo dois meses depois." },
+      { name: "Henrique M.", location: "Braga", text: "Tapete de lã comprado há oito anos com manchas de vinho e café acumuladas. Não sabia que ia ficar tão bem. Quem o vê hoje não acredita na diferença." },
     ],
   };
 }
@@ -360,6 +393,10 @@ function content_lavagem_cadeiras(loc: string, ctx: string): ContentBlock {
       { title: "Cadeiras de escritório com aspeto sujo e desgastado", description: "Cadeiras desgastadas transmitem desleixo a clientes e visitantes. A lavagem profissional devolve um aspeto cuidado e prolonga significativamente a vida útil do estofamento." },
       { title: "Manchas escuras nas zonas de contacto habitual", description: "O encosto e o assento ficam progressivamente mais escuros com o uso diário. A lavagem por extração remove esta sujidade compactada de forma profunda e eficaz." },
     ],
+    testimonials: [
+      { name: "Joana F.", location: "Porto", text: "Cadeiras de sala de jantar com gordura acumulada de anos. Limpei-as várias vezes em casa sem resultado. Numa única visita ficaram como novas. Não voltarei a tentar sozinha." },
+      { name: "Rui B.", location: "Maia", text: "Seis cadeiras de escritório com manchas que já nem sabia de onde vinham. Parecem acabadas de comprar. Muito melhor do que esperava e a um preço razoável." },
+    ],
   };
 }
 
@@ -392,6 +429,10 @@ function content_lavagem_alcatifas(loc: string, ctx: string): ContentBlock {
       { title: "Manchas em zonas de passagem ou entrada", description: `Corredores e entradas acumulam sujidade de calçado que compacta nas fibras em ${loc}. A lavagem profissional remove esta sujidade que a aspiração já não consegue extrair.` },
       { title: "Alcatifa com anos de sujidade compactada", description: "A aspiração regular não remove os resíduos que penetraram nas fibras ao longo do tempo. A lavagem por extração renova a alcatifa devolvendo o aspeto como novo." },
       { title: "Derramamento recente de café ou bebida", description: "Quanto mais rápida a intervenção profissional, maior a probabilidade de remoção total. A extração a quente remove o derramamento antes de se tornar mancha permanente." },
+    ],
+    testimonials: [
+      { name: "Carlos P.", location: "Porto", text: "Sede da empresa com alcatifa clara em toda a área de trabalho. Vieram ao fim de semana para não perturbar. Segunda-feira de manhã estava impecável. Fizemos já três vezes." },
+      { name: "Teresa N.", location: "Aveiro", text: "Hotel com o corredor principal muito danificado. Já estava a ponderar substituir a alcatifa. Depois da lavagem mudei completamente de ideias. Ficou como quando foi colocada." },
     ],
   };
 }
@@ -426,6 +467,10 @@ function content_impermeabilizacao_sofa(loc: string, ctx: string): ContentBlock 
       { title: "Família com crianças pequenas ou animais de estimação", description: "Acidentes são inevitáveis. Sem proteção, cada derramamento pode tornar-se uma mancha permanente. A impermeabilização repele líquidos antes de penetrarem nas fibras." },
       { title: "Tecido delicado como veludo, pele ou microfibra", description: "Estes tecidos são difíceis de limpar sem danificar. Um erro de limpeza pode ser irreversível. A impermeabilização evita que o problema aconteça desde o início." },
     ],
+    testimonials: [
+      { name: "Susana L.", location: "Porto", text: "Protegemos o sofá novo logo na primeira semana. Dois meses depois o meu filho entornou sumo de manga em cima. Limpou-se com um papel. Valeu cada cêntimo sem qualquer dúvida." },
+      { name: "David A.", location: "Vila Nova de Gaia", text: "Veludo cinzento claro. Toda a gente me dizia que ia ser impossível de manter. Com a impermeabilização já passou um ano e está impecável. Recomendo a qualquer pessoa com sofá de cor clara." },
+    ],
   };
 }
 
@@ -458,6 +503,10 @@ function content_impermeabilizacao_colchao(loc: string, ctx: string): ContentBlo
       { title: "Criança com incontinência noturna", description: "Cada acidente sem proteção é uma mancha nova e profunda no colchão. A barreira impermeável repele o líquido antes de penetrar, mantendo o colchão limpo e sem odores." },
       { title: "Colchão de qualidade (viscoelástico, memory foam)", description: "Colchões de espuma não podem ser lavados por imersão. Uma mancha que penetra pode ser permanente. A impermeabilização profissional é a única proteção real eficaz." },
       { title: "Suores noturnos frequentes", description: "O suor excessivo penetra nas fibras e deteriora o colchão de dentro para fora. A barreira impermeável protege as camadas internas e prolonga significativamente a vida útil." },
+    ],
+    testimonials: [
+      { name: "Patrícia M.", location: "Braga", text: "Tenho dois filhos pequenos e acidentes nocturnos eram um problema frequente. Desde que impermeabilizámos o colchão é tudo muito mais simples de gerir. Devíamos ter feito antes." },
+      { name: "Fernando G.", location: "Lisboa", text: "Colchão de viscoelástico de alta qualidade. Não queria arriscar estragá-lo. A impermeabilização deu-me a tranquilidade que precisava. Perfeito para quem quer proteger um investimento." },
     ],
   };
 }
@@ -492,10 +541,14 @@ function content_impermeabilizacao_cadeiras(loc: string, ctx: string): ContentBl
       { title: "Veludo claro ou tecido de cor lisa", description: "Estas cadeiras mostram qualquer mancha de imediato. Sem impermeabilização, qualquer derrame cria uma marca visível que a limpeza doméstica não consegue remover." },
       { title: "Cadeiras de design, vintage ou de valor", description: "A reposição pode ser impossível ou muito cara. A impermeabilização profissional protege o investimento com uma barreira invisível que não altera o aspeto nem o toque." },
     ],
+    testimonials: [
+      { name: "Cristina B.", location: "Porto", text: "Restaurante com quarenta cadeiras de veludo. A limpeza diária reduziu para metade do tempo depois da impermeabilização. O tecido mantém-se muito melhor do que antes." },
+      { name: "André F.", location: "Matosinhos", text: "Cadeiras de design da sala de jantar que queria mesmo proteger. Um ano depois nem uma marca visível. Foi claramente a decisão certa logo no início." },
+    ],
   };
 }
 
-// ─── Testimonials por serviço ──────────────────────────────────────
+// ─── Testimonials por serviço (legado — mantido para compatibilidade) ──
 
 const SERVICE_TESTIMONIALS: Record<ServiceKey, { name: string; city: string; stars: number; text: string }> = {
   sofa: {
@@ -575,7 +628,6 @@ function buildData(
     metaDescription: content.intro.slice(0, 155).trimEnd(),
     h1: `${variantLabel} Profissional de ${svc.label} ${prep} ${locationName}`,
     ...content,
-    testimonial: SERVICE_TESTIMONIALS[serviceKey],
     priceFrom,
   };
 }

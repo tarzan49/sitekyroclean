@@ -38,11 +38,6 @@ import heroChairD     from "@/assets/hero-chair-cleaning-new.webp";
 import heroChairM     from "@/assets/hero-chair-cleaning-new-mobile.webp";
 import heroRugD       from "@/assets/hero-rug-cleaning-new.webp";
 import heroRugM       from "@/assets/hero-rug-cleaning-new-mobile.webp";
-import resultSofa        from "@/assets/galeria-sofa-depois.webp";
-import resultColchao     from "@/assets/galeria-colchao-depois.webp";
-import resultTapetes     from "@/assets/galeria-tapete-depois.webp";
-import resultCadeiras    from "@/assets/galeria-cadeira-depois.webp";
-import resultAlcatifas   from "@/assets/galeria-alcatifa-resultado.webp";
 
 // Problem card backgrounds
 import imgAlergiasSofa     from "@/assets/hero-p-alergias-sofa.webp";
@@ -100,13 +95,6 @@ const HERO_IMAGES: Record<ServiceKey, { d: string; m: string }> = {
   alcatifas: { d: heroRugD,      m: heroRugM },
 };
 
-const RESULT_IMAGES: Record<ServiceKey, string> = {
-  sofa:      resultSofa,
-  colchao:   resultColchao,
-  tapetes:   resultTapetes,
-  cadeiras:  resultCadeiras,
-  alcatifas: resultAlcatifas,
-};
 
 
 const SERVICE_PACK_SLUGS: Record<ServiceKey, string[]> = {
@@ -213,7 +201,6 @@ const SofaVariantPage = () => {
   const variantLabel = VARIANT_LABEL[data.variantKey];
   const prep = cityPrep(data.locationName);
   const heroImgs = HERO_IMAGES[data.serviceKey];
-  const resultImg = RESULT_IMAGES[data.serviceKey];
   const problemImgs = PROBLEM_IMAGES[`${data.variantKey}-${data.serviceKey}`];
   const problemLabels = VARIANT_PROBLEM_LABELS[data.variantKey];
 
@@ -454,73 +441,31 @@ const SofaVariantPage = () => {
           </div>
         </section>
 
-        {/* ═══ RESULTADO ═══ */}
+        {/* ═══ AVALIAÇÕES ═══ */}
         <section className="py-12 md:py-16 bg-[#FDFDF9]">
           <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
-              <div className="relative overflow-hidden shadow-2xl">
-                <img
-                  src={resultImg}
-                  alt={`Resultado após ${variantLabel.toLowerCase()} ${prep} ${data.locationName}`}
-                  className="w-full h-[280px] md:h-[400px] object-cover"
-                  loading="lazy"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#071a12]/85 via-[#0B2F2A]/30 to-transparent" />
-                <div className="absolute bottom-0 left-0 right-0 p-6 md:p-10">
-                  <h2 className="font-playfair text-xl md:text-3xl font-bold text-white mb-2">
-                    Resultado após {variantLabel.toLowerCase()} profissional
-                  </h2>
-                  <p className="text-white/70 text-sm md:text-base max-w-lg">
-                    Resultados visíveis no momento. Tratamento profissional ao domicílio {prep} {data.locationName}.
-                  </p>
-                  <div className="flex items-center gap-3 mt-4 flex-wrap">
-                    <div className="flex items-center gap-1.5">
-                      <CheckCircle className="w-4 h-4" style={{ color: "#D4AF37" }} />
-                      <span className="text-white/80 text-sm">Produtos certificados</span>
+            <div className="flex items-center gap-3 mb-8">
+              <div className="h-px w-8 flex-shrink-0" style={{ backgroundColor: "#D4AF37", opacity: 0.65 }} />
+              <p className="text-[10px] font-bold tracking-[0.28em] uppercase" style={{ color: "#D4AF37", opacity: 0.85 }}>Avaliações de clientes</p>
+            </div>
+            <div className="grid sm:grid-cols-2 gap-px" style={{ backgroundColor: "#E8E4DE" }}>
+              {data.testimonials.map((t, i) => (
+                <div key={i} className="relative overflow-hidden p-6 md:p-8 bg-white" style={{ borderTop: "2px solid #D4AF37" }}>
+                  <div className="flex gap-0.5 mb-4">
+                    {[...Array(5)].map((_, j) => <Star key={j} className="w-3.5 h-3.5 fill-[#D4AF37]" style={{ color: "#D4AF37" }} />)}
+                  </div>
+                  <p className="text-sm text-[#111111]/65 leading-relaxed italic mb-5">"{t.text}"</p>
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-8 h-8 flex items-center justify-center text-xs font-bold text-white flex-shrink-0" style={{ background: "#D4AF37" }}>
+                      {t.name.charAt(0)}
                     </div>
-                    <div className="flex items-center gap-1.5">
-                      <CheckCircle className="w-4 h-4" style={{ color: "#D4AF37" }} />
-                      <span className="text-white/80 text-sm">Garantia de resultado</span>
+                    <div>
+                      <p className="text-xs font-bold text-[#111111]">{t.name}</p>
+                      <p className="text-[10px] text-[#111111]/40">{t.location}</p>
                     </div>
                   </div>
                 </div>
-              </div>
-          </div>
-        </section>
-
-        {/* ═══ TESTEMUNHO ═══ */}
-        <section className="py-10 md:py-14 bg-white">
-          <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
-            <div className="max-w-xl">
-              <div className="border border-[#E8E4DE] p-8 md:p-10">
-                <div className="flex gap-0.5 mb-5">
-                  {[...Array(data.testimonial.stars)].map((_, k) => (
-                    <Star key={k} className="w-4 h-4 fill-[#D4AF37] text-[#D4AF37]" />
-                  ))}
-                </div>
-                <blockquote className="font-playfair text-xl md:text-2xl font-light text-[#111111] leading-relaxed mb-6">
-                  "{data.testimonial.text}"
-                </blockquote>
-                <div className="flex items-center gap-3 pt-4 border-t border-[#E8E4DE]">
-                  <div className="w-10 h-10 bg-[#071a12] flex items-center justify-center flex-shrink-0">
-                    <span className="font-playfair text-[#D4AF37] font-bold text-sm">
-                      {data.testimonial.name.charAt(0)}
-                    </span>
-                  </div>
-                  <div>
-                    <p className="font-semibold text-[#111111] text-sm">{data.testimonial.name}</p>
-                    <p className="text-[#111111]/45 text-xs">{data.testimonial.city} · Cliente verificado</p>
-                  </div>
-                  <div className="ml-auto flex items-center gap-1.5">
-                    <svg viewBox="0 0 24 24" className="w-5 h-5 flex-shrink-0" fill="none">
-                      <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
-                      <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
-                      <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/>
-                      <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
-                    </svg>
-                    <span className="text-xs text-[#111111]/40">Google Review</span>
-                  </div>
-                </div>
-              </div>
+              ))}
             </div>
           </div>
         </section>
