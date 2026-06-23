@@ -501,9 +501,12 @@ const SofaVariantPage = () => {
                 if (!mun || !mun.freguesias.length) return null;
                 return (
                   <div>
-                    <p className="text-[10px] font-bold tracking-[0.26em] uppercase mb-3" style={{ color: "#D4AF37" }}>
-                      Zonas {prep} {data.locationName}
-                    </p>
+                    <div className="flex items-center gap-3 mb-3">
+                      <div className="h-px w-8 flex-shrink-0" style={{ backgroundColor: "#D4AF37", opacity: 0.65 }} />
+                      <p className="text-[10px] font-bold tracking-[0.26em] uppercase" style={{ color: "#D4AF37", opacity: 0.85 }}>
+                        Zonas {prep} {data.locationName}
+                      </p>
+                    </div>
                     <div className="flex flex-wrap gap-2">
                       {mun.freguesias.slice(0, 8).map(f => (
                         <Link
@@ -522,9 +525,12 @@ const SofaVariantPage = () => {
 
               {/* Outras cidades */}
               <div>
-                <p className="text-[10px] font-bold tracking-[0.26em] uppercase mb-3" style={{ color: "#D4AF37" }}>
-                  Também disponível em
-                </p>
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="h-px w-8 flex-shrink-0" style={{ backgroundColor: "#D4AF37", opacity: 0.65 }} />
+                  <p className="text-[10px] font-bold tracking-[0.26em] uppercase" style={{ color: "#D4AF37", opacity: 0.85 }}>
+                    Também disponível em
+                  </p>
+                </div>
                 <div className="flex flex-wrap gap-2">
                   {cities.filter(c => c.slug !== parsed.locationPart).slice(0, 8).map(city => (
                     <Link
@@ -540,9 +546,12 @@ const SofaVariantPage = () => {
 
               {/* Outros serviços na mesma cidade */}
               <div>
-                <p className="text-[10px] font-bold tracking-[0.26em] uppercase mb-3" style={{ color: "#D4AF37" }}>
-                  Outros serviços {prep} {data.locationName}
-                </p>
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="h-px w-8 flex-shrink-0" style={{ backgroundColor: "#D4AF37", opacity: 0.65 }} />
+                  <p className="text-[10px] font-bold tracking-[0.26em] uppercase" style={{ color: "#D4AF37", opacity: 0.85 }}>
+                    Outros serviços {prep} {data.locationName}
+                  </p>
+                </div>
                 <div className="flex flex-wrap gap-2">
                   {(SERVICES.filter(s => s !== parsed.serviceKey) as ServiceKey[]).map(svcKey => (
                     <Link
