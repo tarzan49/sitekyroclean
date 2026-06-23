@@ -7,12 +7,11 @@ import { useEffect, useMemo } from "react";
 import { useLocation, Link } from "react-router-dom";
 import { QuizLocationProvider, QuizServiceProvider } from "@/context/QuizLocationContext";
 import { CheckCircle, Star, MapPin, MessageCircle } from "lucide-react";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import QuizButton from "@/components/QuizButton";
 import { trackWhatsAppClick } from "@/lib/quizTracking";
-import ServiceFAQSchema from "@/components/ServiceFAQSchema";
+import ServiceFAQ from "@/components/ServiceFAQ";
 import SectionHeader from "@/components/SectionHeader";
 import ServicePackBanner from "@/components/ServicePackBanner";
 import ServicePriceSection from "@/components/ServicePriceSection";
@@ -64,6 +63,10 @@ import imgCadeiraAntes     from "@/assets/galeria-cadeira-antes.webp";
 import imgCadeiraProcesso  from "@/assets/galeria-cadeira-processo.webp";
 import imgAlcatifaProcesso from "@/assets/galeria-alcatifa-processo.webp";
 import imgColchaoAntes     from "@/assets/galeria-colchao-antes.webp";
+
+const SERVICE_PLURAL: Record<ServiceKey, string> = {
+  sofa: 'sofás', colchao: 'colchões', tapetes: 'tapetes', cadeiras: 'cadeiras', alcatifas: 'alcatifas',
+};
 
 const VARIANT_PROBLEM_LABELS: Record<VariantKey, [string, string, string]> = {
   higienizacao:      ['Saúde',    'Higiene',  'Família'],
@@ -208,7 +211,6 @@ const SofaVariantPage = () => {
     <QuizLocationProvider value={data.locationName}>
     <QuizServiceProvider value={quizService}>
     <>
-      <ServiceFAQSchema faqs={data.faqs} />
       <Header />
       <main>
 
@@ -471,34 +473,11 @@ const SofaVariantPage = () => {
         </section>
 
         {/* ═══ FAQ ═══ */}
-        <section className="py-12 md:py-16 relative overflow-hidden bg-checker-dark">
-          <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8 relative z-10">
-              <SectionHeader
-                overline="Perguntas"
-                heading="Perguntas"
-                goldWord="Frequentes"
-                light={false}
-              />
-              <div className="max-w-3xl">
-                <Accordion type="single" collapsible className="space-y-4">
-                  {data.faqs.map((faq, i) => (
-                    <AccordionItem
-                      key={i}
-                      value={`faq-${i}`}
-                      className="bg-white/[0.04] rounded-[18px] border border-white/10 px-6 transition-all duration-300 data-[state=open]:border-[#D4AF37]/30"
-                    >
-                      <AccordionTrigger className="text-left text-sm font-semibold text-white py-5 hover:no-underline [&[data-state=open]>svg]:text-[#D4AF37]">
-                        {faq.question}
-                      </AccordionTrigger>
-                      <AccordionContent className="text-sm text-white/55 pb-5 leading-relaxed">
-                        {faq.answer}
-                      </AccordionContent>
-                    </AccordionItem>
-                  ))}
-                </Accordion>
-              </div>
-          </div>
-        </section>
+        <ServiceFAQ
+          faqs={data.faqs}
+          heading={`Perguntas sobre ${variantLabel.toLowerCase()} de ${SERVICE_PLURAL[data.serviceKey]} ${prep} ${data.locationName}`}
+          variant="dark"
+        />
 
         {/* ═══ ÁREA DE SERVIÇO ═══ */}
         <section className="py-12 md:py-14 bg-[#FDFDF9]">
