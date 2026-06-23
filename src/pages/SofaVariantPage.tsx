@@ -148,15 +148,15 @@ const SERVICE_LABEL: Record<ServiceKey, string> = {
 };
 
 const QUIZ_CTA: Record<VariantKey, string> = {
-  higienizacao:      'Ver o meu preço, grátis',
-  lavagem:           'Ver o meu preço, grátis',
-  impermeabilizacao: 'Proteger agora, ver preço',
+  higienizacao:      'Calcular o meu preço',
+  lavagem:           'Calcular o meu preço',
+  impermeabilizacao: 'Calcular o meu preço',
 };
 
 const WA_BTN_LABEL: Record<VariantKey, string> = {
-  higienizacao:      'Higienizar agora',
-  lavagem:           'Lavar agora',
-  impermeabilizacao: 'Proteger agora',
+  higienizacao:      'Falar por WhatsApp',
+  lavagem:           'Falar por WhatsApp',
+  impermeabilizacao: 'Falar por WhatsApp',
 };
 
 const SofaVariantPage = () => {
