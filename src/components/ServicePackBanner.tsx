@@ -45,7 +45,7 @@ const ServicePackBanner = ({ packSlugs, city = "porto", variant = "light" }: Pro
             <em className="not-italic" style={{ color: "#D4AF37" }}>poupe mais</em>
           </h2>
           <p className={`text-[15px] leading-relaxed max-w-xl ${textSub}`}>
-            Segundo serviço na mesma visita — 10% de desconto automático e sem taxa extra de deslocação.
+            Segundo serviço na mesma visita: 10% de desconto automático e sem taxa extra de deslocação.
           </p>
         </div>
 

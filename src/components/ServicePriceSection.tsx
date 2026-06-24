@@ -11,33 +11,33 @@ import { cn } from "@/lib/utils";
 
 const SERVICE_POINTS: Record<string, { stat?: string; title: string; desc: string }[]> = {
   'limpeza-sofas': [
-    { stat: '2,5 kg', title: 'de sujidade acumulada por ano', desc: 'Células mortas, gordura e suor que o tecido absorve e retém — invisíveis, mas presentes. O aspirador não os tira.' },
+    { stat: '2,5 kg', title: 'de sujidade acumulada por ano', desc: 'Células mortas, gordura e suor que o tecido absorve e retém. Invisíveis, mas presentes. O aspirador não os tira.' },
     { stat: '99,9%', title: 'eliminação de patogénicos', desc: 'A temperatura de extração profissional atinge profundidade e eficácia impossíveis para equipamento doméstico.' },
-    { title: 'Resultado visível ou voltamos', desc: 'Se a diferença não for clara, repetimos sem custo. É o nosso compromisso — sem letras pequenas, sem condições.' },
+    { title: 'Resultado visível ou voltamos', desc: 'Se a diferença não for clara, repetimos sem custo. É o nosso compromisso, sem letras pequenas, sem condições.' },
   ],
   'limpeza-colchoes': [
     { stat: '2M+', title: 'ácaros num colchão de 5 anos', desc: 'O peso original pode dobrar em matéria orgânica. O que está a respirar todas as noites?' },
-    { stat: '40%', title: 'piora na qualidade do sono', desc: 'Alta concentração de ácaros degrada o sono mesmo sem sintomas visíveis — comprovado em estudos de polissonografia.' },
-    { title: 'Seguro essa mesma noite', desc: 'Produtos hipoalergénicos certificados sem resíduos. Pode dormir logo após a intervenção — sem esperar.' },
+    { stat: '40%', title: 'piora na qualidade do sono', desc: 'Alta concentração de ácaros degrada o sono mesmo sem sintomas visíveis. Comprovado em estudos de polissonografia.' },
+    { title: 'Seguro essa mesma noite', desc: 'Produtos hipoalergénicos certificados sem resíduos. Pode dormir logo após a intervenção, sem esperar.' },
   ],
   'limpeza-tapetes': [
-    { stat: '8×', title: 'mais alérgenos que pavimento liso', desc: 'Tapetes retêm e libertam no ar partículas a cada passo — pólenes, ácaros e poluentes invisíveis.' },
+    { stat: '8×', title: 'mais alérgenos que pavimento liso', desc: 'Tapetes retêm e libertam no ar partículas a cada passo: pólenes, ácaros e poluentes invisíveis.' },
     { stat: '90%', title: 'da aparência original recuperada', desc: 'Tapetes considerados "inutilizáveis" ficam como novos com extração profissional a quente. Sem substituição.' },
     { title: 'Ao domicílio, sem recolha, sem espera', desc: 'Tratado no seu espaço com equipamento profissional. Não precisa sair de casa nem aguardar entrega.' },
   ],
   'limpeza-cadeiras': [
     { stat: '400×', title: 'mais bactérias que a sanita', desc: 'As zonas de contacto de cadeiras de jantar estão entre as superfícies mais contaminadas de uma casa.' },
-    { title: 'Protocolo por material, não genérico', desc: 'Veludo, couro, linho — cada tecido tem a sua abordagem. Nunca arriscamos o material errado no tecido errado.' },
+    { title: 'Protocolo por material, não genérico', desc: 'Veludo, couro, linho: cada tecido tem a sua abordagem. Nunca arriscamos o material errado no tecido errado.' },
     { stat: '3–6h', title: 'e estão prontas', desc: 'Resultado no próprio dia. Sem paralisar a sua sala de jantar ou escritório por dias.' },
   ],
   'limpeza-alcatifas': [
     { stat: '1 kg/m²', title: 'de sujidade invisível acumulada', desc: 'Fibras compactadas retêm o que não se vê mas que respira todos os dias. Nem a aspiração profissional chega.' },
-    { stat: '2,5×', title: 'pior qualidade do ar sem limpeza', desc: 'Alcatifas sem manutenção anual degradam significativamente o ar interior — crítico em escritórios e quartos.' },
-    { title: 'Metro a metro, sem exceção', desc: 'Mapeamos o espaço e tratamos tudo — cantos, bordas e zonas sob mobília sem exception.' },
+    { stat: '2,5×', title: 'pior qualidade do ar sem limpeza', desc: 'Alcatifas sem manutenção anual degradam significativamente o ar interior. Crítico em escritórios e quartos.' },
+    { title: 'Metro a metro, sem exceção', desc: 'Mapeamos o espaço e tratamos tudo: cantos, bordas e zonas sob mobília sem exceção.' },
   ],
   'impermeabilizacao': [
     { stat: '60s', title: 'para uma mancha ser permanente', desc: 'Sem proteção, o tecido absorve o vinho em menos de 60 segundos. Com nano-barreira, rola para o chão.' },
-    { stat: '10⁻⁹m', title: 'de proteção molecular', desc: 'Nano-partículas criam uma barreira a nível molecular invisível ao toque — não altera cor, textura nem respirabilidade do tecido.' },
+    { stat: '10⁻⁹m', title: 'de proteção molecular', desc: 'Nano-partículas criam uma barreira a nível molecular invisível ao toque. Não altera cor, textura nem respirabilidade do tecido.' },
     { stat: '40%', title: 'mais vida útil para o estofo', desc: 'O custo da impermeabilização amortiza-se em menos de 12 meses face à substituição prematura do estofo.' },
   ],
 };
