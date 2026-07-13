@@ -647,3 +647,12 @@ Este ficheiro não foi mantido em sincronia nas sessões seguintes. O histórico
 Correções aplicadas: canonical URLs em branco nas 17 páginas core, BreadcrumbList inválida removida, preços errados no Service JSON-LD, hreflang bloqueado por robots.txt removido, imagem OG movida para local (`public/images/og-social.webp`), `initialLocation` no widget de preços das 2041 páginas de variante (`ServicePriceSection.tsx`), mensagem de horário no `/obrigado` fora do expediente (seg-sáb 08:00-00:00), horário errado no `LocalBusinessSchema.tsx` da homepage corrigido, logo 404 no schema corrigido (`public/images/kyro-logo.png`).
 
 **Pendente:** confirmar no Google Ads que os anúncios apontam para páginas de cidade (`/limpeza-sofas-porto`) e não para páginas genéricas (`/limpeza-sofas`) — ação do user no dashboard, não código.
+
+## Sessão pós-férias, parte 2/3 (2026-07-14)
+
+**Commits:** `05c9dca` → `89b7173` — publicados, deploy Cloudflare Pages automático.
+
+- Fotos de hero variadas por cidade/freguesia em todos os 6 serviços (antes só sofás tinham variedade, via `SofaVariantPage.tsx`; agora `LocationServicePage.tsx`/`FreguesiaServicePage.tsx` também, usando o mesmo pool de imagens já existente em `public/images/variant-heroes/`).
+- **Preços de colchão +10€** em todas as referências site-wide (higienização 49/59/69€, impermeabilização 55/60/65€ antes de ser removida — ver abaixo).
+- **Impermeabilização de colchão descontinuada** (decisão de negócio): removida do quiz (toggle "Adicionar Impermeabilização"), das páginas SEO (`/impermeabilizacao-colchao-{cidade}` deixaram de ser geradas, 2041→1884 keyword variant pages) com redirect 301 para `/limpeza-colchoes-{cidade}`, e de todo o copy de marketing (blog, FAQ). Sofá e cadeiras continuam a oferecer impermeabilização normalmente.
+- Preços de sofá/cadeiras/tapetes/alcatifas **não foram tocados** (fora do pedido).
