@@ -1,17 +1,26 @@
 import { useEffect, useMemo } from "react";
 import { useLocation, Link } from "react-router-dom";
 import { QuizLocationProvider, QuizServiceProvider } from "@/context/QuizLocationContext";
-import { Star, ArrowRight, CheckCircle, MapPin, MessageCircle, Clock, Truck, ThumbsUp } from "lucide-react";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { Star, ArrowRight, CheckCircle, MapPin, MessageCircle } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import QuizButton from "@/components/QuizButton";
 import { trackWhatsAppClick } from "@/lib/quizTracking";
 import ServiceFAQSchema from "@/components/ServiceFAQSchema";
 import { getPricePageData, getAllPriceRoutes } from "@/data/priceSeoData";
+import { SERVICE_TESTIMONIALS } from "@/data/locationPriceTestimonialsData";
 import { services, cities, cityPrep } from "@/data/locationSeoData";
 import { SERVICE_TO_QUIZ } from "@/constants/serviceToQuiz";
+import { SERVICE_HERO_IMAGES, SERVICE_HERO_FALLBACK } from "@/constants/serviceContent";
 import { buildServiceWaMessage } from "@/lib/whatsappMessages";
-import { SITE_URL, WHATSAPP_BASE, REVIEW_RATING } from "@/constants/business";
+import { SITE_URL, WHATSAPP_BASE, REVIEW_RATING, REVIEW_COUNT } from "@/constants/business";
+import {
+  buildWebPageNode,
+  buildBreadcrumbNode,
+  buildServiceNode,
+  buildOfferNode,
+} from "@/lib/seoSchema";
 
 const PricePage = () => {
   const { pathname } = useLocation();
@@ -30,6 +39,10 @@ const PricePage = () => {
       if (desc) desc.setAttribute("content", data.metaDescription);
       const canonical = document.querySelector('link[rel="canonical"]');
       if (canonical) canonical.setAttribute("href", `${SITE_URL}${pathname}`);
+      const ogTitle = document.querySelector('meta[property="og:title"]');
+      if (ogTitle) ogTitle.setAttribute("content", data.title);
+      const ogDesc = document.querySelector('meta[property="og:description"]');
+      if (ogDesc) ogDesc.setAttribute("content", data.metaDescription);
     }
   }, [pathname, data]);
 
@@ -37,10 +50,10 @@ const PricePage = () => {
     return (
       <>
         <Header />
-        <main className="pt-28 pb-16 min-h-screen bg-[#FAFAF7]">
+        <main className="pt-28 pb-16 min-h-screen bg-white">
           <div className="container mx-auto px-4 text-center">
-            <h1 className="text-3xl font-bold text-[#111111] mb-4">Página não encontrada</h1>
-            <Link to="/" className="text-[#D4AF37] hover:underline">Voltar ao início</Link>
+            <h1 className="font-playfair text-3xl font-bold text-[#111111] mb-4">Página não encontrada</h1>
+            <Link to="/" style={{ color: "#D4AF37" }} className="hover:underline">Voltar ao início</Link>
           </div>
         </main>
         <Footer />
@@ -50,9 +63,13 @@ const PricePage = () => {
 
   const prep = cityPrep(data.cityName);
   const quizService = SERVICE_TO_QUIZ[data.serviceSlug];
+  const heroImgs = SERVICE_HERO_IMAGES[data.serviceSlug] ?? SERVICE_HERO_FALLBACK;
+  const service = services.find(s => s.slug === data.serviceSlug);
+  const servicePrice = service?.priceFrom ?? "49€";
   const relatedServices = services.filter(s => s.slug !== data.serviceSlug).slice(0, 4);
-  const nearbyCities = cities.filter(c => c.slug !== data.citySlug).slice(0, 6);
+  const nearbyCities = cities.filter(c => c.slug !== data.citySlug).slice(0, 8);
   const waHref = `${WHATSAPP_BASE}?text=${encodeURIComponent(buildServiceWaMessage(data.serviceSlug, data.cityName))}`;
+  const testimonial = SERVICE_TESTIMONIALS[data.serviceSlug]?.[0];
 
   return (
     <QuizLocationProvider value={data.cityName}>
@@ -61,302 +78,356 @@ const PricePage = () => {
       <Header />
       <main>
 
-        {/* ── Hero ── */}
-        <section className="relative pt-24 md:pt-32 pb-16 md:pb-20 bg-[#071a12] overflow-hidden">
-          <div className="absolute inset-0 pointer-events-none">
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[400px] rounded-full bg-[#D4AF37]/[0.04] blur-3xl" />
+        {/* ══════════════════════════════════════════════════
+            HERO — full-bleed, tipo editorial de revista
+        ══════════════════════════════════════════════════ */}
+        <section className="relative min-h-[92vh] flex flex-col justify-end overflow-hidden">
+          <div className="absolute inset-0" aria-hidden="true">
+            <picture>
+              <source media="(max-width: 767px)" srcSet={heroImgs.m} />
+              <source media="(min-width: 768px)" srcSet={heroImgs.d} />
+              <img src={heroImgs.d} alt="" className="w-full h-full object-cover" loading="eager" />
+            </picture>
+            <div className="absolute inset-0" style={{ background: "linear-gradient(160deg, rgba(7,26,18,0.15) 0%, rgba(7,26,18,0.55) 45%, rgba(7,26,18,0.97) 100%)" }} />
           </div>
 
-          <div className="container mx-auto px-4 relative">
-            <div className="max-w-3xl mx-auto text-center">
-              <nav className="flex items-center justify-center gap-1.5 text-xs text-white/30 mb-6" aria-label="Breadcrumb">
-                <Link to="/" className="hover:text-white/60 transition-colors">Início</Link>
-                <span>/</span>
-                <Link to={`/${data.serviceSlug}`} className="hover:text-white/60 transition-colors">{data.serviceName}</Link>
-                <span>/</span>
-                <span className="text-white/50">Preços {prep} {data.cityName}</span>
-              </nav>
+          <div className="relative z-10 px-5 sm:px-8 lg:px-16 pb-12 md:pb-20 pt-28">
+            <nav className="flex items-center gap-1.5 text-xs text-white/40 mb-8" aria-label="Breadcrumb">
+              <Link to="/" className="hover:text-white/70 transition-colors">Início</Link>
+              <span>/</span>
+              <Link to={`/${data.serviceSlug}`} className="hover:text-white/70 transition-colors">{data.serviceName}</Link>
+              <span>/</span>
+              <span className="text-white/60">Preços {prep} {data.cityName}</span>
+            </nav>
 
-              <div className="inline-flex items-center gap-2 bg-[#D4AF37]/10 border border-[#D4AF37]/25 rounded-full px-4 py-1.5 mb-6">
-                <div className="flex gap-0.5">
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="w-3 h-3 fill-[#D4AF37] text-[#D4AF37]" />
-                  ))}
-                </div>
-                <span className="text-[#D4AF37] text-xs font-semibold tracking-wider uppercase">
-                  Tabela de Preços {new Date().getFullYear()}
-                </span>
-              </div>
+            <div className="max-w-5xl">
+              <p className="text-[10px] font-black tracking-[0.35em] uppercase mb-5" style={{ color: "#D4AF37" }}>
+                Tabela de Preços {new Date().getFullYear()}
+              </p>
 
-              <h1 className="font-playfair text-3xl md:text-5xl font-bold text-white mb-5 leading-tight">
-                {data.h1}
+              <h1 className="font-playfair font-bold text-white leading-[0.95] mb-8" style={{ fontSize: "clamp(2.4rem, 7vw, 5.5rem)" }}>
+                Preço de {data.serviceName}
+                <br />
+                <span style={{ color: "#D4AF37" }}>{prep} {data.cityName}</span>
               </h1>
-              <p className="text-white/50 text-base md:text-lg mb-8 max-w-xl mx-auto leading-relaxed">
-                Preços transparentes, sem surpresas. Deslocação e equipamento profissional incluídos.
+
+              <div className="w-16 h-px mb-7" style={{ backgroundColor: "#D4AF37" }} />
+
+              <p className="text-white/65 leading-relaxed mb-8 max-w-xl" style={{ fontSize: "clamp(0.9rem, 2vw, 1.1rem)" }}>
+                {data.intro}
               </p>
 
-              <div className="flex gap-3 justify-center max-w-sm mx-auto">
-                <div className="relative flex-1">
-                  <div className="absolute -inset-1.5 rounded-full bg-[#D4AF37]/40 opacity-30 blur-lg pointer-events-none" />
-                  <QuizButton
-                    className="relative w-full"
-                    buttonClassName="h-[52px] !py-0 w-full"
-                    ctaLabel="Ver preço grátis"
-                    initialLocation={data.cityName}
-                    initialService={quizService}
-                  />
-                </div>
-                <a
-                  href={waHref}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onClick={() => trackWhatsAppClick(`price_hero_${data.serviceSlug}_${data.citySlug}`)}
-                  className="flex-1 inline-flex items-center justify-center gap-2 h-[52px] px-5 rounded-full font-black text-sm text-white bg-gradient-to-r from-[#1DA851] via-[#25D366] to-[#1DA851] shadow-[0_6px_22px_rgba(37,211,102,0.42)] hover:scale-[1.025] active:scale-[0.95] transition-all duration-200 touch-manipulation"
-                >
-                  <MessageCircle className="w-[18px] h-[18px] flex-shrink-0" strokeWidth={2} />
-                  Falar agora
-                </a>
-              </div>
-
-              <div className="flex items-center justify-center gap-5 mt-8 flex-wrap">
-                <span className="flex items-center gap-1.5 text-white/35 text-xs">
-                  <Clock className="w-3.5 h-3.5" />Resposta em 30 min
-                </span>
-                <span className="w-px h-3 bg-white/10" />
-                <span className="flex items-center gap-1.5 text-white/35 text-xs">
-                  <Truck className="w-3.5 h-3.5" />Deslocação incluída
-                </span>
-                <span className="w-px h-3 bg-white/10" />
-                <span className="flex items-center gap-1.5 text-white/35 text-xs">
-                  <ThumbsUp className="w-3.5 h-3.5" />Sem compromisso
-                </span>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* ── Price Cards ── */}
-        <section className="py-14 md:py-20 bg-[#FAFAF7]">
-          <div className="container mx-auto px-4">
-            <div className="max-w-4xl mx-auto">
-              <div className="text-center mb-10">
-                <p className="text-xs font-semibold tracking-[0.25em] uppercase text-[#D4AF37] mb-2">
-                  Preços Kyro Clean Solutions
-                </p>
-                <h2 className="font-playfair text-2xl md:text-3xl font-bold text-[#111111]">
-                  Tabela de preços: {data.serviceName} {prep} {data.cityName}
-                </h2>
-                <div className="w-12 h-0.5 bg-[#D4AF37] mx-auto mt-4" />
-              </div>
-
-              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
-                {data.priceTable.map((row, i) => (
-                  <div
-                    key={i}
-                    className="bg-white rounded-2xl p-6 border border-[#111111]/6 shadow-sm hover:shadow-md hover:border-[#D4AF37]/25 transition-all duration-200 group"
-                  >
-                    <div className="w-8 h-0.5 bg-[#D4AF37] mb-4 group-hover:w-12 transition-all duration-300" />
-                    <p className="text-sm text-[#111111]/55 font-medium leading-snug mb-1">
-                      {row.item}
-                    </p>
-                    {row.note && (
-                      <span className="inline-block text-[10px] uppercase tracking-widest text-[#D4AF37]/70 font-semibold mb-3">
-                        {row.note}
-                      </span>
-                    )}
-                    <p className="font-playfair text-2xl font-bold text-[#111111] mt-2">
-                      {row.price}
-                    </p>
+              <div className="flex flex-col gap-4">
+                <div className="flex flex-col sm:flex-row gap-3 max-w-sm">
+                  <div className="relative flex-1">
+                    <div className="absolute -inset-1.5 rounded-full bg-gold/40 opacity-30 blur-lg pointer-events-none" />
+                    <QuizButton className="relative w-full" buttonClassName="h-[52px] !py-0 w-full" ctaLabel="Ver preço grátis" initialLocation={data.cityName} initialService={quizService} />
                   </div>
-                ))}
-              </div>
+                  <a
+                    href={waHref}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={() => trackWhatsAppClick(`price_hero_${data.serviceSlug}_${data.citySlug}`)}
+                    className="relative flex-1 inline-flex items-center justify-center gap-2 h-[52px] px-5 rounded-full font-black text-sm text-white bg-gradient-to-r from-[#1DA851] via-[#25D366] to-[#1DA851] shadow-[0_6px_22px_rgba(37,211,102,0.42)] hover:scale-[1.025] active:scale-[0.95] transition-all duration-200 touch-manipulation"
+                  >
+                    <MessageCircle className="w-[18px] h-[18px]" strokeWidth={2} />
+                    Falar agora
+                  </a>
+                </div>
 
-              <p className="text-center text-xs text-[#111111]/35">
-                Preços indicativos. O orçamento definitivo é confirmado antes de iniciar qualquer trabalho, sem surpresas.
+                <div className="flex flex-wrap items-center gap-3">
+                  <div className="flex items-center gap-1">
+                    {[...Array(5)].map((_, i) => <Star key={i} className="w-3.5 h-3.5 fill-[#D4AF37]" style={{ color: "#D4AF37" }} />)}
+                    <span className="text-white font-bold text-xs ml-1.5">{REVIEW_RATING}</span>
+                    <span className="text-white/40 text-xs ml-0.5">Google</span>
+                  </div>
+                  <span className="text-white/30 text-xs">·</span>
+                  <span className="text-white/50 text-xs">{REVIEW_COUNT}+ avaliações</span>
+                  <span className="text-white/30 text-xs">·</span>
+                  <span style={{ color: "#D4AF37" }} className="text-xs font-semibold">Desde {servicePrice}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ══════════════════════════════════════════════════
+            GARANTIAS STRIP
+        ══════════════════════════════════════════════════ */}
+        <div className="bg-white border-b border-[#E8E4DE] py-4 px-5 sm:px-8 lg:px-16">
+          <div className="flex flex-wrap gap-x-8 gap-y-2">
+            {[
+              { t: "Deslocação incluída", s: `${prep} ${data.cityName}` },
+              { t: "Resultado garantido", s: "Ou repetimos grátis" },
+              { t: "Resposta em 30 min", s: "Sem compromisso" },
+            ].map(g => (
+              <div key={g.t} className="flex items-center gap-2">
+                <CheckCircle className="w-4 h-4 flex-shrink-0" style={{ color: "#D4AF37" }} />
+                <span className="text-xs font-bold text-[#111111]">{g.t}</span>
+                <span className="text-xs text-[#111111]/45 hidden sm:inline">· {g.s}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* ══════════════════════════════════════════════════
+            TABELA DE PREÇOS — split-screen edge-to-edge
+        ══════════════════════════════════════════════════ */}
+        <section className="grid md:grid-cols-2">
+          <div className="px-8 py-16 md:px-14 md:py-24 flex flex-col justify-between" style={{ backgroundColor: "#071a12" }}>
+            <div>
+              <p className="text-[10px] font-black tracking-[0.32em] uppercase mb-6" style={{ color: "#D4AF37" }}>
+                Tabela de Preços
+              </p>
+              <p className="font-playfair font-bold leading-none mb-3" style={{ fontSize: "clamp(5rem, 12vw, 9rem)", color: "rgba(212,175,55,0.18)" }}>01</p>
+              <h2 className="font-playfair font-bold text-white mb-4 leading-tight" style={{ fontSize: "clamp(1.5rem, 3.5vw, 2.4rem)" }}>
+                {data.serviceName}
+              </h2>
+              <p className="text-white/50 text-sm leading-relaxed mb-8 max-w-sm">
+                Preços fixos e transparentes {prep} {data.cityName}. O valor final é sempre confirmado antes de qualquer intervenção, sem surpresas.
               </p>
             </div>
+            <div className="w-10 h-px" style={{ backgroundColor: "rgba(212,175,55,0.4)" }} />
           </div>
-        </section>
 
-        {/* ── Trust Strip ── */}
-        <section className="py-12 bg-[#071a12]">
-          <div className="container mx-auto px-4">
-            <div className="max-w-4xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-              <div>
-                <div className="flex justify-center gap-0.5 mb-2">
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="w-4 h-4 fill-[#D4AF37] text-[#D4AF37]" />
-                  ))}
-                </div>
-                <p className="text-white font-bold text-xl font-playfair">{REVIEW_RATING}</p>
-                <p className="text-white/35 text-xs mt-1">Google Reviews</p>
-              </div>
-              <div>
-                <p className="text-[#D4AF37] font-bold text-2xl font-playfair">+1000</p>
-                <p className="text-white/35 text-xs mt-1">Clientes satisfeitos</p>
-              </div>
-              <div>
-                <p className="text-white font-bold text-2xl font-playfair">1h</p>
-                <p className="text-white/35 text-xs mt-1">Duração média do serviço</p>
-              </div>
-              <div>
-                <p className="text-white font-bold text-2xl font-playfair">0€</p>
-                <p className="text-white/35 text-xs mt-1">Custos de deslocação</p>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* ── Price Factors ── */}
-        {data.factors.length > 0 && (
-          <section className="py-14 bg-[#FAFAF7]">
-            <div className="container mx-auto px-4">
-              <div className="max-w-4xl mx-auto">
-                <div className="text-center mb-8">
-                  <h2 className="font-playfair text-2xl md:text-3xl font-bold text-[#111111]">
-                    O que influencia o preço?
-                  </h2>
-                  <div className="w-12 h-0.5 bg-[#D4AF37] mx-auto mt-4" />
-                </div>
-                <div className="grid sm:grid-cols-2 gap-3">
-                  {data.factors.map((factor, i) => (
-                    <div
-                      key={i}
-                      className="flex items-start gap-3 p-4 bg-white rounded-xl border border-[#111111]/6 shadow-sm"
-                    >
-                      <CheckCircle className="w-4 h-4 text-[#D4AF37] flex-shrink-0 mt-0.5" />
-                      <span className="text-sm text-[#111111]/75 font-medium">{factor}</span>
+          <div className="px-8 py-16 md:px-14 md:py-24 bg-[#FDFDF9]">
+            <p className="text-[10px] font-black tracking-[0.28em] uppercase mb-6" style={{ color: "#D4AF37" }}>Preços</p>
+            <ul className="divide-y divide-[#E8E4DE] border-t border-[#E8E4DE]">
+              {data.priceTable.map((row, i) => (
+                <li key={i} className="flex items-start justify-between gap-4 py-5">
+                  <div className="flex items-start gap-3 min-w-0">
+                    <span className="text-[10px] font-black tracking-wider pt-1 w-6 flex-shrink-0" style={{ color: "#D4AF37" }}>{String(i + 1).padStart(2, "0")}</span>
+                    <div>
+                      <p className="text-sm font-semibold text-[#111111] leading-snug">{row.item}</p>
+                      {row.note && (
+                        <span className="inline-block text-[10px] uppercase tracking-widest text-[#D4AF37]/70 font-semibold mt-1">
+                          {row.note}
+                        </span>
+                      )}
                     </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </section>
-        )}
+                  </div>
+                  <p className="font-playfair text-xl font-bold text-[#111111] flex-shrink-0 tabular-nums">{row.price}</p>
+                </li>
+              ))}
+            </ul>
+            <p className="text-xs text-[#111111]/35 mt-6">
+              Preços indicativos. O orçamento definitivo é confirmado antes de iniciar qualquer trabalho, sem surpresas.
+            </p>
+          </div>
+        </section>
 
-        {/* ── FAQ ── */}
-        {data.faqs.length > 0 && (
-          <section className="py-14 bg-[#FDFDF9] border-t border-[#111111]/5">
-            <div className="container mx-auto px-4">
-              <div className="max-w-3xl mx-auto">
-                <div className="text-center mb-10">
-                  <p className="text-xs font-semibold tracking-[0.25em] uppercase text-[#D4AF37] mb-2">
-                    Perguntas frequentes
+        {/* ══════════════════════════════════════════════════
+            O QUE INFLUENCIA O PREÇO — editorial numerado
+        ══════════════════════════════════════════════════ */}
+        {data.factors.length > 0 && (
+          <section className="bg-[#FDFDF9]">
+            <div className="px-8 py-14 md:px-14 md:py-20 border-b border-[#E8E4DE]">
+              <p className="text-[10px] font-black tracking-[0.32em] uppercase mb-4" style={{ color: "#D4AF37" }}>
+                Fatores de preço
+              </p>
+              <h2 className="font-playfair font-bold text-[#111111] leading-tight max-w-2xl" style={{ fontSize: "clamp(1.8rem, 4.5vw, 3.2rem)" }}>
+                O que influencia o preço final
+              </h2>
+            </div>
+            <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-0 divide-y divide-[#E8E4DE] sm:divide-y-0 sm:gap-px" style={{ backgroundColor: "#E8E4DE" }}>
+              {data.factors.map((factor, idx) => (
+                <div key={idx} className="bg-[#FDFDF9] px-8 py-10 md:px-8 md:py-12 flex flex-col">
+                  <p className="font-playfair font-bold leading-none mb-4" style={{ fontSize: "clamp(2.5rem, 4vw, 4rem)", color: "rgba(212,175,55,0.18)" }}>
+                    {String(idx + 1).padStart(2, "0")}
                   </p>
-                  <h2 className="font-playfair text-2xl md:text-3xl font-bold text-[#111111]">
-                    Dúvidas sobre preços
-                  </h2>
+                  <div className="w-6 h-px mb-4" style={{ backgroundColor: "#D4AF37" }} />
+                  <p className="text-sm text-[#111111]/60 leading-relaxed">{factor}</p>
                 </div>
-                <ServiceFAQSchema faqs={data.faqs} />
-                <div className="space-y-3">
-                  {data.faqs.map((faq, i) => (
-                    <details
-                      key={i}
-                      className="group bg-[#FAFAF7] rounded-xl border border-[#111111]/6 px-6"
-                    >
-                      <summary className="py-5 font-semibold text-[#111111] cursor-pointer list-none flex items-center justify-between text-[15px]">
-                        {faq.question}
-                        <ArrowRight className="w-4 h-4 text-[#D4AF37] group-open:rotate-90 transition-transform flex-shrink-0 ml-3" />
-                      </summary>
-                      <p className="pb-5 text-[#111111]/55 leading-relaxed text-sm">{faq.answer}</p>
-                    </details>
-                  ))}
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* ══════════════════════════════════════════════════
+            TRUST STATS
+        ══════════════════════════════════════════════════ */}
+        <section className="px-8 py-14 md:px-14 md:py-20" style={{ backgroundColor: "#071a12" }}>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl">
+            {[
+              { v: REVIEW_RATING, l: "Google Reviews", stars: true },
+              { v: "+1000", l: "Clientes satisfeitos" },
+              { v: "1h", l: "Duração média do serviço" },
+              { v: "0€", l: "Deslocação em Porto e Grande Porto" },
+            ].map((s, i) => (
+              <div key={i}>
+                {s.stars && (
+                  <div className="flex gap-0.5 mb-2">
+                    {[...Array(5)].map((_, k) => <Star key={k} className="w-3.5 h-3.5 fill-[#D4AF37]" style={{ color: "#D4AF37" }} />)}
+                  </div>
+                )}
+                <p className="font-playfair font-bold text-white" style={{ fontSize: "clamp(1.6rem, 3vw, 2.2rem)" }}>{s.v}</p>
+                <p className="text-white/40 text-xs mt-1 leading-snug">{s.l}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* ══════════════════════════════════════════════════
+            TESTEMUNHO — pull quote editorial
+        ══════════════════════════════════════════════════ */}
+        {testimonial && (
+          <section className="px-8 py-16 md:px-14 md:py-24 bg-[#FDFDF9] border-t border-[#E8E4DE]">
+            <div className="max-w-3xl">
+              <p className="font-playfair font-bold leading-none mb-4 select-none" style={{ fontSize: "7rem", color: "rgba(212,175,55,0.15)", lineHeight: 1 }} aria-hidden="true">"</p>
+              <p className="font-playfair text-[#111111] leading-relaxed mb-8" style={{ fontSize: "clamp(1.15rem, 2.8vw, 1.65rem)" }}>
+                {testimonial.text}
+              </p>
+              <div className="flex items-center gap-4">
+                <div className="flex gap-0.5">
+                  {[...Array(5)].map((_, i) => <Star key={i} className="w-4 h-4 fill-[#D4AF37]" style={{ color: "#D4AF37" }} />)}
+                </div>
+                <div className="h-3.5 w-px" style={{ backgroundColor: "rgba(212,175,55,0.3)" }} />
+                <div>
+                  <span className="text-sm font-bold text-[#111111]">{testimonial.name}</span>
+                  <span className="text-[#111111]/40 text-xs ml-2">· {testimonial.city} · Google</span>
                 </div>
               </div>
             </div>
           </section>
         )}
 
-        {/* ── Internal Links ── */}
-        <section className="py-10 bg-[#FAFAF7] border-t border-[#111111]/5">
-          <div className="container mx-auto px-4">
-            <div className="max-w-4xl mx-auto space-y-6">
-              <div>
-                <h3 className="text-xs font-bold text-[#111111]/40 uppercase tracking-widest mb-3">
-                  Ver página completa do serviço
-                </h3>
-                <Link
-                  to={`/${data.serviceSlug}-${data.citySlug}`}
-                  className="inline-flex items-center gap-2 bg-white border border-[#D4AF37]/30 px-4 py-2.5 rounded-xl text-sm font-semibold text-[#1A4E30] hover:bg-[#D4AF37]/5 transition-all"
-                >
-                  <ArrowRight className="w-4 h-4 text-[#D4AF37]" />
-                  {data.serviceName} {prep} {data.cityName}
-                </Link>
+        {/* ══════════════════════════════════════════════════
+            FAQ
+        ══════════════════════════════════════════════════ */}
+        {data.faqs.length > 0 && (
+          <section className="px-8 py-16 md:px-14 md:py-24" style={{ backgroundColor: "#071a12" }}>
+            <div className="max-w-3xl">
+              <p className="text-[10px] font-black tracking-[0.32em] uppercase mb-4" style={{ color: "#D4AF37" }}>
+                Perguntas
+              </p>
+              <h2 className="font-playfair font-bold text-white leading-tight mb-12" style={{ fontSize: "clamp(1.8rem, 4.5vw, 3.2rem)" }}>
+                Dúvidas sobre preços
+              </h2>
+              <ServiceFAQSchema faqs={data.faqs} />
+              <Accordion type="single" collapsible className="space-y-0 divide-y divide-white/10 border-t border-white/10">
+                {data.faqs.map((faq, i) => (
+                  <AccordionItem key={i} value={`faq-${i}`} className="border-0 py-1">
+                    <AccordionTrigger className="text-left text-sm md:text-base font-semibold text-white py-5 hover:no-underline [&[data-state=open]]:text-[#D4AF37] [&[data-state=open]>svg]:text-[#D4AF37]">
+                      {faq.question}
+                    </AccordionTrigger>
+                    <AccordionContent className="text-sm text-white/55 pb-6 leading-relaxed">
+                      {faq.answer}
+                    </AccordionContent>
+                  </AccordionItem>
+                ))}
+              </Accordion>
+            </div>
+          </section>
+        )}
+
+        {/* ══════════════════════════════════════════════════
+            PREÇO EDITORIAL — dramático
+        ══════════════════════════════════════════════════ */}
+        <section className="px-8 py-16 md:px-14 md:py-24 bg-[#FDFDF9] border-t border-[#E8E4DE]">
+          <div className="flex flex-col md:flex-row items-start md:items-end justify-between gap-10 max-w-5xl">
+            <div>
+              <p className="text-[10px] font-black tracking-[0.32em] uppercase mb-5" style={{ color: "#D4AF37" }}>
+                Investimento
+              </p>
+              <p className="font-playfair font-bold text-[#111111] leading-none mb-3" style={{ fontSize: "clamp(2.8rem, 8vw, 6rem)" }}>
+                {servicePrice}
+              </p>
+              <p className="text-[#111111]/45 text-sm leading-relaxed max-w-sm">
+                Preço fixo, confirmado antes de qualquer intervenção. Sem surpresas. Deslocação incluída no Porto e Grande Porto.
+              </p>
+            </div>
+            <div className="flex flex-col gap-3 w-full md:w-auto md:min-w-[280px]">
+              <div className="relative">
+                <div className="absolute -inset-1.5 rounded-full bg-gold/40 opacity-30 blur-lg pointer-events-none" />
+                <QuizButton className="relative w-full" buttonClassName="h-[52px] !py-0 w-full" ctaLabel="Ver preço grátis" initialLocation={data.cityName} initialService={quizService} />
               </div>
-              <div>
-                <h3 className="text-xs font-bold text-[#111111]/40 uppercase tracking-widest mb-3">
-                  Preços noutras cidades
-                </h3>
-                <div className="flex flex-wrap gap-2">
-                  {nearbyCities.map(city => (
-                    <Link
-                      key={city.slug}
-                      to={`/preco-${data.serviceSlug}-${city.slug}`}
-                      className="inline-flex items-center gap-1.5 bg-white px-3 py-2 rounded-lg text-sm font-medium text-[#111111]/65 border border-[#111111]/8 hover:border-[#D4AF37]/30 hover:text-[#111111] transition-all"
-                    >
-                      <MapPin className="w-3 h-3 text-[#D4AF37]" />
-                      {city.name}
-                    </Link>
-                  ))}
-                </div>
-              </div>
-              <div>
-                <h3 className="text-xs font-bold text-[#111111]/40 uppercase tracking-widest mb-3">
-                  Outros serviços {prep} {data.cityName}
-                </h3>
-                <div className="flex flex-wrap gap-2">
-                  {relatedServices.map(svc => (
-                    <Link
-                      key={svc.slug}
-                      to={`/preco-${svc.slug}-${data.citySlug}`}
-                      className="inline-flex items-center gap-1.5 bg-white px-3 py-2 rounded-lg text-sm font-medium text-[#111111]/65 border border-[#111111]/8 hover:border-[#D4AF37]/30 hover:text-[#111111] transition-all"
-                    >
-                      <ArrowRight className="w-3 h-3 text-[#D4AF37]" />
-                      {svc.name}
-                    </Link>
-                  ))}
-                </div>
-              </div>
+              <a
+                href={waHref}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => trackWhatsAppClick(`price_final_${data.serviceSlug}_${data.citySlug}`)}
+                className="w-full inline-flex items-center justify-center gap-2 h-[52px] px-5 rounded-full font-black text-sm text-white bg-gradient-to-r from-[#1DA851] via-[#25D366] to-[#1DA851] shadow-[0_6px_22px_rgba(37,211,102,0.42)] hover:scale-[1.025] active:scale-[0.95] transition-all duration-200 touch-manipulation"
+              >
+                <MessageCircle className="w-[18px] h-[18px]" strokeWidth={2} />
+                Falar agora
+              </a>
             </div>
           </div>
         </section>
 
-        {/* ── CTA ── */}
-        <section className="py-16 md:py-20 bg-[#071a12] relative overflow-hidden">
-          <div className="absolute inset-0 pointer-events-none">
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[300px] rounded-full bg-[#D4AF37]/[0.05] blur-3xl" />
-          </div>
-          <div className="container mx-auto px-4 text-center relative">
-            <p className="text-xs font-semibold tracking-[0.25em] uppercase text-[#D4AF37] mb-3">
-              Orçamento Grátis
+        {/* ══════════════════════════════════════════════════
+            CTA FINAL
+        ══════════════════════════════════════════════════ */}
+        <section className="px-8 py-16 md:px-14 md:py-24 border-t border-[#E8E4DE]" style={{ backgroundColor: "#071a12" }}>
+          <div className="max-w-2xl">
+            <p className="text-[10px] font-black tracking-[0.32em] uppercase mb-5" style={{ color: "#D4AF37" }}>
+              Kyro Clean Solutions
             </p>
-            <h2 className="font-playfair text-2xl md:text-4xl font-bold text-white mb-3">
+            <h2 className="font-playfair font-bold text-white leading-tight mb-5" style={{ fontSize: "clamp(1.8rem, 4.5vw, 3.2rem)" }}>
               Peça o seu orçamento {prep} {data.cityName}
             </h2>
-            <p className="text-white/45 mb-8 text-sm md:text-base max-w-md mx-auto">
-              Resposta em menos de 30 minutos. Sem compromisso, sem surpresas.
+            <p className="text-white/45 text-sm leading-relaxed mb-10 max-w-md">
+              Desde {servicePrice} · Resultado garantido ou repetimos grátis · Deslocação incluída no Porto e Grande Porto
             </p>
-            <div className="flex gap-3 justify-center mx-auto max-w-xs sm:max-w-sm">
+            <div className="flex flex-col sm:flex-row gap-3 max-w-sm">
               <div className="relative flex-1">
-                <div className="absolute -inset-1.5 rounded-full bg-[#D4AF37]/40 opacity-30 blur-lg pointer-events-none" />
-                <QuizButton
-                  className="relative w-full"
-                  buttonClassName="h-[52px] !py-0 w-full"
-                  ctaLabel="Ver preço grátis"
-                  initialLocation={data.cityName}
-                  initialService={quizService}
-                />
+                <div className="absolute -inset-1.5 rounded-full bg-gold/40 opacity-30 blur-lg pointer-events-none" />
+                <QuizButton className="relative w-full" buttonClassName="h-[52px] !py-0 w-full" ctaLabel="Ver preço grátis" initialLocation={data.cityName} initialService={quizService} />
               </div>
               <a
                 href={waHref}
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={() => trackWhatsAppClick(`price_cta_${data.serviceSlug}_${data.citySlug}`)}
-                className="flex-1 inline-flex items-center justify-center gap-2 h-[52px] px-5 rounded-full font-black text-sm text-white bg-gradient-to-r from-[#1DA851] via-[#25D366] to-[#1DA851] shadow-[0_6px_22px_rgba(37,211,102,0.42)] hover:scale-[1.025] active:scale-[0.95] transition-all duration-200 touch-manipulation"
+                className="relative flex-1 inline-flex items-center justify-center gap-2 h-[52px] px-5 rounded-full font-black text-sm text-white bg-gradient-to-r from-[#1DA851] via-[#25D366] to-[#1DA851] shadow-[0_6px_22px_rgba(37,211,102,0.42)] hover:scale-[1.025] active:scale-[0.95] transition-all duration-200 touch-manipulation"
               >
-                <MessageCircle className="w-[18px] h-[18px] flex-shrink-0" strokeWidth={2} />
+                <MessageCircle className="w-[18px] h-[18px]" strokeWidth={2} />
                 Falar agora
               </a>
+            </div>
+          </div>
+        </section>
+
+        {/* ══════════════════════════════════════════════════
+            REDE INTERNA
+        ══════════════════════════════════════════════════ */}
+        <section className="px-8 py-12 md:px-14 md:py-16 bg-[#FDFDF9] border-t border-[#E8E4DE]">
+          <div className="space-y-10">
+            <div>
+              <p className="text-[10px] font-black tracking-[0.28em] uppercase mb-4 text-[#111111]/40">Ver página completa do serviço</p>
+              <Link
+                to={`/${data.serviceSlug}-${data.citySlug}`}
+                className="inline-flex items-center gap-1.5 bg-white px-3.5 py-2 rounded-xl text-sm font-medium text-[#111111] border border-[#E8E4DE] hover:border-[#D4AF37]/40 transition-all"
+              >
+                <ArrowRight className="w-3 h-3" style={{ color: "#D4AF37" }} />
+                {data.serviceName} {prep} {data.cityName}
+              </Link>
+            </div>
+
+            <div>
+              <p className="text-[10px] font-black tracking-[0.28em] uppercase mb-4 text-[#111111]/40">Outros serviços {prep} {data.cityName}</p>
+              <div className="flex flex-wrap gap-2">
+                {relatedServices.map(svc => (
+                  <Link key={svc.slug} to={`/preco-${svc.slug}-${data.citySlug}`}
+                    className="inline-flex items-center gap-1.5 bg-white px-3.5 py-2 rounded-xl text-sm font-medium text-[#111111] border border-[#E8E4DE] hover:border-[#D4AF37]/40 transition-all">
+                    <ArrowRight className="w-3 h-3" style={{ color: "#D4AF37" }} />
+                    {svc.name}
+                  </Link>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <p className="text-[10px] font-black tracking-[0.28em] uppercase mb-4 text-[#111111]/40">Preços noutras cidades</p>
+              <div className="flex flex-wrap gap-2">
+                {nearbyCities.map(city => (
+                  <Link key={city.slug} to={`/preco-${data.serviceSlug}-${city.slug}`}
+                    className="inline-flex items-center gap-1.5 bg-white px-3.5 py-2 rounded-xl text-sm font-medium text-[#111111] border border-[#E8E4DE] hover:border-[#D4AF37]/40 transition-all">
+                    <MapPin className="w-3 h-3" style={{ color: "#D4AF37" }} />
+                    {city.name}
+                  </Link>
+                ))}
+              </div>
             </div>
           </div>
         </section>
@@ -367,47 +438,19 @@ const PricePage = () => {
             __html: JSON.stringify({
               "@context": "https://schema.org",
               "@graph": [
-                {
-                  "@type": "WebPage",
-                  "@id": `${SITE_URL}${pathname}#webpage`,
-                  "url": `${SITE_URL}${pathname}`,
-                  "name": data.title,
-                  "description": data.metaDescription,
-                  "inLanguage": "pt-PT",
-                  "isPartOf": { "@id": `${SITE_URL}/#website` },
-                  "publisher": { "@id": `${SITE_URL}/#business` },
-                  "breadcrumb": { "@id": `${SITE_URL}${pathname}#breadcrumb` },
-                },
-                {
-                  "@type": "BreadcrumbList",
-                  "@id": `${SITE_URL}${pathname}#breadcrumb`,
-                  "itemListElement": [
-                    { "@type": "ListItem", "position": 1, "name": "Início", "item": SITE_URL },
-                    { "@type": "ListItem", "position": 2, "name": data.serviceName, "item": `${SITE_URL}/${data.serviceSlug}` },
-                    { "@type": "ListItem", "position": 3, "name": `Preços ${cityPrep(data.cityName)} ${data.cityName}`, "item": `${SITE_URL}${pathname}` },
-                  ],
-                },
-                {
-                  "@type": "Service",
-                  "@id": `${SITE_URL}${pathname}#service`,
-                  "name": `${data.serviceName} ${cityPrep(data.cityName)} ${data.cityName}`,
-                  "description": data.metaDescription,
-                  "url": `${SITE_URL}${pathname}`,
-                  "provider": { "@id": `${SITE_URL}/#business` },
-                  "areaServed": { "@type": "City", "name": data.cityName },
-                  "offers": {
-                    "@type": "Offer",
-                    "availability": "https://schema.org/InStock",
-                    "areaServed": { "@type": "City", "name": data.cityName },
-                    "priceSpecification": {
-                      "@type": "PriceSpecification",
-                      "minPrice": data.priceTable[0]?.price.replace(/[^0-9]/g, "") ?? "15",
-                      "maxPrice": data.priceTable[data.priceTable.length - 1]?.price.replace(/[^0-9]/g, "") ?? "99",
-                      "priceCurrency": "EUR",
-                      "description": `Preço de ${data.serviceName} ${cityPrep(data.cityName)} ${data.cityName}`,
-                    },
-                  },
-                },
+                buildWebPageNode({ url: `${SITE_URL}${pathname}`, name: data.title, description: data.metaDescription }),
+                buildBreadcrumbNode(`${SITE_URL}${pathname}#breadcrumb`, [
+                  { name: "Início", item: SITE_URL },
+                  { name: data.serviceName, item: `${SITE_URL}/${data.serviceSlug}` },
+                  { name: `Preços ${prep} ${data.cityName}`, item: `${SITE_URL}${pathname}` },
+                ]),
+                buildServiceNode({
+                  url: `${SITE_URL}${pathname}`,
+                  name: `${data.serviceName} ${prep} ${data.cityName}`,
+                  description: data.metaDescription,
+                  areaServed: { "@type": "City", name: data.cityName },
+                  offers: buildOfferNode(servicePrice.replace(/[^0-9]/g, "")),
+                }),
               ],
             }),
           }}
