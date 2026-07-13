@@ -46,3 +46,55 @@ export const SERVICE_RESULT_CONTENT: Record<string, (place: string) => { desc: s
 
 export const SERVICE_HERO_FALLBACK = { d: heroSofaD, m: heroSofaM };
 export const SERVICE_RESULT_FALLBACK = resultSofa;
+
+// Pool de heroes por serviço para variar a foto entre páginas de Localidade/Freguesia ×
+// Serviço — rotação determinística por nome da cidade/freguesia (mesmo pool de fotos
+// já usado em SofaVariantPage.tsx). Fotos únicas por página evitam conteúdo repetido.
+const SERVICE_HERO_POOL: Record<string, string[]> = {
+  "limpeza-sofas": [
+    "/images/variant-heroes/sofas/sofa-v1.jpeg",
+    "/images/variant-heroes/sofas/sofa-v2.jpeg",
+    "/images/variant-heroes/sofas/sofa-v3.jpeg",
+    "/images/variant-heroes/sofas/sofa-v4.jpeg",
+    "/images/variant-heroes/sofas/sofa-v5.jpeg",
+    "/images/variant-heroes/sofas/sofa-v6.jpeg",
+    "/images/variant-heroes/sofas/sofa-v7.jpeg",
+  ],
+  "limpeza-colchoes": [
+    "/images/variant-heroes/colchoes/colchao-v1.png",
+    "/images/variant-heroes/colchoes/colchao-v2.png",
+    "/images/variant-heroes/colchoes/colchao-v3.png",
+    "/images/variant-heroes/colchoes/colchao-v4.png",
+    "/images/variant-heroes/colchoes/colchao-v5.png",
+    "/images/variant-heroes/colchoes/colchao-v6.png",
+  ],
+  "limpeza-tapetes": [
+    "/images/variant-heroes/tapetes/tapetes-v1.png",
+    "/images/variant-heroes/tapetes/tapetes-v2.png",
+  ],
+  "limpeza-cadeiras": [
+    "/images/variant-heroes/cadeiras/cadeiras-v1.png",
+    "/images/variant-heroes/cadeiras/cadeiras-v2.png",
+  ],
+  "limpeza-alcatifas": [
+    "/images/variant-heroes/alcatifas/alcatifas-v1.jpeg",
+    "/images/variant-heroes/alcatifas/alcatifas-v2.jpg",
+    "/images/variant-heroes/alcatifas/alcatifas-v3.jpg",
+    "/images/variant-heroes/alcatifas/alcatifas-v4.png",
+  ],
+  "impermeabilizacao": [
+    "/images/variant-heroes/impermeabilizacao/impermeabilizacao-v1.png",
+    "/images/variant-heroes/impermeabilizacao/impermeabilizacao-v2.png",
+    "/images/variant-heroes/impermeabilizacao/impermeabilizacao-v3.png",
+    "/images/variant-heroes/impermeabilizacao/impermeabilizacao-v4.jpg",
+    "/images/variant-heroes/impermeabilizacao/impermeabilizacao-v5.png",
+  ],
+};
+
+export function pickServiceHero(serviceSlug: string, locationName: string): { d: string; m: string } {
+  const pool = SERVICE_HERO_POOL[serviceSlug];
+  if (!pool) return SERVICE_HERO_IMAGES[serviceSlug] ?? SERVICE_HERO_FALLBACK;
+  const hash = locationName.split("").reduce((a, c) => a + c.charCodeAt(0), 0);
+  const img = pool[hash % pool.length];
+  return { d: img, m: img };
+}

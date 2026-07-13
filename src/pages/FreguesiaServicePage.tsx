@@ -25,7 +25,7 @@ import { trackWhatsAppClick } from "@/lib/quizTracking";
 import { SERVICE_PACK_SLUGS } from "@/constants/servicePackSlugs";
 import { SERVICE_TO_QUIZ } from "@/constants/serviceToQuiz";
 import { METRO_CITIES } from "@/constants/metroCities";
-import { SERVICE_HERO_IMAGES, SERVICE_HERO_FALLBACK } from "@/constants/serviceContent";
+import { pickServiceHero } from "@/constants/serviceContent";
 import { buildServiceWaMessage } from "@/lib/whatsappMessages";
 import { SITE_URL, WHATSAPP_BASE } from "@/constants/business";
 import { PRICE_TABLE, PRICE_TABLE_QUIZ_CONFIG, SERVICE_TESTIMONIALS, type PriceRowQuizConfig } from "@/data/locationPriceTestimonialsData";
@@ -141,7 +141,7 @@ const FreguesiaServicePage = () => {
   }
 
   const quizService = SERVICE_TO_QUIZ[data.serviceSlug];
-  const heroImgs = SERVICE_HERO_IMAGES[data.serviceSlug] ?? SERVICE_HERO_FALLBACK;
+  const heroImgs = pickServiceHero(data.serviceSlug, data.name);
   const nearbyFreguesias = getNearbyFreguesias(data.municipioSlug, data.nearby);
   const otherServices = services.filter(s => s.slug !== data.serviceSlug);
   const serviceBaseUrl = services.find(s => s.slug === data.serviceSlug)?.baseRoute ?? `/${data.serviceSlug}`;
@@ -194,8 +194,8 @@ const FreguesiaServicePage = () => {
           <div className="absolute inset-0" style={{ background: "#071a12" }} />
           <div className="absolute inset-0 overflow-hidden" aria-hidden="true">
             <picture className="w-full h-full">
-              <source media="(max-width: 767px)" srcSet={heroImgs.m} type="image/webp" />
-              <source media="(min-width: 768px)" srcSet={heroImgs.d} type="image/webp" />
+              <source media="(max-width: 767px)" srcSet={heroImgs.m} />
+              <source media="(min-width: 768px)" srcSet={heroImgs.d} />
               <img src={heroImgs.d} alt={data.h1} className="w-full h-full object-cover" loading="eager" />
             </picture>
           </div>
