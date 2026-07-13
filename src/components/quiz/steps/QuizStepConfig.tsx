@@ -5,7 +5,7 @@ import { sofaPrices, mattressPrices } from '@/components/quiz/QuizTypes';
 import type { QuizFormData, SofaItem, MattressItem } from '@/components/quiz/QuizTypes';
 import {
   sofaSetQty, sofaTogglePack,
-  mattressSetQty, mattressTogglePack,
+  mattressSetQty,
   calcCarpetPrice, calcChairClean, calcChairWaterproof,
   calcPackPricing,
 } from '@/components/quiz/quizHelpers';
@@ -100,47 +100,23 @@ const QuizStepConfig = ({
           {mattressPrices.map(option => {
             const item = mattressItems.find(i => i.sizeId === option.id);
             const qty = item?.qty ?? 0;
-            const packOn = item?.packEnabled ?? false;
             const isActive = qty > 0;
-            const isWaterproofBase = formData.serviceType === 'waterproofing';
-            const { basePrice, packDelta, displayPrice: dp } = calcPackPricing(option, packOn, isWaterproofBase);
-            const upsellLabel = isWaterproofBase ? 'Adicionar Higienização Profunda' : 'Adicionar Proteção Total VIP';
-            const upsellSub = isWaterproofBase
-              ? `${packDelta !== null ? `+${packDelta}€/un.` : '+?€/un.'} · Limpeza profunda incluída`
-              : `${packDelta !== null ? `+${packDelta}€/un.` : '+?€/un.'} · Proteção até 10 anos`;
+            const dp = typeof option.cleaningPrice === 'number' ? option.cleaningPrice : null;
             return (
-              <div key={option.id} className={cn('rounded-sm border-2 transition-all duration-200 overflow-hidden', isActive && packOn ? 'border-gold bg-[#1a2a1a] shadow-[0_0_12px_rgba(212,175,55,0.20)]' : isActive ? 'border-gold/50 bg-[#1a2a1a] shadow-[0_0_8px_rgba(212,175,55,0.10)]' : 'border-gold/20 bg-[#1a2a1a]')}>
+              <div key={option.id} className={cn('rounded-sm border-2 transition-all duration-200 overflow-hidden', isActive ? 'border-gold/50 bg-[#1a2a1a] shadow-[0_0_8px_rgba(212,175,55,0.10)]' : 'border-gold/20 bg-[#1a2a1a]')}>
                 <div className="flex items-center justify-between px-4 py-3">
                   <div className="flex-1 min-w-0 mr-3">
                     <span className="text-sm font-semibold text-white">{option.label}</span>
                     <div className="flex items-center gap-1.5 mt-0.5">
-                      {isActive && packOn && <span className="text-[9px] bg-gold/15 text-gold/80 px-1.5 py-0.5 rounded-full font-bold leading-none">VIP</span>}
-                      {isActive && packOn && basePrice !== null && (
-                        <span className="text-sm text-white/30 line-through tabular-nums">{basePrice}€</span>
-                      )}
-                      <span className={cn('text-sm font-bold tabular-nums', isActive && packOn ? 'text-gold' : isActive ? 'text-white/80' : 'text-white/40')}>{dp !== null ? `${dp}€/un.` : 'Sob Orçamento'}</span>
+                      <span className={cn('text-sm font-bold tabular-nums', isActive ? 'text-white/80' : 'text-white/40')}>{dp !== null ? `${dp}€/un.` : 'Sob Orçamento'}</span>
                     </div>
                   </div>
                   <div className="flex items-center gap-2 flex-shrink-0">
                     <button onClick={() => setMattressItems(mattressSetQty(mattressItems, option.id, qty - 1))} disabled={qty === 0} className="w-11 h-11 rounded-sm border border-white/20 bg-white/[0.05] text-white font-bold text-xl flex items-center justify-center disabled:opacity-20 active:scale-95 transition-all touch-manipulation hover:border-gold/50">−</button>
-                    <span className={cn('w-7 text-center font-bold tabular-nums text-base', isActive ? (packOn ? 'text-gold' : 'text-white/80') : 'text-white/30')}>{qty}</span>
+                    <span className={cn('w-7 text-center font-bold tabular-nums text-base', isActive ? 'text-white/80' : 'text-white/30')}>{qty}</span>
                     <button onClick={() => setMattressItems(mattressSetQty(mattressItems, option.id, qty + 1))} className="w-11 h-11 rounded-sm border border-white/20 bg-white/[0.05] text-white font-bold text-xl flex items-center justify-center active:scale-95 transition-all touch-manipulation hover:border-gold/50">+</button>
                   </div>
                 </div>
-                {isActive && (
-                  <div className="px-4 pb-3">
-                    <button onClick={() => setMattressItems(mattressTogglePack(mattressItems, option.id))} className={cn('w-full flex items-center gap-2.5 px-3 py-2 rounded-sm border transition-all duration-200 touch-manipulation', packOn ? 'border-gold/50 bg-gold/[0.08]' : 'border-gold/15 bg-[#1a2a1a] hover:border-gold/40')}>
-                      <Shield className={cn('w-4 h-4 flex-shrink-0', packOn ? 'text-gold' : 'text-white/25')} />
-                      <div className="flex-1 text-left">
-                        <p className={cn('text-[11px] font-bold leading-none', packOn ? 'text-white' : 'text-white/50')}>{upsellLabel}</p>
-                        <p className={cn('text-[11px] mt-0.5 leading-none', packOn ? 'text-gold/60' : 'text-white/25')}>{upsellSub}</p>
-                      </div>
-                      <div className={cn('w-8 h-4 rounded-full border flex items-center px-0.5 transition-all duration-300 flex-shrink-0', packOn ? 'border-gold bg-gold/20' : 'border-white/20 bg-white/[0.05]')}>
-                        <div className={cn('w-3 h-3 rounded-full transition-all duration-300', packOn ? 'bg-gold translate-x-[14px]' : 'bg-white/30 translate-x-0')} />
-                      </div>
-                    </button>
-                  </div>
-                )}
               </div>
             );
           })}

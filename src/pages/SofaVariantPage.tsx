@@ -76,7 +76,6 @@ const PROBLEM_IMAGES: Record<string, [string, string, string]> = {
   'lavagem-cadeiras':            [imgCadeiraAntes,    imgLimpCadeiras,     imgCadeiraProcesso],
   'lavagem-alcatifas':           [imgMofAlcatifa,     imgAlcatifaProcesso, imgManchasCafe],
   'impermeabilizacao-sofa':      [imgWaterproofing,   imgFamiliaSofa,      imgSofaVeludo],
-  'impermeabilizacao-colchao':   [imgManchasColchao,  imgColchaoAntes,     imgMauCheiroColchao],
   'impermeabilizacao-cadeiras':  [imgCadeiraAntes,    imgLimpCadeiras,     imgCadeiraProcesso],
 };
 

@@ -18,7 +18,7 @@ export interface KeywordVariantRoute {
 const SERVICES_FOR_VARIANT: Record<VariantKey, ServiceKey[]> = {
   higienizacao:      ['sofa', 'colchao', 'tapetes', 'cadeiras', 'alcatifas'],
   lavagem:           ['sofa', 'colchao', 'tapetes', 'cadeiras', 'alcatifas'],
-  impermeabilizacao: ['sofa', 'colchao', 'cadeiras'],
+  impermeabilizacao: ['sofa', 'cadeiras'],
 };
 
 const VARIANTS: VariantKey[] = ['higienizacao', 'lavagem', 'impermeabilizacao'];

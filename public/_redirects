@@ -8,5 +8,8 @@
 /pack-quarto-completo-porto-miragaia         /pack-quarto-completo-porto            301
 /pack-sofa-e-colchao-lousada-*               /pack-sofa-e-colchao-porto             301
 
+# ── Descontinuado: impermeabilização de colchão (2026-07) ────────────────────
+/impermeabilizacao-colchao-*                /limpeza-colchoes-:splat              301
+
 # ── SPA fallback (must be last) ───────────────────────────────────────────────
 /*                                           /index.html                            200

@@ -67,14 +67,14 @@ export const sofaPrices: PriceOption[] = [
 export const sofaChaisePrice = { cleaning: 10, waterproofing: 20 };
 
 // Mattress pricing
-// Limpeza:           39 / 49 / 59
-// Impermeabilização: 45 / 50 / 55
-// Pack Total (15% desconto sobre soma): 71 / 84 / 97  (poupa 13/15/17€ vs. separado)
+// Limpeza:           49 / 59 / 69
+// Impermeabilização: 55 / 60 / 65
+// Pack Total (15% desconto sobre soma): 88 / 101 / 114  (poupa 16/18/20€ vs. separado)
 // originalBothPrice = soma sem desconto (preço riscado no UI)
 export const mattressPrices: PriceOption[] = [
-  { id: 'solteiro', label: 'Solteiro',     cleaningPrice: 39, waterproofingPrice: 45, bothPrice: 71,  originalBothPrice: 84  },
-  { id: 'casal',    label: 'Casal',        cleaningPrice: 49, waterproofingPrice: 50, bothPrice: 84,  originalBothPrice: 99  },
-  { id: 'king',     label: 'King / Queen', cleaningPrice: 59, waterproofingPrice: 55, bothPrice: 97,  originalBothPrice: 114 },
+  { id: 'solteiro', label: 'Solteiro',     cleaningPrice: 49, waterproofingPrice: 55, bothPrice: 88,  originalBothPrice: 104 },
+  { id: 'casal',    label: 'Casal',        cleaningPrice: 59, waterproofingPrice: 60, bothPrice: 101, originalBothPrice: 119 },
+  { id: 'king',     label: 'King / Queen', cleaningPrice: 69, waterproofingPrice: 65, bothPrice: 114, originalBothPrice: 134 },
 ];
 
 export const chairPrices = {
@@ -128,12 +128,6 @@ export const locationPrices: Record<string, number> = {
   'Sintra': 35,
   'Almada': 35,
   'Setúbal': 40,
-};
-
-export const mattressWaterproofPrices: Record<string, number> = {
-  'solteiro': 71,
-  'casal': 84,
-  'king': 97,
 };
 
 export const carpetWaterproofingPrices = [

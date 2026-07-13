@@ -54,9 +54,9 @@ const expertTips: ExpertTip[] = [
     url: "/blog/limpeza-colchao-bebe-crianca",
   },
   {
-    title: "Vale a pena impermeabilizar o colchão?",
-    summary: "A impermeabilização protege de acidentes e manchas futuras, aumentando significativamente a vida útil do colchão.",
-    url: "/blog/impermeabilizacao-sofa-vale-pena",
+    title: "Como tirar manchas de urina do colchão",
+    summary: "Manchas frescas, secas ou antigas: veja o passo a passo para remover a mancha e o odor de urina do colchão em casa.",
+    url: "/blog/como-tirar-manchas-urina-colchao",
   },
 ];
 

@@ -4,7 +4,7 @@ import { sofaPrices, mattressPrices } from '@/components/quiz/QuizTypes';
 import type { QuizFormData, UpsellItemConfig } from '@/components/quiz/QuizTypes';
 import {
   sofaSetQty, sofaTogglePack,
-  mattressSetQty, mattressTogglePack,
+  mattressSetQty,
   calcCarpetPrice, calcChairClean,
 } from '@/components/quiz/quizHelpers';
 import { useUpsellSelection } from './useUpsellSelection';
@@ -181,7 +181,7 @@ const QuizUpsellOverlay = ({
           <div className="grid grid-cols-2 gap-2 w-full max-w-xs mx-auto mb-4">
             {([
               { id: 'sofa',     img: '/images/services/sofa.webp',    label: 'Sofá',     sublabel: 'a partir de 49€' },
-              { id: 'mattress', img: '/images/services/colchao.webp', label: 'Colchão',  sublabel: 'a partir de 39€' },
+              { id: 'mattress', img: '/images/services/colchao.webp', label: 'Colchão',  sublabel: 'a partir de 49€' },
               { id: 'carpet',   img: '/images/services/tapete.webp',  label: 'Tapete',   sublabel: 'a partir de 5€/m²' },
               { id: 'chairs',   img: '/images/services/cadeira.webp', label: 'Cadeiras', sublabel: '15€/cadeira' },
             ] as const).map(opt => (
@@ -346,44 +346,26 @@ const QuizUpsellOverlay = ({
                 {mattressPrices.map(opt => {
                   const item = pendingMattressItems.find(i => i.sizeId === opt.id);
                   const qty = item?.qty ?? 0;
-                  const packOn = item?.packEnabled ?? false;
                   const isActive = qty > 0;
                   const cleanP = typeof opt.cleaningPrice === 'number' ? (opt.cleaningPrice as number) : null;
-                  const bothP = typeof opt.bothPrice === 'number' ? (opt.bothPrice as number) : null;
-                  const dp = cleanP !== null ? (packOn && bothP !== null ? bothP : cleanP) : null;
+                  const dp = cleanP;
                   return (
-                    <div key={opt.id} className={cn('rounded-sm border-2 transition-all duration-200 overflow-hidden', isActive && packOn ? 'border-gold bg-[#1a2a1a] shadow-[0_0_10px_rgba(212,175,55,0.18)]' : isActive ? 'border-gold/50 bg-[#1a2a1a]' : 'border-gold/20 bg-[#1a2a1a]')}>
+                    <div key={opt.id} className={cn('rounded-sm border-2 transition-all duration-200 overflow-hidden', isActive ? 'border-gold/50 bg-[#1a2a1a]' : 'border-gold/20 bg-[#1a2a1a]')}>
                       <div className="flex items-center justify-between px-4 py-3">
                         <div className="flex-1 min-w-0 mr-3">
                           <span className="text-sm font-semibold text-white">{opt.label}</span>
                           <div className="mt-0.5">
-                            <span className={cn('text-sm font-bold tabular-nums', isActive ? (packOn ? 'text-gold' : 'text-white/80') : 'text-white/40')}>
+                            <span className={cn('text-sm font-bold tabular-nums', isActive ? 'text-white/80' : 'text-white/40')}>
                               {dp !== null ? `${dp}€/un.${qty > 1 ? ` × ${qty} = ${dp * qty}€` : ''}` : 'Sob orç.'}
                             </span>
                           </div>
                         </div>
                         <div className="flex items-center gap-2 flex-shrink-0">
                           <button onClick={() => setPendingMattressItems(mattressSetQty(pendingMattressItems, opt.id, qty - 1))} disabled={qty === 0} className="w-8 h-8 rounded-lg border border-white/20 bg-white/[0.05] text-white font-bold text-base flex items-center justify-center disabled:opacity-20 active:scale-95 transition-all touch-manipulation hover:border-gold/50">−</button>
-                          <span className={cn('w-6 text-center font-bold tabular-nums text-sm', isActive ? (packOn ? 'text-gold' : 'text-white/80') : 'text-white/30')}>{qty}</span>
+                          <span className={cn('w-6 text-center font-bold tabular-nums text-sm', isActive ? 'text-white/80' : 'text-white/30')}>{qty}</span>
                           <button onClick={() => setPendingMattressItems(mattressSetQty(pendingMattressItems, opt.id, qty + 1))} className="w-8 h-8 rounded-lg border border-white/20 bg-white/[0.05] text-white font-bold text-base flex items-center justify-center active:scale-95 transition-all touch-manipulation hover:border-gold/50">+</button>
                         </div>
                       </div>
-                      {isActive && cleanP !== null && (
-                        <div className="px-4 pb-3">
-                          <button onClick={() => setPendingMattressItems(mattressTogglePack(pendingMattressItems, opt.id))} className={cn('w-full flex items-center gap-2.5 px-3 py-2 rounded-sm border transition-all duration-200 touch-manipulation', packOn ? 'border-gold/50 bg-gold/[0.08]' : 'border-gold/15 bg-[#1a2a1a] hover:border-gold/40')}>
-                            <Shield className={cn('w-4 h-4 flex-shrink-0', packOn ? 'text-gold' : 'text-white/25')} />
-                            <div className="flex-1 text-left">
-                              <p className={cn('text-[11px] font-bold leading-none', packOn ? 'text-white' : 'text-white/50')}>Adicionar Impermeabilização</p>
-                              <p className={cn('text-[11px] mt-0.5 leading-none', packOn ? 'text-gold/60' : 'text-white/25')}>
-                                {bothP !== null ? `+${(bothP - cleanP) * qty}€` : '+30€/un.'} · Proteção até 10 anos
-                              </p>
-                            </div>
-                            <div className={cn('w-8 h-4 rounded-full border flex items-center px-0.5 transition-all duration-300 flex-shrink-0', packOn ? 'border-gold bg-gold/20' : 'border-white/20 bg-white/[0.05]')}>
-                              <div className={cn('w-3 h-3 rounded-full transition-all duration-300', packOn ? 'bg-gold translate-x-[14px]' : 'bg-white/30 translate-x-0')} />
-                            </div>
-                          </button>
-                        </div>
-                      )}
                     </div>
                   );
                 })}
@@ -394,18 +376,13 @@ const QuizUpsellOverlay = ({
                   pendingMattressItems.filter(i => i.qty > 0).forEach(item => {
                     const opt = mattressPrices.find(p => p.id === item.sizeId)!;
                     const cleanP = typeof opt.cleaningPrice === 'number' ? (opt.cleaningPrice as number) : 0;
-                    const bothP = typeof opt.bothPrice === 'number' ? (opt.bothPrice as number) : cleanP;
-                    const unitPrice = item.packEnabled ? bothP : cleanP;
-                    const total = unitPrice * item.qty;
-                    const waterproofExtra = item.packEnabled ? (bothP - cleanP) * item.qty : 0;
+                    const total = cleanP * item.qty;
                     setUpsellItems(prev => [...prev, {
                       id: 'mattress',
                       mattressSize: item.sizeId,
                       qty: item.qty,
                       price: total,
-                      label: `${item.qty}× Colchão ${opt.label}${item.packEnabled ? ' + Impermeab.' : ''}`,
-                      waterproof: item.packEnabled,
-                      waterproofPrice: waterproofExtra,
+                      label: `${item.qty}× Colchão ${opt.label}`,
                     }]);
                   });
                   setUpsellSubStep('select');

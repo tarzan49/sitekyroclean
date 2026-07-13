@@ -46,7 +46,7 @@ const SERVICE_META: Record<ServiceKey, {
   label: string; labelPlural: string; canonicalBase: string; priceFrom: string; waterproofPriceFrom?: string;
 }> = {
   sofa:      { label: 'Sofá',      labelPlural: 'Sofás',      canonicalBase: 'limpeza-sofas',     priceFrom: '49€',     waterproofPriceFrom: '49€'      },
-  colchao:   { label: 'Colchão',   labelPlural: 'Colchões',   canonicalBase: 'limpeza-colchoes',  priceFrom: '39€',     waterproofPriceFrom: '45€'      },
+  colchao:   { label: 'Colchão',   labelPlural: 'Colchões',   canonicalBase: 'limpeza-colchoes',  priceFrom: '49€' },
   tapetes:   { label: 'Tapetes',   labelPlural: 'Tapetes',    canonicalBase: 'limpeza-tapetes',   priceFrom: '5€/m²'                                    },
   cadeiras:  { label: 'Cadeiras',  labelPlural: 'Cadeiras',   canonicalBase: 'limpeza-cadeiras',  priceFrom: '17,50€',  waterproofPriceFrom: '15€/cad.' },
   alcatifas: { label: 'Alcatifas', labelPlural: 'Alcatifas',  canonicalBase: 'limpeza-alcatifas', priceFrom: '3€/m²'                                    },
@@ -61,7 +61,7 @@ const VARIANT_CANONICAL_BASE: Partial<Record<VariantKey, string>> = {
 const SERVICES_FOR_VARIANT: Record<VariantKey, ServiceKey[]> = {
   higienizacao:      ['sofa', 'colchao', 'tapetes', 'cadeiras', 'alcatifas'],
   lavagem:           ['sofa', 'colchao', 'tapetes', 'cadeiras', 'alcatifas'],
-  impermeabilizacao: ['sofa', 'colchao', 'cadeiras'],
+  impermeabilizacao: ['sofa', 'cadeiras'],
 };
 
 // ─── Content generators (one per variant × service) ────────────────
@@ -127,7 +127,7 @@ function content_higienizacao_colchao(loc: string, ctx: string): ContentBlock {
       { question: `Com que frequência devo higienizar o colchão de um bebé?`, answer: `Para bebés recomendamos a cada 6 meses. A pele do bebé é mais sensível e passa mais tempo em contacto direto com as fibras do que um adulto.` },
       { question: `O colchão fica húmido depois da higienização? Quando posso dormir nele?`, answer: `A higienização não usa grandes quantidades de líquido. Com ventilação normal o colchão fica pronto para dormir no mesmo dia, tipicamente em 3 a 5 horas.` },
       { question: `A higienização funciona em colchões de memory foam e látex?`, answer: `Sim. Adaptamos os produtos e técnicas ao tipo de espuma para não danificar a estrutura interna. O resultado é o mesmo: eliminação de ácaros, patogénicos e odores.` },
-      { question: `Qual o preço de higienização de colchão de casal em ${loc}?`, answer: `A partir de 49€ para casal e 59€ para king size. Deslocamo-nos a ${loc} sem custo adicional. Orçamento gratuito e sem compromisso.` },
+      { question: `Qual o preço de higienização de colchão de casal em ${loc}?`, answer: `A partir de 59€ para casal e 69€ para king size. Deslocamo-nos a ${loc} sem custo adicional. Orçamento gratuito e sem compromisso.` },
     ],
     problems: [
       { title: "Acordar com olhos vermelhos ou nariz congestionado", description: `Os ácaros do colchão são a causa mais comum de rinite alérgica noturna em ${loc}. O corpo passa 8 horas em contacto direto com o foco de contaminação.` },
@@ -311,8 +311,8 @@ function content_lavagem_colchao(loc: string, ctx: string): ContentBlock {
       { question: `A lavagem remove manchas de urina antigas de criança do colchão?`, answer: `Sim. O pré-tratamento enzimático específico para urina quebra os compostos orgânicos e remove tanto a mancha como o odor, mesmo em manchas com meses ou anos de antiguidade.` },
       { question: `As manchas amareladas de suor saem com a lavagem do colchão?`, answer: `Sim, na grande maioria dos casos. A extração a quente com pré-tratamento enzimático remove manchas amareladas de suor que resistiram a todas as tentativas domésticas.` },
       { question: `A lavagem é segura em colchões de molas e híbridos?`, answer: `Sim. A extração é feita apenas nas camadas de estofamento superior, sem atingir as molas ou a estrutura interna. É segura em qualquer tipo de colchão.` },
-      { question: `Vale a pena lavar o colchão antes de impermeabilizar?`, answer: `Sim, e é o que recomendamos. A impermeabilização aplicada sobre um colchão limpo tem muito maior eficácia e duração. Oferecemos o pack combinado com desconto.` },
-      { question: `Quanto custa lavar um colchão king size em ${loc}?`, answer: `A partir de 69€ para king e queen size. Para colchão de solteiro a partir de 39€ e casal a partir de 49€. Deslocamo-nos a ${loc} sem custo adicional.` },
+      { question: `A lavagem funciona em colchões antigos ou muito usados?`, answer: `Sim. Mesmo colchões com vários anos de uso reagem bem à extração profissional, recuperando frescura e reduzindo alergénios acumulados. Se houver dano estrutural (molas partidas, buracos), a lavagem não resolve esse desgaste, apenas a limpeza e o odor.` },
+      { question: `Quanto custa lavar um colchão king size em ${loc}?`, answer: `A partir de 69€ para king e queen size. Para colchão de solteiro a partir de 49€ e casal a partir de 59€. Deslocamo-nos a ${loc} sem custo adicional.` },
     ],
     problems: [
       { title: "Manchas amareladas de suor que resistiram a tudo", description: "A oxidação do suor cria manchas proteicas que se ligam às fibras com o tempo. A lavagem enzimática a quente é o único método que as remove eficazmente sem danificar o colchão." },
@@ -474,43 +474,6 @@ function content_impermeabilizacao_sofa(loc: string, ctx: string): ContentBlock 
   };
 }
 
-function content_impermeabilizacao_colchao(loc: string, ctx: string): ContentBlock {
-  return {
-    intro: `A impermeabilização de colchões em ${loc} protege o seu investimento de derrames acidentais, suor e líquidos biológicos, preservando a higiene e prolongando a vida útil do colchão por anos. A Kyro Clean Solutions aplica tratamento certificado ao domicílio em ${loc} e ${ctx}.`,
-    whatIs: `Este tratamento cria uma barreira no interior do colchão que repele líquidos antes de penetrarem — muito útil para colchões de crianças, idosos ou qualquer pessoa que queira proteger um colchão de qualidade. Aplicado ao domicílio em ${loc}, com o colchão no lugar, sem transportar nada.`,
-    benefits: [
-      'Proteção total contra acidentes noturnos de crianças e idosos',
-      'Repele suor, líquidos biológicos e derrames',
-      'Prolonga significativamente a vida útil do colchão',
-      'Mantém a higiene mesmo após anos de uso',
-      `Serviço ao domicílio em ${loc}, colchão no lugar`,
-      'Combinável com higienização para proteção completa',
-    ],
-    processSteps: [
-      { step: 1, title: 'Avaliação do colchão', description: `Verificação do estado e tipo de revestimento em ${loc}.` },
-      { step: 2, title: 'Preparação da superfície', description: 'O colchão deve estar limpo e seco. Recomendamos higienização prévia.' },
-      { step: 3, title: 'Aplicação do impermeabilizante', description: 'Tratamento uniforme de ambas as faces com produto certificado, seguro para pele sensível.' },
-      { step: 4, title: 'Secagem e ativação', description: 'Colchão pronto a usar após 3 a 5 horas de secagem natural.' },
-    ],
-    faqs: [
-      { question: `A impermeabilização do colchão é segura para recém-nascidos e bebés?`, answer: `Sim. Usamos produtos certificados, hipoalergénicos e sem compostos tóxicos. Após a secagem completa (3 a 5 horas), o colchão é totalmente seguro para bebés e crianças.` },
-      { question: `Qual a diferença entre uma capa impermeável e a impermeabilização profissional?`, answer: `A capa é removível e protege só a superfície exterior. A impermeabilização profissional penetra nas fibras do revestimento do colchão, criando uma barreira invisível que não interfere com o conforto nem com o ar do colchão.` },
-      { question: `Tenho de sair de casa durante a aplicação no colchão?`, answer: `Não é necessário. O tratamento é rápido (30 a 45 minutos) e não produz odores fortes. O colchão fica pronto a usar após 3 a 5 horas de secagem natural.` },
-      { question: `A impermeabilização funciona em colchões de viscoelástico e latex?`, answer: `Sim. Adaptamos o produto ao revestimento exterior do colchão, seja ele de tecido, ticking ou jersey. A estrutura interna de viscoelástico ou látex não é afetada.` },
-      { question: `Com que frequência devo reaplicar a impermeabilização no colchão?`, answer: `Para colchões de bebé ou crianças pequenas, a cada 18 a 24 meses. Para adultos sem acidentes frequentes, a proteção dura 3 a 5 anos com uso normal e lavagens regulares do lençol.` },
-    ],
-    problems: [
-      { title: "Criança com incontinência noturna", description: "Cada acidente sem proteção é uma mancha nova e profunda no colchão. A barreira impermeável repele o líquido antes de penetrar, mantendo o colchão limpo e sem odores." },
-      { title: "Colchão de qualidade (viscoelástico, memory foam)", description: "Colchões de espuma não podem ser lavados por imersão. Uma mancha que penetra pode ser permanente. A impermeabilização profissional é a única proteção real eficaz." },
-      { title: "Suores noturnos frequentes", description: "O suor excessivo penetra nas fibras e deteriora o colchão de dentro para fora. A barreira impermeável protege as camadas internas e prolonga significativamente a vida útil." },
-    ],
-    testimonials: [
-      { name: "Patrícia M.", location: "Braga", text: "Tenho dois filhos pequenos e acidentes nocturnos eram um problema frequente. Desde que impermeabilizámos o colchão é tudo muito mais simples de gerir. Devíamos ter feito antes." },
-      { name: "Fernando G.", location: "Lisboa", text: "Colchão de viscoelástico de alta qualidade. Não queria arriscar estragá-lo. A impermeabilização deu-me a tranquilidade que precisava. Perfeito para quem quer proteger um investimento." },
-    ],
-  };
-}
-
 function content_impermeabilizacao_cadeiras(loc: string, ctx: string): ContentBlock {
   return {
     intro: `A impermeabilização de cadeiras estofadas em ${loc} protege o tecido de derramamentos, gordura e uso intensivo, ideal para restaurantes, escritórios e residências que querem cadeiras com aspeto cuidado por mais tempo. Kyro Clean Solutions ao domicílio em ${loc} e ${ctx}.`,
@@ -587,7 +550,6 @@ const GENERATORS: Record<string, (loc: string, ctx: string) => ContentBlock> = {
   'lavagem-cadeiras':           content_lavagem_cadeiras,
   'lavagem-alcatifas':          content_lavagem_alcatifas,
   'impermeabilizacao-sofa':     content_impermeabilizacao_sofa,
-  'impermeabilizacao-colchao':  content_impermeabilizacao_colchao,
   'impermeabilizacao-cadeiras': content_impermeabilizacao_cadeiras,
 };
 

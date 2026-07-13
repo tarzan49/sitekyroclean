@@ -69,7 +69,7 @@ export const cities = [
 // Services configuration
 export const services = [
   { name: "Limpeza de Sofás", slug: "limpeza-sofas", baseRoute: "/limpeza-sofas", priceFrom: "49€", icon: "sofa" },
-  { name: "Limpeza de Colchões", slug: "limpeza-colchoes", baseRoute: "/limpeza-colchoes", priceFrom: "39€", icon: "mattress" },
+  { name: "Limpeza de Colchões", slug: "limpeza-colchoes", baseRoute: "/limpeza-colchoes", priceFrom: "49€", icon: "mattress" },
   { name: "Limpeza de Tapetes", slug: "limpeza-tapetes", baseRoute: "/limpeza-tapetes", priceFrom: "5€/m²", icon: "carpet" },
   { name: "Limpeza de Cadeiras", slug: "limpeza-cadeiras", baseRoute: "/limpeza-cadeiras", priceFrom: "10€", icon: "chair" },
   { name: "Limpeza de Alcatifas", slug: "limpeza-alcatifas", baseRoute: "/limpeza-alcatifas", priceFrom: "3€/m²", icon: "rug" },
@@ -119,10 +119,10 @@ function generateColchaoContent(city: string, cityDesc: string): Omit<LocationSe
   const prep = cityPrep(city);
   const Prep = cityPrepCap(city);
   return {
-    title: `Limpeza de Colchões ${city} | Desde 39€ | Kyro Clean Solutions`,
-    metaDescription: `Higienização profissional de colchões ${prep} ${city}. Eliminamos ácaros, bactérias e odores para noites mais saudáveis. Serviço ao domicílio desde 39€.`,
+    title: `Limpeza de Colchões ${city} | Desde 49€ | Kyro Clean Solutions`,
+    metaDescription: `Higienização profissional de colchões ${prep} ${city}. Eliminamos ácaros, bactérias e odores para noites mais saudáveis. Serviço ao domicílio desde 49€.`,
     h1: `Limpeza e Higienização de Colchões ${prep} ${city}`,
-    intro: `Sabia que o seu colchão pode conter milhões de ácaros e bactérias? ${Prep} ${city}, a Kyro Clean Solutions oferece higienização profunda de colchões ao domicílio, eliminando microrganismos, manchas e odores acumulados. Dormirá melhor e mais saudável. Serviço disponível ${prep} ${city} e ${cityDesc} desde 39€.`,
+    intro: `Sabia que o seu colchão pode conter milhões de ácaros e bactérias? ${Prep} ${city}, a Kyro Clean Solutions oferece higienização profunda de colchões ao domicílio, eliminando microrganismos, manchas e odores acumulados. Dormirá melhor e mais saudável. Serviço disponível ${prep} ${city} e ${cityDesc} desde 49€.`,
     problems: [
       { title: "Ácaros no colchão", description: `Um colchão pode conter até 2 milhões de ácaros. ${Prep} ${city}, o clima húmido favorece a proliferação destes microrganismos que causam alergias, rinite e asma.` },
       { title: "Manchas de suor e líquidos", description: `Manchas de suor, urina, sangue e outros líquidos penetram no colchão e criam ambiente ideal para bactérias e fungos.` },
@@ -140,7 +140,7 @@ function generateColchaoContent(city: string, cityDesc: string): Omit<LocationSe
     ],
     localSection: `A nossa equipa de higienização de colchões cobre toda a área de ${city} e arredores. Atendemos residências, hotéis, residências seniores e alojamentos locais ${prep} ${city}. ${(locationPrices[city] ?? 0) === 0 ? 'Deslocação incluída sem custos adicionais.' : `Taxa de deslocação de ${locationPrices[city]}€.`}`,
     faqs: [
-      { question: `Quanto custa a limpeza de colchão ${prep} ${city}?`, answer: `A higienização de colchão ${prep} ${city} começa a partir de 39€ para colchão de solteiro. Colchões de casal têm preços a partir de 49€. Contacte-nos para orçamento personalizado.` },
+      { question: `Quanto custa a limpeza de colchão ${prep} ${city}?`, answer: `A higienização de colchão ${prep} ${city} começa a partir de 49€ para colchão de solteiro. Colchões de casal têm preços a partir de 59€. Contacte-nos para orçamento personalizado.` },
       { question: `A limpeza de colchão remove ácaros?`, answer: `Sim. O nosso processo de higienização profissional elimina até 99% dos ácaros, bactérias e fungos presentes no colchão, ideal para quem sofre de alergias.` },
       { question: `A limpeza remove cheiro de urina do colchão?`, answer: `Sim. A nossa extração profunda combinada com desodorização enzimática elimina completamente odores de urina, incluindo manchas antigas.` },
       { question: `Quanto tempo demora a secagem do colchão?`, answer: `O colchão fica pronto a usar no mesmo dia, tipicamente em 4-6 horas após a limpeza. Em dias mais secos, pode estar pronto ainda mais cedo.` },

@@ -170,7 +170,7 @@ const posts: BlogPost[] = [
       },
       {
         heading: "Quanto custa impermeabilizar um sofá?",
-        body: "O custo da impermeabilização de sofá é 49€ (1 lugar), 69€ (2 lugares) e 89€ (3 lugares). Para colchões: 45€ (solteiro), 50€ (casal) e 55€ (king). Quando contratada em pack com a limpeza, o total é mais baixo do que os dois serviços separados.\n\nConsiderando que pode poupar uma limpeza extra por ano e prolonga significativamente a vida do tecido, o retorno do investimento é claro para a maioria dos clientes.",
+        body: "O custo da impermeabilização de sofá é 49€ (1 lugar), 69€ (2 lugares) e 89€ (3 lugares). Quando contratada em pack com a limpeza, o total é mais baixo do que os dois serviços separados.\n\nConsiderando que pode poupar uma limpeza extra por ano e prolonga significativamente a vida do tecido, o retorno do investimento é claro para a maioria dos clientes.",
       },
     ],
     faq: [
@@ -264,8 +264,8 @@ const posts: BlogPost[] = [
     sections: [
       {
         heading: "Tabela de preços por tamanho (2025)",
-        body: "Os preços da Kyro Clean Solutions para limpeza profissional de colchões são:\n\n**Colchão solteiro**, Limpeza: 39€ | Impermeabilização: 45€ | Pack limpeza+impermeabilização: 71€\n\n**Colchão casal**, Limpeza: 49€ | Impermeabilização: 50€ | Pack limpeza+impermeabilização: 84€\n\n**Colchão king / queen**, Limpeza: 59€ | Impermeabilização: 55€ | Pack limpeza+impermeabilização: 97€\n\nTodos os preços incluem deslocação na área do Porto, pré-tratamento de manchas, limpeza por extração a vapor e secagem rápida. O colchão fica pronto a usar em 2 a 4 horas.",
-        tip: "O pack limpeza + impermeabilização representa uma poupança de 13€ a 17€ face à contratação separada (15% de desconto automático). É a opção mais popular para famílias com crianças pequenas.",
+        body: "Os preços da Kyro Clean Solutions para limpeza profissional de colchões são:\n\n**Colchão solteiro**: 49€\n\n**Colchão casal**: 59€\n\n**Colchão king / queen**: 69€\n\nTodos os preços incluem deslocação na área do Porto, pré-tratamento de manchas, limpeza por extração a vapor e secagem rápida. O colchão fica pronto a usar em 2 a 4 horas.",
+        tip: "Combine com a limpeza do sofá no mesmo dia e poupe 10% no total com o Pack Sofá + Colchão.",
       },
       {
         heading: "O que inclui uma limpeza profissional de colchão?",
@@ -273,16 +273,12 @@ const posts: BlogPost[] = [
       },
       {
         heading: "Colchão de solteiro vs. casal: diferença de preço justificada?",
-        body: "A diferença de 10€ entre o colchão solteiro (39€) e o casal (49€) reflete a diferença de área a tratar. Um colchão casal padrão tem aproximadamente o dobro da superfície de um solteiro, o que exige mais produto, mais tempo de extração e mais produto anti-ácaros.\n\nPara casais, a higienização regular dos dois lados do colchão é especialmente importante, pois cada pessoa contribui com células mortas, suor e temperatura para o seu lado, criando zonas distintas de concentração de ácaros.",
+        body: "A diferença de 10€ entre o colchão solteiro (49€) e o casal (59€) reflete a diferença de área a tratar. Um colchão casal padrão tem aproximadamente o dobro da superfície de um solteiro, o que exige mais produto, mais tempo de extração e mais produto anti-ácaros.\n\nPara casais, a higienização regular dos dois lados do colchão é especialmente importante, pois cada pessoa contribui com células mortas, suor e temperatura para o seu lado, criando zonas distintas de concentração de ácaros.",
       },
       {
         heading: "Quando é que a limpeza de colchão é urgente?",
         body: "Há situações em que a higienização profissional é imediata e não apenas preventiva:\n\n**Mancha de urina** (crianças ou animais), A urina seca forma cristais de ácido úrico que os produtos caseiros não dissolve. Sem tratamento enzimático profissional, o cheiro regressa sempre em dias húmidos.\n\n**Suor excessivo ou doença prolongada**, Após febre alta ou doença, o colchão absorve quantidades significativas de suor, fluidos corporais e medicação. A higienização elimina agentes patogénicos.\n\n**Compra de casa usada**, Um colchão de segunda mão ou deixado por inquilinos anteriores deve ser sempre higienizado antes de usar.\n\n**Sintomas de alergia noturnos**, Espirros, nariz entupido ou olhos a coçar que melhoram fora de casa são sinal claro de concentração de ácaros no colchão.",
         tip: "Não esperes ver manchas para chamar um profissional. Um colchão visualmente limpo pode ter centenas de milhar de ácaros nas suas fibras internas.",
-      },
-      {
-        heading: "Vale a pena impermeabilizar o colchão?",
-        body: "A impermeabilização de colchões cria uma barreira invisível que impede a absorção de líquidos. É especialmente recomendada para:\n\n- Bebés e crianças pequenas em fase de treino de esfíncteres\n- Pessoas idosas ou com incontinência\n- Colchões de alto valor (memory foam, látex natural)\n- Qualquer pessoa que queira proteger o investimento\n\nO custo da impermeabilização varia entre 45€ (solteiro) e 55€ (king), mas quando feita em conjunto com a limpeza o pack fica entre 71€ e 97€, uma poupança real face à contratação separada (15% de desconto automático).\n\nA impermeabilização dura entre 12 e 24 meses dependendo da utilização.",
       },
     ],
     faq: [
@@ -1296,7 +1292,7 @@ const posts: BlogPost[] = [
       {
         heading: "O processo de limpeza profissional de colchão de bebé",
         body: "A limpeza profissional de colchão usa extração a vapor a alta temperatura que:\n\n1. Elimina até 98% dos ácaros e os seus resíduos alérgenos\n2. Remove manchas de origem orgânica (leite, urina, suor)\n3. Elimina odores na fonte, não com mascaradores\n4. Deixa o colchão utilizável em 2 a 4 horas\n\nOs produtos utilizados são certificados para uso em ambientes infantis. Não há resíduos após secagem.",
-        tip: "Combina a limpeza do colchão com a impermeabilização. O custo adicional é pequeno e protege durante 12 a 18 meses contra a penetração de líquidos.",
+        tip: "Depois da limpeza, use um protetor de colchão impermeável e respirável para reduzir a frequência necessária de novas intervenções.",
       },
     ],
     faq: [
@@ -1545,7 +1541,7 @@ const posts: BlogPost[] = [
       },
       {
         heading: "Preços de limpeza profissional de colchão",
-        body: "A Kyro Clean trata colchões com urina com um processo de 2 etapas: aplicação de produto enzimático concentrado seguida de extração a quente.\n\nPreços:\n- Colchão solteiro: a partir de 49€\n- Colchão de casal: a partir de 59€\n- King size / queen size: a partir de 69€\n\nO colchão fica seco em 2 a 4 horas. Recomendamos sempre impermeabilização após a limpeza para prevenir futuras infiltrações.",
+        body: "A Kyro Clean trata colchões com urina com um processo de 2 etapas: aplicação de produto enzimático concentrado seguida de extração a quente.\n\nPreços:\n- Colchão solteiro: a partir de 49€\n- Colchão de casal: a partir de 59€\n- King size / queen size: a partir de 69€\n\nO colchão fica seco em 2 a 4 horas. Recomendamos sempre o uso de um protetor de colchão impermeável após a limpeza para prevenir futuras infiltrações.",
       },
     ],
     faq: [
@@ -1562,8 +1558,8 @@ const posts: BlogPost[] = [
         a: "Após limpeza profissional, o colchão fica utilizável em 2 a 4 horas com ventilação adequada.",
       },
       {
-        q: "Vale a pena impermeabilizar o colchão após a limpeza?",
-        a: "Altamente recomendado, especialmente em quartos de crianças ou idosos. A impermeabilização cria uma barreira que impede a penetração de líquidos nas fibras, facilitando enormemente a limpeza de acidentes futuros.",
+        q: "Vale a pena usar um protetor de colchão após a limpeza?",
+        a: "Altamente recomendado, especialmente em quartos de crianças ou idosos. Um protetor impermeável e respirável impede a penetração de líquidos nas fibras, facilitando enormemente a limpeza de acidentes futuros.",
       },
     ],
     relatedService: { label: "Ver preços de limpeza de colchões", href: "/limpeza-colchoes" },

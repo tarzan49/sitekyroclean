@@ -80,8 +80,8 @@ const allFaqs: FAQ[] = [
   {
     id: "preco-colchao-solteiro",
     question: "Quanto custa limpar um colchão de solteiro?",
-    answer: <>A <Link to="/limpeza-colchoes" className="text-gold hover:underline font-medium">limpeza de colchão solteiro</Link> custa <strong>39€</strong>. Colchão de casal: 49€. King-size ou queen-size: 59€. O serviço inclui aspiração profunda, extração a vapor (temperatura superior a 55ºC, letal para ácaros), tratamento de manchas, bactericida e antifúngico. A limpeza de colchão é particularmente importante porque passamos 7 a 8 horas diárias em contacto direto com ele. Um colchão com 5 anos sem tratamento pode conter 2 milhões de ácaros por metro quadrado. Recomendamos 1 vez por ano, 2 vezes para pessoas com alergias ou asma.</>,
-    plainAnswer: "Colchão solteiro: 39€. Casal: 49€. King/queen-size: 59€. Inclui aspiração profissional, extração a vapor (acima de 55ºC), tratamento de manchas, bactericida e antifúngico. Recomendado 1 a 2 vezes por ano.",
+    answer: <>A <Link to="/limpeza-colchoes" className="text-gold hover:underline font-medium">limpeza de colchão solteiro</Link> custa <strong>49€</strong>. Colchão de casal: 59€. King-size ou queen-size: 69€. O serviço inclui aspiração profunda, extração a vapor (temperatura superior a 55ºC, letal para ácaros), tratamento de manchas, bactericida e antifúngico. A limpeza de colchão é particularmente importante porque passamos 7 a 8 horas diárias em contacto direto com ele. Um colchão com 5 anos sem tratamento pode conter 2 milhões de ácaros por metro quadrado. Recomendamos 1 vez por ano, 2 vezes para pessoas com alergias ou asma.</>,
+    plainAnswer: "Colchão solteiro: 49€. Casal: 59€. King/queen-size: 69€. Inclui aspiração profissional, extração a vapor (acima de 55ºC), tratamento de manchas, bactericida e antifúngico. Recomendado 1 a 2 vezes por ano.",
   },
   {
     id: "servico-fora-porto",
@@ -103,9 +103,9 @@ const allFaqs: FAQ[] = [
   },
   {
     id: "quanto-custa-impermeabilizacao",
-    question: "Quanto custa impermeabilizar um sofá ou colchão?",
-    answer: <>A <Link to="/impermeabilizacao" className="text-gold hover:underline font-medium">impermeabilização profissional</Link> para sofás custa <strong>49€ (1 lugar), 69€ (2 lugares) e 89€ (3 lugares)</strong>. Para colchões: 45€ (solteiro), 50€ (casal) e 55€ (king). Quando contratada em pack com a limpeza, o total é mais baixo do que os dois serviços separados. A impermeabilização cria uma barreira invisível nas fibras que impede a absorção de líquidos durante 12 a 18 meses, especialmente recomendada em casas com crianças ou animais.</>,
-    plainAnswer: "Impermeabilização sofá: 49€ (1 lugar), 69€ (2 lugares), 89€ (3 lugares). Colchão: 45€ (solteiro), 50€ (casal), 55€ (king). Pack limpeza+impermeabilização tem desconto. Efeito dura 12 a 18 meses.",
+    question: "Quanto custa impermeabilizar um sofá?",
+    answer: <>A <Link to="/impermeabilizacao" className="text-gold hover:underline font-medium">impermeabilização profissional</Link> para sofás custa <strong>49€ (1 lugar), 69€ (2 lugares) e 89€ (3 lugares)</strong>. Quando contratada em pack com a limpeza, o total é mais baixo do que os dois serviços separados. A impermeabilização cria uma barreira invisível nas fibras que impede a absorção de líquidos durante 12 a 18 meses, especialmente recomendada em casas com crianças ou animais.</>,
+    plainAnswer: "Impermeabilização sofá: 49€ (1 lugar), 69€ (2 lugares), 89€ (3 lugares). Pack limpeza+impermeabilização tem desconto. Efeito dura 12 a 18 meses.",
   },
   {
     id: "diferenca-tapete-alcatifa",

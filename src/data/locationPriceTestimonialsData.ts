@@ -57,9 +57,9 @@ export const PRICE_TABLE: Record<string, { item: string; price: string }[]> = {
     { item: 'Sofá de 4+ lugares',        price: 'Sob orçamento' },
   ],
   'limpeza-colchoes': [
-    { item: 'Colchão solteiro',        price: '39€' },
-    { item: 'Colchão casal',           price: '49€' },
-    { item: 'Colchão king / queen',    price: '59€' },
+    { item: 'Colchão solteiro',        price: '49€' },
+    { item: 'Colchão casal',           price: '59€' },
+    { item: 'Colchão king / queen',    price: '69€' },
   ],
   'limpeza-tapetes': [
     { item: 'Tapetes (m²)',             price: '10€/m²' },

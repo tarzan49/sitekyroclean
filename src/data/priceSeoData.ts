@@ -31,7 +31,7 @@ const priceTables: Record<string, { item: string; price: string; note?: string }
     { item: "Colchão Solteiro", price: "Desde 49€" },
     { item: "Colchão Casal", price: "Desde 59€" },
     { item: "Colchão King Size", price: "Desde 69€" },
-    { item: "Colchão berço/criança", price: "Desde 29€" },
+    { item: "Colchão berço/criança", price: "Desde 39€" },
     { item: "Cabeceira estofada", price: "Desde 20€", note: "add-on" },
   ],
   "limpeza-tapetes": [
