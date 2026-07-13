@@ -28,10 +28,18 @@ const GOOGLE_REVIEWS_URL = "https://www.google.com/search?q=Kyro%20Clean%20Solut
 const fmt = (n: number | null) =>
   n === null ? "Sob orç." : `${(Math.round(n * 100) / 100).toFixed(2).replace(".", ",")}€`;
 
+// Horário: Segunda a Sábado, 08:00 - 00:00 (fechado Domingo e 00:00-08:00)
+function isWithinBusinessHours(date: Date): boolean {
+  const day = date.getDay();
+  if (day === 0) return false;
+  return date.getHours() >= 8;
+}
+
 const Obrigado = () => {
   const navigate = useNavigate();
   const [receipt, setReceipt] = useState<ReceiptData | null>(null);
   const [waUrl, setWaUrl] = useState(WHATSAPP_BASE);
+  const [isOpenNow] = useState(() => isWithinBusinessHours(new Date()));
 
   useEffect(() => {
     try {
@@ -72,7 +80,9 @@ const Obrigado = () => {
             </h1>
             <div className="flex items-center gap-1.5 text-[11px] text-white/35">
               <Clock className="w-3.5 h-3.5" />
-              Especialista contacta em menos de 30 minutos
+              {isOpenNow
+                ? "Especialista contacta em menos de 30 minutos"
+                : "Fora de horário — contactamos assim que reabrirmos (seg-sáb, 08:00-00:00)"}
             </div>
           </div>
 

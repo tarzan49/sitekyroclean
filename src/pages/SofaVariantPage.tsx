@@ -340,6 +340,7 @@ const SofaVariantPage = () => {
         {/* ═══ TABELA DE PREÇOS ═══ */}
         <ServicePriceSection
           serviceSlug={parsed.variantKey === 'impermeabilizacao' ? 'impermeabilizacao' : SERVICEKEY_TO_SLUG[parsed.serviceKey]}
+          initialLocation={data.locationName}
         />
 
         {/* ═══ PROBLEMAS ═══ */}

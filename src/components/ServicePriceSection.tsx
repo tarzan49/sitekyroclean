@@ -84,9 +84,10 @@ function DiscountBar({ total }: { total: number }) {
 
 interface Props {
   serviceSlug: string;
+  initialLocation?: string;
 }
 
-export default function ServicePriceSection({ serviceSlug }: Props) {
+export default function ServicePriceSection({ serviceSlug, initialLocation }: Props) {
   const rows = PRICE_TABLE[serviceSlug];
   const { isQuizOpen, openQuiz, closeQuiz } = useQuizLauncher();
   const [activeConfig, setActiveConfig] = useState<PriceRowQuizConfig | null>(null);
@@ -457,6 +458,7 @@ export default function ServicePriceSection({ serviceSlug }: Props) {
         <QuizFormLazy
           isOpen={isQuizOpen}
           onClose={closeQuiz}
+          initialLocation={initialLocation}
           initialService={activeConfig.service}
           initialServiceType={activeConfig.serviceType}
           initialSofaItems={activeConfig.sofaItems}
