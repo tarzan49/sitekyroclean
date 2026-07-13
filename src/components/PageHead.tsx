@@ -24,29 +24,29 @@ const routeMeta: Record<string, { pt: PageMeta; en: PageMeta; es: PageMeta }> = 
   },
   "/limpeza-sofas": {
     pt: {
-      title: "Limpeza e Lavagem de Sofás ao Domicílio | Desde 39€ | Kyro Clean Solutions",
+      title: "Limpeza e Lavagem de Sofás ao Domicílio | Desde 49€ | Kyro Clean Solutions",
       description: "Limpeza e lavagem profissional de sofás ao domicílio. Remoção de manchas, ácaros e odores com extração profissional. Resultados visíveis no momento. Porto, Lisboa e todo o país.",
     },
     en: {
-      title: "Sofa Cleaning & Washing Service | From €39 | Kyro Clean Solutions",
+      title: "Sofa Cleaning & Washing Service | From €49 | Kyro Clean Solutions",
       description: "Professional sofa cleaning and washing at your home. Stain, mite and odour removal with professional extraction equipment. Visible results on the spot.",
     },
     es: {
-      title: "Limpieza y Lavado de Sofás a Domicilio | Desde 39€ | Kyro Clean Solutions",
+      title: "Limpieza y Lavado de Sofás a Domicilio | Desde 49€ | Kyro Clean Solutions",
       description: "Limpieza y lavado profesional de sofás a domicilio. Eliminación de manchas, ácaros y olores con extracción profesional.",
     },
   },
   "/limpeza-colchoes": {
     pt: {
-      title: "Limpeza e Higienização de Colchões | Desde 39€ | Kyro Clean Solutions",
+      title: "Limpeza e Higienização de Colchões | Desde 49€ | Kyro Clean Solutions",
       description: "Higienização e lavagem profunda de colchões ao domicílio. Eliminamos ácaros, bactérias e odores para noites mais saudáveis. Porto, Lisboa e todo o país.",
     },
     en: {
-      title: "Mattress Cleaning & Sanitization | From €39 | Kyro Clean Solutions",
+      title: "Mattress Cleaning & Sanitization | From €49 | Kyro Clean Solutions",
       description: "Deep mattress cleaning and sanitization at your home. We eliminate mites, bacteria and odours for healthier nights.",
     },
     es: {
-      title: "Limpieza e Higienización de Colchones | Desde 39€ | Kyro Clean Solutions",
+      title: "Limpieza e Higienización de Colchones | Desde 49€ | Kyro Clean Solutions",
       description: "Higienización y lavado profundo de colchones a domicilio. Eliminamos ácaros, bacterias y olores.",
     },
   },
@@ -66,29 +66,29 @@ const routeMeta: Record<string, { pt: PageMeta; en: PageMeta; es: PageMeta }> = 
   },
   "/limpeza-cadeiras": {
     pt: {
-      title: "Limpeza e Lavagem de Cadeiras Estofadas | Desde 10€ | Kyro Clean Solutions",
+      title: "Limpeza e Lavagem de Cadeiras Estofadas | Desde 12,50€ | Kyro Clean Solutions",
       description: "Limpeza e lavagem profissional de cadeiras estofadas ao domicílio. Ideal para escritórios, restaurantes e residências. Resultados no momento.",
     },
     en: {
-      title: "Upholstered Chair Cleaning | From €10 | Kyro Clean Solutions",
+      title: "Upholstered Chair Cleaning | From €12.50 | Kyro Clean Solutions",
       description: "Professional upholstered chair cleaning at your location. Ideal for offices, restaurants and homes. Instant results.",
     },
     es: {
-      title: "Limpieza y Lavado de Sillas Tapizadas | Desde 10€ | Kyro Clean Solutions",
+      title: "Limpieza y Lavado de Sillas Tapizadas | Desde 12,50€ | Kyro Clean Solutions",
       description: "Limpieza profesional de sillas tapizadas a domicilio. Ideal para oficinas, restaurantes y hogares.",
     },
   },
   "/limpeza-alcatifas": {
     pt: {
-      title: "Limpeza e Lavagem de Alcatifas | Desde 3€/m² | Kyro Clean Solutions",
+      title: "Limpeza e Lavagem de Alcatifas | Desde 7€/m² | Kyro Clean Solutions",
       description: "Limpeza e lavagem profunda de alcatifas com extração profissional. Removemos sujidade acumulada e alergénios. Secagem rápida. Porto, Lisboa e todo o país.",
     },
     en: {
-      title: "Carpet Cleaning & Deep Wash | From €3/m² | Kyro Clean Solutions",
+      title: "Carpet Cleaning & Deep Wash | From €7/m² | Kyro Clean Solutions",
       description: "Deep carpet cleaning and washing with professional extraction equipment. We remove accumulated dirt and allergens. Fast drying.",
     },
     es: {
-      title: "Limpieza y Lavado de Moquetas | Desde 3€/m² | Kyro Clean Solutions",
+      title: "Limpieza y Lavado de Moquetas | Desde 7€/m² | Kyro Clean Solutions",
       description: "Limpieza y lavado profundo de moquetas con extracción profesional. Eliminamos suciedad acumulada y alérgenos.",
     },
   },
@@ -108,16 +108,16 @@ const routeMeta: Record<string, { pt: PageMeta; en: PageMeta; es: PageMeta }> = 
   },
   "/packs": {
     pt: {
-      title: "Packs Limpeza + Impermeabilização | Kyro Clean Solutions | Até 15% Desconto",
+      title: "Packs Limpeza + Impermeabilização | Kyro Clean Solutions | Até 10% Desconto",
       description: "Packs exclusivos de limpeza e impermeabilização com até 15% de desconto. Proteja os seus estofos com o melhor preço.",
     },
     en: {
-      title: "Cleaning + Waterproofing Packs | Kyro Clean Solutions | Up to 15% Off",
-      description: "Exclusive cleaning and waterproofing packs with up to 15% discount. Protect your upholstery at the best price.",
+      title: "Cleaning + Waterproofing Packs | Kyro Clean Solutions | Up to 10% Off",
+      description: "Exclusive cleaning and waterproofing packs with up to 10% discount. Protect your upholstery at the best price.",
     },
     es: {
-      title: "Packs Limpieza + Impermeabilización | Kyro Clean Solutions | Hasta 15% Descuento",
-      description: "Packs exclusivos de limpieza e impermeabilización con hasta 15% de descuento.",
+      title: "Packs Limpieza + Impermeabilización | Kyro Clean Solutions | Hasta 10% Descuento",
+      description: "Packs exclusivos de limpieza e impermeabilización con hasta 10% de descuento.",
     },
   },
   "/blog": {
@@ -282,30 +282,7 @@ const PageHead = () => {
       if (canonical) canonical.setAttribute("href", `${SITE_URL}${path}`);
     }
 
-    // Hreflang tags
-    const hreflangLangs = ["pt", "en", "es"];
-    // Remove old hreflang tags
-    document.querySelectorAll('link[hreflang]').forEach(el => el.remove());
-    
-    // Add new hreflang tags
-    hreflangLangs.forEach(lng => {
-      const link = document.createElement("link");
-      link.rel = "alternate";
-      link.hreflang = lng;
-      link.href = `${SITE_URL}${path}${lng !== "pt" ? `?lang=${lng}` : ""}`;
-      document.head.appendChild(link);
-    });
-
-    // x-default
-    const xDefault = document.createElement("link");
-    xDefault.rel = "alternate";
-    xDefault.setAttribute("hreflang", "x-default");
-    xDefault.href = `${SITE_URL}${path}`;
-    document.head.appendChild(xDefault);
-
-    return () => {
-      document.querySelectorAll('link[hreflang]').forEach(el => el.remove());
-    };
+    return () => {};
   }, [location.pathname, lang]);
 
   return null;
