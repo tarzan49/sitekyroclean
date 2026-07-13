@@ -633,3 +633,17 @@ Step 5 — Seletor de vaga/calendário
 - Slider Before/After nas páginas de serviço
 - A/B test no copy do CTA do ServiceSchedulingBar
 - Swipe/drag touch no carrossel (arrastar com o dedo em mobile)
+
+---
+
+## ⚠️ AVISO: este ficheiro está desatualizado desde a Sessão 5 (2026-05-19)
+
+Este ficheiro não foi mantido em sincronia nas sessões seguintes. O histórico completo e atualizado (sessões 6-46+, incluindo redesigns, SEO técnico, quiz refactor, auditorias) está na memória do Claude Code (`project_kyro.md`), não aqui. Pasta local também mudou: `spotless-pro-flow-main` → `sitekyroclean`.
+
+## Sessão pós-férias — Audit SEO técnico + conversão (2026-07-13)
+
+**Commits:** `c16fac9` → `405b700` — publicados, deploy Cloudflare Pages automático.
+
+Correções aplicadas: canonical URLs em branco nas 17 páginas core, BreadcrumbList inválida removida, preços errados no Service JSON-LD, hreflang bloqueado por robots.txt removido, imagem OG movida para local (`public/images/og-social.webp`), `initialLocation` no widget de preços das 2041 páginas de variante (`ServicePriceSection.tsx`), mensagem de horário no `/obrigado` fora do expediente (seg-sáb 08:00-00:00), horário errado no `LocalBusinessSchema.tsx` da homepage corrigido, logo 404 no schema corrigido (`public/images/kyro-logo.png`).
+
+**Pendente:** confirmar no Google Ads que os anúncios apontam para páginas de cidade (`/limpeza-sofas-porto`) e não para páginas genéricas (`/limpeza-sofas`) — ação do user no dashboard, não código.
