@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ChevronDown, MessageCircle } from "lucide-react";
+import { ChevronDown, MessageCircle, Phone } from "lucide-react";
 import {
   Sheet,
   SheetContent,
@@ -16,7 +16,8 @@ import {
 import QuizForm from "./QuizFormLazy";
 import { useQuizLocation, useQuizService } from "@/context/QuizLocationContext";
 import { trackWhatsAppClick } from "@/lib/quizTracking";
-import { WHATSAPP_BASE } from "@/constants/business";
+import { trackCallClick } from "@/lib/analytics";
+import { WHATSAPP_BASE, PHONE_TEL, PHONE_DISPLAY } from "@/constants/business";
 import { useQuizLauncher } from "@/hooks/use-quiz-launcher";
 
 const serviceLinks = [
@@ -134,8 +135,16 @@ const Header = () => {
           </Link>
         </nav>
 
-        {/* ── RIGHT: two outline buttons (desktop) ── */}
+        {/* ── RIGHT: three outline buttons (desktop) ── */}
         <div className="hidden md:flex items-center gap-2.5 shrink-0">
+          <a
+            href={`tel:${PHONE_TEL}`}
+            onClick={() => trackCallClick('header_desktop')}
+            className="border border-[#111111]/25 text-[#111111] text-[10px] font-semibold tracking-[0.18em] uppercase px-4 py-2.5 hover:bg-[#111111]/4 transition-colors flex items-center gap-2 whitespace-nowrap"
+          >
+            <Phone className="w-3.5 h-3.5 text-[#111111]/70 flex-shrink-0" strokeWidth={2} />
+            Ligar
+          </a>
           <button
             onClick={openQuiz}
             className="border border-[#D4AF37] text-[#111111] text-[10px] font-semibold tracking-[0.18em] uppercase px-5 py-2.5 hover:bg-[#D4AF37]/6 transition-colors whitespace-nowrap"
@@ -154,8 +163,18 @@ const Header = () => {
           </a>
         </div>
 
-        {/* ── MOBILE: hamburger left + WA icon right ── */}
+        {/* ── MOBILE: hamburger left + call/WA icons right ── */}
         <div className="flex items-center gap-2 md:hidden">
+          {/* Call icon only */}
+          <a
+            href={`tel:${PHONE_TEL}`}
+            onClick={() => trackCallClick('header_mobile')}
+            className="border border-[#111111]/25 p-2 flex items-center justify-center"
+            aria-label="Ligar"
+          >
+            <Phone className="w-4 h-4 text-[#111111]/70" strokeWidth={2} />
+          </a>
+
           {/* WhatsApp icon only */}
           <a
             href={waHref}
@@ -268,6 +287,14 @@ const Header = () => {
                 >
                   <MessageCircle className="w-3.5 h-3.5 text-[#25D366]" strokeWidth={2} />
                   WhatsApp
+                </a>
+                <a
+                  href={`tel:${PHONE_TEL}`}
+                  onClick={() => { setMobileMenuOpen(false); trackCallClick('header_mobile_menu'); }}
+                  className="w-full border border-[#111111]/25 text-[#111111] text-[10px] font-semibold tracking-[0.18em] uppercase py-3.5 hover:bg-[#111111]/4 transition-colors flex items-center justify-center gap-2"
+                >
+                  <Phone className="w-3.5 h-3.5 text-[#111111]/70" strokeWidth={2} />
+                  Ligar · {PHONE_DISPLAY}
                 </a>
               </div>
             </SheetContent>
