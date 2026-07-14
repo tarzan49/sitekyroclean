@@ -10,9 +10,11 @@ import SectionHeader from "@/components/SectionHeader";
 import ServiceFAQ from "@/components/ServiceFAQ";
 import ServicePriceSection from "@/components/ServicePriceSection";
 import ServicePackBanner from "@/components/ServicePackBanner";
+import ServiceAutoCarousel from "@/components/ServiceAutoCarousel";
 import { trackWhatsAppClick } from "@/lib/quizTracking";
 import { SERVICE_TO_QUIZ } from "@/constants/serviceToQuiz";
 import { SERVICE_PACK_SLUGS } from "@/constants/servicePackSlugs";
+import { SERVICE_GALLERY } from "@/constants/serviceGallery";
 import {
   getMaterialBySlug,
   getAllMaterialCityRoutes,
@@ -104,6 +106,7 @@ const MaterialPage = () => {
   const h1Rest = h1Words.join(" ");
 
   const testimonials = SERVICE_TESTIMONIALS[data.serviceSlug];
+  const gallery = SERVICE_GALLERY[data.serviceSlug];
 
   return (
     <QuizLocationProvider value={cityName ?? undefined}>
@@ -218,20 +221,22 @@ const MaterialPage = () => {
           </div>
         </section>
 
-        {/* ═══ GALERIA — O MATERIAL EM DETALHE ═══ */}
-        <section className="py-14 md:py-20 bg-[#FDFDF9]">
-          <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
-            <SectionHeader overline="Em Detalhe" heading="A intervenção em" goldWord={data.name} light={true} />
-            <div className="relative overflow-hidden max-w-4xl" style={{ borderTop: "2px solid #D4AF37" }}>
-              <img
-                src={heroImg}
-                alt={`${data.serviceName} em ${data.name.toLowerCase()}`}
-                className="w-full max-h-[480px] object-cover"
-                loading="lazy"
-              />
-            </div>
-          </div>
-        </section>
+        {/* ═══ GALERIA — ANTES E DEPOIS ═══ */}
+        {gallery && (
+          <ServiceAutoCarousel
+            overline="Resultados Reais"
+            heading={`Antes e depois: ${data.name}`}
+            subtitle={`Transformação real em ${data.serviceName.toLowerCase()} — resultado visível no próprio dia.`}
+            beforeImage={gallery.before}
+            afterImage={gallery.after}
+            slides={[
+              { src: heroImg, label: "Pormenor" },
+              gallery.slides[1],
+            ]}
+            rotateBeforeAfter={gallery.rotateBeforeAfter}
+            variant="light"
+          />
+        )}
 
         {/* ═══ PROCESSO DE LIMPEZA ═══ */}
         <section className="py-14 md:py-20 bg-kyro-green">
