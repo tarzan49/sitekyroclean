@@ -17,7 +17,7 @@ import QuizForm from "./QuizFormLazy";
 import { useQuizLocation, useQuizService } from "@/context/QuizLocationContext";
 import { trackWhatsAppClick } from "@/lib/quizTracking";
 import { trackCallClick } from "@/lib/analytics";
-import { WHATSAPP_BASE, PHONE_TEL, PHONE_DISPLAY } from "@/constants/business";
+import { WHATSAPP_BASE, PHONE_TEL } from "@/constants/business";
 import { useQuizLauncher } from "@/hooks/use-quiz-launcher";
 
 const serviceLinks = [
@@ -294,7 +294,7 @@ const Header = () => {
                   className="w-full border border-[#111111]/25 text-[#111111] text-[10px] font-semibold tracking-[0.18em] uppercase py-3.5 hover:bg-[#111111]/4 transition-colors flex items-center justify-center gap-2"
                 >
                   <Phone className="w-3.5 h-3.5 text-[#111111]/70" strokeWidth={2} />
-                  Ligar · {PHONE_DISPLAY}
+                  Ligar
                 </a>
               </div>
             </SheetContent>

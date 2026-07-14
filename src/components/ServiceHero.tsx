@@ -1,7 +1,8 @@
-import { MessageCircle } from "lucide-react";
+import { MessageCircle, Phone } from "lucide-react";
 import QuizForm from "./QuizFormLazy";
 import { trackWhatsAppClick } from "@/lib/quizTracking";
-import { WHATSAPP_BASE } from "@/constants/business";
+import { trackCallClick } from "@/lib/analytics";
+import { WHATSAPP_BASE, PHONE_TEL, PHONE_DISPLAY } from "@/constants/business";
 import TrustRatingBadge from "@/components/TrustRatingBadge";
 import { useQuizLauncher } from "@/hooks/use-quiz-launcher";
 
@@ -184,6 +185,16 @@ const ServiceHero = ({
               <div className="flex justify-center pt-1">
                 <TrustRatingBadge variant="mapsLink" />
               </div>
+
+              {/* Prefere ligar? — mobile only */}
+              <a
+                href={`tel:${PHONE_TEL}`}
+                onClick={() => trackCallClick('service_hero_mobile')}
+                className="md:hidden flex justify-center items-center gap-1.5 text-white/45 text-xs mt-3 hover:text-white/70 transition-colors"
+              >
+                <Phone className="w-3 h-3 flex-shrink-0" strokeWidth={2} />
+                Prefere ligar? {PHONE_DISPLAY}
+              </a>
 
             </div>
           </div>

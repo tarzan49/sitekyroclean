@@ -1,6 +1,7 @@
-import { Star, MapPin } from "lucide-react";
-import { REVIEW_RATING, REVIEW_COUNT } from "@/constants/business";
+import { Star, MapPin, Phone } from "lucide-react";
+import { REVIEW_RATING, REVIEW_COUNT, PHONE_TEL, PHONE_DISPLAY } from "@/constants/business";
 import { GOOGLE_REVIEWS_SHORT_URL } from "@/constants/google";
+import { trackCallClick } from "@/lib/analytics";
 
 type TrustRatingBadgeProps = {
   variant: "hero" | "compact" | "mapsLink" | "pillSmall" | "horizontal" | "card";
@@ -10,20 +11,30 @@ const TrustRatingBadge = ({ variant }: TrustRatingBadgeProps) => {
   switch (variant) {
     case "hero":
       return (
-        <div className="flex flex-wrap items-center gap-4 mb-8">
-          <div className="flex items-center gap-1.5">
-            <div className="flex gap-0.5">
-              {[...Array(5)].map((_, i) => (
-                <Star key={i} className="w-4 h-4 fill-[#D4AF37]" style={{ color: "#D4AF37" }} />
-              ))}
+        <div className="mb-8">
+          <div className="flex flex-wrap items-center gap-4">
+            <div className="flex items-center gap-1.5">
+              <div className="flex gap-0.5">
+                {[...Array(5)].map((_, i) => (
+                  <Star key={i} className="w-4 h-4 fill-[#D4AF37]" style={{ color: "#D4AF37" }} />
+                ))}
+              </div>
+              <span className="text-white font-bold text-sm">{REVIEW_RATING}</span>
+              <span className="text-white/50 text-xs">Google</span>
             </div>
-            <span className="text-white font-bold text-sm">{REVIEW_RATING}</span>
-            <span className="text-white/50 text-xs">Google</span>
+            <div className="h-4 w-px bg-white/20" />
+            <span className="text-white/60 text-xs font-medium">{REVIEW_COUNT}+ avaliações</span>
+            <div className="h-4 w-px bg-white/20" />
+            <span className="text-white/60 text-xs font-medium">+1000 clientes</span>
           </div>
-          <div className="h-4 w-px bg-white/20" />
-          <span className="text-white/60 text-xs font-medium">{REVIEW_COUNT}+ avaliações</span>
-          <div className="h-4 w-px bg-white/20" />
-          <span className="text-white/60 text-xs font-medium">+1000 clientes</span>
+          <a
+            href={`tel:${PHONE_TEL}`}
+            onClick={() => trackCallClick('hero_mobile')}
+            className="md:hidden inline-flex items-center gap-1.5 text-white/45 text-xs mt-2.5 hover:text-white/70 transition-colors"
+          >
+            <Phone className="w-3 h-3 flex-shrink-0" strokeWidth={2} />
+            Prefere ligar? {PHONE_DISPLAY}
+          </a>
         </div>
       );
 

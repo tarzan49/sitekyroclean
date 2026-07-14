@@ -6,11 +6,12 @@
 import { useEffect, useMemo } from "react";
 import { useLocation, Link } from "react-router-dom";
 import { QuizLocationProvider, QuizServiceProvider } from "@/context/QuizLocationContext";
-import { CheckCircle, Star, MapPin, MessageCircle } from "lucide-react";
+import { CheckCircle, Star, MapPin, MessageCircle, Phone } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import QuizButton from "@/components/QuizButton";
 import { trackWhatsAppClick } from "@/lib/quizTracking";
+import { trackCallClick } from "@/lib/analytics";
 import ServiceFAQ from "@/components/ServiceFAQ";
 import ServicePackBanner from "@/components/ServicePackBanner";
 import ServicePriceSection from "@/components/ServicePriceSection";
@@ -23,7 +24,7 @@ import {
 import { cities, cityPrep } from "@/data/locationSeoData";
 import { municipiosComFreguesias } from "@/data/freguesiaSeoData";
 import { GENERIC_PROCESS_STEPS, IMPERMEABILIZACAO_STEPS } from "@/constants/serviceProcesses";
-import { SITE_URL, WHATSAPP_BASE } from "@/constants/business";
+import { SITE_URL, WHATSAPP_BASE, PHONE_TEL, PHONE_DISPLAY } from "@/constants/business";
 import TrustRatingBadge from "@/components/TrustRatingBadge";
 import { buildVariantWaMessage } from "@/lib/whatsappMessages";
 
@@ -317,6 +318,15 @@ const SofaVariantPage = () => {
                   <div className="flex justify-center pt-1">
                     <TrustRatingBadge variant="mapsLink" />
                   </div>
+
+                  <a
+                    href={`tel:${PHONE_TEL}`}
+                    onClick={() => trackCallClick('variant_hero_mobile')}
+                    className="md:hidden flex justify-center items-center gap-1.5 text-white/45 text-xs mt-3 hover:text-white/70 transition-colors"
+                  >
+                    <Phone className="w-3 h-3 flex-shrink-0" strokeWidth={2} />
+                    Prefere ligar? {PHONE_DISPLAY}
+                  </a>
 
                 </div>
               </div>
