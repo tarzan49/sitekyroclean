@@ -9,12 +9,14 @@ import TrustRatingBadge from "@/components/TrustRatingBadge";
 import SectionHeader from "@/components/SectionHeader";
 import ServiceFAQ from "@/components/ServiceFAQ";
 import ServicePriceSection from "@/components/ServicePriceSection";
+import ServiceAutoCarousel from "@/components/ServiceAutoCarousel";
 import { trackWhatsAppClick } from "@/lib/quizTracking";
 import { getPricePageData, getAllPriceRoutes } from "@/data/priceSeoData";
 import { SERVICE_TESTIMONIALS } from "@/data/locationPriceTestimonialsData";
 import { services, cities, cityPrep } from "@/data/locationSeoData";
 import { SERVICE_TO_QUIZ } from "@/constants/serviceToQuiz";
 import { SERVICE_HERO_IMAGES, SERVICE_HERO_FALLBACK } from "@/constants/serviceContent";
+import { SERVICE_GALLERY } from "@/constants/serviceGallery";
 import { buildServiceWaMessage } from "@/lib/whatsappMessages";
 import { SITE_URL, WHATSAPP_BASE } from "@/constants/business";
 import {
@@ -72,6 +74,7 @@ const PricePage = () => {
   const nearbyCities = cities.filter(c => c.slug !== data.citySlug).slice(0, 8);
   const waHref = `${WHATSAPP_BASE}?text=${encodeURIComponent(buildServiceWaMessage(data.serviceSlug, data.cityName))}`;
   const testimonials = SERVICE_TESTIMONIALS[data.serviceSlug];
+  const gallery = SERVICE_GALLERY[data.serviceSlug];
 
   return (
     <QuizLocationProvider value={data.cityName}>
@@ -189,6 +192,20 @@ const PricePage = () => {
               </div>
             </div>
           </section>
+        )}
+
+        {/* ═══ GALERIA — ANTES E DEPOIS ═══ */}
+        {gallery && (
+          <ServiceAutoCarousel
+            overline="Resultados Reais"
+            heading={`Antes e depois: ${data.serviceName}`}
+            subtitle={`Transformação real ${prep} ${data.cityName} — resultado visível no próprio dia.`}
+            beforeImage={gallery.before}
+            afterImage={gallery.after}
+            slides={gallery.slides}
+            rotateBeforeAfter={gallery.rotateBeforeAfter}
+            variant="light"
+          />
         )}
 
         {/* ═══ FAQ ═══ */}

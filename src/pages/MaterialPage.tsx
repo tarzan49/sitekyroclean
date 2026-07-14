@@ -1,7 +1,7 @@
 import { useEffect, useMemo } from "react";
 import { useLocation, Link } from "react-router-dom";
 import { QuizLocationProvider, QuizServiceProvider } from "@/context/QuizLocationContext";
-import { MapPin, Star, CheckCircle, MessageCircle, ArrowRight, Search, Droplets, Sparkles, Wind } from "lucide-react";
+import { MapPin, Star, MessageCircle, ArrowRight, Search, Droplets, Sparkles, Wind } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import QuizButton from "@/components/QuizButton";
@@ -10,9 +10,11 @@ import SectionHeader from "@/components/SectionHeader";
 import ServiceFAQ from "@/components/ServiceFAQ";
 import ServicePriceSection from "@/components/ServicePriceSection";
 import ServicePackBanner from "@/components/ServicePackBanner";
+import ServiceAutoCarousel from "@/components/ServiceAutoCarousel";
 import { trackWhatsAppClick } from "@/lib/quizTracking";
 import { SERVICE_TO_QUIZ } from "@/constants/serviceToQuiz";
 import { SERVICE_PACK_SLUGS } from "@/constants/servicePackSlugs";
+import { SERVICE_GALLERY } from "@/constants/serviceGallery";
 import {
   getMaterialBySlug,
   getAllMaterialCityRoutes,
@@ -104,6 +106,7 @@ const MaterialPage = () => {
   const h1Rest = h1Words.join(" ");
 
   const testimonials = SERVICE_TESTIMONIALS[data.serviceSlug];
+  const gallery = SERVICE_GALLERY[data.serviceSlug];
 
   return (
     <QuizLocationProvider value={cityName ?? undefined}>
@@ -205,8 +208,8 @@ const MaterialPage = () => {
               goldWord={data.name}
               light={false}
             />
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-px" style={{ backgroundColor: "rgba(255,255,255,0.08)" }}>
-              {data.characteristics.map((c, i) => (
+            <div className="grid grid-cols-2 gap-px" style={{ backgroundColor: "rgba(255,255,255,0.08)" }}>
+              {data.characteristics.slice(0, 4).map((c, i) => (
                 <div key={i} className="relative overflow-hidden flex items-start gap-3 p-6 md:p-7" style={{ backgroundColor: "#0d241b", borderTop: "2px solid rgba(212,175,55,0.55)" }}>
                   <span className="font-playfair font-bold flex-shrink-0 leading-none" style={{ fontSize: "1.75rem", color: "rgba(212,175,55,0.4)" }}>
                     {String(i + 1).padStart(2, "0")}
@@ -218,25 +221,19 @@ const MaterialPage = () => {
           </div>
         </section>
 
-        {/* ═══ CUIDADOS DIÁRIOS ═══ */}
-        <section className="py-14 md:py-20 bg-[#FDFDF9]">
-          <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
-            <SectionHeader
-              overline="Manutenção"
-              heading="Cuidados diários com o"
-              goldWord={data.name}
-              light={true}
-            />
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-px" style={{ backgroundColor: "#E8E4DE" }}>
-              {data.tips.map((tip, i) => (
-                <div key={i} className="relative overflow-hidden flex items-start gap-3 p-6 md:p-7 bg-white" style={{ borderTop: "2px solid #D4AF37" }}>
-                  <CheckCircle className="relative w-5 h-5 mt-0.5 shrink-0" style={{ color: "#D4AF37" }} />
-                  <span className="relative text-sm text-[#111111]/65 leading-relaxed">{tip}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
+        {/* ═══ GALERIA — ANTES E DEPOIS ═══ */}
+        {gallery && (
+          <ServiceAutoCarousel
+            overline="Resultados Reais"
+            heading={`Antes e depois: ${data.name}`}
+            subtitle={`Transformação real em ${data.serviceName.toLowerCase()} — resultado visível no próprio dia.`}
+            beforeImage={gallery.before}
+            afterImage={gallery.after}
+            slides={gallery.slides}
+            rotateBeforeAfter={gallery.rotateBeforeAfter}
+            variant="light"
+          />
+        )}
 
         {/* ═══ PROCESSO DE LIMPEZA ═══ */}
         <section className="py-14 md:py-20 bg-kyro-green">
