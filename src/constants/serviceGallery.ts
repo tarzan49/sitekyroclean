@@ -13,7 +13,10 @@ import colchaoProcesso from "@/assets/galeria-colchao-processo.webp";
 
 import tapeteBefore from "@/assets/galeria-tapete-antes.webp";
 import tapeteAfter from "@/assets/galeria-tapete-depois.webp";
-import tapeteProcesso from "@/assets/galeria-tapete-processo.webp";
+// Nota: galeria-tapete-processo.webp / hero-carpet-cleaning-new.webp / public/images/tapetes/v1.png
+// são todos a MESMA foto duplicada sob nomes diferentes — por isso a "Extração" usa aqui a foto do
+// tapete persa (distinta), evitando repetir a foto usada como Pormenor nos materiais sem foto própria.
+const tapetePersaExtracao = "/images/variant-heroes/tapetes/tapetes-v2.png";
 
 import cadeiraBefore from "@/assets/galeria-cadeira-antes.webp";
 import cadeiraAfter from "@/assets/galeria-cadeira-depois.webp";
@@ -59,7 +62,7 @@ export const SERVICE_GALLERY: Record<string, ServiceGallery> = {
     after: tapeteAfter,
     slides: [
       { src: alcatifaResultado, label: "Técnico" },
-      { src: tapeteProcesso, label: "Extração" },
+      { src: tapetePersaExtracao, label: "Extração" },
     ],
   },
   "limpeza-cadeiras": {
