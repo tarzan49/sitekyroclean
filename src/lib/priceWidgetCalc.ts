@@ -61,9 +61,9 @@ export function calcCarpetWidget(area: number, alcatifa = false): number | null 
     return area * 3;
   }
   if (area > 15) return null;
-  if (area <= 5)  return area * 10;
-  if (area <= 10) return 50 + (area - 5) * 8;
-  return 90 + (area - 10) * 7;
+  if (area <= 5)  return area * 12;
+  if (area <= 10) return 60 + (area - 5) * 10;
+  return 110 + (area - 10) * 9;
 }
 
 export const WIDGET_DISCOUNT_THRESHOLD = 149;

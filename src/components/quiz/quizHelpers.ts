@@ -54,9 +54,9 @@ export function calcPackPricing(
 
 // ── Carpet ────────────────────────────────────────────────────────────────────
 export const CARPET_TIERS = [
-  { label: 'Até 5 m²',   sublabel: 'Pequenos', rate: 10,   max: 5 },
-  { label: '5 a 10 m²',  sublabel: 'Médios',   rate: 8,    max: 10 },
-  { label: '10 a 15 m²', sublabel: 'Grandes',  rate: 7,    max: 15 },
+  { label: 'Até 5 m²',   sublabel: 'Pequenos', rate: 12,   max: 5 },
+  { label: '5 a 10 m²',  sublabel: 'Médios',   rate: 10,   max: 10 },
+  { label: '10 a 15 m²', sublabel: 'Grandes',  rate: 9,    max: 15 },
   { label: '+15 m²',     sublabel: 'Extra',    rate: null, max: Infinity },
 ] as const;
 
@@ -69,9 +69,9 @@ export function carpetActiveTier(area: number): number {
 
 export function calcCarpetPrice(area: number): number | null {
   if (area <= 0 || area > 15) return null;
-  if (area <= 5)  return area * 10;
-  if (area <= 10) return 50 + (area - 5) * 8;
-  return 90 + (area - 10) * 7;
+  if (area <= 5)  return area * 12;
+  if (area <= 10) return 60 + (area - 5) * 10;
+  return 110 + (area - 10) * 9;
 }
 
 // ── Chairs ────────────────────────────────────────────────────────────────────

@@ -99,7 +99,7 @@ const LimpezaTapetes = () => {
           serviceName="Limpeza de Tapetes"
           description="Lavagem e limpeza profissional de tapetes no Porto. Remoção de manchas e odores."
           url="/limpeza-tapetes"
-          priceFrom="5€/m²"
+          priceFrom="12€/m²"
           reviews={[
             { author: "Sandra V.", city: "Paredes", text: "Fiquei impressionada com a diferença. O tapete da sala recuperou cores que já nem me lembrava que tinha.", date: "2025-02-22" },
             { author: "Miguel S.", city: "Cascais", text: "Profissionais de confiança! Limparam os tapetes persas antigos com todo o cuidado. Resultado impecável!", date: "2025-03-25" },

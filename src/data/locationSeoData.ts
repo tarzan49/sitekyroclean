@@ -70,7 +70,7 @@ export const cities = [
 export const services = [
   { name: "Limpeza de Sofás", slug: "limpeza-sofas", baseRoute: "/limpeza-sofas", priceFrom: "49€", icon: "sofa" },
   { name: "Limpeza de Colchões", slug: "limpeza-colchoes", baseRoute: "/limpeza-colchoes", priceFrom: "49€", icon: "mattress" },
-  { name: "Limpeza de Tapetes", slug: "limpeza-tapetes", baseRoute: "/limpeza-tapetes", priceFrom: "5€/m²", icon: "carpet" },
+  { name: "Limpeza de Tapetes", slug: "limpeza-tapetes", baseRoute: "/limpeza-tapetes", priceFrom: "12€/m²", icon: "carpet" },
   { name: "Limpeza de Cadeiras", slug: "limpeza-cadeiras", baseRoute: "/limpeza-cadeiras", priceFrom: "10€", icon: "chair" },
   { name: "Limpeza de Alcatifas", slug: "limpeza-alcatifas", baseRoute: "/limpeza-alcatifas", priceFrom: "3€/m²", icon: "rug" },
   { name: "Impermeabilização", slug: "impermeabilizacao", baseRoute: "/impermeabilizacao", priceFrom: "49€", icon: "waterproof" },
@@ -153,10 +153,10 @@ function generateTapetesContent(city: string, cityDesc: string): Omit<LocationSe
   const prep = cityPrep(city);
   const Prep = cityPrepCap(city);
   return {
-    title: `Limpeza de Tapetes ${city} | Desde 5€/m² | Kyro Clean Solutions`,
-    metaDescription: `Lavagem profissional de tapetes ${prep} ${city}. Limpeza de tapetes persas, orientais e modernos. Recolha e entrega. Desde 5€/m².`,
+    title: `Limpeza de Tapetes ${city} | Desde 12€/m² | Kyro Clean Solutions`,
+    metaDescription: `Lavagem profissional de tapetes ${prep} ${city}. Limpeza de tapetes persas, orientais e modernos. Recolha e entrega. Desde 12€/m².`,
     h1: `Limpeza e Lavagem de Tapetes ${prep} ${city}`,
-    intro: `Procura lavagem de tapetes profissional ${prep} ${city}? A Kyro Clean Solutions oferece limpeza especializada de tapetes de todos os tipos: persas, orientais, modernos, de lã e sintéticos. Serviço disponível ${prep} ${city} e ${cityDesc} com recolha e entrega ao domicílio. Preços desde 5€/m².`,
+    intro: `Procura lavagem de tapetes profissional ${prep} ${city}? A Kyro Clean Solutions oferece limpeza especializada de tapetes de todos os tipos: persas, orientais, modernos, de lã e sintéticos. Serviço disponível ${prep} ${city} e ${cityDesc} com recolha e entrega ao domicílio. Preços desde 12€/m².`,
     problems: [
       { title: "Sujidade acumulada nas fibras", description: `Os tapetes acumulam poeira, terra, areia e resíduos diariamente. ${Prep} ${city}, o uso constante torna a limpeza profunda essencial para manter a higiene.` },
       { title: "Manchas resistentes", description: `Manchas de líquidos, comida e animais que se fixam nas fibras do tapete e são impossíveis de remover com aspirador convencional.` },
@@ -174,7 +174,7 @@ function generateTapetesContent(city: string, cityDesc: string): Omit<LocationSe
     ],
     localSection: `Recolhemos e entregamos tapetes em toda a área de ${city}. Atendemos clientes residenciais e comerciais: restaurantes, hotéis e escritórios ${prep} ${city} e arredores.`,
     faqs: [
-      { question: `Quanto custa a limpeza de tapetes ${prep} ${city}?`, answer: `A limpeza de tapetes ${prep} ${city} tem preços a partir de 5€/m². O custo depende do tipo de tapete, dimensão e estado de sujidade. Peça orçamento gratuito.` },
+      { question: `Quanto custa a limpeza de tapetes ${prep} ${city}?`, answer: `A limpeza de tapetes ${prep} ${city} tem preços a partir de 12€/m². O custo depende do tipo de tapete, dimensão e estado de sujidade. Peça orçamento gratuito.` },
       { question: `Fazem lavagem de tapetes persas ${prep} ${city}?`, answer: `Sim. Temos experiência na lavagem de tapetes persas, orientais e delicados. Utilizamos produtos e técnicas específicas para preservar as fibras e cores.` },
       { question: `Têm serviço de recolha de tapetes ${prep} ${city}?`, answer: `Sim! Oferecemos recolha e entrega de tapetes ao domicílio ${prep} ${city} e toda a área envolvente, sem custos adicionais para encomendas acima de 50€.` },
       { question: `Quanto tempo demora a lavagem de tapetes?`, answer: `O processo completo de lavagem e secagem demora tipicamente 3-5 dias úteis, dependendo do tipo e tamanho do tapete.` },

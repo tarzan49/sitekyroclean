@@ -351,14 +351,14 @@ const ProblemCityPage = () => {
 
         {/* ═══ FAQ ═══ */}
         {localFaqs.length > 0 && (
-          <ServiceFAQ faqs={localFaqs} heading="Perguntas Frequentes" variant="dark" />
+          <ServiceFAQ faqs={localFaqs} heading="Perguntas Frequentes" variant="light" />
         )}
 
         {/* ═══ AVALIAÇÕES REAIS ═══ */}
         {testimonial && (
-          <section className="py-14 md:py-20 bg-[#FDFDF9]">
+          <section className="py-14 md:py-20 bg-kyro-green">
             <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
-              <SectionHeader overline="Avaliações Reais" heading="O que dizem os nossos" goldWord="clientes" light={true} />
+              <SectionHeader overline="Avaliações Reais" heading="O que dizem os nossos" goldWord="clientes" light={false} />
               <div className="max-w-md">
                 <div className="relative overflow-hidden p-6 md:p-8 bg-white" style={{ borderTop: "2px solid #D4AF37" }}>
                   <div className="flex gap-0.5 mb-4">

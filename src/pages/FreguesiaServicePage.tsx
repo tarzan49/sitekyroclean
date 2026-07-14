@@ -379,7 +379,7 @@ const FreguesiaServicePage = () => {
                                 <span className="font-playfair font-bold text-xl tabular-nums" style={{ color: "#D4AF37" }}>{dynamicPrice}</span>
                               </div>
                               <p className="text-[11px] ml-1" style={{ color: "rgba(17,17,17,0.38)" }}>
-                                {isAlcatifa ? 'até 50m²: 3€/m² · +50m²: sob orçamento' : '≤5m²: 10€/m² · ≤10m²: 8€/m² · ≤15m²: 7€/m² · +15m²: sob orçamento'}
+                                {isAlcatifa ? 'até 50m²: 3€/m² · +50m²: sob orçamento' : '≤5m²: 12€/m² · ≤10m²: 10€/m² · ≤15m²: 9€/m² · +15m²: sob orçamento'}
                               </p>
                             </div>
                           );

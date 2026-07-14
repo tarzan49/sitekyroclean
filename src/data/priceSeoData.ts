@@ -35,10 +35,10 @@ const priceTables: Record<string, { item: string; price: string; note?: string }
     { item: "Cabeceira estofada", price: "Desde 20€", note: "add-on" },
   ],
   "limpeza-tapetes": [
-    { item: "Tapete até 3m²", price: "Desde 15€" },
-    { item: "Tapete 3-6m²", price: "Desde 25€" },
-    { item: "Tapete 6-10m²", price: "Desde 40€" },
-    { item: "Tapete +10m²", price: "Sob consulta" },
+    { item: "Tapete até 5m²", price: "12€/m²" },
+    { item: "Tapete até 10m²", price: "10€/m²" },
+    { item: "Tapete até 15m²", price: "9€/m²" },
+    { item: "Tapete +15m²", price: "Sob consulta" },
     { item: "Tapete persa/oriental", price: "Sob consulta", note: "tratamento premium" },
   ],
   "limpeza-cadeiras": [
@@ -118,7 +118,7 @@ const priceFaqs: Record<string, { question: string; answer: string }[]> = {
     { question: "A deslocação em {city} tem custo?", answer: "Não. A deslocação está incluída no preço do serviço em {city} e arredores." },
   ],
   "limpeza-tapetes": [
-    { question: "Quanto custa limpar um tapete em {city}?", answer: "A limpeza de tapetes em {city} começa a partir de 5€/m². Tapetes artesanais, persas ou de seda podem ter preços especiais. Peça orçamento gratuito." },
+    { question: "Quanto custa limpar um tapete em {city}?", answer: "A limpeza de tapetes em {city} começa a partir de 12€/m². Tapetes artesanais, persas ou de seda podem ter preços especiais. Peça orçamento gratuito." },
     { question: "Recolhem e entregam tapetes em {city}?", answer: "Sim, podemos recolher o tapete em {city}, limpá-lo no nosso centro e entregá-lo limpo na sua casa. O serviço de recolha e entrega está incluído." },
   ],
   "limpeza-cadeiras": [

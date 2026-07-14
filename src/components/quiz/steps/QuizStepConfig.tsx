@@ -167,7 +167,7 @@ const QuizStepConfig = ({
           <p className="text-xs text-white/35 text-center mt-1 leading-snug">Se tiver vários tapetes, insira a soma total das áreas.</p>
         </div>
         <p className="text-xs text-white/30 text-center leading-snug">
-          ≤5m²: 10€/m² · ≤10m²: 8€/m² · ≤15m²: 7€/m² · +15m²: sob orçamento
+          ≤5m²: 12€/m² · ≤10m²: 10€/m² · ≤15m²: 9€/m² · +15m²: sob orçamento
         </p>
       </div>
     );

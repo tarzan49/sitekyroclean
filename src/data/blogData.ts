@@ -321,7 +321,7 @@ const posts: BlogPost[] = [
     sections: [
       {
         heading: "Preços de limpeza de tapetes (2025)",
-        body: "A Kyro Clean Solutions pratica os seguintes preços para limpeza de tapetes:\n\n**Tapetes avulsos (recolha e entrega ou ao domicílio):**\n- Até 5 m²: 10€/m²\n- Até 10 m²: 9€/m²\n- Até 20 m²: 7€/m²\n- Mais de 20 m²: sob orçamento\n\n**Alcatifas (limpeza no local, m² de área):** a partir de 3€/m²\n\nO preço por metro quadrado é menor em tapetes maiores porque o tempo de setup e deslocação é fixo, só o produto e a extração aumentam com a área.\n\nExemplo prático: um tapete de sala de 8 m² custa 72€ (8 × 9€). Uma alcatifa de quarto de 12 m² custa a partir de 36€ (12 × 3€).",
+        body: "A Kyro Clean Solutions pratica os seguintes preços para limpeza de tapetes:\n\n**Tapetes avulsos (recolha e entrega ou ao domicílio):**\n- Até 5 m²: 12€/m²\n- Até 10 m²: 10€/m²\n- Até 15 m²: 9€/m²\n- Mais de 15 m²: sob orçamento\n\n**Alcatifas (limpeza no local, m² de área):** a partir de 3€/m²\n\nO preço por metro quadrado é menor em tapetes maiores porque o tempo de setup e deslocação é fixo, só o produto e a extração aumentam com a área.\n\nExemplo prático: um tapete de sala de 8 m² custa 90€. Uma alcatifa de quarto de 12 m² custa a partir de 36€ (12 × 3€).",
         tip: "Tapetes com franjas, de lã natural ou de seda requerem tratamento especializado. Informa sempre o técnico do material antes de agendar.",
       },
       {

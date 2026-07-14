@@ -278,14 +278,14 @@ const MaterialPage = () => {
 
         {/* ═══ FAQ ═══ */}
         {data.faqs.length > 0 && (
-          <ServiceFAQ faqs={data.faqs} heading={`Perguntas sobre ${data.name.toLowerCase()}`} variant="dark" />
+          <ServiceFAQ faqs={data.faqs} heading={`Perguntas sobre ${data.name.toLowerCase()}`} variant="light" />
         )}
 
         {/* ═══ AVALIAÇÕES REAIS ═══ */}
         {testimonials && testimonials.length > 0 && (
-          <section className="py-14 md:py-20 bg-[#FDFDF9]">
+          <section className="py-14 md:py-20 bg-kyro-green">
             <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
-              <SectionHeader overline="Avaliações Reais" heading="O que dizem os nossos" goldWord="clientes" light={true} />
+              <SectionHeader overline="Avaliações Reais" heading="O que dizem os nossos" goldWord="clientes" light={false} />
               <div className="grid sm:grid-cols-2 gap-px" style={{ backgroundColor: "#E8E4DE" }}>
                 {testimonials.map((t, i) => (
                   <div key={i} className="relative overflow-hidden p-6 md:p-8 bg-white" style={{ borderTop: "2px solid #D4AF37" }}>
@@ -313,7 +313,7 @@ const MaterialPage = () => {
         <ServicePackBanner
           packSlugs={SERVICE_PACK_SLUGS[data.serviceSlug] ?? ["pack-sala-completa"]}
           city={citySlug || undefined}
-          variant="dark"
+          variant="light"
         />
 
         {/* ═══ REDE INTERNA ═══ */}

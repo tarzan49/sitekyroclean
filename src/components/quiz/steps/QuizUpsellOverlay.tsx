@@ -182,7 +182,7 @@ const QuizUpsellOverlay = ({
             {([
               { id: 'sofa',     img: '/images/services/sofa.webp',    label: 'Sofá',     sublabel: 'a partir de 49€' },
               { id: 'mattress', img: '/images/services/colchao.webp', label: 'Colchão',  sublabel: 'a partir de 49€' },
-              { id: 'carpet',   img: '/images/services/tapete.webp',  label: 'Tapete',   sublabel: 'a partir de 5€/m²' },
+              { id: 'carpet',   img: '/images/services/tapete.webp',  label: 'Tapete',   sublabel: 'a partir de 12€/m²' },
               { id: 'chairs',   img: '/images/services/cadeira.webp', label: 'Cadeiras', sublabel: '15€/cadeira' },
             ] as const).map(opt => (
               <button
@@ -438,7 +438,7 @@ const QuizUpsellOverlay = ({
                   onChange={e => setPendingCarpetArea(e.target.value)}
                   className="w-full h-12 px-4 text-lg font-bold text-center bg-[#1a2a1a] border border-gold/25 focus:border-gold focus:outline-none rounded-sm transition-colors text-white placeholder:text-white/25 mb-1"
                 />
-                <p className="text-xs text-white/30 text-center mb-4">≤5m²: 10€/m² · ≤10m²: 8€/m² · ≤15m²: 7€/m² · +15m²: sob orçamento</p>
+                <p className="text-xs text-white/30 text-center mb-4">≤5m²: 12€/m² · ≤10m²: 10€/m² · ≤15m²: 9€/m² · +15m²: sob orçamento</p>
                 <button
                   disabled={!pendingCarpetArea || isNaN(parseFloat(pendingCarpetArea)) || parseFloat(pendingCarpetArea) <= 0}
                   onClick={() => {
