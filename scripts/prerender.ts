@@ -640,7 +640,7 @@ export function prerenderRoutes(outDir: string): number {
             'Produto certificado e seguro para crianças e animais',
           ],
           faqs: faqs([
-            { q: 'Quanto custa a limpeza de colchão?', a: 'A limpeza de colchão começa a partir de 49€ para solteiro, 59€ para casal e 69€ para king. Peça orçamento gratuito.' },
+            { q: 'Quanto custa a limpeza de colchão?', a: 'A limpeza de colchão começa a partir de 49€ para solteiro, 69€ para casal e 79€ para king. Peça orçamento gratuito.' },
             { q: 'Com que frequência devo limpar o colchão?', a: 'Recomendamos higienização profissional a cada 6 a 12 meses. Em casos de alergias, gravidez ou crianças pequenas, idealmente cada 6 meses.' },
             { q: 'A limpeza elimina os ácaros do colchão?', a: 'Sim. O nosso processo elimina até 99% dos ácaros, ovos e alergénios presentes no colchão, com tratamento antimicrobiano de duração até 6 meses.' },
             { q: 'Fazem limpeza de colchões ao domicílio?', a: 'Sim. O técnico desloca-se a sua casa com todo o equipamento. Não precisa de retirar o colchão nem de se deslocar.' },

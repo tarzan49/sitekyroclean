@@ -58,8 +58,8 @@ export const PRICE_TABLE: Record<string, { item: string; price: string }[]> = {
   ],
   'limpeza-colchoes': [
     { item: 'Colchão solteiro',        price: '49€' },
-    { item: 'Colchão casal',           price: '59€' },
-    { item: 'Colchão king / queen',    price: '69€' },
+    { item: 'Colchão casal',           price: '69€' },
+    { item: 'Colchão king / queen',    price: '79€' },
   ],
   'limpeza-tapetes': [
     { item: 'Tapetes (m²)',             price: '12€/m²' },

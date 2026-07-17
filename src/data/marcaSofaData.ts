@@ -284,6 +284,14 @@ const marcaCities = [
   { name: "Vila Nova de Gaia", slug: "vila-nova-de-gaia" },
   { name: "Maia", slug: "maia" },
   { name: "Barcelos", slug: "barcelos" },
+  { name: "Sintra", slug: "sintra" },
+  { name: "Cascais", slug: "cascais" },
+  { name: "Oeiras", slug: "oeiras" },
+  { name: "Amadora", slug: "amadora" },
+  { name: "Faro", slug: "faro" },
+  { name: "Loulé", slug: "loule" },
+  { name: "Albufeira", slug: "albufeira" },
+  { name: "Portimão", slug: "portimao" },
 ];
 
 export interface MarcaSofaRoute {

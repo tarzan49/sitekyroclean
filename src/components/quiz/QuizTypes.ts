@@ -73,8 +73,8 @@ export const sofaChaisePrice = { cleaning: 10, waterproofing: 20 };
 // originalBothPrice = soma sem desconto (preço riscado no UI)
 export const mattressPrices: PriceOption[] = [
   { id: 'solteiro', label: 'Solteiro',     cleaningPrice: 49, waterproofingPrice: 55, bothPrice: 88,  originalBothPrice: 104 },
-  { id: 'casal',    label: 'Casal',        cleaningPrice: 59, waterproofingPrice: 60, bothPrice: 101, originalBothPrice: 119 },
-  { id: 'king',     label: 'King / Queen', cleaningPrice: 69, waterproofingPrice: 65, bothPrice: 114, originalBothPrice: 134 },
+  { id: 'casal',    label: 'Casal',        cleaningPrice: 69, waterproofingPrice: 60, bothPrice: 101, originalBothPrice: 119 },
+  { id: 'king',     label: 'King / Queen', cleaningPrice: 79, waterproofingPrice: 65, bothPrice: 114, originalBothPrice: 134 },
 ];
 
 export const chairPrices = {

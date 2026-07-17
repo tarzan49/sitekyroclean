@@ -763,7 +763,7 @@ const problemDefinitions: ProblemPage[] = [
     h1: "Quanto Custa a Higienização Profissional de Colchão?",
     intro: "Quer saber o preço de higienização de colchão? Na Kyro Clean Solutions, a higienização profissional começa a partir de 49€, incluindo remoção de ácaros, desodorização e tratamento de manchas.",
     problemDetail: "O preço de higienização de colchão depende do tamanho (single, casal, king) e serviços adicionais como remoção de manchas específicas. Muitas pessoas evitam limpar o colchão por assumirem que é caro, mas os preços são acessíveis.",
-    solutionDetail: "Preços claros: colchão single desde 49€, colchão casal desde 59€, colchão king desde 69€. Tratamento anti-ácaros e desodorização estão incluídos. Manchas específicas (urina, sangue) podem ter suplemento.",
+    solutionDetail: "Preços claros: colchão single desde 49€, colchão casal desde 69€, colchão king desde 79€. Tratamento anti-ácaros e desodorização estão incluídos. Manchas específicas (urina, sangue) podem ter suplemento.",
     benefits: [
       "Desde 49€ com anti-ácaros incluído",
       "Desodorização incluída",
@@ -773,7 +773,7 @@ const problemDefinitions: ProblemPage[] = [
       "Pagamento após serviço",
     ],
     faqs: [
-      { question: "Quanto custa limpar um colchão de casal?", answer: "A higienização de colchão de casal começa a partir de 59€, incluindo anti-ácaros e desodorização." },
+      { question: "Quanto custa limpar um colchão de casal?", answer: "A higienização de colchão de casal começa a partir de 69€, incluindo anti-ácaros e desodorização." },
       { question: "O tratamento de manchas de urina tem custo extra?", answer: "Manchas simples estão incluídas. Manchas severas de urina podem ter um suplemento de 10-15€ pelo tratamento enzimático adicional." },
     ],
     relatedProblems: ["preco-limpeza-sofa", "acaros-colchao", "urina-colchao"],

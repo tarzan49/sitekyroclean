@@ -216,7 +216,11 @@ const problemRelatedCities: Record<string, string[]> = {
   "limpeza-sofa-seco": ["porto","braga","matosinhos"],
 };
 
-const topMetroCities = ["porto","matosinhos","maia","vila-nova-de-gaia","gondomar","braga","lisboa"];
+const topMetroCities = [
+  "porto","matosinhos","maia","vila-nova-de-gaia","gondomar","braga",
+  "lisboa","sintra","cascais","oeiras","amadora","almada","loures",
+  "faro","loule","albufeira","portimao","lagos",
+];
 
 const materialSlugs = [
   "limpeza-sofa-tecido","limpeza-sofa-veludo","limpeza-sofa-pele",
@@ -396,7 +400,7 @@ export function generateSitemaps(outDir: string) {
 
   // 10. Marca Sofá pages (8 brands × 10 cities = 80 pages)
   const marcaSlugs = ['ikea', 'natuzzi', 'roche-bobois', 'conforama', 'el-corte-ingles', 'kave-home', 'leroy-merlin', 'moviflor'];
-  const marcaCities = ['porto', 'lisboa', 'braga', 'aveiro', 'coimbra', 'guimaraes', 'matosinhos', 'vila-nova-de-gaia', 'maia', 'barcelos'];
+  const marcaCities = ['porto', 'lisboa', 'braga', 'aveiro', 'coimbra', 'guimaraes', 'matosinhos', 'vila-nova-de-gaia', 'maia', 'barcelos', 'sintra', 'cascais', 'oeiras', 'amadora', 'faro', 'loule', 'albufeira', 'portimao'];
   const marcaUrls: string[] = [];
   for (const marca of marcaSlugs) {
     for (const city of marcaCities) {

@@ -3,14 +3,13 @@
 
 import { PROBLEM_ROUTE_SLUGS } from "./problemRouteData";
 import { cities } from "./locationSeoData";
+import { METRO_CITIES as TOP_METRO } from "../constants/metroCities";
 
 export interface ProblemCityRoute {
   path: string;
   problemSlug: string;
   citySlug: string;
 }
-
-const TOP_METRO = new Set(["porto", "matosinhos", "maia", "vila-nova-de-gaia", "gondomar", "braga", "lisboa"]);
 
 // Generate all problem × city routes
 export function getAllProblemCityRoutes(): ProblemCityRoute[] {
