@@ -28,7 +28,7 @@ const MobileStickyBar = () => {
             target="_blank"
             rel="noopener noreferrer"
             onClick={() => trackWhatsAppClick('sticky_bar')}
-            className="flex items-center justify-center gap-2.5 w-full h-14 bg-gradient-to-r from-[#1DA851] via-[#25D366] to-[#1DA851] shadow-[0_4px_24px_rgba(37,211,102,0.40)] active:scale-[0.98] transition-all touch-manipulation"
+            className="flex items-center justify-center gap-2.5 w-full h-14 bg-gradient-to-r from-[#1DA851] via-[#25D366] to-[#1DA851] shadow-[0_6px_22px_rgba(37,211,102,0.42),0_2px_6px_rgba(0,0,0,0.28),inset_0_1px_0_rgba(255,255,255,0.20),inset_0_-2px_0_rgba(0,0,0,0.12)] active:scale-[0.98] transition-all touch-manipulation"
           >
             <MessageCircle className="w-4 h-4 text-white flex-shrink-0" strokeWidth={2} />
             <span className="text-white text-[13px] font-semibold tracking-[0.18em] uppercase">Falar por WhatsApp</span>

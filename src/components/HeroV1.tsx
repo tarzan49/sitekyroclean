@@ -1,4 +1,4 @@
-import { useState, useEffect, lazy, Suspense } from "react";
+import { useEffect, lazy, Suspense } from "react";
 import { trackWhatsAppClick } from "@/lib/quizTracking";
 import { MessageCircle } from "lucide-react";
 import { WHATSAPP_BASE } from "@/constants/business";
@@ -23,29 +23,11 @@ const SERVICES = [
 
 const Hero = () => {
   const { isQuizOpen, openQuiz: handleOpenQuiz, closeQuiz } = useQuizLauncher();
-  const [showStickyCTA, setShowStickyCTA] = useState(false);
 
   useEffect(() => {
     window.addEventListener('openQuiz', handleOpenQuiz);
     return () => window.removeEventListener('openQuiz', handleOpenQuiz);
   }, [handleOpenQuiz]);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      const heroSection = document.getElementById('orcamento');
-      const finalCta    = document.querySelector('[data-section="final-cta"]');
-      let shouldShow = false;
-      if (heroSection) shouldShow = heroSection.getBoundingClientRect().bottom < 100;
-      if (finalCta) {
-        const r = finalCta.getBoundingClientRect();
-        if (r.top < window.innerHeight && r.bottom > 0) shouldShow = false;
-      }
-      setShowStickyCTA(shouldShow);
-      window.dispatchEvent(new CustomEvent('stickyCtaChange', { detail: { isVisible: shouldShow } }));
-    };
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
 
   return (
     <>
@@ -194,26 +176,6 @@ const Hero = () => {
           <QuizForm isOpen={isQuizOpen} onClose={closeQuiz} />
         </Suspense>
       </section>
-
-      {/* Sticky mobile CTA */}
-      {!isQuizOpen && (
-        <div
-          className={`fixed bottom-0 left-0 right-0 bg-kyro-green/97 backdrop-blur-md border-t border-gold/20 p-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] z-50 md:hidden transition-transform duration-300 shadow-2xl ${
-            showStickyCTA ? 'translate-y-0' : 'translate-y-full'
-          }`}
-        >
-          <a
-            href={`${WHATSAPP_BASE}?text=${encodeURIComponent('Olá! Gostaria de pedir um orçamento para limpeza de estofos.')}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            onClick={() => trackWhatsAppClick('hero_sticky_mobile')}
-            className="flex items-center justify-center gap-3 w-full h-14 rounded-2xl bg-[#25D366] shadow-[0_4px_24px_rgba(37,211,102,0.50)] active:scale-[0.98] transition-all touch-manipulation"
-          >
-            <MessageCircle className="w-5 h-5 text-white flex-shrink-0" strokeWidth={2} />
-            <span className="text-white font-black text-base tracking-wide">Falar no WhatsApp</span>
-          </a>
-        </div>
-      )}
     </>
   );
 };
