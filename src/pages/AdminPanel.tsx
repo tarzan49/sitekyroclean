@@ -102,6 +102,21 @@ function getSitemapRegionBreakdown(file: string): { region: AdminRegion; count: 
   return ADMIN_REGIONS.map(region => ({ region, count: regions.filter(r => r === region).length }));
 }
 
+// Same URLs as getSitemapUrls(), filtered down to a single region — powers the
+// per-region drill-down on the Localidade/Freguesia/Variantes Keyword cards.
+function getSitemapUrlsForRegion(file: string, region: AdminRegion): string[] {
+  switch (file) {
+    case "sitemap-location.xml":
+      return getAllLocationRoutes().filter(r => getAdminRegion(r.citySlug) === region).map(r => r.path);
+    case "sitemap-freguesia.xml":
+      return getAllFreguesiaRoutes().filter(r => getAdminRegion(r.citySlug) === region).map(r => r.path);
+    case "sitemap-keyword-variants.xml":
+      return getAllKeywordVariantRoutes().filter(r => getRegionForLocationPart(r.locationPart) === region).map(r => r.path);
+    default:
+      return [];
+  }
+}
+
 // ── Types ─────────────────────────────────────────────────────────────────────
 interface ErrorLog {
   id: string;
@@ -474,8 +489,22 @@ const AdminPanel = () => {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {SITEMAPS.map((sm) => {
-                const isExpanded = expandedSitemap === sm.file;
-                const cachedUrls = sitemapUrlCache[sm.file];
+                const isExpanded = expandedSitemap === sm.file || expandedSitemap?.startsWith(`${sm.file}::`);
+                const activeKey = isExpanded ? expandedSitemap! : null;
+                const cachedUrls = activeKey ? sitemapUrlCache[activeKey] : undefined;
+                const activeRegion = activeKey?.includes("::") ? activeKey.split("::")[1] as AdminRegion : null;
+
+                const expand = (key: string, loader: () => string[]) => {
+                  if (expandedSitemap === key) {
+                    setExpandedSitemap(null);
+                    return;
+                  }
+                  if (!sitemapUrlCache[key]) {
+                    setSitemapUrlCache(prev => ({ ...prev, [key]: loader() }));
+                  }
+                  setExpandedSitemap(key);
+                };
+
                 return (
                   <div key={sm.file} className={`bg-white rounded-2xl border shadow-sm transition-all overflow-hidden ${isExpanded ? "border-gold/30 shadow-md col-span-full" : "border-gray-100 hover:shadow-md"}`}>
                     <div className="h-0.5 bg-gradient-to-r from-transparent via-gold to-transparent" />
@@ -491,20 +520,11 @@ const AdminPanel = () => {
                         {sm.file !== "sitemap.xml" && (
                           <button
                             type="button"
-                            onClick={() => {
-                              if (isExpanded) {
-                                setExpandedSitemap(null);
-                              } else {
-                                if (!cachedUrls) {
-                                  setSitemapUrlCache(prev => ({ ...prev, [sm.file]: getSitemapUrls(sm.file) }));
-                                }
-                                setExpandedSitemap(sm.file);
-                              }
-                            }}
-                            className={`p-1.5 rounded-lg border transition-colors flex-shrink-0 ${isExpanded ? "bg-gold/10 border-gold/30 text-gold" : "border-gray-200 text-gray-400 hover:text-gold hover:border-gold/30"}`}
-                            title={isExpanded ? "Fechar drill-down" : "Ver URLs"}
+                            onClick={() => expand(sm.file, () => getSitemapUrls(sm.file))}
+                            className={`p-1.5 rounded-lg border transition-colors flex-shrink-0 ${expandedSitemap === sm.file ? "bg-gold/10 border-gold/30 text-gold" : "border-gray-200 text-gray-400 hover:text-gold hover:border-gold/30"}`}
+                            title={expandedSitemap === sm.file ? "Fechar drill-down" : "Ver todos os URLs"}
                           >
-                            <ChevronDown className={`w-3.5 h-3.5 transition-transform ${isExpanded ? "rotate-180" : ""}`} />
+                            <ChevronDown className={`w-3.5 h-3.5 transition-transform ${expandedSitemap === sm.file ? "rotate-180" : ""}`} />
                           </button>
                         )}
                       </div>
@@ -518,12 +538,22 @@ const AdminPanel = () => {
 
                       {sitemapRegionBreakdowns[sm.file] && (
                         <div className="grid grid-cols-2 gap-1.5 mb-4">
-                          {sitemapRegionBreakdowns[sm.file].map(rb => (
-                            <div key={rb.region} className="bg-gray-50 rounded-lg px-2 py-1.5 border border-gray-100 flex items-center justify-between">
-                              <span className="text-[10px] text-gray-500 truncate">{ADMIN_REGION_LABELS[rb.region]}</span>
-                              <span className="text-xs font-bold text-navy flex-shrink-0 ml-1">{rb.count.toLocaleString("pt-PT")}</span>
-                            </div>
-                          ))}
+                          {sitemapRegionBreakdowns[sm.file].map(rb => {
+                            const key = `${sm.file}::${rb.region}`;
+                            const active = expandedSitemap === key;
+                            return (
+                              <button
+                                key={rb.region}
+                                type="button"
+                                onClick={() => expand(key, () => getSitemapUrlsForRegion(sm.file, rb.region))}
+                                className={`rounded-lg px-2 py-1.5 border flex items-center justify-between transition-colors ${active ? "bg-gold/10 border-gold/30" : "bg-gray-50 border-gray-100 hover:border-gold/30"}`}
+                                title={`Ver URLs de ${ADMIN_REGION_LABELS[rb.region]}`}
+                              >
+                                <span className={`text-[10px] truncate ${active ? "text-gold" : "text-gray-500"}`}>{ADMIN_REGION_LABELS[rb.region]}</span>
+                                <span className={`text-xs font-bold flex-shrink-0 ml-1 ${active ? "text-gold" : "text-navy"}`}>{rb.count.toLocaleString("pt-PT")}</span>
+                              </button>
+                            );
+                          })}
                         </div>
                       )}
 
@@ -548,7 +578,7 @@ const AdminPanel = () => {
                       <div className="border-t border-gray-100 bg-gray-50/50 p-5">
                         <div className="flex items-center justify-between mb-3">
                           <p className="text-xs font-bold text-navy/60 uppercase tracking-widest">
-                            {cachedUrls.length.toLocaleString("pt-PT")} URLs geradas
+                            {cachedUrls.length.toLocaleString("pt-PT")} URLs {activeRegion ? `· ${ADMIN_REGION_LABELS[activeRegion]}` : "geradas"}
                           </p>
                           <span className="text-[10px] text-gray-400">a mostrar primeiras 100</span>
                         </div>
