@@ -1,7 +1,7 @@
 import { useEffect, useMemo } from "react";
 import { useLocation, Link } from "react-router-dom";
 import { QuizLocationProvider, QuizServiceProvider } from "@/context/QuizLocationContext";
-import { MapPin, Star, MessageCircle, ArrowRight, Search, Droplets, Sparkles, Wind } from "lucide-react";
+import { MapPin, Star, MessageCircle, ArrowRight } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import QuizButton from "@/components/QuizButton";
@@ -34,7 +34,6 @@ import {
   DEFAULT_AREA_SERVED,
 } from "@/lib/seoSchema";
 
-const STEP_ICONS = [Search, Droplets, Sparkles, Wind];
 
 const MaterialPage = () => {
   const { pathname } = useLocation();
@@ -256,16 +255,12 @@ const MaterialPage = () => {
                   <div key={colIdx} className="grid gap-px" style={{ backgroundColor: "rgba(255,255,255,0.08)" }}>
                     {colSteps.map((step, idx) => {
                       const num = offset + idx;
-                      const Icon = STEP_ICONS[num] ?? Sparkles;
                       return (
                         <div key={num} className="relative overflow-hidden flex items-start gap-4 p-5 md:p-6" style={{ backgroundColor: "#0d241b", borderTop: "2px solid rgba(212,175,55,0.55)" }}>
-                          <div className="w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0" style={{ backgroundColor: "rgba(212,175,55,0.15)", border: "1px solid rgba(212,175,55,0.35)" }}>
-                            <Icon className="w-4 h-4" style={{ color: "#D4AF37" }} />
-                          </div>
-                          <div>
-                            <p className="text-[10px] font-bold tracking-[0.24em] uppercase mb-1" style={{ color: "#D4AF37" }}>{String(num + 1).padStart(2, "0")}</p>
-                            <p className="text-sm text-white/70 leading-relaxed">{step}</p>
-                          </div>
+                          <span className="font-playfair font-bold flex-shrink-0 leading-none" style={{ fontSize: "1.5rem", color: "#D4AF37" }}>
+                            {String(num + 1).padStart(2, "0")}
+                          </span>
+                          <p className="text-sm text-white/70 leading-relaxed pt-1">{step}</p>
                         </div>
                       );
                     })}

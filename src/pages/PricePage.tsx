@@ -255,15 +255,15 @@ const PricePage = () => {
         )}
 
         {/* ═══ REDE INTERNA ═══ */}
-        <section className="py-14 md:py-20 bg-kyro-green">
+        <section className="py-14 md:py-20 bg-[#FDFDF9]">
           <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
-            <SectionHeader overline="Cobertura" heading="Explore" goldWord="mais" light={false} />
+            <SectionHeader overline="Cobertura" heading="Explore" goldWord="mais" light={true} />
             <div className="grid md:grid-cols-3 gap-x-12 gap-y-10">
               <div>
                 <p className="text-[10px] font-bold tracking-[0.26em] uppercase mb-3" style={{ color: "#D4AF37" }}>Ver página completa</p>
                 <div className="flex flex-wrap gap-2">
                   <Link to={`/${data.serviceSlug}-${data.citySlug}`}
-                    className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full text-sm font-medium text-white border border-white/15 hover:border-[#D4AF37]/40 hover:bg-white/5 transition-all">
+                    className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full text-sm font-medium text-[#111111] bg-white border border-[#E8E4DE] hover:border-[#D4AF37]/40 hover:bg-[#D4AF37]/5 transition-all">
                     <ArrowRight className="w-3 h-3" style={{ color: "#D4AF37" }} />
                     {data.serviceName} {prep} {data.cityName}
                   </Link>
@@ -275,7 +275,7 @@ const PricePage = () => {
                 <div className="flex flex-wrap gap-2">
                   {relatedServices.map(svc => (
                     <Link key={svc.slug} to={`/preco-${svc.slug}-${data.citySlug}`}
-                      className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full text-sm font-medium text-white border border-white/15 hover:border-[#D4AF37]/40 hover:bg-white/5 transition-all">
+                      className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full text-sm font-medium text-[#111111] bg-white border border-[#E8E4DE] hover:border-[#D4AF37]/40 hover:bg-[#D4AF37]/5 transition-all">
                       <ArrowRight className="w-3 h-3" style={{ color: "#D4AF37" }} />
                       {svc.name}
                     </Link>
@@ -288,7 +288,7 @@ const PricePage = () => {
                 <div className="flex flex-wrap gap-2">
                   {nearbyCities.map(city => (
                     <Link key={city.slug} to={`/preco-${data.serviceSlug}-${city.slug}`}
-                      className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full text-sm font-medium text-white border border-white/15 hover:border-[#D4AF37]/40 hover:bg-white/5 transition-all">
+                      className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full text-sm font-medium text-[#111111] bg-white border border-[#E8E4DE] hover:border-[#D4AF37]/40 hover:bg-[#D4AF37]/5 transition-all">
                       <MapPin className="w-3 h-3" style={{ color: "#D4AF37" }} />
                       {city.name}
                     </Link>
