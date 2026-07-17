@@ -139,6 +139,68 @@ const freguesiaLocalData: Record<string, FreguesiaLocalData> = {
   "portimao-centro": { landmarks: ["Praia da Rocha", "Marina de Portimão"], localTip: "Maior cidade do Algarve ocidental: atendemos residências permanentes e apartamentos de veraneio junto à praia." },
   "lagos-centro": { landmarks: ["Marina de Lagos", "Centro Histórico de Lagos"], localTip: "Cidade histórica muito procurada por turistas: higienização profissional entre estadias de alojamento local." },
   "tavira-centro": { landmarks: ["Ponte Romana de Tavira", "Ilha de Tavira"], localTip: "Centro histórico junto ao rio Gilão: cuidamos de mobiliário tradicional e estofos em casas antigas restauradas." },
+
+  // ─── Sintra ───
+  "sintra-vila": { landmarks: ["Palácio Nacional de Sintra", "Palácio da Pena", "Quinta da Regaleira"], localTip: "Serra com nevoeiro e humidade constante: os estofos em casas históricas de Sintra pedem impermeabilização mais frequente do que na maioria do país." },
+  "agualva-e-mira-sintra": { landmarks: ["Estação de Agualva-Cacém", "Parque Urbano de Mira-Sintra"], localTip: "Zona residencial bem servida por comboio: fácil agendar a visita em torno da sua rotina de deslocação a Lisboa." },
+  "algueirao-mem-martins": { landmarks: ["Mercado de Algueirão", "Parque da Amizade"], localTip: "Uma das freguesias mais populosas do concelho: atendemos apartamentos e moradias com a mesma rapidez de agendamento." },
+  "casal-de-cambra": { landmarks: ["Parque Urbano do Casal de Cambra"], localTip: "Bairro residencial compacto e arborizado: ideal para agendar a limpeza num fim de manhã tranquilo." },
+  "cacem-e-sao-marcos": { landmarks: ["Estação Ferroviária do Cacém", "Igreja de São Marcos"], localTip: "Nó ferroviário da linha de Sintra: muitos apartamentos arrendados a curto prazo que beneficiam de higienização entre inquilinos." },
+  "massama-e-monte-abraao": { landmarks: ["Centro Comercial de Massamá", "Parque Urbano de Monte Abraão"], localTip: "Zona residencial em expansão: protegemos estofos e sofás novos com impermeabilização preventiva desde o primeiro dia." },
+  "queluz-e-belas": { landmarks: ["Palácio de Queluz", "Autódromo do Estoril (proximidade)"], localTip: "Junto ao Palácio de Queluz, a humidade dos jardins históricos exige atenção redobrada aos tecidos em casas próximas." },
+  "rio-de-mouro": { landmarks: ["Parque Basílio", "Zona industrial e residencial"], localTip: "Concelho em crescimento com muitas famílias jovens: higienização regular protege crianças e animais de estimação." },
+  "sao-joao-das-lampas-e-terrugem": { landmarks: ["Praia do Magoito (proximidade)", "Zona rural do concelho"], localTip: "Perto da costa: a maresia atlântica alcança mesmo as zonas mais interiores, tornando a impermeabilização especialmente útil." },
+  "colares": { landmarks: ["Praia da Adraga", "Vinhas de Colares", "Quinta do Penedo"], localTip: "Vinhedos históricos e clima marítimo húmido: os estofos em casas de campo desta zona pedem cuidados extra contra a humidade." },
+  "almargem-do-bispo": { landmarks: ["Pedreiras de mármore de Pêro Pinheiro", "Zona rural de Montelavar"], localTip: "Zona semi-rural do concelho de Sintra: deslocamo-nos com o mesmo equipamento profissional até às moradias mais afastadas." },
+
+  // ─── Cascais ───
+  "cascais-estoril": { landmarks: ["Casino Estoril", "Boca do Inferno", "Marina de Cascais"], localTip: "A maresia da linha de Cascais é intensa: recomendamos impermeabilização de sofás e cadeiras para quem vive perto da costa." },
+  "alcabideche": { landmarks: ["Aeródromo de Cascais", "Quinta da Marinha"], localTip: "Muitas moradias de golfe e campos de golfe na zona: tratamos estofos de gama alta com produtos certificados para tecidos e peles nobres." },
+  "carcavelos-e-parede": { landmarks: ["Praia de Carcavelos", "Nova School of Business and Economics"], localTip: "Zona de praia com grande vida estudantil: higienização rápida entre inquilinos é o nosso forte em apartamentos arrendados." },
+  "sao-domingos-de-rana": { landmarks: ["Parque Urbano de Talaíde"], localTip: "Zona residencial no interior do concelho de Cascais: cobrimos toda a área com a mesma rapidez de resposta." },
+
+  // ─── Oeiras ───
+  "oeiras-e-sao-juliao-da-barra": { landmarks: ["Forte de São Julião da Barra", "Marina de Oeiras", "Praia de Oeiras"], localTip: "Junto à foz do Tejo: a humidade marítima constante torna a impermeabilização de sofás e tapetes especialmente recomendada." },
+  "alges-linda-a-velha": { landmarks: ["Jardim Municipal de Algés", "Doca de Algés"], localTip: "Zona residencial densa junto ao rio: atendemos apartamentos e escritórios com agendamento flexível." },
+  "carnaxide-e-queijas": { landmarks: ["Centro Colombo (proximidade)", "Zona empresarial de Carnaxide"], localTip: "Muitos escritórios e sedes de empresas: limpamos cadeiras e sofás de receção fora do horário de expediente." },
+  "barcarena": { landmarks: ["Parque dos Poetas"], localTip: "Zona residencial arborizada: ideal para agendar a limpeza com tranquilidade, sem pressa." },
+  "porto-salvo": { landmarks: ["Tagus Park (polo tecnológico)"], localTip: "Polo de escritórios e empresas de tecnologia: atendemos espaços comerciais com rapidez para não interromper a atividade." },
+
+  // ─── Amadora ───
+  "aguas-livres": { landmarks: ["Aqueduto das Águas Livres (proximidade)"], localTip: "Zona residencial próxima do aqueduto histórico: atendemos apartamentos com a mesma pontualidade em toda a Amadora." },
+  "alfragide": { landmarks: ["IKEA Alfragide", "Dolce Vita Tejo"], localTip: "Grande zona comercial: muitos clientes aproveitam para mobilar a casa e pedem impermeabilização preventiva em estofos novos." },
+  "encosta-do-sol": { landmarks: ["Zona residencial da Amadora"], localTip: "Bairro residencial consolidado: higienização regular é a escolha mais comum das famílias desta zona." },
+  "falagueira-venda-nova": { landmarks: ["Estádio José Gomes"], localTip: "Zona urbana densa e bem servida por transportes: fácil coordenar a visita com a sua rotina diária." },
+  "mina-de-agua": { landmarks: ["Zona residencial da Mina de Água"], localTip: "Bairro residencial tranquilo: atendemos com a mesma rapidez e sem custos de deslocação adicionais." },
+  "venteira": { landmarks: ["Câmara Municipal da Amadora"], localTip: "Centro administrativo do concelho: atendemos residências e pequenos escritórios na mesma visita, se necessário." },
+
+  // ─── Almada ───
+  "almada-cova-da-piedade": { landmarks: ["Cristo Rei", "Elevador Panorâmico de Almada"], localTip: "Vista sobre o Tejo e Lisboa: a humidade do rio torna a impermeabilização de sofás e tapetes especialmente útil nesta zona." },
+  "caparica-e-trafaria": { landmarks: ["Forte da Trafaria", "Ferry para Belém"], localTip: "Zona costeira com ligação fluvial a Lisboa: atendemos residências permanentes e de férias com a mesma atenção." },
+  "costa-da-caparica": { landmarks: ["Praia da Costa da Caparica", "Passadiços da Fonte da Telha"], localTip: "Uma das praias mais procuradas do país: a maresia intensa exige limpeza e impermeabilização mais frequentes em estofos perto da costa." },
+  "charneca-de-caparica": { landmarks: ["Pinhal do Rei"], localTip: "Zona residencial junto ao pinhal: o pólen e a areia da proximidade da praia acumulam-se em tapetes e estofos, pedindo limpeza regular." },
+  "laranjeiro-e-feijo": { landmarks: ["Zona residencial consolidada de Almada"], localTip: "Bairro familiar bem servido por transportes para Lisboa: agendamos com flexibilidade ao fim do dia." },
+
+  // ─── Loures ───
+  "loures-centro": { landmarks: ["Jardim do Rossio de Loures", "Convento da Graça"], localTip: "Centro histórico do concelho: atendemos moradias tradicionais e apartamentos novos com o mesmo rigor." },
+  "sacavem-e-prior-velho": { landmarks: ["Parque Urbano de Sacavém", "Antiga Fábrica de Faianças"], localTip: "Zona em forte renovação urbana: muitos apartamentos novos que beneficiam de impermeabilização preventiva desde o início." },
+  "santa-iria-de-azoia": { landmarks: ["Zona industrial e ribeirinha do Tejo"], localTip: "Concelho com forte presença industrial e residencial: atendemos escritórios e residências na mesma zona sem custo extra." },
+  "camarate-unhos-apelacao": { landmarks: ["Proximidade do Aeroporto de Lisboa"], localTip: "Perto do aeroporto: limpamos também estofos de alojamento local e apartamentos de curta duração." },
+  "santo-antonio-dos-cavaleiros": { landmarks: ["Zona residencial planeada"], localTip: "Bairro residencial bem planeado: ideal para agendar a limpeza com antecedência e sem imprevistos." },
+  "bucelas": { landmarks: ["Vinhas e adegas de Bucelas"], localTip: "Vila vinhateira histórica: cuidamos de mobiliário tradicional em casas de campo e quintas da região." },
+  "fanhoes": { landmarks: ["Zona rural do concelho de Loures"], localTip: "Freguesia rural e tranquila: garantimos cobertura total mesmo nas zonas mais afastadas do centro de Loures." },
+  "lousa-loures": { landmarks: ["Zona rural a norte de Loures"], localTip: "Uma das freguesias mais interiores do concelho: a nossa equipa desloca-se sem custo extra de deslocação dentro da zona." },
+  "moscavide-e-portela": { landmarks: ["Parque das Nações (proximidade)", "Estação de Moscavide"], localTip: "Mesmo junto ao Parque das Nações: atendemos apartamentos modernos com a mesma atenção a tecidos e estofos de gama alta." },
+
+  // ─── Algarve: Loulé, Albufeira, Portimão, Lagos (top cities) ───
+  "alte-e-salir": { landmarks: ["Aldeia de Alte (uma das mais bonitas de Portugal)", "Serra do Caldeirão"], localTip: "Zona serrana no interior de Loulé: deslocamo-nos com o mesmo equipamento profissional até às aldeias mais afastadas do litoral." },
+  "ferreiras": { landmarks: ["Zona residencial e comercial de Albufeira"], localTip: "Bairro em crescimento no interior de Albufeira: muitas moradias novas que beneficiam de impermeabilização preventiva." },
+  "paderne": { landmarks: ["Castelo de Paderne"], localTip: "Zona rural com património histórico: atendemos moradias tradicionais e quintas na mesma área de Albufeira." },
+  "alvor": { landmarks: ["Praia de Alvor", "Ria de Alvor"], localTip: "Vila piscatória muito procurada por turistas: higienização rápida entre estadias de alojamento local junto à ria." },
+  "mexilhoeira-grande": { landmarks: ["Zona rural entre Portimão e Lagos"], localTip: "Freguesia mais interior do concelho de Portimão: cobrimos toda a área sem custo extra de deslocação." },
+  "luz-lagos": { landmarks: ["Praia da Luz"], localTip: "Vila costeira muito procurada por residentes estrangeiros: tratamos estofos e tapetes de moradias de férias com o mesmo rigor profissional." },
+  "odiaxere": { landmarks: ["Barragem de Odiáxere"], localTip: "Zona mais interior do concelho de Lagos, junto à barragem: atendemos moradias rurais com a mesma pontualidade." },
+  "bensafrim": { landmarks: ["Zona rural serrana de Lagos"], localTip: "Freguesia rural no interior de Lagos: a nossa equipa chega com o mesmo equipamento profissional até às casas mais isoladas." },
 };
 
 function getDefaultLocalData(freguesia: string, municipio: string): FreguesiaLocalData {
