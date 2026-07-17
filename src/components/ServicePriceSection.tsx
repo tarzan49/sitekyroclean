@@ -56,7 +56,7 @@ function DiscountBar({ total }: { total: number }) {
   const pct = Math.min(100, (total / WIDGET_DISCOUNT_THRESHOLD) * 100);
   const remaining = Math.ceil(WIDGET_DISCOUNT_THRESHOLD - total);
   return (
-    <div className="px-5 py-3 border-t" style={{ borderColor: "rgba(17,17,17,0.07)" }}>
+    <div className="px-4 py-2.5 sm:px-5 sm:py-3 border-t" style={{ borderColor: "rgba(17,17,17,0.07)" }}>
       {reached ? (
         <div className="flex items-center justify-between">
           <span className="text-xs font-semibold" style={{ color: "#D4AF37" }}>10% de desconto ativo</span>
@@ -202,25 +202,20 @@ export default function ServicePriceSection({ serviceSlug, initialLocation }: Pr
           <div className="overflow-hidden" style={{ boxShadow: "0 12px 50px rgba(7,26,18,0.16), 0 2px 8px rgba(7,26,18,0.08)" }}>
 
             {/* Header escuro */}
-            <div className="px-6 py-6" style={{ background: "#071a12" }}>
-              <div className="flex items-start justify-between mb-3">
+            <div className="px-5 py-4 sm:px-6 sm:py-6" style={{ background: "#071a12" }}>
+              <div className="flex items-start justify-between mb-2 sm:mb-3">
                 <div className="flex items-center gap-2">
                   <span className="w-2 h-2 rounded-full" style={{ background: "#25D366" }} />
                   <p className="text-[9px] font-bold tracking-[0.28em] uppercase" style={{ color: "rgba(255,255,255,0.40)" }}>Orçamento Gratuito</p>
                 </div>
                 <span className="text-[10px] font-semibold px-2 py-0.5" style={{ background: "rgba(212,175,55,0.12)", color: "#D4AF37" }}>Sem compromisso</span>
               </div>
-              <h3 className="font-playfair text-xl font-bold text-white leading-snug mb-1">
+              <h3 className="font-playfair text-lg sm:text-xl font-bold text-white leading-snug mb-1">
                 Calcule o seu preço agora
               </h3>
               <p className="text-xs" style={{ color: "rgba(255,255,255,0.38)" }}>
                 Resposta em menos de 30 min · Deslocação ao domicílio
               </p>
-              <div className="mt-3 pt-3" style={{ borderTop: "1px solid rgba(255,255,255,0.07)" }}>
-                <p className="text-[10px]" style={{ color: "rgba(255,255,255,0.26)" }}>
-                  Porto 0€ · Grande Porto +5-10€ · Braga/Aveiro +20€ · Lisboa +35€
-                </p>
-              </div>
             </div>
 
             {/* Linhas */}
@@ -233,7 +228,7 @@ export default function ServicePriceSection({ serviceSlug, initialLocation }: Pr
                   return (
                     <div
                       key={i}
-                      className="flex items-center gap-4 px-5 py-4 border-b transition-all duration-200"
+                      className="flex items-center gap-3 sm:gap-4 px-4 py-3 sm:px-5 sm:py-4 border-b transition-all duration-200"
                       style={{
                         borderBottomColor: "rgba(17,17,17,0.06)",
                         borderLeft: active ? "3px solid #D4AF37" : "3px solid transparent",
@@ -246,27 +241,27 @@ export default function ServicePriceSection({ serviceSlug, initialLocation }: Pr
                           type="button"
                           onClick={() => setChaiseLongueAddon(v => Math.max(0, v - 1))}
                           aria-label="Remover"
-                          className="w-10 h-10 flex items-center justify-center transition-all active:scale-95"
+                          className="w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center transition-all active:scale-95"
                           style={{ background: "#071a12", color: "white", opacity: active ? 1 : 0, pointerEvents: active ? 'auto' : 'none' }}
                         >
                           <Minus className="w-4 h-4" />
                         </button>
                         <span
-                          className="w-8 text-center font-playfair text-xl font-bold tabular-nums"
+                          className="w-7 sm:w-8 text-center font-playfair text-lg sm:text-xl font-bold tabular-nums"
                           style={{ color: active ? "#D4AF37" : "rgba(17,17,17,0.20)" }}
                         >{chaiseLongueAddon}</span>
                         <button
                           type="button"
                           onClick={() => setChaiseLongueAddon(v => v + 1)}
                           aria-label="Adicionar"
-                          className="w-10 h-10 flex items-center justify-center transition-all active:scale-95"
+                          className="w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center transition-all active:scale-95"
                           style={{ background: "#071a12", color: "white" }}
                         >
                           <Plus className="w-4 h-4" />
                         </button>
                       </div>
                       <span className="flex-1 text-sm font-medium" style={{ color: active ? "#111111" : "rgba(17,17,17,0.55)" }}>{row.item}</span>
-                      <span className="font-playfair text-xl font-bold tabular-nums flex-shrink-0" style={{ color: active ? "#D4AF37" : "rgba(17,17,17,0.25)" }}>{row.price}</span>
+                      <span className="font-playfair text-lg sm:text-xl font-bold tabular-nums flex-shrink-0" style={{ color: active ? "#D4AF37" : "rgba(17,17,17,0.25)" }}>{row.price}</span>
                     </div>
                   );
                 }
@@ -328,7 +323,7 @@ export default function ServicePriceSection({ serviceSlug, initialLocation }: Pr
                 return (
                   <div
                     key={i}
-                    className="flex items-center gap-4 px-5 py-4 border-b transition-all duration-200"
+                    className="flex items-center gap-3 sm:gap-4 px-4 py-3 sm:px-5 sm:py-4 border-b transition-all duration-200"
                     style={{
                       borderBottomColor: "rgba(17,17,17,0.06)",
                       borderLeft: active ? "3px solid #D4AF37" : "3px solid transparent",
@@ -342,20 +337,20 @@ export default function ServicePriceSection({ serviceSlug, initialLocation }: Pr
                         onClick={() => adjustQty(i, -1)}
                         disabled={qty === 0}
                         aria-label="Diminuir"
-                        className="w-10 h-10 flex items-center justify-center transition-all active:scale-95 disabled:opacity-25"
+                        className="w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center transition-all active:scale-95 disabled:opacity-25"
                         style={{ background: active ? "#071a12" : "#f0f0eb", color: active ? "white" : "rgba(17,17,17,0.40)" }}
                       >
                         <Minus className="w-4 h-4" />
                       </button>
                       <span
-                        className="w-8 text-center font-playfair text-xl font-bold tabular-nums"
+                        className="w-7 sm:w-8 text-center font-playfair text-lg sm:text-xl font-bold tabular-nums"
                         style={{ color: active ? "#D4AF37" : "rgba(17,17,17,0.20)" }}
                       >{qty}</span>
                       <button
                         type="button"
                         onClick={() => adjustQty(i, 1)}
                         aria-label="Aumentar"
-                        className="w-10 h-10 flex items-center justify-center transition-all active:scale-95"
+                        className="w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center transition-all active:scale-95"
                         style={{ background: "#071a12", color: "white" }}
                       >
                         <Plus className="w-4 h-4" />
@@ -367,7 +362,7 @@ export default function ServicePriceSection({ serviceSlug, initialLocation }: Pr
                     </span>
 
                     {dynamicPrice !== null && (
-                      <span className="font-playfair text-xl font-bold tabular-nums flex-shrink-0 transition-colors" style={{ color: active ? "#D4AF37" : "rgba(17,17,17,0.25)" }}>
+                      <span className="font-playfair text-lg sm:text-xl font-bold tabular-nums flex-shrink-0 transition-colors" style={{ color: active ? "#D4AF37" : "rgba(17,17,17,0.25)" }}>
                         {dynamicPrice}
                       </span>
                     )}
@@ -380,12 +375,12 @@ export default function ServicePriceSection({ serviceSlug, initialLocation }: Pr
             <DiscountBar total={total} />
 
             {/* Total + CTA */}
-            <div className="bg-white px-5 pb-5 space-y-3">
+            <div className="bg-white px-4 pb-4 sm:px-5 sm:pb-5 space-y-2.5 sm:space-y-3">
 
               {/* Total block */}
               {hasSelection && total > 0 && (
                 <div
-                  className="flex items-center justify-between px-5 py-4"
+                  className="flex items-center justify-between px-4 py-3 sm:px-5 sm:py-4"
                   style={{ background: "#071a12" }}
                 >
                   <div>
@@ -397,8 +392,8 @@ export default function ServicePriceSection({ serviceSlug, initialLocation }: Pr
                     )}
                   </div>
                   <span
-                    className="font-playfair font-bold tabular-nums"
-                    style={{ fontSize: "2rem", lineHeight: 1, color: "#D4AF37" }}
+                    className="font-playfair font-bold tabular-nums text-[1.65rem] sm:text-[2rem]"
+                    style={{ lineHeight: 1, color: "#D4AF37" }}
                   >
                     {discountActive ? discountedTotal : total}€
                   </span>
@@ -410,7 +405,7 @@ export default function ServicePriceSection({ serviceSlug, initialLocation }: Pr
                 type="button"
                 onClick={handleContinue}
                 className={cn(
-                  "w-full h-14 flex items-center justify-center gap-3 font-bold text-[13px] tracking-[0.18em] uppercase transition-all active:scale-[0.98]",
+                  "w-full h-12 sm:h-14 flex items-center justify-center gap-3 font-bold text-[13px] tracking-[0.18em] uppercase transition-all active:scale-[0.98]",
                   !hasSelection && "opacity-60"
                 )}
                 style={{
