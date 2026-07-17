@@ -107,28 +107,25 @@ const Hero = () => {
             </h1>
 
             {/* Stats + Services row */}
-            <div className="flex flex-col md:flex-row md:items-baseline md:gap-x-3 gap-y-2 mb-5">
+            <div className="flex flex-wrap items-center gap-x-5 gap-y-2.5 mb-6">
               {/* Main stat */}
-              <div className="flex items-baseline gap-1 flex-shrink-0">
+              <div className="flex items-baseline gap-1.5 flex-shrink-0">
                 <span
-                  className="text-base md:text-lg font-bold text-gold"
+                  className="font-playfair text-xl md:text-2xl font-bold text-gold leading-none"
                   style={{ textShadow: '0 1px 8px rgba(0,0,0,0.5)' }}
                 >
                   {STATS[0].value}
                 </span>
-                <span className="text-[11px] md:text-xs text-white/65 font-medium">{STATS[0].label}</span>
+                <span className="text-[10px] md:text-[11px] text-white/60 font-medium tracking-[0.08em] uppercase">{STATS[0].label}</span>
               </div>
               {/* Separator — desktop only */}
-              <span className="hidden md:block text-white/20 text-xs">·</span>
-              {/* Services — forced single line */}
-              <div className="flex items-center flex-nowrap gap-x-2">
+              <span className="hidden md:block w-px h-4 bg-white/15 flex-shrink-0" />
+              {/* Services */}
+              <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5">
                 {SERVICES.map((s, i) => (
-                  <div key={i} className="flex items-baseline gap-[3px] flex-shrink-0">
-                    <span className="text-[10px] font-bold" style={{ color: '#D4AF37' }}>{s.value}</span>
-                    <span className="text-[9px]" style={{ color: 'rgba(255,255,255,0.40)' }}>{s.label}</span>
-                    {i < SERVICES.length - 1 && (
-                      <span className="text-white/18 text-[9px] ml-1">·</span>
-                    )}
+                  <div key={i} className="flex items-baseline gap-1 flex-shrink-0">
+                    <span className="text-xs font-bold leading-none" style={{ color: '#D4AF37' }}>{s.value}</span>
+                    <span className="text-[10px] tracking-[0.04em]" style={{ color: 'rgba(255,255,255,0.45)' }}>{s.label}</span>
                   </div>
                 ))}
               </div>
