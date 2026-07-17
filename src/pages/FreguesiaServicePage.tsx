@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useLocation, Link } from "react-router-dom";
-import { MapPin, Star, CheckCircle, MessageCircle, ArrowRight, Minus, Plus } from "lucide-react";
+import { MapPin, Star, CheckCircle, MessageCircle, ArrowRight, Minus, Plus, Euro, Clock } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import QuizButton from "@/components/QuizButton";
@@ -9,6 +9,7 @@ import SectionHeader from "@/components/SectionHeader";
 import ServiceLocationSchema from "@/components/ServiceLocationSchema";
 import ServiceFAQ from "@/components/ServiceFAQ";
 import ServicePackBanner from "@/components/ServicePackBanner";
+import ServiceSnapshotStats from "@/components/ServiceSnapshotStats";
 import TrustRatingBadge from "@/components/TrustRatingBadge";
 import { useQuizLauncher } from "@/hooks/use-quiz-launcher";
 import { services } from "@/data/locationSeoData";
@@ -158,10 +159,10 @@ const FreguesiaServicePage = () => {
     : data.service.toLowerCase();
 
   const snapshotStats = [
-    { value: "5.0 ★", label: "Avaliação Google" },
-    { value: data.priceFrom, label: `Desde, em ${data.name}` },
-    { value: nearbyFreguesias.length > 0 ? `${nearbyFreguesias.length}+` : "100%", label: nearbyFreguesias.length > 0 ? "Zonas próximas" : "Cobertura local" },
-    { value: "30min", label: "Tempo de resposta" },
+    { value: "5.0 ★", label: "Avaliação Google", icon: Star },
+    { value: data.priceFrom, label: `Desde, em ${data.name}`, icon: Euro },
+    { value: nearbyFreguesias.length > 0 ? `${nearbyFreguesias.length}+` : "100%", label: nearbyFreguesias.length > 0 ? "Zonas próximas" : "Cobertura local", icon: MapPin },
+    { value: "30min", label: "Tempo de resposta", icon: Clock },
   ];
 
   const problemImages = PROBLEM_IMAGES[data.serviceSlug] ?? [];
@@ -289,18 +290,7 @@ const FreguesiaServicePage = () => {
         </section>
 
         {/* ═══ LOCAL SNAPSHOT ═══ */}
-        <section style={{ backgroundColor: "#071a12" }}>
-          <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
-            <div className="grid grid-cols-2 md:grid-cols-4 divide-x divide-white/10">
-              {snapshotStats.map((s, i) => (
-                <div key={i} className="py-6 md:py-8 px-2 text-center">
-                  <p className="font-playfair font-bold text-2xl md:text-3xl leading-none mb-2" style={{ color: "#D4AF37" }}>{s.value}</p>
-                  <p className="text-[9px] font-medium text-white/40 tracking-[0.24em] uppercase">{s.label}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
+        <ServiceSnapshotStats stats={snapshotStats} />
 
         {/* ═══ TABELA DE PREÇOS ═══ */}
         {PRICE_TABLE[data.serviceSlug] && (

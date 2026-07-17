@@ -6,7 +6,7 @@
 import { useEffect, useMemo } from "react";
 import { useLocation, Link } from "react-router-dom";
 import { QuizLocationProvider, QuizServiceProvider } from "@/context/QuizLocationContext";
-import { CheckCircle, Star, MapPin, MessageCircle, Phone } from "lucide-react";
+import { CheckCircle, Star, MapPin, MessageCircle, Phone, Euro, Clock } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import QuizButton from "@/components/QuizButton";
@@ -15,6 +15,7 @@ import { trackCallClick } from "@/lib/analytics";
 import ServiceFAQ from "@/components/ServiceFAQ";
 import ServicePackBanner from "@/components/ServicePackBanner";
 import ServicePriceSection from "@/components/ServicePriceSection";
+import ServiceSnapshotStats from "@/components/ServiceSnapshotStats";
 import { SERVICEKEY_TO_QUIZ } from "@/constants/serviceToQuiz";
 import {
   getKeywordVariantData,
@@ -239,6 +240,36 @@ const SofaVariantPage = () => {
   const problemImgs = PROBLEM_IMAGES[`${data.variantKey}-${data.serviceKey}`];
   const problemLabels = VARIANT_PROBLEM_LABELS[data.variantKey];
 
+  // Zonas cobertas/próximas: cidade → nº de freguesias desse concelho; freguesia → nº de freguesias vizinhas
+  let zonesValue = "100%";
+  let zonesLabel = `Cobertura ${prep} ${data.locationName}`;
+  const cityMatch = cities.find(c => c.slug === parsed.locationPart);
+  if (cityMatch) {
+    const mun = municipiosComFreguesias.find(m => m.slug === cityMatch.slug);
+    if (mun && mun.freguesias.length > 0) {
+      zonesValue = `${mun.freguesias.length}+`;
+      zonesLabel = "Zonas cobertas";
+    }
+  } else {
+    for (const mun of municipiosComFreguesias) {
+      if (parsed.locationPart.startsWith(`${mun.slug}-`)) {
+        const freg = mun.freguesias.find(f => f.slug === parsed.locationPart.slice(mun.slug.length + 1));
+        if (freg && freg.nearby.length > 0) {
+          zonesValue = `${freg.nearby.length}+`;
+          zonesLabel = "Zonas próximas";
+        }
+        break;
+      }
+    }
+  }
+
+  const snapshotStats = [
+    { value: "5.0 ★", label: "Avaliação Google", icon: Star },
+    { value: data.priceFrom, label: `Desde, ${prep} ${data.locationName.split(',')[0].trim()}`, icon: Euro },
+    { value: zonesValue, label: zonesLabel, icon: MapPin },
+    { value: "30min", label: "Tempo de resposta", icon: Clock },
+  ];
+
   return (
     <QuizLocationProvider value={data.locationName}>
     <QuizServiceProvider value={quizService}>
@@ -247,7 +278,7 @@ const SofaVariantPage = () => {
       <main>
 
         {/* ═══ HERO ═══ */}
-        <section className="relative pt-24 md:pt-28 pb-24 md:pb-40 overflow-hidden min-h-[75vh] md:min-h-[85vh]">
+        <section className="relative pt-24 md:pt-28 pb-16 md:pb-24 overflow-hidden">
           <div className="absolute inset-0" style={{ background: "#071a12" }} />
           <div className="absolute inset-0 overflow-hidden" aria-hidden="true">
             <img src={heroImg} alt={data.h1} className="w-full h-full object-cover" loading="eager" />
@@ -265,79 +296,76 @@ const SofaVariantPage = () => {
                   <span className="text-white/70">{variantLabel}</span>
                 </nav>
 
-                <div className="flex items-center gap-2 mb-4">
-                  <MapPin className="w-4 h-4" style={{ color: "#D4AF37" }} />
-                  <span className="text-[10px] font-bold tracking-[0.28em] uppercase" style={{ color: "#D4AF37" }}>{data.locationName}</span>
+                <div className="inline-flex items-start mb-5">
+                  <div className="flex flex-col gap-1">
+                    <div className="w-7 h-px bg-gradient-to-r from-gold to-transparent" />
+                    <span
+                      className="text-[10px] font-bold text-gold/90 tracking-[0.30em] uppercase"
+                      style={{ textShadow: "0 1px 6px rgba(0,0,0,0.6)" }}
+                    >
+                      {variantLabel} · {data.locationName}
+                    </span>
+                  </div>
                 </div>
 
-                <h1 className="font-playfair text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4 leading-[1.15]">
+                <h1
+                  className="font-playfair text-[1.75rem] sm:text-4xl md:text-5xl lg:text-6xl font-semibold text-white mb-4 leading-[1.12]"
+                  style={{ textShadow: "0 2px 16px rgba(0,0,0,0.65)" }}
+                >
                   {data.h1}
                 </h1>
 
-                <p className="text-base md:text-lg text-white/70 leading-relaxed mb-6 max-w-lg">
+                <p className="text-sm sm:text-base md:text-lg text-white/70 leading-relaxed mb-6 max-w-lg">
                   {data.intro.split('.')[0]}.
                 </p>
 
-                {/* CTAs — igual ao hero da homepage */}
-                <div className="flex flex-col gap-2.5 w-full max-w-sm">
+                <div className="mb-6">
+                  <TrustRatingBadge variant="mapsLink" />
+                </div>
 
-                  {/* Gold */}
-                  <div className="relative group">
-                    <div className="absolute -inset-1.5 rounded-full bg-gradient-to-r from-[#C9A84C]/50 to-[#E8D070]/40 opacity-30 blur-lg group-hover:opacity-55 transition-opacity duration-400 pointer-events-none" />
-                    <QuizButton
-                      className="relative w-full"
-                      buttonClassName="h-[58px] md:h-[52px] !py-0 w-full"
-                      ctaLabel="Calcular o meu preço"
-                      initialLocation={data.locationName}
-                      initialService={quizService}
-                    />
-                  </div>
-
-                  {/* WhatsApp */}
-                  <div className="relative group">
-                    <div className="absolute -inset-1.5 rounded-full bg-[#25D366]/40 opacity-30 blur-lg group-hover:opacity-55 transition-opacity duration-400 pointer-events-none" />
+                <div className="flex flex-col sm:flex-row gap-3 max-w-md">
+                  <QuizButton
+                    className="flex-1"
+                    buttonClassName="h-[58px] md:h-[52px] !py-0 w-full"
+                    ctaLabel="Calcular o meu preço"
+                    initialLocation={data.locationName}
+                    initialService={quizService}
+                  />
+                  <div className="relative group flex-1">
+                    <div className="absolute -inset-1.5 bg-[#25D366]/40 opacity-30 blur-lg group-hover:opacity-55 transition-opacity duration-400 pointer-events-none" />
                     <a
                       href={`${WHATSAPP_BASE}?text=${encodeURIComponent(buildVariantWaMessage(data.variantKey === 'impermeabilizacao', SERVICE_LABEL[data.serviceKey], VARIANT_LABEL[data.variantKey], data.locationName))}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       onClick={() => trackWhatsAppClick(`variant_hero_${parsed.variantKey}_${parsed.serviceKey}`)}
-                      className={[
-                        'relative flex items-center justify-center gap-2 w-full font-bold text-white touch-manipulation',
-                        'h-[58px] md:h-[52px] px-8',
-                        'bg-gradient-to-r from-[#1DA851] via-[#25D366] to-[#1DA851]',
-                        'shadow-[0_6px_22px_rgba(37,211,102,0.42),0_2px_6px_rgba(0,0,0,0.28),inset_0_1px_0_rgba(255,255,255,0.20),inset_0_-2px_0_rgba(0,0,0,0.12)]',
-                        'hover:shadow-[0_10px_32px_rgba(37,211,102,0.60),0_4px_10px_rgba(0,0,0,0.32)]',
-                        'hover:scale-[1.025] active:scale-[0.95] transition-all duration-150',
-                      ].join(' ')}
+                      className="relative flex items-center justify-center gap-2 w-full h-[58px] md:h-[52px] px-6 font-bold text-white touch-manipulation bg-gradient-to-r from-[#1DA851] via-[#25D366] to-[#1DA851] shadow-[0_6px_22px_rgba(37,211,102,0.42),0_2px_6px_rgba(0,0,0,0.28),inset_0_1px_0_rgba(255,255,255,0.20),inset_0_-2px_0_rgba(0,0,0,0.12)] hover:shadow-[0_10px_32px_rgba(37,211,102,0.60),0_4px_10px_rgba(0,0,0,0.32)] hover:scale-[1.025] active:scale-[0.95] transition-all duration-150"
                     >
-                      <MessageCircle className="w-[18px] h-[18px] text-white flex-shrink-0" strokeWidth={2} />
+                      <MessageCircle className="w-[18px] h-[18px] flex-shrink-0" strokeWidth={2} />
                       <span className="text-[13px] font-semibold tracking-[0.18em] uppercase">Falar por WhatsApp</span>
                     </a>
                   </div>
-
-                  <div className="flex justify-center pt-1">
-                    <TrustRatingBadge variant="mapsLink" />
-                  </div>
-
-                  <a
-                    href={`tel:${PHONE_TEL}`}
-                    onClick={() => trackCallClick('variant_hero_mobile')}
-                    className="md:hidden flex justify-center items-center gap-1.5 text-white/45 text-xs mt-3 hover:text-white/70 transition-colors"
-                  >
-                    <Phone className="w-3 h-3 flex-shrink-0" strokeWidth={2} />
-                    Prefere ligar? {PHONE_DISPLAY}
-                  </a>
-
                 </div>
+
+                <a
+                  href={`tel:${PHONE_TEL}`}
+                  onClick={() => trackCallClick('variant_hero_mobile')}
+                  className="md:hidden flex items-center gap-1.5 text-white/45 text-xs mt-4 hover:text-white/70 transition-colors"
+                >
+                  <Phone className="w-3 h-3 flex-shrink-0" strokeWidth={2} />
+                  Prefere ligar? {PHONE_DISPLAY}
+                </a>
+
+                <p className="text-white/40 text-xs mt-4">Desde {data.priceFrom} · Orçamento gratuito · Sem compromisso</p>
               </div>
 
               <div className="hidden lg:block">
                 <div className="relative">
-                  <div className="absolute -inset-4 rounded-3xl blur-2xl opacity-20" style={{ background: "linear-gradient(135deg, #D4AF37, transparent)" }} />
+                  <div className="absolute -inset-4 blur-2xl opacity-20" style={{ background: "linear-gradient(135deg, #D4AF37, transparent)" }} />
                   <img
                     src={heroImg}
                     alt={`${variantLabel} profissional ${prep} ${data.locationName}`}
-                    className="relative rounded-2xl w-full max-h-[400px] object-cover shadow-2xl"
+                    className="relative w-full max-h-[440px] object-cover shadow-2xl"
+                    style={{ borderTop: "2px solid #D4AF37" }}
                     loading="eager"
                   />
                 </div>
@@ -345,6 +373,9 @@ const SofaVariantPage = () => {
             </div>
           </div>
         </section>
+
+        {/* ═══ LOCAL SNAPSHOT ═══ */}
+        <ServiceSnapshotStats stats={snapshotStats} />
 
         {/* ═══ TABELA DE PREÇOS ═══ */}
         <ServicePriceSection

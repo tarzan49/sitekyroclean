@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useLocation, Link } from "react-router-dom";
-import { MapPin, Star, CheckCircle, MessageCircle, ArrowRight, Minus, Plus } from "lucide-react";
+import { MapPin, Star, CheckCircle, MessageCircle, ArrowRight, Minus, Plus, Euro, Clock } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import QuizButton from "@/components/QuizButton";
@@ -10,6 +10,7 @@ import { trackWhatsAppClick } from "@/lib/quizTracking";
 import ServiceLocationSchema from "@/components/ServiceLocationSchema";
 import ServiceFAQ from "@/components/ServiceFAQ";
 import ServicePackBanner from "@/components/ServicePackBanner";
+import ServiceSnapshotStats from "@/components/ServiceSnapshotStats";
 import { getLocationServiceData, services, cities, getCityLinksForService } from "@/data/locationSeoData";
 import { QuizLocationProvider, QuizServiceProvider } from "@/context/QuizLocationContext";
 import { municipiosComFreguesias } from "@/data/freguesiaSeoData";
@@ -167,12 +168,12 @@ const LocationServicePage = () => {
 
   const freguesiaCount = cityFreguesias?.freguesias.length ?? 0;
   const snapshotStats = [
-    { value: "5.0 ★", label: "Avaliação Google" },
-    { value: data.priceFrom, label: `Desde, ${cityPrep} ${data.city}` },
+    { value: "5.0 ★", label: "Avaliação Google", icon: Star },
+    { value: data.priceFrom, label: `Desde, ${cityPrep} ${data.city}`, icon: Euro },
     freguesiaCount > 0
-      ? { value: `${freguesiaCount}+`, label: "Zonas cobertas" }
-      : { value: "100%", label: `Cobertura ${cityPrep} ${data.city}` },
-    { value: "30min", label: "Tempo de resposta" },
+      ? { value: `${freguesiaCount}+`, label: "Zonas cobertas", icon: MapPin }
+      : { value: "100%", label: `Cobertura ${cityPrep} ${data.city}`, icon: MapPin },
+    { value: "30min", label: "Tempo de resposta", icon: Clock },
   ];
 
   const processSteps = data.serviceSlug === 'impermeabilizacao' ? IMPERMEABILIZACAO_STEPS : GENERIC_PROCESS_STEPS;
@@ -300,18 +301,7 @@ const LocationServicePage = () => {
         </section>
 
         {/* ═══ LOCAL SNAPSHOT ═══ */}
-        <section style={{ backgroundColor: "#071a12" }}>
-          <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
-            <div className="grid grid-cols-2 md:grid-cols-4 divide-x divide-white/10">
-              {snapshotStats.map((s, i) => (
-                <div key={i} className="py-6 md:py-8 px-2 text-center">
-                  <p className="font-playfair font-bold text-2xl md:text-3xl leading-none mb-2" style={{ color: "#D4AF37" }}>{s.value}</p>
-                  <p className="text-[9px] font-medium text-white/40 tracking-[0.24em] uppercase">{s.label}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
+        <ServiceSnapshotStats stats={snapshotStats} />
 
         {/* ═══ TABELA DE PREÇOS ═══ */}
         {PRICE_TABLE[data.serviceSlug] && (
