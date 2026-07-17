@@ -31,7 +31,7 @@ const ADMIN_PASSWORD = (import.meta.env.VITE_ADMIN_PASSWORD as string) || 'kyro2
 
 // ── Sitemap config (mirrors scripts/generate-sitemap.ts output — 10 real sub-sitemaps) ──
 const SITEMAPS = [
-  { name: "Sitemap Index", file: "sitemap-index.xml", description: "Índice principal (10 sub-sitemaps)", icon: Globe },
+  { name: "Sitemap Index", file: "sitemap.xml", description: "Índice principal (10 sub-sitemaps)", icon: Globe },
   { name: "Core (Serviços + Páginas principais)", file: "sitemap-core.xml", description: "6 serviços + páginas institucionais", icon: Zap },
   { name: "Localidade × Serviço", file: "sitemap-location.xml", description: "Concelhos × 6 serviços — Porto/Norte, Lisboa/AML, Algarve", icon: Map },
   { name: "Freguesia × Serviço", file: "sitemap-freguesia.xml", description: "Freguesias × 6 serviços — Porto/Norte, Lisboa/AML, Algarve", icon: Map },
@@ -167,7 +167,7 @@ const AdminPanel = () => {
   const sitemapCounts = useMemo(() => {
     const counts: Record<string, number> = {};
     for (const sm of SITEMAPS) {
-      if (sm.file === "sitemap-index.xml") continue;
+      if (sm.file === "sitemap.xml") continue;
       counts[sm.file] = getSitemapUrls(sm.file).length;
     }
     return counts;
@@ -488,7 +488,7 @@ const AdminPanel = () => {
                           <h3 className="font-semibold text-navy text-sm leading-tight">{sm.name}</h3>
                           <p className="text-xs text-gray-400 mt-0.5">{sm.description}</p>
                         </div>
-                        {sm.file !== "sitemap-index.xml" && (
+                        {sm.file !== "sitemap.xml" && (
                           <button
                             type="button"
                             onClick={() => {
