@@ -15,7 +15,7 @@ import { getPricePageData, getAllPriceRoutes } from "@/data/priceSeoData";
 import { SERVICE_TESTIMONIALS } from "@/data/locationPriceTestimonialsData";
 import { services, cities, cityPrep } from "@/data/locationSeoData";
 import { SERVICE_TO_QUIZ } from "@/constants/serviceToQuiz";
-import { SERVICE_HERO_IMAGES, SERVICE_HERO_FALLBACK } from "@/constants/serviceContent";
+import { pickServiceHero } from "@/constants/serviceContent";
 import { SERVICE_GALLERY } from "@/constants/serviceGallery";
 import { buildServiceWaMessage } from "@/lib/whatsappMessages";
 import { SITE_URL, WHATSAPP_BASE } from "@/constants/business";
@@ -67,7 +67,7 @@ const PricePage = () => {
 
   const prep = cityPrep(data.cityName);
   const quizService = SERVICE_TO_QUIZ[data.serviceSlug];
-  const heroImgs = SERVICE_HERO_IMAGES[data.serviceSlug] ?? SERVICE_HERO_FALLBACK;
+  const heroImgs = pickServiceHero(data.serviceSlug, data.cityName);
   const service = services.find(s => s.slug === data.serviceSlug);
   const servicePrice = service?.priceFrom ?? "49€";
   const relatedServices = services.filter(s => s.slug !== data.serviceSlug).slice(0, 4);
@@ -178,15 +178,28 @@ const PricePage = () => {
         {/* ═══ O QUE INFLUENCIA O PREÇO ═══ */}
         {data.factors.length > 0 && (
           <section className="py-14 md:py-20 bg-kyro-green">
-            <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
+            <div className="max-w-6xl mx-auto px-5 sm:px-6 lg:px-8">
               <SectionHeader overline="Fatores de Preço" heading="O que influencia o" goldWord="valor final" light={false} />
-              <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-px" style={{ backgroundColor: "rgba(255,255,255,0.08)" }}>
-                {data.factors.map((factor, i) => (
-                  <div key={i} className="relative overflow-hidden flex items-start gap-3 p-6 md:p-7" style={{ backgroundColor: "#0d241b", borderTop: "2px solid rgba(212,175,55,0.55)" }}>
-                    <span className="font-playfair font-bold flex-shrink-0 leading-none" style={{ fontSize: "1.75rem", color: "rgba(212,175,55,0.4)" }}>
+              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-px" style={{ backgroundColor: "rgba(255,255,255,0.08)" }}>
+                {data.factors.slice(0, 6).map((factor, i) => (
+                  <div
+                    key={i}
+                    className="group relative overflow-hidden flex flex-col gap-3 p-7 md:p-8 transition-colors duration-300 hover:bg-[#102a20]"
+                    style={{ backgroundColor: "#0d241b", borderTop: "2px solid rgba(212,175,55,0.55)" }}
+                  >
+                    <span
+                      className="absolute -right-2 -top-3 font-playfair font-bold leading-none select-none transition-opacity duration-300 group-hover:opacity-100"
+                      style={{ fontSize: "4.5rem", color: "rgba(212,175,55,0.08)" }}
+                    >
                       {String(i + 1).padStart(2, "0")}
                     </span>
-                    <span className="text-sm text-white/65 leading-relaxed pt-1">{factor}</span>
+                    <span
+                      className="relative font-playfair font-bold leading-none"
+                      style={{ fontSize: "1.5rem", color: "#D4AF37" }}
+                    >
+                      {String(i + 1).padStart(2, "0")}
+                    </span>
+                    <span className="relative text-sm text-white/70 leading-relaxed">{factor}</span>
                   </div>
                 ))}
               </div>
@@ -210,14 +223,14 @@ const PricePage = () => {
 
         {/* ═══ FAQ ═══ */}
         {data.faqs.length > 0 && (
-          <ServiceFAQ faqs={data.faqs} heading={`Dúvidas sobre preços ${prep} ${data.cityName}`} variant="light" />
+          <ServiceFAQ faqs={data.faqs} heading={`Dúvidas sobre preços ${prep} ${data.cityName}`} variant="dark" />
         )}
 
         {/* ═══ AVALIAÇÕES REAIS ═══ */}
         {testimonials && testimonials.length > 0 && (
-          <section className="py-14 md:py-20 bg-kyro-green">
+          <section className="py-14 md:py-20 bg-[#FDFDF9]">
             <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
-              <SectionHeader overline="Avaliações Reais" heading="O que dizem os nossos" goldWord="clientes" light={false} />
+              <SectionHeader overline="Avaliações Reais" heading="O que dizem os nossos" goldWord="clientes" light={true} />
               <div className="grid sm:grid-cols-2 gap-px" style={{ backgroundColor: "#E8E4DE" }}>
                 {testimonials.map((t, i) => (
                   <div key={i} className="relative overflow-hidden p-6 md:p-8 bg-white" style={{ borderTop: "2px solid #D4AF37" }}>
