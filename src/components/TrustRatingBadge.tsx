@@ -1,11 +1,13 @@
-import { Star, MapPin, Phone } from "lucide-react";
+import { Star, MapPin, Phone, Users } from "lucide-react";
 import { REVIEW_RATING, REVIEW_COUNT, PHONE_TEL, PHONE_DISPLAY } from "@/constants/business";
 import { GOOGLE_REVIEWS_SHORT_URL } from "@/constants/google";
 import { trackCallClick } from "@/lib/analytics";
 
 type TrustRatingBadgeProps = {
-  variant: "hero" | "compact" | "mapsLink" | "pillSmall" | "horizontal" | "card";
+  variant: "hero" | "compact" | "mapsLink" | "mapsLinkClients" | "pillSmall" | "horizontal" | "card";
 };
+
+const pillClass = "flex items-center gap-2 bg-black/30 border border-white/[0.14] rounded-full px-4 py-2 backdrop-blur-sm";
 
 const TrustRatingBadge = ({ variant }: TrustRatingBadgeProps) => {
   switch (variant) {
@@ -54,7 +56,7 @@ const TrustRatingBadge = ({ variant }: TrustRatingBadgeProps) => {
           href={GOOGLE_REVIEWS_SHORT_URL}
           target="_blank"
           rel="noopener noreferrer"
-          className="flex items-center gap-2 bg-black/30 border border-white/[0.14] rounded-full px-4 py-2 backdrop-blur-sm hover:bg-black/45 transition-colors group"
+          className={`${pillClass} hover:bg-black/45 transition-colors group`}
         >
           <MapPin className="w-3.5 h-3.5 text-gold flex-shrink-0 group-hover:scale-110 transition-transform" strokeWidth={2} />
           <div className="flex items-center gap-0.5">
@@ -66,6 +68,32 @@ const TrustRatingBadge = ({ variant }: TrustRatingBadgeProps) => {
             {REVIEW_RATING} · {REVIEW_COUNT}+ avaliações Google
           </span>
         </a>
+      );
+
+    case "mapsLinkClients":
+      return (
+        <div className="flex flex-wrap items-center gap-2">
+          <a
+            href={GOOGLE_REVIEWS_SHORT_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={`${pillClass} hover:bg-black/45 transition-colors group`}
+          >
+            <MapPin className="w-3.5 h-3.5 text-gold flex-shrink-0 group-hover:scale-110 transition-transform" strokeWidth={2} />
+            <div className="flex items-center gap-0.5">
+              {[...Array(5)].map((_, i) => (
+                <Star key={i} className="w-2.5 h-2.5 fill-[#D4AF37] text-[#D4AF37]" />
+              ))}
+            </div>
+            <span className="text-white/80 text-[11px] font-semibold tracking-wide">
+              {REVIEW_RATING} · {REVIEW_COUNT}+ avaliações Google
+            </span>
+          </a>
+          <div className={pillClass}>
+            <Users className="w-3.5 h-3.5 text-gold flex-shrink-0" strokeWidth={2} />
+            <span className="text-white/80 text-[11px] font-semibold tracking-wide">+1000 clientes</span>
+          </div>
+        </div>
       );
 
     case "pillSmall":

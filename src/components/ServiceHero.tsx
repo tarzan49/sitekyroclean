@@ -183,7 +183,7 @@ const ServiceHero = ({
 
               {/* Google Maps pill */}
               <div className="flex justify-center pt-1">
-                <TrustRatingBadge variant="mapsLink" />
+                <TrustRatingBadge variant="mapsLinkClients" />
               </div>
 
               {/* Prefere ligar? — mobile only */}

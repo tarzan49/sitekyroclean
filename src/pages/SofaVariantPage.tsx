@@ -320,7 +320,7 @@ const SofaVariantPage = () => {
                 </p>
 
                 <div className="mb-6">
-                  <TrustRatingBadge variant="mapsLink" />
+                  <TrustRatingBadge variant="mapsLinkClients" />
                 </div>
 
                 <div className="flex flex-col sm:flex-row gap-3 max-w-md">
