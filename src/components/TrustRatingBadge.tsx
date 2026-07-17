@@ -72,15 +72,15 @@ const TrustRatingBadge = ({ variant }: TrustRatingBadgeProps) => {
 
     case "mapsLinkClients":
       return (
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto">
           <a
             href={GOOGLE_REVIEWS_SHORT_URL}
             target="_blank"
             rel="noopener noreferrer"
-            className={`${pillClass} hover:bg-black/45 transition-colors group`}
+            className={`${pillClass} hover:bg-black/45 transition-colors group justify-center whitespace-nowrap`}
           >
             <MapPin className="w-3.5 h-3.5 text-gold flex-shrink-0 group-hover:scale-110 transition-transform" strokeWidth={2} />
-            <div className="flex items-center gap-0.5">
+            <div className="flex items-center gap-0.5 flex-shrink-0">
               {[...Array(5)].map((_, i) => (
                 <Star key={i} className="w-2.5 h-2.5 fill-[#D4AF37] text-[#D4AF37]" />
               ))}
@@ -89,7 +89,7 @@ const TrustRatingBadge = ({ variant }: TrustRatingBadgeProps) => {
               {REVIEW_RATING} · {REVIEW_COUNT}+ avaliações Google
             </span>
           </a>
-          <div className={pillClass}>
+          <div className={`${pillClass} justify-center whitespace-nowrap`}>
             <Users className="w-3.5 h-3.5 text-gold flex-shrink-0" strokeWidth={2} />
             <span className="text-white/80 text-[11px] font-semibold tracking-wide">+1000 clientes</span>
           </div>

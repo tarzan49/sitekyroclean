@@ -202,8 +202,8 @@ const LocationServicePage = () => {
       <Header />
       <main>
 
-        {/* ═══ HERO ═══ */}
-        <section className="relative pt-24 md:pt-28 pb-16 md:pb-24 overflow-hidden">
+        {/* ═══ HERO + LOCAL SNAPSHOT (fundo fotográfico contínuo) ═══ */}
+        <div className="relative overflow-hidden">
           <div className="absolute inset-0" style={{ background: "#071a12" }} />
           <div className="absolute inset-0 overflow-hidden" aria-hidden="true">
             <picture className="w-full h-full">
@@ -212,8 +212,9 @@ const LocationServicePage = () => {
               <img src={heroImgs.d} alt={data.h1} className="w-full h-full object-cover" loading="eager" />
             </picture>
           </div>
-          <div className="absolute inset-0" style={{ background: "linear-gradient(to bottom, rgba(7,26,18,0.42) 0%, rgba(7,26,18,0.65) 40%, rgba(7,26,18,0.88) 75%, rgba(7,26,18,0.97) 100%)" }} />
+          <div className="absolute inset-0" style={{ background: "linear-gradient(to bottom, rgba(7,26,18,0.42) 0%, rgba(7,26,18,0.65) 40%, rgba(7,26,18,0.90) 78%, rgba(7,26,18,0.97) 100%)" }} />
 
+        <section className="relative pt-24 md:pt-28 pb-16 md:pb-24">
           <div className="container mx-auto px-5 sm:px-6 lg:px-8 relative z-10">
             <div className="max-w-6xl mx-auto grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
               <div>
@@ -300,8 +301,8 @@ const LocationServicePage = () => {
           </div>
         </section>
 
-        {/* ═══ LOCAL SNAPSHOT ═══ */}
-        <ServiceSnapshotStats stats={snapshotStats} bgImage={heroImgs.d} />
+        <ServiceSnapshotStats stats={snapshotStats} />
+        </div>
 
         {/* ═══ TABELA DE PREÇOS ═══ */}
         {PRICE_TABLE[data.serviceSlug] && (
