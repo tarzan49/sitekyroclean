@@ -301,7 +301,7 @@ const LocationServicePage = () => {
         </section>
 
         {/* ═══ LOCAL SNAPSHOT ═══ */}
-        <ServiceSnapshotStats stats={snapshotStats} />
+        <ServiceSnapshotStats stats={snapshotStats} bgImage={heroImgs.d} />
 
         {/* ═══ TABELA DE PREÇOS ═══ */}
         {PRICE_TABLE[data.serviceSlug] && (

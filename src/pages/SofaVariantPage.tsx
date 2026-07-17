@@ -375,7 +375,7 @@ const SofaVariantPage = () => {
         </section>
 
         {/* ═══ LOCAL SNAPSHOT ═══ */}
-        <ServiceSnapshotStats stats={snapshotStats} />
+        <ServiceSnapshotStats stats={snapshotStats} bgImage={heroImg} />
 
         {/* ═══ TABELA DE PREÇOS ═══ */}
         <ServicePriceSection
