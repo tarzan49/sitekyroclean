@@ -106,34 +106,34 @@ const Hero = () => {
               <span style={{ color: '#D4AF37' }}>ao domicílio.</span>
             </h1>
 
-            {/* Stats + Services row */}
-            <div className="flex flex-wrap items-stretch gap-x-6 gap-y-4 mb-7">
-              {/* Main stat */}
-              <div className="flex-shrink-0">
-                <p
-                  className="font-playfair text-2xl md:text-3xl font-bold text-gold leading-none mb-1.5"
+            {/* Trust row: main stat + Google rating, one compact line */}
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mb-5">
+              <div className="flex items-baseline gap-1.5">
+                <span
+                  className="font-playfair text-xl md:text-2xl font-bold text-gold leading-none"
                   style={{ textShadow: '0 1px 8px rgba(0,0,0,0.5)' }}
                 >
                   {STATS[0].value}
-                </p>
-                <p className="text-[10px] text-white/55 font-medium tracking-[0.16em] uppercase">{STATS[0].label}</p>
+                </span>
+                <span className="text-[10px] text-white/55 font-medium tracking-[0.14em] uppercase">{STATS[0].label}</span>
               </div>
-              {/* Separator — desktop only */}
-              <span className="hidden md:block w-px self-stretch bg-white/15 flex-shrink-0" />
-              {/* Services */}
-              <div className="flex flex-wrap gap-x-6 gap-y-4">
-                {SERVICES.map((s, i) => (
-                  <div key={i} className="flex-shrink-0">
-                    <p className="font-playfair text-base md:text-lg font-bold text-gold leading-none mb-1.5">{s.value}</p>
-                    <p className="text-[9px] font-medium tracking-[0.14em] uppercase" style={{ color: 'rgba(255,255,255,0.45)' }}>{s.label}</p>
-                  </div>
-                ))}
-              </div>
+              <span className="w-px h-4 bg-white/15 flex-shrink-0" />
+              <TrustRatingBadge variant="mapsLink" />
+            </div>
+
+            {/* Services breakdown — desktop only, keeps mobile hero uncluttered */}
+            <div className="hidden md:flex flex-wrap gap-x-6 gap-y-3 mb-7">
+              {SERVICES.map((s, i) => (
+                <div key={i} className="flex-shrink-0">
+                  <p className="font-playfair text-lg font-bold text-gold leading-none mb-1">{s.value}</p>
+                  <p className="text-[9px] font-medium tracking-[0.14em] uppercase" style={{ color: 'rgba(255,255,255,0.45)' }}>{s.label}</p>
+                </div>
+              ))}
             </div>
 
             {/* Subtitle */}
             <p
-              className="text-sm sm:text-base md:text-lg text-white leading-relaxed mb-8 max-w-lg"
+              className="text-sm sm:text-base md:text-lg text-white leading-relaxed mb-6 md:mb-8 max-w-lg"
               style={{ textShadow: '0 1px 10px rgba(0,0,0,0.55)' }}
             >
               Eliminamos manchas, ácaros e odores com equipamento profissional. Resultado garantido no próprio dia, em qualquer ponto de Portugal.
@@ -185,12 +185,6 @@ const Hero = () => {
                   <span className="text-[13px] font-semibold tracking-[0.18em] uppercase">Falar por WhatsApp</span>
                 </a>
               </div>
-
-              {/* Google Maps badge — pill, centered */}
-              <div className="flex justify-center pt-1">
-                <TrustRatingBadge variant="mapsLink" />
-              </div>
-
 
             </div>
           </div>
