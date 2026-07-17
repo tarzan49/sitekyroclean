@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, lazy, Suspense } from "react";
+import { useState, useEffect, useCallback, useMemo, lazy, Suspense } from "react";
 import { Link } from "react-router-dom";
 import {
   Map, AlertTriangle, BarChart3, RefreshCw, ExternalLink, Trash2,
@@ -19,6 +19,7 @@ import { getAllPackComboRoutes } from "@/data/packComboData";
 import { getAllMarcaSofaRoutes } from "@/data/marcaSofaData";
 import { getAllPosts } from "@/data/blogData";
 import { SITE_URL } from "@/constants/business";
+import { getAdminRegion, getRegionForLocationPart, ADMIN_REGIONS, ADMIN_REGION_LABELS, type AdminRegion } from "@/data/regionUtils";
 
 const AdminDashboard = lazy(() => import("./AdminDashboard"));
 const AdminImport   = lazy(() => import("./AdminImport"));
@@ -28,36 +29,38 @@ const AdminSeoPages = lazy(() => import("./AdminSeoPages"));
 // ── Auth ─────────────────────────────────────────────────────────────────────
 const ADMIN_PASSWORD = (import.meta.env.VITE_ADMIN_PASSWORD as string) || 'kyro2025';
 
-// ── Sitemap config (mirrors generate-sitemap.ts output) ──────────────────────
+// ── Sitemap config (mirrors scripts/generate-sitemap.ts output — 10 real sub-sitemaps) ──
 const SITEMAPS = [
   { name: "Sitemap Index", file: "sitemap-index.xml", description: "Índice principal (10 sub-sitemaps)", icon: Globe },
-  { name: "Serviços Principais", file: "sitemap-services.xml", count: 6, description: "Páginas de serviço", icon: Zap },
-  { name: "Localidade × Serviço", file: "sitemap-location-service.xml", count: 150, description: "25 cidades × 6 serviços", icon: Map },
-  { name: "Freguesia × Serviço", file: "sitemap-freguesia-service.xml", count: 792, description: "132 freguesias × 6 serviços", icon: Map },
-  { name: "Material & Preço", file: "sitemap-material-price.xml", count: 436, description: "Material (286) + Preço (150)", icon: FileText },
-  { name: "Problemas", file: "sitemap-problems.xml", count: 465, description: "Problema + Problema×Cidade", icon: AlertTriangle },
-  { name: "Variantes Keyword", file: "sitemap-keyword-variants.xml", count: 1570, description: "higienização/lavagem × 5 serviços × 157 locais", icon: Target },
-  { name: "Recursos (Blog/FAQ)", file: "sitemap-resources.xml", count: 8, description: "Blog (5) + FAQ + Glossário + Blog index", icon: FileText },
-  { name: "Packs", file: "sitemap-packs.xml", count: 20, description: "4 packs × 5 cidades", icon: Target },
-  { name: "Marcas", file: "sitemap-marcas.xml", count: 80, description: "8 marcas × 10 cidades", icon: Shield },
+  { name: "Core (Serviços + Páginas principais)", file: "sitemap-core.xml", description: "6 serviços + páginas institucionais", icon: Zap },
+  { name: "Localidade × Serviço", file: "sitemap-location.xml", description: "Concelhos × 6 serviços — Porto/Norte, Lisboa/AML, Algarve", icon: Map },
+  { name: "Freguesia × Serviço", file: "sitemap-freguesia.xml", description: "Freguesias × 6 serviços — Porto/Norte, Lisboa/AML, Algarve", icon: Map },
+  { name: "Material", file: "sitemap-material.xml", description: "Material + Material×Cidade", icon: FileText },
+  { name: "Preço", file: "sitemap-price.xml", description: "Preço × concelho", icon: FileText },
+  { name: "Problemas", file: "sitemap-problem.xml", description: "Problema + Problema×Cidade", icon: AlertTriangle },
+  { name: "Variantes Keyword", file: "sitemap-keyword-variants.xml", description: "higienização/lavagem/impermeabilização × serviços × locais", icon: Target },
+  { name: "Recursos (Blog/FAQ)", file: "sitemap-resources.xml", description: "Blog + FAQ + Glossário", icon: FileText },
+  { name: "Packs", file: "sitemap-packs.xml", description: "Packs combo × concelho", icon: Target },
+  { name: "Marcas", file: "sitemap-marcas.xml", description: "Marcas de sofá × concelho", icon: Shield },
 ];
 
 // ── Sitemap URL Generators ────────────────────────────────────────────────────
 function getSitemapUrls(file: string): string[] {
   switch (file) {
-    case "sitemap-services.xml":
+    case "sitemap-core.xml":
       return services.map(s => s.baseRoute);
-    case "sitemap-location-service.xml":
+    case "sitemap-location.xml":
       return getAllLocationRoutes().map(r => r.path);
-    case "sitemap-freguesia-service.xml":
+    case "sitemap-freguesia.xml":
       return getAllFreguesiaRoutes().map(r => r.path);
-    case "sitemap-material-price.xml":
+    case "sitemap-material.xml":
       return [
         ...getAllMaterialRoutes().map(r => r.path),
         ...getAllMaterialCityRoutes().map(r => r.path),
-        ...getAllPriceRoutes().map(r => r.path),
       ];
-    case "sitemap-problems.xml":
+    case "sitemap-price.xml":
+      return getAllPriceRoutes().map(r => r.path);
+    case "sitemap-problem.xml":
       return [
         ...getAllProblems().map(p => `/problemas/${p.slug}`),
         ...getAllProblemCityRoutes().map(r => r.path),
@@ -78,6 +81,25 @@ function getSitemapUrls(file: string): string[] {
     default:
       return [];
   }
+}
+
+// ── Regional breakdown (only for the 3 sitemaps that carry a citySlug/locationPart) ──
+function getSitemapRegionBreakdown(file: string): { region: AdminRegion; count: number }[] | null {
+  let regions: (AdminRegion | null)[];
+  switch (file) {
+    case "sitemap-location.xml":
+      regions = getAllLocationRoutes().map(r => getAdminRegion(r.citySlug));
+      break;
+    case "sitemap-freguesia.xml":
+      regions = getAllFreguesiaRoutes().map(r => getAdminRegion(r.citySlug));
+      break;
+    case "sitemap-keyword-variants.xml":
+      regions = getAllKeywordVariantRoutes().map(r => getRegionForLocationPart(r.locationPart));
+      break;
+    default:
+      return null;
+  }
+  return ADMIN_REGIONS.map(region => ({ region, count: regions.filter(r => r === region).length }));
 }
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -141,6 +163,24 @@ const AdminPanel = () => {
   const [activeTab, setActiveTab] = useState<Tab>("sitemap");
   const [expandedSitemap, setExpandedSitemap] = useState<string | null>(null);
   const [sitemapUrlCache, setSitemapUrlCache] = useState<Record<string, string[]>>({});
+
+  const sitemapCounts = useMemo(() => {
+    const counts: Record<string, number> = {};
+    for (const sm of SITEMAPS) {
+      if (sm.file === "sitemap-index.xml") continue;
+      counts[sm.file] = getSitemapUrls(sm.file).length;
+    }
+    return counts;
+  }, []);
+
+  const sitemapRegionBreakdowns = useMemo(() => {
+    const breakdowns: Record<string, { region: AdminRegion; count: number }[]> = {};
+    for (const sm of SITEMAPS) {
+      const breakdown = getSitemapRegionBreakdown(sm.file);
+      if (breakdown) breakdowns[sm.file] = breakdown;
+    }
+    return breakdowns;
+  }, []);
 
   // Error Log state
   const [errors, setErrors] = useState<ErrorLog[]>([]);
@@ -428,7 +468,7 @@ const AdminPanel = () => {
             <div className="flex items-center justify-between mb-2">
               <div>
                 <h2 className="text-lg font-bold text-navy">Sitemap Monitor</h2>
-                <p className="text-sm text-gray-500">7 sub-sitemaps · {SITEMAPS.slice(1).reduce((a, s) => a + (s.count ?? 0), 0).toLocaleString("pt-PT")} URLs indexadas</p>
+                <p className="text-sm text-gray-500">10 sub-sitemaps · {Object.values(sitemapCounts).reduce((a, c) => a + c, 0).toLocaleString("pt-PT")} URLs indexadas</p>
               </div>
             </div>
 
@@ -469,10 +509,21 @@ const AdminPanel = () => {
                         )}
                       </div>
 
-                      {sm.count != null && (
+                      {sitemapCounts[sm.file] != null && (
                         <div className="bg-gray-50 rounded-xl p-3 mb-4 flex items-center justify-between border border-gray-100">
                           <span className="text-xs text-gray-500">URLs</span>
-                          <span className="text-xl font-bold text-navy font-playfair">{sm.count.toLocaleString("pt-PT")}</span>
+                          <span className="text-xl font-bold text-navy font-playfair">{sitemapCounts[sm.file].toLocaleString("pt-PT")}</span>
+                        </div>
+                      )}
+
+                      {sitemapRegionBreakdowns[sm.file] && (
+                        <div className="grid grid-cols-2 gap-1.5 mb-4">
+                          {sitemapRegionBreakdowns[sm.file].map(rb => (
+                            <div key={rb.region} className="bg-gray-50 rounded-lg px-2 py-1.5 border border-gray-100 flex items-center justify-between">
+                              <span className="text-[10px] text-gray-500 truncate">{ADMIN_REGION_LABELS[rb.region]}</span>
+                              <span className="text-xs font-bold text-navy flex-shrink-0 ml-1">{rb.count.toLocaleString("pt-PT")}</span>
+                            </div>
+                          ))}
                         </div>
                       )}
 

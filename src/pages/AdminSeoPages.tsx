@@ -6,6 +6,7 @@ import { getAllProblems, problemCategories } from "@/data/problemSeoData";
 import { getAllLocationRoutes, services, cities } from "@/data/locationSeoData";
 import { getAllFreguesiaRoutes, municipiosComFreguesias } from "@/data/freguesiaSeoData";
 import { getAllKeywordVariantRoutes } from "@/data/keywordVariantData";
+import { getAdminRegion, getRegionForLocationPart, ADMIN_REGIONS, ADMIN_REGION_LABELS, type AdminRegion } from "@/data/regionUtils";
 
 type PageType = 'service' | 'location' | 'problem' | 'freguesia' | 'variant';
 
@@ -16,12 +17,14 @@ interface PageEntry {
   keyword: string;
   visible: boolean;
   category?: string;
+  region?: AdminRegion;
 }
 
 const AdminSeoPages = ({ embedded = false }: { embedded?: boolean }) => {
   const [search, setSearch] = useState("");
   const [typeFilter, setTypeFilter] = useState<PageType | 'all'>('all');
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
+  const [regionFilter, setRegionFilter] = useState<AdminRegion | 'all'>('all');
 
   const allPages = useMemo(() => {
     const pages: PageEntry[] = [];
@@ -51,6 +54,7 @@ const AdminSeoPages = ({ embedded = false }: { embedded?: boolean }) => {
           keyword: `${svc.name.toLowerCase()} ${city.name.toLowerCase()}`,
           visible: true,
           category: city.name,
+          region: getAdminRegion(city.slug) ?? undefined,
         });
       }
     });
@@ -82,6 +86,7 @@ const AdminSeoPages = ({ embedded = false }: { embedded?: boolean }) => {
           keyword: `${svc.name.toLowerCase()} ${f.name.toLowerCase()}`,
           visible: true,
           category: m.name,
+          region: getAdminRegion(m.slug) ?? undefined,
         });
       }
     });
@@ -102,6 +107,7 @@ const AdminSeoPages = ({ embedded = false }: { embedded?: boolean }) => {
         keyword: `${route.variantKey} ${route.serviceKey} ${route.locationPart}`,
         visible: true,
         category: variantLabel,
+        region: getRegionForLocationPart(route.locationPart) ?? undefined,
       });
     });
 
@@ -112,6 +118,9 @@ const AdminSeoPages = ({ embedded = false }: { embedded?: boolean }) => {
     let result = allPages;
     if (typeFilter !== 'all') {
       result = result.filter(p => p.type === typeFilter);
+    }
+    if (regionFilter !== 'all') {
+      result = result.filter(p => p.region === regionFilter);
     }
     if (categoryFilter !== 'all') {
       result = result.filter(p => p.category === categoryFilter);
@@ -125,7 +134,7 @@ const AdminSeoPages = ({ embedded = false }: { embedded?: boolean }) => {
       );
     }
     return result;
-  }, [allPages, typeFilter, categoryFilter, search]);
+  }, [allPages, typeFilter, regionFilter, categoryFilter, search]);
 
   const categories = useMemo(() => {
     const cats = new Set(allPages.map(p => p.category).filter(Boolean));
@@ -141,6 +150,15 @@ const AdminSeoPages = ({ embedded = false }: { embedded?: boolean }) => {
     variant: allPages.filter(p => p.type === 'variant').length,
     visible: allPages.filter(p => p.visible).length,
   }), [allPages]);
+
+  const regionStats = useMemo(() => {
+    const regionable = allPages.filter(p => p.region);
+    return ADMIN_REGIONS.map(region => ({
+      region,
+      label: ADMIN_REGION_LABELS[region],
+      count: regionable.filter(p => p.region === region).length,
+    }));
+  }, [allPages]);
 
   const typeLabels: Record<PageType, string> = {
     service: 'Serviço',
@@ -198,6 +216,21 @@ const AdminSeoPages = ({ embedded = false }: { embedded?: boolean }) => {
           ))}
         </div>
 
+        {/* Region stats (Localização / Freguesia / Variante only) */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+          {regionStats.map(rs => (
+            <button
+              key={rs.region}
+              type="button"
+              onClick={() => setRegionFilter(regionFilter === rs.region ? 'all' : rs.region)}
+              className={`rounded-xl p-3 border text-left transition-colors ${regionFilter === rs.region ? 'bg-[#0B2F2A] border-[#0B2F2A] text-white' : 'bg-white border-[#0B2F2A]/10 hover:border-[#D4AF37]/40'}`}
+            >
+              <p className={`text-lg font-bold ${regionFilter === rs.region ? 'text-white' : 'text-[#111111]'}`}>{rs.count}</p>
+              <p className={`text-xs ${regionFilter === rs.region ? 'text-white/70' : 'text-[#111111]/50'}`}>{rs.label}</p>
+            </button>
+          ))}
+        </div>
+
         {/* Filters */}
         <div className="flex flex-col sm:flex-row gap-3 mb-6">
           <div className="relative flex-1">
@@ -220,6 +253,16 @@ const AdminSeoPages = ({ embedded = false }: { embedded?: boolean }) => {
             <option value="freguesia">Freguesia</option>
             <option value="problem">Problema</option>
             <option value="variant">Variante (higienização/lavagem/impermeabilização)</option>
+          </select>
+          <select
+            value={regionFilter}
+            onChange={e => setRegionFilter(e.target.value as AdminRegion | 'all')}
+            className="px-3 py-2 rounded-lg border border-[#0B2F2A]/20 bg-white text-sm text-[#111111]"
+          >
+            <option value="all">Todas as regiões</option>
+            {ADMIN_REGIONS.map(region => (
+              <option key={region} value={region}>{ADMIN_REGION_LABELS[region]}</option>
+            ))}
           </select>
           <select
             value={categoryFilter}
@@ -249,6 +292,7 @@ const AdminSeoPages = ({ embedded = false }: { embedded?: boolean }) => {
                   <th className="text-left px-4 py-3 font-semibold text-[#111111] hidden md:table-cell">URL</th>
                   <th className="text-left px-4 py-3 font-semibold text-[#111111] hidden lg:table-cell">Keyword</th>
                   <th className="text-left px-4 py-3 font-semibold text-[#111111] hidden lg:table-cell">Categoria</th>
+                  <th className="text-left px-4 py-3 font-semibold text-[#111111] hidden xl:table-cell">Região</th>
                   <th className="text-center px-4 py-3 font-semibold text-[#111111] w-20">Visível</th>
                   <th className="text-center px-4 py-3 font-semibold text-[#111111] w-16">Link</th>
                 </tr>
@@ -272,6 +316,9 @@ const AdminSeoPages = ({ embedded = false }: { embedded?: boolean }) => {
                     </td>
                     <td className="px-4 py-3 text-[#111111]/50 hidden lg:table-cell text-xs">
                       {page.category}
+                    </td>
+                    <td className="px-4 py-3 text-[#111111]/50 hidden xl:table-cell text-xs">
+                      {page.region ? ADMIN_REGION_LABELS[page.region] : "—"}
                     </td>
                     <td className="px-4 py-3 text-center">
                       {page.visible ? (
