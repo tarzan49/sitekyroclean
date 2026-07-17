@@ -5,7 +5,7 @@ import type { QuizFormData, UpsellItemConfig } from '@/components/quiz/QuizTypes
 import {
   sofaSetQty, sofaTogglePack,
   mattressSetQty,
-  calcCarpetPrice, calcChairClean,
+  calcCarpetPrice, calcChairClean, calcChairWaterproof,
 } from '@/components/quiz/quizHelpers';
 import { useUpsellSelection } from './useUpsellSelection';
 
@@ -183,7 +183,7 @@ const QuizUpsellOverlay = ({
               { id: 'sofa',     img: '/images/services/sofa.webp',    label: 'Sofá',     sublabel: 'a partir de 49€' },
               { id: 'mattress', img: '/images/services/colchao.webp', label: 'Colchão',  sublabel: 'a partir de 49€' },
               { id: 'carpet',   img: '/images/services/tapete.webp',  label: 'Tapete',   sublabel: 'a partir de 12€/m²' },
-              { id: 'chairs',   img: '/images/services/cadeira.webp', label: 'Cadeiras', sublabel: '15€/cadeira' },
+              { id: 'chairs',   img: '/images/services/cadeira.webp', label: 'Cadeiras', sublabel: 'a partir de 17,50€' },
             ] as const).map(opt => (
               <button
                 key={opt.id}
@@ -460,7 +460,7 @@ const QuizUpsellOverlay = ({
             const qty = pendingChairQtyNum;
             const sobOrç = qty >= 10;
             const basePrice = calcChairClean(qty) ?? 0;
-            const waterproofPrice = pendingWaterproof && !sobOrç ? qty * 10 : 0;
+            const waterproofPrice = pendingWaterproof && !sobOrç ? (calcChairWaterproof(qty) ?? 0) : 0;
             const totalChairPrice = basePrice + waterproofPrice;
             return (
               <div className="w-full max-w-xs mx-auto">
@@ -507,9 +507,9 @@ const QuizUpsellOverlay = ({
                     </div>
                     <div className="text-left flex-1">
                       <p className="text-sm font-bold text-white">Adicionar Impermeabilização</p>
-                      <p className="text-xs text-white/40">+10€/cadeira: proteção duradoura</p>
+                      <p className="text-xs text-white/40">Proteção duradoura contra manchas</p>
                     </div>
-                    <span className="text-gold font-bold text-sm flex-shrink-0">+{qty * 10}€</span>
+                    <span className="text-gold font-bold text-sm flex-shrink-0">+{(calcChairWaterproof(qty) ?? 0) % 1 === 0 ? (calcChairWaterproof(qty) ?? 0) : (calcChairWaterproof(qty) ?? 0).toFixed(1).replace('.', ',')}€</span>
                   </button>
                 )}
                 <button

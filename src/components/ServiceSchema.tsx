@@ -21,7 +21,7 @@ interface ServiceSchemaProps {
 
 const ServiceSchema = ({ serviceName, description, url, priceFrom, imageUrl, breadcrumbLabel, reviews }: ServiceSchemaProps) => {
   const fullUrl = `${SITE_URL}${url}`;
-  const priceNumeric = priceFrom.replace(/[^0-9]/g, '') || DEFAULT_PRICE_FROM.replace(/[^0-9]/g, '');
+  const priceNumeric = priceFrom.replace(',', '.').replace(/[^0-9.]/g, '') || DEFAULT_PRICE_FROM.replace(',', '.').replace(/[^0-9.]/g, '');
 
   const schema = {
     "@context": "https://schema.org",

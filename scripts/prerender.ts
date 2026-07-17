@@ -129,7 +129,7 @@ function buildBreadcrumbSchema(items: { name: string; url: string }[]) {
 
 /** Service — signals what's offered, where, at what price, with ratings. */
 function buildServiceSchema(serviceName: string, cityName: string, priceFrom: string) {
-  const price = priceFrom.replace(/[^0-9]/g, '') || '0';
+  const price = priceFrom.replace(',', '.').replace(/[^0-9.]/g, '') || '0';
   return {
     '@context': 'https://schema.org',
     '@type': 'Service',
@@ -439,8 +439,9 @@ export function prerenderRoutes(outDir: string): number {
 
     // Material base pages (no city)
     for (const mat of getAllMaterials()) {
+      const matPriceFrom = services.find(s => s.slug === mat.serviceSlug)?.priceFrom ?? '49€';
       const schemas: object[] = [
-        buildServiceSchema(mat.serviceName, 'Portugal', '39€'),
+        buildServiceSchema(mat.serviceName, 'Portugal', matPriceFrom),
         buildBreadcrumbSchema([
           { name: 'Início',        url: BASE_URL + '/' },
           { name: mat.serviceName, url: `${BASE_URL}/${mat.serviceSlug}` },
@@ -473,8 +474,9 @@ export function prerenderRoutes(outDir: string): number {
     for (const route of getAllMaterialCityRoutes()) {
       const data = getMaterialCityData(route.materialSlug, route.citySlug);
       if (!data) continue;
+      const dataPriceFrom = services.find(s => s.slug === data.serviceSlug)?.priceFrom ?? '49€';
       const schemas: object[] = [
-        buildServiceSchema(data.serviceName, data.city, '39€'),
+        buildServiceSchema(data.serviceName, data.city, dataPriceFrom),
         buildBreadcrumbSchema([
           { name: 'Início',        url: BASE_URL + '/' },
           { name: data.serviceName, url: `${BASE_URL}/${data.serviceSlug}` },
@@ -656,8 +658,8 @@ export function prerenderRoutes(outDir: string): number {
       },
       {
         path: '/limpeza-tapetes',
-        title: 'Limpeza e Lavagem de Tapetes | Desde 10€/m² | Kyro Clean Solutions',
-        desc: 'Lavagem profissional de tapetes com extração profunda. Removemos sujidade, manchas e alergénios. Serviço ao domicílio em todo o país. Desde 10€/m².',
+        title: 'Limpeza e Lavagem de Tapetes | Desde 12€/m² | Kyro Clean Solutions',
+        desc: 'Lavagem profissional de tapetes com extração profunda. Removemos sujidade, manchas e alergénios. Serviço ao domicílio em todo o país. Desde 12€/m².',
         content: {
           h1: 'Limpeza e Lavagem de Tapetes ao Domicílio',
           intro: 'Limpeza profissional de tapetes ao domicílio com extração profunda. Removemos sujidade acumulada, manchas difíceis e alergénios. Tapetes persas, shaggy, sisal e todos os tipos tratados com produto específico ao material.',
@@ -670,14 +672,14 @@ export function prerenderRoutes(outDir: string): number {
             'Serviço ao domicílio sem necessidade de recolha',
           ],
           faqs: faqs([
-            { q: 'Quanto custa a limpeza de tapete?', a: 'O preço depende da área: até 5m² é 10€/m², de 5 a 10m² é 8€/m² e de 10 a 15m² é 7€/m². Para áreas maiores peça orçamento.' },
+            { q: 'Quanto custa a limpeza de tapete?', a: 'O preço depende da área: até 5m² é 12€/m², de 5 a 10m² é 10€/m² e de 10 a 15m² é 9€/m². Para áreas maiores peça orçamento.' },
             { q: 'Quanto tempo demora a limpeza de tapete?', a: 'O serviço demora 1 a 2 horas. O tapete fica seco em 4 a 8 horas, dependendo da espessura e material.' },
             { q: 'Que tipos de tapete limpam?', a: 'Limpamos todos os tipos: persas, shaggy, sisal, juta, lã, acrílico, polipropileno e fibras naturais. O produto é sempre adaptado ao material.' },
             { q: 'Fazem limpeza de tapetes ao domicílio?', a: 'Sim. O técnico desloca-se a sua casa com equipamento de extração profissional. Não precisa de entregar o tapete.' },
           ]),
         },
         extraSchemas: [
-          buildServiceSchema('Limpeza de Tapetes', 'Portugal', '10€'),
+          buildServiceSchema('Limpeza de Tapetes', 'Portugal', '12€'),
           buildBreadcrumbSchema([
             { name: 'Início', url: BASE_URL + '/' },
             { name: 'Limpeza de Tapetes', url: BASE_URL + '/limpeza-tapetes' },
@@ -686,8 +688,8 @@ export function prerenderRoutes(outDir: string): number {
       },
       {
         path: '/limpeza-cadeiras',
-        title: 'Limpeza de Cadeiras Estofadas | Desde 12,50€ | Kyro Clean Solutions',
-        desc: 'Limpeza profissional de cadeiras estofadas ao domicílio. Ideal para residências, escritórios e restaurantes. Resultados visíveis no momento. Desde 12,50€/cadeira.',
+        title: 'Limpeza de Cadeiras Estofadas | Desde 17,50€ | Kyro Clean Solutions',
+        desc: 'Limpeza profissional de cadeiras estofadas ao domicílio. Ideal para residências, escritórios e restaurantes. Resultados visíveis no momento. Desde 17,50€/cadeira.',
         content: {
           h1: 'Limpeza de Cadeiras Estofadas ao Domicílio',
           intro: 'Serviço profissional de limpeza de cadeiras estofadas ao domicílio. Removemos sujidade de uso diário, manchas de comida e odores com extração profissional. Ideal para residências, escritórios e restaurantes.',
@@ -700,14 +702,14 @@ export function prerenderRoutes(outDir: string): number {
             'Preço por volume: quanto mais cadeiras, menor o preço unitário',
           ],
           faqs: faqs([
-            { q: 'Quanto custa a limpeza de cadeiras?', a: 'O preço por cadeira diminui com a quantidade: até 3 cadeiras é 17,50€/unid., de 4 a 6 é 15€/unid., de 7 a 9 é 12,50€/unid. e a partir de 10 cadeiras por orçamento.' },
+            { q: 'Quanto custa a limpeza de cadeiras?', a: 'O preço por cadeira diminui com a quantidade: até 3 cadeiras é 17,50€/unid., de 4 a 6 é 12,50€/unid., de 7 a 9 é 10€/unid. e a partir de 10 cadeiras por orçamento.' },
             { q: 'Limpam cadeiras de escritório?', a: 'Sim. Limpamos cadeiras de escritório, sala de jantar, poltronas e bancos. O serviço é ao domicílio ou no local de trabalho.' },
             { q: 'Quanto tempo demora a limpeza de cadeiras?', a: 'Cada cadeira demora 15 a 30 minutos. Um conjunto de 6 cadeiras leva cerca de 2 horas. As cadeiras ficam secas em 2 a 4 horas.' },
             { q: 'Fazem limpeza de cadeiras em quantidade para restaurantes?', a: 'Sim. Para restaurantes, hotéis e escritórios temos condições especiais. Contacte-nos para orçamento personalizado.' },
           ]),
         },
         extraSchemas: [
-          buildServiceSchema('Limpeza de Cadeiras', 'Portugal', '12€'),
+          buildServiceSchema('Limpeza de Cadeiras', 'Portugal', '17,50€'),
           buildBreadcrumbSchema([
             { name: 'Início', url: BASE_URL + '/' },
             { name: 'Limpeza de Cadeiras', url: BASE_URL + '/limpeza-cadeiras' },
@@ -716,7 +718,7 @@ export function prerenderRoutes(outDir: string): number {
       },
       {
         path: '/limpeza-alcatifas',
-        title: 'Limpeza de Alcatifas | Desde 7€/m² | Kyro Clean Solutions',
+        title: 'Limpeza de Alcatifas | Desde 3€/m² | Kyro Clean Solutions',
         desc: 'Limpeza profissional de alcatifas com extração profunda. Removemos sujidade acumulada, manchas e alergénios. Secagem rápida. Porto, Lisboa e todo o país.',
         content: {
           h1: 'Limpeza de Alcatifas ao Domicílio',
@@ -730,14 +732,14 @@ export function prerenderRoutes(outDir: string): number {
             'Secagem em 4 a 8 horas',
           ],
           faqs: faqs([
-            { q: 'Quanto custa a limpeza de alcatifa?', a: 'A limpeza de alcatifa começa a partir de 7€/m² para áreas até 15m². Para áreas maiores o preço é calculado por orçamento.' },
+            { q: 'Quanto custa a limpeza de alcatifa?', a: 'A limpeza de alcatifa começa a partir de 3€/m². Para grandes superfícies o preço é calculado por orçamento.' },
             { q: 'Qual a diferença entre tapete e alcatifa?', a: 'Tapetes são peças soltas; alcatifas são revestimentos fixos que cobrem toda a divisão. Tratamos ambos ao domicílio com equipamento profissional.' },
             { q: 'Limpam alcatifas de escritório?', a: 'Sim. Temos disponibilidade para escritórios, hotéis, clínicas e outros espaços comerciais, incluindo fora do horário comercial.' },
             { q: 'A alcatifa fica molhada muito tempo?', a: 'Com o nosso equipamento de extração profissional, a alcatifa fica seca em 4 a 8 horas dependendo da espessura e ventilação.' },
           ]),
         },
         extraSchemas: [
-          buildServiceSchema('Limpeza de Alcatifas', 'Portugal', '7€'),
+          buildServiceSchema('Limpeza de Alcatifas', 'Portugal', '3€'),
           buildBreadcrumbSchema([
             { name: 'Início', url: BASE_URL + '/' },
             { name: 'Limpeza de Alcatifas', url: BASE_URL + '/limpeza-alcatifas' },
@@ -761,7 +763,7 @@ export function prerenderRoutes(outDir: string): number {
           ],
           faqs: faqs([
             { q: 'O que é a impermeabilização de estofos?', a: 'A impermeabilização cria uma barreira nano-tecnológica invisível na fibra do estofo que repele líquidos e dificulta a penetração de manchas. O tecido mantém a aparência e textura originais.' },
-            { q: 'Quanto custa a impermeabilização?', a: 'A impermeabilização de sofá começa a partir de 49€ para 1 lugar. Para cadeiras o preço parte de 7,50€ por unidade. Peça orçamento gratuito.' },
+            { q: 'Quanto custa a impermeabilização?', a: 'A impermeabilização de sofá começa a partir de 49€ para 1 lugar. Para cadeiras o preço parte de 17,50€ por unidade. Peça orçamento gratuito.' },
             { q: 'Quanto tempo dura a impermeabilização?', a: 'A duração é de 2 a 10 anos dependendo do uso, tipo de tecido e produto aplicado. Recomendamos renovação após limpeza profissional.' },
             { q: 'Posso fazer impermeabilização sem limpeza prévia?', a: 'Recomendamos sempre limpeza prévia para maior eficácia. Temos packs combinados de limpeza e impermeabilização com desconto.' },
           ]),

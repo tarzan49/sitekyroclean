@@ -20,7 +20,7 @@ interface Props {
 }
 
 const ServiceLocationSchema = ({ serviceName, serviceBaseUrl, placeName, parentPlace, description, pageUrl, priceFrom }: Props) => {
-  const priceNum = /\d+/.exec(priceFrom)?.[0] ?? DEFAULT_PRICE_FROM.replace(/[^0-9]/g, '');
+  const priceNum = /\d+(?:[.,]\d+)?/.exec(priceFrom)?.[0]?.replace(',', '.') ?? DEFAULT_PRICE_FROM.replace(',', '.').replace(/[^0-9.]/g, '');
   const fullUrl = `${SITE_URL}${pageUrl}`;
 
   const prep = cityPrep(placeName);

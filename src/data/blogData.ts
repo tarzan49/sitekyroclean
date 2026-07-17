@@ -376,7 +376,7 @@ const posts: BlogPost[] = [
     slug: "limpeza-cadeiras-estofadas-precos-guia",
     title: "Limpeza de cadeiras estofadas: preços, métodos e quando vale a pena",
     metaTitle: "Limpeza de Cadeiras Estofadas: Preços 2025 | Kyro Clean",
-    metaDescription: "Preços reais da limpeza profissional de cadeiras estofadas em Portugal. Cadeiras de escritório, sala de jantar e restaurante. Desde 10€ por cadeira.",
+    metaDescription: "Preços reais da limpeza profissional de cadeiras estofadas em Portugal. Cadeiras de escritório, sala de jantar e restaurante. Desde 17,50€ por cadeira.",
     publishDate: "2025-11-20",
     updatedDate: "2025-11-20",
     author: "Equipa Kyro Clean",
@@ -387,7 +387,7 @@ const posts: BlogPost[] = [
     sections: [
       {
         heading: "Preços de limpeza de cadeiras (2025)",
-        body: "A Kyro Clean Solutions pratica os seguintes preços:\n\n**Cadeira individual:**\n- Limpeza só do tampo (assento): 15€/cadeira\n- Limpeza completa (assento + costas + laterais): 20€/cadeira\n\n**Lote de 6 ou mais cadeiras:**\n- Limpeza só do tampo: 10€/cadeira\n- Limpeza completa: 15€/cadeira\n\nO desconto por volume reflete a eficiência do técnico quando tem várias peças no mesmo local, a deslocação e o setup do equipamento são custos fixos que se diluem com mais peças.",
+        body: "A Kyro Clean Solutions pratica preço decrescente por unidade, quanto mais cadeiras limpar de uma vez:\n\n- 1ª a 3ª cadeira: 17,50€/unidade\n- 4ª a 6ª cadeira: 12,50€/unidade\n- 7ª a 9ª cadeira: 10€/unidade\n- 10 ou mais cadeiras: orçamento personalizado\n\nO desconto por volume reflete a eficiência do técnico quando tem várias peças no mesmo local, a deslocação e o setup do equipamento são custos fixos que se diluem com mais peças.",
         tip: "Para restaurantes ou escritórios com mais de 20 cadeiras, solicitamos orçamento personalizado que pode representar uma poupança adicional de 20 a 30%.",
       },
       {
@@ -692,7 +692,7 @@ const posts: BlogPost[] = [
       },
       {
         heading: "Quanto custa a limpeza profissional de alcatifa para escritório?",
-        body: "O preço da limpeza profissional de alcatifa comercial em Portugal varia conforme a área:\n\n| Área | Preço médio por m² |\n|------|-------------------|\n| Até 50 m² | 3,50€ – 4,50€/m² |\n| 50 – 200 m² | 2,50€ – 3,50€/m² |\n| Acima de 200 m² | 1,80€ – 2,50€/m² |\n\nEspaços com manchas intensas, colas ou resíduos específicos podem ter sobrecusto de pré-tratamento.\n\nA maioria das empresas profissionais trabalha fora do horário de expediente (tarde, noite ou fim de semana) para não interromper a atividade: inclua esta condição no pedido de orçamento.",
+        body: "O preço da limpeza profissional de alcatifa comercial em Portugal começa em 3€/m². Para grandes superfícies (escritórios, comércio, espaços acima de 50m²) o orçamento é personalizado, com desconto de volume face ao preço por m² de espaços pequenos.\n\nEspaços com manchas intensas, colas ou resíduos específicos podem ter sobrecusto de pré-tratamento.\n\nA maioria das empresas profissionais trabalha fora do horário de expediente (tarde, noite ou fim de semana) para não interromper a atividade: inclua esta condição no pedido de orçamento.",
         tip: "Peça contratos de limpeza semestral ou anual: habitualmente com 10-15% de desconto face ao preço por intervenção avulsa.",
       },
     ],
@@ -1585,7 +1585,7 @@ const posts: BlogPost[] = [
     sections: [
       {
         heading: "Preços por metro quadrado em Portugal (2025)",
-        body: "A limpeza profissional de alcatifas é calculada por área. Os preços da Kyro Clean:\n\n- Até 20m²: 7€ a 10€ por m² (dependendo do estado)\n- De 20m² a 50m²: 6€ a 8€ por m²\n- Mais de 50m² (escritórios, comércio): orçamento personalizado com desconto de volume\n\n**Exemplos práticos:**\n- Sala com alcatifa de 15m²: 105€ a 150€\n- T2 completo com alcatifa (40m²): 240€ a 320€\n- Escritório de 80m²: orçamento personalizado (geralmente abaixo de 5€/m²)\n\nA deslocação está incluída para a área do Porto. Para outros concelhos aplica-se uma taxa de deslocação.",
+        body: "A limpeza profissional de alcatifas é calculada por área. Os preços da Kyro Clean começam em 3€/m², para grandes superfícies (escritórios, comércio) o orçamento é personalizado com desconto de volume.\n\n**Exemplos práticos:**\n- Sala com alcatifa de 15m²: cerca de 45€\n- T2 completo com alcatifa (40m²): cerca de 120€\n- Escritório de 80m² ou mais: orçamento personalizado\n\nA deslocação está incluída para a área do Porto. Para outros concelhos aplica-se uma taxa de deslocação.",
         tip: "Mede a área antes de pedir orçamento: comprimento × largura de cada divisão com alcatifa. Inclui zonas sob mobiliário que também são limpas.",
       },
       {

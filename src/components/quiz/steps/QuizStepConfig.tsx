@@ -238,7 +238,7 @@ const QuizStepConfig = ({
         {!sob && (
           <p className="text-xs text-white/30 text-center leading-snug">
             {isWaterproofPrimary
-              ? '1ª–4ª: 15€ · 5ª–6ª: 12,5€ · 7ª–9ª: 10€ por cadeira'
+              ? '1ª–4ª: 17,5€ · 5ª–9ª: 15€ por cadeira'
               : '1ª–3ª: 17,5€ · 4ª–6ª: 12,5€ · 7ª–9ª: 10€ por cadeira'}
           </p>
         )}

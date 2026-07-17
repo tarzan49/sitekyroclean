@@ -66,29 +66,29 @@ const routeMeta: Record<string, { pt: PageMeta; en: PageMeta; es: PageMeta }> = 
   },
   "/limpeza-cadeiras": {
     pt: {
-      title: "Limpeza e Lavagem de Cadeiras Estofadas | Desde 12,50€ | Kyro Clean Solutions",
+      title: "Limpeza e Lavagem de Cadeiras Estofadas | Desde 17,50€ | Kyro Clean Solutions",
       description: "Limpeza e lavagem profissional de cadeiras estofadas ao domicílio. Ideal para escritórios, restaurantes e residências. Resultados no momento.",
     },
     en: {
-      title: "Upholstered Chair Cleaning | From €12.50 | Kyro Clean Solutions",
+      title: "Upholstered Chair Cleaning | From €17.50 | Kyro Clean Solutions",
       description: "Professional upholstered chair cleaning at your location. Ideal for offices, restaurants and homes. Instant results.",
     },
     es: {
-      title: "Limpieza y Lavado de Sillas Tapizadas | Desde 12,50€ | Kyro Clean Solutions",
+      title: "Limpieza y Lavado de Sillas Tapizadas | Desde 17,50€ | Kyro Clean Solutions",
       description: "Limpieza profesional de sillas tapizadas a domicilio. Ideal para oficinas, restaurantes y hogares.",
     },
   },
   "/limpeza-alcatifas": {
     pt: {
-      title: "Limpeza e Lavagem de Alcatifas | Desde 7€/m² | Kyro Clean Solutions",
+      title: "Limpeza e Lavagem de Alcatifas | Desde 3€/m² | Kyro Clean Solutions",
       description: "Limpeza e lavagem profunda de alcatifas com extração profissional. Removemos sujidade acumulada e alergénios. Secagem rápida. Porto, Lisboa e todo o país.",
     },
     en: {
-      title: "Carpet Cleaning & Deep Wash | From €7/m² | Kyro Clean Solutions",
+      title: "Carpet Cleaning & Deep Wash | From €3/m² | Kyro Clean Solutions",
       description: "Deep carpet cleaning and washing with professional extraction equipment. We remove accumulated dirt and allergens. Fast drying.",
     },
     es: {
-      title: "Limpieza y Lavado de Moquetas | Desde 7€/m² | Kyro Clean Solutions",
+      title: "Limpieza y Lavado de Moquetas | Desde 3€/m² | Kyro Clean Solutions",
       description: "Limpieza y lavado profundo de moquetas con extracción profesional. Eliminamos suciedad acumulada y alérgenos.",
     },
   },
