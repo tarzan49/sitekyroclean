@@ -107,25 +107,25 @@ const Hero = () => {
             </h1>
 
             {/* Stats + Services row */}
-            <div className="flex flex-wrap items-center gap-x-5 gap-y-2.5 mb-6">
+            <div className="flex flex-wrap items-stretch gap-x-6 gap-y-4 mb-7">
               {/* Main stat */}
-              <div className="flex items-baseline gap-1.5 flex-shrink-0">
-                <span
-                  className="font-playfair text-xl md:text-2xl font-bold text-gold leading-none"
+              <div className="flex-shrink-0">
+                <p
+                  className="font-playfair text-2xl md:text-3xl font-bold text-gold leading-none mb-1.5"
                   style={{ textShadow: '0 1px 8px rgba(0,0,0,0.5)' }}
                 >
                   {STATS[0].value}
-                </span>
-                <span className="text-[10px] md:text-[11px] text-white/60 font-medium tracking-[0.08em] uppercase">{STATS[0].label}</span>
+                </p>
+                <p className="text-[10px] text-white/55 font-medium tracking-[0.16em] uppercase">{STATS[0].label}</p>
               </div>
               {/* Separator — desktop only */}
-              <span className="hidden md:block w-px h-4 bg-white/15 flex-shrink-0" />
+              <span className="hidden md:block w-px self-stretch bg-white/15 flex-shrink-0" />
               {/* Services */}
-              <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5">
+              <div className="flex flex-wrap gap-x-6 gap-y-4">
                 {SERVICES.map((s, i) => (
-                  <div key={i} className="flex items-baseline gap-1 flex-shrink-0">
-                    <span className="text-xs font-bold leading-none" style={{ color: '#D4AF37' }}>{s.value}</span>
-                    <span className="text-[10px] tracking-[0.04em]" style={{ color: 'rgba(255,255,255,0.45)' }}>{s.label}</span>
+                  <div key={i} className="flex-shrink-0">
+                    <p className="font-playfair text-base md:text-lg font-bold text-gold leading-none mb-1.5">{s.value}</p>
+                    <p className="text-[9px] font-medium tracking-[0.14em] uppercase" style={{ color: 'rgba(255,255,255,0.45)' }}>{s.label}</p>
                   </div>
                 ))}
               </div>
