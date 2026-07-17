@@ -104,6 +104,41 @@ const freguesiaLocalData: Record<string, FreguesiaLocalData> = {
   "alfena": { landmarks: ["Centro de Alfena", "Parques locais"], localTip: "Zona residencial em crescimento: novos moradores, novos estofos para proteger." },
   "campo-valongo": { landmarks: ["Estação de Campo", "Serras de Valongo"], localTip: "Zona semi-rural entre serras: a natureza traz pólen que se acumula nos estofos." },
   "sobrado-valongo": { landmarks: ["Centro de Sobrado", "zona leste de Valongo"], localTip: "Zona tranquila e familiar: sem custos de deslocação adicionais." },
+
+  // ─── Lisboa ───
+  "santa-maria-maior": { landmarks: ["Castelo de São Jorge", "Sé de Lisboa", "Alfama"], localTip: "Prédios históricos com pouca ventilação no centro de Lisboa: a limpeza profunda ajuda a prevenir humidade e alergénios nos estofos." },
+  "misericordia": { landmarks: ["Chiado", "Bairro Alto", "Príncipe Real"], localTip: "Apartamentos turísticos e alojamento local em grande número: higienização rápida entre hóspedes é essencial nesta zona." },
+  "santo-antonio": { landmarks: ["Avenida da Liberdade", "Rato", "Jardim do Príncipe Real"], localTip: "Residências de padrão elevado: a nossa equipa está habituada a tecidos premium e peles naturais." },
+  "sao-vicente": { landmarks: ["Graça", "Panteão Nacional", "Feira da Ladra"], localTip: "Zona histórica com miradouros: edifícios antigos exigem atenção redobrada à humidade nos estofos." },
+  "arroios": { landmarks: ["Anjos", "Alameda", "Praça do Chile"], localTip: "Bairro multicultural e denso: agendamos com flexibilidade para residências e pequenos negócios locais." },
+  "avenidas-novas": { landmarks: ["Gulbenkian", "El Corte Inglés", "Campo Pequeno"], localTip: "Zona residencial e empresarial de referência em Lisboa: atendemos apartamentos, escritórios e clínicas." },
+  "belem": { landmarks: ["Mosteiro dos Jerónimos", "Torre de Belém", "MAAT"], localTip: "Junto ao rio Tejo: a humidade constante torna a impermeabilização de sofás especialmente recomendada." },
+  "parque-das-nacoes": { landmarks: ["Oceanário de Lisboa", "Vasco da Gama", "Altice Arena"], localTip: "Apartamentos modernos junto ao rio: a nossa equipa protege estofos novos com impermeabilização preventiva." },
+  "alvalade": { landmarks: ["Estádio de Alvalade", "Avenida da Igreja"], localTip: "Bairro residencial planeado, muito procurado por famílias: higienização regular para crianças e alérgicos." },
+  "benfica": { landmarks: ["Estádio da Luz", "Palácio Fronteira"], localTip: "Uma das zonas mais populosas de Lisboa: atendemos residências e escritórios com rapidez e sem complicações." },
+  "campo-de-ourique": { landmarks: ["Mercado de Campo de Ourique", "Jardim da Parada"], localTip: "Bairro residencial tranquilo muito procurado por famílias: cuidamos de sofás, colchões e tapetes com o mesmo rigor." },
+  "estrela": { landmarks: ["Basílica da Estrela", "Jardim da Estrela"], localTip: "Zona nobre e histórica de Lisboa: trabalhamos com tecidos delicados e mobiliário de valor." },
+
+  // ─── Algarve: Loulé (Quarteira, Vilamoura, Almancil) ───
+  "quarteira": { landmarks: ["Praia de Quarteira", "Marina de Vilamoura (proximidade)"], localTip: "Muitos apartamentos de férias e alojamento local: higienização rápida entre check-ins é o nosso forte." },
+  "vilamoura": { landmarks: ["Marina de Vilamoura", "Casino de Vilamoura", "Campos de Golfe de Vilamoura"], localTip: "Vivendas e apartamentos de alto padrão junto à marina: tratamos estofos de luxo, incluindo pele e tecidos premium, com produtos certificados." },
+  "almancil": { landmarks: ["Igreja Matriz de Almancil (azulejos)", "Zona de restaurantes de Vale do Lobo/Quinta do Lago"], localTip: "Concentra algumas das moradias mais valorizadas do Algarve: serviço discreto e cuidadoso para estofos de gama alta." },
+  "quinta-do-lago": { landmarks: ["Ria Formosa (Quinta do Lago)", "Campos de Golfe da Quinta do Lago"], localTip: "Uma das zonas residenciais mais exclusivas de Portugal: atendemos moradias de luxo com total confidencialidade e produtos de gama profissional para tecidos e peles nobres." },
+  "vale-do-lobo": { landmarks: ["Falésia de Vale do Lobo", "Campos de Golfe de Vale do Lobo"], localTip: "Vivendas de luxo junto ao mar: a maresia exige impermeabilização e limpeza periódica para preservar estofos e tapetes de valor." },
+  "loule-centro": { landmarks: ["Mercado Municipal de Loulé", "Castelo de Loulé"], localTip: "Centro histórico do concelho: atendemos residências tradicionais e apartamentos renovados em toda a zona." },
+  "boliqueime": { landmarks: ["Zona rural entre Loulé e Albufeira"], localTip: "Muitas moradias com jardim e piscina: aplicamos impermeabilização para proteger estofos exteriores e interiores do calor algarvio." },
+
+  // ─── Algarve: Faro, Albufeira, Olhão ───
+  "faro-centro": { landmarks: ["Sé de Faro", "Marina de Faro", "Ria Formosa"], localTip: "Capital do Algarve, com apartamentos junto à marina e ao centro histórico: agendamos com facilidade em toda a cidade." },
+  "montenegro": { landmarks: ["Aeroporto de Faro (proximidade)", "Praia de Faro"], localTip: "Perto do aeroporto: limpamos também estofos de alojamento local e apartamentos de curta duração." },
+  "albufeira-centro": { landmarks: ["Praia dos Pescadores", "Marina de Albufeira", "Praia da Oura"], localTip: "Cidade turística com elevada rotatividade de hóspedes: higienização rápida e eficaz entre reservas de alojamento local." },
+  "guia": { landmarks: ["Zoomarine (proximidade)", "Zona hoteleira de Albufeira"], localTip: "Perto da zona hoteleira: atendemos moradias e apartamentos de férias com disponibilidade flexível." },
+  "olhao-centro": { landmarks: ["Mercado de Olhão", "Porto de Pesca de Olhão"], localTip: "Cidade piscatória junto à Ria Formosa: a humidade e o sal marítimo exigem limpeza e impermeabilização mais frequentes." },
+
+  // ─── Algarve: Portimão, Lagos, Tavira ───
+  "portimao-centro": { landmarks: ["Praia da Rocha", "Marina de Portimão"], localTip: "Maior cidade do Algarve ocidental: atendemos residências permanentes e apartamentos de veraneio junto à praia." },
+  "lagos-centro": { landmarks: ["Marina de Lagos", "Centro Histórico de Lagos"], localTip: "Cidade histórica muito procurada por turistas: higienização profissional entre estadias de alojamento local." },
+  "tavira-centro": { landmarks: ["Ponte Romana de Tavira", "Ilha de Tavira"], localTip: "Centro histórico junto ao rio Gilão: cuidamos de mobiliário tradicional e estofos em casas antigas restauradas." },
 };
 
 function getDefaultLocalData(freguesia: string, municipio: string): FreguesiaLocalData {

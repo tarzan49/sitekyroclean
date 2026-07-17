@@ -22,6 +22,11 @@ export const DEFAULT_AREA_SERVED: AreaServedItem[] = [
   { "@type": "City", "name": "Gondomar" },
   { "@type": "City", "name": "Braga" },
   { "@type": "City", "name": "Lisboa" },
+  { "@type": "City", "name": "Cascais" },
+  { "@type": "City", "name": "Sintra" },
+  { "@type": "City", "name": "Faro" },
+  { "@type": "City", "name": "Loulé" },
+  { "@type": "City", "name": "Albufeira" },
 ];
 
 /** Site-wide LocalBusiness node, optionally scoped to an areaServed. */

@@ -95,6 +95,7 @@ export const chairPrices = {
 };
 
 export const locationPrices: Record<string, number> = {
+  // ═══ Porto/Norte (equipa Porto) ═══
   // Zona 0 — Porto metropolitan core (grátis)
   'Porto': 0,
   'Matosinhos': 0,
@@ -121,13 +122,55 @@ export const locationPrices: Record<string, number> = {
   'Aveiro': 20,
   // Zona 5 — Minho, ~55-70 min
   'Guimarães': 25,
-  // Zona Lisboa — deslocação especial
-  'Lisboa': 35,
-  'Cascais': 35,
-  'Oeiras': 35,
-  'Sintra': 35,
-  'Almada': 35,
-  'Setúbal': 40,
+
+  // ═══ Lisboa / Área Metropolitana (equipa local) ═══
+  // Zona 0 — Lisboa (grátis)
+  'Lisboa': 0,
+  // Zona 1 — Vizinhos imediatos, ~10-15 min
+  'Amadora': 5,
+  'Odivelas': 5,
+  'Oeiras': 5,
+  // Zona 2 — Grande Lisboa, ~20-30 min
+  'Cascais': 10,
+  'Sintra': 10,
+  'Loures': 10,
+  'Almada': 10,
+  'Seixal': 10,
+  // Zona 3 — Mais afastado, ~30-40 min
+  'Vila Franca de Xira': 15,
+  'Barreiro': 15,
+  'Moita': 15,
+  'Mafra': 15,
+  // Zona 4 — Extremos da AML, ~40-50 min
+  'Setúbal': 20,
+  'Montijo': 20,
+  'Alcochete': 20,
+  'Palmela': 20,
+  'Sesimbra': 20,
+
+  // ═══ Algarve (equipa local) ═══
+  // Zona 0 — Faro/Loulé (grátis)
+  'Faro': 0,
+  'Loulé': 0,
+  // Zona 1 — Vizinhos imediatos, ~10-15 min
+  'Albufeira': 5,
+  'São Brás de Alportel': 5,
+  'Olhão': 5,
+  // Zona 2 — Algarve central, ~20-30 min
+  'Silves': 10,
+  'Lagoa': 10,
+  'Tavira': 10,
+  // Zona 3 — Algarve ocidental, ~30-40 min
+  'Portimão': 15,
+  'Lagos': 15,
+  // Zona 4 — Extremos, ~40-55 min
+  'Vila Real de Santo António': 20,
+  'Castro Marim': 20,
+  'Monchique': 20,
+  // Zona 5 — Interior/Costa Vicentina, ~55-70 min
+  'Aljezur': 25,
+  'Vila do Bispo': 25,
+  'Alcoutim': 25,
 };
 
 export const carpetWaterproofingPrices = [

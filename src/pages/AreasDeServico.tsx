@@ -1,15 +1,122 @@
-﻿import { useState } from "react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { MapPin, ArrowRight, Phone, ChevronDown } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import QuizButton from "@/components/QuizButton";
 import { cities, services } from "@/data/locationSeoData";
-import { municipiosComFreguesias, getFreguesiaStats } from "@/data/freguesiaSeoData";
+import { municipiosComFreguesias, getFreguesiaStats, type MunicipioGroup } from "@/data/freguesiaSeoData";
 import { SITE_URL, PHONE_TEL, PHONE_DISPLAY } from "@/constants/business";
 
-const ampCities = cities.filter((_, i) => i < 19); // AMP + Braga/Guimarães
-const lisboaCities = cities.filter((_, i) => i >= 19);
+type Area = "porto" | "lisboa" | "algarve";
+
+const REGIONS: { area: Area; title: string }[] = [
+  { area: "porto", title: "Área Metropolitana do Porto e Norte" },
+  { area: "lisboa", title: "Lisboa e Área Metropolitana" },
+  { area: "algarve", title: "Algarve" },
+];
+
+function citiesForArea(area: Area) {
+  return cities.filter(c => c.area === area);
+}
+
+function municipiosForArea(area: Area) {
+  const slugs = new Set(citiesForArea(area).map(c => c.slug));
+  return municipiosComFreguesias.filter(m => slugs.has(m.slug));
+}
+
+const RegionSection = ({
+  title,
+  area,
+  openMunicipio,
+  setOpenMunicipio,
+}: {
+  title: string;
+  area: Area;
+  openMunicipio: string | null;
+  setOpenMunicipio: (slug: string | null) => void;
+}) => {
+  const municipios = municipiosForArea(area);
+  const areaCities = citiesForArea(area);
+
+  return (
+    <section className="py-12 md:py-16 odd:bg-secondary/20 even:bg-background">
+      <div className="container mx-auto px-4">
+        <div className="max-w-5xl mx-auto">
+          <h2 className="text-2xl md:text-3xl font-bold text-[#111111] mb-8">
+            <MapPin className="w-6 h-6 text-gold inline mr-2" />
+            {title}
+          </h2>
+          <div className="space-y-3">
+            {municipios.map((m: MunicipioGroup) => {
+              const isOpen = openMunicipio === m.slug;
+              const cityExists = areaCities.some(c => c.slug === m.slug);
+              return (
+                <div key={m.slug} className="bg-card rounded-xl border border-border/30 overflow-hidden">
+                  <button
+                    onClick={() => setOpenMunicipio(isOpen ? null : m.slug)}
+                    className="w-full flex items-center justify-between p-4 md:p-5 hover:bg-secondary/30 transition-colors text-left"
+                  >
+                    <div className="flex items-center gap-3">
+                      <MapPin className="w-4 h-4 text-turquoise flex-shrink-0" />
+                      <div>
+                        <span className="text-base md:text-lg font-bold text-[#111111]">{m.name}</span>
+                        <span className="block text-xs text-[#111111]/55">{m.freguesias.length} freguesias</span>
+                      </div>
+                    </div>
+                    <ChevronDown className={`w-5 h-5 text-[#111111]/55 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+                  </button>
+
+                  {isOpen && (
+                    <div className="px-4 md:px-5 pb-5 border-t border-border/20">
+                      {/* Municipality service links */}
+                      {cityExists && (
+                        <div className="mb-4 pt-4">
+                          <p className="text-xs font-semibold text-[#111111]/55 uppercase tracking-wide mb-2">Serviços em {m.name}</p>
+                          <div className="flex flex-wrap gap-2">
+                            {services.map(svc => (
+                              <Link
+                                key={svc.slug}
+                                to={`/${svc.slug}-${m.slug}`}
+                                className="inline-flex items-center gap-1.5 bg-gold/5 px-3 py-1.5 rounded-lg text-xs font-medium text-[#111111] border border-gold/20 hover:bg-gold/10 transition-colors"
+                              >
+                                <ArrowRight className="w-3 h-3 text-gold" />
+                                {svc.name}
+                              </Link>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Freguesias */}
+                      {m.freguesias.length > 0 && (
+                        <>
+                          <p className="text-xs font-semibold text-[#111111]/55 uppercase tracking-wide mb-2">Freguesias</p>
+                          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
+                            {m.freguesias.map(f => (
+                              <Link
+                                key={f.slug}
+                                to={`/limpeza-sofas-${m.slug}-${f.slug}`}
+                                className="group flex items-center gap-1.5 bg-secondary/30 px-3 py-2 rounded-lg text-sm text-[#111111] hover:bg-gold/5 hover:border-gold/30 border border-transparent transition-all"
+                              >
+                                <MapPin className="w-3 h-3 text-gold flex-shrink-0" />
+                                <span className="group-hover:text-turquoise transition-colors truncate">{f.name}</span>
+                              </Link>
+                            ))}
+                          </div>
+                        </>
+                      )}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+};
 
 const AreasDeServico = () => {
   const [openMunicipio, setOpenMunicipio] = useState<string | null>(null);
@@ -32,7 +139,7 @@ const AreasDeServico = () => {
               </h1>
               <div className="w-16 h-1 bg-gold rounded-full mx-auto mb-5" />
               <p className="text-base md:text-lg text-[#111111]/55 leading-relaxed max-w-2xl mx-auto mb-4">
-                A Kyro Clean Solutions presta serviços de limpeza profissional de estofos ao domicílio em {stats.municipios} municípios e {stats.freguesias} freguesias.
+                A Kyro Clean Solutions presta serviços de limpeza profissional de estofos ao domicílio em {stats.municipios} municípios e {stats.freguesias} freguesias, do Porto ao Algarve.
               </p>
               <p className="text-sm text-[#111111]/55 mb-6">
                 {stats.totalPages}+ páginas de serviço local
@@ -47,115 +154,15 @@ const AreasDeServico = () => {
           </div>
         </section>
 
-        {/* Porto Metropolitan Area */}
-        <section className="py-12 md:py-16 bg-secondary/20">
-          <div className="container mx-auto px-4">
-            <div className="max-w-5xl mx-auto">
-              <h2 className="text-2xl md:text-3xl font-bold text-[#111111] mb-8">
-                <MapPin className="w-6 h-6 text-gold inline mr-2" />
-                Área Metropolitana do Porto
-              </h2>
-              <div className="space-y-3">
-                {municipiosComFreguesias.map(m => {
-                  const isOpen = openMunicipio === m.slug;
-                  const cityExists = ampCities.some(c => c.slug === m.slug);
-                  return (
-                    <div key={m.slug} className="bg-card rounded-xl border border-border/30 overflow-hidden">
-                      <button
-                        onClick={() => setOpenMunicipio(isOpen ? null : m.slug)}
-                        className="w-full flex items-center justify-between p-4 md:p-5 hover:bg-secondary/30 transition-colors text-left"
-                      >
-                        <div className="flex items-center gap-3">
-                          <MapPin className="w-4 h-4 text-turquoise flex-shrink-0" />
-                          <div>
-                            <span className="text-base md:text-lg font-bold text-[#111111]">{m.name}</span>
-                            <span className="block text-xs text-[#111111]/55">{m.freguesias.length} freguesias</span>
-                          </div>
-                        </div>
-                        <ChevronDown className={`w-5 h-5 text-[#111111]/55 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
-                      </button>
-
-                      {isOpen && (
-                        <div className="px-4 md:px-5 pb-5 border-t border-border/20">
-                          {/* Municipality service links */}
-                          {cityExists && (
-                            <div className="mb-4 pt-4">
-                              <p className="text-xs font-semibold text-[#111111]/55 uppercase tracking-wide mb-2">Serviços em {m.name}</p>
-                              <div className="flex flex-wrap gap-2">
-                                {services.map(svc => (
-                                  <Link
-                                    key={svc.slug}
-                                    to={`/${svc.slug}-${m.slug}`}
-                                    className="inline-flex items-center gap-1.5 bg-gold/5 px-3 py-1.5 rounded-lg text-xs font-medium text-[#111111] border border-gold/20 hover:bg-gold/10 transition-colors"
-                                  >
-                                    <ArrowRight className="w-3 h-3 text-gold" />
-                                    {svc.name}
-                                  </Link>
-                                ))}
-                              </div>
-                            </div>
-                          )}
-
-                          {/* Freguesias */}
-                          <p className="text-xs font-semibold text-[#111111]/55 uppercase tracking-wide mb-2">Freguesias</p>
-                          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
-                            {m.freguesias.map(f => (
-                              <Link
-                                key={f.slug}
-                                to={`/limpeza-sofas-${m.slug}-${f.slug}`}
-                                className="group flex items-center gap-1.5 bg-secondary/30 px-3 py-2 rounded-lg text-sm text-[#111111] hover:bg-gold/5 hover:border-gold/30 border border-transparent transition-all"
-                              >
-                                <MapPin className="w-3 h-3 text-gold flex-shrink-0" />
-                                <span className="group-hover:text-turquoise transition-colors truncate">{f.name}</span>
-                              </Link>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Lisboa Region */}
-        {lisboaCities.length > 0 && (
-          <section className="py-12 md:py-16 bg-background">
-            <div className="container mx-auto px-4">
-              <div className="max-w-5xl mx-auto">
-                <h2 className="text-2xl md:text-3xl font-bold text-[#111111] mb-8">
-                  <MapPin className="w-6 h-6 text-gold inline mr-2" />
-                  Lisboa e Região
-                </h2>
-                <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {lisboaCities.map(city => (
-                    <div key={city.slug} className="bg-card rounded-xl p-5 shadow-sm border border-border/30 hover:shadow-md hover:border-gold/20 transition-all">
-                      <h3 className="text-lg font-bold text-[#111111] mb-3 flex items-center gap-2">
-                        <MapPin className="w-4 h-4 text-turquoise" />
-                        {city.name}
-                      </h3>
-                      <p className="text-xs text-[#111111]/55 mb-3 capitalize">{city.description}</p>
-                      <div className="space-y-1.5">
-                        {services.map(svc => (
-                          <Link
-                            key={svc.slug}
-                            to={`/${svc.slug}-${city.slug}`}
-                            className="group flex items-center gap-2 text-sm text-[#111111] hover:text-turquoise transition-colors"
-                          >
-                            <ArrowRight className="w-3 h-3 text-gold group-hover:translate-x-0.5 transition-transform" />
-                            {svc.name}
-                          </Link>
-                        ))}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </section>
-        )}
+        {REGIONS.map(r => (
+          <RegionSection
+            key={r.area}
+            title={r.title}
+            area={r.area}
+            openMunicipio={openMunicipio}
+            setOpenMunicipio={setOpenMunicipio}
+          />
+        ))}
 
         {/* CTA */}
         <section className="py-10 md:py-14 bg-kyro-green">
@@ -182,7 +189,7 @@ const AreasDeServico = () => {
                   "@id": `${SITE_URL}/areas-de-servico#webpage`,
                   "url": `${SITE_URL}/areas-de-servico`,
                   "name": "Áreas de Serviço | Kyro Clean Solutions",
-                  "description": `Serviços de limpeza profissional em ${stats.municipios} municípios e ${stats.freguesias} freguesias da Área Metropolitana do Porto e Lisboa.`,
+                  "description": `Serviços de limpeza profissional em ${stats.municipios} municípios e ${stats.freguesias} freguesias do Porto, Lisboa e Algarve.`,
                   "inLanguage": "pt-PT",
                   "isPartOf": { "@id": `${SITE_URL}/#website` },
                   "publisher": { "@id": `${SITE_URL}/#business` },

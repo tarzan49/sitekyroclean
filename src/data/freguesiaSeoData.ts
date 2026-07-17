@@ -236,6 +236,350 @@ export const municipiosComFreguesias: MunicipioGroup[] = [
       { name: "Moldes", slug: "moldes", nearby: ["arouca-centro"] },
     ],
   },
+  // ═══════════════ Lisboa / Área Metropolitana ═══════════════
+  {
+    name: "Lisboa", slug: "lisboa",
+    freguesias: [
+      { name: "Santa Maria Maior", slug: "santa-maria-maior", nearby: ["misericordia", "sao-vicente", "arroios"] },
+      { name: "Misericórdia", slug: "misericordia", nearby: ["santa-maria-maior", "santo-antonio", "estrela"] },
+      { name: "Santo António", slug: "santo-antonio", nearby: ["misericordia", "avenidas-novas", "arroios"] },
+      { name: "São Vicente", slug: "sao-vicente", nearby: ["santa-maria-maior", "penha-de-franca", "beato"] },
+      { name: "Arroios", slug: "arroios", nearby: ["santo-antonio", "penha-de-franca", "areeiro"] },
+      { name: "Penha de França", slug: "penha-de-franca", nearby: ["sao-vicente", "arroios", "beato"] },
+      { name: "Beato", slug: "beato", nearby: ["sao-vicente", "penha-de-franca", "marvila"] },
+      { name: "Marvila", slug: "marvila", nearby: ["beato", "parque-das-nacoes", "olivais"] },
+      { name: "Parque das Nações", slug: "parque-das-nacoes", nearby: ["marvila", "olivais"] },
+      { name: "Areeiro", slug: "areeiro", nearby: ["arroios", "alvalade", "avenidas-novas"] },
+      { name: "Alvalade", slug: "alvalade", nearby: ["areeiro", "avenidas-novas", "olivais"] },
+      { name: "Avenidas Novas", slug: "avenidas-novas", nearby: ["santo-antonio", "areeiro", "campolide"] },
+      { name: "Campo de Ourique", slug: "campo-de-ourique", nearby: ["estrela", "campolide", "alcantara"] },
+      { name: "Estrela", slug: "estrela", nearby: ["misericordia", "campo-de-ourique", "campolide"] },
+      { name: "Campolide", slug: "campolide", nearby: ["avenidas-novas", "campo-de-ourique", "benfica"] },
+      { name: "Alcântara", slug: "alcantara", nearby: ["campo-de-ourique", "belem", "campolide"] },
+      { name: "Belém", slug: "belem", nearby: ["alcantara", "ajuda"] },
+      { name: "Ajuda", slug: "ajuda", nearby: ["belem", "benfica"] },
+      { name: "Benfica", slug: "benfica", nearby: ["campolide", "ajuda", "sao-domingos-de-benfica"] },
+      { name: "São Domingos de Benfica", slug: "sao-domingos-de-benfica", nearby: ["benfica", "carnide", "avenidas-novas"] },
+      { name: "Carnide", slug: "carnide", nearby: ["sao-domingos-de-benfica", "lumiar", "benfica"] },
+      { name: "Lumiar", slug: "lumiar", nearby: ["carnide", "santa-clara", "olivais"] },
+      { name: "Santa Clara", slug: "santa-clara", nearby: ["lumiar", "olivais"] },
+      { name: "Olivais", slug: "olivais", nearby: ["santa-clara", "parque-das-nacoes", "alvalade"] },
+    ],
+  },
+  {
+    name: "Cascais", slug: "cascais",
+    freguesias: [
+      { name: "Cascais e Estoril", slug: "cascais-estoril", nearby: ["alcabideche", "carcavelos-e-parede"] },
+      { name: "Alcabideche", slug: "alcabideche", nearby: ["cascais-estoril", "sao-domingos-de-rana"] },
+      { name: "Carcavelos e Parede", slug: "carcavelos-e-parede", nearby: ["cascais-estoril", "sao-domingos-de-rana"] },
+      { name: "São Domingos de Rana", slug: "sao-domingos-de-rana", nearby: ["alcabideche", "carcavelos-e-parede"] },
+    ],
+  },
+  {
+    name: "Oeiras", slug: "oeiras",
+    freguesias: [
+      { name: "Oeiras e São Julião da Barra", slug: "oeiras-e-sao-juliao-da-barra", nearby: ["carnaxide-e-queijas", "porto-salvo"] },
+      { name: "Algés, Linda-a-Velha e Cruz Quebrada", slug: "alges-linda-a-velha", nearby: ["carnaxide-e-queijas", "oeiras-e-sao-juliao-da-barra"] },
+      { name: "Carnaxide e Queijas", slug: "carnaxide-e-queijas", nearby: ["alges-linda-a-velha", "oeiras-e-sao-juliao-da-barra", "barcarena"] },
+      { name: "Barcarena", slug: "barcarena", nearby: ["carnaxide-e-queijas", "porto-salvo"] },
+      { name: "Porto Salvo", slug: "porto-salvo", nearby: ["barcarena", "oeiras-e-sao-juliao-da-barra"] },
+    ],
+  },
+  {
+    name: "Sintra", slug: "sintra",
+    freguesias: [
+      { name: "Sintra (Vila)", slug: "sintra-vila", nearby: ["colares", "almargem-do-bispo", "rio-de-mouro"] },
+      { name: "Agualva e Mira-Sintra", slug: "agualva-e-mira-sintra", nearby: ["cacem-e-sao-marcos", "algueirao-mem-martins"] },
+      { name: "Algueirão-Mem Martins", slug: "algueirao-mem-martins", nearby: ["agualva-e-mira-sintra", "rio-de-mouro", "casal-de-cambra"] },
+      { name: "Casal de Cambra", slug: "casal-de-cambra", nearby: ["algueirao-mem-martins", "cacem-e-sao-marcos"] },
+      { name: "Cacém e São Marcos", slug: "cacem-e-sao-marcos", nearby: ["agualva-e-mira-sintra", "massama-e-monte-abraao"] },
+      { name: "Massamá e Monte Abraão", slug: "massama-e-monte-abraao", nearby: ["cacem-e-sao-marcos", "queluz-e-belas"] },
+      { name: "Queluz e Belas", slug: "queluz-e-belas", nearby: ["massama-e-monte-abraao", "rio-de-mouro"] },
+      { name: "Rio de Mouro", slug: "rio-de-mouro", nearby: ["algueirao-mem-martins", "queluz-e-belas", "sintra-vila"] },
+      { name: "São João das Lampas e Terrugem", slug: "sao-joao-das-lampas-e-terrugem", nearby: ["sintra-vila", "colares"] },
+      { name: "Colares", slug: "colares", nearby: ["sintra-vila", "sao-joao-das-lampas-e-terrugem"] },
+      { name: "Almargem do Bispo, Pêro Pinheiro e Montelavar", slug: "almargem-do-bispo", nearby: ["sintra-vila", "sao-joao-das-lampas-e-terrugem"] },
+    ],
+  },
+  {
+    name: "Almada", slug: "almada",
+    freguesias: [
+      { name: "Almada, Cova da Piedade, Pragal e Cacilhas", slug: "almada-cova-da-piedade", nearby: ["laranjeiro-e-feijo", "caparica-e-trafaria"] },
+      { name: "Caparica e Trafaria", slug: "caparica-e-trafaria", nearby: ["almada-cova-da-piedade", "costa-da-caparica"] },
+      { name: "Costa da Caparica", slug: "costa-da-caparica", nearby: ["caparica-e-trafaria", "charneca-de-caparica"] },
+      { name: "Charneca de Caparica e Sobreda", slug: "charneca-de-caparica", nearby: ["costa-da-caparica", "laranjeiro-e-feijo"] },
+      { name: "Laranjeiro e Feijó", slug: "laranjeiro-e-feijo", nearby: ["almada-cova-da-piedade", "charneca-de-caparica"] },
+    ],
+  },
+  {
+    name: "Setúbal", slug: "setubal",
+    freguesias: [
+      { name: "Setúbal (Centro Histórico)", slug: "setubal-centro", nearby: ["sao-sebastiao-setubal", "sado"] },
+      { name: "São Sebastião", slug: "sao-sebastiao-setubal", nearby: ["setubal-centro", "gambia-pontes"] },
+      { name: "Sado", slug: "sado", nearby: ["setubal-centro", "gambia-pontes"] },
+      { name: "Gâmbia-Pontes-Alto da Guerra", slug: "gambia-pontes", nearby: ["sao-sebastiao-setubal", "sado"] },
+      { name: "Azeitão", slug: "azeitao", nearby: ["setubal-centro"] },
+    ],
+  },
+  {
+    name: "Amadora", slug: "amadora",
+    freguesias: [
+      { name: "Águas Livres", slug: "aguas-livres", nearby: ["alfragide", "venteira"] },
+      { name: "Alfragide", slug: "alfragide", nearby: ["aguas-livres", "encosta-do-sol"] },
+      { name: "Encosta do Sol", slug: "encosta-do-sol", nearby: ["alfragide", "falagueira-venda-nova"] },
+      { name: "Falagueira-Venda Nova", slug: "falagueira-venda-nova", nearby: ["encosta-do-sol", "mina-de-agua"] },
+      { name: "Mina de Água", slug: "mina-de-agua", nearby: ["falagueira-venda-nova", "venteira"] },
+      { name: "Venteira", slug: "venteira", nearby: ["mina-de-agua", "aguas-livres"] },
+    ],
+  },
+  {
+    name: "Odivelas", slug: "odivelas",
+    freguesias: [
+      { name: "Odivelas", slug: "odivelas-centro", nearby: ["povoa-de-santo-adriao", "pontinha-e-famoes"] },
+      { name: "Póvoa de Santo Adrião e Olival Basto", slug: "povoa-de-santo-adriao", nearby: ["odivelas-centro", "ramada-e-canecas"] },
+      { name: "Ramada e Caneças", slug: "ramada-e-canecas", nearby: ["povoa-de-santo-adriao", "odivelas-centro"] },
+      { name: "Pontinha e Famões", slug: "pontinha-e-famoes", nearby: ["odivelas-centro"] },
+    ],
+  },
+  {
+    name: "Loures", slug: "loures",
+    freguesias: [
+      { name: "Loures", slug: "loures-centro", nearby: ["sacavem-e-prior-velho", "bucelas"] },
+      { name: "Sacavém e Prior Velho", slug: "sacavem-e-prior-velho", nearby: ["loures-centro", "moscavide-e-portela", "santa-iria-de-azoia"] },
+      { name: "Santa Iria de Azoia, São João da Talha e Bobadela", slug: "santa-iria-de-azoia", nearby: ["sacavem-e-prior-velho", "camarate-unhos-apelacao"] },
+      { name: "Camarate, Unhos e Apelação", slug: "camarate-unhos-apelacao", nearby: ["santa-iria-de-azoia", "santo-antonio-dos-cavaleiros"] },
+      { name: "Santo António dos Cavaleiros e Frielas", slug: "santo-antonio-dos-cavaleiros", nearby: ["camarate-unhos-apelacao", "loures-centro"] },
+      { name: "Bucelas", slug: "bucelas", nearby: ["loures-centro", "fanhoes"] },
+      { name: "Fanhões", slug: "fanhoes", nearby: ["bucelas", "lousa-loures"] },
+      { name: "Lousa", slug: "lousa-loures", nearby: ["fanhoes", "loures-centro"] },
+      { name: "Moscavide e Portela", slug: "moscavide-e-portela", nearby: ["sacavem-e-prior-velho"] },
+    ],
+  },
+  {
+    name: "Vila Franca de Xira", slug: "vila-franca-de-xira",
+    freguesias: [
+      { name: "Vila Franca de Xira", slug: "vila-franca-de-xira-centro", nearby: ["alverca-do-ribatejo", "povoa-de-santa-iria"] },
+      { name: "Alverca do Ribatejo", slug: "alverca-do-ribatejo", nearby: ["vila-franca-de-xira-centro", "povoa-de-santa-iria"] },
+      { name: "Póvoa de Santa Iria e Forte da Casa", slug: "povoa-de-santa-iria", nearby: ["alverca-do-ribatejo", "vialonga"] },
+      { name: "Alhandra, São João dos Montes e Calhandriz", slug: "alhandra", nearby: ["vila-franca-de-xira-centro", "castanheira-do-ribatejo"] },
+      { name: "Vialonga", slug: "vialonga", nearby: ["povoa-de-santa-iria", "vila-franca-de-xira-centro"] },
+      { name: "Castanheira do Ribatejo e Cachoeiras", slug: "castanheira-do-ribatejo", nearby: ["alhandra", "vila-franca-de-xira-centro"] },
+    ],
+  },
+  {
+    name: "Barreiro", slug: "barreiro",
+    freguesias: [
+      { name: "Barreiro e Lavradio", slug: "barreiro-e-lavradio", nearby: ["alto-do-seixalinho", "palhais-e-coina"] },
+      { name: "Alto do Seixalinho, Santo André e Verderena", slug: "alto-do-seixalinho", nearby: ["barreiro-e-lavradio", "palhais-e-coina"] },
+      { name: "Palhais e Coina", slug: "palhais-e-coina", nearby: ["barreiro-e-lavradio", "alto-do-seixalinho"] },
+    ],
+  },
+  {
+    name: "Moita", slug: "moita",
+    freguesias: [
+      { name: "Moita", slug: "moita-centro", nearby: ["baixa-da-banheira", "alhos-vedros"] },
+      { name: "Baixa da Banheira e Vale da Amoreira", slug: "baixa-da-banheira", nearby: ["moita-centro", "alhos-vedros"] },
+      { name: "Alhos Vedros", slug: "alhos-vedros", nearby: ["moita-centro", "baixa-da-banheira"] },
+      { name: "Gaio-Rosário e Sarilhos Pequenos", slug: "gaio-rosario", nearby: ["moita-centro"] },
+    ],
+  },
+  {
+    name: "Mafra", slug: "mafra",
+    freguesias: [
+      { name: "Mafra", slug: "mafra-centro", nearby: ["malveira", "venda-do-pinheiro"] },
+      { name: "Ericeira", slug: "ericeira", nearby: ["mafra-centro"] },
+      { name: "Malveira e São Miguel de Alcainça", slug: "malveira", nearby: ["mafra-centro", "venda-do-pinheiro"] },
+      { name: "Venda do Pinheiro e Santo Estêvão das Galés", slug: "venda-do-pinheiro", nearby: ["malveira", "mafra-centro"] },
+    ],
+  },
+  {
+    name: "Seixal", slug: "seixal",
+    freguesias: [
+      { name: "Seixal, Arrentela e Aldeia de Paio Pires", slug: "seixal-centro", nearby: ["amora", "corroios"] },
+      { name: "Amora", slug: "amora", nearby: ["seixal-centro", "corroios"] },
+      { name: "Corroios", slug: "corroios", nearby: ["amora", "seixal-centro"] },
+      { name: "Fernão Ferro", slug: "fernao-ferro", nearby: ["seixal-centro"] },
+    ],
+  },
+  {
+    name: "Montijo", slug: "montijo",
+    freguesias: [
+      { name: "Montijo e Afonsoeiro", slug: "montijo-centro", nearby: ["alto-estanqueiro", "sarilhos-grandes"] },
+      { name: "Alto Estanqueiro-Jardia", slug: "alto-estanqueiro", nearby: ["montijo-centro", "canha"] },
+      { name: "Canha", slug: "canha", nearby: ["alto-estanqueiro", "pegoes"] },
+      { name: "Pegões", slug: "pegoes", nearby: ["canha"] },
+      { name: "Sarilhos Grandes", slug: "sarilhos-grandes", nearby: ["montijo-centro"] },
+    ],
+  },
+  {
+    name: "Alcochete", slug: "alcochete",
+    freguesias: [
+      { name: "Alcochete", slug: "alcochete-centro", nearby: ["samouco", "sao-francisco-alcochete"] },
+      { name: "Samouco", slug: "samouco", nearby: ["alcochete-centro"] },
+      { name: "São Francisco", slug: "sao-francisco-alcochete", nearby: ["alcochete-centro"] },
+    ],
+  },
+  {
+    name: "Palmela", slug: "palmela",
+    freguesias: [
+      { name: "Palmela", slug: "palmela-centro", nearby: ["pinhal-novo", "quinta-do-anjo"] },
+      { name: "Pinhal Novo", slug: "pinhal-novo", nearby: ["palmela-centro", "poceirao-e-marateca"] },
+      { name: "Poceirão e Marateca", slug: "poceirao-e-marateca", nearby: ["pinhal-novo"] },
+      { name: "Quinta do Anjo", slug: "quinta-do-anjo", nearby: ["palmela-centro"] },
+    ],
+  },
+  {
+    name: "Sesimbra", slug: "sesimbra",
+    freguesias: [
+      { name: "Sesimbra (Castelo) e Quinta do Conde", slug: "sesimbra-castelo", nearby: ["santiago-sesimbra"] },
+      { name: "Santiago", slug: "santiago-sesimbra", nearby: ["sesimbra-castelo"] },
+    ],
+  },
+  // ═══════════════ Algarve ═══════════════
+  {
+    name: "Faro", slug: "faro",
+    freguesias: [
+      { name: "Faro (Sé e São Pedro)", slug: "faro-centro", nearby: ["conceicao-de-faro", "montenegro"] },
+      { name: "Conceição de Faro", slug: "conceicao-de-faro", nearby: ["faro-centro", "montenegro"] },
+      { name: "Estoi", slug: "estoi", nearby: ["santa-barbara-de-nexe", "faro-centro"] },
+      { name: "Montenegro", slug: "montenegro", nearby: ["faro-centro", "conceicao-de-faro"] },
+      { name: "Santa Bárbara de Nexe", slug: "santa-barbara-de-nexe", nearby: ["estoi", "faro-centro"] },
+    ],
+  },
+  {
+    name: "Loulé", slug: "loule",
+    freguesias: [
+      { name: "Loulé (Centro)", slug: "loule-centro", nearby: ["boliqueime", "alte-e-salir"] },
+      { name: "Quarteira", slug: "quarteira", nearby: ["vilamoura", "almancil"] },
+      { name: "Vilamoura", slug: "vilamoura", nearby: ["quarteira", "almancil"] },
+      { name: "Almancil", slug: "almancil", nearby: ["quinta-do-lago", "vale-do-lobo", "quarteira"] },
+      { name: "Quinta do Lago", slug: "quinta-do-lago", nearby: ["vale-do-lobo", "almancil"] },
+      { name: "Vale do Lobo", slug: "vale-do-lobo", nearby: ["quinta-do-lago", "almancil"] },
+      { name: "Boliqueime", slug: "boliqueime", nearby: ["loule-centro", "almancil"] },
+      { name: "Alte, Ameixial e Salir", slug: "alte-e-salir", nearby: ["loule-centro"] },
+    ],
+  },
+  {
+    name: "Albufeira", slug: "albufeira",
+    freguesias: [
+      { name: "Albufeira e Olhos de Água", slug: "albufeira-centro", nearby: ["guia", "ferreiras"] },
+      { name: "Ferreiras", slug: "ferreiras", nearby: ["albufeira-centro", "paderne"] },
+      { name: "Guia", slug: "guia", nearby: ["albufeira-centro", "ferreiras"] },
+      { name: "Paderne", slug: "paderne", nearby: ["ferreiras"] },
+    ],
+  },
+  {
+    name: "Olhão", slug: "olhao",
+    freguesias: [
+      { name: "Olhão", slug: "olhao-centro", nearby: ["quelfes", "pechao"] },
+      { name: "Quelfes", slug: "quelfes", nearby: ["olhao-centro", "moncarapacho-e-fuseta"] },
+      { name: "Moncarapacho e Fuseta", slug: "moncarapacho-e-fuseta", nearby: ["quelfes", "olhao-centro"] },
+      { name: "Pechão", slug: "pechao", nearby: ["olhao-centro"] },
+    ],
+  },
+  {
+    name: "São Brás de Alportel", slug: "sao-bras-de-alportel",
+    freguesias: [
+      { name: "São Brás de Alportel", slug: "sao-bras-de-alportel-centro", nearby: [] },
+    ],
+  },
+  {
+    name: "Silves", slug: "silves",
+    freguesias: [
+      { name: "Silves", slug: "silves-centro", nearby: ["algoz-e-tunes", "sao-bartolomeu-de-messines"] },
+      { name: "Algoz e Tunes", slug: "algoz-e-tunes", nearby: ["silves-centro", "armacao-de-pera"] },
+      { name: "Armação de Pêra", slug: "armacao-de-pera", nearby: ["algoz-e-tunes", "pera"] },
+      { name: "Pêra", slug: "pera", nearby: ["armacao-de-pera"] },
+      { name: "São Bartolomeu de Messines", slug: "sao-bartolomeu-de-messines", nearby: ["silves-centro", "sao-marcos-da-serra"] },
+      { name: "São Marcos da Serra", slug: "sao-marcos-da-serra", nearby: ["sao-bartolomeu-de-messines"] },
+    ],
+  },
+  {
+    name: "Lagoa", slug: "lagoa-algarve",
+    freguesias: [
+      { name: "Lagoa e Carvoeiro", slug: "lagoa-e-carvoeiro", nearby: ["estombar-e-parchal", "porches"] },
+      { name: "Estômbar e Parchal", slug: "estombar-e-parchal", nearby: ["lagoa-e-carvoeiro", "ferragudo"] },
+      { name: "Ferragudo", slug: "ferragudo", nearby: ["estombar-e-parchal"] },
+      { name: "Porches", slug: "porches", nearby: ["lagoa-e-carvoeiro"] },
+    ],
+  },
+  {
+    name: "Tavira", slug: "tavira",
+    freguesias: [
+      { name: "Tavira (Santa Maria e Santiago)", slug: "tavira-centro", nearby: ["conceicao-e-cabanas", "santa-luzia-tavira"] },
+      { name: "Conceição e Cabanas de Tavira", slug: "conceicao-e-cabanas", nearby: ["tavira-centro", "luz-de-tavira"] },
+      { name: "Luz de Tavira e Santo Estêvão", slug: "luz-de-tavira", nearby: ["conceicao-e-cabanas", "santa-catarina-da-fonte-do-bispo"] },
+      { name: "Santa Catarina da Fonte do Bispo", slug: "santa-catarina-da-fonte-do-bispo", nearby: ["luz-de-tavira", "cachopo"] },
+      { name: "Santa Luzia", slug: "santa-luzia-tavira", nearby: ["tavira-centro"] },
+      { name: "Cachopo", slug: "cachopo", nearby: ["santa-catarina-da-fonte-do-bispo"] },
+    ],
+  },
+  {
+    name: "Portimão", slug: "portimao",
+    freguesias: [
+      { name: "Portimão", slug: "portimao-centro", nearby: ["alvor", "mexilhoeira-grande"] },
+      { name: "Alvor", slug: "alvor", nearby: ["portimao-centro", "mexilhoeira-grande"] },
+      { name: "Mexilhoeira Grande", slug: "mexilhoeira-grande", nearby: ["alvor", "portimao-centro"] },
+    ],
+  },
+  {
+    name: "Lagos", slug: "lagos",
+    freguesias: [
+      { name: "Lagos (São Sebastião e Santa Maria)", slug: "lagos-centro", nearby: ["luz-lagos", "odiaxere"] },
+      { name: "Luz", slug: "luz-lagos", nearby: ["lagos-centro", "bensafrim"] },
+      { name: "Odiáxere", slug: "odiaxere", nearby: ["lagos-centro", "bensafrim"] },
+      { name: "Bensafrim e Barão de São João", slug: "bensafrim", nearby: ["luz-lagos", "odiaxere"] },
+    ],
+  },
+  {
+    name: "Vila Real de Santo António", slug: "vila-real-de-santo-antonio",
+    freguesias: [
+      { name: "Vila Real de Santo António", slug: "vila-real-de-santo-antonio-centro", nearby: ["monte-gordo"] },
+      { name: "Monte Gordo", slug: "monte-gordo", nearby: ["vila-real-de-santo-antonio-centro"] },
+    ],
+  },
+  {
+    name: "Castro Marim", slug: "castro-marim",
+    freguesias: [
+      { name: "Castro Marim", slug: "castro-marim-centro", nearby: ["odeleite", "azinhal"] },
+      { name: "Odeleite", slug: "odeleite", nearby: ["castro-marim-centro"] },
+      { name: "Azinhal", slug: "azinhal", nearby: ["castro-marim-centro"] },
+    ],
+  },
+  {
+    name: "Monchique", slug: "monchique",
+    freguesias: [
+      { name: "Monchique", slug: "monchique-centro", nearby: ["alferce", "marmelete"] },
+      { name: "Alferce", slug: "alferce", nearby: ["monchique-centro"] },
+      { name: "Marmelete", slug: "marmelete", nearby: ["monchique-centro"] },
+    ],
+  },
+  {
+    name: "Aljezur", slug: "aljezur",
+    freguesias: [
+      { name: "Aljezur", slug: "aljezur-centro", nearby: ["bordeira", "odeceixe"] },
+      { name: "Bordeira", slug: "bordeira", nearby: ["aljezur-centro", "rogil"] },
+      { name: "Odeceixe", slug: "odeceixe", nearby: ["aljezur-centro"] },
+      { name: "Rogil", slug: "rogil", nearby: ["bordeira"] },
+    ],
+  },
+  {
+    name: "Vila do Bispo", slug: "vila-do-bispo",
+    freguesias: [
+      { name: "Vila do Bispo e Raposeira", slug: "vila-do-bispo-centro", nearby: ["sagres", "budens"] },
+      { name: "Budens", slug: "budens", nearby: ["vila-do-bispo-centro"] },
+      { name: "Sagres", slug: "sagres", nearby: ["vila-do-bispo-centro"] },
+    ],
+  },
+  {
+    name: "Alcoutim", slug: "alcoutim",
+    freguesias: [
+      { name: "Alcoutim e Pereiro", slug: "alcoutim-centro", nearby: ["gioes", "martim-longo"] },
+      { name: "Giões", slug: "gioes", nearby: ["alcoutim-centro"] },
+      { name: "Martim Longo", slug: "martim-longo", nearby: ["vaqueiros", "alcoutim-centro"] },
+      { name: "Vaqueiros", slug: "vaqueiros", nearby: ["martim-longo"] },
+    ],
+  },
 ];
 
 // ─── Flatten all freguesias ───────────────────────────────────────
