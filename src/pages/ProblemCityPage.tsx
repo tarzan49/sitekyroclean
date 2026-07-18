@@ -233,56 +233,67 @@ const ProblemCityPage = () => {
           </div>
         </section>
 
-        {/* ═══ PROBLEMA + SOLUÇÃO ═══ */}
-        <section className="py-14 md:py-20 bg-kyro-green">
+        {/* ═══ PROBLEMA + SOLUÇÃO — visual, 2 cartões fotográficos ═══ */}
+        <section className="py-14 md:py-20 bg-[#FDFDF9]">
           <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
-            <SectionHeader overline="Diagnóstico" heading="O que realmente" goldWord="acontece" light={false} />
-            <div className="grid md:grid-cols-2 gap-px" style={{ backgroundColor: "rgba(255,255,255,0.08)" }}>
-              <div className="p-7 md:p-9 bg-[#FDFDF9]">
-                <div className="flex items-center gap-3 mb-5">
-                  <AlertTriangle className="w-5 h-5" style={{ color: "#D4AF37" }} />
-                  <p className="text-[10px] font-bold tracking-[0.26em] uppercase" style={{ color: "#D4AF37" }}>O Problema {prep} {city.name}</p>
-                </div>
-                <p className="text-sm text-[#111111]/65 leading-relaxed mb-4">{problem.problemDetail}</p>
-                <p className="text-sm text-[#111111]/45 leading-relaxed italic border-t border-[#E8E4DE] pt-4">{cityContext}</p>
+            <SectionHeader overline="Diagnóstico" heading="Do problema à" goldWord="solução" light={true} />
+            <div className="grid sm:grid-cols-2 gap-4 md:gap-6 mb-6">
+              {/* Problema */}
+              <div className="relative aspect-[4/5] sm:aspect-[3/4] overflow-hidden rounded-sm">
+                <img src={heroImg} alt={`${problem.h1} — o problema`} className="absolute inset-0 w-full h-full object-cover" loading="lazy" />
+                <div className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(7,26,18,0.94) 0%, rgba(7,26,18,0.45) 42%, rgba(7,26,18,0.05) 68%, transparent 100%)" }} />
+                <span
+                  className="absolute top-5 left-5 inline-flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-bold tracking-[0.22em] uppercase text-white"
+                  style={{ backgroundColor: "rgba(160,55,40,0.92)" }}
+                >
+                  <AlertTriangle className="w-3 h-3 flex-shrink-0" /> O Problema {prep} {city.name}
+                </span>
+                <p className="absolute bottom-0 left-0 right-0 p-5 md:p-7 text-sm md:text-[15px] text-white/90 leading-relaxed">
+                  {problem.problemDetail}
+                </p>
               </div>
-              <div className="p-7 md:p-9" style={{ backgroundColor: "#0d241b" }}>
-                <div className="flex items-center gap-3 mb-5">
-                  <Lightbulb className="w-5 h-5" style={{ color: "#D4AF37" }} />
-                  <p className="text-[10px] font-bold tracking-[0.26em] uppercase" style={{ color: "#D4AF37" }}>A Solução</p>
-                </div>
-                <p className="text-sm text-white/65 leading-relaxed">{problem.solutionDetail}</p>
+              {/* Solução */}
+              <div className="relative aspect-[4/5] sm:aspect-[3/4] overflow-hidden rounded-sm">
+                <img src={gallery?.after ?? heroImg} alt={`${problem.h1} — a solução`} className="absolute inset-0 w-full h-full object-cover" loading="lazy" />
+                <div className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(7,26,18,0.94) 0%, rgba(7,26,18,0.45) 42%, rgba(7,26,18,0.05) 68%, transparent 100%)" }} />
+                <span
+                  className="absolute top-5 left-5 inline-flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-bold tracking-[0.22em] uppercase"
+                  style={{ backgroundColor: "rgba(212,175,55,0.94)", color: "#071a12" }}
+                >
+                  <Lightbulb className="w-3 h-3 flex-shrink-0" /> A Solução
+                </span>
+                <p className="absolute bottom-0 left-0 right-0 p-5 md:p-7 text-sm md:text-[15px] text-white/90 leading-relaxed">
+                  {problem.solutionDetail}
+                </p>
               </div>
             </div>
+            <p className="text-sm text-[#111111]/50 leading-relaxed italic max-w-2xl">{cityContext}</p>
           </div>
         </section>
 
-        {/* ═══ PROCESSO ═══ */}
+        {/* ═══ PROCESSO — timeline horizontal ligada por linha ═══ */}
         <section className="py-14 md:py-20 bg-kyro-green">
           <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
             <SectionHeader overline="Processo" heading="Como tratamos este problema" goldWord={city.name} light={false} />
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-px" style={{ backgroundColor: "rgba(255,255,255,0.08)" }}>
-              {[0, 1].map((colIdx) => {
-                const colSteps = colIdx === 0 ? PROCESS_STEPS.slice(0, 2) : PROCESS_STEPS.slice(2);
-                const offset = colIdx === 0 ? 0 : 2;
+            <div className="relative grid grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-10">
+              <div
+                className="hidden lg:block absolute top-6 left-0 right-0 h-px"
+                style={{ background: "linear-gradient(to right, transparent, #D4AF37 8%, #D4AF37 92%, transparent)" }}
+                aria-hidden="true"
+              />
+              {PROCESS_STEPS.map((step, idx) => {
+                const Icon = step.icon;
                 return (
-                  <div key={colIdx} className="grid gap-px" style={{ backgroundColor: "rgba(255,255,255,0.08)" }}>
-                    {colSteps.map((step, idx) => {
-                      const num = offset + idx;
-                      const Icon = step.icon;
-                      return (
-                        <div key={num} className="relative overflow-hidden flex items-start gap-4 p-5 md:p-6" style={{ backgroundColor: "#0d241b", borderTop: "2px solid rgba(212,175,55,0.55)" }}>
-                          <div className="w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0" style={{ backgroundColor: "rgba(212,175,55,0.15)", border: "1px solid rgba(212,175,55,0.35)" }}>
-                            <Icon className="w-4 h-4" style={{ color: "#D4AF37" }} />
-                          </div>
-                          <div>
-                            <p className="text-[10px] font-bold tracking-[0.24em] uppercase mb-1" style={{ color: "#D4AF37" }}>{String(num + 1).padStart(2, "0")}</p>
-                            <p className="text-sm font-semibold text-white mb-1">{step.title}</p>
-                            <p className="text-sm text-white/60 leading-relaxed">{step.body}</p>
-                          </div>
-                        </div>
-                      );
-                    })}
+                  <div key={idx} className="relative flex flex-col items-start">
+                    <div
+                      className="relative z-10 w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0 mb-4"
+                      style={{ backgroundColor: "#0d241b", border: "2px solid #D4AF37" }}
+                    >
+                      <Icon className="w-5 h-5" style={{ color: "#D4AF37" }} />
+                    </div>
+                    <p className="text-[10px] font-bold tracking-[0.24em] uppercase mb-1.5" style={{ color: "#D4AF37" }}>{String(idx + 1).padStart(2, "0")}</p>
+                    <p className="text-sm font-semibold text-white mb-1.5">{step.title}</p>
+                    <p className="text-sm text-white/55 leading-relaxed">{step.body}</p>
                   </div>
                 );
               })}
@@ -351,14 +362,14 @@ const ProblemCityPage = () => {
 
         {/* ═══ FAQ ═══ */}
         {localFaqs.length > 0 && (
-          <ServiceFAQ faqs={localFaqs} heading="Perguntas Frequentes" variant="light" />
+          <ServiceFAQ faqs={localFaqs} heading="Perguntas Frequentes" variant="dark" />
         )}
 
         {/* ═══ AVALIAÇÕES REAIS ═══ */}
         {testimonial && (
-          <section className="py-14 md:py-20 bg-kyro-green">
+          <section className="py-14 md:py-20 bg-[#FDFDF9]">
             <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
-              <SectionHeader overline="Avaliações Reais" heading="O que dizem os nossos" goldWord="clientes" light={false} />
+              <SectionHeader overline="Avaliações Reais" heading="O que dizem os nossos" goldWord="clientes" light={true} />
               <div className="max-w-md">
                 <div className="relative overflow-hidden p-6 md:p-8 bg-white" style={{ borderTop: "2px solid #D4AF37" }}>
                   <div className="flex gap-0.5 mb-4">

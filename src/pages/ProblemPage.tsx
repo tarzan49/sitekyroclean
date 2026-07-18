@@ -197,72 +197,81 @@ const ProblemPage = () => {
           </div>
         </section>
 
-        {/* ═══ PROBLEMA + SOLUÇÃO ═══ */}
-        <section className="py-14 md:py-20 bg-kyro-green">
+        {/* ═══ PROBLEMA + SOLUÇÃO — visual, 2 cartões fotográficos ═══ */}
+        <section className="py-14 md:py-20 bg-[#FDFDF9]">
           <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
-            <SectionHeader overline="Diagnóstico" heading="O que realmente" goldWord="acontece" light={false} />
-            <div className="grid md:grid-cols-2 gap-px" style={{ backgroundColor: "rgba(255,255,255,0.08)" }}>
-              <div className="p-7 md:p-9 bg-[#FDFDF9]">
-                <div className="flex items-center gap-3 mb-5">
-                  <AlertTriangle className="w-5 h-5" style={{ color: "#D4AF37" }} />
-                  <p className="text-[10px] font-bold tracking-[0.26em] uppercase" style={{ color: "#D4AF37" }}>O Problema</p>
-                </div>
-                <p className="text-sm text-[#111111]/65 leading-relaxed">{data.problemDetail}</p>
+            <SectionHeader overline="Diagnóstico" heading="Do problema à" goldWord="solução" light={true} />
+            <div className="grid sm:grid-cols-2 gap-4 md:gap-6">
+              {/* Problema */}
+              <div className="relative aspect-[4/5] sm:aspect-[3/4] overflow-hidden rounded-sm">
+                <img src={heroImg} alt={`${data.h1} — o problema`} className="absolute inset-0 w-full h-full object-cover" loading="lazy" />
+                <div className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(7,26,18,0.94) 0%, rgba(7,26,18,0.45) 42%, rgba(7,26,18,0.05) 68%, transparent 100%)" }} />
+                <span
+                  className="absolute top-5 left-5 inline-flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-bold tracking-[0.22em] uppercase text-white"
+                  style={{ backgroundColor: "rgba(160,55,40,0.92)" }}
+                >
+                  <AlertTriangle className="w-3 h-3 flex-shrink-0" /> O Problema
+                </span>
+                <p className="absolute bottom-0 left-0 right-0 p-5 md:p-7 text-sm md:text-[15px] text-white/90 leading-relaxed">
+                  {data.problemDetail}
+                </p>
               </div>
-              <div className="p-7 md:p-9" style={{ backgroundColor: "#0d241b" }}>
-                <div className="flex items-center gap-3 mb-5">
-                  <Lightbulb className="w-5 h-5" style={{ color: "#D4AF37" }} />
-                  <p className="text-[10px] font-bold tracking-[0.26em] uppercase" style={{ color: "#D4AF37" }}>A Solução</p>
-                </div>
-                <p className="text-sm text-white/65 leading-relaxed">{data.solutionDetail}</p>
+              {/* Solução */}
+              <div className="relative aspect-[4/5] sm:aspect-[3/4] overflow-hidden rounded-sm">
+                <img src={gallery?.after ?? heroImg} alt={`${data.h1} — a solução`} className="absolute inset-0 w-full h-full object-cover" loading="lazy" />
+                <div className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(7,26,18,0.94) 0%, rgba(7,26,18,0.45) 42%, rgba(7,26,18,0.05) 68%, transparent 100%)" }} />
+                <span
+                  className="absolute top-5 left-5 inline-flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-bold tracking-[0.22em] uppercase"
+                  style={{ backgroundColor: "rgba(212,175,55,0.94)", color: "#071a12" }}
+                >
+                  <Lightbulb className="w-3 h-3 flex-shrink-0" /> A Solução
+                </span>
+                <p className="absolute bottom-0 left-0 right-0 p-5 md:p-7 text-sm md:text-[15px] text-white/90 leading-relaxed">
+                  {data.solutionDetail}
+                </p>
               </div>
             </div>
           </div>
         </section>
 
-        {/* ═══ QUANDO CHAMAR ═══ */}
-        <section className="py-14 md:py-20 bg-[#FDFDF9]">
+        {/* ═══ QUANDO CHAMAR — checklist, não grid numerada (para não repetir Benefícios) ═══ */}
+        <section className="py-14 md:py-20 bg-kyro-green">
           <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
-            <SectionHeader overline="Quando Agir" heading="Quando chamar um" goldWord="profissional" light={true} />
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-px" style={{ backgroundColor: "#E8E4DE" }}>
+            <SectionHeader overline="Quando Agir" heading="Quando chamar um" goldWord="profissional" light={false} />
+            <div className="grid sm:grid-cols-2 gap-x-8 gap-y-1">
               {WHEN_TO_CALL.map((sign, idx) => (
-                <div key={idx} className="relative overflow-hidden flex items-start gap-3 p-6 md:p-7 bg-white" style={{ borderTop: "2px solid #D4AF37" }}>
-                  <span className="font-playfair font-bold flex-shrink-0 leading-none" style={{ fontSize: "1.75rem", color: "rgba(212,175,55,0.35)" }}>
-                    {String(idx + 1).padStart(2, "0")}
-                  </span>
-                  <span className="text-sm text-[#111111]/60 leading-relaxed pt-1">{sign}</span>
+                <div key={idx} className="flex items-start gap-3 py-3.5" style={{ borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
+                  <AlertTriangle className="w-4 h-4 flex-shrink-0 mt-0.5" style={{ color: "#D4AF37" }} />
+                  <span className="text-sm text-white/70 leading-relaxed">{sign}</span>
                 </div>
               ))}
             </div>
           </div>
         </section>
 
-        {/* ═══ PROCESSO ═══ */}
-        <section className="py-14 md:py-20 bg-kyro-green">
+        {/* ═══ PROCESSO — timeline horizontal ligada por linha, não grid ═══ */}
+        <section className="py-14 md:py-20 bg-[#FDFDF9]">
           <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
-            <SectionHeader overline="Processo" heading="Como tratamos este" goldWord="problema" light={false} />
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-px" style={{ backgroundColor: "rgba(255,255,255,0.08)" }}>
-              {[0, 1].map((colIdx) => {
-                const colSteps = colIdx === 0 ? PROCESS_STEPS.slice(0, 2) : PROCESS_STEPS.slice(2);
-                const offset = colIdx === 0 ? 0 : 2;
+            <SectionHeader overline="Processo" heading="Como tratamos este" goldWord="problema" light={true} />
+            <div className="relative grid grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-10">
+              <div
+                className="hidden lg:block absolute top-6 left-0 right-0 h-px"
+                style={{ background: "linear-gradient(to right, transparent, #D4AF37 8%, #D4AF37 92%, transparent)" }}
+                aria-hidden="true"
+              />
+              {PROCESS_STEPS.map((step, idx) => {
+                const Icon = step.icon;
                 return (
-                  <div key={colIdx} className="grid gap-px" style={{ backgroundColor: "rgba(255,255,255,0.08)" }}>
-                    {colSteps.map((step, idx) => {
-                      const num = offset + idx;
-                      const Icon = step.icon;
-                      return (
-                        <div key={num} className="relative overflow-hidden flex items-start gap-4 p-5 md:p-6" style={{ backgroundColor: "#0d241b", borderTop: "2px solid rgba(212,175,55,0.55)" }}>
-                          <div className="w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0" style={{ backgroundColor: "rgba(212,175,55,0.15)", border: "1px solid rgba(212,175,55,0.35)" }}>
-                            <Icon className="w-4 h-4" style={{ color: "#D4AF37" }} />
-                          </div>
-                          <div>
-                            <p className="text-[10px] font-bold tracking-[0.24em] uppercase mb-1" style={{ color: "#D4AF37" }}>{String(num + 1).padStart(2, "0")}</p>
-                            <p className="text-sm font-semibold text-white mb-1">{step.title}</p>
-                            <p className="text-sm text-white/60 leading-relaxed">{step.body}</p>
-                          </div>
-                        </div>
-                      );
-                    })}
+                  <div key={idx} className="relative flex flex-col items-start">
+                    <div
+                      className="relative z-10 w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0 mb-4 bg-white"
+                      style={{ border: "2px solid #D4AF37" }}
+                    >
+                      <Icon className="w-5 h-5" style={{ color: "#D4AF37" }} />
+                    </div>
+                    <p className="text-[10px] font-bold tracking-[0.24em] uppercase mb-1.5" style={{ color: "#D4AF37" }}>{String(idx + 1).padStart(2, "0")}</p>
+                    <p className="text-sm font-semibold text-[#111111] mb-1.5">{step.title}</p>
+                    <p className="text-sm text-[#111111]/55 leading-relaxed">{step.body}</p>
                   </div>
                 );
               })}
@@ -271,19 +280,19 @@ const ProblemPage = () => {
         </section>
 
         {/* ═══ BENEFÍCIOS ═══ */}
-        <section className="py-14 md:py-20 bg-[#FDFDF9]">
+        <section className="py-14 md:py-20 bg-kyro-green">
           <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
-            <SectionHeader overline="Vantagens" heading="O que muda depois da nossa" goldWord="intervenção" light={true} />
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-px" style={{ backgroundColor: "#E8E4DE" }}>
+            <SectionHeader overline="Vantagens" heading="O que muda depois da nossa" goldWord="intervenção" light={false} />
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-px" style={{ backgroundColor: "rgba(255,255,255,0.08)" }}>
               {data.benefits.map((benefit, idx) => (
-                <div key={idx} className="relative overflow-hidden flex items-start gap-3 p-6 md:p-7 bg-white" style={{ borderTop: "2px solid #D4AF37" }}>
+                <div key={idx} className="relative overflow-hidden flex items-start gap-3 p-6 md:p-7" style={{ backgroundColor: "#0d241b", borderTop: "2px solid rgba(212,175,55,0.55)" }}>
                   <span
                     className="absolute bottom-2 right-3 font-playfair font-bold leading-none select-none pointer-events-none"
-                    style={{ fontSize: "5rem", color: "rgba(212,175,55,0.1)" }}
+                    style={{ fontSize: "5rem", color: "rgba(212,175,55,0.08)" }}
                   >
                     {String(idx + 1).padStart(2, "0")}
                   </span>
-                  <span className="relative text-sm text-[#111111]/65 leading-relaxed">{benefit}</span>
+                  <span className="relative text-sm text-white/65 leading-relaxed">{benefit}</span>
                 </div>
               ))}
             </div>
@@ -292,23 +301,23 @@ const ProblemPage = () => {
 
         {/* ═══ DICA DE ESPECIALISTA ═══ */}
         {categoryTips && (
-          <section className="py-14 md:py-20 bg-kyro-green">
+          <section className="py-14 md:py-20 bg-[#FDFDF9]">
             <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
-              <SectionHeader overline="Dica de Especialista" heading={categoryTips.title.split(" ").slice(0, -1).join(" ") || "O que fazer"} goldWord={categoryTips.title.split(" ").slice(-1)[0] ?? "agora"} light={false} />
+              <SectionHeader overline="Dica de Especialista" heading={categoryTips.title.split(" ").slice(0, -1).join(" ") || "O que fazer"} goldWord={categoryTips.title.split(" ").slice(-1)[0] ?? "agora"} light={true} />
               <div className="max-w-2xl">
                 <ol className="space-y-4 mb-8">
                   {categoryTips.steps.map((step, i) => (
                     <li key={i} className="flex items-start gap-4">
-                      <span className="font-black text-xs w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5" style={{ backgroundColor: "rgba(212,175,55,0.18)", color: "#D4AF37" }}>
+                      <span className="font-black text-xs w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5" style={{ backgroundColor: "rgba(212,175,55,0.12)", color: "#B8912A" }}>
                         {i + 1}
                       </span>
-                      <p className="text-sm text-white/70 leading-relaxed">{step}</p>
+                      <p className="text-sm text-[#111111]/65 leading-relaxed">{step}</p>
                     </li>
                   ))}
                 </ol>
-                <div className="flex items-start gap-3 p-4" style={{ backgroundColor: "rgba(212,175,55,0.05)", border: "1px solid rgba(212,175,55,0.2)" }}>
-                  <AlertTriangle className="w-4 h-4 flex-shrink-0 mt-0.5" style={{ color: "#D4AF37" }} />
-                  <p className="text-xs text-white/50 leading-relaxed">{categoryTips.warning}</p>
+                <div className="flex items-start gap-3 p-4" style={{ backgroundColor: "rgba(212,175,55,0.06)", border: "1px solid rgba(212,175,55,0.25)" }}>
+                  <AlertTriangle className="w-4 h-4 flex-shrink-0 mt-0.5" style={{ color: "#B8912A" }} />
+                  <p className="text-xs text-[#111111]/55 leading-relaxed">{categoryTips.warning}</p>
                 </div>
               </div>
             </div>
@@ -325,7 +334,7 @@ const ProblemPage = () => {
             afterImage={gallery.after}
             slides={gallery.slides}
             rotateBeforeAfter={gallery.rotateBeforeAfter}
-            variant="light"
+            variant="dark"
           />
         )}
 
@@ -363,9 +372,9 @@ const ProblemPage = () => {
         )}
 
         {/* ═══ REDE INTERNA ═══ */}
-        <section className="py-14 md:py-20 bg-kyro-green">
+        <section className="py-14 md:py-20 bg-[#FDFDF9]">
           <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
-            <SectionHeader overline="Explore" heading="Continue a" goldWord="explorar" light={false} />
+            <SectionHeader overline="Explore" heading="Continue a" goldWord="explorar" light={true} />
             <div className="grid md:grid-cols-2 gap-x-12 gap-y-10">
               {relatedServiceData.length > 0 && (
                 <div>
@@ -373,7 +382,7 @@ const ProblemPage = () => {
                   <div className="flex flex-wrap gap-2">
                     {relatedServiceData.map(svc => (
                       <Link key={svc.slug} to={svc.baseRoute}
-                        className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full text-sm font-medium text-white border border-white/15 hover:border-[#D4AF37]/40 hover:bg-white/5 transition-all">
+                        className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full text-sm font-medium text-[#111111] bg-white border border-[#E8E4DE] hover:border-[#D4AF37]/40 hover:bg-[#D4AF37]/5 transition-all">
                         <ArrowRight className="w-3 h-3" style={{ color: "#D4AF37" }} />
                         {svc.name}
                       </Link>
@@ -388,7 +397,7 @@ const ProblemPage = () => {
                   <div className="flex flex-wrap gap-2">
                     {relatedProblemLinks.map(link => (
                       <Link key={link.path} to={link.path}
-                        className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full text-sm font-medium text-white border border-white/15 hover:border-[#D4AF37]/40 hover:bg-white/5 transition-all">
+                        className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full text-sm font-medium text-[#111111] bg-white border border-[#E8E4DE] hover:border-[#D4AF37]/40 hover:bg-[#D4AF37]/5 transition-all">
                         <ArrowRight className="w-3 h-3" style={{ color: "#D4AF37" }} />
                         {link.name}
                       </Link>
@@ -403,7 +412,7 @@ const ProblemPage = () => {
                   <div className="flex flex-wrap gap-2">
                     {relatedCityData.map(city => (
                       <Link key={city.slug} to={`/${data.slug}-${city.slug}`}
-                        className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full text-sm font-medium text-white border border-white/15 hover:border-[#D4AF37]/40 hover:bg-white/5 transition-all">
+                        className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full text-sm font-medium text-[#111111] bg-white border border-[#E8E4DE] hover:border-[#D4AF37]/40 hover:bg-[#D4AF37]/5 transition-all">
                         <MapPin className="w-3 h-3" style={{ color: "#D4AF37" }} />
                         {city.name}
                       </Link>
@@ -431,7 +440,7 @@ const ProblemPage = () => {
               description: data.metaDescription,
               serviceType: relatedService.name,
               areaServed: DEFAULT_AREA_SERVED,
-              offers: buildOfferNode(relatedService.priceFrom.replace(/[^0-9]/g, ''), {
+              offers: buildOfferNode(relatedService.priceFrom.replace(',', '.').replace(/[^0-9.]/g, ''), {
                 validFrom: "2025-01-01",
                 priceValidUntil: "2026-12-31",
               }),
