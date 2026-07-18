@@ -201,33 +201,35 @@ const ProblemPage = () => {
           <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
             <SectionHeader overline="Diagnóstico" heading="O problema," goldWord="a solução" light={true} />
             <div className="grid sm:grid-cols-2 gap-4 md:gap-6">
-              {/* Problema */}
+              {/* Problema — imagem dessaturada: comunica "antes" sem usar vermelho */}
               <div className="relative aspect-[4/3] overflow-hidden rounded-sm">
-                <img src={heroImg} alt={`${data.h1} — o problema`} className="absolute inset-0 w-full h-full object-cover" loading="lazy" />
-                <div className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(7,26,18,0.85) 0%, rgba(7,26,18,0.5) 38%, rgba(7,26,18,0.08) 66%, transparent 100%)" }} />
-                <span
-                  className="absolute top-5 left-5 inline-flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-bold tracking-[0.22em] uppercase text-white backdrop-blur-sm"
-                  style={{ backgroundColor: "rgba(7,26,18,0.75)", border: "1px solid rgba(212,175,55,0.35)" }}
-                >
-                  <AlertTriangle className="w-3 h-3 flex-shrink-0" style={{ color: "#D4AF37" }} /> O Problema
-                </span>
-                <div className="absolute bottom-0 left-0 right-0 p-5 md:p-7 min-h-[130px] md:min-h-[150px] flex flex-col justify-start">
-                  <p className="text-[10px] font-bold tracking-[0.18em] uppercase mb-2" style={{ color: "#D4AF37" }}>Porque acontece</p>
-                  <p className="text-sm text-white/85 leading-relaxed">{data.problemDetail}</p>
+                <img
+                  src={heroImg}
+                  alt={`${data.h1} — o problema`}
+                  className="absolute inset-0 w-full h-full object-cover"
+                  style={{ filter: "grayscale(85%) brightness(0.78) contrast(1.05)" }}
+                  loading="lazy"
+                />
+                <div className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(7,26,18,0.90) 0%, rgba(7,26,18,0.6) 45%, rgba(7,26,18,0.15) 72%, transparent 100%)" }} />
+                <div className="absolute bottom-0 left-0 right-0 p-5 md:p-7 min-h-[160px] md:min-h-[180px] flex flex-col justify-start">
+                  <div className="flex items-center gap-1.5 mb-2">
+                    <AlertTriangle className="w-3.5 h-3.5 flex-shrink-0 text-white/60" />
+                    <span className="text-[10px] font-bold tracking-[0.22em] uppercase text-white/60">O Problema</span>
+                  </div>
+                  <p className="font-playfair text-lg font-bold text-white mb-2 leading-tight">Porque acontece</p>
+                  <p className="text-sm text-white/80 leading-relaxed">{data.problemDetail}</p>
                 </div>
               </div>
-              {/* Solução */}
+              {/* Solução — cor cheia: comunica "depois" */}
               <div className="relative aspect-[4/3] overflow-hidden rounded-sm">
                 <img src={gallery?.after ?? heroImg} alt={`${data.h1} — a solução`} className="absolute inset-0 w-full h-full object-cover" loading="lazy" />
-                <div className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(7,26,18,0.85) 0%, rgba(7,26,18,0.5) 38%, rgba(7,26,18,0.08) 66%, transparent 100%)" }} />
-                <span
-                  className="absolute top-5 left-5 inline-flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-bold tracking-[0.22em] uppercase"
-                  style={{ backgroundColor: "rgba(212,175,55,0.94)", color: "#071a12" }}
-                >
-                  <Lightbulb className="w-3 h-3 flex-shrink-0" /> A Solução
-                </span>
-                <div className="absolute bottom-0 left-0 right-0 p-5 md:p-7 min-h-[130px] md:min-h-[150px] flex flex-col justify-start">
-                  <p className="text-[10px] font-bold tracking-[0.18em] uppercase mb-2" style={{ color: "#D4AF37" }}>Como resolvemos</p>
+                <div className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(7,26,18,0.90) 0%, rgba(7,26,18,0.6) 45%, rgba(7,26,18,0.15) 72%, transparent 100%)" }} />
+                <div className="absolute bottom-0 left-0 right-0 p-5 md:p-7 min-h-[160px] md:min-h-[180px] flex flex-col justify-start">
+                  <div className="flex items-center gap-1.5 mb-2">
+                    <Lightbulb className="w-3.5 h-3.5 flex-shrink-0" style={{ color: "#D4AF37" }} />
+                    <span className="text-[10px] font-bold tracking-[0.22em] uppercase" style={{ color: "#D4AF37" }}>A Solução</span>
+                  </div>
+                  <p className="font-playfair text-lg font-bold mb-2 leading-tight" style={{ color: "#D4AF37" }}>Como resolvemos</p>
                   <p className="text-sm text-white/85 leading-relaxed">{data.solutionDetail}</p>
                 </div>
               </div>
