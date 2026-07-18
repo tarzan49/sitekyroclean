@@ -3,7 +3,6 @@ import { useParams, Link } from "react-router-dom";
 import { QuizServiceProvider } from "@/context/QuizLocationContext";
 import {
   MapPin, Star, MessageCircle, ArrowRight, AlertTriangle, Lightbulb,
-  Search, Droplets, Sparkles, Wind,
 } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -41,10 +40,10 @@ const WHEN_TO_CALL = [
 ];
 
 const PROCESS_STEPS = [
-  { icon: Search,   title: "Identificação do tecido", body: "Avaliamos o tipo de material e a extensão do problema antes de aplicar qualquer produto ou equipamento." },
-  { icon: Droplets, title: "Pulverização",            body: "Aplicação de solução específica, adequada ao tecido identificado e ao problema a tratar." },
-  { icon: Wind,     title: "Escovação",               body: "Escovagem para distribuir o produto e soltar a sujidade nas fibras, preparando para a extração." },
-  { icon: Sparkles, title: "Extração",                body: "Extração profissional a alta temperatura remove resíduos e sujidade das camadas mais profundas das fibras." },
+  { title: "Identificação do tecido", body: "Avaliamos o tipo de material e a extensão do problema antes de aplicar qualquer produto ou equipamento." },
+  { title: "Pulverização",            body: "Aplicação de solução específica, adequada ao tecido identificado e ao problema a tratar." },
+  { title: "Escovação",               body: "Escovagem para distribuir o produto e soltar a sujidade nas fibras, preparando para a extração." },
+  { title: "Extração",                body: "Extração profissional a alta temperatura remove resíduos e sujidade das camadas mais profundas das fibras." },
 ];
 
 function getProblemWaBtnLabel(slug: string): string {
@@ -200,35 +199,37 @@ const ProblemPage = () => {
         {/* ═══ PROBLEMA + SOLUÇÃO — visual, 2 cartões fotográficos ═══ */}
         <section className="py-14 md:py-20 bg-[#FDFDF9]">
           <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
-            <SectionHeader overline="Diagnóstico" heading="Do problema à" goldWord="solução" light={true} />
+            <SectionHeader overline="Diagnóstico" heading="O problema," goldWord="a solução" light={true} />
             <div className="grid sm:grid-cols-2 gap-4 md:gap-6">
               {/* Problema */}
-              <div className="relative aspect-[4/5] sm:aspect-[3/4] overflow-hidden rounded-sm">
+              <div className="relative aspect-[4/3] overflow-hidden rounded-sm">
                 <img src={heroImg} alt={`${data.h1} — o problema`} className="absolute inset-0 w-full h-full object-cover" loading="lazy" />
-                <div className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(7,26,18,0.94) 0%, rgba(7,26,18,0.45) 42%, rgba(7,26,18,0.05) 68%, transparent 100%)" }} />
+                <div className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(7,26,18,0.95) 0%, rgba(7,26,18,0.68) 38%, rgba(7,26,18,0.15) 66%, transparent 100%)" }} />
                 <span
                   className="absolute top-5 left-5 inline-flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-bold tracking-[0.22em] uppercase text-white"
                   style={{ backgroundColor: "rgba(160,55,40,0.92)" }}
                 >
                   <AlertTriangle className="w-3 h-3 flex-shrink-0" /> O Problema
                 </span>
-                <p className="absolute bottom-0 left-0 right-0 p-5 md:p-7 text-sm md:text-[15px] text-white/90 leading-relaxed">
-                  {data.problemDetail}
-                </p>
+                <div className="absolute bottom-0 left-0 right-0 p-5 md:p-7">
+                  <p className="text-[10px] font-bold tracking-[0.18em] uppercase mb-2" style={{ color: "#D4AF37" }}>Porque acontece</p>
+                  <p className="text-sm text-white/85 leading-relaxed">{data.problemDetail}</p>
+                </div>
               </div>
               {/* Solução */}
-              <div className="relative aspect-[4/5] sm:aspect-[3/4] overflow-hidden rounded-sm">
+              <div className="relative aspect-[4/3] overflow-hidden rounded-sm">
                 <img src={gallery?.after ?? heroImg} alt={`${data.h1} — a solução`} className="absolute inset-0 w-full h-full object-cover" loading="lazy" />
-                <div className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(7,26,18,0.94) 0%, rgba(7,26,18,0.45) 42%, rgba(7,26,18,0.05) 68%, transparent 100%)" }} />
+                <div className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(7,26,18,0.95) 0%, rgba(7,26,18,0.68) 38%, rgba(7,26,18,0.15) 66%, transparent 100%)" }} />
                 <span
                   className="absolute top-5 left-5 inline-flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-bold tracking-[0.22em] uppercase"
                   style={{ backgroundColor: "rgba(212,175,55,0.94)", color: "#071a12" }}
                 >
                   <Lightbulb className="w-3 h-3 flex-shrink-0" /> A Solução
                 </span>
-                <p className="absolute bottom-0 left-0 right-0 p-5 md:p-7 text-sm md:text-[15px] text-white/90 leading-relaxed">
-                  {data.solutionDetail}
-                </p>
+                <div className="absolute bottom-0 left-0 right-0 p-5 md:p-7">
+                  <p className="text-[10px] font-bold tracking-[0.18em] uppercase mb-2" style={{ color: "#D4AF37" }}>Como resolvemos</p>
+                  <p className="text-sm text-white/85 leading-relaxed">{data.solutionDetail}</p>
+                </div>
               </div>
             </div>
           </div>
@@ -259,22 +260,19 @@ const ProblemPage = () => {
                 style={{ background: "linear-gradient(to right, transparent, #D4AF37 8%, #D4AF37 92%, transparent)" }}
                 aria-hidden="true"
               />
-              {PROCESS_STEPS.map((step, idx) => {
-                const Icon = step.icon;
-                return (
-                  <div key={idx} className="relative flex flex-col items-start">
-                    <div
-                      className="relative z-10 w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0 mb-4 bg-white"
-                      style={{ border: "2px solid #D4AF37" }}
-                    >
-                      <Icon className="w-5 h-5" style={{ color: "#D4AF37" }} />
-                    </div>
-                    <p className="text-[10px] font-bold tracking-[0.24em] uppercase mb-1.5" style={{ color: "#D4AF37" }}>{String(idx + 1).padStart(2, "0")}</p>
-                    <p className="text-sm font-semibold text-[#111111] mb-1.5">{step.title}</p>
-                    <p className="text-sm text-[#111111]/55 leading-relaxed">{step.body}</p>
+              {PROCESS_STEPS.map((step, idx) => (
+                <div key={idx} className="relative flex flex-col items-start">
+                  <div
+                    className="relative z-10 w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0 mb-4 bg-white"
+                    style={{ border: "2px solid #D4AF37" }}
+                  >
+                    <span className="font-playfair font-bold text-lg leading-none" style={{ color: "#D4AF37" }}>{idx + 1}</span>
                   </div>
-                );
-              })}
+                  <p className="text-[10px] font-bold tracking-[0.24em] uppercase mb-1.5" style={{ color: "#D4AF37" }}>{String(idx + 1).padStart(2, "0")}</p>
+                  <p className="text-sm font-semibold text-[#111111] mb-1.5">{step.title}</p>
+                  <p className="text-sm text-[#111111]/55 leading-relaxed">{step.body}</p>
+                </div>
+              ))}
             </div>
           </div>
         </section>
