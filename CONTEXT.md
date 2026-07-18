@@ -669,4 +669,16 @@ Correções aplicadas: canonical URLs em branco nas 17 páginas core, Breadcrumb
 - **GBP:** aconselhado a criar 2 perfis novos (Lisboa + Algarve) em vez de reaproveitar o do Porto — proximidade é o fator de ranking dominante, o Porto não vai aparecer no Local Pack a 300km de distância independentemente do nº de reviews.
 
 **Pendente (ação do user):** GSC já resubmetido; criar perfis GBP para Lisboa/Algarve; confirmar limite do Formspree (50 submissões/mês) dado o aumento de alcance.
-- Preços de sofá/cadeiras/tapetes/alcatifas **não foram tocados** (fora do pedido).
+
+## Sessão — Redesign visual: hero/stats/pills, PricePage, Material, WhatsApp único, páginas de Problema (2026-07-17/18)
+
+**Commits:** `3ecea24` → `bbe68cf` (hero Variantes Keyword + widget) → `40d4d06` → `3ea36ef` (Preço + Material) → `f0d45a9` → `3007db1` → `6caf9fe` (hero homepage) → `0ac58f2` (WhatsApp) → `35952f9` → `977596f` → `aaa8d6a` → `b521766` (páginas de Problema)
+
+- **Novo `src/components/ServiceSnapshotStats.tsx`**: faixa de stats (5.0★/preço/zonas/tempo resposta) partilhada entre Localidade/Freguesia/Variantes Keyword. Fundo = mesma foto do hero a continuar (hero + faixa partilham um único `<img>` num wrapper comum) — 1ª tentativa com `background-image` separado ficou errada (amplia demasiado o centro da foto).
+- **`TrustRatingBadge.tsx` nova variante `mapsLinkClients`**: pill de avaliações + pill "+1000 clientes", aplicada em 5 sítios. Bug mobile corrigido (`flex-col sm:flex-row` em vez de `flex-wrap` que sobrepunha as pills).
+- **WhatsApp — bug de duplicação:** a homepage (`HeroV1.tsx`) tinha a sua própria barra fixa de WhatsApp mobile, diferente e sem coordenação com o componente global `MobileStickyBar.tsx` já montado em todas as páginas — por isso o botão "mudava sem motivo" consoante o scroll. Duplicação removida, fica só a global (que ganhou sombra premium).
+- **Homepage — audit de densidade mobile:** hero tinha 7 blocos de conteúdo empilhados em 320px. Stat principal + avaliações fundidos numa linha, repartição por serviço passou a `hidden md:flex`.
+- **PricePage.tsx:** hero com imagens variadas por localidade (`pickServiceHero`); `priceFactors` padronizado a 6 itens por serviço (grid 3 colunas); alternância de fundo corrigida.
+- **MaterialPage.tsx:** ícones em círculo no "Como limpamos" removidos, ficou só o número (user achou os ícones "emoji-like").
+- **Páginas de Problema (`ProblemPage.tsx` + `ProblemCityPage.tsx`, 995 páginas) — trabalho mais extenso da sessão:** alternância de fundo corrigida (regra: secção após hero tem de ser branca); "Processo" virou timeline horizontal; "Problema+Solução" reescrita como 2 cartões fotográficos (não texto) — **foto do Problema a preto-e-branco, foto da Solução a cores cheias**, é o contraste visual que conta a história em vez de precisar de vermelho. User vai criar imagens dedicadas por problema no futuro (spec: 4:3, antes/depois do mesmo objeto).
+- **Descoberta:** `problemDetail`/`solutionDetail` (e provavelmente outros campos) nunca estiveram no HTML pré-renderizado estático — só existem depois da hidratação React. Não é regressão desta sessão, é limitação pré-existente do `scripts/prerender.ts` para este campo. Vale um audit futuro de cobertura do prerender por tipo de página.
