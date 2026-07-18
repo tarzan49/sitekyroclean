@@ -476,6 +476,15 @@ Observações:
 ${formData.description || 'Sem observações adicionais'}
     `.trim();
 
+    trackQuizEvent({
+      step: 4,
+      action: 'complete',
+      service: formData.service ?? undefined,
+      city: finalLocation ?? undefined,
+      value: totalPrice > 0 ? totalPrice : undefined,
+      service_type: formData.serviceType ?? undefined,
+    });
+
     const { success } = await submit({
       name: formData.name,
       phone: formData.phone,
