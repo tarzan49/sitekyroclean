@@ -152,7 +152,7 @@ export const packs: PackCombo[] = [
         key: 'colchao',
         label: 'Colchão',
         options: [
-          { id: 'solteiro', label: 'Solteiro',     sublabel: '90×200 cm',  price: 39 },
+          { id: 'solteiro', label: 'Solteiro',     sublabel: '90×200 cm',  price: 49 },
           { id: 'casal',    label: 'Casal',         sublabel: '140×200 cm', price: 69 },
           { id: 'king',     label: 'King / Queen',  sublabel: '160+ cm',    price: 79 },
         ],
@@ -288,7 +288,7 @@ export const packs: PackCombo[] = [
         key: 'colchao',
         label: 'Colchão',
         options: [
-          { id: 'solteiro', label: 'Solteiro',     sublabel: '90×200 cm',  price: 39 },
+          { id: 'solteiro', label: 'Solteiro',     sublabel: '90×200 cm',  price: 49 },
           { id: 'casal',    label: 'Casal',         sublabel: '140×200 cm', price: 69 },
           { id: 'king',     label: 'King / Queen',  sublabel: '160+ cm',    price: 79 },
         ],
