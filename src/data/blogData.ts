@@ -43,7 +43,7 @@ const posts: BlogPost[] = [
       },
       {
         heading: "O que influencia o preço?",
-        body: "Vários fatores determinam o custo final:\n\n**Tamanho e configuração**, Um sofá em L tem mais metros de tecido do que um sofá de 3 lugares reto. O número de chaises e almofadas avulsas também conta.\n\n**Material do tecido**, Tecidos delicados como veludo, alcântara ou chenille requerem produtos específicos. O preço base não varia por tipo de tecido.\n\n**Estado de sujidade**, Manchas antigas, urina de animais ou bolor exigem pré-tratamentos especializados que não estão incluídos no preço base.\n\n**Impermeabilização**, Se adicionares impermeabilização ao serviço (recomendado), o pack limpeza mais impermeabilização fica entre 40€ e 50€ acima do preço da limpeza simples, mas com desconto face à contratação separada.",
+        body: "Vários fatores determinam o custo final:\n\n**Tamanho e configuração**, Um sofá em L tem mais metros de tecido do que um sofá de 3 lugares reto. O número de chaises e almofadas avulsas também conta.\n\n**Material do tecido**, Tecidos delicados como veludo, alcântara ou chenille requerem produtos específicos. O preço base não varia por tipo de tecido.\n\n**Estado de sujidade**, Manchas antigas, urina de animais ou bolor exigem pré-tratamentos especializados que não estão incluídos no preço base.\n\n**Impermeabilização**, Se adicionares impermeabilização ao serviço (recomendado), o pack limpeza mais impermeabilização fica entre 60€ e 90€ acima do preço da limpeza simples, mas com desconto face à contratação separada.",
       },
       {
         heading: "Limpeza DIY vs. limpeza profissional: vale a pena?",
@@ -170,7 +170,7 @@ const posts: BlogPost[] = [
       },
       {
         heading: "Quanto custa impermeabilizar um sofá?",
-        body: "O custo da impermeabilização de sofá é 49€ (1 lugar), 69€ (2 lugares) e 89€ (3 lugares). Quando contratada em pack com a limpeza, o total é mais baixo do que os dois serviços separados.\n\nConsiderando que pode poupar uma limpeza extra por ano e prolonga significativamente a vida do tecido, o retorno do investimento é claro para a maioria dos clientes.",
+        body: "O custo da impermeabilização de sofá é 69€ (1 lugar), 89€ (2 lugares) e 109€ (3 lugares). Quando contratada em pack com a limpeza, o total é mais baixo do que os dois serviços separados.\n\nConsiderando que pode poupar uma limpeza extra por ano e prolonga significativamente a vida do tecido, o retorno do investimento é claro para a maioria dos clientes.",
       },
     ],
     faq: [
@@ -376,7 +376,7 @@ const posts: BlogPost[] = [
     slug: "limpeza-cadeiras-estofadas-precos-guia",
     title: "Limpeza de cadeiras estofadas: preços, métodos e quando vale a pena",
     metaTitle: "Limpeza de Cadeiras Estofadas: Preços 2025 | Kyro Clean",
-    metaDescription: "Preços reais da limpeza profissional de cadeiras estofadas em Portugal. Cadeiras de escritório, sala de jantar e restaurante. Desde 17,50€ por cadeira.",
+    metaDescription: "Preços reais da limpeza profissional de cadeiras estofadas em Portugal. Cadeiras de escritório, sala de jantar e restaurante. Desde 20€ por cadeira.",
     publishDate: "2025-11-20",
     updatedDate: "2025-11-20",
     author: "Equipa Kyro Clean",
@@ -387,7 +387,7 @@ const posts: BlogPost[] = [
     sections: [
       {
         heading: "Preços de limpeza de cadeiras (2025)",
-        body: "A Kyro Clean Solutions pratica preço decrescente por unidade, quanto mais cadeiras limpar de uma vez:\n\n- 1ª a 3ª cadeira: 17,50€/unidade\n- 4ª a 6ª cadeira: 12,50€/unidade\n- 7ª a 9ª cadeira: 10€/unidade\n- 10 ou mais cadeiras: orçamento personalizado\n\nO desconto por volume reflete a eficiência do técnico quando tem várias peças no mesmo local, a deslocação e o setup do equipamento são custos fixos que se diluem com mais peças.",
+        body: "A Kyro Clean Solutions pratica preço decrescente por unidade, quanto mais cadeiras limpar de uma vez:\n\n- 1ª a 4ª cadeira: 20€/unidade\n- 5ª a 7ª cadeira: 17,50€/unidade\n- 8ª a 10ª cadeira: 15€/unidade\n- 11 ou mais cadeiras: orçamento personalizado\n\nO desconto por volume reflete a eficiência do técnico quando tem várias peças no mesmo local, a deslocação e o setup do equipamento são custos fixos que se diluem com mais peças.",
         tip: "Para restaurantes ou escritórios com mais de 20 cadeiras, solicitamos orçamento personalizado que pode representar uma poupança adicional de 20 a 30%.",
       },
       {

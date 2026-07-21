@@ -430,15 +430,16 @@ const QuizForm = ({
     
     if (upsellItems.length > 0) {
       const upsellLabels: Record<string, string> = { mattress: 'Colchão', carpet: 'Tapete', chairs: 'Cadeiras' };
-      upsellItems.forEach(item => {
+      const upsellParts = upsellItems.map(item => {
         const itemLabel = upsellLabels[item.id] ?? item.id;
         const detail = item.mattressSize
           ? ` (${mattressPrices.find(p => p.id === item.mattressSize)?.label ?? item.mattressSize})`
           : item.carpetArea ? ` (${item.carpetArea}m²)`
           : item.chairQty ? ` (${item.chairQty}x)`
           : '';
-        details.push(`Pack: +${itemLabel}${detail}`);
+        return `+${itemLabel}${detail}`;
       });
+      details.push(`Pack: ${upsellParts.join(', ')}`);
     }
 
     return details.join(' | ');
@@ -458,8 +459,8 @@ const QuizForm = ({
       : serviceLabel;
     const packPctLabel = packDiscountPct > 0 ? `Pack -${Math.round(packDiscountPct * 100)}%` : '';
     const priceText = packDiscountActive && totalPrice > 0
-      ? `${packDiscountedPrice}€ (IVA incl., ${packPctLabel})`
-      : totalPrice > 0 ? `${totalPrice}€ (IVA incl.)` : 'Sob orçamento';
+      ? `${packDiscountedPrice}€ (${packPctLabel})`
+      : totalPrice > 0 ? `${totalPrice}€` : 'Sob orçamento';
 
     const message = `
 [QUIZ RÁPIDO - Kyro Clean Solutions]
@@ -469,7 +470,7 @@ Tipo: ${serviceTypeLabel}
 Detalhes: ${detailsSummary}
 Localização: ${finalLocation}
 Deslocação: ${isFreeTravel ? 'Grátis (pedido >150€)' : `${finalTravelCost}€`}
-VALOR TOTAL (IVA incl.): ${priceText}
+VALOR TOTAL: ${priceText}
 Contacto preferido: WhatsApp${formData.email ? `\nEmail: ${formData.email}` : ''}
 
 Observações:
@@ -785,11 +786,11 @@ ${formData.description || 'Sem observações adicionais'}
 
             {/* Step 2 - Service Type */}
             {currentStep === 2 && (() => {
-              const cleanPrice = formData.service === 'mattress' ? 39
+              const cleanPrice = formData.service === 'mattress' ? (mattressPrices[0].cleaningPrice as number)
                 : formData.service === 'chairs' ? undefined
-                : 49;
-              const waterPrice = formData.service === 'sofa' ? 49
-                : formData.service === 'mattress' ? 45
+                : (sofaPrices[0].cleaningPrice as number);
+              const waterPrice = formData.service === 'sofa' ? (sofaPrices[0].waterproofingPrice as number)
+                : formData.service === 'mattress' ? (mattressPrices[0].waterproofingPrice as number)
                 : undefined;
               // No Pack card on step 2, upsell is inline per-item in step 3
               const packPrice = undefined;

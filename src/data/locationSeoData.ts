@@ -114,9 +114,9 @@ export const services = [
   { name: "Limpeza de Sofás", slug: "limpeza-sofas", baseRoute: "/limpeza-sofas", priceFrom: "49€", icon: "sofa" },
   { name: "Limpeza de Colchões", slug: "limpeza-colchoes", baseRoute: "/limpeza-colchoes", priceFrom: "49€", icon: "mattress" },
   { name: "Limpeza de Tapetes", slug: "limpeza-tapetes", baseRoute: "/limpeza-tapetes", priceFrom: "12€/m²", icon: "carpet" },
-  { name: "Limpeza de Cadeiras", slug: "limpeza-cadeiras", baseRoute: "/limpeza-cadeiras", priceFrom: "17,50€", icon: "chair" },
+  { name: "Limpeza de Cadeiras", slug: "limpeza-cadeiras", baseRoute: "/limpeza-cadeiras", priceFrom: "20€", icon: "chair" },
   { name: "Limpeza de Alcatifas", slug: "limpeza-alcatifas", baseRoute: "/limpeza-alcatifas", priceFrom: "3€/m²", icon: "rug" },
-  { name: "Impermeabilização", slug: "impermeabilizacao", baseRoute: "/impermeabilizacao", priceFrom: "49€", icon: "waterproof" },
+  { name: "Impermeabilização", slug: "impermeabilizacao", baseRoute: "/impermeabilizacao", priceFrom: "69€", icon: "waterproof" },
 ] as const;
 
 // Cities that take a definite article in Portuguese ("no Porto", "na Amadora"); everything else reads naturally with "em"
@@ -245,10 +245,10 @@ function generateCadeirasContent(city: string, cityDesc: string): Omit<LocationS
   const prep = cityPrep(city);
   const Prep = cityPrepCap(city);
   return {
-    title: `Limpeza de Cadeiras Estofadas ${city} | Desde 17,50€ | Kyro Clean Solutions`,
-    metaDescription: `Limpeza profissional de cadeiras estofadas ${prep} ${city}. Ideal para escritórios, restaurantes e residências. Desde 17,50€ por cadeira.`,
+    title: `Limpeza de Cadeiras Estofadas ${city} | Desde 20€ | Kyro Clean Solutions`,
+    metaDescription: `Limpeza profissional de cadeiras estofadas ${prep} ${city}. Ideal para escritórios, restaurantes e residências. Desde 20€ por cadeira.`,
     h1: `Limpeza de Cadeiras Estofadas ${prep} ${city}`,
-    intro: `Precisa de limpar cadeiras estofadas ${prep} ${city}? A Kyro Clean Solutions realiza limpeza profissional de cadeiras de escritório, cadeiras de jantar e cadeiras estofadas ${prep} ${city} e ${cityDesc}. Serviço rápido e eficaz ao domicílio ou no seu estabelecimento. Desde 17,50€ por cadeira.`,
+    intro: `Precisa de limpar cadeiras estofadas ${prep} ${city}? A Kyro Clean Solutions realiza limpeza profissional de cadeiras de escritório, cadeiras de jantar e cadeiras estofadas ${prep} ${city} e ${cityDesc}. Serviço rápido e eficaz ao domicílio ou no seu estabelecimento. Desde 20€ por cadeira.`,
     problems: [
       { title: "Sujidade do uso diário", description: `Cadeiras de escritório e jantar acumulam manchas de suor, gordura e líquidos diariamente. ${Prep} ${city}, muitos escritórios e restaurantes necessitam de limpeza regular.` },
       { title: "Manchas visíveis", description: `Manchas de café, alimentos e tinta que deixam as cadeiras com aspecto descuidado, prejudicando a imagem do seu espaço.` },
@@ -256,7 +256,7 @@ function generateCadeirasContent(city: string, cityDesc: string): Omit<LocationS
     ],
     howItWorks: `Limpeza de cadeiras ${prep} ${city}: 1) Inspeção do tecido, 2) Pulverização com produto específico, 3) Escovação para penetrar nas fibras, 4) Extração profunda com equipamento profissional, 5) Secagem rápida. Ideal para lotes de cadeiras em escritórios e restaurantes.`,
     benefits: [
-      "Preços por unidade a partir de 17,50€, com desconto progressivo para lotes de cadeiras",
+      "Preços por unidade a partir de 20€, com desconto progressivo para lotes de cadeiras",
       "Ideal para escritórios, restaurantes, salas de reunião e refeitórios",
       "Remoção de manchas de café, tinta, gordura e uso diário",
       "Serviço rápido que não interrompe o funcionamento do seu espaço",
@@ -265,7 +265,7 @@ function generateCadeirasContent(city: string, cityDesc: string): Omit<LocationS
     ],
     localSection: `Atendemos escritórios, restaurantes, hotéis, clínicas e residências ${prep} ${city}. Oferecemos preços especiais para limpeza de lotes de cadeiras em empresas da zona de ${city} e arredores.`,
     faqs: [
-      { question: `Quanto custa limpar cadeiras estofadas ${prep} ${city}?`, answer: `A limpeza de cadeiras estofadas ${prep} ${city} começa a partir de 17,50€ por cadeira (1ª a 3ª), com preço decrescente por unidade a partir da 4ª. Ideal para escritórios e restaurantes.` },
+      { question: `Quanto custa limpar cadeiras estofadas ${prep} ${city}?`, answer: `A limpeza de cadeiras estofadas ${prep} ${city} começa a partir de 20€ por cadeira (1ª a 4ª), com preço decrescente por unidade a partir da 5ª. Ideal para escritórios e restaurantes.` },
       { question: `Fazem limpeza de cadeiras de escritório ${prep} ${city}?`, answer: `Sim! Limpamos cadeiras de escritório, cadeiras de conferência e cadeiras executivas. Deslocamo-nos ao seu escritório ${prep} ${city} sem interrupção do trabalho.` },
       { question: `Qual o desconto para limpeza de muitas cadeiras?`, answer: `Oferecemos descontos progressivos: 10% para 10+ cadeiras, 15% para 20+ cadeiras. Contacte-nos para orçamento personalizado para o seu escritório ou restaurante ${prep} ${city}.` },
     ],
@@ -326,7 +326,7 @@ function generateImpermeabilizacaoContent(city: string, cityDesc: string): Omit<
     ],
     localSection: `Oferecemos impermeabilização de estofos ${prep} ${city} e toda a região envolvente. Ideal combinar com limpeza profissional: peça pack completo com desconto.`,
     faqs: [
-      { question: `Quanto custa impermeabilizar um sofá ${prep} ${city}?`, answer: `A impermeabilização de sofás ${prep} ${city} custa 49€ (1 lugar), 69€ (2 lugares) e 89€ (3 lugares). O pack limpeza + impermeabilização numa única visita começa em 89€ para 1 lugar. Orçamento gratuito ${prep} ${city}.` },
+      { question: `Quanto custa impermeabilizar um sofá ${prep} ${city}?`, answer: `A impermeabilização de sofás ${prep} ${city} custa 69€ (1 lugar), 89€ (2 lugares) e 109€ (3 lugares). O pack limpeza + impermeabilização numa única visita começa em 109€ para 1 lugar. Orçamento gratuito ${prep} ${city}.` },
       { question: `A impermeabilização altera a textura do sofá?`, answer: `Não. O nosso produto de impermeabilização é completamente invisível e não altera a cor, textura ou respirabilidade do tecido.` },
       { question: `Quanto tempo dura a impermeabilização?`, answer: `A nossa impermeabilização profissional dura entre 5 a 10 anos, dependendo do uso e tipo de tecido. Oferecemos garantia incluída.` },
       { question: `Vale a pena impermeabilizar o sofá?`, answer: `Sim, especialmente se tem crianças ou animais. A impermeabilização previne manchas e facilita a limpeza, poupando centenas de euros em substituição de estofos a longo prazo.` },

@@ -9,14 +9,13 @@ function parseRowPrice(price: string): number {
 
 export function calcChairBracket(qty: number, waterproof: boolean): number | null {
   if (qty <= 0) return 0;
+  if (qty > 10) return null; // 11+ cadeiras = sob orçamento
   if (waterproof) {
-    if (qty > 10) return null;
-    return qty <= 4 ? qty * 17.5 : 4 * 17.5 + (qty - 4) * 15;
+    return qty <= 6 ? qty * 25 : 6 * 25 + (qty - 6) * 20;
   }
-  if (qty >= 10) return null; // limpeza: 10+ cadeiras = sob orçamento
-  if (qty <= 3) return qty * 17.5;
-  if (qty <= 6) return 52.5 + (qty - 3) * 12.5;
-  return 90 + (qty - 6) * 10;
+  if (qty <= 4) return qty * 20;
+  if (qty <= 7) return 80 + (qty - 4) * 17.5;
+  return 132.5 + (qty - 7) * 15;
 }
 
 export function calcWidgetTotal(
@@ -48,7 +47,7 @@ export function calcWidgetTotal(
     if (unitPrice > 0) total += unitPrice * qty;
   });
 
-  const chaisePriceUnit = isWaterproof ? 20 : 10;
+  const chaisePriceUnit = isWaterproof ? 25 : 10;
   if (chaiseLongueAddon > 0) total += chaisePriceUnit * chaiseLongueAddon;
 
   return Math.round(total * 10) / 10;
@@ -105,8 +104,8 @@ export function buildWidgetQuizConfig(
     const chairUpsell: UpsellItemConfig[] = chairTotal > 0 ? [{
       id: 'chairs', chairQty: String(chairTotal), qty: chairTotal,
       price: Math.round(((isWaterproof
-        ? (chairTotal <= 4 ? chairTotal * 17.5 : 4 * 17.5 + (chairTotal - 4) * 15)
-        : (chairTotal <= 3 ? chairTotal * 17.5 : chairTotal <= 6 ? 52.5 + (chairTotal - 3) * 12.5 : 90 + (chairTotal - 6) * 10)
+        ? (chairTotal <= 6 ? chairTotal * 25 : 6 * 25 + (chairTotal - 6) * 20)
+        : (chairTotal <= 4 ? chairTotal * 20 : chairTotal <= 7 ? 80 + (chairTotal - 4) * 17.5 : 132.5 + (chairTotal - 7) * 15)
       )) * 10) / 10,
       label: `${chairTotal} cadeira${chairTotal > 1 ? 's' : ''}`,
       waterproof: isWaterproof, waterproofPrice: 0,

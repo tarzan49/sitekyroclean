@@ -688,8 +688,8 @@ export function prerenderRoutes(outDir: string): number {
       },
       {
         path: '/limpeza-cadeiras',
-        title: 'Limpeza de Cadeiras Estofadas | Desde 17,50€ | Kyro Clean Solutions',
-        desc: 'Limpeza profissional de cadeiras estofadas ao domicílio. Ideal para residências, escritórios e restaurantes. Resultados visíveis no momento. Desde 17,50€/cadeira.',
+        title: 'Limpeza de Cadeiras Estofadas | Desde 20€ | Kyro Clean Solutions',
+        desc: 'Limpeza profissional de cadeiras estofadas ao domicílio. Ideal para residências, escritórios e restaurantes. Resultados visíveis no momento. Desde 20€/cadeira.',
         content: {
           h1: 'Limpeza de Cadeiras Estofadas ao Domicílio',
           intro: 'Serviço profissional de limpeza de cadeiras estofadas ao domicílio. Removemos sujidade de uso diário, manchas de comida e odores com extração profissional. Ideal para residências, escritórios e restaurantes.',
@@ -702,14 +702,14 @@ export function prerenderRoutes(outDir: string): number {
             'Preço por volume: quanto mais cadeiras, menor o preço unitário',
           ],
           faqs: faqs([
-            { q: 'Quanto custa a limpeza de cadeiras?', a: 'O preço por cadeira diminui com a quantidade: até 3 cadeiras é 17,50€/unid., de 4 a 6 é 12,50€/unid., de 7 a 9 é 10€/unid. e a partir de 10 cadeiras por orçamento.' },
+            { q: 'Quanto custa a limpeza de cadeiras?', a: 'O preço por cadeira diminui com a quantidade: até 4 cadeiras é 20€/unid., de 5 a 7 é 17,50€/unid., de 8 a 10 é 15€/unid. e a partir de 11 cadeiras por orçamento.' },
             { q: 'Limpam cadeiras de escritório?', a: 'Sim. Limpamos cadeiras de escritório, sala de jantar, poltronas e bancos. O serviço é ao domicílio ou no local de trabalho.' },
             { q: 'Quanto tempo demora a limpeza de cadeiras?', a: 'Cada cadeira demora 15 a 30 minutos. Um conjunto de 6 cadeiras leva cerca de 2 horas. As cadeiras ficam secas em 2 a 4 horas.' },
             { q: 'Fazem limpeza de cadeiras em quantidade para restaurantes?', a: 'Sim. Para restaurantes, hotéis e escritórios temos condições especiais. Contacte-nos para orçamento personalizado.' },
           ]),
         },
         extraSchemas: [
-          buildServiceSchema('Limpeza de Cadeiras', 'Portugal', '17,50€'),
+          buildServiceSchema('Limpeza de Cadeiras', 'Portugal', '20€'),
           buildBreadcrumbSchema([
             { name: 'Início', url: BASE_URL + '/' },
             { name: 'Limpeza de Cadeiras', url: BASE_URL + '/limpeza-cadeiras' },
@@ -749,7 +749,7 @@ export function prerenderRoutes(outDir: string): number {
       {
         path: '/impermeabilizacao',
         title: 'Impermeabilização de Estofos | Proteção até 10 anos | Kyro Clean Solutions',
-        desc: 'Impermeabilização profissional de sofás, cadeiras e tapetes. Proteção invisível contra manchas e líquidos. Duração até 10 anos. Desde 49€. Serviço ao domicílio.',
+        desc: 'Impermeabilização profissional de sofás, cadeiras e tapetes. Proteção invisível contra manchas e líquidos. Duração até 10 anos. Desde 69€. Serviço ao domicílio.',
         content: {
           h1: 'Impermeabilização de Estofos e Tapetes',
           intro: 'Proteja os seus estofos com impermeabilização profissional ao domicílio. Barreira invisível contra manchas, líquidos e desgaste com duração até 10 anos. Ideal após limpeza ou em estofos novos.',
@@ -763,13 +763,13 @@ export function prerenderRoutes(outDir: string): number {
           ],
           faqs: faqs([
             { q: 'O que é a impermeabilização de estofos?', a: 'A impermeabilização cria uma barreira nano-tecnológica invisível na fibra do estofo que repele líquidos e dificulta a penetração de manchas. O tecido mantém a aparência e textura originais.' },
-            { q: 'Quanto custa a impermeabilização?', a: 'A impermeabilização de sofá começa a partir de 49€ para 1 lugar. Para cadeiras o preço parte de 17,50€ por unidade. Peça orçamento gratuito.' },
+            { q: 'Quanto custa a impermeabilização?', a: 'A impermeabilização de sofá começa a partir de 69€ para 1 lugar. Para cadeiras o preço parte de 25€ por unidade. Peça orçamento gratuito.' },
             { q: 'Quanto tempo dura a impermeabilização?', a: 'A duração é de 2 a 10 anos dependendo do uso, tipo de tecido e produto aplicado. Recomendamos renovação após limpeza profissional.' },
             { q: 'Posso fazer impermeabilização sem limpeza prévia?', a: 'Recomendamos sempre limpeza prévia para maior eficácia. Temos packs combinados de limpeza e impermeabilização com desconto.' },
           ]),
         },
         extraSchemas: [
-          buildServiceSchema('Impermeabilização de Estofos', 'Portugal', '49€'),
+          buildServiceSchema('Impermeabilização de Estofos', 'Portugal', '69€'),
           buildBreadcrumbSchema([
             { name: 'Início', url: BASE_URL + '/' },
             { name: 'Impermeabilização', url: BASE_URL + '/impermeabilizacao' },

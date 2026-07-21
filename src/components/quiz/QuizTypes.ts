@@ -57,14 +57,14 @@ export interface PriceOption {
 // originalBothPrice = soma separada (preço riscado no UI)
 // delta (upsell text) = bothPrice - cleaningPrice
 export const sofaPrices: PriceOption[] = [
-  { id: '1-lugar',    label: '1 Lugar',    cleaningPrice: 49, waterproofingPrice: 49, bothPrice: 89,  originalBothPrice: 98  },
-  { id: '2-lugares',  label: '2 Lugares',  cleaningPrice: 69, waterproofingPrice: 69, bothPrice: 129, originalBothPrice: 138 },
-  { id: '3-lugares',  label: '3 Lugares',  cleaningPrice: 79, waterproofingPrice: 89, bothPrice: 149, originalBothPrice: 168 },
+  { id: '1-lugar',    label: '1 Lugar',    cleaningPrice: 49, waterproofingPrice: 69,  bothPrice: 109, originalBothPrice: 118 },
+  { id: '2-lugares',  label: '2 Lugares',  cleaningPrice: 69, waterproofingPrice: 89,  bothPrice: 149, originalBothPrice: 158 },
+  { id: '3-lugares',  label: '3 Lugares',  cleaningPrice: 79, waterproofingPrice: 109, bothPrice: 169, originalBothPrice: 188 },
   { id: '4+-lugares', label: '4+ Lugares', cleaningPrice: 'Sob orçamento', waterproofingPrice: 'Sob orçamento', bothPrice: 'Sob orçamento' },
 ];
 
-// Chaise longue: preço fixo de 20€ (limpeza ou pack)
-export const sofaChaisePrice = { cleaning: 10, waterproofing: 20 };
+// Chaise longue: preço fixo (limpeza ou pack)
+export const sofaChaisePrice = { cleaning: 10, waterproofing: 25 };
 
 // Mattress pricing
 // Limpeza:           49 / 59 / 69

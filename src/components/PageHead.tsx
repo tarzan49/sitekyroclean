@@ -66,15 +66,15 @@ const routeMeta: Record<string, { pt: PageMeta; en: PageMeta; es: PageMeta }> = 
   },
   "/limpeza-cadeiras": {
     pt: {
-      title: "Limpeza e Lavagem de Cadeiras Estofadas | Desde 17,50€ | Kyro Clean Solutions",
+      title: "Limpeza e Lavagem de Cadeiras Estofadas | Desde 20€ | Kyro Clean Solutions",
       description: "Limpeza e lavagem profissional de cadeiras estofadas ao domicílio. Ideal para escritórios, restaurantes e residências. Resultados no momento.",
     },
     en: {
-      title: "Upholstered Chair Cleaning | From €17.50 | Kyro Clean Solutions",
+      title: "Upholstered Chair Cleaning | From €20 | Kyro Clean Solutions",
       description: "Professional upholstered chair cleaning at your location. Ideal for offices, restaurants and homes. Instant results.",
     },
     es: {
-      title: "Limpieza y Lavado de Sillas Tapizadas | Desde 17,50€ | Kyro Clean Solutions",
+      title: "Limpieza y Lavado de Sillas Tapizadas | Desde 20€ | Kyro Clean Solutions",
       description: "Limpieza profesional de sillas tapizadas a domicilio. Ideal para oficinas, restaurantes y hogares.",
     },
   },

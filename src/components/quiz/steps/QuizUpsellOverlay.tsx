@@ -183,7 +183,7 @@ const QuizUpsellOverlay = ({
               { id: 'sofa',     img: '/images/services/sofa.webp',    label: 'Sofá',     sublabel: 'a partir de 49€' },
               { id: 'mattress', img: '/images/services/colchao.webp', label: 'Colchão',  sublabel: 'a partir de 49€' },
               { id: 'carpet',   img: '/images/services/tapete.webp',  label: 'Tapete',   sublabel: 'a partir de 12€/m²' },
-              { id: 'chairs',   img: '/images/services/cadeira.webp', label: 'Cadeiras', sublabel: 'a partir de 17,50€' },
+              { id: 'chairs',   img: '/images/services/cadeira.webp', label: 'Cadeiras', sublabel: 'a partir de 20€' },
             ] as const).map(opt => (
               <button
                 key={opt.id}
@@ -458,7 +458,7 @@ const QuizUpsellOverlay = ({
           {/* Chairs config */}
           {pendingUpsellId === 'chairs' && (() => {
             const qty = pendingChairQtyNum;
-            const sobOrç = qty >= 10;
+            const sobOrç = qty > 10;
             const basePrice = calcChairClean(qty) ?? 0;
             const waterproofPrice = pendingWaterproof && !sobOrç ? (calcChairWaterproof(qty) ?? 0) : 0;
             const totalChairPrice = basePrice + waterproofPrice;

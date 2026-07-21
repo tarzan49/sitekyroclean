@@ -219,7 +219,6 @@ const PackComboPage = () => {
                             {opt.sublabel && (
                               <span className="text-[10px] text-[#111111]/40 mt-0.5 leading-snug">{opt.sublabel}</span>
                             )}
-                            <span className="text-xs font-semibold mt-2" style={{ color: "#D4AF37" }}>{opt.price}€</span>
                           </button>
                         );
                       })}

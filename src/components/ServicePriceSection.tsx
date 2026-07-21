@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { CheckCircle, Minus, Plus, Star, ArrowRight, ExternalLink, ChevronDown } from "lucide-react";
-import { GOOGLE_REVIEWS_SHORT_URL } from "@/constants/google";
+import { GOOGLE_REVIEWS_VIEW_URL } from "@/constants/google";
 import { calcWidgetTotal, calcChairBracket, calcCarpetWidget, buildWidgetQuizConfig, WIDGET_DISCOUNT_THRESHOLD } from "@/lib/priceWidgetCalc";
 import { useQuizLauncher } from "@/hooks/use-quiz-launcher";
 import QuizFormLazy from "@/components/QuizFormLazy";
@@ -154,7 +154,7 @@ export default function ServicePriceSection({ serviceSlug, initialLocation }: Pr
         <div style={{ borderTop: "1px solid rgba(17,17,17,0.08)" }} />
       </div>
       <a
-        href={GOOGLE_REVIEWS_SHORT_URL}
+        href={GOOGLE_REVIEWS_VIEW_URL}
         target="_blank"
         rel="noopener noreferrer"
         className="inline-flex mt-4 items-center gap-3 px-4 py-3 border transition-all hover:shadow-md group w-full"

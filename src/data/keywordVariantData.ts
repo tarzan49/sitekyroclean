@@ -45,10 +45,10 @@ interface ContentBlock {
 const SERVICE_META: Record<ServiceKey, {
   label: string; labelPlural: string; canonicalBase: string; priceFrom: string; waterproofPriceFrom?: string;
 }> = {
-  sofa:      { label: 'Sofá',      labelPlural: 'Sofás',      canonicalBase: 'limpeza-sofas',     priceFrom: '49€',     waterproofPriceFrom: '49€'      },
+  sofa:      { label: 'Sofá',      labelPlural: 'Sofás',      canonicalBase: 'limpeza-sofas',     priceFrom: '49€',     waterproofPriceFrom: '69€'      },
   colchao:   { label: 'Colchão',   labelPlural: 'Colchões',   canonicalBase: 'limpeza-colchoes',  priceFrom: '49€' },
   tapetes:   { label: 'Tapetes',   labelPlural: 'Tapetes',    canonicalBase: 'limpeza-tapetes',   priceFrom: '12€/m²'                                    },
-  cadeiras:  { label: 'Cadeiras',  labelPlural: 'Cadeiras',   canonicalBase: 'limpeza-cadeiras',  priceFrom: '17,50€',  waterproofPriceFrom: '17,50€/cad.' },
+  cadeiras:  { label: 'Cadeiras',  labelPlural: 'Cadeiras',   canonicalBase: 'limpeza-cadeiras',  priceFrom: '20€',     waterproofPriceFrom: '25€/cad.'    },
   alcatifas: { label: 'Alcatifas', labelPlural: 'Alcatifas',  canonicalBase: 'limpeza-alcatifas', priceFrom: '3€/m²'                                    },
 };
 
@@ -200,7 +200,7 @@ function content_higienizacao_cadeiras(loc: string, ctx: string): ContentBlock {
       { question: `Emitem certificado de higienização para inspeções sanitárias em ${loc}?`, answer: `Sim. Após cada serviço emitimos certificado com identificação dos produtos usados, aceite em inspeções HACCP e auditorias sanitárias. Essencial para restaurantes, clínicas e espaços de saúde em ${loc}.` },
       { question: `Conseguem higienizar cadeiras de veludo sem danificar a textura?`, answer: `Sim. O veludo é um dos tecidos mais comuns em cadeiras de restaurante e escritório. Usamos produtos e técnicas específicas para veludo que eliminam os patogénicos sem alterar a textura ou brilho do tecido.` },
       { question: `Podem trabalhar fora do horário de funcionamento do restaurante?`, answer: `Sim. Trabalhamos regularmente ao fim de semana, à noite e de madrugada para não perturbar o funcionamento do negócio. As cadeiras ficam prontas a usar em 2 a 4 horas.` },
-      { question: `Qual o desconto para higienizar um lote grande de cadeiras em ${loc}?`, answer: `Até 3 cadeiras: 17,50€/cad. · 4 a 6 cadeiras: 12,50€/cad. · 7 a 9 cadeiras: 10€/cad. Para 10 ou mais cadeiras, orçamento personalizado. Orçamento gratuito em ${loc}.` },
+      { question: `Qual o desconto para higienizar um lote grande de cadeiras em ${loc}?`, answer: `Até 4 cadeiras: 20€/cad. · 5 a 7 cadeiras: 17,50€/cad. · 8 a 10 cadeiras: 15€/cad. Para 11 ou mais cadeiras, orçamento personalizado. Orçamento gratuito em ${loc}.` },
       { question: `A higienização funciona em cadeiras de mesh (escritório) além de estofo?`, answer: `Sim. O mesh é tratado com bactericida compatível que elimina as bactérias sem danificar as fibras plásticas da rede. Muito comum em cadeiras ergonómicas de escritório partilhadas.` },
     ],
     problems: [
@@ -386,7 +386,7 @@ function content_lavagem_cadeiras(loc: string, ctx: string): ContentBlock {
       { question: `Quanto tempo ficam as cadeiras fora de uso depois da lavagem?`, answer: `Com o nosso sistema de extração de alta sucção, as cadeiras ficam prontas a usar em 2 a 4 horas. Em dias quentes com boa ventilação pode ser menos.` },
       { question: `Conseguem lavar cadeiras de veludo sem danificar a textura característica?`, answer: `Sim. O veludo requer técnica específica — lavagem com movimento correto das fibras. Temos experiência em veludo de várias qualidades e densidades sem danificar a textura.` },
       { question: `Fazem lavagem de cadeiras de restaurante fora do horário de funcionamento?`, answer: `Sim. É o nosso horário mais frequente para restaurantes em ${loc}. Trabalhamos à noite ou ao fim de semana para que as cadeiras estejam prontas antes da abertura.` },
-      { question: `Qual o preço para lavar um lote de 20 cadeiras de escritório em ${loc}?`, answer: `Para lotes entre 10 e 30 cadeiras o preço é 12,50€/cad. Para lotes maiores há preço personalizado. Orçamento gratuito com deslocação a ${loc} incluída.` },
+      { question: `Qual o preço para lavar um lote de 20 cadeiras de escritório em ${loc}?`, answer: `Para lotes acima de 10 cadeiras aplicamos preço personalizado, normalmente com desconto face ao preço por unidade. Orçamento gratuito com deslocação a ${loc} incluída.` },
     ],
     problems: [
       { title: "Cadeiras de jantar com manchas de comida acumuladas", description: "Gordura, molhos e bebidas acumulam-se nas fibras ao longo dos anos. A extração profissional remove estas manchas mesmo as mais antigas e profundas nas fibras." },
@@ -460,7 +460,7 @@ function content_impermeabilizacao_sofa(loc: string, ctx: string): ContentBlock 
       { question: `Quanto tempo dura a impermeabilização de um sofá?`, answer: `Com uso normal, a proteção dura 2 a 5 anos. Em famílias com crianças ou animais de estimação, onde há mais probabilidade de derrames, recomendamos reaplicação ao fim de 2 anos.` },
       { question: `Preciso de limpar o sofá antes de o impermeabilizar?`, answer: `Sim, e é altamente recomendado. Aplicar impermeabilização sobre tecido sujo reduz significativamente a eficácia e duração da barreira. Oferecemos o pack limpeza + impermeabilização com desconto em ${loc}.` },
       { question: `A impermeabilização funciona em sofás de veludo, pele e microfibra?`, answer: `Sim. Adaptamos a formulação ao tipo de tecido. Para veludo e tecidos delicados usamos produtos específicos que preservam a textura e o brilho característico do material.` },
-      { question: `Qual a diferença de preço entre só impermeabilizar e fazer o pack limpeza + impermeabilização?`, answer: `Só impermeabilização: 49€ (1L), 69€ (2L), 89€ (3L). Pack com limpeza: 89€ (1L), 129€ (2L), 149€ (3L). O pack representa uma poupança considerável e garante maior eficácia da proteção.` },
+      { question: `Qual a diferença de preço entre só impermeabilizar e fazer o pack limpeza + impermeabilização?`, answer: `Só impermeabilização: 69€ (1L), 89€ (2L), 109€ (3L). Pack com limpeza: 109€ (1L), 149€ (2L), 169€ (3L). O pack representa uma poupança considerável e garante maior eficácia da proteção.` },
     ],
     problems: [
       { title: "Sofá novo que quer proteger desde o início", description: "É muito mais fácil e económico proteger do que tratar manchas após o facto. Uma aplicação cria uma barreira invisível que dura 2 a 5 anos sem alterar o toque ou a cor." },
@@ -496,7 +496,7 @@ function content_impermeabilizacao_cadeiras(loc: string, ctx: string): ContentBl
       { question: `A impermeabilização das cadeiras facilita a limpeza diária do restaurante?`, answer: `Sim, muito. Derrames de vinho, café e molhos ficam à superfície e limpam-se com um pano — em vez de penetrarem nas fibras e criarem manchas permanentes. O tempo de limpeza diária reduz significativamente.` },
       { question: `A impermeabilização funciona em cadeiras de pele sintética ou só em tecido?`, answer: `Funciona nos dois. Para pele sintética o tratamento reforça a repelência natural do material. Para tecido (veludo, chenille, mesh) cria uma barreira nas fibras. Adaptamos o produto ao material.` },
       { question: `Quanto tempo ficam as cadeiras fora de uso depois da impermeabilização?`, answer: `A impermeabilização é rápida (15 a 30 minutos por lote) e a secagem demora 1 a 2 horas. As cadeiras ficam prontas a usar no mesmo dia, sem necessidade de fechar o espaço.` },
-      { question: `Qual o desconto para impermeabilizar um lote de cadeiras de restaurante?`, answer: `17,50€/cad. para as primeiras 4 cadeiras, 15€/cad. a partir da 5ª. Para lotes acima de 10 cadeiras, orçamento personalizado para o seu restaurante em ${loc}.` },
+      { question: `Qual o desconto para impermeabilizar um lote de cadeiras de restaurante?`, answer: `25€/cad. para as primeiras 6 cadeiras, 20€/cad. da 7ª à 10ª. Para lotes acima de 10 cadeiras, orçamento personalizado para o seu restaurante em ${loc}.` },
       { question: `A impermeabilização das cadeiras resiste a derrames de gordura e molhos?`, answer: `Sim. A barreira repele gordura, molhos, vinho e bebidas. Para derrames de produtos muito ácidos (vinagre, sumos cítricos) é recomendado limpar rapidamente para preservar a barreira mais tempo.` },
     ],
     problems: [

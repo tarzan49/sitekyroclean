@@ -65,18 +65,18 @@ export const PRICE_TABLE: Record<string, { item: string; price: string }[]> = {
     { item: 'Tapetes (m²)',             price: '12€/m²' },
   ],
   'limpeza-cadeiras': [
-    { item: 'Cadeiras',                 price: '17.5€/cad' },
+    { item: 'Cadeiras',                 price: '20€/cad' },
   ],
   'limpeza-alcatifas': [
     { item: 'Alcatifas (m²)',           price: '3€/m²' },
   ],
   'impermeabilizacao': [
-    { item: 'Sofá 1 lugar',            price: '49€' },
-    { item: 'Sofá 2 lugares',          price: '69€' },
-    { item: 'Sofá 3 lugares',          price: '89€' },
+    { item: 'Sofá 1 lugar',            price: '69€' },
+    { item: 'Sofá 2 lugares',          price: '89€' },
+    { item: 'Sofá 3 lugares',          price: '109€' },
     { item: 'Sofá de 4+ lugares',        price: 'Sob orçamento' },
-    { item: 'Chaise longue (add-on)',  price: '+20€' },
-    { item: 'Cadeiras',               price: '17.5€/cad' },
+    { item: 'Chaise longue (add-on)',  price: '+25€' },
+    { item: 'Cadeiras',               price: '25€/cad' },
   ],
 };
 

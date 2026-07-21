@@ -1,6 +1,6 @@
 import { Star, MapPin, Phone, Users } from "lucide-react";
 import { REVIEW_RATING, REVIEW_COUNT, PHONE_TEL, PHONE_DISPLAY } from "@/constants/business";
-import { GOOGLE_REVIEWS_SHORT_URL } from "@/constants/google";
+import { GOOGLE_REVIEWS_VIEW_URL } from "@/constants/google";
 import { trackCallClick } from "@/lib/analytics";
 
 type TrustRatingBadgeProps = {
@@ -53,7 +53,7 @@ const TrustRatingBadge = ({ variant }: TrustRatingBadgeProps) => {
     case "mapsLink":
       return (
         <a
-          href={GOOGLE_REVIEWS_SHORT_URL}
+          href={GOOGLE_REVIEWS_VIEW_URL}
           target="_blank"
           rel="noopener noreferrer"
           className={`${pillClass} hover:bg-black/45 transition-colors group`}
@@ -74,7 +74,7 @@ const TrustRatingBadge = ({ variant }: TrustRatingBadgeProps) => {
       return (
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto">
           <a
-            href={GOOGLE_REVIEWS_SHORT_URL}
+            href={GOOGLE_REVIEWS_VIEW_URL}
             target="_blank"
             rel="noopener noreferrer"
             className={`${pillClass} hover:bg-black/45 transition-colors group justify-center whitespace-nowrap`}

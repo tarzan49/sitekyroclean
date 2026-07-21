@@ -125,9 +125,9 @@ function buildWaUrl(payload: QuizLeadPayload, bookingId: string): string {
   const waExtrasText = waExtras.length > 0 ? waExtras.join(' + ') : 'Sem extras';
 
   const waTotalPrice = packDiscountActive && totalPrice > 0
-    ? `${packDiscountedPrice}€ (Pack -10%) (IVA incl.)`
+    ? `${packDiscountedPrice}€ (Pack -10%)`
     : totalPrice > 0
-      ? `${totalPrice}€ (IVA incl.)`
+      ? `${totalPrice}€`
       : 'Sob orçamento';
 
   const waText = encodeURIComponent(
@@ -180,7 +180,7 @@ function buildReceiptLines(payload: QuizLeadPayload) {
       const wQty = chairWaterproofQty;
       if (wQty > 0) {
         const wTotal = calcChairWaterproof(wQty);
-        const wUnit = wQty <= 6 ? 15 : wQty <= 9 ? 12.5 : null;
+        const wUnit = wQty <= 6 ? 25 : wQty <= 10 ? 20 : null;
         receiptLines.push({ label: 'Impermeabilização Cadeiras', qty: wQty, unitPrice: wUnit, total: wTotal });
       }
     }

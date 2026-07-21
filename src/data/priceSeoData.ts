@@ -25,7 +25,7 @@ const priceTables: Record<string, { item: string; price: string; note?: string }
     { item: "Sofá 3 lugares", price: "Desde 79€" },
     { item: "Sofá 4-5 lugares", price: "Desde 89€" },
     { item: "Sofá em L", price: "Desde 99€" },
-    { item: "Impermeabilização", price: "Desde 49€", note: "add-on recomendado" },
+    { item: "Impermeabilização", price: "Desde 69€", note: "add-on recomendado" },
   ],
   "limpeza-colchoes": [
     { item: "Colchão Solteiro", price: "Desde 49€" },
@@ -42,10 +42,10 @@ const priceTables: Record<string, { item: string; price: string; note?: string }
     { item: "Tapete persa/oriental", price: "Sob consulta", note: "tratamento premium" },
   ],
   "limpeza-cadeiras": [
-    { item: "1ª a 3ª cadeira", price: "17,50€/un" },
-    { item: "4ª a 6ª cadeira", price: "12,50€/un" },
-    { item: "7ª a 9ª cadeira", price: "10€/un" },
-    { item: "10+ cadeiras", price: "Sob orçamento" },
+    { item: "1ª a 4ª cadeira", price: "20€/un" },
+    { item: "5ª a 7ª cadeira", price: "17,50€/un" },
+    { item: "8ª a 10ª cadeira", price: "15€/un" },
+    { item: "11+ cadeiras", price: "Sob orçamento" },
   ],
   "limpeza-alcatifas": [
     { item: "Alcatifa até 10m²", price: "Desde 30€" },
@@ -54,10 +54,10 @@ const priceTables: Record<string, { item: string; price: string; note?: string }
     { item: "Alcatifa +40m²", price: "Sob consulta" },
   ],
   "impermeabilizacao": [
-    { item: "Sofá 1 lugar", price: "Desde 49€" },
-    { item: "Sofá 2 lugares", price: "Desde 69€" },
-    { item: "Sofá 3 lugares", price: "Desde 89€" },
-    { item: "Cadeiras (por unidade)", price: "Desde 17,50€" },
+    { item: "Sofá 1 lugar", price: "Desde 69€" },
+    { item: "Sofá 2 lugares", price: "Desde 89€" },
+    { item: "Sofá 3 lugares", price: "Desde 109€" },
+    { item: "Cadeiras (por unidade)", price: "Desde 25€" },
     { item: "Tapete (por m²)", price: "Desde 10€/m²" },
     { item: "Cabeceira", price: "Desde 15€" },
   ],
@@ -131,14 +131,14 @@ const priceFaqs: Record<string, { question: string; answer: string }[]> = {
     { question: "Recolhem e entregam tapetes em {city}?", answer: "Sim, podemos recolher o tapete em {city}, limpá-lo no nosso centro e entregá-lo limpo na sua casa. O serviço de recolha e entrega está incluído." },
   ],
   "limpeza-cadeiras": [
-    { question: "Quanto custa limpar cadeiras em {city}?", answer: "A limpeza de cadeiras em {city} começa a partir de 17,50€ por cadeira (1ª a 3ª), com preço decrescente por unidade a partir da 4ª cadeira." },
+    { question: "Quanto custa limpar cadeiras em {city}?", answer: "A limpeza de cadeiras em {city} começa a partir de 20€ por cadeira (1ª a 4ª), com preço decrescente por unidade a partir da 5ª cadeira." },
     { question: "Limpam cadeiras de escritório?", answer: "Sim, limpamos todo o tipo de cadeiras estofadas: cadeiras de jantar, de escritório, poltronas e cadeirões." },
   ],
   "limpeza-alcatifas": [
     { question: "Quanto custa limpar alcatifas em {city}?", answer: "A limpeza de alcatifas em {city} começa a partir de 3€/m². O preço depende da área total e estado da alcatifa." },
   ],
   "impermeabilizacao": [
-    { question: "Quanto custa impermeabilizar um sofá em {city}?", answer: "A impermeabilização de sofás em {city} custa desde 49€ (1 lugar), 69€ (2 lugares) e 89€ (3 lugares). Recomendamos combinar com limpeza para melhor resultado e preço especial." },
+    { question: "Quanto custa impermeabilizar um sofá em {city}?", answer: "A impermeabilização de sofás em {city} custa desde 69€ (1 lugar), 89€ (2 lugares) e 109€ (3 lugares). Recomendamos combinar com limpeza para melhor resultado e preço especial." },
     { question: "A impermeabilização vale a pena?", answer: "Sim. A impermeabilização protege contra manchas de líquidos e prolonga a vida útil do estofamento. É especialmente recomendada para famílias com crianças ou animais." },
   ],
 };

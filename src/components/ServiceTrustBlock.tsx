@@ -1,7 +1,7 @@
 import { Star, ExternalLink, ChevronDown } from "lucide-react";
 import { useState } from "react";
 import { SERVICE_TRUST_POOL, type TrustPoint } from "@/constants/serviceTrustPool";
-import { GOOGLE_REVIEWS_SHORT_URL } from "@/constants/google";
+import { GOOGLE_REVIEWS_VIEW_URL } from "@/constants/google";
 
 interface Props {
   serviceSlug: string;
@@ -46,7 +46,7 @@ function Points({ points, fullDesc }: { points: TrustPoint[]; fullDesc: boolean 
         <div style={{ borderTop: "1px solid rgba(17,17,17,0.08)" }} />
       </div>
       <a
-        href={GOOGLE_REVIEWS_SHORT_URL}
+        href={GOOGLE_REVIEWS_VIEW_URL}
         target="_blank"
         rel="noopener noreferrer"
         className="inline-flex mt-4 items-center gap-3 px-4 py-3 border transition-all hover:shadow-md group w-full"
