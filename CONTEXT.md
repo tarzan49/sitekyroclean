@@ -721,3 +721,5 @@ Correções aplicadas: canonical URLs em branco nas 17 páginas core, Breadcrumb
 - **Fórmula final de preço de cadeiras** (corrigida várias vezes pelo user ao longo da sessão): limpeza 1-4@20€/5-6@15€/7-10@12,50€; impermeabilização 1-4@25€/5-10@20€. Propagada a todos os motores de cálculo e cópias de marketing.
 - **Pack 2-lugares (Sofá+Impermeabilização) → 145€** (era 149€), "3L+Chaise" → 199€ (valores finais dados explicitamente pelo user).
 - Verificação final: script standalone confirmou os 22 preços-base dos 4 packs batem 100% com as fórmulas canónicas.
+
+**Footer.tsx corrigido no fecho da sessão:** texto (descrição, copyright, links legais) usava `text-[#111111]/NN` sobre fundo verde escuro — invisível; trocado para `text-white/NN`. Ícone "≡" trocado por `ChevronRight`. "Limpeza e Lavagem de X" → "Higienização de X". Removida linha de cabeceiras/estrados e bloco de redes sociais (não existem). Descrição da empresa reescrita e movida do meio de uma coluna de links para debaixo do logo (mais legível). Cobertura: "Portugal Continental inteiro".
