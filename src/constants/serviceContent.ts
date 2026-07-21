@@ -1,7 +1,7 @@
 import heroSofaD              from "@/assets/hero-sofa-cleaning-new.webp";
 import heroSofaM              from "@/assets/hero-sofa-cleaning-new-mobile.webp";
-import heroMattressD          from "@/assets/hero-mattress-v6.png";
-import heroMattressM          from "@/assets/hero-mattress-v6.png";
+import heroMattressD          from "@/assets/hero-mattress-v6.webp";
+import heroMattressM          from "@/assets/hero-mattress-v6.webp";
 import heroCarpetD            from "@/assets/hero-carpet-cleaning-new.webp";
 import heroCarpetM            from "@/assets/hero-carpet-cleaning-new-mobile.webp";
 import heroChairD             from "@/assets/hero-chair-cleaning-new.webp";
@@ -61,33 +61,33 @@ const SERVICE_HERO_POOL: Record<string, string[]> = {
     "/images/variant-heroes/sofas/sofa-v7.jpeg",
   ],
   "limpeza-colchoes": [
-    "/images/variant-heroes/colchoes/colchao-v1.png",
-    "/images/variant-heroes/colchoes/colchao-v2.png",
-    "/images/variant-heroes/colchoes/colchao-v3.png",
-    "/images/variant-heroes/colchoes/colchao-v4.png",
-    "/images/variant-heroes/colchoes/colchao-v5.png",
-    "/images/variant-heroes/colchoes/colchao-v6.png",
+    "/images/variant-heroes/colchoes/colchao-v1.webp",
+    "/images/variant-heroes/colchoes/colchao-v2.webp",
+    "/images/variant-heroes/colchoes/colchao-v3.webp",
+    "/images/variant-heroes/colchoes/colchao-v4.webp",
+    "/images/variant-heroes/colchoes/colchao-v5.webp",
+    "/images/variant-heroes/colchoes/colchao-v6.webp",
   ],
   "limpeza-tapetes": [
-    "/images/variant-heroes/tapetes/tapetes-v1.png",
-    "/images/variant-heroes/tapetes/tapetes-v2.png",
+    "/images/variant-heroes/tapetes/tapetes-v1.webp",
+    "/images/variant-heroes/tapetes/tapetes-v2.webp",
   ],
   "limpeza-cadeiras": [
-    "/images/variant-heroes/cadeiras/cadeiras-v1.png",
-    "/images/variant-heroes/cadeiras/cadeiras-v2.png",
+    "/images/variant-heroes/cadeiras/cadeiras-v1.webp",
+    "/images/variant-heroes/cadeiras/cadeiras-v2.webp",
   ],
   "limpeza-alcatifas": [
     "/images/variant-heroes/alcatifas/alcatifas-v1.jpeg",
     "/images/variant-heroes/alcatifas/alcatifas-v2.jpg",
-    "/images/variant-heroes/alcatifas/alcatifas-v3.jpg",
-    "/images/variant-heroes/alcatifas/alcatifas-v4.png",
+    "/images/variant-heroes/alcatifas/alcatifas-v3.webp",
+    "/images/variant-heroes/alcatifas/alcatifas-v4.webp",
   ],
   "impermeabilizacao": [
-    "/images/variant-heroes/impermeabilizacao/impermeabilizacao-v1.png",
-    "/images/variant-heroes/impermeabilizacao/impermeabilizacao-v2.png",
-    "/images/variant-heroes/impermeabilizacao/impermeabilizacao-v3.png",
+    "/images/variant-heroes/impermeabilizacao/impermeabilizacao-v1.webp",
+    "/images/variant-heroes/impermeabilizacao/impermeabilizacao-v2.webp",
+    "/images/variant-heroes/impermeabilizacao/impermeabilizacao-v3.webp",
     "/images/variant-heroes/impermeabilizacao/impermeabilizacao-v4.jpg",
-    "/images/variant-heroes/impermeabilizacao/impermeabilizacao-v5.png",
+    "/images/variant-heroes/impermeabilizacao/impermeabilizacao-v5.webp",
   ],
 };
 

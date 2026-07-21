@@ -3,8 +3,8 @@
 
 import sofaBefore from "@/assets/galeria-sofa-antes.webp";
 import sofaAfter from "@/assets/galeria-sofa-depois.webp";
-import sofaResultado from "@/assets/sofa-pele-pormenor.png";
-import sofaProcesso from "@/assets/sofa-extracao.png";
+import sofaResultado from "@/assets/sofa-pele-pormenor.webp";
+import sofaProcesso from "@/assets/sofa-extracao.webp";
 
 import colchaoBefore from "@/assets/galeria-colchao-antes.webp";
 import colchaoAfter from "@/assets/galeria-colchao-depois.webp";
@@ -13,10 +13,10 @@ import colchaoProcesso from "@/assets/galeria-colchao-processo.webp";
 
 import tapeteBefore from "@/assets/galeria-tapete-antes.webp";
 import tapeteAfter from "@/assets/galeria-tapete-depois.webp";
-// Nota: galeria-tapete-processo.webp / hero-carpet-cleaning-new.webp / public/images/tapetes/v1.png
+// Nota: galeria-tapete-processo.webp / hero-carpet-cleaning-new.webp / public/images/tapetes/v1.webp
 // são todos a MESMA foto duplicada sob nomes diferentes — por isso a "Extração" usa aqui a foto do
 // tapete persa (distinta), evitando repetir a foto usada como Pormenor nos materiais sem foto própria.
-const tapetePersaExtracao = "/images/variant-heroes/tapetes/tapetes-v2.png";
+const tapetePersaExtracao = "/images/variant-heroes/tapetes/tapetes-v2.webp";
 
 import cadeiraBefore from "@/assets/galeria-cadeira-antes.webp";
 import cadeiraAfter from "@/assets/galeria-cadeira-depois.webp";

@@ -9,7 +9,7 @@ import sofaTecido    from "@/assets/hero-p-limpeza-sofa-tecido.webp";
 import sofaVeludo    from "@/assets/hero-p-limpeza-sofa-veludo.webp";
 import sofaPele      from "@/assets/hero-p-limpeza-sofa-pele.webp";
 import sofaMicrofibra from "@/assets/hero-p-sofa-microfibras.webp";
-import sofaCamurca   from "@/assets/service-sofa-camurca.png";
+import sofaCamurca   from "@/assets/service-sofa-camurca.webp";
 import tapetePersa   from "@/assets/hero-p-tapete-persa.webp";
 import tapeteLa      from "@/assets/hero-p-tapete-la.webp";
 

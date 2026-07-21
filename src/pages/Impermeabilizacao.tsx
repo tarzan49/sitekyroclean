@@ -19,19 +19,19 @@ const impermeabilizacaoGuarantee: GuaranteeItem[] = [
     label: "Eficácia",
     title: "Proteção testada, comprovada",
     body: "Cada aplicação é verificada com teste de repelência no final do processo. Só saímos quando a barreira está ativa e uniforme em toda a superfície tratada.",
-    image: "/images/impermeabilizacao/v5.png",
+    image: "/images/impermeabilizacao/v5.webp",
   },
   {
     label: "Durabilidade",
     title: "Válida por até 10 anos",
     body: "A barreira impermeável mantém-se ativa durante anos em condições normais de uso. A longevidade depende do tipo de tecido e da frequência de limpeza.",
-    image: "/images/impermeabilizacao/v2.png",
+    image: "/images/impermeabilizacao/v2.webp",
   },
   {
     label: "Segurança",
     title: "Sem alteração visível nem tátil",
     body: "O produto seca sem resíduos, sem alterar a cor, o toque nem o aspeto do tecido. Crianças e animais podem regressar ao espaço imediatamente após a secagem.",
-    image: "/images/impermeabilizacao/v3.png",
+    image: "/images/impermeabilizacao/v3.webp",
   },
 ];
 

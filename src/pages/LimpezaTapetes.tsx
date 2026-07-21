@@ -20,13 +20,13 @@ const tapetesGuarantee: GuaranteeItem[] = [
     label: "Manchas",
     title: "Manchas fora ou voltamos",
     body: "Garantimos a remoção de manchas tratáveis. Se não for possível, avaliamos sem custo e explicamos com exatidão o que aconteceu e quais as opções.",
-    image: "/images/tapetes/v1.png",
+    image: "/images/tapetes/v1.webp",
   },
   {
     label: "Fibras",
     title: "Fibras íntegras, cores preservadas",
     body: "Analisamos o tipo de fibra antes de qualquer intervenção. Técnica e produtos são adaptados para preservar a trama e a tonalidade original do tapete.",
-    image: "/images/tapetes/v2.png",
+    image: "/images/tapetes/v2.webp",
   },
   {
     label: "Odores",
@@ -82,7 +82,7 @@ const LimpezaTapetes = () => {
           beforeImage={tapeteAntes}
           afterImage={tapeteDepois}
           slides={[
-            { src: '/images/tapetes/v2.png', label: "Técnico" },
+            { src: '/images/tapetes/v2.webp', label: "Técnico" },
             { src: tapeteProcesso, label: "Extração" },
           ]}
           variant="dark"

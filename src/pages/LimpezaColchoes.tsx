@@ -21,13 +21,13 @@ const colchoesGuarantee: GuaranteeItem[] = [
     label: "Satisfação",
     title: "Resultado visível ou repetimos",
     body: "Se a higienização não trouxer uma diferença clara, voltamos sem qualquer custo. Comprometemo-nos com o resultado, não apenas com o processo.",
-    image: "/images/colchoes/v4.png",
+    image: "/images/colchoes/v4.webp",
   },
   {
     label: "Higiene",
     title: "Eliminação profunda de ácaros",
     body: "Temperatura, pressão e produtos combinados garantem a eliminação de ácaros, fungos e bactérias em profundidade, não apenas na superfície do tecido.",
-    image: "/images/colchoes/v5.png",
+    image: "/images/colchoes/v5.webp",
   },
   {
     label: "Segurança",
@@ -85,7 +85,7 @@ const LimpezaColchoes = () => {
           beforeImage={colchaoDepois}
           afterImage={colchaoAntes}
           slides={[
-            { src: '/images/colchoes/v3.png', label: "Pormenor" },
+            { src: '/images/colchoes/v3.webp', label: "Pormenor" },
             { src: colchaoProcesso, label: "Extração" },
           ]}
           variant="dark"

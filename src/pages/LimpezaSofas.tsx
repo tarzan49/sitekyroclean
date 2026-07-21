@@ -13,27 +13,27 @@ import ServiceEliteGuarantee, { GuaranteeItem } from "@/components/ServiceEliteG
 import { ExpertTip } from "@/components/ServiceExpertTips";
 import sofaBeforeNew from "@/assets/galeria-sofa-antes.webp";
 import sofaAfterNew from "@/assets/galeria-sofa-depois.webp";
-import sofaResultado from "@/assets/sofa-pele-pormenor.png";
-import sofaProcesso from "@/assets/sofa-extracao.png";
+import sofaResultado from "@/assets/sofa-pele-pormenor.webp";
+import sofaProcesso from "@/assets/sofa-extracao.webp";
 
 const sofaGuarantee: GuaranteeItem[] = [
   {
     label: "Satisfação",
     title: "100% ou repetimos",
     body: "Se o resultado não corresponder às expectativas, voltamos sem custo adicional. Garantia válida para qualquer tipo de tecido, sem exceções.",
-    image: "/images/guarantee/sofa-tecido.png",
+    image: "/images/guarantee/sofa-tecido.webp",
   },
   {
     label: "Cuidado",
     title: "Zero danos no seu sofá",
     body: "Avaliamos cada tecido antes de começar. Os produtos e a pressão são ajustados ao material exato do seu sofá para garantir segurança total.",
-    image: "/images/guarantee/sofa-veludo.png",
+    image: "/images/guarantee/sofa-veludo.webp",
   },
   {
     label: "Rapidez",
     title: "Seco em 2 a 4 horas",
     body: "Extração de alta potência reduz a humidade residual ao mínimo. Pode sentar-se no sofá no mesmo dia, sem esperas longas.",
-    image: "/images/guarantee/sofa-microfibras.png",
+    image: "/images/guarantee/sofa-microfibras.webp",
   },
 ];
 

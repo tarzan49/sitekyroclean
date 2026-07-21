@@ -20,7 +20,7 @@ const alcatifasGuarantee: GuaranteeItem[] = [
     label: "Satisfação",
     title: "Higiene uniforme ou repetimos",
     body: "Garantimos cobertura total sem zonas esquecidas. Se alguma área ficar abaixo do esperado, voltamos e tratamos sem qualquer custo adicional.",
-    image: "/images/alcatifas/v3.png",
+    image: "/images/alcatifas/v3.webp",
   },
   {
     label: "Cobertura",
