@@ -682,3 +682,36 @@ Correções aplicadas: canonical URLs em branco nas 17 páginas core, Breadcrumb
 - **MaterialPage.tsx:** ícones em círculo no "Como limpamos" removidos, ficou só o número (user achou os ícones "emoji-like").
 - **Páginas de Problema (`ProblemPage.tsx` + `ProblemCityPage.tsx`, 995 páginas) — trabalho mais extenso da sessão:** alternância de fundo corrigida (regra: secção após hero tem de ser branca); "Processo" virou timeline horizontal; "Problema+Solução" reescrita como 2 cartões fotográficos (não texto) — **foto do Problema a preto-e-branco, foto da Solução a cores cheias**, é o contraste visual que conta a história em vez de precisar de vermelho. User vai criar imagens dedicadas por problema no futuro (spec: 4:3, antes/depois do mesmo objeto).
 - **Descoberta:** `problemDetail`/`solutionDetail` (e provavelmente outros campos) nunca estiveram no HTML pré-renderizado estático — só existem depois da hidratação React. Não é regressão desta sessão, é limitação pré-existente do `scripts/prerender.ts` para este campo. Vale um audit futuro de cobertura do prerender por tipo de página.
+
+## Sessão — Overhaul de preços impermeabilização/cadeiras + bugs críticos + reviews link + IVA (2026-07-21)
+
+**Commit:** `09b7a33`
+
+**Preços novos (pedido explícito do user):**
+- Sofá impermeabilização: 69/89/109€ (1L/2L/3L), era 49/69/89€. Pack recalculado com o mesmo desconto (9/9/19€): 109/149/169€.
+- Chaise longue impermeabilização: 20€ → 25€.
+- Cadeiras impermeabilização: 1-6un 25€, 7-10un 20€, 11+ sob orçamento.
+- Cadeiras limpeza: 1-4un 20€, 5-7un 17,50€, 8-10un 15€, 11+ sob orçamento (cutoff sob-orçamento mudou de 10 para 11).
+- Pack "3L+Chaise" (Sofá+Impermeabilização): 199€ fixo, definido explicitamente pelo user.
+
+**Bugs de preço encontrados e corrigidos (todos com o mesmo padrão: números hardcoded desligados da fonte única `QuizTypes.ts`):**
+1. `QuizForm.tsx` step "Escolha o seu tratamento" tinha `49/45/39€` hardcoded, nunca acompanhava alterações reais de preço — era o bug que o user via no ecrã. Agora lê de `sofaPrices[0]`/`mattressPrices[0]`.
+2. `priceWidgetCalc.ts` — motor de preços duplicado usado pelos widgets SEO (Localidade/Freguesia/ServicePriceSection), tinha as suas próprias cópias das fórmulas de cadeiras e chaise, desalinhadas do motor do quiz.
+3. Off-by-one no corte "sob orçamento" das cadeiras (`qty>=10` em vez de `qty>10`) em `QuizStepConfig.tsx` e `QuizUpsellOverlay.tsx`.
+4. `index.html` raiz — schema JSON-LD estático da homepage tinha preço de cadeiras fixo em "12.50" (nunca apanhado por greps anteriores por estar fora de `src/`).
+5. `submissionService.ts` — preço unitário do recibo para "Impermeabilização Cadeiras" usava tabela de tiers completamente diferente e obsoleta.
+
+**Bug do "Pack:" repetido no WhatsApp/Formspree:** corrigido para aparecer uma única vez no início da lista de upsells.
+
+**Link de avaliações Google partido (site inteiro):** `GOOGLE_REVIEWS_SHORT_URL` usava um link curto `share.google/...` expirado que redirecionava para uma página genérica do Google. Substituído por `GOOGLE_REVIEWS_VIEW_URL` baseado no place_id (não expira). Afetava o ícone de avaliações em quase todo o site.
+
+**"IVA incl." removido** de todo o site (quiz, WhatsApp, Formspree, CRM) — pedido explícito do user.
+
+**`PackComboPage.tsx`:** removido o preço confuso de baixo dos 4 cards de opção de sofá (só aparece agora ao selecionar, na caixa de resumo com desconto).
+
+**Verificação:** sem Playwright/chromium-cli instalados neste ambiente — escrito um driver CDP mínimo em Node puro (fetch+WebSocket nativos) para confirmar visualmente via screenshot real que o quiz mostra os preços corretos. Vale a pena gerar uma skill `/run-skill-generator` para isto numa sessão futura.
+
+**Pendente no fim desta sessão:**
+1. **Velocidade do site:** dezenas de imagens PNG/JPG usadas em páginas reais (incluindo as 4284 páginas de variantes) entre 1.8MB e 11MB cada, nunca otimizadas (o script `optimize-images.js` existe mas escreve para uma pasta que o código nunca referencia). Por converter para WebP.
+2. **Redesign premium de `/packs`:** design considerado "pouco premium" vs resto do site.
+3. **Mais páginas `/packs` por cidade:** só 20 atualmente (4 packs × 5 cidades) — user quer expandir para as principais cidades de Portugal.
