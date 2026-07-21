@@ -1,5 +1,5 @@
 import { WHATSAPP_BASE } from "../constants/business";
-import { cityPrep } from "./locationSeoData";
+import { cityPrep, cities } from "./locationSeoData";
 
 // Pack/Combo SEO pages — targets "pack sofá e colchão porto", "limpeza completa sala porto"
 //
@@ -159,7 +159,7 @@ export const packs: PackCombo[] = [
       },
     ],
     features: [
-      'Limpeza a vapor profunda do sofá',
+      'Limpeza profunda do sofá',
       'Higienização completa do colchão',
       'Remoção de 99% dos ácaros e alergénios',
       'Eliminação de bactérias e odores',
@@ -193,14 +193,14 @@ export const packs: PackCombo[] = [
         // packPrice = preço VIP numa única visita (= quiz bothPrice)
         options: [
           { id: '1-lugar',   label: '1 Lugar',    sublabel: 'Sofá pequeno / poltrona', price: 118, packPrice: 109 },
-          { id: '2-lugares', label: '2 Lugares',  sublabel: 'Sofá standard',           price: 158, packPrice: 149 },
+          { id: '2-lugares', label: '2 Lugares',  sublabel: 'Sofá standard',           price: 158, packPrice: 145 },
           { id: '3-lugares', label: '3 Lugares',  sublabel: 'Sofá grande / familiar',  price: 188, packPrice: 169 },
           { id: '3l-chaise', label: '3L + Chaise',sublabel: 'Com chaise longue',        price: 223, packPrice: 199 },
         ],
       },
     ],
     features: [
-      'Limpeza profissional a vapor (primeiro)',
+      'Limpeza profissional profunda (primeiro)',
       'Impermeabilização com produto certificado (depois)',
       'Ordem correta: limpar antes de impermeabilizar',
       'Proteção duradoura até 12 meses',
@@ -241,18 +241,18 @@ export const packs: PackCombo[] = [
         key: 'tapete',
         label: 'Tapete',
         options: [
-          { id: 'pequeno', label: 'Pequeno',  sublabel: 'Até 5 m²',  price: 45 },
-          { id: 'medio',   label: 'Médio',    sublabel: '5 – 10 m²', price: 64 },
-          { id: 'grande',  label: 'Grande',   sublabel: '10 – 15 m²',price: 84 },
+          { id: 'pequeno', label: 'Pequeno',  sublabel: 'Até 5 m²',  price: 60 },
+          { id: 'medio',   label: 'Médio',    sublabel: '5 – 10 m²', price: 110 },
+          { id: 'grande',  label: 'Grande',   sublabel: '10 – 15 m²',price: 155 },
         ],
       },
       {
         key: 'cadeiras',
         label: 'Cadeiras',
         options: [
-          { id: '2',  label: '2 Cadeiras',  sublabel: 'Mesa de 2 pessoas', price: 36 },
-          { id: '4',  label: '4 Cadeiras',  sublabel: 'Mesa de 4 pessoas', price: 60 },
-          { id: '6',  label: '6 Cadeiras',  sublabel: 'Mesa de 6 pessoas', price: 80 },
+          { id: '2',  label: '2 Cadeiras',  sublabel: 'Mesa de 2 pessoas', price: 40 },
+          { id: '4',  label: '4 Cadeiras',  sublabel: 'Mesa de 4 pessoas', price: 80 },
+          { id: '6',  label: '6 Cadeiras',  sublabel: 'Mesa de 6 pessoas', price: 110 },
         ],
       },
     ],
@@ -270,8 +270,8 @@ export const packs: PackCombo[] = [
       text: 'A minha sala ficou completamente transformada. Sofá, tapete e cadeiras impecáveis. Vale muito a pena o pack!',
       author: 'Sofia L., Braga',
     },
-    service1: 'Sofá + Tapete',
-    service2: 'Cadeiras de Sala',
+    service1: 'Sofá',
+    service2: 'Tapete',
     service1Slug: 'limpeza-sofas',
     service2Slug: 'limpeza-tapetes',
   },
@@ -297,8 +297,8 @@ export const packs: PackCombo[] = [
         key: 'tapete',
         label: 'Tapete de Quarto',
         options: [
-          { id: 'pequeno', label: 'Pequeno',  sublabel: 'Até 5 m²',  price: 45 },
-          { id: 'medio',   label: 'Médio',    sublabel: '5 – 10 m²', price: 64 },
+          { id: 'pequeno', label: 'Pequeno',  sublabel: 'Até 5 m²',  price: 60 },
+          { id: 'medio',   label: 'Médio',    sublabel: '5 – 10 m²', price: 110 },
         ],
       },
     ],
@@ -323,13 +323,20 @@ export const packs: PackCombo[] = [
   },
 ];
 
-export const packCities = [
-  { name: 'Porto',    slug: 'porto'    },
-  { name: 'Lisboa',   slug: 'lisboa'   },
-  { name: 'Braga',    slug: 'braga'    },
-  { name: 'Aveiro',   slug: 'aveiro'   },
-  { name: 'Coimbra',  slug: 'coimbra'  },
+// Cidades principais das 3 regiões operacionais reais (Porto/Norte, Lisboa/AML, Algarve —
+// ver `cities` em locationSeoData.ts). Exclui vilas/municípios menores dessa lista (só as
+// cidades mais conhecidas de cada região), mas cobre muito mais do que as 5 anteriores.
+const PACK_CITY_SLUGS = [
+  // Porto / Norte
+  'porto', 'vila-nova-de-gaia', 'matosinhos', 'maia', 'gondomar', 'povoa-de-varzim',
+  'braga', 'guimaraes',
+  // Lisboa / AML
+  'lisboa', 'sintra', 'cascais', 'oeiras', 'almada', 'amadora', 'odivelas', 'setubal',
+  // Algarve
+  'faro', 'loule', 'albufeira', 'portimao', 'lagos', 'tavira',
 ];
+
+export const packCities = cities.filter(c => (PACK_CITY_SLUGS as readonly string[]).includes(c.slug));
 
 export interface PackComboRoute {
   path: string;

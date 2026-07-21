@@ -711,7 +711,13 @@ Correções aplicadas: canonical URLs em branco nas 17 páginas core, Breadcrumb
 
 **Verificação:** sem Playwright/chromium-cli instalados neste ambiente — escrito um driver CDP mínimo em Node puro (fetch+WebSocket nativos) para confirmar visualmente via screenshot real que o quiz mostra os preços corretos. Vale a pena gerar uma skill `/run-skill-generator` para isto numa sessão futura.
 
-**Pendente no fim desta sessão:**
-1. **Velocidade do site:** dezenas de imagens PNG/JPG usadas em páginas reais (incluindo as 4284 páginas de variantes) entre 1.8MB e 11MB cada, nunca otimizadas (o script `optimize-images.js` existe mas escreve para uma pasta que o código nunca referencia). Por converter para WebP.
-2. **Redesign premium de `/packs`:** design considerado "pouco premium" vs resto do site.
-3. **Mais páginas `/packs` por cidade:** só 20 atualmente (4 packs × 5 cidades) — user quer expandir para as principais cidades de Portugal.
+**Pendente no fim desta sessão:** nenhum — os 3 pontos abaixo foram todos concluídos na continuação desta mesma sessão maratona (ver secção seguinte).
+
+## Sessão — Continuação: imagens, redesign /packs, expansão cidades, fórmula final cadeiras (2026-07-21)
+
+- **Imagens otimizadas:** 35 PNG/JPG gigantes (até 11MB) convertidas para WebP, ~125MB poupados, originais removidos.
+- **`/packs` redesenhado** (~15 rondas de feedback iterativo com screenshots via driver CDP): cards de seleção com ícone, títulos alinhados à esquerda de forma consistente, caixa de preço reescrita (preço riscado cinza à esquerda / pack dourado à direita), botão WhatsApp com o gradiente premium já usado no `MobileStickyBar.tsx`, fotos reais por serviço do pack (corrigido bug em "Sala Completa" que mostrava foto errada), "Garantias incluídas" em grelha 2×2. Ícone `Sparkles` banido do site.
+- **`packCities` expandido de 5 (incluía Coimbra, que nem é cidade operacional) para 22 cidades reais** das 3 regiões (Porto/Lisboa/Algarve) → 88 páginas de pack (era 20).
+- **Fórmula final de preço de cadeiras** (corrigida várias vezes pelo user ao longo da sessão): limpeza 1-4@20€/5-6@15€/7-10@12,50€; impermeabilização 1-4@25€/5-10@20€. Propagada a todos os motores de cálculo e cópias de marketing.
+- **Pack 2-lugares (Sofá+Impermeabilização) → 145€** (era 149€), "3L+Chaise" → 199€ (valores finais dados explicitamente pelo user).
+- Verificação final: script standalone confirmou os 22 preços-base dos 4 packs batem 100% com as fórmulas canónicas.

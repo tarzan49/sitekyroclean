@@ -1,6 +1,6 @@
 ﻿import { useMemo, useEffect, useState } from "react";
 import { useLocation, Link } from "react-router-dom";
-import { CheckCircle, Star, ArrowRight, Shield, Zap, MessageCircle } from "lucide-react";
+import { CheckCircle, Star, ArrowRight, Shield, Zap, MessageCircle, Sofa, BedDouble, Armchair, LayoutGrid, Quote } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import TrustRatingBadge from "@/components/TrustRatingBadge";
@@ -13,7 +13,7 @@ import {
   buildWhatsAppUrl,
 } from "@/data/packComboData";
 import { cityPrep } from "@/data/locationSeoData";
-import { pickServiceHero } from "@/constants/serviceContent";
+import { pickServiceHero, SERVICE_RESULT_IMAGES } from "@/constants/serviceContent";
 import { SITE_URL, WHATSAPP_BASE, REVIEW_RATING, REVIEW_COUNT } from "@/constants/business";
 import {
   buildWebPageNode,
@@ -21,6 +21,20 @@ import {
   buildServiceNode,
   buildOfferNode,
 } from "@/lib/seoSchema";
+
+const SELECTOR_ICON: Record<string, typeof Sofa> = {
+  sofa: Sofa,
+  colchao: BedDouble,
+  tapete: LayoutGrid,
+  cadeiras: Armchair,
+};
+
+const SELECTOR_SLUG: Record<string, string> = {
+  sofa: 'limpeza-sofas',
+  colchao: 'limpeza-colchoes',
+  tapete: 'limpeza-tapetes',
+  cadeiras: 'limpeza-cadeiras',
+};
 
 const PackComboPage = () => {
   const { pathname } = useLocation();
@@ -175,92 +189,103 @@ const PackComboPage = () => {
         {/* ═══ CONFIGURADOR ═══ */}
         <section id="configurador" className="py-10 md:py-14 bg-[#FDFDF9]">
           <div className="container mx-auto px-5 sm:px-6 lg:px-8">
-            <div className="max-w-2xl mx-auto">
+            <div className="max-w-5xl mx-auto">
 
-              <div className="text-center mb-8">
-                <p className="text-[10px] font-bold tracking-[0.28em] uppercase mb-2" style={{ color: "#D4AF37" }}>
-                  Passo 1 de 2
-                </p>
-                <h2 className="font-playfair text-xl md:text-2xl font-bold text-[#111111]">
-                  Configure o seu pack
+              <div className="mb-8">
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="h-px w-8 flex-shrink-0" style={{ backgroundColor: "#D4AF37", opacity: 0.65 }} />
+                  <p className="text-[10px] font-bold tracking-[0.28em] uppercase" style={{ color: "#D4AF37", opacity: 0.9 }}>
+                    Passo 1 de 2
+                  </p>
+                </div>
+                <h2 className="font-playfair text-2xl md:text-3xl font-bold text-[#111111] leading-tight">
+                  Configure o seu <em className="not-italic" style={{ color: "#D4AF37" }}>pack</em>
                 </h2>
-                <p className="text-sm text-[#111111]/50 mt-1 mb-4">Selecione as opções abaixo para ver o preço exacto</p>
-                <div className="inline-flex items-center gap-3 rounded-xl px-5 py-3 text-sm text-[#111111]/70" style={{ background: "rgba(212,175,55,0.06)", border: "1px solid rgba(212,175,55,0.22)" }}>
+                <p className="text-sm text-[#111111]/50 mt-2 mb-4">Selecione as opções abaixo para ver o preço exacto</p>
+                <div className="inline-flex items-center gap-3 rounded-sm px-5 py-3 text-sm text-[#111111]/70" style={{ background: "rgba(212,175,55,0.06)", border: "1px solid rgba(212,175,55,0.22)" }}>
                   <CheckCircle className="w-4 h-4 flex-shrink-0" style={{ color: "#D4AF37" }} />
                   <span>Este pack inclui: <strong className="text-[#111111]">{pack.service1}</strong> + <strong className="text-[#111111]">{pack.service2}</strong></span>
                 </div>
               </div>
 
+              <div className="max-w-2xl">
               {/* Selectors */}
-              <div className="space-y-5 mb-8">
-                {pack.selectors.map(sel => (
-                  <div key={sel.key}>
-                    <p className="text-xs font-bold text-[#111111]/50 uppercase tracking-widest mb-2">{sel.label}</p>
-                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                      {sel.options.map(opt => {
-                        const isSelected = selections[sel.key] === opt.id;
-                        return (
-                          <button
-                            key={opt.id}
-                            onClick={() => setSelections(prev => ({ ...prev, [sel.key]: opt.id }))}
-                            className={[
-                              "relative flex flex-col items-start text-left px-3 py-3 rounded-xl border-2 transition-all",
-                              isSelected
-                                ? "border-[#D4AF37] bg-[#D4AF37]/[0.06]"
-                                : "border-[#E8E4DE] bg-white hover:border-[#D4AF37]/40",
-                            ].join(" ")}
-                          >
-                            {isSelected && (
-                              <span className="absolute top-2 right-2 w-4 h-4 rounded-full flex items-center justify-center" style={{ background: "#D4AF37" }}>
-                                <CheckCircle className="w-3 h-3 text-white" />
-                              </span>
-                            )}
-                            <span className="text-sm font-bold text-[#111111]">{opt.label}</span>
-                            {opt.sublabel && (
-                              <span className="text-[10px] text-[#111111]/40 mt-0.5 leading-snug">{opt.sublabel}</span>
-                            )}
-                          </button>
-                        );
-                      })}
+              <div className="space-y-6 mb-8">
+                {pack.selectors.map(sel => {
+                  const SelIcon = SELECTOR_ICON[sel.key] ?? Sofa;
+                  return (
+                    <div key={sel.key}>
+                      <div className="flex items-center gap-2.5 mb-3">
+                        <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: "rgba(212,175,55,0.1)", border: "1px solid rgba(212,175,55,0.25)" }}>
+                          <SelIcon className="w-4 h-4" style={{ color: "#D4AF37" }} strokeWidth={1.75} />
+                        </div>
+                        <p className="text-xs font-bold text-[#111111]/50 uppercase tracking-widest">{sel.label}</p>
+                      </div>
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                        {sel.options.map(opt => {
+                          const isSelected = selections[sel.key] === opt.id;
+                          return (
+                            <button
+                              key={opt.id}
+                              onClick={() => setSelections(prev => ({ ...prev, [sel.key]: opt.id }))}
+                              className={[
+                                "relative flex flex-col items-start text-left px-4 py-3.5 rounded-sm border-2 transition-all",
+                                isSelected
+                                  ? "border-[#D4AF37] bg-[#D4AF37]/[0.06] shadow-[0_2px_14px_rgba(212,175,55,0.16)]"
+                                  : "border-[#E8E4DE] bg-white hover:border-[#D4AF37]/40",
+                              ].join(" ")}
+                            >
+                              {isSelected && (
+                                <span className="absolute top-2 right-2 w-4 h-4 rounded-full flex items-center justify-center" style={{ background: "#D4AF37" }}>
+                                  <CheckCircle className="w-3 h-3 text-white" />
+                                </span>
+                              )}
+                              <span className="font-playfair text-base font-bold text-[#111111]">{opt.label}</span>
+                              {opt.sublabel && (
+                                <span className="text-[10px] text-[#111111]/40 mt-0.5 leading-snug">{opt.sublabel}</span>
+                              )}
+                            </button>
+                          );
+                        })}
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
 
               {/* Live price card */}
               <div
-                className="rounded-2xl overflow-hidden border mb-6"
-                style={{ borderColor: "rgba(212,175,55,0.25)", background: "#071a12" }}
+                className="rounded-sm overflow-hidden border mb-6"
+                style={{ borderColor: "rgba(212,175,55,0.30)", background: "#0a1f15" }}
               >
-                {/* Price comparison header */}
-                <div className="grid grid-cols-2 divide-x" style={{ borderColor: "rgba(255,255,255,0.07)" }}>
-                  <div className="px-5 py-4">
-                    <p className="text-[9px] font-black uppercase tracking-widest text-white/30 mb-1">Individual</p>
-                    <p className="text-xl font-bold text-white/35 line-through tabular-nums">
+                <div className="grid grid-cols-2 divide-x" style={{ borderColor: "rgba(255,255,255,0.08)" }}>
+                  <div className="px-5 py-6">
+                    <p className="text-[9px] font-bold uppercase tracking-widest text-white/35 mb-2">Preço separado</p>
+                    <p className="text-3xl font-bold text-white/40 line-through tabular-nums leading-none">
                       {prices ? `${prices.individualTotal}€` : '-'}
                     </p>
+                    <p className="text-[10px] text-white/25 mt-2">2 visitas separadas</p>
                   </div>
-                  <div className="px-5 py-4" style={{ background: "rgba(212,175,55,0.06)" }}>
-                    <p className="text-[9px] font-black uppercase tracking-widest mb-1" style={{ color: "#D4AF37" }}>Preço Pack</p>
-                    <p className="font-playfair text-2xl font-bold tabular-nums" style={{ color: "#D4AF37" }}>
+                  <div className="px-5 py-6" style={{ background: "rgba(212,175,55,0.07)" }}>
+                    <p className="text-[9px] font-bold uppercase tracking-widest mb-2" style={{ color: "#D4AF37" }}>Preço deste pack</p>
+                    <p className="font-playfair text-4xl font-black tabular-nums leading-none" style={{ color: "#D4AF37" }}>
                       {prices ? `${prices.packTotal}€` : '-'}
                     </p>
+                    {prices && prices.savingsPct > 0 && (
+                      <p className="text-[10px] font-bold mt-2" style={{ color: "#D4AF37", opacity: 0.85 }}>Poupa {prices.savingsPct}%</p>
+                    )}
                   </div>
                 </div>
 
-                {/* Savings banner */}
                 {prices && prices.savings > 0 && (
-                  <div className="px-5 py-2.5 border-t flex items-center justify-between" style={{ borderColor: "rgba(255,255,255,0.07)" }}>
-                    <span className="text-xs text-white/40">Poupança real</span>
-                    <span className="text-xs font-black text-green-400">
-                      {prices.savings}€ ({prices.savingsPct}% desconto)
-                    </span>
+                  <div className="mx-5 mt-5 mb-5 px-4 py-3 rounded-sm flex items-center justify-center text-sm font-bold text-center" style={{ background: "rgba(74,222,128,0.10)", color: "#4ade80", border: "1px solid rgba(74,222,128,0.25)" }}>
+                    Poupa {prices.savings}€ nesta configuração. Compensa reservar o pack.
                   </div>
                 )}
 
                 {/* Selection breakdown */}
                 {prices && (
-                  <div className="px-5 py-3 border-t space-y-1" style={{ borderColor: "rgba(255,255,255,0.07)" }}>
+                  <div className="px-5 py-3 border-t space-y-1" style={{ borderColor: "rgba(255,255,255,0.08)" }}>
                     {prices.lines.map((line, i) => (
                       <div key={i} className="flex justify-between text-xs">
                         <span className="text-white/45">{line.label}</span>
@@ -270,8 +295,8 @@ const PackComboPage = () => {
                   </div>
                 )}
 
-                <div className="px-5 pb-3 pt-1">
-                  <p className="text-[9px] text-white/20">Sujeito a confirmação · Preço fixo após confirmar</p>
+                <div className="px-5 pb-4 pt-1">
+                  <p className="text-[9px] text-white/25 text-center">Sujeito a confirmação · Preço fixo após confirmar</p>
                 </div>
               </div>
 
@@ -283,16 +308,16 @@ const PackComboPage = () => {
                   rel="noopener noreferrer"
                   onClick={e => { if (!allSelected) e.preventDefault(); }}
                   className={[
-                    "w-full h-14 flex items-center justify-center gap-3 rounded-2xl font-bold text-base transition-all active:scale-[0.98] touch-manipulation",
+                    "w-full h-16 flex items-center justify-center gap-3 rounded-sm transition-all active:scale-[0.98] touch-manipulation",
                     allSelected
-                      ? "bg-[#25D366] hover:bg-[#20bd5a] text-white shadow-[0_4px_24px_rgba(37,211,102,0.30)]"
+                      ? "bg-gradient-to-r from-[#1DA851] via-[#25D366] to-[#1DA851] shadow-[0_6px_22px_rgba(37,211,102,0.42),0_2px_6px_rgba(0,0,0,0.28),inset_0_1px_0_rgba(255,255,255,0.20),inset_0_-2px_0_rgba(0,0,0,0.12)]"
                       : "bg-gray-200 text-gray-400 cursor-not-allowed",
                   ].join(" ")}
                 >
-                  <MessageCircle className="w-5 h-5 flex-shrink-0" />
+                  <MessageCircle className="w-5 h-5 flex-shrink-0 text-white" />
                   {allSelected
-                    ? `Reservar via WhatsApp, ${prices?.packTotal ?? ''}€`
-                    : 'Selecione as opções acima'}
+                    ? <span className="text-white text-[13px] font-semibold tracking-[0.14em] uppercase">Reservar via WhatsApp <strong className="font-black text-base tracking-normal normal-case">{prices?.packTotal ?? ''}€</strong></span>
+                    : <span className="text-sm font-bold">Selecione as opções acima</span>}
                 </a>
 
                 <p className="text-center text-[10px] text-[#111111]/35">
@@ -301,6 +326,7 @@ const PackComboPage = () => {
                 </p>
               </div>
 
+              </div>
             </div>
           </div>
         </section>
@@ -308,25 +334,33 @@ const PackComboPage = () => {
         {/* ═══ COMO FUNCIONA ═══ */}
         <section className="py-12 md:py-16 bg-kyro-green">
           <div className="container mx-auto px-5 sm:px-6 lg:px-8">
-            <div className="max-w-2xl mx-auto">
-              <p className="text-[10px] font-bold tracking-[0.28em] uppercase mb-4 text-center" style={{ color: "#D4AF37" }}>
-                Passo 2 de 2
-              </p>
-              <h2 className="font-playfair text-xl md:text-2xl font-bold text-white text-center mb-8">
-                Como funciona
+            <div className="max-w-5xl mx-auto mb-8">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="h-px w-8 flex-shrink-0" style={{ backgroundColor: "#D4AF37", opacity: 0.65 }} />
+                <p className="text-[10px] font-bold tracking-[0.28em] uppercase" style={{ color: "#D4AF37", opacity: 0.9 }}>
+                  Passo 2 de 2
+                </p>
+              </div>
+              <h2 className="font-playfair text-2xl md:text-3xl font-bold text-white">
+                Como <em className="not-italic" style={{ color: "#D4AF37" }}>funciona</em>
               </h2>
+            </div>
+            <div className="max-w-2xl mx-auto">
               <div className="relative grid grid-cols-3 gap-4 text-center">
-                <div className="hidden sm:block absolute top-4 left-0 right-0 h-px" style={{ background: "linear-gradient(to right, transparent, #D4AF37 12%, #D4AF37 88%, transparent)" }} aria-hidden="true" />
+                <div className="hidden sm:block absolute top-5 left-0 right-0 h-px" style={{ background: "linear-gradient(to right, transparent, #D4AF37 12%, #D4AF37 88%, transparent)" }} aria-hidden="true" />
                 {[
-                  { n: '1', title: 'Envie o pack', desc: 'Clique no botão WhatsApp, a mensagem já vem preenchida com os detalhes.' },
-                  { n: '2', title: 'Confirmamos', desc: 'Respondemos em menos de 30 min a confirmar data e horário.' },
-                  { n: '3', title: 'Tratamos de tudo', desc: 'A equipa desloca-se e executa ambos os serviços na mesma visita.' },
+                  { n: '1', icon: MessageCircle, title: 'Envie o pack', desc: 'Clique no botão WhatsApp, a mensagem já vem preenchida com os detalhes.' },
+                  { n: '2', icon: CheckCircle, title: 'Confirmamos', desc: 'Respondemos em menos de 30 min a confirmar data e horário.' },
+                  { n: '3', icon: Zap, title: 'Tratamos de tudo', desc: 'A equipa desloca-se e executa ambos os serviços na mesma visita.' },
                 ].map(step => (
-                  <div key={step.n} className="relative flex flex-col items-center gap-2">
-                    <div className="relative z-10 w-8 h-8 rounded-full flex items-center justify-center text-sm font-black text-[#071a12]" style={{ background: "#D4AF37" }}>
-                      {step.n}
+                  <div key={step.n} className="relative flex flex-col items-center gap-2.5">
+                    <div
+                      className="relative z-10 w-10 h-10 rounded-full flex items-center justify-center"
+                      style={{ background: "#0c2318", border: "1.5px solid #D4AF37", boxShadow: "0 0 18px rgba(212,175,55,0.25)" }}
+                    >
+                      <step.icon className="w-4 h-4" style={{ color: "#D4AF37" }} strokeWidth={2} />
                     </div>
-                    <p className="text-xs font-bold text-white">{step.title}</p>
+                    <p className="text-xs font-bold text-white">{step.n}. {step.title}</p>
                     <p className="text-[11px] text-white/50 leading-snug">{step.desc}</p>
                   </div>
                 ))}
@@ -338,19 +372,43 @@ const PackComboPage = () => {
         {/* ═══ O QUE ESTÁ INCLUÍDO ═══ */}
         <section className="py-12 md:py-16 bg-[#FDFDF9]">
           <div className="container mx-auto px-5 sm:px-6 lg:px-8">
-            <div className="max-w-4xl mx-auto">
-              <div className="flex items-center gap-3 mb-3">
-                <div className="h-px w-10 opacity-60" style={{ backgroundColor: "#D4AF37" }} />
-                <p className="text-[10px] font-bold tracking-[0.28em] uppercase" style={{ color: "#D4AF37" }}>Incluído</p>
+            <div className="max-w-5xl mx-auto grid md:grid-cols-2 gap-8 md:gap-12 items-center">
+              <div className="order-2 md:order-1">
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="h-px w-10 opacity-60" style={{ backgroundColor: "#D4AF37" }} />
+                  <p className="text-[10px] font-bold tracking-[0.28em] uppercase" style={{ color: "#D4AF37" }}>Incluído</p>
+                </div>
+                <h2 className="font-playfair text-2xl md:text-3xl font-bold text-[#111111] mb-6">O que está incluído</h2>
+                <div className="space-y-0">
+                  {pack.features.slice(0, 6).map((feature, i) => (
+                    <div
+                      key={i}
+                      className="flex items-center gap-3.5 py-3"
+                      style={i < Math.min(pack.features.length, 6) - 1 ? { borderBottom: "1px solid #E8E4DE" } : undefined}
+                    >
+                      <span className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: "#D4AF37" }} />
+                      <span className="text-sm md:text-base text-[#111111]/75 font-medium">{feature}</span>
+                    </div>
+                  ))}
+                </div>
               </div>
-              <h2 className="font-playfair text-2xl md:text-3xl font-bold text-[#111111] mb-6">O que está incluído</h2>
-              <div className="grid sm:grid-cols-2 gap-3">
-                {pack.features.map((feature, i) => (
-                  <div key={i} className="flex items-start gap-3 p-4 rounded-xl border border-[#E8E4DE] bg-white">
-                    <CheckCircle className="w-5 h-5 flex-shrink-0 mt-0.5" style={{ color: "#D4AF37" }} />
-                    <span className="text-sm md:text-base text-[#111111]/75 font-medium">{feature}</span>
-                  </div>
-                ))}
+              <div className={`order-1 md:order-2 grid gap-3 ${pack.selectors.length >= 3 ? 'grid-cols-3' : 'grid-cols-2'}`}>
+                {pack.selectors.map(sel => {
+                  const slug = SELECTOR_SLUG[sel.key];
+                  return (
+                    <div key={sel.key} className="relative rounded-sm overflow-hidden aspect-[3/4]" style={{ boxShadow: "0 8px 32px rgba(0,0,0,0.12)" }}>
+                      <img
+                        src={SERVICE_RESULT_IMAGES[slug] ?? SERVICE_RESULT_IMAGES['limpeza-sofas']}
+                        alt={`Resultado de ${sel.label}`}
+                        className="w-full h-full object-cover"
+                        loading="lazy"
+                      />
+                      <span className="absolute bottom-2 left-2 right-2 text-[10px] font-bold text-white uppercase tracking-wide px-2 py-1.5 rounded-sm text-center" style={{ background: "rgba(7,26,18,0.65)", backdropFilter: "blur(2px)" }}>
+                        {sel.label}
+                      </span>
+                    </div>
+                  );
+                })}
               </div>
             </div>
           </div>
@@ -359,30 +417,46 @@ const PackComboPage = () => {
         {/* ═══ TESTEMUNHO + GARANTIAS ═══ */}
         <section className="py-12 md:py-16 bg-kyro-green">
           <div className="container mx-auto px-5 sm:px-6 lg:px-8">
-            <div className="max-w-4xl mx-auto grid md:grid-cols-2 gap-4">
-              <div className="bg-white rounded-2xl p-6 shadow-sm">
-                <div className="flex gap-0.5 mb-3">
-                  {[...Array(5)].map((_, i) => <Star key={i} className="w-4 h-4 fill-[#D4AF37]" style={{ color: "#D4AF37" }} />)}
-                </div>
-                <p className="text-[#111111]/60 text-sm leading-relaxed italic mb-3">
-                  "{pack.testimonial.text}"
-                </p>
-                <p className="text-xs font-bold text-[#111111]">{pack.testimonial.author}</p>
+            <div className="max-w-5xl mx-auto">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="h-px w-8 flex-shrink-0" style={{ backgroundColor: "#D4AF37", opacity: 0.65 }} />
+                <p className="text-[10px] font-bold tracking-[0.28em] uppercase" style={{ color: "#D4AF37", opacity: 0.9 }}>Confiança</p>
               </div>
+              <h2 className="font-playfair text-2xl md:text-3xl font-bold text-white mb-8">
+                O que dizem os <em className="not-italic" style={{ color: "#D4AF37" }}>nossos clientes</em>
+              </h2>
 
-              <div className="rounded-2xl p-6 border border-white/10 bg-white/[0.04] space-y-3">
-                <h3 className="font-semibold text-white text-sm mb-1">Garantias incluídas</h3>
-                {[
-                  { icon: Shield, text: "Garantia de satisfação 100%" },
-                  { icon: Zap, text: `Serviço ao domicílio ${prep} ${city.name}` },
-                  { icon: CheckCircle, text: "Produtos certificados e seguros" },
-                  { icon: Star, text: `${REVIEW_RATING} · ${REVIEW_COUNT}+ avaliações Google verificadas` },
-                ].map((item, i) => (
-                  <div key={i} className="flex items-center gap-3">
-                    <item.icon className="w-4 h-4 flex-shrink-0" style={{ color: "#D4AF37" }} />
-                    <span className="text-sm text-white/70">{item.text}</span>
+              <div className="grid md:grid-cols-2 gap-4">
+                <div className="rounded-sm p-6 md:p-7" style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(212,175,55,0.20)" }}>
+                  <Quote className="w-7 h-7 mb-3" style={{ color: "#D4AF37", opacity: 0.45 }} strokeWidth={1.5} />
+                  <div className="flex gap-0.5 mb-3">
+                    {[...Array(5)].map((_, i) => <Star key={i} className="w-3.5 h-3.5 fill-[#D4AF37]" style={{ color: "#D4AF37" }} />)}
                   </div>
-                ))}
+                  <p className="text-white/75 text-sm leading-relaxed italic mb-4">
+                    "{pack.testimonial.text}"
+                  </p>
+                  <p className="text-xs font-bold text-white/90">{pack.testimonial.author}</p>
+                </div>
+
+                <div className="rounded-sm p-6 md:p-7" style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(212,175,55,0.20)" }}>
+                  <div className="flex items-center gap-2.5 mb-5">
+                    <div className="h-px w-6 flex-shrink-0" style={{ backgroundColor: "#D4AF37", opacity: 0.65 }} />
+                    <h3 className="text-[10px] font-bold tracking-[0.22em] uppercase" style={{ color: "#D4AF37", opacity: 0.9 }}>Garantias incluídas</h3>
+                  </div>
+                  <div className="grid grid-cols-2 gap-x-4 gap-y-5">
+                    {[
+                      { icon: Shield, text: "Garantia de satisfação 100%" },
+                      { icon: Zap, text: `Serviço ao domicílio ${prep} ${city.name}` },
+                      { icon: CheckCircle, text: "Produtos certificados e seguros" },
+                      { icon: Star, text: `${REVIEW_RATING} · ${REVIEW_COUNT}+ avaliações Google verificadas` },
+                    ].map((item, i) => (
+                      <div key={i} className="flex flex-col items-start gap-2">
+                        <item.icon className="w-5 h-5" style={{ color: "#D4AF37" }} strokeWidth={1.5} />
+                        <span className="text-xs text-white/75 leading-snug">{item.text}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -391,8 +465,12 @@ const PackComboPage = () => {
         {/* ═══ SERVIÇOS INDIVIDUAIS + CTA FINAL ═══ */}
         <section className="py-12 md:py-16 bg-[#FDFDF9]">
           <div className="container mx-auto px-5 sm:px-6 lg:px-8">
-            <div className="max-w-4xl mx-auto">
-              <h3 className="text-base font-playfair font-bold text-[#111111] mb-4">Serviços individuais</h3>
+            <div className="max-w-5xl mx-auto">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="h-px w-8 flex-shrink-0" style={{ backgroundColor: "#D4AF37", opacity: 0.65 }} />
+                <p className="text-[10px] font-bold tracking-[0.28em] uppercase" style={{ color: "#D4AF37", opacity: 0.9 }}>Explorar mais</p>
+              </div>
+              <h3 className="text-xl font-playfair font-bold text-[#111111] mb-4">Serviços individuais</h3>
               <div className="flex flex-wrap gap-2 mb-10">
                 <Link to={`/${pack.service1Slug}`} className="inline-flex items-center gap-1.5 bg-white px-3 py-2 rounded-lg text-sm text-[#111111] border border-[#E8E4DE] hover:border-[#D4AF37]/35 transition-all">
                   <ArrowRight className="w-3 h-3" style={{ color: "#D4AF37" }} />{pack.service1}
@@ -406,31 +484,6 @@ const PackComboPage = () => {
                 <Link to="/guia-de-packs" className="inline-flex items-center gap-1.5 bg-white px-3 py-2 rounded-lg text-sm text-[#111111] border border-[#E8E4DE] hover:border-[#D4AF37]/35 transition-all">
                   <ArrowRight className="w-3 h-3" style={{ color: "#D4AF37" }} />Todos os packs disponíveis
                 </Link>
-              </div>
-
-              <div
-                className="rounded-sm p-8 md:p-10 text-center"
-                style={{ background: "#071a12", border: "1px solid rgba(212,175,55,0.22)" }}
-              >
-                <p className="text-[10px] font-bold tracking-[0.28em] uppercase mb-3" style={{ color: "#D4AF37" }}>Kyro Clean Solutions</p>
-                <h2 className="font-playfair text-xl md:text-2xl font-bold text-white mb-2">
-                  Pronto para reservar?
-                </h2>
-                <p className="text-white/50 text-sm mb-6">
-                  Configure acima e envie via WhatsApp. Confirmamos em menos de 30 min.
-                </p>
-                <a
-                  href="#configurador"
-                  onClick={e => {
-                    e.preventDefault();
-                    document.getElementById('configurador')?.scrollIntoView({ behavior: 'smooth' });
-                  }}
-                  className="inline-flex items-center gap-2 px-6 py-3 rounded-full font-bold text-[#071a12] transition-all hover:opacity-90"
-                  style={{ background: "#D4AF37" }}
-                >
-                  Configurar o pack
-                  <ArrowRight className="w-4 h-4" />
-                </a>
               </div>
             </div>
           </div>

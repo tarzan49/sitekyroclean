@@ -702,7 +702,7 @@ export function prerenderRoutes(outDir: string): number {
             'Preço por volume: quanto mais cadeiras, menor o preço unitário',
           ],
           faqs: faqs([
-            { q: 'Quanto custa a limpeza de cadeiras?', a: 'O preço por cadeira diminui com a quantidade: até 4 cadeiras é 20€/unid., de 5 a 7 é 17,50€/unid., de 8 a 10 é 15€/unid. e a partir de 11 cadeiras por orçamento.' },
+            { q: 'Quanto custa a limpeza de cadeiras?', a: 'O preço por cadeira diminui com a quantidade: até 4 cadeiras é 20€/unid., de 5 a 6 é 15€/unid., de 7 a 10 é 12,50€/unid. e a partir de 11 cadeiras por orçamento.' },
             { q: 'Limpam cadeiras de escritório?', a: 'Sim. Limpamos cadeiras de escritório, sala de jantar, poltronas e bancos. O serviço é ao domicílio ou no local de trabalho.' },
             { q: 'Quanto tempo demora a limpeza de cadeiras?', a: 'Cada cadeira demora 15 a 30 minutos. Um conjunto de 6 cadeiras leva cerca de 2 horas. As cadeiras ficam secas em 2 a 4 horas.' },
             { q: 'Fazem limpeza de cadeiras em quantidade para restaurantes?', a: 'Sim. Para restaurantes, hotéis e escritórios temos condições especiais. Contacte-nos para orçamento personalizado.' },

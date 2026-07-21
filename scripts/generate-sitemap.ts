@@ -388,9 +388,14 @@ export function generateSitemaps(outDir: string) {
     ...blogSlugs.map(s => xmlUrl(`/blog/${s}`, 'monthly', '0.8')),
   ];
 
-  // 9. Pack/Combo pages (4 packs × 5 cities = 20 pages)
+  // 9. Pack/Combo pages (4 packs × 22 cidades principais = 88 pages)
+  // Manter sincronizado com PACK_CITY_SLUGS em src/data/packComboData.ts
   const packSlugs = ['pack-sofa-e-colchao', 'pack-sofa-impermeabilizacao', 'pack-sala-completa', 'pack-quarto-completo'];
-  const packCities = ['porto', 'lisboa', 'braga', 'aveiro', 'coimbra'];
+  const packCities = [
+    'porto', 'vila-nova-de-gaia', 'matosinhos', 'maia', 'gondomar', 'povoa-de-varzim', 'braga', 'guimaraes',
+    'lisboa', 'sintra', 'cascais', 'oeiras', 'almada', 'amadora', 'odivelas', 'setubal',
+    'faro', 'loule', 'albufeira', 'portimao', 'lagos', 'tavira',
+  ];
   const packUrls: string[] = [];
   for (const pack of packSlugs) {
     for (const city of packCities) {

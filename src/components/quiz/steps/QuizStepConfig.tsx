@@ -184,8 +184,8 @@ const QuizStepConfig = ({
     const totalChairPrice = (primaryPrice ?? 0) + (addonEnabled && !sob ? (addonPrice ?? 0) : 0);
     const addonLabel = isWaterproofPrimary ? 'Adicionar Higienização' : 'Adicionar Impermeabilização';
     const addonRateHint = isWaterproofPrimary
-      ? (qty <= 4 ? '20' : qty <= 7 ? '17,5' : '15')
-      : (qty <= 6 ? '25' : '20');
+      ? (qty <= 4 ? '20' : qty <= 6 ? '15' : '12,5')
+      : (qty <= 4 ? '25' : '20');
 
     const setChairQty = (newQty: number) => {
       const clamped = Math.max(1, newQty);
@@ -238,8 +238,8 @@ const QuizStepConfig = ({
         {!sob && (
           <p className="text-xs text-white/30 text-center leading-snug">
             {isWaterproofPrimary
-              ? '1ª–6ª: 25€ · 7ª–10ª: 20€ por cadeira'
-              : '1ª–4ª: 20€ · 5ª–7ª: 17,5€ · 8ª–10ª: 15€ por cadeira'}
+              ? '1ª–4ª: 25€ · 5ª–10ª: 20€ por cadeira'
+              : '1ª–4ª: 20€ · 5ª–6ª: 15€ · 7ª–10ª: 12,5€ por cadeira'}
           </p>
         )}
         {!sob && (

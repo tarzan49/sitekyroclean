@@ -43,8 +43,8 @@ const priceTables: Record<string, { item: string; price: string; note?: string }
   ],
   "limpeza-cadeiras": [
     { item: "1ª a 4ª cadeira", price: "20€/un" },
-    { item: "5ª a 7ª cadeira", price: "17,50€/un" },
-    { item: "8ª a 10ª cadeira", price: "15€/un" },
+    { item: "5ª a 6ª cadeira", price: "15€/un" },
+    { item: "7ª a 10ª cadeira", price: "12,50€/un" },
     { item: "11+ cadeiras", price: "Sob orçamento" },
   ],
   "limpeza-alcatifas": [

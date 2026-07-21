@@ -58,7 +58,7 @@ export interface PriceOption {
 // delta (upsell text) = bothPrice - cleaningPrice
 export const sofaPrices: PriceOption[] = [
   { id: '1-lugar',    label: '1 Lugar',    cleaningPrice: 49, waterproofingPrice: 69,  bothPrice: 109, originalBothPrice: 118 },
-  { id: '2-lugares',  label: '2 Lugares',  cleaningPrice: 69, waterproofingPrice: 89,  bothPrice: 149, originalBothPrice: 158 },
+  { id: '2-lugares',  label: '2 Lugares',  cleaningPrice: 69, waterproofingPrice: 89,  bothPrice: 145, originalBothPrice: 158 },
   { id: '3-lugares',  label: '3 Lugares',  cleaningPrice: 79, waterproofingPrice: 109, bothPrice: 169, originalBothPrice: 188 },
   { id: '4+-lugares', label: '4+ Lugares', cleaningPrice: 'Sob orçamento', waterproofingPrice: 'Sob orçamento', bothPrice: 'Sob orçamento' },
 ];

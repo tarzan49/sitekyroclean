@@ -11,9 +11,9 @@ import heroRugM               from "@/assets/hero-rug-cleaning-new-mobile.webp";
 import heroWaterproofD        from "@/assets/hero-waterproofing.webp";
 import heroWaterproofM        from "@/assets/hero-waterproofing-mobile.webp";
 import resultSofa              from "@/assets/galeria-sofa-depois.webp";
-import resultColchao           from "@/assets/galeria-colchao-depois.webp";
+import resultColchao           from "@/assets/galeria-colchao-resultado.webp";
 import resultTapetes           from "@/assets/galeria-tapete-depois.webp";
-import resultCadeiras          from "@/assets/galeria-cadeira-depois.webp";
+import resultCadeiras          from "@/assets/galeria-cadeira-resultado-cliente.webp";
 import resultAlcatifas         from "@/assets/galeria-alcatifa-resultado.webp";
 import resultImpermeabilizacao from "@/assets/galeria-impermeabilizacao-depois.webp";
 

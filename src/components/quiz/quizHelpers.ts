@@ -77,37 +77,37 @@ export function calcCarpetPrice(area: number): number | null {
 // ── Chairs ────────────────────────────────────────────────────────────────────
 export const CHAIR_TIERS = [
   { label: '1ª a 4ª',  sublabel: 'cadeira', rate: 20 },
-  { label: '5ª a 7ª',  sublabel: 'cadeira', rate: 17.5 },
-  { label: '8ª a 10ª', sublabel: 'cadeira', rate: 15 },
+  { label: '5ª a 6ª',  sublabel: 'cadeira', rate: 15 },
+  { label: '7ª a 10ª', sublabel: 'cadeira', rate: 12.5 },
   { label: '11+',      sublabel: 'cadeiras', rate: null },
 ] as const;
 
 export const CHAIR_WATERPROOF_TIERS = [
-  { label: '1 a 6',  sublabel: 'cadeiras', rate: 25 },
-  { label: '7 a 10', sublabel: 'cadeiras', rate: 20 },
+  { label: '1 a 4',  sublabel: 'cadeiras', rate: 25 },
+  { label: '5 a 10', sublabel: 'cadeiras', rate: 20 },
   { label: '11+',    sublabel: 'cadeiras', rate: null },
 ] as const;
 
 export function chairActiveTier(qty: number): number {
   if (qty <= 4) return 0;
-  if (qty <= 7) return 1;
+  if (qty <= 6) return 1;
   if (qty <= 10) return 2;
   return 3;
 }
 
-// Bracket pricing: 1-4 @ 20€ · 5-7 @ 17.5€ · 8-10 @ 15€ · 11+: sob orçamento
+// Bracket pricing: 1-4 @ 20€ · 5-6 @ 15€ · 7-10 @ 12.5€ · 11+: sob orçamento
 export function calcChairClean(qty: number): number | null {
   if (qty <= 0 || qty > 10) return null;
   if (qty <= 4) return qty * 20;
-  if (qty <= 7) return 80 + (qty - 4) * 17.5;
-  return 132.5 + (qty - 7) * 15;
+  if (qty <= 6) return 4 * 20 + (qty - 4) * 15;
+  return 4 * 20 + 2 * 15 + (qty - 6) * 12.5;
 }
 
-// Progressive: 1-6 @ 25€, 7-10 @ 20€ each, 11+: sob orçamento
+// Progressive: 1-4 @ 25€, 5-10 @ 20€ each, 11+: sob orçamento
 export function calcChairWaterproof(qty: number): number | null {
   if (qty <= 0 || qty > 10) return null;
-  if (qty <= 6) return qty * 25;
-  return 6 * 25 + (qty - 6) * 20;
+  if (qty <= 4) return qty * 25;
+  return 4 * 25 + (qty - 4) * 20;
 }
 
 export function fmtN(n: number): string {

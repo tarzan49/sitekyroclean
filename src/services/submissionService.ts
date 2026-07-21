@@ -180,7 +180,7 @@ function buildReceiptLines(payload: QuizLeadPayload) {
       const wQty = chairWaterproofQty;
       if (wQty > 0) {
         const wTotal = calcChairWaterproof(wQty);
-        const wUnit = wQty <= 6 ? 25 : wQty <= 10 ? 20 : null;
+        const wUnit = wQty <= 4 ? 25 : wQty <= 10 ? 20 : null;
         receiptLines.push({ label: 'Impermeabilização Cadeiras', qty: wQty, unitPrice: wUnit, total: wTotal });
       }
     }

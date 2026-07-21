@@ -387,7 +387,7 @@ const posts: BlogPost[] = [
     sections: [
       {
         heading: "Preços de limpeza de cadeiras (2025)",
-        body: "A Kyro Clean Solutions pratica preço decrescente por unidade, quanto mais cadeiras limpar de uma vez:\n\n- 1ª a 4ª cadeira: 20€/unidade\n- 5ª a 7ª cadeira: 17,50€/unidade\n- 8ª a 10ª cadeira: 15€/unidade\n- 11 ou mais cadeiras: orçamento personalizado\n\nO desconto por volume reflete a eficiência do técnico quando tem várias peças no mesmo local, a deslocação e o setup do equipamento são custos fixos que se diluem com mais peças.",
+        body: "A Kyro Clean Solutions pratica preço decrescente por unidade, quanto mais cadeiras limpar de uma vez:\n\n- 1ª a 4ª cadeira: 20€/unidade\n- 5ª a 10ª cadeira: 15€/unidade\n- 11 ou mais cadeiras: orçamento personalizado\n\nO desconto por volume reflete a eficiência do técnico quando tem várias peças no mesmo local, a deslocação e o setup do equipamento são custos fixos que se diluem com mais peças.",
         tip: "Para restaurantes ou escritórios com mais de 20 cadeiras, solicitamos orçamento personalizado que pode representar uma poupança adicional de 20 a 30%.",
       },
       {
