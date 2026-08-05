@@ -9,6 +9,7 @@ export interface MarcaSofa {
   materialDescription: string;
   cleaningProcess: string;
   doNots: string[];
+  doThis: string[];
   estimatedPriceRange: string;
   minPrice: number;
   maxPrice: number;
@@ -27,8 +28,10 @@ export const marcas: MarcaSofa[] = [
     doNots: [
       "Não usar produtos alcalinos: danificam a microfibra permanentemente",
       "Não esfregar com força: as fibras ficam com aspeto felpudo",
-      "Não ensopar em água: pode deformar as almofadas de espuma",
-      "Não usar secador de cabelo: calor excessivo danifica o tecido sintético",
+    ],
+    doThis: [
+      "Extraímos a sujidade acumulada nas fibras de microfibra sem danificar o tecido sintético IKEA",
+      "Tratamos separadamente as capas removíveis de modelos como o EKTORP, para um resultado mais completo",
     ],
     estimatedPriceRange: "49€ - 79€",
     minPrice: 49,
@@ -59,8 +62,10 @@ export const marcas: MarcaSofa[] = [
     doNots: [
       "Nunca usar produtos de limpeza domésticos: danificam o couro de forma irreversível",
       "Não expor a luz solar direta durante a secagem: racha o couro",
-      "Não usar álcool, acetona ou solventes de qualquer tipo",
-      "Não deixar água parada: pode criar manchas permanentes",
+    ],
+    doThis: [
+      "Hidratamos e restauramos o brilho natural do couro genuíno Natuzzi com condicionador profissional certificado",
+      "Usamos técnica manual sem vapor direto no couro, preservando a elasticidade original do material",
     ],
     estimatedPriceRange: "79€ - 129€",
     minPrice: 79,
@@ -91,8 +96,10 @@ export const marcas: MarcaSofa[] = [
     doNots: [
       "Nunca tentar limpeza doméstica: risco de dano irreversível em tecidos de luxo",
       "Não usar vapor a alta temperatura em seda ou linho",
-      "Não aplicar qualquer produto sem testar num canto invisível",
-      "Não esfregar jamais: as fibras de luxo ficam danificadas permanentemente",
+    ],
+    doThis: [
+      "Fazemos sempre avaliação prévia gratuita do tecido antes de qualquer intervenção em peças de design Roche Bobois",
+      "Temos seguro de responsabilidade civil que cobre eventuais danos em sofás de valor elevado",
     ],
     estimatedPriceRange: "Sob consulta",
     minPrice: 89,
@@ -123,8 +130,10 @@ export const marcas: MarcaSofa[] = [
     doNots: [
       "Não usar vapor a alta pressão em couro PU: descasca e não tem recuperação",
       "Evitar produtos com álcool em tecidos sintéticos: dissolve o PU",
-      "Não esfregar com força nas costuras: são o ponto fraco do couro sintético",
-      "Não deixar produto de limpeza a secar no couro PU",
+    ],
+    doThis: [
+      "Usamos técnica específica para couro PU que não agride nem descasca o material",
+      "Damos atenção redobrada às costuras, o ponto mais frágil do couro sintético Conforama",
     ],
     estimatedPriceRange: "49€ - 79€",
     minPrice: 49,
@@ -155,8 +164,10 @@ export const marcas: MarcaSofa[] = [
     doNots: [
       "Não usar água muito quente em linho: pode encolher o tecido",
       "Não usar branqueadores em tecidos coloridos: descolora permanentemente",
-      "Sempre respeitar as etiquetas de limpeza do fabricante",
-      "Não tentar remover manchas a seco esfregando: piora o resultado",
+    ],
+    doThis: [
+      "Usamos produtos de pH neutro que deixam as cores do tecido El Corte Inglés mais vivas e definidas",
+      "Tratamos almofadas removíveis e fixas com o método adequado a cada uma",
     ],
     estimatedPriceRange: "49€ - 89€",
     minPrice: 49,
@@ -187,8 +198,10 @@ export const marcas: MarcaSofa[] = [
     doNots: [
       "Nunca esfregar veludo com força: o pelo fica permanentemente danificado",
       "Não usar vapor de alta pressão em boucle: destrói a textura característica",
-      "Secar sempre à sombra e sem calor excessivo",
-      "Não usar esponjas abrasivas em nenhum destes tecidos",
+    ],
+    doThis: [
+      "Escovamos o veludo sempre na direção do pelo com fibras profissionais suaves, sem deixar marcas",
+      "Usamos vapor a pressão mínima e temperatura controlada para preservar a textura característica do boucle",
     ],
     estimatedPriceRange: "59€ - 89€",
     minPrice: 59,
@@ -219,7 +232,10 @@ export const marcas: MarcaSofa[] = [
     doNots: [
       "Não usar produtos de limpeza agressivos em poliéster: podem alterar as cores",
       "Não deixar humidade por tempo prolongado: risco de bolor nas costuras",
-      "Evitar esfregar manchas secas a seco: empurra a mancha para o interior das fibras",
+    ],
+    doThis: [
+      "Removemos manchas de uso quotidiano com desengordurante específico para poliéster, sem alterar as cores",
+      "Extraímos a humidade por completo, eliminando o risco de bolor nas costuras",
     ],
     estimatedPriceRange: "49€ - 79€",
     minPrice: 49,
@@ -250,7 +266,10 @@ export const marcas: MarcaSofa[] = [
     doNots: [
       "Não usar o mesmo produto em couro e tecido: são tratamentos completamente diferentes",
       "Não tratar couro genuíno com produtos de couro sintético e vice-versa",
-      "Testar sempre num local discreto antes de tratar a superfície total",
+    ],
+    doThis: [
+      "Fazemos avaliação prévia gratuita do revestimento antes de qualquer intervenção, tecido ou couro",
+      "Eliminamos odores persistentes como fumo e animais de estimação em mais de 90% dos casos",
     ],
     estimatedPriceRange: "49€ - 89€",
     minPrice: 49,
