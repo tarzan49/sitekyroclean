@@ -29,6 +29,7 @@ import { getAllMaterials, getAllMaterialCityRoutes, getMaterialCityData } from '
 import { getAllPriceRoutes, getPricePageData } from '../src/data/priceSeoData';
 import { getAllPackComboRoutes, getPackByCityAndId, getFromPrice } from '../src/data/packComboData';
 import { getAllMarcaSofaRoutes, getMarcaByCityAndSlug } from '../src/data/marcaSofaData';
+import { getAllMarcaColchaoRoutes, getMarcaColchaoByCityAndSlug } from '../src/data/marcaColchaoData';
 
 const BASE_URL = 'https://cleansolutions.com.pt';
 
@@ -555,7 +556,7 @@ export function prerenderRoutes(outDir: string): number {
     console.log(`  Pack pages:              ${count - prev}`);
   }
 
-  // ── 9. Marca Sofá pages (8 × 10 = 80) ───────────────────────────────────
+  // ── 9. Marca Sofá pages (8 × 18 = 144) ──────────────────────────────────
   {
     const prev = count;
     for (const route of getAllMarcaSofaRoutes()) {
@@ -565,7 +566,20 @@ export function prerenderRoutes(outDir: string): number {
       const desc  = `Especialistas em limpeza de sofás ${data.marca.name} em ${data.city.name}. ${data.marca.material}. ${data.marca.estimatedPriceRange}. Serviço ao domicílio.`;
       emit(route.path, title, desc);
     }
-    console.log(`  Marca pages:             ${count - prev}`);
+    console.log(`  Marca Sofá pages:        ${count - prev}`);
+  }
+
+  // ── 9b. Marca Colchão pages (6 × 18 = 108) ──────────────────────────────
+  {
+    const prev = count;
+    for (const route of getAllMarcaColchaoRoutes()) {
+      const data = getMarcaColchaoByCityAndSlug(route.marcaSlug, route.citySlug);
+      if (!data) continue;
+      const title = `Limpeza Colchão ${data.marca.name} em ${data.city.name}, Especialistas | Kyro Clean`;
+      const desc  = `Especialistas em limpeza de colchões ${data.marca.name} em ${data.city.name}. ${data.marca.material}. ${data.marca.estimatedPriceRange}. Serviço ao domicílio.`;
+      emit(route.path, title, desc);
+    }
+    console.log(`  Marca Colchão pages:     ${count - prev}`);
   }
 
   // ── 10. Core static pages (service hubs, editorial, packs) ─────────────

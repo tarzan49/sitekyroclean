@@ -403,13 +403,21 @@ export function generateSitemaps(outDir: string) {
     }
   }
 
-  // 10. Marca Sofá pages (8 brands × 10 cities = 80 pages)
+  // 10. Marca Sofá pages (8 brands × 18 cities = 144 pages)
   const marcaSlugs = ['ikea', 'natuzzi', 'roche-bobois', 'conforama', 'el-corte-ingles', 'kave-home', 'leroy-merlin', 'moviflor'];
   const marcaCities = ['porto', 'lisboa', 'braga', 'aveiro', 'coimbra', 'guimaraes', 'matosinhos', 'vila-nova-de-gaia', 'maia', 'barcelos', 'sintra', 'cascais', 'oeiras', 'amadora', 'faro', 'loule', 'albufeira', 'portimao'];
   const marcaUrls: string[] = [];
   for (const marca of marcaSlugs) {
     for (const city of marcaCities) {
       marcaUrls.push(xmlUrl(`/limpeza-sofa-${marca}-${city}`, 'monthly', '0.7'));
+    }
+  }
+
+  // 11. Marca Colchão pages (6 brands × 18 cities = 108 pages)
+  const marcaColchaoSlugs = ['ikea', 'conforama', 'molaflex', 'pikolin', 'colmol', 'mindol'];
+  for (const marca of marcaColchaoSlugs) {
+    for (const city of marcaCities) {
+      marcaUrls.push(xmlUrl(`/limpeza-colchao-${marca}-${city}`, 'monthly', '0.7'));
     }
   }
 
