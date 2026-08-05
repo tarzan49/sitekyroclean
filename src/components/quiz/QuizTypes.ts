@@ -123,7 +123,7 @@ export const locationPrices: Record<string, number> = {
   'Braga': 20,
   'Aveiro': 20,
   // Zona 5 — Minho, ~55-70 min
-  'Guimarães': 25,
+  'Guimarães': 20,
 
   // ═══ Lisboa / Área Metropolitana (equipa local) ═══
   // Zona 0 — Lisboa
@@ -170,9 +170,9 @@ export const locationPrices: Record<string, number> = {
   'Castro Marim': 20,
   'Monchique': 20,
   // Zona 5 — Interior/Costa Vicentina, ~55-70 min
-  'Aljezur': 25,
-  'Vila do Bispo': 25,
-  'Alcoutim': 25,
+  'Aljezur': 20,
+  'Vila do Bispo': 20,
+  'Alcoutim': 20,
 };
 
 export const carpetWaterproofingPrices = [

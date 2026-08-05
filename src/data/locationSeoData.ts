@@ -12,7 +12,7 @@ const locationPrices: Record<string, number> = {
   'Santo Tirso': 10, 'Trofa': 10, 'Paredes': 10,
   'Penafiel': 15, 'Paços de Ferreira': 15, 'Felgueiras': 15, 'Lousada': 15,
   'Arouca': 20, 'Braga': 20, 'Aveiro': 20,
-  'Guimarães': 25,
+  'Guimarães': 20,
   // ── Lisboa / Área Metropolitana (equipa local) ──
   'Lisboa': 5,
   'Amadora': 5, 'Odivelas': 5, 'Oeiras': 5,
@@ -25,7 +25,7 @@ const locationPrices: Record<string, number> = {
   'Silves': 10, 'Lagoa': 10, 'Tavira': 10,
   'Portimão': 15, 'Lagos': 15,
   'Vila Real de Santo António': 20, 'Castro Marim': 20, 'Monchique': 20,
-  'Aljezur': 25, 'Vila do Bispo': 25, 'Alcoutim': 25,
+  'Aljezur': 20, 'Vila do Bispo': 20, 'Alcoutim': 20,
 };
 
 export interface LocationService {
