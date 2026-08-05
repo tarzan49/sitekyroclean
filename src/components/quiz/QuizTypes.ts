@@ -95,83 +95,84 @@ export const chairPrices = {
 };
 
 // Sem zona grátis: mínimo 5€ sempre, sobe com a distância ao centro de cada equipa.
+// Só as antigas zonas 0€ subiram para 5€ — todas as outras zonas mantêm o preço original.
 export const locationPrices: Record<string, number> = {
   // ═══ Porto/Norte (equipa Porto) ═══
   // Zona 0 — Porto metropolitan core
   'Porto': 5,
   'Matosinhos': 5,
   // Zona 1 — Subúrbios imediatos, ~10-20 min
-  'Vila Nova de Gaia': 10,
-  'Maia': 10,
-  'Gondomar': 10,
+  'Vila Nova de Gaia': 5,
+  'Maia': 5,
+  'Gondomar': 5,
   // Zona 2 — Grande Porto, ~20-30 min
-  'Valongo': 15,
-  'Espinho': 15,
-  'Póvoa de Varzim': 15,
-  'Vila do Conde': 15,
-  'Santo Tirso': 15,
-  'Trofa': 15,
-  'Paredes': 15,
+  'Valongo': 10,
+  'Espinho': 10,
+  'Póvoa de Varzim': 10,
+  'Vila do Conde': 10,
+  'Santo Tirso': 10,
+  'Trofa': 10,
+  'Paredes': 10,
   // Zona 3 — Interior norte, ~35-45 min
-  'Penafiel': 20,
-  'Paços de Ferreira': 20,
-  'Felgueiras': 20,
-  'Lousada': 20,
+  'Penafiel': 15,
+  'Paços de Ferreira': 15,
+  'Felgueiras': 15,
+  'Lousada': 15,
   // Zona 4 — Mais afastado, ~45-55 min
-  'Arouca': 25,
-  'Braga': 25,
-  'Aveiro': 25,
+  'Arouca': 20,
+  'Braga': 20,
+  'Aveiro': 20,
   // Zona 5 — Minho, ~55-70 min
-  'Guimarães': 30,
+  'Guimarães': 25,
 
   // ═══ Lisboa / Área Metropolitana (equipa local) ═══
   // Zona 0 — Lisboa
   'Lisboa': 5,
   // Zona 1 — Vizinhos imediatos, ~10-15 min
-  'Amadora': 10,
-  'Odivelas': 10,
-  'Oeiras': 10,
+  'Amadora': 5,
+  'Odivelas': 5,
+  'Oeiras': 5,
   // Zona 2 — Grande Lisboa, ~20-30 min
-  'Cascais': 15,
-  'Sintra': 15,
-  'Loures': 15,
-  'Almada': 15,
-  'Seixal': 15,
+  'Cascais': 10,
+  'Sintra': 10,
+  'Loures': 10,
+  'Almada': 10,
+  'Seixal': 10,
   // Zona 3 — Mais afastado, ~30-40 min
-  'Vila Franca de Xira': 20,
-  'Barreiro': 20,
-  'Moita': 20,
-  'Mafra': 20,
+  'Vila Franca de Xira': 15,
+  'Barreiro': 15,
+  'Moita': 15,
+  'Mafra': 15,
   // Zona 4 — Extremos da AML, ~40-50 min
-  'Setúbal': 25,
-  'Montijo': 25,
-  'Alcochete': 25,
-  'Palmela': 25,
-  'Sesimbra': 25,
+  'Setúbal': 20,
+  'Montijo': 20,
+  'Alcochete': 20,
+  'Palmela': 20,
+  'Sesimbra': 20,
 
   // ═══ Algarve (equipa local) ═══
   // Zona 0 — Faro/Loulé
   'Faro': 5,
   'Loulé': 5,
   // Zona 1 — Vizinhos imediatos, ~10-15 min
-  'Albufeira': 10,
-  'São Brás de Alportel': 10,
-  'Olhão': 10,
+  'Albufeira': 5,
+  'São Brás de Alportel': 5,
+  'Olhão': 5,
   // Zona 2 — Algarve central, ~20-30 min
-  'Silves': 15,
-  'Lagoa': 15,
-  'Tavira': 15,
+  'Silves': 10,
+  'Lagoa': 10,
+  'Tavira': 10,
   // Zona 3 — Algarve ocidental, ~30-40 min
-  'Portimão': 20,
-  'Lagos': 20,
+  'Portimão': 15,
+  'Lagos': 15,
   // Zona 4 — Extremos, ~40-55 min
-  'Vila Real de Santo António': 25,
-  'Castro Marim': 25,
-  'Monchique': 25,
+  'Vila Real de Santo António': 20,
+  'Castro Marim': 20,
+  'Monchique': 20,
   // Zona 5 — Interior/Costa Vicentina, ~55-70 min
-  'Aljezur': 30,
-  'Vila do Bispo': 30,
-  'Alcoutim': 30,
+  'Aljezur': 25,
+  'Vila do Bispo': 25,
+  'Alcoutim': 25,
 };
 
 export const carpetWaterproofingPrices = [

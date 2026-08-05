@@ -3,28 +3,29 @@
 // locationPrices duplicado aqui (sem import @/) para compatibilidade com scripts/prerender.ts (Node.js sem alias Vite)
 // Três equipas locais, três sistemas de zonas independentes (Porto/Norte, Lisboa/AML, Algarve)
 // Sem zona grátis: mínimo 5€ sempre, sobe com a distância ao centro de cada equipa.
+// Só as antigas zonas 0€ subiram para 5€ — todas as outras zonas mantêm o preço original.
 const locationPrices: Record<string, number> = {
   // ── Porto/Norte ──
   'Porto': 5, 'Matosinhos': 5,
-  'Vila Nova de Gaia': 10, 'Maia': 10, 'Gondomar': 10,
-  'Valongo': 15, 'Espinho': 15, 'Póvoa de Varzim': 15, 'Vila do Conde': 15,
-  'Santo Tirso': 15, 'Trofa': 15, 'Paredes': 15,
-  'Penafiel': 20, 'Paços de Ferreira': 20, 'Felgueiras': 20, 'Lousada': 20,
-  'Arouca': 25, 'Braga': 25, 'Aveiro': 25,
-  'Guimarães': 30,
+  'Vila Nova de Gaia': 5, 'Maia': 5, 'Gondomar': 5,
+  'Valongo': 10, 'Espinho': 10, 'Póvoa de Varzim': 10, 'Vila do Conde': 10,
+  'Santo Tirso': 10, 'Trofa': 10, 'Paredes': 10,
+  'Penafiel': 15, 'Paços de Ferreira': 15, 'Felgueiras': 15, 'Lousada': 15,
+  'Arouca': 20, 'Braga': 20, 'Aveiro': 20,
+  'Guimarães': 25,
   // ── Lisboa / Área Metropolitana (equipa local) ──
   'Lisboa': 5,
-  'Amadora': 10, 'Odivelas': 10, 'Oeiras': 10,
-  'Cascais': 15, 'Sintra': 15, 'Loures': 15, 'Almada': 15, 'Seixal': 15,
-  'Vila Franca de Xira': 20, 'Barreiro': 20, 'Moita': 20, 'Mafra': 20,
-  'Setúbal': 25, 'Montijo': 25, 'Alcochete': 25, 'Palmela': 25, 'Sesimbra': 25,
+  'Amadora': 5, 'Odivelas': 5, 'Oeiras': 5,
+  'Cascais': 10, 'Sintra': 10, 'Loures': 10, 'Almada': 10, 'Seixal': 10,
+  'Vila Franca de Xira': 15, 'Barreiro': 15, 'Moita': 15, 'Mafra': 15,
+  'Setúbal': 20, 'Montijo': 20, 'Alcochete': 20, 'Palmela': 20, 'Sesimbra': 20,
   // ── Algarve (equipa local) ──
   'Faro': 5, 'Loulé': 5,
-  'Albufeira': 10, 'São Brás de Alportel': 10, 'Olhão': 10,
-  'Silves': 15, 'Lagoa': 15, 'Tavira': 15,
-  'Portimão': 20, 'Lagos': 20,
-  'Vila Real de Santo António': 25, 'Castro Marim': 25, 'Monchique': 25,
-  'Aljezur': 30, 'Vila do Bispo': 30, 'Alcoutim': 30,
+  'Albufeira': 5, 'São Brás de Alportel': 5, 'Olhão': 5,
+  'Silves': 10, 'Lagoa': 10, 'Tavira': 10,
+  'Portimão': 15, 'Lagos': 15,
+  'Vila Real de Santo António': 20, 'Castro Marim': 20, 'Monchique': 20,
+  'Aljezur': 25, 'Vila do Bispo': 25, 'Alcoutim': 25,
 };
 
 export interface LocationService {
