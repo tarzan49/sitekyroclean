@@ -9,6 +9,7 @@ export interface MarcaColchao {
   materialDescription: string;
   cleaningProcess: string;
   doNots: string[];
+  doThis: string[];
   estimatedPriceRange: string;
   minPrice: number;
   maxPrice: number;
@@ -26,9 +27,11 @@ export const marcasColchao: MarcaColchao[] = [
     cleaningProcess: "Extração a vapor de baixa humidade calibrada para não saturar o núcleo de espuma. Aspiração profunda dos dois lados, seguida de tratamento anti-ácaros e desodorização.",
     doNots: [
       "Não ensopar o colchão em água: a espuma interior demora dias a secar e pode criar bolor",
-      "Não usar lixívia no tecido quilted: descolora e enfraquece as fibras",
       "Não expor o colchão ao sol direto para secar: deforma a espuma viscoelástica",
-      "Não voltar a fazer a cama antes de o colchão secar completamente",
+    ],
+    doThis: [
+      "Tratamos os dois lados do colchão com extração profissional, removendo ácaros e sujidade que a aspiração doméstica não alcança",
+      "Usamos vapor de baixa humidade calibrado para colchões de espuma IKEA, sem comprometer a garantia do produto",
     ],
     estimatedPriceRange: "49€ - 79€",
     minPrice: 49,
@@ -49,9 +52,11 @@ export const marcasColchao: MarcaColchao[] = [
     cleaningProcess: "Aspiração profunda inicial em ambos os lados, seguida de extração a vapor com produto anti-ácaros certificado. Tratamento localizado de manchas antes da extração geral.",
     doNots: [
       "Não usar detergentes domésticos genéricos: podem deixar resíduo que atrai mais sujidade",
-      "Não esfregar as costuras acolchoadas com força: podem rasgar",
       "Não guardar o colchão de pé enquanto seca: deforma o núcleo interior",
-      "Não cobrir o colchão com lençóis antes de estar 100% seco: retém humidade",
+    ],
+    doThis: [
+      "Adaptamos a técnica ao tipo de núcleo, espuma ou molas, de cada modelo Conforama, sem margem de erro",
+      "Devolvemos o colchão pronto a usar em poucas horas, sem interromper a sua rotina",
     ],
     estimatedPriceRange: "49€ - 79€",
     minPrice: 49,
@@ -73,8 +78,10 @@ export const marcasColchao: MarcaColchao[] = [
     doNots: [
       "Não usar detergentes fortes ou alcalinos: podem remover o tratamento anti-ácaros de fábrica",
       "Não esfregar com força o tecido jacquard: as fibras podem puxar e desfazer o padrão",
-      "Não usar vapor de alta pressão numa só zona: pode saturar localmente o núcleo",
-      "Não dobrar ou enrolar o colchão para secar mais depressa: deforma as molas",
+    ],
+    doThis: [
+      "Preservamos o tratamento anti-ácaros de fábrica com produtos de pH neutro certificados",
+      "Renovamos a eficácia do tratamento Molaflex original em vez de o substituir por químicos agressivos",
     ],
     estimatedPriceRange: "49€ - 79€",
     minPrice: 49,
@@ -96,8 +103,10 @@ export const marcasColchao: MarcaColchao[] = [
     doNots: [
       "Não ensopar o tecido respirável: a estrutura porosa absorve e retém água mais do que um tecido normal",
       "Não usar amaciador ou perfumes têxteis: podem obstruir os poros do tecido respirável",
-      "Não secar ao sol direto: pode amarelecer o tecido e degradar a espuma ortopédica",
-      "Não usar o colchão sem proteção nas primeiras horas após a limpeza",
+    ],
+    doThis: [
+      "Mantemos a respirabilidade do tecido Pikolin com vapor de baixa humidade, sem obstruir os poros",
+      "Preservamos o suporte ortopédico do núcleo, prolongando o desempenho e o conforto do colchão",
     ],
     estimatedPriceRange: "49€ - 79€",
     minPrice: 49,
@@ -119,8 +128,10 @@ export const marcasColchao: MarcaColchao[] = [
     doNots: [
       "Não usar produtos químicos agressivos: comprometem a natureza hipoalergénica das fibras naturais",
       "Não usar branqueadores: descolora fibras naturais de forma permanente",
-      "Não secar com calor direto (secador, aquecedor): pode encolher fibras naturais",
-      "Não guardar o colchão dobrado antes de secar por completo",
+    ],
+    doThis: [
+      "Usamos produtos biodegradáveis e de pH neutro, alinhados com a filosofia sustentável Colmol",
+      "Preservamos as propriedades hipoalergénicas das fibras naturais e recicladas em cada limpeza",
     ],
     estimatedPriceRange: "49€ - 79€",
     minPrice: 49,
@@ -142,8 +153,10 @@ export const marcasColchao: MarcaColchao[] = [
     doNots: [
       "Não ensopar em água: a espuma interior demora a secar e pode desenvolver bolor",
       "Não usar produtos abrasivos nas fibras naturais exteriores",
-      "Não expor ao sol direto durante a secagem: pode degradar a espuma",
-      "Não usar o colchão sem estar completamente seco: retém humidade e odores",
+    ],
+    doThis: [
+      "Tratamos as fibras naturais com produtos suaves que preservam a qualidade Mindol",
+      "Eliminamos ácaros e suor sem comprometer a composição sustentável do colchão",
     ],
     estimatedPriceRange: "49€ - 79€",
     minPrice: 49,
