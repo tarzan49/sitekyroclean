@@ -17,6 +17,7 @@ import { getAllProblems } from "@/data/problemSeoData";
 import { getAllKeywordVariantRoutes } from "@/data/keywordVariantData";
 import { getAllPackComboRoutes } from "@/data/packComboData";
 import { getAllMarcaSofaRoutes } from "@/data/marcaSofaData";
+import { getAllMarcaColchaoRoutes } from "@/data/marcaColchaoData";
 import { getAllPosts } from "@/data/blogData";
 import { SITE_URL } from "@/constants/business";
 import { getAdminRegion, getRegionForLocationPart, ADMIN_REGIONS, ADMIN_REGION_LABELS, type AdminRegion } from "@/data/regionUtils";
@@ -30,23 +31,27 @@ const AdminSeoPages = lazy(() => import("./AdminSeoPages"));
 const ADMIN_PASSWORD = (import.meta.env.VITE_ADMIN_PASSWORD as string) || 'kyro2025';
 
 // ── Sitemap config (mirrors scripts/generate-sitemap.ts output — 10 real sub-sitemaps) ──
+// "Marcas de Sofá" e "Marcas de Colchão" partilham o mesmo ficheiro físico
+// (sitemap-marcas.xml) mas aparecem como cartões separados aqui — por isso
+// têm um `id` próprio distinto de `file` (usado só para o link/preview do XML).
 const SITEMAPS = [
-  { name: "Sitemap Index", file: "sitemap.xml", description: "Índice principal (10 sub-sitemaps)", icon: Globe },
-  { name: "Core (Serviços + Páginas principais)", file: "sitemap-core.xml", description: "6 serviços + páginas institucionais", icon: Zap },
-  { name: "Localidade × Serviço", file: "sitemap-location.xml", description: "Concelhos × 6 serviços — Porto/Norte, Lisboa/AML, Algarve", icon: Map },
-  { name: "Freguesia × Serviço", file: "sitemap-freguesia.xml", description: "Freguesias × 6 serviços — Porto/Norte, Lisboa/AML, Algarve", icon: Map },
-  { name: "Material", file: "sitemap-material.xml", description: "Material + Material×Cidade", icon: FileText },
-  { name: "Preço", file: "sitemap-price.xml", description: "Preço × concelho", icon: FileText },
-  { name: "Problemas", file: "sitemap-problem.xml", description: "Problema + Problema×Cidade", icon: AlertTriangle },
-  { name: "Variantes Keyword", file: "sitemap-keyword-variants.xml", description: "higienização/lavagem/impermeabilização × serviços × locais", icon: Target },
-  { name: "Recursos (Blog/FAQ)", file: "sitemap-resources.xml", description: "Blog + FAQ + Glossário", icon: FileText },
-  { name: "Packs", file: "sitemap-packs.xml", description: "Packs combo × concelho", icon: Target },
-  { name: "Marcas", file: "sitemap-marcas.xml", description: "Marcas de sofá × concelho", icon: Shield },
+  { id: "sitemap.xml",              file: "sitemap.xml",              name: "Sitemap Index", description: "Índice principal (10 sub-sitemaps)", icon: Globe },
+  { id: "sitemap-core.xml",         file: "sitemap-core.xml",         name: "Core (Serviços + Páginas principais)", description: "6 serviços + páginas institucionais", icon: Zap },
+  { id: "sitemap-location.xml",     file: "sitemap-location.xml",     name: "Localidade × Serviço", description: "Concelhos × 6 serviços — Porto/Norte, Lisboa/AML, Algarve", icon: Map },
+  { id: "sitemap-freguesia.xml",    file: "sitemap-freguesia.xml",    name: "Freguesia × Serviço", description: "Freguesias × 6 serviços — Porto/Norte, Lisboa/AML, Algarve", icon: Map },
+  { id: "sitemap-material.xml",     file: "sitemap-material.xml",     name: "Material", description: "Material + Material×Cidade", icon: FileText },
+  { id: "sitemap-price.xml",        file: "sitemap-price.xml",        name: "Preço", description: "Preço × concelho", icon: FileText },
+  { id: "sitemap-problem.xml",      file: "sitemap-problem.xml",      name: "Problemas", description: "Problema + Problema×Cidade", icon: AlertTriangle },
+  { id: "sitemap-keyword-variants.xml", file: "sitemap-keyword-variants.xml", name: "Variantes Keyword", description: "higienização/lavagem/impermeabilização × serviços × locais", icon: Target },
+  { id: "sitemap-resources.xml",    file: "sitemap-resources.xml",    name: "Recursos (Blog/FAQ)", description: "Blog + FAQ + Glossário", icon: FileText },
+  { id: "sitemap-packs.xml",        file: "sitemap-packs.xml",        name: "Packs", description: "Packs combo × concelho", icon: Target },
+  { id: "sitemap-marcas-sofa",      file: "sitemap-marcas.xml",       name: "Marcas de Sofá", description: "8 marcas × 18 concelhos", icon: Shield },
+  { id: "sitemap-marcas-colchao",   file: "sitemap-marcas.xml",       name: "Marcas de Colchão", description: "6 marcas × 34 concelhos (cidades mais povoadas)", icon: Shield },
 ];
 
 // ── Sitemap URL Generators ────────────────────────────────────────────────────
-function getSitemapUrls(file: string): string[] {
-  switch (file) {
+function getSitemapUrls(id: string): string[] {
+  switch (id) {
     case "sitemap-core.xml":
       return services.map(s => s.baseRoute);
     case "sitemap-location.xml":
@@ -76,17 +81,19 @@ function getSitemapUrls(file: string): string[] {
       ];
     case "sitemap-packs.xml":
       return getAllPackComboRoutes().map(r => r.path);
-    case "sitemap-marcas.xml":
+    case "sitemap-marcas-sofa":
       return getAllMarcaSofaRoutes().map(r => r.path);
+    case "sitemap-marcas-colchao":
+      return getAllMarcaColchaoRoutes().map(r => r.path);
     default:
       return [];
   }
 }
 
 // ── Regional breakdown (only for the 3 sitemaps that carry a citySlug/locationPart) ──
-function getSitemapRegionBreakdown(file: string): { region: AdminRegion; count: number }[] | null {
+function getSitemapRegionBreakdown(id: string): { region: AdminRegion; count: number }[] | null {
   let regions: (AdminRegion | null)[];
-  switch (file) {
+  switch (id) {
     case "sitemap-location.xml":
       regions = getAllLocationRoutes().map(r => getAdminRegion(r.citySlug));
       break;
@@ -104,8 +111,8 @@ function getSitemapRegionBreakdown(file: string): { region: AdminRegion; count: 
 
 // Same URLs as getSitemapUrls(), filtered down to a single region — powers the
 // per-region drill-down on the Localidade/Freguesia/Variantes Keyword cards.
-function getSitemapUrlsForRegion(file: string, region: AdminRegion): string[] {
-  switch (file) {
+function getSitemapUrlsForRegion(id: string, region: AdminRegion): string[] {
+  switch (id) {
     case "sitemap-location.xml":
       return getAllLocationRoutes().filter(r => getAdminRegion(r.citySlug) === region).map(r => r.path);
     case "sitemap-freguesia.xml":
@@ -182,8 +189,8 @@ const AdminPanel = () => {
   const sitemapCounts = useMemo(() => {
     const counts: Record<string, number> = {};
     for (const sm of SITEMAPS) {
-      if (sm.file === "sitemap.xml") continue;
-      counts[sm.file] = getSitemapUrls(sm.file).length;
+      if (sm.id === "sitemap.xml") continue;
+      counts[sm.id] = getSitemapUrls(sm.id).length;
     }
     return counts;
   }, []);
@@ -191,8 +198,8 @@ const AdminPanel = () => {
   const sitemapRegionBreakdowns = useMemo(() => {
     const breakdowns: Record<string, { region: AdminRegion; count: number }[]> = {};
     for (const sm of SITEMAPS) {
-      const breakdown = getSitemapRegionBreakdown(sm.file);
-      if (breakdown) breakdowns[sm.file] = breakdown;
+      const breakdown = getSitemapRegionBreakdown(sm.id);
+      if (breakdown) breakdowns[sm.id] = breakdown;
     }
     return breakdowns;
   }, []);
@@ -489,7 +496,7 @@ const AdminPanel = () => {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {SITEMAPS.map((sm) => {
-                const isExpanded = expandedSitemap === sm.file || expandedSitemap?.startsWith(`${sm.file}::`);
+                const isExpanded = expandedSitemap === sm.id || expandedSitemap?.startsWith(`${sm.id}::`);
                 const activeKey = isExpanded ? expandedSitemap! : null;
                 const cachedUrls = activeKey ? sitemapUrlCache[activeKey] : undefined;
                 const activeRegion = activeKey?.includes("::") ? activeKey.split("::")[1] as AdminRegion : null;
@@ -506,7 +513,7 @@ const AdminPanel = () => {
                 };
 
                 return (
-                  <div key={sm.file} className={`bg-white rounded-2xl border shadow-sm transition-all overflow-hidden ${isExpanded ? "border-gold/30 shadow-md col-span-full" : "border-gray-100 hover:shadow-md"}`}>
+                  <div key={sm.id} className={`bg-white rounded-2xl border shadow-sm transition-all overflow-hidden ${isExpanded ? "border-gold/30 shadow-md col-span-full" : "border-gray-100 hover:shadow-md"}`}>
                     <div className="h-0.5 bg-gradient-to-r from-transparent via-gold to-transparent" />
                     <div className="p-5">
                       <div className="flex items-start gap-3 mb-4">
@@ -517,35 +524,35 @@ const AdminPanel = () => {
                           <h3 className="font-semibold text-navy text-sm leading-tight">{sm.name}</h3>
                           <p className="text-xs text-gray-400 mt-0.5">{sm.description}</p>
                         </div>
-                        {sm.file !== "sitemap.xml" && (
+                        {sm.id !== "sitemap.xml" && (
                           <button
                             type="button"
-                            onClick={() => expand(sm.file, () => getSitemapUrls(sm.file))}
-                            className={`p-1.5 rounded-lg border transition-colors flex-shrink-0 ${expandedSitemap === sm.file ? "bg-gold/10 border-gold/30 text-gold" : "border-gray-200 text-gray-400 hover:text-gold hover:border-gold/30"}`}
-                            title={expandedSitemap === sm.file ? "Fechar drill-down" : "Ver todos os URLs"}
+                            onClick={() => expand(sm.id, () => getSitemapUrls(sm.id))}
+                            className={`p-1.5 rounded-lg border transition-colors flex-shrink-0 ${expandedSitemap === sm.id ? "bg-gold/10 border-gold/30 text-gold" : "border-gray-200 text-gray-400 hover:text-gold hover:border-gold/30"}`}
+                            title={expandedSitemap === sm.id ? "Fechar drill-down" : "Ver todos os URLs"}
                           >
-                            <ChevronDown className={`w-3.5 h-3.5 transition-transform ${expandedSitemap === sm.file ? "rotate-180" : ""}`} />
+                            <ChevronDown className={`w-3.5 h-3.5 transition-transform ${expandedSitemap === sm.id ? "rotate-180" : ""}`} />
                           </button>
                         )}
                       </div>
 
-                      {sitemapCounts[sm.file] != null && (
+                      {sitemapCounts[sm.id] != null && (
                         <div className="bg-gray-50 rounded-xl p-3 mb-4 flex items-center justify-between border border-gray-100">
                           <span className="text-xs text-gray-500">URLs</span>
-                          <span className="text-xl font-bold text-navy font-playfair">{sitemapCounts[sm.file].toLocaleString("pt-PT")}</span>
+                          <span className="text-xl font-bold text-navy font-playfair">{sitemapCounts[sm.id].toLocaleString("pt-PT")}</span>
                         </div>
                       )}
 
-                      {sitemapRegionBreakdowns[sm.file] && (
+                      {sitemapRegionBreakdowns[sm.id] && (
                         <div className="grid grid-cols-2 gap-1.5 mb-4">
-                          {sitemapRegionBreakdowns[sm.file].map(rb => {
-                            const key = `${sm.file}::${rb.region}`;
+                          {sitemapRegionBreakdowns[sm.id].map(rb => {
+                            const key = `${sm.id}::${rb.region}`;
                             const active = expandedSitemap === key;
                             return (
                               <button
                                 key={rb.region}
                                 type="button"
-                                onClick={() => expand(key, () => getSitemapUrlsForRegion(sm.file, rb.region))}
+                                onClick={() => expand(key, () => getSitemapUrlsForRegion(sm.id, rb.region))}
                                 className={`rounded-lg px-2 py-1.5 border flex items-center justify-between transition-colors ${active ? "bg-gold/10 border-gold/30" : "bg-gray-50 border-gray-100 hover:border-gold/30"}`}
                                 title={`Ver URLs de ${ADMIN_REGION_LABELS[rb.region]}`}
                               >
