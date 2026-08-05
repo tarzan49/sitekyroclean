@@ -69,12 +69,12 @@ export const sofaChaisePrice = { cleaning: 10, waterproofing: 25 };
 // Mattress pricing
 // Limpeza:           59 / 69 / 79
 // Impermeabilização: 55 / 60 / 65
-// Pack Total: 88 / 101 / 114 (poupa 26/13/20€ vs. separado)
+// Pack Total: 88 / 101 / 114 (poupa 26/28/30€ vs. separado)
 // originalBothPrice = soma sem desconto (preço riscado no UI)
 export const mattressPrices: PriceOption[] = [
   { id: 'solteiro', label: 'Solteiro',     cleaningPrice: 59, waterproofingPrice: 55, bothPrice: 88,  originalBothPrice: 114 },
-  { id: 'casal',    label: 'Casal',        cleaningPrice: 69, waterproofingPrice: 60, bothPrice: 101, originalBothPrice: 119 },
-  { id: 'king',     label: 'King / Queen', cleaningPrice: 79, waterproofingPrice: 65, bothPrice: 114, originalBothPrice: 134 },
+  { id: 'casal',    label: 'Casal',        cleaningPrice: 69, waterproofingPrice: 60, bothPrice: 101, originalBothPrice: 129 },
+  { id: 'king',     label: 'King / Queen', cleaningPrice: 79, waterproofingPrice: 65, bothPrice: 114, originalBothPrice: 144 },
 ];
 
 export const chairPrices = {
