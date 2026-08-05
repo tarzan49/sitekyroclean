@@ -1,6 +1,8 @@
 // Marca × Cidade SEO pages:"limpeza sofá IKEA porto", "higienização sofá Natuzzi lisboa"
 // Zero competition in the market:no competitor has brand-specific pages
 
+import { MARCA_CITIES } from "./marcaCities";
+
 export interface MarcaSofa {
   id: string;
   name: string;
@@ -292,26 +294,7 @@ export const marcas: MarcaSofa[] = [
   },
 ];
 
-const marcaCities = [
-  { name: "Porto", slug: "porto" },
-  { name: "Lisboa", slug: "lisboa" },
-  { name: "Braga", slug: "braga" },
-  { name: "Aveiro", slug: "aveiro" },
-  { name: "Coimbra", slug: "coimbra" },
-  { name: "Guimarães", slug: "guimaraes" },
-  { name: "Matosinhos", slug: "matosinhos" },
-  { name: "Vila Nova de Gaia", slug: "vila-nova-de-gaia" },
-  { name: "Maia", slug: "maia" },
-  { name: "Barcelos", slug: "barcelos" },
-  { name: "Sintra", slug: "sintra" },
-  { name: "Cascais", slug: "cascais" },
-  { name: "Oeiras", slug: "oeiras" },
-  { name: "Amadora", slug: "amadora" },
-  { name: "Faro", slug: "faro" },
-  { name: "Loulé", slug: "loule" },
-  { name: "Albufeira", slug: "albufeira" },
-  { name: "Portimão", slug: "portimao" },
-];
+const marcaCities = MARCA_CITIES;
 
 export interface MarcaSofaRoute {
   path: string;

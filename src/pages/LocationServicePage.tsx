@@ -28,6 +28,7 @@ import SectionHeader from "@/components/SectionHeader";
 import { PRICE_TABLE, PRICE_TABLE_QUIZ_CONFIG, SERVICE_TESTIMONIALS, type PriceRowQuizConfig } from "@/data/locationPriceTestimonialsData";
 import { calcWidgetTotal, calcChairBracket, calcCarpetWidget, buildWidgetQuizConfig, WIDGET_DISCOUNT_THRESHOLD } from "@/lib/priceWidgetCalc";
 import { locationPrices } from "@/components/quiz/QuizTypes";
+import { MARCA_CITY_SLUGS } from "@/data/marcaCities";
 import { PROBLEM_IMAGES, PROBLEM_CTA, PRICE_HEADING_VERB } from "@/constants/problemCardHelpers";
 import { ServiceTrustDesktop, ServiceTrustMobile } from "@/components/ServiceTrustBlock";
 
@@ -148,18 +149,10 @@ const LocationServicePage = () => {
 
   const MARCA_SLUGS = ['ikea', 'natuzzi', 'kave-home', 'leroy-merlin', 'moviflor', 'conforama', 'el-corte-ingles', 'roche-bobois'];
   const MARCA_COLCHAO_SLUGS = ['ikea', 'conforama', 'molaflex', 'pikolin', 'colmol', 'mindol'];
-  // Páginas de marca de sofá só existem nestas 18 cidades — evita links para páginas inexistentes
-  const MARCA_SOFA_CITY_SLUGS = ['porto', 'lisboa', 'braga', 'aveiro', 'coimbra', 'guimaraes', 'matosinhos', 'vila-nova-de-gaia', 'maia', 'barcelos', 'sintra', 'cascais', 'oeiras', 'amadora', 'faro', 'loule', 'albufeira', 'portimao'];
-  // Páginas de marca de colchão cobrem as 34 cidades mais povoadas do site
-  const MARCA_COLCHAO_CITY_SLUGS = [
-    'porto', 'vila-nova-de-gaia', 'braga', 'matosinhos', 'gondomar', 'guimaraes', 'maia', 'valongo',
-    'paredes', 'vila-do-conde', 'povoa-de-varzim', 'penafiel', 'santo-tirso',
-    'lisboa', 'sintra', 'cascais', 'loures', 'amadora', 'almada', 'seixal', 'oeiras', 'odivelas',
-    'vila-franca-de-xira', 'setubal', 'mafra', 'barreiro', 'moita', 'montijo', 'palmela', 'sesimbra',
-    'faro', 'loule', 'portimao', 'albufeira',
-  ];
-  const hasMarcaSofaCity = MARCA_SOFA_CITY_SLUGS.includes(data.citySlug);
-  const hasMarcaColchaoCity = MARCA_COLCHAO_CITY_SLUGS.includes(data.citySlug);
+  // Páginas de marca (sofá e colchão) cobrem as mesmas 34 cidades mais povoadas do site
+  const hasMarcaCity = (MARCA_CITY_SLUGS as readonly string[]).includes(data.citySlug);
+  const hasMarcaSofaCity = hasMarcaCity;
+  const hasMarcaColchaoCity = hasMarcaCity;
 
   const resultContent = (SERVICE_RESULT_CONTENT[data.serviceSlug] ?? SERVICE_RESULT_CONTENT['limpeza-sofas'])(data.city);
   const serviceBaseUrl = services.find(s => s.slug === data.serviceSlug)?.baseRoute ?? `/${data.serviceSlug}`;

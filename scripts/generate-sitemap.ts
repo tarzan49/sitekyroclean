@@ -403,9 +403,18 @@ export function generateSitemaps(outDir: string) {
     }
   }
 
-  // 10. Marca Sofá pages (8 brands × 18 cities = 144 pages)
+  // Cidades mais povoadas do país que o site já cobre (mesma lista para
+  // sofá/colchão/cadeiras/tapetes — ver src/data/marcaCities.ts)
+  const marcaCities = [
+    'porto', 'vila-nova-de-gaia', 'braga', 'matosinhos', 'gondomar', 'guimaraes', 'maia', 'valongo',
+    'paredes', 'vila-do-conde', 'povoa-de-varzim', 'penafiel', 'santo-tirso',
+    'lisboa', 'sintra', 'cascais', 'loures', 'amadora', 'almada', 'seixal', 'oeiras', 'odivelas',
+    'vila-franca-de-xira', 'setubal', 'mafra', 'barreiro', 'moita', 'montijo', 'palmela', 'sesimbra',
+    'faro', 'loule', 'portimao', 'albufeira',
+  ];
+
+  // 10. Marca Sofá pages (8 brands × 34 cities = 272 pages)
   const marcaSlugs = ['ikea', 'natuzzi', 'roche-bobois', 'conforama', 'el-corte-ingles', 'kave-home', 'leroy-merlin', 'moviflor'];
-  const marcaCities = ['porto', 'lisboa', 'braga', 'aveiro', 'coimbra', 'guimaraes', 'matosinhos', 'vila-nova-de-gaia', 'maia', 'barcelos', 'sintra', 'cascais', 'oeiras', 'amadora', 'faro', 'loule', 'albufeira', 'portimao'];
   const marcaUrls: string[] = [];
   for (const marca of marcaSlugs) {
     for (const city of marcaCities) {
@@ -414,17 +423,9 @@ export function generateSitemaps(outDir: string) {
   }
 
   // 11. Marca Colchão pages (6 brands × 34 cities = 204 pages)
-  // Cidades mais povoadas do país que o site já cobre (ver marcaColchaoData.ts)
   const marcaColchaoSlugs = ['ikea', 'conforama', 'molaflex', 'pikolin', 'colmol', 'mindol'];
-  const marcaColchaoCities = [
-    'porto', 'vila-nova-de-gaia', 'braga', 'matosinhos', 'gondomar', 'guimaraes', 'maia', 'valongo',
-    'paredes', 'vila-do-conde', 'povoa-de-varzim', 'penafiel', 'santo-tirso',
-    'lisboa', 'sintra', 'cascais', 'loures', 'amadora', 'almada', 'seixal', 'oeiras', 'odivelas',
-    'vila-franca-de-xira', 'setubal', 'mafra', 'barreiro', 'moita', 'montijo', 'palmela', 'sesimbra',
-    'faro', 'loule', 'portimao', 'albufeira',
-  ];
   for (const marca of marcaColchaoSlugs) {
-    for (const city of marcaColchaoCities) {
+    for (const city of marcaCities) {
       marcaUrls.push(xmlUrl(`/limpeza-colchao-${marca}-${city}`, 'monthly', '0.7'));
     }
   }

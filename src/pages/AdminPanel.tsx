@@ -45,7 +45,7 @@ const SITEMAPS = [
   { id: "sitemap-keyword-variants.xml", file: "sitemap-keyword-variants.xml", name: "Variantes Keyword", description: "higienização/lavagem/impermeabilização × serviços × locais", icon: Target },
   { id: "sitemap-resources.xml",    file: "sitemap-resources.xml",    name: "Recursos (Blog/FAQ)", description: "Blog + FAQ + Glossário", icon: FileText },
   { id: "sitemap-packs.xml",        file: "sitemap-packs.xml",        name: "Packs", description: "Packs combo × concelho", icon: Target },
-  { id: "sitemap-marcas-sofa",      file: "sitemap-marcas.xml",       name: "Marcas de Sofá", description: "8 marcas × 18 concelhos", icon: Shield },
+  { id: "sitemap-marcas-sofa",      file: "sitemap-marcas.xml",       name: "Marcas de Sofá", description: "8 marcas × 34 concelhos (cidades mais povoadas)", icon: Shield },
   { id: "sitemap-marcas-colchao",   file: "sitemap-marcas.xml",       name: "Marcas de Colchão", description: "6 marcas × 34 concelhos (cidades mais povoadas)", icon: Shield },
 ];
 
