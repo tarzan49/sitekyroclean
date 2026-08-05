@@ -749,7 +749,7 @@ export function prerenderRoutes(outDir: string): number {
       {
         path: '/impermeabilizacao',
         title: 'Impermeabilização de Estofos | Proteção até 10 anos | Kyro Clean Solutions',
-        desc: 'Impermeabilização profissional de sofás, cadeiras e tapetes. Proteção invisível contra manchas e líquidos. Duração até 10 anos. Desde 69€. Serviço ao domicílio.',
+        desc: 'Impermeabilização profissional de sofás, cadeiras e tapetes. Proteção invisível contra manchas e líquidos. Duração até 10 anos. Desde 59€. Serviço ao domicílio.',
         content: {
           h1: 'Impermeabilização de Estofos e Tapetes',
           intro: 'Proteja os seus estofos com impermeabilização profissional ao domicílio. Barreira invisível contra manchas, líquidos e desgaste com duração até 10 anos. Ideal após limpeza ou em estofos novos.',
@@ -763,13 +763,13 @@ export function prerenderRoutes(outDir: string): number {
           ],
           faqs: faqs([
             { q: 'O que é a impermeabilização de estofos?', a: 'A impermeabilização cria uma barreira nano-tecnológica invisível na fibra do estofo que repele líquidos e dificulta a penetração de manchas. O tecido mantém a aparência e textura originais.' },
-            { q: 'Quanto custa a impermeabilização?', a: 'A impermeabilização de sofá começa a partir de 69€ para 1 lugar. Para cadeiras o preço parte de 25€ por unidade. Peça orçamento gratuito.' },
+            { q: 'Quanto custa a impermeabilização?', a: 'A impermeabilização de sofá começa a partir de 59€ para 1 lugar. Para cadeiras o preço parte de 25€ por unidade. Peça orçamento gratuito.' },
             { q: 'Quanto tempo dura a impermeabilização?', a: 'A duração é de 2 a 10 anos dependendo do uso, tipo de tecido e produto aplicado. Recomendamos renovação após limpeza profissional.' },
             { q: 'Posso fazer impermeabilização sem limpeza prévia?', a: 'Recomendamos sempre limpeza prévia para maior eficácia. Temos packs combinados de limpeza e impermeabilização com desconto.' },
           ]),
         },
         extraSchemas: [
-          buildServiceSchema('Impermeabilização de Estofos', 'Portugal', '69€'),
+          buildServiceSchema('Impermeabilização de Estofos', 'Portugal', '59€'),
           buildBreadcrumbSchema([
             { name: 'Início', url: BASE_URL + '/' },
             { name: 'Impermeabilização', url: BASE_URL + '/impermeabilizacao' },

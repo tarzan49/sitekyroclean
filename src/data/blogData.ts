@@ -43,7 +43,7 @@ const posts: BlogPost[] = [
       },
       {
         heading: "O que influencia o preço?",
-        body: "Vários fatores determinam o custo final:\n\n**Tamanho e configuração**, Um sofá em L tem mais metros de tecido do que um sofá de 3 lugares reto. O número de chaises e almofadas avulsas também conta.\n\n**Material do tecido**, Tecidos delicados como veludo, alcântara ou chenille requerem produtos específicos. O preço base não varia por tipo de tecido.\n\n**Estado de sujidade**, Manchas antigas, urina de animais ou bolor exigem pré-tratamentos especializados que não estão incluídos no preço base.\n\n**Impermeabilização**, Se adicionares impermeabilização ao serviço (recomendado), o pack limpeza mais impermeabilização fica entre 60€ e 90€ acima do preço da limpeza simples, mas com desconto face à contratação separada.",
+        body: "Vários fatores determinam o custo final:\n\n**Tamanho e configuração**, Um sofá em L tem mais metros de tecido do que um sofá de 3 lugares reto. O número de chaises e almofadas avulsas também conta.\n\n**Material do tecido**, Tecidos delicados como veludo, alcântara ou chenille requerem produtos específicos. O preço base não varia por tipo de tecido.\n\n**Estado de sujidade**, Manchas antigas, urina de animais ou bolor exigem pré-tratamentos especializados que não estão incluídos no preço base.\n\n**Impermeabilização**, Se adicionares impermeabilização ao serviço (recomendado), o pack limpeza mais impermeabilização fica entre 50€ e 90€ acima do preço da limpeza simples, mas com desconto face à contratação separada.",
       },
       {
         heading: "Limpeza DIY vs. limpeza profissional: vale a pena?",
