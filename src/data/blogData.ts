@@ -264,7 +264,7 @@ const posts: BlogPost[] = [
     sections: [
       {
         heading: "Tabela de preços por tamanho (2025)",
-        body: "Os preços da Kyro Clean Solutions para limpeza profissional de colchões são:\n\n**Colchão solteiro**: 49€\n\n**Colchão casal**: 69€\n\n**Colchão king / queen**: 79€\n\nTodos os preços incluem deslocação na área do Porto, pré-tratamento de manchas, limpeza por extração a vapor e secagem rápida. O colchão fica pronto a usar em 2 a 4 horas.",
+        body: "Os preços da Kyro Clean Solutions para limpeza profissional de colchões são:\n\n**Colchão solteiro**: 59€\n\n**Colchão casal**: 69€\n\n**Colchão king / queen**: 79€\n\nTodos os preços incluem deslocação na área do Porto, pré-tratamento de manchas, limpeza por extração a vapor e secagem rápida. O colchão fica pronto a usar em 2 a 4 horas.",
         tip: "Combine com a limpeza do sofá no mesmo dia e poupe 10% no total com o Pack Sofá + Colchão.",
       },
       {
@@ -273,7 +273,7 @@ const posts: BlogPost[] = [
       },
       {
         heading: "Colchão de solteiro vs. casal: diferença de preço justificada?",
-        body: "A diferença de 20€ entre o colchão solteiro (49€) e o casal (69€) reflete a diferença de área a tratar. Um colchão casal padrão tem aproximadamente o dobro da superfície de um solteiro, o que exige mais produto, mais tempo de extração e mais produto anti-ácaros.\n\nPara casais, a higienização regular dos dois lados do colchão é especialmente importante, pois cada pessoa contribui com células mortas, suor e temperatura para o seu lado, criando zonas distintas de concentração de ácaros.",
+        body: "A diferença de 10€ entre o colchão solteiro (59€) e o casal (69€) reflete a diferença de área a tratar. Um colchão casal padrão tem aproximadamente o dobro da superfície de um solteiro, o que exige mais produto, mais tempo de extração e mais produto anti-ácaros.\n\nPara casais, a higienização regular dos dois lados do colchão é especialmente importante, pois cada pessoa contribui com células mortas, suor e temperatura para o seu lado, criando zonas distintas de concentração de ácaros.",
       },
       {
         heading: "Quando é que a limpeza de colchão é urgente?",
@@ -1310,7 +1310,7 @@ const posts: BlogPost[] = [
       },
       {
         q: "Quanto custa limpar um colchão de bebé?",
-        a: "O colchão de bebé (tamanho berço) tem preço a partir de 49€. Colchões de cama individual a partir de 49€, casal a partir de 69€ e king/queen a partir de 79€.",
+        a: "O colchão de bebé (tamanho berço) tem preço a partir de 59€. Colchões de cama individual a partir de 59€, casal a partir de 69€ e king/queen a partir de 79€.",
       },
     ],
     relatedService: { label: "Pedir orçamento de limpeza de colchão", href: "/limpeza-colchoes" },
@@ -1541,7 +1541,7 @@ const posts: BlogPost[] = [
       },
       {
         heading: "Preços de limpeza profissional de colchão",
-        body: "A Kyro Clean trata colchões com urina com um processo de 2 etapas: aplicação de produto enzimático concentrado seguida de extração a quente.\n\nPreços:\n- Colchão solteiro: a partir de 49€\n- Colchão de casal: a partir de 69€\n- King size / queen size: a partir de 79€\n\nO colchão fica seco em 2 a 4 horas. Recomendamos sempre o uso de um protetor de colchão impermeável após a limpeza para prevenir futuras infiltrações.",
+        body: "A Kyro Clean trata colchões com urina com um processo de 2 etapas: aplicação de produto enzimático concentrado seguida de extração a quente.\n\nPreços:\n- Colchão solteiro: a partir de 59€\n- Colchão de casal: a partir de 69€\n- King size / queen size: a partir de 79€\n\nO colchão fica seco em 2 a 4 horas. Recomendamos sempre o uso de um protetor de colchão impermeável após a limpeza para prevenir futuras infiltrações.",
       },
     ],
     faq: [

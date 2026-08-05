@@ -28,7 +28,7 @@ const priceTables: Record<string, { item: string; price: string; note?: string }
     { item: "Impermeabilização", price: "Desde 59€", note: "add-on recomendado" },
   ],
   "limpeza-colchoes": [
-    { item: "Colchão Solteiro", price: "Desde 49€" },
+    { item: "Colchão Solteiro", price: "Desde 59€" },
     { item: "Colchão Casal", price: "Desde 69€" },
     { item: "Colchão King Size", price: "Desde 79€" },
     { item: "Colchão berço/criança", price: "Desde 39€" },
@@ -122,7 +122,7 @@ const priceFaqs: Record<string, { question: string; answer: string }[]> = {
     { question: "Oferecem descontos para múltiplas peças?", answer: "Sim! Se combinar vários serviços (ex: sofá + colchão + cadeiras) aplicamos desconto no valor total. Peça um orçamento personalizado." },
   ],
   "limpeza-colchoes": [
-    { question: "Quanto custa limpar um colchão em {city}?", answer: "A limpeza de colchões em {city} começa a partir de 49€ para colchões de solteiro e 69€ para colchões de casal. O preço depende do tamanho e estado do colchão." },
+    { question: "Quanto custa limpar um colchão em {city}?", answer: "A limpeza de colchões em {city} começa a partir de 59€ para colchões de solteiro e 69€ para colchões de casal. O preço depende do tamanho e estado do colchão." },
     { question: "O preço inclui anti-ácaros?", answer: "Sim, o nosso serviço standard inclui tratamento anti-ácaros. Para tratamentos intensivos, pode haver um suplemento." },
     { question: "A deslocação em {city} tem custo?", answer: "Sim, a partir de 5€ em {city} e arredores, consoante a distância ao centro. O valor exato é mostrado no orçamento antes de confirmar." },
   ],

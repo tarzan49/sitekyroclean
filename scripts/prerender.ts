@@ -636,11 +636,11 @@ export function prerenderRoutes(outDir: string): number {
       },
       {
         path: '/limpeza-colchoes',
-        title: 'Limpeza e Higienização de Colchões | Desde 49€ | Kyro Clean Solutions',
-        desc: 'Higienização profissional de colchões ao domicílio. Eliminamos ácaros, bactérias e odores para noites mais saudáveis. Desde 49€. Porto, Lisboa e todo o país.',
+        title: 'Limpeza e Higienização de Colchões | Desde 59€ | Kyro Clean Solutions',
+        desc: 'Higienização profissional de colchões ao domicílio. Eliminamos ácaros, bactérias e odores para noites mais saudáveis. Desde 59€. Porto, Lisboa e todo o país.',
         content: {
           h1: 'Limpeza e Higienização de Colchões ao Domicílio',
-          intro: 'Serviço de higienização profunda de colchões ao domicílio. Eliminamos até 99% dos ácaros, bactérias e fungos com extração profissional. Noites mais saudáveis a partir de 49€.',
+          intro: 'Serviço de higienização profunda de colchões ao domicílio. Eliminamos até 99% dos ácaros, bactérias e fungos com extração profissional. Noites mais saudáveis a partir de 59€.',
           processSteps: [
             { step: 1, title: 'Aspiração profunda', description: 'Remoção de ácaros e partículas superficiais com aspirador HEPA.' },
             { step: 2, title: 'Tratamento antimicrobiano', description: 'Aplicação de produto específico contra fungos, bactérias e ácaros.' },
@@ -656,14 +656,14 @@ export function prerenderRoutes(outDir: string): number {
             'Produto certificado e seguro para crianças e animais',
           ],
           faqs: faqs([
-            { q: 'Quanto custa a limpeza de colchão?', a: 'A limpeza de colchão começa a partir de 49€ para solteiro, 69€ para casal e 79€ para king. Peça orçamento gratuito.' },
+            { q: 'Quanto custa a limpeza de colchão?', a: 'A limpeza de colchão começa a partir de 59€ para solteiro, 69€ para casal e 79€ para king. Peça orçamento gratuito.' },
             { q: 'Com que frequência devo limpar o colchão?', a: 'Recomendamos higienização profissional a cada 6 a 12 meses. Em casos de alergias, gravidez ou crianças pequenas, idealmente cada 6 meses.' },
             { q: 'A limpeza elimina os ácaros do colchão?', a: 'Sim. O nosso processo elimina até 99% dos ácaros, ovos e alergénios presentes no colchão, com tratamento antimicrobiano de duração até 6 meses.' },
             { q: 'Fazem limpeza de colchões ao domicílio?', a: 'Sim. O técnico desloca-se a sua casa com todo o equipamento. Não precisa de retirar o colchão nem de se deslocar.' },
           ]),
         },
         extraSchemas: [
-          buildServiceSchema('Limpeza de Colchões', 'Portugal', '49€'),
+          buildServiceSchema('Limpeza de Colchões', 'Portugal', '59€'),
           buildBreadcrumbSchema([
             { name: 'Início', url: BASE_URL + '/' },
             { name: 'Limpeza de Colchões', url: BASE_URL + '/limpeza-colchoes' },

@@ -57,7 +57,7 @@ export const PRICE_TABLE: Record<string, { item: string; price: string }[]> = {
     { item: 'Sofá de 4+ lugares',        price: 'Sob orçamento' },
   ],
   'limpeza-colchoes': [
-    { item: 'Colchão solteiro',        price: '49€' },
+    { item: 'Colchão solteiro',        price: '59€' },
     { item: 'Colchão casal',           price: '69€' },
     { item: 'Colchão king / queen',    price: '79€' },
   ],

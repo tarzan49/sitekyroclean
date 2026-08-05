@@ -181,7 +181,7 @@ const QuizUpsellOverlay = ({
           <div className="grid grid-cols-2 gap-2 w-full max-w-xs mx-auto mb-4">
             {([
               { id: 'sofa',     img: '/images/services/sofa.webp',    label: 'Sofá',     sublabel: 'a partir de 49€' },
-              { id: 'mattress', img: '/images/services/colchao.webp', label: 'Colchão',  sublabel: 'a partir de 49€' },
+              { id: 'mattress', img: '/images/services/colchao.webp', label: 'Colchão',  sublabel: 'a partir de 59€' },
               { id: 'carpet',   img: '/images/services/tapete.webp',  label: 'Tapete',   sublabel: 'a partir de 12€/m²' },
               { id: 'chairs',   img: '/images/services/cadeira.webp', label: 'Cadeiras', sublabel: 'a partir de 20€' },
             ] as const).map(opt => (

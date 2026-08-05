@@ -38,15 +38,15 @@ const routeMeta: Record<string, { pt: PageMeta; en: PageMeta; es: PageMeta }> = 
   },
   "/limpeza-colchoes": {
     pt: {
-      title: "Limpeza e Higienização de Colchões | Desde 49€ | Kyro Clean Solutions",
+      title: "Limpeza e Higienização de Colchões | Desde 59€ | Kyro Clean Solutions",
       description: "Higienização e lavagem profunda de colchões ao domicílio. Eliminamos ácaros, bactérias e odores para noites mais saudáveis. Porto, Lisboa e todo o país.",
     },
     en: {
-      title: "Mattress Cleaning & Sanitization | From €49 | Kyro Clean Solutions",
+      title: "Mattress Cleaning & Sanitization | From €59 | Kyro Clean Solutions",
       description: "Deep mattress cleaning and sanitization at your home. We eliminate mites, bacteria and odours for healthier nights.",
     },
     es: {
-      title: "Limpieza e Higienización de Colchones | Desde 49€ | Kyro Clean Solutions",
+      title: "Limpieza e Higienización de Colchones | Desde 59€ | Kyro Clean Solutions",
       description: "Higienización y lavado profundo de colchones a domicilio. Eliminamos ácaros, bacterias y olores.",
     },
   },

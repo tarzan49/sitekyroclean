@@ -80,8 +80,8 @@ const allFaqs: FAQ[] = [
   {
     id: "preco-colchao-solteiro",
     question: "Quanto custa limpar um colchão de solteiro?",
-    answer: <>A <Link to="/limpeza-colchoes" className="text-gold hover:underline font-medium">limpeza de colchão solteiro</Link> custa <strong>49€</strong>. Colchão de casal: 69€. King-size ou queen-size: 79€. O serviço inclui aspiração profunda, extração a vapor (temperatura superior a 55ºC, letal para ácaros), tratamento de manchas, bactericida e antifúngico. A limpeza de colchão é particularmente importante porque passamos 7 a 8 horas diárias em contacto direto com ele. Um colchão com 5 anos sem tratamento pode conter 2 milhões de ácaros por metro quadrado. Recomendamos 1 vez por ano, 2 vezes para pessoas com alergias ou asma.</>,
-    plainAnswer: "Colchão solteiro: 49€. Casal: 69€. King/queen-size: 79€. Inclui aspiração profissional, extração a vapor (acima de 55ºC), tratamento de manchas, bactericida e antifúngico. Recomendado 1 a 2 vezes por ano.",
+    answer: <>A <Link to="/limpeza-colchoes" className="text-gold hover:underline font-medium">limpeza de colchão solteiro</Link> custa <strong>59€</strong>. Colchão de casal: 69€. King-size ou queen-size: 79€. O serviço inclui aspiração profunda, extração a vapor (temperatura superior a 55ºC, letal para ácaros), tratamento de manchas, bactericida e antifúngico. A limpeza de colchão é particularmente importante porque passamos 7 a 8 horas diárias em contacto direto com ele. Um colchão com 5 anos sem tratamento pode conter 2 milhões de ácaros por metro quadrado. Recomendamos 1 vez por ano, 2 vezes para pessoas com alergias ou asma.</>,
+    plainAnswer: "Colchão solteiro: 59€. Casal: 69€. King/queen-size: 79€. Inclui aspiração profissional, extração a vapor (acima de 55ºC), tratamento de manchas, bactericida e antifúngico. Recomendado 1 a 2 vezes por ano.",
   },
   {
     id: "servico-fora-porto",

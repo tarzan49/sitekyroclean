@@ -46,7 +46,7 @@ const SERVICE_META: Record<ServiceKey, {
   label: string; labelPlural: string; canonicalBase: string; priceFrom: string; waterproofPriceFrom?: string;
 }> = {
   sofa:      { label: 'Sofá',      labelPlural: 'Sofás',      canonicalBase: 'limpeza-sofas',     priceFrom: '49€',     waterproofPriceFrom: '59€'      },
-  colchao:   { label: 'Colchão',   labelPlural: 'Colchões',   canonicalBase: 'limpeza-colchoes',  priceFrom: '49€' },
+  colchao:   { label: 'Colchão',   labelPlural: 'Colchões',   canonicalBase: 'limpeza-colchoes',  priceFrom: '59€' },
   tapetes:   { label: 'Tapetes',   labelPlural: 'Tapetes',    canonicalBase: 'limpeza-tapetes',   priceFrom: '12€/m²'                                    },
   cadeiras:  { label: 'Cadeiras',  labelPlural: 'Cadeiras',   canonicalBase: 'limpeza-cadeiras',  priceFrom: '20€',     waterproofPriceFrom: '25€/cad.'    },
   alcatifas: { label: 'Alcatifas', labelPlural: 'Alcatifas',  canonicalBase: 'limpeza-alcatifas', priceFrom: '3€/m²'                                    },
@@ -312,7 +312,7 @@ function content_lavagem_colchao(loc: string, ctx: string): ContentBlock {
       { question: `As manchas amareladas de suor saem com a lavagem do colchão?`, answer: `Sim, na grande maioria dos casos. A extração a quente com pré-tratamento enzimático remove manchas amareladas de suor que resistiram a todas as tentativas domésticas.` },
       { question: `A lavagem é segura em colchões de molas e híbridos?`, answer: `Sim. A extração é feita apenas nas camadas de estofamento superior, sem atingir as molas ou a estrutura interna. É segura em qualquer tipo de colchão.` },
       { question: `A lavagem funciona em colchões antigos ou muito usados?`, answer: `Sim. Mesmo colchões com vários anos de uso reagem bem à extração profissional, recuperando frescura e reduzindo alergénios acumulados. Se houver dano estrutural (molas partidas, buracos), a lavagem não resolve esse desgaste, apenas a limpeza e o odor.` },
-      { question: `Quanto custa lavar um colchão king size em ${loc}?`, answer: `A partir de 79€ para king e queen size. Para colchão de solteiro a partir de 49€ e casal a partir de 69€. Deslocação a partir de 5€ a ${loc}, consoante a distância.` },
+      { question: `Quanto custa lavar um colchão king size em ${loc}?`, answer: `A partir de 79€ para king e queen size. Para colchão de solteiro a partir de 59€ e casal a partir de 69€. Deslocação a partir de 5€ a ${loc}, consoante a distância.` },
     ],
     problems: [
       { title: "Manchas amareladas de suor que resistiram a tudo", description: "A oxidação do suor cria manchas proteicas que se ligam às fibras com o tempo. A lavagem enzimática a quente é o único método que as remove eficazmente sem danificar o colchão." },
