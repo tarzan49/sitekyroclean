@@ -749,3 +749,18 @@ Correções aplicadas: canonical URLs em branco nas 17 páginas core, Breadcrumb
 - Commits: `fix(pricing): remove deslocação grátis...` (com o erro) → `fix(pricing): reverte subida indevida de +5€...` (correção).
 
 **Padrão a vigiar em sessões futuras:** qualquer alteração à tabela `locationPrices` tem efeitos em cascata em pelo menos 3 sítios que não são óbvios à primeira vista: (1) `locationSeoData.ts` tem uma cópia duplicada standalone, (2) dezenas de FAQs/benefícios em `problemSeoData.ts`/`priceSeoData.ts`/`freguesiaContentEngine.ts`/`keywordVariantData.ts` fazem afirmações textuais fixas sobre custo de deslocação (não derivadas da tabela), (3) `scripts/prerender.ts` pode ter as suas próprias cópias hardcoded fora de `src/`.
+
+**Ajuste seguinte (mesma sessão):** teto da deslocação baixado de 25€ para 20€ (Guimarães, Aljezur, Vila do Bispo, Alcoutim). Commit `fix(pricing): limita deslocação a um máximo de 20€`.
+
+## Sessão — Piloto Marca × Cidade para colchões (2026-08-05)
+
+**Pedido do user:** cruzar marca × localidade para os 5 serviços (sofá já existe, faltava colchão/tapete/cadeira/impermeabilização) para "SEO Super completo". Dado o volume (5 serviços × ~8 marcas × 18 cidades ≈ 720 páginas, cada uma exigindo conteúdo único para não ser penalizada como duplicado), perguntei ao user como avançar — escolheu **piloto com 1 serviço primeiro**, antes de replicar para os restantes.
+
+**Implementado: colchão × marca × cidade (108 páginas).**
+- Marcas confirmadas por pesquisa web (não inventadas): IKEA, Conforama (retalhistas gerais, reaproveitados da lista de sofá), Molaflex, Pikolin, Colmol, Mindol (marcas de colchão reais do mercado PT). Tapete deixado de fora do scope: marca não é como se pesquisa limpeza de tapetes.
+- `src/data/marcaColchaoData.ts` + `src/pages/MarcaColchaoPage.tsx` replicam exatamente o padrão de `marcaSofaData.ts`/`MarcaSofaPage.tsx` (mesmas 18 cidades, mesma estrutura de conteúdo: material, processo, 4 "não fazer", faixa de preço 49€-79€ igual para todas as marcas — ao contrário do padrão do sofá, o preço de colchão não varia por marca no negócio real, só por tamanho). Ícone `Sparkles` (banido) trocado por `ShieldCheck`.
+- Rotas em `App.tsx`, sitemap (`sitemap-marcas.xml`, agora 252 URLs) e prerender estático (`scripts/prerender.ts`) todos atualizados — **`scripts/*.ts` não é coberto por `tsc --noEmit`** (fora do `tsconfig.app.json`), por isso a validação real foi um `npm run build` completo (confirmado: 8690 rotas prerenderizadas, 0 erros).
+- **Bug pré-existente encontrado e corrigido de caminho:** o bloco "Marcas de sofá" em `LocationServicePage.tsx` linkava para `/limpeza-sofa-{marca}-{cidade}` em todas as ~150 cidades das páginas de localidade, mas páginas de marca só existem nas 18 cidades de `marcaCities` — ~132 links iam para 404. Adicionada guarda `MARCA_CITY_SLUGS.includes(data.citySlug)`, aplicada ao bloco de sofá já existente e ao novo bloco de colchão.
+- Verificado visualmente no browser (mobile 390px + desktop): hero, material, do's/don'ts, processo, FAQ, CTA, links cruzados entre marcas, e o novo bloco "Marcas de colchão" em `/limpeza-colchoes-porto`.
+
+**Pendente:** aprovação do user sobre o formato antes de replicar para cadeira e impermeabilização (marca faz sentido nesses dois; tapete fica de fora).
