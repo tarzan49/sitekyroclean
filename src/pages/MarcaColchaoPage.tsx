@@ -238,28 +238,29 @@ const MarcaColchaoPage = () => {
         <ServicePriceSection serviceSlug="limpeza-colchoes" initialLocation={city.name} />
 
         {/* ═══ MATERIAL: NÃO FAZER / FAZER ═══ */}
-        <section className="py-14 md:py-20 bg-[#FDFDF9]">
+        <section className="py-14 md:py-20 bg-kyro-green">
           <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
             <SectionHeader
               overline="Material"
               heading="O que saber sobre o colchão"
               goldWord={marca.name}
               subtitle={marca.materialDescription}
+              light={false}
             />
             <p className="text-[10px] font-bold tracking-[0.28em] uppercase mb-5" style={{ color: "#D4AF37" }}>
               {marca.material}
             </p>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-px" style={{ backgroundColor: "#E8E4DE" }}>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {marca.doNots.map((doNot, i) => (
-                <div key={`no-${i}`} className="flex items-start gap-3 p-6 md:p-7 bg-white" style={{ borderTop: "2px solid #ef4444" }}>
+                <div key={`no-${i}`} className="flex items-start gap-3 p-6 md:p-7 rounded-xl" style={{ backgroundColor: "rgba(255,255,255,0.04)", border: "1px solid rgba(239,68,68,0.35)" }}>
                   <XCircle className="w-4 h-4 flex-shrink-0 mt-0.5" style={{ color: "#ef4444" }} />
-                  <span className="text-sm text-[#111111]/65 leading-relaxed">{doNot}</span>
+                  <span className="text-sm text-white/70 leading-relaxed">{doNot}</span>
                 </div>
               ))}
               {marca.doThis.map((doThis, i) => (
-                <div key={`yes-${i}`} className="flex items-start gap-3 p-6 md:p-7" style={{ backgroundColor: "#071a12", borderTop: "2px solid #D4AF37" }}>
+                <div key={`yes-${i}`} className="relative flex items-start gap-3 p-6 md:p-7 rounded-xl" style={{ backgroundColor: "rgba(212,175,55,0.08)", border: "1.5px solid #D4AF37", boxShadow: "0 0 24px rgba(212,175,55,0.15)" }}>
                   <CheckCircle2 className="w-4 h-4 flex-shrink-0 mt-0.5" style={{ color: "#D4AF37" }} />
-                  <span className="text-sm text-white/75 leading-relaxed">{doThis}</span>
+                  <span className="text-sm text-white/90 leading-relaxed font-medium">{doThis}</span>
                 </div>
               ))}
             </div>
@@ -315,72 +316,33 @@ const MarcaColchaoPage = () => {
           variant="dark"
         />
 
-        {/* ═══ CTA ═══ */}
-        <section className="py-10 md:py-14 bg-checker-dark">
-          <div className="container mx-auto px-5 sm:px-6 lg:px-8 text-center">
-            <p className="text-[10px] font-bold tracking-[0.28em] uppercase mb-4" style={{ color: "#D4AF37" }}>Kyro Clean Solutions</p>
-            <h2 className="font-playfair text-xl md:text-3xl font-bold text-white mb-3">
-              Peça orçamento para o seu colchão {marca.name} {prep} {city.name}
-            </h2>
-            <p className="text-white/60 mb-6">
-              {marca.estimatedPriceRange} · Resposta em menos de 30 minutos
-            </p>
-            <div className="flex gap-3 justify-center w-full max-w-sm mx-auto">
-              <div className="relative group flex-1">
-                <div className="absolute -inset-1.5 rounded-full bg-gradient-to-r from-[#C9A84C]/50 to-[#E8D070]/40 opacity-30 blur-lg group-hover:opacity-55 transition-opacity duration-400 pointer-events-none" />
-                <QuizButton className="w-full" initialLocation={city.name} initialService="mattress" />
-              </div>
-              <div className="relative group flex-1">
-                <div className="absolute -inset-1.5 rounded-full bg-[#25D366]/40 opacity-30 blur-lg group-hover:opacity-55 transition-opacity duration-400 pointer-events-none" />
-                <a
-                  href={`${WHATSAPP_BASE}?text=${encodeURIComponent(`Olá! Gostaria de pedir um orçamento para limpeza do meu colchão ${marca.name} em ${city.name}.`)}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onClick={() => trackWhatsAppClick(`marca_colchao_cta_${marca.slug}`)}
-                  className={[
-                    'relative flex items-center justify-center gap-2 w-full rounded-full font-bold text-white touch-manipulation',
-                    'bg-gradient-to-r from-[#1DA851] via-[#25D366] to-[#1DA851]',
-                    'shadow-[0_6px_22px_rgba(37,211,102,0.42),0_2px_6px_rgba(0,0,0,0.28),inset_0_1px_0_rgba(255,255,255,0.20),inset_0_-2px_0_rgba(0,0,0,0.12)]',
-                    'hover:shadow-[0_10px_32px_rgba(37,211,102,0.60),0_4px_10px_rgba(0,0,0,0.32)]',
-                    'hover:scale-[1.025] active:scale-[0.95]',
-                    'active:shadow-[0_2px_8px_rgba(37,211,102,0.30),inset_0_2px_4px_rgba(0,0,0,0.18)]',
-                    'transition-all duration-150',
-                    'px-8 py-3 text-sm',
-                  ].join(' ')}
-                >
-                  <MessageCircle className="w-[18px] h-[18px] text-white flex-shrink-0" strokeWidth={2} />
-                  <span className="tracking-wide">WhatsApp</span>
-                </a>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* ═══ OUTRAS MARCAS ═══ */}
-        <section className="py-10 bg-[#FDFDF9]">
-          <div className="container mx-auto px-5 sm:px-6 lg:px-8">
-            <div className="max-w-4xl mx-auto">
-              <div className="mb-6 pb-5 border-b border-[#E8E4DE]">
-                <p className="text-xs text-[#111111]/50 mb-2">Serviço completo de limpeza de colchões:</p>
-                <Link
-                  to={`/limpeza-colchoes-${city.slug}`}
-                  className="text-sm font-semibold text-[#D4AF37] hover:underline"
-                >
-                  Limpeza de Colchões em {city.name}: Ver todos os tamanhos e preços
-                </Link>
-              </div>
-              <h3 className="font-playfair text-lg font-bold text-[#111111] mb-4">Outras marcas que limpamos em {city.name}</h3>
-              <div className="flex flex-wrap gap-2">
-                {["ikea", "conforama", "molaflex", "pikolin", "colmol", "mindol"]
-                  .filter(slug => slug !== marca.slug)
-                  .map(slug => (
-                    <Link key={slug} to={`/limpeza-colchao-${slug}-${city.slug}`}
-                      className="inline-flex items-center gap-1.5 bg-white px-3 py-2 rounded-lg text-sm text-[#111111] border border-[#E8E4DE] hover:border-[#D4AF37]/35 hover:bg-[#D4AF37]/5 transition-all capitalize">
-                      <ArrowRight className="w-3 h-3" style={{ color: "#D4AF37" }} />
-                      {slug.replace(/-/g, " ")}
-                    </Link>
-                  ))}
-              </div>
+        {/* ═══ OUTRAS MARCAS / COBERTURA ═══ */}
+        <section className="py-14 md:py-20 bg-[#FDFDF9]">
+          <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
+            <SectionHeader
+              overline="Mais Opções"
+              heading="Outras marcas que limpamos em"
+              goldWord={city.name}
+              subtitle={`Veja também a tabela completa de tamanhos e preços de limpeza de colchões ${prep} ${city.name}.`}
+            />
+            <Link
+              to={`/limpeza-colchoes-${city.slug}`}
+              className="inline-flex items-center gap-1.5 text-sm font-semibold mb-8 hover:underline"
+              style={{ color: "#D4AF37" }}
+            >
+              Ver todos os tamanhos e preços em {city.name}
+              <ArrowRight className="w-3.5 h-3.5" />
+            </Link>
+            <div className="flex flex-wrap gap-2">
+              {["ikea", "conforama", "molaflex", "pikolin", "colmol", "mindol"]
+                .filter(slug => slug !== marca.slug)
+                .map(slug => (
+                  <Link key={slug} to={`/limpeza-colchao-${slug}-${city.slug}`}
+                    className="inline-flex items-center gap-1.5 bg-white px-3.5 py-2 rounded-full text-sm font-medium text-[#111111] border border-[#E8E4DE] hover:border-[#D4AF37]/40 hover:bg-[#D4AF37]/5 hover:shadow-sm transition-all capitalize">
+                    <ArrowRight className="w-3 h-3" style={{ color: "#D4AF37" }} />
+                    {slug.replace(/-/g, " ")}
+                  </Link>
+                ))}
             </div>
           </div>
         </section>
