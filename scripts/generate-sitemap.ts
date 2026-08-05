@@ -413,10 +413,18 @@ export function generateSitemaps(outDir: string) {
     }
   }
 
-  // 11. Marca Colchão pages (6 brands × 18 cities = 108 pages)
+  // 11. Marca Colchão pages (6 brands × 34 cities = 204 pages)
+  // Cidades mais povoadas do país que o site já cobre (ver marcaColchaoData.ts)
   const marcaColchaoSlugs = ['ikea', 'conforama', 'molaflex', 'pikolin', 'colmol', 'mindol'];
+  const marcaColchaoCities = [
+    'porto', 'vila-nova-de-gaia', 'braga', 'matosinhos', 'gondomar', 'guimaraes', 'maia', 'valongo',
+    'paredes', 'vila-do-conde', 'povoa-de-varzim', 'penafiel', 'santo-tirso',
+    'lisboa', 'sintra', 'cascais', 'loures', 'amadora', 'almada', 'seixal', 'oeiras', 'odivelas',
+    'vila-franca-de-xira', 'setubal', 'mafra', 'barreiro', 'moita', 'montijo', 'palmela', 'sesimbra',
+    'faro', 'loule', 'portimao', 'albufeira',
+  ];
   for (const marca of marcaColchaoSlugs) {
-    for (const city of marcaCities) {
+    for (const city of marcaColchaoCities) {
       marcaUrls.push(xmlUrl(`/limpeza-colchao-${marca}-${city}`, 'monthly', '0.7'));
     }
   }

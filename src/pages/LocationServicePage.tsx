@@ -148,9 +148,18 @@ const LocationServicePage = () => {
 
   const MARCA_SLUGS = ['ikea', 'natuzzi', 'kave-home', 'leroy-merlin', 'moviflor', 'conforama', 'el-corte-ingles', 'roche-bobois'];
   const MARCA_COLCHAO_SLUGS = ['ikea', 'conforama', 'molaflex', 'pikolin', 'colmol', 'mindol'];
-  // Páginas de marca só existem nestas 18 cidades — evita links para páginas inexistentes
-  const MARCA_CITY_SLUGS = ['porto', 'lisboa', 'braga', 'aveiro', 'coimbra', 'guimaraes', 'matosinhos', 'vila-nova-de-gaia', 'maia', 'barcelos', 'sintra', 'cascais', 'oeiras', 'amadora', 'faro', 'loule', 'albufeira', 'portimao'];
-  const hasMarcaCity = MARCA_CITY_SLUGS.includes(data.citySlug);
+  // Páginas de marca de sofá só existem nestas 18 cidades — evita links para páginas inexistentes
+  const MARCA_SOFA_CITY_SLUGS = ['porto', 'lisboa', 'braga', 'aveiro', 'coimbra', 'guimaraes', 'matosinhos', 'vila-nova-de-gaia', 'maia', 'barcelos', 'sintra', 'cascais', 'oeiras', 'amadora', 'faro', 'loule', 'albufeira', 'portimao'];
+  // Páginas de marca de colchão cobrem as 34 cidades mais povoadas do site
+  const MARCA_COLCHAO_CITY_SLUGS = [
+    'porto', 'vila-nova-de-gaia', 'braga', 'matosinhos', 'gondomar', 'guimaraes', 'maia', 'valongo',
+    'paredes', 'vila-do-conde', 'povoa-de-varzim', 'penafiel', 'santo-tirso',
+    'lisboa', 'sintra', 'cascais', 'loures', 'amadora', 'almada', 'seixal', 'oeiras', 'odivelas',
+    'vila-franca-de-xira', 'setubal', 'mafra', 'barreiro', 'moita', 'montijo', 'palmela', 'sesimbra',
+    'faro', 'loule', 'portimao', 'albufeira',
+  ];
+  const hasMarcaSofaCity = MARCA_SOFA_CITY_SLUGS.includes(data.citySlug);
+  const hasMarcaColchaoCity = MARCA_COLCHAO_CITY_SLUGS.includes(data.citySlug);
 
   const resultContent = (SERVICE_RESULT_CONTENT[data.serviceSlug] ?? SERVICE_RESULT_CONTENT['limpeza-sofas'])(data.city);
   const serviceBaseUrl = services.find(s => s.slug === data.serviceSlug)?.baseRoute ?? `/${data.serviceSlug}`;
@@ -884,7 +893,7 @@ const LocationServicePage = () => {
                 </div>
               )}
 
-              {hasMarcaCity && data.serviceSlug === 'limpeza-sofas' && (
+              {hasMarcaSofaCity && data.serviceSlug === 'limpeza-sofas' && (
                 <div>
                   <p className="text-[10px] font-bold tracking-[0.26em] uppercase mb-3" style={{ color: "#D4AF37" }}>Marcas de sofá {cityPrep} {data.city}</p>
                   <div className="flex flex-wrap gap-2">
@@ -901,7 +910,7 @@ const LocationServicePage = () => {
                 </div>
               )}
 
-              {hasMarcaCity && data.serviceSlug === 'limpeza-colchoes' && (
+              {hasMarcaColchaoCity && data.serviceSlug === 'limpeza-colchoes' && (
                 <div>
                   <p className="text-[10px] font-bold tracking-[0.26em] uppercase mb-3" style={{ color: "#D4AF37" }}>Marcas de colchão {cityPrep} {data.city}</p>
                   <div className="flex flex-wrap gap-2">

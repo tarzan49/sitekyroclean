@@ -157,25 +157,49 @@ export const marcasColchao: MarcaColchao[] = [
   },
 ];
 
+// As cidades mais povoadas do país entre as que o site já cobre em
+// locationSeoData.ts (top-50 nacional por população, INE/Censos via
+// Wikipédia — https://pt.wikipedia.org/wiki/Lista_de_munic%C3%ADpios_de_Portugal_por_popula%C3%A7%C3%A3o).
+// Aveiro/Coimbra/Barcelos removidas: têm população elevada mas não têm
+// páginas de localização no site (não estão em locationSeoData.ts).
 const marcaCities = [
+  // Porto/Norte
   { name: "Porto", slug: "porto" },
-  { name: "Lisboa", slug: "lisboa" },
-  { name: "Braga", slug: "braga" },
-  { name: "Aveiro", slug: "aveiro" },
-  { name: "Coimbra", slug: "coimbra" },
-  { name: "Guimarães", slug: "guimaraes" },
-  { name: "Matosinhos", slug: "matosinhos" },
   { name: "Vila Nova de Gaia", slug: "vila-nova-de-gaia" },
+  { name: "Braga", slug: "braga" },
+  { name: "Matosinhos", slug: "matosinhos" },
+  { name: "Gondomar", slug: "gondomar" },
+  { name: "Guimarães", slug: "guimaraes" },
   { name: "Maia", slug: "maia" },
-  { name: "Barcelos", slug: "barcelos" },
+  { name: "Valongo", slug: "valongo" },
+  { name: "Paredes", slug: "paredes" },
+  { name: "Vila do Conde", slug: "vila-do-conde" },
+  { name: "Póvoa de Varzim", slug: "povoa-de-varzim" },
+  { name: "Penafiel", slug: "penafiel" },
+  { name: "Santo Tirso", slug: "santo-tirso" },
+  // Lisboa / Área Metropolitana
+  { name: "Lisboa", slug: "lisboa" },
   { name: "Sintra", slug: "sintra" },
   { name: "Cascais", slug: "cascais" },
-  { name: "Oeiras", slug: "oeiras" },
+  { name: "Loures", slug: "loures" },
   { name: "Amadora", slug: "amadora" },
+  { name: "Almada", slug: "almada" },
+  { name: "Seixal", slug: "seixal" },
+  { name: "Oeiras", slug: "oeiras" },
+  { name: "Odivelas", slug: "odivelas" },
+  { name: "Vila Franca de Xira", slug: "vila-franca-de-xira" },
+  { name: "Setúbal", slug: "setubal" },
+  { name: "Mafra", slug: "mafra" },
+  { name: "Barreiro", slug: "barreiro" },
+  { name: "Moita", slug: "moita" },
+  { name: "Montijo", slug: "montijo" },
+  { name: "Palmela", slug: "palmela" },
+  { name: "Sesimbra", slug: "sesimbra" },
+  // Algarve
   { name: "Faro", slug: "faro" },
   { name: "Loulé", slug: "loule" },
-  { name: "Albufeira", slug: "albufeira" },
   { name: "Portimão", slug: "portimao" },
+  { name: "Albufeira", slug: "albufeira" },
 ];
 
 export interface MarcaColchaoRoute {

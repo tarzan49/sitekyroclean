@@ -8,6 +8,7 @@ import Footer from "@/components/Footer";
 import QuizButton from "@/components/QuizButton";
 import TrustRatingBadge from "@/components/TrustRatingBadge";
 import ServiceFAQSchema from "@/components/ServiceFAQSchema";
+import SectionHeader from "@/components/SectionHeader";
 import { getAllMarcaColchaoRoutes, getMarcaColchaoByCityAndSlug } from "@/data/marcaColchaoData";
 import { cityPrep } from "@/data/locationSeoData";
 import { trackWhatsAppClick } from "@/lib/quizTracking";
@@ -185,40 +186,24 @@ const MarcaColchaoPage = () => {
         </section>
 
         {/* ═══ MATERIAL + DO NOTS ═══ */}
-        <section className="py-12 md:py-16 bg-[#FDFDF9]">
-          <div className="container mx-auto px-5 sm:px-6 lg:px-8">
-            <div className="max-w-4xl mx-auto">
-              <div className="flex items-center gap-3 mb-3">
-                <div className="h-px w-10 opacity-40" style={{ backgroundColor: "#D4AF37" }} />
-                <p className="text-[10px] font-bold tracking-[0.28em] uppercase" style={{ color: "#D4AF37" }}>Material</p>
-              </div>
-              <h2 className="font-playfair text-2xl md:text-3xl font-bold text-[#111111] mb-8">
-                O que saber sobre o colchão {marca.name}
-              </h2>
-
-              <div className="grid md:grid-cols-2 gap-6">
-                {/* Material badge + description */}
-                <div className="bg-white rounded-2xl p-6 md:p-8 shadow-sm border border-[#E8E4DE]">
-                  <p className="text-[10px] font-bold tracking-[0.28em] uppercase mb-4" style={{ color: "#D4AF37" }}>{marca.material}</p>
-                  <p className="text-sm md:text-base text-[#111111]/60 leading-relaxed">
-                    {marca.materialDescription}
-                  </p>
+        <section className="py-14 md:py-20 bg-[#FDFDF9]">
+          <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
+            <SectionHeader
+              overline="Material"
+              heading="O que saber sobre o colchão"
+              goldWord={marca.name}
+              subtitle={marca.materialDescription}
+            />
+            <p className="text-[10px] font-bold tracking-[0.28em] uppercase mb-5" style={{ color: "#D4AF37" }}>
+              {marca.material}
+            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-px" style={{ backgroundColor: "#E8E4DE" }}>
+              {marca.doNots.map((doNot, i) => (
+                <div key={i} className="flex items-start gap-3 p-6 md:p-7 bg-white" style={{ borderTop: "2px solid #ef4444" }}>
+                  <XCircle className="w-4 h-4 flex-shrink-0 mt-0.5" style={{ color: "#ef4444" }} />
+                  <span className="text-sm text-[#111111]/65 leading-relaxed">{doNot}</span>
                 </div>
-
-                {/* Do Nots */}
-                <div className="rounded-2xl p-6 md:p-8 shadow-sm border" style={{ background: "#071a12", borderColor: "rgba(212,175,55,0.2)" }}>
-                  <p className="text-[10px] font-bold tracking-[0.25em] uppercase mb-3" style={{ color: "#D4AF37" }}>Atenção</p>
-                  <h3 className="font-playfair text-lg font-bold text-white mb-4">O que NÃO fazer</h3>
-                  <ul className="space-y-3">
-                    {marca.doNots.map((doNot, i) => (
-                      <li key={i} className="flex items-start gap-3">
-                        <XCircle className="w-4 h-4 flex-shrink-0 mt-0.5" style={{ color: "#ef4444" }} />
-                        <span className="text-sm text-white/70">{doNot}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </div>
+              ))}
             </div>
           </div>
         </section>
