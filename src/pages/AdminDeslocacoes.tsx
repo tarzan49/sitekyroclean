@@ -27,8 +27,8 @@ export default function AdminDeslocacoes() {
           <p className="text-white/40 text-sm">Kyro Clean Solutions · Uso interno · 3 equipas locais, 3 sistemas de zonas independentes</p>
         </div>
 
-        <div className="bg-emerald-900/20 border border-emerald-500/20 rounded-xl p-4 mb-6 text-sm text-emerald-300">
-          Deslocação <strong>gratuita</strong> em pedidos acima de <strong>150€</strong> (independente da zona).
+        <div className="bg-white/[0.03] border border-white/10 rounded-xl p-4 mb-6 text-sm text-white/50">
+          A deslocação é sempre o preço fixo da zona. <strong className="text-white/70">Nunca é gratuita nem varia</strong> com o valor do pedido — só é 0€ nas zonas marcadas "Grátis" abaixo (Porto, Lisboa e Faro/Loulé centro).
         </div>
 
         {REGIONS.map(region => {
@@ -75,7 +75,6 @@ export default function AdminDeslocacoes() {
               <tr className="border-b border-white/10 text-white/40 text-xs uppercase tracking-wider">
                 <th className="text-left px-4 py-3">Cidade</th>
                 <th className="text-right px-4 py-3">Deslocação</th>
-                <th className="text-right px-4 py-3">Grátis a partir de</th>
               </tr>
             </thead>
             <tbody>
@@ -86,9 +85,6 @@ export default function AdminDeslocacoes() {
                     {price === 0
                       ? <span className="text-emerald-400">Grátis</span>
                       : <span className="text-gold">{price}€</span>}
-                  </td>
-                  <td className="px-4 py-2.5 text-right text-white/40 text-xs">
-                    150€ em serviços
                   </td>
                 </tr>
               ))}

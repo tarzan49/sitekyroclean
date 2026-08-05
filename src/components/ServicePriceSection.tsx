@@ -93,6 +93,7 @@ export default function ServicePriceSection({ serviceSlug, initialLocation }: Pr
   const [activeConfig, setActiveConfig] = useState<PriceRowQuizConfig | null>(null);
   const [rowQuantities, setRowQuantities] = useState<Record<number, number>>({});
   const [chaiseLongueAddon, setChaiseLongueAddon] = useState(0);
+  const [infoOpen, setInfoOpen] = useState(false);
 
   if (!rows) return null;
 
@@ -119,7 +120,6 @@ export default function ServicePriceSection({ serviceSlug, initialLocation }: Pr
   const discountActive = total >= WIDGET_DISCOUNT_THRESHOLD;
   const discountedTotal = Math.round(total * 0.9);
   const hasSelection = total > 0 || Object.values(rowQuantities).some(q => q > 0) || chaiseLongueAddon > 0;
-  const [infoOpen, setInfoOpen] = useState(false);
 
   const TrustPoints = ({ fullDesc }: { fullDesc: boolean }) => (
     <>
