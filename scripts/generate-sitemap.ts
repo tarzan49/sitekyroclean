@@ -430,6 +430,14 @@ export function generateSitemaps(outDir: string) {
     }
   }
 
+  // 12. Marca Cadeiras pages (6 brands × 34 cities = 204 pages)
+  const marcaCadeirasSlugs = ['ikea', 'conforama', 'leroy-merlin', 'herman-miller', 'moviflor', 'el-corte-ingles'];
+  for (const marca of marcaCadeirasSlugs) {
+    for (const city of marcaCities) {
+      marcaUrls.push(xmlUrl(`/limpeza-cadeiras-${marca}-${city}`, 'monthly', '0.7'));
+    }
+  }
+
   // Write sub-sitemaps
   const sitemapFiles = [
     { name: 'sitemap-core.xml', urls: coreUrls },

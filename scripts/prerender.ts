@@ -30,6 +30,7 @@ import { getAllPriceRoutes, getPricePageData } from '../src/data/priceSeoData';
 import { getAllPackComboRoutes, getPackByCityAndId, getFromPrice } from '../src/data/packComboData';
 import { getAllMarcaSofaRoutes, getMarcaByCityAndSlug } from '../src/data/marcaSofaData';
 import { getAllMarcaColchaoRoutes, getMarcaColchaoByCityAndSlug } from '../src/data/marcaColchaoData';
+import { getAllMarcaCadeirasRoutes, getMarcaCadeirasByCityAndSlug } from '../src/data/marcaCadeirasData';
 
 const BASE_URL = 'https://cleansolutions.com.pt';
 
@@ -580,6 +581,19 @@ export function prerenderRoutes(outDir: string): number {
       emit(route.path, title, desc);
     }
     console.log(`  Marca Colchão pages:     ${count - prev}`);
+  }
+
+  // ── 9c. Marca Cadeiras pages (6 × 34 = 204) ─────────────────────────────
+  {
+    const prev = count;
+    for (const route of getAllMarcaCadeirasRoutes()) {
+      const data = getMarcaCadeirasByCityAndSlug(route.marcaSlug, route.citySlug);
+      if (!data) continue;
+      const title = `Limpeza Cadeiras ${data.marca.name} em ${data.city.name}, Especialistas | Kyro Clean`;
+      const desc  = `Especialistas em limpeza de cadeiras ${data.marca.name} em ${data.city.name}. ${data.marca.material}. ${data.marca.estimatedPriceRange}. Serviço ao domicílio.`;
+      emit(route.path, title, desc);
+    }
+    console.log(`  Marca Cadeiras pages:    ${count - prev}`);
   }
 
   // ── 10. Core static pages (service hubs, editorial, packs) ─────────────

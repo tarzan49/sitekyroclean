@@ -18,6 +18,7 @@ import { getAllKeywordVariantRoutes } from "@/data/keywordVariantData";
 import { getAllPackComboRoutes } from "@/data/packComboData";
 import { getAllMarcaSofaRoutes } from "@/data/marcaSofaData";
 import { getAllMarcaColchaoRoutes } from "@/data/marcaColchaoData";
+import { getAllMarcaCadeirasRoutes } from "@/data/marcaCadeirasData";
 import { getAllPosts } from "@/data/blogData";
 import { SITE_URL } from "@/constants/business";
 import { getAdminRegion, getRegionForLocationPart, ADMIN_REGIONS, ADMIN_REGION_LABELS, type AdminRegion } from "@/data/regionUtils";
@@ -47,6 +48,7 @@ const SITEMAPS = [
   { id: "sitemap-packs.xml",        file: "sitemap-packs.xml",        name: "Packs", description: "Packs combo × concelho", icon: Target },
   { id: "sitemap-marcas-sofa",      file: "sitemap-marcas.xml",       name: "Marcas de Sofá", description: "8 marcas × 34 concelhos (cidades mais povoadas)", icon: Shield },
   { id: "sitemap-marcas-colchao",   file: "sitemap-marcas.xml",       name: "Marcas de Colchão", description: "6 marcas × 34 concelhos (cidades mais povoadas)", icon: Shield },
+  { id: "sitemap-marcas-cadeiras",  file: "sitemap-marcas.xml",       name: "Marcas de Cadeiras", description: "6 marcas × 34 concelhos (cidades mais povoadas)", icon: Shield },
 ];
 
 // ── Sitemap URL Generators ────────────────────────────────────────────────────
@@ -85,6 +87,8 @@ function getSitemapUrls(id: string): string[] {
       return getAllMarcaSofaRoutes().map(r => r.path);
     case "sitemap-marcas-colchao":
       return getAllMarcaColchaoRoutes().map(r => r.path);
+    case "sitemap-marcas-cadeiras":
+      return getAllMarcaCadeirasRoutes().map(r => r.path);
     default:
       return [];
   }

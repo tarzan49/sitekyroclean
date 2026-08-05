@@ -149,10 +149,12 @@ const LocationServicePage = () => {
 
   const MARCA_SLUGS = ['ikea', 'natuzzi', 'kave-home', 'leroy-merlin', 'moviflor', 'conforama', 'el-corte-ingles', 'roche-bobois'];
   const MARCA_COLCHAO_SLUGS = ['ikea', 'conforama', 'molaflex', 'pikolin', 'colmol', 'mindol'];
-  // Páginas de marca (sofá e colchão) cobrem as mesmas 34 cidades mais povoadas do site
+  const MARCA_CADEIRAS_SLUGS = ['ikea', 'conforama', 'leroy-merlin', 'herman-miller', 'moviflor', 'el-corte-ingles'];
+  // Páginas de marca (sofá, colchão, cadeiras) cobrem as mesmas 34 cidades mais povoadas do site
   const hasMarcaCity = (MARCA_CITY_SLUGS as readonly string[]).includes(data.citySlug);
   const hasMarcaSofaCity = hasMarcaCity;
   const hasMarcaColchaoCity = hasMarcaCity;
+  const hasMarcaCadeirasCity = hasMarcaCity;
 
   const resultContent = (SERVICE_RESULT_CONTENT[data.serviceSlug] ?? SERVICE_RESULT_CONTENT['limpeza-sofas'])(data.city);
   const serviceBaseUrl = services.find(s => s.slug === data.serviceSlug)?.baseRoute ?? `/${data.serviceSlug}`;
@@ -911,6 +913,23 @@ const LocationServicePage = () => {
                       <Link
                         key={slug}
                         to={`/limpeza-colchao-${slug}-${data.citySlug}`}
+                        className="inline-flex items-center gap-1.5 bg-white px-3.5 py-2 rounded-full text-sm font-medium text-[#111111] border border-[#E8E4DE] hover:border-[#D4AF37]/40 hover:bg-[#D4AF37]/5 hover:shadow-sm transition-all capitalize"
+                      >
+                        {slug.replace(/-/g, ' ')}
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {hasMarcaCadeirasCity && data.serviceSlug === 'limpeza-cadeiras' && (
+                <div>
+                  <p className="text-[10px] font-bold tracking-[0.26em] uppercase mb-3" style={{ color: "#D4AF37" }}>Marcas de cadeiras {cityPrep} {data.city}</p>
+                  <div className="flex flex-wrap gap-2">
+                    {MARCA_CADEIRAS_SLUGS.map(slug => (
+                      <Link
+                        key={slug}
+                        to={`/limpeza-cadeiras-${slug}-${data.citySlug}`}
                         className="inline-flex items-center gap-1.5 bg-white px-3.5 py-2 rounded-full text-sm font-medium text-[#111111] border border-[#E8E4DE] hover:border-[#D4AF37]/40 hover:bg-[#D4AF37]/5 hover:shadow-sm transition-all capitalize"
                       >
                         {slug.replace(/-/g, ' ')}

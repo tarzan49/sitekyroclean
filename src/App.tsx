@@ -21,6 +21,7 @@ import { getAllKeywordVariantRoutes } from "@/data/keywordVariantRouteData";
 import { getAllPackComboRoutes } from "@/data/packComboData";
 import { getAllMarcaSofaRoutes } from "@/data/marcaSofaData";
 import { getAllMarcaColchaoRoutes } from "@/data/marcaColchaoData";
+import { getAllMarcaCadeirasRoutes } from "@/data/marcaCadeirasData";
 
 // Critical path - load immediately
 import IndexV1 from "./pages/IndexV1";
@@ -55,6 +56,7 @@ const Packs = lazy(() => import("./pages/Packs"));
 const PacksSitemap = lazy(() => import("./pages/PacksSitemap"));
 const MarcaSofaPage = lazy(() => import("./pages/MarcaSofaPage"));
 const MarcaColchaoPage = lazy(() => import("./pages/MarcaColchaoPage"));
+const MarcaCadeirasPage = lazy(() => import("./pages/MarcaCadeirasPage"));
 const Blog = lazy(() => import("./pages/Blog"));
 const BlogPost = lazy(() => import("./pages/BlogPost"));
 const PoliticaPrivacidade = lazy(() => import("./pages/PoliticaPrivacidade"));
@@ -86,6 +88,7 @@ const keywordVariantRoutes = getAllKeywordVariantRoutes();
 const packComboRoutes = getAllPackComboRoutes();
 const marcaSofaRoutes = getAllMarcaSofaRoutes();
 const marcaColchaoRoutes = getAllMarcaColchaoRoutes();
+const marcaCadeirasRoutes = getAllMarcaCadeirasRoutes();
 
 // ── Inner router component, must be inside <BrowserRouter> to use useLocation
 const AppRoutes = () => {
@@ -143,6 +146,10 @@ const AppRoutes = () => {
                 {/* Marca Colchão pages: 6 brands × cities */}
                 {marcaColchaoRoutes.map(route => (
                   <Route key={route.path} path={route.path} element={<MarcaColchaoPage />} />
+                ))}
+                {/* Marca Cadeiras pages: 6 brands × cities */}
+                {marcaCadeirasRoutes.map(route => (
+                  <Route key={route.path} path={route.path} element={<MarcaCadeirasPage />} />
                 ))}
                 {/* Material base pages */}
                 {materialRoutes.map(route => (
