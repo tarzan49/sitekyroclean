@@ -723,3 +723,17 @@ Correções aplicadas: canonical URLs em branco nas 17 páginas core, Breadcrumb
 - Verificação final: script standalone confirmou os 22 preços-base dos 4 packs batem 100% com as fórmulas canónicas.
 
 **Footer.tsx corrigido no fecho da sessão:** texto (descrição, copyright, links legais) usava `text-[#111111]/NN` sobre fundo verde escuro — invisível; trocado para `text-white/NN`. Ícone "≡" trocado por `ChevronRight`. "Limpeza e Lavagem de X" → "Higienização de X". Removida linha de cabeceiras/estrados e bloco de redes sociais (não existem). Descrição da empresa reescrita e movida do meio de uma coluna de links para debaixo do logo (mais legível). Cobertura: "Portugal Continental inteiro".
+
+## Sessão — Audit Formspree/deslocação + baixa preço impermeabilização sofá (2026-08-05)
+
+**Bug reportado pelo user:** emails do Formspree diziam "Deslocação: Grátis (pedido >150€)" mesmo quando o pedido não chegava aos 150€. Investigação confirmou que o cálculo do preço (`use-quiz-pricing.ts`) sempre esteve correto — `finalTravelCost` é sempre o preço fixo da zona (0/5/10/15€), nunca varia com o total do pedido. O bug era só o texto em `QuizForm.tsx:472`, que atribuía a razão errada ("pedido >150€") sempre que a zona tinha custo 0€ (Porto/Lisboa/Faro-Loulé centro). Corrigido para "Grátis (zona sem custo)". A mesma alegação fictícia de "grátis acima de 150€, independente da zona" existia também no painel `/admin/deslocacoes` — banner e coluna removidos (não correspondiam a nenhuma regra real no código).
+
+**Bug adicional encontrado no audit (não relacionado):** `ServicePriceSection.tsx` chamava `useState` depois de um `return null` condicional — viola Rules of Hooks, risco de crash se `serviceSlug` for inválido. Corrigido (hook movido antes do early return).
+
+**Baixa de preço (pedido explícito do user): impermeabilização de sofás −10€ em todo o site:**
+- 1 lugar: 69€ → 59€ | 2 lugares: 89€ → 79€ | 3 lugares: 109€ → 99€ (fonte única `QuizTypes.ts`)
+- Pack Sofá+Impermeabilização 1 lugar: 109€ → 99€ (decisão do user, via pergunta) — sem isto o pack ficava mais caro (109€) que fazer os dois serviços em separado (108€ com o novo preço). Os packs 2L/3L/3L+chaise mantiveram-se (145/169/199€), já ficavam com poupança positiva sem alteração.
+- `originalBothPrice` (preço riscado) recalculado para 1L/2L/3L: 108/148/178€.
+- Atualizadas ~17 referências estáticas de texto (SEO, blog, FAQ, homepage) em 10 ficheiros além do `QuizTypes.ts` e `packComboData.ts` — grep final confirmou zero referências antigas (69/89/109€) ligadas a impermeabilização de sofá.
+
+**2 commits separados** (`fix(quiz): ...` e `fix(pricing): ...`), ainda não fez push para o remoto (Cloudflare Pages faz deploy automático no push a `main` — a confirmar com o user antes).
