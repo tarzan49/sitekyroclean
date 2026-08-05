@@ -127,7 +127,7 @@ function content_higienizacao_colchao(loc: string, ctx: string): ContentBlock {
       { question: `Com que frequência devo higienizar o colchão de um bebé?`, answer: `Para bebés recomendamos a cada 6 meses. A pele do bebé é mais sensível e passa mais tempo em contacto direto com as fibras do que um adulto.` },
       { question: `O colchão fica húmido depois da higienização? Quando posso dormir nele?`, answer: `A higienização não usa grandes quantidades de líquido. Com ventilação normal o colchão fica pronto para dormir no mesmo dia, tipicamente em 3 a 5 horas.` },
       { question: `A higienização funciona em colchões de memory foam e látex?`, answer: `Sim. Adaptamos os produtos e técnicas ao tipo de espuma para não danificar a estrutura interna. O resultado é o mesmo: eliminação de ácaros, patogénicos e odores.` },
-      { question: `Qual o preço de higienização de colchão de casal em ${loc}?`, answer: `A partir de 69€ para casal e 79€ para king size. Deslocamo-nos a ${loc} sem custo adicional. Orçamento gratuito e sem compromisso.` },
+      { question: `Qual o preço de higienização de colchão de casal em ${loc}?`, answer: `A partir de 69€ para casal e 79€ para king size. Deslocação a partir de 5€ a ${loc}, consoante a distância. Orçamento gratuito e sem compromisso.` },
     ],
     problems: [
       { title: "Acordar com olhos vermelhos ou nariz congestionado", description: `Os ácaros do colchão são a causa mais comum de rinite alérgica noturna em ${loc}. O corpo passa 8 horas em contacto direto com o foco de contaminação.` },
@@ -312,7 +312,7 @@ function content_lavagem_colchao(loc: string, ctx: string): ContentBlock {
       { question: `As manchas amareladas de suor saem com a lavagem do colchão?`, answer: `Sim, na grande maioria dos casos. A extração a quente com pré-tratamento enzimático remove manchas amareladas de suor que resistiram a todas as tentativas domésticas.` },
       { question: `A lavagem é segura em colchões de molas e híbridos?`, answer: `Sim. A extração é feita apenas nas camadas de estofamento superior, sem atingir as molas ou a estrutura interna. É segura em qualquer tipo de colchão.` },
       { question: `A lavagem funciona em colchões antigos ou muito usados?`, answer: `Sim. Mesmo colchões com vários anos de uso reagem bem à extração profissional, recuperando frescura e reduzindo alergénios acumulados. Se houver dano estrutural (molas partidas, buracos), a lavagem não resolve esse desgaste, apenas a limpeza e o odor.` },
-      { question: `Quanto custa lavar um colchão king size em ${loc}?`, answer: `A partir de 79€ para king e queen size. Para colchão de solteiro a partir de 49€ e casal a partir de 69€. Deslocamo-nos a ${loc} sem custo adicional.` },
+      { question: `Quanto custa lavar um colchão king size em ${loc}?`, answer: `A partir de 79€ para king e queen size. Para colchão de solteiro a partir de 49€ e casal a partir de 69€. Deslocação a partir de 5€ a ${loc}, consoante a distância.` },
     ],
     problems: [
       { title: "Manchas amareladas de suor que resistiram a tudo", description: "A oxidação do suor cria manchas proteicas que se ligam às fibras com o tempo. A lavagem enzimática a quente é o único método que as remove eficazmente sem danificar o colchão." },

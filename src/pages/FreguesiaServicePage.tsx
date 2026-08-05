@@ -303,7 +303,7 @@ const FreguesiaServicePage = () => {
                     overline="Tabela de Preços"
                     heading={`Quanto custa ${PRICE_HEADING_VERB[data.serviceSlug] ?? data.service.toLowerCase()} em`}
                     goldWord={data.name}
-                    subtitle={`Preços fixos e transparentes, sem surpresas. ${(locationPrices[data.municipio] ?? 0) === 0 ? `Deslocação incluída em toda a área de ${data.municipio}.` : `Deslocação +${locationPrices[data.municipio]}€ a ${data.municipio}.`} Orçamento gratuito antes de qualquer compromisso.`}
+                    subtitle={`Preços fixos e transparentes, sem surpresas. Deslocação +${locationPrices[data.municipio] ?? 5}€ a ${data.municipio}. Orçamento gratuito antes de qualquer compromisso.`}
                   />
                   <div className="hidden md:block">
                     <ServiceTrustDesktop serviceSlug={data.serviceSlug} variant={2} />
@@ -392,9 +392,9 @@ const FreguesiaServicePage = () => {
                     </div>
                     <div className="pt-3 pb-5 border-t space-y-3" style={{ borderColor: "rgba(17,17,17,0.07)" }}>
                       <div className="flex items-center gap-1.5">
-                        <CheckCircle className="w-3.5 h-3.5 flex-shrink-0" style={{ color: (locationPrices[data.municipio] ?? 0) === 0 ? "#25D366" : "rgba(17,17,17,0.25)" }} />
+                        <CheckCircle className="w-3.5 h-3.5 flex-shrink-0" style={{ color: "rgba(17,17,17,0.25)" }} />
                         <span className="text-xs" style={{ color: "rgba(17,17,17,0.45)" }}>
-                          {(locationPrices[data.municipio] ?? 0) === 0 ? `Deslocação incluída em ${data.municipio}` : `+${locationPrices[data.municipio]}€ deslocação a ${data.municipio}`}
+                          +{locationPrices[data.municipio] ?? 5}€ deslocação a {data.municipio}
                         </span>
                       </div>
                       {(() => {

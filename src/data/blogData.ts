@@ -1585,7 +1585,7 @@ const posts: BlogPost[] = [
     sections: [
       {
         heading: "Preços por metro quadrado em Portugal (2025)",
-        body: "A limpeza profissional de alcatifas é calculada por área. Os preços da Kyro Clean começam em 3€/m², para grandes superfícies (escritórios, comércio) o orçamento é personalizado com desconto de volume.\n\n**Exemplos práticos:**\n- Sala com alcatifa de 15m²: cerca de 45€\n- T2 completo com alcatifa (40m²): cerca de 120€\n- Escritório de 80m² ou mais: orçamento personalizado\n\nA deslocação está incluída para a área do Porto. Para outros concelhos aplica-se uma taxa de deslocação.",
+        body: "A limpeza profissional de alcatifas é calculada por área. Os preços da Kyro Clean começam em 3€/m², para grandes superfícies (escritórios, comércio) o orçamento é personalizado com desconto de volume.\n\n**Exemplos práticos:**\n- Sala com alcatifa de 15m²: cerca de 45€\n- T2 completo com alcatifa (40m²): cerca de 120€\n- Escritório de 80m² ou mais: orçamento personalizado\n\nA deslocação custa a partir de 5€ na área do Porto e aumenta com a distância para outros concelhos.",
         tip: "Mede a área antes de pedir orçamento: comprimento × largura de cada divisão com alcatifa. Inclui zonas sob mobiliário que também são limpas.",
       },
       {

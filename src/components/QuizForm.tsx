@@ -166,7 +166,6 @@ const QuizForm = ({
   const {
     calculateServicePrice,
     travelCost,
-    isFreeTravel,
     finalTravelCost,
     totalPrice,
     hasSobOrcamento,
@@ -469,7 +468,7 @@ Serviço: ${serviceLabel}
 Tipo: ${serviceTypeLabel}
 Detalhes: ${detailsSummary}
 Localização: ${finalLocation}
-Deslocação: ${isFreeTravel ? 'Grátis (zona sem custo)' : `${finalTravelCost}€`}
+Deslocação: ${finalTravelCost}€
 VALOR TOTAL: ${priceText}
 Contacto preferido: WhatsApp${formData.email ? `\nEmail: ${formData.email}` : ''}
 

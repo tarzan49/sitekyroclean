@@ -208,7 +208,7 @@ const Blog = () => {
           <div className="container mx-auto px-4 text-center max-w-xl">
             <p className="text-gold text-sm font-bold uppercase tracking-widest mb-3">Pronto para começar?</p>
             <h2 className="font-playfair text-3xl text-white font-bold mb-4">Orçamento gratuito em 2 minutos</h2>
-            <p className="text-white/60 mb-8">Deslocação incluída. Resultado garantido ou devolvemos o dinheiro.</p>
+            <p className="text-white/60 mb-8">Preço transparente, sem surpresas. Resultado garantido ou devolvemos o dinheiro.</p>
             <QuizButton />
           </div>
         </section>

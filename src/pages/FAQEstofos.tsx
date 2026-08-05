@@ -20,8 +20,8 @@ const allFaqs: FAQ[] = [
   {
     id: "quanto-custa-limpar-sofa-porto",
     question: "Quanto custa limpar um sofá no Porto?",
-    answer: <>A <Link to="/limpeza-sofas" className="text-gold hover:underline font-medium">limpeza de sofá no Porto</Link> custa <strong>49€ para sofás de 1 lugar</strong>, 69€ para 2 lugares e 79€ para 3 lugares. Sofás com chaise longue têm um acréscimo de 10€. A deslocação está incluída para o Porto. Para concelhos limítrofes como Matosinhos, Gaia ou Maia aplica-se uma taxa de 5€. Não há custos escondidos: o preço do orçamento é o preço final.</>,
-    plainAnswer: "Limpeza de sofá: 49€ (1 lugar), 69€ (2 lugares), 79€ (3 lugares). Chaise longue: +10€. Deslocação incluída no Porto. Concelhos limítrofes: +5€. Sem custos escondidos.",
+    answer: <>A <Link to="/limpeza-sofas" className="text-gold hover:underline font-medium">limpeza de sofá no Porto</Link> custa <strong>49€ para sofás de 1 lugar</strong>, 69€ para 2 lugares e 79€ para 3 lugares. Sofás com chaise longue têm um acréscimo de 10€. A deslocação custa a partir de 5€ e aumenta com a distância ao centro. Não há custos escondidos: o preço do orçamento é o preço final.</>,
+    plainAnswer: "Limpeza de sofá: 49€ (1 lugar), 69€ (2 lugares), 79€ (3 lugares). Chaise longue: +10€. Deslocação a partir de 5€, consoante a distância. Sem custos escondidos.",
   },
   {
     id: "preco-sofa-3-lugares",
@@ -44,8 +44,8 @@ const allFaqs: FAQ[] = [
   {
     id: "limpeza-em-casa-domicilio",
     question: "A limpeza é feita em casa ou tenho de levar o sofá?",
-    answer: <>A <Link to="/limpeza-sofas" className="text-gold hover:underline font-medium">limpeza de sofás Kyro Clean</Link> é <strong>sempre realizada ao domicílio</strong>: não é necessário deslocar o sofá. Um técnico desloca-se com equipamento profissional completo incluído no preço. O serviço demora 45 a 90 minutos para sofás standard. Não é necessária qualquer preparação da sua parte: não precisa de tirar almofadas, coberturas ou mover móveis adjacentes. A água suja é totalmente aspirada pelo equipamento, o seu pavimento fica seco e protegido. Deslocação incluída no <strong>Porto</strong>. Para Matosinhos, Gaia, Maia, Gondomar e Valongo a taxa é <strong>5€</strong>. Para Póvoa de Varzim, Vila do Conde, Braga e Guimarães a taxa é <strong>10€</strong>. Para Lisboa e área metropolitana a taxa é <strong>15€</strong>.</>,
-    plainAnswer: "Limpeza sempre ao domicílio, sem deslocar o sofá. Técnico chega com equipamento completo. Serviço: 45 a 90 minutos. Porto: deslocação incluída. Matosinhos/Gaia/Maia/Gondomar/Valongo: +5€. Póvoa/Vila do Conde/Braga/Guimarães: +10€. Lisboa e área: +15€.",
+    answer: <>A <Link to="/limpeza-sofas" className="text-gold hover:underline font-medium">limpeza de sofás Kyro Clean</Link> é <strong>sempre realizada ao domicílio</strong>: não é necessário deslocar o sofá. Um técnico desloca-se com equipamento profissional completo incluído no preço. O serviço demora 45 a 90 minutos para sofás standard. Não é necessária qualquer preparação da sua parte: não precisa de tirar almofadas, coberturas ou mover móveis adjacentes. A água suja é totalmente aspirada pelo equipamento, o seu pavimento fica seco e protegido. A deslocação custa a partir de <strong>5€</strong> e aumenta com a distância ao centro — o valor exato aparece no calculador de orçamento antes de confirmar.</>,
+    plainAnswer: "Limpeza sempre ao domicílio, sem deslocar o sofá. Técnico chega com equipamento completo. Serviço: 45 a 90 minutos. Deslocação a partir de 5€, consoante a distância — valor exato no calculador de orçamento.",
   },
   {
     id: "diferenca-higienizacao-limpeza",
@@ -86,14 +86,14 @@ const allFaqs: FAQ[] = [
   {
     id: "servico-fora-porto",
     question: "Fazem limpeza de sofás fora do Porto?",
-    answer: <>Sim. A Kyro Clean serve o <strong>Porto sem custo de deslocação</strong>. Para Matosinhos, Vila Nova de Gaia, Maia, Gondomar e Valongo a taxa de deslocação é de <strong>5€</strong>. Para Póvoa de Varzim, Vila do Conde, Braga e Guimarães a taxa é de <strong>10€</strong>. Para Lisboa, Cascais, Sintra e Oeiras a taxa é de <strong>15€</strong>, com agendamento com pelo menos 48 horas de antecedência. Para zonas fora destas áreas avaliamos caso a caso. O horário de serviço é segunda a sábado, das 8h às 24h.</>,
-    plainAnswer: "Porto: sem custo de deslocação. Matosinhos/Gaia/Maia/Gondomar/Valongo: +5€. Póvoa de Varzim/Vila do Conde/Braga/Guimarães: +10€. Lisboa e área metropolitana: +15€ (agendamento 48h antecedência).",
+    answer: <>Sim. A Kyro Clean serve o <strong>Porto a partir de 5€ de deslocação</strong>. Para Matosinhos, Vila Nova de Gaia, Maia, Gondomar e Valongo a taxa sobe com a distância. Para Lisboa, Cascais, Sintra e Oeiras aplica-se com agendamento com pelo menos 48 horas de antecedência. Para zonas fora destas áreas avaliamos caso a caso. O valor exato aparece no calculador de orçamento. O horário de serviço é segunda a sábado, das 8h às 24h.</>,
+    plainAnswer: "Deslocação a partir de 5€, sobe com a distância ao centro de cada equipa (Porto, Lisboa, Algarve). Lisboa e área: agendamento com 48h de antecedência. Valor exato no calculador de orçamento.",
   },
   {
     id: "quanto-custa-limpar-tapete",
     question: "Quanto custa limpar um tapete profissionalmente?",
-    answer: <>A <Link to="/limpeza-tapetes" className="text-gold hover:underline font-medium">limpeza profissional de tapetes</Link> é calculada por metro quadrado: <strong>12€/m² até 5 m²</strong>, 10€/m² até 10 m² e 9€/m² até 15 m². Exemplo: um tapete de sala de 8 m² custa 90€. Para mais de 15 m², orçamento personalizado. A deslocação está incluída na área do Porto, aplicando-se a mesma tabela de taxas dos restantes serviços fora do Porto. O tapete fica pronto a usar em 2 a 4 horas. Tapetes persas, de seda ou lã natural têm processo adaptado ao material sem acréscimo de preço.</>,
-    plainAnswer: "Limpeza de tapetes: 12€/m² até 5m², 10€/m² até 10m², 9€/m² até 15m². Exemplo: tapete 8m² = 90€. Mais de 15m²: orçamento personalizado. Deslocação incluída no Porto.",
+    answer: <>A <Link to="/limpeza-tapetes" className="text-gold hover:underline font-medium">limpeza profissional de tapetes</Link> é calculada por metro quadrado: <strong>12€/m² até 5 m²</strong>, 10€/m² até 10 m² e 9€/m² até 15 m². Exemplo: um tapete de sala de 8 m² custa 90€. Para mais de 15 m², orçamento personalizado. A deslocação custa a partir de 5€ no Porto e aumenta com a distância, seguindo a mesma tabela dos restantes serviços. O tapete fica pronto a usar em 2 a 4 horas. Tapetes persas, de seda ou lã natural têm processo adaptado ao material sem acréscimo de preço.</>,
+    plainAnswer: "Limpeza de tapetes: 12€/m² até 5m², 10€/m² até 10m², 9€/m² até 15m². Exemplo: tapete 8m² = 90€. Mais de 15m²: orçamento personalizado. Deslocação a partir de 5€.",
   },
   {
     id: "quanto-custa-limpar-alcatifa",

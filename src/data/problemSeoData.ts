@@ -745,7 +745,7 @@ const problemDefinitions: ProblemPage[] = [
     ],
     faqs: [
       { question: "Quanto custa limpar um sofá de 3 lugares?", answer: "A limpeza profissional de um sofá de 3 lugares começa a partir de 49€. O preço final depende do tipo de tecido e estado de sujidade." },
-      { question: "A deslocação tem custo adicional?", answer: "Não. A deslocação está incluída no preço na área metropolitana do Porto e nas principais cidades onde operamos." },
+      { question: "A deslocação tem custo adicional?", answer: "Sim, a partir de 5€, consoante a distância ao centro da área metropolitana do Porto ou das principais cidades onde operamos. O valor exato aparece no orçamento antes de confirmar." },
       { question: "Existem packs com desconto?", answer: "Sim. Oferecemos packs de limpeza + impermeabilização com desconto até 15%. Também temos desconto para limpeza de múltiplos itens na mesma visita." },
       { question: "Como posso pedir orçamento?", answer: "Peça orçamento gratuito através do nosso formulário online, WhatsApp ou telefone. Respondemos em menos de 30 minutos." },
     ],
@@ -844,7 +844,7 @@ const problemDefinitions: ProblemPage[] = [
     category: "metodo",
     keyword: "limpeza de sofá ao domicílio",
     title: "Limpeza de Sofá ao Domicílio | Porto e Arredores | Kyro",
-    metaDescription: "Limpeza profissional de sofá ao domicílio no Porto e arredores. Equipamento de extração profissional. Sem deslocação extra. Desde 49€. Orçamento grátis.",
+    metaDescription: "Limpeza profissional de sofá ao domicílio no Porto e arredores. Equipamento de extração profissional. Deslocação a partir de 5€. Desde 49€. Orçamento grátis.",
     h1: "Limpeza de Sofá ao Domicílio no Porto e Arredores",
     intro: "Não precisa transportar o sofá para lado nenhum. A equipa da Kyro Clean Solutions desloca-se à sua casa com todo o equipamento profissional necessário para uma limpeza perfeita ao domicílio.",
     problemDetail: "Muitas pessoas adiam a limpeza do sofá por pensarem que é necessário transportá-lo. Com o nosso serviço ao domicílio, todo o processo é feito no conforto da sua casa, sem complicações.",
@@ -858,7 +858,7 @@ const problemDefinitions: ProblemPage[] = [
       "Resultado imediato",
     ],
     faqs: [
-      { question: "A deslocação ao domicílio tem custo extra?", answer: "Não. A deslocação está incluída no preço na área metropolitana do Porto e nas principais cidades onde operamos." },
+      { question: "A deslocação ao domicílio tem custo extra?", answer: "Sim, a partir de 5€, consoante a distância ao centro da área metropolitana do Porto ou das principais cidades onde operamos. O valor exato aparece no orçamento antes de confirmar." },
       { question: "Precisam de acesso a água ou eletricidade?", answer: "Sim, precisamos de acesso a uma torneira de água e uma tomada elétrica. A nossa equipa trata de tudo o resto." },
     ],
     relatedProblems: ["limpeza-profunda-sofa", "preco-limpeza-sofa", "limpeza-sofa-urgente"],
@@ -1342,8 +1342,8 @@ const problemDefinitions: ProblemPage[] = [
     h1: "Limpeza de Sofá Perto de Si: Serviço ao Domicílio",
     intro: "Procura limpeza de sofá perto de si? A Kyro Clean Solutions cobre Porto, Lisboa e todo o Norte de Portugal com serviço ao domicílio. A nossa equipa desloca-se até à sua casa com todo o equipamento.",
     problemDetail: "Quando pesquisa 'limpeza de sofá perto de mim', quer um serviço local, fiável e com boas avaliações. A Kyro Clean Solutions tem 5.0 no Google, +1000 clientes satisfeitos e cobertura em todo o Norte de Portugal e região de Lisboa.",
-    solutionDetail: "Atuamos no Porto e em Matosinhos, Maia, Gaia, Gondomar, Valongo, Braga, Guimarães, Póvoa de Varzim, Vila do Conde, Lisboa, Cascais, Oeiras, Sintra, Almada e Setúbal. Deslocação incluída no preço.",
-    benefits: ["Cobertura Norte de Portugal + Lisboa", "5.0 Google", "+1000 clientes satisfeitos", "Deslocação incluída", "Desde 49€", "Resposta em menos de 30 minutos"],
+    solutionDetail: "Atuamos no Porto e em Matosinhos, Maia, Gaia, Gondomar, Valongo, Braga, Guimarães, Póvoa de Varzim, Vila do Conde, Lisboa, Cascais, Oeiras, Sintra, Almada e Setúbal. Deslocação a partir de 5€, consoante a distância.",
+    benefits: ["Cobertura Norte de Portugal + Lisboa", "5.0 Google", "+1000 clientes satisfeitos", "Deslocação a partir de 5€", "Desde 49€", "Resposta em menos de 30 minutos"],
     faqs: [
       { question: "Em que cidades fazem limpeza de sofá?", answer: "Servimos Porto e toda a área metropolitana, Braga, Guimarães, e região de Lisboa (Cascais, Oeiras, Sintra, Almada, Setúbal). Contacte-nos para confirmar disponibilidade na sua zona." },
     ],

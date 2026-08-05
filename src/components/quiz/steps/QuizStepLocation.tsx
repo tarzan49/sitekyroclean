@@ -81,7 +81,7 @@ const QuizStepLocation = ({
                   >
                     <span className="font-medium text-white text-sm">{city}</span>
                     <span className="text-[11px] text-gold/60">
-                      {locationPrices[city] === 0 ? 'Deslocação grátis' : `+${locationPrices[city]}€`}
+                      +{locationPrices[city]}€
                     </span>
                   </button>
                 ))}

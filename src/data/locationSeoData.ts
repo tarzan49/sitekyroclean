@@ -2,28 +2,29 @@
 // Each city × service combination has unique content to avoid duplicate content penalties
 // locationPrices duplicado aqui (sem import @/) para compatibilidade com scripts/prerender.ts (Node.js sem alias Vite)
 // Três equipas locais, três sistemas de zonas independentes (Porto/Norte, Lisboa/AML, Algarve)
+// Sem zona grátis: mínimo 5€ sempre, sobe com a distância ao centro de cada equipa.
 const locationPrices: Record<string, number> = {
   // ── Porto/Norte ──
-  'Porto': 0, 'Matosinhos': 0,
-  'Vila Nova de Gaia': 5, 'Maia': 5, 'Gondomar': 5,
-  'Valongo': 10, 'Espinho': 10, 'Póvoa de Varzim': 10, 'Vila do Conde': 10,
-  'Santo Tirso': 10, 'Trofa': 10, 'Paredes': 10,
-  'Penafiel': 15, 'Paços de Ferreira': 15, 'Felgueiras': 15, 'Lousada': 15,
-  'Arouca': 20, 'Braga': 20, 'Aveiro': 20,
-  'Guimarães': 25,
+  'Porto': 5, 'Matosinhos': 5,
+  'Vila Nova de Gaia': 10, 'Maia': 10, 'Gondomar': 10,
+  'Valongo': 15, 'Espinho': 15, 'Póvoa de Varzim': 15, 'Vila do Conde': 15,
+  'Santo Tirso': 15, 'Trofa': 15, 'Paredes': 15,
+  'Penafiel': 20, 'Paços de Ferreira': 20, 'Felgueiras': 20, 'Lousada': 20,
+  'Arouca': 25, 'Braga': 25, 'Aveiro': 25,
+  'Guimarães': 30,
   // ── Lisboa / Área Metropolitana (equipa local) ──
-  'Lisboa': 0,
-  'Amadora': 5, 'Odivelas': 5, 'Oeiras': 5,
-  'Cascais': 10, 'Sintra': 10, 'Loures': 10, 'Almada': 10, 'Seixal': 10,
-  'Vila Franca de Xira': 15, 'Barreiro': 15, 'Moita': 15, 'Mafra': 15,
-  'Setúbal': 20, 'Montijo': 20, 'Alcochete': 20, 'Palmela': 20, 'Sesimbra': 20,
+  'Lisboa': 5,
+  'Amadora': 10, 'Odivelas': 10, 'Oeiras': 10,
+  'Cascais': 15, 'Sintra': 15, 'Loures': 15, 'Almada': 15, 'Seixal': 15,
+  'Vila Franca de Xira': 20, 'Barreiro': 20, 'Moita': 20, 'Mafra': 20,
+  'Setúbal': 25, 'Montijo': 25, 'Alcochete': 25, 'Palmela': 25, 'Sesimbra': 25,
   // ── Algarve (equipa local) ──
-  'Faro': 0, 'Loulé': 0,
-  'Albufeira': 5, 'São Brás de Alportel': 5, 'Olhão': 5,
-  'Silves': 10, 'Lagoa': 10, 'Tavira': 10,
-  'Portimão': 15, 'Lagos': 15,
-  'Vila Real de Santo António': 20, 'Castro Marim': 20, 'Monchique': 20,
-  'Aljezur': 25, 'Vila do Bispo': 25, 'Alcoutim': 25,
+  'Faro': 5, 'Loulé': 5,
+  'Albufeira': 10, 'São Brás de Alportel': 10, 'Olhão': 10,
+  'Silves': 15, 'Lagoa': 15, 'Tavira': 15,
+  'Portimão': 20, 'Lagos': 20,
+  'Vila Real de Santo António': 25, 'Castro Marim': 25, 'Monchique': 25,
+  'Aljezur': 30, 'Vila do Bispo': 30, 'Alcoutim': 30,
 };
 
 export interface LocationService {
@@ -157,11 +158,11 @@ function generateSofaContent(city: string, cityDesc: string): Omit<LocationServi
       "Tratamento adaptado a cada tecido: algodão, linho, veludo, microfibra, chenille ou couro",
       "Remoção de manchas de vinho, café, gordura e urina de animais de estimação",
       "Eliminação de até 99% dos ácaros, bactérias e fungos do estofo",
-      `Equipa móvel que se desloca a casas e empresas ${prep} ${city} sem custo extra de deslocação`,
+      `Equipa móvel que se desloca a casas e empresas ${prep} ${city}, com deslocação calculada pela distância`,
       "Sofá seco e pronto a usar em poucas horas, sem químicos agressivos",
       `Conhecemos bem as necessidades de quem vive ${prep} ${city}, ${cityDesc}, e adaptamos o horário à sua disponibilidade`,
     ],
-    localSection: `Servimos toda a área de ${city} e arredores, incluindo as principais freguesias e zonas residenciais. A nossa equipa desloca-se diretamente à sua casa ${prep} ${city}${(locationPrices[city] ?? 0) === 0 ? ', sem custos adicionais de deslocação' : ` com taxa de deslocação de ${locationPrices[city]}€`}. Atendemos clientes residenciais e comerciais: escritórios, restaurantes, hotéis e clínicas ${prep} ${city}.`,
+    localSection: `Servimos toda a área de ${city} e arredores, incluindo as principais freguesias e zonas residenciais. A nossa equipa desloca-se diretamente à sua casa ${prep} ${city} com taxa de deslocação de ${locationPrices[city] ?? 5}€. Atendemos clientes residenciais e comerciais: escritórios, restaurantes, hotéis e clínicas ${prep} ${city}.`,
     faqs: [
       { question: `Quanto custa a limpeza de sofá ${prep} ${city}?`, answer: `A limpeza de sofá ${prep} ${city} começa a partir de 49€ para sofás de 1 lugar. O preço varia conforme o tamanho, tipo de tecido e estado de sujidade. Peça orçamento gratuito sem compromisso.` },
       { question: `Quanto tempo demora a limpeza do sofá ${prep} ${city}?`, answer: `O serviço de limpeza de sofá ao domicílio ${prep} ${city} demora entre 1 a 3 horas, dependendo do tamanho e estado do sofá. O sofá fica pronto a usar em 4-6 horas após a limpeza.` },
@@ -196,7 +197,7 @@ function generateColchaoContent(city: string, cityDesc: string): Omit<LocationSe
       `Serviço ao domicílio ${prep} ${city}, sem necessidade de desmontar a cama`,
       `Ideal para famílias e alérgicos ${prep} ${city} que procuram noites de sono mais saudáveis`,
     ],
-    localSection: `A nossa equipa de higienização de colchões cobre toda a área de ${city} e arredores. Atendemos residências, hotéis, residências seniores e alojamentos locais ${prep} ${city}. ${(locationPrices[city] ?? 0) === 0 ? 'Deslocação incluída sem custos adicionais.' : `Taxa de deslocação de ${locationPrices[city]}€.`}`,
+    localSection: `A nossa equipa de higienização de colchões cobre toda a área de ${city} e arredores. Atendemos residências, hotéis, residências seniores e alojamentos locais ${prep} ${city}. Taxa de deslocação de ${locationPrices[city] ?? 5}€.`,
     faqs: [
       { question: `Quanto custa a limpeza de colchão ${prep} ${city}?`, answer: `A higienização de colchão ${prep} ${city} começa a partir de 49€ para colchão de solteiro. Colchões de casal têm preços a partir de 69€. Contacte-nos para orçamento personalizado.` },
       { question: `A limpeza de colchão remove ácaros?`, answer: `Sim. O nosso processo de higienização profissional elimina até 99% dos ácaros, bactérias e fungos presentes no colchão, ideal para quem sofre de alergias.` },

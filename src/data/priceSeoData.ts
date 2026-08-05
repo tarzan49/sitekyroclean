@@ -118,13 +118,13 @@ const priceFaqs: Record<string, { question: string; answer: string }[]> = {
   "limpeza-sofas": [
     { question: "Quanto custa limpar um sofá em {city}?", answer: "A limpeza de sofás em {city} começa a partir de 69€ para sofás de 2 lugares. O preço final depende do tamanho, tipo de tecido e estado do sofá. Peça um orçamento grátis para saber o preço exato." },
     { question: "O orçamento é gratuito?", answer: "Sim, todos os nossos orçamentos são 100% gratuitos e sem compromisso. Pode pedir por WhatsApp, telefone ou através do nosso formulário online." },
-    { question: "Há custos adicionais de deslocação em {city}?", answer: "Não. A deslocação em {city} e arredores está incluída no preço do serviço. Não cobramos taxa de deslocação." },
+    { question: "Há custos adicionais de deslocação em {city}?", answer: "A deslocação em {city} e arredores custa a partir de 5€, consoante a distância ao centro. O valor exato é mostrado no orçamento antes de confirmar." },
     { question: "Oferecem descontos para múltiplas peças?", answer: "Sim! Se combinar vários serviços (ex: sofá + colchão + cadeiras) aplicamos desconto no valor total. Peça um orçamento personalizado." },
   ],
   "limpeza-colchoes": [
     { question: "Quanto custa limpar um colchão em {city}?", answer: "A limpeza de colchões em {city} começa a partir de 49€ para colchões de solteiro e 69€ para colchões de casal. O preço depende do tamanho e estado do colchão." },
     { question: "O preço inclui anti-ácaros?", answer: "Sim, o nosso serviço standard inclui tratamento anti-ácaros. Para tratamentos intensivos, pode haver um suplemento." },
-    { question: "A deslocação em {city} tem custo?", answer: "Não. A deslocação está incluída no preço do serviço em {city} e arredores." },
+    { question: "A deslocação em {city} tem custo?", answer: "Sim, a partir de 5€ em {city} e arredores, consoante a distância ao centro. O valor exato é mostrado no orçamento antes de confirmar." },
   ],
   "limpeza-tapetes": [
     { question: "Quanto custa limpar um tapete em {city}?", answer: "A limpeza de tapetes em {city} começa a partir de 12€/m². Tapetes artesanais, persas ou de seda podem ter preços especiais. Peça orçamento gratuito." },

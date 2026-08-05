@@ -314,7 +314,7 @@ const LocationServicePage = () => {
                     overline="Tabela de Preços"
                     heading={`Quanto custa ${PRICE_HEADING_VERB[data.serviceSlug] ?? data.service.toLowerCase()} ${cityPrep}`}
                     goldWord={data.city}
-                    subtitle={`Preços fixos e transparentes, sem surpresas. ${(locationPrices[data.city] ?? 0) === 0 ? `Deslocação incluída em toda a área de ${data.city}.` : `Deslocação +${locationPrices[data.city]}€ a ${data.city}.`} Orçamento gratuito antes de qualquer compromisso.`}
+                    subtitle={`Preços fixos e transparentes, sem surpresas. Deslocação +${locationPrices[data.city] ?? 5}€ a ${data.city}. Orçamento gratuito antes de qualquer compromisso.`}
                   />
                   {/* Trust facts — desktop only (variante 1) */}
                   <div className="hidden md:block">
@@ -338,14 +338,9 @@ const LocationServicePage = () => {
                       Resposta em menos de 30 min · Deslocação ao domicílio
                     </p>
                     <div className="mt-3 pt-3" style={{ borderTop: "1px solid rgba(255,255,255,0.07)" }}>
-                      {(() => {
-                        const fee = locationPrices[data.city] ?? 0;
-                        return (
-                          <p className="text-[10px]" style={{ color: fee === 0 ? "rgba(37,211,102,0.60)" : "rgba(255,255,255,0.26)" }}>
-                            {fee === 0 ? `Deslocação incluída em ${data.city}` : `+${fee}€ deslocação a ${data.city}`}
-                          </p>
-                        );
-                      })()}
+                      <p className="text-[10px]" style={{ color: "rgba(255,255,255,0.26)" }}>
+                        +{locationPrices[data.city] ?? 5}€ deslocação a {data.city}
+                      </p>
                     </div>
                   </div>
 
@@ -530,15 +525,15 @@ const LocationServicePage = () => {
                       const total = calcWidgetTotal(data.serviceSlug, rowQuantities, chaiseLongueAddon);
                       const discountActive = total >= WIDGET_DISCOUNT_THRESHOLD;
                       const discountedTotal = Math.round(total * 0.9);
-                      const fee = locationPrices[data.city] ?? 0;
+                      const fee = locationPrices[data.city] ?? 5;
                       const hasAnySelection = total > 0 || Object.values(rowQuantities).some(q => q > 0) || chaiseLongueAddon > 0;
                       return (
                         <div className="bg-white px-5 pt-3 pb-5 space-y-3">
                           {/* Deslocação */}
                           <div className="flex items-center gap-1.5">
-                            <CheckCircle className="w-3.5 h-3.5" style={{ color: fee === 0 ? "#25D366" : "rgba(17,17,17,0.25)" }} />
+                            <CheckCircle className="w-3.5 h-3.5" style={{ color: "rgba(17,17,17,0.25)" }} />
                             <span className="text-xs" style={{ color: "rgba(17,17,17,0.45)" }}>
-                              {fee === 0 ? `Deslocação incluída em ${data.city}` : `+${fee}€ deslocação a ${data.city}`}
+                              +{fee}€ deslocação a {data.city}
                             </span>
                           </div>
 

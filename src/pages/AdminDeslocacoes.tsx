@@ -28,7 +28,7 @@ export default function AdminDeslocacoes() {
         </div>
 
         <div className="bg-white/[0.03] border border-white/10 rounded-xl p-4 mb-6 text-sm text-white/50">
-          A deslocação é sempre o preço fixo da zona. <strong className="text-white/70">Nunca é gratuita nem varia</strong> com o valor do pedido — só é 0€ nas zonas marcadas "Grátis" abaixo (Porto, Lisboa e Faro/Loulé centro).
+          A deslocação é sempre o preço fixo da zona. <strong className="text-white/70">Nunca é gratuita nem varia</strong> com o valor do pedido — mínimo 5€, sobe quanto mais afastado do centro de cada equipa.
         </div>
 
         {REGIONS.map(region => {
@@ -51,9 +51,7 @@ export default function AdminDeslocacoes() {
                   <div key={price} className={`border rounded-xl p-4 ${ZONE_COLORS[i % ZONE_COLORS.length]}`}>
                     <div className="flex items-center justify-between mb-3">
                       <span className="font-semibold text-white/90 text-sm">Zona {i}</span>
-                      <span className="font-mono font-bold text-base">
-                        {price === 0 ? <span className="text-emerald-400">Grátis</span> : <span className="text-gold">{price}€</span>}
-                      </span>
+                      <span className="font-mono font-bold text-base text-gold">{price}€</span>
                     </div>
                     <div className="flex flex-wrap gap-2">
                       {byPrice[price].map((city) => (
@@ -81,11 +79,7 @@ export default function AdminDeslocacoes() {
               {Object.entries(locationPrices).map(([city, price]) => (
                 <tr key={city} className="border-b border-white/[0.05] hover:bg-white/[0.03]">
                   <td className="px-4 py-2.5 text-white/80">{city}</td>
-                  <td className="px-4 py-2.5 text-right font-mono font-medium">
-                    {price === 0
-                      ? <span className="text-emerald-400">Grátis</span>
-                      : <span className="text-gold">{price}€</span>}
-                  </td>
+                  <td className="px-4 py-2.5 text-right font-mono font-medium text-gold">{price}€</td>
                 </tr>
               ))}
             </tbody>

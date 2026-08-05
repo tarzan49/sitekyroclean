@@ -74,13 +74,14 @@ export function useQuizPricing(
     return price;
   }, [formData, sofaItems, mattressItems]);
 
-  // Calculate travel cost: uses expanded locationPrices from QuizTypes
+  // Calculate travel cost: uses expanded locationPrices from QuizTypes.
+  // Mínimo é sempre 5€ (sem zona grátis) — usado também como fallback para
+  // localização ainda não escolhida ou "outra" fora da tabela de zonas.
   const travelCost = useMemo(() => {
-    if (!formData.location || formData.location === 'other') return 0;
-    return locationPrices[formData.location] ?? 0;
+    if (!formData.location || formData.location === 'other') return 5;
+    return locationPrices[formData.location] ?? 5;
   }, [formData.location]);
 
-  const isFreeTravel = travelCost === 0;
   const finalTravelCost = travelCost;
 
   const safePrice = (n: number) => (isNaN(n) || n == null) ? 0 : n;
@@ -102,7 +103,6 @@ export function useQuizPricing(
   return {
     calculateServicePrice,
     travelCost,
-    isFreeTravel,
     finalTravelCost,
     totalPrice,
     hasSobOrcamento,

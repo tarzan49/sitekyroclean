@@ -229,7 +229,7 @@ const BlogPost = () => {
               Precisa de ajuda profissional?
             </h3>
             <p className="text-white/60 text-sm mb-6 max-w-md mx-auto">
-              Orçamento gratuito em 2 minutos. Deslocação ao domicílio incluída na área do Porto.
+              Orçamento gratuito em 2 minutos. Deslocação a partir de 5€ na área do Porto.
             </p>
             <QuizButton />
           </div>
