@@ -71,9 +71,9 @@ export const PRICE_TABLE: Record<string, { item: string; price: string }[]> = {
     { item: 'Alcatifas (m²)',           price: '3€/m²' },
   ],
   'impermeabilizacao': [
-    { item: 'Sofá 1 lugar',            price: '69€' },
-    { item: 'Sofá 2 lugares',          price: '89€' },
-    { item: 'Sofá 3 lugares',          price: '109€' },
+    { item: 'Sofá 1 lugar',            price: '59€' },
+    { item: 'Sofá 2 lugares',          price: '79€' },
+    { item: 'Sofá 3 lugares',          price: '99€' },
     { item: 'Sofá de 4+ lugares',        price: 'Sob orçamento' },
     { item: 'Chaise longue (add-on)',  price: '+25€' },
     { item: 'Cadeiras',               price: '25€/cad' },

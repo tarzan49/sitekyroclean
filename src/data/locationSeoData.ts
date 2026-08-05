@@ -116,7 +116,7 @@ export const services = [
   { name: "Limpeza de Tapetes", slug: "limpeza-tapetes", baseRoute: "/limpeza-tapetes", priceFrom: "12€/m²", icon: "carpet" },
   { name: "Limpeza de Cadeiras", slug: "limpeza-cadeiras", baseRoute: "/limpeza-cadeiras", priceFrom: "20€", icon: "chair" },
   { name: "Limpeza de Alcatifas", slug: "limpeza-alcatifas", baseRoute: "/limpeza-alcatifas", priceFrom: "3€/m²", icon: "rug" },
-  { name: "Impermeabilização", slug: "impermeabilizacao", baseRoute: "/impermeabilizacao", priceFrom: "69€", icon: "waterproof" },
+  { name: "Impermeabilização", slug: "impermeabilizacao", baseRoute: "/impermeabilizacao", priceFrom: "59€", icon: "waterproof" },
 ] as const;
 
 // Cities that take a definite article in Portuguese ("no Porto", "na Amadora"); everything else reads naturally with "em"
@@ -326,7 +326,7 @@ function generateImpermeabilizacaoContent(city: string, cityDesc: string): Omit<
     ],
     localSection: `Oferecemos impermeabilização de estofos ${prep} ${city} e toda a região envolvente. Ideal combinar com limpeza profissional: peça pack completo com desconto.`,
     faqs: [
-      { question: `Quanto custa impermeabilizar um sofá ${prep} ${city}?`, answer: `A impermeabilização de sofás ${prep} ${city} custa 69€ (1 lugar), 89€ (2 lugares) e 109€ (3 lugares). O pack limpeza + impermeabilização numa única visita começa em 109€ para 1 lugar. Orçamento gratuito ${prep} ${city}.` },
+      { question: `Quanto custa impermeabilizar um sofá ${prep} ${city}?`, answer: `A impermeabilização de sofás ${prep} ${city} custa 59€ (1 lugar), 79€ (2 lugares) e 99€ (3 lugares). O pack limpeza + impermeabilização numa única visita começa em 99€ para 1 lugar. Orçamento gratuito ${prep} ${city}.` },
       { question: `A impermeabilização altera a textura do sofá?`, answer: `Não. O nosso produto de impermeabilização é completamente invisível e não altera a cor, textura ou respirabilidade do tecido.` },
       { question: `Quanto tempo dura a impermeabilização?`, answer: `A nossa impermeabilização profissional dura entre 5 a 10 anos, dependendo do uso e tipo de tecido. Oferecemos garantia incluída.` },
       { question: `Vale a pena impermeabilizar o sofá?`, answer: `Sim, especialmente se tem crianças ou animais. A impermeabilização previne manchas e facilita a limpeza, poupando centenas de euros em substituição de estofos a longo prazo.` },

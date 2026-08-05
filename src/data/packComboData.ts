@@ -192,10 +192,10 @@ export const packs: PackCombo[] = [
         // price = se feito em 2 visitas separadas (limpeza + impermeab.)
         // packPrice = preço VIP numa única visita (= quiz bothPrice)
         options: [
-          { id: '1-lugar',   label: '1 Lugar',    sublabel: 'Sofá pequeno / poltrona', price: 118, packPrice: 109 },
-          { id: '2-lugares', label: '2 Lugares',  sublabel: 'Sofá standard',           price: 158, packPrice: 145 },
-          { id: '3-lugares', label: '3 Lugares',  sublabel: 'Sofá grande / familiar',  price: 188, packPrice: 169 },
-          { id: '3l-chaise', label: '3L + Chaise',sublabel: 'Com chaise longue',        price: 223, packPrice: 199 },
+          { id: '1-lugar',   label: '1 Lugar',    sublabel: 'Sofá pequeno / poltrona', price: 108, packPrice: 99 },
+          { id: '2-lugares', label: '2 Lugares',  sublabel: 'Sofá standard',           price: 148, packPrice: 145 },
+          { id: '3-lugares', label: '3 Lugares',  sublabel: 'Sofá grande / familiar',  price: 178, packPrice: 169 },
+          { id: '3l-chaise', label: '3L + Chaise',sublabel: 'Com chaise longue',        price: 213, packPrice: 199 },
         ],
       },
     ],

@@ -712,7 +712,7 @@ const problemDefinitions: ProblemPage[] = [
       "Prolonga vida do sofá",
     ],
     faqs: [
-      { question: "Quanto custa impermeabilizar o sofá?", answer: "A impermeabilização de sofás custa 69€ (1 lugar), 89€ (2 lugares) e 109€ (3 lugares). O pack limpeza + impermeabilização começa em 109€ para 1 lugar." },
+      { question: "Quanto custa impermeabilizar o sofá?", answer: "A impermeabilização de sofás custa 59€ (1 lugar), 79€ (2 lugares) e 99€ (3 lugares). O pack limpeza + impermeabilização começa em 99€ para 1 lugar." },
       { question: "A impermeabilização altera o tecido?", answer: "Não. O nosso produto é completamente invisível e não altera a cor, textura, toque ou respirabilidade do tecido." },
       { question: "Quanto tempo dura a impermeabilização?", answer: "A nossa impermeabilização profissional dura entre 5 a 10 anos, dependendo do uso e tipo de tecido." },
     ],
@@ -734,7 +734,7 @@ const problemDefinitions: ProblemPage[] = [
     h1: "Quanto Custa Limpar um Sofá Profissionalmente?",
     intro: "Está a pesquisar preços de limpeza de sofá? Os preços da Kyro Clean Solutions começam a partir de 49€ para sofás de 1 lugar (69€ para 2 lugares), com opções de impermeabilização e packs com desconto.",
     problemDetail: "Os preços de limpeza de sofá variam conforme vários fatores: tamanho do sofá (2, 3 ou mais lugares), tipo de tecido, estado de sujidade, tipo de manchas e serviços adicionais como impermeabilização. Muitas empresas não são transparentes com preços, mas na Kyro acreditamos em transparência.",
-    solutionDetail: "Oferecemos preços transparentes e competitivos: sofá de 1 lugar desde 49€, sofá de 2 lugares desde 69€, sofá de 3 lugares desde 79€, sofá em L desde 99€. Impermeabilização adicional desde 69€. Packs de limpeza + impermeabilização com desconto. Orçamento personalizado gratuito e sem compromisso.",
+    solutionDetail: "Oferecemos preços transparentes e competitivos: sofá de 1 lugar desde 49€, sofá de 2 lugares desde 69€, sofá de 3 lugares desde 79€, sofá em L desde 99€. Impermeabilização adicional desde 59€. Packs de limpeza + impermeabilização com desconto. Orçamento personalizado gratuito e sem compromisso.",
     benefits: [
       "Preços transparentes desde 49€",
       "Orçamento gratuito sem compromisso",

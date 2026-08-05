@@ -25,7 +25,7 @@ const priceTables: Record<string, { item: string; price: string; note?: string }
     { item: "Sofá 3 lugares", price: "Desde 79€" },
     { item: "Sofá 4-5 lugares", price: "Desde 89€" },
     { item: "Sofá em L", price: "Desde 99€" },
-    { item: "Impermeabilização", price: "Desde 69€", note: "add-on recomendado" },
+    { item: "Impermeabilização", price: "Desde 59€", note: "add-on recomendado" },
   ],
   "limpeza-colchoes": [
     { item: "Colchão Solteiro", price: "Desde 49€" },
@@ -54,9 +54,9 @@ const priceTables: Record<string, { item: string; price: string; note?: string }
     { item: "Alcatifa +40m²", price: "Sob consulta" },
   ],
   "impermeabilizacao": [
-    { item: "Sofá 1 lugar", price: "Desde 69€" },
-    { item: "Sofá 2 lugares", price: "Desde 89€" },
-    { item: "Sofá 3 lugares", price: "Desde 109€" },
+    { item: "Sofá 1 lugar", price: "Desde 59€" },
+    { item: "Sofá 2 lugares", price: "Desde 79€" },
+    { item: "Sofá 3 lugares", price: "Desde 99€" },
     { item: "Cadeiras (por unidade)", price: "Desde 25€" },
     { item: "Tapete (por m²)", price: "Desde 10€/m²" },
     { item: "Cabeceira", price: "Desde 15€" },
@@ -138,7 +138,7 @@ const priceFaqs: Record<string, { question: string; answer: string }[]> = {
     { question: "Quanto custa limpar alcatifas em {city}?", answer: "A limpeza de alcatifas em {city} começa a partir de 3€/m². O preço depende da área total e estado da alcatifa." },
   ],
   "impermeabilizacao": [
-    { question: "Quanto custa impermeabilizar um sofá em {city}?", answer: "A impermeabilização de sofás em {city} custa desde 69€ (1 lugar), 89€ (2 lugares) e 109€ (3 lugares). Recomendamos combinar com limpeza para melhor resultado e preço especial." },
+    { question: "Quanto custa impermeabilizar um sofá em {city}?", answer: "A impermeabilização de sofás em {city} custa desde 59€ (1 lugar), 79€ (2 lugares) e 99€ (3 lugares). Recomendamos combinar com limpeza para melhor resultado e preço especial." },
     { question: "A impermeabilização vale a pena?", answer: "Sim. A impermeabilização protege contra manchas de líquidos e prolonga a vida útil do estofamento. É especialmente recomendada para famílias com crianças ou animais." },
   ],
 };

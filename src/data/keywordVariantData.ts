@@ -45,7 +45,7 @@ interface ContentBlock {
 const SERVICE_META: Record<ServiceKey, {
   label: string; labelPlural: string; canonicalBase: string; priceFrom: string; waterproofPriceFrom?: string;
 }> = {
-  sofa:      { label: 'Sofá',      labelPlural: 'Sofás',      canonicalBase: 'limpeza-sofas',     priceFrom: '49€',     waterproofPriceFrom: '69€'      },
+  sofa:      { label: 'Sofá',      labelPlural: 'Sofás',      canonicalBase: 'limpeza-sofas',     priceFrom: '49€',     waterproofPriceFrom: '59€'      },
   colchao:   { label: 'Colchão',   labelPlural: 'Colchões',   canonicalBase: 'limpeza-colchoes',  priceFrom: '49€' },
   tapetes:   { label: 'Tapetes',   labelPlural: 'Tapetes',    canonicalBase: 'limpeza-tapetes',   priceFrom: '12€/m²'                                    },
   cadeiras:  { label: 'Cadeiras',  labelPlural: 'Cadeiras',   canonicalBase: 'limpeza-cadeiras',  priceFrom: '20€',     waterproofPriceFrom: '25€/cad.'    },
@@ -460,7 +460,7 @@ function content_impermeabilizacao_sofa(loc: string, ctx: string): ContentBlock 
       { question: `Quanto tempo dura a impermeabilização de um sofá?`, answer: `Com uso normal, a proteção dura 2 a 5 anos. Em famílias com crianças ou animais de estimação, onde há mais probabilidade de derrames, recomendamos reaplicação ao fim de 2 anos.` },
       { question: `Preciso de limpar o sofá antes de o impermeabilizar?`, answer: `Sim, e é altamente recomendado. Aplicar impermeabilização sobre tecido sujo reduz significativamente a eficácia e duração da barreira. Oferecemos o pack limpeza + impermeabilização com desconto em ${loc}.` },
       { question: `A impermeabilização funciona em sofás de veludo, pele e microfibra?`, answer: `Sim. Adaptamos a formulação ao tipo de tecido. Para veludo e tecidos delicados usamos produtos específicos que preservam a textura e o brilho característico do material.` },
-      { question: `Qual a diferença de preço entre só impermeabilizar e fazer o pack limpeza + impermeabilização?`, answer: `Só impermeabilização: 69€ (1L), 89€ (2L), 109€ (3L). Pack com limpeza: 109€ (1L), 145€ (2L), 169€ (3L). O pack representa uma poupança considerável e garante maior eficácia da proteção.` },
+      { question: `Qual a diferença de preço entre só impermeabilizar e fazer o pack limpeza + impermeabilização?`, answer: `Só impermeabilização: 59€ (1L), 79€ (2L), 99€ (3L). Pack com limpeza: 99€ (1L), 145€ (2L), 169€ (3L). O pack representa uma poupança considerável e garante maior eficácia da proteção.` },
     ],
     problems: [
       { title: "Sofá novo que quer proteger desde o início", description: "É muito mais fácil e económico proteger do que tratar manchas após o facto. Uma aplicação cria uma barreira invisível que dura 2 a 5 anos sem alterar o toque ou a cor." },
