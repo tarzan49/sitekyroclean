@@ -268,25 +268,24 @@ const MarcaColchaoPage = () => {
         </section>
 
         {/* ═══ PROCESSO ═══ */}
-        <section className="py-14 md:py-20 bg-checker-dark">
+        <section className="py-14 md:py-20 bg-[#FDFDF9]">
           <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
             <SectionHeader
               overline="Como Trabalhamos"
               heading="O nosso processo de limpeza para o"
               goldWord={marca.name}
-              light={false}
             />
-            <div className="grid sm:grid-cols-2 gap-px" style={{ backgroundColor: "rgba(255,255,255,0.08)" }}>
+            <div className="grid sm:grid-cols-2 gap-px" style={{ backgroundColor: "#E8E4DE" }}>
               {PROCESS_STEPS.map((step) => {
                 const Icon = step.icon;
                 return (
-                  <div key={step.label} className="relative overflow-hidden flex items-start gap-4 p-6 md:p-7" style={{ backgroundColor: "#0d241b", borderTop: "2px solid rgba(212,175,55,0.55)" }}>
-                    <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0" style={{ backgroundColor: "rgba(212,175,55,0.15)", border: "1px solid rgba(212,175,55,0.3)" }}>
+                  <div key={step.label} className="relative overflow-hidden flex items-start gap-4 p-6 md:p-7 bg-white" style={{ borderTop: "2px solid #D4AF37" }}>
+                    <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0" style={{ backgroundColor: "rgba(212,175,55,0.12)", border: "1px solid rgba(212,175,55,0.3)" }}>
                       <Icon className="w-4 h-4" style={{ color: "#D4AF37" }} />
                     </div>
                     <div>
-                      <p className="text-sm font-semibold text-white mb-1">{step.title}</p>
-                      <p className="text-xs text-white/55 leading-relaxed">{step.desc}</p>
+                      <p className="text-sm font-semibold text-[#111111] mb-1">{step.title}</p>
+                      <p className="text-xs text-[#111111]/55 leading-relaxed">{step.desc}</p>
                     </div>
                   </div>
                 );
@@ -306,14 +305,14 @@ const MarcaColchaoPage = () => {
             { src: galProcesso, label: "Processo" },
             { src: galResultado, label: "Resultado" },
           ]}
-          variant="light"
+          variant="dark"
         />
 
         {/* ═══ FAQ ═══ */}
         <ServiceFAQ
           faqs={marca.faqs}
           heading={`Perguntas sobre colchões ${marca.name}`}
-          variant="dark"
+          variant="light"
         />
 
         {/* ═══ OUTRAS MARCAS / COBERTURA ═══ */}
