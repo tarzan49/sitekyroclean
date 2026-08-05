@@ -764,3 +764,33 @@ Correções aplicadas: canonical URLs em branco nas 17 páginas core, Breadcrumb
 - Verificado visualmente no browser (mobile 390px + desktop): hero, material, do's/don'ts, processo, FAQ, CTA, links cruzados entre marcas, e o novo bloco "Marcas de colchão" em `/limpeza-colchoes-porto`.
 
 **Pendente:** aprovação do user sobre o formato antes de replicar para cadeira e impermeabilização (marca faz sentido nesses dois; tapete fica de fora).
+
+## Sessão — Redesign premium marca × item × cidade (sofá/colchão/cadeiras) + preços (2026-08-06)
+
+**Pedido do user (guiou toda a sessão):** "vou-te dizer tudo o que quero e tu vais fazendo passo a passo, dando prioridade ao que facilitar o teu trabalho." Pediu para expandir marca×item×cidade a TODOS os itens (sofá/colchão/cadeiras/tapetes) nas cidades mais povoadas, e redesenhar o conteúdo completo das páginas.
+
+**1. Cidades unificadas:** criado `src/data/marcaCities.ts` — as 34 cidades mais povoadas do país que já estão no site (INE/Censos via Wikipédia), partilhado por `marcaSofaData.ts`/`marcaColchaoData.ts`/`marcaCadeirasData.ts`. Sofá alargado de 18→34 cidades (144→272 páginas). `generate-sitemap.ts`, `prerender.ts` e `LocationServicePage.tsx` (guarda de cidade única `MARCA_CITY_SLUGS`) todos atualizados.
+
+**2. Redesign completo do template (sofá + colchão, depois cadeiras já nasceu correto):**
+- Hero ao nível das páginas de variante (`SofaVariantPage.tsx`): fundo fotográfico contínuo, `ServiceSnapshotStats` por baixo.
+- **Primeira secção a seguir ao hero passa a ser o orçamento** (`ServicePriceSection`, calculadora real com steppers) — não informação sobre a marca. Pedido explícito do user: "os clientes querem preço, rapidez... não informação que eventualmente nem é relevante."
+- "O que saber sobre" (2ª secção): fundo verde (`bg-kyro-green`), 2 "não pode fazer" (borda vermelha fina) + 2 "porque a Kyro" únicos por marca (retângulo dourado completo, fundo dourado translúcido, glow) — substituiu o grid antigo de 4 avisos.
+- Sequência de cores final (**user corrigiu 2 vezes**): Hero(escuro) → Orçamento(branco) → Material(verde) → Processo(branco) → Galeria antes/depois(verde) → FAQ(branco) → Outras marcas(branco). Primeira tentativa teve Material+Processo os dois verdes seguidos — user apanhou.
+- FAQ trocado de Accordion genérico para `ServiceFAQ` (numeração, +/-, já usado no resto do site).
+- Secção CTA final duplicada (repetia botões do hero) **removida a pedido do user**.
+- "Outras marcas" reescrita com `SectionHeader` (não tinha título/subtítulo antes, "tava perdida" nas palavras do user).
+- Ícone `Sparkles` (banido) trocado por `ShieldCheck` também em `MarcaSofaPage.tsx` (só tinha sido feito no colchão antes).
+
+**3. Marca Cadeiras — 204 páginas novas (6 marcas × 34 cidades):** IKEA, Conforama, Leroy Merlin, Herman Miller, Moviflor, El Corte Inglés — confirmadas por pesquisa web. Preço por unidade (12,50€-20€, desce com quantidade) em vez de faixa por tamanho.
+
+**4. Tapetes — decisão de NÃO criar página:** o padrão `/limpeza-tapete-{tipo}-{cidade}` colidia diretamente com as páginas de Material×Cidade já existentes (`materialSeoData.ts` já cobre lã/persa/sintético/sisal × todas as cidades). Cheguei a criar `marcaTapetesData.ts` antes de detetar a colisão — apagado a tempo, sem chegar a ligar rotas.
+
+**5. Painel Admin → Sitemaps:** "Marcas" dividido em 3 cartões independentes (Sofá 272 / Colchão 204 / Cadeiras 204), cada um com contagem, drill-down e link para XML próprios, todos a apontar para o mesmo `sitemap-marcas.xml` físico (usam `id` distinto de `file` para isso).
+
+**6. Preço do colchão solteiro +10€ (49€→59€):** pedido do user, aplicado a 17 referências em 12 ficheiros — incluindo o upsell do próprio quiz (`QuizUpsellOverlay.tsx`) e `scripts/prerender.ts` (schema+FAQ+title da página core, mesma categoria de esquecimento de sessões anteriores). Casal/king mantidos.
+
+**7. Bug de preço pré-existente corrigido:** `originalBothPrice` (preço riscado) do colchão casal (119→129) e king (134→144) não batia com a soma limpeza+impermeabilização — encontrado na sessão anterior mas só corrigido nesta, a pedido explícito do user.
+
+**Padrão a vigiar:** qualquer página nova com padrão `/algo-{x}-{cidade}` tem de ser verificada contra `materialSeoData.ts`/`keywordVariantData.ts`/`problemCitySeoData.ts` antes de ligar rotas — o espaço de slugs deste site já está bastante preenchido e colisões são fáceis de criar sem dar por isso (aconteceu com tapetes nesta sessão).
+
+**Pendente no fim desta sessão:** audit completo do site com múltiplos agentes especializados (layout, código, incoerências, funcionalidade/otimização para cliente, mobile, SEO, design, coerência de texto) — pedido pelo user, ainda não executado. Também por avaliar: SEO em inglês para turistas britânicos no Porto/Lisboa/Algarve (ideia do user, ainda não decidida).
