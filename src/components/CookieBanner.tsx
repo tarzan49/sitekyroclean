@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { getConsent, setConsent } from '@/lib/consent';
 
 const CookieBanner = () => {
   const [visible, setVisible] = useState(false);
+  const { pathname } = useLocation();
+  const isEn = pathname.startsWith('/en/');
 
   useEffect(() => {
     // Show only when no decision has been recorded yet
@@ -37,15 +39,31 @@ const CookieBanner = () => {
           {/* Text */}
           <div className="flex-1 min-w-0">
             <p className="text-xs sm:text-sm text-white/70 leading-relaxed">
-              Utilizamos cookies e o Google Analytics para melhorar a sua experiência e analisar o tráfego do site. Consulte a nossa{' '}
-              <Link
-                to="/politica-de-privacidade"
-                className="text-[#D4AF37] underline underline-offset-2 hover:text-[#f0dc8a] transition-colors"
-                onClick={() => setVisible(false)}
-              >
-                Política de Privacidade
-              </Link>
-              .
+              {isEn ? (
+                <>
+                  We use cookies and Google Analytics to improve your experience and analyse site traffic. See our{' '}
+                  <Link
+                    to="/politica-de-privacidade"
+                    className="text-[#D4AF37] underline underline-offset-2 hover:text-[#f0dc8a] transition-colors"
+                    onClick={() => setVisible(false)}
+                  >
+                    Privacy Policy
+                  </Link>
+                  .
+                </>
+              ) : (
+                <>
+                  Utilizamos cookies e o Google Analytics para melhorar a sua experiência e analisar o tráfego do site. Consulte a nossa{' '}
+                  <Link
+                    to="/politica-de-privacidade"
+                    className="text-[#D4AF37] underline underline-offset-2 hover:text-[#f0dc8a] transition-colors"
+                    onClick={() => setVisible(false)}
+                  >
+                    Política de Privacidade
+                  </Link>
+                  .
+                </>
+              )}
             </p>
           </div>
 
@@ -55,13 +73,13 @@ const CookieBanner = () => {
               onClick={decline}
               className="h-11 px-4 text-xs font-medium text-white/40 hover:text-white/70 transition-colors touch-manipulation rounded-lg"
             >
-              Recusar
+              {isEn ? "Decline" : "Recusar"}
             </button>
             <button
               onClick={accept}
               className="h-11 px-5 text-xs font-bold rounded-full bg-[#D4AF37] hover:bg-[#f0dc8a] text-[#0B2F2A] transition-colors touch-manipulation shadow-md"
             >
-              Aceitar
+              {isEn ? "Accept" : "Aceitar"}
             </button>
           </div>
         </div>

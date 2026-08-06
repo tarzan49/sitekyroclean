@@ -31,6 +31,7 @@ import { getAllPackComboRoutes, getPackByCityAndId, getFromPrice } from '../src/
 import { getAllMarcaSofaRoutes, getMarcaByCityAndSlug } from '../src/data/marcaSofaData';
 import { getAllMarcaColchaoRoutes, getMarcaColchaoByCityAndSlug } from '../src/data/marcaColchaoData';
 import { getAllMarcaCadeirasRoutes, getMarcaCadeirasByCityAndSlug } from '../src/data/marcaCadeirasData';
+import { EN_PAGES } from '../src/data/enTouristSeoData';
 
 const BASE_URL = 'https://cleansolutions.com.pt';
 
@@ -289,9 +290,11 @@ export function prerenderRoutes(outDir: string): number {
     desc: string,
     content?: PageContent,
     schemas?: object[],
+    lang: 'pt' | 'en' = 'pt',
   ): void {
     const canonical = `${BASE_URL}${routePath}`;
     let html = injectMeta(template, title, desc, canonical);
+    if (lang !== 'pt') html = html.replace('<html lang="pt">', `<html lang="${lang}">`);
     if (content) html = injectContent(html, generatePageBody(content));
     // LocalBusiness on every page
     html = injectJsonLd(html, LOCAL_BIZ);
@@ -977,6 +980,36 @@ export function prerenderRoutes(outDir: string): number {
       emit(page.path, page.title, page.desc, page.content, schemas);
     }
     console.log(`  Core static pages:       ${count - prev}`);
+  }
+
+  // ── EN tourist pages (isolated /en/ namespace, lang="en") ──────────────
+  {
+    const prev = count;
+    for (const p of EN_PAGES) {
+      const url = `/en/${p.slug}`;
+      const schemas: object[] = [
+        buildBreadcrumbSchema([
+          { name: 'Home',  url: BASE_URL + '/' },
+          { name: p.h1,    url: `${BASE_URL}${url}` },
+        ]),
+        buildFaqSchema(p.faqs),
+      ];
+      emit(
+        url,
+        p.title,
+        p.metaDescription,
+        {
+          h1: `${p.h1} ${p.h1Gold}`,
+          intro: p.intro,
+          problems: p.scenarios.map(s => ({ title: s.title, description: s.body })),
+          benefits: p.whyUs,
+          faqs: p.faqs,
+        },
+        schemas,
+        'en',
+      );
+    }
+    console.log(`  EN tourist pages:        ${count - prev}`);
   }
 
   return count;

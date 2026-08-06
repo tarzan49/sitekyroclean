@@ -12,6 +12,7 @@ import { getVisibleProblems } from '../src/data/problemSeoData';
 import { getAllProblemCityRoutes } from '../src/data/problemCitySeoData';
 import { getAllMaterialRoutes, getAllMaterialCityRoutes } from '../src/data/materialSeoData';
 import { getAllKeywordVariantRoutes } from '../src/data/keywordVariantData';
+import { getAllEnRoutes } from '../src/data/enTouristSeoData';
 
 const BASE_URL = 'https://cleansolutions.com.pt';
 const TODAY = new Date().toISOString().split('T')[0];
@@ -339,6 +340,11 @@ export function generateSitemaps(outDir: string) {
     }
   }
 
+  // 13. EN tourist pages (isolated /en/ namespace) — own dedicated sitemap,
+  // kept separate from all PT sitemaps above so it can be reviewed/analysed
+  // on its own.
+  const enUrls: string[] = getAllEnRoutes().map(r => xmlUrl(r.path, 'monthly', '0.6'));
+
   // Write sub-sitemaps
   const sitemapFiles = [
     { name: 'sitemap-core.xml', urls: coreUrls },
@@ -351,6 +357,7 @@ export function generateSitemaps(outDir: string) {
     { name: 'sitemap-resources.xml', urls: resourceUrls },
     { name: 'sitemap-packs.xml', urls: packUrls },
     { name: 'sitemap-marcas.xml', urls: marcaUrls },
+    { name: 'sitemap-en.xml', urls: enUrls },
   ];
 
   let totalUrls = 0;

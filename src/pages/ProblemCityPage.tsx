@@ -16,7 +16,7 @@ import ServiceLocationSchema from "@/components/ServiceLocationSchema";
 import { getProblemBySlug, getRelatedProblemLinks } from "@/data/problemSeoData";
 import { CATEGORY_TIPS, CATEGORY_STATS, splitTipsHeading } from "@/data/problemTipsData";
 import { SERVICE_TESTIMONIALS } from "@/data/locationPriceTestimonialsData";
-import { getServiceGallery } from "@/constants/serviceGallery";
+import { getServiceGallery, getSolutionImage } from "@/constants/serviceGallery";
 import { cities, services, DEFAULT_PRICE_FROM, cityPrep, cityPrepCap } from "@/data/locationSeoData";
 import { SERVICE_TO_QUIZ } from "@/constants/serviceToQuiz";
 import { METRO_CITY_SLUGS } from "@/constants/metroCities";
@@ -119,6 +119,7 @@ const ProblemCityPage = () => {
   const testimonial = testimonialPool[testimonialHash % testimonialPool.length];
   const gallery = getServiceGallery(problem.relatedServices[0], `${problem.slug}-${city.slug}`);
   const heroImg = getProblemHeroImage(problem.slug);
+  const solutionImg = getSolutionImage(problem.relatedServices[0], `${problem.slug}-${city.slug}`) ?? heroImg;
   const waHref = WHATSAPP_BASE;
   const snapshotStats = CATEGORY_STATS[problem.category] ?? CATEGORY_STATS.manchas;
 
@@ -243,17 +244,18 @@ const ProblemCityPage = () => {
           <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
             <SectionHeader overline="Diagnóstico" heading="O problema," goldWord="a solução" light={true} />
             <div className="grid sm:grid-cols-2 gap-4 md:gap-6 mb-6">
-              {/* Problema — imagem dessaturada + acento vermelho */}
-              <div className="relative aspect-[4/3] overflow-hidden rounded-sm" style={{ border: "3px solid #ef4444", boxShadow: "0 0 0 1px rgba(239,68,68,0.3)" }}>
-                <img
-                  src={heroImg}
-                  alt={`${problem.h1}, o problema`}
-                  className="absolute inset-0 w-full h-full object-cover"
-                  style={{ filter: "grayscale(85%) brightness(0.78) contrast(1.05)" }}
-                  loading="lazy"
-                />
-                <div className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(7,26,18,0.90) 0%, rgba(7,26,18,0.6) 45%, rgba(7,26,18,0.15) 72%, transparent 100%)" }} />
-                <div className="absolute bottom-0 left-0 right-0 p-5 md:p-7 h-[172px] md:h-[196px] flex flex-col justify-start overflow-hidden">
+              {/* Problema — imagem dessaturada + acento vermelho; texto num painel sólido abaixo, nunca cortado */}
+              <div className="rounded-sm overflow-hidden flex flex-col" style={{ border: "3px solid #ef4444", boxShadow: "0 0 0 1px rgba(239,68,68,0.3)" }}>
+                <div className="relative aspect-[4/3] overflow-hidden">
+                  <img
+                    src={heroImg}
+                    alt={`${problem.h1}, o problema`}
+                    className="absolute inset-0 w-full h-full object-cover"
+                    style={{ filter: "grayscale(85%) brightness(0.78) contrast(1.05)" }}
+                    loading="lazy"
+                  />
+                </div>
+                <div className="p-5 md:p-7 flex-1 flex flex-col" style={{ background: "#0d241b" }}>
                   <div className="flex items-center gap-1.5 mb-2">
                     <XCircle className="w-3.5 h-3.5 flex-shrink-0" style={{ color: "#ef4444" }} />
                     <span className="text-[10px] font-bold tracking-[0.22em] uppercase" style={{ color: "#ef4444" }}>O Problema {prep} {city.name}</span>
@@ -262,11 +264,12 @@ const ProblemCityPage = () => {
                   <p className="text-sm text-white/80 leading-relaxed">{problem.problemDetail}</p>
                 </div>
               </div>
-              {/* Solução — cor cheia + acento verde: sensação de esperança */}
-              <div className="relative aspect-[4/3] overflow-hidden rounded-sm" style={{ border: "3px solid #22c55e", boxShadow: "0 0 0 1px rgba(34,197,94,0.3)" }}>
-                <img src={gallery?.after ?? heroImg} alt={`${problem.h1}, a solução`} className="absolute inset-0 w-full h-full object-cover" loading="lazy" />
-                <div className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(7,26,18,0.90) 0%, rgba(7,26,18,0.6) 45%, rgba(7,26,18,0.15) 72%, transparent 100%)" }} />
-                <div className="absolute bottom-0 left-0 right-0 p-5 md:p-7 h-[172px] md:h-[196px] flex flex-col justify-start overflow-hidden">
+              {/* Solução — cor cheia + acento verde: sensação de esperança; texto num painel sólido abaixo, nunca cortado */}
+              <div className="rounded-sm overflow-hidden flex flex-col" style={{ border: "3px solid #22c55e", boxShadow: "0 0 0 1px rgba(34,197,94,0.3)" }}>
+                <div className="relative aspect-[4/3] overflow-hidden">
+                  <img src={solutionImg} alt={`${problem.h1}, a solução`} className="absolute inset-0 w-full h-full object-cover" loading="lazy" />
+                </div>
+                <div className="p-5 md:p-7 flex-1 flex flex-col" style={{ background: "#0d241b" }}>
                   <div className="flex items-center gap-1.5 mb-2">
                     <CheckCircle2 className="w-3.5 h-3.5 flex-shrink-0" style={{ color: "#22c55e" }} />
                     <span className="text-[10px] font-bold tracking-[0.22em] uppercase" style={{ color: "#22c55e" }}>A Solução</span>
@@ -284,23 +287,17 @@ const ProblemCityPage = () => {
         <section className="py-14 md:py-20 bg-kyro-green">
           <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
             <SectionHeader overline="Processo" heading="Como tratamos este problema" goldWord={city.name} light={false} />
-            <div className="relative grid grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-10">
-              <div
-                className="hidden lg:block absolute top-6 left-0 right-0 h-px"
-                style={{ background: "linear-gradient(to right, transparent, #D4AF37 8%, #D4AF37 92%, transparent)" }}
-                aria-hidden="true"
-              />
+            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-px" style={{ backgroundColor: "rgba(255,255,255,0.08)" }}>
               {PROCESS_STEPS.map((step, idx) => (
-                <div key={idx} className="relative flex flex-col items-start">
-                  <div
-                    className="relative z-10 w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0 mb-4"
-                    style={{ backgroundColor: "#0d241b", border: "2px solid #D4AF37" }}
+                <div key={idx} className="relative overflow-hidden p-5 md:p-6" style={{ backgroundColor: "#0d241b", borderTop: "2px solid rgba(212,175,55,0.55)" }}>
+                  <span
+                    className="absolute bottom-2 right-3 font-playfair font-bold leading-none select-none pointer-events-none"
+                    style={{ fontSize: "5rem", color: "rgba(212,175,55,0.08)" }}
                   >
-                    <span className="font-playfair font-bold text-lg leading-none" style={{ color: "#D4AF37" }}>{idx + 1}</span>
-                  </div>
-                  <p className="text-[10px] font-bold tracking-[0.24em] uppercase mb-1.5" style={{ color: "#D4AF37" }}>{String(idx + 1).padStart(2, "0")}</p>
-                  <p className="text-sm font-semibold text-white mb-1.5">{step.title}</p>
-                  <p className="text-sm text-white/55 leading-relaxed">{step.body}</p>
+                    {String(idx + 1).padStart(2, "0")}
+                  </span>
+                  <p className="relative text-sm font-semibold text-white mb-1.5">{step.title}</p>
+                  <p className="relative text-sm text-white/55 leading-relaxed">{step.body}</p>
                 </div>
               ))}
             </div>

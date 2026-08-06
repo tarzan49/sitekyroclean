@@ -11,8 +11,8 @@ import ServiceExpertTips from "@/components/ServiceExpertTips";
 import ServicePriceSection from "@/components/ServicePriceSection";
 import ServiceEliteGuarantee, { GuaranteeItem } from "@/components/ServiceEliteGuarantee";
 import { ExpertTip } from "@/components/ServiceExpertTips";
-import sofaBeforeNew from "@/assets/galeria-sofa-antes.webp";
-import sofaAfterNew from "@/assets/galeria-sofa-depois.webp";
+import sofaBeforeNew from "@/assets/galeria-sofa-antes-2.webp";
+import sofaAfterNew from "@/assets/galeria-sofa-depois-2.webp";
 import sofaResultado from "@/assets/sofa-pele-pormenor.webp";
 import sofaProcesso from "@/assets/sofa-extracao.webp";
 

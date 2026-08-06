@@ -52,8 +52,10 @@ export const SERVICE_GALLERY: Record<string, ServiceGallery> = {
     ],
   },
   "limpeza-colchoes": {
-    before: colchaoBefore,
-    after: colchaoAfter,
+    // Nomes dos ficheiros estão trocados face ao conteúdo real (antes.webp = colchão limpo,
+    // depois.webp = colchão sujo) — mapeamento invertido aqui para corrigir a exibição.
+    before: colchaoAfter,
+    after: colchaoBefore,
     slides: [
       { src: colchaoResultado, label: "Pormenor" },
       { src: colchaoProcesso, label: "Extração" },
@@ -122,4 +124,15 @@ export function getServiceGallery(serviceSlug: string, seed: string): ServiceGal
   if (!variants || variants.length < 2) return base;
   const pick = variants[hashSeed(seed) % variants.length];
   return { ...base, before: pick.before, after: pick.after };
+}
+
+/** Picks one "solution" photo (the after-shot + any detail/process slides) for a
+ * service, deterministically varied per `seed` so pages don't all show the exact
+ * same photo, but stable across re-renders of the same page. */
+export function getSolutionImage(serviceSlug: string, seed: string): string | undefined {
+  const gallery = getServiceGallery(serviceSlug, seed);
+  if (!gallery) return undefined;
+  const candidates = Array.from(new Set([gallery.after, ...gallery.slides.map(s => s.src)]));
+  if (candidates.length < 2) return candidates[0];
+  return candidates[hashSeed(`${seed}:solution`) % candidates.length];
 }

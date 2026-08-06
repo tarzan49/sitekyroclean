@@ -10,12 +10,14 @@ interface FAQItem {
 interface ServiceFAQProps {
   faqs: FAQItem[];
   heading?: string;
+  overline?: string;
   variant?: "light" | "dark";
 }
 
 const ServiceFAQ = ({
   faqs,
   heading = "Perguntas Frequentes",
+  overline = "Dúvidas Frequentes",
   variant = "light",
 }: ServiceFAQProps) => {
   const [open, setOpen] = useState<number | null>(0);
@@ -35,7 +37,7 @@ const ServiceFAQ = ({
           <div className="flex items-center gap-3 mb-4">
             <div className="h-px w-8 flex-shrink-0" style={{ backgroundColor: '#D4AF37', opacity: 0.65 }} />
             <p className="text-[10px] font-bold tracking-[0.28em] uppercase" style={{ color: '#D4AF37', opacity: 0.85 }}>
-              Dúvidas Frequentes
+              {overline}
             </p>
           </div>
           <h2 className={`font-playfair text-[1.85rem] sm:text-4xl md:text-[2.6rem] font-bold leading-[1.1] ${light ? "text-[#111111]" : "text-white"}`}>
