@@ -14,7 +14,7 @@ const DEFAULT_BENEFITS: BenefitItem[] = [
   {
     label: "Saúde",
     title: "Ambiente mais saudável",
-    body: "Eliminação de 99,9% de ácaros, bactérias e alergénios. Respirar melhor em casa começa com superfícies realmente limpas, não apenas visualmente.",
+    body: "Eliminação de 99% de ácaros, bactérias e alergénios. Respirar melhor em casa começa com superfícies realmente limpas, não apenas visualmente.",
   },
   {
     label: "Estética",

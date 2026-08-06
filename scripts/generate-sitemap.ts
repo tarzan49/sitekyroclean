@@ -9,6 +9,9 @@
 import fs from 'fs';
 import path from 'path';
 import { getVisibleProblems } from '../src/data/problemSeoData';
+import { getAllProblemCityRoutes } from '../src/data/problemCitySeoData';
+import { getAllMaterialRoutes, getAllMaterialCityRoutes } from '../src/data/materialSeoData';
+import { getAllKeywordVariantRoutes } from '../src/data/keywordVariantData';
 
 const BASE_URL = 'https://cleansolutions.com.pt';
 const TODAY = new Date().toISOString().split('T')[0];
@@ -140,78 +143,11 @@ const municipiosComFreguesias = [
 // sitemap can never drift into emitting slugs that don't have a real page.
 const problemSlugs = getVisibleProblems().map(p => p.slug);
 
-// Problem × City: mirrors problemCitySeoData logic
-const problemRelatedCities: Record<string, string[]> = {
-  "manchas-sofa": ["porto","matosinhos","maia","vila-nova-de-gaia"],
-  "manchas-vinho-sofa": ["porto","braga","guimaraes"],
-  "manchas-cafe-sofa": ["porto","maia","matosinhos"],
-  "manchas-gordura-sofa": ["porto","vila-nova-de-gaia","gondomar"],
-  "manchas-colchao": ["porto","braga","matosinhos"],
-  "manchas-tapete": ["porto","vila-nova-de-gaia","braga"],
-  "cheiro-sofa": ["porto","maia","gondomar"],
-  "cheiro-urina-sofa": ["porto","matosinhos","valongo"],
-  "cheiro-colchao": ["porto","braga","maia"],
-  "urina-colchao": ["porto","gondomar","valongo"],
-  "cheiro-tapete": ["porto","maia","vila-nova-de-gaia"],
-  "acaros-colchao": ["porto","braga","matosinhos"],
-  "acaros-sofa": ["porto","gondomar","maia"],
-  "alergias-sofa": ["porto","matosinhos","braga"],
-  "alergias-colchao": ["porto","maia","vila-nova-de-gaia"],
-  "pelos-animais-sofa": ["porto","gondomar","valongo"],
-  "pelos-animais-tapete": ["porto","maia","matosinhos"],
-  "limpeza-sofa-tecido": ["porto","matosinhos","braga"],
-  "limpeza-sofa-pele": ["porto","vila-nova-de-gaia","guimaraes"],
-  "limpeza-sofa-veludo": ["porto","braga","matosinhos"],
-  "tapete-persa": ["porto","vila-nova-de-gaia","cascais"],
-  "tapete-la": ["porto","braga","guimaraes"],
-  "mofo-tapete": ["porto","maia","gondomar"],
-  "mofo-alcatifa": ["porto","matosinhos","maia"],
-  "impermeabilizar-sofa": ["porto","matosinhos","braga"],
-  "preco-limpeza-sofa": ["porto","matosinhos","lisboa"],
-  "preco-limpeza-colchao": ["porto","braga","maia"],
-  "preco-limpeza-tapete": ["porto","vila-nova-de-gaia","braga"],
-  "limpeza-profunda-sofa": ["porto","matosinhos","gondomar"],
-  "limpeza-sofa-domicilio": ["porto","maia","vila-nova-de-gaia"],
-  "limpeza-sofa-urgente": ["porto","matosinhos","braga"],
-  "limpeza-colchao-urgente": ["porto","maia","gondomar"],
-  "empresa-limpeza-estofos": ["porto","matosinhos","vila-nova-de-gaia"],
-  "limpeza-sofa-profissional": ["porto","braga","guimaraes"],
-  "higienizacao-colchao": ["porto","matosinhos","maia"],
-  "lavagem-tapetes": ["porto","vila-nova-de-gaia","braga"],
-  "limpeza-cadeiras-escritorio": ["porto","matosinhos","maia"],
-  "limpeza-alcatifas-empresa": ["porto","matosinhos","vila-nova-de-gaia"],
-  "manchas-sangue-colchao": ["porto","braga","maia"],
-  "limpeza-sofa-bebe": ["porto","matosinhos","gondomar"],
-  "limpeza-estofos-automovel": ["porto","maia","vila-nova-de-gaia"],
-  "manchas-tinta-sofa": ["porto","braga","matosinhos"],
-  "sofa-amarelado": ["porto","maia","gondomar"],
-  "limpeza-sofa-microfibra": ["porto","matosinhos","braga"],
-  "limpeza-cabeceira-cama": ["porto","maia","vila-nova-de-gaia"],
-  "limpeza-sofa-chenille": ["porto","braga","matosinhos"],
-  "limpeza-puff": ["porto","maia","matosinhos"],
-  "manchas-suor-sofa": ["porto","gondomar","valongo"],
-  "limpeza-colchao-bebe": ["porto","matosinhos","maia"],
-  "limpeza-sofa-hotel": ["porto","braga","lisboa"],
-  "limpeza-cortinas": ["porto","matosinhos","maia"],
-  "acaros-tapete": ["porto","maia","braga"],
-  "limpeza-sofa-perto-de-mim": ["porto","matosinhos","maia"],
-  "limpeza-sofa-antes-depois": ["porto","vila-nova-de-gaia","braga"],
-  "impermeabilizar-tapete": ["porto","maia","matosinhos"],
-  "limpeza-sofa-seco": ["porto","braga","matosinhos"],
-};
-
-const topMetroCities = [
-  "porto","matosinhos","maia","vila-nova-de-gaia","gondomar","braga",
-  "lisboa","sintra","cascais","oeiras","amadora","almada","loures",
-  "faro","loule","albufeira","portimao","lagos",
-];
-
-const materialSlugs = [
-  "limpeza-sofa-tecido","limpeza-sofa-veludo","limpeza-sofa-pele",
-  "limpeza-sofa-microfibra","limpeza-sofa-linho","limpeza-sofa-camurca",
-  "limpeza-sofa-sintetico","limpeza-tapete-la","limpeza-tapete-persa",
-  "limpeza-tapete-sintetico","limpeza-tapete-sisal"
-];
+// Problem × City, Material (+City) and Keyword Variant routes are all
+// imported directly from src/data/ below (see generateSitemaps()) instead of
+// duplicated here — mirroring the exact same logic scripts/prerender.ts uses
+// to build these pages means the sitemap can never list a URL without a
+// matching real page, or omit a real page from the sitemap.
 
 // ─── XML Helpers ─────────────────────────────────────────────────
 
@@ -283,48 +219,31 @@ export function generateSitemaps(outDir: string) {
     }
   }
 
-  // 4. Problem pages (standalone + city combos)
+  // 4. Problem pages (standalone + city combos) — imported, mirrors prerender.ts exactly
   const problemUrls: string[] = [];
   for (const slug of problemSlugs) {
     problemUrls.push(xmlUrl(`/problemas/${slug}`, 'monthly', '0.7'));
   }
-  // Problem × City combos
-  for (const slug of problemSlugs) {
-    const related = problemRelatedCities[slug] || [];
-    const targetCities = new Set([...related, ...topMetroCities]);
-    for (const citySlug of targetCities) {
-      if (cities.some(c => c.slug === citySlug)) {
-        problemUrls.push(xmlUrl(`/${slug}-${citySlug}`, 'monthly', '0.6'));
-      }
-    }
+  for (const route of getAllProblemCityRoutes()) {
+    problemUrls.push(xmlUrl(route.path, 'monthly', '0.6'));
   }
 
-  // 5. Material pages (standalone + city combos)
+  // 5. Material pages (standalone + city combos) — imported, mirrors prerender.ts exactly
   const materialUrls: string[] = [];
-  for (const mat of materialSlugs) {
-    materialUrls.push(xmlUrl(`/${mat}`, 'monthly', '0.7'));
+  for (const route of getAllMaterialRoutes()) {
+    materialUrls.push(xmlUrl(route.path, 'monthly', '0.7'));
   }
-  for (const mat of materialSlugs) {
-    for (const city of cities) {
-      materialUrls.push(xmlUrl(`/${mat}-${city.slug}`, 'monthly', '0.6'));
-    }
+  for (const route of getAllMaterialCityRoutes()) {
+    materialUrls.push(xmlUrl(route.path, 'monthly', '0.6'));
   }
 
-  // 6. Keyword variant pages: higienização/lavagem × 5 services × cities + parishes
-  const kvVariants  = ['higienizacao', 'lavagem'];
-  const kvServices  = ['sofa', 'colchao', 'tapetes', 'cadeiras', 'alcatifas'];
+  // 6. Keyword variant pages: higienização/lavagem/impermeabilização × services × cities + parishes
+  // Imported, mirrors prerender.ts exactly (previously hand-duplicated here and
+  // missing the impermeabilizacao variant entirely — ~700 real pages weren't
+  // being submitted to Google via sitemap).
   const keywordVariantUrls: string[] = [];
-  for (const v of kvVariants) {
-    for (const s of kvServices) {
-      for (const city of cities) {
-        keywordVariantUrls.push(xmlUrl(`/${v}-${s}-${city.slug}`, 'monthly', '0.6'));
-      }
-      for (const mun of municipiosComFreguesias) {
-        for (const freg of mun.freguesias) {
-          keywordVariantUrls.push(xmlUrl(`/${v}-${s}-${mun.slug}-${freg}`, 'monthly', '0.6'));
-        }
-      }
-    }
+  for (const route of getAllKeywordVariantRoutes()) {
+    keywordVariantUrls.push(xmlUrl(route.path, 'monthly', '0.6'));
   }
 
   // 7. Price pages (service × city)

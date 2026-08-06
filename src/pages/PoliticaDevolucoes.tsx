@@ -16,7 +16,7 @@ const PoliticaDevolucoes = () => (
     <main className="bg-[#FDFDF9] min-h-screen pt-20 pb-16">
       <div className="max-w-2xl mx-auto px-5 sm:px-6">
         <div className="pt-8 pb-6 border-b border-[#1A4E30]/10 mb-8">
-          <p className="text-xs font-semibold tracking-[0.25em] uppercase text-[#D4AF37] mb-2">Kyro Clean Solutions</p>
+          <p className="text-[10px] font-bold tracking-[0.28em] uppercase text-[#D4AF37] mb-2">Kyro Clean Solutions</p>
           <h1 className="font-playfair text-3xl sm:text-4xl font-bold text-[#111111] leading-tight">
             Política de Devoluções
           </h1>

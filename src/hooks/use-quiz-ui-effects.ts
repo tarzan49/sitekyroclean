@@ -92,7 +92,7 @@ export function useQuizUiEffects({
     `4 pessoas de ${location || 'Porto'} pediram orçamento nas últimas 2 horas`,
     `Alguém de ${location || 'Porto'} acabou de reservar, agenda a fechar`,
     `Agenda quase cheia esta semana em ${location || 'Porto'}, garanta já`,
-    `Mais de 50 clientes satisfeitos · Avaliação 5.0 no Google`,
+    `Mais de 1000 clientes satisfeitos · Avaliação 5.0 no Google`,
   ];
 
   useEffect(() => {

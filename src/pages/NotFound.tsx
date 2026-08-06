@@ -29,7 +29,7 @@ const NotFound = () => (
       {/* 404 */}
       <h1 className="font-playfair text-[8rem] md:text-[11rem] font-bold leading-none mb-2 select-none"
         style={{
-          background: "linear-gradient(135deg, #A87C2A 0%, #EDD96A 50%, #A87C2A 100%)",
+          background: "linear-gradient(135deg, #B8912A 0%, #EDD96A 50%, #B8912A 100%)",
           WebkitBackgroundClip: "text",
           WebkitTextFillColor: "transparent",
           filter: "drop-shadow(0 0 40px rgba(212,175,55,0.35))",
@@ -51,7 +51,7 @@ const NotFound = () => (
       {/* CTAs */}
       <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-14">
         <Link to="/"
-          className="flex items-center gap-2 bg-gradient-to-r from-[#A87C2A] to-[#D4AF37] hover:from-[#D4AF37] hover:to-[#EDD96A] text-[#071a12] font-bold text-sm px-7 py-3.5 rounded-full shadow-[0_4px_20px_rgba(212,175,55,0.35)] hover:shadow-[0_4px_28px_rgba(212,175,55,0.5)] transition-all active:scale-[0.97]">
+          className="flex items-center gap-2 bg-gradient-to-r from-[#B8912A] to-[#D4AF37] hover:from-[#D4AF37] hover:to-[#EDD96A] text-[#071a12] font-bold text-sm px-7 py-3.5 rounded-full shadow-[0_4px_20px_rgba(212,175,55,0.35)] hover:shadow-[0_4px_28px_rgba(212,175,55,0.5)] transition-all active:scale-[0.97]">
           <Home className="w-4 h-4" />
           Voltar ao início
         </Link>
@@ -64,7 +64,7 @@ const NotFound = () => (
       </div>
 
       {/* Popular pages */}
-      <p className="text-[11px] font-semibold tracking-[0.2em] uppercase text-white/30 mb-5">
+      <p className="text-[10px] font-bold tracking-[0.28em] uppercase text-white/30 mb-5">
         Páginas populares
       </p>
       <div className="grid grid-cols-2 gap-3">

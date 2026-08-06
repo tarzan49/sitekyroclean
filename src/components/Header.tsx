@@ -169,7 +169,7 @@ const Header = () => {
           <a
             href={`tel:${PHONE_TEL}`}
             onClick={() => trackCallClick('header_mobile')}
-            className="border border-[#111111]/25 p-2 flex items-center justify-center"
+            className="w-11 h-11 border border-[#111111]/25 flex items-center justify-center touch-manipulation"
             aria-label="Ligar"
           >
             <Phone className="w-4 h-4 text-[#111111]/70" strokeWidth={2} />
@@ -181,7 +181,7 @@ const Header = () => {
             target="_blank"
             rel="noopener noreferrer"
             onClick={() => trackWhatsAppClick('header_mobile')}
-            className="border border-[#25D366] p-2 flex items-center justify-center"
+            className="w-11 h-11 border border-[#25D366] flex items-center justify-center touch-manipulation"
             aria-label="WhatsApp"
           >
             <MessageCircle className="w-4 h-4 text-[#25D366]" strokeWidth={2} />

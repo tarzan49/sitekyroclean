@@ -171,7 +171,7 @@ const AdminSeoPages = ({ embedded = false }: { embedded?: boolean }) => {
   const typeColors: Record<PageType, string> = {
     service: 'bg-[#0B2F2A]/10 text-[#0B2F2A] border-[#0B2F2A]/20',
     location: 'bg-blue-500/10 text-blue-600 border-blue-500/20',
-    problem: 'bg-[#D4AF37]/10 text-[#a07c1a] border-[#D4AF37]/20',
+    problem: 'bg-[#D4AF37]/10 text-[#B8912A] border-[#D4AF37]/20',
     freguesia: 'bg-purple-500/10 text-purple-600 border-purple-500/20',
     variant: 'bg-rose-500/10 text-rose-600 border-rose-500/20',
   };

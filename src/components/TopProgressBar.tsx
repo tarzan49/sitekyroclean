@@ -38,7 +38,7 @@ const TopProgressBar = () => {
         height: '2.5px',
         width: `${width}%`,
         opacity,
-        background: 'linear-gradient(90deg, #C9A84C 0%, #F0DC8A 50%, #C9A84C 100%)',
+        background: 'linear-gradient(90deg, #C9A84C 0%, #EDD96A 50%, #C9A84C 100%)',
         boxShadow: '0 0 10px rgba(201, 168, 76, 0.8), 0 0 4px rgba(201, 168, 76, 0.6)',
         transition: 'width 0.4s cubic-bezier(0.4,0,0.2,1), opacity 0.25s ease',
         zIndex: 99999,

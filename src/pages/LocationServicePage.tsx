@@ -707,7 +707,7 @@ const LocationServicePage = () => {
                     {colSteps.map((step, idx) => {
                       const num = offset + idx;
                       return (
-                        <div key={num} className="relative overflow-hidden flex items-start gap-4 p-5 md:p-6 bg-white" style={{ borderTop: "2px solid rgba(212,175,55,0.55)" }}>
+                        <div key={num} className="relative overflow-hidden flex items-start gap-4 p-5 md:p-6 bg-white" style={{ borderTop: "2px solid #D4AF37" }}>
                           <span className="font-playfair font-bold flex-shrink-0 leading-none" style={{ fontSize: "1.75rem", color: "rgba(212,175,55,0.35)" }}>
                             {String(num + 1).padStart(2, "0")}
                           </span>

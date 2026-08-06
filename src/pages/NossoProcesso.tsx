@@ -2,6 +2,7 @@ import { Search, SprayCanIcon as Spray, Droplets, Wind, Shield, ClipboardCheck, 
 import { useRef, useEffect, useState } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import SectionHeader from "@/components/SectionHeader";
 import { trackCallClick } from "@/lib/analytics";
 import { PHONE_TEL } from "@/constants/business";
 
@@ -93,29 +94,30 @@ const NossoProcesso = () => {
     <>
       <Header />
       <main>
-        {/* Hero Section - Aligned with Packs page */}
+        {/* Hero Section */}
         <section className="pt-24 md:pt-28 pb-8 md:pb-12 bg-background">
-          <div className="container mx-auto px-4">
-            {/* Title with gold accent */}
-            <div className="text-center mb-6 md:mb-8">
-              <h1 
-                className="text-3xl md:text-4xl lg:text-5xl font-bold text-[#111111] mb-3 animate-fade-in"
-                style={{ animationDelay: "0.1s" }}
-              >
-                O Nosso Processo
-              </h1>
-              <p 
-                className="text-base md:text-lg text-[#111111]/55 max-w-2xl mx-auto mb-4 animate-fade-in"
-                style={{ animationDelay: "0.2s" }}
-              >
-                Cada etapa pensada para garantir resultados excepcionais
+          <div className="container mx-auto px-4 max-w-4xl">
+            <div className="flex items-center gap-3 mb-4 animate-fade-in" style={{ animationDelay: "0.1s" }}>
+              <div className="h-px w-8 flex-shrink-0" style={{ backgroundColor: "#D4AF37", opacity: 0.65 }} />
+              <p className="text-[10px] font-bold tracking-[0.28em] uppercase" style={{ color: "#D4AF37", opacity: 0.85 }}>
+                Como trabalhamos
               </p>
-              <div 
-                className="w-16 h-0.5 bg-gold mx-auto animate-fade-in"
-                style={{ animationDelay: "0.3s" }}
-              ></div>
             </div>
 
+            <h1
+              className="font-playfair text-3xl md:text-4xl lg:text-5xl font-bold leading-[1.1] text-[#111111] animate-fade-in"
+              style={{ animationDelay: "0.15s" }}
+            >
+              O Nosso{" "}
+              <em className="not-italic" style={{ color: "#D4AF37" }}>Processo</em>
+            </h1>
+
+            <p
+              className="mt-4 text-base md:text-lg text-[#111111]/55 max-w-2xl animate-fade-in"
+              style={{ animationDelay: "0.2s" }}
+            >
+              Cada etapa pensada para garantir resultados excepcionais
+            </p>
           </div>
         </section>
 
@@ -129,7 +131,7 @@ const NossoProcesso = () => {
                   <div className="relative mb-10 last:mb-0">
                     {/* Connector Line with gold gradient */}
                     {index < steps.length - 1 && (
-                      <div className="absolute left-[44px] top-[100px] w-px h-16 bg-gradient-to-b from-gold/40 via-teal/20 to-transparent hidden md:block" />
+                      <div className="absolute left-[44px] top-[100px] w-px h-16 bg-gradient-to-b from-gold/40 via-gold/15 to-transparent hidden md:block" />
                     )}
 
                     <div className="flex flex-col md:flex-row gap-5 items-start">
@@ -138,7 +140,7 @@ const NossoProcesso = () => {
                         {/* Outer ring with gold accent */}
                         <div className="w-[88px] h-[88px] rounded-full bg-gradient-to-br from-secondary via-background to-secondary border border-gold/20 flex items-center justify-center shadow-sm">
                           <div className="w-[72px] h-[72px] rounded-full bg-[#FFFFFF] border border-[rgba(26,78,48,0.12)] flex items-center justify-center shadow-inner">
-                            <step.icon className="h-8 w-8 text-teal" strokeWidth={1.5} />
+                            <step.icon className="h-8 w-8 text-gold" strokeWidth={1.5} />
                           </div>
                         </div>
                         {/* Step number badge with gold */}
@@ -170,31 +172,32 @@ const NossoProcesso = () => {
               ))}
             </div>
 
-            {/* Call to Action with gold accents */}
+            {/* Call to Action */}
             <AnimatedCard delay={600}>
-              <div className="mt-16 text-center">
-                <div className="relative bg-gradient-to-r from-teal to-turquoise p-8 rounded-2xl shadow-xl max-w-3xl mx-auto overflow-hidden">
+              <div className="mt-16">
+                <div className="relative p-8 md:p-10 rounded-2xl shadow-xl max-w-3xl overflow-hidden" style={{ background: "linear-gradient(160deg, #071a12 0%, #0B2F2A 55%, #0a2218 100%)" }}>
                   {/* Gold corner accents */}
                   <div className="absolute top-0 left-0 w-16 h-16 border-t-2 border-l-2 border-gold/50 rounded-tl-2xl" />
                   <div className="absolute bottom-0 right-0 w-16 h-16 border-b-2 border-r-2 border-gold/50 rounded-br-2xl" />
-                  
-                  <h2 className="text-2xl md:text-3xl font-bold text-white mb-2">
-                    Pronto para experimentar?
-                  </h2>
-                  <p className="text-white/90 mb-6 text-lg">
-                    Peça já o seu orçamento gratuito e permita-nos cuidar dos seus estofados com o máximo profissionalismo.
-                  </p>
-                  <div className="flex flex-col sm:flex-row gap-4 justify-center">
+
+                  <SectionHeader
+                    overline="Pronto para experimentar?"
+                    heading="Vamos cuidar dos seus"
+                    goldWord="estofos"
+                    subtitle="Peça já o seu orçamento gratuito e permita-nos cuidar dos seus estofados com o máximo profissionalismo."
+                    light={false}
+                  />
+                  <div className="flex flex-col sm:flex-row gap-4">
                     <a
                       href={`tel:${PHONE_TEL}`}
                       onClick={() => trackCallClick('nosso_processo_cta')}
-                      className="inline-flex items-center justify-center px-8 py-3 bg-[#FFFFFF] text-teal font-semibold rounded-lg hover:bg-[#FDFDF9] transition-colors shadow-md"
+                      className="inline-flex items-center justify-center px-8 py-3 bg-white text-[#0B2F2A] font-semibold rounded-lg hover:bg-[#FDFDF9] transition-colors shadow-md"
                     >
                       Ligar Agora
                     </a>
                     <a
                       href="/#orcamento"
-                      className="inline-flex items-center justify-center px-8 py-3 bg-gold text-white font-semibold rounded-lg hover:bg-gold/90 transition-colors shadow-md"
+                      className="inline-flex items-center justify-center px-8 py-3 bg-gold text-[#0B2F2A] font-semibold rounded-lg hover:bg-gold/90 transition-colors shadow-md"
                     >
                       Pedir Orçamento
                     </a>

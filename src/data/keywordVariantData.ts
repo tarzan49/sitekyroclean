@@ -72,7 +72,7 @@ function content_higienizacao_sofa(loc: string, ctx: string): ContentBlock {
     intro: `A higienização profissional do sofá em ${loc} vai além da limpeza visual: eliminamos os agentes patogénicos invisíveis que afetam a saúde da sua família. A Kyro Clean Solutions usa protocolos de sanitização certificados para remover ácaros, bactérias, fungos e alergénios acumulados nos tecidos em ${loc} e ${ctx}.`,
     whatIs: `A higienização vai além de tirar o pó: elimina os ácaros, bactérias e fungos que vivem nos tecidos e que causam alergias, espirros e problemas respiratórios. Feita com produtos seguros para toda a família, é especialmente recomendada quando há bebés, crianças ou alérgicos em casa em ${loc}.`,
     benefits: [
-      'Eliminação de 99,9% de ácaros, bactérias e vírus',
+      'Eliminação de 99% de ácaros, bactérias e vírus',
       'Sanitização certificada com agentes antimicrobianos',
       'Seguro para bebés, crianças e pessoas alérgicas',
       'Produtos certificados e hipoalergénicos',
@@ -81,7 +81,7 @@ function content_higienizacao_sofa(loc: string, ctx: string): ContentBlock {
     ],
     processSteps: [
       { step: 1, title: 'Avaliação de higiene', description: `Inspecção do sofá e identificação de focos de contaminação em ${loc}.` },
-      { step: 2, title: 'Aspiração HEPA', description: 'Remoção de 99,9% dos ácaros e detritos com filtro HEPA certificado.' },
+      { step: 2, title: 'Aspiração HEPA', description: 'Remoção de 99% dos ácaros e detritos com filtro HEPA certificado.' },
       { step: 3, title: 'Sanitização antimicrobiana', description: 'Aplicação de agente certificado, seguro para tecidos e toda a família.' },
       { step: 4, title: 'Secagem rápida', description: 'Sofá pronto a usar em poucas horas, sem humidade residual.' },
     ],
@@ -109,7 +109,7 @@ function content_higienizacao_colchao(loc: string, ctx: string): ContentBlock {
     intro: `Passamos um terço da vida no colchão, por isso a higienização profissional do colchão em ${loc} é essencial para a saúde do sono. A Kyro Clean Solutions elimina ácaros, bactérias e fungos com protocolos de sanitização certificados, garantindo noites mais saudáveis em ${loc} e ${ctx}.`,
     whatIs: `Passamos um terço da vida no colchão, por isso a higiene interna importa tanto como a externa. Este tratamento elimina os ácaros e bactérias das camadas profundas que causam alergias nocturnas, espirros de manhã e má qualidade de sono, sem produtos tóxicos, seguro para toda a família.`,
     benefits: [
-      'Eliminação de 99,9% dos ácaros e bactérias do colchão',
+      'Eliminação de 99% dos ácaros e bactérias do colchão',
       'Melhoria comprovada da qualidade do sono',
       'Ideal para alérgicos, asmáticos e pessoas com rinite',
       'Seguro para bebés e grávidas',
@@ -118,7 +118,7 @@ function content_higienizacao_colchao(loc: string, ctx: string): ContentBlock {
     ],
     processSteps: [
       { step: 1, title: 'Avaliação de contaminação', description: `Análise do nível de infestação e identificação de focos em ${loc}.` },
-      { step: 2, title: 'Aspiração HEPA profunda', description: 'Remoção de 99,9% dos ácaros, esporos e detritos biológicos.' },
+      { step: 2, title: 'Aspiração HEPA profunda', description: 'Remoção de 99% dos ácaros, esporos e detritos biológicos.' },
       { step: 3, title: 'Tratamento antimicrobiano', description: 'Aplicação de produto certificado, seguro para contato com pele sensível.' },
       { step: 4, title: 'Secagem e aeração', description: 'Colchão pronto a usar no mesmo dia após aeração.' },
     ],
@@ -147,7 +147,7 @@ function content_higienizacao_tapetes(loc: string, ctx: string): ContentBlock {
     whatIs: `O tapete retém nos seus fios o pólen, ácaros e bactérias que entram em casa com os sapatos ou com os animais de estimação. Este tratamento remove esses alergénios em profundidade, tornando o chão seguro para crianças que brincam e para quem sofre de alergias em ${loc}.`,
     benefits: [
       'Tapete seguro para crianças que brincam no chão',
-      'Eliminação de 99,9% de ácaros e alergénios',
+      'Eliminação de 99% de ácaros e alergénios',
       'Fibras preservadas, sem danos em tapetes delicados',
       'Melhoria da qualidade do ar interior',
       `Serviço ao domicílio em ${loc}`,
@@ -169,7 +169,7 @@ function content_higienizacao_tapetes(loc: string, ctx: string): ContentBlock {
     problems: [
       { title: "Criança que brinca no chão com espirros frequentes", description: "O tapete concentra ácaros, pólen e fungos nas fibras. Quando a criança rasteja ou brinca, inalha estes alergénios em concentração máxima ao nível do chão." },
       { title: "Animal de estimação que dorme no tapete", description: "Pelos, caspa e bactérias dos animais penetram nas fibras e multiplicam-se. A higienização remove alergénios de animais que a aspiração doméstica deixa para trás." },
-      { title: "Espirros frequentes ou comichão nos olhos em casa", description: "O tapete liberta alergénios ao ser pisado, criando uma nuvem invisível ao nível do chão. A higienização profunda reduz estes níveis em 99,9%." },
+      { title: "Espirros frequentes ou comichão nos olhos em casa", description: "O tapete liberta alergénios ao ser pisado, criando uma nuvem invisível ao nível do chão. A higienização profunda reduz estes níveis em 99%." },
     ],
     testimonials: [
       { name: "Inês T.", location: "Lisboa", text: "Tapete persa de família com manchas que me recusava a tentar limpar em casa com medo de o estragar. Voltou a ficar como novo. Fico aliviada por não ter tentado sozinha." },
@@ -180,7 +180,7 @@ function content_higienizacao_tapetes(loc: string, ctx: string): ContentBlock {
 
 function content_higienizacao_cadeiras(loc: string, ctx: string): ContentBlock {
   return {
-    intro: `A higienização de cadeiras estofadas em ${loc} é essencial para restaurantes, escritórios e clínicas que partilham superfícies entre múltiplos utilizadores. A Kyro Clean Solutions aplica bactericida certificado que elimina 99,9% dos microrganismos em cadeiras de uso partilhado em ${loc} e ${ctx}.`,
+    intro: `A higienização de cadeiras estofadas em ${loc} é essencial para restaurantes, escritórios e clínicas que partilham superfícies entre múltiplos utilizadores. A Kyro Clean Solutions aplica bactericida certificado que elimina 99% dos microrganismos em cadeiras de uso partilhado em ${loc} e ${ctx}.`,
     whatIs: `As cadeiras que partilhamos acumulam bactérias e vírus em silêncio, a limpeza habitual com pano não chega para os remover. Este tratamento elimina os germes das fibras com produtos certificados, essencial para restaurantes, escritórios e qualquer espaço onde várias pessoas se sentam na mesma cadeira em ${loc}.`,
     benefits: [
       'Bactericida certificado compatível com normas HACCP',

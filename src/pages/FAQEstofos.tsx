@@ -251,7 +251,7 @@ const FAQEstofos = () => {
 
               {/* CTA card */}
               <div className="bg-kyro-green rounded-2xl p-5">
-                <p className="text-[10px] font-bold tracking-[0.25em] uppercase mb-1" style={{ color: '#D4AF37' }}>
+                <p className="text-[10px] font-bold tracking-[0.28em] uppercase mb-1" style={{ color: '#D4AF37' }}>
                   Orçamento grátis
                 </p>
                 <p className="font-playfair text-white font-bold text-base leading-snug mb-1">
@@ -285,7 +285,7 @@ const FAQEstofos = () => {
 
               {/* Related services */}
               <div className="bg-white rounded-2xl p-4 border border-[#E8E4DE]">
-                <p className="text-[10px] font-bold tracking-[0.25em] uppercase text-[#111111]/40 mb-3">
+                <p className="text-[10px] font-bold tracking-[0.28em] uppercase text-[#111111]/40 mb-3">
                   Serviços
                 </p>
                 <div className="space-y-1">

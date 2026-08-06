@@ -94,7 +94,7 @@ const BeforeAfterPage = () => {
                 <span>/</span>
                 <span className="text-[#1A4E30] font-medium">Antes e Depois</span>
               </nav>
-              <p className="text-xs font-semibold tracking-[0.25em] uppercase text-[#D4AF37] mb-3">Resultados reais</p>
+              <p className="text-[10px] font-bold tracking-[0.28em] uppercase text-[#D4AF37] mb-3">Resultados reais</p>
               <h1 className="font-playfair text-3xl md:text-4xl lg:text-5xl font-bold text-[#111111] mb-4 leading-tight">
                 Antes e Depois da Limpeza Profissional
               </h1>
@@ -122,7 +122,7 @@ const BeforeAfterPage = () => {
                     <h3 className="font-semibold text-[#111111] text-sm leading-snug">{t.title}</h3>
                     <Link
                       to={t.serviceLink}
-                      className="inline-flex items-center gap-1 text-xs font-semibold text-[#D4AF37] hover:text-[#b8962e] transition-colors shrink-0"
+                      className="inline-flex items-center gap-1 text-xs font-semibold text-[#D4AF37] hover:text-[#B8912A] transition-colors shrink-0"
                     >
                       {t.service}
                       <ArrowRight className="w-3 h-3" />

@@ -47,7 +47,7 @@ const posts: BlogPost[] = [
       },
       {
         heading: "Limpeza DIY vs. limpeza profissional: vale a pena?",
-        body: "Muitos clientes tentam primeiro limpar o sofá em casa antes de nos contactar. O resultado habitual: o tecido fica molhado durante horas, podem surgir manchas de água ou o odor não desaparece completamente.\n\nIsso acontece porque os equipamentos domésticos não atingem a temperatura nem a pressão necessárias para extrair a sujidade das fibras em profundidade. Uma limpeza profissional com equipamento de extração a quente remove até 98% dos ácaros e bactérias, impossível de atingir com produtos de supermercado.\n\nConsiderando que um sofá de qualidade custa entre 500€ e 3000€, uma limpeza profissional anual a 60€ é um investimento que prolonga a vida do móvel em vários anos.",
+        body: "Muitos clientes tentam primeiro limpar o sofá em casa antes de nos contactar. O resultado habitual: o tecido fica molhado durante horas, podem surgir manchas de água ou o odor não desaparece completamente.\n\nIsso acontece porque os equipamentos domésticos não atingem a temperatura nem a pressão necessárias para extrair a sujidade das fibras em profundidade. Uma limpeza profissional com equipamento de extração a quente remove até 99% dos ácaros e bactérias, impossível de atingir com produtos de supermercado.\n\nConsiderando que um sofá de qualidade custa entre 500€ e 3000€, uma limpeza profissional anual a 60€ é um investimento que prolonga a vida do móvel em vários anos.",
         tip: "Sofás com garantia do fabricante podem exigir limpeza profissional documentada para manter a garantia válida.",
       },
       {
@@ -229,7 +229,7 @@ const posts: BlogPost[] = [
     faq: [
       {
         q: "A limpeza profissional elimina todos os ácaros?",
-        a: "A limpeza por extração a vapor a alta temperatura elimina mais de 98% dos ácaros e remove os seus resíduos alérgenos. Com tratamento anti-ácaros complementar, a eficácia aumenta e o efeito dura mais.",
+        a: "A limpeza por extração a vapor a alta temperatura elimina mais de 99% dos ácaros e remove os seus resíduos alérgenos. Com tratamento anti-ácaros complementar, a eficácia aumenta e o efeito dura mais.",
       },
       {
         q: "Com que frequência devo limpar o colchão por causa dos ácaros?",
@@ -292,7 +292,7 @@ const posts: BlogPost[] = [
       },
       {
         q: "O serviço inclui tratamento anti-ácaros?",
-        a: "Sim. A limpeza por extração a vapor a alta temperatura já elimina mais de 98% dos ácaros. Aplicamos também um produto acaricida profissional de efeito residual de 3 a 6 meses.",
+        a: "Sim. A limpeza por extração a vapor a alta temperatura já elimina mais de 99% dos ácaros. Aplicamos também um produto acaricida profissional de efeito residual de 3 a 6 meses.",
       },
       {
         q: "Limpam colchões de memory foam e látex?",
@@ -963,7 +963,7 @@ const posts: BlogPost[] = [
     sections: [
       {
         heading: "O que é a higienização profissional?",
-        body: "A higienização por extração a vapor é um processo de limpeza profunda que remove a sujidade acumulada nas fibras do sofá: manchas, odores, ácaros, bactérias e alérgenos. Utiliza água quente a alta pressão injetada nas fibras e aspirada de imediato, arrastando tudo o que está acumulado.\n\nO resultado é um sofá com aparência renovada, sem odores e com até 98% menos ácaros. O tempo de secagem é de 2 a 4 horas.",
+        body: "A higienização por extração a vapor é um processo de limpeza profunda que remove a sujidade acumulada nas fibras do sofá: manchas, odores, ácaros, bactérias e alérgenos. Utiliza água quente a alta pressão injetada nas fibras e aspirada de imediato, arrastando tudo o que está acumulado.\n\nO resultado é um sofá com aparência renovada, sem odores e com até 99% menos ácaros. O tempo de secagem é de 2 a 4 horas.",
         tip: "A higienização é recomendada mesmo que o sofá pareça limpo visualmente. Ácaros e bactérias não são visíveis a olho nu.",
       },
       {
@@ -1094,7 +1094,7 @@ const posts: BlogPost[] = [
       },
       {
         heading: "3. Crises de alergia ou rinite a piorar em casa",
-        body: "Se notares que espirras mais ou tens olhos a comichão especialmente quando estás no sofá, pode ser uma resposta a ácaros acumulados. Um sofá de uso regular pode ter entre 100 mil a 1 milhão de ácaros por metro quadrado. A limpeza por extração a quente remove até 98% destes alérgenos.",
+        body: "Se notares que espirras mais ou tens olhos a comichão especialmente quando estás no sofá, pode ser uma resposta a ácaros acumulados. Um sofá de uso regular pode ter entre 100 mil a 1 milhão de ácaros por metro quadrado. A limpeza por extração a quente remove até 99% destes alérgenos.",
       },
       {
         heading: "4. O tecido está visivelmente desgastado ou com brilho diferente",
@@ -1291,7 +1291,7 @@ const posts: BlogPost[] = [
       },
       {
         heading: "O processo de limpeza profissional de colchão de bebé",
-        body: "A limpeza profissional de colchão usa extração a vapor a alta temperatura que:\n\n1. Elimina até 98% dos ácaros e os seus resíduos alérgenos\n2. Remove manchas de origem orgânica (leite, urina, suor)\n3. Elimina odores na fonte, não com mascaradores\n4. Deixa o colchão utilizável em 2 a 4 horas\n\nOs produtos utilizados são certificados para uso em ambientes infantis. Não há resíduos após secagem.",
+        body: "A limpeza profissional de colchão usa extração a vapor a alta temperatura que:\n\n1. Elimina até 99% dos ácaros e os seus resíduos alérgenos\n2. Remove manchas de origem orgânica (leite, urina, suor)\n3. Elimina odores na fonte, não com mascaradores\n4. Deixa o colchão utilizável em 2 a 4 horas\n\nOs produtos utilizados são certificados para uso em ambientes infantis. Não há resíduos após secagem.",
         tip: "Depois da limpeza, use um protetor de colchão impermeável e respirável para reduzir a frequência necessária de novas intervenções.",
       },
     ],
@@ -1342,7 +1342,7 @@ const posts: BlogPost[] = [
       },
       {
         heading: "O que o processo remove efetivamente",
-        body: "A extração a vapor profissional remove:\n\n**Sujidade estrutural**: poeira, células de pele morta, gordura do corpo, resíduos de alimentos e partículas que se acumulam nas fibras ao longo do tempo.\n\n**Ácaros e alérgenos**: a temperatura de 80 a 100ºC mata os ácaros do pó e desnatura os seus resíduos alérgenos. Eficácia de até 98%.\n\n**Manchas orgânicas**: com pré-tratamento enzimático, manchas de café, vinho, urina e gordura são dissolvidas antes da extração.\n\n**Odores**: os compostos orgânicos que causam odores são eliminados na fonte, não mascarados.",
+        body: "A extração a vapor profissional remove:\n\n**Sujidade estrutural**: poeira, células de pele morta, gordura do corpo, resíduos de alimentos e partículas que se acumulam nas fibras ao longo do tempo.\n\n**Ácaros e alérgenos**: a temperatura de 80 a 100ºC mata os ácaros do pó e desnatura os seus resíduos alérgenos. Eficácia de até 99%.\n\n**Manchas orgânicas**: com pré-tratamento enzimático, manchas de café, vinho, urina e gordura são dissolvidas antes da extração.\n\n**Odores**: os compostos orgânicos que causam odores são eliminados na fonte, não mascarados.",
       },
       {
         heading: "Porque é superior a outros métodos",

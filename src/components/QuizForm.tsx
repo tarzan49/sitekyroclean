@@ -662,7 +662,7 @@ ${formData.description || 'Sem observações adicionais'}
           <div className="flex justify-end">
             <button
               onClick={handleClose}
-              className="p-2 hover:bg-white/10 active:bg-white/20 rounded-full transition-colors touch-manipulation"
+              className="w-11 h-11 flex items-center justify-center hover:bg-white/10 active:bg-white/20 rounded-full transition-colors touch-manipulation"
               aria-label="Fechar"
             >
               <X className="w-4 h-4 text-white/40" />

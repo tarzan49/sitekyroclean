@@ -4,16 +4,17 @@ import { MapPin, ArrowRight, Phone, ChevronDown } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import QuizButton from "@/components/QuizButton";
+import SectionHeader from "@/components/SectionHeader";
 import { cities, services } from "@/data/locationSeoData";
 import { municipiosComFreguesias, getFreguesiaStats, type MunicipioGroup } from "@/data/freguesiaSeoData";
 import { SITE_URL, PHONE_TEL, PHONE_DISPLAY } from "@/constants/business";
 
 type Area = "porto" | "lisboa" | "algarve";
 
-const REGIONS: { area: Area; title: string }[] = [
-  { area: "porto", title: "Área Metropolitana do Porto e Norte" },
-  { area: "lisboa", title: "Lisboa e Área Metropolitana" },
-  { area: "algarve", title: "Algarve" },
+const REGIONS: { area: Area; heading: string; goldWord: string }[] = [
+  { area: "porto", heading: "Área Metropolitana do", goldWord: "Porto e Norte" },
+  { area: "lisboa", heading: "Lisboa e Área", goldWord: "Metropolitana" },
+  { area: "algarve", heading: "Cobertura no", goldWord: "Algarve" },
 ];
 
 function citiesForArea(area: Area) {
@@ -26,12 +27,14 @@ function municipiosForArea(area: Area) {
 }
 
 const RegionSection = ({
-  title,
+  heading,
+  goldWord,
   area,
   openMunicipio,
   setOpenMunicipio,
 }: {
-  title: string;
+  heading: string;
+  goldWord: string;
   area: Area;
   openMunicipio: string | null;
   setOpenMunicipio: (slug: string | null) => void;
@@ -43,10 +46,12 @@ const RegionSection = ({
     <section className="py-12 md:py-16 odd:bg-secondary/20 even:bg-background">
       <div className="container mx-auto px-4">
         <div className="max-w-5xl mx-auto">
-          <h2 className="text-2xl md:text-3xl font-bold text-[#111111] mb-8">
-            <MapPin className="w-6 h-6 text-gold inline mr-2" />
-            {title}
-          </h2>
+          <SectionHeader
+            overline="Cobertura"
+            heading={heading}
+            goldWord={goldWord}
+            light={true}
+          />
           <div className="space-y-3">
             {municipios.map((m: MunicipioGroup) => {
               const isOpen = openMunicipio === m.slug;
@@ -58,7 +63,7 @@ const RegionSection = ({
                     className="w-full flex items-center justify-between p-4 md:p-5 hover:bg-secondary/30 transition-colors text-left"
                   >
                     <div className="flex items-center gap-3">
-                      <MapPin className="w-4 h-4 text-turquoise flex-shrink-0" />
+                      <MapPin className="w-4 h-4 text-gold flex-shrink-0" />
                       <div>
                         <span className="text-base md:text-lg font-bold text-[#111111]">{m.name}</span>
                         <span className="block text-xs text-[#111111]/55">{m.freguesias.length} freguesias</span>
@@ -100,7 +105,7 @@ const RegionSection = ({
                                 className="group flex items-center gap-1.5 bg-secondary/30 px-3 py-2 rounded-lg text-sm text-[#111111] hover:bg-gold/5 hover:border-gold/30 border border-transparent transition-all"
                               >
                                 <MapPin className="w-3 h-3 text-gold flex-shrink-0" />
-                                <span className="group-hover:text-turquoise transition-colors truncate">{f.name}</span>
+                                <span className="group-hover:text-gold transition-colors truncate">{f.name}</span>
                               </Link>
                             ))}
                           </div>
@@ -128,28 +133,28 @@ const AreasDeServico = () => {
       <main>
         {/* Hero */}
         <section className="pt-24 md:pt-28 pb-10 md:pb-14 bg-background">
-          <div className="container mx-auto px-4">
-            <div className="max-w-4xl mx-auto text-center">
-              <div className="flex items-center justify-center gap-2 mb-3">
-                <MapPin className="w-5 h-5 text-gold" />
-                <span className="text-gold font-semibold text-sm uppercase tracking-wide">Cobertura Nacional</span>
-              </div>
-              <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-[#111111] mb-4">
-                Áreas de Serviço
-              </h1>
-              <div className="w-16 h-1 bg-gold rounded-full mx-auto mb-5" />
-              <p className="text-base md:text-lg text-[#111111]/55 leading-relaxed max-w-2xl mx-auto mb-4">
-                A Kyro Clean Solutions presta serviços de limpeza profissional de estofos ao domicílio em {stats.municipios} municípios e {stats.freguesias} freguesias, do Porto ao Algarve.
+          <div className="container mx-auto px-4 max-w-4xl">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="h-px w-8 flex-shrink-0" style={{ backgroundColor: "#D4AF37", opacity: 0.65 }} />
+              <p className="text-[10px] font-bold tracking-[0.28em] uppercase" style={{ color: "#D4AF37", opacity: 0.85 }}>
+                Cobertura Nacional
               </p>
-              <p className="text-sm text-[#111111]/55 mb-6">
-                {stats.totalPages}+ páginas de serviço local
-              </p>
-              <div className="flex flex-wrap justify-center gap-3">
-                <QuizButton />
-                <a href={`tel:${PHONE_TEL}`} className="inline-flex items-center gap-2 bg-secondary text-[#111111] font-semibold text-sm px-5 py-2.5 rounded-full border border-border/30 hover:bg-secondary/80 transition-colors">
-                  <Phone className="w-4 h-4" /> {PHONE_DISPLAY}
-                </a>
-              </div>
+            </div>
+            <h1 className="font-playfair text-3xl md:text-4xl lg:text-5xl font-bold leading-[1.1] text-[#111111]">
+              Áreas de{" "}
+              <em className="not-italic" style={{ color: "#D4AF37" }}>Serviço</em>
+            </h1>
+            <p className="mt-4 text-base md:text-lg text-[#111111]/55 leading-relaxed max-w-2xl">
+              A Kyro Clean Solutions presta serviços de limpeza profissional de estofos ao domicílio em {stats.municipios} municípios e {stats.freguesias} freguesias, do Porto ao Algarve.
+            </p>
+            <p className="text-sm text-[#111111]/55 mt-2 mb-6">
+              {stats.totalPages}+ páginas de serviço local
+            </p>
+            <div className="flex flex-wrap gap-3">
+              <QuizButton />
+              <a href={`tel:${PHONE_TEL}`} className="inline-flex items-center gap-2 bg-secondary text-[#111111] font-semibold text-sm px-5 py-2.5 rounded-full border border-border/30 hover:bg-secondary/80 transition-colors">
+                <Phone className="w-4 h-4" /> {PHONE_DISPLAY}
+              </a>
             </div>
           </div>
         </section>
@@ -157,7 +162,8 @@ const AreasDeServico = () => {
         {REGIONS.map(r => (
           <RegionSection
             key={r.area}
-            title={r.title}
+            heading={r.heading}
+            goldWord={r.goldWord}
             area={r.area}
             openMunicipio={openMunicipio}
             setOpenMunicipio={setOpenMunicipio}
@@ -166,13 +172,14 @@ const AreasDeServico = () => {
 
         {/* CTA */}
         <section className="py-10 md:py-14 bg-kyro-green">
-          <div className="container mx-auto px-4 text-center">
-            <h2 className="text-xl md:text-3xl font-bold text-white mb-3">
-              Precisa de limpeza profissional na sua cidade?
-            </h2>
-            <p className="text-white/60 mb-6 text-base">
-              Peça o seu orçamento gratuito: resposta em menos de 30 minutos.
-            </p>
+          <div className="container mx-auto px-4 max-w-4xl">
+            <SectionHeader
+              overline="Comece já"
+              heading="Precisa de limpeza profissional na sua"
+              goldWord="cidade?"
+              subtitle="Peça o seu orçamento gratuito: resposta em menos de 30 minutos."
+              light={false}
+            />
             <QuizButton />
           </div>
         </section>

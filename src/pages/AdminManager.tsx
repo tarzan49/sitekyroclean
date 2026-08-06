@@ -250,7 +250,7 @@ const AdminManager = ({ embedded = false }: { embedded?: boolean }) => {
                 </div>
               </div>
               <div className="flex items-center gap-3">
-                <Link to="/admin-seo-pages" className="hidden sm:flex items-center gap-1.5 text-xs text-white/50 hover:text-gold transition-colors px-3 py-1.5 rounded-lg border border-white/10 hover:border-gold/30">
+                <Link to="/admin/panel" className="hidden sm:flex items-center gap-1.5 text-xs text-white/50 hover:text-gold transition-colors px-3 py-1.5 rounded-lg border border-white/10 hover:border-gold/30">
                   <BarChart3 className="w-3.5 h-3.5" /> SEO Explorer
                 </Link>
                 <Link to="/" className="flex items-center gap-1.5 text-xs text-white/50 hover:text-gold transition-colors px-3 py-1.5 rounded-lg border border-white/10 hover:border-gold/30">
@@ -570,7 +570,7 @@ const AdminManager = ({ embedded = false }: { embedded?: boolean }) => {
               },
               {
                 title: "SEO Explorer",
-                url: "/admin-seo-pages",
+                url: "/admin/panel",
                 desc: "Tabela completa de todas as páginas",
                 icon: BarChart3,
                 color: "text-purple-500",
@@ -623,7 +623,7 @@ const AdminManager = ({ embedded = false }: { embedded?: boolean }) => {
                 ))}
               </div>
               <Link
-                to="/admin-seo-pages"
+                to="/admin/panel"
                 className="mt-3 flex items-center gap-1 text-xs text-gold hover:underline font-medium"
               >
                 Ver todas <ChevronRight className="w-3.5 h-3.5" />
@@ -649,7 +649,7 @@ const AdminManager = ({ embedded = false }: { embedded?: boolean }) => {
                 ))}
               </div>
               <Link
-                to="/admin-seo-pages"
+                to="/admin/panel"
                 className="mt-3 flex items-center gap-1 text-xs text-gold hover:underline font-medium"
               >
                 Ver todas <ChevronRight className="w-3.5 h-3.5" />

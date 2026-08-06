@@ -62,9 +62,9 @@ const QuizStepConfig = ({
                     </div>
                   </div>
                   <div className="flex items-center gap-2 flex-shrink-0">
-                    <button onClick={() => setSofaItems(sofaSetQty(sofaItems, option.id, qty - 1))} disabled={qty === 0} className="w-11 h-11 rounded-sm border border-white/20 bg-white/[0.05] text-white font-bold text-xl flex items-center justify-center disabled:opacity-20 active:scale-95 transition-all touch-manipulation hover:border-gold/50">−</button>
+                    <button onClick={() => setSofaItems(sofaSetQty(sofaItems, option.id, qty - 1))} disabled={qty === 0} className="w-14 h-14 rounded-sm border-2 border-white/20 bg-white/[0.05] text-white font-bold text-2xl flex items-center justify-center disabled:opacity-20 active:scale-95 transition-all touch-manipulation hover:border-gold/50">−</button>
                     <span className={cn('w-7 text-center font-bold tabular-nums text-base', isActive ? (packOn ? 'text-gold' : 'text-white/80') : 'text-white/30')}>{qty}</span>
-                    <button onClick={() => setSofaItems(sofaSetQty(sofaItems, option.id, qty + 1))} className="w-11 h-11 rounded-sm border border-white/20 bg-white/[0.05] text-white font-bold text-xl flex items-center justify-center active:scale-95 transition-all touch-manipulation hover:border-gold/50">+</button>
+                    <button onClick={() => setSofaItems(sofaSetQty(sofaItems, option.id, qty + 1))} className="w-14 h-14 rounded-sm border-2 border-white/20 bg-white/[0.05] text-white font-bold text-2xl flex items-center justify-center active:scale-95 transition-all touch-manipulation hover:border-gold/50">+</button>
                   </div>
                 </div>
                 {isActive && !isSob && basePrice !== null && (
@@ -112,9 +112,9 @@ const QuizStepConfig = ({
                     </div>
                   </div>
                   <div className="flex items-center gap-2 flex-shrink-0">
-                    <button onClick={() => setMattressItems(mattressSetQty(mattressItems, option.id, qty - 1))} disabled={qty === 0} className="w-11 h-11 rounded-sm border border-white/20 bg-white/[0.05] text-white font-bold text-xl flex items-center justify-center disabled:opacity-20 active:scale-95 transition-all touch-manipulation hover:border-gold/50">−</button>
+                    <button onClick={() => setMattressItems(mattressSetQty(mattressItems, option.id, qty - 1))} disabled={qty === 0} className="w-14 h-14 rounded-sm border-2 border-white/20 bg-white/[0.05] text-white font-bold text-2xl flex items-center justify-center disabled:opacity-20 active:scale-95 transition-all touch-manipulation hover:border-gold/50">−</button>
                     <span className={cn('w-7 text-center font-bold tabular-nums text-base', isActive ? 'text-white/80' : 'text-white/30')}>{qty}</span>
-                    <button onClick={() => setMattressItems(mattressSetQty(mattressItems, option.id, qty + 1))} className="w-11 h-11 rounded-sm border border-white/20 bg-white/[0.05] text-white font-bold text-xl flex items-center justify-center active:scale-95 transition-all touch-manipulation hover:border-gold/50">+</button>
+                    <button onClick={() => setMattressItems(mattressSetQty(mattressItems, option.id, qty + 1))} className="w-14 h-14 rounded-sm border-2 border-white/20 bg-white/[0.05] text-white font-bold text-2xl flex items-center justify-center active:scale-95 transition-all touch-manipulation hover:border-gold/50">+</button>
                   </div>
                 </div>
               </div>

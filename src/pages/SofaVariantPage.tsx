@@ -469,7 +469,7 @@ const SofaVariantPage = () => {
               <h2 className="font-playfair text-[1.85rem] sm:text-4xl md:text-[2.6rem] font-bold leading-[1.1] text-white">
                 A escolha certa para os seus{" "}<em className="not-italic" style={{ color: "#D4AF37" }}>estofos</em>
               </h2>
-              <p className="mt-4 text-[15px] leading-relaxed max-w-2xl text-white/50">Rapidez no orçamento, garantia total no resultado e mais de 60 clientes satisfeitos confirmam-no.</p>
+              <p className="mt-4 text-[15px] leading-relaxed max-w-2xl text-white/50">Rapidez no orçamento, garantia total no resultado e mais de 1000 clientes satisfeitos confirmam-no.</p>
             </div>
 
             {/* 3 stats */}

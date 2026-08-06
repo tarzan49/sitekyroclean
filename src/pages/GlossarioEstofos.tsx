@@ -20,7 +20,7 @@ const terms: Term[] = [
   {
     id: "higienizacao-vs-limpeza-vs-lavagem",
     term: "Higienização vs Limpeza vs Lavagem",
-    definition: "Três termos frequentemente confundidos mas com significados distintos. Limpeza remove sujidade visível (manchas, pó, gordura) da superfície do tecido. Higienização vai além: elimina agentes biológicos invisíveis como ácaros, bactérias, fungos e alergénios:que representam risco para a saúde. Lavagem implica utilização de água em grande quantidade e é menos comum em estofos (risco de deformação). O serviço Kyro Clean combina limpeza profunda com higienização por vapor a 160°C.",
+    definition: "Três termos frequentemente confundidos mas com significados distintos. Limpeza remove sujidade visível (manchas, pó, gordura) da superfície do tecido. Higienização vai além: elimina agentes biológicos invisíveis como ácaros, bactérias, fungos e alergénios, que representam risco para a saúde. Lavagem implica utilização de água em grande quantidade e é menos comum em estofos (risco de deformação). O serviço Kyro Clean combina limpeza profunda com higienização por vapor a 160°C.",
     example: "Quando diz que quer 'higienizar' o sofá, está a pedir eliminação de ácaros e bactérias. Quando diz 'limpar', pode estar a referir-se apenas à remoção de manchas visíveis.",
     serviceLink: { label: "Limpeza e Higienização de Sofás", to: "/limpeza-sofas" },
   },
@@ -28,7 +28,7 @@ const terms: Term[] = [
     id: "impermeabilizacao-sofa",
     term: "Impermeabilização de Sofá",
     definition: "Tratamento aplicado após a limpeza que cria uma barreira protetora invisível nas fibras do tecido. Quando um líquido é derramado sobre um sofá impermeabilizado, fica na superfície em forma de gotas (efeito lotus) em vez de ser absorvido pelas fibras. Protege contra vinho, café, sumos, gordura e urina de animais. O efeito dura tipicamente 12 a 18 meses.",
-    example: "Família com crianças pequenas impermeabiliza o sofá de microfibra após a limpeza. Quando o filho derrama sumo de laranja, basta limpar com um pano:sem mancha.",
+    example: "Família com crianças pequenas impermeabiliza o sofá de microfibra após a limpeza. Quando o filho derrama sumo de laranja, basta limpar com um pano, sem mancha.",
     serviceLink: { label: "Impermeabilização de Estofos", to: "/impermeabilizacao" },
   },
   {
@@ -41,14 +41,14 @@ const terms: Term[] = [
   {
     id: "shampoo-estofos",
     term: "Shampoo de Estofos",
-    definition: "Produto detergente específico para tecidos estofados, formulado para penetrar nas fibras e emulsionar sujidade orgânica (gordura, suor, manchas proteicas). É aplicado em espuma para minimizar a quantidade de água utilizada:fundamental para evitar a deformação das almofadas. Diferente do shampoo de tapetes, que é mais agressivo. Requer aspiração para remoção completa após aplicação.",
+    definition: "Produto detergente específico para tecidos estofados, formulado para penetrar nas fibras e emulsionar sujidade orgânica (gordura, suor, manchas proteicas). É aplicado em espuma para minimizar a quantidade de água utilizada, fundamental para evitar a deformação das almofadas. Diferente do shampoo de tapetes, que é mais agressivo. Requer aspiração para remoção completa após aplicação.",
     example: "Sofá de microfibra com manchas de suor no encosto e assento. Aplicação de shampoo de estofos em espuma, seguida de extração a vapor, remove a sujidade acumulada sem ensopar.",
   },
   {
     id: "limpeza-seco-sofa",
     term: "Limpeza a Seco de Sofá",
     definition: "Método de limpeza que utiliza solventes ou compostos em pó (sem água ou com humidade mínima inferior a 5%) para dissolver e remover sujidade das fibras. Indicado para tecidos que não toleram humidade: alcântara, veludo de seda, alguns tipos de linho e estofos com enchimentos que deformam com água. O processo aplica o produto, deixa agir 10 a 15 minutos e aspira ou escova. Não elimina ácaros tão eficazmente quanto o vapor, por isso é complementado com tratamento anti-ácaros separado quando necessário.",
-    example: "Sofá de alcântara creme com manchas de café. Limpeza a seco com solvente neutro:manchas removidas sem qualquer risco de marcas de humidade ou deformação do tecido.",
+    example: "Sofá de alcântara creme com manchas de café. Limpeza a seco com solvente neutro: manchas removidas sem qualquer risco de marcas de humidade ou deformação do tecido.",
     serviceLink: { label: "Limpeza Especializada por Material", to: "/limpeza-sofas" },
   },
   {
@@ -68,33 +68,33 @@ const terms: Term[] = [
     id: "tecido-microsuede",
     term: "Tecido Microsuede (Microfibra de Camurça)",
     definition: "Tecido sintético de alta densidade que imita a textura suave da camurça natural, mas com maior resistência e facilidade de manutenção. É composto por fibras de poliéster ultra-finas (menos de 1 dtex). Muito popular em sofás modernos (IKEA KIVIK, modelos Conforama). Resiste bem à limpeza a vapor mas é sensível a produtos alcalinos e ao calor excessivo que pode fundir as microfibras.",
-    example: "Sofá de microsuede cinza com manchas de café. Limpeza a vapor a temperatura moderada com produto neutro:resultado excelente, cor uniforme restaurada.",
+    example: "Sofá de microsuede cinza com manchas de café. Limpeza a vapor a temperatura moderada com produto neutro: resultado excelente, cor uniforme restaurada.",
   },
   {
     id: "alcantara-sintetica-natural",
     term: "Alcântara Sintética vs Natural",
     definition: "Alcântara natural (também chamada Alcantara®) é uma marca registada italiana feita de poliéster e poliuretano, com textura ultra-macia. Alcântara sintética genérica é uma imitação de menor qualidade. Ambas exigem limpeza especializada: nunca vapor a alta pressão, nunca produtos com álcool. A limpeza a seco com escova profissional é a técnica preferida. O couro Alcantara® tem tratamento anti-mancha de fábrica que é parcialmente restaurável.",
-    example: "Sofá de alcântara sintética cinza-escuro com manchas de gordura. Limpeza a seco com produto específico e escova suave:manchas removidas sem alteração da textura.",
+    example: "Sofá de alcântara sintética cinza-escuro com manchas de gordura. Limpeza a seco com produto específico e escova suave: manchas removidas sem alteração da textura.",
     serviceLink: { label: "Limpeza de Sofás por Material", to: "/limpeza-sofas" },
   },
   {
     id: "veludo-terciopelo-cuidados",
     term: "Veludo e Terciopelo: Cuidados Especiais",
     definition: "Veludo tem pelo curto e denso que cria reflexo luminoso característico. Terciopelo é um tipo de veludo com pelo mais longo. Ambos são extremamente sensíveis ao atrito: esfregar contra o pelo cria marcas permanentes e brilho irregular. A limpeza profissional usa escova de pelos macios na direção correta do pelo, seguida de extração controlada. Nunca usar vapor direto a alta pressão.",
-    example: "Sofá de veludo azul petróleo com marcas de uso no assento. Limpeza com escova especializada:as fibras ficam alinhadas e o aspeto premium é restaurado.",
+    example: "Sofá de veludo azul petróleo com marcas de uso no assento. Limpeza com escova especializada: as fibras ficam alinhadas e o aspeto premium é restaurado.",
     serviceLink: { label: "Limpeza Especializada de Veludo", to: "/limpeza-sofas" },
   },
   {
     id: "couro-pu-ecologico",
     term: "Couro PU (Ecológico / Sintético)",
     definition: "Couro PU (polyuretano) é um revestimento sintético que imita o couro genuíno a menor custo. É composto por uma base têxtil revestida de poliuretano. Principal fraqueza: o revestimento descasca com o tempo, especialmente em zonas de maior atrito. Não existe tratamento que reverta o descascamento avançado, mas a limpeza correta retarda o processo. Nunca usar vapor de alta pressão ou produtos com solventes.",
-    example: "Sofá de couro PU Conforama com início de descascamento nas costuras. Limpeza suave com produto específico e condicionador de PU:processo estabilizado e aspeto melhorado.",
+    example: "Sofá de couro PU Conforama com início de descascamento nas costuras. Limpeza suave com produto específico e condicionador de PU: processo estabilizado e aspeto melhorado.",
   },
   {
     id: "manchas-proteicas-oleosas",
     term: "Manchas Proteicas vs Manchas Oleosas",
-    definition: "Dois tipos com tratamento completamente diferente. Manchas proteicas (sangue, leite, ovo, urina, vómito) são de origem orgânica e requerem tratamento enzimático:as enzimas quebram as proteínas para fácil remoção. Usar calor (vapor) antes do tratamento enzimático 'coze' a proteína e fixa a mancha permanentemente. Manchas oleosas (gordura, manteiga, maquilhagem) requerem desengordurante de base aquosa antes do vapor.",
-    example: "Mancha de sangue fresco: primeiro tratar com produto enzimático frio, depois vapor. Mancha de sangue seco tratada com vapor logo de início: fixed:impossível de remover completamente.",
+    definition: "Dois tipos com tratamento completamente diferente. Manchas proteicas (sangue, leite, ovo, urina, vómito) são de origem orgânica e requerem tratamento enzimático: as enzimas quebram as proteínas para fácil remoção. Usar calor (vapor) antes do tratamento enzimático 'coze' a proteína e fixa a mancha permanentemente. Manchas oleosas (gordura, manteiga, maquilhagem) requerem desengordurante de base aquosa antes do vapor.",
+    example: "Mancha de sangue fresco: primeiro tratar com produto enzimático frio, depois vapor. Mancha de sangue seco tratada com vapor logo de início: impossível de remover completamente.",
   },
   {
     id: "fungos-bolor-estofos",
@@ -105,8 +105,8 @@ const terms: Term[] = [
   {
     id: "desodorizacao-estofos",
     term: "Desodorização de Estofos",
-    definition: "Processo de eliminação de odores persistentes (cigarro, animais, humidade, suor) dos estofos. Existem dois níveis: desodorização de superfície (produtos que mascaram o odor:temporário) e desodorização profunda (ozono ou enzimas que destroem as moléculas responsáveis pelo odor:permanente). A Kyro Clean usa técnica enzimática de desodorização profunda, eficaz em mais de 90% dos casos.",
-    example: "Casa de fumador com sofás impregnados de odor a tabaco. Após desodorização enzimática profissional, odor eliminado em 24-48 horas:não apenas mascarado.",
+    definition: "Processo de eliminação de odores persistentes (cigarro, animais, humidade, suor) dos estofos. Existem dois níveis: desodorização de superfície (produtos que mascaram o odor, temporário) e desodorização profunda (ozono ou enzimas que destroem as moléculas responsáveis pelo odor, permanente). A Kyro Clean usa técnica enzimática de desodorização profunda, eficaz em mais de 90% dos casos.",
+    example: "Casa de fumador com sofás impregnados de odor a tabaco. Após desodorização enzimática profissional, odor eliminado em 24-48 horas, não apenas mascarado.",
     serviceLink: { label: "Limpeza e Desodorização", to: "/limpeza-sofas" },
   },
   {
@@ -119,8 +119,8 @@ const terms: Term[] = [
   {
     id: "limpeza-estofos-exterior",
     term: "Limpeza de Estofos de Exterior",
-    definition: "Sofás, cadeiras e espreguiçadeiras de exterior (terraço, jardim, piscina) têm tecidos específicos resistentes à humidade e UV (olefin, acrílico, textilene, sling). Estes materiais são mais resistentes à água mas acumulam algas, fungos, terra e gordura solar. A limpeza usa produtos adequados a tecidos outdoor e é mais rápida que a de interior:a secagem é imediata. Em Portugal, a limpeza sazonal (primavera/outono) é recomendada.",
-    example: "Conjunto de garden lounge com cushions de olefin no Porto. Após inverno: manchas verdes de algas e terra. Limpeza com produto específico outdoor:resultado impecável para o verão.",
+    definition: "Sofás, cadeiras e espreguiçadeiras de exterior (terraço, jardim, piscina) têm tecidos específicos resistentes à humidade e UV (olefin, acrílico, textilene, sling). Estes materiais são mais resistentes à água mas acumulam algas, fungos, terra e gordura solar. A limpeza usa produtos adequados a tecidos outdoor e é mais rápida que a de interior: a secagem é imediata. Em Portugal, a limpeza sazonal (primavera/outono) é recomendada.",
+    example: "Conjunto de garden lounge com cushions de olefin no Porto. Após inverno: manchas verdes de algas e terra. Limpeza com produto específico outdoor: resultado impecável para o verão.",
     serviceLink: { label: "Limpeza de Tapetes e Exterior", to: "/limpeza-tapetes" },
   },
 ];
@@ -199,14 +199,14 @@ const GlossarioEstofos = () => {
               <div className="w-9 h-9 rounded-xl bg-gold/10 border border-gold/20 flex items-center justify-center">
                 <BookOpen className="w-4 h-4 text-gold" />
               </div>
-              <p className="text-gold text-[10px] font-bold tracking-[0.25em] uppercase">KYRO CLEAN SOLUTIONS</p>
+              <p className="text-gold text-[10px] font-bold tracking-[0.28em] uppercase">KYRO CLEAN SOLUTIONS</p>
             </div>
 
             <h1 className="font-playfair text-3xl sm:text-4xl font-bold text-white leading-tight mb-4">
               Glossário de Limpeza de Estofos
             </h1>
             <p className="text-white/55 text-base leading-relaxed max-w-2xl mb-6">
-              {terms.length} termos técnicos explicados com rigor e acessibilidade:definições citáveis, com exemplo prático e link para o serviço relevante.
+              {terms.length} termos técnicos explicados com rigor e acessibilidade: definições citáveis, com exemplo prático e link para o serviço relevante.
             </p>
 
             {/* Quick index pills */}
@@ -270,7 +270,7 @@ const GlossarioEstofos = () => {
                   <div className="pl-10">
                     <Link
                       to={term.serviceLink.to}
-                      className="inline-flex items-center gap-1.5 text-sm font-semibold text-gold hover:text-[#A87C2A] transition-colors"
+                      className="inline-flex items-center gap-1.5 text-sm font-semibold text-gold hover:text-[#B8912A] transition-colors"
                     >
                       <ArrowRight className="w-3.5 h-3.5" />
                       {term.serviceLink.label}
@@ -284,7 +284,7 @@ const GlossarioEstofos = () => {
           {/* ── Final CTA ── */}
           <div className="rounded-2xl overflow-hidden" style={{ background: "#071a12" }}>
             <div className="px-6 py-8 flex flex-col items-center text-center">
-              <p className="text-[10px] font-bold tracking-[0.25em] uppercase text-gold/70 mb-2">PRONTO PARA AGENDAR?</p>
+              <p className="text-[10px] font-bold tracking-[0.28em] uppercase text-gold/70 mb-2">PRONTO PARA AGENDAR?</p>
               <h2 className="font-playfair text-2xl font-bold text-white mb-2">Orçamento gratuito em 30 segundos</h2>
               <p className="text-white/50 text-sm mb-6">Técnico contacta em menos de 30 minutos · Sem compromisso</p>
               <QuizButton ctaLabel="Calcular preço grátis" />

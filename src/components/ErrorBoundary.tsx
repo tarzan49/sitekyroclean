@@ -73,7 +73,7 @@ class ErrorBoundary extends Component<Props, State> {
                   this.setState({ hasError: false, error: undefined });
                   window.location.reload();
                 }}
-                className="flex items-center gap-2 bg-gradient-to-r from-[#A87C2A] to-[#D4AF37] hover:from-[#D4AF37] hover:to-[#EDD96A] text-[#071a12] font-bold text-sm px-7 py-3.5 rounded-full shadow-[0_4px_20px_rgba(212,175,55,0.35)] hover:shadow-[0_4px_28px_rgba(212,175,55,0.5)] transition-all active:scale-[0.97] w-full sm:w-auto justify-center"
+                className="flex items-center gap-2 bg-gradient-to-r from-[#B8912A] to-[#D4AF37] hover:from-[#D4AF37] hover:to-[#EDD96A] text-[#071a12] font-bold text-sm px-7 py-3.5 rounded-full shadow-[0_4px_20px_rgba(212,175,55,0.35)] hover:shadow-[0_4px_28px_rgba(212,175,55,0.5)] transition-all active:scale-[0.97] w-full sm:w-auto justify-center"
               >
                 <RefreshCw className="w-4 h-4" strokeWidth={2.5} />
                 Tentar novamente
