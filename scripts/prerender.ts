@@ -930,15 +930,6 @@ export function prerenderRoutes(outDir: string): number {
         },
       },
       {
-        path: '/testemunhos',
-        title: 'Testemunhos de Clientes | Kyro Clean Solutions | 5.0 Google',
-        desc: 'Veja o que dizem os nossos clientes. Avaliação 5.0 no Google com mais de 1000 clientes satisfeitos em todo o país.',
-        content: {
-          h1: 'Testemunhos de Clientes',
-          intro: 'Mais de 1000 clientes em todo o país confiaram os seus estofos à Kyro Clean Solutions. Avaliação 5.0 estrelas no Google. Leia as histórias dos nossos clientes.',
-        },
-      },
-      {
         path: '/areas-de-servico',
         title: 'Áreas de Serviço | Porto, Lisboa e Todo o País | Kyro Clean Solutions',
         desc: 'Serviços de limpeza profissional de estofos disponíveis em todo o país. Porto, Gaia, Matosinhos, Lisboa, Braga e muito mais.',
@@ -951,21 +942,6 @@ export function prerenderRoutes(outDir: string): number {
             'Lisboa e área metropolitana: agendamento em 48h',
             'Aveiro e Coimbra: serviço disponível',
             'Todo o território continental: por orçamento',
-          ],
-        },
-      },
-      {
-        path: '/nosso-processo',
-        title: 'O Nosso Processo | Kyro Clean Solutions',
-        desc: 'Conheça o processo de limpeza profissional da Kyro Clean Solutions. Tecnologia avançada, produtos certificados e resultados garantidos.',
-        content: {
-          h1: 'O Nosso Processo de Limpeza',
-          intro: 'O processo de limpeza profissional da Kyro Clean Solutions combina diagnóstico, pré-tratamento, extração profissional e secagem controlada para resultados garantidos.',
-          processSteps: [
-            { step: 1, title: 'Diagnóstico', description: 'Avaliamos o material, manchas e estado geral do estofo.' },
-            { step: 2, title: 'Pré-tratamento', description: 'Aplicamos produtos específicos por tipo de mancha e tecido.' },
-            { step: 3, title: 'Extração profissional', description: 'Equipamento de vapor profissional limpa em profundidade.' },
-            { step: 4, title: 'Resultado garantido', description: 'Estofo limpo, seco e como novo. Resultados visíveis no momento.' },
           ],
         },
       },

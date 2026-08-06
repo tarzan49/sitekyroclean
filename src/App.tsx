@@ -34,7 +34,6 @@ const LimpezaTapetes = lazy(() => import("./pages/LimpezaTapetes"));
 const LimpezaColchoes = lazy(() => import("./pages/LimpezaColchoes"));
 const LimpezaCadeiras = lazy(() => import("./pages/LimpezaCadeiras"));
 const LimpezaAlcatifas = lazy(() => import("./pages/LimpezaAlcatifas"));
-const NossoProcesso = lazy(() => import("./pages/NossoProcesso"));
 const Obrigado = lazy(() => import("./pages/Obrigado"));
 const LocationServicePage = lazy(() => import("./pages/LocationServicePage"));
 const FreguesiaServicePage = lazy(() => import("./pages/FreguesiaServicePage"));
@@ -62,7 +61,6 @@ const BlogPost = lazy(() => import("./pages/BlogPost"));
 const PoliticaPrivacidade = lazy(() => import("./pages/PoliticaPrivacidade"));
 const TermosCondicoes = lazy(() => import("./pages/TermosCondicoes"));
 const PoliticaDevolucoes = lazy(() => import("./pages/PoliticaDevolucoes"));
-const Testemunhos = lazy(() => import("./pages/Testemunhos"));
 
 // Loading fallback component
 const PageLoader = () => (
@@ -114,7 +112,6 @@ const AppRoutes = () => {
                 <Route path="/limpeza-colchoes" element={<LimpezaColchoes />} />
                 <Route path="/limpeza-cadeiras" element={<LimpezaCadeiras />} />
                 <Route path="/limpeza-alcatifas" element={<LimpezaAlcatifas />} />
-                <Route path="/nosso-processo" element={<NossoProcesso />} />
                 <Route path="/obrigado" element={<Obrigado />} />
                 <Route path="/packs" element={<Packs />} />
                 <Route path="/guia-de-packs" element={<PacksSitemap />} />
@@ -175,7 +172,6 @@ const AppRoutes = () => {
                 <Route path="/perguntas-frequentes-limpeza-estofos" element={<FAQEstofos />} />
                 <Route path="/glossario-limpeza-estofos" element={<GlossarioEstofos />} />
                 {/* Legal */}
-                <Route path="/testemunhos" element={<Testemunhos />} />
                 <Route path="/politica-de-privacidade" element={<PoliticaPrivacidade />} />
                 <Route path="/termos-e-condicoes" element={<TermosCondicoes />} />
                 <Route path="/politica-de-devolucoes" element={<PoliticaDevolucoes />} />

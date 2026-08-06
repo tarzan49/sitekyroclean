@@ -218,34 +218,6 @@ const routeMeta: Record<string, { pt: PageMeta; en: PageMeta; es: PageMeta }> = 
       description: "Elija el pack de limpieza ideal para su hogar. Packs con descuento para sofá, colchón, alfombras y más.",
     },
   },
-  "/testemunhos": {
-    pt: {
-      title: "Testemunhos de Clientes | Kyro Clean Solutions | 5.0 Google",
-      description: "Veja o que dizem os nossos clientes. Avaliação 5.0 no Google com mais de 1000 clientes satisfeitos.",
-    },
-    en: {
-      title: "Client Testimonials | Kyro Clean Solutions | 5.0 Google",
-      description: "See what our clients say. 5.0 Google rating with over 1000 satisfied clients.",
-    },
-    es: {
-      title: "Testimonios de Clientes | Kyro Clean Solutions | 5.0 Google",
-      description: "Vea lo que dicen nuestros clientes. Valoración 5.0 en Google con más de 1000 clientes satisfechos.",
-    },
-  },
-  "/nosso-processo": {
-    pt: {
-      title: "O Nosso Processo | Kyro Clean Solutions",
-      description: "Conheça o nosso processo de limpeza profissional. Tecnologia avançada, produtos certificados e resultados garantidos.",
-    },
-    en: {
-      title: "Our Process | Kyro Clean Solutions",
-      description: "Learn about our professional cleaning process. Advanced technology, certified products and guaranteed results.",
-    },
-    es: {
-      title: "Nuestro Proceso | Kyro Clean Solutions",
-      description: "Conozca nuestro proceso de limpieza profesional. Tecnología avanzada, productos certificados y resultados garantizados.",
-    },
-  },
 };
 
 const PageHead = () => {

@@ -194,8 +194,6 @@ export function generateSitemaps(outDir: string) {
     xmlUrl('/blog', 'weekly', '0.8'),
     xmlUrl('/perguntas-frequentes-limpeza-estofos', 'monthly', '0.7'),
     xmlUrl('/glossario-limpeza-estofos', 'monthly', '0.6'),
-    xmlUrl('/testemunhos', 'monthly', '0.6'),
-    xmlUrl('/nosso-processo', 'monthly', '0.6'),
     xmlUrl('/areas-de-servico', 'monthly', '0.7'),
     xmlUrl('/antes-depois-limpeza', 'monthly', '0.7'),
   ];
