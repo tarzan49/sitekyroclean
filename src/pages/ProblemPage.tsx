@@ -337,13 +337,13 @@ const ProblemPage = () => {
             afterImage={gallery.after}
             slides={gallery.slides}
             rotateBeforeAfter={gallery.rotateBeforeAfter}
-            variant="dark"
+            variant="light"
           />
         )}
 
         {/* ═══ FAQ ═══ */}
         {data.faqs.length > 0 && (
-          <ServiceFAQ faqs={data.faqs} heading={`Perguntas sobre ${data.h1.toLowerCase()}`} variant="light" />
+          <ServiceFAQ faqs={data.faqs} heading={`Perguntas sobre ${data.h1.toLowerCase()}`} variant="dark" />
         )}
 
         {/* ═══ AVALIAÇÕES REAIS ═══ */}
