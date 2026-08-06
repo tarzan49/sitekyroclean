@@ -820,3 +820,26 @@ Correções aplicadas: canonical URLs em branco nas 17 páginas core, Breadcrumb
 **Pendente:** os 17 WARNING + 5 INFO de `AUDIT.md` ainda por decidir/corrigir (paleta fora de marca em `Testemunhos.tsx`/`NossoProcesso.tsx`, drift de tokens dourados, `chairPrices` morto — já resolvido nesta sessão à parte, sitemaps estáticos desatualizados em `public/`, etc.). SEO em inglês para turistas britânicos: ainda só avaliado, não decidido.
 
 **Commit:** `5349d60` — `fix: corrige os 13 achados críticos do audit de 8 agentes` (32 ficheiros), pushed para `origin/master`.
+
+## Sessão — Correção dos 17 achados WARNING do audit (continuação, 2026-08-06)
+
+Depois de fechar os 13 CRITICAL (commit `5349d60`), o user pediu para avançar para os 17 WARNING de `AUDIT.md`. Todos corrigidos, build+browser verificados, commit `c6362e3` pushed.
+
+**Conteúdo/dados:** nome errado "Clean Solutions"→"Kyro Clean Solutions" em 3 testemunhos; "+50 clientes" alinhado para "+1000" (quiz widget + `SofaVariantPage.tsx`); % de eliminação de ácaros padronizada em 99% (era 99,9%/98% em vários ficheiros); `GlossarioEstofos.tsx` tinha 15 casos de dois-pontos colados à palavra seguinte + um `fixed:` literal esquecido numa string (bug de edição antiga); 4 links `/admin-seo-pages` (rota inexistente, corrigidos para `/admin/panel`).
+
+**SEO:** removidos os 8 `public/sitemap*.xml` estáticos (sempre regenerados em `dist/` no build, eram dead weight); `generate-sitemap.ts` passou a importar `getAllProblemCityRoutes`/`getAllMaterialRoutes`/`getAllMaterialCityRoutes`/`getAllKeywordVariantRoutes` de `src/data/` em vez de reconstruir a lógica à mão — isto revelou e corrigiu um bug real: a sitemap nunca incluía a variante "impermeabilização" das keyword-variant pages, ~714 páginas reais nunca submetidas ao Google.
+
+**Mobile:** botões call/WhatsApp do `Header` (mobile) e botão fechar do `QuizForm` tinham 32px de área de toque, subiram para 44px; stepper do quiz unificado em 56px (sofá/colchão estavam a 44px, cadeiras e upsell já em 56px).
+
+**Design tokens:** "dourado escuro" unificado em `#B8912A` (6 pontos usavam `#A87C2A`/`#b8962e`/`#a07c1a`); overline padronizado (`text-[10px] font-bold tracking-[0.28em]`) em 8 páginas incl. as 3 legais; `TopProgressBar.tsx` tinha um desvio isolado no gradiente (`#F0DC8A` em vez de `#EDD96A`).
+
+**Testemunhos.tsx / NossoProcesso.tsx / AreasDeServico.tsx:** reescritas para usar `SectionHeader` (títulos à esquerda, overline+linha dourada) em vez de títulos centrados; paleta teal/turquoise/navy substituída por dourado/verde-kyro; cartões de testemunhos migrados do padrão antigo (`rounded-3xl`, avatar navy→turquoise) para o grid hairline com borda dourada já usado nas páginas de marca/material.
+
+**Duas correções da própria auditoria (lição importante):** ao investigar findings #25 (opacidade de borda hairline) e #27 (duas famílias de botão CTA), percebi que o relatório original tinha a leitura errada em pelo menos um caso — comparei contra 7-9 outros ficheiros para confirmar o padrão real dominante antes de "corrigir" e descobri que:
+- #25: o padrão `rgba(...,0.55)` que o audit queria substituir era na verdade o dominante em 9 ficheiros (incluindo o próprio `SofaVariantPage.tsx` usado como referência do hero das páginas de marca); as 3 `Marca*Page.tsx` (criadas nesta sessão) é que eram o desvio. Corrigi na direção inversa à sugerida pelo audit.
+- #27: confirmei que a "família B" (botão sem `rounded-*`, cantos retos) é o `ServicePriceSection.tsx`, um componente único reutilizado em milhares de páginas como widget de calculadora embutido — decisão intencional de design, não um bug. Deixado como está.
+- #28 (wrapper de ícone): sem padrão dominante claro entre os 5 contextos semânticos diferentes; decisão consciente de não forçar uniformização especulativa.
+
+**Lição para sessões futuras:** antes de "corrigir" um finding de consistência visual reportado por um audit, sempre verificar QUANTOS ficheiros usam cada variante antes de assumir que a versão citada como "mais recente/correta" pelo audit é de facto a dominante — o relatório pode ter a direção invertida.
+
+**Ficheiro `AUDIT.md`** atualizado no topo com estado de resolução (30/35 findings corrigidos: 13 CRITICAL + 17 WARNING; 5 INFO por decidir; notas inline nos findings #25/#27/#28 explicando as decisões tomadas).

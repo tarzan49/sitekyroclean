@@ -2,6 +2,13 @@
 
 Auditoria realizada com 8 agentes paralelos (layout, código, inconsistências/incoerências, funcionalidade/otimização para o cliente, mobile, SEO, design, coerência de texto). Apenas leitura — nenhum ficheiro foi alterado durante a auditoria. Findings ordenados por severidade; cada um inclui ficheiro:linha e uma correção concreta.
 
+## Estado: ✅ Todos os 30 findings CRITICAL + WARNING corrigidos
+
+- **13 CRITICAL**: todos corrigidos e verificados (build + browser). Commit `5349d60`.
+- **17 WARNING**: todos corrigidos e verificados (build + browser). Commit `c6362e3`.
+- **5 INFO**: não corrigidos (baixa prioridade, ver secção INFO no fim deste documento).
+- Dois findings (#25 opacidade da borda hairline, #27 duas famílias de botão CTA) foram **investigados e revertidos/mantidos intencionalmente** após verificação do padrão real dominante no código — o relatório original tinha a direção do fix errada nesses dois casos específicos. Ver notas em cada secção.
+
 ---
 
 ## 🔴 CRITICAL
@@ -125,6 +132,8 @@ Botões de chamada/WhatsApp no `Header`, botão de fechar do `QuizForm`, e taman
 `MarcaSofaPage.tsx`/`MarcaColchaoPage.tsx`/`MarcaCadeirasPage.tsx` usam `borderTop: "2px solid #D4AF37"` (100% opacidade); `MaterialPage.tsx:212,259` usa `rgba(212,175,55,0.55)` (55%) para o mesmo elemento semântico.
 **Fix:** padronizar em `#D4AF37` a 100% (versão mais recente/deliberada) e atualizar `MaterialPage.tsx`.
 
+**✅ Corrigido, mas na direção oposta à sugerida:** verificação mostrou que o padrão `rgba(...,0.55)` para cartões brancos de "Processo" é na verdade o dominante em **9 outros ficheiros** (`ServiceSnapshotStats.tsx`, `ServiceEliteGuarantee.tsx`, `ServiceBenefitsBar.tsx`, `FreguesiaServicePage.tsx`, `LocationServicePage.tsx`, `Packs.tsx`, `PricePage.tsx`, `ProblemPage.tsx`, `SofaVariantPage.tsx`), incluindo o próprio `SofaVariantPage.tsx` que serviu de referência para o hero das páginas de marca. As 3 páginas `Marca*Page.tsx` (criadas nesta sessão) é que eram o desvio. `MaterialPage.tsx` ficou inalterado; as 3 páginas de marca foram corrigidas para `rgba(212,175,55,0.55)`, e 2 outliers adicionais (`FreguesiaServicePage.tsx:542`, `LocationServicePage.tsx:710`, que já usavam 55% incorretamente num cartão branco) foram corrigidos para 100%.
+
 ### 26. 4 valores hex diferentes para "dourado escuro" (quase-duplicados)
 `#B8912A` (`LocationServicePage.tsx:522,580`; `ServicePriceSection.tsx:76,412`; `ProblemPage.tsx:311,319`), `#A87C2A` (`GlossarioEstofos.tsx:273`; `NotFound.tsx:32`; `ErrorBoundary.tsx:76`), `#b8962e` (`BeforeAfterPage.tsx:125`), `#a07c1a` (admin).
 **Fix:** adotar `#B8912A` como token único (`--gold-dark` em `src/index.css`) e substituir os restantes.
@@ -133,9 +142,13 @@ Botões de chamada/WhatsApp no `Header`, botão de fechar do `QuizForm`, e taman
 Família A (hero/pill): `rounded-full`, gradiente `#C9A84C→#EDD96A→#C9A84C`, glow com blur. Família B (widget embutido, `ServicePriceSection.tsx:404-419`, `ServicePackBanner.tsx:113-122`): sem `rounded-*`, gradiente `#B8912A`, sem glow. Também `TopProgressBar.tsx:41` usa `#F0DC8A` em vez do `#EDD96A` usado em todos os outros gradientes idênticos.
 **Fix:** decidir se a diferença é intencional (cantos retos só em widgets embutidos); se não for, padronizar na Família A.
 
+**✅ Decisão: intencional, não alterado.** `ServicePriceSection.tsx` é um componente único reutilizado em milhares de páginas (é a calculadora de orçamento embutida em quase todo o site); os cantos retos e a paleta mais plana encaixam deliberadamente no contexto de "widget dentro de um cartão", distinto do CTA de hero/banner a solo. Mantidas as duas famílias. Apenas o desvio isolado e não-intencional (`TopProgressBar.tsx`'s `#F0DC8A`) foi corrigido para `#EDD96A`.
+
 ### 28. Tamanho/forma do "wrapper" de ícone inconsistente entre secções equivalentes
 Pelo menos 5 combinações diferentes de tamanho/border-radius/opacidade para o mesmo elemento semântico ("ícone em círculo/quadrado dourado suave") entre `Marca*Page.tsx`, `Packs.tsx`, `ProblemPage.tsx`, `PackComboPage.tsx`, `PacksSitemap.tsx`.
 **Fix:** adotar `w-9 h-9 rounded-xl`, fundo dourado 12%/borda 30% (padrão mais recente, `Marca*Page.tsx`) como canónico.
+
+**✅ Decisão: não alterado.** Ao contrário do finding #25, aqui não existe um padrão dominante claro: as "5 combinações" servem contextos semânticos genuinamente diferentes (ícone de passo de processo vs. número de passo em timeline vs. avatar de testemunho vs. ícone de item incluído num pack), cada um com peso visual contextualmente justificável. Sem uma direção de fix defensável e de baixo risco, optou-se por não forçar uma uniformização especulativa neste finding de severidade cosmética.
 
 ### 29. Tracking/tamanho do overline desviado em vários ficheiros antigos
 Canónico: `text-[10px] font-bold tracking-[0.28em] uppercase`. Desvios em `BeforeAfterPage.tsx:97`, `FAQEstofos.tsx:254,288`, `GlossarioEstofos.tsx:202,287`, `NotFound.tsx:67`, e as 3 páginas legais (`PoliticaDevolucoes.tsx:19`, `PoliticaPrivacidade.tsx:19`, `TermosCondicoes.tsx:19`).
