@@ -40,6 +40,7 @@ const FreguesiaServicePage = lazy(() => import("./pages/FreguesiaServicePage"));
 const ProblemPage = lazy(() => import("./pages/ProblemPage"));
 const ProblemCityPage = lazy(() => import("./pages/ProblemCityPage"));
 const EnServicePage = lazy(() => import("./pages/EnServicePage"));
+const EnGuidePage = lazy(() => import("./pages/EnGuidePage"));
 const MaterialPage = lazy(() => import("./pages/MaterialPage"));
 const PricePage = lazy(() => import("./pages/PricePage"));
 const BeforeAfterPage = lazy(() => import("./pages/BeforeAfterPage"));
@@ -134,6 +135,7 @@ const AppRoutes = () => {
                 {/* Problem SEO pages */}
                 <Route path="/problemas/:slug" element={<ProblemPage />} />
                 {/* English tourist SEO pages — isolated /en/ namespace, no PT overlap */}
+                <Route path="/en/airbnb-portugal-cleaning-guide" element={<EnGuidePage />} />
                 <Route path="/en/:slug" element={<EnServicePage />} />
                 {/* Problem × City explicit routes (higienizacao-* and lavagem-* filtered out above) */}
                 {problemCityRoutes.map(route => (

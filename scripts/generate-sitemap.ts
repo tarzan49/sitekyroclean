@@ -343,7 +343,10 @@ export function generateSitemaps(outDir: string) {
   // 13. EN tourist pages (isolated /en/ namespace) — own dedicated sitemap,
   // kept separate from all PT sitemaps above so it can be reviewed/analysed
   // on its own.
-  const enUrls: string[] = getAllEnRoutes().map(r => xmlUrl(r.path, 'monthly', '0.6'));
+  const enUrls: string[] = [
+    ...getAllEnRoutes().map(r => xmlUrl(r.path, 'monthly', '0.6')),
+    xmlUrl('/en/airbnb-portugal-cleaning-guide', 'monthly', '0.7'),
+  ];
 
   // Write sub-sitemaps
   const sitemapFiles = [

@@ -219,6 +219,17 @@ const EnServicePage = () => {
         {/* ═══ FAQ ═══ */}
         <ServiceFAQ faqs={page.faqs} heading="Frequently Asked Questions" overline="FAQ" variant="light" />
 
+        {page.audience === "host" && (
+          <section className="py-8 bg-[#FDFDF9] border-t border-[#111111]/8 text-center px-5">
+            <p className="text-sm text-[#111111]/60">
+              Want more detail on documentation and pricing?{" "}
+              <Link to="/en/airbnb-portugal-cleaning-guide" className="font-semibold underline underline-offset-4" style={{ color: "#D4AF37" }}>
+                Read the full host guide
+              </Link>
+            </p>
+          </section>
+        )}
+
         {/* ═══ FINAL CTA ═══ */}
         <section className="py-14 md:py-16 bg-kyro-green border-t border-white/10">
           <div className="max-w-3xl mx-auto px-5 sm:px-6 lg:px-8 text-center">

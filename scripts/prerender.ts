@@ -1012,6 +1012,34 @@ export function prerenderRoutes(outDir: string): number {
     console.log(`  EN tourist pages:        ${count - prev}`);
   }
 
+  // ── EN host guide (single long-form article, isolated /en/ namespace) ──
+  {
+    const url = '/en/airbnb-portugal-cleaning-guide';
+    const title = 'Airbnb & Short-Term Rental Cleaning in Portugal | Host Guide | Kyro Clean';
+    const desc = "A practical guide for Airbnb and short-term rental hosts in Portugal: turnover cleaning timelines, what to photograph for damage claims, and realistic costs for sofa, mattress and rug cleaning.";
+    emit(
+      url,
+      title,
+      desc,
+      {
+        h1: 'Airbnb & short-term rental cleaning in Portugal',
+        intro: desc,
+        benefits: [
+          'Photograph damage before cleaning it — timestamped before/after is the standard most platforms ask for.',
+          'Same-day is often possible, but the earlier in the day you reach out, the better your odds.',
+          'Prices start from €49 (sofa) / €59 (mattress) / €12/m² (rug), always confirmed before we start.',
+          'Before/after photo documentation is standard on every job, no need to request it separately.',
+        ],
+      },
+      [buildBreadcrumbSchema([
+        { name: 'Home', url: BASE_URL + '/' },
+        { name: 'Airbnb & Short-Term Rental Cleaning Guide', url: BASE_URL + url },
+      ])],
+      'en',
+    );
+    console.log(`  EN host guide:           1`);
+  }
+
   return count;
 }
 
