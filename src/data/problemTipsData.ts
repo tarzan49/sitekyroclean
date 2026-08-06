@@ -145,3 +145,16 @@ export const CATEGORY_TIPS: Record<string, { title: string; steps: string[]; war
     warning: "Uso antes de secar completamente pode causar marcas de água no tecido",
   },
 };
+
+// Splits a CATEGORY_TIPS title into {heading, goldWord} for SectionHeader.
+// Keeps a trailing number with the word after it (e.g. "primeiros 5 minutos"
+// → goldWord "5 minutos") instead of leaving a lone digit in the white part.
+export function splitTipsHeading(title: string): { heading: string; goldWord: string } {
+  const words = title.split(" ");
+  const secondLast = words[words.length - 2] ?? "";
+  const goldStart = /^\d+$/.test(secondLast) ? words.length - 2 : words.length - 1;
+  return {
+    heading: words.slice(0, goldStart).join(" ") || "O que fazer",
+    goldWord: words.slice(goldStart).join(" ") || "agora",
+  };
+}

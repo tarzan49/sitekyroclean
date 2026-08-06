@@ -14,7 +14,7 @@ import ServiceAutoCarousel from "@/components/ServiceAutoCarousel";
 import ServiceSnapshotStats from "@/components/ServiceSnapshotStats";
 import ServiceLocationSchema from "@/components/ServiceLocationSchema";
 import { getProblemBySlug, getRelatedProblemLinks } from "@/data/problemSeoData";
-import { CATEGORY_TIPS, CATEGORY_STATS } from "@/data/problemTipsData";
+import { CATEGORY_TIPS, CATEGORY_STATS, splitTipsHeading } from "@/data/problemTipsData";
 import { SERVICE_TESTIMONIALS } from "@/data/locationPriceTestimonialsData";
 import { SERVICE_GALLERY } from "@/constants/serviceGallery";
 import { cities, services, DEFAULT_PRICE_FROM, cityPrep, cityPrepCap } from "@/data/locationSeoData";
@@ -244,7 +244,7 @@ const ProblemCityPage = () => {
             <SectionHeader overline="Diagnóstico" heading="O problema," goldWord="a solução" light={true} />
             <div className="grid sm:grid-cols-2 gap-4 md:gap-6 mb-6">
               {/* Problema — imagem dessaturada + acento vermelho */}
-              <div className="relative aspect-[4/3] overflow-hidden rounded-sm" style={{ boxShadow: "inset 0 0 0 2px rgba(239,68,68,0.55)" }}>
+              <div className="relative aspect-[4/3] overflow-hidden rounded-sm" style={{ border: "3px solid #ef4444", boxShadow: "0 0 0 1px rgba(239,68,68,0.3)" }}>
                 <img
                   src={heroImg}
                   alt={`${problem.h1}, o problema`}
@@ -253,20 +253,20 @@ const ProblemCityPage = () => {
                   loading="lazy"
                 />
                 <div className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(7,26,18,0.90) 0%, rgba(7,26,18,0.6) 45%, rgba(7,26,18,0.15) 72%, transparent 100%)" }} />
-                <div className="absolute bottom-0 left-0 right-0 p-5 md:p-7 min-h-[160px] md:min-h-[180px] flex flex-col justify-start">
+                <div className="absolute bottom-0 left-0 right-0 p-5 md:p-7 h-[172px] md:h-[196px] flex flex-col justify-start overflow-hidden">
                   <div className="flex items-center gap-1.5 mb-2">
                     <XCircle className="w-3.5 h-3.5 flex-shrink-0" style={{ color: "#ef4444" }} />
                     <span className="text-[10px] font-bold tracking-[0.22em] uppercase" style={{ color: "#ef4444" }}>O Problema {prep} {city.name}</span>
                   </div>
-                  <p className="font-playfair text-lg font-bold text-white mb-2 leading-tight">Porque acontece</p>
+                  <p className="font-playfair text-lg font-bold mb-2 leading-tight" style={{ color: "#ef4444" }}>Porque acontece</p>
                   <p className="text-sm text-white/80 leading-relaxed">{problem.problemDetail}</p>
                 </div>
               </div>
               {/* Solução — cor cheia + acento verde: sensação de esperança */}
-              <div className="relative aspect-[4/3] overflow-hidden rounded-sm" style={{ boxShadow: "inset 0 0 0 2px rgba(34,197,94,0.55)" }}>
+              <div className="relative aspect-[4/3] overflow-hidden rounded-sm" style={{ border: "3px solid #22c55e", boxShadow: "0 0 0 1px rgba(34,197,94,0.3)" }}>
                 <img src={gallery?.after ?? heroImg} alt={`${problem.h1}, a solução`} className="absolute inset-0 w-full h-full object-cover" loading="lazy" />
                 <div className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(7,26,18,0.90) 0%, rgba(7,26,18,0.6) 45%, rgba(7,26,18,0.15) 72%, transparent 100%)" }} />
-                <div className="absolute bottom-0 left-0 right-0 p-5 md:p-7 min-h-[160px] md:min-h-[180px] flex flex-col justify-start">
+                <div className="absolute bottom-0 left-0 right-0 p-5 md:p-7 h-[172px] md:h-[196px] flex flex-col justify-start overflow-hidden">
                   <div className="flex items-center gap-1.5 mb-2">
                     <CheckCircle2 className="w-3.5 h-3.5 flex-shrink-0" style={{ color: "#22c55e" }} />
                     <span className="text-[10px] font-bold tracking-[0.22em] uppercase" style={{ color: "#22c55e" }}>A Solução</span>
@@ -331,7 +331,7 @@ const ProblemCityPage = () => {
         {categoryTips && (
           <section className="py-14 md:py-20 bg-kyro-green">
             <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
-              <SectionHeader overline="Dica de Especialista" heading={categoryTips.title.split(" ").slice(0, -1).join(" ") || "O que fazer"} goldWord={categoryTips.title.split(" ").slice(-1)[0] ?? "agora"} light={false} />
+              <SectionHeader overline="Dica de Especialista" heading={splitTipsHeading(categoryTips.title).heading} goldWord={splitTipsHeading(categoryTips.title).goldWord} light={false} />
               <div className="max-w-2xl">
                 <ol className="space-y-4 mb-8">
                   {categoryTips.steps.map((step, i) => (
