@@ -318,7 +318,7 @@ const AdminSeoPages = ({ embedded = false }: { embedded?: boolean }) => {
                       {page.category}
                     </td>
                     <td className="px-4 py-3 text-[#111111]/50 hidden xl:table-cell text-xs">
-                      {page.region ? ADMIN_REGION_LABELS[page.region] : "—"}
+                      {page.region ? ADMIN_REGION_LABELS[page.region] : "N/D"}
                     </td>
                     <td className="px-4 py-3 text-center">
                       {page.visible ? (

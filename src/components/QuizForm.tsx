@@ -457,9 +457,11 @@ const QuizForm = ({
       ? `${serviceLabel}, ${upsellItems.map(i => upsellItemLabels[i.id] ?? i.id).join(', ')}`
       : serviceLabel;
     const packPctLabel = packDiscountPct > 0 ? `Pack -${Math.round(packDiscountPct * 100)}%` : '';
-    const priceText = packDiscountActive && totalPrice > 0
-      ? `${packDiscountedPrice}€ (${packPctLabel})`
-      : totalPrice > 0 ? `${totalPrice}€` : 'Sob orçamento';
+    const priceText = (hasSobOrcamento || hasUpsellSobItem)
+      ? 'Sob orçamento'
+      : packDiscountActive && totalPrice > 0
+        ? `${packDiscountedPrice}€ (${packPctLabel})`
+        : totalPrice > 0 ? `${totalPrice}€` : 'Sob orçamento';
 
     const message = `
 [QUIZ RÁPIDO - Kyro Clean Solutions]
@@ -506,6 +508,8 @@ ${formData.description || 'Sem observações adicionais'}
       chairWaterproofQty: formData.chairWaterproofQty,
       calculateServicePrice,
       totalPrice,
+      hasSobOrcamento,
+      hasUpsellSobItem,
       packDiscountActive,
       packDiscountedPrice,
       packDiscountPct,
@@ -870,9 +874,14 @@ ${formData.description || 'Sem observações adicionais'}
       <div className="px-4 sm:px-5 pt-3 flex flex-col gap-2 flex-shrink-0 border-t border-white/[0.05] items-center" style={{ paddingBottom: 'max(1rem, env(safe-area-inset-bottom))' }}>
         {currentStep === totalSteps ? (
           <div className="flex flex-col gap-2 w-full">
-            {totalPrice > 0 && (
+            {totalPrice > 0 && !hasSobOrcamento && !hasUpsellSobItem && (
               <p className="text-center text-[10px] text-white/25 font-medium tracking-wide">
                 Preço final: <span className="text-gold/60 font-bold">{packDiscountActive ? `${packDiscountedPrice}€` : `${totalPrice}€`}</span>
+              </p>
+            )}
+            {(hasSobOrcamento || hasUpsellSobItem) && (
+              <p className="text-center text-[10px] text-white/25 font-medium tracking-wide">
+                Valor: <span className="text-gold/60 font-bold">Sob orçamento</span>
               </p>
             )}
             <Button

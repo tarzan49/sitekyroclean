@@ -1,5 +1,5 @@
 ﻿import type React from 'react';
-import { Sparkles, Shield, Star, Check } from 'lucide-react';
+import { Droplets, Shield, Star, Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface ServiceTypeSelectorProps {
@@ -37,7 +37,7 @@ const ServiceTypeSelector = ({
   const options: OptionConfig[] = [
     {
       id: 'cleaning' as const,
-      icon: Sparkles,
+      icon: Droplets,
       title: 'Higienização Profunda',
       badge: 'MAIS PEDIDO',
       badgeStyle: 'gold' as const,

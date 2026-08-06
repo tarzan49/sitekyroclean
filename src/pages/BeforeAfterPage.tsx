@@ -165,7 +165,7 @@ const BeforeAfterPage = () => {
               <div className="grid sm:grid-cols-3 gap-3">
                 {[
                   { name: "Limpeza de Sofás",    link: "/limpeza-sofas",    price: "Desde 49€" },
-                  { name: "Limpeza de Colchões", link: "/limpeza-colchoes", price: "Desde 49€" },
+                  { name: "Limpeza de Colchões", link: "/limpeza-colchoes", price: "Desde 59€" },
                   { name: "Limpeza de Tapetes",  link: "/limpeza-tapetes",  price: "Desde 12€/m²" },
                   { name: "Limpeza de Cadeiras", link: "/limpeza-cadeiras", price: "Desde 20€" },
                   { name: "Limpeza de Alcatifas",link: "/limpeza-alcatifas",price: "Desde 3€/m²" },

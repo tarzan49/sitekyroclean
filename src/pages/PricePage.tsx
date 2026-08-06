@@ -212,7 +212,7 @@ const PricePage = () => {
           <ServiceAutoCarousel
             overline="Resultados Reais"
             heading={`Antes e depois: ${data.serviceName}`}
-            subtitle={`Transformação real ${prep} ${data.cityName} — resultado visível no próprio dia.`}
+            subtitle={`Transformação real ${prep} ${data.cityName}, resultado visível no próprio dia.`}
             beforeImage={gallery.before}
             afterImage={gallery.after}
             slides={gallery.slides}

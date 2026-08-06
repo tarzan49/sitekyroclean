@@ -17,6 +17,7 @@ interface ReceiptData {
   discountLabel: string | null;
   discountAmount: number;
   total: number;
+  sobOrcamento: boolean;
   location: string;
   slot: string;
   bookingId: string;
@@ -50,7 +51,7 @@ const Obrigado = () => {
     } catch { /* ignore parse errors */ }
   }, []);
 
-  const isSobOrcamento = receipt ? receipt.total === 0 : false;
+  const isSobOrcamento = receipt?.sobOrcamento ?? false;
 
   return (
     <div className="min-h-screen flex flex-col overflow-hidden bg-checker-dark">
@@ -82,7 +83,7 @@ const Obrigado = () => {
               <Clock className="w-3.5 h-3.5" />
               {isOpenNow
                 ? "Especialista contacta em menos de 30 minutos"
-                : "Fora de horário — contactamos assim que reabrirmos (seg-sáb, 08:00-00:00)"}
+                : "Fora de horário, contactamos assim que reabrirmos (seg-sáb, 08:00-00:00)"}
             </div>
           </div>
 

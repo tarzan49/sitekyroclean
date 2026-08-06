@@ -1,12 +1,12 @@
 ﻿import { Link } from "react-router-dom";
-import { Home, Phone, ArrowRight, Sofa, BedDouble, Sparkles, BookOpen } from "lucide-react";
+import { Home, Phone, ArrowRight, Sofa, BedDouble, Shield, BookOpen } from "lucide-react";
 import { trackCallClick } from "@/lib/analytics";
 import { PHONE_TEL, PHONE_DISPLAY } from "@/constants/business";
 
 const popularPages = [
   { to: "/limpeza-sofas",    icon: Sofa,       label: "Limpeza de Sofás",    desc: "Extração profissional ao domicílio" },
   { to: "/limpeza-colchoes", icon: BedDouble,  label: "Limpeza de Colchões", desc: "Higienização e remoção de ácaros" },
-  { to: "/impermeabilizacao",icon: Sparkles,   label: "Impermeabilização",   desc: "Proteção até 10 anos" },
+  { to: "/impermeabilizacao",icon: Shield,     label: "Impermeabilização",   desc: "Proteção até 10 anos" },
   { to: "/blog",             icon: BookOpen,   label: "Blog",                desc: "Dicas e guias de manutenção" },
 ];
 

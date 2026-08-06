@@ -205,7 +205,7 @@ const ProblemPage = () => {
               <div className="relative aspect-[4/3] overflow-hidden rounded-sm">
                 <img
                   src={heroImg}
-                  alt={`${data.h1} — o problema`}
+                  alt={`${data.h1}, o problema`}
                   className="absolute inset-0 w-full h-full object-cover"
                   style={{ filter: "grayscale(85%) brightness(0.78) contrast(1.05)" }}
                   loading="lazy"
@@ -222,7 +222,7 @@ const ProblemPage = () => {
               </div>
               {/* Solução — cor cheia: comunica "depois" */}
               <div className="relative aspect-[4/3] overflow-hidden rounded-sm">
-                <img src={gallery?.after ?? heroImg} alt={`${data.h1} — a solução`} className="absolute inset-0 w-full h-full object-cover" loading="lazy" />
+                <img src={gallery?.after ?? heroImg} alt={`${data.h1}, a solução`} className="absolute inset-0 w-full h-full object-cover" loading="lazy" />
                 <div className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(7,26,18,0.90) 0%, rgba(7,26,18,0.6) 45%, rgba(7,26,18,0.15) 72%, transparent 100%)" }} />
                 <div className="absolute bottom-0 left-0 right-0 p-5 md:p-7 min-h-[160px] md:min-h-[180px] flex flex-col justify-start">
                   <div className="flex items-center gap-1.5 mb-2">

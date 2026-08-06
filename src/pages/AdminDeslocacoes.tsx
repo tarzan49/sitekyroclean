@@ -28,7 +28,7 @@ export default function AdminDeslocacoes() {
         </div>
 
         <div className="bg-white/[0.03] border border-white/10 rounded-xl p-4 mb-6 text-sm text-white/50">
-          A deslocação é sempre o preço fixo da zona. <strong className="text-white/70">Nunca é gratuita nem varia</strong> com o valor do pedido — mínimo 5€, sobe quanto mais afastado do centro de cada equipa.
+          A deslocação é sempre o preço fixo da zona. <strong className="text-white/70">Nunca é gratuita nem varia</strong> com o valor do pedido: mínimo 5€, sobe quanto mais afastado do centro de cada equipa.
         </div>
 
         {REGIONS.map(region => {

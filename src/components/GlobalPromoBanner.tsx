@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Sparkles } from "lucide-react";
+import { Tag } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { QUIZ_STATE_CHANGE_EVENT } from "@/constants/quiz";
 
@@ -31,7 +31,7 @@ const GlobalPromoBanner = () => {
         {/* Desktop Layout */}
         <div className="hidden md:flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Sparkles className="h-4 w-4 text-[#beb47d]" />
+            <Tag className="h-4 w-4 text-[#beb47d]" />
             <span className="font-semibold text-sm">
               Packs exclusivos: Limpeza + Impermeabilização com 15% desconto
             </span>
@@ -44,7 +44,7 @@ const GlobalPromoBanner = () => {
         {/* Mobile Layout - Compact */}
         <div className="md:hidden flex items-center justify-between gap-3">
           <div className="flex items-center gap-2 flex-1 min-w-0">
-            <Sparkles className="h-4 w-4 text-[#beb47d] flex-shrink-0" />
+            <Tag className="h-4 w-4 text-[#beb47d] flex-shrink-0" />
             <span className="font-semibold text-xs leading-tight">
               Packs exclusivos: até 15% desconto
             </span>

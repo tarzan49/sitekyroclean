@@ -1,284 +1,182 @@
-# Code Audit — Kyro Clean Solutions (`src/`)
+# Auditoria Completa — Kyro Clean Solutions
 
-Date: 2026-06-10
-Scope: entire `src/` directory (React 18 + TypeScript + Vite + Tailwind, ~3,946 prerendered routes)
-
-Legend: 🔴 CRITICAL · 🟡 WARNING · 🟢 INFO
+Auditoria realizada com 8 agentes paralelos (layout, código, inconsistências/incoerências, funcionalidade/otimização para o cliente, mobile, SEO, design, coerência de texto). Apenas leitura — nenhum ficheiro foi alterado durante a auditoria. Findings ordenados por severidade; cada um inclui ficheiro:linha e uma correção concreta.
 
 ---
 
 ## 🔴 CRITICAL
 
-### C1. Core business data (phone, email, address, review count, site URL) hardcoded in 50+ files
+### 1. "Sob orçamento" é cobrado como se fosse só a deslocação
+`src/hooks/use-quiz-pricing.ts` calcula `hasSobOrcamento` / `hasUpsellSobItem`, mas estas flags nunca chegam a `src/services/submissionService.ts` (`QuizLeadPayload`). Resultado: em qualquer sítio onde o preço é comunicado — WhatsApp, CRM, recibo/email — um pedido que devia ser "sob orçamento" aparece como se custasse apenas a taxa de deslocação.
+**Fix:** adicionar `hasSobOrcamento`/`hasUpsellSobItem` ao `QuizLeadPayload` e propagá-los desde `use-quiz-pricing.ts` até `submissionService.ts`, e usá-los em todos os templates de mensagem (WhatsApp/CRM/recibo) para mostrar "Sob orçamento" em vez do valor calculado.
 
-No `src/constants/business.ts` exists. `src/constants/google.ts` only has Google Place/Review/Maps URLs.
+### 2. Falhas no envio do lead são completamente silenciosas
+`submitQuizLead()` em `src/services/submissionService.ts` nunca rejeita, os `.catch()` no Formspree e no Supabase apenas fazem `logError`. `useQuizSubmission` resolve sempre `{success:true}`, mesmo que ambos os envios falhem — o cliente vê "pedido enviado com sucesso" e nem o negócio recebe o lead nem o cliente é avisado.
+**Fix:** propagar o erro (ou pelo menos um `success:false`) quando ambos os canais falham, e mostrar um aviso ao utilizador com um caminho alternativo (telefone/WhatsApp).
 
-- **Phone (`925530647` / `+351925530647` / `925 530 647`)** — ~75 occurrences across ~40 files: `Header.tsx:68`, `Footer.tsx:147,149`, `lib/analytics.ts:35`, `LocalBusinessSchema.tsx:16`, `ServiceLocationSchema.tsx:48`, `ServiceSchema.tsx:63`, `ProblemPage.tsx:521`, `ReviewRequest.tsx:28`, `FAQEstofos.tsx` (10x), `HeaderV1.tsx`, `FinalCTAV1.tsx`, `QuotePopup.tsx`, `ServiceContactSection.tsx`, `Contact.tsx`, every SEO template (Location/Freguesia/Material/MarcaSofa/Problem/SofaVariant/PackCombo/Price), `WhatsAppButton.tsx`, `MobileStickyBar.tsx`, `ErrorBoundary.tsx`, `services/submissionService.ts`, `data/packComboData.ts`.
-- **Email (`cleansolutions.pt25@gmail.com`)** — 14 occurrences in 12 files: `Contact.tsx:103,130,132`, `Footer.tsx:151,153`, `QuizForm.tsx:869`, `ServiceContactSection.tsx:44,46`, `LocalBusinessSchema.tsx:17`, `ServiceLocationSchema.tsx:49`, `ServiceSchema.tsx:64`, `FAQ.tsx:174,182`, `PoliticaPrivacidade.tsx:130-131`, `TermosCondicoes.tsx:31`, `ProblemPage.tsx`.
-- **Address/geo (`R. de António Cardoso 263`, `Porto`, `4150-081`, `41.1496,-8.6109`)** — identical block repeated in `LocalBusinessSchema.tsx:30-38`, `ServiceLocationSchema.tsx:53-56`, `ServiceSchema.tsx:68-71`, `ProblemPage.tsx:526-528`.
-- **`BASE_URL`/`SITE_URL = "https://cleansolutions.com.pt"`** — re-declared as a local const in `LocalBusinessSchema.tsx:4`, `ServiceSchema.tsx:1`, `BlogPost.tsx:86`, and inlined as a raw string literal 100+ times across `ProblemPage.tsx` (12x), `MaterialPage.tsx` (16x), `PricePage.tsx` (13x), `Blog.tsx` (13x), `AreasDeServico.tsx` (8x), `PackComboPage.tsx`, `Packs.tsx`, `PacksSitemap.tsx`, `BeforeAfterPage.tsx`, `MarcaSofaPage.tsx`.
-- **Review count/rating (`reviewCount`/`ratingCount: "60"`, `"5.0"`, `"+1000 clientes"`)** — schema duplicated in `LocalBusinessSchema.tsx:63-64`, `ServiceLocationSchema.tsx:64-65`, `ServiceSchema.tsx:78-79`, `ProblemPage.tsx:531`, `ReviewRequest.tsx:34`; UI copy duplicated in `QuotePopup.tsx:142`, `ServiceHero.tsx:204`, `HeroV1.tsx:212`, `GuaranteeSection.tsx:113`, `FreguesiaServicePage.tsx:167`, `LocationServicePage.tsx:229`, `SofaVariantPage.tsx:222`, `MarcaSofaPage.tsx:174`, `MaterialPage.tsx:175`, `FAQEstofos.tsx:286`, `PackComboPage.tsx:369`, `Obrigado.tsx:214`, `problemSeoData.ts:941`.
+### 3. Sitemap está a submeter 4 URLs fantasma (404) ao Google
+`scripts/generate-sitemap.ts` mantém a sua própria cópia hardcoded de `problemSlugs`, desalinhada da fonte real em `src/data/`. Está a emitir estas URLs que não existem:
+`limpeza-estofos-automovel`, `limpeza-cortinas`, `impermeabilizar-tapete`, `limpeza-sofa-seco`.
+**Fix:** substituir os arrays hardcoded em `generate-sitemap.ts` por imports diretos de `src/data/problemSeoData.ts` (mesmo padrão que `scripts/prerender.ts` já usa).
 
-**Why this is critical:** every time the review count grows (it just changed 50→60 in this exact session, requiring 24 manual edits across 19 files), or the phone/email/address ever changes, someone has to find and edit every one of these spots correctly. Missing even one leaves stale/inconsistent data live (e.g. wrong phone in a JSON-LD block that Google has already indexed).
+### 4. Preços de cadeiras contraditórios em 3 ficheiros
+`chairPrices` em `src/components/quiz/QuizTypes.ts` (código morto, nada importa isto), `src/data/priceSeoData.ts` e `src/data/blogData.ts` têm valores diferentes para o mesmo serviço. O motor real de preços é `calcChairClean`/`calcChairWaterproof` em `quizHelpers.ts`.
+**Fix:** apagar o `chairPrices` morto de `QuizTypes.ts`; alinhar `priceSeoData.ts` e `blogData.ts` com os valores reais de `quizHelpers.ts` (12,50€–20€/unidade).
 
-**Fix:** create `src/constants/business.ts`:
-```ts
-export const SITE_URL = "https://cleansolutions.com.pt";
-export const PHONE_DISPLAY = "925 530 647";
-export const PHONE_TEL = "925530647";
-export const PHONE_E164 = "+351925530647";
-export const WHATSAPP_BASE = `https://wa.me/351925530647`;
-export const BUSINESS_EMAIL = "cleansolutions.pt25@gmail.com";
-export const BUSINESS_ADDRESS = {
-  streetAddress: "R. de António Cardoso 263",
-  addressLocality: "Porto",
-  postalCode: "4150-081",
-  addressCountry: "PT",
-};
-export const BUSINESS_GEO = { latitude: 41.1496, longitude: -8.6109 };
-export const REVIEW_RATING = "5.0";
-export const REVIEW_COUNT = "60";
-export const CLIENTS_SERVED_LABEL = "+1000";
-```
-Then import-and-replace across the ~50 files above. This is the single highest-leverage fix in this audit.
+### 5. Dois nós LocalBusiness JSON-LD conflituosos em cada página pré-renderizada
+`scripts/prerender.ts` (`buildLocalBusinessSchema()`, linhas 88-116) injeta um schema `LocalBusiness` com coordenadas geo diferentes das que já estão no `index.html` estático, em vez de o substituir. Cada página pré-renderizada envia 2 nós LocalBusiness conflituosos ao Google.
+**Fix:** remover o schema estático de `index.html` (ou o de `prerender.ts`) e manter apenas uma fonte de verdade para as coordenadas.
 
----
+### 6. ~900+ páginas (incluindo as 680 novas de marca) sem `buildLocalBusinessNode()` no `@graph`
+As páginas de marca × cidade criadas nesta sessão (sofá/colchão/cadeiras) não têm o nó LocalBusiness no schema `@graph` que as restantes páginas SEO têm.
+**Fix:** adicionar a chamada a `buildLocalBusinessNode()` nos blocos de prerender das 3 marcas em `scripts/prerender.ts`.
 
-### C2. Five independent hand-rolled JSON-LD `@graph` builders — schema coverage diverges per template family
+### 7. Link do rodapé partido em todo o site
+Aponta para `/problemas/cheiro-urina-colchao`, mas a rota real é `/problemas/urina-colchao`. Confirmado por dois agentes independentes (layout + funcionalidade) — está em produção em todas as páginas.
+**Fix:** corrigir o slug no componente do rodapé (`src/components/Footer.tsx` ou equivalente).
 
-- `ProblemPage.tsx:511-556` builds its own `@graph` (LocalBusiness + WebPage + BreadcrumbList) — **omits the `Service`/`Offer` node** that `ServiceSchema`/`ServiceLocationSchema` include.
-- `MaterialPage.tsx:396-446` builds a third independent `@graph` (WebPage + BreadcrumbList + Service).
-- `MarcaSofaPage.tsx:77-129` and `PackComboPage.tsx:71-113` each build a fourth/fifth `@graph`; `MarcaSofaPage` even inlines its own `FAQPage` schema instead of reusing `ServiceFAQSchema`.
-- `ReviewRequest.tsx:24-40` re-declares yet another `LocalBusiness` node with the same `telephone`/`ratingValue`/`reviewCount` fields.
-- Meanwhile `LocationServicePage.tsx` and `FreguesiaServicePage.tsx` correctly use the shared `ServiceLocationSchema` + `ServiceFAQSchema`.
+### 8. Travessão "—" em conteúdo visível ao cliente (regra dura do site), ~40+ ocorrências
+- `src/data/keywordVariantData.ts` — **18 ocorrências** em `whatIs`/FAQ `answer`, renderizadas em todas as páginas de keyword-variant (linhas 89, 90, 92, 107-121).
+- `src/constants/serviceTrustPool.ts` — **23 ocorrências** em `desc`, usadas no componente de trust-stats das seis páginas de serviço principais (linhas 14, 20, 22, 26, 36, 37, 42, 48, 56, 62, 70, 78, 83, 85, 90, 91, 99, 100, 105, 111, 120, 127, 133).
+- `src/pages/Obrigado.tsx:85` — "Fora de horário — contactamos assim que reabrirmos...", mostrado a todo o cliente que submete fora de horário.
+- `src/pages/Packs.tsx:212` — subtitle do `SectionHeader`, sob o H2 principal.
+- `src/pages/MaterialPage.tsx:228` e `src/pages/PricePage.tsx:215` — subtitle do `ServiceAutoCarousel`.
+- `src/pages/ProblemPage.tsx:208,225` e `src/pages/ProblemCityPage.tsx:244,261` — em `alt` de imagem (menor impacto visual, mas ainda viola a regra).
+**Fix:** substituir todos os "—" por vírgula, ponto ou "com" conforme a frase. Começar pelos dois ficheiros de dados (`keywordVariantData.ts`, `serviceTrustPool.ts`) porque afetam o maior número de páginas.
 
-**Why critical:** Problem/Material/MarcaSofa/PackCombo pages (hundreds of routes) likely have weaker rich-result eligibility (missing `Offer`/`aggregateRating`/inconsistent `Service` schema) than Location/Freguesia pages, purely due to copy-paste drift — not an intentional design choice.
+### 9. Ícone Sparkles decorativo (regra dura do site banida), 5 pontos visíveis ao cliente
+- `src/components/GlobalPromoBanner.tsx:2,34,47` — banner global, visível em quase todas as páginas.
+- `src/components/quiz/ServiceTypeSelector.tsx:2,40` — ícone da opção "Higienização Profunda" no quiz, visto por todos os utilizadores.
+- `src/pages/NotFound.tsx:2,9` — cartão "Impermeabilização" na página 404.
+- `src/components/Contact.tsx:1,312` — junto a um heading do formulário de contacto.
+- `src/components/layout/SectionLayout.tsx:1,46` — `Sparkles` é o `badgeIcon` **por defeito** deste componente partilhado (sem importadores ativos hoje, mas é uma armadilha para o futuro).
+**Fix:** `GlobalPromoBanner` → `Tag`/`Percent`; `ServiceTypeSelector` → `Droplets`/`Waves`; `NotFound` → `Shield` (já usado para impermeabilização noutros sítios); `Contact.tsx` remover; `SectionLayout.tsx` mudar o default para `Shield` ou `CheckCircle2`.
 
-**Fix:** Move all `@graph` node builders into `src/lib/seoSchema.ts` as composable functions (`buildLocalBusinessNode()`, `buildBreadcrumbNode(items)`, `buildServiceNode(...)`, `buildFaqNode(...)`). Refactor `ProblemPage`, `MaterialPage`, `MarcaSofaPage`, `PackComboPage`, `ReviewRequest` to compose from these instead of hand-writing `@graph` arrays. Removes ~150-200 duplicated lines and closes the schema gap.
+### 10. Claims de "deslocação grátis/incluída" reapareceram fora do sweep original
+A correção da mensagem de deslocação feita no início desta sessão não cobriu todos os ficheiros:
+- `src/data/priceSeoData.ts:169`
+- `src/pages/FAQEstofos.tsx:77-78`
+- `src/data/blogData.ts:41,267`
+**Fix:** aplicar a mesma correção já usada no Formspree/orçamento — deslocação nunca é grátis/incluída, é sempre o preço real da zona.
 
----
+### 11. Preço de colchão desatualizado (49€) sobrevive à subida do solteiro
+`src/pages/Services.tsx:253` (a linha do colchão na grid de serviços, distinta da linha de impermeabilização já corrigida) continua a mostrar 49€. Também há entradas em `src/data/problemSeoData.ts` cujo texto de intro/benefícios diz 49€ enquanto o `metaDescription` da mesma entrada já diz 59€.
+**Fix:** atualizar `Services.tsx:253` para 59€ e rever `problemSeoData.ts` por entradas de colchão com 49€ no corpo do texto.
 
-### C3. Dead/orphaned files that could mislead a future developer
+### 12. Preço do colchão de bebé (berço) inconsistente: 39€ vs 59€
+Duas fontes diferentes do site mostram valores diferentes para o mesmo item.
+**Fix:** localizar as duas ocorrências e decidir o valor correto (provavelmente 39€, já que berço é um item mais pequeno que solteiro) e alinhar.
 
-- **`src/pages/FAQ.tsx`** (205 lines) — not routed anywhere in `App.tsx`. The live FAQ route (`/perguntas-frequentes-limpeza-estofos`) serves `FAQEstofos.tsx`. Editing `FAQ.tsx` would have zero effect.
-- **`src/components/HeaderV1.tsx`** (382 lines) — not imported anywhere; the live header is `Header.tsx`. A near-duplicate that could be mistakenly "fixed" instead of the real header.
-- **`src/components/QuotePopup.tsx`** (188 lines) + **`src/hooks/usePopupStorage.ts`** (46 lines) — never rendered. Backed by 32 orphaned i18n keys (`quotePopup`, `welcomePopup`, `newsletterPopup` sections in `translation.json`).
-
-**Fix:** Delete all three files (and the `usePopupStorage` hook) plus the 32 orphaned i18n keys. ~439 lines removed with zero behavioral change. If `QuotePopup` was a planned feature, confirm with the team before deleting — otherwise it's dead weight.
+### 13. `priceSeoData.ts` inventa um preço fixo onde o motor real diz "Sob orçamento"
+Para sofás de 4+ lugares, `priceSeoData.ts` mostra "Desde 89€"/"Desde 99€" fixos, mas `QuizTypes.ts` trata este caso como puro "Sob orçamento" (sem preço fixo).
+**Fix:** alinhar `priceSeoData.ts` para mostrar "Sob orçamento" ou remover o valor fixo inventado.
 
 ---
 
 ## 🟡 WARNING
 
-### W1. `QuizForm.tsx` is a 1,304-line god component
+### 14. Sitemaps públicos desatualizados em `public/`
+Os ficheiros `public/sitemap*.xml` commitados no git não incluem as 3 sub-sitemaps mais recentes (incluindo as 680 páginas novas de marca). Risco de servir sitemaps desatualizados se o build de produção não correr o `closeBundle` corretamente.
+**Fix:** confirmar que o pipeline de deploy sempre regenera estes ficheiros antes de publicar, ou remover as cópias estáticas do git e gerar sempre em build.
 
-`src/components/QuizForm.tsx` mixes:
-- ~25 `useState` hooks for unrelated concerns (step nav, location autocomplete, countdown timer, social proof rotation, exit intent, 8 separate `pending*` upsell states, confetti, summary modal).
-- Pure pricing logic (`calculateServicePrice`, `travelCost`, `packDiscountActive`, `isSobOrcamento`, lines 150-266) mixed into component state.
-- `handleSubmit()` (lines 607-883, ~280 lines): builds Formspree payload, retries network requests, calls `supabase.from('leads').insert(...)` directly (lines 695-723), builds WhatsApp message + receipt, writes `sessionStorage`.
-- 9 `useEffect` hooks for scroll lock, keyboard padding, countdown timer, price animation, social proof rotation, confetti, exit-intent, scroll-to-top.
-- The full 340-line modal render tree (lines 956-1299).
+### 15. Nome da marca errado em testemunhos ao vivo
+Algum(ns) testemunho(s) mostra(m) "Clean Solutions" em vez de "Kyro Clean Solutions".
+**Fix:** localizar e corrigir a string nos dados de testemunhos.
 
-**Fix:** extract three hooks:
-- `useQuizPricing(formData, items)` → `{ totalPrice, packDiscountActive, isSobOrcamento, ... }`
-- `useQuizSubmission()` → wraps Formspree + Supabase + sessionStorage + WhatsApp/receipt building
-- `useQuizUiEffects(isOpen)` → scroll lock, keyboard padding, timers, social proof rotation, exit intent
+### 16. Contradição "+1000 clientes" vs "50 clientes" no próprio widget do quiz
+`src/hooks/use-quiz-ui-effects.ts:95` diz algo como "Mais de 50 clientes", contradizendo o "+1000 clientes" usado noutras partes do site.
+**Fix:** alinhar para o valor real e atual, consistente em todo o site.
 
-`QuizForm.tsx` becomes the orchestrator + render shell only.
+### 17. Percentagem de eliminação de ácaros varia entre 98% / 99% / 99,9%
+Ocorre em pelo menos 3 sítios diferentes do site com valores diferentes para a mesma alegação.
+**Fix:** escolher um valor único e verificável e substituir todas as ocorrências.
 
----
+### 18. Pontuação sistemicamente quebrada em `GlossarioEstofos.tsx`
+Padrão recorrente de erros de pontuação ao longo do ficheiro.
+**Fix:** revisão de texto dedicada a este ficheiro.
 
-### W2. No service/storage abstraction — direct `supabase`/`sessionStorage` access inline
+### 19. Links partidos no admin "SEO Explorer" (4 ocorrências)
+Painel `/admin` com links que não resolvem corretamente.
+**Fix:** localizar as 4 ocorrências em `src/pages/AdminSeoPages.tsx` (ou equivalente) e corrigir os hrefs.
 
-- `QuizForm.tsx:693-723` dynamically imports `@/lib/supabase` and inserts into `leads` directly from the component, with a large inline object literal and a swallowed try/catch.
-- `safeSessionSet()` (`QuizForm.tsx:47-53`) duplicates what should be a shared `src/lib/safeStorage.ts`. `QuotePopup.tsx` reads the same `sessionStorage` key (`hasClickedQuote`) directly with no shared helper.
+### 20. `scripts/generate-sitemap.ts` duplica ~350 linhas de dados que já existem em `src/data/`
+Este ficheiro reconstrói localmente ~10 datasets (incluindo o `problemSlugs` desalinhado do finding #3) em vez de importar de `src/data/`. É a causa-raiz do finding #3 e um risco de drift permanente.
+**Fix:** substituir os arrays hardcoded por imports de `src/data/*`, seguindo o padrão já usado em `scripts/prerender.ts`.
 
-**Fix:** add `src/services/leadsService.ts` exporting `submitLead(lead: LeadInput): Promise<void>` (wraps Supabase insert + `logError`); add `src/lib/safeStorage.ts` exporting `safeSessionGet/Set`, `safeLocalGet/Set` for reuse.
+### 21. Alvos de toque (touch targets) pequenos em mobile
+Botões de chamada/WhatsApp no `Header`, botão de fechar do `QuizForm`, e tamanhos de stepper inconsistentes entre `src/components/quiz/QuizStepConfig.tsx` e `src/components/quiz/QuizUpsellOverlay.tsx`.
+**Fix:** garantir mínimo 44×44px em todos os controlos tocáveis; unificar o tamanho do stepper entre os dois ficheiros.
 
----
+### 22. Páginas antigas ignoram o `SectionHeader` e centram os títulos (viola a regra de alinhamento à esquerda)
+- `src/pages/Testemunhos.tsx:105-124` (H1) e `:235-240` (CTA H2) — título centrado, sem serif, sem overline.
+- `src/pages/NossoProcesso.tsx:100-117` (H1) e `:181-183` (CTA H2) — mesmo problema.
+- `src/pages/AreasDeServico.tsx:132-153` (H1, pill centrado em vez de overline) e `:170-172` (CTA H2); `:46-49` (`RegionSection`) alinha à esquerda mas ainda sem `font-playfair`/overline.
+**Fix:** substituir os 6 headings por `<SectionHeader overline=... heading=... goldWord=... light=... />`, seguindo o padrão já usado em `BeforeAfterPage.tsx`, `GlossarioEstofos.tsx` e os `Marca*Page.tsx`.
 
-### W3. "Open quiz" tracking sequence copy-pasted in 4 components, read independently in a 5th
+### 23. Paleta fora da marca em duas páginas antigas
+`Testemunhos.tsx` e `NossoProcesso.tsx` usam `teal`/`turquoise`/`navy` (linhas `Testemunhos.tsx:135,169,223,257`; `NossoProcesso.tsx:132,139,176,181`) em vez do dourado `#D4AF37`/verde `#071a12`/`#0d241b` usado em todo o resto do site. É o finding visual mais gritante da auditoria.
+**Fix:** re-tematizar as duas páginas para a paleta dourado/verde-kyro já definida em `src/index.css`.
 
-`window.dispatchEvent(new CustomEvent('quizOpened')); sessionStorage.setItem('hasClickedQuote', '1');` appears verbatim in:
-- `QuizButton.tsx:19-20`
-- `Header.tsx:44-45`
-- `HeaderV1.tsx:43-44` (dead file, see C3)
-- `ServiceSchedulingBar.tsx:36-37`
+### 24. Cartões de testemunhos com padrão visual diferente do resto do site
+`Testemunhos.tsx:135,165-169` usa `rounded-3xl shadow-md` com barra dourada no topo, um terceiro idioma de cartão que não corresponde nem ao padrão `TestimonialsV1.tsx` nem ao grid hairline usado nas páginas de marca (ex. `src/pages/MarcaSofaPage.tsx:283-302`).
+**Fix:** migrar `Testemunhos.tsx` para reutilizar o componente `TestimonialsV1`/o mesmo padrão hairline.
 
-`QuotePopup.tsx:40` (also dead, see C3) reads the `hasClickedQuote` key independently.
+### 25. Opacidade da borda dourada do grid hairline inconsistente
+`MarcaSofaPage.tsx`/`MarcaColchaoPage.tsx`/`MarcaCadeirasPage.tsx` usam `borderTop: "2px solid #D4AF37"` (100% opacidade); `MaterialPage.tsx:212,259` usa `rgba(212,175,55,0.55)` (55%) para o mesmo elemento semântico.
+**Fix:** padronizar em `#D4AF37` a 100% (versão mais recente/deliberada) e atualizar `MaterialPage.tsx`.
 
-**Fix:** add `src/hooks/use-quiz-launcher.ts` exporting `markQuizOpened()`, plus constants `QUIZ_OPENED_EVENT` / `HAS_CLICKED_QUOTE_KEY` in `src/constants/`. Replace the live call sites (Header, QuizButton, and `ServiceSchedulingBar` if it's actually live — see W9 note).
+### 26. 4 valores hex diferentes para "dourado escuro" (quase-duplicados)
+`#B8912A` (`LocationServicePage.tsx:522,580`; `ServicePriceSection.tsx:76,412`; `ProblemPage.tsx:311,319`), `#A87C2A` (`GlossarioEstofos.tsx:273`; `NotFound.tsx:32`; `ErrorBoundary.tsx:76`), `#b8962e` (`BeforeAfterPage.tsx:125`), `#a07c1a` (admin).
+**Fix:** adotar `#B8912A` como token único (`--gold-dark` em `src/index.css`) e substituir os restantes.
 
----
+### 27. Botão CTA primário com duas famílias visuais não reconciliadas
+Família A (hero/pill): `rounded-full`, gradiente `#C9A84C→#EDD96A→#C9A84C`, glow com blur. Família B (widget embutido, `ServicePriceSection.tsx:404-419`, `ServicePackBanner.tsx:113-122`): sem `rounded-*`, gradiente `#B8912A`, sem glow. Também `TopProgressBar.tsx:41` usa `#F0DC8A` em vez do `#EDD96A` usado em todos os outros gradientes idênticos.
+**Fix:** decidir se a diferença é intencional (cantos retos só em widgets embutidos); se não for, padronizar na Família A.
 
-### W4. `QuizUpsellOverlay.tsx` (561 lines) — 18 props prop-drilled from `QuizForm`, 8 of them `pending*` state pairs
+### 28. Tamanho/forma do "wrapper" de ícone inconsistente entre secções equivalentes
+Pelo menos 5 combinações diferentes de tamanho/border-radius/opacidade para o mesmo elemento semântico ("ícone em círculo/quadrado dourado suave") entre `Marca*Page.tsx`, `Packs.tsx`, `ProblemPage.tsx`, `PackComboPage.tsx`, `PacksSitemap.tsx`.
+**Fix:** adotar `w-9 h-9 rounded-xl`, fundo dourado 12%/borda 30% (padrão mais recente, `Marca*Page.tsx`) como canónico.
 
-`QuizForm.tsx:74-80` owns `pendingUpsellId`, `pendingSofaItems`, `pendingMattressItems`, `pendingCarpetArea`, `pendingChairQtyNum`, `pendingWaterproof` (+ setters) purely so `QuizUpsellOverlay` (lines 1160-1182 of `QuizForm.tsx`) can manage its own internal `prompt → select → config` flow.
+### 29. Tracking/tamanho do overline desviado em vários ficheiros antigos
+Canónico: `text-[10px] font-bold tracking-[0.28em] uppercase`. Desvios em `BeforeAfterPage.tsx:97`, `FAQEstofos.tsx:254,288`, `GlossarioEstofos.tsx:202,287`, `NotFound.tsx:67`, e as 3 páginas legais (`PoliticaDevolucoes.tsx:19`, `PoliticaPrivacidade.tsx:19`, `TermosCondicoes.tsx:19`).
+**Fix:** padronizar todos para `text-[10px] font-bold tracking-[0.28em] uppercase`.
 
-**Fix:** move all `pending*` state into `QuizUpsellOverlay` itself (or a co-located `useUpsellSelection()` hook). Expose only `onConfirm(item)` / `onCancel()` to `QuizForm`. Removes 12 props + 8 state vars from `QuizForm`.
-
----
-
-### W5. Four parallel WhatsApp message-builder functions instead of one shared module
-
-- `src/lib/buildServiceWaMessage.ts` (canonical, shared — good).
-- `buildMaterialWaMessage()` — `MaterialPage.tsx:42-57`
-- `buildProblemWaMessage()` — `ProblemPage.tsx:101-159` (~58 lines of slug switch)
-- `buildWaMessage()` — `SofaVariantPage.tsx:109`
-- `buildWhatsAppUrl()` — `data/packComboData.ts:100`
-
-All four follow the identical "Olá! ... <item> ... <city>. Qual é o preço...?" shape but live in separate page files.
-
-**Fix:** consolidate into `src/lib/whatsappMessages.ts` alongside `buildServiceWaMessage`. ~60 lines reorganized; centralizes copy/tone for future edits.
-
----
-
-### W6. Trust-badge / star-rating JSX block copy-pasted ~10+ times; `GoogleReviewsBadge` built for this purpose but unused
-
-Pixel-identical "★★★★★ 5.0 · 60+ avaliações · Google" blocks (same Tailwind classes, same `[...Array(5)]` star loop, same `#D4AF37` gold) appear verbatim in:
-- `FreguesiaServicePage.tsx:155-170`, `LocationServicePage.tsx:217-231`, `SofaVariantPage.tsx:208-223` (identical)
-- Smaller variants: `ServiceHero.tsx:195-207`, `QuotePopup.tsx:136-143` (dead, see C3), `MarcaSofaPage.tsx:173-174`, `MaterialPage.tsx:172-175`, `FAQEstofos.tsx:284-286`, `PackComboPage.tsx:355-369`, `HeroV1.tsx`, `GuaranteeSection.tsx`, `HowItWorksV1.tsx`, `BeforeAfterPage.tsx`, `QuizStepContact.tsx`
-
-`src/components/GoogleReviewsBadge.tsx` already exists, accepts `rating`/`count` props, and is **never imported**.
-
-**Fix:** extend `GoogleReviewsBadge` (or build `<TrustRatingBadge variant="hero"|"compact"|"pill" rating={REVIEW_RATING} reviewCount={REVIEW_COUNT} />`) and replace the ~10+ inline blocks. ~120-150 lines removed; also fixes C1's review-count duplication for these specific spots in one shot.
-
----
-
-### W7. Inline data + page-level logic in large SEO templates should move to `src/data`/`src/lib`
-
-- `LocationServicePage.tsx` (657 lines): `PRICE_TABLE` (lines 24-59) and `SERVICE_TESTIMONIALS` (lines 61-86) are static content living inline instead of in `src/data/` like `locationSeoData.ts`.
-- `ProblemPage.tsx` (564 lines): `CATEGORY_TIPS` (lines 17-99, ~83 lines) → `src/data/problemTipsData.ts`; `buildProblemWaMessage()` (lines 101-159) → `src/lib/` (see W5).
-- `MaterialPage.tsx` (455 lines): `MATERIAL_HERO` map + `buildMaterialWaMessage()` (lines 26-57) → `src/data/materialHeroImages.ts` + `src/lib/`.
-
-**Fix:** as part of W5's consolidation, also relocate these data tables to `src/data/` for consistency with the existing data-file convention.
-
----
-
-### W8. `QuizStepConfig.tsx` (311 lines) — near-duplicate sofa/mattress pricing branches
-
-Sofa branch and mattress branch each recompute `basePrice`, `bothFullP`, `packPrice`, `packDelta`, `dp` (display price) with the same shape, differing only in price table (`sofaPrices` vs `mattressPrices`) and add-on delta (+40 vs +30).
-
-**Fix:** extract `usePackPricing(option, item, serviceType, addonDelta)` in `quizHelpers.ts` returning `{ basePrice, packPrice, packDelta, displayPrice }`; use in both branches.
-
----
-
-### W9. Dead components/files safe to delete (~2,500 lines, near-zero risk — none are imported anywhere)
-
-| Group | Files | LOC |
-|---|---|---|
-| Higienização/lavagem keyword-variant wrappers (re-export `getKeywordVariantData`, never imported — route gen goes through `getAllKeywordVariantRoutes()` directly) | `data/higienizacaoAlcatifasData.ts`, `higienizacaoCadeirasData.ts`, `higienizacaoColchaoData.ts`, `higienizacaoSofaData.ts`, `higienizacaoTapetesData.ts`, `lavagemAlcatifasData.ts`, `lavagemCadeirasData.ts`, `lavagemColchaoData.ts`, `lavagemSofaData.ts`, `lavagemTapetesData.ts` | ~80 |
-| Dead homepage components (back orphaned i18n sections `about`, `beforeAfter`, `clientTypes`, `whyChooseUs`, `trustBadges`) | `components/About.tsx`, `BeforeAfterSection.tsx`, `BenefitCard.tsx`, `ClientTypes.tsx`, `DidYouKnowBox.tsx`, `GuaranteeSection.tsx`, `WhyChooseUs.tsx`, `TrustBadges.tsx`, `SocialProofBarV1.tsx` | ~1,162 |
-| Dead `Service*` page-section components (superseded by `ServiceHero`/`ServiceFAQ`/`ServiceBenefitsBar` which ARE used) | `components/RelatedServices.tsx`, `ServiceAreaLinks.tsx`, `ServiceBenefitsSection.tsx`, `ServiceContactSection.tsx`, `ServiceGuarantee.tsx`, `ServicePageTitle.tsx`, `ServiceProblemsGrid.tsx`, `ServiceSchedulingBar.tsx` *(check W3 usage first)*, `ServiceTestimonials.tsx` | ~837 |
-| Other dead standalone components | `components/LocationAutocomplete.tsx`, `OptimizedImage.tsx`, `PacksTopBar.tsx`, `GoogleReviewsBadge.tsx` *(or repurpose per W6)*, `WhatsAppButton.tsx`, `NavLink.tsx` | ~592 |
-| Unused quiz step variants | `components/quiz/steps/QuizStep0Location.tsx`, `QuizStep4Contact.tsx` | ~263 |
-| `QuizSummary.tsx` — own header comment claims it's behind a `{false && ...}` guard that no longer exists in `QuizForm.tsx`; fully disconnected | `components/quiz/steps/QuizSummary.tsx` | ~225 |
-| Dead exports never called (`App.tsx` hardcodes `/problemas/:slug`, doesn't enumerate) | `data/problemSeoData.ts:1389-1400` (`getProblemsByCategory`, `getAllProblemRoutes`) | ~10 |
-
-> ⚠️ Note: `ServiceSchedulingBar.tsx` is listed both here (as a "dead Service* component") and in W3 (as a live call site for the quiz-launcher pattern). **Verify actual usage with a fresh grep before deleting** — the two audit passes disagreed; if it's genuinely unused, drop it from W3's fix list too.
-
-**Fix:** delete all files above (after double-checking the `ServiceSchedulingBar` conflict noted above). ~2,500 lines removed.
-
----
-
-### W10. Orphaned i18n sections in `src/i18n/locales/pt/translation.json`
-
-No `t('...')` references found for these top-level sections:
-- `quotePopup`, `welcomePopup`, `newsletterPopup` (32 keys, tied to dead `QuotePopup.tsx` — see C3)
-- `about`, `beforeAfter`, `clientTypes`, `whyChooseUs`, `trustBadges` (tied to dead components — see W9)
-- `slider` (3 keys), `christmas` (4 keys — **double-check**, may be a seasonal toggle), `promocoes` (6 keys), `testimonials2` (1 key)
-
-**Fix:** remove once the corresponding dead components (W9/C3) are deleted; manually verify `christmas` isn't behind a date-based feature flag before removing.
-
----
-
-### W11. `react-i18next` used inconsistently — newer SEO templates bypass i18n entirely
-
-Older "core" pages (`LimpezaSofas.tsx`, `LimpezaColchoes.tsx`, `LimpezaCadeiras.tsx`, `LimpezaTapetes.tsx`, `LimpezaAlcatifas.tsx`, `Impermeabilizacao.tsx`, `Index.tsx`) use `useTranslation()`/`t('key')`. All newer programmatic SEO templates (`LocationServicePage`, `FreguesiaServicePage`, `ProblemPage`, `MaterialPage`, `MarcaSofaPage`, `SofaVariantPage`, `PackComboPage`, `ProblemCityPage`) hardcode every string in PT directly in JSX — zero `react-i18next` imports.
-
-**Why it matters:** not a live bug (site is PT-only today), but it's an architectural fork — `src/i18n/locales/pt/` is now dead weight for ~80% of pages, and any future i18n expansion requires retrofitting every SEO template.
-
-**Fix:** either (a) formally document that SEO template pages are PT-only by design and exclude them from the i18n system, or (b) if multi-language is planned, migrate shared section copy (FAQ headers, CTA labels, "Como funciona") into `t()` keys via a shared `useServicePageCopy()` hook.
-
----
-
-### W12. shadcn/ui scaffold — ~3,254 lines of unused generated components (separate, low-priority cleanup)
-
-Confirmed zero usages outside their own file: `alert-dialog`, `alert`, `aspect-ratio`, `avatar`, `badge`, `breadcrumb`, `calendar`, `card`, `carousel`, `chart`, `checkbox`, `collapsible`, `command`, `context-menu`, `drawer`, `dropdown-menu`, `form`, `input-otp`, `menubar`, `navigation-menu`, `pagination`, `popover`, `progress`, `radio-group`, `resizable`, `scroll-area`, `select`, `sidebar`, `slider`, `switch`, `table`, `toggle-group`, `toggle` (all in `src/components/ui/`).
-
-**Fix (optional, separate pass):** delete unused `ui/*` files and corresponding `package.json` deps: `@radix-ui/react-{alert-dialog,aspect-ratio,avatar,checkbox,collapsible,context-menu,dropdown-menu,menubar,navigation-menu,popover,progress,radio-group,scroll-area,select,slider,switch,toggle,toggle-group}`, `cmdk`, `vaul`, `input-otp`, `recharts`, `react-day-picker`, `react-resizable-panels`.
+### 30. `chairPrices` em `QuizTypes.ts` é código morto
+Nada importa este export; o motor real é `calcChairClean`/`calcChairWaterproof` em `quizHelpers.ts` (relacionado com finding #4).
+**Fix:** apagar o export morto.
 
 ---
 
 ## 🟢 INFO
 
-### I1. `ServiceSchema.tsx:90-100` hardcodes its own 8-city `areaServed` array instead of mapping `cities` from `locationSeoData.ts` (already the source of truth, used by `LocalBusinessSchema`).
+### 31. Em dash em `plainAnswer` só afeta o schema JSON-LD, não o DOM visível
+`src/pages/FAQEstofos.tsx:24-114` (`plainAnswer`) alimenta apenas `FAQPage` JSON-LD (linha 137), não o `<answer>` renderizado. Vale a pena limpar porque o Google pode mostrar este texto em rich snippets, mas não é uma violação visível em sentido estrito.
 
-### I2. `"39€"` default price fallback duplicated independently in `MaterialPage.tsx:81-82`, `ProblemCityPage.tsx:86`, `ServiceLocationSchema.tsx:12`, `ServiceSchema.tsx:22`, `LimpezaSofas.tsx:130`, `LimpezaColchoes.tsx:130`. Export `DEFAULT_PRICE_FROM = "39€"` from `locationSeoData.ts` and reference it.
+### 32. Overline secundário ("Outros serviços" etc.) usa `0.26em` em vez de `0.28em`
+Consistente em ~7 ficheiros (`LocationServicePage.tsx`, `FreguesiaServicePage.tsx`, `MaterialPage.tsx`, `PricePage.tsx`, `ProblemPage.tsx`, `ProblemCityPage.tsx`) — parece ser um nível secundário intencional, não drift acidental. Só a confirmar.
 
-### I3. Unused npm dependencies (not imported anywhere in `src/`): `@hookform/resolvers`, `date-fns`, `i18next-browser-languagedetector`. Run `npm uninstall` for these (verify not used by build scripts first).
+### 33. `MaterialPage.tsx:318` ("Explore mais") usa grid `gap-x-12 gap-y-10` em vez de hairline
+Secção com pill-chips de links, não cartões — tratamento diferente é contextualmente razoável.
 
-### I4. Unused/write-only state in `QuizForm.tsx`: `locationFadeIn` (61), `pendingChairQty` (78), `showSummary` (81), `timerFlash` (82, 375-376, 924), `hasSofas` (155), `isSobOrcamento` useMemo (242-265, real one is in `pricingService.ts`), `needsLocationStep` (450), `timingLabel`/`contactLabel` (615-616), `hypoText` (732). ~15-20 lines. **Caution:** `timerFlash`/`showSummary` look like half-wired UI features — confirm with the team before deleting.
+### 34. Páginas legais nunca usam `SectionHeader`
+`PoliticaPrivacidade.tsx`, `PoliticaDevolucoes.tsx`, `TermosCondicoes.tsx` têm o seu próprio cabeçalho simplificado. Baixa prioridade (páginas de boilerplate legal são convencionalmente mais simples).
 
-### I5. Small dead exports/hooks:
-- `src/hooks/use-intersection-observer.ts` (53 lines) — never imported, delete file.
-- `src/lib/performance.ts` — `criticalStyles`/`preloadCriticalResources` (lines 1-23) unused, only `measureWebVitals` is used.
-- `src/hooks/use-quiz-analytics.ts` — `useUpsellTracking` (153-180+) never used.
-- `src/hooks/useScrollReveal.ts` — `getActiveIndex()` (14-24) never called.
-- `src/data/freguesiaContentEngine.ts:287` (`getSeed`), `src/data/marcaSofaData.ts` (`marcaCities`), `src/hooks/use-toast.ts:129` (`reducer`) — exported but only used internally; drop `export`.
-
-### I6. Unused imports / dead identifiers (~20 spots, one-line fixes each):
-`Header.tsx` (`onOpenQuiz` prop), `Hero.tsx` (`trackWhatsAppClick` import + `waHref` — possible tracking gap, not just dead code), `QuizForm.tsx` (`Check`, `Flame` from lucide-react), `Services.tsx` (`containerW`/`setContainerW`), `layout/SectionLayout.tsx` (`ctaLink` prop), `AdminDashboard.tsx` (6 unused lucide icons, `PRIORITY_MAP`, `setFilterAssigned`), `AdminPanel.tsx` (`XCircle`), `AdminSeoPages.tsx` (`ProblemPage` type), `BlogPost.tsx` (`allPosts`), `MarcaSofaPage.tsx` (`CheckCircle`), `ProblemCityPage.tsx` (`METRO_CITIES`, `ProblemCityRoute`), `Testemunhos.tsx` (`Sparkles`), `materialSeoData.ts` (`services` import), `pricingService.ts` (`mattressItems` param in `isSobOrcamento`).
-
-### I7. SEO template section order drift (cosmetic, document rather than fix):
-- `LocationServicePage` has "Tabela de Preços" + "Testemunhos" sections that `FreguesiaServicePage` lacks.
-- `FreguesiaServicePage` renders `ServiceFAQSchema` inline inside the FAQ section; `LocationServicePage` renders it at the very end.
-- None of `ProblemPage`/`MaterialPage`/`MarcaSofaPage`/`SofaVariantPage` have a `GuaranteeSection`-equivalent block that core `Limpeza*` pages have.
-- **Fix:** document which sections are "core" vs "optional per template family", or codify via a shared `<SeoPageLayout>`.
-
-### I8. Raw hex colors (`#071a12`, `#0B2F2A`, `#FDFDF9`, `#D4AF37`) used inline via `style={{...}}` alongside `bg-checker-dark`/`bg-kyro-green` Tailwind utilities across all SEO templates (e.g. `LocationServicePage.tsx:184` vs `:351`). Consistent across templates (not drift between files), but a missed opportunity to fully adopt the `bg-kyro-green` utility and drop ~dozens of inline style objects.
-
-### I9. Files over 400 lines
-
-| Lines | File | Note |
-|---|---|---|
-| 1650 | `src/data/blogData.ts` | content dataset, expected |
-| 1421 | `src/data/problemSeoData.ts` | content dataset, expected |
-| 1304 | `src/components/QuizForm.tsx` | see W1 |
-| 1105 | `src/pages/AdminPanel.tsx` | out of scope (admin) |
-| 826 | `src/pages/AdminDashboard.tsx` | out of scope (admin) |
-| 712 | `src/pages/AdminManager.tsx` | out of scope (admin) |
-| 657 | `src/pages/LocationServicePage.tsx` | see W7 |
-| 635 | `src/components/ui/sidebar.tsx` | shadcn boilerplate, unused (W12) |
-| 564 | `src/pages/ProblemPage.tsx` | see C2, W7 |
-| 561 | `src/components/quiz/steps/QuizUpsellOverlay.tsx` | see W4 |
-| 554 | `src/data/keywordVariantData.ts` | content dataset, expected |
-| 473 | `src/pages/FreguesiaServicePage.tsx` | see I7 |
-| 463 | `src/pages/SofaVariantPage.tsx` | |
-| 462 | `src/data/materialSeoData.ts` | content dataset, expected |
-| 455 | `src/pages/MaterialPage.tsx` | see C2, W7 |
-| 439 | `src/pages/AdminImport.tsx` | out of scope (admin) |
-| 438 | `src/components/Services.tsx` | |
-| 435 | `src/pages/PackComboPage.tsx` | see C2 |
-| 421 | `src/pages/PricePage.tsx` | |
+### 35. Rotas `/admin/*` com as mesmas violações (travessão, Sparkles) mas não públicas
+`AdminDeslocacoes.tsx:31`, `AdminSeoPages.tsx:321`, `AdminManager.tsx:16,48,130,316` — gated, menor prioridade que os públicos.
 
 ---
 
-## Summary
+## Resumo
 
-| Severity | Count | Approx. LOC removable/affected |
-|---|---|---|
-| 🔴 CRITICAL | 3 | C1: ~50 files to consolidate (low LOC, high risk reduction) · C2: ~150-200 lines · C3: ~439 lines deleted |
-| 🟡 WARNING | 12 | W9 alone: ~2,500 lines deleted; W6: ~120-150 lines; W5/W7: ~120 lines reorganized; W12 (optional): ~3,254 lines |
-| 🟢 INFO | 9 | ~75-100 lines (unused imports/exports/vars) |
+| Severidade | Nº de findings |
+|---|---|
+| 🔴 CRITICAL | 13 |
+| 🟡 WARNING | 17 |
+| 🟢 INFO | 5 |
 
-**Near-zero-risk deletions available immediately:** C3 (~439 lines) + W9 (~2,500 lines) = **~2,940 lines**, none of which are imported anywhere in the project.
-
-**Top 5 most impactful issues:**
-1. **C1** — No `src/constants/business.ts`; phone/email/address/review-count/site-URL hardcoded across ~50 files. Highest leverage fix in this audit — directly caused the 24-file edit needed earlier this session just to bump the review count from 50 to 60.
-2. **C3 + W9** — ~2,940 lines of dead components/pages/data files, including a duplicate header (`HeaderV1.tsx`) and a duplicate FAQ page (`FAQ.tsx`) that could be mistakenly edited instead of the live versions.
-3. **C2** — 5 divergent hand-rolled JSON-LD builders; Problem/Material/MarcaSofa/PackCombo pages are missing schema fields (`Offer`, consistent `aggregateRating`) that Location/Freguesia pages have, a real SEO gap across hundreds of routes.
-4. **W1** — `QuizForm.tsx` (1,304 lines) is a god component mixing pricing logic, Supabase writes, analytics, and a 340-line render tree — the most business-critical file on the site (lead capture) and the hardest to safely modify.
-5. **W6** — Trust-badge/review JSX duplicated 10+ times while a purpose-built `GoogleReviewsBadge` component sits unused; fixing this also resolves part of C1's review-count duplication.
-
-Full details with file paths and line numbers for every item above are in this file.
+**Os 5 mais impactantes:**
+1. "Sob orçamento" cobrado errado em todos os canais de comunicação com o cliente (#1)
+2. Falhas de envio de lead 100% silenciosas — negócio pode perder pedidos sem saber (#2)
+3. Travessão banido em ~40+ pontos de conteúdo visível, incluindo dados que alimentam centenas de páginas (#8)
+4. Ícone Sparkles banido em 5 pontos de alta visibilidade, incluindo o banner global (#9)
+5. Schema LocalBusiness duplicado/conflituoso + ausente em ~900 páginas — prejudica SEO local (#5, #6)

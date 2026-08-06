@@ -77,23 +77,6 @@ export const mattressPrices: PriceOption[] = [
   { id: 'king',     label: 'King / Queen', cleaningPrice: 79, waterproofingPrice: 65, bothPrice: 114, originalBothPrice: 144 },
 ];
 
-export const chairPrices = {
-  cleaning: {
-    single_top: { label: '1 cadeira (tampo)', price: 15 },
-    single_full: { label: '1 cadeira completa', price: 20 },
-    bulk_top: { label: '6+ cadeiras (tampo)', price: 10, perUnit: true },
-    bulk_full: { label: '6+ cadeiras completas', price: 15, perUnit: true },
-    other: { label: 'Outro', price: 0 },
-  },
-  waterproofing: {
-    single_top: { label: '1 cadeira (tampo)', price: 15 },
-    single_full: { label: '1 cadeira completa', price: 20 },
-    bulk_top: { label: '6+ cadeiras (tampo)', price: 10, perUnit: true },
-    bulk_full: { label: '6+ cadeiras completas', price: 15, perUnit: true },
-    other: { label: 'Outro', price: 0 },
-  },
-};
-
 // Sem zona grátis: mínimo 5€ sempre, sobe com a distância ao centro de cada equipa.
 // Só as antigas zonas 0€ subiram para 5€ — todas as outras zonas mantêm o preço original.
 export const locationPrices: Record<string, number> = {

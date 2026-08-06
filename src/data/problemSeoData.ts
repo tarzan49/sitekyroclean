@@ -734,7 +734,7 @@ const problemDefinitions: ProblemPage[] = [
     h1: "Quanto Custa Limpar um Sofá Profissionalmente?",
     intro: "Está a pesquisar preços de limpeza de sofá? Os preços da Kyro Clean Solutions começam a partir de 49€ para sofás de 1 lugar (69€ para 2 lugares), com opções de impermeabilização e packs com desconto.",
     problemDetail: "Os preços de limpeza de sofá variam conforme vários fatores: tamanho do sofá (2, 3 ou mais lugares), tipo de tecido, estado de sujidade, tipo de manchas e serviços adicionais como impermeabilização. Muitas empresas não são transparentes com preços, mas na Kyro acreditamos em transparência.",
-    solutionDetail: "Oferecemos preços transparentes e competitivos: sofá de 1 lugar desde 49€, sofá de 2 lugares desde 69€, sofá de 3 lugares desde 79€, sofá em L desde 99€. Impermeabilização adicional desde 59€. Packs de limpeza + impermeabilização com desconto. Orçamento personalizado gratuito e sem compromisso.",
+    solutionDetail: "Oferecemos preços transparentes e competitivos: sofá de 1 lugar desde 49€, sofá de 2 lugares desde 69€, sofá de 3 lugares desde 79€, sofá em L ou 4+ lugares sob orçamento. Impermeabilização adicional desde 59€. Packs de limpeza + impermeabilização com desconto. Orçamento personalizado gratuito e sem compromisso.",
     benefits: [
       "Preços transparentes desde 49€",
       "Orçamento gratuito sem compromisso",
@@ -761,11 +761,11 @@ const problemDefinitions: ProblemPage[] = [
     title: "Quanto Custa Limpar um Colchão? | Preços 2025 | Kyro",
     metaDescription: "Preços de higienização profissional de colchão. Desde 59€. Anti-ácaros e desodorização incluídos. Peça orçamento grátis.",
     h1: "Quanto Custa a Higienização Profissional de Colchão?",
-    intro: "Quer saber o preço de higienização de colchão? Na Kyro Clean Solutions, a higienização profissional começa a partir de 49€, incluindo remoção de ácaros, desodorização e tratamento de manchas.",
+    intro: "Quer saber o preço de higienização de colchão? Na Kyro Clean Solutions, a higienização profissional começa a partir de 59€, incluindo remoção de ácaros, desodorização e tratamento de manchas.",
     problemDetail: "O preço de higienização de colchão depende do tamanho (single, casal, king) e serviços adicionais como remoção de manchas específicas. Muitas pessoas evitam limpar o colchão por assumirem que é caro, mas os preços são acessíveis.",
     solutionDetail: "Preços claros: colchão single desde 59€, colchão casal desde 69€, colchão king desde 79€. Tratamento anti-ácaros e desodorização estão incluídos. Manchas específicas (urina, sangue) podem ter suplemento.",
     benefits: [
-      "Desde 49€ com anti-ácaros incluído",
+      "Desde 59€ com anti-ácaros incluído",
       "Desodorização incluída",
       "Orçamento grátis",
       "Sem custos ocultos",
@@ -996,7 +996,7 @@ const problemDefinitions: ProblemPage[] = [
       "Anti-ácaros profissional",
       "Remoção de manchas incluída",
       "Desodorização incluída",
-      "Desde 49€",
+      "Desde 59€",
       "Melhora qualidade do sono",
     ],
     faqs: [

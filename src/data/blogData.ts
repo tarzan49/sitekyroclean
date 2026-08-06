@@ -38,7 +38,7 @@ const posts: BlogPost[] = [
     sections: [
       {
         heading: "Preços médios em Portugal (2025)",
-        body: "Em Portugal, o preço médio de limpeza profissional de sofá começa nos 49€. Um sofá de 2 lugares custa 69€ e um sofá de 3 lugares 79€. Chaise longue tem um acréscimo de 10€. Sofás em L ou modulares são orçamentados conforme a dimensão.\n\nEstes valores incluem deslocação na área do Porto, pré-tratamento de manchas, limpeza por extração a vapor e secagem rápida. O sofá fica utilizável em 2 a 4 horas.",
+        body: "Em Portugal, o preço médio de limpeza profissional de sofá começa nos 49€. Um sofá de 2 lugares custa 69€ e um sofá de 3 lugares 79€. Chaise longue tem um acréscimo de 10€. Sofás em L ou modulares são orçamentados conforme a dimensão.\n\nEstes valores incluem pré-tratamento de manchas, limpeza por extração a vapor e secagem rápida; a deslocação é cobrada à parte, consoante a localização. O sofá fica utilizável em 2 a 4 horas.",
         tip: "Pede sempre um orçamento com visita ou foto antes de confirmar. Desconfias de preços abaixo de 25€, geralmente não incluem limpeza profunda por extração.",
       },
       {
@@ -264,7 +264,7 @@ const posts: BlogPost[] = [
     sections: [
       {
         heading: "Tabela de preços por tamanho (2025)",
-        body: "Os preços da Kyro Clean Solutions para limpeza profissional de colchões são:\n\n**Colchão solteiro**: 59€\n\n**Colchão casal**: 69€\n\n**Colchão king / queen**: 79€\n\nTodos os preços incluem deslocação na área do Porto, pré-tratamento de manchas, limpeza por extração a vapor e secagem rápida. O colchão fica pronto a usar em 2 a 4 horas.",
+        body: "Os preços da Kyro Clean Solutions para limpeza profissional de colchões são:\n\n**Colchão solteiro**: 59€\n\n**Colchão casal**: 69€\n\n**Colchão king / queen**: 79€\n\nTodos os preços incluem pré-tratamento de manchas, limpeza por extração a vapor e secagem rápida; a deslocação é cobrada à parte, consoante a localização. O colchão fica pronto a usar em 2 a 4 horas.",
         tip: "Combine com a limpeza do sofá no mesmo dia e poupe 10% no total com o Pack Sofá + Colchão.",
       },
       {
@@ -387,7 +387,7 @@ const posts: BlogPost[] = [
     sections: [
       {
         heading: "Preços de limpeza de cadeiras (2025)",
-        body: "A Kyro Clean Solutions pratica preço decrescente por unidade, quanto mais cadeiras limpar de uma vez:\n\n- 1ª a 4ª cadeira: 20€/unidade\n- 5ª a 10ª cadeira: 15€/unidade\n- 11 ou mais cadeiras: orçamento personalizado\n\nO desconto por volume reflete a eficiência do técnico quando tem várias peças no mesmo local, a deslocação e o setup do equipamento são custos fixos que se diluem com mais peças.",
+        body: "A Kyro Clean Solutions pratica preço decrescente por unidade, quanto mais cadeiras limpar de uma vez:\n\n- 1ª a 4ª cadeira: 20€/unidade\n- 5ª a 6ª cadeira: 15€/unidade\n- 7ª a 10ª cadeira: 12,50€/unidade\n- 11 ou mais cadeiras: orçamento personalizado\n\nO desconto por volume reflete a eficiência do técnico quando tem várias peças no mesmo local, a deslocação e o setup do equipamento são custos fixos que se diluem com mais peças.",
         tip: "Para restaurantes ou escritórios com mais de 20 cadeiras, solicitamos orçamento personalizado que pode representar uma poupança adicional de 20 a 30%.",
       },
       {
@@ -415,7 +415,7 @@ const posts: BlogPost[] = [
       },
       {
         q: "Fazem deslocação a escritórios fora do Porto?",
-        a: "Sim. Temos capacidade para trabalhos em Lisboa, Braga, Aveiro e outras cidades. Para lotes grandes fora da área do Porto, contacte-nos para orçamento com deslocação incluída.",
+        a: "Sim. Temos capacidade para trabalhos em Lisboa, Braga, Aveiro e outras cidades. Para lotes grandes fora da área do Porto, contacte-nos para orçamento personalizado com o custo de deslocação calculado consoante a distância.",
       },
     ],
     relatedService: { label: "Ver preços de limpeza de cadeiras", href: "/limpeza-cadeiras" },

@@ -8,6 +8,7 @@
 
 import fs from 'fs';
 import path from 'path';
+import { getVisibleProblems } from '../src/data/problemSeoData';
 
 const BASE_URL = 'https://cleansolutions.com.pt';
 const TODAY = new Date().toISOString().split('T')[0];
@@ -135,26 +136,9 @@ const municipiosComFreguesias = [
   { slug: "alcoutim", freguesias: ["alcoutim-centro","gioes","martim-longo","vaqueiros"] },
 ];
 
-const problemSlugs = [
-  "manchas-sofa","manchas-vinho-sofa","manchas-cafe-sofa","manchas-gordura-sofa",
-  "manchas-colchao","manchas-tapete","cheiro-sofa","cheiro-urina-sofa",
-  "cheiro-colchao","urina-colchao","cheiro-tapete","acaros-colchao",
-  "acaros-sofa","alergias-sofa","alergias-colchao","pelos-animais-sofa",
-  "pelos-animais-tapete","limpeza-sofa-tecido","limpeza-sofa-pele",
-  "limpeza-sofa-veludo","tapete-persa","tapete-la","mofo-tapete",
-  "mofo-alcatifa","impermeabilizar-sofa","preco-limpeza-sofa",
-  "preco-limpeza-colchao","preco-limpeza-tapete","limpeza-profunda-sofa",
-  "limpeza-sofa-domicilio","limpeza-sofa-urgente","limpeza-colchao-urgente",
-  "empresa-limpeza-estofos","limpeza-sofa-profissional","higienizacao-colchao",
-  "lavagem-tapetes","limpeza-cadeiras-escritorio","limpeza-alcatifas-empresa",
-  "manchas-sangue-colchao","limpeza-sofa-bebe","limpeza-estofos-automovel",
-  "manchas-tinta-sofa","sofa-amarelado","limpeza-sofa-microfibra",
-  "limpeza-cabeceira-cama","limpeza-sofa-chenille","limpeza-puff",
-  "manchas-suor-sofa","limpeza-colchao-bebe","limpeza-sofa-hotel",
-  "limpeza-cortinas","acaros-tapete",
-  "limpeza-sofa-perto-de-mim","limpeza-sofa-antes-depois",
-  "impermeabilizar-tapete","limpeza-sofa-seco"
-];
+// Mirrors src/data/problemSeoData.ts exactly (imported, not duplicated) so this
+// sitemap can never drift into emitting slugs that don't have a real page.
+const problemSlugs = getVisibleProblems().map(p => p.slug);
 
 // Problem × City: mirrors problemCitySeoData logic
 const problemRelatedCities: Record<string, string[]> = {

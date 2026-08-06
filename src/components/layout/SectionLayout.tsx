@@ -1,4 +1,4 @@
-import { LucideIcon, Sparkles, ArrowRight } from "lucide-react";
+import { LucideIcon, Shield, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
@@ -43,7 +43,7 @@ interface SectionLayoutProps {
 
 export const SectionLayout = ({
   badge,
-  badgeIcon: BadgeIcon = Sparkles,
+  badgeIcon: BadgeIcon = Shield,
   title,
   titleHighlight,
   subtitle,

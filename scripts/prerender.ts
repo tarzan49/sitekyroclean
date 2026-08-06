@@ -84,11 +84,17 @@ function injectJsonLd(html: string, data: object): string {
 
 // ─── JSON-LD schema builders ────────────────────────────────────────────────
 
-/** LocalBusiness — injected on every page for local pack ranking. */
+/**
+ * LocalBusiness — injected on every prerendered page for local pack ranking.
+ * Coordinates/fields mirror the single static block in index.html (used
+ * as-is for the un-prerendered "/" route) so every page agrees on one
+ * canonical @id instead of shipping two conflicting LocalBusiness nodes.
+ */
 function buildLocalBusinessSchema() {
   return {
     '@context': 'https://schema.org',
     '@type': 'LocalBusiness',
+    '@id': BASE_URL,
     name: 'Kyro Clean Solutions',
     url: BASE_URL,
     telephone: BIZ_PHONE,
@@ -102,8 +108,8 @@ function buildLocalBusinessSchema() {
     },
     geo: {
       '@type': 'GeoCoordinates',
-      latitude: 41.1496,
-      longitude: -8.6109,
+      latitude: 41.1579,
+      longitude: -8.6291,
     },
     aggregateRating: {
       '@type': 'AggregateRating',
@@ -260,7 +266,14 @@ export function prerenderRoutes(outDir: string): number {
     return 0;
   }
 
-  const template = fs.readFileSync(templatePath, 'utf-8');
+  // The template still carries index.html's own static LocalBusiness <script>.
+  // Strip it here so every prerendered page gets exactly the one LOCAL_BIZ
+  // block injected below instead of two conflicting LocalBusiness nodes.
+  const rawTemplate = fs.readFileSync(templatePath, 'utf-8');
+  const template = rawTemplate.replace(
+    /\s*<script type="application\/ld\+json">\s*\{\s*"@context":\s*"https:\/\/schema\.org",\s*"@type":\s*"LocalBusiness"[\s\S]*?<\/script>/,
+    '',
+  );
   let count = 0;
 
   // Pre-built constant — injected into every single page for local pack ranking.
@@ -565,7 +578,17 @@ export function prerenderRoutes(outDir: string): number {
       if (!data) continue;
       const title = `Limpeza Sofá ${data.marca.name} em ${data.city.name}, Especialistas | Kyro Clean`;
       const desc  = `Especialistas em limpeza de sofás ${data.marca.name} em ${data.city.name}. ${data.marca.material}. ${data.marca.estimatedPriceRange}. Serviço ao domicílio.`;
-      emit(route.path, title, desc);
+      const svc = services.find(s => s.slug === data.marca.serviceSlug);
+      const schemas: object[] = [
+        buildServiceSchema(`Limpeza de Sofá ${data.marca.name}`, data.city.name, String(data.marca.minPrice)),
+        buildBreadcrumbSchema([
+          { name: 'Início', url: BASE_URL + '/' },
+          ...(svc ? [{ name: svc.name, url: `${BASE_URL}${svc.baseRoute}` }] : []),
+          { name: `${data.marca.name} - ${data.city.name}`, url: `${BASE_URL}${route.path}` },
+        ]),
+      ];
+      if (data.marca.faqs?.length) schemas.push(buildFaqSchema(data.marca.faqs));
+      emit(route.path, title, desc, undefined, schemas);
     }
     console.log(`  Marca Sofá pages:        ${count - prev}`);
   }
@@ -578,7 +601,17 @@ export function prerenderRoutes(outDir: string): number {
       if (!data) continue;
       const title = `Limpeza Colchão ${data.marca.name} em ${data.city.name}, Especialistas | Kyro Clean`;
       const desc  = `Especialistas em limpeza de colchões ${data.marca.name} em ${data.city.name}. ${data.marca.material}. ${data.marca.estimatedPriceRange}. Serviço ao domicílio.`;
-      emit(route.path, title, desc);
+      const svc = services.find(s => s.slug === data.marca.serviceSlug);
+      const schemas: object[] = [
+        buildServiceSchema(`Limpeza de Colchão ${data.marca.name}`, data.city.name, String(data.marca.minPrice)),
+        buildBreadcrumbSchema([
+          { name: 'Início', url: BASE_URL + '/' },
+          ...(svc ? [{ name: svc.name, url: `${BASE_URL}${svc.baseRoute}` }] : []),
+          { name: `${data.marca.name} - ${data.city.name}`, url: `${BASE_URL}${route.path}` },
+        ]),
+      ];
+      if (data.marca.faqs?.length) schemas.push(buildFaqSchema(data.marca.faqs));
+      emit(route.path, title, desc, undefined, schemas);
     }
     console.log(`  Marca Colchão pages:     ${count - prev}`);
   }
@@ -591,7 +624,17 @@ export function prerenderRoutes(outDir: string): number {
       if (!data) continue;
       const title = `Limpeza Cadeiras ${data.marca.name} em ${data.city.name}, Especialistas | Kyro Clean`;
       const desc  = `Especialistas em limpeza de cadeiras ${data.marca.name} em ${data.city.name}. ${data.marca.material}. ${data.marca.estimatedPriceRange}. Serviço ao domicílio.`;
-      emit(route.path, title, desc);
+      const svc = services.find(s => s.slug === data.marca.serviceSlug);
+      const schemas: object[] = [
+        buildServiceSchema(`Limpeza de Cadeiras ${data.marca.name}`, data.city.name, String(data.marca.minPrice)),
+        buildBreadcrumbSchema([
+          { name: 'Início', url: BASE_URL + '/' },
+          ...(svc ? [{ name: svc.name, url: `${BASE_URL}${svc.baseRoute}` }] : []),
+          { name: `${data.marca.name} - ${data.city.name}`, url: `${BASE_URL}${route.path}` },
+        ]),
+      ];
+      if (data.marca.faqs?.length) schemas.push(buildFaqSchema(data.marca.faqs));
+      emit(route.path, title, desc, undefined, schemas);
     }
     console.log(`  Marca Cadeiras pages:    ${count - prev}`);
   }
@@ -812,10 +855,10 @@ export function prerenderRoutes(outDir: string): number {
           h1: 'Packs de Limpeza e Impermeabilização',
           intro: 'Packs exclusivos que combinam limpeza e impermeabilização com até 10% de desconto. Numa só visita, o técnico trata todos os seus estofos com o melhor preço.',
           benefits: [
-            'Pack Sofá + Colchão — tratamento completo em uma visita',
-            'Pack Sala Completa — sofá, tapete e cadeiras',
-            'Pack Quarto Completo — colchão e almofadas',
-            'Pack Sofá + Impermeabilização — proteção duradoura',
+            'Pack Sofá + Colchão: tratamento completo em uma visita',
+            'Pack Sala Completa: sofá, tapete e cadeiras',
+            'Pack Quarto Completo: colchão e almofadas',
+            'Pack Sofá + Impermeabilização: proteção duradoura',
             'Poupança até 10% vs serviços individuais',
             'Agendamento flexível, incluindo fins de semana',
           ],
@@ -882,7 +925,7 @@ export function prerenderRoutes(outDir: string): number {
         title: 'Antes e Depois | Resultados Reais de Limpeza Profissional | Kyro Clean',
         desc: 'Veja os resultados reais da limpeza profissional de sofás, colchões, tapetes e cadeiras. Antes e depois de cada serviço. Sem filtros, sem retoques.',
         content: {
-          h1: 'Antes e Depois — Resultados Reais',
+          h1: 'Antes e Depois: Resultados Reais',
           intro: 'Galeria com fotografias reais de trabalhos realizados pela Kyro Clean Solutions. Resultados antes e depois de limpeza de sofás, colchões, tapetes e cadeiras. Sem filtros nem retoques.',
         },
       },
@@ -903,11 +946,11 @@ export function prerenderRoutes(outDir: string): number {
           h1: 'Áreas de Serviço',
           intro: 'A Kyro Clean Solutions presta serviços de limpeza profissional de estofos em todo o país: Porto, Vila Nova de Gaia, Matosinhos, Maia, Lisboa, Braga, Guimarães, Coimbra e muito mais.',
           benefits: [
-            'Porto e Grande Porto — sem custo de deslocação',
-            'Braga e Guimarães — disponível todos os dias',
-            'Lisboa e área metropolitana — agendamento em 48h',
-            'Aveiro e Coimbra — serviço disponível',
-            'Todo o território continental — por orçamento',
+            'Porto e Grande Porto: deslocação a partir de 5€',
+            'Braga e Guimarães: disponível todos os dias',
+            'Lisboa e área metropolitana: agendamento em 48h',
+            'Aveiro e Coimbra: serviço disponível',
+            'Todo o território continental: por orçamento',
           ],
         },
       },

@@ -209,7 +209,7 @@ const Packs = () => {
               heading="Mais serviço,"
               goldWord="menos custo"
               light={false}
-              subtitle="Combinar serviços na mesma visita não é só mais prático — é a forma mais inteligente de cuidar da sua casa."
+              subtitle="Combinar serviços na mesma visita não é só mais prático, é a forma mais inteligente de cuidar da sua casa."
             />
 
             <div className="grid sm:grid-cols-3 gap-px" style={{ backgroundColor: "rgba(255,255,255,0.08)" }}>

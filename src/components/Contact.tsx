@@ -1,4 +1,4 @@
-import { Phone, Mail, MapPin, Clock, Send, Sparkles, MessageSquare } from "lucide-react";
+import { Phone, Mail, MapPin, Clock, Send, MessageSquare } from "lucide-react";
 import { submitContactForm } from "@/services/contactService";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -309,7 +309,6 @@ const Contact = () => {
               
               <div className="relative bg-[#FFFFFF] p-8 rounded-[22px] shadow-xl h-full">
                 <h3 className="text-xl font-bold text-[#111111] mb-6 flex items-center gap-2">
-                  <Sparkles className="w-5 h-5 text-gold" />
                   Informações de Contacto
                 </h3>
                 

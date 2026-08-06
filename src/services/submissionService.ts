@@ -30,6 +30,8 @@ export interface QuizLeadPayload {
   calculateServicePrice: number;
 
   totalPrice: number;
+  hasSobOrcamento: boolean;
+  hasUpsellSobItem: boolean;
   packDiscountActive: boolean;
   packDiscountedPrice: number;
   packDiscountPct: number;
@@ -116,7 +118,7 @@ async function insertCrmLead(payload: QuizLeadPayload, bookingId: string): Promi
 function buildWaUrl(payload: QuizLeadPayload, bookingId: string): string {
   const {
     serviceLabel, serviceTypeLabel, detailsSummary, finalLocation,
-    totalPrice, packDiscountActive, packDiscountedPrice, hypoallergenic, hypoSurcharge,
+    totalPrice, hasSobOrcamento, hasUpsellSobItem, packDiscountActive, packDiscountedPrice, hypoallergenic, hypoSurcharge,
   } = payload;
 
   const waExtras: string[] = [];
@@ -124,11 +126,13 @@ function buildWaUrl(payload: QuizLeadPayload, bookingId: string): string {
   if (hypoallergenic === true) waExtras.push(`Produtos Hipoalergénicos (+${hypoSurcharge}€)`);
   const waExtrasText = waExtras.length > 0 ? waExtras.join(' + ') : 'Sem extras';
 
-  const waTotalPrice = packDiscountActive && totalPrice > 0
-    ? `${packDiscountedPrice}€ (Pack -10%)`
-    : totalPrice > 0
-      ? `${totalPrice}€`
-      : 'Sob orçamento';
+  const waTotalPrice = (hasSobOrcamento || hasUpsellSobItem)
+    ? 'Sob orçamento'
+    : packDiscountActive && totalPrice > 0
+      ? `${packDiscountedPrice}€ (Pack -10%)`
+      : totalPrice > 0
+        ? `${totalPrice}€`
+        : 'Sob orçamento';
 
   const waText = encodeURIComponent(
     `Olá Kyro Clean Solutions. Acabei de gerar um orçamento detalhado no site e pretendo confirmar o agendamento.\n\n` +
@@ -204,15 +208,18 @@ function buildReceiptLines(payload: QuizLeadPayload) {
 
 function persistObrigadoData(payload: QuizLeadPayload, bookingId: string, waUrl: string): void {
   const {
-    totalPrice, packDiscountActive, packDiscountedPrice, packDiscountPct,
+    totalPrice, hasSobOrcamento, hasUpsellSobItem, packDiscountActive, packDiscountedPrice, packDiscountPct,
     serviceLabel, serviceTypeLabel, finalLocation, slotLabel, name,
   } = payload;
 
-  const finalPriceText = packDiscountActive && totalPrice > 0
-    ? `${packDiscountedPrice}€ (Pack -10%)`
-    : totalPrice > 0
-      ? `${totalPrice}€`
-      : 'Sob orçamento';
+  const isSobOrcamento = hasSobOrcamento || hasUpsellSobItem;
+  const finalPriceText = isSobOrcamento
+    ? 'Sob orçamento'
+    : packDiscountActive && totalPrice > 0
+      ? `${packDiscountedPrice}€ (Pack -10%)`
+      : totalPrice > 0
+        ? `${totalPrice}€`
+        : 'Sob orçamento';
 
   const discountAmt = packDiscountActive ? Math.round((totalPrice - packDiscountedPrice) * 100) / 100 : 0;
 
@@ -229,6 +236,7 @@ function persistObrigadoData(payload: QuizLeadPayload, bookingId: string, waUrl:
     discountLabel: packDiscountActive ? `Pack Família −${Math.round(packDiscountPct * 100)}%` : null,
     discountAmount: discountAmt,
     total: packDiscountActive ? packDiscountedPrice : totalPrice,
+    sobOrcamento: isSobOrcamento,
     location: finalLocation,
     slot: slotLabel,
     bookingId,
@@ -240,7 +248,7 @@ export async function submitQuizLead(payload: QuizLeadPayload): Promise<void> {
   const bookingId = generateBookingId();
 
   // Persist receipt + WA URL FIRST — synchronous, no network, so /obrigado
-  // always renders the full receipt even if both channels are still in-flight.
+  // renders the full receipt as soon as the caller navigates.
   try {
     const waUrl = buildWaUrl(payload, bookingId);
     persistObrigadoData(payload, bookingId, waUrl);
@@ -248,26 +256,42 @@ export async function submitQuizLead(payload: QuizLeadPayload): Promise<void> {
     console.warn('[submissionService] persistObrigadoData failed:', persistErr);
   }
 
-  // Both channels fire in background. React SPA navigation does not unload the
-  // page, so these requests complete even after the user reaches /obrigado.
-  insertCrmLead(payload, bookingId).catch(err => {
+  // Await both channels: if EITHER one lands, the lead reached the business
+  // and we resolve normally. Only reject (both failed) so the caller can fall
+  // back to the WhatsApp/email toast — silently swallowing a total failure
+  // means the customer thinks they're booked and the business never hears.
+  const [crmResult, formspreeResult] = await Promise.allSettled([
+    insertCrmLead(payload, bookingId),
+    postToFormspree(payload),
+  ]);
+
+  const crmOk = crmResult.status === 'fulfilled';
+  const formspreeOk = formspreeResult.status === 'fulfilled' && formspreeResult.value.ok;
+  const bothFailed = !crmOk && !formspreeOk;
+
+  if (!crmOk) {
+    const err = crmResult.status === 'rejected' ? crmResult.reason : null;
     logError({
       message: err instanceof Error ? err.message : String(err),
       source: 'QuizForm-crm',
-      severity: 'warning',
+      severity: bothFailed ? 'error' : 'warning',
       stack: err instanceof Error ? err.stack ?? null : null,
     });
-  });
+  }
 
-  postToFormspree(payload).then(res => {
-    if (!res.ok) logError({ message: `Formspree HTTP ${res.status}`, source: 'QuizForm-formspree', severity: 'warning', stack: null });
-  }).catch(err => {
+  if (!formspreeOk) {
+    const err = formspreeResult.status === 'rejected'
+      ? formspreeResult.reason
+      : `Formspree HTTP ${formspreeResult.value.status}`;
     logError({
       message: err instanceof Error ? err.message : String(err),
       source: 'QuizForm-formspree',
-      severity: 'warning',
+      severity: bothFailed ? 'error' : 'warning',
       stack: err instanceof Error ? err.stack ?? null : null,
     });
-  });
-  // Returns immediately — caller navigates to /obrigado in <100ms
+  }
+
+  if (bothFailed) {
+    throw new Error('Both CRM insert and Formspree submission failed');
+  }
 }

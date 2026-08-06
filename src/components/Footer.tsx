@@ -121,7 +121,7 @@ const Footer = () => {
               </li>
               <li className="flex items-center gap-2">
                 <ChevronRight className="h-3.5 w-3.5 text-turquoise flex-shrink-0" />
-                <Link to="/problemas/cheiro-urina-colchao" className="hover:text-turquoise active:text-turquoise transition-colors py-1 touch-manipulation">Urina no Colchão</Link>
+                <Link to="/problemas/urina-colchao" className="hover:text-turquoise active:text-turquoise transition-colors py-1 touch-manipulation">Urina no Colchão</Link>
               </li>
               <li className="flex items-center gap-2">
                 <ChevronRight className="h-3.5 w-3.5 text-turquoise flex-shrink-0" />

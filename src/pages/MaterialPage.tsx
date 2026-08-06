@@ -225,7 +225,7 @@ const MaterialPage = () => {
           <ServiceAutoCarousel
             overline="Resultados Reais"
             heading={`Antes e depois: ${data.name}`}
-            subtitle={`Transformação real em ${data.serviceName.toLowerCase()} — resultado visível no próprio dia.`}
+            subtitle={`Transformação real em ${data.serviceName.toLowerCase()}, resultado visível no próprio dia.`}
             beforeImage={gallery.before}
             afterImage={gallery.after}
             slides={[

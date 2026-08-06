@@ -86,10 +86,10 @@ function content_higienizacao_sofa(loc: string, ctx: string): ContentBlock {
       { step: 4, title: 'Secagem rápida', description: 'Sofá pronto a usar em poucas horas, sem humidade residual.' },
     ],
     faqs: [
-      { question: `Quanto tempo após a higienização posso usar o sofá?`, answer: `Em condições normais de ventilação, o sofá está pronto a usar em 2 a 4 horas. Não fica húmido nem com cheiro a produtos — apenas limpo.` },
-      { question: `A higienização resolve mesmo os espirros e alergias causados pelo sofá?`, answer: `Sim. Os ácaros do sofá são uma das principais causas de rinite alérgica em casa. O processo elimina-os das fibras profundas — onde o aspirador doméstico não chega — e os sintomas melhoram visivelmente.` },
+      { question: `Quanto tempo após a higienização posso usar o sofá?`, answer: `Em condições normais de ventilação, o sofá está pronto a usar em 2 a 4 horas. Não fica húmido nem com cheiro a produtos, apenas limpo.` },
+      { question: `A higienização resolve mesmo os espirros e alergias causados pelo sofá?`, answer: `Sim. Os ácaros do sofá são uma das principais causas de rinite alérgica em casa. O processo elimina-os das fibras profundas, onde o aspirador doméstico não chega, e os sintomas melhoram visivelmente.` },
       { question: `Fazem higienização de sofá ao domicílio em ${loc}?`, answer: `Sim, deslocamo-nos a ${loc} com todo o equipamento. Não precisa de preparar nada nem de mover o sofá.` },
-      { question: `Qual a diferença entre higienizar e simplesmente aspirar o sofá?`, answer: `O aspirador remove sujidade solta da superfície. A higienização profissional penetra nas fibras e elimina os patogénicos invisíveis — ácaros, bactérias, fungos — que causam alergias e odores persistentes.` },
+      { question: `Qual a diferença entre higienizar e simplesmente aspirar o sofá?`, answer: `O aspirador remove sujidade solta da superfície. A higienização profissional penetra nas fibras e elimina os patogénicos invisíveis (ácaros, bactérias, fungos) que causam alergias e odores persistentes.` },
       { question: `A higienização do sofá é segura se tiver crianças e animais em casa?`, answer: `Sim. Usamos produtos certificados e sem compostos tóxicos, seguros para crianças e animais. O sofá pode ser usado poucas horas depois.` },
     ],
     problems: [
@@ -107,7 +107,7 @@ function content_higienizacao_sofa(loc: string, ctx: string): ContentBlock {
 function content_higienizacao_colchao(loc: string, ctx: string): ContentBlock {
   return {
     intro: `Passamos um terço da vida no colchão, por isso a higienização profissional do colchão em ${loc} é essencial para a saúde do sono. A Kyro Clean Solutions elimina ácaros, bactérias e fungos com protocolos de sanitização certificados, garantindo noites mais saudáveis em ${loc} e ${ctx}.`,
-    whatIs: `Passamos um terço da vida no colchão, por isso a higiene interna importa tanto como a externa. Este tratamento elimina os ácaros e bactérias das camadas profundas que causam alergias nocturnas, espirros de manhã e má qualidade de sono — sem produtos tóxicos, seguro para toda a família.`,
+    whatIs: `Passamos um terço da vida no colchão, por isso a higiene interna importa tanto como a externa. Este tratamento elimina os ácaros e bactérias das camadas profundas que causam alergias nocturnas, espirros de manhã e má qualidade de sono, sem produtos tóxicos, seguro para toda a família.`,
     benefits: [
       'Eliminação de 99,9% dos ácaros e bactérias do colchão',
       'Melhoria comprovada da qualidade do sono',
@@ -123,7 +123,7 @@ function content_higienizacao_colchao(loc: string, ctx: string): ContentBlock {
       { step: 4, title: 'Secagem e aeração', description: 'Colchão pronto a usar no mesmo dia após aeração.' },
     ],
     faqs: [
-      { question: `A higienização do colchão melhora mesmo as alergias nocturnas?`, answer: `Sim. Os ácaros do colchão são a principal causa de rinite e asma noturna. Higienizar elimina esses alergénios das camadas profundas onde nenhum aspirador chega — muitos clientes notam diferença na primeira semana.` },
+      { question: `A higienização do colchão melhora mesmo as alergias nocturnas?`, answer: `Sim. Os ácaros do colchão são a principal causa de rinite e asma noturna. Higienizar elimina esses alergénios das camadas profundas onde nenhum aspirador chega, muitos clientes notam diferença na primeira semana.` },
       { question: `Com que frequência devo higienizar o colchão de um bebé?`, answer: `Para bebés recomendamos a cada 6 meses. A pele do bebé é mais sensível e passa mais tempo em contacto direto com as fibras do que um adulto.` },
       { question: `O colchão fica húmido depois da higienização? Quando posso dormir nele?`, answer: `A higienização não usa grandes quantidades de líquido. Com ventilação normal o colchão fica pronto para dormir no mesmo dia, tipicamente em 3 a 5 horas.` },
       { question: `A higienização funciona em colchões de memory foam e látex?`, answer: `Sim. Adaptamos os produtos e técnicas ao tipo de espuma para não danificar a estrutura interna. O resultado é o mesmo: eliminação de ácaros, patogénicos e odores.` },
@@ -161,7 +161,7 @@ function content_higienizacao_tapetes(loc: string, ctx: string): ContentBlock {
     ],
     faqs: [
       { question: `A higienização danifica as cores de tapetes persas ou de lã?`, answer: `Não. Avaliamos sempre o tipo de fibra antes de iniciar e usamos produtos adaptados a cada material. Tapetes persas e orientais recebem tratamento específico que preserva as cores originais.` },
-      { question: `A higienização remove os alergénios de cão e gato do tapete?`, answer: `Sim. O processo remove pelos, caspa e todos os alergénios de animais das fibras em profundidade — o aspirador doméstico remove os pelos visíveis mas não atinge estes alergénios microscópicos.` },
+      { question: `A higienização remove os alergénios de cão e gato do tapete?`, answer: `Sim. O processo remove pelos, caspa e todos os alergénios de animais das fibras em profundidade. O aspirador doméstico remove os pelos visíveis mas não atinge estes alergénios microscópicos.` },
       { question: `Fazem higienização de tapetes ao domicílio em ${loc} ou tenho de os entregar?`, answer: `Fazemos ao domicílio, sem necessidade de transporte. Deslocamo-nos a ${loc} com todo o equipamento. Para tapetes muito delicados podemos fazer recolha e tratamento nas nossas instalações.` },
       { question: `Posso tentar higienizar o tapete em casa com um aspirador potente?`, answer: `O aspirador doméstico remove sujidade solta da superfície. Para eliminar os ácaros e patogénicos das camadas profundas das fibras é necessário equipamento profissional e produtos certificados.` },
       { question: `Qual o preço mínimo de higienização de tapete em ${loc}?`, answer: `A partir de 12€/m², com preço mínimo de 25€ por serviço. O preço final depende do tipo de fibra e estado do tapete. Orçamento gratuito ao domicílio em ${loc}.` },
@@ -181,7 +181,7 @@ function content_higienizacao_tapetes(loc: string, ctx: string): ContentBlock {
 function content_higienizacao_cadeiras(loc: string, ctx: string): ContentBlock {
   return {
     intro: `A higienização de cadeiras estofadas em ${loc} é essencial para restaurantes, escritórios e clínicas que partilham superfícies entre múltiplos utilizadores. A Kyro Clean Solutions aplica bactericida certificado que elimina 99,9% dos microrganismos em cadeiras de uso partilhado em ${loc} e ${ctx}.`,
-    whatIs: `As cadeiras que partilhamos acumulam bactérias e vírus em silêncio — a limpeza habitual com pano não chega para os remover. Este tratamento elimina os germes das fibras com produtos certificados, essencial para restaurantes, escritórios e qualquer espaço onde várias pessoas se sentam na mesma cadeira em ${loc}.`,
+    whatIs: `As cadeiras que partilhamos acumulam bactérias e vírus em silêncio, a limpeza habitual com pano não chega para os remover. Este tratamento elimina os germes das fibras com produtos certificados, essencial para restaurantes, escritórios e qualquer espaço onde várias pessoas se sentam na mesma cadeira em ${loc}.`,
     benefits: [
       'Bactericida certificado compatível com normas HACCP',
       'Ideal para restaurantes, escritórios e clínicas em ${loc}',
@@ -234,7 +234,7 @@ function content_higienizacao_alcatifas(loc: string, ctx: string): ContentBlock 
       { step: 4, title: 'Secagem acelerada', description: 'Espaço apto para uso em 2-4 horas com ventilação adequada.' },
     ],
     faqs: [
-      { question: `A higienização de alcatifas melhora realmente a qualidade do ar do espaço?`, answer: `Sim. As alcatifas são o maior reservatório de alergénios, pólen e bactérias em espaços fechados. Após higienização a qualidade do ar interior melhora de forma mensurável — especialmente relevante em escritórios e clínicas.` },
+      { question: `A higienização de alcatifas melhora realmente a qualidade do ar do espaço?`, answer: `Sim. As alcatifas são o maior reservatório de alergénios, pólen e bactérias em espaços fechados. Após higienização a qualidade do ar interior melhora de forma mensurável, especialmente relevante em escritórios e clínicas.` },
       { question: `Emitem relatório de higienização aceite em auditorias ISO ou sanitárias?`, answer: `Sim. Emitimos relatório detalhado com ficha técnica dos produtos usados, aceite em auditorias de qualidade do ar, certificações ISO e inspeções sanitárias. Disponível para todos os serviços em ${loc}.` },
       { question: `O espaço tem de fechar durante a higienização das alcatifas?`, answer: `Depende da dimensão e do tipo de espaço. Em escritórios e clínicas fazemos frequentemente fora do horário para não interromper a atividade. O espaço fica apto para uso 2 a 4 horas após o serviço.` },
       { question: `Fazem higienização de alcatifas ao fim de semana e à noite em ${loc}?`, answer: `Sim. É o horário mais comum para espaços comerciais em ${loc}. Agendamos conforme a disponibilidade do espaço para minimizar qualquer perturbação ao negócio.` },
@@ -255,7 +255,7 @@ function content_higienizacao_alcatifas(loc: string, ctx: string): ContentBlock 
 function content_lavagem_sofa(loc: string, ctx: string): ContentBlock {
   return {
     intro: `Precisa de lavar o sofá em ${loc}? A Kyro Clean Solutions realiza lavagem profunda por extração profissional, o método mais eficaz para remover manchas, gorduras e resíduos acumulados nas fibras. Ao contrário da limpeza seca, a lavagem por extração penetra nas camadas profundas do tecido, devolvendo o sofá ao estado original em ${loc} e ${ctx}.`,
-    whatIs: `A lavagem profissional é como uma limpeza por dentro do tecido: retira manchas, gordura acumulada e o escurecimento que o aspirador doméstico nunca consegue atingir. O sofá fica com as cores e o toque que tinha quando era novo — ao domicílio em ${loc}, sem mover o sofá.`,
+    whatIs: `A lavagem profissional é como uma limpeza por dentro do tecido: retira manchas, gordura acumulada e o escurecimento que o aspirador doméstico nunca consegue atingir. O sofá fica com as cores e o toque que tinha quando era novo, ao domicílio em ${loc}, sem mover o sofá.`,
     benefits: [
       'Extração profunda com equipamento profissional',
       'Remove manchas antigas que a limpeza seca não consegue',
@@ -273,7 +273,7 @@ function content_lavagem_sofa(loc: string, ctx: string): ContentBlock {
     faqs: [
       { question: `A lavagem por extração pode danificar o tecido do sofá?`, answer: `Não, desde que se avalie o tecido antes de iniciar. É segura para microfibra, algodão, linho, chenille e veludo. Para tecidos muito delicados como seda usamos métodos alternativos sem água.` },
       { question: `Quanto tempo fica o sofá húmido após a lavagem profissional?`, answer: `Com o nosso sistema de extração de alta sucção, o sofá fica pronto a usar em 4 a 6 horas com boa ventilação. Em dias quentes pode secar ainda mais rápido.` },
-      { question: `A lavagem consegue remover manchas de café e vinho com anos?`, answer: `Sim, na grande maioria dos casos. Manchas antigas de café, vinho e gordura são removidas pela extração profissional a quente. Manchas muito antigas ou de tinta podem precisar de tratamento adicional — avaliamos gratuitamente.` },
+      { question: `A lavagem consegue remover manchas de café e vinho com anos?`, answer: `Sim, na grande maioria dos casos. Manchas antigas de café, vinho e gordura são removidas pela extração profissional a quente. Manchas muito antigas ou de tinta podem precisar de tratamento adicional, avaliamos gratuitamente.` },
       { question: `Posso escolher o horário da visita para lavar o sofá em ${loc}?`, answer: `Sim. Agendamos conforme a sua disponibilidade em ${loc}, incluindo fins de semana e horários alargados. O processo decorre no local, sem necessidade de mover o sofá.` },
       { question: `Qual a diferença de preço entre lavar um sofá de 2 e 3 lugares?`, answer: `Sofá de 2 lugares a partir de 49€, 3 lugares a partir de 69€. Com chaise longue acrescenta 10€. Orçamento gratuito e personalizado ao seu sofá em ${loc}.` },
     ],
@@ -292,7 +292,7 @@ function content_lavagem_sofa(loc: string, ctx: string): ContentBlock {
 function content_lavagem_colchao(loc: string, ctx: string): ContentBlock {
   return {
     intro: `Manchas de suor, urina ou outros líquidos no colchão em ${loc}? A Kyro Clean Solutions realiza lavagem profunda por extração que remove manchas acumuladas nas camadas profundas do colchão, renovando-o completamente. Serviço ao domicílio em ${loc} e ${ctx}.`,
-    whatIs: `Com o uso diário, o colchão absorve suor, líquidos e manchas nas suas camadas profundas — e o arejamento não chega para os remover. Este tratamento extrai essas impurezas de dentro do colchão, devolve o aspeto original e elimina os odores na raiz, tudo ao domicílio em ${loc}.`,
+    whatIs: `Com o uso diário, o colchão absorve suor, líquidos e manchas nas suas camadas profundas, e o arejamento não chega para os remover. Este tratamento extrai essas impurezas de dentro do colchão, devolve o aspeto original e elimina os odores na raiz, tudo ao domicílio em ${loc}.`,
     benefits: [
       'Remoção de manchas de suor, urina e sangue',
       'Extração profunda nas camadas interiores do colchão',
@@ -329,7 +329,7 @@ function content_lavagem_colchao(loc: string, ctx: string): ContentBlock {
 function content_lavagem_tapetes(loc: string, ctx: string): ContentBlock {
   return {
     intro: `Precisa de lavar tapetes em ${loc}? A Kyro Clean Solutions faz lavagem especializada de tapetes de todos os tipos (persas, orientais, modernos e de lã) com extração profissional e recolha ao domicílio em ${loc} e ${ctx}. Preços desde 12€/m².`,
-    whatIs: `A lavagem profissional retira a sujidade compactada que anos de aspiração deixaram para trás nas fibras, restaura as cores e o toque originais. Feita com produtos adaptados ao tipo de fibra — lã, seda, sintético ou persa — para que o tapete não corra riscos em ${loc}.`,
+    whatIs: `A lavagem profissional retira a sujidade compactada que anos de aspiração deixaram para trás nas fibras, restaura as cores e o toque originais. Feita com produtos adaptados ao tipo de fibra (lã, seda, sintético ou persa) para que o tapete não corra riscos em ${loc}.`,
     benefits: [
       'Lavagem especializada para tapetes persas e orientais',
       'Restauração das cores e aspeto original',
@@ -366,7 +366,7 @@ function content_lavagem_tapetes(loc: string, ctx: string): ContentBlock {
 function content_lavagem_cadeiras(loc: string, ctx: string): ContentBlock {
   return {
     intro: `Lavagem de cadeiras estofadas em ${loc} para restaurantes, escritórios e residências. A Kyro Clean Solutions renova lotes de cadeiras com extração profissional, eliminando manchas e devolvendo um aspeto como novo. Serviço ao domicílio em ${loc} e ${ctx}.`,
-    whatIs: `A lavagem profissional remove manchas de gordura, comida e suor que se acumularam nas fibras das cadeiras ao longo do tempo. Cadeiras com aspeto cuidado transmitem profissionalismo — e a secagem é rápida para que o espaço não fique parado. Feita ao domicílio em ${loc}.`,
+    whatIs: `A lavagem profissional remove manchas de gordura, comida e suor que se acumularam nas fibras das cadeiras ao longo do tempo. Cadeiras com aspeto cuidado transmitem profissionalismo, e a secagem é rápida para que o espaço não fique parado. Feita ao domicílio em ${loc}.`,
     benefits: [
       'Ideal para lotes de cadeiras de restaurante e escritório',
       'Aspeto como novo: manchas e gorduras eliminadas',
@@ -384,7 +384,7 @@ function content_lavagem_cadeiras(loc: string, ctx: string): ContentBlock {
     faqs: [
       { question: `A lavagem consegue remover gordura de cozinha das cadeiras de restaurante?`, answer: `Sim. A gordura de cozinha é uma das manchas mais comuns em cadeiras de restaurante e a mais difícil de remover em casa. O pré-tratamento desengordurante profissional dissolve-a antes da extração.` },
       { question: `Quanto tempo ficam as cadeiras fora de uso depois da lavagem?`, answer: `Com o nosso sistema de extração de alta sucção, as cadeiras ficam prontas a usar em 2 a 4 horas. Em dias quentes com boa ventilação pode ser menos.` },
-      { question: `Conseguem lavar cadeiras de veludo sem danificar a textura característica?`, answer: `Sim. O veludo requer técnica específica — lavagem com movimento correto das fibras. Temos experiência em veludo de várias qualidades e densidades sem danificar a textura.` },
+      { question: `Conseguem lavar cadeiras de veludo sem danificar a textura característica?`, answer: `Sim. O veludo requer técnica específica: lavagem com movimento correto das fibras. Temos experiência em veludo de várias qualidades e densidades sem danificar a textura.` },
       { question: `Fazem lavagem de cadeiras de restaurante fora do horário de funcionamento?`, answer: `Sim. É o nosso horário mais frequente para restaurantes em ${loc}. Trabalhamos à noite ou ao fim de semana para que as cadeiras estejam prontas antes da abertura.` },
       { question: `Qual o preço para lavar um lote de 20 cadeiras de escritório em ${loc}?`, answer: `Para lotes acima de 10 cadeiras aplicamos preço personalizado, normalmente com desconto face ao preço por unidade. Orçamento gratuito com deslocação a ${loc} incluída.` },
     ],
@@ -403,7 +403,7 @@ function content_lavagem_cadeiras(loc: string, ctx: string): ContentBlock {
 function content_lavagem_alcatifas(loc: string, ctx: string): ContentBlock {
   return {
     intro: `Lavagem de alcatifas em ${loc} para hotéis, escritórios e grandes espaços comerciais. A Kyro Clean Solutions realiza extração profunda profissional em qualquer dimensão de alcatifa, com secagem rápida e mínima perturbação do negócio em ${loc} e ${ctx}.`,
-    whatIs: `A lavagem profissional penetra nas camadas mais densas da alcatifa e remove a sujidade que anos de aspiração deixaram para trás — manchas de passagem, derramamentos e a sujidade invisível das fibras. O resultado é visível no mesmo dia, com secagem em 2 a 4 horas em ${loc}.`,
+    whatIs: `A lavagem profissional penetra nas camadas mais densas da alcatifa e remove a sujidade que anos de aspiração deixaram para trás: manchas de passagem, derramamentos e a sujidade invisível das fibras. O resultado é visível no mesmo dia, com secagem em 2 a 4 horas em ${loc}.`,
     benefits: [
       'Equipamento comercial para grandes superfícies',
       'Remove manchas de passagem e derramamentos',
@@ -440,7 +440,7 @@ function content_lavagem_alcatifas(loc: string, ctx: string): ContentBlock {
 function content_impermeabilizacao_sofa(loc: string, ctx: string): ContentBlock {
   return {
     intro: `A impermeabilização de sofás em ${loc} cria uma barreira invisível contra líquidos, manchas e gordura, protegendo o seu investimento por anos sem alterar o toque ou a aparência do tecido. A Kyro Clean Solutions aplica tratamento de nano-partículas certificado em ${loc} e ${ctx}, com resultados garantidos.`,
-    whatIs: `Este tratamento cria uma barreira invisível no tecido do sofá: a próxima vez que cair café, vinho ou sumo, o líquido fica à superfície e limpa-se com um pano — sem mancha, sem stress. O toque e o aspeto do sofá ficam exactamente iguais, e a proteção dura anos em ${loc}.`,
+    whatIs: `Este tratamento cria uma barreira invisível no tecido do sofá: a próxima vez que cair café, vinho ou sumo, o líquido fica à superfície e limpa-se com um pano, sem mancha, sem stress. O toque e o aspeto do sofá ficam exactamente iguais, e a proteção dura anos em ${loc}.`,
     benefits: [
       'Barreira invisível contra líquidos, manchas e gordura',
       'Toque e aspeto do tecido 100% preservados',
@@ -456,7 +456,7 @@ function content_impermeabilizacao_sofa(loc: string, ctx: string): ContentBlock 
       { step: 4, title: 'Secagem e ativação', description: 'A barreira ativa-se na secagem: sofá pronto a usar em 2 a 4 horas.' },
     ],
     faqs: [
-      { question: `A impermeabilização altera o toque ou a cor do sofá?`, answer: `Não. O tratamento é completamente invisível e não altera a maciez, a cor nem a textura do tecido. O sofá fica igual ao toque — só que repele líquidos.` },
+      { question: `A impermeabilização altera o toque ou a cor do sofá?`, answer: `Não. O tratamento é completamente invisível e não altera a maciez, a cor nem a textura do tecido. O sofá fica igual ao toque, só que repele líquidos.` },
       { question: `Quanto tempo dura a impermeabilização de um sofá?`, answer: `Com uso normal, a proteção dura 2 a 5 anos. Em famílias com crianças ou animais de estimação, onde há mais probabilidade de derrames, recomendamos reaplicação ao fim de 2 anos.` },
       { question: `Preciso de limpar o sofá antes de o impermeabilizar?`, answer: `Sim, e é altamente recomendado. Aplicar impermeabilização sobre tecido sujo reduz significativamente a eficácia e duração da barreira. Oferecemos o pack limpeza + impermeabilização com desconto em ${loc}.` },
       { question: `A impermeabilização funciona em sofás de veludo, pele e microfibra?`, answer: `Sim. Adaptamos a formulação ao tipo de tecido. Para veludo e tecidos delicados usamos produtos específicos que preservam a textura e o brilho característico do material.` },
@@ -493,7 +493,7 @@ function content_impermeabilizacao_cadeiras(loc: string, ctx: string): ContentBl
       { step: 4, title: 'Secagem rápida', description: 'Cadeiras prontas a usar em 1 a 2 horas, sem interrupção do negócio.' },
     ],
     faqs: [
-      { question: `A impermeabilização das cadeiras facilita a limpeza diária do restaurante?`, answer: `Sim, muito. Derrames de vinho, café e molhos ficam à superfície e limpam-se com um pano — em vez de penetrarem nas fibras e criarem manchas permanentes. O tempo de limpeza diária reduz significativamente.` },
+      { question: `A impermeabilização das cadeiras facilita a limpeza diária do restaurante?`, answer: `Sim, muito. Derrames de vinho, café e molhos ficam à superfície e limpam-se com um pano, em vez de penetrarem nas fibras e criarem manchas permanentes. O tempo de limpeza diária reduz significativamente.` },
       { question: `A impermeabilização funciona em cadeiras de pele sintética ou só em tecido?`, answer: `Funciona nos dois. Para pele sintética o tratamento reforça a repelência natural do material. Para tecido (veludo, chenille, mesh) cria uma barreira nas fibras. Adaptamos o produto ao material.` },
       { question: `Quanto tempo ficam as cadeiras fora de uso depois da impermeabilização?`, answer: `A impermeabilização é rápida (15 a 30 minutos por lote) e a secagem demora 1 a 2 horas. As cadeiras ficam prontas a usar no mesmo dia, sem necessidade de fechar o espaço.` },
       { question: `Qual o desconto para impermeabilizar um lote de cadeiras de restaurante?`, answer: `25€/cad. para as primeiras 4 cadeiras, 20€/cad. da 5ª à 10ª. Para lotes acima de 10 cadeiras, orçamento personalizado para o seu restaurante em ${loc}.` },

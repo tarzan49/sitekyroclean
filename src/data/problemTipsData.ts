@@ -67,7 +67,7 @@ export const CATEGORY_TIPS: Record<string, { title: string; steps: string[]; war
     steps: [
       "Fotografe o estado atual do estofado e envie pelo WhatsApp para orçamento mais exato",
       "Compare sempre pelo método: extração profissional a quente ≠ shampooing superficial",
-      "Orçamentos que incluem deslocação, pré-tratamento e secagem são os mais completos",
+      "Orçamentos que discriminam deslocação, pré-tratamento e secagem são os mais transparentes",
     ],
     warning: "Preços abaixo de 25€ geralmente não incluem extração profissional real, o resultado é temporário",
   },

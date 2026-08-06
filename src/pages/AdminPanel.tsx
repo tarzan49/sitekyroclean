@@ -38,8 +38,8 @@ const ADMIN_PASSWORD = (import.meta.env.VITE_ADMIN_PASSWORD as string) || 'kyro2
 const SITEMAPS = [
   { id: "sitemap.xml",              file: "sitemap.xml",              name: "Sitemap Index", description: "Índice principal (10 sub-sitemaps)", icon: Globe },
   { id: "sitemap-core.xml",         file: "sitemap-core.xml",         name: "Core (Serviços + Páginas principais)", description: "6 serviços + páginas institucionais", icon: Zap },
-  { id: "sitemap-location.xml",     file: "sitemap-location.xml",     name: "Localidade × Serviço", description: "Concelhos × 6 serviços — Porto/Norte, Lisboa/AML, Algarve", icon: Map },
-  { id: "sitemap-freguesia.xml",    file: "sitemap-freguesia.xml",    name: "Freguesia × Serviço", description: "Freguesias × 6 serviços — Porto/Norte, Lisboa/AML, Algarve", icon: Map },
+  { id: "sitemap-location.xml",     file: "sitemap-location.xml",     name: "Localidade × Serviço", description: "Concelhos × 6 serviços: Porto/Norte, Lisboa/AML, Algarve", icon: Map },
+  { id: "sitemap-freguesia.xml",    file: "sitemap-freguesia.xml",    name: "Freguesia × Serviço", description: "Freguesias × 6 serviços: Porto/Norte, Lisboa/AML, Algarve", icon: Map },
   { id: "sitemap-material.xml",     file: "sitemap-material.xml",     name: "Material", description: "Material + Material×Cidade", icon: FileText },
   { id: "sitemap-price.xml",        file: "sitemap-price.xml",        name: "Preço", description: "Preço × concelho", icon: FileText },
   { id: "sitemap-problem.xml",      file: "sitemap-problem.xml",      name: "Problemas", description: "Problema + Problema×Cidade", icon: AlertTriangle },
