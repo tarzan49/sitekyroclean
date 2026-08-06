@@ -2,7 +2,7 @@ import { useEffect, useMemo } from "react";
 import { useParams, Link } from "react-router-dom";
 import { QuizServiceProvider } from "@/context/QuizLocationContext";
 import {
-  MapPin, Star, MessageCircle, ArrowRight, AlertTriangle, Lightbulb,
+  MapPin, Star, MessageCircle, ArrowRight, AlertTriangle, XCircle, CheckCircle2,
 } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -11,8 +11,9 @@ import TrustRatingBadge from "@/components/TrustRatingBadge";
 import SectionHeader from "@/components/SectionHeader";
 import ServiceFAQ from "@/components/ServiceFAQ";
 import ServiceAutoCarousel from "@/components/ServiceAutoCarousel";
+import ServiceSnapshotStats from "@/components/ServiceSnapshotStats";
 import { getProblemBySlug, getRelatedProblemLinks } from "@/data/problemSeoData";
-import { CATEGORY_TIPS } from "@/data/problemTipsData";
+import { CATEGORY_TIPS, CATEGORY_STATS } from "@/data/problemTipsData";
 import { SERVICE_TESTIMONIALS } from "@/data/locationPriceTestimonialsData";
 import { SERVICE_GALLERY } from "@/constants/serviceGallery";
 import { services, cities } from "@/data/locationSeoData";
@@ -106,6 +107,7 @@ const ProblemPage = () => {
   const gallery = SERVICE_GALLERY[data.relatedServices[0]];
   const heroImg = getProblemHeroImage(slug ?? "");
   const waHref = `${WHATSAPP_BASE}?text=${encodeURIComponent(buildProblemWaMessage(slug ?? ""))}`;
+  const snapshotStats = CATEGORY_STATS[data.category] ?? CATEGORY_STATS.manchas;
 
   const h1Words = data.h1.trim().split(" ");
   const h1Gold = h1Words.pop() ?? "";
@@ -117,14 +119,15 @@ const ProblemPage = () => {
       <Header />
       <main>
 
-        {/* ═══ HERO ═══ */}
-        <section className="relative pt-24 md:pt-28 pb-16 md:pb-24 overflow-hidden">
+        {/* ═══ HERO + SNAPSHOT (fundo fotográfico contínuo) ═══ */}
+        <div className="relative overflow-hidden">
           <div className="absolute inset-0" style={{ background: "#071a12" }} />
           <div className="absolute inset-0 overflow-hidden" aria-hidden="true">
             <img src={heroImg} alt="" className="w-full h-full object-cover" loading="eager" />
           </div>
           <div className="absolute inset-0" style={{ background: "linear-gradient(to bottom, rgba(7,26,18,0.42) 0%, rgba(7,26,18,0.65) 40%, rgba(7,26,18,0.88) 75%, rgba(7,26,18,0.97) 100%)" }} />
 
+        <section className="relative pt-24 md:pt-28 pb-16 md:pb-24">
           <div className="container mx-auto px-5 sm:px-6 lg:px-8 relative z-10">
             <div className="max-w-6xl mx-auto grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
               <div>
@@ -196,13 +199,16 @@ const ProblemPage = () => {
           </div>
         </section>
 
+        <ServiceSnapshotStats stats={snapshotStats} />
+        </div>
+
         {/* ═══ PROBLEMA + SOLUÇÃO — visual, 2 cartões fotográficos ═══ */}
         <section className="py-14 md:py-20 bg-[#FDFDF9]">
           <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
             <SectionHeader overline="Diagnóstico" heading="O problema," goldWord="a solução" light={true} />
             <div className="grid sm:grid-cols-2 gap-4 md:gap-6">
-              {/* Problema — imagem dessaturada: comunica "antes" sem usar vermelho */}
-              <div className="relative aspect-[4/3] overflow-hidden rounded-sm">
+              {/* Problema — imagem dessaturada + acento vermelho */}
+              <div className="relative aspect-[4/3] overflow-hidden rounded-sm" style={{ boxShadow: "inset 0 0 0 2px rgba(239,68,68,0.55)" }}>
                 <img
                   src={heroImg}
                   alt={`${data.h1}, o problema`}
@@ -213,23 +219,23 @@ const ProblemPage = () => {
                 <div className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(7,26,18,0.90) 0%, rgba(7,26,18,0.6) 45%, rgba(7,26,18,0.15) 72%, transparent 100%)" }} />
                 <div className="absolute bottom-0 left-0 right-0 p-5 md:p-7 min-h-[160px] md:min-h-[180px] flex flex-col justify-start">
                   <div className="flex items-center gap-1.5 mb-2">
-                    <AlertTriangle className="w-3.5 h-3.5 flex-shrink-0 text-white/60" />
-                    <span className="text-[10px] font-bold tracking-[0.22em] uppercase text-white/60">O Problema</span>
+                    <XCircle className="w-3.5 h-3.5 flex-shrink-0" style={{ color: "#ef4444" }} />
+                    <span className="text-[10px] font-bold tracking-[0.22em] uppercase" style={{ color: "#ef4444" }}>O Problema</span>
                   </div>
                   <p className="font-playfair text-lg font-bold text-white mb-2 leading-tight">Porque acontece</p>
                   <p className="text-sm text-white/80 leading-relaxed">{data.problemDetail}</p>
                 </div>
               </div>
-              {/* Solução — cor cheia: comunica "depois" */}
-              <div className="relative aspect-[4/3] overflow-hidden rounded-sm">
+              {/* Solução — cor cheia + acento verde: sensação de esperança */}
+              <div className="relative aspect-[4/3] overflow-hidden rounded-sm" style={{ boxShadow: "inset 0 0 0 2px rgba(34,197,94,0.55)" }}>
                 <img src={gallery?.after ?? heroImg} alt={`${data.h1}, a solução`} className="absolute inset-0 w-full h-full object-cover" loading="lazy" />
                 <div className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(7,26,18,0.90) 0%, rgba(7,26,18,0.6) 45%, rgba(7,26,18,0.15) 72%, transparent 100%)" }} />
                 <div className="absolute bottom-0 left-0 right-0 p-5 md:p-7 min-h-[160px] md:min-h-[180px] flex flex-col justify-start">
                   <div className="flex items-center gap-1.5 mb-2">
-                    <Lightbulb className="w-3.5 h-3.5 flex-shrink-0" style={{ color: "#D4AF37" }} />
-                    <span className="text-[10px] font-bold tracking-[0.22em] uppercase" style={{ color: "#D4AF37" }}>A Solução</span>
+                    <CheckCircle2 className="w-3.5 h-3.5 flex-shrink-0" style={{ color: "#22c55e" }} />
+                    <span className="text-[10px] font-bold tracking-[0.22em] uppercase" style={{ color: "#22c55e" }}>A Solução</span>
                   </div>
-                  <p className="font-playfair text-lg font-bold mb-2 leading-tight" style={{ color: "#D4AF37" }}>Como resolvemos</p>
+                  <p className="font-playfair text-lg font-bold mb-2 leading-tight" style={{ color: "#22c55e" }}>Como resolvemos</p>
                   <p className="text-sm text-white/85 leading-relaxed">{data.solutionDetail}</p>
                 </div>
               </div>
@@ -237,25 +243,22 @@ const ProblemPage = () => {
           </div>
         </section>
 
-        {/* ═══ QUANDO CHAMAR — checklist, não grid numerada (para não repetir Benefícios) ═══ */}
+        {/* ═══ QUANDO CHAMAR + PROCESSO — fundidas, fundo verde único ═══ */}
         <section className="py-14 md:py-20 bg-kyro-green">
           <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
             <SectionHeader overline="Quando Agir" heading="Quando chamar um" goldWord="profissional" light={false} />
-            <div className="grid sm:grid-cols-2 gap-x-8 gap-y-1">
+            <div className="grid sm:grid-cols-2 gap-px mb-16 md:mb-20" style={{ backgroundColor: "rgba(255,255,255,0.08)" }}>
               {WHEN_TO_CALL.map((sign, idx) => (
-                <div key={idx} className="flex items-start gap-3 py-3.5" style={{ borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
-                  <AlertTriangle className="w-4 h-4 flex-shrink-0 mt-0.5" style={{ color: "#D4AF37" }} />
-                  <span className="text-sm text-white/70 leading-relaxed">{sign}</span>
+                <div key={idx} className="relative overflow-hidden flex items-start gap-3.5 p-5 md:p-6" style={{ backgroundColor: "#0d241b", borderTop: "2px solid rgba(212,175,55,0.55)" }}>
+                  <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0" style={{ backgroundColor: "rgba(212,175,55,0.12)", border: "1px solid rgba(212,175,55,0.3)" }}>
+                    <AlertTriangle className="w-4 h-4" style={{ color: "#D4AF37" }} />
+                  </div>
+                  <span className="text-sm text-white/75 leading-relaxed pt-1.5">{sign}</span>
                 </div>
               ))}
             </div>
-          </div>
-        </section>
 
-        {/* ═══ PROCESSO — timeline horizontal ligada por linha, não grid ═══ */}
-        <section className="py-14 md:py-20 bg-[#FDFDF9]">
-          <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
-            <SectionHeader overline="Processo" heading="Como tratamos este" goldWord="problema" light={true} />
+            <SectionHeader overline="Processo" heading="Como tratamos este" goldWord="problema" light={false} />
             <div className="relative grid grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-10">
               <div
                 className="hidden lg:block absolute top-6 left-0 right-0 h-px"
@@ -265,14 +268,14 @@ const ProblemPage = () => {
               {PROCESS_STEPS.map((step, idx) => (
                 <div key={idx} className="relative flex flex-col items-start">
                   <div
-                    className="relative z-10 w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0 mb-4 bg-white"
-                    style={{ border: "2px solid #D4AF37" }}
+                    className="relative z-10 w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0 mb-4"
+                    style={{ backgroundColor: "#0d241b", border: "2px solid #D4AF37" }}
                   >
                     <span className="font-playfair font-bold text-lg leading-none" style={{ color: "#D4AF37" }}>{idx + 1}</span>
                   </div>
                   <p className="text-[10px] font-bold tracking-[0.24em] uppercase mb-1.5" style={{ color: "#D4AF37" }}>{String(idx + 1).padStart(2, "0")}</p>
-                  <p className="text-sm font-semibold text-[#111111] mb-1.5">{step.title}</p>
-                  <p className="text-sm text-[#111111]/55 leading-relaxed">{step.body}</p>
+                  <p className="text-sm font-semibold text-white mb-1.5">{step.title}</p>
+                  <p className="text-sm text-white/55 leading-relaxed">{step.body}</p>
                 </div>
               ))}
             </div>
@@ -280,19 +283,19 @@ const ProblemPage = () => {
         </section>
 
         {/* ═══ BENEFÍCIOS ═══ */}
-        <section className="py-14 md:py-20 bg-kyro-green">
+        <section className="py-14 md:py-20 bg-[#FDFDF9]">
           <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
-            <SectionHeader overline="Vantagens" heading="O que muda depois da nossa" goldWord="intervenção" light={false} />
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-px" style={{ backgroundColor: "rgba(255,255,255,0.08)" }}>
+            <SectionHeader overline="Vantagens" heading="O que muda depois da nossa" goldWord="intervenção" light={true} />
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-px" style={{ backgroundColor: "#E8E4DE" }}>
               {data.benefits.map((benefit, idx) => (
-                <div key={idx} className="relative overflow-hidden flex items-start gap-3 p-6 md:p-7" style={{ backgroundColor: "#0d241b", borderTop: "2px solid rgba(212,175,55,0.55)" }}>
+                <div key={idx} className="relative overflow-hidden flex items-start gap-3 p-6 md:p-7 bg-white" style={{ borderTop: "2px solid #D4AF37" }}>
                   <span
                     className="absolute bottom-2 right-3 font-playfair font-bold leading-none select-none pointer-events-none"
-                    style={{ fontSize: "5rem", color: "rgba(212,175,55,0.08)" }}
+                    style={{ fontSize: "5rem", color: "rgba(212,175,55,0.1)" }}
                   >
                     {String(idx + 1).padStart(2, "0")}
                   </span>
-                  <span className="relative text-sm text-white/65 leading-relaxed">{benefit}</span>
+                  <span className="relative text-sm text-[#111111]/65 leading-relaxed">{benefit}</span>
                 </div>
               ))}
             </div>
@@ -301,23 +304,23 @@ const ProblemPage = () => {
 
         {/* ═══ DICA DE ESPECIALISTA ═══ */}
         {categoryTips && (
-          <section className="py-14 md:py-20 bg-[#FDFDF9]">
+          <section className="py-14 md:py-20 bg-kyro-green">
             <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
-              <SectionHeader overline="Dica de Especialista" heading={categoryTips.title.split(" ").slice(0, -1).join(" ") || "O que fazer"} goldWord={categoryTips.title.split(" ").slice(-1)[0] ?? "agora"} light={true} />
+              <SectionHeader overline="Dica de Especialista" heading={categoryTips.title.split(" ").slice(0, -1).join(" ") || "O que fazer"} goldWord={categoryTips.title.split(" ").slice(-1)[0] ?? "agora"} light={false} />
               <div className="max-w-2xl">
                 <ol className="space-y-4 mb-8">
                   {categoryTips.steps.map((step, i) => (
                     <li key={i} className="flex items-start gap-4">
-                      <span className="font-black text-xs w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5" style={{ backgroundColor: "rgba(212,175,55,0.12)", color: "#B8912A" }}>
+                      <span className="font-black text-xs w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5" style={{ backgroundColor: "rgba(212,175,55,0.18)", color: "#D4AF37" }}>
                         {i + 1}
                       </span>
-                      <p className="text-sm text-[#111111]/65 leading-relaxed">{step}</p>
+                      <p className="text-sm text-white/70 leading-relaxed">{step}</p>
                     </li>
                   ))}
                 </ol>
-                <div className="flex items-start gap-3 p-4" style={{ backgroundColor: "rgba(212,175,55,0.06)", border: "1px solid rgba(212,175,55,0.25)" }}>
-                  <AlertTriangle className="w-4 h-4 flex-shrink-0 mt-0.5" style={{ color: "#B8912A" }} />
-                  <p className="text-xs text-[#111111]/55 leading-relaxed">{categoryTips.warning}</p>
+                <div className="flex items-start gap-3 p-4" style={{ backgroundColor: "rgba(212,175,55,0.05)", border: "1px solid rgba(212,175,55,0.2)" }}>
+                  <AlertTriangle className="w-4 h-4 flex-shrink-0 mt-0.5" style={{ color: "#D4AF37" }} />
+                  <p className="text-xs text-white/50 leading-relaxed">{categoryTips.warning}</p>
                 </div>
               </div>
             </div>
@@ -345,9 +348,9 @@ const ProblemPage = () => {
 
         {/* ═══ AVALIAÇÕES REAIS ═══ */}
         {testimonials && testimonials.length > 0 && (
-          <section className="py-14 md:py-20 bg-kyro-green">
+          <section className="py-14 md:py-20 bg-[#FDFDF9]">
             <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
-              <SectionHeader overline="Avaliações Reais" heading="O que dizem os nossos" goldWord="clientes" light={false} />
+              <SectionHeader overline="Avaliações Reais" heading="O que dizem os nossos" goldWord="clientes" light={true} />
               <div className="grid sm:grid-cols-2 gap-px" style={{ backgroundColor: "#E8E4DE" }}>
                 {testimonials.map((t, i) => (
                   <div key={i} className="relative overflow-hidden p-6 md:p-8 bg-white" style={{ borderTop: "2px solid #D4AF37" }}>

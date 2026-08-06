@@ -2,7 +2,7 @@ import { useEffect, useMemo } from "react";
 import { useLocation, Link } from "react-router-dom";
 import { QuizLocationProvider, QuizServiceProvider } from "@/context/QuizLocationContext";
 import {
-  MapPin, Star, MessageCircle, ArrowRight, AlertTriangle, Lightbulb,
+  MapPin, Star, MessageCircle, ArrowRight, AlertTriangle, XCircle, CheckCircle2,
 } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -11,9 +11,10 @@ import TrustRatingBadge from "@/components/TrustRatingBadge";
 import SectionHeader from "@/components/SectionHeader";
 import ServiceFAQ from "@/components/ServiceFAQ";
 import ServiceAutoCarousel from "@/components/ServiceAutoCarousel";
+import ServiceSnapshotStats from "@/components/ServiceSnapshotStats";
 import ServiceLocationSchema from "@/components/ServiceLocationSchema";
 import { getProblemBySlug, getRelatedProblemLinks } from "@/data/problemSeoData";
-import { CATEGORY_TIPS } from "@/data/problemTipsData";
+import { CATEGORY_TIPS, CATEGORY_STATS } from "@/data/problemTipsData";
 import { SERVICE_TESTIMONIALS } from "@/data/locationPriceTestimonialsData";
 import { SERVICE_GALLERY } from "@/constants/serviceGallery";
 import { cities, services, DEFAULT_PRICE_FROM, cityPrep, cityPrepCap } from "@/data/locationSeoData";
@@ -119,6 +120,7 @@ const ProblemCityPage = () => {
   const gallery = SERVICE_GALLERY[problem.relatedServices[0]];
   const heroImg = getProblemHeroImage(problem.slug);
   const waHref = WHATSAPP_BASE;
+  const snapshotStats = CATEGORY_STATS[problem.category] ?? CATEGORY_STATS.manchas;
 
   const validCitySlugs = new Set([...METRO_CITY_SLUGS, ...problem.relatedCities]);
   const nearbyCities = cities
@@ -151,14 +153,15 @@ const ProblemCityPage = () => {
       <Header />
       <main>
 
-        {/* ═══ HERO ═══ */}
-        <section className="relative pt-24 md:pt-28 pb-16 md:pb-24 overflow-hidden">
+        {/* ═══ HERO + SNAPSHOT (fundo fotográfico contínuo) ═══ */}
+        <div className="relative overflow-hidden">
           <div className="absolute inset-0" style={{ background: "#071a12" }} />
           <div className="absolute inset-0 overflow-hidden" aria-hidden="true">
             <img src={heroImg} alt="" className="w-full h-full object-cover" loading="eager" />
           </div>
           <div className="absolute inset-0" style={{ background: "linear-gradient(to bottom, rgba(7,26,18,0.42) 0%, rgba(7,26,18,0.65) 40%, rgba(7,26,18,0.88) 75%, rgba(7,26,18,0.97) 100%)" }} />
 
+        <section className="relative pt-24 md:pt-28 pb-16 md:pb-24">
           <div className="container mx-auto px-5 sm:px-6 lg:px-8 relative z-10">
             <div className="max-w-6xl mx-auto grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
               <div>
@@ -232,13 +235,16 @@ const ProblemCityPage = () => {
           </div>
         </section>
 
+        <ServiceSnapshotStats stats={snapshotStats} />
+        </div>
+
         {/* ═══ PROBLEMA + SOLUÇÃO — visual, 2 cartões fotográficos ═══ */}
         <section className="py-14 md:py-20 bg-[#FDFDF9]">
           <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
             <SectionHeader overline="Diagnóstico" heading="O problema," goldWord="a solução" light={true} />
             <div className="grid sm:grid-cols-2 gap-4 md:gap-6 mb-6">
-              {/* Problema — imagem dessaturada: comunica "antes" sem usar vermelho */}
-              <div className="relative aspect-[4/3] overflow-hidden rounded-sm">
+              {/* Problema — imagem dessaturada + acento vermelho */}
+              <div className="relative aspect-[4/3] overflow-hidden rounded-sm" style={{ boxShadow: "inset 0 0 0 2px rgba(239,68,68,0.55)" }}>
                 <img
                   src={heroImg}
                   alt={`${problem.h1}, o problema`}
@@ -249,23 +255,23 @@ const ProblemCityPage = () => {
                 <div className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(7,26,18,0.90) 0%, rgba(7,26,18,0.6) 45%, rgba(7,26,18,0.15) 72%, transparent 100%)" }} />
                 <div className="absolute bottom-0 left-0 right-0 p-5 md:p-7 min-h-[160px] md:min-h-[180px] flex flex-col justify-start">
                   <div className="flex items-center gap-1.5 mb-2">
-                    <AlertTriangle className="w-3.5 h-3.5 flex-shrink-0 text-white/60" />
-                    <span className="text-[10px] font-bold tracking-[0.22em] uppercase text-white/60">O Problema {prep} {city.name}</span>
+                    <XCircle className="w-3.5 h-3.5 flex-shrink-0" style={{ color: "#ef4444" }} />
+                    <span className="text-[10px] font-bold tracking-[0.22em] uppercase" style={{ color: "#ef4444" }}>O Problema {prep} {city.name}</span>
                   </div>
                   <p className="font-playfair text-lg font-bold text-white mb-2 leading-tight">Porque acontece</p>
                   <p className="text-sm text-white/80 leading-relaxed">{problem.problemDetail}</p>
                 </div>
               </div>
-              {/* Solução — cor cheia: comunica "depois" */}
-              <div className="relative aspect-[4/3] overflow-hidden rounded-sm">
+              {/* Solução — cor cheia + acento verde: sensação de esperança */}
+              <div className="relative aspect-[4/3] overflow-hidden rounded-sm" style={{ boxShadow: "inset 0 0 0 2px rgba(34,197,94,0.55)" }}>
                 <img src={gallery?.after ?? heroImg} alt={`${problem.h1}, a solução`} className="absolute inset-0 w-full h-full object-cover" loading="lazy" />
                 <div className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(7,26,18,0.90) 0%, rgba(7,26,18,0.6) 45%, rgba(7,26,18,0.15) 72%, transparent 100%)" }} />
                 <div className="absolute bottom-0 left-0 right-0 p-5 md:p-7 min-h-[160px] md:min-h-[180px] flex flex-col justify-start">
                   <div className="flex items-center gap-1.5 mb-2">
-                    <Lightbulb className="w-3.5 h-3.5 flex-shrink-0" style={{ color: "#D4AF37" }} />
-                    <span className="text-[10px] font-bold tracking-[0.22em] uppercase" style={{ color: "#D4AF37" }}>A Solução</span>
+                    <CheckCircle2 className="w-3.5 h-3.5 flex-shrink-0" style={{ color: "#22c55e" }} />
+                    <span className="text-[10px] font-bold tracking-[0.22em] uppercase" style={{ color: "#22c55e" }}>A Solução</span>
                   </div>
-                  <p className="font-playfair text-lg font-bold mb-2 leading-tight" style={{ color: "#D4AF37" }}>Como resolvemos</p>
+                  <p className="font-playfair text-lg font-bold mb-2 leading-tight" style={{ color: "#22c55e" }}>Como resolvemos</p>
                   <p className="text-sm text-white/85 leading-relaxed">{problem.solutionDetail}</p>
                 </div>
               </div>
