@@ -16,7 +16,7 @@ import { SERVICE_TESTIMONIALS } from "@/data/locationPriceTestimonialsData";
 import { services, cities, cityPrep } from "@/data/locationSeoData";
 import { SERVICE_TO_QUIZ } from "@/constants/serviceToQuiz";
 import { pickServiceHero } from "@/constants/serviceContent";
-import { SERVICE_GALLERY } from "@/constants/serviceGallery";
+import { getServiceGallery } from "@/constants/serviceGallery";
 import { buildServiceWaMessage } from "@/lib/whatsappMessages";
 import { SITE_URL, WHATSAPP_BASE } from "@/constants/business";
 import {
@@ -74,7 +74,7 @@ const PricePage = () => {
   const nearbyCities = cities.filter(c => c.slug !== data.citySlug).slice(0, 8);
   const waHref = `${WHATSAPP_BASE}?text=${encodeURIComponent(buildServiceWaMessage(data.serviceSlug, data.cityName))}`;
   const testimonials = SERVICE_TESTIMONIALS[data.serviceSlug];
-  const gallery = SERVICE_GALLERY[data.serviceSlug];
+  const gallery = getServiceGallery(data.serviceSlug, data.citySlug);
 
   return (
     <QuizLocationProvider value={data.cityName}>

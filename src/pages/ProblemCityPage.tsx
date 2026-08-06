@@ -16,7 +16,7 @@ import ServiceLocationSchema from "@/components/ServiceLocationSchema";
 import { getProblemBySlug, getRelatedProblemLinks } from "@/data/problemSeoData";
 import { CATEGORY_TIPS, CATEGORY_STATS, splitTipsHeading } from "@/data/problemTipsData";
 import { SERVICE_TESTIMONIALS } from "@/data/locationPriceTestimonialsData";
-import { SERVICE_GALLERY } from "@/constants/serviceGallery";
+import { getServiceGallery } from "@/constants/serviceGallery";
 import { cities, services, DEFAULT_PRICE_FROM, cityPrep, cityPrepCap } from "@/data/locationSeoData";
 import { SERVICE_TO_QUIZ } from "@/constants/serviceToQuiz";
 import { METRO_CITY_SLUGS } from "@/constants/metroCities";
@@ -117,7 +117,7 @@ const ProblemCityPage = () => {
   const testimonialPool = SERVICE_TESTIMONIALS[problem.relatedServices[0]] ?? SERVICE_TESTIMONIALS['limpeza-sofas'];
   const testimonialHash = city.name.split("").reduce((a, c) => a + c.charCodeAt(0), 0);
   const testimonial = testimonialPool[testimonialHash % testimonialPool.length];
-  const gallery = SERVICE_GALLERY[problem.relatedServices[0]];
+  const gallery = getServiceGallery(problem.relatedServices[0], `${problem.slug}-${city.slug}`);
   const heroImg = getProblemHeroImage(problem.slug);
   const waHref = WHATSAPP_BASE;
   const snapshotStats = CATEGORY_STATS[problem.category] ?? CATEGORY_STATS.manchas;

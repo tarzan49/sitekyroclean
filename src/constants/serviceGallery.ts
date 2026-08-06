@@ -3,6 +3,8 @@
 
 import sofaBefore from "@/assets/galeria-sofa-antes.webp";
 import sofaAfter from "@/assets/galeria-sofa-depois.webp";
+import sofaBefore2 from "@/assets/galeria-sofa-antes-2.webp";
+import sofaAfter2 from "@/assets/galeria-sofa-depois-2.webp";
 import sofaResultado from "@/assets/sofa-pele-pormenor.webp";
 import sofaProcesso from "@/assets/sofa-extracao.webp";
 
@@ -91,3 +93,33 @@ export const SERVICE_GALLERY: Record<string, ServiceGallery> = {
     ],
   },
 };
+
+// Extra before/after pairs for services with more than one real set of photos.
+// getServiceGallery() picks one deterministically per page so the same page
+// always shows the same pair (stable across re-crawls/re-renders) while
+// different pages across the site show different photos.
+const GALLERY_VARIANTS: Partial<Record<string, { before: string; after: string }[]>> = {
+  "limpeza-sofas": [
+    { before: sofaBefore, after: sofaAfter },
+    { before: sofaBefore2, after: sofaAfter2 },
+  ],
+};
+
+function hashSeed(seed: string): number {
+  let h = 0;
+  for (let i = 0; i < seed.length; i++) h = (h + seed.charCodeAt(i) * 31) | 0;
+  return Math.abs(h);
+}
+
+/** Gallery for a service, with the before/after pair picked deterministically
+ * from `seed` (e.g. city slug, material slug, problem slug) when the service
+ * has more than one real pair available. Falls back to the single pair for
+ * services that only have one. */
+export function getServiceGallery(serviceSlug: string, seed: string): ServiceGallery | undefined {
+  const base = SERVICE_GALLERY[serviceSlug];
+  if (!base) return undefined;
+  const variants = GALLERY_VARIANTS[serviceSlug];
+  if (!variants || variants.length < 2) return base;
+  const pick = variants[hashSeed(seed) % variants.length];
+  return { ...base, before: pick.before, after: pick.after };
+}

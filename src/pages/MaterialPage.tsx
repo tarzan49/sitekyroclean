@@ -14,7 +14,7 @@ import ServiceAutoCarousel from "@/components/ServiceAutoCarousel";
 import { trackWhatsAppClick } from "@/lib/quizTracking";
 import { SERVICE_TO_QUIZ } from "@/constants/serviceToQuiz";
 import { SERVICE_PACK_SLUGS } from "@/constants/servicePackSlugs";
-import { SERVICE_GALLERY } from "@/constants/serviceGallery";
+import { getServiceGallery } from "@/constants/serviceGallery";
 import {
   getMaterialBySlug,
   getAllMaterialCityRoutes,
@@ -105,7 +105,7 @@ const MaterialPage = () => {
   const h1Rest = h1Words.join(" ");
 
   const testimonials = SERVICE_TESTIMONIALS[data.serviceSlug];
-  const gallery = SERVICE_GALLERY[data.serviceSlug];
+  const gallery = getServiceGallery(data.serviceSlug, `${data.slug}-${citySlug}`);
 
   return (
     <QuizLocationProvider value={cityName ?? undefined}>

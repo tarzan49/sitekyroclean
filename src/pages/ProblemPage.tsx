@@ -15,7 +15,7 @@ import ServiceSnapshotStats from "@/components/ServiceSnapshotStats";
 import { getProblemBySlug, getRelatedProblemLinks } from "@/data/problemSeoData";
 import { CATEGORY_TIPS, CATEGORY_STATS, splitTipsHeading } from "@/data/problemTipsData";
 import { SERVICE_TESTIMONIALS } from "@/data/locationPriceTestimonialsData";
-import { SERVICE_GALLERY } from "@/constants/serviceGallery";
+import { getServiceGallery } from "@/constants/serviceGallery";
 import { services, cities } from "@/data/locationSeoData";
 import { SERVICE_TO_QUIZ } from "@/constants/serviceToQuiz";
 import { getProblemHeroImage } from "@/lib/problemHeroImages";
@@ -104,7 +104,7 @@ const ProblemPage = () => {
   const servicePrice = relatedService?.priceFrom ?? "49€";
   const categoryTips = CATEGORY_TIPS[data.category];
   const testimonials = SERVICE_TESTIMONIALS[data.relatedServices[0]];
-  const gallery = SERVICE_GALLERY[data.relatedServices[0]];
+  const gallery = getServiceGallery(data.relatedServices[0], slug ?? "");
   const heroImg = getProblemHeroImage(slug ?? "");
   const waHref = `${WHATSAPP_BASE}?text=${encodeURIComponent(buildProblemWaMessage(slug ?? ""))}`;
   const snapshotStats = CATEGORY_STATS[data.category] ?? CATEGORY_STATS.manchas;
