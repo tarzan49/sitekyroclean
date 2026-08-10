@@ -32,6 +32,7 @@ import { getAllMarcaSofaRoutes, getMarcaByCityAndSlug } from '../src/data/marcaS
 import { getAllMarcaColchaoRoutes, getMarcaColchaoByCityAndSlug } from '../src/data/marcaColchaoData';
 import { getAllMarcaCadeirasRoutes, getMarcaCadeirasByCityAndSlug } from '../src/data/marcaCadeirasData';
 import { EN_PAGES } from '../src/data/enTouristSeoData';
+import { getAllPosts } from '../src/data/blogData';
 
 const BASE_URL = 'https://cleansolutions.com.pt';
 
@@ -1006,6 +1007,49 @@ export function prerenderRoutes(outDir: string): number {
       'en',
     );
     console.log(`  EN host guide:           1`);
+  }
+
+  // ── Blog posts (individual articles — index page only prerendered before) ──
+  {
+    const prev = count;
+    for (const post of getAllPosts()) {
+      const url = `/blog/${post.slug}`;
+      const pageUrl = `${BASE_URL}${url}`;
+      const blogPostingSchema = {
+        '@type': 'BlogPosting',
+        headline: post.title,
+        description: post.metaDescription,
+        datePublished: post.publishDate,
+        dateModified: post.updatedDate,
+        inLanguage: 'pt-PT',
+        author: { '@type': 'Organization', name: 'Kyro Clean Solutions' },
+        mainEntityOfPage: `${pageUrl}#webpage`,
+      };
+      const schemas: object[] = [
+        buildBreadcrumbSchema([
+          { name: 'Início', url: BASE_URL + '/' },
+          { name: 'Blog', url: BASE_URL + '/blog' },
+          { name: post.title, url: pageUrl },
+        ]),
+        blogPostingSchema,
+      ];
+      if (post.faq?.length) {
+        schemas.push(buildFaqSchema(post.faq.map(f => ({ question: f.q, answer: f.a }))));
+      }
+      emit(
+        url,
+        post.metaTitle,
+        post.metaDescription,
+        {
+          h1: post.title,
+          intro: post.intro,
+          problems: post.sections.map(s => ({ title: s.heading, description: s.body })),
+          faqs: post.faq?.map(f => ({ question: f.q, answer: f.a })),
+        },
+        schemas,
+      );
+    }
+    console.log(`  Blog posts:              ${count - prev}`);
   }
 
   return count;
