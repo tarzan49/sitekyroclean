@@ -7,6 +7,11 @@
 /limpeza-carpetes                            /limpeza-tapetes                       301
 /pack-quarto-completo-porto-miragaia         /pack-quarto-completo-porto            301
 /pack-sofa-e-colchao-lousada-*               /pack-sofa-e-colchao-porto             301
+# Páginas orfãs de um sistema de packs antigo (sem cidade) — nunca tiveram rota
+# React real, JS mostrava sempre 404 (soft-404 no Google). Redireciona para o
+# equivalente atual (pack × cidade).
+/pack-sofa-colchao                           /pack-sofa-e-colchao-porto             301
+/pack-sofa-impermeabilizacao                 /pack-sofa-impermeabilizacao-porto     301
 
 # ── Descontinuado: impermeabilização de colchão (2026-07) ────────────────────
 /impermeabilizacao-colchao-*                /limpeza-colchoes-:splat              301

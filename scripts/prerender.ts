@@ -874,38 +874,6 @@ export function prerenderRoutes(outDir: string): number {
         ],
       },
       {
-        path: '/pack-sofa-colchao',
-        title: 'Pack Sofá + Colchão | Limpeza Combinada com 10% Desconto | Kyro Clean',
-        desc: 'Pack exclusivo de limpeza de sofá e colchão numa só visita. 10% de desconto. Porto, Lisboa e todo o país. Orçamento grátis.',
-        content: {
-          h1: 'Pack Sofá + Colchão',
-          intro: 'Limpe o sofá e o colchão numa só visita com 10% de desconto vs preços individuais. O técnico trata ambos com equipamento profissional, poupando tempo e dinheiro.',
-        },
-        extraSchemas: [
-          buildBreadcrumbSchema([
-            { name: 'Início', url: BASE_URL + '/' },
-            { name: 'Packs', url: BASE_URL + '/packs' },
-            { name: 'Pack Sofá + Colchão', url: BASE_URL + '/pack-sofa-colchao' },
-          ]),
-        ],
-      },
-      {
-        path: '/pack-sofa-impermeabilizacao',
-        title: 'Pack Sofá + Impermeabilização | Limpeza e Proteção | Kyro Clean',
-        desc: 'Limpe e impermeabilize o seu sofá na mesma visita com desconto. Limpeza profissional + proteção contra manchas. Orçamento grátis.',
-        content: {
-          h1: 'Pack Sofá + Impermeabilização',
-          intro: 'Combine a limpeza profissional do sofá com impermeabilização numa só visita. Resultado imediato e proteção duradoura contra manchas e líquidos.',
-        },
-        extraSchemas: [
-          buildBreadcrumbSchema([
-            { name: 'Início', url: BASE_URL + '/' },
-            { name: 'Packs', url: BASE_URL + '/packs' },
-            { name: 'Pack Sofá + Impermeabilização', url: BASE_URL + '/pack-sofa-impermeabilizacao' },
-          ]),
-        ],
-      },
-      {
         path: '/guia-de-packs',
         title: 'Guia de Packs de Limpeza | Kyro Clean Solutions',
         desc: 'Escolha o pack de limpeza ideal para a sua casa. Packs com desconto para sofá, colchão, tapetes e mais. Orçamento grátis.',
