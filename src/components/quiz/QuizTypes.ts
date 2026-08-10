@@ -109,12 +109,13 @@ export const locationPrices: Record<string, number> = {
   'Guimarães': 20,
 
   // ═══ Lisboa / Área Metropolitana (equipa local) ═══
+  // Regra: mínimo 10€, máximo 15€ (nunca 5€ nem 20€ em Lisboa/Algarve).
   // Zona 0 — Lisboa
-  'Lisboa': 5,
+  'Lisboa': 10,
   // Zona 1 — Vizinhos imediatos, ~10-15 min
-  'Amadora': 5,
-  'Odivelas': 5,
-  'Oeiras': 5,
+  'Amadora': 10,
+  'Odivelas': 10,
+  'Oeiras': 10,
   // Zona 2 — Grande Lisboa, ~20-30 min
   'Cascais': 10,
   'Sintra': 10,
@@ -127,20 +128,21 @@ export const locationPrices: Record<string, number> = {
   'Moita': 15,
   'Mafra': 15,
   // Zona 4 — Extremos da AML, ~40-50 min
-  'Setúbal': 20,
-  'Montijo': 20,
-  'Alcochete': 20,
-  'Palmela': 20,
-  'Sesimbra': 20,
+  'Setúbal': 15,
+  'Montijo': 15,
+  'Alcochete': 15,
+  'Palmela': 15,
+  'Sesimbra': 15,
 
   // ═══ Algarve (equipa local) ═══
+  // Regra: mínimo 10€, máximo 15€ (nunca 5€ nem 20€ em Lisboa/Algarve).
   // Zona 0 — Faro/Loulé
-  'Faro': 5,
-  'Loulé': 5,
+  'Faro': 10,
+  'Loulé': 10,
   // Zona 1 — Vizinhos imediatos, ~10-15 min
-  'Albufeira': 5,
-  'São Brás de Alportel': 5,
-  'Olhão': 5,
+  'Albufeira': 10,
+  'São Brás de Alportel': 10,
+  'Olhão': 10,
   // Zona 2 — Algarve central, ~20-30 min
   'Silves': 10,
   'Lagoa': 10,
@@ -149,13 +151,13 @@ export const locationPrices: Record<string, number> = {
   'Portimão': 15,
   'Lagos': 15,
   // Zona 4 — Extremos, ~40-55 min
-  'Vila Real de Santo António': 20,
-  'Castro Marim': 20,
-  'Monchique': 20,
+  'Vila Real de Santo António': 15,
+  'Castro Marim': 15,
+  'Monchique': 15,
   // Zona 5 — Interior/Costa Vicentina, ~55-70 min
-  'Aljezur': 20,
-  'Vila do Bispo': 20,
-  'Alcoutim': 20,
+  'Aljezur': 15,
+  'Vila do Bispo': 15,
+  'Alcoutim': 15,
 };
 
 export const carpetWaterproofingPrices = [

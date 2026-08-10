@@ -87,7 +87,7 @@ const allFaqs: FAQ[] = [
     id: "servico-fora-porto",
     question: "Fazem limpeza de sofás fora do Porto?",
     answer: <>Sim. A Kyro Clean serve o <strong>Porto a partir de 5€ de deslocação</strong>. Para Matosinhos, Vila Nova de Gaia, Maia, Gondomar e Valongo a taxa sobe com a distância. Para Lisboa, Cascais, Sintra e Oeiras aplica-se com agendamento com pelo menos 48 horas de antecedência. Para zonas fora destas áreas avaliamos caso a caso. O valor exato aparece no calculador de orçamento. O horário de serviço é segunda a sábado, das 8h às 24h.</>,
-    plainAnswer: "Deslocação a partir de 5€, sobe com a distância ao centro de cada equipa (Porto, Lisboa, Algarve). Lisboa e área: agendamento com 48h de antecedência. Valor exato no calculador de orçamento.",
+    plainAnswer: "Deslocação a partir de 5€ no Porto, a partir de 10€ em Lisboa e Algarve, sobe com a distância ao centro de cada equipa. Lisboa e área: agendamento com 48h de antecedência. Valor exato no calculador de orçamento.",
   },
   {
     id: "quanto-custa-limpar-tapete",
