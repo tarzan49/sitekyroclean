@@ -5,6 +5,5 @@ Disallow: /obrigado
 Disallow: /obrigado-pelo-servico
 Disallow: /api/
 Disallow: /*.json$
-Disallow: /*?lang=*
 
 Sitemap: https://cleansolutions.com.pt/sitemap.xml

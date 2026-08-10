@@ -1,4 +1,5 @@
-﻿import { Link } from "react-router-dom";
+﻿import { useEffect } from "react";
+import { Link } from "react-router-dom";
 import { Home, Phone, ArrowRight, Sofa, BedDouble, Shield, BookOpen } from "lucide-react";
 import { trackCallClick } from "@/lib/analytics";
 import { PHONE_TEL, PHONE_DISPLAY } from "@/constants/business";
@@ -10,7 +11,19 @@ const popularPages = [
   { to: "/blog",             icon: BookOpen,   label: "Blog",                desc: "Dicas e guias de manutenção" },
 ];
 
-const NotFound = () => (
+const NotFound = () => {
+  useEffect(() => {
+    let robotsMeta = document.querySelector('meta[name="robots"]');
+    if (!robotsMeta) {
+      robotsMeta = document.createElement('meta');
+      robotsMeta.setAttribute('name', 'robots');
+      document.head.appendChild(robotsMeta);
+    }
+    robotsMeta.setAttribute('content', 'noindex, follow');
+    return () => { robotsMeta?.setAttribute('content', 'index, follow'); };
+  }, []);
+
+  return (
   <div className="min-h-screen flex flex-col items-center justify-center px-4 py-16 relative overflow-hidden"
     style={{ background: "linear-gradient(160deg, #071a12 0%, #0B2F2A 55%, #0a2218 100%)" }}>
 
@@ -85,6 +98,7 @@ const NotFound = () => (
       </div>
     </div>
   </div>
-);
+  );
+};
 
 export default NotFound;
