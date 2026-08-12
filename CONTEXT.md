@@ -914,3 +914,19 @@ Commits: `84fee7d` (24 páginas EN base + fixes de `/problemas`), `e13ee42` (gui
 Nenhuma alteração de código adicional foi necessária a partir deste audit — confirma que todas as correções da sessão (taxa de deslocação, blog, packs órfãos, robots.txt) estão a funcionar corretamente em produção.
 
 **Commits desta sessão:** `e3715a6` (robots.txt + noindex), `4faa72a` (packs órfãos), `f22510e` (blog prerender), `c14f6b4` (taxa de deslocação). Todos pushed.
+
+## Sessão — Páginas B2B comerciais (restaurantes/hotéis/escritórios) (2026-08-12, continuação)
+
+User pediu sugestão de algo em falta no site; respondi que faltava uma página dedicada a clientes B2B/contratos recorrentes (restaurantes, hotéis, escritórios) — já havia prova real disso nos testemunhos (Lumiere Restaurante) mas caíam todos no quiz genérico de consumidor. User pediu para construir já, para todas as cidades grandes do país, prometendo dar depois uma lista real de restaurantes/hotéis com quem já trabalhou para adicionar como testemunhos (ainda não recebida no fim desta sessão — não inventar nada entretanto).
+
+**Construído:** `src/data/commercialSeoData.ts` + `src/pages/CommercialPage.tsx`, rota `/limpeza-comercial-{cidade}`, 20 cidades (7 Porto/Norte, 7 Lisboa/AML, 6 Algarve, mesmo critério de "cidades grandes" já usado em `packComboData.ts`/`marcaSofaData.ts`). Página combina 3 segmentos (Restaurantes/Hotéis/Escritórios) numa só página por cidade, com pontos de dor e solução específicos por segmento. CTA deliberadamente diferente das páginas de consumidor: sem tabela de preço fixo (preço de contrato é negociado, não faz sentido num quiz), botão WhatsApp pede "proposta" em vez de "orçamento". Testemunho real reaproveitado da Lumiere Restaurante (já existia em `TestimonialsV1.tsx`) — nenhum testemunho novo foi inventado.
+
+**Wired:** rotas em `App.tsx` (registo explícito por cidade, não segmento dinâmico dash-joined, seguindo o padrão já estabelecido no projeto), `scripts/prerender.ts` (20 páginas), `scripts/generate-sitemap.ts` (`sitemap-comercial.xml` dedicado, 20 URLs).
+
+**Bugs próprios encontrados e corrigidos antes do commit:** frase final da página tinha "ao seu espaço Porto" sem preposição (faltava `cityPrep()`); mensagem de WhatsApp tinha o mesmo problema ("negócio em Porto" em vez de "negócio no Porto"); 4 respostas de FAQ no ficheiro de dados tinham travessão "—" (regra rígida do site, proibido em conteúdo visível) — todos corrigidos antes do commit.
+
+**Verificado:** build limpo, audit estático (`audit-sitemap.js`) confirma 0 problemas em 9189 URLs, testado ao vivo em 3 cidades (Porto/Lisboa/Faro) sem erros de consola, gramática de preposição correta em todas.
+
+**Pendente:** user vai enviar lista de restaurantes/hotéis reais para adicionar como testemunhos nestas páginas — não fazer nada até essa lista chegar.
+
+Commit: `755017b`, pushed.
