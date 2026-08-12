@@ -33,6 +33,7 @@ import { getAllMarcaColchaoRoutes, getMarcaColchaoByCityAndSlug } from '../src/d
 import { getAllMarcaCadeirasRoutes, getMarcaCadeirasByCityAndSlug } from '../src/data/marcaCadeirasData';
 import { EN_PAGES } from '../src/data/enTouristSeoData';
 import { getAllPosts } from '../src/data/blogData';
+import { getAllCommercialRoutes, getCommercialPageData } from '../src/data/commercialSeoData';
 
 const BASE_URL = 'https://cleansolutions.com.pt';
 
@@ -1050,6 +1051,35 @@ export function prerenderRoutes(outDir: string): number {
       );
     }
     console.log(`  Blog posts:              ${count - prev}`);
+  }
+
+  // ── Commercial B2B pages (restaurantes/hotéis/escritórios × cidade) ────
+  {
+    const prev = count;
+    for (const route of getAllCommercialRoutes()) {
+      const data = getCommercialPageData(route.citySlug);
+      if (!data) continue;
+      const schemas: object[] = [
+        buildBreadcrumbSchema([
+          { name: 'Início', url: BASE_URL + '/' },
+          { name: data.h1, url: BASE_URL + route.path },
+        ]),
+      ];
+      emit(
+        route.path,
+        data.title,
+        data.metaDescription,
+        {
+          h1: data.h1,
+          intro: data.intro,
+          problems: data.segments.map(s => ({ title: s.label, description: `${s.painPoints.join(' ')} ${s.solution}` })),
+          benefits: data.benefits,
+          faqs: data.faqs,
+        },
+        schemas,
+      );
+    }
+    console.log(`  Commercial B2B pages:    ${count - prev}`);
   }
 
   return count;

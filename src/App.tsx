@@ -22,6 +22,7 @@ import { getAllPackComboRoutes } from "@/data/packComboData";
 import { getAllMarcaSofaRoutes } from "@/data/marcaSofaData";
 import { getAllMarcaColchaoRoutes } from "@/data/marcaColchaoData";
 import { getAllMarcaCadeirasRoutes } from "@/data/marcaCadeirasData";
+import { getAllCommercialRoutes } from "@/data/commercialSeoData";
 
 // Critical path - load immediately
 import IndexV1 from "./pages/IndexV1";
@@ -41,6 +42,7 @@ const ProblemPage = lazy(() => import("./pages/ProblemPage"));
 const ProblemCityPage = lazy(() => import("./pages/ProblemCityPage"));
 const EnServicePage = lazy(() => import("./pages/EnServicePage"));
 const EnGuidePage = lazy(() => import("./pages/EnGuidePage"));
+const CommercialPage = lazy(() => import("./pages/CommercialPage"));
 const MaterialPage = lazy(() => import("./pages/MaterialPage"));
 const PricePage = lazy(() => import("./pages/PricePage"));
 const BeforeAfterPage = lazy(() => import("./pages/BeforeAfterPage"));
@@ -89,6 +91,7 @@ const packComboRoutes = getAllPackComboRoutes();
 const marcaSofaRoutes = getAllMarcaSofaRoutes();
 const marcaColchaoRoutes = getAllMarcaColchaoRoutes();
 const marcaCadeirasRoutes = getAllMarcaCadeirasRoutes();
+const commercialRoutes = getAllCommercialRoutes();
 
 // ── Inner router component, must be inside <BrowserRouter> to use useLocation
 const AppRoutes = () => {
@@ -140,6 +143,10 @@ const AppRoutes = () => {
                 {/* Problem × City explicit routes (higienizacao-* and lavagem-* filtered out above) */}
                 {problemCityRoutes.map(route => (
                   <Route key={route.path} path={route.path} element={<ProblemCityPage />} />
+                ))}
+                {/* Commercial B2B pages: restaurantes/hotéis/escritórios × cidade */}
+                {commercialRoutes.map(route => (
+                  <Route key={route.path} path={route.path} element={<CommercialPage />} />
                 ))}
                 {/* Marca Sofá pages: 8 brands × cities */}
                 {marcaSofaRoutes.map(route => (

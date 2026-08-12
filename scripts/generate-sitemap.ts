@@ -13,6 +13,7 @@ import { getAllProblemCityRoutes } from '../src/data/problemCitySeoData';
 import { getAllMaterialRoutes, getAllMaterialCityRoutes } from '../src/data/materialSeoData';
 import { getAllKeywordVariantRoutes } from '../src/data/keywordVariantData';
 import { getAllEnRoutes } from '../src/data/enTouristSeoData';
+import { getAllCommercialRoutes } from '../src/data/commercialSeoData';
 
 const BASE_URL = 'https://cleansolutions.com.pt';
 const TODAY = new Date().toISOString().split('T')[0];
@@ -348,6 +349,10 @@ export function generateSitemaps(outDir: string) {
     xmlUrl('/en/airbnb-portugal-cleaning-guide', 'monthly', '0.7'),
   ];
 
+  // 14. Commercial B2B pages (restaurantes/hotéis/escritórios × cidade) — own
+  // dedicated sitemap, separate from the consumer-facing sitemaps above.
+  const commercialUrls: string[] = getAllCommercialRoutes().map(r => xmlUrl(r.path, 'monthly', '0.6'));
+
   // Write sub-sitemaps
   const sitemapFiles = [
     { name: 'sitemap-core.xml', urls: coreUrls },
@@ -361,6 +366,7 @@ export function generateSitemaps(outDir: string) {
     { name: 'sitemap-packs.xml', urls: packUrls },
     { name: 'sitemap-marcas.xml', urls: marcaUrls },
     { name: 'sitemap-en.xml', urls: enUrls },
+    { name: 'sitemap-comercial.xml', urls: commercialUrls },
   ];
 
   let totalUrls = 0;

@@ -120,3 +120,8 @@ export function buildVariantWaMessage(
   const variant = variantLabel.toLowerCase();
   return `Olá! Preciso de ${variant} profissional para o meu ${svc} em ${locationName}. Podem dar-me um orçamento e indicar a vossa disponibilidade?`;
 }
+
+/** Used on CommercialPage (B2B: restaurantes, hotéis, escritórios). */
+export function buildCommercialWaMessage(cityName: string): string {
+  return `Olá! Represento um negócio ${cityPrep(cityName)} ${cityName} (restaurante/hotel/escritório) e tenho interesse num contrato de limpeza recorrente de estofos. Podem enviar-me uma proposta?`;
+}
