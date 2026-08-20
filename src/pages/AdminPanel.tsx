@@ -20,6 +20,8 @@ import { getAllMarcaSofaRoutes } from "@/data/marcaSofaData";
 import { getAllMarcaColchaoRoutes } from "@/data/marcaColchaoData";
 import { getAllMarcaCadeirasRoutes } from "@/data/marcaCadeirasData";
 import { getAllPosts } from "@/data/blogData";
+import { getAllEnRoutes } from "@/data/enTouristSeoData";
+import { getAllCommercialRoutes } from "@/data/commercialSeoData";
 import { SITE_URL } from "@/constants/business";
 import { getAdminRegion, getRegionForLocationPart, ADMIN_REGIONS, ADMIN_REGION_LABELS, type AdminRegion } from "@/data/regionUtils";
 
@@ -31,12 +33,12 @@ const AdminSeoPages = lazy(() => import("./AdminSeoPages"));
 // ── Auth ─────────────────────────────────────────────────────────────────────
 const ADMIN_PASSWORD = (import.meta.env.VITE_ADMIN_PASSWORD as string) || 'kyro2025';
 
-// ── Sitemap config (mirrors scripts/generate-sitemap.ts output — 10 real sub-sitemaps) ──
+// ── Sitemap config (mirrors scripts/generate-sitemap.ts output — 12 real sub-sitemaps) ──
 // "Marcas de Sofá" e "Marcas de Colchão" partilham o mesmo ficheiro físico
 // (sitemap-marcas.xml) mas aparecem como cartões separados aqui — por isso
 // têm um `id` próprio distinto de `file` (usado só para o link/preview do XML).
 const SITEMAPS = [
-  { id: "sitemap.xml",              file: "sitemap.xml",              name: "Sitemap Index", description: "Índice principal (10 sub-sitemaps)", icon: Globe },
+  { id: "sitemap.xml",              file: "sitemap.xml",              name: "Sitemap Index", description: "Índice principal (12 sub-sitemaps)", icon: Globe },
   { id: "sitemap-core.xml",         file: "sitemap-core.xml",         name: "Core (Serviços + Páginas principais)", description: "6 serviços + páginas institucionais", icon: Zap },
   { id: "sitemap-location.xml",     file: "sitemap-location.xml",     name: "Localidade × Serviço", description: "Concelhos × 6 serviços: Porto/Norte, Lisboa/AML, Algarve", icon: Map },
   { id: "sitemap-freguesia.xml",    file: "sitemap-freguesia.xml",    name: "Freguesia × Serviço", description: "Freguesias × 6 serviços: Porto/Norte, Lisboa/AML, Algarve", icon: Map },
@@ -49,6 +51,8 @@ const SITEMAPS = [
   { id: "sitemap-marcas-sofa",      file: "sitemap-marcas.xml",       name: "Marcas de Sofá", description: "8 marcas × 34 concelhos (cidades mais povoadas)", icon: Shield },
   { id: "sitemap-marcas-colchao",   file: "sitemap-marcas.xml",       name: "Marcas de Colchão", description: "6 marcas × 34 concelhos (cidades mais povoadas)", icon: Shield },
   { id: "sitemap-marcas-cadeiras",  file: "sitemap-marcas.xml",       name: "Marcas de Cadeiras", description: "6 marcas × 34 concelhos (cidades mais povoadas)", icon: Shield },
+  { id: "sitemap-en.xml",           file: "sitemap-en.xml",           name: "Inglês (Turismo)", description: "Páginas /en/ para turistas — namespace isolado do PT", icon: Globe },
+  { id: "sitemap-comercial.xml",    file: "sitemap-comercial.xml",    name: "Comercial (B2B)", description: "Restaurantes/hotéis/escritórios × concelho", icon: Star },
 ];
 
 // ── Sitemap URL Generators ────────────────────────────────────────────────────
@@ -89,6 +93,13 @@ function getSitemapUrls(id: string): string[] {
       return getAllMarcaColchaoRoutes().map(r => r.path);
     case "sitemap-marcas-cadeiras":
       return getAllMarcaCadeirasRoutes().map(r => r.path);
+    case "sitemap-en.xml":
+      return [
+        ...getAllEnRoutes().map(r => r.path),
+        "/en/airbnb-portugal-cleaning-guide",
+      ];
+    case "sitemap-comercial.xml":
+      return getAllCommercialRoutes().map(r => r.path);
     default:
       return [];
   }
@@ -494,7 +505,7 @@ const AdminPanel = () => {
             <div className="flex items-center justify-between mb-2">
               <div>
                 <h2 className="text-lg font-bold text-navy">Sitemap Monitor</h2>
-                <p className="text-sm text-gray-500">10 sub-sitemaps · {Object.values(sitemapCounts).reduce((a, c) => a + c, 0).toLocaleString("pt-PT")} URLs indexadas</p>
+                <p className="text-sm text-gray-500">12 sub-sitemaps · {Object.values(sitemapCounts).reduce((a, c) => a + c, 0).toLocaleString("pt-PT")} URLs indexadas</p>
               </div>
             </div>
 
