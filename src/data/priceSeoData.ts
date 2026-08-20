@@ -58,7 +58,6 @@ const priceTables: Record<string, { item: string; price: string; note?: string }
     { item: "Sofá 2 lugares", price: "Desde 79€" },
     { item: "Sofá 3 lugares", price: "Desde 99€" },
     { item: "Cadeiras (por unidade)", price: "Desde 25€" },
-    { item: "Tapete (por m²)", price: "Desde 10€/m²" },
     { item: "Cabeceira", price: "Desde 15€" },
   ],
 };

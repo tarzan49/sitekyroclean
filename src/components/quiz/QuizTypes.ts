@@ -160,13 +160,6 @@ export const locationPrices: Record<string, number> = {
   'Alcoutim': 15,
 };
 
-export const carpetWaterproofingPrices = [
-  { id: 'ate-5m2',   label: 'Até 5 m²',  price: '10€/m²' },
-  { id: 'ate-10m2',  label: 'Até 10 m²', price: '9€/m²' },
-  { id: 'ate-20m2',  label: 'Até 20 m²', price: '7€/m²' },
-  { id: 'mais-20m2', label: '+20 m²',     price: 'Sob orçamento' },
-];
-
 export interface SofaItem     { sizeId: string; qty: number; packEnabled: boolean; }
 export interface MattressItem { sizeId: string; qty: number; packEnabled: boolean; }
 

@@ -36,7 +36,7 @@ const TermosCondicoes = () => (
 
         <Section title="2. Objeto">
           <p>
-            A Kyro Clean Solutions presta serviços de limpeza, higienização e impermeabilização profissional de sofás, colchões, tapetes, cadeiras e outros estofos, realizados no domicílio do cliente ou em local acordado entre as partes.
+            A Kyro Clean Solutions presta serviços de limpeza e higienização profissional de sofás, colchões, tapetes, cadeiras e outros estofos, bem como impermeabilização profissional de sofás, cadeiras e outros estofos, realizados no domicílio do cliente ou em local acordado entre as partes.
           </p>
         </Section>
 

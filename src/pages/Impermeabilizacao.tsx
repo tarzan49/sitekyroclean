@@ -47,11 +47,6 @@ const expertTips: ExpertTip[] = [
     url: "/blog/higienizacao-vs-impermeabilizacao-sofa",
   },
   {
-    title: "Impermeabilização vs. limpeza: qual fazer primeiro?",
-    summary: "Aplicar impermeabilização sobre tecido sujo é um erro comum que reduz a eficácia a zero. Descubra a ordem correta do processo completo.",
-    url: "/blog/impermeabilizacao-tapete-guia",
-  },
-  {
     title: "Impermeabilização é segura para crianças e animais?",
     summary: "Os produtos que utilizamos são certificados, não tóxicos e seguros após a secagem. Saiba exatamente o que está a aplicar na sua casa.",
     url: "/blog/limpeza-sofa-bebe-crianca",
@@ -97,7 +92,7 @@ const Impermeabilizacao = () => {
         <ServiceCityLinks serviceSlug="impermeabilizacao" serviceLabel="Impermeabilização de Estofos" />
         <ServiceSchema
           serviceName="Impermeabilização de Estofos"
-          description="Impermeabilização profissional de sofás, tapetes e cadeiras no Porto. Proteção até 10 anos."
+          description="Impermeabilização profissional de sofás e cadeiras no Porto. Proteção até 10 anos."
           url="/impermeabilizacao"
           priceFrom="59€"
           reviews={[

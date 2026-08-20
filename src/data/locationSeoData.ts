@@ -311,7 +311,7 @@ function generateImpermeabilizacaoContent(city: string, cityDesc: string): Omit<
   const prep = cityPrep(city);
   return {
     title: `Impermeabilização de Estofos ${city} | Proteção até 10 anos | Kyro Clean Solutions`,
-    metaDescription: `Impermeabilização profissional de sofás, cadeiras e tapetes ${prep} ${city}. Proteção invisível contra manchas e líquidos com garantia até 10 anos.`,
+    metaDescription: `Impermeabilização profissional de sofás e cadeiras ${prep} ${city}. Proteção invisível contra manchas e líquidos com garantia até 10 anos.`,
     h1: `Impermeabilização de Estofos ${prep} ${city}`,
     intro: `Proteja os seus estofos contra manchas e líquidos ${prep} ${city}. A Kyro Clean Solutions aplica impermeabilização profissional invisível que cria uma barreira protetora nos tecidos, repelindo líquidos e facilitando a limpeza. Serviço disponível ${prep} ${city} e ${cityDesc} com garantia até 10 anos.`,
     problems: [

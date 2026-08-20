@@ -182,10 +182,6 @@ const posts: BlogPost[] = [
         q: "A impermeabilização tem algum cheiro ou produto químico nocivo?",
         a: "Os produtos profissionais que utilizamos são certificados, sem cheiro após cura e seguros para crianças e animais. Recomendamos ventilar o espaço durante 2 horas após aplicação.",
       },
-      {
-        q: "Funciona em tapetes também?",
-        a: "Sim. A impermeabilização é igualmente eficaz em tapetes, especialmente recomendada para tapetes em zonas de refeição ou áreas de estar com crianças.",
-      },
     ],
     relatedService: { label: "Serviço de impermeabilização profissional", href: "/impermeabilizacao" },
     relatedPosts: [
@@ -890,63 +886,6 @@ const posts: BlogPost[] = [
       "limpeza-sofa-animais-domesticos",
     ],
   },
-  {
-    slug: "impermeabilizacao-tapete-guia",
-    title: "Impermeabilização de tapetes: vale a pena? Quanto custa e quanto dura?",
-    metaTitle: "Impermeabilização de Tapetes | Vale a Pena? Guia 2026 | Kyro Clean",
-    metaDescription: "Guia completo sobre impermeabilização de tapetes: como funciona, quanto dura, quanto custa e para que tipos de tapete é recomendada. Preços reais.",
-    publishDate: "2026-05-19",
-    updatedDate: "2026-05-19",
-    author: "Equipa Kyro Clean",
-    readingTime: 5,
-    category: "Impermeabilização",
-    heroAlt: "Gota de água sobre tapete impermeabilizado com efeito lótus",
-    intro: "Um tapete de qualidade pode custar centenas ou milhares de euros. A impermeabilização protege esse investimento por uma fração do preço. Mas vale mesmo a pena? Para que tipos de tapete funciona e quanto dura o tratamento? Aqui tens as respostas.",
-    sections: [
-      {
-        heading: "Como funciona a impermeabilização de tapetes",
-        body: "A impermeabilização de tapetes aplica uma solução protetora que penetra nas fibras e cria uma barreira hidrofóbica invisível. Quando um líquido contacta com a superfície tratada, forma gotas em vez de ser absorvido: o chamado efeito lótus.\n\nNa Kyro Clean usamos produtos de base fluoropolimérica certificados para uso em têxteis domésticos, sem odor após secagem e seguros para crianças e animais de estimação. O processo demora entre 30 e 60 minutos (incluindo secagem) e pode ser aplicado no mesmo dia da limpeza.\n\nO que a impermeabilização protege:\n- Vinho, sumo e bebidas em geral\n- Café, chá e leite\n- Molhos e alimentos líquidos\n- Urina de animais (dá tempo para limpar antes da absorção)\n- Sujidade superficial e partículas de pó",
-        tip: "A impermeabilização não é uma barreira total: se deixares o líquido mais de 2 a 3 minutos sem limpar, ele penetrará nas fibras. Atua rapidamente quando acontece um derrame.",
-      },
-      {
-        heading: "Para que tipos de tapete é recomendada?",
-        body: "**Tapetes sintéticos (polipropileno, nylon, poliéster):** ideais para impermeabilização: as fibras aceitam bem o tratamento e o efeito dura até 18 meses.\n\n**Tapetes de lã:** compatíveis e recomendados, especialmente em áreas de passagem. A lã é naturalmente um pouco hidrófoba, e a impermeabilização amplifica essa proteção.\n\n**Tapetes de sisal e juta:** recomendado com produto específico para fibras naturais. Estas fibras são muito absorventes, pelo que a proteção é especialmente útil.\n\n**Tapetes persas e artesanais:** deve ser avaliado caso a caso. As fibras naturais e tintas naturais destes tapetes podem reagir de forma diferente. Fazemos sempre teste de compatibilidade antes do tratamento.\n\n**Tapetes de couro:** não recomendado (requerem produto específico para couro, não o mesmo tratamento têxtil).",
-      },
-      {
-        heading: "Quanto custa e quanto dura?",
-        body: "O preço da impermeabilização de tapetes varia com a dimensão:\n\n| Dimensão | Preço estimado |\n|---|---|\n| Tapete pequeno (até 2m²) | 15€ a 20€ |\n| Tapete médio (2-4m²) | 20€ a 35€ |\n| Tapete grande (4-8m²) | 35€ a 55€ |\n| Tapete XXL (8m² ou mais) | a partir de 55€ |\n\nAplicada após limpeza (pack limpeza + impermeabilização): desconto de 15% a 20% face ao valor separado.\n\n**Duração:** 12 a 18 meses em condições normais. Em áreas de elevada passagem (corredor de entrada, sala de jantar) o tratamento pode durar menos: 8 a 12 meses. A frequência de lavagem também influencia: cada limpeza profunda remove progressivamente o tratamento.",
-      },
-      {
-        heading: "Sinais de que o tapete precisa de nova impermeabilização",
-        body: "Como saber se o tratamento ainda está ativo? Faz o teste da gota:\n\n**Teste rápido:** verte uma colher de chá de água sobre o tapete. Se as gotas permanecem na superfície arredondadas (efeito lótus), o tratamento está ativo. Se a água se espalha e é absorvida rapidamente, é altura de renovar.\n\n**Outros sinais:**\n- Manchas de líquidos aparecem imediatamente após o derrame\n- O tapete parece absorver sujidade superficial mais facilmente\n- Após mais de 18 meses do último tratamento\n\nO momento ideal para renovar a impermeabilização é logo após uma limpeza profissional: aplicar sobre tapete limpo maximiza a eficácia e a durabilidade do tratamento.",
-      },
-    ],
-    faq: [
-      {
-        q: "A impermeabilização altera o aspeto ou a textura do tapete?",
-        a: "Não. O tratamento é completamente invisível após secagem. A textura, as cores e o toque do tapete mantêm-se inalterados. Após secagem completa (1 a 2 horas), não é possível distinguir um tapete tratado de um não tratado.",
-      },
-      {
-        q: "Posso impermeabilizar o tapete sem o limpar primeiro?",
-        a: "Não recomendamos. A impermeabilização aplicada sobre sujidade ou pó será menos eficaz e durará menos. O correto é sempre limpar profissionalmente primeiro e aplicar o tratamento imediatamente a seguir, com o tapete ainda fresco.",
-      },
-      {
-        q: "A impermeabilização é segura para crianças que brincam no tapete?",
-        a: "Sim. Os produtos que utilizamos são certificados, hipoalergénicos e sem solventes tóxicos. Após secagem completa (cerca de 1 hora), o tapete é completamente seguro. Não há odor residual nem nenhum composto nocivo nas fibras.",
-      },
-      {
-        q: "Posso impermeabilizar o tapete eu próprio com produto de loja?",
-        a: "Existem sprays de impermeabilização no mercado, mas a eficácia é muito inferior à aplicação profissional. Os produtos profissionais penetram nas fibras de forma uniforme; os sprays domésticos tendem a criar uma camada superficial desigual que se perde mais rapidamente. Para tapetes de valor, recomendamos sempre aplicação profissional.",
-      },
-    ],
-    relatedService: { label: "Impermeabilização profissional de tapetes e sofás", href: "/impermeabilizacao" },
-    relatedPosts: [
-      "impermeabilizacao-sofa-vale-pena",
-      "limpeza-tapetes-profissional-guia-completo",
-      "limpeza-alcatifa-escritorio",
-    ],
-  },
-
   // ── Cluster 1: Sofá ──────────────────────────────────────────────────────
   {
     slug: "higienizacao-vs-impermeabilizacao-sofa",
@@ -1566,7 +1505,6 @@ const posts: BlogPost[] = [
     relatedPosts: [
       "quanto-custa-limpar-colchao-profissional",
       "limpeza-colchao-bebe-crianca",
-      "impermeabilizacao-tapete-guia",
     ],
   },
 

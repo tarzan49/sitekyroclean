@@ -21,7 +21,7 @@ const Footer = () => {
             <span className="text-lg md:text-xl font-bold text-gold tracking-wide">Kyro Clean Solutions</span>
           </div>
           <p className="text-sm text-white/55 leading-relaxed max-w-xl mx-auto">
-            Especialistas em higienização e impermeabilização profissional de sofás, colchões, tapetes e cadeiras, ao domicílio. Equipamento de extração profissional e produtos certificados, com cobertura em Portugal Continental inteiro.
+            Especialistas em higienização de sofás, colchões, tapetes e cadeiras, e impermeabilização profissional de sofás e cadeiras, ao domicílio. Equipamento de extração profissional e produtos certificados, com cobertura em Portugal Continental inteiro.
           </p>
         </div>
 
@@ -41,10 +41,6 @@ const Footer = () => {
               <li className="flex items-center gap-2">
                 <ChevronRight className="h-3.5 w-3.5 text-turquoise flex-shrink-0" />
                 <Link to="/limpeza-tapetes" className="hover:text-turquoise active:text-turquoise transition-colors py-1 touch-manipulation">Higienização de Tapetes</Link>
-              </li>
-              <li className="flex items-center gap-2">
-                <ChevronRight className="h-3.5 w-3.5 text-turquoise flex-shrink-0" />
-                <Link to="/impermeabilizacao" className="hover:text-turquoise active:text-turquoise transition-colors py-1 touch-manipulation">Impermeabilização de Tapetes</Link>
               </li>
               <li className="flex items-center gap-2">
                 <ChevronRight className="h-3.5 w-3.5 text-turquoise flex-shrink-0" />

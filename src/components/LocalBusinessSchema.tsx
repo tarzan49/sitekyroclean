@@ -18,7 +18,7 @@ const LocalBusinessSchema = () => {
         "@type": ["LocalBusiness", "CleaningService"],
         "@id": `${SITE_URL}/#business`,
         "name": "Kyro Clean Solutions",
-        "description": "Serviço profissional de limpeza e lavagem de estofos, sofás, colchões, tapetes, cadeiras e alcatifas. Impermeabilização e remoção de manchas ao domicílio.",
+        "description": "Serviço profissional de limpeza e lavagem de estofos, sofás, colchões, tapetes, cadeiras e alcatifas. Impermeabilização de sofás e cadeiras e remoção de manchas ao domicílio.",
         "url": SITE_URL,
         "telephone": PHONE_E164,
         "email": BUSINESS_EMAIL,

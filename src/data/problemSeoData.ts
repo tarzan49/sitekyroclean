@@ -947,7 +947,7 @@ const problemDefinitions: ProblemPage[] = [
     ],
     faqs: [
       { question: "A Kyro Clean Solutions é uma empresa certificada?", answer: "Sim. Temos certificação Clean & Safe, utilizamos produtos certificados e hipoalergénicos, e temos 5.0 estrelas no Google com avaliações reais." },
-      { question: "Que serviços de limpeza de estofos oferecem?", answer: "Limpamos sofás, colchões, cadeiras, tapetes, alcatifas e oferecemos impermeabilização. Todos os serviços são realizados ao domicílio." },
+      { question: "Que serviços de limpeza de estofos oferecem?", answer: "Limpamos sofás, colchões, cadeiras, tapetes, alcatifas e oferecemos impermeabilização de sofás e cadeiras. Todos os serviços são realizados ao domicílio." },
     ],
     relatedProblems: ["limpeza-profunda-sofa", "preco-limpeza-sofa", "limpeza-sofa-domicilio"],
     relatedServices: ["limpeza-sofas", "limpeza-colchoes", "limpeza-tapetes", "limpeza-cadeiras"],

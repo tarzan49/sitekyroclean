@@ -33,7 +33,6 @@ const HERO_MAP: Record<string, string> = {
   "guia-acaros-em-casa":                        imgAcarosSofa,
   "limpeza-sofa-animais-domesticos":            imgAcarosSofa,
   "como-manter-sofa-limpo-entre-limpezas":      imgSofaTecido,
-  "impermeabilizacao-tapete-guia":              imgTapetes,
   "higienizacao-vs-impermeabilizacao-sofa":     imgSofaDesgast,
   "com-que-frequencia-limpar-sofa":             imgSofaTecido,
   "sinais-sofa-precisa-limpeza-profissional":   imgManchasVinho,

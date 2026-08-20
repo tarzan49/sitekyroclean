@@ -825,9 +825,9 @@ export function prerenderRoutes(outDir: string): number {
       {
         path: '/impermeabilizacao',
         title: 'Impermeabilização de Estofos | Proteção até 10 anos | Kyro Clean Solutions',
-        desc: 'Impermeabilização profissional de sofás, cadeiras e tapetes. Proteção invisível contra manchas e líquidos. Duração até 10 anos. Desde 59€. Serviço ao domicílio.',
+        desc: 'Impermeabilização profissional de sofás e cadeiras. Proteção invisível contra manchas e líquidos. Duração até 10 anos. Desde 59€. Serviço ao domicílio.',
         content: {
-          h1: 'Impermeabilização de Estofos e Tapetes',
+          h1: 'Impermeabilização de Estofos',
           intro: 'Proteja os seus estofos com impermeabilização profissional ao domicílio. Barreira invisível contra manchas, líquidos e desgaste com duração até 10 anos. Ideal após limpeza ou em estofos novos.',
           benefits: [
             'Proteção invisível que não altera a textura nem a cor',

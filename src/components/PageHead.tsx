@@ -95,15 +95,15 @@ const routeMeta: Record<string, { pt: PageMeta; en: PageMeta; es: PageMeta }> = 
   "/impermeabilizacao": {
     pt: {
       title: "Impermeabilização de Estofos | Kyro Clean Solutions | Proteção até 10 anos",
-      description: "Impermeabilização profissional de sofás, cadeiras e tapetes. Proteção invisível contra manchas e líquidos com garantia até 10 anos.",
+      description: "Impermeabilização profissional de sofás e cadeiras. Proteção invisível contra manchas e líquidos com garantia até 10 anos.",
     },
     en: {
       title: "Upholstery Waterproofing | Kyro Clean Solutions | Up to 10-Year Protection",
-      description: "Professional waterproofing for sofas, chairs and rugs. Invisible protection against stains and liquids with up to 10-year guarantee.",
+      description: "Professional waterproofing for sofas and chairs. Invisible protection against stains and liquids with up to 10-year guarantee.",
     },
     es: {
       title: "Impermeabilización de Tapizados | Kyro Clean Solutions | Protección hasta 10 años",
-      description: "Impermeabilización profesional de sofás, sillas y alfombras. Protección invisible contra manchas y líquidos.",
+      description: "Impermeabilización profesional de sofás y sillas. Protección invisible contra manchas y líquidos.",
     },
   },
   "/packs": {

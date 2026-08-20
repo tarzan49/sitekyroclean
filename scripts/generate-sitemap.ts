@@ -271,7 +271,6 @@ export function generateSitemaps(outDir: string) {
     'guia-acaros-em-casa',
     'limpeza-sofa-animais-domesticos',
     'como-manter-sofa-limpo-entre-limpezas',
-    'impermeabilizacao-tapete-guia',
     'higienizacao-vs-impermeabilizacao-sofa',
     'com-que-frequencia-limpar-sofa',
     'sinais-sofa-precisa-limpeza-profissional',

@@ -5,7 +5,6 @@ export {
   sofaPrices,
   mattressPrices,
   sofaChaisePrice,
-  carpetWaterproofingPrices,
   locationPrices,
 } from './QuizTypes';
 export type { QuizFormData, PriceOption, SofaItem, MattressItem, UpsellItemConfig } from './QuizTypes';

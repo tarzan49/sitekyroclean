@@ -160,7 +160,7 @@ const freguesiaLocalData: Record<string, FreguesiaLocalData> = {
   "sao-domingos-de-rana": { landmarks: ["Parque Urbano de Talaíde"], localTip: "Zona residencial no interior do concelho de Cascais: cobrimos toda a área com a mesma rapidez de resposta." },
 
   // ─── Oeiras ───
-  "oeiras-e-sao-juliao-da-barra": { landmarks: ["Forte de São Julião da Barra", "Marina de Oeiras", "Praia de Oeiras"], localTip: "Junto à foz do Tejo: a humidade marítima constante torna a impermeabilização de sofás e tapetes especialmente recomendada." },
+  "oeiras-e-sao-juliao-da-barra": { landmarks: ["Forte de São Julião da Barra", "Marina de Oeiras", "Praia de Oeiras"], localTip: "Junto à foz do Tejo: a humidade marítima constante torna a impermeabilização de sofás especialmente recomendada." },
   "alges-linda-a-velha": { landmarks: ["Jardim Municipal de Algés", "Doca de Algés"], localTip: "Zona residencial densa junto ao rio: atendemos apartamentos e escritórios com agendamento flexível." },
   "carnaxide-e-queijas": { landmarks: ["Centro Colombo (proximidade)", "Zona empresarial de Carnaxide"], localTip: "Muitos escritórios e sedes de empresas: limpamos cadeiras e sofás de receção fora do horário de expediente." },
   "barcarena": { landmarks: ["Parque dos Poetas"], localTip: "Zona residencial arborizada: ideal para agendar a limpeza com tranquilidade, sem pressa." },
@@ -175,7 +175,7 @@ const freguesiaLocalData: Record<string, FreguesiaLocalData> = {
   "venteira": { landmarks: ["Câmara Municipal da Amadora"], localTip: "Centro administrativo do concelho: atendemos residências e pequenos escritórios na mesma visita, se necessário." },
 
   // ─── Almada ───
-  "almada-cova-da-piedade": { landmarks: ["Cristo Rei", "Elevador Panorâmico de Almada"], localTip: "Vista sobre o Tejo e Lisboa: a humidade do rio torna a impermeabilização de sofás e tapetes especialmente útil nesta zona." },
+  "almada-cova-da-piedade": { landmarks: ["Cristo Rei", "Elevador Panorâmico de Almada"], localTip: "Vista sobre o Tejo e Lisboa: a humidade do rio torna a impermeabilização de sofás especialmente útil nesta zona." },
   "caparica-e-trafaria": { landmarks: ["Forte da Trafaria", "Ferry para Belém"], localTip: "Zona costeira com ligação fluvial a Lisboa: atendemos residências permanentes e de férias com a mesma atenção." },
   "costa-da-caparica": { landmarks: ["Praia da Costa da Caparica", "Passadiços da Fonte da Telha"], localTip: "Uma das praias mais procuradas do país: a maresia intensa exige limpeza e impermeabilização mais frequentes em estofos perto da costa." },
   "charneca-de-caparica": { landmarks: ["Pinhal do Rei"], localTip: "Zona residencial junto ao pinhal: o pólen e a areia da proximidade da praia acumulam-se em tapetes e estofos, pedindo limpeza regular." },
