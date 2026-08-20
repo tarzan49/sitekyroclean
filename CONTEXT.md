@@ -4,6 +4,18 @@
 
 ---
 
+## ⚠️ Duas máquinas, um repositório (ler primeiro)
+
+O dono trabalha neste projeto a partir de **duas máquinas** — um PC Windows e um MacBook — cada uma com a sua própria instância do Claude Code e a sua própria memória local (a memória de uma não é visível à outra; só este ficheiro CONTEXT.md viaja entre as duas, via Git).
+
+**Não há sincronização automática.** Antes de tocares em código:
+1. Corre `git status` e `git log -5 --oneline`. Se não estiveres alinhado com `origin/master`, faz `git pull` primeiro.
+2. Se estiveres a meio de uma tarefa nesta máquina, faz commit + push antes de trocar de máquina — caso contrário a outra máquina não vê o trabalho e arriscam-se conflitos.
+3. O `.env` de cada máquina é local e nunca deve ir para o Git (contém chaves do Supabase) — é normal aparecer como modificado/não commitado no `git status`, ignora isso.
+4. O site em produção (cleansolutions.com.pt) só atualiza quando há push para o GitHub — os servidores locais (`npm run dev`) em qualquer das máquinas são só para testar antes disso.
+
+---
+
 ## Projeto
 
 **Kyro Clean Solutions** — site React/TypeScript de landing + quiz de orçamento para empresa de limpeza de estofos em Porto, Portugal.
