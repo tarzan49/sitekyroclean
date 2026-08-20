@@ -20,8 +20,8 @@ const allFaqs: FAQ[] = [
   {
     id: "quanto-custa-limpar-sofa-porto",
     question: "Quanto custa limpar um sofá no Porto?",
-    answer: <>A <Link to="/limpeza-sofas" className="text-gold hover:underline font-medium">limpeza de sofá no Porto</Link> custa <strong>49€ para sofás de 1 lugar</strong>, 69€ para 2 lugares e 79€ para 3 lugares. Sofás com chaise longue têm um acréscimo de 10€. A deslocação custa a partir de 5€ e aumenta com a distância ao centro. Não há custos escondidos: o preço do orçamento é o preço final.</>,
-    plainAnswer: "Limpeza de sofá: 49€ (1 lugar), 69€ (2 lugares), 79€ (3 lugares). Chaise longue: +10€. Deslocação a partir de 5€, consoante a distância. Sem custos escondidos.",
+    answer: <>A <Link to="/limpeza-sofas" className="text-gold hover:underline font-medium">limpeza de sofá no Porto</Link> custa <strong>49€ para sofás de 1 lugar</strong>, 69€ para 2 lugares e 79€ para 3 lugares. Sofás com chaise longue têm um acréscimo de 10€. A deslocação custa a partir de 10€ e aumenta com a distância ao centro. Não há custos escondidos: o preço do orçamento é o preço final.</>,
+    plainAnswer: "Limpeza de sofá: 49€ (1 lugar), 69€ (2 lugares), 79€ (3 lugares). Chaise longue: +10€. Deslocação a partir de 10€, consoante a distância. Sem custos escondidos.",
   },
   {
     id: "preco-sofa-3-lugares",
@@ -44,8 +44,8 @@ const allFaqs: FAQ[] = [
   {
     id: "limpeza-em-casa-domicilio",
     question: "A limpeza é feita em casa ou tenho de levar o sofá?",
-    answer: <>A <Link to="/limpeza-sofas" className="text-gold hover:underline font-medium">limpeza de sofás Kyro Clean</Link> é <strong>sempre realizada ao domicílio</strong>: não é necessário deslocar o sofá. Um técnico desloca-se com equipamento profissional completo incluído no preço. O serviço demora 45 a 90 minutos para sofás standard. Não é necessária qualquer preparação da sua parte: não precisa de tirar almofadas, coberturas ou mover móveis adjacentes. A água suja é totalmente aspirada pelo equipamento, o seu pavimento fica seco e protegido. A deslocação custa a partir de <strong>5€</strong> e aumenta com a distância ao centro: o valor exato aparece no calculador de orçamento antes de confirmar.</>,
-    plainAnswer: "Limpeza sempre ao domicílio, sem deslocar o sofá. Técnico chega com equipamento completo. Serviço: 45 a 90 minutos. Deslocação a partir de 5€, consoante a distância, valor exato no calculador de orçamento.",
+    answer: <>A <Link to="/limpeza-sofas" className="text-gold hover:underline font-medium">limpeza de sofás Kyro Clean</Link> é <strong>sempre realizada ao domicílio</strong>: não é necessário deslocar o sofá. Um técnico desloca-se com equipamento profissional completo incluído no preço. O serviço demora 45 a 90 minutos para sofás standard. Não é necessária qualquer preparação da sua parte: não precisa de tirar almofadas, coberturas ou mover móveis adjacentes. A água suja é totalmente aspirada pelo equipamento, o seu pavimento fica seco e protegido. A deslocação custa a partir de <strong>10€</strong> e aumenta com a distância ao centro: o valor exato aparece no calculador de orçamento antes de confirmar.</>,
+    plainAnswer: "Limpeza sempre ao domicílio, sem deslocar o sofá. Técnico chega com equipamento completo. Serviço: 45 a 90 minutos. Deslocação a partir de 10€, consoante a distância, valor exato no calculador de orçamento.",
   },
   {
     id: "diferenca-higienizacao-limpeza",
