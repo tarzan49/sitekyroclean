@@ -144,7 +144,7 @@ const BeforeAfterPage = () => {
                 </div>
                 <div className="h-px sm:h-12 sm:w-px w-full bg-[#1A4E30]/10" />
                 <div className="text-center sm:text-left">
-                  <p className="text-3xl font-bold text-[#1A4E30]">+1000</p>
+                  <p className="text-3xl font-bold text-[#1A4E30]">+1100</p>
                   <p className="text-sm text-[#777]">clientes satisfeitos</p>
                 </div>
                 <div className="sm:ml-auto">

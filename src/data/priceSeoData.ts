@@ -153,7 +153,7 @@ export function getPricePageData(serviceSlug: string, citySlug: string): PricePa
   const table = priceTables[serviceSlug] || [];
   const factors = priceFactors[serviceSlug] || [];
   const prep = cityPrep(city.name);
-  const travelFee = city.area === 'porto' ? '5€' : '10€';
+  const travelFee = '10€'; // minimo sitewide
   const faqs = (priceFaqs[serviceSlug] || []).map(faq => ({
     question: faq.question.replace(/em \{city\}/g, `${prep} ${city.name}`),
     answer: faq.answer

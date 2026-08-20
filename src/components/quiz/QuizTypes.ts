@@ -77,17 +77,17 @@ export const mattressPrices: PriceOption[] = [
   { id: 'king',     label: 'King / Queen', cleaningPrice: 79, waterproofingPrice: 65, bothPrice: 114, originalBothPrice: 144 },
 ];
 
-// Sem zona grátis: mínimo 5€ sempre, sobe com a distância ao centro de cada equipa.
-// Só as antigas zonas 0€ subiram para 5€ — todas as outras zonas mantêm o preço original.
+// Sem zona grátis: mínimo 10€ sempre em todo o site, sobe com a distância ao centro de cada equipa.
+// Antigas zonas 0€/5€ subiram para 10€ (mínimo sitewide) — todas as outras zonas mantêm o preço original.
 export const locationPrices: Record<string, number> = {
   // ═══ Porto/Norte (equipa Porto) ═══
   // Zona 0 — Porto metropolitan core
-  'Porto': 5,
-  'Matosinhos': 5,
+  'Porto': 10,
+  'Matosinhos': 10,
   // Zona 1 — Subúrbios imediatos, ~10-20 min
-  'Vila Nova de Gaia': 5,
-  'Maia': 5,
-  'Gondomar': 5,
+  'Vila Nova de Gaia': 10,
+  'Maia': 10,
+  'Gondomar': 10,
   // Zona 2 — Grande Porto, ~20-30 min
   'Valongo': 10,
   'Espinho': 10,

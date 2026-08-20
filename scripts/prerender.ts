@@ -41,7 +41,7 @@ const BASE_URL = 'https://cleansolutions.com.pt';
 const BIZ_PHONE   = '+351925530647';
 const BIZ_EMAIL   = 'cleansolutions.pt25@gmail.com';
 const BIZ_RATING  = '5.0';
-const BIZ_REVIEWS = '60';
+const BIZ_REVIEWS = '80';
 
 // ─── HTML helpers ──────────────────────────────────────────────────────────
 
@@ -910,7 +910,7 @@ export function prerenderRoutes(outDir: string): number {
           h1: 'Áreas de Serviço',
           intro: 'A Kyro Clean Solutions presta serviços de limpeza profissional de estofos em todo o país: Porto, Vila Nova de Gaia, Matosinhos, Maia, Lisboa, Braga, Guimarães, Coimbra e muito mais.',
           benefits: [
-            'Porto e Grande Porto: deslocação a partir de 5€',
+            'Porto e Grande Porto: deslocação a partir de 10€',
             'Braga e Guimarães: disponível todos os dias',
             'Lisboa e área metropolitana: agendamento em 48h',
             'Aveiro e Coimbra: serviço disponível',

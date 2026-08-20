@@ -2,12 +2,12 @@
 // Each city × service combination has unique content to avoid duplicate content penalties
 // locationPrices duplicado aqui (sem import @/) para compatibilidade com scripts/prerender.ts (Node.js sem alias Vite)
 // Três equipas locais, três sistemas de zonas independentes (Porto/Norte, Lisboa/AML, Algarve)
-// Sem zona grátis: mínimo 5€ sempre, sobe com a distância ao centro de cada equipa.
-// Só as antigas zonas 0€ subiram para 5€ — todas as outras zonas mantêm o preço original.
+// Sem zona grátis: mínimo 10€ sempre em todo o site, sobe com a distância ao centro de cada equipa.
+// Antigas zonas 0€/5€ subiram para 10€ (mínimo sitewide) — todas as outras zonas mantêm o preço original.
 const locationPrices: Record<string, number> = {
   // ── Porto/Norte ──
-  'Porto': 5, 'Matosinhos': 5,
-  'Vila Nova de Gaia': 5, 'Maia': 5, 'Gondomar': 5,
+  'Porto': 10, 'Matosinhos': 10,
+  'Vila Nova de Gaia': 10, 'Maia': 10, 'Gondomar': 10,
   'Valongo': 10, 'Espinho': 10, 'Póvoa de Varzim': 10, 'Vila do Conde': 10,
   'Santo Tirso': 10, 'Trofa': 10, 'Paredes': 10,
   'Penafiel': 15, 'Paços de Ferreira': 15, 'Felgueiras': 15, 'Lousada': 15,

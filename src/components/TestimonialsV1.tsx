@@ -205,7 +205,7 @@ const Testimonials = () => {
                     ))}
                   </div>
                 </div>
-                <p className="text-[11px] text-white/45 mt-1">60+ avaliações verificadas</p>
+                <p className="text-[11px] text-white/45 mt-1">80+ avaliações verificadas</p>
               </div>
             </a>
           </div>
