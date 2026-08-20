@@ -162,8 +162,8 @@ Nada importa este export; o motor real é `calcChairClean`/`calcChairWaterproof`
 
 ## 🟢 INFO
 
-### 31. Em dash em `plainAnswer` só afeta o schema JSON-LD, não o DOM visível
-`src/pages/FAQEstofos.tsx:24-114` (`plainAnswer`) alimenta apenas `FAQPage` JSON-LD (linha 137), não o `<answer>` renderizado. Vale a pena limpar porque o Google pode mostrar este texto em rich snippets, mas não é uma violação visível em sentido estrito.
+### 31. ✅ Resolvido — Em dash em `plainAnswer` só afeta o schema JSON-LD, não o DOM visível
+`src/pages/FAQEstofos.tsx:24-114` (`plainAnswer`) alimenta apenas `FAQPage` JSON-LD (linha 137), não o `<answer>` renderizado. Confirmado em 2026-08-20: zero ocorrências de "—" no ficheiro atual.
 
 ### 32. Overline secundário ("Outros serviços" etc.) usa `0.26em` em vez de `0.28em`
 Consistente em ~7 ficheiros (`LocationServicePage.tsx`, `FreguesiaServicePage.tsx`, `MaterialPage.tsx`, `PricePage.tsx`, `ProblemPage.tsx`, `ProblemCityPage.tsx`) — parece ser um nível secundário intencional, não drift acidental. Só a confirmar.
