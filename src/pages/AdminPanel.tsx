@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, useMemo, lazy, Suspense } from "react
 import { Link } from "react-router-dom";
 import {
   Map, AlertTriangle, BarChart3, RefreshCw, ExternalLink, Trash2,
-  Home, Settings2, Lock, ChevronRight, ChevronDown, Activity, TrendingUp,
+  Home, Settings2, Lock, ChevronRight, ChevronLeft, ChevronDown, Activity, TrendingUp,
   Users, DollarSign, Target, Clock, CheckCircle,
   FileText, Globe, Shield, Zap, Star, Copy, MessageCircle,
   Upload, Search, Lightbulb,
@@ -193,6 +193,20 @@ interface QuizMetrics {
 // ── Tabs ─────────────────────────────────────────────────────────────────────
 type Tab = "sitemap" | "errors" | "metrics" | "reviews" | "crm" | "import" | "seo-stats" | "seo-pages";
 
+// ── Weekly WhatsApp clicks chart ────────────────────────────────────────────
+interface WaWeekDay { label: string; date: string; count: number; }
+const WA_DAY_LABELS = ["Seg", "Ter", "Qua", "Qui", "Sex", "Sáb", "Dom"];
+
+// Monday of the week `offset` weeks from the current one (offset 0 = this week, -1 = last week...)
+function getWeekStart(offset: number): Date {
+  const now = new Date();
+  const day = now.getDay(); // 0=Sun..6=Sat
+  const diffToMonday = day === 0 ? -6 : 1 - day;
+  const monday = new Date(now.getFullYear(), now.getMonth(), now.getDate() + diffToMonday + offset * 7);
+  monday.setHours(0, 0, 0, 0);
+  return monday;
+}
+
 // ── Component ─────────────────────────────────────────────────────────────────
 const AdminPanel = () => {
   const [authed, setAuthed] = useState(false);
@@ -228,6 +242,11 @@ const AdminPanel = () => {
   const [metrics, setMetrics] = useState<QuizMetrics | null>(null);
   const [metricsLoading, setMetricsLoading] = useState(false);
   const [metricsError, setMetricsError] = useState<string | null>(null);
+
+  // Weekly WhatsApp clicks chart state
+  const [waWeekOffset, setWaWeekOffset] = useState(0); // 0 = current week, -1 = last week...
+  const [waWeekData, setWaWeekData] = useState<WaWeekDay[] | null>(null);
+  const [waWeekLoading, setWaWeekLoading] = useState(false);
 
   // ── Fetch Error Logs ────────────────────────────────────────────────────────
   const fetchErrors = useCallback(async () => {
@@ -363,6 +382,38 @@ const AdminPanel = () => {
     }
   }, []);
 
+  // ── Fetch weekly WhatsApp clicks (queried fresh per week, not limited to the last 5000 events) ──
+  const fetchWaWeek = useCallback(async (offset: number) => {
+    setWaWeekLoading(true);
+    try {
+      const weekStart = getWeekStart(offset);
+      const weekEnd = new Date(weekStart.getTime() + 7 * 86400000);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { data, error } = await (supabase as any)
+        .from("quiz_events")
+        .select("created_at")
+        .eq("action", "whatsapp_click")
+        .gte("created_at", weekStart.toISOString())
+        .lt("created_at", weekEnd.toISOString());
+      if (error) throw error;
+
+      const counts = new Array(7).fill(0);
+      (data ?? []).forEach((e: { created_at: string }) => {
+        const idx = (new Date(e.created_at).getDay() + 6) % 7; // Mon=0..Sun=6
+        counts[idx]++;
+      });
+      const days: WaWeekDay[] = counts.map((count, i) => {
+        const date = new Date(weekStart.getTime() + i * 86400000);
+        return { label: WA_DAY_LABELS[i], date: date.toLocaleDateString("pt-PT", { day: "2-digit", month: "2-digit" }), count };
+      });
+      setWaWeekData(days);
+    } catch {
+      setWaWeekData(null);
+    } finally {
+      setWaWeekLoading(false);
+    }
+  }, []);
+
   const resetMetrics = async () => {
     if (!confirm("Apagar TODOS os dados de métricas do quiz? Esta ação é irreversível.")) return;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -376,6 +427,7 @@ const AdminPanel = () => {
     }
     setMetrics(null);
     fetchMetrics();
+    fetchWaWeek(waWeekOffset);
     alert("Dados apagados com sucesso.");
   };
 
@@ -385,6 +437,12 @@ const AdminPanel = () => {
     if (activeTab === "errors") fetchErrors();
     if (activeTab === "metrics") fetchMetrics();
   }, [authed, activeTab, fetchErrors, fetchMetrics]);
+
+  // Load weekly WhatsApp chart when the metrics tab opens or the selected week changes
+  useEffect(() => {
+    if (!authed || activeTab !== "metrics") return;
+    fetchWaWeek(waWeekOffset);
+  }, [authed, activeTab, waWeekOffset, fetchWaWeek]);
 
   // ── Delete error log ────────────────────────────────────────────────────────
   const deleteError = async (id: string) => {
@@ -795,7 +853,7 @@ const AdminPanel = () => {
               </div>
               <div className="flex items-center gap-2">
                 <button
-                  onClick={fetchMetrics}
+                  onClick={() => { fetchMetrics(); fetchWaWeek(waWeekOffset); }}
                   disabled={metricsLoading}
                   className="flex items-center gap-1.5 px-3 py-2 text-xs font-medium rounded-lg border border-gray-200 text-navy hover:border-navy/30 transition-colors disabled:opacity-50"
                 >
@@ -907,6 +965,76 @@ const AdminPanel = () => {
                     </div>
                   </div>
                 )}
+
+                {/* Weekly WhatsApp clicks chart */}
+                <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+                  <div className="flex items-center justify-between mb-5 flex-wrap gap-2">
+                    <h3 className="text-sm font-semibold text-navy flex items-center gap-2">
+                      <MessageCircle className="w-4 h-4 text-[#25D366]" /> Clicks WhatsApp por semana
+                    </h3>
+                    <div className="flex items-center gap-1.5">
+                      <button
+                        onClick={() => setWaWeekOffset(o => o - 1)}
+                        className="p-1.5 rounded-lg border border-gray-200 hover:border-navy/30 transition-colors"
+                        aria-label="Semana anterior"
+                      >
+                        <ChevronLeft className="w-4 h-4 text-navy/60" />
+                      </button>
+                      <span className="text-xs text-navy/70 font-medium min-w-[112px] text-center">
+                        {(() => {
+                          const start = getWeekStart(waWeekOffset);
+                          const end = new Date(start.getTime() + 6 * 86400000);
+                          const fmt = (d: Date) => d.toLocaleDateString("pt-PT", { day: "2-digit", month: "short" });
+                          return waWeekOffset === 0 ? `Esta semana` : `${fmt(start)} – ${fmt(end)}`;
+                        })()}
+                      </span>
+                      <button
+                        onClick={() => setWaWeekOffset(o => Math.min(o + 1, 0))}
+                        disabled={waWeekOffset >= 0}
+                        className="p-1.5 rounded-lg border border-gray-200 hover:border-navy/30 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                        aria-label="Semana seguinte"
+                      >
+                        <ChevronRight className="w-4 h-4 text-navy/60" />
+                      </button>
+                      {waWeekOffset !== 0 && (
+                        <button onClick={() => setWaWeekOffset(0)} className="text-[11px] text-gold hover:underline ml-1 font-medium">
+                          Hoje
+                        </button>
+                      )}
+                    </div>
+                  </div>
+
+                  {waWeekLoading ? (
+                    <p className="text-sm text-gray-400 py-10 text-center">A carregar...</p>
+                  ) : waWeekData ? (
+                    <>
+                      <div className="flex items-end justify-between gap-2">
+                        {waWeekData.map(d => {
+                          const max = Math.max(...waWeekData.map(x => x.count), 1);
+                          const barPx = d.count > 0 ? Math.max((d.count / max) * 96, 8) : 2;
+                          return (
+                            <div key={d.date} className="flex-1 flex flex-col items-center gap-1.5">
+                              <span className="text-xs font-semibold text-navy">{d.count}</span>
+                              <div className="w-full flex items-end justify-center h-24">
+                                <div
+                                  className="w-full max-w-[28px] rounded-t-md bg-gradient-to-t from-[#128C7E] to-[#25D366] transition-all duration-500"
+                                  style={{ height: `${barPx}px` }}
+                                />
+                              </div>
+                              <span className="text-[10px] text-navy/50 font-semibold">{d.label}</span>
+                              <span className="text-[10px] text-gray-400">{d.date}</span>
+                            </div>
+                          );
+                        })}
+                      </div>
+                      <p className="text-xs text-gray-400 mt-4 text-right">
+                        Total na semana: <span className="font-semibold text-navy">{waWeekData.reduce((s, d) => s + d.count, 0)}</span>
+                      </p>
+                    </>
+                  ) : (
+                    <p className="text-sm text-gray-400 py-10 text-center">Sem dados para esta semana.</p>
+                  )}
+                </div>
 
                 {/* Breakdown grid */}
                 {metrics.totalStarts > 0 && (
