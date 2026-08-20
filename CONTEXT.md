@@ -1,6 +1,6 @@
 ﻿# Kyro Clean Solutions — Full Project Context
 
-> Cola isto no início de uma nova conversa para retomar o trabalho sem perder nada.
+> O `CLAUDE.md` na raiz carrega automaticamente em qualquer sessão do Claude Code aberta nesta pasta (regras fixas e factos de negócio atuais). Este ficheiro é a referência de arquitetura mais profunda — lê-o quando precisares de detalhe sobre rotas, fluxo do quiz, design tokens ou tabelas de preços.
 
 ---
 
