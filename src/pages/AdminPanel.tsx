@@ -4,8 +4,7 @@ import {
   Map, AlertTriangle, BarChart3, RefreshCw, ExternalLink, Trash2,
   Home, Settings2, Lock, ChevronRight, ChevronDown, Activity, TrendingUp,
   Users, DollarSign, Target, Clock, CheckCircle,
-  FileText, Globe, Shield, Zap, Star, Copy, MessageCircle,
-  Search, Lightbulb,
+  FileText, Globe, Shield, Zap, Star, MessageCircle,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { getAllLocationRoutes, services } from "@/data/locationSeoData";
@@ -22,12 +21,9 @@ import { getAllMarcaCadeirasRoutes } from "@/data/marcaCadeirasData";
 import { getAllPosts } from "@/data/blogData";
 import { getAllEnRoutes } from "@/data/enTouristSeoData";
 import { getAllCommercialRoutes } from "@/data/commercialSeoData";
-import { SITE_URL } from "@/constants/business";
 import { getAdminRegion, getRegionForLocationPart, ADMIN_REGIONS, ADMIN_REGION_LABELS, type AdminRegion } from "@/data/regionUtils";
 
 const AdminDashboard = lazy(() => import("./AdminDashboard"));
-const AdminManager  = lazy(() => import("./AdminManager"));
-const AdminSeoPages = lazy(() => import("./AdminSeoPages"));
 
 // ── Auth ─────────────────────────────────────────────────────────────────────
 const ADMIN_PASSWORD = (import.meta.env.VITE_ADMIN_PASSWORD as string) || 'kyro2025';
@@ -190,7 +186,7 @@ interface QuizMetrics {
 }
 
 // ── Tabs ─────────────────────────────────────────────────────────────────────
-type Tab = "sitemap" | "errors" | "metrics" | "reviews" | "crm" | "seo-stats" | "seo-pages";
+type Tab = "sitemap" | "errors" | "metrics" | "crm";
 
 // ── WhatsApp clicks chart (rolling line chart, Formspree-style) ────────────
 interface WaChartPoint { date: Date; count: number; }
@@ -539,9 +535,6 @@ const AdminPanel = () => {
             { id: "sitemap",   label: "Sitemaps",      icon: Globe },
             { id: "errors",    label: "Error Log",     icon: AlertTriangle },
             { id: "metrics",   label: "Métricas Quiz", icon: BarChart3 },
-            { id: "reviews",   label: "Reviews",       icon: Star },
-            { id: "seo-stats", label: "SEO Stats",     icon: Activity },
-            { id: "seo-pages", label: "SEO Páginas",   icon: Search },
           ] as { id: Tab; label: string; icon: React.ElementType }[]).map(tab => (
             <button
               key={tab.id}
@@ -1180,9 +1173,6 @@ const AdminPanel = () => {
           </div>
         )}
 
-        {/* ── REVIEWS TOOL ───────────────────────────────────────────── */}
-        {activeTab === "reviews" && <ReviewsTab />}
-
         {/* ── CRM ────────────────────────────────────────────────────── */}
         {activeTab === "crm" && (
           <div className="bg-[#071a12] rounded-2xl p-4 -mx-2">
@@ -1192,154 +1182,7 @@ const AdminPanel = () => {
           </div>
         )}
 
-
-        {/* ── SEO STATS ──────────────────────────────────────────────── */}
-        {activeTab === "seo-stats" && (
-          <Suspense fallback={<div className="flex items-center justify-center py-16"><div className="w-8 h-8 border-2 border-gold border-t-transparent rounded-full animate-spin" /></div>}>
-            <AdminManager embedded />
-          </Suspense>
-        )}
-
-        {/* ── SEO PÁGINAS ────────────────────────────────────────────── */}
-        {activeTab === "seo-pages" && (
-          <Suspense fallback={<div className="flex items-center justify-center py-16"><div className="w-8 h-8 border-2 border-gold border-t-transparent rounded-full animate-spin" /></div>}>
-            <AdminSeoPages embedded />
-          </Suspense>
-        )}
-
       </main>
-    </div>
-  );
-};
-
-// ── Reviews WhatsApp Generator ────────────────────────────────────────────────
-const serviceOptions = [
-  { value: "sofa", label: "Sofá" },
-  { value: "colchao", label: "Colchão" },
-  { value: "tapete", label: "Tapete" },
-  { value: "cadeiras", label: "Cadeiras" },
-  { value: "alcatifa", label: "Alcatifa" },
-  { value: "impermeabilizacao", label: "Impermeabilização" },
-];
-
-const ReviewsTab = () => {
-  const [nome, setNome] = useState("");
-  const [cidade, setCidade] = useState("Porto");
-  const [servico, setServico] = useState("sofa");
-  const [copied, setCopied] = useState(false);
-
-  const reviewPageUrl = `${SITE_URL}/obrigado-pelo-servico?nome=${encodeURIComponent(nome || "Cliente")}&cidade=${encodeURIComponent(cidade)}&servico=${encodeURIComponent(servico)}`;
-
-  const servicoLabel = serviceOptions.find(s => s.value === servico)?.label ?? servico;
-
-  const whatsappMsg = `Olá ${nome || "Cliente"}! Obrigado por escolher a Kyro Clean para a limpeza do seu ${servicoLabel.toLowerCase()} em ${cidade}. Esperamos que tenha ficado completamente satisfeito! Se tiver 1 minuto, uma avaliação no Google ajuda-nos muito a chegar a mais clientes em ${cidade}: ${reviewPageUrl}`;
-
-  const copyMsg = async () => {
-    await navigator.clipboard.writeText(whatsappMsg);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
-
-  return (
-    <div className="space-y-6 max-w-2xl">
-      <div>
-        <h2 className="text-lg font-bold text-navy">Gerador de Pedido de Review</h2>
-        <p className="text-sm text-gray-500 mt-1">Preenche os dados do cliente → copia a mensagem → envia no WhatsApp.</p>
-      </div>
-
-      {/* Form */}
-      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-4">
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <div>
-            <label className="text-xs font-bold text-navy uppercase tracking-wider block mb-1">Nome do cliente</label>
-            <input
-              type="text"
-              placeholder="ex: Ana Silva"
-              value={nome}
-              onChange={e => setNome(e.target.value)}
-              className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-gold/50 transition-colors"
-            />
-          </div>
-          <div>
-            <label className="text-xs font-bold text-navy uppercase tracking-wider block mb-1">Cidade</label>
-            <input
-              type="text"
-              placeholder="ex: Porto"
-              value={cidade}
-              onChange={e => setCidade(e.target.value)}
-              className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-gold/50 transition-colors"
-            />
-          </div>
-          <div>
-            <label className="text-xs font-bold text-navy uppercase tracking-wider block mb-1">Serviço</label>
-            <select
-              value={servico}
-              onChange={e => setServico(e.target.value)}
-              className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-gold/50 transition-colors bg-white"
-            >
-              {serviceOptions.map(opt => (
-                <option key={opt.value} value={opt.value}>{opt.label}</option>
-              ))}
-            </select>
-          </div>
-        </div>
-
-        {/* Preview URL */}
-        <div>
-          <label className="text-xs font-bold text-navy uppercase tracking-wider block mb-1">Link da página de review</label>
-          <div className="flex items-center gap-2">
-            <code className="flex-1 text-xs bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 truncate text-gray-600">
-              {reviewPageUrl}
-            </code>
-            <a
-              href={reviewPageUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="p-2 rounded-xl border border-gray-200 text-gray-400 hover:text-gold hover:border-gold/30 transition-colors flex-shrink-0"
-              title="Pré-visualizar"
-            >
-              <ExternalLink className="w-4 h-4" />
-            </a>
-          </div>
-        </div>
-
-        {/* Message preview */}
-        <div>
-          <label className="text-xs font-bold text-navy uppercase tracking-wider block mb-1">Mensagem para WhatsApp</label>
-          <div className="bg-[#DCF8C6] rounded-2xl p-4 text-sm text-gray-800 leading-relaxed whitespace-pre-wrap border border-gray-100">
-            {whatsappMsg}
-          </div>
-        </div>
-
-        {/* Actions */}
-        <div className="flex gap-3">
-          <button
-            onClick={copyMsg}
-            className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-sm transition-all ${copied ? "bg-green-500 text-white" : "bg-gold text-navy hover:bg-[#d4c57b]"}`}
-          >
-            {copied ? <CheckCircle className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
-            {copied ? "Copiado!" : "Copiar mensagem"}
-          </button>
-          <a
-            href={`https://wa.me/?text=${encodeURIComponent(whatsappMsg)}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-sm bg-[#25D366] text-white hover:bg-[#20bd5a] transition-colors"
-          >
-            <MessageCircle className="w-4 h-4" />
-            Abrir WhatsApp
-          </a>
-        </div>
-      </div>
-
-      {/* Tip */}
-      <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4">
-        <p className="text-xs font-bold text-amber-800 mb-1 flex items-center gap-1"><Lightbulb className="w-3.5 h-3.5" />Impacto</p>
-        <p className="text-xs text-amber-700 leading-relaxed">
-          O pack dos 3 resultados Google (Local Pack) gera 40-60% de todos os cliques em pesquisas locais.
-          Cada review aumenta o rating e a visibilidade. Envia esta mensagem após cada serviço concluído.
-        </p>
-      </div>
     </div>
   );
 };
