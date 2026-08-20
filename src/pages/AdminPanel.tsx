@@ -2,10 +2,10 @@ import { useState, useEffect, useCallback, useMemo, lazy, Suspense } from "react
 import { Link } from "react-router-dom";
 import {
   Map, AlertTriangle, BarChart3, RefreshCw, ExternalLink, Trash2,
-  Home, Settings2, Lock, ChevronRight, ChevronLeft, ChevronDown, Activity, TrendingUp,
+  Home, Settings2, Lock, ChevronRight, ChevronDown, Activity, TrendingUp,
   Users, DollarSign, Target, Clock, CheckCircle,
   FileText, Globe, Shield, Zap, Star, Copy, MessageCircle,
-  Upload, Search, Lightbulb,
+  Search, Lightbulb,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { getAllLocationRoutes, services } from "@/data/locationSeoData";
@@ -26,7 +26,6 @@ import { SITE_URL } from "@/constants/business";
 import { getAdminRegion, getRegionForLocationPart, ADMIN_REGIONS, ADMIN_REGION_LABELS, type AdminRegion } from "@/data/regionUtils";
 
 const AdminDashboard = lazy(() => import("./AdminDashboard"));
-const AdminImport   = lazy(() => import("./AdminImport"));
 const AdminManager  = lazy(() => import("./AdminManager"));
 const AdminSeoPages = lazy(() => import("./AdminSeoPages"));
 
@@ -191,20 +190,27 @@ interface QuizMetrics {
 }
 
 // ── Tabs ─────────────────────────────────────────────────────────────────────
-type Tab = "sitemap" | "errors" | "metrics" | "reviews" | "crm" | "import" | "seo-stats" | "seo-pages";
+type Tab = "sitemap" | "errors" | "metrics" | "reviews" | "crm" | "seo-stats" | "seo-pages";
 
-// ── Weekly WhatsApp clicks chart ────────────────────────────────────────────
-interface WaWeekDay { label: string; date: string; count: number; }
-const WA_DAY_LABELS = ["Seg", "Ter", "Qua", "Qui", "Sex", "Sáb", "Dom"];
+// ── WhatsApp clicks chart (rolling line chart, Formspree-style) ────────────
+interface WaChartPoint { date: Date; count: number; }
+type WaRange = 30 | 90 | 365;
+const WA_RANGES: { days: WaRange; label: string }[] = [
+  { days: 30, label: "30 dias" },
+  { days: 90, label: "90 dias" },
+  { days: 365, label: "1 ano" },
+];
 
-// Monday of the week `offset` weeks from the current one (offset 0 = this week, -1 = last week...)
-function getWeekStart(offset: number): Date {
+// Today (UTC midnight, matching how Postgres timestamptz / created_at.slice(0,10) buckets days)
+// minus `days-1` through today, oldest first.
+function buildDateRange(days: WaRange): Date[] {
   const now = new Date();
-  const day = now.getDay(); // 0=Sun..6=Sat
-  const diffToMonday = day === 0 ? -6 : 1 - day;
-  const monday = new Date(now.getFullYear(), now.getMonth(), now.getDate() + diffToMonday + offset * 7);
-  monday.setHours(0, 0, 0, 0);
-  return monday;
+  const todayUTC = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
+  const dates: Date[] = [];
+  for (let i = days - 1; i >= 0; i--) {
+    dates.push(new Date(todayUTC.getTime() - i * 86400000));
+  }
+  return dates;
 }
 
 // ── Component ─────────────────────────────────────────────────────────────────
@@ -244,9 +250,9 @@ const AdminPanel = () => {
   const [metricsError, setMetricsError] = useState<string | null>(null);
 
   // Weekly WhatsApp clicks chart state
-  const [waWeekOffset, setWaWeekOffset] = useState(0); // 0 = current week, -1 = last week...
-  const [waWeekData, setWaWeekData] = useState<WaWeekDay[] | null>(null);
-  const [waWeekLoading, setWaWeekLoading] = useState(false);
+  const [waRange, setWaRange] = useState<WaRange>(30);
+  const [waChartData, setWaChartData] = useState<WaChartPoint[] | null>(null);
+  const [waChartLoading, setWaChartLoading] = useState(false);
 
   // ── Fetch Error Logs ────────────────────────────────────────────────────────
   const fetchErrors = useCallback(async () => {
@@ -383,34 +389,33 @@ const AdminPanel = () => {
   }, []);
 
   // ── Fetch weekly WhatsApp clicks (queried fresh per week, not limited to the last 5000 events) ──
-  const fetchWaWeek = useCallback(async (offset: number) => {
-    setWaWeekLoading(true);
+  const fetchWaChart = useCallback(async (days: WaRange) => {
+    setWaChartLoading(true);
     try {
-      const weekStart = getWeekStart(offset);
-      const weekEnd = new Date(weekStart.getTime() + 7 * 86400000);
+      const range = buildDateRange(days);
+      const rangeStart = range[0];
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const { data, error } = await (supabase as any)
         .from("quiz_events")
         .select("created_at")
         .eq("action", "whatsapp_click")
-        .gte("created_at", weekStart.toISOString())
-        .lt("created_at", weekEnd.toISOString());
+        .gte("created_at", rangeStart.toISOString());
       if (error) throw error;
 
-      const counts = new Array(7).fill(0);
+      const countByDay: Record<string, number> = {};
       (data ?? []).forEach((e: { created_at: string }) => {
-        const idx = (new Date(e.created_at).getDay() + 6) % 7; // Mon=0..Sun=6
-        counts[idx]++;
+        const key = e.created_at.slice(0, 10); // YYYY-MM-DD
+        countByDay[key] = (countByDay[key] ?? 0) + 1;
       });
-      const days: WaWeekDay[] = counts.map((count, i) => {
-        const date = new Date(weekStart.getTime() + i * 86400000);
-        return { label: WA_DAY_LABELS[i], date: date.toLocaleDateString("pt-PT", { day: "2-digit", month: "2-digit" }), count };
-      });
-      setWaWeekData(days);
+      const points: WaChartPoint[] = range.map(date => ({
+        date,
+        count: countByDay[date.toISOString().slice(0, 10)] ?? 0,
+      }));
+      setWaChartData(points);
     } catch {
-      setWaWeekData(null);
+      setWaChartData(null);
     } finally {
-      setWaWeekLoading(false);
+      setWaChartLoading(false);
     }
   }, []);
 
@@ -427,7 +432,7 @@ const AdminPanel = () => {
     }
     setMetrics(null);
     fetchMetrics();
-    fetchWaWeek(waWeekOffset);
+    fetchWaChart(waRange);
     alert("Dados apagados com sucesso.");
   };
 
@@ -438,11 +443,11 @@ const AdminPanel = () => {
     if (activeTab === "metrics") fetchMetrics();
   }, [authed, activeTab, fetchErrors, fetchMetrics]);
 
-  // Load weekly WhatsApp chart when the metrics tab opens or the selected week changes
+  // Load WhatsApp clicks chart when the metrics tab opens or the selected range changes
   useEffect(() => {
     if (!authed || activeTab !== "metrics") return;
-    fetchWaWeek(waWeekOffset);
-  }, [authed, activeTab, waWeekOffset, fetchWaWeek]);
+    fetchWaChart(waRange);
+  }, [authed, activeTab, waRange, fetchWaChart]);
 
   // ── Delete error log ────────────────────────────────────────────────────────
   const deleteError = async (id: string) => {
@@ -531,7 +536,6 @@ const AdminPanel = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 flex gap-1 pb-0 overflow-x-auto scrollbar-none">
           {([
             { id: "crm",       label: "CRM",          icon: Users },
-            { id: "import",    label: "Importar BD",   icon: Upload },
             { id: "sitemap",   label: "Sitemaps",      icon: Globe },
             { id: "errors",    label: "Error Log",     icon: AlertTriangle },
             { id: "metrics",   label: "Métricas Quiz", icon: BarChart3 },
@@ -853,7 +857,7 @@ const AdminPanel = () => {
               </div>
               <div className="flex items-center gap-2">
                 <button
-                  onClick={() => { fetchMetrics(); fetchWaWeek(waWeekOffset); }}
+                  onClick={() => { fetchMetrics(); fetchWaChart(waRange); }}
                   disabled={metricsLoading}
                   className="flex items-center gap-1.5 px-3 py-2 text-xs font-medium rounded-lg border border-gray-200 text-navy hover:border-navy/30 transition-colors disabled:opacity-50"
                 >
@@ -966,73 +970,89 @@ const AdminPanel = () => {
                   </div>
                 )}
 
-                {/* Weekly WhatsApp clicks chart */}
+                {/* WhatsApp clicks chart */}
                 <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
-                  <div className="flex items-center justify-between mb-5 flex-wrap gap-2">
+                  <div className="flex items-center justify-between mb-1 flex-wrap gap-3">
                     <h3 className="text-sm font-semibold text-navy flex items-center gap-2">
-                      <MessageCircle className="w-4 h-4 text-[#25D366]" /> Clicks WhatsApp por semana
+                      <MessageCircle className="w-4 h-4 text-[#25D366]" /> Clicks WhatsApp
                     </h3>
-                    <div className="flex items-center gap-1.5">
-                      <button
-                        onClick={() => setWaWeekOffset(o => o - 1)}
-                        className="p-1.5 rounded-lg border border-gray-200 hover:border-navy/30 transition-colors"
-                        aria-label="Semana anterior"
-                      >
-                        <ChevronLeft className="w-4 h-4 text-navy/60" />
-                      </button>
-                      <span className="text-xs text-navy/70 font-medium min-w-[112px] text-center">
-                        {(() => {
-                          const start = getWeekStart(waWeekOffset);
-                          const end = new Date(start.getTime() + 6 * 86400000);
-                          const fmt = (d: Date) => d.toLocaleDateString("pt-PT", { day: "2-digit", month: "short" });
-                          return waWeekOffset === 0 ? `Esta semana` : `${fmt(start)} – ${fmt(end)}`;
-                        })()}
-                      </span>
-                      <button
-                        onClick={() => setWaWeekOffset(o => Math.min(o + 1, 0))}
-                        disabled={waWeekOffset >= 0}
-                        className="p-1.5 rounded-lg border border-gray-200 hover:border-navy/30 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
-                        aria-label="Semana seguinte"
-                      >
-                        <ChevronRight className="w-4 h-4 text-navy/60" />
-                      </button>
-                      {waWeekOffset !== 0 && (
-                        <button onClick={() => setWaWeekOffset(0)} className="text-[11px] text-gold hover:underline ml-1 font-medium">
-                          Hoje
+                    <div className="flex items-center gap-1 bg-gray-50 rounded-lg p-1">
+                      {WA_RANGES.map(r => (
+                        <button
+                          key={r.days}
+                          onClick={() => setWaRange(r.days)}
+                          className={`px-2.5 py-1 text-xs font-medium rounded-md transition-colors ${
+                            waRange === r.days ? "bg-white text-navy shadow-sm" : "text-navy/50 hover:text-navy/80"
+                          }`}
+                        >
+                          {r.label}
                         </button>
-                      )}
+                      ))}
                     </div>
                   </div>
 
-                  {waWeekLoading ? (
-                    <p className="text-sm text-gray-400 py-10 text-center">A carregar...</p>
-                  ) : waWeekData ? (
-                    <>
-                      <div className="flex items-end justify-between gap-2">
-                        {waWeekData.map(d => {
-                          const max = Math.max(...waWeekData.map(x => x.count), 1);
-                          const barPx = d.count > 0 ? Math.max((d.count / max) * 96, 8) : 2;
-                          return (
-                            <div key={d.date} className="flex-1 flex flex-col items-center gap-1.5">
-                              <span className="text-xs font-semibold text-navy">{d.count}</span>
-                              <div className="w-full flex items-end justify-center h-24">
-                                <div
-                                  className="w-full max-w-[28px] rounded-t-md bg-gradient-to-t from-[#128C7E] to-[#25D366] transition-all duration-500"
-                                  style={{ height: `${barPx}px` }}
-                                />
-                              </div>
-                              <span className="text-[10px] text-navy/50 font-semibold">{d.label}</span>
-                              <span className="text-[10px] text-gray-400">{d.date}</span>
-                            </div>
-                          );
-                        })}
-                      </div>
-                      <p className="text-xs text-gray-400 mt-4 text-right">
-                        Total na semana: <span className="font-semibold text-navy">{waWeekData.reduce((s, d) => s + d.count, 0)}</span>
-                      </p>
-                    </>
+                  {waChartLoading ? (
+                    <p className="text-sm text-gray-400 py-16 text-center">A carregar...</p>
+                  ) : waChartData ? (
+                    (() => {
+                      const total = waChartData.reduce((s, d) => s + d.count, 0);
+                      const max = Math.max(...waChartData.map(d => d.count), 1);
+                      const n = waChartData.length;
+                      const W = 800, H = 180, padL = 24, padR = 8, padT = 12, padB = 4;
+                      const innerW = W - padL - padR, innerH = H - padT - padB;
+                      const xAt = (i: number) => padL + (n === 1 ? innerW / 2 : (i / (n - 1)) * innerW);
+                      const yAt = (count: number) => padT + innerH - (count / max) * innerH;
+                      const linePath = waChartData.map((d, i) => `${i === 0 ? "M" : "L"} ${xAt(i).toFixed(1)},${yAt(d.count).toFixed(1)}`).join(" ");
+                      const areaPath = `${linePath} L ${xAt(n - 1).toFixed(1)},${(padT + innerH).toFixed(1)} L ${xAt(0).toFixed(1)},${(padT + innerH).toFixed(1)} Z`;
+                      const labelCount = Math.min(7, n);
+                      const labelStep = Math.max(1, Math.round((n - 1) / Math.max(labelCount - 1, 1)));
+                      const labelIndices = new Set<number>();
+                      for (let i = 0; i < n; i += labelStep) labelIndices.add(i);
+                      labelIndices.add(n - 1);
+
+                      return (
+                        <>
+                          <div className="mt-2 mb-3">
+                            <span className="text-3xl font-bold text-navy font-playfair">{total}</span>
+                            <span className="text-sm text-gray-400 ml-2">clicks nos últimos {waRange} dias</span>
+                          </div>
+                          <svg viewBox={`0 0 ${W} ${H}`} className="w-full h-[180px]" preserveAspectRatio="none">
+                            <defs>
+                              <linearGradient id="waGradient" x1="0" y1="0" x2="0" y2="1">
+                                <stop offset="0%" stopColor="#25D366" />
+                                <stop offset="100%" stopColor="#25D366" stopOpacity={0} />
+                              </linearGradient>
+                            </defs>
+                            {[0, 0.5, 1].map(f => (
+                              <line key={f} x1={padL} x2={W - padR} y1={padT + innerH * f} y2={padT + innerH * f} stroke="#F1F1F1" strokeWidth={1} />
+                            ))}
+                            <text x={2} y={padT + 4} fontSize={9} fill="#9CA3AF">{max}</text>
+                            <text x={2} y={padT + innerH} fontSize={9} fill="#9CA3AF">0</text>
+                            <path d={areaPath} fill="url(#waGradient)" stroke="none" />
+                            <path d={linePath} fill="none" stroke="#128C7E" strokeWidth={2} strokeLinejoin="round" strokeLinecap="round" />
+                            {n <= 31 && waChartData.map((d, i) => (
+                              <circle key={i} cx={xAt(i)} cy={yAt(d.count)} r={d.count > 0 ? 2.5 : 1.5} fill={d.count > 0 ? "#128C7E" : "#E5E7EB"}>
+                                <title>{`${d.date.toLocaleDateString("pt-PT", { day: "2-digit", month: "2-digit" })}: ${d.count} clicks`}</title>
+                              </circle>
+                            ))}
+                          </svg>
+                          <div className="relative h-4 mt-1">
+                            {waChartData.map((d, i) => labelIndices.has(i) && (
+                              <span
+                                key={i}
+                                className="absolute text-[10px] text-gray-400 -translate-x-1/2"
+                                style={{ left: `${(xAt(i) / W) * 100}%` }}
+                              >
+                                {d.date.toLocaleDateString("pt-PT", { day: "2-digit", month: "2-digit" })}
+                              </span>
+                            ))}
+                          </div>
+                          <p className="text-[11px] text-gray-400 mt-3 text-right">Fuso horário: UTC</p>
+                        </>
+                      );
+                    })()
                   ) : (
-                    <p className="text-sm text-gray-400 py-10 text-center">Sem dados para esta semana.</p>
+                    <p className="text-sm text-gray-400 py-16 text-center">Sem dados para este período.</p>
                   )}
                 </div>
 
@@ -1172,14 +1192,6 @@ const AdminPanel = () => {
           </div>
         )}
 
-        {/* ── IMPORTAR BD ────────────────────────────────────────────── */}
-        {activeTab === "import" && (
-          <div className="bg-[#071a12] rounded-2xl p-6 max-w-2xl">
-            <Suspense fallback={<div className="flex items-center justify-center py-16"><div className="w-8 h-8 border-2 border-gold border-t-transparent rounded-full animate-spin" /></div>}>
-              <AdminImport embedded />
-            </Suspense>
-          </div>
-        )}
 
         {/* ── SEO STATS ──────────────────────────────────────────────── */}
         {activeTab === "seo-stats" && (
