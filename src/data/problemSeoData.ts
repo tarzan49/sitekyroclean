@@ -738,15 +738,15 @@ const problemDefinitions: ProblemPage[] = [
     benefits: [
       "Preços transparentes desde 49€",
       "Orçamento gratuito sem compromisso",
-      "Packs com desconto até 15%",
+      "Packs com desconto até 10%",
       "Sem custos ocultos",
       "Pagamento após o serviço",
       "Garantia de satisfação incluída",
     ],
     faqs: [
-      { question: "Quanto custa limpar um sofá de 3 lugares?", answer: "A limpeza profissional de um sofá de 3 lugares começa a partir de 49€. O preço final depende do tipo de tecido e estado de sujidade." },
+      { question: "Quanto custa limpar um sofá de 3 lugares?", answer: "A limpeza profissional de um sofá de 3 lugares começa a partir de 79€. O preço final depende do tipo de tecido e estado de sujidade." },
       { question: "A deslocação tem custo adicional?", answer: "Sim, a partir de 10€, consoante a distância ao centro da área metropolitana do Porto ou das principais cidades onde operamos. O valor exato aparece no orçamento antes de confirmar." },
-      { question: "Existem packs com desconto?", answer: "Sim. Oferecemos packs de limpeza + impermeabilização com desconto até 15%. Também temos desconto para limpeza de múltiplos itens na mesma visita." },
+      { question: "Existem packs com desconto?", answer: "Sim. Oferecemos packs de limpeza + impermeabilização com desconto até 10%. Também temos desconto para limpeza de múltiplos itens na mesma visita." },
       { question: "Como posso pedir orçamento?", answer: "Peça orçamento gratuito através do nosso formulário online, WhatsApp ou telefone. Respondemos em menos de 30 minutos." },
     ],
     relatedProblems: ["preco-limpeza-colchao", "preco-limpeza-tapete", "limpeza-profunda-sofa"],

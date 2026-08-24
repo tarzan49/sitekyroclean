@@ -271,7 +271,7 @@ function generateCadeirasContent(city: string, cityDesc: string): Omit<LocationS
     faqs: [
       { question: `Quanto custa limpar cadeiras estofadas ${prep} ${city}?`, answer: `A limpeza de cadeiras estofadas ${prep} ${city} começa a partir de 20€ por cadeira (1ª a 4ª), com preço decrescente por unidade a partir da 5ª. Ideal para escritórios e restaurantes.` },
       { question: `Fazem limpeza de cadeiras de escritório ${prep} ${city}?`, answer: `Sim! Limpamos cadeiras de escritório, cadeiras de conferência e cadeiras executivas. Deslocamo-nos ao seu escritório ${prep} ${city} sem interrupção do trabalho.` },
-      { question: `Qual o desconto para limpeza de muitas cadeiras?`, answer: `Oferecemos descontos progressivos: 10% para 10+ cadeiras, 15% para 20+ cadeiras. Contacte-nos para orçamento personalizado para o seu escritório ou restaurante ${prep} ${city}.` },
+      { question: `Qual o desconto para limpeza de muitas cadeiras?`, answer: `O preço desce por escalão à medida que o número de cadeiras aumenta: 20€/cadeira até 4 unidades, 15€ da 5ª à 6ª, e 12,50€ da 7ª à 10ª. Acima de 10 cadeiras preparamos um orçamento personalizado para o seu escritório ou restaurante ${prep} ${city}.` },
     ],
   };
 }
