@@ -11,6 +11,7 @@ import ServiceLocationSchema from "@/components/ServiceLocationSchema";
 import ServiceFAQ from "@/components/ServiceFAQ";
 import ServicePackBanner from "@/components/ServicePackBanner";
 import ServiceSnapshotStats from "@/components/ServiceSnapshotStats";
+import PageBreadcrumb from "@/components/PageBreadcrumb";
 import { getLocationServiceData, services, cities, getCityLinksForService } from "@/data/locationSeoData";
 import { QuizLocationProvider, QuizServiceProvider } from "@/context/QuizLocationContext";
 import { municipiosComFreguesias } from "@/data/freguesiaSeoData";
@@ -32,12 +33,6 @@ import { MARCA_CITY_SLUGS } from "@/data/marcaCities";
 import { PROBLEM_IMAGES, PROBLEM_CTA, PRICE_HEADING_VERB } from "@/constants/problemCardHelpers";
 import { ServiceTrustDesktop, ServiceTrustMobile } from "@/components/ServiceTrustBlock";
 
-
-// Default quantity shown by a price-table row's stepper before the user adjusts it.
-function getRowDefaultQty(config: PriceRowQuizConfig): number {
-  if (config.chairQty) return parseInt(config.chairQty, 10) || 1;
-  return 1;
-}
 
 function parseLocationRoute(pathname: string): { serviceSlug: string; citySlug: string } | null {
   const path = pathname.replace(/^\//, '');
@@ -72,16 +67,6 @@ const LocationServicePage = () => {
       const current = prev[i] ?? 0;
       return { ...prev, [i]: Math.min(max, Math.max(min, current + delta)) };
     });
-  };
-
-  const handleSelectRow = (i: number, config: PriceRowQuizConfig) => {
-    const qty = rowQuantities[i] ?? getRowDefaultQty(config);
-    const resolved: PriceRowQuizConfig = { ...config };
-    if (config.sofaSizeId) resolved.sofaQty = qty;
-    if (config.mattressSizeId) resolved.mattressQty = qty;
-    if (config.chairQty) resolved.chairQty = String(qty);
-    setPriceQuizConfig(resolved);
-    openPriceQuiz();
   };
 
   const handlePriceTableContinue = () => {
@@ -226,13 +211,11 @@ const LocationServicePage = () => {
           <div className="container mx-auto px-5 sm:px-6 lg:px-8 relative z-10">
             <div className="max-w-6xl mx-auto grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
               <div>
-                <nav className="flex items-center gap-1.5 text-xs text-white/50 mb-6 flex-wrap" aria-label="Breadcrumb">
-                  <Link to="/" className="hover:text-white/80 transition-colors">Início</Link>
-                  <span>/</span>
-                  <Link to={serviceBaseUrl} className="hover:text-white/80 transition-colors">{data.service}</Link>
-                  <span>/</span>
-                  <span className="text-white/70">{data.city}</span>
-                </nav>
+                <PageBreadcrumb items={[
+                  { label: "Início", to: "/" },
+                  { label: data.service, to: serviceBaseUrl },
+                  { label: data.city },
+                ]} />
 
                 {/* Overline */}
                 <div className="inline-flex items-start mb-5">

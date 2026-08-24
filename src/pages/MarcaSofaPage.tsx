@@ -3,6 +3,7 @@ import { useLocation, Link } from "react-router-dom";
 import { QuizLocationProvider, QuizServiceProvider } from "@/context/QuizLocationContext";
 import { XCircle, CheckCircle2, ArrowRight, Search, ShieldCheck, Droplets, Wind, MessageCircle, Phone, Star, Euro, Clock } from "lucide-react";
 import Header from "@/components/Header";
+import PageBreadcrumb from "@/components/PageBreadcrumb";
 import Footer from "@/components/Footer";
 import QuizButton from "@/components/QuizButton";
 import TrustRatingBadge from "@/components/TrustRatingBadge";
@@ -150,13 +151,11 @@ const MarcaSofaPage = () => {
             <div className="container mx-auto px-5 sm:px-6 lg:px-8 relative z-10">
               <div className="max-w-6xl mx-auto grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
                 <div>
-                  <nav className="flex items-center gap-1.5 text-xs text-white/50 mb-6 flex-wrap" aria-label="Breadcrumb">
-                    <Link to="/" className="hover:text-white/80 transition-colors">Início</Link>
-                    <span>/</span>
-                    <Link to="/limpeza-sofas" className="hover:text-white/80 transition-colors">Limpeza de Sofás</Link>
-                    <span>/</span>
-                    <span className="text-white/70">{marca.name}, {city.name}</span>
-                  </nav>
+                  <PageBreadcrumb items={[
+                    { label: "Início", to: "/" },
+                    { label: "Limpeza de Sofás", to: "/limpeza-sofas" },
+                    { label: `${marca.name}, ${city.name}` },
+                  ]} />
 
                   <div className="inline-flex items-start mb-5">
                     <div className="flex flex-col gap-1">

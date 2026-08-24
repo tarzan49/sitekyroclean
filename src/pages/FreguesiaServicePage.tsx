@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useLocation, Link } from "react-router-dom";
 import { MapPin, Star, CheckCircle, MessageCircle, ArrowRight, Minus, Plus, Euro, Clock } from "lucide-react";
 import Header from "@/components/Header";
+import PageBreadcrumb from "@/components/PageBreadcrumb";
 import Footer from "@/components/Footer";
 import QuizButton from "@/components/QuizButton";
 import QuizFormLazy from "@/components/QuizFormLazy";
@@ -34,11 +35,6 @@ import { calcWidgetTotal, calcChairBracket, calcCarpetWidget, buildWidgetQuizCon
 import { locationPrices } from "@/components/quiz/QuizTypes";
 import { PROBLEM_IMAGES, PROBLEM_POOL_CTA, PRICE_HEADING_VERB } from "@/constants/problemCardHelpers";
 import { ServiceTrustDesktop, ServiceTrustMobile } from "@/components/ServiceTrustBlock";
-
-function getRowDefaultQty(config: PriceRowQuizConfig): number {
-  if (config.chairQty) return parseInt(config.chairQty, 10) || 1;
-  return 1;
-}
 
 function parseFreguesiaRoute(pathname: string): { serviceSlug: string; citySlug: string; freguesiaSlug: string } | null {
   const path = pathname.replace(/^\//, '');
@@ -84,16 +80,6 @@ const FreguesiaServicePage = () => {
       const current = prev[i] ?? 0;
       return { ...prev, [i]: Math.min(max, Math.max(min, current + delta)) };
     });
-  };
-
-  const handleSelectRow = (i: number, config: PriceRowQuizConfig) => {
-    const qty = rowQuantities[i] ?? getRowDefaultQty(config);
-    const resolved: PriceRowQuizConfig = { ...config };
-    if (config.sofaSizeId) resolved.sofaQty = qty;
-    if (config.mattressSizeId) resolved.mattressQty = qty;
-    if (config.chairQty) resolved.chairQty = String(qty);
-    setPriceQuizConfig(resolved);
-    openPriceQuiz();
   };
 
   const handlePriceTableContinue = () => {
@@ -206,15 +192,12 @@ const FreguesiaServicePage = () => {
           <div className="container mx-auto px-5 sm:px-6 lg:px-8 relative z-10">
             <div className="max-w-6xl mx-auto grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
               <div>
-                <nav className="flex items-center gap-1.5 text-xs text-white/50 mb-6 flex-wrap" aria-label="Breadcrumb">
-                  <Link to="/" className="hover:text-white/80 transition-colors">Início</Link>
-                  <span>/</span>
-                  <Link to={serviceBaseUrl} className="hover:text-white/80 transition-colors">{data.service}</Link>
-                  <span>/</span>
-                  <Link to={`/${data.serviceSlug}-${data.municipioSlug}`} className="hover:text-white/80 transition-colors">{data.municipio}</Link>
-                  <span>/</span>
-                  <span className="text-white/70">{data.name}</span>
-                </nav>
+                <PageBreadcrumb items={[
+                  { label: "Início", to: "/" },
+                  { label: data.service, to: serviceBaseUrl },
+                  { label: data.municipio, to: `/${data.serviceSlug}-${data.municipioSlug}` },
+                  { label: data.name },
+                ]} />
 
                 <div className="inline-flex items-start mb-5">
                   <div className="flex flex-col gap-1">
