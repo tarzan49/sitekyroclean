@@ -374,9 +374,9 @@ const QuizForm = ({
 
   const getServiceTypeLabel = () => {
     const labels: Record<string, string> = {
-      cleaning: 'Limpeza e Lavagem',
-      waterproofing: 'Impermeabilização',
-      both: 'Lavagem + Impermeabilização',
+      cleaning: 'Higienização Profunda',
+      waterproofing: 'Impermeabilização Premium',
+      both: 'Pack Proteção Total',
     };
     return labels[formData.serviceType] || '';
   };
