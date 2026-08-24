@@ -5,6 +5,7 @@ import {
   MapPin, Star, MessageCircle, ArrowRight, AlertTriangle, XCircle, CheckCircle2,
 } from "lucide-react";
 import Header from "@/components/Header";
+import PageBreadcrumb from "@/components/PageBreadcrumb";
 import Footer from "@/components/Footer";
 import QuizButton from "@/components/QuizButton";
 import TrustRatingBadge from "@/components/TrustRatingBadge";
@@ -28,6 +29,7 @@ import {
   buildBreadcrumbNode,
   buildServiceNode,
   buildOfferNode,
+  clearPrerenderedSchema,
   DEFAULT_AREA_SERVED,
 } from "@/lib/seoSchema";
 
@@ -62,6 +64,10 @@ const ProblemPage = () => {
     () => (data ? services.find(s => s.slug === data.relatedServices[0]) : undefined),
     [data]
   );
+
+  useEffect(() => {
+    clearPrerenderedSchema();
+  }, []);
 
   useEffect(() => {
     if (data) {
@@ -132,11 +138,10 @@ const ProblemPage = () => {
           <div className="container mx-auto px-5 sm:px-6 lg:px-8 relative z-10">
             <div className="max-w-6xl mx-auto grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
               <div>
-                <nav className="flex items-center gap-1.5 text-xs text-white/50 mb-6 flex-wrap" aria-label="Breadcrumb">
-                  <Link to="/" className="hover:text-white/80 transition-colors">Início</Link>
-                  <span>/</span>
-                  <span className="text-white/70">{data.h1}</span>
-                </nav>
+                <PageBreadcrumb items={[
+                  { label: "Início", to: "/" },
+                  { label: data.h1 },
+                ]} />
 
                 <div className="inline-flex items-start mb-5">
                   <div className="flex flex-col gap-1">

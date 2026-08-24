@@ -34,14 +34,9 @@ import { getAllMarcaCadeirasRoutes, getMarcaCadeirasByCityAndSlug } from '../src
 import { EN_PAGES } from '../src/data/enTouristSeoData';
 import { getAllPosts } from '../src/data/blogData';
 import { getAllCommercialRoutes, getCommercialPageData } from '../src/data/commercialSeoData';
+import { buildLocalBusinessNode, buildBreadcrumbNode, buildServiceNode, buildFaqNode, buildOfferNode } from '../src/lib/seoSchema';
 
 const BASE_URL = 'https://cleansolutions.com.pt';
-
-// ─── Business constants (mirrors src/constants/business.ts) ────────────────
-const BIZ_PHONE   = '+351925530647';
-const BIZ_EMAIL   = 'cleansolutions.pt25@gmail.com';
-const BIZ_RATING  = '5.0';
-const BIZ_REVIEWS = '80';
 
 // ─── HTML helpers ──────────────────────────────────────────────────────────
 
@@ -79,62 +74,38 @@ function injectContent(html: string, bodyHtml: string): string {
   return html.replace('<div id="root"></div>', `<div id="root">${bodyHtml}</div>`);
 }
 
-/** Append a JSON-LD <script> just before </head>. */
+/**
+ * Append a JSON-LD <script> just before </head>. Marked data-ssr-schema so
+ * client-side schema components (which re-render the same node types after
+ * hydration) can find and remove it via clearPrerenderedSchema() — otherwise
+ * bots doing a second, JS-rendered crawl pass would see two overlapping
+ * structured-data blocks on the same page.
+ */
 function injectJsonLd(html: string, data: object): string {
-  const script = `  <script type="application/ld+json">${JSON.stringify(data)}</script>`;
+  const script = `  <script type="application/ld+json" data-ssr-schema="true">${JSON.stringify(data)}</script>`;
   return html.replace('</head>', `${script}\n</head>`);
 }
 
 // ─── JSON-LD schema builders ────────────────────────────────────────────────
+// Thin wrappers around the single canonical implementation in
+// src/lib/seoSchema.ts (the same one every client-side schema component
+// uses). Call-site signatures below are unchanged on purpose — only these
+// 4 function bodies changed — so none of the ~50 call sites across this
+// file needed touching. This eliminates the hand-maintained duplicate that
+// used to drift from the client-side version (different @id format, missing
+// geo/openingHours/sameAs) and was the root cause of pages shipping two
+// conflicting LocalBusiness nodes after hydration.
 
-/**
- * LocalBusiness — injected on every prerendered page for local pack ranking.
- * Coordinates/fields mirror the single static block in index.html (used
- * as-is for the un-prerendered "/" route) so every page agrees on one
- * canonical @id instead of shipping two conflicting LocalBusiness nodes.
- */
+/** LocalBusiness — injected on every prerendered page for local pack ranking. */
 function buildLocalBusinessSchema() {
-  return {
-    '@context': 'https://schema.org',
-    '@type': 'LocalBusiness',
-    '@id': BASE_URL,
-    name: 'Kyro Clean Solutions',
-    url: BASE_URL,
-    telephone: BIZ_PHONE,
-    email: BIZ_EMAIL,
-    address: {
-      '@type': 'PostalAddress',
-      streetAddress: 'R. de António Cardoso 263',
-      addressLocality: 'Porto',
-      postalCode: '4150-081',
-      addressCountry: 'PT',
-    },
-    geo: {
-      '@type': 'GeoCoordinates',
-      latitude: 41.1579,
-      longitude: -8.6291,
-    },
-    aggregateRating: {
-      '@type': 'AggregateRating',
-      ratingValue: BIZ_RATING,
-      reviewCount: BIZ_REVIEWS,
-      bestRating: '5',
-    },
-    priceRange: '€€',
-  };
+  return { '@context': 'https://schema.org', ...buildLocalBusinessNode() };
 }
 
 /** BreadcrumbList — rich results in SERPs, helps Google understand site hierarchy. */
 function buildBreadcrumbSchema(items: { name: string; url: string }[]) {
   return {
     '@context': 'https://schema.org',
-    '@type': 'BreadcrumbList',
-    itemListElement: items.map((item, i) => ({
-      '@type': 'ListItem',
-      position: i + 1,
-      name: item.name,
-      item: item.url,
-    })),
+    ...buildBreadcrumbNode(undefined, items.map(it => ({ name: it.name, item: it.url }))),
   };
 }
 
@@ -143,43 +114,17 @@ function buildServiceSchema(serviceName: string, cityName: string, priceFrom: st
   const price = priceFrom.replace(',', '.').replace(/[^0-9.]/g, '') || '0';
   return {
     '@context': 'https://schema.org',
-    '@type': 'Service',
-    name: serviceName,
-    provider: {
-      '@type': 'LocalBusiness',
-      name: 'Kyro Clean Solutions',
-      url: BASE_URL,
-    },
-    areaServed: {
-      '@type': 'City',
-      name: cityName,
-    },
-    offers: {
-      '@type': 'Offer',
-      price,
-      priceCurrency: 'EUR',
-      availability: 'https://schema.org/InStock',
-    },
-    aggregateRating: {
-      '@type': 'AggregateRating',
-      ratingValue: BIZ_RATING,
-      reviewCount: BIZ_REVIEWS,
-      bestRating: '5',
-    },
+    ...buildServiceNode({
+      name: serviceName,
+      areaServed: { '@type': 'City', name: cityName },
+      offers: buildOfferNode(price),
+    }),
   };
 }
 
 /** FAQPage — eligible for Google FAQ rich results (expandable Q&A in SERPs). */
 function buildFaqSchema(faqs: { question: string; answer: string }[]) {
-  return {
-    '@context': 'https://schema.org',
-    '@type': 'FAQPage',
-    mainEntity: faqs.map(f => ({
-      '@type': 'Question',
-      name: f.question,
-      acceptedAnswer: { '@type': 'Answer', text: f.answer },
-    })),
-  };
+  return { '@context': 'https://schema.org', ...buildFaqNode(faqs) };
 }
 
 // ─── Content HTML generators ───────────────────────────────────────────────
@@ -269,13 +214,28 @@ export function prerenderRoutes(outDir: string): number {
     return 0;
   }
 
-  // The template still carries index.html's own static LocalBusiness <script>.
-  // Strip it here so every prerendered page gets exactly the one LOCAL_BIZ
-  // block injected below instead of two conflicting LocalBusiness nodes.
+  // The template is dist/index.html, which carries the homepage's own static
+  // LocalBusiness + Service JSON-LD (index.html is only ever served as-is for
+  // the un-prerendered "/" route). Every other route reuses this same file as
+  // its <head> boilerplate, so without stripping, all ~9000 prerendered pages
+  // would ship the homepage's generic LocalBusiness/Service nodes *in addition
+  // to* their own page-specific ones. Strip by parsing each JSON-LD block
+  // (not a hand-rolled regex — brittle against attribute/whitespace changes,
+  // as happened here once already) and dropping @type LocalBusiness/Service.
+  // WebSite is intentionally kept: it's genuinely the same node on every page
+  // (buildWebPageNode() on subpages cross-references it by @id).
   const rawTemplate = fs.readFileSync(templatePath, 'utf-8');
+  const STRIP_TYPES = new Set(['LocalBusiness', 'Service']);
   const template = rawTemplate.replace(
-    /\s*<script type="application\/ld\+json">\s*\{\s*"@context":\s*"https:\/\/schema\.org",\s*"@type":\s*"LocalBusiness"[\s\S]*?<\/script>/,
-    '',
+    /\s*<script type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/g,
+    (match, jsonText) => {
+      try {
+        const parsed = JSON.parse(jsonText);
+        return STRIP_TYPES.has(parsed['@type']) ? '' : match;
+      } catch {
+        return match; // not parseable JSON — leave untouched, don't risk corrupting it
+      }
+    },
   );
   let count = 0;
 

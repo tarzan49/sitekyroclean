@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { SITE_URL } from "@/constants/business";
 import { cities, DEFAULT_PRICE_FROM } from "@/data/locationSeoData";
 import {
@@ -6,6 +7,7 @@ import {
   buildLocalBusinessNode,
   buildServiceNode,
   buildOfferNode,
+  clearPrerenderedSchema,
   type ServiceReview,
 } from "@/lib/seoSchema";
 
@@ -20,6 +22,10 @@ interface ServiceSchemaProps {
 }
 
 const ServiceSchema = ({ serviceName, description, url, priceFrom, imageUrl, breadcrumbLabel, reviews }: ServiceSchemaProps) => {
+  useEffect(() => {
+    clearPrerenderedSchema();
+  }, []);
+
   const fullUrl = `${SITE_URL}${url}`;
   const priceNumeric = priceFrom.replace(',', '.').replace(/[^0-9.]/g, '') || DEFAULT_PRICE_FROM.replace(',', '.').replace(/[^0-9.]/g, '');
 

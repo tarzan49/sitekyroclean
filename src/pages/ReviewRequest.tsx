@@ -1,8 +1,9 @@
-﻿import { useSearchParams } from "react-router-dom";
+﻿import { useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import { Star, ExternalLink, MessageCircle, Heart } from "lucide-react";
 import { GOOGLE_REVIEW_URL } from "@/constants/google";
 import { WHATSAPP_BASE } from "@/constants/business";
-import { buildLocalBusinessNode } from "@/lib/seoSchema";
+import { buildLocalBusinessNode, clearPrerenderedSchema } from "@/lib/seoSchema";
 
 const serviceLabels: Record<string, string> = {
   sofa: "sofá",
@@ -14,6 +15,10 @@ const serviceLabels: Record<string, string> = {
 };
 
 const ReviewRequest = () => {
+  useEffect(() => {
+    clearPrerenderedSchema();
+  }, []);
+
   const [params] = useSearchParams();
   const nome = params.get("nome") || "Cliente";
   const cidade = params.get("cidade") || "Porto";

@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { useLocation, Link } from "react-router-dom";
 import { Utensils, BedDouble, Briefcase, MessageCircle, Phone, CheckCircle2, Quote } from "lucide-react";
 import Header from "@/components/Header";
+import PageBreadcrumb from "@/components/PageBreadcrumb";
 import Footer from "@/components/Footer";
 import SectionHeader from "@/components/SectionHeader";
 import ServiceFAQ from "@/components/ServiceFAQ";
@@ -10,7 +11,7 @@ import { cityPrep } from "@/data/locationSeoData";
 import { getProblemHeroImage } from "@/lib/problemHeroImages";
 import { buildCommercialWaMessage } from "@/lib/whatsappMessages";
 import { SITE_URL, WHATSAPP_BASE, PHONE_TEL, PHONE_DISPLAY, REVIEW_RATING, REVIEW_COUNT } from "@/constants/business";
-import { buildLocalBusinessNode, buildBreadcrumbNode, buildServiceNode } from "@/lib/seoSchema";
+import { buildLocalBusinessNode, buildBreadcrumbNode, buildServiceNode, clearPrerenderedSchema } from "@/lib/seoSchema";
 
 const SEGMENT_ICONS: Record<SegmentKey, typeof Utensils> = {
   restaurantes: Utensils,
@@ -23,6 +24,10 @@ const CommercialPage = () => {
   const citySlug = pathname.replace(/^\/limpeza-comercial-/, "");
   const data = getCommercialPageData(citySlug);
   const heroImg = getProblemHeroImage("limpeza-sofa-hotel");
+
+  useEffect(() => {
+    clearPrerenderedSchema();
+  }, []);
 
   useEffect(() => {
     if (data) {
@@ -91,11 +96,10 @@ const CommercialPage = () => {
           <section className="relative pt-24 md:pt-28 pb-16 md:pb-24">
             <div className="container mx-auto px-5 sm:px-6 lg:px-8 relative z-10">
               <div className="max-w-2xl">
-                <nav className="flex items-center gap-1.5 text-xs text-white/50 mb-6 flex-wrap" aria-label="Breadcrumb">
-                  <Link to="/" className="hover:text-white/80 transition-colors">Início</Link>
-                  <span>/</span>
-                  <span className="text-white/70">{data.h1}</span>
-                </nav>
+                <PageBreadcrumb items={[
+                  { label: "Início", to: "/" },
+                  { label: data.h1 },
+                ]} />
 
                 <div className="inline-flex items-start mb-5">
                   <div className="flex flex-col gap-1">

@@ -81,14 +81,16 @@
   <meta name="theme-color" content="#071a12">
   <link rel="canonical" href="https://cleansolutions.com.pt/">
 
-  <!-- Structured Data - LocalBusiness -->
-  <script type="application/ld+json">
+  <!-- Structured Data - LocalBusiness (data-ssr-schema: removed client-side by
+       LocalBusinessSchema.tsx on mount via clearPrerenderedSchema(), see
+       src/lib/seoSchema.ts, to avoid shipping two LocalBusiness nodes after hydration) -->
+  <script type="application/ld+json" data-ssr-schema="true">
     {
       "@context": "https://schema.org",
       "@type": "LocalBusiness",
       "name": "Kyro Clean Solutions",
       "image": "https://cleansolutions.com.pt/images/kyro-logo.png",
-      "@id": "https://cleansolutions.com.pt",
+      "@id": "https://cleansolutions.com.pt/#business",
       "url": "https://cleansolutions.com.pt",
       "telephone": "+351925530647",
       "email": "cleansolutions.pt25@gmail.com",
@@ -141,7 +143,7 @@
           {"@type": "Offer", "itemOffered": {"@type": "Service", "name": "Impermeabilização", "description": "Proteção contra manchas e líquidos para estofos"}}
         ]
       },
-      "aggregateRating": {"@type": "AggregateRating", "ratingValue": "5", "reviewCount": "60"}
+      "aggregateRating": {"@type": "AggregateRating", "ratingValue": "5", "reviewCount": "80"}
     }
   </script>
 

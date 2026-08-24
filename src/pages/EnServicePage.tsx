@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { Star, MessageCircle, Phone, Clock, Languages, Camera, Users, CheckCircle2 } from "lucide-react";
 import EnHeader from "@/components/EnHeader";
+import PageBreadcrumb from "@/components/PageBreadcrumb";
 import EnFooter from "@/components/EnFooter";
 import SectionHeader from "@/components/SectionHeader";
 import ServiceFAQ from "@/components/ServiceFAQ";
@@ -12,7 +13,7 @@ import {
   SITE_URL, WHATSAPP_BASE, PHONE_TEL, PHONE_DISPLAY,
   REVIEW_RATING, REVIEW_COUNT, CLIENTS_SERVED_LABEL,
 } from "@/constants/business";
-import { buildLocalBusinessNode, buildServiceNode, buildBreadcrumbNode } from "@/lib/seoSchema";
+import { buildLocalBusinessNode, buildServiceNode, buildBreadcrumbNode, clearPrerenderedSchema } from "@/lib/seoSchema";
 
 function buildEnWaMessage(page: EnPageData): string {
   if (page.audience === "host") {
@@ -42,6 +43,10 @@ function getHostStats(): SnapshotStat[] {
 const EnServicePage = () => {
   const { slug } = useParams<{ slug: string }>();
   const page = slug ? getEnPageBySlug(slug) : null;
+
+  useEffect(() => {
+    clearPrerenderedSchema();
+  }, []);
 
   useEffect(() => {
     if (page) {
@@ -115,11 +120,10 @@ const EnServicePage = () => {
           <section className="relative pt-24 md:pt-28 pb-16 md:pb-24">
             <div className="container mx-auto px-5 sm:px-6 lg:px-8 relative z-10">
               <div className="max-w-3xl">
-                <nav className="flex items-center gap-1.5 text-xs text-white/50 mb-6 flex-wrap" aria-label="Breadcrumb">
-                  <Link to="/" className="hover:text-white/80 transition-colors">Home</Link>
-                  <span>/</span>
-                  <span className="text-white/70">{page.h1}</span>
-                </nav>
+                <PageBreadcrumb items={[
+                  { label: "Home", to: "/" },
+                  { label: page.h1 },
+                ]} />
 
                 <div className="inline-flex items-start mb-5">
                   <div className="flex flex-col gap-1">

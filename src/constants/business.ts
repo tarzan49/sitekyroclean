@@ -1,7 +1,5 @@
 export const SITE_URL = "https://cleansolutions.com.pt";
 
-export const BUSINESS_NAME = "Kyro Clean Solutions";
-
 export const PHONE_DISPLAY = "925 530 647";
 export const PHONE_TEL = "925530647";
 export const PHONE_E164 = "+351925530647";
@@ -20,8 +18,8 @@ export const BUSINESS_ADDRESS = {
 
 export const BUSINESS_GEO = {
   "@type": "GeoCoordinates",
-  latitude: 41.1496,
-  longitude: -8.6109,
+  latitude: 41.1579,
+  longitude: -8.6291,
 } as const;
 
 export const REVIEW_RATING = "5.0";

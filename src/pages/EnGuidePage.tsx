@@ -6,7 +6,7 @@ import EnFooter from "@/components/EnFooter";
 import SectionHeader from "@/components/SectionHeader";
 import ServiceFAQ from "@/components/ServiceFAQ";
 import { SITE_URL, WHATSAPP_BASE, PHONE_TEL, PHONE_DISPLAY } from "@/constants/business";
-import { buildLocalBusinessNode, buildBreadcrumbNode } from "@/lib/seoSchema";
+import { buildLocalBusinessNode, buildBreadcrumbNode, clearPrerenderedSchema } from "@/lib/seoSchema";
 import heroImg from "@/assets/hero-p-limpeza-sofa-hotel.webp";
 
 const PAGE_URL = `${SITE_URL}/en/airbnb-portugal-cleaning-guide`;
@@ -71,6 +71,10 @@ const RELATED_HOST_PAGES = [
 ];
 
 const EnGuidePage = () => {
+  useEffect(() => {
+    clearPrerenderedSchema();
+  }, []);
+
   useEffect(() => {
     document.title = TITLE;
     document.documentElement.setAttribute("lang", "en");
