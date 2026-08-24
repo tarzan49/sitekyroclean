@@ -10,10 +10,6 @@ export function getConsent(): ConsentStatus {
   }
 }
 
-export function hasConsent(): boolean {
-  return getConsent() === 'accepted';
-}
-
 function applyGtagConsent(granted: boolean) {
   if (typeof window === 'undefined' || !window.gtag) return;
   const val = granted ? 'granted' : 'denied';

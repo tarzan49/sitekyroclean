@@ -582,23 +582,6 @@ export const municipiosComFreguesias: MunicipioGroup[] = [
   },
 ];
 
-// ─── Flatten all freguesias ───────────────────────────────────────
-export function getAllFreguesias(): Freguesia[] {
-  const result: Freguesia[] = [];
-  for (const m of municipiosComFreguesias) {
-    for (const f of m.freguesias) {
-      result.push({
-        name: f.name,
-        slug: f.slug,
-        municipio: m.name,
-        municipioSlug: m.slug,
-        nearby: f.nearby,
-      });
-    }
-  }
-  return result;
-}
-
 // ─── Route generation ─────────────────────────────────────────────
 export interface FreguesiaRoute {
   path: string;

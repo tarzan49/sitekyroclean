@@ -31,12 +31,3 @@ export const MATERIAL_HERO: Record<string, string> = {
   "limpeza-tapete-sintetico": heroCarpet,
   "limpeza-tapete-sisal":     heroCarpet,
 };
-
-// Materiais que ainda não têm foto própria — mostrar a foto genérica do
-// serviço em vez de arriscar mostrar o material errado.
-export const MATERIALS_WITHOUT_DEDICATED_PHOTO = new Set([
-  "limpeza-sofa-linho",
-  "limpeza-sofa-sintetico",
-  "limpeza-tapete-sintetico",
-  "limpeza-tapete-sisal",
-]);

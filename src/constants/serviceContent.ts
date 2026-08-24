@@ -45,7 +45,6 @@ export const SERVICE_RESULT_CONTENT: Record<string, (place: string) => { desc: s
 };
 
 export const SERVICE_HERO_FALLBACK = { d: heroSofaD, m: heroSofaM };
-export const SERVICE_RESULT_FALLBACK = resultSofa;
 
 // Pool de heroes por serviço para variar a foto entre páginas de Localidade/Freguesia ×
 // Serviço — rotação determinística por nome da cidade/freguesia (mesmo pool de fotos

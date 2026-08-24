@@ -64,16 +64,12 @@ export default defineConfig(({ mode }) => ({
           if (id.includes('node_modules/react-router')) {
             return 'vendor-router';
           }
-          // Framer Motion — large, rarely changes
-          if (id.includes('node_modules/framer-motion')) {
-            return 'vendor-framer';
-          }
           // Radix UI primitives
           if (id.includes('node_modules/@radix-ui')) {
             return 'vendor-radix';
           }
-          // Supabase / tanstack
-          if (id.includes('node_modules/@supabase') || id.includes('node_modules/@tanstack')) {
+          // Supabase
+          if (id.includes('node_modules/@supabase')) {
             return 'vendor-data';
           }
         },
