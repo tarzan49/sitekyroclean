@@ -13,6 +13,13 @@ const locationPrices: Record<string, number> = {
   'Penafiel': 15, 'Paços de Ferreira': 15, 'Felgueiras': 15, 'Lousada': 15,
   'Arouca': 20, 'Braga': 20, 'Aveiro': 20,
   'Guimarães': 20,
+  // ── Braga/Minho (equipa local Braga, preço por distância a Braga, nunca acima de 20€) ──
+  'Vila Nova de Famalicão': 10,
+  'Barcelos': 10,
+  'Viana do Castelo': 20,
+  'Póvoa de Lanhoso': 10,
+  'Fafe': 15,
+  'Esposende': 15,
   // ── Lisboa / Área Metropolitana (equipa local) ──
   // Regra: mínimo 10€, máximo 15€ (nunca 5€ nem 20€ em Lisboa/Algarve).
   'Lisboa': 10,
@@ -75,6 +82,13 @@ export const cities = [
   // Outros: Norte
   { name: "Braga", slug: "braga", region: "secondary", area: "porto", description: "cidade milenar do Minho" },
   { name: "Guimarães", slug: "guimaraes", region: "secondary", area: "porto", description: "berço da nação portuguesa" },
+  // Expansão Braga/Minho (2026-08-25, equipa local nova em Braga)
+  { name: "Vila Nova de Famalicão", slug: "vila-nova-de-famalicao", region: "secondary", area: "porto", description: "cidade industrial do Vale do Ave" },
+  { name: "Barcelos", slug: "barcelos", region: "secondary", area: "porto", description: "cidade oleira do Minho" },
+  { name: "Viana do Castelo", slug: "viana-do-castelo", region: "secondary", area: "porto", description: "cidade costeira à foz do Lima" },
+  { name: "Póvoa de Lanhoso", slug: "povoa-de-lanhoso", region: "secondary", area: "porto", description: "vila do Minho perto de Braga" },
+  { name: "Fafe", slug: "fafe", region: "secondary", area: "porto", description: "vila do Minho, terra do capuchinho" },
+  { name: "Esposende", slug: "esposende", region: "secondary", area: "porto", description: "vila costeira na foz do Cávado" },
   // Lisboa e Área Metropolitana
   { name: "Lisboa", slug: "lisboa", region: "primary", area: "lisboa", description: "capital de Portugal" },
   { name: "Amadora", slug: "amadora", region: "secondary", area: "lisboa", description: "município vizinho de Lisboa, um dos mais densos do país" },

@@ -324,14 +324,21 @@ export const packs: PackCombo[] = [
 ];
 
 // Cidades principais das 3 regiões operacionais reais (Porto/Norte, Lisboa/AML, Algarve —
-// ver `cities` em locationSeoData.ts). Exclui vilas/municípios menores dessa lista (só as
-// cidades mais conhecidas de cada região), mas cobre muito mais do que as 5 anteriores.
+// ver `cities` em locationSeoData.ts).
+// 2026-08-25: Porto/Norte e Lisboa/AML passaram a cobrir TODAS as cidades já existentes em
+// `cities` para essas duas áreas (antes só uma seleção parcial) — pedido do dono para tornar
+// estas duas regiões "mais compostas" sem inventar cidades novas: todas já têm página de
+// localização própria no site, só não estavam incluídas nos Packs. Algarve mantém-se como
+// seleção parcial (fora do âmbito deste pedido).
 const PACK_CITY_SLUGS = [
-  // Porto / Norte
-  'porto', 'vila-nova-de-gaia', 'matosinhos', 'maia', 'gondomar', 'povoa-de-varzim',
-  'braga', 'guimaraes',
-  // Lisboa / AML
-  'lisboa', 'sintra', 'cascais', 'oeiras', 'almada', 'amadora', 'odivelas', 'setubal',
+  // Porto / Norte — todas as 25 cidades de area:"porto" em locationSeoData.ts
+  'porto', 'matosinhos', 'maia', 'vila-nova-de-gaia', 'gondomar', 'valongo', 'povoa-de-varzim',
+  'vila-do-conde', 'paredes', 'penafiel', 'lousada', 'pacos-de-ferreira', 'felgueiras',
+  'santo-tirso', 'trofa', 'espinho', 'arouca',
+  'braga', 'guimaraes', 'vila-nova-de-famalicao', 'barcelos', 'viana-do-castelo', 'povoa-de-lanhoso', 'fafe', 'esposende',
+  // Lisboa / AML — todas as 18 cidades de area:"lisboa" em locationSeoData.ts
+  'lisboa', 'amadora', 'odivelas', 'oeiras', 'cascais', 'sintra', 'loures', 'almada', 'seixal',
+  'vila-franca-de-xira', 'barreiro', 'moita', 'mafra', 'setubal', 'montijo', 'alcochete', 'palmela', 'sesimbra',
   // Algarve
   'faro', 'loule', 'albufeira', 'portimao', 'lagos', 'tavira',
 ];

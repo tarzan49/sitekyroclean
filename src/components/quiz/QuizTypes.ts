@@ -107,6 +107,13 @@ export const locationPrices: Record<string, number> = {
   'Aveiro': 20,
   // Zona 5 — Minho, ~55-70 min
   'Guimarães': 20,
+  // Zona 6 — Braga/Minho, equipa local Braga, preço por distância a Braga, nunca acima de 20€
+  'Vila Nova de Famalicão': 10,
+  'Barcelos': 10,
+  'Viana do Castelo': 20,
+  'Póvoa de Lanhoso': 10,
+  'Fafe': 15,
+  'Esposende': 15,
 
   // ═══ Lisboa / Área Metropolitana (equipa local) ═══
   // Regra: mínimo 10€, máximo 15€ (nunca 5€ nem 20€ em Lisboa/Algarve).

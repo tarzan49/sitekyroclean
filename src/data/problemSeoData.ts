@@ -503,86 +503,13 @@ const problemDefinitions: ProblemPage[] = [
   // ══════════════════════════════════════════
   // CATEGORY: MATERIAIS (Material-specific)
   // ══════════════════════════════════════════
-  {
-    slug: "limpeza-sofa-tecido",
-    category: "materiais",
-    keyword: "limpeza de sofá de tecido",
-    title: "Limpeza de Sofá de Tecido | Profissional ao Domicílio | Kyro",
-    metaDescription: "Limpeza profissional de sofás de tecido (algodão, linho, microfibra, veludo). Extração profunda extração profissional. Desde 49€. Peça orçamento.",
-    h1: "Limpeza Profissional de Sofás de Tecido",
-    intro: "Sofás de tecido: algodão, linho, poliéster, microfibra ou veludo: necessitam de cuidados específicos. A Kyro Clean Solutions adapta o processo de limpeza ao tipo de tecido do seu sofá para resultados perfeitos sem risco de danos.",
-    problemDetail: "Cada tipo de tecido tem características únicas: o algodão absorve mais líquidos, o veludo marca com facilidade, a microfibra retém sujidade nas microfibras, o linho pode encolher com água quente. Usar o produto ou técnica errada pode causar danos permanentes.",
-    solutionDetail: "Inspeccionamos o tecido antes de iniciar e selecionamos o produto e temperatura adequados. A extração profissional é ajustada para cada tipo de fibra, garantindo limpeza eficaz sem risco de encolhimento, descoloração ou deformação.",
-    benefits: [
-      "Tratamento específico por tipo de tecido",
-      "Seguro para algodão, linho, veludo e microfibra",
-      "Sem risco de encolhimento",
-      "Preserva as cores originais",
-      "Extração profunda ajustável",
-      "Desde 49€",
-    ],
-    faqs: [
-      { question: "Que tipos de tecido podem ser limpos?", answer: "Limpamos todos os tipos: algodão, poliéster, linho, microfibra, veludo, chenille, jacquard e misturas. Cada tecido recebe tratamento específico." },
-      { question: "A limpeza pode encolher o tecido do sofá?", answer: "Não. Ajustamos a temperatura e quantidade de água ao tipo de tecido, prevenindo encolhimento." },
-    ],
-    relatedProblems: ["limpeza-sofa-pele", "limpeza-sofa-veludo", "manchas-sofa"],
-    relatedServices: ["limpeza-sofas", "impermeabilizacao"],
-    relatedCities: ["porto", "matosinhos", "braga"],
-    visible: true,
-  },
-  {
-    slug: "limpeza-sofa-pele",
-    category: "materiais",
-    keyword: "limpeza de sofá de pele",
-    title: "Limpeza de Sofá de Pele | Tratamento Especializado | Kyro",
-    metaDescription: "Limpeza e tratamento profissional de sofás de pele e couro. Hidratação e proteção incluídas. Peça orçamento grátis.",
-    h1: "Limpeza e Tratamento de Sofás de Pele",
-    intro: "Sofás de pele e couro requerem cuidados especializados. A Kyro Clean Solutions limpa, hidrata e protege sofás de pele genuína e sintética, devolvendo maciez e brilho natural ao material.",
-    problemDetail: "A pele e o couro ressecam com o tempo, perdendo maciez e criando fissuras. Exposição solar, calor, e falta de hidratação aceleram a deterioração. Produtos de limpeza comuns podem danificar permanentemente a pele, removendo óleos naturais e causando descoloração.",
-    solutionDetail: "Utilizamos produtos específicos para pele e couro que limpam sem retirar os óleos naturais. Após a limpeza, aplicamos creme hidratante profissional que nutre a pele e previne fissuras. Opcionalmente, aplicamos proteção UV contra descoloração solar.",
-    benefits: [
-      "Produtos específicos para pele e couro",
-      "Hidratação profissional incluída",
-      "Proteção contra fissuras",
-      "Proteção UV opcional",
-      "Restaura maciez e brilho",
-      "Seguro para pele genuína e sintética",
-    ],
-    faqs: [
-      { question: "Limpam sofás de pele genuína e sintética?", answer: "Sim. Temos produtos e técnicas específicas para cada tipo: pele genuína, napa, nobuck e pele sintética." },
-      { question: "A limpeza hidrata o couro?", answer: "Sim. Após a limpeza, aplicamos creme hidratante profissional que nutre e protege a pele." },
-    ],
-    relatedProblems: ["limpeza-sofa-tecido", "manchas-sofa", "limpeza-profunda-sofa"],
-    relatedServices: ["limpeza-sofas"],
-    relatedCities: ["porto", "vila-nova-de-gaia", "guimaraes"],
-    visible: true,
-  },
-  {
-    slug: "limpeza-sofa-veludo",
-    category: "materiais",
-    keyword: "limpeza de sofá de veludo",
-    title: "Limpeza de Sofá de Veludo | Cuidado Especializado | Kyro",
-    metaDescription: "Limpeza profissional de sofás de veludo. Tratamento delicado que preserva a textura e cor. Peça orçamento grátis.",
-    h1: "Limpeza Profissional de Sofás de Veludo",
-    intro: "O veludo é um tecido elegante mas delicado que exige cuidados profissionais. A Kyro Clean Solutions limpa sofás de veludo com técnicas que preservam a textura, brilho e cor original do tecido.",
-    problemDetail: "Sofás de veludo são muito sensíveis: marcam facilmente com pressão, acumulam pó e pelos, e manchas podem fixar-se rapidamente. Limpeza caseira errada pode esmagar as fibras, criando marcas permanentes e alterando a textura.",
-    solutionDetail: "Utilizamos técnicas de limpeza a baixa pressão e temperatura controlada, com produtos específicos para veludo que não esmagam as fibras. A extração é feita de forma suave, preservando a textura e orientação das fibras do veludo.",
-    benefits: [
-      "Técnica de baixa pressão",
-      "Preserva textura do veludo",
-      "Temperatura controlada",
-      "Remove pó e manchas",
-      "Não esmaga as fibras",
-      "Resultado elegante e uniforme",
-    ],
-    faqs: [
-      { question: "A limpeza do veludo altera a textura?", answer: "Não. Utilizamos técnicas específicas de baixa pressão que limpam sem esmagar ou alterar a orientação das fibras do veludo." },
-    ],
-    relatedProblems: ["limpeza-sofa-tecido", "manchas-sofa", "limpeza-sofa-pele"],
-    relatedServices: ["limpeza-sofas"],
-    relatedCities: ["porto", "braga", "matosinhos"],
-    visible: true,
-  },
+  // limpeza-sofa-tecido / limpeza-sofa-pele / limpeza-sofa-veludo removidos
+  // daqui (2026-08-25) — colidiam com as páginas equivalentes de
+  // src/data/materialSeoData.ts (mesmo slug, mesmas cidades), causando URLs
+  // com conteúdo diferente consoante fossem vistas pelo Google (estático,
+  // ganhava Material) ou por um utilizador real (React Router, ganhava
+  // Problema). O conteúdo de "material" já é o correto para estes 3 slugs;
+  // fundido numa única fonte em materialSeoData.ts. Ver CODE_AUDIT.md.
   {
     slug: "tapete-persa",
     category: "materiais",
@@ -981,58 +908,11 @@ const problemDefinitions: ProblemPage[] = [
     relatedCities: ["porto", "matosinhos", "braga"],
     visible: true,
   },
-  {
-    slug: "higienizacao-colchao",
-    category: "metodo",
-    keyword: "higienização de colchão",
-    title: "Higienização de Colchão | Anti-Ácaros Profissional | Kyro",
-    metaDescription: "Higienização profissional de colchão. Anti-ácaros, remoção de manchas e desodorização. Desde 59€. Peça orçamento.",
-    h1: "Higienização Profissional de Colchão",
-    intro: "A higienização de colchão é essencial para quem valoriza um sono saudável. A Kyro Clean Solutions faz higienização completa do colchão: anti-ácaros, remoção de manchas e desodorização: com resultados visíveis.",
-    problemDetail: "O colchão acumula milhões de ácaros, células mortas, suor e bactérias ao longo do tempo. Um colchão não higienizado pode ser fonte de alergias, problemas respiratórios e má qualidade do sono.",
-    solutionDetail: "Processo completo de higienização: aspiração HEPA, extração profunda extração profissional, tratamento anti-ácaros, remoção de manchas e desodorização final. O colchão fica higienizado e fresco.",
-    benefits: [
-      "Processo completo de higienização",
-      "Anti-ácaros profissional",
-      "Remoção de manchas incluída",
-      "Desodorização incluída",
-      "Desde 59€",
-      "Melhora qualidade do sono",
-    ],
-    faqs: [
-      { question: "Qual a diferença entre higienização e limpeza de colchão?", answer: "A higienização é mais completa: inclui aspiração HEPA, anti-ácaros, extração profunda, remoção de manchas e desodorização. É o tratamento mais completo para colchões." },
-    ],
-    relatedProblems: ["acaros-colchao", "manchas-colchao", "cheiro-colchao"],
-    relatedServices: ["limpeza-colchoes"],
-    relatedCities: ["porto", "braga", "maia"],
-    visible: true,
-  },
-  {
-    slug: "lavagem-tapetes",
-    category: "metodo",
-    keyword: "lavagem de tapetes profissional",
-    title: "Lavagem de Tapetes Profissional | Recolha e Entrega | Kyro",
-    metaDescription: "Lavagem profissional de tapetes com recolha e entrega ao domicílio. Todos os tipos de tapete. Desde 12€/m². Orçamento grátis.",
-    h1: "Lavagem Profissional de Tapetes",
-    intro: "A Kyro Clean Solutions faz lavagem profissional de todos os tipos de tapetes: sintéticos, lã, algodão, persas e orientais: com recolha e entrega ao domicílio incluídas.",
-    problemDetail: "Tapetes acumulam pó, sujidade, manchas e odores que a aspiração doméstica não consegue remover completamente. Tapetes de fibras naturais requerem lavagem especializada para não danificar.",
-    solutionDetail: "Recolhemos o tapete na sua casa, lavamos profissionalmente com produtos específicos para cada tipo de fibra, secamos de forma controlada e devolvemos limpo e fresco. Todo o processo demora 3-5 dias úteis.",
-    benefits: [
-      "Recolha e entrega incluídas",
-      "Todos os tipos de tapete",
-      "Produtos específicos por fibra",
-      "Secagem controlada",
-      "Desde 12€/m²",
-      "3-5 dias úteis",
-    ],
-    faqs: [
-      { question: "Quanto tempo demora a lavagem do tapete?", answer: "O processo completo (recolha, lavagem, secagem, entrega) demora normalmente 3-5 dias úteis." },
-    ],
-    relatedProblems: ["manchas-tapete", "cheiro-tapete", "tapete-persa"],
-    relatedServices: ["limpeza-tapetes", "limpeza-alcatifas"],
-    relatedCities: ["porto", "matosinhos", "vila-nova-de-gaia"],
-    visible: true,
-  },
+  // higienizacao-colchao / lavagem-tapetes removidos daqui (2026-08-25) —
+  // colidiam com as variantes keyword equivalentes de keywordVariantData.ts
+  // (mesmo slug, mesmas cidades). O conteúdo de "keyword variant" já é o
+  // correto para estes 2 slugs (é literalmente o propósito desse motor);
+  // fundido numa única fonte lá. Ver CODE_AUDIT.md.
   {
     slug: "limpeza-cadeiras-escritorio",
     category: "metodo",
@@ -1108,7 +988,7 @@ const problemDefinitions: ProblemPage[] = [
       { question: "A mancha de sangue seca sai do colchão?", answer: "Na maioria dos casos, sim. As enzimas proteolíticas que utilizamos são muito eficazes mesmo em manchas de sangue já secas." },
       { question: "Devo usar água quente para limpar sangue?", answer: "Não! Água quente fixa a mancha de sangue. Use apenas água fria até que o tratamento profissional seja realizado." },
     ],
-    relatedProblems: ["manchas-colchao", "urina-colchao", "higienizacao-colchao"],
+    relatedProblems: ["manchas-colchao", "urina-colchao", "cheiro-colchao"],
     relatedServices: ["limpeza-colchoes"],
     relatedCities: ["porto", "maia", "gondomar"],
     visible: true,
@@ -1176,30 +1056,14 @@ const problemDefinitions: ProblemPage[] = [
     faqs: [
       { question: "É possível recuperar a cor de um sofá branco amarelado?", answer: "Sim. O nosso tratamento de branqueamento seguro remove os depósitos que causam amarelecimento. Os resultados dependem da causa e duração do amarelecimento." },
     ],
-    relatedProblems: ["manchas-sofa", "limpeza-profunda-sofa", "limpeza-sofa-tecido"],
+    relatedProblems: ["manchas-sofa", "limpeza-profunda-sofa", "limpeza-sofa-chenille"],
     relatedServices: ["limpeza-sofas"],
     relatedCities: ["porto", "cascais", "lisboa"],
     visible: true,
   },
-  {
-    slug: "limpeza-sofa-microfibra",
-    category: "materiais",
-    keyword: "limpeza sofá microfibra",
-    title: "Limpeza de Sofá de Microfibra | Profissional | Kyro",
-    metaDescription: "Limpeza profissional de sofás de microfibra. Técnicas que preservam a textura. Remoção de manchas. Desde 49€. Orçamento grátis.",
-    h1: "Limpeza Profissional de Sofás de Microfibra",
-    intro: "Sofás de microfibra são populares pela sua suavidade, mas requerem cuidados específicos. A Kyro Clean Solutions limpa microfibra com técnicas que preservam a textura macia característica do material.",
-    problemDetail: "A microfibra retém sujidade nas suas fibras ultrafinas, criando marcas visíveis e zonas escurecidas com o uso. Água em excesso pode deixar marcas de auréola. Produtos errados podem esmagar as fibras.",
-    solutionDetail: "Utilizamos técnica de limpeza controlada com pouca humidade e produtos específicos para microfibra. A escovagem final na direção das fibras restaura a textura suave original.",
-    benefits: ["Técnica específica para microfibra", "Preserva textura suave", "Sem marcas de água", "Escovagem direcional", "Remoção de manchas", "Desde 49€"],
-    faqs: [
-      { question: "A limpeza de microfibra deixa marcas de água?", answer: "Não. Utilizamos a quantidade correta de humidade e técnicas que previnem auréolas e marcas de água." },
-    ],
-    relatedProblems: ["limpeza-sofa-tecido", "limpeza-sofa-veludo", "manchas-sofa"],
-    relatedServices: ["limpeza-sofas"],
-    relatedCities: ["porto", "matosinhos", "lisboa"],
-    visible: true,
-  },
+  // limpeza-sofa-microfibra removido daqui (2026-08-25) — colidia com a
+  // página equivalente de materialSeoData.ts (mesmo slug, mesmas cidades).
+  // Ver CODE_AUDIT.md.
   {
     slug: "limpeza-cabeceira-cama",
     category: "metodo",
@@ -1214,7 +1078,7 @@ const problemDefinitions: ProblemPage[] = [
     faqs: [
       { question: "Quanto custa limpar uma cabeceira de cama?", answer: "A limpeza de cabeceira estofada começa a partir de 15€, dependendo do tamanho e estado de sujidade." },
     ],
-    relatedProblems: ["manchas-colchao", "acaros-colchao", "higienizacao-colchao"],
+    relatedProblems: ["manchas-colchao", "acaros-colchao", "cheiro-colchao"],
     relatedServices: ["limpeza-colchoes", "limpeza-cadeiras"],
     relatedCities: ["porto", "braga", "vila-nova-de-gaia"],
     visible: true,
@@ -1233,7 +1097,7 @@ const problemDefinitions: ProblemPage[] = [
     faqs: [
       { question: "A limpeza do chenille pode esmagar as fibras?", answer: "Não. Utilizamos técnicas de baixa pressão especificamente desenhadas para preservar a textura felpuda do chenille." },
     ],
-    relatedProblems: ["limpeza-sofa-veludo", "limpeza-sofa-tecido", "manchas-sofa"],
+    relatedProblems: ["sofa-amarelado", "limpeza-profunda-sofa", "manchas-sofa"],
     relatedServices: ["limpeza-sofas"],
     relatedCities: ["porto", "lisboa", "sintra"],
     visible: true,

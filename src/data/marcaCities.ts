@@ -3,8 +3,9 @@
 // entre as que o site já cobre em locationSeoData.ts — ranking real de
 // população INE/Censos via Wikipédia:
 // https://pt.wikipedia.org/wiki/Lista_de_munic%C3%ADpios_de_Portugal_por_popula%C3%A7%C3%A3o
-// Aveiro/Coimbra/Barcelos ficam de fora: população elevada mas sem
-// páginas de localização no site (ficariam órfãs).
+// Aveiro/Coimbra ficam de fora: população elevada mas sem páginas de
+// localização no site (ficariam órfãs). Barcelos foi adicionado em
+// 2026-08-25 (expansão Braga) — já tem página de localização própria.
 export const MARCA_CITIES = [
   // Porto/Norte
   { name: "Porto", slug: "porto" },
@@ -20,6 +21,12 @@ export const MARCA_CITIES = [
   { name: "Póvoa de Varzim", slug: "povoa-de-varzim" },
   { name: "Penafiel", slug: "penafiel" },
   { name: "Santo Tirso", slug: "santo-tirso" },
+  { name: "Vila Nova de Famalicão", slug: "vila-nova-de-famalicao" },
+  { name: "Barcelos", slug: "barcelos" },
+  { name: "Viana do Castelo", slug: "viana-do-castelo" },
+  { name: "Póvoa de Lanhoso", slug: "povoa-de-lanhoso" },
+  { name: "Fafe", slug: "fafe" },
+  { name: "Esposende", slug: "esposende" },
   // Lisboa / Área Metropolitana
   { name: "Lisboa", slug: "lisboa" },
   { name: "Sintra", slug: "sintra" },

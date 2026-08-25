@@ -82,10 +82,7 @@ const frequesiaRoutes = getAllFreguesiaRoutes();
 const materialRoutes = getAllMaterialRoutes();
 const materialCityRoutes = getAllMaterialCityRoutes();
 const priceRoutes = getAllPriceRoutes();
-// Filter out higienizacao/lavagem prefixes: keywordVariantRoutes cover those paths first
-const problemCityRoutes = getAllProblemCityRoutes().filter(
-  r => !r.path.startsWith('/higienizacao-') && !r.path.startsWith('/lavagem-')
-);
+const problemCityRoutes = getAllProblemCityRoutes();
 const keywordVariantRoutes = getAllKeywordVariantRoutes();
 const packComboRoutes = getAllPackComboRoutes();
 const marcaSofaRoutes = getAllMarcaSofaRoutes();
