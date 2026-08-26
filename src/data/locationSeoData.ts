@@ -179,7 +179,7 @@ function generateSofaContent(city: string, cityDesc: string): Omit<LocationServi
       "Sofá seco e pronto a usar em poucas horas, sem químicos agressivos",
       `Conhecemos bem as necessidades de quem vive ${prep} ${city}, ${cityDesc}, e adaptamos o horário à sua disponibilidade`,
     ],
-    localSection: `Servimos toda a área de ${city} e arredores, incluindo as principais freguesias e zonas residenciais. A nossa equipa desloca-se diretamente à sua casa ${prep} ${city} com taxa de deslocação de ${locationPrices[city] ?? 5}€. Atendemos clientes residenciais e comerciais: escritórios, restaurantes, hotéis e clínicas ${prep} ${city}.`,
+    localSection: `Servimos toda a área de ${city} e arredores, incluindo as principais freguesias e zonas residenciais. A nossa equipa desloca-se diretamente à sua casa ${prep} ${city} com taxa de deslocação de ${locationPrices[city] ?? 10}€. Atendemos clientes residenciais e comerciais: escritórios, restaurantes, hotéis e clínicas ${prep} ${city}.`,
     faqs: [
       { question: `Quanto custa a limpeza de sofá ${prep} ${city}?`, answer: `A limpeza de sofá ${prep} ${city} começa a partir de 49€ para sofás de 1 lugar. O preço varia conforme o tamanho, tipo de tecido e estado de sujidade. Peça orçamento gratuito sem compromisso.` },
       { question: `Quanto tempo demora a limpeza do sofá ${prep} ${city}?`, answer: `O serviço de limpeza de sofá ao domicílio ${prep} ${city} demora entre 1 a 3 horas, dependendo do tamanho e estado do sofá. O sofá fica pronto a usar em 4-6 horas após a limpeza.` },
@@ -214,7 +214,7 @@ function generateColchaoContent(city: string, cityDesc: string): Omit<LocationSe
       `Serviço ao domicílio ${prep} ${city}, sem necessidade de desmontar a cama`,
       `Ideal para famílias e alérgicos ${prep} ${city} que procuram noites de sono mais saudáveis`,
     ],
-    localSection: `A nossa equipa de higienização de colchões cobre toda a área de ${city} e arredores. Atendemos residências, hotéis, residências seniores e alojamentos locais ${prep} ${city}. Taxa de deslocação de ${locationPrices[city] ?? 5}€.`,
+    localSection: `A nossa equipa de higienização de colchões cobre toda a área de ${city} e arredores. Atendemos residências, hotéis, residências seniores e alojamentos locais ${prep} ${city}. Taxa de deslocação de ${locationPrices[city] ?? 10}€.`,
     faqs: [
       { question: `Quanto custa a limpeza de colchão ${prep} ${city}?`, answer: `A higienização de colchão ${prep} ${city} começa a partir de 59€ para colchão de solteiro. Colchões de casal têm preços a partir de 69€. Contacte-nos para orçamento personalizado.` },
       { question: `A limpeza de colchão remove ácaros?`, answer: `Sim. O nosso processo de higienização profissional elimina até 99% dos ácaros, bactérias e fungos presentes no colchão, ideal para quem sofre de alergias.` },

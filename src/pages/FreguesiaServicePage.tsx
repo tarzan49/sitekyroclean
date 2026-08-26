@@ -286,7 +286,7 @@ const FreguesiaServicePage = () => {
                     overline="Tabela de Preços"
                     heading={`Quanto custa ${PRICE_HEADING_VERB[data.serviceSlug] ?? data.service.toLowerCase()} em`}
                     goldWord={data.name}
-                    subtitle={`Preços fixos e transparentes, sem surpresas. Deslocação +${locationPrices[data.municipio] ?? 5}€ a ${data.municipio}. Orçamento gratuito antes de qualquer compromisso.`}
+                    subtitle={`Preços fixos e transparentes, sem surpresas. Deslocação +${locationPrices[data.municipio] ?? 10}€ a ${data.municipio}. Orçamento gratuito antes de qualquer compromisso.`}
                   />
                   <div className="hidden md:block">
                     <ServiceTrustDesktop serviceSlug={data.serviceSlug} variant={2} />
@@ -377,7 +377,7 @@ const FreguesiaServicePage = () => {
                       <div className="flex items-center gap-1.5">
                         <CheckCircle className="w-3.5 h-3.5 flex-shrink-0" style={{ color: "rgba(17,17,17,0.25)" }} />
                         <span className="text-xs" style={{ color: "rgba(17,17,17,0.45)" }}>
-                          +{locationPrices[data.municipio] ?? 5}€ deslocação a {data.municipio}
+                          +{locationPrices[data.municipio] ?? 10}€ deslocação a {data.municipio}
                         </span>
                       </div>
                       {(() => {

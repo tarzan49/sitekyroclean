@@ -305,7 +305,7 @@ const LocationServicePage = () => {
                     overline="Tabela de Preços"
                     heading={`Quanto custa ${PRICE_HEADING_VERB[data.serviceSlug] ?? data.service.toLowerCase()} ${cityPrep}`}
                     goldWord={data.city}
-                    subtitle={`Preços fixos e transparentes, sem surpresas. Deslocação +${locationPrices[data.city] ?? 5}€ a ${data.city}. Orçamento gratuito antes de qualquer compromisso.`}
+                    subtitle={`Preços fixos e transparentes, sem surpresas. Deslocação +${locationPrices[data.city] ?? 10}€ a ${data.city}. Orçamento gratuito antes de qualquer compromisso.`}
                   />
                   {/* Trust facts — desktop only (variante 1) */}
                   <div className="hidden md:block">
@@ -330,7 +330,7 @@ const LocationServicePage = () => {
                     </p>
                     <div className="mt-3 pt-3" style={{ borderTop: "1px solid rgba(255,255,255,0.07)" }}>
                       <p className="text-[10px]" style={{ color: "rgba(255,255,255,0.26)" }}>
-                        +{locationPrices[data.city] ?? 5}€ deslocação a {data.city}
+                        +{locationPrices[data.city] ?? 10}€ deslocação a {data.city}
                       </p>
                     </div>
                   </div>
@@ -516,7 +516,7 @@ const LocationServicePage = () => {
                       const total = calcWidgetTotal(data.serviceSlug, rowQuantities, chaiseLongueAddon);
                       const discountActive = total >= WIDGET_DISCOUNT_THRESHOLD;
                       const discountedTotal = Math.round(total * 0.9);
-                      const fee = locationPrices[data.city] ?? 5;
+                      const fee = locationPrices[data.city] ?? 10;
                       const hasAnySelection = total > 0 || Object.values(rowQuantities).some(q => q > 0) || chaiseLongueAddon > 0;
                       return (
                         <div className="bg-white px-5 pt-3 pb-5 space-y-3">

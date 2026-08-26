@@ -79,7 +79,7 @@ export function useQuizPricing(
   // localização ainda não escolhida ou "outra" fora da tabela de zonas.
   const travelCost = useMemo(() => {
     if (!formData.location || formData.location === 'other') return 5;
-    return locationPrices[formData.location] ?? 5;
+    return locationPrices[formData.location] ?? 10;
   }, [formData.location]);
 
   const finalTravelCost = travelCost;
