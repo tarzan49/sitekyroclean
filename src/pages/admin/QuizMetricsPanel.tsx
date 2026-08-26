@@ -2,7 +2,7 @@ import { useState, useCallback, useEffect } from "react";
 import {
   RefreshCw, Trash2, Activity, TrendingUp, Users, DollarSign, Target,
   Clock, CheckCircle, Globe, Zap, MessageCircle, Map, BarChart3,
-  ChevronLeft, ChevronRight, Phone, Inbox, LucideIcon,
+  ChevronLeft, ChevronRight, Phone, Inbox, LucideIcon, List, X,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -26,6 +26,19 @@ interface QuizEvent {
 
 interface ChartPoint { date: Date; count: number; }
 
+// One individual, ungrouped event — powers the "ver detalhes" drill-down list under
+// each chart. created_at is already full timestamptz precision in Supabase; this is
+// just the first UI that exposes hour/minute/second instead of the day bucket.
+interface DetailRow { id: string; date: Date; typeLabel: string; origin: string; }
+
+function formatDetailDate(d: Date): string {
+  return d.toLocaleDateString("pt-PT", { day: "2-digit", month: "2-digit", year: "numeric", timeZone: "UTC" });
+}
+
+function formatDetailTime(d: Date): string {
+  return d.toLocaleTimeString("pt-PT", { hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false, timeZone: "UTC" });
+}
+
 interface WeekMetrics {
   totalStarts: number;
   totalCompletes: number;
@@ -47,6 +60,9 @@ interface WeekMetrics {
   waChart: ChartPoint[];
   callChart: ChartPoint[];
   leadsChart: ChartPoint[];
+  waDetailRows: DetailRow[];
+  callDetailRows: DetailRow[];
+  leadsDetailRows: DetailRow[];
 }
 
 const WEEKDAY_SHORT = ["Seg", "Ter", "Qua", "Qui", "Sex", "Sáb", "Dom"];
@@ -126,6 +142,71 @@ function useCountUp(target: number, trigger: number | null): number {
   return display;
 }
 
+// ── Detail drill-down drawer: individual events behind an aggregated chart ───
+
+interface EventDetailDrawerProps {
+  open: boolean;
+  onClose: () => void;
+  icon: LucideIcon;
+  iconColorClass: string;
+  title: string;
+  rows: DetailRow[];
+  focusLabel: string | null; // ex: "26/08/2026" when filtered to one day, else null
+  onClearFocus: () => void;
+}
+
+function EventDetailDrawer({ open, onClose, icon: Icon, iconColorClass, title, rows, focusLabel, onClearFocus }: EventDetailDrawerProps) {
+  if (!open) return null;
+  const sorted = [...rows].sort((a, b) => b.date.getTime() - a.date.getTime());
+
+  return (
+    <div className="fixed inset-0 z-50 flex justify-end">
+      <div className="absolute inset-0 bg-black/40" onClick={onClose} />
+      <div className="relative w-full sm:w-[440px] h-full bg-white shadow-2xl flex flex-col animate-in slide-in-from-right duration-200">
+        <div className="p-4 sm:p-5 border-b border-gray-100 flex-shrink-0">
+          <div className="flex items-center justify-between gap-3">
+            <h3 className="text-sm font-semibold text-navy flex items-center gap-2">
+              <Icon className={`w-4 h-4 ${iconColorClass}`} /> {title}
+            </h3>
+            <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-navy transition-colors">
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+          <p className="text-[11px] text-gray-400 mt-1">
+            {sorted.length} {sorted.length === 1 ? "registo" : "registos"} · mais recente primeiro · fuso horário UTC
+          </p>
+          {focusLabel && (
+            <button onClick={onClearFocus} className="mt-2 text-xs font-medium text-navy bg-gray-100 hover:bg-gray-200 rounded-full px-3 py-1 transition-colors">
+              A mostrar só {focusLabel} · ver semana toda ✕
+            </button>
+          )}
+        </div>
+
+        <div className="flex-1 overflow-y-auto">
+          {sorted.length === 0 ? (
+            <p className="text-sm text-gray-400 text-center py-16">Sem registos para mostrar.</p>
+          ) : (
+            <div className="divide-y divide-gray-50">
+              {sorted.map(row => (
+                <div key={row.id} className="px-4 sm:px-5 py-3 flex items-center justify-between gap-3">
+                  <div>
+                    <p className="text-sm font-semibold text-navy">{row.typeLabel}</p>
+                    <p className="text-xs text-gray-400 mt-0.5">{row.origin}</p>
+                  </div>
+                  <div className="text-right flex-shrink-0">
+                    <p className="text-xs font-medium text-navy/80">{formatDetailDate(row.date)}</p>
+                    <p className="text-xs text-gray-400 font-mono">{formatDetailTime(row.date)}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ── Shared weekly line chart (WhatsApp / Pedidos / Chamadas all reuse this) ───
 
 interface WeekLineChartProps {
@@ -140,12 +221,21 @@ interface WeekLineChartProps {
   lineColor: string;
   areaColor: string;
   gradientId: string;
+  detailRows: DetailRow[];
 }
 
 function WeekLineChart({
-  icon: Icon, iconColorClass, title, helper, data, loading, error, totalSuffix, lineColor, areaColor, gradientId,
+  icon: Icon, iconColorClass, title, helper, data, loading, error, totalSuffix, lineColor, areaColor, gradientId, detailRows,
 }: WeekLineChartProps) {
   const [selected, setSelected] = useState<number | null>(null);
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [drawerDay, setDrawerDay] = useState<number | null>(null);
+
+  const openDetails = (dayIndex: number | null) => { setDrawerDay(dayIndex); setDrawerOpen(true); };
+  const drawerRows = drawerDay !== null
+    ? detailRows.filter(r => r.date.toISOString().slice(0, 10) === data[drawerDay]?.date.toISOString().slice(0, 10))
+    : detailRows;
+  const drawerFocusLabel = drawerDay !== null && data[drawerDay] ? formatDetailDate(data[drawerDay].date) : null;
   const total = data.reduce((s, d) => s + d.count, 0);
   const max = Math.max(...data.map(d => d.count), 1);
   const n = data.length;
@@ -168,9 +258,17 @@ function WeekLineChart({
       {/* Fixed-height header block so a 2-line title (ex: "Pedidos de orçamento") reserves the
           same vertical space as a 1-line one — otherwise the number below starts at a different
           y-offset per card and the row of three cards looks unaligned. */}
-      <div className="min-h-[2.5rem] flex items-start gap-2 mb-1">
-        <Icon className={`w-4 h-4 mt-0.5 flex-shrink-0 ${iconColorClass}`} />
-        <h3 className="text-sm font-semibold text-navy leading-snug">{title}</h3>
+      <div className="min-h-[2.5rem] flex items-start justify-between gap-2 mb-1">
+        <div className="flex items-start gap-2">
+          <Icon className={`w-4 h-4 mt-0.5 flex-shrink-0 ${iconColorClass}`} />
+          <h3 className="text-sm font-semibold text-navy leading-snug">{title}</h3>
+        </div>
+        <button
+          onClick={() => openDetails(null)}
+          className="flex items-center gap-1 text-[11px] font-medium text-navy/60 hover:text-navy bg-gray-50 hover:bg-gray-100 rounded-full px-2.5 py-1 transition-colors flex-shrink-0"
+        >
+          <List className="w-3 h-3" /> Ver detalhes
+        </button>
       </div>
       {helper && <p className="text-[11px] text-gray-400 mb-2 min-h-[1rem]">{helper}</p>}
 
@@ -233,11 +331,19 @@ function WeekLineChart({
                 className="absolute -top-1 -translate-x-1/2 pointer-events-none kyro-pop z-10"
                 style={{ left: `${selectedLeftPct}%` }}
               >
-                <div className="bg-navy text-white rounded-xl px-3 py-1.5 shadow-lg text-center whitespace-nowrap">
+                <div className="bg-navy text-white rounded-xl px-3 py-1.5 shadow-lg text-center whitespace-nowrap pointer-events-auto">
                   <p className="text-[10px] text-white/60 leading-none mb-0.5">
                     {WEEKDAY_SHORT[selected]} · {data[selected].date.toLocaleDateString("pt-PT", { day: "2-digit", month: "2-digit", timeZone: "UTC" })}
                   </p>
                   <p className="text-lg font-bold font-playfair leading-none">{animatedCount}</p>
+                  {animatedCount > 0 && (
+                    <button
+                      onClick={() => openDetails(selected)}
+                      className="text-[9px] text-white/70 hover:text-white underline underline-offset-2 mt-1 block mx-auto"
+                    >
+                      ver lista
+                    </button>
+                  )}
                 </div>
               </div>
             )}
@@ -259,6 +365,17 @@ function WeekLineChart({
           <p className="text-[11px] text-gray-400 mt-3 text-right">Fuso horário: UTC · toca num dia para ver o número exato</p>
         </>
       )}
+
+      <EventDetailDrawer
+        open={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
+        icon={Icon}
+        iconColorClass={iconColorClass}
+        title={title}
+        rows={drawerRows}
+        focusLabel={drawerFocusLabel}
+        onClearFocus={() => setDrawerDay(null)}
+      />
     </div>
   );
 }
@@ -284,19 +401,25 @@ const QuizMetricsPanel = () => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (supabase as any).from("quiz_events").select("*").gte("created_at", startISO).lt("created_at", endISO),
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (supabase as any).from("leads").select("id, created_at").gte("created_at", startISO).lt("created_at", endISO),
+        (supabase as any).from("leads").select("id, created_at, service, location").gte("created_at", startISO).lt("created_at", endISO),
       ]);
       if (eventsRes.error) throw eventsRes.error;
       if (leadsRes.error) throw leadsRes.error;
 
       const events: QuizEvent[] = eventsRes.data ?? [];
-      const leadsRows: { id: string; created_at: string }[] = leadsRes.data ?? [];
+      const leadsRows: { id: string; created_at: string; service: string | null; location: string | null }[] = leadsRes.data ?? [];
 
       const countByDay = (rows: { created_at: string }[]): ChartPoint[] => {
         const map: Record<string, number> = {};
         rows.forEach(r => { const k = r.created_at.slice(0, 10); map[k] = (map[k] ?? 0) + 1; });
         return weekDays.map(d => ({ date: d, count: map[d.toISOString().slice(0, 10)] ?? 0 }));
       };
+
+      // Individual, ungrouped rows behind each chart — powers the "ver detalhes" drawer.
+      const buildEventDetailRows = (rows: QuizEvent[], typeLabel: string): DetailRow[] =>
+        rows.map(e => ({ id: e.id, date: new Date(e.created_at), typeLabel, origin: groupClickOrigin(e.service ?? "desconhecido") }));
+      const buildLeadDetailRows = (rows: typeof leadsRows): DetailRow[] =>
+        rows.map(r => ({ id: r.id, date: new Date(r.created_at), typeLabel: "Pedido de orçamento", origin: r.location ?? (r.service ?? "-") }));
 
       const starts = events.filter(e => e.action === "start" && e.step === 0);
       const completes = events.filter(e => e.action === "complete");
@@ -374,6 +497,9 @@ const QuizMetricsPanel = () => {
         waChart: countByDay(waEvents),
         callChart: countByDay(callEvents),
         leadsChart: countByDay(leadsRows),
+        waDetailRows: buildEventDetailRows(waEvents, "Clique WhatsApp"),
+        callDetailRows: buildEventDetailRows(callEvents, "Clique em ligar"),
+        leadsDetailRows: buildLeadDetailRows(leadsRows),
       });
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : "Erro ao carregar métricas. Confirma que as tabelas quiz_events e leads existem no Supabase.");
@@ -531,6 +657,7 @@ const QuizMetricsPanel = () => {
               lineColor="#128C7E"
               areaColor="#25D366"
               gradientId="chartWa"
+              detailRows={data.waDetailRows}
             />
             <WeekLineChart
               icon={Inbox}
@@ -544,6 +671,7 @@ const QuizMetricsPanel = () => {
               lineColor="#8a7326"
               areaColor="#D4AF37"
               gradientId="chartLeads"
+              detailRows={data.leadsDetailRows}
             />
             <WeekLineChart
               icon={Phone}
@@ -557,6 +685,7 @@ const QuizMetricsPanel = () => {
               lineColor="#2563EB"
               areaColor="#3B82F6"
               gradientId="chartCall"
+              detailRows={data.callDetailRows}
             />
           </div>
 
