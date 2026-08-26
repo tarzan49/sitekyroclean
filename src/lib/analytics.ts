@@ -4,6 +4,7 @@
  */
 
 import { PHONE_TEL } from "@/constants/business";
+import { trackCallClickEvent } from "@/lib/quizTracking";
 
 // ============================================
 // CORE EVENT TRACKING
@@ -36,6 +37,10 @@ export function trackCallClick(location: string) {
     event_label: location,
     phone_number: PHONE_TEL,
   });
+
+  // Also track in Supabase quiz_events so it shows up in the admin panel
+  // alongside WhatsApp clicks — GA4 alone isn't visible there.
+  trackCallClickEvent(location);
 }
 
 // ============================================

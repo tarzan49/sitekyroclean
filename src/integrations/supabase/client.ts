@@ -5,13 +5,38 @@ import type { Database } from './types';
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
 const SUPABASE_PUBLISHABLE_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
 
+// createClient() throws synchronously ("supabaseUrl is required.") when these are
+// missing — that happened in production 2026-08-24→26 because VITE_SUPABASE_URL/
+// VITE_SUPABASE_PUBLISHABLE_KEY were only ever set via the committed .env file, which
+// was (correctly) untracked from git for being a public-repo secret leak. Cloudflare
+// Pages was never given its own copy in the project's environment variables, so the
+// next build compiled with both undefined. Because this file is imported eagerly at
+// the top of AdminDashboard.tsx/QuizMetricsPanel.tsx, that throw crashed the whole
+// admin panel (caught only by the top-level ErrorBoundary) — and every quiz_events/
+// leads/error_logs insert across the site failed silently forever after, since all of
+// them wrap this client in try/catch. See isSupabaseConfigured for the loud warning.
+export const isSupabaseConfigured = Boolean(SUPABASE_URL && SUPABASE_PUBLISHABLE_KEY);
+
+if (!isSupabaseConfigured) {
+  // eslint-disable-next-line no-console
+  console.error(
+    '[Supabase] VITE_SUPABASE_URL / VITE_SUPABASE_PUBLISHABLE_KEY em falta. ' +
+    'Se isto está em produção: configura estas variáveis no Cloudflare Pages ' +
+    '(Settings → Environment variables) e faz um novo deploy — o .env local não chega ao build.'
+  );
+}
+
 // Import the supabase client like this:
 // import { supabase } from "@/integrations/supabase/client";
 
-export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
-  auth: {
-    storage: localStorage,
-    persistSession: true,
-    autoRefreshToken: true,
+export const supabase = createClient<Database>(
+  SUPABASE_URL || 'https://placeholder.supabase.co',
+  SUPABASE_PUBLISHABLE_KEY || 'placeholder-key',
+  {
+    auth: {
+      storage: localStorage,
+      persistSession: true,
+      autoRefreshToken: true,
+    }
   }
-});
+);

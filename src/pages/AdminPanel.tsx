@@ -1,6 +1,7 @@
 import { useState, lazy, Suspense } from "react";
 import { Link } from "react-router-dom";
 import { AlertTriangle, BarChart3, Home, Settings2, Lock, Users, Globe } from "lucide-react";
+import { isSupabaseConfigured } from "@/integrations/supabase/client";
 
 const AdminDashboard = lazy(() => import("./AdminDashboard"));
 const SitemapMonitor = lazy(() => import("./admin/SitemapMonitor"));
@@ -108,6 +109,20 @@ const AdminPanel = () => {
       </header>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
+        {!isSupabaseConfigured && (
+          <div className="mb-6 flex items-start gap-3 rounded-2xl border border-red-300 bg-red-50 p-4 text-red-800">
+            <AlertTriangle className="w-5 h-5 flex-shrink-0 mt-0.5 text-red-600" />
+            <div className="text-sm">
+              <p className="font-bold">Supabase não está configurado neste ambiente</p>
+              <p className="mt-1">
+                CRM, Métricas Quiz e Error Log não estão a gravar nem a ler dados agora.
+                Se isto acontece em produção: configura <code className="bg-red-100 px-1 rounded">VITE_SUPABASE_URL</code> e{" "}
+                <code className="bg-red-100 px-1 rounded">VITE_SUPABASE_PUBLISHABLE_KEY</code> no Cloudflare Pages
+                (Settings → Environment variables) e faz um novo deploy — o <code className="bg-red-100 px-1 rounded">.env</code> local não chega ao build.
+              </p>
+            </div>
+          </div>
+        )}
         {activeTab === "sitemap" && (
           <Suspense fallback={<TabFallback />}>
             <SitemapMonitor />

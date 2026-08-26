@@ -3,7 +3,14 @@ import { createClient } from '@supabase/supabase-js';
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL as string;
 const supabaseKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY as string;
 
-export const supabase = createClient(supabaseUrl, supabaseKey);
+// See src/integrations/supabase/client.ts for why this guards against a missing
+// env var instead of letting createClient() throw synchronously.
+export const isSupabaseConfigured = Boolean(supabaseUrl && supabaseKey);
+
+export const supabase = createClient(
+  supabaseUrl || 'https://placeholder.supabase.co',
+  supabaseKey || 'placeholder-key'
+);
 
 // CRM statuses for quiz leads; legacy CSV records use their original Portuguese Funil values
 export type LeadStatus = 'pending' | 'contacted' | 'scheduled' | 'lost' | (string & {});

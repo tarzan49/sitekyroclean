@@ -106,6 +106,24 @@ export function trackWhatsAppClick(source: string) {
   });
 }
 
+// location: same "where on the page" labels trackCallClick() in src/lib/analytics.ts
+// already passes (header_desktop, footer, final_cta, etc). Requires the
+// 'call_click' value added to quiz_events_action_check — see
+// supabase/migrations/20260826000000_widen_quiz_events_action_check_call_click.sql.
+// This counts taps on the "ligar" button, not answered calls — a website has no way
+// to know if a phone call was actually picked up.
+export function trackCallClickEvent(location: string) {
+  if (!IS_PRODUCTION) return;
+  insertEventKeepalive({
+    session_id: SESSION_ID,
+    step: 0,
+    action: "call_click",
+    service: location,
+    page_path: window.location.pathname,
+    device: getDevice(),
+  });
+}
+
 // Called once per session on page hide/unload with seconds spent on site
 export function trackSessionTime(seconds: number) {
   if (!IS_PRODUCTION) return;
