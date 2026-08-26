@@ -23,6 +23,9 @@ package-lock.json
 .env.local
 .env.production
 
+# Local-only business docs (budget/strategy drafts, not for the public repo)
+GOOGLE-ADS-PORTO-CAMPANHA.md
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
