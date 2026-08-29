@@ -87,8 +87,13 @@ export function useQuizPricing(
   const safePrice = (n: number) => (isNaN(n) || n == null) ? 0 : n;
   const upsellItemsTotal = upsellItems.reduce((sum, item) => sum + safePrice(item.price), 0);
   const totalPrice = safePrice(calculateServicePrice) + safePrice(upsellItemsTotal) + safePrice(finalTravelCost) + 0;
-  // True when the user has qty>0 of the "4+ lugares" sofa (no fixed price → custom quote)
-  const hasSobOrcamento = sofaItems.some(i => i.sizeId === '4+-lugares' && i.qty > 0);
+  // True when the user has qty>0 of the "4+ lugares" sofa, or a carpet area over 15m²
+  // (both have no fixed price → custom quote). Without the carpet check, calculateServicePrice
+  // silently fell back to 0 for area>15m² (calcCarpetPrice returns null there), so totalPrice
+  // ended up as travel cost alone with nothing flagging it as a custom quote.
+  const hasSobOrcamento =
+    sofaItems.some(i => i.sizeId === '4+-lugares' && i.qty > 0) ||
+    (formData.service === 'carpet' && parseFloat(formData.carpetArea) > 15);
   // Any upsell item with price=0 is a SOB item (chairs ≥10, carpet >15m², sofa 4+ lugares)
   const hasUpsellSobItem = upsellItems.some(i => i.price === 0);
   // Pack 10% activates: cart ≥149€ in known prices, OR cart >100€ + any SOB item
