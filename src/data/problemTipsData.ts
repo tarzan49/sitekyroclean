@@ -4,7 +4,7 @@ import { Star, Clock, Users, CheckCircle2, ShieldCheck, Timer } from "lucide-rea
 // Snapshot stats shown right below the hero on problem pages, varied by category
 // so each problem type highlights the fact most relevant to it. Every value here
 // reuses a figure already established elsewhere on the site (99% ácaros, 30min
-// resposta, 2-4h secagem, 5.0★, +1100 clientes, 80+ avaliações) — no invented stats.
+// resposta, 2-4h secagem, 5.0★, +1100 clientes, 90+ avaliações) — no invented stats.
 export const CATEGORY_STATS: Record<string, { value: string; label: string; icon: LucideIcon }[]> = {
   manchas: [
     { value: "5.0★", label: "Avaliação Google", icon: Star },
@@ -38,7 +38,7 @@ export const CATEGORY_STATS: Record<string, { value: string; label: string; icon
   ],
   preco: [
     { value: "5.0★", label: "Avaliação Google", icon: Star },
-    { value: "80+", label: "Avaliações verificadas", icon: ShieldCheck },
+    { value: "90+", label: "Avaliações verificadas", icon: ShieldCheck },
     { value: "30min", label: "Resposta ao pedido", icon: Clock },
     { value: "Grátis", label: "Orçamento sem compromisso", icon: CheckCircle2 },
   ],

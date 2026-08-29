@@ -865,7 +865,7 @@ const problemDefinitions: ProblemPage[] = [
     problemDetail: "Escolher a empresa certa para limpar os seus estofos é importante. Equipamento inadequado pode danificar tecidos, e produtos baratos podem deixar resíduos prejudiciais. Uma empresa profissional garante resultados seguros e eficazes.",
     solutionDetail: "A Kyro Clean Solutions utiliza equipamento de extração profissional, produtos certificados e tem técnicos formados. Oferecemos serviço ao domicílio em todo o Porto e Norte de Portugal, com garantia de satisfação.",
     benefits: [
-      "5.0 Google: 80+ avaliações reais",
+      "5.0 Google: 90+ avaliações reais",
       "+1100 clientes satisfeitos",
       "Equipamento de extração profissional",
       "Produtos certificados e seguros",

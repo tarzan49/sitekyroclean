@@ -10,18 +10,18 @@ export const BUSINESS_EMAIL_HREF = `mailto:${BUSINESS_EMAIL}`;
 
 export const BUSINESS_ADDRESS = {
   "@type": "PostalAddress",
-  streetAddress: "R. de António Cardoso 263",
+  streetAddress: "Rua de Ferreira Cardoso 174",
   addressLocality: "Porto",
-  postalCode: "4150-081",
+  postalCode: "4300-197",
   addressCountry: "PT",
 } as const;
 
 export const BUSINESS_GEO = {
   "@type": "GeoCoordinates",
-  latitude: 41.1579,
-  longitude: -8.6291,
+  latitude: 41.147231,
+  longitude: -8.596869,
 } as const;
 
 export const REVIEW_RATING = "5.0";
-export const REVIEW_COUNT = "80";
+export const REVIEW_COUNT = "90";
 export const CLIENTS_SERVED_LABEL = "+1100";
