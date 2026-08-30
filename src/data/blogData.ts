@@ -761,7 +761,7 @@ const posts: BlogPost[] = [
       },
       {
         q: "Os ácaros desaparecem no verão?",
-        a: "Não. Na maioria de Portugal, as condições de temperatura e humidade são ideais para ácaros durante todo o ano. O verão pode trazer alguma redução junto à costa, mas a população recupara rapidamente no outono.",
+        a: "Não. Na maioria de Portugal, as condições de temperatura e humidade são ideais para ácaros durante todo o ano. O verão pode trazer alguma redução junto à costa, mas a população recupera rapidamente no outono.",
       },
       {
         q: "Lavar o colchão profissionalmente substitui a capa anti-ácaros?",
@@ -1221,7 +1221,7 @@ const posts: BlogPost[] = [
       },
       {
         heading: "Com que frequência limpar o colchão do bebé",
-        body: "Para colchões de bebé (0 a 3 anos): **a cada 3 a 4 meses** é a recomendação ideal. Para crianças de 3 a 8 anos, a cada 4 a 6 meses.\n\nIstes são ciclos mais curtos do que para adultos porque a criança passa mais horas na cama proporcionalmente, transpira mais em relação ao volume corporal, e o sistema imunitário está ainda em desenvolvimento.",
+        body: "Para colchões de bebé (0 a 3 anos): **a cada 3 a 4 meses** é a recomendação ideal. Para crianças de 3 a 8 anos, a cada 4 a 6 meses.\n\nEstes são ciclos mais curtos do que para adultos porque a criança passa mais horas na cama proporcionalmente, transpira mais em relação ao volume corporal, e o sistema imunitário está ainda em desenvolvimento.",
       },
       {
         heading: "Proteção entre limpezas",
