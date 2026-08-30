@@ -271,7 +271,7 @@ const materialDefinitions: MaterialDefinition[] = [
     serviceName: "Limpeza de Tapetes",
     keyword: "limpeza tapete lã",
     title: "Limpeza de Tapete de Lã | Kyro Clean Solutions",
-    metaDescription: "Limpeza profissional de tapetes de lã. Preservamos a qualidade e cor das fibras naturais. Tratamento delicado. Desde 12€/m².",
+    metaDescription: "Limpeza profissional de tapetes de lã. Preservamos a qualidade e cor das fibras naturais. Tratamento delicado. Desde 15€/m².",
     h1: "Limpeza Profissional de Tapetes de Lã",
     intro: "Tapetes de lã são peças valiosas que requerem cuidados especializados. A nossa equipa limpa tapetes de lã com técnicas que preservam a qualidade, cor e integridade das fibras naturais.",
     characteristics: [
@@ -294,7 +294,7 @@ const materialDefinitions: MaterialDefinition[] = [
     ],
     faqs: [
       { question: "A limpeza profissional encolhe tapetes de lã?", answer: "Não. Utilizamos temperaturas e técnicas controladas específicas para lã que previnem o encolhimento e preservam as fibras." },
-      { question: "Quanto custa limpar um tapete de lã?", answer: "A partir de 12€/m² (até 5m²), com tarifa decrescente para áreas maiores. Tapetes orientais ou artesanais podem requerer tratamento especializado com preço sob consulta." },
+      { question: "Quanto custa limpar um tapete de lã?", answer: "A partir de 15€/m² (até 3m²), com tarifa decrescente para áreas maiores. Tapetes orientais ou artesanais podem requerer tratamento especializado com preço sob consulta." },
     ],
     relatedMaterials: ["limpeza-tapete-sintetico", "limpeza-tapete-persa", "limpeza-tapete-sisal"],
   },
@@ -339,7 +339,7 @@ const materialDefinitions: MaterialDefinition[] = [
     serviceName: "Limpeza de Tapetes",
     keyword: "limpeza tapete sintético",
     title: "Limpeza de Tapete Sintético | Kyro Clean Solutions",
-    metaDescription: "Limpeza profissional de tapetes sintéticos. Remoção de manchas e odores. Resultados imediatos. Desde 12€/m². Orçamento grátis.",
+    metaDescription: "Limpeza profissional de tapetes sintéticos. Remoção de manchas e odores. Resultados imediatos. Desde 15€/m². Orçamento grátis.",
     h1: "Limpeza de Tapetes Sintéticos",
     intro: "Tapetes sintéticos (polipropileno, poliéster, nylon) são resistentes mas acumulam sujidade e odores. A nossa limpeza profissional remove toda a sujidade acumulada nas fibras e devolve o aspeto original.",
     characteristics: [
@@ -361,7 +361,7 @@ const materialDefinitions: MaterialDefinition[] = [
       "Limpeza profissional semestral recomendada",
     ],
     faqs: [
-      { question: "Quanto custa limpar um tapete sintético?", answer: "A partir de 12€/m² (até 5m²), com tarifa decrescente para áreas maiores. Tapetes sintéticos são geralmente mais económicos de limpar do que tapetes naturais." },
+      { question: "Quanto custa limpar um tapete sintético?", answer: "A partir de 15€/m² (até 3m²), com tarifa decrescente para áreas maiores. Tapetes sintéticos são geralmente mais económicos de limpar do que tapetes naturais." },
       { question: "A limpeza levanta as fibras achatadas?", answer: "Sim. O processo de extração e escovagem ajuda a restaurar o volume e aspeto original das fibras sintéticas." },
     ],
     relatedMaterials: ["limpeza-tapete-la", "limpeza-tapete-persa", "limpeza-tapete-sisal"],

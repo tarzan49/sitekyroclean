@@ -131,7 +131,7 @@ export const cities = [
 export const services = [
   { name: "Limpeza de Sofás", slug: "limpeza-sofas", baseRoute: "/limpeza-sofas", priceFrom: "49€", icon: "sofa" },
   { name: "Limpeza de Colchões", slug: "limpeza-colchoes", baseRoute: "/limpeza-colchoes", priceFrom: "59€", icon: "mattress" },
-  { name: "Limpeza de Tapetes", slug: "limpeza-tapetes", baseRoute: "/limpeza-tapetes", priceFrom: "12€/m²", icon: "carpet" },
+  { name: "Limpeza de Tapetes", slug: "limpeza-tapetes", baseRoute: "/limpeza-tapetes", priceFrom: "15€/m²", icon: "carpet" },
   { name: "Limpeza de Cadeiras", slug: "limpeza-cadeiras", baseRoute: "/limpeza-cadeiras", priceFrom: "20€", icon: "chair" },
   { name: "Limpeza de Alcatifas", slug: "limpeza-alcatifas", baseRoute: "/limpeza-alcatifas", priceFrom: "3€/m²", icon: "rug" },
   { name: "Impermeabilização", slug: "impermeabilizacao", baseRoute: "/impermeabilizacao", priceFrom: "59€", icon: "waterproof" },
@@ -229,10 +229,10 @@ function generateTapetesContent(city: string, cityDesc: string): Omit<LocationSe
   const prep = cityPrep(city);
   const Prep = cityPrepCap(city);
   return {
-    title: `Limpeza de Tapetes ${city} | Desde 12€/m² | Kyro Clean Solutions`,
-    metaDescription: `Lavagem profissional de tapetes ${prep} ${city}. Limpeza de tapetes persas, orientais e modernos. Recolha e entrega. Desde 12€/m².`,
+    title: `Limpeza de Tapetes ${city} | Desde 15€/m² | Kyro Clean Solutions`,
+    metaDescription: `Lavagem profissional de tapetes ${prep} ${city}. Limpeza de tapetes persas, orientais e modernos. Recolha e entrega. Desde 15€/m².`,
     h1: `Limpeza e Lavagem de Tapetes ${prep} ${city}`,
-    intro: `Procura lavagem de tapetes profissional ${prep} ${city}? A Kyro Clean Solutions oferece limpeza especializada de tapetes de todos os tipos: persas, orientais, modernos, de lã e sintéticos. Serviço disponível ${prep} ${city} e ${cityDesc} com recolha e entrega ao domicílio. Preços desde 12€/m².`,
+    intro: `Procura lavagem de tapetes profissional ${prep} ${city}? A Kyro Clean Solutions oferece limpeza especializada de tapetes de todos os tipos: persas, orientais, modernos, de lã e sintéticos. Serviço disponível ${prep} ${city} e ${cityDesc} com recolha e entrega ao domicílio. Preços desde 15€/m².`,
     problems: [
       { title: "Sujidade acumulada nas fibras", description: `Os tapetes acumulam poeira, terra, areia e resíduos diariamente. ${Prep} ${city}, o uso constante torna a limpeza profunda essencial para manter a higiene.` },
       { title: "Manchas resistentes", description: `Manchas de líquidos, comida e animais que se fixam nas fibras do tapete e são impossíveis de remover com aspirador convencional.` },
@@ -250,7 +250,7 @@ function generateTapetesContent(city: string, cityDesc: string): Omit<LocationSe
     ],
     localSection: `Recolhemos e entregamos tapetes em toda a área de ${city}. Atendemos clientes residenciais e comerciais: restaurantes, hotéis e escritórios ${prep} ${city} e arredores.`,
     faqs: [
-      { question: `Quanto custa a limpeza de tapetes ${prep} ${city}?`, answer: `A limpeza de tapetes ${prep} ${city} tem preços a partir de 12€/m². O custo depende do tipo de tapete, dimensão e estado de sujidade. Peça orçamento gratuito.` },
+      { question: `Quanto custa a limpeza de tapetes ${prep} ${city}?`, answer: `A limpeza de tapetes ${prep} ${city} tem preços a partir de 15€/m². O custo depende do tipo de tapete, dimensão e estado de sujidade. Peça orçamento gratuito.` },
       { question: `Fazem lavagem de tapetes persas ${prep} ${city}?`, answer: `Sim. Temos experiência na lavagem de tapetes persas, orientais e delicados. Utilizamos produtos e técnicas específicas para preservar as fibras e cores.` },
       { question: `Têm serviço de recolha de tapetes ${prep} ${city}?`, answer: `Sim! Oferecemos recolha e entrega de tapetes ao domicílio ${prep} ${city} e toda a área envolvente, sem custos adicionais para encomendas acima de 50€.` },
       { question: `Quanto tempo demora a lavagem de tapetes?`, answer: `O processo completo de lavagem e secagem demora tipicamente 3-5 dias úteis, dependendo do tipo e tamanho do tapete.` },
@@ -324,30 +324,30 @@ function generateAlcatifasContent(city: string, cityDesc: string): Omit<Location
 function generateImpermeabilizacaoContent(city: string, cityDesc: string): Omit<LocationService, 'slug' | 'city' | 'citySlug' | 'service' | 'serviceSlug' | 'relatedServices' | 'priceFrom'> {
   const prep = cityPrep(city);
   return {
-    title: `Impermeabilização de Estofos ${city} | Proteção até 10 anos | Kyro Clean Solutions`,
-    metaDescription: `Impermeabilização profissional de sofás e cadeiras ${prep} ${city}. Proteção invisível contra manchas e líquidos com garantia até 10 anos.`,
+    title: `Impermeabilização de Estofos ${city} | Essencial ou Premium | Kyro Clean Solutions`,
+    metaDescription: `Impermeabilização profissional de sofás e cadeiras ${prep} ${city}. Versão Essencial e versão Premium, com proteção invisível real até 5 anos.`,
     h1: `Impermeabilização de Estofos ${prep} ${city}`,
-    intro: `Proteja os seus estofos contra manchas e líquidos ${prep} ${city}. A Kyro Clean Solutions aplica impermeabilização profissional invisível que cria uma barreira protetora nos tecidos, repelindo líquidos e facilitando a limpeza. Serviço disponível ${prep} ${city} e ${cityDesc} com garantia até 10 anos.`,
+    intro: `Proteja os seus estofos contra manchas e líquidos ${prep} ${city}. A Kyro Clean Solutions aplica impermeabilização profissional invisível que cria uma barreira protetora nos tecidos, repelindo líquidos e facilitando a limpeza. Duas versões disponíveis, Essencial e Premium, ${prep} ${city} e ${cityDesc}.`,
     problems: [
       { title: "Sofá sem proteção", description: `Sem impermeabilização, qualquer derrame penetra rapidamente nas fibras do sofá, causando manchas permanentes e danos ao estofamento.` },
-      { title: "Manchas frequentes com crianças e animais", description: `Famílias ${prep} ${city} com crianças e animais de estimação sofrem com manchas constantes. A impermeabilização previne estes danos.` },
+      { title: "Manchas frequentes com crianças e animais", description: `Famílias ${prep} ${city} com crianças e animais de estimação sofrem com manchas constantes. A versão Premium, mais resistente ao desgaste, é a recomendada para estes casos.` },
       { title: "Desgaste acelerado dos tecidos", description: `Tecidos não protegidos desgastam-se mais rapidamente. A impermeabilização prolonga significativamente a vida útil dos estofos.` },
     ],
-    howItWorks: `Processo de impermeabilização ${prep} ${city}: 1) Limpeza prévia dos estofos (se necessário), 2) Aplicação uniforme do produto impermeabilizante, 3) Secagem e cura do produto, 4) Teste de repelência. Garantia até 10 anos.`,
+    howItWorks: `Processo de impermeabilização ${prep} ${city}: 1) Limpeza prévia dos estofos (se necessário), 2) Escolha entre a versão Essencial (à base de água) ou Premium (à base de diluente), 3) Aplicação uniforme do produto, 4) Secagem e teste de repelência.`,
     benefits: [
       "Barreira protetora invisível que não altera a cor nem a textura do tecido",
       "Proteção contra manchas de vinho, café, gordura e urina de animais",
-      "Garantia de durabilidade até 10 anos consoante o tecido e uso",
-      "Ideal para famílias com crianças pequenas e animais de estimação",
+      "Essencial: até 2 lavagens e 1 a 2 anos de proteção real. Premium: até 5 lavagens e até 5 anos de proteção real",
+      "Ideal para famílias com crianças pequenas e animais de estimação (recomendamos a Premium)",
       `Aplicação ao domicílio ${prep} ${city}, com possibilidade de combinar com limpeza prévia`,
-      `Recomendado para quem vive ${prep} ${city} e quer proteger sofás, cadeiras e tapetes a longo prazo`,
+      `Recomendado para quem vive ${prep} ${city} e quer proteger sofás e cadeiras a longo prazo`,
     ],
-    localSection: `Oferecemos impermeabilização de estofos ${prep} ${city} e toda a região envolvente. Ideal combinar com limpeza profissional: peça pack completo com desconto.`,
+    localSection: `Oferecemos impermeabilização de estofos ${prep} ${city} e toda a região envolvente, nas versões Essencial e Premium. Ideal combinar a Essencial com limpeza profissional: peça o Pack Proteção Total com desconto.`,
     faqs: [
-      { question: `Quanto custa impermeabilizar um sofá ${prep} ${city}?`, answer: `A impermeabilização de sofás ${prep} ${city} custa 59€ (1 lugar), 79€ (2 lugares) e 99€ (3 lugares). O pack limpeza + impermeabilização numa única visita começa em 99€ para 1 lugar. Orçamento gratuito ${prep} ${city}.` },
-      { question: `A impermeabilização altera a textura do sofá?`, answer: `Não. O nosso produto de impermeabilização é completamente invisível e não altera a cor, textura ou respirabilidade do tecido.` },
-      { question: `Quanto tempo dura a impermeabilização?`, answer: `A nossa impermeabilização profissional dura entre 5 a 10 anos, dependendo do uso e tipo de tecido. Oferecemos garantia incluída.` },
-      { question: `Vale a pena impermeabilizar o sofá?`, answer: `Sim, especialmente se tem crianças ou animais. A impermeabilização previne manchas e facilita a limpeza, poupando centenas de euros em substituição de estofos a longo prazo.` },
+      { question: `Quanto custa impermeabilizar um sofá ${prep} ${city}?`, answer: `Versão Essencial: 59€ (1 lugar), 79€ (2 lugares) e 99€ (3 lugares). Versão Premium: 79€ (1 lugar), 99€ (2 lugares) e 129€ (3 lugares). O pack limpeza + impermeabilização Essencial numa única visita começa em 99€ para 1 lugar. Orçamento gratuito ${prep} ${city}.` },
+      { question: `A impermeabilização altera a textura do sofá?`, answer: `Não. Nas duas versões, o produto de impermeabilização é completamente invisível e não altera a cor, textura ou respirabilidade do tecido.` },
+      { question: `Quanto tempo dura a impermeabilização?`, answer: `Depende da versão. A Essencial, à base de água, aguenta até 2 lavagens e dura 1 a 2 anos consoante o uso. A Premium, à base de diluente e mais resistente ao desgaste, aguenta até 5 lavagens e dura até 5 anos.` },
+      { question: `Vale a pena impermeabilizar o sofá?`, answer: `Sim, especialmente se tem crianças ou animais, caso em que a versão Premium costuma compensar mais a longo prazo. A impermeabilização previne manchas e facilita a limpeza, poupando na substituição de estofos.` },
     ],
   };
 }

@@ -134,7 +134,7 @@ export const packs: PackCombo[] = [
     id: 'sofa-colchao',
     name: 'Pack Sofá + Colchão',
     slug: 'pack-sofa-e-colchao',
-    tagline: 'O pack mais completo para o teu quarto e sala',
+    tagline: 'O pack mais completo para o seu quarto e sala',
     description: 'Limpeza profissional do sofá e do colchão no mesmo dia. Uma visita, dois resultados, 10% de desconto garantido.',
     discountPct: 0.10,
     selectors: [
@@ -182,7 +182,7 @@ export const packs: PackCombo[] = [
     id: 'sofa-impermeabilizacao',
     name: 'Pack Sofá + Impermeabilização',
     slug: 'pack-sofa-impermeabilizacao',
-    tagline: 'Limpa e protege: o tratamento mais completo para o teu sofá',
+    tagline: 'Limpa e protege: o tratamento mais completo para o seu sofá',
     description: 'Limpeza profunda e impermeabilização na mesma visita. Mais eficaz (impermeabiliza sobre tecido limpo), uma única deslocação e preço VIP.',
     discountPct: 0,
     selectors: [

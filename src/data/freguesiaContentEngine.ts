@@ -566,7 +566,7 @@ const faqsByService: Record<string, FAQTemplate[]> = {
   "impermeabilizacao": [
     {
       question: (svc, f) => `Quanto custa a impermeabilização de sofá em ${f}?`,
-      answer: (svc, f, price, c) => `A impermeabilização em ${f}, ${c} começa a partir de ${price}. É frequentemente mais económico combinar com a limpeza num único serviço. Peça o seu orçamento.`,
+      answer: (svc, f, price, c) => `Em ${f}, ${c}, a versão Essencial começa a partir de ${price} e a versão Premium, mais resistente e duradoura, tem um valor um pouco superior. É frequentemente mais económico combinar a Essencial com a limpeza num único serviço. Peça o seu orçamento.`,
     },
     {
       question: (svc, f) => `Fazem impermeabilização ao domicílio em ${f}?`,
@@ -574,7 +574,11 @@ const faqsByService: Record<string, FAQTemplate[]> = {
     },
     {
       question: (svc, f) => `Quanto tempo dura o efeito da impermeabilização em ${f}?`,
-      answer: (svc, f, price, c) => `Em condições normais de uso em ${f}, o efeito da impermeabilização dura entre 2 a 3 anos. A duração depende do nível de uso e do tipo de tecido.`,
+      answer: (svc, f, price, c) => `Depende da versão escolhida. Em ${f}, a versão Essencial (à base de água) dura entre 1 a 2 anos consoante o uso. A versão Premium (à base de diluente), mais resistente ao desgaste, dura até 5 anos e aguenta mais lavagens.`,
+    },
+    {
+      question: (svc, f) => `Qual a diferença entre a Essencial e a Premium em ${f}?`,
+      answer: (svc, f, price, c) => `A Essencial é à base de água e aguenta até 2 lavagens. A Premium é à base de diluente, mais resistente ao desgaste, e aguenta até 5 lavagens, com proteção real até 5 anos. Para casas com crianças ou animais em ${f}, costumamos recomendar a Premium.`,
     },
     {
       question: (svc, f) => `A impermeabilização altera o aspeto do sofá em ${f}?`,

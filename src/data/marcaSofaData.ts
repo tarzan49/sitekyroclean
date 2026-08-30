@@ -280,7 +280,7 @@ export const marcas: MarcaSofa[] = [
     faqs: [
       {
         question: "Tratam tanto os sofás de tecido como de couro do Moviflor?",
-        answer: "Sim, tratamos todos os materiais Moviflor. A avaliação prévia gratuita garante o tratamento adequado para o modelo exato do teu sofá.",
+        answer: "Sim, tratamos todos os materiais Moviflor. A avaliação prévia gratuita garante o tratamento adequado para o modelo exato do seu sofá.",
       },
       {
         question: "Conseguem remover cheiro de cigarro ou animais de um sofá Moviflor?",
@@ -288,7 +288,7 @@ export const marcas: MarcaSofa[] = [
       },
       {
         question: "O serviço Kyro Clean inclui transporte ou recolha do sofá Moviflor?",
-        answer: "Não. O serviço é ao domicílio: deslocamo-nos até à tua casa. Sem necessidade de mover ou transportar o sofá.",
+        answer: "Não. O serviço é ao domicílio: deslocamo-nos até à sua casa. Sem necessidade de mover ou transportar o sofá.",
       },
     ],
   },

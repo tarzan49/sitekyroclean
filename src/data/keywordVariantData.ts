@@ -47,7 +47,7 @@ const SERVICE_META: Record<ServiceKey, {
 }> = {
   sofa:      { label: 'Sofá',      labelPlural: 'Sofás',      canonicalBase: 'limpeza-sofas',     priceFrom: '49€',     waterproofPriceFrom: '59€'      },
   colchao:   { label: 'Colchão',   labelPlural: 'Colchões',   canonicalBase: 'limpeza-colchoes',  priceFrom: '59€' },
-  tapetes:   { label: 'Tapetes',   labelPlural: 'Tapetes',    canonicalBase: 'limpeza-tapetes',   priceFrom: '12€/m²'                                    },
+  tapetes:   { label: 'Tapetes',   labelPlural: 'Tapetes',    canonicalBase: 'limpeza-tapetes',   priceFrom: '15€/m²'                                    },
   cadeiras:  { label: 'Cadeiras',  labelPlural: 'Cadeiras',   canonicalBase: 'limpeza-cadeiras',  priceFrom: '20€',     waterproofPriceFrom: '25€/cad.'    },
   alcatifas: { label: 'Alcatifas', labelPlural: 'Alcatifas',  canonicalBase: 'limpeza-alcatifas', priceFrom: '3€/m²'                                    },
 };
@@ -164,7 +164,7 @@ function content_higienizacao_tapetes(loc: string, ctx: string): ContentBlock {
       { question: `A higienização remove os alergénios de cão e gato do tapete?`, answer: `Sim. O processo remove pelos, caspa e todos os alergénios de animais das fibras em profundidade. O aspirador doméstico remove os pelos visíveis mas não atinge estes alergénios microscópicos.` },
       { question: `Fazem higienização de tapetes ao domicílio em ${loc} ou tenho de os entregar?`, answer: `Fazemos ao domicílio, sem necessidade de transporte. Deslocamo-nos a ${loc} com todo o equipamento. Para tapetes muito delicados podemos fazer recolha e tratamento nas nossas instalações.` },
       { question: `Posso tentar higienizar o tapete em casa com um aspirador potente?`, answer: `O aspirador doméstico remove sujidade solta da superfície. Para eliminar os ácaros e patogénicos das camadas profundas das fibras é necessário equipamento profissional e produtos certificados.` },
-      { question: `Qual o preço mínimo de higienização de tapete em ${loc}?`, answer: `A partir de 12€/m², com preço mínimo de 25€ por serviço. O preço final depende do tipo de fibra e estado do tapete. Orçamento gratuito ao domicílio em ${loc}.` },
+      { question: `Qual o preço mínimo de higienização de tapete em ${loc}?`, answer: `A partir de 15€/m², com preço mínimo de 25€ por serviço. O preço final depende do tipo de fibra e estado do tapete. Orçamento gratuito ao domicílio em ${loc}.` },
     ],
     problems: [
       { title: "Criança que brinca no chão com espirros frequentes", description: "O tapete concentra ácaros, pólen e fungos nas fibras. Quando a criança rasteja ou brinca, inalha estes alergénios em concentração máxima ao nível do chão." },
@@ -328,7 +328,7 @@ function content_lavagem_colchao(loc: string, ctx: string): ContentBlock {
 
 function content_lavagem_tapetes(loc: string, ctx: string): ContentBlock {
   return {
-    intro: `Precisa de lavar tapetes em ${loc}? A Kyro Clean Solutions faz lavagem especializada de tapetes de todos os tipos (persas, orientais, modernos e de lã) com extração profissional e recolha ao domicílio em ${loc} e ${ctx}. Preços desde 12€/m².`,
+    intro: `Precisa de lavar tapetes em ${loc}? A Kyro Clean Solutions faz lavagem especializada de tapetes de todos os tipos (persas, orientais, modernos e de lã) com extração profissional e recolha ao domicílio em ${loc} e ${ctx}. Preços desde 15€/m².`,
     whatIs: `A lavagem profissional retira a sujidade compactada que anos de aspiração deixaram para trás nas fibras, restaura as cores e o toque originais. Feita com produtos adaptados ao tipo de fibra (lã, seda, sintético ou persa) para que o tapete não corra riscos em ${loc}.`,
     benefits: [
       'Lavagem especializada para tapetes persas e orientais',
@@ -349,7 +349,7 @@ function content_lavagem_tapetes(loc: string, ctx: string): ContentBlock {
       { question: `A lavagem preserva as cores originais de tapetes naturais?`, answer: `Sim. A extração profissional remove a sujidade que opaca as cores, revelando os tons originais das fibras. Em tapetes persas e orientais usamos técnicas específicas que realçam as cores sem os danificar.` },
       { question: `A lavagem remove os pelos de cão e gato presos nas fibras do tapete?`, answer: `Sim. O processo de extração remove pelos, caspa e alergénios de animais que ficam presos nas fibras e que o aspirador comum não consegue retirar completamente.` },
       { question: `Quanto tempo demora a lavagem e secagem de um tapete de lã?`, answer: `O processo de lavagem demora entre 3 a 5 dias úteis para tapetes de lã (secagem mais lenta para preservar as fibras). Tapetes sintéticos ficam prontos em 1 a 2 dias.` },
-      { question: `Qual o preço mínimo para lavagem de tapete pequeno em ${loc}?`, answer: `Preço mínimo de 25€ por tapete, a partir de 12€/m² para médios e grandes. O preço final depende do tipo de fibra e estado. Orçamento gratuito com recolha em ${loc}.` },
+      { question: `Qual o preço mínimo para lavagem de tapete pequeno em ${loc}?`, answer: `Preço mínimo de 25€ por tapete, a partir de 15€/m² para médios e grandes. O preço final depende do tipo de fibra e estado. Orçamento gratuito com recolha em ${loc}.` },
     ],
     problems: [
       { title: "Manchas de café, molho ou vinho que ficaram", description: "As fibras absorvem líquidos em segundos. Quanto mais tempo passam, mais profundas ficam. A extração profissional remove a grande maioria das manchas antigas, mesmo de anos." },
@@ -439,32 +439,32 @@ function content_lavagem_alcatifas(loc: string, ctx: string): ContentBlock {
 
 function content_impermeabilizacao_sofa(loc: string, ctx: string): ContentBlock {
   return {
-    intro: `A impermeabilização de sofás em ${loc} cria uma barreira invisível contra líquidos, manchas e gordura, protegendo o seu investimento por anos sem alterar o toque ou a aparência do tecido. A Kyro Clean Solutions aplica tratamento de nano-partículas certificado em ${loc} e ${ctx}, com resultados garantidos.`,
-    whatIs: `Este tratamento cria uma barreira invisível no tecido do sofá: a próxima vez que cair café, vinho ou sumo, o líquido fica à superfície e limpa-se com um pano, sem mancha, sem stress. O toque e o aspeto do sofá ficam exactamente iguais, e a proteção dura anos em ${loc}.`,
+    intro: `A impermeabilização de sofás em ${loc} cria uma barreira invisível contra líquidos, manchas e gordura, protegendo o seu investimento sem alterar o toque ou a aparência do tecido. A Kyro Clean Solutions aplica tratamento certificado em ${loc} e ${ctx}, em duas versões: Essencial e Premium.`,
+    whatIs: `Este tratamento cria uma barreira invisível no tecido do sofá: a próxima vez que cair café, vinho ou sumo, o líquido fica à superfície e limpa-se com um pano, sem mancha, sem stress. O toque e o aspeto do sofá ficam exactamente iguais. A versão Essencial (à base de água) protege por 1 a 2 anos, e a versão Premium (à base de diluente, mais resistente ao desgaste) protege até 5 anos em ${loc}.`,
     benefits: [
       'Barreira invisível contra líquidos, manchas e gordura',
       'Toque e aspeto do tecido 100% preservados',
-      'Proteção de 2 a 5 anos com uma única aplicação',
-      'Reduz a frequência e custo das limpezas futuras',
+      'Essencial: até 2 lavagens, 1 a 2 anos de proteção real',
+      'Premium: até 5 lavagens, até 5 anos de proteção real, mais resistente ao desgaste',
       `Serviço ao domicílio em ${loc}, sem deslocação do sofá`,
       'Seguro para tecidos naturais, sintéticos e veludo',
     ],
     processSteps: [
       { step: 1, title: 'Avaliação do tecido', description: `Inspecção do tipo de fibra e estado do sofá em ${loc} para confirmar compatibilidade.` },
       { step: 2, title: 'Limpeza prévia', description: 'O sofá deve estar limpo antes da aplicação. Recomendamos limpeza prévia para resultado ideal.' },
-      { step: 3, title: 'Aplicação de nano-partículas', description: 'Tratamento uniforme em todo o tecido com o produto impermeabilizante certificado.' },
+      { step: 3, title: 'Escolha da versão e aplicação', description: 'Essencial (à base de água) ou Premium (à base de diluente), aplicada uniformemente em todo o tecido.' },
       { step: 4, title: 'Secagem e ativação', description: 'A barreira ativa-se na secagem: sofá pronto a usar em 2 a 4 horas.' },
     ],
     faqs: [
-      { question: `A impermeabilização altera o toque ou a cor do sofá?`, answer: `Não. O tratamento é completamente invisível e não altera a maciez, a cor nem a textura do tecido. O sofá fica igual ao toque, só que repele líquidos.` },
-      { question: `Quanto tempo dura a impermeabilização de um sofá?`, answer: `Com uso normal, a proteção dura 2 a 5 anos. Em famílias com crianças ou animais de estimação, onde há mais probabilidade de derrames, recomendamos reaplicação ao fim de 2 anos.` },
-      { question: `Preciso de limpar o sofá antes de o impermeabilizar?`, answer: `Sim, e é altamente recomendado. Aplicar impermeabilização sobre tecido sujo reduz significativamente a eficácia e duração da barreira. Oferecemos o pack limpeza + impermeabilização com desconto em ${loc}.` },
-      { question: `A impermeabilização funciona em sofás de veludo, pele e microfibra?`, answer: `Sim. Adaptamos a formulação ao tipo de tecido. Para veludo e tecidos delicados usamos produtos específicos que preservam a textura e o brilho característico do material.` },
-      { question: `Qual a diferença de preço entre só impermeabilizar e fazer o pack limpeza + impermeabilização?`, answer: `Só impermeabilização: 59€ (1L), 79€ (2L), 99€ (3L). Pack com limpeza: 99€ (1L), 145€ (2L), 169€ (3L). O pack representa uma poupança considerável e garante maior eficácia da proteção.` },
+      { question: `A impermeabilização altera o toque ou a cor do sofá?`, answer: `Não. Em ambas as versões, o tratamento é completamente invisível e não altera a maciez, a cor nem a textura do tecido. O sofá fica igual ao toque, só que repele líquidos.` },
+      { question: `Quanto tempo dura a impermeabilização de um sofá?`, answer: `Depende da versão. A Essencial, à base de água, dura 1 a 2 anos com uso normal e aguenta até 2 lavagens. A Premium, à base de diluente e mais resistente ao desgaste, dura até 5 anos e aguenta até 5 lavagens. Em famílias com crianças ou animais de estimação, a Premium costuma compensar mais.` },
+      { question: `Preciso de limpar o sofá antes de o impermeabilizar?`, answer: `Sim, e é altamente recomendado. Aplicar impermeabilização sobre tecido sujo reduz significativamente a eficácia e duração da barreira. Oferecemos o pack limpeza + impermeabilização Essencial com desconto em ${loc}.` },
+      { question: `A impermeabilização funciona em sofás de veludo, pele e microfibra?`, answer: `Sim. Adaptamos a formulação ao tipo de tecido, em ambas as versões. Para veludo e tecidos delicados usamos produtos específicos que preservam a textura e o brilho característico do material.` },
+      { question: `Qual a diferença entre a Essencial e a Premium?`, answer: `Essencial (à base de água): 59€ (1L), 79€ (2L), 99€ (3L), aguenta até 2 lavagens. Premium (à base de diluente): 79€ (1L), 99€ (2L), 129€ (3L), aguenta até 5 lavagens e dura até 5 anos. O pack com limpeza (99€/145€/169€) está sempre associado à Essencial.` },
     ],
     problems: [
-      { title: "Sofá novo que quer proteger desde o início", description: "É muito mais fácil e económico proteger do que tratar manchas após o facto. Uma aplicação cria uma barreira invisível que dura 2 a 5 anos sem alterar o toque ou a cor." },
-      { title: "Família com crianças pequenas ou animais de estimação", description: "Acidentes são inevitáveis. Sem proteção, cada derramamento pode tornar-se uma mancha permanente. A impermeabilização repele líquidos antes de penetrarem nas fibras." },
+      { title: "Sofá novo que quer proteger desde o início", description: "É muito mais fácil e económico proteger do que tratar manchas após o facto. A versão Premium cria uma barreira invisível que dura até 5 anos sem alterar o toque ou a cor." },
+      { title: "Família com crianças pequenas ou animais de estimação", description: "Acidentes são inevitáveis. Sem proteção, cada derramamento pode tornar-se uma mancha permanente. Para uso intenso, a versão Premium repele líquidos por mais tempo e aguenta mais lavagens do que a Essencial." },
       { title: "Tecido delicado como veludo, pele ou microfibra", description: "Estes tecidos são difíceis de limpar sem danificar. Um erro de limpeza pode ser irreversível. A impermeabilização evita que o problema aconteça desde o início." },
     ],
     testimonials: [
@@ -476,28 +476,28 @@ function content_impermeabilizacao_sofa(loc: string, ctx: string): ContentBlock 
 
 function content_impermeabilizacao_cadeiras(loc: string, ctx: string): ContentBlock {
   return {
-    intro: `A impermeabilização de cadeiras estofadas em ${loc} protege o tecido de derramamentos, gordura e uso intensivo, ideal para restaurantes, escritórios e residências que querem cadeiras com aspeto cuidado por mais tempo. Kyro Clean Solutions ao domicílio em ${loc} e ${ctx}.`,
-    whatIs: `Uma aplicação cria uma barreira transparente nas fibras das cadeiras que repele líquidos e gordura. A limpeza do dia a dia fica reduzida a uma passagem de pano húmido, e o tecido mantém o aspeto cuidado por anos. Aplicamos ao domicílio em ${loc}, de 2 cadeiras a centenas.`,
+    intro: `A impermeabilização de cadeiras estofadas em ${loc} protege o tecido de derramamentos, gordura e uso intensivo, ideal para restaurantes, escritórios e residências que querem cadeiras com aspeto cuidado por mais tempo. Kyro Clean Solutions ao domicílio em ${loc} e ${ctx}, com versão Essencial e versão Premium.`,
+    whatIs: `Uma aplicação cria uma barreira transparente nas fibras das cadeiras que repele líquidos e gordura. A limpeza do dia a dia fica reduzida a uma passagem de pano húmido. A versão Essencial (à base de água) mantém o aspeto cuidado por 1 a 2 anos, e a versão Premium (à base de diluente, mais resistente ao desgaste) por até 5 anos. Aplicamos ao domicílio em ${loc}, de 2 cadeiras a centenas.`,
     benefits: [
       'Tecido repele derramamentos, café e gordura',
       'Manutenção diária reduzida a uma simples passagem de pano',
-      'Prolonga o aspeto cuidado das cadeiras por anos',
-      'Ideal para restaurantes, hotéis e escritórios',
+      'Essencial: até 2 lavagens. Premium: até 5 lavagens, mais resistente ao desgaste',
+      'Ideal para restaurantes, hotéis e escritórios de uso intenso (recomendamos a Premium)',
       `Aplicação ao domicílio em ${loc}, sem transporte`,
-      'Descontos progressivos para lotes acima de 6 cadeiras',
+      'Descontos progressivos para lotes acima de 4 cadeiras',
     ],
     processSteps: [
       { step: 1, title: 'Avaliação do tecido', description: `Inspecção do tipo de fibra de cada cadeira em ${loc}: veludo, mesh, tecido ou pele sintética.` },
       { step: 2, title: 'Limpeza prévia', description: 'Recomendamos limpeza das cadeiras antes da aplicação para máxima eficácia da barreira.' },
-      { step: 3, title: 'Aplicação do impermeabilizante', description: 'Tratamento uniforme com produto certificado, adaptado ao tipo de tecido.' },
+      { step: 3, title: 'Escolha da versão e aplicação', description: 'Essencial ou Premium, aplicada uniformemente com produto certificado, adaptado ao tipo de tecido.' },
       { step: 4, title: 'Secagem rápida', description: 'Cadeiras prontas a usar em 1 a 2 horas, sem interrupção do negócio.' },
     ],
     faqs: [
       { question: `A impermeabilização das cadeiras facilita a limpeza diária do restaurante?`, answer: `Sim, muito. Derrames de vinho, café e molhos ficam à superfície e limpam-se com um pano, em vez de penetrarem nas fibras e criarem manchas permanentes. O tempo de limpeza diária reduz significativamente.` },
-      { question: `A impermeabilização funciona em cadeiras de pele sintética ou só em tecido?`, answer: `Funciona nos dois. Para pele sintética o tratamento reforça a repelência natural do material. Para tecido (veludo, chenille, mesh) cria uma barreira nas fibras. Adaptamos o produto ao material.` },
+      { question: `A impermeabilização funciona em cadeiras de pele sintética ou só em tecido?`, answer: `Funciona nos dois. Para pele sintética o tratamento reforça a repelência natural do material. Para tecido (veludo, chenille, mesh) cria uma barreira nas fibras. Adaptamos o produto ao material, em ambas as versões.` },
       { question: `Quanto tempo ficam as cadeiras fora de uso depois da impermeabilização?`, answer: `A impermeabilização é rápida (15 a 30 minutos por lote) e a secagem demora 1 a 2 horas. As cadeiras ficam prontas a usar no mesmo dia, sem necessidade de fechar o espaço.` },
-      { question: `Qual o desconto para impermeabilizar um lote de cadeiras de restaurante?`, answer: `25€/cad. para as primeiras 4 cadeiras, 20€/cad. da 5ª à 10ª. Para lotes acima de 10 cadeiras, orçamento personalizado para o seu restaurante em ${loc}.` },
-      { question: `A impermeabilização das cadeiras resiste a derrames de gordura e molhos?`, answer: `Sim. A barreira repele gordura, molhos, vinho e bebidas. Para derrames de produtos muito ácidos (vinagre, sumos cítricos) é recomendado limpar rapidamente para preservar a barreira mais tempo.` },
+      { question: `Qual a diferença de preço entre a Essencial e a Premium para cadeiras?`, answer: `Essencial: 25€/un. para as primeiras 4 cadeiras, 20€/un. da 5ª à 10ª. Premium: 35€/un. para as primeiras 4, 30€/un. da 5ª à 10ª. Para lotes acima de 10 cadeiras, orçamento personalizado para o seu restaurante em ${loc}.` },
+      { question: `Para restaurantes com uso intenso, vale a pena a versão Premium?`, answer: `Sim. A Premium aguenta até 5 lavagens contra 2 da Essencial, e a proteção real dura até 5 anos em vez de 1 a 2. Em cadeiras de restaurante, sujeitas a limpeza diária, esta diferença compensa o investimento inicial mais alto.` },
     ],
     problems: [
       { title: "Cadeiras de jantar usadas diariamente", description: "A mesa de jantar é a zona de maior risco para derrames. Sem proteção, uma taça de vinho ou molho pode danificar o tecido de forma permanente e irreversível." },

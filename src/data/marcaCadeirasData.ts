@@ -142,7 +142,7 @@ export const marcasCadeiras: MarcaCadeiras[] = [
     faqs: [
       { question: "Tratam tanto cadeiras de tecido como de couro do Moviflor?", answer: "Sim, tratamos todos os materiais Moviflor. A avaliação prévia gratuita garante o tratamento adequado para cada revestimento." },
       { question: "Conseguem limpar um conjunto de 6 cadeiras Moviflor na mesma visita?", answer: "Sim, e o preço por unidade desce a partir da 5ª cadeira. O conjunto todo fica pronto na mesma visita." },
-      { question: "O serviço inclui transporte das cadeiras Moviflor?", answer: "Não. O serviço é ao domicílio: deslocamo-nos até à tua casa, sem necessidade de mover ou transportar as cadeiras." },
+      { question: "O serviço inclui transporte das cadeiras Moviflor?", answer: "Não. O serviço é ao domicílio: deslocamo-nos até à sua casa, sem necessidade de mover ou transportar as cadeiras." },
     ],
   },
   {

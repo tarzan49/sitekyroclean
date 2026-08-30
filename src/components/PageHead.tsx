@@ -52,7 +52,7 @@ const routeMeta: Record<string, { pt: PageMeta; en: PageMeta; es: PageMeta }> = 
   },
   "/limpeza-tapetes": {
     pt: {
-      title: "Limpeza e Lavagem de Tapetes | Desde 12€/m² | Kyro Clean Solutions",
+      title: "Limpeza e Lavagem de Tapetes | Desde 15€/m² | Kyro Clean Solutions",
       description: "Lavagem profissional de tapetes com extração profunda. Removemos sujidade, manchas e alergénios. Recolha e entrega disponível em todo o país.",
     },
     en: {
@@ -60,7 +60,7 @@ const routeMeta: Record<string, { pt: PageMeta; en: PageMeta; es: PageMeta }> = 
       description: "Professional rug cleaning with deep professional extraction. We remove dirt, stains and allergens. Pick-up and delivery available.",
     },
     es: {
-      title: "Limpieza y Lavado de Alfombras | Desde 12€/m² | Kyro Clean Solutions",
+      title: "Limpieza y Lavado de Alfombras | Desde 15€/m² | Kyro Clean Solutions",
       description: "Lavado profesional de alfombras con extracción profunda. Eliminamos suciedad, manchas y alérgenos.",
     },
   },
@@ -94,16 +94,16 @@ const routeMeta: Record<string, { pt: PageMeta; en: PageMeta; es: PageMeta }> = 
   },
   "/impermeabilizacao": {
     pt: {
-      title: "Impermeabilização de Estofos | Kyro Clean Solutions | Proteção até 10 anos",
-      description: "Impermeabilização profissional de sofás e cadeiras. Proteção invisível contra manchas e líquidos com garantia até 10 anos.",
+      title: "Impermeabilização de Estofos | Kyro Clean Solutions | Essencial ou Premium",
+      description: "Impermeabilização profissional de sofás e cadeiras. Versão Essencial e versão Premium, com proteção invisível e real até 5 anos.",
     },
     en: {
-      title: "Upholstery Waterproofing | Kyro Clean Solutions | Up to 10-Year Protection",
-      description: "Professional waterproofing for sofas and chairs. Invisible protection against stains and liquids with up to 10-year guarantee.",
+      title: "Upholstery Waterproofing | Kyro Clean Solutions | Essential or Premium",
+      description: "Professional waterproofing for sofas and chairs. Essential and Premium tiers, with invisible protection lasting up to 5 years.",
     },
     es: {
-      title: "Impermeabilización de Tapizados | Kyro Clean Solutions | Protección hasta 10 años",
-      description: "Impermeabilización profesional de sofás y sillas. Protección invisible contra manchas y líquidos.",
+      title: "Impermeabilización de Tapizados | Kyro Clean Solutions | Esencial o Premium",
+      description: "Impermeabilización profesional de sofás y sillas. Versión Esencial y versión Premium, con protección invisible real hasta 5 años.",
     },
   },
   "/packs": {

@@ -92,8 +92,8 @@ const allFaqs: FAQ[] = [
   {
     id: "quanto-custa-limpar-tapete",
     question: "Quanto custa limpar um tapete profissionalmente?",
-    answer: <>A <Link to="/limpeza-tapetes" className="text-gold hover:underline font-medium">limpeza profissional de tapetes</Link> é calculada por metro quadrado: <strong>12€/m² até 5 m²</strong>, 10€/m² até 10 m² e 9€/m² até 15 m². Exemplo: um tapete de sala de 8 m² custa 90€. Para mais de 15 m², orçamento personalizado. A deslocação custa a partir de 10€ no Porto e aumenta com a distância, seguindo a mesma tabela dos restantes serviços. O tapete fica pronto a usar em 2 a 4 horas. Tapetes persas, de seda ou lã natural têm processo adaptado ao material sem acréscimo de preço.</>,
-    plainAnswer: "Limpeza de tapetes: 12€/m² até 5m², 10€/m² até 10m², 9€/m² até 15m². Exemplo: tapete 8m² = 90€. Mais de 15m²: orçamento personalizado. Deslocação a partir de 10€.",
+    answer: <>A <Link to="/limpeza-tapetes" className="text-gold hover:underline font-medium">limpeza profissional de tapetes</Link> é calculada por metro quadrado: <strong>15€/m² até 3 m²</strong>, 12,5€/m² até 5 m², 11,5€/m² até 8 m², 10,5€/m² até 10 m² e 10€/m² até 15 m². Exemplo: um tapete de sala de 8 m² custa 104,50€. Para mais de 15 m², orçamento personalizado. A deslocação custa a partir de 10€ no Porto e aumenta com a distância, seguindo a mesma tabela dos restantes serviços. O tapete fica pronto a usar em 2 a 4 horas. Tapetes persas, de seda ou lã natural têm processo adaptado ao material sem acréscimo de preço.</>,
+    plainAnswer: "Limpeza de tapetes: 15€/m² até 3m², 12,5€/m² até 5m², 11,5€/m² até 8m², 10,5€/m² até 10m², 10€/m² até 15m². Exemplo: tapete 8m² = 104,50€. Mais de 15m²: orçamento personalizado. Deslocação a partir de 10€.",
   },
   {
     id: "quanto-custa-limpar-alcatifa",
@@ -104,8 +104,8 @@ const allFaqs: FAQ[] = [
   {
     id: "quanto-custa-impermeabilizacao",
     question: "Quanto custa impermeabilizar um sofá?",
-    answer: <>A <Link to="/impermeabilizacao" className="text-gold hover:underline font-medium">impermeabilização profissional</Link> para sofás custa <strong>59€ (1 lugar), 79€ (2 lugares) e 99€ (3 lugares)</strong>. Quando contratada em pack com a limpeza, o total é mais baixo do que os dois serviços separados. A impermeabilização cria uma barreira invisível nas fibras que impede a absorção de líquidos durante 12 a 18 meses, especialmente recomendada em casas com crianças ou animais.</>,
-    plainAnswer: "Impermeabilização sofá: 59€ (1 lugar), 79€ (2 lugares), 99€ (3 lugares). Pack limpeza+impermeabilização tem desconto. Efeito dura 12 a 18 meses.",
+    answer: <>A <Link to="/impermeabilizacao" className="text-gold hover:underline font-medium">impermeabilização profissional</Link> para sofás existe em duas versões. A <strong>Essencial</strong> (à base de água) custa <strong>59€ (1 lugar), 79€ (2 lugares) e 99€ (3 lugares)</strong>, aguenta até 2 lavagens e dura 1 a 2 anos. A <strong>Premium</strong> (à base de diluente, mais resistente ao desgaste) custa <strong>79€ (1 lugar), 99€ (2 lugares) e 129€ (3 lugares)</strong>, aguenta até 5 lavagens e dura até 5 anos. Quando a Essencial é contratada em pack com a limpeza, o total é mais baixo do que os dois serviços separados. Para casas com crianças ou animais, a Premium costuma compensar mais.</>,
+    plainAnswer: "Impermeabilização sofá: Essencial 59€/79€/99€ (até 2 lavagens, 1 a 2 anos). Premium 79€/99€/129€ (até 5 lavagens, até 5 anos). Pack limpeza+Essencial tem desconto.",
   },
   {
     id: "diferenca-tapete-alcatifa",

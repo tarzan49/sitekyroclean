@@ -35,9 +35,11 @@ const priceTables: Record<string, { item: string; price: string; note?: string }
     { item: "Cabeceira estofada", price: "Desde 20€", note: "add-on" },
   ],
   "limpeza-tapetes": [
-    { item: "Tapete até 5m²", price: "12€/m²" },
-    { item: "Tapete até 10m²", price: "10€/m²" },
-    { item: "Tapete até 15m²", price: "9€/m²" },
+    { item: "Tapete até 3m²", price: "15€/m²" },
+    { item: "Tapete de 3 a 5m²", price: "12,5€/m²" },
+    { item: "Tapete de 5 a 8m²", price: "11,5€/m²" },
+    { item: "Tapete de 8 a 10m²", price: "10,5€/m²" },
+    { item: "Tapete de 10 a 15m²", price: "10€/m²" },
     { item: "Tapete +15m²", price: "Sob consulta" },
     { item: "Tapete persa/oriental", price: "Sob consulta", note: "tratamento premium" },
   ],
@@ -54,10 +56,10 @@ const priceTables: Record<string, { item: string; price: string; note?: string }
     { item: "Alcatifa +40m²", price: "Sob consulta" },
   ],
   "impermeabilizacao": [
-    { item: "Sofá 1 lugar", price: "Desde 59€" },
-    { item: "Sofá 2 lugares", price: "Desde 79€" },
-    { item: "Sofá 3 lugares", price: "Desde 99€" },
-    { item: "Cadeiras (por unidade)", price: "Desde 25€" },
+    { item: "Sofá 1 lugar", price: "Desde 59€", note: "Essencial, 79€ na Premium" },
+    { item: "Sofá 2 lugares", price: "Desde 79€", note: "Essencial, 99€ na Premium" },
+    { item: "Sofá 3 lugares", price: "Desde 99€", note: "Essencial, 129€ na Premium" },
+    { item: "Cadeiras (por unidade)", price: "Desde 25€", note: "Essencial, 35€ na Premium" },
     { item: "Cabeceira", price: "Desde 15€" },
   ],
 };
@@ -126,7 +128,7 @@ const priceFaqs: Record<string, { question: string; answer: string }[]> = {
     { question: "A deslocação em {city} tem custo?", answer: "Sim, a partir de {travelFee} em {city} e arredores, consoante a distância ao centro. O valor exato é mostrado no orçamento antes de confirmar." },
   ],
   "limpeza-tapetes": [
-    { question: "Quanto custa limpar um tapete em {city}?", answer: "A limpeza de tapetes em {city} começa a partir de 12€/m². Tapetes artesanais, persas ou de seda podem ter preços especiais. Peça orçamento gratuito." },
+    { question: "Quanto custa limpar um tapete em {city}?", answer: "A limpeza de tapetes em {city} começa a partir de 15€/m². Tapetes artesanais, persas ou de seda podem ter preços especiais. Peça orçamento gratuito." },
     { question: "Recolhem e entregam tapetes em {city}?", answer: "Sim, podemos recolher o tapete em {city}, limpá-lo no nosso centro e entregá-lo limpo na sua casa. O serviço de recolha e entrega está incluído." },
   ],
   "limpeza-cadeiras": [
@@ -137,8 +139,9 @@ const priceFaqs: Record<string, { question: string; answer: string }[]> = {
     { question: "Quanto custa limpar alcatifas em {city}?", answer: "A limpeza de alcatifas em {city} começa a partir de 3€/m². O preço depende da área total e estado da alcatifa." },
   ],
   "impermeabilizacao": [
-    { question: "Quanto custa impermeabilizar um sofá em {city}?", answer: "A impermeabilização de sofás em {city} custa desde 59€ (1 lugar), 79€ (2 lugares) e 99€ (3 lugares). Recomendamos combinar com limpeza para melhor resultado e preço especial." },
-    { question: "A impermeabilização vale a pena?", answer: "Sim. A impermeabilização protege contra manchas de líquidos e prolonga a vida útil do estofamento. É especialmente recomendada para famílias com crianças ou animais." },
+    { question: "Quanto custa impermeabilizar um sofá em {city}?", answer: "Versão Essencial: desde 59€ (1 lugar), 79€ (2 lugares) e 99€ (3 lugares). Versão Premium, mais resistente e duradoura: desde 79€ (1 lugar), 99€ (2 lugares) e 129€ (3 lugares). Recomendamos combinar a Essencial com limpeza para preço especial." },
+    { question: "Qual a diferença entre a Essencial e a Premium?", answer: "A Essencial, à base de água, aguenta até 2 lavagens e protege por 1 a 2 anos. A Premium, à base de diluente e mais resistente ao desgaste, aguenta até 5 lavagens e protege até 5 anos. Para famílias com crianças ou animais, a Premium costuma compensar mais." },
+    { question: "A impermeabilização vale a pena?", answer: "Sim. A impermeabilização protege contra manchas de líquidos e prolonga a vida útil do estofamento. É especialmente recomendada para famílias com crianças ou animais, sobretudo na versão Premium." },
   ],
 };
 

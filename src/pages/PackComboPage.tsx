@@ -272,14 +272,14 @@ const PackComboPage = () => {
                       {prices ? `${prices.packTotal}€` : '-'}
                     </p>
                     {prices && prices.savingsPct > 0 && (
-                      <p className="text-[10px] font-bold mt-2" style={{ color: "#D4AF37", opacity: 0.85 }}>Poupa {prices.savingsPct}%</p>
+                      <p className="text-[10px] font-bold mt-2" style={{ color: "#D4AF37", opacity: 0.85 }}>Poupe {prices.savingsPct}%</p>
                     )}
                   </div>
                 </div>
 
                 {prices && prices.savings > 0 && (
                   <div className="mx-5 mt-5 mb-5 px-4 py-3 rounded-sm flex items-center justify-center text-sm font-bold text-center" style={{ background: "rgba(74,222,128,0.10)", color: "#4ade80", border: "1px solid rgba(74,222,128,0.25)" }}>
-                    Poupa {prices.savings}€ nesta configuração. Compensa reservar o pack.
+                    Poupe {prices.savings}€ nesta configuração. Compensa reservar o pack.
                   </div>
                 )}
 

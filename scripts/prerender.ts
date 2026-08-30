@@ -694,8 +694,8 @@ export function prerenderRoutes(outDir: string): number {
       },
       {
         path: '/limpeza-tapetes',
-        title: 'Limpeza e Lavagem de Tapetes | Desde 12€/m² | Kyro Clean Solutions',
-        desc: 'Lavagem profissional de tapetes com extração profunda. Removemos sujidade, manchas e alergénios. Serviço ao domicílio em todo o país. Desde 12€/m².',
+        title: 'Limpeza e Lavagem de Tapetes | Desde 15€/m² | Kyro Clean Solutions',
+        desc: 'Lavagem profissional de tapetes com extração profunda. Removemos sujidade, manchas e alergénios. Serviço ao domicílio em todo o país. Desde 15€/m².',
         content: {
           h1: 'Limpeza e Lavagem de Tapetes ao Domicílio',
           intro: 'Limpeza profissional de tapetes ao domicílio com extração profunda. Removemos sujidade acumulada, manchas difíceis e alergénios. Tapetes persas, shaggy, sisal e todos os tipos tratados com produto específico ao material.',
@@ -708,7 +708,7 @@ export function prerenderRoutes(outDir: string): number {
             'Serviço ao domicílio sem necessidade de recolha',
           ],
           faqs: faqs([
-            { q: 'Quanto custa a limpeza de tapete?', a: 'O preço depende da área: até 5m² é 12€/m², de 5 a 10m² é 10€/m² e de 10 a 15m² é 9€/m². Para áreas maiores peça orçamento.' },
+            { q: 'Quanto custa a limpeza de tapete?', a: 'O preço depende da área: até 3m² é 15€/m², de 3 a 5m² é 12,5€/m², de 5 a 8m² é 11,5€/m², de 8 a 10m² é 10,5€/m² e de 10 a 15m² é 10€/m². Para áreas maiores peça orçamento.' },
             { q: 'Quanto tempo demora a limpeza de tapete?', a: 'O serviço demora 1 a 2 horas. O tapete fica seco em 4 a 8 horas, dependendo da espessura e material.' },
             { q: 'Que tipos de tapete limpam?', a: 'Limpamos todos os tipos: persas, shaggy, sisal, juta, lã, acrílico, polipropileno e fibras naturais. O produto é sempre adaptado ao material.' },
             { q: 'Fazem limpeza de tapetes ao domicílio?', a: 'Sim. O técnico desloca-se a sua casa com equipamento de extração profissional. Não precisa de entregar o tapete.' },
@@ -784,24 +784,24 @@ export function prerenderRoutes(outDir: string): number {
       },
       {
         path: '/impermeabilizacao',
-        title: 'Impermeabilização de Estofos | Proteção até 10 anos | Kyro Clean Solutions',
-        desc: 'Impermeabilização profissional de sofás e cadeiras. Proteção invisível contra manchas e líquidos. Duração até 10 anos. Desde 59€. Serviço ao domicílio.',
+        title: 'Impermeabilização de Estofos | Essencial ou Premium | Kyro Clean Solutions',
+        desc: 'Impermeabilização profissional de sofás e cadeiras. Versão Essencial e versão Premium, com proteção invisível real até 5 anos. Desde 59€. Serviço ao domicílio.',
         content: {
           h1: 'Impermeabilização de Estofos',
-          intro: 'Proteja os seus estofos com impermeabilização profissional ao domicílio. Barreira invisível contra manchas, líquidos e desgaste com duração até 10 anos. Ideal após limpeza ou em estofos novos.',
+          intro: 'Proteja os seus estofos com impermeabilização profissional ao domicílio. Barreira invisível contra manchas, líquidos e desgaste, em duas versões: Essencial e Premium. Ideal após limpeza ou em estofos novos.',
           benefits: [
             'Proteção invisível que não altera a textura nem a cor',
             'Repelência a líquidos, manchas de vinho e gordura',
-            'Duração até 10 anos com manutenção adequada',
+            'Essencial: até 2 lavagens, 1 a 2 anos de proteção real. Premium: até 5 lavagens, até 5 anos',
             'Reduz a frequência de limpezas necessárias',
-            'Ideal para famílias com crianças e animais domésticos',
+            'Ideal para famílias com crianças e animais domésticos (recomendamos a Premium)',
             'Produto certificado e eco-friendly',
           ],
           faqs: faqs([
-            { q: 'O que é a impermeabilização de estofos?', a: 'A impermeabilização cria uma barreira nano-tecnológica invisível na fibra do estofo que repele líquidos e dificulta a penetração de manchas. O tecido mantém a aparência e textura originais.' },
-            { q: 'Quanto custa a impermeabilização?', a: 'A impermeabilização de sofá começa a partir de 59€ para 1 lugar. Para cadeiras o preço parte de 25€ por unidade. Peça orçamento gratuito.' },
-            { q: 'Quanto tempo dura a impermeabilização?', a: 'A duração é de 2 a 10 anos dependendo do uso, tipo de tecido e produto aplicado. Recomendamos renovação após limpeza profissional.' },
-            { q: 'Posso fazer impermeabilização sem limpeza prévia?', a: 'Recomendamos sempre limpeza prévia para maior eficácia. Temos packs combinados de limpeza e impermeabilização com desconto.' },
+            { q: 'O que é a impermeabilização de estofos?', a: 'A impermeabilização cria uma barreira invisível na fibra do estofo que repele líquidos e dificulta a penetração de manchas. O tecido mantém a aparência e textura originais.' },
+            { q: 'Quanto custa a impermeabilização?', a: 'A versão Essencial começa a partir de 59€ para sofá de 1 lugar e 25€ por cadeira. A versão Premium começa a partir de 79€ para sofá de 1 lugar e 35€ por cadeira. Peça orçamento gratuito.' },
+            { q: 'Quanto tempo dura a impermeabilização?', a: 'Depende da versão. A Essencial, à base de água, dura 1 a 2 anos e aguenta até 2 lavagens. A Premium, à base de diluente e mais resistente ao desgaste, dura até 5 anos e aguenta até 5 lavagens.' },
+            { q: 'Posso fazer impermeabilização sem limpeza prévia?', a: 'Recomendamos sempre limpeza prévia para maior eficácia. Temos o Pack Proteção Total, que combina limpeza com a versão Essencial com desconto.' },
           ]),
         },
         extraSchemas: [

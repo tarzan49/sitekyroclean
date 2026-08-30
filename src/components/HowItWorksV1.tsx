@@ -35,7 +35,7 @@ const guarantees = [
   {
     icon: Droplets,
     titleFallback: "Proteção duradoura",
-    textFallback: "Impermeabilização com garantia até 10 anos.",
+    textFallback: "Impermeabilização Premium com proteção real até 5 anos.",
   },
 ];
 
