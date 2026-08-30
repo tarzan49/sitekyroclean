@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { X, ChevronRight, ChevronLeft, AlertTriangle } from 'lucide-react';
+import { X, ChevronRight, ChevronLeft, AlertTriangle, MessageCircle, Phone, CheckCircle2, CalendarClock, Star } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import { trackQuizEvent } from '@/lib/quizTracking';
@@ -20,12 +20,21 @@ import QuizStepLocation from './quiz/steps/QuizStepLocation';
 import QuizStepConfig from './quiz/steps/QuizStepConfig';
 import QuizUpsellOverlay from './quiz/steps/QuizUpsellOverlay';
 import QuizStepContact from './quiz/steps/QuizStepContact';
-import { calcChairWaterproof } from './quiz/quizHelpers';
+import { calcChairWaterproof, calcChairWaterproofPremium, calcChairClean, calcCarpetPrice } from './quiz/quizHelpers';
 import { WHATSAPP_BASE, BUSINESS_EMAIL } from '@/constants/business';
 import { QUIZ_STATE_CHANGE_EVENT } from '@/constants/quiz';
 import { useQuizPricing } from '@/hooks/use-quiz-pricing';
 import { useQuizUiEffects } from '@/hooks/use-quiz-ui-effects';
 import { useQuizSubmission } from '@/hooks/use-quiz-submission';
+import type { SocialProofCategory } from '@/hooks/use-quiz-ui-effects';
+
+const SOCIAL_PROOF_ICON: Record<SocialProofCategory, typeof MessageCircle> = {
+  whatsapp: MessageCircle,
+  call: Phone,
+  job: CheckCircle2,
+  booking: CalendarClock,
+  trust: Star,
+};
 
 
 interface QuizFormProps {
@@ -176,6 +185,13 @@ const QuizForm = ({
     discountedPrice,
     packDiscountedPrice,
   } = useQuizPricing(formData, sofaItems, mattressItems, upsellItems);
+
+  // Encomenda mínima: 50€. Sob orçamento fica sempre acima disso na prática, por
+  // isso só se aplica a pedidos com preço fechado.
+  const MIN_ORDER_VALUE = 50;
+  const effectiveTotal = packDiscountActive ? packDiscountedPrice : totalPrice;
+  const belowMinimum = !hasSobOrcamento && !hasUpsellSobItem && totalPrice > 0 && effectiveTotal < MIN_ORDER_VALUE;
+  const amountToMinimum = Math.max(0, Math.round((MIN_ORDER_VALUE - effectiveTotal) * 100) / 100);
 
   const {
     countdown,
@@ -373,42 +389,74 @@ const QuizForm = ({
   };
 
   const getServiceTypeLabel = () => {
+    if (formData.serviceType === 'waterproofing') {
+      return formData.waterproofingTier === 'premium' ? 'Impermeabilização Premium' : 'Impermeabilização Essencial';
+    }
     const labels: Record<string, string> = {
       cleaning: 'Higienização Profunda',
-      waterproofing: 'Impermeabilização Premium',
       both: 'Pack Proteção Total',
     };
     return labels[formData.serviceType] || '';
   };
 
+  // "Sob orçamento" for null (invalid/out-of-table), otherwise "X€" or "X,YZ€".
+  const fmtEuro = (n: number | null) => (n === null ? 'Sob orçamento' : n % 1 === 0 ? `${n}€` : `${n.toFixed(2).replace('.', ',')}€`);
+
   const buildDetailsSummary = () => {
     const details = [];
-    
+
     switch (formData.service) {
       case 'sofa': {
+        const isWaterproofBase = formData.serviceType === 'waterproofing';
+        const isPremiumTier = formData.waterproofingTier === 'premium';
         const sofaLines = sofaItems
           .filter(i => i.qty > 0)
           .map(i => {
             const opt = sofaPrices.find(p => p.id === i.sizeId);
-            return opt ? `${i.qty}x Sofá ${opt.label}` : null;
+            if (!opt) return null;
+            const baseP = isWaterproofBase
+              ? (isPremiumTier
+                  ? (typeof opt.waterproofingPremiumPrice === 'number' ? opt.waterproofingPremiumPrice : null)
+                  : (typeof opt.waterproofingPrice === 'number' ? opt.waterproofingPrice : null))
+              : (typeof opt.cleaningPrice === 'number' ? opt.cleaningPrice : null);
+            // Pack Premium = pack Essencial + a mesma diferença já aprovada entre
+            // Essencial e Premium standalone (ver quizHelpers.ts calcPackPricing).
+            const tierDelta = isPremiumTier && typeof opt.waterproofingPremiumPrice === 'number' && typeof opt.waterproofingPrice === 'number'
+              ? opt.waterproofingPremiumPrice - opt.waterproofingPrice : 0;
+            const bothEssencial = typeof opt.bothPrice === 'number' ? opt.bothPrice : (baseP !== null ? baseP + 40 : null);
+            const bothP = bothEssencial !== null ? bothEssencial + tierDelta : null;
+            const unitPrice = i.packEnabled ? bothP : baseP;
+            const lineTotal = unitPrice !== null ? unitPrice * i.qty : null;
+            const tierTag = i.packEnabled
+              ? (isPremiumTier ? ' + Proteção 5 anos' : ' + Proteção 2 anos')
+              : (isWaterproofBase ? (isPremiumTier ? ' (Premium)' : ' (Essencial)') : '');
+            return `${i.qty}x Sofá ${opt.label}${tierTag}: ${fmtEuro(lineTotal)}`;
           })
           .filter(Boolean) as string[];
         if (sofaLines.length > 0) details.push(...sofaLines);
-        if (sofaItems.some(i => i.packEnabled && i.qty > 0)) details.push('+ Proteção Total VIP');
         break;
       }
       case 'carpet':
         if (formData.carpetArea) {
-          details.push(`Detalhes do Tapete: ${formData.carpetArea}`);
+          const area = parseFloat(formData.carpetArea);
+          const price = !isNaN(area) && area > 0 ? calcCarpetPrice(area) : null;
+          details.push(`Tapete ${formData.carpetArea}m²: ${fmtEuro(price)}`);
         }
         break;
       case 'mattress': {
+        const isWaterproofBase = formData.serviceType === 'waterproofing';
         const mattressLines = mattressItems
           .filter(i => i.qty > 0)
           .map(i => {
             const opt = mattressPrices.find(p => p.id === i.sizeId);
             if (!opt) return null;
-            return `${i.qty}x Colchão ${opt.label}`;
+            const baseP = isWaterproofBase
+              ? (typeof opt.waterproofingPrice === 'number' ? opt.waterproofingPrice : null)
+              : (typeof opt.cleaningPrice === 'number' ? opt.cleaningPrice : null);
+            const bothP = typeof opt.bothPrice === 'number' ? opt.bothPrice : (baseP !== null ? baseP + 30 : null);
+            const unitPrice = i.packEnabled ? bothP : baseP;
+            const lineTotal = unitPrice !== null ? unitPrice * i.qty : null;
+            return `${i.qty}x Colchão ${opt.label}: ${fmtEuro(lineTotal)}`;
           })
           .filter(Boolean) as string[];
         if (mattressLines.length > 0) details.push(...mattressLines);
@@ -416,17 +464,23 @@ const QuizForm = ({
       }
       case 'chairs':
         if (formData.chairQuantity) {
-          details.push(`${formData.chairQuantity} cadeira(s): Limpeza`);
+          const qty = parseInt(formData.chairQuantity);
+          const isWaterproofPrimary = formData.serviceType === 'waterproofing';
+          const isPremium = isWaterproofPrimary && formData.waterproofingTier === 'premium';
+          const calcWaterproof = isPremium ? calcChairWaterproofPremium : calcChairWaterproof;
+          const primaryTotal = !isNaN(qty) && qty > 0 ? (isWaterproofPrimary ? calcWaterproof(qty) : calcChairClean(qty)) : null;
+          const primaryLabel = isWaterproofPrimary ? `Impermeabilização${isPremium ? ' Premium' : ' Essencial'}` : 'Limpeza';
+          details.push(`${formData.chairQuantity} cadeira(s): ${primaryLabel}: ${fmtEuro(primaryTotal)}`);
           const wQty = formData.chairWaterproofQty;
           if (wQty > 0) {
-            const wTotal = calcChairWaterproof(wQty);
-            const wStr = wTotal !== null ? `${wTotal % 1 === 0 ? wTotal : wTotal.toFixed(1).replace('.', ',')}€` : 'Sob orçamento';
-            details.push(`Impermeabilização de ${wQty} cadeira(s): ${wStr}`);
+            const addonTotal = isWaterproofPrimary ? calcChairClean(wQty) : calcWaterproof(wQty);
+            const addonLabel = isWaterproofPrimary ? 'Limpeza' : `Impermeabilização${isPremium ? ' Premium' : ' Essencial'}`;
+            details.push(`${addonLabel} de ${wQty} cadeira(s): ${fmtEuro(addonTotal)}`);
           }
         }
         break;
     }
-    
+
     if (upsellItems.length > 0) {
       const upsellLabels: Record<string, string> = { mattress: 'Colchão', carpet: 'Tapete', chairs: 'Cadeiras' };
       const upsellParts = upsellItems.map(item => {
@@ -436,7 +490,7 @@ const QuizForm = ({
           : item.carpetArea ? ` (${item.carpetArea}m²)`
           : item.chairQty ? ` (${item.chairQty}x)`
           : '';
-        return `+${itemLabel}${detail}`;
+        return `+${itemLabel}${detail}: ${fmtEuro(item.price > 0 ? item.price : null)}`;
       });
       details.push(`Pack: ${upsellParts.join(', ')}`);
     }
@@ -494,6 +548,8 @@ ${formData.description || 'Sem observações adicionais'}
       photos: formData.photos,
       finalLocation,
       service: formData.service,
+      serviceType: formData.serviceType,
+      waterproofingTier: formData.waterproofingTier,
       serviceLabel,
       serviceTypeLabel,
       crmServiceLabel,
@@ -884,13 +940,27 @@ ${formData.description || 'Sem observações adicionais'}
                 Valor: <span className="text-gold/60 font-bold">Sob orçamento</span>
               </p>
             )}
-            <Button
-              onClick={handleSubmit}
-              disabled={isSubmitting}
-              className="w-full h-14 bg-gradient-to-r from-gold to-[#d4c57b] hover:from-[#d4c57b] hover:to-gold text-[#12121e] font-black text-base tracking-wider uppercase touch-manipulation active:scale-[0.98] rounded-sm shadow-[0_0_32px_rgba(212,175,55,0.30)]"
-            >
-              {isSubmitting ? 'A enviar...' : 'FINALIZAR PEDIDO'}
-            </Button>
+            {belowMinimum ? (
+              <>
+                <div className="text-center text-xs text-white/60 leading-snug px-2">
+                  Já vamos estar em sua casa, aproveite e junte mais um serviço ao mesmo pedido, poupa na deslocação e fica com tudo tratado de uma vez. Faltam só <span className="text-gold font-bold">{amountToMinimum % 1 === 0 ? amountToMinimum : amountToMinimum.toFixed(2).replace('.', ',')}€</span> para o pedido mínimo.
+                </div>
+                <Button
+                  onClick={() => { (document.activeElement as HTMLElement)?.blur(); setShowUpsell(true); }}
+                  className="w-full h-14 bg-gradient-to-r from-gold to-[#d4c57b] hover:from-[#d4c57b] hover:to-gold text-[#12121e] font-black text-base tracking-wider uppercase touch-manipulation active:scale-[0.98] rounded-sm shadow-[0_0_32px_rgba(212,175,55,0.30)]"
+                >
+                  Adicionar Mais um Serviço
+                </Button>
+              </>
+            ) : (
+              <Button
+                onClick={handleSubmit}
+                disabled={isSubmitting}
+                className="w-full h-14 bg-gradient-to-r from-gold to-[#d4c57b] hover:from-[#d4c57b] hover:to-gold text-[#12121e] font-black text-base tracking-wider uppercase touch-manipulation active:scale-[0.98] rounded-sm shadow-[0_0_32px_rgba(212,175,55,0.30)]"
+              >
+                {isSubmitting ? 'A enviar...' : 'FINALIZAR PEDIDO'}
+              </Button>
+            )}
             <p className="text-center text-[11px] text-white/30 font-medium -mt-0.5">
               Sem compromisso · Grátis · Respondemos em menos de 30 min
             </p>
@@ -931,11 +1001,19 @@ ${formData.description || 'Sem observações adicionais'}
     )}
 
     {/* Rotating social proof bar */}
-    <div className="border-t border-gold/[0.10] px-4 py-2 text-center flex-shrink-0 bg-[#061410] flex items-center justify-center gap-1.5">
-      <span className="w-1.5 h-1.5 rounded-full bg-gold/55 animate-pulse flex-shrink-0" />
-      <p className="text-[11px] text-white/45 font-medium transition-all duration-700">
-        {socialProofMessages[socialProofIdx]}
-      </p>
+    <div className="border-t border-gold/20 px-4 py-2.5 text-center flex-shrink-0 bg-gradient-to-r from-[#0a1f18] via-[#0d2820] to-[#0a1f18] flex items-center justify-center gap-2 overflow-hidden">
+      {(() => {
+        const current = socialProofMessages[socialProofIdx];
+        const Icon = SOCIAL_PROOF_ICON[current.category];
+        return (
+          <div key={socialProofIdx} className="flex items-center gap-2 kyro-social-proof-in">
+            <Icon className="w-3.5 h-3.5 text-gold flex-shrink-0" />
+            <p className="text-xs text-white/75 font-semibold leading-snug">
+              {current.text}
+            </p>
+          </div>
+        );
+      })()}
     </div>
 
     {showExitIntent && (

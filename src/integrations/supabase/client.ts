@@ -22,7 +22,7 @@ if (!isSupabaseConfigured) {
   console.error(
     '[Supabase] VITE_SUPABASE_URL / VITE_SUPABASE_PUBLISHABLE_KEY em falta. ' +
     'Se isto está em produção: configura estas variáveis no Cloudflare Pages ' +
-    '(Settings → Environment variables) e faz um novo deploy — o .env local não chega ao build.'
+    '(Settings → Environment variables) e faz um novo deploy, o .env local não chega ao build.'
   );
 }
 

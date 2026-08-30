@@ -118,7 +118,7 @@ const AdminPanel = () => {
                 CRM, Métricas Quiz e Error Log não estão a gravar nem a ler dados agora.
                 Se isto acontece em produção: configura <code className="bg-red-100 px-1 rounded">VITE_SUPABASE_URL</code> e{" "}
                 <code className="bg-red-100 px-1 rounded">VITE_SUPABASE_PUBLISHABLE_KEY</code> no Cloudflare Pages
-                (Settings → Environment variables) e faz um novo deploy — o <code className="bg-red-100 px-1 rounded">.env</code> local não chega ao build.
+                (Settings → Environment variables) e faz um novo deploy, o <code className="bg-red-100 px-1 rounded">.env</code> local não chega ao build.
               </p>
             </div>
           </div>

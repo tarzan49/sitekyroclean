@@ -23,35 +23,25 @@ interface QuizUpsellOverlayProps {
   onBack: () => void;
 }
 
-/** Reusable pack progress bar */
-const PackProgressBar = ({ totalPrice }: { totalPrice: number }) => {
-  const THRESHOLD = 149;
-  const pct = Math.min(totalPrice / THRESHOLD * 100, 100);
-  const faltam = Math.max(0, Math.ceil(THRESHOLD - totalPrice));
-  const reached = totalPrice >= THRESHOLD;
-  const glowOpacity = (pct / 100 * 0.75).toFixed(2);
-  const glowRadius = Math.round(pct / 10);
-  return (
-    <div className="w-full max-w-xs mx-auto mb-4">
-      <div className="flex justify-between items-center mb-2">
-        <span className="text-[10px] text-gold/60 tabular-nums font-semibold">{Math.round(totalPrice)}€ no carrinho</span>
-        <span className={cn('text-[10px] font-bold uppercase tracking-wider transition-colors', reached ? 'text-gold' : 'text-white/25')}>149€ → −10%</span>
+// Desconto de 10% (2026-08-30): já não depende do total do carrinho, depende de
+// adicionar um artigo de upsell que sozinho valha mais de 60€. Não há um "encher até
+// X€" para mostrar aqui (o item ainda não está escolhido nestes ecrãs), por isso é
+// só a regra explicada, não uma barra de progresso do total.
+const MIN_UPSELL_FOR_DISCOUNT = 60;
+const PackDiscountHint = ({ packDiscountActive }: { packDiscountActive: boolean }) => (
+  <div className="w-full max-w-xs mx-auto mb-4">
+    {packDiscountActive ? (
+      <div className="flex items-center justify-center gap-1.5 text-gold text-xs font-bold">
+        <Check className="w-3.5 h-3.5" />
+        10% de desconto ativado em todo o pedido
       </div>
-      <div className="h-1 bg-gold/10 rounded-full overflow-hidden">
-        <div
-          className={cn('h-full rounded-full transition-all duration-700', reached ? 'bg-gradient-to-r from-gold/50 via-[#f5e27a] to-gold' : 'bg-gradient-to-r from-gold/15 to-gold')}
-          style={{
-            width: `${Math.max(pct, 2)}%`,
-            boxShadow: reached ? '0 0 8px rgba(212,175,55,0.95)' : `0 0 ${glowRadius}px rgba(212,175,55,${glowOpacity})`,
-          }}
-        />
-      </div>
-      <p className={cn('text-[10px] text-center mt-2 font-semibold transition-colors', reached ? 'text-gold' : 'text-white/35')}>
-        {reached ? 'Desconto de 10% ativado!' : `Faltam ${faltam}€ para 10% de desconto`}
+    ) : (
+      <p className="text-[11px] text-white/35 text-center leading-snug">
+        Adicione um serviço de mais de <span className="text-gold font-semibold">{MIN_UPSELL_FOR_DISCOUNT}€</span> (ex: colchão, tapete, 3+ cadeiras) e ganhe <span className="text-gold font-semibold">10% em tudo</span>.
       </p>
-    </div>
-  );
-};
+    )}
+  </div>
+);
 
 const QuizUpsellOverlay = ({
   formData,
@@ -92,7 +82,7 @@ const QuizUpsellOverlay = ({
               <p className="text-[13px] text-white/50 max-w-[265px] mx-auto mb-5 leading-relaxed">
                 Aproveite a deslocação para limpar mais artigos na mesma visita. O desconto de <span className="text-gold font-bold">10% aplica-se a tudo</span>.
               </p>
-              <PackProgressBar totalPrice={totalPrice} />
+              <PackDiscountHint packDiscountActive={packDiscountActive} />
               <button
                 onClick={() => setUpsellSubStep('select')}
                 className="w-full max-w-xs h-14 bg-gradient-to-r from-gold to-[#d4c57b] hover:from-[#d4c57b] hover:to-gold text-[#12121e] font-black text-[15px] tracking-wide rounded-sm shadow-[0_4px_36px_rgba(212,175,55,0.45)] touch-manipulation active:scale-[0.98] transition-all flex items-center justify-center gap-2.5 mb-3"
@@ -108,9 +98,9 @@ const QuizUpsellOverlay = ({
                 Uma visita. Tudo limpo.
               </h2>
               <p className="text-[13px] text-white/50 max-w-[265px] mx-auto mb-5 leading-relaxed">
-                O técnico já vai até si, aproveite para limpar tudo de uma vez. A partir de <span className="text-gold font-bold">149€</span> poupa <span className="text-gold font-bold">10% em todo o pedido</span> automaticamente.
+                O técnico já vai até si, aproveite para limpar tudo de uma vez. Junte um serviço de mais de <span className="text-gold font-bold">60€</span> e poupa <span className="text-gold font-bold">10% em todo o pedido</span> automaticamente.
               </p>
-              <PackProgressBar totalPrice={totalPrice} />
+              <PackDiscountHint packDiscountActive={packDiscountActive} />
               <button
                 onClick={() => setUpsellSubStep('select')}
                 className="w-full max-w-xs h-14 bg-gradient-to-r from-gold to-[#d4c57b] hover:from-[#d4c57b] hover:to-gold text-[#12121e] font-black text-[15px] tracking-wide rounded-sm shadow-[0_4px_36px_rgba(212,175,55,0.45)] touch-manipulation active:scale-[0.98] transition-all flex items-center justify-center gap-2.5 mb-3"
@@ -148,7 +138,7 @@ const QuizUpsellOverlay = ({
           <h2 className="font-playfair text-xl sm:text-2xl font-bold text-white mb-1 leading-[1.3]">
             {packDiscountActive ? 'Desconto de 10% ativado!' : 'Que artigo quer adicionar?'}
           </h2>
-          <PackProgressBar totalPrice={totalPrice} />
+          <PackDiscountHint packDiscountActive={packDiscountActive} />
 
           {upsellItems.length > 0 && (
             <div className="w-full max-w-xs mx-auto mb-3 flex flex-col gap-1.5">
@@ -182,7 +172,7 @@ const QuizUpsellOverlay = ({
             {([
               { id: 'sofa',     img: '/images/services/sofa.webp',    label: 'Sofá',     sublabel: 'a partir de 49€' },
               { id: 'mattress', img: '/images/services/colchao.webp', label: 'Colchão',  sublabel: 'a partir de 59€' },
-              { id: 'carpet',   img: '/images/services/tapete.webp',  label: 'Tapete',   sublabel: 'a partir de 12€/m²' },
+              { id: 'carpet',   img: '/images/services/tapete.webp',  label: 'Tapete',   sublabel: 'a partir de 15€/m²' },
               { id: 'chairs',   img: '/images/services/cadeira.webp', label: 'Cadeiras', sublabel: 'a partir de 20€' },
             ] as const).map(opt => (
               <button
@@ -438,7 +428,7 @@ const QuizUpsellOverlay = ({
                   onChange={e => setPendingCarpetArea(e.target.value)}
                   className="w-full h-12 px-4 text-lg font-bold text-center bg-[#1a2a1a] border border-gold/25 focus:border-gold focus:outline-none rounded-sm transition-colors text-white placeholder:text-white/25 mb-1"
                 />
-                <p className="text-xs text-white/30 text-center mb-4">≤5m²: 12€/m² · ≤10m²: 10€/m² · ≤15m²: 9€/m² · +15m²: sob orçamento</p>
+                <p className="text-xs text-white/30 text-center mb-4">≤3m²: 15€/m² · ≤5m²: 12,5€/m² · ≤8m²: 11,5€/m² · ≤10m²: 10,5€/m² · ≤15m²: 10€/m² · +15m²: sob orçamento</p>
                 <button
                   disabled={!pendingCarpetArea || isNaN(parseFloat(pendingCarpetArea)) || parseFloat(pendingCarpetArea) <= 0}
                   onClick={() => {

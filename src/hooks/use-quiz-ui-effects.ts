@@ -1,5 +1,91 @@
-import { useState, useEffect, useRef, useCallback, type RefObject } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo, type RefObject } from 'react';
 import type { useToast } from '@/hooks/use-toast';
+import { locationPrices } from '@/components/quiz';
+
+// Reaproveita a tabela real de zonas (locationPrices) como proxy de "tamanho" da
+// localidade — zona 0 (10€, núcleo/perto da equipa) = grande, zona intermédia (15€)
+// = média, zona mais distante (20€) = pequena. Evita inventar uma classificação de
+// população à parte; cidades fora da tabela ("outra") tratam-se como "média".
+type CityTier = 'grande' | 'media' | 'pequena';
+
+function getCityTier(location: string): CityTier {
+  const price = locationPrices[location];
+  if (price === undefined) return 'media';
+  if (price <= 10) return 'grande';
+  if (price <= 15) return 'media';
+  return 'pequena';
+}
+
+function randInt(min: number, max: number): number {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+// Segunda=1 ... Domingo=7
+export function getDaysIntoWeek(): number {
+  const day = new Date().getUTCDay(); // 0=Domingo..6=Sábado
+  return day === 0 ? 7 : day;
+}
+
+// Escala um intervalo de "semana completa" pela fração da semana já decorrida, com
+// mínimo de 1 (à segunda-feira o número ainda é pequeno mas nunca zero/embaraçoso;
+// ao domingo mostra a semana cheia, refletindo o volume real de 10-15 pedidos/dia).
+export function scaledWeekly(fullMin: number, fullMax: number, daysIntoWeek: number): number {
+  const frac = daysIntoWeek / 7;
+  const min = Math.max(1, Math.round(fullMin * frac));
+  const max = Math.max(min + 1, Math.round(fullMax * frac));
+  return randInt(min, max);
+}
+
+export type SocialProofCategory = 'whatsapp' | 'call' | 'job' | 'booking' | 'trust';
+
+export interface SocialProofMessage {
+  text: string;
+  category: SocialProofCategory;
+}
+
+// Números gerados uma vez por abertura do quiz (não a cada rotação), dentro de um
+// intervalo plausível por "tamanho" de localidade — não é uma métrica ao vivo, é o
+// mesmo tipo de frase de confiança que já existia no site, só com mais variedade
+// e escalada por zona em vez de um valor fixo igual para toda a gente.
+export function buildSocialProofMessages(location: string): SocialProofMessage[] {
+  const city = location && location !== 'other' ? location : 'Porto';
+  const tier = getCityTier(location);
+  const ranges: Record<CityTier, { wa: [number, number]; call: [number, number]; job: [number, number] }> = {
+    grande: { wa: [8, 16], call: [4, 9], job: [3, 7] },
+    media: { wa: [3, 7], call: [2, 4], job: [1, 3] },
+    pequena: { wa: [1, 3], call: [1, 2], job: [1, 2] },
+  };
+  // Intervalos "semana completa" (domingo, semana toda decorrida) por tier, escalados
+  // pela fração da semana já passada — reflete o volume real de 10-15 pedidos/dia,
+  // evita "esta semana já fizemos 1" soar a negócio parado quando é só segunda-feira.
+  const weeklyFullRanges: Record<CityTier, { tapete: [number, number]; cadeira: [number, number] }> = {
+    grande: { tapete: [8, 18], cadeira: [3, 9] },
+    media: { tapete: [4, 10], cadeira: [2, 5] },
+    pequena: { tapete: [2, 6], cadeira: [1, 3] },
+  };
+  const r = ranges[tier];
+  const wr = weeklyFullRanges[tier];
+  const daysIntoWeek = getDaysIntoWeek();
+  const waCount = randInt(r.wa[0], r.wa[1]);
+  const callCount = randInt(r.call[0], r.call[1]);
+  const sofaCount = randInt(r.job[0], r.job[1]);
+  const colchaoCount = randInt(1, Math.max(1, Math.floor(r.job[1] / 2)));
+  const tapeteCount = scaledWeekly(wr.tapete[0], wr.tapete[1], daysIntoWeek);
+  const cadeiraCount = scaledWeekly(wr.cadeira[0], wr.cadeira[1], daysIntoWeek);
+
+  return [
+    { category: 'whatsapp', text: `Hoje já ${waCount} pessoa${waCount > 1 ? 's' : ''} de ${city} ${waCount > 1 ? 'pediram' : 'pediu'} orçamento via WhatsApp` },
+    { category: 'call', text: `Hoje já ${callCount} pessoa${callCount > 1 ? 's' : ''} ${callCount > 1 ? 'ligaram' : 'ligou'} a pedir informações` },
+    { category: 'job', text: `Hoje já limpámos ${sofaCount} sofá${sofaCount > 1 ? 's' : ''} e ${colchaoCount} ${colchaoCount > 1 ? 'colchões' : 'colchão'}` },
+    { category: 'booking', text: `Alguém de ${city} acabou de reservar, agenda a fechar` },
+    { category: 'job', text: `Esta semana já higienizámos ${tapeteCount} tapete${tapeteCount > 1 ? 's' : ''} em ${city} e arredores` },
+    { category: 'booking', text: `Agenda quase cheia esta semana em ${city}, garanta já` },
+    { category: 'job', text: `Já tratámos ${cadeiraCount} conjunto${cadeiraCount > 1 ? 's' : ''} de cadeiras esta semana` },
+    { category: 'trust', text: `Mais de 1100 clientes satisfeitos · Avaliação 5.0 no Google` },
+    { category: 'trust', text: `Mais de 90 avaliações reais no Google, 5.0 estrelas` },
+    { category: 'trust', text: `Resposta em menos de 30 minutos, na maioria das vezes bem mais rápido` },
+  ];
+}
 
 const TIMER_KEY = 'kyro_timer_expiry';
 const TIMER_DURATION = 10 * 60; // 10 minutes in seconds
@@ -88,31 +174,25 @@ export function useQuizUiEffects({
     return `${m}:${s}`;
   };
 
-  const socialProofMessages = [
-    `4 pessoas de ${location || 'Porto'} pediram orçamento nas últimas 2 horas`,
-    `Alguém de ${location || 'Porto'} acabou de reservar, agenda a fechar`,
-    `Agenda quase cheia esta semana em ${location || 'Porto'}, garanta já`,
-    `Mais de 1000 clientes satisfeitos · Avaliação 5.0 no Google`,
-  ];
+  // Recalcula só quando a localidade muda ou o quiz reabre, não a cada rotação,
+  // para os números não "saltarem" enquanto a mesma frase está visível.
+  const socialProofMessages = useMemo(() => buildSocialProofMessages(location), [location, isOpen]);
 
   useEffect(() => {
     if (!isOpen) return;
     const interval = setInterval(() => {
       setSocialProofIdx(i => (i + 1) % socialProofMessages.length);
-    }, 3500);
+    }, 4000);
     return () => clearInterval(interval);
   }, [isOpen, location]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Confetti when pack discount activates (total ≥ 149€ or SOB trigger)
+  // Confetti when pack discount activates (upsell item added acima de 60€)
   useEffect(() => {
     if (packDiscountActive && !prevTotalRef.current) {
       setConfettiActive(true);
-      const viaSob = totalPrice < 149 && hasUpsellSobItem;
       toast({
         title: 'Desconto de 10% ativado!',
-        description: viaSob
-          ? 'Ao adicionar um artigo de valor elevado, ativou o desconto de Pack automaticamente.'
-          : 'Parabéns! Atingiu 149€ e tem 10% de desconto em todo o pedido.',
+        description: 'Ao juntar mais um serviço ao mesmo pedido, aproveita a deslocação e ganha 10% de desconto no total.',
         duration: 4000,
       });
       const id = setTimeout(() => setConfettiActive(false), 4500);

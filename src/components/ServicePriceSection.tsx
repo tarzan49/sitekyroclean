@@ -278,7 +278,7 @@ export default function ServicePriceSection({ serviceSlug, initialLocation }: Pr
                 const dynamicPrice: string | null = isChair
                   ? (qty <= 0 ? null : chairP === null ? 'Sob orçamento' : `${chairP}€`)
                   : isCarpet
-                  ? (qty <= 0 ? (isAlcatifa ? '3€/m²' : '12€/m²') : carpetP == null ? 'Sob orçamento' : `${Math.round(carpetP * 10) / 10}€`)
+                  ? (qty <= 0 ? (isAlcatifa ? '3€/m²' : '15€/m²') : carpetP == null ? 'Sob orçamento' : `${Math.round(carpetP * 10) / 10}€`)
                   : row.price;
 
                 if (isCarpet) {
@@ -314,7 +314,7 @@ export default function ServicePriceSection({ serviceSlug, initialLocation }: Pr
                         )}
                       </div>
                       <p className="text-[11px] mt-1.5" style={{ color: "rgba(17,17,17,0.35)" }}>
-                        {isAlcatifa ? 'até 50m²: 3€/m² · +50m²: sob orçamento' : '≤5m²: 12€/m² · ≤10m²: 10€/m² · ≤15m²: 9€/m² · +15m²: sob orçamento'}
+                        {isAlcatifa ? 'até 50m²: 3€/m² · +50m²: sob orçamento' : '≤3m²: 15€/m² · ≤5m²: 12,5€/m² · ≤8m²: 11,5€/m² · ≤10m²: 10,5€/m² · ≤15m²: 10€/m² · +15m²: sob orçamento'}
                       </p>
                     </div>
                   );

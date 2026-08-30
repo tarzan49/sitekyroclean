@@ -1,6 +1,6 @@
 import { sofaPrices, mattressPrices } from '@/components/quiz/QuizTypes';
 import type { SofaItem, MattressItem, UpsellItemConfig } from '@/components/quiz/QuizTypes';
-import { calcChairClean, calcChairWaterproof } from '@/components/quiz/quizHelpers';
+import { calcChairClean, calcChairWaterproof, calcChairWaterproofPremium } from '@/components/quiz/quizHelpers';
 import { WHATSAPP_BASE } from '@/constants/business';
 import { safeSessionSet } from '@/lib/safeStorage';
 import { logError } from '@/lib/errorTracking';
@@ -14,6 +14,8 @@ export interface QuizLeadPayload {
   finalLocation: string;
 
   service: string;
+  serviceType: string;
+  waterproofingTier: 'essencial' | 'premium';
   serviceLabel: string;
   serviceTypeLabel: string;
   crmServiceLabel: string;
@@ -151,41 +153,65 @@ function buildWaUrl(payload: QuizLeadPayload, bookingId: string): string {
 
 function buildReceiptLines(payload: QuizLeadPayload) {
   const {
-    service, sofaItems, mattressItems, upsellItems, carpetArea, chairQuantity,
+    service, serviceType, waterproofingTier, sofaItems, mattressItems, upsellItems, carpetArea, chairQuantity,
     chairWaterproofQty, calculateServicePrice, finalTravelCost, finalLocation,
   } = payload;
 
   const receiptLines: Array<{ label: string; qty: number; unitPrice: number | null; total: number | null }> = [];
+  const isWaterproofBase = serviceType === 'waterproofing';
+  const isPremium = isWaterproofBase && waterproofingTier === 'premium';
+  const calcChairWaterproofTier = isPremium ? calcChairWaterproofPremium : calcChairWaterproof;
 
   if (service === 'sofa') {
+    // Aqui o tier aplica-se mesmo quando o pack (limpeza + proteção) está ligado com
+    // serviceType='cleaning' (toggles "Proteção 2/5 anos"), não só quando a proteção é
+    // o serviço principal — por isso não se restringe a isWaterproofBase como o `isPremium`
+    // usado mais abaixo para cadeiras.
+    const isPremiumTierSofa = waterproofingTier === 'premium';
     sofaItems.filter(i => i.qty > 0).forEach(item => {
       const opt = sofaPrices.find(p => p.id === item.sizeId);
       if (!opt) return;
-      const unit = item.packEnabled && typeof opt.bothPrice === 'number'
-        ? (opt.bothPrice as number)
-        : typeof opt.cleaningPrice === 'number' ? (opt.cleaningPrice as number) : null;
-      receiptLines.push({ label: `Sofá ${opt.label}${item.packEnabled ? ' + Impermeab.' : ''}`, qty: item.qty, unitPrice: unit, total: unit !== null ? unit * item.qty : null });
+      const baseP = isWaterproofBase
+        ? (isPremiumTierSofa
+            ? (typeof opt.waterproofingPremiumPrice === 'number' ? (opt.waterproofingPremiumPrice as number) : null)
+            : (typeof opt.waterproofingPrice === 'number' ? (opt.waterproofingPrice as number) : null))
+        : (typeof opt.cleaningPrice === 'number' ? (opt.cleaningPrice as number) : null);
+      // Pack Premium = pack Essencial + a mesma diferença já aprovada entre Essencial
+      // e Premium standalone (ver quizHelpers.ts calcPackPricing).
+      const tierDelta = isPremiumTierSofa && typeof opt.waterproofingPremiumPrice === 'number' && typeof opt.waterproofingPrice === 'number'
+        ? (opt.waterproofingPremiumPrice as number) - (opt.waterproofingPrice as number) : 0;
+      const bothEssencial = typeof opt.bothPrice === 'number' ? (opt.bothPrice as number) : null;
+      const bothP = bothEssencial !== null ? bothEssencial + tierDelta : null;
+      const unit = item.packEnabled ? bothP : baseP;
+      const tierTag = item.packEnabled
+        ? (isPremiumTierSofa ? ' + Proteção 5 anos' : ' + Proteção 2 anos')
+        : (isWaterproofBase ? (isPremiumTierSofa ? ' (Impermeab. Premium)' : ' (Impermeab. Essencial)') : '');
+      receiptLines.push({ label: `Sofá ${opt.label}${tierTag}`, qty: item.qty, unitPrice: unit, total: unit !== null ? unit * item.qty : null });
     });
   } else if (service === 'mattress') {
     mattressItems.filter(i => i.qty > 0).forEach(item => {
       const opt = mattressPrices.find(p => p.id === item.sizeId);
       if (!opt) return;
-      const unit = item.packEnabled && typeof opt.bothPrice === 'number'
-        ? (opt.bothPrice as number)
-        : typeof opt.cleaningPrice === 'number' ? (opt.cleaningPrice as number) : null;
-      const typeStr = item.packEnabled ? ' (Pack Proteção Total)' : ' (Limpeza)';
+      const baseP = isWaterproofBase
+        ? (typeof opt.waterproofingPrice === 'number' ? (opt.waterproofingPrice as number) : null)
+        : (typeof opt.cleaningPrice === 'number' ? (opt.cleaningPrice as number) : null);
+      const bothP = typeof opt.bothPrice === 'number' ? (opt.bothPrice as number) : null;
+      const unit = item.packEnabled ? bothP : baseP;
+      const typeStr = item.packEnabled ? ' (Pack Proteção Total)' : isWaterproofBase ? ' (Impermeabilização)' : ' (Limpeza)';
       receiptLines.push({ label: `Colchão ${opt.label}${typeStr}`, qty: item.qty, unitPrice: unit, total: unit !== null ? unit * item.qty : null });
     });
   } else if (service === 'chairs') {
     const cQty = parseInt(chairQuantity);
     if (!isNaN(cQty) && cQty > 0) {
-      const cleanTotal = calcChairClean(cQty);
-      receiptLines.push({ label: 'Limpeza Cadeiras', qty: cQty, unitPrice: cleanTotal !== null ? Math.round(cleanTotal / cQty * 10) / 10 : null, total: cleanTotal });
+      const primaryTotal = isWaterproofBase ? calcChairWaterproofTier(cQty) : calcChairClean(cQty);
+      const primaryLabel = isWaterproofBase ? `Impermeabilização Cadeiras${isPremium ? ' Premium' : ' Essencial'}` : 'Limpeza Cadeiras';
+      receiptLines.push({ label: primaryLabel, qty: cQty, unitPrice: primaryTotal !== null ? Math.round(primaryTotal / cQty * 10) / 10 : null, total: primaryTotal });
       const wQty = chairWaterproofQty;
       if (wQty > 0) {
-        const wTotal = calcChairWaterproof(wQty);
-        const wUnit = wQty <= 4 ? 25 : wQty <= 10 ? 20 : null;
-        receiptLines.push({ label: 'Impermeabilização Cadeiras', qty: wQty, unitPrice: wUnit, total: wTotal });
+        const addonTotal = isWaterproofBase ? calcChairClean(wQty) : calcChairWaterproofTier(wQty);
+        const addonLabel = isWaterproofBase ? 'Limpeza Cadeiras' : `Impermeabilização Cadeiras${isPremium ? ' Premium' : ' Essencial'}`;
+        const addonUnit = addonTotal !== null ? Math.round(addonTotal / wQty * 10) / 10 : null;
+        receiptLines.push({ label: addonLabel, qty: wQty, unitPrice: addonUnit, total: addonTotal });
       }
     }
   } else if (service === 'carpet') {

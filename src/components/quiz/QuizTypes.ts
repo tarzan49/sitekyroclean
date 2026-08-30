@@ -1,6 +1,10 @@
 export interface QuizFormData {
   service: string;
   serviceType: 'cleaning' | 'waterproofing' | 'both' | '';
+  // Só relevante quando serviceType === 'waterproofing' e o serviço é sofá/cadeiras.
+  // "essencial" = à base de água (produto atual, aguenta ~2 lavagens). "premium" =
+  // à base de diluente (novo, 2026-08-30, dura até 5 anos/5 lavagens, preço mais alto).
+  waterproofingTier: 'essencial' | 'premium';
   sofaSize: string;
   sofaHasChaise: boolean;
   carpetArea: string;
@@ -24,6 +28,7 @@ export interface QuizFormData {
 export const initialFormData: QuizFormData = {
   service: '',
   serviceType: '',
+  waterproofingTier: 'essencial',
   sofaSize: '',
   sofaHasChaise: false,
   carpetArea: '',
@@ -51,16 +56,20 @@ export interface PriceOption {
   waterproofingPrice: number | string;
   bothPrice: number | string;
   originalBothPrice?: number | string;
+  // Impermeabilização Premium (à base de diluente), só existe para sofá por agora
+  // (adicionado 2026-08-30). "both" (Pack Proteção Total) continua sempre Essencial,
+  // não há combo Premium+limpeza com desconto definido.
+  waterproofingPremiumPrice?: number | string;
 }
 
 // Sofa pack pricing: limpeza + impermeabilização com desconto
 // originalBothPrice = soma separada (preço riscado no UI)
 // delta (upsell text) = bothPrice - cleaningPrice
 export const sofaPrices: PriceOption[] = [
-  { id: '1-lugar',    label: '1 Lugar',    cleaningPrice: 49, waterproofingPrice: 59, bothPrice: 99,  originalBothPrice: 108 },
-  { id: '2-lugares',  label: '2 Lugares',  cleaningPrice: 69, waterproofingPrice: 79, bothPrice: 145, originalBothPrice: 148 },
-  { id: '3-lugares',  label: '3 Lugares',  cleaningPrice: 79, waterproofingPrice: 99, bothPrice: 169, originalBothPrice: 178 },
-  { id: '4+-lugares', label: '4+ Lugares', cleaningPrice: 'Sob orçamento', waterproofingPrice: 'Sob orçamento', bothPrice: 'Sob orçamento' },
+  { id: '1-lugar',    label: '1 Lugar',    cleaningPrice: 49, waterproofingPrice: 59, bothPrice: 99,  originalBothPrice: 108, waterproofingPremiumPrice: 79 },
+  { id: '2-lugares',  label: '2 Lugares',  cleaningPrice: 69, waterproofingPrice: 79, bothPrice: 145, originalBothPrice: 148, waterproofingPremiumPrice: 99 },
+  { id: '3-lugares',  label: '3 Lugares',  cleaningPrice: 79, waterproofingPrice: 99, bothPrice: 169, originalBothPrice: 178, waterproofingPremiumPrice: 129 },
+  { id: '4+-lugares', label: '4+ Lugares', cleaningPrice: 'Sob orçamento', waterproofingPrice: 'Sob orçamento', bothPrice: 'Sob orçamento', waterproofingPremiumPrice: 'Sob orçamento' },
 ];
 
 // Chaise longue: preço fixo (limpeza ou pack)
