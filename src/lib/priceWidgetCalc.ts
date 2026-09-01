@@ -160,7 +160,10 @@ export interface WidgetArticleInfo {
 
 export function calcWidgetArticles(
   serviceSlug: string,
-  rowQuantities: Record<number, number>
+  rowQuantities: Record<number, number>,
+  addonRows: Set<number> = new Set(),
+  addonTier: WidgetTier = 'essencial',
+  antiAcarosRows: Set<number> = new Set()
 ): WidgetArticleInfo {
   const rows = PRICE_TABLE[serviceSlug] ?? [];
   const configs = PRICE_TABLE_QUIZ_CONFIG[serviceSlug] ?? [];
@@ -177,8 +180,15 @@ export function calcWidgetArticles(
     const cfg = configs[i];
     if (!cfg) return; // chaise longue: addon, não é um artigo próprio
     if (cfg.service === 'chairs') {
-      const total = calcChairBracket(qty, isWaterproof);
-      if (total !== null && total > 0) { articleTotal += total; noteCandidate(total); }
+      let total = calcChairBracket(qty, isWaterproof) ?? 0;
+      // Addons contam para o artigo (pedido explícito 2026-09-01: o valor
+      // do addon ligado tem de entrar na conta do Pack Família, tal como já
+      // acontece no total realmente cobrado — mesma lógica do modal).
+      if (!isWaterproof) {
+        if (addonRows.has(i)) total += calcChairAddonWaterproofTotal(qty, addonTier) ?? 0;
+        if (antiAcarosRows.has(i)) total += calcChairAntiAcarosTotal(qty) ?? 0;
+      }
+      if (total > 0) { articleTotal += total; noteCandidate(total); }
       return;
     }
     if (cfg.service === 'carpet') {
@@ -187,8 +197,11 @@ export function calcWidgetArticles(
       if (total !== null && total > 0) { articleTotal += total; noteCandidate(total); }
       return;
     }
-    // Sofá / colchão: cada unidade é um artigo separado ao preço base da linha.
-    const unitPrice = parseRowPrice(row.price);
+    // Sofá / colchão: cada unidade é um artigo separado ao preço da linha,
+    // incluindo o addon quando está ligado (mesma lógica do chairs acima).
+    let unitPrice = parseRowPrice(row.price);
+    if (addonRows.has(i)) unitPrice += calcRowAddonDelta(cfg, addonTier) ?? 0;
+    if (antiAcarosRows.has(i)) unitPrice += calcSofaAntiAcarosDelta(cfg) ?? 0;
     if (unitPrice > 0) {
       articleTotal += unitPrice * qty;
       noteCandidate(unitPrice);

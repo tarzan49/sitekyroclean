@@ -131,7 +131,7 @@ export default function ServicePriceSection({ serviceSlug, initialLocation }: Pr
 
   const total = calcWidgetTotal(serviceSlug, rowQuantities, chaiseLongueAddon, addonRows, addonTier, antiAcarosRows);
   const travelFee = initialLocation ? (locationPrices[initialLocation] ?? 10) : 0;
-  const articles = calcWidgetArticles(serviceSlug, rowQuantities);
+  const articles = calcWidgetArticles(serviceSlug, rowQuantities, addonRows, addonTier, antiAcarosRows);
   const pricing = calcWidgetPricing(total, travelFee, articles);
   const firstTierAddonRow = Array.from(addonRows).find(i => {
     const svc = quizConfigs[i]?.service;

@@ -627,7 +627,7 @@ const LocationServicePage = () => {
                     {(() => {
                       const total = calcWidgetTotal(data.serviceSlug, rowQuantities, chaiseLongueAddon, addonRows, addonTier, antiAcarosRows);
                       const fee = locationPrices[data.city] ?? 10;
-                      const articles = calcWidgetArticles(data.serviceSlug, rowQuantities);
+                      const articles = calcWidgetArticles(data.serviceSlug, rowQuantities, addonRows, addonTier, antiAcarosRows);
                       const pricing = calcWidgetPricing(total, fee, articles);
                       return (
                         <div className="px-5 py-3 border-t" style={{ borderColor: "rgba(17,17,17,0.07)" }}>
@@ -661,7 +661,7 @@ const LocationServicePage = () => {
                     {(() => {
                       const total = calcWidgetTotal(data.serviceSlug, rowQuantities, chaiseLongueAddon, addonRows, addonTier, antiAcarosRows);
                       const fee = locationPrices[data.city] ?? 10;
-                      const articles = calcWidgetArticles(data.serviceSlug, rowQuantities);
+                      const articles = calcWidgetArticles(data.serviceSlug, rowQuantities, addonRows, addonTier, antiAcarosRows);
                       const pricing = calcWidgetPricing(total, fee, articles);
                       const hasAnySelection = total > 0 || Object.values(rowQuantities).some(q => q > 0) || chaiseLongueAddon > 0;
                       return (

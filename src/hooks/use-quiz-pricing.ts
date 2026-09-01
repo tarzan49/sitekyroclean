@@ -50,9 +50,13 @@ export function useQuizPricing(
             : 0;
           const bothEssencial = typeof opt.bothPrice === 'number' ? (opt.bothPrice as number) : baseP + 40;
           const bothP = bothEssencial + tierDelta;
+          // Os addons contam para o artigo (pedido explícito 2026-09-01: o
+          // valor do Pack/Proteção ligado tem de entrar na conta do Pack
+          // Família, tal como já entra no preço realmente cobrado — antes só
+          // o preço base sem addon contava, o que fazia um sofá com uma
+          // Proteção 10 anos cara continuar a não qualificar para o desconto).
           const unitPrice = item.packEnabled ? bothP : baseP;
-          if (unitPrice > 0) price += unitPrice * item.qty;
-          if (baseP > 0) { baseTotal += baseP * item.qty; noteCandidate(baseP); }
+          if (unitPrice > 0) { price += unitPrice * item.qty; baseTotal += unitPrice * item.qty; noteCandidate(unitPrice); }
         });
         break;
       }
@@ -68,8 +72,7 @@ export function useQuizPricing(
             : (typeof opt.cleaningPrice === 'number' ? (opt.cleaningPrice as number) : 0);
           const bothP = typeof opt.bothPrice === 'number' ? (opt.bothPrice as number) : baseP + 30;
           const unitPrice = item.packEnabled ? bothP : baseP;
-          if (unitPrice > 0) price += unitPrice * item.qty;
-          if (baseP > 0) { baseTotal += baseP * item.qty; noteCandidate(baseP); }
+          if (unitPrice > 0) { price += unitPrice * item.qty; baseTotal += unitPrice * item.qty; noteCandidate(unitPrice); }
         });
         break;
       }
@@ -85,15 +88,19 @@ export function useQuizPricing(
             : (calcChairClean(chairQty) ?? 0);
           price += primaryChairPrice;
         }
-        // As cadeiras (o serviço principal, sem o addon de impermeabilização
-        // sobre elas) contam como 1 artigo só, ao preço total do lote.
-        if (primaryChairPrice > 0) { baseTotal += primaryChairPrice; noteCandidate(primaryChairPrice); }
         const addonQty = formData.chairWaterproofQty;
+        let addonChairPrice = 0;
         if (addonQty > 0) {
-          price += formData.serviceType === 'waterproofing'
+          addonChairPrice = formData.serviceType === 'waterproofing'
             ? (calcChairClean(addonQty) ?? 0)
             : (calcWaterproof(addonQty) ?? 0);
+          price += addonChairPrice;
         }
+        // Cadeiras (serviço principal + addon de impermeabilização, quando
+        // ligado) contam como 1 artigo só, ao preço total do lote incluindo
+        // o addon — os addons contam para o Pack Família (2026-09-01).
+        const totalChairArticle = primaryChairPrice + addonChairPrice;
+        if (totalChairArticle > 0) { baseTotal += totalChairArticle; noteCandidate(totalChairArticle); }
         break;
       }
 

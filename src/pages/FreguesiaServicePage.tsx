@@ -538,7 +538,7 @@ const FreguesiaServicePage = () => {
                       {(() => {
                         const total = calcWidgetTotal(data.serviceSlug, rowQuantities, chaiseLongueAddon, addonRows, addonTier, antiAcarosRows);
                         const fee = locationPrices[data.municipio] ?? 10;
-                        const articles = calcWidgetArticles(data.serviceSlug, rowQuantities);
+                        const articles = calcWidgetArticles(data.serviceSlug, rowQuantities, addonRows, addonTier, antiAcarosRows);
                         const pricing = calcWidgetPricing(total, fee, articles);
                         return (
                           <div className="space-y-2">
