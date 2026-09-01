@@ -144,7 +144,7 @@ const MaterialPage = () => {
                   {h1Rest}{" "}<span style={{ color: "#D4AF37" }}>{h1Gold}</span>
                 </h1>
 
-                <p className="text-sm sm:text-base md:text-lg text-white/70 leading-relaxed mb-6 max-w-lg">
+                <p className="text-sm sm:text-base md:text-lg text-white/70 leading-relaxed mb-6 max-w-lg line-clamp-2">
                   {data.intro.match(/^[^.?]*[.?]/)?.[0] ?? data.intro}
                 </p>
 
@@ -293,9 +293,9 @@ const MaterialPage = () => {
         <section className="py-14 md:py-20" style={{ backgroundColor: "#FDFDF9" }}>
           <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
             <SectionHeader overline="Cobertura" heading="Explore" goldWord="mais" />
-            <div className="grid md:grid-cols-2 gap-x-12 gap-y-10">
+            <div className="grid md:grid-cols-2 gap-4">
               {relatedLinks.length > 0 && (
-                <div>
+                <div className="p-5 rounded-xl bg-white" style={{ border: "1px solid rgba(17,17,17,0.08)", boxShadow: "0 4px 16px rgba(7,26,18,0.04)" }}>
                   <p className="text-[10px] font-bold tracking-[0.26em] uppercase mb-3" style={{ color: "#D4AF37" }}>Outros materiais</p>
                   <div className="flex flex-wrap gap-2">
                     {relatedLinks.map(link => (
@@ -310,7 +310,7 @@ const MaterialPage = () => {
               )}
 
               {!isCityVariant && (
-                <div>
+                <div className="p-5 rounded-xl bg-white" style={{ border: "1px solid rgba(17,17,17,0.08)", boxShadow: "0 4px 16px rgba(7,26,18,0.04)" }}>
                   <p className="text-[10px] font-bold tracking-[0.26em] uppercase mb-3" style={{ color: "#D4AF37" }}>Disponível em</p>
                   <div className="flex flex-wrap gap-2">
                     {topCities.map(city => (
@@ -325,7 +325,7 @@ const MaterialPage = () => {
               )}
 
               {isCityVariant && (
-                <div>
+                <div className="p-5 rounded-xl bg-white" style={{ border: "1px solid rgba(17,17,17,0.08)", boxShadow: "0 4px 16px rgba(7,26,18,0.04)" }}>
                   <p className="text-[10px] font-bold tracking-[0.26em] uppercase mb-3" style={{ color: "#D4AF37" }}>Também disponível em</p>
                   <div className="flex flex-wrap gap-2">
                     {cities.filter(c => c.slug !== citySlug).slice(0, 8).map(city => (

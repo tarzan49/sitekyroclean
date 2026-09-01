@@ -155,7 +155,7 @@ const ProblemPage = () => {
                   {h1Rest}{" "}<span style={{ color: "#D4AF37" }}>{h1Gold}</span>
                 </h1>
 
-                <p className="text-sm sm:text-base md:text-lg text-white/70 leading-relaxed mb-6 max-w-lg">
+                <p className="text-sm sm:text-base md:text-lg text-white/70 leading-relaxed mb-6 max-w-lg line-clamp-2">
                   {data.intro.match(/^[^.?]*[.?]/)?.[0] ?? data.intro}
                 </p>
 
@@ -359,9 +359,9 @@ const ProblemPage = () => {
         <section className="py-14 md:py-20 bg-[#FDFDF9]">
           <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
             <SectionHeader overline="Explore" heading="Continue a" goldWord="explorar" light={true} />
-            <div className="grid md:grid-cols-2 gap-x-12 gap-y-10">
+            <div className="grid md:grid-cols-2 gap-4">
               {relatedServiceData.length > 0 && (
-                <div>
+                <div className="p-5 rounded-xl bg-white" style={{ border: "1px solid rgba(17,17,17,0.08)", boxShadow: "0 4px 16px rgba(7,26,18,0.04)" }}>
                   <p className="text-[10px] font-bold tracking-[0.26em] uppercase mb-3" style={{ color: "#D4AF37" }}>Serviços relacionados</p>
                   <div className="flex flex-wrap gap-2">
                     {relatedServiceData.map(svc => (
@@ -376,7 +376,7 @@ const ProblemPage = () => {
               )}
 
               {relatedProblemLinks.length > 0 && (
-                <div>
+                <div className="p-5 rounded-xl bg-white" style={{ border: "1px solid rgba(17,17,17,0.08)", boxShadow: "0 4px 16px rgba(7,26,18,0.04)" }}>
                   <p className="text-[10px] font-bold tracking-[0.26em] uppercase mb-3" style={{ color: "#D4AF37" }}>Problemas relacionados</p>
                   <div className="flex flex-wrap gap-2">
                     {relatedProblemLinks.map(link => (
@@ -391,7 +391,7 @@ const ProblemPage = () => {
               )}
 
               {relatedCityData.length > 0 && (
-                <div>
+                <div className="p-5 rounded-xl bg-white" style={{ border: "1px solid rgba(17,17,17,0.08)", boxShadow: "0 4px 16px rgba(7,26,18,0.04)" }}>
                   <p className="text-[10px] font-bold tracking-[0.26em] uppercase mb-3" style={{ color: "#D4AF37" }}>Disponível em</p>
                   <div className="flex flex-wrap gap-2">
                     {relatedCityData.map(city => (

@@ -316,7 +316,7 @@ const SofaVariantPage = () => {
                   {data.h1}
                 </h1>
 
-                <p className="text-sm sm:text-base md:text-lg text-white/70 leading-relaxed mb-6 max-w-lg">
+                <p className="text-sm sm:text-base md:text-lg text-white/70 leading-relaxed mb-6 max-w-lg line-clamp-2">
                   {data.intro.match(/^[^.?]*[.?]/)?.[0] ?? data.intro}
                 </p>
 
@@ -594,14 +594,14 @@ const SofaVariantPage = () => {
                 {`Área de serviço ${prep}`}{" "}<em className="not-italic" style={{ color: "#D4AF37" }}>{data.locationName}</em>
               </h2>
             </div>
-            <div className="grid md:grid-cols-2 gap-x-12 gap-y-10">
+            <div className="grid md:grid-cols-2 gap-4">
 
               {/* Zonas / Freguesias da cidade */}
               {(() => {
                 const mun = municipiosComFreguesias.find(m => m.slug === parsed.locationPart);
                 if (!mun || !mun.freguesias.length) return null;
                 return (
-                  <div>
+                  <div className="p-5 rounded-xl" style={{ background: "#FDFDF9", border: "1px solid rgba(17,17,17,0.08)" }}>
                     <div className="flex items-center gap-3 mb-3">
                       <div className="h-px w-8 flex-shrink-0" style={{ backgroundColor: "#D4AF37", opacity: 0.65 }} />
                       <p className="text-[10px] font-bold tracking-[0.26em] uppercase" style={{ color: "#D4AF37", opacity: 0.85 }}>
@@ -625,7 +625,7 @@ const SofaVariantPage = () => {
               })()}
 
               {/* Outras cidades */}
-              <div>
+              <div className="p-5 rounded-xl" style={{ background: "#FDFDF9", border: "1px solid rgba(17,17,17,0.08)" }}>
                 <div className="flex items-center gap-3 mb-3">
                   <div className="h-px w-8 flex-shrink-0" style={{ backgroundColor: "#D4AF37", opacity: 0.65 }} />
                   <p className="text-[10px] font-bold tracking-[0.26em] uppercase" style={{ color: "#D4AF37", opacity: 0.85 }}>
@@ -646,7 +646,7 @@ const SofaVariantPage = () => {
               </div>
 
               {/* Outros serviços na mesma cidade */}
-              <div>
+              <div className="p-5 rounded-xl" style={{ background: "#FDFDF9", border: "1px solid rgba(17,17,17,0.08)" }}>
                 <div className="flex items-center gap-3 mb-3">
                   <div className="h-px w-8 flex-shrink-0" style={{ backgroundColor: "#D4AF37", opacity: 0.65 }} />
                   <p className="text-[10px] font-bold tracking-[0.26em] uppercase" style={{ color: "#D4AF37", opacity: 0.85 }}>

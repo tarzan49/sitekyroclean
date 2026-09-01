@@ -117,7 +117,7 @@ const PricePage = () => {
                   Preço de {data.serviceName} {prep} <span style={{ color: "#D4AF37" }}>{data.cityName}</span>
                 </h1>
 
-                <p className="text-sm sm:text-base md:text-lg text-white/70 leading-relaxed mb-6 max-w-lg">
+                <p className="text-sm sm:text-base md:text-lg text-white/70 leading-relaxed mb-6 max-w-lg line-clamp-2">
                   {data.intro.match(/^[^.?]*[.?]/)?.[0] ?? data.intro}
                 </p>
 

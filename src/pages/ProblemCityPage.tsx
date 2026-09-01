@@ -183,8 +183,8 @@ const ProblemCityPage = () => {
                   {h1Rest} {h1Gold} {prep} <span style={{ color: "#D4AF37" }}>{city.name}</span>
                 </h1>
 
-                <p className="text-sm sm:text-base md:text-lg text-white/70 leading-relaxed mb-6 max-w-lg">
-                  {problem.intro.replace(/no Porto|ao domicílio/g, `${prep} ${city.name}`).split('.')[0]}.
+                <p className="text-sm sm:text-base md:text-lg text-white/70 leading-relaxed mb-6 max-w-lg line-clamp-2">
+                  {problem.intro.replace(/no Porto|ao domicílio/g, `${prep} ${city.name}`).match(/^[^.?]*[.?]/)?.[0] ?? problem.intro}
                 </p>
 
                 <div className="mb-6">
@@ -376,9 +376,9 @@ const ProblemCityPage = () => {
         <section className="py-14 md:py-20 bg-kyro-green">
           <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
             <SectionHeader overline="Explore" heading="Continue a" goldWord="explorar" light={false} />
-            <div className="grid md:grid-cols-3 gap-x-12 gap-y-10">
+            <div className="grid md:grid-cols-3 gap-4">
               {relatedServiceData.length > 0 && (
-                <div>
+                <div className="p-5 rounded-xl" style={{ border: "1px solid rgba(255,255,255,0.10)", background: "rgba(255,255,255,0.03)" }}>
                   <p className="text-[10px] font-bold tracking-[0.26em] uppercase mb-3" style={{ color: "#D4AF37" }}>Serviços {prep} {city.name}</p>
                   <div className="flex flex-wrap gap-2">
                     {relatedServiceData.map(svc => (
@@ -393,7 +393,7 @@ const ProblemCityPage = () => {
               )}
 
               {relatedProblemLinks.length > 0 && (
-                <div>
+                <div className="p-5 rounded-xl" style={{ border: "1px solid rgba(255,255,255,0.10)", background: "rgba(255,255,255,0.03)" }}>
                   <p className="text-[10px] font-bold tracking-[0.26em] uppercase mb-3" style={{ color: "#D4AF37" }}>Problemas relacionados</p>
                   <div className="flex flex-wrap gap-2">
                     {relatedProblemLinks.map(link => (
@@ -407,7 +407,7 @@ const ProblemCityPage = () => {
                 </div>
               )}
 
-              <div>
+              <div className="p-5 rounded-xl" style={{ border: "1px solid rgba(255,255,255,0.10)", background: "rgba(255,255,255,0.03)" }}>
                 <p className="text-[10px] font-bold tracking-[0.26em] uppercase mb-3" style={{ color: "#D4AF37" }}>Este problema noutras cidades</p>
                 <div className="flex flex-wrap gap-2">
                   {nearbyCities.map(c => (

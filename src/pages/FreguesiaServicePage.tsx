@@ -246,7 +246,7 @@ const FreguesiaServicePage = () => {
                   {h1Rest}{" "}<span style={{ color: "#D4AF37" }}>{h1Gold}</span>
                 </h1>
 
-                <p className="text-sm sm:text-base md:text-lg text-white/70 leading-relaxed mb-6 max-w-lg">
+                <p className="text-sm sm:text-base md:text-lg text-white/70 leading-relaxed mb-6 max-w-lg line-clamp-2">
                   {/* Mesma lógica do LocationServicePage.tsx — corta na 1ª
                       frase (ponto OU interrogação), robusto mesmo que um
                       template de intro futuro comece por uma pergunta. */}
