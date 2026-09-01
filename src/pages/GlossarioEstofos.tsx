@@ -27,7 +27,7 @@ const terms: Term[] = [
   {
     id: "impermeabilizacao-sofa",
     term: "Impermeabilização de Sofá",
-    definition: "Tratamento aplicado após a limpeza que cria uma barreira protetora invisível nas fibras do tecido. Quando um líquido é derramado sobre um sofá impermeabilizado, fica na superfície em forma de gotas (efeito lotus) em vez de ser absorvido pelas fibras. Protege contra vinho, café, sumos, gordura e urina de animais. Existem duas versões: a Essencial (à base de água), com efeito de 1 a 2 anos, e a Premium (à base de diluente, mais resistente ao desgaste), com efeito até 5 anos.",
+    definition: "Tratamento aplicado após a limpeza que cria uma barreira protetora invisível nas fibras do tecido. Quando um líquido é derramado sobre um sofá impermeabilizado, fica na superfície em forma de gotas (efeito lotus) em vez de ser absorvido pelas fibras. Protege contra vinho, café, sumos, gordura e urina de animais. Existem duas versões: a Essencial (à base de água), com efeito de 1 a 2 anos, e a Premium (à base de diluente, mais resistente ao desgaste), com efeito até 10 anos.",
     example: "Família com crianças pequenas impermeabiliza o sofá de microfibra após a limpeza. Quando o filho derrama sumo de laranja, basta limpar com um pano, sem mancha.",
     serviceLink: { label: "Impermeabilização de Estofos", to: "/impermeabilizacao" },
   },

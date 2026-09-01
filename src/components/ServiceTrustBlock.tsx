@@ -1,7 +1,8 @@
 import { Star, ExternalLink, ChevronDown } from "lucide-react";
 import { useState } from "react";
-import { SERVICE_TRUST_POOL, type TrustPoint } from "@/constants/serviceTrustPool";
+import { SERVICE_TRUST_POOL, getTrustPointsForSeed, type TrustPoint } from "@/constants/serviceTrustPool";
 import { GOOGLE_REVIEWS_VIEW_URL } from "@/constants/google";
+import { REVIEW_COUNT } from "@/constants/business";
 
 interface Props {
   serviceSlug: string;
@@ -10,6 +11,14 @@ interface Props {
   fullDesc?: boolean;
   /** Se true, mostra botão colapsável em mobile abaixo do wrapper pai */
   mobileCollapsible?: boolean;
+  /** Identifica a página de forma estável (cidade/freguesia) para escolher
+   *  sempre o mesmo item de um pool nessa página — só usado para sofá/colchão. */
+  seedKey?: string;
+}
+
+function resolvePoints(serviceSlug: string, variant: 0 | 1 | 2, seedKey?: string): TrustPoint[] {
+  const pooled = getTrustPointsForSeed(serviceSlug, `${serviceSlug}:${variant}:${seedKey ?? 'default'}`);
+  return pooled ?? SERVICE_TRUST_POOL[serviceSlug]?.[variant] ?? [];
 }
 
 function Points({ points, fullDesc }: { points: TrustPoint[]; fullDesc: boolean }) {
@@ -32,8 +41,9 @@ function Points({ points, fullDesc }: { points: TrustPoint[]; fullDesc: boolean 
                   {p.stat}
                 </p>
               )}
-              <p className="text-sm font-semibold leading-snug mb-0.5" style={{ color: "#111111" }}>
-                {p.title}
+              <p className="text-sm font-semibold leading-snug mb-0.5">
+                <span style={{ color: "#B8912A" }}>{p.titleGold}</span>
+                {p.titleRest && <span style={{ color: "#111111" }}>{p.titleRest}</span>}
               </p>
               {fullDesc && (
                 <p className="text-[13px] leading-relaxed" style={{ color: "rgba(17,17,17,0.50)" }}>
@@ -57,7 +67,7 @@ function Points({ points, fullDesc }: { points: TrustPoint[]; fullDesc: boolean 
         </div>
         <div className="h-3.5 w-px flex-shrink-0" style={{ background: "rgba(17,17,17,0.12)" }} />
         <span className="text-sm font-semibold" style={{ color: "#111111" }}>5.0</span>
-        <span className="text-xs flex-1" style={{ color: "rgba(17,17,17,0.45)" }}>+60 avaliações · Deixar avaliação</span>
+        <span className="text-xs flex-1" style={{ color: "rgba(17,17,17,0.45)" }}>+{REVIEW_COUNT} avaliações · Deixar avaliação</span>
         <ExternalLink className="w-3 h-3 opacity-30 group-hover:opacity-60 transition-opacity flex-shrink-0" style={{ color: "#111111" }} />
       </a>
     </>
@@ -65,8 +75,8 @@ function Points({ points, fullDesc }: { points: TrustPoint[]; fullDesc: boolean 
 }
 
 /** Versão desktop (always visible, with full descriptions) */
-export function ServiceTrustDesktop({ serviceSlug, variant = 0 }: Props) {
-  const points = SERVICE_TRUST_POOL[serviceSlug]?.[variant] ?? [];
+export function ServiceTrustDesktop({ serviceSlug, variant = 0, seedKey }: Props) {
+  const points = resolvePoints(serviceSlug, variant, seedKey);
   if (!points.length) return null;
   return (
     <div className="mt-8">
@@ -76,9 +86,9 @@ export function ServiceTrustDesktop({ serviceSlug, variant = 0 }: Props) {
 }
 
 /** Versão mobile colapsável (compact, no descriptions) */
-export function ServiceTrustMobile({ serviceSlug, variant = 0 }: Props) {
+export function ServiceTrustMobile({ serviceSlug, variant = 0, seedKey }: Props) {
   const [open, setOpen] = useState(false);
-  const points = SERVICE_TRUST_POOL[serviceSlug]?.[variant] ?? [];
+  const points = resolvePoints(serviceSlug, variant, seedKey);
   if (!points.length) return null;
   return (
     <div className="mt-6">

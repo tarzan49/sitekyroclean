@@ -13,13 +13,13 @@ import ServicePriceSection from "@/components/ServicePriceSection";
 import ServiceAutoCarousel from "@/components/ServiceAutoCarousel";
 import { trackWhatsAppClick } from "@/lib/quizTracking";
 import { getPricePageData, getAllPriceRoutes } from "@/data/priceSeoData";
-import { SERVICE_TESTIMONIALS } from "@/data/locationPriceTestimonialsData";
 import { services, cities, cityPrep } from "@/data/locationSeoData";
 import { SERVICE_TO_QUIZ } from "@/constants/serviceToQuiz";
 import { pickServiceHero } from "@/constants/serviceContent";
 import { getServiceGallery } from "@/constants/serviceGallery";
 import { buildServiceWaMessage } from "@/lib/whatsappMessages";
 import { SITE_URL, WHATSAPP_BASE } from "@/constants/business";
+import ServiceReviewsGrid from "@/components/ServiceReviewsGrid";
 import {
   buildWebPageNode,
   buildBreadcrumbNode,
@@ -74,7 +74,6 @@ const PricePage = () => {
   const relatedServices = services.filter(s => s.slug !== data.serviceSlug).slice(0, 4);
   const nearbyCities = cities.filter(c => c.slug !== data.citySlug).slice(0, 8);
   const waHref = `${WHATSAPP_BASE}?text=${encodeURIComponent(buildServiceWaMessage(data.serviceSlug, data.cityName))}`;
-  const testimonials = SERVICE_TESTIMONIALS[data.serviceSlug];
   const gallery = getServiceGallery(data.serviceSlug, data.citySlug);
 
   return (
@@ -119,7 +118,7 @@ const PricePage = () => {
                 </h1>
 
                 <p className="text-sm sm:text-base md:text-lg text-white/70 leading-relaxed mb-6 max-w-lg">
-                  {data.intro.split('.')[0]}.
+                  {data.intro.match(/^[^.?]*[.?]/)?.[0] ?? data.intro}
                 </p>
 
                 <div className="mb-6">
@@ -226,39 +225,19 @@ const PricePage = () => {
         )}
 
         {/* ═══ AVALIAÇÕES REAIS ═══ */}
-        {testimonials && testimonials.length > 0 && (
-          <section className="py-14 md:py-20 bg-[#FDFDF9]">
-            <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
-              <SectionHeader overline="Avaliações Reais" heading="O que dizem os nossos" goldWord="clientes" light={true} />
-              <div className="grid sm:grid-cols-2 gap-px" style={{ backgroundColor: "#E8E4DE" }}>
-                {testimonials.map((t, i) => (
-                  <div key={i} className="relative overflow-hidden p-6 md:p-8 bg-white" style={{ borderTop: "2px solid #D4AF37" }}>
-                    <div className="flex gap-0.5 mb-4">
-                      {[...Array(5)].map((_, j) => <Star key={j} className="w-3.5 h-3.5 fill-[#D4AF37]" style={{ color: "#D4AF37" }} />)}
-                    </div>
-                    <p className="text-sm text-[#111111]/65 leading-relaxed italic mb-4">"{t.text}"</p>
-                    <div className="flex items-center gap-2">
-                      <div className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold text-white" style={{ background: "#D4AF37" }}>
-                        {t.name.charAt(0)}
-                      </div>
-                      <div>
-                        <p className="text-xs font-bold text-[#111111]">{t.name}</p>
-                        <p className="text-[10px] text-[#111111]/40">{t.city}</p>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </section>
-        )}
+        <section className="py-14 md:py-20 bg-[#FDFDF9]">
+          <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
+            <SectionHeader overline="Avaliações Reais" heading="O que dizem os nossos" goldWord="clientes" light={true} />
+            <ServiceReviewsGrid serviceSlug={data.serviceSlug} seed={data.citySlug} heading="" />
+          </div>
+        </section>
 
         {/* ═══ REDE INTERNA ═══ */}
         <section className="py-14 md:py-20 bg-[#FDFDF9]">
           <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
             <SectionHeader overline="Cobertura" heading="Explore" goldWord="mais" light={true} />
-            <div className="grid md:grid-cols-3 gap-x-12 gap-y-10">
-              <div>
+            <div className="grid md:grid-cols-3 gap-4">
+              <div className="p-5 rounded-xl bg-white" style={{ border: "1px solid rgba(17,17,17,0.08)", boxShadow: "0 4px 16px rgba(7,26,18,0.04)" }}>
                 <p className="text-[10px] font-bold tracking-[0.26em] uppercase mb-3" style={{ color: "#D4AF37" }}>Ver página completa</p>
                 <div className="flex flex-wrap gap-2">
                   <Link to={`/${data.serviceSlug}-${data.citySlug}`}
@@ -269,7 +248,7 @@ const PricePage = () => {
                 </div>
               </div>
 
-              <div>
+              <div className="p-5 rounded-xl bg-white" style={{ border: "1px solid rgba(17,17,17,0.08)", boxShadow: "0 4px 16px rgba(7,26,18,0.04)" }}>
                 <p className="text-[10px] font-bold tracking-[0.26em] uppercase mb-3" style={{ color: "#D4AF37" }}>Outros serviços {prep} {data.cityName}</p>
                 <div className="flex flex-wrap gap-2">
                   {relatedServices.map(svc => (
@@ -282,7 +261,7 @@ const PricePage = () => {
                 </div>
               </div>
 
-              <div>
+              <div className="p-5 rounded-xl bg-white" style={{ border: "1px solid rgba(17,17,17,0.08)", boxShadow: "0 4px 16px rgba(7,26,18,0.04)" }}>
                 <p className="text-[10px] font-bold tracking-[0.26em] uppercase mb-3" style={{ color: "#D4AF37" }}>Preços noutras cidades</p>
                 <div className="flex flex-wrap gap-2">
                   {nearbyCities.map(city => (

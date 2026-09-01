@@ -9,9 +9,17 @@ export function useQuizPricing(
   mattressItems: MattressItem[],
   upsellItems: UpsellItemConfig[],
 ) {
-  // Calculate total price early for analytics (moved up for hook dependency)
-  const calculateServicePrice = useMemo(() => {
+  // Calculate total price early for analytics (moved up for hook dependency).
+  // Em paralelo, calcula também o "artigo base" de cada item (preço SEM addon,
+  // por unidade) — usado só para decidir se o Pack Família qualifica (ver
+  // packDiscountActive mais abaixo), nunca para o preço real cobrado.
+  const { calculateServicePrice, articleBaseTotal, minQualifyingArticle } = useMemo(() => {
     let price = 0;
+    let baseTotal = 0;
+    let minQualifying: number | null = null;
+    const noteCandidate = (p: number) => {
+      if (p >= 60 && (minQualifying === null || p < minQualifying)) minQualifying = p;
+    };
 
     switch (formData.service) {
       case 'sofa': {
@@ -28,13 +36,23 @@ export function useQuizPricing(
             ? waterproofP
             : (typeof opt.cleaningPrice === 'number' ? (opt.cleaningPrice as number) : 0);
           // Pack Premium = pack Essencial + a mesma diferença já aprovada entre
-          // Essencial e Premium standalone (não é um combo com preço próprio).
-          const tierDelta = isPremium && typeof opt.waterproofingPremiumPrice === 'number' && typeof opt.waterproofingPrice === 'number'
-            ? opt.waterproofingPremiumPrice - opt.waterproofingPrice : 0;
+          // Essencial e Premium standalone (não é um combo com preço próprio) —
+          // mas respeita primeiro o override packPremiumDelta (ex: 3-lugares tem
+          // 20€ fixo em vez dos 30€ que a diferença standalone daria), exatamente
+          // como calcPackPricing em quizHelpers.ts. Sem isto, o pack Premium do
+          // sofá de 3 lugares saía 10€ mais caro aqui do que em todo o resto do
+          // site (widget, Step 3, upsell), pois usava sempre a diferença bruta.
+          const tierDelta = isPremium
+            ? (typeof opt.packPremiumDelta === 'number'
+                ? opt.packPremiumDelta
+                : (typeof opt.waterproofingPremiumPrice === 'number' && typeof opt.waterproofingPrice === 'number'
+                    ? opt.waterproofingPremiumPrice - opt.waterproofingPrice : 0))
+            : 0;
           const bothEssencial = typeof opt.bothPrice === 'number' ? (opt.bothPrice as number) : baseP + 40;
           const bothP = bothEssencial + tierDelta;
           const unitPrice = item.packEnabled ? bothP : baseP;
           if (unitPrice > 0) price += unitPrice * item.qty;
+          if (baseP > 0) { baseTotal += baseP * item.qty; noteCandidate(baseP); }
         });
         break;
       }
@@ -51,6 +69,7 @@ export function useQuizPricing(
           const bothP = typeof opt.bothPrice === 'number' ? (opt.bothPrice as number) : baseP + 30;
           const unitPrice = item.packEnabled ? bothP : baseP;
           if (unitPrice > 0) price += unitPrice * item.qty;
+          if (baseP > 0) { baseTotal += baseP * item.qty; noteCandidate(baseP); }
         });
         break;
       }
@@ -59,11 +78,16 @@ export function useQuizPricing(
         const isPremium = formData.waterproofingTier === 'premium';
         const calcWaterproof = isPremium ? calcChairWaterproofPremium : calcChairWaterproof;
         const chairQty = parseInt(formData.chairQuantity);
+        let primaryChairPrice = 0;
         if (!isNaN(chairQty) && chairQty > 0) {
-          price = formData.serviceType === 'waterproofing'
+          primaryChairPrice = formData.serviceType === 'waterproofing'
             ? (calcWaterproof(chairQty) ?? 0)
             : (calcChairClean(chairQty) ?? 0);
+          price += primaryChairPrice;
         }
+        // As cadeiras (o serviço principal, sem o addon de impermeabilização
+        // sobre elas) contam como 1 artigo só, ao preço total do lote.
+        if (primaryChairPrice > 0) { baseTotal += primaryChairPrice; noteCandidate(primaryChairPrice); }
         const addonQty = formData.chairWaterproofQty;
         if (addonQty > 0) {
           price += formData.serviceType === 'waterproofing'
@@ -76,13 +100,15 @@ export function useQuizPricing(
       case 'carpet': {
         const carpetArea = parseFloat(formData.carpetArea);
         if (!isNaN(carpetArea) && carpetArea > 0) {
-          price = calcCarpetPrice(carpetArea) ?? 0;
+          const carpetP = calcCarpetPrice(carpetArea) ?? 0;
+          price = carpetP;
+          if (carpetP > 0) { baseTotal += carpetP; noteCandidate(carpetP); }
         }
         break;
       }
     }
 
-    return price;
+    return { calculateServicePrice: price, articleBaseTotal: baseTotal, minQualifyingArticle: minQualifying };
   }, [formData, sofaItems, mattressItems]);
 
   // Calculate travel cost: uses expanded locationPrices from QuizTypes.
@@ -104,19 +130,54 @@ export function useQuizPricing(
   // (both have no fixed price → custom quote). Without the carpet check, calculateServicePrice
   // silently fell back to 0 for area>15m² (calcCarpetPrice returns null there), so totalPrice
   // ended up as travel cost alone with nothing flagging it as a custom quote.
+  // Cadeiras: primário e addon podem ter limiares "sob orçamento" diferentes
+  // (limpeza até 10, impermeabilização a partir de 10) — usa sempre a função
+  // de preço real em vez de repetir um limiar numérico à mão, para não
+  // desalinhar outra vez (bug real 2026-08-31: 10 cadeiras + impermeabilização
+  // mostrava 170€ no topo do quiz, cobrando só a limpeza, addon ignorado em
+  // silêncio, porque o limiar hardcoded aqui era ">10" em vez de ">=10").
+  const isChairService = formData.service === 'chairs';
+  const chairQtyNum = parseInt(formData.chairQuantity);
+  const chairPrimaryCalc = formData.serviceType === 'waterproofing'
+    ? (formData.waterproofingTier === 'premium' ? calcChairWaterproofPremium : calcChairWaterproof)
+    : calcChairClean;
+  const chairPrimaryNeedsQuote = isChairService && !isNaN(chairQtyNum) && chairQtyNum > 0 && chairPrimaryCalc(chairQtyNum) === null;
+  const chairAddonQty = formData.chairWaterproofQty;
+  const chairAddonCalc = formData.serviceType === 'waterproofing'
+    ? calcChairClean
+    : (formData.waterproofingTier === 'premium' ? calcChairWaterproofPremium : calcChairWaterproof);
+  const chairAddonNeedsQuote = isChairService && chairAddonQty > 0 && chairAddonCalc(chairAddonQty) === null;
   const hasSobOrcamento =
     sofaItems.some(i => i.sizeId === '4+-lugares' && i.qty > 0) ||
     (formData.service === 'carpet' && parseFloat(formData.carpetArea) > 15) ||
-    (formData.service === 'chairs' && parseInt(formData.chairQuantity) > 10);
+    chairPrimaryNeedsQuote ||
+    chairAddonNeedsQuote;
   // Any upsell item with price=0 is a SOB item (chairs ≥10, carpet >15m², sofa 4+ lugares)
   const hasUpsellSobItem = upsellItems.some(i => i.price === 0);
-  // Desconto de 10% (2026-08-30): já não depende do total do pedido, depende de o
-  // cliente ADICIONAR um segundo serviço (upsell) que sozinho valha mais de 60€ (ex:
-  // colchão, 3 cadeiras, tapete de 5m²) — a lógica de negócio é "aproveitar a mesma
-  // deslocação para mais serviço". Um item de upsell "sob orçamento" (price=0) conta
-  // sempre como qualificado, é implicitamente um pedido grande.
-  const MIN_UPSELL_FOR_DISCOUNT = 60;
-  const packDiscountActive = upsellItems.some(i => i.price > MIN_UPSELL_FOR_DISCOUNT || i.price === 0);
+  // Desconto de 10% (2026-08-31, reformulado x4 — confirmado com 3 exemplos
+  // concretos): conta-se cada UNIDADE de mobília (sofá, colchão, cadeiras
+  // como lote, tapete) como um artigo ao seu preço BASE (sem addon) — tanto
+  // as do serviço principal como as adicionadas via upsell (Pack Família).
+  // Regra final: soma de todos os artigos > 160€ (100€ de base + 60€ do
+  // artigo extra, não sobrepostos) E pelo menos um artigo, sozinho, vale
+  // 60€ ou mais. Testado com 3 casos reais: 3 colchões casal de 69€ (207€,
+  // >160, um artigo=69≥60) qualifica; 2 colchões casal de 69€ (138€, NÃO
+  // passa 160) não qualifica; 2×sofá 1L 49€ + 1×sofá 2L 69€ (167€, >160,
+  // artigo de 69≥60) qualifica. Uma tentativa anterior (subtrair o artigo
+  // mínimo e exigir que o resto passasse 100€) falhava neste último caso
+  // (98€ de resto, por 2€ não chegava aos 100€) — não é assim que funciona.
+  // 'sofa-anti-acaros'/'chairs-anti-acaros' no upsellItems são tratamento no
+  // mesmo item, não um artigo novo (só lá estão por conveniência de cálculo
+  // no widget), por isso ficam de fora. Um artigo de upsell "sob orçamento"
+  // conta sempre como qualificado (é implicitamente grande mesmo com 0€).
+  const PACK_DISCOUNT_MIN_TOTAL = 160; // 100€ de base + 60€ do artigo extra
+  const NON_ARTICLE_UPSELL_IDS = new Set(['sofa-anti-acaros', 'chairs-anti-acaros']);
+  const articleUpsellItems = upsellItems.filter(i => !NON_ARTICLE_UPSELL_IDS.has(i.id));
+  const upsellArticleTotal = articleUpsellItems.reduce((sum, item) => sum + safePrice(item.price), 0);
+  const hasSubstantialUpsellArticle = articleUpsellItems.some(i => i.price >= 60);
+  const totalArticleValue = articleBaseTotal + upsellArticleTotal;
+  const hasSubstantialArticle = minQualifyingArticle !== null || hasSubstantialUpsellArticle;
+  const packDiscountActive = (totalArticleValue > PACK_DISCOUNT_MIN_TOTAL && hasSubstantialArticle) || hasUpsellSobItem;
   const packDiscountPct = packDiscountActive ? 0.10 : 0;
   const serviceOnlyTotal = calculateServicePrice + upsellItemsTotal + 0;
   const discountedPrice = Math.round(totalPrice);

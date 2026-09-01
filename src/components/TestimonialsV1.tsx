@@ -1,6 +1,7 @@
 import { Star, Quote } from "lucide-react";
 import { useEffect, useRef, useState, useCallback } from "react";
 import useEmblaCarousel from "embla-carousel-react";
+import { ALL_REVIEWS } from "@/data/reviewsPool";
 
 const GoogleG = ({ className }: { className?: string }) => (
   <svg viewBox="0 0 48 48" className={className} aria-hidden="true">
@@ -10,119 +11,6 @@ const GoogleG = ({ className }: { className?: string }) => (
     <path fill="#EA4335" d="M24 10.75c3.23 0 6.13 1.11 8.41 3.29l6.31-6.31C34.91 4.18 29.93 2 24 2 15.4 2 7.96 6.93 4.34 14.12l7.35 5.7c1.73-5.2 6.58-9.07 12.31-9.07z"/>
   </svg>
 );
-
-const REVIEWS = [
-  {
-    name: "Paulo Henrique Cavalcante Silverio",
-    initial: "P",
-    text: "Serviço impecável! Atendimento ótimo dos rapazes.",
-  },
-  {
-    name: "Beatriz Lança",
-    initial: "B",
-    text: "Fizeram um ótimo trabalho com um sofá super antigo e com alguma sujidade acumulada, recomendo muito!!!",
-  },
-  {
-    name: "Stephany Rios",
-    initial: "S",
-    text: "Fizeram um ótimo trabalho na limpeza do sofá. Vi o serviço a ser feito hoje e as manchas desapareceram logo após a limpeza. O sofá ficou com um aspeto renovado, limpo e com um cheiro muito agradável. Estou muito satisfeita com o trabalho e recomendo o serviço!",
-  },
-  {
-    name: "Guillermo Rumbos",
-    initial: "G",
-    text: "Ótimo trabalho.",
-  },
-  {
-    name: "Vitor Lucena",
-    initial: "V",
-    text: "Incrível trabalho, recomendo 5⭐️",
-  },
-  {
-    name: "Luisa Peixoto",
-    initial: "L",
-    text: "Excelente serviço.",
-  },
-  {
-    name: "João Abreu",
-    initial: "J",
-    text: "Ótimo serviço, 100% recomendado!!",
-  },
-  {
-    name: "PIFFEN",
-    initial: "P",
-    text: "Muito bom! Excelente serviço, sem dúvida irei voltar a contactar!",
-  },
-  {
-    name: "Manuel Reis",
-    initial: "M",
-    text: "Serviço 5 estrelas!",
-  },
-  {
-    name: "Pedro Novais",
-    initial: "P",
-    text: "Serviço impecável! Dois jovens trabalhadores muito educados e profissionais fizeram a limpeza do meu sofá com grande cuidado e o resultado ficou excelente. Recomendo vivamente!",
-  },
-  {
-    name: "Miriam Salomão",
-    initial: "M",
-    text: "Excelente trabalho no meu tapete branco, que ficou limpinho! A equipa também é muito educada e foram muito cuidadosos com os restantes móveis da casa. Eu os recomendo!",
-  },
-  {
-    name: "Lucas Costa",
-    initial: "L",
-    text: "Estiveram em casa, Guilherme e Tomas, foram pontuais, profissionais, cordiais e fizeram um excelente trabalho trazendo nosso sofá de volta a vida. Recomendo.",
-  },
-  {
-    name: "Sonya Marabyan",
-    initial: "S",
-    text: "We called the guys to clean the sofa, they did everything very quickly and efficiently. Literally an hour and everything was ready.",
-  },
-  {
-    name: "Francisco Peixoto",
-    initial: "F",
-    text: "Limpeza e serviço impecável! Achei o estilo do vídeo antes e depois muito criativo também, dá a entender que sabem o que fazem 🙌🏻",
-  },
-  {
-    name: "Lumiere Restaurante",
-    initial: "L",
-    text: "Somos um restaurante que prima pela qualidade e gostamos de contratar empresas de excelência com o mesmo reflexo! São eles que tornam o nosso ambiente mais limpo e charmoso! Recomendo 5⭐️",
-  },
-  {
-    name: "Jaime Guimarães",
-    initial: "J",
-    text: "Recorri a esta empresa para a limpeza de um sofá e fiquei muito agradado com o resultado final e com a simpatia da equipa. Serviço 5 estrelas.",
-  },
-  {
-    name: "Clarinda Neves",
-    initial: "C",
-    text: "Fiquei muito satisfeita com o resultado. O meu sofá ficou completamente renovado. Equipa pontual, atenciosa e muito profissional. Voltarei a contratar com certeza!",
-  },
-  {
-    name: "Alexandra Magro",
-    initial: "A",
-    text: "Um serviço de excelência e um ótimo atendimento! O colchão ficou como novo! Daria 6 estrelas se fosse possível!",
-  },
-  {
-    name: "Maria do Carmo Cruz",
-    initial: "M",
-    text: "Prestáveis, com serviços de recolha e ao domicílio. Os tapetes, embora não os tenha aberto na totalidade, após a limpeza, chegaram cheirosos e limpos. Contacto fácil por WhatsApp com a equipa.",
-  },
-  {
-    name: "Cristina Pereira",
-    initial: "C",
-    text: "Excelente trabalho na limpeza de um sofá muito sujo e com várias manchas. Um serviço executado com profissionalismo e simpatia, definitivamente uma empresa a recomendar, muito obrigado!",
-  },
-  {
-    name: "Francisco Silva",
-    initial: "F",
-    text: "Serviço impecável, boa iniciativa! Recomendo!",
-  },
-  {
-    name: "Carla P.",
-    initial: "C",
-    text: "Serviço profissional, rápido e eficiente.",
-  },
-];
 
 const Testimonials = () => {
   const [isVisible, setIsVisible] = useState(false);
@@ -215,7 +103,7 @@ const Testimonials = () => {
         <div className={`transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}>
           <div className="overflow-hidden" ref={emblaRef}>
             <div className="flex gap-5 md:gap-7">
-              {REVIEWS.map((review, i) => (
+              {ALL_REVIEWS.map((review, i) => (
                 <div
                   key={i}
                   className="relative flex-none w-[85vw] md:w-[calc((100%-56px)/3)] flex flex-col p-6 md:p-7 rounded-2xl overflow-hidden transition-all duration-300 hover:-translate-y-1"
@@ -223,7 +111,6 @@ const Testimonials = () => {
                     background: "linear-gradient(160deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%)",
                     border: "1px solid rgba(212,175,55,0.18)",
                     borderTop: "2px solid #D4AF37",
-                    minHeight: 270,
                     boxShadow: "0 20px 40px -20px rgba(0,0,0,0.5)",
                   }}
                 >
@@ -242,9 +129,11 @@ const Testimonials = () => {
                   </div>
 
                   {/* Text */}
-                  <p className="text-[13.5px] md:text-sm leading-relaxed italic flex-1 mb-5 text-white/70 relative">
-                    "{review.text}"
-                  </p>
+                  <div className="flex-1 mb-5 flex items-center relative">
+                    <p className="text-[13.5px] md:text-sm leading-relaxed italic text-white/70">
+                      "{review.text}"
+                    </p>
+                  </div>
 
                   {/* Author */}
                   <div className="flex items-center gap-3 flex-shrink-0 pt-4 relative" style={{ borderTop: "1px solid rgba(255,255,255,0.08)" }}>
@@ -253,7 +142,7 @@ const Testimonials = () => {
                         className="w-9 h-9 rounded-full flex items-center justify-center text-[#12121e] font-bold text-xs"
                         style={{ background: "linear-gradient(135deg, #EDD96A, #D4AF37)" }}
                       >
-                        {review.initial}
+                        {review.name.charAt(0)}
                       </div>
                       <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full bg-white flex items-center justify-center" style={{ boxShadow: "0 0 0 2px #0a2922" }}>
                         <GoogleG className="w-2.5 h-2.5" />
@@ -286,7 +175,7 @@ const Testimonials = () => {
 
             {/* Counter */}
             <span className="text-[10px] text-white/30 font-mono tracking-widest">
-              {selectedIndex + 1}/{REVIEWS.length}
+              {selectedIndex + 1}/{ALL_REVIEWS.length}
             </span>
 
             {/* Next */}

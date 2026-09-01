@@ -28,7 +28,7 @@ const QuizStepLocation = ({
       {!locationQuery && (
         <>
           <p className="text-gold text-[10px] font-bold tracking-[0.28em] uppercase mb-1">LOCALIZAÇÃO</p>
-          <h2 className="font-playfair text-lg sm:text-2xl font-bold text-white mb-1 leading-tight">
+          <h2 className="font-playfair text-2xl sm:text-3xl font-bold text-white mb-1 leading-tight">
             Vamos até si.
           </h2>
           <p className="text-[11px] text-white/35 mb-3">

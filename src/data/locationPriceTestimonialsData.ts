@@ -9,10 +9,12 @@ export type PriceRowQuizConfig = {
   mattressSizeId?: string;
   carpetArea?: string;
   chairQty?: string;
+  chairWaterproofing?: boolean;
   sofaQty?: number;
   mattressQty?: number;
-  sofaItems?: { sizeId: string; qty: number; chaiseLongue?: boolean }[];
-  mattressItems?: { sizeId: string; qty: number }[];
+  sofaItems?: { sizeId: string; qty: number; chaiseLongue?: boolean; packEnabled?: boolean }[];
+  mattressItems?: { sizeId: string; qty: number; packEnabled?: boolean }[];
+  waterproofingTier?: 'essencial' | 'premium';
   initialUpsellItems?: import('@/components/quiz/QuizTypes').UpsellItemConfig[];
 };
 
@@ -76,33 +78,6 @@ export const PRICE_TABLE: Record<string, { item: string; price: string }[]> = {
     { item: 'Sofá 3 lugares',          price: '99€' },
     { item: 'Sofá de 4+ lugares',        price: 'Sob orçamento' },
     { item: 'Chaise longue (add-on)',  price: '+25€' },
-    { item: 'Cadeiras',               price: '25€/cad' },
-  ],
-};
-
-export const SERVICE_TESTIMONIALS: Record<string, { name: string; city: string; text: string }[]> = {
-  'limpeza-sofas': [
-    { name: "Maria S.", city: "Porto", text: "O meu sofá tinha 8 anos e achei que ia ter de comprar um novo. Resultado incrível, como novo em poucas horas!" },
-    { name: "Rui T.", city: "Espinho", text: "Tinham-me dito que a nódoa de vinho não saía. A Kyro provou o contrário! Sofá impecável." },
-  ],
-  'limpeza-colchoes': [
-    { name: "Fernando G.", city: "Rio Tinto", text: "Tinha alergia constante à noite. Depois da limpeza do colchão melhorou imenso. Super recomendo!" },
-    { name: "Daniela R.", city: "Famalicão", text: "Limparam os colchões das crianças. Ficaram super higiénicos e sem aquele cheiro a humidade." },
-  ],
-  'limpeza-tapetes': [
-    { name: "Sandra V.", city: "Paredes", text: "O tapete da sala recuperou cores que já nem me lembrava que tinha. Fiquei completamente impressionada!" },
-    { name: "Miguel S.", city: "Cascais", text: "Limparam tapetes persas antigos com todo o cuidado. Resultado impecável, como novos." },
-  ],
-  'limpeza-cadeiras': [
-    { name: "Teresa F.", city: "Lisboa", text: "As cadeiras da sala de jantar ficaram como novas. Atendimento excelente do início ao fim." },
-    { name: "Helena M.", city: "Ermesinde", text: "As cadeiras do escritório ficaram impecáveis. Equipa pontual e muito profissional." },
-  ],
-  'limpeza-alcatifas': [
-    { name: "Carlos M.", city: "Braga", text: "Serviço de excelência! A alcatifa do escritório ficou impecável. Profissionais muito competentes e pontuais." },
-    { name: "António F.", city: "Vila do Conde", text: "Limparam todo o recheio do AL e os hóspedes notaram logo a diferença. Obrigado!" },
-  ],
-  'impermeabilizacao': [
-    { name: "Ricardo A.", city: "Póvoa de Varzim", text: "A impermeabilização foi perfeita. Agora estou muito mais tranquilo com crianças em casa. Recomendo vivamente!" },
-    { name: "João P.", city: "Vila Nova de Gaia", text: "Cheiro fresco e sensação incrível. Equipa profissional, rápida e super cuidadosa." },
+    { item: 'Cadeiras',               price: '20€/cad' },
   ],
 };

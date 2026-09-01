@@ -164,7 +164,7 @@ function buildReceiptLines(payload: QuizLeadPayload) {
 
   if (service === 'sofa') {
     // Aqui o tier aplica-se mesmo quando o pack (limpeza + proteção) está ligado com
-    // serviceType='cleaning' (toggles "Proteção 2/5 anos"), não só quando a proteção é
+    // serviceType='cleaning' (toggles "Proteção 2/10 anos"), não só quando a proteção é
     // o serviço principal — por isso não se restringe a isWaterproofBase como o `isPremium`
     // usado mais abaixo para cadeiras.
     const isPremiumTierSofa = waterproofingTier === 'premium';
@@ -184,7 +184,7 @@ function buildReceiptLines(payload: QuizLeadPayload) {
       const bothP = bothEssencial !== null ? bothEssencial + tierDelta : null;
       const unit = item.packEnabled ? bothP : baseP;
       const tierTag = item.packEnabled
-        ? (isPremiumTierSofa ? ' + Proteção 5 anos' : ' + Proteção 2 anos')
+        ? (isPremiumTierSofa ? ' + Proteção 10 anos' : ' + Proteção 2 anos')
         : (isWaterproofBase ? (isPremiumTierSofa ? ' (Impermeab. Premium)' : ' (Impermeab. Essencial)') : '');
       receiptLines.push({ label: `Sofá ${opt.label}${tierTag}`, qty: item.qty, unitPrice: unit, total: unit !== null ? unit * item.qty : null });
     });
@@ -197,7 +197,7 @@ function buildReceiptLines(payload: QuizLeadPayload) {
         : (typeof opt.cleaningPrice === 'number' ? (opt.cleaningPrice as number) : null);
       const bothP = typeof opt.bothPrice === 'number' ? (opt.bothPrice as number) : null;
       const unit = item.packEnabled ? bothP : baseP;
-      const typeStr = item.packEnabled ? ' (Pack Proteção Total)' : isWaterproofBase ? ' (Impermeabilização)' : ' (Limpeza)';
+      const typeStr = item.packEnabled ? ' (Pack: Limpeza + Anti Ácaros)' : isWaterproofBase ? ' (Anti Ácaros)' : ' (Limpeza)';
       receiptLines.push({ label: `Colchão ${opt.label}${typeStr}`, qty: item.qty, unitPrice: unit, total: unit !== null ? unit * item.qty : null });
     });
   } else if (service === 'chairs') {

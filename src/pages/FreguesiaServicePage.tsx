@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useLocation, Link } from "react-router-dom";
-import { MapPin, Star, CheckCircle, MessageCircle, ArrowRight, Minus, Plus, Euro, Clock } from "lucide-react";
+import { MapPin, Star, CheckCircle, MessageCircle, ArrowRight, Minus, Plus, Euro, Clock, Check, Shield, Bug } from "lucide-react";
 import Header from "@/components/Header";
 import PageBreadcrumb from "@/components/PageBreadcrumb";
 import Footer from "@/components/Footer";
@@ -30,11 +30,13 @@ import { METRO_CITIES } from "@/constants/metroCities";
 import { pickServiceHero } from "@/constants/serviceContent";
 import { buildServiceWaMessage } from "@/lib/whatsappMessages";
 import { SITE_URL, WHATSAPP_BASE } from "@/constants/business";
-import { PRICE_TABLE, PRICE_TABLE_QUIZ_CONFIG, SERVICE_TESTIMONIALS, type PriceRowQuizConfig } from "@/data/locationPriceTestimonialsData";
-import { calcWidgetTotal, calcChairBracket, calcCarpetWidget, buildWidgetQuizConfig, WIDGET_DISCOUNT_THRESHOLD } from "@/lib/priceWidgetCalc";
+import { PRICE_TABLE, PRICE_TABLE_QUIZ_CONFIG, type PriceRowQuizConfig } from "@/data/locationPriceTestimonialsData";
+import { calcWidgetTotal, calcChairBracket, calcCarpetWidget, buildWidgetQuizConfig, calcRowAddonDelta, calcSofaAntiAcarosDelta, calcChairAddonWaterproofTotal, calcChairAntiAcarosTotal, calcWidgetPricing, calcWidgetArticles, PACK_DISCOUNT_MIN_SERVICE, PACK_DISCOUNT_MIN_UPSELL_ITEM, type WidgetTier } from "@/lib/priceWidgetCalc";
 import { locationPrices } from "@/components/quiz/QuizTypes";
 import { PROBLEM_IMAGES, PROBLEM_POOL_CTA, PRICE_HEADING_VERB } from "@/constants/problemCardHelpers";
 import { ServiceTrustDesktop, ServiceTrustMobile } from "@/components/ServiceTrustBlock";
+import { CarpetTierLegend } from "@/components/CarpetTierLegend";
+import ServiceReviewsGrid from "@/components/ServiceReviewsGrid";
 
 function parseFreguesiaRoute(pathname: string): { serviceSlug: string; citySlug: string; freguesiaSlug: string } | null {
   const path = pathname.replace(/^\//, '');
@@ -69,22 +71,48 @@ const FreguesiaServicePage = () => {
   const [priceQuizConfig, setPriceQuizConfig] = useState<PriceRowQuizConfig | null>(null);
   const [rowQuantities, setRowQuantities] = useState<Record<number, number>>({});
   const [chaiseLongueAddon, setChaiseLongueAddon] = useState(0);
+  const [addonRows, setAddonRows] = useState<Set<number>>(new Set());
+  const [addonTier, setAddonTier] = useState<WidgetTier>('essencial');
+  const [antiAcarosRows, setAntiAcarosRows] = useState<Set<number>>(new Set());
 
   useEffect(() => {
     setRowQuantities({});
     setChaiseLongueAddon(0);
+    setAddonRows(new Set());
+    setAntiAcarosRows(new Set());
   }, [data?.serviceSlug]);
 
   const adjustRowQty = (i: number, delta: number, min = 0, max = 99) => {
     setRowQuantities(prev => {
       const current = prev[i] ?? 0;
-      return { ...prev, [i]: Math.min(max, Math.max(min, current + delta)) };
+      const next = Math.min(max, Math.max(min, current + delta));
+      if (next === 0) {
+        setAddonRows(a => { if (!a.has(i)) return a; const n = new Set(a); n.delete(i); return n; });
+        setAntiAcarosRows(a => { if (!a.has(i)) return a; const n = new Set(a); n.delete(i); return n; });
+      }
+      return { ...prev, [i]: next };
+    });
+  };
+
+  const toggleAddonRow = (i: number) => {
+    setAddonRows(prev => {
+      const next = new Set(prev);
+      if (next.has(i)) next.delete(i); else next.add(i);
+      return next;
+    });
+  };
+
+  const toggleAntiAcarosRow = (i: number) => {
+    setAntiAcarosRows(prev => {
+      const next = new Set(prev);
+      if (next.has(i)) next.delete(i); else next.add(i);
+      return next;
     });
   };
 
   const handlePriceTableContinue = () => {
     if (!data) return;
-    const config = buildWidgetQuizConfig(data.serviceSlug, rowQuantities, chaiseLongueAddon);
+    const config = buildWidgetQuizConfig(data.serviceSlug, rowQuantities, chaiseLongueAddon, addonRows, addonTier, antiAcarosRows);
     if (!config) return;
     setPriceQuizConfig(config);
     openPriceQuiz();
@@ -219,7 +247,10 @@ const FreguesiaServicePage = () => {
                 </h1>
 
                 <p className="text-sm sm:text-base md:text-lg text-white/70 leading-relaxed mb-6 max-w-lg">
-                  {data.intro.split('.')[0]}.
+                  {/* Mesma lógica do LocationServicePage.tsx — corta na 1ª
+                      frase (ponto OU interrogação), robusto mesmo que um
+                      template de intro futuro comece por uma pergunta. */}
+                  {data.intro.match(/^[^.?]*[.?]/)?.[0] ?? data.intro}
                 </p>
 
                 <div className="mb-6">
@@ -280,7 +311,7 @@ const FreguesiaServicePage = () => {
         {PRICE_TABLE[data.serviceSlug] && (
           <section className="py-14 md:py-20 bg-[#FDFDF9]">
             <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
-              <div className="grid md:grid-cols-2 gap-10 md:gap-16 items-start">
+              <div className="grid md:grid-cols-2 gap-10 md:gap-16 items-center">
                 <div>
                   <SectionHeader
                     overline="Tabela de Preços"
@@ -289,7 +320,7 @@ const FreguesiaServicePage = () => {
                     subtitle={`Preços fixos e transparentes, sem surpresas. Deslocação +${locationPrices[data.municipio] ?? 10}€ a ${data.municipio}. Orçamento gratuito antes de qualquer compromisso.`}
                   />
                   <div className="hidden md:block">
-                    <ServiceTrustDesktop serviceSlug={data.serviceSlug} variant={2} />
+                    <ServiceTrustDesktop serviceSlug={data.serviceSlug} variant={2} seedKey={`${data.municipio}-${data.name}`} />
                   </div>
                 </div>
                 <div className="overflow-hidden" style={{ boxShadow: "0 12px 50px rgba(7,26,18,0.16), 0 2px 8px rgba(7,26,18,0.08)" }}>
@@ -352,27 +383,151 @@ const FreguesiaServicePage = () => {
                                 <span className="flex-1 border-b border-dotted mb-0.5" style={{ borderColor: "rgba(17,17,17,0.12)" }} />
                                 <span className="font-playfair font-bold text-xl tabular-nums" style={{ color: "#D4AF37" }}>{dynamicPrice}</span>
                               </div>
-                              <p className="text-[11px] ml-1" style={{ color: "rgba(17,17,17,0.38)" }}>
-                                {isAlcatifa ? 'até 50m²: 3€/m² · +50m²: sob orçamento' : '≤3m²: 15€/m² · ≤5m²: 12,5€/m² · ≤8m²: 11,5€/m² · ≤10m²: 10,5€/m² · ≤15m²: 10€/m² · +15m²: sob orçamento'}
-                              </p>
+                              <CarpetTierLegend isAlcatifa={isAlcatifa} qty={qty} />
                             </div>
                           );
                         }
 
+                        // Nunca mostrar o addon "Impermeabilizar"/"Anti Ácaros" na própria
+                        // página de impermeabilização — aí já é o serviço primário.
+                        const canAddon = !isWaterproof && (quizConfig.service === 'sofa' || quizConfig.service === 'mattress' || isChair);
+                        const isSofaAddon = quizConfig.service === 'sofa';
+                        const addonOn = addonRows.has(i);
+                        const addonDelta = !canAddon || qty <= 0 ? null
+                          : isChair ? calcChairAddonWaterproofTotal(qty, addonTier)
+                          : calcRowAddonDelta(quizConfig, addonTier);
+                        const canAntiAcaros = !isWaterproof && (isSofaAddon || isChair);
+                        const antiAcarosOn = antiAcarosRows.has(i);
+                        const antiAcarosDelta = !canAntiAcaros || qty <= 0 ? null
+                          : isChair ? calcChairAntiAcarosTotal(qty)
+                          : calcSofaAntiAcarosDelta(quizConfig);
+
                         return (
-                          <div key={i} className="flex items-center gap-3 py-3">
-                            <div className="flex items-center gap-0.5 rounded-full border px-1 py-1 flex-shrink-0" style={{ borderColor: qty > 0 ? "rgba(212,175,55,0.5)" : "rgba(7,26,18,0.15)" }}>
-                              <button type="button" onClick={() => adjustRowQty(i, -1)} className="w-9 h-9 flex items-center justify-center rounded-full text-[#111111]/40 hover:bg-[rgba(7,26,18,0.08)] transition-colors" aria-label="Diminuir"><Minus className="w-4 h-4" /></button>
-                              <span className="w-7 text-center font-playfair text-lg font-bold tabular-nums" style={{ color: qty > 0 ? "#D4AF37" : "#111111" }}>{qty}</span>
-                              <button type="button" onClick={() => adjustRowQty(i, 1)} className="w-9 h-9 flex items-center justify-center rounded-full text-[#111111]/40 hover:bg-[rgba(7,26,18,0.08)] transition-colors" aria-label="Aumentar"><Plus className="w-4 h-4" /></button>
+                          <div key={i} className="py-3">
+                            <div className="flex items-center gap-3">
+                              <div className="flex items-center gap-0.5 rounded-full border px-1 py-1 flex-shrink-0" style={{ borderColor: qty > 0 ? "rgba(212,175,55,0.5)" : "rgba(7,26,18,0.15)" }}>
+                                <button type="button" onClick={() => adjustRowQty(i, -1)} className="w-9 h-9 flex items-center justify-center rounded-full text-[#111111]/40 hover:bg-[rgba(7,26,18,0.08)] transition-colors" aria-label="Diminuir"><Minus className="w-4 h-4" /></button>
+                                <span className="w-7 text-center font-playfair text-lg font-bold tabular-nums" style={{ color: qty > 0 ? "#D4AF37" : "#111111" }}>{qty}</span>
+                                <button type="button" onClick={() => adjustRowQty(i, 1)} className="w-9 h-9 flex items-center justify-center rounded-full text-[#111111]/40 hover:bg-[rgba(7,26,18,0.08)] transition-colors" aria-label="Aumentar"><Plus className="w-4 h-4" /></button>
+                              </div>
+                              <span className="transition-colors" style={{ fontSize: "14px", color: qty > 0 ? "#111111" : "rgba(17,17,17,0.55)" }}>{row.item}</span>
+                              <span className="flex-1 border-b border-dotted mb-0.5" style={{ borderColor: "rgba(17,17,17,0.12)" }} />
+                              <span className="font-playfair font-bold text-xl tabular-nums" style={{ color: "#D4AF37" }}>{dynamicPrice}</span>
                             </div>
-                            <span className="transition-colors" style={{ fontSize: "14px", color: qty > 0 ? "#111111" : "rgba(17,17,17,0.55)" }}>{row.item}</span>
-                            <span className="flex-1 border-b border-dotted mb-0.5" style={{ borderColor: "rgba(17,17,17,0.12)" }} />
-                            <span className="font-playfair font-bold text-xl tabular-nums" style={{ color: "#D4AF37" }}>{dynamicPrice}</span>
+
+                            {canAddon && qty > 0 && (
+                              <button
+                                type="button"
+                                onClick={() => toggleAddonRow(i)}
+                                className="flex items-center gap-2 w-full pl-[52px] pt-2 text-left touch-manipulation"
+                              >
+                                <span
+                                  className="w-4 h-4 rounded-sm border flex items-center justify-center flex-shrink-0 transition-all"
+                                  style={{ borderColor: addonOn ? "#D4AF37" : "rgba(17,17,17,0.25)", background: addonOn ? "#D4AF37" : "transparent" }}
+                                >
+                                  {addonOn && <Check className="w-3 h-3" style={{ color: "#071a12" }} strokeWidth={3} />}
+                                </span>
+                                <Shield className="w-3 h-3 flex-shrink-0" style={{ color: addonOn ? "#D4AF37" : "rgba(17,17,17,0.30)" }} />
+                                <span className="text-[11px] font-semibold flex-1" style={{ color: addonOn ? "#111111" : "rgba(17,17,17,0.45)" }}>
+                                  {isSofaAddon || isChair ? 'Impermeabilizar' : 'Anti Ácaros'}
+                                </span>
+                                {addonDelta !== null && (
+                                  <span className="text-[11px] font-bold tabular-nums" style={{ color: addonOn ? "#D4AF37" : "rgba(17,17,17,0.35)" }}>
+                                    +{addonDelta}€{isChair ? '' : '/un.'}
+                                  </span>
+                                )}
+                              </button>
+                            )}
+
+                            {canAntiAcaros && qty > 0 && antiAcarosDelta !== null && (
+                              <button
+                                type="button"
+                                onClick={() => toggleAntiAcarosRow(i)}
+                                className="flex items-center gap-2 w-full pl-[52px] pt-2 text-left touch-manipulation"
+                              >
+                                <span
+                                  className="w-4 h-4 rounded-sm border flex items-center justify-center flex-shrink-0 transition-all"
+                                  style={{ borderColor: antiAcarosOn ? "#D4AF37" : "rgba(17,17,17,0.25)", background: antiAcarosOn ? "#D4AF37" : "transparent" }}
+                                >
+                                  {antiAcarosOn && <Check className="w-3 h-3" style={{ color: "#071a12" }} strokeWidth={3} />}
+                                </span>
+                                <Bug className="w-3 h-3 flex-shrink-0" style={{ color: antiAcarosOn ? "#D4AF37" : "rgba(17,17,17,0.30)" }} />
+                                <span className="text-[11px] font-semibold flex-1" style={{ color: antiAcarosOn ? "#111111" : "rgba(17,17,17,0.45)" }}>
+                                  Anti Ácaros
+                                </span>
+                                <span className="text-[11px] font-bold tabular-nums" style={{ color: antiAcarosOn ? "#D4AF37" : "rgba(17,17,17,0.35)" }}>
+                                  +{antiAcarosDelta}€{isChair ? '' : '/un.'}
+                                </span>
+                              </button>
+                            )}
                           </div>
                         );
                       })}
                     </div>
+
+                    {(() => {
+                      const firstTierAddonRow = Array.from(addonRows).find(i => {
+                        const svc = PRICE_TABLE_QUIZ_CONFIG[data.serviceSlug]?.[i]?.service;
+                        return svc === 'sofa' || svc === 'chairs';
+                      });
+                      if (firstTierAddonRow === undefined) return null;
+                      const cfg = PRICE_TABLE_QUIZ_CONFIG[data.serviceSlug]![firstTierAddonRow]!;
+                      const qtyForRow = rowQuantities[firstTierAddonRow] ?? 0;
+                      const essDelta = cfg.service === 'chairs' ? calcChairAddonWaterproofTotal(qtyForRow, 'essencial') : calcRowAddonDelta(cfg, 'essencial');
+                      const premDelta = cfg.service === 'chairs' ? calcChairAddonWaterproofTotal(qtyForRow, 'premium') : calcRowAddonDelta(cfg, 'premium');
+                      const extraDelta = essDelta !== null && premDelta !== null ? Math.round((premDelta - essDelta) * 100) / 100 : null;
+                      return (
+                      <div className="mt-1 mb-1 p-3 rounded-xl" style={{ background: "rgba(212,175,55,0.06)" }}>
+                        <p className="text-[10px] font-bold tracking-[0.16em] uppercase mb-2" style={{ color: "rgba(17,17,17,0.40)" }}>
+                          Nível de impermeabilização
+                        </p>
+                        <div className="grid grid-cols-2 gap-2">
+                          <button
+                            type="button"
+                            onClick={() => setAddonTier('essencial')}
+                            className="text-left px-3 py-2 rounded-lg border-2 transition-all"
+                            style={{
+                              borderColor: addonTier === 'essencial' ? "#D4AF37" : "rgba(17,17,17,0.12)",
+                              background: addonTier === 'essencial' ? "white" : "rgba(255,255,255,0.5)",
+                            }}
+                          >
+                            <div className="flex items-center gap-1 mb-0.5">
+                              {addonTier === 'essencial' && <Check className="w-3 h-3" style={{ color: "#D4AF37" }} strokeWidth={3} />}
+                              <p className="text-xs font-bold" style={{ color: "#111111" }}>Essencial</p>
+                            </div>
+                            <p className="text-[10px] leading-snug" style={{ color: "rgba(17,17,17,0.40)" }}>1-2 anos de proteção</p>
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setAddonTier('premium')}
+                            className="relative text-left px-3 py-2 rounded-lg border-2 transition-all"
+                            style={{
+                              borderColor: addonTier === 'premium' ? "#D4AF37" : "rgba(212,175,55,0.35)",
+                              background: addonTier === 'premium' ? "white" : "rgba(255,255,255,0.5)",
+                            }}
+                          >
+                            <span
+                              className="absolute -top-2 right-2 text-[7px] font-black px-1.5 py-0.5 uppercase tracking-wide rounded-sm"
+                              style={{ background: "linear-gradient(135deg,#B8912A,#EDD96A)", color: "#071a12" }}
+                            >
+                              Dura Mais
+                            </span>
+                            <div className="flex items-center gap-1 mb-0.5">
+                              {addonTier === 'premium' && <Check className="w-3 h-3" style={{ color: "#D4AF37" }} strokeWidth={3} />}
+                              <p className="text-xs font-bold" style={{ color: "#111111" }}>Premium</p>
+                              {extraDelta !== null && (
+                                <span className="text-[9px] font-black leading-none px-1.5 py-[3px] rounded-full whitespace-nowrap" style={{ background: addonTier === 'premium' ? "#D4AF37" : "rgba(212,175,55,0.15)", color: addonTier === 'premium' ? "white" : "#B8912A" }}>
+                                  só +{extraDelta}€
+                                </span>
+                              )}
+                            </div>
+                            <p className="text-[10px] leading-snug font-semibold" style={{ color: "#B8912A" }}>até 10 anos · até 5 lavagens</p>
+                          </button>
+                        </div>
+                      </div>
+                      );
+                    })()}
+
                     <div className="pt-3 pb-5 border-t space-y-3" style={{ borderColor: "rgba(17,17,17,0.07)" }}>
                       <div className="flex items-center gap-1.5">
                         <CheckCircle className="w-3.5 h-3.5 flex-shrink-0" style={{ color: "rgba(17,17,17,0.25)" }} />
@@ -381,30 +536,40 @@ const FreguesiaServicePage = () => {
                         </span>
                       </div>
                       {(() => {
-                        const total = calcWidgetTotal(data.serviceSlug, rowQuantities, chaiseLongueAddon);
-                        const discountActive = total >= WIDGET_DISCOUNT_THRESHOLD;
-                        const progress = Math.min(100, (total / WIDGET_DISCOUNT_THRESHOLD) * 100);
-                        const remaining = Math.ceil(WIDGET_DISCOUNT_THRESHOLD - total);
-                        const discountedTotal = Math.round(total * 0.9);
+                        const total = calcWidgetTotal(data.serviceSlug, rowQuantities, chaiseLongueAddon, addonRows, addonTier, antiAcarosRows);
+                        const fee = locationPrices[data.municipio] ?? 10;
+                        const articles = calcWidgetArticles(data.serviceSlug, rowQuantities);
+                        const pricing = calcWidgetPricing(total, fee, articles);
                         return (
                           <div className="space-y-2">
-                            {!discountActive && (
-                              <div>
-                                <div className="flex justify-between text-xs mb-1" style={{ color: "rgba(17,17,17,0.40)" }}>
-                                  <span>{total > 0 ? `Faltam ${remaining}€ para 10% de desconto` : `A partir de ${WIDGET_DISCOUNT_THRESHOLD}€ tem 10% de desconto`}</span>
-                                  {total > 0 && <span>{total}€ / {WIDGET_DISCOUNT_THRESHOLD}€</span>}
+                            {pricing.discountActive ? (
+                              <div
+                                className="flex items-center gap-3 rounded-xl px-4 py-3"
+                                style={{ background: "linear-gradient(135deg, rgba(212,175,55,0.10), rgba(212,175,55,0.02))", border: "1px solid rgba(212,175,55,0.35)" }}
+                              >
+                                <div
+                                  className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0"
+                                  style={{ background: "linear-gradient(135deg, #C9A84C, #F0DC8A)", boxShadow: "0 2px 10px rgba(212,175,55,0.45)" }}
+                                >
+                                  <Check className="w-4 h-4" style={{ color: "#071a12" }} strokeWidth={3.5} />
                                 </div>
-                                <div className="h-1.5 rounded-full overflow-hidden" style={{ background: "rgba(17,17,17,0.08)" }}>
-                                  <div className="h-full rounded-full transition-all duration-300" style={{ width: `${progress}%`, background: "linear-gradient(90deg,#C9A84C,#EDD96A)" }} />
+                                <div className="flex-1 text-left">
+                                  <p className="text-sm font-bold leading-none" style={{ color: "#111111" }}>10% de desconto ativo</p>
+                                  <p className="text-[10px] mt-1 leading-none" style={{ color: "rgba(17,17,17,0.40)" }}>Aplica-se a todo o pedido</p>
                                 </div>
+                                <span className="text-[11px] font-black px-2 py-1 rounded-full flex-shrink-0" style={{ background: "#D4AF37", color: "white" }}>-10%</span>
                               </div>
+                            ) : (
+                              <p className="text-xs leading-snug" style={{ color: "rgba(17,17,17,0.40)" }}>
+                                Pedidos de <span className="font-semibold" style={{ color: "#111111" }}>{PACK_DISCOUNT_MIN_SERVICE}€+</span> com um item extra de <span className="font-semibold" style={{ color: "#111111" }}>{PACK_DISCOUNT_MIN_UPSELL_ITEM}€+</span> ganham <span className="font-semibold" style={{ color: "#D4AF37" }}>10% de desconto em tudo</span>.
+                              </p>
                             )}
                             {total > 0 && (
-                              <div className="flex items-center justify-between rounded-xl px-4 py-3" style={{ background: discountActive ? "rgba(212,175,55,0.09)" : "rgba(17,17,17,0.03)" }}>
-                                <span className="text-sm font-medium" style={{ color: "#111111" }}>{discountActive ? "10% de desconto ativado!" : "Total estimado"}</span>
+                              <div className="flex items-center justify-between rounded-xl px-4 py-3" style={{ background: pricing.discountActive ? "rgba(212,175,55,0.09)" : "rgba(17,17,17,0.03)" }}>
+                                <span className="text-sm font-medium" style={{ color: "#111111" }}>{pricing.discountActive ? "Total com desconto" : "Total estimado"}</span>
                                 <div className="flex items-baseline gap-2">
-                                  {discountActive && <span className="text-xs line-through" style={{ color: "rgba(17,17,17,0.35)" }}>{total}€</span>}
-                                  <span className="font-playfair font-bold text-xl" style={{ color: "#D4AF37" }}>{discountActive ? discountedTotal : total}€</span>
+                                  {pricing.discountActive && <span className="text-xs line-through" style={{ color: "rgba(17,17,17,0.35)" }}>{pricing.grandTotal}€</span>}
+                                  <span className="font-playfair font-bold text-xl" style={{ color: "#D4AF37" }}>{pricing.discountActive ? pricing.discountedTotal : pricing.grandTotal}€</span>
                                 </div>
                               </div>
                             )}
@@ -419,7 +584,7 @@ const FreguesiaServicePage = () => {
                 </div>
               </div>
               <div className="lg:hidden">
-                <ServiceTrustMobile serviceSlug={data.serviceSlug} variant={2} />
+                <ServiceTrustMobile serviceSlug={data.serviceSlug} variant={2} seedKey={`${data.municipio}-${data.name}`} />
               </div>
             </div>
           </section>
@@ -441,6 +606,8 @@ const FreguesiaServicePage = () => {
             initialChairQty={priceQuizConfig.chairQty}
             initialCarpetArea={priceQuizConfig.carpetArea}
             initialUpsellItems={priceQuizConfig.initialUpsellItems}
+            initialWaterproofingTier={priceQuizConfig.waterproofingTier}
+            initialChairWaterproofing={priceQuizConfig.chairWaterproofing}
             skipToUpsell
           />
         )}
@@ -545,63 +712,13 @@ const FreguesiaServicePage = () => {
           <ServiceFAQ faqs={data.faqs} heading={`Perguntas sobre ${data.service.toLowerCase()} em ${data.name}`} variant="dark" />
         )}
 
-        {/* ═══ BENEFÍCIOS + TESTEMUNHOS ═══ */}
-        {data.benefits && data.benefits.length > 0 && (
-          <section className="py-14 md:py-20 bg-[#FDFDF9]">
-            <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
-              <SectionHeader
-                overline="Vantagens"
-                heading={`Porquê escolher a Kyro em`}
-                goldWord={data.name}
-                light={true}
-              />
-              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-px mb-10" style={{ backgroundColor: "#E8E4DE" }}>
-                {data.benefits.map((benefit, idx) => (
-                  <div key={idx} className="relative overflow-hidden bg-white p-6 md:p-7" style={{ borderTop: "2px solid #D4AF37" }}>
-                    <span
-                      className="absolute top-3 right-4 font-playfair font-bold leading-none select-none pointer-events-none"
-                      style={{ fontSize: "4.5rem", color: "rgba(212,175,55,0.07)" }}
-                    >
-                      {String(idx + 1).padStart(2, "0")}
-                    </span>
-                    <p className="relative text-[10px] font-bold tracking-[0.24em] uppercase mb-3" style={{ color: "#D4AF37" }}>
-                      {String(idx + 1).padStart(2, "0")}
-                    </p>
-                    <p className="relative text-sm text-[#111111]/70 leading-relaxed">{benefit}</p>
-                  </div>
-                ))}
-              </div>
-
-              {SERVICE_TESTIMONIALS[data.serviceSlug] && (
-                <>
-                  <div className="flex items-center gap-3 mb-6">
-                    <div className="h-px w-8 flex-shrink-0" style={{ backgroundColor: "#D4AF37", opacity: 0.65 }} />
-                    <p className="text-[10px] font-bold tracking-[0.28em] uppercase" style={{ color: "#D4AF37", opacity: 0.85 }}>Avaliações Reais</p>
-                  </div>
-                  <div className="grid sm:grid-cols-2 gap-px" style={{ backgroundColor: "#E8E4DE" }}>
-                    {SERVICE_TESTIMONIALS[data.serviceSlug].map((t, i) => (
-                      <div key={i} className="relative overflow-hidden p-6 md:p-8 bg-white" style={{ borderTop: "2px solid #D4AF37" }}>
-                        <div className="relative flex gap-0.5 mb-4">
-                          {[...Array(5)].map((_, j) => <Star key={j} className="w-3.5 h-3.5 fill-[#D4AF37]" style={{ color: "#D4AF37" }} />)}
-                        </div>
-                        <p className="relative text-sm text-[#111111]/65 leading-relaxed italic mb-4">"{t.text}"</p>
-                        <div className="relative flex items-center gap-2">
-                          <div className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold text-white" style={{ background: "#D4AF37" }}>
-                            {t.name.charAt(0)}
-                          </div>
-                          <div>
-                            <p className="text-xs font-bold text-[#111111]">{t.name}</p>
-                            <p className="text-[10px] text-[#111111]/40">{t.city}</p>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </>
-              )}
-            </div>
-          </section>
-        )}
+        {/* ═══ TESTEMUNHOS ═══ */}
+        <section className="py-14 md:py-20 bg-[#FDFDF9]">
+          <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
+            <SectionHeader overline="Avaliações Reais" heading="O que dizem os nossos" goldWord="clientes" light={true} />
+            <ServiceReviewsGrid serviceSlug={data.serviceSlug} seed={`${data.municipio}-${data.name}`} heading="" />
+          </div>
+        </section>
 
         {/* ═══ PACKS ═══ */}
         <ServicePackBanner
@@ -620,9 +737,9 @@ const FreguesiaServicePage = () => {
               subtitle={data.localSection}
             />
 
-            <div className="grid md:grid-cols-2 gap-x-12 gap-y-10">
+            <div className="grid md:grid-cols-2 gap-4">
               {nearbyFreguesias.length > 0 && (
-                <div>
+                <div className="p-5 rounded-xl bg-white" style={{ border: "1px solid rgba(17,17,17,0.08)", boxShadow: "0 4px 16px rgba(7,26,18,0.04)" }}>
                   <p className="text-[10px] font-bold tracking-[0.26em] uppercase mb-3" style={{ color: "#D4AF37" }}>Freguesias próximas</p>
                   <div className="flex flex-wrap gap-2">
                     {nearbyFreguesias.map(f => (
@@ -639,7 +756,7 @@ const FreguesiaServicePage = () => {
                 </div>
               )}
 
-              <div>
+              <div className="p-5 rounded-xl bg-white" style={{ border: "1px solid rgba(17,17,17,0.08)", boxShadow: "0 4px 16px rgba(7,26,18,0.04)" }}>
                 <p className="text-[10px] font-bold tracking-[0.26em] uppercase mb-3" style={{ color: "#D4AF37" }}>Outros serviços em {data.name}</p>
                 <div className="flex flex-wrap gap-2">
                   {otherServices.map(svc => (
@@ -655,7 +772,7 @@ const FreguesiaServicePage = () => {
               </div>
 
               {municipioProblems.length > 0 && (
-                <div>
+                <div className="p-5 rounded-xl bg-white" style={{ border: "1px solid rgba(17,17,17,0.08)", boxShadow: "0 4px 16px rgba(7,26,18,0.04)" }}>
                   <p className="text-[10px] font-bold tracking-[0.26em] uppercase mb-3" style={{ color: "#D4AF37" }}>Problemas que resolvemos em {data.municipio}</p>
                   <div className="flex flex-wrap gap-2">
                     {municipioProblems.map(p => (

@@ -10,6 +10,11 @@ interface ServiceTypeSelectorProps {
   packPrice?: number;
   waterproofingDesc?: string;
   hideWaterproofing?: boolean;
+  // Rótulos do slot "waterproofing" — por omissão é a impermeabilização (sofá/
+  // cadeiras); o colchão reaproveita este mesmo slot para "Anti Ácaros" (2026-08-30).
+  waterproofingTitle?: string;
+  waterproofingSubtitle?: string;
+  bothDesc?: string;
 }
 
 interface OptionConfig {
@@ -33,6 +38,9 @@ const ServiceTypeSelector = ({
   packPrice,
   waterproofingDesc = 'Ideal para estofos novos ou recém-limpos.',
   hideWaterproofing = false,
+  waterproofingTitle = 'Proteção Anti-Manchas',
+  waterproofingSubtitle = 'Impermeabilização Essencial',
+  bothDesc = 'Limpeza Profunda + Impermeabilização Essencial',
 }: ServiceTypeSelectorProps) => {
   const options: OptionConfig[] = [
     {
@@ -48,8 +56,8 @@ const ServiceTypeSelector = ({
     {
       id: 'waterproofing' as const,
       icon: Shield,
-      title: 'Proteção Anti-Manchas',
-      subtitle: 'Impermeabilização Essencial',
+      title: waterproofingTitle,
+      subtitle: waterproofingSubtitle,
       badge: 'RECOMENDADO',
       badgeStyle: 'silver' as const,
       desc: waterproofingDesc,
@@ -62,7 +70,7 @@ const ServiceTypeSelector = ({
       title: 'PACK PROTEÇÃO TOTAL',
       badge: undefined,
       badgeStyle: undefined,
-      desc: 'Limpeza Profunda + Impermeabilização Essencial',
+      desc: bothDesc,
       subdesc: 'A melhor qualidade do mercado com desconto de pack apenas hoje.',
       price: packPrice,
       recommended: true,

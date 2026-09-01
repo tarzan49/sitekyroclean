@@ -325,7 +325,7 @@ function generateImpermeabilizacaoContent(city: string, cityDesc: string): Omit<
   const prep = cityPrep(city);
   return {
     title: `Impermeabilização de Estofos ${city} | Essencial ou Premium | Kyro Clean Solutions`,
-    metaDescription: `Impermeabilização profissional de sofás e cadeiras ${prep} ${city}. Versão Essencial e versão Premium, com proteção invisível real até 5 anos.`,
+    metaDescription: `Impermeabilização profissional de sofás e cadeiras ${prep} ${city}. Versão Essencial e versão Premium, com proteção invisível real até 10 anos.`,
     h1: `Impermeabilização de Estofos ${prep} ${city}`,
     intro: `Proteja os seus estofos contra manchas e líquidos ${prep} ${city}. A Kyro Clean Solutions aplica impermeabilização profissional invisível que cria uma barreira protetora nos tecidos, repelindo líquidos e facilitando a limpeza. Duas versões disponíveis, Essencial e Premium, ${prep} ${city} e ${cityDesc}.`,
     problems: [
@@ -337,7 +337,7 @@ function generateImpermeabilizacaoContent(city: string, cityDesc: string): Omit<
     benefits: [
       "Barreira protetora invisível que não altera a cor nem a textura do tecido",
       "Proteção contra manchas de vinho, café, gordura e urina de animais",
-      "Essencial: até 2 lavagens e 1 a 2 anos de proteção real. Premium: até 5 lavagens e até 5 anos de proteção real",
+      "Essencial: até 2 lavagens e 1 a 2 anos de proteção real. Premium: até 5 lavagens e até 10 anos de proteção real",
       "Ideal para famílias com crianças pequenas e animais de estimação (recomendamos a Premium)",
       `Aplicação ao domicílio ${prep} ${city}, com possibilidade de combinar com limpeza prévia`,
       `Recomendado para quem vive ${prep} ${city} e quer proteger sofás e cadeiras a longo prazo`,
@@ -346,7 +346,7 @@ function generateImpermeabilizacaoContent(city: string, cityDesc: string): Omit<
     faqs: [
       { question: `Quanto custa impermeabilizar um sofá ${prep} ${city}?`, answer: `Versão Essencial: 59€ (1 lugar), 79€ (2 lugares) e 99€ (3 lugares). Versão Premium: 79€ (1 lugar), 99€ (2 lugares) e 129€ (3 lugares). O pack limpeza + impermeabilização Essencial numa única visita começa em 99€ para 1 lugar. Orçamento gratuito ${prep} ${city}.` },
       { question: `A impermeabilização altera a textura do sofá?`, answer: `Não. Nas duas versões, o produto de impermeabilização é completamente invisível e não altera a cor, textura ou respirabilidade do tecido.` },
-      { question: `Quanto tempo dura a impermeabilização?`, answer: `Depende da versão. A Essencial, à base de água, aguenta até 2 lavagens e dura 1 a 2 anos consoante o uso. A Premium, à base de diluente e mais resistente ao desgaste, aguenta até 5 lavagens e dura até 5 anos.` },
+      { question: `Quanto tempo dura a impermeabilização?`, answer: `Depende da versão. A Essencial, à base de água, aguenta até 2 lavagens e dura 1 a 2 anos consoante o uso. A Premium, à base de diluente e mais resistente ao desgaste, aguenta até 5 lavagens e dura até 10 anos.` },
       { question: `Vale a pena impermeabilizar o sofá?`, answer: `Sim, especialmente se tem crianças ou animais, caso em que a versão Premium costuma compensar mais a longo prazo. A impermeabilização previne manchas e facilita a limpeza, poupando na substituição de estofos.` },
     ],
   };

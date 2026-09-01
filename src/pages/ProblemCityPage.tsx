@@ -16,7 +16,6 @@ import ServiceSnapshotStats from "@/components/ServiceSnapshotStats";
 import ServiceLocationSchema from "@/components/ServiceLocationSchema";
 import { getProblemBySlug, getRelatedProblemLinks } from "@/data/problemSeoData";
 import { CATEGORY_TIPS, CATEGORY_STATS, splitTipsHeading } from "@/data/problemTipsData";
-import { SERVICE_TESTIMONIALS } from "@/data/locationPriceTestimonialsData";
 import { getServiceGallery, getSolutionImage } from "@/constants/serviceGallery";
 import { cities, services, DEFAULT_PRICE_FROM, cityPrep, cityPrepCap } from "@/data/locationSeoData";
 import { SERVICE_TO_QUIZ } from "@/constants/serviceToQuiz";
@@ -25,6 +24,7 @@ import { getAllProblemCityRoutes } from "@/data/problemCitySeoData";
 import { getProblemHeroImage } from "@/lib/problemHeroImages";
 import { trackWhatsAppClick } from "@/lib/quizTracking";
 import { SITE_URL, WHATSAPP_BASE } from "@/constants/business";
+import ServiceReviewsGrid from "@/components/ServiceReviewsGrid";
 
 const PROCESS_STEPS = [
   { title: "Identificação do tecido", body: "Avaliamos o tipo de material e a extensão do problema antes de aplicar qualquer produto ou equipamento." },
@@ -115,9 +115,6 @@ const ProblemCityPage = () => {
   const servicePrice = relatedServiceData[0]?.priceFrom ?? DEFAULT_PRICE_FROM;
   const cityContext = getCityContext(problem.slug, city.name, city.description);
   const categoryTips = CATEGORY_TIPS[problem.category];
-  const testimonialPool = SERVICE_TESTIMONIALS[problem.relatedServices[0]] ?? SERVICE_TESTIMONIALS['limpeza-sofas'];
-  const testimonialHash = city.name.split("").reduce((a, c) => a + c.charCodeAt(0), 0);
-  const testimonial = testimonialPool[testimonialHash % testimonialPool.length];
   const gallery = getServiceGallery(problem.relatedServices[0], `${problem.slug}-${city.slug}`);
   const heroImg = getProblemHeroImage(problem.slug);
   const solutionImg = getSolutionImage(problem.relatedServices[0], `${problem.slug}-${city.slug}`) ?? heroImg;
@@ -148,7 +145,7 @@ const ProblemCityPage = () => {
         serviceName={problem.h1}
         serviceBaseUrl={`/problemas/${problem.slug}`}
         placeName={city.name}
-        description={`${problem.intro.split('.')[0]} ${prep} ${city.name}. Serviço profissional ao domicílio.`}
+        description={`${problem.intro.match(/^[^.?]*[.?]/)?.[0] ?? problem.intro} ${prep} ${city.name}. Serviço profissional ao domicílio.`}
         pageUrl={pathname}
         priceFrom={servicePrice}
       />
@@ -368,30 +365,12 @@ const ProblemCityPage = () => {
         )}
 
         {/* ═══ AVALIAÇÕES REAIS ═══ */}
-        {testimonial && (
-          <section className="py-14 md:py-20 bg-[#FDFDF9]">
-            <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
-              <SectionHeader overline="Avaliações Reais" heading="O que dizem os nossos" goldWord="clientes" light={true} />
-              <div className="max-w-md">
-                <div className="relative overflow-hidden p-6 md:p-8 bg-white" style={{ borderTop: "2px solid #D4AF37" }}>
-                  <div className="flex gap-0.5 mb-4">
-                    {[...Array(5)].map((_, j) => <Star key={j} className="w-3.5 h-3.5 fill-[#D4AF37]" style={{ color: "#D4AF37" }} />)}
-                  </div>
-                  <p className="text-sm text-[#111111]/65 leading-relaxed italic mb-4">"{testimonial.text}"</p>
-                  <div className="flex items-center gap-2">
-                    <div className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold text-white" style={{ background: "#D4AF37" }}>
-                      {testimonial.name.charAt(0)}
-                    </div>
-                    <div>
-                      <p className="text-xs font-bold text-[#111111]">{testimonial.name}</p>
-                      <p className="text-[10px] text-[#111111]/40">{testimonial.city}</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </section>
-        )}
+        <section className="py-14 md:py-20 bg-[#FDFDF9]">
+          <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
+            <SectionHeader overline="Avaliações Reais" heading="O que dizem os nossos" goldWord="clientes" light={true} />
+            <ServiceReviewsGrid serviceSlug={problem.relatedServices[0]} seed={`${problem.slug}-${city.slug}`} heading="" />
+          </div>
+        </section>
 
         {/* ═══ REDE INTERNA ═══ */}
         <section className="py-14 md:py-20 bg-kyro-green">

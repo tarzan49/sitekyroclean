@@ -25,7 +25,7 @@ import {
 import { cities, cityPrep } from "@/data/locationSeoData";
 import { municipiosComFreguesias } from "@/data/freguesiaSeoData";
 import { GENERIC_PROCESS_STEPS, IMPERMEABILIZACAO_STEPS } from "@/constants/serviceProcesses";
-import { SITE_URL, WHATSAPP_BASE, PHONE_TEL, PHONE_DISPLAY } from "@/constants/business";
+import { SITE_URL, WHATSAPP_BASE, PHONE_TEL, PHONE_DISPLAY, REVIEW_COUNT } from "@/constants/business";
 import TrustRatingBadge from "@/components/TrustRatingBadge";
 import { buildVariantWaMessage } from "@/lib/whatsappMessages";
 
@@ -317,7 +317,7 @@ const SofaVariantPage = () => {
                 </h1>
 
                 <p className="text-sm sm:text-base md:text-lg text-white/70 leading-relaxed mb-6 max-w-lg">
-                  {data.intro.split('.')[0]}.
+                  {data.intro.match(/^[^.?]*[.?]/)?.[0] ?? data.intro}
                 </p>
 
                 <div className="mb-6">
@@ -476,7 +476,7 @@ const SofaVariantPage = () => {
             <div className="grid grid-cols-3 gap-px mb-10" style={{ backgroundColor: "rgba(255,255,255,0.06)" }}>
               {[
                 { stat: "< 30 min", label: "Resposta ao orçamento" },
-                { stat: "5.0 ★",   label: "+60 avaliações Google" },
+                { stat: "5.0 ★",   label: `+${REVIEW_COUNT} avaliações Google` },
                 { stat: "100%",     label: "Garantia de resultado" },
               ].map((item, i) => (
                 <div key={i} className="p-5 sm:p-6 md:p-7" style={{ background: "rgba(255,255,255,0.04)", borderTop: "2px solid rgba(212,175,55,0.55)" }}>

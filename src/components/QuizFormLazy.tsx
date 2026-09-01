@@ -16,12 +16,14 @@ interface Props {
   initialServiceType?: 'cleaning' | 'waterproofing' | 'both';
   initialSofaSizeId?: string;
   initialSofaQty?: number;
-  initialSofaItems?: { sizeId: string; qty: number; chaiseLongue?: boolean }[];
+  initialSofaItems?: { sizeId: string; qty: number; chaiseLongue?: boolean; packEnabled?: boolean }[];
   initialMattressSizeId?: string;
   initialMattressQty?: number;
-  initialMattressItems?: { sizeId: string; qty: number }[];
+  initialMattressItems?: { sizeId: string; qty: number; packEnabled?: boolean }[];
   initialChairQty?: string;
+  initialChairWaterproofing?: boolean;
   initialCarpetArea?: string;
+  initialWaterproofingTier?: 'essencial' | 'premium';
   problema?: string;
   skipToUpsell?: boolean;
   initialUpsellItems?: import('./quiz/QuizTypes').UpsellItemConfig[];

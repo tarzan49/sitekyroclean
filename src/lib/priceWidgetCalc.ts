@@ -1,5 +1,57 @@
 import { PRICE_TABLE, PRICE_TABLE_QUIZ_CONFIG, type PriceRowQuizConfig } from "@/data/locationPriceTestimonialsData";
 import type { UpsellItemConfig } from "@/components/quiz/QuizTypes";
+import { sofaPrices, mattressPrices } from "@/components/quiz/QuizTypes";
+import { calcPackPricing, calcChairWaterproof, calcChairWaterproofPremium } from "@/components/quiz/quizHelpers";
+
+export type WidgetTier = 'essencial' | 'premium';
+
+// Anti Ácaros para sofás: addon plano por tamanho (sem tiers Essencial/Premium,
+// ao contrário da impermeabilização) — pedido explícito 2026-08-31.
+export const SOFA_ANTI_ACAROS_PRICE: Record<string, number> = {
+  '1-lugar': 20,
+  '2-lugares': 40,
+  '3-lugares': 50,
+};
+
+export function calcSofaAntiAcarosDelta(cfg: PriceRowQuizConfig): number | null {
+  if (cfg.service !== 'sofa' || !cfg.sofaSizeId) return null;
+  return SOFA_ANTI_ACAROS_PRICE[cfg.sofaSizeId] ?? null;
+}
+
+// Addon de impermeabilização para cadeiras (quando limpeza é o serviço
+// primário) — reaproveita os preços já existentes de calcChairWaterproof(Premium).
+export function calcChairAddonWaterproofTotal(qty: number, tier: WidgetTier): number | null {
+  return tier === 'premium' ? calcChairWaterproofPremium(qty) : calcChairWaterproof(qty);
+}
+
+// Anti Ácaros para cadeiras: 7,5€ por cadeira, sempre (preço fixo, sem
+// escalões) — confirmado 2026-08-31.
+export const CHAIR_ANTI_ACAROS_UNIT_PRICE = 7.5;
+
+export function calcChairAntiAcarosTotal(qty: number): number | null {
+  if (qty <= 0) return 0;
+  if (qty > 10) return null;
+  return Math.round(qty * CHAIR_ANTI_ACAROS_UNIT_PRICE * 10) / 10;
+}
+
+// Delta por unidade (preço com protecção - preço só limpeza) para uma linha
+// sofá/colchão do widget, espelhando exactamente calcPackPricing do quiz modal
+// (mesmo fallbackDelta: 40 para sofás, 30 para colchões).
+export function calcRowAddonDelta(cfg: PriceRowQuizConfig, tier: WidgetTier): number | null {
+  if (cfg.service === 'sofa' && cfg.sofaSizeId) {
+    const opt = sofaPrices.find(p => p.id === cfg.sofaSizeId);
+    if (!opt) return null;
+    const { basePrice, packPrice } = calcPackPricing(opt, true, false, 40, tier);
+    return basePrice !== null && packPrice !== null ? packPrice - basePrice : null;
+  }
+  if (cfg.service === 'mattress' && cfg.mattressSizeId) {
+    const opt = mattressPrices.find(p => p.id === cfg.mattressSizeId);
+    if (!opt) return null;
+    const { basePrice, packPrice } = calcPackPricing(opt, true, false, 30, tier);
+    return basePrice !== null && packPrice !== null ? packPrice - basePrice : null;
+  }
+  return null;
+}
 
 function parseRowPrice(price: string): number {
   if (price.includes('/m²') || price.toLowerCase().includes('orçamento')) return 0;
@@ -9,7 +61,7 @@ function parseRowPrice(price: string): number {
 
 export function calcChairBracket(qty: number, waterproof: boolean): number | null {
   if (qty <= 0) return 0;
-  if (qty > 10) return null; // 11+ cadeiras = sob orçamento
+  if (qty >= 10) return null; // 10+ cadeiras = sempre sob orçamento (2026-09-01)
   if (waterproof) {
     return qty <= 4 ? qty * 25 : 4 * 25 + (qty - 4) * 20;
   }
@@ -21,7 +73,10 @@ export function calcChairBracket(qty: number, waterproof: boolean): number | nul
 export function calcWidgetTotal(
   serviceSlug: string,
   rowQuantities: Record<number, number>,
-  chaiseLongueAddon: number
+  chaiseLongueAddon: number,
+  addonRows: Set<number> = new Set(),
+  addonTier: WidgetTier = 'essencial',
+  antiAcarosRows: Set<number> = new Set()
 ): number {
   const rows = PRICE_TABLE[serviceSlug] ?? [];
   const configs = PRICE_TABLE_QUIZ_CONFIG[serviceSlug] ?? [];
@@ -35,6 +90,18 @@ export function calcWidgetTotal(
     if (cfg?.service === 'chairs') {
       const c = calcChairBracket(qty, isWaterproof);
       if (c !== null) total += c;
+      // Addons só fazem sentido quando cadeiras não são já o serviço de
+      // impermeabilização primário (mesma lógica do sofá/colchão).
+      if (!isWaterproof) {
+        if (addonRows.has(i)) {
+          const wp = calcChairAddonWaterproofTotal(qty, addonTier);
+          if (wp !== null) total += wp;
+        }
+        if (antiAcarosRows.has(i)) {
+          const aa = calcChairAntiAcarosTotal(qty);
+          if (aa !== null) total += aa;
+        }
+      }
       return;
     }
     if (cfg?.service === 'carpet') {
@@ -45,6 +112,14 @@ export function calcWidgetTotal(
     }
     const unitPrice = parseRowPrice(row.price);
     if (unitPrice > 0) total += unitPrice * qty;
+    if (cfg && addonRows.has(i)) {
+      const delta = calcRowAddonDelta(cfg, addonTier);
+      if (delta !== null) total += delta * qty;
+    }
+    if (cfg && antiAcarosRows.has(i)) {
+      const delta = calcSofaAntiAcarosDelta(cfg);
+      if (delta !== null) total += delta * qty;
+    }
   });
 
   const chaisePriceUnit = isWaterproof ? 25 : 10;
@@ -67,7 +142,78 @@ export function calcCarpetWidget(area: number, alcatifa = false): number | null 
   return 125.5 + (area - 10) * 10;
 }
 
-export const WIDGET_DISCOUNT_THRESHOLD = 149;
+// 2026-08-31 (reformulado x4, confirmado com 3 exemplos concretos) — espelha
+// use-quiz-pricing.ts: conta-se cada UNIDADE de mobília (sofá, colchão,
+// cadeiras-como-lote, tapete) como um artigo ao seu preço BASE (sem addon).
+// Regra final: soma de todos os artigos > 160€ (100€ de base + 60€ do artigo
+// extra, não sobrepostos) E pelo menos um artigo, sozinho, vale 60€ ou mais.
+// Testado: 3 colchões casal 69€ (207€) qualifica; 2 colchões casal 69€
+// (138€) não qualifica; 2×sofá 1L 49€ + 1×sofá 2L 69€ (167€) qualifica.
+export const PACK_DISCOUNT_MIN_SERVICE = 100;
+export const PACK_DISCOUNT_MIN_UPSELL_ITEM = 60;
+export const PACK_DISCOUNT_MIN_TOTAL = PACK_DISCOUNT_MIN_SERVICE + PACK_DISCOUNT_MIN_UPSELL_ITEM;
+
+export interface WidgetArticleInfo {
+  articleTotal: number;
+  minQualifyingArticle: number | null;
+}
+
+export function calcWidgetArticles(
+  serviceSlug: string,
+  rowQuantities: Record<number, number>
+): WidgetArticleInfo {
+  const rows = PRICE_TABLE[serviceSlug] ?? [];
+  const configs = PRICE_TABLE_QUIZ_CONFIG[serviceSlug] ?? [];
+  const isWaterproof = serviceSlug === 'impermeabilizacao';
+  let articleTotal = 0;
+  let minQualifyingArticle: number | null = null;
+  const noteCandidate = (p: number) => {
+    if (p >= PACK_DISCOUNT_MIN_UPSELL_ITEM && (minQualifyingArticle === null || p < minQualifyingArticle)) minQualifyingArticle = p;
+  };
+
+  rows.forEach((row, i) => {
+    const qty = rowQuantities[i] ?? 0;
+    if (qty <= 0) return;
+    const cfg = configs[i];
+    if (!cfg) return; // chaise longue: addon, não é um artigo próprio
+    if (cfg.service === 'chairs') {
+      const total = calcChairBracket(qty, isWaterproof);
+      if (total !== null && total > 0) { articleTotal += total; noteCandidate(total); }
+      return;
+    }
+    if (cfg.service === 'carpet') {
+      const isAlcatifa = serviceSlug === 'limpeza-alcatifas';
+      const total = calcCarpetWidget(qty, isAlcatifa);
+      if (total !== null && total > 0) { articleTotal += total; noteCandidate(total); }
+      return;
+    }
+    // Sofá / colchão: cada unidade é um artigo separado ao preço base da linha.
+    const unitPrice = parseRowPrice(row.price);
+    if (unitPrice > 0) {
+      articleTotal += unitPrice * qty;
+      noteCandidate(unitPrice);
+    }
+  });
+
+  return { articleTotal, minQualifyingArticle };
+}
+
+export interface WidgetPricing {
+  serviceTotal: number;
+  travelFee: number;
+  grandTotal: number;
+  discountActive: boolean;
+  discountedTotal: number;
+  remaining: number;
+}
+
+export function calcWidgetPricing(serviceTotal: number, travelFee: number, articles: WidgetArticleInfo): WidgetPricing {
+  const grandTotal = serviceTotal + travelFee;
+  const discountActive = articles.minQualifyingArticle !== null
+    && articles.articleTotal > PACK_DISCOUNT_MIN_TOTAL;
+  const discountedTotal = discountActive ? Math.round(serviceTotal * 0.9) + travelFee : grandTotal;
+  return { serviceTotal, travelFee, grandTotal, discountActive, discountedTotal, remaining: 0 };
+}
 
 /**
  * Constrói a config do quiz a partir do estado do widget.
@@ -76,34 +222,51 @@ export const WIDGET_DISCOUNT_THRESHOLD = 149;
 export function buildWidgetQuizConfig(
   serviceSlug: string,
   rowQuantities: Record<number, number>,
-  chaiseLongueAddon: number
+  chaiseLongueAddon: number,
+  addonRows: Set<number> = new Set(),
+  addonTier: WidgetTier = 'essencial',
+  antiAcarosRows: Set<number> = new Set()
 ): PriceRowQuizConfig | null {
   const configs = PRICE_TABLE_QUIZ_CONFIG[serviceSlug] ?? [];
   const isWaterproof = serviceSlug === 'impermeabilizacao';
   const svcType: 'cleaning' | 'waterproofing' = isWaterproof ? 'waterproofing' : 'cleaning';
 
   // Agrupar linhas seleccionadas por serviço
-  const sofaRows:    { sizeId: string; qty: number }[]     = [];
-  const mattressRows:{ sizeId: string; qty: number }[]     = [];
+  const sofaRows:    { sizeId: string; qty: number; packEnabled: boolean }[]     = [];
+  const mattressRows:{ sizeId: string; qty: number; packEnabled: boolean }[]     = [];
   let   chairTotal = 0;
+  let   chairWaterproofOn = false;
+  let   chairAntiAcarosOn = false;
   let   carpetArea = 0;
   let   carpetCfg: PriceRowQuizConfig | null = null;
+  let   antiAcarosQty = 0;
+  let   antiAcarosPrice = 0;
 
   configs.forEach((cfg, i) => {
     if (!cfg) return;
     const qty = rowQuantities[i] ?? 0;
-    if (cfg.service === 'sofa'    && cfg.sofaSizeId    && qty > 0) sofaRows.push({ sizeId: cfg.sofaSizeId, qty });
-    if (cfg.service === 'mattress'&& cfg.mattressSizeId&& qty > 0) mattressRows.push({ sizeId: cfg.mattressSizeId, qty });
-    if (cfg.service === 'chairs'  && qty > 0) chairTotal += qty;
+    const packEnabled = addonRows.has(i);
+    if (cfg.service === 'sofa'    && cfg.sofaSizeId    && qty > 0) sofaRows.push({ sizeId: cfg.sofaSizeId, qty, packEnabled });
+    if (cfg.service === 'mattress'&& cfg.mattressSizeId&& qty > 0) mattressRows.push({ sizeId: cfg.mattressSizeId, qty, packEnabled });
+    if (cfg.service === 'chairs'  && qty > 0) {
+      chairTotal += qty;
+      if (packEnabled) chairWaterproofOn = true;
+      if (antiAcarosRows.has(i)) chairAntiAcarosOn = true;
+    }
     if (cfg.service === 'carpet'  && qty > 0) { carpetArea = qty; carpetCfg = cfg; }
+    if (cfg.service === 'sofa'    && qty > 0 && antiAcarosRows.has(i)) {
+      const delta = calcSofaAntiAcarosDelta(cfg);
+      if (delta !== null) { antiAcarosQty += qty; antiAcarosPrice += delta * qty; }
+    }
   });
 
-  // Sofás (primário) + cadeiras como upsell
+  // Sofás (primário) + cadeiras/anti-ácaros como upsell
   if (sofaRows.length > 0) {
     const sofaItems = sofaRows.map(r => ({ ...r, chaiseLongue: false as boolean }));
     if (chaiseLongueAddon > 0) sofaItems[0].chaiseLongue = true;
 
-    const chairUpsell: UpsellItemConfig[] = chairTotal > 0 ? [{
+    const upsells: UpsellItemConfig[] = [];
+    if (chairTotal > 0) upsells.push({
       id: 'chairs', chairQty: String(chairTotal), qty: chairTotal,
       price: Math.round(((isWaterproof
         ? (chairTotal <= 4 ? chairTotal * 25 : 4 * 25 + (chairTotal - 4) * 20)
@@ -111,19 +274,33 @@ export function buildWidgetQuizConfig(
       )) * 10) / 10,
       label: `${chairTotal} cadeira${chairTotal > 1 ? 's' : ''}`,
       waterproof: isWaterproof, waterproofPrice: 0,
-    }] : [];
+    });
+    if (antiAcarosQty > 0) upsells.push({
+      id: 'sofa-anti-acaros', qty: antiAcarosQty,
+      price: Math.round(antiAcarosPrice * 10) / 10,
+      label: 'Anti Ácaros (sofá)',
+    });
 
-    return { service: 'sofa', serviceType: svcType, sofaItems, initialUpsellItems: chairUpsell.length ? chairUpsell : undefined };
+    return { service: 'sofa', serviceType: svcType, sofaItems, waterproofingTier: addonTier, initialUpsellItems: upsells.length ? upsells : undefined };
   }
 
   // Colchões
   if (mattressRows.length > 0) {
-    return { service: 'mattress', serviceType: svcType, mattressItems: mattressRows };
+    return { service: 'mattress', serviceType: svcType, mattressItems: mattressRows, waterproofingTier: addonTier };
   }
 
   // Cadeiras (sem sofás)
   if (chairTotal > 0) {
-    return { service: 'chairs', serviceType: svcType, chairQty: String(chairTotal) };
+    const chairAntiAcarosUpsell: UpsellItemConfig[] = chairAntiAcarosOn ? [{
+      id: 'chairs-anti-acaros', qty: chairTotal,
+      price: Math.round((calcChairAntiAcarosTotal(chairTotal) ?? 0) * 10) / 10,
+      label: 'Anti Ácaros (cadeiras)',
+    }] : [];
+    return {
+      service: 'chairs', serviceType: svcType, chairQty: String(chairTotal),
+      chairWaterproofing: chairWaterproofOn, waterproofingTier: addonTier,
+      initialUpsellItems: chairAntiAcarosUpsell.length ? chairAntiAcarosUpsell : undefined,
+    };
   }
 
   // Tapetes / alcatifas

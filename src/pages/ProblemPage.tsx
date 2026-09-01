@@ -15,7 +15,6 @@ import ServiceAutoCarousel from "@/components/ServiceAutoCarousel";
 import ServiceSnapshotStats from "@/components/ServiceSnapshotStats";
 import { getProblemBySlug, getRelatedProblemLinks } from "@/data/problemSeoData";
 import { CATEGORY_TIPS, CATEGORY_STATS, splitTipsHeading } from "@/data/problemTipsData";
-import { SERVICE_TESTIMONIALS } from "@/data/locationPriceTestimonialsData";
 import { getServiceGallery, getSolutionImage } from "@/constants/serviceGallery";
 import { services, cities } from "@/data/locationSeoData";
 import { SERVICE_TO_QUIZ } from "@/constants/serviceToQuiz";
@@ -23,6 +22,7 @@ import { getProblemHeroImage } from "@/lib/problemHeroImages";
 import { trackWhatsAppClick } from "@/lib/quizTracking";
 import { buildProblemWaMessage } from "@/lib/whatsappMessages";
 import { SITE_URL, WHATSAPP_BASE } from "@/constants/business";
+import ServiceReviewsGrid from "@/components/ServiceReviewsGrid";
 import {
   buildLocalBusinessNode,
   buildWebPageNode,
@@ -109,7 +109,6 @@ const ProblemPage = () => {
     .filter(Boolean) as typeof cities[number][];
   const servicePrice = relatedService?.priceFrom ?? "49€";
   const categoryTips = CATEGORY_TIPS[data.category];
-  const testimonials = SERVICE_TESTIMONIALS[data.relatedServices[0]];
   const gallery = getServiceGallery(data.relatedServices[0], slug ?? "");
   const heroImg = getProblemHeroImage(slug ?? "");
   const solutionImg = getSolutionImage(data.relatedServices[0], slug ?? "") ?? heroImg;
@@ -157,7 +156,7 @@ const ProblemPage = () => {
                 </h1>
 
                 <p className="text-sm sm:text-base md:text-lg text-white/70 leading-relaxed mb-6 max-w-lg">
-                  {data.intro.split('.')[0]}.
+                  {data.intro.match(/^[^.?]*[.?]/)?.[0] ?? data.intro}
                 </p>
 
                 <div className="mb-6">
@@ -349,32 +348,12 @@ const ProblemPage = () => {
         )}
 
         {/* ═══ AVALIAÇÕES REAIS ═══ */}
-        {testimonials && testimonials.length > 0 && (
-          <section className="py-14 md:py-20 bg-[#FDFDF9]">
-            <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
-              <SectionHeader overline="Avaliações Reais" heading="O que dizem os nossos" goldWord="clientes" light={true} />
-              <div className="grid sm:grid-cols-2 gap-px" style={{ backgroundColor: "#E8E4DE" }}>
-                {testimonials.map((t, i) => (
-                  <div key={i} className="relative overflow-hidden p-6 md:p-8 bg-white" style={{ borderTop: "2px solid #D4AF37" }}>
-                    <div className="flex gap-0.5 mb-4">
-                      {[...Array(5)].map((_, j) => <Star key={j} className="w-3.5 h-3.5 fill-[#D4AF37]" style={{ color: "#D4AF37" }} />)}
-                    </div>
-                    <p className="text-sm text-[#111111]/65 leading-relaxed italic mb-4">"{t.text}"</p>
-                    <div className="flex items-center gap-2">
-                      <div className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold text-white" style={{ background: "#D4AF37" }}>
-                        {t.name.charAt(0)}
-                      </div>
-                      <div>
-                        <p className="text-xs font-bold text-[#111111]">{t.name}</p>
-                        <p className="text-[10px] text-[#111111]/40">{t.city}</p>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </section>
-        )}
+        <section className="py-14 md:py-20 bg-[#FDFDF9]">
+          <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
+            <SectionHeader overline="Avaliações Reais" heading="O que dizem os nossos" goldWord="clientes" light={true} />
+            <ServiceReviewsGrid serviceSlug={data.relatedServices[0]} seed={data.slug} heading="" />
+          </div>
+        </section>
 
         {/* ═══ REDE INTERNA ═══ */}
         <section className="py-14 md:py-20 bg-[#FDFDF9]">

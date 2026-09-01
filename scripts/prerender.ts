@@ -785,22 +785,22 @@ export function prerenderRoutes(outDir: string): number {
       {
         path: '/impermeabilizacao',
         title: 'Impermeabilização de Estofos | Essencial ou Premium | Kyro Clean Solutions',
-        desc: 'Impermeabilização profissional de sofás e cadeiras. Versão Essencial e versão Premium, com proteção invisível real até 5 anos. Desde 59€. Serviço ao domicílio.',
+        desc: 'Impermeabilização profissional de sofás e cadeiras. Versão Essencial e versão Premium, com proteção invisível real até 10 anos. Desde 59€. Serviço ao domicílio.',
         content: {
           h1: 'Impermeabilização de Estofos',
           intro: 'Proteja os seus estofos com impermeabilização profissional ao domicílio. Barreira invisível contra manchas, líquidos e desgaste, em duas versões: Essencial e Premium. Ideal após limpeza ou em estofos novos.',
           benefits: [
             'Proteção invisível que não altera a textura nem a cor',
             'Repelência a líquidos, manchas de vinho e gordura',
-            'Essencial: até 2 lavagens, 1 a 2 anos de proteção real. Premium: até 5 lavagens, até 5 anos',
+            'Essencial: até 2 lavagens, 1 a 2 anos de proteção real. Premium: até 5 lavagens, até 10 anos',
             'Reduz a frequência de limpezas necessárias',
             'Ideal para famílias com crianças e animais domésticos (recomendamos a Premium)',
             'Produto certificado e eco-friendly',
           ],
           faqs: faqs([
             { q: 'O que é a impermeabilização de estofos?', a: 'A impermeabilização cria uma barreira invisível na fibra do estofo que repele líquidos e dificulta a penetração de manchas. O tecido mantém a aparência e textura originais.' },
-            { q: 'Quanto custa a impermeabilização?', a: 'A versão Essencial começa a partir de 59€ para sofá de 1 lugar e 25€ por cadeira. A versão Premium começa a partir de 79€ para sofá de 1 lugar e 35€ por cadeira. Peça orçamento gratuito.' },
-            { q: 'Quanto tempo dura a impermeabilização?', a: 'Depende da versão. A Essencial, à base de água, dura 1 a 2 anos e aguenta até 2 lavagens. A Premium, à base de diluente e mais resistente ao desgaste, dura até 5 anos e aguenta até 5 lavagens.' },
+            { q: 'Quanto custa a impermeabilização?', a: 'A versão Essencial começa a partir de 59€ para sofá de 1 lugar e 20€ por cadeira. A versão Premium começa a partir de 79€ para sofá de 1 lugar e 30€ por cadeira. Peça orçamento gratuito.' },
+            { q: 'Quanto tempo dura a impermeabilização?', a: 'Depende da versão. A Essencial, à base de água, dura 1 a 2 anos e aguenta até 2 lavagens. A Premium, à base de diluente e mais resistente ao desgaste, dura até 10 anos e aguenta até 5 lavagens.' },
             { q: 'Posso fazer impermeabilização sem limpeza prévia?', a: 'Recomendamos sempre limpeza prévia para maior eficácia. Temos o Pack Proteção Total, que combina limpeza com a versão Essencial com desconto.' },
           ]),
         },

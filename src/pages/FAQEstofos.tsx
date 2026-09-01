@@ -5,7 +5,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import QuizButton from "@/components/QuizButton";
 import TrustRatingBadge from "@/components/TrustRatingBadge";
-import { SITE_URL, WHATSAPP_BASE, PHONE_E164, PHONE_DISPLAY } from "@/constants/business";
+import { SITE_URL, WHATSAPP_BASE, PHONE_E164, PHONE_DISPLAY, REVIEW_COUNT } from "@/constants/business";
 
 const PAGE_URL = `${SITE_URL}/perguntas-frequentes-limpeza-estofos`;
 
@@ -68,8 +68,8 @@ const allFaqs: FAQ[] = [
   {
     id: "garantia-satisfacao",
     question: "Têm garantia de satisfação?",
-    answer: <>Sim. A Kyro Clean oferece <strong>garantia de satisfação total</strong>: se o resultado não corresponder ao que foi acordado antes do serviço, voltamos ao domicílio sem custo adicional para corrigir o trabalho. A garantia cobre manchas identificadas e estimadas antes de começar. Para a acionar, basta contactar-nos nas <strong>48 horas</strong> após o serviço via <a href={WHATSAPP_BASE} target="_blank" rel="noopener noreferrer" className="text-gold hover:underline font-medium">WhatsApp ({PHONE_DISPLAY})</a>. A nossa taxa de reclamações é inferior a 1%: mais de 99% dos clientes ficam satisfeitos na primeira visita, reflectido nas nossas <strong>mais de 60 avaliações 5 estrelas no Google</strong>. Somos honestos sobre o que conseguimos e não conseguimos remover antes de aceitar o trabalho: nunca prometer e não cumprir.</>,
-    plainAnswer: "Garantia de satisfação total: voltamos sem custo se o resultado não corresponder ao acordado. Acionar em 48h via WhatsApp. Taxa de reclamações inferior a 1%. Mais de 60 avaliações 5 estrelas no Google.",
+    answer: <>Sim. A Kyro Clean oferece <strong>garantia de satisfação total</strong>: se o resultado não corresponder ao que foi acordado antes do serviço, voltamos ao domicílio sem custo adicional para corrigir o trabalho. A garantia cobre manchas identificadas e estimadas antes de começar. Para a acionar, basta contactar-nos nas <strong>48 horas</strong> após o serviço via <a href={WHATSAPP_BASE} target="_blank" rel="noopener noreferrer" className="text-gold hover:underline font-medium">WhatsApp ({PHONE_DISPLAY})</a>. A nossa taxa de reclamações é inferior a 1%: mais de 99% dos clientes ficam satisfeitos na primeira visita, reflectido nas nossas <strong>mais de {REVIEW_COUNT} avaliações 5 estrelas no Google</strong>. Somos honestos sobre o que conseguimos e não conseguimos remover antes de aceitar o trabalho: nunca prometer e não cumprir.</>,
+    plainAnswer: `Garantia de satisfação total: voltamos sem custo se o resultado não corresponder ao acordado. Acionar em 48h via WhatsApp. Taxa de reclamações inferior a 1%. Mais de ${REVIEW_COUNT} avaliações 5 estrelas no Google.`,
   },
   {
     id: "como-pedir-orcamento-rapido",
@@ -104,8 +104,8 @@ const allFaqs: FAQ[] = [
   {
     id: "quanto-custa-impermeabilizacao",
     question: "Quanto custa impermeabilizar um sofá?",
-    answer: <>A <Link to="/impermeabilizacao" className="text-gold hover:underline font-medium">impermeabilização profissional</Link> para sofás existe em duas versões. A <strong>Essencial</strong> (à base de água) custa <strong>59€ (1 lugar), 79€ (2 lugares) e 99€ (3 lugares)</strong>, aguenta até 2 lavagens e dura 1 a 2 anos. A <strong>Premium</strong> (à base de diluente, mais resistente ao desgaste) custa <strong>79€ (1 lugar), 99€ (2 lugares) e 129€ (3 lugares)</strong>, aguenta até 5 lavagens e dura até 5 anos. Quando a Essencial é contratada em pack com a limpeza, o total é mais baixo do que os dois serviços separados. Para casas com crianças ou animais, a Premium costuma compensar mais.</>,
-    plainAnswer: "Impermeabilização sofá: Essencial 59€/79€/99€ (até 2 lavagens, 1 a 2 anos). Premium 79€/99€/129€ (até 5 lavagens, até 5 anos). Pack limpeza+Essencial tem desconto.",
+    answer: <>A <Link to="/impermeabilizacao" className="text-gold hover:underline font-medium">impermeabilização profissional</Link> para sofás existe em duas versões. A <strong>Essencial</strong> (à base de água) custa <strong>59€ (1 lugar), 79€ (2 lugares) e 99€ (3 lugares)</strong>, aguenta até 2 lavagens e dura 1 a 2 anos. A <strong>Premium</strong> (à base de diluente, mais resistente ao desgaste) custa <strong>79€ (1 lugar), 99€ (2 lugares) e 129€ (3 lugares)</strong>, aguenta até 5 lavagens e dura até 10 anos. Quando a Essencial é contratada em pack com a limpeza, o total é mais baixo do que os dois serviços separados. Para casas com crianças ou animais, a Premium costuma compensar mais.</>,
+    plainAnswer: "Impermeabilização sofá: Essencial 59€/79€/99€ (até 2 lavagens, 1 a 2 anos). Premium 79€/99€/129€ (até 5 lavagens, até 10 anos). Pack limpeza+Essencial tem desconto.",
   },
   {
     id: "diferenca-tapete-alcatifa",

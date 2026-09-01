@@ -3,7 +3,7 @@ export interface QuizFormData {
   serviceType: 'cleaning' | 'waterproofing' | 'both' | '';
   // Só relevante quando serviceType === 'waterproofing' e o serviço é sofá/cadeiras.
   // "essencial" = à base de água (produto atual, aguenta ~2 lavagens). "premium" =
-  // à base de diluente (novo, 2026-08-30, dura até 5 anos/5 lavagens, preço mais alto).
+  // à base de diluente (novo, 2026-08-30, dura até 10 anos/5 lavagens, preço mais alto).
   waterproofingTier: 'essencial' | 'premium';
   sofaSize: string;
   sofaHasChaise: boolean;
@@ -60,6 +60,10 @@ export interface PriceOption {
   // (adicionado 2026-08-30). "both" (Pack Proteção Total) continua sempre Essencial,
   // não há combo Premium+limpeza com desconto definido.
   waterproofingPremiumPrice?: number | string;
+  // Override do delta Premium dentro do Pack (limpeza+impermeabilização), quando o
+  // valor derivado (waterproofingPremiumPrice - waterproofingPrice) não é o desejado
+  // só para o combo. Omitido = deriva-se automaticamente como antes.
+  packPremiumDelta?: number;
 }
 
 // Sofa pack pricing: limpeza + impermeabilização com desconto
@@ -68,22 +72,27 @@ export interface PriceOption {
 export const sofaPrices: PriceOption[] = [
   { id: '1-lugar',    label: '1 Lugar',    cleaningPrice: 49, waterproofingPrice: 59, bothPrice: 99,  originalBothPrice: 108, waterproofingPremiumPrice: 79 },
   { id: '2-lugares',  label: '2 Lugares',  cleaningPrice: 69, waterproofingPrice: 79, bothPrice: 145, originalBothPrice: 148, waterproofingPremiumPrice: 99 },
-  { id: '3-lugares',  label: '3 Lugares',  cleaningPrice: 79, waterproofingPrice: 99, bothPrice: 169, originalBothPrice: 178, waterproofingPremiumPrice: 129 },
+  { id: '3-lugares',  label: '3 Lugares',  cleaningPrice: 79, waterproofingPrice: 99, bothPrice: 159, originalBothPrice: 178, waterproofingPremiumPrice: 129, packPremiumDelta: 20 },
   { id: '4+-lugares', label: '4+ Lugares', cleaningPrice: 'Sob orçamento', waterproofingPrice: 'Sob orçamento', bothPrice: 'Sob orçamento', waterproofingPremiumPrice: 'Sob orçamento' },
 ];
 
 // Chaise longue: preço fixo (limpeza ou pack)
 export const sofaChaisePrice = { cleaning: 10, waterproofing: 25 };
 
-// Mattress pricing
-// Limpeza:           59 / 69 / 79
-// Impermeabilização: 55 / 60 / 65
-// Pack Total: 88 / 101 / 114 (poupa 26/28/30€ vs. separado)
-// originalBothPrice = soma sem desconto (preço riscado no UI)
+// Mattress pricing (2026-08-30: waterproofingPrice/bothPrice/originalBothPrice
+// reaproveitados para "Anti Ácaros" — mesmo motor de preços da impermeabilização do
+// sofá (standalone + pack com desconto), só o rótulo na UI é que muda. Não confundir
+// com impermeabilização real: colchões não têm essa opção, só anti-ácaros.
+// Anti Ácaros sozinho: 35 / 40 / 45 (varia por tamanho, ao contrário do sofá)
+// Limpeza:             59 / 69 / 79
+// Pack Total:          84 / 99 / 114 (2026-08-31: king corrigido de 104 para 114 —
+// o delta do pack tem de subir com o tamanho: solteiro +25, casal +30, king +35;
+// 104 dava só +25, abaixo do casal, o que não fazia sentido)
+// originalBothPrice = soma sem desconto (limpeza + anti-ácaros sozinho, preço riscado)
 export const mattressPrices: PriceOption[] = [
-  { id: 'solteiro', label: 'Solteiro',     cleaningPrice: 59, waterproofingPrice: 55, bothPrice: 88,  originalBothPrice: 114 },
-  { id: 'casal',    label: 'Casal',        cleaningPrice: 69, waterproofingPrice: 60, bothPrice: 101, originalBothPrice: 129 },
-  { id: 'king',     label: 'King / Queen', cleaningPrice: 79, waterproofingPrice: 65, bothPrice: 114, originalBothPrice: 144 },
+  { id: 'solteiro', label: 'Solteiro',     cleaningPrice: 59, waterproofingPrice: 35, bothPrice: 84,  originalBothPrice: 94 },
+  { id: 'casal',    label: 'Casal',        cleaningPrice: 69, waterproofingPrice: 40, bothPrice: 99,  originalBothPrice: 109 },
+  { id: 'king',     label: 'King / Queen', cleaningPrice: 79, waterproofingPrice: 45, bothPrice: 114, originalBothPrice: 124 },
 ];
 
 // Sem zona grátis: mínimo 10€ sempre em todo o site, sobe com a distância ao centro de cada equipa.

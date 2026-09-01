@@ -1,3 +1,4 @@
+import { sofaPrices, mattressPrices } from './QuizTypes';
 import type { SofaItem, MattressItem, PriceOption } from './QuizTypes';
 
 // ── Sofa helpers ─────────────────────────────────────────────────────────────
@@ -53,7 +54,11 @@ export function calcPackPricing(
   const waterPrice = typeof option.waterproofingPrice === 'number' ? option.waterproofingPrice : null;
   const waterPremiumPrice = typeof option.waterproofingPremiumPrice === 'number' ? option.waterproofingPremiumPrice : null;
   const basePrice = isWaterproofBase ? (isPremium ? waterPremiumPrice : waterPrice) : cleanPrice;
-  const tierDelta = isPremium && waterPremiumPrice !== null && waterPrice !== null ? waterPremiumPrice - waterPrice : 0;
+  const tierDelta = isPremium
+    ? (typeof option.packPremiumDelta === 'number'
+        ? option.packPremiumDelta
+        : (waterPremiumPrice !== null && waterPrice !== null ? waterPremiumPrice - waterPrice : 0))
+    : 0;
   const bothEssencial = typeof option.bothPrice === 'number'
     ? option.bothPrice
     : (fallbackDelta !== null && cleanPrice !== null ? cleanPrice + fallbackDelta : null);
@@ -95,55 +100,95 @@ export function calcCarpetPrice(area: number): number | null {
 }
 
 // ── Chairs ────────────────────────────────────────────────────────────────────
-export const CHAIR_TIERS = [
-  { label: '1ª a 4ª',  sublabel: 'cadeira', rate: 20 },
-  { label: '5ª a 6ª',  sublabel: 'cadeira', rate: 15 },
-  { label: '7ª a 10ª', sublabel: 'cadeira', rate: 12.5 },
-  { label: '11+',      sublabel: 'cadeiras', rate: null },
-] as const;
-
-export const CHAIR_WATERPROOF_TIERS = [
-  { label: '1 a 4',  sublabel: 'cadeiras', rate: 25 },
-  { label: '5 a 10', sublabel: 'cadeiras', rate: 20 },
-  { label: '11+',    sublabel: 'cadeiras', rate: null },
-] as const;
-
-// Impermeabilização Premium (à base de diluente, adicionado 2026-08-30).
-export const CHAIR_WATERPROOF_PREMIUM_TIERS = [
-  { label: '1 a 4',  sublabel: 'cadeiras', rate: 35 },
-  { label: '5 a 10', sublabel: 'cadeiras', rate: 30 },
-  { label: '11+',    sublabel: 'cadeiras', rate: null },
-] as const;
-
-export function chairActiveTier(qty: number): number {
-  if (qty <= 4) return 0;
-  if (qty <= 6) return 1;
-  if (qty <= 10) return 2;
-  return 3;
-}
-
-// Bracket pricing: 1-4 @ 20€ · 5-6 @ 15€ · 7-10 @ 12.5€ · 11+: sob orçamento
+// Bracket pricing: 1-4 @ 20€ · 5-6 @ 15€ · 7-9 @ 12.5€ · 10+: sob orçamento
+// — limiar alinhado com calcChairWaterproof(Premium) 2026-08-31: 10 cadeiras
+// é sempre sob orçamento, com ou sem impermeabilização (pedido explícito,
+// era ">10" aqui e ">=10" nas duas de baixo, o desalinhamento causava um
+// bug real de preço a cair silenciosamente para a limpeza sozinha a 10).
 export function calcChairClean(qty: number): number | null {
-  if (qty <= 0 || qty > 10) return null;
+  if (qty <= 0 || qty >= 10) return null;
   if (qty <= 4) return qty * 20;
   if (qty <= 6) return 4 * 20 + (qty - 4) * 15;
   return 4 * 20 + 2 * 15 + (qty - 6) * 12.5;
 }
 
-// Progressive: 1-4 @ 25€, 5-10 @ 20€ each, 11+: sob orçamento
+// Progressive: 1-4 @ 15€, 5-9 @ 10€ each, 10+: sob orçamento — baixado 2026-08-31
+// (era 1-4 @ 20€, 5-10 @ 15€, 11+ sob orçamento).
 export function calcChairWaterproof(qty: number): number | null {
-  if (qty <= 0 || qty > 10) return null;
-  if (qty <= 4) return qty * 25;
-  return 4 * 25 + (qty - 4) * 20;
+  if (qty <= 0 || qty >= 10) return null;
+  if (qty <= 4) return qty * 15;
+  return 4 * 15 + (qty - 4) * 10;
 }
 
-// Premium (à base de diluente): 1-4 @ 35€, 5-10 @ 30€ each, 11+: sob orçamento
+// Premium (à base de diluente): 1-4 @ 20€, 5-9 @ 15€ each, 10+: sob orçamento
+// — sempre +5€/cadeira sobre a Essencial (2026-09-01, era +10€/cadeira fixo:
+// a 9 cadeiras dava Essencial 110€ vs Premium 200€, +82%, desproporcional
+// face ao gap Premium/Essencial dos sofás, ~+25 a +40%. Com +5€/cadeira fica
+// Essencial 110€ vs Premium 155€, +41%, alinhado).
 export function calcChairWaterproofPremium(qty: number): number | null {
-  if (qty <= 0 || qty > 10) return null;
-  if (qty <= 4) return qty * 35;
-  return 4 * 35 + (qty - 4) * 30;
+  if (qty <= 0 || qty >= 10) return null;
+  if (qty <= 4) return qty * 20;
+  return 4 * 20 + (qty - 4) * 15;
 }
 
 export function fmtN(n: number): string {
   return n % 1 === 0 ? `${n}€` : `${n.toFixed(1).replace('.', ',')}€`;
+}
+
+// ── Live preview do artigo extra a ser configurado no upsell ──────────────────
+// Espelha exatamente o cálculo que cada botão "Adicionar X" faz ao confirmar
+// (ver QuizUpsellOverlay.tsx), mas em modo leitura, para que o preço no topo do
+// quiz suba assim que se clica "+", tal como já acontece em Quantidades — sem
+// isto o preço só atualizava depois de o artigo estar confirmado.
+export function computePendingUpsellTotal(
+  pendingUpsellId: string | null,
+  pendingSofaItems: SofaItem[],
+  pendingMattressItems: MattressItem[],
+  pendingCarpetArea: string,
+  pendingChairQtyNum: number,
+  pendingWaterproof: boolean,
+  isWaterproofBase: boolean,
+  waterproofingTier: 'essencial' | 'premium' = 'essencial',
+): number {
+  switch (pendingUpsellId) {
+    case 'sofa': {
+      return pendingSofaItems.filter(i => i.qty > 0).reduce((sum, item) => {
+        const opt = sofaPrices.find(p => p.id === item.sizeId);
+        if (!opt) return sum;
+        const { basePrice, packDelta } = calcPackPricing(opt, item.packEnabled, isWaterproofBase, 40, waterproofingTier);
+        const bothP = basePrice !== null && packDelta !== null ? basePrice + packDelta : null;
+        const unitPrice = item.packEnabled && bothP !== null ? bothP : basePrice;
+        return sum + (unitPrice !== null ? unitPrice * item.qty : 0);
+      }, 0);
+    }
+    case 'mattress': {
+      return pendingMattressItems.filter(i => i.qty > 0).reduce((sum, item) => {
+        const opt = mattressPrices.find(p => p.id === item.sizeId);
+        if (!opt) return sum;
+        const cleanP = typeof opt.cleaningPrice === 'number' ? opt.cleaningPrice : null;
+        const waterP = typeof opt.waterproofingPrice === 'number' ? opt.waterproofingPrice : null;
+        const baseP = isWaterproofBase ? waterP : cleanP;
+        const bothP = typeof opt.bothPrice === 'number' ? opt.bothPrice : (baseP !== null ? baseP + 30 : null);
+        const unitPrice = item.packEnabled && bothP !== null ? bothP : baseP;
+        return sum + (unitPrice !== null ? unitPrice * item.qty : 0);
+      }, 0);
+    }
+    case 'carpet': {
+      const area = parseFloat(pendingCarpetArea);
+      if (isNaN(area) || area <= 0 || area > 15) return 0;
+      return Math.round((calcCarpetPrice(area) ?? 0) * 100) / 100;
+    }
+    case 'chairs': {
+      const basePriceRaw = calcChairClean(pendingChairQtyNum);
+      const calcWaterproofTier = waterproofingTier === 'premium' ? calcChairWaterproofPremium : calcChairWaterproof;
+      const waterproofPriceRaw = pendingWaterproof ? calcWaterproofTier(pendingChairQtyNum) : 0;
+      // Sob orçamento (preço null) tem de devolver 0 — convenção do resto do
+      // quiz (price === 0 = sob orçamento, ver hasUpsellSobItem) — nunca
+      // somar um preço parcial que ignore o addon em silêncio.
+      if (basePriceRaw === null || waterproofPriceRaw === null) return 0;
+      return basePriceRaw + waterproofPriceRaw;
+    }
+    default:
+      return 0;
+  }
 }

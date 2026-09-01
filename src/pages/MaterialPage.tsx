@@ -22,9 +22,9 @@ import {
   getMaterialCityData,
   getRelatedMaterialLinks,
 } from "@/data/materialSeoData";
-import { SERVICE_TESTIMONIALS } from "@/data/locationPriceTestimonialsData";
 import { cities, services, DEFAULT_PRICE_FROM, cityPrep } from "@/data/locationSeoData";
 import { SITE_URL, WHATSAPP_BASE } from "@/constants/business";
+import ServiceReviewsGrid from "@/components/ServiceReviewsGrid";
 import { buildMaterialWaMessage } from "@/lib/whatsappMessages";
 import { MATERIAL_HERO, MATERIAL_HERO_FALLBACK } from "@/data/materialHeroImages";
 import {
@@ -105,7 +105,6 @@ const MaterialPage = () => {
   const h1Gold = h1Words.pop() ?? "";
   const h1Rest = h1Words.join(" ");
 
-  const testimonials = SERVICE_TESTIMONIALS[data.serviceSlug];
   const gallery = getServiceGallery(data.serviceSlug, `${data.slug}-${citySlug}`);
 
   return (
@@ -146,7 +145,7 @@ const MaterialPage = () => {
                 </h1>
 
                 <p className="text-sm sm:text-base md:text-lg text-white/70 leading-relaxed mb-6 max-w-lg">
-                  {data.intro.split('.')[0]}.
+                  {data.intro.match(/^[^.?]*[.?]/)?.[0] ?? data.intro}
                 </p>
 
                 <div className="mb-6">
@@ -276,32 +275,12 @@ const MaterialPage = () => {
         )}
 
         {/* ═══ AVALIAÇÕES REAIS ═══ */}
-        {testimonials && testimonials.length > 0 && (
-          <section className="py-14 md:py-20 bg-kyro-green">
-            <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
-              <SectionHeader overline="Avaliações Reais" heading="O que dizem os nossos" goldWord="clientes" light={false} />
-              <div className="grid sm:grid-cols-2 gap-px" style={{ backgroundColor: "#E8E4DE" }}>
-                {testimonials.map((t, i) => (
-                  <div key={i} className="relative overflow-hidden p-6 md:p-8 bg-white" style={{ borderTop: "2px solid #D4AF37" }}>
-                    <div className="flex gap-0.5 mb-4">
-                      {[...Array(5)].map((_, j) => <Star key={j} className="w-3.5 h-3.5 fill-[#D4AF37]" style={{ color: "#D4AF37" }} />)}
-                    </div>
-                    <p className="text-sm text-[#111111]/65 leading-relaxed italic mb-4">"{t.text}"</p>
-                    <div className="flex items-center gap-2">
-                      <div className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold text-white" style={{ background: "#D4AF37" }}>
-                        {t.name.charAt(0)}
-                      </div>
-                      <div>
-                        <p className="text-xs font-bold text-[#111111]">{t.name}</p>
-                        <p className="text-[10px] text-[#111111]/40">{t.city}</p>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </section>
-        )}
+        <section className="py-14 md:py-20 bg-kyro-green">
+          <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
+            <SectionHeader overline="Avaliações Reais" heading="O que dizem os nossos" goldWord="clientes" light={false} />
+            <ServiceReviewsGrid serviceSlug={data.serviceSlug} seed={`${data.slug}-${citySlug}`} heading="" />
+          </div>
+        </section>
 
         {/* ═══ PACKS ═══ */}
         <ServicePackBanner

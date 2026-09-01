@@ -25,8 +25,8 @@ const impermeabilizacaoGuarantee: GuaranteeItem[] = [
   },
   {
     label: "Durabilidade",
-    title: "Até 5 anos com a versão Premium",
-    body: "Temos duas versões: a Essencial (à base de água), que aguenta até 2 lavagens, e a Premium (à base de diluente), mais resistente ao desgaste, que aguenta até 5 lavagens e mantém a proteção por até 5 anos.",
+    title: "Até 10 anos com a versão Premium",
+    body: "Temos duas versões: a Essencial (à base de água), que aguenta até 2 lavagens, e a Premium (à base de diluente), mais resistente ao desgaste, que aguenta até 5 lavagens e mantém a proteção por até 10 anos.",
     image: "/images/impermeabilizacao/v2.webp",
   },
   {
@@ -78,7 +78,7 @@ const waterproofingTiers: WaterproofingTier[] = [
     name: "Essencial",
     base: "À base de água",
     sofaPrice: "59€ / 79€ / 99€",
-    chairPrice: "25€/un (1-4) · 20€/un (5-10)",
+    chairPrice: "15€/un (1-4) · 10€/un (5-9)",
     washes: "Aguenta até 2 lavagens",
     durability: "Até 1 a 2 anos de proteção real, consoante o uso",
     features: [
@@ -93,9 +93,9 @@ const waterproofingTiers: WaterproofingTier[] = [
     name: "Premium",
     base: "À base de diluente",
     sofaPrice: "79€ / 99€ / 129€",
-    chairPrice: "35€/un (1-4) · 30€/un (5-10)",
+    chairPrice: "20€/un (1-4) · 15€/un (5-9)",
     washes: "Aguenta até 5 lavagens",
-    durability: "Até 5 anos de proteção real (salvo exceções)",
+    durability: "Até 10 anos de proteção real (salvo exceções)",
     badge: "Recomendado",
     highlighted: true,
     features: [
@@ -194,8 +194,8 @@ const WaterproofingTierComparison = () => (
 const Impermeabilizacao = () => {
   const faqs = [
     { question: 'O que é exatamente a impermeabilização e como funciona?', answer: 'A impermeabilização cria uma camada de proteção invisível e respirável à volta das fibras do tecido. Líquidos e sujidade deixam de ser absorvidos com facilidade, formando gotas à superfície que podem ser limpas rapidamente antes de penetrarem no estofo.' },
-    { question: 'Qual a diferença entre a Essencial e a Premium?', answer: 'A Essencial é à base de água, aguenta até 2 lavagens e mantém a proteção real por 1 a 2 anos, consoante o uso. A Premium é à base de diluente, mais resistente ao desgaste, aguenta até 5 lavagens e dura até 5 anos. Para casas com crianças, animais ou uso intenso, a Premium compensa a longo prazo.' },
-    { question: 'Quanto tempo dura a impermeabilização?', answer: 'Depende da versão escolhida. Com a Essencial, a proteção real dura 1 a 2 anos, consoante o uso. Com a Premium, mais resistente ao desgaste, a proteção dura até 5 anos. Para manter o efeito repelente visível no dia a dia, podem ser recomendadas reaplicações localizadas ou manutenções preventivas, sobretudo em zonas de maior uso.' },
+    { question: 'Qual a diferença entre a Essencial e a Premium?', answer: 'A Essencial é à base de água, aguenta até 2 lavagens e mantém a proteção real por 1 a 2 anos, consoante o uso. A Premium é à base de diluente, mais resistente ao desgaste, aguenta até 5 lavagens e dura até 10 anos. Para casas com crianças, animais ou uso intenso, a Premium compensa a longo prazo.' },
+    { question: 'Quanto tempo dura a impermeabilização?', answer: 'Depende da versão escolhida. Com a Essencial, a proteção real dura 1 a 2 anos, consoante o uso. Com a Premium, mais resistente ao desgaste, a proteção dura até 10 anos. Para manter o efeito repelente visível no dia a dia, podem ser recomendadas reaplicações localizadas ou manutenções preventivas, sobretudo em zonas de maior uso.' },
     { question: 'A impermeabilização é definitiva?', answer: 'O tratamento não cria uma película rígida nem permanente. A proteção mantém-se ativa durante o período correspondente à versão aplicada, mas o seu desempenho pode ser reforçado com manutenção adequada.' },
     { question: 'A impermeabilização precisa de manutenção?', answer: 'Sim. A manutenção preventiva permite preservar o nível máximo de proteção e prolongar a vida útil dos estofos. Recomendamos avaliações periódicas, especialmente em contextos de uso intensivo.' },
     { question: 'A impermeabilização altera a cor, o toque ou o conforto do tecido?', answer: 'Não. O tecido mantém o mesmo aspeto e toque natural em ambas as versões. O tratamento é hidrorrepelente e respirável, não criando película rígida. O que muda é a forma como reage a líquidos: em vez de serem rapidamente absorvidos, formam pequenas gotas à superfície, facilitando a limpeza imediata.' },
@@ -232,7 +232,7 @@ const Impermeabilizacao = () => {
         <ServiceCityLinks serviceSlug="impermeabilizacao" serviceLabel="Impermeabilização de Estofos" />
         <ServiceSchema
           serviceName="Impermeabilização de Estofos"
-          description="Impermeabilização profissional de sofás e cadeiras no Porto. Versão Essencial e versão Premium, com proteção real até 5 anos."
+          description="Impermeabilização profissional de sofás e cadeiras no Porto. Versão Essencial e versão Premium, com proteção real até 10 anos."
           url="/impermeabilizacao"
           priceFrom="59€"
           reviews={[

@@ -1,69 +1,70 @@
 import { ChevronLeft, ChevronRight, Check, X, Shield } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { sofaPrices, mattressPrices } from '@/components/quiz/QuizTypes';
-import type { QuizFormData, UpsellItemConfig } from '@/components/quiz/QuizTypes';
+import type { QuizFormData, UpsellItemConfig, SofaItem, MattressItem } from '@/components/quiz/QuizTypes';
 import {
   sofaSetQty, sofaTogglePack,
-  mattressSetQty,
-  calcCarpetPrice, calcChairClean, calcChairWaterproof,
+  mattressSetQty, mattressTogglePack,
+  calcCarpetPrice, calcChairClean, calcChairWaterproof, calcChairWaterproofPremium,
+  calcPackPricing,
 } from '@/components/quiz/quizHelpers';
-import { useUpsellSelection } from './useUpsellSelection';
+import { WHATSAPP_BASE } from '@/constants/business';
 
 interface QuizUpsellOverlayProps {
-  formData: Pick<QuizFormData, 'serviceType'>;
+  formData: Pick<QuizFormData, 'serviceType' | 'waterproofingTier'>;
+  updateFormData: (u: Partial<QuizFormData>) => void;
   upsellSubStep: 'prompt' | 'select' | 'config';
   setUpsellSubStep: (v: 'prompt' | 'select' | 'config') => void;
   upsellItems: UpsellItemConfig[];
   setUpsellItems: React.Dispatch<React.SetStateAction<UpsellItemConfig[]>>;
   totalPrice: number;
   packDiscountActive: boolean;
+  /** true quando o total do pedido mostrado no ecrã (totalPrice, com deslocação
+   *  incluída) já passa os 100€ — o mesmo número que a "Estimativa" no topo mostra. */
+  serviceQualifiesForDiscount: boolean;
   /** Called when user confirms pack and wants to proceed to contact step. */
   onGoToContact: () => void;
   /** Called when user taps "Voltar" on the prompt sub-step. */
   onBack: () => void;
+  // Estado do "artigo pendente" a ser configurado — vive em QuizForm.tsx (não aqui)
+  // para que o preço no topo do quiz possa somar este valor em tempo real, ver
+  // computePendingUpsellTotal em quizHelpers.ts.
+  pendingUpsellId: string | null;
+  setPendingUpsellId: (id: string | null) => void;
+  pendingSofaItems: SofaItem[];
+  setPendingSofaItems: React.Dispatch<React.SetStateAction<SofaItem[]>>;
+  pendingMattressItems: MattressItem[];
+  setPendingMattressItems: React.Dispatch<React.SetStateAction<MattressItem[]>>;
+  pendingCarpetArea: string;
+  setPendingCarpetArea: (v: string) => void;
+  pendingChairQtyNum: number;
+  setPendingChairQtyNum: React.Dispatch<React.SetStateAction<number>>;
+  pendingWaterproof: boolean;
+  setPendingWaterproof: React.Dispatch<React.SetStateAction<boolean>>;
+  resetPending: () => void;
 }
 
-// Desconto de 10% (2026-08-30): já não depende do total do carrinho, depende de
-// adicionar um artigo de upsell que sozinho valha mais de 60€. Não há um "encher até
-// X€" para mostrar aqui (o item ainda não está escolhido nestes ecrãs), por isso é
-// só a regra explicada, não uma barra de progresso do total.
-const MIN_UPSELL_FOR_DISCOUNT = 60;
-const PackDiscountHint = ({ packDiscountActive }: { packDiscountActive: boolean }) => (
-  <div className="w-full max-w-xs mx-auto mb-4">
-    {packDiscountActive ? (
-      <div className="flex items-center justify-center gap-1.5 text-gold text-xs font-bold">
-        <Check className="w-3.5 h-3.5" />
-        10% de desconto ativado em todo o pedido
-      </div>
-    ) : (
-      <p className="text-[11px] text-white/35 text-center leading-snug">
-        Adicione um serviço de mais de <span className="text-gold font-semibold">{MIN_UPSELL_FOR_DISCOUNT}€</span> (ex: colchão, tapete, 3+ cadeiras) e ganhe <span className="text-gold font-semibold">10% em tudo</span>.
-      </p>
-    )}
-  </div>
-);
 
 const QuizUpsellOverlay = ({
   formData,
+  updateFormData,
   upsellSubStep,
   setUpsellSubStep,
   upsellItems,
   setUpsellItems,
   totalPrice,
   packDiscountActive,
+  serviceQualifiesForDiscount,
   onGoToContact,
   onBack,
+  pendingUpsellId, setPendingUpsellId,
+  pendingSofaItems, setPendingSofaItems,
+  pendingMattressItems, setPendingMattressItems,
+  pendingCarpetArea, setPendingCarpetArea,
+  pendingChairQtyNum, setPendingChairQtyNum,
+  pendingWaterproof, setPendingWaterproof,
+  resetPending,
 }: QuizUpsellOverlayProps) => {
-
-  const {
-    pendingUpsellId, setPendingUpsellId,
-    pendingSofaItems, setPendingSofaItems,
-    pendingMattressItems, setPendingMattressItems,
-    pendingCarpetArea, setPendingCarpetArea,
-    pendingChairQtyNum, setPendingChairQtyNum,
-    pendingWaterproof, setPendingWaterproof,
-    resetPending,
-  } = useUpsellSelection();
 
   return (
     <div className="flex-1 flex flex-col w-full items-center">
@@ -76,13 +77,13 @@ const QuizUpsellOverlay = ({
           {packDiscountActive ? (
             /* ── Desconto já ativo: foco na conveniência da visita ── */
             <>
-              <h2 className="font-playfair text-2xl sm:text-3xl font-bold text-white mb-3 leading-[1.2]">
-                O técnico já<br />vai até si.
+              <h2 className="font-playfair text-2xl sm:text-3xl font-bold mb-3 leading-[1.2] whitespace-nowrap">
+                <span className="text-gold" style={{ textShadow: '0 0 18px rgba(212,175,55,0.55)' }}>10% Ativo.</span>{' '}
+                <span className="text-white">Aproveite Tudo.</span>
               </h2>
-              <p className="text-[13px] text-white/50 max-w-[265px] mx-auto mb-5 leading-relaxed">
-                Aproveite a deslocação para limpar mais artigos na mesma visita. O desconto de <span className="text-gold font-bold">10% aplica-se a tudo</span>.
+              <p className="text-[13px] text-white/50 max-w-[265px] mx-auto mb-6 leading-relaxed">
+                Aproveite a deslocação para limpar mais artigos na mesma visita, sem custo extra de trajeto.
               </p>
-              <PackDiscountHint packDiscountActive={packDiscountActive} />
               <button
                 onClick={() => setUpsellSubStep('select')}
                 className="w-full max-w-xs h-14 bg-gradient-to-r from-gold to-[#d4c57b] hover:from-[#d4c57b] hover:to-gold text-[#12121e] font-black text-[15px] tracking-wide rounded-sm shadow-[0_4px_36px_rgba(212,175,55,0.45)] touch-manipulation active:scale-[0.98] transition-all flex items-center justify-center gap-2.5 mb-3"
@@ -91,22 +92,42 @@ const QuizUpsellOverlay = ({
                 <ChevronRight className="w-5 h-5" />
               </button>
             </>
-          ) : (
-            /* ── Desconto ainda não ativo: vender o Pack ── */
+          ) : serviceQualifiesForDiscount ? (
+            /* ── Desconto ainda não ativo, mas o pedido já qualifica: vender o Pack ──
+               Um só bloco de texto (sem PackDiscountHint a repetir a mesma regra por
+               baixo) e um framing de "está quase a ganhar", não de regulamento. */
             <>
-              <h2 className="font-playfair text-2xl sm:text-3xl font-bold text-white mb-3 leading-[1.2]">
-                Uma visita. Tudo limpo.
+              <h2 className="font-playfair text-2xl sm:text-3xl font-bold mb-3 leading-[1.2] whitespace-nowrap">
+                <span className="text-white">A Um Passo dos</span>{' '}
+                <span className="text-gold" style={{ textShadow: '0 0 18px rgba(212,175,55,0.55)' }}>10%.</span>
               </h2>
-              <p className="text-[13px] text-white/50 max-w-[265px] mx-auto mb-5 leading-relaxed">
-                O técnico já vai até si, aproveite para limpar tudo de uma vez. Junte um serviço de mais de <span className="text-gold font-bold">60€</span> e poupa <span className="text-gold font-bold">10% em todo o pedido</span> automaticamente.
+              <p className="text-[13px] text-white/50 max-w-[265px] mx-auto mb-6 leading-relaxed">
+                Junte outro item de <span className="text-white/80 font-semibold">60€+</span> (colchão, tapete, cadeiras) e o desconto aplica-se ao pedido todo.
               </p>
-              <PackDiscountHint packDiscountActive={packDiscountActive} />
               <button
                 onClick={() => setUpsellSubStep('select')}
                 className="w-full max-w-xs h-14 bg-gradient-to-r from-gold to-[#d4c57b] hover:from-[#d4c57b] hover:to-gold text-[#12121e] font-black text-[15px] tracking-wide rounded-sm shadow-[0_4px_36px_rgba(212,175,55,0.45)] touch-manipulation active:scale-[0.98] transition-all flex items-center justify-center gap-2.5 mb-3"
               >
                 <Check className="w-5 h-5" />
                 Sim, quero poupar 10%
+              </button>
+            </>
+          ) : (
+            /* ── Pedido ainda não qualifica para o desconto: vender a conveniência,
+               com a regra do desconto mencionada uma só vez, sem bloco repetido ── */
+            <>
+              <h2 className="font-playfair text-2xl sm:text-3xl font-bold text-white mb-3 leading-[1.2]">
+                Uma visita. Tudo limpo.
+              </h2>
+              <p className="text-[13px] text-white/50 max-w-[240px] mx-auto mb-6 leading-relaxed">
+                Pedidos de <span className="text-white/80 font-semibold">100€+</span> com um item extra de <span className="text-white/80 font-semibold">60€+</span> ganham <span className="text-gold font-bold">10% de desconto em tudo</span>.
+              </p>
+              <button
+                onClick={() => setUpsellSubStep('select')}
+                className="w-full max-w-xs h-14 bg-gradient-to-r from-gold to-[#d4c57b] hover:from-[#d4c57b] hover:to-gold text-[#12121e] font-black text-[15px] tracking-wide rounded-sm shadow-[0_4px_36px_rgba(212,175,55,0.45)] touch-manipulation active:scale-[0.98] transition-all flex items-center justify-center gap-2.5 mb-3"
+              >
+                Adicionar mais um artigo
+                <ChevronRight className="w-5 h-5" />
               </button>
             </>
           )}
@@ -135,10 +156,24 @@ const QuizUpsellOverlay = ({
       {upsellSubStep === 'select' && (
         <div className="flex flex-col w-full items-center text-center">
           <p className="text-gold text-[10px] font-bold tracking-[0.28em] uppercase mb-1">PACK FAMÍLIA</p>
-          <h2 className="font-playfair text-xl sm:text-2xl font-bold text-white mb-1 leading-[1.3]">
-            {packDiscountActive ? 'Desconto de 10% ativado!' : 'Que artigo quer adicionar?'}
+          <h2 className={cn(
+            "font-playfair text-2xl sm:text-3xl font-bold text-white leading-[1.3] whitespace-nowrap",
+            serviceQualifiesForDiscount && !packDiscountActive ? "mb-3" : "mb-6"
+          )}>
+            {packDiscountActive
+              ? 'Desconto de 10% ativado!'
+              : serviceQualifiesForDiscount
+              ? <><span className="text-white">A Um Passo dos</span> <span className="text-gold" style={{ textShadow: '0 0 18px rgba(212,175,55,0.55)' }}>10%.</span></>
+              : 'Escolha o Próximo Item.'}
           </h2>
-          <PackDiscountHint packDiscountActive={packDiscountActive} />
+          {packDiscountActive && (
+            <p className="text-[13px] text-gold/60 mb-6 -mt-2">Aplica-se a todo o pedido</p>
+          )}
+          {serviceQualifiesForDiscount && !packDiscountActive && (
+            <p className="text-[13px] text-white/50 max-w-[265px] mx-auto mb-6 leading-relaxed">
+              Junte outro item de <span className="text-white/80 font-semibold">60€+</span> (colchão, tapete, cadeiras) e o desconto aplica-se ao pedido todo.
+            </p>
+          )}
 
           {upsellItems.length > 0 && (
             <div className="w-full max-w-xs mx-auto mb-3 flex flex-col gap-1.5">
@@ -168,7 +203,7 @@ const QuizUpsellOverlay = ({
             </div>
           )}
 
-          <div className="grid grid-cols-2 gap-2 w-full max-w-xs mx-auto mb-4">
+          <div className="grid grid-cols-2 gap-2 w-full max-w-[260px] mx-auto mb-4">
             {([
               { id: 'sofa',     img: '/images/services/sofa.webp',    label: 'Sofá',     sublabel: 'a partir de 49€' },
               { id: 'mattress', img: '/images/services/colchao.webp', label: 'Colchão',  sublabel: 'a partir de 59€' },
@@ -198,7 +233,9 @@ const QuizUpsellOverlay = ({
             ))}
           </div>
 
-          <p className="text-xs text-white/25 text-center mb-3">Desconto não acumulável com outras promoções</p>
+          {(packDiscountActive || serviceQualifiesForDiscount) && (
+            <p className="text-xs text-white/25 text-center mb-3">Desconto não acumulável com outras promoções</p>
+          )}
           <div className="w-full max-w-xs mx-auto flex items-center gap-3">
             <button
               onClick={() => setUpsellSubStep('prompt')}
@@ -233,7 +270,7 @@ const QuizUpsellOverlay = ({
           {pendingUpsellId === 'sofa' && (
             <div className="w-full max-w-xs mx-auto">
               <p className="text-gold text-[11px] font-bold tracking-[0.28em] uppercase mb-0.5 text-center w-full">ARTIGO EXTRA</p>
-              <h3 className="font-playfair text-xl font-bold text-white mb-3 text-center">Detalhes do(s) Sofá(s)</h3>
+              <h3 className="font-playfair text-2xl sm:text-3xl font-bold text-white mb-3 text-center">Detalhes do(s) Sofá(s)</h3>
               <div className="flex flex-col gap-2 mb-3">
                 {sofaPrices.map(opt => {
                   const item = pendingSofaItems.find(i => i.sizeId === opt.id);
@@ -251,6 +288,10 @@ const QuizUpsellOverlay = ({
                   const dp = packOn && bothP !== null ? bothP : baseP;
                   const upsellLabel = isWaterproofBase ? 'Adicionar Higienização Profunda' : 'Adicionar Proteção Total VIP';
                   const upsellSub = isWaterproofBase ? `+${packDelta}€/un. · Limpeza profunda incluída` : `+${packDelta}€/un. · Impermeabilização completa`;
+                  const essencialSofa = calcPackPricing(opt, true, false, 40, 'essencial');
+                  const premiumSofa = calcPackPricing(opt, true, false, 40, 'premium');
+                  const premiumExtraDelta = premiumSofa.packDelta !== null && essencialSofa.packDelta !== null
+                    ? Math.round((premiumSofa.packDelta - essencialSofa.packDelta) * 100) / 100 : null;
                   return (
                     <div key={opt.id} className={cn('rounded-sm border-2 transition-all duration-200 overflow-hidden', isActive && packOn ? 'border-gold bg-[#1a2a1a] shadow-[0_0_12px_rgba(212,175,55,0.20)]' : isActive ? 'border-gold/50 bg-[#1a2a1a] shadow-[0_0_8px_rgba(212,175,55,0.10)]' : 'border-gold/20 bg-[#1a2a1a]')}>
                       <div className="flex items-center justify-between px-4 py-3">
@@ -272,7 +313,7 @@ const QuizUpsellOverlay = ({
                           <button onClick={() => setPendingSofaItems(sofaSetQty(pendingSofaItems, opt.id, qty + 1))} className="w-8 h-8 rounded-lg border border-white/20 bg-white/[0.05] text-white font-bold text-base flex items-center justify-center active:scale-95 transition-all touch-manipulation hover:border-gold/50">+</button>
                         </div>
                       </div>
-                      {isActive && (
+                      {isActive && isWaterproofBase && (
                         <div className="px-4 pb-3">
                           <button onClick={() => setPendingSofaItems(sofaTogglePack(pendingSofaItems, opt.id))} className={cn('w-full flex items-center gap-2.5 px-3 py-2 rounded-sm border transition-all duration-200 touch-manipulation', packOn ? 'border-gold/50 bg-gold/[0.08]' : 'border-gold/15 bg-[#1a2a1a] hover:border-gold/40')}>
                             <Shield className={cn('w-4 h-4 flex-shrink-0', packOn ? 'text-gold' : 'text-white/25')} />
@@ -284,6 +325,66 @@ const QuizUpsellOverlay = ({
                               <div className={cn('w-3 h-3 rounded-full transition-all duration-300', packOn ? 'bg-gold translate-x-[14px]' : 'bg-white/30 translate-x-0')} />
                             </div>
                           </button>
+                          {!isSob && (
+                            <p className="text-[10px] text-white/25 leading-snug mt-1.5 px-1">
+                              Remove manchas, odores e ácaros em profundidade.
+                            </p>
+                          )}
+                        </div>
+                      )}
+                      {isActive && !isWaterproofBase && !isSob && (
+                        <div className="px-4 pb-3">
+                          <div className="grid grid-cols-2 gap-2 pt-3">
+                            <button
+                              onClick={() => {
+                                const turningOn = !(packOn && formData.waterproofingTier === 'essencial');
+                                setPendingSofaItems(turningOn && packOn ? pendingSofaItems : sofaTogglePack(pendingSofaItems, opt.id));
+                                updateFormData({ waterproofingTier: 'essencial' });
+                              }}
+                              className={cn(
+                                'rounded-sm border-2 px-3 py-2.5 text-left transition-all duration-200 touch-manipulation',
+                                packOn && formData.waterproofingTier === 'essencial'
+                                  ? 'border-gold bg-gold/[0.08] shadow-[0_0_10px_rgba(212,175,55,0.18)]'
+                                  : 'border-gold/20 bg-[#1a2a1a] hover:border-gold/40'
+                              )}
+                            >
+                              <div className="flex items-center gap-1.5 mb-0.5">
+                                {packOn && formData.waterproofingTier === 'essencial' && <Check className="w-3 h-3 text-gold flex-shrink-0" />}
+                                <p className={cn('text-xs font-bold', packOn && formData.waterproofingTier === 'essencial' ? 'text-white' : 'text-white/60')}>Essencial</p>
+                              </div>
+                              <p className="text-[10px] text-white/35 leading-snug">+{essencialSofa.packDelta}€ · 1-2 anos</p>
+                            </button>
+                            <button
+                              onClick={() => {
+                                const turningOn = !(packOn && formData.waterproofingTier === 'premium');
+                                setPendingSofaItems(turningOn && packOn ? pendingSofaItems : sofaTogglePack(pendingSofaItems, opt.id));
+                                updateFormData({ waterproofingTier: 'premium' });
+                              }}
+                              className={cn(
+                                'relative rounded-sm border-2 px-3 py-2.5 text-left transition-all duration-200 touch-manipulation',
+                                packOn && formData.waterproofingTier === 'premium'
+                                  ? 'border-gold bg-gold/[0.10] shadow-[0_0_16px_rgba(212,175,55,0.30)]'
+                                  : 'border-gold/50 bg-[#1a2a1a] ring-1 ring-gold/20 hover:border-gold/75'
+                              )}
+                            >
+                              <span className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-gradient-to-r from-[#C9A84C] to-[#F0DC8A] text-[#12121e] text-[8px] font-black px-2.5 py-0.5 rounded-full tracking-widest uppercase shadow-md whitespace-nowrap">
+                                Melhor Proteção
+                              </span>
+                              <div className="flex items-center gap-1.5 mb-0.5">
+                                {packOn && formData.waterproofingTier === 'premium' && <Check className="w-3 h-3 text-gold flex-shrink-0" />}
+                                <p className={cn('text-xs font-bold', packOn && formData.waterproofingTier === 'premium' ? 'text-white' : 'text-white/85')}>Premium</p>
+                                {premiumExtraDelta !== null && (
+                                  <span className={cn('text-[9px] font-black leading-none px-1.5 py-[3px] rounded-full whitespace-nowrap flex-shrink-0', packOn && formData.waterproofingTier === 'premium' ? 'bg-gold text-[#12121e]' : 'bg-gold/20 text-gold')}>
+                                    só +{premiumExtraDelta}€
+                                  </span>
+                                )}
+                              </div>
+                              <p className={cn('text-[10px] leading-snug', packOn && formData.waterproofingTier === 'premium' ? 'text-gold/60' : 'text-gold/45')}>até 10 anos, 5 lavagens</p>
+                            </button>
+                          </div>
+                          <p className="text-[10px] text-white/25 leading-snug mt-1.5 px-1">
+                            Protege o tecido contra manchas e nódoas, prolongando a vida do estofo.
+                          </p>
                         </div>
                       )}
                     </div>
@@ -296,20 +397,18 @@ const QuizUpsellOverlay = ({
                   const isWaterproofBase = formData.serviceType === 'waterproofing';
                   pendingSofaItems.filter(i => i.qty > 0).forEach(item => {
                     const opt = sofaPrices.find(p => p.id === item.sizeId)!;
-                    const isSobItem = typeof opt.cleaningPrice !== 'number';
-                    const cleanP = isSobItem ? null : (opt.cleaningPrice as number);
-                    const waterP = typeof opt.waterproofingPrice === 'number' ? (opt.waterproofingPrice as number) : null;
-                    const baseP = isWaterproofBase ? waterP : cleanP;
-                    const bothP = typeof opt.bothPrice === 'number' ? (opt.bothPrice as number) : (baseP !== null ? baseP + 40 : null);
+                    const { basePrice: baseP, packDelta } = calcPackPricing(opt, item.packEnabled, isWaterproofBase, 40, formData.waterproofingTier);
+                    const bothP = baseP !== null && packDelta !== null ? baseP + packDelta : null;
                     const unitPrice = item.packEnabled && bothP !== null ? bothP : baseP;
                     const total = unitPrice !== null ? unitPrice * item.qty : 0;
-                    const packExtra = item.packEnabled && bothP !== null && baseP !== null ? (bothP - baseP) * item.qty : 0;
+                    const packExtra = item.packEnabled && packDelta !== null ? packDelta * item.qty : 0;
+                    const tierTag = item.packEnabled && !isWaterproofBase ? (formData.waterproofingTier === 'premium' ? ' + Premium' : ' + Essencial') : '';
                     setUpsellItems(prev => [...prev, {
                       id: 'sofa',
                       sofaSize: item.sizeId,
                       qty: item.qty,
                       price: total,
-                      label: `${item.qty}× Sofá ${opt.label}${item.packEnabled ? ' + Pack' : ''}`,
+                      label: `${item.qty}× Sofá ${opt.label}${item.packEnabled ? ` + Pack${tierTag}` : ''}`,
                       waterproof: item.packEnabled,
                       waterproofPrice: packExtra,
                     }]);
@@ -330,23 +429,30 @@ const QuizUpsellOverlay = ({
           {pendingUpsellId === 'mattress' && (
             <div className="w-full max-w-xs mx-auto">
               <p className="text-gold text-[10px] font-bold tracking-[0.28em] uppercase mb-1 text-center w-full">ARTIGO EXTRA</p>
-              <h3 className="font-playfair text-xl font-bold text-white mb-1 text-center">Colchão</h3>
+              <h3 className="font-playfair text-2xl sm:text-3xl font-bold text-white mb-1 text-center">Colchão</h3>
               <p className="text-xs text-white/35 mb-3 text-center">Selecione tamanho e quantidade</p>
               <div className="flex flex-col gap-2 mb-4">
                 {mattressPrices.map(opt => {
                   const item = pendingMattressItems.find(i => i.sizeId === opt.id);
                   const qty = item?.qty ?? 0;
+                  const packOn = item?.packEnabled ?? false;
                   const isActive = qty > 0;
-                  const cleanP = typeof opt.cleaningPrice === 'number' ? (opt.cleaningPrice as number) : null;
-                  const dp = cleanP;
+                  const isWaterproofBase = formData.serviceType === 'waterproofing';
+                  const { isSob, packDelta, displayPrice: dp } = calcPackPricing(opt, packOn, isWaterproofBase, 30);
+                  const upsellLabel = isWaterproofBase ? 'Adicionar Higienização Profunda' : 'Adicionar Anti Ácaros';
+                  const upsellSub = isWaterproofBase ? `+${packDelta}€/un. · Limpeza profunda incluída` : `+${packDelta}€/un. · Tratamento anti-ácaros`;
                   return (
-                    <div key={opt.id} className={cn('rounded-sm border-2 transition-all duration-200 overflow-hidden', isActive ? 'border-gold/50 bg-[#1a2a1a]' : 'border-gold/20 bg-[#1a2a1a]')}>
+                    <div key={opt.id} className={cn('rounded-sm border-2 transition-all duration-200 overflow-hidden', isActive && packOn ? 'border-gold bg-[#1a2a1a] shadow-[0_0_12px_rgba(212,175,55,0.20)]' : isActive ? 'border-gold/50 bg-[#1a2a1a] shadow-[0_0_8px_rgba(212,175,55,0.10)]' : 'border-gold/20 bg-[#1a2a1a]')}>
                       <div className="flex items-center justify-between px-4 py-3">
                         <div className="flex-1 min-w-0 mr-3">
                           <span className="text-sm font-semibold text-white">{opt.label}</span>
-                          <div className="mt-0.5">
-                            <span className={cn('text-sm font-bold tabular-nums', isActive ? 'text-white/80' : 'text-white/40')}>
-                              {dp !== null ? `${dp}€/un.${qty > 1 ? ` × ${qty} = ${dp * qty}€` : ''}` : 'Sob orç.'}
+                          <div className="flex items-center gap-1.5 mt-0.5">
+                            {isActive && packOn && <span className="text-[9px] bg-gold/15 text-gold/80 px-1.5 py-0.5 rounded-full font-bold leading-none">PACK</span>}
+                            {isActive && packOn && typeof opt.originalBothPrice === 'number' && (
+                              <span className="text-sm text-white/30 line-through tabular-nums">{opt.originalBothPrice}€</span>
+                            )}
+                            <span className={cn('text-sm font-bold tabular-nums', isActive ? (packOn ? 'text-gold' : 'text-white/80') : 'text-white/40')}>
+                              {isSob ? 'Sob orç.' : `${dp}€/un.${qty > 1 ? ` × ${qty} = ${(dp ?? 0) * qty}€` : ''}`}
                             </span>
                           </div>
                         </div>
@@ -356,6 +462,23 @@ const QuizUpsellOverlay = ({
                           <button onClick={() => setPendingMattressItems(mattressSetQty(pendingMattressItems, opt.id, qty + 1))} className="w-8 h-8 rounded-lg border border-white/20 bg-white/[0.05] text-white font-bold text-base flex items-center justify-center active:scale-95 transition-all touch-manipulation hover:border-gold/50">+</button>
                         </div>
                       </div>
+                      {isActive && !isSob && (
+                        <div className="px-4 pb-3">
+                          <button onClick={() => setPendingMattressItems(mattressTogglePack(pendingMattressItems, opt.id))} className={cn('w-full flex items-center gap-2.5 px-3 py-2 rounded-sm border transition-all duration-200 touch-manipulation', packOn ? 'border-gold/50 bg-gold/[0.08]' : 'border-gold/15 bg-[#1a2a1a] hover:border-gold/40')}>
+                            <Shield className={cn('w-4 h-4 flex-shrink-0', packOn ? 'text-gold' : 'text-white/25')} />
+                            <div className="flex-1 text-left">
+                              <p className={cn('text-[11px] font-bold leading-none', packOn ? 'text-white' : 'text-white/50')}>{upsellLabel}</p>
+                              <p className={cn('text-[11px] mt-0.5 leading-none', packOn ? 'text-gold/60' : 'text-white/25')}>{upsellSub}</p>
+                            </div>
+                            <div className={cn('w-8 h-4 rounded-full border flex items-center px-0.5 transition-all duration-300 flex-shrink-0', packOn ? 'border-gold bg-gold/20' : 'border-white/20 bg-white/[0.05]')}>
+                              <div className={cn('w-3 h-3 rounded-full transition-all duration-300', packOn ? 'bg-gold translate-x-[14px]' : 'bg-white/30 translate-x-0')} />
+                            </div>
+                          </button>
+                          <p className="text-[10px] text-white/25 leading-snug mt-1.5 px-1">
+                            Elimina os ácaros e impede que voltem, prevenindo alergias e problemas respiratórios.
+                          </p>
+                        </div>
+                      )}
                     </div>
                   );
                 })}
@@ -363,16 +486,24 @@ const QuizUpsellOverlay = ({
               <button
                 disabled={!pendingMattressItems.some(i => i.qty > 0)}
                 onClick={() => {
+                  const isWaterproofBase = formData.serviceType === 'waterproofing';
                   pendingMattressItems.filter(i => i.qty > 0).forEach(item => {
                     const opt = mattressPrices.find(p => p.id === item.sizeId)!;
-                    const cleanP = typeof opt.cleaningPrice === 'number' ? (opt.cleaningPrice as number) : 0;
-                    const total = cleanP * item.qty;
+                    const cleanP = typeof opt.cleaningPrice === 'number' ? (opt.cleaningPrice as number) : null;
+                    const waterP = typeof opt.waterproofingPrice === 'number' ? (opt.waterproofingPrice as number) : null;
+                    const baseP = isWaterproofBase ? waterP : cleanP;
+                    const bothP = typeof opt.bothPrice === 'number' ? (opt.bothPrice as number) : (baseP !== null ? baseP + 30 : null);
+                    const unitPrice = item.packEnabled && bothP !== null ? bothP : baseP;
+                    const total = unitPrice !== null ? unitPrice * item.qty : 0;
+                    const packExtra = item.packEnabled && bothP !== null && baseP !== null ? (bothP - baseP) * item.qty : 0;
                     setUpsellItems(prev => [...prev, {
                       id: 'mattress',
                       mattressSize: item.sizeId,
                       qty: item.qty,
                       price: total,
-                      label: `${item.qty}× Colchão ${opt.label}`,
+                      label: `${item.qty}× Colchão ${opt.label}${item.packEnabled ? ' + Anti Ácaros' : ''}`,
+                      waterproof: item.packEnabled,
+                      waterproofPrice: packExtra,
                     }]);
                   });
                   setUpsellSubStep('select');
@@ -396,7 +527,7 @@ const QuizUpsellOverlay = ({
             return (
               <div className="w-full max-w-xs mx-auto">
                 <p className="text-gold text-[10px] font-bold tracking-[0.28em] uppercase mb-1 text-center w-full">ARTIGO EXTRA</p>
-                <h3 className="font-playfair text-xl font-bold text-white mb-3 text-center">Tapete</h3>
+                <h3 className="font-playfair text-2xl sm:text-3xl font-bold text-white mb-3 text-center">Tapete</h3>
                 <div className={cn(
                   'w-full rounded-sm border px-5 py-4 text-center transition-all duration-300 mb-4',
                   uSob ? 'bg-[#1a2a1a] border-white/20'
@@ -428,7 +559,7 @@ const QuizUpsellOverlay = ({
                   onChange={e => setPendingCarpetArea(e.target.value)}
                   className="w-full h-12 px-4 text-lg font-bold text-center bg-[#1a2a1a] border border-gold/25 focus:border-gold focus:outline-none rounded-sm transition-colors text-white placeholder:text-white/25 mb-1"
                 />
-                <p className="text-xs text-white/30 text-center mb-4">≤3m²: 15€/m² · ≤5m²: 12,5€/m² · ≤8m²: 11,5€/m² · ≤10m²: 10,5€/m² · ≤15m²: 10€/m² · +15m²: sob orçamento</p>
+                <p className="text-xs text-white/30 text-center mb-4">Preço por m² desce com a área: até 3m² 15€, até 5m² 12,5€, até 8m² 11,5€, até 10m² 10,5€, até 15m² 10€. Acima de 15m², sob orçamento.</p>
                 <button
                   disabled={!pendingCarpetArea || isNaN(parseFloat(pendingCarpetArea)) || parseFloat(pendingCarpetArea) <= 0}
                   onClick={() => {
@@ -448,14 +579,28 @@ const QuizUpsellOverlay = ({
           {/* Chairs config */}
           {pendingUpsellId === 'chairs' && (() => {
             const qty = pendingChairQtyNum;
-            const sobOrç = qty > 10;
-            const basePrice = calcChairClean(qty) ?? 0;
-            const waterproofPrice = pendingWaterproof && !sobOrç ? (calcChairWaterproof(qty) ?? 0) : 0;
+            const basePriceRaw = calcChairClean(qty);
+            const isPremiumTier = formData.waterproofingTier === 'premium';
+            const waterproofEssencialPriceRaw = calcChairWaterproof(qty);
+            const waterproofPremiumPriceRaw = calcChairWaterproofPremium(qty);
+            const activeWaterproofRaw = isPremiumTier ? waterproofPremiumPriceRaw : waterproofEssencialPriceRaw;
+            // "Sob orçamento" tem de propagar-se assim que o preço base OU o
+            // addon ligado não tem valor fixo — nunca cair para 0/ignorar o
+            // addon em silêncio (mesmo bug do QuizStepConfig.tsx: a partir de
+            // 10 cadeiras a impermeabilização é sob orçamento, mas a limpeza
+            // sozinha ainda tem preço fixo até 10).
+            const sobOrç = basePriceRaw === null || (pendingWaterproof && activeWaterproofRaw === null);
+            const basePrice = basePriceRaw ?? 0;
+            const waterproofEssencialPrice = waterproofEssencialPriceRaw ?? 0;
+            const waterproofPremiumPrice = waterproofPremiumPriceRaw ?? 0;
+            const waterproofPrice = pendingWaterproof && !sobOrç ? (isPremiumTier ? waterproofPremiumPrice : waterproofEssencialPrice) : 0;
             const totalChairPrice = basePrice + waterproofPrice;
+            const chairPremiumExtraDelta = Math.round((waterproofPremiumPrice - waterproofEssencialPrice) * 100) / 100;
+            const chairWhatsappMsg = encodeURIComponent('Olá, tenho cadeiras de um tipo diferente (sem tampo, costas ou braços) e gostava de um orçamento personalizado.');
             return (
               <div className="w-full max-w-xs mx-auto">
                 <p className="text-gold text-[10px] font-bold tracking-[0.28em] uppercase mb-1 text-center w-full">ARTIGO EXTRA</p>
-                <h3 className="font-playfair text-xl font-bold text-white text-center mb-1">Cadeiras</h3>
+                <h3 className="font-playfair text-2xl sm:text-3xl font-bold text-white text-center mb-1">Cadeiras</h3>
                 <div className={cn(
                   'w-full rounded-sm border px-5 py-4 text-center mb-5 transition-all duration-300',
                   sobOrç ? 'bg-[#1a2a1a] border-white/20' : 'bg-[#1a2a1a] border-gold/30 shadow-[0_0_20px_rgba(212,175,55,0.10)]'
@@ -485,23 +630,64 @@ const QuizUpsellOverlay = ({
                   >+</button>
                 </div>
                 {!sobOrç && (
-                  <button
-                    onClick={() => setPendingWaterproof(w => !w)}
-                    className={cn(
-                      'w-full flex items-center gap-3 px-4 py-3 rounded-sm border-2 transition-all touch-manipulation mb-4',
-                      pendingWaterproof ? 'border-gold bg-[#1a2a1a] shadow-[0_0_10px_rgba(212,175,55,0.15)]' : 'border-gold/20 bg-[#1a2a1a] hover:border-gold/40'
-                    )}
-                  >
-                    <div className={cn('w-5 h-5 rounded-md border-2 flex items-center justify-center flex-shrink-0 transition-all', pendingWaterproof ? 'border-gold bg-gold' : 'border-white/30')}>
-                      {pendingWaterproof && <Check className="w-3 h-3 text-[#12121e]" />}
-                    </div>
-                    <div className="text-left flex-1">
-                      <p className="text-sm font-bold text-white">Adicionar Impermeabilização</p>
-                      <p className="text-xs text-white/40">Proteção duradoura contra manchas</p>
-                    </div>
-                    <span className="text-gold font-bold text-sm flex-shrink-0">+{(calcChairWaterproof(qty) ?? 0) % 1 === 0 ? (calcChairWaterproof(qty) ?? 0) : (calcChairWaterproof(qty) ?? 0).toFixed(1).replace('.', ',')}€</span>
-                  </button>
+                  <div className="grid grid-cols-2 gap-2 pt-3 mb-1">
+                    <button
+                      onClick={() => {
+                        const turningOn = !(pendingWaterproof && formData.waterproofingTier === 'essencial');
+                        setPendingWaterproof(turningOn);
+                        updateFormData({ waterproofingTier: 'essencial' });
+                      }}
+                      className={cn(
+                        'rounded-sm border-2 px-3 py-2.5 text-left transition-all duration-200 touch-manipulation',
+                        pendingWaterproof && formData.waterproofingTier === 'essencial'
+                          ? 'border-gold bg-gold/[0.08] shadow-[0_0_10px_rgba(212,175,55,0.18)]'
+                          : 'border-gold/20 bg-[#1a2a1a] hover:border-gold/40'
+                      )}
+                    >
+                      <div className="flex items-center gap-1.5 mb-0.5">
+                        {pendingWaterproof && formData.waterproofingTier === 'essencial' && <Check className="w-3 h-3 text-gold flex-shrink-0" />}
+                        <p className={cn('text-xs font-bold', pendingWaterproof && formData.waterproofingTier === 'essencial' ? 'text-white' : 'text-white/60')}>Essencial</p>
+                      </div>
+                      <p className="text-[10px] text-white/35 leading-snug">+{waterproofEssencialPrice % 1 === 0 ? waterproofEssencialPrice : waterproofEssencialPrice.toFixed(1).replace('.', ',')}€ · 1-2 anos</p>
+                    </button>
+                    <button
+                      onClick={() => {
+                        const turningOn = !(pendingWaterproof && formData.waterproofingTier === 'premium');
+                        setPendingWaterproof(turningOn);
+                        updateFormData({ waterproofingTier: 'premium' });
+                      }}
+                      className={cn(
+                        'relative rounded-sm border-2 px-3 py-2.5 text-left transition-all duration-200 touch-manipulation',
+                        pendingWaterproof && formData.waterproofingTier === 'premium'
+                          ? 'border-gold bg-gold/[0.10] shadow-[0_0_16px_rgba(212,175,55,0.30)]'
+                          : 'border-gold/50 bg-[#1a2a1a] ring-1 ring-gold/20 hover:border-gold/75'
+                      )}
+                    >
+                      <span className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-gradient-to-r from-[#C9A84C] to-[#F0DC8A] text-[#12121e] text-[8px] font-black px-2.5 py-0.5 rounded-full tracking-widest uppercase shadow-md whitespace-nowrap">
+                        Melhor Proteção
+                      </span>
+                      <div className="flex items-center gap-1.5 mb-0.5">
+                        {pendingWaterproof && formData.waterproofingTier === 'premium' && <Check className="w-3 h-3 text-gold flex-shrink-0" />}
+                        <p className={cn('text-xs font-bold', pendingWaterproof && formData.waterproofingTier === 'premium' ? 'text-white' : 'text-white/85')}>Premium</p>
+                        <span className={cn('text-[9px] font-black leading-none px-1.5 py-[3px] rounded-full whitespace-nowrap flex-shrink-0', pendingWaterproof && formData.waterproofingTier === 'premium' ? 'bg-gold text-[#12121e]' : 'bg-gold/20 text-gold')}>
+                          só +{chairPremiumExtraDelta}€
+                        </span>
+                      </div>
+                      <p className={cn('text-[10px] leading-snug', pendingWaterproof && formData.waterproofingTier === 'premium' ? 'text-gold/60' : 'text-gold/45')}>até 10 anos, 5 lavagens</p>
+                    </button>
+                  </div>
                 )}
+                <p className="text-[10px] text-white/20 text-center leading-snug px-2 mb-4">
+                  Preço para cadeiras com tampo, costas e braços. Cadeira diferente?{' '}
+                  <a
+                    href={`${WHATSAPP_BASE}?text=${chairWhatsappMsg}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-[#25D366]/70 hover:text-[#25D366] underline underline-offset-2 touch-manipulation whitespace-nowrap"
+                  >
+                    Pedir no WhatsApp
+                  </a>
+                </p>
                 <button
                   onClick={() => {
                     setUpsellItems(prev => [...prev, {
@@ -509,7 +695,7 @@ const QuizUpsellOverlay = ({
                       chairQty: String(qty),
                       qty,
                       price: sobOrç ? 0 : totalChairPrice,
-                      label: `${qty} Cadeira${qty > 1 ? 's' : ''}`,
+                      label: `${qty} Cadeira${qty > 1 ? 's' : ''}${pendingWaterproof && !sobOrç ? (isPremiumTier ? ' + Impermeab. Premium' : ' + Impermeab. Essencial') : ''}`,
                       waterproof: pendingWaterproof && !sobOrç,
                       waterproofPrice: pendingWaterproof && !sobOrç ? waterproofPrice : 0,
                     }]);

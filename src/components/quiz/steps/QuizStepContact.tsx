@@ -29,7 +29,7 @@ const QuizStepContact = ({ formData, updateFormData, scrollContainerRef }: QuizS
     >
       <div className="w-full max-w-sm">
         <p className="text-gold text-[10px] font-bold tracking-[0.28em] uppercase mb-1 text-center">CONTACTO</p>
-        <h2 className="font-playfair text-xl sm:text-2xl font-bold text-white text-center mb-1 leading-[1.3]">
+        <h2 className="font-playfair text-2xl sm:text-3xl font-bold text-white text-center mb-1 leading-[1.3]">
           Os seus dados
         </h2>
         <p className="text-center text-[11px] text-white/30 mb-5">

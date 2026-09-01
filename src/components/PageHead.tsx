@@ -95,7 +95,7 @@ const routeMeta: Record<string, { pt: PageMeta; en: PageMeta; es: PageMeta }> = 
   "/impermeabilizacao": {
     pt: {
       title: "Impermeabilização de Estofos | Kyro Clean Solutions | Essencial ou Premium",
-      description: "Impermeabilização profissional de sofás e cadeiras. Versão Essencial e versão Premium, com proteção invisível e real até 5 anos.",
+      description: "Impermeabilização profissional de sofás e cadeiras. Versão Essencial e versão Premium, com proteção invisível e real até 10 anos.",
     },
     en: {
       title: "Upholstery Waterproofing | Kyro Clean Solutions | Essential or Premium",

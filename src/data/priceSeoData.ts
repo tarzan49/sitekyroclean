@@ -46,8 +46,8 @@ const priceTables: Record<string, { item: string; price: string; note?: string }
   "limpeza-cadeiras": [
     { item: "1ª a 4ª cadeira", price: "20€/un" },
     { item: "5ª a 6ª cadeira", price: "15€/un" },
-    { item: "7ª a 10ª cadeira", price: "12,50€/un" },
-    { item: "11+ cadeiras", price: "Sob orçamento" },
+    { item: "7ª a 9ª cadeira", price: "12,50€/un" },
+    { item: "10+ cadeiras", price: "Sob orçamento" },
   ],
   "limpeza-alcatifas": [
     { item: "Alcatifa até 10m²", price: "Desde 30€" },
@@ -59,7 +59,7 @@ const priceTables: Record<string, { item: string; price: string; note?: string }
     { item: "Sofá 1 lugar", price: "Desde 59€", note: "Essencial, 79€ na Premium" },
     { item: "Sofá 2 lugares", price: "Desde 79€", note: "Essencial, 99€ na Premium" },
     { item: "Sofá 3 lugares", price: "Desde 99€", note: "Essencial, 129€ na Premium" },
-    { item: "Cadeiras (por unidade)", price: "Desde 25€", note: "Essencial, 35€ na Premium" },
+    { item: "Cadeiras (por unidade)", price: "Desde 20€", note: "Essencial, 30€ na Premium" },
     { item: "Cabeceira", price: "Desde 15€" },
   ],
 };
@@ -140,7 +140,7 @@ const priceFaqs: Record<string, { question: string; answer: string }[]> = {
   ],
   "impermeabilizacao": [
     { question: "Quanto custa impermeabilizar um sofá em {city}?", answer: "Versão Essencial: desde 59€ (1 lugar), 79€ (2 lugares) e 99€ (3 lugares). Versão Premium, mais resistente e duradoura: desde 79€ (1 lugar), 99€ (2 lugares) e 129€ (3 lugares). Recomendamos combinar a Essencial com limpeza para preço especial." },
-    { question: "Qual a diferença entre a Essencial e a Premium?", answer: "A Essencial, à base de água, aguenta até 2 lavagens e protege por 1 a 2 anos. A Premium, à base de diluente e mais resistente ao desgaste, aguenta até 5 lavagens e protege até 5 anos. Para famílias com crianças ou animais, a Premium costuma compensar mais." },
+    { question: "Qual a diferença entre a Essencial e a Premium?", answer: "A Essencial, à base de água, aguenta até 2 lavagens e protege por 1 a 2 anos. A Premium, à base de diluente e mais resistente ao desgaste, aguenta até 5 lavagens e protege até 10 anos. Para famílias com crianças ou animais, a Premium costuma compensar mais." },
     { question: "A impermeabilização vale a pena?", answer: "Sim. A impermeabilização protege contra manchas de líquidos e prolonga a vida útil do estofamento. É especialmente recomendada para famílias com crianças ou animais, sobretudo na versão Premium." },
   ],
 };

@@ -574,11 +574,11 @@ const faqsByService: Record<string, FAQTemplate[]> = {
     },
     {
       question: (svc, f) => `Quanto tempo dura o efeito da impermeabilização em ${f}?`,
-      answer: (svc, f, price, c) => `Depende da versão escolhida. Em ${f}, a versão Essencial (à base de água) dura entre 1 a 2 anos consoante o uso. A versão Premium (à base de diluente), mais resistente ao desgaste, dura até 5 anos e aguenta mais lavagens.`,
+      answer: (svc, f, price, c) => `Depende da versão escolhida. Em ${f}, a versão Essencial (à base de água) dura entre 1 a 2 anos consoante o uso. A versão Premium (à base de diluente), mais resistente ao desgaste, dura até 10 anos e aguenta mais lavagens.`,
     },
     {
       question: (svc, f) => `Qual a diferença entre a Essencial e a Premium em ${f}?`,
-      answer: (svc, f, price, c) => `A Essencial é à base de água e aguenta até 2 lavagens. A Premium é à base de diluente, mais resistente ao desgaste, e aguenta até 5 lavagens, com proteção real até 5 anos. Para casas com crianças ou animais em ${f}, costumamos recomendar a Premium.`,
+      answer: (svc, f, price, c) => `A Essencial é à base de água e aguenta até 2 lavagens. A Premium é à base de diluente, mais resistente ao desgaste, e aguenta até 5 lavagens, com proteção real até 10 anos. Para casas com crianças ou animais em ${f}, costumamos recomendar a Premium.`,
     },
     {
       question: (svc, f) => `A impermeabilização altera o aspeto do sofá em ${f}?`,

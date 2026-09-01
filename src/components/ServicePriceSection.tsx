@@ -1,44 +1,33 @@
 import { useState } from "react";
-import { CheckCircle, Minus, Plus, Star, ArrowRight, ExternalLink, ChevronDown } from "lucide-react";
+import { CheckCircle, Minus, Plus, Star, ArrowRight, ExternalLink, ChevronDown, Check, Shield, Bug } from "lucide-react";
 import { GOOGLE_REVIEWS_VIEW_URL } from "@/constants/google";
-import { calcWidgetTotal, calcChairBracket, calcCarpetWidget, buildWidgetQuizConfig, WIDGET_DISCOUNT_THRESHOLD } from "@/lib/priceWidgetCalc";
+import { calcWidgetTotal, calcChairBracket, calcCarpetWidget, buildWidgetQuizConfig, calcRowAddonDelta, calcSofaAntiAcarosDelta, calcChairAddonWaterproofTotal, calcChairAntiAcarosTotal, calcWidgetPricing, calcWidgetArticles, PACK_DISCOUNT_MIN_SERVICE, PACK_DISCOUNT_MIN_UPSELL_ITEM, type WidgetTier } from "@/lib/priceWidgetCalc";
+import { locationPrices } from "@/components/quiz/QuizTypes";
 import { useQuizLauncher } from "@/hooks/use-quiz-launcher";
 import QuizFormLazy from "@/components/QuizFormLazy";
 import SectionHeader from "@/components/SectionHeader";
 import { PRICE_TABLE, PRICE_TABLE_QUIZ_CONFIG, type PriceRowQuizConfig } from "@/data/locationPriceTestimonialsData";
 import { PRICE_HEADING_VERB } from "@/constants/problemCardHelpers";
+import { REVIEW_COUNT } from "@/constants/business";
+import { getTrustPointsForSeed } from "@/constants/serviceTrustPool";
 import { cn } from "@/lib/utils";
+import { CarpetTierLegend } from "@/components/CarpetTierLegend";
 
-const SERVICE_POINTS: Record<string, { stat?: string; title: string; desc: string }[]> = {
-  'limpeza-sofas': [
-    { stat: '2,5 kg', title: 'de sujidade acumulada por ano', desc: 'Células mortas, gordura e suor que o tecido absorve e retém. Invisíveis, mas presentes. O aspirador não os tira.' },
-    { stat: '99,9%', title: 'eliminação de patogénicos', desc: 'A temperatura de extração profissional atinge profundidade e eficácia impossíveis para equipamento doméstico.' },
-    { title: 'Resultado visível ou voltamos', desc: 'Se a diferença não for clara, repetimos sem custo. É o nosso compromisso, sem letras pequenas, sem condições.' },
-  ],
-  'limpeza-colchoes': [
-    { stat: '2M+', title: 'ácaros num colchão de 5 anos', desc: 'O peso original pode dobrar em matéria orgânica. O que está a respirar todas as noites?' },
-    { stat: '40%', title: 'piora na qualidade do sono', desc: 'Alta concentração de ácaros degrada o sono mesmo sem sintomas visíveis. Comprovado em estudos de polissonografia.' },
-    { title: 'Seguro essa mesma noite', desc: 'Produtos hipoalergénicos certificados sem resíduos. Pode dormir logo após a intervenção, sem esperar.' },
-  ],
-  'limpeza-tapetes': [
-    { stat: '8×', title: 'mais alérgenos que pavimento liso', desc: 'Tapetes retêm e libertam no ar partículas a cada passo: pólenes, ácaros e poluentes invisíveis.' },
-    { stat: '90%', title: 'da aparência original recuperada', desc: 'Tapetes considerados "inutilizáveis" ficam como novos com extração profissional a quente. Sem substituição.' },
-    { title: 'Ao domicílio, sem recolha, sem espera', desc: 'Tratado no seu espaço com equipamento profissional. Não precisa sair de casa nem aguardar entrega.' },
-  ],
-  'limpeza-cadeiras': [
-    { stat: '400×', title: 'mais bactérias que a sanita', desc: 'As zonas de contacto de cadeiras de jantar estão entre as superfícies mais contaminadas de uma casa.' },
-    { title: 'Protocolo por material, não genérico', desc: 'Veludo, couro, linho: cada tecido tem a sua abordagem. Nunca arriscamos o material errado no tecido errado.' },
-    { stat: '3–6h', title: 'e estão prontas', desc: 'Resultado no próprio dia. Sem paralisar a sua sala de jantar ou escritório por dias.' },
-  ],
+// Terceiro ponto de cada serviço reescrito para puxar para o upsell/Pack Família
+// (mesma visita, mais um estofo) — pedido explícito 2026-08-30, mantém-se
+// sincronizado com a variante 0 de src/constants/serviceTrustPool.ts.
+// Sofá, colchão, cadeiras e tapetes já não estão aqui — usam pools de várias
+// opções por ponto, ver getTrustPointsForSeed em serviceTrustPool.ts.
+const SERVICE_POINTS: Record<string, { stat?: string; titleGold: string; titleRest?: string; desc: string }[]> = {
   'limpeza-alcatifas': [
-    { stat: '1 kg/m²', title: 'de sujidade invisível acumulada', desc: 'Fibras compactadas retêm o que não se vê mas que respira todos os dias. Nem a aspiração profissional chega.' },
-    { stat: '2,5×', title: 'pior qualidade do ar sem limpeza', desc: 'Alcatifas sem manutenção anual degradam significativamente o ar interior. Crítico em escritórios e quartos.' },
-    { title: 'Metro a metro, sem exceção', desc: 'Mapeamos o espaço e tratamos tudo: cantos, bordas e zonas sob mobília sem exceção.' },
+    { stat: '1 kg/m²', titleGold: 'Sujidade invisível', titleRest: ' acumulada em cada m²', desc: 'Fibras compactadas retêm o que não se vê mas que respira todos os dias. Nem a aspiração profissional chega.' },
+    { stat: '2,5×', titleGold: 'Pior qualidade do ar', titleRest: ' sem limpeza regular', desc: 'Alcatifas sem manutenção anual degradam significativamente o ar interior. Crítico em escritórios e quartos.' },
+    { titleGold: 'Aproveite a visita', titleRest: ' para mais um espaço', desc: 'O técnico já está em sua casa: junte sofás, cadeiras ou tapetes na mesma visita e poupe na deslocação.' },
   ],
   'impermeabilizacao': [
-    { stat: '60s', title: 'para uma mancha ser permanente', desc: 'Sem proteção, o tecido absorve o vinho em menos de 60 segundos. Com nano-barreira, rola para o chão.' },
-    { stat: '10⁻⁹m', title: 'de proteção molecular', desc: 'Nano-partículas criam uma barreira a nível molecular invisível ao toque. Não altera cor, textura nem respirabilidade do tecido.' },
-    { stat: '40%', title: 'mais vida útil para o estofo', desc: 'O custo da impermeabilização amortiza-se em menos de 12 meses face à substituição prematura do estofo.' },
+    { stat: '60s', titleGold: '60 segundos', titleRest: ' para uma mancha ficar permanente', desc: 'Sem proteção, o tecido absorve o vinho em menos de 60 segundos. Com nano-barreira, rola para o chão.' },
+    { stat: '10⁻⁹m', titleGold: 'Proteção molecular', titleRest: ' a nível nanométrico', desc: 'Nano-partículas criam uma barreira a nível molecular invisível ao toque. Não altera cor, textura nem respirabilidade do tecido.' },
+    { titleGold: 'Combine com a limpeza', titleRest: ' e poupe', desc: 'Peça a impermeabilização junto com a limpeza profunda: o Pack Proteção Total tem desconto sobre os dois serviços em separado.' },
   ],
 };
 
@@ -51,32 +40,30 @@ const SERVICE_SUBTITLE: Record<string, string> = {
   'impermeabilizacao': 'Preço fixo, combinável com limpeza ou em separado. Sem compromisso.',
 };
 
-function DiscountBar({ total }: { total: number }) {
-  const reached = total >= WIDGET_DISCOUNT_THRESHOLD;
-  const pct = Math.min(100, (total / WIDGET_DISCOUNT_THRESHOLD) * 100);
-  const remaining = Math.ceil(WIDGET_DISCOUNT_THRESHOLD - total);
+function DiscountBar({ discountActive }: { discountActive: boolean }) {
   return (
     <div className="px-4 py-2.5 sm:px-5 sm:py-3 border-t" style={{ borderColor: "rgba(17,17,17,0.07)" }}>
-      {reached ? (
-        <div className="flex items-center justify-between">
-          <span className="text-xs font-semibold" style={{ color: "#D4AF37" }}>10% de desconto ativo</span>
-          <span className="text-[10px] px-2 py-0.5 font-bold rounded-sm" style={{ background: "rgba(212,175,55,0.12)", color: "#D4AF37" }}>-10%</span>
+      {discountActive ? (
+        <div
+          className="flex items-center gap-3 px-3.5 py-2.5 rounded-sm"
+          style={{ background: "linear-gradient(135deg, rgba(212,175,55,0.10), rgba(212,175,55,0.02))", border: "1px solid rgba(212,175,55,0.35)" }}
+        >
+          <div
+            className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0"
+            style={{ background: "linear-gradient(135deg, #C9A84C, #F0DC8A)", boxShadow: "0 2px 10px rgba(212,175,55,0.45)" }}
+          >
+            <Check className="w-4 h-4" style={{ color: "#071a12" }} strokeWidth={3.5} />
+          </div>
+          <div className="flex-1 text-left">
+            <p className="text-sm font-bold leading-none" style={{ color: "#111111" }}>10% de desconto ativo</p>
+            <p className="text-[10px] mt-1 leading-none" style={{ color: "rgba(17,17,17,0.40)" }}>Aplica-se a todo o pedido</p>
+          </div>
+          <span className="text-[11px] font-black px-2 py-1 rounded-sm flex-shrink-0" style={{ background: "#D4AF37", color: "white" }}>-10%</span>
         </div>
       ) : (
-        <>
-          <div className="flex items-center justify-between mb-1.5">
-            <span className="text-[11px]" style={{ color: "rgba(17,17,17,0.45)" }}>
-              {total > 0 ? <><span className="font-semibold" style={{ color: "#111111" }}>Faltam {remaining}€</span> para 10% de desconto</> : 'Adicione 149€+ e poupe 10% em tudo'}
-            </span>
-            {total > 0 && <span className="text-[11px] font-semibold" style={{ color: "rgba(17,17,17,0.40)" }}>{total}€ / {WIDGET_DISCOUNT_THRESHOLD}€</span>}
-          </div>
-          <div className="h-1.5 overflow-hidden" style={{ background: "rgba(17,17,17,0.07)" }}>
-            <div
-              className="h-full transition-all duration-500"
-              style={{ width: `${Math.max(pct, total > 0 ? 4 : 0)}%`, background: "linear-gradient(90deg,#B8912A,#EDD96A)" }}
-            />
-          </div>
-        </>
+        <p className="text-[11px] leading-snug" style={{ color: "rgba(17,17,17,0.45)" }}>
+          Pedidos de <span className="font-semibold" style={{ color: "#111111" }}>{PACK_DISCOUNT_MIN_SERVICE}€+</span> com um item extra de <span className="font-semibold" style={{ color: "#111111" }}>{PACK_DISCOUNT_MIN_UPSELL_ITEM}€+</span> ganham <span className="font-semibold" style={{ color: "#D4AF37" }}>10% de desconto em tudo</span>.
+        </p>
       )}
     </div>
   );
@@ -94,18 +81,44 @@ export default function ServicePriceSection({ serviceSlug, initialLocation }: Pr
   const [rowQuantities, setRowQuantities] = useState<Record<number, number>>({});
   const [chaiseLongueAddon, setChaiseLongueAddon] = useState(0);
   const [infoOpen, setInfoOpen] = useState(false);
+  const [addonRows, setAddonRows] = useState<Set<number>>(new Set());
+  const [addonTier, setAddonTier] = useState<WidgetTier>('essencial');
+  const [antiAcarosRows, setAntiAcarosRows] = useState<Set<number>>(new Set());
 
   if (!rows) return null;
+
+  const quizConfigs = PRICE_TABLE_QUIZ_CONFIG[serviceSlug] ?? [];
 
   const adjustQty = (i: number, delta: number, max?: number) => {
     setRowQuantities(prev => {
       const next = (prev[i] ?? 0) + delta;
-      return { ...prev, [i]: Math.min(max ?? 99, Math.max(0, next)) };
+      const clamped = Math.min(max ?? 99, Math.max(0, next));
+      if (clamped === 0) {
+        setAddonRows(a => { if (!a.has(i)) return a; const n = new Set(a); n.delete(i); return n; });
+        setAntiAcarosRows(a => { if (!a.has(i)) return a; const n = new Set(a); n.delete(i); return n; });
+      }
+      return { ...prev, [i]: clamped };
+    });
+  };
+
+  const toggleAddonRow = (i: number) => {
+    setAddonRows(prev => {
+      const next = new Set(prev);
+      if (next.has(i)) next.delete(i); else next.add(i);
+      return next;
+    });
+  };
+
+  const toggleAntiAcarosRow = (i: number) => {
+    setAntiAcarosRows(prev => {
+      const next = new Set(prev);
+      if (next.has(i)) next.delete(i); else next.add(i);
+      return next;
     });
   };
 
   const handleContinue = () => {
-    const config = buildWidgetQuizConfig(serviceSlug, rowQuantities, chaiseLongueAddon);
+    const config = buildWidgetQuizConfig(serviceSlug, rowQuantities, chaiseLongueAddon, addonRows, addonTier, antiAcarosRows);
     if (!config) return;
     setActiveConfig(config);
     openQuiz();
@@ -116,15 +129,33 @@ export default function ServicePriceSection({ serviceSlug, initialLocation }: Pr
   const goldWord = verbWords.pop() ?? "";
   const heading = `Quanto custa ${verbWords.join(" ")}`;
 
-  const total = calcWidgetTotal(serviceSlug, rowQuantities, chaiseLongueAddon);
-  const discountActive = total >= WIDGET_DISCOUNT_THRESHOLD;
-  const discountedTotal = Math.round(total * 0.9);
+  const total = calcWidgetTotal(serviceSlug, rowQuantities, chaiseLongueAddon, addonRows, addonTier, antiAcarosRows);
+  const travelFee = initialLocation ? (locationPrices[initialLocation] ?? 10) : 0;
+  const articles = calcWidgetArticles(serviceSlug, rowQuantities);
+  const pricing = calcWidgetPricing(total, travelFee, articles);
+  const firstTierAddonRow = Array.from(addonRows).find(i => {
+    const svc = quizConfigs[i]?.service;
+    return svc === 'sofa' || svc === 'chairs';
+  });
+  const hasSofaAddon = firstTierAddonRow !== undefined;
+  const tierAddonCfg = hasSofaAddon ? quizConfigs[firstTierAddonRow]! : null;
+  const tierAddonQty = hasSofaAddon ? (rowQuantities[firstTierAddonRow] ?? 0) : 0;
+  const sofaAddonEssencialDelta = tierAddonCfg
+    ? (tierAddonCfg.service === 'chairs' ? calcChairAddonWaterproofTotal(tierAddonQty, 'essencial') : calcRowAddonDelta(tierAddonCfg, 'essencial'))
+    : null;
+  const sofaAddonPremiumDelta = tierAddonCfg
+    ? (tierAddonCfg.service === 'chairs' ? calcChairAddonWaterproofTotal(tierAddonQty, 'premium') : calcRowAddonDelta(tierAddonCfg, 'premium'))
+    : null;
+  const sofaAddonExtraDelta = sofaAddonEssencialDelta !== null && sofaAddonPremiumDelta !== null
+    ? Math.round((sofaAddonPremiumDelta - sofaAddonEssencialDelta) * 100) / 100 : null;
   const hasSelection = total > 0 || Object.values(rowQuantities).some(q => q > 0) || chaiseLongueAddon > 0;
+
+  const trustPoints = getTrustPointsForSeed(serviceSlug, `${serviceSlug}:0:${initialLocation ?? 'default'}`) ?? SERVICE_POINTS[serviceSlug] ?? [];
 
   const TrustPoints = ({ fullDesc }: { fullDesc: boolean }) => (
     <>
       <div className="flex flex-col gap-0">
-        {(SERVICE_POINTS[serviceSlug] ?? []).map((point, i) => (
+        {trustPoints.map((point, i) => (
           <div
             key={i}
             className="flex gap-4 py-4"
@@ -140,8 +171,9 @@ export default function ServicePriceSection({ serviceSlug, initialLocation }: Pr
                   {point.stat}
                 </p>
               )}
-              <p className="text-sm font-semibold leading-snug mb-0.5" style={{ color: "#111111" }}>
-                {point.title}
+              <p className="text-sm font-semibold leading-snug mb-0.5">
+                <span style={{ color: "#B8912A" }}>{point.titleGold}</span>
+                {point.titleRest && <span style={{ color: "#111111" }}>{point.titleRest}</span>}
               </p>
               {fullDesc && (
                 <p className="text-[13px] leading-relaxed" style={{ color: "rgba(17,17,17,0.50)" }}>
@@ -165,7 +197,7 @@ export default function ServicePriceSection({ serviceSlug, initialLocation }: Pr
         </div>
         <div className="h-3.5 w-px" style={{ background: "rgba(17,17,17,0.12)" }} />
         <span className="text-sm font-semibold" style={{ color: "#111111" }}>5.0</span>
-        <span className="text-xs flex-1" style={{ color: "rgba(17,17,17,0.45)" }}>+60 avaliações · Deixar avaliação</span>
+        <span className="text-xs flex-1" style={{ color: "rgba(17,17,17,0.45)" }}>+{REVIEW_COUNT} avaliações · Deixar avaliação</span>
         <ExternalLink className="w-3 h-3 opacity-30 group-hover:opacity-60 transition-opacity flex-shrink-0" style={{ color: "#111111" }} />
       </a>
     </>
@@ -185,7 +217,7 @@ export default function ServicePriceSection({ serviceSlug, initialLocation }: Pr
           />
         </div>
 
-        <div className="grid lg:grid-cols-2 gap-8 lg:gap-20 items-start">
+        <div className="grid lg:grid-cols-2 gap-8 lg:gap-20 items-center">
 
           {/* ── Coluna esquerda — desktop: heading + trust + google alinhados com widget ── */}
           <div className="hidden lg:block lg:pt-0">
@@ -201,21 +233,14 @@ export default function ServicePriceSection({ serviceSlug, initialLocation }: Pr
           {/* ── Widget ── */}
           <div className="overflow-hidden" style={{ boxShadow: "0 12px 50px rgba(7,26,18,0.16), 0 2px 8px rgba(7,26,18,0.08)" }}>
 
-            {/* Header escuro */}
-            <div className="px-5 py-4 sm:px-6 sm:py-6" style={{ background: "#071a12" }}>
-              <div className="flex items-start justify-between mb-2 sm:mb-3">
-                <div className="flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full" style={{ background: "#25D366" }} />
-                  <p className="text-[9px] font-bold tracking-[0.28em] uppercase" style={{ color: "rgba(255,255,255,0.40)" }}>Orçamento Gratuito</p>
-                </div>
-                <span className="text-[10px] font-semibold px-2 py-0.5" style={{ background: "rgba(212,175,55,0.12)", color: "#D4AF37" }}>Sem compromisso</span>
+            {/* Header verde */}
+            <div className="px-5 py-4 sm:px-6 sm:py-5" style={{ background: "#071a12" }}>
+              <div className="flex items-center gap-2 mb-1.5">
+                <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: "#25D366" }} />
+                <p className="text-[9px] font-bold tracking-[0.26em] uppercase" style={{ color: "rgba(255,255,255,0.45)" }}>Orçamento Gratuito</p>
               </div>
-              <h3 className="font-playfair text-lg sm:text-xl font-bold text-white leading-snug mb-1">
-                Calcule o seu preço agora
-              </h3>
-              <p className="text-xs" style={{ color: "rgba(255,255,255,0.38)" }}>
-                Resposta em menos de 30 min · Deslocação ao domicílio
-              </p>
+              <p className="text-white font-semibold text-sm leading-snug">Escolha as quantidades e continue para o orçamento</p>
+              <p className="text-xs mt-0.5" style={{ color: "rgba(255,255,255,0.38)" }}>Sem compromisso · Resposta em menos de 30 min</p>
             </div>
 
             {/* Linhas */}
@@ -313,69 +338,191 @@ export default function ServicePriceSection({ serviceSlug, initialLocation }: Pr
                           <span className="font-playfair text-xl font-bold tabular-nums" style={{ color: active ? "#D4AF37" : "rgba(17,17,17,0.25)" }}>{dynamicPrice}</span>
                         )}
                       </div>
-                      <p className="text-[11px] mt-1.5" style={{ color: "rgba(17,17,17,0.35)" }}>
-                        {isAlcatifa ? 'até 50m²: 3€/m² · +50m²: sob orçamento' : '≤3m²: 15€/m² · ≤5m²: 12,5€/m² · ≤8m²: 11,5€/m² · ≤10m²: 10,5€/m² · ≤15m²: 10€/m² · +15m²: sob orçamento'}
-                      </p>
+                      <CarpetTierLegend isAlcatifa={isAlcatifa} qty={qty} />
                     </div>
                   );
                 }
 
+                // Nunca mostrar o addon "Impermeabilizar"/"Anti Ácaros" na própria
+                // página de impermeabilização — aí a impermeabilização já É o
+                // serviço primário, "adicioná-la" a si mesma não faz sentido.
+                const canAddon = !isWaterproof && (quizConfig.service === 'sofa' || quizConfig.service === 'mattress' || isChair);
+                const isSofaAddon = quizConfig.service === 'sofa';
+                const addonOn = addonRows.has(i);
+                const addonDelta = !canAddon || !active ? null
+                  : isChair ? calcChairAddonWaterproofTotal(qty, addonTier)
+                  : calcRowAddonDelta(quizConfig, addonTier);
+                const canAntiAcaros = !isWaterproof && (isSofaAddon || isChair);
+                const antiAcarosOn = antiAcarosRows.has(i);
+                const antiAcarosDelta = !canAntiAcaros || !active ? null
+                  : isChair ? calcChairAntiAcarosTotal(qty)
+                  : calcSofaAntiAcarosDelta(quizConfig);
+
                 return (
                   <div
                     key={i}
-                    className="flex items-center gap-3 sm:gap-4 px-4 py-3 sm:px-5 sm:py-4 border-b transition-all duration-200"
+                    className="border-b transition-all duration-200"
                     style={{
                       borderBottomColor: "rgba(17,17,17,0.06)",
                       borderLeft: active ? "3px solid #D4AF37" : "3px solid transparent",
                       background: active ? "rgba(212,175,55,0.03)" : "transparent",
                     }}
                   >
-                    {/* Stepper */}
-                    <div className="flex items-center gap-1 flex-shrink-0">
-                      <button
-                        type="button"
-                        onClick={() => adjustQty(i, -1)}
-                        disabled={qty === 0}
-                        aria-label="Diminuir"
-                        className="w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center transition-all active:scale-95 disabled:opacity-25"
-                        style={{ background: active ? "#071a12" : "#f0f0eb", color: active ? "white" : "rgba(17,17,17,0.40)" }}
-                      >
-                        <Minus className="w-4 h-4" />
-                      </button>
-                      <span
-                        className="w-7 sm:w-8 text-center font-playfair text-lg sm:text-xl font-bold tabular-nums"
-                        style={{ color: active ? "#D4AF37" : "rgba(17,17,17,0.20)" }}
-                      >{qty}</span>
-                      <button
-                        type="button"
-                        onClick={() => adjustQty(i, 1)}
-                        aria-label="Aumentar"
-                        className="w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center transition-all active:scale-95"
-                        style={{ background: "#071a12", color: "white" }}
-                      >
-                        <Plus className="w-4 h-4" />
-                      </button>
+                    <div className="flex items-center gap-3 sm:gap-4 px-4 py-3 sm:px-5 sm:py-4">
+                      {/* Stepper */}
+                      <div className="flex items-center gap-1 flex-shrink-0">
+                        <button
+                          type="button"
+                          onClick={() => adjustQty(i, -1)}
+                          disabled={qty === 0}
+                          aria-label="Diminuir"
+                          className="w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center transition-all active:scale-95 disabled:opacity-25"
+                          style={{ background: active ? "#071a12" : "#f0f0eb", color: active ? "white" : "rgba(17,17,17,0.40)" }}
+                        >
+                          <Minus className="w-4 h-4" />
+                        </button>
+                        <span
+                          className="w-7 sm:w-8 text-center font-playfair text-lg sm:text-xl font-bold tabular-nums"
+                          style={{ color: active ? "#D4AF37" : "rgba(17,17,17,0.20)" }}
+                        >{qty}</span>
+                        <button
+                          type="button"
+                          onClick={() => adjustQty(i, 1)}
+                          aria-label="Aumentar"
+                          className="w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center transition-all active:scale-95"
+                          style={{ background: "#071a12", color: "white" }}
+                        >
+                          <Plus className="w-4 h-4" />
+                        </button>
+                      </div>
+
+                      <span className="flex-1 text-sm font-medium transition-colors" style={{ color: active ? "#111111" : "rgba(17,17,17,0.55)" }}>
+                        {row.item}
+                      </span>
+
+                      {dynamicPrice !== null && (
+                        <span className="font-playfair text-lg sm:text-xl font-bold tabular-nums flex-shrink-0 transition-colors" style={{ color: active ? "#D4AF37" : "rgba(17,17,17,0.25)" }}>
+                          {dynamicPrice}
+                        </span>
+                      )}
                     </div>
 
-                    <span className="flex-1 text-sm font-medium transition-colors" style={{ color: active ? "#111111" : "rgba(17,17,17,0.55)" }}>
-                      {row.item}
-                    </span>
+                    {canAddon && active && (
+                      <button
+                        type="button"
+                        onClick={() => toggleAddonRow(i)}
+                        className="flex items-center gap-2 w-full pl-[76px] pr-4 sm:pl-[88px] sm:pr-5 pb-3 -mt-0.5 text-left touch-manipulation"
+                      >
+                        <span
+                          className="w-4 h-4 rounded-sm border flex items-center justify-center flex-shrink-0 transition-all"
+                          style={{ borderColor: addonOn ? "#D4AF37" : "rgba(17,17,17,0.25)", background: addonOn ? "#D4AF37" : "transparent" }}
+                        >
+                          {addonOn && <Check className="w-3 h-3" style={{ color: "#071a12" }} strokeWidth={3} />}
+                        </span>
+                        <Shield className="w-3 h-3 flex-shrink-0" style={{ color: addonOn ? "#D4AF37" : "rgba(17,17,17,0.30)" }} />
+                        <span className="text-[11px] font-semibold flex-1" style={{ color: addonOn ? "#111111" : "rgba(17,17,17,0.45)" }}>
+                          {isSofaAddon || isChair ? 'Impermeabilizar' : 'Anti Ácaros'}
+                        </span>
+                        {addonDelta !== null && (
+                          <span className="text-[11px] font-bold tabular-nums" style={{ color: addonOn ? "#D4AF37" : "rgba(17,17,17,0.35)" }}>
+                            +{addonDelta}€{isChair ? '' : '/un.'}
+                          </span>
+                        )}
+                      </button>
+                    )}
 
-                    {dynamicPrice !== null && (
-                      <span className="font-playfair text-lg sm:text-xl font-bold tabular-nums flex-shrink-0 transition-colors" style={{ color: active ? "#D4AF37" : "rgba(17,17,17,0.25)" }}>
-                        {dynamicPrice}
-                      </span>
+                    {canAntiAcaros && active && antiAcarosDelta !== null && (
+                      <button
+                        type="button"
+                        onClick={() => toggleAntiAcarosRow(i)}
+                        className="flex items-center gap-2 w-full pl-[76px] pr-4 sm:pl-[88px] sm:pr-5 pb-3 -mt-0.5 text-left touch-manipulation"
+                      >
+                        <span
+                          className="w-4 h-4 rounded-sm border flex items-center justify-center flex-shrink-0 transition-all"
+                          style={{ borderColor: antiAcarosOn ? "#D4AF37" : "rgba(17,17,17,0.25)", background: antiAcarosOn ? "#D4AF37" : "transparent" }}
+                        >
+                          {antiAcarosOn && <Check className="w-3 h-3" style={{ color: "#071a12" }} strokeWidth={3} />}
+                        </span>
+                        <Bug className="w-3 h-3 flex-shrink-0" style={{ color: antiAcarosOn ? "#D4AF37" : "rgba(17,17,17,0.30)" }} />
+                        <span className="text-[11px] font-semibold flex-1" style={{ color: antiAcarosOn ? "#111111" : "rgba(17,17,17,0.45)" }}>
+                          Anti Ácaros
+                        </span>
+                        <span className="text-[11px] font-bold tabular-nums" style={{ color: antiAcarosOn ? "#D4AF37" : "rgba(17,17,17,0.35)" }}>
+                          +{antiAcarosDelta}€{isChair ? '' : '/un.'}
+                        </span>
+                      </button>
                     )}
                   </div>
                 );
               })}
+
+              {/* Nível de proteção — só aparece quando há pelo menos um sofá com impermeabilização activa (colchão/anti-ácaros não tem tiers) */}
+              {hasSofaAddon && (
+                <div className="px-4 py-3.5 sm:px-5 sm:py-4 border-b" style={{ borderBottomColor: "rgba(17,17,17,0.06)", background: "rgba(212,175,55,0.04)" }}>
+                  <p className="text-[10px] font-bold tracking-[0.16em] uppercase mb-2" style={{ color: "rgba(17,17,17,0.40)" }}>
+                    Nível de impermeabilização
+                  </p>
+                  <div className="grid grid-cols-2 gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setAddonTier('essencial')}
+                      className="text-left px-3 py-2 border-2 transition-all"
+                      style={{
+                        borderColor: addonTier === 'essencial' ? "#D4AF37" : "rgba(17,17,17,0.12)",
+                        background: addonTier === 'essencial' ? "white" : "rgba(255,255,255,0.5)",
+                      }}
+                    >
+                      <div className="flex items-center gap-1 mb-0.5">
+                        {addonTier === 'essencial' && <Check className="w-3 h-3" style={{ color: "#D4AF37" }} strokeWidth={3} />}
+                        <p className="text-xs font-bold" style={{ color: "#111111" }}>Essencial</p>
+                      </div>
+                      <p className="text-[10px] leading-snug" style={{ color: "rgba(17,17,17,0.40)" }}>1-2 anos de proteção</p>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setAddonTier('premium')}
+                      className="relative text-left px-3 py-2 border-2 transition-all"
+                      style={{
+                        borderColor: addonTier === 'premium' ? "#D4AF37" : "rgba(212,175,55,0.35)",
+                        background: addonTier === 'premium' ? "white" : "rgba(255,255,255,0.5)",
+                      }}
+                    >
+                      <span
+                        className="absolute -top-2 right-2 text-[7px] font-black px-1.5 py-0.5 uppercase tracking-wide rounded-sm"
+                        style={{ background: "linear-gradient(135deg,#B8912A,#EDD96A)", color: "#071a12" }}
+                      >
+                        Dura Mais
+                      </span>
+                      <div className="flex items-center gap-1 mb-0.5">
+                        {addonTier === 'premium' && <Check className="w-3 h-3" style={{ color: "#D4AF37" }} strokeWidth={3} />}
+                        <p className="text-xs font-bold" style={{ color: "#111111" }}>Premium</p>
+                        {sofaAddonExtraDelta !== null && (
+                          <span className="text-[9px] font-black leading-none px-1.5 py-[3px] rounded-full whitespace-nowrap" style={{ background: addonTier === 'premium' ? "#D4AF37" : "rgba(212,175,55,0.15)", color: addonTier === 'premium' ? "white" : "#B8912A" }}>
+                            só +{sofaAddonExtraDelta}€
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-[10px] leading-snug font-semibold" style={{ color: "#B8912A" }}>até 10 anos · até 5 lavagens</p>
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Discount bar */}
-            <DiscountBar total={total} />
+            <DiscountBar discountActive={pricing.discountActive} />
 
             {/* Total + CTA */}
             <div className="bg-white px-4 pb-4 sm:px-5 sm:pb-5 space-y-2.5 sm:space-y-3">
+
+              {travelFee > 0 && (
+                <div className="flex items-center gap-1.5 pt-3">
+                  <CheckCircle className="w-3.5 h-3.5" style={{ color: "rgba(17,17,17,0.25)" }} />
+                  <span className="text-xs" style={{ color: "rgba(17,17,17,0.45)" }}>
+                    +{travelFee}€ deslocação a {initialLocation}
+                  </span>
+                </div>
+              )}
 
               {/* Total block */}
               {hasSelection && total > 0 && (
@@ -385,17 +532,17 @@ export default function ServicePriceSection({ serviceSlug, initialLocation }: Pr
                 >
                   <div>
                     <p className="text-[10px] font-bold tracking-[0.18em] uppercase mb-0.5" style={{ color: "rgba(255,255,255,0.40)" }}>
-                      {discountActive ? "Total com desconto" : "Total estimado"}
+                      {pricing.discountActive ? "Total com desconto" : "Total estimado"}
                     </p>
-                    {discountActive && (
-                      <p className="text-xs line-through" style={{ color: "rgba(255,255,255,0.30)" }}>{total}€</p>
+                    {pricing.discountActive && (
+                      <p className="text-xs line-through" style={{ color: "rgba(255,255,255,0.30)" }}>{pricing.grandTotal}€</p>
                     )}
                   </div>
                   <span
                     className="font-playfair font-bold tabular-nums text-[1.65rem] sm:text-[2rem]"
                     style={{ lineHeight: 1, color: "#D4AF37" }}
                   >
-                    {discountActive ? discountedTotal : total}€
+                    {pricing.discountActive ? pricing.discountedTotal : pricing.grandTotal}€
                   </span>
                 </div>
               )}
@@ -465,6 +612,8 @@ export default function ServicePriceSection({ serviceSlug, initialLocation }: Pr
           initialCarpetArea={activeConfig.carpetArea}
           initialChairQty={activeConfig.chairQty}
           initialUpsellItems={activeConfig.initialUpsellItems}
+          initialWaterproofingTier={activeConfig.waterproofingTier}
+          initialChairWaterproofing={activeConfig.chairWaterproofing}
           skipToUpsell
         />
       )}

@@ -162,7 +162,7 @@ const posts: BlogPost[] = [
       },
       {
         heading: "Quanto dura a impermeabilização?",
-        body: "Depende da versão escolhida. Temos duas: a Essencial, à base de água, e a Premium, à base de diluente e mais resistente ao desgaste.\n\n- **Essencial**, aguenta até 2 lavagens e mantém a proteção real entre 1 e 2 anos, consoante o uso.\n- **Premium**, aguenta até 5 lavagens e mantém a proteção real até 5 anos.\n\nA durabilidade real também varia com:\n\n- **Uso diário**, Sofás muito utilizados perdem eficácia mais rápido.\n- **Limpezas**, Cada limpeza esfrega ligeiramente a barreira protetora, daí a diferença entre 2 e 5 lavagens suportadas.\n- **Animais de estimação**, As unhas dos animais desgastam o tratamento, um argumento a favor da Premium.\n\nRecomendamos renovar a impermeabilização a cada limpeza profissional, é quando o tecido está mais limpo e o produto adere melhor.",
+        body: "Depende da versão escolhida. Temos duas: a Essencial, à base de água, e a Premium, à base de diluente e mais resistente ao desgaste.\n\n- **Essencial**, aguenta até 2 lavagens e mantém a proteção real entre 1 e 2 anos, consoante o uso.\n- **Premium**, aguenta até 5 lavagens e mantém a proteção real até 10 anos.\n\nA durabilidade real também varia com:\n\n- **Uso diário**, Sofás muito utilizados perdem eficácia mais rápido.\n- **Limpezas**, Cada limpeza esfrega ligeiramente a barreira protetora, daí a diferença entre 2 e 5 lavagens suportadas.\n- **Animais de estimação**, As unhas dos animais desgastam o tratamento, um argumento a favor da Premium.\n\nRecomendamos renovar a impermeabilização a cada limpeza profissional, é quando o tecido está mais limpo e o produto adere melhor.",
       },
       {
         heading: "Para que tipos de sofá é recomendada?",
@@ -387,7 +387,7 @@ const posts: BlogPost[] = [
     sections: [
       {
         heading: "Preços de limpeza de cadeiras (2025)",
-        body: "A Kyro Clean Solutions pratica preço decrescente por unidade, quanto mais cadeiras limpar de uma vez:\n\n- 1ª a 4ª cadeira: 20€/unidade\n- 5ª a 6ª cadeira: 15€/unidade\n- 7ª a 10ª cadeira: 12,50€/unidade\n- 11 ou mais cadeiras: orçamento personalizado\n\nO desconto por volume reflete a eficiência do técnico quando tem várias peças no mesmo local, a deslocação e o setup do equipamento são custos fixos que se diluem com mais peças.",
+        body: "A Kyro Clean Solutions pratica preço decrescente por unidade, quanto mais cadeiras limpar de uma vez:\n\n- 1ª a 4ª cadeira: 20€/unidade\n- 5ª a 6ª cadeira: 15€/unidade\n- 7ª a 9ª cadeira: 12,50€/unidade\n- 10 ou mais cadeiras: orçamento personalizado\n\nO desconto por volume reflete a eficiência do técnico quando tem várias peças no mesmo local, a deslocação e o setup do equipamento são custos fixos que se diluem com mais peças.",
         tip: "Para restaurantes ou escritórios com mais de 20 cadeiras, solicitamos orçamento personalizado que pode representar uma poupança adicional de 20 a 30%.",
       },
       {
@@ -806,7 +806,7 @@ const posts: BlogPost[] = [
       },
       {
         heading: "Impermeabilização: a solução preventiva",
-        body: "Após a limpeza profissional, recomendamos sempre impermeabilização para donos de animais. O tratamento cria uma barreira invisível nas fibras que:\n\n- Impede que a urina penetre até à espuma (dá tempo para limpar)\n- Facilita a remoção de pelos (não aderem tanto às fibras tratadas)\n- Reduz a absorção de odores e gordura animal\n\nExistem duas versões: a Essencial, com efeito de 1 a 2 anos, e a Premium, mais resistente ao desgaste das unhas e ao uso diário dos animais, com efeito até 5 anos. Para casas com animais de estimação, a Premium é normalmente a escolha que mais compensa a longo prazo. O custo do tratamento é significativamente inferior ao de substituir o sofá antecipadamente.",
+        body: "Após a limpeza profissional, recomendamos sempre impermeabilização para donos de animais. O tratamento cria uma barreira invisível nas fibras que:\n\n- Impede que a urina penetre até à espuma (dá tempo para limpar)\n- Facilita a remoção de pelos (não aderem tanto às fibras tratadas)\n- Reduz a absorção de odores e gordura animal\n\nExistem duas versões: a Essencial, com efeito de 1 a 2 anos, e a Premium, mais resistente ao desgaste das unhas e ao uso diário dos animais, com efeito até 10 anos. Para casas com animais de estimação, a Premium é normalmente a escolha que mais compensa a longo prazo. O custo do tratamento é significativamente inferior ao de substituir o sofá antecipadamente.",
       },
     ],
     faq: [
@@ -911,7 +911,7 @@ const posts: BlogPost[] = [
       },
       {
         heading: "O que é a impermeabilização?",
-        body: "A impermeabilização é um tratamento preventivo aplicado após a limpeza (ou num sofá já limpo). O produto cria uma barreira microscópica entre as fibras que repele líquidos e gorduras, impedindo que as manchas penetrem no tecido.\n\nQuando derrama algo num sofá impermeabilizado, o líquido fica em cima do tecido em forma de pequenas esferas e basta absorvê-lo com um pano. Existem duas versões: a Essencial, à base de água, com efeito de 1 a 2 anos, e a Premium, à base de diluente e mais resistente ao desgaste, com efeito até 5 anos.",
+        body: "A impermeabilização é um tratamento preventivo aplicado após a limpeza (ou num sofá já limpo). O produto cria uma barreira microscópica entre as fibras que repele líquidos e gorduras, impedindo que as manchas penetrem no tecido.\n\nQuando derrama algo num sofá impermeabilizado, o líquido fica em cima do tecido em forma de pequenas esferas e basta absorvê-lo com um pano. Existem duas versões: a Essencial, à base de água, com efeito de 1 a 2 anos, e a Premium, à base de diluente e mais resistente ao desgaste, com efeito até 10 anos.",
         tip: "A impermeabilização não limpa o sofá. Deve ser aplicada sempre após higienização, ou num sofá que esteja genuinamente limpo.",
       },
       {
@@ -939,7 +939,7 @@ const posts: BlogPost[] = [
       },
       {
         q: "Quanto tempo dura a impermeabilização?",
-        a: "Depende da versão. A Essencial dura 1 a 2 anos em condições normais de uso e aguenta até 2 lavagens. A Premium, mais resistente ao desgaste, dura até 5 anos e aguenta até 5 lavagens, ideal para sofás com muito tráfego.",
+        a: "Depende da versão. A Essencial dura 1 a 2 anos em condições normais de uso e aguenta até 2 lavagens. A Premium, mais resistente ao desgaste, dura até 10 anos e aguenta até 5 lavagens, ideal para sofás com muito tráfego.",
       },
       {
         q: "Posso impermeabilizar em casa com produto de loja?",

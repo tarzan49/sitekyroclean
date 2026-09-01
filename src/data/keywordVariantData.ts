@@ -48,7 +48,7 @@ const SERVICE_META: Record<ServiceKey, {
   sofa:      { label: 'Sofá',      labelPlural: 'Sofás',      canonicalBase: 'limpeza-sofas',     priceFrom: '49€',     waterproofPriceFrom: '59€'      },
   colchao:   { label: 'Colchão',   labelPlural: 'Colchões',   canonicalBase: 'limpeza-colchoes',  priceFrom: '59€' },
   tapetes:   { label: 'Tapetes',   labelPlural: 'Tapetes',    canonicalBase: 'limpeza-tapetes',   priceFrom: '15€/m²'                                    },
-  cadeiras:  { label: 'Cadeiras',  labelPlural: 'Cadeiras',   canonicalBase: 'limpeza-cadeiras',  priceFrom: '20€',     waterproofPriceFrom: '25€/cad.'    },
+  cadeiras:  { label: 'Cadeiras',  labelPlural: 'Cadeiras',   canonicalBase: 'limpeza-cadeiras',  priceFrom: '20€',     waterproofPriceFrom: '20€/cad.'    },
   alcatifas: { label: 'Alcatifas', labelPlural: 'Alcatifas',  canonicalBase: 'limpeza-alcatifas', priceFrom: '3€/m²'                                    },
 };
 
@@ -186,7 +186,7 @@ function content_higienizacao_cadeiras(loc: string, ctx: string): ContentBlock {
       'Bactericida certificado compatível com normas HACCP',
       'Ideal para restaurantes, escritórios e clínicas em ${loc}',
       'Imagem profissional: cadeiras com aspeto cuidado',
-      'Descontos progressivos para lotes acima de 10 cadeiras',
+      'Descontos progressivos para lotes a partir de 10 cadeiras',
       `Serviço ao domicílio em ${loc}`,
       'Cadeiras prontas a usar em poucas horas',
     ],
@@ -200,7 +200,7 @@ function content_higienizacao_cadeiras(loc: string, ctx: string): ContentBlock {
       { question: `Emitem certificado de higienização para inspeções sanitárias em ${loc}?`, answer: `Sim. Após cada serviço emitimos certificado com identificação dos produtos usados, aceite em inspeções HACCP e auditorias sanitárias. Essencial para restaurantes, clínicas e espaços de saúde em ${loc}.` },
       { question: `Conseguem higienizar cadeiras de veludo sem danificar a textura?`, answer: `Sim. O veludo é um dos tecidos mais comuns em cadeiras de restaurante e escritório. Usamos produtos e técnicas específicas para veludo que eliminam os patogénicos sem alterar a textura ou brilho do tecido.` },
       { question: `Podem trabalhar fora do horário de funcionamento do restaurante?`, answer: `Sim. Trabalhamos regularmente ao fim de semana, à noite e de madrugada para não perturbar o funcionamento do negócio. As cadeiras ficam prontas a usar em 2 a 4 horas.` },
-      { question: `Qual o desconto para higienizar um lote grande de cadeiras em ${loc}?`, answer: `Até 4 cadeiras: 20€/cad. · 5 a 6 cadeiras: 15€/cad. · 7 a 10 cadeiras: 12,50€/cad. Para 11 ou mais cadeiras, orçamento personalizado. Orçamento gratuito em ${loc}.` },
+      { question: `Qual o desconto para higienizar um lote grande de cadeiras em ${loc}?`, answer: `Até 4 cadeiras: 20€/cad. · 5 a 6 cadeiras: 15€/cad. · 7 a 9 cadeiras: 12,50€/cad. Para 10 ou mais cadeiras, orçamento personalizado. Orçamento gratuito em ${loc}.` },
       { question: `A higienização funciona em cadeiras de mesh (escritório) além de estofo?`, answer: `Sim. O mesh é tratado com bactericida compatível que elimina as bactérias sem danificar as fibras plásticas da rede. Muito comum em cadeiras ergonómicas de escritório partilhadas.` },
     ],
     problems: [
@@ -386,7 +386,7 @@ function content_lavagem_cadeiras(loc: string, ctx: string): ContentBlock {
       { question: `Quanto tempo ficam as cadeiras fora de uso depois da lavagem?`, answer: `Com o nosso sistema de extração de alta sucção, as cadeiras ficam prontas a usar em 2 a 4 horas. Em dias quentes com boa ventilação pode ser menos.` },
       { question: `Conseguem lavar cadeiras de veludo sem danificar a textura característica?`, answer: `Sim. O veludo requer técnica específica: lavagem com movimento correto das fibras. Temos experiência em veludo de várias qualidades e densidades sem danificar a textura.` },
       { question: `Fazem lavagem de cadeiras de restaurante fora do horário de funcionamento?`, answer: `Sim. É o nosso horário mais frequente para restaurantes em ${loc}. Trabalhamos à noite ou ao fim de semana para que as cadeiras estejam prontas antes da abertura.` },
-      { question: `Qual o preço para lavar um lote de 20 cadeiras de escritório em ${loc}?`, answer: `Para lotes acima de 10 cadeiras aplicamos preço personalizado, normalmente com desconto face ao preço por unidade. Orçamento gratuito com deslocação a ${loc} incluída.` },
+      { question: `Qual o preço para lavar um lote de 20 cadeiras de escritório em ${loc}?`, answer: `Para lotes a partir de 10 cadeiras aplicamos preço personalizado, normalmente com desconto face ao preço por unidade. Orçamento gratuito com deslocação a ${loc} incluída.` },
     ],
     problems: [
       { title: "Cadeiras de jantar com manchas de comida acumuladas", description: "Gordura, molhos e bebidas acumulam-se nas fibras ao longo dos anos. A extração profissional remove estas manchas mesmo as mais antigas e profundas nas fibras." },
@@ -440,12 +440,12 @@ function content_lavagem_alcatifas(loc: string, ctx: string): ContentBlock {
 function content_impermeabilizacao_sofa(loc: string, ctx: string): ContentBlock {
   return {
     intro: `A impermeabilização de sofás em ${loc} cria uma barreira invisível contra líquidos, manchas e gordura, protegendo o seu investimento sem alterar o toque ou a aparência do tecido. A Kyro Clean Solutions aplica tratamento certificado em ${loc} e ${ctx}, em duas versões: Essencial e Premium.`,
-    whatIs: `Este tratamento cria uma barreira invisível no tecido do sofá: a próxima vez que cair café, vinho ou sumo, o líquido fica à superfície e limpa-se com um pano, sem mancha, sem stress. O toque e o aspeto do sofá ficam exactamente iguais. A versão Essencial (à base de água) protege por 1 a 2 anos, e a versão Premium (à base de diluente, mais resistente ao desgaste) protege até 5 anos em ${loc}.`,
+    whatIs: `Este tratamento cria uma barreira invisível no tecido do sofá: a próxima vez que cair café, vinho ou sumo, o líquido fica à superfície e limpa-se com um pano, sem mancha, sem stress. O toque e o aspeto do sofá ficam exactamente iguais. A versão Essencial (à base de água) protege por 1 a 2 anos, e a versão Premium (à base de diluente, mais resistente ao desgaste) protege até 10 anos em ${loc}.`,
     benefits: [
       'Barreira invisível contra líquidos, manchas e gordura',
       'Toque e aspeto do tecido 100% preservados',
       'Essencial: até 2 lavagens, 1 a 2 anos de proteção real',
-      'Premium: até 5 lavagens, até 5 anos de proteção real, mais resistente ao desgaste',
+      'Premium: até 5 lavagens, até 10 anos de proteção real, mais resistente ao desgaste',
       `Serviço ao domicílio em ${loc}, sem deslocação do sofá`,
       'Seguro para tecidos naturais, sintéticos e veludo',
     ],
@@ -457,13 +457,13 @@ function content_impermeabilizacao_sofa(loc: string, ctx: string): ContentBlock 
     ],
     faqs: [
       { question: `A impermeabilização altera o toque ou a cor do sofá?`, answer: `Não. Em ambas as versões, o tratamento é completamente invisível e não altera a maciez, a cor nem a textura do tecido. O sofá fica igual ao toque, só que repele líquidos.` },
-      { question: `Quanto tempo dura a impermeabilização de um sofá?`, answer: `Depende da versão. A Essencial, à base de água, dura 1 a 2 anos com uso normal e aguenta até 2 lavagens. A Premium, à base de diluente e mais resistente ao desgaste, dura até 5 anos e aguenta até 5 lavagens. Em famílias com crianças ou animais de estimação, a Premium costuma compensar mais.` },
+      { question: `Quanto tempo dura a impermeabilização de um sofá?`, answer: `Depende da versão. A Essencial, à base de água, dura 1 a 2 anos com uso normal e aguenta até 2 lavagens. A Premium, à base de diluente e mais resistente ao desgaste, dura até 10 anos e aguenta até 5 lavagens. Em famílias com crianças ou animais de estimação, a Premium costuma compensar mais.` },
       { question: `Preciso de limpar o sofá antes de o impermeabilizar?`, answer: `Sim, e é altamente recomendado. Aplicar impermeabilização sobre tecido sujo reduz significativamente a eficácia e duração da barreira. Oferecemos o pack limpeza + impermeabilização Essencial com desconto em ${loc}.` },
       { question: `A impermeabilização funciona em sofás de veludo, pele e microfibra?`, answer: `Sim. Adaptamos a formulação ao tipo de tecido, em ambas as versões. Para veludo e tecidos delicados usamos produtos específicos que preservam a textura e o brilho característico do material.` },
-      { question: `Qual a diferença entre a Essencial e a Premium?`, answer: `Essencial (à base de água): 59€ (1L), 79€ (2L), 99€ (3L), aguenta até 2 lavagens. Premium (à base de diluente): 79€ (1L), 99€ (2L), 129€ (3L), aguenta até 5 lavagens e dura até 5 anos. O pack com limpeza (99€/145€/169€) está sempre associado à Essencial.` },
+      { question: `Qual a diferença entre a Essencial e a Premium?`, answer: `Essencial (à base de água): 59€ (1L), 79€ (2L), 99€ (3L), aguenta até 2 lavagens. Premium (à base de diluente): 79€ (1L), 99€ (2L), 129€ (3L), aguenta até 5 lavagens e dura até 10 anos. O pack com limpeza (99€/145€/159€) está sempre associado à Essencial.` },
     ],
     problems: [
-      { title: "Sofá novo que quer proteger desde o início", description: "É muito mais fácil e económico proteger do que tratar manchas após o facto. A versão Premium cria uma barreira invisível que dura até 5 anos sem alterar o toque ou a cor." },
+      { title: "Sofá novo que quer proteger desde o início", description: "É muito mais fácil e económico proteger do que tratar manchas após o facto. A versão Premium cria uma barreira invisível que dura até 10 anos sem alterar o toque ou a cor." },
       { title: "Família com crianças pequenas ou animais de estimação", description: "Acidentes são inevitáveis. Sem proteção, cada derramamento pode tornar-se uma mancha permanente. Para uso intenso, a versão Premium repele líquidos por mais tempo e aguenta mais lavagens do que a Essencial." },
       { title: "Tecido delicado como veludo, pele ou microfibra", description: "Estes tecidos são difíceis de limpar sem danificar. Um erro de limpeza pode ser irreversível. A impermeabilização evita que o problema aconteça desde o início." },
     ],
@@ -477,7 +477,7 @@ function content_impermeabilizacao_sofa(loc: string, ctx: string): ContentBlock 
 function content_impermeabilizacao_cadeiras(loc: string, ctx: string): ContentBlock {
   return {
     intro: `A impermeabilização de cadeiras estofadas em ${loc} protege o tecido de derramamentos, gordura e uso intensivo, ideal para restaurantes, escritórios e residências que querem cadeiras com aspeto cuidado por mais tempo. Kyro Clean Solutions ao domicílio em ${loc} e ${ctx}, com versão Essencial e versão Premium.`,
-    whatIs: `Uma aplicação cria uma barreira transparente nas fibras das cadeiras que repele líquidos e gordura. A limpeza do dia a dia fica reduzida a uma passagem de pano húmido. A versão Essencial (à base de água) mantém o aspeto cuidado por 1 a 2 anos, e a versão Premium (à base de diluente, mais resistente ao desgaste) por até 5 anos. Aplicamos ao domicílio em ${loc}, de 2 cadeiras a centenas.`,
+    whatIs: `Uma aplicação cria uma barreira transparente nas fibras das cadeiras que repele líquidos e gordura. A limpeza do dia a dia fica reduzida a uma passagem de pano húmido. A versão Essencial (à base de água) mantém o aspeto cuidado por 1 a 2 anos, e a versão Premium (à base de diluente, mais resistente ao desgaste) por até 10 anos. Aplicamos ao domicílio em ${loc}, de 2 cadeiras a centenas.`,
     benefits: [
       'Tecido repele derramamentos, café e gordura',
       'Manutenção diária reduzida a uma simples passagem de pano',
@@ -496,8 +496,8 @@ function content_impermeabilizacao_cadeiras(loc: string, ctx: string): ContentBl
       { question: `A impermeabilização das cadeiras facilita a limpeza diária do restaurante?`, answer: `Sim, muito. Derrames de vinho, café e molhos ficam à superfície e limpam-se com um pano, em vez de penetrarem nas fibras e criarem manchas permanentes. O tempo de limpeza diária reduz significativamente.` },
       { question: `A impermeabilização funciona em cadeiras de pele sintética ou só em tecido?`, answer: `Funciona nos dois. Para pele sintética o tratamento reforça a repelência natural do material. Para tecido (veludo, chenille, mesh) cria uma barreira nas fibras. Adaptamos o produto ao material, em ambas as versões.` },
       { question: `Quanto tempo ficam as cadeiras fora de uso depois da impermeabilização?`, answer: `A impermeabilização é rápida (15 a 30 minutos por lote) e a secagem demora 1 a 2 horas. As cadeiras ficam prontas a usar no mesmo dia, sem necessidade de fechar o espaço.` },
-      { question: `Qual a diferença de preço entre a Essencial e a Premium para cadeiras?`, answer: `Essencial: 25€/un. para as primeiras 4 cadeiras, 20€/un. da 5ª à 10ª. Premium: 35€/un. para as primeiras 4, 30€/un. da 5ª à 10ª. Para lotes acima de 10 cadeiras, orçamento personalizado para o seu restaurante em ${loc}.` },
-      { question: `Para restaurantes com uso intenso, vale a pena a versão Premium?`, answer: `Sim. A Premium aguenta até 5 lavagens contra 2 da Essencial, e a proteção real dura até 5 anos em vez de 1 a 2. Em cadeiras de restaurante, sujeitas a limpeza diária, esta diferença compensa o investimento inicial mais alto.` },
+      { question: `Qual a diferença de preço entre a Essencial e a Premium para cadeiras?`, answer: `Essencial: 15€/un. para as primeiras 4 cadeiras, 10€/un. da 5ª à 9ª. Premium: 20€/un. para as primeiras 4, 15€/un. da 5ª à 9ª. A partir de 10 cadeiras, orçamento personalizado para o seu restaurante em ${loc}.` },
+      { question: `Para restaurantes com uso intenso, vale a pena a versão Premium?`, answer: `Sim. A Premium aguenta até 5 lavagens contra 2 da Essencial, e a proteção real dura até 10 anos em vez de 1 a 2. Em cadeiras de restaurante, sujeitas a limpeza diária, esta diferença compensa o investimento inicial mais alto.` },
     ],
     problems: [
       { title: "Cadeiras de jantar usadas diariamente", description: "A mesa de jantar é a zona de maior risco para derrames. Sem proteção, uma taça de vinho ou molho pode danificar o tecido de forma permanente e irreversível." },
@@ -510,31 +510,6 @@ function content_impermeabilizacao_cadeiras(loc: string, ctx: string): ContentBl
     ],
   };
 }
-
-// ─── Testimonials por serviço (legado — mantido para compatibilidade) ──
-
-const SERVICE_TESTIMONIALS: Record<ServiceKey, { name: string; city: string; stars: number; text: string }> = {
-  sofa: {
-    name: "Ana M.", city: "Porto", stars: 5,
-    text: "O sofá de veludo estava com manchas de anos que eu achei impossíveis de tirar. O António chegou, tratou com um cuidado incrível e ficou como novo. Nem parece o mesmo sofá.",
-  },
-  colchao: {
-    name: "Rui F.", city: "Braga", stars: 5,
-    text: "Nunca pensei que o meu colchão pudesse ter tantos ácaros. Os meus filhos têm alergias e a diferença foi imediata, dormem muito melhor. Serviço impecável e com muito cuidado.",
-  },
-  tapetes: {
-    name: "Sofia C.", city: "Lisboa", stars: 5,
-    text: "Tapete persa de família com manchas de mais de 10 anos. Ficou perfeito. Trabalharam com muito cuidado e conheciam claramente o que faziam com fibras delicadas.",
-  },
-  cadeiras: {
-    name: "João P.", city: "Vila Nova de Gaia", stars: 5,
-    text: "Tenho um restaurante com 32 cadeiras. Resultado profissional, cadeiras como novas. Os clientes já comentaram a limpeza do espaço. Voltarei certamente a contratar.",
-  },
-  alcatifas: {
-    name: "Dra. Carla V.", city: "Porto", stars: 5,
-    text: "Clínica com alcatifa em três salas de espera. Serviço profissional, com ficha técnica dos produtos. Ideal para as nossas auditorias sanitárias anuais.",
-  },
-};
 
 // ─── Generator map ─────────────────────────────────────────────────
 
