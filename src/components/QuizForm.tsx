@@ -327,6 +327,12 @@ const QuizForm = ({
       case 'mattress':
         return mattressItems.some(i => i.qty > 0);
       case 'chairs': {
+        // Ecrã mostra "1" por omissão sem o utilizador tocar no stepper
+        // (Math.max(1, parseInt(...) || 1) em QuizStepConfig), mas o estado
+        // real fica em '' até ao primeiro clique em +/-. Sem isto, escolher
+        // a quantidade de 1 cadeira "de calha" e avançar ficava bloqueado
+        // (parseInt('') é NaN), mesmo o ecrã mostrando 1 corretamente.
+        if (formData.chairQuantity === '') return true;
         const n = parseInt(formData.chairQuantity);
         return !isNaN(n) && n >= 1;
       }
@@ -356,6 +362,15 @@ const QuizForm = ({
 
   const handleNext = () => {
     if (canProceed()) {
+      // Commita o valor implícito de 1 cadeira ao avançar (canProceedStep3
+      // já aceita '' como válido para não bloquear "Continuar" com o ecrã a
+      // mostrar 1) — sem isto o preço, o resumo do pedido e o payload do
+      // Formspree ficavam todos a tratar '' como "sem cadeiras" (0€, linha
+      // de cadeiras omitida da mensagem), mesmo o cliente tendo avançado
+      // com 1 cadeira visível no ecrã.
+      if (formData.service === 'chairs' && formData.chairQuantity === '') {
+        updateFormData({ chairQuantity: '1', chairType: 'bulk_full' });
+      }
       const loc = formData.location === 'other' ? formData.otherLocation : formData.location;
       trackQuizEvent({
         step: currentStep,
