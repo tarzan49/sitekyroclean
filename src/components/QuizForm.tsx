@@ -216,9 +216,10 @@ const QuizForm = ({
     packDiscountedPrice,
   } = useQuizPricing(formData, sofaItems, mattressItems, upsellItemsForPricing);
 
-  // Encomenda mínima: 50€. Sob orçamento fica sempre acima disso na prática, por
-  // isso só se aplica a pedidos com preço fechado.
-  const MIN_ORDER_VALUE = 50;
+  // Encomenda mínima: 60€ (subido de 50€ em 2026-09-02, a pedido do dono). Sob
+  // orçamento fica sempre acima disso na prática, por isso só se aplica a
+  // pedidos com preço fechado.
+  const MIN_ORDER_VALUE = 60;
   const effectiveTotal = packDiscountActive ? packDiscountedPrice : totalPrice;
   const belowMinimum = !hasSobOrcamento && !hasUpsellSobItem && totalPrice > 0 && effectiveTotal < MIN_ORDER_VALUE;
   const amountToMinimum = Math.max(0, Math.round((MIN_ORDER_VALUE - effectiveTotal) * 100) / 100);
