@@ -19,6 +19,7 @@ import type { QuizFormData, SofaItem, MattressItem, UpsellItemConfig } from './q
 import QuizStepLocation from './quiz/steps/QuizStepLocation';
 import QuizStepConfig from './quiz/steps/QuizStepConfig';
 import QuizUpsellOverlay from './quiz/steps/QuizUpsellOverlay';
+import QuizMinimumGate from './quiz/steps/QuizMinimumGate';
 import QuizStepContact from './quiz/steps/QuizStepContact';
 import { calcChairWaterproof, calcChairWaterproofPremium, calcChairClean, calcCarpetPrice, computePendingUpsellTotal } from './quiz/quizHelpers';
 import { useUpsellSelection } from './quiz/steps/useUpsellSelection';
@@ -122,6 +123,10 @@ const QuizForm = ({
   const [exitIntentFired, setExitIntentFired] = useState(false);
   const startsAtUpsell = Boolean(skipToUpsell && initialLocation);
   const [showUpsell, setShowUpsell] = useState(startsAtUpsell);
+  // Ecrã dedicado "Quase Lá" (2026-09-02): mostrado ANTES do Pack Família
+  // quando o pedido fica abaixo do mínimo, em vez de espremer a mensagem no
+  // rodapé do step 4 junto com o formulário de contacto.
+  const [showMinimumGate, setShowMinimumGate] = useState(false);
   const [upsellShown, setUpsellShown] = useState(startsAtUpsell);
   const [upsellItems, setUpsellItems] = useState<UpsellItemConfig[]>(initialUpsellItems ?? []);
   const [upsellSubStep, setUpsellSubStep] = useState<'prompt' | 'select' | 'config'>('prompt');
@@ -387,8 +392,14 @@ const QuizForm = ({
         nextStep = 3;
       }
       // Upsell intercept: always show Pack Família when going forward from step 3
-      // (re-shows if user clicked Voltar from Pack back to quantities)
+      // (re-shows if user clicked Voltar from Pack back to quantities).
+      // Quando o pedido fica abaixo do mínimo, o ecrã "Quase Lá" intercepta
+      // primeiro (bloqueia até resolver), só depois segue para o Pack Família.
       if (currentStep === 3) {
+        if (belowMinimum) {
+          setShowMinimumGate(true);
+          return;
+        }
         setUpsellShown(true);
         setUpsellSubStep('prompt');
         setShowUpsell(true);
@@ -937,8 +948,8 @@ ${formData.description || 'Sem observações adicionais'}
               );
             })()}
 
-            {/* Step 3 - Config (hidden while Pack Família overlay is active) */}
-            {currentStep === 3 && !showUpsell && (
+            {/* Step 3 - Config (hidden while Pack Família overlay or o "Quase Lá" active) */}
+            {currentStep === 3 && !showUpsell && !showMinimumGate && (
               <div className="flex-1 flex flex-col w-full items-center text-center overflow-y-auto">
                 <QuizStepConfig
                   formData={formData}
@@ -949,6 +960,39 @@ ${formData.description || 'Sem observações adicionais'}
                   setMattressItems={setMattressItems}
                 />
               </div>
+            )}
+
+            {/* "Quase Lá": bloqueia antes do Pack Família quando abaixo do mínimo */}
+            {showMinimumGate && (
+              <QuizMinimumGate
+                formData={formData}
+                updateFormData={updateFormData}
+                sofaItems={sofaItems}
+                setSofaItems={setSofaItems}
+                mattressItems={mattressItems}
+                setMattressItems={setMattressItems}
+                upsellItems={upsellItems}
+                setUpsellItems={setUpsellItems}
+                minOrderValue={MIN_ORDER_VALUE}
+                amountToMinimum={amountToMinimum}
+                belowMinimum={belowMinimum}
+                onOpenFullUpsell={() => {
+                  (document.activeElement as HTMLElement)?.blur();
+                  setShowMinimumGate(false);
+                  setUpsellShown(true);
+                  setUpsellSubStep('select');
+                  setShowUpsell(true);
+                }}
+                onContinue={() => {
+                  if (belowMinimum) return;
+                  (document.activeElement as HTMLElement)?.blur();
+                  setShowMinimumGate(false);
+                  setUpsellShown(true);
+                  setUpsellSubStep('prompt');
+                  setShowUpsell(true);
+                }}
+                onBack={() => { (document.activeElement as HTMLElement)?.blur(); setShowMinimumGate(false); }}
+              />
             )}
 
             {/* Pack Família upsell (multi-step overlay) */}
@@ -977,7 +1021,7 @@ ${formData.description || 'Sem observações adicionais'}
 
 
             {/* Step 4 - Contact */}
-            {currentStep === 4 && !showUpsell && (
+            {currentStep === 4 && !showUpsell && !showMinimumGate && (
               <QuizStepContact
                 formData={formData}
                 updateFormData={updateFormData}
@@ -990,7 +1034,7 @@ ${formData.description || 'Sem observações adicionais'}
     </div>
 
     {/* Footer — hidden on step 0 (auto-advances on city selection) */}
-    {currentStep <= totalSteps && !showUpsell && currentStep > 0 && (
+    {currentStep <= totalSteps && !showUpsell && !showMinimumGate && currentStep > 0 && (
       <div className="px-4 sm:px-5 pt-3 flex flex-col gap-2 flex-shrink-0 border-t border-white/[0.05] items-center" style={{ paddingBottom: 'max(1rem, env(safe-area-inset-bottom))' }}>
         {currentStep === totalSteps ? (
           <div className="flex flex-col gap-2 w-full">
@@ -1004,27 +1048,13 @@ ${formData.description || 'Sem observações adicionais'}
                 Valor: <span className="text-gold/60 font-bold">Sob orçamento</span>
               </p>
             )}
-            {belowMinimum ? (
-              <>
-                <div className="text-center text-xs text-white/60 leading-snug px-2">
-                  Já vamos estar em sua casa, aproveite e junte mais um serviço ao mesmo pedido, poupa na deslocação e fica com tudo tratado de uma vez. Faltam só <span className="text-gold font-bold">{amountToMinimum % 1 === 0 ? amountToMinimum : amountToMinimum.toFixed(2).replace('.', ',')}€</span> para o pedido mínimo.
-                </div>
-                <Button
-                  onClick={() => { (document.activeElement as HTMLElement)?.blur(); setShowUpsell(true); }}
-                  className="w-full h-14 bg-gradient-to-r from-gold to-[#d4c57b] hover:from-[#d4c57b] hover:to-gold text-[#12121e] font-black text-base tracking-wider uppercase touch-manipulation active:scale-[0.98] rounded-sm shadow-[0_0_32px_rgba(212,175,55,0.30)]"
-                >
-                  Adicionar Mais um Serviço
-                </Button>
-              </>
-            ) : (
-              <Button
-                onClick={handleSubmit}
-                disabled={isSubmitting}
-                className="w-full h-14 bg-gradient-to-r from-gold to-[#d4c57b] hover:from-[#d4c57b] hover:to-gold text-[#12121e] font-black text-base tracking-wider uppercase touch-manipulation active:scale-[0.98] rounded-sm shadow-[0_0_32px_rgba(212,175,55,0.30)]"
-              >
-                {isSubmitting ? 'A enviar...' : 'FINALIZAR PEDIDO'}
-              </Button>
-            )}
+            <Button
+              onClick={handleSubmit}
+              disabled={isSubmitting}
+              className="w-full h-14 bg-gradient-to-r from-gold to-[#d4c57b] hover:from-[#d4c57b] hover:to-gold text-[#12121e] font-black text-base tracking-wider uppercase touch-manipulation active:scale-[0.98] rounded-sm shadow-[0_0_32px_rgba(212,175,55,0.30)]"
+            >
+              {isSubmitting ? 'A enviar...' : 'FINALIZAR PEDIDO'}
+            </Button>
             <p className="text-center text-[11px] text-white/30 font-medium -mt-0.5">
               Sem compromisso · Grátis · Respondemos em menos de 30 min
             </p>
