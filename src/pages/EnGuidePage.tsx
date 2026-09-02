@@ -27,22 +27,22 @@ const SECTIONS = [
     title: "The cleaning standard guests expect",
     body: [
       "Guest expectations in short-term rentals are higher than in a typical household clean, because the guest is comparing your listing photos to what they're standing in. A sofa with a visible watermark, a mattress with a faint stain under the sheet, or a rug that smells of the last guest's pet are the kind of details that show up in reviews.",
-      "Regular vacuuming and surface wiping between stays is not the same as periodic deep cleaning. Upholstery, mattresses and rugs accumulate dust mites, body oils and odour over weeks of guest turnover even when the property looks clean on the surface — a professional extraction clean every few months (more often for high-turnover listings) keeps that baseline from building up between the emergency visits.",
+      "Regular vacuuming and surface wiping between stays is not the same as periodic deep cleaning. Upholstery, mattresses and rugs accumulate dust mites, body oils and odour over weeks of guest turnover even when the property looks clean on the surface; a professional extraction clean every few months (more often for high-turnover listings) keeps that baseline from building up between the emergency visits.",
     ],
   },
   {
     id: "documentation",
     title: "What to document when a guest causes damage",
     body: [
-      "Most short-term rental platforms' damage and deposit claims processes ask hosts to provide clear, dated evidence — typically a before photo (or your standard listing photos, if the item wasn't damaged when the guest checked in), a photo of the damage itself, and a photo or receipt showing it was professionally addressed. Vague descriptions without photos are the most common reason claims get delayed or rejected.",
-      "Practically, that means: photograph the item as soon as you notice the damage, before any cleaning is attempted. Keep the guest's check-in and check-out dates on hand. If you call in a professional cleaner, ask for before-and-after photos as part of the job (we provide these on every visit as standard, not as a special request) and keep the receipt — it's your proof the damage was real and that you took reasonable steps to resolve it.",
+      "Most short-term rental platforms' damage and deposit claims processes ask hosts to provide clear, dated evidence: typically a before photo (or your standard listing photos, if the item wasn't damaged when the guest checked in), a photo of the damage itself, and a photo or receipt showing it was professionally addressed. Vague descriptions without photos are the most common reason claims get delayed or rejected.",
+      "Practically, that means: photograph the item as soon as you notice the damage, before any cleaning is attempted. Keep the guest's check-in and check-out dates on hand. If you call in a professional cleaner, ask for before-and-after photos as part of the job (we provide these on every visit as standard, not as a special request) and keep the receipt; it's your proof the damage was real and that you took reasonable steps to resolve it.",
     ],
   },
   {
     id: "turnover-timelines",
     title: "Realistic turnover cleaning timelines",
     body: [
-      "A same-day emergency clean is possible in most cases if you contact us in the morning for an afternoon check-in, but it depends on our schedule that day and where the property is — the earlier in the day you reach out, the more likely we can fit it in before your next guest arrives.",
+      "A same-day emergency clean is possible in most cases if you contact us in the morning for an afternoon check-in, but it depends on our schedule that day and where the property is; the earlier in the day you reach out, the more likely we can fit it in before your next guest arrives.",
       "For planned deep cleans (not emergencies), we recommend booking a few days ahead where possible, especially during the Algarve's peak summer season when demand is highest across the region.",
     ],
   },
@@ -50,17 +50,17 @@ const SECTIONS = [
     id: "costs",
     title: "Realistic costs",
     body: [
-      "Sofa cleaning starts from €49, mattress cleaning from €59, and rug cleaning from €12/m² — exact pricing depends on the size and condition of the item and is always confirmed before we start, so there are no surprises on the invoice you show your guest or platform.",
-      "If a single listing needs regular attention, ask about a standing arrangement — several hosts we work with have us on a recurring schedule rather than calling for each individual incident.",
+      "Sofa cleaning starts from €49, mattress cleaning from €59, and rug cleaning from €12/m²; exact pricing depends on the size and condition of the item and is always confirmed before we start, so there are no surprises on the invoice you show your guest or platform.",
+      "If a single listing needs regular attention, ask about a standing arrangement; several hosts we work with have us on a recurring schedule rather than calling for each individual incident.",
     ],
   },
 ];
 
 const FAQS = [
-  { question: "Do you provide before-and-after photos automatically?", answer: "Yes, on every job — it's part of our standard process, not something you need to request." },
+  { question: "Do you provide before-and-after photos automatically?", answer: "Yes, on every job; it's part of our standard process, not something you need to request." },
   { question: "Can you invoice for accounting or tax purposes?", answer: "Yes, we provide a receipt for every job, itemised on request." },
   { question: "Do you work with property management companies, not just individual hosts?", answer: "Yes, several of our regular clients manage multiple listings across the Algarve, Lisbon and Porto." },
-  { question: "What if the guest has already checked out and I'm not at the property?", answer: "We're used to coordinating directly with hosts remotely — send us photos and address, and we can liaise with a cleaner, keyholder or the next guest's check-in time directly." },
+  { question: "What if the guest has already checked out and I'm not at the property?", answer: "We're used to coordinating directly with hosts remotely; send us photos and address, and we can liaise with a cleaner, keyholder or the next guest's check-in time directly." },
   { question: "Do you cover areas outside Porto, Lisbon and the Algarve?", answer: "Our English-language service is focused on these three regions, where the vast majority of short-term rental demand in Portugal is concentrated, but message us and we'll let you know if we can help." },
 ];
 
@@ -150,7 +150,7 @@ const EnGuidePage = () => {
                 </h1>
 
                 <p className="text-sm sm:text-base md:text-lg text-white/70 leading-relaxed mb-6 max-w-lg">
-                  A practical guide for hosts: turnover timelines, what to document when a guest causes damage, and realistic costs — based on what we see cleaning rental properties across Porto, Lisbon and the Algarve.
+                  A practical guide for hosts: turnover timelines, what to document when a guest causes damage, and realistic costs, based on what we see cleaning rental properties across Porto, Lisbon and the Algarve.
                 </p>
 
                 <div className="flex flex-col sm:flex-row gap-3 max-w-md">
@@ -213,7 +213,7 @@ const EnGuidePage = () => {
             <SectionHeader overline="Key Takeaways" heading="If you remember one thing from" goldWord="each section" light={false} />
             <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-px" style={{ backgroundColor: "rgba(255,255,255,0.08)" }}>
               {[
-                { icon: Camera, text: "Photograph damage before cleaning it — timestamped before/after is the standard most platforms ask for." },
+                { icon: Camera, text: "Photograph damage before cleaning it: timestamped before/after is the standard most platforms ask for." },
                 { icon: Clock, text: "Same-day is often possible, but the earlier in the day you reach out, the better your odds." },
                 { icon: Euro, text: "Prices start from €49 (sofa) / €59 (mattress) / €12/m² (rug), always confirmed before we start." },
                 { icon: CheckCircle2, text: "Before/after photo documentation is standard on every job, no need to request it separately." },
