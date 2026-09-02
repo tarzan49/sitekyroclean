@@ -24,14 +24,17 @@ export function calcChairAddonWaterproofTotal(qty: number, tier: WidgetTier): nu
   return tier === 'premium' ? calcChairWaterproofPremium(qty) : calcChairWaterproof(qty);
 }
 
-// Anti Ácaros para cadeiras: 7,5€ por cadeira, sempre (preço fixo, sem
-// escalões) — confirmado 2026-08-31.
+// Anti Ácaros para cadeiras: 1ª cadeira 10€, seguintes 7,5€ cada, mudado de
+// preço fixo (7,5€ sempre, confirmado 2026-08-31) para escalão em 2026-09-02
+// a pedido do dono, para que 1 cadeira + Impermeabilização + Anti Ácaros feche
+// exatamente no mínimo de pedido (35€ base + 15€ + 10€ = 60€).
+export const CHAIR_ANTI_ACAROS_FIRST_PRICE = 10;
 export const CHAIR_ANTI_ACAROS_UNIT_PRICE = 7.5;
 
 export function calcChairAntiAcarosTotal(qty: number): number | null {
   if (qty <= 0) return 0;
   if (qty > 10) return null;
-  return Math.round(qty * CHAIR_ANTI_ACAROS_UNIT_PRICE * 10) / 10;
+  return Math.round((CHAIR_ANTI_ACAROS_FIRST_PRICE + (qty - 1) * CHAIR_ANTI_ACAROS_UNIT_PRICE) * 10) / 10;
 }
 
 // Delta por unidade (preço com protecção - preço só limpeza) para uma linha

@@ -164,7 +164,7 @@ const QuizMinimumGate = ({
           <AddonChip
             icon={Bug}
             title="Adicionar Anti Ácaros"
-            subtitle="7,5€ por cadeira"
+            subtitle={chairQtyNum === 1 ? '10€ na 1ª cadeira' : '10€ na 1ª, 7,5€ nas seguintes'}
             priceLabel={`+${chairAntiAcarosPriceRaw}€`}
             active={chairAntiAcarosOn}
             onClick={toggleChairAntiAcaros}
