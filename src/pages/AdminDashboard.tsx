@@ -341,6 +341,8 @@ const AdminDashboard = ({ embedded = false }: { embedded?: boolean }) => {
     value: lead.value ?? '',
     margin_value: lead.margin_value != null ? String(lead.margin_value) : '',
     total_value: lead.total_value != null ? String(lead.total_value) : '',
+    service: lead.service ?? '',
+    details: lead.details ?? '',
   };
 
   const flashSaved = (leadId: string) => {
@@ -362,6 +364,8 @@ const AdminDashboard = ({ embedded = false }: { embedded?: boolean }) => {
       value: edit.value,
       margin_value: marginNum,
       total_value: totalNum,
+      service: edit.service,
+      details: edit.details,
     }).eq('id', leadId);
     if (!err) {
       setLeads(prev => prev.map(l => l.id === leadId ? { ...l, ...edit, margin_value: marginNum, total_value: totalNum } : l));
@@ -752,7 +756,9 @@ const AdminDashboard = ({ embedded = false }: { embedded?: boolean }) => {
                   const edit = getEdit(lead);
                   const isDirty = edit.notes !== (lead.notes ?? '') || edit.next_step !== (lead.next_step ?? '') || edit.value !== (lead.value ?? '')
                     || edit.margin_value !== (lead.margin_value != null ? String(lead.margin_value) : '')
-                    || edit.total_value !== (lead.total_value != null ? String(lead.total_value) : '');
+                    || edit.total_value !== (lead.total_value != null ? String(lead.total_value) : '')
+                    || edit.service !== (lead.service ?? '')
+                    || edit.details !== (lead.details ?? '');
                   const isSaving = saving[lead.id];
                   const waPhone = (lead.phone ?? '').replace(/\D/g, '');
                   const waMsg = encodeURIComponent(buildWAMsg(lead));
@@ -866,24 +872,53 @@ const AdminDashboard = ({ embedded = false }: { embedded?: boolean }) => {
                         <tr className={`border-b border-white/[0.04] ${rowBg}`}>
                           <td colSpan={7} className="px-4 py-4 bg-white/[0.015]">
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                              <div>
-                                <label className="block text-[10px] font-bold text-white/35 uppercase tracking-wider mb-1">Localização</label>
-                                <span className="text-white/80 text-xs font-medium flex items-center gap-1"><MapPin className="w-3 h-3 flex-shrink-0" />{lead.location || '-'}</span>
-                                {lead.details && <p className="text-white/40 text-[10px] mt-1 leading-snug">{lead.details}</p>}
+
+                              {/* ── Contacto & Localização ────────────────────────── */}
+                              <div className="bg-white/[0.025] border border-white/[0.06] rounded-xl p-4">
+                                <p className="text-[10.5px] font-extrabold text-white/40 uppercase tracking-wider mb-3 flex items-center gap-1.5">
+                                  <MapPin className="w-3.5 h-3.5" /> Contacto &amp; Localização
+                                </p>
+
+                                <label className="block text-[10px] text-white/35 mb-1">Localização</label>
+                                <span className="text-white/80 text-xs font-medium flex items-center gap-1 mb-3">{lead.location || '-'}</span>
+
+                                <label className="block text-[10px] text-white/35 mb-1">Título do pedido</label>
+                                <input
+                                  type="text"
+                                  value={getEdit(lead).service}
+                                  onChange={e => setEdits(prev => ({ ...prev, [lead.id]: { ...getEdit(lead), service: e.target.value } }))}
+                                  placeholder="ex: Sofá: Impermeabilização"
+                                  className="w-full h-8 px-2.5 text-xs font-semibold bg-white/[0.05] border border-white/[0.14] rounded-lg text-white placeholder:text-white/20 focus:outline-none focus:border-gold mb-3"
+                                />
+
+                                <label className="block text-[10px] text-white/35 mb-1">Descrição</label>
+                                <textarea
+                                  value={getEdit(lead).details}
+                                  onChange={e => setEdits(prev => ({ ...prev, [lead.id]: { ...getEdit(lead), details: e.target.value } }))}
+                                  placeholder="ex: 1x Sofá 2 Lugares: 99€"
+                                  rows={2}
+                                  className="w-full px-2.5 py-1.5 text-[11px] bg-white/[0.05] border border-white/[0.1] rounded-lg text-white/80 placeholder:text-white/20 focus:outline-none focus:border-gold resize-y min-h-[40px] mb-3"
+                                />
+
                                 {lead.slot && <p className="text-gold/50 text-[10px] mt-1 flex items-center gap-1"><CalendarDays className="w-3 h-3" />{lead.slot}</p>}
                                 {lead.email && <p className="text-white/25 text-[10px] mt-1">{lead.email}</p>}
                                 {lead.booking_id && !lead.booking_id.startsWith('CSV-') && (
                                   <p className="text-gold/50 text-[10px] font-mono mt-1">#{lead.booking_id}</p>
                                 )}
+                              </div>
 
-                                <label className="block text-[10px] font-bold text-white/35 uppercase tracking-wider mt-3 mb-1">Margem própria / Valor total</label>
-                                <div className="flex items-center gap-1.5">
+                              {/* ── Valores ───────────────────────────────────────── */}
+                              <div className="bg-gradient-to-br from-gold/[0.08] to-gold/[0.02] border border-gold/[0.22] rounded-xl p-4">
+                                <p className="text-[10.5px] font-extrabold text-gold/80 uppercase tracking-wider mb-3">Valores</p>
+
+                                <label className="block text-[10px] text-white/35 mb-1">O que eu ganho / Total pago pelo cliente</label>
+                                <div className="flex items-center gap-1.5 mb-1">
                                   <input
                                     type="text"
                                     value={getEdit(lead).margin_value}
                                     onChange={e => setEdits(prev => ({ ...prev, [lead.id]: { ...getEdit(lead), margin_value: e.target.value } }))}
                                     placeholder="margem"
-                                    className="w-full max-w-[90px] h-7 px-2 text-[11px] font-bold bg-gold/[0.08] border border-gold/20 rounded text-gold placeholder:text-gold/30 focus:outline-none focus:border-gold"
+                                    className="w-full max-w-[90px] h-8 px-2 text-[11px] font-bold bg-gold/[0.1] border border-gold/25 rounded-lg text-gold placeholder:text-gold/30 focus:outline-none focus:border-gold"
                                   />
                                   <span className="text-white/25 text-[10px]">/</span>
                                   <input
@@ -891,27 +926,25 @@ const AdminDashboard = ({ embedded = false }: { embedded?: boolean }) => {
                                     value={getEdit(lead).total_value}
                                     onChange={e => setEdits(prev => ({ ...prev, [lead.id]: { ...getEdit(lead), total_value: e.target.value } }))}
                                     placeholder="total (c/ parceiro)"
-                                    className="w-full max-w-[130px] h-7 px-2 text-[11px] font-bold bg-white/[0.05] border border-white/[0.12] rounded text-white placeholder:text-white/20 focus:outline-none focus:border-gold"
+                                    className="w-full max-w-[140px] h-8 px-2 text-[11px] font-bold bg-white/[0.06] border border-white/[0.14] rounded-lg text-white placeholder:text-white/20 focus:outline-none focus:border-gold"
                                   />
                                 </div>
 
-                                <label className="block text-[10px] font-bold text-white/35 uppercase tracking-wider mt-3 mb-1">Valor (legado, texto livre)</label>
+                                <label className="block text-[10px] text-white/35 mb-1 mt-3">Valor (legado, texto livre)</label>
                                 <input
                                   type="text"
                                   value={getEdit(lead).value}
                                   onChange={e => setEdits(prev => ({ ...prev, [lead.id]: { ...getEdit(lead), value: e.target.value } }))}
                                   placeholder="ex: 89€"
-                                  className="w-full max-w-[120px] h-7 px-2 text-[11px] font-bold bg-gold/[0.08] border border-gold/20 rounded text-gold placeholder:text-gold/30 focus:outline-none focus:border-gold"
+                                  className="w-full max-w-[130px] h-8 px-2 text-[11px] font-bold bg-white/[0.05] border border-white/[0.12] rounded-lg text-gold/80 placeholder:text-white/20 focus:outline-none focus:border-gold mb-3"
                                 />
-                              </div>
 
-                              <div>
-                                <label className="block text-[10px] font-bold text-white/35 uppercase tracking-wider mb-1">Região</label>
+                                <label className="block text-[10px] text-white/35 mb-1">Região (automática)</label>
                                 <span className="inline-block text-xs font-medium text-white/70 mb-3">
                                   {lead.region || guessRegionFromLocation(lead.location)}
                                 </span>
 
-                                <label className="block text-[10px] font-bold text-white/35 uppercase tracking-wider mb-1">Estado</label>
+                                <label className="block text-[10px] text-white/35 mb-1">Estado do pedido</label>
                                 <select
                                   value={FILTER_STATUSES.find(g => g.matches.includes(edit.status))?.value ?? 'pendente'}
                                   onChange={e => autoSaveField(lead.id, 'status', CRUCIAL_STATUS_RAW[e.target.value] ?? 'pending')}
@@ -926,8 +959,9 @@ const AdminDashboard = ({ embedded = false }: { embedded?: boolean }) => {
                                 </select>
                               </div>
 
-                              <div>
-                                <label className="block text-[10px] font-bold text-white/35 uppercase tracking-wider mb-1">Próximo passo / Notas</label>
+                              {/* ── Notas & Próximo Passo ─────────────────────────── */}
+                              <div className="bg-white/[0.025] border border-white/[0.06] rounded-xl p-4">
+                                <p className="text-[10.5px] font-extrabold text-white/40 uppercase tracking-wider mb-3">Notas &amp; Próximo Passo</p>
                                 {(() => {
                                   const insight = getSalesInsight(lead);
                                   const upsell = getUpsellBadge(lead);
