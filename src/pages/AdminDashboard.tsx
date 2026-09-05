@@ -246,8 +246,24 @@ const AdminDashboard = ({ embedded = false }: { embedded?: boolean }) => {
       .from('leads')
       .select('*')
       .order('created_at', { ascending: false });
-    if (err) setError(err.message);
-    else setLeads(data as Lead[] ?? []);
+    if (err) { setError(err.message); setLoading(false); return; }
+    let rows = (data as Lead[]) ?? [];
+
+    // Auto-concluir serviços do WhatsApp cuja data já passou e continuam
+    // "Agendado" — pedido do dono (2026-09-05): não há cron/edge function,
+    // mas como o painel é aberto com regularidade, correr esta verificação a
+    // cada carregamento tem o mesmo efeito prático de "todos os dias".
+    // Só mexe em source='WhatsApp' (datas reais de agendamento) — nunca em
+    // leads do quiz, cujo created_at é a data de submissão, não de serviço.
+    const todayStr = new Date().toISOString().slice(0, 10);
+    const toClose = rows.filter(l => l.source === 'WhatsApp' && l.status === 'scheduled' && l.created_at.slice(0, 10) < todayStr);
+    if (toClose.length > 0) {
+      await supabase.from('leads').update({ status: 'Fechado' }).in('id', toClose.map(l => l.id));
+      const closedIds = new Set(toClose.map(l => l.id));
+      rows = rows.map(l => closedIds.has(l.id) ? { ...l, status: 'Fechado' } : l);
+    }
+
+    setLeads(rows);
     setLoading(false);
   }, []);
 
@@ -693,7 +709,7 @@ const AdminDashboard = ({ embedded = false }: { embedded?: boolean }) => {
                       : 'Nenhum lead corresponde aos filtros seleccionados.'}
                   </td></tr>
                 )}
-                {filtered.map((lead, i) => {
+                {(() => { let lastMonthKey = ''; return filtered.map((lead, i) => {
                   const edit = getEdit(lead);
                   const isDirty = edit.notes !== (lead.notes ?? '') || edit.next_step !== (lead.next_step ?? '') || edit.value !== (lead.value ?? '');
                   const isSaving = saving[lead.id];
@@ -706,8 +722,34 @@ const AdminDashboard = ({ embedded = false }: { embedded?: boolean }) => {
                   const displayTotal = hasMargin && lead.total_value != null && lead.total_value !== lead.margin_value ? lead.total_value : null;
                   const rowBg = stale ? 'bg-amber-900/[0.07]' : (i % 2 === 0 ? '' : 'bg-white/[0.01]');
 
+                  // Cabeçalho de mês (pedido do dono: organizar por mês) — a
+                  // lista já vem ordenada por created_at desc, por isso um
+                  // header aparece sempre que o mês muda em relação à linha
+                  // anterior, sem precisar de agrupar tudo antecipadamente.
+                  const rowDate = new Date(lead.created_at);
+                  const monthKey = `${rowDate.getFullYear()}-${rowDate.getMonth()}`;
+                  const showMonthHeader = monthKey !== lastMonthKey;
+                  lastMonthKey = monthKey;
+                  let monthLabel = '', monthCount = 0, monthMargin = 0;
+                  if (showMonthHeader) {
+                    const monthLeads = filtered.filter(l => {
+                      const d = new Date(l.created_at);
+                      return `${d.getFullYear()}-${d.getMonth()}` === monthKey;
+                    });
+                    monthCount = monthLeads.length;
+                    monthMargin = monthLeads.reduce((s, l) => s + (l.margin_value ?? parseValue(l.value ?? '')), 0);
+                    monthLabel = rowDate.toLocaleDateString('pt-PT', { month: 'long', year: 'numeric' });
+                  }
+
                   return (
                     <Fragment key={lead.id}>
+                      {showMonthHeader && (
+                        <tr className="bg-white/[0.05]">
+                          <td colSpan={7} className="px-3 py-2 text-[11px] font-bold text-gold/85 uppercase tracking-wider capitalize">
+                            {monthLabel} <span className="text-white/35 normal-case font-medium tracking-normal">· {monthCount} serviço{monthCount !== 1 ? 's' : ''} · {monthMargin.toFixed(0)}€ margem</span>
+                          </td>
+                        </tr>
+                      )}
                       <tr
                         onClick={() => setExpandedId(isExpanded ? null : lead.id)}
                         className={`border-b cursor-pointer transition-colors hover:bg-indigo-500/[0.06] ${stale ? 'border-amber-500/20' : 'border-white/[0.04]'} ${rowBg}`}
@@ -925,7 +967,7 @@ const AdminDashboard = ({ embedded = false }: { embedded?: boolean }) => {
                       )}
                     </Fragment>
                   );
-                })}
+                }); })()}
               </tbody>
             </table>
           </div>
