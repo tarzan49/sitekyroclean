@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, Fragment } from 'react';
 import { MessageCircle, Download, RefreshCw, LogOut, TrendingUp, Users, Filter, Bell, Plus, Zap, X, Trash2, Check, Lock, AlertTriangle, CalendarDays, MapPin, Globe } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { supabase, type Lead, type LeadStatus } from '@/lib/supabase';
@@ -213,6 +213,7 @@ const AdminDashboard = ({ embedded = false }: { embedded?: boolean }) => {
 
   // Filters
   const [filterStatus, setFilterStatus] = useState<string>('all');
+  const [expandedId, setExpandedId] = useState<string | null>(null);
   const [filterCity, setFilterCity] = useState('all');
   const [filterAssigned] = useState('all');
   const [filterPriority, setFilterPriority] = useState('all');
@@ -628,23 +629,30 @@ const AdminDashboard = ({ embedded = false }: { embedded?: boolean }) => {
         <div className="flex flex-wrap items-center gap-2">
           <Filter className="w-4 h-4 text-white/30 flex-shrink-0" />
 
-          {/* Status */}
-          <select value={filterStatus} onChange={e => setFilterStatus(e.target.value)} className={SELECT_CLS} style={{ colorScheme: 'dark' }}>
-            <option value="all" className={OPTION_CLS}>Todos os estados</option>
-            {FILTER_STATUSES.map(g => (
-              <option key={g.value} value={g.value} className={OPTION_CLS}>{g.label}</option>
-            ))}
-          </select>
+          {/* Status — chips (canonical, matches the top-level status badges) */}
+          <button
+            onClick={() => setFilterStatus('all')}
+            className={`h-8 px-3 text-[11.5px] font-bold rounded-lg border transition-colors ${filterStatus === 'all' ? 'border-gold text-gold bg-gold/[0.08]' : 'border-white/[0.12] text-white/60 bg-[#1a1a2e] hover:border-white/25'}`}
+          >
+            Todos
+          </button>
+          {FILTER_STATUSES.map(g => (
+            <button
+              key={g.value}
+              onClick={() => setFilterStatus(g.value)}
+              className={`h-8 px-3 text-[11.5px] font-bold rounded-lg border transition-colors ${filterStatus === g.value ? 'border-gold text-gold bg-gold/[0.08]' : 'border-white/[0.12] text-white/60 bg-[#1a1a2e] hover:border-white/25'}`}
+            >
+              {CANONICAL_STATUS[g.value]?.label ?? g.label}
+            </button>
+          ))}
 
-          {/* Priority */}
+          {/* Priority + City — secondary, compact selects */}
           <select value={filterPriority} onChange={e => setFilterPriority(e.target.value)} className={SELECT_CLS} style={{ colorScheme: 'dark' }}>
             <option value="all" className={OPTION_CLS}>Todas as prioridades</option>
             {FILTER_PRIORITIES.map(p => (
               <option key={p.value} value={p.value} className={OPTION_CLS}>{p.label}</option>
             ))}
           </select>
-
-          {/* City */}
           <select value={filterCity} onChange={e => setFilterCity(e.target.value)} className={SELECT_CLS} style={{ colorScheme: 'dark' }}>
             <option value="all" className={OPTION_CLS}>Todas as cidades</option>
             {cities.map(c => <option key={c} value={c} className={OPTION_CLS}>{c}</option>)}
@@ -660,23 +668,26 @@ const AdminDashboard = ({ embedded = false }: { embedded?: boolean }) => {
           </div>
         )}
 
-        {/* Leads table */}
+        {/* Leads table — 7 columns by default; clica numa linha para ver/editar
+            prioridade, responsável, próximo passo, notas e ações (guardar/apagar),
+            tudo preservado, só escondido até se precisar (pedido do dono: menos
+            poluição visual sem perder nenhuma função existente). */}
         <div className="bg-white/[0.02] border border-white/[0.06] rounded-2xl overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-xs">
               <thead>
                 <tr className="border-b border-white/[0.06] bg-white/[0.03]">
-                  {['Data', 'Resp.', 'Cliente', 'Serviço & Item', 'Localização', 'Região', 'Prioridade', 'Status', 'Origem', 'Próx. passo / Notas', ''].map(h => (
-                    <th key={h} className="text-left px-3 py-1.5 text-[11px] font-bold text-white/40 uppercase tracking-wider whitespace-nowrap">{h}</th>
+                  {['Data', 'Cliente', 'Serviço', 'Região', 'Origem', 'Valor', 'Estado'].map(h => (
+                    <th key={h} className="text-left px-3 py-2 text-[11px] font-bold text-white/40 uppercase tracking-wider whitespace-nowrap">{h}</th>
                   ))}
                 </tr>
               </thead>
               <tbody>
                 {loading && (
-                  <tr><td colSpan={11} className="text-center py-12 text-white/30">A carregar leads...</td></tr>
+                  <tr><td colSpan={7} className="text-center py-12 text-white/30">A carregar leads...</td></tr>
                 )}
                 {!loading && filtered.length === 0 && (
-                  <tr><td colSpan={11} className="text-center py-12 text-white/30">
+                  <tr><td colSpan={7} className="text-center py-12 text-white/30">
                     {leads.length === 0
                       ? 'Ainda não há leads. Cria a tabela no Supabase e aguarda o primeiro pedido!'
                       : 'Nenhum lead corresponde aos filtros seleccionados.'}
@@ -688,213 +699,231 @@ const AdminDashboard = ({ embedded = false }: { embedded?: boolean }) => {
                   const isSaving = saving[lead.id];
                   const waPhone = (lead.phone ?? '').replace(/\D/g, '');
                   const waMsg = encodeURIComponent(buildWAMsg(lead));
-                  const cfg = getStatusCfg(edit.status);
                   const stale = isStale(lead);
-
-                  // cfg is used implicitly via the select styling — keep reference
-                  void cfg;
+                  const isExpanded = expandedId === lead.id;
+                  const hasMargin = lead.margin_value != null;
+                  const displayMargin = hasMargin ? lead.margin_value : (edit.value || lead.value || '-');
+                  const displayTotal = hasMargin && lead.total_value != null && lead.total_value !== lead.margin_value ? lead.total_value : null;
+                  const rowBg = stale ? 'bg-amber-900/[0.07]' : (i % 2 === 0 ? '' : 'bg-white/[0.01]');
 
                   return (
-                    <tr key={lead.id} className={`border-b transition-colors hover:bg-indigo-500/[0.06] ${stale ? 'border-amber-500/20 bg-amber-900/[0.07]' : 'border-white/[0.04]' + (i % 2 === 0 ? '' : ' bg-white/[0.01]')}`}>
-                      {/* Date */}
-                      <td className="px-3 py-1.5 whitespace-nowrap">
-                        <div className="flex items-center gap-1.5">
-                          <p className="text-white/80 text-xs font-mono">{new Date(lead.created_at).toLocaleDateString('pt-PT')}</p>
-                          {stale && (
-                            <span title={`Sem follow-up há +${STALE_DAYS} dias`}>
-                              <Bell className="w-3 h-3 text-amber-400 flex-shrink-0" />
-                            </span>
-                          )}
-                        </div>
-                        {lead.booking_id && !lead.booking_id.startsWith('CSV-') && (
-                          <p className="text-gold/50 text-[10px] font-mono mt-0.5">#{lead.booking_id}</p>
-                        )}
-                        {stale && (
-                          <span className="text-[9px] font-bold text-amber-400/70 uppercase tracking-wide">Follow-up!</span>
-                        )}
-                      </td>
-                      {/* Assigned to */}
-                      <td className="px-3 py-1.5 whitespace-nowrap">
-                        <span className="text-white/60 text-xs font-medium">{lead.assigned_to || '-'}</span>
-                      </td>
-                      {/* Client */}
-                      <td className="px-3 py-1.5">
-                        <p className="font-semibold text-white whitespace-nowrap">{lead.name}</p>
-                        <div className="flex items-center gap-1.5 mt-0.5">
+                    <Fragment key={lead.id}>
+                      <tr
+                        onClick={() => setExpandedId(isExpanded ? null : lead.id)}
+                        className={`border-b cursor-pointer transition-colors hover:bg-indigo-500/[0.06] ${stale ? 'border-amber-500/20' : 'border-white/[0.04]'} ${rowBg}`}
+                      >
+                        {/* Date */}
+                        <td className="px-3 py-2 whitespace-nowrap">
+                          <div className="flex items-center gap-1.5">
+                            <p className="text-white/80 text-xs font-mono">{new Date(lead.created_at).toLocaleDateString('pt-PT')}</p>
+                            {stale && (
+                              <span title={`Sem follow-up há +${STALE_DAYS} dias`}>
+                                <Bell className="w-3 h-3 text-amber-400 flex-shrink-0" />
+                              </span>
+                            )}
+                          </div>
+                        </td>
+                        {/* Client */}
+                        <td className="px-3 py-2">
+                          <p className="font-semibold text-white whitespace-nowrap">{lead.name}</p>
                           {lead.phone && (
-                            <>
+                            <div className="flex items-center gap-1.5 mt-0.5">
                               <span className="text-white/50 text-xs">{lead.phone}</span>
                               {waPhone.length >= 9 && (
                                 <a
                                   href={`https://wa.me/351${waPhone}?text=${waMsg}`}
                                   target="_blank"
                                   rel="noopener noreferrer"
+                                  onClick={e => e.stopPropagation()}
                                   className="flex-shrink-0 w-5 h-5 bg-[#25D366] rounded-full flex items-center justify-center hover:bg-[#20bd5a] transition-colors"
                                   title="Abrir WhatsApp"
                                 >
                                   <MessageCircle className="w-3 h-3 text-white" />
                                 </a>
                               )}
-                            </>
+                            </div>
                           )}
-                        </div>
-                        {lead.email && <p className="text-white/25 text-[10px] mt-0.5">{lead.email}</p>}
-                      </td>
-                      {/* Service */}
-                      <td className="px-3 py-1.5 max-w-[180px]">
-                        {lead.service && lead.service !== 'Histórico' && (
-                          <p className="font-semibold text-white/90 text-xs">{lead.service}{lead.service_type ? `: ${lead.service_type}` : ''}</p>
-                        )}
-                        {lead.details && <p className="text-white/40 text-[10px] mt-0.5 leading-snug">{lead.details}</p>}
-                        {lead.slot && <p className="text-gold/50 text-[10px] mt-0.5 flex items-center gap-1"><CalendarDays className="w-3 h-3" />{lead.slot}</p>}
-                      </td>
-                      {/* Location + value input */}
-                      <td className="px-3 py-1.5">
-                        <span className="text-white/80 text-xs font-medium whitespace-nowrap flex items-center gap-1"><MapPin className="w-3 h-3 flex-shrink-0" />{lead.location}</span>
-                        <input
-                          type="text"
-                          value={getEdit(lead).value}
-                          onChange={e => setEdits(prev => ({ ...prev, [lead.id]: { ...getEdit(lead), value: e.target.value } }))}
-                          placeholder="ex: 89€"
-                          className="mt-0.5 w-full max-w-[70px] h-6 px-1.5 text-[11px] font-bold bg-gold/[0.08] border border-gold/20 rounded text-gold placeholder:text-gold/30 focus:outline-none focus:border-gold"
-                        />
-                        {lead.total_value != null && lead.margin_value != null && lead.total_value !== lead.margin_value && (
-                          <p className="text-[9.5px] text-white/25 mt-0.5">total {lead.total_value}€</p>
-                        )}
-                      </td>
-                      {/* Região */}
-                      <td className="px-3 py-1.5 whitespace-nowrap">
-                        <span className="text-white/45 text-[10.5px]">{lead.region || '-'}</span>
-                      </td>
-                      {/* Priority — auto-save on change */}
-                      <td className="px-3 py-1.5 whitespace-nowrap">
-                        <select
-                          value={getEdit(lead).priority}
-                          onChange={e => autoSaveField(lead.id, 'priority', e.target.value)}
-                          className="text-[10px] font-bold px-1.5 py-0.5 rounded-lg border cursor-pointer focus:outline-none bg-[#1a1a2e] text-white border-white/20"
-                          style={{ colorScheme: 'dark' }}
-                        >
-                          <option value="" className="bg-[#1a1a2e] text-white">-</option>
-                          {FILTER_PRIORITIES.map(p => <option key={p.value} value={p.value} className="bg-[#1a1a2e] text-white">{p.label}</option>)}
-                        </select>
-                      </td>
-                      {/* Status — canonical badge (5 colors) + full legacy dropdown to edit */}
-                      <td className="px-3 py-1.5">
-                        <span className={`inline-block mb-1 px-2 py-0.5 rounded-full text-[9.5px] font-bold border ${getCanonicalStatus(edit.status).cls}`}>
-                          {getCanonicalStatus(edit.status).label}
-                        </span>
-                        <select
-                          value={edit.status}
-                          onChange={e => autoSaveField(lead.id, 'status', e.target.value)}
-                          className="block text-[10px] font-bold px-2 py-1 rounded-lg border border-white/20 cursor-pointer focus:outline-none focus:ring-1 focus:ring-gold bg-[#1a1a2e] text-white max-w-[160px]"
-                          style={{ colorScheme: 'dark' }}
-                        >
-                          {Object.keys(STATUS_MAP).map(s => (
-                            <option key={s} value={s} className="bg-[#1a1a2e] text-white">
-                              {STATUS_MAP[s].dot} {STATUS_MAP[s].label}
-                            </option>
-                          ))}
-                        </select>
-                      </td>
-                      {/* Source */}
-                      <td className="px-3 py-1.5 whitespace-nowrap">
-                        <span className={`px-2 py-0.5 rounded-full text-[9.5px] font-bold ${lead.source === 'WhatsApp' ? 'bg-[#25D366]/15 text-[#5fd68a]' : 'bg-blue-500/15 text-blue-300'}`}>
-                          {lead.source === 'WhatsApp' ? 'WhatsApp' : (lead.source || 'Website')}
-                        </span>
-                      </td>
-                      {/* Next step + Notes */}
-                      <td className="px-3 py-1.5 min-w-[200px]">
-                        {/* Sales insight */}
-                        {(() => {
-                          const insight = getSalesInsight(lead);
-                          const upsell = getUpsellBadge(lead);
-                          return (
-                            <>
-                              {upsell && (
-                                <span className="inline-block text-[9px] font-bold bg-blue-500/15 text-blue-300 border border-blue-400/20 px-1.5 py-0.5 rounded-full mb-1 mr-1">
-                                  {upsell}
-                                </span>
-                              )}
-                              {insight && (
-                                <span className={`inline-block text-[9px] font-bold px-1.5 py-0.5 rounded-full mb-1 border ${
-                                  insight.type === 'price' ? 'bg-amber-500/15 text-amber-300 border-amber-400/20' :
-                                  insight.type === 'ghost' ? 'bg-zinc-500/15 text-zinc-400 border-zinc-400/20' :
-                                  'bg-red-500/15 text-red-300 border-red-400/20'
-                                }`}>
-                                  {insight.emoji} {insight.text}
-                                </span>
-                              )}
-                            </>
-                          );
-                        })()}
-                        <input
-                          type="text"
-                          value={edit.next_step}
-                          onChange={e => setEdits(prev => ({ ...prev, [lead.id]: { ...getEdit(lead), next_step: e.target.value } }))}
-                          placeholder="→ Próximo passo..."
-                          className="w-full h-7 px-2.5 text-[11px] font-semibold bg-gold/[0.06] border border-gold/20 rounded-lg text-gold placeholder:text-gold/30 focus:outline-none focus:border-gold transition-colors mb-1.5"
-                        />
-                        <textarea
-                          value={edit.notes}
-                          onChange={e => setEdits(prev => ({
-                            ...prev,
-                            [lead.id]: { ...getEdit(lead), notes: e.target.value },
-                          }))}
-                          placeholder="Histórico e notas..."
-                          rows={2}
-                          className="w-full px-2.5 py-1.5 text-xs bg-white/[0.05] border border-white/[0.08] rounded-lg text-white placeholder:text-white/20 focus:outline-none focus:border-gold transition-colors resize-y min-h-[40px] max-h-[120px]"
-                        />
-                        {(stale || getSalesInsight(lead)) && waPhone.length >= 9 && (
-                          <div className="flex gap-1 mt-1 flex-wrap">
-                            <a
-                              href={`https://wa.me/351${waPhone}?text=${encodeURIComponent(`Olá ${lead.name}, aqui é o António da Kyro Clean Solutions. Temos uma promoção especial esta semana: 10% de desconto. Posso enviar um orçamento atualizado?`)}`}
-                              target="_blank" rel="noopener noreferrer"
-                              className="flex items-center gap-1 h-6 px-2 text-[9px] font-bold bg-[#25D366]/15 text-[#25D366] border border-[#25D366]/25 rounded-md hover:bg-[#25D366]/25 transition-colors whitespace-nowrap"
-                            >
-                              <Zap className="w-2.5 h-2.5" /> Enviar Promo
-                            </a>
-                            <a
-                              href={`https://wa.me/351${waPhone}?text=${encodeURIComponent(`Olá ${lead.name}, aqui é o António da Kyro Clean Solutions. Que tal marcarmos uma demonstração gratuita sem compromisso${lead.location ? ` em ${lead.location}` : ''}?`)}`}
-                              target="_blank" rel="noopener noreferrer"
-                              className="flex items-center gap-1 h-6 px-2 text-[9px] font-bold bg-blue-500/15 text-blue-300 border border-blue-400/25 rounded-md hover:bg-blue-500/25 transition-colors whitespace-nowrap"
-                            >
-                              <MessageCircle className="w-2.5 h-2.5" /> Agendar Demo
-                            </a>
-                            <button
-                              onClick={() => setEdits(prev => ({ ...prev, [lead.id]: { ...getEdit(lead), priority: 'Frio' } }))}
-                              className="flex items-center gap-1 h-6 px-2 text-[9px] font-bold bg-zinc-500/15 text-zinc-400 border border-zinc-400/25 rounded-md hover:bg-zinc-500/25 transition-colors whitespace-nowrap"
-                            >
-                              Mudar para Frio
-                            </button>
-                          </div>
-                        )}
-                      </td>
-                      {/* Actions: save + delete */}
-                      <td className="px-3 py-1.5">
-                        <div className="flex flex-col items-center gap-1.5">
-                          {saved[lead.id] ? (
-                            <span className="flex items-center gap-1 h-7 px-2.5 text-[10px] font-bold text-green-400 bg-green-500/10 border border-green-500/30 rounded-lg whitespace-nowrap">
-                              <Check className="w-3 h-3" /> Guardado
-                            </span>
-                          ) : isDirty && (
-                            <button
-                              onClick={() => saveEdit(lead.id)}
-                              disabled={isSaving}
-                              className="h-7 px-3 text-[10px] font-bold bg-gold text-[#12121e] rounded-lg hover:bg-[#d4c57b] transition-colors disabled:opacity-50 whitespace-nowrap"
-                            >
-                              {isSaving ? '...' : 'Guardar'}
-                            </button>
+                        </td>
+                        {/* Service */}
+                        <td className="px-3 py-2 max-w-[200px]">
+                          {lead.service && lead.service !== 'Histórico' && (
+                            <p className="font-semibold text-white/90 text-xs">{lead.service}{lead.service_type ? `: ${lead.service_type}` : ''}</p>
                           )}
-                          <button
-                            onClick={() => deleteLead(lead.id)}
-                            className="w-7 h-7 flex items-center justify-center text-white/20 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors"
-                            title="Apagar lead"
-                          >
-                            <Trash2 className="w-3.5 h-3.5" />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
+                        </td>
+                        {/* Região */}
+                        <td className="px-3 py-2 whitespace-nowrap">
+                          <span className="text-white/55 text-[11px]">{lead.region || '-'}</span>
+                        </td>
+                        {/* Source */}
+                        <td className="px-3 py-2 whitespace-nowrap">
+                          <span className={`px-2 py-0.5 rounded-full text-[9.5px] font-bold ${lead.source === 'WhatsApp' ? 'bg-[#25D366]/15 text-[#5fd68a]' : 'bg-blue-500/15 text-blue-300'}`}>
+                            {lead.source === 'WhatsApp' ? 'WhatsApp' : (lead.source || 'Website')}
+                          </span>
+                        </td>
+                        {/* Value */}
+                        <td className="px-3 py-2 whitespace-nowrap">
+                          <span className="font-bold text-white text-xs">
+                            {typeof displayMargin === 'number' ? `${displayMargin}€` : displayMargin}
+                          </span>
+                          {displayTotal != null && (
+                            <span className="text-[10px] text-white/30 line-through ml-1.5">{displayTotal}€</span>
+                          )}
+                        </td>
+                        {/* Status — canonical badge only, edit inside the expanded row */}
+                        <td className="px-3 py-2 whitespace-nowrap">
+                          <span className={`inline-block px-2 py-0.5 rounded-full text-[9.5px] font-bold border ${getCanonicalStatus(edit.status).cls}`}>
+                            {getCanonicalStatus(edit.status).label}
+                          </span>
+                        </td>
+                      </tr>
+
+                      {isExpanded && (
+                        <tr className={`border-b border-white/[0.04] ${rowBg}`}>
+                          <td colSpan={7} className="px-4 py-4 bg-white/[0.015]">
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                              <div>
+                                <label className="block text-[10px] font-bold text-white/35 uppercase tracking-wider mb-1">Localização</label>
+                                <span className="text-white/80 text-xs font-medium flex items-center gap-1"><MapPin className="w-3 h-3 flex-shrink-0" />{lead.location || '-'}</span>
+                                {lead.details && <p className="text-white/40 text-[10px] mt-1 leading-snug">{lead.details}</p>}
+                                {lead.slot && <p className="text-gold/50 text-[10px] mt-1 flex items-center gap-1"><CalendarDays className="w-3 h-3" />{lead.slot}</p>}
+                                {lead.email && <p className="text-white/25 text-[10px] mt-1">{lead.email}</p>}
+                                {lead.booking_id && !lead.booking_id.startsWith('CSV-') && (
+                                  <p className="text-gold/50 text-[10px] font-mono mt-1">#{lead.booking_id}</p>
+                                )}
+
+                                <label className="block text-[10px] font-bold text-white/35 uppercase tracking-wider mt-3 mb-1">Valor (legado, texto livre)</label>
+                                <input
+                                  type="text"
+                                  value={getEdit(lead).value}
+                                  onChange={e => setEdits(prev => ({ ...prev, [lead.id]: { ...getEdit(lead), value: e.target.value } }))}
+                                  placeholder="ex: 89€"
+                                  className="w-full max-w-[120px] h-7 px-2 text-[11px] font-bold bg-gold/[0.08] border border-gold/20 rounded text-gold placeholder:text-gold/30 focus:outline-none focus:border-gold"
+                                />
+                              </div>
+
+                              <div>
+                                <label className="block text-[10px] font-bold text-white/35 uppercase tracking-wider mb-1">Responsável / Prioridade</label>
+                                <div className="flex items-center gap-2 mb-2">
+                                  <span className="text-white/60 text-xs font-medium">{lead.assigned_to || '-'}</span>
+                                  <select
+                                    value={getEdit(lead).priority}
+                                    onChange={e => autoSaveField(lead.id, 'priority', e.target.value)}
+                                    className="text-[10px] font-bold px-1.5 py-0.5 rounded-lg border cursor-pointer focus:outline-none bg-[#1a1a2e] text-white border-white/20"
+                                    style={{ colorScheme: 'dark' }}
+                                  >
+                                    <option value="" className="bg-[#1a1a2e] text-white">-</option>
+                                    {FILTER_PRIORITIES.map(p => <option key={p.value} value={p.value} className="bg-[#1a1a2e] text-white">{p.label}</option>)}
+                                  </select>
+                                </div>
+
+                                <label className="block text-[10px] font-bold text-white/35 uppercase tracking-wider mb-1">Estado detalhado</label>
+                                <select
+                                  value={edit.status}
+                                  onChange={e => autoSaveField(lead.id, 'status', e.target.value)}
+                                  className="block text-[10px] font-bold px-2 py-1 rounded-lg border border-white/20 cursor-pointer focus:outline-none focus:ring-1 focus:ring-gold bg-[#1a1a2e] text-white max-w-[200px]"
+                                  style={{ colorScheme: 'dark' }}
+                                >
+                                  {Object.keys(STATUS_MAP).map(s => (
+                                    <option key={s} value={s} className="bg-[#1a1a2e] text-white">
+                                      {STATUS_MAP[s].dot} {STATUS_MAP[s].label}
+                                    </option>
+                                  ))}
+                                </select>
+                              </div>
+
+                              <div>
+                                <label className="block text-[10px] font-bold text-white/35 uppercase tracking-wider mb-1">Próximo passo / Notas</label>
+                                {(() => {
+                                  const insight = getSalesInsight(lead);
+                                  const upsell = getUpsellBadge(lead);
+                                  return (
+                                    <>
+                                      {upsell && (
+                                        <span className="inline-block text-[9px] font-bold bg-blue-500/15 text-blue-300 border border-blue-400/20 px-1.5 py-0.5 rounded-full mb-1 mr-1">
+                                          {upsell}
+                                        </span>
+                                      )}
+                                      {insight && (
+                                        <span className={`inline-block text-[9px] font-bold px-1.5 py-0.5 rounded-full mb-1 border ${
+                                          insight.type === 'price' ? 'bg-amber-500/15 text-amber-300 border-amber-400/20' :
+                                          insight.type === 'ghost' ? 'bg-zinc-500/15 text-zinc-400 border-zinc-400/20' :
+                                          'bg-red-500/15 text-red-300 border-red-400/20'
+                                        }`}>
+                                          {insight.emoji} {insight.text}
+                                        </span>
+                                      )}
+                                    </>
+                                  );
+                                })()}
+                                <input
+                                  type="text"
+                                  value={edit.next_step}
+                                  onChange={e => setEdits(prev => ({ ...prev, [lead.id]: { ...getEdit(lead), next_step: e.target.value } }))}
+                                  placeholder="→ Próximo passo..."
+                                  className="w-full h-7 px-2.5 text-[11px] font-semibold bg-gold/[0.06] border border-gold/20 rounded-lg text-gold placeholder:text-gold/30 focus:outline-none focus:border-gold transition-colors mb-1.5"
+                                />
+                                <textarea
+                                  value={edit.notes}
+                                  onChange={e => setEdits(prev => ({
+                                    ...prev,
+                                    [lead.id]: { ...getEdit(lead), notes: e.target.value },
+                                  }))}
+                                  placeholder="Histórico e notas..."
+                                  rows={2}
+                                  className="w-full px-2.5 py-1.5 text-xs bg-white/[0.05] border border-white/[0.08] rounded-lg text-white placeholder:text-white/20 focus:outline-none focus:border-gold transition-colors resize-y min-h-[40px] max-h-[120px]"
+                                />
+                                {(stale || getSalesInsight(lead)) && waPhone.length >= 9 && (
+                                  <div className="flex gap-1 mt-1 flex-wrap">
+                                    <a
+                                      href={`https://wa.me/351${waPhone}?text=${encodeURIComponent(`Olá ${lead.name}, aqui é o António da Kyro Clean Solutions. Temos uma promoção especial esta semana: 10% de desconto. Posso enviar um orçamento atualizado?`)}`}
+                                      target="_blank" rel="noopener noreferrer"
+                                      className="flex items-center gap-1 h-6 px-2 text-[9px] font-bold bg-[#25D366]/15 text-[#25D366] border border-[#25D366]/25 rounded-md hover:bg-[#25D366]/25 transition-colors whitespace-nowrap"
+                                    >
+                                      <Zap className="w-2.5 h-2.5" /> Enviar Promo
+                                    </a>
+                                    <a
+                                      href={`https://wa.me/351${waPhone}?text=${encodeURIComponent(`Olá ${lead.name}, aqui é o António da Kyro Clean Solutions. Que tal marcarmos uma demonstração gratuita sem compromisso${lead.location ? ` em ${lead.location}` : ''}?`)}`}
+                                      target="_blank" rel="noopener noreferrer"
+                                      className="flex items-center gap-1 h-6 px-2 text-[9px] font-bold bg-blue-500/15 text-blue-300 border border-blue-400/25 rounded-md hover:bg-blue-500/25 transition-colors whitespace-nowrap"
+                                    >
+                                      <MessageCircle className="w-2.5 h-2.5" /> Agendar Demo
+                                    </a>
+                                    <button
+                                      onClick={() => setEdits(prev => ({ ...prev, [lead.id]: { ...getEdit(lead), priority: 'Frio' } }))}
+                                      className="flex items-center gap-1 h-6 px-2 text-[9px] font-bold bg-zinc-500/15 text-zinc-400 border border-zinc-400/25 rounded-md hover:bg-zinc-500/25 transition-colors whitespace-nowrap"
+                                    >
+                                      Mudar para Frio
+                                    </button>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+
+                            <div className="flex items-center gap-2 mt-4 pt-3 border-t border-white/[0.06]">
+                              {saved[lead.id] ? (
+                                <span className="flex items-center gap-1 h-8 px-3 text-[11px] font-bold text-green-400 bg-green-500/10 border border-green-500/30 rounded-lg">
+                                  <Check className="w-3.5 h-3.5" /> Guardado
+                                </span>
+                              ) : isDirty && (
+                                <button
+                                  onClick={() => saveEdit(lead.id)}
+                                  disabled={isSaving}
+                                  className="h-8 px-4 text-[11px] font-bold bg-gold text-[#12121e] rounded-lg hover:bg-[#d4c57b] transition-colors disabled:opacity-50"
+                                >
+                                  {isSaving ? '...' : 'Guardar alterações'}
+                                </button>
+                              )}
+                              <button
+                                onClick={() => deleteLead(lead.id)}
+                                className="flex items-center gap-1.5 h-8 px-3 text-[11px] font-bold text-white/30 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" /> Apagar lead
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      )}
+                    </Fragment>
                   );
                 })}
               </tbody>
