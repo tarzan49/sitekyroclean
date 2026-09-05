@@ -92,7 +92,7 @@ const waterproofingTiers: WaterproofingTier[] = [
     icon: FlaskConical,
     name: "Premium",
     base: "À base de diluente",
-    sofaPrice: "79€ / 99€ / 129€",
+    sofaPrice: "89€ / 109€ / 139€",
     chairPrice: "20€/un (1-4) · 15€/un (5-9)",
     washes: "Aguenta até 5 lavagens",
     durability: "Até 10 anos de proteção real (salvo exceções)",

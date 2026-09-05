@@ -19,16 +19,6 @@ function WaterproofingTierPicker({ formData, updateFormData }: { formData: QuizF
   return (
     <div className="w-full max-w-sm grid grid-cols-2 gap-2 mb-1 pt-3 items-stretch">
       <button
-        onClick={() => updateFormData({ waterproofingTier: 'essencial' })}
-        className={cn('rounded-sm border-2 px-3 py-2.5 text-left transition-all duration-200 touch-manipulation', tier === 'essencial' ? 'border-gold bg-[#1a2a1a] shadow-[0_0_10px_rgba(212,175,55,0.18)]' : 'border-gold/20 bg-[#1a2a1a] hover:border-gold/40')}
-      >
-        <div className="flex items-center gap-1.5 mb-0.5">
-          {tier === 'essencial' && <Check className="w-3 h-3 text-gold flex-shrink-0" />}
-          <p className={cn('text-xs font-bold', tier === 'essencial' ? 'text-white' : 'text-white/60')}>Essencial</p>
-        </div>
-        <p className="text-[10px] text-white/35 leading-snug">1 a 2 anos de proteção · até 2 lavagens</p>
-      </button>
-      <button
         onClick={() => updateFormData({ waterproofingTier: 'premium' })}
         className={cn(
           'relative rounded-sm border-2 px-3 py-2.5 text-left transition-all duration-200 touch-manipulation',
@@ -45,6 +35,16 @@ function WaterproofingTierPicker({ formData, updateFormData }: { formData: QuizF
           <p className={cn('text-xs font-bold', tier === 'premium' ? 'text-white' : 'text-white/85')}>Premium</p>
         </div>
         <p className={cn('text-[10px] leading-snug font-semibold', tier === 'premium' ? 'text-gold/70' : 'text-gold/45')}>Até 10 anos de proteção · até 5 lavagens</p>
+      </button>
+      <button
+        onClick={() => updateFormData({ waterproofingTier: 'essencial' })}
+        className={cn('rounded-sm border-2 px-3 py-2.5 text-left transition-all duration-200 touch-manipulation', tier === 'essencial' ? 'border-gold bg-[#1a2a1a] shadow-[0_0_10px_rgba(212,175,55,0.18)]' : 'border-gold/20 bg-[#1a2a1a] hover:border-gold/40')}
+      >
+        <div className="flex items-center gap-1.5 mb-0.5">
+          {tier === 'essencial' && <Check className="w-3 h-3 text-gold flex-shrink-0" />}
+          <p className={cn('text-xs font-bold', tier === 'essencial' ? 'text-white' : 'text-white/60')}>Essencial</p>
+        </div>
+        <p className="text-[10px] text-white/35 leading-snug">1 a 2 anos de proteção · até 2 lavagens</p>
       </button>
     </div>
   );
@@ -141,24 +141,6 @@ const QuizStepConfig = ({
                       </button>
                     ) : (
                       <div className="flex flex-col gap-1.5">
-                        {/* Proteção 2 anos (Essencial) */}
-                        <button
-                          onClick={() => {
-                            const turningOn = !(packOn && packTier === 'essencial');
-                            setSofaItems(turningOn && packOn ? sofaItems : sofaTogglePack(sofaItems, option.id));
-                            updateFormData({ waterproofingTier: 'essencial' });
-                          }}
-                          className={cn('w-full flex items-center gap-2.5 px-3 py-2 rounded-sm border transition-all duration-200 touch-manipulation', packOn && packTier === 'essencial' ? 'border-gold/50 bg-gold/[0.08]' : 'border-gold/15 bg-[#1a2a1a] hover:border-gold/40')}
-                        >
-                          <Shield className={cn('w-4 h-4 flex-shrink-0', packOn && packTier === 'essencial' ? 'text-gold' : 'text-white/25')} />
-                          <div className="flex-1 text-left">
-                            <p className={cn('text-[11px] font-bold leading-none', packOn && packTier === 'essencial' ? 'text-white' : 'text-white/50')}>Proteção 2 anos</p>
-                            <p className={cn('text-[11px] mt-0.5 leading-none', packOn && packTier === 'essencial' ? 'text-gold/60' : 'text-white/25')}>+{essencial.packDelta}€/un. · 1-2 anos</p>
-                          </div>
-                          <div className={cn('w-8 h-4 rounded-full border flex items-center px-0.5 transition-all duration-300 flex-shrink-0', packOn && packTier === 'essencial' ? 'border-gold bg-gold/20' : 'border-white/20 bg-white/[0.05]')}>
-                            <div className={cn('w-3 h-3 rounded-full transition-all duration-300', packOn && packTier === 'essencial' ? 'bg-gold translate-x-[14px]' : 'bg-white/30 translate-x-0')} />
-                          </div>
-                        </button>
                         {/* Proteção 10 anos (Premium) — preço e material em paralelo com a de 2 anos,
                             sem framing de desconto (evita dar a entender que a de 2 anos é má opção) */}
                         <button
@@ -188,6 +170,24 @@ const QuizStepConfig = ({
                           </div>
                           <div className={cn('w-8 h-4 rounded-full border flex items-center px-0.5 transition-all duration-300 flex-shrink-0', packOn && packTier === 'premium' ? 'border-gold bg-gold/20' : 'border-white/20 bg-white/[0.05]')}>
                             <div className={cn('w-3 h-3 rounded-full transition-all duration-300', packOn && packTier === 'premium' ? 'bg-gold translate-x-[14px]' : 'bg-white/30 translate-x-0')} />
+                          </div>
+                        </button>
+                        {/* Proteção 2 anos (Essencial) */}
+                        <button
+                          onClick={() => {
+                            const turningOn = !(packOn && packTier === 'essencial');
+                            setSofaItems(turningOn && packOn ? sofaItems : sofaTogglePack(sofaItems, option.id));
+                            updateFormData({ waterproofingTier: 'essencial' });
+                          }}
+                          className={cn('w-full flex items-center gap-2.5 px-3 py-2 rounded-sm border transition-all duration-200 touch-manipulation', packOn && packTier === 'essencial' ? 'border-gold/50 bg-gold/[0.08]' : 'border-gold/15 bg-[#1a2a1a] hover:border-gold/40')}
+                        >
+                          <Shield className={cn('w-4 h-4 flex-shrink-0', packOn && packTier === 'essencial' ? 'text-gold' : 'text-white/25')} />
+                          <div className="flex-1 text-left">
+                            <p className={cn('text-[11px] font-bold leading-none', packOn && packTier === 'essencial' ? 'text-white' : 'text-white/50')}>Proteção 2 anos</p>
+                            <p className={cn('text-[11px] mt-0.5 leading-none', packOn && packTier === 'essencial' ? 'text-gold/60' : 'text-white/25')}>+{essencial.packDelta}€/un. · 1-2 anos</p>
+                          </div>
+                          <div className={cn('w-8 h-4 rounded-full border flex items-center px-0.5 transition-all duration-300 flex-shrink-0', packOn && packTier === 'essencial' ? 'border-gold bg-gold/20' : 'border-white/20 bg-white/[0.05]')}>
+                            <div className={cn('w-3 h-3 rounded-full transition-all duration-300', packOn && packTier === 'essencial' ? 'bg-gold translate-x-[14px]' : 'bg-white/30 translate-x-0')} />
                           </div>
                         </button>
                       </div>
@@ -439,23 +439,6 @@ const QuizStepConfig = ({
         {!sob && !isWaterproofPrimary && (
           <div className="w-full max-w-xs grid grid-cols-2 gap-2 pt-3">
             <button
-              onClick={() => toggleAddonTier('essencial')}
-              className={cn(
-                'rounded-sm border-2 px-3 py-2.5 text-left transition-all duration-200 touch-manipulation',
-                addonEnabled && formData.waterproofingTier === 'essencial'
-                  ? 'border-gold bg-gold/[0.08] shadow-[0_0_10px_rgba(212,175,55,0.18)]'
-                  : 'border-gold/20 bg-[#1a2a1a] hover:border-gold/40'
-              )}
-            >
-              <div className="flex items-center gap-1.5 mb-0.5">
-                {addonEnabled && formData.waterproofingTier === 'essencial' && <Check className="w-3 h-3 text-gold flex-shrink-0" />}
-                <p className={cn('text-xs font-bold', addonEnabled && formData.waterproofingTier === 'essencial' ? 'text-white' : 'text-white/60')}>Essencial</p>
-              </div>
-              <p className="text-[10px] text-white/35 leading-snug">
-                +{addonEssencialPrice !== null ? `${addonEssencialPrice % 1 === 0 ? addonEssencialPrice : addonEssencialPrice.toFixed(1).replace('.', ',')}€` : 'orç.'} · 1-2 anos
-              </p>
-            </button>
-            <button
               onClick={() => toggleAddonTier('premium')}
               className={cn(
                 'relative rounded-sm border-2 px-3 py-2.5 text-left transition-all duration-200 touch-manipulation',
@@ -478,6 +461,23 @@ const QuizStepConfig = ({
               </div>
               <p className={cn('text-[10px] leading-snug', addonEnabled && formData.waterproofingTier === 'premium' ? 'text-gold/60' : 'text-gold/45')}>
                 até 10 anos, 5 lavagens
+              </p>
+            </button>
+            <button
+              onClick={() => toggleAddonTier('essencial')}
+              className={cn(
+                'rounded-sm border-2 px-3 py-2.5 text-left transition-all duration-200 touch-manipulation',
+                addonEnabled && formData.waterproofingTier === 'essencial'
+                  ? 'border-gold bg-gold/[0.08] shadow-[0_0_10px_rgba(212,175,55,0.18)]'
+                  : 'border-gold/20 bg-[#1a2a1a] hover:border-gold/40'
+              )}
+            >
+              <div className="flex items-center gap-1.5 mb-0.5">
+                {addonEnabled && formData.waterproofingTier === 'essencial' && <Check className="w-3 h-3 text-gold flex-shrink-0" />}
+                <p className={cn('text-xs font-bold', addonEnabled && formData.waterproofingTier === 'essencial' ? 'text-white' : 'text-white/60')}>Essencial</p>
+              </div>
+              <p className="text-[10px] text-white/35 leading-snug">
+                +{addonEssencialPrice !== null ? `${addonEssencialPrice % 1 === 0 ? addonEssencialPrice : addonEssencialPrice.toFixed(1).replace('.', ',')}€` : 'orç.'} · 1-2 anos
               </p>
             </button>
           </div>

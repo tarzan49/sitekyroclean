@@ -56,9 +56,9 @@ const priceTables: Record<string, { item: string; price: string; note?: string }
     { item: "Alcatifa +40m²", price: "Sob consulta" },
   ],
   "impermeabilizacao": [
-    { item: "Sofá 1 lugar", price: "Desde 59€", note: "Essencial, 79€ na Premium" },
-    { item: "Sofá 2 lugares", price: "Desde 79€", note: "Essencial, 99€ na Premium" },
-    { item: "Sofá 3 lugares", price: "Desde 99€", note: "Essencial, 129€ na Premium" },
+    { item: "Sofá 1 lugar", price: "Desde 59€", note: "Essencial, 89€ na Premium" },
+    { item: "Sofá 2 lugares", price: "Desde 79€", note: "Essencial, 109€ na Premium" },
+    { item: "Sofá 3 lugares", price: "Desde 99€", note: "Essencial, 139€ na Premium" },
     { item: "Cadeiras (por unidade)", price: "Desde 20€", note: "Essencial, 30€ na Premium" },
     { item: "Cabeceira", price: "Desde 15€" },
   ],
@@ -139,7 +139,7 @@ const priceFaqs: Record<string, { question: string; answer: string }[]> = {
     { question: "Quanto custa limpar alcatifas em {city}?", answer: "A limpeza de alcatifas em {city} começa a partir de 3€/m². O preço depende da área total e estado da alcatifa." },
   ],
   "impermeabilizacao": [
-    { question: "Quanto custa impermeabilizar um sofá em {city}?", answer: "Versão Essencial: desde 59€ (1 lugar), 79€ (2 lugares) e 99€ (3 lugares). Versão Premium, mais resistente e duradoura: desde 79€ (1 lugar), 99€ (2 lugares) e 129€ (3 lugares). Recomendamos combinar a Essencial com limpeza para preço especial." },
+    { question: "Quanto custa impermeabilizar um sofá em {city}?", answer: "Versão Essencial: desde 59€ (1 lugar), 79€ (2 lugares) e 99€ (3 lugares). Versão Premium, mais resistente e duradoura: desde 89€ (1 lugar), 109€ (2 lugares) e 139€ (3 lugares). Recomendamos combinar a Essencial com limpeza para preço especial." },
     { question: "Qual a diferença entre a Essencial e a Premium?", answer: "A Essencial, à base de água, aguenta até 2 lavagens e protege por 1 a 2 anos. A Premium, à base de diluente e mais resistente ao desgaste, aguenta até 5 lavagens e protege até 10 anos. Para famílias com crianças ou animais, a Premium costuma compensar mais." },
     { question: "A impermeabilização vale a pena?", answer: "Sim. A impermeabilização protege contra manchas de líquidos e prolonga a vida útil do estofamento. É especialmente recomendada para famílias com crianças ou animais, sobretudo na versão Premium." },
   ],

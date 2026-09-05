@@ -639,7 +639,7 @@ const problemDefinitions: ProblemPage[] = [
       "Facilita limpeza diária",
     ],
     faqs: [
-      { question: "Quanto custa impermeabilizar o sofá?", answer: "Versão Essencial: 59€ (1 lugar), 79€ (2 lugares) e 99€ (3 lugares). Versão Premium: 79€ (1 lugar), 99€ (2 lugares) e 129€ (3 lugares). O pack limpeza + impermeabilização Essencial começa em 99€ para 1 lugar." },
+      { question: "Quanto custa impermeabilizar o sofá?", answer: "Versão Essencial: 59€ (1 lugar), 79€ (2 lugares) e 99€ (3 lugares). Versão Premium: 89€ (1 lugar), 109€ (2 lugares) e 139€ (3 lugares). O pack limpeza + impermeabilização Essencial começa em 99€ para 1 lugar." },
       { question: "A impermeabilização altera o tecido?", answer: "Não. Em ambas as versões, o produto é completamente invisível e não altera a cor, textura, toque ou respirabilidade do tecido." },
       { question: "Quanto tempo dura a impermeabilização?", answer: "A Essencial, à base de água, dura 1 a 2 anos consoante o uso e aguenta até 2 lavagens. A Premium, à base de diluente e mais resistente ao desgaste, dura até 10 anos e aguenta até 5 lavagens." },
     ],

@@ -83,7 +83,7 @@ const Obrigado = () => {
               <Clock className="w-3.5 h-3.5" />
               {isOpenNow
                 ? "Especialista contacta em menos de 30 minutos"
-                : "Fora de horário, contactamos assim que reabrirmos (seg-sáb, 08:00-00:00)"}
+                : "Fora de horário, mas respondemos o mais rápido possível assim que reabrirmos (seg-sáb, 08:00-00:00)"}
             </div>
           </div>
 
@@ -184,19 +184,9 @@ const Obrigado = () => {
             )}
           </div>
 
-          {/* ── NOTICE ── */}
-          <div className="w-full flex items-start gap-3 bg-gold/[0.05] border border-gold/20 rounded-2xl px-4 py-3.5 mb-6">
-            <Check className="w-4 h-4 text-gold flex-shrink-0 mt-0.5" />
-            <p className="text-white/60 text-xs leading-relaxed">
-              Um especialista Kyro entrará em contacto para confirmar os detalhes finais e agendar a visita.
-            </p>
-          </div>
-
-          {/* ── CTA ── */}
-          <div className="w-full flex flex-col items-center gap-3">
-            <p className="text-[11px] text-white/35 text-center -mb-1">
-              A forma mais rápida de confirmar o seu agendamento
-            </p>
+          {/* ── CTA: zona de maior destaque logo a seguir ao total, é a ação
+              mais importante da página, não um aviso de texto solto ── */}
+          <div className="w-full flex flex-col items-center gap-3 mb-6">
             <a
               href={waUrl}
               target="_blank"
@@ -206,6 +196,12 @@ const Obrigado = () => {
               <MessageCircle className="w-5 h-5 flex-shrink-0" />
               Confirmar via WhatsApp →
             </a>
+            <div className="flex items-start gap-2 px-1">
+              <Check className="w-3.5 h-3.5 text-gold flex-shrink-0 mt-0.5" />
+              <p className="text-white/45 text-xs leading-relaxed text-left">
+                A forma mais rápida de confirmar. Um especialista Kyro trata dos detalhes finais e agenda a visita.
+              </p>
+            </div>
             <button
               onClick={() => navigate("/")}
               className="flex items-center justify-center gap-1.5 text-xs text-white/20 hover:text-white/45 py-2 transition-colors"

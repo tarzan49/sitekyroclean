@@ -104,8 +104,8 @@ const allFaqs: FAQ[] = [
   {
     id: "quanto-custa-impermeabilizacao",
     question: "Quanto custa impermeabilizar um sofá?",
-    answer: <>A <Link to="/impermeabilizacao" className="text-gold hover:underline font-medium">impermeabilização profissional</Link> para sofás existe em duas versões. A <strong>Essencial</strong> (à base de água) custa <strong>59€ (1 lugar), 79€ (2 lugares) e 99€ (3 lugares)</strong>, aguenta até 2 lavagens e dura 1 a 2 anos. A <strong>Premium</strong> (à base de diluente, mais resistente ao desgaste) custa <strong>79€ (1 lugar), 99€ (2 lugares) e 129€ (3 lugares)</strong>, aguenta até 5 lavagens e dura até 10 anos. Quando a Essencial é contratada em pack com a limpeza, o total é mais baixo do que os dois serviços separados. Para casas com crianças ou animais, a Premium costuma compensar mais.</>,
-    plainAnswer: "Impermeabilização sofá: Essencial 59€/79€/99€ (até 2 lavagens, 1 a 2 anos). Premium 79€/99€/129€ (até 5 lavagens, até 10 anos). Pack limpeza+Essencial tem desconto.",
+    answer: <>A <Link to="/impermeabilizacao" className="text-gold hover:underline font-medium">impermeabilização profissional</Link> para sofás existe em duas versões. A <strong>Essencial</strong> (à base de água) custa <strong>59€ (1 lugar), 79€ (2 lugares) e 99€ (3 lugares)</strong>, aguenta até 2 lavagens e dura 1 a 2 anos. A <strong>Premium</strong> (à base de diluente, mais resistente ao desgaste) custa <strong>89€ (1 lugar), 109€ (2 lugares) e 139€ (3 lugares)</strong>, aguenta até 5 lavagens e dura até 10 anos. Quando a Essencial é contratada em pack com a limpeza, o total é mais baixo do que os dois serviços separados. Para casas com crianças ou animais, a Premium costuma compensar mais.</>,
+    plainAnswer: "Impermeabilização sofá: Essencial 59€/79€/99€ (até 2 lavagens, 1 a 2 anos). Premium 89€/109€/139€ (até 5 lavagens, até 10 anos). Pack limpeza+Essencial tem desconto.",
   },
   {
     id: "diferenca-tapete-alcatifa",

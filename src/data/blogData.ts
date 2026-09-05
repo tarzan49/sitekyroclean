@@ -170,7 +170,7 @@ const posts: BlogPost[] = [
       },
       {
         heading: "Quanto custa impermeabilizar um sofá?",
-        body: "A versão Essencial custa 59€ (1 lugar), 79€ (2 lugares) e 99€ (3 lugares). A versão Premium, mais resistente e duradoura, custa 79€ (1 lugar), 99€ (2 lugares) e 129€ (3 lugares). Quando a Essencial é contratada em pack com a limpeza, o total é mais baixo do que os dois serviços separados.\n\nConsiderando que a Premium aguenta mais do dobro das lavagens da Essencial e evita reaplicações frequentes, o retorno do investimento é claro para quem tem uso mais intenso do sofá.",
+        body: "A versão Essencial custa 59€ (1 lugar), 79€ (2 lugares) e 99€ (3 lugares). A versão Premium, mais resistente e duradoura, custa 89€ (1 lugar), 109€ (2 lugares) e 139€ (3 lugares). Quando a Essencial é contratada em pack com a limpeza, o total é mais baixo do que os dois serviços separados.\n\nConsiderando que a Premium aguenta mais do dobro das lavagens da Essencial e evita reaplicações frequentes, o retorno do investimento é claro para quem tem uso mais intenso do sofá.",
       },
     ],
     faq: [
