@@ -871,6 +871,14 @@ const AdminDashboard = ({ embedded = false }: { embedded?: boolean }) => {
                       {isExpanded && (
                         <tr className={`border-b border-white/[0.04] ${rowBg}`}>
                           <td colSpan={7} className="px-4 py-4 bg-white/[0.015]">
+                            <div className="flex justify-end mb-2">
+                              <button
+                                onClick={() => setExpandedId(null)}
+                                className="flex items-center gap-1 h-7 px-2.5 text-[10.5px] font-bold text-white/40 hover:text-white/70 hover:bg-white/[0.06] rounded-lg transition-colors"
+                              >
+                                <X className="w-3.5 h-3.5" /> Fechar
+                              </button>
+                            </div>
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
 
                               {/* ── Contacto & Localização ────────────────────────── */}

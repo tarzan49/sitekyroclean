@@ -146,6 +146,13 @@ const LocationServicePage = () => {
     );
   }
 
+  // 'impermeabilizacao' nao tem entrada em SERVICE_TO_QUIZ (nao e um movel,
+  // e um tipo de servico que se aplica a varios) - quizService fica undefined
+  // nessas paginas. Bug real encontrado 2026-09-06: o CTA do hero abaixo usava
+  // skipToUpsell incondicional, o que saltava reto para o contacto com
+  // service='' e nunca deixava o cliente escolher sofa/colchao/cadeiras -
+  // formData.service ficava vazio no lead todo (preco, "Servico:" e
+  // "Detalhes:" em branco no Formspree, valor total so a deslocacao).
   const quizService = SERVICE_TO_QUIZ[data.serviceSlug];
 
   const heroImgs = pickServiceHero(data.serviceSlug, data.city);
@@ -284,7 +291,7 @@ const LocationServicePage = () => {
                     initialLocation={data.city}
                     initialService={quizService}
                     initialServiceType={data.serviceSlug === 'impermeabilizacao' ? 'waterproofing' : 'cleaning'}
-                    skipToUpsell
+                    skipToUpsell={!!quizService}
                     buttonClassName="h-[58px] md:h-[52px] !py-0 w-full"
                   />
                   <div className="relative group flex-1">
