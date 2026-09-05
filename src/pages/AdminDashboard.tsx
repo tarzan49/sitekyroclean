@@ -339,6 +339,8 @@ const AdminDashboard = ({ embedded = false }: { embedded?: boolean }) => {
     status: lead.status,
     priority: lead.priority ?? '',
     value: lead.value ?? '',
+    margin_value: lead.margin_value != null ? String(lead.margin_value) : '',
+    total_value: lead.total_value != null ? String(lead.total_value) : '',
   };
 
   const flashSaved = (leadId: string) => {
@@ -350,15 +352,19 @@ const AdminDashboard = ({ embedded = false }: { embedded?: boolean }) => {
     const edit = edits[leadId];
     if (!edit) return;
     setSaving(s => ({ ...s, [leadId]: true }));
+    const marginNum = edit.margin_value.trim() ? parseValue(edit.margin_value) : null;
+    const totalNum = edit.total_value.trim() ? parseValue(edit.total_value) : null;
     const { error: err } = await supabase.from('leads').update({
       status: edit.status,
       notes: edit.notes,
       next_step: edit.next_step,
       priority: edit.priority,
       value: edit.value,
+      margin_value: marginNum,
+      total_value: totalNum,
     }).eq('id', leadId);
     if (!err) {
-      setLeads(prev => prev.map(l => l.id === leadId ? { ...l, ...edit } : l));
+      setLeads(prev => prev.map(l => l.id === leadId ? { ...l, ...edit, margin_value: marginNum, total_value: totalNum } : l));
       flashSaved(leadId);
     }
     setSaving(s => ({ ...s, [leadId]: false }));
@@ -744,7 +750,9 @@ const AdminDashboard = ({ embedded = false }: { embedded?: boolean }) => {
                 )}
                 {(() => { let lastMonthKey = ''; return filtered.map((lead, i) => {
                   const edit = getEdit(lead);
-                  const isDirty = edit.notes !== (lead.notes ?? '') || edit.next_step !== (lead.next_step ?? '') || edit.value !== (lead.value ?? '');
+                  const isDirty = edit.notes !== (lead.notes ?? '') || edit.next_step !== (lead.next_step ?? '') || edit.value !== (lead.value ?? '')
+                    || edit.margin_value !== (lead.margin_value != null ? String(lead.margin_value) : '')
+                    || edit.total_value !== (lead.total_value != null ? String(lead.total_value) : '');
                   const isSaving = saving[lead.id];
                   const waPhone = (lead.phone ?? '').replace(/\D/g, '');
                   const waMsg = encodeURIComponent(buildWAMsg(lead));
@@ -867,6 +875,25 @@ const AdminDashboard = ({ embedded = false }: { embedded?: boolean }) => {
                                 {lead.booking_id && !lead.booking_id.startsWith('CSV-') && (
                                   <p className="text-gold/50 text-[10px] font-mono mt-1">#{lead.booking_id}</p>
                                 )}
+
+                                <label className="block text-[10px] font-bold text-white/35 uppercase tracking-wider mt-3 mb-1">Margem própria / Valor total</label>
+                                <div className="flex items-center gap-1.5">
+                                  <input
+                                    type="text"
+                                    value={getEdit(lead).margin_value}
+                                    onChange={e => setEdits(prev => ({ ...prev, [lead.id]: { ...getEdit(lead), margin_value: e.target.value } }))}
+                                    placeholder="margem"
+                                    className="w-full max-w-[90px] h-7 px-2 text-[11px] font-bold bg-gold/[0.08] border border-gold/20 rounded text-gold placeholder:text-gold/30 focus:outline-none focus:border-gold"
+                                  />
+                                  <span className="text-white/25 text-[10px]">/</span>
+                                  <input
+                                    type="text"
+                                    value={getEdit(lead).total_value}
+                                    onChange={e => setEdits(prev => ({ ...prev, [lead.id]: { ...getEdit(lead), total_value: e.target.value } }))}
+                                    placeholder="total (c/ parceiro)"
+                                    className="w-full max-w-[130px] h-7 px-2 text-[11px] font-bold bg-white/[0.05] border border-white/[0.12] rounded text-white placeholder:text-white/20 focus:outline-none focus:border-gold"
+                                  />
+                                </div>
 
                                 <label className="block text-[10px] font-bold text-white/35 uppercase tracking-wider mt-3 mb-1">Valor (legado, texto livre)</label>
                                 <input
