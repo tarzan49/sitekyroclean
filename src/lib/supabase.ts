@@ -36,4 +36,10 @@ export interface Lead {
   priority: string;
   source: string;
   next_step: string;
+  // Margin/total/region (2026-09-05): margin_value is what the owner actually
+  // kept; total_value is what the customer paid (partner/subcontractor jobs
+  // keep the difference). Null on older quiz-origin leads that predate this.
+  margin_value: number | null;
+  total_value: number | null;
+  region: string | null;
 }

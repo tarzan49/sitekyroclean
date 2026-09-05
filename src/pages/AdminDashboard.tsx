@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from 'react';
-import { MessageCircle, Download, RefreshCw, LogOut, TrendingUp, Users, Euro, Filter, Upload, Bell, Plus, Zap, X, Trash2, Check, Lock, AlertTriangle, CalendarDays, MapPin } from 'lucide-react';
+import { MessageCircle, Download, RefreshCw, LogOut, TrendingUp, Users, Filter, Bell, Plus, Zap, X, Trash2, Check, Lock, AlertTriangle, CalendarDays, MapPin, Globe } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { supabase, type Lead, type LeadStatus } from '@/lib/supabase';
 
@@ -32,6 +32,25 @@ const STATUS_MAP: Record<string, { label: string; color: string; dot: string }> 
 const DEFAULT_STATUS = { label: 'Desconhecido', color: 'bg-white/[0.05] text-white/40 border-white/10', dot: '●' };
 
 function getStatusCfg(s: string) { return STATUS_MAP[s] ?? DEFAULT_STATUS; }
+
+// ── Canonical status buckets (5, not 15) for the badge shown in the table —
+// the legacy dropdown below still lists every historical value so old CSV
+// leads keep an exact, editable status; this is only the display grouping.
+const CANONICAL_STATUS: Record<string, { label: string; cls: string }> = {
+  pendente:   { label: 'Novo',        cls: 'bg-yellow-500/15 text-yellow-300 border-yellow-500/30' },
+  contactado: { label: 'Contactado',  cls: 'bg-blue-500/15 text-blue-300 border-blue-500/30' },
+  agendado:   { label: 'Agendado',    cls: 'bg-green-500/15 text-green-300 border-green-500/30' },
+  recorrente: { label: 'Concluído',   cls: 'bg-gold/15 text-gold border-gold/30' },
+  perdido:    { label: 'Perdido',     cls: 'bg-red-500/15 text-red-300 border-red-500/30' },
+};
+function getCanonicalStatus(s: string): { label: string; cls: string } {
+  const grp = FILTER_STATUSES.find(g => g.matches.includes(s));
+  return grp ? CANONICAL_STATUS[grp.value] : DEFAULT_STATUS_CANONICAL;
+}
+const DEFAULT_STATUS_CANONICAL = { label: 'Desconhecido', cls: 'bg-white/[0.05] text-white/40 border-white/10' };
+
+const REGION_LABEL: Record<string, string> = { Porto: 'Porto', Lisboa: 'Lisboa', Algarve: 'Algarve', Braga: 'Braga' };
+const REGIONS = ['Porto', 'Lisboa', 'Algarve', 'Braga'] as const;
 
 // Legacy alias for dropdown (quiz CRM statuses that can be assigned)
 const STATUS_CONFIG = STATUS_MAP;
@@ -209,6 +228,17 @@ const AdminDashboard = ({ embedded = false }: { embedded?: boolean }) => {
   const [quickAddText, setQuickAddText] = useState('');
   const [quickAddSaving, setQuickAddSaving] = useState(false);
 
+  // Registar Serviço (WhatsApp job) state
+  const [jobOpen, setJobOpen] = useState(false);
+  const [jobSaving, setJobSaving] = useState(false);
+  const [jobRegion, setJobRegion] = useState<string>('Porto');
+  const [jobService, setJobService] = useState<string>('Sofá');
+  const [jobMargin, setJobMargin] = useState('');
+  const [jobTotal, setJobTotal] = useState('');
+  const [jobDone, setJobDone] = useState(true);
+  const [jobNotes, setJobNotes] = useState('');
+  const JOB_SERVICES = ['Sofá', 'Colchão', 'Tapete', 'Cadeiras', 'Alcatifa', 'Outro'];
+
   const fetchLeads = useCallback(async () => {
     setLoading(true); setError(null);
     const { data, error: err } = await supabase
@@ -335,6 +365,41 @@ const AdminDashboard = ({ embedded = false }: { embedded?: boolean }) => {
     setQuickAddSaving(false);
   };
 
+  const handleSaveJob = async () => {
+    const margin = parseValue(jobMargin);
+    if (margin <= 0) return;
+    const total = jobTotal.trim() ? parseValue(jobTotal) : margin;
+    setJobSaving(true);
+    const { error: err } = await supabase.from('leads').insert({
+      name: 'Sem nome',
+      phone: '',
+      email: null,
+      location: jobRegion,
+      region: jobRegion,
+      status: jobDone ? 'Fechado' : 'scheduled',
+      priority: 'Frio',
+      source: 'WhatsApp',
+      assigned_to: '',
+      notes: jobNotes,
+      service: jobService,
+      service_type: '',
+      details: '',
+      value: `${margin}€`,
+      margin_value: margin,
+      total_value: total,
+      slot: '',
+      booking_id: `WA-${Math.random().toString(36).substr(2, 6).toUpperCase()}`,
+      message: '',
+      next_step: '',
+    });
+    if (!err) {
+      setJobOpen(false);
+      setJobMargin(''); setJobTotal(''); setJobNotes(''); setJobDone(true);
+      fetchLeads();
+    }
+    setJobSaving(false);
+  };
+
   // Computed stats
   const now = new Date();
   const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
@@ -352,6 +417,38 @@ const AdminDashboard = ({ embedded = false }: { embedded?: boolean }) => {
   const cities = [...new Set(leads.map(l => l.location).filter(Boolean))].sort();
   const persons = [...new Set(leads.map(l => l.assigned_to).filter(Boolean))].sort();
   const priorities = ['Urgente', 'Quente', 'Morno', 'Frio', 'Fechado'];
+
+  // ── Money metrics (2026-09-05): margin_value/total_value when set (WhatsApp
+  // jobs + any lead edited since), falling back to the legacy text `value`
+  // field for older quiz leads where both are treated as the same number
+  // (no partner split tracked for those).
+  const moneyOf = (l: Lead) => {
+    const margin = l.margin_value ?? parseValue(edits[l.id]?.value ?? l.value);
+    const total = l.total_value ?? margin;
+    return { margin, total };
+  };
+  const isDone = (l: Lead) => l.status === 'Fechado' || l.status === 'scheduled';
+  const doneThisMonth = thisMonth.filter(isDone);
+  const monthMoney = doneThisMonth.reduce((acc, l) => {
+    const m = moneyOf(l);
+    return { margin: acc.margin + m.margin, total: acc.total + m.total };
+  }, { margin: 0, total: 0 });
+  const discountPct = monthMoney.total > 0 ? Math.round((1 - monthMoney.margin / monthMoney.total) * 100) : 0;
+
+  const originCounts: Record<string, number> = { Website: 0, WhatsApp: 0 };
+  leads.forEach(l => {
+    const src = l.source === 'WhatsApp' ? 'WhatsApp' : 'Website';
+    originCounts[src] = (originCounts[src] ?? 0) + 1;
+  });
+  const originTotal = Math.max(1, originCounts.Website + originCounts.WhatsApp);
+
+  const regionMoney: Record<string, number> = {};
+  leads.filter(isDone).forEach(l => {
+    const region = l.region || (REGIONS.find(r => (l.location ?? '').includes(r)) ?? null);
+    if (!region) return;
+    regionMoney[region] = (regionMoney[region] ?? 0) + moneyOf(l).margin;
+  });
+  const maxRegionMoney = Math.max(1, ...Object.values(regionMoney));
 
   // suppress unused variable warnings — these are kept for compatibility
   void STATUS_CONFIG;
@@ -424,8 +521,8 @@ const AdminDashboard = ({ embedded = false }: { embedded?: boolean }) => {
             <button onClick={() => navigate('/admin/panel')} className="hidden sm:flex items-center gap-2 h-9 px-4 text-xs font-bold text-white/50 border border-white/10 rounded-xl hover:bg-white/[0.06] transition-colors">
               <Zap className="w-3.5 h-3.5" /> Painel
             </button>
-            <button onClick={() => navigate('/admin/import')} className="flex items-center gap-2 h-9 px-4 text-xs font-bold text-gold/70 border border-gold/20 rounded-xl hover:bg-gold/[0.06] transition-colors">
-              <Upload className="w-3.5 h-3.5" /> Importar BD Histórica
+            <button onClick={() => setJobOpen(true)} className="flex items-center gap-2 h-9 px-4 text-xs font-bold text-[#12121e] bg-gradient-to-r from-gold to-[#d4c57b] rounded-xl hover:opacity-90 transition-opacity">
+              <Plus className="w-3.5 h-3.5" /> Registar Serviço
             </button>
             <button onClick={() => setQuickAddOpen(true)} className="flex items-center gap-2 h-9 px-4 text-xs font-bold text-white border border-white/20 rounded-xl hover:bg-white/[0.08] transition-colors">
               <Plus className="w-3.5 h-3.5" /> Novo Lead
@@ -446,6 +543,9 @@ const AdminDashboard = ({ embedded = false }: { embedded?: boolean }) => {
       {/* Embedded action bar */}
       {embedded && (
         <div className="flex items-center gap-2 flex-wrap mb-4">
+          <button onClick={() => setJobOpen(true)} className="flex items-center gap-2 h-9 px-4 text-xs font-bold text-[#12121e] bg-gradient-to-r from-gold to-[#d4c57b] rounded-xl hover:opacity-90 transition-opacity">
+            <Plus className="w-3.5 h-3.5" /> Registar Serviço
+          </button>
           <button onClick={() => setQuickAddOpen(true)} className="flex items-center gap-2 h-9 px-4 text-xs font-bold text-white border border-white/20 rounded-xl hover:bg-white/[0.08] transition-colors bg-white/[0.04]">
             <Plus className="w-3.5 h-3.5" /> Novo Lead
           </button>
@@ -460,12 +560,45 @@ const AdminDashboard = ({ embedded = false }: { embedded?: boolean }) => {
 
       <div className={`py-6 space-y-6 max-w-[1400px] ${embedded ? "" : "px-6 mx-auto"}`}>
 
-        {/* Stats */}
+        {/* Money-first stats */}
         <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
+          <div className="bg-gradient-to-br from-gold/[0.10] to-gold/[0.02] border border-gold/25 rounded-2xl p-5">
+            <p className="text-[11px] font-bold text-white/40 uppercase tracking-wider mb-2">Margem própria este mês</p>
+            <p className="text-3xl font-playfair font-bold text-gold leading-none">{monthMoney.margin.toFixed(0)}€</p>
+            <p className="text-[11.5px] text-white/35 mt-1.5">de <b className="text-white/60">{monthMoney.total.toFixed(0)}€</b> faturado {discountPct > 0 && `· ${discountPct}% p/ parceiros`}</p>
+          </div>
           <StatCard icon={Users}      label="Leads este mês"    value={thisMonth.length} sub={`${leads.length} total histórico`}           color="bg-blue-500/15 text-blue-300" />
-          <StatCard icon={Euro}       label="Valor em potencial" value={`${potentialValue.toFixed(0)}€`} sub={`${pending.length} em progresso`} color="bg-gold/15 text-gold" />
-          <StatCard icon={TrendingUp} label="Taxa de conversão"  value={`${conversionRate}%`} sub={`${closed.length} fechados`} color="bg-green-500/15 text-green-300" />
+          <StatCard icon={TrendingUp} label="Taxa de conversão"  value={`${conversionRate}%`} sub={`${closed.length} concluídos`} color="bg-green-500/15 text-green-300" />
           <StatCard icon={Bell}       label="Follow-ups urgentes" value={staleLeads.length} sub={`Sem resposta há +${STALE_DAYS} dias`}     color="bg-amber-500/15 text-amber-300" />
+        </div>
+
+        {/* Origin + region breakdown */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="bg-white/[0.03] border border-white/[0.07] rounded-2xl p-5">
+            <p className="text-xs font-bold text-white/60 mb-3.5 flex items-center gap-2"><Globe className="w-3.5 h-3.5 text-white/40" /> Origem dos leads</p>
+            {(['Website', 'WhatsApp'] as const).map(src => (
+              <div key={src} className="flex items-center gap-2.5 mb-2.5 last:mb-0">
+                <span className="text-xs text-white/55 w-20 flex-shrink-0">{src}</span>
+                <div className="flex-1 h-2 rounded-full bg-white/[0.06] overflow-hidden">
+                  <div className="h-full rounded-full" style={{ width: `${(originCounts[src] / originTotal) * 100}%`, background: src === 'WhatsApp' ? '#5fd68a' : '#5b9bf0' }} />
+                </div>
+                <span className="text-xs font-bold text-white/75 w-8 text-right flex-shrink-0">{originCounts[src]}</span>
+              </div>
+            ))}
+          </div>
+          <div className="bg-white/[0.03] border border-white/[0.07] rounded-2xl p-5">
+            <p className="text-xs font-bold text-white/60 mb-3.5 flex items-center gap-2"><MapPin className="w-3.5 h-3.5 text-white/40" /> Margem por região (concluídos)</p>
+            {REGIONS.filter(r => regionMoney[r]).length === 0 && <p className="text-xs text-white/30">Sem dados de região ainda.</p>}
+            {REGIONS.filter(r => regionMoney[r]).map(r => (
+              <div key={r} className="flex items-center gap-2.5 mb-2.5 last:mb-0">
+                <span className="text-xs text-white/55 w-16 flex-shrink-0">{REGION_LABEL[r]}</span>
+                <div className="flex-1 h-2 rounded-full bg-white/[0.06] overflow-hidden">
+                  <div className="h-full rounded-full bg-gradient-to-r from-gold to-[#d4c57b]" style={{ width: `${(regionMoney[r] / maxRegionMoney) * 100}%` }} />
+                </div>
+                <span className="text-xs font-bold text-gold w-16 text-right flex-shrink-0">{regionMoney[r].toFixed(0)}€</span>
+              </div>
+            ))}
+          </div>
         </div>
 
         {/* Follow-up alert banner */}
@@ -533,17 +666,17 @@ const AdminDashboard = ({ embedded = false }: { embedded?: boolean }) => {
             <table className="w-full text-xs">
               <thead>
                 <tr className="border-b border-white/[0.06] bg-white/[0.03]">
-                  {['Data', 'Resp.', 'Cliente', 'Serviço & Item', 'Localização', 'Prioridade', 'Status', 'Origem', 'Próx. passo / Notas', ''].map(h => (
+                  {['Data', 'Resp.', 'Cliente', 'Serviço & Item', 'Localização', 'Região', 'Prioridade', 'Status', 'Origem', 'Próx. passo / Notas', ''].map(h => (
                     <th key={h} className="text-left px-3 py-1.5 text-[11px] font-bold text-white/40 uppercase tracking-wider whitespace-nowrap">{h}</th>
                   ))}
                 </tr>
               </thead>
               <tbody>
                 {loading && (
-                  <tr><td colSpan={10} className="text-center py-12 text-white/30">A carregar leads...</td></tr>
+                  <tr><td colSpan={11} className="text-center py-12 text-white/30">A carregar leads...</td></tr>
                 )}
                 {!loading && filtered.length === 0 && (
-                  <tr><td colSpan={10} className="text-center py-12 text-white/30">
+                  <tr><td colSpan={11} className="text-center py-12 text-white/30">
                     {leads.length === 0
                       ? 'Ainda não há leads. Cria a tabela no Supabase e aguarda o primeiro pedido!'
                       : 'Nenhum lead corresponde aos filtros seleccionados.'}
@@ -625,6 +758,13 @@ const AdminDashboard = ({ embedded = false }: { embedded?: boolean }) => {
                           placeholder="ex: 89€"
                           className="mt-0.5 w-full max-w-[70px] h-6 px-1.5 text-[11px] font-bold bg-gold/[0.08] border border-gold/20 rounded text-gold placeholder:text-gold/30 focus:outline-none focus:border-gold"
                         />
+                        {lead.total_value != null && lead.margin_value != null && lead.total_value !== lead.margin_value && (
+                          <p className="text-[9.5px] text-white/25 mt-0.5">total {lead.total_value}€</p>
+                        )}
+                      </td>
+                      {/* Região */}
+                      <td className="px-3 py-1.5 whitespace-nowrap">
+                        <span className="text-white/45 text-[10.5px]">{lead.region || '-'}</span>
                       </td>
                       {/* Priority — auto-save on change */}
                       <td className="px-3 py-1.5 whitespace-nowrap">
@@ -638,12 +778,15 @@ const AdminDashboard = ({ embedded = false }: { embedded?: boolean }) => {
                           {FILTER_PRIORITIES.map(p => <option key={p.value} value={p.value} className="bg-[#1a1a2e] text-white">{p.label}</option>)}
                         </select>
                       </td>
-                      {/* Status — auto-save on change */}
+                      {/* Status — canonical badge (5 colors) + full legacy dropdown to edit */}
                       <td className="px-3 py-1.5">
+                        <span className={`inline-block mb-1 px-2 py-0.5 rounded-full text-[9.5px] font-bold border ${getCanonicalStatus(edit.status).cls}`}>
+                          {getCanonicalStatus(edit.status).label}
+                        </span>
                         <select
                           value={edit.status}
                           onChange={e => autoSaveField(lead.id, 'status', e.target.value)}
-                          className="text-[10px] font-bold px-2 py-1 rounded-lg border border-white/20 cursor-pointer focus:outline-none focus:ring-1 focus:ring-gold bg-[#1a1a2e] text-white max-w-[160px]"
+                          className="block text-[10px] font-bold px-2 py-1 rounded-lg border border-white/20 cursor-pointer focus:outline-none focus:ring-1 focus:ring-gold bg-[#1a1a2e] text-white max-w-[160px]"
                           style={{ colorScheme: 'dark' }}
                         >
                           {Object.keys(STATUS_MAP).map(s => (
@@ -655,7 +798,9 @@ const AdminDashboard = ({ embedded = false }: { embedded?: boolean }) => {
                       </td>
                       {/* Source */}
                       <td className="px-3 py-1.5 whitespace-nowrap">
-                        <span className="text-white/40 text-[10px]">{lead.source || '-'}</span>
+                        <span className={`px-2 py-0.5 rounded-full text-[9.5px] font-bold ${lead.source === 'WhatsApp' ? 'bg-[#25D366]/15 text-[#5fd68a]' : 'bg-blue-500/15 text-blue-300'}`}>
+                          {lead.source === 'WhatsApp' ? 'WhatsApp' : (lead.source || 'Website')}
+                        </span>
                       </td>
                       {/* Next step + Notes */}
                       <td className="px-3 py-1.5 min-w-[200px]">
@@ -758,6 +903,90 @@ const AdminDashboard = ({ embedded = false }: { embedded?: boolean }) => {
         </div>
 
       </div>
+
+      {/* Registar Serviço Modal (WhatsApp / telefone / cliente habitual) */}
+      {jobOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm px-4">
+          <div className="bg-[#14141f] border border-white/[0.10] rounded-2xl p-6 w-full max-w-md shadow-2xl">
+            <div className="flex items-center justify-between mb-1">
+              <h3 className="font-playfair font-bold text-white text-lg">Registar Serviço</h3>
+              <button onClick={() => setJobOpen(false)} className="p-1 text-white/30 hover:text-white/60 transition-colors">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <p className="text-white/40 text-[11px] mb-4">Para pedidos que vieram por WhatsApp, telefone ou cliente habitual (fora do quiz do site).</p>
+
+            <p className="text-[10.5px] font-bold text-white/40 uppercase tracking-wider mb-1.5">Região</p>
+            <div className="flex gap-2 flex-wrap mb-4">
+              {REGIONS.map(r => (
+                <button
+                  key={r}
+                  onClick={() => setJobRegion(r)}
+                  className={`h-8 px-3.5 rounded-lg text-xs font-bold border-2 transition-colors ${jobRegion === r ? 'border-gold text-gold bg-gold/10' : 'border-white/12 text-white/60 bg-white/[0.03]'}`}
+                >
+                  {r}
+                </button>
+              ))}
+            </div>
+
+            <p className="text-[10.5px] font-bold text-white/40 uppercase tracking-wider mb-1.5">Serviço</p>
+            <div className="flex gap-2 flex-wrap mb-4">
+              {JOB_SERVICES.map(s => (
+                <button
+                  key={s}
+                  onClick={() => setJobService(s)}
+                  className={`h-8 px-3.5 rounded-lg text-xs font-bold border-2 transition-colors ${jobService === s ? 'border-gold text-gold bg-gold/10' : 'border-white/12 text-white/60 bg-white/[0.03]'}`}
+                >
+                  {s}
+                </button>
+              ))}
+            </div>
+
+            <div className="grid grid-cols-2 gap-3 mb-4">
+              <div>
+                <p className="text-[10.5px] font-bold text-white/40 uppercase tracking-wider mb-1.5">Margem própria</p>
+                <input
+                  type="text" value={jobMargin} onChange={e => setJobMargin(e.target.value)} placeholder="ex: 55€"
+                  className="w-full h-10 px-3 text-sm bg-white/[0.05] border border-white/[0.12] rounded-lg text-white placeholder:text-white/20 focus:outline-none focus:border-gold"
+                />
+              </div>
+              <div>
+                <p className="text-[10.5px] font-bold text-white/40 uppercase tracking-wider mb-1.5">Valor total (opcional)</p>
+                <input
+                  type="text" value={jobTotal} onChange={e => setJobTotal(e.target.value)} placeholder="se houve parceiro"
+                  className="w-full h-10 px-3 text-sm bg-white/[0.05] border border-white/[0.12] rounded-lg text-white placeholder:text-white/20 focus:outline-none focus:border-gold"
+                />
+              </div>
+            </div>
+
+            <label className="flex items-center gap-2 mb-4 cursor-pointer select-none">
+              <input type="checkbox" checked={jobDone} onChange={e => setJobDone(e.target.checked)} className="w-4 h-4 accent-gold" />
+              <span className="text-xs text-white/60">Já concluído (desmarcar se ainda está agendado)</span>
+            </label>
+
+            <textarea
+              value={jobNotes}
+              onChange={e => setJobNotes(e.target.value)}
+              placeholder="Notas (opcional)..."
+              rows={2}
+              className="w-full bg-white/[0.05] border border-white/[0.12] rounded-xl px-3 py-2.5 text-sm text-white placeholder:text-white/25 focus:outline-none focus:border-gold resize-none mb-4"
+            />
+
+            <div className="flex gap-3">
+              <button onClick={() => setJobOpen(false)} className="flex-1 h-10 text-sm text-white/50 border border-white/[0.10] rounded-xl hover:bg-white/[0.05] transition-colors">
+                Cancelar
+              </button>
+              <button
+                onClick={handleSaveJob}
+                disabled={jobSaving || parseValue(jobMargin) <= 0}
+                className="flex-1 h-10 text-sm font-bold bg-gradient-to-r from-gold to-[#d4c57b] text-[#12121e] rounded-xl hover:opacity-90 transition-opacity disabled:opacity-50"
+              >
+                {jobSaving ? 'A guardar...' : 'Guardar Serviço'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Quick Add Lead Modal */}
       {quickAddOpen && (
