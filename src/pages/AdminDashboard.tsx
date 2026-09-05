@@ -802,13 +802,15 @@ const AdminDashboard = ({ embedded = false }: { embedded?: boolean }) => {
                             {lead.source === 'WhatsApp' ? 'WhatsApp' : (lead.source || 'Website')}
                           </span>
                         </td>
-                        {/* Value */}
+                        {/* Value — nunca riscar o total: nao e desconto, e a
+                            margem propria (esquerda) vs o corte do parceiro
+                            (direita), dois valores reais, nao um "antes/depois". */}
                         <td className="px-3 py-2 whitespace-nowrap">
-                          <span className="font-bold text-white text-xs">
+                          <span className="font-bold text-gold text-xs">
                             {typeof displayMargin === 'number' ? `${displayMargin}€` : displayMargin}
                           </span>
                           {displayTotal != null && (
-                            <span className="text-[10px] text-white/30 line-through ml-1.5">{displayTotal}€</span>
+                            <span className="text-[10px] text-white/35 ml-1.5">· parceiro {(displayTotal - (displayMargin as number)).toFixed(2).replace(/\.00$/, '')}€</span>
                           )}
                         </td>
                         {/* Status — canonical badge only, edit inside the expanded row */}
