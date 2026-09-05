@@ -570,8 +570,24 @@ const QuizForm = ({
       ? `${serviceLabel}, ${upsellItems.map(i => upsellItemLabels[i.id] ?? i.id).join(', ')}`
       : serviceLabel;
     const packPctLabel = packDiscountPct > 0 ? `Pack -${Math.round(packDiscountPct * 100)}%` : '';
+    // Quando o serviço principal ou algum upsell não tem preço fechado
+    // (sofá 4+ lugares, tapete >15m², etc.), o valor deixava de mostrar a
+    // deslocação e os itens com preço real que também fazem parte do
+    // mesmo pedido — decompor em vez de colapsar tudo para "Sob orçamento"
+    // (pedido do dono: ex. colchão com preço fechado + sofá sob orçamento
+    // deve aparecer como "10€ deslocação + 69€ Colchão + Sob orçamento").
+    const buildMixedPriceBreakdown = () => {
+      const parts: string[] = [];
+      if (finalTravelCost > 0) parts.push(`${finalTravelCost}€ deslocação`);
+      if (!hasSobOrcamento && calculateServicePrice > 0) parts.push(`${calculateServicePrice}€ ${serviceLabel}`);
+      upsellItems.forEach(item => {
+        if (item.price > 0) parts.push(`${item.price}€ ${upsellItemLabels[item.id] ?? item.label ?? item.id}`);
+      });
+      parts.push('Sob orçamento');
+      return parts.join(' + ');
+    };
     const priceText = (hasSobOrcamento || hasUpsellSobItem)
-      ? 'Sob orçamento'
+      ? buildMixedPriceBreakdown()
       : packDiscountActive && totalPrice > 0
         ? `${packDiscountedPrice}€ (${packPctLabel})`
         : totalPrice > 0 ? `${totalPrice}€` : 'Sob orçamento';

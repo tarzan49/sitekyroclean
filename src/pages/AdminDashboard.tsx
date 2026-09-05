@@ -2,6 +2,23 @@ import { useEffect, useState, useCallback, Fragment } from 'react';
 import { MessageCircle, Download, RefreshCw, LogOut, TrendingUp, Users, Filter, Bell, Plus, Zap, X, Trash2, Check, Lock, AlertTriangle, CalendarDays, MapPin, Globe } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { supabase, type Lead, type LeadStatus } from '@/lib/supabase';
+import { cities as ALL_CITIES } from '@/data/locationSeoData';
+
+// Deriva a região macro (Porto/Lisboa/Algarve/Braga) a partir do texto livre
+// de `location` dos leads do quiz — pedido do dono para não ter de preencher
+// isto à mão como faz nos serviços do WhatsApp. Braga sai do bucket "porto"
+// da tabela de cidades (que a trata como área operacional do Porto) porque o
+// dono usa Braga como região própria na sua notação P/L/A/B.
+function guessRegionFromLocation(location: string | null): string {
+  if (!location) return '-';
+  const text = location.toLowerCase();
+  if (text.includes('braga')) return 'Braga';
+  const match = ALL_CITIES.find(c => text.includes(c.name.toLowerCase()));
+  if (!match) return '-';
+  if (match.area === 'lisboa') return 'Lisboa';
+  if (match.area === 'algarve') return 'Algarve';
+  return 'Porto';
+}
 
 // ── Password gate ─────────────────────────────────────────────────────────────
 const ADMIN_PASSWORD = (import.meta.env.VITE_ADMIN_PASSWORD as string) || 'kyro2025';
@@ -68,6 +85,22 @@ const FILTER_STATUSES = [
   { value: 'recorrente', label: 'Recorrente',
     matches: ['Cliente recorrente', 'Fechado'] },
 ];
+
+// Dropdown de mudar estado dentro da linha expandida — reduzido a 4 passos
+// (pedido do dono: a lista completa de 19 estados legados do funil CSV era
+// "demasiada coisa"). "Contactado" fica de fora de propósito: nesta operação
+// o contacto acontece quase sempre no mesmo dia via WhatsApp, não é uma fase
+// separada que valha a pena gerir manualmente — o que importa é se já está
+// agendado, se aconteceu, ou se caiu.
+const CRUCIAL_STATUSES = [
+  { value: 'pendente',   label: 'Novo' },
+  { value: 'agendado',   label: 'Agendado' },
+  { value: 'recorrente', label: 'Concluído' },
+  { value: 'perdido',    label: 'Perdido' },
+];
+const CRUCIAL_STATUS_RAW: Record<string, string> = {
+  pendente: 'pending', agendado: 'scheduled', recorrente: 'Fechado', perdido: 'lost',
+};
 
 const FILTER_PRIORITIES = [
   { value: 'Frio',    label: 'Frio' },
@@ -794,7 +827,7 @@ const AdminDashboard = ({ embedded = false }: { embedded?: boolean }) => {
                         </td>
                         {/* Região */}
                         <td className="px-3 py-2 whitespace-nowrap">
-                          <span className="text-white/55 text-[11px]">{lead.region || '-'}</span>
+                          <span className="text-white/55 text-[11px]">{lead.region || guessRegionFromLocation(lead.location)}</span>
                         </td>
                         {/* Source */}
                         <td className="px-3 py-2 whitespace-nowrap">
@@ -846,30 +879,21 @@ const AdminDashboard = ({ embedded = false }: { embedded?: boolean }) => {
                               </div>
 
                               <div>
-                                <label className="block text-[10px] font-bold text-white/35 uppercase tracking-wider mb-1">Responsável / Prioridade</label>
-                                <div className="flex items-center gap-2 mb-2">
-                                  <span className="text-white/60 text-xs font-medium">{lead.assigned_to || '-'}</span>
-                                  <select
-                                    value={getEdit(lead).priority}
-                                    onChange={e => autoSaveField(lead.id, 'priority', e.target.value)}
-                                    className="text-[10px] font-bold px-1.5 py-0.5 rounded-lg border cursor-pointer focus:outline-none bg-[#1a1a2e] text-white border-white/20"
-                                    style={{ colorScheme: 'dark' }}
-                                  >
-                                    <option value="" className="bg-[#1a1a2e] text-white">-</option>
-                                    {FILTER_PRIORITIES.map(p => <option key={p.value} value={p.value} className="bg-[#1a1a2e] text-white">{p.label}</option>)}
-                                  </select>
-                                </div>
+                                <label className="block text-[10px] font-bold text-white/35 uppercase tracking-wider mb-1">Região</label>
+                                <span className="inline-block text-xs font-medium text-white/70 mb-3">
+                                  {lead.region || guessRegionFromLocation(lead.location)}
+                                </span>
 
-                                <label className="block text-[10px] font-bold text-white/35 uppercase tracking-wider mb-1">Estado detalhado</label>
+                                <label className="block text-[10px] font-bold text-white/35 uppercase tracking-wider mb-1">Estado</label>
                                 <select
-                                  value={edit.status}
-                                  onChange={e => autoSaveField(lead.id, 'status', e.target.value)}
-                                  className="block text-[10px] font-bold px-2 py-1 rounded-lg border border-white/20 cursor-pointer focus:outline-none focus:ring-1 focus:ring-gold bg-[#1a1a2e] text-white max-w-[200px]"
+                                  value={FILTER_STATUSES.find(g => g.matches.includes(edit.status))?.value ?? 'pendente'}
+                                  onChange={e => autoSaveField(lead.id, 'status', CRUCIAL_STATUS_RAW[e.target.value] ?? 'pending')}
+                                  className="block text-[11px] font-bold px-2 py-1.5 rounded-lg border border-white/20 cursor-pointer focus:outline-none focus:ring-1 focus:ring-gold bg-[#1a1a2e] text-white max-w-[200px]"
                                   style={{ colorScheme: 'dark' }}
                                 >
-                                  {Object.keys(STATUS_MAP).map(s => (
-                                    <option key={s} value={s} className="bg-[#1a1a2e] text-white">
-                                      {STATUS_MAP[s].dot} {STATUS_MAP[s].label}
+                                  {CRUCIAL_STATUSES.map(s => (
+                                    <option key={s.value} value={s.value} className="bg-[#1a1a2e] text-white">
+                                      {s.label}
                                     </option>
                                   ))}
                                 </select>
