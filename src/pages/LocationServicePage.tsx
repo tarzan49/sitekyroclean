@@ -909,6 +909,19 @@ const LocationServicePage = () => {
           </section>
         )}
 
+        {/* ═══ TESTEMUNHOS ═══ */}
+        <section className="py-14 md:py-20 bg-[#FDFDF9]">
+          <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
+            <SectionHeader overline="Avaliações Reais" heading="O que dizem os nossos" goldWord="clientes" light={true} />
+            <ServiceReviewsGrid serviceSlug={data.serviceSlug} seed={data.city} heading="" />
+          </div>
+        </section>
+
+        {/* ═══ FAQ ═══ */}
+        {data.faqs && data.faqs.length > 0 && (
+          <ServiceFAQ faqs={data.faqs} heading={`Perguntas sobre ${data.service.toLowerCase()} ${cityPrep} ${data.city}`} variant="dark" />
+        )}
+
         {/* ═══ COMO FUNCIONA ═══ */}
         <section className="py-14 md:py-20 bg-[#FDFDF9]">
           <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
@@ -944,19 +957,6 @@ const LocationServicePage = () => {
                 );
               })}
             </div>
-          </div>
-        </section>
-
-        {/* ═══ FAQ ═══ */}
-        {data.faqs && data.faqs.length > 0 && (
-          <ServiceFAQ faqs={data.faqs} heading={`Perguntas sobre ${data.service.toLowerCase()} ${cityPrep} ${data.city}`} variant="dark" />
-        )}
-
-        {/* ═══ TESTEMUNHOS ═══ */}
-        <section className="py-14 md:py-20 bg-[#FDFDF9]">
-          <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
-            <SectionHeader overline="Avaliações Reais" heading="O que dizem os nossos" goldWord="clientes" light={true} />
-            <ServiceReviewsGrid serviceSlug={data.serviceSlug} seed={data.city} heading="" />
           </div>
         </section>
 
