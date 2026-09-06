@@ -40,13 +40,33 @@ Fixed 06 Sep. `curl https://cleansolutions.com.pt/` returned an 11KB shell: titl
 **Time:** done
 **Changes:** `scripts/prerender.ts` only (~15 lines added at the end of `prerenderRoutes()`). No body copy touched — reused your own real hero headline and homepage meta description, wrote nothing new.
 
-### [ ] 4. Export your Search Console reports · 2 min, unlocks the real numbers
+### [x] 4. Search Console exports · supplied 06 Sep, here's what they show
 
-Performance, Pages (Indexing), Core Web Vitals, Manual actions — see `references/on-page-seo.md` and the skill's own Layer 1 for exact click paths. Until these land, indexed count, real ranking positions, and field performance (vs. lab-only Lighthouse) are all inferred rather than measured.
+**Manual actions:** clean — "Nenhum problema detetado."
 
-**Who:** you, in Search Console
-**Time:** ~2 min
-**Changes:** none to the site
+**Indexing (as of 28 Aug, latest data point):** **8,115 indexed, 9,415 not indexed** — total known URLs ~17,530, above the ~15,000 sitemap count (Google discovered some extra ones, normal). Trending up: both indexed and not-indexed jumped together around 22 Aug, consistent with the programmatic page set landing in the sitemap around then. The "not indexed" reasons add up to exactly 9,415:
+
+| Reason | Pages | Status |
+|---|---:|---|
+| Discovered, not indexed | 5,127 | **Real, open.** Google knows these URLs exist but hasn't prioritized crawling them — by far the biggest bucket, and the expected symptom of a very large templated page set (ties directly to the doorway-page question in finding-to-come #6). |
+| Alternate page with proper canonical | 1,369 | Normal — correctly-canonicalized duplicates, not a problem by itself. |
+| Blocked by robots.txt | 1,167 | **Already fixed, draining out.** This is stale classification from the old `Disallow: /*?lang=*` rule, removed 10 Aug (commit `e3715a6`) — that commit's own message predicted almost this exact number ("~1170 URLs ... stuck permanently"). No action needed, just waiting on Google's re-crawl. |
+| Crawled, not indexed | 751 | **Real, open.** Google looked and passed — a quality/uniqueness signal, same underlying question as the 5,127 above. |
+| Excluded by noindex | 728 | **Already fixed, draining out.** Stale residue from a noindex tag applied to variant pages then removed on 5 Jun (commit `101c3ab`, "remove noindex from 1570 keyword variant pages"). Confirmed no active noindex logic anywhere in the current codebase except the intentional one on the 404 page. |
+| Blocked, 403 | 66 | Minor, worth a look if it's not intentional. |
+| Server error (5xx) | 42 | Minor. |
+| Redirect error | 31 | Minor. |
+| Redirect page | 7 | Minor. |
+| Blocked, other 4xx | 3 | Minor. |
+| Duplicate, Google picked a different canonical | 2 | Negligible. |
+
+**Core Web Vitals (mobile only supplied):** 54 URLs flagged for INP over 200ms, 0 for LCP. No major red flags, but this is mobile-only — the desktop export wasn't included, worth grabbing if you want the full picture (Experience → Core Web Vitals → Desktop tab → Export).
+
+**Performance (impressions only, last 3 months):** 1,562 total impressions, 99% Portugal, mobile-dominant (1,195 vs 358 desktop). Top pages are a mix of blog posts (`quanto-custa-limpar-sofa-profissional` leads at 217) and city-specific service pages — the blog is pulling real weight. Note: only "Impressions" was ticked on export, not clicks or average position — re-export with those two ticked if you want CTR and ranking-position data (same Performance report, same Export button).
+
+**Who:** done — you supplied these
+**Time:** done
+**Changes:** none, this is measurement only
 
 ### [ ] 5. Google Business Profile pastes, if you want Layer 11 (Local) graded
 
@@ -61,7 +81,8 @@ Categories, services, service area from your GBP dashboard (About → Edit, Serv
 ## What this audit did NOT measure
 
 - **Semrush (Layers 2, 3, 4, 12 backlinks/keywords):** not connected. No free way to see referring domains, keyword rankings, or competitor traffic without it.
-- **Search Console (Layer 1):** not supplied. Indexed count and rankings above are inferred from the sitemap and this pass's live checks, not measured.
+- **Search Console clicks/position (Layer 1):** the Performance export only had Impressions ticked — clicks and average position weren't included. Re-export to get CTR and real ranking positions.
+- **Search Console Core Web Vitals, desktop (Layer 1):** only the mobile export was supplied.
 - **Lighthouse (Layer 6):** not run this pass — needs either a headless Chrome available in this environment or your own local run (`npx lighthouse https://cleansolutions.com.pt/ --view`). Can run this next if useful.
 - **On-page 80-check grade, GEO 38-check grade (Layers 5, 7):** not run in full against `references/on-page-seo.md` / `references/geo.md` this pass — the four items above surfaced from spot checks, not the complete checklist. Can run the full grid next on a chosen scope (recommend one-page-per-template given ~15k URLs).
 - **Doorway/thin-page similarity (Layer 13):** `code/check_page_similarity.py` is in place but not run yet — would want to point it at a sample of freguesia pages (the highest-volume templated set) to check real similarity, not assume it from reading the generator code.
