@@ -2,7 +2,7 @@ import { MessageCircle, Phone } from "lucide-react";
 import QuizForm from "./QuizFormLazy";
 import { trackWhatsAppClick } from "@/lib/quizTracking";
 import { trackCallClick } from "@/lib/analytics";
-import { WHATSAPP_BASE, PHONE_TEL, PHONE_DISPLAY, REVIEW_COUNT } from "@/constants/business";
+import { WHATSAPP_BASE, PHONE_TEL, PHONE_DISPLAY } from "@/constants/business";
 import TrustRatingBadge from "@/components/TrustRatingBadge";
 import { useQuizLauncher } from "@/hooks/use-quiz-launcher";
 
@@ -185,11 +185,6 @@ const ServiceHero = ({
               <div className="flex justify-center pt-1">
                 <TrustRatingBadge variant="mapsLinkClients" />
               </div>
-
-              {/* Milestone: número redondo, convite social para quem ainda não decidiu */}
-              <p className="text-[11px] text-gold/70 font-medium text-center">
-                Já somos {REVIEW_COUNT} a recomendar. Venha ser o próximo.
-              </p>
 
               {/* Prefere ligar? — mobile only */}
               <a

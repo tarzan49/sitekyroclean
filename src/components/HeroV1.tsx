@@ -1,7 +1,7 @@
 import { useEffect, lazy, Suspense } from "react";
 import { trackWhatsAppClick } from "@/lib/quizTracking";
 import { MessageCircle } from "lucide-react";
-import { WHATSAPP_BASE, REVIEW_COUNT } from "@/constants/business";
+import { WHATSAPP_BASE } from "@/constants/business";
 import TrustRatingBadge from "@/components/TrustRatingBadge";
 import { useQuizLauncher } from "@/hooks/use-quiz-launcher";
 
@@ -102,12 +102,6 @@ const Hero = () => {
               <span className="w-px h-4 bg-white/15 flex-shrink-0" />
               <TrustRatingBadge variant="mapsLink" />
             </div>
-
-            {/* Milestone: {REVIEW_COUNT} avaliações é um número redondo que vale a pena
-                celebrar, e serve de convite social para quem ainda não decidiu */}
-            <p className="text-[11px] text-gold/70 font-medium mb-5 -mt-3">
-              Já somos {REVIEW_COUNT} a recomendar. Venha ser o próximo.
-            </p>
 
             {/* Services breakdown — desktop only, keeps mobile hero uncluttered */}
             <div className="hidden md:flex flex-wrap gap-x-6 gap-y-3 mb-7">
