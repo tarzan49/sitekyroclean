@@ -16,5 +16,9 @@
 # ── Descontinuado: impermeabilização de colchão (2026-07) ────────────────────
 /impermeabilizacao-colchao-*                /limpeza-colchoes-:splat              301
 
-# ── SPA fallback (must be last) ───────────────────────────────────────────────
-/*                                           /index.html                            200
+# Sem catch-all "/* /index.html 200" aqui de propósito (2026-09-06): esse
+# catch-all fazia QUALQUER url inexistente devolver a homepage com 200
+# (soft 404 real, achado no /audit). Cloudflare Pages já trata isto sozinho:
+# sem nenhuma regra a apanhar o "/*", qualquer pedido que não seja um destes
+# nem um ficheiro real cai automaticamente no dist/404.html (gerado pelo
+# scripts/prerender.ts), servido com estado HTTP 404 a sério.

@@ -1069,6 +1069,52 @@ export function prerenderRoutes(outDir: string): number {
     console.log('  Homepage h1/intro:       injected');
   }
 
+  // ── 404.html ──────────────────────────────────────────────────────────
+  // Cloudflare Pages serves this file, with a REAL 404 HTTP status, for any
+  // request that matches no static asset and no explicit rule in
+  // public/_redirects — that's what actually fixes the soft-404 finding
+  // from the 2026-09-06 /audit (every invalid URL was 200-ing as the
+  // homepage, because the old catch-all `/* /index.html 200` rewrote
+  // everything before Cloudflare's own 404.html handling ever got a turn).
+  // Mirrors src/pages/NotFound.tsx's noindex intent server-side too, not
+  // only via that component's client-side useEffect.
+  {
+    const notFoundTitle = 'Página Não Encontrada | Kyro Clean Solutions';
+    const notFoundDesc = 'O endereço que procura não existe ou foi movido. Veja os nossos serviços de limpeza de sofás, colchões, tapetes e mais, ao domicílio em todo o país.';
+    let notFoundHtml = injectMeta(template, notFoundTitle, notFoundDesc, `${BASE_URL}/`);
+    notFoundHtml = notFoundHtml.replace('</head>', '  <meta name="robots" content="noindex, follow">\n</head>');
+    notFoundHtml = injectContent(notFoundHtml, generatePageBody({
+      h1: 'Página não encontrada',
+      intro: notFoundDesc,
+    }));
+    notFoundHtml = injectJsonLd(notFoundHtml, LOCAL_BIZ);
+    fs.writeFileSync(path.join(outDir, '404.html'), notFoundHtml, 'utf-8');
+    console.log('  404 page:                generated');
+  }
+
+  // ── Client-only routes (never crawled, never a real "page") ────────────
+  // /obrigado, /obrigado-pelo-servico, /admin/panel, /admin/deslocacoes only
+  // ever render from session/local state, are Disallow'd in robots.txt, and
+  // were never part of the sitemap. They used to rely on the blanket
+  // `/* /index.html 200` _redirects catch-all — removed for the 404 fix
+  // above, so each needs its own real static file instead, exactly like
+  // every other route on the site (public/_redirects can't target
+  // /index.html directly: a `path /index.html 200` rule redirects to `/`
+  // instead of rewriting, confirmed against wrangler pages dev — a real
+  // file sidesteps that entirely). noindex added server-side, belt and
+  // suspenders alongside the robots.txt Disallow (Disallow blocks crawling,
+  // not indexing of an already-linked URL — the exact confusion flagged in
+  // the audit's index-hygiene notes).
+  {
+    const CLIENT_ONLY_ROUTES = ['/obrigado', '/obrigado-pelo-servico', '/admin/panel', '/admin/deslocacoes'];
+    for (const routePath of CLIENT_ONLY_ROUTES) {
+      let html = template.replace('</head>', '  <meta name="robots" content="noindex, follow">\n</head>');
+      html = injectJsonLd(html, LOCAL_BIZ);
+      writeRoute(outDir, routePath, html);
+    }
+    console.log(`  Client-only routes:      ${CLIENT_ONLY_ROUTES.length}`);
+  }
+
   return count;
 }
 

@@ -6,17 +6,20 @@
 
 ---
 
-### [ ] 1. Soft-404s: any bad URL returns 200 with the homepage · index-hygiene, real
+### [x] 1. Soft-404s: any bad URL returned 200 with the homepage · index-hygiene, real
+Fixed 06 Sep. `curl -o /dev/null -w "%{http_code}" https://cleansolutions.com.pt/pagina-que-nao-existe-xyz-123` returned **200**, served with the homepage's own title/meta, because `_redirects` ended in a blanket `/* /index.html 200` catch-all.
 
-`curl -o /dev/null -w "%{http_code}" https://cleansolutions.com.pt/pagina-que-nao-existe-xyz-123` → **200**, served with the homepage's own title/meta. Cause: `public/_redirects` ends in the required SPA fallback `/* /index.html 200`, which every static+React-Router site needs for deep-link refreshes to work — but it also means Cloudflare Pages can never return a real 404 for a URL that was never a route at all.
+**First attempt failed and I reverted it**, worth recording why: tried adding a `/* /index.html 404` rule — turns out Cloudflare Pages `_redirects` [only supports status 200 on a rewrite](https://developers.cloudflare.com/pages/configuration/redirects/); custom statuses on a rewrite are silently unsupported. Confirmed locally with `wrangler pages dev` before touching anything live.
 
-You already know about part of this — `_redirects` has a "Soft 404 fixes" section patching specific known-bad URLs (`/limpeza-sofas-paranhos`, `/como-limpar-sofa-*`, old pack URLs) one at a time. This finding is the general case: **any** typo, dead backlink, or deleted page 200s as the homepage, which Google's Search Console will eventually surface as "soft 404" and treat as noise rather than a real page.
+**The real fix, verified locally:** Cloudflare Pages has a documented built-in behavior — if a `404.html` exists in the deploy, it's served with a genuine 404 status for any request matching no static file and no `_redirects` rule. Added a `404.html` generation step to `scripts/prerender.ts` (reuses the same `generatePageBody()`/schema helpers every other page already gets, with its own noindex meta), and removed the blanket catch-all from `_redirects` entirely.
 
-**Real fix, not trivial:** since every valid route already has its own prerendered `.html` file in `dist/`, the catch-all may not even be load-bearing for known routes (Cloudflare Pages serves a matching static file before falling through to `_redirects`). Worth testing whether narrowing the fallback (or moving true 404 handling to a Cloudflare Pages Function that checks the real route list) lets genuinely-unknown URLs 404 properly while known routes keep working. This needs verification against a preview deploy before touching production `_redirects` — proposing it here, not doing it.
+That surfaced a second wrinkle: `/obrigado`, `/obrigado-pelo-servico`, `/admin/panel`, `/admin/deslocacoes` are genuinely client-only (never prerendered, `Disallow`'d in robots.txt already) and used to ride the same catch-all to keep working on direct load/refresh. A `_redirects` rule targeting `/index.html` turned out to redirect to `/` instead of rewriting (reproducible in `wrangler pages dev`, not documented anywhere I could find) — so instead of relying on `_redirects` for these 4 at all, `scripts/prerender.ts` now writes them as real static files, exactly like the other ~15,000 routes, each with its own noindex meta.
 
-**Who:** me, with your yes to test against a preview deploy first
-**Time:** ~30 min investigation + testing
-**Changes:** `public/_redirects` only, no content touched
+**Verified with `wrangler pages dev` against the actual production build** (not just dev mode): homepage 200, every real page 200, all 4 client-only routes 200 with noindex present, the existing 301 redirects and trailing-slash rule still fire, and — the actual fix — a made-up URL now returns a real 404 with the styled `NotFound.tsx` page, zero console errors on any of it.
+
+**Who:** me, in `scripts/prerender.ts` and `public/_redirects`
+**Time:** done (took longer than the 30 min estimate — two dead ends before finding what actually works, both caught by local testing before touching production)
+**Changes:** `scripts/prerender.ts` (404.html + 4 client-only-route generation) and `public/_redirects` (catch-all removed). No body copy touched.
 
 ### [ ] 2. Cloudflare's managed robots.txt blocks every AI crawler sitewide · GEO, owner decision needed
 
