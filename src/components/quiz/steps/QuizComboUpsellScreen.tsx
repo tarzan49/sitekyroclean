@@ -1,19 +1,21 @@
-import { useState } from 'react';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { ChevronLeft, ChevronRight, Droplet } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { sofaPrices, mattressPrices } from '@/components/quiz/QuizTypes';
 import type { UpsellItemConfig } from '@/components/quiz/QuizTypes';
-import { calcChairClean } from '@/components/quiz/quizHelpers';
+import { calcChairClean, calcChairWaterproof, calcPackPricing } from '@/components/quiz/quizHelpers';
 
 interface QuizComboUpsellScreenProps {
   upsellItems: UpsellItemConfig[];
   setUpsellItems: (items: UpsellItemConfig[]) => void;
   onContinue: () => void;
+  onBack: () => void;
 }
 
 type View = 'summary' | 'mattress' | 'sofa' | 'chairs';
 
 const CHAIRS_STARTING_PRICE = 20;
+const CHAIRS_MIN_QTY = 3;
 
 function fmt(n: number): string {
   return n % 1 === 0 ? String(n) : n.toFixed(1).replace('.', ',');
@@ -24,14 +26,23 @@ function fmt(n: number): string {
 // quantidades com os tamanhos/preços reais do negócio, em vez do fluxo
 // anterior de escolher um item de cada vez. Substitui QuizUpsellOverlay
 // no ponto "antes de finalizar" (pedido explícito, aprovado em mockup).
-const QuizComboUpsellScreen = ({ upsellItems, setUpsellItems, onContinue }: QuizComboUpsellScreenProps) => {
+const QuizComboUpsellScreen = ({ upsellItems, setUpsellItems, onContinue, onBack }: QuizComboUpsellScreenProps) => {
   const [view, setView] = useState<View>('summary');
   const [mattressQty, setMattressQty] = useState<Record<string, number>>({});
   const [sofaQty, setSofaQty] = useState<Record<string, number>>({});
   const [chairsQty, setChairsQty] = useState(0);
+  const [sofaWaterproofOn, setSofaWaterproofOn] = useState(false);
+  const [chairsWaterproofOn, setChairsWaterproofOn] = useState(false);
 
   const setMattQty = (id: string, qty: number) => setMattressQty(prev => ({ ...prev, [id]: Math.max(0, Math.min(9, qty)) }));
   const setSofaQtyFor = (id: string, qty: number) => setSofaQty(prev => ({ ...prev, [id]: Math.max(0, Math.min(9, qty)) }));
+  // Cadeiras no upsell só compensam a partir de 3un (60€, o mínimo para o
+  // desconto de 10% do pack) — pedido explícito do dono para não deixar
+  // escolher 1 ou 2 cadeiras aqui e nunca chegar ao desconto anunciado.
+  const decChairs = () => setChairsQty(q => (q <= CHAIRS_MIN_QTY ? 0 : q - 1));
+  const incChairs = () => setChairsQty(q => (q <= 0 ? CHAIRS_MIN_QTY : Math.min(9, q + 1)));
+
+  const sofaPack = (opt: (typeof sofaPrices)[number]) => calcPackPricing(opt, false, false, 40, 'essencial');
 
   const mattressTotal = mattressPrices.reduce((sum, opt) => {
     const q = mattressQty[opt.id] ?? 0;
@@ -39,10 +50,23 @@ const QuizComboUpsellScreen = ({ upsellItems, setUpsellItems, onContinue }: Quiz
   }, 0);
   const sofaTotal = sofaPrices.reduce((sum, opt) => {
     const q = sofaQty[opt.id] ?? 0;
-    return sum + (typeof opt.cleaningPrice === 'number' ? q * opt.cleaningPrice : 0);
+    if (q <= 0 || typeof opt.cleaningPrice !== 'number') return sum;
+    const pack = sofaPack(opt);
+    const unitPrice = sofaWaterproofOn && typeof pack.packPrice === 'number' ? pack.packPrice : opt.cleaningPrice;
+    return sum + q * unitPrice;
   }, 0);
-  const chairsPrice = calcChairClean(chairsQty);
-  const chairsTotal = chairsQty > 0 ? (chairsPrice ?? 0) : 0;
+  // Delta calculado sempre (independente do toggle) para o preço mostrado no
+  // próprio chip "Impermeabilizar" — tem de mostrar quanto custaria ligar,
+  // não 0€ só porque ainda está desligado.
+  const sofaWaterproofDeltaTotal = sofaPrices.reduce((sum, opt) => {
+    const q = sofaQty[opt.id] ?? 0;
+    if (q <= 0 || typeof opt.cleaningPrice !== 'number') return sum;
+    return sum + q * (sofaPack(opt).packDelta ?? 0);
+  }, 0);
+  const chairsCleanPrice = calcChairClean(chairsQty);
+  const chairsWaterproofDeltaIfOn = calcChairWaterproof(chairsQty) ?? 0;
+  const chairsWaterproofDelta = chairsWaterproofOn ? chairsWaterproofDeltaIfOn : 0;
+  const chairsTotal = chairsQty > 0 ? (chairsCleanPrice ?? 0) + chairsWaterproofDelta : 0;
 
   const mattressQtyTotal = Object.values(mattressQty).reduce((a, b) => a + b, 0);
   const sofaQtyTotal = Object.values(sofaQty).reduce((a, b) => a + b, 0);
@@ -52,13 +76,22 @@ const QuizComboUpsellScreen = ({ upsellItems, setUpsellItems, onContinue }: Quiz
     .filter(opt => (mattressQty[opt.id] ?? 0) > 0)
     .map(opt => `${mattressQty[opt.id]}x ${opt.label}`)
     .join(', ') || 'a partir de 59€';
-  const sofaSummary = sofaPrices
+  const sofaSummaryBase = sofaPrices
     .filter(opt => (sofaQty[opt.id] ?? 0) > 0)
     .map(opt => `${sofaQty[opt.id]}x ${opt.label}`)
-    .join(', ') || 'a partir de 49€';
-  const chairsSummary = chairsQty > 0 ? `${chairsQty} cadeira${chairsQty > 1 ? 's' : ''}` : `a partir de ${CHAIRS_STARTING_PRICE}€/un.`;
+    .join(', ');
+  const sofaSummary = sofaSummaryBase
+    ? `${sofaSummaryBase}${sofaWaterproofOn ? ' + Imperm.' : ''}`
+    : 'a partir de 49€';
+  const chairsSummary = chairsQty > 0
+    ? `${chairsQty} cadeira${chairsQty > 1 ? 's' : ''}${chairsWaterproofOn ? ' + Imperm.' : ''}`
+    : `a partir de ${CHAIRS_STARTING_PRICE}€/un.`;
 
-  const handleContinue = () => {
+  // Sincroniza o subtotal e os itens em tempo real com o formData do quiz —
+  // a "Estimativa" no topo do modal tem de acompanhar cada +1/-1 aqui dentro,
+  // não só depois de "Confirmar"/"Finalizar Orçamento" (bug real: a pessoa
+  // ficava sem feedback nenhum de preço enquanto ajustava quantidades).
+  useEffect(() => {
     const items: UpsellItemConfig[] = [];
     mattressPrices.forEach(opt => {
       const q = mattressQty[opt.id] ?? 0;
@@ -69,20 +102,31 @@ const QuizComboUpsellScreen = ({ upsellItems, setUpsellItems, onContinue }: Quiz
     sofaPrices.forEach(opt => {
       const q = sofaQty[opt.id] ?? 0;
       if (q > 0 && typeof opt.cleaningPrice === 'number') {
-        items.push({ id: `sofa-${opt.id}`, sofaSize: opt.id, qty: q, price: q * opt.cleaningPrice, label: `${q}x Sofá ${opt.label}` });
+        const pack = sofaPack(opt);
+        const unitPrice = sofaWaterproofOn && typeof pack.packPrice === 'number' ? pack.packPrice : opt.cleaningPrice;
+        items.push({
+          id: `sofa-${opt.id}`,
+          sofaSize: opt.id,
+          qty: q,
+          price: q * unitPrice,
+          label: `${q}x Sofá ${opt.label}${sofaWaterproofOn ? ' + Impermeabilização' : ''}`,
+          waterproof: sofaWaterproofOn,
+        });
       }
     });
-    if (chairsQty > 0 && chairsPrice !== null) {
-      items.push({ id: 'chairs', chairQty: String(chairsQty), qty: chairsQty, price: chairsPrice, label: `${chairsQty} Cadeira${chairsQty > 1 ? 's' : ''}` });
+    if (chairsQty > 0) {
+      items.push({
+        id: 'chairs',
+        chairQty: String(chairsQty),
+        qty: chairsQty,
+        price: (chairsCleanPrice ?? 0) + chairsWaterproofDelta,
+        label: `${chairsQty} Cadeira${chairsQty > 1 ? 's' : ''}${chairsWaterproofOn ? ' + Impermeabilização' : ''}`,
+        waterproof: chairsWaterproofOn,
+      });
     }
     setUpsellItems(items);
-    onContinue();
-  };
-
-  const skip = () => {
-    setUpsellItems([]);
-    onContinue();
-  };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mattressQty, sofaQty, chairsQty, sofaWaterproofOn, chairsWaterproofOn]);
 
   const baseTotal = mattressTotal + sofaTotal + chairsTotal;
   const subtotalLabel = `${fmt(baseTotal)}€`;
@@ -99,6 +143,25 @@ const QuizComboUpsellScreen = ({ upsellItems, setUpsellItems, onContinue }: Quiz
         <button onClick={onInc} className="w-9 h-9 rounded-sm border-2 border-white/20 bg-white/[0.05] text-white font-bold text-lg flex items-center justify-center active:scale-95 transition-all touch-manipulation hover:border-gold/50">+</button>
       </div>
     </div>
+  );
+
+  const WaterproofToggle = ({ active, onClick, priceLabel }: { active: boolean; onClick: () => void; priceLabel: string }) => (
+    <button
+      onClick={onClick}
+      className={cn(
+        'w-full flex items-center gap-3 text-left px-3.5 py-3 rounded-sm border-2 transition-all touch-manipulation',
+        active ? 'border-gold bg-gold/[0.08]' : 'border-white/10 bg-[#1a2a1a] hover:border-gold/30'
+      )}
+    >
+      <span className={cn('flex-shrink-0 w-8 h-8 rounded-sm flex items-center justify-center', active ? 'bg-gold/20' : 'bg-white/[0.06]')}>
+        <Droplet className={cn('w-4 h-4', active ? 'text-gold' : 'text-white/40')} strokeWidth={1.8} />
+      </span>
+      <span className="flex-1 min-w-0">
+        <span className={cn('block text-sm font-semibold', active ? 'text-white' : 'text-white/80')}>Impermeabilizar</span>
+        <span className="block text-[11px] text-white/35">Proteção Essencial incluída</span>
+      </span>
+      <span className={cn('flex-shrink-0 text-xs font-bold tabular-nums', active ? 'text-gold' : 'text-white/45')}>{priceLabel}</span>
+    </button>
   );
 
   if (view === 'mattress' || view === 'sofa' || view === 'chairs') {
@@ -137,16 +200,28 @@ const QuizComboUpsellScreen = ({ upsellItems, setUpsellItems, onContinue }: Quiz
                 onInc={() => setSofaQtyFor(opt.id, (sofaQty[opt.id] ?? 0) + 1)}
               />
             ))}
+            <WaterproofToggle
+              active={sofaWaterproofOn}
+              onClick={() => setSofaWaterproofOn(v => !v)}
+              priceLabel={sofaQtyTotal > 0 ? `+${fmt(sofaWaterproofDeltaTotal)}€` : ''}
+            />
           </div>
         )}
         {view === 'chairs' && (
           <>
             <div className="flex items-center justify-center gap-6">
-              <button onClick={() => setChairsQty(q => Math.max(0, q - 1))} disabled={chairsQty <= 0} className="w-14 h-14 rounded-sm border-2 border-white/20 bg-white/[0.05] text-white font-bold text-2xl flex items-center justify-center disabled:opacity-25 active:scale-95 transition-all touch-manipulation hover:border-gold/50">−</button>
+              <button onClick={decChairs} disabled={chairsQty <= 0} className="w-14 h-14 rounded-sm border-2 border-white/20 bg-white/[0.05] text-white font-bold text-2xl flex items-center justify-center disabled:opacity-25 active:scale-95 transition-all touch-manipulation hover:border-gold/50">−</button>
               <span className="text-4xl font-black text-gold w-10 text-center tabular-nums leading-none">{chairsQty}</span>
-              <button onClick={() => setChairsQty(q => Math.min(9, q + 1))} className="w-14 h-14 rounded-sm border-2 border-white/20 bg-white/[0.05] text-white font-bold text-2xl flex items-center justify-center active:scale-95 transition-all touch-manipulation hover:border-gold/50">+</button>
+              <button onClick={incChairs} className="w-14 h-14 rounded-sm border-2 border-white/20 bg-white/[0.05] text-white font-bold text-2xl flex items-center justify-center active:scale-95 transition-all touch-manipulation hover:border-gold/50">+</button>
             </div>
-            <p className="text-xs text-white/30 text-center leading-snug">1ª–4ª: 20€ · 5ª–6ª: 15€ · 7ª–9ª: 12,5€ por cadeira</p>
+            <p className="text-xs text-white/30 text-center leading-snug">Mínimo de {CHAIRS_MIN_QTY} cadeiras · 1ª–4ª: 20€ · 5ª–6ª: 15€ · 7ª–9ª: 12,5€ por cadeira</p>
+            <div className="w-full max-w-xs">
+              <WaterproofToggle
+                active={chairsWaterproofOn}
+                onClick={() => setChairsWaterproofOn(v => !v)}
+                priceLabel={chairsQty > 0 ? `+${fmt(chairsWaterproofDeltaIfOn)}€` : ''}
+              />
+            </div>
           </>
         )}
 
@@ -206,13 +281,13 @@ const QuizComboUpsellScreen = ({ upsellItems, setUpsellItems, onContinue }: Quiz
       </div>
 
       <button
-        onClick={handleContinue}
+        onClick={onContinue}
         className="w-full max-w-xs h-14 bg-gradient-to-r from-gold to-[#d4c57b] hover:from-[#d4c57b] hover:to-gold text-[#12121e] font-black text-base tracking-wider uppercase touch-manipulation active:scale-[0.98] rounded-sm shadow-[0_0_32px_rgba(212,175,55,0.30)]"
       >
         Finalizar Orçamento
       </button>
-      <button onClick={skip} className="text-xs text-white/25 hover:text-white/45 underline underline-offset-2 touch-manipulation">
-        Continuar sem adicionar
+      <button onClick={onBack} className="flex items-center gap-1 text-xs text-white/25 hover:text-white/45 transition-colors touch-manipulation">
+        <ChevronLeft className="w-3.5 h-3.5" /> Voltar
       </button>
     </div>
   );

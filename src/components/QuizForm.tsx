@@ -359,8 +359,8 @@ const QuizForm = ({
     || formData.service === 'mattress';
 
   // Extraído do handleNext original: o que acontece depois da etapa de
-  // quantidades (step 3), partilhado entre o fluxo normal e o "Continuar"/
-  // "Continuar sem adicionar" do upsell das cadeiras, que intercepta antes.
+  // quantidades (step 3), partilhado entre o fluxo normal e o "Continuar"
+  // do upsell das cadeiras, que intercepta antes.
   const proceedPastConfig = () => {
     if (belowMinimum) {
       setShowMinimumGate(true);
@@ -554,17 +554,12 @@ const QuizForm = ({
     }
 
     if (upsellItems.length > 0) {
-      const upsellLabels: Record<string, string> = { mattress: 'Colchão', carpet: 'Tapete', chairs: 'Cadeiras' };
-      const upsellParts = upsellItems.map(item => {
-        const itemLabel = upsellLabels[item.id] ?? item.id;
-        const detail = item.mattressSize
-          ? ` (${mattressPrices.find(p => p.id === item.mattressSize)?.label ?? item.mattressSize})`
-          : item.carpetArea ? ` (${item.carpetArea}m²)`
-          : item.chairQty ? ` (${item.chairQty}x)`
-          : '';
-        return `+${itemLabel}${detail}: ${fmtEuro(item.price > 0 ? item.price : null)}`;
-      });
-      details.push(`Pack: ${upsellParts.join(', ')}`);
+      // item.label já vem pronto do QuizComboUpsellScreen (ex. "1x Colchão Casal
+      // + Impermeabilização") — usar diretamente em vez de reconstruir a partir
+      // de item.id, que para itens com tamanho (mattress-casal, sofa-2-lugares)
+      // não batia com nenhuma chave do mapa antigo e mostrava o id em bruto.
+      const upsellParts = upsellItems.map(item => `+${item.label}: ${fmtEuro(item.price > 0 ? item.price : null)}`);
+      details.push(`Upsell: ${upsellParts.join(', ')}`);
     }
 
     return details.join(' | ');
@@ -578,9 +573,8 @@ const QuizForm = ({
     const serviceTypeLabel = getServiceTypeLabel();
     const detailsSummary = buildDetailsSummary();
 
-    const upsellItemLabels: Record<string, string> = { mattress: 'Colchão', carpet: 'Tapete', chairs: 'Cadeiras', 'sofa-anti-acaros': 'Anti Ácaros (sofá)', 'chairs-anti-acaros': 'Anti Ácaros (cadeiras)' };
     const crmServiceLabel = upsellItems.length > 0
-      ? `${serviceLabel}, ${upsellItems.map(i => upsellItemLabels[i.id] ?? i.id).join(', ')}`
+      ? `${serviceLabel}, ${upsellItems.map(i => i.label ?? i.id).join(', ')}`
       : serviceLabel;
     const packPctLabel = packDiscountPct > 0 ? `Pack -${Math.round(packDiscountPct * 100)}%` : '';
     // Quando o serviço principal ou algum upsell não tem preço fechado
@@ -594,7 +588,7 @@ const QuizForm = ({
       if (finalTravelCost > 0) parts.push(`${finalTravelCost}€ deslocação`);
       if (!hasSobOrcamento && calculateServicePrice > 0) parts.push(`${calculateServicePrice}€ ${serviceLabel}`);
       upsellItems.forEach(item => {
-        if (item.price > 0) parts.push(`${item.price}€ ${upsellItemLabels[item.id] ?? item.label ?? item.id}`);
+        if (item.price > 0) parts.push(`${item.price}€ ${item.label ?? item.id}`);
       });
       parts.push('Sob orçamento');
       return parts.join(' + ');
@@ -1053,6 +1047,7 @@ ${formData.description || 'Sem observações adicionais'}
                 upsellItems={upsellItems}
                 setUpsellItems={setUpsellItems}
                 onContinue={() => { (document.activeElement as HTMLElement)?.blur(); setShowUpsell(false); setCurrentStep(4); }}
+                onBack={() => { (document.activeElement as HTMLElement)?.blur(); setShowUpsell(false); setUpsellItems([]); }}
               />
             )}
 

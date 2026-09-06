@@ -138,9 +138,6 @@ const QuizChairsAddonUpsell = ({ formData, updateFormData, onContinue, onBack }:
       >
         {anySelected ? 'Adicionar e Continuar' : 'Continuar'}
       </button>
-      <button onClick={onContinue} className="text-xs text-white/25 hover:text-white/45 underline underline-offset-2 touch-manipulation">
-        Continuar sem adicionar
-      </button>
       <button onClick={onBack} className="flex items-center gap-1 text-xs text-white/20 hover:text-white/45 transition-colors touch-manipulation mt-1">
         <ChevronLeft className="w-3.5 h-3.5" /> Voltar
       </button>
