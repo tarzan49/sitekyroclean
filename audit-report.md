@@ -83,6 +83,23 @@ Fixed 06 Sep. `curl https://cleansolutions.com.pt/` returned an 11KB shell: titl
 **Time:** done
 **Changes:** none, this is measurement only
 
+### [ ] 6. Doorway-page check: pages LOOK like duplicates before JS runs, aren't once it does · index-hygiene, real but nuanced
+
+Ran `code/check_page_similarity.py` twice against real live pages:
+
+- **8 freguesia pages, same service** (`limpeza-tapetes-porto-{paranhos,ramalde,bonfim,campanha,cedofeita,lordelo-do-ouro,aldoar,foz-do-douro}`): **PASS**, each owns enough unique server-rendered content.
+- **3 pages covering the same topic through different systems** (`limpeza-tapetes-porto-cedofeita` — a freguesia page; `higienizacao-tapetes-porto-cedofeita` and `lavagem-tapetes-porto-cedofeita` — keyword-variant pages, same underlying template as each other): **FAIL**, all three "own 0 distinct phrases" once shared boilerplate is stripped.
+
+That FAIL looked alarming, so I checked it against the actual rendered pages (Playwright, full JS hydration) before reporting it as a real problem — and it isn't the problem it looks like. Rendered word-overlap between the three: 38.7%, 40.4%, and 59.1% — real, substantial differentiation once the page's actual content (widgets, problem cards, FAQs, trust points) loads. **The tool's raw-HTML check isn't wrong, it's just measuring something specific**: every one of these ~15,000 pages intentionally ships only a small `<h1>` + one intro paragraph server-side (the same fix pattern from finding #3, applied sitewide by design) — that sliver is similar enough across pages covering the same city+service that a non-JS check sees them as identical, even though the full page isn't.
+
+**Why this still matters, not just a false alarm:** Google's indexing has two passes — a fast first pass that decides crawl priority using exactly this kind of thin, pre-render signal, and a slower full-render pass that sees the real content. If the first pass is what's deciding "eh, looks like more of the same" on a chunk of the 5,127 discovered-not-indexed pages, then the fix isn't writing more unique body content (there's already 40-60% real differentiation) — it's making the server-rendered sliver itself a little more distinctive per page, so the fast pass doesn't misjudge them.
+
+**Not fixing this now** — it's a real lead worth acting on, but it's a content/templating decision (what goes in that server-rendered snippet, per page type) rather than a mechanical bug, and I only spot-checked one city/topic, not all ~15,000 pages. Flagging it as the most concrete next step from this audit rather than guessing at a fix.
+
+**Who:** worth a conversation on what the server-rendered snippet should say per page type
+**Time:** not estimated, discovery only so far
+**Changes:** none proposed yet
+
 ### [ ] 5. Google Business Profile pastes, if you want Layer 11 (Local) graded
 
 Categories, services, service area from your GBP dashboard (About → Edit, Services → Edit). Reviews, rating, hours are pulled live already if you want a map-pack + review comparison against 2-3 real competitors.
