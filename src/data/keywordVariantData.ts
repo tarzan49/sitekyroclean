@@ -47,7 +47,7 @@ const SERVICE_META: Record<ServiceKey, {
 }> = {
   sofa:      { label: 'Sofá',      labelPlural: 'Sofás',      canonicalBase: 'limpeza-sofas',     priceFrom: '49€',     waterproofPriceFrom: '59€'      },
   colchao:   { label: 'Colchão',   labelPlural: 'Colchões',   canonicalBase: 'limpeza-colchoes',  priceFrom: '59€' },
-  tapetes:   { label: 'Tapetes',   labelPlural: 'Tapetes',    canonicalBase: 'limpeza-tapetes',   priceFrom: '15€/m²'                                    },
+  tapetes:   { label: 'Tapetes',   labelPlural: 'Tapetes',    canonicalBase: 'limpeza-tapetes',   priceFrom: 'Sob orçamento'                              },
   cadeiras:  { label: 'Cadeiras',  labelPlural: 'Cadeiras',   canonicalBase: 'limpeza-cadeiras',  priceFrom: '20€',     waterproofPriceFrom: '20€/cad.'    },
   alcatifas: { label: 'Alcatifas', labelPlural: 'Alcatifas',  canonicalBase: 'limpeza-alcatifas', priceFrom: '3€/m²'                                    },
 };
@@ -164,7 +164,7 @@ function content_higienizacao_tapetes(loc: string, ctx: string): ContentBlock {
       { question: `A higienização remove os alergénios de cão e gato do tapete?`, answer: `Sim. O processo remove pelos, caspa e todos os alergénios de animais das fibras em profundidade. O aspirador doméstico remove os pelos visíveis mas não atinge estes alergénios microscópicos.` },
       { question: `Fazem higienização de tapetes ao domicílio em ${loc} ou tenho de os entregar?`, answer: `Fazemos ao domicílio, sem necessidade de transporte. Deslocamo-nos a ${loc} com todo o equipamento. Para tapetes muito delicados podemos fazer recolha e tratamento nas nossas instalações.` },
       { question: `Posso tentar higienizar o tapete em casa com um aspirador potente?`, answer: `O aspirador doméstico remove sujidade solta da superfície. Para eliminar os ácaros e patogénicos das camadas profundas das fibras é necessário equipamento profissional e produtos certificados.` },
-      { question: `Qual o preço mínimo de higienização de tapete em ${loc}?`, answer: `A partir de 15€/m², com preço mínimo de 25€ por serviço. O preço final depende do tipo de fibra e estado do tapete. Orçamento gratuito ao domicílio em ${loc}.` },
+      { question: `Qual o preço da higienização de tapete em ${loc}?`, answer: `Cada tapete é medido (largura x comprimento) e orçamentado individualmente, sem preço fixo por m². O valor final depende do tipo de fibra e estado do tapete. Orçamento gratuito ao domicílio em ${loc}.` },
     ],
     problems: [
       { title: "Criança que brinca no chão com espirros frequentes", description: "O tapete concentra ácaros, pólen e fungos nas fibras. Quando a criança rasteja ou brinca, inalha estes alergénios em concentração máxima ao nível do chão." },
@@ -328,7 +328,7 @@ function content_lavagem_colchao(loc: string, ctx: string): ContentBlock {
 
 function content_lavagem_tapetes(loc: string, ctx: string): ContentBlock {
   return {
-    intro: `Precisa de lavar tapetes em ${loc}? A Kyro Clean Solutions faz lavagem especializada de tapetes de todos os tipos (persas, orientais, modernos e de lã) com extração profissional e recolha ao domicílio em ${loc} e ${ctx}. Preços desde 15€/m².`,
+    intro: `Precisa de lavar tapetes em ${loc}? A Kyro Clean Solutions faz lavagem especializada de tapetes de todos os tipos (persas, orientais, modernos e de lã) com extração profissional e recolha ao domicílio em ${loc} e ${ctx}. Cada tapete é medido e orçamentado individualmente.`,
     whatIs: `A lavagem profissional retira a sujidade compactada que anos de aspiração deixaram para trás nas fibras, restaura as cores e o toque originais. Feita com produtos adaptados ao tipo de fibra (lã, seda, sintético ou persa) para que o tapete não corra riscos em ${loc}.`,
     benefits: [
       'Lavagem especializada para tapetes persas e orientais',
@@ -349,7 +349,7 @@ function content_lavagem_tapetes(loc: string, ctx: string): ContentBlock {
       { question: `A lavagem preserva as cores originais de tapetes naturais?`, answer: `Sim. A extração profissional remove a sujidade que opaca as cores, revelando os tons originais das fibras. Em tapetes persas e orientais usamos técnicas específicas que realçam as cores sem os danificar.` },
       { question: `A lavagem remove os pelos de cão e gato presos nas fibras do tapete?`, answer: `Sim. O processo de extração remove pelos, caspa e alergénios de animais que ficam presos nas fibras e que o aspirador comum não consegue retirar completamente.` },
       { question: `Quanto tempo demora a lavagem e secagem de um tapete de lã?`, answer: `O processo de lavagem demora entre 3 a 5 dias úteis para tapetes de lã (secagem mais lenta para preservar as fibras). Tapetes sintéticos ficam prontos em 1 a 2 dias.` },
-      { question: `Qual o preço mínimo para lavagem de tapete pequeno em ${loc}?`, answer: `Preço mínimo de 25€ por tapete, a partir de 15€/m² para médios e grandes. O preço final depende do tipo de fibra e estado. Orçamento gratuito com recolha em ${loc}.` },
+      { question: `Qual o preço para lavagem de um tapete pequeno em ${loc}?`, answer: `Cada tapete é medido e orçamentado individualmente, sem preço fixo por m². O valor final depende do tipo de fibra e estado. Orçamento gratuito com recolha em ${loc}.` },
     ],
     problems: [
       { title: "Manchas de café, molho ou vinho que ficaram", description: "As fibras absorvem líquidos em segundos. Quanto mais tempo passam, mais profundas ficam. A extração profissional remove a grande maioria das manchas antigas, mesmo de anos." },

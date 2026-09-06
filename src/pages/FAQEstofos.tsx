@@ -92,8 +92,8 @@ const allFaqs: FAQ[] = [
   {
     id: "quanto-custa-limpar-tapete",
     question: "Quanto custa limpar um tapete profissionalmente?",
-    answer: <>A <Link to="/limpeza-tapetes" className="text-gold hover:underline font-medium">limpeza profissional de tapetes</Link> é calculada por metro quadrado: <strong>15€/m² até 3 m²</strong>, 12,5€/m² até 5 m², 11,5€/m² até 8 m², 10,5€/m² até 10 m² e 10€/m² até 15 m². Exemplo: um tapete de sala de 8 m² custa 104,50€. Para mais de 15 m², orçamento personalizado. A deslocação custa a partir de 10€ no Porto e aumenta com a distância, seguindo a mesma tabela dos restantes serviços. O tapete fica pronto a usar em 2 a 4 horas. Tapetes persas, de seda ou lã natural têm processo adaptado ao material sem acréscimo de preço.</>,
-    plainAnswer: "Limpeza de tapetes: 15€/m² até 3m², 12,5€/m² até 5m², 11,5€/m² até 8m², 10,5€/m² até 10m², 10€/m² até 15m². Exemplo: tapete 8m² = 104,50€. Mais de 15m²: orçamento personalizado. Deslocação a partir de 10€.",
+    answer: <>A <Link to="/limpeza-tapetes" className="text-gold hover:underline font-medium">limpeza profissional de tapetes</Link> é sempre orçamentada à medida: cada tapete é medido individualmente (largura x comprimento) e o preço depende do tipo de fibra, dimensão e estado de sujidade, sem tabela fixa por m². A deslocação custa a partir de 10€ no Porto e aumenta com a distância, seguindo a mesma tabela dos restantes serviços. O tapete fica pronto a usar em 2 a 4 horas. Tapetes persas, de seda ou lã natural têm processo adaptado ao material sem acréscimo de preço.</>,
+    plainAnswer: "Limpeza de tapetes: orçamento à medida de cada tapete (mede-se largura x comprimento), sem tabela fixa por m². Depende do tipo de fibra e estado do tapete. Deslocação a partir de 10€.",
   },
   {
     id: "quanto-custa-limpar-alcatifa",

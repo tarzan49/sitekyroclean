@@ -28,7 +28,7 @@ import TrustRatingBadge from "@/components/TrustRatingBadge";
 import SectionHeader from "@/components/SectionHeader";
 import { PRICE_TABLE, PRICE_TABLE_QUIZ_CONFIG, type PriceRowQuizConfig } from "@/data/locationPriceTestimonialsData";
 import { calcWidgetTotal, calcChairBracket, calcCarpetWidget, buildWidgetQuizConfig, calcRowAddonDelta, calcSofaAntiAcarosDelta, calcChairAddonWaterproofTotal, calcChairAntiAcarosTotal, calcWidgetPricing, calcWidgetArticles, PACK_DISCOUNT_MIN_SERVICE, PACK_DISCOUNT_MIN_UPSELL_ITEM, type WidgetTier } from "@/lib/priceWidgetCalc";
-import { locationPrices } from "@/components/quiz/QuizTypes";
+import { locationPrices, type CarpetItem } from "@/components/quiz/QuizTypes";
 import { MARCA_CITY_SLUGS } from "@/data/marcaCities";
 import { PROBLEM_IMAGES, PROBLEM_CTA, PRICE_HEADING_VERB } from "@/constants/problemCardHelpers";
 import { ServiceTrustDesktop, ServiceTrustMobile } from "@/components/ServiceTrustBlock";
@@ -61,13 +61,38 @@ const LocationServicePage = () => {
   const [addonRows, setAddonRows] = useState<Set<number>>(new Set());
   const [addonTier, setAddonTier] = useState<WidgetTier>('premium');
   const [antiAcarosRows, setAntiAcarosRows] = useState<Set<number>>(new Set());
+  // Simulador de tapetes (2026-09-06): várias peças medidas por linha, mesma
+  // lógica do quiz — nunca uma área única. Alcatifa continua com rowQuantities.
+  const [carpetItemsByRow, setCarpetItemsByRow] = useState<Record<number, CarpetItem[]>>({});
 
   useEffect(() => {
     setRowQuantities({});
     setChaiseLongueAddon(0);
     setAddonRows(new Set());
     setAntiAcarosRows(new Set());
+    setCarpetItemsByRow({});
   }, [data?.serviceSlug]);
+
+  const getCarpetItems = (i: number): CarpetItem[] => carpetItemsByRow[i] ?? [{ id: `tapete-${i}-1`, largura: '', comprimento: '' }];
+  const carpetItemArea = (item: CarpetItem): number => {
+    const l = parseFloat((item.largura + '').replace(',', '.'));
+    const c = parseFloat((item.comprimento + '').replace(',', '.'));
+    return !isNaN(l) && !isNaN(c) && l > 0 && c > 0 ? l * c : 0;
+  };
+  const setCarpetRow = (i: number, items: CarpetItem[]) => {
+    setCarpetItemsByRow(prev => ({ ...prev, [i]: items }));
+    const validCount = items.filter(it => carpetItemArea(it) > 0).length;
+    setRowQuantities(prev => ({ ...prev, [i]: validCount }));
+  };
+  const updateCarpetItem = (i: number, id: string, field: 'largura' | 'comprimento', value: string) => {
+    setCarpetRow(i, getCarpetItems(i).map(it => (it.id === id ? { ...it, [field]: value } : it)));
+  };
+  const addCarpetItem = (i: number) => {
+    setCarpetRow(i, [...getCarpetItems(i), { id: `tapete-${i}-${Date.now()}`, largura: '', comprimento: '' }]);
+  };
+  const removeCarpetItem = (i: number, id: string) => {
+    setCarpetRow(i, getCarpetItems(i).filter(it => it.id !== id));
+  };
 
   const adjustRowQty = (i: number, delta: number, min = 0, max = 99) => {
     setRowQuantities(prev => {
@@ -99,7 +124,7 @@ const LocationServicePage = () => {
 
   const handlePriceTableContinue = () => {
     if (!data) return;
-    const config = buildWidgetQuizConfig(data.serviceSlug, rowQuantities, chaiseLongueAddon, addonRows, addonTier, antiAcarosRows);
+    const config = buildWidgetQuizConfig(data.serviceSlug, rowQuantities, chaiseLongueAddon, addonRows, addonTier, antiAcarosRows, carpetItemsByRow);
     if (!config) return;
     setPriceQuizConfig(config);
     openPriceQuiz();
@@ -197,7 +222,9 @@ const LocationServicePage = () => {
   const freguesiaCount = cityFreguesias?.freguesias.length ?? 0;
   const snapshotStats = [
     { value: "5.0 ★", label: "Avaliação Google", icon: Star },
-    { value: data.priceFrom, label: `Desde, ${cityPrep} ${data.city}`, icon: Euro },
+    data.serviceSlug === 'limpeza-tapetes'
+      ? { value: "Á Medida", label: `Orçamento, ${cityPrep} ${data.city}`, icon: Euro }
+      : { value: data.priceFrom, label: `Desde, ${cityPrep} ${data.city}`, icon: Euro },
     freguesiaCount > 0
       ? { value: `${freguesiaCount}+`, label: "Zonas cobertas", icon: MapPin }
       : { value: "100%", label: `Cobertura ${cityPrep} ${data.city}`, icon: MapPin },
@@ -309,7 +336,7 @@ const LocationServicePage = () => {
                   </div>
                 </div>
 
-                <p className="text-white/40 text-xs mt-4">Desde {data.priceFrom} · Orçamento gratuito · Sem compromisso</p>
+                <p className="text-white/40 text-xs mt-4">{/^\d/.test(data.priceFrom) ? `Desde ${data.priceFrom} · ` : ''}Orçamento gratuito · Sem compromisso</p>
               </div>
 
               <div className="hidden lg:block">
@@ -345,7 +372,9 @@ const LocationServicePage = () => {
                     overline="Tabela de Preços"
                     heading={`Quanto custa ${PRICE_HEADING_VERB[data.serviceSlug] ?? data.service.toLowerCase()} ${cityPrep}`}
                     goldWord={data.city}
-                    subtitle={`Preços fixos e transparentes, sem surpresas. Deslocação +${locationPrices[data.city] ?? 10}€ a ${data.city}. Orçamento gratuito antes de qualquer compromisso.`}
+                    subtitle={data.serviceSlug === 'limpeza-tapetes'
+                      ? `Orçamento à medida de cada tapete. Deslocação +${locationPrices[data.city] ?? 10}€ a ${data.city}. Sem surpresas, sem custos escondidos.`
+                      : `Preços fixos e transparentes, sem surpresas. Deslocação +${locationPrices[data.city] ?? 10}€ a ${data.city}. Orçamento gratuito antes de qualquer compromisso.`}
                   />
                   {/* Trust facts — desktop only (variante 1) */}
                   <div className="hidden md:block">
@@ -424,7 +453,7 @@ const LocationServicePage = () => {
                           ? (qty <= 0 ? (isAlcatifa ? '3€/m²' : 'Sob orçamento') : carpetP == null ? 'Sob orçamento' : `${Math.round(carpetP * 10) / 10}€`)
                           : row.price;
 
-                        if (isCarpet) {
+                        if (isCarpet && isAlcatifa) {
                           return (
                             <div
                               key={i}
@@ -437,7 +466,7 @@ const LocationServicePage = () => {
                             >
                               <div className="flex items-center gap-3">
                                 <input
-                                  type="number" min={0} max={isAlcatifa ? 50 : 20}
+                                  type="number" min={0} max={50}
                                   value={qty || ''} placeholder="0"
                                   onChange={e => {
                                     const v = parseFloat(e.target.value) || 0;
@@ -457,6 +486,59 @@ const LocationServicePage = () => {
                                 )}
                               </div>
                               <CarpetTierLegend isAlcatifa={isAlcatifa} qty={qty} />
+                            </div>
+                          );
+                        }
+
+                        if (isCarpet) {
+                          const items = getCarpetItems(i);
+                          const active = qty > 0;
+                          return (
+                            <div
+                              key={i}
+                              className="px-5 py-4 border-b transition-all duration-200"
+                              style={{
+                                borderBottomColor: "rgba(17,17,17,0.06)",
+                                borderLeft: active ? "3px solid #D4AF37" : "3px solid transparent",
+                                background: active ? "rgba(212,175,55,0.03)" : "transparent",
+                              }}
+                            >
+                              <div className="flex flex-col gap-2">
+                                {items.map((item, idx) => {
+                                  const area = carpetItemArea(item);
+                                  return (
+                                    <div key={item.id} className="flex items-center gap-2 rounded-lg border px-3 py-2" style={{ borderColor: "rgba(17,17,17,0.10)" }}>
+                                      <span className="text-[10px] font-bold uppercase tracking-wide flex-shrink-0" style={{ color: "rgba(17,17,17,0.35)" }}>Tapete {idx + 1}</span>
+                                      <input
+                                        type="number" min={0} step={0.1} placeholder="Largura" value={item.largura}
+                                        onChange={e => updateCarpetItem(i, item.id, 'largura', e.target.value)}
+                                        className="w-24 text-center text-base font-semibold outline-none rounded-lg"
+                                        style={{ border: "1px solid rgba(17,17,17,0.18)", color: "#111111", background: "white", padding: "10px 6px" }}
+                                      />
+                                      <span className="text-sm flex-shrink-0" style={{ color: "rgba(17,17,17,0.3)" }}>×</span>
+                                      <input
+                                        type="number" min={0} step={0.1} placeholder="Compr." value={item.comprimento}
+                                        onChange={e => updateCarpetItem(i, item.id, 'comprimento', e.target.value)}
+                                        className="w-24 text-center text-base font-semibold outline-none rounded-lg"
+                                        style={{ border: "1px solid rgba(17,17,17,0.18)", color: "#111111", background: "white", padding: "10px 6px" }}
+                                      />
+                                      <span className="flex-1 text-right text-xs font-bold tabular-nums" style={{ color: area > 0 ? "#D4AF37" : "rgba(17,17,17,0.25)" }}>{area > 0 ? `${Math.round(area * 100) / 100} m²` : ''}</span>
+                                      {items.length > 1 && (
+                                        <button type="button" onClick={() => removeCarpetItem(i, item.id)} aria-label="Remover tapete" className="w-5 h-5 flex items-center justify-center flex-shrink-0" style={{ color: "rgba(17,17,17,0.3)" }}>×</button>
+                                      )}
+                                    </div>
+                                  );
+                                })}
+                                <button
+                                  type="button"
+                                  onClick={() => addCarpetItem(i)}
+                                  className="w-full flex items-center justify-center gap-1.5 py-2 rounded-lg border border-dashed text-xs font-bold"
+                                  style={{ borderColor: "rgba(212,175,55,0.4)", color: "#B8912A" }}
+                                >
+                                  <Plus className="w-3 h-3" /> Adicionar outro tapete
+                                </button>
+                                <p className="text-[11px] text-center" style={{ color: "rgba(17,17,17,0.4)" }}>Cada tapete é sempre <span style={{ color: "#D4AF37", fontWeight: 700 }}>sob orçamento</span></p>
+                              </div>
                             </div>
                           );
                         }
@@ -658,7 +740,7 @@ const LocationServicePage = () => {
                             </div>
                           ) : (
                             <p className="text-[11px] leading-snug" style={{ color: "rgba(17,17,17,0.45)" }}>
-                              Pedidos de <span className="font-semibold" style={{ color: "#111111" }}>{PACK_DISCOUNT_MIN_SERVICE}€+</span> com um item extra de <span className="font-semibold" style={{ color: "#111111" }}>{PACK_DISCOUNT_MIN_UPSELL_ITEM}€+</span> ganham <span className="font-semibold" style={{ color: "#D4AF37" }}>10% de desconto em tudo</span>.
+                              Peça um colchão, um sofá ou algumas cadeiras a mais (desde <span className="font-semibold" style={{ color: "#111111" }}>{PACK_DISCOUNT_MIN_UPSELL_ITEM}€</span>) num pedido de <span className="font-semibold" style={{ color: "#111111" }}>{PACK_DISCOUNT_MIN_SERVICE}€+</span> e ganhe <span className="font-semibold" style={{ color: "#D4AF37" }}>10% de desconto em tudo</span>.
                             </p>
                           )}
                         </div>
@@ -756,6 +838,7 @@ const LocationServicePage = () => {
             initialMattressQty={priceQuizConfig.mattressQty}
             initialChairQty={priceQuizConfig.chairQty}
             initialCarpetArea={priceQuizConfig.carpetArea}
+            initialCarpetItems={priceQuizConfig.carpetItems}
             initialUpsellItems={priceQuizConfig.initialUpsellItems}
             initialWaterproofingTier={priceQuizConfig.waterproofingTier}
             initialChairWaterproofing={priceQuizConfig.chairWaterproofing}

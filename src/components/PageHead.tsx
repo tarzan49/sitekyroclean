@@ -52,15 +52,15 @@ const routeMeta: Record<string, { pt: PageMeta; en: PageMeta; es: PageMeta }> = 
   },
   "/limpeza-tapetes": {
     pt: {
-      title: "Limpeza e Lavagem de Tapetes | Desde 15€/m² | Kyro Clean Solutions",
+      title: "Limpeza e Lavagem de Tapetes | Orçamento Grátis | Kyro Clean Solutions",
       description: "Lavagem profissional de tapetes com extração profunda. Removemos sujidade, manchas e alergénios. Recolha e entrega disponível em todo o país.",
     },
     en: {
-      title: "Rug Cleaning & Washing | From €12/m² | Kyro Clean Solutions",
+      title: "Rug Cleaning & Washing | Free Quote | Kyro Clean Solutions",
       description: "Professional rug cleaning with deep professional extraction. We remove dirt, stains and allergens. Pick-up and delivery available.",
     },
     es: {
-      title: "Limpieza y Lavado de Alfombras | Desde 15€/m² | Kyro Clean Solutions",
+      title: "Limpieza y Lavado de Alfombras | Presupuesto Gratis | Kyro Clean Solutions",
       description: "Lavado profesional de alfombras con extracción profunda. Eliminamos suciedad, manchas y alérgenos.",
     },
   },

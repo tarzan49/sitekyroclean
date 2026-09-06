@@ -265,7 +265,9 @@ const SofaVariantPage = () => {
 
   const snapshotStats = [
     { value: "5.0 ★", label: "Avaliação Google", icon: Star },
-    { value: data.priceFrom, label: `Desde, ${prep} ${data.locationName.split(',')[0].trim()}`, icon: Euro },
+    data.serviceKey === 'tapetes'
+      ? { value: "Á Medida", label: `Orçamento, ${prep} ${data.locationName.split(',')[0].trim()}`, icon: Euro }
+      : { value: data.priceFrom, label: `Desde, ${prep} ${data.locationName.split(',')[0].trim()}`, icon: Euro },
     { value: zonesValue, label: zonesLabel, icon: MapPin },
     { value: "30min", label: "Tempo de resposta", icon: Clock },
   ];
@@ -356,7 +358,7 @@ const SofaVariantPage = () => {
                   Prefere ligar? {PHONE_DISPLAY}
                 </a>
 
-                <p className="text-white/40 text-xs mt-4">Desde {data.priceFrom} · Orçamento gratuito · Sem compromisso</p>
+                <p className="text-white/40 text-xs mt-4">{/^\d/.test(data.priceFrom) ? `Desde ${data.priceFrom} · ` : ''}Orçamento gratuito · Sem compromisso</p>
               </div>
 
               <div className="hidden lg:block">

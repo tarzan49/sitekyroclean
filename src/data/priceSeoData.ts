@@ -35,13 +35,8 @@ const priceTables: Record<string, { item: string; price: string; note?: string }
     { item: "Cabeceira estofada", price: "Desde 20€", note: "add-on" },
   ],
   "limpeza-tapetes": [
-    { item: "Tapete até 3m²", price: "15€/m²" },
-    { item: "Tapete de 3 a 5m²", price: "12,5€/m²" },
-    { item: "Tapete de 5 a 8m²", price: "11,5€/m²" },
-    { item: "Tapete de 8 a 10m²", price: "10,5€/m²" },
-    { item: "Tapete de 10 a 15m²", price: "10€/m²" },
-    { item: "Tapete +15m²", price: "Sob consulta" },
-    { item: "Tapete persa/oriental", price: "Sob consulta", note: "tratamento premium" },
+    { item: "Tapetes (qualquer dimensão)", price: "Sob orçamento", note: "medido à peça, largura x comprimento" },
+    { item: "Tapete persa/oriental", price: "Sob orçamento", note: "tratamento premium" },
   ],
   "limpeza-cadeiras": [
     { item: "1ª a 4ª cadeira", price: "20€/un" },
@@ -128,7 +123,7 @@ const priceFaqs: Record<string, { question: string; answer: string }[]> = {
     { question: "A deslocação em {city} tem custo?", answer: "Sim, a partir de {travelFee} em {city} e arredores, consoante a distância ao centro. O valor exato é mostrado no orçamento antes de confirmar." },
   ],
   "limpeza-tapetes": [
-    { question: "Quanto custa limpar um tapete em {city}?", answer: "A limpeza de tapetes em {city} começa a partir de 15€/m². Tapetes artesanais, persas ou de seda podem ter preços especiais. Peça orçamento gratuito." },
+    { question: "Quanto custa limpar um tapete em {city}?", answer: "A limpeza de tapetes em {city} é sempre orçamentada à medida de cada tapete, conforme a dimensão e o tipo de fibra. Tapetes artesanais, persas ou de seda podem ter preços especiais. Peça orçamento gratuito." },
     { question: "Recolhem e entregam tapetes em {city}?", answer: "Sim, podemos recolher o tapete em {city}, limpá-lo no nosso centro e entregá-lo limpo na sua casa. O serviço de recolha e entrega está incluído." },
   ],
   "limpeza-cadeiras": [
@@ -169,7 +164,7 @@ export function getPricePageData(serviceSlug: string, citySlug: string): PricePa
     citySlug: city.slug,
     cityName: city.name,
     title: `Preço ${service.name} ${city.name} | Tabela de Preços | Kyro Clean Solutions`,
-    metaDescription: `Preços de ${service.name.toLowerCase()} ${prep} ${city.name}. Tabela de preços atualizada. Desde ${service.priceFrom}. Orçamento gratuito e sem compromisso.`,
+    metaDescription: `Preços de ${service.name.toLowerCase()} ${prep} ${city.name}. Tabela de preços atualizada.${/^\d/.test(service.priceFrom) ? ` Desde ${service.priceFrom}.` : ''} Orçamento gratuito e sem compromisso.`,
     h1: `Preço de ${service.name} ${prep} ${city.name}`,
     intro: `Consulte os preços de ${service.name.toLowerCase()} ${prep} ${city.name}. Preços transparentes, sem custos escondidos: a deslocação é calculada consoante a localização, equipamento de extração profissional e produtos certificados. Orçamento gratuito e sem compromisso.`,
     priceTable: table,

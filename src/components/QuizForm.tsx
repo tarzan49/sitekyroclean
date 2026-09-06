@@ -54,6 +54,7 @@ interface QuizFormProps {
   initialChairQty?: string;
   initialChairWaterproofing?: boolean;
   initialCarpetArea?: string;
+  initialCarpetItems?: CarpetItem[];
   initialWaterproofingTier?: 'essencial' | 'premium';
   problema?: string;
   skipToUpsell?: boolean;
@@ -73,7 +74,7 @@ function calcInitialStep(loc?: string, svc?: string, hasItem?: boolean, skipUpse
 const QuizForm = ({
   isOpen, onClose, initialLocation, initialService, problema,
   initialServiceType, initialSofaSizeId, initialSofaQty, initialSofaItems,
-  initialMattressSizeId, initialMattressQty, initialMattressItems, initialChairQty, initialChairWaterproofing, initialCarpetArea,
+  initialMattressSizeId, initialMattressQty, initialMattressItems, initialChairQty, initialChairWaterproofing, initialCarpetArea, initialCarpetItems,
   initialWaterproofingTier, skipToUpsell, initialUpsellItems,
 }: QuizFormProps) => {
   const { toast } = useToast();
@@ -81,7 +82,7 @@ const QuizForm = ({
   const hasInitialItem = Boolean(
     initialSofaItems?.some(i => i.qty > 0) || initialSofaSizeId ||
     initialMattressItems?.some(i => i.qty > 0) || initialMattressSizeId ||
-    initialChairQty || initialCarpetArea
+    initialChairQty || initialCarpetArea || initialCarpetItems?.length
   );
 
   // Builders for the pre-filled state when the quiz is opened directly from
@@ -115,11 +116,15 @@ const QuizForm = ({
     }
     return initialMattressSizeId ? [{ sizeId: initialMattressSizeId, qty: initialMattressQty ?? 1, packEnabled: false }] : [];
   };
-  // Simulador de tapetes (2026-09-06) só guarda largura/comprimento, não uma
-  // área total solta — initialCarpetArea (herdado de um widget de preços que só
-  // pede a área somada) não dá para converter num tapete válido, por isso o
-  // simulador arranca sempre com uma linha em branco.
-  const buildInitialCarpetItems = (): CarpetItem[] => [{ id: 'tapete-1', largura: '', comprimento: '' }];
+  // Simulador de tapetes (2026-09-06) guarda largura/comprimento por peça —
+  // se vier de um widget de preços que já mediu tapetes (initialCarpetItems),
+  // arranca com essas peças; senão (ou se vier só initialCarpetArea, um widget
+  // mais antigo que só pedia a área somada, impossível de converter num par
+  // largura×comprimento) arranca com uma linha em branco.
+  const buildInitialCarpetItems = (): CarpetItem[] =>
+    initialCarpetItems && initialCarpetItems.length > 0
+      ? initialCarpetItems.map((it, i) => ({ ...it, id: it.id || `tapete-${i + 1}` }))
+      : [{ id: 'tapete-1', largura: '', comprimento: '' }];
 
   const [currentStep, setCurrentStep] = useState(() => calcInitialStep(initialLocation, initialService, hasInitialItem, skipToUpsell, !!initialServiceType));
   const [locationQuery, setLocationQuery] = useState('');

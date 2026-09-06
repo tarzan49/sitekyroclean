@@ -12,6 +12,15 @@ function pick<T>(arr: readonly T[], seed: number): T {
   return arr[seed % arr.length];
 }
 
+/** Tapetes não têm preço fixo (2026-09-06, sempre "Sob orçamento") — os templates
+ * partilhados por todos os serviços dizem sempre "desde {price}", o que fica
+ * quebrado para tapetes ("desde Sob orçamento"). Esta função devolve a cláusula
+ * "desde X" pronta a inserir, já adaptada quando não há preço numérico. */
+function priceClause(price: string, capitalized = false): string {
+  const clause = /^\d/.test(price) ? `desde ${price}` : 'com orçamento sempre à medida';
+  return capitalized ? clause.charAt(0).toUpperCase() + clause.slice(1) : clause;
+}
+
 function pickN<T>(arr: readonly T[], seed: number, n: number): T[] {
   const copy = [...arr];
   const result: T[] = [];
@@ -219,14 +228,14 @@ export function getLocalData(slug: string, freguesia: string, municipio: string)
 type ContentTemplate = (f: string, c: string, svc: string, price: string) => string;
 
 const introTemplates: ContentTemplate[] = [
-  (f, c, svc, price) => `Procura ${svc.toLowerCase()} profissional em ${f}, ${c}? A Kyro Clean Solutions presta serviços ao domicílio com equipamento de extração profissional. Resultados visíveis no momento, desde ${price}.`,
-  (f, c, svc, price) => `A Kyro Clean Solutions é a escolha de referência em ${f} para ${svc.toLowerCase()}. Utilizamos tecnologia de extração profissional com água quente em toda a zona de ${c}. Serviço desde ${price}.`,
-  (f, c, svc, price) => `Em ${f}, a proximidade urbana e o ritmo do dia-a-dia fazem com que os estofos acumulem sujidade invisível. A Kyro Clean Solutions oferece ${svc.toLowerCase()} profissional em ${c} com resultados no próprio dia, desde ${price}.`,
-  (f, c, svc, price) => `Diga adeus às manchas e odores em ${f}. A Kyro Clean Solutions disponibiliza o serviço mais completo de ${svc.toLowerCase()} em ${c}, com equipamento profissional e produtos certificados. Desde ${price}.`,
-  (f, c, svc, price) => `Residentes de ${f} já confiam na Kyro Clean Solutions para ${svc.toLowerCase()} ao domicílio. Deslocamo-nos a qualquer zona de ${c} com equipamento de extração profissional. Preços desde ${price}.`,
-  (f, c, svc, price) => `Precisa de ${svc.toLowerCase()} em ${f}? A nossa equipa especializada cobre toda a zona de ${c} com um serviço rápido, eficaz e sem complicações. Higienização profissional desde ${price}.`,
-  (f, c, svc, price) => `Em ${f}, ${c}, os estofos merecem cuidados profissionais. A Kyro Clean Solutions utiliza extração profissional a quente para remover manchas, ácaros e odores. Desde ${price} ao domicílio.`,
-  (f, c, svc, price) => `A limpeza caseira não é suficiente para eliminar ácaros e bactérias dos seus estofos em ${f}. A Kyro Clean Solutions garante uma higienização profunda em ${c}, desde ${price}.`,
+  (f, c, svc, price) => `Procura ${svc.toLowerCase()} profissional em ${f}, ${c}? A Kyro Clean Solutions presta serviços ao domicílio com equipamento de extração profissional. Resultados visíveis no momento, ${priceClause(price)}.`,
+  (f, c, svc, price) => `A Kyro Clean Solutions é a escolha de referência em ${f} para ${svc.toLowerCase()}. Utilizamos tecnologia de extração profissional com água quente em toda a zona de ${c}. Serviço ${priceClause(price)}.`,
+  (f, c, svc, price) => `Em ${f}, a proximidade urbana e o ritmo do dia-a-dia fazem com que os estofos acumulem sujidade invisível. A Kyro Clean Solutions oferece ${svc.toLowerCase()} profissional em ${c} com resultados no próprio dia, ${priceClause(price)}.`,
+  (f, c, svc, price) => `Diga adeus às manchas e odores em ${f}. A Kyro Clean Solutions disponibiliza o serviço mais completo de ${svc.toLowerCase()} em ${c}, com equipamento profissional e produtos certificados. ${priceClause(price, true)}.`,
+  (f, c, svc, price) => `Residentes de ${f} já confiam na Kyro Clean Solutions para ${svc.toLowerCase()} ao domicílio. Deslocamo-nos a qualquer zona de ${c} com equipamento de extração profissional. Preços ${priceClause(price)}.`,
+  (f, c, svc, price) => `Precisa de ${svc.toLowerCase()} em ${f}? A nossa equipa especializada cobre toda a zona de ${c} com um serviço rápido, eficaz e sem complicações. Higienização profissional ${priceClause(price)}.`,
+  (f, c, svc, price) => `Em ${f}, ${c}, os estofos merecem cuidados profissionais. A Kyro Clean Solutions utiliza extração profissional a quente para remover manchas, ácaros e odores. ${priceClause(price, true)} ao domicílio.`,
+  (f, c, svc, price) => `A limpeza caseira não é suficiente para eliminar ácaros e bactérias dos seus estofos em ${f}. A Kyro Clean Solutions garante uma higienização profunda em ${c}, ${priceClause(price)}.`,
 ];
 
 // ─── How It Works Templates ──────────────────────────────────────
@@ -242,10 +251,10 @@ const howItWorksTemplates: ContentTemplate[] = [
 // ─── Meta Description Templates ──────────────────────────────────
 
 const metaDescTemplates: Array<(svc: string, f: string, c: string, price: string) => string> = [
-  (svc, f, c, price) => `${svc} profissional em ${f}, ${c}. Ao domicílio com resultados visíveis. Desde ${price}. Orçamento grátis.`,
-  (svc, f, c, price) => `${svc} em ${f}, ${c}. Remoção de manchas, ácaros e odores ao domicílio. Desde ${price}. Peça orçamento gratuito.`,
-  (svc, f, c, price) => `Serviço profissional de ${svc.toLowerCase()} em ${f}. Equipamento de extração profissional. Desde ${price} em ${c}.`,
-  (svc, f, c, price) => `${svc} ao domicílio em ${f}, ${c}. Técnicos certificados, produtos seguros. Desde ${price}. Orçamento grátis.`,
+  (svc, f, c, price) => `${svc} profissional em ${f}, ${c}. Ao domicílio com resultados visíveis. ${priceClause(price, true)}. Orçamento grátis.`,
+  (svc, f, c, price) => `${svc} em ${f}, ${c}. Remoção de manchas, ácaros e odores ao domicílio. ${priceClause(price, true)}. Peça orçamento gratuito.`,
+  (svc, f, c, price) => `Serviço profissional de ${svc.toLowerCase()} em ${f}. Equipamento de extração profissional. ${priceClause(price, true)} em ${c}.`,
+  (svc, f, c, price) => `${svc} ao domicílio em ${f}, ${c}. Técnicos certificados, produtos seguros. ${priceClause(price, true)}. Orçamento grátis.`,
 ];
 
 // ─── Problem Pools (service-specific, location-aware) ─────────────
@@ -464,7 +473,7 @@ const faqsByService: Record<string, FAQTemplate[]> = {
   "limpeza-tapetes": [
     {
       question: (svc, f) => `Quanto custa a limpeza de tapete em ${f}?`,
-      answer: (svc, f, price, c) => `A limpeza de tapete em ${f}, ${c} começa a partir de ${price}. O preço varia com o tamanho e tipo de fibra. Peça o seu orçamento gratuito.`,
+      answer: (svc, f, price, c) => `A limpeza de tapete em ${f}, ${c} é sempre orçamentada à medida de cada tapete. O preço varia com o tamanho e tipo de fibra. Peça o seu orçamento gratuito.`,
     },
     {
       question: (svc, f) => `Fazem limpeza de tapete ao domicílio em ${f}?`,
@@ -654,7 +663,7 @@ export function getDynamicContent(
   const localSection = `Prestamos serviço em ${freguesiaName}, perto de ${landmarkList}. ${localData.localTip}`;
 
   return {
-    title: `${serviceName} em ${freguesiaName}, ${municipio} | Desde ${priceFrom} | Kyro Clean Solutions`,
+    title: `${serviceName} em ${freguesiaName}, ${municipio} | ${/^\d/.test(priceFrom) ? `Desde ${priceFrom}` : 'Orçamento Grátis'} | Kyro Clean Solutions`,
     metaDescription,
     h1: `${serviceName} em ${freguesiaName}`,
     intro: `${intro} ${localSection}`,

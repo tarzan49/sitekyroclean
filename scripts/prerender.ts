@@ -111,13 +111,13 @@ function buildBreadcrumbSchema(items: { name: string; url: string }[]) {
 
 /** Service — signals what's offered, where, at what price, with ratings. */
 function buildServiceSchema(serviceName: string, cityName: string, priceFrom: string) {
-  const price = priceFrom.replace(',', '.').replace(/[^0-9.]/g, '') || '0';
+  const price = priceFrom.replace(',', '.').replace(/[^0-9.]/g, '');
   return {
     '@context': 'https://schema.org',
     ...buildServiceNode({
       name: serviceName,
       areaServed: { '@type': 'City', name: cityName },
-      offers: buildOfferNode(price),
+      ...(price && { offers: buildOfferNode(price) }),
     }),
   };
 }
@@ -694,8 +694,8 @@ export function prerenderRoutes(outDir: string): number {
       },
       {
         path: '/limpeza-tapetes',
-        title: 'Limpeza e Lavagem de Tapetes | Desde 15€/m² | Kyro Clean Solutions',
-        desc: 'Lavagem profissional de tapetes com extração profunda. Removemos sujidade, manchas e alergénios. Serviço ao domicílio em todo o país. Desde 15€/m².',
+        title: 'Limpeza e Lavagem de Tapetes | Orçamento Grátis | Kyro Clean Solutions',
+        desc: 'Lavagem profissional de tapetes com extração profunda. Removemos sujidade, manchas e alergénios. Serviço ao domicílio em todo o país. Orçamento à medida de cada tapete.',
         content: {
           h1: 'Limpeza e Lavagem de Tapetes ao Domicílio',
           intro: 'Limpeza profissional de tapetes ao domicílio com extração profunda. Removemos sujidade acumulada, manchas difíceis e alergénios. Tapetes persas, shaggy, sisal e todos os tipos tratados com produto específico ao material.',
@@ -708,14 +708,20 @@ export function prerenderRoutes(outDir: string): number {
             'Serviço ao domicílio sem necessidade de recolha',
           ],
           faqs: faqs([
-            { q: 'Quanto custa a limpeza de tapete?', a: 'O preço depende da área: até 3m² é 15€/m², de 3 a 5m² é 12,5€/m², de 5 a 8m² é 11,5€/m², de 8 a 10m² é 10,5€/m² e de 10 a 15m² é 10€/m². Para áreas maiores peça orçamento.' },
+            { q: 'Quanto custa a limpeza de tapete?', a: 'Cada tapete é medido (largura x comprimento) e orçamentado individualmente, sem preço fixo por m². Peça um orçamento gratuito e sem compromisso.' },
             { q: 'Quanto tempo demora a limpeza de tapete?', a: 'O serviço demora 1 a 2 horas. O tapete fica seco em 4 a 8 horas, dependendo da espessura e material.' },
             { q: 'Que tipos de tapete limpam?', a: 'Limpamos todos os tipos: persas, shaggy, sisal, juta, lã, acrílico, polipropileno e fibras naturais. O produto é sempre adaptado ao material.' },
             { q: 'Fazem limpeza de tapetes ao domicílio?', a: 'Sim. O técnico desloca-se a sua casa com equipamento de extração profissional. Não precisa de entregar o tapete.' },
           ]),
         },
         extraSchemas: [
-          buildServiceSchema('Limpeza de Tapetes', 'Portugal', '12€'),
+          {
+            '@context': 'https://schema.org',
+            ...buildServiceNode({
+              name: 'Limpeza de Tapetes',
+              areaServed: { '@type': 'City', name: 'Portugal' },
+            }),
+          },
           buildBreadcrumbSchema([
             { name: 'Início', url: BASE_URL + '/' },
             { name: 'Limpeza de Tapetes', url: BASE_URL + '/limpeza-tapetes' },
@@ -957,7 +963,7 @@ export function prerenderRoutes(outDir: string): number {
         benefits: [
           'Photograph damage before cleaning it — timestamped before/after is the standard most platforms ask for.',
           'Same-day is often possible, but the earlier in the day you reach out, the better your odds.',
-          'Prices start from €49 (sofa) / €59 (mattress) / €12/m² (rug), always confirmed before we start.',
+          'Prices start from €49 (sofa) / €59 (mattress); rugs are quoted per piece, always confirmed before we start.',
           'Before/after photo documentation is standard on every job, no need to request it separately.',
         ],
       },

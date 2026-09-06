@@ -23,6 +23,7 @@ interface Props {
   initialChairQty?: string;
   initialChairWaterproofing?: boolean;
   initialCarpetArea?: string;
+  initialCarpetItems?: import('./quiz/QuizTypes').CarpetItem[];
   initialWaterproofingTier?: 'essencial' | 'premium';
   problema?: string;
   skipToUpsell?: boolean;

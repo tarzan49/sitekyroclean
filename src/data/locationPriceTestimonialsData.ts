@@ -8,6 +8,7 @@ export type PriceRowQuizConfig = {
   sofaSizeId?: string;
   mattressSizeId?: string;
   carpetArea?: string;
+  carpetItems?: import('@/components/quiz/QuizTypes').CarpetItem[];
   chairQty?: string;
   chairWaterproofing?: boolean;
   sofaQty?: number;

@@ -1,5 +1,5 @@
 import { PRICE_TABLE, PRICE_TABLE_QUIZ_CONFIG, type PriceRowQuizConfig } from "@/data/locationPriceTestimonialsData";
-import type { UpsellItemConfig } from "@/components/quiz/QuizTypes";
+import type { UpsellItemConfig, CarpetItem } from "@/components/quiz/QuizTypes";
 import { sofaPrices, mattressPrices } from "@/components/quiz/QuizTypes";
 import { calcPackPricing, calcChairWaterproof, calcChairWaterproofPremium } from "@/components/quiz/quizHelpers";
 
@@ -238,7 +238,8 @@ export function buildWidgetQuizConfig(
   chaiseLongueAddon: number,
   addonRows: Set<number> = new Set(),
   addonTier: WidgetTier = 'essencial',
-  antiAcarosRows: Set<number> = new Set()
+  antiAcarosRows: Set<number> = new Set(),
+  carpetItemsByRow: Record<number, CarpetItem[]> = {}
 ): PriceRowQuizConfig | null {
   const configs = PRICE_TABLE_QUIZ_CONFIG[serviceSlug] ?? [];
   const isWaterproof = serviceSlug === 'impermeabilizacao';
@@ -252,6 +253,8 @@ export function buildWidgetQuizConfig(
   let   chairAntiAcarosOn = false;
   let   carpetArea = 0;
   let   carpetCfg: PriceRowQuizConfig | null = null;
+  let   carpetRowIndex = -1;
+  const isAlcatifa = serviceSlug === 'limpeza-alcatifas';
   let   antiAcarosQty = 0;
   let   antiAcarosPrice = 0;
 
@@ -266,7 +269,7 @@ export function buildWidgetQuizConfig(
       if (packEnabled) chairWaterproofOn = true;
       if (antiAcarosRows.has(i)) chairAntiAcarosOn = true;
     }
-    if (cfg.service === 'carpet'  && qty > 0) { carpetArea = qty; carpetCfg = cfg; }
+    if (cfg.service === 'carpet'  && qty > 0) { carpetArea = qty; carpetCfg = cfg; carpetRowIndex = i; }
     if (cfg.service === 'sofa'    && qty > 0 && antiAcarosRows.has(i)) {
       const delta = calcSofaAntiAcarosDelta(cfg);
       if (delta !== null) { antiAcarosQty += qty; antiAcarosPrice += delta * qty; }
@@ -316,9 +319,21 @@ export function buildWidgetQuizConfig(
     };
   }
 
-  // Tapetes / alcatifas
-  if (carpetArea > 0 && carpetCfg) {
+  // Alcatifas: continuam com o modelo de área única (preço real por m²).
+  if (carpetArea > 0 && carpetCfg && isAlcatifa) {
     return { ...(carpetCfg as PriceRowQuizConfig), carpetArea: String(carpetArea) };
+  }
+  // Tapetes: várias peças medidas (largura×comprimento), sempre sob orçamento
+  // — mesma lógica do simulador do quiz, para o "Continuar" já levar os
+  // tapetes que a pessoa mediu aqui em vez de abrir o passo do quiz vazio.
+  const carpetItems = carpetRowIndex >= 0 ? (carpetItemsByRow[carpetRowIndex] ?? []) : [];
+  const validCarpetItems = carpetItems.filter(it => {
+    const l = parseFloat((it.largura + '').replace(',', '.'));
+    const c = parseFloat((it.comprimento + '').replace(',', '.'));
+    return !isNaN(l) && !isNaN(c) && l > 0 && c > 0;
+  });
+  if (carpetCfg && validCarpetItems.length > 0) {
+    return { ...(carpetCfg as PriceRowQuizConfig), carpetArea: undefined, carpetItems: validCarpetItems };
   }
 
   return null;

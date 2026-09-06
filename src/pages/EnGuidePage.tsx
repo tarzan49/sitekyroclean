@@ -50,7 +50,7 @@ const SECTIONS = [
     id: "costs",
     title: "Realistic costs",
     body: [
-      "Sofa cleaning starts from €49, mattress cleaning from €59, and rug cleaning from €12/m²; exact pricing depends on the size and condition of the item and is always confirmed before we start, so there are no surprises on the invoice you show your guest or platform.",
+      "Sofa cleaning starts from €49 and mattress cleaning from €59; rugs are measured and quoted individually rather than a fixed per-m² rate. Exact pricing depends on the size and condition of the item and is always confirmed before we start, so there are no surprises on the invoice you show your guest or platform.",
       "If a single listing needs regular attention, ask about a standing arrangement; several hosts we work with have us on a recurring schedule rather than calling for each individual incident.",
     ],
   },
@@ -215,7 +215,7 @@ const EnGuidePage = () => {
               {[
                 { icon: Camera, text: "Photograph damage before cleaning it: timestamped before/after is the standard most platforms ask for." },
                 { icon: Clock, text: "Same-day is often possible, but the earlier in the day you reach out, the better your odds." },
-                { icon: Euro, text: "Prices start from €49 (sofa) / €59 (mattress) / €12/m² (rug), always confirmed before we start." },
+                { icon: Euro, text: "Prices start from €49 (sofa) / €59 (mattress); rugs are quoted per piece, always confirmed before we start." },
                 { icon: CheckCircle2, text: "Before/after photo documentation is standard on every job, no need to request it separately." },
               ].map((item, idx) => (
                 <div key={idx} className="relative overflow-hidden p-5 md:p-6" style={{ backgroundColor: "#0d241b", borderTop: "2px solid rgba(212,175,55,0.55)" }}>

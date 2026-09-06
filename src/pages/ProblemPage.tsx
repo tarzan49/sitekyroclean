@@ -424,9 +424,11 @@ const ProblemPage = () => {
               description: data.metaDescription,
               serviceType: relatedService.name,
               areaServed: DEFAULT_AREA_SERVED,
-              offers: buildOfferNode(relatedService.priceFrom.replace(',', '.').replace(/[^0-9.]/g, ''), {
-                validFrom: "2025-01-01",
-                priceValidUntil: "2026-12-31",
+              ...(relatedService.priceFrom.replace(',', '.').replace(/[^0-9.]/g, '') && {
+                offers: buildOfferNode(relatedService.priceFrom.replace(',', '.').replace(/[^0-9.]/g, ''), {
+                  validFrom: "2025-01-01",
+                  priceValidUntil: "2026-12-31",
+                }),
               }),
             })] : []),
           ],

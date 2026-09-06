@@ -174,7 +174,7 @@ const MaterialPage = () => {
                   </div>
                 </div>
 
-                <p className="text-white/40 text-xs mt-4">Desde {servicePrice} · Orçamento gratuito · Sem compromisso</p>
+                <p className="text-white/40 text-xs mt-4">{/^\d/.test(servicePrice) ? `Desde ${servicePrice} · ` : ''}Orçamento gratuito · Sem compromisso</p>
               </div>
 
               <div className="hidden lg:block">
@@ -357,7 +357,7 @@ const MaterialPage = () => {
               name: data.title,
               description: data.metaDescription,
               areaServed: isCityVariant && cityName ? { "@type": "City", name: cityName } : DEFAULT_AREA_SERVED,
-              offers: buildOfferNode(servicePrice.replace(/[^0-9]/g, "")),
+              ...(servicePrice.replace(/[^0-9]/g, "") && { offers: buildOfferNode(servicePrice.replace(/[^0-9]/g, "")) }),
             }),
           ],
         }) }} />

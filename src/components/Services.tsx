@@ -253,7 +253,7 @@ const Services = () => {
     { title: "Limpeza de Colchões", price: "59€",   image: mattressImg,   imageM: mattressImgM,   icon: iconMattress,   link: "/limpeza-colchoes",   altText: "Limpeza de Colchões",          badge: "Durma em ambiente puro"         },
     { title: "Limpeza de Sofás",   price: "49€",    image: sofaImg,       imageM: sofaImgM,       icon: iconSofa,       link: "/limpeza-sofas",      altText: "Limpeza de Sofás",             badge: "O seu sofá novo outra vez"      },
     { title: "Limpeza de Cadeiras", price: "20€",    image: chairsImg,     imageM: chairsImgM,     icon: iconChair,      link: "/limpeza-cadeiras",   altText: "Limpeza de Cadeiras",          badge: "Detalhe e higiene profunda"     },
-    { title: "Limpeza de Tapetes", price: "15€/m²", image: carpetImg,     imageM: carpetImgM,     icon: iconCarpet,     link: "/limpeza-tapetes",    altText: "Limpeza de Tapetes",           badge: "Cuidado delicado fibra a fibra" },
+    { title: "Limpeza de Tapetes", price: "Sob orçamento", image: carpetImg,     imageM: carpetImgM,     icon: iconCarpet,     link: "/limpeza-tapetes",    altText: "Limpeza de Tapetes",           badge: "Cuidado delicado fibra a fibra" },
     { title: "Limpeza de Alcatifas", price: "3€/m²", image: rugsImg,      imageM: rugsImgM,       icon: iconRug,        link: "/limpeza-alcatifas",  altText: "Limpeza de Alcatifas",         badge: "Renovação total do espaço"      },
   ];
 

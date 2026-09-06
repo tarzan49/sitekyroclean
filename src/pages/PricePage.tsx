@@ -147,7 +147,7 @@ const PricePage = () => {
                   </div>
                 </div>
 
-                <p className="text-white/40 text-xs mt-4">Desde {servicePrice} · Orçamento gratuito · Sem compromisso</p>
+                <p className="text-white/40 text-xs mt-4">{/^\d/.test(servicePrice) ? `Desde ${servicePrice} · ` : ''}Orçamento gratuito · Sem compromisso</p>
               </div>
 
               <div className="hidden lg:block">
@@ -294,7 +294,7 @@ const PricePage = () => {
                   name: `${data.serviceName} ${prep} ${data.cityName}`,
                   description: data.metaDescription,
                   areaServed: { "@type": "City", name: data.cityName },
-                  offers: buildOfferNode(servicePrice.replace(/[^0-9]/g, "")),
+                  ...(servicePrice.replace(/[^0-9]/g, "") && { offers: buildOfferNode(servicePrice.replace(/[^0-9]/g, "")) }),
                 }),
               ],
             }),
