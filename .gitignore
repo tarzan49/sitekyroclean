@@ -36,3 +36,4 @@ GOOGLE-ADS-PORTO-CAMPANHA.md
 *.njsproj
 *.sln
 *.sw?
+.tmp-*.mjs
