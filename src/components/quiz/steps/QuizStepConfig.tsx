@@ -302,7 +302,7 @@ const QuizStepConfig = ({
                   <span className="text-[11px] font-bold uppercase tracking-wider text-white/40">Tapete {i + 1}</span>
                   {carpetItems.length > 1 && (
                     <button
-                      onClick={() => setCarpetItems(carpetRemoveItem(carpetItems, item.id))}
+                      onClick={() => setCarpetItems(prev => carpetRemoveItem(prev, item.id))}
                       aria-label="Remover tapete"
                       className="w-5 h-5 rounded-sm flex items-center justify-center text-white/30 hover:text-white/70 hover:bg-white/10 transition-colors touch-manipulation"
                     >×</button>
@@ -313,7 +313,7 @@ const QuizStepConfig = ({
                     <input
                       type="number" inputMode="decimal" min="0" step="0.1" placeholder="0"
                       value={item.largura}
-                      onChange={(e) => setCarpetItems(carpetUpdateItem(carpetItems, item.id, 'largura', e.target.value))}
+                      onChange={(e) => setCarpetItems(prev => carpetUpdateItem(prev, item.id, 'largura', e.target.value))}
                       className="w-full h-11 text-center text-base font-bold bg-white/[0.05] text-white placeholder:text-white/25 rounded-sm border-2 border-white/15 focus:border-gold focus:outline-none transition-colors"
                     />
                     <span className="text-[9px] text-center uppercase tracking-wide text-white/30">Largura (m)</span>
@@ -323,7 +323,7 @@ const QuizStepConfig = ({
                     <input
                       type="number" inputMode="decimal" min="0" step="0.1" placeholder="0"
                       value={item.comprimento}
-                      onChange={(e) => setCarpetItems(carpetUpdateItem(carpetItems, item.id, 'comprimento', e.target.value))}
+                      onChange={(e) => setCarpetItems(prev => carpetUpdateItem(prev, item.id, 'comprimento', e.target.value))}
                       className="w-full h-11 text-center text-base font-bold bg-white/[0.05] text-white placeholder:text-white/25 rounded-sm border-2 border-white/15 focus:border-gold focus:outline-none transition-colors"
                     />
                     <span className="text-[9px] text-center uppercase tracking-wide text-white/30">Comprimento (m)</span>
@@ -337,7 +337,7 @@ const QuizStepConfig = ({
             );
           })}
           <button
-            onClick={() => setCarpetItems(carpetAddItem(carpetItems))}
+            onClick={() => setCarpetItems(prev => carpetAddItem(prev))}
             className="w-full flex items-center justify-center gap-2 py-3 rounded-sm border-2 border-dashed border-gold/30 text-gold/80 text-sm font-bold hover:border-gold/60 hover:bg-gold/[0.04] transition-all touch-manipulation"
           >
             <span className="w-5 h-5 rounded-full border border-gold/50 flex items-center justify-center text-xs leading-none">+</span>
