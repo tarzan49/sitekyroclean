@@ -1,13 +1,14 @@
 import { useMemo } from 'react';
-import type { QuizFormData, SofaItem, MattressItem, UpsellItemConfig } from '@/components/quiz';
+import type { QuizFormData, SofaItem, MattressItem, CarpetItem, UpsellItemConfig } from '@/components/quiz';
 import { sofaPrices, mattressPrices, locationPrices } from '@/components/quiz';
-import { calcCarpetPrice, calcChairClean, calcChairWaterproof, calcChairWaterproofPremium } from '@/components/quiz/quizHelpers';
+import { calcChairClean, calcChairWaterproof, calcChairWaterproofPremium, carpetHasValidItems } from '@/components/quiz/quizHelpers';
 
 export function useQuizPricing(
   formData: QuizFormData,
   sofaItems: SofaItem[],
   mattressItems: MattressItem[],
   upsellItems: UpsellItemConfig[],
+  carpetItems: CarpetItem[],
 ) {
   // Calculate total price early for analytics (moved up for hook dependency).
   // Em paralelo, calcula também o "artigo base" de cada item (preço SEM addon,
@@ -96,27 +97,31 @@ export function useQuizPricing(
             : (calcWaterproof(addonQty) ?? 0);
           price += addonChairPrice;
         }
-        // Cadeiras (serviço principal + addon de impermeabilização, quando
-        // ligado) contam como 1 artigo só, ao preço total do lote incluindo
-        // o addon — os addons contam para o Pack Família (2026-09-01).
-        const totalChairArticle = primaryChairPrice + addonChairPrice;
+        // Anti Ácaros das cadeiras (upsell pós-quantidade, 2026-09-06): sempre
+        // 5€/cadeira fixo, mutuamente exclusivo com o addon de impermeabilização
+        // acima (a UI do upsell garante nunca terem os dois ligados ao mesmo tempo).
+        let antiAcarosChairPrice = 0;
+        if (formData.chairAntiAcaros && !isNaN(chairQty) && chairQty > 0) {
+          antiAcarosChairPrice = chairQty * 5;
+          price += antiAcarosChairPrice;
+        }
+        // Cadeiras (serviço principal + addon de impermeabilização ou Anti
+        // Ácaros, quando ligado) contam como 1 artigo só, ao preço total do
+        // lote incluindo o addon — os addons contam para o Pack Família (2026-09-01).
+        const totalChairArticle = primaryChairPrice + addonChairPrice + antiAcarosChairPrice;
         if (totalChairArticle > 0) { baseTotal += totalChairArticle; noteCandidate(totalChairArticle); }
         break;
       }
 
       case 'carpet': {
-        const carpetArea = parseFloat(formData.carpetArea);
-        if (!isNaN(carpetArea) && carpetArea > 0) {
-          const carpetP = calcCarpetPrice(carpetArea) ?? 0;
-          price = carpetP;
-          if (carpetP > 0) { baseTotal += carpetP; noteCandidate(carpetP); }
-        }
+        // Sem preço fixo (2026-09-06): tapetes nunca contam para o preço nem
+        // para o Pack Família, ficam sempre sob orçamento (ver hasSobOrcamento).
         break;
       }
     }
 
     return { calculateServicePrice: price, articleBaseTotal: baseTotal, minQualifyingArticle: minQualifying };
-  }, [formData, sofaItems, mattressItems]);
+  }, [formData, sofaItems, mattressItems, carpetItems]);
 
   // Calculate travel cost: uses expanded locationPrices from QuizTypes.
   // Mínimo é sempre 10€ (sem zona grátis). Antes de escolher localização não há
@@ -156,10 +161,10 @@ export function useQuizPricing(
   const chairAddonNeedsQuote = isChairService && chairAddonQty > 0 && chairAddonCalc(chairAddonQty) === null;
   const hasSobOrcamento =
     sofaItems.some(i => i.sizeId === '4+-lugares' && i.qty > 0) ||
-    (formData.service === 'carpet' && parseFloat(formData.carpetArea) > 15) ||
+    (formData.service === 'carpet' && carpetHasValidItems(carpetItems)) ||
     chairPrimaryNeedsQuote ||
     chairAddonNeedsQuote;
-  // Any upsell item with price=0 is a SOB item (chairs ≥10, carpet >15m², sofa 4+ lugares)
+  // Any upsell item with price=0 is a SOB item (chairs ≥10, tapetes (sempre), sofa 4+ lugares)
   const hasUpsellSobItem = upsellItems.some(i => i.price === 0);
   // Desconto de 10% (2026-08-31, reformulado x4 — confirmado com 3 exemplos
   // concretos): conta-se cada UNIDADE de mobília (sofá, colchão, cadeiras

@@ -1,12 +1,12 @@
 import { Shield, Check, Star } from 'lucide-react';
-import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 import { sofaPrices, mattressPrices } from '@/components/quiz/QuizTypes';
-import type { QuizFormData, SofaItem, MattressItem } from '@/components/quiz/QuizTypes';
+import type { QuizFormData, SofaItem, MattressItem, CarpetItem } from '@/components/quiz/QuizTypes';
 import {
   sofaSetQty, sofaTogglePack,
   mattressSetQty, mattressTogglePack,
-  calcCarpetPrice, calcChairClean, calcChairWaterproof, calcChairWaterproofPremium,
+  carpetAddItem, carpetRemoveItem, carpetUpdateItem, carpetItemArea, carpetTotalArea,
+  calcChairClean, calcChairWaterproof, calcChairWaterproofPremium,
   calcPackPricing,
 } from '@/components/quiz/quizHelpers';
 import { WHATSAPP_BASE } from '@/constants/business';
@@ -60,6 +60,8 @@ interface QuizStepConfigProps {
   setSofaItems: React.Dispatch<React.SetStateAction<SofaItem[]>>;
   mattressItems: MattressItem[];
   setMattressItems: React.Dispatch<React.SetStateAction<MattressItem[]>>;
+  carpetItems: CarpetItem[];
+  setCarpetItems: React.Dispatch<React.SetStateAction<CarpetItem[]>>;
 }
 
 const QuizStepConfig = ({
@@ -69,6 +71,8 @@ const QuizStepConfig = ({
   setSofaItems,
   mattressItems,
   setMattressItems,
+  carpetItems,
+  setCarpetItems,
 }: QuizStepConfigProps) => {
 
   // ── SOFÁS ──────────────────────────────────────────────────────────────────
@@ -274,48 +278,79 @@ const QuizStepConfig = ({
   }
 
   // ── TAPETES ────────────────────────────────────────────────────────────────
+  // Simulador (2026-09-06): sem estimativa de preço nenhuma — qualquer tapete é
+  // sempre sob orçamento. O cliente mede largura × comprimento por tapete, em
+  // vez de somar tudo numa única "área total", e pode adicionar quantos quiser
+  // (padrão "adicionar paragem" do Uber/Google Maps).
   if (formData.service === 'carpet') {
-    const areaNum = parseFloat(formData.carpetArea);
-    const validArea = !isNaN(areaNum) && areaNum > 0;
-    const calculatedPrice = validArea ? calcCarpetPrice(areaNum) : null;
-    const sob = validArea && areaNum > 15;
+    const hasMultiple = carpetItems.length > 1;
+    const totalArea = carpetTotalArea(carpetItems);
+    const hasAnyValid = totalArea > 0;
     return (
       <div className="flex flex-col gap-3 overflow-hidden items-center w-full">
         <p className="text-gold text-[10px] font-bold tracking-[0.28em] uppercase mb-0.5 text-center w-full">O QUE PRECISA?</p>
-        <h2 className="font-playfair text-2xl sm:text-3xl font-bold text-white text-center w-full">Detalhes do Tapete</h2>
-        <div className={cn(
-          'w-full max-w-xs rounded-sm border px-5 py-4 text-center transition-all duration-300',
-          sob ? 'bg-[#1a2a1a] border-white/20'
-            : validArea ? 'bg-[#1a2a1a] border-gold/30 shadow-[0_0_20px_rgba(212,175,55,0.10)]'
-            : 'bg-[#1a2a1a] border-gold/15'
-        )}>
-          <p className="text-[10px] text-white/35 uppercase tracking-wider mb-1">Estimativa total</p>
-          {validArea ? (
-            <>
-              <p
-                className={cn('font-playfair font-black leading-none mb-1', sob ? 'text-white/50 text-2xl' : 'text-gold text-4xl')}
-                style={!sob ? { textShadow: '0 0 28px rgba(212,175,55,0.55)' } : undefined}
-              >
-                {sob ? 'Sob Orçamento' : `${calculatedPrice !== null ? Math.round(calculatedPrice) : '0'}€`}
-              </p>
-              <p className="text-[10px] text-white/30">
-                {sob ? 'O nosso especialista entra em contacto' : `${areaNum} m²`}
-              </p>
-            </>
-          ) : (
-            <p className="text-white/25 text-sm font-medium py-1">Insira a área para ver o preço</p>
-          )}
+        <h2 className="font-playfair text-2xl sm:text-3xl font-bold text-white text-center w-full">Detalhes do(s) Tapete(s)</h2>
+        <p className="text-xs text-white/35 text-center leading-snug max-w-xs">
+          Meça cada tapete e adicione quantos precisar. Sem preço fixo por m², cada peça é sempre orçamentada à parte.
+        </p>
+        <div className="flex flex-col gap-2 w-full max-w-xs">
+          {carpetItems.map((item, i) => {
+            const area = carpetItemArea(item);
+            return (
+              <div key={item.id} className="rounded-sm border border-gold/15 bg-[#1a2a1a] p-3 flex flex-col gap-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-[11px] font-bold uppercase tracking-wider text-white/40">Tapete {i + 1}</span>
+                  {carpetItems.length > 1 && (
+                    <button
+                      onClick={() => setCarpetItems(carpetRemoveItem(carpetItems, item.id))}
+                      aria-label="Remover tapete"
+                      className="w-5 h-5 rounded-sm flex items-center justify-center text-white/30 hover:text-white/70 hover:bg-white/10 transition-colors touch-manipulation"
+                    >×</button>
+                  )}
+                </div>
+                <div className="flex items-end gap-2">
+                  <div className="flex-1 flex flex-col gap-1">
+                    <input
+                      type="number" inputMode="decimal" min="0" step="0.1" placeholder="0"
+                      value={item.largura}
+                      onChange={(e) => setCarpetItems(carpetUpdateItem(carpetItems, item.id, 'largura', e.target.value))}
+                      className="w-full h-11 text-center text-base font-bold bg-white/[0.05] text-white placeholder:text-white/25 rounded-sm border-2 border-white/15 focus:border-gold focus:outline-none transition-colors"
+                    />
+                    <span className="text-[9px] text-center uppercase tracking-wide text-white/30">Largura (m)</span>
+                  </div>
+                  <span className="text-white/25 text-sm pb-4">×</span>
+                  <div className="flex-1 flex flex-col gap-1">
+                    <input
+                      type="number" inputMode="decimal" min="0" step="0.1" placeholder="0"
+                      value={item.comprimento}
+                      onChange={(e) => setCarpetItems(carpetUpdateItem(carpetItems, item.id, 'comprimento', e.target.value))}
+                      className="w-full h-11 text-center text-base font-bold bg-white/[0.05] text-white placeholder:text-white/25 rounded-sm border-2 border-white/15 focus:border-gold focus:outline-none transition-colors"
+                    />
+                    <span className="text-[9px] text-center uppercase tracking-wide text-white/30">Comprimento (m)</span>
+                  </div>
+                </div>
+                <div className="text-right pt-1 border-t border-white/[0.06]">
+                  <span className="text-[10px] text-white/30">Área </span>
+                  <span className="text-sm font-bold text-gold tabular-nums">{area !== null ? `${area % 1 === 0 ? area : area.toFixed(2).replace('.', ',')} m²` : '0 m²'}</span>
+                </div>
+              </div>
+            );
+          })}
+          <button
+            onClick={() => setCarpetItems(carpetAddItem(carpetItems))}
+            className="w-full flex items-center justify-center gap-2 py-3 rounded-sm border-2 border-dashed border-gold/30 text-gold/80 text-sm font-bold hover:border-gold/60 hover:bg-gold/[0.04] transition-all touch-manipulation"
+          >
+            <span className="w-5 h-5 rounded-full border border-gold/50 flex items-center justify-center text-xs leading-none">+</span>
+            Adicionar outro tapete
+          </button>
         </div>
-        <div className="w-full max-w-xs">
-          <label className="block text-xs font-bold text-white/40 uppercase tracking-wider text-center mb-1.5">Área total de todos os tapetes</label>
-          <div className="relative">
-            <Input type="number" inputMode="decimal" min="0" step="0.5" placeholder="Ex: 12" value={formData.carpetArea} onChange={(e) => updateFormData({ carpetArea: e.target.value })} className={cn('text-lg font-bold bg-[#1a2a1a] text-white placeholder:text-white/25 h-11 pr-12 rounded-sm border-2 transition-all duration-300 focus-visible:ring-0 focus-visible:ring-offset-0', validArea ? 'border-gold shadow-[0_0_12px_rgba(212,175,55,0.18)]' : 'border-gold/25')} />
-            <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-sm font-bold text-gold/60 pointer-events-none">m²</span>
-          </div>
-          <p className="text-xs text-white/35 text-center mt-1 leading-snug">Se tiver vários tapetes, insira a soma total das áreas.</p>
-        </div>
+        {hasMultiple && hasAnyValid && (
+          <p className="text-xs text-white/35 text-center">
+            Área total: <span className="text-white/60 font-semibold">{totalArea % 1 === 0 ? totalArea : totalArea.toFixed(2).replace('.', ',')} m²</span>
+          </p>
+        )}
         <p className="text-xs text-white/30 text-center leading-snug">
-          Preço por m² desce com a área: até 3m² 15€, até 5m² 12,5€, até 8m² 11,5€, até 10m² 10,5€, até 15m² 10€. Acima de 15m², sob orçamento.
+          Qualquer tapete é sempre sob orçamento. Confirmamos o preço certo na visita, sem compromisso.
         </p>
       </div>
     );
@@ -356,19 +391,6 @@ const QuizStepConfig = ({
       updateFormData({ chairWaterproofing: next, chairWaterproofQty: next ? qty : 0 });
     };
 
-    // Dual essencial/premium do addon de impermeabilização (quando limpeza é o
-    // serviço principal) — espelha o padrão "Proteção 2/10 anos" do sofá, em vez de
-    // um único checkbox só com a tarifa Água.
-    const toggleAddonTier = (tier: 'essencial' | 'premium') => {
-      const turningOff = addonEnabled && formData.waterproofingTier === tier;
-      updateFormData({
-        chairWaterproofing: !turningOff,
-        chairWaterproofQty: !turningOff ? qty : 0,
-        waterproofingTier: tier,
-      });
-    };
-    const addonEssencialPrice = calcChairWaterproof(qty);
-    const addonPremiumPrice = calcChairWaterproofPremium(qty);
     const chairWhatsappMsg = encodeURIComponent('Olá, tenho cadeiras de um tipo diferente (sem tampo, costas ou braços) e gostava de um orçamento personalizado.');
 
     return (
@@ -406,11 +428,9 @@ const QuizStepConfig = ({
             className="w-14 h-14 rounded-sm border-2 border-white/20 bg-white/[0.05] text-white font-bold text-2xl flex items-center justify-center active:scale-95 transition-all touch-manipulation hover:border-gold/50"
           >+</button>
         </div>
-        {!sob && (
+        {!sob && isWaterproofPrimary && (
           <p className="text-xs text-white/30 text-center leading-snug">
-            {isWaterproofPrimary
-              ? (isPremiumTier ? '1ª–4ª: 20€ · 5ª–9ª: 15€ por cadeira' : '1ª–4ª: 15€ · 5ª–9ª: 10€ por cadeira')
-              : '1ª–4ª: 20€ · 5ª–6ª: 15€ · 7ª–9ª: 12,5€ por cadeira'}
+            {isPremiumTier ? '1ª–4ª: 20€ · 5ª–9ª: 15€ por cadeira' : '1ª–4ª: 15€ · 5ª–9ª: 10€ por cadeira'}
           </p>
         )}
         {!sob && isWaterproofPrimary && (
@@ -436,54 +456,6 @@ const QuizStepConfig = ({
                 : 'orçamento'}
             </span>
           </button>
-        )}
-        {/* Impermeabilização como addon: duas linhas empilhadas, mesmo padrão do
-            "Proteção 10/2 anos" do sofá — Premium em destaque (selo + maior
-            contraste), Essencial continua disponível por baixo, mais discreta. */}
-        {!sob && !isWaterproofPrimary && (
-          <div className="flex flex-col gap-1.5 w-full max-w-xs">
-            <button
-              onClick={() => toggleAddonTier('premium')}
-              className={cn('relative w-full flex items-center gap-2.5 px-3 py-2 rounded-sm border-2 transition-all duration-200 touch-manipulation', addonEnabled && formData.waterproofingTier === 'premium' ? 'border-gold bg-gold/[0.10] shadow-[0_0_10px_rgba(212,175,55,0.18)]' : 'border-gold/30 bg-[#1a2a1a] hover:border-gold/55')}
-            >
-              <span className="absolute -top-2 left-3 bg-gold text-[#12121e] text-[8px] font-black px-2 py-0.5 rounded-[3px] tracking-wide uppercase whitespace-nowrap shadow-sm border border-[#12121e]">
-                Melhor Proteção
-              </span>
-              <Shield className={cn('w-4 h-4 flex-shrink-0', addonEnabled && formData.waterproofingTier === 'premium' ? 'text-gold' : 'text-gold/50')} />
-              <div className="flex-1 text-left min-w-0">
-                <p className={cn('text-[11px] font-bold leading-none', addonEnabled && formData.waterproofingTier === 'premium' ? 'text-white' : 'text-white/60')}>Premium</p>
-                <p className="text-[11px] mt-0.5 leading-none whitespace-nowrap">
-                  {addonPremiumPrice !== null ? (
-                    <>
-                      <span className="text-white/30 line-through">{addonPremiumPrice + 5}€</span>{' '}
-                      <span className={cn('font-semibold', addonEnabled && formData.waterproofingTier === 'premium' ? 'text-gold' : 'text-gold/70')}>{addonPremiumPrice}€</span>{' '}
-                      <span className={addonEnabled && formData.waterproofingTier === 'premium' ? 'text-gold/70' : 'text-gold/45'}>· até 10 anos, 5 lavagens</span>
-                    </>
-                  ) : (
-                    <span className={addonEnabled && formData.waterproofingTier === 'premium' ? 'text-gold/70' : 'text-gold/45'}>Sob orçamento · até 10 anos, 5 lavagens</span>
-                  )}
-                </p>
-              </div>
-              <div className={cn('w-8 h-4 rounded-full border flex items-center px-0.5 transition-all duration-300 flex-shrink-0', addonEnabled && formData.waterproofingTier === 'premium' ? 'border-gold bg-gold/20' : 'border-white/20 bg-white/[0.05]')}>
-                <div className={cn('w-3 h-3 rounded-full transition-all duration-300', addonEnabled && formData.waterproofingTier === 'premium' ? 'bg-gold translate-x-[14px]' : 'bg-white/30 translate-x-0')} />
-              </div>
-            </button>
-            <button
-              onClick={() => toggleAddonTier('essencial')}
-              className={cn('w-full flex items-center gap-2.5 px-3 py-2 rounded-sm border transition-all duration-200 touch-manipulation', addonEnabled && formData.waterproofingTier === 'essencial' ? 'border-gold/50 bg-gold/[0.08]' : 'border-gold/15 bg-[#1a2a1a] hover:border-gold/40')}
-            >
-              <Shield className={cn('w-4 h-4 flex-shrink-0', addonEnabled && formData.waterproofingTier === 'essencial' ? 'text-gold' : 'text-white/25')} />
-              <div className="flex-1 text-left">
-                <p className={cn('text-[11px] font-bold leading-none', addonEnabled && formData.waterproofingTier === 'essencial' ? 'text-white' : 'text-white/50')}>Essencial</p>
-                <p className={cn('text-[11px] mt-0.5 leading-none', addonEnabled && formData.waterproofingTier === 'essencial' ? 'text-gold/60' : 'text-white/25')}>
-                  {addonEssencialPrice !== null ? `+${addonEssencialPrice % 1 === 0 ? addonEssencialPrice : addonEssencialPrice.toFixed(1).replace('.', ',')}€` : 'orç.'} · 1-2 anos
-                </p>
-              </div>
-              <div className={cn('w-8 h-4 rounded-full border flex items-center px-0.5 transition-all duration-300 flex-shrink-0', addonEnabled && formData.waterproofingTier === 'essencial' ? 'border-gold bg-gold/20' : 'border-white/20 bg-white/[0.05]')}>
-                <div className={cn('w-3 h-3 rounded-full transition-all duration-300', addonEnabled && formData.waterproofingTier === 'essencial' ? 'bg-gold translate-x-[14px]' : 'bg-white/30 translate-x-0')} />
-              </div>
-            </button>
-          </div>
         )}
         {/* Aviso de tipo de cadeira: discreto de propósito, é uma exceção, não a
             regra — não deve competir visualmente com o preço/opções acima. */}

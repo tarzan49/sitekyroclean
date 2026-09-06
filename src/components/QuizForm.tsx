@@ -15,13 +15,14 @@ import {
   sofaPrices,
   mattressPrices,
 } from './quiz';
-import type { QuizFormData, SofaItem, MattressItem, UpsellItemConfig } from './quiz';
+import type { QuizFormData, SofaItem, MattressItem, CarpetItem, UpsellItemConfig } from './quiz';
 import QuizStepLocation from './quiz/steps/QuizStepLocation';
 import QuizStepConfig from './quiz/steps/QuizStepConfig';
 import QuizUpsellOverlay from './quiz/steps/QuizUpsellOverlay';
 import QuizMinimumGate from './quiz/steps/QuizMinimumGate';
+import QuizChairsAddonUpsell from './quiz/steps/QuizChairsAddonUpsell';
 import QuizStepContact from './quiz/steps/QuizStepContact';
-import { calcChairWaterproof, calcChairWaterproofPremium, calcChairClean, calcCarpetPrice, computePendingUpsellTotal } from './quiz/quizHelpers';
+import { calcChairWaterproof, calcChairWaterproofPremium, calcChairClean, computePendingUpsellTotal, carpetHasValidItems, carpetItemArea } from './quiz/quizHelpers';
 import { useUpsellSelection } from './quiz/steps/useUpsellSelection';
 import { WHATSAPP_BASE, BUSINESS_EMAIL } from '@/constants/business';
 import { QUIZ_STATE_CHANGE_EVENT } from '@/constants/quiz';
@@ -115,6 +116,11 @@ const QuizForm = ({
     }
     return initialMattressSizeId ? [{ sizeId: initialMattressSizeId, qty: initialMattressQty ?? 1, packEnabled: false }] : [];
   };
+  // Simulador de tapetes (2026-09-06) só guarda largura/comprimento, não uma
+  // área total solta — initialCarpetArea (herdado de um widget de preços que só
+  // pede a área somada) não dá para converter num tapete válido, por isso o
+  // simulador arranca sempre com uma linha em branco.
+  const buildInitialCarpetItems = (): CarpetItem[] => [{ id: 'tapete-1', largura: '', comprimento: '' }];
 
   const [currentStep, setCurrentStep] = useState(() => calcInitialStep(initialLocation, initialService, hasInitialItem, skipToUpsell, !!initialServiceType));
   const [locationQuery, setLocationQuery] = useState('');
@@ -127,11 +133,19 @@ const QuizForm = ({
   // quando o pedido fica abaixo do mínimo, em vez de espremer a mensagem no
   // rodapé do step 4 junto com o formulário de contacto.
   const [showMinimumGate, setShowMinimumGate] = useState(false);
+  // Upsell "estilo companhia aérea" (2026-09-06): quando o serviço principal
+  // são cadeiras + limpeza, a decisão de Impermeabilização/Anti Ácaros sai da
+  // etapa de quantidades e passa para aqui, logo a seguir ao "Continuar" —
+  // mostra-se uma única vez por sessão (chairsAddonUpsellShown), antes do
+  // gate do mínimo, já que a escolha aqui pode resolver o mínimo sozinha.
+  const [showChairsAddonUpsell, setShowChairsAddonUpsell] = useState(false);
+  const [chairsAddonUpsellShown, setChairsAddonUpsellShown] = useState(false);
   const [upsellShown, setUpsellShown] = useState(startsAtUpsell);
   const [upsellItems, setUpsellItems] = useState<UpsellItemConfig[]>(initialUpsellItems ?? []);
   const [upsellSubStep, setUpsellSubStep] = useState<'prompt' | 'select' | 'config'>('prompt');
   const [sofaItems, setSofaItems] = useState<SofaItem[]>(buildInitialSofaItems);
   const [mattressItems, setMattressItems] = useState<MattressItem[]>(buildInitialMattressItems);
+  const [carpetItems, setCarpetItems] = useState<CarpetItem[]>(buildInitialCarpetItems);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [formData, setFormData] = useState<QuizFormData>(buildInitialFormData);
   const prevIsOpenRef = useRef(false);
@@ -219,7 +233,7 @@ const QuizForm = ({
     serviceOnlyTotal,
     discountedPrice,
     packDiscountedPrice,
-  } = useQuizPricing(formData, sofaItems, mattressItems, upsellItemsForPricing);
+  } = useQuizPricing(formData, sofaItems, mattressItems, upsellItemsForPricing, carpetItems);
 
   // Encomenda mínima: 60€ (subido de 50€ em 2026-09-02, a pedido do dono). Sob
   // orçamento fica sempre acima disso na prática, por isso só se aplica a
@@ -280,6 +294,7 @@ const QuizForm = ({
       setFormData(buildInitialFormData());
       setSofaItems(buildInitialSofaItems());
       setMattressItems(buildInitialMattressItems());
+      setCarpetItems(buildInitialCarpetItems());
       const atUpsell = Boolean(skipToUpsell && initialLocation);
       setShowUpsell(atUpsell);
       setUpsellShown(atUpsell);
@@ -326,8 +341,7 @@ const QuizForm = ({
         return sofaItems.some(i => i.qty > 0);
       }
       case 'carpet': {
-        const a = parseFloat(formData.carpetArea);
-        return !isNaN(a) && a > 0;
+        return carpetHasValidItems(carpetItems);
       }
       case 'mattress':
         return mattressItems.some(i => i.qty > 0);
@@ -365,6 +379,19 @@ const QuizForm = ({
     || formData.service === 'chairs'
     || formData.service === 'mattress';
 
+  // Extraído do handleNext original: o que acontece depois da etapa de
+  // quantidades (step 3), partilhado entre o fluxo normal e o "Continuar"/
+  // "Continuar sem adicionar" do upsell das cadeiras, que intercepta antes.
+  const proceedPastConfig = () => {
+    if (belowMinimum) {
+      setShowMinimumGate(true);
+      return;
+    }
+    setUpsellShown(true);
+    setUpsellSubStep('prompt');
+    setShowUpsell(true);
+  };
+
   const handleNext = () => {
     if (canProceed()) {
       // Commita o valor implícito de 1 cadeira ao avançar (canProceedStep3
@@ -391,18 +418,20 @@ const QuizForm = ({
         updateFormData({ serviceType: 'cleaning' });
         nextStep = 3;
       }
+      // Upsell "estilo companhia aérea" das cadeiras intercepta primeiro,
+      // antes do gate do mínimo, porque a escolha aqui (Impermeabilização ou
+      // Anti Ácaros) pode sozinha tirar o pedido de abaixo do mínimo.
+      if (currentStep === 3 && formData.service === 'chairs' && formData.serviceType === 'cleaning' && !chairsAddonUpsellShown) {
+        setChairsAddonUpsellShown(true);
+        setShowChairsAddonUpsell(true);
+        return;
+      }
       // Upsell intercept: always show Pack Família when going forward from step 3
       // (re-shows if user clicked Voltar from Pack back to quantities).
       // Quando o pedido fica abaixo do mínimo, o ecrã "Quase Lá" intercepta
       // primeiro (bloqueia até resolver), só depois segue para o Pack Família.
       if (currentStep === 3) {
-        if (belowMinimum) {
-          setShowMinimumGate(true);
-          return;
-        }
-        setUpsellShown(true);
-        setUpsellSubStep('prompt');
-        setShowUpsell(true);
+        proceedPastConfig();
         return;
       }
       if (nextStep <= totalSteps) {
@@ -494,13 +523,14 @@ const QuizForm = ({
         if (sofaLines.length > 0) details.push(...sofaLines);
         break;
       }
-      case 'carpet':
-        if (formData.carpetArea) {
-          const area = parseFloat(formData.carpetArea);
-          const price = !isNaN(area) && area > 0 ? calcCarpetPrice(area) : null;
-          details.push(`Tapete ${formData.carpetArea}m²: ${fmtEuro(price)}`);
+      case 'carpet': {
+        const validCarpets = carpetItems.map(carpetItemArea).filter((a): a is number => a !== null);
+        if (validCarpets.length > 0) {
+          const areasLabel = validCarpets.map(a => `${a % 1 === 0 ? a : a.toFixed(2).replace('.', ',')}m²`).join(', ');
+          details.push(`Tapete(s) ${areasLabel}: Sob Orçamento`);
         }
         break;
+      }
       case 'mattress': {
         const isWaterproofBase = formData.serviceType === 'waterproofing';
         const mattressLines = mattressItems
@@ -525,16 +555,22 @@ const QuizForm = ({
         if (formData.chairQuantity) {
           const qty = parseInt(formData.chairQuantity);
           const isWaterproofPrimary = formData.serviceType === 'waterproofing';
-          const isPremium = isWaterproofPrimary && formData.waterproofingTier === 'premium';
-          const calcWaterproof = isPremium ? calcChairWaterproofPremium : calcChairWaterproof;
+          // Tier real do formulário, não limitada ao caso "impermeabilização
+          // primária" — sem isto, o addon Premium (limpeza como serviço
+          // principal) aparecia sempre rotulado "Essencial" na mensagem.
+          const isPremiumTier = formData.waterproofingTier === 'premium';
+          const calcWaterproof = isPremiumTier ? calcChairWaterproofPremium : calcChairWaterproof;
           const primaryTotal = !isNaN(qty) && qty > 0 ? (isWaterproofPrimary ? calcWaterproof(qty) : calcChairClean(qty)) : null;
-          const primaryLabel = isWaterproofPrimary ? `Impermeabilização${isPremium ? ' Premium' : ' Essencial'}` : 'Limpeza';
+          const primaryLabel = isWaterproofPrimary ? `Impermeabilização${isPremiumTier ? ' Premium' : ' Essencial'}` : 'Limpeza';
           details.push(`${formData.chairQuantity} cadeira(s): ${primaryLabel}: ${fmtEuro(primaryTotal)}`);
           const wQty = formData.chairWaterproofQty;
           if (wQty > 0) {
             const addonTotal = isWaterproofPrimary ? calcChairClean(wQty) : calcWaterproof(wQty);
-            const addonLabel = isWaterproofPrimary ? 'Limpeza' : `Impermeabilização${isPremium ? ' Premium' : ' Essencial'}`;
+            const addonLabel = isWaterproofPrimary ? 'Limpeza' : `Impermeabilização${isPremiumTier ? ' Premium' : ' Essencial'}`;
             details.push(`${addonLabel} de ${wQty} cadeira(s): ${fmtEuro(addonTotal)}`);
+          }
+          if (formData.chairAntiAcaros && !isNaN(qty) && qty > 0) {
+            details.push(`Anti Ácaros de ${qty} cadeira(s): ${fmtEuro(qty * 5)}`);
           }
         }
         break;
@@ -634,9 +670,10 @@ ${formData.description || 'Sem observações adicionais'}
       sofaItems,
       mattressItems,
       upsellItems,
-      carpetArea: formData.carpetArea,
+      carpetItems,
       chairQuantity: formData.chairQuantity,
       chairWaterproofQty: formData.chairWaterproofQty,
+      chairAntiAcaros: formData.chairAntiAcaros,
       calculateServicePrice,
       totalPrice,
       hasSobOrcamento,
@@ -716,6 +753,7 @@ ${formData.description || 'Sem observações adicionais'}
     setUpsellSubStep('select');
     setSofaItems(buildInitialSofaItems());
     setMattressItems(buildInitialMattressItems());
+    setCarpetItems(buildInitialCarpetItems());
     resetUiEffects();
   };
 
@@ -909,11 +947,13 @@ ${formData.description || 'Sem observações adicionais'}
                     // Colchão já não salta o Passo 2 (2026-08-30): tem Anti Ácaros como
                     // segunda opção real, tal como sofá/cadeiras têm impermeabilização.
                     const skipServiceType = service === 'carpet';
-                    updateFormData({ service, serviceType: skipServiceType ? 'cleaning' : '', sofaSize: '', mattressSize: '', chairType: '', carpetArea: '', chairWaterproofing: false, chairWaterproofQty: 0 });
+                    updateFormData({ service, serviceType: skipServiceType ? 'cleaning' : '', sofaSize: '', mattressSize: '', chairType: '', carpetArea: '', chairWaterproofing: false, chairWaterproofQty: 0, chairAntiAcaros: false });
                     setSofaItems([]);
                     setMattressItems([]);
+                    setCarpetItems(buildInitialCarpetItems());
                     setUpsellItems([]);
                     setUpsellShown(false);
+                    setChairsAddonUpsellShown(false);
                     setTimeout(() => setCurrentStep(skipServiceType ? 3 : 2), 180);
                   }}
                 />
@@ -964,8 +1004,8 @@ ${formData.description || 'Sem observações adicionais'}
               );
             })()}
 
-            {/* Step 3 - Config (hidden while Pack Família overlay or o "Quase Lá" active) */}
-            {currentStep === 3 && !showUpsell && !showMinimumGate && (
+            {/* Step 3 - Config (hidden while Pack Família overlay, "Quase Lá" ou upsell das cadeiras ativos) */}
+            {currentStep === 3 && !showUpsell && !showMinimumGate && !showChairsAddonUpsell && (
               <div className="flex-1 flex flex-col w-full items-center text-center overflow-y-auto">
                 <QuizStepConfig
                   formData={formData}
@@ -974,6 +1014,25 @@ ${formData.description || 'Sem observações adicionais'}
                   setSofaItems={setSofaItems}
                   mattressItems={mattressItems}
                   setMattressItems={setMattressItems}
+                  carpetItems={carpetItems}
+                  setCarpetItems={setCarpetItems}
+                />
+              </div>
+            )}
+
+            {/* Upsell "estilo companhia aérea" das cadeiras: logo a seguir ao
+                "Continuar" da etapa de quantidades, antes do gate do mínimo */}
+            {showChairsAddonUpsell && (
+              <div className="flex-1 flex flex-col w-full items-center text-center overflow-y-auto">
+                <QuizChairsAddonUpsell
+                  formData={formData}
+                  updateFormData={updateFormData}
+                  onContinue={() => {
+                    (document.activeElement as HTMLElement)?.blur();
+                    setShowChairsAddonUpsell(false);
+                    proceedPastConfig();
+                  }}
+                  onBack={() => { (document.activeElement as HTMLElement)?.blur(); setShowChairsAddonUpsell(false); }}
                 />
               </div>
             )}
@@ -1050,7 +1109,7 @@ ${formData.description || 'Sem observações adicionais'}
     </div>
 
     {/* Footer — hidden on step 0 (auto-advances on city selection) */}
-    {currentStep <= totalSteps && !showUpsell && !showMinimumGate && currentStep > 0 && (
+    {currentStep <= totalSteps && !showUpsell && !showMinimumGate && !showChairsAddonUpsell && currentStep > 0 && (
       <div className="px-4 sm:px-5 pt-3 flex flex-col gap-2 flex-shrink-0 border-t border-white/[0.05] items-center" style={{ paddingBottom: 'max(1rem, env(safe-area-inset-bottom))' }}>
         {currentStep === totalSteps ? (
           <div className="flex flex-col gap-2 w-full">

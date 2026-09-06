@@ -1,6 +1,6 @@
 import { sofaPrices, mattressPrices } from '@/components/quiz/QuizTypes';
-import type { SofaItem, MattressItem, UpsellItemConfig } from '@/components/quiz/QuizTypes';
-import { calcChairClean, calcChairWaterproof, calcChairWaterproofPremium } from '@/components/quiz/quizHelpers';
+import type { SofaItem, MattressItem, CarpetItem, UpsellItemConfig } from '@/components/quiz/QuizTypes';
+import { calcChairClean, calcChairWaterproof, calcChairWaterproofPremium, carpetItemArea } from '@/components/quiz/quizHelpers';
 import { WHATSAPP_BASE } from '@/constants/business';
 import { safeSessionSet } from '@/lib/safeStorage';
 import { logError } from '@/lib/errorTracking';
@@ -26,9 +26,10 @@ export interface QuizLeadPayload {
   sofaItems: SofaItem[];
   mattressItems: MattressItem[];
   upsellItems: UpsellItemConfig[];
-  carpetArea: string;
+  carpetItems: CarpetItem[];
   chairQuantity: string;
   chairWaterproofQty: number;
+  chairAntiAcaros: boolean;
   calculateServicePrice: number;
 
   totalPrice: number;
@@ -153,13 +154,16 @@ function buildWaUrl(payload: QuizLeadPayload, bookingId: string): string {
 
 function buildReceiptLines(payload: QuizLeadPayload) {
   const {
-    service, serviceType, waterproofingTier, sofaItems, mattressItems, upsellItems, carpetArea, chairQuantity,
-    chairWaterproofQty, calculateServicePrice, finalTravelCost, finalLocation,
+    service, serviceType, waterproofingTier, sofaItems, mattressItems, upsellItems, carpetItems, chairQuantity,
+    chairWaterproofQty, chairAntiAcaros, calculateServicePrice, finalTravelCost, finalLocation,
   } = payload;
 
   const receiptLines: Array<{ label: string; qty: number; unitPrice: number | null; total: number | null }> = [];
   const isWaterproofBase = serviceType === 'waterproofing';
-  const isPremium = isWaterproofBase && waterproofingTier === 'premium';
+  // Tier real do formulário — não limitada ao caso "impermeabilização primária",
+  // senão o addon Premium (limpeza como serviço principal) saía sempre "Essencial"
+  // no recibo, mesmo o cliente tendo escolhido Premium no upsell pós-quantidade.
+  const isPremium = waterproofingTier === 'premium';
   const calcChairWaterproofTier = isPremium ? calcChairWaterproofPremium : calcChairWaterproof;
 
   if (service === 'sofa') {
@@ -213,9 +217,20 @@ function buildReceiptLines(payload: QuizLeadPayload) {
         const addonUnit = addonTotal !== null ? Math.round(addonTotal / wQty * 10) / 10 : null;
         receiptLines.push({ label: addonLabel, qty: wQty, unitPrice: addonUnit, total: addonTotal });
       }
+      if (chairAntiAcaros) {
+        receiptLines.push({ label: 'Anti Ácaros Cadeiras', qty: cQty, unitPrice: 5, total: cQty * 5 });
+      }
     }
   } else if (service === 'carpet') {
-    receiptLines.push({ label: `Tapete ${carpetArea}m²`, qty: 1, unitPrice: calculateServicePrice || null, total: calculateServicePrice || null });
+    // Sem preço fixo (2026-09-06): cada tapete medido vira a sua própria linha,
+    // sempre sob orçamento, nunca um total calculado por m².
+    carpetItems
+      .map(carpetItemArea)
+      .filter((area): area is number => area !== null)
+      .forEach(area => {
+        const label = `Tapete ${area % 1 === 0 ? area : Math.round(area * 100) / 100}m²`;
+        receiptLines.push({ label, qty: 1, unitPrice: null, total: null });
+      });
   }
 
   upsellItems.forEach(item => {

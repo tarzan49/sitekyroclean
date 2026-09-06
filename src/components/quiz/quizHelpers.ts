@@ -1,5 +1,5 @@
 import { sofaPrices, mattressPrices } from './QuizTypes';
-import type { SofaItem, MattressItem, PriceOption } from './QuizTypes';
+import type { SofaItem, MattressItem, CarpetItem, PriceOption } from './QuizTypes';
 
 // ── Sofa helpers ─────────────────────────────────────────────────────────────
 export function sofaSetQty(items: SofaItem[], sizeId: string, newQty: number): SofaItem[] {
@@ -23,6 +23,35 @@ export function mattressSetQty(items: MattressItem[], sizeId: string, newQty: nu
 }
 export function mattressTogglePack(items: MattressItem[], sizeId: string): MattressItem[] {
   return items.map(i => i.sizeId === sizeId ? { ...i, packEnabled: !i.packEnabled } : i);
+}
+
+// ── Carpet item helpers ────────────────────────────────────────────────────────
+// Simulador de tapetes (2026-09-06): sem preço fixo, o cliente só mede cada
+// tapete (largura × comprimento) e adiciona quantos precisar, tudo sob orçamento.
+let carpetItemSeq = 1;
+export function carpetNewItem(): CarpetItem {
+  return { id: `tapete-${carpetItemSeq++}`, largura: '', comprimento: '' };
+}
+export function carpetAddItem(items: CarpetItem[]): CarpetItem[] {
+  return [...items, carpetNewItem()];
+}
+export function carpetRemoveItem(items: CarpetItem[], id: string): CarpetItem[] {
+  return items.filter(i => i.id !== id);
+}
+export function carpetUpdateItem(items: CarpetItem[], id: string, field: 'largura' | 'comprimento', value: string): CarpetItem[] {
+  return items.map(i => i.id === id ? { ...i, [field]: value } : i);
+}
+export function carpetItemArea(item: CarpetItem): number | null {
+  const l = parseFloat(item.largura.replace(',', '.'));
+  const c = parseFloat(item.comprimento.replace(',', '.'));
+  if (isNaN(l) || isNaN(c) || l <= 0 || c <= 0) return null;
+  return l * c;
+}
+export function carpetHasValidItems(items: CarpetItem[]): boolean {
+  return items.some(i => carpetItemArea(i) !== null);
+}
+export function carpetTotalArea(items: CarpetItem[]): number {
+  return items.reduce((sum, i) => sum + (carpetItemArea(i) ?? 0), 0);
 }
 
 // ── Pack pricing (sofa + mattress) ────────────────────────────────────────────

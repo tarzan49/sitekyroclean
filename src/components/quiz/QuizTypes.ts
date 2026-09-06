@@ -13,6 +13,9 @@ export interface QuizFormData {
   chairQuantity: string;
   chairWaterproofing: boolean;
   chairWaterproofQty: number;
+  // Anti Ácaros das cadeiras: serviço próprio, mutuamente exclusivo com a
+  // impermeabilização addon acima (decisão feita no upsell pós-quantidade).
+  chairAntiAcaros: boolean;
   location: string;
   otherLocation: string;
   timing: string;
@@ -39,6 +42,7 @@ export const initialFormData: QuizFormData = {
   chairQuantity: '',
   chairWaterproofing: false,
   chairWaterproofQty: 0,
+  chairAntiAcaros: false,
   location: '',
   otherLocation: '',
   timing: '',
@@ -189,6 +193,9 @@ export const locationPrices: Record<string, number> = {
 
 export interface SofaItem     { sizeId: string; qty: number; packEnabled: boolean; }
 export interface MattressItem { sizeId: string; qty: number; packEnabled: boolean; }
+// Tapetes: sem preço fixo (sempre sob orçamento), por isso o simulador só
+// guarda as dimensões medidas, uma linha por tapete (2026-09-06).
+export interface CarpetItem   { id: string; largura: string; comprimento: string; }
 
 export interface UpsellItemConfig {
   id: string;
