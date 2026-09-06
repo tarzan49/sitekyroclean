@@ -62,7 +62,7 @@ function DiscountBar({ discountActive }: { discountActive: boolean }) {
         </div>
       ) : (
         <p className="text-[11px] leading-snug" style={{ color: "rgba(17,17,17,0.45)" }}>
-          Peça um colchão, sofá, tapete, alcatifa ou algumas cadeiras a mais (desde <span className="font-semibold" style={{ color: "#111111" }}>{PACK_DISCOUNT_MIN_UPSELL_ITEM}€</span>) num pedido de <span className="font-semibold" style={{ color: "#111111" }}>{PACK_DISCOUNT_MIN_SERVICE}€+</span> e ganhe <span className="font-semibold" style={{ color: "#D4AF37" }}>10% de desconto em tudo</span>.
+          Adicione um colchão, sofá, tapete, alcatifa ou algumas cadeiras a mais (desde <span className="font-semibold" style={{ color: "#111111" }}>{PACK_DISCOUNT_MIN_UPSELL_ITEM}€</span>) num pedido de <span className="font-semibold" style={{ color: "#111111" }}>{PACK_DISCOUNT_MIN_SERVICE}€+</span> e ganhe <span className="font-semibold" style={{ color: "#D4AF37" }}>10% de desconto em tudo</span>.
         </p>
       )}
     </div>

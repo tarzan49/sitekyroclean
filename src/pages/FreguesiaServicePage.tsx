@@ -642,7 +642,7 @@ const FreguesiaServicePage = () => {
                               </div>
                             ) : (
                               <p className="text-xs leading-snug" style={{ color: "rgba(17,17,17,0.40)" }}>
-                                Peça um colchão, sofá, tapete, alcatifa ou algumas cadeiras a mais (desde <span className="font-semibold" style={{ color: "#111111" }}>{PACK_DISCOUNT_MIN_UPSELL_ITEM}€</span>) num pedido de <span className="font-semibold" style={{ color: "#111111" }}>{PACK_DISCOUNT_MIN_SERVICE}€+</span> e ganhe <span className="font-semibold" style={{ color: "#D4AF37" }}>10% de desconto em tudo</span>.
+                                Adicione um colchão, sofá, tapete, alcatifa ou algumas cadeiras a mais (desde <span className="font-semibold" style={{ color: "#111111" }}>{PACK_DISCOUNT_MIN_UPSELL_ITEM}€</span>) num pedido de <span className="font-semibold" style={{ color: "#111111" }}>{PACK_DISCOUNT_MIN_SERVICE}€+</span> e ganhe <span className="font-semibold" style={{ color: "#D4AF37" }}>10% de desconto em tudo</span>.
                               </p>
                             )}
                             {total > 0 && (
@@ -701,6 +701,14 @@ const FreguesiaServicePage = () => {
           initialService={quizService}
         />
 
+        {/* ═══ TESTEMUNHOS ═══ */}
+        <section className="py-14 md:py-20 bg-[#FDFDF9]">
+          <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
+            <SectionHeader overline="Avaliações Reais" heading="O que dizem os nossos" goldWord="clientes" light={true} />
+            <ServiceReviewsGrid serviceSlug={data.serviceSlug} seed={`${data.municipio}-${data.name}`} heading="" />
+          </div>
+        </section>
+
         {/* ═══ PROBLEMAS QUE RESOLVEMOS ═══ */}
         {problemCards.length > 0 && (
           <section className="py-14 md:py-20 bg-kyro-green">
@@ -750,14 +758,6 @@ const FreguesiaServicePage = () => {
             </div>
           </section>
         )}
-
-        {/* ═══ TESTEMUNHOS ═══ */}
-        <section className="py-14 md:py-20 bg-[#FDFDF9]">
-          <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
-            <SectionHeader overline="Avaliações Reais" heading="O que dizem os nossos" goldWord="clientes" light={true} />
-            <ServiceReviewsGrid serviceSlug={data.serviceSlug} seed={`${data.municipio}-${data.name}`} heading="" />
-          </div>
-        </section>
 
         {/* ═══ FAQ ═══ */}
         {data.faqs && data.faqs.length > 0 && (
