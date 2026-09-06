@@ -28,7 +28,9 @@ export interface QuizFormData {
 export const initialFormData: QuizFormData = {
   service: '',
   serviceType: '',
-  waterproofingTier: 'essencial',
+  // Default de negócio: Premium é o tier de maior margem e a Kyro quer vendê-lo
+  // primeiro. Nunca reverter para 'essencial' aqui sem pedido explícito.
+  waterproofingTier: 'premium',
   sofaSize: '',
   sofaHasChaise: false,
   carpetArea: '',

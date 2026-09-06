@@ -95,7 +95,7 @@ const QuizForm = ({
     carpetArea: initialCarpetArea || '',
     chairQuantity: initialChairQty || '',
     chairType: initialChairQty ? 'bulk_full' : '',
-    waterproofingTier: initialWaterproofingTier || 'essencial',
+    waterproofingTier: initialWaterproofingTier || 'premium',
     chairWaterproofing: initialChairWaterproofing ?? false,
     chairWaterproofQty: initialChairWaterproofing && initialChairQty ? parseInt(initialChairQty) || 0 : 0,
   });

@@ -148,7 +148,7 @@ export function computePendingUpsellTotal(
   pendingChairQtyNum: number,
   pendingWaterproof: boolean,
   isWaterproofBase: boolean,
-  waterproofingTier: 'essencial' | 'premium' = 'essencial',
+  waterproofingTier: 'essencial' | 'premium' = 'premium',
 ): number {
   switch (pendingUpsellId) {
     case 'sofa': {

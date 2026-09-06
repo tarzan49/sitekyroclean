@@ -91,10 +91,12 @@ const QuizMinimumGate = ({
   const chairAntiAcarosPriceRaw = calcChairAntiAcarosTotal(chairQtyNum);
 
   const toggleChairImper = () => {
+    // Não forçar waterproofingTier aqui: este chip é um toggle rápido sem
+    // seletor de tier próprio, e sobrescrever sempre para 'essencial' apagava
+    // silenciosamente uma escolha de Premium já feita noutro passo do quiz.
     updateFormData({
       chairWaterproofing: !chairImperOn,
       chairWaterproofQty: !chairImperOn ? chairQtyNum : 0,
-      waterproofingTier: 'essencial',
     });
   };
   const toggleChairAntiAcaros = () => {

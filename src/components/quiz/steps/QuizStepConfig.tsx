@@ -116,7 +116,7 @@ const QuizStepConfig = ({
                       {!packOn && isWaterproofBase && packTier === 'premium' && !isSob && typeof dp === 'number' && (
                         <span className="text-sm text-white/30 line-through tabular-nums">{dp + 10}€</span>
                       )}
-                      <span className={cn('text-sm font-bold tabular-nums', isSob ? isActive ? 'text-white/70' : 'text-white/35' : isActive && packOn ? 'text-gold' : isActive ? 'text-white/80' : 'text-white/40')}>
+                      <span className={cn('text-sm font-bold tabular-nums', isSob ? isActive ? 'text-white/70' : 'text-white/35' : isActive && (packOn || (isWaterproofBase && packTier === 'premium')) ? 'text-gold' : isActive ? 'text-white/80' : 'text-white/40')}>
                         {isSob ? 'Sob Orçamento' : `${dp}€/un.`}
                       </span>
                     </div>
