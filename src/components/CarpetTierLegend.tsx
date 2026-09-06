@@ -1,22 +1,16 @@
 // Legenda de escalões de preço por m² (tapetes/alcatifas) no widget de preços.
 // Componente partilhado pelos 3 sítios que renderizam o widget (ver "terceira
 // armadilha" no CLAUDE.md) para não triplicar também esta lógica.
-const CARPET_TIERS = [
-  { max: 3, label: '≤3m²', price: '15€/m²' },
-  { max: 5, label: '≤5m²', price: '12,5€/m²' },
-  { max: 8, label: '≤8m²', price: '11,5€/m²' },
-  { max: 10, label: '≤10m²', price: '10,5€/m²' },
-  { max: 15, label: '≤15m²', price: '10€/m²' },
-  { max: Infinity, label: '+15m²', price: 'Sob orçamento' },
-];
-
 const ALCATIFA_TIERS = [
   { max: 50, label: 'até 50m²', price: '3€/m²' },
   { max: Infinity, label: '+50m²', price: 'Sob orçamento' },
 ];
 
 export function CarpetTierLegend({ isAlcatifa, qty }: { isAlcatifa: boolean; qty: number }) {
-  const tiers = isAlcatifa ? ALCATIFA_TIERS : CARPET_TIERS;
+  // Tapetes (não-alcatifa) já não têm escalão por m² — sempre sob orçamento,
+  // não há tabela para mostrar (2026-09-06).
+  if (!isAlcatifa) return null;
+  const tiers = ALCATIFA_TIERS;
   const activeIdx = qty > 0 ? tiers.findIndex(t => qty <= t.max) : -1;
   return (
     <div className="flex flex-wrap gap-1.5 mt-2">

@@ -421,7 +421,7 @@ const LocationServicePage = () => {
                         const dynamicPrice: string | null = isChair
                           ? (qty <= 0 ? null : chairP === null ? 'Sob orçamento' : `${chairP}€`)
                           : isCarpet
-                          ? (qty <= 0 ? (isAlcatifa ? '3€/m²' : '15€/m²') : carpetP == null ? 'Sob orçamento' : `${Math.round(carpetP * 10) / 10}€`)
+                          ? (qty <= 0 ? (isAlcatifa ? '3€/m²' : 'Sob orçamento') : carpetP == null ? 'Sob orçamento' : `${Math.round(carpetP * 10) / 10}€`)
                           : row.price;
 
                         if (isCarpet) {

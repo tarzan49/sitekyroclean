@@ -303,7 +303,7 @@ export default function ServicePriceSection({ serviceSlug, initialLocation }: Pr
                 const dynamicPrice: string | null = isChair
                   ? (qty <= 0 ? null : chairP === null ? 'Sob orçamento' : `${chairP}€`)
                   : isCarpet
-                  ? (qty <= 0 ? (isAlcatifa ? '3€/m²' : '15€/m²') : carpetP == null ? 'Sob orçamento' : `${Math.round(carpetP * 10) / 10}€`)
+                  ? (qty <= 0 ? (isAlcatifa ? '3€/m²' : 'Sob orçamento') : carpetP == null ? 'Sob orçamento' : `${Math.round(carpetP * 10) / 10}€`)
                   : row.price;
 
                 if (isCarpet) {
@@ -482,7 +482,7 @@ export default function ServicePriceSection({ serviceSlug, initialLocation }: Pr
                       <div className="flex items-center gap-1 mb-0.5">
                         {addonTier === 'premium' && <Check className="w-3 h-3" style={{ color: "#D4AF37" }} strokeWidth={3} />}
                         <p className="text-xs font-bold" style={{ color: "#111111" }}>Premium</p>
-                        {sofaAddonExtraDelta !== null && (
+                        {sofaAddonExtraDelta !== null && tierAddonCfg?.service !== 'chairs' && (
                           <span className="text-[9px] font-black leading-none px-1.5 py-[3px] rounded-full whitespace-nowrap" style={{ background: addonTier === 'premium' ? "#D4AF37" : "rgba(212,175,55,0.15)", color: addonTier === 'premium' ? "white" : "#B8912A" }}>
                             por apenas +{sofaAddonExtraDelta}€
                           </span>
