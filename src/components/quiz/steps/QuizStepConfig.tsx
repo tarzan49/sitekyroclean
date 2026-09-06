@@ -21,18 +21,16 @@ function WaterproofingTierPicker({ formData, updateFormData }: { formData: QuizF
       <button
         onClick={() => updateFormData({ waterproofingTier: 'premium' })}
         className={cn(
-          'relative rounded-sm border-2 px-3 py-2.5 text-left transition-all duration-200 touch-manipulation',
+          'rounded-sm border-2 px-3 py-2.5 text-left transition-all duration-200 touch-manipulation',
           tier === 'premium'
             ? 'border-gold bg-[#1a2a1a] shadow-[0_0_18px_rgba(212,175,55,0.30)]'
             : 'border-gold/50 bg-[#1a2a1a] ring-1 ring-gold/20 hover:border-gold/75'
         )}
       >
-        <span className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-gradient-to-r from-[#C9A84C] to-[#F0DC8A] text-[#12121e] text-[8px] font-black px-2.5 py-0.5 rounded-full tracking-widest uppercase shadow-md whitespace-nowrap">
-          Dura Mais
-        </span>
         <div className="flex items-center gap-1.5 mb-0.5">
           {tier === 'premium' && <Check className="w-3 h-3 text-gold flex-shrink-0" />}
           <p className={cn('text-xs font-bold', tier === 'premium' ? 'text-white' : 'text-white/85')}>Premium</p>
+          <span className="text-[8px] font-bold uppercase tracking-wide text-gold border border-gold/40 rounded-[3px] px-1 py-[1px] leading-none">Dura mais</span>
         </div>
         <p className={cn('text-[10px] leading-snug font-semibold', tier === 'premium' ? 'text-gold/70' : 'text-gold/45')}>Até 10 anos de proteção · até 5 lavagens</p>
       </button>
@@ -114,6 +112,9 @@ const QuizStepConfig = ({
                       {isActive && packOn && <span className="text-[9px] bg-gold/15 text-gold/80 px-1.5 py-0.5 rounded-full font-bold leading-none">PACK</span>}
                       {isActive && packOn && typeof originalPackPrice === 'number' && (
                         <span className="text-sm text-white/30 line-through tabular-nums">{originalPackPrice}€</span>
+                      )}
+                      {!packOn && isWaterproofBase && packTier === 'premium' && !isSob && typeof dp === 'number' && (
+                        <span className="text-sm text-white/30 line-through tabular-nums">{dp + 10}€</span>
                       )}
                       <span className={cn('text-sm font-bold tabular-nums', isSob ? isActive ? 'text-white/70' : 'text-white/35' : isActive && packOn ? 'text-gold' : isActive ? 'text-white/80' : 'text-white/40')}>
                         {isSob ? 'Sob Orçamento' : `${dp}€/un.`}

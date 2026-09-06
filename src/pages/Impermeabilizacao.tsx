@@ -74,21 +74,6 @@ interface WaterproofingTier {
 
 const waterproofingTiers: WaterproofingTier[] = [
   {
-    icon: Droplet,
-    name: "Essencial",
-    base: "À base de água",
-    sofaPrice: "59€ / 79€ / 99€",
-    chairPrice: "15€/un (1-4) · 10€/un (5-9)",
-    washes: "Aguenta até 2 lavagens",
-    durability: "Até 1 a 2 anos de proteção real, consoante o uso",
-    features: [
-      { label: "Proteção completa contra manchas de líquidos e gordura" },
-      { label: "Sem alteração de cor, toque ou textura do tecido" },
-      { label: "Combinável com o Pack Proteção Total (limpeza + impermeabilização)" },
-      { label: "Boa opção para uso moderado e primeira proteção" },
-    ],
-  },
-  {
     icon: FlaskConical,
     name: "Premium",
     base: "À base de diluente",
@@ -103,6 +88,21 @@ const waterproofingTiers: WaterproofingTier[] = [
       { label: "Ideal para casas com crianças, animais ou uso intenso" },
       { label: "Aguenta mais do dobro das lavagens da Essencial" },
       { label: "Menos reaplicações ao longo dos anos, mais poupança a longo prazo" },
+    ],
+  },
+  {
+    icon: Droplet,
+    name: "Essencial",
+    base: "À base de água",
+    sofaPrice: "59€ / 79€ / 99€",
+    chairPrice: "15€/un (1-4) · 10€/un (5-9)",
+    washes: "Aguenta até 2 lavagens",
+    durability: "Até 1 a 2 anos de proteção real, consoante o uso",
+    features: [
+      { label: "Proteção completa contra manchas de líquidos e gordura" },
+      { label: "Sem alteração de cor, toque ou textura do tecido" },
+      { label: "Combinável com o Pack Proteção Total (limpeza + impermeabilização)" },
+      { label: "Boa opção para uso moderado e primeira proteção" },
     ],
   },
 ];

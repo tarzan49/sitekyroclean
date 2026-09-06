@@ -465,6 +465,29 @@ export default function ServicePriceSection({ serviceSlug, initialLocation }: Pr
                   <div className="grid grid-cols-2 gap-2">
                     <button
                       type="button"
+                      onClick={() => setAddonTier('premium')}
+                      className="text-left px-3 py-2 border-2 transition-all"
+                      style={{
+                        borderColor: addonTier === 'premium' ? "#D4AF37" : "rgba(212,175,55,0.35)",
+                        background: addonTier === 'premium' ? "white" : "rgba(255,255,255,0.5)",
+                      }}
+                    >
+                      <div className="flex items-center gap-1 mb-0.5">
+                        {addonTier === 'premium' && <Check className="w-3 h-3" style={{ color: "#D4AF37" }} strokeWidth={3} />}
+                        <p className="text-xs font-bold" style={{ color: "#111111" }}>Premium</p>
+                        <span className="text-[8px] font-bold uppercase tracking-wide px-1 py-[1px] rounded-[3px] leading-none" style={{ color: "#B8912A", border: "1px solid rgba(184,145,42,0.45)" }}>
+                          Dura mais
+                        </span>
+                        {sofaAddonExtraDelta !== null && (
+                          <span className="text-[9px] font-black leading-none px-1.5 py-[3px] rounded-full whitespace-nowrap" style={{ background: addonTier === 'premium' ? "#D4AF37" : "rgba(212,175,55,0.15)", color: addonTier === 'premium' ? "white" : "#B8912A" }}>
+                            só +{sofaAddonExtraDelta}€
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-[10px] leading-snug font-semibold" style={{ color: "#B8912A" }}>até 10 anos · até 5 lavagens</p>
+                    </button>
+                    <button
+                      type="button"
                       onClick={() => setAddonTier('essencial')}
                       className="text-left px-3 py-2 border-2 transition-all"
                       style={{
@@ -477,32 +500,6 @@ export default function ServicePriceSection({ serviceSlug, initialLocation }: Pr
                         <p className="text-xs font-bold" style={{ color: "#111111" }}>Essencial</p>
                       </div>
                       <p className="text-[10px] leading-snug" style={{ color: "rgba(17,17,17,0.40)" }}>1-2 anos de proteção</p>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setAddonTier('premium')}
-                      className="relative text-left px-3 py-2 border-2 transition-all"
-                      style={{
-                        borderColor: addonTier === 'premium' ? "#D4AF37" : "rgba(212,175,55,0.35)",
-                        background: addonTier === 'premium' ? "white" : "rgba(255,255,255,0.5)",
-                      }}
-                    >
-                      <span
-                        className="absolute -top-2 right-2 text-[7px] font-black px-1.5 py-0.5 uppercase tracking-wide rounded-sm"
-                        style={{ background: "linear-gradient(135deg,#B8912A,#EDD96A)", color: "#071a12" }}
-                      >
-                        Dura Mais
-                      </span>
-                      <div className="flex items-center gap-1 mb-0.5">
-                        {addonTier === 'premium' && <Check className="w-3 h-3" style={{ color: "#D4AF37" }} strokeWidth={3} />}
-                        <p className="text-xs font-bold" style={{ color: "#111111" }}>Premium</p>
-                        {sofaAddonExtraDelta !== null && (
-                          <span className="text-[9px] font-black leading-none px-1.5 py-[3px] rounded-full whitespace-nowrap" style={{ background: addonTier === 'premium' ? "#D4AF37" : "rgba(212,175,55,0.15)", color: addonTier === 'premium' ? "white" : "#B8912A" }}>
-                            só +{sofaAddonExtraDelta}€
-                          </span>
-                        )}
-                      </div>
-                      <p className="text-[10px] leading-snug font-semibold" style={{ color: "#B8912A" }}>até 10 anos · até 5 lavagens</p>
                     </button>
                   </div>
                 </div>
