@@ -702,22 +702,22 @@ const FreguesiaServicePage = () => {
         />
 
         {/* ═══ TESTEMUNHOS ═══ */}
-        <section className="py-14 md:py-20 bg-[#FDFDF9]">
+        <section className="py-14 md:py-20 bg-kyro-green">
           <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
-            <SectionHeader overline="Avaliações Reais" heading="O que dizem os nossos" goldWord="clientes" light={true} />
+            <SectionHeader overline="Avaliações Reais" heading="O que dizem os nossos" goldWord="clientes" light={false} />
             <ServiceReviewsGrid serviceSlug={data.serviceSlug} seed={`${data.municipio}-${data.name}`} heading="" />
           </div>
         </section>
 
         {/* ═══ PROBLEMAS QUE RESOLVEMOS ═══ */}
         {problemCards.length > 0 && (
-          <section className="py-14 md:py-20 bg-kyro-green">
+          <section className="py-14 md:py-20 bg-[#FDFDF9]">
             <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
               <SectionHeader
                 overline="O Que Resolvemos"
                 heading={`Problemas de ${serviceCategory} que resolvemos em`}
                 goldWord={data.name}
-                light={false}
+                light={true}
               />
               <div className={`flex gap-3 overflow-x-auto snap-x snap-mandatory scrollbar-hide pb-2 md:overflow-visible md:grid md:grid-cols-2 ${problemGridCols} md:gap-4 md:pb-0`}>
                 {problemCards.map((card, idx) => (
@@ -752,7 +752,7 @@ const FreguesiaServicePage = () => {
                   </div>
                 ))}
               </div>
-              <p className="text-center text-[9px] text-white/18 tracking-[0.22em] uppercase mt-4 md:hidden">
+              <p className="text-center text-[9px] text-[#111111]/20 tracking-[0.22em] uppercase mt-4 md:hidden">
                 deslize para ver mais →
               </p>
             </div>
