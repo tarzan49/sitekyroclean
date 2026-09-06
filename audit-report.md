@@ -83,6 +83,34 @@ Fixed 06 Sep. `curl https://cleansolutions.com.pt/` returned an 11KB shell: titl
 **Time:** done
 **Changes:** none, this is measurement only
 
+**Update 07 Sep — second export supplied (`cleansolutions-4`), as of 04 Sep data:**
+
+Big picture is genuinely good news, and it predates anything from this session (this branch still isn't deployed): the trend chart shows **indexed pages jumped from 8,115 → 12,950 and not-indexed dropped from 9,415 → 4,629** in a single step around **29 Aug** — that's the two historical fixes (noindex removal `101c3ab`, robots.txt rule removal `e3715a6`) finally landing after Google's re-crawl. Confirms those two "already fixed, draining out" rows from the first export were correctly diagnosed.
+
+This export adds a column the first one didn't carry in a way I'd flagged clearly enough: **Validação** (Falha/Iniciada/Aprovado/Não iniciado) — meaning someone already clicked "Validar correção" in Search Console for these categories, and this is Google's verdict on that specific validation run, not just a raw count:
+
+| Reason | Pages | Validação | Read |
+|---|---:|---|---|
+| Página alternativa com etiqueta canónica correta | 1,412 | **Falha** | Biggest bucket now. Someone told Google this was fixed; Google rechecked and said no. Ties directly to finding #6 — worth pulling the actual URL list from this row in GSC (this export only has the aggregate count, not per-page URLs) to see if these are the keyword-variant pages Google is quietly re-canonicalizing elsewhere because it judges them too similar to another page, despite the code intending them to be self-canonical. |
+| Bloqueada pelo ficheiro robots.txt | 1,150 | Iniciada | Still draining, same historical rule as before. |
+| Excluída pela etiqueta noindex | 740 | **Falha** | Same historical fix as before (`101c3ab`), but a validation attempt on this specific one also failed — worth a URL-level check (not just assuming it's residue) since "Falha" means Google actively found noindex still present on a sample, not just "hasn't recrawled yet." |
+| Rastreada, atualmente não indexada | 541 | **Falha** | Down from 751 but still failing validation — this is the other real, open bucket from finding #6. |
+| **Soft 404** | **132** | **Falha** | This is the finding #1 fix from this session — makes sense it's still failing validation, since the fix lives on `worktree-kyro-minorder-emdash`, not in production yet. Re-submit for validation only after merging + deploying + confirming live via curl. |
+| Erro de redireccionamento | 31 | Iniciada | Minor. |
+| Página com redirecionamento | 7 | **Falha** | Minor, small enough to not prioritize. |
+| Página duplicada, canónica diferente do utilizador | 5 | **Falha** | Negligible size. |
+| Bloqueada, acesso proibido (403) | 65 | Aprovado | Passed. |
+| Erro do servidor (5xx) | 38 | Aprovado | Passed. |
+| Bloqueada, outro 4xx | 3 | Aprovado | Passed. |
+| Detetada, atualmente não indexada | 505 | Aprovado | **Down from 5,127 — passed validation.** The biggest single bucket from the first export basically resolved itself once the historical fixes propagated. |
+| *(não crítico)* Indexada mas bloqueada por robots.txt | 4 | Não iniciado | Negligible. |
+
+**Net read:** the two scariest numbers from the first pass (5,127 discovered-not-indexed, 751 crawled-not-indexed) have both dropped hard (505 and 541) without any of this session's fixes being live yet — good, low-risk confirmation the historical fixes work as diagnosed. What's now most worth attention is the **1,412 "alternate canonical" pages with a failed validation** — that's Google actively telling us something about duplicate/near-duplicate content that a previous validation attempt claimed was resolved and wasn't. Recommend pulling the specific URL list for that row next time (GSC → that row → "Páginas" export) before guessing further — this export's CSV only has the count.
+
+**Who:** you supplied the export; next step (pulling the 1,412-row URL list) needs another GSC export from you
+**Time:** done, this pass
+**Changes:** none yet — diagnosis only
+
 ### [~] 6. Doorway-page check: real duplicate-content risk in `keywordVariantData.ts`, partially fixed · index-hygiene, real
 
 Ran `code/check_page_similarity.py` against real live pages in several rounds, refining the diagnosis each time instead of accepting the first read:
