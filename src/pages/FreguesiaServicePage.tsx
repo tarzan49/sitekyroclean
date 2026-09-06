@@ -508,9 +508,9 @@ const FreguesiaServicePage = () => {
                             <div className="flex items-center gap-1 mb-0.5">
                               {addonTier === 'premium' && <Check className="w-3 h-3" style={{ color: "#D4AF37" }} strokeWidth={3} />}
                               <p className="text-xs font-bold" style={{ color: "#111111" }}>Premium</p>
-                              {extraDelta !== null && (
+                              {extraDelta !== null && cfg.service !== 'chairs' && (
                                 <span className="text-[9px] font-black leading-none px-1.5 py-[3px] rounded-full whitespace-nowrap" style={{ background: addonTier === 'premium' ? "#D4AF37" : "rgba(212,175,55,0.15)", color: addonTier === 'premium' ? "white" : "#B8912A" }}>
-                                  só +{extraDelta}€
+                                  por apenas +{extraDelta}€
                                 </span>
                               )}
                             </div>

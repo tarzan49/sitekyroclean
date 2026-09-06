@@ -1,4 +1,4 @@
-import { ChevronLeft, ChevronRight, Check, X, Shield } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Check, X, Shield, Star } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { sofaPrices, mattressPrices } from '@/components/quiz/QuizTypes';
 import type { QuizFormData, UpsellItemConfig, SofaItem, MattressItem } from '@/components/quiz/QuizTypes';
@@ -367,15 +367,16 @@ const QuizUpsellOverlay = ({
                                   : 'border-gold/50 bg-[#1a2a1a] ring-1 ring-gold/20 hover:border-gold/75'
                               )}
                             >
-                              <span className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-gradient-to-r from-[#C9A84C] to-[#F0DC8A] text-[#12121e] text-[8px] font-black px-2.5 py-0.5 rounded-full tracking-widest uppercase shadow-md whitespace-nowrap">
-                                Melhor Proteção
+                              <span className="absolute -top-2 -right-2 z-10 flex w-9 h-9 flex-col items-center justify-center rounded-sm border-2 border-[#12121e] bg-gold shadow-md">
+                                <Star className="w-3 h-3 fill-[#12121e] text-[#12121e]" />
+                                <span className="text-[6px] font-black uppercase leading-none tracking-tight text-[#12121e]">Top</span>
                               </span>
                               <div className="flex items-center gap-1.5 mb-0.5">
                                 {packOn && formData.waterproofingTier === 'premium' && <Check className="w-3 h-3 text-gold flex-shrink-0" />}
                                 <p className={cn('text-xs font-bold', packOn && formData.waterproofingTier === 'premium' ? 'text-white' : 'text-white/85')}>Premium</p>
                                 {premiumExtraDelta !== null && (
                                   <span className={cn('text-[9px] font-black leading-none px-1.5 py-[3px] rounded-full whitespace-nowrap flex-shrink-0', packOn && formData.waterproofingTier === 'premium' ? 'bg-gold text-[#12121e]' : 'bg-gold/20 text-gold')}>
-                                    só +{premiumExtraDelta}€
+                                    por apenas +{premiumExtraDelta}€
                                   </span>
                                 )}
                               </div>
@@ -595,7 +596,6 @@ const QuizUpsellOverlay = ({
             const waterproofPremiumPrice = waterproofPremiumPriceRaw ?? 0;
             const waterproofPrice = pendingWaterproof && !sobOrç ? (isPremiumTier ? waterproofPremiumPrice : waterproofEssencialPrice) : 0;
             const totalChairPrice = basePrice + waterproofPrice;
-            const chairPremiumExtraDelta = Math.round((waterproofPremiumPrice - waterproofEssencialPrice) * 100) / 100;
             const chairWhatsappMsg = encodeURIComponent('Olá, tenho cadeiras de um tipo diferente (sem tampo, costas ou braços) e gostava de um orçamento personalizado.');
             return (
               <div className="w-full max-w-xs mx-auto">
@@ -630,52 +630,32 @@ const QuizUpsellOverlay = ({
                   >+</button>
                 </div>
                 {!sobOrç && (
-                  <div className="grid grid-cols-2 gap-2 pt-3 mb-1">
-                    <button
-                      onClick={() => {
-                        const turningOn = !(pendingWaterproof && formData.waterproofingTier === 'essencial');
-                        setPendingWaterproof(turningOn);
-                        updateFormData({ waterproofingTier: 'essencial' });
-                      }}
-                      className={cn(
-                        'rounded-sm border-2 px-3 py-2.5 text-left transition-all duration-200 touch-manipulation',
-                        pendingWaterproof && formData.waterproofingTier === 'essencial'
-                          ? 'border-gold bg-gold/[0.08] shadow-[0_0_10px_rgba(212,175,55,0.18)]'
-                          : 'border-gold/20 bg-[#1a2a1a] hover:border-gold/40'
-                      )}
-                    >
-                      <div className="flex items-center gap-1.5 mb-0.5">
-                        {pendingWaterproof && formData.waterproofingTier === 'essencial' && <Check className="w-3 h-3 text-gold flex-shrink-0" />}
-                        <p className={cn('text-xs font-bold', pendingWaterproof && formData.waterproofingTier === 'essencial' ? 'text-white' : 'text-white/60')}>Essencial</p>
-                      </div>
-                      <p className="text-[10px] text-white/35 leading-snug">+{waterproofEssencialPrice % 1 === 0 ? waterproofEssencialPrice : waterproofEssencialPrice.toFixed(1).replace('.', ',')}€ · 1-2 anos</p>
-                    </button>
-                    <button
-                      onClick={() => {
-                        const turningOn = !(pendingWaterproof && formData.waterproofingTier === 'premium');
-                        setPendingWaterproof(turningOn);
-                        updateFormData({ waterproofingTier: 'premium' });
-                      }}
-                      className={cn(
-                        'relative rounded-sm border-2 px-3 py-2.5 text-left transition-all duration-200 touch-manipulation',
-                        pendingWaterproof && formData.waterproofingTier === 'premium'
-                          ? 'border-gold bg-gold/[0.10] shadow-[0_0_16px_rgba(212,175,55,0.30)]'
-                          : 'border-gold/50 bg-[#1a2a1a] ring-1 ring-gold/20 hover:border-gold/75'
-                      )}
-                    >
-                      <span className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-gradient-to-r from-[#C9A84C] to-[#F0DC8A] text-[#12121e] text-[8px] font-black px-2.5 py-0.5 rounded-full tracking-widest uppercase shadow-md whitespace-nowrap">
-                        Melhor Proteção
-                      </span>
-                      <div className="flex items-center gap-1.5 mb-0.5">
-                        {pendingWaterproof && formData.waterproofingTier === 'premium' && <Check className="w-3 h-3 text-gold flex-shrink-0" />}
-                        <p className={cn('text-xs font-bold', pendingWaterproof && formData.waterproofingTier === 'premium' ? 'text-white' : 'text-white/85')}>Premium</p>
-                        <span className={cn('text-[9px] font-black leading-none px-1.5 py-[3px] rounded-full whitespace-nowrap flex-shrink-0', pendingWaterproof && formData.waterproofingTier === 'premium' ? 'bg-gold text-[#12121e]' : 'bg-gold/20 text-gold')}>
-                          só +{chairPremiumExtraDelta}€
-                        </span>
-                      </div>
-                      <p className={cn('text-[10px] leading-snug', pendingWaterproof && formData.waterproofingTier === 'premium' ? 'text-gold/60' : 'text-gold/45')}>até 10 anos, 5 lavagens</p>
-                    </button>
-                  </div>
+                  <button
+                    onClick={() => {
+                      setPendingWaterproof(v => !v);
+                      updateFormData({ waterproofingTier: 'premium' });
+                    }}
+                    className={cn('w-full flex items-center gap-2.5 px-3 py-2 mt-3 mb-1 rounded-sm border transition-all duration-200 touch-manipulation', pendingWaterproof ? 'border-gold/50 bg-gold/[0.08]' : 'border-gold/15 bg-[#1a2a1a] hover:border-gold/40')}
+                  >
+                    <Shield className={cn('w-4 h-4 flex-shrink-0', pendingWaterproof ? 'text-gold' : 'text-white/25')} />
+                    <div className="flex-1 text-left">
+                      <p className={cn('text-[11px] font-bold leading-none', pendingWaterproof ? 'text-white' : 'text-white/50')}>Adicionar Impermeabilização Premium</p>
+                      <p className="text-[11px] mt-0.5 leading-none">
+                        {waterproofPremiumPriceRaw !== null ? (
+                          <>
+                            <span className="text-white/30 line-through">{waterproofPremiumPriceRaw + 5}€</span>{' '}
+                            <span className="text-gold font-semibold">{waterproofPremiumPriceRaw}€</span>{' '}
+                            <span className={pendingWaterproof ? 'text-gold/60' : 'text-white/25'}>· até 10 anos, 5 lavagens</span>
+                          </>
+                        ) : (
+                          <span className={pendingWaterproof ? 'text-gold/60' : 'text-white/25'}>Sob orçamento · até 10 anos, 5 lavagens</span>
+                        )}
+                      </p>
+                    </div>
+                    <div className={cn('w-8 h-4 rounded-full border flex items-center px-0.5 transition-all duration-300 flex-shrink-0', pendingWaterproof ? 'border-gold bg-gold/20' : 'border-white/20 bg-white/[0.05]')}>
+                      <div className={cn('w-3 h-3 rounded-full transition-all duration-300', pendingWaterproof ? 'bg-gold translate-x-[14px]' : 'bg-white/30 translate-x-0')} />
+                    </div>
+                  </button>
                 )}
                 <p className="text-[10px] text-white/20 text-center leading-snug px-2 mb-4">
                   Preço para cadeiras com tampo, costas e braços. Cadeira diferente?{' '}

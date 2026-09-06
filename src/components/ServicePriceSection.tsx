@@ -484,7 +484,7 @@ export default function ServicePriceSection({ serviceSlug, initialLocation }: Pr
                         <p className="text-xs font-bold" style={{ color: "#111111" }}>Premium</p>
                         {sofaAddonExtraDelta !== null && (
                           <span className="text-[9px] font-black leading-none px-1.5 py-[3px] rounded-full whitespace-nowrap" style={{ background: addonTier === 'premium' ? "#D4AF37" : "rgba(212,175,55,0.15)", color: addonTier === 'premium' ? "white" : "#B8912A" }}>
-                            só +{sofaAddonExtraDelta}€
+                            por apenas +{sofaAddonExtraDelta}€
                           </span>
                         )}
                       </div>

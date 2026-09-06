@@ -121,7 +121,7 @@ const QuizStepConfig = ({
                       {!packOn && isWaterproofBase && packTier === 'premium' && !isSob && typeof dp === 'number' && (
                         <span className="text-sm text-white/30 line-through tabular-nums">{dp + 10}€</span>
                       )}
-                      <span className={cn('text-sm font-bold tabular-nums', isSob ? isActive ? 'text-white/70' : 'text-white/35' : isActive && (packOn || (isWaterproofBase && packTier === 'premium')) ? 'text-gold' : isActive ? 'text-white/80' : 'text-white/40')}>
+                      <span className={cn('text-sm font-bold tabular-nums', isSob ? isActive ? 'text-white/70' : 'text-white/35' : (isActive && packOn) || (isWaterproofBase && packTier === 'premium') ? 'text-gold' : isActive ? 'text-white/80' : 'text-white/40')}>
                         {isSob ? 'Sob Orçamento' : `${dp}€/un.`}
                       </span>
                     </div>
@@ -157,7 +157,7 @@ const QuizStepConfig = ({
                           }}
                           className={cn('relative w-full flex items-center gap-2.5 px-3 py-2 rounded-sm border-2 transition-all duration-200 touch-manipulation', packOn && packTier === 'premium' ? 'border-gold bg-gold/[0.10] shadow-[0_0_10px_rgba(212,175,55,0.18)]' : 'border-gold/30 bg-[#1a2a1a] hover:border-gold/55')}
                         >
-                          <span className="absolute -top-2 left-3 bg-gradient-to-r from-[#C9A84C] to-[#F0DC8A] text-[#12121e] text-[8px] font-black px-2 py-0.5 rounded-full tracking-wide uppercase whitespace-nowrap shadow-sm">
+                          <span className="absolute -top-2 left-3 bg-gold text-[#12121e] text-[8px] font-black px-2 py-0.5 rounded-[3px] tracking-wide uppercase whitespace-nowrap shadow-sm border border-[#12121e]">
                             Melhor Proteção
                           </span>
                           <Shield className={cn('w-4 h-4 flex-shrink-0', packOn && packTier === 'premium' ? 'text-gold' : 'text-gold/50')} />
@@ -166,7 +166,7 @@ const QuizStepConfig = ({
                               <p className={cn('text-[11px] font-bold leading-none', packOn && packTier === 'premium' ? 'text-white' : 'text-white/60')}>Proteção 10 anos</p>
                               {premiumExtraDelta !== null && (
                                 <span className={cn('text-[10px] font-black leading-none px-1.5 py-[3px] rounded-full whitespace-nowrap flex-shrink-0', packOn && packTier === 'premium' ? 'bg-gold text-[#12121e]' : 'bg-gold/20 text-gold')}>
-                                  só +{premiumExtraDelta}€
+                                  por apenas +{premiumExtraDelta}€
                                 </span>
                               )}
                             </div>
@@ -367,10 +367,7 @@ const QuizStepConfig = ({
         waterproofingTier: tier,
       });
     };
-    const addonEssencialPrice = calcChairWaterproof(qty);
     const addonPremiumPrice = calcChairWaterproofPremium(qty);
-    const chairPremiumExtraDelta = addonEssencialPrice !== null && addonPremiumPrice !== null
-      ? Math.round((addonPremiumPrice - addonEssencialPrice) * 100) / 100 : null;
     const chairWhatsappMsg = encodeURIComponent('Olá, tenho cadeiras de um tipo diferente (sem tampo, costas ou braços) e gostava de um orçamento personalizado.');
 
     return (
@@ -439,54 +436,35 @@ const QuizStepConfig = ({
             </span>
           </button>
         )}
-        {/* Impermeabilização como addon: Água vs Diluente lado a lado (mesmo padrão
-            visual do seletor Essencial/Premium do topo do quiz), para a Premium
-            parecer a melhor escolha por comparação direta (pedido explícito). */}
+        {/* Impermeabilização como addon: toggle único já fixo em Premium (mesmo
+            padrão visual do toggle "Adicionar Proteção Total VIP" do sofá) — o
+            duplo Essencial/Premium foi removido porque a Premium é o que a Kyro
+            quer vender aqui, e o "só +X€" comparativo variava com a quantidade
+            de cadeiras, o que induzia o cliente em erro. */}
         {!sob && !isWaterproofPrimary && (
-          <div className="w-full max-w-xs grid grid-cols-2 gap-2 pt-3">
-            <button
-              onClick={() => toggleAddonTier('premium')}
-              className={cn(
-                'relative rounded-sm border-2 px-3 py-2.5 text-left transition-all duration-200 touch-manipulation',
-                addonEnabled && formData.waterproofingTier === 'premium'
-                  ? 'border-gold bg-gold/[0.10] shadow-[0_0_16px_rgba(212,175,55,0.30)]'
-                  : 'border-gold/50 bg-[#1a2a1a] ring-1 ring-gold/20 hover:border-gold/75'
-              )}
-            >
-              <span className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-gradient-to-r from-[#C9A84C] to-[#F0DC8A] text-[#12121e] text-[8px] font-black px-2.5 py-0.5 rounded-full tracking-widest uppercase shadow-md whitespace-nowrap">
-                Melhor Proteção
-              </span>
-              <div className="flex items-center gap-1.5 mb-0.5">
-                {addonEnabled && formData.waterproofingTier === 'premium' && <Check className="w-3 h-3 text-gold flex-shrink-0" />}
-                <p className={cn('text-xs font-bold', addonEnabled && formData.waterproofingTier === 'premium' ? 'text-white' : 'text-white/85')}>Premium</p>
-                {chairPremiumExtraDelta !== null && (
-                  <span className={cn('text-[9px] font-black leading-none px-1.5 py-[3px] rounded-full whitespace-nowrap flex-shrink-0', addonEnabled && formData.waterproofingTier === 'premium' ? 'bg-gold text-[#12121e]' : 'bg-gold/20 text-gold')}>
-                    só +{chairPremiumExtraDelta}€
-                  </span>
+          <button
+            onClick={() => toggleAddonTier('premium')}
+            className={cn('w-full max-w-xs flex items-center gap-2.5 px-3 py-2 rounded-sm border transition-all duration-200 touch-manipulation', addonEnabled ? 'border-gold/50 bg-gold/[0.08]' : 'border-gold/15 bg-[#1a2a1a] hover:border-gold/40')}
+          >
+            <Shield className={cn('w-4 h-4 flex-shrink-0', addonEnabled ? 'text-gold' : 'text-white/25')} />
+            <div className="flex-1 text-left">
+              <p className={cn('text-[11px] font-bold leading-none', addonEnabled ? 'text-white' : 'text-white/50')}>Adicionar Impermeabilização Premium</p>
+              <p className="text-[11px] mt-0.5 leading-none">
+                {addonPremiumPrice !== null ? (
+                  <>
+                    <span className="text-white/30 line-through">{addonPremiumPrice + 5}€</span>{' '}
+                    <span className="text-gold font-semibold">{addonPremiumPrice}€</span>{' '}
+                    <span className={addonEnabled ? 'text-gold/60' : 'text-white/25'}>· até 10 anos, 5 lavagens</span>
+                  </>
+                ) : (
+                  <span className={addonEnabled ? 'text-gold/60' : 'text-white/25'}>Sob orçamento · até 10 anos, 5 lavagens</span>
                 )}
-              </div>
-              <p className={cn('text-[10px] leading-snug', addonEnabled && formData.waterproofingTier === 'premium' ? 'text-gold/60' : 'text-gold/45')}>
-                até 10 anos, 5 lavagens
               </p>
-            </button>
-            <button
-              onClick={() => toggleAddonTier('essencial')}
-              className={cn(
-                'rounded-sm border-2 px-3 py-2.5 text-left transition-all duration-200 touch-manipulation',
-                addonEnabled && formData.waterproofingTier === 'essencial'
-                  ? 'border-gold bg-gold/[0.08] shadow-[0_0_10px_rgba(212,175,55,0.18)]'
-                  : 'border-gold/20 bg-[#1a2a1a] hover:border-gold/40'
-              )}
-            >
-              <div className="flex items-center gap-1.5 mb-0.5">
-                {addonEnabled && formData.waterproofingTier === 'essencial' && <Check className="w-3 h-3 text-gold flex-shrink-0" />}
-                <p className={cn('text-xs font-bold', addonEnabled && formData.waterproofingTier === 'essencial' ? 'text-white' : 'text-white/60')}>Essencial</p>
-              </div>
-              <p className="text-[10px] text-white/35 leading-snug">
-                +{addonEssencialPrice !== null ? `${addonEssencialPrice % 1 === 0 ? addonEssencialPrice : addonEssencialPrice.toFixed(1).replace('.', ',')}€` : 'orç.'} · 1-2 anos
-              </p>
-            </button>
-          </div>
+            </div>
+            <div className={cn('w-8 h-4 rounded-full border flex items-center px-0.5 transition-all duration-300 flex-shrink-0', addonEnabled ? 'border-gold bg-gold/20' : 'border-white/20 bg-white/[0.05]')}>
+              <div className={cn('w-3 h-3 rounded-full transition-all duration-300', addonEnabled ? 'bg-gold translate-x-[14px]' : 'bg-white/30 translate-x-0')} />
+            </div>
+          </button>
         )}
         {/* Aviso de tipo de cadeira: discreto de propósito, é uma exceção, não a
             regra — não deve competir visualmente com o preço/opções acima. */}
