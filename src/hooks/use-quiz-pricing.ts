@@ -138,10 +138,11 @@ export function useQuizPricing(
   const safePrice = (n: number) => (isNaN(n) || n == null) ? 0 : n;
   const upsellItemsTotal = upsellItems.reduce((sum, item) => sum + safePrice(item.price), 0);
   const totalPrice = safePrice(calculateServicePrice) + safePrice(upsellItemsTotal) + safePrice(finalTravelCost) + 0;
-  // True when the user has qty>0 of the "4+ lugares" sofa, or a carpet area over 15m²
-  // (both have no fixed price → custom quote). Without the carpet check, calculateServicePrice
-  // silently fell back to 0 for area>15m² (calcCarpetPrice returns null there), so totalPrice
-  // ended up as travel cost alone with nothing flagging it as a custom quote.
+  // True when the user has qty>0 of the "4+ lugares" sofa, or any measured
+  // carpet (carpets never have a fixed price anymore — always a custom quote,
+  // see carpetHasValidItems) — without this, calculateServicePrice silently
+  // fell back to 0 for those cases, so totalPrice ended up as travel cost
+  // alone with nothing flagging it as a custom quote.
   // Cadeiras: primário e addon podem ter limiares "sob orçamento" diferentes
   // (limpeza até 10, impermeabilização a partir de 10) — usa sempre a função
   // de preço real em vez de repetir um limiar numérico à mão, para não

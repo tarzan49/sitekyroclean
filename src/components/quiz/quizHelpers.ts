@@ -97,37 +97,6 @@ export function calcPackPricing(
   return { isSob, basePrice, packPrice, packDelta, displayPrice };
 }
 
-// ── Carpet ────────────────────────────────────────────────────────────────────
-// Preços atualizados 2026-08-30 (subida de preços, escalões mais finos: era só
-// 5/10/15m² a 12/10/9€/m²). Cumulativo por escalão, cada fatia paga só a sua taxa,
-// para não haver saltos bruscos ao cruzar uma fronteira de escalão.
-export const CARPET_TIERS = [
-  { label: 'Até 3 m²',    sublabel: 'Muito pequenos', rate: 15,   max: 3 },
-  { label: '3 a 5 m²',    sublabel: 'Pequenos',       rate: 12.5, max: 5 },
-  { label: '5 a 8 m²',    sublabel: 'Médios',         rate: 11.5, max: 8 },
-  { label: '8 a 10 m²',   sublabel: 'Médios-grandes', rate: 10.5, max: 10 },
-  { label: '10 a 15 m²',  sublabel: 'Grandes',        rate: 10,   max: 15 },
-  { label: '+15 m²',      sublabel: 'Extra',          rate: null, max: Infinity },
-] as const;
-
-export function carpetActiveTier(area: number): number {
-  if (area <= 3) return 0;
-  if (area <= 5) return 1;
-  if (area <= 8) return 2;
-  if (area <= 10) return 3;
-  if (area <= 15) return 4;
-  return 5;
-}
-
-export function calcCarpetPrice(area: number): number | null {
-  if (area <= 0 || area > 15) return null;
-  if (area <= 3)  return area * 15;
-  if (area <= 5)  return 45 + (area - 3) * 12.5;
-  if (area <= 8)  return 70 + (area - 5) * 11.5;
-  if (area <= 10) return 104.5 + (area - 8) * 10.5;
-  return 125.5 + (area - 10) * 10;
-}
-
 // ── Chairs ────────────────────────────────────────────────────────────────────
 // Bracket pricing: 1-4 @ 20€ · 5-6 @ 15€ · 7-9 @ 12.5€ · 10+: sob orçamento
 // — limiar alinhado com calcChairWaterproof(Premium) 2026-08-31: 10 cadeiras
@@ -164,60 +133,3 @@ export function fmtN(n: number): string {
   return n % 1 === 0 ? `${n}€` : `${n.toFixed(1).replace('.', ',')}€`;
 }
 
-// ── Live preview do artigo extra a ser configurado no upsell ──────────────────
-// Espelha exatamente o cálculo que cada botão "Adicionar X" faz ao confirmar
-// (ver QuizUpsellOverlay.tsx), mas em modo leitura, para que o preço no topo do
-// quiz suba assim que se clica "+", tal como já acontece em Quantidades — sem
-// isto o preço só atualizava depois de o artigo estar confirmado.
-export function computePendingUpsellTotal(
-  pendingUpsellId: string | null,
-  pendingSofaItems: SofaItem[],
-  pendingMattressItems: MattressItem[],
-  pendingCarpetArea: string,
-  pendingChairQtyNum: number,
-  pendingWaterproof: boolean,
-  isWaterproofBase: boolean,
-  waterproofingTier: 'essencial' | 'premium' = 'premium',
-): number {
-  switch (pendingUpsellId) {
-    case 'sofa': {
-      return pendingSofaItems.filter(i => i.qty > 0).reduce((sum, item) => {
-        const opt = sofaPrices.find(p => p.id === item.sizeId);
-        if (!opt) return sum;
-        const { basePrice, packDelta } = calcPackPricing(opt, item.packEnabled, isWaterproofBase, 40, waterproofingTier);
-        const bothP = basePrice !== null && packDelta !== null ? basePrice + packDelta : null;
-        const unitPrice = item.packEnabled && bothP !== null ? bothP : basePrice;
-        return sum + (unitPrice !== null ? unitPrice * item.qty : 0);
-      }, 0);
-    }
-    case 'mattress': {
-      return pendingMattressItems.filter(i => i.qty > 0).reduce((sum, item) => {
-        const opt = mattressPrices.find(p => p.id === item.sizeId);
-        if (!opt) return sum;
-        const cleanP = typeof opt.cleaningPrice === 'number' ? opt.cleaningPrice : null;
-        const waterP = typeof opt.waterproofingPrice === 'number' ? opt.waterproofingPrice : null;
-        const baseP = isWaterproofBase ? waterP : cleanP;
-        const bothP = typeof opt.bothPrice === 'number' ? opt.bothPrice : (baseP !== null ? baseP + 30 : null);
-        const unitPrice = item.packEnabled && bothP !== null ? bothP : baseP;
-        return sum + (unitPrice !== null ? unitPrice * item.qty : 0);
-      }, 0);
-    }
-    case 'carpet': {
-      const area = parseFloat(pendingCarpetArea);
-      if (isNaN(area) || area <= 0 || area > 15) return 0;
-      return Math.round((calcCarpetPrice(area) ?? 0) * 100) / 100;
-    }
-    case 'chairs': {
-      const basePriceRaw = calcChairClean(pendingChairQtyNum);
-      const calcWaterproofTier = waterproofingTier === 'premium' ? calcChairWaterproofPremium : calcChairWaterproof;
-      const waterproofPriceRaw = pendingWaterproof ? calcWaterproofTier(pendingChairQtyNum) : 0;
-      // Sob orçamento (preço null) tem de devolver 0 — convenção do resto do
-      // quiz (price === 0 = sob orçamento, ver hasUpsellSobItem) — nunca
-      // somar um preço parcial que ignore o addon em silêncio.
-      if (basePriceRaw === null || waterproofPriceRaw === null) return 0;
-      return basePriceRaw + waterproofPriceRaw;
-    }
-    default:
-      return 0;
-  }
-}

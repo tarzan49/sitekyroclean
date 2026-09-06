@@ -22,8 +22,7 @@ import QuizComboUpsellScreen from './quiz/steps/QuizComboUpsellScreen';
 import QuizMinimumGate from './quiz/steps/QuizMinimumGate';
 import QuizChairsAddonUpsell from './quiz/steps/QuizChairsAddonUpsell';
 import QuizStepContact from './quiz/steps/QuizStepContact';
-import { calcChairWaterproof, calcChairWaterproofPremium, calcChairClean, computePendingUpsellTotal, carpetHasValidItems, carpetItemArea } from './quiz/quizHelpers';
-import { useUpsellSelection } from './quiz/steps/useUpsellSelection';
+import { calcChairWaterproof, calcChairWaterproofPremium, calcChairClean, carpetHasValidItems, carpetItemArea } from './quiz/quizHelpers';
 import { WHATSAPP_BASE, BUSINESS_EMAIL } from '@/constants/business';
 import { QUIZ_STATE_CHANGE_EVENT } from '@/constants/quiz';
 import { useQuizPricing } from '@/hooks/use-quiz-pricing';
@@ -142,7 +141,6 @@ const QuizForm = ({
   const [chairsAddonUpsellShown, setChairsAddonUpsellShown] = useState(false);
   const [upsellShown, setUpsellShown] = useState(startsAtUpsell);
   const [upsellItems, setUpsellItems] = useState<UpsellItemConfig[]>(initialUpsellItems ?? []);
-  const [upsellSubStep, setUpsellSubStep] = useState<'prompt' | 'select' | 'config'>('prompt');
   const [sofaItems, setSofaItems] = useState<SofaItem[]>(buildInitialSofaItems);
   const [mattressItems, setMattressItems] = useState<MattressItem[]>(buildInitialMattressItems);
   const [carpetItems, setCarpetItems] = useState<CarpetItem[]>(buildInitialCarpetItems);
@@ -197,30 +195,6 @@ const QuizForm = ({
 
   const hypoSurcharge = 0;
 
-  // Estado do "artigo pendente" do upsell vive aqui (não em QuizUpsellOverlay) para
-  // que o preço no topo do quiz suba assim que se clica "+" a configurar, tal como
-  // já acontece em Quantidades — antes só atualizava depois de confirmar o artigo.
-  const {
-    pendingUpsellId, setPendingUpsellId,
-    pendingSofaItems, setPendingSofaItems,
-    pendingMattressItems, setPendingMattressItems,
-    pendingCarpetArea, setPendingCarpetArea,
-    pendingChairQtyNum, setPendingChairQtyNum,
-    pendingWaterproof, setPendingWaterproof,
-    resetPending,
-  } = useUpsellSelection();
-
-  const pendingUpsellPreviewPrice = (showUpsell && upsellSubStep === 'config')
-    ? computePendingUpsellTotal(
-        pendingUpsellId, pendingSofaItems, pendingMattressItems, pendingCarpetArea,
-        pendingChairQtyNum, pendingWaterproof, formData.serviceType === 'waterproofing',
-        formData.waterproofingTier === 'premium' ? 'premium' : 'essencial',
-      )
-    : 0;
-  const upsellItemsForPricing = pendingUpsellPreviewPrice > 0
-    ? [...upsellItems, { id: 'pending-preview', price: pendingUpsellPreviewPrice, label: '' }]
-    : upsellItems;
-
   const {
     calculateServicePrice,
     travelCost,
@@ -233,7 +207,7 @@ const QuizForm = ({
     serviceOnlyTotal,
     discountedPrice,
     packDiscountedPrice,
-  } = useQuizPricing(formData, sofaItems, mattressItems, upsellItemsForPricing, carpetItems);
+  } = useQuizPricing(formData, sofaItems, mattressItems, upsellItems, carpetItems);
 
   // Encomenda mínima: 60€ (subido de 50€ em 2026-09-02, a pedido do dono). Sob
   // orçamento fica sempre acima disso na prática, por isso só se aplica a
@@ -388,7 +362,6 @@ const QuizForm = ({
       return;
     }
     setUpsellShown(true);
-    setUpsellSubStep('prompt');
     setShowUpsell(true);
   };
 
@@ -444,7 +417,6 @@ const QuizForm = ({
   const handlePrev = () => {
     // If on step 4 (contact) and upsell was shown, go back to upsell item selector
     if (currentStep === 4 && upsellShown) {
-      setUpsellSubStep('select');
       setShowUpsell(true);
       return;
     }
@@ -750,7 +722,6 @@ ${formData.description || 'Sem observações adicionais'}
     setShowUpsell(false);
     setUpsellShown(false);
     setUpsellItems([]);
-    setUpsellSubStep('select');
     setSofaItems(buildInitialSofaItems());
     setMattressItems(buildInitialMattressItems());
     setCarpetItems(buildInitialCarpetItems());
@@ -1055,7 +1026,6 @@ ${formData.description || 'Sem observações adicionais'}
                   (document.activeElement as HTMLElement)?.blur();
                   setShowMinimumGate(false);
                   setUpsellShown(true);
-                  setUpsellSubStep('select');
                   setShowUpsell(true);
                 }}
                 onContinue={() => {
@@ -1063,7 +1033,6 @@ ${formData.description || 'Sem observações adicionais'}
                   (document.activeElement as HTMLElement)?.blur();
                   setShowMinimumGate(false);
                   setUpsellShown(true);
-                  setUpsellSubStep('prompt');
                   setShowUpsell(true);
                 }}
                 onBack={() => { (document.activeElement as HTMLElement)?.blur(); setShowMinimumGate(false); }}
