@@ -19,7 +19,7 @@ const QuizStep1Service = ({ onSelect }: QuizStep1ServiceProps) => {
   const serviceOptions = [
     { id: 'sofa',     label: 'Sofá',     sublabel: 'a partir de 49€' },
     { id: 'mattress', label: 'Colchão',  sublabel: 'a partir de 59€' },
-    { id: 'carpet',   label: 'Tapete',   sublabel: 'a partir de 15€/m²' },
+    { id: 'carpet',   label: 'Tapete',   sublabel: 'Sob orçamento' },
     { id: 'chairs',   label: 'Cadeiras', sublabel: 'a partir de 20€' },
   ];
 
