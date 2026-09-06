@@ -83,22 +83,25 @@ Fixed 06 Sep. `curl https://cleansolutions.com.pt/` returned an 11KB shell: titl
 **Time:** done
 **Changes:** none, this is measurement only
 
-### [ ] 6. Doorway-page check: pages LOOK like duplicates before JS runs, aren't once it does · index-hygiene, real but nuanced
+### [~] 6. Doorway-page check: real duplicate-content risk in `keywordVariantData.ts`, partially fixed · index-hygiene, real
 
-Ran `code/check_page_similarity.py` twice against real live pages:
+Ran `code/check_page_similarity.py` against real live pages in several rounds, refining the diagnosis each time instead of accepting the first read:
 
-- **8 freguesia pages, same service** (`limpeza-tapetes-porto-{paranhos,ramalde,bonfim,campanha,cedofeita,lordelo-do-ouro,aldoar,foz-do-douro}`): **PASS**, each owns enough unique server-rendered content.
-- **3 pages covering the same topic through different systems** (`limpeza-tapetes-porto-cedofeita` — a freguesia page; `higienizacao-tapetes-porto-cedofeita` and `lavagem-tapetes-porto-cedofeita` — keyword-variant pages, same underlying template as each other): **FAIL**, all three "own 0 distinct phrases" once shared boilerplate is stripped.
+**Round 1** — 3 pages covering the same topic through different systems: **FAIL**, "0 distinct phrases." Checked against Playwright-rendered content (full JS hydration) before believing it: real overlap was only 38-59%, genuine differentiation. Looked like a pure methodology artifact (the tool only sees the small server-rendered `<h1>`+intro sliver, same for every page by design — see finding #3).
 
-That FAIL looked alarming, so I checked it against the actual rendered pages (Playwright, full JS hydration) before reporting it as a real problem — and it isn't the problem it looks like. Rendered word-overlap between the three: 38.7%, 40.4%, and 59.1% — real, substantial differentiation once the page's actual content (widgets, problem cards, FAQs, trust points) loads. **The tool's raw-HTML check isn't wrong, it's just measuring something specific**: every one of these ~15,000 pages intentionally ships only a small `<h1>` + one intro paragraph server-side (the same fix pattern from finding #3, applied sitewide by design) — that sliver is similar enough across pages covering the same city+service that a non-JS check sees them as identical, even though the full page isn't.
+**Round 2 (the real root cause)** — re-ran with a fairer, larger sample (9 pages instead of 3), because a 3-page sample makes the tool's own boilerplate filter (strips any phrase on >30% of compared pages) pathologically aggressive: with only 3 pages, a phrase shared by just 2 of them (67%) gets stripped as "boilerplate" even though it's ordinary shared-topic language, not duplication. At 9 pages, the keyword-variant pages were still borderline-failing (43-45 unique phrases vs. the 50 floor) — a real, narrower finding survived: `keywordVariantData.ts`'s 12 content-generator functions (`content_higienizacao_sofa`, `content_lavagem_cadeiras`, etc.) each had a **single fixed `intro`/`whatIs` template per service, zero variation by location** — unlike `freguesiaContentEngine.ts`, which already pools multiple intro variants and picks one per location by a seeded hash.
 
-**Why this still matters, not just a false alarm:** Google's indexing has two passes — a fast first pass that decides crawl priority using exactly this kind of thin, pre-render signal, and a slower full-render pass that sees the real content. If the first pass is what's deciding "eh, looks like more of the same" on a chunk of the 5,127 discovered-not-indexed pages, then the fix isn't writing more unique body content (there's already 40-60% real differentiation) — it's making the server-rendered sliver itself a little more distinctive per page, so the fast pass doesn't misjudge them.
+**Fix implemented:** added the same pool+seed pattern to all 12 functions — 3 hand-written variants each for `intro` and `whatIs` (facts/prices/tier names preserved verbatim across variants), picked via a hash of the location string, independently salted per field and per function (`getSeed(loc + '|<service-key>')`) so that two locations colliding on one function's pick don't systematically collide on every other function's pick too — an issue caught and fixed during verification (Cedofeita/Paranhos/Bonfim were originally landing on the same variant across every one of the 12 functions simultaneously, because the hash only depended on the location string).
 
-**Not fixing this now** — it's a real lead worth acting on, but it's a content/templating decision (what goes in that server-rendered snippet, per page type) rather than a mechanical bug, and I only spot-checked one city/topic, not all ~15,000 pages. Flagging it as the most concrete next step from this audit rather than guessing at a fix.
+**Round 3 (the bigger picture, not yet fixed):** re-testing a broader 14-page mix (`higienizacao-sofa` × 8 freguesias, `lavagem-cadeiras` × 3, `impermeabilizacao-sofa` × 3) after the fix still failed, worse for the two smaller-content functions. Root cause is structural, not a seed bug: **every field except `intro`/`whatIs` — `benefits`, `problems`, `processSteps`, `faqs`, `testimonials` — is 100% identical across all locations, for all 12 functions**, confirmed by spot-checking `content_higienizacao_tapetes` too. The earlier passing 8-9 page tests happened only because the tool's boilerplate threshold is corpus-wide (>30% of *all* pages in that one run): with 8+ same-function pages in the sample, their shared fixed content crosses 30% and gets stripped as boilerplate; with only 3, it stays under 30% and counts as real (and correctly flagged) overlap. So those earlier passes were a sample-composition artifact, not evidence the content is actually differentiated — the intro/whatIs fix is a genuine, shipped improvement, but it does not fully resolve doorway-page risk on its own.
 
-**Who:** worth a conversation on what the server-rendered snippet should say per page type
-**Time:** not estimated, discovery only so far
-**Changes:** none proposed yet
+**What's shipped vs. what's left:**
+- Shipped: pool+seed variety for `intro`+`whatIs` across all 12 functions, verified with `tsc`/`npm run build`, committed.
+- Left: the same treatment (real per-location variety, not just `${loc}` interpolation) for `benefits`/`problems`/`processSteps`/`faqs`/`testimonials` — matching what `FreguesiaServicePage`/`freguesiaContentEngine.ts` already does correctly. This is a content-authoring task (~5 fields × 12 functions), not a mechanical fix, and is a separate scoping decision from what was asked for in this pass.
+
+**Who:** needs a decision on whether/when to invest in full field-level content variety for the 12 keyword-variant functions
+**Time:** intro/whatIs pooling done this session; full field variety not estimated
+**Changes:** `src/data/keywordVariantData.ts` (committed this session)
 
 ### [ ] 5. Google Business Profile pastes, if you want Layer 11 (Local) graded
 
