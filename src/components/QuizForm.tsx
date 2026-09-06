@@ -18,7 +18,7 @@ import {
 import type { QuizFormData, SofaItem, MattressItem, CarpetItem, UpsellItemConfig } from './quiz';
 import QuizStepLocation from './quiz/steps/QuizStepLocation';
 import QuizStepConfig from './quiz/steps/QuizStepConfig';
-import QuizUpsellOverlay from './quiz/steps/QuizUpsellOverlay';
+import QuizComboUpsellScreen from './quiz/steps/QuizComboUpsellScreen';
 import QuizMinimumGate from './quiz/steps/QuizMinimumGate';
 import QuizChairsAddonUpsell from './quiz/steps/QuizChairsAddonUpsell';
 import QuizStepContact from './quiz/steps/QuizStepContact';
@@ -1070,27 +1070,15 @@ ${formData.description || 'Sem observações adicionais'}
               />
             )}
 
-            {/* Pack Família upsell (multi-step overlay) */}
+            {/* Upsell final "estilo companhia aérea": uma única tela com as 3
+                categorias (Colchão, Sofá, Cadeiras), substitui o antigo fluxo
+                QuizUpsellOverlay de escolher um item de cada vez (pedido
+                explícito, aprovado em mockup 2026-09-06). */}
             {showUpsell && (
-              <QuizUpsellOverlay
-                formData={formData}
-                updateFormData={updateFormData}
-                upsellSubStep={upsellSubStep}
-                setUpsellSubStep={setUpsellSubStep}
+              <QuizComboUpsellScreen
                 upsellItems={upsellItems}
                 setUpsellItems={setUpsellItems}
-                totalPrice={totalPrice}
-                packDiscountActive={packDiscountActive}
-                serviceQualifiesForDiscount={totalPrice > 100}
-                onGoToContact={() => { (document.activeElement as HTMLElement)?.blur(); setShowUpsell(false); setCurrentStep(4); }}
-                onBack={() => { (document.activeElement as HTMLElement)?.blur(); setShowUpsell(false); setCurrentStep(3); }}
-                pendingUpsellId={pendingUpsellId} setPendingUpsellId={setPendingUpsellId}
-                pendingSofaItems={pendingSofaItems} setPendingSofaItems={setPendingSofaItems}
-                pendingMattressItems={pendingMattressItems} setPendingMattressItems={setPendingMattressItems}
-                pendingCarpetArea={pendingCarpetArea} setPendingCarpetArea={setPendingCarpetArea}
-                pendingChairQtyNum={pendingChairQtyNum} setPendingChairQtyNum={setPendingChairQtyNum}
-                pendingWaterproof={pendingWaterproof} setPendingWaterproof={setPendingWaterproof}
-                resetPending={resetPending}
+                onContinue={() => { (document.activeElement as HTMLElement)?.blur(); setShowUpsell(false); setCurrentStep(4); }}
               />
             )}
 
