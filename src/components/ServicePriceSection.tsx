@@ -34,7 +34,7 @@ const SERVICE_POINTS: Record<string, { stat?: string; titleGold: string; titleRe
 const SERVICE_SUBTITLE: Record<string, string> = {
   'limpeza-sofas':     'Preço fixo por tamanho e tratamento. Sem avaliação prévia, sem deslocações em vão.',
   'limpeza-colchoes':  'Preço fixo por tamanho de colchão. Orçamento confirmado antes de qualquer intervenção.',
-  'limpeza-tapetes':   'Preço por m² calculado na hora. Sem surpresas, sem custos escondidos.',
+  'limpeza-tapetes':   'Orçamento à medida de cada tapete. Sem surpresas, sem custos escondidos.',
   'limpeza-cadeiras':  'Preço por cadeira com desconto progressivo em lotes. Confirmado antes de avançar.',
   'limpeza-alcatifas': 'Preço por m² com desconto em grandes superfícies. Orçamento gratuito.',
   'impermeabilizacao': 'Preço fixo, combinável com limpeza ou em separado. Sem compromisso.',

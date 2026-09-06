@@ -10,9 +10,10 @@ interface QuizChairsAddonUpsellProps {
   onBack: () => void;
 }
 
-// Anti Ácaros das cadeiras: serviço à parte da impermeabilização (mutuamente
-// exclusivos aqui), sempre 5€ por cadeira, sem escalão — decisão explícita do
-// dono, o preço mostrado ao cliente é sempre por unidade, nunca o total.
+// Anti Ácaros das cadeiras: serviço independente da impermeabilização (a
+// pessoa pode adicionar os dois ao mesmo tempo, pedido explícito), sempre 5€
+// por cadeira, sem escalão — preço mostrado ao cliente é sempre por unidade,
+// nunca o total.
 const CHAIR_ANTI_ACAROS_UNIT_RATE = 5;
 const CHAIR_ANTI_ACAROS_STRIKE_UNIT_RATE = 10;
 
@@ -26,35 +27,30 @@ const QuizChairsAddonUpsell = ({ formData, updateFormData, onContinue, onBack }:
   const premiumPrice = calcChairWaterproofPremium(qty);
   const essencialPrice = calcChairWaterproof(qty);
 
-  const selection: 'premium' | 'essencial' | 'antiacaros' | null =
-    formData.chairAntiAcaros ? 'antiacaros'
-    : formData.chairWaterproofing && formData.waterproofingTier === 'premium' ? 'premium'
-    : formData.chairWaterproofing && formData.waterproofingTier === 'essencial' ? 'essencial'
+  const waterproofTier: 'premium' | 'essencial' | null = formData.chairWaterproofing
+    ? (formData.waterproofingTier === 'premium' ? 'premium' : 'essencial')
     : null;
+  const antiAcarosOn = formData.chairAntiAcaros;
+  const anySelected = waterproofTier !== null || antiAcarosOn;
 
   const selectWaterproof = (tier: 'premium' | 'essencial') => {
-    const turningOff = selection === tier;
+    const turningOff = waterproofTier === tier;
     updateFormData(
       turningOff
         ? { chairWaterproofing: false, chairWaterproofQty: 0 }
-        : { chairWaterproofing: true, chairWaterproofQty: qty, waterproofingTier: tier, chairAntiAcaros: false }
+        : { chairWaterproofing: true, chairWaterproofQty: qty, waterproofingTier: tier }
     );
   };
 
   const selectAntiAcaros = () => {
-    const turningOff = selection === 'antiacaros';
-    updateFormData(
-      turningOff
-        ? { chairAntiAcaros: false }
-        : { chairAntiAcaros: true, chairWaterproofing: false, chairWaterproofQty: 0 }
-    );
+    updateFormData({ chairAntiAcaros: !antiAcarosOn });
   };
 
-  const addonTotal = selection === 'premium' ? (premiumPrice ?? 0)
-    : selection === 'essencial' ? (essencialPrice ?? 0)
-    : selection === 'antiacaros' ? qty * CHAIR_ANTI_ACAROS_UNIT_RATE
+  const waterproofTotal = waterproofTier === 'premium' ? (premiumPrice ?? 0)
+    : waterproofTier === 'essencial' ? (essencialPrice ?? 0)
     : 0;
-  const total = (primaryPrice ?? 0) + addonTotal;
+  const antiAcarosTotal = antiAcarosOn ? qty * CHAIR_ANTI_ACAROS_UNIT_RATE : 0;
+  const total = (primaryPrice ?? 0) + waterproofTotal + antiAcarosTotal;
   const fmt = (n: number) => (n % 1 === 0 ? n : n.toFixed(1).replace('.', ','));
 
   return (
@@ -71,7 +67,7 @@ const QuizChairsAddonUpsell = ({ formData, updateFormData, onContinue, onBack }:
           onClick={() => selectWaterproof('premium')}
           className={cn(
             'relative rounded-sm border-2 px-3 py-2.5 text-left transition-all duration-200 touch-manipulation',
-            selection === 'premium'
+            waterproofTier === 'premium'
               ? 'border-gold bg-[#1a2a1a] shadow-[0_0_18px_rgba(212,175,55,0.30)]'
               : 'border-gold/50 bg-[#1a2a1a] ring-1 ring-gold/20 hover:border-gold/75'
           )}
@@ -81,14 +77,14 @@ const QuizChairsAddonUpsell = ({ formData, updateFormData, onContinue, onBack }:
             <span className="text-[6px] font-black uppercase leading-none tracking-tight text-[#12121e]">Top</span>
           </span>
           <div className="flex items-center gap-1.5 mb-0.5">
-            {selection === 'premium' && <Check className="w-3 h-3 text-gold flex-shrink-0" />}
-            <p className={cn('text-xs font-bold', selection === 'premium' ? 'text-white' : 'text-white/85')}>Premium</p>
+            {waterproofTier === 'premium' && <Check className="w-3 h-3 text-gold flex-shrink-0" />}
+            <p className={cn('text-xs font-bold', waterproofTier === 'premium' ? 'text-white' : 'text-white/85')}>Premium</p>
           </div>
-          <p className={cn('text-[10px] leading-snug font-semibold mb-1', selection === 'premium' ? 'text-gold/70' : 'text-gold/45')}>Até 10 anos · 5 lavagens</p>
+          <p className={cn('text-[10px] leading-snug font-semibold mb-1', waterproofTier === 'premium' ? 'text-gold/70' : 'text-gold/45')}>Até 10 anos · 5 lavagens</p>
           {premiumPrice !== null ? (
             <p className="text-[11px] leading-none">
               <span className="text-white/30 line-through">{fmt(premiumPrice + 5)}€</span>{' '}
-              <span className={cn('font-bold', selection === 'premium' ? 'text-gold' : 'text-gold/80')}>{fmt(premiumPrice)}€</span>
+              <span className={cn('font-bold', waterproofTier === 'premium' ? 'text-gold' : 'text-gold/80')}>{fmt(premiumPrice)}€</span>
             </p>
           ) : (
             <p className="text-[11px] text-gold/60">Sob orçamento</p>
@@ -98,15 +94,15 @@ const QuizChairsAddonUpsell = ({ formData, updateFormData, onContinue, onBack }:
           onClick={() => selectWaterproof('essencial')}
           className={cn(
             'rounded-sm border-2 px-3 py-2.5 text-left transition-all duration-200 touch-manipulation',
-            selection === 'essencial' ? 'border-gold bg-[#1a2a1a] shadow-[0_0_10px_rgba(212,175,55,0.18)]' : 'border-gold/20 bg-[#1a2a1a] hover:border-gold/40'
+            waterproofTier === 'essencial' ? 'border-gold bg-[#1a2a1a] shadow-[0_0_10px_rgba(212,175,55,0.18)]' : 'border-gold/20 bg-[#1a2a1a] hover:border-gold/40'
           )}
         >
           <div className="flex items-center gap-1.5 mb-0.5">
-            {selection === 'essencial' && <Check className="w-3 h-3 text-gold flex-shrink-0" />}
-            <p className={cn('text-xs font-bold', selection === 'essencial' ? 'text-white' : 'text-white/60')}>Essencial</p>
+            {waterproofTier === 'essencial' && <Check className="w-3 h-3 text-gold flex-shrink-0" />}
+            <p className={cn('text-xs font-bold', waterproofTier === 'essencial' ? 'text-white' : 'text-white/60')}>Essencial</p>
           </div>
           <p className="text-[10px] text-white/35 leading-snug mb-1">1 a 2 anos · 2 lavagens</p>
-          <p className={cn('text-[11px] font-bold', selection === 'essencial' ? 'text-white' : 'text-white/50')}>
+          <p className={cn('text-[11px] font-bold', waterproofTier === 'essencial' ? 'text-white' : 'text-white/50')}>
             {essencialPrice !== null ? `${fmt(essencialPrice)}€` : 'Sob orçamento'}
           </p>
         </button>
@@ -117,17 +113,17 @@ const QuizChairsAddonUpsell = ({ formData, updateFormData, onContinue, onBack }:
         onClick={selectAntiAcaros}
         className={cn(
           'w-full max-w-xs flex items-center gap-3 px-3 py-2.5 rounded-sm border-2 transition-all duration-200 touch-manipulation text-left',
-          selection === 'antiacaros' ? 'border-gold bg-gold/[0.08] shadow-[0_0_10px_rgba(212,175,55,0.15)]' : 'border-gold/20 bg-[#1a2a1a] hover:border-gold/40'
+          antiAcarosOn ? 'border-gold bg-gold/[0.08] shadow-[0_0_10px_rgba(212,175,55,0.15)]' : 'border-gold/20 bg-[#1a2a1a] hover:border-gold/40'
         )}
       >
-        <Bug className={cn('w-4 h-4 flex-shrink-0', selection === 'antiacaros' ? 'text-gold' : 'text-white/30')} />
+        <Bug className={cn('w-4 h-4 flex-shrink-0', antiAcarosOn ? 'text-gold' : 'text-white/30')} />
         <div className="flex-1 min-w-0">
-          <p className={cn('text-xs font-bold', selection === 'antiacaros' ? 'text-white' : 'text-white/70')}>Anti Ácaros</p>
+          <p className={cn('text-xs font-bold', antiAcarosOn ? 'text-white' : 'text-white/70')}>Anti Ácaros</p>
           <p className="text-[10px] text-white/35 leading-snug">Evita que os ácaros voltem a aparecer e elimina bactérias do estofo.</p>
         </div>
         <div className="text-right flex-shrink-0">
           <p className="text-[10px] text-white/30 line-through leading-none">{CHAIR_ANTI_ACAROS_STRIKE_UNIT_RATE}€/un.</p>
-          <p className={cn('text-sm font-bold leading-none mt-0.5', selection === 'antiacaros' ? 'text-gold' : 'text-white/60')}>{CHAIR_ANTI_ACAROS_UNIT_RATE}€/un.</p>
+          <p className={cn('text-sm font-bold leading-none mt-0.5', antiAcarosOn ? 'text-gold' : 'text-white/60')}>{CHAIR_ANTI_ACAROS_UNIT_RATE}€/un.</p>
         </div>
       </button>
 
@@ -140,7 +136,7 @@ const QuizChairsAddonUpsell = ({ formData, updateFormData, onContinue, onBack }:
         onClick={onContinue}
         className="w-full max-w-xs h-14 bg-gradient-to-r from-gold to-[#d4c57b] hover:from-[#d4c57b] hover:to-gold text-[#12121e] font-black text-base tracking-wider uppercase touch-manipulation active:scale-[0.98] rounded-sm shadow-[0_0_32px_rgba(212,175,55,0.30)]"
       >
-        {selection ? 'Adicionar e Continuar' : 'Continuar'}
+        {anySelected ? 'Adicionar e Continuar' : 'Continuar'}
       </button>
       <button onClick={onContinue} className="text-xs text-white/25 hover:text-white/45 underline underline-offset-2 touch-manipulation">
         Continuar sem adicionar

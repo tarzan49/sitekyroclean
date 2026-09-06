@@ -119,16 +119,17 @@ function getCadeirasTrustPoints(seed: string): TrustPoint[] {
 
 // Tapetes: sem upsell (impermeabilização de tapetes foi descontinuada — não
 // reintroduzir), por isso os 2 primeiros pontos são pools de 5 factos, não
-// de upsell: 1º = "a partir de" + preço base de higienização (não há addon,
-// mas segue a mesma convenção de preço+produto do resto do site), 2º =
-// info de qualidade/confiança que convença o cliente a limpar (sem preço).
-// 3º fixo (Pack Família) — 2026-08-31, títulos revistos 2026-09-01.
+// de upsell: 1º = gancho de produto (sem preço fixo — cada tapete é sempre
+// orçamentado à parte, mudança de 2026-09-06, não voltar a pôr "a partir de
+// X€/m²" aqui), 2º = info de qualidade/confiança que convença o cliente a
+// limpar. 3º fixo (Pack Família) — 2026-08-31, títulos revistos 2026-09-01,
+// preço removido 2026-09-06.
 const TAPETES_PROBLEMA_POOL: TrustPoint[] = [
-  { titleGold: 'A partir de 15€/m² Higienização de Tapetes', titleRest: ' que elimina alergénios invisíveis', desc: 'Tapetes retêm e libertam no ar partículas a cada passo: pólenes, ácaros e poluentes invisíveis, até 8× mais que um pavimento liso. A higienização profissional remove o que a aspiração doméstica nunca chega.' },
-  { titleGold: 'A partir de 15€/m² Higienização de Tapetes', titleRest: ' que elimina bactérias que a aspiração não apanha', desc: 'Um tapete de uso doméstico pode conter até 4.000 vezes mais bactérias por cm² do que a sanita. Não é visível, mas está lá, a cada passo descalço.' },
-  { titleGold: 'A partir de 15€/m² Higienização de Tapetes', titleRest: ' que remove o pó acumulado há meses', desc: 'Um tapete médio acumula até 2 kg de matéria orgânica, pó e resíduos por metro quadrado ao longo de 12 meses, mesmo com aspiração regular.' },
-  { titleGold: 'A partir de 15€/m² Higienização de Tapetes', titleRest: ' que remove odores que a aspiração nunca tira', desc: 'Suor, animais de estimação e humidade ficam retidos nas fibras profundas do tapete. Só a extração profissional a quente remove o odor pela raiz, não só à superfície.' },
-  { titleGold: 'A partir de 15€/m² Higienização de Tapetes', titleRest: ' para aliviar alergias em casa', desc: 'Espirros e olhos irritados em casa podem vir do tapete, não do ar exterior. Fibras densas acumulam ácaros e pólen que a ventilação normal não remove.' },
+  { titleGold: 'Higienização de Tapetes', titleRest: ' que elimina alergénios invisíveis', desc: 'Tapetes retêm e libertam no ar partículas a cada passo: pólenes, ácaros e poluentes invisíveis, até 8× mais que um pavimento liso. A higienização profissional remove o que a aspiração doméstica nunca chega.' },
+  { titleGold: 'Higienização de Tapetes', titleRest: ' que elimina bactérias que a aspiração não apanha', desc: 'Um tapete de uso doméstico pode conter até 4.000 vezes mais bactérias por cm² do que a sanita. Não é visível, mas está lá, a cada passo descalço.' },
+  { titleGold: 'Higienização de Tapetes', titleRest: ' que remove o pó acumulado há meses', desc: 'Um tapete médio acumula até 2 kg de matéria orgânica, pó e resíduos por metro quadrado ao longo de 12 meses, mesmo com aspiração regular.' },
+  { titleGold: 'Higienização de Tapetes', titleRest: ' que remove odores que a aspiração nunca tira', desc: 'Suor, animais de estimação e humidade ficam retidos nas fibras profundas do tapete. Só a extração profissional a quente remove o odor pela raiz, não só à superfície.' },
+  { titleGold: 'Higienização de Tapetes', titleRest: ' para aliviar alergias em casa', desc: 'Espirros e olhos irritados em casa podem vir do tapete, não do ar exterior. Fibras densas acumulam ácaros e pólen que a ventilação normal não remove.' },
 ];
 
 const TAPETES_QUALIDADE_POOL: TrustPoint[] = [
