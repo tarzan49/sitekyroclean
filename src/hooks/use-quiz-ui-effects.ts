@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback, useMemo, type RefObject } from 'react';
 import type { useToast } from '@/hooks/use-toast';
 import { locationPrices } from '@/components/quiz';
+import { REVIEW_COUNT } from '@/constants/business';
 
 // Reaproveita a tabela real de zonas (locationPrices) como proxy de "tamanho" da
 // localidade — zona 0 (10€, núcleo/perto da equipa) = grande, zona intermédia (15€)
@@ -82,7 +83,7 @@ export function buildSocialProofMessages(location: string): SocialProofMessage[]
     { category: 'booking', text: `Agenda quase cheia esta semana em ${city}, garanta já` },
     { category: 'job', text: `Já tratámos ${cadeiraCount} conjunto${cadeiraCount > 1 ? 's' : ''} de cadeiras esta semana` },
     { category: 'trust', text: `Mais de 1100 clientes satisfeitos · Avaliação 5.0 no Google` },
-    { category: 'trust', text: `Mais de 90 avaliações reais no Google, 5.0 estrelas` },
+    { category: 'trust', text: `Mais de ${REVIEW_COUNT} avaliações reais no Google, 5.0 estrelas` },
     { category: 'trust', text: `Resposta em menos de 30 minutos, na maioria das vezes bem mais rápido` },
   ];
 }

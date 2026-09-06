@@ -99,7 +99,7 @@ export const EN_PAGES: EnPageData[] = [
       "English-speaking team: explain the problem once, clearly",
       "Same-day availability in Lagos and nearby areas",
       "Professional hot-water extraction, not a supermarket carpet shampoo",
-      "5.0★ on Google, 90+ verified reviews",
+      "5.0★ on Google, 100+ verified reviews",
     ],
     faqs: [
       { question: "How quickly can you get here?", answer: "Usually within a few hours of confirming, depending on our schedule that day; message us with your location and the sooner the better." },
@@ -153,7 +153,7 @@ export const EN_PAGES: EnPageData[] = [
       "English-speaking team, quick to coordinate by WhatsApp",
       "Same-day appointments, including short notice before a flight",
       "Professional extraction equipment: most items usable again within hours",
-      "5.0★ on Google, 90+ verified reviews",
+      "5.0★ on Google, 100+ verified reviews",
     ],
     faqs: [
       { question: "I fly out in a few hours, can you still help?", answer: "Message us straight away with your address and flight time; we'll do our best to fit you in, but the earlier you contact us, the more likely we can help." },
@@ -182,7 +182,7 @@ export const EN_PAGES: EnPageData[] = [
       "English-speaking team, direct WhatsApp coordination",
       "Same-day availability for urgent turnovers",
       "Before/after photo documentation on every job",
-      "5.0★ on Google, 90+ verified reviews, professional insured technicians",
+      "5.0★ on Google, 100+ verified reviews, professional insured technicians",
     ],
     faqs: [
       { question: "Can you invoice for accounting/tax purposes?", answer: "Yes, we can provide a receipt for every job." },
@@ -212,7 +212,7 @@ export const EN_PAGES: EnPageData[] = [
       "English-speaking technicians: no language barrier",
       "Same-day appointments across Lisbon",
       "Professional hot-water extraction equipment",
-      "5.0★ rating on Google, 90+ verified reviews",
+      "5.0★ rating on Google, 100+ verified reviews",
     ],
     faqs: [
       { question: "Can you come today?", answer: "In most cases yes; message us on WhatsApp with a photo of the stain and your address, and we'll confirm a time." },
@@ -238,7 +238,7 @@ export const EN_PAGES: EnPageData[] = [
       "English-speaking team",
       "Same-day availability in Cascais and nearby areas",
       "Professional hot-water extraction, not a rented carpet cleaner",
-      "5.0★ on Google, 90+ verified reviews",
+      "5.0★ on Google, 100+ verified reviews",
     ],
     faqs: [
       { question: "How quickly can you get here?", answer: "Usually within a few hours of confirming; message us with your location as soon as possible." },
@@ -265,7 +265,7 @@ export const EN_PAGES: EnPageData[] = [
       "English-speaking team",
       "Same-day availability in Sintra and the greater Lisbon area",
       "Professional hot-water extraction equipment",
-      "5.0★ on Google, 90+ verified reviews",
+      "5.0★ on Google, 100+ verified reviews",
     ],
     faqs: [
       { question: "How quickly can you get here?", answer: "Usually within a few hours of confirming; message us with your location as soon as possible." },
@@ -292,7 +292,7 @@ export const EN_PAGES: EnPageData[] = [
       "English-speaking team",
       "Same-day availability in Oeiras and the wider Lisbon coast",
       "Professional hot-water extraction, not a rented carpet cleaner",
-      "5.0★ on Google, 90+ verified reviews",
+      "5.0★ on Google, 100+ verified reviews",
     ],
     faqs: [
       { question: "How quickly can you get here?", answer: "Usually within a few hours of confirming; message us with your location as soon as possible." },
@@ -318,7 +318,7 @@ export const EN_PAGES: EnPageData[] = [
       "English-speaking team",
       "Same-day availability across Almada and the south bank",
       "Professional hot-water extraction equipment",
-      "5.0★ on Google, 90+ verified reviews",
+      "5.0★ on Google, 100+ verified reviews",
     ],
     faqs: [
       { question: "Can you come today?", answer: "In most cases yes; message us on WhatsApp with a photo of the stain and we'll confirm a time." },
@@ -344,7 +344,7 @@ export const EN_PAGES: EnPageData[] = [
       "English-speaking team",
       "Same-day availability across Setúbal and the surrounding area",
       "Professional hot-water extraction, not a rented carpet cleaner",
-      "5.0★ on Google, 90+ verified reviews",
+      "5.0★ on Google, 100+ verified reviews",
     ],
     faqs: [
       { question: "How quickly can you get here?", answer: "Usually within a few hours of confirming; message us with your location as soon as possible." },
@@ -370,7 +370,7 @@ export const EN_PAGES: EnPageData[] = [
       "English-speaking team",
       "Same-day availability across Sesimbra and the surrounding area",
       "Professional hot-water extraction equipment",
-      "5.0★ on Google, 90+ verified reviews",
+      "5.0★ on Google, 100+ verified reviews",
     ],
     faqs: [
       { question: "Can you come today?", answer: "In most cases yes; message us on WhatsApp with a photo of the stain and we'll confirm a time." },
@@ -396,7 +396,7 @@ export const EN_PAGES: EnPageData[] = [
       "English-speaking team",
       "Same-day availability across Mafra and the surrounding area",
       "Professional hot-water extraction, not a rented carpet cleaner",
-      "5.0★ on Google, 90+ verified reviews",
+      "5.0★ on Google, 100+ verified reviews",
     ],
     faqs: [
       { question: "How quickly can you get here?", answer: "Usually within a few hours of confirming; message us with your location as soon as possible." },
@@ -453,7 +453,7 @@ export const EN_PAGES: EnPageData[] = [
       "English-speaking technicians: no language barrier",
       "Same-day appointments across Porto",
       "Professional hot-water extraction equipment",
-      "5.0★ rating on Google, 90+ verified reviews",
+      "5.0★ rating on Google, 100+ verified reviews",
     ],
     faqs: [
       { question: "Can you come today?", answer: "In most cases yes; message us on WhatsApp with a photo of the stain and your address, and we'll confirm a time." },
@@ -479,7 +479,7 @@ export const EN_PAGES: EnPageData[] = [
       "English-speaking team",
       "Same-day availability in Vila Nova de Gaia and greater Porto",
       "Professional hot-water extraction equipment",
-      "5.0★ on Google, 90+ verified reviews",
+      "5.0★ on Google, 100+ verified reviews",
     ],
     faqs: [
       { question: "How quickly can you get here?", answer: "Usually within a few hours of confirming; message us with your location as soon as possible." },
@@ -505,7 +505,7 @@ export const EN_PAGES: EnPageData[] = [
       "English-speaking team",
       "Same-day availability across Matosinhos and greater Porto",
       "Professional hot-water extraction, not a rented carpet cleaner",
-      "5.0★ on Google, 90+ verified reviews",
+      "5.0★ on Google, 100+ verified reviews",
     ],
     faqs: [
       { question: "Can you come today?", answer: "In most cases yes; message us on WhatsApp with a photo of the stain and we'll confirm a time." },
@@ -532,7 +532,7 @@ export const EN_PAGES: EnPageData[] = [
       "English-speaking team",
       "Same-day availability across the north coast and greater Porto",
       "Professional hot-water extraction equipment",
-      "5.0★ on Google, 90+ verified reviews",
+      "5.0★ on Google, 100+ verified reviews",
     ],
     faqs: [
       { question: "Can you come today?", answer: "In most cases yes; message us on WhatsApp with a photo of the stain and we'll confirm a time." },
@@ -558,7 +558,7 @@ export const EN_PAGES: EnPageData[] = [
       "English-speaking team",
       "Same-day availability across Vila do Conde and greater Porto",
       "Professional hot-water extraction, not a rented carpet cleaner",
-      "5.0★ on Google, 90+ verified reviews",
+      "5.0★ on Google, 100+ verified reviews",
     ],
     faqs: [
       { question: "How quickly can you get here?", answer: "Usually within a few hours of confirming; message us with your location as soon as possible." },
@@ -584,7 +584,7 @@ export const EN_PAGES: EnPageData[] = [
       "English-speaking team",
       "Same-day availability across Espinho and greater Porto",
       "Professional hot-water extraction equipment",
-      "5.0★ on Google, 90+ verified reviews",
+      "5.0★ on Google, 100+ verified reviews",
     ],
     faqs: [
       { question: "Can you come today?", answer: "In most cases yes; message us on WhatsApp with a photo of the stain and we'll confirm a time." },
@@ -610,7 +610,7 @@ export const EN_PAGES: EnPageData[] = [
       "English-speaking team",
       "Same-day availability across Braga and the surrounding area",
       "Professional hot-water extraction equipment",
-      "5.0★ on Google, 90+ verified reviews",
+      "5.0★ on Google, 100+ verified reviews",
     ],
     faqs: [
       { question: "How quickly can you get here?", answer: "Usually within a few hours of confirming; message us with your location as soon as possible." },
@@ -636,7 +636,7 @@ export const EN_PAGES: EnPageData[] = [
       "English-speaking team",
       "Same-day availability across Guimarães and the surrounding area",
       "Professional hot-water extraction equipment",
-      "5.0★ on Google, 90+ verified reviews",
+      "5.0★ on Google, 100+ verified reviews",
     ],
     faqs: [
       { question: "How quickly can you get here?", answer: "Usually within a few hours of confirming; message us with your location as soon as possible." },

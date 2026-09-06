@@ -93,7 +93,7 @@ const Testimonials = () => {
                     ))}
                   </div>
                 </div>
-                <p className="text-[11px] text-white/45 mt-1">90+ avaliações verificadas</p>
+                <p className="text-[11px] text-white/45 mt-1">100+ avaliações verificadas</p>
               </div>
             </a>
           </div>
