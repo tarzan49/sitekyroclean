@@ -83,7 +83,7 @@ const Obrigado = () => {
               <Clock className="w-3.5 h-3.5" />
               {isOpenNow
                 ? "Especialista contacta em menos de 30 minutos"
-                : "Fora de horário, mas respondemos o mais rápido possível assim que reabrirmos (seg-sáb, 08:00-00:00)"}
+                : "Respondemos o mais rápido possível"}
             </div>
           </div>
 
