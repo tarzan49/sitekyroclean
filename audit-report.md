@@ -21,13 +21,28 @@ That surfaced a second wrinkle: `/obrigado`, `/obrigado-pelo-servico`, `/admin/p
 **Time:** done (took longer than the 30 min estimate — two dead ends before finding what actually works, both caught by local testing before touching production)
 **Changes:** `scripts/prerender.ts` (404.html + 4 client-only-route generation) and `public/_redirects` (catch-all removed). No body copy touched.
 
-### [ ] 2. Cloudflare's managed robots.txt blocks every AI crawler sitewide · GEO, owner decision needed
+### [x] 2. Cloudflare's managed robots.txt blocked every AI crawler sitewide · GEO
+Fixed 06 Sep, owner decision made: allow AI crawling. `robots.txt` (auto-managed by Cloudflare, not in this repo) used to disallow `ClaudeBot`, `GPTBot`, `Google-Extended`, `Applebot-Extended`, `Bytespider`, `CCBot`, `Amazonbot`, `meta-externalagent` sitewide, plus declare `Content-Signal: ai-train=no`. Regular `Googlebot`/`Bingbot` were never affected, so normal Search indexing was never at risk — this was specifically about AI citability (ChatGPT/Claude/Perplexity naming the business in answers).
 
-`robots.txt` (auto-managed by Cloudflare, not something in your repo) disallows `ClaudeBot`, `GPTBot`, `Google-Extended`, `Applebot-Extended`, `Bytespider`, `CCBot`, `Amazonbot`, `meta-externalagent` — full site, `Disallow: /`. Regular `Googlebot` (classic Search) and `Bingbot` are **not** in that block list, so normal Google/Bing search indexing is unaffected. `Google-Extended` specifically controls Gemini/AI-training use of your content, separate from Search indexing.
+Changed in Cloudflare dashboard → Overview → "Manage AI bot access": **"Block AI training bots"** set to *Do not block (allow crawlers)*, and **"Content Signals Policy"** set to *Disable robots.txt configuration* (no explicit "allow" option exists there, this is the closest — it stops Cloudflare declaring `ai-train=no` at all). Verified live immediately after:
 
-**This is a real choice, not obviously a bug:** blocking it protects your written content (testimonials, service descriptions, pricing) from being used to train AI models for free. The cost is that ChatGPT, Claude, and Perplexity can't cite your business by name when someone asks "melhor limpeza de sofás no Porto" — increasingly how younger/tech-savvy customers search. Given `Content-Signal: search=yes,ai-train=no,use=reference` is also declared, someone already made a deliberate call here.
+```
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /obrigado
+Disallow: /obrigado-pelo-servico
+Disallow: /api/
+Disallow: /*.json$
 
-**Not fixing this without your yes** — it's your call whether AI-surface visibility is worth trading against training-data protection. If you want AI citability, the fix is a `robots.txt` override in Cloudflare (outside this repo) allowing at minimum `ClaudeBot`, `GPTBot`, `PerplexityBot`, `OAI-SearchBot`.
+Sitemap: https://cleansolutions.com.pt/sitemap.xml
+```
+
+Both Cloudflare-managed blocks gone — what's left is exactly the site's own `public/robots.txt`.
+
+**Who:** you, in the Cloudflare dashboard (talked through step by step)
+**Time:** done
+**Changes:** none to this repo — Cloudflare dashboard setting only
 
 **Who:** you, in Cloudflare dashboard (this isn't in the site's own code)
 **Time:** 5 min if you decide to change it
