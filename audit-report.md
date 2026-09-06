@@ -6,6 +6,20 @@
 
 ---
 
+## Conclusão geral (07 Sep) — em que nível está o site
+
+**O código está bem mais avançado do que o site que está no ar.** `worktree-kyro-minorder-emdash` está 34 commits à frente de `master` (8.004 inserções, 1.739 remoções, 63 ficheiros) e nada disto foi ainda para produção. Isto inclui os 3 findings técnicos marcados [x] nesta auditoria (soft-404, homepage sem `<h1>`, e agora a variedade de conteúdo das keyword-variant pages) — só o finding #2 (bots de IA desbloqueados no Cloudflare) está mesmo ao vivo, porque foi uma alteração de dashboard, não de código. Ou seja: hoje, em produção, um URL inventado ainda devolve 200 com a homepage, a homepage ainda não tem `<h1>` no HTML bruto, e as ~7.800 páginas keyword-variant ainda mostram benefits/problems/faqs 100% idênticos entre localizações.
+
+**SEO técnico (indexação, crawl, robots):** em recuperação clara e mensurável, mas por fixes ANTIGOS que já estão em produção (remoção de noindex a 5 Jun, remoção de regra robots.txt a 10 Ago) — não pelo trabalho desta sessão. Indexadas subiram de 8.115 para 12.950 e não-indexadas desceram de 9.415 para 4.629 num salto a 29 Ago. Boa tendência, mas ainda com um alerta ativo: 1.412 páginas com "Página alternativa com etiqueta canónica correta" falharam validação do Google recentemente — provavelmente ligado às keyword-variant pages sendo re-canonicalizadas pelo próprio Google por as achar demasiado parecidas, o que é exatamente o problema que esta sessão andou a corrigir (mas ainda não está em produção para o Google poder re-testar).
+
+**Conteúdo duplicado / doorway pages (o maior risco estrutural do site, dado o volume):** era o ponto mais fraco — 12 funções geradoras de conteúdo com texto 100% fixo entre localizações, só o nome da cidade mudava. Corrigido nesta sessão e nas duas anteriores: intro/whatIs (variedade real, sessão anterior) + benefits/problems/faqs/testimonials (variedade real, esta sessão). Verificado com teste automatizado de similaridade contra o HTML real prerenderizado: as 12 funções passam agora. Ainda por decidir/fazer: `processSteps` continua fixo por decisão deliberada (baixo valor de diferenciação), e falta confirmar diretamente no GSC se as 1.412 páginas "canonical alternativo" acima eram mesmo estas.
+
+**O que NÃO foi medido nesta auditoria** (zero dados, não é "mau", é desconhecido): rankings e backlinks (sem Semrush), cliques/CTR/posição média (export do GSC só tinha impressões), Core Web Vitals desktop (só mobile foi exportado), Google Business Profile / pacote local, Lighthouse/performance, e se ChatGPT/Perplexity/Google AI Mode já citam o negócio nas respostas.
+
+**Resumo de uma linha:** a fundação técnica está a ser bem tratada e o maior risco de conteúdo em escala (doorway pages) ficou resolvido no código — mas nada disto conta para o site real enquanto este branch não for para `master` e para produção. Essa é a ação de maior alavancagem disponível agora: mesclar e publicar.
+
+---
+
 ### [x] 1. Soft-404s: any bad URL returned 200 with the homepage · index-hygiene, real
 Fixed 06 Sep. `curl -o /dev/null -w "%{http_code}" https://cleansolutions.com.pt/pagina-que-nao-existe-xyz-123` returned **200**, served with the homepage's own title/meta, because `_redirects` ended in a blanket `/* /index.html 200` catch-all.
 
