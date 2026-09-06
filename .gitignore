@@ -38,3 +38,6 @@ GOOGLE-ADS-PORTO-CAMPANHA.md
 *.sln
 *.sw?
 .tmp-*.mjs
+
+# Google Ads strategy docs (budget/keywords, not for the public repo)
+g-ads/
