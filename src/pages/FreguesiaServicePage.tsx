@@ -72,7 +72,7 @@ const FreguesiaServicePage = () => {
   const [rowQuantities, setRowQuantities] = useState<Record<number, number>>({});
   const [chaiseLongueAddon, setChaiseLongueAddon] = useState(0);
   const [addonRows, setAddonRows] = useState<Set<number>>(new Set());
-  const [addonTier, setAddonTier] = useState<WidgetTier>('essencial');
+  const [addonTier, setAddonTier] = useState<WidgetTier>('premium');
   const [antiAcarosRows, setAntiAcarosRows] = useState<Set<number>>(new Set());
 
   useEffect(() => {
@@ -492,18 +492,22 @@ const FreguesiaServicePage = () => {
                           <button
                             type="button"
                             onClick={() => setAddonTier('premium')}
-                            className="text-left px-3 py-2 rounded-lg border-2 transition-all"
+                            className="relative text-left px-3 py-2 rounded-lg border-2 transition-all"
                             style={{
                               borderColor: addonTier === 'premium' ? "#D4AF37" : "rgba(212,175,55,0.35)",
                               background: addonTier === 'premium' ? "white" : "rgba(255,255,255,0.5)",
                             }}
                           >
+                            <span
+                              className="absolute -top-2 -right-2 z-10 flex w-9 h-9 flex-col items-center justify-center"
+                              style={{ background: "#D4AF37", border: "2px solid #111111" }}
+                            >
+                              <Star className="w-3 h-3" style={{ color: "#111111", fill: "#111111" }} />
+                              <span className="text-[6px] font-black uppercase leading-none tracking-tight" style={{ color: "#111111" }}>Top</span>
+                            </span>
                             <div className="flex items-center gap-1 mb-0.5">
                               {addonTier === 'premium' && <Check className="w-3 h-3" style={{ color: "#D4AF37" }} strokeWidth={3} />}
                               <p className="text-xs font-bold" style={{ color: "#111111" }}>Premium</p>
-                              <span className="text-[8px] font-bold uppercase tracking-wide px-1 py-[1px] rounded-[3px] leading-none" style={{ color: "#B8912A", border: "1px solid rgba(184,145,42,0.45)" }}>
-                                Dura mais
-                              </span>
                               {extraDelta !== null && (
                                 <span className="text-[9px] font-black leading-none px-1.5 py-[3px] rounded-full whitespace-nowrap" style={{ background: addonTier === 'premium' ? "#D4AF37" : "rgba(212,175,55,0.15)", color: addonTier === 'premium' ? "white" : "#B8912A" }}>
                                   só +{extraDelta}€

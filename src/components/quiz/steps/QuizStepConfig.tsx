@@ -1,4 +1,4 @@
-import { Shield, Check } from 'lucide-react';
+import { Shield, Check, Star } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 import { sofaPrices, mattressPrices } from '@/components/quiz/QuizTypes';
@@ -21,16 +21,21 @@ function WaterproofingTierPicker({ formData, updateFormData }: { formData: QuizF
       <button
         onClick={() => updateFormData({ waterproofingTier: 'premium' })}
         className={cn(
-          'rounded-sm border-2 px-3 py-2.5 text-left transition-all duration-200 touch-manipulation',
+          'relative rounded-sm border-2 px-3 py-2.5 text-left transition-all duration-200 touch-manipulation',
           tier === 'premium'
             ? 'border-gold bg-[#1a2a1a] shadow-[0_0_18px_rgba(212,175,55,0.30)]'
             : 'border-gold/50 bg-[#1a2a1a] ring-1 ring-gold/20 hover:border-gold/75'
         )}
       >
+        {/* Selo "escolha superior": canto sólido em vez do pill em gradiente
+            anterior, que lia como template genérico e pouco tinha de impacto. */}
+        <span className="absolute -top-2 -right-2 z-10 flex w-9 h-9 flex-col items-center justify-center rounded-sm border-2 border-[#12121e] bg-gold shadow-md">
+          <Star className="w-3 h-3 fill-[#12121e] text-[#12121e]" />
+          <span className="text-[6px] font-black uppercase leading-none tracking-tight text-[#12121e]">Top</span>
+        </span>
         <div className="flex items-center gap-1.5 mb-0.5">
           {tier === 'premium' && <Check className="w-3 h-3 text-gold flex-shrink-0" />}
           <p className={cn('text-xs font-bold', tier === 'premium' ? 'text-white' : 'text-white/85')}>Premium</p>
-          <span className="text-[8px] font-bold uppercase tracking-wide text-gold border border-gold/40 rounded-[3px] px-1 py-[1px] leading-none">Dura mais</span>
         </div>
         <p className={cn('text-[10px] leading-snug font-semibold', tier === 'premium' ? 'text-gold/70' : 'text-gold/45')}>Até 10 anos de proteção · até 5 lavagens</p>
       </button>
