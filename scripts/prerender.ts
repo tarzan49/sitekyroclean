@@ -1048,6 +1048,27 @@ export function prerenderRoutes(outDir: string): number {
     console.log(`  Commercial B2B pages:    ${count - prev}`);
   }
 
+  // ── Homepage ("/") ────────────────────────────────────────────────────
+  // index.html is only ever used as the shared <head> template for every
+  // other route (captured into `template` above, LocalBusiness/Service
+  // stripped) and was otherwise served completely un-prerendered — the
+  // single most important page on the site shipped zero <h1> and zero body
+  // text to Googlebot's first (no-JS) pass or any crawler that skips JS.
+  // Every other route already gets this h1+intro safety net via emit(); the
+  // homepage never did. Written to dist/index.html using rawTemplate (which
+  // still has the homepage's own real LocalBusiness/Service JSON-LD, unlike
+  // the stripped `template`) *after* `template` was captured above, so this
+  // has no effect on the ~15,000 already-generated routes.
+  {
+    const homeBody = generatePageBody({
+      h1: 'Estofos como novos, ao domicílio.',
+      intro: 'O seu sofá, colchão ou tapete como novo em 1h, ao domicílio, sem sair de casa. Avaliação 5.0 Google. Extração profissional. Porto, Gaia, Lisboa e todo o país. Orçamento grátis.',
+    });
+    const homeHtml = injectContent(rawTemplate, homeBody);
+    fs.writeFileSync(templatePath, homeHtml, 'utf-8');
+    console.log('  Homepage h1/intro:       injected');
+  }
+
   return count;
 }
 
