@@ -769,35 +769,55 @@ const FreguesiaServicePage = () => {
           <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
             <SectionHeader
               overline="Processo"
-              heading="Como funciona em"
+              heading={data.serviceSlug === 'impermeabilizacao' ? 'Os passos da nossa impermeabilização em' : 'Os passos da nossa limpeza profunda em'}
               goldWord={data.name}
               subtitle={data.howItWorks}
               light={true}
             />
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-px" style={{ backgroundColor: "#E8E4DE" }}>
-              {[0, 1].map((colIdx) => {
-                const splitAt = Math.ceil(processSteps.length / 2);
-                const colSteps = colIdx === 0 ? processSteps.slice(0, splitAt) : processSteps.slice(splitAt);
-                const offset = colIdx === 0 ? 0 : splitAt;
-                return (
-                  <div key={colIdx} className="grid gap-px" style={{ backgroundColor: "#E8E4DE" }}>
-                    {colSteps.map((step, idx) => {
-                      const num = offset + idx;
-                      return (
-                        <div key={num} className="relative overflow-hidden flex items-start gap-4 p-5 md:p-6 bg-white" style={{ borderTop: "2px solid #D4AF37" }}>
-                          <span className="font-playfair font-bold flex-shrink-0 leading-none" style={{ fontSize: "1.75rem", color: "rgba(212,175,55,0.35)" }}>
-                            {String(num + 1).padStart(2, "0")}
-                          </span>
-                          <div>
-                            <p className="text-sm font-semibold text-[#111111] mb-1">{step.label}</p>
-                            <p className="text-xs text-[#111111]/55 leading-relaxed">{step.desc}</p>
-                          </div>
-                        </div>
-                      );
-                    })}
+            {/* Timeline vertical em mobile, horizontal a partir de md — substitui
+                a antiga grelha plana de 2 colunas (pedido do dono: "pouco
+                interessante o visual dos passos", 2026-09-06). */}
+            <div className="flex flex-col md:hidden mt-2">
+              {processSteps.map((step, idx) => (
+                <div key={idx} className="flex gap-4">
+                  <div className="flex flex-col items-center flex-shrink-0">
+                    <div
+                      className="w-11 h-11 rounded-full flex items-center justify-center font-playfair font-bold text-base flex-shrink-0"
+                      style={{ background: "linear-gradient(135deg, #C9A84C, #EDD96A, #C9A84C)", color: "#111111", boxShadow: "0 4px 14px rgba(212,175,55,0.35)" }}
+                    >
+                      {idx + 1}
+                    </div>
+                    {idx < processSteps.length - 1 && (
+                      <div className="flex-1 w-px my-1" style={{ background: "linear-gradient(to bottom, rgba(212,175,55,0.5), rgba(212,175,55,0.15))" }} />
+                    )}
                   </div>
-                );
-              })}
+                  <div className={idx < processSteps.length - 1 ? "pb-7 pt-2.5" : "pt-2.5"}>
+                    <p className="text-sm font-bold text-[#111111] mb-1">{step.label}</p>
+                    <p className="text-xs text-[#111111]/55 leading-relaxed">{step.desc}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="hidden md:block relative mt-4">
+              <div
+                className="absolute h-px"
+                style={{ left: "10%", right: "10%", top: "22px", background: "linear-gradient(to right, rgba(212,175,55,0.15), rgba(212,175,55,0.6), rgba(212,175,55,0.6), rgba(212,175,55,0.15))" }}
+              />
+              <div className="grid relative" style={{ gridTemplateColumns: `repeat(${processSteps.length}, 1fr)` }}>
+                {processSteps.map((step, idx) => (
+                  <div key={idx} className="flex flex-col items-center text-center px-3">
+                    <div
+                      className="w-11 h-11 rounded-full flex items-center justify-center font-playfair font-bold text-base mb-4 relative z-10"
+                      style={{ background: "linear-gradient(135deg, #C9A84C, #EDD96A, #C9A84C)", color: "#111111", boxShadow: "0 4px 14px rgba(212,175,55,0.35)" }}
+                    >
+                      {idx + 1}
+                    </div>
+                    <p className="text-sm font-bold text-[#111111] mb-1.5">{step.label}</p>
+                    <p className="text-xs text-[#111111]/55 leading-relaxed max-w-[170px]">{step.desc}</p>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </section>
