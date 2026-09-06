@@ -245,27 +245,41 @@ Colchão: +30€ em todos os tamanhos
 
 ## Estados Principais do QuizForm
 
+> **⚠️ 2026-09-06: o bloco de "Upsell em curso" abaixo está desatualizado.**
+> `QuizUpsellOverlay.tsx` foi removido por completo (nunca mais `pendingUpsellId`,
+> `pendingMattressSize/Qty`, `pendingCarpetArea`, `pendingChairQty(Num)`,
+> `pendingWaterproof`, `upsellSubStep` — todo esse hook (`useUpsellSelection.ts`)
+> e a função `computePendingUpsellTotal` foram apagados, já não existem no
+> código). O ecrã de upsell final é agora `QuizComboUpsellScreen.tsx`: sem
+> sub-passo `select`/`config`, sem "artigo pendente" — cada categoria
+> (Colchão/Sofá/Cadeiras) tem o seu próprio mini-estado interno
+> (`mattressQty`/`sofaQty`/`chairsQty`, tudo dentro do próprio componente) e
+> escreve directamente para `upsellItems`/`setUpsellItems` só ao confirmar.
+> `showUpsell`/`upsellShown`/`upsellItems` continuam a existir e a significar
+> o mesmo. Ver secção "Upsell final — Aproveite e poupe 10%" mais abaixo
+> (substitui a secção "Ecrã de Upsell — Pack Família" antiga, que ficou só
+> como registo histórico da versão anterior).
+>
+> Também novo em 2026-09-06: `carpetItems: CarpetItem[]` substituiu
+> `carpetArea`/`pendingCarpetArea` como estado dos tapetes (ver secção própria
+> de Tapetes), e existe um novo ecrã intercalado `QuizChairsAddonUpsell.tsx`
+> (estado `showChairsAddonUpsell`) que só aparece quando `service==='chairs'`
+> e `serviceType==='cleaning'`, logo a seguir ao "Continuar" da etapa de
+> quantidades das cadeiras.
+
 ```ts
 // Navegação
 currentStep: number                   // 0–5
-showUpsell: boolean                   // ecrã de upsell visível
+showUpsell: boolean                   // ecrã de upsell final visível (QuizComboUpsellScreen)
 upsellShown: boolean                  // já foi mostrado (evita re-intercetar)
-upsellSubStep: 'select' | 'config'   // sub-passo dentro do upsell
+showChairsAddonUpsell: boolean        // NOVO 2026-09-06: upsell de addon logo após quantidades de cadeiras
 showSummary: boolean                  // ecrã de resumo (actualmente false hardcoded)
 
 // Itens
 sofaItems: SofaItem[]
 mattressItems: MattressItem[]
-upsellItems: UpsellItemConfig[]
-
-// Upsell config em curso
-pendingUpsellId: string | null
-pendingMattressSize: string           // reutilizado para sofá no upsell
-pendingMattressQty: number            // reutilizado para sofá no upsell
-pendingCarpetArea: string
-pendingChairQty: string
-pendingChairQtyNum: number
-pendingWaterproof: boolean
+carpetItems: CarpetItem[]             // NOVO 2026-09-06, substitui carpetArea (string única)
+upsellItems: UpsellItemConfig[]       // agora escrito de uma vez pelo QuizComboUpsellScreen
 
 // Preço e UI
 countdown: number                     // timer 10min em segundos (localStorage 'kyro_timer_expiry')
@@ -273,7 +287,7 @@ displayPrice: number                  // preço animado (ticker, step de 35ms)
 hypoallergenic: boolean | null
 
 // Reset ao trocar serviço no step 1:
-setSofaItems([]), setMattressItems([]), setUpsellItems([]), setUpsellShown(false)
+setSofaItems([]), setMattressItems([]), setCarpetItems([blank]), setUpsellItems([]), setUpsellShown(false)
 ```
 
 ---
@@ -296,7 +310,12 @@ setSofaItems([]), setMattressItems([]), setUpsellItems([]), setUpsellShown(false
 
 ---
 
-## Ecrã de Upsell — Pack Família
+## Ecrã de Upsell — Pack Família (HISTÓRICO, já não corresponde ao código)
+
+Descrição de uma versão anterior do fluxo (nem sequer a imediatamente anterior
+a 2026-09-06 — os números "200€"/emoji "🎉" já não batiam com o código antes
+de hoje). Mantido só como registo de como o upsell já foi desenhado. **Para o
+comportamento atual, ver a secção seguinte.**
 
 ```
 Gatilho: após step 4 (calendário), só uma vez (upsellShown)
@@ -319,6 +338,43 @@ Sub-passo 'config':
   - Tapete: input área m² + estimativa em tempo real
   - Cadeiras: stepper qty + toggle impermeabilização (+5€/cad)
   - Botão "Voltar" → 'select'
+```
+
+---
+
+## Upsell final — "Aproveite e poupe 10%" (atual, desde 2026-09-06)
+
+Componente: `src/components/quiz/steps/QuizComboUpsellScreen.tsx`. Substitui
+por completo o `QuizUpsellOverlay.tsx` da secção anterior (apagado do repo).
+Gatilho: mesmo `showUpsell` de sempre, disparado pelo `QuizMinimumGate` (gate
+do mínimo de pedido) quando o total já chega ao mínimo, ou diretamente quando
+não há gate a bloquear.
+
+```
+Ecrã "summary" (default):
+  - 3 linhas clicáveis: Colchão / Sofá / Cadeiras, cada uma mostra um resumo
+    ("a partir de X€" se vazia, ou "1x Casal" etc. se já configurada)
+  - Clicar numa linha abre a página de quantidades real dessa categoria
+    (tamanhos e preços de verdade — sofaPrices/mattressPrices de QuizTypes.ts,
+    calcChairClean de quizHelpers.ts — nunca uma quantidade genérica sem
+    tamanho, isso já foi tentado e rejeitado)
+  - Caixa de subtotal: "DESCONTO DE 10% ATIVO" (gold) assim que qualquer
+    categoria tem qty>0, subtotal do extra sempre visível
+  - Botão "Finalizar Orçamento": sempre ativo, escreve os itens escolhidos em
+    upsellItems/setUpsellItems (um UpsellItemConfig por categoria com qty>0) e
+    avança
+  - "Continuar sem adicionar": limpa upsellItems e avança na mesma — nunca
+    bloqueia quem não quer adicionar nada
+
+Ecrã de quantidades por categoria (view: 'mattress' | 'sofa' | 'chairs'):
+  - Colchão: Solteiro 59€ / Casal 69€ / King-Queen 79€, stepper por tamanho
+  - Sofá: 1/2/3 Lugares a 49€/69€/79€, stepper por tamanho
+  - Cadeiras: um único stepper de quantidade, bracket 20€/15€/12,5€
+  - Botão "Confirmar" volta ao summary
+
+Reaproveita a infraestrutura já existente (packDiscountActive, o array
+upsellItems, o recibo em submissionService.ts) sem alterações — só a UI de
+escolha mudou.
 ```
 
 ---
@@ -942,3 +998,23 @@ User pediu sugestão de algo em falta no site; respondi que faltava uma página 
 **Pendente:** user vai enviar lista de restaurantes/hotéis reais para adicionar como testemunhos nestas páginas — não fazer nada até essa lista chegar.
 
 Commit: `755017b`, pushed.
+
+## Sessão — Redesign tapetes + cadeiras + novo upsell de combos + limpeza (2026-09-06)
+
+Sessão longa e iterativa, muito guiada por mockup (canvas de design) antes de tocar em código real, e com duas reversões a meio (Essencial removido das cadeiras por engano, badge "5€/un." do Anti Ácaros mostrado como total em vez de taxa unitária) — ambas corrigidas ainda na mesma sessão a pedido do user. Registo do estado final, não da história passo a passo (ver mensagens do chat para essa).
+
+**1. Ordem Premium/Essencial e preço sempre dourado.** Em todos os seletores de tier (sofá, cadeiras, addons), Premium passou a aparecer sempre primeiro/em destaque, com selo sólido "TOP" (estrela + texto, canto superior direito) em vez do pill em gradiente "Dura Mais" anterior — pedido explícito porque o gradiente lia como "gerado por AI". O preço do tier Premium é dourado sempre, mesmo com quantidade a 0 (antes só ficava dourado depois de ativo). Badges "só +X€" que escalavam com a quantidade (cadeiras) foram removidas por induzirem o cliente em erro; onde o delta é mesmo fixo por unidade (sofá), o texto passou a "por apenas +X€".
+
+**2. Tapetes nunca mostram preço.** O passo "Detalhes do(s) Tapete(s)" (`QuizStepConfig.tsx`) deixou de estimar preço — virou um simulador: cada tapete é uma linha com Largura×Comprimento (m), área calculada mas sem €, "+ Adicionar outro tapete" sem limite, remoção com "×". Removido de `quizHelpers.ts`: `calcCarpetPrice`, `CARPET_TIERS`, `carpetActiveTier` (motor antigo por escalão de m², órfão depois disto). Novo tipo `CarpetItem` em `QuizTypes.ts`. O card do serviço "Tapete" no seletor inicial (`QuizStep1Service.tsx`) passou de "a partir de 15€/m²" para "Sob orçamento". Os 3 widgets de marketing usam um motor **separado** (`calcCarpetWidget` em `priceWidgetCalc.ts`) que foi ajustado à parte para o mesmo resultado (sempre sob orçamento, exceto alcatifa a 3€/m², serviço diferente).
+
+**3. Cadeiras: decisão de addon movida para depois do "Continuar".** Quando limpeza é o serviço principal, "Detalhes das Cadeiras" ficou só com a quantidade (removida a tabela de escalões de preço e os dois toggles de impermeabilização que lá estavam). Um novo ecrã, `QuizChairsAddonUpsell.tsx`, aparece uma única vez logo a seguir, estilo "companhia aérea": Impermeabilização (Premium com selo TOP + preço com desconto honesto de +5€, Essencial sempre presente por baixo — **nunca remover uma das duas sem pedido explícito**, já aconteceu por engano nesta sessão) OU Anti Ácaros — novo, mutuamente exclusivo com a impermeabilização, sempre **5€/cadeira fixo**, mostrado só como taxa unitária "5€/un." (nunca como total calculado — pedido repetido duas vezes pelo user, com bastante ênfase). Novo campo `chairAntiAcaros: boolean` em `QuizTypes.ts`, contribuição de preço em `use-quiz-pricing.ts`, linha própria no recibo (`submissionService.ts`).
+
+**4. Novo upsell final "Aproveite e poupe 10%".** `QuizUpsellOverlay.tsx` (escolher um item de cada vez, com sub-passos 'select'/'config') foi completamente apagado do repo. Substituído por `QuizComboUpsellScreen.tsx`: as 3 categorias (Colchão/Sofá/Cadeiras) na mesma tela, cada uma abre a sua própria página de quantidades com tamanhos e preços reais (não uma quantidade genérica sem tamanho — isso foi tentado e explicitamente rejeitado pelo user, "como é que me crias uma lógica de upsell assim sabendo tudo o que sabes do meu projeto?"). Reaproveita sem alterações o array `upsellItems`/`setUpsellItems`, `packDiscountActive` e o recibo já existentes — só a UI de escolha mudou. Toda a infraestrutura de "artigo pendente" (`useUpsellSelection.ts`, `pendingUpsellId`/`pendingSofaItems`/etc., `computePendingUpsellTotal`) ficou órfã e foi apagada.
+
+**5. Hero: removida a linha "Já somos N a recomendar".** Tinha sido acrescentada mais cedo na mesma sessão (pedido de reforçar psicologicamente as 100 avaliações), mas ficava redundante com o badge `TrustRatingBadge` duas linhas acima (já mostra "5.0 · N+ avaliações Google") — o user apontou que "não acrescentou nada" e "ficou parolo". Removida de `HeroV1.tsx` e `ServiceHero.tsx`; decisão de design foi cortar, não tentar redesenhar uma frase redundante.
+
+**Verificação:** `npx tsc --noEmit -p .` limpo e `npm run build` completo (14993 rotas prerenderizadas) repetidos várias vezes ao longo da sessão, incluindo depois da limpeza final de código morto. Vários fluxos confirmados visualmente com Playwright (tapete multi-item, cadeiras a qty 4 e a qty 10 — 10+ é "sob orçamento" desde sempre, não é bug novo —, upsell de combos a adicionar colchão casal e a aplicar o desconto de 10%).
+
+**Trabalho em paralelo:** grande parte desta sessão foi feita por várias sub-tarefas em simultâneo no mesmo worktree (tapete, cadeiras, widgets), o que por vezes gerou commits que misturam ficheiros de mais do que uma tarefa (inevitável quando duas tarefas mexem no mesmo `QuizForm.tsx`/`QuizTypes.ts` ao mesmo tempo) — todos verificados com tsc+build antes e depois, sem problemas encontrados.
+
+Commits desta sessão (ordem cronológica, todos em `worktree-kyro-minorder-emdash`, nenhum em `master`): `35ec931`, `aba750a`, `1bf6340`, `56535b3`, `6f9439a`, `d2fca49`, `68f7aad`, `7a01cfe`, `26321ee`, `36f8088`, `b613174`, `7744d2a`, `612800a`. Branch não foi integrado em `master` — fica ao critério do dono.
