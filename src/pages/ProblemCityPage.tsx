@@ -2,7 +2,7 @@ import { useEffect, useMemo } from "react";
 import { useLocation, Link } from "react-router-dom";
 import { QuizLocationProvider, QuizServiceProvider } from "@/context/QuizLocationContext";
 import {
-  MapPin, Star, MessageCircle, ArrowRight, AlertTriangle, XCircle, CheckCircle2,
+  MapPin, Star, MessageCircle, ArrowRight, AlertTriangle,
 } from "lucide-react";
 import Header from "@/components/Header";
 import PageBreadcrumb from "@/components/PageBreadcrumb";
@@ -11,13 +11,14 @@ import QuizButton from "@/components/QuizButton";
 import TrustRatingBadge from "@/components/TrustRatingBadge";
 import SectionHeader from "@/components/SectionHeader";
 import ServiceFAQ from "@/components/ServiceFAQ";
+import ServicePriceSection from "@/components/ServicePriceSection";
 import ServiceAutoCarousel from "@/components/ServiceAutoCarousel";
 import ServiceSnapshotStats from "@/components/ServiceSnapshotStats";
 import ServiceLocationSchema from "@/components/ServiceLocationSchema";
 import { getProblemBySlug, getRelatedProblemLinks } from "@/data/problemSeoData";
 import { CATEGORY_TIPS, CATEGORY_STATS, splitTipsHeading } from "@/data/problemTipsData";
-import { getServiceGallery, getSolutionImage } from "@/constants/serviceGallery";
-import { cities, services, DEFAULT_PRICE_FROM, cityPrep, cityPrepCap } from "@/data/locationSeoData";
+import { getServiceGallery } from "@/constants/serviceGallery";
+import { cities, services, DEFAULT_PRICE_FROM, cityPrep } from "@/data/locationSeoData";
 import { SERVICE_TO_QUIZ } from "@/constants/serviceToQuiz";
 import { METRO_CITY_SLUGS } from "@/constants/metroCities";
 import { getAllProblemCityRoutes } from "@/data/problemCitySeoData";
@@ -33,26 +34,6 @@ const PROCESS_STEPS = [
   { title: "Extração",                body: "Extração profissional a alta temperatura remove resíduos e sujidade das camadas mais profundas das fibras." },
 ];
 
-function getCityContext(problemSlug: string, cityName: string, cityDesc: string): string {
-  const base = `${cityPrepCap(cityName)} ${cityName}, ${cityDesc}`;
-  if (problemSlug.includes("mancha"))
-    return `${base}, as manchas nos estofos agravam-se com a humidade atlântica e o ritmo de vida agitado. A penetração nas fibras ocorre em horas, tratamento profissional é mais eficaz quanto mais rápido for aplicado.`;
-  if (problemSlug.includes("acar"))
-    return `${base}, o clima húmido favorece a multiplicação de ácaros em sofás, colchões e tapetes. Uma higienização profissional elimina 99% dos ácaros na primeira sessão, sem produtos tóxicos.`;
-  if (problemSlug.includes("odor") || problemSlug.includes("cheiro"))
-    return `${base}, os odores persistem mais tempo nas fibras devido à humidade do ar. Ventilação doméstica não chega, a extração profunda é o único método que elimina o cheiro na raiz.`;
-  if (problemSlug.includes("pelo"))
-    return `${base}, os pelos de animais acumulam-se rapidamente em estofos e alcatifas. A extração profissional remove pelos, dander e alérgenos associados que os aspiradores domésticos não alcançam.`;
-  if (problemSlug.includes("urina"))
-    return `${base}, os acidentes de animais e crianças requerem tratamento imediato para evitar danos permanentes nas fibras e odores persistentes. O nosso serviço de urgência está disponível ao domicílio.`;
-  if (problemSlug.includes("mofo") || problemSlug.includes("bolor"))
-    return `${base}, a humidade elevada favorece o aparecimento de mofo em estofos e tapetes. O tratamento profissional elimina o fungo na raiz e aplica proteção preventiva contra recorrência.`;
-  if (problemSlug.includes("alerg"))
-    return `${base}, as alergias são amplificadas pela acumulação de alérgenos nos estofos. A higienização reduz drasticamente os níveis de ácaros e partículas alergénicas no ambiente doméstico.`;
-  if (problemSlug.includes("impermeabil"))
-    return `${base}, a impermeabilização cria uma barreira invisível contra líquidos e manchas, essencial num clima com chuva frequente. A proteção ativa em 24 horas e dura meses.`;
-  return `${base}, a higienização regular dos estofos é fundamental para manter um ambiente saudável. O serviço ao domicílio da Kyro elimina o problema na raiz, com resultados visíveis no mesmo dia.`;
-}
 
 function getProblemWaBtnLabel(slug: string): string {
   const s = slug ?? '';
@@ -113,11 +94,9 @@ const ProblemCityPage = () => {
     .map(slug => services.find(s => s.slug === slug))
     .filter(Boolean) as typeof services[number][];
   const servicePrice = relatedServiceData[0]?.priceFrom ?? DEFAULT_PRICE_FROM;
-  const cityContext = getCityContext(problem.slug, city.name, city.description);
   const categoryTips = CATEGORY_TIPS[problem.category];
   const gallery = getServiceGallery(problem.relatedServices[0], `${problem.slug}-${city.slug}`);
   const heroImg = getProblemHeroImage(problem.slug);
-  const solutionImg = getSolutionImage(problem.relatedServices[0], `${problem.slug}-${city.slug}`) ?? heroImg;
   const waHref = WHATSAPP_BASE;
   const snapshotStats = CATEGORY_STATS[problem.category] ?? CATEGORY_STATS.manchas;
 
@@ -188,7 +167,7 @@ const ProblemCityPage = () => {
                 </p>
 
                 <div className="mb-6">
-                  <TrustRatingBadge variant="hero" />
+                  <TrustRatingBadge variant="mapsLinkClients" />
                 </div>
 
                 <div className="flex flex-col sm:flex-row gap-3 max-w-md">
@@ -235,47 +214,14 @@ const ProblemCityPage = () => {
         <ServiceSnapshotStats stats={snapshotStats} />
         </div>
 
-        {/* ═══ PROBLEMA + SOLUÇÃO — visual, 2 cartões fotográficos ═══ */}
+        {/* ═══ TABELA DE PREÇOS ═══ */}
+        <ServicePriceSection serviceSlug={problem.relatedServices[0]} initialLocation={city.name} />
+
+        {/* ═══ AVALIAÇÕES REAIS — logo abaixo do widget ═══ */}
         <section className="py-14 md:py-20 bg-[#FDFDF9]">
           <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
-            <SectionHeader overline="Diagnóstico" heading="O problema," goldWord="a solução" light={true} />
-            <div className="grid sm:grid-cols-2 gap-4 md:gap-6 mb-6">
-              {/* Problema — imagem dessaturada + acento vermelho; texto num painel sólido abaixo, nunca cortado */}
-              <div className="rounded-sm overflow-hidden flex flex-col" style={{ border: "3px solid #ef4444", boxShadow: "0 0 0 1px rgba(239,68,68,0.3)" }}>
-                <div className="relative aspect-[4/3] overflow-hidden">
-                  <img
-                    src={heroImg}
-                    alt={`${problem.h1}, o problema`}
-                    className="absolute inset-0 w-full h-full object-cover"
-                    style={{ filter: "grayscale(85%) brightness(0.78) contrast(1.05)" }}
-                    loading="lazy"
-                  />
-                </div>
-                <div className="p-5 md:p-7 flex-1 flex flex-col" style={{ background: "#0d241b" }}>
-                  <div className="flex items-center gap-1.5 mb-2">
-                    <XCircle className="w-3.5 h-3.5 flex-shrink-0" style={{ color: "#ef4444" }} />
-                    <span className="text-[10px] font-bold tracking-[0.22em] uppercase" style={{ color: "#ef4444" }}>O Problema {prep} {city.name}</span>
-                  </div>
-                  <p className="font-playfair text-lg font-bold mb-2 leading-tight" style={{ color: "#ef4444" }}>Porque acontece</p>
-                  <p className="text-sm text-white/80 leading-relaxed">{problem.problemDetail}</p>
-                </div>
-              </div>
-              {/* Solução — cor cheia + acento verde: sensação de esperança; texto num painel sólido abaixo, nunca cortado */}
-              <div className="rounded-sm overflow-hidden flex flex-col" style={{ border: "3px solid #22c55e", boxShadow: "0 0 0 1px rgba(34,197,94,0.3)" }}>
-                <div className="relative aspect-[4/3] overflow-hidden">
-                  <img src={solutionImg} alt={`${problem.h1}, a solução`} className="absolute inset-0 w-full h-full object-cover" loading="lazy" />
-                </div>
-                <div className="p-5 md:p-7 flex-1 flex flex-col" style={{ background: "#0d241b" }}>
-                  <div className="flex items-center gap-1.5 mb-2">
-                    <CheckCircle2 className="w-3.5 h-3.5 flex-shrink-0" style={{ color: "#22c55e" }} />
-                    <span className="text-[10px] font-bold tracking-[0.22em] uppercase" style={{ color: "#22c55e" }}>A Solução</span>
-                  </div>
-                  <p className="font-playfair text-lg font-bold mb-2 leading-tight" style={{ color: "#22c55e" }}>Como resolvemos</p>
-                  <p className="text-sm text-white/85 leading-relaxed">{problem.solutionDetail}</p>
-                </div>
-              </div>
-            </div>
-            <p className="text-sm text-[#111111]/50 leading-relaxed italic max-w-2xl">{cityContext}</p>
+            <SectionHeader overline="Avaliações Reais" heading="O que dizem os nossos" goldWord="clientes" light={true} />
+            <ServiceReviewsGrid serviceSlug={problem.relatedServices[0]} seed={`${problem.slug}-${city.slug}`} heading="" />
           </div>
         </section>
 
@@ -363,14 +309,6 @@ const ProblemCityPage = () => {
         {localFaqs.length > 0 && (
           <ServiceFAQ faqs={localFaqs} heading="Perguntas Frequentes" variant="dark" />
         )}
-
-        {/* ═══ AVALIAÇÕES REAIS ═══ */}
-        <section className="py-14 md:py-20 bg-[#FDFDF9]">
-          <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
-            <SectionHeader overline="Avaliações Reais" heading="O que dizem os nossos" goldWord="clientes" light={true} />
-            <ServiceReviewsGrid serviceSlug={problem.relatedServices[0]} seed={`${problem.slug}-${city.slug}`} heading="" />
-          </div>
-        </section>
 
         {/* ═══ REDE INTERNA ═══ */}
         <section className="py-14 md:py-20 bg-kyro-green">
