@@ -139,10 +139,10 @@ export default function PriceWidget({ serviceSlug, initialLocation }: Props) {
                   {items.map((item, idx) => {
                     const area = w.carpetItemArea(item);
                     return (
-                      <div key={item.id} className="flex items-center gap-2 rounded-sm border border-white/15 bg-white/[0.03] px-2.5 py-1.5">
+                      <div key={item.id} className="flex flex-wrap items-center gap-2 rounded-sm border border-white/15 bg-white/[0.03] px-2.5 py-1.5">
                         <span className="text-[9px] font-bold uppercase tracking-wide flex-shrink-0 text-white/35">Tapete {idx + 1}</span>
                         <input
-                          type="number" min={0} step={0.1} placeholder="Largura" value={item.largura}
+                          type="number" min={0} step={0.1} placeholder="Larg." value={item.largura}
                           onChange={e => w.updateCarpetItem(i, item.id, 'largura', e.target.value)}
                           className="w-16 text-center text-base font-semibold outline-none rounded-sm border border-white/20 bg-white/[0.05] text-white placeholder:text-white/25 px-1 py-1.5"
                         />
@@ -208,14 +208,22 @@ export default function PriceWidget({ serviceSlug, initialLocation }: Props) {
                   </button>
                 </div>
 
-                <span className={cn("text-[13px] font-medium transition-colors truncate min-w-0", active ? "text-white" : "text-white/45")}>{row.item}</span>
-                <span className="flex-1 min-w-[8px] border-b border-dotted border-white/[0.15] mb-0.5" />
-
-                {dynamicPrice !== null && (
-                  <span className={cn("font-playfair text-base font-bold tabular-nums flex-shrink-0 transition-colors", active ? "text-gold" : "text-white")}>
-                    {dynamicPrice}
-                  </span>
-                )}
+                {/* Nome+preço partilham uma sub-linha que pode quebrar (achado
+                    real ao testar em 375px): nome e preço a competir em pé de
+                    igualdade cortava o nome por completo em linhas com preço
+                    comprido ("Sofá de 4+ lugares" + "Sob orçamento" ficava só
+                    "Sob orçamento", sem nome nenhum visível). Com min-w no
+                    nome, se os dois não cabem lado a lado o preço desce para
+                    uma 2ª linha em vez de o nome desaparecer. */}
+                <div className="flex-1 min-w-0 flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
+                  <span className={cn("min-w-[72px] flex-1 truncate text-[13px] font-medium transition-colors", active ? "text-white" : "text-white/45")}>{row.item}</span>
+                  <span className="hidden sm:block flex-1 min-w-[8px] border-b border-dotted border-white/[0.15] mb-0.5" />
+                  {dynamicPrice !== null && (
+                    <span className={cn("font-playfair text-base font-bold tabular-nums flex-shrink-0 transition-colors", active ? "text-gold" : "text-white")}>
+                      {dynamicPrice}
+                    </span>
+                  )}
+                </div>
               </div>
             </div>
           );
