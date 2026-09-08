@@ -135,29 +135,39 @@ export default function PriceWidget({ serviceSlug, initialLocation }: Props) {
                   active ? "border-gold/50 bg-[#1a2a1a] shadow-[0_0_10px_rgba(212,175,55,0.15)]" : "border-dashed border-white/25 bg-white/[0.02]"
                 )}
               >
-                <div className="flex flex-col gap-1.5">
+                <div className="flex flex-col gap-2">
                   {items.map((item, idx) => {
                     const area = w.carpetItemArea(item);
                     return (
-                      <div key={item.id} className="flex flex-wrap items-center gap-2 rounded-sm border border-white/15 bg-white/[0.03] px-2.5 py-1.5">
-                        <span className="text-[9px] font-bold uppercase tracking-wide flex-shrink-0 text-white/35">Tapete {idx + 1}</span>
-                        <input
-                          type="number" min={0} step={0.1} placeholder="Larg." value={item.largura}
-                          onChange={e => w.updateCarpetItem(i, item.id, 'largura', e.target.value)}
-                          className="w-16 text-center text-base font-semibold outline-none rounded-sm border border-white/20 bg-white/[0.05] text-white placeholder:text-white/25 px-1 py-1.5"
-                        />
-                        <span className="text-xs flex-shrink-0 text-white/25">×</span>
-                        <input
-                          type="number" min={0} step={0.1} placeholder="Compr." value={item.comprimento}
-                          onChange={e => w.updateCarpetItem(i, item.id, 'comprimento', e.target.value)}
-                          className="w-16 text-center text-base font-semibold outline-none rounded-sm border border-white/20 bg-white/[0.05] text-white placeholder:text-white/25 px-1 py-1.5"
-                        />
-                        <span className={cn("flex-1 text-right text-[11px] font-bold tabular-nums", area > 0 ? "text-gold" : "text-white/25")}>
-                          {area > 0 ? `${Math.round(area * 100) / 100} m²` : ''}
-                        </span>
-                        {items.length > 1 && (
-                          <button type="button" onClick={() => w.removeCarpetItem(i, item.id)} aria-label="Remover tapete" className="w-4 h-4 flex items-center justify-center flex-shrink-0 text-white/30 hover:text-white/70">×</button>
-                        )}
+                      <div key={item.id} className="rounded-sm border border-white/15 bg-white/[0.03] px-3 py-2.5 flex flex-col gap-2">
+                        <div className="flex items-center justify-between">
+                          <span className="text-[9px] font-bold uppercase tracking-wide text-white/35">Tapete {idx + 1}</span>
+                          <div className="flex items-center gap-2">
+                            <span className={cn("text-xs font-bold tabular-nums", area > 0 ? "text-gold" : "text-white/25")}>
+                              {area > 0 ? `${Math.round(area * 100) / 100} m²` : ''}
+                            </span>
+                            {items.length > 1 && (
+                              <button type="button" onClick={() => w.removeCarpetItem(i, item.id)} aria-label="Remover tapete" className="w-5 h-5 flex items-center justify-center flex-shrink-0 text-white/30 hover:text-white/70 text-base leading-none">×</button>
+                            )}
+                          </div>
+                        </div>
+                        {/* Campos grandes de propósito (pedido explícito 2026-09-09:
+                            "as pessoas mais velhas irão ter dificuldade") — sem os
+                            spinners nativos do input number, que só ocupavam largura
+                            já escassa sem ajudar a legibilidade. */}
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="number" min={0} step={0.1} inputMode="decimal" placeholder="Larg." value={item.largura}
+                            onChange={e => w.updateCarpetItem(i, item.id, 'largura', e.target.value)}
+                            className="flex-1 min-w-0 text-center text-lg font-semibold outline-none rounded-sm border border-white/20 bg-white/[0.05] text-white placeholder:text-white/25 px-2 py-2.5 focus:border-gold [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                          />
+                          <span className="text-sm flex-shrink-0 text-white/25">×</span>
+                          <input
+                            type="number" min={0} step={0.1} inputMode="decimal" placeholder="Compr." value={item.comprimento}
+                            onChange={e => w.updateCarpetItem(i, item.id, 'comprimento', e.target.value)}
+                            className="flex-1 min-w-0 text-center text-lg font-semibold outline-none rounded-sm border border-white/20 bg-white/[0.05] text-white placeholder:text-white/25 px-2 py-2.5 focus:border-gold [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                          />
+                        </div>
                       </div>
                     );
                   })}
