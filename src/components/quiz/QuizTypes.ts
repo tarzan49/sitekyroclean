@@ -76,9 +76,16 @@ export interface PriceOption {
 // originalBothPrice = soma separada (preço riscado no UI)
 // delta (upsell text) = bothPrice - cleaningPrice
 export const sofaPrices: PriceOption[] = [
+  // Pack (limpeza + impermeabilização) corrigido 2026-09-08 para valores fixos
+  // aprovados — Essencial: 1L=99€, 2L=149€, 3L=159€. Premium = Essencial + 30€
+  // em todos os tamanhos (regra consistente confirmada pelo dono). bothPrice é
+  // o total Essencial; packPremiumDelta é o que falta somar a esse total para
+  // chegar ao Premium. originalBothPrice (preço riscado) subiu com o 2L para
+  // continuar acima do novo bothPrice — nunca pode ficar abaixo, senão o
+  // "desconto" mostrado no UI fica ao contrário (bug já visto antes).
   { id: '1-lugar',    label: '1 Lugar',    cleaningPrice: 49, waterproofingPrice: 59, bothPrice: 99,  originalBothPrice: 108, waterproofingPremiumPrice: 89 },
-  { id: '2-lugares',  label: '2 Lugares',  cleaningPrice: 69, waterproofingPrice: 79, bothPrice: 145, originalBothPrice: 148, waterproofingPremiumPrice: 109 },
-  { id: '3-lugares',  label: '3 Lugares',  cleaningPrice: 79, waterproofingPrice: 99, bothPrice: 159, originalBothPrice: 178, waterproofingPremiumPrice: 139, packPremiumDelta: 20 },
+  { id: '2-lugares',  label: '2 Lugares',  cleaningPrice: 69, waterproofingPrice: 79, bothPrice: 139, originalBothPrice: 148, waterproofingPremiumPrice: 109, packPremiumDelta: 30 },
+  { id: '3-lugares',  label: '3 Lugares',  cleaningPrice: 79, waterproofingPrice: 99, bothPrice: 169, originalBothPrice: 178, waterproofingPremiumPrice: 139, packPremiumDelta: 30 },
   { id: '4+-lugares', label: '4+ Lugares', cleaningPrice: 'Sob orçamento', waterproofingPrice: 'Sob orçamento', bothPrice: 'Sob orçamento', waterproofingPremiumPrice: 'Sob orçamento' },
 ];
 
@@ -96,9 +103,12 @@ export const sofaChaisePrice = { cleaning: 10, waterproofing: 25 };
 // 104 dava só +25, abaixo do casal, o que não fazia sentido)
 // originalBothPrice = soma sem desconto (limpeza + anti-ácaros sozinho, preço riscado)
 export const mattressPrices: PriceOption[] = [
-  { id: 'solteiro', label: 'Solteiro',     cleaningPrice: 59, waterproofingPrice: 35, bothPrice: 84,  originalBothPrice: 94 },
-  { id: 'casal',    label: 'Casal',        cleaningPrice: 69, waterproofingPrice: 40, bothPrice: 99,  originalBothPrice: 109 },
-  { id: 'king',     label: 'King / Queen', cleaningPrice: 79, waterproofingPrice: 45, bothPrice: 114, originalBothPrice: 124 },
+  // bothPrice (= preço do upsell Anti Ácaros) baixado em 10€ em cada tamanho
+  // 2026-09-08, teste explícito do dono para ver se um preço mais atrativo
+  // melhora a conversão deste upsell — reverter se não compensar.
+  { id: 'solteiro', label: 'Solteiro',     cleaningPrice: 59, waterproofingPrice: 35, bothPrice: 74,  originalBothPrice: 94 },
+  { id: 'casal',    label: 'Casal',        cleaningPrice: 69, waterproofingPrice: 40, bothPrice: 89,  originalBothPrice: 109 },
+  { id: 'king',     label: 'King / Queen', cleaningPrice: 79, waterproofingPrice: 45, bothPrice: 104, originalBothPrice: 124 },
 ];
 
 // Sem zona grátis: mínimo 10€ sempre em todo o site, sobe com a distância ao centro de cada equipa.

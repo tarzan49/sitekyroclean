@@ -145,12 +145,13 @@ export function calcCarpetWidget(area: number, alcatifa = false): number | null 
 // 2026-08-31 (reformulado x4, confirmado com 3 exemplos concretos) — espelha
 // use-quiz-pricing.ts: conta-se cada UNIDADE de mobília (sofá, colchão,
 // cadeiras-como-lote, tapete) como um artigo ao seu preço BASE (sem addon).
-// Regra final: soma de todos os artigos > 160€ (100€ de base + 60€ do artigo
-// extra, não sobrepostos) E pelo menos um artigo, sozinho, vale 60€ ou mais.
-// Testado: 3 colchões casal 69€ (207€) qualifica; 2 colchões casal 69€
-// (138€) não qualifica; 2×sofá 1L 49€ + 1×sofá 2L 69€ (167€) qualifica.
+// Regra final: soma de todos os artigos > 149€ (100€ de base + 49€ do artigo
+// extra, não sobrepostos) E pelo menos um artigo, sozinho, vale 49€ ou mais.
+// Limiar do artigo extra baixado de 60€ para 49€ 2026-09-08 (pedido explícito
+// do dono, secção final do upsell) — use-quiz-pricing.ts importa estas
+// constantes em vez de duplicar o número, para nunca mais dessincronizar.
 export const PACK_DISCOUNT_MIN_SERVICE = 100;
-export const PACK_DISCOUNT_MIN_UPSELL_ITEM = 60;
+export const PACK_DISCOUNT_MIN_UPSELL_ITEM = 49;
 export const PACK_DISCOUNT_MIN_TOTAL = PACK_DISCOUNT_MIN_SERVICE + PACK_DISCOUNT_MIN_UPSELL_ITEM;
 
 export interface WidgetArticleInfo {

@@ -42,10 +42,10 @@ const SERVICE_SUBTITLE: Record<string, string> = {
 
 function DiscountBar({ discountActive }: { discountActive: boolean }) {
   return (
-    <div className="px-4 py-2.5 sm:px-5 sm:py-3 border-t" style={{ borderColor: "rgba(17,17,17,0.07)" }}>
+    <div className="px-4 py-2.5 sm:px-5 sm:py-3 bg-[#FAFAF7]">
       {discountActive ? (
         <div
-          className="flex items-center gap-3 px-3.5 py-2.5 rounded-sm"
+          className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl"
           style={{ background: "linear-gradient(135deg, rgba(212,175,55,0.10), rgba(212,175,55,0.02))", border: "1px solid rgba(212,175,55,0.35)" }}
         >
           <div
@@ -255,12 +255,12 @@ export default function ServicePriceSection({ serviceSlug, initialLocation }: Pr
           </div>
 
           {/* ── Widget ── */}
-          <div className="overflow-hidden" style={{ boxShadow: "0 12px 50px rgba(7,26,18,0.16), 0 2px 8px rgba(7,26,18,0.08)" }}>
+          <div className="overflow-hidden rounded-2xl" style={{ boxShadow: "0 20px 60px rgba(7,26,18,0.22), 0 2px 8px rgba(7,26,18,0.10)" }}>
 
             {/* Header verde */}
-            <div className="px-5 py-4 sm:px-6 sm:py-5" style={{ background: "#071a12" }}>
+            <div className="px-5 py-4 sm:px-6 sm:py-5" style={{ background: "linear-gradient(135deg, #0d2a1c 0%, #071a12 100%)" }}>
               <div className="flex items-center gap-2 mb-1.5">
-                <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: "#25D366" }} />
+                <span className="w-2 h-2 rounded-full flex-shrink-0 animate-pulse" style={{ background: "#25D366" }} />
                 <p className="text-[9px] font-bold tracking-[0.26em] uppercase" style={{ color: "rgba(255,255,255,0.45)" }}>Orçamento Gratuito</p>
               </div>
               <p className="text-white font-semibold text-sm leading-snug">Escolha as quantidades e continue para o orçamento</p>
@@ -268,7 +268,7 @@ export default function ServicePriceSection({ serviceSlug, initialLocation }: Pr
             </div>
 
             {/* Linhas */}
-            <div className="bg-white">
+            <div className="bg-[#FAFAF7] py-2">
               {rows.map((row, i) => {
                 const quizConfig = PRICE_TABLE_QUIZ_CONFIG[serviceSlug]?.[i] ?? null;
 
@@ -277,11 +277,11 @@ export default function ServicePriceSection({ serviceSlug, initialLocation }: Pr
                   return (
                     <div
                       key={i}
-                      className="flex items-center gap-3 sm:gap-4 px-4 py-3 sm:px-5 sm:py-4 border-b transition-all duration-200"
+                      className="flex items-center gap-3 sm:gap-4 px-4 py-3 sm:px-5 sm:py-4 mx-2 sm:mx-3 my-1 rounded-xl transition-all duration-200"
                       style={{
-                        borderBottomColor: "rgba(17,17,17,0.06)",
-                        borderLeft: active ? "3px solid #D4AF37" : "3px solid transparent",
-                        background: active ? "rgba(212,175,55,0.03)" : "transparent",
+                        border: active ? "1px solid rgba(212,175,55,0.45)" : "1px solid rgba(17,17,17,0.07)",
+                        boxShadow: active ? "0 4px 18px rgba(212,175,55,0.20)" : "none",
+                        background: active ? "rgba(212,175,55,0.05)" : "white",
                       }}
                     >
                       {/* Stepper */}
@@ -290,7 +290,7 @@ export default function ServicePriceSection({ serviceSlug, initialLocation }: Pr
                           type="button"
                           onClick={() => setChaiseLongueAddon(v => Math.max(0, v - 1))}
                           aria-label="Remover"
-                          className="w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center transition-all active:scale-95"
+                          className="w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center transition-all active:scale-95"
                           style={{ background: "#071a12", color: "white", opacity: active ? 1 : 0, pointerEvents: active ? 'auto' : 'none' }}
                         >
                           <Minus className="w-4 h-4" />
@@ -303,7 +303,7 @@ export default function ServicePriceSection({ serviceSlug, initialLocation }: Pr
                           type="button"
                           onClick={() => setChaiseLongueAddon(v => v + 1)}
                           aria-label="Adicionar"
-                          className="w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center transition-all active:scale-95"
+                          className="w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center transition-all active:scale-95"
                           style={{ background: "#071a12", color: "white" }}
                         >
                           <Plus className="w-4 h-4" />
@@ -334,11 +334,11 @@ export default function ServicePriceSection({ serviceSlug, initialLocation }: Pr
                   return (
                     <div
                       key={i}
-                      className="px-5 py-4 border-b transition-all duration-200"
+                      className="px-5 py-4 mx-2 sm:mx-3 my-1 rounded-xl transition-all duration-200"
                       style={{
-                        borderBottomColor: "rgba(17,17,17,0.06)",
-                        borderLeft: active ? "3px solid #D4AF37" : "3px solid transparent",
-                        background: active ? "rgba(212,175,55,0.03)" : "transparent",
+                        border: active ? "1px solid rgba(212,175,55,0.45)" : "1px solid rgba(17,17,17,0.07)",
+                        boxShadow: active ? "0 4px 18px rgba(212,175,55,0.20)" : "none",
+                        background: active ? "rgba(212,175,55,0.05)" : "white",
                       }}
                     >
                       <div className="flex items-center gap-3">
@@ -372,11 +372,11 @@ export default function ServicePriceSection({ serviceSlug, initialLocation }: Pr
                   return (
                     <div
                       key={i}
-                      className="px-5 py-4 border-b transition-all duration-200"
+                      className="px-5 py-4 mx-2 sm:mx-3 my-1 rounded-xl transition-all duration-200"
                       style={{
-                        borderBottomColor: "rgba(17,17,17,0.06)",
-                        borderLeft: active ? "3px solid #D4AF37" : "3px solid transparent",
-                        background: active ? "rgba(212,175,55,0.03)" : "transparent",
+                        border: active ? "1px solid rgba(212,175,55,0.45)" : "1px solid rgba(17,17,17,0.07)",
+                        boxShadow: active ? "0 4px 18px rgba(212,175,55,0.20)" : "none",
+                        background: active ? "rgba(212,175,55,0.05)" : "white",
                       }}
                     >
                       <div className="flex flex-col gap-2">
@@ -437,11 +437,11 @@ export default function ServicePriceSection({ serviceSlug, initialLocation }: Pr
                 return (
                   <div
                     key={i}
-                    className="border-b transition-all duration-200"
+                    className="mx-2 sm:mx-3 my-1 rounded-xl overflow-hidden transition-all duration-200"
                     style={{
-                      borderBottomColor: "rgba(17,17,17,0.06)",
-                      borderLeft: active ? "3px solid #D4AF37" : "3px solid transparent",
-                      background: active ? "rgba(212,175,55,0.03)" : "transparent",
+                      border: active ? "1px solid rgba(212,175,55,0.45)" : "1px solid rgba(17,17,17,0.07)",
+                      boxShadow: active ? "0 4px 18px rgba(212,175,55,0.20)" : "none",
+                      background: active ? "rgba(212,175,55,0.05)" : "white",
                     }}
                   >
                     <div className="flex items-center gap-3 sm:gap-4 px-4 py-3 sm:px-5 sm:py-4">
@@ -452,7 +452,7 @@ export default function ServicePriceSection({ serviceSlug, initialLocation }: Pr
                           onClick={() => adjustQty(i, -1)}
                           disabled={qty === 0}
                           aria-label="Diminuir"
-                          className="w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center transition-all active:scale-95 disabled:opacity-25"
+                          className="w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center transition-all active:scale-95 disabled:opacity-25"
                           style={{ background: active ? "#071a12" : "#f0f0eb", color: active ? "white" : "rgba(17,17,17,0.40)" }}
                         >
                           <Minus className="w-4 h-4" />
@@ -465,7 +465,7 @@ export default function ServicePriceSection({ serviceSlug, initialLocation }: Pr
                           type="button"
                           onClick={() => adjustQty(i, 1)}
                           aria-label="Aumentar"
-                          className="w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center transition-all active:scale-95"
+                          className="w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center transition-all active:scale-95"
                           style={{ background: "#071a12", color: "white" }}
                         >
                           <Plus className="w-4 h-4" />
@@ -534,7 +534,7 @@ export default function ServicePriceSection({ serviceSlug, initialLocation }: Pr
 
               {/* Nível de proteção — só aparece quando há pelo menos um sofá com impermeabilização activa (colchão/anti-ácaros não tem tiers) */}
               {hasSofaAddon && (
-                <div className="px-4 py-3.5 sm:px-5 sm:py-4 border-b" style={{ borderBottomColor: "rgba(17,17,17,0.06)", background: "rgba(212,175,55,0.04)" }}>
+                <div className="px-4 py-3.5 sm:px-5 sm:py-4 mx-2 sm:mx-3 my-1 rounded-xl" style={{ border: "1px solid rgba(212,175,55,0.25)", background: "rgba(212,175,55,0.06)" }}>
                   <p className="text-[10px] font-bold tracking-[0.16em] uppercase mb-2" style={{ color: "rgba(17,17,17,0.40)" }}>
                     Nível de impermeabilização
                   </p>
@@ -590,7 +590,7 @@ export default function ServicePriceSection({ serviceSlug, initialLocation }: Pr
             <DiscountBar discountActive={pricing.discountActive} />
 
             {/* Total + CTA */}
-            <div className="bg-white px-4 pb-4 sm:px-5 sm:pb-5 space-y-2.5 sm:space-y-3">
+            <div className="bg-white px-4 pb-4 sm:px-5 sm:pb-5 pt-1 space-y-2.5 sm:space-y-3 rounded-b-2xl">
 
               {travelFee > 0 && (
                 <div className="flex items-center gap-1.5 pt-3">
@@ -604,8 +604,8 @@ export default function ServicePriceSection({ serviceSlug, initialLocation }: Pr
               {/* Total block */}
               {hasSelection && total > 0 && (
                 <div
-                  className="flex items-center justify-between px-4 py-3 sm:px-5 sm:py-4"
-                  style={{ background: "#071a12" }}
+                  className="flex items-center justify-between px-4 py-3 sm:px-5 sm:py-4 rounded-xl"
+                  style={{ background: "linear-gradient(135deg, #0d2a1c 0%, #071a12 100%)", boxShadow: "0 6px 20px rgba(7,26,18,0.25)" }}
                 >
                   <div>
                     <p className="text-[10px] font-bold tracking-[0.18em] uppercase mb-0.5" style={{ color: "rgba(255,255,255,0.40)" }}>
@@ -629,13 +629,13 @@ export default function ServicePriceSection({ serviceSlug, initialLocation }: Pr
                 type="button"
                 onClick={handleContinue}
                 className={cn(
-                  "w-full h-12 sm:h-14 flex items-center justify-center gap-3 font-bold text-[13px] tracking-[0.18em] uppercase transition-all active:scale-[0.98]",
+                  "w-full h-12 sm:h-14 flex items-center justify-center gap-3 font-bold text-[13px] tracking-[0.18em] uppercase transition-all active:scale-[0.98] hover:scale-[1.015] rounded-full",
                   !hasSelection && "opacity-60"
                 )}
                 style={{
                   background: "linear-gradient(135deg, #B8912A 0%, #EDD96A 50%, #B8912A 100%)",
                   color: "#071a12",
-                  boxShadow: hasSelection ? "0 6px 28px rgba(212,175,55,0.45)" : "none",
+                  boxShadow: hasSelection ? "0 8px 32px rgba(212,175,55,0.50)" : "none",
                 }}
               >
                 Continuar para o orçamento

@@ -14,17 +14,22 @@ import { WHATSAPP_BASE } from '@/constants/business';
 // Escolha Essencial (água) vs Premium (diluente), só aparece quando o serviceType
 // é 'waterproofing' standalone — o Pack (both) fica sempre Essencial, não há preço
 // de combo definido para Premium+limpeza.
-function WaterproofingTierPicker({ formData, updateFormData }: { formData: QuizFormData; updateFormData: (u: Partial<QuizFormData>) => void }) {
-  const tier = formData.waterproofingTier;
+export function WaterproofingTierPicker({ formData, updateFormData, onSelect, activeTier }: { formData: QuizFormData; updateFormData: (u: Partial<QuizFormData>) => void; onSelect?: (t: 'premium' | 'essencial') => void; activeTier?: 'premium' | 'essencial' | null }) {
+  // activeTier deixa o chamador decidir o que conta como "selecionado" na UI
+  // — por omissão é a preferência de tier (formData.waterproofingTier), mas
+  // um upsell onde ainda ninguém clicou em nada não pode mostrar um cartão já
+  // dourado/marcado (pedido explícito 2026-09-08: "parece que a pessoa já
+  // escolheu algo e ainda não escolheu").
+  const tier = activeTier === undefined ? formData.waterproofingTier : activeTier;
   return (
     <div className="w-full max-w-sm grid grid-cols-2 gap-2 mb-1 pt-3 items-stretch">
       <button
-        onClick={() => updateFormData({ waterproofingTier: 'premium' })}
+        onClick={() => { updateFormData({ waterproofingTier: 'premium' }); onSelect?.('premium'); }}
         className={cn(
           'relative rounded-sm border-2 px-3 py-2.5 text-left transition-all duration-200 touch-manipulation',
           tier === 'premium'
             ? 'border-gold bg-[#1a2a1a] shadow-[0_0_18px_rgba(212,175,55,0.30)]'
-            : 'border-gold/50 bg-[#1a2a1a] ring-1 ring-gold/20 hover:border-gold/75'
+            : 'border-white/15 bg-[#1a2a1a] hover:border-gold/40'
         )}
       >
         {/* Selo "escolha superior": canto sólido em vez do pill em gradiente
@@ -40,7 +45,7 @@ function WaterproofingTierPicker({ formData, updateFormData }: { formData: QuizF
         <p className={cn('text-[10px] leading-snug font-semibold', tier === 'premium' ? 'text-gold/70' : 'text-gold/45')}>Até 10 anos de proteção · até 5 lavagens</p>
       </button>
       <button
-        onClick={() => updateFormData({ waterproofingTier: 'essencial' })}
+        onClick={() => { updateFormData({ waterproofingTier: 'essencial' }); onSelect?.('essencial'); }}
         className={cn('rounded-sm border-2 px-3 py-2.5 text-left transition-all duration-200 touch-manipulation', tier === 'essencial' ? 'border-gold bg-[#1a2a1a] shadow-[0_0_10px_rgba(212,175,55,0.18)]' : 'border-gold/20 bg-[#1a2a1a] hover:border-gold/40')}
       >
         <div className="flex items-center gap-1.5 mb-0.5">
@@ -92,16 +97,7 @@ const QuizStepConfig = ({
             const isActive = qty > 0;
             const isWaterproofBase = formData.serviceType === 'waterproofing';
             const packTier = formData.waterproofingTier;
-            const { isSob, basePrice, packDelta, displayPrice: dp } = calcPackPricing(option, packOn, isWaterproofBase, 40, packTier);
-            const upsellLabel = isWaterproofBase ? 'Adicionar Higienização Profunda' : 'Adicionar Proteção Total VIP';
-            const upsellSub = isWaterproofBase ? `+${packDelta}€/un. · Limpeza profunda incluída` : `+${packDelta}€/un. · Impermeabilização completa`;
-            // Só faz sentido separar em 2 anos/10 anos quando se está a ADICIONAR proteção
-            // a uma limpeza (o outro sentido, adicionar limpeza a uma proteção já escolhida
-            // no seletor Essencial/Premium do topo, mantém-se um único toggle).
-            const essencial = calcPackPricing(option, true, false, 40, 'essencial');
-            const premium = calcPackPricing(option, true, false, 40, 'premium');
-            const premiumExtraDelta = premium.packDelta !== null && essencial.packDelta !== null
-              ? Math.round((premium.packDelta - essencial.packDelta) * 100) / 100 : null;
+            const { isSob, displayPrice: dp } = calcPackPricing(option, packOn, isWaterproofBase, 40, packTier);
             // originalBothPrice (108/148/178) é a soma essencial fixa (limpeza + imperm.
             // essencial) — só serve de referência "preço riscado" para o pack Essencial.
             // No pack Premium a soma separada é maior (o waterproofing premium custa mais),
@@ -136,74 +132,11 @@ const QuizStepConfig = ({
                     <button onClick={() => setSofaItems(sofaSetQty(sofaItems, option.id, qty + 1))} className="w-14 h-14 rounded-sm border-2 border-white/20 bg-white/[0.05] text-white font-bold text-2xl flex items-center justify-center active:scale-95 transition-all touch-manipulation hover:border-gold/50">+</button>
                   </div>
                 </div>
-                {isActive && !isSob && basePrice !== null && packDelta !== null && (
-                  <div className="px-4 pb-3">
-                    {isWaterproofBase ? (
-                      <button onClick={() => setSofaItems(sofaTogglePack(sofaItems, option.id))} className={cn('w-full flex items-center gap-2.5 px-3 py-2 rounded-sm border transition-all duration-200 touch-manipulation', packOn ? 'border-gold/50 bg-gold/[0.08]' : 'border-gold/15 bg-[#1a2a1a] hover:border-gold/40')}>
-                        <Shield className={cn('w-4 h-4 flex-shrink-0', packOn ? 'text-gold' : 'text-white/25')} />
-                        <div className="flex-1 text-left">
-                          <p className={cn('text-[11px] font-bold leading-none', packOn ? 'text-white' : 'text-white/50')}>{upsellLabel}</p>
-                          <p className={cn('text-[11px] mt-0.5 leading-none', packOn ? 'text-gold/60' : 'text-white/25')}>{upsellSub}</p>
-                        </div>
-                        <div className={cn('w-8 h-4 rounded-full border flex items-center px-0.5 transition-all duration-300 flex-shrink-0', packOn ? 'border-gold bg-gold/20' : 'border-white/20 bg-white/[0.05]')}>
-                          <div className={cn('w-3 h-3 rounded-full transition-all duration-300', packOn ? 'bg-gold translate-x-[14px]' : 'bg-white/30 translate-x-0')} />
-                        </div>
-                      </button>
-                    ) : (
-                      <div className="flex flex-col gap-1.5">
-                        {/* Proteção 10 anos (Premium) — preço e material em paralelo com a de 2 anos,
-                            sem framing de desconto (evita dar a entender que a de 2 anos é má opção) */}
-                        <button
-                          onClick={() => {
-                            const turningOn = !(packOn && packTier === 'premium');
-                            setSofaItems(turningOn && packOn ? sofaItems : sofaTogglePack(sofaItems, option.id));
-                            updateFormData({ waterproofingTier: 'premium' });
-                          }}
-                          className={cn('relative w-full flex items-center gap-2.5 px-3 py-2 rounded-sm border-2 transition-all duration-200 touch-manipulation', packOn && packTier === 'premium' ? 'border-gold bg-gold/[0.10] shadow-[0_0_10px_rgba(212,175,55,0.18)]' : 'border-gold/30 bg-[#1a2a1a] hover:border-gold/55')}
-                        >
-                          <span className="absolute -top-2 left-3 bg-gold text-[#12121e] text-[8px] font-black px-2 py-0.5 rounded-[3px] tracking-wide uppercase whitespace-nowrap shadow-sm border border-[#12121e]">
-                            Melhor Proteção
-                          </span>
-                          <Shield className={cn('w-4 h-4 flex-shrink-0', packOn && packTier === 'premium' ? 'text-gold' : 'text-gold/50')} />
-                          <div className="flex-1 text-left min-w-0">
-                            <div className="flex items-center gap-1.5">
-                              <p className={cn('text-[11px] font-bold leading-none', packOn && packTier === 'premium' ? 'text-white' : 'text-white/60')}>Proteção 10 anos</p>
-                              {premiumExtraDelta !== null && (
-                                <span className={cn('text-[10px] font-black leading-none px-1.5 py-[3px] rounded-full whitespace-nowrap flex-shrink-0', packOn && packTier === 'premium' ? 'bg-gold text-[#12121e]' : 'bg-gold/20 text-gold')}>
-                                  por apenas +{premiumExtraDelta}€
-                                </span>
-                              )}
-                            </div>
-                            <p className={cn('text-[11px] mt-0.5 leading-none whitespace-nowrap', packOn && packTier === 'premium' ? 'text-gold/70' : 'text-gold/50')}>
-                              +{premium.packDelta}€/un. · até 10 anos, 5 lavagens
-                            </p>
-                          </div>
-                          <div className={cn('w-8 h-4 rounded-full border flex items-center px-0.5 transition-all duration-300 flex-shrink-0', packOn && packTier === 'premium' ? 'border-gold bg-gold/20' : 'border-white/20 bg-white/[0.05]')}>
-                            <div className={cn('w-3 h-3 rounded-full transition-all duration-300', packOn && packTier === 'premium' ? 'bg-gold translate-x-[14px]' : 'bg-white/30 translate-x-0')} />
-                          </div>
-                        </button>
-                        {/* Proteção 2 anos (Essencial) */}
-                        <button
-                          onClick={() => {
-                            const turningOn = !(packOn && packTier === 'essencial');
-                            setSofaItems(turningOn && packOn ? sofaItems : sofaTogglePack(sofaItems, option.id));
-                            updateFormData({ waterproofingTier: 'essencial' });
-                          }}
-                          className={cn('w-full flex items-center gap-2.5 px-3 py-2 rounded-sm border transition-all duration-200 touch-manipulation', packOn && packTier === 'essencial' ? 'border-gold/50 bg-gold/[0.08]' : 'border-gold/15 bg-[#1a2a1a] hover:border-gold/40')}
-                        >
-                          <Shield className={cn('w-4 h-4 flex-shrink-0', packOn && packTier === 'essencial' ? 'text-gold' : 'text-white/25')} />
-                          <div className="flex-1 text-left">
-                            <p className={cn('text-[11px] font-bold leading-none', packOn && packTier === 'essencial' ? 'text-white' : 'text-white/50')}>Proteção 2 anos</p>
-                            <p className={cn('text-[11px] mt-0.5 leading-none', packOn && packTier === 'essencial' ? 'text-gold/60' : 'text-white/25')}>+{essencial.packDelta}€/un. · 1-2 anos</p>
-                          </div>
-                          <div className={cn('w-8 h-4 rounded-full border flex items-center px-0.5 transition-all duration-300 flex-shrink-0', packOn && packTier === 'essencial' ? 'border-gold bg-gold/20' : 'border-white/20 bg-white/[0.05]')}>
-                            <div className={cn('w-3 h-3 rounded-full transition-all duration-300', packOn && packTier === 'essencial' ? 'bg-gold translate-x-[14px]' : 'bg-white/30 translate-x-0')} />
-                          </div>
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                )}
+                {/* Upsell de impermeabilização/proteção (e, na direção contrária,
+                    de higienização) vive só na página dedicada a seguir às
+                    quantidades (QuizSofaAddonUpsell) — não faz sentido competir
+                    visualmente com a escolha de quantidade aqui, e confundia o
+                    cliente (pedido explícito 2026-09-08). */}
               </div>
             );
           })}
@@ -252,7 +185,11 @@ const QuizStepConfig = ({
                     <button onClick={() => setMattressItems(mattressSetQty(mattressItems, option.id, qty + 1))} className="w-14 h-14 rounded-sm border-2 border-white/20 bg-white/[0.05] text-white font-bold text-2xl flex items-center justify-center active:scale-95 transition-all touch-manipulation hover:border-gold/50">+</button>
                   </div>
                 </div>
-                {isActive && !isSob && (
+                {/* O upsell de Anti Ácaros (limpeza como serviço primário) passou para a
+                    página dedicada a seguir às quantidades (QuizMattressAddonUpsell) —
+                    mesma lógica aplicada a sofá e cadeiras (pedido explícito 2026-09-08).
+                    Mantém-se aqui só quando anti-ácaros É o serviço primário. */}
+                {isActive && !isSob && isWaterproofBase && (
                   <div className="px-4 pb-3">
                     <button onClick={() => setMattressItems(mattressTogglePack(mattressItems, option.id))} className={cn('w-full flex items-center gap-2.5 px-3 py-2 rounded-sm border transition-all duration-200 touch-manipulation', packOn ? 'border-gold/50 bg-gold/[0.08]' : 'border-gold/15 bg-[#1a2a1a] hover:border-gold/40')}>
                       <Shield className={cn('w-4 h-4 flex-shrink-0', packOn ? 'text-gold' : 'text-white/25')} />
@@ -372,10 +309,6 @@ const QuizStepConfig = ({
     // enquanto 9 cadeiras dava 347,5€ — um pedido maior a custar menos).
     const sob = primaryPrice === null || (addonEnabled && addonPrice === null);
     const totalChairPrice = sob ? 0 : (primaryPrice ?? 0) + (addonEnabled ? (addonPrice ?? 0) : 0);
-    const addonLabel = isWaterproofPrimary ? 'Adicionar Higienização' : 'Adicionar Impermeabilização';
-    const addonRateHint = isWaterproofPrimary
-      ? (qty <= 4 ? '20' : qty <= 6 ? '15' : '12,5')
-      : isPremiumTier ? (qty <= 4 ? '20' : '15') : (qty <= 4 ? '15' : '10'); // Essencial 15/10 · Premium 20/15
 
     const setChairQty = (newQty: number) => {
       const clamped = Math.max(1, newQty);
@@ -384,11 +317,6 @@ const QuizStepConfig = ({
         chairType: 'bulk_full',
         ...(addonEnabled ? { chairWaterproofQty: clamped } : {}),
       });
-    };
-
-    const toggleAddon = () => {
-      const next = !addonEnabled;
-      updateFormData({ chairWaterproofing: next, chairWaterproofQty: next ? qty : 0 });
     };
 
     const chairWhatsappMsg = encodeURIComponent('Olá, tenho cadeiras de um tipo diferente (sem tampo, costas ou braços) e gostava de um orçamento personalizado.');
@@ -428,35 +356,9 @@ const QuizStepConfig = ({
             className="w-14 h-14 rounded-sm border-2 border-white/20 bg-white/[0.05] text-white font-bold text-2xl flex items-center justify-center active:scale-95 transition-all touch-manipulation hover:border-gold/50"
           >+</button>
         </div>
-        {!sob && isWaterproofPrimary && (
-          <p className="text-xs text-white/30 text-center leading-snug">
-            {isPremiumTier ? '1ª–4ª: 20€ · 5ª–9ª: 15€ por cadeira' : '1ª–4ª: 15€ · 5ª–9ª: 10€ por cadeira'}
-          </p>
-        )}
-        {!sob && isWaterproofPrimary && (
-          <button
-            onClick={toggleAddon}
-            className={cn(
-              'w-full max-w-xs flex items-center gap-3 px-4 py-3 rounded-sm border-2 transition-all touch-manipulation',
-              addonEnabled
-                ? 'border-gold bg-[#1a2a1a] shadow-[0_0_10px_rgba(212,175,55,0.15)]'
-                : 'border-gold/20 bg-[#1a2a1a] hover:border-gold/40'
-            )}
-          >
-            <div className={cn('w-5 h-5 rounded-md border-2 flex items-center justify-center flex-shrink-0 transition-all', addonEnabled ? 'border-gold bg-gold' : 'border-white/30')}>
-              {addonEnabled && <Check className="w-3 h-3 text-[#12121e]" />}
-            </div>
-            <div className="text-left flex-1">
-              <p className="text-sm font-bold text-white">{addonLabel}</p>
-              <p className="text-xs text-white/40">{addonRateHint}€/cadeira</p>
-            </div>
-            <span className="text-gold font-bold text-sm flex-shrink-0">
-              +{addonPrice !== null
-                ? `${addonPrice % 1 === 0 ? addonPrice : addonPrice.toFixed(1).replace('.', ',')}€`
-                : 'orçamento'}
-            </span>
-          </button>
-        )}
+        {/* Upsell de Higienização (impermeabilização como serviço primário)
+            passou para a página dedicada a seguir às quantidades — mesma
+            lógica já aplicada ao sofá (pedido explícito 2026-09-08). */}
         {/* Aviso de tipo de cadeira: discreto de propósito, é uma exceção, não a
             regra — não deve competir visualmente com o preço/opções acima. */}
         <p className="text-[10px] text-white/20 text-center leading-snug px-2">

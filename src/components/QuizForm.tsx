@@ -19,8 +19,9 @@ import type { QuizFormData, SofaItem, MattressItem, CarpetItem, UpsellItemConfig
 import QuizStepLocation from './quiz/steps/QuizStepLocation';
 import QuizStepConfig from './quiz/steps/QuizStepConfig';
 import QuizComboUpsellScreen from './quiz/steps/QuizComboUpsellScreen';
-import QuizMinimumGate from './quiz/steps/QuizMinimumGate';
 import QuizChairsAddonUpsell from './quiz/steps/QuizChairsAddonUpsell';
+import QuizSofaAddonUpsell from './quiz/steps/QuizSofaAddonUpsell';
+import QuizMattressAddonUpsell from './quiz/steps/QuizMattressAddonUpsell';
 import QuizStepContact from './quiz/steps/QuizStepContact';
 import { calcChairWaterproof, calcChairWaterproofPremium, calcChairClean, carpetHasValidItems, carpetItemArea } from './quiz/quizHelpers';
 import { WHATSAPP_BASE, BUSINESS_EMAIL } from '@/constants/business';
@@ -67,7 +68,9 @@ function calcInitialStep(loc?: string, svc?: string, hasItem?: boolean, skipUpse
   if (!svc) return 1;
   if (hasItem) return 3;
   // Skip serviceType selector when already known or service doesn't need it
-  const skipType = svc === 'carpet' || svc === 'chairs' || svc === 'mattress' || hasSvcType;
+  // (só o tapete não tem essa escolha — sofá, colchão e cadeiras têm todos
+  // Higienização vs Impermeabilização/Anti Ácaros, ver shouldSkipServiceType).
+  const skipType = svc === 'carpet' || svc === 'mattress' || hasSvcType;
   return skipType ? 3 : 2;
 }
 
@@ -133,17 +136,16 @@ const QuizForm = ({
   const [exitIntentFired, setExitIntentFired] = useState(false);
   const startsAtUpsell = Boolean(skipToUpsell && initialLocation);
   const [showUpsell, setShowUpsell] = useState(startsAtUpsell);
-  // Ecrã dedicado "Quase Lá" (2026-09-02): mostrado ANTES do Pack Família
-  // quando o pedido fica abaixo do mínimo, em vez de espremer a mensagem no
-  // rodapé do step 4 junto com o formulário de contacto.
-  const [showMinimumGate, setShowMinimumGate] = useState(false);
-  // Upsell "estilo companhia aérea" (2026-09-06): quando o serviço principal
-  // são cadeiras + limpeza, a decisão de Impermeabilização/Anti Ácaros sai da
-  // etapa de quantidades e passa para aqui, logo a seguir ao "Continuar" —
-  // mostra-se uma única vez por sessão (chairsAddonUpsellShown), antes do
-  // gate do mínimo, já que a escolha aqui pode resolver o mínimo sozinha.
+  // Upsell "estilo companhia aérea" (2026-09-06, uniformizado 2026-09-08): para
+  // cadeiras/sofá/colchão + limpeza, a decisão de proteção/Anti Ácaros sai da
+  // etapa de quantidades e passa para um ecrã dedicado logo a seguir ao
+  // "Continuar" — nunca compete visualmente com a escolha de quantidade.
+  // Mostra-se sempre que se avança de step3 (sem flag "só uma vez por sessão":
+  // voltar às quantidades e avançar de novo tem de mostrar este ecrã outra
+  // vez, nunca saltar direto para o Pack Família — bug real reportado).
   const [showChairsAddonUpsell, setShowChairsAddonUpsell] = useState(false);
-  const [chairsAddonUpsellShown, setChairsAddonUpsellShown] = useState(false);
+  const [showSofaAddonUpsell, setShowSofaAddonUpsell] = useState(false);
+  const [showMattressAddonUpsell, setShowMattressAddonUpsell] = useState(false);
   const [upsellShown, setUpsellShown] = useState(startsAtUpsell);
   const [upsellItems, setUpsellItems] = useState<UpsellItemConfig[]>(initialUpsellItems ?? []);
   const [sofaItems, setSofaItems] = useState<SofaItem[]>(buildInitialSofaItems);
@@ -214,13 +216,6 @@ const QuizForm = ({
     packDiscountedPrice,
   } = useQuizPricing(formData, sofaItems, mattressItems, upsellItems, carpetItems);
 
-  // Encomenda mínima: 60€ (subido de 50€ em 2026-09-02, a pedido do dono). Sob
-  // orçamento fica sempre acima disso na prática, por isso só se aplica a
-  // pedidos com preço fechado.
-  const MIN_ORDER_VALUE = 60;
-  const effectiveTotal = packDiscountActive ? packDiscountedPrice : totalPrice;
-  const belowMinimum = !hasSobOrcamento && !hasUpsellSobItem && totalPrice > 0 && effectiveTotal < MIN_ORDER_VALUE;
-  const amountToMinimum = Math.max(0, Math.round((MIN_ORDER_VALUE - effectiveTotal) * 100) / 100);
 
   const {
     countdown,
@@ -278,6 +273,13 @@ const QuizForm = ({
       setShowUpsell(atUpsell);
       setUpsellShown(atUpsell);
       setUpsellItems(initialUpsellItems ?? []);
+      // Sem isto, reabrir o quiz depois de ter chegado a um destes upsells
+      // dedicados numa sessão anterior deixava as flags presas a true — o
+      // passo inicial recalculado (ex: Localização) e o upsell antigo
+      // renderizavam ambos ao mesmo tempo (bug real reportado).
+      setShowChairsAddonUpsell(false);
+      setShowSofaAddonUpsell(false);
+      setShowMattressAddonUpsell(false);
       setCurrentStep(calcInitialStep(initialLocation, initialService, hasInitialItem, skipToUpsell, !!initialServiceType));
     }
     prevIsOpenRef.current = isOpen;
@@ -353,19 +355,22 @@ const QuizForm = ({
     }
   };
 
-  // Sofa & mattress now show their own 2-card step 2 (Higienização / Impermeabilização)
-  const shouldSkipServiceType = formData.service === 'carpet'
-    || formData.service === 'chairs'
-    || formData.service === 'mattress';
+  // Sofá, colchão e cadeiras têm todos o seu próprio Passo 2 (Higienização vs
+  // Impermeabilização/Anti Ácaros) — só o tapete não tem esse conceito (sempre
+  // sob orçamento), por isso é o único que salta a etapa. Antes incluía também
+  // colchão e cadeiras aqui, o que desalinhava com o clique direto no Passo 1
+  // (que já não os saltava) e causava o "Voltar" a saltar o Passo 2 por engano.
+  // Colchão voltou a saltar este passo (2026-09-08): Anti Ácaros não existe
+  // como serviço primário próprio, só como upsell dependente de uma limpeza
+  // (tal como a impermeabilização do sofá nunca é pedida sozinha sem limpeza
+  // — mas ao contrário desse caso, o colchão não tem um "modo impermeabilização"
+  // real por trás, por isso nem faz sentido perguntar aqui).
+  const shouldSkipServiceType = formData.service === 'carpet' || formData.service === 'mattress';
 
   // Extraído do handleNext original: o que acontece depois da etapa de
   // quantidades (step 3), partilhado entre o fluxo normal e o "Continuar"
   // do upsell das cadeiras, que intercepta antes.
   const proceedPastConfig = () => {
-    if (belowMinimum) {
-      setShowMinimumGate(true);
-      return;
-    }
     setUpsellShown(true);
     setShowUpsell(true);
   };
@@ -396,18 +401,23 @@ const QuizForm = ({
         updateFormData({ serviceType: 'cleaning' });
         nextStep = 3;
       }
-      // Upsell "estilo companhia aérea" das cadeiras intercepta primeiro,
-      // antes do gate do mínimo, porque a escolha aqui (Impermeabilização ou
-      // Anti Ácaros) pode sozinha tirar o pedido de abaixo do mínimo.
-      if (currentStep === 3 && formData.service === 'chairs' && formData.serviceType === 'cleaning' && !chairsAddonUpsellShown) {
-        setChairsAddonUpsellShown(true);
+      // Upsell "estilo companhia aérea" dedicado por serviço, sempre a seguir
+      // às quantidades (só quando a limpeza é o serviço principal) — a pessoa
+      // pensa só em quantidade no step 3, decide a proteção/Anti Ácaros aqui.
+      if (currentStep === 3 && formData.service === 'chairs' && (formData.serviceType === 'cleaning' || formData.serviceType === 'waterproofing')) {
         setShowChairsAddonUpsell(true);
+        return;
+      }
+      if (currentStep === 3 && formData.service === 'sofa' && (formData.serviceType === 'cleaning' || formData.serviceType === 'waterproofing')) {
+        setShowSofaAddonUpsell(true);
+        return;
+      }
+      if (currentStep === 3 && formData.service === 'mattress' && formData.serviceType === 'cleaning') {
+        setShowMattressAddonUpsell(true);
         return;
       }
       // Upsell intercept: always show Pack Família when going forward from step 3
       // (re-shows if user clicked Voltar from Pack back to quantities).
-      // Quando o pedido fica abaixo do mínimo, o ecrã "Quase Lá" intercepta
-      // primeiro (bloqueia até resolver), só depois segue para o Pack Família.
       if (currentStep === 3) {
         proceedPastConfig();
         return;
@@ -914,16 +924,16 @@ ${formData.description || 'Sem observações adicionais'}
                 <QuizStep1Service
                   selectedService={formData.service}
                   onSelect={(service) => {
-                    // Colchão já não salta o Passo 2 (2026-08-30): tem Anti Ácaros como
-                    // segunda opção real, tal como sofá/cadeiras têm impermeabilização.
-                    const skipServiceType = service === 'carpet';
+                    // Colchão volta a saltar o Passo 2 (2026-09-08): Anti Ácaros não
+                    // existe como serviço primário, só como upsell dependente de uma
+                    // limpeza — ver shouldSkipServiceType acima para mais contexto.
+                    const skipServiceType = service === 'carpet' || service === 'mattress';
                     updateFormData({ service, serviceType: skipServiceType ? 'cleaning' : '', sofaSize: '', mattressSize: '', chairType: '', carpetArea: '', chairWaterproofing: false, chairWaterproofQty: 0, chairAntiAcaros: false });
                     setSofaItems([]);
                     setMattressItems([]);
                     setCarpetItems(buildInitialCarpetItems());
                     setUpsellItems([]);
                     setUpsellShown(false);
-                    setChairsAddonUpsellShown(false);
                     setTimeout(() => setCurrentStep(skipServiceType ? 3 : 2), 180);
                   }}
                 />
@@ -974,8 +984,8 @@ ${formData.description || 'Sem observações adicionais'}
               );
             })()}
 
-            {/* Step 3 - Config (hidden while Pack Família overlay, "Quase Lá" ou upsell das cadeiras ativos) */}
-            {currentStep === 3 && !showUpsell && !showMinimumGate && !showChairsAddonUpsell && (
+            {/* Step 3 - Config (hidden enquanto o Pack Família ou um upsell dedicado por serviço está ativo) */}
+            {currentStep === 3 && !showUpsell && !showChairsAddonUpsell && !showSofaAddonUpsell && !showMattressAddonUpsell && (
               <div className="flex-1 flex flex-col w-full items-center text-center overflow-y-auto">
                 <QuizStepConfig
                   formData={formData}
@@ -990,9 +1000,9 @@ ${formData.description || 'Sem observações adicionais'}
               </div>
             )}
 
-            {/* Upsell "estilo companhia aérea" das cadeiras: logo a seguir ao
-                "Continuar" da etapa de quantidades, antes do gate do mínimo */}
-            {showChairsAddonUpsell && (
+            {/* Upsells "estilo companhia aérea", um por serviço: logo a seguir
+                ao "Continuar" da etapa de quantidades. */}
+            {currentStep === 3 && showChairsAddonUpsell && (
               <div className="flex-1 flex flex-col w-full items-center text-center overflow-y-auto">
                 <QuizChairsAddonUpsell
                   formData={formData}
@@ -1007,35 +1017,38 @@ ${formData.description || 'Sem observações adicionais'}
               </div>
             )}
 
-            {/* "Quase Lá": bloqueia antes do Pack Família quando abaixo do mínimo */}
-            {showMinimumGate && (
-              <QuizMinimumGate
-                formData={formData}
-                updateFormData={updateFormData}
-                sofaItems={sofaItems}
-                setSofaItems={setSofaItems}
-                mattressItems={mattressItems}
-                setMattressItems={setMattressItems}
-                upsellItems={upsellItems}
-                setUpsellItems={setUpsellItems}
-                minOrderValue={MIN_ORDER_VALUE}
-                amountToMinimum={amountToMinimum}
-                belowMinimum={belowMinimum}
-                onOpenFullUpsell={() => {
-                  (document.activeElement as HTMLElement)?.blur();
-                  setShowMinimumGate(false);
-                  setUpsellShown(true);
-                  setShowUpsell(true);
-                }}
-                onContinue={() => {
-                  if (belowMinimum) return;
-                  (document.activeElement as HTMLElement)?.blur();
-                  setShowMinimumGate(false);
-                  setUpsellShown(true);
-                  setShowUpsell(true);
-                }}
-                onBack={() => { (document.activeElement as HTMLElement)?.blur(); setShowMinimumGate(false); }}
-              />
+            {currentStep === 3 && showSofaAddonUpsell && (
+              <div className="flex-1 flex flex-col w-full items-center text-center overflow-y-auto">
+                <QuizSofaAddonUpsell
+                  formData={formData}
+                  updateFormData={updateFormData}
+                  sofaItems={sofaItems}
+                  setSofaItems={setSofaItems}
+                  onContinue={() => {
+                    (document.activeElement as HTMLElement)?.blur();
+                    setShowSofaAddonUpsell(false);
+                    proceedPastConfig();
+                  }}
+                  onBack={() => { (document.activeElement as HTMLElement)?.blur(); setShowSofaAddonUpsell(false); }}
+                />
+              </div>
+            )}
+
+            {currentStep === 3 && showMattressAddonUpsell && (
+              <div className="flex-1 flex flex-col w-full items-center text-center overflow-y-auto">
+                <QuizMattressAddonUpsell
+                  formData={formData}
+                  updateFormData={updateFormData}
+                  mattressItems={mattressItems}
+                  setMattressItems={setMattressItems}
+                  onContinue={() => {
+                    (document.activeElement as HTMLElement)?.blur();
+                    setShowMattressAddonUpsell(false);
+                    proceedPastConfig();
+                  }}
+                  onBack={() => { (document.activeElement as HTMLElement)?.blur(); setShowMattressAddonUpsell(false); }}
+                />
+              </div>
             )}
 
             {/* Upsell final "estilo companhia aérea": uma única tela com as 3
@@ -1046,14 +1059,33 @@ ${formData.description || 'Sem observações adicionais'}
               <QuizComboUpsellScreen
                 upsellItems={upsellItems}
                 setUpsellItems={setUpsellItems}
+                totalPrice={totalPrice}
+                packDiscountActive={packDiscountActive}
+                packDiscountedPrice={packDiscountedPrice}
                 onContinue={() => { (document.activeElement as HTMLElement)?.blur(); setShowUpsell(false); setCurrentStep(4); }}
-                onBack={() => { (document.activeElement as HTMLElement)?.blur(); setShowUpsell(false); setUpsellItems([]); }}
+                onBack={() => {
+                  (document.activeElement as HTMLElement)?.blur();
+                  setShowUpsell(false);
+                  setUpsellItems([]);
+                  setCurrentStep(3);
+                  // Volta ao ecrã de upsell dedicado do serviço (não direto às
+                  // quantidades) quando esse serviço tem um — mesma condição
+                  // usada para mostrá-lo a avançar (bug real: "Voltar" saltava
+                  // sempre para as quantidades, ignorando esse passo).
+                  if (formData.service === 'chairs' && (formData.serviceType === 'cleaning' || formData.serviceType === 'waterproofing')) {
+                    setShowChairsAddonUpsell(true);
+                  } else if (formData.service === 'sofa' && (formData.serviceType === 'cleaning' || formData.serviceType === 'waterproofing')) {
+                    setShowSofaAddonUpsell(true);
+                  } else if (formData.service === 'mattress' && formData.serviceType === 'cleaning') {
+                    setShowMattressAddonUpsell(true);
+                  }
+                }}
               />
             )}
 
 
             {/* Step 4 - Contact */}
-            {currentStep === 4 && !showUpsell && !showMinimumGate && (
+            {currentStep === 4 && !showUpsell && (
               <QuizStepContact
                 formData={formData}
                 updateFormData={updateFormData}
@@ -1066,7 +1098,7 @@ ${formData.description || 'Sem observações adicionais'}
     </div>
 
     {/* Footer — hidden on step 0 (auto-advances on city selection) */}
-    {currentStep <= totalSteps && !showUpsell && !showMinimumGate && !showChairsAddonUpsell && currentStep > 0 && (
+    {currentStep <= totalSteps && !showUpsell && !showChairsAddonUpsell && !showSofaAddonUpsell && !showMattressAddonUpsell && currentStep > 0 && (
       <div className="px-4 sm:px-5 pt-3 flex flex-col gap-2 flex-shrink-0 border-t border-white/[0.05] items-center" style={{ paddingBottom: 'max(1rem, env(safe-area-inset-bottom))' }}>
         {currentStep === totalSteps ? (
           <div className="flex flex-col gap-2 w-full">
@@ -1080,23 +1112,24 @@ ${formData.description || 'Sem observações adicionais'}
                 Valor: <span className="text-gold/60 font-bold">Sob orçamento</span>
               </p>
             )}
-            <Button
-              onClick={handleSubmit}
-              disabled={isSubmitting}
-              className="w-full h-14 bg-gradient-to-r from-gold to-[#d4c57b] hover:from-[#d4c57b] hover:to-gold text-[#12121e] font-black text-base tracking-wider uppercase touch-manipulation active:scale-[0.98] rounded-sm shadow-[0_0_32px_rgba(212,175,55,0.30)]"
-            >
-              {isSubmitting ? 'A enviar...' : 'FINALIZAR PEDIDO'}
-            </Button>
+            <div className="flex items-center gap-3 w-full">
+              <button
+                onClick={handlePrev}
+                className="h-14 px-5 flex-shrink-0 bg-transparent border border-white/[0.14] text-white/50 hover:text-white/80 hover:border-white/30 active:scale-[0.98] touch-manipulation rounded-sm flex items-center justify-center transition-all text-sm font-semibold"
+              >
+                <ChevronLeft className="w-4 h-4 mr-1" /> Voltar
+              </button>
+              <Button
+                onClick={handleSubmit}
+                disabled={isSubmitting}
+                className="flex-1 h-14 bg-gradient-to-r from-gold to-[#d4c57b] hover:from-[#d4c57b] hover:to-gold text-[#12121e] font-black text-base tracking-wider uppercase touch-manipulation active:scale-[0.98] rounded-sm shadow-[0_0_32px_rgba(212,175,55,0.30)]"
+              >
+                {isSubmitting ? 'A enviar...' : 'FINALIZAR PEDIDO'}
+              </Button>
+            </div>
             <p className="text-center text-[11px] text-white/30 font-medium -mt-0.5">
               Sem compromisso · Grátis · Respondemos em menos de 30 min
             </p>
-            <button
-              onClick={handlePrev}
-              className="w-full h-7 text-xs text-white/20 hover:text-white/45 active:text-white/45 active:bg-transparent touch-manipulation bg-transparent border-none outline-none"
-            >
-              <ChevronLeft className="w-3.5 h-3.5 mr-1 inline" />
-              Voltar
-            </button>
           </div>
         ) : (
           /* Steps 1–2 auto-advance on card tap — only show Voltar (subtle).

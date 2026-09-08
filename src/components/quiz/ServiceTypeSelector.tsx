@@ -38,7 +38,7 @@ const ServiceTypeSelector = ({
   packPrice,
   waterproofingDesc = 'Ideal para estofos novos ou recém-limpos.',
   hideWaterproofing = false,
-  waterproofingTitle = 'Proteção Anti-Manchas',
+  waterproofingTitle = 'Impermeabilização',
   waterproofingSubtitle = 'Impermeabilização Essencial',
   bothDesc = 'Limpeza Profunda + Impermeabilização Essencial',
 }: ServiceTypeSelectorProps) => {

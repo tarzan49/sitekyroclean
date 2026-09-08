@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import type { QuizFormData, SofaItem, MattressItem, CarpetItem, UpsellItemConfig } from '@/components/quiz';
 import { sofaPrices, mattressPrices, locationPrices } from '@/components/quiz';
 import { calcChairClean, calcChairWaterproof, calcChairWaterproofPremium, carpetHasValidItems } from '@/components/quiz/quizHelpers';
+import { PACK_DISCOUNT_MIN_UPSELL_ITEM, PACK_DISCOUNT_MIN_TOTAL } from '@/lib/priceWidgetCalc';
 
 export function useQuizPricing(
   formData: QuizFormData,
@@ -19,7 +20,7 @@ export function useQuizPricing(
     let baseTotal = 0;
     let minQualifying: number | null = null;
     const noteCandidate = (p: number) => {
-      if (p >= 60 && (minQualifying === null || p < minQualifying)) minQualifying = p;
+      if (p >= PACK_DISCOUNT_MIN_UPSELL_ITEM && (minQualifying === null || p < minQualifying)) minQualifying = p;
     };
 
     switch (formData.service) {
@@ -173,21 +174,18 @@ export function useQuizPricing(
   // as do serviço principal como as adicionadas via upsell (Pack Família).
   // Regra final: soma de todos os artigos > 160€ (100€ de base + 60€ do
   // artigo extra, não sobrepostos) E pelo menos um artigo, sozinho, vale
-  // 60€ ou mais. Testado com 3 casos reais: 3 colchões casal de 69€ (207€,
-  // >160, um artigo=69≥60) qualifica; 2 colchões casal de 69€ (138€, NÃO
-  // passa 160) não qualifica; 2×sofá 1L 49€ + 1×sofá 2L 69€ (167€, >160,
-  // artigo de 69≥60) qualifica. Uma tentativa anterior (subtrair o artigo
-  // mínimo e exigir que o resto passasse 100€) falhava neste último caso
-  // (98€ de resto, por 2€ não chegava aos 100€) — não é assim que funciona.
+  // PACK_DISCOUNT_MIN_UPSELL_ITEM ou mais. Limiares importados de
+  // priceWidgetCalc.ts (nunca duplicar o número aqui — foi assim que o
+  // limiar do artigo extra ficou desincronizado a 60€ depois de baixar
+  // para 49€ 2026-09-08, bug real só apanhado ao rever este ficheiro).
   // 'sofa-anti-acaros'/'chairs-anti-acaros' no upsellItems são tratamento no
   // mesmo item, não um artigo novo (só lá estão por conveniência de cálculo
   // no widget), por isso ficam de fora. Um artigo de upsell "sob orçamento"
   // conta sempre como qualificado (é implicitamente grande mesmo com 0€).
-  const PACK_DISCOUNT_MIN_TOTAL = 160; // 100€ de base + 60€ do artigo extra
   const NON_ARTICLE_UPSELL_IDS = new Set(['sofa-anti-acaros', 'chairs-anti-acaros']);
   const articleUpsellItems = upsellItems.filter(i => !NON_ARTICLE_UPSELL_IDS.has(i.id));
   const upsellArticleTotal = articleUpsellItems.reduce((sum, item) => sum + safePrice(item.price), 0);
-  const hasSubstantialUpsellArticle = articleUpsellItems.some(i => i.price >= 60);
+  const hasSubstantialUpsellArticle = articleUpsellItems.some(i => i.price >= PACK_DISCOUNT_MIN_UPSELL_ITEM);
   const totalArticleValue = articleBaseTotal + upsellArticleTotal;
   const hasSubstantialArticle = minQualifyingArticle !== null || hasSubstantialUpsellArticle;
   const packDiscountActive = (totalArticleValue > PACK_DISCOUNT_MIN_TOTAL && hasSubstantialArticle) || hasUpsellSobItem;

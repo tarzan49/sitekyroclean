@@ -1,7 +1,7 @@
 import { useEffect, useMemo } from "react";
 import { useLocation, Link } from "react-router-dom";
 import { QuizLocationProvider, QuizServiceProvider } from "@/context/QuizLocationContext";
-import { MapPin, Star, MessageCircle, ArrowRight } from "lucide-react";
+import { MapPin, Star, MessageCircle, ArrowRight, Clock, Euro } from "lucide-react";
 import Header from "@/components/Header";
 import PageBreadcrumb from "@/components/PageBreadcrumb";
 import Footer from "@/components/Footer";
@@ -11,6 +11,7 @@ import SectionHeader from "@/components/SectionHeader";
 import ServiceFAQ from "@/components/ServiceFAQ";
 import ServicePriceSection from "@/components/ServicePriceSection";
 import ServiceAutoCarousel from "@/components/ServiceAutoCarousel";
+import ServiceSnapshotStats from "@/components/ServiceSnapshotStats";
 import { trackWhatsAppClick } from "@/lib/quizTracking";
 import { getPricePageData, getAllPriceRoutes } from "@/data/priceSeoData";
 import { services, cities, cityPrep } from "@/data/locationSeoData";
@@ -76,6 +77,15 @@ const PricePage = () => {
   const waHref = `${WHATSAPP_BASE}?text=${encodeURIComponent(buildServiceWaMessage(data.serviceSlug, data.cityName))}`;
   const gallery = getServiceGallery(data.serviceSlug, data.citySlug);
 
+  const snapshotStats = [
+    { value: "5.0 ★", label: "Avaliação Google", icon: Star },
+    data.serviceSlug === 'limpeza-tapetes'
+      ? { value: "Á Medida", label: `Orçamento, em ${data.cityName}`, icon: Euro }
+      : { value: servicePrice, label: `Desde, em ${data.cityName}`, icon: Euro },
+    { value: nearbyCities.length > 0 ? `${nearbyCities.length}+` : "100%", label: nearbyCities.length > 0 ? "Zonas próximas" : "Cobertura local", icon: MapPin },
+    { value: "30min", label: "Tempo de resposta", icon: Clock },
+  ];
+
   return (
     <QuizLocationProvider value={data.cityName}>
     <QuizServiceProvider value={quizService}>
@@ -83,8 +93,8 @@ const PricePage = () => {
       <Header />
       <main>
 
-        {/* ═══ HERO ═══ */}
-        <section className="relative pt-24 md:pt-28 pb-16 md:pb-24 overflow-hidden">
+        {/* ═══ HERO + LOCAL SNAPSHOT (fundo fotográfico contínuo) ═══ */}
+        <div className="relative overflow-hidden">
           <div className="absolute inset-0" style={{ background: "#071a12" }} />
           <div className="absolute inset-0 overflow-hidden" aria-hidden="true">
             <picture className="w-full h-full">
@@ -93,8 +103,9 @@ const PricePage = () => {
               <img src={heroImgs.d} alt="" className="w-full h-full object-cover" loading="eager" />
             </picture>
           </div>
-          <div className="absolute inset-0" style={{ background: "linear-gradient(to bottom, rgba(7,26,18,0.42) 0%, rgba(7,26,18,0.65) 40%, rgba(7,26,18,0.88) 75%, rgba(7,26,18,0.97) 100%)" }} />
+          <div className="absolute inset-0" style={{ background: "linear-gradient(to bottom, rgba(7,26,18,0.42) 0%, rgba(7,26,18,0.65) 40%, rgba(7,26,18,0.90) 78%, rgba(7,26,18,0.97) 100%)" }} />
 
+        <section className="relative pt-24 md:pt-28 pb-16 md:pb-24">
           <div className="container mx-auto px-5 sm:px-6 lg:px-8 relative z-10">
             <div className="max-w-6xl mx-auto grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
               <div>
@@ -170,15 +181,45 @@ const PricePage = () => {
           </div>
         </section>
 
+        <ServiceSnapshotStats stats={snapshotStats} />
+        </div>
+
         {/* ═══ TABELA DE PREÇOS ═══ */}
         <ServicePriceSection serviceSlug={data.serviceSlug} initialLocation={data.cityName} />
 
+        {/* ═══ AVALIAÇÕES REAIS ═══ */}
+        <section className="py-14 md:py-20 bg-kyro-green">
+          <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
+            <SectionHeader overline="Avaliações Reais" heading="O que dizem os nossos" goldWord="clientes" light={false} />
+            <ServiceReviewsGrid serviceSlug={data.serviceSlug} seed={data.citySlug} heading="" />
+          </div>
+        </section>
+
+        {/* ═══ GALERIA — ANTES E DEPOIS ═══ */}
+        {gallery && (
+          <ServiceAutoCarousel
+            overline="Resultados Reais"
+            heading={`Antes e depois: ${data.serviceName}`}
+            subtitle={`Transformação real ${prep} ${data.cityName}, resultado visível no próprio dia.`}
+            beforeImage={gallery.before}
+            afterImage={gallery.after}
+            slides={gallery.slides}
+            rotateBeforeAfter={gallery.rotateBeforeAfter}
+            variant="light"
+          />
+        )}
+
+        {/* ═══ FAQ ═══ */}
+        {data.faqs.length > 0 && (
+          <ServiceFAQ faqs={data.faqs} heading={`Dúvidas sobre preços ${prep} ${data.cityName}`} variant="dark" />
+        )}
+
         {/* ═══ O QUE INFLUENCIA O PREÇO ═══ */}
         {data.factors.length > 0 && (
-          <section className="py-14 md:py-20 bg-kyro-green">
+          <section className="py-14 md:py-20 bg-[#FDFDF9]">
             <div className="max-w-6xl mx-auto px-5 sm:px-6 lg:px-8">
-              <SectionHeader overline="Fatores de Preço" heading="O que influencia o" goldWord="valor final" light={false} />
-              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-px" style={{ backgroundColor: "rgba(255,255,255,0.08)" }}>
+              <SectionHeader overline="Fatores de Preço" heading="O que influencia o" goldWord="valor final" light={true} />
+              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-px" style={{ backgroundColor: "rgba(17,17,17,0.06)" }}>
                 {data.factors.slice(0, 6).map((factor, i) => (
                   <div
                     key={i}
@@ -204,33 +245,6 @@ const PricePage = () => {
             </div>
           </section>
         )}
-
-        {/* ═══ GALERIA — ANTES E DEPOIS ═══ */}
-        {gallery && (
-          <ServiceAutoCarousel
-            overline="Resultados Reais"
-            heading={`Antes e depois: ${data.serviceName}`}
-            subtitle={`Transformação real ${prep} ${data.cityName}, resultado visível no próprio dia.`}
-            beforeImage={gallery.before}
-            afterImage={gallery.after}
-            slides={gallery.slides}
-            rotateBeforeAfter={gallery.rotateBeforeAfter}
-            variant="light"
-          />
-        )}
-
-        {/* ═══ FAQ ═══ */}
-        {data.faqs.length > 0 && (
-          <ServiceFAQ faqs={data.faqs} heading={`Dúvidas sobre preços ${prep} ${data.cityName}`} variant="dark" />
-        )}
-
-        {/* ═══ AVALIAÇÕES REAIS ═══ */}
-        <section className="py-14 md:py-20 bg-[#FDFDF9]">
-          <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
-            <SectionHeader overline="Avaliações Reais" heading="O que dizem os nossos" goldWord="clientes" light={true} />
-            <ServiceReviewsGrid serviceSlug={data.serviceSlug} seed={data.citySlug} heading="" />
-          </div>
-        </section>
 
         {/* ═══ REDE INTERNA ═══ */}
         <section className="py-14 md:py-20 bg-[#FDFDF9]">
