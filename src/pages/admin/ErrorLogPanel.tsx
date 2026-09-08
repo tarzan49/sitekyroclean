@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from "react";
-import { RefreshCw, Trash2, CheckCircle, Shield } from "lucide-react";
+import { RefreshCw, Trash2, CheckCircle, Shield, Search } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
 interface ErrorLog {
@@ -15,29 +15,61 @@ interface ErrorLog {
   severity: string;
 }
 
+const PAGE_SIZE = 100;
+
 const ErrorLogPanel = () => {
   const [errors, setErrors] = useState<ErrorLog[]>([]);
   const [errorsLoading, setErrorsLoading] = useState(false);
   const [errorsError, setErrorsError] = useState<string | null>(null);
+  const [hasMore, setHasMore] = useState(false);
+  // Sem isto, os antigos erros de localhost (agora já não gravados, ver
+  // errorTracking.ts) continuavam a enterrar erros reais de produção — só
+  // os últimos 50, sem filtro nenhum, mostravam-se, e um erro de há uns
+  // dias ficava inacessível atrás de centenas de linhas de "localhost"
+  // (achado real 2026-09-09, a investigar um lead a sério em falta).
+  const [search, setSearch] = useState("");
+  const [hideLocalhost, setHideLocalhost] = useState(true);
+
+  const runQuery = useCallback(async (offset: number) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let query = (supabase as any)
+      .from("error_logs")
+      .select("*")
+      .order("created_at", { ascending: false });
+    if (hideLocalhost) query = query.not("url", "ilike", "%localhost%");
+    const term = search.trim();
+    if (term) query = query.or(`message.ilike.%${term}%,source.ilike.%${term}%,url.ilike.%${term}%`);
+    return query.range(offset, offset + PAGE_SIZE - 1);
+  }, [search, hideLocalhost]);
 
   const fetchErrors = useCallback(async () => {
     setErrorsLoading(true);
     setErrorsError(null);
     try {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { data, error } = await (supabase as any)
-        .from("error_logs")
-        .select("*")
-        .order("created_at", { ascending: false })
-        .limit(50);
+      const { data, error } = await runQuery(0);
       if (error) throw error;
       setErrors(data ?? []);
+      setHasMore((data?.length ?? 0) === PAGE_SIZE);
     } catch (e: unknown) {
       setErrorsError(e instanceof Error ? e.message : "Erro ao carregar logs. Cria a tabela error_logs no Supabase primeiro.");
     } finally {
       setErrorsLoading(false);
     }
-  }, []);
+  }, [runQuery]);
+
+  const loadMore = async () => {
+    setErrorsLoading(true);
+    try {
+      const { data, error } = await runQuery(errors.length);
+      if (error) throw error;
+      setErrors(prev => [...prev, ...(data ?? [])]);
+      setHasMore((data?.length ?? 0) === PAGE_SIZE);
+    } catch (e: unknown) {
+      setErrorsError(e instanceof Error ? e.message : "Erro ao carregar mais logs.");
+    } finally {
+      setErrorsLoading(false);
+    }
+  };
 
   useEffect(() => {
     fetchErrors();
@@ -67,10 +99,10 @@ const ErrorLogPanel = () => {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
           <h2 className="text-lg font-bold text-navy">Error Log</h2>
-          <p className="text-sm text-gray-500">Últimos 50 erros registados no site</p>
+          <p className="text-sm text-gray-500">{errors.length} erro{errors.length === 1 ? "" : "s"} carregado{errors.length === 1 ? "" : "s"}{hideLocalhost ? " · localhost escondido" : ""}</p>
         </div>
         <div className="flex gap-2">
           <button
@@ -91,6 +123,23 @@ const ErrorLogPanel = () => {
             </button>
           )}
         </div>
+      </div>
+
+      <div className="flex items-center gap-3 flex-wrap">
+        <div className="relative flex-1 min-w-[220px]">
+          <Search className="w-3.5 h-3.5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
+          <input
+            type="text"
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            placeholder="Procurar por mensagem, origem (ex. QuizForm-crm) ou URL..."
+            className="w-full pl-8 pr-3 py-2 text-xs rounded-lg border border-gray-200 focus:border-gold focus:outline-none text-navy placeholder:text-gray-400"
+          />
+        </div>
+        <label className="flex items-center gap-1.5 text-xs text-gray-500 cursor-pointer select-none">
+          <input type="checkbox" checked={hideLocalhost} onChange={e => setHideLocalhost(e.target.checked)} className="rounded border-gray-300" />
+          Esconder localhost
+        </label>
       </div>
 
       {errorsError && (
@@ -170,6 +219,17 @@ const ErrorLogPanel = () => {
               </tbody>
             </table>
           </div>
+          {hasMore && (
+            <div className="p-3 border-t border-gray-100 text-center">
+              <button
+                onClick={loadMore}
+                disabled={errorsLoading}
+                className="px-4 py-2 text-xs font-medium rounded-lg border border-gray-200 text-navy hover:border-navy/30 transition-colors disabled:opacity-50"
+              >
+                {errorsLoading ? "A carregar..." : `Carregar mais ${PAGE_SIZE}`}
+              </button>
+            </div>
+          )}
         </div>
       )}
 
