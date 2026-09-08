@@ -7,6 +7,19 @@ export async function logError(payload: {
   stack?: string | null;
   severity: "error" | "warning" | "unhandled_rejection";
 }) {
+  // Fora de produção (localhost, previews) — nunca escrever no error_logs
+  // partilhado. Antes disto, qualquer erro de JS durante desenvolvimento
+  // (ex.: um HMR a meio de uma edição) ficava gravado ali para sempre,
+  // inundando o painel de admin com ruído e escondendo erros reais de
+  // clientes por trás de centenas de entradas de "localhost" (achado real
+  // 2026-09-09, ao investigar um lead em falta no Error Log). Mesmo padrão
+  // já usado em quizTracking.ts (IS_PRODUCTION).
+  const { IS_PRODUCTION } = await import("@/lib/quizTracking");
+  if (!IS_PRODUCTION) {
+    // eslint-disable-next-line no-console
+    console.warn('[errorTracking] Fora de produção — erro NÃO gravado no error_logs (simulado):', payload.message);
+    return;
+  }
   try {
     const { supabase } = await import("@/integrations/supabase/client");
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
