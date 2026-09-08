@@ -106,17 +106,18 @@ export default function PriceWidget({ serviceSlug, initialLocation }: Props) {
                 )}
               >
                 <div className="flex items-center gap-3">
+                  {/* Campo grande de propósito, igual ao dos tapetes (pedido
+                      explícito 2026-09-09) — sem spinners nativos. */}
                   <input
-                    type="number" min={0} max={50}
+                    type="number" min={0} max={50} inputMode="decimal"
                     value={qty || ''} placeholder="0"
                     onChange={e => w.setAlcatifaQty(i, parseFloat(e.target.value) || 0)}
-                    className="w-16 text-center font-playfair text-base font-bold outline-none transition-colors bg-transparent"
-                    style={{ borderBottom: `2px solid ${active ? "#D4AF37" : "rgba(255,255,255,0.20)"}`, color: active ? "#D4AF37" : "#ffffff" }}
+                    className="w-24 text-center text-lg font-semibold outline-none rounded-sm border border-white/20 bg-white/[0.05] text-white placeholder:text-white/25 px-2 py-2.5 focus:border-gold [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                   />
-                  <span className="text-xs font-medium text-white/40">m²</span>
+                  <span className="text-sm font-medium text-white/40">m²</span>
                   <span className="flex-1" />
                   {dynamicPrice !== null && (
-                    <span className={cn("font-playfair text-base font-bold tabular-nums", active ? "text-gold" : "text-white")}>{dynamicPrice}</span>
+                    <span className={cn("font-playfair text-lg font-bold tabular-nums", active ? "text-gold" : "text-white")}>{dynamicPrice}</span>
                   )}
                 </div>
                 <CarpetTierLegend isAlcatifa={isAlcatifaService} qty={qty} />
