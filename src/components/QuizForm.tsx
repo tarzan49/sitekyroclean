@@ -23,12 +23,14 @@ import QuizChairsAddonUpsell from './quiz/steps/QuizChairsAddonUpsell';
 import QuizSofaAddonUpsell from './quiz/steps/QuizSofaAddonUpsell';
 import QuizMattressAddonUpsell from './quiz/steps/QuizMattressAddonUpsell';
 import QuizStepContact from './quiz/steps/QuizStepContact';
-import { calcChairWaterproof, calcChairWaterproofPremium, calcChairClean, carpetHasValidItems, carpetItemArea } from './quiz/quizHelpers';
+import { calcChairWaterproof, calcChairWaterproofPremium, calcChairClean, carpetItemArea } from './quiz/quizHelpers';
 import { WHATSAPP_BASE, BUSINESS_EMAIL } from '@/constants/business';
 import { QUIZ_STATE_CHANGE_EVENT } from '@/constants/quiz';
 import { useQuizPricing } from '@/hooks/use-quiz-pricing';
 import { useQuizUiEffects } from '@/hooks/use-quiz-ui-effects';
 import { useQuizSubmission } from '@/hooks/use-quiz-submission';
+import { useQuizNavigation } from '@/hooks/use-quiz-navigation';
+import type { UpsellScreen } from '@/hooks/use-quiz-navigation';
 import type { SocialProofCategory } from '@/hooks/use-quiz-ui-effects';
 
 const SOCIAL_PROOF_ICON: Record<SocialProofCategory, typeof MessageCircle> = {
@@ -63,7 +65,13 @@ interface QuizFormProps {
 }
 
 function calcInitialStep(loc?: string, svc?: string, hasItem?: boolean, skipUpsell?: boolean, hasSvcType?: boolean): number {
-  if (skipUpsell && loc) return 4;
+  // Step 3, nunca 4: os ecrãs de upsell dedicados por serviço (chairs/sofa/
+  // mattress) só renderizam quando currentStep === 3 (ver JSX mais abaixo) —
+  // o combo não tem essa restrição, mas também funciona bem em 3 (a barra de
+  // progresso fica a 75% em vez de 100%, condizente com "ainda falta o
+  // contacto"). Antes ficava preso sempre no combo, saltando o upsell
+  // dedicado por serviço (pedido explícito 2026-09-08).
+  if (skipUpsell && loc) return 3;
   if (!loc) return 0;
   if (!svc) return 1;
   if (hasItem) return 3;
@@ -72,6 +80,19 @@ function calcInitialStep(loc?: string, svc?: string, hasItem?: boolean, skipUpse
   // Higienização vs Impermeabilização/Anti Ácaros, ver shouldSkipServiceType).
   const skipType = svc === 'carpet' || svc === 'mattress' || hasSvcType;
   return skipType ? 3 : 2;
+}
+
+// Ecrã de upsell inicial ao entrar já "a saltar" para a fase de upsell
+// (skipToUpsell, usado pelo widget de preços): mostra primeiro o ecrã
+// dedicado do serviço escolhido (mesma regra usada em handleNext para o
+// fluxo passo-a-passo normal), e só cai no combo quando esse serviço não tem
+// upsell dedicado (tapete) ou o tipo não qualifica (ex. colchão em
+// impermeabilização, que não tem "Higienização" como addon).
+function calcInitialUpsellScreen(svc?: string, svcType?: string): UpsellScreen {
+  if (svc === 'chairs' && (svcType === 'cleaning' || svcType === 'waterproofing')) return 'chairs';
+  if (svc === 'sofa' && (svcType === 'cleaning' || svcType === 'waterproofing')) return 'sofa';
+  if (svc === 'mattress' && svcType === 'cleaning') return 'mattress';
+  return 'combo';
 }
 
 const QuizForm = ({
@@ -129,13 +150,12 @@ const QuizForm = ({
       ? initialCarpetItems.map((it, i) => ({ ...it, id: it.id || `tapete-${i + 1}` }))
       : [{ id: 'tapete-1', largura: '', comprimento: '' }];
 
-  const [currentStep, setCurrentStep] = useState(() => calcInitialStep(initialLocation, initialService, hasInitialItem, skipToUpsell, !!initialServiceType));
+  const currentStepInitial = calcInitialStep(initialLocation, initialService, hasInitialItem, skipToUpsell, !!initialServiceType);
   const [locationQuery, setLocationQuery] = useState('');
   const [hypoallergenic, setHypoallergenic] = useState<boolean | null>(null);
   const [showExitIntent, setShowExitIntent] = useState(false);
   const [exitIntentFired, setExitIntentFired] = useState(false);
   const startsAtUpsell = Boolean(skipToUpsell && initialLocation);
-  const [showUpsell, setShowUpsell] = useState(startsAtUpsell);
   // Upsell "estilo companhia aérea" (2026-09-06, uniformizado 2026-09-08): para
   // cadeiras/sofá/colchão + limpeza, a decisão de proteção/Anti Ácaros sai da
   // etapa de quantidades e passa para um ecrã dedicado logo a seguir ao
@@ -143,9 +163,17 @@ const QuizForm = ({
   // Mostra-se sempre que se avança de step3 (sem flag "só uma vez por sessão":
   // voltar às quantidades e avançar de novo tem de mostrar este ecrã outra
   // vez, nunca saltar direto para o Pack Família — bug real reportado).
-  const [showChairsAddonUpsell, setShowChairsAddonUpsell] = useState(false);
-  const [showSofaAddonUpsell, setShowSofaAddonUpsell] = useState(false);
-  const [showMattressAddonUpsell, setShowMattressAddonUpsell] = useState(false);
+  //
+  // Estas 4 telas de upsell são sempre mutuamente exclusivas (nunca duas ao
+  // mesmo tempo) — antes eram 4 booleans independentes (showUpsell,
+  // showChairsAddonUpsell, showSofaAddonUpsell, showMattressAddonUpsell) que
+  // tinham de ser mantidos sincronizados à mão em cada sítio que os lia ou
+  // escrevia; já causou bugs reais nesta sessão (flags a ficarem presas a
+  // true, ecrãs a aparecerem ao mesmo tempo). Union type em vez disso — por
+  // construção, só pode haver um ativo, não há "dois flags em desacordo"
+  // possível (audit de código 2026-09-08, thinning do QuizForm.tsx). Tipo
+  // partilhado com useQuizNavigation, que também lê/escreve este estado.
+  const [activeUpsellScreen, setActiveUpsellScreen] = useState<UpsellScreen>(startsAtUpsell ? calcInitialUpsellScreen(initialService, initialServiceType) : null);
   const [upsellShown, setUpsellShown] = useState(startsAtUpsell);
   const [upsellItems, setUpsellItems] = useState<UpsellItemConfig[]>(initialUpsellItems ?? []);
   const [sofaItems, setSofaItems] = useState<SofaItem[]>(buildInitialSofaItems);
@@ -216,6 +244,40 @@ const QuizForm = ({
     packDiscountedPrice,
   } = useQuizPricing(formData, sofaItems, mattressItems, upsellItems, carpetItems);
 
+  const updateFormData = useCallback((updates: Partial<QuizFormData>) => {
+    setFormData(prev => ({ ...prev, ...updates }));
+  }, []);
+
+  // useQuizNavigation precisa de vir ANTES de useQuizUiEffects/useQuizAnalytics
+  // e dos efeitos abaixo que leem currentStep — caso contrário currentStep
+  // seria lido antes de ser declarado (TDZ: "Cannot access before
+  // initialization" ao renderizar), já que era este próprio hook que o
+  // definia mais abaixo no ficheiro antes desta correção.
+  const firstStep = calcInitialStep(initialLocation, initialService, hasInitialItem);
+
+  const {
+    currentStep,
+    setCurrentStep,
+    canProceed,
+    proceedPastConfig,
+    handleNext,
+    handlePrev,
+  } = useQuizNavigation({
+    formData,
+    updateFormData,
+    sofaItems,
+    mattressItems,
+    carpetItems,
+    totalPrice,
+    initialStep: currentStepInitial,
+    firstStep,
+    totalSteps,
+    activeUpsellScreen,
+    setActiveUpsellScreen,
+    upsellShown,
+    setUpsellShown,
+    setLocationQuery,
+  });
 
   const {
     countdown,
@@ -231,7 +293,7 @@ const QuizForm = ({
     isOpen,
     scrollContainerRef,
     currentStep,
-    showUpsell,
+    showUpsell: activeUpsellScreen === 'combo',
     totalPrice,
     packDiscountActive,
     hasUpsellSobItem,
@@ -270,16 +332,13 @@ const QuizForm = ({
       setMattressItems(buildInitialMattressItems());
       setCarpetItems(buildInitialCarpetItems());
       const atUpsell = Boolean(skipToUpsell && initialLocation);
-      setShowUpsell(atUpsell);
+      // Sem isto, reabrir o quiz depois de ter chegado a um destes upsells
+      // dedicados numa sessão anterior deixava a tela presa aberta — o passo
+      // inicial recalculado (ex: Localização) e o upsell antigo renderizavam
+      // ambos ao mesmo tempo (bug real reportado).
+      setActiveUpsellScreen(atUpsell ? calcInitialUpsellScreen(initialService, initialServiceType) : null);
       setUpsellShown(atUpsell);
       setUpsellItems(initialUpsellItems ?? []);
-      // Sem isto, reabrir o quiz depois de ter chegado a um destes upsells
-      // dedicados numa sessão anterior deixava as flags presas a true — o
-      // passo inicial recalculado (ex: Localização) e o upsell antigo
-      // renderizavam ambos ao mesmo tempo (bug real reportado).
-      setShowChairsAddonUpsell(false);
-      setShowSofaAddonUpsell(false);
-      setShowMattressAddonUpsell(false);
       setCurrentStep(calcInitialStep(initialLocation, initialService, hasInitialItem, skipToUpsell, !!initialServiceType));
     }
     prevIsOpenRef.current = isOpen;
@@ -288,8 +347,8 @@ const QuizForm = ({
   // skipToUpsell + no location: after user picks city at step 0, jump straight to upsell
   useEffect(() => {
     if (skipToUpsell && formData.location && currentStep === 0) {
-      setCurrentStep(4);
-      setShowUpsell(true);
+      setCurrentStep(3);
+      setActiveUpsellScreen(calcInitialUpsellScreen(initialService, initialServiceType));
       setUpsellShown(true);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -310,146 +369,6 @@ const QuizForm = ({
     window.addEventListener('beforeunload', handleBeforeUnload);
     return () => window.removeEventListener('beforeunload', handleBeforeUnload);
   }, [isOpen]);
-
-  const updateFormData = useCallback((updates: Partial<QuizFormData>) => {
-    setFormData(prev => ({ ...prev, ...updates }));
-  }, []);
-
-
-  const canProceedStep3 = () => {
-    switch (formData.service) {
-      case 'sofa': {
-        return sofaItems.some(i => i.qty > 0);
-      }
-      case 'carpet': {
-        return carpetHasValidItems(carpetItems);
-      }
-      case 'mattress':
-        return mattressItems.some(i => i.qty > 0);
-      case 'chairs': {
-        // Ecrã mostra "1" por omissão sem o utilizador tocar no stepper
-        // (Math.max(1, parseInt(...) || 1) em QuizStepConfig), mas o estado
-        // real fica em '' até ao primeiro clique em +/-. Sem isto, escolher
-        // a quantidade de 1 cadeira "de calha" e avançar ficava bloqueado
-        // (parseInt('') é NaN), mesmo o ecrã mostrando 1 corretamente.
-        if (formData.chairQuantity === '') return true;
-        const n = parseInt(formData.chairQuantity);
-        return !isNaN(n) && n >= 1;
-      }
-      default:
-        return false;
-    }
-  };
-
-  const firstStep = calcInitialStep(initialLocation, initialService, hasInitialItem);
-
-  // Step order: [0-Location?], 1-Service, 2-ServiceType, 3-Config, [Upsell], 4-Contact (submit)
-  const canProceed = () => {
-    switch (currentStep) {
-      case 0: return formData.location !== '' && formData.location !== 'other';
-      case 1: return formData.service !== '';
-      case 2: return formData.serviceType !== '';
-      case 3: return canProceedStep3();
-      case 4: return formData.name.trim() !== '' && formData.phone.trim() !== '';
-      default: return false;
-    }
-  };
-
-  // Sofá, colchão e cadeiras têm todos o seu próprio Passo 2 (Higienização vs
-  // Impermeabilização/Anti Ácaros) — só o tapete não tem esse conceito (sempre
-  // sob orçamento), por isso é o único que salta a etapa. Antes incluía também
-  // colchão e cadeiras aqui, o que desalinhava com o clique direto no Passo 1
-  // (que já não os saltava) e causava o "Voltar" a saltar o Passo 2 por engano.
-  // Colchão voltou a saltar este passo (2026-09-08): Anti Ácaros não existe
-  // como serviço primário próprio, só como upsell dependente de uma limpeza
-  // (tal como a impermeabilização do sofá nunca é pedida sozinha sem limpeza
-  // — mas ao contrário desse caso, o colchão não tem um "modo impermeabilização"
-  // real por trás, por isso nem faz sentido perguntar aqui).
-  const shouldSkipServiceType = formData.service === 'carpet' || formData.service === 'mattress';
-
-  // Extraído do handleNext original: o que acontece depois da etapa de
-  // quantidades (step 3), partilhado entre o fluxo normal e o "Continuar"
-  // do upsell das cadeiras, que intercepta antes.
-  const proceedPastConfig = () => {
-    setUpsellShown(true);
-    setShowUpsell(true);
-  };
-
-  const handleNext = () => {
-    if (canProceed()) {
-      // Commita o valor implícito de 1 cadeira ao avançar (canProceedStep3
-      // já aceita '' como válido para não bloquear "Continuar" com o ecrã a
-      // mostrar 1) — sem isto o preço, o resumo do pedido e o payload do
-      // Formspree ficavam todos a tratar '' como "sem cadeiras" (0€, linha
-      // de cadeiras omitida da mensagem), mesmo o cliente tendo avançado
-      // com 1 cadeira visível no ecrã.
-      if (formData.service === 'chairs' && formData.chairQuantity === '') {
-        updateFormData({ chairQuantity: '1', chairType: 'bulk_full' });
-      }
-      const loc = formData.location === 'other' ? formData.otherLocation : formData.location;
-      trackQuizEvent({
-        step: currentStep,
-        action: 'complete',
-        service: formData.service ?? undefined,
-        city: loc ?? undefined,
-        value: totalPrice > 0 ? totalPrice : undefined,
-        service_type: formData.serviceType ?? undefined,
-      });
-
-      let nextStep = currentStep + 1;
-      if (nextStep === 2 && shouldSkipServiceType) {
-        updateFormData({ serviceType: 'cleaning' });
-        nextStep = 3;
-      }
-      // Upsell "estilo companhia aérea" dedicado por serviço, sempre a seguir
-      // às quantidades (só quando a limpeza é o serviço principal) — a pessoa
-      // pensa só em quantidade no step 3, decide a proteção/Anti Ácaros aqui.
-      if (currentStep === 3 && formData.service === 'chairs' && (formData.serviceType === 'cleaning' || formData.serviceType === 'waterproofing')) {
-        setShowChairsAddonUpsell(true);
-        return;
-      }
-      if (currentStep === 3 && formData.service === 'sofa' && (formData.serviceType === 'cleaning' || formData.serviceType === 'waterproofing')) {
-        setShowSofaAddonUpsell(true);
-        return;
-      }
-      if (currentStep === 3 && formData.service === 'mattress' && formData.serviceType === 'cleaning') {
-        setShowMattressAddonUpsell(true);
-        return;
-      }
-      // Upsell intercept: always show Pack Família when going forward from step 3
-      // (re-shows if user clicked Voltar from Pack back to quantities).
-      if (currentStep === 3) {
-        proceedPastConfig();
-        return;
-      }
-      if (nextStep <= totalSteps) {
-        (document.activeElement as HTMLElement)?.blur();
-        setCurrentStep(nextStep);
-      }
-    }
-  };
-
-  const handlePrev = () => {
-    // If on step 4 (contact) and upsell was shown, go back to upsell item selector
-    if (currentStep === 4 && upsellShown) {
-      setShowUpsell(true);
-      return;
-    }
-    let prevStep = currentStep - 1;
-    // Details (step 3): skip ServiceType only for services that don't use it
-    if (currentStep === 3 && shouldSkipServiceType) prevStep = 1;
-    // Sofa/mattress go 3→2 naturally; still skip step 2 on explicit backward from step 2
-    else if (prevStep === 2 && shouldSkipServiceType) prevStep = 1;
-
-    if (prevStep >= firstStep) {
-      // Going back to location step: clear selection so city cards render again
-      if (prevStep === 0) {
-        updateFormData({ location: '' });
-        setLocationQuery('');
-      }
-      setCurrentStep(prevStep);
-    }
-  };
 
   const getServiceLabel = () => {
     const labels: Record<string, string> = {
@@ -728,7 +647,7 @@ ${formData.description || 'Sem observações adicionais'}
     setHypoallergenic(null);
     setShowExitIntent(false);
     setExitIntentFired(false);
-    setShowUpsell(false);
+    setActiveUpsellScreen(null);
     setUpsellShown(false);
     setUpsellItems([]);
     setSofaItems(buildInitialSofaItems());
@@ -844,7 +763,7 @@ ${formData.description || 'Sem observações adicionais'}
              , hidden: step 2 (treatment selector, sem qtds)
              , visível: step 3 (quantidades) e step 4 (contacto) quando totalPrice > 0
              , também visível em step 1 quando há custo de deslocação */}
-          {(totalPrice > 0 || hasSobOrcamento) && (showUpsell || finalTravelCost > 0 || (currentStep !== 1 && currentStep !== 2)) && (
+          {(totalPrice > 0 || hasSobOrcamento) && (activeUpsellScreen === 'combo' || finalTravelCost > 0 || (currentStep !== 1 && currentStep !== 2)) && (
             <div className="sticky top-0 z-20 text-white flex flex-col border-b border-white/[0.16] -mx-5 sm:-mx-6 animate-fade-in" style={{ background: "#071a12" }}>
             <div className="flex items-center justify-between py-3 px-5 sm:px-6">
               <span className="text-xs text-white/40 font-medium">
@@ -908,8 +827,8 @@ ${formData.description || 'Sem observações adicionais'}
                 onCitySelect={(city) => {
                   updateFormData({ location: city });
                   if (skipToUpsell) {
-                    setCurrentStep(4);
-                    setShowUpsell(true);
+                    setCurrentStep(3);
+                    setActiveUpsellScreen(calcInitialUpsellScreen(initialService, initialServiceType));
                     setUpsellShown(true);
                   } else {
                     setCurrentStep(calcInitialStep(city, initialService, hasInitialItem, false, !!initialServiceType));
@@ -985,7 +904,7 @@ ${formData.description || 'Sem observações adicionais'}
             })()}
 
             {/* Step 3 - Config (hidden enquanto o Pack Família ou um upsell dedicado por serviço está ativo) */}
-            {currentStep === 3 && !showUpsell && !showChairsAddonUpsell && !showSofaAddonUpsell && !showMattressAddonUpsell && (
+            {currentStep === 3 && activeUpsellScreen === null && (
               <div className="flex-1 flex flex-col w-full items-center text-center overflow-y-auto">
                 <QuizStepConfig
                   formData={formData}
@@ -1002,22 +921,21 @@ ${formData.description || 'Sem observações adicionais'}
 
             {/* Upsells "estilo companhia aérea", um por serviço: logo a seguir
                 ao "Continuar" da etapa de quantidades. */}
-            {currentStep === 3 && showChairsAddonUpsell && (
+            {currentStep === 3 && activeUpsellScreen === 'chairs' && (
               <div className="flex-1 flex flex-col w-full items-center text-center overflow-y-auto">
                 <QuizChairsAddonUpsell
                   formData={formData}
                   updateFormData={updateFormData}
                   onContinue={() => {
                     (document.activeElement as HTMLElement)?.blur();
-                    setShowChairsAddonUpsell(false);
                     proceedPastConfig();
                   }}
-                  onBack={() => { (document.activeElement as HTMLElement)?.blur(); setShowChairsAddonUpsell(false); }}
+                  onBack={() => { (document.activeElement as HTMLElement)?.blur(); setActiveUpsellScreen(null); }}
                 />
               </div>
             )}
 
-            {currentStep === 3 && showSofaAddonUpsell && (
+            {currentStep === 3 && activeUpsellScreen === 'sofa' && (
               <div className="flex-1 flex flex-col w-full items-center text-center overflow-y-auto">
                 <QuizSofaAddonUpsell
                   formData={formData}
@@ -1026,15 +944,14 @@ ${formData.description || 'Sem observações adicionais'}
                   setSofaItems={setSofaItems}
                   onContinue={() => {
                     (document.activeElement as HTMLElement)?.blur();
-                    setShowSofaAddonUpsell(false);
                     proceedPastConfig();
                   }}
-                  onBack={() => { (document.activeElement as HTMLElement)?.blur(); setShowSofaAddonUpsell(false); }}
+                  onBack={() => { (document.activeElement as HTMLElement)?.blur(); setActiveUpsellScreen(null); }}
                 />
               </div>
             )}
 
-            {currentStep === 3 && showMattressAddonUpsell && (
+            {currentStep === 3 && activeUpsellScreen === 'mattress' && (
               <div className="flex-1 flex flex-col w-full items-center text-center overflow-y-auto">
                 <QuizMattressAddonUpsell
                   formData={formData}
@@ -1043,10 +960,9 @@ ${formData.description || 'Sem observações adicionais'}
                   setMattressItems={setMattressItems}
                   onContinue={() => {
                     (document.activeElement as HTMLElement)?.blur();
-                    setShowMattressAddonUpsell(false);
                     proceedPastConfig();
                   }}
-                  onBack={() => { (document.activeElement as HTMLElement)?.blur(); setShowMattressAddonUpsell(false); }}
+                  onBack={() => { (document.activeElement as HTMLElement)?.blur(); setActiveUpsellScreen(null); }}
                 />
               </div>
             )}
@@ -1055,29 +971,33 @@ ${formData.description || 'Sem observações adicionais'}
                 categorias (Colchão, Sofá, Cadeiras), substitui o antigo fluxo
                 QuizUpsellOverlay de escolher um item de cada vez (pedido
                 explícito, aprovado em mockup 2026-09-06). */}
-            {showUpsell && (
+            {activeUpsellScreen === 'combo' && (
               <QuizComboUpsellScreen
                 upsellItems={upsellItems}
                 setUpsellItems={setUpsellItems}
                 totalPrice={totalPrice}
                 packDiscountActive={packDiscountActive}
                 packDiscountedPrice={packDiscountedPrice}
-                onContinue={() => { (document.activeElement as HTMLElement)?.blur(); setShowUpsell(false); setCurrentStep(4); }}
+                onContinue={() => { (document.activeElement as HTMLElement)?.blur(); setActiveUpsellScreen(null); setCurrentStep(4); }}
                 onBack={() => {
                   (document.activeElement as HTMLElement)?.blur();
-                  setShowUpsell(false);
                   setUpsellItems([]);
                   setCurrentStep(3);
                   // Volta ao ecrã de upsell dedicado do serviço (não direto às
                   // quantidades) quando esse serviço tem um — mesma condição
                   // usada para mostrá-lo a avançar (bug real: "Voltar" saltava
-                  // sempre para as quantidades, ignorando esse passo).
+                  // sempre para as quantidades, ignorando esse passo). Tem de
+                  // ser explícito no "senão nenhum" (null) — ao contrário dos
+                  // 4 booleans de antes, este estado não fica automaticamente
+                  // "desligado" só por não ser mexido aqui.
                   if (formData.service === 'chairs' && (formData.serviceType === 'cleaning' || formData.serviceType === 'waterproofing')) {
-                    setShowChairsAddonUpsell(true);
+                    setActiveUpsellScreen('chairs');
                   } else if (formData.service === 'sofa' && (formData.serviceType === 'cleaning' || formData.serviceType === 'waterproofing')) {
-                    setShowSofaAddonUpsell(true);
+                    setActiveUpsellScreen('sofa');
                   } else if (formData.service === 'mattress' && formData.serviceType === 'cleaning') {
-                    setShowMattressAddonUpsell(true);
+                    setActiveUpsellScreen('mattress');
+                  } else {
+                    setActiveUpsellScreen(null);
                   }
                 }}
               />
@@ -1085,7 +1005,7 @@ ${formData.description || 'Sem observações adicionais'}
 
 
             {/* Step 4 - Contact */}
-            {currentStep === 4 && !showUpsell && (
+            {currentStep === 4 && activeUpsellScreen !== 'combo' && (
               <QuizStepContact
                 formData={formData}
                 updateFormData={updateFormData}
@@ -1098,7 +1018,7 @@ ${formData.description || 'Sem observações adicionais'}
     </div>
 
     {/* Footer — hidden on step 0 (auto-advances on city selection) */}
-    {currentStep <= totalSteps && !showUpsell && !showChairsAddonUpsell && !showSofaAddonUpsell && !showMattressAddonUpsell && currentStep > 0 && (
+    {currentStep <= totalSteps && activeUpsellScreen === null && currentStep > 0 && (
       <div className="px-4 sm:px-5 pt-3 flex flex-col gap-2 flex-shrink-0 border-t border-white/[0.05] items-center" style={{ paddingBottom: 'max(1rem, env(safe-area-inset-bottom))' }}>
         {currentStep === totalSteps ? (
           <div className="flex flex-col gap-2 w-full">

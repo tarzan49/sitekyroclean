@@ -3,6 +3,8 @@ import { MessageCircle, Download, RefreshCw, LogOut, TrendingUp, Users, Filter, 
 import { useNavigate } from 'react-router-dom';
 import { supabase, type Lead, type LeadStatus } from '@/lib/supabase';
 import { cities as ALL_CITIES } from '@/data/locationSeoData';
+import { useAdminSession } from '@/hooks/use-admin-session';
+import { supabase as authClient } from '@/integrations/supabase/client';
 
 // Deriva a região macro (Porto/Lisboa/Algarve/Braga) a partir do texto livre
 // de `location` dos leads do quiz — pedido do dono para não ter de preencher
@@ -19,9 +21,6 @@ function guessRegionFromLocation(location: string | null): string {
   if (match.area === 'algarve') return 'Algarve';
   return 'Porto';
 }
-
-// ── Password gate ─────────────────────────────────────────────────────────────
-const ADMIN_PASSWORD = (import.meta.env.VITE_ADMIN_PASSWORD as string) || 'kyro2025';
 
 // ── Status config — covers both quiz CRM statuses and legacy CSV Funil values ─
 const STATUS_MAP: Record<string, { label: string; color: string; dot: string }> = {
@@ -234,10 +233,11 @@ const StatCard = ({ icon: Icon, label, value, sub, color }: {
 const AdminDashboard = ({ embedded = false }: { embedded?: boolean }) => {
   const navigate = useNavigate();
 
-  // Auth
-  const [authed, setAuthed] = useState(() => sessionStorage.getItem('kyro_admin') === '1');
-  const [pwInput, setPwInput] = useState('');
-  const [pwError, setPwError] = useState(false);
+  // Auth — sessão real do Supabase Auth (2026-09-08), substitui o antigo
+  // gate de password em texto simples no bundle (achado CRITICAL no audit
+  // de código). Este componente só é montado dentro de AdminPanel.tsx, que
+  // já faz o mesmo check; repete-se aqui como defesa em profundidade.
+  const { isAuthed: authed } = useAdminSession();
 
   // Data
   const [leads, setLeads] = useState<Lead[]>([]);
@@ -318,20 +318,7 @@ const AdminDashboard = ({ embedded = false }: { embedded?: boolean }) => {
     return () => { supabase.removeChannel(channel); };
   }, [authed]);
 
-  const handleLogin = () => {
-    if (pwInput === ADMIN_PASSWORD) {
-      sessionStorage.setItem('kyro_admin', '1');
-      setAuthed(true);
-    } else {
-      setPwError(true);
-      setTimeout(() => setPwError(false), 2000);
-    }
-  };
-
-  const handleLogout = () => {
-    sessionStorage.removeItem('kyro_admin');
-    setAuthed(false);
-  };
+  const handleLogout = () => { authClient.auth.signOut(); };
 
   const getEdit = (lead: Lead) => edits[lead.id] ?? {
     notes: lead.notes ?? '',
@@ -528,35 +515,15 @@ const AdminDashboard = ({ embedded = false }: { embedded?: boolean }) => {
   });
 
   // ── Login screen ──────────────────────────────────────────────────────────
+  // Nunca deve ser alcançado em uso normal — este componente só é montado
+  // dentro de AdminPanel.tsx, que já exige sessão antes de o renderizar.
+  // Fica só como rede de segurança caso seja montado de outra forma no futuro.
   if (!authed) {
     return (
       <div className="min-h-screen bg-[#0D0D1A] flex items-center justify-center px-4">
-        <div className="w-full max-w-sm">
-          <div className="text-center mb-8">
-            <div className="w-16 h-16 rounded-2xl bg-gold/10 border border-gold/30 flex items-center justify-center mx-auto mb-4">
-              <Lock className="w-7 h-7 text-gold" />
-            </div>
-            <h1 className="font-playfair text-2xl font-bold text-white">Kyro Admin</h1>
-            <p className="text-white/40 text-sm mt-1">Acesso restrito à equipa Kyro</p>
-          </div>
-          <div className="bg-white/[0.04] border border-white/[0.08] rounded-2xl p-6">
-            <label className="block text-xs font-bold text-white/50 uppercase tracking-wider mb-2">Password</label>
-            <input
-              type="password"
-              value={pwInput}
-              onChange={e => setPwInput(e.target.value)}
-              onKeyDown={e => e.key === 'Enter' && handleLogin()}
-              placeholder="••••••••••••"
-              className={`w-full h-12 px-4 text-sm bg-white/[0.06] border rounded-xl text-white placeholder:text-white/20 focus:outline-none focus:border-gold transition-colors ${pwError ? 'border-red-500' : 'border-white/15'}`}
-            />
-            {pwError && <p className="text-red-400 text-xs mt-1.5">Password incorrecta</p>}
-            <button
-              onClick={handleLogin}
-              className="w-full h-12 mt-4 bg-gradient-to-r from-gold to-[#d4c57b] text-[#12121e] font-bold rounded-xl hover:opacity-90 transition-opacity"
-            >
-              Entrar
-            </button>
-          </div>
+        <div className="flex items-center gap-3 text-white/50">
+          <Lock className="w-5 h-5" />
+          <p className="text-sm">Sessão terminada. Volta a entrar em /admin/panel.</p>
         </div>
       </div>
     );

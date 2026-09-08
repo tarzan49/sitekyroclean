@@ -4,6 +4,7 @@ import { calcChairClean, calcChairWaterproof, calcChairWaterproofPremium, carpet
 import { WHATSAPP_BASE } from '@/constants/business';
 import { safeSessionSet } from '@/lib/safeStorage';
 import { logError } from '@/lib/errorTracking';
+import { IS_PRODUCTION } from '@/lib/quizTracking';
 
 /** All the data the submission pipeline needs. Assembled by useQuizSubmission. */
 export interface QuizLeadPayload {
@@ -295,6 +296,16 @@ export async function submitQuizLead(payload: QuizLeadPayload): Promise<void> {
     persistObrigadoData(payload, bookingId, waUrl);
   } catch (persistErr) {
     console.warn('[submissionService] persistObrigadoData failed:', persistErr);
+  }
+
+  // Fora de cleansolutions.com.pt (localhost, previews, etc.) — nunca cria um
+  // lead a sério nem manda um email a sério para o dono. A página /obrigado
+  // continua a funcionar normalmente (usa só o que persistObrigadoData já
+  // guardou acima), só os dois efeitos externos reais é que ficam de fora.
+  if (!IS_PRODUCTION) {
+    // eslint-disable-next-line no-console
+    console.warn(`[submissionService] Fora de produção — pedido #${bookingId} NÃO enviado ao CRM nem ao Formspree (simulado).`);
+    return;
   }
 
   // Await both channels: if EITHER one lands, the lead reached the business

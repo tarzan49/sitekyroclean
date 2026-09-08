@@ -1,4 +1,107 @@
-# Auditoria Completa — Kyro Clean Solutions
+# Auditoria — 2026-09-08 (código: dead code, segurança, type-safety, arquitetura)
+
+Auditoria realizada com 4 agentes paralelos, cada um numa frente diferente: dead code/duplicação, segurança, type-safety/correção, arquitetura/performance. Apenas leitura — nenhum ficheiro foi alterado durante a investigação. Esta auditoria é **diferente** da de 2026-08-20 mais abaixo neste documento (aquela focou-se em layout/design/SEO/conteúdo); esta foca-se em qualidade e segurança do código em `src/`.
+
+Severidade: **CRITICAL** (bug real que afeta dinheiro, dados de clientes, ou segurança agora) · **WARNING** (problema real, não urgente) · **INFO** (vale a pena saber, baixa prioridade).
+
+---
+
+## 🔴 CRITICAL
+
+### 1. Tabelas `leads`, `quiz_events` e `error_logs` são legíveis e escrevíveis por qualquer pessoa, sem autenticação nenhuma
+`supabase/migrations/20240101_admin_tables.sql` — as políticas RLS dão ao papel `anon` `select using (true)`, `insert with check (true)`, `update using (true)` nas três tabelas. A chave anon é pública (vai no bundle JS de qualquer visitante, por design), por isso **qualquer visitante pode abrir a consola do browser e ler o nome, telefone, preço e notas de margem internas de todos os clientes** diretamente do endpoint REST do Supabase — ou sobrescrever campos de qualquer lead. Não é hipotético: foi assim que esta sessão encontrou os leads de teste falsos ("wd"/"jhiji") e as linhas importadas do WhatsApp, só com a chave anon pública.
+**Fix:** remover as políticas permissivas de `select`/`update`; restringir leitura/escrita a um papel de admin autenticado via Supabase Auth. Manter `insert` aberto só em `leads` (o quiz público precisa dele) — mas ver #5, devia ter proteção contra bots também.
+
+### 2. A password de admin está compilada em texto simples no bundle JS público
+`src/pages/AdminDashboard.tsx:24` e `src/pages/AdminPanel.tsx:11`:
+```ts
+const ADMIN_PASSWORD = (import.meta.env.VITE_ADMIN_PASSWORD as string) || 'kyro2025';
+```
+Qualquer variável de ambiente prefixada com `VITE_` é embutida no bundle do cliente pelo Vite. Confirmado presente em texto simples no `dist/assets/AdminDashboard-*.js` / `AdminPanel-*.js` já compilado. Quem vir o JS do site em produção tem a password real. **Trocar a password não resolve isto** — o próximo build volta a embutir a nova, igualmente visível.
+**Fix:** isto precisa de autenticação real do lado do servidor (sessão Supabase Auth + verificação de papel via RLS, ou uma regra Cloudflare Access à frente de `/admin`), não uma comparação de strings no cliente. É a mesma causa-raiz do #1 — resolver o Supabase Auth como deve ser trata dos dois.
+
+### 3. Password de fallback fixa `'kyro2025'` no código
+Mesmas duas linhas do #2. Se um build correr sem `VITE_ADMIN_PASSWORD` definida (este projeto já teve uma falha documentada de variável de ambiente no Cloudflare Pages, ver comentários em `src/integrations/supabase/client.ts`), o painel de admin cai silenciosamente para esta string fixa — que está agora no código-fonte.
+**Fix:** falhar fechado (bloquear o acesso admin) em vez de usar um fallback silencioso quando a variável não existe.
+
+### 4. Sofá "4+ Lugares" desaparecia silenciosamente ao ser adicionado no upsell final "Poupe 10%"
+`src/components/quiz/steps/QuizComboUpsellScreen.tsx` (cálculo de `sofaTotal` e o `useEffect` que constrói `upsellItems`) só incluíam um tamanho de sofá se `typeof opt.cleaningPrice === 'number'`. A opção `'4+-lugares'` tem `cleaningPrice: 'Sob orçamento'` (uma string) — mas a linha do stepper não tinha essa proteção, por isso o cliente conseguia tocar "+", via o cartão selecionado (borda dourada), e o item nunca era adicionado a `upsellItems`, nunca chegava ao CRM nem à mensagem de WhatsApp/Formspree. O cliente pensava ter pedido um sofá de 4+ lugares; o negócio nunca soube.
+**✅ Corrigido nesta sessão** — ver "Correções aplicadas" no fim.
+
+---
+
+## 🟡 WARNING
+
+### 5. Proteção contra bots existe no código mas nunca é usada
+`src/lib/recaptcha.ts` (um helper completo de reCAPTCHA v3, a corresponder à `VITE_RECAPTCHA_SITE_KEY` real e configurada) nunca é importado em lado nenhum de `src/`. O caminho real de submissão de leads (`src/services/submissionService.ts`) não tem captcha nem rate-limiting nenhum. Combinado com a política de insert aberta do #1, um script pode enviar leads falsos em massa diretamente para a API REST do Supabase, sem passar pelo site. Já existe um verificador de reCAPTCHA do lado do servidor em `supabase/functions/_shared/recaptcha.ts`, mas só está ligado às funções de newsletter, não ao quiz.
+**Fix:** ligar `getRecaptchaToken()` a `submissionService.submitQuizLead`, verificar o token do lado do servidor antes do insert.
+
+### 6. Widget de preços de marketing não aplica a mesma regra "sob orçamento qualifica sempre" que o quiz aplica
+`src/lib/priceWidgetCalc.ts` (`calcWidgetPricing`) calcula a elegibilidade do desconto de 10% só a partir de `articleTotal > PACK_DISCOUNT_MIN_TOTAL`, sem equivalente ao `|| hasUpsellSobItem` do quiz (`use-quiz-pricing.ts`), que trata qualquer item a 0€/sob orçamento como automaticamente qualificado. Na prática: um visitante numa página de preço que adiciona um tapete como extra no widget é informado que não desbloqueia o desconto, mas a mesma combinação no quiz real qualificaria. Mesmo padrão do #4 — uma correção de "null" feita numa superfície de preço e não na sua implementação paralela.
+**Fix:** adicionar o mesmo ramo "sob orçamento qualifica sempre" a `calcWidgetPricing`.
+
+### 7. Fórmula de preço em escalão das cadeiras duplicada uma terceira vez
+`src/lib/priceWidgetCalc.ts` define `calcChairBracket()` especificamente para centralizar o cálculo por escalão (já usado em dois sítios) — mas `buildWidgetQuizConfig` reimplementa a mesma aritmética inline em vez de chamar essa função. As duas cópias concordam hoje, mas é exatamente o padrão que já causou o bug de desincronização 60€/49€ do `PACK_DISCOUNT_MIN_UPSELL_ITEM`, corrigido mais cedo nesta sessão.
+**Fix:** substituir a cópia inline por uma chamada a `calcChairBracket`.
+
+### 8. Bug latente no caminho de fallback do `calcPackPricing`
+`src/components/quiz/quizHelpers.ts` — quando uma opção não tem `bothPrice` fixo, o fallback deriva-o como `cleaningPrice + delta`, sempre ancorado no preço de limpeza mesmo quando a impermeabilização é o serviço primário (onde a base real devia ser o preço de impermeabilização). Não é acionado atualmente — todas as entradas reais de sofá/colchão têm `bothPrice` explícito — mas é uma armadilha para o próximo tamanho novo adicionado sem um.
+**Fix:** ramificar o fallback da mesma forma que `basePrice` já ramifica, consoante `isWaterproofBase`.
+
+### 9. Tipos gerados do Supabase não incluem `leads`, `quiz_events` nem `error_logs`
+`src/integrations/supabase/types.ts` não tem nenhuma referência a estas três tabelas, apesar de serem os dados de negócio reais do site. Isto obriga a 8 casts `as any` espalhados por `quizTracking.ts`, `errorTracking.ts`, `QuizMetricsPanel.tsx` e `ErrorLogPanel.tsx` — ou seja, **o compilador não dá nenhuma segurança de tipos em nenhum insert/update a leads, analytics ou erros.** Um nome de coluna com erro de escrita ou um tipo de valor errado compila sem problemas e falha em silêncio ou corrompe dados em runtime — exatamente a classe de bug que produziu a confusão `chairAntiAcaros`/`chairWaterproofQty` desta sessão, noutra área. Existem também dois clientes Supabase independentes (`src/integrations/supabase/client.ts`, tipado, e `src/lib/supabase.ts`, sem tipos, com a sua própria interface `Lead` escrita à mão, usado só por `AdminDashboard.tsx`).
+**Fix:** regenerar `types.ts` a partir do schema real (`supabase gen types typescript`), remover os 8 casts `as any`, e retirar o segundo cliente sem tipos.
+
+### 10. `QuizForm.tsx` tem 1224 linhas e acumula demasiadas responsabilidades
+Lógica de navegação/passos, agregação de preços, 4 booleans independentes para visibilidade de ecrãs de upsell, submissão, e disparo de analytics — tudo no mesmo componente. Este ficheiro já foi o local de vários bugs reais nesta sessão precisamente porque estado sem relação tem de ser mantido sincronizado à mão (pelo menos 3 booleans "skip step" desincronizados foram encontrados e corrigidos hoje).
+**Fix:** extrair um hook `useQuizNavigation` para a lógica de passos/`canProceed`; substituir os 4 booleans independentes de visibilidade por uma única union `activeUpsellScreen: 'chairs' | 'sofa' | 'mattress' | null` — elimina uma classe inteira de bugs "duas flags em desacordo" por construção.
+
+### 11. `QuizStepConfig.tsx` mistura quatro UIs de serviço não relacionadas num único componente de 417 linhas
+Sofá/colchão/tapete/cadeiras têm cada um o seu bloco `if (formData.service === X) return (...)` inline, com a matemática de preços embutida diretamente no JSX. Editar cadeiras arrisca um erro de copy-paste para o bloco quase idêntico do sofá — este padrão já causou pelo menos um bug real nesta sessão (preço de cadeiras a referenciar o campo errado do formulário).
+**Fix:** separar num ficheiro por serviço (`QuizStepConfigSofa.tsx`, etc.), despachados por um componente pai fino.
+
+### 12. Toda a tabela de ~9000 rotas vai para o browser de todos os visitantes, sempre
+`src/App.tsx` chama todos os ~9 geradores de listas de rotas (freguesia, keyword-variant, material, preço, pack-combo, marca×3, comercial — ~9000 rotas no total) no topo do módulo, e mapeia-as todas em elementos `<Route>` no render principal. Como cada visitante aterra exatamente numa página HTML pré-renderizada vinda da pesquisa, não há razão de produto para hidratar um router client-side com 9000 padrões de rota em cada pageview. Custo real: o chunk de entrada eager tem 369KB pré-gzip.
+**Fix:** estrutural, não é um patch rápido — para um site pré-renderizado como este, navegação normal `<a href>` entre páginas HTML estáticas já completas funcionaria bem para páginas de conteúdo; reservar o router SPA só para o modal do quiz e `/admin`.
+
+### 13. Sem proteção contra caminhos de rota duplicados em `scripts/prerender.ts`, apesar de geradores comprovadamente sobrepostos
+`src/App.tsx` tem um comentário a notar que as rotas de keyword-variant são registadas *antes* das de problema×cidade especificamente "para ganhar em caminhos sobrepostos" — ou seja, dois geradores diferentes podem produzir o mesmo URL, e a precedência do router depende da ordem. O `prerender.ts` escreve um ficheiro HTML estático por rota sem nenhuma verificação de duplicados/colisão. Se a ordem de iteração do script de prerender alguma vez divergir da ordem de registo de rotas do `App.tsx` para um caminho que colide, o Google indexa conteúdo diferente do que a hidratação mostra para esse URL.
+**Fix:** adicionar uma verificação em build-time que recolhe todos os caminhos gerados num map e falha em qualquer colisão não resolvida por uma ordem de precedência explícita e orientada a dados.
+
+### 14. Três implementações separadas e feitas à mão do seletor Premium/Essencial
+O componente partilhado e exportado `WaterproofingTierPicker` (`QuizStepConfig.tsx`) é corretamente reutilizado por `QuizSofaAddonUpsell.tsx` — mas `QuizChairsAddonUpsell.tsx` tem a sua própria reimplementação de ~45 linhas em vez disso. É exatamente o tipo de desvio que já causou um bug real de preços nesta sessão (o delta Premium/Essencial invertido em `QuizComboUpsellScreen.tsx`, corrigido mais cedo hoje).
+**Fix:** fazer o `QuizChairsAddonUpsell` importar e usar o componente partilhado, como a versão do sofá já faz.
+
+---
+
+## 🟢 INFO
+
+15. **Comentário desatualizado a citar os limiares antigos**: `use-quiz-pricing.ts` ainda tem um bloco de comentário a dizer "> 160€ (100€ de base + 60€ do artigo extra...)" a poucas linhas de outro comentário no mesmo bloco que já diz corretamente 49€ — contraditório, vai confundir o próximo a ler o ficheiro. **✅ Corrigido nesta sessão.**
+16. `src/components/Contact.tsx` (356 linhas) e `src/services/contactService.ts` estão órfãos — nunca importados em lado nenhum. `quoteFormSchema` em `src/lib/validation.ts` só é usado por este componente morto, por isso também está morto por consequência.
+17. `src/lib/performance.ts` (`measureWebVitals`) não tem nenhum ponto de chamada — Web Vitals não estão de facto a ser medidos apesar do código existir para isso.
+18. O markup dos botões +/− do stepper está copy-pasted ~10 vezes entre `QuizStepConfig.tsx` e `QuizComboUpsellScreen.tsx` (mais uma variante mais pequena nos dois ecrãs de addon-upsell). Vale a pena extrair para um `<QtyStepper>` partilhado.
+19. `MarcaSofaPage.tsx` / `MarcaColchaoPage.tsx` / `MarcaCadeirasPage.tsx` (~1060 linhas combinadas) são ~60%+ estruturalmente idênticas depois de normalizar o substantivo do produto — candidato a extração de template, prioridade mais baixa já que páginas SEO por vezes beneficiam de variação intencional de texto por página.
+20. `dangerouslySetInnerHTML` para JSON-LD aparece em ~20 ficheiros, todos alimentados por dados estáticos escritos por developers hoje (não explorável atualmente), mas `JSON.stringify` não escapa `</script>` — tornar-se-ia um vetor de XSS armazenado no momento em que algum destes campos passasse a vir de texto editável por utilizador ou CMS.
+21. Não existe política RLS de DELETE em `leads`/`quiz_events`/`error_logs` — o que significa que o botão "Apagar todos os dados" em `QuizMetricsPanel.tsx` quase de certeza não faz nada em produção (consistente com o que foi observado com a tentativa de delete via chave anon mais cedo nesta sessão). Vale a pena confirmar diretamente no dashboard do Supabase e ligar um caminho de delete autenticado a sério, ou remover o botão para não dar falsa confiança.
+22. `trackQuizEvent({action:'start'})` pode registar mais do que uma vez por visitante real se ele fechar e reabrir o quiz na mesma visita à página (o session ID é gerado uma vez ao carregar o módulo, não por abertura do quiz) — infla ligeiramente `totalStarts`/reduz `completionRate` no painel de métricas. Não afeta dinheiro.
+23. `.env` foi commitado no commit inicial deste repositório e só mais tarde removido do tracking — a password nesse histórico já foi entretanto rodada, sem ação necessária, mas o histórico em si nunca foi purgado.
+24. O SDK do Supabase (219KB) e outros chunks lazy grandes (`blogData.ts` 140KB, `AdminDashboard.tsx` 44.5KB) já estão corretamente isolados do bundle público — sinalizado apenas como "não regredir isto sem querer" (um futuro `import { supabase }` estático fora de `/admin` ou do padrão de import dinâmico do quiz reintroduziria silenciosamente 219KB na carga de todos os visitantes).
+
+---
+
+## Correções aplicadas durante esta auditoria
+
+Dada a severidade e relevância direta com o trabalho de hoje, estas foram corrigidas de imediato em vez de só documentadas:
+
+- **#4 (sofá 4+ Lugares desaparecia)** — o stepper de `'4+-lugares'` em `QuizComboUpsellScreen.tsx` agora adiciona um item placeholder com `price: 0` (mesmo padrão já usado para tapete), por isso sobrevive em `upsellItems`, ativa `hasUpsellSobItem`, e chega mesmo ao negócio em vez de desaparecer.
+- **#15 (comentário desatualizado)** — corrigida a referência antiga a 160€/60€ em `use-quiz-pricing.ts` para os valores reais de 149€/49€.
+
+Tudo o resto neste documento é um relatório para revisão, ainda não executado — em particular, #1/#2/#3 (RLS do Supabase + autenticação de admin) são decisões de infraestrutura/negócio que precisam da tua aprovação explícita antes de qualquer mudança, já que afetam como o painel de admin passa a ser acedido.
+
+---
+---
+
+# Auditoria Completa — Kyro Clean Solutions (2026-08-20)
 
 Auditoria realizada com 8 agentes paralelos (layout, código, inconsistências/incoerências, funcionalidade/otimização para o cliente, mobile, SEO, design, coerência de texto). Apenas leitura — nenhum ficheiro foi alterado durante a auditoria. Findings ordenados por severidade; cada um inclui ficheiro:linha e uma correção concreta.
 
@@ -179,7 +282,7 @@ Secção com pill-chips de links, não cartões — tratamento diferente é cont
 
 ---
 
-## Resumo
+## Resumo (auditoria 2026-08-20)
 
 | Severidade | Nº de findings |
 |---|---|

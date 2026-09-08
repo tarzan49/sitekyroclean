@@ -91,13 +91,13 @@ const QuizMattressAddonUpsell = ({ mattressItems, setMattressItems, onContinue, 
                       <button
                         onClick={toggleItem}
                         disabled={!packOn}
-                        className="w-9 h-9 rounded-sm border-2 border-white/20 bg-white/[0.05] text-white font-bold text-lg flex items-center justify-center disabled:opacity-20 active:scale-95 transition-all touch-manipulation hover:border-gold/50"
+                        className="w-9 h-9 rounded-sm border-2 border-white/20 bg-white/[0.05] text-white font-bold text-lg flex items-center justify-center disabled:opacity-20 disabled:border-transparent disabled:bg-transparent active:scale-95 transition-all touch-manipulation hover:border-gold/50"
                       >−</button>
                       <span className={cn('w-6 text-center font-bold tabular-nums text-base', packOn ? 'text-gold' : 'text-white/30')}>{packOn ? qty : 0}</span>
                       <button
                         onClick={toggleItem}
                         disabled={packOn}
-                        className="w-9 h-9 rounded-sm border-2 border-white/20 bg-white/[0.05] text-white font-bold text-lg flex items-center justify-center disabled:opacity-20 active:scale-95 transition-all touch-manipulation hover:border-gold/50"
+                        className="w-9 h-9 rounded-sm border-2 border-white/20 bg-white/[0.05] text-white font-bold text-lg flex items-center justify-center disabled:opacity-20 disabled:border-transparent disabled:bg-transparent active:scale-95 transition-all touch-manipulation hover:border-gold/50"
                       >+</button>
                     </div>
                   )}

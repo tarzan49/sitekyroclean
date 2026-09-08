@@ -1,14 +1,13 @@
 import { useState, lazy, Suspense } from "react";
 import { Link } from "react-router-dom";
-import { AlertTriangle, BarChart3, Home, Settings2, Lock, Users, Globe } from "lucide-react";
-import { isSupabaseConfigured } from "@/integrations/supabase/client";
+import { AlertTriangle, BarChart3, Home, Settings2, Lock, LogOut, Users, Globe } from "lucide-react";
+import { isSupabaseConfigured, supabase } from "@/integrations/supabase/client";
+import { useAdminSession } from "@/hooks/use-admin-session";
 
 const AdminDashboard = lazy(() => import("./AdminDashboard"));
 const SitemapMonitor = lazy(() => import("./admin/SitemapMonitor"));
 const ErrorLogPanel = lazy(() => import("./admin/ErrorLogPanel"));
 const QuizMetricsPanel = lazy(() => import("./admin/QuizMetricsPanel"));
-
-const ADMIN_PASSWORD = (import.meta.env.VITE_ADMIN_PASSWORD as string) || 'kyro2025';
 
 type Tab = "sitemap" | "errors" | "metrics" | "crm";
 
@@ -20,12 +19,35 @@ const TabFallback = () => (
 
 // ── Component ─────────────────────────────────────────────────────────────────
 const AdminPanel = () => {
-  const [authed, setAuthed] = useState(false);
+  const { isAuthed, loading: authLoading } = useAdminSession();
+  const [email, setEmail] = useState("");
   const [pwd, setPwd] = useState("");
+  const [loginError, setLoginError] = useState<string | null>(null);
+  const [signingIn, setSigningIn] = useState(false);
   const [activeTab, setActiveTab] = useState<Tab>("sitemap");
 
+  const handleLogin = async () => {
+    setSigningIn(true);
+    setLoginError(null);
+    const { error } = await supabase.auth.signInWithPassword({ email, password: pwd });
+    setSigningIn(false);
+    if (error) setLoginError("Email ou password incorretos");
+  };
+
   // ── Auth gate ─────────────────────────────────────────────────────────────
-  if (!authed) {
+  // Sessão real do Supabase Auth (2026-09-08) — antes era só uma string
+  // comparada em JS no browser, visível em texto simples no bundle público
+  // do site (achado CRITICAL no audit de código). Cria o utilizador admin
+  // em Supabase Dashboard → Authentication → Users → Add user.
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-[#12121e] flex items-center justify-center">
+        <div className="w-8 h-8 border-2 border-gold border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  if (!isAuthed) {
     return (
       <div className="min-h-screen bg-[#12121e] flex items-center justify-center p-4">
         <div className="bg-[#13132B] border border-gold/20 rounded-2xl p-8 w-full max-w-sm shadow-2xl">
@@ -39,25 +61,28 @@ const AdminPanel = () => {
             </div>
           </div>
           <input
+            type="email"
+            placeholder="Email"
+            value={email}
+            onChange={e => setEmail(e.target.value)}
+            onKeyDown={e => { if (e.key === "Enter") handleLogin(); }}
+            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-white/30 outline-none focus:border-gold/50 mb-3 text-sm"
+          />
+          <input
             type="password"
-            placeholder="Password de acesso"
+            placeholder="Password"
             value={pwd}
             onChange={e => setPwd(e.target.value)}
-            onKeyDown={e => { if (e.key === "Enter" && pwd === ADMIN_PASSWORD) { sessionStorage.setItem('kyro_admin', '1'); setAuthed(true); } }}
+            onKeyDown={e => { if (e.key === "Enter") handleLogin(); }}
             className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-white/30 outline-none focus:border-gold/50 mb-4 text-sm"
           />
+          {loginError && <p className="text-red-400 text-xs mb-3">{loginError}</p>}
           <button
-            onClick={() => {
-              if (pwd === ADMIN_PASSWORD) {
-                sessionStorage.setItem('kyro_admin', '1');
-                setAuthed(true);
-              } else {
-                alert("Password incorreta");
-              }
-            }}
-            className="w-full bg-gradient-to-r from-gold to-[#d4c57b] text-[#12121e] font-bold py-3 rounded-xl hover:opacity-90 transition-opacity text-sm"
+            onClick={handleLogin}
+            disabled={signingIn}
+            className="w-full bg-gradient-to-r from-gold to-[#d4c57b] text-[#12121e] font-bold py-3 rounded-xl hover:opacity-90 transition-opacity text-sm disabled:opacity-50"
           >
-            Entrar
+            {signingIn ? "A entrar..." : "Entrar"}
           </button>
         </div>
       </div>
@@ -79,9 +104,17 @@ const AdminPanel = () => {
               <p className="text-xs text-white/40">Kyro Clean Solutions</p>
             </div>
           </div>
-          <Link to="/" className="flex items-center gap-1.5 text-xs text-white/50 hover:text-gold transition-colors px-3 py-1.5 rounded-lg border border-white/10 hover:border-gold/30">
-            <Home className="w-3.5 h-3.5" /> Ver Site
-          </Link>
+          <div className="flex items-center gap-2">
+            <Link to="/" className="flex items-center gap-1.5 text-xs text-white/50 hover:text-gold transition-colors px-3 py-1.5 rounded-lg border border-white/10 hover:border-gold/30">
+              <Home className="w-3.5 h-3.5" /> Ver Site
+            </Link>
+            <button
+              onClick={() => supabase.auth.signOut()}
+              className="flex items-center gap-1.5 text-xs text-white/50 hover:text-gold transition-colors px-3 py-1.5 rounded-lg border border-white/10 hover:border-gold/30"
+            >
+              <LogOut className="w-3.5 h-3.5" /> Sair
+            </button>
+          </div>
         </div>
 
         {/* Tabs */}

@@ -1,15 +1,13 @@
 import { useEffect, useState } from 'react';
-import { ChevronLeft, Shield, Star, Plus, Check } from 'lucide-react';
+import { ChevronLeft, Plus, Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { sofaPrices, mattressPrices } from '@/components/quiz/QuizTypes';
 import type { UpsellItemConfig, CarpetItem } from '@/components/quiz/QuizTypes';
 import {
-  calcChairClean, calcChairWaterproof, calcChairWaterproofPremium, calcPackPricing,
+  calcChairClean,
   carpetAddItem, carpetRemoveItem, carpetUpdateItem, carpetItemArea, carpetTotalArea,
 } from '@/components/quiz/quizHelpers';
 import { PACK_DISCOUNT_MIN_SERVICE, PACK_DISCOUNT_MIN_UPSELL_ITEM } from '@/lib/priceWidgetCalc';
-
-type WaterproofTier = 'off' | 'essencial' | 'premium';
 
 interface QuizComboUpsellScreenProps {
   upsellItems: UpsellItemConfig[];
@@ -29,7 +27,10 @@ interface QuizComboUpsellScreenProps {
 type View = 'summary' | 'mattress' | 'sofa' | 'chairs' | 'carpet';
 
 const CHAIRS_STARTING_PRICE = 20;
-const CHAIRS_MIN_QTY = 3;
+// Mínimo subiu de 3 para 4 (2026-09-08, pedido explícito do dono): 4 é o
+// número mais comum de cadeiras numa casa (conjunto de mesa de jantar
+// standard), fica mais realista que 3 como ponto de partida do upsell.
+const CHAIRS_MIN_QTY = 4;
 
 function fmt(n: number): string {
   return n % 1 === 0 ? String(n) : n.toFixed(1).replace('.', ',');
@@ -45,51 +46,31 @@ const QuizComboUpsellScreen = ({ upsellItems, setUpsellItems, onContinue, onBack
   const [mattressQty, setMattressQty] = useState<Record<string, number>>({});
   const [sofaQty, setSofaQty] = useState<Record<string, number>>({});
   const [chairsQty, setChairsQty] = useState(0);
-  const [sofaWaterproofTier, setSofaWaterproofTier] = useState<WaterproofTier>('off');
-  const [chairsWaterproofTier, setChairsWaterproofTier] = useState<WaterproofTier>('off');
   const [carpetItems, setCarpetItems] = useState<CarpetItem[]>([{ id: 'upsell-tapete-1', largura: '', comprimento: '' }]);
 
   const setMattQty = (id: string, qty: number) => setMattressQty(prev => ({ ...prev, [id]: Math.max(0, Math.min(9, qty)) }));
   const setSofaQtyFor = (id: string, qty: number) => setSofaQty(prev => ({ ...prev, [id]: Math.max(0, Math.min(9, qty)) }));
-  // Cadeiras no upsell só compensam a partir de 3un (60€, acima do mínimo de
+  // Cadeiras no upsell só compensam a partir de 4un (80€, acima do mínimo de
   // 49€ do artigo extra para o desconto de 10% do pack) — pedido explícito do
-  // dono para não deixar escolher 1 ou 2 cadeiras aqui e nunca chegar ao
-  // desconto anunciado.
+  // dono para não deixar escolher 1-3 cadeiras aqui e nunca chegar ao
+  // desconto anunciado. 4 também é o nº mais comum de cadeiras numa casa.
   const decChairs = () => setChairsQty(q => (q <= CHAIRS_MIN_QTY ? 0 : q - 1));
   const incChairs = () => setChairsQty(q => (q <= 0 ? CHAIRS_MIN_QTY : Math.min(9, q + 1)));
 
-  const sofaPack = (opt: (typeof sofaPrices)[number], tier: 'essencial' | 'premium' = 'essencial') => calcPackPricing(opt, true, false, 40, tier);
-
+  // Este upsell final é sempre e só limpeza (2026-09-08, pedido explícito do
+  // dono): quem queria impermeabilização já teve essa opção como serviço
+  // principal lá atrás — oferecer proteção outra vez aqui, para um item
+  // novo, só complicava um ecrã que é suposto ser rápido e leve.
   const mattressTotal = mattressPrices.reduce((sum, opt) => {
     const q = mattressQty[opt.id] ?? 0;
     return sum + (typeof opt.cleaningPrice === 'number' ? q * opt.cleaningPrice : 0);
   }, 0);
   const sofaTotal = sofaPrices.reduce((sum, opt) => {
     const q = sofaQty[opt.id] ?? 0;
-    if (q <= 0 || typeof opt.cleaningPrice !== 'number') return sum;
-    const pack = sofaWaterproofTier !== 'off' ? sofaPack(opt, sofaWaterproofTier) : null;
-    const unitPrice = pack && typeof pack.packPrice === 'number' ? pack.packPrice : opt.cleaningPrice;
-    return sum + q * unitPrice;
-  }, 0);
-  // Deltas calculados sempre para as duas tiers (independente da seleção atual)
-  // para os preços mostrados nos próprios cartões Premium/Essencial — têm de
-  // mostrar quanto custaria ligar, não 0€ só porque ainda está desligado.
-  const sofaEssencialDeltaTotal = sofaPrices.reduce((sum, opt) => {
-    const q = sofaQty[opt.id] ?? 0;
-    if (q <= 0 || typeof opt.cleaningPrice !== 'number') return sum;
-    return sum + q * (sofaPack(opt, 'essencial').packDelta ?? 0);
-  }, 0);
-  const sofaPremiumDeltaTotal = sofaPrices.reduce((sum, opt) => {
-    const q = sofaQty[opt.id] ?? 0;
-    if (q <= 0 || typeof opt.cleaningPrice !== 'number') return sum;
-    return sum + q * (sofaPack(opt, 'premium').packDelta ?? 0);
+    return sum + (typeof opt.cleaningPrice === 'number' ? q * opt.cleaningPrice : 0);
   }, 0);
   const chairsCleanPrice = calcChairClean(chairsQty);
-  const chairsWaterproofEssencialDelta = calcChairWaterproof(chairsQty) ?? 0;
-  const chairsWaterproofPremiumDelta = calcChairWaterproofPremium(chairsQty) ?? 0;
-  const chairsWaterproofDelta = chairsWaterproofTier === 'premium' ? chairsWaterproofPremiumDelta
-    : chairsWaterproofTier === 'essencial' ? chairsWaterproofEssencialDelta : 0;
-  const chairsTotal = chairsQty > 0 ? (chairsCleanPrice ?? 0) + chairsWaterproofDelta : 0;
+  const chairsTotal = chairsQty > 0 ? (chairsCleanPrice ?? 0) : 0;
 
   const mattressQtyTotal = Object.values(mattressQty).reduce((a, b) => a + b, 0);
   const sofaQtyTotal = Object.values(sofaQty).reduce((a, b) => a + b, 0);
@@ -97,25 +78,24 @@ const QuizComboUpsellScreen = ({ upsellItems, setUpsellItems, onContinue, onBack
   const carpetTotalAreaValue = carpetTotalArea(carpetItems);
   const carpetValidCount = carpetItems.filter(it => carpetItemArea(it) !== null).length;
 
-  const tierLabel = (t: WaterproofTier) => t === 'premium' ? ' + Imperm. Premium' : t === 'essencial' ? ' + Imperm. Essencial' : '';
-
+  // Copy curta tipo "a partir de X€" (mesma convenção do Passo 1 — QuizStep1Service)
+  // — as frases de marketing anteriores ("Também aproveita?", "Some ao pedido")
+  // não cabiam nos cartões mais pequenos e liam-se mal (pedido explícito 2026-09-08).
   const mattressSummary = mattressPrices
     .filter(opt => (mattressQty[opt.id] ?? 0) > 0)
     .map(opt => `${mattressQty[opt.id]}x ${opt.label}`)
-    .join(', ') || 'Também aproveita? a partir de 59€';
+    .join(', ') || 'a partir de 59€';
   const sofaSummaryBase = sofaPrices
     .filter(opt => (sofaQty[opt.id] ?? 0) > 0)
     .map(opt => `${sofaQty[opt.id]}x ${opt.label}`)
     .join(', ');
-  const sofaSummary = sofaSummaryBase
-    ? `${sofaSummaryBase}${tierLabel(sofaWaterproofTier)}`
-    : 'Some ao pedido, a partir de 49€';
+  const sofaSummary = sofaSummaryBase || 'a partir de 49€';
   const chairsSummary = chairsQty > 0
-    ? `${chairsQty} cadeira${chairsQty > 1 ? 's' : ''}${tierLabel(chairsWaterproofTier)}`
-    : `Deixe-as como novas, a partir de ${CHAIRS_STARTING_PRICE}€/un.`;
+    ? `${chairsQty} cadeira${chairsQty > 1 ? 's' : ''}`
+    : `a partir de ${CHAIRS_STARTING_PRICE}€/un.`;
   const carpetSummary = carpetValidCount > 0
     ? `${carpetValidCount} tapete${carpetValidCount > 1 ? 's' : ''} · sob orçamento`
-    : 'Sempre sob orçamento, sem compromisso';
+    : 'Sob orçamento';
 
   // Sincroniza o subtotal e os itens em tempo real com o formData do quiz —
   // a "Estimativa" no topo do modal tem de acompanhar cada +1/-1 aqui dentro,
@@ -131,17 +111,27 @@ const QuizComboUpsellScreen = ({ upsellItems, setUpsellItems, onContinue, onBack
     });
     sofaPrices.forEach(opt => {
       const q = sofaQty[opt.id] ?? 0;
-      if (q > 0 && typeof opt.cleaningPrice === 'number') {
-        const pack = sofaWaterproofTier !== 'off' ? sofaPack(opt, sofaWaterproofTier) : null;
-        const unitPrice = pack && typeof pack.packPrice === 'number' ? pack.packPrice : opt.cleaningPrice;
+      if (q <= 0) return;
+      // "4+ Lugares" não tem cleaningPrice numérico (é sempre sob orçamento)
+      // — sem este ramo, o item desaparecia em silêncio: o cartão mostrava
+      // selecionado mas nunca chegava a upsellItems, nunca era cobrado nem
+      // enviado ao negócio (bug real, achado no audit 2026-09-08). Mesmo
+      // padrão já usado para tapete: price:0 para acionar hasUpsellSobItem.
+      if (typeof opt.cleaningPrice === 'number') {
         items.push({
           id: `sofa-${opt.id}`,
           sofaSize: opt.id,
           qty: q,
-          price: q * unitPrice,
-          label: `${q}x Sofá ${opt.label}${tierLabel(sofaWaterproofTier)}`,
-          waterproof: sofaWaterproofTier !== 'off',
-          waterproofPrice: pack?.packDelta ?? undefined,
+          price: q * opt.cleaningPrice,
+          label: `${q}x Sofá ${opt.label}`,
+        });
+      } else {
+        items.push({
+          id: `sofa-${opt.id}`,
+          sofaSize: opt.id,
+          qty: q,
+          price: 0,
+          label: `${q}x Sofá ${opt.label} (sob orçamento)`,
         });
       }
     });
@@ -150,10 +140,8 @@ const QuizComboUpsellScreen = ({ upsellItems, setUpsellItems, onContinue, onBack
         id: 'chairs',
         chairQty: String(chairsQty),
         qty: chairsQty,
-        price: (chairsCleanPrice ?? 0) + chairsWaterproofDelta,
-        label: `${chairsQty} Cadeira${chairsQty > 1 ? 's' : ''}${tierLabel(chairsWaterproofTier)}`,
-        waterproof: chairsWaterproofTier !== 'off',
-        waterproofPrice: chairsWaterproofTier !== 'off' ? chairsWaterproofDelta : undefined,
+        price: chairsCleanPrice ?? 0,
+        label: `${chairsQty} Cadeira${chairsQty > 1 ? 's' : ''}`,
       });
     }
     if (carpetValidCount > 0) {
@@ -167,80 +155,54 @@ const QuizComboUpsellScreen = ({ upsellItems, setUpsellItems, onContinue, onBack
     }
     setUpsellItems(items);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [mattressQty, sofaQty, chairsQty, sofaWaterproofTier, chairsWaterproofTier, carpetItems]);
+  }, [mattressQty, sofaQty, chairsQty, carpetItems]);
 
   const baseTotal = mattressTotal + sofaTotal + chairsTotal;
   const subtotalLabel = `${fmt(baseTotal)}€`;
 
+  // Mesmo tamanho/peso visual das linhas do início do orçamento
+  // (QuizStepConfig: botões w-14 h-14, container max-w-sm) — estava mais
+  // pequeno aqui e ficava mal para quem já vê pior (pedido explícito
+  // 2026-09-08). Tracejado quando vazio / sólido dourado quando ativo,
+  // mesma convenção agora uniformizada em todo o quiz.
   const StepperRow = ({ label, unitLabel, qty, onDec, onInc }: { label: string; unitLabel: string; qty: number; onDec: () => void; onInc: () => void }) => (
-    <div className={cn('w-full flex items-center justify-between gap-2 rounded-sm border px-3.5 py-3', qty > 0 ? 'border-gold/40 bg-gold/[0.05]' : 'border-white/10 bg-[#1a2a1a]')}>
+    <div className={cn(
+      'w-full flex items-center justify-between gap-2 rounded-sm border-2 px-4 py-3 transition-all duration-200',
+      qty > 0 ? 'border-gold bg-[#1a2a1a] shadow-[0_0_12px_rgba(212,175,55,0.20)]' : 'border-dashed border-gold/30 bg-gold/[0.03]'
+    )}>
       <div className="text-left">
         <p className="text-sm font-semibold text-white">{label}</p>
-        <p className="text-[11px] text-white/35">{unitLabel}</p>
+        <p className="text-xs text-white/35">{unitLabel}</p>
       </div>
-      <div className="flex items-center gap-2.5 flex-shrink-0">
-        <button onClick={onDec} disabled={qty <= 0} className="w-9 h-9 rounded-sm border-2 border-white/20 bg-white/[0.05] text-white font-bold text-lg flex items-center justify-center disabled:opacity-25 active:scale-95 transition-all touch-manipulation hover:border-gold/50">−</button>
-        <span className="w-5 text-center font-bold text-gold tabular-nums">{qty}</span>
-        <button onClick={onInc} className="w-9 h-9 rounded-sm border-2 border-white/20 bg-white/[0.05] text-white font-bold text-lg flex items-center justify-center active:scale-95 transition-all touch-manipulation hover:border-gold/50">+</button>
+      <div className="flex items-center gap-2 flex-shrink-0">
+        <button onClick={onDec} disabled={qty <= 0} className="w-14 h-14 rounded-sm border-2 border-white/20 bg-white/[0.05] text-white font-bold text-2xl flex items-center justify-center disabled:opacity-20 disabled:border-transparent disabled:bg-transparent active:scale-95 transition-all touch-manipulation hover:border-gold/50">−</button>
+        <span className={cn('w-7 text-center font-bold tabular-nums text-base', qty > 0 ? 'text-gold' : 'text-white/30')}>{qty}</span>
+        <button onClick={onInc} className="w-14 h-14 rounded-sm border-2 border-white/20 bg-white/[0.05] text-white font-bold text-2xl flex items-center justify-center active:scale-95 transition-all touch-manipulation hover:border-gold/50">+</button>
       </div>
     </div>
   );
 
-  // Seletor Premium/Essencial de impermeabilização — mesmo padrão (com selo
-  // Top) usado no passo principal do quiz, em vez do antigo toggle único que
-  // só oferecia a Essencial (pedido explícito: "e só a essencial? péssimo").
-  const WaterproofTierPicker = ({ tier, onSelect, essencialDelta, premiumDelta }: { tier: WaterproofTier; onSelect: (t: WaterproofTier) => void; essencialDelta: number; premiumDelta: number }) => {
-    const premiumExtra = Math.round((premiumDelta - essencialDelta) * 10) / 10;
-    return (
-      <div className="w-full grid grid-cols-2 gap-2">
-        <button
-          type="button"
-          onClick={() => onSelect(tier === 'premium' ? 'off' : 'premium')}
-          className={cn(
-            'relative rounded-sm border-2 px-3 py-2.5 text-left transition-all duration-200 touch-manipulation',
-            tier === 'premium' ? 'border-gold bg-gold/[0.10] shadow-[0_0_10px_rgba(212,175,55,0.18)]' : 'border-gold/30 bg-[#1a2a1a] hover:border-gold/55'
-          )}
-        >
-          <span className="absolute -top-2 -right-2 z-10 flex w-8 h-8 flex-col items-center justify-center rounded-sm border-2 border-[#12121e] bg-gold shadow-md">
-            <Star className="w-2.5 h-2.5 fill-[#12121e] text-[#12121e]" />
-            <span className="text-[5px] font-black uppercase leading-none tracking-tight text-[#12121e]">Top</span>
-          </span>
-          <div className="flex items-center gap-1 mb-0.5">
-            <Shield className={cn('w-3.5 h-3.5 flex-shrink-0', tier === 'premium' ? 'text-gold' : 'text-gold/50')} />
-            <p className={cn('text-xs font-bold', tier === 'premium' ? 'text-white' : 'text-white/80')}>Premium</p>
-          </div>
-          <p className={cn('text-[10px] leading-snug font-semibold', tier === 'premium' ? 'text-gold/75' : 'text-gold/45')}>até 10 anos · +{fmt(premiumExtra)}€</p>
-        </button>
-        <button
-          type="button"
-          onClick={() => onSelect(tier === 'essencial' ? 'off' : 'essencial')}
-          className={cn(
-            'rounded-sm border-2 px-3 py-2.5 text-left transition-all duration-200 touch-manipulation',
-            tier === 'essencial' ? 'border-gold/60 bg-gold/[0.08]' : 'border-white/15 bg-[#1a2a1a] hover:border-gold/30'
-          )}
-        >
-          <div className="flex items-center gap-1 mb-0.5">
-            <Shield className={cn('w-3.5 h-3.5 flex-shrink-0', tier === 'essencial' ? 'text-gold' : 'text-white/30')} />
-            <p className={cn('text-xs font-bold', tier === 'essencial' ? 'text-white' : 'text-white/60')}>Essencial</p>
-          </div>
-          <p className="text-[10px] text-white/35 leading-snug">1-2 anos · +{fmt(essencialDelta)}€</p>
-        </button>
-      </div>
-    );
-  };
-
   if (view === 'mattress' || view === 'sofa' || view === 'chairs' || view === 'carpet') {
     const label = view === 'mattress' ? 'Colchão' : view === 'sofa' ? 'Sofá(s)' : view === 'chairs' ? 'Cadeiras' : 'Tapete(s)';
     return (
-      <div className="flex flex-col gap-3 overflow-hidden items-center w-full">
-        <button onClick={() => setView('summary')} className="flex items-center gap-1 text-xs text-white/40 hover:text-white/70 transition-colors touch-manipulation self-start ml-1">
-          <ChevronLeft className="w-3.5 h-3.5" /> Voltar
-        </button>
+      <div className="flex flex-col gap-2 overflow-hidden items-center w-full">
+        {/* "Voltar" só no rodapé agora (2026-09-08) — este link duplicado no
+            topo, mais a frase de intro do sofá, empurravam o Confirmar para
+            fora do ecrã em telemóvel quando as 4 linhas já estavam reveladas
+            (pedido explícito: "importante o botão continuar aparecer
+            sempre"). O rodapé já tem Voltar + Confirmar, chega. */}
         <p className="text-gold text-[10px] font-bold tracking-[0.28em] uppercase mb-0.5 text-center w-full">QUANTIDADES</p>
-        <h2 className="font-playfair text-2xl sm:text-3xl font-bold text-white text-center w-full">Detalhes do{view === 'sofa' || view === 'carpet' ? '(s)' : ''} {label}</h2>
+        <h2 className="font-playfair text-2xl sm:text-3xl font-bold text-white text-center w-full">
+          Detalhes do{view === 'sofa' || view === 'carpet' ? '(s)' : ''} {label}
+        </h2>
 
         {view === 'mattress' && (
-          <div className="flex flex-col gap-2 w-full max-w-xs">
+          // Scroll interno próprio (não a página toda) acima de ~3 linhas —
+          // garante que o rodapé Voltar/Confirmar fica sempre à vista mesmo
+          // em ecrãs pequenos, em vez de ser empurrado para fora (pedido
+          // explícito 2026-09-08: "importante o botão continuar aparecer
+          // sempre").
+          <div className="flex flex-col gap-2 w-full max-w-sm max-h-[280px] overflow-y-auto pr-0.5">
             {mattressPrices.map(opt => (
               <StepperRow
                 key={opt.id}
@@ -254,7 +216,10 @@ const QuizComboUpsellScreen = ({ upsellItems, setUpsellItems, onContinue, onBack
           </div>
         )}
         {view === 'sofa' && (
-          <div className="flex flex-col gap-2 w-full max-w-xs">
+          // Sempre limpeza, sem escolha de proteção (2026-09-08, pedido
+          // explícito) — mesmo padrão do colchão. Scroll interno próprio
+          // acima de ~3 linhas para o rodapé nunca ficar de fora.
+          <div className="flex flex-col gap-2 w-full max-w-sm max-h-[280px] overflow-y-auto pr-0.5">
             {sofaPrices.map(opt => (
               <StepperRow
                 key={opt.id}
@@ -265,41 +230,36 @@ const QuizComboUpsellScreen = ({ upsellItems, setUpsellItems, onContinue, onBack
                 onInc={() => setSofaQtyFor(opt.id, (sofaQty[opt.id] ?? 0) + 1)}
               />
             ))}
-            {sofaQtyTotal > 0 && (
-              <WaterproofTierPicker
-                tier={sofaWaterproofTier}
-                onSelect={setSofaWaterproofTier}
-                essencialDelta={sofaEssencialDeltaTotal}
-                premiumDelta={sofaPremiumDeltaTotal}
-              />
-            )}
           </div>
         )}
         {view === 'chairs' && (
+          // Sempre limpeza, sem escolha de proteção (2026-09-08, pedido
+          // explícito, mesma razão do sofá).
           <>
             <div className="flex items-center justify-center gap-6">
               <button onClick={decChairs} disabled={chairsQty <= 0} className="w-14 h-14 rounded-sm border-2 border-white/20 bg-white/[0.05] text-white font-bold text-2xl flex items-center justify-center disabled:opacity-25 active:scale-95 transition-all touch-manipulation hover:border-gold/50">−</button>
               <span className="text-4xl font-black text-gold w-10 text-center tabular-nums leading-none">{chairsQty}</span>
               <button onClick={incChairs} className="w-14 h-14 rounded-sm border-2 border-white/20 bg-white/[0.05] text-white font-bold text-2xl flex items-center justify-center active:scale-95 transition-all touch-manipulation hover:border-gold/50">+</button>
             </div>
+            {/* Preço da quantidade escolhida sempre visível — antes só se via
+                um número de cadeiras sem preço nenhum, ao contrário do
+                colchão/sofá que mostram sempre "X€/un." (pedido explícito
+                2026-09-08: "senão o cliente não sabe o que está a pagar"). */}
+            <p className="font-playfair text-2xl font-bold text-gold tabular-nums">
+              {chairsCleanPrice !== null ? `${fmt(chairsCleanPrice)}€` : 'Sob orçamento'}
+            </p>
             <p className="text-xs text-white/30 text-center leading-snug">Mínimo de {CHAIRS_MIN_QTY} cadeiras</p>
-            {chairsQty > 0 && (
-              <div className="w-full max-w-xs">
-                <WaterproofTierPicker
-                  tier={chairsWaterproofTier}
-                  onSelect={setChairsWaterproofTier}
-                  essencialDelta={chairsWaterproofEssencialDelta}
-                  premiumDelta={chairsWaterproofPremiumDelta}
-                />
-              </div>
-            )}
           </>
         )}
         {view === 'carpet' && (
           <div className="flex flex-col gap-2 w-full max-w-xs">
             <p className="text-xs text-white/35 text-center leading-snug -mt-1 mb-1">
-              Meça cada tapete e adicione quantos precisar. Sem preço fixo por m², cada peça é sempre orçamentada à parte.
+              Sem preço fixo por m², cada tapete é sempre orçamentado à parte.
             </p>
+            {/* Scroll interno próprio a partir do 2º tapete — o rodapé
+                Voltar/Confirmar nunca deve ficar de fora (pedido explícito
+                2026-09-08). */}
+            <div className="flex flex-col gap-2 max-h-[240px] overflow-y-auto pr-0.5">
             {carpetItems.map((item, i) => {
               const area = carpetItemArea(item);
               return (
@@ -349,9 +309,7 @@ const QuizComboUpsellScreen = ({ upsellItems, setUpsellItems, onContinue, onBack
               <Plus className="w-3.5 h-3.5" />
               Adicionar outro tapete
             </button>
-            <p className="text-xs text-white/30 text-center leading-snug">
-              Qualquer tapete é sempre sob orçamento. Confirmamos o preço certo na visita, sem compromisso.
-            </p>
+            </div>
           </div>
         )}
 
@@ -383,53 +341,60 @@ const QuizComboUpsellScreen = ({ upsellItems, setUpsellItems, onContinue, onBack
   const savings = packDiscountActive ? Math.max(0, Math.round(totalPrice) - packDiscountedPrice) : 0;
 
   return (
-    <div className="flex flex-col gap-3 overflow-hidden items-center w-full">
+    <div className="flex flex-col gap-2 overflow-hidden items-center w-full">
       <p className="text-gold text-[10px] font-bold tracking-[0.28em] uppercase mb-0.5 text-center w-full">UM BÓNUS PARA SI</p>
       <h2 className="font-playfair text-2xl sm:text-3xl font-bold text-white text-center w-full">Poupe 10% no pedido todo</h2>
-      <p className="text-xs text-white/55 text-center max-w-xs leading-relaxed">
-        Se juntar mais um serviço, o desconto aplica-se a tudo, não só ao extra. Totalmente opcional.
+      <p className="text-xs text-white/55 text-center max-w-xs leading-relaxed -mt-1">
+        Se juntar mais um serviço, o desconto aplica-se a tudo, não só ao extra.{' '}
+        <span className="text-white/25 text-[10px]">Válido a partir de {PACK_DISCOUNT_MIN_SERVICE}€, extra de {PACK_DISCOUNT_MIN_UPSELL_ITEM}€+.</span>
       </p>
 
-      <div className="flex flex-col gap-2.5 w-full max-w-xs">
+      {/* Grelha 2x2 compacta — mesma proporção do Passo 1 (QuizStep1Service),
+          só que sem foto: cartão tracejado + "+"/✓, para caber tudo em
+          mobile sem cortar o rodapé Voltar/Finalizar (pedido explícito
+          2026-09-08: a versão em lista vertical empurrava o rodapé para
+          fora do ecrã). */}
+      <div className="grid grid-cols-2 gap-2 w-full max-w-xs">
         {rowConfig.map(row => (
           <button
             key={row.view}
             onClick={() => setView(row.view)}
             className={cn(
-              'w-full min-h-[64px] flex items-center gap-3 px-4 py-3.5 rounded-sm border-2 text-left transition-all duration-200 touch-manipulation active:scale-[0.98]',
+              'relative min-h-[76px] flex flex-col items-start justify-center gap-0.5 rounded-sm border-2 px-3 py-2.5 text-left transition-all duration-200 touch-manipulation active:scale-[0.98]',
               row.selected
                 ? 'border-gold bg-[#1a2a1a] shadow-[0_0_14px_rgba(212,175,55,0.20)]'
                 : 'border-dashed border-gold/30 bg-gold/[0.03] hover:border-gold/55 hover:bg-gold/[0.05]'
             )}
           >
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-bold text-white">{row.label}</p>
-              <p className={cn('text-xs truncate mt-0.5', row.selected ? 'text-gold/80' : 'text-white/45')}>{row.summary}</p>
-            </div>
             <span className={cn(
-              'flex-shrink-0 w-7 h-7 rounded-full border-2 flex items-center justify-center transition-colors duration-200',
+              'absolute top-1.5 right-1.5 w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors duration-200',
               row.selected ? 'border-gold bg-gold' : 'border-gold/50 bg-transparent'
             )}>
               {row.selected
-                ? <Check className="w-3.5 h-3.5 text-[#12121e]" strokeWidth={3} />
-                : <Plus className="w-3.5 h-3.5 text-gold" strokeWidth={3} />}
+                ? <Check className="w-2.5 h-2.5 text-[#12121e]" strokeWidth={3} />
+                : <Plus className="w-2.5 h-2.5 text-gold" strokeWidth={3} />}
             </span>
+            <p className="text-sm font-bold text-white pr-5">{row.label}</p>
+            <p className={cn('text-[11px] truncate w-full pr-1', row.selected ? 'text-gold/80' : 'text-white/45')}>{row.summary}</p>
           </button>
         ))}
       </div>
 
-      <p className="text-[10px] text-white/25 text-center leading-snug max-w-xs">
-        Válido em pedidos a partir de {PACK_DISCOUNT_MIN_SERVICE}€, com um serviço extra de pelo menos {PACK_DISCOUNT_MIN_UPSELL_ITEM}€.
-      </p>
-
       {anySelected && (
-        <div className="w-full max-w-xs rounded-sm border border-gold/35 bg-gold/[0.06] px-4 py-3.5 animate-fade-slide-up">
-          <div className="flex items-center gap-1.5 mb-2">
-            <span className="w-1.5 h-1.5 rounded-full bg-gold flex-shrink-0" />
-            <span className="text-[10px] font-bold uppercase tracking-wider text-gold">
-              {packDiscountActive ? `Poupa ${fmt(savings)}€ no pedido todo` : 'Desconto de 10% ativo'}
-            </span>
-          </div>
+        <div className="w-full max-w-xs rounded-sm border border-gold/35 bg-gold/[0.06] px-4 py-2.5 animate-fade-slide-up">
+          {/* Só reivindica o desconto quando REALMENTE está ativo — antes
+              dizia sempre "Desconto de 10% ativo" mesmo no ramo em que
+              packDiscountActive era false (bug real 2026-09-08: cliente via
+              "ativo" com um pedido de 108€, bem abaixo do mínimo de 149€,
+              porque o texto do "senão" nunca tinha sido escrito a sério). */}
+          {packDiscountActive && (
+            <div className="flex items-center gap-1.5 mb-1">
+              <span className="w-1.5 h-1.5 rounded-full bg-gold flex-shrink-0" />
+              <span className="text-[10px] font-bold uppercase tracking-wider text-gold">
+                Poupa {fmt(savings)}€ no pedido todo
+              </span>
+            </div>
+          )}
           <div className="flex items-baseline justify-between">
             <span className="text-xs text-white/45">Subtotal do extra</span>
             <span className="font-playfair text-xl font-bold text-gold tabular-nums">{subtotalLabel}</span>

@@ -16,7 +16,12 @@ const SESSION_ID = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL as string;
 const SUPABASE_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY as string;
 
-const IS_PRODUCTION =
+// Exportado para o submissionService.ts também usar — o insert em "leads" e o
+// email via Formspree não tinham NENHUM guard, por isso um teste completo do
+// quiz em localhost (mesma base de dados Supabase da produção) criava um
+// lead a sério e mandava um email a sério para o dono (bug real, achado
+// 2026-09-08 depois de aparecerem leads de teste como "wd"/"wd" na produção).
+export const IS_PRODUCTION =
   typeof window !== "undefined" &&
   window.location.hostname === "cleansolutions.com.pt";
 

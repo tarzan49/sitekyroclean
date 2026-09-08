@@ -31,12 +31,18 @@ interface ChartPoint { date: Date; count: number; }
 // just the first UI that exposes hour/minute/second instead of the day bucket.
 interface DetailRow { id: string; date: Date; typeLabel: string; origin: string; }
 
+// Fuso do painel: Copenhaga (pedido explícito do dono 2026-09-08). Trocado de
+// UTC — que fazia um "pedido" aparecer no futuro (ex: hoje ao meio-dia antes
+// de ser meio-dia em Lisboa) sempre que a hora UTC crua não batia certo com a
+// hora local de quem está a ler o painel.
+const DASHBOARD_TZ = "Europe/Copenhagen";
+
 function formatDetailDate(d: Date): string {
-  return d.toLocaleDateString("pt-PT", { day: "2-digit", month: "2-digit", year: "numeric", timeZone: "UTC" });
+  return d.toLocaleDateString("pt-PT", { day: "2-digit", month: "2-digit", year: "numeric", timeZone: DASHBOARD_TZ });
 }
 
 function formatDetailTime(d: Date): string {
-  return d.toLocaleTimeString("pt-PT", { hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false, timeZone: "UTC" });
+  return d.toLocaleTimeString("pt-PT", { hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false, timeZone: DASHBOARD_TZ });
 }
 
 interface WeekMetrics {
@@ -67,18 +73,57 @@ interface WeekMetrics {
 
 const WEEKDAY_SHORT = ["Seg", "Ter", "Qua", "Qui", "Sex", "Sáb", "Dom"];
 
-// ── Date helpers (all UTC-based, matching how created_at.slice(0,10) buckets days
-//    in Postgres timestamptz). Week = Monday 00:00 UTC through Sunday 23:59 UTC. ──
+// ── Date helpers — all in DASHBOARD_TZ (Europe/Copenhagen), not raw UTC. ──
+//
+// A day/week "boundary" here always means local midnight in DASHBOARD_TZ,
+// converted to the correct UTC instant for that specific calendar date (never
+// a fixed +1/+2 assumption — Intl resolves the real DST offset for that day).
+// Week = Monday 00:00 through Sunday 23:59, both local to DASHBOARD_TZ.
 
-function addDaysUTC(d: Date, days: number): Date {
+function addDays(d: Date, days: number): Date {
   return new Date(d.getTime() + days * 86400000);
 }
 
-function getWeekStartUTC(d: Date): Date {
-  const utc = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()));
-  const day = utc.getUTCDay(); // 0 = Sunday .. 6 = Saturday
-  const diff = day === 0 ? -6 : 1 - day;
-  return addDaysUTC(utc, diff);
+// Offset (in minutes) of `timeZone` relative to UTC, evaluated AT `date` —
+// not a constant, since Copenhagen is UTC+1 in winter and UTC+2 in summer.
+function tzOffsetMinutes(date: Date, timeZone: string): number {
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone, hour12: false,
+    year: "numeric", month: "2-digit", day: "2-digit",
+    hour: "2-digit", minute: "2-digit", second: "2-digit",
+  }).formatToParts(date);
+  const map: Record<string, string> = {};
+  parts.forEach(p => { map[p.type] = p.value; });
+  const hour = map.hour === "24" ? "00" : map.hour;
+  const asUTC = Date.UTC(+map.year, +map.month - 1, +map.day, +hour, +map.minute, +map.second);
+  return (asUTC - date.getTime()) / 60000;
+}
+
+// The UTC instant corresponding to local midnight (00:00) in `timeZone` on
+// the given calendar date.
+function zonedMidnightUTC(year: number, month: number, day: number, timeZone: string): Date {
+  const guess = new Date(Date.UTC(year, month - 1, day, 0, 0, 0));
+  const offsetMin = tzOffsetMinutes(guess, timeZone);
+  return new Date(guess.getTime() - offsetMin * 60000);
+}
+
+// "YYYY-MM-DD" of `date` as seen in `timeZone`'s local calendar (day-bucket
+// key — NOT the same as date.toISOString().slice(0,10), which is UTC's day).
+function zonedDayKey(date: Date, timeZone: string): string {
+  return new Intl.DateTimeFormat("en-CA", { timeZone, year: "numeric", month: "2-digit", day: "2-digit" }).format(date);
+}
+
+function zonedYMD(date: Date, timeZone: string): { y: number; m: number; d: number } {
+  const [y, m, d] = zonedDayKey(date, timeZone).split("-").map(Number);
+  return { y, m, d };
+}
+
+function getWeekStart(d: Date, timeZone: string): Date {
+  const { y, m, d: day } = zonedYMD(d, timeZone);
+  const dow = new Date(Date.UTC(y, m - 1, day)).getUTCDay(); // 0=Sun..6=Sat — pure calendar-date math, TZ-independent
+  const diff = dow === 0 ? -6 : 1 - dow;
+  const monday = new Date(Date.UTC(y, m - 1, day + diff));
+  return zonedMidnightUTC(monday.getUTCFullYear(), monday.getUTCMonth() + 1, monday.getUTCDate(), timeZone);
 }
 
 // Click sources are page-specific event labels (ex: `price_hero_sofa_porto`,
@@ -105,18 +150,27 @@ function groupClickOrigin(raw: string): string {
   return "Outra página";
 }
 
-function buildWeekDays(weekStart: Date): Date[] {
-  return Array.from({ length: 7 }, (_, i) => addDaysUTC(weekStart, i));
+// weekStart is always a "true" local-midnight-Monday instant in timeZone —
+// walking forward day-by-day via calendar dates (not +24h in ms) keeps every
+// entry pinned to local midnight even across a DST transition inside the week.
+function buildWeekDays(weekStart: Date, timeZone: string): Date[] {
+  const { y, m, d } = zonedYMD(weekStart, timeZone);
+  return Array.from({ length: 7 }, (_, i) => {
+    const day = new Date(Date.UTC(y, m - 1, d + i));
+    return zonedMidnightUTC(day.getUTCFullYear(), day.getUTCMonth() + 1, day.getUTCDate(), timeZone);
+  });
 }
 
-function formatWeekLabel(weekStart: Date): string {
-  const weekEnd = addDaysUTC(weekStart, 6);
-  const sameMonth = weekStart.getUTCMonth() === weekEnd.getUTCMonth() && weekStart.getUTCFullYear() === weekEnd.getUTCFullYear();
-  const endStr = `${weekEnd.getUTCDate()} de ${weekEnd.toLocaleDateString("pt-PT", { month: "long", timeZone: "UTC" })} de ${weekEnd.getUTCFullYear()}`;
+function formatWeekLabel(weekStart: Date, timeZone: string): string {
+  const weekEnd = addDays(weekStart, 6);
+  const s = zonedYMD(weekStart, timeZone);
+  const e = zonedYMD(weekEnd, timeZone);
+  const sameMonth = s.y === e.y && s.m === e.m;
+  const endStr = `${e.d} de ${weekEnd.toLocaleDateString("pt-PT", { month: "long", timeZone })} de ${e.y}`;
   if (sameMonth) {
-    return `${weekStart.getUTCDate()} – ${endStr}`;
+    return `${s.d} – ${endStr}`;
   }
-  const startStr = weekStart.toLocaleDateString("pt-PT", { day: "2-digit", month: "short", timeZone: "UTC" }).replace(/\.$/, "");
+  const startStr = weekStart.toLocaleDateString("pt-PT", { day: "2-digit", month: "short", timeZone }).replace(/\.$/, "");
   return `${startStr} – ${endStr}`;
 }
 
@@ -173,7 +227,7 @@ function EventDetailDrawer({ open, onClose, icon: Icon, iconColorClass, title, r
             </button>
           </div>
           <p className="text-[11px] text-gray-400 mt-1">
-            {sorted.length} {sorted.length === 1 ? "registo" : "registos"} · mais recente primeiro · fuso horário UTC
+            {sorted.length} {sorted.length === 1 ? "registo" : "registos"} · mais recente primeiro · fuso horário Copenhaga
           </p>
           {focusLabel && (
             <button onClick={onClearFocus} className="mt-2 text-xs font-medium text-navy bg-gray-100 hover:bg-gray-200 rounded-full px-3 py-1 transition-colors">
@@ -232,8 +286,8 @@ function WeekLineChart({
   const [drawerDay, setDrawerDay] = useState<number | null>(null);
 
   const openDetails = (dayIndex: number | null) => { setDrawerDay(dayIndex); setDrawerOpen(true); };
-  const drawerRows = drawerDay !== null
-    ? detailRows.filter(r => r.date.toISOString().slice(0, 10) === data[drawerDay]?.date.toISOString().slice(0, 10))
+  const drawerRows = drawerDay !== null && data[drawerDay]
+    ? detailRows.filter(r => zonedDayKey(r.date, DASHBOARD_TZ) === zonedDayKey(data[drawerDay].date, DASHBOARD_TZ))
     : detailRows;
   const drawerFocusLabel = drawerDay !== null && data[drawerDay] ? formatDetailDate(data[drawerDay].date) : null;
   const total = data.reduce((s, d) => s + d.count, 0);
@@ -333,7 +387,7 @@ function WeekLineChart({
               >
                 <div className="bg-navy text-white rounded-xl px-3 py-1.5 shadow-lg text-center whitespace-nowrap pointer-events-auto">
                   <p className="text-[10px] text-white/60 leading-none mb-0.5">
-                    {WEEKDAY_SHORT[selected]} · {data[selected].date.toLocaleDateString("pt-PT", { day: "2-digit", month: "2-digit", timeZone: "UTC" })}
+                    {WEEKDAY_SHORT[selected]} · {data[selected].date.toLocaleDateString("pt-PT", { day: "2-digit", month: "2-digit", timeZone: DASHBOARD_TZ })}
                   </p>
                   <p className="text-lg font-bold font-playfair leading-none">{animatedCount}</p>
                   {animatedCount > 0 && (
@@ -362,7 +416,7 @@ function WeekLineChart({
               </button>
             ))}
           </div>
-          <p className="text-[11px] text-gray-400 mt-3 text-right">Fuso horário: UTC · toca num dia para ver o número exato</p>
+          <p className="text-[11px] text-gray-400 mt-3 text-right">Fuso horário: Copenhaga · toca num dia para ver o número exato</p>
         </>
       )}
 
@@ -381,38 +435,46 @@ function WeekLineChart({
 }
 
 const QuizMetricsPanel = () => {
-  const [weekStart, setWeekStart] = useState<Date>(() => getWeekStartUTC(new Date()));
+  const [weekStart, setWeekStart] = useState<Date>(() => getWeekStart(new Date(), DASHBOARD_TZ));
   const [data, setData] = useState<WeekMetrics | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const currentWeekStart = getWeekStartUTC(new Date());
+  const currentWeekStart = getWeekStart(new Date(), DASHBOARD_TZ);
   const isCurrentWeek = weekStart.getTime() >= currentWeekStart.getTime();
 
   const fetchWeek = useCallback(async (ws: Date) => {
     setLoading(true);
     setError(null);
     try {
-      const weekDays = buildWeekDays(ws);
+      const weekDays = buildWeekDays(ws, DASHBOARD_TZ);
       const startISO = ws.toISOString();
-      const endISO = addDaysUTC(ws, 7).toISOString();
+      const endISO = addDays(ws, 7).toISOString();
 
       const [eventsRes, leadsRes] = await Promise.all([
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (supabase as any).from("quiz_events").select("*").gte("created_at", startISO).lt("created_at", endISO),
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (supabase as any).from("leads").select("id, created_at, service, location").gte("created_at", startISO).lt("created_at", endISO),
+        (supabase as any).from("leads").select("id, created_at, service, location, source").gte("created_at", startISO).lt("created_at", endISO),
       ]);
       if (eventsRes.error) throw eventsRes.error;
       if (leadsRes.error) throw leadsRes.error;
 
       const events: QuizEvent[] = eventsRes.data ?? [];
-      const leadsRows: { id: string; created_at: string; service: string | null; location: string | null }[] = leadsRes.data ?? [];
+      // "leads" também guarda o histórico de reservas do WhatsApp importado
+      // manualmente (source="WhatsApp", booking_id="WA-IMPORT-*", created_at
+      // é a data agendada do serviço, não a data do pedido — por isso caem
+      // no futuro/hoje ao meio-dia exato, nunca um horário real). Isto NÃO
+      // é um "Pedido de orçamento" feito pelo quiz — descoberto 2026-09-08
+      // depois de o dono notar 4 "pedidos" com o mesmo timestamp exato e um
+      // "pedido" datado para hoje ainda antes de ser meio-dia.
+      const allLeadsRows: { id: string; created_at: string; service: string | null; location: string | null; source: string | null }[] = leadsRes.data ?? [];
+      const leadsRows = allLeadsRows.filter(r => r.source !== "WhatsApp");
 
       const countByDay = (rows: { created_at: string }[]): ChartPoint[] => {
         const map: Record<string, number> = {};
-        rows.forEach(r => { const k = r.created_at.slice(0, 10); map[k] = (map[k] ?? 0) + 1; });
-        return weekDays.map(d => ({ date: d, count: map[d.toISOString().slice(0, 10)] ?? 0 }));
+        rows.forEach(r => { const k = zonedDayKey(new Date(r.created_at), DASHBOARD_TZ); map[k] = (map[k] ?? 0) + 1; });
+        return weekDays.map(d => ({ date: d, count: map[zonedDayKey(d, DASHBOARD_TZ)] ?? 0 }));
       };
 
       // Individual, ungrouped rows behind each chart — powers the "ver detalhes" drawer.
@@ -513,11 +575,13 @@ const QuizMetricsPanel = () => {
     fetchWeek(weekStart);
   }, [weekStart, fetchWeek]);
 
-  const goPrevWeek = () => setWeekStart(ws => addDaysUTC(ws, -7));
+  // Re-snap via getWeekStart after the +/-7d jump (not just add ms) so a DST
+  // transition inside that span can't leave weekStart off local midnight.
+  const goPrevWeek = () => setWeekStart(ws => getWeekStart(addDays(ws, -7), DASHBOARD_TZ));
   const goNextWeek = () => {
     if (isCurrentWeek) return;
     setWeekStart(ws => {
-      const next = addDaysUTC(ws, 7);
+      const next = getWeekStart(addDays(ws, 7), DASHBOARD_TZ);
       return next.getTime() > currentWeekStart.getTime() ? currentWeekStart : next;
     });
   };
@@ -586,7 +650,7 @@ const QuizMetricsPanel = () => {
         </button>
 
         <div className="text-center min-w-0">
-          <p className="text-sm sm:text-base font-bold text-navy font-playfair truncate">{formatWeekLabel(weekStart)}</p>
+          <p className="text-sm sm:text-base font-bold text-navy font-playfair truncate">{formatWeekLabel(weekStart, DASHBOARD_TZ)}</p>
           {!isCurrentWeek ? (
             <button onClick={goThisWeek} className="text-[11px] text-gold hover:text-gold/70 font-medium underline underline-offset-2">
               Voltar à semana atual
@@ -873,7 +937,7 @@ const QuizMetricsPanel = () => {
               <Clock className="w-12 h-12 text-gray-300 mx-auto mb-3" />
               <p className="text-navy font-semibold">Sem dados de quiz nesta semana</p>
               <p className="text-sm text-gray-400 mt-1">
-                Ninguém iniciou o quiz entre {formatWeekLabel(weekStart)}. Isto pode ser normal (semana calma)
+                Ninguém iniciou o quiz entre {formatWeekLabel(weekStart, DASHBOARD_TZ)}. Isto pode ser normal (semana calma)
                 ou indicar um problema de tracking, não é necessariamente um bug.
               </p>
             </div>
@@ -891,7 +955,7 @@ const QuizMetricsPanel = () => {
           O quiz regista eventos na tabela <code className="bg-gray-100 px-1 rounded">quiz_events</code> do Supabase
           em cada step, e os pedidos de orçamento submetidos com sucesso ficam na tabela <code className="bg-gray-100 px-1 rounded">leads</code>.
           <strong> Localhost está excluído</strong>: só conta tráfego real de produção.
-          O painel mostra sempre uma semana de cada vez (segunda a domingo, fuso UTC) e navega com as setas no topo.
+          O painel mostra sempre uma semana de cada vez (segunda a domingo, fuso Copenhaga) e navega com as setas no topo.
         </p>
         <p className="text-xs text-gray-500">
           <code className="bg-gray-100 px-1 rounded">call_click</code> conta cliques no botão de ligar, não chamadas

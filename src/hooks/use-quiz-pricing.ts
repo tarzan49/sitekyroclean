@@ -172,7 +172,7 @@ export function useQuizPricing(
   // concretos): conta-se cada UNIDADE de mobília (sofá, colchão, cadeiras
   // como lote, tapete) como um artigo ao seu preço BASE (sem addon) — tanto
   // as do serviço principal como as adicionadas via upsell (Pack Família).
-  // Regra final: soma de todos os artigos > 160€ (100€ de base + 60€ do
+  // Regra final: soma de todos os artigos > 149€ (100€ de base + 49€ do
   // artigo extra, não sobrepostos) E pelo menos um artigo, sozinho, vale
   // PACK_DISCOUNT_MIN_UPSELL_ITEM ou mais. Limiares importados de
   // priceWidgetCalc.ts (nunca duplicar o número aqui — foi assim que o
