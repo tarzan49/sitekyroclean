@@ -357,6 +357,8 @@ const QuizComboUpsellScreen = ({ primaryService, upsellItems, setUpsellItems, on
     { view: 'carpet', label: 'Tapete', summary: carpetSummary, selected: carpetValidCount > 0 },
   ];
 
+  const visibleRows = rowConfig.filter(row => row.view !== primaryService || row.selected);
+  const compactRows = visibleRows.length <= 3;
   const savings = packDiscountActive ? Math.max(0, Math.round(totalPrice) - packDiscountedPrice) : 0;
 
   return (
@@ -378,25 +380,24 @@ const QuizComboUpsellScreen = ({ primaryService, upsellItems, setUpsellItems, on
         )}
       </p>
 
-      {/* Grelha 2x2 compacta — mesma proporção do Passo 1 (QuizStep1Service),
-          só que sem foto: cartão tracejado + "+"/✓, para caber tudo em
-          mobile sem cortar o rodapé Voltar/Finalizar (pedido explícito
-          2026-09-08: a versão em lista vertical empurrava o rodapé para
-          fora do ecrã). */}
-      <div className="grid grid-cols-2 gap-2 w-full max-w-xs">
-        {rowConfig.filter(row => row.view !== primaryService || row.selected).map(row => (
+      {/* Até três sugestões: linhas compactas, sem cartão isolado à esquerda.
+          Com quatro sugestões, preservar a grelha 2x2 para limitar a altura. */}
+      <div className={cn('grid gap-2 w-full max-w-xs', compactRows ? 'grid-cols-1' : 'grid-cols-2')}>
+        {visibleRows.map(row => (
           <button
             key={row.view}
             onClick={() => setView(row.view)}
             className={cn(
-              'relative min-h-[76px] flex flex-col items-start justify-center gap-0.5 rounded-sm border-2 px-3 py-2.5 text-left transition-all duration-200 touch-manipulation active:scale-[0.98]',
+              'relative flex flex-col items-start justify-center gap-0.5 rounded-sm border-2 px-3 text-left transition-all duration-200 touch-manipulation active:scale-[0.98]',
+              compactRows ? 'min-h-14 py-2 pr-12' : 'min-h-[76px] py-2.5',
               row.selected
                 ? 'border-gold bg-[#1a2a1a] shadow-[0_0_14px_rgba(212,175,55,0.20)]'
                 : 'border-dashed border-gold/30 bg-gold/[0.03] hover:border-gold/55 hover:bg-gold/[0.05]'
             )}
           >
             <span className={cn(
-              'absolute top-1.5 right-1.5 w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors duration-200',
+              'absolute w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors duration-200',
+              compactRows ? 'top-1/2 right-3 -translate-y-1/2' : 'top-1.5 right-1.5',
               row.selected ? 'border-gold bg-gold' : 'border-gold/50 bg-transparent'
             )}>
               {row.selected
