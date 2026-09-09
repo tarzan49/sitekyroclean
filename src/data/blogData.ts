@@ -1516,7 +1516,7 @@ const posts: BlogPost[] = [
     slug: "quanto-custa-limpar-alcatifa",
     title: "Quanto custa limpar uma alcatifa profissionalmente? Preços 2025",
     metaTitle: "Preço Limpeza de Alcatifa 2025 | Guia Completo | Kyro Clean",
-    metaDescription: "Preços reais de limpeza profissional de alcatifas em Portugal: por m², por divisão e por tipo. O que está incluído, tempo de secagem e como pedir orçamento.",
+    metaDescription: "Preços de limpeza profissional de alcatifas em Portugal: sempre orçamentados à medida da área e do estado. O que está incluído, tempo de secagem e como pedir orçamento.",
     publishDate: "2026-05-20",
     updatedDate: "2026-05-20",
     author: "Equipa Kyro Clean",
@@ -1545,7 +1545,7 @@ const posts: BlogPost[] = [
       },
       {
         heading: "Tapete vs alcatifa: qual a diferença para efeitos de preço?",
-        body: "A distinção é importante para o orçamento:\n\n**Tapete**: peça solta com dimensões definidas, colocada sobre o pavimento. Pode ser movido, sacudido e tratado individualmente.\n\n**Alcatifa**: revestimento de piso fixo ou semi-fixo que cobre toda ou parte de uma divisão.\n\nOs preços são calculados por m² em ambos os casos, mas o processo de limpeza difere:\n- Tapetes são tratados ao local com possibilidade de movimentação\n- Alcatifas são sempre limpas no local, sem remoção\n\nPara tapetes pequenos (até 2m²), a Kyro Clean tem preços mínimos de 25€ por peça.",
+        body: "A distinção é importante para o orçamento:\n\n**Tapete**: peça solta com dimensões definidas, colocada sobre o pavimento. Pode ser movido, sacudido e tratado individualmente.\n\n**Alcatifa**: revestimento de piso fixo ou semi-fixo que cobre toda ou parte de uma divisão.\n\nEm ambos os casos, o orçamento é sempre feito à medida (dimensão, tipo de fibra e estado), sem tabela fixa por m², mas o processo de limpeza difere:\n- Tapetes são tratados ao local com possibilidade de movimentação\n- Alcatifas são sempre limpas no local, sem remoção",
       },
     ],
     faq: [

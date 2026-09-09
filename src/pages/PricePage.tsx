@@ -82,7 +82,7 @@ const PricePage = () => {
 
   const snapshotStats = [
     { value: "5.0 ★", label: "Avaliação Google", icon: Star },
-    data.serviceSlug === 'limpeza-tapetes'
+    (data.serviceSlug === 'limpeza-tapetes' || data.serviceSlug === 'limpeza-alcatifas')
       ? { value: "Á Medida", label: `Orçamento, em ${data.cityName}`, icon: Euro }
       : { value: servicePrice, label: `Desde, em ${data.cityName}`, icon: Euro },
     { value: nearbyCities.length > 0 ? `${nearbyCities.length}+` : "100%", label: nearbyCities.length > 0 ? "Zonas próximas" : "Cobertura local", icon: MapPin },

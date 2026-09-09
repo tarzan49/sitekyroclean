@@ -7,6 +7,12 @@ interface BeforeAfterSliderProps {
   afterLabel?: string;
   orientation?: "vertical" | "horizontal";
   noFrame?: boolean;
+  // Selo discreto "Efeito ilustrativo" para pares que não são um trabalho
+  // real da Kyro (pedido explícito 2026-09-09, depois de o dono confirmar
+  // que 3 pares de impermeabilização são gerados por IA: "quero que faças
+  // isso mas nao menciones a cena de AI" — o selo avisa que a foto é
+  // ilustrativa sem explicar a origem).
+  illustrative?: boolean;
   // Usado pela pool rotativa do hero (HeroBeforeAfterPool) para pausar a
   // rotação automática enquanto a pessoa está mesmo a arrastar — sem isto,
   // um par podia ser trocado a meio de uma interação real.
@@ -20,6 +26,7 @@ const BeforeAfterSlider = ({
   afterLabel = "Depois",
   orientation = "vertical",
   noFrame = false,
+  illustrative = false,
   onDraggingChange,
 }: BeforeAfterSliderProps) => {
   // sliderPosition (state) só é a fonte de verdade para o RENDER inicial e
@@ -283,6 +290,12 @@ const BeforeAfterSlider = ({
           />
         )}
       </div>
+
+      {illustrative && (
+        <span className="absolute top-3 left-1/2 -translate-x-1/2 z-20 pointer-events-none text-[9px] font-semibold tracking-[0.12em] uppercase text-white/80 bg-black/45 backdrop-blur-sm px-2.5 py-1 rounded-sm">
+          Efeito ilustrativo
+        </span>
+      )}
     </div>
   );
 

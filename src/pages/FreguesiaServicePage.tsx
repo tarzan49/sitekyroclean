@@ -134,7 +134,7 @@ const FreguesiaServicePage = () => {
 
   const snapshotStats = [
     { value: "5.0 ★", label: "Avaliação Google", icon: Star },
-    data.serviceSlug === 'limpeza-tapetes'
+    (data.serviceSlug === 'limpeza-tapetes' || data.serviceSlug === 'limpeza-alcatifas')
       ? { value: "Á Medida", label: `Orçamento, em ${data.name}`, icon: Euro }
       : { value: data.priceFrom, label: `Desde, em ${data.name}`, icon: Euro },
     { value: nearbyFreguesias.length > 0 ? `${nearbyFreguesias.length}+` : "100%", label: nearbyFreguesias.length > 0 ? "Zonas próximas" : "Cobertura local", icon: MapPin },
@@ -287,6 +287,8 @@ const FreguesiaServicePage = () => {
                     goldWord={data.name}
                     subtitle={data.serviceSlug === 'limpeza-tapetes'
                       ? `Orçamento à medida de cada tapete. Deslocação +${locationPrices[data.municipio] ?? 10}€ a ${data.municipio}. Sem surpresas, sem custos escondidos.`
+                      : data.serviceSlug === 'limpeza-alcatifas'
+                      ? `Orçamento à medida de cada espaço. Deslocação +${locationPrices[data.municipio] ?? 10}€ a ${data.municipio}. Sem preço fixo por m², sem surpresas.`
                       : `Preços fixos e transparentes, sem surpresas. Deslocação +${locationPrices[data.municipio] ?? 10}€ a ${data.municipio}. Orçamento gratuito antes de qualquer compromisso.`}
                   />
                   <div className="hidden md:block">

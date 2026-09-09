@@ -273,7 +273,7 @@ const SofaVariantPage = () => {
 
   const snapshotStats = [
     { value: "5.0 ★", label: "Avaliação Google", icon: Star },
-    data.serviceKey === 'tapetes'
+    (data.serviceKey === 'tapetes' || data.serviceKey === 'alcatifas')
       ? { value: "Á Medida", label: `Orçamento, ${prep} ${data.locationName.split(',')[0].trim()}`, icon: Euro }
       : { value: data.priceFrom, label: `Desde, ${prep} ${data.locationName.split(',')[0].trim()}`, icon: Euro },
     { value: zonesValue, label: zonesLabel, icon: MapPin },

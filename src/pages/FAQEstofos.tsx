@@ -110,8 +110,8 @@ const allFaqs: FAQ[] = [
   {
     id: "diferenca-tapete-alcatifa",
     question: "Qual é a diferença entre tapete e alcatifa para efeitos de limpeza?",
-    answer: <><strong>Tapete</strong> é uma peça solta com dimensões definidas que pode ser movida e transportada. <strong>Alcatifa</strong> é um revestimento de piso fixo ou semi-fixo que cobre toda uma divisão. Do ponto de vista de limpeza: tapetes avulsos são tratados ao domicílio ou com recolha e entrega; alcatifas são sempre limpas no local por extração a vapor sem remoção. Os preços são calculados por metro quadrado em ambos os casos. Para mais detalhes: <Link to="/limpeza-tapetes" className="text-gold hover:underline font-medium">limpeza de tapetes</Link> ou <Link to="/limpeza-alcatifas" className="text-gold hover:underline font-medium">limpeza de alcatifas</Link>.</>,
-    plainAnswer: "Tapete: peça solta, tratada ao domicílio ou com recolha. Alcatifa: revestimento fixo, sempre limpa no local por extração. Preço calculado por m² em ambos os casos.",
+    answer: <><strong>Tapete</strong> é uma peça solta com dimensões definidas que pode ser movida e transportada. <strong>Alcatifa</strong> é um revestimento de piso fixo ou semi-fixo que cobre toda uma divisão. Do ponto de vista de limpeza: tapetes avulsos são tratados ao domicílio ou com recolha e entrega; alcatifas são sempre limpas no local por extração a vapor sem remoção. Em ambos os casos o orçamento é sempre feito à medida, sem tabela fixa por m². Para mais detalhes: <Link to="/limpeza-tapetes" className="text-gold hover:underline font-medium">limpeza de tapetes</Link> ou <Link to="/limpeza-alcatifas" className="text-gold hover:underline font-medium">limpeza de alcatifas</Link>.</>,
+    plainAnswer: "Tapete: peça solta, tratada ao domicílio ou com recolha. Alcatifa: revestimento fixo, sempre limpa no local por extração. Orçamento sempre à medida em ambos os casos, sem preço fixo por m².",
   },
 ];
 

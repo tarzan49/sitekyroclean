@@ -72,6 +72,7 @@ const HeroBeforeAfterPool = ({ category, className, intervalMs = 5000 }: Props) 
             beforeImage={item.before}
             afterImage={item.after}
             noFrame
+            illustrative={item.illustrative}
             onDraggingChange={d => { draggingRef.current = d; }}
           />
         ) : (

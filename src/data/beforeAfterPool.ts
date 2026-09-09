@@ -110,7 +110,12 @@ import tapete06Depois from "@/assets/before-after-pool/tapete-06-depois.webp";
 
 export type BeforeAfterCategory = "sofa" | "colchao" | "cadeiras" | "tapete" | "impermeabilizacao";
 
-export type PoolItem = { kind: "pair"; before: string; after: string } | { kind: "single"; image: string };
+// `illustrative` marca pares que não são um trabalho real da Kyro (ver nota
+// "impermeabilizacao-02/03/04" acima) — o slider mostra um selo discreto
+// "Efeito ilustrativo" quando presente, sem explicar a origem da imagem.
+export type PoolItem =
+  | { kind: "pair"; before: string; after: string; illustrative?: boolean }
+  | { kind: "single"; image: string };
 
 export const BEFORE_AFTER_POOL: Record<BeforeAfterCategory, PoolItem[]> = {
   sofa: [
@@ -152,9 +157,9 @@ export const BEFORE_AFTER_POOL: Record<BeforeAfterCategory, PoolItem[]> = {
   ],
   impermeabilizacao: [
     { kind: "pair", before: impermeabilizacao01Antes, after: impermeabilizacao01Depois },
-    { kind: "pair", before: impermeabilizacao02Antes, after: impermeabilizacao02Depois },
-    { kind: "pair", before: impermeabilizacao03Antes, after: impermeabilizacao03Depois },
-    { kind: "pair", before: impermeabilizacao04Antes, after: impermeabilizacao04Depois },
+    { kind: "pair", before: impermeabilizacao02Antes, after: impermeabilizacao02Depois, illustrative: true },
+    { kind: "pair", before: impermeabilizacao03Antes, after: impermeabilizacao03Depois, illustrative: true },
+    { kind: "pair", before: impermeabilizacao04Antes, after: impermeabilizacao04Depois, illustrative: true },
   ],
 };
 

@@ -149,7 +149,7 @@ const LocationServicePage = () => {
   const freguesiaCount = cityFreguesias?.freguesias.length ?? 0;
   const snapshotStats = [
     { value: "5.0 ★", label: "Avaliação Google", icon: Star },
-    data.serviceSlug === 'limpeza-tapetes'
+    (data.serviceSlug === 'limpeza-tapetes' || data.serviceSlug === 'limpeza-alcatifas')
       ? { value: "Á Medida", label: `Orçamento, ${cityPrep} ${data.city}`, icon: Euro }
       : { value: data.priceFrom, label: `Desde, ${cityPrep} ${data.city}`, icon: Euro },
     freguesiaCount > 0
@@ -307,6 +307,8 @@ const LocationServicePage = () => {
                     goldWord={data.city}
                     subtitle={data.serviceSlug === 'limpeza-tapetes'
                       ? `Orçamento à medida de cada tapete. Deslocação +${locationPrices[data.city] ?? 10}€ a ${data.city}. Sem surpresas, sem custos escondidos.`
+                      : data.serviceSlug === 'limpeza-alcatifas'
+                      ? `Orçamento à medida de cada espaço. Deslocação +${locationPrices[data.city] ?? 10}€ a ${data.city}. Sem preço fixo por m², sem surpresas.`
                       : `Preços fixos e transparentes, sem surpresas. Deslocação +${locationPrices[data.city] ?? 10}€ a ${data.city}. Orçamento gratuito antes de qualquer compromisso.`}
                   />
                   {/* Trust facts — desktop only (variante 1) */}
