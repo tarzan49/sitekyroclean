@@ -1,3 +1,5 @@
+import QuizCarpetMeasureGuide from '../QuizCarpetMeasureGuide';
+import QuizCareIntro from '../QuizCareIntro';
 import QuizFurnitureImage from '../QuizFurnitureImage';
 import { useEffect, useState } from 'react';
 import { ChevronLeft, Plus, Check } from 'lucide-react';
@@ -195,6 +197,7 @@ const QuizComboUpsellScreen = ({ primaryService, upsellItems, setUpsellItems, on
           Detalhes do{view === 'sofa' || view === 'carpet' ? '(s)' : ''} {label}
         </h2>
 
+        {view === 'carpet' && <QuizCarpetMeasureGuide />}
         {view === 'mattress' && (
           // Scroll interno próprio (não a página toda) acima de ~3 linhas —
           // garante que o rodapé Voltar/Confirmar fica sempre à vista mesmo
@@ -237,6 +240,7 @@ const QuizComboUpsellScreen = ({ primaryService, upsellItems, setUpsellItems, on
           // Sempre limpeza, sem escolha de proteção (2026-09-08, pedido
           // explícito, mesma razão do sofá).
           <>
+            <QuizCareIntro service="chairs">Escolha quantas cadeiras quer juntar à mesma visita.</QuizCareIntro>
             <div className="flex items-center justify-center gap-6">
               <button onClick={decChairs} disabled={chairsQty <= 0} className="w-14 h-14 rounded-sm border-2 border-white/20 bg-white/[0.05] text-white font-bold text-2xl flex items-center justify-center disabled:opacity-25 active:scale-95 transition-all touch-manipulation hover:border-gold/50">−</button>
               <span className="text-4xl font-black text-gold w-10 text-center tabular-nums leading-none">{chairsQty}</span>

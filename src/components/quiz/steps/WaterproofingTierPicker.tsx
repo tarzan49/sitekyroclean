@@ -1,4 +1,4 @@
-import { Check, Star } from 'lucide-react';
+import { Check, Star, ShieldCheck, Droplets } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { QuizFormData } from '@/components/quiz/QuizTypes';
 
@@ -35,11 +35,12 @@ export function WaterproofingTierPicker({ formData, updateFormData, onSelect, ac
           <Star className="w-3 h-3 fill-[#12121e] text-[#12121e]" />
           <span className="text-[6px] font-black uppercase leading-none tracking-tight text-[#12121e]">Top</span>
         </span>
+        <ShieldCheck aria-hidden="true" className="w-7 h-7 text-gold mb-2" />
         <div className="flex items-center gap-1.5 mb-0.5">
           {tier === 'premium' && <Check className="w-3 h-3 text-gold flex-shrink-0" />}
           <p className={cn('text-xs font-bold', tier === 'premium' ? 'text-white' : 'text-white/85')}>Premium</p>
         </div>
-        <p className={cn('text-[10px] leading-snug font-semibold', tier === 'premium' ? 'text-gold/70' : 'text-gold/45')}>Até 10 anos de proteção · até 5 lavagens</p>
+        <p className={cn('text-[11px] leading-relaxed font-semibold', tier === 'premium' ? 'text-gold/70' : 'text-gold/80')}>Até 10 anos de proteção · até 5 lavagens</p>
       </button>
       <button
         type="button"
@@ -47,11 +48,12 @@ export function WaterproofingTierPicker({ formData, updateFormData, onSelect, ac
         onClick={() => { updateFormData({ waterproofingTier: 'essencial' }); onSelect?.('essencial'); }}
         className={cn('rounded-sm border-2 px-3 py-2.5 text-left transition-all duration-200 touch-manipulation', tier === 'essencial' ? 'border-gold bg-[#1a2a1a] shadow-[0_0_10px_rgba(212,175,55,0.18)]' : 'border-gold/20 bg-[#1a2a1a] hover:border-gold/40')}
       >
+        <Droplets aria-hidden="true" className="w-7 h-7 text-gold/75 mb-2" />
         <div className="flex items-center gap-1.5 mb-0.5">
           {tier === 'essencial' && <Check className="w-3 h-3 text-gold flex-shrink-0" />}
-          <p className={cn('text-xs font-bold', tier === 'essencial' ? 'text-white' : 'text-white/60')}>Essencial</p>
+          <p className={cn('text-xs font-bold', tier === 'essencial' ? 'text-white' : 'text-white/80')}>Essencial</p>
         </div>
-        <p className="text-[10px] text-white/35 leading-snug">1 a 2 anos de proteção · até 2 lavagens</p>
+        <p className="text-[10px] text-white/70 leading-snug">1 a 2 anos de proteção · até 2 lavagens</p>
       </button>
     </div>
   );

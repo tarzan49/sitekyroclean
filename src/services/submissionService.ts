@@ -202,7 +202,7 @@ function buildReceiptLines(payload: QuizLeadPayload) {
         : (typeof opt.cleaningPrice === 'number' ? (opt.cleaningPrice as number) : null);
       const bothP = typeof opt.bothPrice === 'number' ? (opt.bothPrice as number) : null;
       const unit = item.packEnabled ? bothP : baseP;
-      const typeStr = item.packEnabled ? ' (Pack: Limpeza + Anti Ácaros)' : isWaterproofBase ? ' (Anti Ácaros)' : ' (Limpeza)';
+      const typeStr = item.packEnabled ? ' (Pack: Limpeza + Desbacterização e Anti Ácaros)' : isWaterproofBase ? ' (Desbacterização e Anti Ácaros)' : ' (Limpeza)';
       receiptLines.push({ label: `Colchão ${opt.label}${typeStr}`, qty: item.qty, unitPrice: unit, total: unit !== null ? unit * item.qty : null });
     });
   } else if (service === 'chairs') {
@@ -219,7 +219,7 @@ function buildReceiptLines(payload: QuizLeadPayload) {
         receiptLines.push({ label: addonLabel, qty: wQty, unitPrice: addonUnit, total: addonTotal });
       }
       if (chairAntiAcaros) {
-        receiptLines.push({ label: 'Anti Ácaros Cadeiras', qty: cQty, unitPrice: 5, total: cQty * 5 });
+        receiptLines.push({ label: 'Desbacterização e Anti Ácaros Cadeiras', qty: cQty, unitPrice: 5, total: cQty * 5 });
       }
     }
   } else if (service === 'carpet') {

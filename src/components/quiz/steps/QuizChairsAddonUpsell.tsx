@@ -1,3 +1,4 @@
+import QuizCareIntro from '../QuizCareIntro';
 import { ChevronLeft, Check, Star, Bug, Droplets, Plus } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { QuizFormData } from '@/components/quiz/QuizTypes';
@@ -43,8 +44,8 @@ const QuizChairsAddonUpsell = ({ formData, updateFormData, onContinue, onBack }:
       <div className="flex flex-col gap-3 overflow-hidden items-center w-full">
         <p className="text-gold text-[10px] font-bold tracking-[0.28em] uppercase mb-0.5 text-center w-full">ANTES DE SEGUIR</p>
         <h2 className="font-playfair text-2xl sm:text-3xl font-bold text-white text-center w-full">Quer também Higienização Profunda?</h2>
-        <p className="text-xs text-white/40 text-center max-w-xs leading-relaxed">
-          Aproveitamos a mesma visita para as deixar como novas antes de proteger. Totalmente opcional.
+        <p className="text-xs text-white/70 text-center max-w-sm leading-relaxed">
+          Limpeza profunda das suas cadeiras antes da aplicação da proteção. Opcional.
         </p>
 
         {/* Mesmo cartão "estilo companhia aérea" do upsell de colchão — Top
@@ -53,7 +54,7 @@ const QuizChairsAddonUpsell = ({ formData, updateFormData, onContinue, onBack }:
         <button
           onClick={toggleAddon}
           className={cn(
-            'relative w-full max-w-xs min-h-[76px] flex items-center gap-3 pl-5 pr-3.5 py-3.5 rounded-sm border-2 text-left transition-all duration-200 touch-manipulation mt-1',
+            'relative w-full max-w-sm min-h-[76px] flex items-center gap-3 pl-5 pr-3.5 py-3.5 rounded-sm border-2 text-left transition-all duration-200 touch-manipulation mt-1',
             addonOn ? 'border-gold bg-[#1a2a1a] shadow-[0_0_18px_rgba(212,175,55,0.30)]' : 'border-dashed border-gold/40 bg-gold/[0.04] hover:border-gold/70 hover:bg-gold/[0.07]'
           )}
         >
@@ -64,7 +65,7 @@ const QuizChairsAddonUpsell = ({ formData, updateFormData, onContinue, onBack }:
           <Droplets className={cn('w-5 h-5 flex-shrink-0', addonOn ? 'text-gold' : 'text-gold/70')} />
           <div className="flex-1 min-w-0">
             <p className={cn('text-sm font-bold', addonOn ? 'text-white' : 'text-white/90')}>Higienização Profunda</p>
-            <p className="text-[10px] text-white/35 leading-snug mt-0.5">Elimina bactérias, odores e alergénios acumulados no estofo, para as sentir como novas.</p>
+            <p className="text-[10px] text-white/65 leading-snug mt-0.5">Elimina bactérias, odores e alergénios acumulados no estofo, para as sentir como novas.</p>
             {higienizacaoPrice !== null && (
               <p className={cn('text-[11px] font-semibold mt-1', addonOn ? 'text-gold' : 'text-gold/60')}>
                 Por apenas <span className="font-black">+{fmt(higienizacaoPrice)}€</span>
@@ -79,16 +80,16 @@ const QuizChairsAddonUpsell = ({ formData, updateFormData, onContinue, onBack }:
           </span>
         </button>
 
-        <div className="flex items-center gap-3 w-full max-w-xs mt-1">
+        <div className="flex items-center gap-3 w-full max-w-sm mt-1">
           <button
             onClick={onBack}
-            className="h-14 px-5 flex-shrink-0 bg-transparent border border-white/[0.14] text-white/50 hover:text-white/80 hover:border-white/30 active:scale-[0.98] touch-manipulation rounded-sm flex items-center justify-center transition-all text-sm font-semibold"
+            className="h-14 px-5 flex-shrink-0 bg-transparent border border-white/[0.14] text-white/70 hover:text-white/80 hover:border-white/30 active:scale-[0.98] touch-manipulation rounded-sm flex items-center justify-center transition-all text-sm font-semibold"
           >
             <ChevronLeft className="w-4 h-4 mr-1" /> Voltar
           </button>
           <button
             onClick={onContinue}
-            className="flex-1 h-14 bg-gradient-to-r from-gold to-[#d4c57b] hover:from-[#d4c57b] hover:to-gold text-[#12121e] font-black text-sm tracking-wider uppercase touch-manipulation active:scale-[0.98] rounded-sm shadow-[0_0_32px_rgba(212,175,55,0.30)]"
+            className="flex-1 h-14 bg-gradient-to-r from-gold to-[#d4c57b] hover:from-[#d4c57b] hover:to-gold text-[#12121e] font-black text-xs leading-snug px-2 tracking-wide uppercase touch-manipulation active:scale-[0.98] rounded-sm shadow-[0_0_32px_rgba(212,175,55,0.30)]"
           >
             {addonOn ? 'Adicionar e Continuar' : 'Continuar'}
           </button>
@@ -120,14 +121,13 @@ const QuizChairsAddonUpsell = ({ formData, updateFormData, onContinue, onBack }:
     <div className="flex flex-col gap-3 overflow-hidden items-center w-full">
       <p className="text-gold text-[10px] font-bold tracking-[0.28em] uppercase mb-0.5 text-center w-full">ANTES DE SEGUIR</p>
       <h2 className="font-playfair text-2xl sm:text-3xl font-bold text-white text-center w-full">Proteja as suas cadeiras</h2>
-      <p className="text-xs text-white/40 text-center max-w-xs leading-relaxed">
-        Já que estamos lá em casa, aproveite para as manter assim por mais tempo. Totalmente opcional.
-      </p>
+      <QuizCareIntro service="chairs">Escolha a proteção para as suas {qty} cadeiras. Pode continuar com a limpeza que já escolheu.</QuizCareIntro>
 
-      <p className="text-[10px] font-bold tracking-[0.14em] uppercase text-white/35 w-full max-w-xs text-left mt-1">Impermeabilização</p>
-      <div className="w-full max-w-xs grid grid-cols-2 gap-2 items-stretch">
+      <p className="text-[10px] font-bold tracking-[0.14em] uppercase text-white/65 w-full max-w-sm text-left mt-1">Impermeabilização</p>
+      <div className="w-full max-w-sm grid grid-cols-2 gap-2 items-stretch">
         <button
           onClick={() => selectWaterproof('premium')}
+          aria-pressed={waterproofTier === 'premium'}
           className={cn(
             'relative rounded-sm border-2 px-3 py-2.5 text-left transition-all duration-200 touch-manipulation',
             waterproofTier === 'premium'
@@ -143,7 +143,7 @@ const QuizChairsAddonUpsell = ({ formData, updateFormData, onContinue, onBack }:
             {waterproofTier === 'premium' && <Check className="w-3 h-3 text-gold flex-shrink-0" />}
             <p className={cn('text-xs font-bold', waterproofTier === 'premium' ? 'text-white' : 'text-white/85')}>Premium</p>
           </div>
-          <p className={cn('text-[10px] leading-snug font-semibold mb-1', waterproofTier === 'premium' ? 'text-gold/70' : 'text-gold/45')}>Até 10 anos · 5 lavagens</p>
+          <p className={cn('text-[10px] leading-snug font-semibold mb-1', waterproofTier === 'premium' ? 'text-gold/70' : 'text-gold/75')}>Até 10 anos · 5 lavagens</p>
           {premiumPrice !== null ? (
             <p className="text-[11px] leading-none">
               <span className="text-white/30 line-through">{fmt(premiumPrice + 5)}€</span>{' '}
@@ -155,6 +155,7 @@ const QuizChairsAddonUpsell = ({ formData, updateFormData, onContinue, onBack }:
         </button>
         <button
           onClick={() => selectWaterproof('essencial')}
+          aria-pressed={waterproofTier === 'essencial'}
           className={cn(
             'rounded-sm border-2 px-3 py-2.5 text-left transition-all duration-200 touch-manipulation',
             waterproofTier === 'essencial' ? 'border-gold bg-[#1a2a1a] shadow-[0_0_10px_rgba(212,175,55,0.18)]' : 'border-gold/20 bg-[#1a2a1a] hover:border-gold/40'
@@ -164,18 +165,19 @@ const QuizChairsAddonUpsell = ({ formData, updateFormData, onContinue, onBack }:
             {waterproofTier === 'essencial' && <Check className="w-3 h-3 text-gold flex-shrink-0" />}
             <p className={cn('text-xs font-bold', waterproofTier === 'essencial' ? 'text-white' : 'text-white/60')}>Essencial</p>
           </div>
-          <p className="text-[10px] text-white/35 leading-snug mb-1">1 a 2 anos · 2 lavagens</p>
-          <p className={cn('text-[11px] font-bold', waterproofTier === 'essencial' ? 'text-white' : 'text-white/50')}>
+          <p className="text-[10px] text-white/65 leading-snug mb-1">1 a 2 anos · 2 lavagens</p>
+          <p className={cn('text-[11px] font-bold', waterproofTier === 'essencial' ? 'text-white' : 'text-white/70')}>
             {essencialPrice !== null ? `${fmt(essencialPrice)}€` : 'Sob orçamento'}
           </p>
         </button>
       </div>
 
-      <p className="text-[10px] font-bold tracking-[0.14em] uppercase text-white/35 w-full max-w-xs text-left mt-2">Outra opção</p>
+      <p className="text-[10px] font-bold tracking-[0.14em] uppercase text-white/65 w-full max-w-sm text-left mt-2">Outra opção</p>
       <button
         onClick={selectAntiAcaros}
+        aria-pressed={antiAcarosOn}
         className={cn(
-          'relative w-full max-w-xs min-h-[76px] flex items-center gap-3 pl-5 pr-3.5 py-3.5 rounded-sm border-2 text-left transition-all duration-200 touch-manipulation',
+          'relative w-full max-w-sm min-h-[76px] flex items-center gap-3 pl-5 pr-3.5 py-3.5 rounded-sm border-2 text-left transition-all duration-200 touch-manipulation',
           antiAcarosOn ? 'border-gold bg-[#1a2a1a] shadow-[0_0_18px_rgba(212,175,55,0.30)]' : 'border-dashed border-gold/40 bg-gold/[0.04] hover:border-gold/70 hover:bg-gold/[0.07]'
         )}
       >
@@ -185,8 +187,8 @@ const QuizChairsAddonUpsell = ({ formData, updateFormData, onContinue, onBack }:
         </span>
         <Bug className={cn('w-5 h-5 flex-shrink-0', antiAcarosOn ? 'text-gold' : 'text-gold/70')} />
         <div className="flex-1 min-w-0">
-          <p className={cn('text-sm font-bold', antiAcarosOn ? 'text-white' : 'text-white/90')}>Anti Ácaros</p>
-          <p className="text-[10px] text-white/35 leading-snug mt-0.5">Evita que os ácaros voltem a aparecer e elimina bactérias do estofo.</p>
+          <p className={cn('text-sm font-bold', antiAcarosOn ? 'text-white' : 'text-white/90')}>Desbacterização e Anti Ácaros</p>
+          <p className="text-[10px] text-white/65 leading-snug mt-0.5">Desbacterização e tratamento antiácaros do tecido, na mesma visita.</p>
           <p className={cn('text-[11px] font-semibold mt-1', antiAcarosOn ? 'text-gold' : 'text-gold/60')}>
             Por apenas <span className="font-black">+{CHAIR_ANTI_ACAROS_UNIT_RATE}€/un.</span>
           </p>
@@ -195,22 +197,22 @@ const QuizChairsAddonUpsell = ({ formData, updateFormData, onContinue, onBack }:
           'flex-shrink-0 w-7 h-7 rounded-full border-2 flex items-center justify-center transition-all',
           antiAcarosOn ? 'border-gold bg-gold' : 'border-gold/50 bg-transparent'
         )}>
-          <Plus className={cn('w-3.5 h-3.5 transition-transform', antiAcarosOn ? 'text-[#12121e] rotate-45' : 'text-gold')} strokeWidth={3} />
+          {antiAcarosOn ? <Check className="w-3.5 h-3.5 text-[#071a12]" strokeWidth={3} /> : <Plus className="w-3.5 h-3.5 text-gold" strokeWidth={3} />}
         </span>
       </button>
 
-      <div className="flex items-center gap-3 w-full max-w-xs mt-1">
+      <div className="flex items-center gap-3 w-full max-w-sm mt-1">
         <button
           onClick={onBack}
-          className="h-14 px-5 flex-shrink-0 bg-transparent border border-white/[0.14] text-white/50 hover:text-white/80 hover:border-white/30 active:scale-[0.98] touch-manipulation rounded-sm flex items-center justify-center transition-all text-sm font-semibold"
+          className="h-14 px-5 flex-shrink-0 bg-transparent border border-white/[0.14] text-white/70 hover:text-white/80 hover:border-white/30 active:scale-[0.98] touch-manipulation rounded-sm flex items-center justify-center transition-all text-sm font-semibold"
         >
           <ChevronLeft className="w-4 h-4 mr-1" /> Voltar
         </button>
         <button
           onClick={onContinue}
-          className="flex-1 h-14 bg-gradient-to-r from-gold to-[#d4c57b] hover:from-[#d4c57b] hover:to-gold text-[#12121e] font-black text-sm tracking-wider uppercase touch-manipulation active:scale-[0.98] rounded-sm shadow-[0_0_32px_rgba(212,175,55,0.30)]"
+          className="flex-1 h-14 bg-gradient-to-r from-gold to-[#d4c57b] hover:from-[#d4c57b] hover:to-gold text-[#12121e] font-black text-xs leading-snug px-2 tracking-wide uppercase touch-manipulation active:scale-[0.98] rounded-sm shadow-[0_0_32px_rgba(212,175,55,0.30)]"
         >
-          {anySelected ? 'Adicionar e Continuar' : 'Continuar'}
+          {anySelected ? 'Continuar com tratamento' : 'Continuar sem extras'}
         </button>
       </div>
     </div>

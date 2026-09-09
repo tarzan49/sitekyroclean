@@ -1,3 +1,4 @@
+import QuizCarpetMeasureGuide from '../QuizCarpetMeasureGuide';
 import type { CarpetItem } from '@/components/quiz/QuizTypes';
 import { carpetAddItem, carpetRemoveItem, carpetUpdateItem, carpetItemArea, carpetTotalArea } from '@/components/quiz/quizHelpers';
 
@@ -23,21 +24,22 @@ const QuizStepConfigCarpet = ({ carpetItems, setCarpetItems }: Props) => {
     <div className="flex flex-col gap-3 overflow-hidden items-center w-full">
       <p className="text-gold text-[10px] font-bold tracking-[0.28em] uppercase mb-0.5 text-center w-full">O QUE PRECISA?</p>
       <h2 className="font-playfair text-2xl sm:text-3xl font-bold text-white text-center w-full">Detalhes do(s) Tapete(s)</h2>
-      <p className="text-xs text-white/35 text-center leading-snug max-w-xs">
+      <QuizCarpetMeasureGuide />
+      <p className="text-xs text-white/70 text-center leading-snug max-w-sm">
         Meça cada tapete e adicione quantos precisar. Sem preço fixo por m², cada peça é sempre orçamentada à parte.
       </p>
-      <div className="flex flex-col gap-2 w-full max-w-xs">
+      <div className="flex flex-col gap-2 w-full max-w-sm">
         {carpetItems.map((item, i) => {
           const area = carpetItemArea(item);
           return (
             <div key={item.id} className="rounded-sm border border-gold/15 bg-[#1a2a1a] p-3 flex flex-col gap-2">
               <div className="flex items-center justify-between">
-                <span className="text-[11px] font-bold uppercase tracking-wider text-white/40">Tapete {i + 1}</span>
+                <span className="text-[11px] font-bold uppercase tracking-wider text-white/75">Tapete {i + 1}</span>
                 {carpetItems.length > 1 && (
                   <button
                     onClick={() => setCarpetItems(prev => carpetRemoveItem(prev, item.id))}
                     aria-label="Remover tapete"
-                    className="w-5 h-5 rounded-sm flex items-center justify-center text-white/30 hover:text-white/70 hover:bg-white/10 transition-colors touch-manipulation"
+                    className="w-11 h-11 rounded-sm flex items-center justify-center text-white/65 hover:text-white/70 hover:bg-white/10 transition-colors touch-manipulation"
                   >×</button>
                 )}
               </div>
@@ -45,25 +47,27 @@ const QuizStepConfigCarpet = ({ carpetItems, setCarpetItems }: Props) => {
                 <div className="flex-1 flex flex-col gap-1">
                   <input
                     type="number" inputMode="decimal" min="0" step="0.1" placeholder="0"
+                    aria-label={`Largura do tapete ${i + 1}, em metros`}
                     value={item.largura}
                     onChange={(e) => setCarpetItems(prev => carpetUpdateItem(prev, item.id, 'largura', e.target.value))}
                     className="w-full h-11 text-center text-base font-bold bg-white/[0.05] text-white placeholder:text-white/25 rounded-sm border-2 border-white/15 focus:border-gold focus:outline-none transition-colors"
                   />
-                  <span className="text-[9px] text-center uppercase tracking-wide text-white/30">Largura (m)</span>
+                  <span className="text-[9px] text-center uppercase tracking-wide text-white/65">Largura (m)</span>
                 </div>
                 <span className="text-white/25 text-sm pb-4">×</span>
                 <div className="flex-1 flex flex-col gap-1">
                   <input
                     type="number" inputMode="decimal" min="0" step="0.1" placeholder="0"
+                    aria-label={`Comprimento do tapete ${i + 1}, em metros`}
                     value={item.comprimento}
                     onChange={(e) => setCarpetItems(prev => carpetUpdateItem(prev, item.id, 'comprimento', e.target.value))}
                     className="w-full h-11 text-center text-base font-bold bg-white/[0.05] text-white placeholder:text-white/25 rounded-sm border-2 border-white/15 focus:border-gold focus:outline-none transition-colors"
                   />
-                  <span className="text-[9px] text-center uppercase tracking-wide text-white/30">Comprimento (m)</span>
+                  <span className="text-[9px] text-center uppercase tracking-wide text-white/65">Comprimento (m)</span>
                 </div>
               </div>
               <div className="text-right pt-1 border-t border-white/[0.06]">
-                <span className="text-[10px] text-white/30">Área </span>
+                <span className="text-[10px] text-white/65">Área </span>
                 <span className="text-sm font-bold text-gold tabular-nums">{area !== null ? `${area % 1 === 0 ? area : area.toFixed(2).replace('.', ',')} m²` : '0 m²'}</span>
               </div>
             </div>
@@ -82,7 +86,7 @@ const QuizStepConfigCarpet = ({ carpetItems, setCarpetItems }: Props) => {
           Área total: <span className="text-white/60 font-semibold">{totalArea % 1 === 0 ? totalArea : totalArea.toFixed(2).replace('.', ',')} m²</span>
         </p>
       )}
-      <p className="text-xs text-white/30 text-center leading-snug">
+      <p className="text-xs text-white/65 text-center leading-snug">
         Qualquer tapete é sempre sob orçamento. Confirmamos o preço certo na visita, sem compromisso.
       </p>
     </div>

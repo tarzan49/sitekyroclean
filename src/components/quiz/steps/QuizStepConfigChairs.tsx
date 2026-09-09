@@ -1,3 +1,4 @@
+import QuizCareIntro from '../QuizCareIntro';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
 import type { QuizFormData } from '@/components/quiz/QuizTypes';
@@ -52,6 +53,7 @@ const QuizStepConfigChairs = ({ formData, updateFormData }: Props) => {
       <h2 className="font-playfair text-2xl sm:text-3xl font-bold text-white text-center w-full">
         {isWaterproofPrimary ? 'Escolha a sua impermeabilização' : 'Detalhes das Cadeiras'}
       </h2>
+      <QuizCareIntro service="chairs">Indique quantas cadeiras pretende tratar. Os cuidados adicionais são escolhidos no passo seguinte.</QuizCareIntro>
       {isWaterproofPrimary && (
         <WaterproofingTierPicker
           formData={formData}
@@ -66,14 +68,14 @@ const QuizStepConfigChairs = ({ formData, updateFormData }: Props) => {
             'w-full max-w-xs rounded-sm border px-5 py-4 text-center transition-all duration-300',
             sob ? 'bg-[#1a2a1a] border-white/20' : 'bg-[#1a2a1a] border-gold/30 shadow-[0_0_20px_rgba(212,175,55,0.10)]'
           )}>
-            <p className="text-[10px] text-white/35 uppercase tracking-wider mb-1">Estimativa total</p>
+            <p className="text-[10px] text-white/70 uppercase tracking-wider mb-1">Estimativa total</p>
             <p
               className={cn('font-playfair font-black leading-none mb-1', sob ? 'text-white/60 text-2xl' : 'text-gold text-4xl')}
               style={!sob ? { textShadow: '0 0 28px rgba(212,175,55,0.55)' } : undefined}
             >
               {sob ? 'Sob Orçamento' : `${totalChairPrice % 1 === 0 ? totalChairPrice : totalChairPrice.toFixed(1).replace('.', ',')}€`}
             </p>
-            <p className="text-[10px] text-white/30">
+            <p className="text-[10px] text-white/65">
               {sob
                 ? 'O nosso especialista entra em contacto'
                 : `${qty} cadeira${qty > 1 ? 's' : ''}${addonEnabled ? (isWaterproofPrimary ? ' + higienização' : ' + impermeabilização') : ''}`}

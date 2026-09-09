@@ -64,3 +64,7 @@ Pedido do responsável: WhatsApp principal e ligação à tabela de preços nas 
 ## Deslocações Braga e Algarve (2026-09-10)
 
 Pedido do responsável: Braga com base local, 10€ em Braga, Guimarães, Vila Nova de Famalicão, Barcelos e Póvoa de Lanhoso; 15€ em Fafe e Esposende; 20€ em Viana do Castelo. Algarve: 25€ nos extremos/interior (Vila Real de Santo António, Castro Marim, Monchique, Aljezur, Vila do Bispo, Alcoutim); Portimão e Lagos mantêm 15€ e restantes zonas 10€. Esta regra substitui o antigo máximo de 15€ no Algarve. Atualizar sempre as duas tabelas (`QuizTypes.ts` e `locationSeoData.ts`). Os escalões são por localidade, não um cálculo GPS por morada.
+
+## Nome do tratamento no orçamento (2026-09-10)
+
+Pedido do responsável: explicitar «Desbacterização e Anti Ácaros» nos upsells de colchões e cadeiras e nos respetivos resumos/recibos. É a apresentação conjunta do tratamento existente, sem alteração de preços. Implementado na branch de pré-visualização `codex/quote-visual-preview`.

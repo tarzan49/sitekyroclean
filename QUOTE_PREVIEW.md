@@ -21,3 +21,9 @@ Generate a production website asset: a square 2x2 sprite sheet with four realist
 Imagens geradas com image_gen: `public/images/services/quote-sofa-sizes.png` (2×2: poltrona de 1 lugar, sofás de 2, 3 e 4 lugares) e `public/images/services/quote-mattress-sizes.png` (solteiro estreito, casal médio, King largo). Mesma iluminação, tecido bege, fundo transparente, sem texto, com proporções e número de assentos diferentes. `QuizFurnitureImage` seleciona por sizeId e usa recortes individuais no sprite de colchões para evitar fragmentos da imagem vizinha. Verificados os três colchões e quatro sofás em 390×844.
 
 A proposta conjunta mantém o cabeçalho e o picotado e reforça o contraste dos preços. O topo permite abrir a composição dos serviços, desconto e deslocação, calculados pelo motor real. Os 19 testes do orçamento continuam a passar.
+
+## Cuidados adicionais e tapetes (2026-09-10)
+
+Os upsells de colchões e cadeiras apresentam explicitamente «Desbacterização e Anti Ácaros», incluindo no resumo e recibo, sem alterar os preços. As imagens contextualizam cada serviço; os controlos selecionados e o botão de continuação tornam a opção escolhida mais clara. A impermeabilização conserva Essencial e Premium. Os tapetes incluem um guia visual largura × comprimento, medidas acessíveis e continuam sob orçamento.
+
+Exemplos locais: `/__preview/orcamento?exemplo=antiacaros`, `?exemplo=impermeabilizacao`, `?exemplo=cadeiras` e `?exemplo=tapetes`. Validação: 22 testes passaram, incluindo seleção opcional dos tratamentos, preços e medidas dos tapetes. Verificados os ecrãs no navegador, incluindo impermeabilização e cadeiras a 390 × 844. Mantém-se a limitação de build da base descrita acima.

@@ -77,7 +77,7 @@ function calcInitialStep(loc?: string, svc?: string, hasItem?: boolean, skipUpse
   if (hasItem) return 3;
   // Skip serviceType selector when already known or service doesn't need it
   // (só o tapete não tem essa escolha — sofá, colchão e cadeiras têm todos
-  // Higienização vs Impermeabilização/Anti Ácaros, ver shouldSkipServiceType).
+  // Higienização vs Impermeabilização/Desbacterização e Anti Ácaros, ver shouldSkipServiceType).
   const skipType = svc === 'carpet' || svc === 'mattress' || hasSvcType;
   return skipType ? 3 : 2;
 }
@@ -157,7 +157,7 @@ const QuizForm = ({
   const [exitIntentFired, setExitIntentFired] = useState(false);
   const startsAtUpsell = Boolean(skipToUpsell && initialLocation);
   // Upsell "estilo companhia aérea" (2026-09-06, uniformizado 2026-09-08): para
-  // cadeiras/sofá/colchão + limpeza, a decisão de proteção/Anti Ácaros sai da
+  // cadeiras/sofá/colchão + limpeza, a decisão de proteção/Desbacterização e Anti Ácaros sai da
   // etapa de quantidades e passa para um ecrã dedicado logo a seguir ao
   // "Continuar" — nunca compete visualmente com a escolha de quantidade.
   // Mostra-se sempre que se avança de step3 (sem flag "só uma vez por sessão":
@@ -376,12 +376,12 @@ const QuizForm = ({
 
   const getServiceTypeLabel = () => {
     if (formData.serviceType === 'waterproofing') {
-      if (formData.service === 'mattress') return 'Anti Ácaros';
+      if (formData.service === 'mattress') return 'Desbacterização e Anti Ácaros';
       return formData.waterproofingTier === 'premium' ? 'Impermeabilização Premium' : 'Impermeabilização Essencial';
     }
     const labels: Record<string, string> = {
       cleaning: 'Higienização Profunda',
-      both: formData.service === 'mattress' ? 'Pack: Limpeza + Anti Ácaros' : 'Pack Proteção Total',
+      both: formData.service === 'mattress' ? 'Pack: Limpeza + Desbacterização e Anti Ácaros' : 'Pack Proteção Total',
     };
     return labels[formData.serviceType] || '';
   };
@@ -444,7 +444,7 @@ const QuizForm = ({
             const bothP = typeof opt.bothPrice === 'number' ? opt.bothPrice : (baseP !== null ? baseP + 30 : null);
             const unitPrice = i.packEnabled ? bothP : baseP;
             const lineTotal = unitPrice !== null ? unitPrice * i.qty : null;
-            const tierTag = i.packEnabled ? ' + Anti Ácaros' : (isWaterproofBase ? ' (Anti Ácaros)' : '');
+            const tierTag = i.packEnabled ? ' + Desbacterização e Anti Ácaros' : (isWaterproofBase ? ' (Desbacterização e Anti Ácaros)' : '');
             return `${i.qty}x Colchão ${opt.label}${tierTag}: ${fmtEuro(lineTotal)}`;
           })
           .filter(Boolean) as string[];
@@ -470,7 +470,7 @@ const QuizForm = ({
             details.push(`${addonLabel} de ${wQty} cadeira(s): ${fmtEuro(addonTotal)}`);
           }
           if (formData.chairAntiAcaros && !isNaN(qty) && qty > 0) {
-            details.push(`Anti Ácaros de ${qty} cadeira(s): ${fmtEuro(qty * 5)}`);
+            details.push(`Desbacterização e Anti Ácaros de ${qty} cadeira(s): ${fmtEuro(qty * 5)}`);
           }
         }
         break;
@@ -806,7 +806,7 @@ ${formData.description || 'Sem observações adicionais'}
                 <QuizStep1Service
                   selectedService={formData.service}
                   onSelect={(service) => {
-                    // Colchão volta a saltar o Passo 2 (2026-09-08): Anti Ácaros não
+                    // Colchão volta a saltar o Passo 2 (2026-09-08): Desbacterização e Anti Ácaros não
                     // existe como serviço primário, só como upsell dependente de uma
                     // limpeza — ver shouldSkipServiceType acima para mais contexto.
                     const skipServiceType = service === 'carpet' || service === 'mattress';
@@ -835,9 +835,9 @@ ${formData.description || 'Sem observações adicionais'}
               const waterDesc = formData.service === 'mattress'
                 ? 'Elimina ácaros e alergénios em profundidade.'
                 : undefined;
-              const waterTitle = formData.service === 'mattress' ? 'Anti Ácaros' : undefined;
+              const waterTitle = formData.service === 'mattress' ? 'Desbacterização e Anti Ácaros' : undefined;
               const waterSubtitle = formData.service === 'mattress' ? 'Tratamento Anti-Ácaros' : undefined;
-              const bothDescText = formData.service === 'mattress' ? 'Limpeza Profunda + Anti Ácaros' : undefined;
+              const bothDescText = formData.service === 'mattress' ? 'Limpeza Profunda + Desbacterização e Anti Ácaros' : undefined;
               return (
                 <div className="flex-1 flex flex-col gap-4 w-full max-w-sm self-center items-center text-center">
                   <div>

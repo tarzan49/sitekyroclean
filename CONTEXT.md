@@ -1053,3 +1053,7 @@ Commits desta sessão (ordem cronológica, todos em `worktree-kyro-minorder-emda
 ## Pré-visualização visual do orçamento (2026-09-10, branch codex/quote-visual-preview)
 
 Proposta para avaliação, ainda não integrada em master: `QuizEstimate.tsx` apresenta o total calculado pelo motor existente, o preço anterior e a poupança. A animação respeita redução de movimento e substitui confettis/toast de desconto. `QuizComboUpsellScreen.tsx` usa imagens de mobiliário, cartões tracejados e botão +, sem preços na seleção de categorias; os preços continuam nos detalhes. A rota `/__preview/orcamento` existe apenas em desenvolvimento e abre o componente real com três sofás de 3 lugares, limpeza + impermeabilização Premium em Porto: 607€ antes e 547€ depois do desconto. A origem das imagens e validação estão em `QUOTE_PREVIEW.md`.
+
+### Pré-visualização dos cuidados adicionais (2026-09-10)
+
+Na branch `codex/quote-visual-preview`, `QuizCareIntro` reutiliza `QuizFurnitureImage` para contextualizar os tratamentos; `QuizCarpetMeasureGuide` é partilhado pelos detalhes de tapetes principais e extras. A rota DEV `/__preview/orcamento` aceita `exemplo=antiacaros|impermeabilizacao|cadeiras|tapetes` para revisão dos ecrãs reais com dados iniciais. Não altera o motor de preços.
