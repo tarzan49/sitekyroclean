@@ -1,7 +1,8 @@
+import QuizEstimate from '@/components/quiz/QuizEstimate';
 import QuizFurnitureImage from '@/components/quiz/QuizFurnitureImage';
 import { WaterproofingTierPicker } from "@/components/quiz/steps/WaterproofingTierPicker";
 import { useState } from "react";
-import { Minus, Plus, Check, ChevronRight, MapPin, ShieldCheck } from "lucide-react";
+import { Minus, Plus, ChevronRight, MapPin, ShieldCheck } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { usePriceWidgetState } from "@/hooks/use-price-widget";
 import { useQuizLauncher } from "@/hooks/use-quiz-launcher";
@@ -55,16 +56,25 @@ export default function PriceWidget({ serviceSlug, initialLocation }: Props) {
 
   return (
     <div
-      className="rounded-2xl overflow-hidden border border-white/15 bg-[#0d2a1c] text-left"
-      style={{ boxShadow: "0 16px 40px rgba(7,26,18,0.16)" }}
+      className="w-full max-w-lg mx-auto rounded-sm overflow-hidden border border-white/[0.18] bg-checker-modal text-left"
+      style={{ boxShadow: "0 8px 60px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.07)" }}
     >
-      <div className="px-5 pt-5 pb-4">
-        <div className="flex items-center justify-between gap-2 mb-3">
-          <p className="text-[10px] font-bold tracking-[0.18em] uppercase text-[#e1c477]">Orçamento gratuito</p>
-          {initialLocation && <span className="inline-flex items-center gap-1 text-xs text-white/85"><MapPin className="h-3.5 w-3.5" />{initialLocation}</span>}
+      <div className="px-5 sm:px-6 py-4 flex items-center justify-between gap-2 border-b border-gold/20">
+        <div className="flex items-center gap-2">
+          <span className="font-playfair text-[14px] font-bold text-white/90 leading-none">Kyro</span>
+          <span className="h-3 w-px bg-white/20" />
+          <span className="text-[9px] font-bold tracking-[0.22em] uppercase text-gold/65">Orçamento</span>
         </div>
-        <h3 className="font-playfair text-white font-bold text-2xl leading-tight">{isWaterproofService ? 'Escolha a sua impermeabilização' : serviceSlug === 'limpeza-sofas' ? 'Quanto custa limpar o seu sofá?' : 'Prepare o seu orçamento'}</h3>
-        <p className="text-sm mt-2 text-white/80">Escolha o tamanho e a quantidade.</p>
+        {initialLocation && <span className="inline-flex items-center gap-1 text-xs text-white/65"><MapPin className="h-3.5 w-3.5" />{initialLocation}</span>}
+      </div>
+      {hasSelection && <div className="px-4 sm:px-6">
+        <QuizEstimate totalPrice={total > 0 ? pricing.grandTotal : 0} discountedPrice={pricing.discountedTotal} discountActive={pricing.discountActive} needsQuote={hasUnpricedSelection} travelOnly={false} location={initialLocation ?? ''} travelCost={initialLocation && total > 0 ? travelFee : undefined} />
+        {!initialLocation && <p className="pt-2 text-center text-xs text-white/65">Deslocação a confirmar conforme a localidade.</p>}
+      </div>}
+      <div className="px-4 sm:px-6 pt-5 pb-4 text-center">
+        <p className="text-gold text-[11px] font-bold tracking-[0.28em] uppercase mb-3">{isWaterproofService ? 'PROTEÇÃO' : 'QUANTIDADES'}</p>
+        <h3 className="font-playfair text-white font-bold text-2xl sm:text-3xl leading-tight">{isWaterproofService ? 'Escolha a sua impermeabilização' : serviceSlug === 'limpeza-sofas' ? 'Detalhes do(s) Sofá(s)' : serviceSlug === 'limpeza-colchoes' ? 'Detalhes do(s) Colchão(ões)' : 'Detalhes do serviço'}</h3>
+        <p className="text-sm mt-2 text-white/65">Escolha o tamanho e a quantidade.</p>
       </div>
 
       {isWaterproofService && (
@@ -79,7 +89,7 @@ export default function PriceWidget({ serviceSlug, initialLocation }: Props) {
         </div>
       )}
       {/* Linhas */}
-      <div className="px-3 sm:px-4 pb-4 space-y-2">
+      <div className="px-3 sm:px-0 pb-4 space-y-2 w-full max-w-sm mx-auto">
         {(!isWaterproofService || w.tierChosen) && rows.map((row, i) => {
           const quizConfig = quizConfigs[i] ?? null;
 
@@ -181,17 +191,17 @@ export default function PriceWidget({ serviceSlug, initialLocation }: Props) {
           }
 
           return (
-            <div key={i} className={cn("rounded-xl border transition-colors", active ? "border-[#d4b563] bg-[#254535]" : "border-dashed border-white/30 bg-white/[0.025]")}>
-              <div className="flex items-center gap-2 px-2 py-3">
-                <QuizFurnitureImage service={quizConfig.service as 'sofa' | 'mattress' | 'chairs'} sizeId={quizConfig.sofaSizeId ?? quizConfig.mattressSizeId} className="!w-11 !h-11 sm:!w-14 sm:!h-14" />
+            <div key={i} className={cn("rounded-sm border-2 transition-all duration-200 overflow-hidden", active ? "border-gold/50 bg-[#1a2a1a] shadow-[0_0_8px_rgba(212,175,55,0.10)]" : "border-dashed border-gold/30 bg-gold/[0.03]")}>
+              <div className="flex items-center gap-2 px-2.5 sm:px-3 py-3">
+                <QuizFurnitureImage service={quizConfig.service as 'sofa' | 'mattress' | 'chairs'} sizeId={quizConfig.sofaSizeId ?? quizConfig.mattressSizeId} />
                 <div className="flex-1 min-w-0">
                   <p className="text-[13px] sm:text-sm font-semibold leading-snug text-white">{row.item}</p>
-                  {dynamicPrice !== null && <p className={cn("text-sm mt-1 tabular-nums", active ? "text-[#ecd38d]" : "text-white/85")}>{dynamicPrice}</p>}
+                  {dynamicPrice !== null && <p className={cn("text-sm font-bold mt-0.5 tabular-nums", active ? "text-white/80" : "text-white/70")}>{dynamicPrice}</p>}
                 </div>
-                <div className="flex items-center shrink-0">
-                  <button type="button" onClick={() => w.adjustQty(i, -1)} disabled={qty === 0} aria-label={`Diminuir ${row.item}`} className="w-11 h-11 rounded-full border border-white/35 text-white flex items-center justify-center disabled:opacity-35 active:scale-95 transition-all touch-manipulation focus-visible:outline focus-visible:outline-2 focus-visible:outline-gold"><Minus className="w-4 h-4" /></button>
-                  <span className="w-6 text-center text-base font-semibold tabular-nums text-white">{qty}</span>
-                  <button type="button" onClick={() => w.adjustQty(i, 1)} aria-label={`Aumentar ${row.item}`} className={cn("w-11 h-11 rounded-full border flex items-center justify-center active:scale-95 transition-all touch-manipulation focus-visible:outline focus-visible:outline-2 focus-visible:outline-gold", active ? "bg-[#d4b563] border-[#d4b563] text-[#071a12]" : "border-white/40 text-white hover:border-gold")}><Plus className="w-4 h-4" /></button>
+                <div className="flex items-center gap-1 shrink-0">
+                  <button type="button" onClick={() => w.adjustQty(i, -1)} disabled={qty === 0} aria-label={`Diminuir ${row.item}`} className="w-11 h-11 sm:w-12 sm:h-12 rounded-sm border-2 border-white/20 bg-white/[0.05] text-white flex items-center justify-center disabled:opacity-35 active:scale-95 transition-all touch-manipulation focus-visible:outline focus-visible:outline-2 focus-visible:outline-gold"><Minus className="w-4 h-4" /></button>
+                  <span className="w-5 text-center text-base font-bold tabular-nums text-white">{qty}</span>
+                  <button type="button" onClick={() => w.adjustQty(i, 1)} aria-label={`Aumentar ${row.item}`} className="w-11 h-11 sm:w-12 sm:h-12 rounded-sm border-2 border-white/20 bg-white/[0.05] text-white flex items-center justify-center active:scale-95 transition-all touch-manipulation hover:border-gold/50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-gold"><Plus className="w-4 h-4" /></button>
                 </div>
               </div>
             </div>
@@ -199,23 +209,9 @@ export default function PriceWidget({ serviceSlug, initialLocation }: Props) {
         })}
       </div>
 
-      <div className="px-5 pb-5">
-        {hasSelection && <div aria-live="polite" className="border-t border-white/20 pt-4 mb-4 space-y-2">
-          <div className="flex justify-between gap-3 text-sm text-white/85"><span>Serviços</span><span className="font-semibold">{total > 0 ? `${total} €` : 'Sob orçamento'}</span></div>
-          <div className="flex justify-between gap-3 text-sm text-white/85"><span>Deslocação{initialLocation ? ` a ${initialLocation}` : ''}</span><span className="font-semibold">{initialLocation ? `${travelFee} €` : 'A confirmar'}</span></div>
-          {pricing.discountActive && <div className="flex items-center justify-between gap-2 rounded-lg bg-gold/10 p-3 text-[#ecd38d]"><span className="text-sm flex items-center gap-2"><Check className="h-4 w-4" />Poupa 10% nos serviços</span><strong className="whitespace-nowrap">−{pricing.grandTotal - pricing.discountedTotal} €</strong></div>}
-          <div className="flex items-center justify-between gap-3 border-t border-white/20 pt-3 !mt-3">
-            <span className="font-playfair font-bold text-lg text-white">Total estimado</span>
-            <div className="text-right">
-              {pricing.discountActive && <p className="text-xs line-through text-white/65">{pricing.grandTotal} €</p>}
-              <span className="font-playfair text-2xl font-bold text-[#ecd38d]">{total > 0 ? `${pricing.discountActive ? pricing.discountedTotal : pricing.grandTotal} €` : 'Sob orçamento'}</span>
-            </div>
-          </div>
-          {hasUnpricedSelection && total > 0 && <p className="text-xs text-white/80">Acresce o valor dos artigos sob orçamento.</p>}
-          {!initialLocation && total > 0 && <p className="text-xs text-white/80">Deslocação a confirmar no próximo passo.</p>}
-        </div>}
+      <div className="px-3 sm:px-0 pb-5 w-full max-w-sm mx-auto">
         {!hasSelection && <p className="text-xs text-white/80 mb-3">{initialLocation ? `Deslocação a ${initialLocation}: ${travelFee} €` : 'Deslocação calculada conforme a localidade.'}</p>}
-        <button type="button" onClick={handleContinue} disabled={!hasSelection} className={cn("w-full h-12 flex items-center justify-center gap-3 bg-[#d4b563] hover:bg-[#e1c477] text-[#071a12] font-bold text-base touch-manipulation active:scale-[0.98] rounded-xl transition-all focus-visible:outline focus-visible:outline-2 focus-visible:outline-white", !hasSelection && "opacity-60")}>
+        <button type="button" onClick={handleContinue} disabled={!hasSelection} className={cn("w-full h-12 flex items-center justify-center gap-3 bg-gradient-to-r from-gold to-[#d4c57b] hover:from-[#d4c57b] hover:to-gold text-[#12121e] font-bold text-base touch-manipulation active:scale-[0.98] rounded-sm shadow-[0_4px_28px_rgba(212,175,55,0.40)] transition-all focus-visible:outline focus-visible:outline-2 focus-visible:outline-white", !hasSelection && "opacity-60")}>
           Continuar <ChevronRight className="w-5 h-5" />
         </button>
         <p className="flex justify-center items-center gap-2 text-xs mt-3 text-white/80"><ShieldCheck className="w-4 h-4" />Gratuito e sem compromisso</p>
