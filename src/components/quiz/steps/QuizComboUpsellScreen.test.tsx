@@ -6,15 +6,15 @@ import type { UpsellItemConfig } from '../QuizTypes';
 
 afterEach(cleanup);
 
-function Harness() {
+function Harness({ primaryService = 'other', packDiscountActive = false } = {}) {
   const [items, setItems] = useState<UpsellItemConfig[]>([]);
   const [contact, setContact] = useState(false);
   return <>
     <output data-testid="items">{JSON.stringify(items)}</output>
     {contact ? <button onClick={() => setContact(false)}>Voltar aos extras</button> :
-      <QuizComboUpsellScreen upsellItems={items} setUpsellItems={setItems}
+      <QuizComboUpsellScreen primaryService={primaryService} upsellItems={items} setUpsellItems={setItems}
         onContinue={() => setContact(true)} onBack={() => {}}
-        totalPrice={100} packDiscountActive={false} packDiscountedPrice={100} />}
+        totalPrice={207} packDiscountActive={packDiscountActive} packDiscountedPrice={packDiscountActive ? 187 : 207} />}
   </>;
 }
 const click = (name: string | RegExp) => fireEvent.click(screen.getByRole('button', { name }));
@@ -32,6 +32,28 @@ function addCarpet() {
 }
 
 describe('final upsell navigation', () => {
+  it.each([
+    ['sofa', /^Sofá/], ['mattress', /^Colchão/], ['chairs', /^Cadeiras/], ['carpet', /^Tapete/],
+  ])('excludes the primary %s category from suggestions', (primaryService, label) => {
+    render(<Harness primaryService={primaryService} />);
+    expect(screen.queryByRole('button', { name: label })).toBeNull();
+    expect(screen.getByRole('button', { name: 'Finalizar Orçamento' })).toBeTruthy();
+  });
+
+  it('acknowledges an existing discount and follows changes to eligibility', () => {
+    const { rerender } = render(<Harness primaryService="sofa" packDiscountActive />);
+    expect(screen.getByText('APROVEITE A MESMA VISITA')).toBeTruthy();
+    expect(screen.getByRole('heading', { name: 'Quer limpar mais alguma coisa?' })).toBeTruthy();
+    expect(screen.getByText(/Já tem 10% de desconto/)).toBeTruthy();
+    expect(screen.queryByText(/Válido a partir de/)).toBeNull();
+    roundTrip();
+    expect(savedItems()).toEqual([]);
+    expect(screen.getByText(/Já tem 10% de desconto/)).toBeTruthy();
+    rerender(<Harness primaryService="sofa" packDiscountActive={false} />);
+    expect(screen.getByRole('heading', { name: 'Poupe 10% no pedido todo' })).toBeTruthy();
+    expect(screen.getByText(/Válido a partir de/)).toBeTruthy();
+  });
+
   it('preserves all categories and individual carpet dimensions when returning from contact', () => {
     render(<Harness />);
     click(/^Colchão/); increment(1); confirm();

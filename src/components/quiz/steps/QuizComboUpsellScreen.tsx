@@ -10,6 +10,7 @@ import {
 import { PACK_DISCOUNT_MIN_SERVICE, PACK_DISCOUNT_MIN_UPSELL_ITEM } from '@/lib/priceWidgetCalc';
 
 interface QuizComboUpsellScreenProps {
+  primaryService: string;
   upsellItems: UpsellItemConfig[];
   setUpsellItems: (items: UpsellItemConfig[]) => void;
   onContinue: () => void;
@@ -41,7 +42,7 @@ function fmt(n: number): string {
 // quantidades com os tamanhos/preços reais do negócio, em vez do fluxo
 // anterior de escolher um item de cada vez. Substitui QuizUpsellOverlay
 // no ponto "antes de finalizar" (pedido explícito, aprovado em mockup).
-const QuizComboUpsellScreen = ({ upsellItems, setUpsellItems, onContinue, onBack, totalPrice, packDiscountActive, packDiscountedPrice }: QuizComboUpsellScreenProps) => {
+const QuizComboUpsellScreen = ({ primaryService, upsellItems, setUpsellItems, onContinue, onBack, totalPrice, packDiscountActive, packDiscountedPrice }: QuizComboUpsellScreenProps) => {
   const [view, setView] = useState<View>('summary');
   // This screen remounts when returning from contact. Restore the selection
   // before the synchronization effect can overwrite the parent's items.
@@ -360,11 +361,21 @@ const QuizComboUpsellScreen = ({ upsellItems, setUpsellItems, onContinue, onBack
 
   return (
     <div className="flex flex-col gap-2 overflow-hidden items-center w-full">
-      <p className="text-gold text-[10px] font-bold tracking-[0.28em] uppercase mb-0.5 text-center w-full">UM BÓNUS PARA SI</p>
-      <h2 className="font-playfair text-2xl sm:text-3xl font-bold text-white text-center w-full">Poupe 10% no pedido todo</h2>
+      <p className="text-gold text-[10px] font-bold tracking-[0.28em] uppercase mb-0.5 text-center w-full">
+        {packDiscountActive ? 'APROVEITE A MESMA VISITA' : 'UM BÓNUS PARA SI'}
+      </p>
+      <h2 className="font-playfair text-2xl sm:text-3xl font-bold text-white text-center w-full">
+        {packDiscountActive ? 'Quer limpar mais alguma coisa?' : 'Poupe 10% no pedido todo'}
+      </h2>
       <p className="text-xs text-white/55 text-center max-w-xs leading-relaxed -mt-1">
-        Se juntar mais um serviço, o desconto aplica-se a tudo, não só ao extra.{' '}
-        <span className="text-white/25 text-[10px]">Válido a partir de {PACK_DISCOUNT_MIN_SERVICE}€, extra de {PACK_DISCOUNT_MIN_UPSELL_ITEM}€+.</span>
+        {packDiscountActive ? (
+          'Já tem 10% de desconto no seu pedido. Adicione outro serviço e aproveite o mesmo desconto também no que acrescentar.'
+        ) : (
+          <>
+            Se juntar mais um serviço, o desconto aplica-se a tudo, não só ao extra.{' '}
+            <span className="text-white/25 text-[10px]">Válido a partir de {PACK_DISCOUNT_MIN_SERVICE}€, extra de {PACK_DISCOUNT_MIN_UPSELL_ITEM}€+.</span>
+          </>
+        )}
       </p>
 
       {/* Grelha 2x2 compacta — mesma proporção do Passo 1 (QuizStep1Service),
@@ -373,7 +384,7 @@ const QuizComboUpsellScreen = ({ upsellItems, setUpsellItems, onContinue, onBack
           2026-09-08: a versão em lista vertical empurrava o rodapé para
           fora do ecrã). */}
       <div className="grid grid-cols-2 gap-2 w-full max-w-xs">
-        {rowConfig.map(row => (
+        {rowConfig.filter(row => row.view !== primaryService || row.selected).map(row => (
           <button
             key={row.view}
             onClick={() => setView(row.view)}

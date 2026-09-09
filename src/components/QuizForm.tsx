@@ -973,6 +973,7 @@ ${formData.description || 'Sem observações adicionais'}
                 explícito, aprovado em mockup 2026-09-06). */}
             {activeUpsellScreen === 'combo' && (
               <QuizComboUpsellScreen
+                primaryService={formData.service}
                 upsellItems={upsellItems}
                 setUpsellItems={setUpsellItems}
                 totalPrice={totalPrice}

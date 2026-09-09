@@ -344,6 +344,14 @@ Sub-passo 'config':
 
 ## Upsell final — "Aproveite e poupe 10%" (atual, desde 2026-09-06)
 
+**Personalização (2026-09-10):** `QuizForm` passa `formData.service` como
+`primaryService` ao `QuizComboUpsellScreen`, que exclui essa categoria das
+sugestões (mantendo extras já selecionados editáveis). A mensagem acompanha
+`packDiscountActive`: com desconto, "APROVEITE A MESMA VISITA" / "Quer limpar
+mais alguma coisa?" e confirmação de que os 10% também abrangem os extras;
+sem desconto, mantém a oferta e as condições de elegibilidade. Não altera o
+cálculo de preços nem obriga a adicionar extras para finalizar.
+
 **Correção de navegação (2026-09-10):** ao regressar do contacto, o
 `QuizComboUpsellScreen` inicializa as quantidades a partir de `upsellItems`,
 antes de sincronizar alterações com o formulário. `UpsellItemConfig.carpetItems`
