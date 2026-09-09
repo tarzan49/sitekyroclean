@@ -137,11 +137,11 @@ export const locationPrices: Record<string, number> = {
   'Lousada': 15,
   // Zona 4 — Mais afastado, ~45-55 min
   'Arouca': 20,
-  'Braga': 20,
   'Aveiro': 20,
-  // Zona 5 — Minho, ~55-70 min
-  'Guimarães': 20,
-  // Zona 6 — Braga/Minho, equipa local Braga, preço por distância a Braga, nunca acima de 20€
+  // ═══ Braga/Minho (equipa local, escalões por distância ao centro de Braga) ═══
+  // Centro e concelhos próximos: 10€; afastados: 15€; extremos: 20€.
+  'Braga': 10,
+  'Guimarães': 10,
   'Vila Nova de Famalicão': 10,
   'Barcelos': 10,
   'Viana do Castelo': 20,
@@ -150,7 +150,7 @@ export const locationPrices: Record<string, number> = {
   'Esposende': 15,
 
   // ═══ Lisboa / Área Metropolitana (equipa local) ═══
-  // Regra: mínimo 10€, máximo 15€ (nunca 5€ nem 20€ em Lisboa/Algarve).
+  // Lisboa: mínimo 10€, máximo 15€.
   // Zona 0 — Lisboa
   'Lisboa': 10,
   // Zona 1 — Vizinhos imediatos, ~10-15 min
@@ -176,7 +176,7 @@ export const locationPrices: Record<string, number> = {
   'Sesimbra': 15,
 
   // ═══ Algarve (equipa local) ═══
-  // Regra: mínimo 10€, máximo 15€ (nunca 5€ nem 20€ em Lisboa/Algarve).
+  // Algarve: 10€ no centro, 15€ na zona ocidental e 25€ nos extremos/interior.
   // Zona 0 — Faro/Loulé
   'Faro': 10,
   'Loulé': 10,
@@ -192,13 +192,13 @@ export const locationPrices: Record<string, number> = {
   'Portimão': 15,
   'Lagos': 15,
   // Zona 4 — Extremos, ~40-55 min
-  'Vila Real de Santo António': 15,
-  'Castro Marim': 15,
-  'Monchique': 15,
+  'Vila Real de Santo António': 25,
+  'Castro Marim': 25,
+  'Monchique': 25,
   // Zona 5 — Interior/Costa Vicentina, ~55-70 min
-  'Aljezur': 15,
-  'Vila do Bispo': 15,
-  'Alcoutim': 15,
+  'Aljezur': 25,
+  'Vila do Bispo': 25,
+  'Alcoutim': 25,
 };
 
 export interface SofaItem     { sizeId: string; qty: number; packEnabled: boolean; }

@@ -60,3 +60,7 @@ As páginas que usam `ServiceReviewsGrid`, incluindo variantes de higienização
 ## Páginas de sofás e entrada Ads (2026-09-10)
 
 Pedido do responsável: WhatsApp principal e ligação à tabela de preços nas páginas de limpeza de sofás e variantes de limpeza/higienização (`SofaLeadActions`). Mostrar deslocação junto do preço inicial, sem alterar valores. Resposta de referência: menos de 30 minutos durante o horário de atendimento (substitui a exceção anterior de 10 minutos nestas duas famílias de páginas). Secagem normalmente 4 a 6 horas, dependente das condições. Não apresentar garantias totais de remoção de manchas nem percentagens/certificações sem comprovação. `?ads=1`, identificadores de clique Google ou `utm_medium=cpc/ppc/paidsearch` ativam navegação reduzida nas páginas de sofás; entradas orgânicas conservam os diretórios. O evento GA4 `whatsapp_click` mede apenas o clique; a importação/configuração de conversões na conta Google Ads ainda exige verificação.
+
+## Deslocações Braga e Algarve (2026-09-10)
+
+Pedido do responsável: Braga com base local, 10€ em Braga, Guimarães, Vila Nova de Famalicão, Barcelos e Póvoa de Lanhoso; 15€ em Fafe e Esposende; 20€ em Viana do Castelo. Algarve: 25€ nos extremos/interior (Vila Real de Santo António, Castro Marim, Monchique, Aljezur, Vila do Bispo, Alcoutim); Portimão e Lagos mantêm 15€ e restantes zonas 10€. Esta regra substitui o antigo máximo de 15€ no Algarve. Atualizar sempre as duas tabelas (`QuizTypes.ts` e `locationSeoData.ts`). Os escalões são por localidade, não um cálculo GPS por morada.

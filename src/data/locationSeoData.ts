@@ -1,7 +1,7 @@
 // Location × Service SEO data for long-tail keyword targeting
 // Each city × service combination has unique content to avoid duplicate content penalties
 // locationPrices duplicado aqui (sem import @/) para compatibilidade com scripts/prerender.ts (Node.js sem alias Vite)
-// Três equipas locais, três sistemas de zonas independentes (Porto/Norte, Lisboa/AML, Algarve)
+// Equipas locais e escalões independentes: Porto, Braga/Minho, Lisboa e Algarve.
 // Sem zona grátis: mínimo 10€ sempre em todo o site, sobe com a distância ao centro de cada equipa.
 // Antigas zonas 0€/5€ subiram para 10€ (mínimo sitewide) — todas as outras zonas mantêm o preço original.
 const locationPrices: Record<string, number> = {
@@ -11,9 +11,9 @@ const locationPrices: Record<string, number> = {
   'Valongo': 10, 'Espinho': 10, 'Póvoa de Varzim': 10, 'Vila do Conde': 10,
   'Santo Tirso': 10, 'Trofa': 10, 'Paredes': 10,
   'Penafiel': 15, 'Paços de Ferreira': 15, 'Felgueiras': 15, 'Lousada': 15,
-  'Arouca': 20, 'Braga': 20, 'Aveiro': 20,
-  'Guimarães': 20,
-  // ── Braga/Minho (equipa local Braga, preço por distância a Braga, nunca acima de 20€) ──
+  'Arouca': 20, 'Aveiro': 20,
+  // ── Braga/Minho: centro/próximos 10€, afastados 15€, extremos 20€ ──
+  'Braga': 10, 'Guimarães': 10,
   'Vila Nova de Famalicão': 10,
   'Barcelos': 10,
   'Viana do Castelo': 20,
@@ -21,20 +21,20 @@ const locationPrices: Record<string, number> = {
   'Fafe': 15,
   'Esposende': 15,
   // ── Lisboa / Área Metropolitana (equipa local) ──
-  // Regra: mínimo 10€, máximo 15€ (nunca 5€ nem 20€ em Lisboa/Algarve).
+  // Lisboa: mínimo 10€, máximo 15€.
   'Lisboa': 10,
   'Amadora': 10, 'Odivelas': 10, 'Oeiras': 10,
   'Cascais': 10, 'Sintra': 10, 'Loures': 10, 'Almada': 10, 'Seixal': 10,
   'Vila Franca de Xira': 15, 'Barreiro': 15, 'Moita': 15, 'Mafra': 15,
   'Setúbal': 15, 'Montijo': 15, 'Alcochete': 15, 'Palmela': 15, 'Sesimbra': 15,
   // ── Algarve (equipa local) ──
-  // Regra: mínimo 10€, máximo 15€ (nunca 5€ nem 20€ em Lisboa/Algarve).
+  // Algarve: centro 10€, zona ocidental 15€, extremos/interior 25€.
   'Faro': 10, 'Loulé': 10,
   'Albufeira': 10, 'São Brás de Alportel': 10, 'Olhão': 10,
   'Silves': 10, 'Lagoa': 10, 'Tavira': 10,
   'Portimão': 15, 'Lagos': 15,
-  'Vila Real de Santo António': 15, 'Castro Marim': 15, 'Monchique': 15,
-  'Aljezur': 15, 'Vila do Bispo': 15, 'Alcoutim': 15,
+  'Vila Real de Santo António': 25, 'Castro Marim': 25, 'Monchique': 25,
+  'Aljezur': 25, 'Vila do Bispo': 25, 'Alcoutim': 25,
 };
 
 export interface LocationService {
