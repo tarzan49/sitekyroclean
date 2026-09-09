@@ -8,9 +8,10 @@ interface QuizEstimateProps {
   needsQuote: boolean;
   travelOnly: boolean;
   location: string;
+  travelCost?: number;
 }
 
-export default function QuizEstimate({ totalPrice, discountedPrice, discountActive, needsQuote, travelOnly, location }: QuizEstimateProps) {
+export default function QuizEstimate({ totalPrice, discountedPrice, discountActive, needsQuote, travelOnly, location, travelCost }: QuizEstimateProps) {
   const target = discountActive ? discountedPrice : Math.round(totalPrice);
   const [amount, setAmount] = useState(target);
   const displayed = useRef(target);
@@ -61,6 +62,17 @@ export default function QuizEstimate({ totalPrice, discountedPrice, discountActi
           <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-gold text-[#071a12]"><Check className="h-3 w-3" strokeWidth={3} /></span>
           <p><span className="font-semibold text-gold">Poupa {savings}€ nesta visita</span><span className="text-white/50"> · 10% aplicado{needsQuote ? ' aos valores estimados' : ''}</span></p>
         </div>
+      )}
+      {travelCost !== undefined && !travelOnly && (
+        <details className="mt-2 text-[11px] text-white/70">
+          <summary className="cursor-pointer py-1 text-white/65 hover:text-gold">Ver composição do orçamento</summary>
+          <dl className="mt-1 space-y-1 border-t border-white/10 pt-2">
+            <div className="flex justify-between gap-3"><dt>Serviços{needsQuote ? ' com preço definido' : ''}</dt><dd>{Math.round(totalPrice - travelCost)}€</dd></div>
+            {discountActive && savings > 0 && <div className="flex justify-between gap-3 text-gold"><dt>Desconto de 10%</dt><dd>−{savings}€</dd></div>}
+            <div className="flex justify-between gap-3"><dt>Deslocação{location ? ` · ${location}` : ''}</dt><dd>{travelCost}€</dd></div>
+            {needsQuote && <div className="text-gold">Acrescem os serviços sob orçamento.</div>}
+          </dl>
+        </details>
       )}
     </div>
   );

@@ -760,6 +760,7 @@ ${formData.description || 'Sem observações adicionais'}
             <QuizEstimate
               totalPrice={totalPrice}
               discountedPrice={packDiscountedPrice}
+              travelCost={finalTravelCost}
               discountActive={packDiscountActive}
               needsQuote={hasSobOrcamento || hasUpsellSobItem}
               travelOnly={calculateServicePrice === 0 && finalTravelCost > 0}

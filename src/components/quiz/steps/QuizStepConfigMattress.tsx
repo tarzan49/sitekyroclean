@@ -36,7 +36,7 @@ const QuizStepConfigMattress = ({ formData, updateFormData, mattressItems, setMa
           return (
             <div key={option.id} className={cn('rounded-sm border-2 transition-all duration-200 overflow-hidden', isActive && packOn ? 'border-gold bg-[#1a2a1a] shadow-[0_0_12px_rgba(212,175,55,0.20)]' : isActive ? 'border-gold/50 bg-[#1a2a1a] shadow-[0_0_8px_rgba(212,175,55,0.10)]' : 'border-dashed border-gold/30 bg-gold/[0.03]')}>
               <div className="flex items-center gap-2 px-2.5 sm:px-3 py-3">
-                <QuizFurnitureImage service="mattress" />
+                <QuizFurnitureImage service="mattress" sizeId={option.id} />
                   <div className="flex-1 min-w-0 text-left">
                   <span className="text-sm font-semibold text-white">{option.label}</span>
                   <div className="flex flex-wrap items-center gap-x-1.5 gap-y-0.5 mt-0.5">
@@ -44,7 +44,7 @@ const QuizStepConfigMattress = ({ formData, updateFormData, mattressItems, setMa
                     {isActive && packOn && typeof option.originalBothPrice === 'number' && (
                       <span className="text-sm text-white/30 line-through tabular-nums">{option.originalBothPrice}€</span>
                     )}
-                    <span className={cn('text-sm font-bold tabular-nums', isSob ? isActive ? 'text-white/70' : 'text-white/35' : isActive && packOn ? 'text-gold' : isActive ? 'text-white/80' : 'text-white/40')}>
+                    <span className={cn('text-sm font-bold tabular-nums', isSob ? isActive ? 'text-white/70' : 'text-white/65' : isActive && packOn ? 'text-gold' : isActive ? 'text-white/80' : 'text-white/70')}>
                       {isSob ? 'Sob Orçamento' : `${dp}€/un.`}
                     </span>
                   </div>
