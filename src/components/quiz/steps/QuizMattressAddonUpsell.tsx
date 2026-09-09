@@ -1,5 +1,6 @@
+import QuizTopBadge from '../QuizTopBadge';
 import QuizCareIntro from '../QuizCareIntro';
-import { ChevronLeft, Star, Bug, Plus, Check } from 'lucide-react';
+import { ChevronLeft, Bug, Plus, Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { mattressPrices } from '@/components/quiz/QuizTypes';
 import type { QuizFormData, MattressItem } from '@/components/quiz/QuizTypes';
@@ -50,10 +51,7 @@ const QuizMattressAddonUpsell = ({ mattressItems, setMattressItems, onContinue, 
           anyOn ? 'border-gold bg-[#1a2a1a] shadow-[0_0_18px_rgba(212,175,55,0.30)]' : 'border-dashed border-gold/40 bg-gold/[0.04] hover:border-gold/70 hover:bg-gold/[0.07]'
         )}
       >
-        <span className="absolute -top-2 -left-2 z-10 flex w-9 h-9 flex-col items-center justify-center rounded-sm border-2 border-[#12121e] bg-gold shadow-md">
-          <Star className="w-3 h-3 fill-[#12121e] text-[#12121e]" />
-          <span className="text-[6px] font-black uppercase leading-none tracking-tight text-[#12121e]">Top</span>
-        </span>
+        <QuizTopBadge className="absolute -top-3 right-3 z-10" />
         <Bug className={cn('w-5 h-5 flex-shrink-0', anyOn ? 'text-gold' : 'text-gold/70')} />
         <div className="flex-1 min-w-0">
           <p className={cn('text-sm font-bold', anyOn ? 'text-white' : 'text-white/90')}>Desbacterização e Anti Ácaros</p>

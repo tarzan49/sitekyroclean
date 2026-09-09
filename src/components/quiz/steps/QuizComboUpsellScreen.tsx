@@ -1,3 +1,4 @@
+import QuizTopBadge from '../QuizTopBadge';
 import QuizCarpetMeasureGuide from '../QuizCarpetMeasureGuide';
 import QuizCareIntro from '../QuizCareIntro';
 import QuizFurnitureImage from '../QuizFurnitureImage';
@@ -370,7 +371,7 @@ const QuizComboUpsellScreen = ({ primaryService, upsellItems, setUpsellItems, on
 
       {/* Até três sugestões: linhas compactas, sem cartão isolado à esquerda.
           Com quatro sugestões, preservar a grelha 2x2 para limitar a altura. */}
-      <div className={cn('grid gap-2.5 w-full max-w-sm mt-2', compactRows ? 'grid-cols-1' : 'grid-cols-2')}>
+      <div className={cn('grid gap-4 w-full max-w-sm mt-3', compactRows ? 'grid-cols-1' : 'grid-cols-2')}>
         {visibleRows.map(row => (
           <button
             key={row.view}
@@ -383,6 +384,7 @@ const QuizComboUpsellScreen = ({ primaryService, upsellItems, setUpsellItems, on
                 : 'border-dashed border-gold/55 bg-gold/[0.025] hover:border-gold hover:bg-gold/[0.05]'
             )}
           >
+            <QuizTopBadge className="absolute -top-2.5 left-3 z-10" />
             <span className={cn(
               'absolute w-7 h-7 rounded-full border flex items-center justify-center transition-colors duration-200',
               compactRows ? 'top-1/2 right-3 -translate-y-1/2' : 'top-1.5 right-1.5',

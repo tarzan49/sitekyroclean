@@ -29,3 +29,5 @@ Os upsells de colchões e cadeiras apresentam explicitamente «Desbacterização
 Exemplos locais: `/__preview/orcamento?exemplo=antiacaros`, `?exemplo=impermeabilizacao`, `?exemplo=cadeiras` e `?exemplo=tapetes`. Validação: 22 testes passaram, incluindo seleção opcional dos tratamentos, preços e medidas dos tapetes. Verificados os ecrãs no navegador, incluindo impermeabilização e cadeiras a 390 × 844. Mantém-se a limitação de build da base descrita acima.
 
 Pedido de simplificação (2026-09-10): nos upsells de colchão e sofá, clicar no cartão liga o tratamento para os artigos escolhidos; repetir o clique retira. Não expandir linhas por tamanho nem steppers abaixo do cartão. A seleção e o total no cabeçalho dão o feedback. Esta decisão substitui a apresentação anterior de detalhes após selecionar.
+
+Selo TOP unificado em `QuizTopBadge`: coroa, placa dourada e texto mais legível; aplicado aos tratamentos, aos dois níveis de impermeabilização e às sugestões de serviços adicionais. Verificado em 390 × 844 e com os 12 testes de upsells aprovados.

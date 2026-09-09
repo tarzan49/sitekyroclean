@@ -70,3 +70,7 @@ Pedido do responsável: Braga com base local, 10€ em Braga, Guimarães, Vila N
 Pedido do responsável: explicitar «Desbacterização e Anti Ácaros» nos upsells de colchões e cadeiras e nos respetivos resumos/recibos. É a apresentação conjunta do tratamento existente, sem alteração de preços. Implementado na branch de pré-visualização `codex/quote-visual-preview`.
 
 Pedido de simplificação (2026-09-10): nos upsells de colchão e sofá, clicar no cartão liga o tratamento para os artigos escolhidos; repetir o clique retira. Não expandir linhas por tamanho nem steppers abaixo do cartão. A seleção e o total no cabeçalho dão o feedback. Esta decisão substitui a apresentação anterior de detalhes após selecionar.
+
+## Selo dos extras (2026-09-10)
+
+Pedido do responsável: usar o selo TOP em todas as opções extra do orçamento, incluindo Essencial e Premium, tratamentos e categorias de serviços adicionais. Na pré-visualização, reutilizar `QuizTopBadge` (coroa e acabamento dourado), sem duplicar markup nem introduzir animações de urgência. O selo não indica que o extra já está selecionado.

@@ -1,5 +1,6 @@
+import QuizTopBadge from '../QuizTopBadge';
 import QuizCareIntro from '../QuizCareIntro';
-import { ChevronLeft, Check, Star, Bug, Droplets, Plus } from 'lucide-react';
+import { ChevronLeft, Check, Bug, Droplets, Plus } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { QuizFormData } from '@/components/quiz/QuizTypes';
 import { calcChairClean, calcChairWaterproof, calcChairWaterproofPremium } from '@/components/quiz/quizHelpers';
@@ -58,10 +59,7 @@ const QuizChairsAddonUpsell = ({ formData, updateFormData, onContinue, onBack }:
             addonOn ? 'border-gold bg-[#1a2a1a] shadow-[0_0_18px_rgba(212,175,55,0.30)]' : 'border-dashed border-gold/40 bg-gold/[0.04] hover:border-gold/70 hover:bg-gold/[0.07]'
           )}
         >
-          <span className="absolute -top-2 -left-2 z-10 flex w-9 h-9 flex-col items-center justify-center rounded-sm border-2 border-[#12121e] bg-gold shadow-md">
-            <Star className="w-3 h-3 fill-[#12121e] text-[#12121e]" />
-            <span className="text-[6px] font-black uppercase leading-none tracking-tight text-[#12121e]">Top</span>
-          </span>
+          <QuizTopBadge className="absolute -top-3 right-3 z-10" />
           <Droplets className={cn('w-5 h-5 flex-shrink-0', addonOn ? 'text-gold' : 'text-gold/70')} />
           <div className="flex-1 min-w-0">
             <p className={cn('text-sm font-bold', addonOn ? 'text-white' : 'text-white/90')}>Higienização Profunda</p>
@@ -124,7 +122,7 @@ const QuizChairsAddonUpsell = ({ formData, updateFormData, onContinue, onBack }:
       <QuizCareIntro service="chairs">Escolha a proteção para as suas {qty} cadeiras. Pode continuar com a limpeza que já escolheu.</QuizCareIntro>
 
       <p className="text-[10px] font-bold tracking-[0.14em] uppercase text-white/65 w-full max-w-sm text-left mt-1">Impermeabilização</p>
-      <div className="w-full max-w-sm grid grid-cols-2 gap-2 items-stretch">
+      <div className="w-full max-w-sm grid grid-cols-2 gap-2 items-stretch mt-2">
         <button
           onClick={() => selectWaterproof('premium')}
           aria-pressed={waterproofTier === 'premium'}
@@ -135,10 +133,7 @@ const QuizChairsAddonUpsell = ({ formData, updateFormData, onContinue, onBack }:
               : 'border-white/15 bg-[#1a2a1a] hover:border-gold/40'
           )}
         >
-          <span className="absolute -top-2 -right-2 z-10 flex w-9 h-9 flex-col items-center justify-center rounded-sm border-2 border-[#12121e] bg-gold shadow-md">
-            <Star className="w-3 h-3 fill-[#12121e] text-[#12121e]" />
-            <span className="text-[6px] font-black uppercase leading-none tracking-tight text-[#12121e]">Top</span>
-          </span>
+          <QuizTopBadge className="absolute -top-3 right-3 z-10" />
           <div className="flex items-center gap-1.5 mb-0.5">
             {waterproofTier === 'premium' && <Check className="w-3 h-3 text-gold flex-shrink-0" />}
             <p className={cn('text-xs font-bold', waterproofTier === 'premium' ? 'text-white' : 'text-white/85')}>Premium</p>
@@ -157,10 +152,11 @@ const QuizChairsAddonUpsell = ({ formData, updateFormData, onContinue, onBack }:
           onClick={() => selectWaterproof('essencial')}
           aria-pressed={waterproofTier === 'essencial'}
           className={cn(
-            'rounded-sm border-2 px-3 py-2.5 text-left transition-all duration-200 touch-manipulation',
+            'relative rounded-sm border-2 px-3 py-2.5 text-left transition-all duration-200 touch-manipulation',
             waterproofTier === 'essencial' ? 'border-gold bg-[#1a2a1a] shadow-[0_0_10px_rgba(212,175,55,0.18)]' : 'border-gold/20 bg-[#1a2a1a] hover:border-gold/40'
           )}
         >
+          <QuizTopBadge className="absolute -top-3 right-3 z-10" />
           <div className="flex items-center gap-1.5 mb-0.5">
             {waterproofTier === 'essencial' && <Check className="w-3 h-3 text-gold flex-shrink-0" />}
             <p className={cn('text-xs font-bold', waterproofTier === 'essencial' ? 'text-white' : 'text-white/60')}>Essencial</p>
@@ -181,10 +177,7 @@ const QuizChairsAddonUpsell = ({ formData, updateFormData, onContinue, onBack }:
           antiAcarosOn ? 'border-gold bg-[#1a2a1a] shadow-[0_0_18px_rgba(212,175,55,0.30)]' : 'border-dashed border-gold/40 bg-gold/[0.04] hover:border-gold/70 hover:bg-gold/[0.07]'
         )}
       >
-        <span className="absolute -top-2 -left-2 z-10 flex w-9 h-9 flex-col items-center justify-center rounded-sm border-2 border-[#12121e] bg-gold shadow-md">
-          <Star className="w-3 h-3 fill-[#12121e] text-[#12121e]" />
-          <span className="text-[6px] font-black uppercase leading-none tracking-tight text-[#12121e]">Top</span>
-        </span>
+        <QuizTopBadge className="absolute -top-3 right-3 z-10" />
         <Bug className={cn('w-5 h-5 flex-shrink-0', antiAcarosOn ? 'text-gold' : 'text-gold/70')} />
         <div className="flex-1 min-w-0">
           <p className={cn('text-sm font-bold', antiAcarosOn ? 'text-white' : 'text-white/90')}>Desbacterização e Anti Ácaros</p>
