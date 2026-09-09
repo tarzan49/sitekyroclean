@@ -553,8 +553,6 @@ html {
 .quiz-scrollbar {
   scrollbar-width: thin;
   scrollbar-color: hsl(var(--gold)) transparent;
-  /* Remove right padding so scrollbar aligns to edge */
-  padding-right: 0 !important;
 }
 
 .quiz-scrollbar::-webkit-scrollbar {

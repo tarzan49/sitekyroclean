@@ -27,6 +27,8 @@ import { getAllCommercialRoutes } from "@/data/commercialSeoData";
 // Critical path - load immediately
 import IndexV1 from "./pages/IndexV1";
 
+const QuoteVisualPreview = import.meta.env.DEV ? lazy(() => import('./pages/QuoteVisualPreview')) : null;
+
 // Lazy load non-critical routes for better initial load
 const NotFound = lazy(() => import("./pages/NotFound"));
 const LimpezaSofas = lazy(() => import("./pages/LimpezaSofas"));
@@ -107,6 +109,7 @@ const AppRoutes = () => {
           <ErrorBoundary>
             <Suspense fallback={<PageLoader />}>
               <Routes>
+                {QuoteVisualPreview && <Route path="/__preview/orcamento" element={<QuoteVisualPreview />} />}
                 <Route path="/" element={<IndexV1 />} />
                 <Route path="/limpeza-sofas" element={<LimpezaSofas />} />
                 <Route path="/impermeabilizacao" element={<Impermeabilizacao />} />

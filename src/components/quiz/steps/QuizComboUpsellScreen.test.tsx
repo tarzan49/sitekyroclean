@@ -76,16 +76,17 @@ describe('final upsell navigation', () => {
     expect(savedItems().some(item => item.mattressSize)).toBe(false);
   });
 
-  it('shows quote-only and mixed subtotals without treating unpriced extras as free', () => {
+  it('keeps category selection free of prices while preserving quote-only extras', () => {
     render(<Harness />);
+    for (const label of [/^Colchão/, /^Sofá/, /^Cadeiras/, /^Tapete/]) {
+      expect(screen.getByRole('button', { name: label }).textContent).not.toContain('€');
+    }
     addCarpet();
-    expect(screen.getByText('Subtotal do extra')).toBeTruthy();
-    expect(screen.getByText('Sob orçamento', { selector: 'span' })).toBeTruthy();
-    expect(screen.queryByText('0€', { exact: true })).toBeNull();
-    click(/^Sofá/); increment(3); confirm();
-    expect(screen.getByText('Sob orçamento', { selector: 'span' })).toBeTruthy();
+    expect(screen.getByRole('button', { name: /Tapete.*sob orçamento/ })).toBeTruthy();
+    expect(savedItems().find(item => item.id === 'carpet')?.price).toBe(0);
     click(/^Colchão/); increment(1); confirm();
-    expect(screen.getByText('69€ + Sob orçamento')).toBeTruthy();
+    expect(savedItems().find(item => item.mattressSize === 'casal')?.price).toBe(69);
+    expect(screen.queryByText('Subtotal do extra')).toBeNull();
   });
 
   it('still allows continuing without extras', () => {

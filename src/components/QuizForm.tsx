@@ -7,7 +7,7 @@ import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import { trackQuizEvent } from '@/lib/quizTracking';
 import { useQuizAnalytics } from '@/hooks/use-quiz-analytics';
-import ConfettiGold from './quiz/ConfettiGold';
+import QuizEstimate from './quiz/QuizEstimate';
 import {
   QuizStep1Service,
   ServiceTypeSelector,
@@ -281,10 +281,8 @@ const QuizForm = ({
 
   const {
     countdown,
-    displayPrice,
     socialProofIdx,
     socialProofMessages,
-    confettiActive,
     exitIntentUnlocked,
     formatCountdown,
     isDiscountActive,
@@ -294,11 +292,7 @@ const QuizForm = ({
     scrollContainerRef,
     currentStep,
     showUpsell: activeUpsellScreen === 'combo',
-    totalPrice,
-    packDiscountActive,
-    hasUpsellSobItem,
     location: formData.location,
-    toast,
   });
 
   // Quiz analytics tracking
@@ -700,7 +694,6 @@ ${formData.description || 'Sem observações adicionais'}
           "h-full sm:h-auto sm:max-h-[92dvh]"
         )}>
 
-        <ConfettiGold active={confettiActive} />
 
         {/* Header */}
         <div className="px-5 sm:px-6 pt-3 sm:pt-4 pb-2.5 sm:pb-3 landscape:pt-2 landscape:pb-1.5 grid grid-cols-[1fr_auto_1fr] items-center gap-2 flex-shrink-0">
@@ -764,48 +757,17 @@ ${formData.description || 'Sem observações adicionais'}
              , visível: step 3 (quantidades) e step 4 (contacto) quando totalPrice > 0
              , também visível em step 1 quando há custo de deslocação */}
           {(totalPrice > 0 || hasSobOrcamento) && (activeUpsellScreen === 'combo' || finalTravelCost > 0 || (currentStep !== 1 && currentStep !== 2)) && (
-            <div className="sticky top-0 z-20 text-white flex flex-col border-b border-white/[0.16] -mx-5 sm:-mx-6 animate-fade-in" style={{ background: "#071a12" }}>
-            <div className="flex items-center justify-between py-3 px-5 sm:px-6">
-              <span className="text-xs text-white/40 font-medium">
-                {calculateServicePrice === 0 && finalTravelCost > 0
-                  ? <span>Deslocação <span className="text-white/20 text-[10px]">({formData.location})</span></span>
-                  : 'Estimativa'
-                }
-              </span>
-              <div className="flex items-center gap-3 pr-8">
-                {packDiscountActive && totalPrice > 0 && (
-                  <span className="text-sm text-white/25 line-through tabular-nums">{Math.round(displayPrice)}€</span>
-                )}
-                {totalPrice > 0 && (
-                  <span className="text-xl font-bold tabular-nums" style={{ color: '#D4AF37' }}>
-                    {packDiscountActive
-                      ? `${Math.round((displayPrice - finalTravelCost) * 0.9 + finalTravelCost)}€`
-                      : `${Math.round(displayPrice)}€`}
-                  </span>
-                )}
-                {(hasSobOrcamento || hasUpsellSobItem) && (
-                  <span className="text-sm font-bold tabular-nums" style={{ color: '#D4AF37' }}>
-                    {totalPrice > 0 ? '+ Sob Orçamento' : 'Sob Orçamento'}
-                  </span>
-                )}
-                {packDiscountActive && totalPrice > 0 && (
-                  <span className="text-[10px] font-bold bg-gold/15 text-gold px-2 py-0.5 rounded-full">
-                    −10% Pack
-                  </span>
-                )}
-              </div>
-            </div>
-            <div className="flex items-center justify-center gap-2 px-5 py-2" style={{ borderTop: "1px solid rgba(212,175,55,0.14)", background: "rgba(212,175,55,0.04)" }}>
-              <span className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: "#D4AF37" }} />
-              <p className="text-[11px]" style={{ color: "rgba(255,255,255,0.62)", fontFamily: "Inter, system-ui, sans-serif" }}>
-                <span className="font-semibold">Alta procura</span>
-                {' · Confirme agora para garantir disponibilidade'}
-              </p>
-            </div>
-            </div>
+            <QuizEstimate
+              totalPrice={totalPrice}
+              discountedPrice={packDiscountedPrice}
+              discountActive={packDiscountActive}
+              needsQuote={hasSobOrcamento || hasUpsellSobItem}
+              travelOnly={calculateServicePrice === 0 && finalTravelCost > 0}
+              location={formData.location}
+            />
           )}
 
-          <div className="flex flex-col py-3 sm:py-5 w-full items-center text-center">
+          <div className="flex flex-col py-3 w-full items-center text-center">
 
             {/* Step 0, Location Autocomplete VIP */}
             {/* Context banner when quiz opened from a problem page */}
