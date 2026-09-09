@@ -1018,3 +1018,8 @@ Sessão longa e iterativa, muito guiada por mockup (canvas de design) antes de t
 **Trabalho em paralelo:** grande parte desta sessão foi feita por várias sub-tarefas em simultâneo no mesmo worktree (tapete, cadeiras, widgets), o que por vezes gerou commits que misturam ficheiros de mais do que uma tarefa (inevitável quando duas tarefas mexem no mesmo `QuizForm.tsx`/`QuizTypes.ts` ao mesmo tempo) — todos verificados com tsc+build antes e depois, sem problemas encontrados.
 
 Commits desta sessão (ordem cronológica, todos em `worktree-kyro-minorder-emdash`, nenhum em `master`): `35ec931`, `aba750a`, `1bf6340`, `56535b3`, `6f9439a`, `d2fca49`, `68f7aad`, `7a01cfe`, `26321ee`, `36f8088`, `b613174`, `7744d2a`, `612800a`. Branch não foi integrado em `master` — fica ao critério do dono.
+
+
+## Widget de impermeabilização (2026-09-10)
+
+`PriceWidget.tsx` reutiliza `WaterproofingTierPicker`: mostra Premium e Essencial sem seleção inicial e revela as quantidades após a escolha. `use-price-widget.ts` conserva o plano ao abrir o quiz e reinicia a seleção quando muda o serviço. Os preços dos sofás vêm de `sofaPrices`; as cadeiras usam `calcChairWaterproof`/`calcChairWaterproofPremium`, incluindo o limite de 10 cadeiras sob orçamento. Total, desconto e artigos enviados ao quiz usam o mesmo plano. Os addons dos serviços de limpeza continuam no upsell do quiz.

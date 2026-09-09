@@ -1,3 +1,4 @@
+import { WaterproofingTierPicker } from "@/components/quiz/steps/WaterproofingTierPicker";
 import { useState } from "react";
 import { Minus, Plus, Check, ChevronRight, CheckCircle2 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -7,7 +8,7 @@ import QuizFormLazy from "@/components/QuizFormLazy";
 import { locationPrices } from "@/components/quiz/QuizTypes";
 import type { PriceRowQuizConfig } from "@/data/locationPriceTestimonialsData";
 import {
-  calcWidgetTotal, calcChairBracket, calcWidgetPricing, calcWidgetArticles,
+  widgetWaterproofPrice, calcWidgetTotal, calcChairBracket, calcWidgetPricing, calcWidgetArticles,
   PACK_DISCOUNT_MIN_SERVICE, PACK_DISCOUNT_MIN_UPSELL_ITEM,
 } from "@/lib/priceWidgetCalc";
 import { PRICE_TABLE, PRICE_TABLE_QUIZ_CONFIG } from "@/data/locationPriceTestimonialsData";
@@ -51,9 +52,9 @@ export default function PriceWidget({ serviceSlug, initialLocation }: Props) {
   // 2026-09-08): ao clicar "Continuar", essa escolha faz-se no ecrã de upsell
   // dedicado que o próprio quiz já mostra a seguir às quantidades — nunca
   // duplicar a mesma decisão em dois sítios.
-  const total = calcWidgetTotal(serviceSlug, w.rowQuantities, w.chaiseLongueAddon);
+  const total = calcWidgetTotal(serviceSlug, w.rowQuantities, w.chaiseLongueAddon, new Set(), w.addonTier);
   const travelFee = initialLocation ? (locationPrices[initialLocation] ?? 10) : 0;
-  const articles = calcWidgetArticles(serviceSlug, w.rowQuantities);
+  const articles = calcWidgetArticles(serviceSlug, w.rowQuantities, new Set(), w.addonTier);
   const pricing = calcWidgetPricing(total, travelFee, articles);
   const hasSelection = total > 0 || Object.values(w.rowQuantities).some(q => q > 0) || w.chaiseLongueAddon > 0;
 
@@ -68,13 +69,24 @@ export default function PriceWidget({ serviceSlug, initialLocation }: Props) {
           <span className="w-1.5 h-1.5 rounded-full bg-[#25D366] flex-shrink-0 animate-pulse" />
           <p className="text-[9px] font-bold tracking-[0.24em] uppercase text-gold/70">Orçamento Gratuito</p>
         </div>
-        <p className="font-playfair text-white font-bold text-sm sm:text-base leading-snug">Escolha as quantidades e continue</p>
+        <p className="font-playfair text-white font-bold text-sm sm:text-base leading-snug">{isWaterproofService ? 'Escolha a sua impermeabilização' : 'Escolha as quantidades e continue'}</p>
         <p className="text-[11px] mt-0.5 text-white/35">Sem compromisso · Resposta em menos de 30 min</p>
       </div>
 
+      {isWaterproofService && (
+        <div className="px-4 pb-3">
+          <WaterproofingTierPicker
+            formData={{ waterproofingTier: w.addonTier }}
+            activeTier={w.tierChosen ? w.addonTier : null}
+            updateFormData={updates => { if (updates.waterproofingTier) w.setAddonTier(updates.waterproofingTier); }}
+            onSelect={() => w.setTierChosen(true)}
+          />
+          <p className="text-xs text-white/60 mt-3">{w.tierChosen ? 'Escolha agora os artigos e as quantidades a proteger.' : 'Selecione uma opção para ver os preços e as quantidades.'}</p>
+        </div>
+      )}
       {/* Linhas */}
       <div className="py-2 px-2 space-y-1.5">
-        {rows.map((row, i) => {
+        {(!isWaterproofService || w.tierChosen) && rows.map((row, i) => {
           const quizConfig = quizConfigs[i] ?? null;
 
           // Linhas sem quizConfig (ex. chaise longue) não têm equivalente real
@@ -86,11 +98,13 @@ export default function PriceWidget({ serviceSlug, initialLocation }: Props) {
           const isCarpet = quizConfig.service === 'carpet';
           const isChair = quizConfig.service === 'chairs';
 
-          const chairP = isChair && qty > 0 ? calcChairBracket(qty, isWaterproofService) : undefined;
+          const chairP = isChair && qty > 0 ? calcChairBracket(qty, isWaterproofService, w.addonTier) : undefined;
           const dynamicPrice: string | null = isChair
-            ? (qty <= 0 ? null : chairP === null ? 'Sob orçamento' : `${chairP}€`)
+            ? (qty <= 0 ? (isWaterproofService ? `${widgetWaterproofPrice(quizConfig, w.addonTier)}€/cad` : null) : chairP === null ? 'Sob orçamento' : `${chairP}€`)
             : isCarpet
             ? 'Sob orçamento' // tapete e alcatifa: nunca têm preço calculado (2026-09-09)
+            : isWaterproofService
+            ? (widgetWaterproofPrice(quizConfig, w.addonTier) === null ? 'Sob orçamento' : `${widgetWaterproofPrice(quizConfig, w.addonTier)}€`)
             : row.price;
 
           // Tapetes E alcatifa: várias peças medidas (largura × comprimento)

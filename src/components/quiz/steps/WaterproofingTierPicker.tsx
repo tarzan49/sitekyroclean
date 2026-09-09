@@ -9,7 +9,7 @@ import type { QuizFormData } from '@/components/quiz/QuizTypes';
 // Extraído de QuizStepConfig.tsx (2026-09-08, thinning do ficheiro monolítico
 // de 417 linhas) — usado por QuizStepConfigSofa, QuizStepConfigChairs, e
 // QuizSofaAddonUpsell.
-export function WaterproofingTierPicker({ formData, updateFormData, onSelect, activeTier }: { formData: QuizFormData; updateFormData: (u: Partial<QuizFormData>) => void; onSelect?: (t: 'premium' | 'essencial') => void; activeTier?: 'premium' | 'essencial' | null }) {
+export function WaterproofingTierPicker({ formData, updateFormData, onSelect, activeTier }: { formData: Pick<QuizFormData, 'waterproofingTier'>; updateFormData: (u: Partial<QuizFormData>) => void; onSelect?: (t: 'premium' | 'essencial') => void; activeTier?: 'premium' | 'essencial' | null }) {
   // activeTier deixa o chamador decidir o que conta como "selecionado" na UI
   // — por omissão é a preferência de tier (formData.waterproofingTier), mas
   // um upsell onde ainda ninguém clicou em nada não pode mostrar um cartão já
@@ -19,6 +19,8 @@ export function WaterproofingTierPicker({ formData, updateFormData, onSelect, ac
   return (
     <div className="w-full max-w-sm grid grid-cols-2 gap-2 mb-1 pt-3 items-stretch">
       <button
+        type="button"
+        aria-pressed={tier === 'premium'}
         onClick={() => { updateFormData({ waterproofingTier: 'premium' }); onSelect?.('premium'); }}
         className={cn(
           'relative rounded-sm border-2 px-3 py-2.5 text-left transition-all duration-200 touch-manipulation',
@@ -40,6 +42,8 @@ export function WaterproofingTierPicker({ formData, updateFormData, onSelect, ac
         <p className={cn('text-[10px] leading-snug font-semibold', tier === 'premium' ? 'text-gold/70' : 'text-gold/45')}>Até 10 anos de proteção · até 5 lavagens</p>
       </button>
       <button
+        type="button"
+        aria-pressed={tier === 'essencial'}
         onClick={() => { updateFormData({ waterproofingTier: 'essencial' }); onSelect?.('essencial'); }}
         className={cn('rounded-sm border-2 px-3 py-2.5 text-left transition-all duration-200 touch-manipulation', tier === 'essencial' ? 'border-gold bg-[#1a2a1a] shadow-[0_0_10px_rgba(212,175,55,0.18)]' : 'border-gold/20 bg-[#1a2a1a] hover:border-gold/40')}
       >

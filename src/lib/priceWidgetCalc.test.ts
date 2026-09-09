@@ -13,12 +13,11 @@ describe('calcChairBracket', () => {
     expect(calcChairBracket(10, false)).toBeNull();
     expect(calcChairBracket(10, true)).toBeNull();
   });
-  it('waterproof bracket (1-4 @ 25€, 5-9 @ 20€) matches cleaning bracket shape but higher', () => {
-    expect(calcChairBracket(4, true)).toBe(100);
-    expect(calcChairBracket(9, true)).toBe(4 * 25 + 5 * 20);
-    for (let qty = 1; qty <= 9; qty++) {
-      expect(calcChairBracket(qty, true)!).toBeGreaterThan(calcChairBracket(qty, false)!);
-    }
+  it('uses the same Essential and Premium chair prices as the quiz', () => {
+    expect(calcChairBracket(4, true, 'essencial')).toBe(60);
+    expect(calcChairBracket(9, true, 'essencial')).toBe(110);
+    expect(calcChairBracket(4, true, 'premium')).toBe(80);
+    expect(calcChairBracket(9, true, 'premium')).toBe(155);
   });
 });
 
@@ -120,5 +119,25 @@ describe('buildWidgetQuizConfig', () => {
     const cfg = buildWidgetQuizConfig('limpeza-cadeiras', { 0: 3 }, 0);
     expect(cfg?.service).toBe('chairs');
     expect(cfg?.chairQty).toBe('3');
+  });
+});
+
+
+describe('waterproof widget handoff', () => {
+  it.each(['essencial', 'premium'] as const)('preserves %s prices and quantities for sofa plus chairs', tier => {
+    const quantities = { 1: 2, 5: 4 };
+    const total = calcWidgetTotal('impermeabilizacao', quantities, 0, new Set(), tier);
+    const config = buildWidgetQuizConfig('impermeabilizacao', quantities, 0, new Set(), tier)!;
+    const sofaUnit = tier === 'premium' ? 109 : 79;
+    const chairs = tier === 'premium' ? 80 : 60;
+    expect(total).toBe(sofaUnit * 2 + chairs);
+    expect(config.waterproofingTier).toBe(tier);
+    expect(config.sofaItems?.[0].qty).toBe(2);
+    expect(config.initialUpsellItems?.[0].price).toBe(chairs);
+    expect(calcWidgetArticles('impermeabilizacao', quantities, new Set(), tier).articleTotal).toBe(total);
+  });
+  it('keeps ten chairs as quote-only in a mixed selection', () => {
+    const config = buildWidgetQuizConfig('impermeabilizacao', { 0: 1, 5: 10 }, 0)!;
+    expect(config.initialUpsellItems?.[0].price).toBe(0);
   });
 });

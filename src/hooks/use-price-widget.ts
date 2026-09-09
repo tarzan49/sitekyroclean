@@ -13,6 +13,7 @@ export function usePriceWidgetState(serviceSlug: string) {
   const [rowQuantities, setRowQuantities] = useState<Record<number, number>>({});
   const [chaiseLongueAddon, setChaiseLongueAddon] = useState(0);
   const [addonRows, setAddonRows] = useState<Set<number>>(new Set());
+  const [tierChosen, setTierChosen] = useState(false);
   const [addonTier, setAddonTier] = useState<WidgetTier>('premium');
   const [antiAcarosRows, setAntiAcarosRows] = useState<Set<number>>(new Set());
   // Simulador de tapetes (2026-09-06): várias peças medidas por linha, mesma
@@ -32,6 +33,8 @@ export function usePriceWidgetState(serviceSlug: string) {
   // do componente ao navegar entre serviços (troca de rota sem remount) — sem
   // isto, quantidades de um serviço ficavam presas ao mudar para outro.
   useEffect(() => {
+    setTierChosen(false);
+    setAddonTier('premium');
     setRowQuantities({});
     setChaiseLongueAddon(0);
     setAddonRows(new Set());
@@ -84,7 +87,7 @@ export function usePriceWidgetState(serviceSlug: string) {
     buildWidgetQuizConfig(serviceSlug, rowQuantities, chaiseLongueAddon, addonRows, addonTier, antiAcarosRows, carpetItemsByRow);
 
   return {
-    rowQuantities, chaiseLongueAddon, setChaiseLongueAddon, addonRows, addonTier, setAddonTier, antiAcarosRows,
+    tierChosen, setTierChosen, rowQuantities, chaiseLongueAddon, setChaiseLongueAddon, addonRows, addonTier, setAddonTier, antiAcarosRows,
     getCarpetItems, updateCarpetItem, addCarpetItem, removeCarpetItem, carpetItemArea,
     adjustQty, toggleAddonRow, toggleAntiAcarosRow, buildConfig,
   };

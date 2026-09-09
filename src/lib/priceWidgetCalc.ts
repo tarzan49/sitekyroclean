@@ -1,7 +1,7 @@
 import { PRICE_TABLE, PRICE_TABLE_QUIZ_CONFIG, type PriceRowQuizConfig } from "@/data/locationPriceTestimonialsData";
 import type { UpsellItemConfig, CarpetItem } from "@/components/quiz/QuizTypes";
 import { sofaPrices, mattressPrices } from "@/components/quiz/QuizTypes";
-import { calcPackPricing, calcChairWaterproof, calcChairWaterproofPremium } from "@/components/quiz/quizHelpers";
+import { calcPackPricing, calcChairClean, calcChairWaterproof, calcChairWaterproofPremium } from "@/components/quiz/quizHelpers";
 
 export type WidgetTier = 'essencial' | 'premium';
 
@@ -62,15 +62,16 @@ function parseRowPrice(price: string): number {
   return m ? parseFloat(m[1]) : 0;
 }
 
-export function calcChairBracket(qty: number, waterproof: boolean): number | null {
+export function calcChairBracket(qty: number, waterproof: boolean, tier: WidgetTier = 'essencial'): number | null {
   if (qty <= 0) return 0;
-  if (qty >= 10) return null; // 10+ cadeiras = sempre sob orçamento (2026-09-01)
-  if (waterproof) {
-    return qty <= 4 ? qty * 25 : 4 * 25 + (qty - 4) * 20;
-  }
-  if (qty <= 4) return qty * 20;
-  if (qty <= 6) return 4 * 20 + (qty - 4) * 15;
-  return 4 * 20 + 2 * 15 + (qty - 6) * 12.5;
+  return waterproof ? calcChairAddonWaterproofTotal(qty, tier) : calcChairClean(qty);
+}
+
+export function widgetWaterproofPrice(cfg: PriceRowQuizConfig, tier: WidgetTier): number | null {
+  if (cfg.service === 'chairs') return calcChairAddonWaterproofTotal(1, tier);
+  const option = sofaPrices.find(p => p.id === cfg.sofaSizeId);
+  const price = tier === 'premium' ? option?.waterproofingPremiumPrice : option?.waterproofingPrice;
+  return typeof price === 'number' ? price : null;
 }
 
 export function calcWidgetTotal(
@@ -91,7 +92,7 @@ export function calcWidgetTotal(
     if (qty <= 0) return;
     const cfg = configs[i];
     if (cfg?.service === 'chairs') {
-      const c = calcChairBracket(qty, isWaterproof);
+      const c = calcChairBracket(qty, isWaterproof, addonTier);
       if (c !== null) total += c;
       // Addons só fazem sentido quando cadeiras não são já o serviço de
       // impermeabilização primário (mesma lógica do sofá/colchão).
@@ -108,7 +109,7 @@ export function calcWidgetTotal(
       return;
     }
     if (cfg?.service === 'carpet') return; // sempre sob orçamento (tapete e alcatifa)
-    const unitPrice = parseRowPrice(row.price);
+    const unitPrice = isWaterproof && cfg ? (widgetWaterproofPrice(cfg, addonTier) ?? 0) : parseRowPrice(row.price);
     if (unitPrice > 0) total += unitPrice * qty;
     if (cfg && addonRows.has(i)) {
       const delta = calcRowAddonDelta(cfg, addonTier);
@@ -165,7 +166,7 @@ export function calcWidgetArticles(
     const cfg = configs[i];
     if (!cfg) return; // chaise longue: addon, não é um artigo próprio
     if (cfg.service === 'chairs') {
-      let total = calcChairBracket(qty, isWaterproof) ?? 0;
+      let total = calcChairBracket(qty, isWaterproof, addonTier) ?? 0;
       // Addons contam para o artigo (pedido explícito 2026-09-01: o valor
       // do addon ligado tem de entrar na conta do Pack Família, tal como já
       // acontece no total realmente cobrado — mesma lógica do modal).
@@ -179,7 +180,7 @@ export function calcWidgetArticles(
     if (cfg.service === 'carpet') return; // sempre sob orçamento (tapete e alcatifa) — nunca conta para o Pack Família
     // Sofá / colchão: cada unidade é um artigo separado ao preço da linha,
     // incluindo o addon quando está ligado (mesma lógica do chairs acima).
-    let unitPrice = parseRowPrice(row.price);
+    let unitPrice = isWaterproof ? (widgetWaterproofPrice(cfg, addonTier) ?? 0) : parseRowPrice(row.price);
     if (addonRows.has(i)) unitPrice += calcRowAddonDelta(cfg, addonTier) ?? 0;
     if (antiAcarosRows.has(i)) unitPrice += calcSofaAntiAcarosDelta(cfg) ?? 0;
     if (unitPrice > 0) {
@@ -262,10 +263,7 @@ export function buildWidgetQuizConfig(
     const upsells: UpsellItemConfig[] = [];
     if (chairTotal > 0) upsells.push({
       id: 'chairs', chairQty: String(chairTotal), qty: chairTotal,
-      price: Math.round(((isWaterproof
-        ? (chairTotal <= 4 ? chairTotal * 25 : 4 * 25 + (chairTotal - 4) * 20)
-        : (chairTotal <= 4 ? chairTotal * 20 : chairTotal <= 6 ? 4 * 20 + (chairTotal - 4) * 15 : 4 * 20 + 2 * 15 + (chairTotal - 6) * 12.5)
-      )) * 10) / 10,
+      price: calcChairBracket(chairTotal, isWaterproof, addonTier) ?? 0,
       label: `${chairTotal} cadeira${chairTotal > 1 ? 's' : ''}`,
       waterproof: isWaterproof, waterproofPrice: 0,
     });
