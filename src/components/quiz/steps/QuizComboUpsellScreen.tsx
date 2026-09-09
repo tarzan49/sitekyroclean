@@ -1,3 +1,4 @@
+import QuizFurnitureImage from '../QuizFurnitureImage';
 import { useEffect, useState } from 'react';
 import { ChevronLeft, Plus, Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -164,17 +165,18 @@ const QuizComboUpsellScreen = ({ primaryService, upsellItems, setUpsellItems, on
   // mesma convenção agora uniformizada em todo o quiz.
   const StepperRow = ({ label, unitLabel, qty, onDec, onInc }: { label: string; unitLabel: string; qty: number; onDec: () => void; onInc: () => void }) => (
     <div className={cn(
-      'w-full flex items-center justify-between gap-2 rounded-sm border-2 px-4 py-3 transition-all duration-200',
+      'w-full flex items-center justify-between gap-2 rounded-sm border-2 px-2.5 sm:px-3 py-3 transition-all duration-200',
       qty > 0 ? 'border-gold bg-[#1a2a1a] shadow-[0_0_12px_rgba(212,175,55,0.20)]' : 'border-dashed border-gold/30 bg-gold/[0.03]'
     )}>
-      <div className="text-left">
+      <QuizFurnitureImage service={view === 'sofa' ? 'sofa' : 'mattress'} />
+      <div className="flex-1 min-w-0 text-left">
         <p className="text-sm font-semibold text-white">{label}</p>
         <p className="text-xs text-white/35">{unitLabel}</p>
       </div>
-      <div className="flex items-center gap-2 flex-shrink-0">
-        <button onClick={onDec} disabled={qty <= 0} className="w-14 h-14 rounded-sm border-2 border-white/20 bg-white/[0.05] text-white font-bold text-2xl flex items-center justify-center disabled:opacity-20 disabled:border-transparent disabled:bg-transparent active:scale-95 transition-all touch-manipulation hover:border-gold/50">−</button>
-        <span className={cn('w-7 text-center font-bold tabular-nums text-base', qty > 0 ? 'text-gold' : 'text-white/30')}>{qty}</span>
-        <button onClick={onInc} className="w-14 h-14 rounded-sm border-2 border-white/20 bg-white/[0.05] text-white font-bold text-2xl flex items-center justify-center active:scale-95 transition-all touch-manipulation hover:border-gold/50">+</button>
+      <div className="flex items-center gap-1 flex-shrink-0">
+        <button onClick={onDec} disabled={qty <= 0} className="w-11 h-11 sm:w-12 sm:h-12 rounded-sm border-2 border-white/20 bg-white/[0.05] text-white font-bold text-2xl flex items-center justify-center disabled:opacity-20 disabled:border-transparent disabled:bg-transparent active:scale-95 transition-all touch-manipulation hover:border-gold/50">−</button>
+        <span className={cn('w-5 text-center font-bold tabular-nums text-base', qty > 0 ? 'text-gold' : 'text-white/30')}>{qty}</span>
+        <button onClick={onInc} className="w-11 h-11 sm:w-12 sm:h-12 rounded-sm border-2 border-white/20 bg-white/[0.05] text-white font-bold text-2xl flex items-center justify-center active:scale-95 transition-all touch-manipulation hover:border-gold/50">+</button>
       </div>
     </div>
   );
