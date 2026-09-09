@@ -51,3 +51,7 @@ Segunda instância do mesmo problema: `src/pages/AdminPanel.tsx` mantém o seu p
 ## Antes de terminar qualquer sessão neste projeto
 
 Atualiza este ficheiro se alguma regra ou facto de negócio mudou; atualiza `CONTEXT.md` se a arquitetura mudou. Faz commit + push após cada alteração concluída, incluindo alterações a estes ficheiros, e confirma que o trabalho da sessão ficou sincronizado antes de trocar de máquina.
+
+## Avaliações regionais (2026-09-10)
+
+As páginas que usam `ServiceReviewsGrid`, incluindo variantes de higienização/lavagem, selecionam por região e serviço. `LISBON_REVIEWS` em `src/data/reviewsPool.ts` contém 13 transcrições de cinco estrelas com texto fornecidas pelo responsável, que confirmou Lisboa. A avaliação de Sara Rochete tem quatro estrelas e nenhum texto, pelo que não integra os cartões. Não inventar testemunhos, alterar estrelas nem atribuir freguesias/cidades sem confirmação. `CONFIRMED_REVIEW_LOCATIONS` regista a fonte das localidades; os antigos rótulos do catálogo histórico não são prova. Quando existe pool regional, só usa essa pool; sem pool confirmada, usa transcrições sem localidade. O catálogo histórico da homepage é separado desta seleção e não foi auditado integralmente.

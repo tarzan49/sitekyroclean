@@ -1040,3 +1040,7 @@ Commits desta sessão (ordem cronológica, todos em `worktree-kyro-minorder-emda
 ## Widget de impermeabilização (2026-09-10)
 
 `PriceWidget.tsx` reutiliza `WaterproofingTierPicker`: mostra Premium e Essencial sem seleção inicial e revela as quantidades após a escolha. `use-price-widget.ts` conserva o plano ao abrir o quiz e reinicia a seleção quando muda o serviço. Os preços dos sofás vêm de `sofaPrices`; as cadeiras usam `calcChairWaterproof`/`calcChairWaterproofPremium`, incluindo o limite de 10 cadeiras sob orçamento. Total, desconto e artigos enviados ao quiz usam o mesmo plano. Os addons dos serviços de limpeza continuam no upsell do quiz.
+
+## Seleção regional de avaliações (2026-09-10)
+
+`ServiceReviewsGrid` usa o caminho da página e a seed para selecionar avaliações por serviço/região em `reviewsPool.ts`. As variantes `SofaVariantPage` partilham agora esta grelha. `LISBON_REVIEWS` guarda as 13 transcrições com texto confirmadas pelo responsável como sendo de Lisboa; `CONFIRMED_REVIEW_LOCATIONS` associa a localidade à fonte. Páginas da região com pool confirmada não são preenchidas com testemunhos de outras regiões. Sem localização confirmada, não mostrar cidade.

@@ -13,6 +13,7 @@ import Footer from "@/components/Footer";
 import QuizButton from "@/components/QuizButton";
 import { trackWhatsAppClick } from "@/lib/quizTracking";
 import { trackCallClick } from "@/lib/analytics";
+import ServiceReviewsGrid from "@/components/ServiceReviewsGrid";
 import ServiceFAQ from "@/components/ServiceFAQ";
 import ServicePackBanner from "@/components/ServicePackBanner";
 import ServicePriceSection from "@/components/ServicePriceSection";
@@ -496,34 +497,10 @@ const SofaVariantPage = () => {
               ))}
             </div>
 
-            {/* Avaliações */}
-            <div className="flex items-center gap-3 mb-6">
-              <div className="h-px w-8 flex-shrink-0" style={{ backgroundColor: "#D4AF37", opacity: 0.65 }} />
-              <p className="text-[10px] font-bold tracking-[0.28em] uppercase" style={{ color: "#D4AF37", opacity: 0.85 }}>Avaliações reais</p>
-            </div>
-            <div className={`grid gap-px ${data.testimonials.length > 1 ? "sm:grid-cols-2" : "sm:max-w-md sm:mx-auto"}`} style={{ backgroundColor: "rgba(255,255,255,0.06)" }}>
-              {data.testimonials.map((t, i) => (
-                <div
-                  key={i}
-                  className="flex flex-col p-6 md:p-8"
-                  style={{ background: "rgba(255,255,255,0.04)", borderTop: "2px solid rgba(212,175,55,0.45)" }}
-                >
-                  <div className="flex gap-0.5 mb-4">
-                    {[...Array(5)].map((_, j) => <Star key={j} className="w-3.5 h-3.5 fill-[#D4AF37]" style={{ color: "#D4AF37" }} />)}
-                  </div>
-                  <p className="text-sm text-white/60 leading-relaxed italic flex-1 mb-5">"{t.text}"</p>
-                  <div className="flex items-center gap-2.5 mt-auto pt-4" style={{ borderTop: "1px solid rgba(255,255,255,0.08)" }}>
-                    <div className="w-8 h-8 flex items-center justify-center text-xs font-bold text-white flex-shrink-0" style={{ background: "#D4AF37" }}>
-                      {t.name.charAt(0)}
-                    </div>
-                    <div>
-                      <p className="text-xs font-bold text-white">{t.name}</p>
-                      <p className="text-[10px] text-white/40">{t.location}</p>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
+            <ServiceReviewsGrid
+              serviceSlug={parsed.variantKey === 'impermeabilizacao' ? 'impermeabilizacao' : SERVICEKEY_TO_SLUG[parsed.serviceKey]}
+              seed={data.locationName}
+            />
           </div>
         </section>
 

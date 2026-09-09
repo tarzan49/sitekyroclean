@@ -2,6 +2,7 @@ import { Star, BadgeCheck } from "lucide-react";
 import { useEffect, useState } from "react";
 import useEmblaCarousel from "embla-carousel-react";
 import { pickReviewSubset, type PoolReview } from "@/data/reviewsPool";
+import { useLocation } from "react-router-dom";
 import { GoogleG } from "@/components/icons/GoogleG";
 
 interface Props {
@@ -62,7 +63,8 @@ function ReviewCard({ r }: { r: PoolReview }) {
  *  6 cartões inteiros empilhados, uma das páginas mais compridas do site
  *  em mobile). Tablet/desktop (`sm`+) mantêm a grelha estática como estava. */
 export default function ServiceReviewsGrid({ serviceSlug, seed, heading = "Avaliações reais" }: Props) {
-  const reviews = pickReviewSubset(serviceSlug, seed, 6);
+  const { pathname } = useLocation();
+  const reviews = pickReviewSubset(serviceSlug, `${pathname}:${seed}`, 6);
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true, align: "start" });
 

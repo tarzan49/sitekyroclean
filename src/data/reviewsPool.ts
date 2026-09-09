@@ -7,11 +7,9 @@
 // diferentes (cidades/freguesias diferentes) tendem a mostrar um conjunto
 // diferente das ~40 avaliações disponíveis.
 //
-// Maioria são avaliações Google reais (nomes/texto exatos, transcritas do
-// Google e do carrossel da homepage). Algumas (assinaladas abaixo) foram
-// escritas para preencher serviços com pouca cobertura real — decisão
-// explícita do dono de as mostrar com o mesmo selo "Avaliação Google
-// verificada" das reais, ver memória kyro-open-decisions (2026-08-31).
+// O catálogo histórico inclui entradas sem origem confirmada. As páginas
+// de serviço usam apenas SERVICE_REVIEW_NAMES (transcrições identificadas
+// no projeto). Localidades antigas não constituem confirmação de origem.
 
 export interface PoolReview {
   name: string;
@@ -19,7 +17,79 @@ export interface PoolReview {
   text: string;
 }
 
+// Transcrições fornecidas pelo responsável em 2026-09-10, que confirmou
+// explicitamente a origem em Lisboa. Sara Rochete (4/5, sem texto) não é
+// transformada num testemunho escrito nem numa avaliação de cinco estrelas.
+export const LISBON_REVIEWS: PoolReview[] = [
+  {
+    "name": "Lidia P",
+    "text": "Serviço rápido e com todos os esclarecimentos e fichas técnicas dos produtos.",
+    "city": "Lisboa"
+  },
+  {
+    "name": "Laura Rodrigues",
+    "text": "Ótimo serviço! O profissional Rodolfo foi muito atencioso e querido. Chegou ainda mais cedo do que o combinado e fez o trabalho minuciosamete. Obrigada.",
+    "city": "Lisboa"
+  },
+  {
+    "name": "Rute Ribeiro",
+    "text": "O colchão ficou como novo, muito satisfeita, o Sr. Joab é competente e muito simpático",
+    "city": "Lisboa"
+  },
+  {
+    "name": "Bárbara Santos",
+    "text": "Ótimo servico",
+    "city": "Lisboa"
+  },
+  {
+    "name": "Cláudio Ferreira",
+    "text": "Excelente trabalho. Tinha umas manchas de marcador no sofá e ambas foram removida na sua totalidade. Está como veio de fábrica.",
+    "city": "Lisboa"
+  },
+  {
+    "name": "José Miguel Silva",
+    "text": "Serviço bastante expedito - tudo o que eu precisava para um tratamento de alcatifas pós-inundação.\nEquipa bastante eficiente.",
+    "city": "Lisboa"
+  },
+  {
+    "name": "Susana Gonçalves",
+    "text": "Muito satisfeita com o vosso serviço",
+    "city": "Lisboa"
+  },
+  {
+    "name": "Diogo Branco",
+    "text": "Correu muito bem. Quer a fase de combinação quer a de execução. A comunicação foi fácil e cordial, o trabalho cuidadoso e a pessoa que o efetuou, João, muito bem educado e cordial. Voltarei a utilizar os vossos serviços",
+    "city": "Lisboa"
+  },
+  {
+    "name": "Maria Sousa",
+    "text": "Serviço impecável e equipa muito simpática.\nRecomendo!",
+    "city": "Lisboa"
+  },
+  {
+    "name": "Ana Relva",
+    "text": "Super acessíveis desde o primeiro momento, sem problemas em responder a qualquer questão. Limpeza 5* e cumpridores de horários. Recomendo vivamente",
+    "city": "Lisboa"
+  },
+  {
+    "name": "Rodolfo Lucena",
+    "text": "Excelente serviço",
+    "city": "Lisboa"
+  },
+  {
+    "name": "Manuel Reis",
+    "text": "Serviço excecional e equipa rápida e eficaz a resolver os problemas.",
+    "city": "Lisboa"
+  },
+  {
+    "name": "Paulo Peixoto",
+    "text": "Serviço muito competente.",
+    "city": "Lisboa"
+  }
+];
+
 export const ALL_REVIEWS: PoolReview[] = [
+  ...LISBON_REVIEWS,
   { name: "Paulo Henrique Cavalcante Silverio", text: "Serviço impecável! Atendimento ótimo dos rapazes." },
   { name: "Beatriz Lança", text: "Fizeram um ótimo trabalho com um sofá super antigo e com alguma sujidade acumulada, recomendo muito!!!" },
   { name: "Stephany Rios", text: "Fizeram um ótimo trabalho na limpeza do sofá. Vi o serviço a ser feito hoje e as manchas desapareceram logo após a limpeza. O sofá ficou com um aspeto renovado, limpo e com um cheiro muito agradável. Estou muito satisfeita com o trabalho e recomendo o serviço!" },
@@ -28,7 +98,6 @@ export const ALL_REVIEWS: PoolReview[] = [
   { name: "Luisa Peixoto", text: "Excelente serviço." },
   { name: "João Abreu", text: "Ótimo serviço, 100% recomendado!!" },
   { name: "PIFFEN", text: "Muito bom! Excelente serviço, sem dúvida irei voltar a contactar!" },
-  { name: "Manuel Reis", text: "Serviço 5 estrelas!" },
   { name: "Pedro Novais", text: "Serviço impecável! Dois jovens trabalhadores muito educados e profissionais fizeram a limpeza do meu sofá com grande cuidado e o resultado ficou excelente. Recomendo vivamente!" },
   { name: "Miriam Salomão", text: "Excelente trabalho no meu tapete branco, que ficou limpinho! A equipa também é muito educada e foram muito cuidadosos com os restantes móveis da casa. Eu os recomendo!" },
   { name: "Lucas Costa", text: "Estiveram em casa, Guilherme e Tomas, foram pontuais, profissionais, cordiais e fizeram um excelente trabalho trazendo nosso sofá de volta a vida. Recomendo." },
@@ -76,6 +145,34 @@ export const ALL_REVIEWS: PoolReview[] = [
   { name: "Cátia L.", city: "Espinho", text: "Fizemos a impermeabilização das cadeiras da sala de jantar antes do Natal. Melhor decisão, sobreviveram ao jantar em família sem uma mancha." },
 ];
 
+// Apenas entradas do bloco original de transcrições. Não incluir textos
+// escritos para preencher serviços nem inferir a cidade a partir da página.
+const SERVICE_REVIEW_NAMES = new Set(["Paulo Henrique Cavalcante Silverio", "Beatriz Lança", "Stephany Rios", "Guillermo Rumbos", "Vitor Lucena", "Luisa Peixoto", "João Abreu", "PIFFEN", "Manuel Reis", "Pedro Novais", "Miriam Salomão", "Lucas Costa", "Sonya Marabyan", "Francisco Peixoto", "Lumiere Restaurante", "Jaime Guimarães", "Clarinda Neves", "Alexandra Magro", "Maria do Carmo Cruz", "Cristina Pereira", "Francisco Silva"]);
+
+export interface ConfirmedReviewLocation {
+  city: string;
+  region: string;
+  /** Fonte da localização ou confirmação explícita do responsável. */
+  source: string;
+}
+
+// Preencher apenas após confirmação. Os rótulos históricos foram
+// questionados pelo responsável e não são uma fonte verificável.
+export const CONFIRMED_REVIEW_LOCATIONS: Record<string, ConfirmedReviewLocation> = Object.fromEntries(
+  LISBON_REVIEWS.map(review => [review.name, {
+    city: 'Lisboa', region: 'lisboa', source: 'Transcrição Google e localidade confirmadas pelo responsável em 2026-09-10',
+  }]),
+);
+
+export function reviewRegion(page: string): string | undefined {
+  const slug = page.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-');
+  const regions: Record<string, string[]> = {
+    lisboa: ['lisboa', 'cascais', 'oeiras', 'sintra', 'amadora', 'odivelas', 'loures', 'almada', 'seixal', 'barreiro', 'moita', 'montijo', 'alcochete', 'mafra', 'vila-franca-de-xira', 'palmela', 'sesimbra', 'setubal'],
+    porto: ['porto', 'vila-nova-de-gaia', 'matosinhos', 'maia', 'gondomar', 'valongo', 'espinho', 'trofa', 'santo-tirso', 'povoa-de-varzim', 'vila-do-conde'],
+  };
+  return Object.entries(regions).find(([, cities]) => cities.some(city => (`-${slug}-`).includes(`-${city}-`)))?.[0];
+}
+
 const SERVICE_KEYWORDS: Record<string, RegExp> = {
   'limpeza-sofas': /sof[áa]|chaise|poltrona/i,
   'limpeza-colchoes': /colch/i,
@@ -98,18 +195,29 @@ function hashSeed(seed: string): number {
  *  concreto, por isso servem para todos). */
 function getReviewPoolForService(serviceSlug: string): PoolReview[] {
   const re = SERVICE_KEYWORDS[serviceSlug];
-  return ALL_REVIEWS.filter(r => (re && re.test(r.text)) || !ANY_SERVICE_KEYWORD.test(r.text));
+  return ALL_REVIEWS.filter(r => (SERVICE_REVIEW_NAMES.has(r.name) || LISBON_REVIEWS.some(local => local.name === r.name)) && ((re && re.test(r.text)) || !ANY_SERVICE_KEYWORD.test(r.text)));
 }
 
 /** Escolha determinística: a mesma seed escolhe sempre o mesmo conjunto de
  *  `count` avaliações (estável para SEO/cache), seeds diferentes tendem a
  *  escolher um conjunto diferente dentro do pool do serviço. */
 export function pickReviewSubset(serviceSlug: string, seed: string, count = 6): PoolReview[] {
-  const pool = getReviewPoolForService(serviceSlug);
-  if (pool.length <= count) return pool;
+  const region = reviewRegion(seed);
+  const candidates = getReviewPoolForService(serviceSlug);
+  // Local confirmado primeiro; depois avaliações sem localização confirmada.
+  // Nunca preencher uma página regional com cidades de outra região.
+  const localReviews = candidates.filter(r => CONFIRMED_REVIEW_LOCATIONS[r.name]?.region === region);
+  const pool = region && localReviews.length > 0 ? localReviews : candidates.filter(r => {
+    const location = CONFIRMED_REVIEW_LOCATIONS[r.name];
+    return !region || !location || location.region === region;
+  });
+  const service = SERVICE_KEYWORDS[serviceSlug];
   return [...pool]
-    .map(r => ({ r, key: hashSeed(`${seed}:${r.name}`) }))
-    .sort((a, b) => a.key - b.key)
-    .slice(0, count)
-    .map(x => x.r);
+    .map(r => {
+      const location = CONFIRMED_REVIEW_LOCATIONS[r.name];
+      return { r, local: !!region && location?.region === region, specific: !!service?.test(r.text), key: hashSeed(`${seed}:${r.name}`) };
+    })
+    .sort((a, b) => Number(b.local) - Number(a.local) || Number(b.specific) - Number(a.specific) || a.key - b.key)
+    .slice(0, Math.max(0, count))
+    .map(({ r }) => ({ name: r.name, text: r.text, city: CONFIRMED_REVIEW_LOCATIONS[r.name]?.city }));
 }
