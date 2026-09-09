@@ -212,6 +212,7 @@ export interface UpsellItemConfig {
   sofaSize?: string;
   mattressSize?: string;
   carpetArea?: string;
+  carpetItems?: CarpetItem[];
   chairQty?: string;
   qty?: number;
   price: number;

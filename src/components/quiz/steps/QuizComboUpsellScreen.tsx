@@ -43,10 +43,22 @@ function fmt(n: number): string {
 // no ponto "antes de finalizar" (pedido explícito, aprovado em mockup).
 const QuizComboUpsellScreen = ({ upsellItems, setUpsellItems, onContinue, onBack, totalPrice, packDiscountActive, packDiscountedPrice }: QuizComboUpsellScreenProps) => {
   const [view, setView] = useState<View>('summary');
-  const [mattressQty, setMattressQty] = useState<Record<string, number>>({});
-  const [sofaQty, setSofaQty] = useState<Record<string, number>>({});
-  const [chairsQty, setChairsQty] = useState(0);
-  const [carpetItems, setCarpetItems] = useState<CarpetItem[]>([{ id: 'upsell-tapete-1', largura: '', comprimento: '' }]);
+  // This screen remounts when returning from contact. Restore the selection
+  // before the synchronization effect can overwrite the parent's items.
+  const [mattressQty, setMattressQty] = useState<Record<string, number>>(() =>
+    Object.fromEntries(upsellItems.filter(item => item.mattressSize).map(item => [item.mattressSize!, item.qty ?? 1]))
+  );
+  const [sofaQty, setSofaQty] = useState<Record<string, number>>(() =>
+    Object.fromEntries(upsellItems.filter(item => item.sofaSize).map(item => [item.sofaSize!, item.qty ?? 1]))
+  );
+  const [chairsQty, setChairsQty] = useState(() => {
+    const chairs = upsellItems.find(item => item.id === 'chairs');
+    return chairs ? Number(chairs.chairQty ?? chairs.qty ?? 0) : 0;
+  });
+  const [carpetItems, setCarpetItems] = useState<CarpetItem[]>(() =>
+    upsellItems.find(item => item.id === 'carpet')?.carpetItems
+      ?? [{ id: 'upsell-tapete-1', largura: '', comprimento: '' }]
+  );
 
   const setMattQty = (id: string, qty: number) => setMattressQty(prev => ({ ...prev, [id]: Math.max(0, Math.min(9, qty)) }));
   const setSofaQtyFor = (id: string, qty: number) => setSofaQty(prev => ({ ...prev, [id]: Math.max(0, Math.min(9, qty)) }));
@@ -74,9 +86,12 @@ const QuizComboUpsellScreen = ({ upsellItems, setUpsellItems, onContinue, onBack
 
   const mattressQtyTotal = Object.values(mattressQty).reduce((a, b) => a + b, 0);
   const sofaQtyTotal = Object.values(sofaQty).reduce((a, b) => a + b, 0);
-  const anySelected = mattressQtyTotal > 0 || sofaQtyTotal > 0 || chairsQty > 0;
   const carpetTotalAreaValue = carpetTotalArea(carpetItems);
   const carpetValidCount = carpetItems.filter(it => carpetItemArea(it) !== null).length;
+  const anySelected = mattressQtyTotal > 0 || sofaQtyTotal > 0 || chairsQty > 0 || carpetValidCount > 0;
+  const hasQuoteOnlyExtra = carpetValidCount > 0 || sofaPrices.some(opt =>
+    (sofaQty[opt.id] ?? 0) > 0 && typeof opt.cleaningPrice !== 'number'
+  ) || (chairsQty > 0 && chairsCleanPrice === null);
 
   // Copy curta tipo "a partir de X€" (mesma convenção do Passo 1 — QuizStep1Service)
   // — as frases de marketing anteriores ("Também aproveita?", "Some ao pedido")
@@ -148,6 +163,7 @@ const QuizComboUpsellScreen = ({ upsellItems, setUpsellItems, onContinue, onBack
       items.push({
         id: 'carpet',
         carpetArea: String(Math.round(carpetTotalAreaValue * 100) / 100),
+        carpetItems,
         qty: carpetValidCount,
         price: 0,
         label: `${carpetValidCount} Tapete${carpetValidCount > 1 ? 's' : ''} (sob orçamento)`,
@@ -158,7 +174,9 @@ const QuizComboUpsellScreen = ({ upsellItems, setUpsellItems, onContinue, onBack
   }, [mattressQty, sofaQty, chairsQty, carpetItems]);
 
   const baseTotal = mattressTotal + sofaTotal + chairsTotal;
-  const subtotalLabel = `${fmt(baseTotal)}€`;
+  const subtotalLabel = hasQuoteOnlyExtra
+    ? (baseTotal > 0 ? `${fmt(baseTotal)}€ + Sob orçamento` : 'Sob orçamento')
+    : `${fmt(baseTotal)}€`;
 
   // Mesmo tamanho/peso visual das linhas do início do orçamento
   // (QuizStepConfig: botões w-14 h-14, container max-w-sm) — estava mais
@@ -395,9 +413,9 @@ const QuizComboUpsellScreen = ({ upsellItems, setUpsellItems, onContinue, onBack
               </span>
             </div>
           )}
-          <div className="flex items-baseline justify-between">
+          <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
             <span className="text-xs text-white/45">Subtotal do extra</span>
-            <span className="font-playfair text-xl font-bold text-gold tabular-nums">{subtotalLabel}</span>
+            <span className="font-playfair text-xl font-bold text-gold tabular-nums text-right ml-auto">{subtotalLabel}</span>
           </div>
         </div>
       )}

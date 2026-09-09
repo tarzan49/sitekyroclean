@@ -344,6 +344,15 @@ Sub-passo 'config':
 
 ## Upsell final — "Aproveite e poupe 10%" (atual, desde 2026-09-06)
 
+**Correção de navegação (2026-09-10):** ao regressar do contacto, o
+`QuizComboUpsellScreen` inicializa as quantidades a partir de `upsellItems`,
+antes de sincronizar alterações com o formulário. `UpsellItemConfig.carpetItems`
+guarda as medidas individuais dos tapetes; `carpetArea` mantém a área agregada
+para os consumidores existentes. O subtotal mostra "Sob orçamento" para extras
+sem preço, ou "X€ + Sob orçamento" quando também há extras com preço conhecido.
+O aviso de cookies fica abaixo do modal do quiz (`z-90` vs. `z-100`), para não
+intercetar os botões em mobile; a escolha de cookies continua disponível ao fechar.
+
 Componente: `src/components/quiz/steps/QuizComboUpsellScreen.tsx`. Substitui
 por completo o `QuizUpsellOverlay.tsx` da secção anterior (apagado do repo).
 Gatilho: mesmo `showUpsell` de sempre, disparado pelo `QuizMinimumGate` (gate

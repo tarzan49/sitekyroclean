@@ -32,7 +32,7 @@ const CookieBanner = () => {
     <div
       role="dialog"
       aria-label="Aviso de cookies"
-      className="fixed bottom-0 left-0 right-0 z-[9999] px-4 pb-4 sm:px-6 sm:pb-5"
+      className="fixed bottom-0 left-0 right-0 z-[90] px-4 pb-4 sm:px-6 sm:pb-5"
     >
       <div className="max-w-2xl mx-auto rounded-2xl border border-gold/20 bg-[#071a12]/95 backdrop-blur-md shadow-[0_-4px_32px_rgba(0,0,0,0.45)] px-5 py-4 sm:px-6 sm:py-5">
         <div className="flex flex-col sm:flex-row sm:items-center gap-4">
