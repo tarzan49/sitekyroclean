@@ -107,12 +107,7 @@ export function calcWidgetTotal(
       }
       return;
     }
-    if (cfg?.service === 'carpet') {
-      const isAlcatifa = serviceSlug === 'limpeza-alcatifas';
-      const p = calcCarpetWidget(qty, isAlcatifa);
-      if (p !== null && p > 0) total += p;
-      return;
-    }
+    if (cfg?.service === 'carpet') return; // sempre sob orçamento (tapete e alcatifa)
     const unitPrice = parseRowPrice(row.price);
     if (unitPrice > 0) total += unitPrice * qty;
     if (cfg && addonRows.has(i)) {
@@ -129,17 +124,6 @@ export function calcWidgetTotal(
   if (chaiseLongueAddon > 0) total += chaisePriceUnit * chaiseLongueAddon;
 
   return Math.round(total * 10) / 10;
-}
-
-export function calcCarpetWidget(area: number, alcatifa = false): number | null {
-  if (area <= 0) return 0;
-  if (alcatifa) {
-    if (area > 50) return null;
-    return area * 3;
-  }
-  // Tapetes (não-alcatifa): sempre sob orçamento, sem preço por m² (2026-09-06,
-  // espelha a remoção da estimativa de preço no simulador de tapetes do quiz).
-  return null;
 }
 
 // 2026-08-31 (reformulado x4, confirmado com 3 exemplos concretos) — espelha
@@ -192,12 +176,7 @@ export function calcWidgetArticles(
       if (total > 0) { articleTotal += total; noteCandidate(total); }
       return;
     }
-    if (cfg.service === 'carpet') {
-      const isAlcatifa = serviceSlug === 'limpeza-alcatifas';
-      const total = calcCarpetWidget(qty, isAlcatifa);
-      if (total !== null && total > 0) { articleTotal += total; noteCandidate(total); }
-      return;
-    }
+    if (cfg.service === 'carpet') return; // sempre sob orçamento (tapete e alcatifa) — nunca conta para o Pack Família
     // Sofá / colchão: cada unidade é um artigo separado ao preço da linha,
     // incluindo o addon quando está ligado (mesma lógica do chairs acima).
     let unitPrice = parseRowPrice(row.price);
@@ -252,10 +231,8 @@ export function buildWidgetQuizConfig(
   let   chairTotal = 0;
   let   chairWaterproofOn = false;
   let   chairAntiAcarosOn = false;
-  let   carpetArea = 0;
   let   carpetCfg: PriceRowQuizConfig | null = null;
   let   carpetRowIndex = -1;
-  const isAlcatifa = serviceSlug === 'limpeza-alcatifas';
   let   antiAcarosQty = 0;
   let   antiAcarosPrice = 0;
 
@@ -270,7 +247,7 @@ export function buildWidgetQuizConfig(
       if (packEnabled) chairWaterproofOn = true;
       if (antiAcarosRows.has(i)) chairAntiAcarosOn = true;
     }
-    if (cfg.service === 'carpet'  && qty > 0) { carpetArea = qty; carpetCfg = cfg; carpetRowIndex = i; }
+    if (cfg.service === 'carpet'  && qty > 0) { carpetCfg = cfg; carpetRowIndex = i; }
     if (cfg.service === 'sofa'    && qty > 0 && antiAcarosRows.has(i)) {
       const delta = calcSofaAntiAcarosDelta(cfg);
       if (delta !== null) { antiAcarosQty += qty; antiAcarosPrice += delta * qty; }
@@ -320,13 +297,12 @@ export function buildWidgetQuizConfig(
     };
   }
 
-  // Alcatifas: continuam com o modelo de área única (preço real por m²).
-  if (carpetArea > 0 && carpetCfg && isAlcatifa) {
-    return { ...(carpetCfg as PriceRowQuizConfig), carpetArea: String(carpetArea) };
-  }
-  // Tapetes: várias peças medidas (largura×comprimento), sempre sob orçamento
-  // — mesma lógica do simulador do quiz, para o "Continuar" já levar os
-  // tapetes que a pessoa mediu aqui em vez de abrir o passo do quiz vazio.
+  // Tapetes E alcatifa: várias peças medidas (largura×comprimento), sempre
+  // sob orçamento (2026-09-09, pedido explícito: "limpeza de alcatifa e
+  // sempre sob orçamento assim como tapete" — alcatifa deixou de ter preço
+  // fixo por m², mesma lógica do simulador do quiz para as duas, para o
+  // "Continuar" já levar as peças que a pessoa mediu aqui em vez de abrir o
+  // passo do quiz vazio).
   const carpetItems = carpetRowIndex >= 0 ? (carpetItemsByRow[carpetRowIndex] ?? []) : [];
   const validCarpetItems = carpetItems.filter(it => {
     const l = parseFloat((it.largura + '').replace(',', '.'));

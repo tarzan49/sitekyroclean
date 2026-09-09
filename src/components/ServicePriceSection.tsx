@@ -8,30 +8,16 @@ import SectionHeader from "@/components/SectionHeader";
 import PriceWidget from "@/components/PriceWidget";
 import { useState } from "react";
 
-// Terceiro ponto de cada serviço reescrito para puxar para o upsell/Pack Família
-// (mesma visita, mais um estofo) — pedido explícito 2026-08-30, mantém-se
-// sincronizado com a variante 0 de src/constants/serviceTrustPool.ts.
-// Sofá, colchão, cadeiras e tapetes já não estão aqui — usam pools de várias
-// opções por ponto, ver getTrustPointsForSeed em serviceTrustPool.ts.
-const SERVICE_POINTS: Record<string, { stat?: string; titleGold: string; titleRest?: string; desc: string }[]> = {
-  'limpeza-alcatifas': [
-    { stat: '1 kg/m²', titleGold: 'Sujidade invisível', titleRest: ' acumulada em cada m²', desc: 'Fibras compactadas retêm o que não se vê mas que respira todos os dias. Nem a aspiração profissional chega.' },
-    { stat: '2,5×', titleGold: 'Pior qualidade do ar', titleRest: ' sem limpeza regular', desc: 'Alcatifas sem manutenção anual degradam significativamente o ar interior. Crítico em escritórios e quartos.' },
-    { titleGold: 'Aproveite a visita', titleRest: ' para mais um espaço', desc: 'O técnico já está em sua casa: junte sofás, cadeiras ou tapetes na mesma visita e poupe na deslocação.' },
-  ],
-  'impermeabilizacao': [
-    { stat: '60s', titleGold: '60 segundos', titleRest: ' para uma mancha ficar permanente', desc: 'Sem proteção, o tecido absorve o vinho em menos de 60 segundos. Com nano-barreira, rola para o chão.' },
-    { stat: '10⁻⁹m', titleGold: 'Proteção molecular', titleRest: ' a nível nanométrico', desc: 'Nano-partículas criam uma barreira a nível molecular invisível ao toque. Não altera cor, textura nem respirabilidade do tecido.' },
-    { titleGold: 'Combine com a limpeza', titleRest: ' e poupe', desc: 'Peça a impermeabilização junto com a limpeza profunda: o Pack Proteção Total tem desconto sobre os dois serviços em separado.' },
-  ],
-};
+// Todos os 6 serviços já usam pools de variedade (ver getTrustPointsForSeed
+// em serviceTrustPool.ts) — o antigo fallback de pontos fixos por serviço
+// (alcatifas, impermeabilização) foi removido por completo em 2026-09-09.
 
 const SERVICE_SUBTITLE: Record<string, string> = {
   'limpeza-sofas':     'Preço fixo por tamanho e tratamento. Sem avaliação prévia, sem deslocações em vão.',
   'limpeza-colchoes':  'Preço fixo por tamanho de colchão. Orçamento confirmado antes de qualquer intervenção.',
   'limpeza-tapetes':   'Orçamento à medida de cada tapete. Sem surpresas, sem custos escondidos.',
   'limpeza-cadeiras':  'Preço por cadeira com desconto progressivo em lotes. Confirmado antes de avançar.',
-  'limpeza-alcatifas': 'Preço por m² com desconto em grandes superfícies. Orçamento gratuito.',
+  'limpeza-alcatifas': 'Orçamento à medida de cada espaço. Sem preço fixo por m², sem surpresas.',
   'impermeabilizacao': 'Preço fixo, combinável com limpeza ou em separado. Sem compromisso.',
 };
 
@@ -51,7 +37,7 @@ export default function ServicePriceSection({ serviceSlug, initialLocation }: Pr
   const goldWord = verbWords.pop() ?? "";
   const heading = `Quanto custa ${verbWords.join(" ")}`;
 
-  const trustPoints = getTrustPointsForSeed(serviceSlug, `${serviceSlug}:0:${initialLocation ?? 'default'}`) ?? SERVICE_POINTS[serviceSlug] ?? [];
+  const trustPoints = getTrustPointsForSeed(serviceSlug, `${serviceSlug}:0:${initialLocation ?? 'default'}`) ?? [];
 
   const TrustPoints = ({ fullDesc }: { fullDesc: boolean }) => (
     <>

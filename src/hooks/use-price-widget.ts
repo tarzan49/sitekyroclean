@@ -16,7 +16,16 @@ export function usePriceWidgetState(serviceSlug: string) {
   const [addonTier, setAddonTier] = useState<WidgetTier>('premium');
   const [antiAcarosRows, setAntiAcarosRows] = useState<Set<number>>(new Set());
   // Simulador de tapetes (2026-09-06): várias peças medidas por linha, mesma
-  // lógica do quiz — nunca uma área única. Alcatifa continua com rowQuantities.
+  // lógica do quiz — nunca uma área única.
+  //
+  // Alcatifa passou a usar o MESMO simulador de várias peças (2026-09-09,
+  // pedido explícito: "e so replicar o widget de tapetes") — uma alcatifa
+  // raramente é um único retângulo (várias divisões, corredores, recortes),
+  // por isso faz sentido medir peça a peça como um tapete. A diferença: para
+  // alcatifa, `rowQuantities[i]` guarda a SOMA das áreas (m² reais, usada no
+  // cálculo "área×3€"), não a contagem de peças — para tapete continua a ser
+  // a contagem (tapete nunca teve preço por m², é sempre "sob orçamento").
+  const isAlcatifaService = serviceSlug === 'limpeza-alcatifas';
   const [carpetItemsByRow, setCarpetItemsByRow] = useState<Record<number, CarpetItem[]>>({});
 
   // LocationServicePage/FreguesiaServicePage reaproveitam a mesma instância
@@ -38,8 +47,10 @@ export function usePriceWidgetState(serviceSlug: string) {
   };
   const setCarpetRow = (i: number, items: CarpetItem[]) => {
     setCarpetItemsByRow(prev => ({ ...prev, [i]: items }));
-    const validCount = items.filter(it => carpetItemArea(it) > 0).length;
-    setRowQuantities(prev => ({ ...prev, [i]: validCount }));
+    const value = isAlcatifaService
+      ? items.reduce((sum, it) => sum + carpetItemArea(it), 0)
+      : items.filter(it => carpetItemArea(it) > 0).length;
+    setRowQuantities(prev => ({ ...prev, [i]: value }));
   };
   const updateCarpetItem = (i: number, id: string, field: 'largura' | 'comprimento', value: string) => {
     setCarpetRow(i, getCarpetItems(i).map(it => (it.id === id ? { ...it, [field]: value } : it)));
@@ -62,10 +73,6 @@ export function usePriceWidgetState(serviceSlug: string) {
     });
   };
 
-  const setAlcatifaQty = (i: number, value: number) => {
-    setRowQuantities(prev => ({ ...prev, [i]: Math.max(0, value) }));
-  };
-
   const toggleAddonRow = (i: number) => {
     setAddonRows(prev => { const n = new Set(prev); if (n.has(i)) n.delete(i); else n.add(i); return n; });
   };
@@ -79,6 +86,6 @@ export function usePriceWidgetState(serviceSlug: string) {
   return {
     rowQuantities, chaiseLongueAddon, setChaiseLongueAddon, addonRows, addonTier, setAddonTier, antiAcarosRows,
     getCarpetItems, updateCarpetItem, addCarpetItem, removeCarpetItem, carpetItemArea,
-    adjustQty, setAlcatifaQty, toggleAddonRow, toggleAntiAcarosRow, buildConfig,
+    adjustQty, toggleAddonRow, toggleAntiAcarosRow, buildConfig,
   };
 }

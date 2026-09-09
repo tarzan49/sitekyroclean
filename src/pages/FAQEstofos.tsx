@@ -98,8 +98,8 @@ const allFaqs: FAQ[] = [
   {
     id: "quanto-custa-limpar-alcatifa",
     question: "Fazem limpeza de alcatifas? Qual é o preço?",
-    answer: <>Sim. A <Link to="/limpeza-alcatifas" className="text-gold hover:underline font-medium">limpeza de alcatifas</Link> é feita no local por extração a vapor, sem necessidade de remover o revestimento. O preço é calculado por metro quadrado conforme a área total a tratar. Para saber o preço exato da sua alcatifa, envie uma foto e a metragem via <a href={WHATSAPP_BASE} target="_blank" rel="noopener noreferrer" className="text-gold hover:underline font-medium">WhatsApp ({PHONE_DISPLAY})</a> e respondemos em menos de 30 minutos. O serviço inclui pré-tratamento de manchas, extração a vapor e bactericida.</>,
-    plainAnswer: `Limpeza de alcatifas feita no local por extração a vapor. Preço por m² conforme área total. Envie foto e metragem via WhatsApp ${PHONE_DISPLAY} para orçamento em menos de 30 minutos. Inclui pré-tratamento, extração e bactericida.`,
+    answer: <>Sim. A <Link to="/limpeza-alcatifas" className="text-gold hover:underline font-medium">limpeza de alcatifas</Link> é feita no local por extração a vapor, sem necessidade de remover o revestimento. O preço é sempre orçamentado à medida da área e do estado da alcatifa, sem tabela fixa por m². Para saber o preço exato da sua alcatifa, envie uma foto e a metragem via <a href={WHATSAPP_BASE} target="_blank" rel="noopener noreferrer" className="text-gold hover:underline font-medium">WhatsApp ({PHONE_DISPLAY})</a> e respondemos em menos de 30 minutos. O serviço inclui pré-tratamento de manchas, extração a vapor e bactericida.</>,
+    plainAnswer: `Limpeza de alcatifas feita no local por extração a vapor. Orçamento sempre à medida da área total, sem preço fixo por m². Envie foto e metragem via WhatsApp ${PHONE_DISPLAY} para orçamento em menos de 30 minutos. Inclui pré-tratamento, extração e bactericida.`,
   },
   {
     id: "quanto-custa-impermeabilizacao",

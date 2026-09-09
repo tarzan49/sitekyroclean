@@ -1,6 +1,6 @@
 import { Star, ExternalLink, ChevronDown } from "lucide-react";
 import { useState } from "react";
-import { SERVICE_TRUST_POOL, getTrustPointsForSeed, type TrustPoint } from "@/constants/serviceTrustPool";
+import { getTrustPointsForSeed, type TrustPoint } from "@/constants/serviceTrustPool";
 import { GOOGLE_REVIEWS_VIEW_URL } from "@/constants/google";
 import { REVIEW_COUNT } from "@/constants/business";
 
@@ -16,9 +16,11 @@ interface Props {
   seedKey?: string;
 }
 
+// Todos os 6 serviços já usam pools de variedade (ver getTrustPointsForSeed
+// em serviceTrustPool.ts) — o antigo sistema de 3 variantes fixas por
+// serviço foi removido por completo em 2026-09-09.
 function resolvePoints(serviceSlug: string, variant: 0 | 1 | 2, seedKey?: string): TrustPoint[] {
-  const pooled = getTrustPointsForSeed(serviceSlug, `${serviceSlug}:${variant}:${seedKey ?? 'default'}`);
-  return pooled ?? SERVICE_TRUST_POOL[serviceSlug]?.[variant] ?? [];
+  return getTrustPointsForSeed(serviceSlug, `${serviceSlug}:${variant}:${seedKey ?? 'default'}`) ?? [];
 }
 
 function Points({ points, fullDesc }: { points: TrustPoint[]; fullDesc: boolean }) {

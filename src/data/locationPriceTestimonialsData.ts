@@ -71,7 +71,7 @@ export const PRICE_TABLE: Record<string, { item: string; price: string }[]> = {
     { item: 'Cadeiras',                 price: '20€/cad' },
   ],
   'limpeza-alcatifas': [
-    { item: 'Alcatifas (m²)',           price: '3€/m²' },
+    { item: 'Alcatifas (m²)',           price: 'Sob orçamento' },
   ],
   'impermeabilizacao': [
     { item: 'Sofá 1 lugar',            price: '59€' },

@@ -321,7 +321,7 @@ const posts: BlogPost[] = [
     sections: [
       {
         heading: "Preços de limpeza de tapetes (2025)",
-        body: "Na Kyro Clean Solutions, cada tapete avulso (recolha e entrega ou ao domicílio) é medido individualmente, largura x comprimento, e orçamentado à medida, sem tabela fixa por m². O valor final depende da dimensão, do tipo de fibra (sintético, lã, seda) e do estado de sujidade, e é sempre confirmado antes de qualquer compromisso.\n\n**Alcatifas (limpeza no local, m² de área):** a partir de 3€/m², essas sim com preço fixo por serem revestimento fixo medido no local.\n\nAo pedir orçamento pode indicar as medidas de cada tapete que quer lavar, e recebe o valor exato sem surpresas antes de agendar.",
+        body: "Na Kyro Clean Solutions, cada tapete avulso (recolha e entrega ou ao domicílio) é medido individualmente, largura x comprimento, e orçamentado à medida, sem tabela fixa por m². O valor final depende da dimensão, do tipo de fibra (sintético, lã, seda) e do estado de sujidade, e é sempre confirmado antes de qualquer compromisso.\n\n**Alcatifas (limpeza no local, m² de área):** também sempre orçamentadas à medida da área e do estado, sem preço fixo por m² — por ser um revestimento fixo, a avaliação é feita no local.\n\nAo pedir orçamento pode indicar as medidas de cada tapete que quer lavar, e recebe o valor exato sem surpresas antes de agendar.",
         tip: "Tapetes com franjas, de lã natural ou de seda requerem tratamento especializado. Informe sempre o técnico do material antes de agendar.",
       },
       {
@@ -692,7 +692,7 @@ const posts: BlogPost[] = [
       },
       {
         heading: "Quanto custa a limpeza profissional de alcatifa para escritório?",
-        body: "O preço da limpeza profissional de alcatifa comercial em Portugal começa em 3€/m². Para grandes superfícies (escritórios, comércio, espaços acima de 50m²) o orçamento é personalizado, com desconto de volume face ao preço por m² de espaços pequenos.\n\nEspaços com manchas intensas, colas ou resíduos específicos podem ter sobrecusto de pré-tratamento.\n\nA maioria das empresas profissionais trabalha fora do horário de expediente (tarde, noite ou fim de semana) para não interromper a atividade: inclua esta condição no pedido de orçamento.",
+        body: "O preço da limpeza profissional de alcatifa comercial em Portugal é sempre orçamentado à medida, sem tabela fixa por m² — depende da área, do estado da alcatifa e do tipo de espaço. Para grandes superfícies (escritórios, comércio, espaços acima de 50m²) o orçamento é personalizado.\n\nEspaços com manchas intensas, colas ou resíduos específicos podem ter sobrecusto de pré-tratamento.\n\nA maioria das empresas profissionais trabalha fora do horário de expediente (tarde, noite ou fim de semana) para não interromper a atividade: inclua esta condição no pedido de orçamento.",
         tip: "Peça contratos de limpeza semestral ou anual: habitualmente com 10-15% de desconto face ao preço por intervenção avulsa.",
       },
     ],
@@ -1526,8 +1526,8 @@ const posts: BlogPost[] = [
     intro: "A alcatifa é um dos revestimentos mais difíceis de manter limpa porque acumula pó, ácaros, gordura e partículas em profundidade que a aspiração regular não remove. A limpeza profissional por extração é a única forma de higienizar verdadeiramente. Mas quanto custa? Aqui encontra os preços reais e o que precisa de saber antes de pedir orçamento.",
     sections: [
       {
-        heading: "Preços por metro quadrado em Portugal (2025)",
-        body: "A limpeza profissional de alcatifas é calculada por área. Os preços da Kyro Clean começam em 3€/m², para grandes superfícies (escritórios, comércio) o orçamento é personalizado com desconto de volume.\n\n**Exemplos práticos:**\n- Sala com alcatifa de 15m²: cerca de 45€\n- T2 completo com alcatifa (40m²): cerca de 120€\n- Escritório de 80m² ou mais: orçamento personalizado\n\nA deslocação custa a partir de 10€ na área do Porto e aumenta com a distância para outros concelhos.",
+        heading: "Quanto custa limpar alcatifa em Portugal (2025)",
+        body: "A limpeza profissional de alcatifas na Kyro Clean é sempre orçamentada à medida, sem tabela fixa por m². O valor final depende de três fatores: a área total a tratar, o estado de sujidade (uma alcatifa nunca aspirada custa mais a tratar do que uma com manutenção regular) e o tipo de espaço (residencial ou comercial, com ou sem restrições de horário).\n\nPara ter uma ideia exata do valor antes de agendar, meça a área e peça orçamento gratuito: a resposta chega tipicamente em menos de 30 minutos.\n\nA deslocação custa a partir de 10€ na área do Porto e aumenta com a distância para outros concelhos.",
         tip: "Meça a área antes de pedir orçamento: comprimento × largura de cada divisão com alcatifa. Inclua zonas sob mobiliário que também são limpas.",
       },
       {

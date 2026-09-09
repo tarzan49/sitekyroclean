@@ -3,6 +3,7 @@ import { useLocation, Link } from "react-router-dom";
 import { MapPin, Star, MessageCircle, ArrowRight, Euro, Clock } from "lucide-react";
 import Header from "@/components/Header";
 import PageBreadcrumb from "@/components/PageBreadcrumb";
+import PriceWidget from "@/components/PriceWidget";
 import HeroBeforeAfterPool from "@/components/HeroBeforeAfterPool";
 import { categoryForServiceSlug } from "@/data/beforeAfterPool";
 import Footer from "@/components/Footer";
@@ -33,11 +34,10 @@ import { pickServiceHero } from "@/constants/serviceContent";
 import { buildServiceWaMessage } from "@/lib/whatsappMessages";
 import { SITE_URL, WHATSAPP_BASE } from "@/constants/business";
 import { PRICE_TABLE, PRICE_TABLE_QUIZ_CONFIG, type PriceRowQuizConfig } from "@/data/locationPriceTestimonialsData";
-import { calcWidgetTotal, calcChairBracket, calcCarpetWidget, buildWidgetQuizConfig, calcRowAddonDelta, calcSofaAntiAcarosDelta, calcChairAddonWaterproofTotal, calcChairAntiAcarosTotal, calcWidgetPricing, calcWidgetArticles, PACK_DISCOUNT_MIN_SERVICE, PACK_DISCOUNT_MIN_UPSELL_ITEM, type WidgetTier } from "@/lib/priceWidgetCalc";
+import { calcWidgetTotal, calcChairBracket, buildWidgetQuizConfig, calcRowAddonDelta, calcSofaAntiAcarosDelta, calcChairAddonWaterproofTotal, calcChairAntiAcarosTotal, calcWidgetPricing, calcWidgetArticles, PACK_DISCOUNT_MIN_SERVICE, PACK_DISCOUNT_MIN_UPSELL_ITEM, type WidgetTier } from "@/lib/priceWidgetCalc";
 import { locationPrices, type CarpetItem } from "@/components/quiz/QuizTypes";
 import { PROBLEM_IMAGES, PROBLEM_POOL_CTA, PRICE_HEADING_VERB } from "@/constants/problemCardHelpers";
 import { ServiceTrustDesktop, ServiceTrustMobile } from "@/components/ServiceTrustBlock";
-import { CarpetTierLegend } from "@/components/CarpetTierLegend";
 import ServiceReviewsGrid from "@/components/ServiceReviewsGrid";
 
 function parseFreguesiaRoute(pathname: string): { serviceSlug: string; citySlug: string; freguesiaSlug: string } | null {
@@ -246,12 +246,12 @@ const FreguesiaServicePage = () => {
                 <p className="text-white/40 text-xs mt-4">{/^\d/.test(data.priceFrom) ? `Desde ${data.priceFrom} · ` : ''}Orçamento gratuito · Sem compromisso</p>
               </div>
 
-              <div className="hidden lg:block">
+              <div className="mt-8 lg:mt-0">
                 <div className="relative">
                   <div className="absolute -inset-4 blur-2xl opacity-20" style={{ background: "linear-gradient(135deg, #D4AF37, transparent)" }} />
                   {beforeAfterCategory ? (
                     <div className="relative shadow-2xl" style={{ borderTop: "2px solid #D4AF37" }}>
-                      <HeroBeforeAfterPool category={beforeAfterCategory} className="w-full aspect-[4/3] max-h-[440px]" />
+                      <HeroBeforeAfterPool category={beforeAfterCategory} className="w-full" />
                     </div>
                   ) : (
                     <picture>

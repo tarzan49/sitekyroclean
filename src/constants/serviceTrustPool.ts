@@ -150,75 +150,81 @@ function getTapetesTrustPoints(seed: string): TrustPoint[] {
   ];
 }
 
-/** Pontos de confiança para sofá/colchão/cadeiras (pools com variedade — ver
- *  acima). `seed` deve identificar a página de forma estável (ex: serviço+
- *  variante+cidade/freguesia) para que a mesma página mostre sempre o mesmo
- *  conteúdo. */
+// Alcatifa: mesma lógica do tapete (pedido explícito 2026-09-09: "combinei
+// contigo o esquema da info anteriormente em colchao cadeira sofa e tapete,
+// quero a mesma logica de tapete para alcatifa") — sem upsell, 1º ponto é
+// gancho de produto, 2º é qualidade/confiança, 3º fixo (Pack Família). Preço
+// removido dos dois pools (2026-09-09: "limpeza de alcatifa e sempre sob
+// orçamento assim como tapete" — nunca voltar a pôr "desde X€/m²" aqui).
+const ALCATIFA_PROBLEMA_POOL: TrustPoint[] = [
+  { stat: '1 kg/m²', titleGold: 'Sujidade invisível', titleRest: ' acumulada em cada m² da alcatifa', desc: 'Fibras compactadas retêm o que não se vê mas que respira todos os dias. Nem a aspiração profissional chega às camadas mais profundas.' },
+  { stat: '2,5×', titleGold: 'Pior qualidade do ar', titleRest: ' sem limpeza regular', desc: 'Alcatifas sem manutenção anual degradam significativamente o ar interior. Crítico em escritórios, quartos e espaços com pouca ventilação.' },
+  { stat: '10×', titleGold: '10× mais poluentes', titleRest: ' retidos do que no ar', desc: 'Fibras densas de alcatifa retêm compostos orgânicos voláteis, poluentes e toxinas que a ventilação normal não remove.' },
+  { stat: '1.000', titleGold: '1.000 pessoas/dia', titleRest: ' em zonas comerciais de tráfego intenso', desc: 'Uma alcatifa de escritório ou loja com uso diário intenso acumula sujidade a um ritmo muito mais rápido do que uma alcatifa doméstica.' },
+  { stat: '5×', titleGold: '5× mais sujidade', titleRest: ' nas zonas de passagem', desc: 'Corredores e entradas acumulam muito mais sujidade por cm² do que zonas estáticas, e são as mais negligenciadas na limpeza doméstica.' },
+];
+
+const ALCATIFA_QUALIDADE_POOL: TrustPoint[] = [
+  { titleGold: 'Aparência renovada', titleRest: ' sem substituir a alcatifa', desc: 'Alcatifas consideradas gastas ou descoloridas recuperam até 85% da tonalidade original com extração profissional a quente, sem gastar em revestimento novo.' },
+  { titleGold: 'Pronto a usar', titleRest: ' em poucas horas', desc: 'O nosso equipamento de alta sucção minimiza a humidade residual. Em condições normais de ventilação, a alcatifa fica seca em 2 a 4 horas.' },
+  { titleGold: 'Sem interromper', titleRest: ' a atividade do espaço', desc: 'Em escritórios, clínicas ou lojas, trabalhamos frequentemente fora do horário de expediente para não afetar o funcionamento do negócio.' },
+  { titleGold: 'Redução de até 99%', titleRest: ' dos alergénios e ácaros', desc: 'A extração profunda a quente remove o que a aspiração doméstica nunca chega, reduzindo significativamente alergénios acumulados nas fibras.' },
+  { titleGold: 'Equipamento certo', titleRest: ' para cada tipo de alcatifa', desc: 'Alcatifas de pelo alto, baixo ou de alta densidade (comum em hotéis) exigem pressão e técnica diferentes. Usamos o equipamento adequado a cada caso.' },
+];
+
+const ALCATIFA_FIXED_CROSSSELL: TrustPoint = { titleGold: 'Uma visita,', titleRest: ' todos os espaços tratados', desc: 'Sofá, colchão, tapete ou cadeiras na mesma visita da alcatifa: um único agendamento, desconto de pack incluído.' };
+
+function getAlcatifaTrustPoints(seed: string): TrustPoint[] {
+  return [
+    pickFromPool(ALCATIFA_PROBLEMA_POOL, `${seed}:problema`),
+    pickFromPool(ALCATIFA_QUALIDADE_POOL, `${seed}:qualidade`),
+    ALCATIFA_FIXED_CROSSSELL,
+  ];
+}
+
+// Impermeabilização: pedido explícito 2026-09-09 — 1º ponto sempre sofá, 2º
+// ponto sempre cadeira (os dois únicos móveis com preço próprio na tabela
+// desta página, ver PRICE_TABLE['impermeabilizacao']), ambos no formato
+// "a partir de/desde X€, proteja durante 10 anos o seu Y de Z". "10 anos" é a
+// duração real já usada na Premium noutro lado do site (ver
+// keywordVariantData.ts: "proteção real até 10 anos"), não um número novo.
+// 3º ponto fica exatamente como estava (fixo, não fazia parte do pedido).
+const IMPERMEABILIZACAO_SOFA_POOL: TrustPoint[] = [
+  { titleGold: 'A partir de 59€,', titleRest: ' proteja durante 10 anos o seu sofá de linho', desc: 'A versão Premium cria uma barreira invisível que resiste a até 5 lavagens e mantém o linho protegido de manchas e líquidos durante uma década.' },
+  { titleGold: 'Desde 59€,', titleRest: ' proteja durante 10 anos o seu sofá de veludo', desc: 'O veludo absorve líquidos em segundos e mancha com facilidade. A Premium cria uma barreira que repele manchas sem alterar o toque aveludado.' },
+  { titleGold: 'A partir de 59€,', titleRest: ' proteja durante 10 anos o seu sofá de chenille', desc: 'O chenille retém sujidade nas fibras entrelaçadas. Com a Premium, líquidos e gordura ficam à superfície, prontos a limpar com um pano.' },
+  { titleGold: 'Desde 59€,', titleRest: ' proteja durante 10 anos o seu sofá de algodão', desc: 'Tecidos de algodão absorvem manchas com muita facilidade. A Premium cria uma barreira invisível que reduz esse risco ao mínimo, sem alterar a cor.' },
+  { titleGold: 'A partir de 59€,', titleRest: ' proteja durante 10 anos o seu sofá de bouclé', desc: 'A textura em laçada do bouclé retém sujidade nos relevos. A Premium protege sem esconder a textura nem alterar o aspeto do tecido.' },
+];
+
+const IMPERMEABILIZACAO_CADEIRA_POOL: TrustPoint[] = [
+  { titleGold: 'A partir de 20€,', titleRest: ' proteja durante 10 anos a sua cadeira de tecido', desc: 'Cadeiras de jantar recebem sumo, molho e gordura todos os dias. A Premium cria uma barreira que dá tempo a limpar antes de a mancha absorver.' },
+  { titleGold: 'Desde 20€,', titleRest: ' proteja durante 10 anos a sua cadeira de veludo', desc: 'O veludo das cadeiras estofadas marca com facilidade. A Premium repele líquidos à superfície sem alterar o brilho nem o toque do tecido.' },
+  { titleGold: 'A partir de 20€,', titleRest: ' proteja durante 10 anos a sua cadeira de linho', desc: 'Linho claro mostra qualquer mancha de imediato. Com a Premium, derrames à mesa ficam à superfície, prontos a remover com um pano seco.' },
+  { titleGold: 'Desde 20€,', titleRest: ' proteja durante 10 anos a sua cadeira de chenille', desc: 'As fibras entrelaçadas do chenille retêm sujidade nas costuras. A Premium cria uma barreira que impede que os líquidos cheguem lá.' },
+  { titleGold: 'A partir de 20€,', titleRest: ' proteja durante 10 anos a sua cadeira estofada', desc: 'Cadeiras de restaurante ou de uso diário sofrem o desgaste mais rápido de todos os estofos. A Premium prolonga o aspeto de novo durante uma década.' },
+];
+
+const IMPERMEABILIZACAO_FIXED_POINT3: TrustPoint = { titleGold: 'Combine com a limpeza', titleRest: ' e poupe', desc: 'Peça a impermeabilização junto com a limpeza profunda: o Pack Proteção Total tem desconto sobre os dois serviços em separado.' };
+
+function getImpermeabilizacaoTrustPoints(seed: string): TrustPoint[] {
+  return [
+    pickFromPool(IMPERMEABILIZACAO_SOFA_POOL, `${seed}:sofa`),
+    pickFromPool(IMPERMEABILIZACAO_CADEIRA_POOL, `${seed}:cadeira`),
+    IMPERMEABILIZACAO_FIXED_POINT3,
+  ];
+}
+
+/** Pontos de confiança para sofá/colchão/cadeiras/tapete/alcatifa/
+ *  impermeabilização (pools com variedade — ver acima). `seed` deve
+ *  identificar a página de forma estável (ex: serviço+variante+cidade/
+ *  freguesia) para que a mesma página mostre sempre o mesmo conteúdo. */
 export function getTrustPointsForSeed(serviceSlug: string, seed: string): TrustPoint[] | null {
   if (serviceSlug === 'limpeza-sofas') return getSofaTrustPoints(seed);
   if (serviceSlug === 'limpeza-colchoes') return getColchaoTrustPoints(seed);
   if (serviceSlug === 'limpeza-cadeiras') return getCadeirasTrustPoints(seed);
   if (serviceSlug === 'limpeza-tapetes') return getTapetesTrustPoints(seed);
+  if (serviceSlug === 'limpeza-alcatifas') return getAlcatifaTrustPoints(seed);
+  if (serviceSlug === 'impermeabilizacao') return getImpermeabilizacaoTrustPoints(seed);
   return null;
 }
-
-/**
- * 3 variantes por serviço — cada tipo de página usa uma variante diferente:
- * [0] = páginas genéricas (/limpeza-sofas)
- * [1] = páginas localidade×serviço (/limpeza-sofas-porto)
- * [2] = páginas freguesia×serviço + keyword variants
- *
- * Sofá, colchão, cadeiras e tapetes já não usam isto (ver
- * getTrustPointsForSeed acima) — os restantes serviços (alcatifas,
- * impermeabilização) ainda usam o sistema de 3 variantes fixas, a rever
- * depois.
- *
- * Em cada variante, um dos 3 pontos foi escrito para puxar para o upsell/Pack
- * Família (mesma visita, mais um estofo, desconto de pack) em vez de só justificar
- * o serviço em si — pedido explícito 2026-08-30: a informação à esquerda do
- * orçamento deve também incentivar o upsell, não só suportar a limpeza isolada.
- */
-export const SERVICE_TRUST_POOL: Record<string, TrustPoint[][]> = {
-
-  'limpeza-alcatifas': [
-    // Variante 0
-    [
-      { stat: '1 kg/m²', titleGold: 'Sujidade invisível', titleRest: ' acumulada em cada m²', desc: 'Fibras compactadas retêm o que não se vê mas que respira todos os dias.' },
-      { stat: '2,5×', titleGold: 'Pior qualidade do ar', titleRest: ' sem limpeza regular', desc: 'Alcatifas sem manutenção anual degradam significativamente o ar interior, crítico em escritórios e quartos.' },
-      { titleGold: 'Aproveite a visita', titleRest: ' para mais um espaço', desc: 'O técnico já está em sua casa: junte sofás, cadeiras ou tapetes na mesma visita e poupe na deslocação.' },
-    ],
-    // Variante 1
-    [
-      { stat: '10×', titleGold: '10× mais poluentes', titleRest: ' retidos do que no ar', desc: 'Fibras densas de alcatifa retêm compostos orgânicos voláteis, poluentes e toxinas que ventilação normal não remove.' },
-      { titleGold: 'Pack Família', titleRest: ' poupa até 10%', desc: 'Combine a alcatifa com outro serviço na mesma visita (sofá, tapete, cadeiras) e o desconto aplica-se a tudo.' },
-      { stat: '85%', titleGold: '85% da tonalidade', titleRest: ' original recuperada', desc: 'Alcatifas consideradas descoloradas ou gastas recuperam até 85% da cor original com extração profissional a quente.' },
-    ],
-    // Variante 2
-    [
-      { stat: '1.000', titleGold: '1.000 pessoas/dia', titleRest: ' em zonas comerciais', desc: 'Uma alcatifa de escritório com 1.000 passagens por dia requer limpeza profissional bimestral para manter condições de higiene.' },
-      { stat: '5×', titleGold: '5× mais sujidade', titleRest: ' nas zonas de passagem', desc: 'Os corredores e entradas acumulam 5× mais sujidade por cm² do que zonas estáticas, e são as mais negligenciadas.' },
-      { titleGold: 'Uma visita,', titleRest: ' todos os espaços tratados', desc: 'Sofás, tapetes ou cadeiras na mesma visita da alcatifa: um único agendamento, desconto de pack incluído.' },
-    ],
-  ],
-
-  'impermeabilizacao': [
-    // Variante 0
-    [
-      { stat: '60s', titleGold: '60 segundos', titleRest: ' para uma mancha ficar permanente', desc: 'Sem proteção, o tecido absorve o vinho em menos de 60 segundos. Com nano-barreira, rola para o chão.' },
-      { stat: '10⁻⁹m', titleGold: 'Proteção molecular', titleRest: ' a nível nanométrico', desc: 'Nano-partículas criam uma barreira a nível molecular invisível ao toque, não altera cor, textura nem respirabilidade.' },
-      { titleGold: 'Combine com a limpeza', titleRest: ' e poupe', desc: 'Peça a impermeabilização junto com a limpeza profunda: o Pack Proteção Total tem desconto sobre os dois serviços em separado.' },
-    ],
-    // Variante 1
-    [
-      { stat: '78%', titleGold: '78% nunca', titleRest: ' impermeabilizou o sofá', desc: 'E 62% desses acabou a substituir o estofo prematuramente. A impermeabilização é o seguro que ninguém contrata antes de precisar.' },
-      { stat: '24h', titleGold: 'Barreira ativa', titleRest: ' 24h após a aplicação', desc: 'A nano-barreira cura em 24 horas à temperatura ambiente. A partir daí, protege contra suor, oleosidade e corantes.' },
-      { titleGold: 'Pack Proteção Total', titleRest: ' poupa mais', desc: 'Combine a impermeabilização com a limpeza profunda no mesmo agendamento e o desconto aplica-se aos dois serviços.' },
-    ],
-    // Variante 2
-    [
-      { stat: '3×', titleGold: '3× mais proteção', titleRest: ' combinado com a limpeza', desc: 'Impermeabilizar sobre tecido limpo aumenta a eficácia da barreira em 3× comparado com aplicação sobre sujidade acumulada.' },
-      { stat: '3×', titleGold: '3× mais tempo', titleRest: ' a manter a cor original', desc: 'Tecidos impermeabilizados resistem ao desbotamento por UV e manchas de oleosidade, mantendo a cor original até 3× mais tempo.' },
-      { titleGold: 'Menos de 1€', titleRest: ' por semana', desc: 'O custo anual de impermeabilização equivale a menos de 1€ por semana, e evita uma substituição que custa 10× mais.' },
-    ],
-  ],
-};

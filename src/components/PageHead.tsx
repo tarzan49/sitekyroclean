@@ -80,15 +80,15 @@ const routeMeta: Record<string, { pt: PageMeta; en: PageMeta; es: PageMeta }> = 
   },
   "/limpeza-alcatifas": {
     pt: {
-      title: "Limpeza e Lavagem de Alcatifas | Desde 3€/m² | Kyro Clean Solutions",
+      title: "Limpeza e Lavagem de Alcatifas | Orçamento Grátis | Kyro Clean Solutions",
       description: "Limpeza e lavagem profunda de alcatifas com extração profissional. Removemos sujidade acumulada e alergénios. Secagem rápida. Porto, Lisboa e todo o país.",
     },
     en: {
-      title: "Carpet Cleaning & Deep Wash | From €3/m² | Kyro Clean Solutions",
+      title: "Carpet Cleaning & Deep Wash | Free Quote | Kyro Clean Solutions",
       description: "Deep carpet cleaning and washing with professional extraction equipment. We remove accumulated dirt and allergens. Fast drying.",
     },
     es: {
-      title: "Limpieza y Lavado de Moquetas | Desde 3€/m² | Kyro Clean Solutions",
+      title: "Limpieza y Lavado de Moquetas | Presupuesto Gratis | Kyro Clean Solutions",
       description: "Limpieza y lavado profundo de moquetas con extracción profesional. Eliminamos suciedad acumulada y alérgenos.",
     },
   },

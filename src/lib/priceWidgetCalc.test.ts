@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import {
-  calcChairBracket, calcCarpetWidget, calcWidgetPricing, calcWidgetArticles,
+  calcChairBracket, calcWidgetPricing, calcWidgetArticles,
   calcWidgetTotal, buildWidgetQuizConfig, PACK_DISCOUNT_MIN_TOTAL,
 } from './priceWidgetCalc';
 
@@ -22,19 +22,14 @@ describe('calcChairBracket', () => {
   });
 });
 
-describe('calcCarpetWidget', () => {
-  it('alcatifa: 3€/m² up to 50m², sob orçamento above', () => {
-    expect(calcCarpetWidget(10, true)).toBe(30);
-    expect(calcCarpetWidget(50, true)).toBe(150);
-    expect(calcCarpetWidget(51, true)).toBeNull();
-  });
-  it('tapetes (non-alcatifa) are always sob orçamento, never priced by m²', () => {
-    expect(calcCarpetWidget(5, false)).toBeNull();
-    expect(calcCarpetWidget(50, false)).toBeNull();
-  });
-  it('0 area is 0€, not sob orçamento (nothing measured yet)', () => {
-    expect(calcCarpetWidget(0, true)).toBe(0);
-    expect(calcCarpetWidget(0, false)).toBe(0);
+// calcCarpetWidget foi removida (2026-09-09, pedido explícito: "limpeza de
+// alcatifa e sempre sob orçamento assim como tapete") — carpet (tapete e
+// alcatifa) nunca mais entra em calcWidgetTotal/calcWidgetArticles, ver o
+// early-return "sempre sob orçamento" nessas duas funções.
+describe('calcWidgetTotal — carpet (tapete e alcatifa) nunca soma ao total', () => {
+  it('linhas de carpet são ignoradas mesmo com qty > 0', () => {
+    expect(calcWidgetTotal('limpeza-tapetes', { 0: 20 }, 0)).toBe(0);
+    expect(calcWidgetTotal('limpeza-alcatifas', { 0: 30 }, 0)).toBe(0);
   });
 });
 

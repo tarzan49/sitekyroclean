@@ -4,11 +4,10 @@ import { cn } from "@/lib/utils";
 import { usePriceWidgetState } from "@/hooks/use-price-widget";
 import { useQuizLauncher } from "@/hooks/use-quiz-launcher";
 import QuizFormLazy from "@/components/QuizFormLazy";
-import { CarpetTierLegend } from "@/components/CarpetTierLegend";
 import { locationPrices } from "@/components/quiz/QuizTypes";
 import type { PriceRowQuizConfig } from "@/data/locationPriceTestimonialsData";
 import {
-  calcWidgetTotal, calcChairBracket, calcCarpetWidget, calcWidgetPricing, calcWidgetArticles,
+  calcWidgetTotal, calcChairBracket, calcWidgetPricing, calcWidgetArticles,
   PACK_DISCOUNT_MIN_SERVICE, PACK_DISCOUNT_MIN_UPSELL_ITEM,
 } from "@/lib/priceWidgetCalc";
 import { PRICE_TABLE, PRICE_TABLE_QUIZ_CONFIG } from "@/data/locationPriceTestimonialsData";
@@ -88,46 +87,24 @@ export default function PriceWidget({ serviceSlug, initialLocation }: Props) {
           const isChair = quizConfig.service === 'chairs';
 
           const chairP = isChair && qty > 0 ? calcChairBracket(qty, isWaterproofService) : undefined;
-          const carpetP = isCarpet && qty > 0 ? calcCarpetWidget(qty, isAlcatifaService) : undefined;
           const dynamicPrice: string | null = isChair
             ? (qty <= 0 ? null : chairP === null ? 'Sob orçamento' : `${chairP}€`)
             : isCarpet
-            ? (qty <= 0 ? (isAlcatifaService ? '3€/m²' : 'Sob orçamento') : carpetP == null ? 'Sob orçamento' : `${Math.round(carpetP * 10) / 10}€`)
+            ? 'Sob orçamento' // tapete e alcatifa: nunca têm preço calculado (2026-09-09)
             : row.price;
 
-          // Alcatifa: input numérico de m²
-          if (isCarpet && isAlcatifaService) {
-            return (
-              <div
-                key={i}
-                className={cn(
-                  "px-3.5 py-2.5 sm:px-4 sm:py-3 rounded-sm border-2 transition-all duration-200",
-                  active ? "border-gold/50 bg-[#1a2a1a] shadow-[0_0_10px_rgba(212,175,55,0.15)]" : "border-dashed border-white/25 bg-white/[0.02]"
-                )}
-              >
-                <div className="flex items-center gap-3">
-                  {/* Campo grande de propósito, igual ao dos tapetes (pedido
-                      explícito 2026-09-09) — sem spinners nativos. */}
-                  <input
-                    type="number" min={0} max={50} inputMode="decimal"
-                    value={qty || ''} placeholder="0"
-                    onChange={e => w.setAlcatifaQty(i, parseFloat(e.target.value) || 0)}
-                    className="w-24 text-center text-lg font-semibold outline-none rounded-sm border border-white/20 bg-white/[0.05] text-white placeholder:text-white/25 px-2 py-2.5 focus:border-gold [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                  />
-                  <span className="text-sm font-medium text-white/40">m²</span>
-                  <span className="flex-1" />
-                  {dynamicPrice !== null && (
-                    <span className={cn("font-playfair text-lg font-bold tabular-nums", active ? "text-gold" : "text-white")}>{dynamicPrice}</span>
-                  )}
-                </div>
-                <CarpetTierLegend isAlcatifa={isAlcatifaService} qty={qty} />
-              </div>
-            );
-          }
-
-          // Tapetes: várias peças medidas (largura × comprimento)
+          // Tapetes E alcatifa: várias peças medidas (largura × comprimento)
+          // — mesmo simulador para as duas (pedido explícito 2026-09-09:
+          // "o de alcatifa e facil resolver e so replicar o widget de
+          // tapetes"), uma alcatifa raramente é um único retângulo (várias
+          // divisões, corredores, recortes). Preço: as duas são sempre "sob
+          // orçamento" (pedido explícito 2026-09-09: "limpeza de alcatifa e
+          // sempre sob orçamento assim como tapete" — alcatifa deixou de ter
+          // tabela de preço por m²). A área total de alcatifa mostra-se só a
+          // título informativo, não entra em nenhum cálculo.
           if (isCarpet) {
             const items = w.getCarpetItems(i);
+            const pieceLabel = isAlcatifaService ? "Divisão" : "Tapete";
             return (
               <div
                 key={i}
@@ -142,13 +119,13 @@ export default function PriceWidget({ serviceSlug, initialLocation }: Props) {
                     return (
                       <div key={item.id} className="rounded-sm border border-white/15 bg-white/[0.03] px-3 py-2.5 flex flex-col gap-2">
                         <div className="flex items-center justify-between">
-                          <span className="text-[9px] font-bold uppercase tracking-wide text-white/35">Tapete {idx + 1}</span>
+                          <span className="text-[9px] font-bold uppercase tracking-wide text-white/35">{pieceLabel} {idx + 1}</span>
                           <div className="flex items-center gap-2">
                             <span className={cn("text-xs font-bold tabular-nums", area > 0 ? "text-gold" : "text-white/25")}>
                               {area > 0 ? `${Math.round(area * 100) / 100} m²` : ''}
                             </span>
                             {items.length > 1 && (
-                              <button type="button" onClick={() => w.removeCarpetItem(i, item.id)} aria-label="Remover tapete" className="w-5 h-5 flex items-center justify-center flex-shrink-0 text-white/30 hover:text-white/70 text-base leading-none">×</button>
+                              <button type="button" onClick={() => w.removeCarpetItem(i, item.id)} aria-label={`Remover ${pieceLabel.toLowerCase()}`} className="w-5 h-5 flex items-center justify-center flex-shrink-0 text-white/30 hover:text-white/70 text-base leading-none">×</button>
                             )}
                           </div>
                         </div>
@@ -177,9 +154,19 @@ export default function PriceWidget({ serviceSlug, initialLocation }: Props) {
                     onClick={() => w.addCarpetItem(i)}
                     className="w-full flex items-center justify-center gap-1.5 py-1.5 rounded-sm border-2 border-dashed border-gold/30 text-gold/80 text-[11px] font-bold hover:border-gold/60 hover:bg-gold/[0.04] transition-all touch-manipulation"
                   >
-                    <Plus className="w-3 h-3" /> Adicionar outro tapete
+                    <Plus className="w-3 h-3" /> Adicionar outra {pieceLabel.toLowerCase()}
                   </button>
-                  <p className="text-[10px] text-center text-white/35">Cada tapete é sempre <span className="text-gold font-bold">sob orçamento</span></p>
+                  {isAlcatifaService && (
+                    <div className="flex items-center justify-between px-1">
+                      <span className="text-[10px] text-white/35">Área total</span>
+                      <span className={cn("text-xs font-bold tabular-nums", qty > 0 ? "text-gold" : "text-white/25")}>
+                        {qty > 0 ? `${Math.round(qty * 100) / 100} m²` : '—'}
+                      </span>
+                    </div>
+                  )}
+                  <p className="text-[10px] text-center text-white/35">
+                    Cada {pieceLabel.toLowerCase()} é sempre <span className="text-gold font-bold">sob orçamento</span>
+                  </p>
                 </div>
               </div>
             );

@@ -215,11 +215,11 @@ const MarcaColchaoPage = () => {
                   <p className="text-white/40 text-xs mt-4">Desde {marca.minPrice}€ · Orçamento gratuito · Sem compromisso</p>
                 </div>
 
-                <div className="hidden lg:block">
+                <div className="mt-8 lg:mt-0">
                   <div className="relative">
                     <div className="absolute -inset-4 blur-2xl opacity-20" style={{ background: "linear-gradient(135deg, #D4AF37, transparent)" }} />
                     <div className="relative shadow-2xl" style={{ borderTop: "2px solid #D4AF37" }}>
-                      <HeroBeforeAfterPool category="colchao" className="w-full aspect-[4/3] max-h-[440px]" />
+                      <HeroBeforeAfterPool category="colchao" className="w-full" />
                     </div>
                   </div>
                 </div>

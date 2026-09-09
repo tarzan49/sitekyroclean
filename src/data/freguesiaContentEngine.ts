@@ -541,7 +541,7 @@ const faqsByService: Record<string, FAQTemplate[]> = {
   "limpeza-alcatifas": [
     {
       question: (svc, f) => `Quanto custa a limpeza de alcatifa em ${f}?`,
-      answer: (svc, f, price, c) => `A limpeza de alcatifa em ${f}, ${c} começa a partir de ${price}. O preço depende da área a tratar. Peça o seu orçamento gratuito para saber o valor exato.`,
+      answer: (svc, f, price, c) => `A limpeza de alcatifa em ${f}, ${c} é sempre orçamentada à medida da área a tratar, sem preço fixo por m². Peça o seu orçamento gratuito.`,
     },
     {
       question: (svc, f) => `Fazem limpeza de alcatifa ao domicílio em ${f}?`,

@@ -45,10 +45,7 @@ const priceTables: Record<string, { item: string; price: string; note?: string }
     { item: "10+ cadeiras", price: "Sob orçamento" },
   ],
   "limpeza-alcatifas": [
-    { item: "Alcatifa até 10m²", price: "Desde 30€" },
-    { item: "Alcatifa 10-20m²", price: "Desde 50€" },
-    { item: "Alcatifa 20-40m²", price: "Desde 80€" },
-    { item: "Alcatifa +40m²", price: "Sob consulta" },
+    { item: "Alcatifas (qualquer dimensão)", price: "Sob orçamento", note: "medida no local, à área" },
   ],
   "impermeabilizacao": [
     { item: "Sofá 1 lugar", price: "Desde 59€", note: "Essencial, 89€ na Premium" },
@@ -131,7 +128,7 @@ const priceFaqs: Record<string, { question: string; answer: string }[]> = {
     { question: "Limpam cadeiras de escritório?", answer: "Sim, limpamos todo o tipo de cadeiras estofadas: cadeiras de jantar, de escritório, poltronas e cadeirões." },
   ],
   "limpeza-alcatifas": [
-    { question: "Quanto custa limpar alcatifas em {city}?", answer: "A limpeza de alcatifas em {city} começa a partir de 3€/m². O preço depende da área total e estado da alcatifa." },
+    { question: "Quanto custa limpar alcatifas em {city}?", answer: "A limpeza de alcatifas em {city} é sempre orçamentada à medida da área total e estado da alcatifa, sem preço fixo por m². Peça orçamento gratuito." },
   ],
   "impermeabilizacao": [
     { question: "Quanto custa impermeabilizar um sofá em {city}?", answer: "Versão Essencial: desde 59€ (1 lugar), 79€ (2 lugares) e 99€ (3 lugares). Versão Premium, mais resistente e duradoura: desde 89€ (1 lugar), 109€ (2 lugares) e 139€ (3 lugares). Recomendamos combinar a Essencial com limpeza para preço especial." },

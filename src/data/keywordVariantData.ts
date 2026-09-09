@@ -71,7 +71,7 @@ const SERVICE_META: Record<ServiceKey, {
   colchao:   { label: 'Colchão',   labelPlural: 'Colchões',   canonicalBase: 'limpeza-colchoes',  priceFrom: '59€' },
   tapetes:   { label: 'Tapetes',   labelPlural: 'Tapetes',    canonicalBase: 'limpeza-tapetes',   priceFrom: 'Sob orçamento'                              },
   cadeiras:  { label: 'Cadeiras',  labelPlural: 'Cadeiras',   canonicalBase: 'limpeza-cadeiras',  priceFrom: '20€',     waterproofPriceFrom: '20€/cad.'    },
-  alcatifas: { label: 'Alcatifas', labelPlural: 'Alcatifas',  canonicalBase: 'limpeza-alcatifas', priceFrom: '3€/m²'                                    },
+  alcatifas: { label: 'Alcatifas', labelPlural: 'Alcatifas',  canonicalBase: 'limpeza-alcatifas', priceFrom: 'Sob orçamento'                             },
 };
 
 // Impermeabilizacao variant: canonical always points to /impermeabilizacao-{location}
@@ -445,14 +445,14 @@ function content_higienizacao_alcatifas(loc: string, ctx: string): ContentBlock 
         { question: `Emitem relatório de higienização aceite em auditorias ISO ou sanitárias?`, answer: `Sim. Emitimos relatório detalhado com ficha técnica dos produtos usados, aceite em auditorias de qualidade do ar, certificações ISO e inspeções sanitárias. Disponível para todos os serviços em ${loc}.` },
         { question: `O espaço tem de fechar durante a higienização das alcatifas?`, answer: `Depende da dimensão e do tipo de espaço. Em escritórios e clínicas fazemos frequentemente fora do horário para não interromper a atividade. O espaço fica apto para uso 2 a 4 horas após o serviço.` },
         { question: `Fazem higienização de alcatifas ao fim de semana e à noite em ${loc}?`, answer: `Sim. É o horário mais comum para espaços comerciais em ${loc}. Agendamos conforme a disponibilidade do espaço para minimizar qualquer perturbação ao negócio.` },
-        { question: `Qual o preço de higienização de alcatifa para escritório em ${loc}?`, answer: `A partir de 3€/m² com descontos progressivos por volume. Para superfícies acima de 100m² há preço especial. Orçamento gratuito e sem compromisso para o seu espaço em ${loc}.` },
+        { question: `Qual o preço de higienização de alcatifa para escritório em ${loc}?`, answer: `Sempre orçamentado à medida da área e do estado da alcatifa, sem preço fixo por m². Orçamento gratuito e sem compromisso para o seu espaço em ${loc}.` },
       ],
       [
         { question: `A higienização de alcatifas melhora realmente a qualidade do ar do espaço?`, answer: `Sim, de forma mensurável. As alcatifas são o maior reservatório de alergénios, pólen e bactérias em espaços fechados, e isso é especialmente relevante em escritórios e clínicas.` },
         { question: `Emitem relatório de higienização aceite em auditorias ISO ou sanitárias?`, answer: `Sim, com ficha técnica detalhada dos produtos usados. É aceite em auditorias de qualidade do ar, certificações ISO e inspeções sanitárias, disponível para qualquer serviço em ${loc}.` },
         { question: `O espaço tem de fechar durante a higienização das alcatifas?`, answer: `Depende da dimensão e do tipo de espaço. Frequentemente trabalhamos fora do horário em escritórios e clínicas, sem interromper a atividade, e o espaço fica pronto 2 a 4 horas depois.` },
         { question: `Fazem higienização de alcatifas ao fim de semana e à noite em ${loc}?`, answer: `Sim, é o horário mais pedido para espaços comerciais em ${loc}. O agendamento acompanha a disponibilidade do espaço para minimizar qualquer perturbação.` },
-        { question: `Qual o preço de higienização de alcatifa para escritório em ${loc}?`, answer: `A partir de 3€/m², com desconto progressivo por volume e preço especial acima de 100m². Orçamento sempre gratuito para o seu espaço em ${loc}.` },
+        { question: `Qual o preço de higienização de alcatifa para escritório em ${loc}?`, answer: `Sempre orçamentado à medida da área e do estado da alcatifa, sem tabela fixa por m². Orçamento sempre gratuito para o seu espaço em ${loc}.` },
       ],
     ] as const, seedF),
     problems: pick([
@@ -807,7 +807,7 @@ function content_lavagem_alcatifas(loc: string, ctx: string): ContentBlock {
         'Secagem rápida: espaço apto em 2-4 horas',
         'Agendamento noturno e ao fim de semana',
         `Cobertura em ${loc} e toda a área envolvente`,
-        'Preços competitivos por m² para grandes áreas',
+        'Orçamento competitivo à medida, mesmo em grandes áreas',
       ],
       [
         'Equipamento comercial adaptado a grandes superfícies',
@@ -815,7 +815,7 @@ function content_lavagem_alcatifas(loc: string, ctx: string): ContentBlock {
         'Espaço apto em 2 a 4 horas de secagem rápida',
         'Trabalho noturno e ao fim de semana sempre possível',
         `Cobertura de ${loc} e toda a área envolvente`,
-        'Preço por m² competitivo em grandes áreas',
+        'Orçamento à medida e competitivo em grandes áreas',
       ],
     ] as const, seedB),
     processSteps: [
@@ -828,16 +828,16 @@ function content_lavagem_alcatifas(loc: string, ctx: string): ContentBlock {
       [
         { question: `A alcatifa pode ser usada no mesmo dia da lavagem?`, answer: `Sim, na maioria dos casos. Com extração de alta sucção e boa ventilação, as alcatifas ficam prontas em 2 a 4 horas. Para alcatifas de alta densidade pode demorar um pouco mais.` },
         { question: `A lavagem profissional funciona em alcatifas de alta densidade (tipo hotel)?`, answer: `Sim. Temos equipamento industrial específico para alcatifas de alta densidade que a extração doméstica não consegue penetrar. É o tipo de alcatifa mais comum em hotéis e centros comerciais.` },
-        { question: `Fazem lavagem de alcatifas em grandes superfícies acima de 100m²?`, answer: `Sim. Temos capacidade para qualquer dimensão de superfície. Já trabalhámos em hotéis, centros comerciais e espaços corporativos em ${loc}. Preço por m² com desconto progressivo por volume.` },
+        { question: `Fazem lavagem de alcatifas em grandes superfícies acima de 100m²?`, answer: `Sim. Temos capacidade para qualquer dimensão de superfície. Já trabalhámos em hotéis, centros comerciais e espaços corporativos em ${loc}. Orçamento sempre à medida da área.` },
         { question: `A lavagem remove o cheiro a bafio de alcatifas antigas?`, answer: `Sim. O cheiro a bafio vem de fungos e bactérias acumulados nas fibras. A lavagem por extração elimina esses microrganismos na raiz, e o odor desaparece completamente após secagem.` },
-        { question: `Qual o preço de lavagem de alcatifa para espaço comercial em ${loc}?`, answer: `A partir de 3€/m² com descontos progressivos para superfícies grandes. Para espaços acima de 100m² há orçamento personalizado. Deslocamo-nos a ${loc} com todo o equipamento.` },
+        { question: `Qual o preço de lavagem de alcatifa para espaço comercial em ${loc}?`, answer: `Sempre orçamentado à medida da área e do estado da alcatifa, sem preço fixo por m². Deslocamo-nos a ${loc} com todo o equipamento para avaliar e orçamentar.` },
       ],
       [
         { question: `A alcatifa pode ser usada no mesmo dia da lavagem?`, answer: `Na maioria dos casos, sim, entre 2 a 4 horas com extração de alta sucção e boa ventilação. Alcatifas de alta densidade podem levar um pouco mais.` },
         { question: `A lavagem profissional funciona em alcatifas de alta densidade (tipo hotel)?`, answer: `Sim, com equipamento industrial próprio para esse tipo de alcatifa, a mais comum em hotéis e centros comerciais, que a extração doméstica não consegue penetrar.` },
-        { question: `Fazem lavagem de alcatifas em grandes superfícies acima de 100m²?`, answer: `Sim, sem limite de dimensão. Já trabalhámos hotéis, centros comerciais e espaços corporativos em ${loc}, com preço por m² e desconto progressivo por volume.` },
+        { question: `Fazem lavagem de alcatifas em grandes superfícies acima de 100m²?`, answer: `Sim, sem limite de dimensão. Já trabalhámos hotéis, centros comerciais e espaços corporativos em ${loc}, sempre com orçamento à medida da área.` },
         { question: `A lavagem remove o cheiro a bafio de alcatifas antigas?`, answer: `Sim. Fungos e bactérias acumulados nas fibras são a origem do cheiro a bafio, e a extração elimina esses microrganismos na raiz até o odor desaparecer por completo.` },
-        { question: `Qual o preço de lavagem de alcatifa para espaço comercial em ${loc}?`, answer: `A partir de 3€/m², com desconto progressivo para superfícies grandes e orçamento personalizado acima de 100m². Levamos todo o equipamento até ${loc}.` },
+        { question: `Qual o preço de lavagem de alcatifa para espaço comercial em ${loc}?`, answer: `Sempre orçamentado à medida da área e do estado da alcatifa, sem preço fixo por m². Levamos todo o equipamento até ${loc} para avaliar e orçamentar.` },
       ],
     ] as const, seedF),
     problems: pick([

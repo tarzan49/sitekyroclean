@@ -133,7 +133,7 @@ export const services = [
   { name: "Limpeza de Colchões", slug: "limpeza-colchoes", baseRoute: "/limpeza-colchoes", priceFrom: "59€", icon: "mattress" },
   { name: "Limpeza de Tapetes", slug: "limpeza-tapetes", baseRoute: "/limpeza-tapetes", priceFrom: "Sob orçamento", icon: "carpet" },
   { name: "Limpeza de Cadeiras", slug: "limpeza-cadeiras", baseRoute: "/limpeza-cadeiras", priceFrom: "20€", icon: "chair" },
-  { name: "Limpeza de Alcatifas", slug: "limpeza-alcatifas", baseRoute: "/limpeza-alcatifas", priceFrom: "3€/m²", icon: "rug" },
+  { name: "Limpeza de Alcatifas", slug: "limpeza-alcatifas", baseRoute: "/limpeza-alcatifas", priceFrom: "Sob orçamento", icon: "rug" },
   { name: "Impermeabilização", slug: "impermeabilizacao", baseRoute: "/impermeabilizacao", priceFrom: "59€", icon: "waterproof" },
 ] as const;
 
@@ -294,10 +294,10 @@ function generateAlcatifasContent(city: string, cityDesc: string): Omit<Location
   const prep = cityPrep(city);
   const Prep = cityPrepCap(city);
   return {
-    title: `Limpeza de Alcatifas ${city} | Desde 3€/m² | Kyro Clean Solutions`,
-    metaDescription: `Limpeza profunda de alcatifas ${prep} ${city}. Remoção de sujidade acumulada e alergénios. Secagem rápida. Desde 3€/m². Orçamento gratuito.`,
+    title: `Limpeza de Alcatifas ${city} | Orçamento Grátis | Kyro Clean Solutions`,
+    metaDescription: `Limpeza profunda de alcatifas ${prep} ${city}. Remoção de sujidade acumulada e alergénios. Secagem rápida. Orçamento sempre à medida do espaço, sem compromisso.`,
     h1: `Limpeza Profunda de Alcatifas ${prep} ${city}`,
-    intro: `As alcatifas do seu espaço ${prep} ${city} precisam de limpeza profissional? A Kyro Clean Solutions oferece limpeza profunda de alcatifas com extração profissional ${prep} ${city} e ${cityDesc}. Removemos sujidade acumulada, manchas e alergénios, devolvendo frescura e higiene. Desde 3€/m².`,
+    intro: `As alcatifas do seu espaço ${prep} ${city} precisam de limpeza profissional? A Kyro Clean Solutions oferece limpeza profunda de alcatifas com extração profissional ${prep} ${city} e ${cityDesc}. Removemos sujidade acumulada, manchas e alergénios, devolvendo frescura e higiene. Cada espaço é medido e orçamentado à medida, sem preço fixo por m².`,
     problems: [
       { title: "Sujidade profunda acumulada", description: `As alcatifas acumulam poeira, terra e resíduos nas camadas profundas das fibras. O aspirador convencional remove apenas a sujidade superficial.` },
       { title: "Alergénios e ácaros", description: `${Prep} ${city}, as alcatifas são reservatórios de ácaros e alergénios que afetam a qualidade do ar interior e causam problemas respiratórios.` },
@@ -314,7 +314,7 @@ function generateAlcatifasContent(city: string, cityDesc: string): Omit<Location
     ],
     localSection: `Atendemos escritórios, hotéis, escolas, clínicas e espaços comerciais com alcatifas ${prep} ${city} e toda a área metropolitana. Oferecemos orçamentos para grandes superfícies.`,
     faqs: [
-      { question: `Quanto custa limpar alcatifas ${prep} ${city}?`, answer: `A limpeza de alcatifas ${prep} ${city} tem preços a partir de 3€/m². Para grandes superfícies oferecemos descontos por volume. Peça orçamento gratuito.` },
+      { question: `Quanto custa limpar alcatifas ${prep} ${city}?`, answer: `A limpeza de alcatifas ${prep} ${city} é sempre orçamentada à medida da área e do estado da alcatifa, sem preço fixo por m². Peça orçamento gratuito.` },
       { question: `Fazem limpeza de alcatifas em escritórios ${prep} ${city}?`, answer: `Sim! Realizamos limpeza de alcatifas em escritórios, hotéis e espaços comerciais ${prep} ${city}. Podemos agendar fora do horário de trabalho para mínima interrupção.` },
       { question: `Quanto tempo demora a secar a alcatifa?`, answer: `Com o nosso processo de extração profissional, a alcatifa fica seca em 2-4 horas. Utilizamos equipamento de alta sucção que minimiza o tempo de secagem.` },
     ],
