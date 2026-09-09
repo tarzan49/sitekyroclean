@@ -371,7 +371,10 @@ const QuizComboUpsellScreen = ({ primaryService, upsellItems, setUpsellItems, on
       </h2>
       <p className="text-xs text-white/55 text-center max-w-xs leading-relaxed -mt-1">
         {packDiscountActive ? (
-          'Já tem 10% de desconto no seu pedido. Adicione outro serviço e aproveite o mesmo desconto também no que acrescentar.'
+          <>
+            Já tem 10% de desconto no pedido.<br />
+            Adicione outro serviço com o mesmo desconto.
+          </>
         ) : (
           <>
             Se juntar mais um serviço, o desconto aplica-se a tudo, não só ao extra.{' '}
