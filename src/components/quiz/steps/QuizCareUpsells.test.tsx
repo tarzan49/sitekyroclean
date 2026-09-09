@@ -3,6 +3,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { initialFormData, type MattressItem } from '../QuizTypes';
 import QuizMattressAddonUpsell from './QuizMattressAddonUpsell';
+import QuizSofaAddonUpsell from './QuizSofaAddonUpsell';
 import QuizChairsAddonUpsell from './QuizChairsAddonUpsell';
 import QuizStepConfigCarpet from './QuizStepConfigCarpet';
 
@@ -23,9 +24,30 @@ describe('care upsells', () => {
     expect(screen.getByRole('button', { name: 'Continuar sem extras' })).toBeTruthy();
     fireEvent.click(treatment);
     expect(treatment.getAttribute('aria-pressed')).toBe('true');
+    expect(screen.queryByText('Casal')).toBeNull();
+    expect(screen.getAllByRole('button')).toHaveLength(3);
     expect(screen.getByRole('button', { name: 'Continuar com tratamento' })).toBeTruthy();
     fireEvent.click(treatment);
     expect(treatment.getAttribute('aria-pressed')).toBe('false');
+  });
+
+  it('toggles sofa protection without expanding quantity rows', () => {
+    function SofaHarness() {
+      const [form, setForm] = useState({ ...initialFormData, serviceType: 'cleaning' });
+      const [items, setItems] = useState([{ sizeId: '3lugares', qty: 2, packEnabled: false }]);
+      return <><QuizSofaAddonUpsell formData={form} updateFormData={u => setForm(prev => ({ ...prev, ...u }))}
+        sofaItems={items} setSofaItems={setItems} onBack={() => {}} onContinue={() => {}} />
+        <output aria-label="Protected quantity">{items.filter(i => i.packEnabled).reduce((sum, i) => sum + i.qty, 0)}</output></>;
+    }
+    render(<SofaHarness />);
+    const premium = screen.getByRole('button', { name: /Premium/ });
+    fireEvent.click(premium);
+    expect(premium.getAttribute('aria-pressed')).toBe('true');
+    expect(screen.getByLabelText('Protected quantity').textContent).toBe('2');
+    expect(screen.getAllByRole('button')).toHaveLength(4);
+    fireEvent.click(premium);
+    expect(premium.getAttribute('aria-pressed')).toBe('false');
+    expect(screen.getByLabelText('Protected quantity').textContent).toBe('0');
   });
 
   it('keeps both chair protection tiers and the 5 euro unit treatment', () => {

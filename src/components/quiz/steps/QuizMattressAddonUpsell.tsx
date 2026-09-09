@@ -1,10 +1,9 @@
 import QuizCareIntro from '../QuizCareIntro';
-import QuizFurnitureImage from '../QuizFurnitureImage';
 import { ChevronLeft, Star, Bug, Plus, Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { mattressPrices } from '@/components/quiz/QuizTypes';
 import type { QuizFormData, MattressItem } from '@/components/quiz/QuizTypes';
-import { mattressTogglePack, calcPackPricing } from '@/components/quiz/quizHelpers';
+import { calcPackPricing } from '@/components/quiz/quizHelpers';
 
 interface QuizMattressAddonUpsellProps {
   formData: QuizFormData;
@@ -15,11 +14,7 @@ interface QuizMattressAddonUpsellProps {
   onBack: () => void;
 }
 
-// Upsell "estilo companhia aérea" do colchão — mesma lógica do sofá: um
-// cartão único faz de "sim/não" (o colchão não tem tiers Premium/Essencial),
-// e só depois de clicar nele aparecem os colchões um a um, cada um com o seu
-// próprio stepper 0/qty — nunca assume que a pessoa quer em todos de
-// antemão (pedido explícito 2026-09-08).
+// O cartão liga/desliga o tratamento para os colchões escolhidos, sem expandir detalhes.
 const QuizMattressAddonUpsell = ({ mattressItems, setMattressItems, onContinue, onBack }: QuizMattressAddonUpsellProps) => {
   const activeItems = mattressItems.filter(i => i.qty > 0);
   const anyOn = activeItems.some(i => i.packEnabled);
@@ -72,56 +67,6 @@ const QuizMattressAddonUpsell = ({ mattressItems, setMattressItems, onContinue, 
           {anyOn ? <Check className="w-3.5 h-3.5 text-[#071a12]" strokeWidth={3} /> : <Plus className="w-3.5 h-3.5 text-gold" strokeWidth={3} />}
         </span>
       </button>
-
-      {/* Só aparecem depois do "sim" acima — cada colchão com o seu próprio
-          stepper 0/qty, nunca passa da quantidade já escolhida. */}
-      {anyOn && (
-        <div className="flex flex-col gap-2 w-full max-w-sm">
-          {activeItems.map(item => {
-            const option = mattressPrices.find(p => p.id === item.sizeId);
-            if (!option) return null;
-            const qty = item.qty;
-            const packOn = item.packEnabled;
-            const pack = calcPackPricing(option, true, false, 30);
-            const isSob = pack.isSob;
-            const toggleItem = () => setMattressItems(mattressTogglePack(mattressItems, item.sizeId));
-            return (
-              <div key={item.sizeId} className={cn('rounded-sm border-2 transition-all duration-200 overflow-hidden', packOn ? 'border-gold bg-[#1a2a1a] shadow-[0_0_12px_rgba(212,175,55,0.20)]' : 'border-white/10 bg-[#1a2a1a]')}>
-                <div className="flex items-center gap-2 px-3 py-3">
-                  <QuizFurnitureImage service="mattress" sizeId={item.sizeId} />
-                  <div className="flex-1 min-w-0 text-left">
-                    <span className={cn('text-sm font-semibold', packOn ? 'text-white' : 'text-white/80')}>{qty > 1 ? `${qty}x ` : ''}{option.label}</span>
-                    {typeof option.cleaningPrice === 'number' && (
-                      <p className="text-xs text-white/65 mt-0.5">{option.cleaningPrice}€/un.</p>
-                    )}
-                    {!isSob && (
-                      <p className={cn('text-[11px] font-semibold mt-1', packOn ? 'text-gold' : 'text-gold/60')}>
-                        Tratamento: <span className="font-black">+{pack.packDelta}€/un.</span>
-                      </p>
-                    )}
-                    {isSob && <p className="text-[11px] text-white/70 mt-1">Sob orçamento</p>}
-                  </div>
-                  {!isSob && (
-                    <div className="flex items-center gap-1 flex-shrink-0">
-                      <button
-                        onClick={toggleItem}
-                        disabled={!packOn}
-                        className="w-11 h-11 rounded-sm border-2 border-white/20 bg-white/[0.05] text-white font-bold text-lg flex items-center justify-center disabled:opacity-20 disabled:border-transparent disabled:bg-transparent active:scale-95 transition-all touch-manipulation hover:border-gold/50"
-                      >−</button>
-                      <span className={cn('w-6 text-center font-bold tabular-nums text-base', packOn ? 'text-gold' : 'text-white/30')}>{packOn ? qty : 0}</span>
-                      <button
-                        onClick={toggleItem}
-                        disabled={packOn}
-                        className="w-11 h-11 rounded-sm border-2 border-white/20 bg-white/[0.05] text-white font-bold text-lg flex items-center justify-center disabled:opacity-20 disabled:border-transparent disabled:bg-transparent active:scale-95 transition-all touch-manipulation hover:border-gold/50"
-                      >+</button>
-                    </div>
-                  )}
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      )}
 
       <div className="flex items-center gap-3 w-full max-w-sm mt-1">
         <button

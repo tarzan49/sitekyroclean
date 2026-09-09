@@ -1,10 +1,7 @@
 import QuizCareIntro from '../QuizCareIntro';
-import QuizFurnitureImage from '../QuizFurnitureImage';
 import { ChevronLeft, Star, Droplets, Plus } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { sofaPrices } from '@/components/quiz/QuizTypes';
 import type { QuizFormData, SofaItem } from '@/components/quiz/QuizTypes';
-import { sofaTogglePack, calcPackPricing } from '@/components/quiz/quizHelpers';
 import { WaterproofingTierPicker } from '@/components/quiz/steps/QuizStepConfig';
 
 interface QuizSofaAddonUpsellProps {
@@ -83,61 +80,6 @@ const QuizSofaAddonUpsell = ({ formData, updateFormData, sofaItems, setSofaItems
           </span>
         </button>
       )}
-      {/* As linhas por sofá só aparecem depois do "sim" (tier ou cartão
-          mestre) — antes disso só se vê a escolha principal, para não
-          assaltar com detalhe antes de decidir (pedido explícito 2026-09-08). */}
-      <div className="flex flex-col gap-2 w-full max-w-sm">
-        {anyPackOn && activeItems.map(item => {
-          const option = sofaPrices.find(p => p.id === item.sizeId);
-          if (!option) return null;
-          const qty = item.qty;
-          const packOn = item.packEnabled;
-          const pack = calcPackPricing(option, true, isWaterproofBase, 40, tier);
-          const baseUnit = isWaterproofBase ? pack.basePrice : (typeof option.cleaningPrice === 'number' ? option.cleaningPrice : null);
-          const isSob = pack.isSob;
-
-          const togglePack = () => setSofaItems(sofaTogglePack(sofaItems, item.sizeId));
-
-          return (
-            <div key={item.sizeId} className={cn('rounded-sm border-2 transition-all duration-200 overflow-hidden', packOn ? 'border-gold bg-[#1a2a1a] shadow-[0_0_12px_rgba(212,175,55,0.20)]' : 'border-white/10 bg-[#1a2a1a]')}>
-              <div className="flex items-center gap-2 px-3 py-3">
-                <QuizFurnitureImage service="sofa" sizeId={item.sizeId} />
-                  <div className="flex-1 min-w-0 text-left">
-                  <span className={cn('text-sm font-semibold', packOn ? 'text-white' : 'text-white/80')}>{qty > 1 ? `${qty}x ` : ''}{option.label}</span>
-                  {typeof baseUnit === 'number' && (
-                    <p className="text-xs text-white/65 mt-0.5">{baseUnit}€/un.</p>
-                  )}
-                  {!isSob && (
-                    <p className={cn('text-[11px] font-semibold mt-1', packOn ? 'text-gold' : 'text-gold/60')}>
-                      Tratamento: <span className="font-black">+{pack.packDelta}€/un.</span>
-                    </p>
-                  )}
-                  {isSob && <p className="text-[11px] text-white/70 mt-1">Sob orçamento</p>}
-                </div>
-                {/* Stepper 0/qty — desliga (0) ou liga (qty) a proteção para
-                    esta linha; nunca passa da quantidade que a pessoa já
-                    escolheu (pedido explícito 2026-09-08). */}
-                {!isSob && (
-                  <div className="flex items-center gap-1 flex-shrink-0">
-                    <button
-                      onClick={togglePack}
-                      disabled={!packOn}
-                      className="w-11 h-11 rounded-sm border-2 border-white/20 bg-white/[0.05] text-white font-bold text-lg flex items-center justify-center disabled:opacity-20 disabled:border-transparent disabled:bg-transparent active:scale-95 transition-all touch-manipulation hover:border-gold/50"
-                    >−</button>
-                    <span className={cn('w-6 text-center font-bold tabular-nums text-base', packOn ? 'text-gold' : 'text-white/30')}>{packOn ? qty : 0}</span>
-                    <button
-                      onClick={togglePack}
-                      disabled={packOn}
-                      className="w-11 h-11 rounded-sm border-2 border-white/20 bg-white/[0.05] text-white font-bold text-lg flex items-center justify-center disabled:opacity-20 disabled:border-transparent disabled:bg-transparent active:scale-95 transition-all touch-manipulation hover:border-gold/50"
-                    >+</button>
-                  </div>
-                )}
-              </div>
-            </div>
-          );
-        })}
-      </div>
-
       <div className="flex items-center gap-3 w-full max-w-sm mt-1">
         <button
           onClick={onBack}
