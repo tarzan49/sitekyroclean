@@ -6,12 +6,18 @@ import { cityPrep } from "@/data/locationSeoData";
  * `${WHATSAPP_BASE}?text=${encodeURIComponent(message)}`.
  */
 
+/** Shared opening for sofa cleaning, including hygiene/laundry variants. */
+function buildSofaWaMessage(placeName?: string | null): string {
+  const loc = placeName ? ` ${cityPrep(placeName)} ${placeName}` : '';
+  return `Olá! Gostaria de confirmar o orçamento e a disponibilidade para limpar o meu sofá${loc}.\n\nPosso enviar uma fotografia do sofá e a localização.`;
+}
+
 /** Used on LocationServicePage, FreguesiaServicePage, PricePage, and MaterialPage. */
 export function buildServiceWaMessage(serviceSlug: string, placeName?: string | null): string {
   const loc = placeName ? ` ${cityPrep(placeName)} ${placeName}` : '';
   switch (serviceSlug) {
     case 'limpeza-sofas':
-      return `Olá! Preciso de limpeza profissional de sofá${loc}. Qual é o preço e disponibilidade?`;
+      return buildSofaWaMessage(placeName);
     case 'limpeza-colchoes':
       return `Olá! Preciso de higienização profissional de colchão${loc}. Qual é o preço e disponibilidade?`;
     case 'limpeza-tapetes':
@@ -117,6 +123,7 @@ export function buildVariantWaMessage(
   if (isWaterproofing) {
     return `Olá! Tenho interesse em impermeabilizar o meu ${svc} em ${locationName}. Qual é o preço e quando têm disponibilidade?`;
   }
+  if (svc === 'sofá' || svc === 'sofa') return buildSofaWaMessage(locationName);
   const variant = variantLabel.toLowerCase();
   return `Olá! Preciso de ${variant} profissional para o meu ${svc} em ${locationName}. Podem dar-me um orçamento e indicar a vossa disponibilidade?`;
 }
