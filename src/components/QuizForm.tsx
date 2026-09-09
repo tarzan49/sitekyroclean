@@ -396,7 +396,7 @@ const QuizForm = ({
   const fmtEuro = (n: number | null) => (n === null ? 'Sob orçamento' : n % 1 === 0 ? `${n}€` : `${n.toFixed(2).replace('.', ',')}€`);
 
   const buildDetailsSummary = () => {
-    const details = [];
+    const details: string[] = [];
 
     switch (formData.service) {
       case 'sofa': {

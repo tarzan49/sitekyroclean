@@ -42,10 +42,11 @@ export async function getRecaptchaToken(action: string): Promise<string | null> 
   if (typeof window === 'undefined') return null;
 
   await loadRecaptchaScript(siteKey);
-  if (!window.grecaptcha) return null;
+  const recaptcha = window.grecaptcha;
+  if (!recaptcha) return null;
 
-  await new Promise<void>((resolve) => window.grecaptcha.ready(resolve));
-  return window.grecaptcha.execute(siteKey, { action });
+  await new Promise<void>((resolve) => recaptcha.ready(resolve));
+  return recaptcha.execute(siteKey, { action });
 }
 
 export {};

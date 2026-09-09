@@ -307,7 +307,7 @@ export function prerenderRoutes(outDir: string): number {
   // ── 2. Freguesia × Service pages (~6 × 132 = ~792) ─────────────────────
   {
     const prev = count;
-    const svcMap = new Map(services.map(s => [s.slug, s]));
+    const svcMap = new Map<string, (typeof services)[number]>(services.map(s => [s.slug, s]));
     for (const route of getAllFreguesiaRoutes()) {
       const freg = getFreguesia(route.citySlug, route.freguesiaSlug);
       const svc  = svcMap.get(route.serviceSlug);

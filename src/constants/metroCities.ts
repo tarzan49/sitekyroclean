@@ -8,4 +8,4 @@ export const METRO_CITY_SLUGS = [
   "faro", "loule", "albufeira", "portimao", "lagos",
 ] as const;
 
-export const METRO_CITIES = new Set(METRO_CITY_SLUGS);
+export const METRO_CITIES = new Set<string>(METRO_CITY_SLUGS);

@@ -253,7 +253,7 @@ const AdminDashboard = ({ embedded = false }: { embedded?: boolean }) => {
   const [filterStaleOnly, setFilterStaleOnly] = useState(false);
 
   // Inline edit state
-  const [edits, setEdits] = useState<Record<string, { notes: string; next_step: string; status: LeadStatus; priority: string; value: string }>>({});
+  const [edits, setEdits] = useState<Record<string, { notes: string; next_step: string; status: LeadStatus; priority: string; value: string; margin_value: string; total_value: string; service: string; details: string }>>({});
   const [saving, setSaving] = useState<Record<string, boolean>>({});
   const [saved, setSaved] = useState<Record<string, boolean>>({});
 

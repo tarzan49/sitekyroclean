@@ -22,7 +22,7 @@ function citiesForArea(area: Area) {
 }
 
 function municipiosForArea(area: Area) {
-  const slugs = new Set(citiesForArea(area).map(c => c.slug));
+  const slugs = new Set<string>(citiesForArea(area).map(c => c.slug));
   return municipiosComFreguesias.filter(m => slugs.has(m.slug));
 }
 

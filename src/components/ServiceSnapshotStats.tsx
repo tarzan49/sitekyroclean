@@ -1,11 +1,12 @@
 import type { ComponentType, CSSProperties } from "react";
+import type { LucideIcon } from "lucide-react";
 
 // Mais permissivo que `LucideIcon` de propósito: o bloco da avaliação Google
 // (2026-09-09) usa o logótipo "G" a cores reais (GoogleG.tsx), não um ícone
 // Lucide de traço único — precisa de aceitar `style`/`strokeWidth` mesmo sem
 // os usar, só para poder ser passado no mesmo campo `icon` sem o chamador
 // (este componente) ter de distinguir os dois casos.
-type StatIcon = ComponentType<{ className?: string; style?: CSSProperties; strokeWidth?: number }>;
+type StatIcon = LucideIcon | ComponentType<{ className?: string; style?: CSSProperties; strokeWidth?: number }>;
 
 export interface SnapshotStat {
   value: string;
