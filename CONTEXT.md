@@ -1048,3 +1048,8 @@ Commits desta sessão (ordem cronológica, todos em `worktree-kyro-minorder-emda
 ## Entrada de anúncios e contacto nas páginas de sofás (2026-09-10)
 
 `SofaLeadActions` centraliza WhatsApp, âncora `#precos` e preço com deslocação. `AdsLandingNavigation` fornece cabeçalho/rodapé reduzidos e `isAdsVisit`; o modo Ads é ativado explicitamente por `ads=1` ou pelos parâmetros de entrada Google Ads, mantendo o URL canónico sem parâmetros. `LocationServicePage` e `SofaVariantPage` conservam as páginas orgânicas e usam esta apresentação quando o serviço é limpeza de sofás. As âncoras são `resultados`, `precos`, `avaliacoes`, `duvidas`. `trackWhatsAppClick` envia também `whatsapp_click` ao GA4 e UTM ao registo interno; não representa uma conversa confirmada.
+
+
+## Galerias dos seis serviços (2026-09-10)
+
+As seis páginas principais de serviço passam `category` a `ServiceAutoCarousel`, que apresenta `ServiceResultsGallery` com toda a categoria de `BEFORE_AFTER_POOL`: comparação deslizante, miniaturas, anterior/seguinte e reprodução/pausa. A rotação de 6 segundos pausa durante interação, foco e hover; começa parada quando o visitante prefere movimento reduzido. Cadeiras mantêm proporção 9:16; alcatifas reutilizam tapetes. Fotografias avulsas não simulam comparações e pares ilustrativos mantêm identificação. As duas imagens de trabalho/pormenor ficam numa área própria abaixo da galeria, preservando enquadramento e espelhamento. Consumidores sem `category` conservam a galeria estática.

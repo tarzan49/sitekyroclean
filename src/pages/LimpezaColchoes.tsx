@@ -81,6 +81,8 @@ const LimpezaColchoes = () => {
         <ServicePriceSection serviceSlug="limpeza-colchoes" />
 
         <ServiceAutoCarousel
+          category="colchao"
+          subtitle="Explore a galeria e arraste a divisória para comparar o antes e o depois de cada limpeza."
           overline="Higiene Revelada"
           beforeImage={colchaoDepois}
           afterImage={colchaoAntes}

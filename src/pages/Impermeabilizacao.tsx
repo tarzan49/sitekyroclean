@@ -213,6 +213,9 @@ const Impermeabilizacao = () => {
         <ServicePriceSection serviceSlug="impermeabilizacao" />
         <WaterproofingTierComparison />
         <ServiceAutoCarousel
+          category="impermeabilizacao"
+          heading="Antes e depois da proteção"
+          subtitle="Explore os exemplos de proteção dos tecidos. As demonstrações ilustrativas estão identificadas em cada comparação."
           overline="A Barreira Invisível"
           beforeImage={impermeabilizacaoAntes}
           afterImage={impermeabilizacaoDepois}

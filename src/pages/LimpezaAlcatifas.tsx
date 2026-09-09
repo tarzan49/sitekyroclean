@@ -78,6 +78,8 @@ const LimpezaAlcatifas = () => {
         />
         <ServicePriceSection serviceSlug="limpeza-alcatifas" />
         <ServiceAutoCarousel
+          category="tapete"
+          subtitle="Explore a galeria e arraste a divisória para comparar o antes e o depois de cada limpeza."
           overline="O Resultado Final"
           beforeImage={tapeteAntes}
           afterImage={tapeteDepois}

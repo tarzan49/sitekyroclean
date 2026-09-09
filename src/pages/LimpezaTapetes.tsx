@@ -78,6 +78,8 @@ const LimpezaTapetes = () => {
         />
         <ServicePriceSection serviceSlug="limpeza-tapetes" />
         <ServiceAutoCarousel
+          category="tapete"
+          subtitle="Explore a galeria e arraste a divisória para comparar o antes e o depois de cada limpeza."
           overline="A Transformação"
           beforeImage={tapeteAntes}
           afterImage={tapeteDepois}

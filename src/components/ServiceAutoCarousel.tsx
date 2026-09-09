@@ -1,3 +1,6 @@
+import ServiceResultsGallery from "@/components/ServiceResultsGallery";
+import type { BeforeAfterCategory } from "@/data/beforeAfterPool";
+
 export interface CarouselSlide {
   src?: string;
   label?: string;
@@ -6,6 +9,7 @@ export interface CarouselSlide {
 }
 
 interface ServiceAutoCarouselProps {
+  category?: BeforeAfterCategory;
   beforeImage?: string;
   afterImage?: string;
   slides: CarouselSlide[];
@@ -19,6 +23,7 @@ interface ServiceAutoCarouselProps {
 }
 
 const ServiceAutoCarousel = ({
+  category,
   beforeImage,
   afterImage,
   slides,
@@ -115,8 +120,25 @@ const ServiceAutoCarousel = ({
           </p>
         </div>
 
-        {/* 2×2 photo grid */}
-        {beforeImage && afterImage ? (
+        {category && (
+          <div className="max-w-5xl">
+            <ServiceResultsGallery key={category} category={category} light={light} />
+            <div className={`mt-10 pt-8 border-t ${light ? "border-black/10" : "border-white/15"}`}>
+              <h3 className={`font-playfair text-2xl mb-5 ${textMain}`}>O cuidado em cada pormenor</h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-5">
+                {slides.slice(0, 2).map((slide, i) => slide.src ? (
+                  <figure key={slide.src}>
+                    <GalleryCell src={slide.src} label={slide.label ?? ""} objectPosition={slide.objectPosition} mirror={slide.mirror} />
+                    <figcaption className={`mt-3 text-sm ${textSub}`}>{slide.label || `Pormenor do serviço ${i + 1}`}</figcaption>
+                  </figure>
+                ) : null)}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Static gallery for pages without a selected pool. */}
+        {!category && beforeImage && afterImage ? (
           <div className="grid grid-cols-2 gap-1 md:gap-1.5 max-w-5xl">
             {/* Top row — before / after */}
             <GalleryCell src={beforeImage} label="Antes" labelSide="left" portrait={rotateBeforeAfter} />

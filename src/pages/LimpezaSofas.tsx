@@ -79,6 +79,8 @@ const LimpezaSofas = () => {
         />
         <ServicePriceSection serviceSlug="limpeza-sofas" />
         <ServiceAutoCarousel
+          category="sofa"
+          subtitle="Explore a galeria e arraste a divisória para comparar o antes e o depois de cada limpeza."
           overline="Antes e Depois"
           beforeImage={sofaBeforeNew}
           afterImage={sofaAfterNew}

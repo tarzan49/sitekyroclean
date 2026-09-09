@@ -80,6 +80,8 @@ const LimpezaCadeiras = () => {
         />
         <ServicePriceSection serviceSlug="limpeza-cadeiras" />
         <ServiceAutoCarousel
+          category="cadeiras"
+          subtitle="Explore a galeria e arraste a divisória para comparar o antes e o depois de cada limpeza."
           overline="Do Uso ao Novo"
           beforeImage={cadeiraAntes}
           afterImage={cadeiraDepois}
