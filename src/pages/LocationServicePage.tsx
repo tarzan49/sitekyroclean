@@ -243,6 +243,7 @@ const LocationServicePage = () => {
                   <TrustRatingBadge variant="mapsLinkClients" />
                 </div>
 
+                {isSofaCleaning ? <SofaLeadActions city={data.city} price={data.priceFrom} href={waUrl} source={`location_hero_${data.serviceSlug}_${data.citySlug}`} /> : <>
                 <div className="flex flex-col sm:flex-row gap-3 max-w-md">
                   <QuizButton
                     className="flex-1"
@@ -254,13 +255,11 @@ const LocationServicePage = () => {
                   />
                   <div className="relative group flex-1">
                     <div className="absolute -inset-1.5 bg-[#25D366]/40 opacity-30 blur-lg group-hover:opacity-55 transition-opacity duration-400 pointer-events-none" />
-                {!isPaidLanding && <>
                     <a
                       href={waUrl}
                       target="_blank"
                       rel="noopener noreferrer"
                       onClick={() => trackWhatsAppClick(`location_hero_${data.serviceSlug}_${data.citySlug}`)}
-                </>}
                       className="relative flex items-center justify-center gap-2 w-full h-[58px] md:h-[52px] px-6 font-bold text-white touch-manipulation bg-gradient-to-r from-[#1DA851] via-[#25D366] to-[#1DA851] shadow-[0_6px_22px_rgba(37,211,102,0.42),0_2px_6px_rgba(0,0,0,0.28),inset_0_1px_0_rgba(255,255,255,0.20),inset_0_-2px_0_rgba(0,0,0,0.12)] hover:shadow-[0_10px_32px_rgba(37,211,102,0.60),0_4px_10px_rgba(0,0,0,0.32)] hover:scale-[1.025] active:scale-[0.95] transition-all duration-150"
                     >
                       <MessageCircle className="w-[18px] h-[18px] flex-shrink-0" strokeWidth={2} />
@@ -292,7 +291,6 @@ const LocationServicePage = () => {
                         loading="eager"
                       />
                     </picture>
-                {isSofaCleaning ? <SofaLeadActions city={data.city} price={data.priceFrom} href={waUrl} source={`location_hero_${data.serviceSlug}_${data.citySlug}`} /> : <>
                   )}
                 </div>
               </div>
@@ -305,7 +303,7 @@ const LocationServicePage = () => {
 
         {/* ═══ TABELA DE PREÇOS ═══ */}
         {PRICE_TABLE[data.serviceSlug] && (
-          <section className="py-14 md:py-20 bg-[#FDFDF9]">
+          <section id="precos" className="scroll-mt-6 py-14 md:py-20 bg-[#FDFDF9]">
             <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
               <div className="grid md:grid-cols-2 gap-10 md:gap-16 items-center">
                 <div>
@@ -351,7 +349,7 @@ const LocationServicePage = () => {
 
         {/* ═══ PROBLEMAS COMUNS ═══ */}
         {problemCards.length > 0 && (
-          <section id="precos" className="scroll-mt-6 py-14 md:py-20 bg-[#FDFDF9]">
+          <section id="problemas" className="scroll-mt-6 py-14 md:py-20 bg-[#FDFDF9]">
             <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
               <SectionHeader
                 overline="O Que Resolvemos"
@@ -475,6 +473,7 @@ const LocationServicePage = () => {
           variant="dark"
         />
 
+        {isPaidLanding ? <section className="p-6 text-center bg-white"><h2 className="font-playfair text-xl mb-2">Serviço ao domicílio</h2><p>Atendimento em {data.city}. Envie a sua morada por WhatsApp para confirmar cobertura e deslocação.</p></section> : <>
         {/* ═══ ÁREA DE SERVIÇO (DIRETÓRIO) ═══ */}
         <section className="py-14 md:py-20" style={{ backgroundColor: "#FDFDF9" }}>
           <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
@@ -487,7 +486,6 @@ const LocationServicePage = () => {
 
             <div className="grid md:grid-cols-2 gap-4">
               {cityFreguesias && cityFreguesias.freguesias.length > 0 && (
-        {isPaidLanding ? <section className="p-6 text-center bg-white"><h2 className="font-playfair text-xl mb-2">Serviço ao domicílio</h2><p>Atendimento em {data.city}. Envie a sua morada por WhatsApp para confirmar cobertura e deslocação.</p></section> : <>
                 <div className="p-5 rounded-xl bg-white" style={{ border: "1px solid rgba(17,17,17,0.08)", boxShadow: "0 4px 16px rgba(7,26,18,0.04)" }}>
                   <p className="text-[10px] font-bold tracking-[0.26em] uppercase mb-3" style={{ color: "#D4AF37" }}>Zonas {cityPrep} {data.city}</p>
                   <div className="flex flex-wrap gap-2">
@@ -625,6 +623,7 @@ const LocationServicePage = () => {
           </div>
         </section>
 
+        </>}
       </main>
       {isPaidLanding ? <AdsLandingFooter /> : <Footer />}
     </QuizServiceProvider>
@@ -633,4 +632,3 @@ const LocationServicePage = () => {
 };
 
 export default LocationServicePage;
-        </>}
