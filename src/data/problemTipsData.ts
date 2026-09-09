@@ -1,63 +1,75 @@
 import type { LucideIcon } from "lucide-react";
-import { Star, Clock, Users, CheckCircle2, ShieldCheck, Timer } from "lucide-react";
+import type { ComponentType, CSSProperties } from "react";
+import { Clock, Users, CheckCircle2, ShieldCheck, Timer } from "lucide-react";
+import { GoogleG } from "@/components/icons/GoogleG";
+import { REVIEW_COUNT } from "@/constants/business";
+
+type StatIcon = LucideIcon | ComponentType<{ className?: string; style?: CSSProperties; strokeWidth?: number }>;
 
 // Snapshot stats shown right below the hero on problem pages, varied by category
 // so each problem type highlights the fact most relevant to it. Every value here
-// reuses a figure already established elsewhere on the site (99% ácaros, 30min
-// resposta, 2-4h secagem, 5.0★, +1100 clientes, 100+ avaliações) — no invented stats.
-export const CATEGORY_STATS: Record<string, { value: string; label: string; icon: LucideIcon }[]> = {
+// reuses a figure already established elsewhere on the site (99% ácaros, 2-4h
+// secagem, 4.9★, +1100 clientes, +100 avaliações) — no invented stats.
+//
+// Revisto 2026-09-09 (pedido explícito, mesmo esquema aplicado às páginas de
+// localidade/freguesia): o bloco "Avaliação Google" passou a mostrar o
+// logótipo real da Google + "+100 avaliações Google" em vez de só "4.9★" com
+// um ícone de estrela solto. "Tempo de resposta" (30min) passou a "<10min"
+// só nestes blocos — em todo o resto do site (quiz, widget) o compromisso
+// continua a ser 30min, não alterar aí sem pedido explícito.
+export const CATEGORY_STATS: Record<string, { value: string; label: string; icon: StatIcon }[]> = {
   manchas: [
-    { value: "5.0★", label: "Avaliação Google", icon: Star },
-    { value: "30min", label: "Tempo de resposta", icon: Clock },
+    { value: "4.9★", label: `+${REVIEW_COUNT} avaliações Google`, icon: GoogleG },
+    { value: "<10min", label: "Respondemos em menos de 10 minutos", icon: Clock },
     { value: "2-4h", label: "Pronto a usar", icon: Timer },
     { value: "+1100", label: "Clientes satisfeitos", icon: Users },
   ],
   odores: [
     { value: "99%", label: "Odor eliminado na fonte", icon: CheckCircle2 },
     { value: "24-48h", label: "Resultado permanente", icon: ShieldCheck },
-    { value: "30min", label: "Tempo de resposta", icon: Clock },
-    { value: "5.0★", label: "Avaliação Google", icon: Star },
+    { value: "<10min", label: "Respondemos em menos de 10 minutos", icon: Clock },
+    { value: "4.9★", label: `+${REVIEW_COUNT} avaliações Google`, icon: GoogleG },
   ],
   saude: [
     { value: "99%", label: "Ácaros eliminados", icon: CheckCircle2 },
-    { value: "30min", label: "Tempo de resposta", icon: Clock },
-    { value: "5.0★", label: "Avaliação Google", icon: Star },
+    { value: "<10min", label: "Respondemos em menos de 10 minutos", icon: Clock },
+    { value: "4.9★", label: `+${REVIEW_COUNT} avaliações Google`, icon: GoogleG },
     { value: "+1100", label: "Clientes satisfeitos", icon: Users },
   ],
   materiais: [
-    { value: "5.0★", label: "Avaliação Google", icon: Star },
-    { value: "30min", label: "Tempo de resposta", icon: Clock },
+    { value: "4.9★", label: `+${REVIEW_COUNT} avaliações Google`, icon: GoogleG },
+    { value: "<10min", label: "Respondemos em menos de 10 minutos", icon: Clock },
     { value: "2-4h", label: "Tempo de secagem", icon: Timer },
     { value: "+1100", label: "Clientes satisfeitos", icon: Users },
   ],
   animais: [
     { value: "99%", label: "Ácaros e pelos eliminados", icon: CheckCircle2 },
-    { value: "30min", label: "Tempo de resposta", icon: Clock },
+    { value: "<10min", label: "Respondemos em menos de 10 minutos", icon: Clock },
     { value: "2-4h", label: "Pronto a usar", icon: Timer },
-    { value: "5.0★", label: "Avaliação Google", icon: Star },
+    { value: "4.9★", label: `+${REVIEW_COUNT} avaliações Google`, icon: GoogleG },
   ],
   preco: [
-    { value: "5.0★", label: "Avaliação Google", icon: Star },
+    { value: "4.9★", label: `+${REVIEW_COUNT} avaliações Google`, icon: GoogleG },
     { value: "100+", label: "Avaliações verificadas", icon: ShieldCheck },
-    { value: "30min", label: "Resposta ao pedido", icon: Clock },
+    { value: "<10min", label: "Resposta ao pedido", icon: Clock },
     { value: "Grátis", label: "Orçamento sem compromisso", icon: CheckCircle2 },
   ],
   urgencia: [
-    { value: "30min", label: "Tempo de resposta", icon: Clock },
+    { value: "<10min", label: "Respondemos em menos de 10 minutos", icon: Clock },
     { value: "24h", label: "Disponibilidade", icon: ShieldCheck },
-    { value: "5.0★", label: "Avaliação Google", icon: Star },
+    { value: "4.9★", label: `+${REVIEW_COUNT} avaliações Google`, icon: GoogleG },
     { value: "2-4h", label: "Pronto a usar", icon: Timer },
   ],
   metodo: [
     { value: "99%", label: "Ácaros e bactérias eliminados", icon: CheckCircle2 },
     { value: "2-4h", label: "Tempo de secagem", icon: Timer },
-    { value: "5.0★", label: "Avaliação Google", icon: Star },
+    { value: "4.9★", label: `+${REVIEW_COUNT} avaliações Google`, icon: GoogleG },
     { value: "+1100", label: "Clientes satisfeitos", icon: Users },
   ],
   protecao: [
     { value: "12-18m", label: "Duração da proteção", icon: ShieldCheck },
     { value: "24h", label: "Proteção já ativa", icon: Clock },
-    { value: "5.0★", label: "Avaliação Google", icon: Star },
+    { value: "4.9★", label: `+${REVIEW_COUNT} avaliações Google`, icon: GoogleG },
     { value: "+1100", label: "Clientes satisfeitos", icon: Users },
   ],
 };

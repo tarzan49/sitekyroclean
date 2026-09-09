@@ -1,7 +1,8 @@
 import { useMemo, useEffect } from "react";
 import { useLocation, Link } from "react-router-dom";
 import { QuizLocationProvider, QuizServiceProvider } from "@/context/QuizLocationContext";
-import { XCircle, CheckCircle2, ArrowRight, Search, ShieldCheck, Droplets, Wind, MessageCircle, Phone, Star, Euro, Clock } from "lucide-react";
+import { XCircle, CheckCircle2, ArrowRight, Search, ShieldCheck, Droplets, Wind, MessageCircle, Phone, Star, Euro, Clock, Timer } from "lucide-react";
+import { GoogleG } from "@/components/icons/GoogleG";
 import Header from "@/components/Header";
 import PageBreadcrumb from "@/components/PageBreadcrumb";
 import HeroBeforeAfterPool from "@/components/HeroBeforeAfterPool";
@@ -17,7 +18,8 @@ import { getAllMarcaSofaRoutes, getMarcaByCityAndSlug } from "@/data/marcaSofaDa
 import { cityPrep } from "@/data/locationSeoData";
 import { trackWhatsAppClick } from "@/lib/quizTracking";
 import { trackCallClick } from "@/lib/analytics";
-import { SITE_URL, WHATSAPP_BASE, PHONE_TEL, PHONE_DISPLAY } from "@/constants/business";
+import { SITE_URL, WHATSAPP_BASE, PHONE_TEL, PHONE_DISPLAY, REVIEW_RATING, REVIEW_COUNT } from "@/constants/business";
+import { SERVICE_DURATION } from "@/constants/problemCardHelpers";
 import {
   buildWebPageNode,
   buildBreadcrumbNode,
@@ -95,11 +97,23 @@ const MarcaSofaPage = () => {
   const prep = cityPrep(city.name);
   const heroImg = MARCA_HERO[marca.slug] ?? heroSofa;
 
+  // Conteúdo revisto 2026-09-09 (pedido explícito): 1º bloco passou a mostrar
+  // a nota real do Google (antes tinha "5.0 ★" fixo, agora usa REVIEW_RATING/
+  // REVIEW_COUNT, a fonte única) em vez de duplicar os pills que já apareciam
+  // no hero — esses pills (TrustRatingBadge "mapsLinkClients") ficaram
+  // escondidos em mobile/tablet por serem redundantes com isto. O "2-4h
+  // Tempo de secagem" antigo era uma cópia solta divergente do facto
+  // canónico (SERVICE_DURATION, "4-6h" para sofá) — substituído para não
+  // haver dois números diferentes para a mesma coisa no site. O último
+  // bloco ("<10min") é uma exceção isolada e deliberada: em todo o resto do
+  // site o compromisso continua a ser 30min, não alterar noutro sítio sem
+  // pedido explícito.
+  const serviceDuration = SERVICE_DURATION['limpeza-sofas'];
   const snapshotStats = [
-    { value: "5.0 ★", label: "Avaliação Google", icon: Star },
+    { value: `${REVIEW_RATING}★`, label: `+${REVIEW_COUNT} avaliações Google`, icon: GoogleG },
     { value: `${marca.minPrice}€`, label: `Desde, ${prep} ${city.name}`, icon: Euro },
-    { value: "2-4h", label: "Tempo de secagem", icon: Clock },
-    { value: "30min", label: "Tempo de resposta", icon: Clock },
+    { value: serviceDuration.value, label: serviceDuration.label, icon: Timer },
+    { value: "<10min", label: "Respondemos em menos de 10 minutos", icon: Clock },
   ];
 
   const jsonLd = {
@@ -148,7 +162,7 @@ const MarcaSofaPage = () => {
           </div>
           <div className="absolute inset-0" style={{ background: "linear-gradient(to bottom, rgba(7,26,18,0.42) 0%, rgba(7,26,18,0.65) 40%, rgba(7,26,18,0.90) 78%, rgba(7,26,18,0.97) 100%)" }} />
 
-          <section className="relative pt-24 md:pt-28 pb-16 md:pb-24">
+          <section className="relative pt-16 md:pt-24 lg:pt-28 pb-16 md:pb-24">
             <div className="container mx-auto px-5 sm:px-6 lg:px-8 relative z-10">
               <div className="max-w-6xl mx-auto grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
                 <div>
@@ -158,7 +172,7 @@ const MarcaSofaPage = () => {
                     { label: `${marca.name}, ${city.name}` },
                   ]} />
 
-                  <div className="inline-flex items-start mb-5">
+                  <div className="inline-flex items-start mb-3 lg:mb-5">
                     <div className="flex flex-col gap-1">
                       <div className="w-7 h-px bg-gradient-to-r from-gold to-transparent" />
                       <span
@@ -171,17 +185,17 @@ const MarcaSofaPage = () => {
                   </div>
 
                   <h1
-                    className="font-playfair text-[1.75rem] sm:text-4xl md:text-5xl lg:text-6xl font-semibold text-white mb-4 leading-[1.12]"
+                    className="font-playfair text-[1.75rem] sm:text-4xl md:text-5xl lg:text-6xl font-semibold text-white mb-3 lg:mb-4 leading-[1.12]"
                     style={{ textShadow: "0 2px 16px rgba(0,0,0,0.65)" }}
                   >
                     Limpeza de Sofá {marca.name} {prep} {city.name}
                   </h1>
 
-                  <p className="text-sm sm:text-base md:text-lg text-white/70 leading-relaxed mb-6 max-w-lg">
+                  <p className="text-sm sm:text-base md:text-lg text-white/70 leading-relaxed mb-4 lg:mb-6 max-w-lg">
                     {marca.materialDescription.split('.')[0]}.
                   </p>
 
-                  <div className="mb-6">
+                  <div className="lg:mb-6">
                     <TrustRatingBadge variant="mapsLinkClients" />
                   </div>
 

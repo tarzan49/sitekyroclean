@@ -6,7 +6,8 @@
 import { useEffect, useMemo } from "react";
 import { useLocation, Link } from "react-router-dom";
 import { QuizLocationProvider, QuizServiceProvider } from "@/context/QuizLocationContext";
-import { CheckCircle, Star, MapPin, MessageCircle, Phone, Euro, Clock } from "lucide-react";
+import { CheckCircle, Star, MapPin, MessageCircle, Phone, Euro, Clock, Timer } from "lucide-react";
+import { GoogleG } from "@/components/icons/GoogleG";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import QuizButton from "@/components/QuizButton";
@@ -25,7 +26,8 @@ import {
 import { cities, cityPrep } from "@/data/locationSeoData";
 import { municipiosComFreguesias } from "@/data/freguesiaSeoData";
 import { GENERIC_PROCESS_STEPS, IMPERMEABILIZACAO_STEPS } from "@/constants/serviceProcesses";
-import { SITE_URL, WHATSAPP_BASE, PHONE_TEL, PHONE_DISPLAY, REVIEW_COUNT } from "@/constants/business";
+import { SITE_URL, WHATSAPP_BASE, PHONE_TEL, PHONE_DISPLAY, REVIEW_RATING, REVIEW_COUNT } from "@/constants/business";
+import { SERVICE_DURATION } from "@/constants/problemCardHelpers";
 import TrustRatingBadge from "@/components/TrustRatingBadge";
 import { buildVariantWaMessage } from "@/lib/whatsappMessages";
 import HeroBeforeAfterPool from "@/components/HeroBeforeAfterPool";
@@ -248,36 +250,28 @@ const SofaVariantPage = () => {
   const problemImgs = PROBLEM_IMAGES[`${data.variantKey}-${data.serviceKey}`];
   const problemLabels = VARIANT_PROBLEM_LABELS[data.variantKey];
 
-  // Zonas cobertas/próximas: cidade → nº de freguesias desse concelho; freguesia → nº de freguesias vizinhas
-  let zonesValue = "100%";
-  let zonesLabel = `Cobertura ${prep} ${data.locationName}`;
-  const cityMatch = cities.find(c => c.slug === parsed.locationPart);
-  if (cityMatch) {
-    const mun = municipiosComFreguesias.find(m => m.slug === cityMatch.slug);
-    if (mun && mun.freguesias.length > 0) {
-      zonesValue = `${mun.freguesias.length}+`;
-      zonesLabel = "Zonas cobertas";
-    }
-  } else {
-    for (const mun of municipiosComFreguesias) {
-      if (parsed.locationPart.startsWith(`${mun.slug}-`)) {
-        const freg = mun.freguesias.find(f => f.slug === parsed.locationPart.slice(mun.slug.length + 1));
-        if (freg && freg.nearby.length > 0) {
-          zonesValue = `${freg.nearby.length}+`;
-          zonesLabel = "Zonas próximas";
-        }
-        break;
-      }
-    }
-  }
-
+  // "impermeabilizacao" pode ser o variantKey mesmo quando serviceKey é
+  // sofa/colchão/etc (mesma condição já usada acima para beforeAfterCategory)
+  // — a duração real é a da impermeabilização nesse caso, não a da limpeza.
+  const durationSlug = parsed?.variantKey === 'impermeabilizacao' ? 'impermeabilizacao' : SERVICEKEY_TO_SLUG[data.serviceKey];
+  const serviceDuration = SERVICE_DURATION[durationSlug] ?? { value: "4-6h", label: "Pronto a usar" };
+  // Conteúdo revisto 2026-09-09 (pedido explícito): 1º bloco passou a mostrar
+  // a nota real do Google (antes tinha "5.0 ★" fixo, agora usa REVIEW_RATING/
+  // REVIEW_COUNT, a fonte única) em vez de duplicar os pills que já apareciam
+  // no hero — esses pills (TrustRatingBadge "mapsLinkClients") ficaram
+  // escondidos em mobile/tablet por serem redundantes com isto. "Zonas
+  // cobertas/próximas" saiu (ainda existe mais abaixo na página) e deu lugar
+  // a algo mais útil para quem decide: quanto tempo demora o serviço. O
+  // último bloco ("<10min") é uma exceção isolada e deliberada: em todo o
+  // resto do site o compromisso continua a ser 30min, não alterar noutro
+  // sítio sem pedido explícito.
   const snapshotStats = [
-    { value: "5.0 ★", label: "Avaliação Google", icon: Star },
+    { value: `${REVIEW_RATING}★`, label: `+${REVIEW_COUNT} avaliações Google`, icon: GoogleG },
     (data.serviceKey === 'tapetes' || data.serviceKey === 'alcatifas')
       ? { value: "Á Medida", label: `Orçamento, ${prep} ${data.locationName.split(',')[0].trim()}`, icon: Euro }
       : { value: data.priceFrom, label: `Desde, ${prep} ${data.locationName.split(',')[0].trim()}`, icon: Euro },
-    { value: zonesValue, label: zonesLabel, icon: MapPin },
-    { value: "30min", label: "Tempo de resposta", icon: Clock },
+    { value: serviceDuration.value, label: serviceDuration.label, icon: Timer },
+    { value: "<10min", label: "Respondemos em menos de 10 minutos", icon: Clock },
   ];
 
   return (
@@ -295,7 +289,7 @@ const SofaVariantPage = () => {
           </div>
           <div className="absolute inset-0" style={{ background: "linear-gradient(to bottom, rgba(7,26,18,0.42) 0%, rgba(7,26,18,0.65) 40%, rgba(7,26,18,0.90) 78%, rgba(7,26,18,0.97) 100%)" }} />
 
-        <section className="relative pt-24 md:pt-28 pb-16 md:pb-24">
+        <section className="relative pt-16 md:pt-24 lg:pt-28 pb-16 md:pb-24">
           <div className="container mx-auto px-5 sm:px-6 lg:px-8 relative z-10">
             <div className="max-w-6xl mx-auto grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
               <div>
@@ -307,7 +301,7 @@ const SofaVariantPage = () => {
                   <span className="text-white/70">{variantLabel}</span>
                 </nav>
 
-                <div className="inline-flex items-start mb-5">
+                <div className="inline-flex items-start mb-3 lg:mb-5">
                   <div className="flex flex-col gap-1">
                     <div className="w-7 h-px bg-gradient-to-r from-gold to-transparent" />
                     <span
@@ -320,17 +314,17 @@ const SofaVariantPage = () => {
                 </div>
 
                 <h1
-                  className="font-playfair text-[1.75rem] sm:text-4xl md:text-5xl lg:text-6xl font-semibold text-white mb-4 leading-[1.12]"
+                  className="font-playfair text-[1.75rem] sm:text-4xl md:text-5xl lg:text-6xl font-semibold text-white mb-3 lg:mb-4 leading-[1.12]"
                   style={{ textShadow: "0 2px 16px rgba(0,0,0,0.65)" }}
                 >
                   {data.h1}
                 </h1>
 
-                <p className="text-sm sm:text-base md:text-lg text-white/70 leading-relaxed mb-6 max-w-lg line-clamp-2">
+                <p className="text-sm sm:text-base md:text-lg text-white/70 leading-relaxed mb-4 lg:mb-6 max-w-lg line-clamp-2">
                   {data.intro.match(/^[^.?]*[.?]/)?.[0] ?? data.intro}
                 </p>
 
-                <div className="mb-6">
+                <div className="lg:mb-6">
                   <TrustRatingBadge variant="mapsLinkClients" />
                 </div>
 
@@ -492,7 +486,7 @@ const SofaVariantPage = () => {
             <div className="grid grid-cols-3 gap-px mb-10" style={{ backgroundColor: "rgba(255,255,255,0.06)" }}>
               {[
                 { stat: "< 30 min", label: "Resposta ao orçamento" },
-                { stat: "5.0 ★",   label: `+${REVIEW_COUNT} avaliações Google` },
+                { stat: `${REVIEW_RATING} ★`, label: `+${REVIEW_COUNT} avaliações Google` },
                 { stat: "100%",     label: "Garantia de resultado" },
               ].map((item, i) => (
                 <div key={i} className="p-5 sm:p-6 md:p-7" style={{ background: "rgba(255,255,255,0.04)", borderTop: "2px solid rgba(212,175,55,0.55)" }}>

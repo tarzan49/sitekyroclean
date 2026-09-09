@@ -1,6 +1,7 @@
 import { useEffect, useMemo } from "react";
 import { useLocation, Link } from "react-router-dom";
-import { MapPin, Star, MessageCircle, ArrowRight, Euro, Clock } from "lucide-react";
+import { MapPin, Star, MessageCircle, ArrowRight, Euro, Clock, Timer } from "lucide-react";
+import { GoogleG } from "@/components/icons/GoogleG";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import QuizButton from "@/components/QuizButton";
@@ -25,13 +26,13 @@ import { SERVICE_TO_QUIZ } from "@/constants/serviceToQuiz";
 import { METRO_CITIES } from "@/constants/metroCities";
 import { SERVICE_RESULT_CONTENT, pickServiceHero } from "@/constants/serviceContent";
 import { buildServiceWaMessage } from "@/lib/whatsappMessages";
-import { SITE_URL, WHATSAPP_BASE } from "@/constants/business";
+import { SITE_URL, WHATSAPP_BASE, REVIEW_RATING, REVIEW_COUNT } from "@/constants/business";
 import TrustRatingBadge from "@/components/TrustRatingBadge";
 import SectionHeader from "@/components/SectionHeader";
 import { PRICE_TABLE } from "@/data/locationPriceTestimonialsData";
 import { locationPrices } from "@/components/quiz/QuizTypes";
 import { MARCA_CITY_SLUGS } from "@/data/marcaCities";
-import { PROBLEM_IMAGES, PROBLEM_CTA, PRICE_HEADING_VERB } from "@/constants/problemCardHelpers";
+import { PROBLEM_IMAGES, PROBLEM_CTA, PRICE_HEADING_VERB, SERVICE_DURATION } from "@/constants/problemCardHelpers";
 import { ServiceTrustDesktop, ServiceTrustMobile } from "@/components/ServiceTrustBlock";
 import ServiceReviewsGrid from "@/components/ServiceReviewsGrid";
 import PriceWidget from "@/components/PriceWidget";
@@ -146,16 +147,24 @@ const LocationServicePage = () => {
   // "Porto" takes the definite article ("no Porto"); every other city in our list reads naturally with "em"
   const cityPrep = data.citySlug === 'porto' ? 'no' : 'em';
 
-  const freguesiaCount = cityFreguesias?.freguesias.length ?? 0;
+  const serviceDuration = SERVICE_DURATION[data.serviceSlug] ?? { value: "4-6h", label: "Pronto a usar" };
+  // Conteúdo revisto 2026-09-09 (pedido explícito): 1º bloco passou a mostrar
+  // a nota real do Google (antes tinha "5.0 ★" fixo, agora usa REVIEW_RATING/
+  // REVIEW_COUNT, a fonte única) em vez de duplicar os pills que já apareciam
+  // no hero — esses pills (TrustRatingBadge "mapsLinkClients") ficaram
+  // escondidos em mobile/tablet por serem redundantes com isto. "Zonas
+  // cobertas" saiu (ainda existe mais abaixo na página) e deu lugar a algo
+  // mais útil para quem decide: quanto tempo demora o serviço. O último
+  // bloco ("<10min") é uma exceção isolada e deliberada: em todo o resto do
+  // site o compromisso continua a ser 30min, não alterar noutro sítio sem
+  // pedido explícito.
   const snapshotStats = [
-    { value: "5.0 ★", label: "Avaliação Google", icon: Star },
+    { value: `${REVIEW_RATING}★`, label: `+${REVIEW_COUNT} avaliações Google`, icon: GoogleG },
     (data.serviceSlug === 'limpeza-tapetes' || data.serviceSlug === 'limpeza-alcatifas')
       ? { value: "Á Medida", label: `Orçamento, ${cityPrep} ${data.city}`, icon: Euro }
       : { value: data.priceFrom, label: `Desde, ${cityPrep} ${data.city}`, icon: Euro },
-    freguesiaCount > 0
-      ? { value: `${freguesiaCount}+`, label: "Zonas cobertas", icon: MapPin }
-      : { value: "100%", label: `Cobertura ${cityPrep} ${data.city}`, icon: MapPin },
-    { value: "30min", label: "Tempo de resposta", icon: Clock },
+    { value: serviceDuration.value, label: serviceDuration.label, icon: Timer },
+    { value: "<10min", label: "Respondemos em menos de 10 minutos", icon: Clock },
   ];
 
   const processSteps = data.serviceSlug === 'impermeabilizacao' ? IMPERMEABILIZACAO_STEPS : GENERIC_PROCESS_STEPS;
@@ -196,7 +205,7 @@ const LocationServicePage = () => {
           </div>
           <div className="absolute inset-0" style={{ background: "linear-gradient(to bottom, rgba(7,26,18,0.42) 0%, rgba(7,26,18,0.65) 40%, rgba(7,26,18,0.90) 78%, rgba(7,26,18,0.97) 100%)" }} />
 
-        <section className="relative pt-24 md:pt-28 pb-16 md:pb-24">
+        <section className="relative pt-16 md:pt-24 lg:pt-28 pb-16 md:pb-24">
           <div className="container mx-auto px-5 sm:px-6 lg:px-8 relative z-10">
             <div className="max-w-6xl mx-auto grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
               <div>
@@ -207,7 +216,7 @@ const LocationServicePage = () => {
                 ]} />
 
                 {/* Overline */}
-                <div className="inline-flex items-start mb-5">
+                <div className="inline-flex items-start mb-3 lg:mb-5">
                   <div className="flex flex-col gap-1">
                     <div className="w-7 h-px bg-gradient-to-r from-gold to-transparent" />
                     <span
@@ -220,13 +229,13 @@ const LocationServicePage = () => {
                 </div>
 
                 <h1
-                  className="font-playfair text-[1.75rem] sm:text-4xl md:text-5xl lg:text-6xl font-semibold text-white mb-4 leading-[1.12]"
+                  className="font-playfair text-[1.75rem] sm:text-4xl md:text-5xl lg:text-6xl font-semibold text-white mb-3 lg:mb-4 leading-[1.12]"
                   style={{ textShadow: "0 2px 16px rgba(0,0,0,0.65)" }}
                 >
                   {h1Rest}{" "}<span style={{ color: "#D4AF37" }}>{h1Gold}</span>
                 </h1>
 
-                <p className="text-sm sm:text-base md:text-lg text-white/70 leading-relaxed mb-6 max-w-lg line-clamp-2">
+                <p className="text-sm sm:text-base md:text-lg text-white/70 leading-relaxed mb-4 lg:mb-6 max-w-lg line-clamp-2">
                   {/* Corta na 1ª frase (ponto OU interrogação) — os templates
                       de intro começam sempre por uma pergunta ("Precisa de
                       limpeza de sofás em X?"), .split('.') sozinho ignorava
@@ -235,7 +244,7 @@ const LocationServicePage = () => {
                   {data.intro.match(/^[^.?]*[.?]/)?.[0] ?? data.intro}
                 </p>
 
-                <div className="mb-6">
+                <div className="lg:mb-6">
                   <TrustRatingBadge variant="mapsLinkClients" />
                 </div>
 

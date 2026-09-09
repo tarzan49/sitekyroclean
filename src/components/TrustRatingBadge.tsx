@@ -71,8 +71,14 @@ const TrustRatingBadge = ({ variant }: TrustRatingBadgeProps) => {
       );
 
     case "mapsLinkClients":
+      // Escondido em mobile/tablet (pedido explícito 2026-09-09: "o subtitulo
+      // + 100+ avaliacoes + 1000 clientes tem que estar em somente 2 frases,
+      // neste momento ocupam um quadrado significativo da tela do iphone" —
+      // essa informação passou a viver no 1º bloco do ServiceSnapshotStats
+      // logo abaixo, que já mostra nota+avaliações Google de forma compacta).
+      // Desktop mantém os 2 pills como estavam.
       return (
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto">
+        <div className="hidden lg:flex lg:items-center gap-2 w-full lg:w-auto">
           <a
             href={GOOGLE_REVIEWS_VIEW_URL}
             target="_blank"

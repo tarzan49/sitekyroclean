@@ -119,3 +119,20 @@ export const PRICE_HEADING_VERB: Record<string, string> = {
   "limpeza-alcatifas": "higienizar uma alcatifa",
   "impermeabilizacao": "impermeabilizar um sofá",
 };
+
+// Duração real já usada noutro lado do site por serviço (nunca inventar um
+// número novo aqui): sofá/colchão/cadeiras usam a mesma secagem genérica de
+// "4 a 6 horas" do processo (ver GENERIC_PROCESS_STEPS em serviceProcesses.ts);
+// tapete e alcatifa têm o seu próprio facto de "2 a 4 horas" documentado em
+// priceSeoData.ts/blogData.ts; impermeabilização usa a ativação de 24h da
+// Premium (ver keywordVariantData.ts). Usado no bloco de snapshot stats do
+// hero (2026-09-09, pedido explícito: trocar "zonas próximas" por algo mais
+// relevante para o cliente, tipo quanto tempo demora o serviço).
+export const SERVICE_DURATION: Record<string, { value: string; label: string }> = {
+  "limpeza-sofas":     { value: "4-6h", label: "Pronto a usar" },
+  "limpeza-colchoes":  { value: "4-6h", label: "Pronto a usar" },
+  "limpeza-cadeiras":  { value: "4-6h", label: "Pronto a usar" },
+  "limpeza-tapetes":   { value: "2-4h", label: "Pronto a usar" },
+  "limpeza-alcatifas": { value: "2-4h", label: "Pronto a usar" },
+  "impermeabilizacao": { value: "24h",  label: "Proteção ativa" },
+};

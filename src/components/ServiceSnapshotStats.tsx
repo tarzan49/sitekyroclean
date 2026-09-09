@@ -1,13 +1,22 @@
-import type { LucideIcon } from "lucide-react";
+import type { ComponentType, CSSProperties } from "react";
+
+// Mais permissivo que `LucideIcon` de propósito: o bloco da avaliação Google
+// (2026-09-09) usa o logótipo "G" a cores reais (GoogleG.tsx), não um ícone
+// Lucide de traço único — precisa de aceitar `style`/`strokeWidth` mesmo sem
+// os usar, só para poder ser passado no mesmo campo `icon` sem o chamador
+// (este componente) ter de distinguir os dois casos.
+type StatIcon = ComponentType<{ className?: string; style?: CSSProperties; strokeWidth?: number }>;
 
 export interface SnapshotStat {
   value: string;
   label: string;
-  icon: LucideIcon;
+  icon: StatIcon;
 }
 
 /** Premium 4-stat strip shown right below the hero on Localidade/Freguesia/Variante
- * pages (5.0★, preço desde, zonas cobertas, tempo de resposta). Mobile-first 2×2 grid.
+ * pages (avaliação Google, preço desde, duração do serviço, tempo de resposta —
+ * conteúdo revisto 2026-09-09, ver nota em cada página que constrói o array).
+ * Mobile-first 2×2 grid.
  * Transparent by design: the caller wraps this together with the hero inside one
  * shared photo-background container so the image reads as one continuous shot,
  * not a re-cropped copy. */

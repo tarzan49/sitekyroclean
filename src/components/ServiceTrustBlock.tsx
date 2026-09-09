@@ -2,7 +2,7 @@ import { Star, ExternalLink, ChevronDown } from "lucide-react";
 import { useState } from "react";
 import { getTrustPointsForSeed, type TrustPoint } from "@/constants/serviceTrustPool";
 import { GOOGLE_REVIEWS_VIEW_URL } from "@/constants/google";
-import { REVIEW_COUNT } from "@/constants/business";
+import { REVIEW_RATING, REVIEW_COUNT } from "@/constants/business";
 
 interface Props {
   serviceSlug: string;
@@ -68,7 +68,7 @@ function Points({ points, fullDesc }: { points: TrustPoint[]; fullDesc: boolean 
           {[...Array(5)].map((_, k) => <Star key={k} className="w-3.5 h-3.5 fill-[#D4AF37] text-[#D4AF37]" />)}
         </div>
         <div className="h-3.5 w-px flex-shrink-0" style={{ background: "rgba(17,17,17,0.12)" }} />
-        <span className="text-sm font-semibold" style={{ color: "#111111" }}>5.0</span>
+        <span className="text-sm font-semibold" style={{ color: "#111111" }}>{REVIEW_RATING}</span>
         <span className="text-xs flex-1" style={{ color: "rgba(17,17,17,0.45)" }}>+{REVIEW_COUNT} avaliações · Deixar avaliação</span>
         <ExternalLink className="w-3 h-3 opacity-30 group-hover:opacity-60 transition-opacity flex-shrink-0" style={{ color: "#111111" }} />
       </a>

@@ -22,6 +22,6 @@ export const BUSINESS_GEO = {
   longitude: -8.596869,
 } as const;
 
-export const REVIEW_RATING = "5.0";
+export const REVIEW_RATING = "4.9";
 export const REVIEW_COUNT = "100";
 export const CLIENTS_SERVED_LABEL = "+1100";

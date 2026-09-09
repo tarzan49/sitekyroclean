@@ -1,7 +1,7 @@
 import { Star } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import type { QuizFormData } from '@/components/quiz/QuizTypes';
-import { REVIEW_COUNT } from '@/constants/business';
+import { REVIEW_RATING, REVIEW_COUNT } from '@/constants/business';
 
 interface QuizStepContactProps {
   formData: QuizFormData;
@@ -39,7 +39,7 @@ const QuizStepContact = ({ formData, updateFormData, scrollContainerRef }: QuizS
         <div className="relative flex items-center gap-4 bg-[#0c1d15] border border-gold/[0.15] rounded-sm pl-5 pr-4 py-3.5 mb-3 overflow-hidden">
           <div className="absolute left-0 top-0 bottom-0 w-[3px] bg-gradient-to-b from-gold/20 via-gold to-gold/20" />
           <div className="flex flex-col items-center justify-center flex-shrink-0">
-            <span className="font-playfair text-3xl font-black text-gold leading-none" style={{ textShadow: '0 0 18px rgba(212,175,55,0.35)' }}>5.0</span>
+            <span className="font-playfair text-3xl font-black text-gold leading-none" style={{ textShadow: "0 0 18px rgba(212,175,55,0.35)" }}>{REVIEW_RATING}</span>
             <div className="flex gap-0.5 mt-1.5">
               {[...Array(5)].map((_, i) => <Star key={i} className="w-3 h-3 fill-gold text-gold" />)}
             </div>

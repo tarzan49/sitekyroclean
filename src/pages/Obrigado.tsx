@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { MessageCircle, ArrowLeft, Star, Check, Clock, MapPin, CalendarDays } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
-import { WHATSAPP_BASE, REVIEW_COUNT } from "@/constants/business";
+import { WHATSAPP_BASE, REVIEW_COUNT, REVIEW_RATING } from "@/constants/business";
 
 interface ReceiptLine {
   label: string;
@@ -219,7 +219,7 @@ const Obrigado = () => {
               ))}
             </div>
             <p className="text-white/30 text-xs text-center leading-snug">
-              Classificação 5.0 com base em mais de {REVIEW_COUNT} avaliações verificadas no{' '}
+              Classificação {REVIEW_RATING} com base em mais de {REVIEW_COUNT} avaliações verificadas no{' '}
               <a
                 href={GOOGLE_REVIEWS_URL}
                 target="_blank"

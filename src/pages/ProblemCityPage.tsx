@@ -142,7 +142,7 @@ const ProblemCityPage = () => {
           </div>
           <div className="absolute inset-0" style={{ background: "linear-gradient(to bottom, rgba(7,26,18,0.42) 0%, rgba(7,26,18,0.65) 40%, rgba(7,26,18,0.88) 75%, rgba(7,26,18,0.97) 100%)" }} />
 
-        <section className="relative pt-24 md:pt-28 pb-16 md:pb-24">
+        <section className="relative pt-16 md:pt-24 lg:pt-28 pb-16 md:pb-24">
           <div className="container mx-auto px-5 sm:px-6 lg:px-8 relative z-10">
             <div className="max-w-6xl mx-auto grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
               <div>
@@ -152,7 +152,7 @@ const ProblemCityPage = () => {
                   { label: city.name },
                 ]} />
 
-                <div className="inline-flex items-start mb-5">
+                <div className="inline-flex items-start mb-3 lg:mb-5">
                   <div className="flex flex-col gap-1">
                     <div className="w-7 h-px bg-gradient-to-r from-gold to-transparent" />
                     <span className="text-[10px] font-bold text-gold/90 tracking-[0.30em] uppercase" style={{ textShadow: "0 1px 6px rgba(0,0,0,0.6)" }}>
@@ -161,15 +161,15 @@ const ProblemCityPage = () => {
                   </div>
                 </div>
 
-                <h1 className="font-playfair text-[1.75rem] sm:text-4xl md:text-5xl lg:text-6xl font-semibold text-white mb-4 leading-[1.12]" style={{ textShadow: "0 2px 16px rgba(0,0,0,0.65)" }}>
+                <h1 className="font-playfair text-[1.75rem] sm:text-4xl md:text-5xl lg:text-6xl font-semibold text-white mb-3 lg:mb-4 leading-[1.12]" style={{ textShadow: "0 2px 16px rgba(0,0,0,0.65)" }}>
                   {h1Rest} {h1Gold} {prep} <span style={{ color: "#D4AF37" }}>{city.name}</span>
                 </h1>
 
-                <p className="text-sm sm:text-base md:text-lg text-white/70 leading-relaxed mb-6 max-w-lg line-clamp-2">
+                <p className="text-sm sm:text-base md:text-lg text-white/70 leading-relaxed mb-4 lg:mb-6 max-w-lg line-clamp-2">
                   {problem.intro.replace(/no Porto|ao domicílio/g, `${prep} ${city.name}`).match(/^[^.?]*[.?]/)?.[0] ?? problem.intro}
                 </p>
 
-                <div className="mb-6">
+                <div className="lg:mb-6">
                   <TrustRatingBadge variant="mapsLinkClients" />
                 </div>
 
