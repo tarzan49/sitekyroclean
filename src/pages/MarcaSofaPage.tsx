@@ -4,6 +4,7 @@ import { QuizLocationProvider, QuizServiceProvider } from "@/context/QuizLocatio
 import { XCircle, CheckCircle2, ArrowRight, Search, ShieldCheck, Droplets, Wind, MessageCircle, Phone, Star, Euro, Clock } from "lucide-react";
 import Header from "@/components/Header";
 import PageBreadcrumb from "@/components/PageBreadcrumb";
+import HeroBeforeAfterPool from "@/components/HeroBeforeAfterPool";
 import Footer from "@/components/Footer";
 import QuizButton from "@/components/QuizButton";
 import TrustRatingBadge from "@/components/TrustRatingBadge";
@@ -222,13 +223,9 @@ const MarcaSofaPage = () => {
                 <div className="hidden lg:block">
                   <div className="relative">
                     <div className="absolute -inset-4 blur-2xl opacity-20" style={{ background: "linear-gradient(135deg, #D4AF37, transparent)" }} />
-                    <img
-                      src={heroImg}
-                      alt={`Limpeza de sofá ${marca.name} ${prep} ${city.name}`}
-                      className="relative w-full max-h-[440px] object-cover shadow-2xl"
-                      style={{ borderTop: "2px solid #D4AF37" }}
-                      loading="eager"
-                    />
+                    <div className="relative shadow-2xl" style={{ borderTop: "2px solid #D4AF37" }}>
+                      <HeroBeforeAfterPool category="sofa" className="w-full aspect-[4/3] max-h-[440px]" />
+                    </div>
                   </div>
                 </div>
               </div>

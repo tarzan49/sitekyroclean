@@ -7,6 +7,10 @@ interface BeforeAfterSliderProps {
   afterLabel?: string;
   orientation?: "vertical" | "horizontal";
   noFrame?: boolean;
+  // Usado pela pool rotativa do hero (HeroBeforeAfterPool) para pausar a
+  // rotação automática enquanto a pessoa está mesmo a arrastar — sem isto,
+  // um par podia ser trocado a meio de uma interação real.
+  onDraggingChange?: (dragging: boolean) => void;
 }
 
 const BeforeAfterSlider = ({
@@ -16,6 +20,7 @@ const BeforeAfterSlider = ({
   afterLabel = "Depois",
   orientation = "vertical",
   noFrame = false,
+  onDraggingChange,
 }: BeforeAfterSliderProps) => {
   const [sliderPosition, setSliderPosition] = useState(50);
   const [isDragging, setIsDragging] = useState(false);
@@ -64,6 +69,10 @@ const BeforeAfterSlider = ({
       : ((clientY - rect.top)   / rect.height) * 100;
     setSliderPosition(Math.min(Math.max(pct, 0), 100));
   }, [orientation]);
+
+  useEffect(() => {
+    onDraggingChange?.(isDragging);
+  }, [isDragging, onDraggingChange]);
 
   const handleMouseDown = (e: React.MouseEvent) => {
     isDraggingRef.current = true;

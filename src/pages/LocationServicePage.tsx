@@ -12,6 +12,8 @@ import ServiceFAQ from "@/components/ServiceFAQ";
 import ServicePackBanner from "@/components/ServicePackBanner";
 import ServiceSnapshotStats from "@/components/ServiceSnapshotStats";
 import PageBreadcrumb from "@/components/PageBreadcrumb";
+import HeroBeforeAfterPool from "@/components/HeroBeforeAfterPool";
+import { categoryForServiceSlug } from "@/data/beforeAfterPool";
 import { getLocationServiceData, services, cities, getCityLinksForService } from "@/data/locationSeoData";
 import { QuizLocationProvider, QuizServiceProvider } from "@/context/QuizLocationContext";
 import { municipiosComFreguesias } from "@/data/freguesiaSeoData";
@@ -105,6 +107,7 @@ const LocationServicePage = () => {
   const quizService = SERVICE_TO_QUIZ[data.serviceSlug];
 
   const heroImgs = pickServiceHero(data.serviceSlug, data.city);
+  const beforeAfterCategory = categoryForServiceSlug(data.serviceSlug);
   const otherServices = data.relatedServices
     .map(slug => {
       const svc = services.find(s => s.slug === slug);
@@ -266,17 +269,23 @@ const LocationServicePage = () => {
               <div className="hidden lg:block">
                 <div className="relative">
                   <div className="absolute -inset-4 blur-2xl opacity-20" style={{ background: "linear-gradient(135deg, #D4AF37, transparent)" }} />
-                  <picture>
-                    <source media="(max-width: 767px)" srcSet={heroImgs.m} type="image/webp" />
-                    <source media="(min-width: 768px)" srcSet={heroImgs.d} type="image/webp" />
-                    <img
-                      src={heroImgs.d}
-                      alt={`${data.service} profissional ${cityPrep} ${data.city}`}
-                      className="relative w-full max-h-[440px] object-cover shadow-2xl"
-                      style={{ borderTop: "2px solid #D4AF37" }}
-                      loading="eager"
-                    />
-                  </picture>
+                  {beforeAfterCategory ? (
+                    <div className="relative shadow-2xl" style={{ borderTop: "2px solid #D4AF37" }}>
+                      <HeroBeforeAfterPool category={beforeAfterCategory} className="w-full aspect-[4/3] max-h-[440px]" />
+                    </div>
+                  ) : (
+                    <picture>
+                      <source media="(max-width: 767px)" srcSet={heroImgs.m} type="image/webp" />
+                      <source media="(min-width: 768px)" srcSet={heroImgs.d} type="image/webp" />
+                      <img
+                        src={heroImgs.d}
+                        alt={`${data.service} profissional ${cityPrep} ${data.city}`}
+                        className="relative w-full max-h-[440px] object-cover shadow-2xl"
+                        style={{ borderTop: "2px solid #D4AF37" }}
+                        loading="eager"
+                      />
+                    </picture>
+                  )}
                 </div>
               </div>
             </div>

@@ -3,6 +3,8 @@ import { useLocation, Link } from "react-router-dom";
 import { MapPin, Star, MessageCircle, ArrowRight, Euro, Clock } from "lucide-react";
 import Header from "@/components/Header";
 import PageBreadcrumb from "@/components/PageBreadcrumb";
+import HeroBeforeAfterPool from "@/components/HeroBeforeAfterPool";
+import { categoryForServiceSlug } from "@/data/beforeAfterPool";
 import Footer from "@/components/Footer";
 import QuizButton from "@/components/QuizButton";
 import QuizFormLazy from "@/components/QuizFormLazy";
@@ -114,6 +116,7 @@ const FreguesiaServicePage = () => {
   // "Detalhes:" em branco no Formspree, valor total so a deslocacao).
   const quizService = SERVICE_TO_QUIZ[data.serviceSlug];
   const heroImgs = pickServiceHero(data.serviceSlug, data.name);
+  const beforeAfterCategory = categoryForServiceSlug(data.serviceSlug);
   const nearbyFreguesias = getNearbyFreguesias(data.municipioSlug, data.nearby);
   const otherServices = services.filter(s => s.slug !== data.serviceSlug);
   const serviceBaseUrl = services.find(s => s.slug === data.serviceSlug)?.baseRoute ?? `/${data.serviceSlug}`;
@@ -246,17 +249,23 @@ const FreguesiaServicePage = () => {
               <div className="hidden lg:block">
                 <div className="relative">
                   <div className="absolute -inset-4 blur-2xl opacity-20" style={{ background: "linear-gradient(135deg, #D4AF37, transparent)" }} />
-                  <picture>
-                    <source media="(max-width: 767px)" srcSet={heroImgs.m} type="image/webp" />
-                    <source media="(min-width: 768px)" srcSet={heroImgs.d} type="image/webp" />
-                    <img
-                      src={heroImgs.d}
-                      alt={`${data.service} profissional em ${data.name}`}
-                      className="relative w-full max-h-[440px] object-cover shadow-2xl"
-                      style={{ borderTop: "2px solid #D4AF37" }}
-                      loading="eager"
-                    />
-                  </picture>
+                  {beforeAfterCategory ? (
+                    <div className="relative shadow-2xl" style={{ borderTop: "2px solid #D4AF37" }}>
+                      <HeroBeforeAfterPool category={beforeAfterCategory} className="w-full aspect-[4/3] max-h-[440px]" />
+                    </div>
+                  ) : (
+                    <picture>
+                      <source media="(max-width: 767px)" srcSet={heroImgs.m} type="image/webp" />
+                      <source media="(min-width: 768px)" srcSet={heroImgs.d} type="image/webp" />
+                      <img
+                        src={heroImgs.d}
+                        alt={`${data.service} profissional em ${data.name}`}
+                        className="relative w-full max-h-[440px] object-cover shadow-2xl"
+                        style={{ borderTop: "2px solid #D4AF37" }}
+                        loading="eager"
+                      />
+                    </picture>
+                  )}
                 </div>
               </div>
             </div>

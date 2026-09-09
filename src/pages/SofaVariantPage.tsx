@@ -28,6 +28,8 @@ import { GENERIC_PROCESS_STEPS, IMPERMEABILIZACAO_STEPS } from "@/constants/serv
 import { SITE_URL, WHATSAPP_BASE, PHONE_TEL, PHONE_DISPLAY, REVIEW_COUNT } from "@/constants/business";
 import TrustRatingBadge from "@/components/TrustRatingBadge";
 import { buildVariantWaMessage } from "@/lib/whatsappMessages";
+import HeroBeforeAfterPool from "@/components/HeroBeforeAfterPool";
+import { categoryForServiceSlug } from "@/data/beforeAfterPool";
 
 
 // Problem card backgrounds
@@ -237,6 +239,12 @@ const SofaVariantPage = () => {
   const variantLabel = VARIANT_LABEL[data.variantKey];
   const prep = cityPrep(data.locationName);
   const heroImg = pickHero(data.serviceKey, data.variantKey, parsed.locationPart);
+  // Mesma condição usada mais abaixo para o serviceSlug do ServicePriceSection
+  // — "impermeabilizacao" pode ser o variantKey mesmo quando serviceKey é
+  // sofa/colchão/etc (a variante em si é sobre impermeabilizar, não limpar).
+  const beforeAfterCategory = categoryForServiceSlug(
+    parsed?.variantKey === 'impermeabilizacao' ? 'impermeabilizacao' : SERVICEKEY_TO_SLUG[data.serviceKey]
+  );
   const problemImgs = PROBLEM_IMAGES[`${data.variantKey}-${data.serviceKey}`];
   const problemLabels = VARIANT_PROBLEM_LABELS[data.variantKey];
 
@@ -364,13 +372,19 @@ const SofaVariantPage = () => {
               <div className="hidden lg:block">
                 <div className="relative">
                   <div className="absolute -inset-4 blur-2xl opacity-20" style={{ background: "linear-gradient(135deg, #D4AF37, transparent)" }} />
-                  <img
-                    src={heroImg}
-                    alt={`${variantLabel} profissional ${prep} ${data.locationName}`}
-                    className="relative w-full max-h-[440px] object-cover shadow-2xl"
-                    style={{ borderTop: "2px solid #D4AF37" }}
-                    loading="eager"
-                  />
+                  {beforeAfterCategory ? (
+                    <div className="relative shadow-2xl" style={{ borderTop: "2px solid #D4AF37" }}>
+                      <HeroBeforeAfterPool category={beforeAfterCategory} className="w-full aspect-[4/3] max-h-[440px]" />
+                    </div>
+                  ) : (
+                    <img
+                      src={heroImg}
+                      alt={`${variantLabel} profissional ${prep} ${data.locationName}`}
+                      className="relative w-full max-h-[440px] object-cover shadow-2xl"
+                      style={{ borderTop: "2px solid #D4AF37" }}
+                      loading="eager"
+                    />
+                  )}
                 </div>
               </div>
             </div>

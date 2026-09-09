@@ -4,6 +4,8 @@ import { QuizLocationProvider, QuizServiceProvider } from "@/context/QuizLocatio
 import { MapPin, Star, MessageCircle, ArrowRight } from "lucide-react";
 import Header from "@/components/Header";
 import PageBreadcrumb from "@/components/PageBreadcrumb";
+import HeroBeforeAfterPool from "@/components/HeroBeforeAfterPool";
+import { categoryForServiceSlug } from "@/data/beforeAfterPool";
 import Footer from "@/components/Footer";
 import QuizButton from "@/components/QuizButton";
 import TrustRatingBadge from "@/components/TrustRatingBadge";
@@ -99,6 +101,7 @@ const MaterialPage = () => {
   const relatedLinks = getRelatedMaterialLinks(data.relatedMaterials);
   const topCities = cities.slice(0, 8);
   const heroImg = MATERIAL_HERO[data.slug] ?? MATERIAL_HERO_FALLBACK;
+  const beforeAfterCategory = categoryForServiceSlug(data.serviceSlug);
   const waHref = `${WHATSAPP_BASE}?text=${encodeURIComponent(buildMaterialWaMessage(data.slug, cityName))}`;
 
   const h1Words = data.h1.trim().split(" ");
@@ -180,13 +183,19 @@ const MaterialPage = () => {
               <div className="hidden lg:block">
                 <div className="relative">
                   <div className="absolute -inset-4 blur-2xl opacity-20" style={{ background: "linear-gradient(135deg, #D4AF37, transparent)" }} />
-                  <img
-                    src={heroImg}
-                    alt={`${data.name} profissional`}
-                    className="relative w-full max-h-[440px] object-cover shadow-2xl"
-                    style={{ borderTop: "2px solid #D4AF37" }}
-                    loading="eager"
-                  />
+                  {beforeAfterCategory ? (
+                    <div className="relative shadow-2xl" style={{ borderTop: "2px solid #D4AF37" }}>
+                      <HeroBeforeAfterPool category={beforeAfterCategory} className="w-full aspect-[4/3] max-h-[440px]" />
+                    </div>
+                  ) : (
+                    <img
+                      src={heroImg}
+                      alt={`${data.name} profissional`}
+                      className="relative w-full max-h-[440px] object-cover shadow-2xl"
+                      style={{ borderTop: "2px solid #D4AF37" }}
+                      loading="eager"
+                    />
+                  )}
                 </div>
               </div>
             </div>

@@ -6,6 +6,8 @@ import {
 } from "lucide-react";
 import Header from "@/components/Header";
 import PageBreadcrumb from "@/components/PageBreadcrumb";
+import HeroBeforeAfterPool from "@/components/HeroBeforeAfterPool";
+import { categoryForServiceSlug } from "@/data/beforeAfterPool";
 import Footer from "@/components/Footer";
 import QuizButton from "@/components/QuizButton";
 import TrustRatingBadge from "@/components/TrustRatingBadge";
@@ -111,6 +113,7 @@ const ProblemPage = () => {
   const categoryTips = CATEGORY_TIPS[data.category];
   const gallery = getServiceGallery(data.relatedServices[0], slug ?? "");
   const heroImg = getProblemHeroImage(slug ?? "");
+  const beforeAfterCategory = categoryForServiceSlug(data.relatedServices[0]);
   const solutionImg = getSolutionImage(data.relatedServices[0], slug ?? "") ?? heroImg;
   const waHref = `${WHATSAPP_BASE}?text=${encodeURIComponent(buildProblemWaMessage(slug ?? ""))}`;
   const snapshotStats = CATEGORY_STATS[data.category] ?? CATEGORY_STATS.manchas;
@@ -191,13 +194,19 @@ const ProblemPage = () => {
               <div className="hidden lg:block">
                 <div className="relative">
                   <div className="absolute -inset-4 blur-2xl opacity-20" style={{ background: "linear-gradient(135deg, #D4AF37, transparent)" }} />
-                  <img
-                    src={heroImg}
-                    alt={data.h1}
-                    className="relative w-full max-h-[440px] object-cover shadow-2xl"
-                    style={{ borderTop: "2px solid #D4AF37" }}
-                    loading="eager"
-                  />
+                  {beforeAfterCategory ? (
+                    <div className="relative shadow-2xl" style={{ borderTop: "2px solid #D4AF37" }}>
+                      <HeroBeforeAfterPool category={beforeAfterCategory} className="w-full aspect-[4/3] max-h-[440px]" />
+                    </div>
+                  ) : (
+                    <img
+                      src={heroImg}
+                      alt={data.h1}
+                      className="relative w-full max-h-[440px] object-cover shadow-2xl"
+                      style={{ borderTop: "2px solid #D4AF37" }}
+                      loading="eager"
+                    />
+                  )}
                 </div>
               </div>
             </div>
