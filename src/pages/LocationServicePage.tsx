@@ -1,3 +1,5 @@
+import SofaLeadActions from "@/components/SofaLeadActions";
+import { AdsLandingHeader, AdsLandingFooter, isAdsVisit } from "@/components/AdsLandingNavigation";
 import { useEffect, useMemo } from "react";
 import { useLocation, Link } from "react-router-dom";
 import { MapPin, Star, MessageCircle, ArrowRight, Euro, Clock, Timer } from "lucide-react";
@@ -117,6 +119,8 @@ const LocationServicePage = () => {
     .filter(Boolean) as (typeof services[number] & { locationPath: string })[];
 
   const cityFreguesias = municipiosComFreguesias.find(m => m.slug === data.citySlug);
+  const isSofaCleaning = data.serviceSlug === "limpeza-sofas";
+  const isPaidLanding = isSofaCleaning && isAdsVisit(location.search);
 
   const materialLinks = getMaterialsByService(data.serviceSlug);
 
@@ -148,23 +152,14 @@ const LocationServicePage = () => {
   const cityPrep = data.citySlug === 'porto' ? 'no' : 'em';
 
   const serviceDuration = SERVICE_DURATION[data.serviceSlug] ?? { value: "4-6h", label: "Pronto a usar" };
-  // Conteúdo revisto 2026-09-09 (pedido explícito): 1º bloco passou a mostrar
-  // a nota real do Google (antes tinha "5.0 ★" fixo, agora usa REVIEW_RATING/
-  // REVIEW_COUNT, a fonte única) em vez de duplicar os pills que já apareciam
-  // no hero — esses pills (TrustRatingBadge "mapsLinkClients") ficaram
-  // escondidos em mobile/tablet por serem redundantes com isto. "Zonas
-  // cobertas" saiu (ainda existe mais abaixo na página) e deu lugar a algo
-  // mais útil para quem decide: quanto tempo demora o serviço. O último
-  // bloco ("<10min") é uma exceção isolada e deliberada: em todo o resto do
-  // site o compromisso continua a ser 30min, não alterar noutro sítio sem
-  // pedido explícito.
+  // Resposta alinhada com o orçamento: menos de 30 minutos no horário de atendimento.
   const snapshotStats = [
     { value: `${REVIEW_RATING}★`, label: `+${REVIEW_COUNT} avaliações Google`, icon: GoogleG },
     (data.serviceSlug === 'limpeza-tapetes' || data.serviceSlug === 'limpeza-alcatifas')
       ? { value: "Á Medida", label: `Orçamento, ${cityPrep} ${data.city}`, icon: Euro }
       : { value: data.priceFrom, label: `Desde, ${cityPrep} ${data.city}`, icon: Euro },
     { value: serviceDuration.value, label: serviceDuration.label, icon: Timer },
-    { value: "<10min", label: "Respondemos em menos de 10 minutos", icon: Clock },
+    { value: "<30min", label: "Resposta durante o horário de atendimento", icon: Clock },
   ];
 
   const processSteps = data.serviceSlug === 'impermeabilizacao' ? IMPERMEABILIZACAO_STEPS : GENERIC_PROCESS_STEPS;
@@ -190,7 +185,7 @@ const LocationServicePage = () => {
         pageUrl={location.pathname}
         priceFrom={data.priceFrom}
       />
-      <Header />
+      {isPaidLanding ? <AdsLandingHeader /> : <Header />}
       <main>
 
         {/* ═══ HERO + LOCAL SNAPSHOT (fundo fotográfico contínuo) ═══ */}
@@ -205,9 +200,9 @@ const LocationServicePage = () => {
           </div>
           <div className="absolute inset-0" style={{ background: "linear-gradient(to bottom, rgba(7,26,18,0.42) 0%, rgba(7,26,18,0.65) 40%, rgba(7,26,18,0.90) 78%, rgba(7,26,18,0.97) 100%)" }} />
 
-        <section className="relative pt-16 md:pt-24 lg:pt-28 pb-16 md:pb-24">
+        <section className="relative pt-6 md:pt-16 lg:pt-20 pb-8 md:pb-16">
           <div className="container mx-auto px-5 sm:px-6 lg:px-8 relative z-10">
-            <div className="max-w-6xl mx-auto grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+            <div className="max-w-6xl mx-auto grid lg:grid-cols-2 gap-4 lg:gap-12 items-center">
               <div>
                 <PageBreadcrumb items={[
                   { label: "Início", to: "/" },
@@ -235,13 +230,13 @@ const LocationServicePage = () => {
                   {h1Rest}{" "}<span style={{ color: "#D4AF37" }}>{h1Gold}</span>
                 </h1>
 
-                <p className="text-sm sm:text-base md:text-lg text-white/70 leading-relaxed mb-4 lg:mb-6 max-w-lg line-clamp-2">
+                <p className="text-sm sm:text-base md:text-lg text-white/70 leading-relaxed mb-4 lg:mb-6 max-w-lg">
                   {/* Corta na 1ª frase (ponto OU interrogação) — os templates
                       de intro começam sempre por uma pergunta ("Precisa de
                       limpeza de sofás em X?"), .split('.') sozinho ignorava
                       o "?" e arrastava o parágrafo inteiro para o hero,
                       empurrando a barra de estatísticas para fora do ecrã. */}
-                  {data.intro.match(/^[^.?]*[.?]/)?.[0] ?? data.intro}
+                  {isSofaCleaning ? "Limpeza ao domicílio por extração profunda. Consulte os preços por tamanho e envie uma foto para avaliarmos as manchas." : (data.intro.match(/^[^.?]*[.?]/)?.[0] ?? data.intro)}
                 </p>
 
                 <div className="lg:mb-6">
@@ -259,11 +254,13 @@ const LocationServicePage = () => {
                   />
                   <div className="relative group flex-1">
                     <div className="absolute -inset-1.5 bg-[#25D366]/40 opacity-30 blur-lg group-hover:opacity-55 transition-opacity duration-400 pointer-events-none" />
+                {!isPaidLanding && <>
                     <a
                       href={waUrl}
                       target="_blank"
                       rel="noopener noreferrer"
                       onClick={() => trackWhatsAppClick(`location_hero_${data.serviceSlug}_${data.citySlug}`)}
+                </>}
                       className="relative flex items-center justify-center gap-2 w-full h-[58px] md:h-[52px] px-6 font-bold text-white touch-manipulation bg-gradient-to-r from-[#1DA851] via-[#25D366] to-[#1DA851] shadow-[0_6px_22px_rgba(37,211,102,0.42),0_2px_6px_rgba(0,0,0,0.28),inset_0_1px_0_rgba(255,255,255,0.20),inset_0_-2px_0_rgba(0,0,0,0.12)] hover:shadow-[0_10px_32px_rgba(37,211,102,0.60),0_4px_10px_rgba(0,0,0,0.32)] hover:scale-[1.025] active:scale-[0.95] transition-all duration-150"
                     >
                       <MessageCircle className="w-[18px] h-[18px] flex-shrink-0" strokeWidth={2} />
@@ -273,9 +270,10 @@ const LocationServicePage = () => {
                 </div>
 
                 <p className="text-white/40 text-xs mt-4">{/^\d/.test(data.priceFrom) ? `Desde ${data.priceFrom} · ` : ''}Orçamento gratuito · Sem compromisso</p>
+                </>}
               </div>
 
-              <div className="mt-8 lg:mt-0">
+              <div id="resultados" className="mt-2 lg:mt-0 scroll-mt-6">
                 <div className="relative">
                   <div className="absolute -inset-4 blur-2xl opacity-20" style={{ background: "linear-gradient(135deg, #D4AF37, transparent)" }} />
                   {beforeAfterCategory ? (
@@ -294,6 +292,7 @@ const LocationServicePage = () => {
                         loading="eager"
                       />
                     </picture>
+                {isSofaCleaning ? <SofaLeadActions city={data.city} price={data.priceFrom} href={waUrl} source={`location_hero_${data.serviceSlug}_${data.citySlug}`} /> : <>
                   )}
                 </div>
               </div>
@@ -343,7 +342,7 @@ const LocationServicePage = () => {
         />
 
         {/* ═══ TESTEMUNHOS ═══ */}
-        <section className="py-14 md:py-20 bg-kyro-green">
+        <section id="avaliacoes" className="scroll-mt-6 py-14 md:py-20 bg-kyro-green">
           <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
             <SectionHeader overline="Avaliações Reais" heading="O que dizem os nossos" goldWord="clientes" light={false} />
             <ServiceReviewsGrid serviceSlug={data.serviceSlug} seed={data.city} heading="" />
@@ -352,7 +351,7 @@ const LocationServicePage = () => {
 
         {/* ═══ PROBLEMAS COMUNS ═══ */}
         {problemCards.length > 0 && (
-          <section className="py-14 md:py-20 bg-[#FDFDF9]">
+          <section id="precos" className="scroll-mt-6 py-14 md:py-20 bg-[#FDFDF9]">
             <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
               <SectionHeader
                 overline="O Que Resolvemos"
@@ -408,7 +407,7 @@ const LocationServicePage = () => {
 
         {/* ═══ FAQ ═══ */}
         {data.faqs && data.faqs.length > 0 && (
-          <ServiceFAQ faqs={data.faqs} heading={`Perguntas sobre ${data.service.toLowerCase()} ${cityPrep} ${data.city}`} variant="dark" />
+          <div id="duvidas" className="scroll-mt-6"><ServiceFAQ faqs={data.faqs} heading={`Perguntas sobre ${data.service.toLowerCase()} ${cityPrep} ${data.city}`} variant="dark" /></div>
         )}
 
         {/* ═══ COMO FUNCIONA ═══ */}
@@ -488,6 +487,7 @@ const LocationServicePage = () => {
 
             <div className="grid md:grid-cols-2 gap-4">
               {cityFreguesias && cityFreguesias.freguesias.length > 0 && (
+        {isPaidLanding ? <section className="p-6 text-center bg-white"><h2 className="font-playfair text-xl mb-2">Serviço ao domicílio</h2><p>Atendimento em {data.city}. Envie a sua morada por WhatsApp para confirmar cobertura e deslocação.</p></section> : <>
                 <div className="p-5 rounded-xl bg-white" style={{ border: "1px solid rgba(17,17,17,0.08)", boxShadow: "0 4px 16px rgba(7,26,18,0.04)" }}>
                   <p className="text-[10px] font-bold tracking-[0.26em] uppercase mb-3" style={{ color: "#D4AF37" }}>Zonas {cityPrep} {data.city}</p>
                   <div className="flex flex-wrap gap-2">
@@ -626,10 +626,11 @@ const LocationServicePage = () => {
         </section>
 
       </main>
-      <Footer />
+      {isPaidLanding ? <AdsLandingFooter /> : <Footer />}
     </QuizServiceProvider>
     </QuizLocationProvider>
   );
 };
 
 export default LocationServicePage;
+        </>}

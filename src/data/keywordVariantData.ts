@@ -90,79 +90,30 @@ const SERVICES_FOR_VARIANT: Record<VariantKey, ServiceKey[]> = {
 // loc = display name ("Porto" or "Paranhos, Porto"), ctx = context phrase
 
 function content_higienizacao_sofa(loc: string, ctx: string): ContentBlock {
-  const seed = getSeed(loc + '|higienizacao-sofa');
-  const seed2 = getSeed(loc + '|higienizacao-sofa_w');
-  const seedB = getSeed(loc + '|higienizacao-sofa_b');
-  const seedP = getSeed(loc + '|higienizacao-sofa_p');
-  const seedF = getSeed(loc + '|higienizacao-sofa_f');
-  const seedT = getSeed(loc + '|higienizacao-sofa_t');
+  const prep = cityPrep(loc);
   return {
-    intro: pick([
-      `A higienização profissional do sofá em ${loc} vai além da limpeza visual: eliminamos os agentes patogénicos invisíveis que afetam a saúde da sua família. A Kyro Clean Solutions usa protocolos de sanitização certificados para remover ácaros, bactérias, fungos e alergénios acumulados nos tecidos em ${loc} e ${ctx}.`,
-      `Precisa de higienizar o sofá em ${loc}? A Kyro Clean Solutions elimina ácaros, bactérias, fungos e alergénios acumulados nos tecidos com protocolos de sanitização certificados, indo muito além do que a limpeza visual consegue, em ${loc} e ${ctx}.`,
-      `O sofá em ${loc} acumula ácaros, bactérias e fungos invisíveis a olho nu, mesmo com aspiração regular. A Kyro Clean Solutions aplica sanitização certificada que elimina esses agentes patogénicos e protege a saúde da sua família em ${loc} e ${ctx}.`,
-    ] as const, seed),
-    whatIs: pick([
-      `A higienização vai além de tirar o pó: elimina os ácaros, bactérias e fungos que vivem nos tecidos e que causam alergias, espirros e problemas respiratórios. Feita com produtos seguros para toda a família, é especialmente recomendada quando há bebés, crianças ou alérgicos em casa em ${loc}.`,
-      `Os tecidos do sofá escondem ácaros, bactérias e fungos que o aspirador doméstico não alcança, e que estão por trás de muitas alergias e espirros em casa. O tratamento elimina-os com produtos seguros para toda a família, indicado sobretudo quando há bebés, crianças ou alérgicos em ${loc}.`,
-      `Um sofá com aspeto limpo pode continuar cheio de ácaros, bactérias e fungos nas fibras, causa frequente de alergias e espirros em casa. Este tratamento elimina-os com produtos seguros para toda a família, especialmente importante havendo bebés, crianças ou alérgicos em ${loc}.`,
-    ] as const, seed2),
-    benefits: pick([
-      [
-        'Eliminação de 99% de ácaros, bactérias e vírus',
-        'Sanitização certificada com agentes antimicrobianos',
-        'Seguro para bebés, crianças e pessoas alérgicas',
-        'Produtos certificados e hipoalergénicos',
-        `Serviço ao domicílio em ${loc}`,
-        'Certificado de higienização disponível sob pedido',
-      ],
-      [
-        '99% dos ácaros, bactérias e vírus eliminados',
-        'Agentes antimicrobianos com certificação profissional',
-        'Recomendado para casas com bebés, crianças ou alérgicos',
-        'Produtos hipoalergénicos, sem compostos tóxicos',
-        `Deslocação incluída em ${loc}`,
-        'Certificado de higienização emitido a pedido',
-      ],
-    ] as const, seedB),
+    intro: `Limpeza de sofás ao domicílio ${prep} ${loc} por extração profunda. Consulte os preços por tamanho e envie fotografias para avaliarmos as manchas. Atendimento em ${ctx}.`,
+    whatIs: 'A higienização remove sujidade acumulada nas fibras por extração. Avaliamos o tecido e o estado do sofá para escolher o tratamento adequado. A remoção de manchas e odores depende da sua origem, antiguidade e do material.',
+    benefits: ['Extração de sujidade acumulada nas fibras', 'Tratamento adaptado ao tecido', 'Avaliação de manchas por fotografia', 'Preço confirmado antes do serviço', `Serviço ao domicílio ${prep} ${loc}`, 'Orientações de ventilação e secagem após o serviço'],
     processSteps: [
-      { step: 1, title: 'Avaliação de higiene', description: `Inspecção do sofá e identificação de focos de contaminação em ${loc}.` },
-      { step: 2, title: 'Aspiração HEPA', description: 'Remoção de 99% dos ácaros e detritos com filtro HEPA certificado.' },
-      { step: 3, title: 'Sanitização antimicrobiana', description: 'Aplicação de agente certificado, seguro para tecidos e toda a família.' },
-      { step: 4, title: 'Secagem rápida', description: 'Sofá pronto a usar em poucas horas, sem humidade residual.' },
+      { step: 1, title: 'Inspeção', description: 'Avaliação do estado e do tecido do sofá.' },
+      { step: 2, title: 'Preparação', description: 'Aplicação do produto adequado ao material e à sujidade.' },
+      { step: 3, title: 'Extração', description: 'Remoção de sujidade com equipamento profissional.' },
+      { step: 4, title: 'Secagem', description: 'Normalmente 4 a 6 horas, dependendo do tecido e da ventilação.' },
     ],
-    faqs: pick([
-      [
-        { question: `Quanto tempo após a higienização posso usar o sofá?`, answer: `Em condições normais de ventilação, o sofá está pronto a usar em 2 a 4 horas. Não fica húmido nem com cheiro a produtos, apenas limpo.` },
-        { question: `A higienização resolve mesmo os espirros e alergias causados pelo sofá?`, answer: `Sim. Os ácaros do sofá são uma das principais causas de rinite alérgica em casa. O processo elimina-os das fibras profundas, onde o aspirador doméstico não chega, e os sintomas melhoram visivelmente.` },
-        { question: `Fazem higienização de sofá ao domicílio em ${loc}?`, answer: `Sim, deslocamo-nos a ${loc} com todo o equipamento. Não precisa de preparar nada nem de mover o sofá.` },
-        { question: `Qual a diferença entre higienizar e simplesmente aspirar o sofá?`, answer: `O aspirador remove sujidade solta da superfície. A higienização profissional penetra nas fibras e elimina os patogénicos invisíveis (ácaros, bactérias, fungos) que causam alergias e odores persistentes.` },
-        { question: `A higienização do sofá é segura se tiver crianças e animais em casa?`, answer: `Sim. Usamos produtos certificados e sem compostos tóxicos, seguros para crianças e animais. O sofá pode ser usado poucas horas depois.` },
-      ],
-      [
-        { question: `Quanto tempo após a higienização posso usar o sofá?`, answer: `Com ventilação normal do espaço, o sofá fica disponível em 2 a 4 horas. Sem humidade nem cheiro a produtos residual, apenas limpo.` },
-        { question: `A higienização resolve mesmo os espirros e alergias causados pelo sofá?`, answer: `Sim. É nas fibras profundas do sofá, fora do alcance do aspirador doméstico, que vivem os ácaros responsáveis por boa parte da rinite alérgica em casa. O tratamento elimina-os e a melhoria dos sintomas é visível.` },
-        { question: `Fazem higienização de sofá ao domicílio em ${loc}?`, answer: `Sim. Levamos todo o equipamento até ${loc}, não precisa de preparar nada nem de deslocar o sofá.` },
-        { question: `Qual a diferença entre higienizar e simplesmente aspirar o sofá?`, answer: `Aspirar remove só a sujidade solta à superfície. A higienização profissional chega às fibras e elimina os patogénicos invisíveis, ácaros, bactérias, fungos, responsáveis por alergias e odores persistentes.` },
-        { question: `A higienização do sofá é segura se tiver crianças e animais em casa?`, answer: `Sim, os produtos usados são certificados e livres de compostos tóxicos, seguros para crianças e animais de estimação. Poucas horas depois o sofá já pode voltar a ser usado normalmente.` },
-      ],
-    ] as const, seedF),
-    problems: pick([
-      [
-        { title: "Alergias que pioram em casa", description: `Um sofá usado durante 3 anos pode conter mais de 15 milhões de ácaros nas fibras. São invisíveis, mas libertam-se ao sentar e agravam alergias respiratórias em ${loc}.` },
-        { title: "Odores que o aspirador não resolve", description: "Bactérias anaeróbias acumulam-se nas camadas profundas do tecido e produzem odores persistentes que nenhum spray doméstico elimina de raiz." },
-        { title: "Bebé ou criança em contacto direto com o tecido", description: "Crianças respiram mais próximo das fibras e são mais vulneráveis a alergénios. A higienização profissional cria um ambiente verdadeiramente seguro para os mais novos." },
-      ],
-      [
-        { title: "Espirros e alergias que não desaparecem", description: `Bastam 3 anos de uso para um sofá acumular mais de 15 milhões de ácaros nas fibras: invisíveis, mas libertados sempre que alguém se senta, agravando alergias respiratórias em ${loc}.` },
-        { title: "Cheiro que volta pouco depois de limpar", description: "Nas camadas mais profundas do tecido acumulam-se bactérias anaeróbias que produzem odores persistentes, resistentes a qualquer spray ou ambientador doméstico." },
-        { title: "Crianças pequenas sempre em contacto com o tecido", description: "Ao gatinhar ou brincar no sofá, as crianças respiram muito mais perto das fibras e são mais sensíveis aos alergénios ali acumulados. A higienização profissional torna esse espaço seguro." },
-      ],
-    ] as const, seedP),
-    testimonials: [pick([
-      { name: "Mariana F.", location: "Porto", text: "O sofá estava num estado que eu já nem queria receber visitas. Depois da higienização ficou tão limpo que parecia ter saído da loja. Os meus filhos voltaram a sentar-se nele sem eu me preocupar." },
-      { name: "Ricardo M.", location: "Matosinhos", text: "Tenho dois gatos e o sofá cheirava de uma forma impossível. Depois do serviço o cheiro desapareceu por completo. Ainda não percebi como é possível, mas ficou impecável." },
-    ] as const, seedT)],
+    faqs: [
+      { question: 'Quanto tempo após a higienização posso usar o sofá?', answer: 'A secagem demora normalmente 4 a 6 horas. Pode demorar mais consoante o tecido, a humidade e a ventilação. Use o sofá apenas quando estiver completamente seco.' },
+      { question: 'Qual é o preço e o que está incluído?', answer: 'Os preços da tabela correspondem à limpeza por tamanho do sofá. A deslocação é cobrada à parte conforme a morada. Sofás de quatro ou mais lugares e tratamentos adicionais exigem orçamento. Confirmamos o valor e o serviço antes de avançar.' },
+      { question: 'Todas as manchas e odores desaparecem?', answer: 'O resultado depende do tecido, da origem e da antiguidade da mancha ou odor. Envie fotografias para uma primeira avaliação; o técnico confirma no local o tratamento possível. Não garantimos a remoção de todas as manchas.' },
+      { question: `Fazem higienização de sofá ao domicílio ${prep} ${loc}?`, answer: `Sim. Levamos o equipamento até ${loc}. Envie a morada para confirmar cobertura, deslocação e disponibilidade.` },
+      { question: 'Que cuidados devo ter com crianças e animais?', answer: 'Informe a equipa sobre sensibilidades conhecidas. Siga as instruções dos produtos e as orientações do técnico, ventile o espaço e mantenha crianças e animais afastados durante o tratamento e até à secagem completa.' },
+    ],
+    problems: [
+      { title: 'Sujidade acumulada', description: 'O uso diário deixa resíduos nas fibras. A extração profissional permite uma limpeza mais profunda do que a aspiração doméstica.' },
+      { title: 'Manchas e odores', description: 'Envie uma fotografia e explique a origem do problema para avaliarmos o tratamento adequado.' },
+      { title: 'Cuidados com o tecido', description: 'Inspecionamos o material antes do serviço e explicamos os cuidados de secagem e manutenção.' },
+    ],
+    testimonials: [],
   };
 }
 

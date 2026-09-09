@@ -1044,3 +1044,7 @@ Commits desta sessão (ordem cronológica, todos em `worktree-kyro-minorder-emda
 ## Seleção regional de avaliações (2026-09-10)
 
 `ServiceReviewsGrid` usa o caminho da página e a seed para selecionar avaliações por serviço/região em `reviewsPool.ts`. As variantes `SofaVariantPage` partilham agora esta grelha. `LISBON_REVIEWS` guarda as 13 transcrições com texto confirmadas pelo responsável como sendo de Lisboa; `CONFIRMED_REVIEW_LOCATIONS` associa a localidade à fonte. Páginas da região com pool confirmada não são preenchidas com testemunhos de outras regiões. Sem localização confirmada, não mostrar cidade.
+
+## Entrada de anúncios e contacto nas páginas de sofás (2026-09-10)
+
+`SofaLeadActions` centraliza WhatsApp, âncora `#precos` e preço com deslocação. `AdsLandingNavigation` fornece cabeçalho/rodapé reduzidos e `isAdsVisit`; o modo Ads é ativado explicitamente por `ads=1` ou pelos parâmetros de entrada Google Ads, mantendo o URL canónico sem parâmetros. `LocationServicePage` e `SofaVariantPage` conservam as páginas orgânicas e usam esta apresentação quando o serviço é limpeza de sofás. As âncoras são `resultados`, `precos`, `avaliacoes`, `duvidas`. `trackWhatsAppClick` envia também `whatsapp_click` ao GA4 e UTM ao registo interno; não representa uma conversa confirmada.

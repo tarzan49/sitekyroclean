@@ -167,26 +167,26 @@ function generateSofaContent(city: string, cityDesc: string): Omit<LocationServi
     problems: [
       { title: "Manchas difíceis no sofá", description: `Manchas de café, vinho, comida ou gordura que se acumulam no dia-a-dia ${prep} ${city}. Sem tratamento profissional, estas manchas penetram nas fibras e tornam-se permanentes.` },
       { title: "Ácaros e bactérias invisíveis", description: `O seu sofá pode conter milhões de ácaros e bactérias que causam alergias, irritações respiratórias e problemas de pele. A limpeza regular doméstica não é suficiente para eliminar estes microrganismos.` },
-      { title: "Odores desagradáveis", description: `Suor, animais de estimação, humidade e uso diário acumulam odores nos tecidos do sofá. A nossa desodorização profissional elimina completamente estes cheiros.` },
+      { title: "Odores desagradáveis", description: `Suor, animais de estimação, humidade e uso diário acumulam odores nos tecidos do sofá. Avaliamos a origem do odor para escolher o tratamento adequado; o resultado depende do tecido e da profundidade da contaminação.` },
       { title: "Desgaste prematuro do tecido", description: `Sem proteção adequada, os tecidos desgastam-se mais rapidamente. A impermeabilização previne danos e prolonga a vida útil do sofá.` },
     ],
     howItWorks: `O nosso processo de limpeza de sofás ${prep} ${city} é simples: 1) Inspeção do sofá e tipo de tecido, 2) Pulverização com produto específico por tecido, 3) Escovação para distribuir o produto nas fibras, 4) Extração profunda com equipamento a quente, 5) Secagem rápida: sofá pronto a usar em poucas horas. Todo o serviço é realizado no conforto da sua casa ${prep} ${city}.`,
     benefits: [
       "Tratamento adaptado a cada tecido: algodão, linho, veludo, microfibra, chenille ou couro",
       "Remoção de manchas de vinho, café, gordura e urina de animais de estimação",
-      "Eliminação de até 99% dos ácaros, bactérias e fungos do estofo",
+      "Extração de sujidade acumulada nas fibras do estofo",
       `Equipa móvel que se desloca a casas e empresas ${prep} ${city}, com deslocação calculada pela distância`,
       "Sofá seco e pronto a usar em poucas horas, sem químicos agressivos",
       `Conhecemos bem as necessidades de quem vive ${prep} ${city}, ${cityDesc}, e adaptamos o horário à sua disponibilidade`,
     ],
     localSection: `Servimos toda a área de ${city} e arredores, incluindo as principais freguesias e zonas residenciais. A nossa equipa desloca-se diretamente à sua casa ${prep} ${city} com taxa de deslocação de ${locationPrices[city] ?? 10}€. Atendemos clientes residenciais e comerciais: escritórios, restaurantes, hotéis e clínicas ${prep} ${city}.`,
     faqs: [
-      { question: `Quanto custa a limpeza de sofá ${prep} ${city}?`, answer: `A limpeza de sofá ${prep} ${city} começa a partir de 49€ para sofás de 1 lugar. O preço varia conforme o tamanho, tipo de tecido e estado de sujidade. Peça orçamento gratuito sem compromisso.` },
-      { question: `Quanto tempo demora a limpeza do sofá ${prep} ${city}?`, answer: `O serviço de limpeza de sofá ao domicílio ${prep} ${city} demora entre 1 a 3 horas, dependendo do tamanho e estado do sofá. O sofá fica pronto a usar em 4-6 horas após a limpeza.` },
+      { question: `Quanto custa a limpeza de sofá ${prep} ${city}?`, answer: `A limpeza de sofá ${prep} ${city} começa a partir de 49€ para sofás de 1 lugar. Os preços da tabela são por tamanho e a deslocação é cobrada à parte conforme a morada. Sofás de quatro ou mais lugares e tratamentos adicionais exigem orçamento, confirmado antes do serviço.` },
+      { question: `Quanto tempo demora a limpeza do sofá ${prep} ${city}?`, answer: `O serviço de limpeza de sofá ao domicílio ${prep} ${city} demora entre 1 a 3 horas, dependendo do tamanho e estado do sofá. A secagem demora normalmente 4 a 6 horas, podendo variar com o tecido, a humidade e a ventilação. Use apenas quando estiver completamente seco.` },
       { question: `A limpeza remove manchas antigas do sofá?`, answer: `Sim, o nosso processo de extração profunda remove a grande maioria das manchas, incluindo manchas antigas de café, vinho, gordura e líquidos. Manchas muito antigas podem necessitar de tratamento adicional.` },
-      { question: `A limpeza de sofá remove ácaros e bactérias?`, answer: `Sim. A nossa higienização profissional elimina até 99% dos ácaros e bactérias presentes no sofá, melhorando significativamente a qualidade do ar e reduzindo alergias.` },
+      { question: `A limpeza de sofá remove ácaros e bactérias?`, answer: `A extração remove sujidade e resíduos acumulados nas fibras. O resultado depende do material e do tratamento; não prometemos uma percentagem de eliminação de microrganismos nem melhoria de sintomas de alergia.` },
       { question: `Fazem limpeza de sofás ao domicílio ${prep} ${city}?`, answer: `Sim! A Kyro Clean Solutions faz limpeza de sofás ao domicílio ${prep} ${city} e toda a área envolvente. A nossa equipa desloca-se à sua casa com todo o equipamento necessário.` },
-      { question: `A limpeza pode danificar o tecido do sofá?`, answer: `Não. Utilizamos produtos certificados e técnicas adaptadas a cada tipo de tecido: algodão, linho, microfibra, veludo ou couro. Inspeccionamos sempre o tecido antes de iniciar.` },
+      { question: `A limpeza pode danificar o tecido do sofá?`, answer: `Inspecionamos o tecido antes de iniciar e escolhemos o processo adequado ao material. Se identificarmos limitações ou riscos, explicamos as opções antes de avançar.` },
     ],
   };
 }

@@ -101,10 +101,19 @@ export async function trackQuizEvent(params: {
 // source: 'floating' | 'hero' | 'contact' | 'obrigado' | etc.
 export function trackWhatsAppClick(source: string) {
   if (!IS_PRODUCTION) return;
+  // Microconversão: mede o clique, não a mensagem enviada nem um cliente.
+  window.gtag?.('event', 'whatsapp_click', {
+    event_category: 'engagement',
+    event_label: source,
+    page_path: window.location.pathname,
+  });
   insertEventKeepalive({
     session_id: SESSION_ID,
     step: 0,
     action: "whatsapp_click",
+    utm_source: getUTMParam("utm_source"),
+    utm_medium: getUTMParam("utm_medium"),
+    utm_campaign: getUTMParam("utm_campaign"),
     service: source,
     page_path: window.location.pathname,
     device: getDevice(),

@@ -1,3 +1,5 @@
+import SofaLeadActions from "@/components/SofaLeadActions";
+import { AdsLandingHeader, AdsLandingFooter, isAdsVisit } from "@/components/AdsLandingNavigation";
 ﻿// Handles all keyword variant pages:
 // /higienizacao-[service]-[city-or-parish]
 // /lavagem-[service]-[city-or-parish]
@@ -236,6 +238,8 @@ const SofaVariantPage = () => {
       </>
     );
   }
+  const isSofaCleaning = data.serviceKey === "sofa" && data.variantKey !== "impermeabilizacao";
+  const isPaidLanding = isSofaCleaning && isAdsVisit(location.search);
 
   const quizService = SERVICEKEY_TO_QUIZ[data.serviceKey];
 
@@ -256,30 +260,21 @@ const SofaVariantPage = () => {
   // — a duração real é a da impermeabilização nesse caso, não a da limpeza.
   const durationSlug = parsed?.variantKey === 'impermeabilizacao' ? 'impermeabilizacao' : SERVICEKEY_TO_SLUG[data.serviceKey];
   const serviceDuration = SERVICE_DURATION[durationSlug] ?? { value: "4-6h", label: "Pronto a usar" };
-  // Conteúdo revisto 2026-09-09 (pedido explícito): 1º bloco passou a mostrar
-  // a nota real do Google (antes tinha "5.0 ★" fixo, agora usa REVIEW_RATING/
-  // REVIEW_COUNT, a fonte única) em vez de duplicar os pills que já apareciam
-  // no hero — esses pills (TrustRatingBadge "mapsLinkClients") ficaram
-  // escondidos em mobile/tablet por serem redundantes com isto. "Zonas
-  // cobertas/próximas" saiu (ainda existe mais abaixo na página) e deu lugar
-  // a algo mais útil para quem decide: quanto tempo demora o serviço. O
-  // último bloco ("<10min") é uma exceção isolada e deliberada: em todo o
-  // resto do site o compromisso continua a ser 30min, não alterar noutro
-  // sítio sem pedido explícito.
+  // Resposta alinhada com o orçamento: menos de 30 minutos no horário de atendimento.
   const snapshotStats = [
     { value: `${REVIEW_RATING}★`, label: `+${REVIEW_COUNT} avaliações Google`, icon: GoogleG },
     (data.serviceKey === 'tapetes' || data.serviceKey === 'alcatifas')
       ? { value: "Á Medida", label: `Orçamento, ${prep} ${data.locationName.split(',')[0].trim()}`, icon: Euro }
       : { value: data.priceFrom, label: `Desde, ${prep} ${data.locationName.split(',')[0].trim()}`, icon: Euro },
     { value: serviceDuration.value, label: serviceDuration.label, icon: Timer },
-    { value: "<10min", label: "Respondemos em menos de 10 minutos", icon: Clock },
+    { value: "<30min", label: "Resposta durante o horário de atendimento", icon: Clock },
   ];
 
   return (
     <QuizLocationProvider value={data.locationName}>
     <QuizServiceProvider value={quizService}>
     <>
-      <Header />
+      {isPaidLanding ? <AdsLandingHeader /> : <Header />}
       <main>
 
         {/* ═══ HERO + LOCAL SNAPSHOT (fundo fotográfico contínuo) ═══ */}
@@ -290,9 +285,10 @@ const SofaVariantPage = () => {
           </div>
           <div className="absolute inset-0" style={{ background: "linear-gradient(to bottom, rgba(7,26,18,0.42) 0%, rgba(7,26,18,0.65) 40%, rgba(7,26,18,0.90) 78%, rgba(7,26,18,0.97) 100%)" }} />
 
-        <section className="relative pt-16 md:pt-24 lg:pt-28 pb-16 md:pb-24">
+        <section className="relative pt-6 md:pt-16 lg:pt-20 pb-8 md:pb-16">
           <div className="container mx-auto px-5 sm:px-6 lg:px-8 relative z-10">
-            <div className="max-w-6xl mx-auto grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+            <div className="max-w-6xl mx-auto grid lg:grid-cols-2 gap-4 lg:gap-12 items-center">
+                {!isPaidLanding && <>
               <div>
                 <nav className="flex items-center gap-1.5 text-xs text-white/50 mb-6 flex-wrap" aria-label="Breadcrumb">
                   <Link to="/" className="hover:text-white/80 transition-colors">Início</Link>
@@ -300,6 +296,7 @@ const SofaVariantPage = () => {
                   <Link to={data.canonical} className="hover:text-white/80 transition-colors">{data.locationName}</Link>
                   <span>/</span>
                   <span className="text-white/70">{variantLabel}</span>
+                </>}
                 </nav>
 
                 <div className="inline-flex items-start mb-3 lg:mb-5">
@@ -321,9 +318,10 @@ const SofaVariantPage = () => {
                   {data.h1}
                 </h1>
 
-                <p className="text-sm sm:text-base md:text-lg text-white/70 leading-relaxed mb-4 lg:mb-6 max-w-lg line-clamp-2">
-                  {data.intro.match(/^[^.?]*[.?]/)?.[0] ?? data.intro}
+                <p className="text-sm sm:text-base md:text-lg text-white/70 leading-relaxed mb-4 lg:mb-6 max-w-lg">
+                  {isSofaCleaning ? "Limpeza ao domicílio por extração profunda. Consulte os preços por tamanho e envie uma foto para avaliarmos as manchas." : (data.intro.match(/^[^.?]*[.?]/)?.[0] ?? data.intro)}
                 </p>
+                {isSofaCleaning ? <SofaLeadActions city={data.locationName} price={data.priceFrom} href={`${WHATSAPP_BASE}?text=${encodeURIComponent(buildVariantWaMessage(false, SERVICE_LABEL[data.serviceKey], VARIANT_LABEL[data.variantKey], data.locationName))}`} source={`variant_hero_${parsed.variantKey}_${parsed.serviceKey}`} /> : <>
 
                 <div className="lg:mb-6">
                   <TrustRatingBadge variant="mapsLinkClients" />
@@ -362,9 +360,10 @@ const SofaVariantPage = () => {
                 </a>
 
                 <p className="text-white/40 text-xs mt-4">{/^\d/.test(data.priceFrom) ? `Desde ${data.priceFrom} · ` : ''}Orçamento gratuito · Sem compromisso</p>
+                </>}
               </div>
 
-              <div className="mt-8 lg:mt-0">
+              <div id="resultados" className="mt-2 lg:mt-0 scroll-mt-6">
                 <div className="relative">
                   <div className="absolute -inset-4 blur-2xl opacity-20" style={{ background: "linear-gradient(135deg, #D4AF37, transparent)" }} />
                   {beforeAfterCategory ? (
@@ -390,10 +389,10 @@ const SofaVariantPage = () => {
         </div>
 
         {/* ═══ TABELA DE PREÇOS ═══ */}
-        <ServicePriceSection
+        <div id="precos" className="scroll-mt-6"><ServicePriceSection
           serviceSlug={parsed.variantKey === 'impermeabilizacao' ? 'impermeabilizacao' : SERVICEKEY_TO_SLUG[parsed.serviceKey]}
           initialLocation={data.locationName}
-        />
+        /></div>
 
         {/* ═══ PROBLEMAS ═══ */}
         <section className="py-12 md:py-16 bg-kyro-green">
@@ -406,7 +405,7 @@ const SofaVariantPage = () => {
                 <h2 className="font-playfair text-[1.85rem] sm:text-4xl md:text-[2.6rem] font-bold leading-[1.1] text-white">
                   {`Problemas que resolvemos ${prep}`}{" "}<em className="not-italic" style={{ color: "#D4AF37" }}>{data.locationName}</em>
                 </h2>
-                <p className="mt-4 text-[15px] leading-relaxed max-w-2xl text-white/50">Se reconhece algum destes cenários, temos a solução no próprio dia.</p>
+                <p className="mt-4 text-[15px] leading-relaxed max-w-2xl text-white/50">Se reconhece algum destes cenários, envie uma fotografia para avaliarmos o tratamento adequado.</p>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 md:gap-8">
                 {data.problems.map((problem, idx) => (
@@ -480,7 +479,7 @@ const SofaVariantPage = () => {
               <h2 className="font-playfair text-[1.85rem] sm:text-4xl md:text-[2.6rem] font-bold leading-[1.1] text-white">
                 A escolha certa para os seus{" "}<em className="not-italic" style={{ color: "#D4AF37" }}>estofos</em>
               </h2>
-              <p className="mt-4 text-[15px] leading-relaxed max-w-2xl text-white/50">Rapidez no orçamento, garantia total no resultado e mais de 1000 clientes satisfeitos confirmam-no.</p>
+              <p className="mt-4 text-[15px] leading-relaxed max-w-2xl text-white/50">Orçamento claro, cuidado com os tecidos e avaliações de clientes que já utilizaram o serviço.</p>
             </div>
 
             {/* 3 stats */}
@@ -488,7 +487,7 @@ const SofaVariantPage = () => {
               {[
                 { stat: "< 30 min", label: "Resposta ao orçamento" },
                 { stat: `${REVIEW_RATING} ★`, label: `+${REVIEW_COUNT} avaliações Google` },
-                { stat: "100%",     label: "Garantia de resultado" },
+                { stat: "Por foto", label: "Avaliação prévia das manchas" },
               ].map((item, i) => (
                 <div key={i} className="p-5 sm:p-6 md:p-7" style={{ background: "rgba(255,255,255,0.04)", borderTop: "2px solid rgba(212,175,55,0.55)" }}>
                   <p className="font-playfair font-bold text-xl sm:text-2xl mb-1" style={{ color: "#D4AF37" }}>{item.stat}</p>
@@ -497,10 +496,10 @@ const SofaVariantPage = () => {
               ))}
             </div>
 
-            <ServiceReviewsGrid
+            <div id="avaliacoes" className="scroll-mt-6"><ServiceReviewsGrid
               serviceSlug={parsed.variantKey === 'impermeabilizacao' ? 'impermeabilizacao' : SERVICEKEY_TO_SLUG[parsed.serviceKey]}
               seed={data.locationName}
-            />
+            /></div>
           </div>
         </section>
 
@@ -557,12 +556,13 @@ const SofaVariantPage = () => {
         </section>
 
         {/* ═══ FAQ ═══ */}
-        <ServiceFAQ
+        <div id="duvidas" className="scroll-mt-6"><ServiceFAQ
           faqs={data.faqs}
           heading={`Perguntas sobre ${variantLabel.toLowerCase()} de ${SERVICE_PLURAL[data.serviceKey]} ${prep} ${data.locationName}`}
           variant="dark"
-        />
+        /></div>
 
+        {isPaidLanding ? <section className="p-6 text-center bg-white"><h2 className="font-playfair text-xl mb-2">Serviço ao domicílio</h2><p>Atendimento em {data.locationName}. Envie a sua morada por WhatsApp para confirmar cobertura e deslocação.</p></section> : <>
         {/* ═══ PACKS ═══ */}
         <ServicePackBanner
           packSlugs={SERVICE_PACK_SLUGS[data.serviceKey] ?? ["pack-sala-completa"]}
@@ -659,13 +659,14 @@ const SofaVariantPage = () => {
                   </Link>
                 </div>
               </div>
+        </>}
 
             </div>
           </div>
         </section>
 
       </main>
-      <Footer />
+      {isPaidLanding ? <AdsLandingFooter /> : <Footer />}
     </>
     </QuizServiceProvider>
     </QuizLocationProvider>

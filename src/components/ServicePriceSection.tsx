@@ -13,7 +13,7 @@ import { useState } from "react";
 // (alcatifas, impermeabilização) foi removido por completo em 2026-09-09.
 
 const SERVICE_SUBTITLE: Record<string, string> = {
-  'limpeza-sofas':     'Preço fixo por tamanho e tratamento. Sem avaliação prévia, sem deslocações em vão.',
+  'limpeza-sofas':     'Preço por tamanho para a limpeza. Deslocação e tratamentos adicionais à parte. Valor confirmado antes do serviço.',
   'limpeza-colchoes':  'Preço fixo por tamanho de colchão. Orçamento confirmado antes de qualquer intervenção.',
   'limpeza-tapetes':   'Orçamento à medida de cada tapete. Sem surpresas, sem custos escondidos.',
   'limpeza-cadeiras':  'Preço por cadeira com desconto progressivo em lotes. Confirmado antes de avançar.',
