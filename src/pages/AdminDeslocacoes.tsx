@@ -1,10 +1,11 @@
 import { locationPrices } from "@/components/quiz/QuizTypes";
 import { cities } from "@/data/locationSeoData";
 
-type Area = "porto" | "lisboa" | "algarve";
+type Area = "porto" | "braga" | "lisboa" | "algarve";
 
 const REGIONS: { area: Area; label: string; color: string }[] = [
-  { area: "porto", label: "Porto / Norte", color: "border-emerald-500/30" },
+  { area: "porto", label: "Porto", color: "border-emerald-500/30" },
+  { area: "braga", label: "Braga / Minho", color: "border-amber-500/30" },
   { area: "lisboa", label: "Lisboa / Área Metropolitana", color: "border-blue-500/30" },
   { area: "algarve", label: "Algarve", color: "border-orange-500/30" },
 ];
@@ -24,7 +25,7 @@ export default function AdminDeslocacoes() {
       <div className="max-w-3xl mx-auto">
         <div className="mb-8">
           <h1 className="text-2xl font-bold text-white mb-1">Tabela de Preços de Deslocação</h1>
-          <p className="text-white/40 text-sm">Kyro Clean Solutions · Uso interno · 3 equipas locais, 3 sistemas de zonas independentes</p>
+          <p className="text-white/40 text-sm">Kyro Clean Solutions · Uso interno · 4 equipas locais, 4 sistemas de zonas independentes</p>
         </div>
 
         <div className="bg-white/[0.03] border border-white/10 rounded-xl p-4 mb-6 text-sm text-white/50">

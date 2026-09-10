@@ -11,9 +11,11 @@ describe('travel fees shared by quote and SEO pages', () => {
   });
   it('uses Braga as a local base and charges Algarve extremities separately', () => {
     expect(locationPrices.Braga).toBe(10);
-    expect(locationPrices.Guimarães).toBe(10);
+    expect(locationPrices.Guimarães).toBe(20);
+    expect(locationPrices.Barcelos).toBe(20);
+    expect(locationPrices['Póvoa de Lanhoso']).toBe(15);
     expect(locationPrices.Fafe).toBeGreaterThan(locationPrices.Braga);
-    expect(locationPrices['Viana do Castelo']).toBeGreaterThan(locationPrices.Fafe);
+    expect(locationPrices['Viana do Castelo']).toBe(20);
     for (const city of ['Vila Real de Santo António', 'Castro Marim', 'Monchique', 'Aljezur', 'Vila do Bispo', 'Alcoutim']) expect(locationPrices[city]).toBe(25);
     expect(locationPrices.Portimão).toBe(15);
     expect(locationPrices.Lagos).toBe(15);

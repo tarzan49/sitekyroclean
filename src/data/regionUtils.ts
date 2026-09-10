@@ -22,6 +22,7 @@ const NORTE_NON_AMP = new Set(["braga", "guimaraes"]);
 export function getAdminRegion(citySlug: string): AdminRegion | null {
   const city = cities.find(c => c.slug === citySlug);
   if (!city) return null;
+  if (city.area === "braga") return "norte";
   if (city.area === "porto") return NORTE_NON_AMP.has(citySlug) ? "norte" : "amp";
   return city.area as "lisboa" | "algarve";
 }

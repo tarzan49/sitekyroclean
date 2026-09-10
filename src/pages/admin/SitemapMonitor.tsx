@@ -1,3 +1,4 @@
+import { getTreatmentRoutes, getExpansionRoutes } from '../../data/treatmentSeoData';
 import { useState, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { Map, AlertTriangle, Globe, FileText, Shield, Zap, Star, Target, ChevronDown, ChevronRight, ExternalLink } from "lucide-react";
@@ -21,6 +22,8 @@ import { getAdminRegion, getRegionForLocationPart, ADMIN_REGIONS, ADMIN_REGION_L
 // (sitemap-marcas.xml) mas aparecem como cartões separados aqui — por isso
 // têm um `id` próprio distinto de `file` (usado só para o link/preview do XML).
 const SITEMAPS = [
+  { id: "sitemap-tratamentos.xml", file: "sitemap-tratamentos.xml", name: "Tratamentos", description: "Anti-ácaros e desbacterização por cidade", icon: Shield },
+  { id: "sitemap-centro.xml", file: "sitemap-centro.xml", name: "Aveiro e Coimbra", description: "Cobertura sob consulta", icon: Map },
   { id: "sitemap.xml",              file: "sitemap.xml",              name: "Sitemap Index", description: "Índice principal (12 sub-sitemaps)", icon: Globe },
   { id: "sitemap-core.xml",         file: "sitemap-core.xml",         name: "Core (Serviços + Páginas principais)", description: "6 serviços + páginas institucionais", icon: Zap },
   { id: "sitemap-location.xml",     file: "sitemap-location.xml",     name: "Localidade × Serviço", description: "Concelhos × 6 serviços: Porto/Norte, Lisboa/AML, Algarve", icon: Map },
@@ -40,6 +43,8 @@ const SITEMAPS = [
 
 function getSitemapUrls(id: string): string[] {
   switch (id) {
+    case "sitemap-tratamentos.xml": return getTreatmentRoutes().map(r => r.path);
+    case "sitemap-centro.xml": return getExpansionRoutes().map(r => r.path);
     case "sitemap-core.xml":
       return services.map(s => s.baseRoute);
     case "sitemap-location.xml":

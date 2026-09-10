@@ -1,3 +1,7 @@
+## Correções comerciais e packs personalizáveis (10/09/2026)
+
+Regras atuais: `CORRECOES-COMERCIAIS-2026-09-10.md`. `src/constants/travel.ts` é a fonte única de deslocações, reexportada por QuizTypes e importada sem alias pelos geradores. `commercialPolicy.ts` centraliza as mensagens comuns. `CustomPackPage` serve `/packs` e as antigas rotas de PackComboPage, com cálculo puro em `customPack.ts`; `packComboData.ts` contém apenas combinações iniciais e rotas, sem segunda tabela de preços. `treatmentSeoData.ts` fornece conteúdo/rotas partilhados pelo React, prerender, sitemap e monitor para anti-ácaros, desbacterização e expansão Aveiro/Coimbra. `TreatmentPage` apresenta essas páginas. Nenhuma equipa permanente nova é anunciada no Centro. `locationSeoData.cities.area` inclui `braga` independente de `porto`. O conteúdo inicial de marcas e problemas passa a incluir processo, benefícios e FAQs.
+
 ﻿# Kyro Clean Solutions — Full Project Context
 
 > O `CLAUDE.md` na raiz carrega automaticamente em qualquer sessão do Claude Code aberta nesta pasta (regras fixas e factos de negócio atuais). Este ficheiro é a referência de arquitetura mais profunda — lê-o quando precisares de detalhe sobre rotas, fluxo do quiz, design tokens ou tabelas de preços.
@@ -936,7 +940,7 @@ Depois de fechar os 17 WARNING, seguiram-se vários pedidos rápidos do user, to
 **1. Remoção de páginas órfãs `/nosso-processo` e `/testemunhos`** (commit `59f1684`): confirmado que nenhum link do site (Header, Footer) apontava para estas rotas — o "TESTEMUNHOS" do menu já faz scroll para a secção de testemunhos da homepage (`TestimonialsV1` dentro de `IndexV1.tsx`), não para a página standalone. Apagados os 2 ficheiros de página, as 2 rotas em `App.tsx`, entradas em `generate-sitemap.ts`, `prerender.ts` e `PageHead.tsx`.
 
 **2. Redesign das ~1000 páginas de problema** (`ProblemPage.tsx` + `ProblemCityPage.tsx`, commits `95982a6`, `6f7b87c`, `7ccbe9f`):
-- Hero ganhou faixa de 4 estatísticas (`ServiceSnapshotStats`, mesmo padrão das páginas de variante-keyword), mobile-first, específicas por categoria de problema (9 categorias em `CATEGORY_STATS` novo em `problemTipsData.ts`) — reutilizam sempre valores já reais do site (99% ácaros, 30min resposta, 2-4h secagem, 5.0★, +1000 clientes, 60+ avaliações), nunca inventados.
+- Hero ganhou faixa de 4 estatísticas (`ServiceSnapshotStats`, mesmo padrão das páginas de variante-keyword), mobile-first, específicas por categoria de problema (9 categorias em `CATEGORY_STATS` novo em `problemTipsData.ts`) — reutilizam sempre valores já reais do site (resposta em menos de 10 minutos, secagem média de 3–6h, avaliação e contagens das constantes comerciais; sem percentagens de eliminação de ácaros), nunca inventados.
 - Secção "O problema, a solução": cartão problema com contorno vermelho nítido (3px sólido, não inset shadow subtil) + ícone XCircle + título "Porque acontece" também vermelho; cartão solução com contorno verde + CheckCircle2 + "Como resolvemos" verde. Overlay de texto passou de `min-height` para `height` fixa para os dois títulos ficarem sempre nivelados independentemente do comprimento do texto de cada lado.
 - `ProblemPage.tsx`: secção "Quando chamar um profissional" (lista simples sem peso visual, o user achou "super barata") fundida com "Como tratamos este problema" num único bloco verde; checklist virou grid de cartões hairline com ícone em círculo.
 - Sequência de cores do `ProblemPage.tsx` trocada várias vezes a pedido do user: versão final é Hero(escuro)→Problema/Solução(branco)→Quando+Processo(verde)→Benefícios(branco)→Dica(verde)→Galeria(branco)→FAQ(verde)→Avaliações(branco)→Rede Interna(branco). **Nota**: inicialmente fiz Galeria=verde/FAQ=branco (a lógica que eu achava certa), o user corrigiu com força ("tas a brincar com a puta da minha cara?") — a ordem certa é Galeria=branco, FAQ=verde. Fiquei mais cauteloso a confirmar antes de assumir isto está "certo" só porque bate com o padrão geral.
@@ -1075,3 +1079,34 @@ Atualização do teste de ofertas: desconto de14€ por unidade em todos os tama
 
 ### Secção de cobertura nas landing pages (2026-09-10)
 A secção completa de serviços e zonas de atendimento permanece visível também em modo Ads, por pedido do dono. Não a substituir pelo resumo «Serviço ao domicílio».
+
+## Galerias de antes e depois (2026-09-10)
+
+`ServiceResultsGallery` centraliza comparação, miniaturas numa faixa horizontal, anterior/seguinte e reprodução opcional (parada por defeito). A miniatura selecionada mantém-se visível sem deslocar a página; a contenção de largura impede que a faixa alargue as grelhas dos heroes em mobile. Usa toda a categoria de `BEFORE_AFTER_POOL`, com cadeiras em 9:16, alcatifas a reutilizar tapetes e identificação de fotos avulsas/efeitos ilustrativos.
+
+`HeroBeforeAfterPool` reutiliza esta galeria nos heroes de cidades, freguesias, variantes, marcas, preços, materiais e problemas. `ServiceAutoCarousel` recebe `category` em todos os seus consumidores atuais e mantém as duas imagens de trabalho/pormenor: ao lado em desktop, por baixo em mobile. A comparação da secção tem largura máxima de 640px. `/antes-depois-limpeza` permite escolher entre os seis serviços e consultar a pool completa. Consumidores futuros sem `category` conservam o fallback estático.
+
+
+## Teste de pack dentro do quiz (2026-09-10)
+
+Apenas em desenvolvimento, `?teste=quiz-pack` mantém o fluxo real do `QuizForm` e substitui o combo de extras de sofá por `QuizSofaPackTest`. O extra escreve em `upsellItems` e avança para o contacto real. `useQuizPricing` recebe um parâmetro opcional de teste (default false, também protegido por DEV) para aplicar 10% aos serviços quando é acrescentado um artigo de pelo menos 49€, sem o limiar de 149€, mantendo cêntimos. O botão final do teste não submete dados; apenas confirma a simulação. Produção conserva as regras existentes. O protótipo anterior `?teste=pack` continua separado no widget.
+
+
+## Guias e conselhos nas páginas de serviço (2026-09-10)
+
+`ServiceExpertTips` usa cartões horizontais compactos com fotografia do artigo, título completo e ligação no cartão inteiro. Em mobile, oculta os resumos; em desktop, mostra duas linhas e distribui quatro guias em 2x2 ou três numa fila. A ligação ao blog permite explorar os restantes guias. `src/constants/blogImages.ts` centraliza as imagens antes duplicadas em `Blog.tsx`/`BlogPost.tsx`, reutilizadas também nos cartões sem carregar o texto integral dos artigos nas páginas de serviço.
+
+
+Atualização do teste local (2026-09-10): `?teste=quiz-pack` agora demonstra colchão casal a +55€, sem acumular desconto de 10%. Compara com limpeza individual (69€ da tabela) + deslocação da localidade, explicitamente uma visita separada. Lisboa: 79€ separado vs +55€ na visita existente, poupança24€, sofá79€ + deslocação10€ + extra55€ =144€. Substitui a proposta anterior de143,20€ neste modo; produção inalterada.
+
+
+## Auditoria Formspree e WhatsApp (2026-09-10)
+
+`submissionService.buildReceiptLines` é a fonte partilhada do detalhe, resumo pré-envio e recibo; `formatQuotePrice` distingue subtotal conhecido de serviços sob orçamento. WhatsApp reutiliza a mensagem do Formspree, acrescentando nome, telefone e a mesma referência. O Formspree recebe também `booking_id`. O recibo só é persistido após sucesso de pelo menos um canal (ou simulação local). Erros devolvidos pelo Supabase são tratados como falha.
+
+`carpetKind` distingue alcatifa de tapete nas entradas do widget e ServiceHero. As medidas individuais seguem em todos os resumos. `carpetAllItemsValid` bloqueia peças incompletas; `carpetHasValidItems` continua a identificar qualquer peça válida para sinalizar orçamento. Extras sobrevivem ao regresso a etapas anteriores; tratamentos importados não são descartados nem convertidos em limpeza. O desconto do quiz/widget exige dois artigos tabelados, acima de149€, de acordo com as regras comerciais prioritárias.
+
+Cobertura e limites: `AUDITORIA-FORMSPREE-WHATSAPP-2026-09-10.md`. Os testes de serviços intercetam a rede; não provam receção na conta Formspree nem entrega de email.
+
+## Publicação autorizada das ofertas (2026-09-10)
+O dono autorizou publicar a versão visual e as ofertas no quiz real: colchões extra45/55/65€, cadeiras4paga3, tapetes5m²paga4 sob orçamento. Ofertas não acumulam10%. O bloqueio de envio aplica-se apenas à simulação DEV explícita; produção envia os pedidos normalmente. Substitui as notas históricas de teste apenas.

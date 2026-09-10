@@ -1,3 +1,4 @@
+import { carpetAllItemsValid } from '@/components/quiz/quizHelpers';
 import { PRICE_TABLE, PRICE_TABLE_QUIZ_CONFIG, type PriceRowQuizConfig } from "@/data/locationPriceTestimonialsData";
 import type { UpsellItemConfig, CarpetItem } from "@/components/quiz/QuizTypes";
 import { sofaPrices, mattressPrices } from "@/components/quiz/QuizTypes";
@@ -141,6 +142,7 @@ export const PACK_DISCOUNT_MIN_TOTAL = PACK_DISCOUNT_MIN_SERVICE + PACK_DISCOUNT
 
 export interface WidgetArticleInfo {
   articleTotal: number;
+  articleCount?: number;
   minQualifyingArticle: number | null;
 }
 
@@ -155,6 +157,7 @@ export function calcWidgetArticles(
   const configs = PRICE_TABLE_QUIZ_CONFIG[serviceSlug] ?? [];
   const isWaterproof = serviceSlug === 'impermeabilizacao';
   let articleTotal = 0;
+  let articleCount = 0;
   let minQualifyingArticle: number | null = null;
   const noteCandidate = (p: number) => {
     if (p >= PACK_DISCOUNT_MIN_UPSELL_ITEM && (minQualifyingArticle === null || p < minQualifyingArticle)) minQualifyingArticle = p;
@@ -174,7 +177,7 @@ export function calcWidgetArticles(
         if (addonRows.has(i)) total += calcChairAddonWaterproofTotal(qty, addonTier) ?? 0;
         if (antiAcarosRows.has(i)) total += calcChairAntiAcarosTotal(qty) ?? 0;
       }
-      if (total > 0) { articleTotal += total; noteCandidate(total); }
+      if (total > 0) { articleCount += 1; articleTotal += total; noteCandidate(total); }
       return;
     }
     if (cfg.service === 'carpet') return; // sempre sob orçamento (tapete e alcatifa) — nunca conta para o Pack Família
@@ -184,12 +187,13 @@ export function calcWidgetArticles(
     if (addonRows.has(i)) unitPrice += calcRowAddonDelta(cfg, addonTier) ?? 0;
     if (antiAcarosRows.has(i)) unitPrice += calcSofaAntiAcarosDelta(cfg) ?? 0;
     if (unitPrice > 0) {
+      articleCount += qty;
       articleTotal += unitPrice * qty;
       noteCandidate(unitPrice);
     }
   });
 
-  return { articleTotal, minQualifyingArticle };
+  return { articleTotal, articleCount, minQualifyingArticle };
 }
 
 export interface WidgetPricing {
@@ -203,7 +207,7 @@ export interface WidgetPricing {
 
 export function calcWidgetPricing(serviceTotal: number, travelFee: number, articles: WidgetArticleInfo): WidgetPricing {
   const grandTotal = serviceTotal + travelFee;
-  const discountActive = articles.minQualifyingArticle !== null
+  const discountActive = (articles.articleCount ?? 0) >= 2 && articles.minQualifyingArticle !== null
     && articles.articleTotal > PACK_DISCOUNT_MIN_TOTAL;
   const discountedTotal = discountActive ? Math.round(serviceTotal * 0.9) + travelFee : grandTotal;
   return { serviceTotal, travelFee, grandTotal, discountActive, discountedTotal, remaining: 0 };
@@ -264,7 +268,8 @@ export function buildWidgetQuizConfig(
     if (chairTotal > 0) upsells.push({
       id: 'chairs', chairQty: String(chairTotal), qty: chairTotal,
       price: calcChairBracket(chairTotal, isWaterproof, addonTier) ?? 0,
-      label: `${chairTotal} cadeira${chairTotal > 1 ? 's' : ''}`,
+      label: `${chairTotal} cadeira${chairTotal > 1 ? 's' : ''}${isWaterproof ? ` (Impermeabilização ${addonTier === 'premium' ? 'Premium' : 'Essencial'})` : ''}`,
+      waterproofingTier: addonTier,
       waterproof: isWaterproof, waterproofPrice: 0,
     });
     if (antiAcarosQty > 0) upsells.push({
@@ -302,13 +307,8 @@ export function buildWidgetQuizConfig(
   // "Continuar" já levar as peças que a pessoa mediu aqui em vez de abrir o
   // passo do quiz vazio).
   const carpetItems = carpetRowIndex >= 0 ? (carpetItemsByRow[carpetRowIndex] ?? []) : [];
-  const validCarpetItems = carpetItems.filter(it => {
-    const l = parseFloat((it.largura + '').replace(',', '.'));
-    const c = parseFloat((it.comprimento + '').replace(',', '.'));
-    return !isNaN(l) && !isNaN(c) && l > 0 && c > 0;
-  });
-  if (carpetCfg && validCarpetItems.length > 0) {
-    return { ...(carpetCfg as PriceRowQuizConfig), carpetArea: undefined, carpetItems: validCarpetItems };
+  if (carpetCfg && carpetAllItemsValid(carpetItems)) {
+    return { ...(carpetCfg as PriceRowQuizConfig), carpetArea: undefined, carpetItems };
   }
 
   return null;

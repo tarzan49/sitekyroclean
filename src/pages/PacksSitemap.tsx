@@ -3,7 +3,7 @@ import DirectoryGroup from "@/components/DirectoryGroup";
 import { ArrowRight, Map } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { packs, packCities, getFromPrice } from "@/data/packComboData";
+import { packs, packCities } from "@/data/packComboData";
 import { SITE_URL } from "@/constants/business";
 
 const PACK_COLORS: Record<string, string> = {
@@ -67,7 +67,7 @@ const PacksSitemap = () => {
                   Guia Completo de Packs
                 </h1>
                 <p className="text-white/60 text-base max-w-xl">
-                  Todos os packs Kyro Clean disponíveis por cidade. Clique no pack que pretende para configurar e reservar via WhatsApp.
+                  Todos os packs Kyro Clean disponíveis por cidade. Clique no pack que pretende para configurar e pedir confirmação via WhatsApp.
                 </p>
               </div>
             </div>
@@ -78,9 +78,8 @@ const PacksSitemap = () => {
         <section className="py-12 md:py-16 bg-[#FDFDF9]">
           <div className="max-w-5xl mx-auto px-5 sm:px-6 lg:px-8 space-y-12">
             {packs.map(pack => {
-              const fromPrice = getFromPrice(pack);
               const badgeClass = PACK_COLORS[pack.id] ?? 'bg-gray-50 border-gray-200 text-gray-600';
-              const savingsLabel = pack.id === 'sofa-impermeabilizacao' ? 'Preço VIP' : 'Poupe 10%';
+              const savingsLabel = 'Personalizável';
 
               return (
                 <div key={pack.id}>
@@ -92,15 +91,15 @@ const PacksSitemap = () => {
                           {savingsLabel}
                         </span>
                         <span className="text-xs text-[#111111]/40">
-                          {pack.selectors.length === 1 ? '1 opção configurável' : `${pack.selectors.length} opções configuráveis`}
+                          Artigos e tratamentos à escolha
                         </span>
                       </div>
                       <h2 className="font-playfair text-xl font-bold text-[#111111]">{pack.name}</h2>
                       <p className="text-sm text-[#111111]/50 mt-0.5">{pack.tagline}</p>
                     </div>
                     <div className="text-right">
-                      <p className="text-xs text-[#111111]/35 mb-0.5">a partir de</p>
-                      <p className="font-playfair text-2xl font-bold" style={{ color: "#D4AF37" }}>{fromPrice}€</p>
+                      <p className="text-xs text-[#111111]/35 mb-0.5">à sua medida</p>
+                      <p className="font-playfair text-2xl font-bold" style={{ color: "#D4AF37" }}>Personalizável</p>
                     </div>
                   </div>
 
@@ -114,7 +113,7 @@ const PacksSitemap = () => {
                       >
                         <div>
                           <p className="text-sm font-semibold text-[#111111] group-hover:text-[#0d3c47]">{city.name}</p>
-                          <p className="text-[10px] text-[#111111]/35">desde {fromPrice}€</p>
+                          <p className="text-[10px] text-[#111111]/35">Configurar artigos</p>
                         </div>
                         <ArrowRight className="w-3.5 h-3.5 text-[#111111]/25 group-hover:text-gold group-hover:translate-x-0.5 transition-all flex-shrink-0" />
                       </Link>
@@ -146,7 +145,6 @@ const PacksSitemap = () => {
                 </thead>
                 <tbody>
                   {packs.map((pack, i) => {
-                    const fromPrice = getFromPrice(pack);
                     return (
                       <tr key={pack.id} className={i < packs.length - 1 ? "border-b border-[#E8E4DE]" : ""}>
                         <td className="px-5 py-4">
@@ -154,19 +152,19 @@ const PacksSitemap = () => {
                           <p className="text-[11px] text-[#111111]/40 mt-0.5 max-w-[200px]">{pack.tagline.split(':')[0]}</p>
                         </td>
                         <td className="px-5 py-4 text-[#111111]/60">
-                          {pack.selectors.map(s => s.label).join(' + ')}
+                          Escolha os seus artigos
                         </td>
                         <td className="px-5 py-4">
                           <span className="text-xs font-bold text-green-700 bg-green-50 border border-green-200 px-2 py-0.5 rounded-full">
-                            {pack.id === 'sofa-impermeabilizacao' ? 'VIP' : '10%'}
+                            Conforme configuração
                           </span>
                         </td>
                         <td className="px-5 py-4 font-bold tabular-nums" style={{ color: "#D4AF37" }}>
-                          {fromPrice}€
+                          Personalizável
                         </td>
                         <td className="px-5 py-4">
                           <Link
-                            to={`/${pack.slug}-${packCities[0].slug}`}
+                            to="/packs"
                             className="inline-flex items-center gap-1 text-xs font-semibold text-gold hover:underline"
                           >
                             Ver pack <ArrowRight className="w-3 h-3" />
@@ -185,7 +183,7 @@ const PacksSitemap = () => {
         <section className="py-8 bg-[#FDFDF9] border-t border-[#E8E4DE]">
           <div className="max-w-5xl mx-auto px-5 sm:px-6 lg:px-8 flex items-center justify-between flex-wrap gap-4">
             <p className="text-sm text-[#111111]/50">
-              {packs.length * packCities.length} combinações disponíveis · Reserva via WhatsApp · Resposta em menos de 10 min
+              {packs.length * packCities.length} combinações disponíveis · Pedido por WhatsApp · Resposta em menos de 10 min
             </p>
             <Link
               to="/packs"

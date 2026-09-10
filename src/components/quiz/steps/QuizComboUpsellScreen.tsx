@@ -7,10 +7,10 @@ import { cn } from '@/lib/utils';
 import { sofaPrices, mattressPrices } from '@/components/quiz/QuizTypes';
 import type { UpsellItemConfig, CarpetItem } from '@/components/quiz/QuizTypes';
 import {
-  calcChairClean,
+  calcChairWaterproof, calcChairWaterproofPremium, calcChairClean,
   carpetAddItem, carpetRemoveItem, carpetUpdateItem, carpetItemArea, carpetTotalArea,
 } from '@/components/quiz/quizHelpers';
-import { PACK_DISCOUNT_MIN_SERVICE, PACK_DISCOUNT_MIN_UPSELL_ITEM } from '@/lib/priceWidgetCalc';
+import { PACK_DISCOUNT_MIN_UPSELL_ITEM } from '@/lib/priceWidgetCalc';
 
 interface QuizComboUpsellScreenProps {
   offerPreview?: boolean;
@@ -49,6 +49,8 @@ function fmt(n: number): string {
 const QuizComboUpsellScreen = ({ offerPreview = false, travelFee = 10, primaryService, upsellItems, setUpsellItems, onContinue, onBack, totalPrice, packDiscountActive, packDiscountedPrice }: QuizComboUpsellScreenProps) => {
   const mattressUnitPrice = (opt: typeof mattressPrices[number]) => offerPreview && typeof opt.cleaningPrice === 'number' ? opt.cleaningPrice - 14 : opt.cleaningPrice;
   const casalSeparate = Number(mattressPrices.find(opt => opt.id === 'casal')!.cleaningPrice) + travelFee;
+  const [initialChairs] = useState(() => upsellItems.find(i => i.id === 'chairs'));
+  const [preservedTreatments] = useState(() => upsellItems.filter(i => i.id.endsWith('-anti-acaros')));
   const [view, setView] = useState<View>('summary');
   // This screen remounts when returning from contact. Restore the selection
   // before the synchronization effect can overwrite the parent's items.
@@ -80,13 +82,14 @@ const QuizComboUpsellScreen = ({ offerPreview = false, travelFee = 10, primarySe
   // dono): quem queria impermeabilização já teve essa opção como serviço
   // principal lá atrás — oferecer proteção outra vez aqui, para um item
   // novo, só complicava um ecrã que é suposto ser rápido e leve.
-  const chairsRegularPrice = calcChairClean(chairsQty);
-  const chairsFree = offerPreview ? Math.floor(chairsQty / 4) : 0;
+  const chairsRegularPrice = initialChairs?.waterproof ? (initialChairs.waterproofingTier === 'premium' ? calcChairWaterproofPremium(chairsQty) : calcChairWaterproof(chairsQty)) : calcChairClean(chairsQty);
+  const chairsFree = offerPreview && !initialChairs?.waterproof ? Math.floor(chairsQty / 4) : 0;
   const chairsCleanPrice = chairsRegularPrice === null ? null : chairsQty > 0 ? Math.round(chairsRegularPrice * (chairsQty - chairsFree) / chairsQty * 100) / 100 : 0;
 
   const mattressQtyTotal = Object.values(mattressQty).reduce((a, b) => a + b, 0);
   const sofaQtyTotal = Object.values(sofaQty).reduce((a, b) => a + b, 0);
   const carpetTotalAreaValue = carpetTotalArea(carpetItems);
+  const incompleteCarpets = carpetItems.some(item => item.largura || item.comprimento) && carpetItems.some(item => carpetItemArea(item) === null);
   const carpetValidCount = carpetItems.filter(it => carpetItemArea(it) !== null).length;
   // Na escolha de extras mostramos o próximo passo, sem antecipar preços.
   const mattressSummary = mattressPrices
@@ -110,7 +113,7 @@ const QuizComboUpsellScreen = ({ offerPreview = false, travelFee = 10, primarySe
   // não só depois de "Confirmar"/"Finalizar Orçamento" (bug real: a pessoa
   // ficava sem feedback nenhum de preço enquanto ajustava quantidades).
   useEffect(() => {
-    const items: UpsellItemConfig[] = [];
+    const items: UpsellItemConfig[] = [...preservedTreatments];
     mattressPrices.forEach(opt => {
       const q = mattressQty[opt.id] ?? 0;
       if (q > 0 && typeof opt.cleaningPrice === 'number') {
@@ -145,11 +148,12 @@ const QuizComboUpsellScreen = ({ offerPreview = false, travelFee = 10, primarySe
     });
     if (chairsQty > 0) {
       items.push({
+        ...initialChairs,
         id: 'chairs',
         chairQty: String(chairsQty),
         qty: chairsQty,
         price: chairsCleanPrice ?? 0,
-        label: `${chairsQty} Cadeira${chairsQty > 1 ? 's' : ''}${offerPreview ? ` (paga ${chairsQty - chairsFree})` : ''}`,
+        label: `${chairsQty} Cadeira${chairsQty > 1 ? 's' : ''}${initialChairs?.waterproof ? ` (Impermeabilização ${initialChairs.waterproofingTier === 'premium' ? 'Premium' : 'Essencial'})` : offerPreview ? ` (paga ${chairsQty - chairsFree})` : ''}`,
       });
     }
     if (carpetValidCount > 0) {
@@ -326,6 +330,7 @@ const QuizComboUpsellScreen = ({ offerPreview = false, travelFee = 10, primarySe
           </div>
         )}
 
+        {view === 'carpet' && incompleteCarpets && <p className="text-xs text-amber-200">Preencha as duas medidas de cada tapete ou remova a peça incompleta.</p>}
         <div className="flex items-center gap-3 w-full max-w-xs mt-1">
           <button
             onClick={() => setView('summary')}
@@ -334,8 +339,9 @@ const QuizComboUpsellScreen = ({ offerPreview = false, travelFee = 10, primarySe
             <ChevronLeft className="w-4 h-4 mr-1" /> Voltar
           </button>
           <button
+            disabled={view === 'carpet' && incompleteCarpets}
             onClick={() => setView('summary')}
-            className="flex-1 h-14 bg-gradient-to-r from-gold to-[#d4c57b] hover:from-[#d4c57b] hover:to-gold text-[#12121e] font-black text-sm tracking-wider uppercase touch-manipulation active:scale-[0.98] rounded-sm shadow-[0_0_32px_rgba(212,175,55,0.30)]"
+            className="disabled:opacity-40 flex-1 h-14 bg-gradient-to-r from-gold to-[#d4c57b] hover:from-[#d4c57b] hover:to-gold text-[#12121e] font-black text-sm tracking-wider uppercase touch-manipulation active:scale-[0.98] rounded-sm shadow-[0_0_32px_rgba(212,175,55,0.30)]"
           >
             Confirmar
           </button>
@@ -360,18 +366,18 @@ const QuizComboUpsellScreen = ({ offerPreview = false, travelFee = 10, primarySe
         {offerPreview || packDiscountActive ? 'APROVEITE A MESMA VISITA' : 'UM BÓNUS PARA SI'}
       </p>
       <h2 className="font-playfair text-2xl sm:text-3xl font-bold text-white text-center w-full">
-        {offerPreview || packDiscountActive ? 'Quer limpar mais alguma coisa?' : 'Poupe 10% no pedido todo'}
+        {offerPreview || packDiscountActive ? 'Quer limpar mais alguma coisa?' : 'Poupe 10% nos serviços'}
       </h2>
       <p className="text-xs text-white/55 text-center max-w-xs leading-relaxed -mt-1">
         {offerPreview ? <>Condições especiais na mesma visita.</> : packDiscountActive ? (
           <>
-            Já tem 10% de desconto no pedido.<br />
-            Adicione outro serviço com o mesmo desconto.
+            Já tem 10% de desconto nos serviços tabelados.<br />
+            Os extras tabelados também beneficiam. Deslocação excluída.
           </>
         ) : (
           <>
-            Se juntar mais um serviço, o desconto aplica-se a tudo, não só ao extra.{' '}
-            <span className="text-white/25 text-[10px]">Válido a partir de {PACK_DISCOUNT_MIN_SERVICE}€, extra de {PACK_DISCOUNT_MIN_UPSELL_ITEM}€+.</span>
+            Junte pelo menos dois artigos: 10% nos serviços tabelados acima de 149€. Deslocação excluída.{' '}
+            <span className="text-white/25 text-[10px]">Válido com um artigo de {PACK_DISCOUNT_MIN_UPSELL_ITEM}€ ou mais.</span>
           </>
         )}
       </p>
@@ -422,6 +428,7 @@ const QuizComboUpsellScreen = ({ offerPreview = false, travelFee = 10, primarySe
           <ChevronLeft className="w-4 h-4 mr-1" /> Voltar
         </button>
         <button
+          disabled={incompleteCarpets}
           onClick={onContinue}
           className="flex-1 h-14 bg-gradient-to-r from-gold to-[#d4c57b] hover:from-[#d4c57b] hover:to-gold text-[#12121e] font-black text-sm tracking-wider uppercase touch-manipulation active:scale-[0.98] rounded-sm shadow-[0_0_32px_rgba(212,175,55,0.30)]"
         >

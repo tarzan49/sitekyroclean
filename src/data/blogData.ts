@@ -38,7 +38,7 @@ const posts: BlogPost[] = [
     sections: [
       {
         heading: "Preços médios em Portugal (2025)",
-        body: "Em Portugal, o preço médio de limpeza profissional de sofá começa nos 49€. Um sofá de 2 lugares custa 69€ e um sofá de 3 lugares 79€. Chaise longue tem um acréscimo de 10€. Sofás em L ou modulares são orçamentados conforme a dimensão.\n\nEstes valores incluem pré-tratamento de manchas, limpeza por extração a vapor e secagem rápida; a deslocação é cobrada à parte, consoante a localização. O sofá fica utilizável em 2 a 4 horas.",
+        body: "Em Portugal, o preço médio de limpeza profissional de sofá começa nos 49€. Um sofá de 2 lugares custa 69€ e um sofá de 3 lugares 79€. Chaise longue tem um acréscimo de 10€. Sofás em L ou modulares são orçamentados conforme a dimensão.\n\nEstes valores incluem pré-tratamento de manchas, limpeza por extração a vapor e secagem rápida; a deslocação é cobrada à parte, consoante a localização. O sofá fica utilizável em 3 a 6 horas.",
         tip: "Peça sempre um orçamento com visita ou foto antes de confirmar. Desconfie de preços abaixo de 25€, geralmente não incluem limpeza profunda por extração.",
       },
       {
@@ -47,7 +47,7 @@ const posts: BlogPost[] = [
       },
       {
         heading: "Limpeza DIY vs. limpeza profissional: vale a pena?",
-        body: "Muitos clientes tentam primeiro limpar o sofá em casa antes de nos contactar. O resultado habitual: o tecido fica molhado durante horas, podem surgir manchas de água ou o odor não desaparece completamente.\n\nIsso acontece porque os equipamentos domésticos não atingem a temperatura nem a pressão necessárias para extrair a sujidade das fibras em profundidade. Uma limpeza profissional com equipamento de extração a quente remove até 99% dos ácaros e bactérias, impossível de atingir com produtos de supermercado.\n\nConsiderando que um sofá de qualidade custa entre 500€ e 3000€, uma limpeza profissional anual a 60€ é um investimento que prolonga a vida do móvel em vários anos.",
+        body: "Muitos clientes tentam primeiro limpar o sofá em casa antes de nos contactar. O resultado habitual: o tecido fica molhado durante horas, podem surgir manchas de água ou o odor não desaparece completamente.\n\nIsso acontece porque os equipamentos domésticos não atingem a temperatura nem a pressão necessárias para extrair a sujidade das fibras em profundidade. Uma limpeza profissional com equipamento de extração a quente ajuda a remover resíduos associados a ácaros e bactérias, impossível de atingir com produtos de supermercado.\n\nConsiderando que um sofá de qualidade custa entre 500€ e 3000€, uma limpeza profissional anual a 60€ é um investimento que prolonga a vida do móvel em vários anos.",
         tip: "Sofás com garantia do fabricante podem exigir limpeza profissional documentada para manter a garantia válida.",
       },
       {
@@ -58,7 +58,7 @@ const posts: BlogPost[] = [
     faq: [
       {
         q: "Quanto tempo demora a limpeza de um sofá?",
-        a: "Entre 45 minutos e 2 horas dependendo do tamanho e estado. O sofá fica utilizável em 2 a 4 horas após a limpeza.",
+        a: "Entre 45 minutos e 2 horas dependendo do tamanho e estado. O sofá fica utilizável em 3 a 6 horas após a limpeza.",
       },
       {
         q: "Limpam sofás de pele/couro?",
@@ -229,7 +229,7 @@ const posts: BlogPost[] = [
     faq: [
       {
         q: "A limpeza profissional elimina todos os ácaros?",
-        a: "A limpeza por extração a vapor a alta temperatura elimina mais de 99% dos ácaros e remove os seus resíduos alérgenos. Com tratamento anti-ácaros complementar, a eficácia aumenta e o efeito dura mais.",
+        a: "A limpeza por extração a vapor a alta temperatura ajuda a remover resíduos associados a ácaros e remove os seus resíduos alérgenos. Com tratamento anti-ácaros complementar, a eficácia aumenta e o efeito dura mais.",
       },
       {
         q: "Com que frequência devo limpar o colchão por causa dos ácaros?",
@@ -264,12 +264,12 @@ const posts: BlogPost[] = [
     sections: [
       {
         heading: "Tabela de preços por tamanho (2025)",
-        body: "Os preços da Kyro Clean Solutions para limpeza profissional de colchões são:\n\n**Colchão solteiro**: 59€\n\n**Colchão casal**: 69€\n\n**Colchão king / queen**: 79€\n\nTodos os preços incluem pré-tratamento de manchas, limpeza por extração a vapor e secagem rápida; a deslocação é cobrada à parte, consoante a localização. O colchão fica pronto a usar em 2 a 4 horas.",
+        body: "Os preços da Kyro Clean Solutions para limpeza profissional de colchões são:\n\n**Colchão solteiro**: 59€\n\n**Colchão casal**: 69€\n\n**Colchão king / queen**: 79€\n\nTodos os preços incluem pré-tratamento de manchas, limpeza por extração a vapor e secagem rápida; a deslocação é cobrada à parte, consoante a localização. O colchão fica pronto a usar em 3 a 6 horas.",
         tip: "Combine com a limpeza do sofá no mesmo dia e poupe 10% no total com o Pack Sofá + Colchão.",
       },
       {
         heading: "O que inclui uma limpeza profissional de colchão?",
-        body: "Uma higienização profissional de colchão vai muito além de aspirar a superfície:\n\n1. **Inspeção visual**, Identificação de manchas, zonas de humidade, sinais de bolor ou infestação de ácaros.\n2. **Aspiração profunda**, Remoção de poeira, células mortas de pele, pelos e detritos das fibras superiores.\n3. **Pré-tratamento de manchas**, Aplicação de produto enzimático em manchas orgânicas (urina, suor, sangue) para dissolução antes da extração.\n4. **Extração a vapor a alta temperatura**, Água quente a alta pressão penetra nas fibras, mata 99,9% dos ácaros e bactérias e aspira toda a sujidade.\n5. **Tratamento anti-ácaros** (incluído no serviço), Produto acaricida profissional de efeito residual de 3 a 6 meses.\n6. **Secagem acelerada**, Aplicação de ar quente para reduzir o tempo de secagem para 2 a 4 horas.",
+        body: "Uma higienização profissional de colchão vai muito além de aspirar a superfície:\n\n1. **Inspeção visual**, Identificação de manchas, zonas de humidade, sinais de bolor ou infestação de ácaros.\n2. **Aspiração profunda**, Remoção de poeira, células mortas de pele, pelos e detritos das fibras superiores.\n3. **Pré-tratamento de manchas**, Aplicação de produto enzimático em manchas orgânicas (urina, suor, sangue) para dissolução antes da extração.\n4. **Extração a vapor a alta temperatura**, Água quente a alta pressão penetra nas fibras, ajuda a remover resíduos associados a ácaros e bactérias e aspira toda a sujidade.\n5. **Tratamento anti-ácaros** (extra opcional), Definido separadamente conforme o artigo e o produto adequado.\n6. **Secagem acelerada**, Aplicação de ar quente para reduzir o tempo de secagem para 3 a 6 horas.",
       },
       {
         heading: "Colchão de solteiro vs. casal: diferença de preço justificada?",
@@ -284,7 +284,7 @@ const posts: BlogPost[] = [
     faq: [
       {
         q: "Quanto tempo o colchão fica húmido após a limpeza?",
-        a: "Entre 2 a 4 horas. Em dias de verão com boa ventilação pode ser menos. Recomendamos abrir as janelas e, se possível, usar um ventilador para acelerar a secagem.",
+        a: "Entre 3 a 6 horas. Em dias de verão com boa ventilação pode ser menos. Recomendamos abrir as janelas e, se possível, usar um ventilador para acelerar a secagem.",
       },
       {
         q: "Podem limpar apenas um lado do colchão?",
@@ -292,7 +292,7 @@ const posts: BlogPost[] = [
       },
       {
         q: "O serviço inclui tratamento anti-ácaros?",
-        a: "Sim. A limpeza por extração a vapor a alta temperatura já elimina mais de 99% dos ácaros. Aplicamos também um produto acaricida profissional de efeito residual de 3 a 6 meses.",
+        a: "Sim. A limpeza por extração a vapor a alta temperatura já ajuda a remover resíduos associados a ácaros. Pode acrescentar um tratamento anti-ácaros, orçamentado separadamente.",
       },
       {
         q: "Limpam colchões de memory foam e látex?",
@@ -330,7 +330,7 @@ const posts: BlogPost[] = [
       },
       {
         heading: "Métodos de limpeza profissional de tapetes",
-        body: "Existem três métodos principais, cada um adequado a situações diferentes:\n\n**Extração a vapor (wet extraction)**, O método mais eficaz para tapetes sintéticos e de lã resistente. Água quente a alta pressão dissolve sujidade, gordura e manchas orgânicas. A extração imediata evita que o tapete fique encharcado. Secagem em 2-6 horas.\n\n**Limpeza a seco (dry compound)**, Indicada para tapetes delicados (seda, lã fina, tapetes persas antigos) que não toleram humidade excessiva. Um composto absorvente é espalhado sobre o tapete, agitado com escova rotativa e aspirado. Sem tempo de secagem.\n\n**Shampooing com extração**, Combinação de espuma de limpeza com extração a vapor. Ideal para tapetes muito sujos ou com manchas de gordura profundas. Mais indicado para alcatifas de escritório ou uso intensivo.",
+        body: "Existem três métodos principais, cada um adequado a situações diferentes:\n\n**Extração a vapor (wet extraction)**, O método mais eficaz para tapetes sintéticos e de lã resistente. Água quente a alta pressão dissolve sujidade, gordura e manchas orgânicas. A extração imediata evita que o tapete fique encharcado. Secagem em 3 a 6 horas.\n\n**Limpeza a seco (dry compound)**, Indicada para tapetes delicados (seda, lã fina, tapetes persas antigos) que não toleram humidade excessiva. Um composto absorvente é espalhado sobre o tapete, agitado com escova rotativa e aspirado. Sem tempo de secagem.\n\n**Shampooing com extração**, Combinação de espuma de limpeza com extração a vapor. Ideal para tapetes muito sujos ou com manchas de gordura profundas. Mais indicado para alcatifas de escritório ou uso intensivo.",
       },
       {
         heading: "Manchas mais difíceis em tapetes e como tratá-las",
@@ -362,7 +362,7 @@ const posts: BlogPost[] = [
       },
       {
         q: "Quanto tempo seca um tapete após a limpeza?",
-        a: "Um tapete fino sintético seca em 1-2 horas. Um tapete de lã espessa pode demorar 4-8 horas. Deixamos sempre o tapete com secagem iniciada antes de sair.",
+        a: "Um tapete fino sintético seca em 3 a 6 horas. Um tapete de lã espessa pode demorar 3 a 6 horas. Deixamos sempre o tapete com secagem iniciada antes de sair.",
       },
     ],
     relatedService: { label: "Ver preços de limpeza de tapetes", href: "/limpeza-tapetes" },
@@ -411,7 +411,7 @@ const posts: BlogPost[] = [
       },
       {
         q: "Quanto tempo demora a limpeza de 6 cadeiras?",
-        a: "Entre 45 minutos e 1 hora e 30 minutos dependendo do estado e do tipo de cadeira. As cadeiras ficam utilizáveis em 1 a 2 horas após a limpeza.",
+        a: "Entre 45 minutos e 1 hora e 30 minutos dependendo do estado e do tipo de cadeira. As cadeiras ficam utilizáveis em 3 a 6 horas após a limpeza.",
       },
       {
         q: "Fazem deslocação a escritórios fora do Porto?",
@@ -481,7 +481,7 @@ const posts: BlogPost[] = [
       },
       {
         q: "Os produtos usados na limpeza profissional são seguros para crianças?",
-        a: "Sim. Usamos exclusivamente produtos certificados e sem solventes agressivos. Após a secagem completa (2 a 4 horas), os estofos são completamente seguros para crianças e animais.",
+        a: "Sim. Usamos exclusivamente produtos certificados e sem solventes agressivos. Após a secagem completa (3 a 6 horas), os estofos são completamente seguros para crianças e animais.",
       },
     ],
     relatedService: { label: "Higienização de colchões, eliminar ácaros e bactérias", href: "/limpeza-colchoes" },
@@ -523,8 +523,8 @@ const posts: BlogPost[] = [
       },
       {
         heading: "5. Organize as próximas 3-4 horas",
-        body: "Após a limpeza, o sofá precisa de 2 a 4 horas para secar completamente (dependendo do tipo de tecido e ventilação). Planeie estar em casa durante esse período ou deixe o espaço ventilado.\n\nAbra as janelas para acelerar a secagem. Não use o sofá nem coloque objetos sobre ele até estar completamente seco, especialmente almofadas, que podem deixar marcas de humidade no tecido.\n\nO técnico confirmará quando o sofá está pronto a usar antes de sair.",
-        tip: "No verão, a secagem leva 1-2 horas. No inverno ou em dias húmidos, pode levar até 4 horas. Um desumidificador acelera o processo.",
+        body: "Após a limpeza, o sofá precisa de 3 a 6 horas para secar completamente (dependendo do tipo de tecido e ventilação). Planeie estar em casa durante esse período ou deixe o espaço ventilado.\n\nAbra as janelas para acelerar a secagem. Não use o sofá nem coloque objetos sobre ele até estar completamente seco, especialmente almofadas, que podem deixar marcas de humidade no tecido.\n\nO técnico confirmará quando o sofá está pronto a usar antes de sair.",
+        tip: "A secagem demora em média 3 a 6 horas e depende da ventilação e das condições do espaço. Um desumidificador pode ajudar.",
       },
     ],
     faq: [
@@ -645,11 +645,11 @@ const posts: BlogPost[] = [
       },
       {
         q: "Quanto tempo demora a eliminar o cheiro de sofá?",
-        a: "Depende do tipo e profundidade do odor. Bicarbonato de sódio precisa de 12-24 horas. Tratamento profissional elimina o odor no momento, com 2-4 horas para secagem completa.",
+        a: "Depende do tipo e profundidade do odor. Bicarbonato de sódio precisa de 12-24 horas. Tratamento profissional elimina o odor no momento, com 3 a 6 horas para secagem completa.",
       },
       {
         q: "O sofá pode ficar com cheiro após limpeza profissional?",
-        a: "Não é comum. Se surgir um ligeiro cheiro a limpo nos primeiros dias, é normal: desaparece completamente após secagem total (24-48h com ventilação). Um cheiro persistente após limpeza profissional é raro e deve ser comunicado ao serviço.",
+        a: "Não é comum. Se surgir um ligeiro cheiro a limpo nos primeiros dias, é normal: desaparece completamente após secagem (em média 3 a 6 horas, dependendo da ventilação). Um cheiro persistente após limpeza profissional é raro e deve ser comunicado ao serviço.",
       },
       {
         q: "O amaciador de roupa pode ser usado para perfumar o sofá?",
@@ -699,7 +699,7 @@ const posts: BlogPost[] = [
     faq: [
       {
         q: "A alcatifa pode ser usada logo após a limpeza profissional?",
-        a: "Recomendamos aguardar 2-4 horas mínimo, de preferência 6-8 horas. A ventilação acelera a secagem. Para alto tráfego, agende a limpeza no fim do dia para ter uma noite completa de secagem.",
+        a: "A secagem demora em média 3 a 6 horas; aguarde até o tecido estar completamente seco. A ventilação acelera a secagem. Para alto tráfego, agende a limpeza no fim do dia para ter uma noite completa de secagem.",
       },
       {
         q: "A limpeza profissional remove manchas antigas de café e comida?",
@@ -746,7 +746,7 @@ const posts: BlogPost[] = [
       },
       {
         heading: "Métodos de controlo: o que funciona e o que não chega",
-        body: "**Medidas de primeira linha (reduzem exposição mas não eliminam)**\n- Capas anti-ácaros de membrana impermeável para colchão e almofadas\n- Lavar roupa de cama a 60°C (mata 100% dos ácaros)\n- Aspiração frequente com filtro HEPA\n- Reduzir humidade interior com desumidificador\n- Remover tapetes em quartos de pessoas alérgicas\n\n**O que não funciona:**\n- Sprays acaricidas de supermercado: eficácia temporária e presença de produtos químicos no ambiente\n- Aspiradores comuns sem filtro HEPA: devolvem os ácaros ao ar durante a aspiração\n- Congelamento de almofadas: mata ácaros mas não remove os alérgenos (excrementos) já presentes\n\n**Eliminação eficaz e duradoura:**\nA extração profissional com água quente a alta temperatura é o único método validado para eliminar até 99% dos ácaros e seus alérgenos das camadas internas de colchões e estofados. O calor da água quente mata os ácaros e a aspiração mecânica remove fisicamente os corpos e excrementos, que são os principais alérgenos.",
+        body: "**Medidas de primeira linha (reduzem exposição mas não eliminam)**\n- Capas anti-ácaros de membrana impermeável para colchão e almofadas\n- Lavar roupa de cama a 60°C (mata 100% dos ácaros)\n- Aspiração frequente com filtro HEPA\n- Reduzir humidade interior com desumidificador\n- Remover tapetes em quartos de pessoas alérgicas\n\n**O que não funciona:**\n- Sprays acaricidas de supermercado: eficácia temporária e presença de produtos químicos no ambiente\n- Aspiradores comuns sem filtro HEPA: devolvem os ácaros ao ar durante a aspiração\n- Congelamento de almofadas: mata ácaros mas não remove os alérgenos (excrementos) já presentes\n\n**Eliminação eficaz e duradoura:**\nA extração profissional com água quente a alta temperatura é o único método validado para remover resíduos acumulados nas fibras das camadas internas de colchões e estofados. O calor da água quente mata os ácaros e a aspiração mecânica remove fisicamente os corpos e excrementos, que são os principais alérgenos.",
       },
       {
         heading: "Frequência recomendada de higienização profissional",
@@ -769,7 +769,7 @@ const posts: BlogPost[] = [
       },
       {
         q: "A limpeza profissional de ácaros é segura para crianças e bebés?",
-        a: "Sim. Os produtos que utilizamos são hipoalergénicos, certificados e sem fragrâncias agressivas. O sofá ou colchão fica pronto a usar após 2-4 horas de secagem, sem resíduos no tecido.",
+        a: "Sim. Os produtos que utilizamos são hipoalergénicos, certificados e sem fragrâncias agressivas. O sofá ou colchão fica pronto a usar após 3 a 6 horas de secagem, sem resíduos no tecido.",
       },
     ],
     relatedService: { label: "Higienização anti-ácaros de colchões e sofás", href: "/limpeza-colchoes" },
@@ -802,7 +802,7 @@ const posts: BlogPost[] = [
       },
       {
         heading: "Quando a limpeza profissional é obrigatória",
-        body: "Existem situações em que a limpeza caseira não é suficiente:\n\n**Urina antiga ou repetida**: se o animal urina no mesmo local mais do que uma vez, o ácido úrico cristaliza em profundidade. A extração profissional com produto enzimático específico é a única solução que elimina definitivamente o odor.\n\n**Dander e ácaros**: os alérgenos de animais só são removidos eficazmente por extração a vapor a temperatura superior a 60°C, que mata os ácaros e remove o dander das fibras mais profundas.\n\n**Sebáceos**: as manchas amarelas no encosto requerem pré-tratamento com solvente específico antes da extração.\n\nA Kyro Clean trata anualmente centenas de sofás com animais de estimação. O protocolo inclui pré-tratamento enzimático, extração a quente e bactericida certificado. Resultado: sofá sem odor, sem dander e com contagem de ácaros reduzida em mais de 95%.",
+        body: "Existem situações em que a limpeza caseira não é suficiente:\n\n**Urina antiga ou repetida**: se o animal urina no mesmo local mais do que uma vez, o ácido úrico cristaliza em profundidade. A extração profissional com produto enzimático específico é a única solução que elimina definitivamente o odor.\n\n**Dander e ácaros**: os alérgenos de animais só são removidos eficazmente por extração a vapor a temperatura superior a 60°C, que mata os ácaros e remove o dander das fibras mais profundas.\n\n**Sebáceos**: as manchas amarelas no encosto requerem pré-tratamento com solvente específico antes da extração.\n\nA Kyro Clean trata anualmente centenas de sofás com animais de estimação. O protocolo inclui pré-tratamento enzimático, extração a quente e avaliação de tratamentos complementares opcionais. Resultado: sofá sem odor, sem dander e com resíduos removidos das fibras.",
       },
       {
         heading: "Impermeabilização: a solução preventiva",
@@ -824,7 +824,7 @@ const posts: BlogPost[] = [
       },
       {
         q: "O processo de limpeza é seguro para os animais?",
-        a: "Sim. Os produtos que utilizamos são hipoalergénicos, biodegradáveis e sem compostos tóxicos para animais. Recomendamos que o animal fique afastado do sofá durante as 2-3 horas de secagem, por conforto e para não afetar o resultado.",
+        a: "Sim. Os produtos que utilizamos são hipoalergénicos, biodegradáveis e sem compostos tóxicos para animais. Recomendamos que o animal fique afastado do sofá durante as 3 a 6 horas de secagem, por conforto e para não afetar o resultado.",
       },
     ],
     relatedService: { label: "Limpeza profissional de sofás: remove pelos, odores e ácaros", href: "/limpeza-sofas" },
@@ -906,7 +906,7 @@ const posts: BlogPost[] = [
     sections: [
       {
         heading: "O que é a higienização profissional?",
-        body: "A higienização por extração a vapor é um processo de limpeza profunda que remove a sujidade acumulada nas fibras do sofá: manchas, odores, ácaros, bactérias e alérgenos. Utiliza água quente a alta pressão injetada nas fibras e aspirada de imediato, arrastando tudo o que está acumulado.\n\nO resultado é um sofá com aparência renovada, sem odores e com até 99% menos ácaros. O tempo de secagem é de 2 a 4 horas.",
+        body: "A higienização por extração a vapor é um processo de limpeza profunda que remove a sujidade acumulada nas fibras do sofá: manchas, odores, ácaros, bactérias e alérgenos. Utiliza água quente a alta pressão injetada nas fibras e aspirada de imediato, arrastando tudo o que está acumulado.\n\nO resultado é um sofá com aparência renovada, sem odores e com menos resíduos nas fibras. O tempo de secagem é de 3 a 6 horas.",
         tip: "A higienização é recomendada mesmo que o sofá pareça limpo visualmente. Ácaros e bactérias não são visíveis a olho nu.",
       },
       {
@@ -931,7 +931,7 @@ const posts: BlogPost[] = [
     faq: [
       {
         q: "A impermeabilização é segura para crianças e animais?",
-        a: "Sim. Os produtos que utilizamos são certificados e seguros após secagem completa, que demora cerca de 2 horas. Não há cheiros residuais nem risco de contacto.",
+        a: "Sim. Os produtos que utilizamos são certificados e seguros após secagem completa, em média 3 a 6 horas, dependendo da ventilação. Não há cheiros residuais nem risco de contacto.",
       },
       {
         q: "A impermeabilização muda a cor ou textura do sofá?",
@@ -1037,7 +1037,7 @@ const posts: BlogPost[] = [
       },
       {
         heading: "3. Crises de alergia ou rinite a piorar em casa",
-        body: "Se notar que espirra mais ou tem olhos a comichão especialmente quando está no sofá, pode ser uma resposta a ácaros acumulados. Um sofá de uso regular pode ter entre 100 mil a 1 milhão de ácaros por metro quadrado. A limpeza por extração a quente remove até 99% destes alérgenos.",
+        body: "Se notar que espirra mais ou tem olhos a comichão especialmente quando está no sofá, pode ser uma resposta a ácaros acumulados. Um sofá de uso regular pode ter entre 100 mil a 1 milhão de ácaros por metro quadrado. A limpeza por extração a quente ajuda a remover resíduos associados a alérgenos.",
       },
       {
         heading: "4. O tecido está visivelmente desgastado ou com brilho diferente",
@@ -1167,7 +1167,7 @@ const posts: BlogPost[] = [
       },
       {
         heading: "Produtos seguros para crianças",
-        body: "Uma preocupação comum dos pais é a segurança dos produtos de limpeza. Na Kyro Clean utilizamos produtos certificados, biodegradáveis e seguros para crianças e animais de estimação após a secagem completa do sofá.\n\nO sofá pode ser utilizado normalmente assim que estiver seco, geralmente 2 a 4 horas após o tratamento. Não há resíduos químicos no tecido após secagem.",
+        body: "Uma preocupação comum dos pais é a segurança dos produtos de limpeza. Na Kyro Clean utilizamos produtos certificados, biodegradáveis e seguros para crianças e animais de estimação após a secagem completa do sofá.\n\nO sofá pode ser utilizado normalmente assim que estiver seco, geralmente 3 a 6 horas após o tratamento. Não há resíduos químicos no tecido após secagem.",
         tip: "Peça sempre ao prestador de serviço as fichas técnicas dos produtos utilizados se tiver dúvidas sobre alergias específicas.",
       },
       {
@@ -1182,7 +1182,7 @@ const posts: BlogPost[] = [
     faq: [
       {
         q: "Os produtos de limpeza são seguros para bebés?",
-        a: "Sim. Os produtos que utilizamos são certificados e seguros após secagem completa. Recomendamos aguardar 2 a 4 horas antes de usar o sofá após o tratamento.",
+        a: "Sim. Os produtos que utilizamos são certificados e seguros após secagem completa. Recomendamos aguardar 3 a 6 horas antes de usar o sofá após o tratamento.",
       },
       {
         q: "Como limpar urina de bebé do sofá rapidamente?",
@@ -1190,7 +1190,7 @@ const posts: BlogPost[] = [
       },
       {
         q: "O sofá pode ser usado no próprio dia da limpeza?",
-        a: "Sim. O sofá fica seco entre 2 a 4 horas após o tratamento. A partir daí pode ser usado normalmente, incluindo por crianças.",
+        a: "Sim. O sofá seca em média em 3 a 6 horas, dependendo da ventilação e do tecido. A partir daí pode ser usado normalmente, incluindo por crianças.",
       },
     ],
     relatedService: { label: "Pedir orçamento de limpeza", href: "/limpeza-sofas" },
@@ -1234,7 +1234,7 @@ const posts: BlogPost[] = [
       },
       {
         heading: "O processo de limpeza profissional de colchão de bebé",
-        body: "A limpeza profissional de colchão usa extração a vapor a alta temperatura que:\n\n1. Elimina até 99% dos ácaros e os seus resíduos alérgenos\n2. Remove manchas de origem orgânica (leite, urina, suor)\n3. Elimina odores na fonte, não com mascaradores\n4. Deixa o colchão utilizável em 2 a 4 horas\n\nOs produtos utilizados são certificados para uso em ambientes infantis. Não há resíduos após secagem.",
+        body: "A limpeza profissional de colchão usa extração a vapor a alta temperatura que:\n\n1. ajuda a remover resíduos associados a ácaros e os seus resíduos alérgenos\n2. Remove manchas de origem orgânica (leite, urina, suor)\n3. Elimina odores na fonte, não com mascaradores\n4. Deixa o colchão utilizável em 3 a 6 horas\n\nOs produtos utilizados são certificados para uso em ambientes infantis. Não há resíduos após secagem.",
         tip: "Depois da limpeza, use um protetor de colchão impermeável e respirável para reduzir a frequência necessária de novas intervenções.",
       },
     ],
@@ -1285,7 +1285,7 @@ const posts: BlogPost[] = [
       },
       {
         heading: "O que o processo remove efetivamente",
-        body: "A extração a vapor profissional remove:\n\n**Sujidade estrutural**: poeira, células de pele morta, gordura do corpo, resíduos de alimentos e partículas que se acumulam nas fibras ao longo do tempo.\n\n**Ácaros e alérgenos**: a temperatura de 80 a 100ºC mata os ácaros do pó e desnatura os seus resíduos alérgenos. Eficácia de até 99%.\n\n**Manchas orgânicas**: com pré-tratamento enzimático, manchas de café, vinho, urina e gordura são dissolvidas antes da extração.\n\n**Odores**: os compostos orgânicos que causam odores são eliminados na fonte, não mascarados.",
+        body: "A extração a vapor profissional remove:\n\n**Sujidade estrutural**: poeira, células de pele morta, gordura do corpo, resíduos de alimentos e partículas que se acumulam nas fibras ao longo do tempo.\n\n**Ácaros e alérgenos**: a temperatura de 80 a 100ºC mata os ácaros do pó e desnatura os seus resíduos alérgenos. O tratamento anti-ácaros é um extra específico.\n\n**Manchas orgânicas**: com pré-tratamento enzimático, manchas de café, vinho, urina e gordura são dissolvidas antes da extração.\n\n**Odores**: os compostos orgânicos que causam odores são eliminados na fonte, não mascarados.",
       },
       {
         heading: "Porque é superior a outros métodos",
@@ -1294,13 +1294,13 @@ const posts: BlogPost[] = [
       },
       {
         heading: "O que esperar durante e após o tratamento",
-        body: "**Durante**: o técnico passa o equipamento em movimentos sobrepostos sobre toda a superfície. Pode ver a água suja a ser aspirada para o reservatório. O processo dura 45 a 90 minutos por sofá de 3 lugares.\n\n**Após**: o sofá vai estar ligeiramente húmido ao toque mas não encharcado. O cheiro inicial de limpeza (solução de extração) desaparece ao secar. A secagem completa leva 2 a 4 horas com ventilação.\n\n**Resultado**: fibras mais macias e limpas, cores mais vivas, ausência de odores e redução drástica de alérgenos.",
+        body: "**Durante**: o técnico passa o equipamento em movimentos sobrepostos sobre toda a superfície. Pode ver a água suja a ser aspirada para o reservatório. O processo dura 45 a 90 minutos por sofá de 3 lugares.\n\n**Após**: o sofá vai estar ligeiramente húmido ao toque mas não encharcado. O cheiro inicial de limpeza (solução de extração) desaparece ao secar. A secagem completa leva 3 a 6 horas com ventilação.\n\n**Resultado**: fibras mais macias e limpas, cores mais vivas, ausência de odores e redução drástica de alérgenos.",
       },
     ],
     faq: [
       {
         q: "O sofá fica muito molhado depois da extração a vapor?",
-        a: "Não. O processo extrai quase toda a humidade imediatamente. O sofá fica ligeiramente húmido ao toque, mas utilizável em 2 a 4 horas com ventilação normal.",
+        a: "Não. O processo extrai quase toda a humidade imediatamente. O sofá fica ligeiramente húmido ao toque, mas utilizável em 3 a 6 horas com ventilação normal.",
       },
       {
         q: "Todos os tipos de tecido podem ser limpos com extração a vapor?",
@@ -1484,7 +1484,7 @@ const posts: BlogPost[] = [
       },
       {
         heading: "Preços de limpeza profissional de colchão",
-        body: "A Kyro Clean trata colchões com urina com um processo de 2 etapas: aplicação de produto enzimático concentrado seguida de extração a quente.\n\nPreços:\n- Colchão solteiro: a partir de 59€\n- Colchão de casal: a partir de 69€\n- King size / queen size: a partir de 79€\n\nO colchão fica seco em 2 a 4 horas. Recomendamos sempre o uso de um protetor de colchão impermeável após a limpeza para prevenir futuras infiltrações.",
+        body: "A Kyro Clean trata colchões com urina com um processo de 2 etapas: aplicação de produto enzimático concentrado seguida de extração a quente.\n\nPreços:\n- Colchão solteiro: a partir de 59€\n- Colchão de casal: a partir de 69€\n- King size / queen size: a partir de 79€\n\nO colchão fica seco em 3 a 6 horas. Recomendamos sempre o uso de um protetor de colchão impermeável após a limpeza para prevenir futuras infiltrações.",
       },
     ],
     faq: [
@@ -1498,7 +1498,7 @@ const posts: BlogPost[] = [
       },
       {
         q: "Quanto tempo depois da limpeza posso usar o colchão?",
-        a: "Após limpeza profissional, o colchão fica utilizável em 2 a 4 horas com ventilação adequada.",
+        a: "Após limpeza profissional, o colchão fica utilizável em 3 a 6 horas com ventilação adequada.",
       },
       {
         q: "Vale a pena usar um protetor de colchão após a limpeza?",
@@ -1532,7 +1532,7 @@ const posts: BlogPost[] = [
       },
       {
         heading: "O que está incluído no preço",
-        body: "Uma limpeza profissional de alcatifa completa inclui:\n\n**Pré-aspiração**: remoção de partículas soltas, pelos e pó antes da limpeza húmida.\n\n**Pré-tratamento de manchas**: identificação e tratamento individual das manchas mais resistentes com produtos específicos.\n\n**Extração a quente**: injeção de água a alta temperatura com agente de limpeza nas fibras, seguida de aspiração imediata da água suja. Remove sujidade, ácaros e bactérias.\n\n**Bactericida e desodorizante**: aplicação de produto que elimina microrganismos e neutraliza odores.\n\n**Resultado final**: alcatifa higienizada, sem cheiro e seca em 2 a 6 horas dependendo da espessura.",
+        body: "Uma limpeza profissional de alcatifa completa inclui:\n\n**Pré-aspiração**: remoção de partículas soltas, pelos e pó antes da limpeza húmida.\n\n**Pré-tratamento de manchas**: identificação e tratamento individual das manchas mais resistentes com produtos específicos.\n\n**Extração a quente**: injeção de água a alta temperatura com agente de limpeza nas fibras, seguida de aspiração imediata da água suja. Remove sujidade, ácaros e bactérias.\n\n**Tratamento de odores**: definido conforme o estado do artigo. A desbacterização pode ser acrescentada como extra opcional.\n\n**Resultado final**: alcatifa higienizada, sem cheiro e seca em 3 a 6 horas dependendo da espessura.",
       },
       {
         heading: "Fatores que influenciam o preço",
@@ -1551,7 +1551,7 @@ const posts: BlogPost[] = [
     faq: [
       {
         q: "Quanto tempo seca uma alcatifa após limpeza profissional?",
-        a: "Entre 2 a 6 horas dependendo da espessura da alcatifa, temperatura ambiente e ventilação. Alcatifas finas de escritório secam em 2 horas; alcatifas espessas residenciais podem demorar 4 a 6 horas.",
+        a: "Em média 3 a 6 horas, dependendo da ventilação, espessura da alcatifa e condições do espaço.",
       },
       {
         q: "Podem limpar a alcatifa sem tirar os móveis?",

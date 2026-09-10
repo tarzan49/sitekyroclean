@@ -36,8 +36,8 @@ export const SERVICE_RESULT_IMAGES: Record<string, string> = {
 };
 
 export const SERVICE_RESULT_CONTENT: Record<string, (place: string) => { desc: string; checks: string[] }> = {
-  'limpeza-sofas':     p => ({ desc: `Sofás de ${p} tratados com extração a quente: manchas, ácaros e odores eliminados. Tecido revitalizado e pronto a usar em 4 a 6 horas.`, checks: ['Remoção de 99% dos ácaros', 'Manchas antigas eliminadas', 'Pronto em 4–6h'] }),
-  'limpeza-colchoes':  p => ({ desc: `Colchões higienizados ao domicílio em ${p}: eliminação de ácaros, manchas de suor e odores para noites mais saudáveis. Seco no mesmo dia.`, checks: ['99% ácaros eliminados', 'Sem resíduos químicos', 'Seco no mesmo dia'] }),
+  'limpeza-sofas':     p => ({ desc: `Sofás de ${p} tratados com extração a quente: manchas, ácaros e odores eliminados. Tecido revitalizado e pronto a usar em 3 a 6 horas.`, checks: ['Remoção de resíduos associados a ácaros', 'Manchas antigas eliminadas', 'Pronto em 3 a 6h'] }),
+  'limpeza-colchoes':  p => ({ desc: `Colchões higienizados ao domicílio em ${p}: remoção de sujidade, tratamento de manchas de suor e odores para noites mais saudáveis. Seco no mesmo dia.`, checks: ['Limpeza profunda das fibras', 'Sem resíduos químicos', 'Seco no mesmo dia'] }),
   'limpeza-tapetes':   p => ({ desc: `Tapetes de ${p} lavados em profundidade: fibras revitalizadas, cores recuperadas e alergénios eliminados. Recolha e entrega incluídas.`, checks: ['Fibras e cores revitalizadas', 'Alergénios eliminados', 'Recolha e entrega'] }),
   'limpeza-cadeiras':  p => ({ desc: `Cadeiras estofadas em ${p} limpas com equipamento profissional: ideal para escritórios, restaurantes e residências. Resultado imediato.`, checks: ['Resultado imediato', 'Ideal para restaurantes', 'Sem resíduos'] }),
   'limpeza-alcatifas': p => ({ desc: `Alcatifas de ${p} tratadas com extração profunda: poeira, ácaros e manchas removidos das fibras. Ideal para espaços comerciais e residências.`, checks: ['Extração profunda', 'Ideal para espaços comerciais', 'Seco rapidamente'] }),

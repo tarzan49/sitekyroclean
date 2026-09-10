@@ -1,3 +1,4 @@
+import { SATISFACTION_PROMISE, PRICE_PROMISE } from '../constants/commercialPolicy';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { BUSINESS_EMAIL, BUSINESS_EMAIL_HREF, WHATSAPP_BASE, PHONE_DISPLAY } from '@/constants/business';
@@ -20,7 +21,7 @@ const PoliticaDevolucoes = () => (
           <h1 className="font-playfair text-3xl sm:text-4xl font-bold text-[#111111] leading-tight">
             Política de Devoluções
           </h1>
-          <p className="text-sm text-[#555] mt-3">Última atualização: junho de 2026</p>
+          <p className="text-sm text-[#555] mt-3">Última atualização: setembro de 2026</p>
         </div>
 
         <Section title="1. Natureza do serviço">
@@ -43,7 +44,7 @@ const PoliticaDevolucoes = () => (
 
         <Section title="3. Reclamações">
           <p>
-            Caso não esteja satisfeito com o resultado, pode contactar-nos no prazo de <strong>48 horas</strong> após a prestação do serviço, através dos contactos indicados abaixo. Cada situação será analisada individualmente, sendo a decisão sobre qualquer medida de resolução da exclusiva competência da Kyro Clean Solutions.
+            {SATISFACTION_PROMISE}
           </p>
         </Section>
 

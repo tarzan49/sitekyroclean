@@ -1,3 +1,5 @@
+import { getTreatmentRoutes, getExpansionRoutes, getTreatmentPage, getExpansionPage } from '../src/data/treatmentSeoData';
+import { PRICE_PROMISE, SATISFACTION_PROMISE, DRYING_PROMISE, COVERAGE_PROMISE, RESPONSE_PROMISE, AVAILABILITY_PROMISE } from '../src/constants/commercialPolicy';
 /**
  * Static prerender for Kyro Clean Solutions
  *
@@ -27,7 +29,7 @@ import { getAllProblems, getProblemBySlug } from '../src/data/problemSeoData';
 import { getAllProblemCityRoutes } from '../src/data/problemCitySeoData';
 import { getAllMaterials, getAllMaterialCityRoutes, getMaterialCityData } from '../src/data/materialSeoData';
 import { getAllPriceRoutes, getPricePageData } from '../src/data/priceSeoData';
-import { getAllPackComboRoutes, getPackByCityAndId, getFromPrice } from '../src/data/packComboData';
+import { getAllPackComboRoutes, getPackByCityAndId } from '../src/data/packComboData';
 import { getAllMarcaSofaRoutes, getMarcaByCityAndSlug } from '../src/data/marcaSofaData';
 import { getAllMarcaColchaoRoutes, getMarcaColchaoByCityAndSlug } from '../src/data/marcaColchaoData';
 import { getAllMarcaCadeirasRoutes, getMarcaCadeirasByCityAndSlug } from '../src/data/marcaCadeirasData';
@@ -141,7 +143,7 @@ interface PageContent {
   priceTable?: { item: string; price: string; note?: string }[];
 }
 
-function generatePageBody(c: PageContent): string {
+function generatePageBody(c: PageContent, lang: 'pt' | 'en' = 'pt'): string {
   let html = `<main>\n<h1>${escHtml(c.h1)}</h1>\n<p>${escHtml(c.intro)}</p>\n`;
 
   if (c.localSection) {
@@ -192,6 +194,7 @@ function generatePageBody(c: PageContent): string {
     html += `</section>\n`;
   }
 
+  if (lang === 'pt') html += `<details><summary>Condições do serviço e garantia</summary>${[PRICE_PROMISE, SATISFACTION_PROMISE, DRYING_PROMISE, AVAILABILITY_PROMISE, COVERAGE_PROMISE, RESPONSE_PROMISE + '. Deslocação a partir de 10€.'].map(text => `<p>${escHtml(text)}</p>`).join('')}<a href="/tratamento-anti-acaros">Tratamento anti-ácaros</a> · <a href="/desbacterizacao">Desbacterização</a></details>`;
   html += `</main>`;
   return html;
 }
@@ -257,7 +260,7 @@ export function prerenderRoutes(outDir: string): number {
     const canonical = `${BASE_URL}${routePath}`;
     let html = injectMeta(template, title, desc, canonical);
     if (lang !== 'pt') html = html.replace('<html lang="pt">', `<html lang="${lang}">`);
-    if (content) html = injectContent(html, generatePageBody(content));
+    html = injectContent(html, generatePageBody(content ?? { h1: title.split(" | ")[0], intro: desc }, lang));
     // LocalBusiness on every page
     html = injectJsonLd(html, LOCAL_BIZ);
     // Caller-provided schemas (FAQ, Service, BreadcrumbList, etc.)
@@ -380,7 +383,7 @@ export function prerenderRoutes(outDir: string): number {
         `/problemas/${p.slug}`,
         p.title,
         p.metaDescription,
-        { h1: p.h1 ?? p.title, intro: p.metaDescription },
+        { h1: p.h1 ?? p.title, intro: p.intro, localSection: p.problemDetail, howItWorks: p.solutionDetail, benefits: p.benefits, faqs: p.faqs },
       );
     }
     console.log(`  Problem pages:           ${count - prev}`);
@@ -394,7 +397,7 @@ export function prerenderRoutes(outDir: string): number {
       const city    = cities.find(c => c.slug === route.citySlug);
       if (!problem || !city) continue;
       const title = `${problem.h1} em ${city.name} | Kyro Clean Solutions`;
-      const desc  = `${problem.h1} em ${city.name}: serviço profissional ao domicílio. ${problem.metaDescription.split('.')[0]}. Orçamento grátis em menos de 2 horas.`;
+      const desc  = `${problem.h1} em ${city.name}: serviço profissional ao domicílio. ${problem.metaDescription.split('.')[0]}. Resposta em menos de 10 minutos.`;
       const schemas: object[] = [
         buildBreadcrumbSchema([
           { name: 'Início',      url: BASE_URL + '/' },
@@ -406,7 +409,7 @@ export function prerenderRoutes(outDir: string): number {
         route.path,
         title,
         desc,
-        { h1: `${problem.h1} em ${city.name}`, intro: desc },
+        { h1: `${problem.h1} em ${city.name}`, intro: problem.intro, localSection: desc, howItWorks: problem.solutionDetail, benefits: problem.benefits, faqs: problem.faqs },
         schemas,
       );
     }
@@ -521,16 +524,20 @@ export function prerenderRoutes(outDir: string): number {
     console.log(`  Price pages:             ${count - prev}`);
   }
 
+  for (const route of [...getTreatmentRoutes(), ...getExpansionRoutes()]) {
+    const page = getTreatmentPage(route.path) ?? getExpansionPage(route.path);
+    if (page) emit(route.path, page.title, page.metaDescription, { h1: page.h1, intro: page.intro, localSection: page.coverage, howItWorks: page.detail, benefits: page.benefits, faqs: page.faqs }, [buildFaqSchema(page.faqs)]);
+  }
+
   // ── 8. Pack / Combo pages (4 × 5 = 20) ──────────────────────────────────
   {
     const prev = count;
     for (const route of getAllPackComboRoutes()) {
       const data = getPackByCityAndId(route.packId, route.citySlug);
       if (!data) continue;
-      const fromPrice = getFromPrice(data.pack);
-      const title = `${data.pack.name} em ${data.city.name}, Desde ${fromPrice}€ | Kyro Clean`;
-      const desc  = `${data.pack.description} Poupe até 10% em relação ao preço individual. Serviço ao domicílio em ${data.city.name}.`;
-      emit(route.path, title, desc);
+      const title = `${data.pack.name} em ${data.city.name} | Monte o seu pack | Kyro Clean`;
+      const desc  = `${data.pack.description} Serviço ao domicílio em ${data.city.name}.`;
+      emit(route.path, title, desc, { h1: `${data.pack.name} em ${data.city.name}`, intro: data.pack.description, howItWorks: 'Escolha os artigos, as quantidades, as medidas e os tratamentos no configurador. A combinação inicial é editável. Tapetes e alcatifas sempre sob orçamento. Desconto Pack Família de 10% nos serviços tabelados acima de 149€, com pelo menos dois artigos e um a partir de 49€. A deslocação não tem desconto.', benefits: [PRICE_PROMISE, SATISFACTION_PROMISE, DRYING_PROMISE, AVAILABILITY_PROMISE] });
     }
     console.log(`  Pack pages:              ${count - prev}`);
   }
@@ -553,7 +560,7 @@ export function prerenderRoutes(outDir: string): number {
         ]),
       ];
       if (data.marca.faqs?.length) schemas.push(buildFaqSchema(data.marca.faqs));
-      emit(route.path, title, desc, undefined, schemas);
+      emit(route.path, title, desc, { h1: title.split(" | ")[0], intro: data.marca.materialDescription, howItWorks: data.marca.cleaningProcess, benefits: data.marca.doThis, faqs: data.marca.faqs }, schemas);
     }
     console.log(`  Marca Sofá pages:        ${count - prev}`);
   }
@@ -576,7 +583,7 @@ export function prerenderRoutes(outDir: string): number {
         ]),
       ];
       if (data.marca.faqs?.length) schemas.push(buildFaqSchema(data.marca.faqs));
-      emit(route.path, title, desc, undefined, schemas);
+      emit(route.path, title, desc, { h1: title.split(" | ")[0], intro: data.marca.materialDescription, howItWorks: data.marca.cleaningProcess, benefits: data.marca.doThis, faqs: data.marca.faqs }, schemas);
     }
     console.log(`  Marca Colchão pages:     ${count - prev}`);
   }
@@ -599,7 +606,7 @@ export function prerenderRoutes(outDir: string): number {
         ]),
       ];
       if (data.marca.faqs?.length) schemas.push(buildFaqSchema(data.marca.faqs));
-      emit(route.path, title, desc, undefined, schemas);
+      emit(route.path, title, desc, { h1: title.split(" | ")[0], intro: data.marca.materialDescription, howItWorks: data.marca.cleaningProcess, benefits: data.marca.doThis, faqs: data.marca.faqs }, schemas);
     }
     console.log(`  Marca Cadeiras pages:    ${count - prev}`);
   }
@@ -631,19 +638,19 @@ export function prerenderRoutes(outDir: string): number {
             { step: 1, title: 'Diagnóstico gratuito', description: 'Avaliamos o material e o estado do estofo no local.' },
             { step: 2, title: 'Pré-tratamento', description: 'Aplicamos produto específico nas manchas e zonas críticas.' },
             { step: 3, title: 'Extração profissional', description: 'Máquina de extração a vapor remove sujidade em profundidade.' },
-            { step: 4, title: 'Resultado garantido', description: 'Sofá limpo e seco em 4 a 6 horas, pronto a usar.' },
+            { step: 4, title: 'Resultado garantido', description: 'Sofá limpo e seco em 3 a 6 horas, pronto a usar.' },
           ],
           benefits: [
             'Remoção de ácaros, bactérias e alergénios',
             'Eliminação de manchas de vinho, café, gordura e sangue',
             'Eliminação de odores de animais domésticos e fumo',
-            'Secagem rápida em 4 a 6 horas',
+            'Secagem rápida em 3 a 6 horas',
             'Técnicos certificados com produtos eco-friendly',
             'Serviço ao domicílio sem custos ocultos',
           ],
           faqs: faqs([
             { q: 'Quanto custa a limpeza de sofá?', a: 'A limpeza de sofá começa a partir de 49€ para sofás de 1 lugar, 69€ para 2 lugares e 79€ para 3 lugares. Peça orçamento gratuito sem compromisso.' },
-            { q: 'Quanto tempo demora a limpeza de sofá?', a: 'O serviço demora entre 1 a 3 horas conforme o tamanho e estado do sofá. O sofá fica pronto a usar em 4 a 6 horas após a limpeza.' },
+            { q: 'Quanto tempo demora a limpeza de sofá?', a: 'O serviço demora entre 1 a 3 horas conforme o tamanho e estado do sofá. O sofá fica pronto a usar em 3 a 6 horas após a limpeza.' },
             { q: 'A limpeza remove manchas antigas do sofá?', a: 'Sim. Tratamos manchas de vinho, café, gordura e sangue com pré-tratamento específico. Manchas muito antigas podem não sair completamente, mas apresentamos sempre o melhor resultado possível.' },
             { q: 'Fazem limpeza de sofás ao domicílio em todo o país?', a: 'Sim. O nosso serviço cobre todo o país: Porto, Lisboa, Braga, Coimbra e arredores.' },
           ]),
@@ -662,25 +669,25 @@ export function prerenderRoutes(outDir: string): number {
         desc: 'Higienização profissional de colchões ao domicílio. Eliminamos ácaros, bactérias e odores para noites mais saudáveis. Desde 59€. Porto, Lisboa e todo o país.',
         content: {
           h1: 'Limpeza e Higienização de Colchões ao Domicílio',
-          intro: 'Serviço de higienização profunda de colchões ao domicílio. Eliminamos até 99% dos ácaros, bactérias e fungos com extração profissional. Noites mais saudáveis a partir de 59€.',
+          intro: 'Serviço de higienização profunda de colchões ao domicílio. Removemos resíduos e partículas acumuladas nas fibras com extração profissional. Noites mais saudáveis a partir de 59€.',
           processSteps: [
             { step: 1, title: 'Aspiração profunda', description: 'Remoção de ácaros e partículas superficiais com aspirador HEPA.' },
-            { step: 2, title: 'Tratamento antimicrobiano', description: 'Aplicação de produto específico contra fungos, bactérias e ácaros.' },
+            { step: 2, title: 'Pré-tratamento de limpeza', description: 'Aplicação de solução de limpeza adequada ao tecido. Os tratamentos anti-ácaros e de desbacterização são opcionais.' },
             { step: 3, title: 'Extração e higienização', description: 'Lavagem em profundidade com extração de vapor profissional.' },
-            { step: 4, title: 'Secagem controlada', description: 'Colchão pronto a usar em 4 a 8 horas.' },
+            { step: 4, title: 'Secagem controlada', description: 'Colchão pronto a usar em 3 a 6 horas.' },
           ],
           benefits: [
-            'Eliminação de até 99% dos ácaros e alergénios',
+            'Remoção de pó e resíduos nas fibras',
             'Remoção de manchas de suor, líquidos e acidentes',
             'Eliminação de odores e fungos',
             'Redução de alergias e problemas respiratórios',
-            'Secagem em 4 a 8 horas',
+            'Secagem em 3 a 6 horas',
             'Produto certificado e seguro para crianças e animais',
           ],
           faqs: faqs([
             { q: 'Quanto custa a limpeza de colchão?', a: 'A limpeza de colchão começa a partir de 59€ para solteiro, 69€ para casal e 79€ para king. Peça orçamento gratuito.' },
             { q: 'Com que frequência devo limpar o colchão?', a: 'Recomendamos higienização profissional a cada 6 a 12 meses. Em casos de alergias, gravidez ou crianças pequenas, idealmente cada 6 meses.' },
-            { q: 'A limpeza elimina os ácaros do colchão?', a: 'Sim. O nosso processo elimina até 99% dos ácaros, ovos e alergénios presentes no colchão, com tratamento antimicrobiano de duração até 6 meses.' },
+            { q: 'A limpeza elimina os ácaros do colchão?', a: 'Sim. O nosso processo ajuda a remover resíduos associados a ácaros, ovos e alergénios presentes no colchão, podendo juntar um tratamento anti-ácaros como extra opcional.' },
             { q: 'Fazem limpeza de colchões ao domicílio?', a: 'Sim. O técnico desloca-se a sua casa com todo o equipamento. Não precisa de retirar o colchão nem de se deslocar.' },
           ]),
         },
@@ -704,12 +711,12 @@ export function prerenderRoutes(outDir: string): number {
             'Eliminação de ácaros e alergénios das fibras',
             'Recuperação das cores e textura original',
             'Tratamento específico por tipo de fibra',
-            'Secagem em 4 a 8 horas',
+            'Secagem em 3 a 6 horas',
             'Serviço ao domicílio sem necessidade de recolha',
           ],
           faqs: faqs([
             { q: 'Quanto custa a limpeza de tapete?', a: 'Cada tapete é medido (largura x comprimento) e orçamentado individualmente, sem preço fixo por m². Peça um orçamento gratuito e sem compromisso.' },
-            { q: 'Quanto tempo demora a limpeza de tapete?', a: 'O serviço demora 1 a 2 horas. O tapete fica seco em 4 a 8 horas, dependendo da espessura e material.' },
+            { q: 'Quanto tempo demora a limpeza de tapete?', a: 'O serviço demora 1 a 2 horas. O tapete fica seco em 3 a 6 horas, dependendo da espessura e material.' },
             { q: 'Que tipos de tapete limpam?', a: 'Limpamos todos os tipos: persas, shaggy, sisal, juta, lã, acrílico, polipropileno e fibras naturais. O produto é sempre adaptado ao material.' },
             { q: 'Fazem limpeza de tapetes ao domicílio?', a: 'Sim. O técnico desloca-se a sua casa com equipamento de extração profissional. Não precisa de entregar o tapete.' },
           ]),
@@ -740,13 +747,13 @@ export function prerenderRoutes(outDir: string): number {
             'Eliminação de bactérias e germes de superfície',
             'Eliminação de odores de cozinha e uso intenso',
             'Tratamento específico por tipo de tecido',
-            'Secagem rápida em 2 a 4 horas',
+            'Secagem rápida em 3 a 6 horas',
             'Preço por volume: quanto mais cadeiras, menor o preço unitário',
           ],
           faqs: faqs([
             { q: 'Quanto custa a limpeza de cadeiras?', a: 'O preço por cadeira diminui com a quantidade: até 4 cadeiras é 20€/unid., de 5 a 6 é 15€/unid., de 7 a 10 é 12,50€/unid. e a partir de 11 cadeiras por orçamento.' },
             { q: 'Limpam cadeiras de escritório?', a: 'Sim. Limpamos cadeiras de escritório, sala de jantar, poltronas e bancos. O serviço é ao domicílio ou no local de trabalho.' },
-            { q: 'Quanto tempo demora a limpeza de cadeiras?', a: 'Cada cadeira demora 15 a 30 minutos. Um conjunto de 6 cadeiras leva cerca de 2 horas. As cadeiras ficam secas em 2 a 4 horas.' },
+            { q: 'Quanto tempo demora a limpeza de cadeiras?', a: 'Cada cadeira demora 15 a 30 minutos. Um conjunto de 6 cadeiras leva cerca de 2 horas. As cadeiras ficam secas em 3 a 6 horas.' },
             { q: 'Fazem limpeza de cadeiras em quantidade para restaurantes?', a: 'Sim. Para restaurantes, hotéis e escritórios temos condições especiais. Contacte-nos para orçamento personalizado.' },
           ]),
         },
@@ -760,7 +767,7 @@ export function prerenderRoutes(outDir: string): number {
       },
       {
         path: '/limpeza-alcatifas',
-        title: 'Limpeza de Alcatifas | Desde 3€/m² | Kyro Clean Solutions',
+        title: 'Limpeza de Alcatifas | Sob Orçamento | Kyro Clean Solutions',
         desc: 'Limpeza profissional de alcatifas com extração profunda. Removemos sujidade acumulada, manchas e alergénios. Secagem rápida. Porto, Lisboa e todo o país.',
         content: {
           h1: 'Limpeza de Alcatifas ao Domicílio',
@@ -771,17 +778,17 @@ export function prerenderRoutes(outDir: string): number {
             'Eliminação de ácaros e alergénios',
             'Recuperação da textura e cor original',
             'Ideal para escritórios, hotéis e grandes superfícies',
-            'Secagem em 4 a 8 horas',
+            'Secagem em 3 a 6 horas',
           ],
           faqs: faqs([
-            { q: 'Quanto custa a limpeza de alcatifa?', a: 'A limpeza de alcatifa começa a partir de 3€/m². Para grandes superfícies o preço é calculado por orçamento.' },
+            { q: 'Quanto custa a limpeza de alcatifa?', a: 'A limpeza de alcatifa é sempre sob orçamento. Indique a largura e o comprimento de cada área, a localidade e envie fotografias.' },
             { q: 'Qual a diferença entre tapete e alcatifa?', a: 'Tapetes são peças soltas; alcatifas são revestimentos fixos que cobrem toda a divisão. Tratamos ambos ao domicílio com equipamento profissional.' },
             { q: 'Limpam alcatifas de escritório?', a: 'Sim. Temos disponibilidade para escritórios, hotéis, clínicas e outros espaços comerciais, incluindo fora do horário comercial.' },
-            { q: 'A alcatifa fica molhada muito tempo?', a: 'Com o nosso equipamento de extração profissional, a alcatifa fica seca em 4 a 8 horas dependendo da espessura e ventilação.' },
+            { q: 'A alcatifa fica molhada muito tempo?', a: 'Com o nosso equipamento de extração profissional, a alcatifa fica seca em 3 a 6 horas dependendo da espessura e ventilação.' },
           ]),
         },
         extraSchemas: [
-          buildServiceSchema('Limpeza de Alcatifas', 'Portugal', '3€'),
+          buildServiceSchema('Limpeza de Alcatifas', 'Portugal', ''),
           buildBreadcrumbSchema([
             { name: 'Início', url: BASE_URL + '/' },
             { name: 'Limpeza de Alcatifas', url: BASE_URL + '/limpeza-alcatifas' },
@@ -791,7 +798,7 @@ export function prerenderRoutes(outDir: string): number {
       {
         path: '/impermeabilizacao',
         title: 'Impermeabilização de Estofos | Essencial ou Premium | Kyro Clean Solutions',
-        desc: 'Impermeabilização profissional de sofás e cadeiras. Versão Essencial e versão Premium, com proteção invisível real até 10 anos. Desde 59€. Serviço ao domicílio.',
+        desc: 'Impermeabilização profissional de sofás e cadeiras. Essencial de 1 a 2 anos desde 59€. Premium até 10 anos desde 89€. Serviço ao domicílio.',
         content: {
           h1: 'Impermeabilização de Estofos',
           intro: 'Proteja os seus estofos com impermeabilização profissional ao domicílio. Barreira invisível contra manchas, líquidos e desgaste, em duas versões: Essencial e Premium. Ideal após limpeza ou em estofos novos.',
@@ -823,14 +830,14 @@ export function prerenderRoutes(outDir: string): number {
         title: 'Packs Limpeza + Impermeabilização | Até 10% Desconto | Kyro Clean Solutions',
         desc: 'Packs exclusivos de limpeza e impermeabilização com até 10% de desconto. Sofá + Colchão, Sala Completa e mais. Serviço ao domicílio. Peça orçamento grátis.',
         content: {
-          h1: 'Packs de Limpeza e Impermeabilização',
-          intro: 'Packs exclusivos que combinam limpeza e impermeabilização com até 10% de desconto. Numa só visita, o técnico trata todos os seus estofos com o melhor preço.',
+          h1: 'Monte o seu pack de limpeza',
+          intro: 'Adicione sofás, colchões, cadeiras, tapetes e alcatifas e escolha os tratamentos. Tapetes e alcatifas sempre sob orçamento, com medidas obrigatórias. O resumo separa serviços, desconto aplicável e deslocação.',
           benefits: [
             'Pack Sofá + Colchão: tratamento completo em uma visita',
             'Pack Sala Completa: sofá, tapete e cadeiras',
-            'Pack Quarto Completo: colchão e almofadas',
+            'Pack Quarto Completo: colchão e tapete sob orçamento',
             'Pack Sofá + Impermeabilização: proteção duradoura',
-            'Poupança até 10% vs serviços individuais',
+            '10% nos serviços tabelados acima de 149€, com dois artigos e um a partir de 49€; deslocação sem desconto',
             'Agendamento flexível, incluindo fins de semana',
           ],
         },
@@ -874,7 +881,7 @@ export function prerenderRoutes(outDir: string): number {
         desc: 'Serviços de limpeza profissional de estofos disponíveis em todo o país. Porto, Gaia, Matosinhos, Lisboa, Braga e muito mais.',
         content: {
           h1: 'Áreas de Serviço',
-          intro: 'A Kyro Clean Solutions presta serviços de limpeza profissional de estofos em todo o país: Porto, Vila Nova de Gaia, Matosinhos, Maia, Lisboa, Braga, Guimarães, Coimbra e muito mais.',
+          intro: 'Equipas em Braga, Porto, Lisboa e Algarve, com cobertura regular do litoral entre Viana do Castelo e o Algarve. Aveiro, Coimbra e outras zonas mediante confirmação de disponibilidade.',
           benefits: [
             'Porto e Grande Porto: deslocação a partir de 10€',
             'Braga e Guimarães: disponível todos os dias',
@@ -894,7 +901,7 @@ export function prerenderRoutes(outDir: string): number {
           faqs: faqs([
             { q: 'Qual o preço da limpeza de sofá?', a: 'A limpeza de sofá começa a partir de 49€ para 1 lugar, 69€ para 2 lugares e 79€ para 3 lugares. Peça orçamento grátis.' },
             { q: 'Fazem serviço ao domicílio?', a: 'Sim, todos os serviços são realizados ao domicílio. O técnico desloca-se até si com todo o equipamento.' },
-            { q: 'Quanto tempo demora o serviço?', a: 'Um sofá demora 1 a 3 horas. Um colchão 1 a 2 horas. O estofo fica seco em 4 a 8 horas.' },
+            { q: 'Quanto tempo demora o serviço?', a: 'Um sofá demora 1 a 3 horas. Um colchão 1 a 2 horas. O estofo fica seco em 3 a 6 horas.' },
             { q: 'Os produtos são seguros para crianças e animais?', a: 'Sim. Usamos apenas produtos certificados, biodegradáveis e seguros para pessoas, crianças e animais domésticos.' },
           ]),
         },
@@ -1062,7 +1069,7 @@ export function prerenderRoutes(outDir: string): number {
   {
     const homeBody = generatePageBody({
       h1: 'Estofos como novos, ao domicílio.',
-      intro: 'O seu sofá, colchão ou tapete como novo em 1h, ao domicílio, sem sair de casa. Avaliação 5.0 Google. Extração profissional. Porto, Gaia, Lisboa e todo o país. Orçamento grátis.',
+      intro: 'O seu sofá, colchão ou tapete como novo em 1h, ao domicílio, sem sair de casa. Avaliação 4.9 Google. Extração profissional. Porto, Gaia, Lisboa e todo o país. Orçamento grátis.',
     });
     const homeHtml = injectContent(rawTemplate, homeBody);
     fs.writeFileSync(templatePath, homeHtml, 'utf-8');

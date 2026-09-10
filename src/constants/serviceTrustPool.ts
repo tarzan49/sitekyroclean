@@ -134,7 +134,7 @@ const TAPETES_PROBLEMA_POOL: TrustPoint[] = [
 
 const TAPETES_QUALIDADE_POOL: TrustPoint[] = [
   { titleGold: 'Aparência renovada', titleRest: ' sem substituir o tapete', desc: 'Tapetes considerados "inutilizáveis" ficam como novos com extração profissional a quente, recuperando até 90% da aparência original. Sem gastar em tapete novo.' },
-  { titleGold: 'Pronto a usar', titleRest: ' em poucas horas', desc: 'O nosso equipamento de alta extração minimiza a humidade residual. Em condições normais de ventilação, o tapete está pronto a pisar em 2 a 4 horas.' },
+  { titleGold: 'Pronto a usar', titleRest: ' em poucas horas', desc: 'O nosso equipamento de alta extração minimiza a humidade residual. Em condições normais de ventilação, o tapete está pronto a pisar em 3 a 6 horas.' },
   { titleGold: 'Recuperação de cores', titleRest: ' sem tratamentos agressivos', desc: 'Enzimas específicas por tipo de fibra restauram a tonalidade original sem branqueamento nem produtos corrosivos que danificam o tapete a longo prazo.' },
   { titleGold: 'A técnica certa', titleRest: ' para cada tipo de fibra', desc: 'Lã, seda, sisal ou sintético: cada material exige um método e produto próprios. Aplicar a técnica errada pode encolher ou destingir o tapete.' },
   { titleGold: 'Tapetes delicados', titleRest: ' tratados com o cuidado que merecem', desc: 'Tapetes antigos, de família ou artesanais recebem um processo mais cuidadoso, testado numa zona pouco visível antes de tratar a peça toda.' },
@@ -166,9 +166,9 @@ const ALCATIFA_PROBLEMA_POOL: TrustPoint[] = [
 
 const ALCATIFA_QUALIDADE_POOL: TrustPoint[] = [
   { titleGold: 'Aparência renovada', titleRest: ' sem substituir a alcatifa', desc: 'Alcatifas consideradas gastas ou descoloridas recuperam até 85% da tonalidade original com extração profissional a quente, sem gastar em revestimento novo.' },
-  { titleGold: 'Pronto a usar', titleRest: ' em poucas horas', desc: 'O nosso equipamento de alta sucção minimiza a humidade residual. Em condições normais de ventilação, a alcatifa fica seca em 2 a 4 horas.' },
+  { titleGold: 'Pronto a usar', titleRest: ' em poucas horas', desc: 'O nosso equipamento de alta sucção minimiza a humidade residual. Em condições normais de ventilação, a alcatifa fica seca em 3 a 6 horas.' },
   { titleGold: 'Sem interromper', titleRest: ' a atividade do espaço', desc: 'Em escritórios, clínicas ou lojas, trabalhamos frequentemente fora do horário de expediente para não afetar o funcionamento do negócio.' },
-  { titleGold: 'Redução de até 99%', titleRest: ' dos alergénios e ácaros', desc: 'A extração profunda a quente remove o que a aspiração doméstica nunca chega, reduzindo significativamente alergénios acumulados nas fibras.' },
+  { titleGold: 'Remoção de resíduos', titleRest: ' dos alergénios e ácaros', desc: 'A extração profunda a quente remove o que a aspiração doméstica nunca chega, reduzindo significativamente alergénios acumulados nas fibras.' },
   { titleGold: 'Equipamento certo', titleRest: ' para cada tipo de alcatifa', desc: 'Alcatifas de pelo alto, baixo ou de alta densidade (comum em hotéis) exigem pressão e técnica diferentes. Usamos o equipamento adequado a cada caso.' },
 ];
 
@@ -185,24 +185,24 @@ function getAlcatifaTrustPoints(seed: string): TrustPoint[] {
 // Impermeabilização: pedido explícito 2026-09-09 — 1º ponto sempre sofá, 2º
 // ponto sempre cadeira (os dois únicos móveis com preço próprio na tabela
 // desta página, ver PRICE_TABLE['impermeabilizacao']), ambos no formato
-// "a partir de/desde X€, proteja durante 10 anos o seu Y de Z". "10 anos" é a
+// "a partir de/desde X€, proteja até 10 anos o seu Y de Z". "10 anos" é a
 // duração real já usada na Premium noutro lado do site (ver
 // keywordVariantData.ts: "proteção real até 10 anos"), não um número novo.
 // 3º ponto fica exatamente como estava (fixo, não fazia parte do pedido).
 const IMPERMEABILIZACAO_SOFA_POOL: TrustPoint[] = [
-  { titleGold: 'A partir de 59€,', titleRest: ' proteja durante 10 anos o seu sofá de linho', desc: 'A versão Premium cria uma barreira invisível que resiste a até 5 lavagens e mantém o linho protegido de manchas e líquidos durante uma década.' },
-  { titleGold: 'Desde 59€,', titleRest: ' proteja durante 10 anos o seu sofá de veludo', desc: 'O veludo absorve líquidos em segundos e mancha com facilidade. A Premium cria uma barreira que repele manchas sem alterar o toque aveludado.' },
-  { titleGold: 'A partir de 59€,', titleRest: ' proteja durante 10 anos o seu sofá de chenille', desc: 'O chenille retém sujidade nas fibras entrelaçadas. Com a Premium, líquidos e gordura ficam à superfície, prontos a limpar com um pano.' },
-  { titleGold: 'Desde 59€,', titleRest: ' proteja durante 10 anos o seu sofá de algodão', desc: 'Tecidos de algodão absorvem manchas com muita facilidade. A Premium cria uma barreira invisível que reduz esse risco ao mínimo, sem alterar a cor.' },
-  { titleGold: 'A partir de 59€,', titleRest: ' proteja durante 10 anos o seu sofá de bouclé', desc: 'A textura em laçada do bouclé retém sujidade nos relevos. A Premium protege sem esconder a textura nem alterar o aspeto do tecido.' },
+  { titleGold: 'Premium desde 89€,', titleRest: ' proteja até 10 anos o seu sofá de linho', desc: 'A versão Premium cria uma barreira invisível que resiste a até 5 lavagens e mantém o linho protegido de manchas e líquidos durante uma década.' },
+  { titleGold: 'Premium desde 89€,', titleRest: ' proteja até 10 anos o seu sofá de veludo', desc: 'O veludo absorve líquidos em segundos e mancha com facilidade. A Premium cria uma barreira que repele manchas sem alterar o toque aveludado.' },
+  { titleGold: 'Premium desde 89€,', titleRest: ' proteja até 10 anos o seu sofá de chenille', desc: 'O chenille retém sujidade nas fibras entrelaçadas. Com a Premium, líquidos e gordura ficam à superfície, prontos a limpar com um pano.' },
+  { titleGold: 'Premium desde 89€,', titleRest: ' proteja até 10 anos o seu sofá de algodão', desc: 'Tecidos de algodão absorvem manchas com muita facilidade. A Premium cria uma barreira invisível que reduz esse risco ao mínimo, sem alterar a cor.' },
+  { titleGold: 'Premium desde 89€,', titleRest: ' proteja até 10 anos o seu sofá de bouclé', desc: 'A textura em laçada do bouclé retém sujidade nos relevos. A Premium protege sem esconder a textura nem alterar o aspeto do tecido.' },
 ];
 
 const IMPERMEABILIZACAO_CADEIRA_POOL: TrustPoint[] = [
-  { titleGold: 'A partir de 20€,', titleRest: ' proteja durante 10 anos a sua cadeira de tecido', desc: 'Cadeiras de jantar recebem sumo, molho e gordura todos os dias. A Premium cria uma barreira que dá tempo a limpar antes de a mancha absorver.' },
-  { titleGold: 'Desde 20€,', titleRest: ' proteja durante 10 anos a sua cadeira de veludo', desc: 'O veludo das cadeiras estofadas marca com facilidade. A Premium repele líquidos à superfície sem alterar o brilho nem o toque do tecido.' },
-  { titleGold: 'A partir de 20€,', titleRest: ' proteja durante 10 anos a sua cadeira de linho', desc: 'Linho claro mostra qualquer mancha de imediato. Com a Premium, derrames à mesa ficam à superfície, prontos a remover com um pano seco.' },
-  { titleGold: 'Desde 20€,', titleRest: ' proteja durante 10 anos a sua cadeira de chenille', desc: 'As fibras entrelaçadas do chenille retêm sujidade nas costuras. A Premium cria uma barreira que impede que os líquidos cheguem lá.' },
-  { titleGold: 'A partir de 20€,', titleRest: ' proteja durante 10 anos a sua cadeira estofada', desc: 'Cadeiras de restaurante ou de uso diário sofrem o desgaste mais rápido de todos os estofos. A Premium prolonga o aspeto de novo durante uma década.' },
+  { titleGold: 'A partir de 20€,', titleRest: ' proteja até 10 anos a sua cadeira de tecido', desc: 'Cadeiras de jantar recebem sumo, molho e gordura todos os dias. A Premium cria uma barreira que dá tempo a limpar antes de a mancha absorver.' },
+  { titleGold: 'Desde 20€,', titleRest: ' proteja até 10 anos a sua cadeira de veludo', desc: 'O veludo das cadeiras estofadas marca com facilidade. A Premium repele líquidos à superfície sem alterar o brilho nem o toque do tecido.' },
+  { titleGold: 'A partir de 20€,', titleRest: ' proteja até 10 anos a sua cadeira de linho', desc: 'Linho claro mostra qualquer mancha de imediato. Com a Premium, derrames à mesa ficam à superfície, prontos a remover com um pano seco.' },
+  { titleGold: 'Desde 20€,', titleRest: ' proteja até 10 anos a sua cadeira de chenille', desc: 'As fibras entrelaçadas do chenille retêm sujidade nas costuras. A Premium cria uma barreira que impede que os líquidos cheguem lá.' },
+  { titleGold: 'A partir de 20€,', titleRest: ' proteja até 10 anos a sua cadeira estofada', desc: 'Cadeiras de restaurante ou de uso diário sofrem o desgaste mais rápido de todos os estofos. A Premium prolonga o aspeto de novo durante uma década.' },
 ];
 
 const IMPERMEABILIZACAO_FIXED_POINT3: TrustPoint = { titleGold: 'Combine com a limpeza', titleRest: ' e poupe', desc: 'Peça a impermeabilização junto com a limpeza profunda: o Pack Proteção Total tem desconto sobre os dois serviços em separado.' };

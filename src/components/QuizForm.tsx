@@ -19,16 +19,17 @@ import {
 import type { QuizFormData, SofaItem, MattressItem, CarpetItem, UpsellItemConfig } from './quiz';
 import QuizStepLocation from './quiz/steps/QuizStepLocation';
 import QuizStepConfig from './quiz/steps/QuizStepConfig';
+import QuizSofaPackTest from './quiz/steps/QuizSofaPackTest';
 import QuizComboUpsellScreen from './quiz/steps/QuizComboUpsellScreen';
 import QuizChairsAddonUpsell, { ChairAddonActions } from './quiz/steps/QuizChairsAddonUpsell';
 import QuizSofaAddonUpsell from './quiz/steps/QuizSofaAddonUpsell';
 import QuizMattressAddonUpsell from './quiz/steps/QuizMattressAddonUpsell';
 import QuizStepContact from './quiz/steps/QuizStepContact';
-import { calcChairWaterproof, calcChairWaterproofPremium, calcChairClean, carpetItemArea } from './quiz/quizHelpers';
 import { WHATSAPP_BASE, BUSINESS_EMAIL } from '@/constants/business';
 import { QUIZ_STATE_CHANGE_EVENT } from '@/constants/quiz';
 import { useQuizPricing } from '@/hooks/use-quiz-pricing';
 import { useQuizUiEffects } from '@/hooks/use-quiz-ui-effects';
+import { buildReceiptLines, formatQuotePrice } from '@/services/submissionService';
 import { useQuizSubmission } from '@/hooks/use-quiz-submission';
 import { useQuizNavigation } from '@/hooks/use-quiz-navigation';
 import type { UpsellScreen } from '@/hooks/use-quiz-navigation';
@@ -58,6 +59,7 @@ interface QuizFormProps {
   initialChairQty?: string;
   initialChairWaterproofing?: boolean;
   initialCarpetArea?: string;
+  initialCarpetKind?: 'tapete' | 'alcatifa';
   initialCarpetItems?: CarpetItem[];
   initialWaterproofingTier?: 'essencial' | 'premium';
   problema?: string;
@@ -99,10 +101,12 @@ function calcInitialUpsellScreen(svc?: string, svcType?: string): UpsellScreen {
 const QuizForm = ({
   isOpen, onClose, initialLocation, initialService, problema,
   initialServiceType, initialSofaSizeId, initialSofaQty, initialSofaItems,
-  initialMattressSizeId, initialMattressQty, initialMattressItems, initialChairQty, initialChairWaterproofing, initialCarpetArea, initialCarpetItems,
+  initialMattressSizeId, initialMattressQty, initialMattressItems, initialChairQty, initialChairWaterproofing, initialCarpetArea, initialCarpetItems, initialCarpetKind,
   initialWaterproofingTier, skipToUpsell, initialUpsellItems,
 }: QuizFormProps) => {
-  const offerPreview = import.meta.env.DEV && new URLSearchParams(window.location.search).get("teste") === "ofertas";
+  const offerPreview = true;
+  const isDemo = import.meta.env.DEV && ["ofertas", "quiz-pack"].includes(new URLSearchParams(window.location.search).get("teste") ?? "");
+  const localPackPreview = false;
   const { toast } = useToast();
   const navigate = useNavigate();
   const hasInitialItem = Boolean(
@@ -120,6 +124,8 @@ const QuizForm = ({
     serviceType: initialServiceType
       || ((initialService && initialService !== 'sofa' && initialService !== 'chairs') ? 'cleaning' : ''),
     carpetArea: initialCarpetArea || '',
+    carpetKind: initialCarpetKind ?? (initialService === 'carpet' && window.location.pathname.includes('alcatifa') ? 'alcatifa' : 'tapete'),
+    description: problema ? `Problema indicado: ${problema.replace(/-/g, ' ')}` : '',
     chairQuantity: initialChairQty || '',
     chairType: initialChairQty ? 'bulk_full' : '',
     waterproofingTier: initialWaterproofingTier || 'premium',
@@ -366,7 +372,7 @@ const QuizForm = ({
   const getServiceLabel = () => {
     const labels: Record<string, string> = {
       sofa: 'Sofá',
-      carpet: 'Tapete',
+      carpet: formData.carpetKind === 'alcatifa' ? 'Alcatifa' : 'Tapete',
       mattress: 'Colchão',
       chairs: 'Cadeiras',
     };
@@ -388,107 +394,22 @@ const QuizForm = ({
   // "Sob orçamento" for null (invalid/out-of-table), otherwise "X€" or "X,YZ€".
   const fmtEuro = (n: number | null) => (n === null ? 'Sob orçamento' : n % 1 === 0 ? `${n}€` : `${n.toFixed(2).replace('.', ',')}€`);
 
-  const buildDetailsSummary = () => {
-    const details: string[] = [];
-
-    switch (formData.service) {
-      case 'sofa': {
-        const isWaterproofBase = formData.serviceType === 'waterproofing';
-        const isPremiumTier = formData.waterproofingTier === 'premium';
-        const sofaLines = splitTreatmentItems(sofaItems)
-          .filter(i => i.qty > 0)
-          .map(i => {
-            const opt = sofaPrices.find(p => p.id === i.sizeId);
-            if (!opt) return null;
-            const baseP = isWaterproofBase
-              ? (isPremiumTier
-                  ? (typeof opt.waterproofingPremiumPrice === 'number' ? opt.waterproofingPremiumPrice : null)
-                  : (typeof opt.waterproofingPrice === 'number' ? opt.waterproofingPrice : null))
-              : (typeof opt.cleaningPrice === 'number' ? opt.cleaningPrice : null);
-            // Pack Premium = pack Essencial + a mesma diferença já aprovada entre
-            // Essencial e Premium standalone (ver quizHelpers.ts calcPackPricing).
-            const tierDelta = isPremiumTier && typeof opt.packPremiumDelta === 'number' ? opt.packPremiumDelta : isPremiumTier && typeof opt.waterproofingPremiumPrice === 'number' && typeof opt.waterproofingPrice === 'number'
-              ? opt.waterproofingPremiumPrice - opt.waterproofingPrice : 0;
-            const bothEssencial = typeof opt.bothPrice === 'number' ? opt.bothPrice : (baseP !== null ? baseP + 40 : null);
-            const bothP = bothEssencial !== null ? bothEssencial + tierDelta : null;
-            const unitPrice = i.packEnabled ? bothP : baseP;
-            const lineTotal = unitPrice !== null ? unitPrice * i.qty : null;
-            const tierTag = i.packEnabled
-              ? (isPremiumTier ? ' + Proteção 10 anos' : ' + Proteção 2 anos')
-              : (isWaterproofBase ? (isPremiumTier ? ' (Premium)' : ' (Essencial)') : '');
-            return `${i.qty}x Sofá ${opt.label}${tierTag}: ${fmtEuro(lineTotal)}`;
-          })
-          .filter(Boolean) as string[];
-        if (sofaLines.length > 0) details.push(...sofaLines);
-        break;
-      }
-      case 'carpet': {
-        const validCarpets = carpetItems.map(carpetItemArea).filter((a): a is number => a !== null);
-        if (validCarpets.length > 0) {
-          const areasLabel = validCarpets.map(a => `${a % 1 === 0 ? a : a.toFixed(2).replace('.', ',')}m²`).join(', ');
-          details.push(`Tapete(s) ${areasLabel}: Sob Orçamento`);
-        }
-        break;
-      }
-      case 'mattress': {
-        const isWaterproofBase = formData.serviceType === 'waterproofing';
-        const mattressLines = splitTreatmentItems(mattressItems)
-          .filter(i => i.qty > 0)
-          .map(i => {
-            const opt = mattressPrices.find(p => p.id === i.sizeId);
-            if (!opt) return null;
-            const baseP = isWaterproofBase
-              ? (typeof opt.waterproofingPrice === 'number' ? opt.waterproofingPrice : null)
-              : (typeof opt.cleaningPrice === 'number' ? opt.cleaningPrice : null);
-            const bothP = typeof opt.bothPrice === 'number' ? opt.bothPrice : (baseP !== null ? baseP + 30 : null);
-            const unitPrice = i.packEnabled ? bothP : baseP;
-            const lineTotal = unitPrice !== null ? unitPrice * i.qty : null;
-            const tierTag = i.packEnabled ? ' + Desbacterização e Anti Ácaros' : (isWaterproofBase ? ' (Desbacterização e Anti Ácaros)' : '');
-            return `${i.qty}x Colchão ${opt.label}${tierTag}: ${fmtEuro(lineTotal)}`;
-          })
-          .filter(Boolean) as string[];
-        if (mattressLines.length > 0) details.push(...mattressLines);
-        break;
-      }
-      case 'chairs':
-        if (formData.chairQuantity) {
-          const qty = parseInt(formData.chairQuantity);
-          const isWaterproofPrimary = formData.serviceType === 'waterproofing';
-          // Tier real do formulário, não limitada ao caso "impermeabilização
-          // primária" — sem isto, o addon Premium (limpeza como serviço
-          // principal) aparecia sempre rotulado "Essencial" na mensagem.
-          const isPremiumTier = formData.waterproofingTier === 'premium';
-          const calcWaterproof = isPremiumTier ? calcChairWaterproofPremium : calcChairWaterproof;
-          const primaryTotal = !isNaN(qty) && qty > 0 ? (isWaterproofPrimary ? calcWaterproof(qty) : calcChairClean(qty)) : null;
-          const primaryLabel = isWaterproofPrimary ? `Impermeabilização${isPremiumTier ? ' Premium' : ' Essencial'}` : 'Limpeza';
-          details.push(`${formData.chairQuantity} cadeira(s): ${primaryLabel}: ${fmtEuro(primaryTotal)}`);
-          const wQty = formData.chairWaterproofQty;
-          if (wQty > 0) {
-            const addonTotal = isWaterproofPrimary ? calcChairClean(wQty) : calcWaterproof(wQty);
-            const addonLabel = isWaterproofPrimary ? 'Limpeza' : `Impermeabilização${isPremiumTier ? ' Premium' : ' Essencial'}`;
-            details.push(`${addonLabel}${formData.serviceType !== 'waterproofing' ? ' (desbacterização e antiácaros incluídos)' : ''} de ${wQty} cadeira(s): ${fmtEuro(addonTotal)}`);
-          }
-          if (formData.chairAntiAcaros && !formData.chairWaterproofing && formData.chairWaterproofQty <= 0 && !isNaN(qty) && qty > 0) {
-            details.push(`Desbacterização e Anti Ácaros de ${qty} cadeira(s): ${fmtEuro(qty * 5)}`);
-          }
-        }
-        break;
-    }
-
-    if (upsellItems.length > 0) {
-      // item.label já vem pronto do QuizComboUpsellScreen (ex. "1x Colchão Casal
-      // + Impermeabilização") — usar diretamente em vez de reconstruir a partir
-      // de item.id, que para itens com tamanho (mattress-casal, sofa-2-lugares)
-      // não batia com nenhuma chave do mapa antigo e mostrava o id em bruto.
-      const upsellParts = upsellItems.map(item => `+${item.label}: ${fmtEuro(item.price > 0 ? item.price : null)}`);
-      details.push(`Upsell: ${upsellParts.join(', ')}`);
-    }
-
-    return details.join(' | ');
-  };
+  const quoteLines = buildReceiptLines({
+    service: formData.service, serviceType: formData.serviceType,
+    waterproofingTier: formData.waterproofingTier, sofaItems, mattressItems, upsellItems, carpetItems,
+    chairQuantity: formData.chairQuantity, chairWaterproofQty: formData.chairWaterproofQty,
+    chairAntiAcaros: formData.chairAntiAcaros, carpetKind: formData.carpetKind, finalTravelCost,
+    finalLocation: formData.location === 'other' ? formData.otherLocation : formData.location,
+  });
+  const quotePriceText = formatQuotePrice({ totalPrice, packDiscountActive, packDiscountedPrice, packDiscountPct, hasSobOrcamento, hasUpsellSobItem });
+  const buildDetailsSummary = () => quoteLines.filter(line => !line.label.startsWith('Deslocação:'))
+    .map(line => `${line.qty}x ${line.label}: ${fmtEuro(line.total)}`).join('\n');
 
   const handleSubmit = async () => {
-    if (offerPreview) { toast({ title: "Teste concluído", description: "Nenhum pedido foi enviado." }); return; }
+    if (isDemo) {
+      toast({ title: "Teste concluído", description: "Nenhum pedido ou contacto foi enviado." });
+      return;
+    }
     if (!canProceed()) return;
 
     const finalLocation = formData.location === 'other' ? formData.otherLocation : formData.location;
@@ -499,28 +420,7 @@ const QuizForm = ({
     const crmServiceLabel = upsellItems.length > 0
       ? `${serviceLabel}, ${upsellItems.map(i => i.label ?? i.id).join(', ')}`
       : serviceLabel;
-    const packPctLabel = packDiscountPct > 0 ? `Pack -${Math.round(packDiscountPct * 100)}%` : '';
-    // Quando o serviço principal ou algum upsell não tem preço fechado
-    // (sofá 4+ lugares, tapete >15m², etc.), o valor deixava de mostrar a
-    // deslocação e os itens com preço real que também fazem parte do
-    // mesmo pedido — decompor em vez de colapsar tudo para "Sob orçamento"
-    // (pedido do dono: ex. colchão com preço fechado + sofá sob orçamento
-    // deve aparecer como "10€ deslocação + 69€ Colchão + Sob orçamento").
-    const buildMixedPriceBreakdown = () => {
-      const parts: string[] = [];
-      if (finalTravelCost > 0) parts.push(`${finalTravelCost}€ deslocação`);
-      if (!hasSobOrcamento && calculateServicePrice > 0) parts.push(`${calculateServicePrice}€ ${serviceLabel}`);
-      upsellItems.forEach(item => {
-        if (item.price > 0) parts.push(`${item.price}€ ${item.label ?? item.id}`);
-      });
-      parts.push('Sob orçamento');
-      return parts.join(' + ');
-    };
-    const priceText = (hasSobOrcamento || hasUpsellSobItem)
-      ? buildMixedPriceBreakdown()
-      : packDiscountActive && totalPrice > 0
-        ? `${packDiscountedPrice}€ (${packPctLabel})`
-        : totalPrice > 0 ? `${totalPrice}€` : 'Sob orçamento';
+    const priceText = quotePriceText;
 
     const message = `
 [QUIZ RÁPIDO - Kyro Clean Solutions]
@@ -530,7 +430,7 @@ Tipo: ${serviceTypeLabel}
 Detalhes: ${detailsSummary}
 Localização: ${finalLocation}
 Deslocação: ${finalTravelCost}€
-VALOR TOTAL: ${priceText}
+ESTIMATIVA: ${priceText}
 Contacto preferido: WhatsApp${formData.email ? `\nEmail: ${formData.email}` : ''}
 
 Observações:
@@ -579,6 +479,8 @@ ${formData.description || 'Sem observações adicionais'}
       hypoallergenic,
       hypoSurcharge,
       slotLabel: formatSelectedSlot(formData.selectedSlot),
+      description: formData.description,
+      carpetKind: formData.carpetKind,
     });
 
     if (!success) {
@@ -594,10 +496,10 @@ ${formData.description || 'Sem observações adicionais'}
       );
 
       toast({
-        title: "Pedido registado",
+        title: "Não foi possível enviar o pedido",
         description: (
           <div className="space-y-2">
-            <p>Para garantir resposta rápida, envie também por:</p>
+            <p>Os dados foram preservados. Envie o pedido por:</p>
             <div className="flex gap-2 mt-2">
               <a
                 href={`${WHATSAPP_BASE}?text=${whatsappMessage}`}
@@ -810,7 +712,7 @@ ${formData.description || 'Sem observações adicionais'}
                     // existe como serviço primário, só como upsell dependente de uma
                     // limpeza — ver shouldSkipServiceType acima para mais contexto.
                     const skipServiceType = service === 'carpet' || service === 'mattress';
-                    updateFormData({ service, serviceType: skipServiceType ? 'cleaning' : '', sofaSize: '', mattressSize: '', chairType: '', carpetArea: '', chairWaterproofing: false, chairWaterproofQty: 0, chairAntiAcaros: false });
+                    updateFormData({ service, carpetKind: 'tapete', serviceType: skipServiceType ? 'cleaning' : '', sofaSize: '', mattressSize: '', chairType: '', carpetArea: '', chairWaterproofing: false, chairWaterproofQty: 0, chairAntiAcaros: false });
                     setSofaItems([]);
                     setMattressItems([]);
                     setCarpetItems(buildInitialCarpetItems());
@@ -935,7 +837,11 @@ ${formData.description || 'Sem observações adicionais'}
                 categorias (Colchão, Sofá, Cadeiras), substitui o antigo fluxo
                 QuizUpsellOverlay de escolher um item de cada vez (pedido
                 explícito, aprovado em mockup 2026-09-06). */}
-            {activeUpsellScreen === 'combo' && (
+            {activeUpsellScreen === 'combo' && localPackPreview && formData.service === 'sofa' && !hasSobOrcamento ? (
+              <QuizSofaPackTest base={calculateServicePrice} travel={finalTravelCost} items={upsellItems}
+                onChoose={item => { setUpsellItems(item ? [item] : []); setActiveUpsellScreen(null); setCurrentStep(4); }}
+                onBack={() => { setActiveUpsellScreen('sofa'); }} />
+            ) : activeUpsellScreen === 'combo' && (
               <QuizComboUpsellScreen
                 offerPreview={offerPreview}
                 travelFee={finalTravelCost}
@@ -948,7 +854,6 @@ ${formData.description || 'Sem observações adicionais'}
                 onContinue={() => { (document.activeElement as HTMLElement)?.blur(); setActiveUpsellScreen(null); setCurrentStep(4); }}
                 onBack={() => {
                   (document.activeElement as HTMLElement)?.blur();
-                  setUpsellItems([]);
                   setCurrentStep(3);
                   // Volta ao ecrã de upsell dedicado do serviço (não direto às
                   // quantidades) quando esse serviço tem um — mesma condição
@@ -974,6 +879,9 @@ ${formData.description || 'Sem observações adicionais'}
             {/* Step 4 - Contact */}
             {currentStep === 4 && activeUpsellScreen !== 'combo' && (
               <QuizStepContact
+                preview={localPackPreview}
+                quoteLines={quoteLines}
+                quotePriceText={quotePriceText}
                 formData={formData}
                 updateFormData={updateFormData}
                 scrollContainerRef={scrollContainerRef}
@@ -1001,12 +909,12 @@ ${formData.description || 'Sem observações adicionais'}
           <div className="flex flex-col gap-2 w-full">
             {totalPrice > 0 && !hasSobOrcamento && !hasUpsellSobItem && (
               <p className="text-center text-[10px] text-white/25 font-medium tracking-wide">
-                Preço final: <span className="text-gold/60 font-bold">{packDiscountActive ? `${packDiscountedPrice}€` : `${totalPrice}€`}</span>
+                Total estimado: <span className="text-gold/60 font-bold">{localPackPreview ? `${(packDiscountActive ? packDiscountedPrice : totalPrice).toFixed(2).replace(".", ",")}€` : packDiscountActive ? `${packDiscountedPrice}€` : `${totalPrice}€`}</span>
               </p>
             )}
             {(hasSobOrcamento || hasUpsellSobItem) && (
               <p className="text-center text-[10px] text-white/25 font-medium tracking-wide">
-                Valor: <span className="text-gold/60 font-bold">Sob orçamento</span>
+                Estimativa: <span className="text-gold/60 font-bold">{quotePriceText}</span>
               </p>
             )}
             <div className="flex items-center gap-3 w-full">
@@ -1018,10 +926,10 @@ ${formData.description || 'Sem observações adicionais'}
               </button>
               <Button
                 onClick={handleSubmit}
-                disabled={isSubmitting}
+                disabled={isSubmitting || (!localPackPreview && !canProceed())}
                 className="flex-1 h-14 bg-gradient-to-r from-gold to-[#d4c57b] hover:from-[#d4c57b] hover:to-gold text-[#12121e] font-black text-base tracking-wider uppercase touch-manipulation active:scale-[0.98] rounded-sm shadow-[0_0_32px_rgba(212,175,55,0.30)]"
               >
-                {offerPreview ? 'CONCLUIR TESTE' : isSubmitting ? 'A enviar...' : 'FINALIZAR PEDIDO'}
+                {isDemo ? 'CONCLUIR TESTE' : isSubmitting ? 'A enviar...' : 'FINALIZAR PEDIDO'}
               </Button>
             </div>
             <p className="text-center text-[11px] text-white/30 font-medium -mt-0.5">

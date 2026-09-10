@@ -1,3 +1,6 @@
+import ServiceResultsGallery from "@/components/ServiceResultsGallery";
+import type { BeforeAfterCategory } from "@/data/beforeAfterPool";
+
 export interface CarouselSlide {
   src?: string;
   label?: string;
@@ -6,6 +9,7 @@ export interface CarouselSlide {
 }
 
 interface ServiceAutoCarouselProps {
+  category?: BeforeAfterCategory;
   beforeImage?: string;
   afterImage?: string;
   slides: CarouselSlide[];
@@ -19,6 +23,7 @@ interface ServiceAutoCarouselProps {
 }
 
 const ServiceAutoCarousel = ({
+  category,
   beforeImage,
   afterImage,
   slides,
@@ -81,7 +86,7 @@ const ServiceAutoCarousel = ({
       )}
       <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent pointer-events-none" />
       <span
-        className={`hidden sm:block absolute bottom-3 font-bold tracking-[0.2em] uppercase text-white backdrop-blur-sm px-3 py-1.5 ${
+        className={`${category ? "hidden" : "hidden sm:block"} absolute bottom-3 font-bold tracking-[0.2em] uppercase text-white backdrop-blur-sm px-3 py-1.5 ${
           labelSide === "right" ? "right-3" : "left-3"
         } ${
           label === "Antes" ? "text-xs bg-red-900/70 border-l-2 border-red-400"
@@ -95,11 +100,11 @@ const ServiceAutoCarousel = ({
   );
 
   return (
-    <section className={`py-12 md:py-20 ${light ? "bg-[#FDFDF9]" : "bg-kyro-green"}`}>
+    <section className={`py-10 md:py-14 ${light ? "bg-[#FDFDF9]" : "bg-kyro-green"}`}>
       <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
 
         {/* Editorial header — slightly larger */}
-        <div className="mb-10 md:mb-14">
+        <div className="mb-6 md:mb-8">
           <div className="flex items-center gap-3 mb-5">
             <div className="h-px w-8 flex-shrink-0" style={{ backgroundColor: '#D4AF37', opacity: 0.65 }} />
             <p className="text-[10px] font-bold tracking-[0.28em] uppercase" style={{ color: '#D4AF37', opacity: 0.85 }}>
@@ -115,8 +120,27 @@ const ServiceAutoCarousel = ({
           </p>
         </div>
 
-        {/* 2×2 photo grid */}
-        {beforeImage && afterImage ? (
+        {category && (
+          <div className="grid max-w-5xl items-start gap-6 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)] lg:gap-10">
+            <div className="min-w-0 max-w-[640px] w-full">
+              <ServiceResultsGallery key={category} category={category} light={light} />
+            </div>
+            <div className={`min-w-0 pt-5 border-t lg:pt-0 lg:border-t-0 ${light ? "border-black/10" : "border-white/15"}`}>
+              <h3 className={`font-playfair text-xl mb-4 ${textMain}`}>O cuidado em cada pormenor</h3>
+              <div className="grid grid-cols-2 lg:grid-cols-1 gap-3 md:gap-4">
+                {slides.slice(0, 2).map((slide, i) => slide.src ? (
+                  <figure key={slide.src}>
+                    <GalleryCell src={slide.src} label={slide.label ?? ""} objectPosition={slide.objectPosition} mirror={slide.mirror} />
+                    <figcaption className={`mt-3 text-sm ${textSub}`}>{slide.label || `Pormenor do serviço ${i + 1}`}</figcaption>
+                  </figure>
+                ) : null)}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Static gallery for pages without a selected pool. */}
+        {!category && beforeImage && afterImage ? (
           <div className="grid grid-cols-2 gap-1 md:gap-1.5 max-w-5xl">
             {/* Top row — before / after */}
             <GalleryCell src={beforeImage} label="Antes" labelSide="left" portrait={rotateBeforeAfter} />

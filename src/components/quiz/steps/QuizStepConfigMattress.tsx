@@ -22,7 +22,7 @@ const QuizStepConfigMattress = ({ formData, updateFormData, mattressItems, setMa
   return (
     <div className="flex flex-col gap-3 w-full overflow-hidden items-center">
       <p className="text-gold text-[11px] font-bold tracking-[0.28em] uppercase mb-0.5 text-center w-full">QUANTIDADES</p>
-      <h2 className="font-playfair text-2xl sm:text-3xl font-bold text-white text-center w-full">Detalhes do(s) Colchão(ões)</h2>
+      <h2 className="font-playfair text-2xl sm:text-3xl font-bold text-white text-center w-full">{isWaterproofBase ? 'Que colchões vamos tratar?' : 'Que colchões vamos limpar?'}</h2>
       <div className="flex flex-col gap-2 w-full max-w-sm">
         {mattressPrices.map(option => {
           const item = mattressItems.find(i => i.sizeId === option.id);

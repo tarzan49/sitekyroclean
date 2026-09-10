@@ -231,6 +231,7 @@ const MaterialPage = () => {
         {/* ═══ GALERIA — ANTES E DEPOIS ═══ */}
         {gallery && (
           <ServiceAutoCarousel
+            category={beforeAfterCategory ?? undefined}
             overline="Resultados Reais"
             heading={`Antes e depois: ${data.name}`}
             subtitle={`Transformação real em ${data.serviceName.toLowerCase()}, resultado visível no próprio dia.`}

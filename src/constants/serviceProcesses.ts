@@ -3,7 +3,7 @@ export const GENERIC_PROCESS_STEPS = [
   { step: "02", label: "Pulverização",     desc: "Aplicação de produto específico para cada tecido" },
   { step: "03", label: "Escovação",        desc: "Distribuição do produto nas fibras com escova profissional" },
   { step: "04", label: "Extração profunda",desc: "Remoção de sujidade, ácaros e manchas" },
-  { step: "05", label: "Secagem rápida",   desc: "Pronto a usar em 4 a 6 horas" },
+  { step: "05", label: "Secagem rápida",   desc: "Pronto a usar em 3 a 6 horas" },
 ];
 
 export const IMPERMEABILIZACAO_STEPS = [

@@ -213,6 +213,9 @@ const Impermeabilizacao = () => {
         <ServicePriceSection serviceSlug="impermeabilizacao" />
         <WaterproofingTierComparison />
         <ServiceAutoCarousel
+          category="impermeabilizacao"
+          heading="Antes e depois da proteção"
+          subtitle="Explore os exemplos de proteção dos tecidos. As demonstrações ilustrativas estão identificadas em cada comparação."
           overline="A Barreira Invisível"
           beforeImage={impermeabilizacaoAntes}
           afterImage={impermeabilizacaoDepois}
@@ -232,7 +235,7 @@ const Impermeabilizacao = () => {
         <ServiceCityLinks serviceSlug="impermeabilizacao" serviceLabel="Impermeabilização de Estofos" />
         <ServiceSchema
           serviceName="Impermeabilização de Estofos"
-          description="Impermeabilização profissional de sofás e cadeiras no Porto. Versão Essencial e versão Premium, com proteção real até 10 anos."
+          description="Impermeabilização profissional de sofás e cadeiras com equipas em Braga, Porto, Lisboa e Algarve. Versão Essencial e versão Premium, com proteção real até 10 anos."
           url="/impermeabilizacao"
           priceFrom="59€"
           reviews={[

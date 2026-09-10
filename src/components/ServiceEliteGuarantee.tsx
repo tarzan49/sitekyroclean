@@ -1,3 +1,4 @@
+import { SATISFACTION_PROMISE } from '../constants/commercialPolicy';
 export interface GuaranteeItem {
   label: string;
   title: string;
@@ -9,8 +10,8 @@ export interface GuaranteeItem {
 const DEFAULT_ITEMS: GuaranteeItem[] = [
   {
     label: "Satisfação",
-    title: "100% ou repetimos",
-    body: "Se o resultado não ficar completamente perfeito, repetimos o serviço sem custos adicionais. Sem condições, sem discussão.",
+    title: "Não ficou satisfeito? Repetimos",
+    body: SATISFACTION_PROMISE,
   },
   {
     label: "Qualidade",
@@ -33,7 +34,7 @@ interface ServiceEliteGuaranteeProps {
 
 const ServiceEliteGuarantee = ({
   heading = "A nossa promessa em cada visita",
-  subtitle = "Cada serviço inclui a nossa garantia de satisfação total, sem compromissos nem letra pequena.",
+  subtitle = "Contacte-nos até 48 horas após o serviço para acionar a repetição gratuita.",
   variant = "light",
   items = DEFAULT_ITEMS,
 }: ServiceEliteGuaranteeProps) => {

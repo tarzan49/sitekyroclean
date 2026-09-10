@@ -2,7 +2,7 @@ import { splitTreatmentItems } from '@/components/quiz/quizHelpers';
 import { useMemo } from 'react';
 import type { QuizFormData, SofaItem, MattressItem, CarpetItem, UpsellItemConfig } from '@/components/quiz';
 import { sofaPrices, mattressPrices, locationPrices } from '@/components/quiz';
-import { calcChairClean, calcChairWaterproof, calcChairWaterproofPremium, carpetHasValidItems } from '@/components/quiz/quizHelpers';
+import { calcPackPricing, calcChairClean, calcChairWaterproof, calcChairWaterproofPremium, carpetHasValidItems } from '@/components/quiz/quizHelpers';
 import { PACK_DISCOUNT_MIN_UPSELL_ITEM, PACK_DISCOUNT_MIN_TOTAL } from '@/lib/priceWidgetCalc';
 
 export function useQuizPricing(
@@ -32,34 +32,7 @@ export function useQuizPricing(
           const opt = sofaPrices.find(p => p.id === item.sizeId);
           if (!opt) return;
           const isWaterproofBase = formData.serviceType === 'waterproofing';
-          const isPremium = formData.waterproofingTier === 'premium';
-          const waterproofP = isPremium
-            ? (typeof opt.waterproofingPremiumPrice === 'number' ? (opt.waterproofingPremiumPrice as number) : 0)
-            : (typeof opt.waterproofingPrice === 'number' ? (opt.waterproofingPrice as number) : 0);
-          const baseP = isWaterproofBase
-            ? waterproofP
-            : (typeof opt.cleaningPrice === 'number' ? (opt.cleaningPrice as number) : 0);
-          // Pack Premium = pack Essencial + a mesma diferença já aprovada entre
-          // Essencial e Premium standalone (não é um combo com preço próprio) —
-          // mas respeita primeiro o override packPremiumDelta (ex: 3-lugares tem
-          // 20€ fixo em vez dos 30€ que a diferença standalone daria), exatamente
-          // como calcPackPricing em quizHelpers.ts. Sem isto, o pack Premium do
-          // sofá de 3 lugares saía 10€ mais caro aqui do que em todo o resto do
-          // site (widget, Step 3, upsell), pois usava sempre a diferença bruta.
-          const tierDelta = isPremium
-            ? (typeof opt.packPremiumDelta === 'number'
-                ? opt.packPremiumDelta
-                : (typeof opt.waterproofingPremiumPrice === 'number' && typeof opt.waterproofingPrice === 'number'
-                    ? opt.waterproofingPremiumPrice - opt.waterproofingPrice : 0))
-            : 0;
-          const bothEssencial = typeof opt.bothPrice === 'number' ? (opt.bothPrice as number) : baseP + 40;
-          const bothP = bothEssencial + tierDelta;
-          // Os addons contam para o artigo (pedido explícito 2026-09-01: o
-          // valor do Pack/Proteção ligado tem de entrar na conta do Pack
-          // Família, tal como já entra no preço realmente cobrado — antes só
-          // o preço base sem addon contava, o que fazia um sofá com uma
-          // Proteção 10 anos cara continuar a não qualificar para o desconto).
-          const unitPrice = item.packEnabled ? bothP : baseP;
+          const unitPrice = calcPackPricing(opt, item.packEnabled, isWaterproofBase, null, formData.waterproofingTier).displayPrice ?? 0;
           if (unitPrice > 0) { price += unitPrice * item.qty; baseTotal += unitPrice * item.qty; noteCandidate(unitPrice); }
         });
         break;
@@ -164,38 +137,34 @@ export function useQuizPricing(
     : (formData.waterproofingTier === 'premium' ? calcChairWaterproofPremium : calcChairWaterproof);
   const chairAddonNeedsQuote = isChairService && chairAddonQty > 0 && chairAddonCalc(chairAddonQty) === null;
   const hasSobOrcamento =
-    sofaItems.some(i => i.sizeId === '4+-lugares' && i.qty > 0) ||
+    (formData.service === 'sofa' && sofaItems.some(i => i.sizeId === '4+-lugares' && i.qty > 0)) ||
     (formData.service === 'carpet' && carpetHasValidItems(carpetItems)) ||
     chairPrimaryNeedsQuote ||
     chairAddonNeedsQuote;
   // Any upsell item with price=0 is a SOB item (chairs ≥10, tapetes (sempre), sofa 4+ lugares)
   const hasUpsellSobItem = upsellItems.some(i => i.price === 0);
-  // Desconto de 10% (2026-08-31, reformulado x4 — confirmado com 3 exemplos
-  // concretos): conta-se cada UNIDADE de mobília (sofá, colchão, cadeiras
-  // como lote, tapete) como um artigo ao seu preço BASE (sem addon) — tanto
-  // as do serviço principal como as adicionadas via upsell (Pack Família).
-  // Regra final: soma de todos os artigos > 149€ (100€ de base + 49€ do
-  // artigo extra, não sobrepostos) E pelo menos um artigo, sozinho, vale
-  // PACK_DISCOUNT_MIN_UPSELL_ITEM ou mais. Limiares importados de
-  // priceWidgetCalc.ts (nunca duplicar o número aqui — foi assim que o
-  // limiar do artigo extra ficou desincronizado a 60€ depois de baixar
-  // para 49€ 2026-09-08, bug real só apanhado ao rever este ficheiro).
-  // 'sofa-anti-acaros'/'chairs-anti-acaros' no upsellItems são tratamento no
-  // mesmo item, não um artigo novo (só lá estão por conveniência de cálculo
-  // no widget), por isso ficam de fora. Um artigo de upsell "sob orçamento"
-  // conta sempre como qualificado (é implicitamente grande mesmo com 0€).
+  // Regra comercial 2026-09-10: pelo menos dois artigos tabelados, soma >149€
+  // e um artigo >=49€. Cadeiras contam como um lote; tratamento não é artigo.
+  // Artigos sob orçamento nunca desbloqueiam um desconto por terem preço zero.
   const NON_ARTICLE_UPSELL_IDS = new Set(['sofa-anti-acaros', 'chairs-anti-acaros']);
   const articleUpsellItems = upsellItems.filter(i => !NON_ARTICLE_UPSELL_IDS.has(i.id));
   const upsellArticleTotal = articleUpsellItems.reduce((sum, item) => sum + safePrice(item.price), 0);
   const hasSubstantialUpsellArticle = articleUpsellItems.some(i => i.price >= PACK_DISCOUNT_MIN_UPSELL_ITEM);
   const totalArticleValue = articleBaseTotal + upsellArticleTotal;
   const hasSubstantialArticle = minQualifyingArticle !== null || hasSubstantialUpsellArticle;
-  const packDiscountActive = (import.meta.env.DEV && offerPreview) ? false : (totalArticleValue > PACK_DISCOUNT_MIN_TOTAL && hasSubstantialArticle) || hasUpsellSobItem;
+  const primaryArticleCount = formData.service === 'sofa' ? sofaItems.reduce((sum, i) => sum + (i.qty > 0 && i.sizeId !== '4+-lugares' ? i.qty : 0), 0)
+    : formData.service === 'mattress' ? mattressItems.reduce((sum, i) => sum + Math.max(0, i.qty), 0)
+    : formData.service === 'chairs' && !chairPrimaryNeedsQuote && chairQtyNum > 0 ? 1 : 0;
+  const articleCount = primaryArticleCount + articleUpsellItems.reduce((sum, i) => sum + (i.price <= 0 ? 0 : i.id === 'chairs' ? 1 : (i.qty ?? 1)), 0);
+  const previewDiscount = offerPreview;
+  const packDiscountActive = previewDiscount
+    ? false // Local fixed-price offer already includes its saving; never stack 10%.
+    : (articleCount >= 2 && totalArticleValue > PACK_DISCOUNT_MIN_TOTAL && hasSubstantialArticle);
   const packDiscountPct = packDiscountActive ? 0.10 : 0;
   const serviceOnlyTotal = calculateServicePrice + upsellItemsTotal + 0;
   const discountedPrice = Math.round(totalPrice);
   const packDiscountedPrice = packDiscountActive && totalPrice > 0
-    ? Math.round(serviceOnlyTotal * 0.9) + finalTravelCost
+    ? (previewDiscount ? Math.round(serviceOnlyTotal * 90) / 100 : Math.round(serviceOnlyTotal * 0.9)) + finalTravelCost
     : discountedPrice;
 
   return {

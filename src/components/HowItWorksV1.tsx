@@ -25,12 +25,12 @@ const guarantees = [
   {
     icon: ShieldCheck,
     titleFallback: "Satisfação garantida",
-    textFallback: "Se não ficou satisfeito, repetimos sem custos.",
+    textFallback: "Se não ficou satisfeito, contacte-nos até 48 horas após o serviço: repetimos sem custos.",
   },
   {
     icon: HandCoins,
     titleFallback: "Orçamento transparente",
-    textFallback: "O valor apresentado é o valor final. Sem surpresas.",
+    textFallback: "Confirmamos o preço antes da marcação, incluindo artigos, medidas, tratamentos e deslocação.",
   },
   {
     icon: Droplets,

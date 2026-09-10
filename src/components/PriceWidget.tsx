@@ -1,7 +1,10 @@
 import QuizEstimate from '@/components/quiz/QuizEstimate';
 import QuizFurnitureImage from '@/components/quiz/QuizFurnitureImage';
 import { WaterproofingTierPicker } from "@/components/quiz/steps/WaterproofingTierPicker";
-import { useState } from "react";
+import { lazy, Suspense, useState } from "react";
+import { useLocation } from "react-router-dom";
+import { carpetAllItemsValid } from "@/components/quiz/quizHelpers";
+const SofaPackPreview = lazy(() => import("@/components/SofaPackPreview"));
 import { Minus, Plus, ChevronRight, MapPin, ShieldCheck } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { usePriceWidgetState } from "@/hooks/use-price-widget";
@@ -21,6 +24,9 @@ interface Props {
 }
 
 export default function PriceWidget({ serviceSlug, initialLocation }: Props) {
+  const { search } = useLocation();
+  const isPackPreview = import.meta.env.DEV && new URLSearchParams(search).get('teste') === 'pack' && serviceSlug === 'limpeza-sofas';
+  const [showPackPreview, setShowPackPreview] = useState(false);
   const rows = PRICE_TABLE[serviceSlug];
   const { isQuizOpen, openQuiz, closeQuiz } = useQuizLauncher();
   const [activeConfig, setActiveConfig] = useState<PriceRowQuizConfig | null>(null);
@@ -33,6 +39,10 @@ export default function PriceWidget({ serviceSlug, initialLocation }: Props) {
   const isWaterproofService = serviceSlug === 'impermeabilizacao';
 
   const handleContinue = () => {
+    if (isPackPreview) {
+      if ((w.rowQuantities[3] ?? 0) === 0) setShowPackPreview(true);
+      return;
+    }
     const config = w.buildConfig();
     if (!config) return;
     setActiveConfig(config);
@@ -46,7 +56,8 @@ export default function PriceWidget({ serviceSlug, initialLocation }: Props) {
   const total = calcWidgetTotal(serviceSlug, w.rowQuantities, w.chaiseLongueAddon, new Set(), w.addonTier);
   const travelFee = initialLocation ? (locationPrices[initialLocation] ?? 10) : 0;
   const articles = calcWidgetArticles(serviceSlug, w.rowQuantities, new Set(), w.addonTier);
-  const pricing = calcWidgetPricing(total, travelFee, articles);
+  const pricing = { ...calcWidgetPricing(total, travelFee, articles), ...(isPackPreview ? { discountActive: false } : {}) };
+  const incompleteMeasures = Object.values(w.carpetItemsByRow).some(items => !carpetAllItemsValid(items));
   const hasSelection = total > 0 || Object.values(w.rowQuantities).some(q => q > 0) || w.chaiseLongueAddon > 0;
 
   const hasUnpricedSelection = quizConfigs.some((cfg, i) => cfg && (w.rowQuantities[i] ?? 0) > 0 && (
@@ -211,12 +222,17 @@ export default function PriceWidget({ serviceSlug, initialLocation }: Props) {
 
       <div className="px-3 sm:px-0 pb-5 w-full max-w-sm mx-auto">
         {!hasSelection && <p className="text-xs text-white/80 mb-3">{initialLocation ? `Deslocação a ${initialLocation}: ${travelFee} €` : 'Deslocação calculada conforme a localidade.'}</p>}
-        <button type="button" onClick={handleContinue} disabled={!hasSelection} className={cn("w-full h-12 flex items-center justify-center gap-3 bg-gradient-to-r from-gold to-[#d4c57b] hover:from-[#d4c57b] hover:to-gold text-[#12121e] font-bold text-base touch-manipulation active:scale-[0.98] rounded-sm shadow-[0_4px_28px_rgba(212,175,55,0.40)] transition-all focus-visible:outline focus-visible:outline-2 focus-visible:outline-white", !hasSelection && "opacity-60")}>
+        <button type="button" onClick={handleContinue} disabled={!hasSelection || incompleteMeasures} className={cn("w-full h-12 flex items-center justify-center gap-3 bg-gradient-to-r from-gold to-[#d4c57b] hover:from-[#d4c57b] hover:to-gold text-[#12121e] font-bold text-base touch-manipulation active:scale-[0.98] rounded-sm shadow-[0_4px_28px_rgba(212,175,55,0.40)] transition-all focus-visible:outline focus-visible:outline-2 focus-visible:outline-white", !hasSelection && "opacity-60")}>
           Continuar <ChevronRight className="w-5 h-5" />
         </button>
         <p className="flex justify-center items-center gap-2 text-xs mt-3 text-white/80"><ShieldCheck className="w-4 h-4" />Gratuito e sem compromisso</p>
       </div>
 
+      {isPackPreview && showPackPreview && <Suspense fallback={<p className="p-4 text-white">A abrir oferta…</p>}><SofaPackPreview
+        base={total} travel={travelFee} city={initialLocation ?? 'Lisboa'}
+        items={rows.flatMap((row, index) => (w.rowQuantities[index] ?? 0) > 0 ? [`${w.rowQuantities[index]} × ${row.item}`] : [])}
+        onClose={() => setShowPackPreview(false)}
+      /></Suspense>}
       {activeConfig && (
         <QuizFormLazy
           isOpen={isQuizOpen}
@@ -230,6 +246,7 @@ export default function PriceWidget({ serviceSlug, initialLocation }: Props) {
           initialMattressItems={activeConfig.mattressItems}
           initialMattressSizeId={activeConfig.mattressSizeId}
           initialMattressQty={activeConfig.mattressQty}
+          initialCarpetKind={serviceSlug === 'limpeza-alcatifas' ? 'alcatifa' : 'tapete'}
           initialCarpetArea={activeConfig.carpetArea}
           initialCarpetItems={activeConfig.carpetItems}
           initialChairQty={activeConfig.chairQty}

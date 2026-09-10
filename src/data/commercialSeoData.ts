@@ -66,7 +66,7 @@ function segmentContent(segment: SegmentKey, cityName: string, prep: string): { 
         painPoints: [
           `Estofos de bancos e cadeiras acumulam manchas de comida, gordura e vinho todos os dias, visíveis a quem entra ${prep} ${cityName}`,
           "Odores de cozinha e de clientes fumadores absorvem-se no tecido e não saem com limpeza normal",
-          "Fecho para limpeza profunda durante o horário de funcionamento não é opção",
+          "Fecho para limpeza profunda não é opção",
         ],
         solution: `Limpeza e desodorização profissional de bancos, cadeiras e sofás de espera, fora do horário de serviço (antes da abertura, depois do fecho ou em dia de descanso), com secagem rápida para não atrasar a reabertura.`,
       };

@@ -267,7 +267,7 @@ interface ProblemSet {
 const problemsByService: Record<string, ProblemSet[]> = {
   "limpeza-sofas": [
     { title: "Manchas de café e vinho no tecido", description: f => `Manchas de café, vinho e gordura são o problema mais frequente nos sofás de ${f}. A extração profissional remove-as sem danificar o tecido.` },
-    { title: "Ácaros invisíveis nas fibras do sofá", description: f => `Os sofás de ${f} acumulam milhões de ácaros que causam alergias respiratórias. A nossa extração profissional elimina 99% destes agentes.` },
+    { title: "Ácaros invisíveis nas fibras do sofá", description: f => `Os sofás de ${f} acumulam milhões de ácaros que causam alergias respiratórias. A nossa extração profissional ajuda a remover pó e resíduos acumulados nas fibras.` },
     { title: "Odores de animais domésticos no sofá", description: f => `O cheiro a cão ou gato impregnado no sofá é um dos pedidos mais frequentes em ${f}. Eliminamos os odores na origem, não apenas os mascaramos.` },
     { title: "Sujidade profunda acumulada ao longo dos anos", description: f => `Anos de uso deixam os sofás de ${f} com uma aparência envelhecida. A limpeza profissional devolve a cor e textura originais.` },
     { title: "Pêlos de animais entranhados no estofo", description: f => `Os pêlos de animais prendem-se profundamente nas fibras do sofá. Em ${f}, muitas famílias com pets beneficiam da nossa limpeza especializada.` },
@@ -302,7 +302,7 @@ const problemsByService: Record<string, ProblemSet[]> = {
     { title: "Pêlos de animais nas cadeiras estofadas", description: f => `Em ${f}, os animais adoram as cadeiras estofadas. Os pêlos e alergénios acumulam-se nas fibras e exigem extração profissional.` },
     { title: "Descoloração e desgaste nas zonas de contacto", description: f => `As zonas de maior contacto das cadeiras em ${f} ficam mais escuras e desgastadas com o uso. A limpeza profissional uniformiza a cor e o aspeto.` },
     { title: "Cadeiras de escritório com anos de uso intenso", description: f => `As cadeiras de escritório em ${f} acumulam suor e sujidade corporal. Uma limpeza profissional melhora a higiene e prolonga a vida útil.` },
-    { title: "Bactérias em superfícies de contacto frequente", description: f => `As cadeiras são uma das superfícies com mais bactérias na casa. Em ${f}, a nossa higienização profissional elimina 99% dos agentes patogénicos.` },
+    { title: "Bactérias em superfícies de contacto frequente", description: f => `As cadeiras são uma das superfícies com mais bactérias na casa. Em ${f}, a nossa higienização profissional ajuda a remover sujidade nas superfícies de contacto.` },
     { title: "Cadeiras de qualidade a perder o aspeto original", description: f => `Cadeiras de designer ou de qualidade superior em ${f} merecem cuidados especializados. Os nossos técnicos trabalham com todos os tipos de tecido e pele.` },
   ],
   "limpeza-alcatifas": [
@@ -335,9 +335,9 @@ const benefitsByService: Record<string, BenefitTemplate[]> = {
   "limpeza-sofas": [
     (f, c) => `Serviço ao domicílio em ${f}: limpamos o sofá na sua própria sala, sem transporte nem complicações em ${c}`,
     (f, c) => `Cobertura total em ${f} e toda a área de ${c}, com deslocação calculada pela distância`,
-    (f)    => `O seu sofá em ${f} fica pronto a usar no mesmo dia, com secagem completa em 4 a 6 horas`,
+    (f)    => `O seu sofá em ${f} fica pronto a usar no mesmo dia, com secagem completa em 3 a 6 horas`,
     (f)    => `Produtos certificados e hipoalergénicos: 100% seguros para as crianças e animais da sua família em ${f}`,
-    (f)    => `Eliminação de 99% dos ácaros, bactérias e alergénios acumulados no sofá em ${f}`,
+    (f)    => `Remoção de resíduos associados a ácaros, bactérias e alergénios acumulados no sofá em ${f}`,
     (f, c) => `Orçamento gratuito e transparente antes de qualquer trabalho no seu sofá em ${f}, ${c}`,
     (f)    => `Técnicos experientes em todos os tipos de tecido: microfibra, veludo, linho e pele sintética em ${f}`,
     (f)    => `Resultados visíveis imediatamente após a limpeza, com garantia de satisfação para clientes de ${f}`,
@@ -348,7 +348,7 @@ const benefitsByService: Record<string, BenefitTemplate[]> = {
     (f)    => `Melhoria imediata da qualidade do sono para residentes de ${f} com alergias noturnas`,
     (f, c) => `Cobertura completa em ${f} e toda a área de ${c}, com deslocação calculada pela distância`,
     (f)    => `Produtos hipoalergénicos e seguros para bebés, crianças e animais de estimação em ${f}`,
-    (f)    => `Colchão pronto a usar no mesmo dia, com secagem completa em 3 a 5 horas em ${f}`,
+    (f)    => `Colchão pronto a usar no mesmo dia, com secagem completa em 3 a 6 horas em ${f}`,
     (f)    => `Tratamento eficaz contra fungos e humidade, frequentes em quartos pouco ventilados de ${f}`,
     (f, c) => `Orçamento gratuito e personalizado para o colchão da sua casa em ${f}, ${c}`,
   ],
@@ -357,7 +357,7 @@ const benefitsByService: Record<string, BenefitTemplate[]> = {
     (f)    => `Recuperação de cores e textura em tapetes envelhecidos de ${f}, com resultados visíveis`,
     (f)    => `Eliminação de ácaros, alergénios e pêlos de animais que se acumulam nos tapetes de ${f}`,
     (f, c) => `Cobertura total em ${f} e toda a área de ${c}, com deslocação calculada pela distância`,
-    (f)    => `Secagem rápida: o tapete de ${f} fica pronto a usar em 2 a 4 horas após a limpeza`,
+    (f)    => `Secagem rápida: o tapete de ${f} fica pronto a usar em 3 a 6 horas após a limpeza`,
     (f)    => `Técnicos especializados em tapetes de lã, seda e fibras delicadas, frequentes em ${f}`,
     (f)    => `Remoção de manchas resistentes que os produtos domésticos de ${f} não conseguem eliminar`,
     (f, c) => `Orçamento gratuito e personalizado para o seu tapete em ${f}, ${c}`,
@@ -367,7 +367,7 @@ const benefitsByService: Record<string, BenefitTemplate[]> = {
     (f)    => `Eliminação de gordura, restos de comida e bactérias acumulados nas cadeiras de ${f}`,
     (f)    => `Produtos seguros para crianças e animais, ideais para as cadeiras de famílias de ${f}`,
     (f, c) => `Cobertura total em ${f} e toda a área de ${c}, com deslocação calculada pela distância`,
-    (f)    => `Cadeiras prontas a usar no mesmo dia, com secagem em 3 a 4 horas em ${f}`,
+    (f)    => `Cadeiras prontas a usar no mesmo dia, com secagem em 3 a 6 horas em ${f}`,
     (f)    => `Remoção de manchas de comida e bebidas que desvalorizam o espaço de refeições em ${f}`,
     (f)    => `Técnicos treinados para todos os tipos de estofo de cadeira presentes nos lares de ${f}`,
     (f, c) => `Orçamento gratuito antes de qualquer trabalho nas suas cadeiras em ${f}, ${c}`,
@@ -413,7 +413,7 @@ const faqsByService: Record<string, FAQTemplate[]> = {
     },
     {
       question: (svc, f) => `Quanto tempo demora a limpeza de sofá em ${f}?`,
-      answer: (svc, f, price, c) => `Em ${f}, a limpeza de um sofá de 2 a 3 lugares demora entre 1 a 2 horas. O sofá fica pronto a usar em 4 a 6 horas após a secagem completa.`,
+      answer: (svc, f, price, c) => `Em ${f}, a limpeza de um sofá de 2 a 3 lugares demora entre 1 a 2 horas. O sofá fica pronto a usar após secagem completa, em média 3 a 6 horas com ventilação.`,
     },
     {
       question: (svc, f) => `Conseguem remover manchas antigas do sofá em ${f}?`,
@@ -447,11 +447,11 @@ const faqsByService: Record<string, FAQTemplate[]> = {
     },
     {
       question: (svc, f) => `Quanto tempo demora a limpeza do colchão em ${f}?`,
-      answer: (svc, f, price, c) => `Em ${f}, a limpeza de um colchão de casal demora entre 45 minutos a 1 hora. O colchão fica pronto a usar em 3 a 5 horas, com secagem completa.`,
+      answer: (svc, f, price, c) => `Em ${f}, a limpeza de um colchão de casal demora entre 45 minutos a 1 hora. O colchão fica pronto a usar em 3 a 6 horas, com secagem completa.`,
     },
     {
       question: (svc, f) => `A limpeza de colchão em ${f} elimina os ácaros?`,
-      answer: (svc, f, price, c) => `Sim. Em ${f}, o nosso processo de extração com água quente elimina 99% dos ácaros e bactérias presentes no colchão, com melhoria imediata para quem sofre de alergias.`,
+      answer: (svc, f, price, c) => `Sim. Em ${f}, o nosso processo de extração com água quente ajuda a remover resíduos associados a ácaros e bactérias presentes no colchão, O tratamento anti-ácaros pode ser acrescentado como extra.`,
     },
     {
       question: (svc, f) => `A limpeza de colchão em ${f} é indicada para bebés e crianças?`,
@@ -481,7 +481,7 @@ const faqsByService: Record<string, FAQTemplate[]> = {
     },
     {
       question: (svc, f) => `Quanto tempo demora a limpeza de tapete em ${f}?`,
-      answer: (svc, f, price, c) => `Em ${f}, a limpeza de um tapete de sala demora entre 30 a 60 minutos. O tapete fica pronto a usar em 2 a 4 horas, consoante o tipo de fibra.`,
+      answer: (svc, f, price, c) => `Em ${f}, a limpeza de um tapete de sala demora entre 30 a 60 minutos. O tapete fica pronto a usar em 3 a 6 horas, consoante o tipo de fibra.`,
     },
     {
       question: (svc, f) => `Conseguem limpar tapetes de lã e peças artesanais em ${f}?`,
@@ -515,7 +515,7 @@ const faqsByService: Record<string, FAQTemplate[]> = {
     },
     {
       question: (svc, f) => `Quanto tempo demora a limpeza de cadeiras em ${f}?`,
-      answer: (svc, f, price, c) => `Em ${f}, a limpeza de um conjunto de 6 cadeiras demora entre 1 a 2 horas. As cadeiras ficam prontas a usar em 3 a 4 horas após a secagem completa.`,
+      answer: (svc, f, price, c) => `Em ${f}, a limpeza de um conjunto de 6 cadeiras demora entre 1 a 2 horas. As cadeiras ficam prontas a usar após secagem completa, em média 3 a 6 horas com ventilação.`,
     },
     {
       question: (svc, f) => `Conseguem remover manchas de comida antigas nas cadeiras em ${f}?`,
@@ -549,7 +549,7 @@ const faqsByService: Record<string, FAQTemplate[]> = {
     },
     {
       question: (svc, f) => `Quanto tempo demora a limpeza de alcatifa em ${f}?`,
-      answer: (svc, f, price, c) => `Em ${f}, uma alcatifa de sala (25-30m²) demora entre 1 a 2 horas. A secagem completa leva entre 4 a 8 horas, consoante a espessura das fibras.`,
+      answer: (svc, f, price, c) => `Em ${f}, uma alcatifa de sala (25-30m²) demora entre 1 a 2 horas. A secagem completa leva entre 3 a 6 horas, consoante a espessura das fibras.`,
     },
     {
       question: (svc, f) => `A limpeza de alcatifa danifica o pavimento em ${f}?`,

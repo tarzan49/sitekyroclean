@@ -1,3 +1,4 @@
+import { getTreatmentRoutes, getExpansionRoutes } from '../src/data/treatmentSeoData';
 ﻿/**
  * Sitemap Generator for Kyro Clean Solutions
  * Generates a Sitemap Index + sub-sitemaps covering all ~1700+ URLs
@@ -236,6 +237,8 @@ export function generateSitemaps(outDir: string) {
 
   // Write sub-sitemaps
   const sitemapFiles = [
+    { name: 'sitemap-tratamentos.xml', urls: getTreatmentRoutes().map(r => xmlUrl(r.path, 'monthly', '0.7')) },
+    { name: 'sitemap-centro.xml', urls: getExpansionRoutes().map(r => xmlUrl(r.path, 'monthly', '0.6')) },
     { name: 'sitemap-core.xml', urls: coreUrls },
     { name: 'sitemap-location.xml', urls: locationUrls },
     { name: 'sitemap-freguesia.xml', urls: freguesiaUrls },
@@ -249,6 +252,14 @@ export function generateSitemaps(outDir: string) {
     { name: 'sitemap-en.xml', urls: enUrls },
     { name: 'sitemap-comercial.xml', urls: commercialUrls },
   ];
+
+  const emittedUrls = new Set<string>();
+  for (const sitemap of sitemapFiles) sitemap.urls = sitemap.urls.filter(entry => {
+    const url = entry.match(/<loc>([^<]+)<\/loc>/)?.[1];
+    if (!url || emittedUrls.has(url)) return false;
+    emittedUrls.add(url);
+    return true;
+  });
 
   let totalUrls = 0;
   for (const sm of sitemapFiles) {

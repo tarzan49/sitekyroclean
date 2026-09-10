@@ -1,54 +1,26 @@
-﻿import { useEffect } from "react";
+﻿import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight, Phone, MessageCircle } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import QuizButton from "@/components/QuizButton";
-import BeforeAfterSlider from "@/components/BeforeAfterSlider";
+import ServiceResultsGallery from "@/components/ServiceResultsGallery";
+import type { BeforeAfterCategory } from "@/data/beforeAfterPool";
 import TrustRatingBadge from "@/components/TrustRatingBadge";
 import { SITE_URL, WHATSAPP_BASE, PHONE_E164 } from "@/constants/business";
 
-import sofaAntes from "@/assets/galeria-sofa-antes.webp";
-import sofaDepois from "@/assets/galeria-sofa-depois.webp";
-import colchaoAntes from "@/assets/galeria-colchao-depois.webp";
-import colchaoDepois from "@/assets/galeria-colchao-antes.webp";
-import tapeteAntes from "@/assets/galeria-tapete-antes.webp";
-import tapeteDepois from "@/assets/galeria-tapete-depois.webp";
-import impermeabilizacaoAntes from "@/assets/galeria-impermeabilizacao-antes.webp";
-import impermeabilizacaoDepois from "@/assets/galeria-impermeabilizacao-depois.webp";
-
-const transformations = [
-  {
-    title: "Sofá: limpeza profunda completa",
-    before: sofaAntes,
-    after: sofaDepois,
-    service: "Limpeza de Sofás",
-    serviceLink: "/limpeza-sofas",
-  },
-  {
-    title: "Colchão: higienização profissional",
-    before: colchaoAntes,
-    after: colchaoDepois,
-    service: "Limpeza de Colchões",
-    serviceLink: "/limpeza-colchoes",
-  },
-  {
-    title: "Tapete: antes e depois com animal",
-    before: tapeteAntes,
-    after: tapeteDepois,
-    service: "Limpeza de Tapetes",
-    serviceLink: "/limpeza-tapetes",
-  },
-  {
-    title: "Impermeabilização: proteção invisível",
-    before: impermeabilizacaoAntes,
-    after: impermeabilizacaoDepois,
-    service: "Impermeabilização",
-    serviceLink: "/impermeabilizacao",
-  },
+const categories: { category: BeforeAfterCategory; label: string; href: string }[] = [
+  { category: "sofa", label: "Sofás", href: "/limpeza-sofas" },
+  { category: "colchao", label: "Colchões", href: "/limpeza-colchoes" },
+  { category: "cadeiras", label: "Cadeiras", href: "/limpeza-cadeiras" },
+  { category: "tapete", label: "Tapetes", href: "/limpeza-tapetes" },
+  { category: "tapete", label: "Alcatifas", href: "/limpeza-alcatifas" },
+  { category: "impermeabilizacao", label: "Impermeabilização", href: "/impermeabilizacao" },
 ];
 
 const BeforeAfterPage = () => {
+  const [selected, setSelected] = useState(0);
+  const service = categories[selected];
   useEffect(() => {
     document.title = "Antes e Depois | Resultados de Limpeza Profissional | Kyro Clean Solutions";
     const desc = document.querySelector('meta[name="description"]');
@@ -100,37 +72,27 @@ const BeforeAfterPage = () => {
               </h1>
               <div className="w-12 h-px bg-[#D4AF37] mx-auto mb-5 opacity-60" />
               <p className="text-base md:text-lg text-[#555] leading-relaxed max-w-2xl mx-auto">
-                Sem retoques. Sem filtros. Estes são os resultados reais dos nossos clientes.
+                Explore os resultados por serviço. As demonstrações de impermeabilização estão identificadas quando são ilustrativas.
               </p>
             </div>
           </div>
         </section>
 
-        {/* Transformations Grid */}
-        <section className="py-12 md:py-16 bg-[#F5F9F6]">
-          <div className="container mx-auto px-4">
-            <div className="max-w-5xl mx-auto grid md:grid-cols-2 gap-10">
-              {transformations.map((t, i) => (
-                <div key={i} className="flex flex-col gap-3">
-                  <BeforeAfterSlider
-                    beforeImage={t.before}
-                    afterImage={t.after}
-                    beforeLabel="Antes"
-                    afterLabel="Depois"
-                  />
-                  <div className="flex items-center justify-between px-1">
-                    <h3 className="font-semibold text-[#111111] text-sm leading-snug">{t.title}</h3>
-                    <Link
-                      to={t.serviceLink}
-                      className="inline-flex items-center gap-1 text-xs font-semibold text-[#D4AF37] hover:text-[#B8912A] transition-colors shrink-0"
-                    >
-                      {t.service}
-                      <ArrowRight className="w-3 h-3" />
-                    </Link>
-                  </div>
-                </div>
+        <section className="py-8 md:py-12 bg-[#F5F9F6]">
+          <div className="max-w-[688px] mx-auto px-5 sm:px-6">
+            <div className="flex flex-wrap gap-2 mb-6" role="group" aria-label="Escolher serviço">
+              {categories.map((entry, i) => (
+                <button key={entry.label} type="button" onClick={() => setSelected(i)} aria-pressed={selected === i}
+                  className={`min-h-11 px-4 rounded-full text-sm border transition-colors focus-visible:outline-gold ${selected === i ? "bg-kyro-green text-white border-kyro-green" : "border-black/15 text-[#111111] hover:border-gold"}`}>
+                  {entry.label}
+                </button>
               ))}
             </div>
+            <h2 className="font-playfair text-2xl text-[#111111] mb-4">{service.label}: antes e depois</h2>
+            <ServiceResultsGallery key={service.label} category={service.category} light />
+            <Link to={service.href} className="inline-flex items-center gap-2 text-sm text-[#1A4E30] mt-5 min-h-11">
+              Conhecer o serviço <ArrowRight className="w-4 h-4" />
+            </Link>
           </div>
         </section>
 

@@ -21,7 +21,7 @@ const PROBLEMS = [
     type: "Colchões",
     link: "/limpeza-colchoes",
     title: "Ácaros e bactérias\ninvisíveis ao olho nu",
-    solution: "Higienização antibacteriana: 99% eliminados",
+    solution: "Tratamentos anti-ácaros e desbacterização opcionais",
     pos: "center",
   },
   {

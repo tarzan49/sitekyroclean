@@ -1,3 +1,4 @@
+import BusinessConditions from './BusinessConditions';
 ﻿import { Phone, Mail, MapPin, ChevronRight } from "lucide-react";
 import { GOOGLE_MAPS_URL } from "@/constants/google";
 import { Link } from "react-router-dom";
@@ -21,7 +22,7 @@ const Footer = () => {
             <span className="text-lg md:text-xl font-bold text-gold tracking-wide">Kyro Clean Solutions</span>
           </div>
           <p className="text-sm text-white/55 leading-relaxed max-w-xl mx-auto">
-            Especialistas em higienização de sofás, colchões, tapetes e cadeiras, e impermeabilização profissional de sofás e cadeiras, ao domicílio. Equipamento de extração profissional e produtos certificados, com cobertura em Portugal Continental inteiro.
+            Especialistas em higienização de sofás, colchões, tapetes e cadeiras, e impermeabilização profissional de sofás e cadeiras, ao domicílio. Equipamento de extração profissional e produtos certificados, com cobertura no litoral entre Viana do Castelo e o Algarve; outras zonas mediante confirmação.
           </p>
         </div>
 
@@ -82,19 +83,19 @@ const Footer = () => {
             <ul className="space-y-2 text-sm">
               <li className="flex items-center gap-2">
                 <ChevronRight className="h-3.5 w-3.5 text-turquoise flex-shrink-0" />
-                <Link to="/pack-sofa-e-colchao-porto" className="hover:text-turquoise active:text-turquoise transition-colors py-1 touch-manipulation">Pack Sofá + Colchão</Link>
+                <Link to="/packs" className="hover:text-turquoise active:text-turquoise transition-colors py-1 touch-manipulation">Pack Sofá + Colchão</Link>
               </li>
               <li className="flex items-center gap-2">
                 <ChevronRight className="h-3.5 w-3.5 text-turquoise flex-shrink-0" />
-                <Link to="/pack-sofa-impermeabilizacao-porto" className="hover:text-turquoise active:text-turquoise transition-colors py-1 touch-manipulation">Pack Sofá + Impermeabilização</Link>
+                <Link to="/packs" className="hover:text-turquoise active:text-turquoise transition-colors py-1 touch-manipulation">Pack Sofá + Impermeabilização</Link>
               </li>
               <li className="flex items-center gap-2">
                 <ChevronRight className="h-3.5 w-3.5 text-turquoise flex-shrink-0" />
-                <Link to="/pack-sala-completa-porto" className="hover:text-turquoise active:text-turquoise transition-colors py-1 touch-manipulation">Pack Sala Completa</Link>
+                <Link to="/packs" className="hover:text-turquoise active:text-turquoise transition-colors py-1 touch-manipulation">Pack Sala Completa</Link>
               </li>
               <li className="flex items-center gap-2">
                 <ChevronRight className="h-3.5 w-3.5 text-turquoise flex-shrink-0" />
-                <Link to="/pack-quarto-completo-porto" className="hover:text-turquoise active:text-turquoise transition-colors py-1 touch-manipulation">Pack Quarto Completo</Link>
+                <Link to="/packs" className="hover:text-turquoise active:text-turquoise transition-colors py-1 touch-manipulation">Pack Quarto Completo</Link>
               </li>
             </ul>
           </div>
@@ -188,6 +189,8 @@ const Footer = () => {
           </div>
         </div>
       </div>
+    <div className="max-w-7xl mx-auto px-5 py-8 text-sm text-white/70"><p>Equipas em Braga, Porto, Lisboa e Algarve. Outras localidades mediante confirmação.</p><p className="mt-2">Resposta em menos de 10 minutos · Deslocação a partir de 10€</p><div className="flex flex-wrap gap-4 mt-4"><Link to="/tratamento-anti-acaros">Tratamento anti-ácaros</Link><Link to="/desbacterizacao">Desbacterização</Link><Link to="/limpeza-estofos-aveiro">Aveiro: consultar disponibilidade</Link><Link to="/limpeza-estofos-coimbra">Coimbra: consultar disponibilidade</Link></div></div>
+    <BusinessConditions />
     </footer>
   );
 };

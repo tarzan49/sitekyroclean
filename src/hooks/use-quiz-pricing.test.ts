@@ -34,12 +34,12 @@ describe('useQuizPricing — packDiscountActive não pode ativar com um único u
     expect(p.packDiscountActive).toBe(false);
   });
 
-  it('activates once combined article value passes 149€ with a qualifying (>=49€) article', () => {
+  it('does not discount a single article even above 149€', () => {
     const p = pricing(
       { service: 'sofa', serviceType: 'cleaning' },
       [{ id: 'mattress', price: 150, qty: 1, label: 'Colchão Casal' }],
     );
-    expect(p.packDiscountActive).toBe(true);
+    expect(p.packDiscountActive).toBe(false);
   });
 
   it('combining the primary sofa item with a qualifying upsell crosses the threshold correctly', () => {
@@ -63,12 +63,12 @@ describe('useQuizPricing — packDiscountActive não pode ativar com um único u
     expect(p.packDiscountActive).toBe(false);
   });
 
-  it('a "sob orçamento" upsell item (price 0) always activates the discount, since it implies a large order', () => {
+  it('a quote-only extra never unlocks an unearned discount', () => {
     const p = pricing(
       { service: 'sofa', serviceType: 'cleaning' },
       [{ id: 'chairs', price: 0, qty: 12, label: '12 cadeiras' }],
     );
-    expect(p.packDiscountActive).toBe(true);
+    expect(p.packDiscountActive).toBe(false);
     expect(p.hasUpsellSobItem).toBe(true);
   });
 });
@@ -116,4 +116,22 @@ it('does not stack the pack discount on local fixed-price offers', () => {
   ));
   expect(result.current.totalPrice).toBe(224);
   expect(result.current.packDiscountActive).toBe(false);
+});
+
+describe('local quiz pack proposal', () => {
+  const sofa = [{ id: 'test-sofa', sizeId: '3-lugares', qty: 1, packEnabled: false, chaiseLongue: false }];
+  const extra = [{ id: 'mattress-casal', mattressSize: 'casal', qty: 1, price: 55, label: '1x Colchão Casal' }];
+  const form = { ...initialFormData, location: 'Lisboa', service: 'sofa', serviceType: 'cleaning' as const };
+  it('keeps the fixed extra price without stacking a pack discount', () => {
+    const actual = renderHook(() => useQuizPricing(form, sofa, [], extra, []));
+    expect(actual.result.current.packDiscountActive).toBe(false);
+    const demo = renderHook(() => useQuizPricing(form, sofa, [], extra, [], true));
+    expect(demo.result.current.packDiscountActive).toBe(false);
+    expect(demo.result.current.totalPrice).toBe(144);
+  });
+  it('keeps the original price when the extra is declined', () => {
+    const demo = renderHook(() => useQuizPricing(form, sofa, [], [], [], true));
+    expect(demo.result.current.packDiscountActive).toBe(false);
+    expect(demo.result.current.totalPrice).toBe(89);
+  });
 });

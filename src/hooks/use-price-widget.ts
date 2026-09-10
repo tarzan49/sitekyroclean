@@ -1,3 +1,4 @@
+import { carpetItemArea as measureCarpet } from '@/components/quiz/quizHelpers';
 import { useState, useEffect } from 'react';
 import type { CarpetItem } from '@/components/quiz/QuizTypes';
 import { type PriceRowQuizConfig } from '@/data/locationPriceTestimonialsData';
@@ -43,11 +44,7 @@ export function usePriceWidgetState(serviceSlug: string) {
   }, [serviceSlug]);
 
   const getCarpetItems = (i: number): CarpetItem[] => carpetItemsByRow[i] ?? [{ id: `tapete-${i}-1`, largura: '', comprimento: '' }];
-  const carpetItemArea = (item: CarpetItem): number => {
-    const l = parseFloat((item.largura + '').replace(',', '.'));
-    const c = parseFloat((item.comprimento + '').replace(',', '.'));
-    return !isNaN(l) && !isNaN(c) && l > 0 && c > 0 ? l * c : 0;
-  };
+  const carpetItemArea = (item: CarpetItem): number => measureCarpet(item) ?? 0;
   const setCarpetRow = (i: number, items: CarpetItem[]) => {
     setCarpetItemsByRow(prev => ({ ...prev, [i]: items }));
     const value = isAlcatifaService
@@ -87,7 +84,7 @@ export function usePriceWidgetState(serviceSlug: string) {
     buildWidgetQuizConfig(serviceSlug, rowQuantities, chaiseLongueAddon, addonRows, addonTier, antiAcarosRows, carpetItemsByRow);
 
   return {
-    tierChosen, setTierChosen, rowQuantities, chaiseLongueAddon, setChaiseLongueAddon, addonRows, addonTier, setAddonTier, antiAcarosRows,
+    carpetItemsByRow, tierChosen, setTierChosen, rowQuantities, chaiseLongueAddon, setChaiseLongueAddon, addonRows, addonTier, setAddonTier, antiAcarosRows,
     getCarpetItems, updateCarpetItem, addCarpetItem, removeCarpetItem, carpetItemArea,
     adjustQty, toggleAddonRow, toggleAntiAcarosRow, buildConfig,
   };

@@ -154,7 +154,7 @@ const LocationServicePage = () => {
   // "Porto" takes the definite article ("no Porto"); every other city in our list reads naturally with "em"
   const cityPrep = data.citySlug === 'porto' ? 'no' : 'em';
 
-  const serviceDuration = SERVICE_DURATION[data.serviceSlug] ?? { value: "4-6h", label: "Pronto a usar" };
+  const serviceDuration = SERVICE_DURATION[data.serviceSlug] ?? { value: "3 a 6h", label: "Pronto a usar" };
   // Resposta alinhada com o orçamento: menos de 10 minutos no horário de atendimento.
   const snapshotStats = [
     { value: `${REVIEW_RATING}★`, label: `+${REVIEW_COUNT} avaliações Google`, icon: GoogleG },
@@ -324,7 +324,7 @@ const LocationServicePage = () => {
                       ? `Orçamento à medida de cada tapete. Deslocação +${locationPrices[data.city] ?? 10}€ a ${data.city}. Sem surpresas, sem custos escondidos.`
                       : data.serviceSlug === 'limpeza-alcatifas'
                       ? `Orçamento à medida de cada espaço. Deslocação +${locationPrices[data.city] ?? 10}€ a ${data.city}. Sem preço fixo por m², sem surpresas.`
-                      : `Preços fixos e transparentes, sem surpresas. Deslocação +${locationPrices[data.city] ?? 10}€ a ${data.city}. Orçamento gratuito antes de qualquer compromisso.`}
+                      : `Estimativa confirmada antes da marcação. Deslocação +${locationPrices[data.city] ?? 10}€ a ${data.city}. Orçamento gratuito antes de qualquer compromisso.`}
                   />
                   {/* Trust facts — desktop only (variante 1) */}
                   <div className="hidden md:block">
@@ -493,7 +493,7 @@ const LocationServicePage = () => {
               )}
 
               <DirectoryGroup title={<>Também disponível em</>}>
-                  {getCityLinksForService(data.serviceSlug).filter(c => c.name !== data.city).slice(0, 6).map(city => (
+                  {getCityLinksForService(data.serviceSlug, data.city).filter(c => c.name !== data.city).slice(0, 6).map(city => (
                     <Link
                       key={city.name}
                       to={city.path}

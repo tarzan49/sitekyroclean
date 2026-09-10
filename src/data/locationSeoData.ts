@@ -1,41 +1,4 @@
-// Location × Service SEO data for long-tail keyword targeting
-// Each city × service combination has unique content to avoid duplicate content penalties
-// locationPrices duplicado aqui (sem import @/) para compatibilidade com scripts/prerender.ts (Node.js sem alias Vite)
-// Equipas locais e escalões independentes: Porto, Braga/Minho, Lisboa e Algarve.
-// Sem zona grátis: mínimo 10€ sempre em todo o site, sobe com a distância ao centro de cada equipa.
-// Antigas zonas 0€/5€ subiram para 10€ (mínimo sitewide) — todas as outras zonas mantêm o preço original.
-const locationPrices: Record<string, number> = {
-  // ── Porto/Norte ──
-  'Porto': 10, 'Matosinhos': 10,
-  'Vila Nova de Gaia': 10, 'Maia': 10, 'Gondomar': 10,
-  'Valongo': 10, 'Espinho': 10, 'Póvoa de Varzim': 10, 'Vila do Conde': 10,
-  'Santo Tirso': 10, 'Trofa': 10, 'Paredes': 10,
-  'Penafiel': 15, 'Paços de Ferreira': 15, 'Felgueiras': 15, 'Lousada': 15,
-  'Arouca': 20, 'Aveiro': 20,
-  // ── Braga/Minho: centro/próximos 10€, afastados 15€, extremos 20€ ──
-  'Braga': 10, 'Guimarães': 10,
-  'Vila Nova de Famalicão': 10,
-  'Barcelos': 10,
-  'Viana do Castelo': 20,
-  'Póvoa de Lanhoso': 10,
-  'Fafe': 15,
-  'Esposende': 15,
-  // ── Lisboa / Área Metropolitana (equipa local) ──
-  // Lisboa: mínimo 10€, máximo 15€.
-  'Lisboa': 10,
-  'Amadora': 10, 'Odivelas': 10, 'Oeiras': 10,
-  'Cascais': 10, 'Sintra': 10, 'Loures': 10, 'Almada': 10, 'Seixal': 10,
-  'Vila Franca de Xira': 15, 'Barreiro': 15, 'Moita': 15, 'Mafra': 15,
-  'Setúbal': 15, 'Montijo': 15, 'Alcochete': 15, 'Palmela': 15, 'Sesimbra': 15,
-  // ── Algarve (equipa local) ──
-  // Algarve: centro 10€, zona ocidental 15€, extremos/interior 25€.
-  'Faro': 10, 'Loulé': 10,
-  'Albufeira': 10, 'São Brás de Alportel': 10, 'Olhão': 10,
-  'Silves': 10, 'Lagoa': 10, 'Tavira': 10,
-  'Portimão': 15, 'Lagos': 15,
-  'Vila Real de Santo António': 25, 'Castro Marim': 25, 'Monchique': 25,
-  'Aljezur': 25, 'Vila do Bispo': 25, 'Alcoutim': 25,
-};
+import { locationPrices } from '../constants/travel';
 
 export interface LocationService {
   slug: string;
@@ -80,15 +43,15 @@ export const cities = [
   { name: "Espinho", slug: "espinho", region: "secondary", area: "porto", description: "cidade costeira a sul do Porto" },
   { name: "Arouca", slug: "arouca", region: "secondary", area: "porto", description: "município no interior do distrito de Aveiro" },
   // Outros: Norte
-  { name: "Braga", slug: "braga", region: "secondary", area: "porto", description: "cidade milenar do Minho" },
-  { name: "Guimarães", slug: "guimaraes", region: "secondary", area: "porto", description: "berço da nação portuguesa" },
+  { name: "Braga", slug: "braga", region: "secondary", area: "braga", description: "cidade milenar do Minho" },
+  { name: "Guimarães", slug: "guimaraes", region: "secondary", area: "braga", description: "berço da nação portuguesa" },
   // Expansão Braga/Minho (2026-08-25, equipa local nova em Braga)
-  { name: "Vila Nova de Famalicão", slug: "vila-nova-de-famalicao", region: "secondary", area: "porto", description: "cidade industrial do Vale do Ave" },
-  { name: "Barcelos", slug: "barcelos", region: "secondary", area: "porto", description: "cidade oleira do Minho" },
-  { name: "Viana do Castelo", slug: "viana-do-castelo", region: "secondary", area: "porto", description: "cidade costeira à foz do Lima" },
-  { name: "Póvoa de Lanhoso", slug: "povoa-de-lanhoso", region: "secondary", area: "porto", description: "vila do Minho perto de Braga" },
-  { name: "Fafe", slug: "fafe", region: "secondary", area: "porto", description: "vila do Minho, terra do capuchinho" },
-  { name: "Esposende", slug: "esposende", region: "secondary", area: "porto", description: "vila costeira na foz do Cávado" },
+  { name: "Vila Nova de Famalicão", slug: "vila-nova-de-famalicao", region: "secondary", area: "braga", description: "cidade industrial do Vale do Ave" },
+  { name: "Barcelos", slug: "barcelos", region: "secondary", area: "braga", description: "cidade oleira do Minho" },
+  { name: "Viana do Castelo", slug: "viana-do-castelo", region: "secondary", area: "braga", description: "cidade costeira à foz do Lima" },
+  { name: "Póvoa de Lanhoso", slug: "povoa-de-lanhoso", region: "secondary", area: "braga", description: "vila do Minho perto de Braga" },
+  { name: "Fafe", slug: "fafe", region: "secondary", area: "braga", description: "vila do Minho, terra do capuchinho" },
+  { name: "Esposende", slug: "esposende", region: "secondary", area: "braga", description: "vila costeira na foz do Cávado" },
   // Lisboa e Área Metropolitana
   { name: "Lisboa", slug: "lisboa", region: "primary", area: "lisboa", description: "capital de Portugal" },
   { name: "Amadora", slug: "amadora", region: "secondary", area: "lisboa", description: "município vizinho de Lisboa, um dos mais densos do país" },
@@ -163,7 +126,7 @@ function generateSofaContent(city: string, cityDesc: string): Omit<LocationServi
     title: `Limpeza de Sofás ${city} | Desde 49€ ao Domicílio | Kyro Clean Solutions`,
     metaDescription: `Limpeza e lavagem profissional de sofás ${prep} ${city}. Remoção de manchas, ácaros e odores ao domicílio. Resultados visíveis no momento. Desde 49€. Peça orçamento grátis.`,
     h1: `Limpeza de Sofás Profissional ${prep} ${city}`,
-    intro: `Precisa de limpeza de sofás ${prep} ${city}? A Kyro Clean Solutions oferece serviço profissional de limpeza e lavagem de sofás ao domicílio ${prep} ${city} e ${cityDesc}. Utilizamos equipamento de extração profissional para remover manchas, ácaros, bactérias e odores acumulados, devolvendo higiene e frescura ao seu sofá. Resultados visíveis no momento com preços desde 49€.`,
+    intro: `Precisa de limpeza de sofás ${prep} ${city}? A Kyro Clean Solutions oferece serviço profissional de limpeza e lavagem de sofás ao domicílio ${prep} ${city}, ${cityDesc}. Utilizamos equipamento de extração profissional para remover manchas, ácaros, bactérias e odores acumulados, devolvendo higiene e frescura ao seu sofá. Resultados visíveis no momento com preços desde 49€.`,
     problems: [
       { title: "Manchas difíceis no sofá", description: `Manchas de café, vinho, comida ou gordura que se acumulam no dia-a-dia ${prep} ${city}. Sem tratamento profissional, estas manchas penetram nas fibras e tornam-se permanentes.` },
       { title: "Ácaros e bactérias invisíveis", description: `O seu sofá pode conter milhões de ácaros e bactérias que causam alergias, irritações respiratórias e problemas de pele. A limpeza regular doméstica não é suficiente para eliminar estes microrganismos.` },
@@ -182,7 +145,7 @@ function generateSofaContent(city: string, cityDesc: string): Omit<LocationServi
     localSection: `Servimos toda a área de ${city} e arredores, incluindo as principais freguesias e zonas residenciais. A nossa equipa desloca-se diretamente à sua casa ${prep} ${city} com taxa de deslocação de ${locationPrices[city] ?? 10}€. Atendemos clientes residenciais e comerciais: escritórios, restaurantes, hotéis e clínicas ${prep} ${city}.`,
     faqs: [
       { question: `Quanto custa a limpeza de sofá ${prep} ${city}?`, answer: `A limpeza de sofá ${prep} ${city} começa a partir de 49€ para sofás de 1 lugar. Os preços da tabela são por tamanho e a deslocação é cobrada à parte conforme a morada. Sofás de quatro ou mais lugares e tratamentos adicionais exigem orçamento, confirmado antes do serviço.` },
-      { question: `Quanto tempo demora a limpeza do sofá ${prep} ${city}?`, answer: `O serviço de limpeza de sofá ao domicílio ${prep} ${city} demora entre 1 a 3 horas, dependendo do tamanho e estado do sofá. A secagem demora normalmente 4 a 6 horas, podendo variar com o tecido, a humidade e a ventilação. Use apenas quando estiver completamente seco.` },
+      { question: `Quanto tempo demora a limpeza do sofá ${prep} ${city}?`, answer: `O serviço de limpeza de sofá ao domicílio ${prep} ${city} demora entre 1 a 3 horas, dependendo do tamanho e estado do sofá. A secagem demora normalmente 3 a 6 horas, podendo variar com o tecido, a humidade e a ventilação. Use apenas quando estiver completamente seco.` },
       { question: `A limpeza remove manchas antigas do sofá?`, answer: `Sim, o nosso processo de extração profunda remove a grande maioria das manchas, incluindo manchas antigas de café, vinho, gordura e líquidos. Manchas muito antigas podem necessitar de tratamento adicional.` },
       { question: `A limpeza de sofá remove ácaros e bactérias?`, answer: `A extração remove sujidade e resíduos acumulados nas fibras. O resultado depende do material e do tratamento; não prometemos uma percentagem de eliminação de microrganismos nem melhoria de sintomas de alergia.` },
       { question: `Fazem limpeza de sofás ao domicílio ${prep} ${city}?`, answer: `Sim! A Kyro Clean Solutions faz limpeza de sofás ao domicílio ${prep} ${city} e toda a área envolvente. A nossa equipa desloca-se à sua casa com todo o equipamento necessário.` },
@@ -198,18 +161,18 @@ function generateColchaoContent(city: string, cityDesc: string): Omit<LocationSe
     title: `Limpeza de Colchões ${city} | Desde 59€ | Kyro Clean Solutions`,
     metaDescription: `Higienização profissional de colchões ${prep} ${city}. Eliminamos ácaros, bactérias e odores para noites mais saudáveis. Serviço ao domicílio desde 59€.`,
     h1: `Limpeza e Higienização de Colchões ${prep} ${city}`,
-    intro: `Sabia que o seu colchão pode conter milhões de ácaros e bactérias? ${Prep} ${city}, a Kyro Clean Solutions oferece higienização profunda de colchões ao domicílio, eliminando microrganismos, manchas e odores acumulados. Dormirá melhor e mais saudável. Serviço disponível ${prep} ${city} e ${cityDesc} desde 59€.`,
+    intro: `Sabia que o seu colchão pode conter milhões de ácaros e bactérias? ${Prep} ${city}, a Kyro Clean Solutions oferece higienização profunda de colchões ao domicílio, eliminando microrganismos, manchas e odores acumulados. Dormirá melhor e mais saudável. Serviço disponível ${prep} ${city}, ${cityDesc} desde 59€.`,
     problems: [
       { title: "Ácaros no colchão", description: `Um colchão pode conter até 2 milhões de ácaros. ${Prep} ${city}, o clima húmido favorece a proliferação destes microrganismos que causam alergias, rinite e asma.` },
       { title: "Manchas de suor e líquidos", description: `Manchas de suor, urina, sangue e outros líquidos penetram no colchão e criam ambiente ideal para bactérias e fungos.` },
       { title: "Odores acumulados", description: `Com o uso diário, odores de suor e humidade ficam retidos nas fibras do colchão, comprometendo a qualidade do sono.` },
       { title: "Alergias noturnas", description: `Se acorda com espirros, olhos irritados ou congestão nasal, o seu colchão pode ser a causa. A higienização profissional resolve este problema.` },
     ],
-    howItWorks: `${Prep} ${city}, o nosso processo inclui: 1) Inspeção e aspiração profunda, 2) Pulverização com solução antibacteriana, 3) Escovação para penetrar nas fibras, 4) Extração a quente com equipamento profissional, 5) Secagem rápida.`,
+    howItWorks: `${Prep} ${city}, o nosso processo inclui: 1) Inspeção e aspiração profunda, 2) Pulverização com solução de limpeza adequada ao tecido, 3) Escovação para penetrar nas fibras, 4) Extração a quente com equipamento profissional, 5) Secagem rápida.`,
     benefits: [
-      "Eliminação de até 99% dos ácaros responsáveis por alergias e rinite noturna",
+      "Limpeza profunda do pó e resíduos acumulados nas fibras",
       "Remoção de manchas de suor, urina e líquidos sem danificar os materiais internos",
-      "Desodorização antibacteriana que devolve frescura ao quarto",
+      "Tratamento de odores que devolve frescura ao quarto",
       "Processo seguro para colchões de espuma, látex, viscoelástico e molas",
       `Serviço ao domicílio ${prep} ${city}, sem necessidade de desmontar a cama`,
       `Ideal para famílias e alérgicos ${prep} ${city} que procuram noites de sono mais saudáveis`,
@@ -217,9 +180,9 @@ function generateColchaoContent(city: string, cityDesc: string): Omit<LocationSe
     localSection: `A nossa equipa de higienização de colchões cobre toda a área de ${city} e arredores. Atendemos residências, hotéis, residências seniores e alojamentos locais ${prep} ${city}. Taxa de deslocação de ${locationPrices[city] ?? 10}€.`,
     faqs: [
       { question: `Quanto custa a limpeza de colchão ${prep} ${city}?`, answer: `A higienização de colchão ${prep} ${city} começa a partir de 59€ para colchão de solteiro. Colchões de casal têm preços a partir de 69€. Contacte-nos para orçamento personalizado.` },
-      { question: `A limpeza de colchão remove ácaros?`, answer: `Sim. O nosso processo de higienização profissional elimina até 99% dos ácaros, bactérias e fungos presentes no colchão, ideal para quem sofre de alergias.` },
+      { question: `A limpeza de colchão remove ácaros?`, answer: `Sim. O nosso processo de higienização profissional ajuda a remover resíduos associados a ácaros, bactérias e fungos presentes no colchão, ideal para quem sofre de alergias.` },
       { question: `A limpeza remove cheiro de urina do colchão?`, answer: `Sim. A nossa extração profunda combinada com desodorização enzimática elimina completamente odores de urina, incluindo manchas antigas.` },
-      { question: `Quanto tempo demora a secagem do colchão?`, answer: `O colchão fica pronto a usar no mesmo dia, tipicamente em 4-6 horas após a limpeza. Em dias mais secos, pode estar pronto ainda mais cedo.` },
+      { question: `Quanto tempo demora a secagem do colchão?`, answer: `O colchão fica pronto a usar no mesmo dia, tipicamente em 3 a 6 horas após a limpeza. Em dias mais secos, pode estar pronto ainda mais cedo.` },
       { question: `Com que frequência devo higienizar o colchão?`, answer: `Recomendamos higienização profissional a cada 6-12 meses para manter o colchão livre de ácaros e bactérias, especialmente para alérgicos.` },
     ],
   };
@@ -232,7 +195,7 @@ function generateTapetesContent(city: string, cityDesc: string): Omit<LocationSe
     title: `Limpeza de Tapetes ${city} | Orçamento Grátis | Kyro Clean Solutions`,
     metaDescription: `Lavagem profissional de tapetes ${prep} ${city}. Limpeza de tapetes persas, orientais e modernos. Recolha e entrega. Orçamento sempre à medida de cada tapete.`,
     h1: `Limpeza e Lavagem de Tapetes ${prep} ${city}`,
-    intro: `Procura lavagem de tapetes profissional ${prep} ${city}? A Kyro Clean Solutions oferece limpeza especializada de tapetes de todos os tipos: persas, orientais, modernos, de lã e sintéticos. Serviço disponível ${prep} ${city} e ${cityDesc} com recolha e entrega ao domicílio. Cada tapete é medido e orçamentado individualmente, sem preço fixo por m².`,
+    intro: `Procura lavagem de tapetes profissional ${prep} ${city}? A Kyro Clean Solutions oferece limpeza especializada de tapetes de todos os tipos: persas, orientais, modernos, de lã e sintéticos. Serviço disponível ${prep} ${city}, ${cityDesc} com recolha e entrega ao domicílio. Cada tapete é medido e orçamentado individualmente, sem preço fixo por m².`,
     problems: [
       { title: "Sujidade acumulada nas fibras", description: `Os tapetes acumulam poeira, terra, areia e resíduos diariamente. ${Prep} ${city}, o uso constante torna a limpeza profunda essencial para manter a higiene.` },
       { title: "Manchas resistentes", description: `Manchas de líquidos, comida e animais que se fixam nas fibras do tapete e são impossíveis de remover com aspirador convencional.` },
@@ -245,14 +208,14 @@ function generateTapetesContent(city: string, cityDesc: string): Omit<LocationSe
       "Revitalização de cores desbotadas e remoção de manchas antigas",
       "Recolha e entrega ao domicílio, sem necessidade de transportar o tapete",
       "Eliminação de odores de animais de estimação e ácaros das fibras",
-      `Serviço de confiança para quem vive ${prep} ${city} e em ${cityDesc}`,
+      `Serviço de confiança para quem vive ${prep} ${city} e arredores`,
       "Secagem controlada que preserva a textura e estrutura das fibras",
     ],
     localSection: `Recolhemos e entregamos tapetes em toda a área de ${city}. Atendemos clientes residenciais e comerciais: restaurantes, hotéis e escritórios ${prep} ${city} e arredores.`,
     faqs: [
       { question: `Quanto custa a limpeza de tapetes ${prep} ${city}?`, answer: `A limpeza de tapetes ${prep} ${city} é sempre orçamentada à medida de cada tapete, conforme o tipo, dimensão e estado de sujidade. Peça orçamento gratuito.` },
       { question: `Fazem lavagem de tapetes persas ${prep} ${city}?`, answer: `Sim. Temos experiência na lavagem de tapetes persas, orientais e delicados. Utilizamos produtos e técnicas específicas para preservar as fibras e cores.` },
-      { question: `Têm serviço de recolha de tapetes ${prep} ${city}?`, answer: `Sim! Oferecemos recolha e entrega de tapetes ao domicílio ${prep} ${city} e toda a área envolvente, sem custos adicionais para encomendas acima de 50€.` },
+      { question: `Têm serviço de recolha de tapetes ${prep} ${city}?`, answer: `Sim! Oferecemos recolha e entrega de tapetes ao domicílio ${prep} ${city} e toda a área envolvente, com condições e custo de deslocação confirmados no orçamento.` },
       { question: `Quanto tempo demora a lavagem de tapetes?`, answer: `O processo completo de lavagem e secagem demora tipicamente 3-5 dias úteis, dependendo do tipo e tamanho do tapete.` },
       { question: `A limpeza de tapetes remove odor a animal de estimação?`, answer: `Sim. A nossa lavagem profunda com desodorização enzimática elimina completamente odores de animais de estimação dos tapetes.` },
     ],
@@ -266,7 +229,7 @@ function generateCadeirasContent(city: string, cityDesc: string): Omit<LocationS
     title: `Limpeza de Cadeiras Estofadas ${city} | Desde 20€ | Kyro Clean Solutions`,
     metaDescription: `Limpeza profissional de cadeiras estofadas ${prep} ${city}. Ideal para escritórios, restaurantes e residências. Desde 20€ por cadeira.`,
     h1: `Limpeza de Cadeiras Estofadas ${prep} ${city}`,
-    intro: `Precisa de limpar cadeiras estofadas ${prep} ${city}? A Kyro Clean Solutions realiza limpeza profissional de cadeiras de escritório, cadeiras de jantar e cadeiras estofadas ${prep} ${city} e ${cityDesc}. Serviço rápido e eficaz ao domicílio ou no seu estabelecimento. Desde 20€ por cadeira.`,
+    intro: `Precisa de limpar cadeiras estofadas ${prep} ${city}? A Kyro Clean Solutions realiza limpeza profissional de cadeiras de escritório, cadeiras de jantar e cadeiras estofadas ${prep} ${city}, ${cityDesc}. Serviço rápido e eficaz ao domicílio ou no seu estabelecimento. Desde 20€ por cadeira.`,
     problems: [
       { title: "Sujidade do uso diário", description: `Cadeiras de escritório e jantar acumulam manchas de suor, gordura e líquidos diariamente. ${Prep} ${city}, muitos escritórios e restaurantes necessitam de limpeza regular.` },
       { title: "Manchas visíveis", description: `Manchas de café, alimentos e tinta que deixam as cadeiras com aspecto descuidado, prejudicando a imagem do seu espaço.` },
@@ -297,7 +260,7 @@ function generateAlcatifasContent(city: string, cityDesc: string): Omit<Location
     title: `Limpeza de Alcatifas ${city} | Orçamento Grátis | Kyro Clean Solutions`,
     metaDescription: `Limpeza profunda de alcatifas ${prep} ${city}. Remoção de sujidade acumulada e alergénios. Secagem rápida. Orçamento sempre à medida do espaço, sem compromisso.`,
     h1: `Limpeza Profunda de Alcatifas ${prep} ${city}`,
-    intro: `As alcatifas do seu espaço ${prep} ${city} precisam de limpeza profissional? A Kyro Clean Solutions oferece limpeza profunda de alcatifas com extração profissional ${prep} ${city} e ${cityDesc}. Removemos sujidade acumulada, manchas e alergénios, devolvendo frescura e higiene. Cada espaço é medido e orçamentado à medida, sem preço fixo por m².`,
+    intro: `As alcatifas do seu espaço ${prep} ${city} precisam de limpeza profissional? A Kyro Clean Solutions oferece limpeza profunda de alcatifas com extração profissional ${prep} ${city}, ${cityDesc}. Removemos sujidade acumulada, manchas e alergénios, devolvendo frescura e higiene. Cada espaço é medido e orçamentado à medida, sem preço fixo por m².`,
     problems: [
       { title: "Sujidade profunda acumulada", description: `As alcatifas acumulam poeira, terra e resíduos nas camadas profundas das fibras. O aspirador convencional remove apenas a sujidade superficial.` },
       { title: "Alergénios e ácaros", description: `${Prep} ${city}, as alcatifas são reservatórios de ácaros e alergénios que afetam a qualidade do ar interior e causam problemas respiratórios.` },
@@ -307,7 +270,7 @@ function generateAlcatifasContent(city: string, cityDesc: string): Omit<Location
     benefits: [
       "Limpeza de grandes superfícies em escritórios, hotéis, escolas e clínicas",
       "Extração profunda que remove sujidade retida nas camadas inferiores da alcatifa",
-      "Redução de até 99% dos alergénios e ácaros acumulados",
+      "Remoção de resíduos associados a alergénios e ácaros acumulados",
       "Secagem rápida com equipamento de alta sucção, sem interromper a atividade",
       `Cobrimos toda a área de ${city} e arredores, com orçamentos para grandes superfícies`,
       `Conhecemos as necessidades de empresas ${prep} ${city}, ${cityDesc}`,
@@ -316,7 +279,7 @@ function generateAlcatifasContent(city: string, cityDesc: string): Omit<Location
     faqs: [
       { question: `Quanto custa limpar alcatifas ${prep} ${city}?`, answer: `A limpeza de alcatifas ${prep} ${city} é sempre orçamentada à medida da área e do estado da alcatifa, sem preço fixo por m². Peça orçamento gratuito.` },
       { question: `Fazem limpeza de alcatifas em escritórios ${prep} ${city}?`, answer: `Sim! Realizamos limpeza de alcatifas em escritórios, hotéis e espaços comerciais ${prep} ${city}. Podemos agendar fora do horário de trabalho para mínima interrupção.` },
-      { question: `Quanto tempo demora a secar a alcatifa?`, answer: `Com o nosso processo de extração profissional, a alcatifa fica seca em 2-4 horas. Utilizamos equipamento de alta sucção que minimiza o tempo de secagem.` },
+      { question: `Quanto tempo demora a secar a alcatifa?`, answer: `Com o nosso processo de extração profissional, a alcatifa fica seca em 3 a 6 horas. Utilizamos equipamento de alta sucção que minimiza o tempo de secagem.` },
     ],
   };
 }
@@ -327,7 +290,7 @@ function generateImpermeabilizacaoContent(city: string, cityDesc: string): Omit<
     title: `Impermeabilização de Estofos ${city} | Essencial ou Premium | Kyro Clean Solutions`,
     metaDescription: `Impermeabilização profissional de sofás e cadeiras ${prep} ${city}. Versão Essencial e versão Premium, com proteção invisível real até 10 anos.`,
     h1: `Impermeabilização de Estofos ${prep} ${city}`,
-    intro: `Proteja os seus estofos contra manchas e líquidos ${prep} ${city}. A Kyro Clean Solutions aplica impermeabilização profissional invisível que cria uma barreira protetora nos tecidos, repelindo líquidos e facilitando a limpeza. Duas versões disponíveis, Essencial e Premium, ${prep} ${city} e ${cityDesc}.`,
+    intro: `Proteja os seus estofos contra manchas e líquidos ${prep} ${city}. A Kyro Clean Solutions aplica impermeabilização profissional invisível que cria uma barreira protetora nos tecidos, repelindo líquidos e facilitando a limpeza. Duas versões disponíveis, Essencial e Premium, ${prep} ${city}, ${cityDesc}.`,
     problems: [
       { title: "Sofá sem proteção", description: `Sem impermeabilização, qualquer derrame penetra rapidamente nas fibras do sofá, causando manchas permanentes e danos ao estofamento.` },
       { title: "Manchas frequentes com crianças e animais", description: `Famílias ${prep} ${city} com crianças e animais de estimação sofrem com manchas constantes. A versão Premium, mais resistente ao desgaste, é a recomendada para estes casos.` },
@@ -409,8 +372,9 @@ export function getAllLocationRoutes(): { path: string; serviceSlug: string; cit
 }
 
 // Get all city links for a specific service (for internal linking)
-export function getCityLinksForService(serviceSlug: string): { name: string; path: string }[] {
-  return cities.map(city => ({
+export function getCityLinksForService(serviceSlug: string, currentCity?: string): { name: string; path: string }[] {
+  const area = cities.find(c => c.name === currentCity)?.area;
+  return [...cities].sort((a, b) => Number(b.area === area) - Number(a.area === area)).map(city => ({
     name: city.name,
     path: `/${serviceSlug}-${city.slug}`,
   }));

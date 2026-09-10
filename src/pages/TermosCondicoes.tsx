@@ -1,3 +1,4 @@
+import { SATISFACTION_PROMISE, PRICE_PROMISE } from '../constants/commercialPolicy';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { BUSINESS_EMAIL, BUSINESS_EMAIL_HREF, PHONE_E164, PHONE_DISPLAY, BUSINESS_ADDRESS } from '@/constants/business';
@@ -20,7 +21,7 @@ const TermosCondicoes = () => (
           <h1 className="font-playfair text-3xl sm:text-4xl font-bold text-[#111111] leading-tight">
             Termos e Condições
           </h1>
-          <p className="text-sm text-[#555] mt-3">Última atualização: junho de 2026</p>
+          <p className="text-sm text-[#555] mt-3">Última atualização: setembro de 2026</p>
         </div>
 
         <Section title="1. Identificação">
@@ -45,7 +46,7 @@ const TermosCondicoes = () => (
             Os orçamentos são gratuitos e sem compromisso, fornecidos via formulário no website, WhatsApp ou telefone. A confirmação do serviço é feita por escrito e só se considera vinculativa após confirmação expressa de ambas as partes.
           </p>
           <p>
-            Os preços indicados no website são de referência. O preço final pode variar consoante o estado de conservação, dimensões reais e tipo de material do estofo, sendo comunicado ao cliente antes do início do serviço.
+            {PRICE_PROMISE}
           </p>
         </Section>
 
@@ -78,7 +79,7 @@ const TermosCondicoes = () => (
 
         <Section title="8. Reclamações">
           <p>
-            Caso não esteja satisfeito com o resultado do serviço, contacte-nos no prazo de 48 horas após a prestação. Cada situação será analisada individualmente, sendo a decisão sobre qualquer medida de resolução da exclusiva competência da Kyro Clean Solutions. Para mais detalhes, consulte a nossa{' '}
+            {SATISFACTION_PROMISE} Para mais detalhes, consulte a nossa{' '}
             <a href="/politica-de-devolucoes" className="text-[#1A4E30] underline underline-offset-2">Política de Devoluções</a>.
           </p>
         </Section>
