@@ -620,7 +620,7 @@ const SofaVariantPage = () => {
                   </p>
                 </div>
                 <div className="flex flex-wrap gap-2">
-                  {cities.filter(c => c.slug !== parsed.locationPart).slice(0, 8).map(city => (
+                  {cities.filter(c => c.slug !== parsed.locationPart).sort((a,b) => Number(b.area === cities.find(c => c.slug === parsed.locationPart)?.area) - Number(a.area === cities.find(c => c.slug === parsed.locationPart)?.area)).slice(0, 8).map(city => (
                     <Link
                       key={city.slug}
                       to={`/${parsed.variantKey}-${parsed.serviceKey}-${city.slug}`}

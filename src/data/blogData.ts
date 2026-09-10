@@ -524,7 +524,7 @@ const posts: BlogPost[] = [
       {
         heading: "5. Organize as próximas 3-4 horas",
         body: "Após a limpeza, o sofá precisa de 3 a 6 horas para secar completamente (dependendo do tipo de tecido e ventilação). Planeie estar em casa durante esse período ou deixe o espaço ventilado.\n\nAbra as janelas para acelerar a secagem. Não use o sofá nem coloque objetos sobre ele até estar completamente seco, especialmente almofadas, que podem deixar marcas de humidade no tecido.\n\nO técnico confirmará quando o sofá está pronto a usar antes de sair.",
-        tip: "No verão, a secagem leva 3 a 6 horas. No inverno ou em dias húmidos, pode levar até 4 horas. Um desumidificador acelera o processo.",
+        tip: "A secagem demora em média 3 a 6 horas e depende da ventilação e das condições do espaço. Um desumidificador pode ajudar.",
       },
     ],
     faq: [
@@ -699,7 +699,7 @@ const posts: BlogPost[] = [
     faq: [
       {
         q: "A alcatifa pode ser usada logo após a limpeza profissional?",
-        a: "Recomendamos aguardar 3 a 6 horas mínimo, de preferência 6-8 horas. A ventilação acelera a secagem. Para alto tráfego, agende a limpeza no fim do dia para ter uma noite completa de secagem.",
+        a: "A secagem demora em média 3 a 6 horas; aguarde até o tecido estar completamente seco. A ventilação acelera a secagem. Para alto tráfego, agende a limpeza no fim do dia para ter uma noite completa de secagem.",
       },
       {
         q: "A limpeza profissional remove manchas antigas de café e comida?",
@@ -1190,7 +1190,7 @@ const posts: BlogPost[] = [
       },
       {
         q: "O sofá pode ser usado no próprio dia da limpeza?",
-        a: "Sim. O sofá fica seco entre 2 a 4 horas após o tratamento. A partir daí pode ser usado normalmente, incluindo por crianças.",
+        a: "Sim. O sofá seca em média em 3 a 6 horas, dependendo da ventilação e do tecido. A partir daí pode ser usado normalmente, incluindo por crianças.",
       },
     ],
     relatedService: { label: "Pedir orçamento de limpeza", href: "/limpeza-sofas" },
@@ -1532,7 +1532,7 @@ const posts: BlogPost[] = [
       },
       {
         heading: "O que está incluído no preço",
-        body: "Uma limpeza profissional de alcatifa completa inclui:\n\n**Pré-aspiração**: remoção de partículas soltas, pelos e pó antes da limpeza húmida.\n\n**Pré-tratamento de manchas**: identificação e tratamento individual das manchas mais resistentes com produtos específicos.\n\n**Extração a quente**: injeção de água a alta temperatura com agente de limpeza nas fibras, seguida de aspiração imediata da água suja. Remove sujidade, ácaros e bactérias.\n\n**Bactericida e desodorizante**: aplicação de produto que elimina microrganismos e neutraliza odores.\n\n**Resultado final**: alcatifa higienizada, sem cheiro e seca em 3 a 6 horas dependendo da espessura.",
+        body: "Uma limpeza profissional de alcatifa completa inclui:\n\n**Pré-aspiração**: remoção de partículas soltas, pelos e pó antes da limpeza húmida.\n\n**Pré-tratamento de manchas**: identificação e tratamento individual das manchas mais resistentes com produtos específicos.\n\n**Extração a quente**: injeção de água a alta temperatura com agente de limpeza nas fibras, seguida de aspiração imediata da água suja. Remove sujidade, ácaros e bactérias.\n\n**Tratamento de odores**: definido conforme o estado do artigo. A desbacterização pode ser acrescentada como extra opcional.\n\n**Resultado final**: alcatifa higienizada, sem cheiro e seca em 3 a 6 horas dependendo da espessura.",
       },
       {
         heading: "Fatores que influenciam o preço",

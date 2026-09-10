@@ -253,6 +253,14 @@ export function generateSitemaps(outDir: string) {
     { name: 'sitemap-comercial.xml', urls: commercialUrls },
   ];
 
+  const emittedUrls = new Set<string>();
+  for (const sitemap of sitemapFiles) sitemap.urls = sitemap.urls.filter(entry => {
+    const url = entry.match(/<loc>([^<]+)<\/loc>/)?.[1];
+    if (!url || emittedUrls.has(url)) return false;
+    emittedUrls.add(url);
+    return true;
+  });
+
   let totalUrls = 0;
   for (const sm of sitemapFiles) {
     const filePath = path.join(outDir, sm.name);

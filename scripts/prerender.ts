@@ -650,7 +650,7 @@ export function prerenderRoutes(outDir: string): number {
           ],
           faqs: faqs([
             { q: 'Quanto custa a limpeza de sofá?', a: 'A limpeza de sofá começa a partir de 49€ para sofás de 1 lugar, 69€ para 2 lugares e 79€ para 3 lugares. Peça orçamento gratuito sem compromisso.' },
-            { q: 'Quanto tempo demora a limpeza de sofá?', a: 'O serviço demora entre 3 a 6 horas conforme o tamanho e estado do sofá. O sofá fica pronto a usar em 3 a 6 horas após a limpeza.' },
+            { q: 'Quanto tempo demora a limpeza de sofá?', a: 'O serviço demora entre 1 a 3 horas conforme o tamanho e estado do sofá. O sofá fica pronto a usar em 3 a 6 horas após a limpeza.' },
             { q: 'A limpeza remove manchas antigas do sofá?', a: 'Sim. Tratamos manchas de vinho, café, gordura e sangue com pré-tratamento específico. Manchas muito antigas podem não sair completamente, mas apresentamos sempre o melhor resultado possível.' },
             { q: 'Fazem limpeza de sofás ao domicílio em todo o país?', a: 'Sim. O nosso serviço cobre todo o país: Porto, Lisboa, Braga, Coimbra e arredores.' },
           ]),
@@ -716,7 +716,7 @@ export function prerenderRoutes(outDir: string): number {
           ],
           faqs: faqs([
             { q: 'Quanto custa a limpeza de tapete?', a: 'Cada tapete é medido (largura x comprimento) e orçamentado individualmente, sem preço fixo por m². Peça um orçamento gratuito e sem compromisso.' },
-            { q: 'Quanto tempo demora a limpeza de tapete?', a: 'O serviço demora 3 a 6 horas. O tapete fica seco em 3 a 6 horas, dependendo da espessura e material.' },
+            { q: 'Quanto tempo demora a limpeza de tapete?', a: 'O serviço demora 1 a 2 horas. O tapete fica seco em 3 a 6 horas, dependendo da espessura e material.' },
             { q: 'Que tipos de tapete limpam?', a: 'Limpamos todos os tipos: persas, shaggy, sisal, juta, lã, acrílico, polipropileno e fibras naturais. O produto é sempre adaptado ao material.' },
             { q: 'Fazem limpeza de tapetes ao domicílio?', a: 'Sim. O técnico desloca-se a sua casa com equipamento de extração profissional. Não precisa de entregar o tapete.' },
           ]),
@@ -901,7 +901,7 @@ export function prerenderRoutes(outDir: string): number {
           faqs: faqs([
             { q: 'Qual o preço da limpeza de sofá?', a: 'A limpeza de sofá começa a partir de 49€ para 1 lugar, 69€ para 2 lugares e 79€ para 3 lugares. Peça orçamento grátis.' },
             { q: 'Fazem serviço ao domicílio?', a: 'Sim, todos os serviços são realizados ao domicílio. O técnico desloca-se até si com todo o equipamento.' },
-            { q: 'Quanto tempo demora o serviço?', a: 'Um sofá demora 1 a 3 horas. Um colchão 3 a 6 horas. O estofo fica seco em 3 a 6 horas.' },
+            { q: 'Quanto tempo demora o serviço?', a: 'Um sofá demora 1 a 3 horas. Um colchão 1 a 2 horas. O estofo fica seco em 3 a 6 horas.' },
             { q: 'Os produtos são seguros para crianças e animais?', a: 'Sim. Usamos apenas produtos certificados, biodegradáveis e seguros para pessoas, crianças e animais domésticos.' },
           ]),
         },

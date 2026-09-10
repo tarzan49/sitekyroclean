@@ -30,6 +30,8 @@
 
 ## Validação
 
-Testes de preços, medidas, deslocação, escalões de impermeabilização e distinção entre subtotal e orçamento. Construção completa e verificação automática de todos os documentos HTML e URLs dos sitemaps. Verificações de formulário no navegador sem envio de pedidos.
+80 testes aprovados após integrar as alterações recentes do site. Verificação de preços, medidas, deslocação, escalões de impermeabilização e distinção entre subtotal e orçamento. Construção completa: 15 176 documentos HTML verificados, sem páginas públicas sem título principal nem URLs de sitemap sem ficheiro. O verificador `scripts/audit-commercial-output.mjs` pode ser repetido após cada build.
+
+No navegador: Barcelos apresenta deslocação de 20€; tapete sem medidas bloqueia o pedido; medidas 2,5 × 3 m seguem na mensagem, com subtotal separado; pack de impermeabilização em Lisboa começa pela Premium (129€ + 10€) e permite trocar para Essencial (99€ + 10€). Nenhum pedido foi enviado.
 
 A indexação das páginas novas depende do rastreio do motor de pesquisa. O configurador prepara uma mensagem para o cliente enviar; não envia pedidos automaticamente.

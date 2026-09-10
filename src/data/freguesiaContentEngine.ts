@@ -245,7 +245,7 @@ const howItWorksTemplates: ContentTemplate[] = [
   (f, c, svc) => `Em ${f}, o processo é simples: inspecionamos o estado dos estofos, aplicamos pré-tratamento específico nas manchas, realizamos a extração profissional profunda e garantimos secagem rápida. Tudo na sua casa em ${c}.`,
   (f, c, svc) => `Na sua casa em ${f}, começamos por avaliar o tipo de tecido e o grau de sujidade. Depois, aplicamos o tratamento mais adequado com extração profissional a quente. O resultado é imediato e os estofos ficam prontos em poucas horas.`,
   (f, c, svc) => `O nosso processo de ${svc.toLowerCase()} em ${f} é pensado para minimizar a interrupção da sua rotina. Chegamos, inspecionamos, tratamos e entregamos: tudo num único agendamento, sem necessidade de transportar os seus estofos.`,
-  (f, c, svc) => `Quando visitamos a sua casa em ${f}, ${c}, trazemos todo o equipamento necessário. Não precisa de preparar nada. O processo dura entre 3 a 6 horas e os estofos ficam prontos a usar no mesmo dia.`,
+  (f, c, svc) => `Quando visitamos a sua casa em ${f}, ${c}, trazemos todo o equipamento necessário. Não precisa de preparar nada. O processo dura entre 1 a 3 horas e os estofos ficam prontos a usar no mesmo dia.`,
 ];
 
 // ─── Meta Description Templates ──────────────────────────────────
@@ -348,7 +348,7 @@ const benefitsByService: Record<string, BenefitTemplate[]> = {
     (f)    => `Melhoria imediata da qualidade do sono para residentes de ${f} com alergias noturnas`,
     (f, c) => `Cobertura completa em ${f} e toda a área de ${c}, com deslocação calculada pela distância`,
     (f)    => `Produtos hipoalergénicos e seguros para bebés, crianças e animais de estimação em ${f}`,
-    (f)    => `Colchão pronto a usar no mesmo dia, com secagem completa em 3 a 5 horas em ${f}`,
+    (f)    => `Colchão pronto a usar no mesmo dia, com secagem completa em 3 a 6 horas em ${f}`,
     (f)    => `Tratamento eficaz contra fungos e humidade, frequentes em quartos pouco ventilados de ${f}`,
     (f, c) => `Orçamento gratuito e personalizado para o colchão da sua casa em ${f}, ${c}`,
   ],
@@ -367,7 +367,7 @@ const benefitsByService: Record<string, BenefitTemplate[]> = {
     (f)    => `Eliminação de gordura, restos de comida e bactérias acumulados nas cadeiras de ${f}`,
     (f)    => `Produtos seguros para crianças e animais, ideais para as cadeiras de famílias de ${f}`,
     (f, c) => `Cobertura total em ${f} e toda a área de ${c}, com deslocação calculada pela distância`,
-    (f)    => `Cadeiras prontas a usar no mesmo dia, com secagem em 3 a 4 horas em ${f}`,
+    (f)    => `Cadeiras prontas a usar no mesmo dia, com secagem em 3 a 6 horas em ${f}`,
     (f)    => `Remoção de manchas de comida e bebidas que desvalorizam o espaço de refeições em ${f}`,
     (f)    => `Técnicos treinados para todos os tipos de estofo de cadeira presentes nos lares de ${f}`,
     (f, c) => `Orçamento gratuito antes de qualquer trabalho nas suas cadeiras em ${f}, ${c}`,
@@ -413,7 +413,7 @@ const faqsByService: Record<string, FAQTemplate[]> = {
     },
     {
       question: (svc, f) => `Quanto tempo demora a limpeza de sofá em ${f}?`,
-      answer: (svc, f, price, c) => `Em ${f}, a limpeza de um sofá de 2 a 3 lugares demora entre 3 a 6 horas. O sofá fica pronto a usar em 3 a 6 horas após a secagem completa.`,
+      answer: (svc, f, price, c) => `Em ${f}, a limpeza de um sofá de 2 a 3 lugares demora entre 1 a 2 horas. O sofá fica pronto a usar após secagem completa, em média 3 a 6 horas com ventilação.`,
     },
     {
       question: (svc, f) => `Conseguem remover manchas antigas do sofá em ${f}?`,
@@ -447,7 +447,7 @@ const faqsByService: Record<string, FAQTemplate[]> = {
     },
     {
       question: (svc, f) => `Quanto tempo demora a limpeza do colchão em ${f}?`,
-      answer: (svc, f, price, c) => `Em ${f}, a limpeza de um colchão de casal demora entre 45 minutos a 1 hora. O colchão fica pronto a usar em 3 a 5 horas, com secagem completa.`,
+      answer: (svc, f, price, c) => `Em ${f}, a limpeza de um colchão de casal demora entre 45 minutos a 1 hora. O colchão fica pronto a usar em 3 a 6 horas, com secagem completa.`,
     },
     {
       question: (svc, f) => `A limpeza de colchão em ${f} elimina os ácaros?`,
@@ -515,7 +515,7 @@ const faqsByService: Record<string, FAQTemplate[]> = {
     },
     {
       question: (svc, f) => `Quanto tempo demora a limpeza de cadeiras em ${f}?`,
-      answer: (svc, f, price, c) => `Em ${f}, a limpeza de um conjunto de 6 cadeiras demora entre 3 a 6 horas. As cadeiras ficam prontas a usar em 3 a 4 horas após a secagem completa.`,
+      answer: (svc, f, price, c) => `Em ${f}, a limpeza de um conjunto de 6 cadeiras demora entre 1 a 2 horas. As cadeiras ficam prontas a usar após secagem completa, em média 3 a 6 horas com ventilação.`,
     },
     {
       question: (svc, f) => `Conseguem remover manchas de comida antigas nas cadeiras em ${f}?`,
@@ -549,7 +549,7 @@ const faqsByService: Record<string, FAQTemplate[]> = {
     },
     {
       question: (svc, f) => `Quanto tempo demora a limpeza de alcatifa em ${f}?`,
-      answer: (svc, f, price, c) => `Em ${f}, uma alcatifa de sala (25-30m²) demora entre 3 a 6 horas. A secagem completa leva entre 3 a 6 horas, consoante a espessura das fibras.`,
+      answer: (svc, f, price, c) => `Em ${f}, uma alcatifa de sala (25-30m²) demora entre 1 a 2 horas. A secagem completa leva entre 3 a 6 horas, consoante a espessura das fibras.`,
     },
     {
       question: (svc, f) => `A limpeza de alcatifa danifica o pavimento em ${f}?`,

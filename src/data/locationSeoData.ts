@@ -145,7 +145,7 @@ function generateSofaContent(city: string, cityDesc: string): Omit<LocationServi
     localSection: `Servimos toda a área de ${city} e arredores, incluindo as principais freguesias e zonas residenciais. A nossa equipa desloca-se diretamente à sua casa ${prep} ${city} com taxa de deslocação de ${locationPrices[city] ?? 10}€. Atendemos clientes residenciais e comerciais: escritórios, restaurantes, hotéis e clínicas ${prep} ${city}.`,
     faqs: [
       { question: `Quanto custa a limpeza de sofá ${prep} ${city}?`, answer: `A limpeza de sofá ${prep} ${city} começa a partir de 49€ para sofás de 1 lugar. Os preços da tabela são por tamanho e a deslocação é cobrada à parte conforme a morada. Sofás de quatro ou mais lugares e tratamentos adicionais exigem orçamento, confirmado antes do serviço.` },
-      { question: `Quanto tempo demora a limpeza do sofá ${prep} ${city}?`, answer: `O serviço de limpeza de sofá ao domicílio ${prep} ${city} demora entre 3 a 6 horas, dependendo do tamanho e estado do sofá. A secagem demora normalmente 3 a 6 horas, podendo variar com o tecido, a humidade e a ventilação. Use apenas quando estiver completamente seco.` },
+      { question: `Quanto tempo demora a limpeza do sofá ${prep} ${city}?`, answer: `O serviço de limpeza de sofá ao domicílio ${prep} ${city} demora entre 1 a 3 horas, dependendo do tamanho e estado do sofá. A secagem demora normalmente 3 a 6 horas, podendo variar com o tecido, a humidade e a ventilação. Use apenas quando estiver completamente seco.` },
       { question: `A limpeza remove manchas antigas do sofá?`, answer: `Sim, o nosso processo de extração profunda remove a grande maioria das manchas, incluindo manchas antigas de café, vinho, gordura e líquidos. Manchas muito antigas podem necessitar de tratamento adicional.` },
       { question: `A limpeza de sofá remove ácaros e bactérias?`, answer: `A extração remove sujidade e resíduos acumulados nas fibras. O resultado depende do material e do tratamento; não prometemos uma percentagem de eliminação de microrganismos nem melhoria de sintomas de alergia.` },
       { question: `Fazem limpeza de sofás ao domicílio ${prep} ${city}?`, answer: `Sim! A Kyro Clean Solutions faz limpeza de sofás ao domicílio ${prep} ${city} e toda a área envolvente. A nossa equipa desloca-se à sua casa com todo o equipamento necessário.` },
@@ -372,8 +372,9 @@ export function getAllLocationRoutes(): { path: string; serviceSlug: string; cit
 }
 
 // Get all city links for a specific service (for internal linking)
-export function getCityLinksForService(serviceSlug: string): { name: string; path: string }[] {
-  return cities.map(city => ({
+export function getCityLinksForService(serviceSlug: string, currentCity?: string): { name: string; path: string }[] {
+  const area = cities.find(c => c.name === currentCity)?.area;
+  return [...cities].sort((a, b) => Number(b.area === area) - Number(a.area === area)).map(city => ({
     name: city.name,
     path: `/${serviceSlug}-${city.slug}`,
   }));

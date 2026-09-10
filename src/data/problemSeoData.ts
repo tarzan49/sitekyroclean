@@ -47,7 +47,7 @@ const problemDefinitions: ProblemPage[] = [
       { question: "A limpeza profissional remove manchas antigas do sofá?", answer: "Sim, na grande maioria dos casos. O nosso processo de extração profunda remove manchas de café, vinho, gordura e outros líquidos, mesmo que sejam antigas. Manchas muito antigas ou de tinta permanente podem necessitar de tratamento adicional." },
       { question: "Quanto custa remover manchas do sofá?", answer: "A remoção de manchas está incluída no serviço de limpeza profissional de sofás, que começa a partir de 49€ para sofás de 1 lugar (69€ para 2 lugares). O preço pode variar conforme a extensão e tipo de manchas." },
       { question: "A limpeza pode danificar o tecido ao remover manchas?", answer: "Não. Utilizamos produtos certificados específicos para cada tipo de tecido e mancha. Antes de iniciar, inspeccionamos sempre o tecido para garantir o tratamento mais adequado e seguro." },
-      { question: "Quanto tempo demora a remover manchas do sofá?", answer: "O serviço completo de limpeza e remoção de manchas demora entre 3 a 6 horas, dependendo do tamanho e estado do sofá. O sofá fica pronto a usar em 3 a 6 horas." },
+      { question: "Quanto tempo demora a remover manchas do sofá?", answer: "O serviço completo de limpeza e remoção de manchas demora entre 1 a 3 horas, dependendo do tamanho e estado do sofá. O sofá fica pronto a usar em 3 a 6 horas." },
     ],
     relatedProblems: ["manchas-vinho-sofa", "manchas-cafe-sofa", "manchas-gordura-sofa", "manchas-colchao"],
     relatedServices: ["limpeza-sofas", "impermeabilizacao"],

@@ -506,7 +506,7 @@ const LocationServicePage = () => {
               <div className="p-5 rounded-xl bg-white" style={{ border: "1px solid rgba(17,17,17,0.08)", boxShadow: "0 4px 16px rgba(7,26,18,0.04)" }}>
                 <p className="text-[10px] font-bold tracking-[0.26em] uppercase mb-3" style={{ color: "#D4AF37" }}>Também disponível em</p>
                 <div className="flex flex-wrap gap-2">
-                  {getCityLinksForService(data.serviceSlug).filter(c => c.name !== data.city).slice(0, 6).map(city => (
+                  {getCityLinksForService(data.serviceSlug, data.city).filter(c => c.name !== data.city).slice(0, 6).map(city => (
                     <Link
                       key={city.name}
                       to={city.path}
