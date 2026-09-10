@@ -55,7 +55,7 @@ const TermosCondicoes = () => (
             O cliente deve garantir o acesso ao local e às tomadas elétricas necessárias. Em caso de impossibilidade de acesso na data acordada por motivo imputável ao cliente, poderá ser cobrada uma taxa de deslocação.
           </p>
           <p>
-            A Kyro Clean Solutions aplica produtos e técnicas adequados ao tipo de material identificado. Os resultados obtidos dependem do estado de conservação, envelhecimento e composição do estofo, não sendo possível garantir resultados específicos independentemente desses fatores. A Kyro Clean Solutions não se responsabiliza por danos preexistentes nem por limitações de resultado inerentes ao estado do estofo.
+            A Kyro Clean Solutions aplica produtos e técnicas adequados ao tipo de material identificado. Os resultados obtidos dependem do estado de conservação, envelhecimento e composição do estofo, não sendo possível garantir resultados específicos independentemente desses fatores. As limitações e os danos preexistentes são explicados antes de começar. Não afastam a repetição gratuita quando a insatisfação é comunicada até 48 horas após o serviço, nos termos da garantia comercial.
           </p>
         </Section>
 

@@ -64,7 +64,7 @@ const QuizChairsAddonUpsell = ({ formData, updateFormData, onContinue, onBack }:
           <Droplets className={cn('w-5 h-5 flex-shrink-0', addonOn ? 'text-gold' : 'text-gold/70')} />
           <div className="flex-1 min-w-0">
             <p className={cn('text-sm font-bold', addonOn ? 'text-white' : 'text-white/90')}>Higienização Profunda</p>
-            <p className="text-[10px] text-white/35 leading-snug mt-0.5">Elimina bactérias, odores e alergénios acumulados no estofo, para as sentir como novas.</p>
+            <p className="text-[10px] text-white/35 leading-snug mt-0.5">Limpeza de manchas e resíduos das fibras. Tratamentos adicionais são opcionais.</p>
             {higienizacaoPrice !== null && (
               <p className={cn('text-[11px] font-semibold mt-1', addonOn ? 'text-gold' : 'text-gold/60')}>
                 Por apenas <span className="font-black">+{fmt(higienizacaoPrice)}€</span>
@@ -186,7 +186,7 @@ const QuizChairsAddonUpsell = ({ formData, updateFormData, onContinue, onBack }:
         <Bug className={cn('w-5 h-5 flex-shrink-0', antiAcarosOn ? 'text-gold' : 'text-gold/70')} />
         <div className="flex-1 min-w-0">
           <p className={cn('text-sm font-bold', antiAcarosOn ? 'text-white' : 'text-white/90')}>Anti Ácaros</p>
-          <p className="text-[10px] text-white/35 leading-snug mt-0.5">Evita que os ácaros voltem a aparecer e elimina bactérias do estofo.</p>
+          <p className="text-[10px] text-white/35 leading-snug mt-0.5">Tratamento adicional dirigido a ácaros. A desbacterização é um extra distinto, sob orçamento.</p>
           <p className={cn('text-[11px] font-semibold mt-1', antiAcarosOn ? 'text-gold' : 'text-gold/60')}>
             Por apenas <span className="font-black">+{CHAIR_ANTI_ACAROS_UNIT_RATE}€/un.</span>
           </p>

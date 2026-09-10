@@ -103,11 +103,6 @@ const LimpezaAlcatifas = () => {
           description="Limpeza profissional de alcatifas no Porto. Remoção de sujidade profunda."
           url="/limpeza-alcatifas"
           priceFrom="Sob orçamento"
-          reviews={[
-            { author: "Carlos M.", city: "", text: "Serviço de excelência! A alcatifa do escritório ficou impecável. Profissionais muito competentes e pontuais.", date: "2025-01-20" },
-            { author: "António F.", city: "", text: "Trabalho cinco estrelas! Limparam todo o recheio do AL e os hóspedes notaram logo a diferença. Obrigado!", date: "2025-03-01" },
-            { author: "Catarina L.", city: "", text: "A alcatifa da escada estava muito suja e ficou impecável. Equipa super simpática e profissional.", date: "2025-04-08" },
-          ]}
         />
       </main>
       <Footer />

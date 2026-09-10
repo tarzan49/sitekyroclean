@@ -76,7 +76,7 @@ export function buildProblemWaMessage(slug: string): string {
   }
   if (s.includes('acar')) {
     const item = s.includes('colchao') ? 'colchão' : 'sofá';
-    return `Olá! Preciso de eliminação de ácaros do meu ${item}. Qual é o serviço e o preço?`;
+    return `Olá! Gostaria de conhecer o tratamento anti-ácaros opcional para o meu ${item}. Podem explicar o que inclui e confirmar o preço?`;
   }
   if (s.includes('alerg')) {
     const item = s.includes('colchao') ? 'colchão' : 'sofá';

@@ -118,7 +118,7 @@ const Hero = () => {
               className="text-sm sm:text-base md:text-lg text-white leading-relaxed mb-6 md:mb-8 max-w-lg"
               style={{ textShadow: '0 1px 10px rgba(0,0,0,0.55)' }}
             >
-              Eliminamos manchas, ácaros e odores com equipamento profissional. Resultado garantido no próprio dia, em qualquer ponto de Portugal.
+              Limpeza profissional de manchas e resíduos, com equipas em Braga, Porto, Lisboa e Algarve. Procuramos atender no próprio dia ou no dia seguinte, mediante disponibilidade. Anti-ácaros e desbacterização são extras opcionais.
             </p>
 
             {/* CTAs */}

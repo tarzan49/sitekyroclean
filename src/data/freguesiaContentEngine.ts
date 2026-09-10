@@ -235,7 +235,7 @@ const introTemplates: ContentTemplate[] = [
   (f, c, svc, price) => `Residentes de ${f} já confiam na Kyro Clean Solutions para ${svc.toLowerCase()} ao domicílio. Deslocamo-nos a qualquer zona de ${c} com equipamento de extração profissional. Preços ${priceClause(price)}.`,
   (f, c, svc, price) => `Precisa de ${svc.toLowerCase()} em ${f}? A nossa equipa especializada cobre toda a zona de ${c} com um serviço rápido, eficaz e sem complicações. Higienização profissional ${priceClause(price)}.`,
   (f, c, svc, price) => `Em ${f}, ${c}, os estofos merecem cuidados profissionais. A Kyro Clean Solutions utiliza extração profissional a quente para remover manchas, ácaros e odores. ${priceClause(price, true)} ao domicílio.`,
-  (f, c, svc, price) => `A limpeza caseira não é suficiente para eliminar ácaros e bactérias dos seus estofos em ${f}. A Kyro Clean Solutions garante uma higienização profunda em ${c}, ${priceClause(price)}.`,
+  (f, c, svc, price) => `A limpeza doméstica pode não remover a sujidade acumulada nas fibras dos seus estofos em ${f}. A Kyro Clean Solutions garante uma higienização profunda em ${c}, ${priceClause(price)}.`,
 ];
 
 // ─── How It Works Templates ──────────────────────────────────────
@@ -344,7 +344,7 @@ const benefitsByService: Record<string, BenefitTemplate[]> = {
   ],
   "limpeza-colchoes": [
     (f, c) => `Higienização ao domicílio em ${f}: o colchão não sai do seu quarto em ${c}`,
-    (f)    => `Eliminação de até 2 milhões de ácaros que se acumulam nos colchões de ${f}`,
+    (f)    => `Remoção de sujidade e resíduos dos colchões de ${f}; tratamento anti-ácaros opcional`,
     (f)    => `Melhoria imediata da qualidade do sono para residentes de ${f} com alergias noturnas`,
     (f, c) => `Cobertura completa em ${f} e toda a área de ${c}, com deslocação calculada pela distância`,
     (f)    => `Produtos hipoalergénicos e seguros para bebés, crianças e animais de estimação em ${f}`,
@@ -355,7 +355,7 @@ const benefitsByService: Record<string, BenefitTemplate[]> = {
   "limpeza-tapetes": [
     (f, c) => `Limpeza ao domicílio em ${f}: tratamos o tapete no local, sem transporte para ${c}`,
     (f)    => `Recuperação de cores e textura em tapetes envelhecidos de ${f}, com resultados visíveis`,
-    (f)    => `Eliminação de ácaros, alergénios e pêlos de animais que se acumulam nos tapetes de ${f}`,
+    (f)    => `Remoção de sujidade, resíduos e pelos de animais acumulados nos tapetes de ${f}`,
     (f, c) => `Cobertura total em ${f} e toda a área de ${c}, com deslocação calculada pela distância`,
     (f)    => `Secagem rápida: o tapete de ${f} fica pronto a usar em 3 a 6 horas após a limpeza`,
     (f)    => `Técnicos especializados em tapetes de lã, seda e fibras delicadas, frequentes em ${f}`,
@@ -364,7 +364,7 @@ const benefitsByService: Record<string, BenefitTemplate[]> = {
   ],
   "limpeza-cadeiras": [
     (f, c) => `Limpeza ao domicílio em ${f}: as cadeiras ficam na sua casa em ${c} durante todo o processo`,
-    (f)    => `Eliminação de gordura, restos de comida e bactérias acumulados nas cadeiras de ${f}`,
+    (f)    => `Remoção de gordura e restos de comida acumulados nas cadeiras de ${f}`,
     (f)    => `Produtos seguros para crianças e animais, ideais para as cadeiras de famílias de ${f}`,
     (f, c) => `Cobertura total em ${f} e toda a área de ${c}, com deslocação calculada pela distância`,
     (f)    => `Cadeiras prontas a usar no mesmo dia, com secagem em 3 a 6 horas em ${f}`,
@@ -451,7 +451,7 @@ const faqsByService: Record<string, FAQTemplate[]> = {
     },
     {
       question: (svc, f) => `A limpeza de colchão em ${f} elimina os ácaros?`,
-      answer: (svc, f, price, c) => `Sim. Em ${f}, o nosso processo de extração com água quente ajuda a remover resíduos associados a ácaros e bactérias presentes no colchão, O tratamento anti-ácaros pode ser acrescentado como extra.`,
+      answer: (svc, f, price, c) => `A limpeza em ${f} remove sujidade e resíduos das fibras. O tratamento anti-ácaros e a desbacterização são extras opcionais, confirmados no orçamento.`,
     },
     {
       question: (svc, f) => `A limpeza de colchão em ${f} é indicada para bebés e crianças?`,
@@ -493,7 +493,7 @@ const faqsByService: Record<string, FAQTemplate[]> = {
     },
     {
       question: (svc, f) => `A limpeza de tapete em ${f} elimina os ácaros?`,
-      answer: (svc, f, price, c) => `Sim. Em ${f}, a extração com água quente elimina os ácaros e alergénios presentes nas fibras do tapete, algo que a aspiração doméstica normal não consegue fazer.`,
+      answer: (svc, f, price, c) => `A limpeza em ${f} remove sujidade e resíduos das fibras. Se pretende um tratamento anti-ácaros, indique-o no pedido: é um extra sujeito a avaliação e orçamento.`,
     },
     {
       question: (svc, f) => `Os produtos são seguros para tapetes delicados em ${f}?`,

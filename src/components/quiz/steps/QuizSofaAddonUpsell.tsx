@@ -72,7 +72,7 @@ const QuizSofaAddonUpsell = ({ formData, updateFormData, sofaItems, setSofaItems
           <Droplets className={cn('w-5 h-5 flex-shrink-0', anyPackOn ? 'text-gold' : 'text-gold/70')} />
           <div className="flex-1 min-w-0">
             <p className={cn('text-sm font-bold', anyPackOn ? 'text-white' : 'text-white/90')}>Higienização Profunda</p>
-            <p className="text-[10px] text-white/35 leading-snug mt-0.5">Elimina manchas, odores e bactérias acumuladas, deixando o estofo como novo.</p>
+            <p className="text-[10px] text-white/35 leading-snug mt-0.5">Limpeza de manchas e resíduos acumulados nas fibras, com processo adequado ao tecido.</p>
           </div>
           <span className={cn(
             'flex-shrink-0 w-7 h-7 rounded-full border-2 flex items-center justify-center transition-all',

@@ -20,8 +20,8 @@ const terms: Term[] = [
   {
     id: "higienizacao-vs-limpeza-vs-lavagem",
     term: "Higienização vs Limpeza vs Lavagem",
-    definition: "Três termos frequentemente confundidos mas com significados distintos. Limpeza remove sujidade visível (manchas, pó, gordura) da superfície do tecido. Higienização vai além: elimina agentes biológicos invisíveis como ácaros, bactérias, fungos e alergénios, que representam risco para a saúde. Lavagem implica utilização de água em grande quantidade e é menos comum em estofos (risco de deformação). O serviço Kyro Clean combina limpeza profunda com higienização por vapor a 160°C.",
-    example: "Quando diz que quer 'higienizar' o sofá, está a pedir eliminação de ácaros e bactérias. Quando diz 'limpar', pode estar a referir-se apenas à remoção de manchas visíveis.",
+    definition: "No site Kyro Clean, limpeza e higienização referem-se à remoção de sujidade e resíduos das fibras. Lavagem descreve um processo de limpeza adequado ao material. Nenhum destes nomes inclui automaticamente tratamento anti-ácaros ou desbacterização: são extras opcionais, com objetivos e preços distintos, confirmados no orçamento.",
+    example: "Pode pedir limpeza do sofá e acrescentar anti-ácaros ou desbacterização; a equipa explica e confirma cada extra antes de marcar.",
     serviceLink: { label: "Limpeza e Higienização de Sofás", to: "/limpeza-sofas" },
   },
   {
@@ -47,7 +47,7 @@ const terms: Term[] = [
   {
     id: "limpeza-seco-sofa",
     term: "Limpeza a Seco de Sofá",
-    definition: "Método de limpeza que utiliza solventes ou compostos em pó (sem água ou com humidade mínima inferior a 5%) para dissolver e remover sujidade das fibras. Indicado para tecidos que não toleram humidade: alcântara, veludo de seda, alguns tipos de linho e estofos com enchimentos que deformam com água. O processo aplica o produto, deixa agir 10 a 15 minutos e aspira ou escova. Não elimina ácaros tão eficazmente quanto o vapor, por isso é complementado com tratamento anti-ácaros separado quando necessário.",
+    definition: "Método de limpeza que utiliza solventes ou compostos em pó (sem água ou com humidade mínima inferior a 5%) para dissolver e remover sujidade das fibras. Indicado para tecidos que não toleram humidade: alcântara, veludo de seda, alguns tipos de linho e estofos com enchimentos que deformam com água. O processo aplica o produto, deixa agir 10 a 15 minutos e aspira ou escova. O anti-ácaros não está incluído na limpeza a seco e pode ser avaliado como tratamento complementar opcional.",
     example: "Sofá de alcântara creme com manchas de café. Limpeza a seco com solvente neutro: manchas removidas sem qualquer risco de marcas de humidade ou deformação do tecido.",
     serviceLink: { label: "Limpeza Especializada por Material", to: "/limpeza-sofas" },
   },
@@ -119,7 +119,7 @@ const terms: Term[] = [
   {
     id: "limpeza-estofos-exterior",
     term: "Limpeza de Estofos de Exterior",
-    definition: "Sofás, cadeiras e espreguiçadeiras de exterior (terraço, jardim, piscina) têm tecidos específicos resistentes à humidade e UV (olefin, acrílico, textilene, sling). Estes materiais são mais resistentes à água mas acumulam algas, fungos, terra e gordura solar. A limpeza usa produtos adequados a tecidos outdoor e é mais rápida que a de interior: a secagem é imediata. Em Portugal, a limpeza sazonal (primavera/outono) é recomendada.",
+    definition: "Sofás, cadeiras e espreguiçadeiras de exterior (terraço, jardim, piscina) têm tecidos específicos resistentes à humidade e UV (olefin, acrílico, textilene, sling). Estes materiais são mais resistentes à água mas acumulam algas, fungos, terra e gordura solar. A limpeza usa produtos adequados a tecidos outdoor e tem secagem média de 3 a 6 horas, dependendo da ventilação, do tecido e das condições do espaço. Em Portugal, a limpeza sazonal (primavera/outono) é recomendada.",
     example: "Conjunto de garden lounge com cushions de olefin no Porto. Após inverno: manchas verdes de algas e terra. Limpeza com produto específico outdoor: resultado impecável para o verão.",
     serviceLink: { label: "Limpeza de Tapetes e Exterior", to: "/limpeza-tapetes" },
   },

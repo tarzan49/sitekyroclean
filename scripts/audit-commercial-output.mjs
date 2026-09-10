@@ -3,6 +3,10 @@ import path from 'node:path';
 import { hasOldResponsePromise } from './response-policy.mjs';
 const root = path.resolve('dist');
 const patterns = {
+  disponibilidadeAntiga: /agendamento em 48h/i,
+  secagemAntiga: /3 a 5 horas|secagem é imediata/i,
+  bactericidaIncluido: /Bactericida certificado|Eliminação de bactérias e germes/i,
+  exclusaoGarantia: /independentemente de terem sido reportados/i,
   deslocacaoIncluida: /deslocação incluída/i,
   tabelaPackAntiga: /99€\/145€\/159€/,
 

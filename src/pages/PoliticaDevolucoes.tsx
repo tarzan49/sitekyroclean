@@ -48,14 +48,10 @@ const PoliticaDevolucoes = () => (
           </p>
         </Section>
 
-        <Section title="4. Situações não cobertas">
-          <p>A Kyro Clean Solutions não assume qualquer responsabilidade por:</p>
-          <ul className="list-disc pl-5 space-y-1.5">
-            <li>Danos, manchas ou defeitos preexistentes, independentemente de terem sido reportados antes do serviço;</li>
-            <li>Resultados limitados pelo estado de desgaste, envelhecimento ou composição do material do estofo;</li>
-            <li>Manchas de natureza permanente, incluindo tinta, corantes industriais ou substâncias não removíveis por métodos de limpeza profissional;</li>
-            <li>Expectativas do cliente que não correspondam ao resultado tecnicamente possível face ao estado do estofo.</li>
-          </ul>
+        <Section title="4. Resultado acordado e limitações do material">
+          <p>Antes do serviço avaliamos o artigo e explicamos limitações como desgaste, danos preexistentes ou manchas que podem ser permanentes. Essas limitações não são uma promessa de reparação ou de remoção total.</p>
+          <p>A existência de uma mancha ou dano anterior não retira o acesso à repetição gratuita quando o cliente comunica insatisfação até 48 horas após o serviço. Repetimos a intervenção sem custos nos termos da garantia comercial, com o processo adequado ao artigo e às limitações previamente explicadas.</p>
+          <p>A repetição não garante a recuperação de tecidos desgastados nem a remoção de manchas permanentes. Os direitos legais do cliente mantêm-se.</p>
         </Section>
 
         <Section title="5. Cancelamentos">

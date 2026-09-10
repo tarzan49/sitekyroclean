@@ -1,3 +1,4 @@
+import { EN_COVERAGE_PROMISE, EN_RESPONSE_PROMISE, EN_AVAILABILITY_PROMISE } from '@/constants/commercialPolicy';
 import { Phone, Mail, MapPin } from "lucide-react";
 import { Link } from "react-router-dom";
 import { GOOGLE_MAPS_URL } from "@/constants/google";
@@ -19,8 +20,9 @@ const EnFooter = () => {
             <span className="text-lg md:text-xl font-bold text-gold tracking-wide">Kyro Clean Solutions</span>
           </div>
           <p className="text-sm text-white/55 leading-relaxed max-w-xl mx-auto">
-            Professional upholstery cleaning for sofas, mattresses and rugs, at your holiday rental. Professional extraction equipment, certified products, English-speaking team.
+            Professional upholstery cleaning for sofas, mattresses and rugs, at your holiday rental. Professional extraction equipment and an English-speaking team.
           </p>
+          <p className="text-sm text-white/70 leading-relaxed max-w-2xl mx-auto mt-4">{EN_COVERAGE_PROMISE}</p><p className="text-sm text-white/70 mt-3">{EN_RESPONSE_PROMISE}. {EN_AVAILABILITY_PROMISE}</p>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-8 max-w-3xl mx-auto text-center sm:text-left">
@@ -39,7 +41,7 @@ const EnFooter = () => {
             </a>
           </div>
           <div>
-            <h3 className="text-sm font-bold mb-2 text-white/80 uppercase tracking-wide">Based in</h3>
+            <h3 className="text-sm font-bold mb-2 text-white/80 uppercase tracking-wide">Registered address</h3>
             <a href={GOOGLE_MAPS_URL} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center sm:justify-start gap-2 text-sm text-white/60 hover:text-gold transition-colors">
               <MapPin className="w-3.5 h-3.5 flex-shrink-0" />
               {BUSINESS_ADDRESS.addressLocality}, Portugal

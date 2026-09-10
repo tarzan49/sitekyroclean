@@ -221,9 +221,9 @@ const posts: BlogPost[] = [
         body: "As alergias a ácaros podem provocar:\n\n**Rinite alérgica**, Espirros frequentes, congestão nasal e corrimento. Piora de manhã ao acordar (colchão) e à noite no sofá.\n\n**Asma brônquica**, Os ácaros são o principal desencadeador de asma alérgica. Em crianças, a exposição precoce aumenta significativamente o risco de desenvolver asma.\n\n**Eczema/dermatite**, Erupções cutâneas e comichão relacionadas com contacto prolongado (especialmente em bebés deitados no chão).\n\n**Perturbação do sono**, Congestão nasal noturna causada por ácaros no colchão prejudica a qualidade do sono mesmo sem sintomas claros.",
       },
       {
-        heading: "Como eliminar ácaros eficazmente?",
-        body: "A aspiração doméstica comum remove apenas os ácaros da superfície, não os que estão nas fibras internas. Para uma eliminação eficaz:\n\n**Limpeza profissional por extração a vapor**, Temperaturas acima de 55°C matam 100% dos ácaros. A extração a alta pressão remove os ácaros mortos, fezes e exoesqueletos das fibras do colchão ou sofá.\n\n**Anti-ácaros**, Tratamento específico com produto acaricida profissional que mantém efeito residual por 3 a 6 meses.\n\n**Medidas preventivas em casa:**\n- Lavar roupa de cama a 60°C semanalmente\n- Manter humidade abaixo de 50%\n- Arejar os quartos diariamente\n- Usar capas de colchão antiácaro certificadas",
-        tip: "A OMS recomenda higienização profissional de colchões a cada 6 meses para pessoas com alergias respiratórias.",
+        heading: "Limpeza e tratamento anti-ácaros: o que muda?",
+        body: "A limpeza profissional remove sujidade e resíduos das fibras. O tratamento anti-ácaros é um extra dirigido a ácaros e é escolhido e orçamentado separadamente. A desbacterização tem outro objetivo e não está incluída automaticamente em nenhum destes serviços. Confirmamos a compatibilidade com o tecido, a aplicação e os cuidados posteriores antes de marcar.",
+        tip: "Ao pedir orçamento, distinga a limpeza dos tratamentos opcionais e indique o cuidado pretendido.",
       },
     ],
     faq: [
@@ -462,7 +462,7 @@ const posts: BlogPost[] = [
       },
       {
         heading: "O que fazer: higienização como intervenção de saúde",
-        body: "A evidência científica aponta para a higienização profissional regular como a intervenção mais custo-eficaz para reduzir a carga de alérgenos em estofos:\n\n**Colchões:** Higienização a cada 6-12 meses reduz a concentração de Der p 1 em 90% durante os 3 meses seguintes ao tratamento.\n\n**Sofás:** Limpeza profissional anual elimina a acumulação de ácaros, bactérias e fungos que se forma gradualmente no tecido.\n\n**Tapetes e alcatifas:** Limpeza profissional 1-2 vezes por ano, com tratamento anti-fúngico em divisões húmidas.\n\nEstas intervenções têm um custo acessível, uma limpeza de colchão de casal custa 69€, um sofá de 2 lugares 69€, e o impacto na saúde respiratória, especialmente em crianças e alérgicos, é clinicamente documentado.",
+        body: "A limpeza de colchões, sofás e tapetes trata a sujidade das fibras. Anti-ácaros e desbacterização são extras opcionais, com avaliação e preço próprios. Confirme com a equipa o cuidado pretendido e as condições de aplicação. A limpeza não é apresentada como tratamento de sintomas nem como garantia de eliminação de microrganismos.",
         tip: "Para famílias com membros alérgicos ou asmáticos, a higienização profissional de estofos pode ser considerada despesa de saúde e, em alguns casos, recomendada pelo médico assistente.",
       },
     ],
@@ -484,7 +484,7 @@ const posts: BlogPost[] = [
         a: "Sim. Usamos exclusivamente produtos certificados e sem solventes agressivos. Após a secagem completa (3 a 6 horas), os estofos são completamente seguros para crianças e animais.",
       },
     ],
-    relatedService: { label: "Higienização de colchões, eliminar ácaros e bactérias", href: "/limpeza-colchoes" },
+    relatedService: { label: "Limpeza de colchões e tratamentos opcionais", href: "/limpeza-colchoes" },
     relatedPosts: [
       "acaros-sofas-colchoes-riscos-saude",
       "quanto-custa-limpar-colchao-profissional",
@@ -688,7 +688,7 @@ const posts: BlogPost[] = [
       },
       {
         heading: "Limpeza de rotina vs. extração profissional: qual a diferença?",
-        body: "A confusão mais comum é pensar que aspiração regular substitui a limpeza profissional. Não substitui: complementa.\n\n**O que a aspiração faz**: remove partículas superficiais e sólidas. Mantém a aparência aceitável e reduz acumulação de alergénios superficiais.\n\n**O que a aspiração não faz**: não remove gorduras e proteínas aderidas às fibras, não elimina bactérias nem ácaros nas camadas internas, não restaura a cor e textura originais.\n\n**O que a extração profissional faz**: injeta água quente a alta pressão nas fibras e aspira imediatamente, removendo gorduras, proteínas, bactérias e sujidade das camadas mais profundas. Restaura a cor e textura original e aumenta significativamente a vida útil da alcatifa.\n\nUma alcatifa limpa profissionalmente regularmente dura 2 a 3 vezes mais que uma apenas aspirada, reduzindo o custo de substituição que pode chegar a 15-40€/m² de alcatifa comercial.",
+        body: "A confusão mais comum é pensar que aspiração regular substitui a limpeza profissional. Não substitui: complementa.\n\n**O que a aspiração faz**: remove partículas superficiais e sólidas. Mantém a aparência aceitável e reduz acumulação de alergénios superficiais.\n\n**O que a aspiração não faz**: não remove gorduras e proteínas aderidas às fibras, não elimina bactérias nem ácaros nas camadas internas, não restaura a cor e textura originais.\n\n**O que a extração profissional faz**: injeta água quente a alta pressão nas fibras e aspira imediatamente, removendo gorduras, proteínas e sujidade das camadas mais profundas. Restaura a cor e textura original e aumenta significativamente a vida útil da alcatifa.\n\nUma alcatifa limpa profissionalmente regularmente dura 2 a 3 vezes mais que uma apenas aspirada, reduzindo o custo de substituição que pode chegar a 15-40€/m² de alcatifa comercial.",
       },
       {
         heading: "Quanto custa a limpeza profissional de alcatifa para escritório?",
@@ -1563,7 +1563,7 @@ const posts: BlogPost[] = [
       },
       {
         q: "Vale a pena limpar uma alcatifa muito velha?",
-        a: "Depende do estado das fibras. Se as fibras estiverem desgastadas e achatadas, a limpeza não restaura a textura mas elimina sujidade e ácaros. Se estiver apenas suja, sim, vale definitivamente a pena limpar.",
+        a: "Depende do estado das fibras. Se as fibras estiverem desgastadas e achatadas, a limpeza não restaura a textura mas remove sujidade e resíduos. Se estiver apenas suja, sim, vale definitivamente a pena limpar.",
       },
     ],
     relatedService: { label: "Ver preços de limpeza de alcatifas", href: "/limpeza-alcatifas" },

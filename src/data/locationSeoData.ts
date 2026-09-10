@@ -159,7 +159,7 @@ function generateColchaoContent(city: string, cityDesc: string): Omit<LocationSe
   const Prep = cityPrepCap(city);
   return {
     title: `Limpeza de Colchões ${city} | Desde 59€ | Kyro Clean Solutions`,
-    metaDescription: `Higienização profissional de colchões ${prep} ${city}. Eliminamos ácaros, bactérias e odores para noites mais saudáveis. Serviço ao domicílio desde 59€.`,
+    metaDescription: `Higienização profissional de colchões ${prep} ${city}. Removemos sujidade e resíduos das fibras. Anti-ácaros e desbacterização são extras opcionais. Serviço ao domicílio desde 59€.`,
     h1: `Limpeza e Higienização de Colchões ${prep} ${city}`,
     intro: `Sabia que o seu colchão pode conter milhões de ácaros e bactérias? ${Prep} ${city}, a Kyro Clean Solutions oferece higienização profunda de colchões ao domicílio, eliminando microrganismos, manchas e odores acumulados. Dormirá melhor e mais saudável. Serviço disponível ${prep} ${city}, ${cityDesc} desde 59€.`,
     problems: [
@@ -207,7 +207,7 @@ function generateTapetesContent(city: string, cityDesc: string): Omit<LocationSe
       "Lavagem especializada de tapetes persas, orientais, de lã e sintéticos",
       "Revitalização de cores desbotadas e remoção de manchas antigas",
       "Recolha e entrega ao domicílio, sem necessidade de transportar o tapete",
-      "Eliminação de odores de animais de estimação e ácaros das fibras",
+      "Tratamento de odores e remoção de sujidade das fibras",
       `Serviço de confiança para quem vive ${prep} ${city} e arredores`,
       "Secagem controlada que preserva a textura e estrutura das fibras",
     ],

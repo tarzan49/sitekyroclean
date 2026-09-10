@@ -641,7 +641,7 @@ export function prerenderRoutes(outDir: string): number {
             { step: 4, title: 'Resultado garantido', description: 'Sofá limpo e seco em 3 a 6 horas, pronto a usar.' },
           ],
           benefits: [
-            'Remoção de ácaros, bactérias e alergénios',
+            'Remoção de sujidade e resíduos das fibras',
             'Eliminação de manchas de vinho, café, gordura e sangue',
             'Eliminação de odores de animais domésticos e fumo',
             'Secagem rápida em 3 a 6 horas',
@@ -666,7 +666,7 @@ export function prerenderRoutes(outDir: string): number {
       {
         path: '/limpeza-colchoes',
         title: 'Limpeza e Higienização de Colchões | Desde 59€ | Kyro Clean Solutions',
-        desc: 'Higienização profissional de colchões ao domicílio. Eliminamos ácaros, bactérias e odores para noites mais saudáveis. Desde 59€. Porto, Lisboa e todo o país.',
+        desc: 'Higienização profissional de colchões ao domicílio. Removemos sujidade e resíduos; anti-ácaros e desbacterização são extras opcionais. Desde 59€. Porto, Lisboa e todo o país.',
         content: {
           h1: 'Limpeza e Higienização de Colchões ao Domicílio',
           intro: 'Serviço de higienização profunda de colchões ao domicílio. Removemos resíduos e partículas acumuladas nas fibras com extração profissional. Noites mais saudáveis a partir de 59€.',
@@ -687,7 +687,7 @@ export function prerenderRoutes(outDir: string): number {
           faqs: faqs([
             { q: 'Quanto custa a limpeza de colchão?', a: 'A limpeza de colchão começa a partir de 59€ para solteiro, 69€ para casal e 79€ para king. Peça orçamento gratuito.' },
             { q: 'Com que frequência devo limpar o colchão?', a: 'Recomendamos higienização profissional a cada 6 a 12 meses. Em casos de alergias, gravidez ou crianças pequenas, idealmente cada 6 meses.' },
-            { q: 'A limpeza elimina os ácaros do colchão?', a: 'Sim. O nosso processo ajuda a remover resíduos associados a ácaros, ovos e alergénios presentes no colchão, podendo juntar um tratamento anti-ácaros como extra opcional.' },
+            { q: 'A limpeza inclui tratamento anti-ácaros?', a: 'Não. A limpeza remove sujidade e resíduos das fibras. Anti-ácaros e desbacterização são tratamentos complementares opcionais, orçamentados separadamente.' },
             { q: 'Fazem limpeza de colchões ao domicílio?', a: 'Sim. O técnico desloca-se a sua casa com todo o equipamento. Não precisa de retirar o colchão nem de se deslocar.' },
           ]),
         },
@@ -708,7 +708,7 @@ export function prerenderRoutes(outDir: string): number {
           intro: 'Limpeza profissional de tapetes ao domicílio com extração profunda. Removemos sujidade acumulada, manchas difíceis e alergénios. Tapetes persas, shaggy, sisal e todos os tipos tratados com produto específico ao material.',
           benefits: [
             'Remoção de manchas de vinho, café, gordura e tinta',
-            'Eliminação de ácaros e alergénios das fibras',
+            'Remoção de sujidade e resíduos das fibras',
             'Recuperação das cores e textura original',
             'Tratamento específico por tipo de fibra',
             'Secagem em 3 a 6 horas',
@@ -744,7 +744,7 @@ export function prerenderRoutes(outDir: string): number {
           intro: 'Serviço profissional de limpeza de cadeiras estofadas ao domicílio. Removemos sujidade de uso diário, manchas de comida e odores com extração profissional. Ideal para residências, escritórios e restaurantes.',
           benefits: [
             'Remoção de manchas de comida, bebida e gordura',
-            'Eliminação de bactérias e germes de superfície',
+            'Remoção de sujidade e resíduos da superfície',
             'Eliminação de odores de cozinha e uso intenso',
             'Tratamento específico por tipo de tecido',
             'Secagem rápida em 3 a 6 horas',
@@ -775,7 +775,7 @@ export function prerenderRoutes(outDir: string): number {
           benefits: [
             'Limpeza em profundidade das fibras compactadas',
             'Remoção de manchas de zonas de passagem intensa',
-            'Eliminação de ácaros e alergénios',
+            'Remoção de sujidade e resíduos das fibras',
             'Recuperação da textura e cor original',
             'Ideal para escritórios, hotéis e grandes superfícies',
             'Secagem em 3 a 6 horas',
@@ -884,10 +884,10 @@ export function prerenderRoutes(outDir: string): number {
           intro: 'Equipas em Braga, Porto, Lisboa e Algarve, com cobertura regular do litoral entre Viana do Castelo e o Algarve. Aveiro, Coimbra e outras zonas mediante confirmação de disponibilidade.',
           benefits: [
             'Porto e Grande Porto: deslocação a partir de 10€',
-            'Braga e Guimarães: disponível todos os dias',
-            'Lisboa e área metropolitana: agendamento em 48h',
-            'Aveiro e Coimbra: serviço disponível',
-            'Todo o território continental: por orçamento',
+            'Equipa local em Braga, com disponibilidade confirmada antes da marcação',
+            AVAILABILITY_PROMISE,
+            'Aveiro e Coimbra: disponibilidade sob consulta',
+            COVERAGE_PROMISE,
           ],
         },
       },

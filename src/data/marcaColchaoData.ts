@@ -26,7 +26,7 @@ export const marcasColchao: MarcaColchao[] = [
     slug: "ikea",
     material: "Tecido quilted removível com núcleo em espuma ou molas ensacadas",
     materialDescription: "Os colchões IKEA (como o MORGEDAL ou o HÖVÅG) combinam um tecido quilted na parte visível com um núcleo em espuma viscoelástica ou molas ensacadas. A camada exterior acumula suor, células mortas e ácaros que a aspiração doméstica não consegue remover em profundidade.",
-    cleaningProcess: "Extração a vapor de baixa humidade calibrada para não saturar o núcleo de espuma. Aspiração profunda dos dois lados, seguida de tratamento anti-ácaros e desodorização.",
+    cleaningProcess: "Extração a vapor de baixa humidade calibrada para não saturar o núcleo de espuma. Aspiração profunda dos dois lados, seguida de extração de sujidade e resíduos. Anti-ácaros e desbacterização são extras opcionais.",
     doNots: [
       "Não ensopar o colchão em água: a espuma interior demora dias a secar e pode criar bolor",
       "Não expor o colchão ao sol direto para secar: deforma a espuma viscoelástica",
@@ -41,7 +41,7 @@ export const marcasColchao: MarcaColchao[] = [
     serviceSlug: "limpeza-colchoes",
     faqs: [
       { question: "O colchão IKEA de espuma pode ser lavado a vapor?", answer: "Sim. Usamos vapor de baixa humidade calibrado especificamente para não saturar a espuma viscoelástica. O processo remove sujidade e ácaros sem comprometer a estrutura do núcleo." },
-      { question: "Quanto tempo demora a secar um colchão IKEA depois da limpeza?", answer: "Entre 3 a 5 horas em condições normais, com ventilação adequada. Recomendamos agendar de manhã para o colchão estar pronto ao final do dia." },
+      { question: "Quanto tempo demora a secar um colchão IKEA depois da limpeza?", answer: "Em média, entre 3 a 6 horas, dependendo da ventilação, do tecido e das condições do espaço. Recomendamos agendar de manhã para o colchão estar pronto ao final do dia." },
       { question: "Conseguem remover manchas antigas de um colchão IKEA?", answer: "Na maioria dos casos sim. Manchas de suor, urina ou líquidos derramados respondem bem ao pré-tratamento enzimático aplicado antes da extração a vapor." },
     ],
   },
@@ -51,7 +51,7 @@ export const marcasColchao: MarcaColchao[] = [
     slug: "conforama",
     material: "Tecido acolchoado com núcleo misto de espuma e molas",
     materialDescription: "Os colchões vendidos na Conforama cobrem várias gamas, de espuma económica a modelos com molas ensacadas. O tecido exterior acolchoado é o que mais retém pó, ácaros e odores ao longo do uso diário, independentemente do núcleo interior.",
-    cleaningProcess: "Aspiração profunda inicial em ambos os lados, seguida de extração a vapor com produto anti-ácaros certificado. Tratamento localizado de manchas antes da extração geral.",
+    cleaningProcess: "Aspiração profunda inicial em ambos os lados, seguida de extração a vapor com produto de limpeza adequado ao tecido. Anti-ácaros e desbacterização são extras opcionais. Tratamento localizado de manchas antes da extração geral.",
     doNots: [
       "Não usar detergentes domésticos genéricos: podem deixar resíduo que atrai mais sujidade",
       "Não guardar o colchão de pé enquanto seca: deforma o núcleo interior",
@@ -101,7 +101,7 @@ export const marcasColchao: MarcaColchao[] = [
     slug: "pikolin",
     material: "Tecido respirável com núcleo ortopédico em espuma ou molas",
     materialDescription: "Os colchões Pikolin destacam-se por núcleos ortopédicos em espuma viscoelástica ou molas ensacadas, com tecidos exteriores pensados para respirabilidade. Essa transpiração adicional também significa mais absorção de suor e humidade, que exige limpeza regular para não comprometer o conforto.",
-    cleaningProcess: "Extração a vapor de baixa humidade, ajustada para tecidos respiráveis. Tratamento anti-ácaros e secagem assistida para acelerar a evaporação da humidade absorvida.",
+    cleaningProcess: "Extração a vapor de baixa humidade, ajustada para tecidos respiráveis. Tratamento anti-ácaros opcional e secagem assistida para acelerar a evaporação da humidade absorvida.",
     doNots: [
       "Não ensopar o tecido respirável: a estrutura porosa absorve e retém água mais do que um tecido normal",
       "Não usar amaciador ou perfumes têxteis: podem obstruir os poros do tecido respirável",
@@ -117,7 +117,7 @@ export const marcasColchao: MarcaColchao[] = [
     faqs: [
       { question: "O tecido respirável do Pikolin precisa de cuidados especiais?", answer: "Sim, usamos vapor de baixa humidade e evitamos produtos que obstruam os poros do tecido, para preservar a respirabilidade original." },
       { question: "A limpeza ajuda a manter o suporte ortopédico do colchão?", answer: "Sim. Ao remover sujidade acumulada e humidade retida, a limpeza profissional ajuda a manter a firmeza e o desempenho do núcleo ortopédico ao longo do tempo." },
-      { question: "Quanto tempo até o colchão Pikolin estar pronto a usar?", answer: "Normalmente 3 a 5 horas, com o tecido respirável a acelerar ligeiramente a secagem face a tecidos convencionais." },
+      { question: "Quanto tempo até o colchão Pikolin estar pronto a usar?", answer: "Em média, entre 3 a 6 horas, dependendo da ventilação, do tecido e das condições do espaço." },
     ],
   },
   {
@@ -126,7 +126,7 @@ export const marcasColchao: MarcaColchao[] = [
     slug: "colmol",
     material: "Tecidos naturais e fibras recicladas",
     materialDescription: "Os colchões Colmol apostam em tecidos naturais e fibras recicladas, uma abordagem mais sustentável que exige produtos de limpeza igualmente suaves para não comprometer as propriedades hipoalergénicas do material.",
-    cleaningProcess: "Extração a vapor com produtos biodegradáveis e de pH neutro, adequados a fibras naturais e recicladas. Tratamento anti-ácaros e secagem controlada.",
+    cleaningProcess: "Extração a vapor com produtos biodegradáveis e de pH neutro, adequados a fibras naturais e recicladas. Tratamento anti-ácaros opcional e secagem controlada.",
     doNots: [
       "Não usar produtos químicos agressivos: comprometem a natureza hipoalergénica das fibras naturais",
       "Não usar branqueadores: descolora fibras naturais de forma permanente",
@@ -158,7 +158,7 @@ export const marcasColchao: MarcaColchao[] = [
     ],
     doThis: [
       "Tratamos as fibras naturais com produtos suaves que preservam a qualidade Mindol",
-      "Eliminamos ácaros e suor sem comprometer a composição sustentável do colchão",
+      "Removemos suor e resíduos com um processo adequado ao material do colchão",
     ],
     estimatedPriceRange: "59€ - 79€",
     minPrice: 59,

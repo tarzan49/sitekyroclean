@@ -37,11 +37,11 @@ const SOFA_IMPERM_UPSELL_POOL: TrustPoint[] = [
 ];
 
 const SOFA_ANTIACAROS_UPSELL_POOL: TrustPoint[] = [
-  { titleGold: 'A partir de 20€ Anti Ácaros', titleRest: ' que elimina os ácaros do sofá', desc: 'Um sofá usado há 3 anos pode albergar até 15 milhões de ácaros, mais do que um colchão da mesma idade, porque não tem a proteção da roupa lavada semanalmente. Peça o tratamento Anti Ácaros já nesta visita e previna alergias e problemas respiratórios.' },
-  { titleGold: 'A partir de 20€ Anti Ácaros', titleRest: ' para acabar com os espirros no sofá', desc: 'Pode ser sinal de ácaros acumulados nas fibras. O tratamento Anti Ácaros elimina-os e reduz sintomas de alergia respiratória em quem usa o sofá todos os dias.' },
-  { titleGold: 'A partir de 20€ Anti Ácaros', titleRest: ' para proteger bebés e crianças', desc: 'A pele sensível reage mais facilmente a ácaros e alergénios acumulados no estofo. O Anti Ácaros elimina-os sem químicos agressivos, seguro para toda a família.' },
-  { titleGold: 'A partir de 20€ Anti Ácaros', titleRest: ': o sofá tem o dobro dos ácaros da cama', desc: 'O sofá nunca é lavado como os lençóis e recebe uso diário de várias pessoas. Peça o Anti Ácaros na mesma visita da limpeza e elimine o problema de vez.' },
-  { titleGold: 'A partir de 20€ Anti Ácaros', titleRest: ' que trata a causa, não só o sintoma', desc: 'Ácaros e os seus resíduos ficam presos nas fibras mesmo após a aspiração. O tratamento Anti Ácaros vai à raiz do problema.' },
+  {"titleGold": "A partir de 20€ Anti Ácaros", "titleRest": ", como complemento à limpeza", "desc": "A limpeza remove sujidade e resíduos do sofá. O tratamento anti-ácaros é opcional e é confirmado separadamente no orçamento."},
+  {"titleGold": "A partir de 20€ Anti Ácaros", "titleRest": ", na mesma visita", "desc": "Pode acrescentar este tratamento ao seu sofá sem marcar outra intervenção. Avaliamos o material e as condições de aplicação antes de começar."},
+  {"titleGold": "A partir de 20€ Anti Ácaros", "titleRest": ", com aplicação adequada ao tecido", "desc": "Escolhemos o tratamento conforme o tecido e o uso do sofá. Explicamos os cuidados após a aplicação e confirmamos o preço antes da marcação."},
+  {"titleGold": "A partir de 20€ Anti Ácaros", "titleRest": ", dirigido a ácaros", "desc": "Anti-ácaros e desbacterização têm objetivos distintos. Indique o cuidado pretendido para receber uma proposta adequada."},
+  {"titleGold": "A partir de 20€ Anti Ácaros", "titleRest": ", com orçamento claro", "desc": "O extra não está incluído automaticamente na limpeza. Pode escolhê-lo ao configurar o artigo e confirmar o valor com a equipa."},
 ];
 
 const SOFA_FIXED_CROSSSELL: TrustPoint = { titleGold: 'Uma visita,', titleRest: ' vários estofos limpos', desc: 'Sofá, colchão, tapete ou cadeiras: o mesmo técnico trata tudo no mesmo dia, com desconto de pack.' };
@@ -63,19 +63,19 @@ const COLCHAO_ADVICE_POOL: TrustPoint[] = [
 ];
 
 const COLCHAO_ANTIACAROS_UPSELL_POOL: TrustPoint[] = [
-  { titleGold: 'A partir de 25€ Anti Ácaros', titleRest: ', sem marcar outra visita', desc: 'O tratamento Anti Ácaros elimina os ácaros do colchão e impede que voltem a aparecer, na mesma visita, sem marcar outro dia.' },
-  { titleGold: 'A partir de 25€ Anti Ácaros', titleRest: ' para dormir muito melhor', desc: 'Alta concentração de ácaros pode reduzir a qualidade do sono em até 40%, mesmo sem sintomas visíveis, comprovado em estudos de polissonografia. Peça o Anti Ácaros e durma melhor já esta noite.' },
-  { titleGold: 'A partir de 25€ Anti Ácaros', titleRest: ' que elimina milhões de ácaros do colchão', desc: 'Um colchão de 5 anos pode ter o peso original em matéria orgânica acumulada. Adicione o Anti Ácaros à limpeza e elimine o problema, não só a sujidade à superfície.' },
-  { titleGold: 'A partir de 25€ Anti Ácaros', titleRest: ' para proteger as crianças', desc: 'O sistema imunitário ainda em desenvolvimento reage mais a ácaros e alergénios. O Anti Ácaros trata o colchão sem químicos agressivos.' },
-  { titleGold: 'A partir de 25€ Anti Ácaros', titleRest: ' que elimina e impede que voltem', desc: 'A limpeza normal remove o que já lá está. O Anti Ácaros vai mais longe: cria condições que impedem a repopulação nos meses seguintes.' },
+  {"titleGold": "Tratamento Anti Ácaros", "titleRest": ", como complemento à limpeza", "desc": "A limpeza remove sujidade e resíduos do colchão. O tratamento anti-ácaros é opcional e é confirmado separadamente no orçamento."},
+  {"titleGold": "Tratamento Anti Ácaros", "titleRest": ", na mesma visita", "desc": "Pode acrescentar este tratamento ao seu colchão sem marcar outra intervenção. Avaliamos o material e as condições de aplicação antes de começar."},
+  {"titleGold": "Tratamento Anti Ácaros", "titleRest": ", com aplicação adequada ao tecido", "desc": "Escolhemos o tratamento conforme o tecido e o uso do colchão. Explicamos os cuidados após a aplicação e confirmamos o preço antes da marcação."},
+  {"titleGold": "Tratamento Anti Ácaros", "titleRest": ", dirigido a ácaros", "desc": "Anti-ácaros e desbacterização têm objetivos distintos. Indique o cuidado pretendido para receber uma proposta adequada."},
+  {"titleGold": "Tratamento Anti Ácaros", "titleRest": ", com orçamento claro", "desc": "O extra não está incluído automaticamente na limpeza. Pode escolhê-lo ao configurar o artigo e confirmar o valor com a equipa."},
 ];
 
 // Intercala estudo/facto com o convite ao Pack Família (índices alternados
 // por construção, a seed decide qual dos 4 aparece em cada página).
 const COLCHAO_POINT3_POOL: TrustPoint[] = [
-  { stat: '80%', titleGold: 'Redução de 80%', titleRest: ' dos episódios de rinite', desc: 'Estudo publicado no Journal of Allergy documenta redução de 80% nos sintomas após higienização profissional do colchão.' },
+  { titleGold: 'Cuidado regular', titleRest: ' para o seu colchão', desc: 'A limpeza ajuda a remover suor, pó e resíduos acumulados nas fibras. Anti-ácaros e desbacterização podem ser acrescentados como extras.' },
   { titleGold: 'Sofá ou tapete', titleRest: ' na mesma visita?', desc: 'Peça o colchão e outro estofo no mesmo agendamento: o técnico já está em sua casa e o desconto aplica-se a tudo.' },
-  { stat: '23%', titleGold: 'Colchões causam 23%', titleRest: ' das alergias respiratórias crónicas', desc: 'São causadas ou agravadas por fungos e bactérias em colchões, segundo estudos do European Journal of Allergy.' },
+  { titleGold: 'Tratamentos opcionais', titleRest: ' conforme o seu objetivo', desc: 'Diga-nos o que pretende tratar. Explicamos a diferença entre limpeza, anti-ácaros e desbacterização antes de escolher.' },
   { titleGold: 'Aproveite o técnico', titleRest: ' já em sua casa', desc: 'Junte sofá, tapete ou cadeiras à limpeza do colchão: mesma visita, mesmo dia, com desconto de pack.' },
 ];
 
@@ -100,11 +100,11 @@ const CADEIRAS_IMPERM_UPSELL_POOL: TrustPoint[] = [
 ];
 
 const CADEIRAS_ANTIACAROS_UPSELL_POOL: TrustPoint[] = [
-  { titleGold: 'A partir de 7,5€ Anti Ácaros', titleRest: ' que elimina as bactérias da cadeira', desc: 'As zonas de contacto de cadeiras de jantar podem ter até 400× mais bactérias do que uma sanita, das superfícies mais contaminadas de uma casa. Peça o tratamento Anti Ácaros já nesta visita.' },
-  { titleGold: 'A partir de 7,5€ Anti Ácaros', titleRest: ' para acabar com os espirros à mesa', desc: 'Pode ser sinal de ácaros acumulados no estofo da cadeira. O tratamento Anti Ácaros elimina-os e reduz sintomas de alergia respiratória em quem usa a cadeira todos os dias.' },
-  { titleGold: 'A partir de 7,5€ Anti Ácaros', titleRest: ' para proteger bebés e crianças', desc: 'A pele sensível reage mais facilmente a ácaros e alergénios acumulados no estofo. O Anti Ácaros elimina-os sem químicos agressivos, seguro para toda a família.' },
-  { titleGold: 'A partir de 7,5€ Anti Ácaros', titleRest: ': as costuras têm 6× mais gordura', desc: 'A gordura corporal e restos alimentares acumulam-se nas costuras e dobras, invisíveis, mas presentes em cada refeição. O Anti Ácaros trata a fundo.' },
-  { titleGold: 'A partir de 7,5€ Anti Ácaros', titleRest: ' que trata a causa, não só o sintoma', desc: 'Ácaros e os seus resíduos ficam presos nas fibras mesmo após a aspiração. O tratamento Anti Ácaros vai à raiz do problema.' },
+  {"titleGold": "5€/un. Anti Ácaros", "titleRest": ", como complemento à limpeza", "desc": "A limpeza remove sujidade e resíduos do cadeira. O tratamento anti-ácaros é opcional e é confirmado separadamente no orçamento."},
+  {"titleGold": "5€/un. Anti Ácaros", "titleRest": ", na mesma visita", "desc": "Pode acrescentar este tratamento ao seu cadeira sem marcar outra intervenção. Avaliamos o material e as condições de aplicação antes de começar."},
+  {"titleGold": "5€/un. Anti Ácaros", "titleRest": ", com aplicação adequada ao tecido", "desc": "Escolhemos o tratamento conforme o tecido e o uso do cadeira. Explicamos os cuidados após a aplicação e confirmamos o preço antes da marcação."},
+  {"titleGold": "5€/un. Anti Ácaros", "titleRest": ", dirigido a ácaros", "desc": "Anti-ácaros e desbacterização têm objetivos distintos. Indique o cuidado pretendido para receber uma proposta adequada."},
+  {"titleGold": "5€/un. Anti Ácaros", "titleRest": ", com orçamento claro", "desc": "O extra não está incluído automaticamente na limpeza. Pode escolhê-lo ao configurar o artigo e confirmar o valor com a equipa."},
 ];
 
 const CADEIRAS_FIXED_CROSSSELL: TrustPoint = { titleGold: 'Uma visita,', titleRest: ' vários estofos limpos', desc: 'Cadeiras, sofá, colchão ou tapete: o mesmo técnico trata tudo no mesmo dia, com desconto de pack.' };
@@ -125,11 +125,11 @@ function getCadeirasTrustPoints(seed: string): TrustPoint[] {
 // limpar. 3º fixo (Pack Família) — 2026-08-31, títulos revistos 2026-09-01,
 // preço removido 2026-09-06.
 const TAPETES_PROBLEMA_POOL: TrustPoint[] = [
-  { titleGold: 'Higienização de Tapetes', titleRest: ' que elimina alergénios invisíveis', desc: 'Tapetes retêm e libertam no ar partículas a cada passo: pólenes, ácaros e poluentes invisíveis, até 8× mais que um pavimento liso. A higienização profissional remove o que a aspiração doméstica nunca chega.' },
-  { titleGold: 'Higienização de Tapetes', titleRest: ' que elimina bactérias que a aspiração não apanha', desc: 'Um tapete de uso doméstico pode conter até 4.000 vezes mais bactérias por cm² do que a sanita. Não é visível, mas está lá, a cada passo descalço.' },
+  { titleGold: 'Higienização de Tapetes', titleRest: ' que remove resíduos das fibras', desc: 'Tapetes retêm e libertam no ar partículas a cada passo: pólenes, ácaros e poluentes invisíveis, até 8× mais que um pavimento liso. A higienização profissional remove o que a aspiração doméstica nunca chega.' },
+  { titleGold: 'Higienização de Tapetes', titleRest: ' com extração de sujidade das fibras', desc: 'A sujidade acumula-se entre as fibras. A limpeza é orçamentada mediante medidas; tratamentos adicionais são avaliados e confirmados à parte.' },
   { titleGold: 'Higienização de Tapetes', titleRest: ' que remove o pó acumulado há meses', desc: 'Um tapete médio acumula até 2 kg de matéria orgânica, pó e resíduos por metro quadrado ao longo de 12 meses, mesmo com aspiração regular.' },
   { titleGold: 'Higienização de Tapetes', titleRest: ' que remove odores que a aspiração nunca tira', desc: 'Suor, animais de estimação e humidade ficam retidos nas fibras profundas do tapete. Só a extração profissional a quente remove o odor pela raiz, não só à superfície.' },
-  { titleGold: 'Higienização de Tapetes', titleRest: ' para aliviar alergias em casa', desc: 'Espirros e olhos irritados em casa podem vir do tapete, não do ar exterior. Fibras densas acumulam ácaros e pólen que a ventilação normal não remove.' },
+  { titleGold: 'Higienização de Tapetes', titleRest: ' para cuidar das fibras em casa', desc: 'Espirros e olhos irritados em casa podem vir do tapete, não do ar exterior. Fibras densas acumulam ácaros e pólen que a ventilação normal não remove.' },
 ];
 
 const TAPETES_QUALIDADE_POOL: TrustPoint[] = [

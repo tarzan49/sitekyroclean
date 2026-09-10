@@ -70,7 +70,7 @@ const QuizStepConfigMattress = ({ formData, updateFormData, mattressItems, setMa
                     </div>
                   </button>
                   <p className="text-[10px] text-white/25 leading-snug mt-1.5 px-1">
-                    Elimina os ácaros e impede que voltem, prevenindo alergias e problemas respiratórios.
+                    Tratamento adicional dirigido a ácaros, com aplicação adequada ao tecido. Não está incluído na limpeza normal.
                   </p>
                 </div>
               )}

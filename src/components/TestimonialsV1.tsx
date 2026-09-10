@@ -1,7 +1,7 @@
 import { Star, Quote } from "lucide-react";
 import { useEffect, useRef, useState, useCallback } from "react";
 import useEmblaCarousel from "embla-carousel-react";
-import { ALL_REVIEWS } from "@/data/reviewsPool";
+import { PUBLISHED_REVIEWS } from "@/data/reviewsPool";
 import { GoogleG } from "@/components/icons/GoogleG";
 import { REVIEW_RATING, REVIEW_COUNT } from "@/constants/business";
 
@@ -86,7 +86,7 @@ const Testimonials = () => {
                     ))}
                   </div>
                 </div>
-                <p className="text-[11px] text-white/45 mt-1">+{REVIEW_COUNT} avaliações verificadas</p>
+                <p className="text-[11px] text-white/45 mt-1">+{REVIEW_COUNT} avaliações no Google</p>
               </div>
             </a>
           </div>
@@ -96,7 +96,7 @@ const Testimonials = () => {
         <div className={`transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}>
           <div className="overflow-hidden" ref={emblaRef}>
             <div className="flex gap-5 md:gap-7">
-              {ALL_REVIEWS.map((review, i) => (
+              {PUBLISHED_REVIEWS.map((review, i) => (
                 <div
                   key={i}
                   className="relative flex-none w-[85vw] md:w-[calc((100%-56px)/3)] flex flex-col p-6 md:p-7 rounded-2xl overflow-hidden transition-all duration-300 hover:-translate-y-1"
@@ -144,7 +144,7 @@ const Testimonials = () => {
                     <div className="flex flex-col min-w-0">
                       <span className="text-[13px] font-semibold text-white truncate">{review.name}</span>
                       <span className="text-[9.5px] font-medium tracking-wide text-white/40">
-                        Avaliação Google verificada
+                        Testemunho de cliente
                       </span>
                     </div>
                   </div>
@@ -168,7 +168,7 @@ const Testimonials = () => {
 
             {/* Counter */}
             <span className="text-[10px] text-white/30 font-mono tracking-widest">
-              {selectedIndex + 1}/{ALL_REVIEWS.length}
+              {selectedIndex + 1}/{PUBLISHED_REVIEWS.length}
             </span>
 
             {/* Next */}

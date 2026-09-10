@@ -63,8 +63,8 @@ const expertTips: ExpertTip[] = [
 
 const LimpezaColchoes = () => {
   const faqs = [
-    { question: 'Para que serve a limpeza de colchões se uso sempre lençóis?', answer: 'Mesmo com lençóis, o colchão acumula ácaros, suor, poeiras e micro-resíduos ao longo do tempo. A limpeza profunda ajuda a reduzir alergias, problemas respiratórios e odores, aumentando o conforto e a higiene do sono.' },
-    { question: 'A limpeza elimina totalmente ácaros e bactérias?', answer: 'Reduzimos de forma muito significativa a carga de ácaros, microorganismos e partículas acumuladas, através de extração profunda e produtos específicos. Nenhum processo é capaz de garantir "0 ácaros", mas o impacto na qualidade do ar e na higiene do colchão é muito visível.' },
+    { question: 'Para que serve a limpeza de colchões se uso sempre lençóis?', answer: 'A limpeza remove sujidade e resíduos das fibras. Anti-ácaros e desbacterização são extras opcionais, com objetivos e preços distintos. Não prometemos eliminação total nem melhoria de sintomas.' },
+    { question: 'A limpeza elimina totalmente ácaros e bactérias?', answer: 'A limpeza remove sujidade e resíduos das fibras. Anti-ácaros e desbacterização são extras opcionais, com objetivos e preços distintos. Não prometemos eliminação total nem melhoria de sintomas.' },
     { question: 'Com que frequência devo limpar o colchão?', answer: 'Para uso doméstico, recomendamos uma limpeza profunda a cada 12 a 18 meses. Em casos de alergias, problemas respiratórios, crianças pequenas ou colchões muito utilizados (AL, hotéis), o ideal é encurtar o intervalo para 6 a 12 meses.' },
   ];
 
@@ -103,14 +103,9 @@ const LimpezaColchoes = () => {
         <ServiceCityLinks serviceSlug="limpeza-colchoes" serviceLabel="Limpeza de Colchões" />
         <ServiceSchema
           serviceName="Limpeza de Colchões"
-          description="Higienização profissional de colchões no Porto. Eliminação de ácaros, bactérias e odores."
+          description="Higienização profissional de colchões no Porto. Limpeza de sujidade e resíduos. Anti-ácaros e desbacterização opcionais."
           url="/limpeza-colchoes"
           priceFrom={DEFAULT_PRICE_FROM}
-          reviews={[
-            { author: "Fernando G.", city: "", text: "Excelente trabalho no meu colchão. Tinha alergia constante e depois da limpeza melhorou imenso. Super recomendo!", date: "2025-01-28" },
-            { author: "Sofia P.", city: "", text: "Fantástico! O colchão estava com manchas difíceis e conseguiram remover tudo. Muito satisfeita com o resultado.", date: "2025-03-10" },
-            { author: "Daniela R.", city: "", text: "Contratei para limpar os colchões das crianças. Ficaram super higiénicos e sem aquele cheiro a humidade. Adorei!", date: "2025-04-15" },
-          ]}
         />
       </main>
       <Footer />

@@ -1,3 +1,4 @@
+import { EN_RESPONSE_PROMISE, EN_AVAILABILITY_PROMISE, EN_DRYING_PROMISE } from '@/constants/commercialPolicy';
 import { useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { Star, MessageCircle, Phone, Clock, Languages, Camera, Users, CheckCircle2 } from "lucide-react";
@@ -25,7 +26,7 @@ function buildEnWaMessage(page: EnPageData): string {
 function getGuestStats(page: EnPageData): SnapshotStat[] {
   return [
     { value: `${REVIEW_RATING}★`, label: "Google Rating", icon: Star },
-    { value: "Same-day", label: "Response Time", icon: Clock },
+    { value: "<10 min", label: "Response Time", icon: Clock },
     { value: "English", label: "Speaking Team", icon: Languages },
     { value: CLIENTS_SERVED_LABEL, label: "Clients Served", icon: Users },
   ];
@@ -34,7 +35,7 @@ function getGuestStats(page: EnPageData): SnapshotStat[] {
 function getHostStats(): SnapshotStat[] {
   return [
     { value: `${REVIEW_RATING}★`, label: "Google Rating", icon: Star },
-    { value: "Same-day", label: "Turnover Cleaning", icon: Clock },
+    { value: "<10 min", label: "Response Time", icon: Clock },
     { value: "Photo", label: "Documentation", icon: Camera },
     { value: "English", label: "Speaking Team", icon: Languages },
   ];
@@ -129,7 +130,7 @@ const EnServicePage = () => {
                   <div className="flex flex-col gap-1">
                     <div className="w-7 h-px bg-gradient-to-r from-gold to-transparent" />
                     <span className="text-[10px] font-bold text-gold/90 tracking-[0.30em] uppercase" style={{ textShadow: "0 1px 6px rgba(0,0,0,0.6)" }}>
-                      {page.audience === "host" ? "For Hosts & Property Managers" : "Same-Day Service"}
+                      {page.audience === "host" ? "For Hosts & Property Managers" : "Local cleaning team"}
                     </span>
                   </div>
                 </div>
@@ -180,7 +181,7 @@ const EnServicePage = () => {
                   </a>
                 </div>
 
-                <p className="text-white/40 text-xs mt-4">Free quote · No obligation · Same-day availability</p>
+                <p className="text-white/60 text-sm mt-4">{EN_AVAILABILITY_PROMISE}</p><p className="text-white/60 text-sm mt-2">{EN_DRYING_PROMISE}</p><p className="text-white/40 text-xs mt-4">Free quote · No obligation · {EN_RESPONSE_PROMISE}</p>
               </div>
             </div>
           </section>
@@ -241,7 +242,7 @@ const EnServicePage = () => {
               Need help <span style={{ color: "#D4AF37" }}>right now?</span>
             </h2>
             <p className="text-white/60 text-sm mb-8 max-w-lg mx-auto">
-              Message us on WhatsApp with a photo of the problem, or call us directly. We usually respond within minutes.
+              Message us on WhatsApp with a photo of the problem, or call us directly. {EN_RESPONSE_PROMISE}.
             </p>
             <div className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
               <a

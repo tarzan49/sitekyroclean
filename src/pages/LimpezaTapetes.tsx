@@ -50,7 +50,7 @@ const expertTips: ExpertTip[] = [
   },
   {
     title: "Como eliminar odores de animais de estimação do tapete",
-    summary: "Os produtos de supermercado mascaram o cheiro, mas não eliminam as bactérias na raiz. Descubra o que realmente funciona.",
+    summary: "O cheiro pode estar associado a resíduos acumulados nas fibras. Conheça os cuidados de limpeza adequados ao artigo.",
     url: "/blog/limpeza-sofa-animais-domesticos",
   },
   {
@@ -103,11 +103,6 @@ const LimpezaTapetes = () => {
           description="Lavagem e limpeza profissional de tapetes no Porto. Remoção de manchas e odores."
           url="/limpeza-tapetes"
           priceFrom="Sob orçamento"
-          reviews={[
-            { author: "Sandra V.", city: "", text: "Fiquei impressionada com a diferença. O tapete da sala recuperou cores que já nem me lembrava que tinha.", date: "2025-02-22" },
-            { author: "Miguel S.", city: "", text: "Profissionais de confiança! Limparam os tapetes persas antigos com todo o cuidado. Resultado impecável!", date: "2025-03-25" },
-            { author: "Catarina L.", city: "", text: "A alcatifa da escada estava muito suja e ficou impecável. Equipa super simpática e profissional.", date: "2025-04-08" },
-          ]}
         />
       </main>
       <Footer />

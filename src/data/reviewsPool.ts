@@ -149,6 +149,8 @@ export const ALL_REVIEWS: PoolReview[] = [
 // escritos para preencher serviços nem inferir a cidade a partir da página.
 const SERVICE_REVIEW_NAMES = new Set(["Paulo Henrique Cavalcante Silverio", "Beatriz Lança", "Stephany Rios", "Guillermo Rumbos", "Vitor Lucena", "Luisa Peixoto", "João Abreu", "PIFFEN", "Manuel Reis", "Pedro Novais", "Miriam Salomão", "Lucas Costa", "Sonya Marabyan", "Francisco Peixoto", "Lumiere Restaurante", "Jaime Guimarães", "Clarinda Neves", "Alexandra Magro", "Maria do Carmo Cruz", "Cristina Pereira", "Francisco Silva"]);
 
+export const PUBLISHED_REVIEWS: PoolReview[] = ALL_REVIEWS.filter(review => SERVICE_REVIEW_NAMES.has(review.name) || LISBON_REVIEWS.some(local => local.name === review.name)).map(review => ({ ...review, city: LISBON_REVIEWS.some(local => local.name === review.name) ? 'Lisboa' : undefined }));
+
 export interface ConfirmedReviewLocation {
   city: string;
   region: string;

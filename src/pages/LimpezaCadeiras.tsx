@@ -106,11 +106,6 @@ const LimpezaCadeiras = () => {
           description="Limpeza profissional de cadeiras e estofos no Porto."
           url="/limpeza-cadeiras"
           priceFrom="20€"
-          reviews={[
-            { author: "Teresa F.", city: "", text: "Adorei o serviço de limpeza das cadeiras da sala de jantar. Ficaram como novas e o atendimento foi excelente.", date: "2025-02-14" },
-            { author: "Helena M.", city: "", text: "As cadeiras do escritório ficaram impecáveis. Equipa pontual e muito profissional. Já agendei para o próximo semestre.", date: "2025-03-20" },
-            { author: "Luís L.", city: "", text: "Excelente serviço e profissionais! Deixaram tudo impecável e fizeram o trabalho com cuidado e simpatia.", date: "2025-01-25" },
-          ]}
         />
       </main>
       <Footer />

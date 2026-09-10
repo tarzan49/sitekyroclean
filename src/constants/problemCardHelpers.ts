@@ -32,16 +32,16 @@ export const PROBLEM_IMAGES: Record<string, string[]> = {
 // CTA labels for LocationServicePage problem cards (keyed by locationSeoData problem titles)
 export const PROBLEM_CTA: Record<string, string> = {
   "Manchas difíceis no sofá": "Remover Manchas",
-  "Ácaros e bactérias invisíveis": "Eliminar Ácaros",
+  "Ácaros e bactérias invisíveis": "Conhecer Anti-ácaros",
   "Odores desagradáveis": "Eliminar Odores",
   "Desgaste prematuro do tecido": "Proteger Tecido",
-  "Ácaros no colchão": "Eliminar Ácaros",
+  "Ácaros no colchão": "Conhecer Anti-ácaros",
   "Manchas de suor e líquidos": "Remover Manchas",
   "Odores acumulados": "Eliminar Odores",
   "Alergias noturnas": "Dormir Melhor",
   "Sujidade acumulada nas fibras": "Limpeza Profunda",
   "Manchas resistentes": "Remover Manchas",
-  "Alergénios e ácaros": "Eliminar Ácaros",
+  "Alergénios e ácaros": "Conhecer Anti-ácaros",
   "Cores desbotadas": "Revitalizar Cores",
   "Sujidade do uso diário": "Limpeza Profunda",
   "Manchas visíveis": "Remover Manchas",
@@ -57,7 +57,7 @@ export const PROBLEM_CTA: Record<string, string> = {
 export const PROBLEM_POOL_CTA: Record<string, string> = {
   // limpeza-sofas
   "Manchas de café e vinho no tecido": "Remover Manchas",
-  "Ácaros invisíveis nas fibras do sofá": "Eliminar Ácaros",
+  "Ácaros invisíveis nas fibras do sofá": "Conhecer Anti-ácaros",
   "Odores de animais domésticos no sofá": "Eliminar Odores",
   "Sujidade profunda acumulada ao longo dos anos": "Limpeza Profunda",
   "Pêlos de animais entranhados no estofo": "Eliminar Pêlos",
@@ -65,7 +65,7 @@ export const PROBLEM_POOL_CTA: Record<string, string> = {
   "Marcas de crianças e derrames no estofo": "Remover Manchas",
   "Tecido envelhecido e cores desbotadas": "Renovar Sofá",
   // limpeza-colchoes
-  "Ácaros que causam alergias ao dormir": "Eliminar Ácaros",
+  "Ácaros que causam alergias ao dormir": "Conhecer Anti-ácaros",
   "Manchas de suor e líquidos no colchão": "Remover Manchas",
   "Odores acumulados ao longo dos anos": "Eliminar Odores",
   "Fungos e humidade em quartos pouco ventilados": "Tratar Humidade",
@@ -76,7 +76,7 @@ export const PROBLEM_POOL_CTA: Record<string, string> = {
   // limpeza-tapetes
   "Sujidade profunda acumulada nas fibras": "Limpeza Profunda",
   "Manchas resistentes de bebidas e alimentos": "Remover Manchas",
-  "Ácaros e alergénios escondidos nas fibras": "Eliminar Ácaros",
+  "Ácaros e alergénios escondidos nas fibras": "Conhecer Anti-ácaros",
   "Pêlos de animais encrustados nas fibras": "Eliminar Pêlos",
   "Cores desbotadas e aspeto envelhecido": "Revitalizar Cores",
   "Odores de animais e humidade no tapete": "Eliminar Odores",
@@ -94,7 +94,7 @@ export const PROBLEM_POOL_CTA: Record<string, string> = {
   // limpeza-alcatifas
   "Sujidade profunda em toda a extensão da alcatifa": "Limpeza Profunda",
   "Manchas difíceis nas zonas de maior passagem": "Remover Manchas",
-  "Ácaros e alergénios em alcatifas de uso intenso": "Eliminar Ácaros",
+  "Ácaros e alergénios em alcatifas de uso intenso": "Conhecer Anti-ácaros",
   "Odores persistentes difíceis de eliminar em casa": "Eliminar Odores",
   "Humidade e risco de mofo em zonas expostas": "Tratar Humidade",
   "Pêlos de animais entranhados nas fibras densas": "Eliminar Pêlos",

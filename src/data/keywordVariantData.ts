@@ -126,12 +126,12 @@ function content_higienizacao_colchao(loc: string, ctx: string): ContentBlock {
   const seedT = getSeed(loc + '|higienizacao-colchao_t');
   return {
     intro: pick([
-      `Passamos um terço da vida no colchão, por isso a higienização profissional do colchão em ${loc} é essencial para a saúde do sono. A Kyro Clean Solutions elimina ácaros, bactérias e fungos com protocolos de sanitização certificados, garantindo noites mais saudáveis em ${loc}, ${ctx}.`,
+      `Passamos um terço da vida no colchão, por isso a higienização profissional do colchão em ${loc} é essencial para a saúde do sono. A Kyro Clean Solutions remove sujidade e resíduos das fibras e disponibiliza anti-ácaros e desbacterização como extras opcionais em ${loc}, ${ctx}.`,
       `Quer dormir melhor em ${loc}? O colchão acumula ácaros, bactérias e fungos ao longo dos anos, mesmo com lençóis lavados regularmente. A Kyro Clean Solutions elimina-os com protocolos de sanitização certificados em ${loc}, ${ctx}.`,
       `Um colchão nunca lavado profissionalmente pode ter milhões de ácaros nas suas camadas internas, mesmo parecendo limpo por fora. A higienização profissional em ${loc} elimina esses agentes com sanitização certificada, garantindo noites mais saudáveis em ${loc}, ${ctx}.`,
     ] as const, seed),
     whatIs: pick([
-      `Passamos um terço da vida no colchão, por isso a higiene interna importa tanto como a externa. Este tratamento elimina os ácaros e bactérias das camadas profundas que causam alergias nocturnas, espirros de manhã e má qualidade de sono, sem produtos tóxicos, seguro para toda a família.`,
+      `Passamos um terço da vida no colchão, por isso a higiene interna importa tanto como a externa. A limpeza remove sujidade e resíduos acumulados nas fibras. Anti-ácaros e desbacterização são tratamentos adicionais, escolhidos e orçamentados separadamente.`,
       `A parte de fora do colchão pode estar impecável enquanto as camadas internas acumulam ácaros e bactérias responsáveis por alergias nocturnas e espirros de manhã. O tratamento chega a essas camadas profundas sem produtos tóxicos, seguro para toda a família.`,
       `Lençóis limpos não significam colchão limpo: os ácaros e bactérias que causam alergias nocturnas e má qualidade de sono vivem nas camadas internas, fora do alcance da lavagem normal. Este tratamento remove-os sem produtos tóxicos, seguro para toda a família.`,
     ] as const, seed2),
@@ -161,16 +161,16 @@ function content_higienizacao_colchao(loc: string, ctx: string): ContentBlock {
     ],
     faqs: pick([
       [
-        { question: `A higienização do colchão melhora mesmo as alergias nocturnas?`, answer: `Sim. Os ácaros do colchão são a principal causa de rinite e asma noturna. Higienizar elimina esses alergénios das camadas profundas onde nenhum aspirador chega, muitos clientes notam diferença na primeira semana.` },
+        { question: `A higienização do colchão melhora mesmo as alergias nocturnas?`, answer: `A limpeza remove sujidade e resíduos das fibras. Anti-ácaros e desbacterização são extras opcionais, com objetivos e preços distintos. Não prometemos eliminação total nem melhoria de sintomas.` },
         { question: `Com que frequência devo higienizar o colchão de um bebé?`, answer: `Para bebés recomendamos a cada 6 meses. A pele do bebé é mais sensível e passa mais tempo em contacto direto com as fibras do que um adulto.` },
-        { question: `O colchão fica húmido depois da higienização? Quando posso dormir nele?`, answer: `A higienização não usa grandes quantidades de líquido. Com ventilação normal o colchão fica pronto para dormir no mesmo dia, tipicamente em 3 a 5 horas.` },
-        { question: `A higienização funciona em colchões de memory foam e látex?`, answer: `Sim. Adaptamos os produtos e técnicas ao tipo de espuma para não danificar a estrutura interna. O resultado é o mesmo: eliminação de ácaros, patogénicos e odores.` },
+        { question: `O colchão fica húmido depois da higienização? Quando posso dormir nele?`, answer: `A higienização não usa grandes quantidades de líquido. Com ventilação normal o colchão fica pronto para dormir no mesmo dia, tipicamente em 3 a 6 horas.` },
+        { question: `A higienização funciona em colchões de memory foam e látex?`, answer: `A limpeza remove sujidade e resíduos das fibras. Anti-ácaros e desbacterização são extras opcionais, com objetivos e preços distintos. Não prometemos eliminação total nem melhoria de sintomas.` },
         { question: `Qual o preço de higienização de colchão de casal em ${loc}?`, answer: `A partir de 69€ para casal e 79€ para king size. Deslocação a partir de 10€ a ${loc}, consoante a distância. Orçamento gratuito e sem compromisso.` },
       ],
       [
-        { question: `A higienização do colchão melhora mesmo as alergias nocturnas?`, answer: `Sim. A maior parte da rinite e asma noturna tem origem nos ácaros do colchão. O tratamento chega às camadas profundas que nenhum aspirador alcança, e muitos clientes já notam diferença logo na primeira semana.` },
+        { question: `A higienização do colchão melhora mesmo as alergias nocturnas?`, answer: `A limpeza remove sujidade e resíduos das fibras. Anti-ácaros e desbacterização são extras opcionais, com objetivos e preços distintos. Não prometemos eliminação total nem melhoria de sintomas.` },
         { question: `Com que frequência devo higienizar o colchão de um bebé?`, answer: `A cada 6 meses é o recomendado para bebés, cuja pele é mais sensível e passa muito mais tempo em contacto direto com as fibras do que a de um adulto.` },
-        { question: `O colchão fica húmido depois da higienização? Quando posso dormir nele?`, answer: `Não são usadas grandes quantidades de líquido no processo. Com ventilação normal, o colchão está pronto para dormir no mesmo dia, entre 3 a 5 horas depois.` },
+        { question: `O colchão fica húmido depois da higienização? Quando posso dormir nele?`, answer: `Não são usadas grandes quantidades de líquido no processo. Com ventilação normal, o colchão está pronto para dormir no mesmo dia, entre 3 a 6 horas depois.` },
         { question: `A higienização funciona em colchões de memory foam e látex?`, answer: `Sim, os produtos e técnicas são adaptados ao tipo de espuma para não comprometer a estrutura interna, com o mesmo resultado: ácaros, patogénicos e odores eliminados.` },
         { question: `Qual o preço de higienização de colchão de casal em ${loc}?`, answer: `Casal a partir de 69€, king size a partir de 79€. A deslocação a ${loc} soma a partir de 10€ consoante a distância. Orçamento sempre gratuito, sem compromisso.` },
       ],
@@ -241,7 +241,7 @@ function content_higienizacao_tapetes(loc: string, ctx: string): ContentBlock {
         { question: `A higienização danifica as cores de tapetes persas ou de lã?`, answer: `Não. Avaliamos sempre o tipo de fibra antes de iniciar e usamos produtos adaptados a cada material. Tapetes persas e orientais recebem tratamento específico que preserva as cores originais.` },
         { question: `A higienização remove os alergénios de cão e gato do tapete?`, answer: `Sim. O processo remove pelos, caspa e todos os alergénios de animais das fibras em profundidade. O aspirador doméstico remove os pelos visíveis mas não atinge estes alergénios microscópicos.` },
         { question: `Fazem higienização de tapetes ao domicílio em ${loc} ou tenho de os entregar?`, answer: `Fazemos ao domicílio, sem necessidade de transporte. Deslocamo-nos a ${loc} com todo o equipamento. Para tapetes muito delicados podemos fazer recolha e tratamento nas nossas instalações.` },
-        { question: `Posso tentar higienizar o tapete em casa com um aspirador potente?`, answer: `O aspirador doméstico remove sujidade solta da superfície. Para eliminar os ácaros e patogénicos das camadas profundas das fibras é necessário equipamento profissional e produtos certificados.` },
+        { question: `Posso tentar higienizar o tapete em casa com um aspirador potente?`, answer: `A limpeza remove sujidade e resíduos das fibras. Anti-ácaros e desbacterização são extras opcionais, com objetivos e preços distintos. Não prometemos eliminação total nem melhoria de sintomas.` },
         { question: `Qual o preço da higienização de tapete em ${loc}?`, answer: `Cada tapete é medido (largura x comprimento) e orçamentado individualmente, sem preço fixo por m². O valor final depende do tipo de fibra e estado do tapete. Orçamento gratuito ao domicílio em ${loc}.` },
       ],
       [
@@ -273,78 +273,33 @@ function content_higienizacao_tapetes(loc: string, ctx: string): ContentBlock {
 
 function content_higienizacao_cadeiras(loc: string, ctx: string): ContentBlock {
   const seed = getSeed(loc + '|higienizacao-cadeiras');
-  const seed2 = getSeed(loc + '|higienizacao-cadeiras_w');
-  const seedB = getSeed(loc + '|higienizacao-cadeiras_b');
-  const seedP = getSeed(loc + '|higienizacao-cadeiras_p');
-  const seedF = getSeed(loc + '|higienizacao-cadeiras_f');
-  const seedT = getSeed(loc + '|higienizacao-cadeiras_t');
   return {
     intro: pick([
-      `A higienização de cadeiras estofadas em ${loc} é essencial para restaurantes, escritórios e clínicas que partilham superfícies entre múltiplos utilizadores. A Kyro Clean Solutions faz limpeza profunda e pode acrescentar desbacterização sob orçamento em cadeiras de uso partilhado em ${loc}, ${ctx}.`,
-      `Precisa de higienizar cadeiras estofadas em ${loc}? Restaurantes, escritórios e clínicas partilham essas superfícies entre múltiplos utilizadores todos os dias. A Kyro Clean Solutions faz limpeza profunda e pode acrescentar desbacterização sob orçamento em ${loc}, ${ctx}.`,
-      `Cadeiras de uso partilhado em ${loc} — restaurantes, escritórios, clínicas — acumulam microrganismos entre um utilizador e o seguinte, sem que a limpeza habitual os remova. A Kyro Clean Solutions disponibiliza desbacterização como tratamento complementar sob orçamento em ${loc}, ${ctx}.`,
+      `Cadeiras de jantar, escritório ou restaurante acumulam manchas e resíduos com o uso diário. Fazemos higienização de cadeiras em ${loc}, ${ctx}, com avaliação do tecido antes de começar.`,
+      `Precisa de renovar o aspeto das cadeiras em ${loc}? A limpeza profunda trata gordura e sujidade das zonas de contacto, com um processo adaptado ao material de cada cadeira.`,
+      `Para casas e espaços de uso partilhado em ${loc}, a Kyro Clean Solutions limpa cadeiras estofadas ao domicílio. Pode acrescentar anti-ácaros ou desbacterização, como tratamentos opcionais com orçamento separado.`,
     ] as const, seed),
-    whatIs: pick([
-      `As cadeiras que partilhamos acumulam bactérias e vírus em silêncio, a limpeza habitual com pano não chega para os remover. Este tratamento elimina os germes das fibras com produtos certificados, essencial para restaurantes, escritórios e qualquer espaço onde várias pessoas se sentam na mesma cadeira em ${loc}.`,
-      `Uma cadeira usada por dezenas de pessoas diferentes por dia acumula bactérias e vírus que um pano nunca remove. Este tratamento elimina os germes das fibras com produtos certificados, essencial em restaurantes, escritórios e qualquer espaço de uso partilhado em ${loc}.`,
-      `Entre um cliente e o seguinte, a cadeira raramente é higienizada a sério — só limpa à superfície. Este tratamento elimina bactérias e vírus das fibras com produtos certificados, essencial para restaurantes, escritórios e espaços de uso partilhado em ${loc}.`,
-    ] as const, seed2),
-    benefits: pick([
-      [
-        'Bactericida certificado compatível com normas HACCP',
-        `Ideal para restaurantes, escritórios e clínicas em ${loc}`,
-        'Imagem profissional: cadeiras com aspeto cuidado',
-        'Descontos progressivos para lotes a partir de 10 cadeiras',
-        `Serviço ao domicílio em ${loc}`,
-        'Cadeiras prontas a usar em poucas horas',
-      ],
-      [
-        'Bactericida certificado, compatível com auditorias HACCP',
-        `Indicado para restaurantes, escritórios e clínicas em ${loc}`,
-        'Cadeiras com aspeto cuidado, imagem mais profissional',
-        'Desconto progressivo a partir de 10 cadeiras no mesmo lote',
-        `Deslocação a partir de 10€ em ${loc}`,
-        'De volta ao uso em poucas horas',
-      ],
-    ] as const, seedB),
+    whatIs: `A higienização de cadeiras em ${loc} remove sujidade e resíduos das fibras. A desbacterização é um tratamento adicional dirigido a bactérias; o anti-ácaros tem outro objetivo e é também opcional. Confirmamos o produto, a compatibilidade com o tecido e o preço de cada extra antes da marcação.`,
+    benefits: ['Tratamento localizado de manchas e gordura', 'Processo adaptado ao tecido de cada cadeira', 'Anti-ácaros opcional, a 5€ por cadeira', 'Desbacterização opcional sob orçamento', 'Lotes de dez ou mais cadeiras sob orçamento', 'Secagem média de 3 a 6 horas, conforme ventilação'],
     processSteps: [
-      { step: 1, title: 'Inspeção por cadeira', description: `Avaliação do estado de cada cadeira e tipo de tecido em ${loc}.` },
-      { step: 2, title: 'Desengordurante profissional', description: 'Remoção de gordura, sujidade e resíduos orgânicos.' },
-      { step: 3, title: 'Bactericida certificado', description: 'Aplicação de produto HACCP-compatível em todas as superfícies.' },
-      { step: 4, title: 'Secagem rápida', description: 'Cadeiras prontas a usar em poucas horas, sem interrupção do negócio.' },
+      { step: 1, title: 'Avaliação do material', description: `Inspeção do tecido, das manchas e das costuras em ${loc}.` },
+      { step: 2, title: 'Pré-tratamento', description: 'Aplicação de solução de limpeza adequada à sujidade e ao tecido.' },
+      { step: 3, title: 'Extração da sujidade', description: 'Extração dos resíduos e da humidade. Tratamentos adicionais só quando escolhidos no orçamento.' },
+      { step: 4, title: 'Secagem e cuidados', description: 'Secagem média de 3 a 6 horas, dependendo da ventilação, tecido e condições do espaço.' },
     ],
-    faqs: pick([
-      [
-        { question: `Emitem certificado de higienização para inspeções sanitárias em ${loc}?`, answer: `Sim. Após cada serviço emitimos certificado com identificação dos produtos usados, aceite em inspeções HACCP e auditorias sanitárias. Essencial para restaurantes, clínicas e espaços de saúde em ${loc}.` },
-        { question: `Conseguem higienizar cadeiras de veludo sem danificar a textura?`, answer: `Sim. O veludo é um dos tecidos mais comuns em cadeiras de restaurante e escritório. Usamos produtos e técnicas específicas para veludo que eliminam os patogénicos sem alterar a textura ou brilho do tecido.` },
-        { question: `Podem trabalhar fora do horário de funcionamento do restaurante?`, answer: `Sim. Trabalhamos regularmente ao fim de semana, à noite e de madrugada para não perturbar o funcionamento do negócio. As cadeiras ficam prontas a usar em 3 a 6 horas.` },
-        { question: `Qual o desconto para higienizar um lote grande de cadeiras em ${loc}?`, answer: `Até 4 cadeiras: 20€/cad. · 5 a 6 cadeiras: 15€/cad. · 7 a 9 cadeiras: 12,50€/cad. Para 10 ou mais cadeiras, orçamento personalizado. Orçamento gratuito em ${loc}.` },
-        { question: `A higienização funciona em cadeiras de mesh (escritório) além de estofo?`, answer: `Sim. O mesh é tratado com bactericida compatível que elimina as bactérias sem danificar as fibras plásticas da rede. Muito comum em cadeiras ergonómicas de escritório partilhadas.` },
-      ],
-      [
-        { question: `Emitem certificado de higienização para inspeções sanitárias em ${loc}?`, answer: `Sim, com identificação dos produtos usados em cada serviço. É aceite em inspeções HACCP e auditorias sanitárias, essencial para restaurantes, clínicas e espaços de saúde em ${loc}.` },
-        { question: `Conseguem higienizar cadeiras de veludo sem danificar a textura?`, answer: `Sim, com produtos e técnicas específicas para veludo, o tecido mais comum em cadeiras de restaurante e escritório. Os patogénicos são eliminados sem alterar a textura nem o brilho.` },
-        { question: `Podem trabalhar fora do horário de funcionamento do restaurante?`, answer: `Sim, é o mais frequente: fim de semana, à noite ou de madrugada, para não perturbar o negócio. As cadeiras ficam prontas a usar em 3 a 6 horas.` },
-        { question: `Qual o desconto para higienizar um lote grande de cadeiras em ${loc}?`, answer: `20€/cad. até 4 cadeiras, 15€/cad. de 5 a 6, 12,50€/cad. de 7 a 9. A partir de 10 cadeiras fazemos orçamento personalizado, sempre gratuito, em ${loc}.` },
-        { question: `A higienização funciona em cadeiras de mesh (escritório) além de estofo?`, answer: `Sim. Usamos bactericida compatível com as fibras plásticas da rede, que elimina as bactérias sem as danificar, muito comum em cadeiras ergonómicas de escritório partilhadas.` },
-      ],
-    ] as const, seedF),
-    problems: pick([
-      [
-        { title: "Cadeiras de uso partilhado (restaurante, escritório)", description: `Cadeiras partilhadas por múltiplos utilizadores são superfícies de alto risco de transmissão de vírus e bactérias que a limpeza convencional não elimina em ${loc}.` },
-        { title: "Inspeção sanitária ou auditoria HACCP pendente", description: "A higienização com certificado é exigida em muitas inspeções para espaços alimentares e de saúde. Emitimos comprovativo após cada serviço para conformidade regulatória." },
-        { title: "Imagem profissional comprometida por cadeiras sujas", description: "Cadeiras com aspeto gorduroso ou manchado transmitem desleixo aos clientes. A higienização profissional devolve o aspeto cuidado e prolonga a vida do estofamento." },
-      ],
-      [
-        { title: "Cadeiras partilhadas por dezenas de clientes por dia", description: `Sempre que várias pessoas usam a mesma cadeira ao longo do dia, o risco de transmissão de vírus e bactérias sobe, e a limpeza convencional não o resolve em ${loc}.` },
-        { title: "Auditoria HACCP ou inspeção sanitária a chegar", description: "Muitas inspeções em espaços alimentares e de saúde exigem certificado de higienização. Emitimos comprovativo após cada serviço para essa conformidade." },
-        { title: "Cadeiras gordurosas ou manchadas à vista dos clientes", description: "O aspeto desleixado das cadeiras reflete-se na perceção do espaço. A higienização profissional devolve o aspeto cuidado e prolonga a vida do estofamento." },
-      ],
-    ] as const, seedP),
-    testimonials: [pick([
-      { name: "Ana Beatriz C.", location: "Porto", text: "Restaurante com quarenta e duas cadeiras. Depois da higienização os clientes começaram a comentar o aspeto do espaço. Isso não acontecia há anos. Valeu completamente o investimento." },
-      { name: "Miguel F.", location: "Aveiro", text: "Escritório com doze cadeiras partilhadas. Era algo que adiava há tempo. Em meia manhã estava feito e as cadeiras ficaram como quando as comprei. Rápido e sem complicações." },
-    ] as const, seedT)],
+    faqs: [
+      { question: 'A desbacterização está incluída na limpeza?', answer: 'Não. É um extra opcional sob orçamento. O tratamento anti-ácaros é outro extra, dirigido a ácaros, e não deve ser confundido com desbacterização.' },
+      { question: 'Podem limpar cadeiras de veludo ou de escritório?', answer: 'Avaliamos o material e escolhemos o método adequado. Nas cadeiras de rede e nos tecidos delicados confirmamos previamente o processo e as limitações.' },
+      { question: `Como peço orçamento para um lote em ${loc}?`, answer: 'Envie o número de cadeiras, fotografias e a morada. Lotes de dez ou mais cadeiras são orçamentados à medida. Respondemos em menos de 10 minutos.' },
+      { question: 'Podem trabalhar fora do horário do estabelecimento?', answer: 'Indique o horário pretendido. Procuramos realizar o serviço no próprio dia ou no dia seguinte, mediante disponibilidade confirmada pela equipa.' },
+      { question: 'Quando posso voltar a usar as cadeiras?', answer: 'A secagem demora em média 3 a 6 horas, dependendo da ventilação, tecido e condições do espaço. Utilize apenas quando estiverem secas.' },
+    ],
+    problems: [
+      { title: 'Manchas e gordura nos assentos', description: 'Comida, bebidas e contacto diário deixam resíduos que podem exigir um tratamento localizado.' },
+      { title: 'Cadeiras de uso partilhado', description: 'Peça limpeza e, se pretender um cuidado adicional, indique desbacterização ou anti-ácaros no orçamento.' },
+      { title: 'Renovar o aspeto do espaço', description: 'Cadeiras com tecido cuidado ajudam a manter uma apresentação uniforme na sala, escritório ou restaurante.' },
+    ],
+    testimonials: [],
   };
 }
 
@@ -387,7 +342,7 @@ function content_higienizacao_alcatifas(loc: string, ctx: string): ContentBlock 
     processSteps: [
       { step: 1, title: 'Aspiração industrial HEPA', description: `Remoção profunda de ácaros e alergénios em toda a superfície em ${loc}.` },
       { step: 2, title: 'Pré-tratamento de limpeza', description: 'Aplicação de agente de largo espectro aprovado para espaços públicos.' },
-      { step: 3, title: 'Extração profunda', description: 'Eliminação dos agentes patogénicos até às camadas mais profundas.' },
+      { step: 3, title: 'Extração profunda', description: 'Extração da sujidade e dos resíduos acumulados nas fibras.' },
       { step: 4, title: 'Secagem acelerada', description: 'Espaço apto para uso em 3 a 6 horas com ventilação adequada.' },
     ],
     faqs: pick([
@@ -549,14 +504,14 @@ function content_lavagem_colchao(loc: string, ctx: string): ContentBlock {
         { question: `A lavagem remove manchas de urina antigas de criança do colchão?`, answer: `Sim. O pré-tratamento enzimático específico para urina quebra os compostos orgânicos e remove tanto a mancha como o odor, mesmo em manchas com meses ou anos de antiguidade.` },
         { question: `As manchas amareladas de suor saem com a lavagem do colchão?`, answer: `Sim, na grande maioria dos casos. A extração a quente com pré-tratamento enzimático remove manchas amareladas de suor que resistiram a todas as tentativas domésticas.` },
         { question: `A lavagem é segura em colchões de molas e híbridos?`, answer: `Sim. A extração é feita apenas nas camadas de estofamento superior, sem atingir as molas ou a estrutura interna. É segura em qualquer tipo de colchão.` },
-        { question: `A lavagem funciona em colchões antigos ou muito usados?`, answer: `Sim. Mesmo colchões com vários anos de uso reagem bem à extração profissional, recuperando frescura e reduzindo alergénios acumulados. Se houver dano estrutural (molas partidas, buracos), a lavagem não resolve esse desgaste, apenas a limpeza e o odor.` },
+        { question: `A lavagem funciona em colchões antigos ou muito usados?`, answer: `A limpeza remove sujidade e resíduos das fibras. Anti-ácaros e desbacterização são extras opcionais, com objetivos e preços distintos. Não prometemos eliminação total nem melhoria de sintomas.` },
         { question: `Quanto custa lavar um colchão king size em ${loc}?`, answer: `A partir de 79€ para king e queen size. Para colchão de solteiro a partir de 59€ e casal a partir de 69€. Deslocação a partir de 10€ a ${loc}, consoante a distância.` },
       ],
       [
         { question: `A lavagem remove manchas de urina antigas de criança do colchão?`, answer: `Sim, mesmo com meses ou anos de antiguidade. O pré-tratamento enzimático específico para urina quebra os compostos orgânicos e remove a mancha e o odor juntos.` },
         { question: `As manchas amareladas de suor saem com a lavagem do colchão?`, answer: `Na grande maioria dos casos, sim. A combinação de extração a quente com pré-tratamento enzimático remove manchas amareladas que já resistiram a tudo em casa.` },
         { question: `A lavagem é segura em colchões de molas e híbridos?`, answer: `Sim, é segura em qualquer tipo de colchão: a extração atua apenas nas camadas de estofamento superior, sem tocar nas molas ou na estrutura interna.` },
-        { question: `A lavagem funciona em colchões antigos ou muito usados?`, answer: `Sim, mesmo com muitos anos de uso o colchão reage bem à extração profissional, recuperando frescura e reduzindo alergénios. Dano estrutural, molas partidas ou buracos não são resolvidos pela lavagem, só a limpeza e o odor.` },
+        { question: `A lavagem funciona em colchões antigos ou muito usados?`, answer: `A limpeza remove sujidade e resíduos das fibras. Anti-ácaros e desbacterização são extras opcionais, com objetivos e preços distintos. Não prometemos eliminação total nem melhoria de sintomas.` },
         { question: `Quanto custa lavar um colchão king size em ${loc}?`, answer: `King e queen size a partir de 79€, solteiro a partir de 59€, casal a partir de 69€. A deslocação a ${loc} soma a partir de 10€, consoante a distância.` },
       ],
     ] as const, seedF),

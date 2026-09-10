@@ -49,7 +49,7 @@ const ServiceTypeSelector = ({
       title: 'Higienização Profunda',
       badge: 'MAIS PEDIDO',
       badgeStyle: 'gold' as const,
-      desc: 'Remoção de manchas, odores e ácaros.',
+      desc: 'Limpeza de manchas e resíduos. Anti-ácaros opcional.',
       price: cleaningPrice,
       recommended: false,
     },

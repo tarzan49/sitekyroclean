@@ -769,7 +769,7 @@ ${formData.description || 'Sem observações adicionais'}
               // No Pack card on step 2, upsell is inline per-item in step 3
               const packPrice = undefined;
               const waterDesc = formData.service === 'mattress'
-                ? 'Elimina ácaros e alergénios em profundidade.'
+                ? 'Tratamento anti-ácaros opcional, distinto da limpeza normal.'
                 : undefined;
               const waterTitle = formData.service === 'mattress' ? 'Anti Ácaros' : undefined;
               const waterSubtitle = formData.service === 'mattress' ? 'Tratamento Anti-Ácaros' : undefined;

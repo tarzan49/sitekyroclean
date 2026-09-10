@@ -33,21 +33,21 @@ const routeMeta: Record<string, { pt: PageMeta; en: PageMeta; es: PageMeta }> = 
     },
     es: {
       title: "Limpieza y Lavado de Sofás a Domicilio | Desde 49€ | Kyro Clean Solutions",
-      description: "Limpieza y lavado profesional de sofás a domicilio. Eliminación de manchas, ácaros y olores con extracción profesional.",
+      description: "Limpieza y lavado profesional de sofás a domicilio. Limpieza de manchas y residuos con extracción profesional. Tratamientos antiácaros y antibacterianos opcionales.",
     },
   },
   "/limpeza-colchoes": {
     pt: {
       title: "Limpeza e Higienização de Colchões | Desde 59€ | Kyro Clean Solutions",
-      description: "Higienização e lavagem profunda de colchões ao domicílio. Eliminamos ácaros, bactérias e odores para noites mais saudáveis. Porto, Lisboa e todo o país.",
+      description: "Higienização e lavagem profunda de colchões ao domicílio. Removemos sujidade e resíduos das fibras. Anti-ácaros e desbacterização opcionais. Equipas em Braga, Porto, Lisboa e Algarve.",
     },
     en: {
       title: "Mattress Cleaning & Sanitization | From €59 | Kyro Clean Solutions",
-      description: "Deep mattress cleaning and sanitization at your home. We eliminate mites, bacteria and odours for healthier nights.",
+      description: "Deep mattress cleaning at your home. Anti-mite and antibacterial treatments are optional extras, quoted separately.",
     },
     es: {
       title: "Limpieza e Higienización de Colchones | Desde 59€ | Kyro Clean Solutions",
-      description: "Higienización y lavado profundo de colchones a domicilio. Eliminamos ácaros, bacterias y olores.",
+      description: "Higienización y lavado profundo de colchones a domicilio. Limpieza de suciedad y residuos. Tratamientos antiácaros y antibacterianos opcionales.",
     },
   },
   "/limpeza-tapetes": {

@@ -32,7 +32,7 @@ const QuizMattressAddonUpsell = ({ mattressItems, setMattressItems, onContinue, 
       <p className="text-gold text-[10px] font-bold tracking-[0.28em] uppercase mb-0.5 text-center w-full">ANTES DE SEGUIR</p>
       <h2 className="font-playfair text-2xl sm:text-3xl font-bold text-white text-center w-full">Proteja {plural ? 'os seus colchões' : 'o seu colchão'}</h2>
       <p className="text-xs text-white/40 text-center max-w-xs leading-relaxed">
-        O colchão acumula suor, bactérias e milhões de ácaros a cada noite, invisíveis mas presentes na sua respiração enquanto dorme.
+        Pode acrescentar o tratamento anti-ácaros à limpeza do colchão. A aplicação e os cuidados são definidos conforme o tecido.
       </p>
 
       <button
@@ -49,7 +49,7 @@ const QuizMattressAddonUpsell = ({ mattressItems, setMattressItems, onContinue, 
         <Bug className={cn('w-5 h-5 flex-shrink-0', anyOn ? 'text-gold' : 'text-gold/70')} />
         <div className="flex-1 min-w-0">
           <p className={cn('text-sm font-bold', anyOn ? 'text-white' : 'text-white/90')}>Desbacterização e Anti Ácaros</p>
-          <p className="text-[10px] text-white/35 leading-snug mt-0.5">Elimina bactérias, ácaros e alergénios em profundidade, para dormir tranquilo.</p>
+          <p className="text-[10px] text-white/35 leading-snug mt-0.5">Tratamento anti-ácaros opcional, confirmado separadamente da limpeza.</p>
         </div>
         <span className={cn(
           'flex-shrink-0 w-7 h-7 rounded-full border-2 flex items-center justify-center transition-all',
