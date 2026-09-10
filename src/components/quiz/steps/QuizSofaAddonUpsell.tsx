@@ -46,7 +46,9 @@ const QuizSofaAddonUpsell = ({ formData, updateFormData, sofaItems, setSofaItems
   const anyPackOn = activeItems.some(i => treatmentQty(i) > 0);
   const selectTier = (t: 'premium' | 'essencial') => {
     const turningOff = anyPackOn && tier === t;
-    if (!turningOff) setSelectionScroll(value => value + 1);
+    if (!turningOff && activeItems.reduce((sum, item) => sum + item.qty, 0) > 1) {
+      setSelectionScroll(value => value + 1);
+    }
     setSofaItems(prev => prev.map(i => i.qty > 0 ? { ...i, packEnabled: !turningOff && (!anyPackOn || treatmentQty(i) > 0), packQty: turningOff ? 0 : (anyPackOn ? treatmentQty(i) : i.qty) } : i));
   };
   // Higienização (impermeabilização → adicionar limpeza): sem tiers, por
