@@ -1070,3 +1070,5 @@ CustomerReviews e CustomerReviewCard uniformizam homepage, páginas de serviços
 Nesta branch de pré-visualização, `?teste=ofertas` em DEV mantém `QuizComboUpsellScreen` com as imagens existentes e todas as categorias. Só o colchão casal tem preço experimental de55€/un.; comparação com69€ + deslocação de uma visita separada. Sem acumular10%. O botão final do quiz não envia pedidos neste modo. Produção e entradas sem a flag conservam preços e desconto existentes. Servidor desta cópia:5188. Não confundir com a cópia master em8090 sem estas imagens.
 
 Teste `?teste=ofertas`: cartões simplificados com uma linha promocional. Casal55€/un.; cadeiras: uma unidade oferecida por conjunto completo de4, com preço unitário do escalão da quantidade escolhida; tapetes:1m² oferecido por cada5m² completos no conjunto, guardando área real e área a cobrar no rótulo, euros sempre sob orçamento. Sem acumulação de10%, apenas DEV.
+
+Atualização do teste de ofertas: desconto de14€ por unidade em todos os tamanhos de colchão (solteiro45€, casal55€, King/Queen65€), pedido explícito do responsável. Apenas no modo DEV `teste=ofertas`; tabela pública inalterada.

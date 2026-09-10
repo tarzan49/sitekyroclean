@@ -47,7 +47,7 @@ function fmt(n: number): string {
 // anterior de escolher um item de cada vez. Substitui QuizUpsellOverlay
 // no ponto "antes de finalizar" (pedido explícito, aprovado em mockup).
 const QuizComboUpsellScreen = ({ offerPreview = false, travelFee = 10, primaryService, upsellItems, setUpsellItems, onContinue, onBack, totalPrice, packDiscountActive, packDiscountedPrice }: QuizComboUpsellScreenProps) => {
-  const mattressUnitPrice = (opt: typeof mattressPrices[number]) => offerPreview && opt.id === 'casal' ? 55 : opt.cleaningPrice;
+  const mattressUnitPrice = (opt: typeof mattressPrices[number]) => offerPreview && typeof opt.cleaningPrice === 'number' ? opt.cleaningPrice - 14 : opt.cleaningPrice;
   const casalSeparate = Number(mattressPrices.find(opt => opt.id === 'casal')!.cleaningPrice) + travelFee;
   const [view, setView] = useState<View>('summary');
   // This screen remounts when returning from contact. Restore the selection
