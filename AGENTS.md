@@ -64,3 +64,7 @@ Pedido do responsável: WhatsApp principal e ligação à tabela de preços nas 
 ## Deslocações Braga e Algarve (2026-09-10)
 
 Pedido do responsável: Braga com base local, 10€ em Braga, Guimarães, Vila Nova de Famalicão, Barcelos e Póvoa de Lanhoso; 15€ em Fafe e Esposende; 20€ em Viana do Castelo. Algarve: 25€ nos extremos/interior (Vila Real de Santo António, Castro Marim, Monchique, Aljezur, Vila do Bispo, Alcoutim); Portimão e Lagos mantêm 15€ e restantes zonas 10€. Esta regra substitui o antigo máximo de 15€ no Algarve. Atualizar sempre as duas tabelas (`QuizTypes.ts` e `locationSeoData.ts`). Os escalões são por localidade, não um cálculo GPS por morada.
+
+## Teste local de upsell (2026-09-10)
+
+`?teste=pack` em páginas de limpeza de sofás ativa, apenas com `import.meta.env.DEV`, um percurso demonstrativo ligado ao `PriceWidget`: seleção de sofá, oferta de colchão, resumo e pré-visualização da mensagem. `SofaPackPreview` calcula a proposta de 10% sobre serviços, excluindo deslocação, sem exigir base de 100€. Não envia contactos nem altera as regras reais do quiz. Esta oferta ainda não está autorizada para produção. Valores de colchão e deslocação vêm das tabelas reais.

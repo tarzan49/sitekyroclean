@@ -1,5 +1,7 @@
 import { WaterproofingTierPicker } from "@/components/quiz/steps/WaterproofingTierPicker";
-import { useState } from "react";
+import { lazy, Suspense, useState } from "react";
+import { useLocation } from "react-router-dom";
+const SofaPackPreview = lazy(() => import("@/components/SofaPackPreview"));
 import { Minus, Plus, Check, ChevronRight, CheckCircle2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { usePriceWidgetState } from "@/hooks/use-price-widget";
@@ -30,6 +32,9 @@ interface Props {
 }
 
 export default function PriceWidget({ serviceSlug, initialLocation }: Props) {
+  const { search } = useLocation();
+  const isPackPreview = import.meta.env.DEV && new URLSearchParams(search).get('teste') === 'pack' && serviceSlug === 'limpeza-sofas';
+  const [showPackPreview, setShowPackPreview] = useState(false);
   const rows = PRICE_TABLE[serviceSlug];
   const { isQuizOpen, openQuiz, closeQuiz } = useQuizLauncher();
   const [activeConfig, setActiveConfig] = useState<PriceRowQuizConfig | null>(null);
@@ -42,6 +47,10 @@ export default function PriceWidget({ serviceSlug, initialLocation }: Props) {
   const isWaterproofService = serviceSlug === 'impermeabilizacao';
 
   const handleContinue = () => {
+    if (isPackPreview) {
+      if ((w.rowQuantities[3] ?? 0) === 0) setShowPackPreview(true);
+      return;
+    }
     const config = w.buildConfig();
     if (!config) return;
     setActiveConfig(config);
@@ -55,7 +64,7 @@ export default function PriceWidget({ serviceSlug, initialLocation }: Props) {
   const total = calcWidgetTotal(serviceSlug, w.rowQuantities, w.chaiseLongueAddon, new Set(), w.addonTier);
   const travelFee = initialLocation ? (locationPrices[initialLocation] ?? 10) : 0;
   const articles = calcWidgetArticles(serviceSlug, w.rowQuantities, new Set(), w.addonTier);
-  const pricing = calcWidgetPricing(total, travelFee, articles);
+  const pricing = { ...calcWidgetPricing(total, travelFee, articles), ...(isPackPreview ? { discountActive: false } : {}) };
   const hasSelection = total > 0 || Object.values(w.rowQuantities).some(q => q > 0) || w.chaiseLongueAddon > 0;
 
   return (
@@ -243,7 +252,7 @@ export default function PriceWidget({ serviceSlug, initialLocation }: Props) {
       </div>
 
       {/* Discount bar */}
-      <div className="px-3.5 sm:px-4 pb-1.5">
+      {!isPackPreview && <div className="px-3.5 sm:px-4 pb-1.5">
         {pricing.discountActive ? (
           <div className="flex items-center gap-2.5 px-3 py-2 rounded-sm" style={{ background: "rgba(212,175,55,0.08)", border: "1px solid rgba(212,175,55,0.30)" }}>
             <div className="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 bg-gold">
@@ -260,7 +269,9 @@ export default function PriceWidget({ serviceSlug, initialLocation }: Props) {
             Adicione um colchão, sofá, tapete, alcatifa ou algumas cadeiras a mais (desde <span className="text-white/70 font-semibold">{PACK_DISCOUNT_MIN_UPSELL_ITEM}€</span>) num pedido de <span className="text-white/70 font-semibold">{PACK_DISCOUNT_MIN_SERVICE}€+</span> e ganhe <span className="text-gold font-semibold">10% de desconto em tudo</span>.
           </p>
         )}
-      </div>
+      </div>}
+
+      {isPackPreview && <p className="px-4 pb-3 text-xs text-gold">Teste: escolha um sofá de 1 a 3 lugares e continue para experimentar a oferta de colchão.</p>}
 
       {/* Total + CTA */}
       <div className="px-3.5 sm:px-4 pb-4 pt-1 space-y-2">
@@ -290,7 +301,7 @@ export default function PriceWidget({ serviceSlug, initialLocation }: Props) {
         <button
           type="button"
           onClick={handleContinue}
-          disabled={!hasSelection}
+          disabled={!hasSelection || (isPackPreview && (total <= 0 || (w.rowQuantities[3] ?? 0) > 0))}
           className={cn(
             "w-full h-11 sm:h-12 flex items-center justify-center gap-2 bg-gradient-to-r from-gold to-[#d4c57b] hover:from-[#d4c57b] hover:to-gold text-[#12121e] font-black text-xs sm:text-sm tracking-wider uppercase touch-manipulation active:scale-[0.98] rounded-sm shadow-[0_0_24px_rgba(212,175,55,0.30)] transition-all",
             !hasSelection && "opacity-50"
@@ -303,6 +314,11 @@ export default function PriceWidget({ serviceSlug, initialLocation }: Props) {
         <p className="text-center text-[9px] text-white/30">Sem cartão · Sem compromisso · 100% gratuito</p>
       </div>
 
+      {isPackPreview && showPackPreview && <Suspense fallback={<p className="p-4 text-white">A abrir oferta…</p>}><SofaPackPreview
+        base={total} travel={travelFee} city={initialLocation ?? 'Lisboa'}
+        items={rows.flatMap((row, index) => (w.rowQuantities[index] ?? 0) > 0 ? [`${w.rowQuantities[index]} × ${row.item}`] : [])}
+        onClose={() => setShowPackPreview(false)}
+      /></Suspense>}
       {activeConfig && (
         <QuizFormLazy
           isOpen={isQuizOpen}
