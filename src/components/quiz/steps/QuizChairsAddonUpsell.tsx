@@ -1,3 +1,4 @@
+import { WaterproofingTierPicker } from './WaterproofingTierPicker';
 import QuizTopBadge from '../QuizTopBadge';
 import QuizCareIntro from '../QuizCareIntro';
 import { ChevronLeft, Check, Bug, Droplets, Plus } from 'lucide-react';
@@ -42,7 +43,7 @@ const QuizChairsAddonUpsell = ({ formData, updateFormData, onContinue, onBack }:
     const addonOn = formData.chairWaterproofQty > 0;
     const toggleAddon = () => updateFormData({ chairWaterproofQty: addonOn ? 0 : qty });
     return (
-      <div className="flex flex-col gap-3 overflow-hidden items-center w-full">
+      <div className="flex flex-col gap-2 overflow-hidden items-center w-full">
         <p className="text-gold text-[10px] font-bold tracking-[0.28em] uppercase mb-0.5 text-center w-full">ANTES DE SEGUIR</p>
         <h2 className="font-playfair text-2xl sm:text-3xl font-bold text-white text-center w-full">Quer também Higienização Profunda?</h2>
         <p className="text-xs text-white/70 text-center max-w-sm leading-relaxed">
@@ -115,59 +116,26 @@ const QuizChairsAddonUpsell = ({ formData, updateFormData, onContinue, onBack }:
   };
 
   return (
-    <div className="flex flex-col gap-3 overflow-hidden items-center w-full">
+    <div className="flex flex-col gap-2 overflow-hidden items-center w-full">
       <p className="text-gold text-[10px] font-bold tracking-[0.28em] uppercase mb-0.5 text-center w-full">ANTES DE SEGUIR</p>
       <h2 className="font-playfair text-2xl sm:text-3xl font-bold text-white text-center w-full">Proteja as suas cadeiras</h2>
-      <QuizCareIntro service="chairs">Escolha a proteção para as suas {qty} cadeiras. Pode continuar com a limpeza que já escolheu.</QuizCareIntro>
+      <QuizCareIntro service="chairs">
+        <ul className="space-y-1.5">{['Repele líquidos', 'Facilita a remoção de manchas', 'Ajuda a conservar o tecido'].map(benefit => <li key={benefit} className="flex items-start gap-1.5"><Check aria-hidden="true" className="w-3.5 h-3.5 text-gold shrink-0 mt-0.5" /><span>{benefit}</span></li>)}</ul>
+      </QuizCareIntro>
 
       <p className="text-[10px] font-bold tracking-[0.14em] uppercase text-white/65 w-full max-w-sm text-left mt-1">Impermeabilização</p>
-      <div className="w-full max-w-sm grid grid-cols-2 gap-2 items-stretch mt-2">
-        <button
-          onClick={() => selectWaterproof('premium')}
-          aria-pressed={waterproofTier === 'premium'}
-          className={cn(
-            'relative rounded-sm border-2 px-3 py-2.5 text-left transition-all duration-200 touch-manipulation',
-            waterproofTier === 'premium'
-              ? 'border-gold bg-[#1a2a1a] shadow-[0_0_18px_rgba(212,175,55,0.30)]'
-              : 'border-white/15 bg-[#1a2a1a] hover:border-gold/40'
-          )}
-        >
-          <QuizTopBadge className="absolute -top-3 right-3 z-10" />
-          <div className="flex items-center gap-1.5 mb-0.5">
-            {waterproofTier === 'premium'  && <Check className="w-3 h-3 text-gold flex-shrink-0" />}
-            <p className={cn('text-xs font-bold', waterproofTier === 'premium' ? 'text-white' : 'text-white/85')}>Premium</p>
-          </div>
-          <p className={cn('text-[10px] leading-snug font-semibold mb-1', waterproofTier === 'premium' ? 'text-gold/70' : 'text-gold/75')}>Até 10 anos · 5 lavagens</p>
-          {premiumPrice !== null ? (
-            <p className="text-[11px] leading-none">
-              <span className="text-white/30 line-through">{fmt(premiumPrice + 5)}€</span>{' '}
-              <span className={cn('font-bold', waterproofTier === 'premium' ? 'text-gold' : 'text-gold/80')}>+{fmt(premiumPrice)}€</span>
-            </p>
-          ) : (
-            <p className="text-[11px] text-gold/60">Sob orçamento</p>
-          )}
-          {premiumPrice !== null && essencialPrice !== null && premiumPrice > essencialPrice && <p className="text-[11px] font-semibold text-gold mt-2">Só mais {fmt(premiumPrice - essencialPrice)}€ que o Essencial</p>}
-        </button>
-        <button
-          onClick={() => selectWaterproof('essencial')}
-          aria-pressed={waterproofTier === 'essencial'}
-          className={cn(
-            'relative rounded-sm border-2 px-3 py-2.5 text-left transition-all duration-200 touch-manipulation',
-            waterproofTier === 'essencial' ? 'border-gold bg-[#1a2a1a] shadow-[0_0_10px_rgba(212,175,55,0.18)]' : 'border-gold/20 bg-[#1a2a1a] hover:border-gold/40'
-          )}
-        >
-          <div className="flex items-center gap-1.5 mb-0.5">
-            {waterproofTier === 'essencial' && <Check className="w-3 h-3 text-gold flex-shrink-0" />}
-            <p className={cn('text-xs font-bold', waterproofTier === 'essencial' ? 'text-white' : 'text-white/60')}>Essencial</p>
-          </div>
-          <p className="text-[10px] text-white/65 leading-snug mb-1">1 a 2 anos · 2 lavagens</p>
-          <p className={cn('text-[11px] font-bold', waterproofTier === 'essencial' ? 'text-white' : 'text-white/70')}>
-            {essencialPrice !== null ? `+${fmt(essencialPrice)}€` : 'Sob orçamento'}
-          </p>
-        </button>
-      </div>
+      <WaterproofingTierPicker
+        compact
+        formData={formData}
+        updateFormData={() => {}}
+        onSelect={selectWaterproof}
+        activeTier={waterproofTier}
+        prices={{ premium: premiumPrice, essencial: essencialPrice }}
+        priceScope={`para ${qty} ${qty === 1 ? 'cadeira' : 'cadeiras'}`}
+        premiumDifference={premiumPrice !== null && essencialPrice !== null ? premiumPrice - essencialPrice : null}
+      />
 
-      <p className="text-[10px] font-bold tracking-[0.14em] uppercase text-white/65 w-full max-w-sm text-left mt-2">Outra opção</p>
+      <p className="text-[10px] font-bold tracking-[0.14em] uppercase text-white/65 w-full max-w-sm text-left mt-2">Cuidado adicional</p>
       <button
         onClick={selectAntiAcaros}
         aria-pressed={antiAcarosOn}
