@@ -1,83 +1,58 @@
-﻿import { cn } from '@/lib/utils';
+import { Check, Clock3 } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { RESPONSE_PROMISE } from '@/constants/commercialPolicy';
 
 interface QuizStep1ServiceProps {
   selectedService: string;
   onSelect: (service: string) => void;
 }
 
-const SERVICE_IMAGES: Record<string, string> = {
-  sofa:     '/images/services/sofa.webp',
-  carpet:   '/images/services/tapete.webp',
-  mattress: '/images/services/colchao.webp',
-  chairs:   '/images/services/cadeira.webp',
-};
+const serviceOptions = [
+  { id: 'sofa', label: 'Sofá', sublabel: 'a partir de 49€', image: 'sofa' },
+  { id: 'mattress', label: 'Colchão', sublabel: 'a partir de 59€', image: 'colchao' },
+  { id: 'carpet', label: 'Tapete', sublabel: 'Sob orçamento', image: 'tapete' },
+  { id: 'chairs', label: 'Cadeiras', sublabel: 'a partir de 20€', image: 'cadeira' },
+];
 
-// object-position overrides
-const IMG_POSITION: Record<string, string> = {};
-
-const QuizStep1Service = ({ onSelect }: QuizStep1ServiceProps) => {
-  const serviceOptions = [
-    { id: 'sofa',     label: 'Sofá',     sublabel: 'a partir de 49€' },
-    { id: 'mattress', label: 'Colchão',  sublabel: 'a partir de 59€' },
-    { id: 'carpet',   label: 'Tapete',   sublabel: 'Sob orçamento' },
-    { id: 'chairs',   label: 'Cadeiras', sublabel: 'a partir de 20€' },
-  ];
-
-  return (
-    <div
-      style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}
-    >
-      <p className="text-gold text-[10px] font-bold tracking-[0.28em] uppercase mb-1 text-center w-full">SERVIÇO</p>
-      <h2 className="font-playfair text-2xl sm:text-3xl font-bold text-white mb-3 text-center w-full">
-        O que precisa de limpar?
+const QuizStep1Service = ({ selectedService, onSelect }: QuizStep1ServiceProps) => (
+  <div className="w-full max-w-md mx-auto text-[#123c2d]">
+    <div className="mb-6 sm:mb-7 text-center">
+      <h2 className="font-playfair text-[1.85rem] sm:text-[2.2rem] leading-[1.15] font-bold tracking-tight">
+        O que vamos deixar<br />como novo?
       </h2>
-
-      <div className="grid grid-cols-2 gap-3 w-full max-w-xs sm:max-w-sm">
-        {serviceOptions.map((option) => {
-          const imgPos = IMG_POSITION[option.id] ?? 'object-center';
-
-          return (
-            <button
-              key={option.id}
-              onClick={() => onSelect(option.id)}
-              className="relative h-[148px] sm:h-[164px] rounded-sm overflow-hidden transition-all duration-200 touch-manipulation active:scale-[0.97] hover:ring-2 hover:ring-gold/35 shadow-[0_2px_10px_rgba(0,0,0,0.4)]"
-            >
-              {/* Background image, dimmed on certain services */}
-              <picture>
-                <source srcSet={SERVICE_IMAGES[option.id]} type="image/webp" />
-                <img
-                  src={SERVICE_IMAGES[option.id].replace('.webp', '.png')}
-                  alt={option.label}
-                  className={cn(
-                    "absolute inset-0 w-full h-full object-cover",
-                    imgPos,
-                    "opacity-100"
-                  )}
-                  loading="lazy"
-                />
-              </picture>
-
-              {/* Gradient overlay: transparent top → deep black bottom */}
-              <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-black/40 to-black/80" />
-              <div className="absolute inset-0 bg-black/20" />
-
-              {/* Label, anchored to bottom */}
-              <div className="absolute inset-x-0 bottom-0 z-10 flex flex-col items-center pb-2.5 px-2">
-                <span className="font-playfair text-[15px] font-bold text-white text-center leading-tight"
-                  style={{ textShadow: '0 1px 8px rgba(0,0,0,0.95)' }}>
-                  {option.label}
-                </span>
-                <span className="text-[11px] text-gold/80 leading-none mt-0.5"
-                  style={{ textShadow: '0 1px 4px rgba(0,0,0,0.8)' }}>
-                  {option.sublabel}
-                </span>
-              </div>
-            </button>
-          );
-        })}
-      </div>
+      <p className="mt-3 text-base leading-relaxed text-[#53665c]">
+        Escolha um serviço para começar<br className="sm:hidden" /> o seu orçamento.
+      </p>
     </div>
-  );
-};
+    <div className="grid grid-cols-2 gap-3 sm:gap-4">
+      {serviceOptions.map(option => {
+        const selected = selectedService === option.id;
+        return (
+          <button
+            key={option.id}
+            type="button"
+            aria-pressed={selected}
+            onClick={() => onSelect(option.id)}
+            className={cn(
+              'group relative overflow-hidden rounded-xl border bg-white text-left transition-all duration-200 touch-manipulation active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#123c2d] focus-visible:ring-offset-4 focus-visible:ring-offset-[#f8f7f2] motion-reduce:transition-none',
+              selected ? 'border-[#123c2d] ring-2 ring-[#123c2d]' : 'border-[#123c2d]/10 hover:border-[#123c2d]/40 hover:shadow-md'
+            )}
+          >
+            <img src={`/images/services/${option.image}.webp`} alt="" className="w-full aspect-[1.55] sm:aspect-[1.65] object-cover" />
+            {selected && <span className="absolute right-2 top-2 flex h-7 w-7 items-center justify-center rounded-full bg-[#123c2d] text-white"><Check aria-hidden="true" className="h-4 w-4" /></span>}
+            <span className="block px-3 py-3 sm:px-4">
+              <span className="block font-playfair text-xl font-bold leading-tight">{option.label}</span>
+              <span className="mt-1 block text-sm leading-snug text-[#53665c]">{option.sublabel}</span>
+            </span>
+          </button>
+        );
+      })}
+    </div>
+    <div className="mt-6 flex flex-col items-center gap-1 text-center text-sm text-[#53665c]">
+      <p className="flex items-center justify-center gap-2"><Clock3 aria-hidden="true" className="h-4 w-4 shrink-0" />{RESPONSE_PROMISE}</p>
+      <p>Sem compromisso</p>
+    </div>
+  </div>
+);
 
 export default QuizStep1Service;

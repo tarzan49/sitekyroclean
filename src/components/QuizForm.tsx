@@ -591,12 +591,15 @@ ${formData.description || 'Sem observações adicionais'}
 
   if (!isOpen) return null;
 
+  const isServiceEntry = currentStep === 1;
+
   const modalContent = (
     <div className="fixed inset-0 z-[100] sm:flex sm:items-center sm:justify-center sm:backdrop-blur-lg sm:p-4" style={{ background: "rgba(5,21,16,0.82)" }} role="dialog" aria-modal="true" aria-labelledby="quiz-title">
       <div
         className={cn(
           "relative w-full sm:max-w-lg sm:rounded-sm shadow-[0_8px_60px_rgba(0,0,0,0.6),inset_0_1px_0_rgba(255,255,255,0.07)] sm:border border-white/[0.18] overflow-hidden animate-scale-in flex flex-col sm:gpu-accelerated bg-checker-modal",
-          "h-full sm:h-auto sm:max-h-[92dvh]"
+          "h-full sm:h-auto sm:max-h-[92dvh]",
+          isServiceEntry && "sm:rounded-2xl"
         )}>
 
         <ConfettiGold active={confettiActive} />
@@ -604,12 +607,12 @@ ${formData.description || 'Sem observações adicionais'}
         {/* Header */}
         <div className="px-5 sm:px-6 pt-3 sm:pt-4 pb-2.5 sm:pb-3 landscape:pt-2 landscape:pb-1.5 grid grid-cols-[1fr_auto_1fr] items-center gap-2 flex-shrink-0">
           <div id="quiz-title" className="flex items-center gap-2">
-            <span className="font-playfair text-[14px] font-bold text-white/90 leading-none">Kyro</span>
-            <span className="h-3 w-px bg-white/20 flex-shrink-0" />
-            <span className="text-[9px] font-bold tracking-[0.22em] uppercase text-gold/65">Orçamento</span>
+            <span className={cn("font-playfair text-[14px] font-bold text-white/90 leading-none", isServiceEntry && "text-2xl")}>Kyro</span>
+            <span className={cn("h-3 w-px bg-white/20 flex-shrink-0", isServiceEntry && "hidden")} />
+            <span className={cn("text-[9px] font-bold tracking-[0.22em] uppercase text-gold/65", isServiceEntry && "hidden")}>Orçamento</span>
           </div>
           <div className="flex items-center justify-center gap-1.5">
-            {currentStep >= 1 && Array.from({ length: totalSteps }, (_, i) => {
+            {isServiceEntry ? <span className="whitespace-nowrap text-sm text-white/70">Passo 1 de {totalSteps}</span> : currentStep >= 1 && Array.from({ length: totalSteps }, (_, i) => {
               const stepNum = i + 1;
               return (
                 <div
@@ -638,7 +641,7 @@ ${formData.description || 'Sem observações adicionais'}
         </div>
 
         {/* Gold progress bar */}
-        <div className="h-[4px] bg-white/[0.04] flex-shrink-0 overflow-hidden">
+        <div className={cn("h-[4px] bg-white/[0.04] flex-shrink-0 overflow-hidden", isServiceEntry && "hidden")}>
           <div
             className="h-full bg-gradient-to-r from-gold/60 via-gold to-[#d4c57b] transition-all duration-500 ease-out"
             style={{ width: `${((currentStep === 0 ? 0.5 : currentStep) / totalSteps) * 100}%` }}
@@ -654,15 +657,16 @@ ${formData.description || 'Sem observações adicionais'}
           ref={scrollContainerRef}
           className={cn(
             "flex flex-col overflow-x-hidden flex-1 quiz-scrollbar px-4 sm:px-6",
-            "min-h-[200px] sm:min-h-[380px] landscape:min-h-[120px] overflow-y-auto pb-2"
+            "min-h-[200px] sm:min-h-[380px] landscape:min-h-[120px] overflow-y-auto pb-2",
+            isServiceEntry && "bg-[#f8f7f2]"
           )}
         >
 
           {/* Animated price ticker
              , hidden: step 2 (treatment selector, sem qtds)
              , visível: step 3 (quantidades) e step 4 (contacto) quando totalPrice > 0
-             , também visível em step 1 quando há custo de deslocação */}
-          {(totalPrice > 0 || hasSobOrcamento) && (activeUpsellScreen === 'combo' || finalTravelCost > 0 || (currentStep !== 1 && currentStep !== 2)) && (
+             , oculto na entrada: a deslocação mantém-se no resumo das etapas seguintes */}
+          {!isServiceEntry && (totalPrice > 0 || hasSobOrcamento) && (activeUpsellScreen === 'combo' || finalTravelCost > 0 || (currentStep !== 1 && currentStep !== 2)) && (
             <div className="sticky top-0 z-20 text-white flex flex-col border-b border-white/[0.16] -mx-5 sm:-mx-6 animate-fade-in" style={{ background: "#071a12" }}>
             <div className="flex items-center justify-between py-3 px-5 sm:px-6">
               <span className="text-xs text-white/40 font-medium">
@@ -704,11 +708,11 @@ ${formData.description || 'Sem observações adicionais'}
             </div>
           )}
 
-          <div className="flex flex-col py-3 sm:py-5 w-full items-center text-center">
+          <div className={cn("flex flex-col py-3 sm:py-5 w-full items-center text-center", isServiceEntry && "py-6 sm:py-7")}>
 
             {/* Step 0, Location Autocomplete VIP */}
             {/* Context banner when quiz opened from a problem page */}
-            {problema && (
+            {problema && !isServiceEntry && (
               <div className="w-full max-w-sm mx-auto mb-4 bg-gold/10 border border-gold/30 rounded-sm px-4 py-3 text-center">
                 <p className="text-gold text-xs font-bold mb-0.5">Detectámos o seu problema</p>
                 <p className="text-white/70 text-xs leading-relaxed">
@@ -924,7 +928,7 @@ ${formData.description || 'Sem observações adicionais'}
     </div>
 
     {/* Footer — hidden on step 0 (auto-advances on city selection) */}
-    {currentStep <= totalSteps && activeUpsellScreen === null && currentStep > 0 && (
+    {currentStep <= totalSteps && activeUpsellScreen === null && currentStep > 1 && (
       <div className="px-4 sm:px-5 pt-3 flex flex-col gap-2 flex-shrink-0 border-t border-white/[0.05] items-center" style={{ paddingBottom: 'max(1rem, env(safe-area-inset-bottom))' }}>
         {currentStep === totalSteps ? (
           <div className="flex flex-col gap-2 w-full">
@@ -985,8 +989,15 @@ ${formData.description || 'Sem observações adicionais'}
       </div>
     )}
 
+    {isServiceEntry && formData.location && (
+      <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 flex-shrink-0 bg-[#f8f7f2] px-5 pb-5 text-sm text-[#53665c]" style={{ paddingBottom: 'max(1.25rem, env(safe-area-inset-bottom))' }}>
+        <span>{formData.location === 'other' ? formData.otherLocation || 'Outra localização' : formData.location}</span>
+        <button type="button" onClick={() => setCurrentStep(0)} className="min-h-11 underline underline-offset-4 hover:text-[#123c2d] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#123c2d]">Alterar localização</button>
+      </div>
+    )}
+
     {/* Rotating social proof bar */}
-    <div className="border-t border-gold/20 px-4 py-2.5 text-center flex-shrink-0 bg-gradient-to-r from-[#0a1f18] via-[#0d2820] to-[#0a1f18] flex items-center justify-center gap-2 overflow-hidden">
+    <div className={cn(isServiceEntry && "hidden", "border-t border-gold/20 px-4 py-2.5 text-center flex-shrink-0 bg-gradient-to-r from-[#0a1f18] via-[#0d2820] to-[#0a1f18] flex items-center justify-center gap-2 overflow-hidden")}>
       {(() => {
         const current = socialProofMessages[socialProofIdx];
         const Icon = SOCIAL_PROOF_ICON[current.category];
