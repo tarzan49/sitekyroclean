@@ -22,7 +22,7 @@ export default function ServicePackBanner({ packSlugs, city, variant = 'light' }
     })),
     {
       id: 'custom-pack',
-      title: 'Montar o meu pack de raiz',
+      title: 'Montar o meu Pack de raiz',
       description: 'Escolha os artigos e os tratamentos do seu pack',
       to: '/packs',
     },
