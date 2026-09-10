@@ -11,6 +11,7 @@ export function useQuizPricing(
   mattressItems: MattressItem[],
   upsellItems: UpsellItemConfig[],
   carpetItems: CarpetItem[],
+  offerPreview = false,
 ) {
   // Calculate total price early for analytics (moved up for hook dependency).
   // Em paralelo, calcula também o "artigo base" de cada item (preço SEM addon,
@@ -189,7 +190,7 @@ export function useQuizPricing(
   const hasSubstantialUpsellArticle = articleUpsellItems.some(i => i.price >= PACK_DISCOUNT_MIN_UPSELL_ITEM);
   const totalArticleValue = articleBaseTotal + upsellArticleTotal;
   const hasSubstantialArticle = minQualifyingArticle !== null || hasSubstantialUpsellArticle;
-  const packDiscountActive = (totalArticleValue > PACK_DISCOUNT_MIN_TOTAL && hasSubstantialArticle) || hasUpsellSobItem;
+  const packDiscountActive = (import.meta.env.DEV && offerPreview) ? false : (totalArticleValue > PACK_DISCOUNT_MIN_TOTAL && hasSubstantialArticle) || hasUpsellSobItem;
   const packDiscountPct = packDiscountActive ? 0.10 : 0;
   const serviceOnlyTotal = calculateServicePrice + upsellItemsTotal + 0;
   const discountedPrice = Math.round(totalPrice);

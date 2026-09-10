@@ -107,3 +107,13 @@ describe('partial treatment quantities', () => {
     expect(result.current.totalPrice).toBe(89 + 69 * 2);
   });
 });
+
+it('does not stack the pack discount on local fixed-price offers', () => {
+  const { result } = renderHook(() => useQuizPricing(
+    { ...initialFormData, location: 'Lisboa', service: 'sofa', serviceType: 'cleaning' },
+    [{ id: 'test', sizeId: '3-lugares', qty: 1, packEnabled: false, chaiseLongue: false }], [],
+    [{ id: 'mattress-casal', price: 55, qty: 1, label: 'Colchão casal' }, { id: 'chairs', price: 80, qty: 4, label: '4 cadeiras' }], [], true,
+  ));
+  expect(result.current.totalPrice).toBe(224);
+  expect(result.current.packDiscountActive).toBe(false);
+});

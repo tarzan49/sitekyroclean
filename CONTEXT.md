@@ -1065,3 +1065,6 @@ A seleção parcial de cuidados em sofás/colchões usa `packQty?: number` com `
 
 ## Testemunhos partilhados (10 setembro 2026)
 CustomerReviews e CustomerReviewCard uniformizam homepage, páginas de serviços/localidades e cartões de packs. Textos existentes e seleção regional preservados; ligação Google usa constantes. Carrossel de 9 segundos com pausa manual, interação, visibilidade e reduced-motion; altura adaptativa mobile. Pré-visualização em mobile-preview.html#avaliacoes. Verificados mobile Lisboa, desktop e lint dos componentes; TypeScript validado.
+
+## Teste de ofertas no upsell com imagens (2026-09-10)
+Nesta branch de pré-visualização, `?teste=ofertas` em DEV mantém `QuizComboUpsellScreen` com as imagens existentes e todas as categorias. Só o colchão casal tem preço experimental de55€/un.; comparação com69€ + deslocação de uma visita separada. Sem acumular10%. O botão final do quiz não envia pedidos neste modo. Produção e entradas sem a flag conservam preços e desconto existentes. Servidor desta cópia:5188. Não confundir com a cópia master em8090 sem estas imagens.

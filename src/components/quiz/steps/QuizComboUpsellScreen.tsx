@@ -13,6 +13,8 @@ import {
 import { PACK_DISCOUNT_MIN_SERVICE, PACK_DISCOUNT_MIN_UPSELL_ITEM } from '@/lib/priceWidgetCalc';
 
 interface QuizComboUpsellScreenProps {
+  offerPreview?: boolean;
+  travelFee?: number;
   primaryService: string;
   upsellItems: UpsellItemConfig[];
   setUpsellItems: (items: UpsellItemConfig[]) => void;
@@ -44,7 +46,9 @@ function fmt(n: number): string {
 // quantidades com os tamanhos/preços reais do negócio, em vez do fluxo
 // anterior de escolher um item de cada vez. Substitui QuizUpsellOverlay
 // no ponto "antes de finalizar" (pedido explícito, aprovado em mockup).
-const QuizComboUpsellScreen = ({ primaryService, upsellItems, setUpsellItems, onContinue, onBack, totalPrice, packDiscountActive, packDiscountedPrice }: QuizComboUpsellScreenProps) => {
+const QuizComboUpsellScreen = ({ offerPreview = false, travelFee = 10, primaryService, upsellItems, setUpsellItems, onContinue, onBack, totalPrice, packDiscountActive, packDiscountedPrice }: QuizComboUpsellScreenProps) => {
+  const mattressUnitPrice = (opt: typeof mattressPrices[number]) => offerPreview && opt.id === 'casal' ? 55 : opt.cleaningPrice;
+  const casalSeparate = Number(mattressPrices.find(opt => opt.id === 'casal')!.cleaningPrice) + travelFee;
   const [view, setView] = useState<View>('summary');
   // This screen remounts when returning from contact. Restore the selection
   // before the synchronization effect can overwrite the parent's items.
@@ -108,7 +112,7 @@ const QuizComboUpsellScreen = ({ primaryService, upsellItems, setUpsellItems, on
     mattressPrices.forEach(opt => {
       const q = mattressQty[opt.id] ?? 0;
       if (q > 0 && typeof opt.cleaningPrice === 'number') {
-        items.push({ id: `mattress-${opt.id}`, mattressSize: opt.id, qty: q, price: q * opt.cleaningPrice, label: `${q}x Colchão ${opt.label}` });
+        items.push({ id: `mattress-${opt.id}`, mattressSize: opt.id, qty: q, price: q * Number(mattressUnitPrice(opt)), label: `${q}x Colchão ${opt.label}` });
       }
     });
     sofaPrices.forEach(opt => {
@@ -210,7 +214,7 @@ const QuizComboUpsellScreen = ({ primaryService, upsellItems, setUpsellItems, on
                 key={opt.id}
                 sizeId={opt.id}
                 label={opt.label}
-                unitLabel={typeof opt.cleaningPrice === 'number' ? `${opt.cleaningPrice}€/un.` : 'Sob orçamento'}
+                unitLabel={typeof mattressUnitPrice(opt) === 'number' ? `${mattressUnitPrice(opt)}€/un.` : 'Sob orçamento'}
                 qty={mattressQty[opt.id] ?? 0}
                 onDec={() => setMattQty(opt.id, (mattressQty[opt.id] ?? 0) - 1)}
                 onInc={() => setMattQty(opt.id, (mattressQty[opt.id] ?? 0) + 1)}
@@ -349,13 +353,13 @@ const QuizComboUpsellScreen = ({ primaryService, upsellItems, setUpsellItems, on
   return (
     <div className="flex flex-col gap-2 overflow-hidden items-center w-full">
       <p className="text-gold text-[10px] font-bold tracking-[0.28em] uppercase mb-0.5 text-center w-full">
-        {packDiscountActive ? 'APROVEITE A MESMA VISITA' : 'UM BÓNUS PARA SI'}
+        {offerPreview || packDiscountActive ? 'APROVEITE A MESMA VISITA' : 'UM BÓNUS PARA SI'}
       </p>
       <h2 className="font-playfair text-2xl sm:text-3xl font-bold text-white text-center w-full">
-        {packDiscountActive ? 'Quer limpar mais alguma coisa?' : 'Poupe 10% no pedido todo'}
+        {offerPreview || packDiscountActive ? 'Quer limpar mais alguma coisa?' : 'Poupe 10% no pedido todo'}
       </h2>
       <p className="text-xs text-white/55 text-center max-w-xs leading-relaxed -mt-1">
-        {packDiscountActive ? (
+        {offerPreview ? <>Escolha o que quer acrescentar. Uma visita, uma só deslocação.</> : packDiscountActive ? (
           <>
             Já tem 10% de desconto no pedido.<br />
             Adicione outro serviço com o mesmo desconto.
@@ -374,7 +378,7 @@ const QuizComboUpsellScreen = ({ primaryService, upsellItems, setUpsellItems, on
         {visibleRows.map(row => (
           <button
             key={row.view}
-            onClick={() => setView(row.view)}
+            onClick={() => { if (offerPreview && row.view === 'mattress' && mattressQtyTotal === 0) setMattQty('casal', 1); setView(row.view); }}
             className={cn(
               'group relative flex items-center gap-3 rounded-sm border px-3 text-left transition-all duration-200 touch-manipulation active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold',
               compactRows ? 'min-h-[78px] py-1.5 pr-12' : 'min-h-[132px] flex-col justify-center py-2.5',
@@ -399,7 +403,14 @@ const QuizComboUpsellScreen = ({ primaryService, upsellItems, setUpsellItems, on
             />
             <span className={cn('min-w-0 flex flex-col gap-1', !compactRows && 'w-full')}>
               <span className="text-sm font-bold text-white">{row.label}</span>
-              <span className={cn('text-[11px] leading-relaxed', row.selected ? 'text-gold/80' : 'text-white/50')}>{row.summary}</span>
+              {offerPreview && row.view === 'mattress' ? <>
+                <span className="text-gold font-bold text-sm">Casal por +55€</span>
+                <span className="text-[11px] text-white/55">{casalSeparate}€ numa visita separada</span>
+                <span className="text-[11px] text-gold">Poupa {casalSeparate - 55}€ face a outra visita</span>
+                {row.selected && <span className="text-[11px] text-white/65">{row.summary}</span>}
+              </> : <span className={cn('text-[11px] leading-relaxed', row.selected ? 'text-gold/80' : 'text-white/50')}>{row.summary}</span>}
+              {offerPreview && row.view === 'chairs' && <span className="text-[11px] text-white/55">Veja o valor ao escolher a quantidade</span>}
+              {offerPreview && row.view === 'carpet' && <span className="text-[11px] text-white/55">Preço a confirmar após avaliação</span>}
             </span>
           </button>
         ))}

@@ -102,6 +102,7 @@ const QuizForm = ({
   initialMattressSizeId, initialMattressQty, initialMattressItems, initialChairQty, initialChairWaterproofing, initialCarpetArea, initialCarpetItems,
   initialWaterproofingTier, skipToUpsell, initialUpsellItems,
 }: QuizFormProps) => {
+  const offerPreview = import.meta.env.DEV && new URLSearchParams(window.location.search).get("teste") === "ofertas";
   const { toast } = useToast();
   const navigate = useNavigate();
   const hasInitialItem = Boolean(
@@ -243,7 +244,7 @@ const QuizForm = ({
     serviceOnlyTotal,
     discountedPrice,
     packDiscountedPrice,
-  } = useQuizPricing(formData, sofaItems, mattressItems, upsellItems, carpetItems);
+  } = useQuizPricing(formData, sofaItems, mattressItems, upsellItems, carpetItems, offerPreview);
 
   const updateFormData = useCallback((updates: Partial<QuizFormData>) => {
     setFormData(prev => ({ ...prev, ...updates }));
@@ -490,6 +491,7 @@ const QuizForm = ({
   };
 
   const handleSubmit = async () => {
+    if (offerPreview) { toast({ title: "Teste concluído", description: "Nenhum pedido foi enviado." }); return; }
     if (!canProceed()) return;
 
     const finalLocation = formData.location === 'other' ? formData.otherLocation : formData.location;
@@ -937,6 +939,8 @@ ${formData.description || 'Sem observações adicionais'}
                 explícito, aprovado em mockup 2026-09-06). */}
             {activeUpsellScreen === 'combo' && (
               <QuizComboUpsellScreen
+                offerPreview={offerPreview}
+                travelFee={finalTravelCost}
                 primaryService={formData.service}
                 upsellItems={upsellItems}
                 setUpsellItems={setUpsellItems}
@@ -1009,7 +1013,7 @@ ${formData.description || 'Sem observações adicionais'}
                 disabled={isSubmitting}
                 className="flex-1 h-14 bg-gradient-to-r from-gold to-[#d4c57b] hover:from-[#d4c57b] hover:to-gold text-[#12121e] font-black text-base tracking-wider uppercase touch-manipulation active:scale-[0.98] rounded-sm shadow-[0_0_32px_rgba(212,175,55,0.30)]"
               >
-                {isSubmitting ? 'A enviar...' : 'FINALIZAR PEDIDO'}
+                {offerPreview ? 'CONCLUIR TESTE' : isSubmitting ? 'A enviar...' : 'FINALIZAR PEDIDO'}
               </Button>
             </div>
             <p className="text-center text-[11px] text-white/30 font-medium -mt-0.5">
