@@ -18,7 +18,7 @@ export function WaterproofingTierPicker({ formData, updateFormData, onSelect, ac
   // escolheu algo e ainda não escolheu").
   const tier = activeTier === undefined ? formData.waterproofingTier : activeTier;
   return (
-    <div className="w-full max-w-sm grid grid-cols-2 gap-2 mb-1 pt-3 items-stretch">
+    <div className="w-full max-w-sm mx-auto grid grid-cols-2 gap-2 mb-1 pt-3 items-stretch">
       <button
         type="button"
         aria-pressed={tier === 'premium'}

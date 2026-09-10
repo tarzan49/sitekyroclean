@@ -1,5 +1,6 @@
 import PriceFactors from "@/components/PriceFactors";
 import DirectoryGroup from "@/components/DirectoryGroup";
+import ProblemCarousel from "@/components/ProblemCarousel";
 import { useEffect, useMemo } from "react";
 import { useLocation, Link } from "react-router-dom";
 import { QuizLocationProvider, QuizServiceProvider } from "@/context/QuizLocationContext";
@@ -11,20 +12,22 @@ import HeroBeforeAfterPool from "@/components/HeroBeforeAfterPool";
 import { categoryForServiceSlug } from "@/data/beforeAfterPool";
 import Footer from "@/components/Footer";
 import QuizButton from "@/components/QuizButton";
+import QuizFormLazy from "@/components/QuizFormLazy";
+import { useQuizLauncher } from "@/hooks/use-quiz-launcher";
 import SectionHeader from "@/components/SectionHeader";
 import ServiceFAQ from "@/components/ServiceFAQ";
 import ServicePriceSection from "@/components/ServicePriceSection";
-import ServiceAutoCarousel from "@/components/ServiceAutoCarousel";
 import ServiceSnapshotStats from "@/components/ServiceSnapshotStats";
 import { trackWhatsAppClick } from "@/lib/quizTracking";
 import { getPricePageData, getAllPriceRoutes } from "@/data/priceSeoData";
+import { getAllProblems } from "@/data/problemSeoData";
 import { services, cities, cityPrep } from "@/data/locationSeoData";
 import { SERVICE_TO_QUIZ } from "@/constants/serviceToQuiz";
+import { METRO_CITIES } from "@/constants/metroCities";
 import { pickServiceHero } from "@/constants/serviceContent";
-import { getServiceGallery, getIllustrativePhotos } from "@/constants/serviceGallery";
 import { buildServiceWaMessage } from "@/lib/whatsappMessages";
 import { SITE_URL, WHATSAPP_BASE, REVIEW_RATING, REVIEW_COUNT } from "@/constants/business";
-import { SERVICE_DURATION } from "@/constants/problemCardHelpers";
+import { SERVICE_DURATION, PROBLEM_IMAGES } from "@/constants/problemCardHelpers";
 import ServiceReviewsGrid from "@/components/ServiceReviewsGrid";
 import {
   buildWebPageNode,
@@ -57,6 +60,17 @@ const PricePage = () => {
     }
   }, [pathname, data]);
 
+  const { isQuizOpen: isProblemQuizOpen, openQuiz: openProblemQuiz, closeQuiz: closeProblemQuiz } = useQuizLauncher();
+
+  const relatedProblems = useMemo(() => {
+    if (!data) return [];
+    return getAllProblems().filter(p =>
+      p.visible &&
+      p.relatedServices.includes(data.serviceSlug) &&
+      (METRO_CITIES.has(data.citySlug) || p.relatedCities.includes(data.citySlug))
+    ).slice(0, 5);
+  }, [data]);
+
   if (!data) {
     return (
       <>
@@ -81,7 +95,16 @@ const PricePage = () => {
   const relatedServices = services.filter(s => s.slug !== data.serviceSlug).slice(0, 4);
   const nearbyCities = cities.filter(c => c.slug !== data.citySlug).slice(0, 8);
   const waHref = `${WHATSAPP_BASE}?text=${encodeURIComponent(buildServiceWaMessage(data.serviceSlug, data.cityName))}`;
-  const gallery = getServiceGallery(data.serviceSlug, data.citySlug);
+
+  const serviceCategory = data.serviceName.startsWith("Limpeza de ")
+    ? data.serviceName.replace("Limpeza de ", "").toLowerCase()
+    : data.serviceName.toLowerCase();
+  const problemImages = PROBLEM_IMAGES[data.serviceSlug] ?? [];
+  const problemCards = relatedProblems.map((problem, idx) => ({
+    title: problem.keyword.charAt(0).toUpperCase() + problem.keyword.slice(1),
+    description: problem.intro.match(/^[^.?]*[.?]/)?.[0] ?? problem.intro,
+    image: problemImages[idx],
+  })).filter(card => card.image);
 
   const serviceDuration = SERVICE_DURATION[data.serviceSlug] ?? { value: "3 a 6h", label: "Pronto a usar" };
   // Resposta em menos de 10 minutos: compromisso comum a todo o site.
@@ -199,6 +222,13 @@ const PricePage = () => {
         {/* ═══ TABELA DE PREÇOS ═══ */}
         <div id="precos" className="scroll-mt-6"><ServicePriceSection serviceSlug={data.serviceSlug} initialLocation={data.cityName} /></div>
 
+        <QuizFormLazy
+          isOpen={isProblemQuizOpen}
+          onClose={closeProblemQuiz}
+          initialLocation={data.cityName}
+          initialService={quizService}
+        />
+
         {/* ═══ AVALIAÇÕES REAIS ═══ */}
         <section id="avaliacoes" className="scroll-mt-6 py-14 md:py-20 bg-kyro-green">
           <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
@@ -207,16 +237,43 @@ const PricePage = () => {
           </div>
         </section>
 
-        {/* ═══ GALERIA ILUSTRATIVA (o antes/depois já está no hero) ═══ */}
-        {gallery && (
-          <ServiceAutoCarousel
-            comparison={false}
-            overline="Resultados Reais"
-            heading={`Antes e depois: ${data.serviceName}`}
-            subtitle={`Transformação real ${prep} ${data.cityName}, resultado visível no próprio dia.`}
-            slides={getIllustrativePhotos(data.serviceSlug, data.citySlug)}
-            variant="light"
-          />
+        {/* ═══ PROBLEMAS QUE RESOLVEMOS (o antes/depois já está no hero) ═══ */}
+        {problemCards.length > 0 && (
+          <section className="py-14 md:py-20 bg-[#FDFDF9]">
+            <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
+              <SectionHeader
+                overline="O Que Resolvemos"
+                heading={`Problemas de ${serviceCategory} que resolvemos ${prep}`}
+                goldWord={data.cityName}
+                light={true}
+              />
+              <p className="-mt-5 mb-7 max-w-xl text-sm sm:text-base leading-relaxed text-[#536259]">
+                Reconhece algum destes sinais? Peça uma avaliação e descubra o tratamento adequado ao seu caso.
+              </p>
+              <ProblemCarousel>
+                {problemCards.map((card, idx) => (
+                  <article key={card.title} className="snap-start flex-none w-[84vw] max-w-[380px] md:max-w-none md:w-auto overflow-hidden rounded-sm border border-[#183b2c]/15 bg-[#0c241a] group flex flex-col shadow-[0_8px_24px_rgba(7,26,18,0.10)]">
+                    <div className="relative h-[185px] sm:h-[220px] overflow-hidden">
+                      <img src={card.image} alt={card.title} className="w-full h-full object-cover saturate-[0.85] motion-safe:group-hover:scale-[1.03] transition-transform duration-700" loading="lazy" decoding="async" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-[#0c241a]/35 to-transparent" />
+                      <span className="absolute top-4 left-4 px-2.5 py-1.5 bg-[#071a12]/85 border border-white/20 text-[#e1c477] text-[10px] font-semibold tracking-[0.16em]">{String(idx + 1).padStart(2, '0')} / {String(problemCards.length).padStart(2, '0')}</span>
+                    </div>
+                    <div className="p-5 sm:p-6 flex flex-col flex-1">
+                      <div className="w-7 h-px bg-gold mb-4" />
+                      <h3 className="font-playfair font-semibold text-white text-[23px] leading-tight mb-3">{card.title}</h3>
+                      <p className="text-white/75 text-sm leading-relaxed mb-6">{card.description}</p>
+                      <div className="mt-auto">
+                        <button type="button" onClick={openProblemQuiz} aria-label={`Pedir avaliação: ${card.title}`} className="w-full min-h-12 flex items-center justify-between gap-3 rounded-sm px-4 py-3 text-sm font-bold text-[#071a12] bg-gradient-to-r from-gold to-[#d4c57b] hover:from-[#d4c57b] hover:to-gold focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-gold active:scale-[0.98] transition-all touch-manipulation">
+                          Pedir avaliação <ArrowRight className="w-5 h-5 shrink-0" />
+                        </button>
+                        <p className="text-white/60 text-[11px] text-center mt-2.5">Orçamento gratuito · Sem compromisso</p>
+                      </div>
+                    </div>
+                  </article>
+                ))}
+              </ProblemCarousel>
+            </div>
+          </section>
         )}
 
         {/* ═══ FAQ ═══ */}
