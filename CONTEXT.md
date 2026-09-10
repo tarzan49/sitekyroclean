@@ -1059,3 +1059,13 @@ Commits desta sessão (ordem cronológica, todos em `worktree-kyro-minorder-emda
 `ServiceResultsGallery` centraliza comparação, miniaturas numa faixa horizontal, anterior/seguinte e reprodução opcional (parada por defeito). A miniatura selecionada mantém-se visível sem deslocar a página; a contenção de largura impede que a faixa alargue as grelhas dos heroes em mobile. Usa toda a categoria de `BEFORE_AFTER_POOL`, com cadeiras em 9:16, alcatifas a reutilizar tapetes e identificação de fotos avulsas/efeitos ilustrativos.
 
 `HeroBeforeAfterPool` reutiliza esta galeria nos heroes de cidades, freguesias, variantes, marcas, preços, materiais e problemas. `ServiceAutoCarousel` recebe `category` em todos os seus consumidores atuais e mantém as duas imagens de trabalho/pormenor: ao lado em desktop, por baixo em mobile. A comparação da secção tem largura máxima de 640px. `/antes-depois-limpeza` permite escolher entre os seis serviços e consultar a pool completa. Consumidores futuros sem `category` conservam o fallback estático.
+
+
+## Teste de pack dentro do quiz (2026-09-10)
+
+Apenas em desenvolvimento, `?teste=quiz-pack` mantém o fluxo real do `QuizForm` e substitui o combo de extras de sofá por `QuizSofaPackTest`. O extra escreve em `upsellItems` e avança para o contacto real. `useQuizPricing` recebe um parâmetro opcional de teste (default false, também protegido por DEV) para aplicar 10% aos serviços quando é acrescentado um artigo de pelo menos 49€, sem o limiar de 149€, mantendo cêntimos. O botão final do teste não submete dados; apenas confirma a simulação. Produção conserva as regras existentes. O protótipo anterior `?teste=pack` continua separado no widget.
+
+
+## Guias e conselhos nas páginas de serviço (2026-09-10)
+
+`ServiceExpertTips` usa cartões horizontais compactos com fotografia do artigo, título completo e ligação no cartão inteiro. Em mobile, oculta os resumos; em desktop, mostra duas linhas e distribui quatro guias em 2x2 ou três numa fila. A ligação ao blog permite explorar os restantes guias. `src/constants/blogImages.ts` centraliza as imagens antes duplicadas em `Blog.tsx`/`BlogPost.tsx`, reutilizadas também nos cartões sem carregar o texto integral dos artigos nas páginas de serviço.
