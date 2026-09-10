@@ -25,6 +25,8 @@ import { getAllMarcaColchaoRoutes } from "@/data/marcaColchaoData";
 import { getAllMarcaCadeirasRoutes } from "@/data/marcaCadeirasData";
 import { getAllCommercialRoutes } from "@/data/commercialSeoData";
 
+const LocationPreview = import.meta.env.DEV ? lazy(() => import("./pages/LocationPreview")) : null;
+
 const TreatmentPage = lazy(() => import('./pages/TreatmentPage'));
 
 // Critical path - load immediately
@@ -113,6 +115,7 @@ const AppRoutes = () => {
             <Suspense fallback={<PageLoader />}>
               <Routes>
                 {QuoteVisualPreview && <Route path="/__preview/orcamento" element={<QuoteVisualPreview />} />}
+                {LocationPreview && <Route path="/__preview/localizacao" element={<LocationPreview />} />}
                 <Route path="/" element={<IndexV1 />} />
                 <Route path="/limpeza-sofas" element={<LimpezaSofas />} />
                 <Route path="/impermeabilizacao" element={<Impermeabilizacao />} />
