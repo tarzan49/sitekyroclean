@@ -41,7 +41,7 @@ const QuizStepConfigChairs = ({ formData, updateFormData }: Props) => {
   const chairWhatsappMsg = encodeURIComponent('Olá, tenho cadeiras de um tipo diferente (sem tampo, costas ou braços) e gostava de um orçamento personalizado.');
 
   return (
-    <div className="flex flex-col gap-3 overflow-hidden items-center w-full">
+    <div className="flex flex-col gap-2 overflow-hidden items-center w-full">
       <p className="text-gold text-[10px] font-bold tracking-[0.28em] uppercase mb-0.5 text-center w-full">{isWaterproofPrimary ? 'PROTEÇÃO' : 'O QUE PRECISA?'}</p>
       <h2 className="font-playfair text-2xl sm:text-3xl font-bold text-white text-center w-full">
         {isWaterproofPrimary ? 'Escolha a sua impermeabilização' : 'Quantas cadeiras vamos limpar?'}
@@ -56,9 +56,9 @@ const QuizStepConfigChairs = ({ formData, updateFormData }: Props) => {
         />
       )}
       {(!isWaterproofPrimary || tierChosen) && (
-        <div className="w-full max-w-sm rounded-sm border border-gold/35 bg-[#1a2a1a] px-4 py-4 shadow-[0_0_20px_rgba(212,175,55,0.08)]">
-          <div className="flex items-center gap-3 text-left mb-4">
-            <QuizFurnitureImage service="chairs" className="!w-20 !h-20" />
+        <div className="w-full max-w-sm rounded-sm border border-gold/35 bg-[#1a2a1a] px-4 py-3 shadow-[0_0_20px_rgba(212,175,55,0.08)]">
+          <div className="flex items-center gap-3 text-left mb-3">
+            <QuizFurnitureImage service="chairs" className="!w-16 !h-16" />
             <div>
               <p className="font-semibold text-white">Cadeiras estofadas</p>
               <p className="text-xs text-white/65 mt-1">{isWaterproofPrimary ? `Impermeabilização ${isPremiumTier ? 'Premium' : 'Essencial'}` : 'Higienização profunda'}</p>
@@ -74,7 +74,7 @@ const QuizStepConfigChairs = ({ formData, updateFormData }: Props) => {
             <button type="button" aria-label="Adicionar uma cadeira" onClick={() => setChairQty(qty + 1)}
               className="w-14 h-14 rounded-sm border-2 border-gold/50 bg-gold/[0.08] text-white font-bold text-2xl flex items-center justify-center active:scale-95 transition-all touch-manipulation hover:border-gold">+</button>
           </div>
-          <div className="border-t border-gold/20 mt-4 pt-3 flex items-center justify-between gap-3 text-left">
+          <div className="border-t border-gold/20 mt-3 pt-2.5 flex items-center justify-between gap-3 text-left">
             <span className="text-xs text-white/75">{isWaterproofPrimary ? 'Proteção das cadeiras' : 'Limpeza das cadeiras'}</span>
             <span className={cn('font-bold tabular-nums', sob ? 'text-sm text-white/80' : 'text-xl text-gold')}>
               {sob ? 'Sob orçamento' : `${primaryPrice.toLocaleString('pt-PT')}€`}

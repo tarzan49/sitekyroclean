@@ -1,14 +1,14 @@
 import DirectoryGroup from "@/components/DirectoryGroup";
+import SofaLeadActions from "@/components/SofaLeadActions";
 import { useMemo, useEffect } from "react";
 import { useLocation, Link } from "react-router-dom";
 import { QuizLocationProvider, QuizServiceProvider } from "@/context/QuizLocationContext";
-import { XCircle, CheckCircle2, ArrowRight, Search, Droplets, Wind, ShieldCheck, MessageCircle, Phone, Star, Euro, Clock, Timer } from "lucide-react";
+import { XCircle, CheckCircle2, ArrowRight, Search, Droplets, Wind, ShieldCheck, Star, Euro, Clock, Timer } from "lucide-react";
 import { GoogleG } from "@/components/icons/GoogleG";
 import Header from "@/components/Header";
 import PageBreadcrumb from "@/components/PageBreadcrumb";
 import HeroBeforeAfterPool from "@/components/HeroBeforeAfterPool";
 import Footer from "@/components/Footer";
-import QuizButton from "@/components/QuizButton";
 import SectionHeader from "@/components/SectionHeader";
 import ServiceSnapshotStats from "@/components/ServiceSnapshotStats";
 import ServicePriceSection from "@/components/ServicePriceSection";
@@ -16,9 +16,7 @@ import ServiceAutoCarousel from "@/components/ServiceAutoCarousel";
 import ServiceFAQ from "@/components/ServiceFAQ";
 import { getAllMarcaCadeirasRoutes, getMarcaCadeirasByCityAndSlug } from "@/data/marcaCadeirasData";
 import { cityPrep } from "@/data/locationSeoData";
-import { trackWhatsAppClick } from "@/lib/quizTracking";
-import { trackCallClick } from "@/lib/analytics";
-import { SITE_URL, WHATSAPP_BASE, PHONE_TEL, PHONE_DISPLAY, REVIEW_RATING, REVIEW_COUNT } from "@/constants/business";
+import { SITE_URL, WHATSAPP_BASE, REVIEW_RATING, REVIEW_COUNT } from "@/constants/business";
 import { SERVICE_DURATION } from "@/constants/problemCardHelpers";
 import {
   buildWebPageNode,
@@ -168,39 +166,12 @@ const MarcaCadeirasPage = () => {
                   </p>
 
 
-                  <div className="flex flex-col sm:flex-row gap-3 max-w-md">
-                    <QuizButton
-                      className="flex-1"
-                      buttonClassName="h-[58px] md:h-[52px] !py-0 w-full"
-                      ctaLabel="Calcular o meu preço"
-                      initialLocation={city.name}
-                      initialService="chairs"
-                    />
-                    <div className="relative group flex-1">
-                      <div className="absolute -inset-1.5 bg-[#25D366]/40 opacity-30 blur-lg group-hover:opacity-55 transition-opacity duration-400 pointer-events-none" />
-                      <a
-                        href={`${WHATSAPP_BASE}?text=${encodeURIComponent(`Olá! Gostaria de pedir um orçamento para limpeza das minhas cadeiras ${marca.name} ${prep} ${city.name}.`)}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        onClick={() => trackWhatsAppClick(`marca_cadeiras_hero_${marca.slug}`)}
-                        className="relative flex items-center justify-center gap-2 w-full h-[58px] md:h-[52px] px-6 font-bold text-white touch-manipulation bg-gradient-to-r from-[#1DA851] via-[#25D366] to-[#1DA851] shadow-[0_6px_22px_rgba(37,211,102,0.42),0_2px_6px_rgba(0,0,0,0.28),inset_0_1px_0_rgba(255,255,255,0.20),inset_0_-2px_0_rgba(0,0,0,0.12)] hover:shadow-[0_10px_32px_rgba(37,211,102,0.60),0_4px_10px_rgba(0,0,0,0.32)] hover:scale-[1.025] active:scale-[0.95] transition-all duration-150"
-                      >
-                        <MessageCircle className="w-[18px] h-[18px] flex-shrink-0" strokeWidth={2} />
-                        <span className="text-[13px] font-semibold tracking-[0.18em] uppercase">Falar por WhatsApp</span>
-                      </a>
-                    </div>
-                  </div>
-
-                  <a
-                    href={`tel:${PHONE_TEL}`}
-                    onClick={() => trackCallClick('marca_cadeiras_hero_mobile')}
-                    className="md:hidden flex items-center gap-1.5 text-white/45 text-xs mt-4 hover:text-white/70 transition-colors"
-                  >
-                    <Phone className="w-3 h-3 flex-shrink-0" strokeWidth={2} />
-                    Prefere ligar? {PHONE_DISPLAY}
-                  </a>
-
-                  <p className="text-white/40 text-xs mt-4">Desde {minPriceLabel}€/unidade · Orçamento gratuito · Sem compromisso</p>
+                  <SofaLeadActions
+                    city={city.name}
+                    price={`${minPriceLabel}€/unidade`}
+                    href={`${WHATSAPP_BASE}?text=${encodeURIComponent(`Olá! Gostaria de pedir um orçamento para limpeza das minhas cadeiras ${marca.name} ${prep} ${city.name}.`)}`}
+                    source={`marca_cadeiras_hero_${marca.slug}`}
+                  />
                 </div>
 
                 <div className="mt-8 lg:mt-0">

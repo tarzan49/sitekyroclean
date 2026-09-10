@@ -5,14 +5,12 @@ import SofaLeadActions from "@/components/SofaLeadActions";
 import { AdsLandingHeader, AdsLandingFooter, isAdsVisit } from "@/components/AdsLandingNavigation";
 import { useEffect, useMemo } from "react";
 import { useLocation, Link } from "react-router-dom";
-import { MapPin, Star, MessageCircle, ArrowRight, Euro, Clock, Timer } from "lucide-react";
+import { MapPin, Star, ArrowRight, Euro, Clock, Timer } from "lucide-react";
 import { GoogleG } from "@/components/icons/GoogleG";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import QuizButton from "@/components/QuizButton";
 import QuizFormLazy from "@/components/QuizFormLazy";
 import { useQuizLauncher } from "@/hooks/use-quiz-launcher";
-import { trackWhatsAppClick } from "@/lib/quizTracking";
 import ServiceLocationSchema from "@/components/ServiceLocationSchema";
 import ServiceFAQ from "@/components/ServiceFAQ";
 import ServicePackBanner from "@/components/ServicePackBanner";
@@ -248,33 +246,7 @@ const LocationServicePage = () => {
                 </p>
 
 
-                {isSofaCleaning ? <SofaLeadActions city={data.city} price={data.priceFrom} href={waUrl} source={`location_hero_${data.serviceSlug}_${data.citySlug}`} /> : <>
-                <div className="flex flex-col sm:flex-row gap-3 max-w-md">
-                  <QuizButton
-                    className="flex-1"
-                    initialLocation={data.city}
-                    initialService={quizService}
-                    initialServiceType={data.serviceSlug === 'impermeabilizacao' ? 'waterproofing' : 'cleaning'}
-                    skipToUpsell={!!quizService}
-                    buttonClassName="h-[58px] md:h-[52px] !py-0 w-full"
-                  />
-                  <div className="relative group flex-1">
-                    <div className="absolute -inset-1.5 bg-[#25D366]/40 opacity-30 blur-lg group-hover:opacity-55 transition-opacity duration-400 pointer-events-none" />
-                    <a
-                      href={waUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      onClick={() => trackWhatsAppClick(`location_hero_${data.serviceSlug}_${data.citySlug}`)}
-                      className="relative flex items-center justify-center gap-2 w-full h-[58px] md:h-[52px] px-6 font-bold text-white touch-manipulation bg-gradient-to-r from-[#1DA851] via-[#25D366] to-[#1DA851] shadow-[0_6px_22px_rgba(37,211,102,0.42),0_2px_6px_rgba(0,0,0,0.28),inset_0_1px_0_rgba(255,255,255,0.20),inset_0_-2px_0_rgba(0,0,0,0.12)] hover:shadow-[0_10px_32px_rgba(37,211,102,0.60),0_4px_10px_rgba(0,0,0,0.32)] hover:scale-[1.025] active:scale-[0.95] transition-all duration-150"
-                    >
-                      <MessageCircle className="w-[18px] h-[18px] flex-shrink-0" strokeWidth={2} />
-                      <span className="text-[13px] font-semibold tracking-[0.18em] uppercase">Falar por WhatsApp</span>
-                    </a>
-                  </div>
-                </div>
-
-                <p className="text-white/40 text-xs mt-4">{/^\d/.test(data.priceFrom) ? `Desde ${data.priceFrom} · ` : ''}Orçamento gratuito · Sem compromisso</p>
-                </>}
+                <SofaLeadActions city={data.city} price={data.priceFrom} href={waUrl} source={`location_hero_${data.serviceSlug}_${data.citySlug}`} />
               </div>
 
               <div id="resultados" className="mt-2 lg:mt-0 scroll-mt-6">

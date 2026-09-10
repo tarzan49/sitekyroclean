@@ -1,16 +1,16 @@
 import DirectoryGroup from "@/components/DirectoryGroup";
+import SofaLeadActions from "@/components/SofaLeadActions";
 import { useEffect, useMemo } from "react";
 import { useLocation, Link } from "react-router-dom";
 import { QuizLocationProvider, QuizServiceProvider } from "@/context/QuizLocationContext";
 import {
-  MapPin, Star, MessageCircle, ArrowRight, AlertTriangle,
+  MapPin, Star, ArrowRight, AlertTriangle,
 } from "lucide-react";
 import Header from "@/components/Header";
 import PageBreadcrumb from "@/components/PageBreadcrumb";
 import HeroBeforeAfterPool from "@/components/HeroBeforeAfterPool";
 import { categoryForServiceSlug } from "@/data/beforeAfterPool";
 import Footer from "@/components/Footer";
-import QuizButton from "@/components/QuizButton";
 import SectionHeader from "@/components/SectionHeader";
 import ServiceFAQ from "@/components/ServiceFAQ";
 import ServicePriceSection from "@/components/ServicePriceSection";
@@ -25,7 +25,6 @@ import { SERVICE_TO_QUIZ } from "@/constants/serviceToQuiz";
 import { METRO_CITY_SLUGS } from "@/constants/metroCities";
 import { getAllProblemCityRoutes } from "@/data/problemCitySeoData";
 import { getProblemHeroImage } from "@/lib/problemHeroImages";
-import { trackWhatsAppClick } from "@/lib/quizTracking";
 import { SITE_URL, WHATSAPP_BASE } from "@/constants/business";
 import ServiceReviewsGrid from "@/components/ServiceReviewsGrid";
 
@@ -36,14 +35,6 @@ const PROCESS_STEPS = [
   { title: "Extração",                body: "Extração profissional a alta temperatura remove resíduos e sujidade das camadas mais profundas das fibras." },
 ];
 
-
-function getProblemWaBtnLabel(slug: string): string {
-  const s = slug ?? '';
-  if (s.includes('urgente')) return 'Contactar agora';
-  if (s.includes('impermeabiliz')) return 'Impermeabilizar agora';
-  if (s.includes('preco') || s.includes('custa')) return 'Pedir orçamento';
-  return 'Falar agora';
-}
 
 const ProblemCityPage = () => {
   const { pathname } = useLocation();
@@ -170,29 +161,7 @@ const ProblemCityPage = () => {
                 </p>
 
 
-                <div className="flex flex-col sm:flex-row gap-3 max-w-md">
-                  <QuizButton
-                    className="flex-1"
-                    initialLocation={city.name}
-                    initialService={quizService}
-                    buttonClassName="h-[58px] md:h-[52px] !py-0 w-full"
-                  />
-                  <div className="relative group flex-1">
-                    <div className="absolute -inset-1.5 bg-[#25D366]/40 opacity-30 blur-lg group-hover:opacity-55 transition-opacity duration-400 pointer-events-none" />
-                    <a
-                      href={waHref}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      onClick={() => trackWhatsAppClick(`problem_city_hero_${problem.slug}_${city.slug}`)}
-                      className="relative flex items-center justify-center gap-2 w-full h-[58px] md:h-[52px] px-6 font-bold text-white touch-manipulation bg-gradient-to-r from-[#1DA851] via-[#25D366] to-[#1DA851] shadow-[0_6px_22px_rgba(37,211,102,0.42),0_2px_6px_rgba(0,0,0,0.28),inset_0_1px_0_rgba(255,255,255,0.20),inset_0_-2px_0_rgba(0,0,0,0.12)] hover:shadow-[0_10px_32px_rgba(37,211,102,0.60),0_4px_10px_rgba(0,0,0,0.32)] hover:scale-[1.025] active:scale-[0.95] transition-all duration-150"
-                    >
-                      <MessageCircle className="w-[18px] h-[18px] flex-shrink-0" strokeWidth={2} />
-                      <span className="text-[13px] font-semibold tracking-[0.18em] uppercase">{getProblemWaBtnLabel(problem.slug)}</span>
-                    </a>
-                  </div>
-                </div>
-
-                <p className="text-white/40 text-xs mt-4">{/^\d/.test(servicePrice) ? `Desde ${servicePrice} · ` : ''}Orçamento gratuito · Sem compromisso</p>
+                <SofaLeadActions city={city.name} price={servicePrice} href={waHref} source={`problem_city_hero_${problem.slug}_${city.slug}`} />
               </div>
 
               <div className="mt-8 lg:mt-0">
