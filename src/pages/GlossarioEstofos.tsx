@@ -112,7 +112,7 @@ const terms: Term[] = [
   {
     id: "tapete-vs-alcatifa",
     term: "Tapete vs Alcatifa: Diferença e Limpeza",
-    definition: "Tapete é uma peça solta com dimensões definidas que pode ser movida e transportada. Inclui tapetes de sala, quarto, persas, kilim e sisal. Alcatifa é um revestimento de piso fixo ou semi-fixo que cobre toda a área de uma divisão e não é removível sem intervenção. Do ponto de vista de limpeza, a distinção é técnica: tapetes avulsos podem ser limpos ao domicílio por extração a vapor ou recolhidos para lavagem nas instalações, acedendo ao anverso e reverso. Alcatifas são sempre tratadas no local por extração a vapor sem remoção. Os preços são calculados por metro quadrado em ambos os casos.",
+    definition: "Tapete é uma peça solta com dimensões definidas que pode ser movida e transportada. Inclui tapetes de sala, quarto, persas, kilim e sisal. Alcatifa é um revestimento de piso fixo ou semi-fixo que cobre toda a área de uma divisão e não é removível sem intervenção. Do ponto de vista de limpeza, a distinção é técnica: tapetes avulsos podem ser limpos ao domicílio por extração a vapor ou recolhidos para lavagem nas instalações, acedendo ao anverso e reverso. Alcatifas são sempre tratadas no local por extração a vapor sem remoção. Tapetes e alcatifas são sempre sob orçamento, mediante a largura e o comprimento de cada peça ou área e a avaliação do seu estado.",
     example: "Tapete persa de 6 m² na sala de jantar: tratado ao domicílio por extração. Alcatifa de quarto de 15 m²: limpa no local sem qualquer remoção, com equipamento profissional transportado pelo técnico.",
     serviceLink: { label: "Limpeza de Tapetes e Alcatifas", to: "/limpeza-tapetes" },
   },
