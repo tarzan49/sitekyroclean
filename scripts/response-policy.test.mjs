@@ -1,4 +1,4 @@
-import { test } from 'node:test';
+import { test } from 'vitest';
 import assert from 'node:assert/strict';
 import { hasOldResponsePromise } from './response-policy.mjs';
 for (const value of ['Resposta em menos de 30 minutos', '<strong>30min</strong><span>Resposta ao pedido</span>', 'Respondemos em menos de\n<strong>30</strong> minutos', 'Reply within thirty minutes', 'Resposta em menos de 30&nbsp;minutos', 'Resposta em menos de 30min']) {
