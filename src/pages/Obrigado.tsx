@@ -166,7 +166,7 @@ const Obrigado = () => {
                 {/* Total */}
                 <div className="flex flex-col items-start gap-3 px-5 py-4 sm:flex-row sm:justify-between">
                   <div>
-                    <span className="text-sm font-black text-white uppercase tracking-wide">Total Estimado</span>
+                    <span className="text-sm font-black text-white uppercase tracking-wide">{isSobOrcamento ? 'Subtotal conhecido' : 'Total estimado'}</span>
                     <p className="text-[9px] text-white/25 uppercase tracking-wide mt-0.5">Sujeito a confirmação</p>
                   </div>
                   <span className="font-playfair text-2xl font-bold text-gold tabular-nums">

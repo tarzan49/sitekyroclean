@@ -121,7 +121,7 @@ const QuizForm = ({
     serviceType: initialServiceType
       || ((initialService && initialService !== 'sofa' && initialService !== 'chairs') ? 'cleaning' : ''),
     carpetArea: initialCarpetArea || '',
-    carpetKind: initialCarpetKind ?? 'tapete',
+    carpetKind: initialCarpetKind ?? (initialService === 'carpet' && window.location.pathname.includes('alcatifa') ? 'alcatifa' : 'tapete'),
     description: problema ? `Problema indicado: ${problema.replace(/-/g, ' ')}` : '',
     chairQuantity: initialChairQty || '',
     chairType: initialChairQty ? 'bulk_full' : '',
@@ -746,7 +746,7 @@ ${formData.description || 'Sem observações adicionais'}
                     // existe como serviço primário, só como upsell dependente de uma
                     // limpeza — ver shouldSkipServiceType acima para mais contexto.
                     const skipServiceType = service === 'carpet' || service === 'mattress';
-                    updateFormData({ service, serviceType: skipServiceType ? 'cleaning' : '', sofaSize: '', mattressSize: '', chairType: '', carpetArea: '', chairWaterproofing: false, chairWaterproofQty: 0, chairAntiAcaros: false });
+                    updateFormData({ service, carpetKind: 'tapete', serviceType: skipServiceType ? 'cleaning' : '', sofaSize: '', mattressSize: '', chairType: '', carpetArea: '', chairWaterproofing: false, chairWaterproofQty: 0, chairAntiAcaros: false });
                     setSofaItems([]);
                     setMattressItems([]);
                     setCarpetItems(buildInitialCarpetItems());

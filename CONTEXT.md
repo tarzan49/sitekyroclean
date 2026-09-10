@@ -1072,3 +1072,12 @@ Apenas em desenvolvimento, `?teste=quiz-pack` mantém o fluxo real do `QuizForm`
 
 
 Atualização do teste local (2026-09-10): `?teste=quiz-pack` agora demonstra colchão casal a +55€, sem acumular desconto de 10%. Compara com limpeza individual (69€ da tabela) + deslocação da localidade, explicitamente uma visita separada. Lisboa: 79€ separado vs +55€ na visita existente, poupança24€, sofá79€ + deslocação10€ + extra55€ =144€. Substitui a proposta anterior de143,20€ neste modo; produção inalterada.
+
+
+## Auditoria Formspree e WhatsApp (2026-09-10)
+
+`submissionService.buildReceiptLines` é a fonte partilhada do detalhe, resumo pré-envio e recibo; `formatQuotePrice` distingue subtotal conhecido de serviços sob orçamento. WhatsApp reutiliza a mensagem do Formspree, acrescentando nome, telefone e a mesma referência. O Formspree recebe também `booking_id`. O recibo só é persistido após sucesso de pelo menos um canal (ou simulação local). Erros devolvidos pelo Supabase são tratados como falha.
+
+`carpetKind` distingue alcatifa de tapete nas entradas do widget e ServiceHero. As medidas individuais seguem em todos os resumos. `carpetAllItemsValid` bloqueia peças incompletas; `carpetHasValidItems` continua a identificar qualquer peça válida para sinalizar orçamento. Extras sobrevivem ao regresso a etapas anteriores; tratamentos importados não são descartados nem convertidos em limpeza. O desconto do quiz/widget exige dois artigos tabelados, acima de149€, de acordo com as regras comerciais prioritárias.
+
+Cobertura e limites: `AUDITORIA-FORMSPREE-WHATSAPP-2026-09-10.md`. Os testes de serviços intercetam a rede; não provam receção na conta Formspree nem entrega de email.
