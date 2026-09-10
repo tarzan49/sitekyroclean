@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useId, useState } from "react";
 import { Plus, Minus } from "lucide-react";
 import ServiceFAQSchema from "@/components/ServiceFAQSchema";
 
@@ -21,6 +21,7 @@ const ServiceFAQ = ({
   variant = "light",
 }: ServiceFAQProps) => {
   const [open, setOpen] = useState<number | null>(0);
+  const id = useId();
   const light = variant === "light";
 
   const words = heading.trim().split(" ");
@@ -44,28 +45,31 @@ const ServiceFAQ = ({
             {restHeading}{" "}
             <em className="not-italic" style={{ color: '#D4AF37' }}>{goldWord}</em>
           </h2>
+          <p className={`text-sm mt-4 leading-relaxed ${light ? 'text-[#536259]' : 'text-white/65'}`}>Preços, cuidados e o que esperar da visita. Toque numa pergunta para ver a resposta.</p>
         </div>
 
         {/* FAQ items */}
-        <div className="max-w-3xl">
+        <div className="max-w-3xl space-y-3">
           {faqs.map((faq, idx) => {
             const isOpen = open === idx;
             return (
               <div
                 key={idx}
-                className="border-b"
-                style={{ borderColor: light ? "#E8E4DE" : "rgba(255,255,255,0.08)" }}
+                className="border rounded-sm overflow-hidden transition-colors duration-300"
+                style={{ borderColor: isOpen ? 'rgba(212,175,55,0.6)' : light ? '#E1E5DE' : 'rgba(255,255,255,0.16)', background: isOpen ? (light ? '#f6f3e9' : '#183528') : light ? '#ffffff' : 'rgba(255,255,255,0.025)' }}
               >
                 <button
                   type="button"
                   onClick={() => setOpen(isOpen ? null : idx)}
-                  className="w-full flex items-start gap-4 py-5 md:py-6 text-left group"
+                  className="w-full flex items-start gap-3 p-4 sm:p-5 text-left group min-h-[72px] focus-visible:outline focus-visible:outline-2 focus-visible:outline-inset focus-visible:outline-gold"
                   aria-expanded={isOpen}
+                  aria-controls={`${id}-answer-${idx}`}
+                  id={`${id}-question-${idx}`}
                 >
                   {/* Number */}
                   <span
                     className="font-playfair font-bold text-[11px] tracking-[0.18em] flex-shrink-0 mt-[3px] select-none"
-                    style={{ color: isOpen ? "#D4AF37" : "rgba(212,175,55,0.35)", transition: "color 0.2s" }}
+                    style={{ color: isOpen ? "#D4AF37" : "#a9904e", transition: "color 0.2s" }}
                   >
                     {String(idx + 1).padStart(2, "0")}
                   </span>
@@ -84,8 +88,8 @@ const ServiceFAQ = ({
 
                   {/* Icon */}
                   <span
-                    className="flex-shrink-0 mt-[2px] ml-2"
-                    style={{ color: isOpen ? "#D4AF37" : light ? "rgba(17,17,17,0.3)" : "rgba(255,255,255,0.3)", transition: "color 0.2s" }}
+                    className="flex-shrink-0 w-7 h-7 border border-current/20 flex items-center justify-center rounded-full"
+                    style={{ color: isOpen ? "#D4AF37" : light ? "rgba(17,17,17,0.3)" : "rgba(255,255,255,0.65)", transition: "color 0.2s" }}
                   >
                     {isOpen
                       ? <Minus className="w-4 h-4" />
@@ -95,19 +99,16 @@ const ServiceFAQ = ({
                 </button>
 
                 {/* Answer */}
-                <div
-                  className="overflow-hidden"
-                  style={{
-                    maxHeight: isOpen ? "600px" : "0px",
-                    transition: "max-height 0.35s cubic-bezier(0.4,0,0.2,1)",
-                  }}
-                >
-                  <p
-                    className="pl-9 pb-6 leading-relaxed"
-                    style={{ fontSize: "14px", color: light ? "rgba(17,17,17,0.55)" : "rgba(255,255,255,0.6)" }}
-                  >
-                    {faq.answer}
-                  </p>
+                <div id={`${id}-answer-${idx}`} role="region" aria-labelledby={`${id}-question-${idx}`} aria-hidden={!isOpen}
+                  className="grid transition-[grid-template-rows,opacity] duration-300 motion-reduce:transition-none"
+                  style={{ gridTemplateRows: isOpen ? '1fr' : '0fr', opacity: isOpen ? 1 : 0 }}>
+                  <div className="overflow-hidden min-h-0">
+                    <div className="px-4 sm:px-5 pb-5">
+                      <div className="border-t border-gold/20 pt-4">
+                        <p className="text-sm leading-7" style={{ color: light ? '#47574c' : 'rgba(255,255,255,0.80)' }}>{faq.answer}</p>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             );

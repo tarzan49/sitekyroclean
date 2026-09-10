@@ -1,3 +1,4 @@
+import ProblemCarousel from '@/components/ProblemCarousel';
 import SofaLeadActions from "@/components/SofaLeadActions";
 import { AdsLandingHeader, AdsLandingFooter, isAdsVisit } from "@/components/AdsLandingNavigation";
 import { useEffect, useMemo } from "react";
@@ -366,7 +367,7 @@ const LocationServicePage = () => {
               <p className="-mt-5 mb-7 max-w-xl text-sm sm:text-base leading-relaxed text-[#536259]">
                 Reconhece algum destes sinais? Peça uma avaliação e descubra o tratamento adequado ao seu caso.
               </p>
-              <div className="flex gap-4 overflow-x-auto snap-x snap-mandatory scroll-px-5 -mx-5 px-5 pb-4 md:mx-0 md:px-0 md:overflow-visible md:grid md:grid-cols-2 md:gap-6" aria-label="Problemas e tratamentos">
+              <ProblemCarousel>
                 {problemCards.map((card, idx) => (
                   <article key={card.title} className="snap-start flex-none w-[84vw] max-w-[380px] md:max-w-none md:w-auto overflow-hidden rounded-sm border border-[#183b2c]/15 bg-[#0c241a] group flex flex-col shadow-[0_8px_24px_rgba(7,26,18,0.10)]">
                     <div className="relative h-[185px] sm:h-[220px] overflow-hidden">
@@ -387,10 +388,7 @@ const LocationServicePage = () => {
                     </div>
                   </article>
                 ))}
-              </div>
-              <p className="flex items-center justify-center gap-2 text-xs text-[#536259] mt-3 md:hidden">
-                Deslize para explorar os {problemCards.length} problemas <ArrowRight className="w-4 h-4" />
-              </p>
+              </ProblemCarousel>
             </div>
           </section>
         )}
