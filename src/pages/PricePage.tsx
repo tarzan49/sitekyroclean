@@ -82,7 +82,7 @@ const PricePage = () => {
   const waHref = `${WHATSAPP_BASE}?text=${encodeURIComponent(buildServiceWaMessage(data.serviceSlug, data.cityName))}`;
   const gallery = getServiceGallery(data.serviceSlug, data.citySlug);
 
-  const serviceDuration = SERVICE_DURATION[data.serviceSlug] ?? { value: "4-6h", label: "Pronto a usar" };
+  const serviceDuration = SERVICE_DURATION[data.serviceSlug] ?? { value: "3 a 6h", label: "Pronto a usar" };
   // Conteúdo revisto 2026-09-09 (pedido explícito): 1º bloco passou a mostrar
   // a nota real do Google (antes tinha "5.0 ★" fixo, agora usa REVIEW_RATING/
   // REVIEW_COUNT, a fonte única) em vez de duplicar os pills que já apareciam

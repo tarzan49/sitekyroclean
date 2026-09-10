@@ -1,3 +1,4 @@
+import { SATISFACTION_PROMISE } from '../constants/commercialPolicy';
 import Header from "@/components/Header";
 import { QuizServiceProvider } from "@/context/QuizLocationContext";
 import Footer from "@/components/Footer";
@@ -19,7 +20,7 @@ const alcatifasGuarantee: GuaranteeItem[] = [
   {
     label: "Satisfação",
     title: "Higiene uniforme ou repetimos",
-    body: "Garantimos cobertura total sem zonas esquecidas. Se alguma área ficar abaixo do esperado, voltamos e tratamos sem qualquer custo adicional.",
+    body: SATISFACTION_PROMISE,
     image: "/images/alcatifas/v3.webp",
   },
   {
@@ -103,9 +104,9 @@ const LimpezaAlcatifas = () => {
           url="/limpeza-alcatifas"
           priceFrom="Sob orçamento"
           reviews={[
-            { author: "Carlos M.", city: "Braga", text: "Serviço de excelência! A alcatifa do escritório ficou impecável. Profissionais muito competentes e pontuais.", date: "2025-01-20" },
-            { author: "António F.", city: "Vila do Conde", text: "Trabalho cinco estrelas! Limparam todo o recheio do AL e os hóspedes notaram logo a diferença. Obrigado!", date: "2025-03-01" },
-            { author: "Catarina L.", city: "Viana do Castelo", text: "A alcatifa da escada estava muito suja e ficou impecável. Equipa super simpática e profissional.", date: "2025-04-08" },
+            { author: "Carlos M.", city: "", text: "Serviço de excelência! A alcatifa do escritório ficou impecável. Profissionais muito competentes e pontuais.", date: "2025-01-20" },
+            { author: "António F.", city: "", text: "Trabalho cinco estrelas! Limparam todo o recheio do AL e os hóspedes notaram logo a diferença. Obrigado!", date: "2025-03-01" },
+            { author: "Catarina L.", city: "", text: "A alcatifa da escada estava muito suja e ficou impecável. Equipa super simpática e profissional.", date: "2025-04-08" },
           ]}
         />
       </main>

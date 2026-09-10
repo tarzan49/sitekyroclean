@@ -133,7 +133,7 @@ const FreguesiaServicePage = () => {
     ? data.service.replace("Limpeza de ", "").toLowerCase()
     : data.service.toLowerCase();
 
-  const serviceDuration = SERVICE_DURATION[data.serviceSlug] ?? { value: "4-6h", label: "Pronto a usar" };
+  const serviceDuration = SERVICE_DURATION[data.serviceSlug] ?? { value: "3 a 6h", label: "Pronto a usar" };
   // Conteúdo revisto 2026-09-09 (pedido explícito): 1º bloco passou a mostrar
   // a nota real do Google (antes tinha "5.0 ★" fixo, agora usa REVIEW_RATING/
   // REVIEW_COUNT, a fonte única) em vez de duplicar os pills que já apareciam
@@ -301,7 +301,7 @@ const FreguesiaServicePage = () => {
                       ? `Orçamento à medida de cada tapete. Deslocação +${locationPrices[data.municipio] ?? 10}€ a ${data.municipio}. Sem surpresas, sem custos escondidos.`
                       : data.serviceSlug === 'limpeza-alcatifas'
                       ? `Orçamento à medida de cada espaço. Deslocação +${locationPrices[data.municipio] ?? 10}€ a ${data.municipio}. Sem preço fixo por m², sem surpresas.`
-                      : `Preços fixos e transparentes, sem surpresas. Deslocação +${locationPrices[data.municipio] ?? 10}€ a ${data.municipio}. Orçamento gratuito antes de qualquer compromisso.`}
+                      : `Estimativa confirmada antes da marcação. Deslocação +${locationPrices[data.municipio] ?? 10}€ a ${data.municipio}. Orçamento gratuito antes de qualquer compromisso.`}
                   />
                   <div className="hidden md:block">
                     <ServiceTrustDesktop serviceSlug={data.serviceSlug} variant={2} seedKey={`${data.municipio}-${data.name}`} />

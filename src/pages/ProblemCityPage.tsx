@@ -61,7 +61,7 @@ const ProblemCityPage = () => {
       const prep = cityPrep(city.name);
       const title = `${problem.h1} ${prep} ${city.name} | Kyro Clean Solutions`;
       document.title = title;
-      const metaDesc = `${problem.h1} ${prep} ${city.name}: serviço profissional ao domicílio. ${problem.metaDescription.split('.')[0]}. Orçamento grátis em menos de 30 minutos.`;
+      const metaDesc = `${problem.h1} ${prep} ${city.name}: serviço profissional ao domicílio. ${problem.metaDescription.split('.')[0]}. Orçamento grátis em menos de 10 minutos.`;
       const desc = document.querySelector('meta[name="description"]');
       if (desc) desc.setAttribute("content", metaDesc);
       const ogTitle = document.querySelector('meta[property="og:title"]');

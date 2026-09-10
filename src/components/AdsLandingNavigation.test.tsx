@@ -12,11 +12,11 @@ describe('ads landing entry and sofa information', () => {
   it('uses consistent drying information and explicit pricing conditions in both cities', () => {
     for (const city of ['porto', 'lisboa']) {
       const hygiene = getKeywordVariantData('higienizacao', 'sofa', city)!;
-      expect(hygiene.faqs[0].answer).toContain('4 a 6 horas');
+      expect(hygiene.faqs[0].answer).toContain('3 a 6 horas');
       expect(JSON.stringify(hygiene)).not.toMatch(/99%|100%|sanitização certificada|2 a 4 horas/);
       const cleaning = getLocationServiceData('limpeza-sofas', city)!;
       expect(cleaning.faqs[0].answer).toContain('deslocação é cobrada à parte');
-      expect(cleaning.faqs[1].answer).toContain('4 a 6 horas');
+      expect(cleaning.faqs[1].answer).toContain('3 a 6 horas');
     }
   });
 });

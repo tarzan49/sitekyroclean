@@ -15,7 +15,8 @@ const ServiceCityLinks = ({ serviceSlug, serviceLabel }: Props) => {
   const normalize = (value: string) => value.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLocaleLowerCase("pt-PT").trim();
   const search = normalize(query);
   const regions = [
-    { area: "porto", label: "Porto e Norte", hint: "Grande Porto, Braga e Minho" },
+    { area: "porto", label: "Porto", hint: "Grande Porto e concelhos próximos" },
+    { area: "braga", label: "Braga e Minho", hint: "Braga, Viana do Castelo e concelhos próximos" },
     { area: "lisboa", label: "Lisboa e Margem Sul", hint: "Lisboa, Cascais, Sintra e Setúbal" },
     { area: "algarve", label: "Algarve", hint: "De Aljezur a Vila Real de Santo António" },
   ].map(region => ({

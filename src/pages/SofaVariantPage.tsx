@@ -259,15 +259,15 @@ const SofaVariantPage = () => {
   // sofa/colchão/etc (mesma condição já usada acima para beforeAfterCategory)
   // — a duração real é a da impermeabilização nesse caso, não a da limpeza.
   const durationSlug = parsed?.variantKey === 'impermeabilizacao' ? 'impermeabilizacao' : SERVICEKEY_TO_SLUG[data.serviceKey];
-  const serviceDuration = SERVICE_DURATION[durationSlug] ?? { value: "4-6h", label: "Pronto a usar" };
-  // Resposta alinhada com o orçamento: menos de 30 minutos no horário de atendimento.
+  const serviceDuration = SERVICE_DURATION[durationSlug] ?? { value: "3 a 6h", label: "Pronto a usar" };
+  // Resposta alinhada com o orçamento: menos de 10 minutos no horário de atendimento.
   const snapshotStats = [
     { value: `${REVIEW_RATING}★`, label: `+${REVIEW_COUNT} avaliações Google`, icon: GoogleG },
     (data.serviceKey === 'tapetes' || data.serviceKey === 'alcatifas')
       ? { value: "Á Medida", label: `Orçamento, ${prep} ${data.locationName.split(',')[0].trim()}`, icon: Euro }
       : { value: data.priceFrom, label: `Desde, ${prep} ${data.locationName.split(',')[0].trim()}`, icon: Euro },
     { value: serviceDuration.value, label: serviceDuration.label, icon: Timer },
-    { value: "<30min", label: "Resposta durante o horário de atendimento", icon: Clock },
+    { value: "<10min", label: "Resposta ao pedido", icon: Clock },
   ];
 
   return (
@@ -288,16 +288,16 @@ const SofaVariantPage = () => {
         <section className="relative pt-6 md:pt-16 lg:pt-20 pb-8 md:pb-16">
           <div className="container mx-auto px-5 sm:px-6 lg:px-8 relative z-10">
             <div className="max-w-6xl mx-auto grid lg:grid-cols-2 gap-4 lg:gap-12 items-center">
-                {!isPaidLanding && <>
               <div>
+                {!isPaidLanding && <>
                 <nav className="flex items-center gap-1.5 text-xs text-white/50 mb-6 flex-wrap" aria-label="Breadcrumb">
                   <Link to="/" className="hover:text-white/80 transition-colors">Início</Link>
                   <span>/</span>
                   <Link to={data.canonical} className="hover:text-white/80 transition-colors">{data.locationName}</Link>
                   <span>/</span>
                   <span className="text-white/70">{variantLabel}</span>
-                </>}
                 </nav>
+                </>}
 
                 <div className="inline-flex items-start mb-3 lg:mb-5">
                   <div className="flex flex-col gap-1">
@@ -485,7 +485,7 @@ const SofaVariantPage = () => {
             {/* 3 stats */}
             <div className="grid grid-cols-3 gap-px mb-10" style={{ backgroundColor: "rgba(255,255,255,0.06)" }}>
               {[
-                { stat: "< 30 min", label: "Resposta ao orçamento" },
+                { stat: "< 10 min", label: "Resposta ao orçamento" },
                 { stat: `${REVIEW_RATING} ★`, label: `+${REVIEW_COUNT} avaliações Google` },
                 { stat: "Por foto", label: "Avaliação prévia das manchas" },
               ].map((item, i) => (
@@ -659,12 +659,12 @@ const SofaVariantPage = () => {
                   </Link>
                 </div>
               </div>
-        </>}
 
             </div>
           </div>
         </section>
 
+        </>}
       </main>
       {isPaidLanding ? <AdsLandingFooter /> : <Footer />}
     </>

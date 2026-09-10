@@ -151,15 +151,15 @@ const LocationServicePage = () => {
   // "Porto" takes the definite article ("no Porto"); every other city in our list reads naturally with "em"
   const cityPrep = data.citySlug === 'porto' ? 'no' : 'em';
 
-  const serviceDuration = SERVICE_DURATION[data.serviceSlug] ?? { value: "4-6h", label: "Pronto a usar" };
-  // Resposta alinhada com o orçamento: menos de 30 minutos no horário de atendimento.
+  const serviceDuration = SERVICE_DURATION[data.serviceSlug] ?? { value: "3 a 6h", label: "Pronto a usar" };
+  // Resposta alinhada com o orçamento: menos de 10 minutos no horário de atendimento.
   const snapshotStats = [
     { value: `${REVIEW_RATING}★`, label: `+${REVIEW_COUNT} avaliações Google`, icon: GoogleG },
     (data.serviceSlug === 'limpeza-tapetes' || data.serviceSlug === 'limpeza-alcatifas')
       ? { value: "Á Medida", label: `Orçamento, ${cityPrep} ${data.city}`, icon: Euro }
       : { value: data.priceFrom, label: `Desde, ${cityPrep} ${data.city}`, icon: Euro },
     { value: serviceDuration.value, label: serviceDuration.label, icon: Timer },
-    { value: "<30min", label: "Resposta durante o horário de atendimento", icon: Clock },
+    { value: "<10min", label: "Resposta ao pedido", icon: Clock },
   ];
 
   const processSteps = data.serviceSlug === 'impermeabilizacao' ? IMPERMEABILIZACAO_STEPS : GENERIC_PROCESS_STEPS;
@@ -239,6 +239,7 @@ const LocationServicePage = () => {
                   {isSofaCleaning ? "Limpeza ao domicílio por extração profunda. Consulte os preços por tamanho e envie uma foto para avaliarmos as manchas." : (data.intro.match(/^[^.?]*[.?]/)?.[0] ?? data.intro)}
                 </p>
 
+                {isSofaCleaning ? <SofaLeadActions city={data.city} price={data.priceFrom} href={waUrl} source={`location_hero_${data.serviceSlug}_${data.citySlug}`} /> : <>
                 <div className="lg:mb-6">
                   <TrustRatingBadge variant="mapsLinkClients" />
                 </div>
@@ -254,13 +255,11 @@ const LocationServicePage = () => {
                   />
                   <div className="relative group flex-1">
                     <div className="absolute -inset-1.5 bg-[#25D366]/40 opacity-30 blur-lg group-hover:opacity-55 transition-opacity duration-400 pointer-events-none" />
-                {!isPaidLanding && <>
                     <a
                       href={waUrl}
                       target="_blank"
                       rel="noopener noreferrer"
                       onClick={() => trackWhatsAppClick(`location_hero_${data.serviceSlug}_${data.citySlug}`)}
-                </>}
                       className="relative flex items-center justify-center gap-2 w-full h-[58px] md:h-[52px] px-6 font-bold text-white touch-manipulation bg-gradient-to-r from-[#1DA851] via-[#25D366] to-[#1DA851] shadow-[0_6px_22px_rgba(37,211,102,0.42),0_2px_6px_rgba(0,0,0,0.28),inset_0_1px_0_rgba(255,255,255,0.20),inset_0_-2px_0_rgba(0,0,0,0.12)] hover:shadow-[0_10px_32px_rgba(37,211,102,0.60),0_4px_10px_rgba(0,0,0,0.32)] hover:scale-[1.025] active:scale-[0.95] transition-all duration-150"
                     >
                       <MessageCircle className="w-[18px] h-[18px] flex-shrink-0" strokeWidth={2} />
@@ -292,7 +291,6 @@ const LocationServicePage = () => {
                         loading="eager"
                       />
                     </picture>
-                {isSofaCleaning ? <SofaLeadActions city={data.city} price={data.priceFrom} href={waUrl} source={`location_hero_${data.serviceSlug}_${data.citySlug}`} /> : <>
                   )}
                 </div>
               </div>
@@ -317,7 +315,7 @@ const LocationServicePage = () => {
                       ? `Orçamento à medida de cada tapete. Deslocação +${locationPrices[data.city] ?? 10}€ a ${data.city}. Sem surpresas, sem custos escondidos.`
                       : data.serviceSlug === 'limpeza-alcatifas'
                       ? `Orçamento à medida de cada espaço. Deslocação +${locationPrices[data.city] ?? 10}€ a ${data.city}. Sem preço fixo por m², sem surpresas.`
-                      : `Preços fixos e transparentes, sem surpresas. Deslocação +${locationPrices[data.city] ?? 10}€ a ${data.city}. Orçamento gratuito antes de qualquer compromisso.`}
+                      : `Estimativa confirmada antes da marcação. Deslocação +${locationPrices[data.city] ?? 10}€ a ${data.city}. Orçamento gratuito antes de qualquer compromisso.`}
                   />
                   {/* Trust facts — desktop only (variante 1) */}
                   <div className="hidden md:block">
@@ -468,6 +466,7 @@ const LocationServicePage = () => {
           </div>
         </section>
 
+        {isPaidLanding ? <section className="p-6 text-center bg-white"><h2 className="font-playfair text-xl mb-2">Serviço ao domicílio</h2><p>Atendimento em {data.city}. Envie a sua morada por WhatsApp para confirmar cobertura e deslocação.</p></section> : <>
         {/* ═══ PACKS ═══ */}
         <ServicePackBanner
           packSlugs={SERVICE_PACK_SLUGS[data.serviceSlug] ?? ["pack-sala-completa"]}
@@ -487,7 +486,6 @@ const LocationServicePage = () => {
 
             <div className="grid md:grid-cols-2 gap-4">
               {cityFreguesias && cityFreguesias.freguesias.length > 0 && (
-        {isPaidLanding ? <section className="p-6 text-center bg-white"><h2 className="font-playfair text-xl mb-2">Serviço ao domicílio</h2><p>Atendimento em {data.city}. Envie a sua morada por WhatsApp para confirmar cobertura e deslocação.</p></section> : <>
                 <div className="p-5 rounded-xl bg-white" style={{ border: "1px solid rgba(17,17,17,0.08)", boxShadow: "0 4px 16px rgba(7,26,18,0.04)" }}>
                   <p className="text-[10px] font-bold tracking-[0.26em] uppercase mb-3" style={{ color: "#D4AF37" }}>Zonas {cityPrep} {data.city}</p>
                   <div className="flex flex-wrap gap-2">
@@ -625,6 +623,7 @@ const LocationServicePage = () => {
           </div>
         </section>
 
+        </>}
       </main>
       {isPaidLanding ? <AdsLandingFooter /> : <Footer />}
     </QuizServiceProvider>
@@ -633,4 +632,3 @@ const LocationServicePage = () => {
 };
 
 export default LocationServicePage;
-        </>}

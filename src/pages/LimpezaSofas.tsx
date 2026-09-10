@@ -1,3 +1,4 @@
+import { SATISFACTION_PROMISE } from '../constants/commercialPolicy';
 import Header from "@/components/Header";
 import { QuizServiceProvider } from "@/context/QuizLocationContext";
 import Footer from "@/components/Footer";
@@ -20,7 +21,7 @@ const sofaGuarantee: GuaranteeItem[] = [
   {
     label: "Satisfação",
     title: "100% ou repetimos",
-    body: "Se o resultado não corresponder às expectativas, voltamos sem custo adicional. Garantia válida para qualquer tipo de tecido, sem exceções.",
+    body: SATISFACTION_PROMISE,
     image: "/images/guarantee/sofa-tecido.webp",
   },
   {
@@ -31,7 +32,7 @@ const sofaGuarantee: GuaranteeItem[] = [
   },
   {
     label: "Rapidez",
-    title: "Seco em 2 a 4 horas",
+    title: "Seco em 3 a 6 horas",
     body: "Extração de alta potência reduz a humidade residual ao mínimo. Pode sentar-se no sofá no mesmo dia, sem esperas longas.",
     image: "/images/guarantee/sofa-microfibras.webp",
   },
@@ -63,7 +64,7 @@ const expertTips: ExpertTip[] = [
 const LimpezaSofas = () => {
   const faqs = [
     { question: 'Quanto tempo demora a limpeza de um sofá?', answer: 'A duração depende do tamanho e do estado do sofá, mas, em média, varia entre 45 minutos e 2 horas. Trabalhamos com máquinas de extração profissional, por isso o processo é rápido, mas sem nunca comprometer o detalhe em cada zona do estofos.' },
-    { question: 'O sofá fica muito molhado? Quanto tempo leva a secar?', answer: 'Não. Usamos extração profunda com forte capacidade de sucção, o que retira a maior parte da água usada na limpeza. Em condições normais de ventilação, o sofá fica seco entre 4 e 8 horas. Em dias mais húmidos pode demorar um pouco mais, mas nunca deixamos o tecido encharcado.' },
+    { question: 'O sofá fica muito molhado? Quanto tempo leva a secar?', answer: 'Não. Usamos extração profunda com forte capacidade de sucção, o que retira a maior parte da água usada na limpeza. Em condições normais de ventilação, o sofá fica seco entre 3 a 6 horas. Em dias mais húmidos pode demorar um pouco mais, mas nunca deixamos o tecido encharcado.' },
     { question: 'A limpeza pode danificar o tecido ou desbotar a cor?', answer: 'Pelo contrário: os produtos que utilizamos são específicos para estofos, com pH equilibrado e adequados a cada tipo de tecido. Fazemos sempre uma avaliação prévia e, se necessário, teste numa zona pouco visível. O objetivo é recuperar a cor e a textura original, sem danificar fibras.' },
   ];
 
@@ -104,9 +105,9 @@ const LimpezaSofas = () => {
           url="/limpeza-sofas"
           priceFrom={DEFAULT_PRICE_FROM}
           reviews={[
-            { author: "Maria S.", city: "Porto", text: "Parece novo outra vez. O meu sofá tinha 8 anos e achei que ia ter de comprar um novo. A Kyro Clean Solutions devolveu-lhe a vida!", date: "2025-03-15" },
-            { author: "Rui T.", city: "Espinho", text: "Tinham-me dito que a nódoa de vinho não saía. A Kyro Clean Solutions provou o contrário! Sofá como novo.", date: "2025-04-02" },
-            { author: "Beatriz C.", city: "Oeiras", text: "Serviço rápido e eficiente. O meu sofá de pele ficou perfeito. Voltarei a contratar com certeza!", date: "2025-02-18" },
+            { author: "Maria S.", city: "", text: "Parece novo outra vez. O meu sofá tinha 8 anos e achei que ia ter de comprar um novo. A Kyro Clean Solutions devolveu-lhe a vida!", date: "2025-03-15" },
+            { author: "Rui T.", city: "", text: "Tinham-me dito que a nódoa de vinho não saía. A Kyro Clean Solutions provou o contrário! Sofá como novo.", date: "2025-04-02" },
+            { author: "Beatriz C.", city: "", text: "Serviço rápido e eficiente. O meu sofá de pele ficou perfeito. Voltarei a contratar com certeza!", date: "2025-02-18" },
           ]}
         />
       </main>

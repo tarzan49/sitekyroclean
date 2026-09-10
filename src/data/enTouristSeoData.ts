@@ -76,7 +76,7 @@ export const EN_PAGES: EnPageData[] = [
     faqs: [
       { question: "Can you come today?", answer: "In most cases yes, subject to availability; message us on WhatsApp with a photo of the stain and we'll confirm a time the same day." },
       { question: "Do I need to be there?", answer: "It helps if someone can let the technician in, but we can also coordinate directly with your host or property manager if you're out for the day." },
-      { question: "Will it be dry before I check out?", answer: "Most sofas and rugs are usable again within 2-4 hours thanks to our extraction method, which removes far more moisture than a standard clean." },
+      { question: "Will it be dry before I check out?", answer: "Most sofas and rugs are usable again within 3 to 6 hours depending on ventilation, fabric and room conditions." },
     ],
   },
   {
@@ -102,7 +102,7 @@ export const EN_PAGES: EnPageData[] = [
       "4.9★ on Google, 100+ verified reviews",
     ],
     faqs: [
-      { question: "How quickly can you get here?", answer: "Usually within a few hours of confirming, depending on our schedule that day; message us with your location and the sooner the better." },
+      { question: "How quickly can you get here?", answer: "We reply in under 10 minutes. We aim for same-day or next-day service, subject to availability confirmed by the team." },
       { question: "Do you work with holiday rental hosts directly?", answer: "Yes, we regularly coordinate directly with hosts and property managers, not just guests." },
       { question: "Is it expensive?", answer: "Pricing depends on the item and size, and we always confirm the price before starting; no surprises at the end." },
     ],
@@ -216,7 +216,7 @@ export const EN_PAGES: EnPageData[] = [
     ],
     faqs: [
       { question: "Can you come today?", answer: "In most cases yes; message us on WhatsApp with a photo of the stain and your address, and we'll confirm a time." },
-      { question: "Will it be dry before I check out?", answer: "Most sofas and rugs are usable again within 2-4 hours thanks to our extraction method." },
+      { question: "Will it be dry before I check out?", answer: "Most sofas and rugs are usable again within 3 to 6 hours depending on ventilation, fabric and room conditions." },
     ],
   },
   {
@@ -241,7 +241,7 @@ export const EN_PAGES: EnPageData[] = [
       "4.9★ on Google, 100+ verified reviews",
     ],
     faqs: [
-      { question: "How quickly can you get here?", answer: "Usually within a few hours of confirming; message us with your location as soon as possible." },
+      { question: "How quickly can you get here?", answer: "We reply in under 10 minutes. We aim for same-day or next-day service, subject to availability confirmed by the team." },
       { question: "Is it expensive?", answer: "We always confirm the price before starting, based on the item and size; no surprises." },
     ],
   },
@@ -268,7 +268,7 @@ export const EN_PAGES: EnPageData[] = [
       "4.9★ on Google, 100+ verified reviews",
     ],
     faqs: [
-      { question: "How quickly can you get here?", answer: "Usually within a few hours of confirming; message us with your location as soon as possible." },
+      { question: "How quickly can you get here?", answer: "We reply in under 10 minutes. We aim for same-day or next-day service, subject to availability confirmed by the team." },
       { question: "Is it expensive?", answer: "We always confirm the price before starting, based on the item and size; no surprises." },
     ],
   },
@@ -295,7 +295,7 @@ export const EN_PAGES: EnPageData[] = [
       "4.9★ on Google, 100+ verified reviews",
     ],
     faqs: [
-      { question: "How quickly can you get here?", answer: "Usually within a few hours of confirming; message us with your location as soon as possible." },
+      { question: "How quickly can you get here?", answer: "We reply in under 10 minutes. We aim for same-day or next-day service, subject to availability confirmed by the team." },
       { question: "Is it expensive?", answer: "We always confirm the price before starting, based on the item and size; no surprises." },
     ],
   },
@@ -347,7 +347,7 @@ export const EN_PAGES: EnPageData[] = [
       "4.9★ on Google, 100+ verified reviews",
     ],
     faqs: [
-      { question: "How quickly can you get here?", answer: "Usually within a few hours of confirming; message us with your location as soon as possible." },
+      { question: "How quickly can you get here?", answer: "We reply in under 10 minutes. We aim for same-day or next-day service, subject to availability confirmed by the team." },
       { question: "Is it expensive?", answer: "We always confirm the price before starting, based on the item and size; no surprises." },
     ],
   },
@@ -399,7 +399,7 @@ export const EN_PAGES: EnPageData[] = [
       "4.9★ on Google, 100+ verified reviews",
     ],
     faqs: [
-      { question: "How quickly can you get here?", answer: "Usually within a few hours of confirming; message us with your location as soon as possible." },
+      { question: "How quickly can you get here?", answer: "We reply in under 10 minutes. We aim for same-day or next-day service, subject to availability confirmed by the team." },
       { question: "Is it expensive?", answer: "We always confirm the price before starting, based on the item and size; no surprises." },
     ],
   },
@@ -457,7 +457,7 @@ export const EN_PAGES: EnPageData[] = [
     ],
     faqs: [
       { question: "Can you come today?", answer: "In most cases yes; message us on WhatsApp with a photo of the stain and your address, and we'll confirm a time." },
-      { question: "Will it be dry before I check out?", answer: "Most sofas and rugs are usable again within 2-4 hours thanks to our extraction method." },
+      { question: "Will it be dry before I check out?", answer: "Most sofas and rugs are usable again within 3 to 6 hours depending on ventilation, fabric and room conditions." },
     ],
   },
   {
@@ -482,7 +482,7 @@ export const EN_PAGES: EnPageData[] = [
       "4.9★ on Google, 100+ verified reviews",
     ],
     faqs: [
-      { question: "How quickly can you get here?", answer: "Usually within a few hours of confirming; message us with your location as soon as possible." },
+      { question: "How quickly can you get here?", answer: "We reply in under 10 minutes. We aim for same-day or next-day service, subject to availability confirmed by the team." },
       { question: "Do you cover both sides of the river?", answer: "Yes, we cover Porto, Gaia and the surrounding municípios as one service area." },
     ],
   },
@@ -561,7 +561,7 @@ export const EN_PAGES: EnPageData[] = [
       "4.9★ on Google, 100+ verified reviews",
     ],
     faqs: [
-      { question: "How quickly can you get here?", answer: "Usually within a few hours of confirming; message us with your location as soon as possible." },
+      { question: "How quickly can you get here?", answer: "We reply in under 10 minutes. We aim for same-day or next-day service, subject to availability confirmed by the team." },
       { question: "Is it expensive?", answer: "We always confirm the price before starting, based on the item and size; no surprises." },
     ],
   },
@@ -613,7 +613,7 @@ export const EN_PAGES: EnPageData[] = [
       "4.9★ on Google, 100+ verified reviews",
     ],
     faqs: [
-      { question: "How quickly can you get here?", answer: "Usually within a few hours of confirming; message us with your location as soon as possible." },
+      { question: "How quickly can you get here?", answer: "We reply in under 10 minutes. We aim for same-day or next-day service, subject to availability confirmed by the team." },
       { question: "Is it expensive?", answer: "We always confirm the price before starting, based on the item and size; no surprises." },
     ],
   },
@@ -639,7 +639,7 @@ export const EN_PAGES: EnPageData[] = [
       "4.9★ on Google, 100+ verified reviews",
     ],
     faqs: [
-      { question: "How quickly can you get here?", answer: "Usually within a few hours of confirming; message us with your location as soon as possible." },
+      { question: "How quickly can you get here?", answer: "We reply in under 10 minutes. We aim for same-day or next-day service, subject to availability confirmed by the team." },
       { question: "Is it expensive?", answer: "We always confirm the price before starting, based on the item and size; no surprises." },
     ],
   },

@@ -52,7 +52,7 @@ const materialDefinitions: MaterialDefinition[] = [
     ],
     faqs: [
       { question: "A limpeza profissional é segura para qualquer tecido?", answer: "Sim. Testamos sempre o tecido antes de iniciar e utilizamos produtos específicos para cada tipo de fibra, garantindo uma limpeza segura e eficaz." },
-      { question: "Quanto tempo demora a secagem do sofá em tecido?", answer: "Normalmente entre 4 a 6 horas. Depende do tipo de tecido, ventilação e temperatura ambiente." },
+      { question: "Quanto tempo demora a secagem do sofá em tecido?", answer: "Normalmente entre 3 a 6 horas. Depende do tipo de tecido, ventilação e temperatura ambiente." },
       { question: "A limpeza remove todas as manchas do tecido?", answer: "Na maioria dos casos, sim. Manchas muito antigas ou de tinta permanente podem necessitar de tratamento adicional." },
     ],
     relatedMaterials: ["limpeza-sofa-veludo", "limpeza-sofa-microfibra", "limpeza-sofa-linho"],

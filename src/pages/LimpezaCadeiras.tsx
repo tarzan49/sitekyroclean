@@ -1,3 +1,4 @@
+import { SATISFACTION_PROMISE } from '../constants/commercialPolicy';
 import Header from "@/components/Header";
 import { QuizServiceProvider } from "@/context/QuizLocationContext";
 import Footer from "@/components/Footer";
@@ -20,7 +21,7 @@ const cadeirasGuarantee: GuaranteeItem[] = [
   {
     label: "Satisfação",
     title: "Cadeiras como novas ou voltamos",
-    body: "Se o resultado não for evidente em cada peça, repetimos sem custos adicionais. Sem limitações de tecido nem de quantidade de cadeiras tratadas.",
+    body: SATISFACTION_PROMISE,
     image: cadeiraProcesso,
     mirror: true,
   },
@@ -106,9 +107,9 @@ const LimpezaCadeiras = () => {
           url="/limpeza-cadeiras"
           priceFrom="20€"
           reviews={[
-            { author: "Teresa F.", city: "Lisboa", text: "Adorei o serviço de limpeza das cadeiras da sala de jantar. Ficaram como novas e o atendimento foi excelente.", date: "2025-02-14" },
-            { author: "Helena M.", city: "Ermesinde", text: "As cadeiras do escritório ficaram impecáveis. Equipa pontual e muito profissional. Já agendei para o próximo semestre.", date: "2025-03-20" },
-            { author: "Luís L.", city: "Gondomar", text: "Excelente serviço e profissionais! Deixaram tudo impecável e fizeram o trabalho com cuidado e simpatia.", date: "2025-01-25" },
+            { author: "Teresa F.", city: "", text: "Adorei o serviço de limpeza das cadeiras da sala de jantar. Ficaram como novas e o atendimento foi excelente.", date: "2025-02-14" },
+            { author: "Helena M.", city: "", text: "As cadeiras do escritório ficaram impecáveis. Equipa pontual e muito profissional. Já agendei para o próximo semestre.", date: "2025-03-20" },
+            { author: "Luís L.", city: "", text: "Excelente serviço e profissionais! Deixaram tudo impecável e fizeram o trabalho com cuidado e simpatia.", date: "2025-01-25" },
           ]}
         />
       </main>

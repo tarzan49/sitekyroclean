@@ -1,3 +1,4 @@
+import { SATISFACTION_PROMISE } from '../constants/commercialPolicy';
 import Header from "@/components/Header";
 import { QuizServiceProvider } from "@/context/QuizLocationContext";
 import Footer from "@/components/Footer";
@@ -19,7 +20,7 @@ const tapetesGuarantee: GuaranteeItem[] = [
   {
     label: "Manchas",
     title: "Manchas fora ou voltamos",
-    body: "Garantimos a remoção de manchas tratáveis. Se não for possível, avaliamos sem custo e explicamos com exatidão o que aconteceu e quais as opções.",
+    body: SATISFACTION_PROMISE,
     image: "/images/tapetes/v1.webp",
   },
   {
@@ -103,9 +104,9 @@ const LimpezaTapetes = () => {
           url="/limpeza-tapetes"
           priceFrom="Sob orçamento"
           reviews={[
-            { author: "Sandra V.", city: "Paredes", text: "Fiquei impressionada com a diferença. O tapete da sala recuperou cores que já nem me lembrava que tinha.", date: "2025-02-22" },
-            { author: "Miguel S.", city: "Cascais", text: "Profissionais de confiança! Limparam os tapetes persas antigos com todo o cuidado. Resultado impecável!", date: "2025-03-25" },
-            { author: "Catarina L.", city: "Viana do Castelo", text: "A alcatifa da escada estava muito suja e ficou impecável. Equipa super simpática e profissional.", date: "2025-04-08" },
+            { author: "Sandra V.", city: "", text: "Fiquei impressionada com a diferença. O tapete da sala recuperou cores que já nem me lembrava que tinha.", date: "2025-02-22" },
+            { author: "Miguel S.", city: "", text: "Profissionais de confiança! Limparam os tapetes persas antigos com todo o cuidado. Resultado impecável!", date: "2025-03-25" },
+            { author: "Catarina L.", city: "", text: "A alcatifa da escada estava muito suja e ficou impecável. Equipa super simpática e profissional.", date: "2025-04-08" },
           ]}
         />
       </main>

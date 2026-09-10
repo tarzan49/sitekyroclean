@@ -1,0 +1,4 @@
+import { PRICE_PROMISE, SATISFACTION_PROMISE, DRYING_PROMISE, AVAILABILITY_PROMISE } from '../constants/commercialPolicy';
+export default function BusinessConditions() {
+  return <details className="max-w-7xl mx-auto px-5 py-6 text-sm text-white/75"><summary className="cursor-pointer font-semibold">Condições do serviço e garantia</summary><div className="space-y-3 mt-4 max-w-3xl"><p>{PRICE_PROMISE}</p><p>{SATISFACTION_PROMISE}</p><p>{DRYING_PROMISE}</p><p>{AVAILABILITY_PROMISE}</p><p>Braga: deslocação de 10€ no escalão até 10 km, 15€ até 15 km e 20€ acima, tomando como referência o centro de Braga e a sede da localidade. Barcelos: 20€. A morada concreta é confirmada antes da marcação.</p><p>A limpeza normal não inclui uma garantia de eliminação de ácaros ou bactérias. Anti-ácaros e desbacterização são tratamentos complementares opcionais.</p></div></details>;
+}

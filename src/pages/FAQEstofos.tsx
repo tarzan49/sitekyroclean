@@ -1,3 +1,4 @@
+import { SATISFACTION_PROMISE, COVERAGE_PROMISE, AVAILABILITY_PROMISE, DRYING_PROMISE } from '../constants/commercialPolicy';
 ﻿import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { ChevronDown, ChevronRight, MessageCircle, Phone } from "lucide-react";
@@ -26,20 +27,20 @@ const allFaqs: FAQ[] = [
   {
     id: "preco-sofa-3-lugares",
     question: "Qual o preço para limpar um sofá de 3 lugares?",
-    answer: <>Um <Link to="/limpeza-sofas" className="text-gold hover:underline font-medium">sofá de 3 lugares</Link> custa <strong>79€</strong>, incluindo pré-tratamento de manchas, extração a vapor com equipamento profissional, bactericida certificado e secagem acelerada. Almofadas soltas são tratadas sem custo adicional. Para obter o preço exato, use o nosso calculador de orçamento, que responde em 30 segundos com base no tamanho e código postal.</>,
-    plainAnswer: "Sofá de 3 lugares: 79€. Inclui pré-tratamento de manchas, extração a vapor profissional, bactericida e secagem acelerada. Almofadas soltas sem custo extra.",
+    answer: <>{'A limpeza de um sofá de 3 lugares custa 79€, mais deslocação. Inclui avaliação, pré-tratamento de manchas e extração da sujidade. Anti-ácaros e desbacterização são extras opcionais.'}</>,
+    plainAnswer: 'A limpeza de um sofá de 3 lugares custa 79€, mais deslocação. Inclui avaliação, pré-tratamento de manchas e extração da sujidade. Anti-ácaros e desbacterização são extras opcionais.',
   },
   {
     id: "sofa-fica-molhado-tempo-seca",
     question: "O sofá fica molhado após a limpeza? Quanto tempo seca?",
-    answer: <>O sofá fica <strong>levemente húmido, não encharcado</strong>. O equipamento de extração a vapor remove a humidade em simultâneo com a sujidade, deixando o tecido com cerca de 20% de humidade residual (semelhante a roupa depois de centrifugada). O tempo de secagem normal é <strong>1 a 3 horas</strong> com ventilação adequada. Em dias de chuva ou divisões sem janelas pode demorar 4 horas. Recomendamos abrir janelas e, se possível, ligar ventoinha apontada ao sofá. Pode sentar-se após 2 horas na maioria dos tecidos; tecidos espessos como veludo ou boucle pedem 3 a 4 horas. A <Link to="/limpeza-sofas" className="text-gold hover:underline font-medium">limpeza de sofás</Link> nunca deixa cheiro a humidade quando o processo de extração é feito corretamente.</>,
-    plainAnswer: "O sofá fica levemente húmido, não encharcado. Secagem: 1 a 3 horas com ventilação normal. Em dias de chuva até 4 horas. Pode usar após 2 horas. Veludo e boucle precisam de 3 a 4 horas.",
+    answer: <>{DRYING_PROMISE}</>,
+    plainAnswer: DRYING_PROMISE,
   },
   {
     id: "manchas-vinho-sangue-gordura",
     question: "Conseguem tirar manchas de vinho, sangue e gordura?",
-    answer: <>Sim. A taxa de remoção da Kyro Clean é <strong>superior a 95% para manchas de vinho tinto, sangue, café, gordura e urina</strong> quando o tratamento é feito dentro de 6 meses após a mancha. Usamos pré-tratamento enzimático específico por tipo: enzimas proteolíticas para sangue, enzimas lipolíticas para gordura, oxidantes controlados para vinho. Manchas antigas com mais de 1 ano oxidam nas fibras e a taxa de remoção desce para 60% a 80%, ainda assim, o resultado é sempre significativamente melhor que o estado inicial. Para casos duvidosos, envie uma foto via <a href={WHATSAPP_BASE} target="_blank" rel="noopener noreferrer" className="text-gold hover:underline font-medium">WhatsApp ({PHONE_DISPLAY})</a> e damos uma estimativa honesta antes de agendar.</>,
-    plainAnswer: "Taxa de remoção superior a 95% para manchas de vinho, sangue, café, gordura e urina tratadas até 6 meses. Pré-tratamento enzimático específico por tipo de mancha. Manchas com mais de 1 ano: 60% a 80% de remoção.",
+    answer: <>{'Tratamos manchas de vinho, sangue, café, gordura e urina. O resultado depende do tecido, da substância e do tempo decorrido. Envie uma fotografia para avaliarmos as possibilidades antes de marcar; não garantimos a remoção de todas as manchas.'}</>,
+    plainAnswer: 'Tratamos manchas de vinho, sangue, café, gordura e urina. O resultado depende do tecido, da substância e do tempo decorrido. Envie uma fotografia para avaliarmos as possibilidades antes de marcar; não garantimos a remoção de todas as manchas.',
   },
   {
     id: "limpeza-em-casa-domicilio",
@@ -50,8 +51,8 @@ const allFaqs: FAQ[] = [
   {
     id: "diferenca-higienizacao-limpeza",
     question: "Qual a diferença entre higienização e limpeza de sofá?",
-    answer: <><strong>Limpeza</strong> remove sujidade visível: manchas, gordura, pó acumulado e resíduos de pele. <strong>Higienização</strong> ataca o invisível: ácaros, bactérias, fungos e alérgenos que se acumulam nas fibras. A temperatura letal para ácaros é 55ºC. O equipamento profissional atinge 160ºC, eliminando 99,9% dos microrganismos. Na Kyro Clean, o serviço padrão de <Link to="/limpeza-sofas" className="text-gold hover:underline font-medium">limpeza de sofás</Link> inclui <em>sempre</em> ambos os processos: primeiro limpamos com produto específico para o tipo de tecido, depois higienizamos com vapor de alta pressão e aplicamos bactericida de longa duração. Não oferecemos limpeza sem higienização, pois é a única forma responsável de tratar estofos, especialmente em casas com crianças, idosos ou pessoas com alergias.</>,
-    plainAnswer: "Limpeza remove sujidade visível. Higienização elimina ácaros, bactérias e fungos com vapor a 160ºC (letal acima de 55ºC). Na Kyro Clean o serviço padrão inclui sempre ambos: limpeza + higienização + bactericida.",
+    answer: <>{'A limpeza remove sujidade, resíduos e partículas. O tratamento anti-ácaros e a desbacterização são extras opcionais, orçamentados separadamente. A limpeza normal não promete eliminação de microrganismos.'}</>,
+    plainAnswer: 'A limpeza remove sujidade, resíduos e partículas. O tratamento anti-ácaros e a desbacterização são extras opcionais, orçamentados separadamente. A limpeza normal não promete eliminação de microrganismos.',
   },
   {
     id: "frequencia-limpeza-sofa",
@@ -68,38 +69,38 @@ const allFaqs: FAQ[] = [
   {
     id: "garantia-satisfacao",
     question: "Têm garantia de satisfação?",
-    answer: <>Sim. A Kyro Clean oferece <strong>garantia de satisfação total</strong>: se o resultado não corresponder ao que foi acordado antes do serviço, voltamos ao domicílio sem custo adicional para corrigir o trabalho. A garantia cobre manchas identificadas e estimadas antes de começar. Para a acionar, basta contactar-nos nas <strong>48 horas</strong> após o serviço via <a href={WHATSAPP_BASE} target="_blank" rel="noopener noreferrer" className="text-gold hover:underline font-medium">WhatsApp ({PHONE_DISPLAY})</a>. A nossa taxa de reclamações é inferior a 1%: mais de 99% dos clientes ficam satisfeitos na primeira visita, reflectido nas nossas <strong>mais de {REVIEW_COUNT} avaliações 5 estrelas no Google</strong>. Somos honestos sobre o que conseguimos e não conseguimos remover antes de aceitar o trabalho: nunca prometer e não cumprir.</>,
-    plainAnswer: `Garantia de satisfação total: voltamos sem custo se o resultado não corresponder ao acordado. Acionar em 48h via WhatsApp. Taxa de reclamações inferior a 1%. Mais de ${REVIEW_COUNT} avaliações 5 estrelas no Google.`,
+    answer: <>{SATISFACTION_PROMISE}</>,
+    plainAnswer: SATISFACTION_PROMISE,
   },
   {
     id: "como-pedir-orcamento-rapido",
     question: "Como faço um orçamento rápido?",
-    answer: <>O método mais rápido é o <strong>calculador online</strong>: responda a 4 perguntas (serviço, tamanho, localização, disponibilidade) e recebe o preço estimado em menos de 30 segundos, sem precisar de falar com ninguém e sem compromisso. Em alternativa: <strong>WhatsApp para {PHONE_DISPLAY}</strong> com uma foto do sofá, resposta em menos de 30 minutos durante o horário de serviço (8h às 24h, segunda a sábado). Para empresas ou volumes, contacte diretamente para orçamento personalizado com desconto de volume. <strong>Não existem custos escondidos</strong>: o preço do orçamento é o preço final pago. O técnico não adiciona extras no local sem aprovação prévia. O serviço de <Link to="/limpeza-sofas" className="text-gold hover:underline font-medium">limpeza de sofás</Link> inclui todo o produto necessário; a deslocação é cobrada à parte, consoante a localização.</>,
-    plainAnswer: `Calculador online em 30 segundos (4 perguntas). Ou WhatsApp para ${PHONE_DISPLAY} com foto, resposta em menos de 30 minutos (8h às 24h, seg. a sáb.). Preço final sem extras. Inclui produto; deslocação cobrada à parte consoante a localização.`,
+    answer: <>O método mais rápido é o <strong>calculador online</strong>: responda a 4 perguntas (serviço, tamanho, localização, disponibilidade) e recebe o preço estimado em menos de 30 segundos, sem precisar de falar com ninguém e sem compromisso. Em alternativa: <strong>WhatsApp para {PHONE_DISPLAY}</strong> com uma foto do sofá, resposta em menos de 10 minutos durante o horário de serviço (8h às 24h, segunda a sábado). Para empresas ou volumes, contacte diretamente para orçamento personalizado com desconto de volume. <strong>Não existem custos escondidos</strong>: o preço do orçamento é o preço final pago. O técnico não adiciona extras no local sem aprovação prévia. O serviço de <Link to="/limpeza-sofas" className="text-gold hover:underline font-medium">limpeza de sofás</Link> inclui todo o produto necessário; a deslocação é cobrada à parte, consoante a localização.</>,
+    plainAnswer: `Calculador online em 30 segundos (4 perguntas). Ou WhatsApp para ${PHONE_DISPLAY} com foto, resposta em menos de 10 minutos (8h às 24h, seg. a sáb.). Preço final sem extras. Inclui produto; deslocação cobrada à parte consoante a localização.`,
   },
   {
     id: "preco-colchao-solteiro",
     question: "Quanto custa limpar um colchão de solteiro?",
-    answer: <>A <Link to="/limpeza-colchoes" className="text-gold hover:underline font-medium">limpeza de colchão solteiro</Link> custa <strong>59€</strong>. Colchão de casal: 69€. King-size ou queen-size: 79€. O serviço inclui aspiração profunda, extração a vapor (temperatura superior a 55ºC, letal para ácaros), tratamento de manchas, bactericida e antifúngico. A limpeza de colchão é particularmente importante porque passamos 7 a 8 horas diárias em contacto direto com ele. Um colchão com 5 anos sem tratamento pode conter 2 milhões de ácaros por metro quadrado. Recomendamos 1 vez por ano, 2 vezes para pessoas com alergias ou asma.</>,
-    plainAnswer: "Colchão solteiro: 59€. Casal: 69€. King/queen-size: 79€. Inclui aspiração profissional, extração a vapor (acima de 55ºC), tratamento de manchas, bactericida e antifúngico. Recomendado 1 a 2 vezes por ano.",
+    answer: <>{'Limpeza de colchão: solteiro 59€, casal 69€, king/queen 79€, mais deslocação. Inclui aspiração, tratamento de manchas e extração de sujidade. Anti-ácaros e desbacterização são extras opcionais.'}</>,
+    plainAnswer: 'Limpeza de colchão: solteiro 59€, casal 69€, king/queen 79€, mais deslocação. Inclui aspiração, tratamento de manchas e extração de sujidade. Anti-ácaros e desbacterização são extras opcionais.',
   },
   {
     id: "servico-fora-porto",
     question: "Fazem limpeza de sofás fora do Porto?",
-    answer: <>Sim. A Kyro Clean serve o <strong>Porto a partir de 10€ de deslocação</strong>. Para Matosinhos, Vila Nova de Gaia, Maia, Gondomar e Valongo a taxa sobe com a distância. Para Lisboa, Cascais, Sintra e Oeiras aplica-se com agendamento com pelo menos 48 horas de antecedência. Para zonas fora destas áreas avaliamos caso a caso. O valor exato aparece no calculador de orçamento. O horário de serviço é segunda a sábado, das 8h às 24h.</>,
-    plainAnswer: "Deslocação a partir de 10€ em todo o país, sobe com a distância ao centro de cada equipa. Lisboa e área: agendamento com 48h de antecedência. Valor exato no calculador de orçamento.",
+    answer: <>{COVERAGE_PROMISE + ' ' + AVAILABILITY_PROMISE + ' Deslocação a partir de 10€, confirmada para a localidade.'}</>,
+    plainAnswer: COVERAGE_PROMISE + ' ' + AVAILABILITY_PROMISE + ' Deslocação a partir de 10€, confirmada para a localidade.',
   },
   {
     id: "quanto-custa-limpar-tapete",
     question: "Quanto custa limpar um tapete profissionalmente?",
-    answer: <>A <Link to="/limpeza-tapetes" className="text-gold hover:underline font-medium">limpeza profissional de tapetes</Link> é sempre orçamentada à medida: cada tapete é medido individualmente (largura x comprimento) e o preço depende do tipo de fibra, dimensão e estado de sujidade, sem tabela fixa por m². A deslocação custa a partir de 10€ no Porto e aumenta com a distância, seguindo a mesma tabela dos restantes serviços. O tapete fica pronto a usar em 2 a 4 horas. Tapetes persas, de seda ou lã natural têm processo adaptado ao material sem acréscimo de preço.</>,
+    answer: <>A <Link to="/limpeza-tapetes" className="text-gold hover:underline font-medium">limpeza profissional de tapetes</Link> é sempre orçamentada à medida: cada tapete é medido individualmente (largura x comprimento) e o preço depende do tipo de fibra, dimensão e estado de sujidade, sem tabela fixa por m². A deslocação custa a partir de 10€ no Porto e aumenta com a distância, seguindo a mesma tabela dos restantes serviços. O tapete fica pronto a usar em 3 a 6 horas. Tapetes persas, de seda ou lã natural têm processo adaptado ao material sem acréscimo de preço.</>,
     plainAnswer: "Limpeza de tapetes: orçamento à medida de cada tapete (mede-se largura x comprimento), sem tabela fixa por m². Depende do tipo de fibra e estado do tapete. Deslocação a partir de 10€.",
   },
   {
     id: "quanto-custa-limpar-alcatifa",
     question: "Fazem limpeza de alcatifas? Qual é o preço?",
-    answer: <>Sim. A <Link to="/limpeza-alcatifas" className="text-gold hover:underline font-medium">limpeza de alcatifas</Link> é feita no local por extração a vapor, sem necessidade de remover o revestimento. O preço é sempre orçamentado à medida da área e do estado da alcatifa, sem tabela fixa por m². Para saber o preço exato da sua alcatifa, envie uma foto e a metragem via <a href={WHATSAPP_BASE} target="_blank" rel="noopener noreferrer" className="text-gold hover:underline font-medium">WhatsApp ({PHONE_DISPLAY})</a> e respondemos em menos de 30 minutos. O serviço inclui pré-tratamento de manchas, extração a vapor e bactericida.</>,
-    plainAnswer: `Limpeza de alcatifas feita no local por extração a vapor. Orçamento sempre à medida da área total, sem preço fixo por m². Envie foto e metragem via WhatsApp ${PHONE_DISPLAY} para orçamento em menos de 30 minutos. Inclui pré-tratamento, extração e bactericida.`,
+    answer: <>Sim. A <Link to="/limpeza-alcatifas" className="text-gold hover:underline font-medium">limpeza de alcatifas</Link> é feita no local por extração a vapor, sem necessidade de remover o revestimento. O preço é sempre orçamentado à medida da área e do estado da alcatifa, sem tabela fixa por m². Para saber o preço exato da sua alcatifa, envie uma foto e a metragem via <a href={WHATSAPP_BASE} target="_blank" rel="noopener noreferrer" className="text-gold hover:underline font-medium">WhatsApp ({PHONE_DISPLAY})</a> e respondemos em menos de 10 minutos. O serviço inclui pré-tratamento de manchas, extração a vapor e extração da sujidade.</>,
+    plainAnswer: `Limpeza de alcatifas feita no local por extração a vapor. Orçamento sempre à medida da área total, sem preço fixo por m². Envie foto e metragem via WhatsApp ${PHONE_DISPLAY} para orçamento em menos de 10 minutos. Inclui pré-tratamento, extração de sujidade.`,
   },
   {
     id: "quanto-custa-impermeabilizacao",
@@ -198,7 +199,7 @@ const FAQEstofos = () => {
   useEffect(() => {
     document.title = "Perguntas Frequentes: Limpeza de Estofos, Tapetes e Alcatifas | Kyro Clean Solutions";
     document.querySelector('meta[name="description"]')?.setAttribute("content",
-      "16 respostas sobre limpeza de sofás, colchões, tapetes e alcatifas no Porto: preços reais, impermeabilização, tempos de secagem, garantia e áreas servidas. Kyro Clean Solutions.");
+      "16 respostas sobre limpeza de sofás, colchões, tapetes e alcatifas em Portugal: preços reais, impermeabilização, tempos de secagem, garantia e áreas servidas. Kyro Clean Solutions.");
     document.querySelector('link[rel="canonical"]')?.setAttribute("href", PAGE_URL);
     document.querySelector('meta[property="og:title"]')?.setAttribute("content",
       "Perguntas Frequentes: Limpeza de Estofos, Tapetes e Alcatifas | Kyro Clean Solutions");
@@ -230,7 +231,7 @@ const FAQEstofos = () => {
               Perguntas Frequentes
             </h1>
             <p className="text-white/55 text-base leading-relaxed max-w-xl">
-              16 respostas com dados reais: preços, tempos de secagem, garantias, materiais e áreas de serviço. Sem marketing.
+              16 respostas com dados reais: preços, tempos de secagem, garantias, materiais e áreas de serviço. Com condições do serviço explicadas.
             </p>
           </div>
         </div>
@@ -258,7 +259,7 @@ const FAQEstofos = () => {
                   Preço em 30 segundos
                 </p>
                 <p className="text-white/45 text-xs mb-4 leading-relaxed">
-                  Sem compromisso · Técnico contacta em menos de 30 min
+                  Sem compromisso · Técnico contacta em menos de 10 min
                 </p>
                 <QuizButton ctaLabel="Calcular preço" />
                 <div className="mt-3 flex flex-col gap-2">

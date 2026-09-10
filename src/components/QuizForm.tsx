@@ -280,14 +280,11 @@ const QuizForm = ({
   });
 
   const {
-    countdown,
     displayPrice,
     socialProofIdx,
     socialProofMessages,
     confettiActive,
     exitIntentUnlocked,
-    formatCountdown,
-    isDiscountActive,
     resetUiEffects,
   } = useQuizUiEffects({
     isOpen,
@@ -798,8 +795,8 @@ ${formData.description || 'Sem observações adicionais'}
             <div className="flex items-center justify-center gap-2 px-5 py-2" style={{ borderTop: "1px solid rgba(212,175,55,0.14)", background: "rgba(212,175,55,0.04)" }}>
               <span className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: "#D4AF37" }} />
               <p className="text-[11px]" style={{ color: "rgba(255,255,255,0.62)", fontFamily: "Inter, system-ui, sans-serif" }}>
-                <span className="font-semibold">Alta procura</span>
-                {' · Confirme agora para garantir disponibilidade'}
+                <span className="font-semibold">Resposta em menos de 10 minutos</span>
+                {' · Orçamento sem compromisso'}
               </p>
             </div>
             </div>
@@ -1049,7 +1046,7 @@ ${formData.description || 'Sem observações adicionais'}
               </Button>
             </div>
             <p className="text-center text-[11px] text-white/30 font-medium -mt-0.5">
-              Sem compromisso · Grátis · Respondemos em menos de 30 min
+              Sem compromisso · Grátis · Respondemos em menos de 10 min
             </p>
           </div>
         ) : (
@@ -1101,30 +1098,23 @@ ${formData.description || 'Sem observações adicionais'}
         <div className="px-7 py-8 text-center max-w-xs mx-auto">
           <AlertTriangle className="w-12 h-12 text-gold mb-4 mx-auto" />
           <h3 className="font-playfair text-2xl sm:text-3xl font-bold text-white mb-3 leading-tight">
-            ESPERE!
+            Vamos terminar o seu orçamento?
           </h3>
           <p className="text-sm text-white/65 mb-2 leading-relaxed">
-            {packDiscountActive
-              ? 'Se sair agora, perde a sua vaga e o desconto de 10% já ativado.'
-              : 'Se sair agora, perde a sua vaga reservada.'}
+            Ainda pode receber uma proposta à medida, sem compromisso. Termine o pedido e respondemos em menos de 10 minutos.
           </p>
-          {isDiscountActive && (
-            <p className="text-xs text-gold/70 mb-5 font-mono bg-gold/10 px-3 py-1.5 rounded-lg inline-block">
-              Vaga reservada por {formatCountdown(countdown)}
-            </p>
-          )}
           <div className="flex flex-col gap-3 mt-5">
             <Button
               onClick={() => setShowExitIntent(false)}
               className="w-full h-12 bg-gradient-to-r from-gold to-[#d4c57b] hover:from-[#d4c57b] hover:to-gold text-[#12121e] font-black rounded-sm shadow-[0_0_20px_rgba(212,175,55,0.3)] touch-manipulation active:scale-[0.98]"
             >
-              {packDiscountActive ? 'Continuar e Guardar Desconto' : 'Continuar e Guardar Vaga'}
+              Continuar o meu orçamento
             </Button>
             <button
               onClick={confirmClose}
               className="text-xs text-white/20 hover:text-white/45 py-2 transition-colors"
             >
-              Sair mesmo assim
+              Sair por agora
             </button>
           </div>
         </div>

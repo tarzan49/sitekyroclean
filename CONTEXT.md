@@ -1,3 +1,7 @@
+## Correções comerciais e packs personalizáveis (10/09/2026)
+
+Regras atuais: `CORRECOES-COMERCIAIS-2026-09-10.md`. `src/constants/travel.ts` é a fonte única de deslocações, reexportada por QuizTypes e importada sem alias pelos geradores. `commercialPolicy.ts` centraliza as mensagens comuns. `CustomPackPage` serve `/packs` e as antigas rotas de PackComboPage, com cálculo puro em `customPack.ts`; `packComboData.ts` contém apenas combinações iniciais e rotas, sem segunda tabela de preços. `treatmentSeoData.ts` fornece conteúdo/rotas partilhados pelo React, prerender, sitemap e monitor para anti-ácaros, desbacterização e expansão Aveiro/Coimbra. `TreatmentPage` apresenta essas páginas. Nenhuma equipa permanente nova é anunciada no Centro. `locationSeoData.cities.area` inclui `braga` independente de `porto`. O conteúdo inicial de marcas e problemas passa a incluir processo, benefícios e FAQs.
+
 ﻿# Kyro Clean Solutions — Full Project Context
 
 > O `CLAUDE.md` na raiz carrega automaticamente em qualquer sessão do Claude Code aberta nesta pasta (regras fixas e factos de negócio atuais). Este ficheiro é a referência de arquitetura mais profunda — lê-o quando precisares de detalhe sobre rotas, fluxo do quiz, design tokens ou tabelas de preços.

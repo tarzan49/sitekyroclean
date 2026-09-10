@@ -21,17 +21,17 @@ export const CATEGORY_STATS: Record<string, { value: string; label: string; icon
   manchas: [
     { value: "4.9★", label: `+${REVIEW_COUNT} avaliações Google`, icon: GoogleG },
     { value: "<10min", label: "Respondemos em menos de 10 minutos", icon: Clock },
-    { value: "2-4h", label: "Pronto a usar", icon: Timer },
+    { value: "3 a 6h", label: "Pronto a usar", icon: Timer },
     { value: "+1100", label: "Clientes satisfeitos", icon: Users },
   ],
   odores: [
-    { value: "99%", label: "Odor eliminado na fonte", icon: CheckCircle2 },
+    { value: "Extra", label: "Tratamento específico sob consulta", icon: CheckCircle2 },
     { value: "24-48h", label: "Resultado permanente", icon: ShieldCheck },
     { value: "<10min", label: "Respondemos em menos de 10 minutos", icon: Clock },
     { value: "4.9★", label: `+${REVIEW_COUNT} avaliações Google`, icon: GoogleG },
   ],
   saude: [
-    { value: "99%", label: "Ácaros eliminados", icon: CheckCircle2 },
+    { value: "Extra", label: "Tratamento específico sob consulta", icon: CheckCircle2 },
     { value: "<10min", label: "Respondemos em menos de 10 minutos", icon: Clock },
     { value: "4.9★", label: `+${REVIEW_COUNT} avaliações Google`, icon: GoogleG },
     { value: "+1100", label: "Clientes satisfeitos", icon: Users },
@@ -39,13 +39,13 @@ export const CATEGORY_STATS: Record<string, { value: string; label: string; icon
   materiais: [
     { value: "4.9★", label: `+${REVIEW_COUNT} avaliações Google`, icon: GoogleG },
     { value: "<10min", label: "Respondemos em menos de 10 minutos", icon: Clock },
-    { value: "2-4h", label: "Tempo de secagem", icon: Timer },
+    { value: "3 a 6h", label: "Tempo de secagem", icon: Timer },
     { value: "+1100", label: "Clientes satisfeitos", icon: Users },
   ],
   animais: [
-    { value: "99%", label: "Ácaros e pelos eliminados", icon: CheckCircle2 },
+    { value: "Extra", label: "Tratamento específico sob consulta", icon: CheckCircle2 },
     { value: "<10min", label: "Respondemos em menos de 10 minutos", icon: Clock },
-    { value: "2-4h", label: "Pronto a usar", icon: Timer },
+    { value: "3 a 6h", label: "Pronto a usar", icon: Timer },
     { value: "4.9★", label: `+${REVIEW_COUNT} avaliações Google`, icon: GoogleG },
   ],
   preco: [
@@ -58,11 +58,11 @@ export const CATEGORY_STATS: Record<string, { value: string; label: string; icon
     { value: "<10min", label: "Respondemos em menos de 10 minutos", icon: Clock },
     { value: "24h", label: "Disponibilidade", icon: ShieldCheck },
     { value: "4.9★", label: `+${REVIEW_COUNT} avaliações Google`, icon: GoogleG },
-    { value: "2-4h", label: "Pronto a usar", icon: Timer },
+    { value: "3 a 6h", label: "Pronto a usar", icon: Timer },
   ],
   metodo: [
-    { value: "99%", label: "Ácaros e bactérias eliminados", icon: CheckCircle2 },
-    { value: "2-4h", label: "Tempo de secagem", icon: Timer },
+    { value: "Extra", label: "Tratamento específico sob consulta", icon: CheckCircle2 },
+    { value: "3 a 6h", label: "Tempo de secagem", icon: Timer },
     { value: "4.9★", label: `+${REVIEW_COUNT} avaliações Google`, icon: GoogleG },
     { value: "+1100", label: "Clientes satisfeitos", icon: Users },
   ],
@@ -100,7 +100,7 @@ export const CATEGORY_TIPS: Record<string, { title: string; steps: string[]; war
       "Capa anti-ácaros reduz exposição mas não elimina os ácaros existentes",
       "Mantenha humidade interior abaixo de 50%, ácaros proliferam acima desse valor",
     ],
-    warning: "Eliminação permanente de 99% dos ácaros só é possível com extração profissional a vapor",
+    warning: "O tratamento anti-ácaros é um complemento específico à limpeza; não prometemos eliminação permanente",
   },
   animais: {
     title: "Controlo imediato com animais de estimação",
@@ -152,7 +152,7 @@ export const CATEGORY_TIPS: Record<string, { title: string; steps: string[]; war
     steps: [
       "O técnico inspeciona o tipo de tecido e manchas antes de iniciar (sinal de profissionalismo)",
       "Processo completo: 45 min a 3 horas conforme dimensão e estado do estofado",
-      "Deixe secar completamente antes de usar, 2 a 6 horas dependendo da ventilação",
+      "Deixe secar completamente antes de usar, 3 a 6 horas dependendo da ventilação",
     ],
     warning: "Uso antes de secar completamente pode causar marcas de água no tecido",
   },

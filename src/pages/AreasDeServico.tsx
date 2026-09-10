@@ -9,10 +9,11 @@ import { cities, services } from "@/data/locationSeoData";
 import { municipiosComFreguesias, getFreguesiaStats, type MunicipioGroup } from "@/data/freguesiaSeoData";
 import { SITE_URL, PHONE_TEL, PHONE_DISPLAY } from "@/constants/business";
 
-type Area = "porto" | "lisboa" | "algarve";
+type Area = "porto" | "braga" | "lisboa" | "algarve";
 
 const REGIONS: { area: Area; heading: string; goldWord: string }[] = [
-  { area: "porto", heading: "Área Metropolitana do", goldWord: "Porto e Norte" },
+  { area: "porto", heading: "Área Metropolitana do", goldWord: "Porto" },
+  { area: "braga", heading: "Equipa de Braga e", goldWord: "Minho" },
   { area: "lisboa", heading: "Lisboa e Área", goldWord: "Metropolitana" },
   { area: "algarve", heading: "Cobertura no", goldWord: "Algarve" },
 ];
@@ -145,10 +146,10 @@ const AreasDeServico = () => {
               <em className="not-italic" style={{ color: "#D4AF37" }}>Serviço</em>
             </h1>
             <p className="mt-4 text-base md:text-lg text-[#111111]/55 leading-relaxed max-w-2xl">
-              A Kyro Clean Solutions presta serviços de limpeza profissional de estofos ao domicílio em {stats.municipios} municípios e {stats.freguesias} freguesias, do Porto ao Algarve.
+              A Kyro Clean Solutions presta serviços de limpeza profissional de estofos ao domicílio em {stats.municipios} municípios e {stats.freguesias} freguesias, de Viana do Castelo ao Algarve, com equipas em Braga, Porto, Lisboa e Algarve.
             </p>
             <p className="text-sm text-[#111111]/55 mt-2 mb-6">
-              {stats.totalPages}+ páginas de serviço local
+              Outras zonas, incluindo Aveiro e Coimbra, mediante confirmação de disponibilidade.
             </p>
             <div className="flex flex-wrap gap-3">
               <QuizButton />
@@ -177,7 +178,7 @@ const AreasDeServico = () => {
               overline="Comece já"
               heading="Precisa de limpeza profissional na sua"
               goldWord="cidade?"
-              subtitle="Peça o seu orçamento gratuito: resposta em menos de 30 minutos."
+              subtitle="Peça o seu orçamento gratuito: resposta em menos de 10 minutos."
               light={false}
             />
             <QuizButton />
@@ -196,7 +197,7 @@ const AreasDeServico = () => {
                   "@id": `${SITE_URL}/areas-de-servico#webpage`,
                   "url": `${SITE_URL}/areas-de-servico`,
                   "name": "Áreas de Serviço | Kyro Clean Solutions",
-                  "description": `Serviços de limpeza profissional em ${stats.municipios} municípios e ${stats.freguesias} freguesias do Porto, Lisboa e Algarve.`,
+                  "description": `Serviços de limpeza profissional em ${stats.municipios} municípios e ${stats.freguesias} freguesias de Braga, Porto, Lisboa e Algarve.`,
                   "inLanguage": "pt-PT",
                   "isPartOf": { "@id": `${SITE_URL}/#website` },
                   "publisher": { "@id": `${SITE_URL}/#business` },

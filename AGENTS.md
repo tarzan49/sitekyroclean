@@ -1,5 +1,10 @@
 # Kyro Clean Solutions — Instruções para Codex
 
+## Atualização comercial prioritária: 10/09/2026
+
+As instruções comerciais atuais estão em `CORRECOES-COMERCIAIS-2026-09-10.md` e prevalecem sobre notas históricas abaixo: avaliação 4.9, resposta <10 minutos, secagem média 3–6 horas com ventilação, garantia de repetição gratuita acionada até 48 horas. Deslocações têm fonte única em `src/constants/travel.ts`: Braga10€, Barcelos20€, Minho por escalões10/15/20. Tapetes E alcatifas sempre sob orçamento. Não reintroduzir reservas fictícias, contadores de atividade simulada nem ameaças de perda de vaga/desconto ao sair. O volume habitual informado é50–60 pedidos/semana. Packs agora configuráveis pelo cliente, com cálculo em `src/lib/customPack.ts` e tabelas do quiz. Anti-ácaros e desbacterização são extras opcionais; limpeza normal não promete eliminação de99%. Equipas independentes em Braga, Porto, Lisboa e Algarve; Aveiro/Coimbra sob consulta. Sitemaps do admin agora estão em `src/pages/admin/SitemapMonitor.tsx`.
+
+
 Este ficheiro carrega automaticamente no início de qualquer sessão do Codex aberta nesta pasta, em qualquer máquina. É a única forma real de manter as duas instâncias (PC Windows + MacBook do dono) alinhadas — não têm memória partilhada, só isto (e o `CONTEXT.md`) viaja entre elas via Git.
 
 **Antes de mexer em código:** lê `CONTEXT.md` (arquitetura completa: rotas, fluxo do quiz, design tokens, tabelas de preços) e `AUDIT.md` (problemas de qualidade de código já conhecidos). Este ficheiro é só as regras e factos que não podes adivinhar a partir do código.

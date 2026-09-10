@@ -99,10 +99,10 @@ function content_higienizacao_sofa(loc: string, ctx: string): ContentBlock {
       { step: 1, title: 'Inspeção', description: 'Avaliação do estado e do tecido do sofá.' },
       { step: 2, title: 'Preparação', description: 'Aplicação do produto adequado ao material e à sujidade.' },
       { step: 3, title: 'Extração', description: 'Remoção de sujidade com equipamento profissional.' },
-      { step: 4, title: 'Secagem', description: 'Normalmente 4 a 6 horas, dependendo do tecido e da ventilação.' },
+      { step: 4, title: 'Secagem', description: 'Normalmente 3 a 6 horas, dependendo do tecido e da ventilação.' },
     ],
     faqs: [
-      { question: 'Quanto tempo após a higienização posso usar o sofá?', answer: 'A secagem demora normalmente 4 a 6 horas. Pode demorar mais consoante o tecido, a humidade e a ventilação. Use o sofá apenas quando estiver completamente seco.' },
+      { question: 'Quanto tempo após a higienização posso usar o sofá?', answer: 'A secagem demora normalmente 3 a 6 horas. Pode demorar mais consoante o tecido, a humidade e a ventilação. Use o sofá apenas quando estiver completamente seco.' },
       { question: 'Qual é o preço e o que está incluído?', answer: 'Os preços da tabela correspondem à limpeza por tamanho do sofá. A deslocação é cobrada à parte conforme a morada. Sofás de quatro ou mais lugares e tratamentos adicionais exigem orçamento. Confirmamos o valor e o serviço antes de avançar.' },
       { question: 'Todas as manchas e odores desaparecem?', answer: 'O resultado depende do tecido, da origem e da antiguidade da mancha ou odor. Envie fotografias para uma primeira avaliação; o técnico confirma no local o tratamento possível. Não garantimos a remoção de todas as manchas.' },
       { question: `Fazem higienização de sofá ao domicílio ${prep} ${loc}?`, answer: `Sim. Levamos o equipamento até ${loc}. Envie a morada para confirmar cobertura, deslocação e disponibilidade.` },
@@ -137,7 +137,7 @@ function content_higienizacao_colchao(loc: string, ctx: string): ContentBlock {
     ] as const, seed2),
     benefits: pick([
       [
-        'Eliminação de 99% dos ácaros e bactérias do colchão',
+        'Remoção de resíduos associados a ácaros e bactérias do colchão',
         'Melhoria comprovada da qualidade do sono',
         'Ideal para alérgicos, asmáticos e pessoas com rinite',
         'Seguro para bebés e grávidas',
@@ -145,18 +145,18 @@ function content_higienizacao_colchao(loc: string, ctx: string): ContentBlock {
         'Colchão pronto a usar no mesmo dia',
       ],
       [
-        '99% dos ácaros e bactérias do colchão eliminados',
+        'Limpeza profunda das fibras do colchão',
         'Sono comprovadamente mais tranquilo depois do tratamento',
         'Recomendado para alérgicos, asmáticos e quem sofre de rinite',
         'Seguro para bebés e mulheres grávidas',
-        `Deslocação incluída em ${loc}`,
+        `Deslocação a partir de 10€ em ${loc}`,
         'Sem esperar dias: colchão pronto no mesmo dia',
       ],
     ] as const, seedB),
     processSteps: [
       { step: 1, title: 'Avaliação de contaminação', description: `Análise do nível de infestação e identificação de focos em ${loc}.` },
-      { step: 2, title: 'Aspiração HEPA profunda', description: 'Remoção de 99% dos ácaros, esporos e detritos biológicos.' },
-      { step: 3, title: 'Tratamento antimicrobiano', description: 'Aplicação de produto certificado, seguro para contato com pele sensível.' },
+      { step: 2, title: 'Aspiração HEPA profunda', description: 'Remoção de resíduos associados a ácaros, esporos e detritos biológicos.' },
+      { step: 3, title: 'Pré-tratamento de limpeza', description: 'Aplicação de produto certificado, seguro para contato com pele sensível.' },
       { step: 4, title: 'Secagem e aeração', description: 'Colchão pronto a usar no mesmo dia após aeração.' },
     ],
     faqs: pick([
@@ -215,7 +215,7 @@ function content_higienizacao_tapetes(loc: string, ctx: string): ContentBlock {
     benefits: pick([
       [
         'Tapete seguro para crianças que brincam no chão',
-        'Eliminação de 99% de ácaros e alergénios',
+        'Remoção de pó e resíduos nas fibras',
         'Fibras preservadas, sem danos em tapetes delicados',
         'Melhoria da qualidade do ar interior',
         `Serviço ao domicílio em ${loc}`,
@@ -223,10 +223,10 @@ function content_higienizacao_tapetes(loc: string, ctx: string): ContentBlock {
       ],
       [
         'Chão seguro para crianças pequenas brincarem',
-        '99% dos ácaros e alergénios eliminados',
+        'Remoção de resíduos acumulados nas fibras',
         'Fibras delicadas preservadas, sem risco de dano',
         'Ar interior visivelmente mais limpo',
-        `Deslocação incluída em ${loc}`,
+        `Deslocação a partir de 10€ em ${loc}`,
         'Adaptado a lã, seda, sintéticos e tapetes persas',
       ],
     ] as const, seedB),
@@ -256,12 +256,12 @@ function content_higienizacao_tapetes(loc: string, ctx: string): ContentBlock {
       [
         { title: "Criança que brinca no chão com espirros frequentes", description: "O tapete concentra ácaros, pólen e fungos nas fibras. Quando a criança rasteja ou brinca, inalha estes alergénios em concentração máxima ao nível do chão." },
         { title: "Animal de estimação que dorme no tapete", description: "Pelos, caspa e bactérias dos animais penetram nas fibras e multiplicam-se. A higienização remove alergénios de animais que a aspiração doméstica deixa para trás." },
-        { title: "Espirros frequentes ou comichão nos olhos em casa", description: "O tapete liberta alergénios ao ser pisado, criando uma nuvem invisível ao nível do chão. A higienização profunda reduz estes níveis em 99%." },
+        { title: "Espirros frequentes ou comichão nos olhos em casa", description: "O tapete liberta alergénios ao ser pisado, criando uma nuvem invisível ao nível do chão. A higienização profunda ajuda a remover partículas acumuladas." },
       ],
       [
         { title: "Espirros constantes quando a criança brinca no chão", description: "Ácaros, pólen e fungos concentram-se nas fibras do tapete, exatamente onde a criança inala mais concentração, ao rastejar ou brincar ao nível do chão." },
         { title: "Cão ou gato que passa horas deitado no tapete", description: "Pelos, caspa e bactérias dos animais acumulam-se e multiplicam-se nas fibras, ficando para trás mesmo depois da aspiração doméstica habitual." },
-        { title: "Comichão nos olhos ou espirros frequentes em casa", description: "Cada vez que o tapete é pisado liberta uma nuvem invisível de alergénios ao nível do chão. A higienização profunda reduz esses níveis em 99%." },
+        { title: "Comichão nos olhos ou espirros frequentes em casa", description: "Cada vez que o tapete é pisado liberta uma nuvem invisível de alergénios ao nível do chão. A higienização profunda ajuda a remover partículas acumuladas." },
       ],
     ] as const, seedP),
     testimonials: [pick([
@@ -280,9 +280,9 @@ function content_higienizacao_cadeiras(loc: string, ctx: string): ContentBlock {
   const seedT = getSeed(loc + '|higienizacao-cadeiras_t');
   return {
     intro: pick([
-      `A higienização de cadeiras estofadas em ${loc} é essencial para restaurantes, escritórios e clínicas que partilham superfícies entre múltiplos utilizadores. A Kyro Clean Solutions aplica bactericida certificado que elimina 99% dos microrganismos em cadeiras de uso partilhado em ${loc} e ${ctx}.`,
-      `Precisa de higienizar cadeiras estofadas em ${loc}? Restaurantes, escritórios e clínicas partilham essas superfícies entre múltiplos utilizadores todos os dias. A Kyro Clean Solutions aplica bactericida certificado que elimina 99% dos microrganismos em ${loc} e ${ctx}.`,
-      `Cadeiras de uso partilhado em ${loc} — restaurantes, escritórios, clínicas — acumulam microrganismos entre um utilizador e o seguinte, sem que a limpeza habitual os remova. A Kyro Clean Solutions aplica bactericida certificado com eliminação de 99% em ${loc} e ${ctx}.`,
+      `A higienização de cadeiras estofadas em ${loc} é essencial para restaurantes, escritórios e clínicas que partilham superfícies entre múltiplos utilizadores. A Kyro Clean Solutions faz limpeza profunda e pode acrescentar desbacterização sob orçamento em cadeiras de uso partilhado em ${loc} e ${ctx}.`,
+      `Precisa de higienizar cadeiras estofadas em ${loc}? Restaurantes, escritórios e clínicas partilham essas superfícies entre múltiplos utilizadores todos os dias. A Kyro Clean Solutions faz limpeza profunda e pode acrescentar desbacterização sob orçamento em ${loc} e ${ctx}.`,
+      `Cadeiras de uso partilhado em ${loc} — restaurantes, escritórios, clínicas — acumulam microrganismos entre um utilizador e o seguinte, sem que a limpeza habitual os remova. A Kyro Clean Solutions disponibiliza desbacterização como tratamento complementar sob orçamento em ${loc} e ${ctx}.`,
     ] as const, seed),
     whatIs: pick([
       `As cadeiras que partilhamos acumulam bactérias e vírus em silêncio, a limpeza habitual com pano não chega para os remover. Este tratamento elimina os germes das fibras com produtos certificados, essencial para restaurantes, escritórios e qualquer espaço onde várias pessoas se sentam na mesma cadeira em ${loc}.`,
@@ -303,7 +303,7 @@ function content_higienizacao_cadeiras(loc: string, ctx: string): ContentBlock {
         `Indicado para restaurantes, escritórios e clínicas em ${loc}`,
         'Cadeiras com aspeto cuidado, imagem mais profissional',
         'Desconto progressivo a partir de 10 cadeiras no mesmo lote',
-        `Deslocação incluída em ${loc}`,
+        `Deslocação a partir de 10€ em ${loc}`,
         'De volta ao uso em poucas horas',
       ],
     ] as const, seedB),
@@ -317,14 +317,14 @@ function content_higienizacao_cadeiras(loc: string, ctx: string): ContentBlock {
       [
         { question: `Emitem certificado de higienização para inspeções sanitárias em ${loc}?`, answer: `Sim. Após cada serviço emitimos certificado com identificação dos produtos usados, aceite em inspeções HACCP e auditorias sanitárias. Essencial para restaurantes, clínicas e espaços de saúde em ${loc}.` },
         { question: `Conseguem higienizar cadeiras de veludo sem danificar a textura?`, answer: `Sim. O veludo é um dos tecidos mais comuns em cadeiras de restaurante e escritório. Usamos produtos e técnicas específicas para veludo que eliminam os patogénicos sem alterar a textura ou brilho do tecido.` },
-        { question: `Podem trabalhar fora do horário de funcionamento do restaurante?`, answer: `Sim. Trabalhamos regularmente ao fim de semana, à noite e de madrugada para não perturbar o funcionamento do negócio. As cadeiras ficam prontas a usar em 2 a 4 horas.` },
+        { question: `Podem trabalhar fora do horário de funcionamento do restaurante?`, answer: `Sim. Trabalhamos regularmente ao fim de semana, à noite e de madrugada para não perturbar o funcionamento do negócio. As cadeiras ficam prontas a usar em 3 a 6 horas.` },
         { question: `Qual o desconto para higienizar um lote grande de cadeiras em ${loc}?`, answer: `Até 4 cadeiras: 20€/cad. · 5 a 6 cadeiras: 15€/cad. · 7 a 9 cadeiras: 12,50€/cad. Para 10 ou mais cadeiras, orçamento personalizado. Orçamento gratuito em ${loc}.` },
         { question: `A higienização funciona em cadeiras de mesh (escritório) além de estofo?`, answer: `Sim. O mesh é tratado com bactericida compatível que elimina as bactérias sem danificar as fibras plásticas da rede. Muito comum em cadeiras ergonómicas de escritório partilhadas.` },
       ],
       [
         { question: `Emitem certificado de higienização para inspeções sanitárias em ${loc}?`, answer: `Sim, com identificação dos produtos usados em cada serviço. É aceite em inspeções HACCP e auditorias sanitárias, essencial para restaurantes, clínicas e espaços de saúde em ${loc}.` },
         { question: `Conseguem higienizar cadeiras de veludo sem danificar a textura?`, answer: `Sim, com produtos e técnicas específicas para veludo, o tecido mais comum em cadeiras de restaurante e escritório. Os patogénicos são eliminados sem alterar a textura nem o brilho.` },
-        { question: `Podem trabalhar fora do horário de funcionamento do restaurante?`, answer: `Sim, é o mais frequente: fim de semana, à noite ou de madrugada, para não perturbar o negócio. As cadeiras ficam prontas a usar em 2 a 4 horas.` },
+        { question: `Podem trabalhar fora do horário de funcionamento do restaurante?`, answer: `Sim, é o mais frequente: fim de semana, à noite ou de madrugada, para não perturbar o negócio. As cadeiras ficam prontas a usar em 3 a 6 horas.` },
         { question: `Qual o desconto para higienizar um lote grande de cadeiras em ${loc}?`, answer: `20€/cad. até 4 cadeiras, 15€/cad. de 5 a 6, 12,50€/cad. de 7 a 9. A partir de 10 cadeiras fazemos orçamento personalizado, sempre gratuito, em ${loc}.` },
         { question: `A higienização funciona em cadeiras de mesh (escritório) além de estofo?`, answer: `Sim. Usamos bactericida compatível com as fibras plásticas da rede, que elimina as bactérias sem as danificar, muito comum em cadeiras ergonómicas de escritório partilhadas.` },
       ],
@@ -386,22 +386,22 @@ function content_higienizacao_alcatifas(loc: string, ctx: string): ContentBlock 
     ] as const, seedB),
     processSteps: [
       { step: 1, title: 'Aspiração industrial HEPA', description: `Remoção profunda de ácaros e alergénios em toda a superfície em ${loc}.` },
-      { step: 2, title: 'Pré-tratamento antimicrobiano', description: 'Aplicação de agente de largo espectro aprovado para espaços públicos.' },
+      { step: 2, title: 'Pré-tratamento de limpeza', description: 'Aplicação de agente de largo espectro aprovado para espaços públicos.' },
       { step: 3, title: 'Extração profunda', description: 'Eliminação dos agentes patogénicos até às camadas mais profundas.' },
-      { step: 4, title: 'Secagem acelerada', description: 'Espaço apto para uso em 2-4 horas com ventilação adequada.' },
+      { step: 4, title: 'Secagem acelerada', description: 'Espaço apto para uso em 3 a 6 horas com ventilação adequada.' },
     ],
     faqs: pick([
       [
         { question: `A higienização de alcatifas melhora realmente a qualidade do ar do espaço?`, answer: `Sim. As alcatifas são o maior reservatório de alergénios, pólen e bactérias em espaços fechados. Após higienização a qualidade do ar interior melhora de forma mensurável, especialmente relevante em escritórios e clínicas.` },
         { question: `Emitem relatório de higienização aceite em auditorias ISO ou sanitárias?`, answer: `Sim. Emitimos relatório detalhado com ficha técnica dos produtos usados, aceite em auditorias de qualidade do ar, certificações ISO e inspeções sanitárias. Disponível para todos os serviços em ${loc}.` },
-        { question: `O espaço tem de fechar durante a higienização das alcatifas?`, answer: `Depende da dimensão e do tipo de espaço. Em escritórios e clínicas fazemos frequentemente fora do horário para não interromper a atividade. O espaço fica apto para uso 2 a 4 horas após o serviço.` },
+        { question: `O espaço tem de fechar durante a higienização das alcatifas?`, answer: `Depende da dimensão e do tipo de espaço. Em escritórios e clínicas fazemos frequentemente fora do horário para não interromper a atividade. O espaço fica apto para uso 3 a 6 horas após o serviço.` },
         { question: `Fazem higienização de alcatifas ao fim de semana e à noite em ${loc}?`, answer: `Sim. É o horário mais comum para espaços comerciais em ${loc}. Agendamos conforme a disponibilidade do espaço para minimizar qualquer perturbação ao negócio.` },
         { question: `Qual o preço de higienização de alcatifa para escritório em ${loc}?`, answer: `Sempre orçamentado à medida da área e do estado da alcatifa, sem preço fixo por m². Orçamento gratuito e sem compromisso para o seu espaço em ${loc}.` },
       ],
       [
         { question: `A higienização de alcatifas melhora realmente a qualidade do ar do espaço?`, answer: `Sim, de forma mensurável. As alcatifas são o maior reservatório de alergénios, pólen e bactérias em espaços fechados, e isso é especialmente relevante em escritórios e clínicas.` },
         { question: `Emitem relatório de higienização aceite em auditorias ISO ou sanitárias?`, answer: `Sim, com ficha técnica detalhada dos produtos usados. É aceite em auditorias de qualidade do ar, certificações ISO e inspeções sanitárias, disponível para qualquer serviço em ${loc}.` },
-        { question: `O espaço tem de fechar durante a higienização das alcatifas?`, answer: `Depende da dimensão e do tipo de espaço. Frequentemente trabalhamos fora do horário em escritórios e clínicas, sem interromper a atividade, e o espaço fica pronto 2 a 4 horas depois.` },
+        { question: `O espaço tem de fechar durante a higienização das alcatifas?`, answer: `Depende da dimensão e do tipo de espaço. Frequentemente trabalhamos fora do horário em escritórios e clínicas, sem interromper a atividade, e o espaço fica pronto 3 a 6 horas depois.` },
         { question: `Fazem higienização de alcatifas ao fim de semana e à noite em ${loc}?`, answer: `Sim, é o horário mais pedido para espaços comerciais em ${loc}. O agendamento acompanha a disponibilidade do espaço para minimizar qualquer perturbação.` },
         { question: `Qual o preço de higienização de alcatifa para escritório em ${loc}?`, answer: `Sempre orçamentado à medida da área e do estado da alcatifa, sem tabela fixa por m². Orçamento sempre gratuito para o seu espaço em ${loc}.` },
       ],
@@ -450,34 +450,34 @@ function content_lavagem_sofa(loc: string, ctx: string): ContentBlock {
         'Devolve o aspeto original e as cores ao tecido',
         'Tecido macio como novo após a lavagem',
         `Lavagem ao domicílio em ${loc}`,
-        'Secagem rápida: sofá pronto em 4 a 6 horas',
+        'Secagem rápida: sofá pronto em 3 a 6 horas',
       ],
       [
         'Extração profunda com equipamento profissional dedicado',
         'Remove manchas antigas que resistem à limpeza seca',
         'Cores e aspeto original de volta ao tecido',
         'Tecido macio ao toque, como quando era novo',
-        `Deslocação incluída em ${loc}`,
-        'Sofá pronto em 4 a 6 horas de secagem',
+        `Deslocação a partir de 10€ em ${loc}`,
+        'Sofá pronto em 3 a 6 horas de secagem',
       ],
     ] as const, seedB),
     processSteps: [
       { step: 1, title: 'Mapeamento de manchas', description: `Identificação e avaliação de cada mancha por tipo em ${loc}.` },
       { step: 2, title: 'Pré-tratamento', description: 'Produto específico por tipo de mancha: gordura, vinho, urina, café.' },
       { step: 3, title: 'Lavagem por extração profissional', description: 'Injeção de solução quente e aspiração em profundidade das fibras.' },
-      { step: 4, title: 'Secagem acelerada', description: 'Sofá pronto a usar em 4 a 6 horas com ventilação adequada.' },
+      { step: 4, title: 'Secagem acelerada', description: 'Sofá pronto a usar em 3 a 6 horas com ventilação adequada.' },
     ],
     faqs: pick([
       [
         { question: `A lavagem por extração pode danificar o tecido do sofá?`, answer: `Não, desde que se avalie o tecido antes de iniciar. É segura para microfibra, algodão, linho, chenille e veludo. Para tecidos muito delicados como seda usamos métodos alternativos sem água.` },
-        { question: `Quanto tempo fica o sofá húmido após a lavagem profissional?`, answer: `Com o nosso sistema de extração de alta sucção, o sofá fica pronto a usar em 4 a 6 horas com boa ventilação. Em dias quentes pode secar ainda mais rápido.` },
+        { question: `Quanto tempo fica o sofá húmido após a lavagem profissional?`, answer: `Com o nosso sistema de extração de alta sucção, o sofá fica pronto a usar em 3 a 6 horas com boa ventilação. Em dias quentes pode secar ainda mais rápido.` },
         { question: `A lavagem consegue remover manchas de café e vinho com anos?`, answer: `Sim, na grande maioria dos casos. Manchas antigas de café, vinho e gordura são removidas pela extração profissional a quente. Manchas muito antigas ou de tinta podem precisar de tratamento adicional, avaliamos gratuitamente.` },
         { question: `Posso escolher o horário da visita para lavar o sofá em ${loc}?`, answer: `Sim. Agendamos conforme a sua disponibilidade em ${loc}, incluindo fins de semana e horários alargados. O processo decorre no local, sem necessidade de mover o sofá.` },
         { question: `Qual a diferença de preço entre lavar um sofá de 2 e 3 lugares?`, answer: `Sofá de 2 lugares a partir de 49€, 3 lugares a partir de 69€. Com chaise longue acrescenta 10€. Orçamento gratuito e personalizado ao seu sofá em ${loc}.` },
       ],
       [
         { question: `A lavagem por extração pode danificar o tecido do sofá?`, answer: `Não, o tecido é sempre avaliado antes de começar. Funciona em microfibra, algodão, linho, chenille e veludo; tecidos muito delicados como seda levam métodos alternativos sem água.` },
-        { question: `Quanto tempo fica o sofá húmido após a lavagem profissional?`, answer: `O sistema de extração de alta sucção deixa o sofá pronto em 4 a 6 horas com boa ventilação, podendo secar ainda mais rápido em dias quentes.` },
+        { question: `Quanto tempo fica o sofá húmido após a lavagem profissional?`, answer: `O sistema de extração de alta sucção deixa o sofá pronto em 3 a 6 horas com boa ventilação, podendo secar ainda mais rápido em dias quentes.` },
         { question: `A lavagem consegue remover manchas de café e vinho com anos?`, answer: `Na grande maioria dos casos, sim. A extração profissional a quente remove manchas antigas de café, vinho e gordura. Manchas muito antigas ou de tinta podem precisar de tratamento adicional, avaliado gratuitamente.` },
         { question: `Posso escolher o horário da visita para lavar o sofá em ${loc}?`, answer: `Sim, o agendamento acompanha a sua disponibilidade em ${loc}, incluindo fins de semana e horários alargados, sem necessidade de mover o sofá do lugar.` },
         { question: `Qual a diferença de preço entre lavar um sofá de 2 e 3 lugares?`, answer: `A partir de 49€ para 2 lugares e 69€ para 3 lugares, mais 10€ com chaise longue. Orçamento sempre gratuito e ajustado ao seu sofá em ${loc}.` },
@@ -534,7 +534,7 @@ function content_lavagem_colchao(loc: string, ctx: string): ContentBlock {
         'Extração que chega às camadas mais interiores do colchão',
         `Odores orgânicos acumulados eliminados na origem em ${loc}`,
         `Aspeto e frescura de colchão novo restaurados em ${loc}`,
-        `Deslocação incluída em ${loc}`,
+        `Deslocação a partir de 10€ em ${loc}`,
         'Sem esperar dias: pronto a usar no mesmo dia',
       ],
     ] as const, seedB),
@@ -688,7 +688,7 @@ function content_lavagem_cadeiras(loc: string, ctx: string): ContentBlock {
         `Manchas e gorduras eliminadas, aspeto renovado em ${loc}`,
         'Cores revitalizadas em qualquer tipo de tecido',
         'Cadeiras prontas no mesmo dia após secagem rápida',
-        `Deslocação incluída em ${loc}`,
+        `Deslocação a partir de 10€ em ${loc}`,
         'Desconto progressivo quanto maior o lote',
       ],
     ] as const, seedB),
@@ -701,14 +701,14 @@ function content_lavagem_cadeiras(loc: string, ctx: string): ContentBlock {
     faqs: pick([
       [
         { question: `A lavagem consegue remover gordura de cozinha das cadeiras de restaurante?`, answer: `Sim. A gordura de cozinha é uma das manchas mais comuns em cadeiras de restaurante e a mais difícil de remover em casa. O pré-tratamento desengordurante profissional dissolve-a antes da extração.` },
-        { question: `Quanto tempo ficam as cadeiras fora de uso depois da lavagem?`, answer: `Com o nosso sistema de extração de alta sucção, as cadeiras ficam prontas a usar em 2 a 4 horas. Em dias quentes com boa ventilação pode ser menos.` },
+        { question: `Quanto tempo ficam as cadeiras fora de uso depois da lavagem?`, answer: `Com o nosso sistema de extração de alta sucção, as cadeiras ficam prontas a usar em 3 a 6 horas. Em dias quentes com boa ventilação pode ser menos.` },
         { question: `Conseguem lavar cadeiras de veludo sem danificar a textura característica?`, answer: `Sim. O veludo requer técnica específica: lavagem com movimento correto das fibras. Temos experiência em veludo de várias qualidades e densidades sem danificar a textura.` },
         { question: `Fazem lavagem de cadeiras de restaurante fora do horário de funcionamento?`, answer: `Sim. É o nosso horário mais frequente para restaurantes em ${loc}. Trabalhamos à noite ou ao fim de semana para que as cadeiras estejam prontas antes da abertura.` },
         { question: `Qual o preço para lavar um lote de 20 cadeiras de escritório em ${loc}?`, answer: `Para lotes a partir de 10 cadeiras aplicamos preço personalizado, normalmente com desconto face ao preço por unidade. Orçamento gratuito com deslocação a ${loc} incluída.` },
       ],
       [
         { question: `A lavagem consegue remover gordura de cozinha das cadeiras de restaurante?`, answer: `Sim, é uma das manchas mais comuns em cadeiras de restaurante e das mais difíceis de tirar em casa. O desengordurante profissional dissolve a gordura antes da extração.` },
-        { question: `Quanto tempo ficam as cadeiras fora de uso depois da lavagem?`, answer: `O sistema de extração de alta sucção deixa as cadeiras prontas em 2 a 4 horas, podendo ser menos em dias quentes com boa ventilação.` },
+        { question: `Quanto tempo ficam as cadeiras fora de uso depois da lavagem?`, answer: `O sistema de extração de alta sucção deixa as cadeiras prontas em 3 a 6 horas, podendo ser menos em dias quentes com boa ventilação.` },
         { question: `Conseguem lavar cadeiras de veludo sem danificar a textura característica?`, answer: `Sim, com técnica específica que respeita o movimento das fibras. Já trabalhámos veludo de várias qualidades e densidades sem danificar a textura.` },
         { question: `Fazem lavagem de cadeiras de restaurante fora do horário de funcionamento?`, answer: `Sim, é o horário mais pedido para restaurantes em ${loc}: à noite ou ao fim de semana, para as cadeiras estarem prontas antes da abertura.` },
         { question: `Qual o preço para lavar um lote de 20 cadeiras de escritório em ${loc}?`, answer: `A partir de 10 cadeiras aplicamos preço personalizado, geralmente com desconto face ao valor por unidade. Orçamento gratuito, deslocação a ${loc} incluída.` },
@@ -747,15 +747,15 @@ function content_lavagem_alcatifas(loc: string, ctx: string): ContentBlock {
       `Hotéis, escritórios e grandes espaços comerciais em ${loc} precisam de lavagem de alcatifa sem parar a atividade. A Kyro Clean Solutions faz extração profunda profissional em qualquer dimensão, com secagem rápida em ${loc} e ${ctx}.`,
     ] as const, seed),
     whatIs: pick([
-      `A lavagem profissional penetra nas camadas mais densas da alcatifa e remove a sujidade que anos de aspiração deixaram para trás: manchas de passagem, derramamentos e a sujidade invisível das fibras. O resultado é visível no mesmo dia, com secagem em 2 a 4 horas em ${loc}.`,
-      `Anos de aspiração deixam sempre uma camada de sujidade compactada nas fibras densas da alcatifa — manchas de passagem, derramamentos antigos, sujidade invisível. A lavagem profissional penetra até essa camada, com resultado visível no mesmo dia e secagem em 2 a 4 horas em ${loc}.`,
-      `As manchas de passagem, derramamentos e sujidade que se acumulam numa alcatifa ao longo dos anos ficam presas nas fibras mais densas, fora do alcance da aspiração normal. A lavagem profissional remove-as, com resultado visível no mesmo dia e secagem em 2 a 4 horas em ${loc}.`,
+      `A lavagem profissional penetra nas camadas mais densas da alcatifa e remove a sujidade que anos de aspiração deixaram para trás: manchas de passagem, derramamentos e a sujidade invisível das fibras. O resultado é visível no mesmo dia, com secagem em 3 a 6 horas em ${loc}.`,
+      `Anos de aspiração deixam sempre uma camada de sujidade compactada nas fibras densas da alcatifa — manchas de passagem, derramamentos antigos, sujidade invisível. A lavagem profissional penetra até essa camada, com resultado visível no mesmo dia e secagem em 3 a 6 horas em ${loc}.`,
+      `As manchas de passagem, derramamentos e sujidade que se acumulam numa alcatifa ao longo dos anos ficam presas nas fibras mais densas, fora do alcance da aspiração normal. A lavagem profissional remove-as, com resultado visível no mesmo dia e secagem em 3 a 6 horas em ${loc}.`,
     ] as const, seed2),
     benefits: pick([
       [
         'Equipamento comercial para grandes superfícies',
         'Remove manchas de passagem e derramamentos',
-        'Secagem rápida: espaço apto em 2-4 horas',
+        'Secagem rápida: espaço apto em 3 a 6 horas',
         'Agendamento noturno e ao fim de semana',
         `Cobertura em ${loc} e toda a área envolvente`,
         'Orçamento competitivo à medida, mesmo em grandes áreas',
@@ -763,7 +763,7 @@ function content_lavagem_alcatifas(loc: string, ctx: string): ContentBlock {
       [
         'Equipamento comercial adaptado a grandes superfícies',
         'Manchas de passagem e derramamentos removidos',
-        'Espaço apto em 2 a 4 horas de secagem rápida',
+        'Espaço apto em 3 a 6 horas de secagem rápida',
         'Trabalho noturno e ao fim de semana sempre possível',
         `Cobertura de ${loc} e toda a área envolvente`,
         'Orçamento à medida e competitivo em grandes áreas',
@@ -773,11 +773,11 @@ function content_lavagem_alcatifas(loc: string, ctx: string): ContentBlock {
       { step: 1, title: 'Aspiração pré-lavagem', description: `Aspiração industrial para remoção de sujidade solta antes da lavagem em ${loc}.` },
       { step: 2, title: 'Aplicação de detergente', description: 'Produto profissional específico para alcatifas comerciais.' },
       { step: 3, title: 'Extração profissional', description: 'Lavagem a quente em profundidade e aspiração de alto volume.' },
-      { step: 4, title: 'Secagem acelerada', description: 'Ventilação dirigida: espaço apto para uso em 2-4 horas.' },
+      { step: 4, title: 'Secagem acelerada', description: 'Ventilação dirigida: espaço apto para uso em 3 a 6 horas.' },
     ],
     faqs: pick([
       [
-        { question: `A alcatifa pode ser usada no mesmo dia da lavagem?`, answer: `Sim, na maioria dos casos. Com extração de alta sucção e boa ventilação, as alcatifas ficam prontas em 2 a 4 horas. Para alcatifas de alta densidade pode demorar um pouco mais.` },
+        { question: `A alcatifa pode ser usada no mesmo dia da lavagem?`, answer: `Sim, na maioria dos casos. Com extração de alta sucção e boa ventilação, as alcatifas ficam prontas em 3 a 6 horas. Para alcatifas de alta densidade pode demorar um pouco mais.` },
         { question: `A lavagem profissional funciona em alcatifas de alta densidade (tipo hotel)?`, answer: `Sim. Temos equipamento industrial específico para alcatifas de alta densidade que a extração doméstica não consegue penetrar. É o tipo de alcatifa mais comum em hotéis e centros comerciais.` },
         { question: `Fazem lavagem de alcatifas em grandes superfícies acima de 100m²?`, answer: `Sim. Temos capacidade para qualquer dimensão de superfície. Já trabalhámos em hotéis, centros comerciais e espaços corporativos em ${loc}. Orçamento sempre à medida da área.` },
         { question: `A lavagem remove o cheiro a bafio de alcatifas antigas?`, answer: `Sim. O cheiro a bafio vem de fungos e bactérias acumulados nas fibras. A lavagem por extração elimina esses microrganismos na raiz, e o odor desaparece completamente após secagem.` },
@@ -850,7 +850,7 @@ function content_impermeabilizacao_sofa(loc: string, ctx: string): ContentBlock 
       { step: 1, title: 'Avaliação do tecido', description: `Inspecção do tipo de fibra e estado do sofá em ${loc} para confirmar compatibilidade.` },
       { step: 2, title: 'Limpeza prévia', description: 'O sofá deve estar limpo antes da aplicação. Recomendamos limpeza prévia para resultado ideal.' },
       { step: 3, title: 'Escolha da versão e aplicação', description: 'Essencial (à base de água) ou Premium (à base de diluente), aplicada uniformemente em todo o tecido.' },
-      { step: 4, title: 'Secagem e ativação', description: 'A barreira ativa-se na secagem: sofá pronto a usar em 2 a 4 horas.' },
+      { step: 4, title: 'Secagem e ativação', description: 'A barreira ativa-se na secagem: sofá pronto a usar em 3 a 6 horas.' },
     ],
     faqs: pick([
       [
@@ -858,14 +858,14 @@ function content_impermeabilizacao_sofa(loc: string, ctx: string): ContentBlock 
         { question: `Quanto tempo dura a impermeabilização de um sofá?`, answer: `Depende da versão. A Essencial, à base de água, dura 1 a 2 anos com uso normal e aguenta até 2 lavagens. A Premium, à base de diluente e mais resistente ao desgaste, dura até 10 anos e aguenta até 5 lavagens. Em famílias com crianças ou animais de estimação, a Premium costuma compensar mais.` },
         { question: `Preciso de limpar o sofá antes de o impermeabilizar?`, answer: `Sim, e é altamente recomendado. Aplicar impermeabilização sobre tecido sujo reduz significativamente a eficácia e duração da barreira. Oferecemos o pack limpeza + impermeabilização Essencial com desconto em ${loc}.` },
         { question: `A impermeabilização funciona em sofás de veludo, pele e microfibra?`, answer: `Sim. Adaptamos a formulação ao tipo de tecido, em ambas as versões. Para veludo e tecidos delicados usamos produtos específicos que preservam a textura e o brilho característico do material.` },
-        { question: `Qual a diferença entre a Essencial e a Premium?`, answer: `Essencial (à base de água): 59€ (1L), 79€ (2L), 99€ (3L), aguenta até 2 lavagens. Premium (à base de diluente): 89€ (1L), 109€ (2L), 139€ (3L), aguenta até 5 lavagens e dura até 10 anos. O pack com limpeza (99€/145€/159€) está sempre associado à Essencial.` },
+        { question: `Qual a diferença entre a Essencial e a Premium?`, answer: `Essencial (à base de água): 59€ (1L), 79€ (2L), 99€ (3L), aguenta até 2 lavagens. Premium (à base de diluente): 89€ (1L), 109€ (2L), 139€ (3L), aguenta até 5 lavagens e dura até 10 anos. Limpeza + Essencial: 99€/139€/169€. Limpeza + Premium: 129€/169€/199€, para 1/2/3 lugares, mais deslocação.` },
       ],
       [
         { question: `A impermeabilização altera o toque ou a cor do sofá?`, answer: `Não, em nenhuma das duas versões. O tratamento é invisível e não muda a maciez, a cor nem a textura do tecido, só passa a repelir líquidos.` },
         { question: `Quanto tempo dura a impermeabilização de um sofá?`, answer: `A Essencial, à base de água, dura 1 a 2 anos com uso normal e aguenta até 2 lavagens. A Premium, à base de diluente e mais resistente ao desgaste, dura até 10 anos e aguenta até 5 lavagens, opção mais vantajosa com crianças ou animais em casa.` },
         { question: `Preciso de limpar o sofá antes de o impermeabilizar?`, answer: `Sim, é muito recomendado: sobre tecido sujo, a barreira perde eficácia e duração. Há um pack limpeza + impermeabilização Essencial com desconto disponível em ${loc}.` },
         { question: `A impermeabilização funciona em sofás de veludo, pele e microfibra?`, answer: `Sim, a formulação é adaptada ao tipo de tecido em ambas as versões, com produtos específicos para veludo e tecidos delicados que preservam textura e brilho.` },
-        { question: `Qual a diferença entre a Essencial e a Premium?`, answer: `Essencial (à base de água): 59€ (1L), 79€ (2L), 99€ (3L), até 2 lavagens. Premium (à base de diluente): 89€ (1L), 109€ (2L), 139€ (3L), até 5 lavagens e 10 anos de duração. O pack com limpeza (99€/145€/159€) é sempre com a Essencial.` },
+        { question: `Qual a diferença entre a Essencial e a Premium?`, answer: `Essencial (à base de água): 59€ (1L), 79€ (2L), 99€ (3L), até 2 lavagens. Premium (à base de diluente): 89€ (1L), 109€ (2L), 139€ (3L), até 5 lavagens e 10 anos de duração. Limpeza + Essencial: 99€/139€/169€. Limpeza + Premium: 129€/169€/199€, para 1/2/3 lugares, mais deslocação.` },
       ],
     ] as const, seedF),
     problems: pick([
@@ -927,20 +927,20 @@ function content_impermeabilizacao_cadeiras(loc: string, ctx: string): ContentBl
       { step: 1, title: 'Avaliação do tecido', description: `Inspecção do tipo de fibra de cada cadeira em ${loc}: veludo, mesh, tecido ou pele sintética.` },
       { step: 2, title: 'Limpeza prévia', description: 'Recomendamos limpeza das cadeiras antes da aplicação para máxima eficácia da barreira.' },
       { step: 3, title: 'Escolha da versão e aplicação', description: 'Essencial ou Premium, aplicada uniformemente com produto certificado, adaptado ao tipo de tecido.' },
-      { step: 4, title: 'Secagem rápida', description: 'Cadeiras prontas a usar em 1 a 2 horas, sem interrupção do negócio.' },
+      { step: 4, title: 'Secagem rápida', description: 'Cadeiras prontas a usar em 3 a 6 horas, sem interrupção do negócio.' },
     ],
     faqs: pick([
       [
         { question: `A impermeabilização das cadeiras facilita a limpeza diária do restaurante?`, answer: `Sim, muito. Derrames de vinho, café e molhos ficam à superfície e limpam-se com um pano, em vez de penetrarem nas fibras e criarem manchas permanentes. O tempo de limpeza diária reduz significativamente.` },
         { question: `A impermeabilização funciona em cadeiras de pele sintética ou só em tecido?`, answer: `Funciona nos dois. Para pele sintética o tratamento reforça a repelência natural do material. Para tecido (veludo, chenille, mesh) cria uma barreira nas fibras. Adaptamos o produto ao material, em ambas as versões.` },
-        { question: `Quanto tempo ficam as cadeiras fora de uso depois da impermeabilização?`, answer: `A impermeabilização é rápida (15 a 30 minutos por lote) e a secagem demora 1 a 2 horas. As cadeiras ficam prontas a usar no mesmo dia, sem necessidade de fechar o espaço.` },
+        { question: `Quanto tempo ficam as cadeiras fora de uso depois da impermeabilização?`, answer: `A impermeabilização é rápida (15 a 30 minutos por lote) e a secagem demora 3 a 6 horas. As cadeiras ficam prontas a usar no mesmo dia, sem necessidade de fechar o espaço.` },
         { question: `Qual a diferença de preço entre a Essencial e a Premium para cadeiras?`, answer: `Essencial: 15€/un. para as primeiras 4 cadeiras, 10€/un. da 5ª à 9ª. Premium: 20€/un. para as primeiras 4, 15€/un. da 5ª à 9ª. A partir de 10 cadeiras, orçamento personalizado para o seu restaurante em ${loc}.` },
         { question: `Para restaurantes com uso intenso, vale a pena a versão Premium?`, answer: `Sim. A Premium aguenta até 5 lavagens contra 2 da Essencial, e a proteção real dura até 10 anos em vez de 1 a 2. Em cadeiras de restaurante, sujeitas a limpeza diária, esta diferença compensa o investimento inicial mais alto.` },
       ],
       [
         { question: `A impermeabilização das cadeiras facilita a limpeza diária do restaurante?`, answer: `Sim, e muito: vinho, café e molhos ficam à superfície e saem com um pano, em vez de penetrar nas fibras e criar manchas permanentes. O tempo de limpeza diária cai bastante.` },
         { question: `A impermeabilização funciona em cadeiras de pele sintética ou só em tecido?`, answer: `Funciona em ambos. Na pele sintética reforça a repelência natural do material; em tecido (veludo, chenille, mesh) cria uma barreira nas fibras. O produto é adaptado ao material em ambas as versões.` },
-        { question: `Quanto tempo ficam as cadeiras fora de uso depois da impermeabilização?`, answer: `A aplicação em si demora 15 a 30 minutos por lote, com 1 a 2 horas de secagem. As cadeiras voltam a uso no mesmo dia, sem fechar o espaço.` },
+        { question: `Quanto tempo ficam as cadeiras fora de uso depois da impermeabilização?`, answer: `A aplicação em si demora 15 a 30 minutos por lote, com 3 a 6 horas de secagem. As cadeiras voltam a uso no mesmo dia, sem fechar o espaço.` },
         { question: `Qual a diferença de preço entre a Essencial e a Premium para cadeiras?`, answer: `Essencial: 15€/un. nas primeiras 4, 10€/un. da 5ª à 9ª. Premium: 20€/un. nas primeiras 4, 15€/un. da 5ª à 9ª. A partir de 10 cadeiras fazemos orçamento personalizado em ${loc}.` },
         { question: `Para restaurantes com uso intenso, vale a pena a versão Premium?`, answer: `Sim. Aguenta até 5 lavagens contra 2 da Essencial, e a proteção real chega a 10 anos em vez de 1 a 2. Em cadeiras de uso diário, essa diferença compensa o investimento inicial mais alto.` },
       ],

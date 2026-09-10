@@ -79,7 +79,7 @@ export default function PriceWidget({ serviceSlug, initialLocation }: Props) {
           <p className="text-[9px] font-bold tracking-[0.24em] uppercase text-gold/70">Orçamento Gratuito</p>
         </div>
         <p className="font-playfair text-white font-bold text-sm sm:text-base leading-snug">{isWaterproofService ? 'Escolha a sua impermeabilização' : 'Escolha as quantidades e continue'}</p>
-        <p className="text-[11px] mt-0.5 text-white/35">Sem compromisso · Resposta em menos de 30 min</p>
+        <p className="text-[11px] mt-0.5 text-white/35">Sem compromisso · Resposta em menos de 10 min</p>
       </div>
 
       {isWaterproofService && (

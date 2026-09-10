@@ -1,3 +1,4 @@
+import { getTreatmentRoutes, getExpansionRoutes } from './data/treatmentSeoData';
 import { lazy, Suspense, useEffect } from "react";
 import { trackSessionTime } from "@/lib/quizTracking";
 import { Toaster } from "@/components/ui/toaster";
@@ -23,6 +24,8 @@ import { getAllMarcaSofaRoutes } from "@/data/marcaSofaData";
 import { getAllMarcaColchaoRoutes } from "@/data/marcaColchaoData";
 import { getAllMarcaCadeirasRoutes } from "@/data/marcaCadeirasData";
 import { getAllCommercialRoutes } from "@/data/commercialSeoData";
+
+const TreatmentPage = lazy(() => import('./pages/TreatmentPage'));
 
 // Critical path - load immediately
 import IndexV1 from "./pages/IndexV1";
@@ -189,6 +192,7 @@ const AppRoutes = () => {
                 <Route path="/admin/deslocacoes" element={<AdminDeslocacoes />} />
                 <Route path="/areas-de-servico" element={<AreasDeServico />} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                {[...getTreatmentRoutes(), ...getExpansionRoutes()].map(route => <Route key={route.path} path={route.path} element={<TreatmentPage />} />)}
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </Suspense>

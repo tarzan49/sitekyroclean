@@ -34,7 +34,7 @@ const terms: Term[] = [
   {
     id: "extracao-vapor-estofos",
     term: "Extração a Vapor de Estofos",
-    definition: "Técnica profissional que combina injeção de vapor de água a alta pressão (até 8 bar) com aspiração simultânea. O vapor penetra nas fibras, solta a sujidade orgânica e mata microrganismos a temperaturas acima de 60ºC, letal para ácaros, bactérias e fungos. A aspiração remove imediatamente os resíduos e 80 a 90% da humidade, deixando o tecido levemente húmido e com tempo de secagem de 1 a 3 horas. É o método de referência para estofos de tecido porque limpa e higieniza em simultâneo sem produtos químicos agressivos.",
+    definition: "Técnica profissional que combina injeção de vapor de água a alta pressão (até 8 bar) com aspiração simultânea. O vapor penetra nas fibras, solta a sujidade orgânica e mata microrganismos a temperaturas acima de 60ºC, letal para ácaros, bactérias e fungos. A aspiração remove imediatamente os resíduos e 80 a 90% da humidade, deixando o tecido levemente húmido e com tempo de secagem de 3 a 6 horas. É o método de referência para estofos de tecido porque limpa e higieniza em simultâneo sem produtos químicos agressivos.",
     example: "Sofá de microfibra com 3 anos de uso intensivo em casa com cão. Após extração a vapor, fibras recuperam cor original, odor a animal eliminado e o dono nota redução imediata de espirros.",
     serviceLink: { label: "Limpeza de Sofás por Extração", to: "/limpeza-sofas" },
   },
@@ -286,7 +286,7 @@ const GlossarioEstofos = () => {
             <div className="px-6 py-8 flex flex-col items-center text-center">
               <p className="text-[10px] font-bold tracking-[0.28em] uppercase text-gold/70 mb-2">PRONTO PARA AGENDAR?</p>
               <h2 className="font-playfair text-2xl font-bold text-white mb-2">Orçamento gratuito em 30 segundos</h2>
-              <p className="text-white/50 text-sm mb-6">Técnico contacta em menos de 30 minutos · Sem compromisso</p>
+              <p className="text-white/50 text-sm mb-6">Técnico contacta em menos de 10 minutos · Sem compromisso</p>
               <QuizButton ctaLabel="Calcular preço grátis" />
             </div>
           </div>

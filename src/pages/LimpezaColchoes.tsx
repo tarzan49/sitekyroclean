@@ -1,3 +1,4 @@
+import { SATISFACTION_PROMISE } from '../constants/commercialPolicy';
 import Header from "@/components/Header";
 import { QuizServiceProvider } from "@/context/QuizLocationContext";
 import Footer from "@/components/Footer";
@@ -20,13 +21,13 @@ const colchoesGuarantee: GuaranteeItem[] = [
   {
     label: "Satisfação",
     title: "Resultado visível ou repetimos",
-    body: "Se a higienização não trouxer uma diferença clara, voltamos sem qualquer custo. Comprometemo-nos com o resultado, não apenas com o processo.",
+    body: SATISFACTION_PROMISE,
     image: "/images/colchoes/v4.webp",
   },
   {
     label: "Higiene",
-    title: "Eliminação profunda de ácaros",
-    body: "Temperatura, pressão e produtos combinados garantem a eliminação de ácaros, fungos e bactérias em profundidade, não apenas na superfície do tecido.",
+    title: "Cuidados adicionais à sua escolha",
+    body: "A limpeza remove sujidade e resíduos. Pode acrescentar tratamento anti-ácaros ou desbacterização ao seu colchão; estes extras são definidos e orçamentados separadamente.",
     image: "/images/colchoes/v5.webp",
   },
   {
@@ -50,7 +51,7 @@ const expertTips: ExpertTip[] = [
   },
   {
     title: "Quanto tempo demora o colchão a secar?",
-    summary: "Com equipamento de extração profissional, o colchão fica seco em 2 a 4 horas. Saiba como acelerar ainda mais o processo.",
+    summary: "Com equipamento de extração profissional, o colchão fica seco em 3 a 6 horas. Saiba como acelerar ainda mais o processo.",
     url: "/blog/limpeza-colchao-bebe-crianca",
   },
   {
@@ -106,9 +107,9 @@ const LimpezaColchoes = () => {
           url="/limpeza-colchoes"
           priceFrom={DEFAULT_PRICE_FROM}
           reviews={[
-            { author: "Fernando G.", city: "Rio Tinto", text: "Excelente trabalho no meu colchão. Tinha alergia constante e depois da limpeza melhorou imenso. Super recomendo!", date: "2025-01-28" },
-            { author: "Sofia P.", city: "Guimarães", text: "Fantástico! O colchão estava com manchas difíceis e conseguiram remover tudo. Muito satisfeita com o resultado.", date: "2025-03-10" },
-            { author: "Daniela R.", city: "Famalicão", text: "Contratei para limpar os colchões das crianças. Ficaram super higiénicos e sem aquele cheiro a humidade. Adorei!", date: "2025-04-15" },
+            { author: "Fernando G.", city: "", text: "Excelente trabalho no meu colchão. Tinha alergia constante e depois da limpeza melhorou imenso. Super recomendo!", date: "2025-01-28" },
+            { author: "Sofia P.", city: "", text: "Fantástico! O colchão estava com manchas difíceis e conseguiram remover tudo. Muito satisfeita com o resultado.", date: "2025-03-10" },
+            { author: "Daniela R.", city: "", text: "Contratei para limpar os colchões das crianças. Ficaram super higiénicos e sem aquele cheiro a humidade. Adorei!", date: "2025-04-15" },
           ]}
         />
       </main>
