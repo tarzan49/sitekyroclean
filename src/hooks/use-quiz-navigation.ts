@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import type { QuizFormData, SofaItem, MattressItem, CarpetItem } from '@/components/quiz';
-import { carpetHasValidItems } from '@/components/quiz/quizHelpers';
+import { carpetAllItemsValid } from '@/components/quiz/quizHelpers';
 import { trackQuizEvent } from '@/lib/quizTracking';
 
 // As 4 telas de upsell dedicadas são sempre mutuamente exclusivas — ver
@@ -69,7 +69,7 @@ export function useQuizNavigation({
         return sofaItems.some(i => i.qty > 0);
       }
       case 'carpet': {
-        return carpetHasValidItems(carpetItems);
+        return carpetAllItemsValid(carpetItems);
       }
       case 'mattress':
         return mattressItems.some(i => i.qty > 0);
@@ -100,7 +100,7 @@ export function useQuizNavigation({
       case 1: return formData.service !== '';
       case 2: return formData.serviceType !== '';
       case 3: return canProceedStep3();
-      case 4: return formData.name.trim() !== '' && formData.phone.trim() !== '';
+      case 4: return canProceedStep3() && formData.location.trim() !== '' && formData.name.trim() !== '' && /^[+\d\s().-]+$/.test(formData.phone.trim()) && formData.phone.replace(/\D/g, '').length >= 9 && formData.phone.replace(/\D/g, '').length <= 15;
       default: return false;
     }
   };

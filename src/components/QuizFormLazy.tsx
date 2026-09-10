@@ -23,6 +23,7 @@ interface Props {
   initialChairQty?: string;
   initialChairWaterproofing?: boolean;
   initialCarpetArea?: string;
+  initialCarpetKind?: 'tapete' | 'alcatifa';
   initialCarpetItems?: import('./quiz/QuizTypes').CarpetItem[];
   initialWaterproofingTier?: 'essencial' | 'premium';
   problema?: string;

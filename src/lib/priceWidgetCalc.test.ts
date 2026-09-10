@@ -38,24 +38,24 @@ describe('calcWidgetTotal — carpet (tapete e alcatifa) nunca soma ao total', (
 // tempo (soma > 149€ E pelo menos um artigo isolado >= 49€), não um sozinho.
 describe('calcWidgetPricing — regra do desconto Pack Família (100€ base + 49€ artigo extra)', () => {
   it('does not activate for a single 49€ article alone, even if that IS the qualifying threshold', () => {
-    const pricing = calcWidgetPricing(49, 10, { articleTotal: 49, minQualifyingArticle: 49 });
+    const pricing = calcWidgetPricing(49, 10, { articleCount: 2, articleTotal: 49, minQualifyingArticle: 49 });
     expect(pricing.discountActive).toBe(false);
   });
   it('does not activate exactly at the 149€ boundary — must be strictly greater than', () => {
     expect(PACK_DISCOUNT_MIN_TOTAL).toBe(149);
-    const pricing = calcWidgetPricing(149, 0, { articleTotal: 149, minQualifyingArticle: 49 });
+    const pricing = calcWidgetPricing(149, 0, { articleCount: 2, articleTotal: 149, minQualifyingArticle: 49 });
     expect(pricing.discountActive).toBe(false);
   });
   it('activates just above 149€ when a qualifying (>=49€) article exists', () => {
-    const pricing = calcWidgetPricing(150, 0, { articleTotal: 150, minQualifyingArticle: 49 });
+    const pricing = calcWidgetPricing(150, 0, { articleCount: 2, articleTotal: 150, minQualifyingArticle: 49 });
     expect(pricing.discountActive).toBe(true);
   });
   it('does NOT activate above 149€ if every individual article is under 49€ (e.g. many small chairs)', () => {
-    const pricing = calcWidgetPricing(200, 0, { articleTotal: 200, minQualifyingArticle: null });
+    const pricing = calcWidgetPricing(200, 0, { articleCount: 2, articleTotal: 200, minQualifyingArticle: null });
     expect(pricing.discountActive).toBe(false);
   });
   it('discountedTotal applies 10% only to the service total, travel fee stays full price', () => {
-    const pricing = calcWidgetPricing(200, 10, { articleTotal: 200, minQualifyingArticle: 60 });
+    const pricing = calcWidgetPricing(200, 10, { articleCount: 2, articleTotal: 200, minQualifyingArticle: 60 });
     expect(pricing.discountActive).toBe(true);
     expect(pricing.discountedTotal).toBe(Math.round(200 * 0.9) + 10);
   });
@@ -140,4 +140,8 @@ describe('waterproof widget handoff', () => {
     const config = buildWidgetQuizConfig('impermeabilizacao', { 0: 1, 5: 10 }, 0)!;
     expect(config.initialUpsellItems?.[0].price).toBe(0);
   });
+});
+
+it('does not drop an incomplete piece when launching a carpet quote', () => {
+  expect(buildWidgetQuizConfig('limpeza-tapetes', { 0: 1 }, 0, new Set(), 'premium', new Set(), { 0: [{ id: 'one', largura: '2', comprimento: '3' }, { id: 'two', largura: '1', comprimento: '' }] })).toBeNull();
 });

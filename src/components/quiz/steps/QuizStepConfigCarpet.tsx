@@ -3,6 +3,7 @@ import { carpetAddItem, carpetRemoveItem, carpetUpdateItem, carpetItemArea, carp
 
 interface Props {
   carpetItems: CarpetItem[];
+  carpetKind?: 'tapete' | 'alcatifa';
   setCarpetItems: React.Dispatch<React.SetStateAction<CarpetItem[]>>;
 }
 
@@ -14,7 +15,7 @@ interface Props {
 // sempre sob orçamento. O cliente mede largura × comprimento por tapete, em
 // vez de somar tudo numa única "área total", e pode adicionar quantos quiser
 // (padrão "adicionar paragem" do Uber/Google Maps).
-const QuizStepConfigCarpet = ({ carpetItems, setCarpetItems }: Props) => {
+const QuizStepConfigCarpet = ({ carpetItems, setCarpetItems, carpetKind = 'tapete' }: Props) => {
   const hasMultiple = carpetItems.length > 1;
   const totalArea = carpetTotalArea(carpetItems);
   const hasAnyValid = totalArea > 0;
@@ -22,17 +23,18 @@ const QuizStepConfigCarpet = ({ carpetItems, setCarpetItems }: Props) => {
   return (
     <div className="flex flex-col gap-3 overflow-hidden items-center w-full">
       <p className="text-gold text-[10px] font-bold tracking-[0.28em] uppercase mb-0.5 text-center w-full">O QUE PRECISA?</p>
-      <h2 className="font-playfair text-2xl sm:text-3xl font-bold text-white text-center w-full">Detalhes do(s) Tapete(s)</h2>
+      <h2 className="font-playfair text-2xl sm:text-3xl font-bold text-white text-center w-full">{carpetKind === 'alcatifa' ? 'Medidas da Alcatifa' : 'Detalhes do(s) Tapete(s)'}</h2>
       <p className="text-xs text-white/35 text-center leading-snug max-w-xs">
-        Meça cada tapete e adicione quantos precisar. Sem preço fixo por m², cada peça é sempre orçamentada à parte.
+        Meça cada peça ou área e adicione quantas precisar. Sem preço fixo por m², cada peça é sempre orçamentada à parte.
       </p>
       <div className="flex flex-col gap-2 w-full max-w-xs">
+        {carpetItems.some(item => carpetItemArea(item) === null) && <p className="text-xs text-white/65">Preencha as duas medidas de cada peça para continuar.</p>}
         {carpetItems.map((item, i) => {
           const area = carpetItemArea(item);
           return (
             <div key={item.id} className="rounded-sm border border-gold/15 bg-[#1a2a1a] p-3 flex flex-col gap-2">
               <div className="flex items-center justify-between">
-                <span className="text-[11px] font-bold uppercase tracking-wider text-white/40">Tapete {i + 1}</span>
+                <span className="text-[11px] font-bold uppercase tracking-wider text-white/40">{carpetKind === 'alcatifa' ? 'Área' : 'Tapete'} {i + 1}</span>
                 {carpetItems.length > 1 && (
                   <button
                     onClick={() => setCarpetItems(prev => carpetRemoveItem(prev, item.id))}
@@ -83,7 +85,7 @@ const QuizStepConfigCarpet = ({ carpetItems, setCarpetItems }: Props) => {
         </p>
       )}
       <p className="text-xs text-white/30 text-center leading-snug">
-        Qualquer tapete é sempre sob orçamento. Confirmamos o preço certo na visita, sem compromisso.
+        O serviço é sempre sob orçamento. Confirmamos o preço certo na visita, sem compromisso.
       </p>
     </div>
   );

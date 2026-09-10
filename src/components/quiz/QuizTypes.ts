@@ -8,6 +8,7 @@ export interface QuizFormData {
   sofaSize: string;
   sofaHasChaise: boolean;
   carpetArea: string;
+  carpetKind?: 'tapete' | 'alcatifa';
   mattressSize: string;
   chairType: string;
   chairQuantity: string;
@@ -132,6 +133,7 @@ export interface UpsellItemConfig {
   price: number;
   label: string;
   waterproof?: boolean;
+  waterproofingTier?: 'essencial' | 'premium';
   waterproofPrice?: number;
   chaiseLongue?: boolean;
 }

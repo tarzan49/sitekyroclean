@@ -5,12 +5,14 @@ import { REVIEW_RATING, REVIEW_COUNT } from '@/constants/business';
 
 interface QuizStepContactProps {
   preview?: boolean;
+  quoteLines: Array<{ label: string; qty: number; total: number | null }>;
+  quotePriceText: string;
   formData: QuizFormData;
   updateFormData: (updates: Partial<QuizFormData>) => void;
   scrollContainerRef: React.RefObject<HTMLDivElement>;
 }
 
-const QuizStepContact = ({ formData, updateFormData, scrollContainerRef, preview = false }: QuizStepContactProps) => {
+const QuizStepContact = ({ formData, updateFormData, scrollContainerRef, quoteLines, quotePriceText, preview = false }: QuizStepContactProps) => {
   const scrollToVisible = (el: HTMLElement) => {
     setTimeout(() => {
       const sc = scrollContainerRef.current;
@@ -28,13 +30,13 @@ const QuizStepContact = ({ formData, updateFormData, scrollContainerRef, preview
       style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}
       className="flex-1"
     >
-      <div className="w-full max-w-sm">
+      <div className="w-full max-w-sm px-4">
         <p className="text-gold text-[10px] font-bold tracking-[0.28em] uppercase mb-1 text-center">CONTACTO</p>
         <h2 className="font-playfair text-2xl sm:text-3xl font-bold text-white text-center mb-1 leading-[1.3]">
           Os seus dados
         </h2>
         <p className="text-center text-[11px] text-white/30 mb-5">
-          {preview ? "Modo de teste: não precisa de preencher dados. Nenhum pedido será enviado." : "Preenche em segundos. O pedido é enviado automaticamente."}
+          {preview ? "Modo de teste: não precisa de preencher dados. Nenhum pedido será enviado." : "Confira o resumo e preencha os seus dados para enviar o pedido."}
         </p>
 
         <div className="relative flex items-center gap-4 bg-[#0c1d15] border border-gold/[0.15] rounded-sm pl-5 pr-4 py-3.5 mb-3 overflow-hidden">
@@ -60,10 +62,22 @@ const QuizStepContact = ({ formData, updateFormData, scrollContainerRef, preview
           </div>
         </div>
 
+        <details className="mb-5 rounded-sm border border-gold/25 bg-white/[0.04] p-3 text-left" open>
+          <summary className="cursor-pointer text-sm font-bold text-white">Resumo do seu pedido</summary>
+          <div className="mt-3 space-y-2">
+            {quoteLines.map((line, i) => <div key={i} className="flex items-start justify-between gap-3 text-xs text-white/75">
+              <span className="min-w-0 break-words">{line.qty}× {line.label}</span>
+              <span className="shrink-0">{line.total === null ? 'Sob orçamento' : `${line.total.toLocaleString('pt-PT')}€`}</span>
+            </div>)}
+            <p className="border-t border-white/10 pt-2 text-sm font-semibold text-[#D4AF37]">{quotePriceText}</p>
+            <p className="text-xs text-white/60">Estimativa sujeita a confirmação. Pode voltar para alterar os artigos.</p>
+          </div>
+        </details>
         <div className="flex flex-col gap-4">
           <div>
-            <label className="block text-[11px] font-bold text-white/65 uppercase tracking-wider mb-1.5">Nome *</label>
+            <label htmlFor="quote-name" className="block text-[11px] font-bold text-white/65 uppercase tracking-wider mb-1.5">Nome *</label>
             <Input
+              id="quote-name"
               placeholder="O seu nome"
               value={formData.name}
               onChange={(e) => updateFormData({ name: e.target.value })}
@@ -75,18 +89,20 @@ const QuizStepContact = ({ formData, updateFormData, scrollContainerRef, preview
             />
           </div>
           <div>
-            <label className="block text-[11px] font-bold text-white/65 uppercase tracking-wider mb-1.5">Telemóvel / WhatsApp *</label>
+            <label htmlFor="quote-phone" className="block text-[11px] font-bold text-white/65 uppercase tracking-wider mb-1.5">Telemóvel / WhatsApp *</label>
             <Input
+              id="quote-phone"
               type="tel"
               placeholder="9xx xxx xxx"
               value={formData.phone}
               onChange={(e) => updateFormData({ phone: e.target.value })}
               autoComplete="off"
-              inputMode="numeric"
+              inputMode="tel"
               onFocus={(e) => scrollToVisible(e.target)}
               className="text-base h-13 bg-[#1a2a1a] border-gold/25 text-white placeholder:text-white/20 focus-visible:ring-gold rounded-sm"
             />
           </div>
+          {formData.phone && formData.phone.replace(/\D/g, '').length < 9 && <p className="text-xs text-amber-200 text-left">Introduza um contacto válido, com indicativo se for estrangeiro.</p>}
         </div>
       </div>
     </div>

@@ -205,6 +205,7 @@ const ServiceHero = ({
         isOpen={isQuizOpen}
         onClose={closeQuiz}
         initialService={QUIZ_SERVICE[serviceSlug]}
+        initialCarpetKind={serviceSlug === 'limpeza-alcatifas' ? 'alcatifa' : 'tapete'}
       />
     </>
   );
