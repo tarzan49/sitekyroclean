@@ -3,7 +3,7 @@ import { useEffect, useMemo } from "react";
 import { useParams, Link } from "react-router-dom";
 import { QuizServiceProvider } from "@/context/QuizLocationContext";
 import {
-  MapPin, Star, MessageCircle, ArrowRight, AlertTriangle, XCircle, CheckCircle2,
+  MapPin, Star, MessageCircle, ArrowRight, AlertTriangle,
 } from "lucide-react";
 import Header from "@/components/Header";
 import PageBreadcrumb from "@/components/PageBreadcrumb";
@@ -17,7 +17,7 @@ import ServiceAutoCarousel from "@/components/ServiceAutoCarousel";
 import ServiceSnapshotStats from "@/components/ServiceSnapshotStats";
 import { getProblemBySlug, getRelatedProblemLinks } from "@/data/problemSeoData";
 import { CATEGORY_TIPS, CATEGORY_STATS, splitTipsHeading } from "@/data/problemTipsData";
-import { getServiceGallery, getSolutionImage } from "@/constants/serviceGallery";
+import { getServiceGallery } from "@/constants/serviceGallery";
 import { services, cities } from "@/data/locationSeoData";
 import { SERVICE_TO_QUIZ } from "@/constants/serviceToQuiz";
 import { getProblemHeroImage } from "@/lib/problemHeroImages";
@@ -114,7 +114,6 @@ const ProblemPage = () => {
   const gallery = getServiceGallery(data.relatedServices[0], slug ?? "");
   const heroImg = getProblemHeroImage(slug ?? "");
   const beforeAfterCategory = categoryForServiceSlug(data.relatedServices[0]);
-  const solutionImg = getSolutionImage(data.relatedServices[0], slug ?? "") ?? heroImg;
   const waHref = `${WHATSAPP_BASE}?text=${encodeURIComponent(buildProblemWaMessage(slug ?? ""))}`;
   const snapshotStats = CATEGORY_STATS[data.category] ?? CATEGORY_STATS.manchas;
 
@@ -212,49 +211,6 @@ const ProblemPage = () => {
 
         <ServiceSnapshotStats stats={snapshotStats} />
         </div>
-
-        {/* ═══ PROBLEMA + SOLUÇÃO — visual, 2 cartões fotográficos ═══ */}
-        <section className="py-14 md:py-20 bg-[#FDFDF9]">
-          <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
-            <SectionHeader overline="Diagnóstico" heading="O problema," goldWord="a solução" light={true} />
-            <div className="grid sm:grid-cols-2 gap-4 md:gap-6">
-              {/* Problema — imagem dessaturada + acento vermelho; texto num painel sólido abaixo, nunca cortado */}
-              <div className="rounded-sm overflow-hidden flex flex-col" style={{ border: "3px solid #ef4444", boxShadow: "0 0 0 1px rgba(239,68,68,0.3)" }}>
-                <div className="relative aspect-[4/3] overflow-hidden">
-                  <img
-                    src={heroImg}
-                    alt={`${data.h1}, o problema`}
-                    className="absolute inset-0 w-full h-full object-cover"
-                    style={{ filter: "grayscale(85%) brightness(0.78) contrast(1.05)" }}
-                    loading="lazy"
-                  />
-                </div>
-                <div className="p-5 md:p-7 flex-1 flex flex-col" style={{ background: "#0d241b" }}>
-                  <div className="flex items-center gap-1.5 mb-2">
-                    <XCircle className="w-3.5 h-3.5 flex-shrink-0" style={{ color: "#ef4444" }} />
-                    <span className="text-[10px] font-bold tracking-[0.22em] uppercase" style={{ color: "#ef4444" }}>O Problema</span>
-                  </div>
-                  <p className="font-playfair text-lg font-bold mb-2 leading-tight" style={{ color: "#ef4444" }}>Porque acontece</p>
-                  <p className="text-sm text-white/80 leading-relaxed">{data.problemDetail}</p>
-                </div>
-              </div>
-              {/* Solução — cor cheia + acento verde: sensação de esperança; texto num painel sólido abaixo, nunca cortado */}
-              <div className="rounded-sm overflow-hidden flex flex-col" style={{ border: "3px solid #22c55e", boxShadow: "0 0 0 1px rgba(34,197,94,0.3)" }}>
-                <div className="relative aspect-[4/3] overflow-hidden">
-                  <img src={solutionImg} alt={`${data.h1}, a solução`} className="absolute inset-0 w-full h-full object-cover" loading="lazy" />
-                </div>
-                <div className="p-5 md:p-7 flex-1 flex flex-col" style={{ background: "#0d241b" }}>
-                  <div className="flex items-center gap-1.5 mb-2">
-                    <CheckCircle2 className="w-3.5 h-3.5 flex-shrink-0" style={{ color: "#22c55e" }} />
-                    <span className="text-[10px] font-bold tracking-[0.22em] uppercase" style={{ color: "#22c55e" }}>A Solução</span>
-                  </div>
-                  <p className="font-playfair text-lg font-bold mb-2 leading-tight" style={{ color: "#22c55e" }}>Como resolvemos</p>
-                  <p className="text-sm text-white/85 leading-relaxed">{data.solutionDetail}</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
 
         {/* ═══ QUANDO CHAMAR + PROCESSO — fundidas, fundo verde único ═══ */}
         <section className="py-14 md:py-20 bg-kyro-green">
