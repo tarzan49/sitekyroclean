@@ -10,7 +10,6 @@ import HeroBeforeAfterPool from "@/components/HeroBeforeAfterPool";
 import { categoryForServiceSlug } from "@/data/beforeAfterPool";
 import Footer from "@/components/Footer";
 import QuizButton from "@/components/QuizButton";
-import TrustRatingBadge from "@/components/TrustRatingBadge";
 import SectionHeader from "@/components/SectionHeader";
 import ServiceFAQ from "@/components/ServiceFAQ";
 import ServicePriceSection from "@/components/ServicePriceSection";
@@ -141,13 +140,6 @@ const PricePage = () => {
                   {data.intro.match(/^[^.?]*[.?]/)?.[0] ?? data.intro}
                 </p>
 
-                {/* Escondido em mobile/tablet: esta página usa a variante "hero"
-                    do TrustRatingBadge (não "mapsLinkClients"), que não foi
-                    alterada no componente partilhado — envolvido aqui para dar
-                    o mesmo resultado sem tocar em TrustRatingBadge.tsx. */}
-                <div className="hidden lg:block lg:mb-6">
-                  <TrustRatingBadge variant="hero" />
-                </div>
 
                 <div className="flex flex-col sm:flex-row gap-3 max-w-md">
                   <QuizButton

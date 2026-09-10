@@ -11,7 +11,6 @@ import HeroBeforeAfterPool from "@/components/HeroBeforeAfterPool";
 import { categoryForServiceSlug } from "@/data/beforeAfterPool";
 import Footer from "@/components/Footer";
 import QuizButton from "@/components/QuizButton";
-import TrustRatingBadge from "@/components/TrustRatingBadge";
 import SectionHeader from "@/components/SectionHeader";
 import ServiceFAQ from "@/components/ServiceFAQ";
 import ServicePriceSection from "@/components/ServicePriceSection";
@@ -170,9 +169,6 @@ const ProblemCityPage = () => {
                   {problem.intro.replace(/no Porto|ao domicílio/g, `${prep} ${city.name}`).match(/^[^.?]*[.?]/)?.[0] ?? problem.intro}
                 </p>
 
-                <div className="lg:mb-6">
-                  <TrustRatingBadge variant="mapsLinkClients" />
-                </div>
 
                 <div className="flex flex-col sm:flex-row gap-3 max-w-md">
                   <QuizButton

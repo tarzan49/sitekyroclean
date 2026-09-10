@@ -16,7 +16,6 @@ import ServiceLocationSchema from "@/components/ServiceLocationSchema";
 import ServiceFAQ from "@/components/ServiceFAQ";
 import ServicePackBanner from "@/components/ServicePackBanner";
 import ServiceSnapshotStats from "@/components/ServiceSnapshotStats";
-import TrustRatingBadge from "@/components/TrustRatingBadge";
 import { useQuizLauncher } from "@/hooks/use-quiz-launcher";
 import { services } from "@/data/locationSeoData";
 import { QuizLocationProvider, QuizServiceProvider } from "@/context/QuizLocationContext";
@@ -220,9 +219,6 @@ const FreguesiaServicePage = () => {
                   {data.intro.match(/^[^.?]*[.?]/)?.[0] ?? data.intro}
                 </p>
 
-                <div className="lg:mb-6">
-                  <TrustRatingBadge variant="mapsLinkClients" />
-                </div>
 
                 <div className="flex flex-col sm:flex-row gap-3 max-w-md">
                   <QuizButton

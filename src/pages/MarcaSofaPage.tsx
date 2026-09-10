@@ -9,7 +9,6 @@ import PageBreadcrumb from "@/components/PageBreadcrumb";
 import HeroBeforeAfterPool from "@/components/HeroBeforeAfterPool";
 import Footer from "@/components/Footer";
 import QuizButton from "@/components/QuizButton";
-import TrustRatingBadge from "@/components/TrustRatingBadge";
 import SectionHeader from "@/components/SectionHeader";
 import ServiceSnapshotStats from "@/components/ServiceSnapshotStats";
 import ServicePriceSection from "@/components/ServicePriceSection";
@@ -187,9 +186,6 @@ const MarcaSofaPage = () => {
                     {marca.materialDescription.split('.')[0]}.
                   </p>
 
-                  <div className="lg:mb-6">
-                    <TrustRatingBadge variant="mapsLinkClients" />
-                  </div>
 
                   <div className="flex flex-col sm:flex-row gap-3 max-w-md">
                     <QuizButton

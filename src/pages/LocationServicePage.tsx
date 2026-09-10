@@ -32,7 +32,6 @@ import { METRO_CITIES } from "@/constants/metroCities";
 import { SERVICE_RESULT_CONTENT, pickServiceHero } from "@/constants/serviceContent";
 import { buildServiceWaMessage } from "@/lib/whatsappMessages";
 import { SITE_URL, WHATSAPP_BASE, REVIEW_RATING, REVIEW_COUNT } from "@/constants/business";
-import TrustRatingBadge from "@/components/TrustRatingBadge";
 import SectionHeader from "@/components/SectionHeader";
 import { PRICE_TABLE } from "@/data/locationPriceTestimonialsData";
 import { locationPrices } from "@/components/quiz/QuizTypes";
@@ -248,9 +247,6 @@ const LocationServicePage = () => {
                   {isSofaCleaning ? "Limpeza ao domicílio por extração profunda. Consulte os preços por tamanho e envie uma foto para avaliarmos as manchas." : (data.intro.match(/^[^.?]*[.?]/)?.[0] ?? data.intro)}
                 </p>
 
-                <div className="lg:mb-6">
-                  <TrustRatingBadge variant="mapsLinkClients" />
-                </div>
 
                 {isSofaCleaning ? <SofaLeadActions city={data.city} price={data.priceFrom} href={waUrl} source={`location_hero_${data.serviceSlug}_${data.citySlug}`} /> : <>
                 <div className="flex flex-col sm:flex-row gap-3 max-w-md">

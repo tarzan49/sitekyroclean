@@ -32,7 +32,6 @@ import { municipiosComFreguesias } from "@/data/freguesiaSeoData";
 import { GENERIC_PROCESS_STEPS, IMPERMEABILIZACAO_STEPS } from "@/constants/serviceProcesses";
 import { SITE_URL, WHATSAPP_BASE, PHONE_TEL, PHONE_DISPLAY, REVIEW_RATING, REVIEW_COUNT } from "@/constants/business";
 import { SERVICE_DURATION } from "@/constants/problemCardHelpers";
-import TrustRatingBadge from "@/components/TrustRatingBadge";
 import { buildVariantWaMessage } from "@/lib/whatsappMessages";
 import HeroBeforeAfterPool from "@/components/HeroBeforeAfterPool";
 import { categoryForServiceSlug } from "@/data/beforeAfterPool";
@@ -324,9 +323,6 @@ const SofaVariantPage = () => {
                 </p>
                 {isSofaCleaning ? <SofaLeadActions city={data.locationName} price={data.priceFrom} href={`${WHATSAPP_BASE}?text=${encodeURIComponent(buildVariantWaMessage(false, SERVICE_LABEL[data.serviceKey], VARIANT_LABEL[data.variantKey], data.locationName))}`} source={`variant_hero_${parsed.variantKey}_${parsed.serviceKey}`} /> : <>
 
-                <div className="lg:mb-6">
-                  <TrustRatingBadge variant="mapsLinkClients" />
-                </div>
 
                 <div className="flex flex-col sm:flex-row gap-3 max-w-md">
                   <QuizButton
