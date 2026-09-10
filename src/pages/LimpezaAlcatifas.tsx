@@ -1,3 +1,4 @@
+import ServiceProcessGuide from "@/components/ServiceProcessGuide";
 import { SATISFACTION_PROMISE } from '../constants/commercialPolicy';
 import Header from "@/components/Header";
 import { QuizServiceProvider } from "@/context/QuizLocationContext";
@@ -95,6 +96,7 @@ const LimpezaAlcatifas = () => {
           items={alcatifasGuarantee}
           variant="light"
         />
+        <ServiceProcessGuide serviceSlug="limpeza-alcatifas" />
         <ServiceFAQ faqs={faqs} heading="Perguntas Frequentes" variant="dark" />
         <ServiceExpertTips tips={expertTips} variant="light" />
         <ServiceCityLinks serviceSlug="limpeza-alcatifas" serviceLabel="Limpeza de Alcatifas" />

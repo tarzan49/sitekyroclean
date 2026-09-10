@@ -198,7 +198,8 @@ const AppRoutes = () => {
                 <Route path="/admin/deslocacoes" element={<AdminDeslocacoes />} />
                 <Route path="/areas-de-servico" element={<AreasDeServico />} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-                {[...getTreatmentRoutes(), ...getExpansionRoutes()].map(route => <Route key={route.path} path={route.path} element={<TreatmentPage />} />)}
+                {getTreatmentRoutes().map(route => <Route key={route.path} path={route.path} element={<TreatmentPage />} />)}
+                {getExpansionRoutes().map(route => <Route key={route.path} path={route.path} element={<LocationServicePage />} />)}
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </Suspense>
