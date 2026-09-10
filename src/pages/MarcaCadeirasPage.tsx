@@ -299,7 +299,7 @@ const MarcaCadeirasPage = () => {
         <ServiceFAQ
           faqs={marca.faqs}
           heading={`Perguntas sobre cadeiras ${marca.name}`}
-          variant="light"
+          variant="dark"
         />
 
         {/* ═══ OUTRAS MARCAS / COBERTURA ═══ */}

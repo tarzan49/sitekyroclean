@@ -282,7 +282,7 @@ const MaterialPage = () => {
 
         {/* ═══ FAQ ═══ */}
         {data.faqs.length > 0 && (
-          <ServiceFAQ faqs={data.faqs} heading={`Perguntas sobre ${data.name.toLowerCase()}`} variant="light" />
+          <ServiceFAQ faqs={data.faqs} heading={`Perguntas sobre ${data.name.toLowerCase()}`} variant="dark" />
         )}
 
         {/* ═══ AVALIAÇÕES REAIS ═══ */}

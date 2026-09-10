@@ -1,7 +1,8 @@
+import ServiceFAQ from "@/components/ServiceFAQ";
 import { SATISFACTION_PROMISE, COVERAGE_PROMISE, AVAILABILITY_PROMISE, DRYING_PROMISE } from '../constants/commercialPolicy';
-﻿import { useEffect, useState } from "react";
+﻿import { useEffect } from "react";
 import { Link } from "react-router-dom";
-import { ChevronDown, ChevronRight, MessageCircle, Phone } from "lucide-react";
+import { ChevronRight, MessageCircle, Phone } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import QuizButton from "@/components/QuizButton";
@@ -150,40 +151,6 @@ const combinedSchema = {
   ],
 };
 
-const FAQItem = ({ faq, index, isOpen, onToggle }: {
-  faq: FAQ; index: number; isOpen: boolean; onToggle: () => void;
-}) => (
-  <div id={faq.id} className={`rounded-2xl border transition-all overflow-hidden scroll-mt-24 ${isOpen ? "border-gold/30 shadow-sm bg-white" : "border-gray-200 bg-white hover:border-gray-300"}`}>
-    <button
-      type="button"
-      onClick={onToggle}
-      className="w-full flex items-start gap-4 px-5 py-4 text-left"
-      aria-expanded={isOpen}
-    >
-      <span className="flex-shrink-0 w-7 h-7 rounded-lg bg-gold/10 border border-gold/20 flex items-center justify-center text-[11px] font-bold text-gold mt-0.5">
-        {String(index + 1).padStart(2, "0")}
-      </span>
-      <span className="flex-1 font-semibold text-[#111111] text-[15px] leading-snug pr-2">{faq.question}</span>
-      <ChevronDown className={`flex-shrink-0 w-5 h-5 transition-transform duration-200 mt-0.5 ${isOpen ? "rotate-180 text-gold" : "text-[#111111]/40"}`} />
-    </button>
-    {isOpen && (
-      <div className="px-5 pb-5">
-        <div className="pl-11">
-          <div className="h-px bg-gray-100 mb-4" />
-          <div className="text-[#111111]/70 text-[15px] leading-relaxed">{faq.answer}</div>
-          <a
-            href={`${PAGE_URL}#${faq.id}`}
-            className="inline-flex items-center gap-1 text-[10px] text-[#111111]/25 hover:text-gold transition-colors mt-3 font-mono"
-            title="Link direto para esta resposta"
-          >
-            # permalink
-          </a>
-        </div>
-      </div>
-    )}
-  </div>
-);
-
 const relatedServices = [
   { to: "/limpeza-sofas",    label: "Limpeza de Sofás" },
   { to: "/limpeza-colchoes", label: "Limpeza de Colchões" },
@@ -194,7 +161,7 @@ const relatedServices = [
 ];
 
 const FAQEstofos = () => {
-  const [openIndex, setOpenIndex] = useState<number | null>(0);
+
 
   useEffect(() => {
     document.title = "Perguntas Frequentes: Limpeza de Estofos, Tapetes e Alcatifas | Kyro Clean Solutions";
@@ -207,7 +174,7 @@ const FAQEstofos = () => {
       "16 respostas sobre limpeza de sofás, colchões, tapetes e alcatifas: preços reais, impermeabilização, manchas difíceis, garantia e áreas servidas.");
   }, []);
 
-  const toggle = (i: number) => setOpenIndex(openIndex === i ? null : i);
+
 
   return (
     <>
@@ -241,10 +208,8 @@ const FAQEstofos = () => {
           <div className="flex gap-10 items-start">
 
             {/* FAQ accordion */}
-            <div className="flex-1 min-w-0 space-y-2.5">
-              {allFaqs.map((faq, i) => (
-                <FAQItem key={faq.id} faq={faq} index={i} isOpen={openIndex === i} onToggle={() => toggle(i)} />
-              ))}
+            <div className="flex-1 min-w-0">
+              <ServiceFAQ faqs={allFaqs} includeSchema={false} />
             </div>
 
             {/* Sticky sidebar, desktop only */}

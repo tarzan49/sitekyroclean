@@ -316,7 +316,7 @@ const MarcaSofaPage = () => {
         <ServiceFAQ
           faqs={marca.faqs}
           heading={`Perguntas sobre sofás ${marca.name}`}
-          variant="light"
+          variant="dark"
         />
 
         {/* ═══ OUTRAS MARCAS / COBERTURA ═══ */}

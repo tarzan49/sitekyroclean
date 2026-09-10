@@ -1,3 +1,4 @@
+import ServiceFAQ from "@/components/ServiceFAQ";
 import DirectoryGroup from "@/components/DirectoryGroup";
 ﻿import { useMemo, useEffect } from "react";
 import { useLocation, Link } from "react-router-dom";
@@ -198,22 +199,7 @@ const BlogPost = () => {
 
           {/* FAQ */}
           {post.faq.length > 0 && (
-            <div className="mt-12">
-              <h2 className="font-playfair text-2xl font-bold text-[#111111] mb-6">Perguntas frequentes</h2>
-              <div className="space-y-3">
-                {post.faq.map((item, i) => (
-                  <details key={i} className="group bg-white border border-[#E8E4DE] rounded-xl shadow-sm overflow-hidden">
-                    <summary className="flex items-center justify-between px-5 py-4 cursor-pointer list-none font-semibold text-[#111111] text-sm hover:bg-[#FDFDF9] transition-colors">
-                      {item.q}
-                      <ChevronRight className="w-4 h-4 text-[#111111]/40 group-open:rotate-90 transition-transform flex-shrink-0 ml-2" />
-                    </summary>
-                    <div className="px-5 pb-4 pt-1 text-sm text-[#111111]/60 leading-relaxed border-t border-[#E8E4DE]/60">
-                      {item.a}
-                    </div>
-                  </details>
-                ))}
-              </div>
-            </div>
+            <ServiceFAQ faqs={post.faq.map(item => ({ question: item.q, answer: item.a }))} includeSchema={false} />
           )}
 
           {/* Link serviço relacionado */}

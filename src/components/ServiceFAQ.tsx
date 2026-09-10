@@ -1,30 +1,42 @@
-import { useId, useState } from "react";
+import { useEffect, useId, useState, type ReactNode } from "react";
 import { Plus, Minus } from "lucide-react";
 import ServiceFAQSchema from "@/components/ServiceFAQSchema";
 
 interface FAQItem {
   question: string;
-  answer: string;
+  answer: ReactNode;
+  plainAnswer?: string;
+  id?: string;
 }
 
 interface ServiceFAQProps {
   faqs: FAQItem[];
   heading?: string;
   overline?: string;
+  variant?: "dark";
+  includeSchema?: boolean;
   description?: string;
-  variant?: "light" | "dark";
 }
 
 const ServiceFAQ = ({
   faqs,
   heading = "Perguntas Frequentes",
   overline = "Dúvidas Frequentes",
+  includeSchema = true,
   description = "Preços, cuidados e o que esperar da visita. Toque numa pergunta para ver a resposta.",
-  variant = "light",
 }: ServiceFAQProps) => {
   const [open, setOpen] = useState<number | null>(0);
   const id = useId();
-  const light = variant === "light";
+  const light = false;
+  useEffect(() => {
+    const revealHash = () => {
+      const index = faqs.findIndex(faq => faq.id && `#${faq.id}` === window.location.hash);
+      if (index >= 0) setOpen(index);
+    };
+    revealHash();
+    window.addEventListener("hashchange", revealHash);
+    return () => window.removeEventListener("hashchange", revealHash);
+  }, [faqs]);
 
   const words = heading.trim().split(" ");
   const goldWord = words.pop() ?? "";
@@ -32,7 +44,7 @@ const ServiceFAQ = ({
 
   return (
     <section className={`py-14 md:py-20 ${light ? "bg-[#FDFDF9]" : "bg-kyro-green"}`}>
-      <ServiceFAQSchema faqs={faqs} />
+      {includeSchema && <ServiceFAQSchema faqs={faqs.map(faq => ({ question: faq.question, answer: faq.plainAnswer ?? (typeof faq.answer === "string" ? faq.answer : "") }))} />}
       <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
 
         {/* Editorial header */}
@@ -56,8 +68,9 @@ const ServiceFAQ = ({
             const isOpen = open === idx;
             return (
               <div
-                key={idx}
-                className="border rounded-sm overflow-hidden transition-colors duration-300"
+                key={faq.id ?? idx}
+                id={faq.id}
+                className="scroll-mt-24 border rounded-sm overflow-hidden transition-colors duration-300"
                 style={{ borderColor: isOpen ? 'rgba(212,175,55,0.6)' : light ? '#E1E5DE' : 'rgba(255,255,255,0.16)', background: isOpen ? (light ? '#f6f3e9' : '#183528') : light ? '#ffffff' : 'rgba(255,255,255,0.025)' }}
               >
                 <button
@@ -107,7 +120,7 @@ const ServiceFAQ = ({
                   <div className="overflow-hidden min-h-0">
                     <div className="px-4 sm:px-5 pb-5">
                       <div className="border-t border-gold/20 pt-4">
-                        <p className="text-sm leading-7" style={{ color: light ? '#47574c' : 'rgba(255,255,255,0.80)' }}>{faq.answer}</p>
+                        <div className="text-sm leading-7" style={{ color: light ? '#47574c' : 'rgba(255,255,255,0.80)' }}>{faq.answer}</div>
                       </div>
                     </div>
                   </div>

@@ -229,7 +229,7 @@ const EnGuidePage = () => {
         </section>
 
         {/* ═══ FAQ ═══ */}
-        <ServiceFAQ faqs={FAQS} heading="Frequently Asked Questions" overline="FAQ" variant="light" />
+        <ServiceFAQ faqs={FAQS} heading="Frequently Asked Questions" overline="FAQ" description="Prices, care and what to expect. Select a question to read the answer." variant="dark" />
 
         {/* ═══ RELATED HOST PAGES ═══ */}
         <section className="py-14 md:py-16 bg-[#FDFDF9] border-t border-[#111111]/8">

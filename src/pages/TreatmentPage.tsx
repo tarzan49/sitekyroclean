@@ -1,3 +1,4 @@
+import ServiceFAQ from "@/components/ServiceFAQ";
 import { clearPrerenderedSchema } from '../lib/seoSchema';
 import { useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
@@ -33,7 +34,7 @@ export default function TreatmentPage() {
     </div></section>
     <section className="max-w-5xl mx-auto px-5 py-14"><h2 className="font-playfair text-3xl mb-8">O que pode acrescentar ao seu cuidado habitual</h2><div className="grid md:grid-cols-3 gap-5">{page.benefits.map(b => <article key={b} className="p-6 bg-white border border-[#E8E4DE] rounded-xl"><CheckCircle2 className="text-[#9B7D20] mb-4" /><p>{b}</p></article>)}</div><p className="mt-8 leading-relaxed">{page.detail}</p></section>
     <section className="bg-[#F0EEE7] px-5 py-12"><div className="max-w-5xl mx-auto"><h2 className="font-playfair text-3xl mb-5">Uma proposta clara, antes de marcar</h2><p className="mb-4">{PRICE_PROMISE}</p><p>{page.coverage}</p></div></section>
-    <section className="max-w-5xl mx-auto px-5 py-14"><h2 className="font-playfair text-3xl mb-7">Perguntas frequentes</h2>{page.faqs.map(f => <details key={f.question} className="py-5 border-b border-[#DDD9CC]"><summary className="font-semibold cursor-pointer">{f.question}</summary><p className="mt-4 leading-relaxed">{f.answer}</p></details>)}</section>
+    <ServiceFAQ faqs={page.faqs} includeSchema={false} />
     <section className="max-w-5xl mx-auto px-5 pb-16"><h2 className="font-playfair text-2xl mb-5">Escolha os artigos e os tratamentos</h2><div className="flex flex-wrap gap-3">{services.map(s => <Link className="border rounded-lg p-3" key={s.slug} to={`/${s.slug}${page.city ? `-${page.city.slug}` : ''}`}>{s.name}</Link>)}{treatments.map(t => <Link className="border rounded-lg p-3" key={t.slug} to={`/${t.slug}${page.city ? `-${page.city.slug}` : ''}`}>{t.name}</Link>)}<Link to="/packs" className="border rounded-lg p-3">Montar o meu pack</Link></div>
     {!page.city && <details className="mt-8"><summary className="cursor-pointer font-semibold">Consultar localidades</summary><div className="flex flex-wrap gap-3 mt-5">{[...cities, ...expansionCities].map(c => <Link className="underline" key={c.slug} to={`${pathname}-${c.slug}`}>{c.name}</Link>)}</div></details>}</section>
   </main><Footer /><script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({ '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: page.faqs.map(f => ({ '@type': 'Question', name: f.question, acceptedAnswer: { '@type': 'Answer', text: f.answer } })) }) }} /></>;
