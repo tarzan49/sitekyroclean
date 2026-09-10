@@ -17,7 +17,7 @@ const QuizStepConfigCarpet = ({ carpetItems, setCarpetItems }: Props) => {
   return (
     <div className="flex w-full flex-col items-center gap-3">
       <div className="space-y-1.5 text-center">
-        <h2 className="font-playfair text-2xl sm:text-3xl font-bold text-white">Os seus tapetes</h2>
+        <h2 className="font-playfair text-2xl sm:text-3xl font-bold text-white">Que tapetes vamos limpar?</h2>
       </div>
 
       <details className="w-full max-w-sm rounded-xl border border-[#D4AF37]/20 bg-[#D4AF37]/[0.06] px-3">

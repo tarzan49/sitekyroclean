@@ -31,7 +31,7 @@ const QuizStepConfigSofa = ({ formData, updateFormData, sofaItems, setSofaItems 
     <div className="flex flex-col gap-3 w-full overflow-hidden items-center">
       <p className="text-gold text-[11px] font-bold tracking-[0.28em] uppercase mb-0.5 text-center w-full">{isWaterproofBase ? 'PROTEÇÃO' : 'QUANTIDADES'}</p>
       <h2 className="font-playfair text-2xl sm:text-3xl font-bold text-white text-center w-full">
-        {isWaterproofBase ? 'Escolha a sua impermeabilização' : 'Detalhes do(s) Sofá(s)'}
+        {isWaterproofBase ? 'Como quer proteger o sofá?' : 'Que sofás vamos limpar?'}
       </h2>
       {isWaterproofBase && (
         <WaterproofingTierPicker
