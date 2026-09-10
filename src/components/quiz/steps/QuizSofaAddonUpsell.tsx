@@ -1,3 +1,4 @@
+import { useEffect, useRef, useState } from 'react';
 import { sofaPrices } from '../QuizTypes';
 import { calcPackPricing, treatmentQty } from '../quizHelpers';
 import QuizTreatmentQuantities from '../QuizTreatmentQuantities';
@@ -19,6 +20,20 @@ interface QuizSofaAddonUpsellProps {
 // Só mostra os sofás que a pessoa já escolheu nas quantidades — nunca os
 // tamanhos que ela não pediu (pedido explícito 2026-09-08).
 const QuizSofaAddonUpsell = ({ formData, updateFormData, sofaItems, setSofaItems, onContinue, onBack }: QuizSofaAddonUpsellProps) => {
+  const tierSectionRef = useRef<HTMLDivElement>(null);
+  const [selectionScroll, setSelectionScroll] = useState(0);
+  useEffect(() => {
+    if (!selectionScroll) return;
+    const frame = requestAnimationFrame(() => {
+      tierSectionRef.current?.scrollIntoView?.({
+        behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth',
+        block: 'start',
+        inline: 'nearest',
+      });
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [selectionScroll]);
+
   const isWaterproofBase = formData.serviceType === 'waterproofing';
   const activeItems = sofaItems.filter(i => i.qty > 0);
   const tier = formData.waterproofingTier;
@@ -31,6 +46,7 @@ const QuizSofaAddonUpsell = ({ formData, updateFormData, sofaItems, setSofaItems
   const anyPackOn = activeItems.some(i => treatmentQty(i) > 0);
   const selectTier = (t: 'premium' | 'essencial') => {
     const turningOff = anyPackOn && tier === t;
+    if (!turningOff) setSelectionScroll(value => value + 1);
     setSofaItems(prev => prev.map(i => i.qty > 0 ? { ...i, packEnabled: !turningOff && (!anyPackOn || treatmentQty(i) > 0), packQty: turningOff ? 0 : (anyPackOn ? treatmentQty(i) : i.qty) } : i));
   };
   // Higienização (impermeabilização → adicionar limpeza): sem tiers, por
@@ -65,6 +81,7 @@ const QuizSofaAddonUpsell = ({ formData, updateFormData, sofaItems, setSofaItems
         </ul>}
       </QuizCareIntro>
       {!isWaterproofBase && (
+        <div ref={tierSectionRef} className="w-full max-w-sm scroll-mt-2">
         <WaterproofingTierPicker
           premiumDifference={premiumDifference}
           prices={{ essencial: essencialTotal, premium: premiumTotal }}
@@ -74,6 +91,7 @@ const QuizSofaAddonUpsell = ({ formData, updateFormData, sofaItems, setSofaItems
           onSelect={selectTier}
           activeTier={anyPackOn ? tier : null}
         />
+        </div>
       )}
       {isWaterproofBase && (
         <button

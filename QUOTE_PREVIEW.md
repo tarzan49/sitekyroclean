@@ -37,3 +37,5 @@ Revisão aprovada do selo TOP (2026-09-10): reservar apenas para impermeabiliza�
 ## Escolha parcial e comparação de proteção (2026-09-10)
 
 Nova decisão do responsável: um sofá/colchão mantém o clique simples; vários permitem escolher quantos recebem tratamento, com linhas compactas «1 de 3», sem repetir imagens/preços. `packQty` opcional representa essa quantidade; ausência preserva a seleção antiga de todas as unidades. `splitTreatmentItems` mantém preços, resumo e recibos coerentes. Esta decisão substitui a remoção absoluta dos seletores. A impermeabilização mostra os dois acréscimos (Essencial e Premium), a diferença real e o âmbito/valor antes de descontos. Benefícios em três pontos curtos junto da imagem. Exemplo local `?exemplo=varios`.
+
+Ao selecionar Premium/Essencial no upsell de sofás, a área de opções desloca-se suavemente para cima da zona visível, aproximando as quantidades e Continuar. Os benefícios permanecem acima, acessíveis por scroll. Não desloca ao desmarcar nem ao ajustar quantidades; respeita preferência por movimento reduzido. Verificado em 390×700, com Continuar visível após seleção.
