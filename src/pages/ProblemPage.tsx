@@ -364,7 +364,7 @@ const ProblemPage = () => {
         {/* ═══ AVALIAÇÕES REAIS ═══ */}
         <section className="py-14 md:py-20 bg-[#FDFDF9]">
           <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
-            <SectionHeader overline="Avaliações Reais" heading="O que dizem os nossos" goldWord="clientes" light={true} />
+            <SectionHeader overline="Avaliações Reais" heading="O que dizem os nossos" goldWord="clientes" subtitle="Nas palavras de quem já nos recebeu em casa." light={true} />
             <ServiceReviewsGrid serviceSlug={data.relatedServices[0]} seed={data.slug} heading="" />
           </div>
         </section>

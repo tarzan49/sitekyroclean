@@ -1062,3 +1062,6 @@ A seleção parcial de cuidados em sofás/colchões usa `packQty?: number` com `
 ## Diretórios finais compactos (2026-09-10)
 
 `src/components/DirectoryGroup.tsx` uniformiza a navegação final das famílias de páginas com grupos fechados por defeito e pesquisa nas listas maiores. Preserva os links no HTML e repõe o estado ao mudar de página. `AreasDeServico` organiza região, concelho, serviços e freguesias com pesquisa global; as seis páginas principais continuam a usar `ServiceCityLinks`. Inventário e verificação em `docs/directory-navigation.md`.
+
+## Testemunhos partilhados (10 setembro 2026)
+CustomerReviews e CustomerReviewCard uniformizam homepage, páginas de serviços/localidades e cartões de packs. Textos existentes e seleção regional preservados; ligação Google usa constantes. Carrossel de 9 segundos com pausa manual, interação, visibilidade e reduced-motion; altura adaptativa mobile. Pré-visualização em mobile-preview.html#avaliacoes. Verificados mobile Lisboa, desktop e lint dos componentes; TypeScript validado.

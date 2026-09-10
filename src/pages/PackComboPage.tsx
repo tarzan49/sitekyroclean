@@ -1,7 +1,8 @@
+import CustomerReviewCard from '@/components/CustomerReviewCard';
 import DirectoryGroup from "@/components/DirectoryGroup";
-﻿import { useMemo, useEffect, useState } from "react";
+import { useMemo, useEffect, useState } from "react";
 import { useLocation, Link } from "react-router-dom";
-import { CheckCircle, Star, ArrowRight, Shield, Zap, MessageCircle, Sofa, BedDouble, Armchair, LayoutGrid, Quote } from "lucide-react";
+import { CheckCircle, Star, ArrowRight, Shield, Zap, MessageCircle, Sofa, BedDouble, Armchair, LayoutGrid } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import TrustRatingBadge from "@/components/TrustRatingBadge";
@@ -428,16 +429,7 @@ const PackComboPage = () => {
               </h2>
 
               <div className="grid md:grid-cols-2 gap-4">
-                <div className="rounded-sm p-6 md:p-7" style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(212,175,55,0.20)" }}>
-                  <Quote className="w-7 h-7 mb-3" style={{ color: "#D4AF37", opacity: 0.45 }} strokeWidth={1.5} />
-                  <div className="flex gap-0.5 mb-3">
-                    {[...Array(5)].map((_, i) => <Star key={i} className="w-3.5 h-3.5 fill-[#D4AF37]" style={{ color: "#D4AF37" }} />)}
-                  </div>
-                  <p className="text-white/75 text-sm leading-relaxed italic mb-4">
-                    "{pack.testimonial.text}"
-                  </p>
-                  <p className="text-xs font-bold text-white/90">{pack.testimonial.author}</p>
-                </div>
+                <CustomerReviewCard review={{name:pack.testimonial.author,text:pack.testimonial.text}} google={false} />
 
                 <div className="rounded-sm p-6 md:p-7" style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(212,175,55,0.20)" }}>
                   <div className="flex items-center gap-2.5 mb-5">
