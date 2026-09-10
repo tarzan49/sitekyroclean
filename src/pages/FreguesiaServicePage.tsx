@@ -134,16 +134,8 @@ const FreguesiaServicePage = () => {
     : data.service.toLowerCase();
 
   const serviceDuration = SERVICE_DURATION[data.serviceSlug] ?? { value: "3 a 6h", label: "Pronto a usar" };
-  // Conteúdo revisto 2026-09-09 (pedido explícito): 1º bloco passou a mostrar
-  // a nota real do Google (antes tinha "5.0 ★" fixo, agora usa REVIEW_RATING/
-  // REVIEW_COUNT, a fonte única) em vez de duplicar os pills que já apareciam
-  // no hero — esses pills (TrustRatingBadge "mapsLinkClients") ficaram
-  // escondidos em mobile/tablet por serem redundantes com isto. "Zonas
-  // próximas" saiu (ainda existe mais abaixo na página) e deu lugar a algo
-  // mais útil para quem decide: quanto tempo demora o serviço. O último
-  // bloco ("<10min") é uma exceção isolada e deliberada: em todo o resto do
-  // site o compromisso continua a ser 30min, não alterar noutro sítio sem
-  // pedido explícito.
+  // Resposta em menos de 10 minutos: compromisso comum a todo o site.
+
   const snapshotStats = [
     { value: `${REVIEW_RATING}★`, label: `+${REVIEW_COUNT} avaliações Google`, icon: GoogleG },
     (data.serviceSlug === 'limpeza-tapetes' || data.serviceSlug === 'limpeza-alcatifas')

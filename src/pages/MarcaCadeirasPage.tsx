@@ -80,17 +80,8 @@ const MarcaCadeirasPage = () => {
   const heroImg = heroCadeiras;
   const minPriceLabel = String(marca.minPrice).replace('.', ',');
 
-  // Conteúdo revisto 2026-09-09 (pedido explícito): 1º bloco passou a mostrar
-  // a nota real do Google (antes tinha "5.0 ★" fixo, agora usa REVIEW_RATING/
-  // REVIEW_COUNT, a fonte única) em vez de duplicar os pills que já apareciam
-  // no hero — esses pills (TrustRatingBadge "mapsLinkClients") ficaram
-  // escondidos em mobile/tablet por serem redundantes com isto. O "1-2h
-  // Tempo de secagem" antigo era uma cópia solta divergente do facto
-  // canónico (SERVICE_DURATION, "4-6h" para cadeiras) — substituído para não
-  // haver dois números diferentes para a mesma coisa no site. O último
-  // bloco ("<10min") é uma exceção isolada e deliberada: em todo o resto do
-  // site o compromisso continua a ser 30min, não alterar noutro sítio sem
-  // pedido explícito.
+  // Resposta em menos de 10 minutos: compromisso comum a todo o site.
+
   const serviceDuration = SERVICE_DURATION['limpeza-cadeiras'];
   const snapshotStats = [
     { value: `${REVIEW_RATING}★`, label: `+${REVIEW_COUNT} avaliações Google`, icon: GoogleG },

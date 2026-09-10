@@ -6,17 +6,7 @@ import { REVIEW_COUNT } from "@/constants/business";
 
 type StatIcon = LucideIcon | ComponentType<{ className?: string; style?: CSSProperties; strokeWidth?: number }>;
 
-// Snapshot stats shown right below the hero on problem pages, varied by category
-// so each problem type highlights the fact most relevant to it. Every value here
-// reuses a figure already established elsewhere on the site (99% ácaros, 2-4h
-// secagem, 4.9★, +1100 clientes, +100 avaliações) — no invented stats.
-//
-// Revisto 2026-09-09 (pedido explícito, mesmo esquema aplicado às páginas de
-// localidade/freguesia): o bloco "Avaliação Google" passou a mostrar o
-// logótipo real da Google + "+100 avaliações Google" em vez de só "4.9★" com
-// um ícone de estrela solto. "Tempo de resposta" (30min) passou a "<10min"
-// só nestes blocos — em todo o resto do site (quiz, widget) o compromisso
-// continua a ser 30min, não alterar aí sem pedido explícito.
+// Resposta em menos de 10 minutos em todas as categorias e no restante site.
 export const CATEGORY_STATS: Record<string, { value: string; label: string; icon: StatIcon }[]> = {
   manchas: [
     { value: "4.9★", label: `+${REVIEW_COUNT} avaliações Google`, icon: GoogleG },
