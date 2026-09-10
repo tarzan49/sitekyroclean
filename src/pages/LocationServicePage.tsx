@@ -469,10 +469,10 @@ const LocationServicePage = () => {
         <section className="py-14 md:py-20" style={{ backgroundColor: "#FDFDF9" }}>
           <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
             <SectionHeader
-              overline="Cobertura"
-              heading={`Área de serviço ${cityPrep}`}
+              overline="Explore por categoria"
+              heading={`Serviços e zonas de atendimento ${cityPrep}`}
               goldWord={data.city}
-              subtitle={data.localSection}
+              subtitle="Encontre a sua zona, explore outros serviços ou consulte as opções por problema, material e marca. Abra uma categoria para ver mais."
             />
 
             <div className="max-w-4xl border-t border-[#D4AF37]/25">
