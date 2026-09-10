@@ -94,14 +94,14 @@ describe('useQuizPricing — chairs "sob orçamento" thresholds stay in sync acr
 
 describe('local quiz pack proposal', () => {
   const sofa = [{ id: 'test-sofa', sizeId: '3-lugares', qty: 1, packEnabled: false, chaiseLongue: false }];
-  const extra = [{ id: 'mattress-casal', mattressSize: 'casal', qty: 1, price: 69, label: '1x Colchão Casal' }];
+  const extra = [{ id: 'mattress-casal', mattressSize: 'casal', qty: 1, price: 55, label: '1x Colchão Casal' }];
   const form = { ...initialFormData, location: 'Lisboa', service: 'sofa', serviceType: 'cleaning' as const };
-  it('uses the proposed discount only in the local preview', () => {
+  it('keeps the fixed extra price without stacking a pack discount', () => {
     const actual = renderHook(() => useQuizPricing(form, sofa, [], extra, []));
     expect(actual.result.current.packDiscountActive).toBe(false);
     const demo = renderHook(() => useQuizPricing(form, sofa, [], extra, [], true));
-    expect(demo.result.current.packDiscountActive).toBe(true);
-    expect(demo.result.current.packDiscountedPrice).toBe(143.2);
+    expect(demo.result.current.packDiscountActive).toBe(false);
+    expect(demo.result.current.totalPrice).toBe(144);
   });
   it('keeps the original price when the extra is declined', () => {
     const demo = renderHook(() => useQuizPricing(form, sofa, [], [], [], true));

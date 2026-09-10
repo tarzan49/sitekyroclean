@@ -75,3 +75,6 @@ Pedido do responsável: Braga com base local, 10€ em Braga, Guimarães, Vila N
 ## Uniformidade dos guias e conselhos (2026-09-10)
 
 Pedido explícito do responsável: os guias devem usar o dourado canónico `#D4AF37` nos destaques, sem variantes castanhas/ocres. O título da secção mantém a escala das secções adjacentes (`text-[1.85rem] sm:text-4xl md:text-[2.6rem]`, `font-playfair`, `leading-[1.1]`). Melhorias de compacidade não autorizam alterar esta identidade tipográfica ou cromática. O token Tailwind `text-gold` resolve atualmente para outro tom; nesta secção usar `text-[#D4AF37]` para corresponder ao dourado explícito das FAQs.
+
+
+Atualização do teste local (2026-09-10): `?teste=quiz-pack` agora demonstra colchão casal a +55€, sem acumular desconto de 10%. Compara com limpeza individual (69€ da tabela) + deslocação da localidade, explicitamente uma visita separada. Lisboa: 79€ separado vs +55€ na visita existente, poupança24€, sofá79€ + deslocação10€ + extra55€ =144€. Substitui a proposta anterior de143,20€ neste modo; produção inalterada.
