@@ -96,14 +96,14 @@ const QuizChairsAddonUpsell = ({ formData, updateFormData, onContinue, onBack, h
 
   return (
     <div className="flex flex-col gap-1.5 overflow-hidden items-center w-full">
-      <h2 className="font-playfair text-2xl font-bold text-white text-center w-full">Proteja as suas cadeiras</h2>
+      <h2 className="font-playfair text-2xl font-bold text-white text-center w-full">Impermeabilização das cadeiras</h2>
       <QuizCareIntro service="chairs">
         <ul className="space-y-1.5">{['Repele líquidos', 'Facilita a remoção de manchas', 'Ajuda a conservar o tecido'].map(benefit => <li key={benefit} className="flex items-start gap-1.5"><Check aria-hidden="true" className="w-3.5 h-3.5 text-gold shrink-0 mt-0.5" /><span>{benefit}</span></li>)}</ul>
       </QuizCareIntro>
 
       <div className="w-full max-w-sm py-1 text-center">
         <p className="flex items-center justify-center gap-1.5 text-xs font-semibold text-gold"><Check aria-hidden="true" className="w-3.5 h-3.5 shrink-0" />Desbacterização + Antiácaros</p>
-        <p className="text-[10px] text-white/65 mt-1">Incluídos em qualquer proteção</p>
+        <p className="text-[10px] text-white/65 mt-1">Incluídos na impermeabilização</p>
       </div>
       <p className="text-[10px] text-white/65 text-center">Preço para {qty} {qty === 1 ? 'cadeira' : 'cadeiras'} · antes de descontos</p>
       <WaterproofingTierPicker
