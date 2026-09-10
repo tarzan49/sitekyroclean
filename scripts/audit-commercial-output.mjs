@@ -1,10 +1,11 @@
 import fs from 'node:fs';
 import path from 'node:path';
+import { hasOldResponsePromise } from './response-policy.mjs';
 const root = path.resolve('dist');
 const patterns = {
   deslocacaoIncluida: /deslocação incluída/i,
   tabelaPackAntiga: /99€\/145€\/159€/,
-  respostaAntiga: /(?:resposta|respondemos).{0,35}30 min/i,
+
   avaliacaoAntiga: /Avaliação 5\.0/,
   eficacia99: /99(?:[.,]9)?%/,
   precoAlcatifa: /3€\/m²/,
@@ -15,6 +16,7 @@ for (const file of walk(root).filter(f => f.endsWith('.html') && !f.endsWith('/4
   report.html++;
   const html = fs.readFileSync(file,'utf8');
   const body = (html.match(/<body[^>]*>([\s\S]*?)<\/body>/)?.[1] ?? '').replace(/<script[\s\S]*?<\/script>/g,'');
+  if (hasOldResponsePromise(html)) (report.contradictions.respostaAntiga ??= []).push(path.relative(root,file));
   const text = body.replace(/<[^>]*>/g,' ');
   if (!/<h1(?:\s|>)/.test(body) && !html.includes('noindex')) report.missingHeading.push(path.relative(root,file));
   for (const [name, pattern] of Object.entries(patterns)) if (pattern.test(text)) (report.contradictions[name] ??= []).push(path.relative(root,file));

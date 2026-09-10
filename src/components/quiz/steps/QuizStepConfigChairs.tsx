@@ -50,7 +50,7 @@ const QuizStepConfigChairs = ({ formData, updateFormData }: Props) => {
     <div className="flex flex-col gap-3 overflow-hidden items-center w-full">
       <p className="text-gold text-[10px] font-bold tracking-[0.28em] uppercase mb-0.5 text-center w-full">{isWaterproofPrimary ? 'PROTEÇÃO' : 'O QUE PRECISA?'}</p>
       <h2 className="font-playfair text-2xl sm:text-3xl font-bold text-white text-center w-full">
-        {isWaterproofPrimary ? 'Escolha a sua impermeabilização' : 'Detalhes das Cadeiras'}
+        {isWaterproofPrimary ? 'Como quer proteger as cadeiras?' : 'Quantas cadeiras vamos limpar?'}
       </h2>
       {isWaterproofPrimary && (
         <WaterproofingTierPicker
