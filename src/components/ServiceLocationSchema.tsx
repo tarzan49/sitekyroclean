@@ -26,7 +26,7 @@ const ServiceLocationSchema = ({ serviceName, serviceBaseUrl, placeName, parentP
     clearPrerenderedSchema();
   }, []);
 
-  const priceNum = /\d+(?:[.,]\d+)?/.exec(priceFrom)?.[0]?.replace(',', '.');
+  const priceNum = /\d+(?:[.,]\d+)?/.exec(priceFrom)?.[0]?.replace(',', '.') ?? DEFAULT_PRICE_FROM.replace(',', '.').replace(/[^0-9.]/g, '');
   const fullUrl = `${SITE_URL}${pageUrl}`;
 
   const prep = cityPrep(placeName);
@@ -51,7 +51,7 @@ const ServiceLocationSchema = ({ serviceName, serviceBaseUrl, placeName, parentP
         description,
         areaServed,
         serviceType: serviceName,
-        ...(priceNum && { offers: buildOfferNode(priceNum, { validFrom: "2025-01-01", priceValidUntil: "2026-12-31" }) }),
+        offers: buildOfferNode(priceNum, { validFrom: "2025-01-01", priceValidUntil: "2026-12-31" }),
       }),
     ],
   };

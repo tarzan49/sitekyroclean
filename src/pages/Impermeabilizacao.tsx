@@ -1,4 +1,3 @@
-import ServiceProcessGuide from "@/components/ServiceProcessGuide";
 import impermeabilizacaoAntes from "@/assets/galeria-impermeabilizacao-antes.webp";
 import impermeabilizacaoDepois from "@/assets/galeria-impermeabilizacao-depois.webp";
 import impermeabilizacaoResultado from "@/assets/galeria-impermeabilizacao-resultado.webp";
@@ -231,7 +230,6 @@ const Impermeabilizacao = () => {
           items={impermeabilizacaoGuarantee}
           variant="light"
         />
-        <ServiceProcessGuide serviceSlug="impermeabilizacao" />
         <ServiceFAQ faqs={faqs} heading="Perguntas Frequentes" variant="dark" />
         <ServiceExpertTips tips={expertTips} variant="light" />
         <ServiceCityLinks serviceSlug="impermeabilizacao" serviceLabel="Impermeabilização de Estofos" />

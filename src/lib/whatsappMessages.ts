@@ -1,4 +1,4 @@
-import { cityPrep } from "../data/locationSeoData";
+import { cityPrep } from "@/data/locationSeoData";
 
 /**
  * WhatsApp opening-message builders.

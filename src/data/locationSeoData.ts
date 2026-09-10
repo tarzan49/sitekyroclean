@@ -336,8 +336,8 @@ const relatedServicesMap: Record<string, string[]> = {
 };
 
 // Generate all location page data
-export function getLocationServiceData(serviceSlug: string, citySlug: string, place?: { name: string; slug: string; description: string }): LocationService | null {
-  const city = place ?? cities.find(c => c.slug === citySlug);
+export function getLocationServiceData(serviceSlug: string, citySlug: string): LocationService | null {
+  const city = cities.find(c => c.slug === citySlug);
   const service = services.find(s => s.slug === serviceSlug);
   const generator = contentGenerators[serviceSlug];
 
