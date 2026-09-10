@@ -593,7 +593,7 @@ ${formData.description || 'Sem observações adicionais'}
       <div
         className={cn(
           "relative w-full sm:max-w-lg sm:rounded-sm shadow-[0_8px_60px_rgba(0,0,0,0.6),inset_0_1px_0_rgba(255,255,255,0.07)] sm:border border-white/[0.18] overflow-hidden animate-scale-in flex flex-col sm:gpu-accelerated bg-checker-modal",
-          "h-full sm:h-auto sm:max-h-[92dvh]"
+          "h-[100dvh] sm:h-auto sm:max-h-[92dvh]"
         )}>
 
 
@@ -650,7 +650,7 @@ ${formData.description || 'Sem observações adicionais'}
           ref={scrollContainerRef}
           className={cn(
             "flex flex-col overflow-x-hidden flex-1 quiz-scrollbar px-4 sm:px-6",
-            "min-h-[200px] sm:min-h-[380px] landscape:min-h-[120px] overflow-y-auto pb-2"
+            "min-h-0 overflow-y-auto"
           )}
         >
 
@@ -670,7 +670,7 @@ ${formData.description || 'Sem observações adicionais'}
             />
           )}
 
-          <div className="flex flex-col py-3 w-full items-center text-center">
+          <div className="flex shrink-0 flex-col my-auto py-4 w-full items-center text-center">
 
             {/* Step 0, Location Autocomplete VIP */}
             {/* Context banner when quiz opened from a problem page */}

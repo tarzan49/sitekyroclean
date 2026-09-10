@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo, type RefObject } from 'react';
+import { useState, useEffect, useLayoutEffect, useCallback, useMemo, type RefObject } from 'react';
 import { REVIEW_COUNT, REVIEW_RATING } from '@/constants/business';
 
 export type SocialProofCategory = 'whatsapp' | 'call' | 'job' | 'booking' | 'trust';
@@ -51,10 +51,10 @@ export function useQuizUiEffects({
     return () => clearTimeout(id);
   }, []);
 
-  // Scroll to top on every step/overlay transition
-  useEffect(() => {
-    scrollContainerRef.current?.scrollTo({ top: 0 });
-  }, [currentStep, showUpsell]); // eslint-disable-line react-hooks/exhaustive-deps
+  // Reset before paint when opening or changing steps.
+  useLayoutEffect(() => {
+    if (isOpen) scrollContainerRef.current?.scrollTo({ top: 0, behavior: 'instant' });
+  }, [isOpen, currentStep, showUpsell]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const resetUiEffects = useCallback(() => {
     setSocialProofIdx(0);

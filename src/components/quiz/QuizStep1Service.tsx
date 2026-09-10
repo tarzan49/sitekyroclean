@@ -40,7 +40,7 @@ const QuizStep1Service = ({ onSelect }: QuizStep1ServiceProps) => {
             <button
               key={option.id}
               onClick={() => onSelect(option.id)}
-              className="relative h-[148px] sm:h-[164px] rounded-sm overflow-hidden transition-all duration-200 touch-manipulation active:scale-[0.97] hover:ring-2 hover:ring-gold/35 shadow-[0_2px_10px_rgba(0,0,0,0.4)]"
+              className="relative h-[clamp(100px,20dvh,148px)] sm:h-[clamp(100px,20dvh,164px)] rounded-sm overflow-hidden transition-all duration-200 touch-manipulation active:scale-[0.97] hover:ring-2 hover:ring-gold/35 shadow-[0_2px_10px_rgba(0,0,0,0.4)]"
             >
               {/* Background image, dimmed on certain services */}
               <picture>
