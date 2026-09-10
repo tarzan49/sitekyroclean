@@ -10,7 +10,7 @@ interface Props {
 // All hero galleries share the same controls and complete category pool.
 export default function HeroBeforeAfterPool({ category, className, intervalMs }: Props) {
   return (
-    <div className={`bg-kyro-green ${className ?? ""}`}>
+    <div className={className}>
       <ServiceResultsGallery key={category} category={category} intervalMs={intervalMs} />
     </div>
   );
