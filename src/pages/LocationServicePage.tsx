@@ -1,4 +1,5 @@
 import ProblemCarousel from '@/components/ProblemCarousel';
+import DirectoryGroup from "@/components/DirectoryGroup";
 import SofaLeadActions from "@/components/SofaLeadActions";
 import { AdsLandingHeader, AdsLandingFooter, isAdsVisit } from "@/components/AdsLandingNavigation";
 import { useEffect, useMemo } from "react";
@@ -474,11 +475,9 @@ const LocationServicePage = () => {
               subtitle={data.localSection}
             />
 
-            <div className="grid md:grid-cols-2 gap-4">
+            <div className="max-w-4xl border-t border-[#D4AF37]/25">
               {cityFreguesias && cityFreguesias.freguesias.length > 0 && (
-                <div className="p-5 rounded-xl bg-white" style={{ border: "1px solid rgba(17,17,17,0.08)", boxShadow: "0 4px 16px rgba(7,26,18,0.04)" }}>
-                  <p className="text-[10px] font-bold tracking-[0.26em] uppercase mb-3" style={{ color: "#D4AF37" }}>Zonas {cityPrep} {data.city}</p>
-                  <div className="flex flex-wrap gap-2">
+                <DirectoryGroup title={<>Zonas {cityPrep} {data.city}</>}>
                     {cityFreguesias.freguesias.slice(0, 8).map(f => (
                       <Link
                         key={f.slug}
@@ -489,13 +488,10 @@ const LocationServicePage = () => {
                         {f.name}
                       </Link>
                     ))}
-                  </div>
-                </div>
+                  </DirectoryGroup>
               )}
 
-              <div className="p-5 rounded-xl bg-white" style={{ border: "1px solid rgba(17,17,17,0.08)", boxShadow: "0 4px 16px rgba(7,26,18,0.04)" }}>
-                <p className="text-[10px] font-bold tracking-[0.26em] uppercase mb-3" style={{ color: "#D4AF37" }}>Também disponível em</p>
-                <div className="flex flex-wrap gap-2">
+              <DirectoryGroup title={<>Também disponível em</>}>
                   {getCityLinksForService(data.serviceSlug).filter(c => c.name !== data.city).slice(0, 6).map(city => (
                     <Link
                       key={city.name}
@@ -505,13 +501,10 @@ const LocationServicePage = () => {
                       {city.name}
                     </Link>
                   ))}
-                </div>
-              </div>
+                </DirectoryGroup>
 
               {otherServices.length > 0 && (
-                <div className="p-5 rounded-xl bg-white" style={{ border: "1px solid rgba(17,17,17,0.08)", boxShadow: "0 4px 16px rgba(7,26,18,0.04)" }}>
-                  <p className="text-[10px] font-bold tracking-[0.26em] uppercase mb-3" style={{ color: "#D4AF37" }}>Outros serviços {cityPrep} {data.city}</p>
-                  <div className="flex flex-wrap gap-2">
+                <DirectoryGroup title={<>Outros serviços {cityPrep} {data.city}</>}>
                     {otherServices.map(svc => (
                       <Link
                         key={svc.slug}
@@ -521,14 +514,11 @@ const LocationServicePage = () => {
                         {svc.name}
                       </Link>
                     ))}
-                  </div>
-                </div>
+                  </DirectoryGroup>
               )}
 
               {relatedProblems.length > 0 && (
-                <div className="p-5 rounded-xl bg-white" style={{ border: "1px solid rgba(17,17,17,0.08)", boxShadow: "0 4px 16px rgba(7,26,18,0.04)" }}>
-                  <p className="text-[10px] font-bold tracking-[0.26em] uppercase mb-3" style={{ color: "#D4AF37" }}>Problemas que resolvemos {cityPrep} {data.city}</p>
-                  <div className="flex flex-wrap gap-2">
+                <DirectoryGroup title={<>Problemas que resolvemos {cityPrep} {data.city}</>}>
                     {relatedProblems.map(p => (
                       <Link
                         key={p.slug}
@@ -538,14 +528,11 @@ const LocationServicePage = () => {
                         {p.keyword}
                       </Link>
                     ))}
-                  </div>
-                </div>
+                  </DirectoryGroup>
               )}
 
               {materialLinks.length > 0 && (
-                <div className="p-5 rounded-xl bg-white" style={{ border: "1px solid rgba(17,17,17,0.08)", boxShadow: "0 4px 16px rgba(7,26,18,0.04)" }}>
-                  <p className="text-[10px] font-bold tracking-[0.26em] uppercase mb-3" style={{ color: "#D4AF37" }}>Por tipo de material {cityPrep} {data.city}</p>
-                  <div className="flex flex-wrap gap-2">
+                <DirectoryGroup title={<>Por tipo de material {cityPrep} {data.city}</>}>
                     {materialLinks.map(m => (
                       <Link
                         key={m.slug}
@@ -555,14 +542,11 @@ const LocationServicePage = () => {
                         {m.name}
                       </Link>
                     ))}
-                  </div>
-                </div>
+                  </DirectoryGroup>
               )}
 
               {hasMarcaSofaCity && data.serviceSlug === 'limpeza-sofas' && (
-                <div className="p-5 rounded-xl bg-white" style={{ border: "1px solid rgba(17,17,17,0.08)", boxShadow: "0 4px 16px rgba(7,26,18,0.04)" }}>
-                  <p className="text-[10px] font-bold tracking-[0.26em] uppercase mb-3" style={{ color: "#D4AF37" }}>Marcas de sofá {cityPrep} {data.city}</p>
-                  <div className="flex flex-wrap gap-2">
+                <DirectoryGroup title={<>Marcas de sofá {cityPrep} {data.city}</>}>
                     {MARCA_SLUGS.map(slug => (
                       <Link
                         key={slug}
@@ -572,14 +556,11 @@ const LocationServicePage = () => {
                         {slug.replace(/-/g, ' ')}
                       </Link>
                     ))}
-                  </div>
-                </div>
+                  </DirectoryGroup>
               )}
 
               {hasMarcaColchaoCity && data.serviceSlug === 'limpeza-colchoes' && (
-                <div className="p-5 rounded-xl bg-white" style={{ border: "1px solid rgba(17,17,17,0.08)", boxShadow: "0 4px 16px rgba(7,26,18,0.04)" }}>
-                  <p className="text-[10px] font-bold tracking-[0.26em] uppercase mb-3" style={{ color: "#D4AF37" }}>Marcas de colchão {cityPrep} {data.city}</p>
-                  <div className="flex flex-wrap gap-2">
+                <DirectoryGroup title={<>Marcas de colchão {cityPrep} {data.city}</>}>
                     {MARCA_COLCHAO_SLUGS.map(slug => (
                       <Link
                         key={slug}
@@ -589,14 +570,11 @@ const LocationServicePage = () => {
                         {slug.replace(/-/g, ' ')}
                       </Link>
                     ))}
-                  </div>
-                </div>
+                  </DirectoryGroup>
               )}
 
               {hasMarcaCadeirasCity && data.serviceSlug === 'limpeza-cadeiras' && (
-                <div className="p-5 rounded-xl bg-white" style={{ border: "1px solid rgba(17,17,17,0.08)", boxShadow: "0 4px 16px rgba(7,26,18,0.04)" }}>
-                  <p className="text-[10px] font-bold tracking-[0.26em] uppercase mb-3" style={{ color: "#D4AF37" }}>Marcas de cadeiras {cityPrep} {data.city}</p>
-                  <div className="flex flex-wrap gap-2">
+                <DirectoryGroup title={<>Marcas de cadeiras {cityPrep} {data.city}</>}>
                     {MARCA_CADEIRAS_SLUGS.map(slug => (
                       <Link
                         key={slug}
@@ -606,8 +584,7 @@ const LocationServicePage = () => {
                         {slug.replace(/-/g, ' ')}
                       </Link>
                     ))}
-                  </div>
-                </div>
+                  </DirectoryGroup>
               )}
             </div>
           </div>
