@@ -465,7 +465,7 @@ const LocationServicePage = () => {
           variant="dark"
         />
 
-        {isPaidLanding ? <section className="p-6 text-center bg-white"><h2 className="font-playfair text-xl mb-2">Serviço ao domicílio</h2><p>Atendimento em {data.city}. Envie a sua morada por WhatsApp para confirmar cobertura e deslocação.</p></section> : <>
+        <>
         {/* ═══ ÁREA DE SERVIÇO (DIRETÓRIO) ═══ */}
         <section className="py-14 md:py-20" style={{ backgroundColor: "#FDFDF9" }}>
           <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
@@ -591,7 +591,7 @@ const LocationServicePage = () => {
           </div>
         </section>
 
-        </>}
+        </>
       </main>
       {isPaidLanding ? <AdsLandingFooter /> : <Footer />}
     </QuizServiceProvider>

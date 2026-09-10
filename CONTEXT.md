@@ -1072,3 +1072,6 @@ Nesta branch de pré-visualização, `?teste=ofertas` em DEV mantém `QuizComboU
 Teste `?teste=ofertas`: cartões simplificados com uma linha promocional. Casal55€/un.; cadeiras: uma unidade oferecida por conjunto completo de4, com preço unitário do escalão da quantidade escolhida; tapetes:1m² oferecido por cada5m² completos no conjunto, guardando área real e área a cobrar no rótulo, euros sempre sob orçamento. Sem acumulação de10%, apenas DEV.
 
 Atualização do teste de ofertas: desconto de14€ por unidade em todos os tamanhos de colchão (solteiro45€, casal55€, King/Queen65€), pedido explícito do responsável. Apenas no modo DEV `teste=ofertas`; tabela pública inalterada.
+
+### Secção de cobertura nas landing pages (2026-09-10)
+A secção completa de serviços e zonas de atendimento permanece visível também em modo Ads, por pedido do dono. Não a substituir pelo resumo «Serviço ao domicílio».

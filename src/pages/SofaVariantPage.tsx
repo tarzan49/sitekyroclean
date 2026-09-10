@@ -563,7 +563,7 @@ const SofaVariantPage = () => {
           variant="dark"
         /></div>
 
-        {isPaidLanding ? <section className="p-6 text-center bg-white"><h2 className="font-playfair text-xl mb-2">Serviço ao domicílio</h2><p>Atendimento em {data.locationName}. Envie a sua morada por WhatsApp para confirmar cobertura e deslocação.</p></section> : <>
+        <>
         {/* ═══ PACKS ═══ */}
         <ServicePackBanner
           packSlugs={SERVICE_PACK_SLUGS[data.serviceKey] ?? ["pack-sala-completa"]}
@@ -640,7 +640,7 @@ const SofaVariantPage = () => {
             </div>
           </div>
         </section>
-        </>}
+        </>
       </main>
       {isPaidLanding ? <AdsLandingFooter /> : <Footer />}
     </>
