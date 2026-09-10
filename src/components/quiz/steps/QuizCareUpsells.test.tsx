@@ -16,6 +16,28 @@ function MattressHarness() {
 }
 
 describe('care upsells', () => {
+  it('narrows the mattress treatment price to only the sizes actually kept, not the whole order', () => {
+    function MultiSizeHarness() {
+      const [items, setItems] = useState<MattressItem[]>([
+        { sizeId: 'solteiro', qty: 1, packEnabled: false },
+        { sizeId: 'king', qty: 1, packEnabled: false },
+      ]);
+      return <QuizMattressAddonUpsell formData={initialFormData} updateFormData={() => {}}
+        mattressItems={items} setMattressItems={setItems} onContinue={() => {}} onBack={() => {}} />;
+    }
+    render(<MultiSizeHarness />);
+    const treatment = screen.getByRole('button', { name: /Desbacterização e Anti Ácaros/ });
+    // Antes de escolher: gama de todo o pedido (solteiro +15€, king +25€).
+    expect(treatment.textContent).toContain('Desde +15€/un.');
+    fireEvent.click(treatment);
+    // Ligado: por omissão aplica a ambos os tamanhos, gama mantém-se.
+    expect(treatment.textContent).toContain('Desde +15€/un.');
+    // Retira o King/Queen do tratamento — só o solteiro fica selecionado.
+    fireEvent.click(screen.getByRole('button', { name: 'Retirar tratamento: King / Queen' }));
+    expect(treatment.textContent).toContain('+15€/un.');
+    expect(treatment.textContent).not.toContain('Desde');
+  });
+
   it('shows the real treatment surcharge before selection and allows removing it', () => {
     render(<MattressHarness />);
     const treatment = screen.getByRole('button', { name: /Desbacterização e Anti Ácaros/ });

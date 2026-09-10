@@ -22,7 +22,13 @@ const QuizMattressAddonUpsell = ({ mattressItems, setMattressItems, onContinue, 
   const anyOn = activeItems.some(i => i.packEnabled);
   const plural = activeItems.length > 1 || (activeItems[0]?.qty ?? 0) > 1;
 
-  const addonPrices = activeItems.flatMap(item => {
+  // Antes de escolher, mostra a gama possível (todos os colchões do pedido).
+  // Depois de ligar o cartão, mostra só os tamanhos que a pessoa escolheu de
+  // facto no QuizTreatmentQuantities abaixo — sem isto, escolher só um
+  // tamanho continuava a mostrar a gama inteira dos outros colchões do pedido,
+  // nunca o preço exato do que ficou selecionado.
+  const priceRelevantItems = anyOn ? activeItems.filter(i => i.packEnabled && (i.packQty ?? 0) > 0) : activeItems;
+  const addonPrices = priceRelevantItems.flatMap(item => {
     const option = mattressPrices.find(p => p.id === item.sizeId);
     if (!option) return [];
     const pack = calcPackPricing(option, true, false, 30);
@@ -30,7 +36,7 @@ const QuizMattressAddonUpsell = ({ mattressItems, setMattressItems, onContinue, 
   });
   const addonPriceLabel = addonPrices.length === 0 ? 'Sob orçamento'
     : Math.min(...addonPrices) === Math.max(...addonPrices)
-      ? `+${addonPrices[0]}€/un.` : `+${Math.min(...addonPrices)}€ a +${Math.max(...addonPrices)}€/un.`;
+      ? `+${addonPrices[0]}€/un.` : `Desde +${Math.min(...addonPrices)}€/un.`;
 
   const toggleAll = () => {
     setMattressItems(prev => prev.map(i => i.qty > 0 ? { ...i, packEnabled: !anyOn, packQty: anyOn ? 0 : i.qty } : i));
