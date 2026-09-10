@@ -1,5 +1,5 @@
 import { useId } from 'react';
-import { Plus, Ruler, Trash2 } from 'lucide-react';
+import { Plus, Trash2 } from 'lucide-react';
 import type { CarpetItem } from '@/components/quiz/QuizTypes';
 import { carpetAddItem, carpetRemoveItem, carpetUpdateItem, carpetItemArea, carpetTotalArea } from '@/components/quiz/quizHelpers';
 
@@ -22,21 +22,15 @@ const QuizStepConfigCarpet = ({ carpetItems, setCarpetItems }: Props) => {
 
       <details className="w-full max-w-sm rounded-xl border border-[#D4AF37]/20 bg-[#D4AF37]/[0.06] px-3">
         <summary className="min-h-11 cursor-pointer py-3 text-left text-xs font-medium text-[#E8D58F] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37] rounded-lg">Comprimento × largura <span className="font-normal text-white/70">· Como medir?</span></summary>
-        <div className="flex items-center gap-3 pb-3">
-          <svg viewBox="0 0 112 94" className="w-16 shrink-0 text-[#D4AF37]" role="img" aria-label="Meça a largura de um lado ao outro e o comprimento de cima a baixo do tapete">
-            <path d="M12 16v-5m0 2h66m0-2v5M88 24h5m-2 0v58m-3 0h5" fill="none" stroke="currentColor" strokeWidth="1.5" />
-            <rect x="12" y="24" width="66" height="58" rx="4" fill="currentColor" fillOpacity=".12" stroke="currentColor" />
-            <rect x="19" y="31" width="52" height="44" rx="2" fill="none" stroke="currentColor" strokeOpacity=".45" />
-            <path d="m45 40 13 13-13 13-13-13Z M18 21v-4m9 4v-4m9 4v-4m9 4v-4m9 4v-4m9 4v-4m9 4v-4M18 89v-4m9 4v-4m9 4v-4m9 4v-4m9 4v-4m9 4v-4m9 4v-4" fill="none" stroke="currentColor" strokeOpacity=".65" />
-          </svg>
-          <div className="min-w-0 text-left">
-            <p className="flex items-center gap-2 text-sm font-semibold text-white"><Ruler size={16} aria-hidden="true" className="text-[#D4AF37]" />Como medir</p>
-            <p className="mt-1 text-xs leading-relaxed text-white/70">Meça o tapete de uma ponta à outra nos dois sentidos: comprimento e largura.</p>
-            <p className="mt-2 text-xs leading-relaxed text-[#E8D58F]">Exemplo: 3 m de comprimento × 2 m de largura = 6 m².</p>
-            <p className="mt-1 text-xs leading-relaxed text-white/70">Preencha Comprimento com 3 e Largura com 2. Calculamos a área por si.</p>
-            <p className="mt-1 text-xs text-white/60">Se medir em centímetros: 300 cm = 3 m; 200 cm = 2 m.</p>
-          </div>
-        </div>
+        <svg viewBox="0 0 340 120" className="mx-auto mb-3 w-full max-w-xs text-[#D4AF37]" role="img" aria-label="Exemplo de um tapete: comprimento de 3 metros na vertical e largura de 2 metros na horizontal.">
+          <rect x="48" y="32" width="88" height="78" rx="5" fill="currentColor" fillOpacity=".1" stroke="currentColor" />
+          <rect x="55" y="39" width="74" height="64" rx="2" fill="none" stroke="currentColor" strokeOpacity=".35" />
+          <path d="m92 54 17 17-17 17-17-17Z" fill="none" stroke="currentColor" strokeOpacity=".5" />
+          <path d="M48 23h88m-83-4-5 4 5 4m78-8 5 4-5 4M148 32v78m-4-73 4-5 4 5m-8 68 4 5 4-5" fill="none" stroke="currentColor" strokeWidth="1.5" />
+          <text x="92" y="13" textAnchor="middle" fill="#E8D58F" fontSize="12">Largura: 2 m</text>
+          <text x="163" y="68" fill="#E8D58F" fontSize="12">Comprimento: 3 m</text>
+          <text x="163" y="87" fill="white" fillOpacity=".65" fontSize="11">Exemplo em metros</text>
+        </svg>
       </details>
 
       <div className="flex w-full max-w-sm flex-col gap-2">
