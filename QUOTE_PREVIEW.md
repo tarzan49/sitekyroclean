@@ -55,3 +55,5 @@ Cadeiras: cartões Premium/Essencial e título da comparação centrados; benef�
 Rodapé das cadeiras: ChairAddonActions colocado fora da área de scroll no QuizForm. Voltar e Continuar sem extras ficam visíveis desde a entrada; após selecionar, o mesmo botão confirma o tratamento. Conteúdo conserva scroll independente. Tipos e testes aprovados; verificado visualmente no browser.
 
 Benefício «Desbacterização + Antiácaros / Incluídos em qualquer proteção» movido para cima dos planos, substituindo o subtítulo redundante Impermeabilização para manter a etapa compacta e o benefício visível antes da escolha.
+
+Entrada nas cadeiras compactada para mostrar ambos os planos completos e botões: sem sobretítulo redundante; quantidade/antes de descontos numa linha comum; duração abreviada nos cartões compactos. Verificação visual em desktop e 390×744, sem corte das opções.
