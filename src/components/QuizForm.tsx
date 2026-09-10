@@ -987,7 +987,7 @@ ${formData.description || 'Sem observações adicionais'}
 
     {/* Rotating social proof bar */}
     <div className="border-t border-gold/20 px-4 py-2.5 text-center flex-shrink-0 bg-gradient-to-r from-[#0a1f18] via-[#0d2820] to-[#0a1f18] flex items-center justify-center gap-2 overflow-hidden">
-      {(() => {
+      {currentStep === 0 ? <p className="text-xs text-white/65 py-1">Orçamento sem compromisso.</p> : (() => {
         const current = socialProofMessages[socialProofIdx];
         const Icon = SOCIAL_PROOF_ICON[current.category];
         return (

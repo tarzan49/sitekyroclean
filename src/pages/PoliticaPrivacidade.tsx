@@ -83,6 +83,7 @@ const PoliticaPrivacidade = () => (
           <ul className="list-disc pl-5 space-y-1.5">
             <li><strong>Google LLC</strong>: através do GA4, mediante consentimento, para análise de tráfego;</li>
             <li><strong>Formspree</strong>: plataforma utilizada para receber pedidos de orçamento de forma segura;</li>
+            <li><strong>Localização opcional (BigDataCloud)</strong>: ao permitir a localização no navegador, as coordenadas atuais são enviadas diretamente ao BigDataCloud para sugerir a localidade do serviço. O fornecedor recebe também o endereço IP e usa estes sinais para melhorar os seus dados de geolocalização. Não guardamos as coordenadas no pedido, apenas a localidade confirmada. Pode recusar a localização e pesquisar manualmente. Consulte a <a href="https://www.bigdatacloud.com/privacy-policy" target="_blank" rel="noopener noreferrer" className="underline">política do fornecedor</a>.</li>
             <li><strong>Supabase</strong>: base de dados segura onde os pedidos são armazenados temporariamente para gestão interna.</li>
           </ul>
           <p>Todos os subprocessadores operam em conformidade com o RGPD e dispõem de salvaguardas adequadas.</p>
