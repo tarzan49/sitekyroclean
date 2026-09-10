@@ -5,19 +5,20 @@ import { carpetAddItem, carpetRemoveItem, carpetUpdateItem, carpetItemArea, carp
 
 interface Props {
   carpetItems: CarpetItem[];
+  carpetKind?: 'tapete' | 'alcatifa';
   setCarpetItems: React.Dispatch<React.SetStateAction<CarpetItem[]>>;
 }
 
 const formatArea = (area: number) => area.toLocaleString('pt-PT', { maximumFractionDigits: 2 });
 
-const QuizStepConfigCarpet = ({ carpetItems, setCarpetItems }: Props) => {
+const QuizStepConfigCarpet = ({ carpetItems, setCarpetItems, carpetKind = 'tapete' }: Props) => {
   const fieldPrefix = useId();
   const totalArea = carpetTotalArea(carpetItems);
 
   return (
     <div className="flex w-full flex-col items-center gap-3">
       <div className="space-y-1.5 text-center">
-        <h2 className="font-playfair text-2xl sm:text-3xl font-bold text-white">Que tapetes vamos limpar?</h2>
+        <h2 className="font-playfair text-2xl sm:text-3xl font-bold text-white">{carpetKind === 'alcatifa' ? 'Que áreas de alcatifa vamos limpar?' : 'Que tapetes vamos limpar?'}</h2>
       </div>
 
       <details className="w-full max-w-sm rounded-xl border border-[#D4AF37]/20 bg-[#D4AF37]/[0.06] px-3">
@@ -34,6 +35,7 @@ const QuizStepConfigCarpet = ({ carpetItems, setCarpetItems }: Props) => {
       </details>
 
       <div className="flex w-full max-w-sm flex-col gap-2">
+        {carpetItems.some(item => carpetItemArea(item) === null) && <p className="text-xs text-white/65">Preencha as duas medidas de cada peça para continuar.</p>}
         {carpetItems.map((item, i) => {
           const area = carpetItemArea(item);
           return (
@@ -41,7 +43,7 @@ const QuizStepConfigCarpet = ({ carpetItems, setCarpetItems }: Props) => {
               <legend className="sr-only">Medidas do tapete {i + 1}</legend>
               <div className="mb-2 flex min-h-6 items-center justify-between gap-2">
                 <div className="flex items-center gap-2.5">
-                  <span className="text-xs font-semibold text-white">Tapete {i + 1}</span>
+                  <span className="text-xs font-semibold text-white">{carpetKind === 'alcatifa' ? 'Área' : 'Tapete'} {i + 1}</span>
                   <span className="text-xs text-[#E8D58F] tabular-nums" aria-live="polite">{area !== null ? `${formatArea(area)} m²` : ''}</span>
                 </div>
                 {carpetItems.length > 1 && (
@@ -67,7 +69,7 @@ const QuizStepConfigCarpet = ({ carpetItems, setCarpetItems }: Props) => {
         })}
         <span id={`${fieldPrefix}-units`} className="sr-only">Medidas em metros.</span>
         <button type="button" onClick={() => setCarpetItems(prev => carpetAddItem(prev))} className="flex min-h-11 w-full items-center justify-center gap-2 rounded-xl border border-dashed border-[#D4AF37]/50 px-3 py-2.5 text-sm font-semibold text-[#E8D58F] transition-colors hover:bg-[#D4AF37]/10 hover:border-[#D4AF37] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37] touch-manipulation">
-          <Plus size={18} aria-hidden="true" />Adicionar outro tapete
+          <Plus size={18} aria-hidden="true" />{carpetKind === 'alcatifa' ? 'Adicionar outra área' : 'Adicionar outro tapete'}
         </button>
         {carpetItems.length > 1 && totalArea > 0 && <p className="text-center text-xs text-white/70">Área total preenchida: <span className="font-semibold text-white">{formatArea(totalArea)} m²</span></p>}
       </div>

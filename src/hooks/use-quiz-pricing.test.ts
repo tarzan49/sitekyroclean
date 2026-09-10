@@ -34,12 +34,12 @@ describe('useQuizPricing — packDiscountActive não pode ativar com um único u
     expect(p.packDiscountActive).toBe(false);
   });
 
-  it('activates once combined article value passes 149€ with a qualifying (>=49€) article', () => {
+  it('does not discount a single article even above 149€', () => {
     const p = pricing(
       { service: 'sofa', serviceType: 'cleaning' },
       [{ id: 'mattress', price: 150, qty: 1, label: 'Colchão Casal' }],
     );
-    expect(p.packDiscountActive).toBe(true);
+    expect(p.packDiscountActive).toBe(false);
   });
 
   it('combining the primary sofa item with a qualifying upsell crosses the threshold correctly', () => {
@@ -63,12 +63,12 @@ describe('useQuizPricing — packDiscountActive não pode ativar com um único u
     expect(p.packDiscountActive).toBe(false);
   });
 
-  it('a "sob orçamento" upsell item (price 0) always activates the discount, since it implies a large order', () => {
+  it('a quote-only extra never unlocks an unearned discount', () => {
     const p = pricing(
       { service: 'sofa', serviceType: 'cleaning' },
       [{ id: 'chairs', price: 0, qty: 12, label: '12 cadeiras' }],
     );
-    expect(p.packDiscountActive).toBe(true);
+    expect(p.packDiscountActive).toBe(false);
     expect(p.hasUpsellSobItem).toBe(true);
   });
 });

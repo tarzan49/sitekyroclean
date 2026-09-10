@@ -1,6 +1,6 @@
 import { sofaPrices, mattressPrices } from '@/components/quiz/QuizTypes';
 import type { SofaItem, MattressItem, CarpetItem, UpsellItemConfig } from '@/components/quiz/QuizTypes';
-import { calcChairClean, calcChairWaterproof, calcChairWaterproofPremium, carpetItemArea } from '@/components/quiz/quizHelpers';
+import { calcChairClean, calcChairWaterproof, calcChairWaterproofPremium, carpetItemArea, calcPackPricing } from '@/components/quiz/quizHelpers';
 import { WHATSAPP_BASE } from '@/constants/business';
 import { safeSessionSet } from '@/lib/safeStorage';
 import { logError } from '@/lib/errorTracking';
@@ -45,20 +45,23 @@ export interface QuizLeadPayload {
   hypoSurcharge: number;
 
   slotLabel: string;
+  description?: string;
+  carpetKind?: 'tapete' | 'alcatifa';
 }
 
 function generateBookingId(): string {
   return Math.random().toString(36).substr(2, 8).toUpperCase();
 }
 
-async function postToFormspree(payload: QuizLeadPayload): Promise<Response> {
+async function postToFormspree(payload: QuizLeadPayload, bookingId: string): Promise<Response> {
   const { name, phone, email, photos, finalLocation, message, serviceLabel } = payload;
   const formPayload = new FormData();
   formPayload.append('name', name);
   formPayload.append('phone', phone);
   if (email) formPayload.append('email', email);
   formPayload.append('location', finalLocation);
-  formPayload.append('message', message);
+  formPayload.append('message', `${message}\nReferência do pedido: #${bookingId}`);
+  formPayload.append('booking_id', bookingId);
   formPayload.append('subject', `Pedido de orçamento - ${serviceLabel}`);
   photos.forEach((photo, i) => {
     formPayload.append(`foto_${i + 1}`, photo, photo.name);
@@ -90,18 +93,9 @@ async function insertCrmLead(payload: QuizLeadPayload, bookingId: string): Promi
     finalLocation, priceText, message, upsellItems,
   } = payload;
 
-  const upsellNotes = upsellItems.length > 0
-    ? upsellItems.map(item => {
-        const imp = item.waterproof ? ' + Impermeabilização' : '';
-        if (item.id === 'mattress') return `Colchão: ${mattressPrices.find(p => p.id === item.mattressSize)?.label ?? item.mattressSize ?? '?'}${imp}`;
-        if (item.id === 'carpet') return `Tapete: ${item.carpetArea ?? '?'}m²${imp}`;
-        if (item.id === 'chairs') return `Cadeiras: ${item.chairQty ?? '?'}x${imp}`;
-        return item.id;
-      }).join(' | ')
-    : '';
-
-  const { supabase } = await import('@/lib/supabase');
-  await supabase.from('leads').insert({
+  const { supabase, isSupabaseConfigured } = await import('@/lib/supabase');
+  if (!isSupabaseConfigured) throw new Error('CRM não configurado');
+  const { error } = await supabase.from('leads').insert({
     name,
     phone,
     email: email || null,
@@ -115,48 +109,32 @@ async function insertCrmLead(payload: QuizLeadPayload, bookingId: string): Promi
     status: 'pending',
     source: 'Website',
     priority: 'Quente',
-    notes: upsellNotes,
+    notes: upsellItems.map(item => item.label).join(' | '),
   });
+  if (error) throw error;
 }
 
-function buildWaUrl(payload: QuizLeadPayload, bookingId: string): string {
-  const {
-    serviceLabel, serviceTypeLabel, detailsSummary, finalLocation,
-    totalPrice, hasSobOrcamento, hasUpsellSobItem, packDiscountActive, packDiscountedPrice, hypoallergenic, hypoSurcharge,
-  } = payload;
-
-  const waExtras: string[] = [];
-  if (serviceTypeLabel) waExtras.push(serviceTypeLabel);
-  if (hypoallergenic === true) waExtras.push(`Produtos Hipoalergénicos (+${hypoSurcharge}€)`);
-  const waExtrasText = waExtras.length > 0 ? waExtras.join(' + ') : 'Sem extras';
-
-  const waTotalPrice = (hasSobOrcamento || hasUpsellSobItem)
-    ? 'Sob orçamento'
-    : packDiscountActive && totalPrice > 0
-      ? `${packDiscountedPrice}€ (Pack -10%)`
-      : totalPrice > 0
-        ? `${totalPrice}€`
-        : 'Sob orçamento';
-
-  const waText = encodeURIComponent(
-    `Olá Kyro Clean Solutions. Acabei de gerar um orçamento detalhado no site e pretendo confirmar o agendamento.\n\n` +
-    `DADOS DO PEDIDO:\n` +
-    `▸ Serviço: ${serviceLabel}\n` +
-    `▸ Item: ${detailsSummary || 'N/D'}\n` +
-    `▸ Extras: ${waExtrasText}\n` +
-    `▸ Localização: ${finalLocation}\n` +
-    `▸ Valor Total: ${waTotalPrice}\n` +
-    `▸ Código de Reserva: #${bookingId}\n\n` +
-    `Aguardo contacto para validação final.`
-  );
-
-  return `${WHATSAPP_BASE}?text=${waText}`;
+export function buildWaUrl(payload: QuizLeadPayload, bookingId: string): string {
+  const text = `Olá Kyro Clean Solutions. Gostaria de confirmar este pedido de orçamento.\n\n` +
+    `Nome: ${payload.name}\nTelemóvel: ${payload.phone}\n` +
+    `${payload.message}\n\nReferência do pedido: #${bookingId}\n` +
+    `Aguardo a confirmação do orçamento e da disponibilidade.`;
+  return `${WHATSAPP_BASE}?text=${encodeURIComponent(text)}`;
 }
 
-function buildReceiptLines(payload: QuizLeadPayload) {
+export function formatQuotePrice(payload: Pick<QuizLeadPayload, 'totalPrice' | 'packDiscountActive' | 'packDiscountedPrice' | 'packDiscountPct' | 'hasSobOrcamento' | 'hasUpsellSobItem'>): string {
+  const value = payload.packDiscountActive ? payload.packDiscountedPrice : payload.totalPrice;
+  const price = `${Number(value.toFixed(2)).toLocaleString('pt-PT')}€`;
+  const discount = payload.packDiscountActive ? ` (Pack -${Math.round(payload.packDiscountPct * 100)}% nos serviços tabelados)` : '';
+  return payload.hasSobOrcamento || payload.hasUpsellSobItem
+    ? `${price} de subtotal conhecido${discount} + serviços sob orçamento`
+    : value > 0 ? `${price}${discount}` : 'Sob orçamento';
+}
+
+export function buildReceiptLines(payload: Pick<QuizLeadPayload, 'service' | 'serviceType' | 'waterproofingTier' | 'sofaItems' | 'mattressItems' | 'upsellItems' | 'carpetItems' | 'chairQuantity' | 'chairWaterproofQty' | 'chairAntiAcaros' | 'finalTravelCost' | 'finalLocation' | 'carpetKind'>) {
   const {
     service, serviceType, waterproofingTier, sofaItems, mattressItems, upsellItems, carpetItems, chairQuantity,
-    chairWaterproofQty, chairAntiAcaros, calculateServicePrice, finalTravelCost, finalLocation,
+    chairWaterproofQty, chairAntiAcaros, finalTravelCost, finalLocation,
   } = payload;
 
   const receiptLines: Array<{ label: string; qty: number; unitPrice: number | null; total: number | null }> = [];
@@ -176,18 +154,7 @@ function buildReceiptLines(payload: QuizLeadPayload) {
     sofaItems.filter(i => i.qty > 0).forEach(item => {
       const opt = sofaPrices.find(p => p.id === item.sizeId);
       if (!opt) return;
-      const baseP = isWaterproofBase
-        ? (isPremiumTierSofa
-            ? (typeof opt.waterproofingPremiumPrice === 'number' ? (opt.waterproofingPremiumPrice as number) : null)
-            : (typeof opt.waterproofingPrice === 'number' ? (opt.waterproofingPrice as number) : null))
-        : (typeof opt.cleaningPrice === 'number' ? (opt.cleaningPrice as number) : null);
-      // Pack Premium = pack Essencial + a mesma diferença já aprovada entre Essencial
-      // e Premium standalone (ver quizHelpers.ts calcPackPricing).
-      const tierDelta = isPremiumTierSofa && typeof opt.waterproofingPremiumPrice === 'number' && typeof opt.waterproofingPrice === 'number'
-        ? (opt.waterproofingPremiumPrice as number) - (opt.waterproofingPrice as number) : 0;
-      const bothEssencial = typeof opt.bothPrice === 'number' ? (opt.bothPrice as number) : null;
-      const bothP = bothEssencial !== null ? bothEssencial + tierDelta : null;
-      const unit = item.packEnabled ? bothP : baseP;
+      const unit = calcPackPricing(opt, item.packEnabled, isWaterproofBase, null, waterproofingTier).displayPrice;
       const tierTag = item.packEnabled
         ? (isPremiumTierSofa ? ' + Proteção 10 anos' : ' + Proteção 2 anos')
         : (isWaterproofBase ? (isPremiumTierSofa ? ' (Impermeab. Premium)' : ' (Impermeab. Essencial)') : '');
@@ -225,19 +192,18 @@ function buildReceiptLines(payload: QuizLeadPayload) {
   } else if (service === 'carpet') {
     // Sem preço fixo (2026-09-06): cada tapete medido vira a sua própria linha,
     // sempre sob orçamento, nunca um total calculado por m².
-    carpetItems
-      .map(carpetItemArea)
-      .filter((area): area is number => area !== null)
-      .forEach(area => {
-        const label = `Tapete ${area % 1 === 0 ? area : Math.round(area * 100) / 100}m²`;
-        receiptLines.push({ label, qty: 1, unitPrice: null, total: null });
-      });
+    carpetItems.forEach((item, i) => {
+      const area = carpetItemArea(item);
+      if (area === null) return;
+      receiptLines.push({ label: `${payload.carpetKind === 'alcatifa' ? 'Alcatifa' : 'Tapete'} ${i + 1}: ${item.largura} × ${item.comprimento} m (${Number(area.toFixed(2))} m²)`, qty: 1, unitPrice: null, total: null });
+    });
   }
 
   upsellItems.forEach(item => {
     const q = item.qty ?? 1;
     const unitP = q > 0 && item.price > 0 ? Math.round(item.price / q * 100) / 100 : null;
-    receiptLines.push({ label: item.label, qty: q, unitPrice: unitP, total: item.price > 0 ? item.price : null });
+    const measures = item.carpetItems?.map((rug, i) => `peça ${i + 1}: ${rug.largura} × ${rug.comprimento} m`).join('; ');
+    receiptLines.push({ label: `${item.label.replace(/^\d+\s*[x×]\s*/i, '')}${measures ? ` (${measures})` : ''}`, qty: q, unitPrice: unitP, total: item.price > 0 ? item.price : null });
     if (item.waterproof && item.waterproofPrice && item.waterproofPrice > 0) {
       receiptLines.push({ label: `Impermeabilização (${item.label})`, qty: 1, unitPrice: item.waterproofPrice, total: item.waterproofPrice });
     }
@@ -255,13 +221,7 @@ function persistObrigadoData(payload: QuizLeadPayload, bookingId: string, waUrl:
   } = payload;
 
   const isSobOrcamento = hasSobOrcamento || hasUpsellSobItem;
-  const finalPriceText = isSobOrcamento
-    ? 'Sob orçamento'
-    : packDiscountActive && totalPrice > 0
-      ? `${packDiscountedPrice}€ (Pack -10%)`
-      : totalPrice > 0
-        ? `${totalPrice}€`
-        : 'Sob orçamento';
+  const finalPriceText = formatQuotePrice(payload);
 
   const discountAmt = packDiscountActive ? Math.round((totalPrice - packDiscountedPrice) * 100) / 100 : 0;
 
@@ -289,20 +249,16 @@ function persistObrigadoData(payload: QuizLeadPayload, bookingId: string, waUrl:
 export async function submitQuizLead(payload: QuizLeadPayload): Promise<void> {
   const bookingId = generateBookingId();
 
-  // Persist receipt + WA URL FIRST — synchronous, no network, so /obrigado
-  // renders the full receipt as soon as the caller navigates.
-  try {
+  const persist = () => {
     const waUrl = buildWaUrl(payload, bookingId);
     persistObrigadoData(payload, bookingId, waUrl);
-  } catch (persistErr) {
-    console.warn('[submissionService] persistObrigadoData failed:', persistErr);
-  }
+  };
 
   // Fora de cleansolutions.com.pt (localhost, previews, etc.) — nunca cria um
   // lead a sério nem manda um email a sério para o dono. A página /obrigado
-  // continua a funcionar normalmente (usa só o que persistObrigadoData já
-  // guardou acima), só os dois efeitos externos reais é que ficam de fora.
+  // continua a funcionar com dados simulados; os efeitos externos ficam de fora.
   if (!IS_PRODUCTION) {
+    persist();
     // eslint-disable-next-line no-console
     console.warn(`[submissionService] Fora de produção — pedido #${bookingId} NÃO enviado ao CRM nem ao Formspree (simulado).`);
     return;
@@ -314,7 +270,7 @@ export async function submitQuizLead(payload: QuizLeadPayload): Promise<void> {
   // means the customer thinks they're booked and the business never hears.
   const [crmResult, formspreeResult] = await Promise.allSettled([
     insertCrmLead(payload, bookingId),
-    postToFormspree(payload),
+    postToFormspree(payload, bookingId),
   ]);
 
   const crmOk = crmResult.status === 'fulfilled';
@@ -346,4 +302,5 @@ export async function submitQuizLead(payload: QuizLeadPayload): Promise<void> {
   if (bothFailed) {
     throw new Error('Both CRM insert and Formspree submission failed');
   }
+  persist();
 }

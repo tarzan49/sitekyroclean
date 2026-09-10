@@ -42,9 +42,9 @@ export function carpetUpdateItem(items: CarpetItem[], id: string, field: 'largur
   return items.map(i => i.id === id ? { ...i, [field]: value } : i);
 }
 export function carpetItemArea(item: CarpetItem): number | null {
-  const l = parseFloat(item.largura.replace(',', '.'));
-  const c = parseFloat(item.comprimento.replace(',', '.'));
-  if (isNaN(l) || isNaN(c) || l <= 0 || c <= 0) return null;
+  const l = Number(item.largura.trim().replace(',', '.'));
+  const c = Number(item.comprimento.trim().replace(',', '.'));
+  if (!Number.isFinite(l * c) || l <= 0 || c <= 0) return null;
   return l * c;
 }
 export function carpetHasValidItems(items: CarpetItem[]): boolean {
@@ -133,3 +133,7 @@ export function fmtN(n: number): string {
   return n % 1 === 0 ? `${n}€` : `${n.toFixed(1).replace('.', ',')}€`;
 }
 
+
+export function carpetAllItemsValid(items: CarpetItem[]): boolean {
+  return items.length > 0 && items.every(i => carpetItemArea(i) !== null);
+}

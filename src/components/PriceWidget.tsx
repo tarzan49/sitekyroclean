@@ -1,3 +1,4 @@
+import { carpetAllItemsValid } from '@/components/quiz/quizHelpers';
 import { WaterproofingTierPicker } from "@/components/quiz/steps/WaterproofingTierPicker";
 import { lazy, Suspense, useState } from "react";
 import { useLocation } from "react-router-dom";
@@ -65,6 +66,7 @@ export default function PriceWidget({ serviceSlug, initialLocation }: Props) {
   const travelFee = initialLocation ? (locationPrices[initialLocation] ?? 10) : 0;
   const articles = calcWidgetArticles(serviceSlug, w.rowQuantities, new Set(), w.addonTier);
   const pricing = { ...calcWidgetPricing(total, travelFee, articles), ...(isPackPreview ? { discountActive: false } : {}) };
+  const incompleteMeasures = Object.values(w.carpetItemsByRow).some(items => !carpetAllItemsValid(items));
   const hasSelection = total > 0 || Object.values(w.rowQuantities).some(q => q > 0) || w.chaiseLongueAddon > 0;
 
   return (
@@ -260,13 +262,13 @@ export default function PriceWidget({ serviceSlug, initialLocation }: Props) {
             </div>
             <div className="flex-1 text-left">
               <p className="text-[11px] font-bold leading-none text-white">10% de desconto ativo</p>
-              <p className="text-[9px] mt-1 leading-none text-white/40">Aplica-se a todo o pedido</p>
+              <p className="text-[9px] mt-1 leading-none text-white/40">Aplica-se aos serviços, exclui deslocação</p>
             </div>
             <span className="text-[9px] font-black px-1.5 py-1 rounded-sm bg-gold text-[#12121e] flex-shrink-0">-10%</span>
           </div>
         ) : (
           <p className="text-[10px] leading-snug text-white/35">
-            Adicione um colchão, sofá, tapete, alcatifa ou algumas cadeiras a mais (desde <span className="text-white/70 font-semibold">{PACK_DISCOUNT_MIN_UPSELL_ITEM}€</span>) num pedido de <span className="text-white/70 font-semibold">{PACK_DISCOUNT_MIN_SERVICE}€+</span> e ganhe <span className="text-gold font-semibold">10% de desconto em tudo</span>.
+            Adicione um colchão, sofá, tapete, alcatifa ou algumas cadeiras a mais (desde <span className="text-white/70 font-semibold">{PACK_DISCOUNT_MIN_UPSELL_ITEM}€</span>) num pedido de <span className="text-white/70 font-semibold">{PACK_DISCOUNT_MIN_SERVICE}€+</span> e ganhe <span className="text-gold font-semibold">10% nos serviços tabelados</span>.
           </p>
         )}
       </div>}
@@ -282,6 +284,7 @@ export default function PriceWidget({ serviceSlug, initialLocation }: Props) {
           </div>
         )}
 
+        {incompleteMeasures && <p className="text-xs text-amber-200 mb-2">Preencha as duas medidas de cada peça ou remova a peça incompleta.</p>}
         {hasSelection && total > 0 && (
           <div className="flex items-center justify-between px-3.5 py-2.5 sm:px-4 sm:py-3 rounded-sm" style={{ background: "linear-gradient(135deg, #0d2a1c 0%, #071a12 100%)" }}>
             <div>
@@ -301,7 +304,7 @@ export default function PriceWidget({ serviceSlug, initialLocation }: Props) {
         <button
           type="button"
           onClick={handleContinue}
-          disabled={!hasSelection || (isPackPreview && (total <= 0 || (w.rowQuantities[3] ?? 0) > 0))}
+          disabled={!hasSelection || incompleteMeasures || (isPackPreview && (total <= 0 || (w.rowQuantities[3] ?? 0) > 0))}
           className={cn(
             "w-full h-11 sm:h-12 flex items-center justify-center gap-2 bg-gradient-to-r from-gold to-[#d4c57b] hover:from-[#d4c57b] hover:to-gold text-[#12121e] font-black text-xs sm:text-sm tracking-wider uppercase touch-manipulation active:scale-[0.98] rounded-sm shadow-[0_0_24px_rgba(212,175,55,0.30)] transition-all",
             !hasSelection && "opacity-50"
@@ -332,6 +335,7 @@ export default function PriceWidget({ serviceSlug, initialLocation }: Props) {
           initialMattressItems={activeConfig.mattressItems}
           initialMattressSizeId={activeConfig.mattressSizeId}
           initialMattressQty={activeConfig.mattressQty}
+          initialCarpetKind={serviceSlug === 'limpeza-alcatifas' ? 'alcatifa' : 'tapete'}
           initialCarpetArea={activeConfig.carpetArea}
           initialCarpetItems={activeConfig.carpetItems}
           initialChairQty={activeConfig.chairQty}

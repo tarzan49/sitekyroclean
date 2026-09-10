@@ -4,10 +4,10 @@ import { cn } from '@/lib/utils';
 import { sofaPrices, mattressPrices } from '@/components/quiz/QuizTypes';
 import type { UpsellItemConfig, CarpetItem } from '@/components/quiz/QuizTypes';
 import {
-  calcChairClean,
+  calcChairWaterproof, calcChairWaterproofPremium, calcChairClean,
   carpetAddItem, carpetRemoveItem, carpetUpdateItem, carpetItemArea, carpetTotalArea,
 } from '@/components/quiz/quizHelpers';
-import { PACK_DISCOUNT_MIN_SERVICE, PACK_DISCOUNT_MIN_UPSELL_ITEM } from '@/lib/priceWidgetCalc';
+import { PACK_DISCOUNT_MIN_UPSELL_ITEM } from '@/lib/priceWidgetCalc';
 
 interface QuizComboUpsellScreenProps {
   primaryService: string;
@@ -43,6 +43,8 @@ function fmt(n: number): string {
 // anterior de escolher um item de cada vez. Substitui QuizUpsellOverlay
 // no ponto "antes de finalizar" (pedido explícito, aprovado em mockup).
 const QuizComboUpsellScreen = ({ primaryService, upsellItems, setUpsellItems, onContinue, onBack, totalPrice, packDiscountActive, packDiscountedPrice }: QuizComboUpsellScreenProps) => {
+  const [initialChairs] = useState(() => upsellItems.find(i => i.id === 'chairs'));
+  const [preservedTreatments] = useState(() => upsellItems.filter(i => i.id.endsWith('-anti-acaros')));
   const [view, setView] = useState<View>('summary');
   // This screen remounts when returning from contact. Restore the selection
   // before the synchronization effect can overwrite the parent's items.
@@ -82,13 +84,16 @@ const QuizComboUpsellScreen = ({ primaryService, upsellItems, setUpsellItems, on
     const q = sofaQty[opt.id] ?? 0;
     return sum + (typeof opt.cleaningPrice === 'number' ? q * opt.cleaningPrice : 0);
   }, 0);
-  const chairsCleanPrice = calcChairClean(chairsQty);
+  const chairsCleanPrice = initialChairs?.waterproof
+    ? (initialChairs.waterproofingTier === 'premium' ? calcChairWaterproofPremium(chairsQty) : calcChairWaterproof(chairsQty))
+    : calcChairClean(chairsQty);
   const chairsTotal = chairsQty > 0 ? (chairsCleanPrice ?? 0) : 0;
 
   const mattressQtyTotal = Object.values(mattressQty).reduce((a, b) => a + b, 0);
   const sofaQtyTotal = Object.values(sofaQty).reduce((a, b) => a + b, 0);
   const carpetTotalAreaValue = carpetTotalArea(carpetItems);
   const carpetValidCount = carpetItems.filter(it => carpetItemArea(it) !== null).length;
+  const incompleteCarpets = carpetItems.some(i => i.largura || i.comprimento) && carpetItems.some(i => carpetItemArea(i) === null);
   const anySelected = mattressQtyTotal > 0 || sofaQtyTotal > 0 || chairsQty > 0 || carpetValidCount > 0;
   const hasQuoteOnlyExtra = carpetValidCount > 0 || sofaPrices.some(opt =>
     (sofaQty[opt.id] ?? 0) > 0 && typeof opt.cleaningPrice !== 'number'
@@ -118,7 +123,7 @@ const QuizComboUpsellScreen = ({ primaryService, upsellItems, setUpsellItems, on
   // não só depois de "Confirmar"/"Finalizar Orçamento" (bug real: a pessoa
   // ficava sem feedback nenhum de preço enquanto ajustava quantidades).
   useEffect(() => {
-    const items: UpsellItemConfig[] = [];
+    const items: UpsellItemConfig[] = [...preservedTreatments];
     mattressPrices.forEach(opt => {
       const q = mattressQty[opt.id] ?? 0;
       if (q > 0 && typeof opt.cleaningPrice === 'number') {
@@ -157,7 +162,9 @@ const QuizComboUpsellScreen = ({ primaryService, upsellItems, setUpsellItems, on
         chairQty: String(chairsQty),
         qty: chairsQty,
         price: chairsCleanPrice ?? 0,
-        label: `${chairsQty} Cadeira${chairsQty > 1 ? 's' : ''}`,
+        label: `${chairsQty} Cadeira${chairsQty > 1 ? 's' : ''}${initialChairs?.waterproof ? ` (Impermeabilização ${initialChairs.waterproofingTier === 'premium' ? 'Premium' : 'Essencial'})` : ''}`,
+        waterproof: initialChairs?.waterproof,
+        waterproofingTier: initialChairs?.waterproofingTier,
       });
     }
     if (carpetValidCount > 0) {
@@ -332,6 +339,7 @@ const QuizComboUpsellScreen = ({ primaryService, upsellItems, setUpsellItems, on
           </div>
         )}
 
+        {view === 'carpet' && incompleteCarpets && <p className="text-xs text-amber-200">Preencha as duas medidas de cada tapete ou remova a peça incompleta.</p>}
         <div className="flex items-center gap-3 w-full max-w-xs mt-1">
           <button
             onClick={() => setView('summary')}
@@ -340,8 +348,9 @@ const QuizComboUpsellScreen = ({ primaryService, upsellItems, setUpsellItems, on
             <ChevronLeft className="w-4 h-4 mr-1" /> Voltar
           </button>
           <button
+            disabled={view === 'carpet' && incompleteCarpets}
             onClick={() => setView('summary')}
-            className="flex-1 h-14 bg-gradient-to-r from-gold to-[#d4c57b] hover:from-[#d4c57b] hover:to-gold text-[#12121e] font-black text-sm tracking-wider uppercase touch-manipulation active:scale-[0.98] rounded-sm shadow-[0_0_32px_rgba(212,175,55,0.30)]"
+            className="disabled:opacity-40 flex-1 h-14 bg-gradient-to-r from-gold to-[#d4c57b] hover:from-[#d4c57b] hover:to-gold text-[#12121e] font-black text-sm tracking-wider uppercase touch-manipulation active:scale-[0.98] rounded-sm shadow-[0_0_32px_rgba(212,175,55,0.30)]"
           >
             Confirmar
           </button>
@@ -367,18 +376,18 @@ const QuizComboUpsellScreen = ({ primaryService, upsellItems, setUpsellItems, on
         {packDiscountActive ? 'APROVEITE A MESMA VISITA' : 'UM BÓNUS PARA SI'}
       </p>
       <h2 className="font-playfair text-2xl sm:text-3xl font-bold text-white text-center w-full">
-        {packDiscountActive ? 'Quer limpar mais alguma coisa?' : 'Poupe 10% no pedido todo'}
+        {packDiscountActive ? 'Quer limpar mais alguma coisa?' : 'Poupe 10% nos serviços'}
       </h2>
       <p className="text-xs text-white/55 text-center max-w-xs leading-relaxed -mt-1">
         {packDiscountActive ? (
           <>
-            Já tem 10% de desconto no pedido.<br />
-            Adicione outro serviço com o mesmo desconto.
+            Já tem 10% de desconto nos serviços tabelados.<br />
+            Os extras tabelados também beneficiam. Deslocação excluída.
           </>
         ) : (
           <>
-            Se juntar mais um serviço, o desconto aplica-se a tudo, não só ao extra.{' '}
-            <span className="text-white/25 text-[10px]">Válido a partir de {PACK_DISCOUNT_MIN_SERVICE}€, extra de {PACK_DISCOUNT_MIN_UPSELL_ITEM}€+.</span>
+            Junte pelo menos dois artigos: 10% nos serviços tabelados acima de 149€. Deslocação excluída.{' '}
+            <span className="text-white/25 text-[10px]">Válido com um artigo de {PACK_DISCOUNT_MIN_UPSELL_ITEM}€ ou mais.</span>
           </>
         )}
       </p>
@@ -424,7 +433,7 @@ const QuizComboUpsellScreen = ({ primaryService, upsellItems, setUpsellItems, on
             <div className="flex items-center gap-1.5 mb-1">
               <span className="w-1.5 h-1.5 rounded-full bg-gold flex-shrink-0" />
               <span className="text-[10px] font-bold uppercase tracking-wider text-gold">
-                Poupa {fmt(savings)}€ no pedido todo
+                Poupa {fmt(savings)}€ nos serviços
               </span>
             </div>
           )}
@@ -443,6 +452,7 @@ const QuizComboUpsellScreen = ({ primaryService, upsellItems, setUpsellItems, on
           <ChevronLeft className="w-4 h-4 mr-1" /> Voltar
         </button>
         <button
+          disabled={incompleteCarpets}
           onClick={onContinue}
           className="flex-1 h-14 bg-gradient-to-r from-gold to-[#d4c57b] hover:from-[#d4c57b] hover:to-gold text-[#12121e] font-black text-sm tracking-wider uppercase touch-manipulation active:scale-[0.98] rounded-sm shadow-[0_0_32px_rgba(212,175,55,0.30)]"
         >

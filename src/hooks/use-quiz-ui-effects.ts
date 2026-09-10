@@ -78,7 +78,7 @@ export function useQuizUiEffects({
       setConfettiActive(true);
       toast({
         title: 'Desconto de 10% ativado!',
-        description: 'Ao juntar mais um serviço ao mesmo pedido, aproveita a deslocação e ganha 10% de desconto no total.',
+        description: 'Ao juntar mais um serviço ao mesmo pedido, aproveita a deslocação e ganha 10% nos serviços tabelados, sem desconto na deslocação.',
         duration: 4000,
       });
       const id = setTimeout(() => setConfettiActive(false), 4500);
