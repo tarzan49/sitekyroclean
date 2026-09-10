@@ -35,3 +35,7 @@
 No navegador: Barcelos apresenta deslocação de 20€; tapete sem medidas bloqueia o pedido; medidas 2,5 × 3 m seguem na mensagem, com subtotal separado; pack de impermeabilização em Lisboa começa pela Premium (129€ + 10€) e permite trocar para Essencial (99€ + 10€). Nenhum pedido foi enviado.
 
 A indexação das páginas novas depende do rastreio do motor de pesquisa. O configurador prepara uma mensagem para o cliente enviar; não envia pedidos automaticamente.
+
+## Confirmação de publicação
+
+A publicação principal foi confirmada no domínio público em 10 de setembro de 2026, incluindo `/packs`, `/desbacterizacao-lisboa`, `/tratamento-anti-acaros-braga` e `/limpeza-estofos-coimbra`. O glossário foi também alinhado com a regra de orçamento de tapetes e alcatifas mediante medidas.
