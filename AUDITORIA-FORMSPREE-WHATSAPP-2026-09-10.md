@@ -57,3 +57,18 @@ Isto não é prova de ausência absoluta de bugs: quantidades e textos livres n�
 Não foi inspecionado o histórico privado de submissões, spam, plano/limites de anexos, configuração de notificações ou entrega final de emails da conta Formspree. O teste de fotos confirma que o ficheiro segue no pedido, não que o plano contratado aceita anexos. A receção real exige um pedido controlado e conferência no destino.
 
 Os percursos genéricos de WhatsApp existentes no cabeçalho/hero não incluem uma simulação que o cliente ainda não submeteu. Os testes inspecionaram a mensagem preparada; não enviaram mensagens pelo WhatsApp.
+
+
+## Confirmação posterior de receção real (10/09/2026)
+
+Depois de o responsável disponibilizar a sessão do Formspree, foi enviado um único pedido de teste pelo site público, identificado como TESTE AUDITORIA TAPETES - IGNORAR - NAO CONTACTAR. Esta verificação posterior substitui a limitação anterior relativa à receção de um pedido novo; a primeira etapa da auditoria usou apenas simulações.
+
+O pedido de teste F1FJVQS6 foi confirmado na caixa de entrada do formulário xreozzbp, com as mesmas informações do resumo e da mensagem preparada para WhatsApp:
+
+- Tapete 1: 2.5 × 3 m, área 7.5 m².
+- Tapete 2: 1.25 × 2.4 m, área 3 m².
+- Duas peças distintas, ambas sob orçamento.
+- Deslocação Lisboa: 10€, apresentada como subtotal conhecido; sem preço inventado para limpeza.
+- Referência idêntica no campo booking_id, corpo recebido e mensagem WhatsApp.
+
+Não foi enviada mensagem pelo WhatsApp. A receção no Formspree foi confirmada; esta verificação não comprova a entrega na caixa de email do destinatário nem o suporte a anexos. Nenhum registo de cliente foi alterado. O teste ficou identificado para ser ignorado.
