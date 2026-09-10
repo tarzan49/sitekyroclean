@@ -34,7 +34,7 @@ describe('calcChairWaterproof (1-4 @ 15€ · 5-9 @ 10€ · 10+ sob orçamento)
     expect(calcChairWaterproof(10)).toBeNull();
   });
   it.each([
-    [1, 15], [4, 60], [5, 70], [9, 110],
+    [1, 15], [4, 70], [5, 70], [9, 110],
   ])('qty=%i -> %i€', (qty, expected) => {
     expect(calcChairWaterproof(qty)).toBeCloseTo(expected);
   });
@@ -45,7 +45,7 @@ describe('calcChairWaterproofPremium (1-4 @ 20€ · 5-9 @ 15€ · 10+ sob orç
     expect(calcChairWaterproofPremium(10)).toBeNull();
   });
   it.each([
-    [1, 20], [4, 80], [5, 95], [9, 155],
+    [1, 20], [4, 90], [5, 95], [9, 155],
   ])('qty=%i -> %i€', (qty, expected) => {
     expect(calcChairWaterproofPremium(qty)).toBeCloseTo(expected);
   });

@@ -1,16 +1,32 @@
 import { sofaPrices, mattressPrices } from './QuizTypes';
 import type { SofaItem, MattressItem, CarpetItem, PriceOption } from './QuizTypes';
 
+// Undefined packQty preserves legacy all-or-nothing selections.
+export function treatmentQty(item: SofaItem | MattressItem): number {
+  return item.packEnabled ? Math.max(0, Math.min(item.qty, item.packQty ?? item.qty)) : 0;
+}
+
+// Keep pricing and receipts on the same unit-based representation.
+export function splitTreatmentItems<T extends SofaItem | MattressItem>(items: T[]): T[] {
+  return items.flatMap(item => {
+    const treated = treatmentQty(item);
+    return [
+      { ...item, qty: treated, packEnabled: true, packQty: undefined },
+      { ...item, qty: item.qty - treated, packEnabled: false, packQty: undefined },
+    ].filter(i => i.qty > 0);
+  });
+}
+
 // ── Sofa helpers ─────────────────────────────────────────────────────────────
 export function sofaSetQty(items: SofaItem[], sizeId: string, newQty: number): SofaItem[] {
   const clamped = Math.max(0, newQty);
   if (clamped === 0) return items.filter(i => i.sizeId !== sizeId);
   const existing = items.find(i => i.sizeId === sizeId);
-  if (existing) return items.map(i => i.sizeId === sizeId ? { ...i, qty: clamped } : i);
+  if (existing) return items.map(i => i.sizeId === sizeId ? { ...i, qty: clamped, packQty: i.packQty === undefined ? undefined : Math.min(i.packQty, clamped) } : i);
   return [...items, { sizeId, qty: clamped, packEnabled: false }];
 }
 export function sofaTogglePack(items: SofaItem[], sizeId: string): SofaItem[] {
-  return items.map(i => i.sizeId === sizeId ? { ...i, packEnabled: !i.packEnabled } : i);
+  return items.map(i => i.sizeId === sizeId ? { ...i, packEnabled: !i.packEnabled, packQty: undefined } : i);
 }
 
 // ── Mattress helpers ──────────────────────────────────────────────────────────
@@ -18,11 +34,11 @@ export function mattressSetQty(items: MattressItem[], sizeId: string, newQty: nu
   const clamped = Math.max(0, newQty);
   if (clamped === 0) return items.filter(i => i.sizeId !== sizeId);
   const existing = items.find(i => i.sizeId === sizeId);
-  if (existing) return items.map(i => i.sizeId === sizeId ? { ...i, qty: clamped } : i);
+  if (existing) return items.map(i => i.sizeId === sizeId ? { ...i, qty: clamped, packQty: i.packQty === undefined ? undefined : Math.min(i.packQty, clamped) } : i);
   return [...items, { sizeId, qty: clamped, packEnabled: false }];
 }
 export function mattressTogglePack(items: MattressItem[], sizeId: string): MattressItem[] {
-  return items.map(i => i.sizeId === sizeId ? { ...i, packEnabled: !i.packEnabled } : i);
+  return items.map(i => i.sizeId === sizeId ? { ...i, packEnabled: !i.packEnabled, packQty: undefined } : i);
 }
 
 // ── Carpet item helpers ────────────────────────────────────────────────────────
@@ -114,6 +130,7 @@ export function calcChairClean(qty: number): number | null {
 // (era 1-4 @ 20€, 5-10 @ 15€, 11+ sob orçamento).
 export function calcChairWaterproof(qty: number): number | null {
   if (qty <= 0 || qty >= 10) return null;
+  if (qty === 4) return 70; // Approved four-chair bundle, including antibacterial care.
   if (qty <= 4) return qty * 15;
   return 4 * 15 + (qty - 4) * 10;
 }
@@ -125,6 +142,7 @@ export function calcChairWaterproof(qty: number): number | null {
 // Essencial 110€ vs Premium 155€, +41%, alinhado).
 export function calcChairWaterproofPremium(qty: number): number | null {
   if (qty <= 0 || qty >= 10) return null;
+  if (qty === 4) return 90; // Approved four-chair bundle, including antibacterial care.
   if (qty <= 4) return qty * 20;
   return 4 * 20 + (qty - 4) * 15;
 }

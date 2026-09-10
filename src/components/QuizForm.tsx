@@ -1,3 +1,4 @@
+import { splitTreatmentItems } from '@/components/quiz/quizHelpers';
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
@@ -7,7 +8,7 @@ import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import { trackQuizEvent } from '@/lib/quizTracking';
 import { useQuizAnalytics } from '@/hooks/use-quiz-analytics';
-import ConfettiGold from './quiz/ConfettiGold';
+import QuizEstimate from './quiz/QuizEstimate';
 import {
   QuizStep1Service,
   ServiceTypeSelector,
@@ -20,7 +21,7 @@ import QuizStepLocation from './quiz/steps/QuizStepLocation';
 import QuizStepConfig from './quiz/steps/QuizStepConfig';
 import QuizSofaPackTest from './quiz/steps/QuizSofaPackTest';
 import QuizComboUpsellScreen from './quiz/steps/QuizComboUpsellScreen';
-import QuizChairsAddonUpsell from './quiz/steps/QuizChairsAddonUpsell';
+import QuizChairsAddonUpsell, { ChairAddonActions } from './quiz/steps/QuizChairsAddonUpsell';
 import QuizSofaAddonUpsell from './quiz/steps/QuizSofaAddonUpsell';
 import QuizMattressAddonUpsell from './quiz/steps/QuizMattressAddonUpsell';
 import QuizStepContact from './quiz/steps/QuizStepContact';
@@ -79,7 +80,7 @@ function calcInitialStep(loc?: string, svc?: string, hasItem?: boolean, skipUpse
   if (hasItem) return 3;
   // Skip serviceType selector when already known or service doesn't need it
   // (só o tapete não tem essa escolha — sofá, colchão e cadeiras têm todos
-  // Higienização vs Impermeabilização/Anti Ácaros, ver shouldSkipServiceType).
+  // Higienização vs Impermeabilização/Desbacterização e Anti Ácaros, ver shouldSkipServiceType).
   const skipType = svc === 'carpet' || svc === 'mattress' || hasSvcType;
   return skipType ? 3 : 2;
 }
@@ -103,7 +104,9 @@ const QuizForm = ({
   initialMattressSizeId, initialMattressQty, initialMattressItems, initialChairQty, initialChairWaterproofing, initialCarpetArea, initialCarpetItems, initialCarpetKind,
   initialWaterproofingTier, skipToUpsell, initialUpsellItems,
 }: QuizFormProps) => {
-  const localPackPreview = import.meta.env.DEV && new URLSearchParams(window.location.search).get("teste") === "quiz-pack";
+  const offerPreview = true;
+  const isDemo = import.meta.env.DEV && ["ofertas", "quiz-pack"].includes(new URLSearchParams(window.location.search).get("teste") ?? "");
+  const localPackPreview = false;
   const { toast } = useToast();
   const navigate = useNavigate();
   const hasInitialItem = Boolean(
@@ -162,7 +165,7 @@ const QuizForm = ({
   const [exitIntentFired, setExitIntentFired] = useState(false);
   const startsAtUpsell = Boolean(skipToUpsell && initialLocation);
   // Upsell "estilo companhia aérea" (2026-09-06, uniformizado 2026-09-08): para
-  // cadeiras/sofá/colchão + limpeza, a decisão de proteção/Anti Ácaros sai da
+  // cadeiras/sofá/colchão + limpeza, a decisão de proteção/Desbacterização e Anti Ácaros sai da
   // etapa de quantidades e passa para um ecrã dedicado logo a seguir ao
   // "Continuar" — nunca compete visualmente com a escolha de quantidade.
   // Mostra-se sempre que se avança de step3 (sem flag "só uma vez por sessão":
@@ -247,7 +250,7 @@ const QuizForm = ({
     serviceOnlyTotal,
     discountedPrice,
     packDiscountedPrice,
-  } = useQuizPricing(formData, sofaItems, mattressItems, upsellItems, carpetItems, localPackPreview);
+  } = useQuizPricing(formData, sofaItems, mattressItems, upsellItems, carpetItems, offerPreview);
 
   const updateFormData = useCallback((updates: Partial<QuizFormData>) => {
     setFormData(prev => ({ ...prev, ...updates }));
@@ -285,10 +288,8 @@ const QuizForm = ({
   });
 
   const {
-    displayPrice,
     socialProofIdx,
     socialProofMessages,
-    confettiActive,
     exitIntentUnlocked,
     resetUiEffects,
   } = useQuizUiEffects({
@@ -296,11 +297,7 @@ const QuizForm = ({
     scrollContainerRef,
     currentStep,
     showUpsell: activeUpsellScreen === 'combo',
-    totalPrice,
-    packDiscountActive,
-    hasUpsellSobItem,
     location: formData.location,
-    toast,
   });
 
   // Quiz analytics tracking
@@ -384,12 +381,12 @@ const QuizForm = ({
 
   const getServiceTypeLabel = () => {
     if (formData.serviceType === 'waterproofing') {
-      if (formData.service === 'mattress') return 'Anti Ácaros';
+      if (formData.service === 'mattress') return 'Desbacterização e Anti Ácaros';
       return formData.waterproofingTier === 'premium' ? 'Impermeabilização Premium' : 'Impermeabilização Essencial';
     }
     const labels: Record<string, string> = {
       cleaning: 'Higienização Profunda',
-      both: formData.service === 'mattress' ? 'Pack: Limpeza + Anti Ácaros' : 'Pack Proteção Total',
+      both: formData.service === 'mattress' ? 'Pack: Limpeza + Desbacterização e Anti Ácaros' : 'Pack Proteção Total',
     };
     return labels[formData.serviceType] || '';
   };
@@ -409,7 +406,7 @@ const QuizForm = ({
     .map(line => `${line.qty}x ${line.label}: ${fmtEuro(line.total)}`).join('\n');
 
   const handleSubmit = async () => {
-    if (localPackPreview) {
+    if (isDemo) {
       toast({ title: "Teste concluído", description: "Nenhum pedido ou contacto foi enviado." });
       return;
     }
@@ -599,7 +596,6 @@ ${formData.description || 'Sem observações adicionais'}
           "h-full sm:h-auto sm:max-h-[92dvh]"
         )}>
 
-        <ConfettiGold active={confettiActive} />
 
         {/* Header */}
         <div className="px-5 sm:px-6 pt-3 sm:pt-4 pb-2.5 sm:pb-3 landscape:pt-2 landscape:pb-1.5 grid grid-cols-[1fr_auto_1fr] items-center gap-2 flex-shrink-0">
@@ -663,48 +659,18 @@ ${formData.description || 'Sem observações adicionais'}
              , visível: step 3 (quantidades) e step 4 (contacto) quando totalPrice > 0
              , também visível em step 1 quando há custo de deslocação */}
           {(totalPrice > 0 || hasSobOrcamento) && (activeUpsellScreen === 'combo' || finalTravelCost > 0 || (currentStep !== 1 && currentStep !== 2)) && (
-            <div className="sticky top-0 z-20 text-white flex flex-col border-b border-white/[0.16] -mx-5 sm:-mx-6 animate-fade-in" style={{ background: "#071a12" }}>
-            <div className="flex items-center justify-between py-3 px-5 sm:px-6">
-              <span className="text-xs text-white/40 font-medium">
-                {calculateServicePrice === 0 && finalTravelCost > 0
-                  ? <span>Deslocação <span className="text-white/20 text-[10px]">({formData.location})</span></span>
-                  : 'Estimativa'
-                }
-              </span>
-              <div className="flex items-center gap-3 pr-8">
-                {packDiscountActive && totalPrice > 0 && (
-                  <span className="text-sm text-white/25 line-through tabular-nums">{localPackPreview ? totalPrice.toFixed(2).replace(".", ",") : Math.round(displayPrice)}€</span>
-                )}
-                {totalPrice > 0 && (
-                  <span className="text-xl font-bold tabular-nums" style={{ color: '#D4AF37' }}>
-                    {localPackPreview ? `${(packDiscountActive ? packDiscountedPrice : totalPrice).toFixed(2).replace(".", ",")}€` : packDiscountActive
-                      ? `${Math.round((displayPrice - finalTravelCost) * 0.9 + finalTravelCost)}€`
-                      : fmtEuro(displayPrice)}
-                  </span>
-                )}
-                {(hasSobOrcamento || hasUpsellSobItem) && (
-                  <span className="text-sm font-bold tabular-nums" style={{ color: '#D4AF37' }}>
-                    {totalPrice > 0 ? '+ Sob Orçamento' : 'Sob Orçamento'}
-                  </span>
-                )}
-                {packDiscountActive && totalPrice > 0 && (
-                  <span className="text-[10px] font-bold bg-gold/15 text-gold px-2 py-0.5 rounded-full">
-                    −10% Pack
-                  </span>
-                )}
-              </div>
-            </div>
-            <div className="flex items-center justify-center gap-2 px-5 py-2" style={{ borderTop: "1px solid rgba(212,175,55,0.14)", background: "rgba(212,175,55,0.04)" }}>
-              <span className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: "#D4AF37" }} />
-              <p className="text-[11px]" style={{ color: "rgba(255,255,255,0.62)", fontFamily: "Inter, system-ui, sans-serif" }}>
-                <span className="font-semibold">Resposta em menos de 10 minutos</span>
-                {' · Orçamento sem compromisso'}
-              </p>
-            </div>
-            </div>
+            <QuizEstimate
+              totalPrice={totalPrice}
+              discountedPrice={packDiscountedPrice}
+              travelCost={finalTravelCost}
+              discountActive={packDiscountActive}
+              needsQuote={hasSobOrcamento || hasUpsellSobItem}
+              travelOnly={calculateServicePrice === 0 && finalTravelCost > 0}
+              location={formData.location}
+            />
           )}
 
-          <div className="flex flex-col py-3 sm:py-5 w-full items-center text-center">
+          <div className="flex flex-col py-3 w-full items-center text-center">
 
             {/* Step 0, Location Autocomplete VIP */}
             {/* Context banner when quiz opened from a problem page */}
@@ -742,7 +708,7 @@ ${formData.description || 'Sem observações adicionais'}
                 <QuizStep1Service
                   selectedService={formData.service}
                   onSelect={(service) => {
-                    // Colchão volta a saltar o Passo 2 (2026-09-08): Anti Ácaros não
+                    // Colchão volta a saltar o Passo 2 (2026-09-08): Desbacterização e Anti Ácaros não
                     // existe como serviço primário, só como upsell dependente de uma
                     // limpeza — ver shouldSkipServiceType acima para mais contexto.
                     const skipServiceType = service === 'carpet' || service === 'mattress';
@@ -771,9 +737,9 @@ ${formData.description || 'Sem observações adicionais'}
               const waterDesc = formData.service === 'mattress'
                 ? 'Tratamento anti-ácaros opcional, distinto da limpeza normal.'
                 : undefined;
-              const waterTitle = formData.service === 'mattress' ? 'Anti Ácaros' : undefined;
+              const waterTitle = formData.service === 'mattress' ? 'Desbacterização e Anti Ácaros' : undefined;
               const waterSubtitle = formData.service === 'mattress' ? 'Tratamento Anti-Ácaros' : undefined;
-              const bothDescText = formData.service === 'mattress' ? 'Limpeza Profunda + Anti Ácaros' : undefined;
+              const bothDescText = formData.service === 'mattress' ? 'Limpeza Profunda + Desbacterização e Anti Ácaros' : undefined;
               return (
                 <div className="flex-1 flex flex-col gap-4 w-full max-w-sm self-center items-center text-center">
                   <div>
@@ -823,6 +789,7 @@ ${formData.description || 'Sem observações adicionais'}
             {currentStep === 3 && activeUpsellScreen === 'chairs' && (
               <div className="flex-1 flex flex-col w-full items-center text-center overflow-y-auto">
                 <QuizChairsAddonUpsell
+                  hideNavigation
                   formData={formData}
                   updateFormData={updateFormData}
                   onContinue={() => {
@@ -876,6 +843,8 @@ ${formData.description || 'Sem observações adicionais'}
                 onBack={() => { setActiveUpsellScreen('sofa'); }} />
             ) : activeUpsellScreen === 'combo' && (
               <QuizComboUpsellScreen
+                offerPreview={offerPreview}
+                travelFee={finalTravelCost}
                 primaryService={formData.service}
                 upsellItems={upsellItems}
                 setUpsellItems={setUpsellItems}
@@ -923,6 +892,16 @@ ${formData.description || 'Sem observações adicionais'}
       </div>
     </div>
 
+    {currentStep === 3 && activeUpsellScreen === 'chairs' && (
+      <div className="shrink-0 w-full flex justify-center px-4 sm:px-6 pt-2 pb-3 border-t border-gold/15 bg-[#071a12]" style={{ paddingBottom: 'max(0.75rem, env(safe-area-inset-bottom))' }}>
+        <ChairAddonActions
+          selected={formData.serviceType === 'waterproofing' ? formData.chairWaterproofQty > 0 : formData.chairWaterproofing}
+          onBack={() => { (document.activeElement as HTMLElement)?.blur(); setActiveUpsellScreen(null); }}
+          onContinue={() => { (document.activeElement as HTMLElement)?.blur(); proceedPastConfig(); }}
+        />
+      </div>
+    )}
+
     {/* Footer — hidden on step 0 (auto-advances on city selection) */}
     {currentStep <= totalSteps && activeUpsellScreen === null && currentStep > 0 && (
       <div className="px-4 sm:px-5 pt-3 flex flex-col gap-2 flex-shrink-0 border-t border-white/[0.05] items-center" style={{ paddingBottom: 'max(1rem, env(safe-area-inset-bottom))' }}>
@@ -950,7 +929,7 @@ ${formData.description || 'Sem observações adicionais'}
                 disabled={isSubmitting || (!localPackPreview && !canProceed())}
                 className="flex-1 h-14 bg-gradient-to-r from-gold to-[#d4c57b] hover:from-[#d4c57b] hover:to-gold text-[#12121e] font-black text-base tracking-wider uppercase touch-manipulation active:scale-[0.98] rounded-sm shadow-[0_0_32px_rgba(212,175,55,0.30)]"
               >
-                {localPackPreview ? 'CONCLUIR TESTE' : isSubmitting ? 'A enviar...' : 'FINALIZAR PEDIDO'}
+                {isDemo ? 'CONCLUIR TESTE' : isSubmitting ? 'A enviar...' : 'FINALIZAR PEDIDO'}
               </Button>
             </div>
             <p className="text-center text-[11px] text-white/30 font-medium -mt-0.5">
@@ -987,7 +966,7 @@ ${formData.description || 'Sem observações adicionais'}
 
     {/* Rotating social proof bar */}
     <div className="border-t border-gold/20 px-4 py-2.5 text-center flex-shrink-0 bg-gradient-to-r from-[#0a1f18] via-[#0d2820] to-[#0a1f18] flex items-center justify-center gap-2 overflow-hidden">
-      {(() => {
+      {currentStep === 0 ? <p className="text-xs text-white/65 py-1">Orçamento sem compromisso.</p> : (() => {
         const current = socialProofMessages[socialProofIdx];
         const Icon = SOCIAL_PROOF_ICON[current.category];
         return (

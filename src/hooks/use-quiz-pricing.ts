@@ -1,3 +1,4 @@
+import { splitTreatmentItems } from '@/components/quiz/quizHelpers';
 import { useMemo } from 'react';
 import type { QuizFormData, SofaItem, MattressItem, CarpetItem, UpsellItemConfig } from '@/components/quiz';
 import { sofaPrices, mattressPrices, locationPrices } from '@/components/quiz';
@@ -10,7 +11,7 @@ export function useQuizPricing(
   mattressItems: MattressItem[],
   upsellItems: UpsellItemConfig[],
   carpetItems: CarpetItem[],
-  localPackPreview = false,
+  offerPreview = false,
 ) {
   // Calculate total price early for analytics (moved up for hook dependency).
   // Em paralelo, calcula também o "artigo base" de cada item (preço SEM addon,
@@ -26,7 +27,7 @@ export function useQuizPricing(
 
     switch (formData.service) {
       case 'sofa': {
-        sofaItems.forEach(item => {
+        splitTreatmentItems(sofaItems).forEach(item => {
           if (item.qty <= 0) return;
           const opt = sofaPrices.find(p => p.id === item.sizeId);
           if (!opt) return;
@@ -38,7 +39,7 @@ export function useQuizPricing(
       }
 
       case 'mattress': {
-        mattressItems.forEach(item => {
+        splitTreatmentItems(mattressItems).forEach(item => {
           if (item.qty <= 0) return;
           const opt = mattressPrices.find(p => p.id === item.sizeId);
           if (!opt) return;
@@ -76,7 +77,7 @@ export function useQuizPricing(
         // 5€/cadeira fixo, mutuamente exclusivo com o addon de impermeabilização
         // acima (a UI do upsell garante nunca terem os dois ligados ao mesmo tempo).
         let antiAcarosChairPrice = 0;
-        if (formData.chairAntiAcaros && !isNaN(chairQty) && chairQty > 0) {
+        if (formData.chairAntiAcaros && formData.serviceType !== 'waterproofing' && !formData.chairWaterproofing && addonQty <= 0 && !isNaN(chairQty) && chairQty > 0) {
           antiAcarosChairPrice = chairQty * 5;
           price += antiAcarosChairPrice;
         }
@@ -155,7 +156,7 @@ export function useQuizPricing(
     : formData.service === 'mattress' ? mattressItems.reduce((sum, i) => sum + Math.max(0, i.qty), 0)
     : formData.service === 'chairs' && !chairPrimaryNeedsQuote && chairQtyNum > 0 ? 1 : 0;
   const articleCount = primaryArticleCount + articleUpsellItems.reduce((sum, i) => sum + (i.price <= 0 ? 0 : i.id === 'chairs' ? 1 : (i.qty ?? 1)), 0);
-  const previewDiscount = import.meta.env.DEV && localPackPreview;
+  const previewDiscount = offerPreview;
   const packDiscountActive = previewDiscount
     ? false // Local fixed-price offer already includes its saving; never stack 10%.
     : (articleCount >= 2 && totalArticleValue > PACK_DISCOUNT_MIN_TOTAL && hasSubstantialArticle);

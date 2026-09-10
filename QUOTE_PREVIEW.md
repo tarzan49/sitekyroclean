@@ -1,0 +1,59 @@
+# Pré-visualização do orçamento
+
+Branch: `codex/quote-visual-preview`. Proposta local para avaliação; não aplicada à produção.
+
+Abrir http://127.0.0.1:5188/__preview/orcamento com `npm run dev -- --host 127.0.0.1 --port 5188`.
+A página usa o QuizForm e o motor de preços reais. Permite adicionar extras, editar quantidades e continuar no fluxo.
+
+Validação: 19 testes passaram (estimativa, regras de preços e navegação dos extras). Verificação visual e interação no browser em desktop e 390 × 844. O build completo encontra erros de JSX preexistentes nas páginas LocationServicePage.tsx e SofaVariantPage.tsx da base 76922c8; não foram incluídas alterações a essas páginas nesta proposta.
+
+## Imagens
+
+Ferramenta: image_gen integrada. Asset final: `public/images/services/quote-furniture.png`, usado como sprite 2 × 2 sobre o verde existente.
+
+Prompt final:
+
+Generate a production website asset: a square 2x2 sprite sheet with four realistic isolated furniture product photos, on a fully transparent background. NO text, NO lines, NO icons, NO logos. Exactly four equal square quadrants, no borders or visible cell backgrounds. TOP LEFT: ivory quilted double mattress alone, three-quarter view showing top and thickness, no bed frame, no pillows. TOP RIGHT: elegant beige fabric two-seat sofa, three-quarter view, no room or accessories. BOTTOM LEFT: one beige upholstered dining chair with wood legs, entire chair in frame. BOTTOM RIGHT: cream natural textured rectangular rug, lying flat seen in three-quarter overhead perspective, no rolls or tassel clutter. Each object centered precisely inside its own quadrant with generous transparent margins at least 12% of cell on all sides. Object entirely contained inside its quadrant. All four photographed under identical soft studio lighting with subtle grounding shadow, sharp realistic fabric textures, warm neutral upholstery. The objects need to remain recognizable at 80px thumbnail size inside a premium dark forest green cleaning quote interface. Transparent true alpha background across all empty space, no checkerboard pattern baked in. This is an asset sprite sheet, not a UI mockup.
+
+
+## Tamanhos distintos e combinação das propostas
+
+Imagens geradas com image_gen: `public/images/services/quote-sofa-sizes.png` (2×2: poltrona de 1 lugar, sofás de 2, 3 e 4 lugares) e `public/images/services/quote-mattress-sizes.png` (solteiro estreito, casal médio, King largo). Mesma iluminação, tecido bege, fundo transparente, sem texto, com proporções e número de assentos diferentes. `QuizFurnitureImage` seleciona por sizeId e usa recortes individuais no sprite de colchões para evitar fragmentos da imagem vizinha. Verificados os três colchões e quatro sofás em 390×844.
+
+A proposta conjunta mantém o cabeçalho e o picotado e reforça o contraste dos preços. O topo permite abrir a composição dos serviços, desconto e deslocação, calculados pelo motor real. Os 19 testes do orçamento continuam a passar.
+
+## Cuidados adicionais e tapetes (2026-09-10)
+
+Os upsells de colchões e cadeiras apresentam explicitamente «Desbacterização e Anti Ácaros», incluindo no resumo e recibo, sem alterar os preços. As imagens contextualizam cada serviço; os controlos selecionados e o botão de continuação tornam a opção escolhida mais clara. A impermeabilização conserva Essencial e Premium. Os tapetes incluem um guia visual largura × comprimento, medidas acessíveis e continuam sob orçamento.
+
+Exemplos locais: `/__preview/orcamento?exemplo=antiacaros`, `?exemplo=impermeabilizacao`, `?exemplo=cadeiras` e `?exemplo=tapetes`. Validação: 22 testes passaram, incluindo seleção opcional dos tratamentos, preços e medidas dos tapetes. Verificados os ecrãs no navegador, incluindo impermeabilização e cadeiras a 390 × 844. Mantém-se a limitação de build da base descrita acima.
+
+Pedido de simplificação (2026-09-10): nos upsells de colchão e sofá, clicar no cartão liga o tratamento para os artigos escolhidos; repetir o clique retira. Não expandir linhas por tamanho nem steppers abaixo do cartão. A seleção e o total no cabeçalho dão o feedback. Esta decisão substitui a apresentação anterior de detalhes após selecionar.
+
+Selo TOP unificado em `QuizTopBadge`: coroa, placa dourada e texto mais legível; aplicado aos tratamentos, aos dois níveis de impermeabilização e às sugestões de serviços adicionais. Verificado em 390 × 844 e com os 12 testes de upsells aprovados.
+
+Revisão aprovada do selo TOP (2026-09-10): reservar apenas para impermeabilização Premium e desbacterização/antiácaros. Essencial, higienização adicional e categorias de artigos deixam de ter selo. Substitui o pedido anterior de selo em todos os extras. A pré-visualização sem parâmetros abre agora no início, sem seleções; `?exemplo=pack` conserva o exemplo preenchido.
+
+## Escolha parcial e comparação de proteção (2026-09-10)
+
+Nova decisão do responsável: um sofá/colchão mantém o clique simples; vários permitem escolher quantos recebem tratamento, com linhas compactas «1 de 3», sem repetir imagens/preços. `packQty` opcional representa essa quantidade; ausência preserva a seleção antiga de todas as unidades. `splitTreatmentItems` mantém preços, resumo e recibos coerentes. Esta decisão substitui a remoção absoluta dos seletores. A impermeabilização mostra os dois acréscimos (Essencial e Premium), a diferença real e o âmbito/valor antes de descontos. Benefícios em três pontos curtos junto da imagem. Exemplo local `?exemplo=varios`.
+
+Ao selecionar Premium/Essencial no upsell de sofás, a área de opções desloca-se suavemente para cima da zona visível, aproximando as quantidades e Continuar. Os benefícios permanecem acima, acessíveis por scroll. Não desloca ao desmarcar nem ao ajustar quantidades; respeita preferência por movimento reduzido. Verificado em 390×700, com Continuar visível após seleção.
+
+Clarificação do responsável: com um único sofá manter o ecrã sem deslocação automática. Só selecionar proteção para vários sofás aciona a descida para opções e quantidades.
+
+Upsell de higienização do sofá: três benefícios curtos, preço adicional calculado por calcPackPricing visível antes de selecionar, âmbito da quantidade e indicação antes de descontos; seleção com visto e CTA «Continuar com higienização». Exemplo `?exemplo=higienizacao`. Tipos e cinco testes de cuidados aprovados.
+
+Detalhes das cadeiras redesenhados: imagem, quantidade e preço do serviço num único cartão; título direto, controlos acessíveis e distinção explícita entre limpeza/proteção das cadeiras e total do pedido no topo. Valores e fluxo preservados; verificado com cinco cadeiras (95€ + 10€ deslocação) em 390×844. Exemplo `?exemplo=quantidade-cadeiras`.
+
+Impermeabilização adicional de cadeiras alinhada com os sofás: benefícios curtos, comparação Premium/Essencial usando WaterproofingTierPicker compacto, preços reais do conjunto e diferença Premium. Mantém antiácaros opcional a 5€/un. Verificado em 390×844 com Continuar visível; tipos e cinco testes aprovados.
+
+Cadeiras: decisão 2026-09-10 substitui o extra separado de antiácaros. Desbacterização e antiácaros passam a benefício incluído na impermeabilização; sem terceiro cartão e sem cobrança extra quando há proteção. Conjunto de quatro cadeiras: Essencial 70€, Premium 90€. Outros escalões preservados até instrução específica.
+
+Cadeiras: cartões Premium/Essencial e título da comparação centrados; benefício incluído apresentado em duas linhas centradas («Desbacterização + Antiácaros» / «Incluídos em qualquer proteção»). Preços e seleções preservados.
+
+Rodapé das cadeiras: ChairAddonActions colocado fora da área de scroll no QuizForm. Voltar e Continuar sem extras ficam visíveis desde a entrada; após selecionar, o mesmo botão confirma o tratamento. Conteúdo conserva scroll independente. Tipos e testes aprovados; verificado visualmente no browser.
+
+Benefício «Desbacterização + Antiácaros / Incluídos em qualquer proteção» movido para cima dos planos, substituindo o subtítulo redundante Impermeabilização para manter a etapa compacta e o benefício visível antes da escolha.
+
+Entrada nas cadeiras compactada para mostrar ambos os planos completos e botões: sem sobretítulo redundante; quantidade/antes de descontos numa linha comum; duração abreviada nos cartões compactos. Verificação visual em desktop e 390×744, sem corte das opções.

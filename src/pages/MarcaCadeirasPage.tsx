@@ -1,3 +1,4 @@
+import DirectoryGroup from "@/components/DirectoryGroup";
 import { useMemo, useEffect } from "react";
 import { useLocation, Link } from "react-router-dom";
 import { QuizLocationProvider, QuizServiceProvider } from "@/context/QuizLocationContext";
@@ -8,7 +9,6 @@ import PageBreadcrumb from "@/components/PageBreadcrumb";
 import HeroBeforeAfterPool from "@/components/HeroBeforeAfterPool";
 import Footer from "@/components/Footer";
 import QuizButton from "@/components/QuizButton";
-import TrustRatingBadge from "@/components/TrustRatingBadge";
 import SectionHeader from "@/components/SectionHeader";
 import ServiceSnapshotStats from "@/components/ServiceSnapshotStats";
 import ServicePriceSection from "@/components/ServicePriceSection";
@@ -169,9 +169,6 @@ const MarcaCadeirasPage = () => {
                     {marca.materialDescription.split('.')[0]}.
                   </p>
 
-                  <div className="lg:mb-6">
-                    <TrustRatingBadge variant="mapsLinkClients" />
-                  </div>
 
                   <div className="flex flex-col sm:flex-row gap-3 max-w-md">
                     <QuizButton
@@ -322,7 +319,7 @@ const MarcaCadeirasPage = () => {
               Ver tabela completa de preços em {city.name}
               <ArrowRight className="w-3.5 h-3.5" />
             </Link>
-            <div className="flex flex-wrap gap-2">
+            <DirectoryGroup title="Outras marcas de cadeiras">
               {["ikea", "conforama", "leroy-merlin", "herman-miller", "moviflor", "el-corte-ingles"]
                 .filter(slug => slug !== marca.slug)
                 .map(slug => (
@@ -332,7 +329,7 @@ const MarcaCadeirasPage = () => {
                     {slug.replace(/-/g, " ")}
                   </Link>
                 ))}
-            </div>
+            </DirectoryGroup>
           </div>
         </section>
 

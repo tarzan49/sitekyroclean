@@ -6,13 +6,13 @@ import type { UpsellItemConfig } from '../QuizTypes';
 
 afterEach(cleanup);
 
-function Harness({ primaryService = 'other', packDiscountActive = false } = {}) {
+function Harness({ primaryService = 'other', packDiscountActive = false, offerPreview = false } = {}) {
   const [items, setItems] = useState<UpsellItemConfig[]>([]);
   const [contact, setContact] = useState(false);
   return <>
     <output data-testid="items">{JSON.stringify(items)}</output>
     {contact ? <button onClick={() => setContact(false)}>Voltar aos extras</button> :
-      <QuizComboUpsellScreen primaryService={primaryService} upsellItems={items} setUpsellItems={setItems}
+      <QuizComboUpsellScreen offerPreview={offerPreview} primaryService={primaryService} upsellItems={items} setUpsellItems={setItems}
         onContinue={() => setContact(true)} onBack={() => {}}
         totalPrice={207} packDiscountActive={packDiscountActive} packDiscountedPrice={packDiscountActive ? 187 : 207} />}
   </>;
@@ -76,16 +76,17 @@ describe('final upsell navigation', () => {
     expect(savedItems().some(item => item.mattressSize)).toBe(false);
   });
 
-  it('shows quote-only and mixed subtotals without treating unpriced extras as free', () => {
+  it('keeps category selection free of prices while preserving quote-only extras', () => {
     render(<Harness />);
+    for (const label of [/^Colchão/, /^Sofá/, /^Cadeiras/, /^Tapete/]) {
+      expect(screen.getByRole('button', { name: label }).textContent).not.toContain('€');
+    }
     addCarpet();
-    expect(screen.getByText('Subtotal do extra')).toBeTruthy();
-    expect(screen.getByText('Sob orçamento', { selector: 'span' })).toBeTruthy();
-    expect(screen.queryByText('0€', { exact: true })).toBeNull();
-    click(/^Sofá/); increment(3); confirm();
-    expect(screen.getByText('Sob orçamento', { selector: 'span' })).toBeTruthy();
+    expect(screen.getByRole('button', { name: /Tapete.*sob orçamento/ })).toBeTruthy();
+    expect(savedItems().find(item => item.id === 'carpet')?.price).toBe(0);
     click(/^Colchão/); increment(1); confirm();
-    expect(screen.getByText('69€ + Sob orçamento')).toBeTruthy();
+    expect(savedItems().find(item => item.mattressSize === 'casal')?.price).toBe(69);
+    expect(screen.queryByText('Subtotal do extra')).toBeNull();
   });
 
   it('still allows continuing without extras', () => {
@@ -117,4 +118,22 @@ it('blocks a partially measured second rug instead of silently omitting it', () 
   expect((screen.getByRole('button', { name: 'Confirmar' }) as HTMLButtonElement).disabled).toBe(true);
   fireEvent.change(screen.getAllByRole('spinbutton')[3], { target: { value: '2' } });
   expect((screen.getByRole('button', { name: 'Confirmar' }) as HTMLButtonElement).disabled).toBe(false);
+});
+
+
+it('applies the published mattress, chair and carpet offers to the saved request', () => {
+  render(<Harness primaryService="sofa" offerPreview />);
+  click(/^Colchão/); increment(0); increment(2); confirm();
+  expect(savedItems().filter(i => i.mattressSize).map(i => i.price)).toEqual([45, 55, 65]);
+  click(/^Cadeiras/); increment(); confirm();
+  expect(savedItems().find(i => i.id === 'chairs')?.price).toBe(60);
+  click(/^Tapete/);
+  const fields = screen.getAllByRole('spinbutton');
+  fireEvent.change(fields[0], { target: { value: '2' } });
+  fireEvent.change(fields[1], { target: { value: '2.5' } });
+  confirm();
+  expect(savedItems().find(i => i.id === 'carpet')?.label).toContain('5 m², paga 4 m²');
+  expect(savedItems().find(i => i.id === 'carpet')?.price).toBe(0);
+  roundTrip();
+  expect(savedItems().filter(i => i.mattressSize).map(i => i.price)).toEqual([45, 55, 65]);
 });

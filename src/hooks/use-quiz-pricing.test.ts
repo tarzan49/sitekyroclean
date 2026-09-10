@@ -92,6 +92,32 @@ describe('useQuizPricing — chairs "sob orçamento" thresholds stay in sync acr
   });
 });
 
+
+describe('partial treatment quantities', () => {
+  it('charges Premium for only one of three sofas, including the pack delta override', () => {
+    const { result } = renderHook(() => useQuizPricing(
+      { ...initialFormData, service: 'sofa', serviceType: 'cleaning', waterproofingTier: 'premium' },
+      [{ sizeId: '3-lugares', qty: 3, packEnabled: true, packQty: 1 }], [], [], []));
+    expect(result.current.totalPrice).toBe(199 + 79 * 2);
+  });
+  it('charges treatment for only one of three mattresses', () => {
+    const { result } = renderHook(() => useQuizPricing(
+      { ...initialFormData, service: 'mattress', serviceType: 'cleaning' },
+      [], [{ sizeId: 'casal', qty: 3, packEnabled: true, packQty: 1 }], [], []));
+    expect(result.current.totalPrice).toBe(89 + 69 * 2);
+  });
+});
+
+it('does not stack the pack discount on local fixed-price offers', () => {
+  const { result } = renderHook(() => useQuizPricing(
+    { ...initialFormData, location: 'Lisboa', service: 'sofa', serviceType: 'cleaning' },
+    [{ sizeId: '3-lugares', qty: 1, packEnabled: false }], [],
+    [{ id: 'mattress-casal', price: 55, qty: 1, label: 'Colchão casal' }, { id: 'chairs', price: 80, qty: 4, label: '4 cadeiras' }], [], true,
+  ));
+  expect(result.current.totalPrice).toBe(224);
+  expect(result.current.packDiscountActive).toBe(false);
+});
+
 describe('local quiz pack proposal', () => {
   const sofa = [{ id: 'test-sofa', sizeId: '3-lugares', qty: 1, packEnabled: false, chaiseLongue: false }];
   const extra = [{ id: 'mattress-casal', mattressSize: 'casal', qty: 1, price: 55, label: '1x Colchão Casal' }];

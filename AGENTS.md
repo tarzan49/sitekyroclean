@@ -2,6 +2,7 @@
 
 A regra dos 10 minutos aplica-se também ao inglês e aos testes locais. Em inglês, usar EN_RESPONSE_PROMISE, EN_AVAILABILITY_PROMISE e EN_COVERAGE_PROMISE; não voltar a apresentar “Same-day” como prazo de resposta. A disponibilidade é próprio dia ou seguinte sob confirmação, nunca uma regra geral de 48h para Lisboa. Secagem média 3–6h também em marcas (IKEA/Pikolin), variantes e glossário. A existência de manchas preexistentes não exclui a repetição gratuita comunicada até48h; explicar limitações antes de executar. Limpeza/higienização não inclui automaticamente anti-ácaros ou desbacterização. Não reintroduzir promessas de eliminação de germes, benefícios clínicos ou bactericida incluído. Homepage usa PUBLISHED_REVIEWS, só transcrições; localidades apenas quando confirmadas. Retirados os blocos independentes de reviews sem origem dos schemas. Preservar estas regras em merges de ramos de teste.
 
+
 # Kyro Clean Solutions — Instruções para Codex
 
 ## Atualização comercial prioritária: 10/09/2026
@@ -73,6 +74,24 @@ Pedido do responsável: WhatsApp principal e ligação à tabela de preços nas 
 ## Deslocações Braga e Algarve (2026-09-10)
 
 Pedido do responsável: Braga com base local, 10€ em Braga, Guimarães, Vila Nova de Famalicão, Barcelos e Póvoa de Lanhoso; 15€ em Fafe e Esposende; 20€ em Viana do Castelo. Algarve: 25€ nos extremos/interior (Vila Real de Santo António, Castro Marim, Monchique, Aljezur, Vila do Bispo, Alcoutim); Portimão e Lagos mantêm 15€ e restantes zonas 10€. Esta regra substitui o antigo máximo de 15€ no Algarve. Atualizar sempre as duas tabelas (`QuizTypes.ts` e `locationSeoData.ts`). Os escalões são por localidade, não um cálculo GPS por morada.
+
+## Nome do tratamento no orçamento (2026-09-10)
+
+Pedido do responsável: explicitar «Desbacterização e Anti Ácaros» nos upsells de colchões e cadeiras e nos respetivos resumos/recibos. É a apresentação conjunta do tratamento existente, sem alteração de preços. Implementado na branch de pré-visualização `codex/quote-visual-preview`.
+
+Pedido de simplificação (2026-09-10): nos upsells de colchão e sofá, clicar no cartão liga o tratamento para os artigos escolhidos; repetir o clique retira. Não expandir linhas por tamanho nem steppers abaixo do cartão. A seleção e o total no cabeçalho dão o feedback. Esta decisão substitui a apresentação anterior de detalhes após selecionar.
+
+## Selo dos extras (2026-09-10)
+
+Pedido do responsável: usar o selo TOP em todas as opções extra do orçamento, incluindo Essencial e Premium, tratamentos e categorias de serviços adicionais. Na pré-visualização, reutilizar `QuizTopBadge` (coroa e acabamento dourado), sem duplicar markup nem introduzir animações de urgência. O selo não indica que o extra já está selecionado.
+
+Revisão aprovada do selo TOP (2026-09-10): reservar apenas para impermeabilização Premium e desbacterização/antiácaros. Essencial, higienização adicional e categorias de artigos deixam de ter selo. Substitui o pedido anterior de selo em todos os extras. A pré-visualização sem parâmetros abre agora no início, sem seleções; `?exemplo=pack` conserva o exemplo preenchido.
+
+## Escolha parcial e comparação de proteção (2026-09-10)
+
+Nova decisão do responsável: um sofá/colchão mantém o clique simples; vários permitem escolher quantos recebem tratamento, com linhas compactas «1 de 3», sem repetir imagens/preços. `packQty` opcional representa essa quantidade; ausência preserva a seleção antiga de todas as unidades. `splitTreatmentItems` mantém preços, resumo e recibos coerentes. Esta decisão substitui a remoção absoluta dos seletores. A impermeabilização mostra os dois acréscimos (Essencial e Premium), a diferença real e o âmbito/valor antes de descontos. Benefícios em três pontos curtos junto da imagem. Exemplo local `?exemplo=varios`.
+
+Cadeiras: decisão 2026-09-10 substitui o extra separado de antiácaros. Desbacterização e antiácaros passam a benefício incluído na impermeabilização; sem terceiro cartão e sem cobrança extra quando há proteção. Conjunto de quatro cadeiras: Essencial 70€, Premium 90€. Outros escalões preservados até instrução específica.
 
 ## Teste local de upsell (2026-09-10)
 

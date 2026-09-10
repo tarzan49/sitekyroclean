@@ -116,8 +116,8 @@ export const mattressPrices: PriceOption[] = [
 // Antigas zonas 0€/5€ subiram para 10€ (mínimo sitewide) — todas as outras zonas mantêm o preço original.
 export { locationPrices } from '../../constants/travel';
 
-export interface SofaItem     { sizeId: string; qty: number; packEnabled: boolean; }
-export interface MattressItem { sizeId: string; qty: number; packEnabled: boolean; }
+export interface SofaItem     { sizeId: string; qty: number; packEnabled: boolean; packQty?: number; }
+export interface MattressItem { sizeId: string; qty: number; packEnabled: boolean; packQty?: number; }
 // Tapetes: sem preço fixo (sempre sob orçamento), por isso o simulador só
 // guarda as dimensões medidas, uma linha por tapete (2026-09-06).
 export interface CarpetItem   { id: string; largura: string; comprimento: string; }

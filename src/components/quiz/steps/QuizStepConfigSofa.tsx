@@ -1,3 +1,5 @@
+import { treatmentQty } from '../quizHelpers';
+import QuizFurnitureImage from '../QuizFurnitureImage';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { sofaPrices } from '@/components/quiz/QuizTypes';
@@ -46,7 +48,9 @@ const QuizStepConfigSofa = ({ formData, updateFormData, sofaItems, setSofaItems 
           {sofaPrices.map(option => {
             const item = sofaItems.find(i => i.sizeId === option.id);
             const qty = item?.qty ?? 0;
-            const packOn = item?.packEnabled ?? false;
+            const treatedQty = item ? treatmentQty(item) : 0;
+            const partialTreatment = treatedQty > 0 && treatedQty < qty;
+            const packOn = (item?.packEnabled ?? false) && !partialTreatment;
             const isActive = qty > 0;
             const packTier = formData.waterproofingTier;
             const { isSob, displayPrice: dp } = calcPackPricing(option, packOn, isWaterproofBase, 40, packTier);
@@ -62,10 +66,11 @@ const QuizStepConfigSofa = ({ formData, updateFormData, sofaItems, setSofaItems 
               : option.originalBothPrice;
             return (
               <div key={option.id} className={cn('rounded-sm border-2 transition-all duration-200 overflow-hidden', isActive && packOn ? 'border-gold bg-[#1a2a1a] shadow-[0_0_12px_rgba(212,175,55,0.20)]' : isActive ? 'border-gold/50 bg-[#1a2a1a] shadow-[0_0_8px_rgba(212,175,55,0.10)]' : 'border-dashed border-gold/30 bg-gold/[0.03]')}>
-                <div className="flex items-center justify-between px-4 py-3">
-                  <div className="flex-1 min-w-0 mr-3">
-                    <span className="text-sm font-semibold text-white">{option.label}</span>
-                    <div className="flex items-center gap-1.5 mt-0.5">
+                <div className="flex items-center gap-2 px-2.5 sm:px-3 py-3">
+                  <QuizFurnitureImage service="sofa" sizeId={option.id} />
+                  <div className="flex-1 min-w-0 text-left">
+                    <span className="text-sm font-semibold text-white">{option.label}</span>{partialTreatment && <p className="text-[10px] text-gold">Tratamento em {treatedQty} de {qty}</p>}
+                    <div className="flex flex-wrap items-center gap-x-1.5 gap-y-0.5 mt-0.5">
                       {isActive && packOn && <span className="text-[9px] bg-gold/15 text-gold/80 px-1.5 py-0.5 rounded-full font-bold leading-none">PACK</span>}
                       {isActive && packOn && typeof originalPackPrice === 'number' && (
                         <span className="text-sm text-white/30 line-through tabular-nums">{originalPackPrice}€</span>
@@ -73,15 +78,15 @@ const QuizStepConfigSofa = ({ formData, updateFormData, sofaItems, setSofaItems 
                       {!packOn && isWaterproofBase && packTier === 'premium' && !isSob && typeof dp === 'number' && (
                         <span className="text-sm text-white/30 line-through tabular-nums">{dp + 10}€</span>
                       )}
-                      <span className={cn('text-sm font-bold tabular-nums', isSob ? isActive ? 'text-white/70' : 'text-white/35' : (isActive && packOn) || (isWaterproofBase && packTier === 'premium') ? 'text-gold' : isActive ? 'text-white/80' : 'text-white/40')}>
+                      <span className={cn('text-sm font-bold tabular-nums', isSob ? isActive ? 'text-white/70' : 'text-white/65' : (isActive && packOn) || (isWaterproofBase && packTier === 'premium') ? 'text-gold' : isActive ? 'text-white/80' : 'text-white/70')}>
                         {isSob ? 'Sob Orçamento' : `${dp}€/un.`}
                       </span>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2 flex-shrink-0">
-                    <button onClick={() => setSofaItems(sofaSetQty(sofaItems, option.id, qty - 1))} disabled={qty === 0} className="w-14 h-14 rounded-sm border-2 border-white/20 bg-white/[0.05] text-white font-bold text-2xl flex items-center justify-center disabled:opacity-20 disabled:border-transparent disabled:bg-transparent active:scale-95 transition-all touch-manipulation hover:border-gold/50">−</button>
-                    <span className={cn('w-7 text-center font-bold tabular-nums text-base', isActive ? (packOn ? 'text-gold' : 'text-white/80') : 'text-white/30')}>{qty}</span>
-                    <button onClick={() => setSofaItems(sofaSetQty(sofaItems, option.id, qty + 1))} className="w-14 h-14 rounded-sm border-2 border-white/20 bg-white/[0.05] text-white font-bold text-2xl flex items-center justify-center active:scale-95 transition-all touch-manipulation hover:border-gold/50">+</button>
+                  <div className="flex items-center gap-1 flex-shrink-0">
+                    <button onClick={() => setSofaItems(sofaSetQty(sofaItems, option.id, qty - 1))} disabled={qty === 0} className="w-11 h-11 sm:w-12 sm:h-12 rounded-sm border-2 border-white/20 bg-white/[0.05] text-white font-bold text-2xl flex items-center justify-center disabled:opacity-20 disabled:border-transparent disabled:bg-transparent active:scale-95 transition-all touch-manipulation hover:border-gold/50">−</button>
+                    <span className={cn('w-5 text-center font-bold tabular-nums text-base', isActive ? (packOn ? 'text-gold' : 'text-white/80') : 'text-white/30')}>{qty}</span>
+                    <button onClick={() => setSofaItems(sofaSetQty(sofaItems, option.id, qty + 1))} className="w-11 h-11 sm:w-12 sm:h-12 rounded-sm border-2 border-white/20 bg-white/[0.05] text-white font-bold text-2xl flex items-center justify-center active:scale-95 transition-all touch-manipulation hover:border-gold/50">+</button>
                   </div>
                 </div>
                 {/* Upsell de impermeabilização/proteção (e, na direção contrária,

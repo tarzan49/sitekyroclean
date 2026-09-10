@@ -1,12 +1,13 @@
+import DirectoryGroup from "@/components/DirectoryGroup";
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { MapPin, ArrowRight, Phone, ChevronDown } from "lucide-react";
+import { MapPin, ArrowRight, Phone, ChevronDown, Search, X } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import QuizButton from "@/components/QuizButton";
 import SectionHeader from "@/components/SectionHeader";
 import { cities, services } from "@/data/locationSeoData";
-import { municipiosComFreguesias, getFreguesiaStats, type MunicipioGroup } from "@/data/freguesiaSeoData";
+import { municipiosComFreguesias, getFreguesiaStats } from "@/data/freguesiaSeoData";
 import { SITE_URL, PHONE_TEL, PHONE_DISPLAY } from "@/constants/business";
 
 type Area = "porto" | "braga" | "lisboa" | "algarve";
@@ -22,110 +23,51 @@ function citiesForArea(area: Area) {
   return cities.filter(c => c.area === area);
 }
 
-function municipiosForArea(area: Area) {
-  const slugs = new Set<string>(citiesForArea(area).map(c => c.slug));
-  return municipiosComFreguesias.filter(m => slugs.has(m.slug));
-}
+const normalize = (value: string) => value.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLocaleLowerCase("pt-PT").trim();
 
-const RegionSection = ({
-  heading,
-  goldWord,
-  area,
-  openMunicipio,
-  setOpenMunicipio,
-}: {
-  heading: string;
-  goldWord: string;
-  area: Area;
-  openMunicipio: string | null;
-  setOpenMunicipio: (slug: string | null) => void;
-}) => {
-  const municipios = municipiosForArea(area);
-  const areaCities = citiesForArea(area);
-
+const RegionSection = ({ heading, goldWord, area, query }: { heading: string; goldWord: string; area: Area; query: string }) => {
+  const search = normalize(query);
+  const areaCities = citiesForArea(area).filter(city => {
+    const municipality = municipiosComFreguesias.find(m => m.slug === city.slug);
+    return !search || normalize(city.name).includes(search) || municipality?.freguesias.some(f => normalize(f.name).includes(search));
+  }).sort((a, b) => a.name.localeCompare(b.name, "pt-PT"));
+  if (!areaCities.length) return null;
   return (
-    <section className="py-12 md:py-16 odd:bg-secondary/20 even:bg-background">
-      <div className="container mx-auto px-4">
-        <div className="max-w-5xl mx-auto">
-          <SectionHeader
-            overline="Cobertura"
-            heading={heading}
-            goldWord={goldWord}
-            light={true}
-          />
-          <div className="space-y-3">
-            {municipios.map((m: MunicipioGroup) => {
-              const isOpen = openMunicipio === m.slug;
-              const cityExists = areaCities.some(c => c.slug === m.slug);
-              return (
-                <div key={m.slug} className="bg-card rounded-xl border border-border/30 overflow-hidden">
-                  <button
-                    onClick={() => setOpenMunicipio(isOpen ? null : m.slug)}
-                    className="w-full flex items-center justify-between p-4 md:p-5 hover:bg-secondary/30 transition-colors text-left"
-                  >
-                    <div className="flex items-center gap-3">
-                      <MapPin className="w-4 h-4 text-gold flex-shrink-0" />
-                      <div>
-                        <span className="text-base md:text-lg font-bold text-[#111111]">{m.name}</span>
-                        <span className="block text-xs text-[#111111]/55">{m.freguesias.length} freguesias</span>
-                      </div>
-                    </div>
-                    <ChevronDown className={`w-5 h-5 text-[#111111]/55 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
-                  </button>
-
-                  {isOpen && (
-                    <div className="px-4 md:px-5 pb-5 border-t border-border/20">
-                      {/* Municipality service links */}
-                      {cityExists && (
-                        <div className="mb-4 pt-4">
-                          <p className="text-xs font-semibold text-[#111111]/55 uppercase tracking-wide mb-2">Serviços em {m.name}</p>
-                          <div className="flex flex-wrap gap-2">
-                            {services.map(svc => (
-                              <Link
-                                key={svc.slug}
-                                to={`/${svc.slug}-${m.slug}`}
-                                className="inline-flex items-center gap-1.5 bg-gold/5 px-3 py-1.5 rounded-lg text-xs font-medium text-[#111111] border border-gold/20 hover:bg-gold/10 transition-colors"
-                              >
-                                <ArrowRight className="w-3 h-3 text-gold" />
-                                {svc.name}
-                              </Link>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-
-                      {/* Freguesias */}
-                      {m.freguesias.length > 0 && (
-                        <>
-                          <p className="text-xs font-semibold text-[#111111]/55 uppercase tracking-wide mb-2">Freguesias</p>
-                          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
-                            {m.freguesias.map(f => (
-                              <Link
-                                key={f.slug}
-                                to={`/limpeza-sofas-${m.slug}-${f.slug}`}
-                                className="group flex items-center gap-1.5 bg-secondary/30 px-3 py-2 rounded-lg text-sm text-[#111111] hover:bg-gold/5 hover:border-gold/30 border border-transparent transition-all"
-                              >
-                                <MapPin className="w-3 h-3 text-gold flex-shrink-0" />
-                                <span className="group-hover:text-gold transition-colors truncate">{f.name}</span>
-                              </Link>
-                            ))}
-                          </div>
-                        </>
-                      )}
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-        </div>
+    <details open={search ? true : undefined} className="group/region border-b border-[#E8E4DE]">
+      <summary className="flex min-h-16 cursor-pointer list-none items-center gap-3 py-5 text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#D4AF37] [&::-webkit-details-marker]:hidden">
+        <MapPin aria-hidden="true" className="h-5 w-5 shrink-0 text-[#B8912A]" />
+        <span className="flex-1 font-semibold text-[#111111]">{heading} {goldWord}</span>
+        <span className="text-xs text-[#666]">{areaCities.length}</span>
+        <ChevronDown aria-hidden="true" className="h-4 w-4 text-[#B8912A] group-open/region:rotate-180" />
+      </summary>
+      <div className="pb-5 pl-3 sm:pl-8">
+        {areaCities.map(city => {
+          const municipality = municipiosComFreguesias.find(m => m.slug === city.slug);
+          const freguesias = (municipality?.freguesias ?? []).filter(f => !search || normalize(city.name).includes(search) || normalize(f.name).includes(search));
+          return <details key={city.slug} open={search ? true : undefined} className="group/city border-t border-[#E8E4DE]">
+            <summary className="flex min-h-14 cursor-pointer list-none items-center gap-3 py-4 text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#D4AF37] [&::-webkit-details-marker]:hidden">
+              <span className="flex-1 text-sm font-semibold text-[#111111]">{city.name}</span>
+              <ChevronDown aria-hidden="true" className="h-4 w-4 text-[#B8912A] group-open/city:rotate-180" />
+            </summary>
+            <div className="pl-3 sm:pl-5">
+              <DirectoryGroup title={`Serviços em ${city.name}`}>
+                {services.map(svc => <Link key={svc.slug} to={`/${svc.slug}-${city.slug}`}>{svc.name}</Link>)}
+              </DirectoryGroup>
+              <DirectoryGroup title={`Freguesias de ${city.name}`} open={search ? true : undefined}>
+                {freguesias.map(f => <Link key={f.slug} to={`/limpeza-sofas-${city.slug}-${f.slug}`}>{f.name}</Link>)}
+              </DirectoryGroup>
+            </div>
+          </details>;
+        })}
       </div>
-    </section>
+    </details>
   );
 };
 
 const AreasDeServico = () => {
-  const [openMunicipio, setOpenMunicipio] = useState<string | null>(null);
+  const [query, setQuery] = useState("");
+  const search = normalize(query);
+  const hasResults = cities.some(city => normalize(city.name).includes(search) || municipiosComFreguesias.find(m => m.slug === city.slug)?.freguesias.some(f => normalize(f.name).includes(search)));
   const stats = getFreguesiaStats();
 
   return (
@@ -160,16 +102,21 @@ const AreasDeServico = () => {
           </div>
         </section>
 
-        {REGIONS.map(r => (
-          <RegionSection
-            key={r.area}
-            heading={r.heading}
-            goldWord={r.goldWord}
-            area={r.area}
-            openMunicipio={openMunicipio}
-            setOpenMunicipio={setOpenMunicipio}
-          />
-        ))}
+        <section className="bg-[#FDFDF9] py-10 md:py-14">
+          <div className="mx-auto max-w-4xl px-5 sm:px-6 lg:px-8">
+            <p className="mb-5 text-sm leading-relaxed text-[#666]">Escolha a região, depois o concelho e o serviço. Também pode pesquisar diretamente uma localidade ou freguesia.</p>
+            <div className="relative mb-6">
+              <label htmlFor="area-search" className="sr-only">Pesquisar localidade ou freguesia</label>
+              <Search aria-hidden="true" className="absolute left-4 top-4 h-4 w-4 text-[#857443]" />
+              <input id="area-search" type="search" value={query} onChange={event => setQuery(event.target.value)} placeholder="Pesquisar localidade ou freguesia…" className="min-h-12 w-full rounded-lg border border-[#E8E4DE] bg-white py-3 pl-11 pr-12 text-base text-[#111111] focus:outline-none focus:ring-2 focus:ring-[#D4AF37]/60 [&::-webkit-search-cancel-button]:appearance-none" />
+              {query && <button type="button" aria-label="Limpar pesquisa" onClick={() => setQuery("")} className="absolute right-0 top-0 flex h-12 w-12 items-center justify-center text-[#666] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#D4AF37]"><X aria-hidden="true" className="h-4 w-4" /></button>}
+            </div>
+            <div className="border-t border-[#E8E4DE]">
+              {REGIONS.map(r => <RegionSection key={`${r.area}-${Boolean(search)}`} {...r} query={query} />)}
+            </div>
+            <p role="status" className="mt-4 text-sm text-[#666]">{!hasResults ? "Não encontrámos essa localidade. Experimente outro nome ou pesquise pelo concelho." : search ? "Resultados nas regiões abaixo." : ""}</p>
+          </div>
+        </section>
 
         {/* CTA */}
         <section className="py-10 md:py-14 bg-kyro-green">

@@ -776,7 +776,7 @@ const problemDefinitions: ProblemPage[] = [
       "Orientação imediata por telefone",
     ],
     faqs: [
-      { question: "Quanto tempo demora a resposta para limpeza urgente?", answer: "Respondemos ao primeiro contacto em menos de 10 minutos. O agendamento depende da disponibilidade mas priorizamos casos urgentes." },
+      { question: "Quanto tempo demora a resposta para limpeza urgente?", answer: "Respondemos ao primeiro contacto em menos de 10 minutos durante horário de funcionamento. O agendamento depende da disponibilidade mas priorizamos casos urgentes." },
       { question: "O que devo fazer enquanto espero pela equipa?", answer: "Absorva o excesso do derrame com papel absorvente. Não esfregue, não use água quente e não aplique produtos caseiros. Isso pode fixar a mancha." },
     ],
     relatedProblems: ["manchas-vinho-sofa", "manchas-cafe-sofa", "manchas-sofa"],

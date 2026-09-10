@@ -1054,6 +1054,32 @@ Commits desta sessão (ordem cronológica, todos em `worktree-kyro-minorder-emda
 `SofaLeadActions` centraliza WhatsApp, âncora `#precos` e preço com deslocação. `AdsLandingNavigation` fornece cabeçalho/rodapé reduzidos e `isAdsVisit`; o modo Ads é ativado explicitamente por `ads=1` ou pelos parâmetros de entrada Google Ads, mantendo o URL canónico sem parâmetros. `LocationServicePage` e `SofaVariantPage` conservam as páginas orgânicas e usam esta apresentação quando o serviço é limpeza de sofás. As âncoras são `resultados`, `precos`, `avaliacoes`, `duvidas`. `trackWhatsAppClick` envia também `whatsapp_click` ao GA4 e UTM ao registo interno; não representa uma conversa confirmada.
 
 
+## Pré-visualização visual do orçamento (2026-09-10, branch codex/quote-visual-preview)
+
+Proposta para avaliação, ainda não integrada em master: `QuizEstimate.tsx` apresenta o total calculado pelo motor existente, o preço anterior e a poupança. A animação respeita redução de movimento e substitui confettis/toast de desconto. `QuizComboUpsellScreen.tsx` usa imagens de mobiliário, cartões tracejados e botão +, sem preços na seleção de categorias; os preços continuam nos detalhes. A rota `/__preview/orcamento` existe apenas em desenvolvimento e abre o componente real com três sofás de 3 lugares, limpeza + impermeabilização Premium em Porto: 607€ antes e 547€ depois do desconto. A origem das imagens e validação estão em `QUOTE_PREVIEW.md`.
+
+### Pré-visualização dos cuidados adicionais (2026-09-10)
+
+Na branch `codex/quote-visual-preview`, `QuizCareIntro` reutiliza `QuizFurnitureImage` para contextualizar os tratamentos; `QuizCarpetMeasureGuide` é partilhado pelos detalhes de tapetes principais e extras. A rota DEV `/__preview/orcamento` aceita `exemplo=antiacaros|impermeabilizacao|cadeiras|tapetes` para revisão dos ecrãs reais com dados iniciais. Não altera o motor de preços.
+
+A seleção parcial de cuidados em sofás/colchões usa `packQty?: number` com `packEnabled`. `QuizTreatmentQuantities` aparece apenas para várias unidades. `treatmentQty` limita ao número de artigos; `splitTreatmentItems` produz linhas com e sem tratamento para cálculo/resumo/recibo, mantendo compatibilidade com seleções antigas. Os preços comparativos no upsell usam `calcPackPricing` e respeitam `packPremiumDelta`.
+## Diretórios finais compactos (2026-09-10)
+
+`src/components/DirectoryGroup.tsx` uniformiza a navegação final das famílias de páginas com grupos fechados por defeito e pesquisa nas listas maiores. Preserva os links no HTML e repõe o estado ao mudar de página. `AreasDeServico` organiza região, concelho, serviços e freguesias com pesquisa global; as seis páginas principais continuam a usar `ServiceCityLinks`. Inventário e verificação em `docs/directory-navigation.md`.
+
+## Testemunhos partilhados (10 setembro 2026)
+CustomerReviews e CustomerReviewCard uniformizam homepage, páginas de serviços/localidades e cartões de packs. Textos existentes e seleção regional preservados; ligação Google usa constantes. Carrossel de 9 segundos com pausa manual, interação, visibilidade e reduced-motion; altura adaptativa mobile. Pré-visualização em mobile-preview.html#avaliacoes. Verificados mobile Lisboa, desktop e lint dos componentes; TypeScript validado.
+
+## Teste de ofertas no upsell com imagens (2026-09-10)
+Nesta branch de pré-visualização, `?teste=ofertas` em DEV mantém `QuizComboUpsellScreen` com as imagens existentes e todas as categorias. Só o colchão casal tem preço experimental de55€/un.; comparação com69€ + deslocação de uma visita separada. Sem acumular10%. O botão final do quiz não envia pedidos neste modo. Produção e entradas sem a flag conservam preços e desconto existentes. Servidor desta cópia:5188. Não confundir com a cópia master em8090 sem estas imagens.
+
+Teste `?teste=ofertas`: cartões simplificados com uma linha promocional. Casal55€/un.; cadeiras: uma unidade oferecida por conjunto completo de4, com preço unitário do escalão da quantidade escolhida; tapetes:1m² oferecido por cada5m² completos no conjunto, guardando área real e área a cobrar no rótulo, euros sempre sob orçamento. Sem acumulação de10%, apenas DEV.
+
+Atualização do teste de ofertas: desconto de14€ por unidade em todos os tamanhos de colchão (solteiro45€, casal55€, King/Queen65€), pedido explícito do responsável. Apenas no modo DEV `teste=ofertas`; tabela pública inalterada.
+
+### Secção de cobertura nas landing pages (2026-09-10)
+A secção completa de serviços e zonas de atendimento permanece visível também em modo Ads, por pedido do dono. Não a substituir pelo resumo «Serviço ao domicílio».
+
 ## Galerias de antes e depois (2026-09-10)
 
 `ServiceResultsGallery` centraliza comparação, miniaturas numa faixa horizontal, anterior/seguinte e reprodução opcional (parada por defeito). A miniatura selecionada mantém-se visível sem deslocar a página; a contenção de largura impede que a faixa alargue as grelhas dos heroes em mobile. Usa toda a categoria de `BEFORE_AFTER_POOL`, com cadeiras em 9:16, alcatifas a reutilizar tapetes e identificação de fotos avulsas/efeitos ilustrativos.
@@ -1081,3 +1107,11 @@ Atualização do teste local (2026-09-10): `?teste=quiz-pack` agora demonstra co
 `carpetKind` distingue alcatifa de tapete nas entradas do widget e ServiceHero. As medidas individuais seguem em todos os resumos. `carpetAllItemsValid` bloqueia peças incompletas; `carpetHasValidItems` continua a identificar qualquer peça válida para sinalizar orçamento. Extras sobrevivem ao regresso a etapas anteriores; tratamentos importados não são descartados nem convertidos em limpeza. O desconto do quiz/widget exige dois artigos tabelados, acima de149€, de acordo com as regras comerciais prioritárias.
 
 Cobertura e limites: `AUDITORIA-FORMSPREE-WHATSAPP-2026-09-10.md`. Os testes de serviços intercetam a rede; não provam receção na conta Formspree nem entrega de email.
+
+## Publicação autorizada das ofertas (2026-09-10)
+O dono autorizou publicar a versão visual e as ofertas no quiz real: colchões extra45/55/65€, cadeiras4paga3, tapetes5m²paga4 sob orçamento. Ofertas não acumulam10%. O bloqueio de envio aplica-se apenas à simulação DEV explícita; produção envia os pedidos normalmente. Substitui as notas históricas de teste apenas.
+## Localidade automática no início do orçamento (2026-09-10)
+
+`QuizStepLocation` pede a posição atual ao navegador quando não existe uma localidade previamente escolhida. `src/lib/locationDetection.ts` usa o endpoint client-side do BigDataCloud, apenas após autorização do navegador, sem guardar coordenadas. Só aceita nomes portugueses que correspondam à tabela canónica de deslocações; não converte um distrito numa cidade. A localidade é pré-selecionada, mas o cliente confirma com Continuar, vendo antes a taxa real. Alterar permite pesquisa global e sugestões da mesma região (`cities.area`); não se afirma que sejam as cidades geometricamente mais próximas. Recusa, falha, timeout ou zona não servida mantêm a pesquisa manual disponível. Uma resposta tardia nunca substitui a escolha manual. A política de privacidade identifica o fornecedor e o uso dos sinais de localização/IP.
+
+O primeiro passo mostra “Orçamento sem compromisso” no rodapé. As restantes etapas conservam o seu comportamento. `/__preview/localizacao` e `?mobile=1` existem apenas em DEV, mostrando o quiz real sobre a homepage. Não há cidade demonstrativa codificada nem simulação em produção. Capturas de QA com Maia usam respostas de geolocalização interceptadas apenas no navegador de teste, sem enviar coordenadas de teste ao fornecedor.

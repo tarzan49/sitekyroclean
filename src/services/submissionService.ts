@@ -1,3 +1,4 @@
+import { splitTreatmentItems } from '@/components/quiz/quizHelpers';
 import { sofaPrices, mattressPrices } from '@/components/quiz/QuizTypes';
 import type { SofaItem, MattressItem, CarpetItem, UpsellItemConfig } from '@/components/quiz/QuizTypes';
 import { calcChairClean, calcChairWaterproof, calcChairWaterproofPremium, carpetItemArea, calcPackPricing } from '@/components/quiz/quizHelpers';
@@ -151,7 +152,7 @@ export function buildReceiptLines(payload: Pick<QuizLeadPayload, 'service' | 'se
     // o serviço principal — por isso não se restringe a isWaterproofBase como o `isPremium`
     // usado mais abaixo para cadeiras.
     const isPremiumTierSofa = waterproofingTier === 'premium';
-    sofaItems.filter(i => i.qty > 0).forEach(item => {
+    splitTreatmentItems(sofaItems).forEach(item => {
       const opt = sofaPrices.find(p => p.id === item.sizeId);
       if (!opt) return;
       const unit = calcPackPricing(opt, item.packEnabled, isWaterproofBase, null, waterproofingTier).displayPrice;
@@ -161,7 +162,7 @@ export function buildReceiptLines(payload: Pick<QuizLeadPayload, 'service' | 'se
       receiptLines.push({ label: `Sofá ${opt.label}${tierTag}`, qty: item.qty, unitPrice: unit, total: unit !== null ? unit * item.qty : null });
     });
   } else if (service === 'mattress') {
-    mattressItems.filter(i => i.qty > 0).forEach(item => {
+    splitTreatmentItems(mattressItems).forEach(item => {
       const opt = mattressPrices.find(p => p.id === item.sizeId);
       if (!opt) return;
       const baseP = isWaterproofBase
@@ -169,7 +170,7 @@ export function buildReceiptLines(payload: Pick<QuizLeadPayload, 'service' | 'se
         : (typeof opt.cleaningPrice === 'number' ? (opt.cleaningPrice as number) : null);
       const bothP = typeof opt.bothPrice === 'number' ? (opt.bothPrice as number) : null;
       const unit = item.packEnabled ? bothP : baseP;
-      const typeStr = item.packEnabled ? ' (Pack: Limpeza + Anti Ácaros)' : isWaterproofBase ? ' (Anti Ácaros)' : ' (Limpeza)';
+      const typeStr = item.packEnabled ? ' (Pack: Limpeza + Desbacterização e Anti Ácaros)' : isWaterproofBase ? ' (Desbacterização e Anti Ácaros)' : ' (Limpeza)';
       receiptLines.push({ label: `Colchão ${opt.label}${typeStr}`, qty: item.qty, unitPrice: unit, total: unit !== null ? unit * item.qty : null });
     });
   } else if (service === 'chairs') {
@@ -183,10 +184,10 @@ export function buildReceiptLines(payload: Pick<QuizLeadPayload, 'service' | 'se
         const addonTotal = isWaterproofBase ? calcChairClean(wQty) : calcChairWaterproofTier(wQty);
         const addonLabel = isWaterproofBase ? 'Limpeza Cadeiras' : `Impermeabilização Cadeiras${isPremium ? ' Premium' : ' Essencial'}`;
         const addonUnit = addonTotal !== null ? Math.round(addonTotal / wQty * 10) / 10 : null;
-        receiptLines.push({ label: addonLabel, qty: wQty, unitPrice: addonUnit, total: addonTotal });
+        receiptLines.push({ label: `${addonLabel}${!isWaterproofBase ? ' (desbacterização e antiácaros incluídos)' : ''}`, qty: wQty, unitPrice: addonUnit, total: addonTotal });
       }
-      if (chairAntiAcaros) {
-        receiptLines.push({ label: 'Anti Ácaros Cadeiras', qty: cQty, unitPrice: 5, total: cQty * 5 });
+      if (chairAntiAcaros && !isWaterproofBase && wQty <= 0) {
+        receiptLines.push({ label: 'Desbacterização e Anti Ácaros Cadeiras', qty: cQty, unitPrice: 5, total: cQty * 5 });
       }
     }
   } else if (service === 'carpet') {

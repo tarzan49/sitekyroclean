@@ -1,3 +1,4 @@
+import DirectoryGroup from "@/components/DirectoryGroup";
 ﻿import { useMemo, useEffect } from "react";
 import { useLocation, Link } from "react-router-dom";
 import { Clock, ArrowRight, ChevronRight, Calendar, User, Lightbulb } from "lucide-react";
@@ -227,28 +228,13 @@ const BlogPost = () => {
           </div>
         </article>
 
-        {/* ── Artigos relacionados ── */}
+        {/* Related reading follows the same collapsed navigation pattern. */}
         {related.length > 0 && (
           <section className="bg-[#F5F4F0] border-t border-[#E8E4DE] py-12">
             <div className="container mx-auto px-4 max-w-3xl">
-              <h2 className="font-playfair text-xl font-bold text-[#111111] mb-6">Artigos relacionados</h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {related.map(p => (
-                  <Link
-                    key={p.slug}
-                    to={`/blog/${p.slug}`}
-                    className="bg-white border border-[#E8E4DE] rounded-xl p-5 hover:border-gold/30 hover:shadow-md transition-all group"
-                  >
-                    <span className="text-xs font-bold text-gold bg-gold/10 px-2 py-0.5 rounded-full">{p.category}</span>
-                    <h3 className="font-semibold text-[#111111] text-sm mt-2 mb-1 leading-snug group-hover:text-gold transition-colors">
-                      {p.title}
-                    </h3>
-                    <span className="flex items-center gap-1 text-xs text-[#111111]/40">
-                      <Clock className="w-3 h-3" /> {p.readingTime} min
-                    </span>
-                  </Link>
-                ))}
-              </div>
+              <DirectoryGroup title="Artigos relacionados">
+                {related.map(p => <Link key={p.slug} to={`/blog/${p.slug}`}>{p.title}</Link>)}
+              </DirectoryGroup>
             </div>
           </section>
         )}

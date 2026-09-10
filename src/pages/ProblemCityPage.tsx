@@ -1,3 +1,4 @@
+import DirectoryGroup from "@/components/DirectoryGroup";
 import { useEffect, useMemo } from "react";
 import { useLocation, Link } from "react-router-dom";
 import { QuizLocationProvider, QuizServiceProvider } from "@/context/QuizLocationContext";
@@ -10,7 +11,6 @@ import HeroBeforeAfterPool from "@/components/HeroBeforeAfterPool";
 import { categoryForServiceSlug } from "@/data/beforeAfterPool";
 import Footer from "@/components/Footer";
 import QuizButton from "@/components/QuizButton";
-import TrustRatingBadge from "@/components/TrustRatingBadge";
 import SectionHeader from "@/components/SectionHeader";
 import ServiceFAQ from "@/components/ServiceFAQ";
 import ServicePriceSection from "@/components/ServicePriceSection";
@@ -169,9 +169,6 @@ const ProblemCityPage = () => {
                   {problem.intro.replace(/no Porto|ao domicílio/g, `${prep} ${city.name}`).match(/^[^.?]*[.?]/)?.[0] ?? problem.intro}
                 </p>
 
-                <div className="lg:mb-6">
-                  <TrustRatingBadge variant="mapsLinkClients" />
-                </div>
 
                 <div className="flex flex-col sm:flex-row gap-3 max-w-md">
                   <QuizButton
@@ -229,7 +226,7 @@ const ProblemCityPage = () => {
         {/* ═══ AVALIAÇÕES REAIS — logo abaixo do widget ═══ */}
         <section className="py-14 md:py-20 bg-[#FDFDF9]">
           <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
-            <SectionHeader overline="Avaliações Reais" heading="O que dizem os nossos" goldWord="clientes" light={true} />
+            <SectionHeader overline="Avaliações Reais" heading="O que dizem os nossos" goldWord="clientes" subtitle="Nas palavras de quem já nos recebeu em casa." light={true} />
             <ServiceReviewsGrid serviceSlug={problem.relatedServices[0]} seed={`${problem.slug}-${city.slug}`} heading="" />
           </div>
         </section>
@@ -323,12 +320,10 @@ const ProblemCityPage = () => {
         {/* ═══ REDE INTERNA ═══ */}
         <section className="py-14 md:py-20 bg-kyro-green">
           <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
-            <SectionHeader overline="Explore" heading="Continue a" goldWord="explorar" light={false} />
-            <div className="grid md:grid-cols-3 gap-4">
+            <SectionHeader overline="Explore por categoria" heading="Serviços, soluções e" goldWord="localidades" light={false} />
+            <div className="max-w-4xl border-t border-[#D4AF37]/25">
               {relatedServiceData.length > 0 && (
-                <div className="p-5 rounded-xl" style={{ border: "1px solid rgba(255,255,255,0.10)", background: "rgba(255,255,255,0.03)" }}>
-                  <p className="text-[10px] font-bold tracking-[0.26em] uppercase mb-3" style={{ color: "#D4AF37" }}>Serviços {prep} {city.name}</p>
-                  <div className="flex flex-wrap gap-2">
+                <DirectoryGroup title={<>Serviços {prep} {city.name}</>} dark>
                     {relatedServiceData.map(svc => (
                       <Link key={svc.slug} to={`/${svc.slug}-${city.slug}`}
                         className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full text-sm font-medium text-white border border-white/15 hover:border-[#D4AF37]/40 hover:bg-white/5 transition-all">
@@ -336,14 +331,11 @@ const ProblemCityPage = () => {
                         {svc.name}
                       </Link>
                     ))}
-                  </div>
-                </div>
+                  </DirectoryGroup>
               )}
 
               {relatedProblemLinks.length > 0 && (
-                <div className="p-5 rounded-xl" style={{ border: "1px solid rgba(255,255,255,0.10)", background: "rgba(255,255,255,0.03)" }}>
-                  <p className="text-[10px] font-bold tracking-[0.26em] uppercase mb-3" style={{ color: "#D4AF37" }}>Problemas relacionados</p>
-                  <div className="flex flex-wrap gap-2">
+                <DirectoryGroup title={<>Problemas relacionados</>} dark>
                     {relatedProblemLinks.map(link => (
                       <Link key={link.path} to={link.path}
                         className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full text-sm font-medium text-white border border-white/15 hover:border-[#D4AF37]/40 hover:bg-white/5 transition-all">
@@ -351,13 +343,10 @@ const ProblemCityPage = () => {
                         {link.name}
                       </Link>
                     ))}
-                  </div>
-                </div>
+                  </DirectoryGroup>
               )}
 
-              <div className="p-5 rounded-xl" style={{ border: "1px solid rgba(255,255,255,0.10)", background: "rgba(255,255,255,0.03)" }}>
-                <p className="text-[10px] font-bold tracking-[0.26em] uppercase mb-3" style={{ color: "#D4AF37" }}>Este problema noutras cidades</p>
-                <div className="flex flex-wrap gap-2">
+              <DirectoryGroup title={<>Este problema noutras cidades</>} dark>
                   {nearbyCities.map(c => (
                     <Link key={c.slug} to={`/${problem.slug}-${c.slug}`}
                       className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full text-sm font-medium text-white border border-white/15 hover:border-[#D4AF37]/40 hover:bg-white/5 transition-all">
@@ -365,8 +354,7 @@ const ProblemCityPage = () => {
                       {c.name}
                     </Link>
                   ))}
-                </div>
-              </div>
+                </DirectoryGroup>
             </div>
           </div>
         </section>

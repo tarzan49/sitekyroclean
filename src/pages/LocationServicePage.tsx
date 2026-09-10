@@ -1,3 +1,6 @@
+import SofaProcessGuide from '@/components/SofaProcessGuide';
+import ProblemCarousel from '@/components/ProblemCarousel';
+import DirectoryGroup from "@/components/DirectoryGroup";
 import SofaLeadActions from "@/components/SofaLeadActions";
 import { AdsLandingHeader, AdsLandingFooter, isAdsVisit } from "@/components/AdsLandingNavigation";
 import { useEffect, useMemo } from "react";
@@ -29,12 +32,11 @@ import { METRO_CITIES } from "@/constants/metroCities";
 import { SERVICE_RESULT_CONTENT, pickServiceHero } from "@/constants/serviceContent";
 import { buildServiceWaMessage } from "@/lib/whatsappMessages";
 import { SITE_URL, WHATSAPP_BASE, REVIEW_RATING, REVIEW_COUNT } from "@/constants/business";
-import TrustRatingBadge from "@/components/TrustRatingBadge";
 import SectionHeader from "@/components/SectionHeader";
 import { PRICE_TABLE } from "@/data/locationPriceTestimonialsData";
 import { locationPrices } from "@/components/quiz/QuizTypes";
 import { MARCA_CITY_SLUGS } from "@/data/marcaCities";
-import { PROBLEM_IMAGES, PROBLEM_CTA, PRICE_HEADING_VERB, SERVICE_DURATION } from "@/constants/problemCardHelpers";
+import { PROBLEM_IMAGES, PRICE_HEADING_VERB, SERVICE_DURATION } from "@/constants/problemCardHelpers";
 import { ServiceTrustDesktop, ServiceTrustMobile } from "@/components/ServiceTrustBlock";
 import ServiceReviewsGrid from "@/components/ServiceReviewsGrid";
 import PriceWidget from "@/components/PriceWidget";
@@ -159,20 +161,26 @@ const LocationServicePage = () => {
       ? { value: "Á Medida", label: `Orçamento, ${cityPrep} ${data.city}`, icon: Euro }
       : { value: data.priceFrom, label: `Desde, ${cityPrep} ${data.city}`, icon: Euro },
     { value: serviceDuration.value, label: serviceDuration.label, icon: Timer },
-    { value: "<10min", label: "Resposta ao pedido", icon: Clock },
+    { value: "<10min", label: "Resposta durante o horário de atendimento", icon: Clock },
   ];
 
   const processSteps = data.serviceSlug === 'impermeabilizacao' ? IMPERMEABILIZACAO_STEPS : GENERIC_PROCESS_STEPS;
 
   const problemImages = PROBLEM_IMAGES[data.serviceSlug] ?? [];
+  const sofaProblemDescriptions: Record<string, string> = {
+    'Manchas difíceis no sofá': 'Café, vinho ou gordura? Avaliamos o tecido e a mancha para escolher o tratamento adequado.',
+    'Ácaros e bactérias invisíveis': 'A sujidade também se acumula no interior das fibras. Conheça as opções de higienização para o seu sofá.',
+    'Odores desagradáveis': 'Animais, humidade ou uso diário? Identificamos a origem do odor para recomendar o tratamento.',
+    'Desgaste prematuro do tecido': 'Proteja o tecido do uso diário. Descubra se a impermeabilização é adequada ao seu sofá.',
+  };
   const problemCards = data.problems.map((problem, idx) => ({
     title: problem.title,
-    description: problem.description,
+    description: isSofaCleaning ? (sofaProblemDescriptions[problem.title] ?? problem.description) : problem.description,
     alt: problem.description,
     image: problemImages[idx],
-    cta: PROBLEM_CTA[problem.title] ?? "Pedir Orçamento",
+
   })).filter(card => card.image);
-  const problemGridCols = problemCards.length >= 4 ? "lg:grid-cols-4" : "lg:grid-cols-3";
+
 
   return (
     <QuizLocationProvider value={data.city}>
@@ -239,11 +247,8 @@ const LocationServicePage = () => {
                   {isSofaCleaning ? "Limpeza ao domicílio por extração profunda. Consulte os preços por tamanho e envie uma foto para avaliarmos as manchas." : (data.intro.match(/^[^.?]*[.?]/)?.[0] ?? data.intro)}
                 </p>
 
-                {isSofaCleaning ? <SofaLeadActions city={data.city} price={data.priceFrom} href={waUrl} source={`location_hero_${data.serviceSlug}_${data.citySlug}`} /> : <>
-                <div className="lg:mb-6">
-                  <TrustRatingBadge variant="mapsLinkClients" />
-                </div>
 
+                {isSofaCleaning ? <SofaLeadActions city={data.city} price={data.priceFrom} href={waUrl} source={`location_hero_${data.serviceSlug}_${data.citySlug}`} /> : <>
                 <div className="flex flex-col sm:flex-row gap-3 max-w-md">
                   <QuizButton
                     className="flex-1"
@@ -303,7 +308,7 @@ const LocationServicePage = () => {
 
         {/* ═══ TABELA DE PREÇOS ═══ */}
         {PRICE_TABLE[data.serviceSlug] && (
-          <section className="py-14 md:py-20 bg-[#FDFDF9]">
+          <section id="precos" className="scroll-mt-6 py-14 md:py-20 bg-[#FDFDF9]">
             <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
               <div className="grid md:grid-cols-2 gap-10 md:gap-16 items-center">
                 <div>
@@ -342,14 +347,14 @@ const LocationServicePage = () => {
         {/* ═══ TESTEMUNHOS ═══ */}
         <section id="avaliacoes" className="scroll-mt-6 py-14 md:py-20 bg-kyro-green">
           <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
-            <SectionHeader overline="Avaliações Reais" heading="O que dizem os nossos" goldWord="clientes" light={false} />
+            <SectionHeader overline="Avaliações Reais" heading="O que dizem os nossos" goldWord="clientes" subtitle="Nas palavras de quem já nos recebeu em casa." light={false} />
             <ServiceReviewsGrid serviceSlug={data.serviceSlug} seed={data.city} heading="" />
           </div>
         </section>
 
         {/* ═══ PROBLEMAS COMUNS ═══ */}
         {problemCards.length > 0 && (
-          <section id="precos" className="scroll-mt-6 py-14 md:py-20 bg-[#FDFDF9]">
+          <section id="problemas" className="scroll-mt-6 py-14 md:py-20 bg-[#FDFDF9]">
             <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
               <SectionHeader
                 overline="O Que Resolvemos"
@@ -357,48 +362,31 @@ const LocationServicePage = () => {
                 goldWord={data.city}
                 light={true}
               />
-              <div className={`flex gap-3 overflow-x-auto snap-x snap-mandatory scrollbar-hide pb-2 md:overflow-visible md:grid md:grid-cols-2 ${problemGridCols} md:gap-4 md:pb-0`}>
-                {problemCards.map((card, idx) => (
-                  <div
-                    key={idx}
-                    className="snap-start flex-none w-[78vw] sm:w-[54vw] md:w-auto relative overflow-hidden rounded-2xl group h-[400px] md:h-[440px]"
-                  >
-                    <img
-                      src={card.image}
-                      alt={card.alt}
-                      className="absolute inset-0 w-full h-full object-cover saturate-[0.55] group-hover:saturate-[0.85] group-hover:scale-[1.05] transition-all duration-700 ease-out"
-                      loading="lazy"
-                      decoding="async"
-                    />
-                    <div className="absolute top-0 left-0 right-0 z-10 p-5 md:p-6 pb-12 bg-gradient-to-b from-[#071a12]/90 via-[#071a12]/35 to-transparent">
-                      <div
-                        className="mb-2 rounded-full opacity-45 group-hover:opacity-90 transition-all duration-400"
-                        style={{ width: "20px", height: "1.5px", backgroundColor: "#D4AF37" }}
-                      />
-                      <h3 className="font-playfair font-bold text-white text-[1.05rem] md:text-[1.15rem] leading-[1.25]">{card.title}</h3>
-                    </div>
-                    <div className="absolute bottom-0 left-0 right-0 z-10 p-5 md:p-6 pt-14 bg-gradient-to-t from-[#071a12] via-[#071a12]/75 to-transparent">
-                      <p className="text-white/65 text-xs leading-relaxed line-clamp-2 mb-4">{card.description}</p>
-                      <button
-                        type="button"
-                        onClick={openProblemQuiz}
-                        className="inline-flex items-center justify-center gap-1.5 min-w-[150px] rounded-full px-4 py-2.5 text-xs font-bold text-[#111111] transition-transform duration-300 group-hover:scale-[1.03]"
-                        style={{
-                          background: "linear-gradient(to right, #C9A84C, #EDD96A, #C9A84C)",
-                          boxShadow: "0 3px 10px rgba(201,168,76,0.35)",
-                        }}
-                      >
-                        {card.cta}
-                        <ArrowRight className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
-                    <div className="absolute inset-0 rounded-2xl ring-1 ring-white/[0.06] group-hover:ring-gold/20 transition-all duration-400 pointer-events-none" />
-                  </div>
-                ))}
-              </div>
-              <p className="text-center text-[9px] text-[#111111]/20 tracking-[0.22em] uppercase mt-4 md:hidden">
-                deslize para ver mais →
+              <p className="-mt-5 mb-7 max-w-xl text-sm sm:text-base leading-relaxed text-[#536259]">
+                Reconhece algum destes sinais? Peça uma avaliação e descubra o tratamento adequado ao seu caso.
               </p>
+              <ProblemCarousel>
+                {problemCards.map((card, idx) => (
+                  <article key={card.title} className="snap-start flex-none w-[84vw] max-w-[380px] md:max-w-none md:w-auto overflow-hidden rounded-sm border border-[#183b2c]/15 bg-[#0c241a] group flex flex-col shadow-[0_8px_24px_rgba(7,26,18,0.10)]">
+                    <div className="relative h-[185px] sm:h-[220px] overflow-hidden">
+                      <img src={card.image} alt={card.title} className="w-full h-full object-cover saturate-[0.85] motion-safe:group-hover:scale-[1.03] transition-transform duration-700" loading="lazy" decoding="async" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-[#0c241a]/35 to-transparent" />
+                      <span className="absolute top-4 left-4 px-2.5 py-1.5 bg-[#071a12]/85 border border-white/20 text-[#e1c477] text-[10px] font-semibold tracking-[0.16em]">{String(idx + 1).padStart(2, '0')} / {String(problemCards.length).padStart(2, '0')}</span>
+                    </div>
+                    <div className="p-5 sm:p-6 flex flex-col flex-1">
+                      <div className="w-7 h-px bg-gold mb-4" />
+                      <h3 className="font-playfair font-semibold text-white text-[23px] leading-tight mb-3">{card.title}</h3>
+                      <p className="text-white/75 text-sm leading-relaxed mb-6">{card.description}</p>
+                      <div className="mt-auto">
+                        <button type="button" onClick={openProblemQuiz} aria-label={`Pedir avaliação: ${card.title}`} className="w-full min-h-12 flex items-center justify-between gap-3 rounded-sm px-4 py-3 text-sm font-bold text-[#071a12] bg-gradient-to-r from-gold to-[#d4c57b] hover:from-[#d4c57b] hover:to-gold focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-gold active:scale-[0.98] transition-all touch-manipulation">
+                          Pedir avaliação <ArrowRight className="w-5 h-5 shrink-0" />
+                        </button>
+                        <p className="text-white/60 text-[11px] text-center mt-2.5">Orçamento gratuito · Sem compromisso</p>
+                      </div>
+                    </div>
+                  </article>
+                ))}
+              </ProblemCarousel>
             </div>
           </section>
         )}
@@ -409,7 +397,7 @@ const LocationServicePage = () => {
         )}
 
         {/* ═══ COMO FUNCIONA ═══ */}
-        <section className="py-14 md:py-20 bg-[#FDFDF9]">
+        {isSofaCleaning ? <SofaProcessGuide city={data.city} cityPrep={cityPrep} /> : <section className="py-14 md:py-20 bg-[#FDFDF9]">
           <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
             <SectionHeader
               overline="Processo"
@@ -464,9 +452,8 @@ const LocationServicePage = () => {
               </div>
             </div>
           </div>
-        </section>
+        </section>}
 
-        {isPaidLanding ? <section className="p-6 text-center bg-white"><h2 className="font-playfair text-xl mb-2">Serviço ao domicílio</h2><p>Atendimento em {data.city}. Envie a sua morada por WhatsApp para confirmar cobertura e deslocação.</p></section> : <>
         {/* ═══ PACKS ═══ */}
         <ServicePackBanner
           packSlugs={SERVICE_PACK_SLUGS[data.serviceSlug] ?? ["pack-sala-completa"]}
@@ -474,21 +461,20 @@ const LocationServicePage = () => {
           variant="dark"
         />
 
+        <>
         {/* ═══ ÁREA DE SERVIÇO (DIRETÓRIO) ═══ */}
         <section className="py-14 md:py-20" style={{ backgroundColor: "#FDFDF9" }}>
           <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
             <SectionHeader
-              overline="Cobertura"
-              heading={`Área de serviço ${cityPrep}`}
+              overline="Explore por categoria"
+              heading={`Serviços e zonas de atendimento ${cityPrep}`}
               goldWord={data.city}
-              subtitle={data.localSection}
+              subtitle="Encontre a sua zona, explore outros serviços ou consulte as opções por problema, material e marca. Abra uma categoria para ver mais."
             />
 
-            <div className="grid md:grid-cols-2 gap-4">
+            <div className="max-w-4xl border-t border-[#D4AF37]/25">
               {cityFreguesias && cityFreguesias.freguesias.length > 0 && (
-                <div className="p-5 rounded-xl bg-white" style={{ border: "1px solid rgba(17,17,17,0.08)", boxShadow: "0 4px 16px rgba(7,26,18,0.04)" }}>
-                  <p className="text-[10px] font-bold tracking-[0.26em] uppercase mb-3" style={{ color: "#D4AF37" }}>Zonas {cityPrep} {data.city}</p>
-                  <div className="flex flex-wrap gap-2">
+                <DirectoryGroup title={<>Zonas {cityPrep} {data.city}</>}>
                     {cityFreguesias.freguesias.slice(0, 8).map(f => (
                       <Link
                         key={f.slug}
@@ -499,13 +485,10 @@ const LocationServicePage = () => {
                         {f.name}
                       </Link>
                     ))}
-                  </div>
-                </div>
+                  </DirectoryGroup>
               )}
 
-              <div className="p-5 rounded-xl bg-white" style={{ border: "1px solid rgba(17,17,17,0.08)", boxShadow: "0 4px 16px rgba(7,26,18,0.04)" }}>
-                <p className="text-[10px] font-bold tracking-[0.26em] uppercase mb-3" style={{ color: "#D4AF37" }}>Também disponível em</p>
-                <div className="flex flex-wrap gap-2">
+              <DirectoryGroup title={<>Também disponível em</>}>
                   {getCityLinksForService(data.serviceSlug, data.city).filter(c => c.name !== data.city).slice(0, 6).map(city => (
                     <Link
                       key={city.name}
@@ -515,13 +498,10 @@ const LocationServicePage = () => {
                       {city.name}
                     </Link>
                   ))}
-                </div>
-              </div>
+                </DirectoryGroup>
 
               {otherServices.length > 0 && (
-                <div className="p-5 rounded-xl bg-white" style={{ border: "1px solid rgba(17,17,17,0.08)", boxShadow: "0 4px 16px rgba(7,26,18,0.04)" }}>
-                  <p className="text-[10px] font-bold tracking-[0.26em] uppercase mb-3" style={{ color: "#D4AF37" }}>Outros serviços {cityPrep} {data.city}</p>
-                  <div className="flex flex-wrap gap-2">
+                <DirectoryGroup title={<>Outros serviços {cityPrep} {data.city}</>}>
                     {otherServices.map(svc => (
                       <Link
                         key={svc.slug}
@@ -531,14 +511,11 @@ const LocationServicePage = () => {
                         {svc.name}
                       </Link>
                     ))}
-                  </div>
-                </div>
+                  </DirectoryGroup>
               )}
 
               {relatedProblems.length > 0 && (
-                <div className="p-5 rounded-xl bg-white" style={{ border: "1px solid rgba(17,17,17,0.08)", boxShadow: "0 4px 16px rgba(7,26,18,0.04)" }}>
-                  <p className="text-[10px] font-bold tracking-[0.26em] uppercase mb-3" style={{ color: "#D4AF37" }}>Problemas que resolvemos {cityPrep} {data.city}</p>
-                  <div className="flex flex-wrap gap-2">
+                <DirectoryGroup title={<>Problemas que resolvemos {cityPrep} {data.city}</>}>
                     {relatedProblems.map(p => (
                       <Link
                         key={p.slug}
@@ -548,14 +525,11 @@ const LocationServicePage = () => {
                         {p.keyword}
                       </Link>
                     ))}
-                  </div>
-                </div>
+                  </DirectoryGroup>
               )}
 
               {materialLinks.length > 0 && (
-                <div className="p-5 rounded-xl bg-white" style={{ border: "1px solid rgba(17,17,17,0.08)", boxShadow: "0 4px 16px rgba(7,26,18,0.04)" }}>
-                  <p className="text-[10px] font-bold tracking-[0.26em] uppercase mb-3" style={{ color: "#D4AF37" }}>Por tipo de material {cityPrep} {data.city}</p>
-                  <div className="flex flex-wrap gap-2">
+                <DirectoryGroup title={<>Por tipo de material {cityPrep} {data.city}</>}>
                     {materialLinks.map(m => (
                       <Link
                         key={m.slug}
@@ -565,14 +539,11 @@ const LocationServicePage = () => {
                         {m.name}
                       </Link>
                     ))}
-                  </div>
-                </div>
+                  </DirectoryGroup>
               )}
 
               {hasMarcaSofaCity && data.serviceSlug === 'limpeza-sofas' && (
-                <div className="p-5 rounded-xl bg-white" style={{ border: "1px solid rgba(17,17,17,0.08)", boxShadow: "0 4px 16px rgba(7,26,18,0.04)" }}>
-                  <p className="text-[10px] font-bold tracking-[0.26em] uppercase mb-3" style={{ color: "#D4AF37" }}>Marcas de sofá {cityPrep} {data.city}</p>
-                  <div className="flex flex-wrap gap-2">
+                <DirectoryGroup title={<>Marcas de sofá {cityPrep} {data.city}</>}>
                     {MARCA_SLUGS.map(slug => (
                       <Link
                         key={slug}
@@ -582,14 +553,11 @@ const LocationServicePage = () => {
                         {slug.replace(/-/g, ' ')}
                       </Link>
                     ))}
-                  </div>
-                </div>
+                  </DirectoryGroup>
               )}
 
               {hasMarcaColchaoCity && data.serviceSlug === 'limpeza-colchoes' && (
-                <div className="p-5 rounded-xl bg-white" style={{ border: "1px solid rgba(17,17,17,0.08)", boxShadow: "0 4px 16px rgba(7,26,18,0.04)" }}>
-                  <p className="text-[10px] font-bold tracking-[0.26em] uppercase mb-3" style={{ color: "#D4AF37" }}>Marcas de colchão {cityPrep} {data.city}</p>
-                  <div className="flex flex-wrap gap-2">
+                <DirectoryGroup title={<>Marcas de colchão {cityPrep} {data.city}</>}>
                     {MARCA_COLCHAO_SLUGS.map(slug => (
                       <Link
                         key={slug}
@@ -599,14 +567,11 @@ const LocationServicePage = () => {
                         {slug.replace(/-/g, ' ')}
                       </Link>
                     ))}
-                  </div>
-                </div>
+                  </DirectoryGroup>
               )}
 
               {hasMarcaCadeirasCity && data.serviceSlug === 'limpeza-cadeiras' && (
-                <div className="p-5 rounded-xl bg-white" style={{ border: "1px solid rgba(17,17,17,0.08)", boxShadow: "0 4px 16px rgba(7,26,18,0.04)" }}>
-                  <p className="text-[10px] font-bold tracking-[0.26em] uppercase mb-3" style={{ color: "#D4AF37" }}>Marcas de cadeiras {cityPrep} {data.city}</p>
-                  <div className="flex flex-wrap gap-2">
+                <DirectoryGroup title={<>Marcas de cadeiras {cityPrep} {data.city}</>}>
                     {MARCA_CADEIRAS_SLUGS.map(slug => (
                       <Link
                         key={slug}
@@ -616,14 +581,13 @@ const LocationServicePage = () => {
                         {slug.replace(/-/g, ' ')}
                       </Link>
                     ))}
-                  </div>
-                </div>
+                  </DirectoryGroup>
               )}
             </div>
           </div>
         </section>
 
-        </>}
+        </>
       </main>
       {isPaidLanding ? <AdsLandingFooter /> : <Footer />}
     </QuizServiceProvider>

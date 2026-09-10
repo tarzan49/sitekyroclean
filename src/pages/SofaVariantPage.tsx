@@ -1,3 +1,4 @@
+import DirectoryGroup from "@/components/DirectoryGroup";
 import SofaLeadActions from "@/components/SofaLeadActions";
 import { AdsLandingHeader, AdsLandingFooter, isAdsVisit } from "@/components/AdsLandingNavigation";
 ﻿// Handles all keyword variant pages:
@@ -31,7 +32,6 @@ import { municipiosComFreguesias } from "@/data/freguesiaSeoData";
 import { GENERIC_PROCESS_STEPS, IMPERMEABILIZACAO_STEPS } from "@/constants/serviceProcesses";
 import { SITE_URL, WHATSAPP_BASE, PHONE_TEL, PHONE_DISPLAY, REVIEW_RATING, REVIEW_COUNT } from "@/constants/business";
 import { SERVICE_DURATION } from "@/constants/problemCardHelpers";
-import TrustRatingBadge from "@/components/TrustRatingBadge";
 import { buildVariantWaMessage } from "@/lib/whatsappMessages";
 import HeroBeforeAfterPool from "@/components/HeroBeforeAfterPool";
 import { categoryForServiceSlug } from "@/data/beforeAfterPool";
@@ -267,7 +267,7 @@ const SofaVariantPage = () => {
       ? { value: "Á Medida", label: `Orçamento, ${prep} ${data.locationName.split(',')[0].trim()}`, icon: Euro }
       : { value: data.priceFrom, label: `Desde, ${prep} ${data.locationName.split(',')[0].trim()}`, icon: Euro },
     { value: serviceDuration.value, label: serviceDuration.label, icon: Timer },
-    { value: "<10min", label: "Resposta ao pedido", icon: Clock },
+    { value: "<10min", label: "Resposta durante o horário de atendimento", icon: Clock },
   ];
 
   return (
@@ -323,9 +323,6 @@ const SofaVariantPage = () => {
                 </p>
                 {isSofaCleaning ? <SofaLeadActions city={data.locationName} price={data.priceFrom} href={`${WHATSAPP_BASE}?text=${encodeURIComponent(buildVariantWaMessage(false, SERVICE_LABEL[data.serviceKey], VARIANT_LABEL[data.variantKey], data.locationName))}`} source={`variant_hero_${parsed.variantKey}_${parsed.serviceKey}`} /> : <>
 
-                <div className="lg:mb-6">
-                  <TrustRatingBadge variant="mapsLinkClients" />
-                </div>
 
                 <div className="flex flex-col sm:flex-row gap-3 max-w-md">
                   <QuizButton
@@ -562,7 +559,7 @@ const SofaVariantPage = () => {
           variant="dark"
         /></div>
 
-        {isPaidLanding ? <section className="p-6 text-center bg-white"><h2 className="font-playfair text-xl mb-2">Serviço ao domicílio</h2><p>Atendimento em {data.locationName}. Envie a sua morada por WhatsApp para confirmar cobertura e deslocação.</p></section> : <>
+        <>
         {/* ═══ PACKS ═══ */}
         <ServicePackBanner
           packSlugs={SERVICE_PACK_SLUGS[data.serviceKey] ?? ["pack-sala-completa"]}
@@ -575,27 +572,20 @@ const SofaVariantPage = () => {
             <div className="mb-10 md:mb-14">
               <div className="flex items-center gap-3 mb-4">
                 <div className="h-px w-8 flex-shrink-0" style={{ backgroundColor: "#D4AF37", opacity: 0.65 }} />
-                <p className="text-[10px] font-bold tracking-[0.28em] uppercase" style={{ color: "#D4AF37", opacity: 0.85 }}>Cobertura</p>
+                <p className="text-[10px] font-bold tracking-[0.28em] uppercase" style={{ color: "#D4AF37", opacity: 0.85 }}>Explore por categoria</p>
               </div>
               <h2 className="font-playfair text-[1.85rem] sm:text-4xl md:text-[2.6rem] font-bold leading-[1.1] text-[#111111]">
-                {`Área de serviço ${prep}`}{" "}<em className="not-italic" style={{ color: "#D4AF37" }}>{data.locationName}</em>
+                {`Serviços e zonas de atendimento ${prep}`}{" "}<em className="not-italic" style={{ color: "#D4AF37" }}>{data.locationName}</em>
               </h2>
             </div>
-            <div className="grid md:grid-cols-2 gap-4">
+            <div className="max-w-4xl border-t border-[#D4AF37]/25">
 
               {/* Zonas / Freguesias da cidade */}
               {(() => {
                 const mun = municipiosComFreguesias.find(m => m.slug === parsed.locationPart);
                 if (!mun || !mun.freguesias.length) return null;
                 return (
-                  <div className="p-5 rounded-xl" style={{ background: "#FDFDF9", border: "1px solid rgba(17,17,17,0.08)" }}>
-                    <div className="flex items-center gap-3 mb-3">
-                      <div className="h-px w-8 flex-shrink-0" style={{ backgroundColor: "#D4AF37", opacity: 0.65 }} />
-                      <p className="text-[10px] font-bold tracking-[0.26em] uppercase" style={{ color: "#D4AF37", opacity: 0.85 }}>
-                        Zonas {prep} {data.locationName}
-                      </p>
-                    </div>
-                    <div className="flex flex-wrap gap-2">
+                  <DirectoryGroup title={<>Zonas {prep} {data.locationName}</>}>
                       {mun.freguesias.slice(0, 8).map(f => (
                         <Link
                           key={f.slug}
@@ -606,21 +596,13 @@ const SofaVariantPage = () => {
                           {f.name}
                         </Link>
                       ))}
-                    </div>
-                  </div>
+                    </DirectoryGroup>
                 );
               })()}
 
               {/* Outras cidades */}
-              <div className="p-5 rounded-xl" style={{ background: "#FDFDF9", border: "1px solid rgba(17,17,17,0.08)" }}>
-                <div className="flex items-center gap-3 mb-3">
-                  <div className="h-px w-8 flex-shrink-0" style={{ backgroundColor: "#D4AF37", opacity: 0.65 }} />
-                  <p className="text-[10px] font-bold tracking-[0.26em] uppercase" style={{ color: "#D4AF37", opacity: 0.85 }}>
-                    Também disponível em
-                  </p>
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  {cities.filter(c => c.slug !== parsed.locationPart).sort((a,b) => Number(b.area === cities.find(c => c.slug === parsed.locationPart)?.area) - Number(a.area === cities.find(c => c.slug === parsed.locationPart)?.area)).slice(0, 8).map(city => (
+              <DirectoryGroup title={<>Também disponível em</>}>
+                  {cities.filter(c => c.slug !== parsed.locationPart).slice(0, 8).map(city => (
                     <Link
                       key={city.slug}
                       to={`/${parsed.variantKey}-${parsed.serviceKey}-${city.slug}`}
@@ -629,18 +611,10 @@ const SofaVariantPage = () => {
                       {city.name}
                     </Link>
                   ))}
-                </div>
-              </div>
+                </DirectoryGroup>
 
               {/* Outros serviços na mesma cidade */}
-              <div className="p-5 rounded-xl" style={{ background: "#FDFDF9", border: "1px solid rgba(17,17,17,0.08)" }}>
-                <div className="flex items-center gap-3 mb-3">
-                  <div className="h-px w-8 flex-shrink-0" style={{ backgroundColor: "#D4AF37", opacity: 0.65 }} />
-                  <p className="text-[10px] font-bold tracking-[0.26em] uppercase" style={{ color: "#D4AF37", opacity: 0.85 }}>
-                    Outros serviços {prep} {data.locationName}
-                  </p>
-                </div>
-                <div className="flex flex-wrap gap-2">
+              <DirectoryGroup title={<>Outros serviços {prep} {data.locationName}</>}>
                   {(SERVICES.filter(s => s !== parsed.serviceKey) as ServiceKey[]).map(svcKey => (
                     <Link
                       key={svcKey}
@@ -657,14 +631,12 @@ const SofaVariantPage = () => {
                   >
                     Página principal
                   </Link>
-                </div>
-              </div>
+                </DirectoryGroup>
 
             </div>
           </div>
         </section>
-
-        </>}
+        </>
       </main>
       {isPaidLanding ? <AdsLandingFooter /> : <Footer />}
     </>

@@ -17,7 +17,7 @@ export interface SnapshotStat {
 /** Premium 4-stat strip shown right below the hero on Localidade/Freguesia/Variante
  * pages (avaliação Google, preço desde, duração do serviço, tempo de resposta —
  * conteúdo revisto 2026-09-09, ver nota em cada página que constrói o array).
- * Mobile-first 2×2 grid.
+ * Compact four-column strip on mobile and desktop.
  * Transparent by design: the caller wraps this together with the hero inside one
  * shared photo-background container so the image reads as one continuous shot,
  * not a re-cropped copy. */
@@ -26,25 +26,29 @@ const ServiceSnapshotStats = ({ stats }: { stats: SnapshotStat[] }) => {
     <section className="relative border-t border-white/10">
       <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
         <div
-          className="grid grid-cols-2 md:grid-cols-4"
+          className="grid grid-cols-4"
           style={{ gap: "1px", backgroundColor: "rgba(255,255,255,0.08)" }}
         >
           {stats.map((s, i) => (
             <div
               key={i}
-              className="py-7 md:py-9 px-3 text-center"
+              className="min-w-0 py-4 md:py-9 px-1 md:px-3 text-center"
               style={{ borderTop: "2px solid rgba(212,175,55,0.55)" }}
             >
-              <s.icon className="w-4 h-4 mx-auto mb-2.5" style={{ color: "#D4AF37" }} strokeWidth={1.75} />
-              <p className="font-playfair font-bold text-2xl md:text-3xl leading-none mb-1.5" style={{ color: "#D4AF37" }}>
+              <s.icon className="w-4 h-4 mx-auto mb-2 md:mb-2.5" style={{ color: "#D4AF37" }} strokeWidth={1.75} />
+              <p className="font-playfair font-bold text-[clamp(19px,5.8vw,24px)] sm:text-2xl md:text-3xl leading-none mb-1.5" style={{ color: "#D4AF37" }}>
                 {s.value}
               </p>
-              <p className="text-[9px] md:text-[10px] font-medium text-white/45 tracking-[0.22em] uppercase">
-                {s.label}
+              <p className="text-[11px] leading-snug md:text-[10px] font-medium text-white/75 md:text-white/60 md:tracking-[0.22em] md:uppercase">
+                <span className="md:hidden">{s.label.startsWith('Desde,') ? 'Desde' : s.label.startsWith('Orçamento,') ? 'Orçamento' : s.label.includes('avaliações Google') ? s.label.replace(' Google', '') : s.label === 'Resposta durante o horário de atendimento' ? 'Resposta*' : s.label.startsWith('Respondemos em menos') ? 'Resposta' : s.label}</span>
+                <span className="hidden md:inline">{s.label}</span>
               </p>
             </div>
           ))}
         </div>
+        {stats.some(s => s.label === 'Resposta durante o horário de atendimento') && (
+          <p className="md:hidden text-center text-[10px] leading-relaxed text-white/65 pb-3 pt-1">*Durante o horário de atendimento.</p>
+        )}
       </div>
     </section>
   );

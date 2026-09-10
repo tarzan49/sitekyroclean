@@ -342,7 +342,7 @@ const Contact = () => {
                 {/* Trust Badge */}
                 <div className="mt-6 p-4 rounded-[18px] bg-gradient-to-r from-gold/10 to-turquoise/10 border border-gold/20">
                   <p className="text-sm text-[#111111]/80 text-center font-medium">
-                    Resposta garantida em menos de 10 minutos.
+                    Resposta garantida em menos de 10 minutos durante o horário de funcionamento.
                   </p>
                 </div>
               </div>
