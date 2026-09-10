@@ -43,3 +43,5 @@ Ao selecionar Premium/Essencial no upsell de sofás, a área de opções desloca
 Clarificação do responsável: com um único sofá manter o ecrã sem deslocação automática. Só selecionar proteção para vários sofás aciona a descida para opções e quantidades.
 
 Upsell de higienização do sofá: três benefícios curtos, preço adicional calculado por calcPackPricing visível antes de selecionar, âmbito da quantidade e indicação antes de descontos; seleção com visto e CTA «Continuar com higienização». Exemplo `?exemplo=higienizacao`. Tipos e cinco testes de cuidados aprovados.
+
+Detalhes das cadeiras redesenhados: imagem, quantidade e preço do serviço num único cartão; título direto, controlos acessíveis e distinção explícita entre limpeza/proteção das cadeiras e total do pedido no topo. Valores e fluxo preservados; verificado com cinco cadeiras (95€ + 10€ deslocação) em 390×844. Exemplo `?exemplo=quantidade-cadeiras`.

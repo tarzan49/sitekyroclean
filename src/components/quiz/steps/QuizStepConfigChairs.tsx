@@ -1,4 +1,4 @@
-import QuizCareIntro from '../QuizCareIntro';
+import QuizFurnitureImage from '../QuizFurnitureImage';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
 import type { QuizFormData } from '@/components/quiz/QuizTypes';
@@ -27,14 +27,7 @@ const QuizStepConfigChairs = ({ formData, updateFormData }: Props) => {
   const qty = Math.max(1, parseInt(formData.chairQuantity) || 1);
   const primaryPrice = isWaterproofPrimary ? calcWaterproof(qty) : calcChairClean(qty);
   const addonEnabled = formData.chairWaterproofing;
-  const addonPrice = isWaterproofPrimary ? calcChairClean(qty) : calcWaterproof(qty);
-  // "Sob orçamento" tem de propagar-se ao total assim que QUALQUER preço
-  // ativo (primário ou addon ligado) não tem valor fixo — nunca cair para
-  // 0/ignorar o addon em silêncio (bug real: 10 cadeiras Premium dava 160€
-  // porque calcChairWaterproofPremium(10) é null e `?? 0` engolia-o,
-  // enquanto 9 cadeiras dava 347,5€ — um pedido maior a custar menos).
-  const sob = primaryPrice === null || (addonEnabled && addonPrice === null);
-  const totalChairPrice = sob ? 0 : (primaryPrice ?? 0) + (addonEnabled ? (addonPrice ?? 0) : 0);
+  const sob = primaryPrice === null;
 
   const setChairQty = (newQty: number) => {
     const clamped = Math.max(1, newQty);
@@ -51,9 +44,9 @@ const QuizStepConfigChairs = ({ formData, updateFormData }: Props) => {
     <div className="flex flex-col gap-3 overflow-hidden items-center w-full">
       <p className="text-gold text-[10px] font-bold tracking-[0.28em] uppercase mb-0.5 text-center w-full">{isWaterproofPrimary ? 'PROTEÇÃO' : 'O QUE PRECISA?'}</p>
       <h2 className="font-playfair text-2xl sm:text-3xl font-bold text-white text-center w-full">
-        {isWaterproofPrimary ? 'Escolha a sua impermeabilização' : 'Detalhes das Cadeiras'}
+        {isWaterproofPrimary ? 'Escolha a sua impermeabilização' : 'Quantas cadeiras vamos limpar?'}
       </h2>
-      <QuizCareIntro service="chairs">Indique quantas cadeiras pretende tratar. Os cuidados adicionais são escolhidos no passo seguinte.</QuizCareIntro>
+      <p className="text-xs text-white/65 text-center">{isWaterproofPrimary ? 'Escolha a proteção e indique a quantidade.' : 'Escolha a quantidade. Nós tratamos da limpeza.'}</p>
       {isWaterproofPrimary && (
         <WaterproofingTierPicker
           formData={formData}
@@ -63,51 +56,45 @@ const QuizStepConfigChairs = ({ formData, updateFormData }: Props) => {
         />
       )}
       {(!isWaterproofPrimary || tierChosen) && (
-        <>
-          <div className={cn(
-            'w-full max-w-xs rounded-sm border px-5 py-4 text-center transition-all duration-300',
-            sob ? 'bg-[#1a2a1a] border-white/20' : 'bg-[#1a2a1a] border-gold/30 shadow-[0_0_20px_rgba(212,175,55,0.10)]'
-          )}>
-            <p className="text-[10px] text-white/70 uppercase tracking-wider mb-1">Estimativa total</p>
-            <p
-              className={cn('font-playfair font-black leading-none mb-1', sob ? 'text-white/60 text-2xl' : 'text-gold text-4xl')}
-              style={!sob ? { textShadow: '0 0 28px rgba(212,175,55,0.55)' } : undefined}
-            >
-              {sob ? 'Sob Orçamento' : `${totalChairPrice % 1 === 0 ? totalChairPrice : totalChairPrice.toFixed(1).replace('.', ',')}€`}
-            </p>
-            <p className="text-[10px] text-white/65">
-              {sob
-                ? 'O nosso especialista entra em contacto'
-                : `${qty} cadeira${qty > 1 ? 's' : ''}${addonEnabled ? (isWaterproofPrimary ? ' + higienização' : ' + impermeabilização') : ''}`}
-            </p>
+        <div className="w-full max-w-sm rounded-sm border border-gold/35 bg-[#1a2a1a] px-4 py-4 shadow-[0_0_20px_rgba(212,175,55,0.08)]">
+          <div className="flex items-center gap-3 text-left mb-4">
+            <QuizFurnitureImage service="chairs" className="!w-20 !h-20" />
+            <div>
+              <p className="font-semibold text-white">Cadeiras estofadas</p>
+              <p className="text-xs text-white/65 mt-1">{isWaterproofPrimary ? `Impermeabilização ${isPremiumTier ? 'Premium' : 'Essencial'}` : 'Higienização profunda'}</p>
+            </div>
           </div>
-          <p className="text-xs text-white/40 uppercase tracking-wider text-center">Quantidade</p>
-          <div className="flex items-center justify-center gap-6">
-            <button
-              onClick={() => setChairQty(qty - 1)}
-              disabled={qty <= 1}
-              className="w-14 h-14 rounded-sm border-2 border-white/20 bg-white/[0.05] text-white font-bold text-2xl flex items-center justify-center disabled:opacity-25 active:scale-95 transition-all touch-manipulation hover:border-gold/50"
-            >−</button>
-            <span className="text-4xl font-black text-gold w-10 text-center tabular-nums leading-none">{qty}</span>
-            <button
-              onClick={() => setChairQty(qty + 1)}
-              className="w-14 h-14 rounded-sm border-2 border-white/20 bg-white/[0.05] text-white font-bold text-2xl flex items-center justify-center active:scale-95 transition-all touch-manipulation hover:border-gold/50"
-            >+</button>
+          <div className="flex items-center justify-between gap-4">
+            <button type="button" aria-label="Retirar uma cadeira" onClick={() => setChairQty(qty - 1)} disabled={qty <= 1}
+              className="w-14 h-14 rounded-sm border-2 border-white/20 bg-white/[0.05] text-white font-bold text-2xl flex items-center justify-center disabled:opacity-25 active:scale-95 transition-all touch-manipulation hover:border-gold/50">−</button>
+            <div className="text-center" aria-live="polite">
+              <span className="text-3xl font-black text-gold tabular-nums">{qty}</span>
+              <p className="text-xs text-white/70">{qty === 1 ? 'cadeira' : 'cadeiras'}</p>
+            </div>
+            <button type="button" aria-label="Adicionar uma cadeira" onClick={() => setChairQty(qty + 1)}
+              className="w-14 h-14 rounded-sm border-2 border-gold/50 bg-gold/[0.08] text-white font-bold text-2xl flex items-center justify-center active:scale-95 transition-all touch-manipulation hover:border-gold">+</button>
           </div>
-        </>
+          <div className="border-t border-gold/20 mt-4 pt-3 flex items-center justify-between gap-3 text-left">
+            <span className="text-xs text-white/75">{isWaterproofPrimary ? 'Proteção das cadeiras' : 'Limpeza das cadeiras'}</span>
+            <span className={cn('font-bold tabular-nums', sob ? 'text-sm text-white/80' : 'text-xl text-gold')}>
+              {sob ? 'Sob orçamento' : `${primaryPrice.toLocaleString('pt-PT')}€`}
+            </span>
+          </div>
+          <p className="text-[10px] text-white/60 mt-1 text-left">{sob ? 'Confirmamos o valor para o seu conjunto.' : 'Sem deslocação nem extras. O total está no topo.'}</p>
+        </div>
       )}
       {/* Upsell de Higienização (impermeabilização como serviço primário)
           passou para a página dedicada a seguir às quantidades — mesma
           lógica já aplicada ao sofá (pedido explícito 2026-09-08). */}
       {/* Aviso de tipo de cadeira: discreto de propósito, é uma exceção, não a
           regra — não deve competir visualmente com o preço/opções acima. */}
-      <p className="text-[10px] text-white/20 text-center leading-snug px-2">
+      <p className="text-[10px] text-white/60 text-center leading-relaxed px-2 max-w-sm">
         Preço para cadeiras com tampo, costas e braços. Cadeira diferente?{' '}
         <a
           href={`${WHATSAPP_BASE}?text=${chairWhatsappMsg}`}
           target="_blank"
           rel="noopener noreferrer"
-          className="text-[#25D366]/70 hover:text-[#25D366] underline underline-offset-2 touch-manipulation whitespace-nowrap"
+          className="text-[#72cba3] hover:text-[#25D366] underline underline-offset-2 touch-manipulation whitespace-nowrap"
         >
           Pedir no WhatsApp
         </a>

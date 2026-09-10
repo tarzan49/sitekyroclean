@@ -6,7 +6,7 @@ import IndexV1 from './IndexV1';
 export default function QuoteVisualPreview() {
   const [open, setOpen] = useState(true);
   const example = new URLSearchParams(window.location.search).get('exemplo');
-  const service = example === 'antiacaros' ? 'mattress' : example === 'cadeiras' ? 'chairs' : example === 'tapetes' ? 'carpet' : 'sofa';
+  const service = example === 'antiacaros' ? 'mattress' : (example === 'cadeiras' || example === 'quantidade-cadeiras') ? 'chairs' : example === 'tapetes' ? 'carpet' : 'sofa';
   const fromStart = !example || example === 'inicio';
   const original = example === 'pack';
   return <>
@@ -18,6 +18,6 @@ export default function QuoteVisualPreview() {
       initialMattressSizeId: service === 'mattress' ? 'casal' : undefined,
       initialMattressQty: 1,
       initialChairQty: service === 'chairs' ? '4' : undefined,
-      initialWaterproofingTier: 'premium' as const, skipToUpsell: service !== 'carpet' })} />
+      initialWaterproofingTier: 'premium' as const, skipToUpsell: service !== 'carpet' && example !== 'quantidade-cadeiras' })} />
   </>;
 }
