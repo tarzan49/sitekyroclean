@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import type { QuizFormData, SofaItem, MattressItem, CarpetItem } from '@/components/quiz';
 import { carpetAllItemsValid } from '@/components/quiz/quizHelpers';
-import { trackQuizEvent } from '@/lib/quizTracking';
 
 // As 4 telas de upsell dedicadas são sempre mutuamente exclusivas — ver
 // QuizForm.tsx para o histórico completo (eram 4 booleans independentes,
@@ -124,16 +123,6 @@ export function useQuizNavigation({
       if (formData.service === 'chairs' && formData.chairQuantity === '') {
         updateFormData({ chairQuantity: '1', chairType: 'bulk_full' });
       }
-      const loc = formData.location === 'other' ? formData.otherLocation : formData.location;
-      trackQuizEvent({
-        step: currentStep,
-        action: 'complete',
-        service: formData.service ?? undefined,
-        city: loc ?? undefined,
-        value: totalPrice > 0 ? totalPrice : undefined,
-        service_type: formData.serviceType ?? undefined,
-      });
-
       let nextStep = currentStep + 1;
       if (nextStep === 2 && shouldSkipServiceType) {
         updateFormData({ serviceType: 'cleaning' });

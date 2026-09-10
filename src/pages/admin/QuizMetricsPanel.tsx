@@ -1,4 +1,6 @@
-import { useState, useCallback, useEffect } from "react";
+import { TrackingHealth } from './TrackingHealth';
+import { classifyMetrics, fetchAllRows } from '@/lib/quizMetrics';
+import { useState, useCallback, useEffect, useRef } from "react";
 import {
   RefreshCw, Trash2, Activity, TrendingUp, Users, DollarSign, Target,
   Clock, CheckCircle, Globe, Zap, MessageCircle, Map, BarChart3,
@@ -46,6 +48,8 @@ function formatDetailTime(d: Date): string {
 }
 
 interface WeekMetrics {
+  legacy: boolean;
+  modernStarts: number;
   totalStarts: number;
   totalCompletes: number;
   completionRate: number;
@@ -440,27 +444,28 @@ const QuizMetricsPanel = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const requestId = useRef(0);
   const currentWeekStart = getWeekStart(new Date(), DASHBOARD_TZ);
   const isCurrentWeek = weekStart.getTime() >= currentWeekStart.getTime();
 
   const fetchWeek = useCallback(async (ws: Date) => {
+    const request = ++requestId.current;
     setLoading(true);
     setError(null);
     try {
       const weekDays = buildWeekDays(ws, DASHBOARD_TZ);
       const startISO = ws.toISOString();
-      const endISO = addDays(ws, 7).toISOString();
+      const endISO = getWeekStart(addDays(ws, 7), DASHBOARD_TZ).toISOString();
 
-      const [eventsRes, leadsRes] = await Promise.all([
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (supabase as any).from("quiz_events").select("*").gte("created_at", startISO).lt("created_at", endISO),
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (supabase as any).from("leads").select("id, created_at, service, location, source").gte("created_at", startISO).lt("created_at", endISO),
+      const [eventRows, leadRows] = await Promise.all([
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- admin tables are absent from generated schema
+        fetchAllRows<QuizEvent>((from, to) => (supabase as any).from("quiz_events").select("*", { count: 'exact' }).gte("created_at", startISO).lt("created_at", endISO).order('created_at').order('id').range(from, to)),
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- admin tables are absent from generated schema
+        fetchAllRows<{ id: string; created_at: string; service: string | null; location: string | null; source: string | null }>((from, to) => (supabase as any).from("leads").select("id, created_at, service, location, source", { count: 'exact' }).gte("created_at", startISO).lt("created_at", endISO).order('created_at').order('id').range(from, to)),
       ]);
-      if (eventsRes.error) throw eventsRes.error;
-      if (leadsRes.error) throw leadsRes.error;
-
-      const events: QuizEvent[] = eventsRes.data ?? [];
+      if (request !== requestId.current) return;
+      const summary = classifyMetrics(eventRows);
+      const { events, starts, completes, stepFunnel, avgSessionSeconds } = summary;
       // "leads" também guarda o histórico de reservas do WhatsApp importado
       // manualmente (source="WhatsApp", booking_id="WA-IMPORT-*", created_at
       // é a data agendada do serviço, não a data do pedido — por isso caem
@@ -468,7 +473,7 @@ const QuizMetricsPanel = () => {
       // é um "Pedido de orçamento" feito pelo quiz — descoberto 2026-09-08
       // depois de o dono notar 4 "pedidos" com o mesmo timestamp exato e um
       // "pedido" datado para hoje ainda antes de ser meio-dia.
-      const allLeadsRows: { id: string; created_at: string; service: string | null; location: string | null; source: string | null }[] = leadsRes.data ?? [];
+      const allLeadsRows: { id: string; created_at: string; service: string | null; location: string | null; source: string | null }[] = leadRows;
       const leadsRows = allLeadsRows.filter(r => r.source !== "WhatsApp");
 
       const countByDay = (rows: { created_at: string }[]): ChartPoint[] => {
@@ -483,8 +488,6 @@ const QuizMetricsPanel = () => {
       const buildLeadDetailRows = (rows: typeof leadsRows): DetailRow[] =>
         rows.map(r => ({ id: r.id, date: new Date(r.created_at), typeLabel: "Pedido de orçamento", origin: r.location ?? (r.service ?? "-") }));
 
-      const starts = events.filter(e => e.action === "start" && e.step === 0);
-      const completes = events.filter(e => e.action === "complete");
       const waEvents = events.filter(e => e.action === "whatsapp_click");
       const callEvents = events.filter(e => e.action === "call_click");
 
@@ -494,11 +497,11 @@ const QuizMetricsPanel = () => {
         : 0;
 
       const serviceCounts: Record<string, number> = {};
-      completes.forEach(e => { if (e.service) serviceCounts[e.service] = (serviceCounts[e.service] ?? 0) + 1; });
+      leadsRows.forEach(e => { if (e.service) serviceCounts[e.service] = (serviceCounts[e.service] ?? 0) + 1; });
       const topService = Object.entries(serviceCounts).sort((a, b) => b[1] - a[1])[0]?.[0] ?? "-";
 
       const cityCounts: Record<string, number> = {};
-      events.filter(e => e.action !== "abandon").forEach(e => { if (e.city) cityCounts[e.city] = (cityCounts[e.city] ?? 0) + 1; });
+      leadsRows.forEach(e => { if (e.location) cityCounts[e.location] = (cityCounts[e.location] ?? 0) + 1; });
       const sortedCities = Object.entries(cityCounts).sort((a, b) => b[1] - a[1]);
       const topCity = sortedCities[0]?.[0] ?? "-";
       const cityBreakdown = sortedCities.slice(0, 10).map(([city, count]) => ({ city, count }));
@@ -518,13 +521,6 @@ const QuizMetricsPanel = () => {
       });
       const sourceBreakdown = Object.entries(sourceCounts).sort((a, b) => b[1] - a[1]).map(([source, count]) => ({ source, count }));
 
-      const STEP_LABELS = ["Localização", "Serviço", "Tipo", "Quantidades", "Contacto"];
-      const stepFunnel = STEP_LABELS.map((label, step) => {
-        const count = events.filter(e => e.step === step && e.action !== "abandon").length;
-        const rate = starts.length > 0 ? (count / starts.length) * 100 : 0;
-        return { step, label, count, rate };
-      });
-
       const waSourceCounts: Record<string, number> = {};
       waEvents.forEach(e => { const s = groupClickOrigin(e.service ?? "desconhecido"); waSourceCounts[s] = (waSourceCounts[s] ?? 0) + 1; });
       const waClicksBySource = Object.entries(waSourceCounts).sort((a, b) => b[1] - a[1]).map(([source, count]) => ({ source, count }));
@@ -533,15 +529,12 @@ const QuizMetricsPanel = () => {
       callEvents.forEach(e => { const s = groupClickOrigin(e.service ?? "desconhecido"); callSourceCounts[s] = (callSourceCounts[s] ?? 0) + 1; });
       const callClicksBySource = Object.entries(callSourceCounts).sort((a, b) => b[1] - a[1]).map(([source, count]) => ({ source, count }));
 
-      const sessionEvents = events.filter(e => e.action === "session_time" && e.value != null);
-      const avgSessionSeconds = sessionEvents.length > 0
-        ? Math.round(sessionEvents.reduce((sum, e) => sum + (e.value ?? 0), 0) / sessionEvents.length)
-        : 0;
-
       setData({
+        legacy: summary.legacy,
+        modernStarts: summary.modernStarts,
         totalStarts: starts.length,
         totalCompletes: completes.length,
-        completionRate: starts.length > 0 ? (completes.length / starts.length) * 100 : 0,
+        completionRate: summary.completionRate,
         avgValue,
         topService,
         topCity,
@@ -564,15 +557,18 @@ const QuizMetricsPanel = () => {
         leadsDetailRows: buildLeadDetailRows(leadsRows),
       });
     } catch (e: unknown) {
+      if (request !== requestId.current) return;
       setError(e instanceof Error ? e.message : "Erro ao carregar métricas. Confirma que as tabelas quiz_events e leads existem no Supabase.");
       setData(null);
     } finally {
-      setLoading(false);
+      if (request === requestId.current) setLoading(false);
     }
   }, []);
 
   useEffect(() => {
     fetchWeek(weekStart);
+    const interval = setInterval(() => { if (document.visibilityState === 'visible') fetchWeek(weekStart); }, 60000);
+    return () => clearInterval(interval);
   }, [weekStart, fetchWeek]);
 
   // Re-snap via getWeekStart after the +/-7d jump (not just add ms) so a DST
@@ -605,6 +601,14 @@ const QuizMetricsPanel = () => {
 
   return (
     <div className="space-y-4">
+      <TrackingHealth />
+      <details className="rounded-lg border border-amber-300 bg-amber-50 p-4 text-sm text-amber-950">
+        <summary className="cursor-pointer font-semibold">Como interpretar as métricas e o histórico</summary>
+        <p>WhatsApp e telefone contam cliques nos links do site, não mensagens recebidas nem chamadas atendidas. Contactos diretos ficam fora desta medição.</p>
+        <p>Os pedidos recebidos são os registos do CRM. Uma submissão entregue apenas por email pode ainda não existir no CRM.</p>
+        {data?.legacy && <p className="mt-2 font-semibold">Esta semana inclui dados anteriores à correção: cliques em falta não são recuperáveis as antigas submissões não confirmavam a entrega e a duração antiga inclui tempo em segundo plano. O funil abaixo usa apenas as novas tentativas ({data.modernStarts}).</p>}
+        <p className="mt-2">A média de orçamento inclui apenas submissões com preço conhecido. As etapas pré-preenchidas podem ser saltadas. A taxa associa submissões a aberturas registadas na mesma semana. Bloqueadores, falta de rede e falhas no dispositivo podem impedir a recolha.</p>
+      </details>
       {/* Local keyframes for the "clicked day" badge pop-in. */}
       <style>{`
         @keyframes kyroPop {
@@ -692,13 +696,13 @@ const QuizMetricsPanel = () => {
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             {[
               { label: "Total iniciados", value: data.totalStarts, icon: Users, color: "text-navy" },
-              { label: "Concluídos", value: data.totalCompletes, icon: CheckCircle, color: "text-green-500" },
-              { label: "Taxa conclusão", value: `${data.completionRate.toFixed(1)}%`, icon: Target, color: "text-gold" },
+              { label: "Submissões registadas", value: data.totalCompletes, icon: CheckCircle, color: "text-green-500" },
+              { label: "Taxa de submissão", value: `${data.completionRate.toFixed(1)}%`, icon: Target, color: "text-gold" },
               { label: "Valor médio orçamento", value: `${data.avgValue.toFixed(0)}€`, icon: DollarSign, color: "text-emerald-600" },
               { label: "Pedidos recebidos", value: data.leadsCount, icon: Inbox, color: "text-gold" },
               { label: "Clicks WhatsApp", value: data.waClicks, icon: MessageCircle, color: "text-[#25D366]" },
               { label: "Cliques em ligar", value: data.callClicks, icon: Phone, color: "text-blue-500" },
-              { label: "Tempo médio no site", value: data.avgSessionSeconds >= 60 ? `${Math.floor(data.avgSessionSeconds / 60)}m ${data.avgSessionSeconds % 60}s` : `${data.avgSessionSeconds}s`, icon: Clock, color: "text-purple-500" },
+              { label: "Tempo por sessão registada", value: data.avgSessionSeconds >= 60 ? `${Math.floor(data.avgSessionSeconds / 60)}m ${data.avgSessionSeconds % 60}s` : `${data.avgSessionSeconds}s`, icon: Clock, color: "text-purple-500" },
             ].map((kpi, i) => (
               <div key={i} className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 text-center">
                 <kpi.icon className={`w-5 h-5 mx-auto mb-2 ${kpi.color}`} />
@@ -819,7 +823,7 @@ const QuizMetricsPanel = () => {
               {/* Step funnel */}
               <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
                 <h3 className="text-sm font-semibold text-navy mb-4 flex items-center gap-2">
-                  <BarChart3 className="w-4 h-4 text-gold" /> Funil por step (onde abandonam, esta semana)
+                  <BarChart3 className="w-4 h-4 text-gold" /> Etapas vistas (novas tentativas, esta semana)
                 </h3>
                 <div className="space-y-3">
                   {data.stepFunnel.map(step => (

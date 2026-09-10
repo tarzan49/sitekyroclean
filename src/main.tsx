@@ -5,6 +5,9 @@ import "./index.css";
 import { initErrorTracking } from "./lib/errorTracking";
 import { restoreConsent } from "./lib/consent";
 
+import { initContactTracking } from './lib/quizTracking';
+initContactTracking();
+
 // Start error tracking (all environments)
 initErrorTracking();
 

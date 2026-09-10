@@ -3,7 +3,6 @@
  * Comprehensive event tracking for quiz funnel, conversions, and Core Web Vitals
  */
 
-import { PHONE_TEL } from "@/constants/business";
 import { trackCallClickEvent } from "@/lib/quizTracking";
 
 // ============================================
@@ -31,15 +30,6 @@ export function trackEvent(
  * Track phone call button clicks - sends to GA4
  */
 export function trackCallClick(location: string) {
-  // Track in Google Analytics
-  trackEvent('call_click', {
-    event_category: 'engagement',
-    event_label: location,
-    phone_number: PHONE_TEL,
-  });
-
-  // Also track in Supabase quiz_events so it shows up in the admin panel
-  // alongside WhatsApp clicks — GA4 alone isn't visible there.
   trackCallClickEvent(location);
 }
 

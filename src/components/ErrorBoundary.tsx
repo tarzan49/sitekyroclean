@@ -1,4 +1,5 @@
-﻿import { Component, ReactNode } from 'react';
+﻿import { logError } from '@/lib/errorTracking';
+import { Component, ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { RefreshCw, Home, MessageCircle, AlertTriangle } from 'lucide-react';
 import { WHATSAPP_BASE } from '@/constants/business';
@@ -24,6 +25,7 @@ class ErrorBoundary extends Component<Props, State> {
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
     console.error('ErrorBoundary caught an error:', error, errorInfo);
+    void logError({ message: error.message, source: 'ErrorBoundary', severity: 'error' });
   }
 
   render() {

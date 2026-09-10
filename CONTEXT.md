@@ -1119,3 +1119,7 @@ O primeiro passo mostra “Orçamento sem compromisso” no rodapé. As restante
 
 ## FAQ uniformes (2026-09-10)
 Todas as FAQ públicas usam `ServiceFAQ`, com o fundo verde e apresentação da página Limpeza Sofás Lisboa. Inclui marcas, materiais, páginas inglesas, tratamentos, artigos e FAQ geral. Não criar acordões FAQ inline ou variantes claras. O componente aceita respostas React com `plainAnswer`, âncoras `id` e `includeSchema={false}` quando a página já fornece FAQPage, evitando schema duplicado. `description` permite traduzir a instrução nas páginas inglesas.
+
+## Métricas v2 (2026-09-10)
+
+A recolha, IDs de tentativa/visita, fila persistente, tratamento do histórico e fórmulas estão documentados em `METRICS.md`. `useQuizAnalytics` centraliza etapas vistas e conclusão após confirmação de entrega; nunca voltar a emitir `complete` no avanço das etapas. `initContactTracking` cobre links WhatsApp/telefone globalmente e evita duplicação com handlers legados. `quizMetrics.ts` centraliza cálculo e paginação. O painel inclui diagnóstico de recolha e distingue cliques de pedidos recebidos.

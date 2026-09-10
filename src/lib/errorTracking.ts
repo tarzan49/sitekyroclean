@@ -23,11 +23,12 @@ export async function logError(payload: {
   try {
     const { supabase } = await import("@/integrations/supabase/client");
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    await (supabase as any).from("error_logs").insert({
+    const { error } = await (supabase as any).from("error_logs").insert({
       ...payload,
       user_agent: navigator.userAgent,
       url: payload.url ?? window.location.href,
     });
+    if (error) console.error("[Error tracking] Could not save diagnostic", error.code);
   } catch {
     // Never throw from error handler
   }

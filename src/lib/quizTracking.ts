@@ -1,154 +1,69 @@
-// Run this in Supabase SQL editor to add the new columns:
-// ALTER TABLE quiz_events
-//   ADD COLUMN IF NOT EXISTS page_path text,
-//   ADD COLUMN IF NOT EXISTS referrer text,
-//   ADD COLUMN IF NOT EXISTS utm_source text,
-//   ADD COLUMN IF NOT EXISTS utm_medium text,
-//   ADD COLUMN IF NOT EXISTS utm_campaign text,
-//   ADD COLUMN IF NOT EXISTS device text;
-//
-// Also required (see supabase/migrations/20260820000000_widen_quiz_events_action_check.sql):
-// the original action CHECK constraint only allowed 'start'/'complete'/'abandon', which
-// silently rejected every 'whatsapp_click' and 'session_time' insert below.
+import { createEventDelivery, sendStoredEvent } from './eventDelivery';
 
-const SESSION_ID = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+export const IS_PRODUCTION = typeof window !== 'undefined' && window.location.hostname === 'cleansolutions.com.pt';
+export const isPublicTrackingPage = () => !/^\/admin(?:\/|$)/.test(window.location.pathname);
+let storage: Storage | undefined;
+try { storage = window.sessionStorage; } catch { /* private browsing */ }
+let outboxStorage: Storage | undefined;
+try { outboxStorage = window.localStorage; } catch { /* unavailable */ }
+let reported = false;
+const outbox = createEventDelivery(e => sendStoredEvent(import.meta.env.VITE_SUPABASE_URL, import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY, e), outboxStorage, message => {
+  if (reported) return;
+  reported = true;
+  void import('./errorTracking').then(({ logError }) => logError({ message, source: 'TrackingDelivery', severity: 'warning' }));
+});
+export const getTrackingDeliveryStatus = outbox.status;
 
-const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL as string;
-const SUPABASE_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY as string;
-
-// Exportado para o submissionService.ts também usar — o insert em "leads" e o
-// email via Formspree não tinham NENHUM guard, por isso um teste completo do
-// quiz em localhost (mesma base de dados Supabase da produção) criava um
-// lead a sério e mandava um email a sério para o dono (bug real, achado
-// 2026-09-08 depois de aparecerem leads de teste como "wd"/"wd" na produção).
-export const IS_PRODUCTION =
-  typeof window !== "undefined" &&
-  window.location.hostname === "cleansolutions.com.pt";
-
-function getUTMParam(name: string): string | null {
-  if (typeof window === "undefined") return null;
-  return new URLSearchParams(window.location.search).get(name);
-}
-
-function getDevice(): "mobile" | "tablet" | "desktop" {
-  if (typeof window === "undefined") return "desktop";
-  const w = window.innerWidth;
-  if (w < 768) return "mobile";
-  if (w < 1024) return "tablet";
-  return "desktop";
-}
-
-async function insertEvent(payload: Record<string, unknown>) {
-  try {
-    const { supabase } = await import("@/integrations/supabase/client");
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    await (supabase as any).from("quiz_events").insert(payload);
-  } catch {
-    // fire-and-forget
+let session: { id: string; last: number; referrer: string | null; utm_source: string | null; utm_medium: string | null; utm_campaign: string | null };
+function context() {
+  const now = Date.now();
+  if (!session) { try { session = JSON.parse(storage?.getItem('kyro_visit_v2') || 'null'); } catch { /* unavailable */ } }
+  if (!session || now - session.last > 30 * 60000) {
+    const params = new URLSearchParams(window.location.search);
+    session = { id: `v2:${crypto.randomUUID()}`, last: now, referrer: document.referrer ? new URL(document.referrer).origin : null,
+      utm_source: params.get('utm_source'), utm_medium: params.get('utm_medium'), utm_campaign: params.get('utm_campaign') };
   }
+  session.last = now;
+  try { storage?.setItem('kyro_visit_v2', JSON.stringify(session)); } catch { /* unavailable */ }
+  return { session_id: session.id, referrer: session.referrer, utm_source: session.utm_source, utm_medium: session.utm_medium,
+    utm_campaign: session.utm_campaign, page_path: window.location.pathname,
+    device: window.innerWidth < 768 ? 'mobile' : window.innerWidth < 1024 ? 'tablet' : 'desktop' };
 }
-
-// Used for events fired right as the page is closing/backgrounding (WhatsApp click that
-// hands off to the app, session-time on pagehide). A normal fetch started at that moment
-// is frequently aborted mid-flight by the browser before it reaches the server; keepalive
-// keeps the request alive past unload the way sendBeacon does, while still allowing the
-// custom headers Supabase's REST API requires.
-function insertEventKeepalive(payload: Record<string, unknown>) {
-  if (!SUPABASE_URL || !SUPABASE_KEY) return;
-  try {
-    fetch(`${SUPABASE_URL}/rest/v1/quiz_events`, {
-      method: "POST",
-      keepalive: true,
-      headers: {
-        "Content-Type": "application/json",
-        apikey: SUPABASE_KEY,
-        Authorization: `Bearer ${SUPABASE_KEY}`,
-        Prefer: "return=minimal",
-      },
-      body: JSON.stringify(payload),
-    }).catch(() => {});
-  } catch {
-    // fire-and-forget
-  }
+function emit(payload: Record<string, unknown>) {
+  if (!IS_PRODUCTION || /^\/admin(?:\/|$)/.test(String(payload.page_path ?? window.location.pathname))) return;
+  try { outbox.enqueue({ ...context(), ...payload }); } catch (error) { console.warn('[Tracking] Could not enqueue event', error); }
 }
-
-export async function trackQuizEvent(params: {
-  step: number;
-  action: "start" | "complete" | "abandon";
-  service?: string;
-  city?: string;
-  value?: number;
-  service_type?: string;
-}) {
-  if (!IS_PRODUCTION) return;
-  await insertEvent({
-    session_id: SESSION_ID,
-    step: params.step,
-    action: params.action,
-    service: params.service ?? null,
-    city: params.city ?? null,
-    value: params.value ?? null,
-    service_type: params.service_type ?? null,
-    page_path: window.location.pathname,
-    referrer: document.referrer || null,
-    utm_source: getUTMParam("utm_source"),
-    utm_medium: getUTMParam("utm_medium"),
-    utm_campaign: getUTMParam("utm_campaign"),
-    device: getDevice(),
-  });
+export function trackQuizEvent(params: { step: number; action: 'start' | 'complete' | 'abandon'; service?: string; city?: string; value?: number; service_type?: string; session_id?: string }) { emit(params); }
+let delegatedClick = false;
+function contact(action: 'whatsapp_click' | 'call_click', source: string) {
+  if (!IS_PRODUCTION || !isPublicTrackingPage()) return;
+  emit({ action, step: 0, service: source });
+  try { window.gtag?.('event', action, { event_category: 'engagement', event_label: source, page_path: window.location.pathname }); } catch { /* contact navigation must remain available */ }
 }
+export function trackWhatsAppClick(source: string) { if (!delegatedClick) contact('whatsapp_click', source); }
+export function trackCallClickEvent(source: string) { if (!delegatedClick) contact('call_click', source); }
+export function trackSessionTime(seconds: number, page_path = window.location.pathname) { if (seconds > 0) emit({ action: 'session_time', step: 0, value: seconds, page_path }); }
 
-// source: 'floating' | 'hero' | 'contact' | 'obrigado' | etc.
-export function trackWhatsAppClick(source: string) {
-  if (!IS_PRODUCTION) return;
-  // Microconversão: mede o clique, não a mensagem enviada nem um cliente.
-  window.gtag?.('event', 'whatsapp_click', {
-    event_category: 'engagement',
-    event_label: source,
-    page_path: window.location.pathname,
-  });
-  insertEventKeepalive({
-    session_id: SESSION_ID,
-    step: 0,
-    action: "whatsapp_click",
-    utm_source: getUTMParam("utm_source"),
-    utm_medium: getUTMParam("utm_medium"),
-    utm_campaign: getUTMParam("utm_campaign"),
-    service: source,
-    page_path: window.location.pathname,
-    device: getDevice(),
-  });
-}
-
-// location: same "where on the page" labels trackCallClick() in src/lib/analytics.ts
-// already passes (header_desktop, footer, final_cta, etc). Requires the
-// 'call_click' value added to quiz_events_action_check — see
-// supabase/migrations/20260826000000_widen_quiz_events_action_check_call_click.sql.
-// This counts taps on the "ligar" button, not answered calls — a website has no way
-// to know if a phone call was actually picked up.
-export function trackCallClickEvent(location: string) {
-  if (!IS_PRODUCTION) return;
-  insertEventKeepalive({
-    session_id: SESSION_ID,
-    step: 0,
-    action: "call_click",
-    service: location,
-    page_path: window.location.pathname,
-    device: getDevice(),
-  });
-}
-
-// Called once per session on page hide/unload with seconds spent on site
-export function trackSessionTime(seconds: number) {
-  if (!IS_PRODUCTION) return;
-  if (seconds < 2) return; // ignore instant bounces
-  insertEventKeepalive({
-    session_id: SESSION_ID,
-    step: 0,
-    action: "session_time",
-    value: seconds,
-    page_path: window.location.pathname,
-    device: getDevice(),
-    referrer: document.referrer || null,
-  });
+export function initContactTracking() {
+  if (!IS_PRODUCTION) return () => {};
+  context();
+  const click = (event: MouseEvent) => {
+    if (event.type === 'auxclick' && event.button !== 1) return;
+    const link = event.target instanceof Element ? event.target.closest('a[href]') : null;
+    if (!link || !isPublicTrackingPage()) return;
+    const url = new URL(link.getAttribute('href')!, window.location.href);
+    const action = url.protocol === 'tel:' ? 'call_click' : ['wa.me', 'api.whatsapp.com', 'web.whatsapp.com'].includes(url.hostname) || url.protocol === 'whatsapp:' ? 'whatsapp_click' : null;
+    if (!action) return;
+    const source = link.getAttribute('data-tracking-source') || (link.closest('header') ? 'header' : link.closest('footer') ? 'footer' : `page:${window.location.pathname}`);
+    contact(action, source);
+    delegatedClick = true;
+    queueMicrotask(() => { delegatedClick = false; });
+  };
+  document.addEventListener('click', click, true);
+  document.addEventListener('auxclick', click, true);
+  const flush = () => { void outbox.flush(); };
+  window.addEventListener('online', flush);
+  const interval = window.setInterval(flush, 30000);
+  flush();
+  return () => { document.removeEventListener('click', click, true); document.removeEventListener('auxclick', click, true); window.removeEventListener('online', flush); clearInterval(interval); };
 }

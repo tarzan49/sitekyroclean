@@ -1,6 +1,6 @@
 import { getTreatmentRoutes, getExpansionRoutes } from './data/treatmentSeoData';
 import { lazy, Suspense, useEffect } from "react";
-import { trackSessionTime } from "@/lib/quizTracking";
+import { trackSessionTime, isPublicTrackingPage } from "@/lib/quizTracking";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -210,13 +210,22 @@ const AppRoutes = () => {
 
 // ── Root app ──────────────────────────────────────────────────────────────────
 const SessionTracker = () => {
+  const { pathname } = useLocation();
   useEffect(() => {
-    const start = Date.now();
-    const send = () => trackSessionTime(Math.round((Date.now() - start) / 1000));
-    document.addEventListener("visibilitychange", () => { if (document.visibilityState === "hidden") send(); });
-    window.addEventListener("pagehide", send);
-    return () => { send(); };
-  }, []);
+    if (!isPublicTrackingPage()) return;
+    let last = document.visibilityState === 'visible' ? Date.now() : 0;
+    const send = () => {
+      const now = Date.now();
+      if (last) trackSessionTime((now - last) / 1000, pathname);
+      last = document.visibilityState === 'visible' ? now : 0;
+    };
+    const hide = () => { send(); last = 0; };
+    const timer = window.setInterval(send, 15000);
+    document.addEventListener('visibilitychange', send);
+    window.addEventListener('pagehide', hide);
+    return () => { hide(); clearInterval(timer); document.removeEventListener('visibilitychange', send); window.removeEventListener('pagehide', hide); };
+
+  }, [pathname]);
   return null;
 };
 

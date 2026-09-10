@@ -6,7 +6,6 @@ import { Button } from '@/components/ui/button';
 import { X, ChevronRight, ChevronLeft, AlertTriangle, MessageCircle, Phone, CheckCircle2, CalendarClock, Star } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
-import { trackQuizEvent } from '@/lib/quizTracking';
 import { useQuizAnalytics } from '@/hooks/use-quiz-analytics';
 import QuizEstimate from './quiz/QuizEstimate';
 import {
@@ -310,16 +309,8 @@ const QuizForm = ({
     location: formData.location === 'other' ? formData.otherLocation : formData.location,
     timing: formData.timing,
     contactMethod: formData.contactMethod,
-    totalValue: totalPrice,
+    totalValue: hasSobOrcamento || hasUpsellSobItem ? undefined : packDiscountActive ? packDiscountedPrice : totalPrice,
   });
-
-  // Track quiz start
-  useEffect(() => {
-    if (isOpen) {
-      trackQuizEvent({ step: 0, action: 'start' });
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isOpen]);
 
   // Re-apply the initial* props whenever the quiz transitions closed → open.
   // Needed because the component stays mounted between opens, so a single
@@ -437,14 +428,6 @@ Observações:
 ${formData.description || 'Sem observações adicionais'}
     `.trim();
 
-    trackQuizEvent({
-      step: 4,
-      action: 'complete',
-      service: formData.service ?? undefined,
-      city: finalLocation ?? undefined,
-      value: totalPrice > 0 ? totalPrice : undefined,
-      service_type: formData.serviceType ?? undefined,
-    });
 
     const { success } = await submit({
       name: formData.name,
@@ -569,15 +552,6 @@ ${formData.description || 'Sem observações adicionais'}
   };
 
   const confirmClose = () => {
-    if (currentStep > 0) {
-      trackQuizEvent({
-        step: currentStep,
-        action: 'abandon',
-        service: formData.service ?? undefined,
-        city: formData.location === 'other' ? formData.otherLocation ?? undefined : formData.location ?? undefined,
-        value: totalPrice > 0 ? totalPrice : undefined,
-      });
-    }
     onClose();
     try {
       resetForm();
