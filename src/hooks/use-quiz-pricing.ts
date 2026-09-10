@@ -191,7 +191,7 @@ export function useQuizPricing(
   const hasSubstantialArticle = minQualifyingArticle !== null || hasSubstantialUpsellArticle;
   const previewDiscount = import.meta.env.DEV && localPackPreview;
   const packDiscountActive = previewDiscount
-    ? calculateServicePrice > 0 && hasSubstantialUpsellArticle
+    ? false // Local fixed-price offer already includes its saving; never stack 10%.
     : (totalArticleValue > PACK_DISCOUNT_MIN_TOTAL && hasSubstantialArticle) || hasUpsellSobItem;
   const packDiscountPct = packDiscountActive ? 0.10 : 0;
   const serviceOnlyTotal = calculateServicePrice + upsellItemsTotal + 0;

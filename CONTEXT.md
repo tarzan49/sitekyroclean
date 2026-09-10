@@ -1069,3 +1069,6 @@ Apenas em desenvolvimento, `?teste=quiz-pack` mantém o fluxo real do `QuizForm`
 ## Guias e conselhos nas páginas de serviço (2026-09-10)
 
 `ServiceExpertTips` usa cartões horizontais compactos com fotografia do artigo, título completo e ligação no cartão inteiro. Em mobile, oculta os resumos; em desktop, mostra duas linhas e distribui quatro guias em 2x2 ou três numa fila. A ligação ao blog permite explorar os restantes guias. `src/constants/blogImages.ts` centraliza as imagens antes duplicadas em `Blog.tsx`/`BlogPost.tsx`, reutilizadas também nos cartões sem carregar o texto integral dos artigos nas páginas de serviço.
+
+
+Atualização do teste local (2026-09-10): `?teste=quiz-pack` agora demonstra colchão casal a +55€, sem acumular desconto de 10%. Compara com limpeza individual (69€ da tabela) + deslocação da localidade, explicitamente uma visita separada. Lisboa: 79€ separado vs +55€ na visita existente, poupança24€, sofá79€ + deslocação10€ + extra55€ =144€. Substitui a proposta anterior de143,20€ neste modo; produção inalterada.
