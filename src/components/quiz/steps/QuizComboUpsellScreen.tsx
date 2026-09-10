@@ -80,7 +80,9 @@ const QuizComboUpsellScreen = ({ offerPreview = false, travelFee = 10, primarySe
   // dono): quem queria impermeabilização já teve essa opção como serviço
   // principal lá atrás — oferecer proteção outra vez aqui, para um item
   // novo, só complicava um ecrã que é suposto ser rápido e leve.
-  const chairsCleanPrice = calcChairClean(chairsQty);
+  const chairsRegularPrice = calcChairClean(chairsQty);
+  const chairsFree = offerPreview ? Math.floor(chairsQty / 4) : 0;
+  const chairsCleanPrice = chairsRegularPrice === null ? null : chairsQty > 0 ? Math.round(chairsRegularPrice * (chairsQty - chairsFree) / chairsQty * 100) / 100 : 0;
 
   const mattressQtyTotal = Object.values(mattressQty).reduce((a, b) => a + b, 0);
   const sofaQtyTotal = Object.values(sofaQty).reduce((a, b) => a + b, 0);
@@ -147,7 +149,7 @@ const QuizComboUpsellScreen = ({ offerPreview = false, travelFee = 10, primarySe
         chairQty: String(chairsQty),
         qty: chairsQty,
         price: chairsCleanPrice ?? 0,
-        label: `${chairsQty} Cadeira${chairsQty > 1 ? 's' : ''}`,
+        label: `${chairsQty} Cadeira${chairsQty > 1 ? 's' : ''}${offerPreview ? ` (paga ${chairsQty - chairsFree})` : ''}`,
       });
     }
     if (carpetValidCount > 0) {
@@ -157,7 +159,7 @@ const QuizComboUpsellScreen = ({ offerPreview = false, travelFee = 10, primarySe
         carpetItems,
         qty: carpetValidCount,
         price: 0,
-        label: `${carpetValidCount} Tapete${carpetValidCount > 1 ? 's' : ''} (sob orçamento)`,
+        label: `${carpetValidCount} Tapete${carpetValidCount > 1 ? 's' : ''} (sob orçamento)${offerPreview ? ` · ${fmt(carpetTotalAreaValue)} m², paga ${fmt(carpetTotalAreaValue - Math.floor(carpetTotalAreaValue / 5))} m²` : ''}`,
       });
     }
     setUpsellItems(items);
@@ -202,6 +204,8 @@ const QuizComboUpsellScreen = ({ offerPreview = false, travelFee = 10, primarySe
         </h2>
 
         {view === 'carpet' && <QuizCarpetMeasureGuide />}
+        {offerPreview && view === 'mattress' && <p className="text-xs text-white/50 text-center">Casal: 55 € nesta visita. Poupa {casalSeparate - 55} € face a uma visita separada de {casalSeparate} €.</p>}
+        {offerPreview && view === 'carpet' && <p className="text-xs text-white/50 text-center">Por cada 5 m², paga 4. Preço por m² confirmado após avaliação.{carpetValidCount > 0 && ` Área: ${fmt(carpetTotalAreaValue)} m² · paga ${fmt(carpetTotalAreaValue - Math.floor(carpetTotalAreaValue / 5))} m².`}</p>}
         {view === 'mattress' && (
           // Scroll interno próprio (não a página toda) acima de ~3 linhas —
           // garante que o rodapé Voltar/Confirmar fica sempre à vista mesmo
@@ -257,13 +261,13 @@ const QuizComboUpsellScreen = ({ offerPreview = false, travelFee = 10, primarySe
             <p className="font-playfair text-2xl font-bold text-gold tabular-nums">
               {chairsCleanPrice !== null ? `${fmt(chairsCleanPrice)}€` : 'Sob orçamento'}
             </p>
-            <p className="text-xs text-white/30 text-center leading-snug">Mínimo de {CHAIRS_MIN_QTY} cadeiras</p>
+            <p className="text-xs text-white/40 text-center leading-snug">{offerPreview ? `${chairsQty} cadeiras · paga ${chairsQty - chairsFree}. Uma oferta por conjunto de 4.` : `Mínimo de ${CHAIRS_MIN_QTY} cadeiras`}</p>
           </>
         )}
         {view === 'carpet' && (
           <div className="flex flex-col gap-2 w-full max-w-xs">
             <p className="text-xs text-white/35 text-center leading-snug -mt-1 mb-1">
-              Sem preço fixo por m², cada tapete é sempre orçamentado à parte.
+              {offerPreview ? "A oferta fica incluída no pedido de avaliação." : "Sem preço fixo por m², cada tapete é sempre orçamentado à parte."}
             </p>
             {/* Scroll interno próprio a partir do 2º tapete — o rodapé
                 Voltar/Confirmar nunca deve ficar de fora (pedido explícito
@@ -359,7 +363,7 @@ const QuizComboUpsellScreen = ({ offerPreview = false, travelFee = 10, primarySe
         {offerPreview || packDiscountActive ? 'Quer limpar mais alguma coisa?' : 'Poupe 10% no pedido todo'}
       </h2>
       <p className="text-xs text-white/55 text-center max-w-xs leading-relaxed -mt-1">
-        {offerPreview ? <>Escolha o que quer acrescentar. Uma visita, uma só deslocação.</> : packDiscountActive ? (
+        {offerPreview ? <>Condições especiais na mesma visita.</> : packDiscountActive ? (
           <>
             Já tem 10% de desconto no pedido.<br />
             Adicione outro serviço com o mesmo desconto.
@@ -374,7 +378,7 @@ const QuizComboUpsellScreen = ({ offerPreview = false, travelFee = 10, primarySe
 
       {/* Até três sugestões: linhas compactas, sem cartão isolado à esquerda.
           Com quatro sugestões, preservar a grelha 2x2 para limitar a altura. */}
-      <div className={cn('grid gap-4 w-full max-w-sm mt-3', compactRows ? 'grid-cols-1' : 'grid-cols-2')}>
+      <div className={cn('grid gap-2 w-full max-w-sm mt-2', compactRows ? 'grid-cols-1' : 'grid-cols-2')}>
         {visibleRows.map(row => (
           <button
             key={row.view}
@@ -383,8 +387,8 @@ const QuizComboUpsellScreen = ({ offerPreview = false, travelFee = 10, primarySe
               'group relative flex items-center gap-3 rounded-sm border px-3 text-left transition-all duration-200 touch-manipulation active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold',
               compactRows ? 'min-h-[78px] py-1.5 pr-12' : 'min-h-[132px] flex-col justify-center py-2.5',
               row.selected
-                ? 'border-gold bg-[#1a2a1a] shadow-[0_0_14px_rgba(212,175,55,0.20)]'
-                : 'border-dashed border-gold/55 bg-gold/[0.025] hover:border-gold hover:bg-gold/[0.05]'
+                ? offerPreview ? 'border-gold/40 bg-white/[0.04]' : 'border-gold bg-[#1a2a1a] shadow-[0_0_14px_rgba(212,175,55,0.20)]'
+                : offerPreview ? 'border-white/10 bg-white/[0.025] hover:border-gold/30' : 'border-dashed border-gold/55 bg-gold/[0.025] hover:border-gold hover:bg-gold/[0.05]'
             )}
           >
             <span className={cn(
@@ -403,14 +407,8 @@ const QuizComboUpsellScreen = ({ offerPreview = false, travelFee = 10, primarySe
             />
             <span className={cn('min-w-0 flex flex-col gap-1', !compactRows && 'w-full')}>
               <span className="text-sm font-bold text-white">{row.label}</span>
-              {offerPreview && row.view === 'mattress' ? <>
-                <span className="text-gold font-bold text-sm">Casal por +55€</span>
-                <span className="text-[11px] text-white/55">{casalSeparate}€ numa visita separada</span>
-                <span className="text-[11px] text-gold">Poupa {casalSeparate - 55}€ face a outra visita</span>
-                {row.selected && <span className="text-[11px] text-white/65">{row.summary}</span>}
-              </> : <span className={cn('text-[11px] leading-relaxed', row.selected ? 'text-gold/80' : 'text-white/50')}>{row.summary}</span>}
-              {offerPreview && row.view === 'chairs' && <span className="text-[11px] text-white/55">Veja o valor ao escolher a quantidade</span>}
-              {offerPreview && row.view === 'carpet' && <span className="text-[11px] text-white/55">Preço a confirmar após avaliação</span>}
+              <span className="text-[12px] font-normal leading-relaxed text-gold/75">{offerPreview ? ({mattress: 'Casal · 55 €', chairs: '4 cadeiras pelo preço de 3', carpet: '5 m² pelo preço de 4', sofa: row.summary}[row.view]) : row.summary}</span>
+              {offerPreview && row.selected && <span className="text-[10px] text-white/45">{row.summary}</span>}
             </span>
           </button>
         ))}
