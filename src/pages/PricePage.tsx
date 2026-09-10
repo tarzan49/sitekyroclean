@@ -28,6 +28,7 @@ import { pickServiceHero } from "@/constants/serviceContent";
 import { buildServiceWaMessage } from "@/lib/whatsappMessages";
 import { SITE_URL, WHATSAPP_BASE, REVIEW_RATING, REVIEW_COUNT } from "@/constants/business";
 import { SERVICE_DURATION, PROBLEM_IMAGES } from "@/constants/problemCardHelpers";
+import impermeabilizacaoAfter from "@/assets/galeria-impermeabilizacao-depois.webp";
 import ServiceReviewsGrid from "@/components/ServiceReviewsGrid";
 import {
   buildWebPageNode,
@@ -100,11 +101,21 @@ const PricePage = () => {
     ? data.serviceName.replace("Limpeza de ", "").toLowerCase()
     : data.serviceName.toLowerCase();
   const problemImages = PROBLEM_IMAGES[data.serviceSlug] ?? [];
-  const problemCards = relatedProblems.map((problem, idx) => ({
-    title: problem.keyword.charAt(0).toUpperCase() + problem.keyword.slice(1),
-    description: problem.intro.match(/^[^.?]*[.?]/)?.[0] ?? problem.intro,
-    image: problemImages[idx],
-  })).filter(card => card.image);
+  // Impermeabilização não é um serviço de limpeza — os "problemas" do catálogo
+  // global (manchas, odores) são sobre limpar, não sobre o que a proteção em
+  // si vende. Cartões próprios, sobre o que a impermeabilização faz.
+  const problemCards = data.serviceSlug === 'impermeabilizacao'
+    ? [
+        { title: "Líquidos que penetram no tecido", description: "Sem proteção, um copo entornado absorve em segundos. A impermeabilização faz o líquido escorregar à superfície, com tempo para limpar antes de manchar.", image: problemImages[2] },
+        { title: "Manchas de gordura difíceis", description: "Gordura e molho penetram fundo em tecido desprotegido e resistem à limpeza caseira. Com a proteção aplicada, ficam à superfície e saem com mais facilidade.", image: problemImages[1] },
+        { title: "Tecido sem proteção nenhuma", description: "Sofás e cadeiras novos ou recém-limpos ficam vulneráveis ao primeiro acidente. A impermeabilização cria uma barreira que dura anos, não semanas.", image: problemImages[0] },
+        { title: "Um sofá que continua como novo", description: "Menos manchas absorvidas significa menos desgaste do tecido ao longo do tempo. A impermeabilização ajuda a manter o aspeto e a durabilidade do estofo.", image: impermeabilizacaoAfter },
+      ]
+    : relatedProblems.map((problem, idx) => ({
+        title: problem.keyword.charAt(0).toUpperCase() + problem.keyword.slice(1),
+        description: problem.intro.match(/^[^.?]*[.?]/)?.[0] ?? problem.intro,
+        image: problemImages[idx],
+      })).filter(card => card.image);
 
   const serviceDuration = SERVICE_DURATION[data.serviceSlug] ?? { value: "3 a 6h", label: "Pronto a usar" };
   // Resposta em menos de 10 minutos: compromisso comum a todo o site.
