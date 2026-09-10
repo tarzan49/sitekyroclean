@@ -7,7 +7,9 @@ interface QuizAnalyticsOptions {
 }
 /** v2: one attempt per opening, viewed steps, success only after delivery. */
 export function useQuizAnalytics(options: QuizAnalyticsOptions) {
-  const latest = useRef(options); latest.current = options;
+  const latest = useRef(options);
+  // Closing also resets the form; preserve the last open step and selections.
+  if (options.isOpen) latest.current = options;
   const attempt = useRef<{ id: string; seen: Set<number>; completed: boolean; closed: boolean } | null>(null);
   const payload = useCallback(() => ({ session_id: attempt.current?.id, service: latest.current.service,
     city: latest.current.location, service_type: latest.current.serviceType, value: latest.current.totalValue }), []);
