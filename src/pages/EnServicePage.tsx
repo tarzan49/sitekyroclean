@@ -222,7 +222,7 @@ const EnServicePage = () => {
         </section>
 
         {/* ═══ FAQ ═══ */}
-        <ServiceFAQ faqs={page.faqs} heading="Frequently Asked Questions" overline="FAQ" variant="light" />
+        <ServiceFAQ faqs={page.faqs} heading="Frequently Asked Questions" overline="FAQ" description="Prices, care and what to expect. Select a question to read the answer." variant="light" />
 
         {page.audience === "host" && (
           <section className="py-8 bg-[#FDFDF9] border-t border-[#111111]/8 text-center px-5">

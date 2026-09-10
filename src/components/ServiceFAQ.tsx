@@ -11,6 +11,7 @@ interface ServiceFAQProps {
   faqs: FAQItem[];
   heading?: string;
   overline?: string;
+  description?: string;
   variant?: "light" | "dark";
 }
 
@@ -18,6 +19,7 @@ const ServiceFAQ = ({
   faqs,
   heading = "Perguntas Frequentes",
   overline = "Dúvidas Frequentes",
+  description = "Preços, cuidados e o que esperar da visita. Toque numa pergunta para ver a resposta.",
   variant = "light",
 }: ServiceFAQProps) => {
   const [open, setOpen] = useState<number | null>(0);
@@ -45,7 +47,7 @@ const ServiceFAQ = ({
             {restHeading}{" "}
             <em className="not-italic" style={{ color: '#D4AF37' }}>{goldWord}</em>
           </h2>
-          <p className={`text-sm mt-4 leading-relaxed ${light ? 'text-[#536259]' : 'text-white/65'}`}>Preços, cuidados e o que esperar da visita. Toque numa pergunta para ver a resposta.</p>
+          <p className={`text-sm mt-4 leading-relaxed ${light ? 'text-[#536259]' : 'text-white/65'}`}>{description}</p>
         </div>
 
         {/* FAQ items */}
