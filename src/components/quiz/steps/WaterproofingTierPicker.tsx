@@ -10,7 +10,7 @@ import type { QuizFormData } from '@/components/quiz/QuizTypes';
 // Extraído de QuizStepConfig.tsx (2026-09-08, thinning do ficheiro monolítico
 // de 417 linhas) — usado por QuizStepConfigSofa, QuizStepConfigChairs, e
 // QuizSofaAddonUpsell.
-export function WaterproofingTierPicker({ formData, updateFormData, onSelect, activeTier, premiumDifference, prices, priceScope, compact = false }: { formData: Pick<QuizFormData, 'waterproofingTier'>; updateFormData: (u: Partial<QuizFormData>) => void; onSelect?: (t: 'premium' | 'essencial') => void; activeTier?: 'premium' | 'essencial' | null; premiumDifference?: number | null; prices?: { essencial: number | null; premium: number | null }; priceScope?: string; compact?: boolean }) {
+export function WaterproofingTierPicker({ formData, updateFormData, onSelect, activeTier, premiumDifference, prices, priceScope, compact = false, centered = false }: { formData: Pick<QuizFormData, 'waterproofingTier'>; updateFormData: (u: Partial<QuizFormData>) => void; onSelect?: (t: 'premium' | 'essencial') => void; activeTier?: 'premium' | 'essencial' | null; premiumDifference?: number | null; prices?: { essencial: number | null; premium: number | null }; priceScope?: string; compact?: boolean; centered?: boolean }) {
   // activeTier deixa o chamador decidir o que conta como "selecionado" na UI
   // — por omissão é a preferência de tier (formData.waterproofingTier), mas
   // um upsell onde ainda ninguém clicou em nada não pode mostrar um cartão já
@@ -24,7 +24,8 @@ export function WaterproofingTierPicker({ formData, updateFormData, onSelect, ac
         aria-pressed={tier === 'premium'}
         onClick={() => { updateFormData({ waterproofingTier: 'premium' }); onSelect?.('premium'); }}
         className={cn(
-          'relative rounded-sm border-2 px-3 py-2.5 text-left transition-all duration-200 touch-manipulation',
+          'relative rounded-sm border-2 px-3 py-2.5 transition-all duration-200 touch-manipulation',
+          centered ? 'text-center flex flex-col items-center' : 'text-left',
           tier === 'premium'
             ? 'border-gold bg-[#1a2a1a] shadow-[0_0_18px_rgba(212,175,55,0.30)]'
             : 'border-white/15 bg-[#1a2a1a] hover:border-gold/40'
@@ -32,9 +33,9 @@ export function WaterproofingTierPicker({ formData, updateFormData, onSelect, ac
       >
         {/* Selo "escolha superior": canto sólido em vez do pill em gradiente
             anterior, que lia como template genérico e pouco tinha de impacto. */}
-        <QuizTopBadge className="absolute -top-3 right-3 z-10" />
+        <QuizTopBadge className={cn("absolute -top-3 z-10", centered ? "left-1/2 -translate-x-1/2" : "right-3")} />
         {!compact && <ShieldCheck aria-hidden="true" className="w-7 h-7 text-gold mb-2" />}
-        <div className="flex items-center gap-1.5 mb-0.5">
+        <div className={cn("flex items-center gap-1.5 mb-0.5", centered && "justify-center")}>
           {tier === 'premium' && <Check className="w-3 h-3 text-gold flex-shrink-0" />}
           <p className={cn('text-xs font-bold', tier === 'premium' ? 'text-white' : 'text-white/85')}>Premium</p>
         </div>
@@ -47,10 +48,11 @@ export function WaterproofingTierPicker({ formData, updateFormData, onSelect, ac
         type="button"
         aria-pressed={tier === 'essencial'}
         onClick={() => { updateFormData({ waterproofingTier: 'essencial' }); onSelect?.('essencial'); }}
-        className={cn('relative rounded-sm border-2 px-3 py-2.5 text-left transition-all duration-200 touch-manipulation', tier === 'essencial' ? 'border-gold bg-[#1a2a1a] shadow-[0_0_10px_rgba(212,175,55,0.18)]' : 'border-gold/20 bg-[#1a2a1a] hover:border-gold/40')}
+        className={cn('relative rounded-sm border-2 px-3 py-2.5 transition-all duration-200 touch-manipulation',
+          centered ? 'text-center flex flex-col items-center' : 'text-left', tier === 'essencial' ? 'border-gold bg-[#1a2a1a] shadow-[0_0_10px_rgba(212,175,55,0.18)]' : 'border-gold/20 bg-[#1a2a1a] hover:border-gold/40')}
       >
         {!compact && <Droplets aria-hidden="true" className="w-7 h-7 text-gold/75 mb-2" />}
-        <div className="flex items-center gap-1.5 mb-0.5">
+        <div className={cn("flex items-center gap-1.5 mb-0.5", centered && "justify-center")}>
           {tier === 'essencial' && <Check className="w-3 h-3 text-gold flex-shrink-0" />}
           <p className={cn('text-xs font-bold', tier === 'essencial' ? 'text-white' : 'text-white/80')}>Essencial</p>
         </div>
