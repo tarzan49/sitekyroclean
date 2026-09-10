@@ -1057,3 +1057,5 @@ Proposta para avaliação, ainda não integrada em master: `QuizEstimate.tsx` ap
 ### Pré-visualização dos cuidados adicionais (2026-09-10)
 
 Na branch `codex/quote-visual-preview`, `QuizCareIntro` reutiliza `QuizFurnitureImage` para contextualizar os tratamentos; `QuizCarpetMeasureGuide` é partilhado pelos detalhes de tapetes principais e extras. A rota DEV `/__preview/orcamento` aceita `exemplo=antiacaros|impermeabilizacao|cadeiras|tapetes` para revisão dos ecrãs reais com dados iniciais. Não altera o motor de preços.
+
+A seleção parcial de cuidados em sofás/colchões usa `packQty?: number` com `packEnabled`. `QuizTreatmentQuantities` aparece apenas para várias unidades. `treatmentQty` limita ao número de artigos; `splitTreatmentItems` produz linhas com e sem tratamento para cálculo/resumo/recibo, mantendo compatibilidade com seleções antigas. Os preços comparativos no upsell usam `calcPackPricing` e respeitam `packPremiumDelta`.

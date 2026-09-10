@@ -201,8 +201,8 @@ export const locationPrices: Record<string, number> = {
   'Alcoutim': 25,
 };
 
-export interface SofaItem     { sizeId: string; qty: number; packEnabled: boolean; }
-export interface MattressItem { sizeId: string; qty: number; packEnabled: boolean; }
+export interface SofaItem     { sizeId: string; qty: number; packEnabled: boolean; packQty?: number; }
+export interface MattressItem { sizeId: string; qty: number; packEnabled: boolean; packQty?: number; }
 // Tapetes: sem preço fixo (sempre sob orçamento), por isso o simulador só
 // guarda as dimensões medidas, uma linha por tapete (2026-09-06).
 export interface CarpetItem   { id: string; largura: string; comprimento: string; }

@@ -1,5 +1,8 @@
+import { sofaPrices } from '../QuizTypes';
+import { calcPackPricing, treatmentQty } from '../quizHelpers';
+import QuizTreatmentQuantities from '../QuizTreatmentQuantities';
 import QuizCareIntro from '../QuizCareIntro';
-import { ChevronLeft, Droplets, Plus } from 'lucide-react';
+import { ChevronLeft, Droplets, Plus, Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { QuizFormData, SofaItem } from '@/components/quiz/QuizTypes';
 import { WaterproofingTierPicker } from '@/components/quiz/steps/QuizStepConfig';
@@ -19,25 +22,36 @@ const QuizSofaAddonUpsell = ({ formData, updateFormData, sofaItems, setSofaItems
   const isWaterproofBase = formData.serviceType === 'waterproofing';
   const activeItems = sofaItems.filter(i => i.qty > 0);
   const tier = formData.waterproofingTier;
-  const titleBase = isWaterproofBase ? 'Quer também Higienização Profunda?' : 'Quer também Impermeabilização?';
-  const subtitle = isWaterproofBase
-    ? 'Limpeza profunda antes da proteção, na mesma visita. Adicione apenas se precisar.'
-    : 'Ajuda a reduzir a absorção de líquidos pelo tecido e facilita os cuidados do dia a dia. Escolha a proteção que prefere.';
+  const titleBase = isWaterproofBase ? 'Quer também Higienização Profunda?' : 'Proteja o sofá do próximo derrame';
+
 
   // Impermeabilização (limpeza → adicionar proteção): clicar num tier já É o
   // "sim" — liga a proteção em todos os sofás mostrados nesse tier. Clicar no
   // tier já ativo desliga tudo de novo.
-  const anyPackOn = activeItems.some(i => i.packEnabled);
+  const anyPackOn = activeItems.some(i => treatmentQty(i) > 0);
   const selectTier = (t: 'premium' | 'essencial') => {
     const turningOff = anyPackOn && tier === t;
-    setSofaItems(prev => prev.map(i => i.qty > 0 ? { ...i, packEnabled: !turningOff } : i));
+    setSofaItems(prev => prev.map(i => i.qty > 0 ? { ...i, packEnabled: !turningOff && (!anyPackOn || treatmentQty(i) > 0), packQty: turningOff ? 0 : (anyPackOn ? treatmentQty(i) : i.qty) } : i));
   };
   // Higienização (impermeabilização → adicionar limpeza): sem tiers, por
   // isso é um único cartão mestre "estilo colchão/cadeiras" que liga/desliga
   // a limpeza em todos os sofás de uma vez (uniformizado 2026-09-08).
   const toggleAllHigienizacao = () => {
-    setSofaItems(prev => prev.map(i => i.qty > 0 ? { ...i, packEnabled: !anyPackOn } : i));
+    setSofaItems(prev => prev.map(i => i.qty > 0 ? { ...i, packEnabled: !anyPackOn, packQty: anyPackOn ? 0 : i.qty } : i));
   };
+
+  const comparisonItems = activeItems.map(i => ({ ...i, qty: anyPackOn ? treatmentQty(i) : i.qty }));
+  const protectionTotal = (selectedTier: 'premium' | 'essencial') => comparisonItems.reduce<number | null>((sum, item) => {
+    if (!item.qty) return sum;
+    const option = sofaPrices.find(p => p.id === item.sizeId);
+    if (!option || sum === null) return null;
+    const pack = calcPackPricing(option, true, false, 40, selectedTier);
+    return pack.isSob || pack.packDelta === null ? null : sum + pack.packDelta * item.qty;
+  }, 0);
+  const essencialTotal = protectionTotal('essencial');
+  const premiumTotal = protectionTotal('premium');
+  const premiumDifference = premiumTotal !== null && essencialTotal !== null ? premiumTotal - essencialTotal : null;
+  const protectionCount = comparisonItems.reduce((sum, i) => sum + i.qty, 0);
 
   return (
     <div className="flex flex-col gap-3 overflow-hidden items-center w-full">
@@ -45,9 +59,16 @@ const QuizSofaAddonUpsell = ({ formData, updateFormData, sofaItems, setSofaItems
       <h2 className="font-playfair text-2xl sm:text-3xl font-bold text-white text-center w-full leading-snug">
         {titleBase}
       </h2>
-      <QuizCareIntro service="sofa" sizeId={activeItems[0]?.sizeId}>{subtitle}</QuizCareIntro>
+      <QuizCareIntro service="sofa" sizeId={activeItems[0]?.sizeId}>
+        {isWaterproofBase ? 'Limpeza profunda antes da proteção, na mesma visita.' : <ul className="space-y-1.5">
+          {['Repele líquidos', 'Facilita a remoção de manchas', 'Ajuda a conservar o aspeto do sofá'].map(benefit => <li key={benefit} className="flex items-start gap-1.5"><Check aria-hidden="true" className="w-3.5 h-3.5 text-gold shrink-0 mt-0.5" /><span>{benefit}</span></li>)}
+        </ul>}
+      </QuizCareIntro>
       {!isWaterproofBase && (
         <WaterproofingTierPicker
+          premiumDifference={premiumDifference}
+          prices={{ essencial: essencialTotal, premium: premiumTotal }}
+          priceScope={protectionCount === 1 ? 'para 1 sofá' : `para ${protectionCount} sofás`}
           formData={formData}
           updateFormData={updateFormData}
           onSelect={selectTier}
@@ -76,6 +97,8 @@ const QuizSofaAddonUpsell = ({ formData, updateFormData, sofaItems, setSofaItems
           </span>
         </button>
       )}
+      {anyPackOn && <QuizTreatmentQuantities service="sofa" items={activeItems}
+        onChange={(sizeId, qty) => setSofaItems(prev => prev.map(i => i.sizeId === sizeId ? { ...i, packQty: qty, packEnabled: qty > 0 } : i))} />}
       <div className="flex items-center gap-3 w-full max-w-sm mt-1">
         <button
           onClick={onBack}

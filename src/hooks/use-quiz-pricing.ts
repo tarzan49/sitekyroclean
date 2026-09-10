@@ -1,3 +1,4 @@
+import { splitTreatmentItems } from '@/components/quiz/quizHelpers';
 import { useMemo } from 'react';
 import type { QuizFormData, SofaItem, MattressItem, CarpetItem, UpsellItemConfig } from '@/components/quiz';
 import { sofaPrices, mattressPrices, locationPrices } from '@/components/quiz';
@@ -25,7 +26,7 @@ export function useQuizPricing(
 
     switch (formData.service) {
       case 'sofa': {
-        sofaItems.forEach(item => {
+        splitTreatmentItems(sofaItems).forEach(item => {
           if (item.qty <= 0) return;
           const opt = sofaPrices.find(p => p.id === item.sizeId);
           if (!opt) return;
@@ -64,7 +65,7 @@ export function useQuizPricing(
       }
 
       case 'mattress': {
-        mattressItems.forEach(item => {
+        splitTreatmentItems(mattressItems).forEach(item => {
           if (item.qty <= 0) return;
           const opt = mattressPrices.find(p => p.id === item.sizeId);
           if (!opt) return;

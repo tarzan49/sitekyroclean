@@ -1,3 +1,4 @@
+import { splitTreatmentItems } from '@/components/quiz/quizHelpers';
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
@@ -396,7 +397,7 @@ const QuizForm = ({
       case 'sofa': {
         const isWaterproofBase = formData.serviceType === 'waterproofing';
         const isPremiumTier = formData.waterproofingTier === 'premium';
-        const sofaLines = sofaItems
+        const sofaLines = splitTreatmentItems(sofaItems)
           .filter(i => i.qty > 0)
           .map(i => {
             const opt = sofaPrices.find(p => p.id === i.sizeId);
@@ -408,7 +409,7 @@ const QuizForm = ({
               : (typeof opt.cleaningPrice === 'number' ? opt.cleaningPrice : null);
             // Pack Premium = pack Essencial + a mesma diferença já aprovada entre
             // Essencial e Premium standalone (ver quizHelpers.ts calcPackPricing).
-            const tierDelta = isPremiumTier && typeof opt.waterproofingPremiumPrice === 'number' && typeof opt.waterproofingPrice === 'number'
+            const tierDelta = isPremiumTier && typeof opt.packPremiumDelta === 'number' ? opt.packPremiumDelta : isPremiumTier && typeof opt.waterproofingPremiumPrice === 'number' && typeof opt.waterproofingPrice === 'number'
               ? opt.waterproofingPremiumPrice - opt.waterproofingPrice : 0;
             const bothEssencial = typeof opt.bothPrice === 'number' ? opt.bothPrice : (baseP !== null ? baseP + 40 : null);
             const bothP = bothEssencial !== null ? bothEssencial + tierDelta : null;
@@ -433,7 +434,7 @@ const QuizForm = ({
       }
       case 'mattress': {
         const isWaterproofBase = formData.serviceType === 'waterproofing';
-        const mattressLines = mattressItems
+        const mattressLines = splitTreatmentItems(mattressItems)
           .filter(i => i.qty > 0)
           .map(i => {
             const opt = mattressPrices.find(p => p.id === i.sizeId);

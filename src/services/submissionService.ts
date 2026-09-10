@@ -1,3 +1,4 @@
+import { splitTreatmentItems } from '@/components/quiz/quizHelpers';
 import { sofaPrices, mattressPrices } from '@/components/quiz/QuizTypes';
 import type { SofaItem, MattressItem, CarpetItem, UpsellItemConfig } from '@/components/quiz/QuizTypes';
 import { calcChairClean, calcChairWaterproof, calcChairWaterproofPremium, carpetItemArea } from '@/components/quiz/quizHelpers';
@@ -173,7 +174,7 @@ function buildReceiptLines(payload: QuizLeadPayload) {
     // o serviço principal — por isso não se restringe a isWaterproofBase como o `isPremium`
     // usado mais abaixo para cadeiras.
     const isPremiumTierSofa = waterproofingTier === 'premium';
-    sofaItems.filter(i => i.qty > 0).forEach(item => {
+    splitTreatmentItems(sofaItems).forEach(item => {
       const opt = sofaPrices.find(p => p.id === item.sizeId);
       if (!opt) return;
       const baseP = isWaterproofBase
@@ -183,7 +184,7 @@ function buildReceiptLines(payload: QuizLeadPayload) {
         : (typeof opt.cleaningPrice === 'number' ? (opt.cleaningPrice as number) : null);
       // Pack Premium = pack Essencial + a mesma diferença já aprovada entre Essencial
       // e Premium standalone (ver quizHelpers.ts calcPackPricing).
-      const tierDelta = isPremiumTierSofa && typeof opt.waterproofingPremiumPrice === 'number' && typeof opt.waterproofingPrice === 'number'
+      const tierDelta = isPremiumTierSofa && typeof opt.packPremiumDelta === 'number' ? opt.packPremiumDelta : isPremiumTierSofa && typeof opt.waterproofingPremiumPrice === 'number' && typeof opt.waterproofingPrice === 'number'
         ? (opt.waterproofingPremiumPrice as number) - (opt.waterproofingPrice as number) : 0;
       const bothEssencial = typeof opt.bothPrice === 'number' ? (opt.bothPrice as number) : null;
       const bothP = bothEssencial !== null ? bothEssencial + tierDelta : null;
@@ -194,7 +195,7 @@ function buildReceiptLines(payload: QuizLeadPayload) {
       receiptLines.push({ label: `Sofá ${opt.label}${tierTag}`, qty: item.qty, unitPrice: unit, total: unit !== null ? unit * item.qty : null });
     });
   } else if (service === 'mattress') {
-    mattressItems.filter(i => i.qty > 0).forEach(item => {
+    splitTreatmentItems(mattressItems).forEach(item => {
       const opt = mattressPrices.find(p => p.id === item.sizeId);
       if (!opt) return;
       const baseP = isWaterproofBase

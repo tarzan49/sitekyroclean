@@ -1,3 +1,4 @@
+import QuizTreatmentQuantities from '../QuizTreatmentQuantities';
 import QuizTopBadge from '../QuizTopBadge';
 import QuizCareIntro from '../QuizCareIntro';
 import { ChevronLeft, Bug, Plus, Check } from 'lucide-react';
@@ -32,7 +33,7 @@ const QuizMattressAddonUpsell = ({ mattressItems, setMattressItems, onContinue, 
       ? `+${addonPrices[0]}€/un.` : `+${Math.min(...addonPrices)}€ a +${Math.max(...addonPrices)}€/un.`;
 
   const toggleAll = () => {
-    setMattressItems(prev => prev.map(i => i.qty > 0 ? { ...i, packEnabled: !anyOn } : i));
+    setMattressItems(prev => prev.map(i => i.qty > 0 ? { ...i, packEnabled: !anyOn, packQty: anyOn ? 0 : i.qty } : i));
   };
 
   return (
@@ -66,6 +67,8 @@ const QuizMattressAddonUpsell = ({ mattressItems, setMattressItems, onContinue, 
         </span>
       </button>
 
+      {anyOn && <QuizTreatmentQuantities service="mattress" items={activeItems}
+        onChange={(sizeId, qty) => setMattressItems(prev => prev.map(i => i.sizeId === sizeId ? { ...i, packQty: qty, packEnabled: qty > 0 } : i))} />}
       <div className="flex items-center gap-3 w-full max-w-sm mt-1">
         <button
           onClick={onBack}

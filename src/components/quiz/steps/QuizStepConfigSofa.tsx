@@ -1,3 +1,4 @@
+import { treatmentQty } from '../quizHelpers';
 import QuizFurnitureImage from '../QuizFurnitureImage';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
@@ -47,7 +48,9 @@ const QuizStepConfigSofa = ({ formData, updateFormData, sofaItems, setSofaItems 
           {sofaPrices.map(option => {
             const item = sofaItems.find(i => i.sizeId === option.id);
             const qty = item?.qty ?? 0;
-            const packOn = item?.packEnabled ?? false;
+            const treatedQty = item ? treatmentQty(item) : 0;
+            const partialTreatment = treatedQty > 0 && treatedQty < qty;
+            const packOn = (item?.packEnabled ?? false) && !partialTreatment;
             const isActive = qty > 0;
             const packTier = formData.waterproofingTier;
             const { isSob, displayPrice: dp } = calcPackPricing(option, packOn, isWaterproofBase, 40, packTier);
@@ -66,7 +69,7 @@ const QuizStepConfigSofa = ({ formData, updateFormData, sofaItems, setSofaItems 
                 <div className="flex items-center gap-2 px-2.5 sm:px-3 py-3">
                   <QuizFurnitureImage service="sofa" sizeId={option.id} />
                   <div className="flex-1 min-w-0 text-left">
-                    <span className="text-sm font-semibold text-white">{option.label}</span>
+                    <span className="text-sm font-semibold text-white">{option.label}</span>{partialTreatment && <p className="text-[10px] text-gold">Tratamento em {treatedQty} de {qty}</p>}
                     <div className="flex flex-wrap items-center gap-x-1.5 gap-y-0.5 mt-0.5">
                       {isActive && packOn && <span className="text-[9px] bg-gold/15 text-gold/80 px-1.5 py-0.5 rounded-full font-bold leading-none">PACK</span>}
                       {isActive && packOn && typeof originalPackPrice === 'number' && (

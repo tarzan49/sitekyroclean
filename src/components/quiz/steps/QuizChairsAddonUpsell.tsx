@@ -134,18 +134,19 @@ const QuizChairsAddonUpsell = ({ formData, updateFormData, onContinue, onBack }:
         >
           <QuizTopBadge className="absolute -top-3 right-3 z-10" />
           <div className="flex items-center gap-1.5 mb-0.5">
-            {waterproofTier === 'premium' && <Check className="w-3 h-3 text-gold flex-shrink-0" />}
+            {waterproofTier === 'premium'  && <Check className="w-3 h-3 text-gold flex-shrink-0" />}
             <p className={cn('text-xs font-bold', waterproofTier === 'premium' ? 'text-white' : 'text-white/85')}>Premium</p>
           </div>
           <p className={cn('text-[10px] leading-snug font-semibold mb-1', waterproofTier === 'premium' ? 'text-gold/70' : 'text-gold/75')}>Até 10 anos · 5 lavagens</p>
           {premiumPrice !== null ? (
             <p className="text-[11px] leading-none">
               <span className="text-white/30 line-through">{fmt(premiumPrice + 5)}€</span>{' '}
-              <span className={cn('font-bold', waterproofTier === 'premium' ? 'text-gold' : 'text-gold/80')}>{fmt(premiumPrice)}€</span>
+              <span className={cn('font-bold', waterproofTier === 'premium' ? 'text-gold' : 'text-gold/80')}>+{fmt(premiumPrice)}€</span>
             </p>
           ) : (
             <p className="text-[11px] text-gold/60">Sob orçamento</p>
           )}
+          {premiumPrice !== null && essencialPrice !== null && premiumPrice > essencialPrice && <p className="text-[11px] font-semibold text-gold mt-2">Só mais {fmt(premiumPrice - essencialPrice)}€ que o Essencial</p>}
         </button>
         <button
           onClick={() => selectWaterproof('essencial')}
@@ -161,7 +162,7 @@ const QuizChairsAddonUpsell = ({ formData, updateFormData, onContinue, onBack }:
           </div>
           <p className="text-[10px] text-white/65 leading-snug mb-1">1 a 2 anos · 2 lavagens</p>
           <p className={cn('text-[11px] font-bold', waterproofTier === 'essencial' ? 'text-white' : 'text-white/70')}>
-            {essencialPrice !== null ? `${fmt(essencialPrice)}€` : 'Sob orçamento'}
+            {essencialPrice !== null ? `+${fmt(essencialPrice)}€` : 'Sob orçamento'}
           </p>
         </button>
       </div>

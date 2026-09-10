@@ -91,3 +91,19 @@ describe('useQuizPricing — chairs "sob orçamento" thresholds stay in sync acr
     expect(p.calculateServicePrice).toBeGreaterThan(0);
   });
 });
+
+
+describe('partial treatment quantities', () => {
+  it('charges Premium for only one of three sofas, including the pack delta override', () => {
+    const { result } = renderHook(() => useQuizPricing(
+      { ...initialFormData, service: 'sofa', serviceType: 'cleaning', waterproofingTier: 'premium' },
+      [{ sizeId: '3-lugares', qty: 3, packEnabled: true, packQty: 1 }], [], [], []));
+    expect(result.current.totalPrice).toBe(199 + 79 * 2);
+  });
+  it('charges treatment for only one of three mattresses', () => {
+    const { result } = renderHook(() => useQuizPricing(
+      { ...initialFormData, service: 'mattress', serviceType: 'cleaning' },
+      [], [{ sizeId: 'casal', qty: 3, packEnabled: true, packQty: 1 }], [], []));
+    expect(result.current.totalPrice).toBe(89 + 69 * 2);
+  });
+});

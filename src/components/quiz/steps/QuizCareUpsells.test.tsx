@@ -31,10 +31,10 @@ describe('care upsells', () => {
     expect(treatment.getAttribute('aria-pressed')).toBe('false');
   });
 
-  it('toggles sofa protection without expanding quantity rows', () => {
+  it('allows protecting only one of several sofas and preserves that choice across tiers', () => {
     function SofaHarness() {
       const [form, setForm] = useState({ ...initialFormData, serviceType: 'cleaning' });
-      const [items, setItems] = useState([{ sizeId: '3lugares', qty: 2, packEnabled: false }]);
+      const [items, setItems] = useState([{ sizeId: '3-lugares', qty: 2, packEnabled: false }]);
       return <><QuizSofaAddonUpsell formData={form} updateFormData={u => setForm(prev => ({ ...prev, ...u }))}
         sofaItems={items} setSofaItems={setItems} onBack={() => {}} onContinue={() => {}} />
         <output aria-label="Protected quantity">{items.filter(i => i.packEnabled).reduce((sum, i) => sum + i.qty, 0)}</output></>;
@@ -44,7 +44,15 @@ describe('care upsells', () => {
     fireEvent.click(premium);
     expect(premium.getAttribute('aria-pressed')).toBe('true');
     expect(screen.getByLabelText('Protected quantity').textContent).toBe('2');
-    expect(screen.getAllByRole('button')).toHaveLength(4);
+    expect(screen.getByText('2 de 2')).toBeTruthy();
+    fireEvent.click(screen.getByRole('button', { name: 'Retirar tratamento: 3 Lugares' }));
+    expect(screen.getByText('1 de 2')).toBeTruthy();
+    expect(screen.getByText('+90€')).toBeTruthy();
+    expect(screen.getByText('+120€')).toBeTruthy();
+    expect(screen.getByText('Só mais 30€ que o Essencial')).toBeTruthy();
+    fireEvent.click(screen.getByRole('button', { name: /^Essencial/ }));
+    expect(screen.getByText('1 de 2')).toBeTruthy();
+    fireEvent.click(premium);
     fireEvent.click(premium);
     expect(premium.getAttribute('aria-pressed')).toBe('false');
     expect(screen.getByLabelText('Protected quantity').textContent).toBe('0');
@@ -54,7 +62,7 @@ describe('care upsells', () => {
     const update = vi.fn();
     render(<QuizChairsAddonUpsell formData={{ ...initialFormData, serviceType: 'cleaning', chairQuantity: '4' }} updateFormData={update} onBack={() => {}} onContinue={() => {}} />);
     expect(screen.getByRole('button', { name: /Premium/ })).toBeTruthy();
-    expect(screen.getByRole('button', { name: /Essencial/ })).toBeTruthy();
+    expect(screen.getByRole('button', { name: /^Essencial/ })).toBeTruthy();
     const treatment = screen.getByRole('button', { name: /Desbacterização e Anti Ácaros/ });
     expect(treatment.textContent).toContain('+5€/un.');
     fireEvent.click(treatment);

@@ -10,7 +10,7 @@ import type { QuizFormData } from '@/components/quiz/QuizTypes';
 // Extraído de QuizStepConfig.tsx (2026-09-08, thinning do ficheiro monolítico
 // de 417 linhas) — usado por QuizStepConfigSofa, QuizStepConfigChairs, e
 // QuizSofaAddonUpsell.
-export function WaterproofingTierPicker({ formData, updateFormData, onSelect, activeTier }: { formData: Pick<QuizFormData, 'waterproofingTier'>; updateFormData: (u: Partial<QuizFormData>) => void; onSelect?: (t: 'premium' | 'essencial') => void; activeTier?: 'premium' | 'essencial' | null }) {
+export function WaterproofingTierPicker({ formData, updateFormData, onSelect, activeTier, premiumDifference, prices, priceScope }: { formData: Pick<QuizFormData, 'waterproofingTier'>; updateFormData: (u: Partial<QuizFormData>) => void; onSelect?: (t: 'premium' | 'essencial') => void; activeTier?: 'premium' | 'essencial' | null; premiumDifference?: number | null; prices?: { essencial: number | null; premium: number | null }; priceScope?: string }) {
   // activeTier deixa o chamador decidir o que conta como "selecionado" na UI
   // — por omissão é a preferência de tier (formData.waterproofingTier), mas
   // um upsell onde ainda ninguém clicou em nada não pode mostrar um cartão já
@@ -38,6 +38,9 @@ export function WaterproofingTierPicker({ formData, updateFormData, onSelect, ac
           {tier === 'premium' && <Check className="w-3 h-3 text-gold flex-shrink-0" />}
           <p className={cn('text-xs font-bold', tier === 'premium' ? 'text-white' : 'text-white/85')}>Premium</p>
         </div>
+        {prices && <p className="text-xl font-bold text-gold mt-2 mb-1">{prices.premium === null ? 'Sob orçamento' : `+${prices.premium.toLocaleString('pt-PT')}€`}</p>}
+        {prices && <p className="text-[10px] text-white/65 mb-2">{priceScope} · antes de descontos</p>}
+        {premiumDifference != null && premiumDifference > 0 && <p className="text-[11px] font-semibold text-gold mb-2 leading-snug">Só mais {premiumDifference.toLocaleString('pt-PT')}€ que o Essencial</p>}
         <p className={cn('text-[11px] leading-relaxed font-semibold', tier === 'premium' ? 'text-gold/70' : 'text-gold/80')}>Até 10 anos de proteção · até 5 lavagens</p>
       </button>
       <button
@@ -51,6 +54,8 @@ export function WaterproofingTierPicker({ formData, updateFormData, onSelect, ac
           {tier === 'essencial' && <Check className="w-3 h-3 text-gold flex-shrink-0" />}
           <p className={cn('text-xs font-bold', tier === 'essencial' ? 'text-white' : 'text-white/80')}>Essencial</p>
         </div>
+        {prices && <p className="text-xl font-bold text-white mt-2 mb-1">{prices.essencial === null ? 'Sob orçamento' : `+${prices.essencial.toLocaleString('pt-PT')}€`}</p>}
+        {prices && <p className="text-[10px] text-white/65 mb-2">{priceScope} · antes de descontos</p>}
         <p className="text-[10px] text-white/70 leading-snug">1 a 2 anos de proteção · até 2 lavagens</p>
       </button>
     </div>

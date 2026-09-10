@@ -33,3 +33,7 @@ Pedido de simplificação (2026-09-10): nos upsells de colchão e sofá, clicar 
 Selo TOP unificado em `QuizTopBadge`: coroa, placa dourada e texto mais legível; aplicado aos tratamentos, aos dois níveis de impermeabilização e às sugestões de serviços adicionais. Verificado em 390 × 844 e com os 12 testes de upsells aprovados.
 
 Revisão aprovada do selo TOP (2026-09-10): reservar apenas para impermeabilização Premium e desbacterização/antiácaros. Essencial, higienização adicional e categorias de artigos deixam de ter selo. Substitui o pedido anterior de selo em todos os extras. A pré-visualização sem parâmetros abre agora no início, sem seleções; `?exemplo=pack` conserva o exemplo preenchido.
+
+## Escolha parcial e comparação de proteção (2026-09-10)
+
+Nova decisão do responsável: um sofá/colchão mantém o clique simples; vários permitem escolher quantos recebem tratamento, com linhas compactas «1 de 3», sem repetir imagens/preços. `packQty` opcional representa essa quantidade; ausência preserva a seleção antiga de todas as unidades. `splitTreatmentItems` mantém preços, resumo e recibos coerentes. Esta decisão substitui a remoção absoluta dos seletores. A impermeabilização mostra os dois acréscimos (Essencial e Premium), a diferença real e o âmbito/valor antes de descontos. Benefícios em três pontos curtos junto da imagem. Exemplo local `?exemplo=varios`.
