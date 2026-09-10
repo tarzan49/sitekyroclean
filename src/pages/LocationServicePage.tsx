@@ -1,3 +1,4 @@
+import SofaProcessGuide from '@/components/SofaProcessGuide';
 import ProblemCarousel from '@/components/ProblemCarousel';
 import DirectoryGroup from "@/components/DirectoryGroup";
 import SofaLeadActions from "@/components/SofaLeadActions";
@@ -400,7 +401,7 @@ const LocationServicePage = () => {
         )}
 
         {/* ═══ COMO FUNCIONA ═══ */}
-        <section className="py-14 md:py-20 bg-[#FDFDF9]">
+        {isSofaCleaning ? <SofaProcessGuide /> : <section className="py-14 md:py-20 bg-[#FDFDF9]">
           <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
             <SectionHeader
               overline="Processo"
@@ -455,7 +456,7 @@ const LocationServicePage = () => {
               </div>
             </div>
           </div>
-        </section>
+        </section>}
 
         {/* ═══ PACKS ═══ */}
         <ServicePackBanner
