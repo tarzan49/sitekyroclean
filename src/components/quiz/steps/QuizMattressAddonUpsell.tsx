@@ -26,7 +26,7 @@ const QuizMattressAddonUpsell = ({ mattressItems, setMattressItems, onContinue, 
     const option = mattressPrices.find(p => p.id === item.sizeId);
     if (!option) return [];
     const pack = calcPackPricing(option, true, false, 30);
-    return pack.isSob ? [] : [pack.packDelta];
+    return pack.isSob || pack.packDelta === null ? [] : [pack.packDelta];
   });
   const addonPriceLabel = addonPrices.length === 0 ? 'Sob orçamento'
     : Math.min(...addonPrices) === Math.max(...addonPrices)

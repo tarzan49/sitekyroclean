@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { cleanup, fireEvent, render, screen } from '@testing-library/react';
-import { initialFormData, type MattressItem } from '../QuizTypes';
+import { initialFormData, type QuizFormData, type MattressItem } from '../QuizTypes';
 import QuizMattressAddonUpsell from './QuizMattressAddonUpsell';
 import QuizSofaAddonUpsell from './QuizSofaAddonUpsell';
 import QuizChairsAddonUpsell from './QuizChairsAddonUpsell';
@@ -33,7 +33,7 @@ describe('care upsells', () => {
 
   it('allows protecting only one of several sofas and preserves that choice across tiers', () => {
     function SofaHarness() {
-      const [form, setForm] = useState({ ...initialFormData, serviceType: 'cleaning' });
+      const [form, setForm] = useState<QuizFormData>({ ...initialFormData, serviceType: 'cleaning' });
       const [items, setItems] = useState([{ sizeId: '3-lugares', qty: 2, packEnabled: false }]);
       return <><QuizSofaAddonUpsell formData={form} updateFormData={u => setForm(prev => ({ ...prev, ...u }))}
         sofaItems={items} setSofaItems={setItems} onBack={() => {}} onContinue={() => {}} />
