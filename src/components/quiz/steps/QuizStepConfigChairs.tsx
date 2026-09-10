@@ -49,10 +49,19 @@ const QuizStepConfigChairs = ({ formData, updateFormData }: Props) => {
       <p className="text-xs text-white/65 text-center">{isWaterproofPrimary ? 'Escolha a proteção e indique a quantidade.' : 'Escolha a quantidade. Nós tratamos da limpeza.'}</p>
       {isWaterproofPrimary && (
         <WaterproofingTierPicker
+          compact
+          centered
           formData={formData}
           updateFormData={updateFormData}
           onSelect={() => setTierChosen(true)}
           activeTier={tierChosen ? formData.waterproofingTier : null}
+          prices={{ premium: calcChairWaterproofPremium(qty), essencial: calcChairWaterproof(qty) }}
+          priceScope={`para ${qty} ${qty === 1 ? 'cadeira' : 'cadeiras'}`}
+          premiumDifference={(() => {
+            const p = calcChairWaterproofPremium(qty);
+            const e = calcChairWaterproof(qty);
+            return p !== null && e !== null ? p - e : null;
+          })()}
         />
       )}
       {(!isWaterproofPrimary || tierChosen) && (
