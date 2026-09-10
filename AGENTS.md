@@ -1,3 +1,7 @@
+# Correções comerciais obrigatórias também neste teste
+
+Resposta em menos de 10 minutos em todas as páginas e no quiz. Não apresentar vagas reservadas, perda de vaga/desconto ou contadores sem reserva real. Estatística permitida: volume habitual de 50–60 pedidos por semana, sem simular atividade em direto. Estas regras prevalecem sobre notas históricas abaixo. As ofertas experimentais continuam apenas no teste local.
+
 # Kyro Clean Solutions — Instruções para Codex
 
 Este ficheiro carrega automaticamente no início de qualquer sessão do Codex aberta nesta pasta, em qualquer máquina. É a única forma real de manter as duas instâncias (PC Windows + MacBook do dono) alinhadas — não têm memória partilhada, só isto (e o `CONTEXT.md`) viaja entre elas via Git.

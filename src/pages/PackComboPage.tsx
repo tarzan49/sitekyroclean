@@ -324,7 +324,7 @@ const PackComboPage = () => {
 
                 <p className="text-center text-[10px] text-[#111111]/35">
                   A mensagem pré-preenchida inclui o pack, as opções selecionadas e o preço.
-                  O responsável confirma em menos de 30 min.
+                  O responsável confirma em menos de 10 min.
                 </p>
               </div>
 
@@ -352,7 +352,7 @@ const PackComboPage = () => {
                 <div className="hidden sm:block absolute top-5 left-0 right-0 h-px" style={{ background: "linear-gradient(to right, transparent, #D4AF37 12%, #D4AF37 88%, transparent)" }} aria-hidden="true" />
                 {[
                   { n: '1', icon: MessageCircle, title: 'Envie o pack', desc: 'Clique no botão WhatsApp, a mensagem já vem preenchida com os detalhes.' },
-                  { n: '2', icon: CheckCircle, title: 'Confirmamos', desc: 'Respondemos em menos de 30 min a confirmar data e horário.' },
+                  { n: '2', icon: CheckCircle, title: 'Confirmamos', desc: 'Respondemos em menos de 10 min a confirmar data e horário.' },
                   { n: '3', icon: Zap, title: 'Tratamos de tudo', desc: 'A equipa desloca-se e executa ambos os serviços na mesma visita.' },
                 ].map(step => (
                   <div key={step.n} className="relative flex flex-col items-center gap-2.5">

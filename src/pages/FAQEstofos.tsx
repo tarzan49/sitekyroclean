@@ -74,8 +74,8 @@ const allFaqs: FAQ[] = [
   {
     id: "como-pedir-orcamento-rapido",
     question: "Como faço um orçamento rápido?",
-    answer: <>O método mais rápido é o <strong>calculador online</strong>: responda a 4 perguntas (serviço, tamanho, localização, disponibilidade) e recebe o preço estimado em menos de 30 segundos, sem precisar de falar com ninguém e sem compromisso. Em alternativa: <strong>WhatsApp para {PHONE_DISPLAY}</strong> com uma foto do sofá, resposta em menos de 30 minutos durante o horário de serviço (8h às 24h, segunda a sábado). Para empresas ou volumes, contacte diretamente para orçamento personalizado com desconto de volume. <strong>Não existem custos escondidos</strong>: o preço do orçamento é o preço final pago. O técnico não adiciona extras no local sem aprovação prévia. O serviço de <Link to="/limpeza-sofas" className="text-gold hover:underline font-medium">limpeza de sofás</Link> inclui todo o produto necessário; a deslocação é cobrada à parte, consoante a localização.</>,
-    plainAnswer: `Calculador online em 30 segundos (4 perguntas). Ou WhatsApp para ${PHONE_DISPLAY} com foto, resposta em menos de 30 minutos (8h às 24h, seg. a sáb.). Preço final sem extras. Inclui produto; deslocação cobrada à parte consoante a localização.`,
+    answer: <>O método mais rápido é o <strong>calculador online</strong>: responda a 4 perguntas (serviço, tamanho, localização, disponibilidade) e recebe o preço estimado em menos de 30 segundos, sem precisar de falar com ninguém e sem compromisso. Em alternativa: <strong>WhatsApp para {PHONE_DISPLAY}</strong> com uma foto do sofá, resposta em menos de 10 minutos durante o horário de serviço (8h às 24h, segunda a sábado). Para empresas ou volumes, contacte diretamente para orçamento personalizado com desconto de volume. <strong>Não existem custos escondidos</strong>: o preço do orçamento é o preço final pago. O técnico não adiciona extras no local sem aprovação prévia. O serviço de <Link to="/limpeza-sofas" className="text-gold hover:underline font-medium">limpeza de sofás</Link> inclui todo o produto necessário; a deslocação é cobrada à parte, consoante a localização.</>,
+    plainAnswer: `Calculador online em 30 segundos (4 perguntas). Ou WhatsApp para ${PHONE_DISPLAY} com foto, resposta em menos de 10 minutos (8h às 24h, seg. a sáb.). Preço final sem extras. Inclui produto; deslocação cobrada à parte consoante a localização.`,
   },
   {
     id: "preco-colchao-solteiro",
@@ -98,8 +98,8 @@ const allFaqs: FAQ[] = [
   {
     id: "quanto-custa-limpar-alcatifa",
     question: "Fazem limpeza de alcatifas? Qual é o preço?",
-    answer: <>Sim. A <Link to="/limpeza-alcatifas" className="text-gold hover:underline font-medium">limpeza de alcatifas</Link> é feita no local por extração a vapor, sem necessidade de remover o revestimento. O preço é sempre orçamentado à medida da área e do estado da alcatifa, sem tabela fixa por m². Para saber o preço exato da sua alcatifa, envie uma foto e a metragem via <a href={WHATSAPP_BASE} target="_blank" rel="noopener noreferrer" className="text-gold hover:underline font-medium">WhatsApp ({PHONE_DISPLAY})</a> e respondemos em menos de 30 minutos. O serviço inclui pré-tratamento de manchas, extração a vapor e bactericida.</>,
-    plainAnswer: `Limpeza de alcatifas feita no local por extração a vapor. Orçamento sempre à medida da área total, sem preço fixo por m². Envie foto e metragem via WhatsApp ${PHONE_DISPLAY} para orçamento em menos de 30 minutos. Inclui pré-tratamento, extração e bactericida.`,
+    answer: <>Sim. A <Link to="/limpeza-alcatifas" className="text-gold hover:underline font-medium">limpeza de alcatifas</Link> é feita no local por extração a vapor, sem necessidade de remover o revestimento. O preço é sempre orçamentado à medida da área e do estado da alcatifa, sem tabela fixa por m². Para saber o preço exato da sua alcatifa, envie uma foto e a metragem via <a href={WHATSAPP_BASE} target="_blank" rel="noopener noreferrer" className="text-gold hover:underline font-medium">WhatsApp ({PHONE_DISPLAY})</a> e respondemos em menos de 10 minutos. O serviço inclui pré-tratamento de manchas, extração a vapor e bactericida.</>,
+    plainAnswer: `Limpeza de alcatifas feita no local por extração a vapor. Orçamento sempre à medida da área total, sem preço fixo por m². Envie foto e metragem via WhatsApp ${PHONE_DISPLAY} para orçamento em menos de 10 minutos. Inclui pré-tratamento, extração e bactericida.`,
   },
   {
     id: "quanto-custa-impermeabilizacao",
@@ -258,7 +258,7 @@ const FAQEstofos = () => {
                   Preço em 30 segundos
                 </p>
                 <p className="text-white/45 text-xs mb-4 leading-relaxed">
-                  Sem compromisso · Técnico contacta em menos de 30 min
+                  Sem compromisso · Técnico contacta em menos de 10 min
                 </p>
                 <QuizButton ctaLabel="Calcular preço" />
                 <div className="mt-3 flex flex-col gap-2">

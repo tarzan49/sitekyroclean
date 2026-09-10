@@ -674,7 +674,7 @@ const problemDefinitions: ProblemPage[] = [
       { question: "Quanto custa limpar um sofá de 3 lugares?", answer: "A limpeza profissional de um sofá de 3 lugares começa a partir de 79€. O preço final depende do tipo de tecido e estado de sujidade." },
       { question: "A deslocação tem custo adicional?", answer: "Sim, a partir de 10€, consoante a distância ao centro da área metropolitana do Porto ou das principais cidades onde operamos. O valor exato aparece no orçamento antes de confirmar." },
       { question: "Existem packs com desconto?", answer: "Sim. Oferecemos packs de limpeza + impermeabilização com desconto até 10%. Também temos desconto para limpeza de múltiplos itens na mesma visita." },
-      { question: "Como posso pedir orçamento?", answer: "Peça orçamento gratuito através do nosso formulário online, WhatsApp ou telefone. Respondemos em menos de 30 minutos." },
+      { question: "Como posso pedir orçamento?", answer: "Peça orçamento gratuito através do nosso formulário online, WhatsApp ou telefone. Respondemos em menos de 10 minutos." },
     ],
     relatedProblems: ["preco-limpeza-colchao", "preco-limpeza-tapete", "limpeza-profunda-sofa"],
     relatedServices: ["limpeza-sofas", "impermeabilizacao"],
@@ -816,7 +816,7 @@ const problemDefinitions: ProblemPage[] = [
       "Orientação imediata por telefone",
     ],
     faqs: [
-      { question: "Quanto tempo demora a resposta para limpeza urgente?", answer: "Respondemos ao primeiro contacto em menos de 30 minutos durante horário de funcionamento. O agendamento depende da disponibilidade mas priorizamos casos urgentes." },
+      { question: "Quanto tempo demora a resposta para limpeza urgente?", answer: "Respondemos ao primeiro contacto em menos de 10 minutos durante horário de funcionamento. O agendamento depende da disponibilidade mas priorizamos casos urgentes." },
       { question: "O que devo fazer enquanto espero pela equipa?", answer: "Absorva o excesso do derrame com papel absorvente. Não esfregue, não use água quente e não aplique produtos caseiros. Isso pode fixar a mancha." },
     ],
     relatedProblems: ["manchas-vinho-sofa", "manchas-cafe-sofa", "manchas-sofa"],
@@ -1207,7 +1207,7 @@ const problemDefinitions: ProblemPage[] = [
     intro: "Procura limpeza de sofá perto de si? A Kyro Clean Solutions cobre Porto, Lisboa e todo o Norte de Portugal com serviço ao domicílio. A nossa equipa desloca-se até à sua casa com todo o equipamento.",
     problemDetail: "Quando pesquisa 'limpeza de sofá perto de mim', quer um serviço local, fiável e com boas avaliações. A Kyro Clean Solutions tem 4.9 no Google, +1100 clientes satisfeitos e cobertura em todo o Norte de Portugal e região de Lisboa.",
     solutionDetail: "Atuamos no Porto e em Matosinhos, Maia, Gaia, Gondomar, Valongo, Braga, Guimarães, Póvoa de Varzim, Vila do Conde, Lisboa, Cascais, Oeiras, Sintra, Almada e Setúbal. Deslocação a partir de 10€, consoante a distância.",
-    benefits: ["Cobertura Norte de Portugal + Lisboa", "4.9 Google", "+1100 clientes satisfeitos", "Deslocação a partir de 10€", "Desde 49€", "Resposta em menos de 30 minutos"],
+    benefits: ["Cobertura Norte de Portugal + Lisboa", "4.9 Google", "+1100 clientes satisfeitos", "Deslocação a partir de 10€", "Desde 49€", "Resposta em menos de 10 minutos"],
     faqs: [
       { question: "Em que cidades fazem limpeza de sofá?", answer: "Servimos Porto e toda a área metropolitana, Braga, Guimarães, e região de Lisboa (Cascais, Oeiras, Sintra, Almada, Setúbal). Contacte-nos para confirmar disponibilidade na sua zona." },
     ],

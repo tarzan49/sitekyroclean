@@ -261,14 +261,14 @@ const SofaVariantPage = () => {
   // — a duração real é a da impermeabilização nesse caso, não a da limpeza.
   const durationSlug = parsed?.variantKey === 'impermeabilizacao' ? 'impermeabilizacao' : SERVICEKEY_TO_SLUG[data.serviceKey];
   const serviceDuration = SERVICE_DURATION[durationSlug] ?? { value: "4-6h", label: "Pronto a usar" };
-  // Resposta alinhada com o orçamento: menos de 30 minutos no horário de atendimento.
+  // Resposta alinhada com o orçamento: menos de 10 minutos no horário de atendimento.
   const snapshotStats = [
     { value: `${REVIEW_RATING}★`, label: `+${REVIEW_COUNT} avaliações Google`, icon: GoogleG },
     (data.serviceKey === 'tapetes' || data.serviceKey === 'alcatifas')
       ? { value: "Á Medida", label: `Orçamento, ${prep} ${data.locationName.split(',')[0].trim()}`, icon: Euro }
       : { value: data.priceFrom, label: `Desde, ${prep} ${data.locationName.split(',')[0].trim()}`, icon: Euro },
     { value: serviceDuration.value, label: serviceDuration.label, icon: Timer },
-    { value: "<30min", label: "Resposta durante o horário de atendimento", icon: Clock },
+    { value: "<10min", label: "Resposta durante o horário de atendimento", icon: Clock },
   ];
 
   return (
@@ -486,7 +486,7 @@ const SofaVariantPage = () => {
             {/* 3 stats */}
             <div className="grid grid-cols-3 gap-px mb-10" style={{ backgroundColor: "rgba(255,255,255,0.06)" }}>
               {[
-                { stat: "< 30 min", label: "Resposta ao orçamento" },
+                { stat: "< 10 min", label: "Resposta ao orçamento" },
                 { stat: `${REVIEW_RATING} ★`, label: `+${REVIEW_COUNT} avaliações Google` },
                 { stat: "Por foto", label: "Avaliação prévia das manchas" },
               ].map((item, i) => (

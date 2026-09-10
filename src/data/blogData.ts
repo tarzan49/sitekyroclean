@@ -1527,7 +1527,7 @@ const posts: BlogPost[] = [
     sections: [
       {
         heading: "Quanto custa limpar alcatifa em Portugal (2025)",
-        body: "A limpeza profissional de alcatifas na Kyro Clean é sempre orçamentada à medida, sem tabela fixa por m². O valor final depende de três fatores: a área total a tratar, o estado de sujidade (uma alcatifa nunca aspirada custa mais a tratar do que uma com manutenção regular) e o tipo de espaço (residencial ou comercial, com ou sem restrições de horário).\n\nPara ter uma ideia exata do valor antes de agendar, meça a área e peça orçamento gratuito: a resposta chega tipicamente em menos de 30 minutos.\n\nA deslocação custa a partir de 10€ na área do Porto e aumenta com a distância para outros concelhos.",
+        body: "A limpeza profissional de alcatifas na Kyro Clean é sempre orçamentada à medida, sem tabela fixa por m². O valor final depende de três fatores: a área total a tratar, o estado de sujidade (uma alcatifa nunca aspirada custa mais a tratar do que uma com manutenção regular) e o tipo de espaço (residencial ou comercial, com ou sem restrições de horário).\n\nPara ter uma ideia exata do valor antes de agendar, meça a área e peça orçamento gratuito: a resposta chega tipicamente em menos de 10 minutos.\n\nA deslocação custa a partir de 10€ na área do Porto e aumenta com a distância para outros concelhos.",
         tip: "Meça a área antes de pedir orçamento: comprimento × largura de cada divisão com alcatifa. Inclua zonas sob mobiliário que também são limpas.",
       },
       {

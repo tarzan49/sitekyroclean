@@ -155,14 +155,14 @@ const LocationServicePage = () => {
   const cityPrep = data.citySlug === 'porto' ? 'no' : 'em';
 
   const serviceDuration = SERVICE_DURATION[data.serviceSlug] ?? { value: "4-6h", label: "Pronto a usar" };
-  // Resposta alinhada com o orçamento: menos de 30 minutos no horário de atendimento.
+  // Resposta alinhada com o orçamento: menos de 10 minutos no horário de atendimento.
   const snapshotStats = [
     { value: `${REVIEW_RATING}★`, label: `+${REVIEW_COUNT} avaliações Google`, icon: GoogleG },
     (data.serviceSlug === 'limpeza-tapetes' || data.serviceSlug === 'limpeza-alcatifas')
       ? { value: "Á Medida", label: `Orçamento, ${cityPrep} ${data.city}`, icon: Euro }
       : { value: data.priceFrom, label: `Desde, ${cityPrep} ${data.city}`, icon: Euro },
     { value: serviceDuration.value, label: serviceDuration.label, icon: Timer },
-    { value: "<30min", label: "Resposta durante o horário de atendimento", icon: Clock },
+    { value: "<10min", label: "Resposta durante o horário de atendimento", icon: Clock },
   ];
 
   const processSteps = data.serviceSlug === 'impermeabilizacao' ? IMPERMEABILIZACAO_STEPS : GENERIC_PROCESS_STEPS;

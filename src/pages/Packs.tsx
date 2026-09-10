@@ -21,7 +21,7 @@ const snapshotStats = [
   { icon: Layers, value: String(packs.length), label: "Packs disponíveis" },
   { icon: Percent, value: "10%", label: "Poupança garantida" },
   { icon: Map, value: String(packCities.length), label: "Cidades cobertas" },
-  { icon: Clock, value: "30min", label: "Confirmação WhatsApp" },
+  { icon: Clock, value: "10min", label: "Confirmação WhatsApp" },
 ];
 
 const Packs = () => {
