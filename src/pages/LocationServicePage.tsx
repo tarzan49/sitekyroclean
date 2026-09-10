@@ -401,7 +401,7 @@ const LocationServicePage = () => {
         )}
 
         {/* ═══ COMO FUNCIONA ═══ */}
-        {isSofaCleaning ? <SofaProcessGuide /> : <section className="py-14 md:py-20 bg-[#FDFDF9]">
+        {isSofaCleaning ? <SofaProcessGuide city={data.city} cityPrep={cityPrep} /> : <section className="py-14 md:py-20 bg-[#FDFDF9]">
           <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
             <SectionHeader
               overline="Processo"

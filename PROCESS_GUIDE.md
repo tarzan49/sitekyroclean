@@ -7,3 +7,7 @@ Brief da geração: poster vertical premium 1024×1536 em português europeu par
 SofaProcessGuide substitui apenas o processo das páginas de limpeza de sofás por localidade. O guia tem descrição acessível, ficheiro descarregável e opção de ampliar. As restantes especialidades conservam a sua sequência própria.
 
 Validação: lint e diff sem erros; guia renderizado em iframe de 390 px; cinco etapas e ações visíveis. Não houve mudança de preços nem do fluxo de orçamento.
+
+## Revisão interativa
+
+O pedido seguinte substituiu o poster na página por uma secção nativa com SectionHeader, cinco tabs e navegação anterior/seguinte. As imagens usam as áreas fotográficas do asset, enquadradas em CSS; os títulos e explicações são HTML. O guia completo permanece apenas como download secundário. Verificado em mobile: seleção direta, próxima etapa, reinício e setas de teclado.
