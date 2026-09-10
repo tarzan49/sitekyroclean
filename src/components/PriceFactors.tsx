@@ -45,17 +45,17 @@ export default function PriceFactors({ serviceSlug }: { serviceSlug: string }) {
         <p className="-mt-5 mb-8 max-w-2xl text-base leading-relaxed text-[#46564e] md:-mt-7">Para chegar ao valor final, olhamos para estes detalhes. Assim, sabe o que estamos a avaliar.</p>
         <div className="grid gap-4 lg:grid-cols-3 lg:gap-6">
           {items.map(({ icon: Icon, title, description, examples }, index) => (
-            <article key={title} className={`rounded-2xl border p-6 sm:p-7 ${index === 0 ? "border-[#0d241b] bg-[#0d241b] text-white" : "border-[#dce2da] bg-white text-[#0d241b]"}`}>
+            <article key={title} className={`rounded-2xl border p-6 sm:p-7 ${index === 1 ? "border-[#0d241b] bg-[#0d241b] text-white" : "border-[#dce2da] bg-white text-[#0d241b]"}`}>
               <div className="mb-6 flex items-center justify-between">
-                <div className={`flex h-16 w-16 items-center justify-center rounded-2xl ${index === 0 ? "bg-white/10 text-[#D4AF37]" : "bg-[#f2f4ed] text-[#183e2e]"}`}>
+                <div className={`flex h-16 w-16 items-center justify-center rounded-2xl ${index === 1 ? "bg-white/10 text-[#D4AF37]" : "bg-[#f2f4ed] text-[#183e2e]"}`}>
                   <Icon aria-hidden="true" className="h-9 w-9" strokeWidth={1.4} />
                 </div>
-                <span aria-hidden="true" className={`text-xs font-semibold tracking-[0.15em] ${index === 0 ? "text-[#D4AF37]" : "text-[#637367]"}`}>0{index + 1}</span>
+                <span aria-hidden="true" className={`text-xs font-semibold tracking-[0.15em] ${index === 1 ? "text-[#D4AF37]" : "text-[#637367]"}`}>0{index + 1}</span>
               </div>
               <h3 className="font-playfair text-2xl leading-tight">{title}</h3>
-              <p className={`mt-3 text-base leading-relaxed ${index === 0 ? "text-[#d6e1da]" : "text-[#46564e]"}`}>{description}</p>
-              <ul className={`mt-6 space-y-3 border-t pt-5 ${index === 0 ? "border-white/20" : "border-[#e5e9e2]"}`}>
-                {examples.map(example => <li key={example} className="flex items-start gap-2.5 text-sm leading-relaxed"><Check aria-hidden="true" className={`mt-0.5 h-4 w-4 shrink-0 ${index === 0 ? "text-[#D4AF37]" : "text-[#326448]"}`} />{example}</li>)}
+              <p className={`mt-3 text-base leading-relaxed ${index === 1 ? "text-[#d6e1da]" : "text-[#46564e]"}`}>{description}</p>
+              <ul className={`mt-6 space-y-3 border-t pt-5 ${index === 1 ? "border-white/20" : "border-[#e5e9e2]"}`}>
+                {examples.map(example => <li key={example} className="flex items-start gap-2.5 text-sm leading-relaxed"><Check aria-hidden="true" className={`mt-0.5 h-4 w-4 shrink-0 ${index === 1 ? "text-[#D4AF37]" : "text-[#326448]"}`} />{example}</li>)}
               </ul>
             </article>
           ))}
