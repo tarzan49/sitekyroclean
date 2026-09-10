@@ -114,9 +114,9 @@ const PricePage = () => {
           </div>
           <div className="absolute inset-0" style={{ background: "linear-gradient(to bottom, rgba(7,26,18,0.42) 0%, rgba(7,26,18,0.65) 40%, rgba(7,26,18,0.90) 78%, rgba(7,26,18,0.97) 100%)" }} />
 
-        <section className="relative pt-16 md:pt-24 lg:pt-28 pb-16 md:pb-24">
+        <section className="relative pt-6 md:pt-16 lg:pt-20 pb-8 md:pb-16">
           <div className="container mx-auto px-5 sm:px-6 lg:px-8 relative z-10">
-            <div className="max-w-6xl mx-auto grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+            <div className="max-w-6xl mx-auto grid lg:grid-cols-2 gap-4 lg:gap-12 items-center">
               <div>
                 <PageBreadcrumb items={[
                   { label: "Início", to: "/" },
@@ -137,7 +137,7 @@ const PricePage = () => {
                   Preço de {data.serviceName} {prep} <span style={{ color: "#D4AF37" }}>{data.cityName}</span>
                 </h1>
 
-                <p className="text-sm sm:text-base md:text-lg text-white/70 leading-relaxed mb-4 lg:mb-6 max-w-lg line-clamp-2">
+                <p className="text-sm sm:text-base md:text-lg text-white/70 leading-relaxed mb-4 lg:mb-6 max-w-lg">
                   {data.intro.match(/^[^.?]*[.?]/)?.[0] ?? data.intro}
                 </p>
 
@@ -167,7 +167,7 @@ const PricePage = () => {
                 <p className="text-white/40 text-xs mt-4">{/^\d/.test(servicePrice) ? `Desde ${servicePrice} · ` : ''}Orçamento gratuito · Sem compromisso</p>
               </div>
 
-              <div className="mt-8 lg:mt-0">
+              <div id="resultados" className="mt-2 lg:mt-0 scroll-mt-6">
                 <div className="relative">
                   <div className="absolute -inset-4 blur-2xl opacity-20" style={{ background: "linear-gradient(135deg, #D4AF37, transparent)" }} />
                   {beforeAfterCategory ? (
@@ -197,10 +197,10 @@ const PricePage = () => {
         </div>
 
         {/* ═══ TABELA DE PREÇOS ═══ */}
-        <ServicePriceSection serviceSlug={data.serviceSlug} initialLocation={data.cityName} />
+        <div id="precos" className="scroll-mt-6"><ServicePriceSection serviceSlug={data.serviceSlug} initialLocation={data.cityName} /></div>
 
         {/* ═══ AVALIAÇÕES REAIS ═══ */}
-        <section className="py-14 md:py-20 bg-kyro-green">
+        <section id="avaliacoes" className="scroll-mt-6 py-14 md:py-20 bg-kyro-green">
           <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
             <SectionHeader overline="Avaliações Reais" heading="O que dizem os nossos" goldWord="clientes" subtitle="Nas palavras de quem já nos recebeu em casa." light={false} />
             <ServiceReviewsGrid serviceSlug={data.serviceSlug} seed={data.citySlug} heading="" />
@@ -224,7 +224,7 @@ const PricePage = () => {
 
         {/* ═══ FAQ ═══ */}
         {data.faqs.length > 0 && (
-          <ServiceFAQ faqs={data.faqs} heading={`Dúvidas sobre preços ${prep} ${data.cityName}`} variant="dark" />
+          <div id="duvidas" className="scroll-mt-6"><ServiceFAQ faqs={data.faqs} heading={`Dúvidas sobre preços ${prep} ${data.cityName}`} variant="dark" /></div>
         )}
 
         {/* ═══ O QUE INFLUENCIA O PREÇO ═══ */}

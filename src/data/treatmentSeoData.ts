@@ -4,10 +4,16 @@ export const treatments = [
   { slug: 'tratamento-anti-acaros', name: 'Tratamento anti-ácaros', intro: 'Um cuidado específico para colchões, sofás e cadeiras, que pode acrescentar à limpeza. O tratamento anti-ácaros é escolhido para atuar sobre ácaros; não deve ser confundido com a extração de sujidade do serviço habitual.', benefits: ['Tratamento dirigido ao objetivo de reduzir a presença de ácaros no artigo.', 'Pode juntar o tratamento à limpeza do colchão ou sofá na mesma visita.', 'Avaliação do tecido e das condições de aplicação antes de começar.'], detail: 'A limpeza remove pó, resíduos e partículas acumuladas. O tratamento anti-ácaros é uma intervenção complementar, com produto e aplicação definidos para esse fim. Não prometemos eliminação total, percentagens de eficácia ou alívio de sintomas.' },
   { slug: 'desbacterizacao', name: 'Desbacterização de estofos', intro: 'Um tratamento complementar dirigido à contaminação bacteriana em sofás, colchões e cadeiras. Peça a avaliação do artigo e acrescente este cuidado ao seu orçamento de limpeza.', benefits: ['Um cuidado adicional para superfícies de contacto frequente.', 'Seleção do tratamento conforme o tecido, o uso e o objetivo da intervenção.', 'Possibilidade de combinar limpeza e tratamento na mesma visita.'], detail: 'A desbacterização tem um objetivo diferente da limpeza de manchas e resíduos. Confirmamos a compatibilidade do produto com o artigo e explicamos o modo de aplicação e os cuidados posteriores. Não é uma promessa de esterilização nem substitui a manutenção regular.' },
 ];
-export const expansionCities = [
-  { name: 'Aveiro', slug: 'aveiro', context: 'Entre apartamentos junto à ria, moradias e alojamentos de curta duração, as necessidades de limpeza variam com os artigos e a utilização de cada espaço.' },
-  { name: 'Coimbra', slug: 'coimbra', context: 'Casas de família, quartos arrendados e apartamentos em mudança de ocupantes pedem soluções diferentes para sofás, colchões e cadeiras.' },
-];
+// Aveiro e Coimbra saíram daqui em 2026-09-10: passaram a cidades reais em
+// locationSeoData.ts (com página de localidade/freguesia/preço/variantes
+// próprias e deslocação confirmada em travel.ts), por isso já não são
+// "cobertura ainda por confirmar". Mantinham aqui geravam rotas
+// /{servico}-{cidade} duplicadas com LocationServicePage.tsx — a versão
+// pré-renderizada (a que o Google vê) acabava a mostrar sempre o placeholder
+// "Disponibilidade sob consulta" em vez da página real. As páginas de
+// tratamento (tratamento-anti-acaros-aveiro etc.) continuam a ser geradas
+// normalmente, agora via `cities` em vez de `expansionCities`.
+export const expansionCities: { name: string; slug: string; context: string }[] = [];
 export function getTreatmentRoutes() {
   return treatments.flatMap(t => [{ path: `/${t.slug}`, treatmentSlug: t.slug, citySlug: '' }, ...[...cities, ...expansionCities].map(c => ({ path: `/${t.slug}-${c.slug}`, treatmentSlug: t.slug, citySlug: c.slug }))]);
 }

@@ -1,4 +1,4 @@
-import { getTreatmentRoutes, getExpansionRoutes } from '../../data/treatmentSeoData';
+import { getTreatmentRoutes } from '../../data/treatmentSeoData';
 import { useState, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { Map, AlertTriangle, Globe, FileText, Shield, Zap, Star, Target, ChevronDown, ChevronRight, ExternalLink } from "lucide-react";
@@ -23,8 +23,7 @@ import { getAdminRegion, getRegionForLocationPart, ADMIN_REGIONS, ADMIN_REGION_L
 // têm um `id` próprio distinto de `file` (usado só para o link/preview do XML).
 const SITEMAPS = [
   { id: "sitemap-tratamentos.xml", file: "sitemap-tratamentos.xml", name: "Tratamentos", description: "Anti-ácaros e desbacterização por cidade", icon: Shield },
-  { id: "sitemap-centro.xml", file: "sitemap-centro.xml", name: "Aveiro e Coimbra", description: "Cobertura sob consulta", icon: Map },
-  { id: "sitemap.xml",              file: "sitemap.xml",              name: "Sitemap Index", description: "Índice principal (12 sub-sitemaps)", icon: Globe },
+  { id: "sitemap.xml",              file: "sitemap.xml",              name: "Sitemap Index", description: "Índice principal", icon: Globe },
   { id: "sitemap-core.xml",         file: "sitemap-core.xml",         name: "Core (Serviços + Páginas principais)", description: "6 serviços + páginas institucionais", icon: Zap },
   { id: "sitemap-location.xml",     file: "sitemap-location.xml",     name: "Localidade × Serviço", description: "Concelhos × 6 serviços: Porto/Norte, Lisboa/AML, Algarve", icon: Map },
   { id: "sitemap-freguesia.xml",    file: "sitemap-freguesia.xml",    name: "Freguesia × Serviço", description: "Freguesias × 6 serviços: Porto/Norte, Lisboa/AML, Algarve", icon: Map },
@@ -44,7 +43,6 @@ const SITEMAPS = [
 function getSitemapUrls(id: string): string[] {
   switch (id) {
     case "sitemap-tratamentos.xml": return getTreatmentRoutes().map(r => r.path);
-    case "sitemap-centro.xml": return getExpansionRoutes().map(r => r.path);
     case "sitemap-core.xml":
       return services.map(s => s.baseRoute);
     case "sitemap-location.xml":
@@ -126,6 +124,8 @@ function getSitemapUrlsForRegion(id: string, region: AdminRegion): string[] {
   }
 }
 
+const SUB_SITEMAP_COUNT = new Set(SITEMAPS.filter(sm => sm.id !== "sitemap.xml").map(sm => sm.file)).size;
+
 const SitemapMonitor = () => {
   const [expandedSitemap, setExpandedSitemap] = useState<string | null>(null);
   const [sitemapUrlCache, setSitemapUrlCache] = useState<Record<string, string[]>>({});
@@ -153,7 +153,7 @@ const SitemapMonitor = () => {
       <div className="flex items-center justify-between mb-2">
         <div>
           <h2 className="text-lg font-bold text-navy">Sitemap Monitor</h2>
-          <p className="text-sm text-gray-500">12 sub-sitemaps · {Object.values(sitemapCounts).reduce((a, c) => a + c, 0).toLocaleString("pt-PT")} URLs indexadas</p>
+          <p className="text-sm text-gray-500">{SUB_SITEMAP_COUNT} sub-sitemaps · {Object.values(sitemapCounts).reduce((a, c) => a + c, 0).toLocaleString("pt-PT")} URLs indexadas</p>
         </div>
       </div>
 

@@ -23,7 +23,9 @@ export const locationPrices: Record<string, number> = {
   'Lousada': 15,
   // Zona 4 — Mais afastado, ~45-55 min
   'Arouca': 20,
-  'Aveiro': 20,
+  // Zona 3 — Centro, sem equipa própria, deslocação a partir do Porto (2026-09-10, corrigido a pedido do dono)
+  'Aveiro': 15,
+  'Coimbra': 15,
   // ═══ Braga/Minho (equipa local, escalões por distância ao centro de Braga) ═══
   // Referência ao centro de Braga: até 10 km = 10€; até 15 km = 15€; acima = 20€.
   // Escalões por sede de concelho; a morada concreta é confirmada no orçamento.

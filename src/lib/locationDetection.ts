@@ -1,6 +1,20 @@
 import { locationPrices } from '@/constants/travel';
+import { municipiosComFreguesias } from '@/data/freguesiaSeoData';
 
 export const normalizeCity = (value: string) => value.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
+
+// BigDataCloud's `city`/`locality` fields often resolve to the civil parish
+// (freguesia) the coordinates fall in, not the municipality \u2014 e.g. someone
+// standing in Ramalde gets `city: "Ramalde"` back, which never matches
+// locationPrices (keyed by municipality). Built once at module load, not
+// per call: freguesia name -> municipality name, only for freguesias whose
+// municipality is an actually served/priced city.
+const freguesiaToMunicipio = new Map<string, string>();
+for (const m of municipiosComFreguesias) {
+  if (!(m.name in locationPrices)) continue;
+  for (const f of m.freguesias) freguesiaToMunicipio.set(normalizeCity(f.name), m.name);
+}
+
 export function matchServiceCity(data: { countryCode?: string; city?: string; locality?: string; localityName?: string }) {
   if (data.countryCode !== 'PT') return undefined;
   // Never match a district: an unsupported town in Porto district is not Porto city.
@@ -8,6 +22,8 @@ export function matchServiceCity(data: { countryCode?: string; city?: string; lo
     if (!candidate) continue;
     const city = Object.keys(locationPrices).find(name => normalizeCity(name) === normalizeCity(candidate));
     if (city) return city;
+    const municipio = freguesiaToMunicipio.get(normalizeCity(candidate));
+    if (municipio) return municipio;
   }
 }
 

@@ -11,4 +11,8 @@ describe('service locality matching', () => {
   it('does not substitute an unserved town with its district', () => {
     expect(matchServiceCity({ countryCode: 'PT', city: 'Baião' })).toBeUndefined();
   });
+  it('resolves a civil parish (freguesia) to its served municipality', () => {
+    expect(matchServiceCity({ countryCode: 'PT', city: 'Ramalde' })).toBe('Porto');
+    expect(matchServiceCity({ countryCode: 'PT', city: 'Gloria' })).toBe('Aveiro');
+  });
 });

@@ -42,6 +42,9 @@ export const cities = [
   { name: "Trofa", slug: "trofa", region: "secondary", area: "porto", description: "município entre Porto e Braga" },
   { name: "Espinho", slug: "espinho", region: "secondary", area: "porto", description: "cidade costeira a sul do Porto" },
   { name: "Arouca", slug: "arouca", region: "secondary", area: "porto", description: "município no interior do distrito de Aveiro" },
+  // Centro (equipa Porto, deslocação alargada — sem equipa própria na região, 2026-09-10)
+  { name: "Aveiro", slug: "aveiro", region: "secondary", area: "porto", description: "cidade da ria, no litoral centro" },
+  { name: "Coimbra", slug: "coimbra", region: "secondary", area: "porto", description: "cidade universitária às margens do Mondego" },
   // Outros: Norte
   { name: "Braga", slug: "braga", region: "secondary", area: "braga", description: "cidade milenar do Minho" },
   { name: "Guimarães", slug: "guimaraes", region: "secondary", area: "braga", description: "berço da nação portuguesa" },

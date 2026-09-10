@@ -1,4 +1,7 @@
+import SofaProcessGuide from '@/components/SofaProcessGuide';
+import ProblemCarousel from '@/components/ProblemCarousel';
 import DirectoryGroup from "@/components/DirectoryGroup";
+import SofaLeadActions from "@/components/SofaLeadActions";
 import { useEffect, useMemo } from "react";
 import { useLocation, Link } from "react-router-dom";
 import { MapPin, Star, MessageCircle, ArrowRight, Euro, Clock, Timer } from "lucide-react";
@@ -37,7 +40,7 @@ import { SITE_URL, WHATSAPP_BASE, REVIEW_RATING, REVIEW_COUNT } from "@/constant
 import { PRICE_TABLE, PRICE_TABLE_QUIZ_CONFIG, type PriceRowQuizConfig } from "@/data/locationPriceTestimonialsData";
 import { calcWidgetTotal, calcChairBracket, buildWidgetQuizConfig, calcRowAddonDelta, calcSofaAntiAcarosDelta, calcChairAddonWaterproofTotal, calcChairAntiAcarosTotal, calcWidgetPricing, calcWidgetArticles, PACK_DISCOUNT_MIN_SERVICE, PACK_DISCOUNT_MIN_UPSELL_ITEM, type WidgetTier } from "@/lib/priceWidgetCalc";
 import { locationPrices, type CarpetItem } from "@/components/quiz/QuizTypes";
-import { PROBLEM_IMAGES, PROBLEM_POOL_CTA, PRICE_HEADING_VERB, SERVICE_DURATION } from "@/constants/problemCardHelpers";
+import { PROBLEM_IMAGES, PRICE_HEADING_VERB, SERVICE_DURATION } from "@/constants/problemCardHelpers";
 import { ServiceTrustDesktop, ServiceTrustMobile } from "@/components/ServiceTrustBlock";
 import ServiceReviewsGrid from "@/components/ServiceReviewsGrid";
 
@@ -122,6 +125,7 @@ const FreguesiaServicePage = () => {
   const otherServices = services.filter(s => s.slug !== data.serviceSlug);
   const serviceBaseUrl = services.find(s => s.slug === data.serviceSlug)?.baseRoute ?? `/${data.serviceSlug}`;
   const processSteps = data.serviceSlug === 'impermeabilizacao' ? IMPERMEABILIZACAO_STEPS : GENERIC_PROCESS_STEPS;
+  const isSofaCleaning = data.serviceSlug === "limpeza-sofas";
 
   const h1Words = data.h1.trim().split(" ");
   const h1Gold = h1Words.pop() ?? "";
@@ -146,14 +150,18 @@ const FreguesiaServicePage = () => {
   ];
 
   const problemImages = PROBLEM_IMAGES[data.serviceSlug] ?? [];
+  const sofaProblemDescriptions: Record<string, string> = {
+    'Manchas difíceis no sofá': 'Café, vinho ou gordura? Avaliamos o tecido e a mancha para escolher o tratamento adequado.',
+    'Ácaros e bactérias invisíveis': 'A sujidade também se acumula no interior das fibras. Conheça as opções de higienização para o seu sofá.',
+    'Odores desagradáveis': 'Animais, humidade ou uso diário? Identificamos a origem do odor para recomendar o tratamento.',
+    'Desgaste prematuro do tecido': 'Proteja o tecido do uso diário. Descubra se a impermeabilização é adequada ao seu sofá.',
+  };
   const problemCards = data.problems.map((problem, idx) => ({
     title: problem.title,
-    description: problem.description,
+    description: isSofaCleaning ? (sofaProblemDescriptions[problem.title] ?? problem.description) : problem.description,
     alt: problem.description,
     image: problemImages.length > 0 ? problemImages[idx % problemImages.length] : undefined,
-    cta: PROBLEM_POOL_CTA[problem.title] ?? "Pedir Orçamento",
   })).filter(card => card.image);
-  const problemGridCols = problemCards.length >= 4 ? "lg:grid-cols-4" : "lg:grid-cols-3";
 
   return (
     <QuizLocationProvider value={data.municipio}>
@@ -182,9 +190,9 @@ const FreguesiaServicePage = () => {
           </div>
           <div className="absolute inset-0" style={{ background: "linear-gradient(to bottom, rgba(7,26,18,0.42) 0%, rgba(7,26,18,0.65) 40%, rgba(7,26,18,0.90) 78%, rgba(7,26,18,0.97) 100%)" }} />
 
-        <section className="relative pt-16 md:pt-24 lg:pt-28 pb-16 md:pb-24">
+        <section className="relative pt-6 md:pt-16 lg:pt-20 pb-8 md:pb-16">
           <div className="container mx-auto px-5 sm:px-6 lg:px-8 relative z-10">
-            <div className="max-w-6xl mx-auto grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+            <div className="max-w-6xl mx-auto grid lg:grid-cols-2 gap-4 lg:gap-12 items-center">
               <div>
                 <PageBreadcrumb items={[
                   { label: "Início", to: "/" },
@@ -212,14 +220,15 @@ const FreguesiaServicePage = () => {
                   {h1Rest}{" "}<span style={{ color: "#D4AF37" }}>{h1Gold}</span>
                 </h1>
 
-                <p className="text-sm sm:text-base md:text-lg text-white/70 leading-relaxed mb-4 lg:mb-6 max-w-lg line-clamp-2">
+                <p className="text-sm sm:text-base md:text-lg text-white/70 leading-relaxed mb-4 lg:mb-6 max-w-lg">
                   {/* Mesma lógica do LocationServicePage.tsx — corta na 1ª
                       frase (ponto OU interrogação), robusto mesmo que um
                       template de intro futuro comece por uma pergunta. */}
-                  {data.intro.match(/^[^.?]*[.?]/)?.[0] ?? data.intro}
+                  {isSofaCleaning ? "Limpeza ao domicílio por extração profunda. Consulte os preços por tamanho e envie uma foto para avaliarmos as manchas." : (data.intro.match(/^[^.?]*[.?]/)?.[0] ?? data.intro)}
                 </p>
 
 
+                {isSofaCleaning ? <SofaLeadActions city={data.name} price={data.priceFrom} href={waUrl} source={`freguesia_hero_${data.serviceSlug}_${data.municipioSlug}`} /> : <>
                 <div className="flex flex-col sm:flex-row gap-3 max-w-md">
                   <QuizButton
                     className="flex-1"
@@ -245,9 +254,10 @@ const FreguesiaServicePage = () => {
                 </div>
 
                 <p className="text-white/40 text-xs mt-4">{/^\d/.test(data.priceFrom) ? `Desde ${data.priceFrom} · ` : ''}Orçamento gratuito · Sem compromisso</p>
+                </>}
               </div>
 
-              <div className="mt-8 lg:mt-0">
+              <div id="resultados" className="mt-2 lg:mt-0 scroll-mt-6">
                 <div className="relative">
                   <div className="absolute -inset-4 blur-2xl opacity-20" style={{ background: "linear-gradient(135deg, #D4AF37, transparent)" }} />
                   {beforeAfterCategory ? (
@@ -278,7 +288,7 @@ const FreguesiaServicePage = () => {
 
         {/* ═══ TABELA DE PREÇOS ═══ */}
         {PRICE_TABLE[data.serviceSlug] && (
-          <section className="py-14 md:py-20 bg-[#FDFDF9]">
+          <section id="precos" className="scroll-mt-6 py-14 md:py-20 bg-[#FDFDF9]">
             <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
               <div className="grid md:grid-cols-2 gap-10 md:gap-16 items-center">
                 <div>
@@ -313,16 +323,16 @@ const FreguesiaServicePage = () => {
         />
 
         {/* ═══ TESTEMUNHOS ═══ */}
-        <section className="py-14 md:py-20 bg-kyro-green">
+        <section id="avaliacoes" className="scroll-mt-6 py-14 md:py-20 bg-kyro-green">
           <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
             <SectionHeader overline="Avaliações Reais" heading="O que dizem os nossos" goldWord="clientes" subtitle="Nas palavras de quem já nos recebeu em casa." light={false} />
             <ServiceReviewsGrid serviceSlug={data.serviceSlug} seed={`${data.municipio}-${data.name}`} heading="" />
           </div>
         </section>
 
-        {/* ═══ PROBLEMAS QUE RESOLVEMOS ═══ */}
+        {/* ═══ PROBLEMAS COMUNS ═══ */}
         {problemCards.length > 0 && (
-          <section className="py-14 md:py-20 bg-[#FDFDF9]">
+          <section id="problemas" className="scroll-mt-6 py-14 md:py-20 bg-[#FDFDF9]">
             <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
               <SectionHeader
                 overline="O Que Resolvemos"
@@ -330,53 +340,42 @@ const FreguesiaServicePage = () => {
                 goldWord={data.name}
                 light={true}
               />
-              <div className={`flex gap-3 overflow-x-auto snap-x snap-mandatory scrollbar-hide pb-2 md:overflow-visible md:grid md:grid-cols-2 ${problemGridCols} md:gap-4 md:pb-0`}>
-                {problemCards.map((card, idx) => (
-                  <div
-                    key={idx}
-                    className="snap-start flex-none w-[78vw] sm:w-[54vw] md:w-auto relative overflow-hidden rounded-2xl group h-[400px] md:h-[440px]"
-                  >
-                    <img
-                      src={card.image as string}
-                      alt={card.alt}
-                      className="absolute inset-0 w-full h-full object-cover saturate-[0.55] group-hover:saturate-[0.85] group-hover:scale-[1.05] transition-all duration-700 ease-out"
-                      loading="lazy"
-                      decoding="async"
-                    />
-                    <div className="absolute top-0 left-0 right-0 z-10 p-5 md:p-6 pb-12 bg-gradient-to-b from-[#071a12]/90 via-[#071a12]/35 to-transparent">
-                      <div className="mb-2 rounded-full opacity-45 group-hover:opacity-90 transition-all duration-400" style={{ width: "20px", height: "1.5px", backgroundColor: "#D4AF37" }} />
-                      <h3 className="font-playfair font-bold text-white text-[1.05rem] md:text-[1.15rem] leading-[1.25]">{card.title}</h3>
-                    </div>
-                    <div className="absolute bottom-0 left-0 right-0 z-10 p-5 md:p-6 pt-14 bg-gradient-to-t from-[#071a12] via-[#071a12]/75 to-transparent">
-                      <p className="text-white/65 text-xs leading-relaxed line-clamp-2 mb-4">{card.description}</p>
-                      <button
-                        type="button"
-                        onClick={openProblemQuiz}
-                        className="inline-flex items-center justify-center gap-1.5 min-w-[150px] rounded-full px-4 py-2.5 text-xs font-bold text-[#111111] transition-transform duration-300 group-hover:scale-[1.03]"
-                        style={{ background: "linear-gradient(to right, #C9A84C, #EDD96A, #C9A84C)", boxShadow: "0 3px 10px rgba(201,168,76,0.35)" }}
-                      >
-                        {card.cta}
-                        <ArrowRight className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
-                    <div className="absolute inset-0 rounded-2xl ring-1 ring-white/[0.06] group-hover:ring-gold/20 transition-all duration-400 pointer-events-none" />
-                  </div>
-                ))}
-              </div>
-              <p className="text-center text-[9px] text-[#111111]/20 tracking-[0.22em] uppercase mt-4 md:hidden">
-                deslize para ver mais →
+              <p className="-mt-5 mb-7 max-w-xl text-sm sm:text-base leading-relaxed text-[#536259]">
+                Reconhece algum destes sinais? Peça uma avaliação e descubra o tratamento adequado ao seu caso.
               </p>
+              <ProblemCarousel>
+                {problemCards.map((card, idx) => (
+                  <article key={card.title} className="snap-start flex-none w-[84vw] max-w-[380px] md:max-w-none md:w-auto overflow-hidden rounded-sm border border-[#183b2c]/15 bg-[#0c241a] group flex flex-col shadow-[0_8px_24px_rgba(7,26,18,0.10)]">
+                    <div className="relative h-[185px] sm:h-[220px] overflow-hidden">
+                      <img src={card.image as string} alt={card.title} className="w-full h-full object-cover saturate-[0.85] motion-safe:group-hover:scale-[1.03] transition-transform duration-700" loading="lazy" decoding="async" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-[#0c241a]/35 to-transparent" />
+                      <span className="absolute top-4 left-4 px-2.5 py-1.5 bg-[#071a12]/85 border border-white/20 text-[#e1c477] text-[10px] font-semibold tracking-[0.16em]">{String(idx + 1).padStart(2, '0')} / {String(problemCards.length).padStart(2, '0')}</span>
+                    </div>
+                    <div className="p-5 sm:p-6 flex flex-col flex-1">
+                      <div className="w-7 h-px bg-gold mb-4" />
+                      <h3 className="font-playfair font-semibold text-white text-[23px] leading-tight mb-3">{card.title}</h3>
+                      <p className="text-white/75 text-sm leading-relaxed mb-6">{card.description}</p>
+                      <div className="mt-auto">
+                        <button type="button" onClick={openProblemQuiz} aria-label={`Pedir avaliação: ${card.title}`} className="w-full min-h-12 flex items-center justify-between gap-3 rounded-sm px-4 py-3 text-sm font-bold text-[#071a12] bg-gradient-to-r from-gold to-[#d4c57b] hover:from-[#d4c57b] hover:to-gold focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-gold active:scale-[0.98] transition-all touch-manipulation">
+                          Pedir avaliação <ArrowRight className="w-5 h-5 shrink-0" />
+                        </button>
+                        <p className="text-white/60 text-[11px] text-center mt-2.5">Orçamento gratuito · Sem compromisso</p>
+                      </div>
+                    </div>
+                  </article>
+                ))}
+              </ProblemCarousel>
             </div>
           </section>
         )}
 
         {/* ═══ FAQ ═══ */}
         {data.faqs && data.faqs.length > 0 && (
-          <ServiceFAQ faqs={data.faqs} heading={`Perguntas sobre ${data.service.toLowerCase()} em ${data.name}`} variant="dark" />
+          <div id="duvidas" className="scroll-mt-6"><ServiceFAQ faqs={data.faqs} heading={`Perguntas sobre ${data.service.toLowerCase()} em ${data.name}`} variant="dark" /></div>
         )}
 
         {/* ═══ COMO FUNCIONA ═══ */}
-        <section className="py-14 md:py-20 bg-[#FDFDF9]">
+        {isSofaCleaning ? <SofaProcessGuide city={data.name} cityPrep="em" /> : <section className="py-14 md:py-20 bg-[#FDFDF9]">
           <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
             <SectionHeader
               overline="Processo"
@@ -431,7 +430,7 @@ const FreguesiaServicePage = () => {
               </div>
             </div>
           </div>
-        </section>
+        </section>}
 
         {/* ═══ PACKS ═══ */}
         <ServicePackBanner
