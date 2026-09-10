@@ -1,3 +1,4 @@
+import DirectoryGroup from "@/components/DirectoryGroup";
 import { useEffect, useMemo } from "react";
 import { useLocation, Link } from "react-router-dom";
 import { QuizLocationProvider, QuizServiceProvider } from "@/context/QuizLocationContext";
@@ -302,12 +303,10 @@ const MaterialPage = () => {
         {/* ═══ REDE INTERNA ═══ */}
         <section className="py-14 md:py-20" style={{ backgroundColor: "#FDFDF9" }}>
           <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
-            <SectionHeader overline="Cobertura" heading="Explore" goldWord="mais" />
-            <div className="grid md:grid-cols-2 gap-4">
+            <SectionHeader overline="Explore por categoria" heading="Materiais e" goldWord="localidades" />
+            <div className="max-w-4xl border-t border-[#D4AF37]/25">
               {relatedLinks.length > 0 && (
-                <div className="p-5 rounded-xl bg-white" style={{ border: "1px solid rgba(17,17,17,0.08)", boxShadow: "0 4px 16px rgba(7,26,18,0.04)" }}>
-                  <p className="text-[10px] font-bold tracking-[0.26em] uppercase mb-3" style={{ color: "#D4AF37" }}>Outros materiais</p>
-                  <div className="flex flex-wrap gap-2">
+                <DirectoryGroup title={<>Outros materiais</>}>
                     {relatedLinks.map(link => (
                       <Link key={link.path} to={link.path}
                         className="inline-flex items-center gap-1.5 bg-white px-3.5 py-2 rounded-full text-sm font-medium text-[#111111] border border-[#E8E4DE] hover:border-[#D4AF37]/40 hover:bg-[#D4AF37]/5 hover:shadow-sm transition-all">
@@ -315,14 +314,11 @@ const MaterialPage = () => {
                         {link.name}
                       </Link>
                     ))}
-                  </div>
-                </div>
+                  </DirectoryGroup>
               )}
 
               {!isCityVariant && (
-                <div className="p-5 rounded-xl bg-white" style={{ border: "1px solid rgba(17,17,17,0.08)", boxShadow: "0 4px 16px rgba(7,26,18,0.04)" }}>
-                  <p className="text-[10px] font-bold tracking-[0.26em] uppercase mb-3" style={{ color: "#D4AF37" }}>Disponível em</p>
-                  <div className="flex flex-wrap gap-2">
+                <DirectoryGroup title={<>Disponível em</>}>
                     {topCities.map(city => (
                       <Link key={city.slug} to={`/${data.slug}-${city.slug}`}
                         className="inline-flex items-center gap-1.5 bg-white px-3.5 py-2 rounded-full text-sm font-medium text-[#111111] border border-[#E8E4DE] hover:border-[#D4AF37]/40 hover:bg-[#D4AF37]/5 hover:shadow-sm transition-all">
@@ -330,14 +326,11 @@ const MaterialPage = () => {
                         {city.name}
                       </Link>
                     ))}
-                  </div>
-                </div>
+                  </DirectoryGroup>
               )}
 
               {isCityVariant && (
-                <div className="p-5 rounded-xl bg-white" style={{ border: "1px solid rgba(17,17,17,0.08)", boxShadow: "0 4px 16px rgba(7,26,18,0.04)" }}>
-                  <p className="text-[10px] font-bold tracking-[0.26em] uppercase mb-3" style={{ color: "#D4AF37" }}>Também disponível em</p>
-                  <div className="flex flex-wrap gap-2">
+                <DirectoryGroup title={<>Também disponível em</>}>
                     {cities.filter(c => c.slug !== citySlug).slice(0, 8).map(city => (
                       <Link key={city.slug} to={`/${data.slug}-${city.slug}`}
                         className="inline-flex items-center gap-1.5 bg-white px-3.5 py-2 rounded-full text-sm font-medium text-[#111111] border border-[#E8E4DE] hover:border-[#D4AF37]/40 hover:bg-[#D4AF37]/5 hover:shadow-sm transition-all">
@@ -345,8 +338,7 @@ const MaterialPage = () => {
                         {city.name}
                       </Link>
                     ))}
-                  </div>
-                </div>
+                  </DirectoryGroup>
               )}
             </div>
           </div>

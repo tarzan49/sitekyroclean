@@ -1,3 +1,4 @@
+import DirectoryGroup from "@/components/DirectoryGroup";
 import { useEffect, useMemo } from "react";
 import { useLocation, Link } from "react-router-dom";
 import { MapPin, Star, MessageCircle, ArrowRight, Euro, Clock, Timer } from "lucide-react";
@@ -455,17 +456,15 @@ const FreguesiaServicePage = () => {
         <section className="py-14 md:py-20" style={{ backgroundColor: "#FDFDF9" }}>
           <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
             <SectionHeader
-              overline="Cobertura"
-              heading={`Área de serviço em`}
+              overline="Explore por categoria"
+              heading="Serviços e zonas de atendimento em"
               goldWord={data.name}
-              subtitle={data.localSection}
+              subtitle="Encontre freguesias próximas, outros serviços e soluções para problemas de estofos. Abra uma categoria para ver mais."
             />
 
-            <div className="grid md:grid-cols-2 gap-4">
+            <div className="max-w-4xl border-t border-[#D4AF37]/25">
               {nearbyFreguesias.length > 0 && (
-                <div className="p-5 rounded-xl bg-white" style={{ border: "1px solid rgba(17,17,17,0.08)", boxShadow: "0 4px 16px rgba(7,26,18,0.04)" }}>
-                  <p className="text-[10px] font-bold tracking-[0.26em] uppercase mb-3" style={{ color: "#D4AF37" }}>Freguesias próximas</p>
-                  <div className="flex flex-wrap gap-2">
+                <DirectoryGroup title={<>Freguesias próximas</>}>
                     {nearbyFreguesias.map(f => (
                       <Link
                         key={f.slug}
@@ -476,13 +475,10 @@ const FreguesiaServicePage = () => {
                         {f.name}
                       </Link>
                     ))}
-                  </div>
-                </div>
+                  </DirectoryGroup>
               )}
 
-              <div className="p-5 rounded-xl bg-white" style={{ border: "1px solid rgba(17,17,17,0.08)", boxShadow: "0 4px 16px rgba(7,26,18,0.04)" }}>
-                <p className="text-[10px] font-bold tracking-[0.26em] uppercase mb-3" style={{ color: "#D4AF37" }}>Outros serviços em {data.name}</p>
-                <div className="flex flex-wrap gap-2">
+              <DirectoryGroup title={<>Outros serviços em {data.name}</>}>
                   {otherServices.map(svc => (
                     <Link
                       key={svc.slug}
@@ -492,13 +488,10 @@ const FreguesiaServicePage = () => {
                       {svc.name}
                     </Link>
                   ))}
-                </div>
-              </div>
+                </DirectoryGroup>
 
               {municipioProblems.length > 0 && (
-                <div className="p-5 rounded-xl bg-white" style={{ border: "1px solid rgba(17,17,17,0.08)", boxShadow: "0 4px 16px rgba(7,26,18,0.04)" }}>
-                  <p className="text-[10px] font-bold tracking-[0.26em] uppercase mb-3" style={{ color: "#D4AF37" }}>Problemas que resolvemos em {data.municipio}</p>
-                  <div className="flex flex-wrap gap-2">
+                <DirectoryGroup title={<>Problemas que resolvemos em {data.municipio}</>}>
                     {municipioProblems.map(p => (
                       <Link
                         key={p.slug}
@@ -508,8 +501,7 @@ const FreguesiaServicePage = () => {
                         {p.keyword}
                       </Link>
                     ))}
-                  </div>
-                </div>
+                  </DirectoryGroup>
               )}
 
               <div className="flex items-center">

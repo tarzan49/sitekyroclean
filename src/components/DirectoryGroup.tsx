@@ -1,4 +1,5 @@
-import { Children, cloneElement, isValidElement, useId, useState, type ReactElement, type ReactNode } from "react";
+import { Children, cloneElement, isValidElement, useId, useState, useEffect, type ReactElement, type ReactNode } from "react";
+import { useLocation } from "react-router-dom";
 import { ChevronDown, Search, X } from "lucide-react";
 
 interface LinkProps { children?: ReactNode; className?: string; to?: string; href?: string }
@@ -7,6 +8,7 @@ interface Props {
   children: ReactNode;
   dark?: boolean;
   language?: "pt" | "en";
+  open?: boolean;
 }
 
 function nodeText(node: ReactNode): string {
@@ -16,9 +18,11 @@ function nodeText(node: ReactNode): string {
 const normalize = (value: string) => value.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLocaleLowerCase("pt-PT").trim();
 
 /** Accepts the existing Link elements, preserving their destinations and handlers. */
-export default function DirectoryGroup({ title, children, dark = false, language = "pt" }: Props) {
+export default function DirectoryGroup({ title, children, dark = false, language = "pt", open }: Props) {
   const id = useId();
+  const { pathname } = useLocation();
   const [query, setQuery] = useState("");
+  useEffect(() => setQuery(""), [pathname]);
   const links = Children.toArray(children).filter((child): child is ReactElement<LinkProps> => isValidElement<LinkProps>(child));
   const search = normalize(query);
   const matches = links.filter(link => normalize(nodeText(link.props.children)).includes(search));
@@ -26,7 +30,7 @@ export default function DirectoryGroup({ title, children, dark = false, language
   if (!links.length) return null;
 
   return (
-    <details className={`group/directory border-b ${dark ? "border-white/15 text-white" : "border-[#E8E4DE] text-[#111111]"}`}>
+    <details key={pathname} open={open} className={`group/directory border-b ${dark ? "border-white/15 text-white" : "border-[#E8E4DE] text-[#111111]"}`}>
       <summary className="flex min-h-16 cursor-pointer list-none items-center gap-4 py-4 text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#D4AF37] [&::-webkit-details-marker]:hidden">
         <span className="flex-1 text-base font-semibold leading-relaxed">{title}</span>
         <span className={`text-xs tabular-nums ${dark ? "text-white/60" : "text-[#666]"}`}>{links.length}</span>

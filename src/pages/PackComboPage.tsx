@@ -1,3 +1,4 @@
+import DirectoryGroup from "@/components/DirectoryGroup";
 ﻿import { useMemo, useEffect, useState } from "react";
 import { useLocation, Link } from "react-router-dom";
 import { CheckCircle, Star, ArrowRight, Shield, Zap, MessageCircle, Sofa, BedDouble, Armchair, LayoutGrid, Quote } from "lucide-react";
@@ -471,7 +472,7 @@ const PackComboPage = () => {
                 <p className="text-[10px] font-bold tracking-[0.28em] uppercase" style={{ color: "#D4AF37", opacity: 0.9 }}>Explorar mais</p>
               </div>
               <h3 className="text-xl font-playfair font-bold text-[#111111] mb-4">Serviços individuais</h3>
-              <div className="flex flex-wrap gap-2 mb-10">
+              <DirectoryGroup title="Serviços e packs relacionados">
                 <Link to={`/${pack.service1Slug}`} className="inline-flex items-center gap-1.5 bg-white px-3 py-2 rounded-lg text-sm text-[#111111] border border-[#E8E4DE] hover:border-[#D4AF37]/35 transition-all">
                   <ArrowRight className="w-3 h-3" style={{ color: "#D4AF37" }} />{pack.service1}
                 </Link>
@@ -484,7 +485,7 @@ const PackComboPage = () => {
                 <Link to="/guia-de-packs" className="inline-flex items-center gap-1.5 bg-white px-3 py-2 rounded-lg text-sm text-[#111111] border border-[#E8E4DE] hover:border-[#D4AF37]/35 transition-all">
                   <ArrowRight className="w-3 h-3" style={{ color: "#D4AF37" }} />Todos os packs disponíveis
                 </Link>
-              </div>
+              </DirectoryGroup>
             </div>
           </div>
         </section>

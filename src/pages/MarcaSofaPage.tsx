@@ -1,3 +1,4 @@
+import DirectoryGroup from "@/components/DirectoryGroup";
 import { useMemo, useEffect } from "react";
 import { useLocation, Link } from "react-router-dom";
 import { QuizLocationProvider, QuizServiceProvider } from "@/context/QuizLocationContext";
@@ -348,7 +349,7 @@ const MarcaSofaPage = () => {
               Ver todos os materiais e preços em {city.name}
               <ArrowRight className="w-3.5 h-3.5" />
             </Link>
-            <div className="flex flex-wrap gap-2">
+            <DirectoryGroup title="Outras marcas de sofás">
               {["ikea", "natuzzi", "kave-home", "leroy-merlin", "moviflor", "conforama", "el-corte-ingles", "roche-bobois"]
                 .filter(slug => slug !== marca.slug)
                 .map(slug => (
@@ -358,7 +359,7 @@ const MarcaSofaPage = () => {
                       {slug.replace(/-/g, " ")}
                     </Link>
                   ))}
-            </div>
+            </DirectoryGroup>
           </div>
         </section>
 

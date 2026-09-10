@@ -1,6 +1,7 @@
 import { fireEvent, render, screen, cleanup } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
 import { MemoryRouter, Link } from "react-router-dom";
+import { StaticRouter } from "react-router-dom/server";
 import { renderToStaticMarkup } from "react-dom/server";
 import DirectoryGroup from "./DirectoryGroup";
 
@@ -8,7 +9,7 @@ afterEach(cleanup);
 const links = ['Guimarães', 'Porto', 'Lisboa', 'Faro', 'Lagos', 'Sintra', 'Cascais', 'Maia'].map((name, i) => <Link key={name} to={`/cidade-${i}`}>{name}</Link>);
 describe('DirectoryGroup', () => {
   it('keeps every destination in server HTML while collapsed', () => {
-    const html = renderToStaticMarkup(<MemoryRouter><DirectoryGroup title="Localidades">{links}</DirectoryGroup></MemoryRouter>);
+    const html = renderToStaticMarkup(<StaticRouter location="/"><DirectoryGroup title="Localidades">{links}</DirectoryGroup></StaticRouter>);
     expect(html).toContain('<details');
     expect(html).not.toContain('<details open');
     for (let i=0; i<links.length; i++) expect(html).toContain(`href="/cidade-${i}"`);

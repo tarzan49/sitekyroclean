@@ -1060,3 +1060,7 @@ Commits desta sessão (ordem cronológica, todos em `worktree-kyro-minorder-emda
 ## Teste de pack dentro do quiz (2026-09-10)
 
 Apenas em desenvolvimento, `?teste=quiz-pack` mantém o fluxo real do `QuizForm` e substitui o combo de extras de sofá por `QuizSofaPackTest`. O extra escreve em `upsellItems` e avança para o contacto real. `useQuizPricing` recebe um parâmetro opcional de teste (default false, também protegido por DEV) para aplicar 10% aos serviços quando é acrescentado um artigo de pelo menos 49€, sem o limiar de 149€, mantendo cêntimos. O botão final do teste não submete dados; apenas confirma a simulação. Produção conserva as regras existentes. O protótipo anterior `?teste=pack` continua separado no widget.
+
+## Diretórios finais compactos (2026-09-10)
+
+`src/components/DirectoryGroup.tsx` uniformiza a navegação final das famílias de páginas com grupos fechados por defeito e pesquisa nas listas maiores. Preserva os links no HTML e repõe o estado ao mudar de página. `AreasDeServico` organiza região, concelho, serviços e freguesias com pesquisa global; as seis páginas principais continuam a usar `ServiceCityLinks`. Inventário e verificação em `docs/directory-navigation.md`.
