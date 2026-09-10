@@ -1,3 +1,4 @@
+import PriceFactors from "@/components/PriceFactors";
 import DirectoryGroup from "@/components/DirectoryGroup";
 import { useEffect, useMemo } from "react";
 import { useLocation, Link } from "react-router-dom";
@@ -227,36 +228,7 @@ const PricePage = () => {
         )}
 
         {/* ═══ O QUE INFLUENCIA O PREÇO ═══ */}
-        {data.factors.length > 0 && (
-          <section className="py-14 md:py-20 bg-[#FDFDF9]">
-            <div className="max-w-6xl mx-auto px-5 sm:px-6 lg:px-8">
-              <SectionHeader overline="Fatores de Preço" heading="O que influencia o" goldWord="valor final" light={true} />
-              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-px" style={{ backgroundColor: "rgba(17,17,17,0.06)" }}>
-                {data.factors.slice(0, 6).map((factor, i) => (
-                  <div
-                    key={i}
-                    className="group relative overflow-hidden flex flex-col gap-3 p-7 md:p-8 transition-colors duration-300 hover:bg-[#102a20]"
-                    style={{ backgroundColor: "#0d241b", borderTop: "2px solid rgba(212,175,55,0.55)" }}
-                  >
-                    <span
-                      className="absolute -right-2 -top-3 font-playfair font-bold leading-none select-none transition-opacity duration-300 group-hover:opacity-100"
-                      style={{ fontSize: "4.5rem", color: "rgba(212,175,55,0.08)" }}
-                    >
-                      {String(i + 1).padStart(2, "0")}
-                    </span>
-                    <span
-                      className="relative font-playfair font-bold leading-none"
-                      style={{ fontSize: "1.5rem", color: "#D4AF37" }}
-                    >
-                      {String(i + 1).padStart(2, "0")}
-                    </span>
-                    <span className="relative text-sm text-white/70 leading-relaxed">{factor}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </section>
-        )}
+        <PriceFactors serviceSlug={data.serviceSlug} />
 
         {/* ═══ REDE INTERNA ═══ */}
         <section className="py-14 md:py-20 bg-[#FDFDF9]">
