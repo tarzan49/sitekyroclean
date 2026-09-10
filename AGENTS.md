@@ -70,3 +70,8 @@ Pedido do responsável: Braga com base local, 10€ em Braga, Guimarães, Vila N
 `?teste=pack` em páginas de limpeza de sofás ativa, apenas com `import.meta.env.DEV`, um percurso demonstrativo ligado ao `PriceWidget`: seleção de sofá, oferta de colchão, resumo e pré-visualização da mensagem. `SofaPackPreview` calcula a proposta de 10% sobre serviços, excluindo deslocação, sem exigir base de 100€. Não envia contactos nem altera as regras reais do quiz. Esta oferta ainda não está autorizada para produção. Valores de colchão e deslocação vêm das tabelas reais.
 
 `?teste=quiz-pack` demonstra a mesma proposta dentro do quiz real (tratamentos → colchão → contacto), apenas em DEV. O botão final é inofensivo e não envia pedidos. Não remover as proteções nem ativar a oferta pública sem pedido do responsável.
+
+
+## Uniformidade dos guias e conselhos (2026-09-10)
+
+Pedido explícito do responsável: os guias devem usar o dourado canónico `#D4AF37` nos destaques, sem variantes castanhas/ocres. O título da secção mantém a escala das secções adjacentes (`text-[1.85rem] sm:text-4xl md:text-[2.6rem]`, `font-playfair`, `leading-[1.1]`). Melhorias de compacidade não autorizam alterar esta identidade tipográfica ou cromática. O token Tailwind `text-gold` resolve atualmente para outro tom; nesta secção usar `text-[#D4AF37]` para corresponder ao dourado explícito das FAQs.
