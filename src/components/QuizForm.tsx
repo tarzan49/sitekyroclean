@@ -630,9 +630,10 @@ ${formData.description || 'Sem observações adicionais'}
 
           {/* Animated price ticker
              , hidden: step 2 (treatment selector, sem qtds)
-             , visível: step 3 (quantidades) e step 4 (contacto) quando totalPrice > 0
+             , hidden: contact step (summary available below the fields)
+             , visível: step 3 (quantidades) quando totalPrice > 0
              , também visível em step 1 quando há custo de deslocação */}
-          {(totalPrice > 0 || hasSobOrcamento) && (activeUpsellScreen === 'combo' || finalTravelCost > 0 || (currentStep !== 1 && currentStep !== 2)) && (
+          {currentStep !== totalSteps && (totalPrice > 0 || hasSobOrcamento) && (activeUpsellScreen === 'combo' || finalTravelCost > 0 || (currentStep !== 1 && currentStep !== 2)) && (
             <QuizEstimate
               totalPrice={totalPrice}
               discountedPrice={packDiscountedPrice}
@@ -644,11 +645,11 @@ ${formData.description || 'Sem observações adicionais'}
             />
           )}
 
-          <div className="flex shrink-0 flex-col my-auto py-4 w-full items-center text-center">
+          <div className={cn("flex shrink-0 flex-col py-4 w-full items-center text-center", currentStep !== totalSteps && "my-auto")}>
 
             {/* Step 0, Location Autocomplete VIP */}
             {/* Context banner when quiz opened from a problem page */}
-            {problema && (
+            {problema && currentStep !== totalSteps && (
               <div className="w-full max-w-sm mx-auto mb-4 bg-gold/10 border border-gold/30 rounded-sm px-4 py-3 text-center">
                 <p className="text-gold text-xs font-bold mb-0.5">Detectámos o seu problema</p>
                 <p className="text-white/70 text-xs leading-relaxed">
@@ -881,16 +882,6 @@ ${formData.description || 'Sem observações adicionais'}
       <div className="px-4 sm:px-5 pt-3 flex flex-col gap-2 flex-shrink-0 border-t border-white/[0.05] items-center" style={{ paddingBottom: 'max(1rem, env(safe-area-inset-bottom))' }}>
         {currentStep === totalSteps ? (
           <div className="flex flex-col gap-2 w-full">
-            {totalPrice > 0 && !hasSobOrcamento && !hasUpsellSobItem && (
-              <p className="text-center text-[10px] text-white/25 font-medium tracking-wide">
-                Total estimado: <span className="text-gold/60 font-bold">{localPackPreview ? `${(packDiscountActive ? packDiscountedPrice : totalPrice).toFixed(2).replace(".", ",")}€` : packDiscountActive ? `${packDiscountedPrice}€` : `${totalPrice}€`}</span>
-              </p>
-            )}
-            {(hasSobOrcamento || hasUpsellSobItem) && (
-              <p className="text-center text-[10px] text-white/25 font-medium tracking-wide">
-                Estimativa: <span className="text-gold/60 font-bold">{quotePriceText}</span>
-              </p>
-            )}
             <div className="flex items-center gap-3 w-full">
               <button
                 onClick={handlePrev}
@@ -903,7 +894,7 @@ ${formData.description || 'Sem observações adicionais'}
                 disabled={isSubmitting || (!localPackPreview && !canProceed())}
                 className="flex-1 h-14 bg-gradient-to-r from-gold to-[#d4c57b] hover:from-[#d4c57b] hover:to-gold text-[#12121e] font-black text-base tracking-wider uppercase touch-manipulation active:scale-[0.98] rounded-sm shadow-[0_0_32px_rgba(212,175,55,0.30)]"
               >
-                {isDemo ? 'CONCLUIR TESTE' : isSubmitting ? 'A enviar...' : 'FINALIZAR PEDIDO'}
+                {isDemo ? 'CONCLUIR TESTE' : isSubmitting ? 'A enviar...' : 'ENVIAR PEDIDO'}
               </Button>
             </div>
             <p className="text-center text-[11px] text-white/30 font-medium -mt-0.5">
@@ -938,8 +929,8 @@ ${formData.description || 'Sem observações adicionais'}
       </div>
     )}
 
-    {/* Rotating social proof bar */}
-    <div className="border-t border-gold/20 px-4 py-2.5 text-center flex-shrink-0 bg-gradient-to-r from-[#0a1f18] via-[#0d2820] to-[#0a1f18] flex items-center justify-center gap-2 overflow-hidden">
+    {/* Social proof stays outside the contact step. */}
+    {currentStep !== totalSteps && <div className="border-t border-gold/20 px-4 py-2.5 text-center flex-shrink-0 bg-gradient-to-r from-[#0a1f18] via-[#0d2820] to-[#0a1f18] flex items-center justify-center gap-2 overflow-hidden">
       {currentStep === 0 ? <p className="text-xs text-white/65 py-1">Orçamento sem compromisso.</p> : (() => {
         const current = socialProofMessages[socialProofIdx];
         const Icon = SOCIAL_PROOF_ICON[current.category];
@@ -952,7 +943,7 @@ ${formData.description || 'Sem observações adicionais'}
           </div>
         );
       })()}
-    </div>
+    </div>}
 
     {showExitIntent && (
       <div className="absolute inset-0 z-50 flex items-center justify-center backdrop-blur-md rounded-t-3xl sm:rounded-2xl" style={{ background: "rgba(5,21,16,0.92)" }}>
