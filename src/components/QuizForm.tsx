@@ -469,9 +469,9 @@ const QuizForm = ({
           if (wQty > 0) {
             const addonTotal = isWaterproofPrimary ? calcChairClean(wQty) : calcWaterproof(wQty);
             const addonLabel = isWaterproofPrimary ? 'Limpeza' : `Impermeabilização${isPremiumTier ? ' Premium' : ' Essencial'}`;
-            details.push(`${addonLabel} de ${wQty} cadeira(s): ${fmtEuro(addonTotal)}`);
+            details.push(`${addonLabel}${formData.serviceType !== 'waterproofing' ? ' (desbacterização e antiácaros incluídos)' : ''} de ${wQty} cadeira(s): ${fmtEuro(addonTotal)}`);
           }
-          if (formData.chairAntiAcaros && !isNaN(qty) && qty > 0) {
+          if (formData.chairAntiAcaros && !formData.chairWaterproofing && formData.chairWaterproofQty <= 0 && !isNaN(qty) && qty > 0) {
             details.push(`Desbacterização e Anti Ácaros de ${qty} cadeira(s): ${fmtEuro(qty * 5)}`);
           }
         }

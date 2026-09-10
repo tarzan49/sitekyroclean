@@ -76,15 +76,15 @@ describe('care upsells', () => {
     expect(cleaning.getAttribute('aria-pressed')).toBe('false');
   });
 
-  it('keeps both chair protection tiers and the 5 euro unit treatment', () => {
+  it('includes antibacterial care in both four-chair protection bundles', () => {
     const update = vi.fn();
     render(<QuizChairsAddonUpsell formData={{ ...initialFormData, serviceType: 'cleaning', chairQuantity: '4' }} updateFormData={update} onBack={() => {}} onContinue={() => {}} />);
-    expect(screen.getByRole('button', { name: /Premium/ })).toBeTruthy();
-    expect(screen.getByRole('button', { name: /^Essencial/ })).toBeTruthy();
-    const treatment = screen.getByRole('button', { name: /Desbacterização e Anti Ácaros/ });
-    expect(treatment.textContent).toContain('+5€/un.');
-    fireEvent.click(treatment);
-    expect(update).toHaveBeenCalledWith({ chairAntiAcaros: true });
+    const premium = screen.getByRole('button', { name: /Premium/ });
+    expect(premium.textContent).toContain('+90€');
+    expect(screen.getByRole('button', { name: /^Essencial/ }).textContent).toContain('+70€');
+    expect(screen.queryByRole('button', { name: /Desbacterização/ })).toBeNull();
+    fireEvent.click(premium);
+    expect(update).toHaveBeenCalledWith({ chairWaterproofing: true, chairWaterproofQty: 4, waterproofingTier: 'premium', chairAntiAcaros: false });
   });
 
   it('explains carpet dimensions and shows area without introducing a price', () => {

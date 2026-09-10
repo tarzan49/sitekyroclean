@@ -1,7 +1,6 @@
 import { WaterproofingTierPicker } from './WaterproofingTierPicker';
-import QuizTopBadge from '../QuizTopBadge';
 import QuizCareIntro from '../QuizCareIntro';
-import { ChevronLeft, Check, Bug, Droplets, Plus } from 'lucide-react';
+import { ChevronLeft, Check, Droplets, Plus } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { QuizFormData } from '@/components/quiz/QuizTypes';
 import { calcChairClean, calcChairWaterproof, calcChairWaterproofPremium } from '@/components/quiz/quizHelpers';
@@ -13,11 +12,7 @@ interface QuizChairsAddonUpsellProps {
   onBack: () => void;
 }
 
-// Anti Ácaros das cadeiras: serviço independente da impermeabilização (a
-// pessoa pode adicionar os dois ao mesmo tempo, pedido explícito), sempre 5€
-// por cadeira, sem escalão — preço mostrado ao cliente é sempre por unidade,
-// nunca o total.
-const CHAIR_ANTI_ACAROS_UNIT_RATE = 5;
+// Desbacterização e antiácaros incluídos na impermeabilização, sem opção separada.
 
 // Upsell "estilo companhia aérea": aparece uma única vez, logo a seguir ao
 // "Continuar" da etapa de quantidades das cadeiras (só quando a limpeza é o
@@ -99,21 +94,17 @@ const QuizChairsAddonUpsell = ({ formData, updateFormData, onContinue, onBack }:
   const waterproofTier: 'premium' | 'essencial' | null = formData.chairWaterproofing
     ? (formData.waterproofingTier === 'premium' ? 'premium' : 'essencial')
     : null;
-  const antiAcarosOn = formData.chairAntiAcaros;
-  const anySelected = waterproofTier !== null || antiAcarosOn;
+  const anySelected = waterproofTier !== null;
 
   const selectWaterproof = (tier: 'premium' | 'essencial') => {
     const turningOff = waterproofTier === tier;
     updateFormData(
       turningOff
-        ? { chairWaterproofing: false, chairWaterproofQty: 0 }
-        : { chairWaterproofing: true, chairWaterproofQty: qty, waterproofingTier: tier }
+        ? { chairWaterproofing: false, chairWaterproofQty: 0, chairAntiAcaros: false }
+        : { chairWaterproofing: true, chairWaterproofQty: qty, waterproofingTier: tier, chairAntiAcaros: false }
     );
   };
 
-  const selectAntiAcaros = () => {
-    updateFormData({ chairAntiAcaros: !antiAcarosOn });
-  };
 
   return (
     <div className="flex flex-col gap-2 overflow-hidden items-center w-full">
@@ -135,31 +126,10 @@ const QuizChairsAddonUpsell = ({ formData, updateFormData, onContinue, onBack }:
         premiumDifference={premiumPrice !== null && essencialPrice !== null ? premiumPrice - essencialPrice : null}
       />
 
-      <p className="text-[10px] font-bold tracking-[0.14em] uppercase text-white/65 w-full max-w-sm text-left mt-2">Cuidado adicional</p>
-      <button
-        onClick={selectAntiAcaros}
-        aria-pressed={antiAcarosOn}
-        className={cn(
-          'relative w-full max-w-sm min-h-[76px] flex items-center gap-3 pl-5 pr-3.5 py-3.5 rounded-sm border-2 text-left transition-all duration-200 touch-manipulation',
-          antiAcarosOn ? 'border-gold bg-[#1a2a1a] shadow-[0_0_18px_rgba(212,175,55,0.30)]' : 'border-dashed border-gold/40 bg-gold/[0.04] hover:border-gold/70 hover:bg-gold/[0.07]'
-        )}
-      >
-        <QuizTopBadge className="absolute -top-3 right-3 z-10" />
-        <Bug className={cn('w-5 h-5 flex-shrink-0', antiAcarosOn ? 'text-gold' : 'text-gold/70')} />
-        <div className="flex-1 min-w-0">
-          <p className={cn('text-sm font-bold', antiAcarosOn ? 'text-white' : 'text-white/90')}>Desbacterização e Anti Ácaros</p>
-          <p className="text-[10px] text-white/65 leading-snug mt-0.5">Desbacterização e tratamento antiácaros do tecido, na mesma visita.</p>
-          <p className={cn('text-[11px] font-semibold mt-1', antiAcarosOn ? 'text-gold' : 'text-gold/60')}>
-            Por apenas <span className="font-black">+{CHAIR_ANTI_ACAROS_UNIT_RATE}€/un.</span>
-          </p>
-        </div>
-        <span className={cn(
-          'flex-shrink-0 w-7 h-7 rounded-full border-2 flex items-center justify-center transition-all',
-          antiAcarosOn ? 'border-gold bg-gold' : 'border-gold/50 bg-transparent'
-        )}>
-          {antiAcarosOn ? <Check className="w-3.5 h-3.5 text-[#071a12]" strokeWidth={3} /> : <Plus className="w-3.5 h-3.5 text-gold" strokeWidth={3} />}
-        </span>
-      </button>
+      <p className="flex items-center gap-2 w-full max-w-sm text-xs text-gold py-2">
+        <Check aria-hidden="true" className="w-4 h-4 shrink-0" />
+        Desbacterização e antiácaros incluídos nas duas opções
+      </p>
 
       <div className="flex items-center gap-3 w-full max-w-sm mt-1">
         <button

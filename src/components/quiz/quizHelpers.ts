@@ -130,6 +130,7 @@ export function calcChairClean(qty: number): number | null {
 // (era 1-4 @ 20€, 5-10 @ 15€, 11+ sob orçamento).
 export function calcChairWaterproof(qty: number): number | null {
   if (qty <= 0 || qty >= 10) return null;
+  if (qty === 4) return 70; // Approved four-chair bundle, including antibacterial care.
   if (qty <= 4) return qty * 15;
   return 4 * 15 + (qty - 4) * 10;
 }
@@ -141,6 +142,7 @@ export function calcChairWaterproof(qty: number): number | null {
 // Essencial 110€ vs Premium 155€, +41%, alinhado).
 export function calcChairWaterproofPremium(qty: number): number | null {
   if (qty <= 0 || qty >= 10) return null;
+  if (qty === 4) return 90; // Approved four-chair bundle, including antibacterial care.
   if (qty <= 4) return qty * 20;
   return 4 * 20 + (qty - 4) * 15;
 }

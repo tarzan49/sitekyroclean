@@ -104,7 +104,7 @@ export function useQuizPricing(
         // 5€/cadeira fixo, mutuamente exclusivo com o addon de impermeabilização
         // acima (a UI do upsell garante nunca terem os dois ligados ao mesmo tempo).
         let antiAcarosChairPrice = 0;
-        if (formData.chairAntiAcaros && !isNaN(chairQty) && chairQty > 0) {
+        if (formData.chairAntiAcaros && formData.serviceType !== 'waterproofing' && !formData.chairWaterproofing && addonQty <= 0 && !isNaN(chairQty) && chairQty > 0) {
           antiAcarosChairPrice = chairQty * 5;
           price += antiAcarosChairPrice;
         }

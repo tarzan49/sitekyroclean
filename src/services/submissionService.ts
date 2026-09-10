@@ -217,9 +217,9 @@ function buildReceiptLines(payload: QuizLeadPayload) {
         const addonTotal = isWaterproofBase ? calcChairClean(wQty) : calcChairWaterproofTier(wQty);
         const addonLabel = isWaterproofBase ? 'Limpeza Cadeiras' : `Impermeabilização Cadeiras${isPremium ? ' Premium' : ' Essencial'}`;
         const addonUnit = addonTotal !== null ? Math.round(addonTotal / wQty * 10) / 10 : null;
-        receiptLines.push({ label: addonLabel, qty: wQty, unitPrice: addonUnit, total: addonTotal });
+        receiptLines.push({ label: `${addonLabel}${!isWaterproofBase ? ' (desbacterização e antiácaros incluídos)' : ''}`, qty: wQty, unitPrice: addonUnit, total: addonTotal });
       }
-      if (chairAntiAcaros) {
+      if (chairAntiAcaros && !isWaterproofBase && wQty <= 0) {
         receiptLines.push({ label: 'Desbacterização e Anti Ácaros Cadeiras', qty: cQty, unitPrice: 5, total: cQty * 5 });
       }
     }

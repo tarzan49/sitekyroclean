@@ -80,3 +80,5 @@ Revisão aprovada do selo TOP (2026-09-10): reservar apenas para impermeabiliza�
 ## Escolha parcial e comparação de proteção (2026-09-10)
 
 Nova decisão do responsável: um sofá/colchão mantém o clique simples; vários permitem escolher quantos recebem tratamento, com linhas compactas «1 de 3», sem repetir imagens/preços. `packQty` opcional representa essa quantidade; ausência preserva a seleção antiga de todas as unidades. `splitTreatmentItems` mantém preços, resumo e recibos coerentes. Esta decisão substitui a remoção absoluta dos seletores. A impermeabilização mostra os dois acréscimos (Essencial e Premium), a diferença real e o âmbito/valor antes de descontos. Benefícios em três pontos curtos junto da imagem. Exemplo local `?exemplo=varios`.
+
+Cadeiras: decisão 2026-09-10 substitui o extra separado de antiácaros. Desbacterização e antiácaros passam a benefício incluído na impermeabilização; sem terceiro cartão e sem cobrança extra quando há proteção. Conjunto de quatro cadeiras: Essencial 70€, Premium 90€. Outros escalões preservados até instrução específica.

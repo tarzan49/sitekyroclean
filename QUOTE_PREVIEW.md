@@ -47,3 +47,5 @@ Upsell de higienização do sofá: três benefícios curtos, preço adicional ca
 Detalhes das cadeiras redesenhados: imagem, quantidade e preço do serviço num único cartão; título direto, controlos acessíveis e distinção explícita entre limpeza/proteção das cadeiras e total do pedido no topo. Valores e fluxo preservados; verificado com cinco cadeiras (95€ + 10€ deslocação) em 390×844. Exemplo `?exemplo=quantidade-cadeiras`.
 
 Impermeabilização adicional de cadeiras alinhada com os sofás: benefícios curtos, comparação Premium/Essencial usando WaterproofingTierPicker compacto, preços reais do conjunto e diferença Premium. Mantém antiácaros opcional a 5€/un. Verificado em 390×844 com Continuar visível; tipos e cinco testes aprovados.
+
+Cadeiras: decisão 2026-09-10 substitui o extra separado de antiácaros. Desbacterização e antiácaros passam a benefício incluído na impermeabilização; sem terceiro cartão e sem cobrança extra quando há proteção. Conjunto de quatro cadeiras: Essencial 70€, Premium 90€. Outros escalões preservados até instrução específica.
