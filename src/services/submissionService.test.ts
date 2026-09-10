@@ -105,3 +105,18 @@ it('retains Alcatifa instead of mislabelling it as a rug', async () => {
   const p = payload({ service: 'carpet' }); p.carpetKind = 'alcatifa';
   expect(buildReceiptLines(p)[0].label).toContain('Alcatifa');
 });
+
+it.each([
+  ['2,5', '3', '7.5'], ['2.5', '3', '7.5'], ['1,25', '2,4', '3'], ['0.75', '1.5', '1.13'],
+])('sends both dimensions and correct rounded area to Formspree: %s × %s', async (largura, comprimento, area) => {
+  const p = payload({ service: 'carpet', serviceType: 'cleaning' });
+  p.carpetItems = [{ id: 'first', largura, comprimento }, { id: 'second', largura: '1', comprimento: '4' }];
+  p.detailsSummary = buildReceiptLines(p).map(l => `${l.qty}x ${l.label}: ${l.total ?? 'Sob orçamento'}`).join('\n');
+  p.message = `Detalhes: ${p.detailsSummary}\nEstimativa: ${p.priceText}`;
+  await submitQuizLead(p);
+  const sent = mocks.fetch.mock.calls[0][1].body as FormData;
+  expect(sent.get('message')).toContain(`Tapete 1: ${largura} × ${comprimento} m (${area} m²)`);
+  expect(sent.get('message')).toContain('Tapete 2: 1 × 4 m (4 m²)');
+  expect(sent.get('message')).toContain('Sob orçamento');
+  expect(new URL(sessionStorage.getItem('kyro_wa_url')!).searchParams.get('text')).toContain(p.message);
+});
