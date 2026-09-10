@@ -91,3 +91,21 @@ describe('useQuizPricing — chairs "sob orçamento" thresholds stay in sync acr
     expect(p.calculateServicePrice).toBeGreaterThan(0);
   });
 });
+
+describe('local quiz pack proposal', () => {
+  const sofa = [{ id: 'test-sofa', sizeId: '3-lugares', qty: 1, packEnabled: false, chaiseLongue: false }];
+  const extra = [{ id: 'mattress-casal', mattressSize: 'casal', qty: 1, price: 69, label: '1x Colchão Casal' }];
+  const form = { ...initialFormData, location: 'Lisboa', service: 'sofa', serviceType: 'cleaning' as const };
+  it('uses the proposed discount only in the local preview', () => {
+    const actual = renderHook(() => useQuizPricing(form, sofa, [], extra, []));
+    expect(actual.result.current.packDiscountActive).toBe(false);
+    const demo = renderHook(() => useQuizPricing(form, sofa, [], extra, [], true));
+    expect(demo.result.current.packDiscountActive).toBe(true);
+    expect(demo.result.current.packDiscountedPrice).toBe(143.2);
+  });
+  it('keeps the original price when the extra is declined', () => {
+    const demo = renderHook(() => useQuizPricing(form, sofa, [], [], [], true));
+    expect(demo.result.current.packDiscountActive).toBe(false);
+    expect(demo.result.current.totalPrice).toBe(89);
+  });
+});

@@ -18,6 +18,7 @@ import {
 import type { QuizFormData, SofaItem, MattressItem, CarpetItem, UpsellItemConfig } from './quiz';
 import QuizStepLocation from './quiz/steps/QuizStepLocation';
 import QuizStepConfig from './quiz/steps/QuizStepConfig';
+import QuizSofaPackTest from './quiz/steps/QuizSofaPackTest';
 import QuizComboUpsellScreen from './quiz/steps/QuizComboUpsellScreen';
 import QuizChairsAddonUpsell from './quiz/steps/QuizChairsAddonUpsell';
 import QuizSofaAddonUpsell from './quiz/steps/QuizSofaAddonUpsell';
@@ -101,6 +102,7 @@ const QuizForm = ({
   initialMattressSizeId, initialMattressQty, initialMattressItems, initialChairQty, initialChairWaterproofing, initialCarpetArea, initialCarpetItems,
   initialWaterproofingTier, skipToUpsell, initialUpsellItems,
 }: QuizFormProps) => {
+  const localPackPreview = import.meta.env.DEV && new URLSearchParams(window.location.search).get("teste") === "quiz-pack";
   const { toast } = useToast();
   const navigate = useNavigate();
   const hasInitialItem = Boolean(
@@ -242,7 +244,7 @@ const QuizForm = ({
     serviceOnlyTotal,
     discountedPrice,
     packDiscountedPrice,
-  } = useQuizPricing(formData, sofaItems, mattressItems, upsellItems, carpetItems);
+  } = useQuizPricing(formData, sofaItems, mattressItems, upsellItems, carpetItems, localPackPreview);
 
   const updateFormData = useCallback((updates: Partial<QuizFormData>) => {
     setFormData(prev => ({ ...prev, ...updates }));
@@ -495,6 +497,10 @@ const QuizForm = ({
   };
 
   const handleSubmit = async () => {
+    if (localPackPreview) {
+      toast({ title: "Teste concluído", description: "Nenhum pedido ou contacto foi enviado." });
+      return;
+    }
     if (!canProceed()) return;
 
     const finalLocation = formData.location === 'other' ? formData.otherLocation : formData.location;
@@ -774,11 +780,11 @@ ${formData.description || 'Sem observações adicionais'}
               </span>
               <div className="flex items-center gap-3 pr-8">
                 {packDiscountActive && totalPrice > 0 && (
-                  <span className="text-sm text-white/25 line-through tabular-nums">{Math.round(displayPrice)}€</span>
+                  <span className="text-sm text-white/25 line-through tabular-nums">{localPackPreview ? totalPrice.toFixed(2).replace(".", ",") : Math.round(displayPrice)}€</span>
                 )}
                 {totalPrice > 0 && (
                   <span className="text-xl font-bold tabular-nums" style={{ color: '#D4AF37' }}>
-                    {packDiscountActive
+                    {localPackPreview ? `${(packDiscountActive ? packDiscountedPrice : totalPrice).toFixed(2).replace(".", ",")}€` : packDiscountActive
                       ? `${Math.round((displayPrice - finalTravelCost) * 0.9 + finalTravelCost)}€`
                       : `${Math.round(displayPrice)}€`}
                   </span>
@@ -971,7 +977,11 @@ ${formData.description || 'Sem observações adicionais'}
                 categorias (Colchão, Sofá, Cadeiras), substitui o antigo fluxo
                 QuizUpsellOverlay de escolher um item de cada vez (pedido
                 explícito, aprovado em mockup 2026-09-06). */}
-            {activeUpsellScreen === 'combo' && (
+            {activeUpsellScreen === 'combo' && localPackPreview && formData.service === 'sofa' && !hasSobOrcamento ? (
+              <QuizSofaPackTest base={calculateServicePrice} travel={finalTravelCost} items={upsellItems}
+                onChoose={item => { setUpsellItems(item ? [item] : []); setActiveUpsellScreen(null); setCurrentStep(4); }}
+                onBack={() => { setActiveUpsellScreen('sofa'); }} />
+            ) : activeUpsellScreen === 'combo' && (
               <QuizComboUpsellScreen
                 primaryService={formData.service}
                 upsellItems={upsellItems}
@@ -1008,6 +1018,7 @@ ${formData.description || 'Sem observações adicionais'}
             {/* Step 4 - Contact */}
             {currentStep === 4 && activeUpsellScreen !== 'combo' && (
               <QuizStepContact
+                preview={localPackPreview}
                 formData={formData}
                 updateFormData={updateFormData}
                 scrollContainerRef={scrollContainerRef}
@@ -1025,7 +1036,7 @@ ${formData.description || 'Sem observações adicionais'}
           <div className="flex flex-col gap-2 w-full">
             {totalPrice > 0 && !hasSobOrcamento && !hasUpsellSobItem && (
               <p className="text-center text-[10px] text-white/25 font-medium tracking-wide">
-                Preço final: <span className="text-gold/60 font-bold">{packDiscountActive ? `${packDiscountedPrice}€` : `${totalPrice}€`}</span>
+                Preço final: <span className="text-gold/60 font-bold">{localPackPreview ? `${(packDiscountActive ? packDiscountedPrice : totalPrice).toFixed(2).replace(".", ",")}€` : packDiscountActive ? `${packDiscountedPrice}€` : `${totalPrice}€`}</span>
               </p>
             )}
             {(hasSobOrcamento || hasUpsellSobItem) && (
@@ -1045,7 +1056,7 @@ ${formData.description || 'Sem observações adicionais'}
                 disabled={isSubmitting}
                 className="flex-1 h-14 bg-gradient-to-r from-gold to-[#d4c57b] hover:from-[#d4c57b] hover:to-gold text-[#12121e] font-black text-base tracking-wider uppercase touch-manipulation active:scale-[0.98] rounded-sm shadow-[0_0_32px_rgba(212,175,55,0.30)]"
               >
-                {isSubmitting ? 'A enviar...' : 'FINALIZAR PEDIDO'}
+                {localPackPreview ? 'CONCLUIR TESTE' : isSubmitting ? 'A enviar...' : 'FINALIZAR PEDIDO'}
               </Button>
             </div>
             <p className="text-center text-[11px] text-white/30 font-medium -mt-0.5">

@@ -4,12 +4,13 @@ import type { QuizFormData } from '@/components/quiz/QuizTypes';
 import { REVIEW_RATING, REVIEW_COUNT } from '@/constants/business';
 
 interface QuizStepContactProps {
+  preview?: boolean;
   formData: QuizFormData;
   updateFormData: (updates: Partial<QuizFormData>) => void;
   scrollContainerRef: React.RefObject<HTMLDivElement>;
 }
 
-const QuizStepContact = ({ formData, updateFormData, scrollContainerRef }: QuizStepContactProps) => {
+const QuizStepContact = ({ formData, updateFormData, scrollContainerRef, preview = false }: QuizStepContactProps) => {
   const scrollToVisible = (el: HTMLElement) => {
     setTimeout(() => {
       const sc = scrollContainerRef.current;
@@ -33,7 +34,7 @@ const QuizStepContact = ({ formData, updateFormData, scrollContainerRef }: QuizS
           Os seus dados
         </h2>
         <p className="text-center text-[11px] text-white/30 mb-5">
-          Preenche em segundos. O pedido é enviado automaticamente.
+          {preview ? "Modo de teste: não precisa de preencher dados. Nenhum pedido será enviado." : "Preenche em segundos. O pedido é enviado automaticamente."}
         </p>
 
         <div className="relative flex items-center gap-4 bg-[#0c1d15] border border-gold/[0.15] rounded-sm pl-5 pr-4 py-3.5 mb-3 overflow-hidden">

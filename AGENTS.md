@@ -68,3 +68,5 @@ Pedido do responsável: Braga com base local, 10€ em Braga, Guimarães, Vila N
 ## Teste local de upsell (2026-09-10)
 
 `?teste=pack` em páginas de limpeza de sofás ativa, apenas com `import.meta.env.DEV`, um percurso demonstrativo ligado ao `PriceWidget`: seleção de sofá, oferta de colchão, resumo e pré-visualização da mensagem. `SofaPackPreview` calcula a proposta de 10% sobre serviços, excluindo deslocação, sem exigir base de 100€. Não envia contactos nem altera as regras reais do quiz. Esta oferta ainda não está autorizada para produção. Valores de colchão e deslocação vêm das tabelas reais.
+
+`?teste=quiz-pack` demonstra a mesma proposta dentro do quiz real (tratamentos → colchão → contacto), apenas em DEV. O botão final é inofensivo e não envia pedidos. Não remover as proteções nem ativar a oferta pública sem pedido do responsável.
