@@ -102,7 +102,10 @@ const QuizChairsAddonUpsell = ({ formData, updateFormData, onContinue, onBack, h
         <ul className="space-y-1.5">{['Repele líquidos', 'Facilita a remoção de manchas', 'Ajuda a conservar o tecido'].map(benefit => <li key={benefit} className="flex items-start gap-1.5"><Check aria-hidden="true" className="w-3.5 h-3.5 text-gold shrink-0 mt-0.5" /><span>{benefit}</span></li>)}</ul>
       </QuizCareIntro>
 
-      <p className="text-[10px] font-bold tracking-[0.14em] uppercase text-white/65 w-full max-w-sm text-center mt-1">Impermeabilização</p>
+      <div className="w-full max-w-sm pt-1 pb-2 text-center">
+        <p className="flex items-center justify-center gap-1.5 text-xs font-semibold text-gold"><Check aria-hidden="true" className="w-3.5 h-3.5 shrink-0" />Desbacterização + Antiácaros</p>
+        <p className="text-[10px] text-white/65 mt-1">Incluídos em qualquer proteção</p>
+      </div>
       <WaterproofingTierPicker
         compact
         centered
@@ -115,10 +118,7 @@ const QuizChairsAddonUpsell = ({ formData, updateFormData, onContinue, onBack, h
         premiumDifference={premiumPrice !== null && essencialPrice !== null ? premiumPrice - essencialPrice : null}
       />
 
-      <div className="w-full max-w-sm py-2 text-center">
-        <p className="flex items-center justify-center gap-1.5 text-xs font-semibold text-gold"><Check aria-hidden="true" className="w-3.5 h-3.5 shrink-0" />Desbacterização + Antiácaros</p>
-        <p className="text-[10px] text-white/65 mt-1">Incluídos em qualquer proteção</p>
-      </div>
+
 
       {!hideNavigation && <ChairAddonActions selected={anySelected} onBack={onBack} onContinue={onContinue} />}
     </div>

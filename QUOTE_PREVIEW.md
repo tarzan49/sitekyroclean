@@ -53,3 +53,5 @@ Cadeiras: decisão 2026-09-10 substitui o extra separado de antiácaros. Desbact
 Cadeiras: cartões Premium/Essencial e título da comparação centrados; benefício incluído apresentado em duas linhas centradas («Desbacterização + Antiácaros» / «Incluídos em qualquer proteção»). Preços e seleções preservados.
 
 Rodapé das cadeiras: ChairAddonActions colocado fora da área de scroll no QuizForm. Voltar e Continuar sem extras ficam visíveis desde a entrada; após selecionar, o mesmo botão confirma o tratamento. Conteúdo conserva scroll independente. Tipos e testes aprovados; verificado visualmente no browser.
+
+Benefício «Desbacterização + Antiácaros / Incluídos em qualquer proteção» movido para cima dos planos, substituindo o subtítulo redundante Impermeabilização para manter a etapa compacta e o benefício visível antes da escolha.
