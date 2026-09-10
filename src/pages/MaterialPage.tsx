@@ -228,20 +228,17 @@ const MaterialPage = () => {
           </div>
         </section>
 
-        {/* ═══ GALERIA — ANTES E DEPOIS ═══ */}
+        {/* ═══ GALERIA ILUSTRATIVA (o antes/depois já está no hero) ═══ */}
         {gallery && (
           <ServiceAutoCarousel
-            category={beforeAfterCategory ?? undefined}
+            comparison={false}
             overline="Resultados Reais"
             heading={`Antes e depois: ${data.name}`}
             subtitle={`Transformação real em ${data.serviceName.toLowerCase()}, resultado visível no próprio dia.`}
-            beforeImage={gallery.before}
-            afterImage={gallery.after}
             slides={[
               { src: heroImg, label: "Pormenor" },
               gallery.slides[1],
             ]}
-            rotateBeforeAfter={gallery.rotateBeforeAfter}
             variant="light"
           />
         )}

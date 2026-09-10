@@ -21,7 +21,7 @@ import { getPricePageData, getAllPriceRoutes } from "@/data/priceSeoData";
 import { services, cities, cityPrep } from "@/data/locationSeoData";
 import { SERVICE_TO_QUIZ } from "@/constants/serviceToQuiz";
 import { pickServiceHero } from "@/constants/serviceContent";
-import { getServiceGallery } from "@/constants/serviceGallery";
+import { getServiceGallery, getIllustrativePhotos } from "@/constants/serviceGallery";
 import { buildServiceWaMessage } from "@/lib/whatsappMessages";
 import { SITE_URL, WHATSAPP_BASE, REVIEW_RATING, REVIEW_COUNT } from "@/constants/business";
 import { SERVICE_DURATION } from "@/constants/problemCardHelpers";
@@ -207,17 +207,14 @@ const PricePage = () => {
           </div>
         </section>
 
-        {/* ═══ GALERIA — ANTES E DEPOIS ═══ */}
+        {/* ═══ GALERIA ILUSTRATIVA (o antes/depois já está no hero) ═══ */}
         {gallery && (
           <ServiceAutoCarousel
-            category={beforeAfterCategory ?? undefined}
+            comparison={false}
             overline="Resultados Reais"
             heading={`Antes e depois: ${data.serviceName}`}
             subtitle={`Transformação real ${prep} ${data.cityName}, resultado visível no próprio dia.`}
-            beforeImage={gallery.before}
-            afterImage={gallery.after}
-            slides={gallery.slides}
-            rotateBeforeAfter={gallery.rotateBeforeAfter}
+            slides={getIllustrativePhotos(data.serviceSlug, data.citySlug)}
             variant="light"
           />
         )}

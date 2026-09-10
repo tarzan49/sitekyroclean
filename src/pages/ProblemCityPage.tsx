@@ -19,7 +19,7 @@ import ServiceSnapshotStats from "@/components/ServiceSnapshotStats";
 import ServiceLocationSchema from "@/components/ServiceLocationSchema";
 import { getProblemBySlug, getRelatedProblemLinks } from "@/data/problemSeoData";
 import { CATEGORY_TIPS, CATEGORY_STATS, splitTipsHeading } from "@/data/problemTipsData";
-import { getServiceGallery } from "@/constants/serviceGallery";
+import { getServiceGallery, getIllustrativePhotos } from "@/constants/serviceGallery";
 import { cities, services, DEFAULT_PRICE_FROM, cityPrep } from "@/data/locationSeoData";
 import { SERVICE_TO_QUIZ } from "@/constants/serviceToQuiz";
 import { METRO_CITY_SLUGS } from "@/constants/metroCities";
@@ -297,17 +297,14 @@ const ProblemCityPage = () => {
           </section>
         )}
 
-        {/* ═══ GALERIA — ANTES E DEPOIS ═══ */}
+        {/* ═══ GALERIA ILUSTRATIVA (o antes/depois já está no hero) ═══ */}
         {gallery && (
           <ServiceAutoCarousel
-            category={beforeAfterCategory ?? undefined}
+            comparison={false}
             overline="Resultados Reais"
             heading="Antes e depois da intervenção"
             subtitle={`Transformações visíveis no próprio dia, ${prep} ${city.name}. Sem químicos agressivos, sem esperas.`}
-            beforeImage={gallery.before}
-            afterImage={gallery.after}
-            slides={gallery.slides}
-            rotateBeforeAfter={gallery.rotateBeforeAfter}
+            slides={getIllustrativePhotos(problem.relatedServices[0], `${problem.slug}-${city.slug}`)}
             variant="light"
           />
         )}

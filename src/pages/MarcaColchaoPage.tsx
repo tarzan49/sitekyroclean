@@ -30,8 +30,6 @@ import imgAcaros     from "@/assets/hero-p-acaros-colchao.webp";
 import imgAlergias   from "@/assets/hero-p-alergias-colchao.webp";
 import imgHotel      from "@/assets/hero-p-limpeza-colchao-hotel.webp";
 import heroColchao   from "@/assets/hero-colchao-v2.webp";
-import galAntes      from "@/assets/galeria-colchao-antes.webp";
-import galDepois     from "@/assets/galeria-colchao-depois.webp";
 import galProcesso   from "@/assets/galeria-colchao-processo.webp";
 import galResultado  from "@/assets/galeria-colchao-resultado.webp";
 
@@ -292,14 +290,12 @@ const MarcaColchaoPage = () => {
           </div>
         </section>
 
-        {/* ═══ GALERIA — ANTES E DEPOIS ═══ */}
+        {/* ═══ GALERIA ILUSTRATIVA (o antes/depois já está no hero) ═══ */}
         <ServiceAutoCarousel
-            category={"colchao"}
+          comparison={false}
           overline="Resultados Reais"
           heading={`Antes e depois: colchão ${marca.name}`}
           subtitle={`Transformação real em limpeza de colchões ${prep} ${city.name}, resultado visível no próprio dia.`}
-          beforeImage={galAntes}
-          afterImage={galDepois}
           slides={[
             { src: galProcesso, label: "Processo" },
             { src: galResultado, label: "Resultado" },

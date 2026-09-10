@@ -26,8 +26,6 @@ import {
   buildServiceNode,
 } from "@/lib/seoSchema";
 import heroCadeiras from "@/assets/hero-p-limpeza-cadeiras.webp";
-import galAntes      from "@/assets/galeria-cadeira-antes.webp";
-import galDepois     from "@/assets/galeria-cadeira-depois.webp";
 import galProcesso   from "@/assets/galeria-cadeira-processo.webp";
 import galResultado  from "@/assets/galeria-cadeira-resultado.webp";
 
@@ -280,14 +278,12 @@ const MarcaCadeirasPage = () => {
           </div>
         </section>
 
-        {/* ═══ GALERIA — ANTES E DEPOIS ═══ */}
+        {/* ═══ GALERIA ILUSTRATIVA (o antes/depois já está no hero) ═══ */}
         <ServiceAutoCarousel
-            category={"cadeiras"}
+          comparison={false}
           overline="Resultados Reais"
           heading={`Antes e depois: cadeiras ${marca.name}`}
           subtitle={`Transformação real em limpeza de cadeiras ${prep} ${city.name}, resultado visível no próprio dia.`}
-          beforeImage={galAntes}
-          afterImage={galDepois}
           slides={[
             { src: galProcesso, label: "Processo" },
             { src: galResultado, label: "Resultado" },

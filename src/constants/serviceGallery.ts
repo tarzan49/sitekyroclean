@@ -113,6 +113,25 @@ function hashSeed(seed: string): number {
   return Math.abs(h);
 }
 
+/** Two standalone, non-comparison photos for a service (finished-result +
+ * detail/process shots — never a "before"/dirty photo), picked deterministically
+ * from `seed` so the same page always shows the same pair while different pages
+ * across the site vary. Used where a before/after comparison already exists
+ * elsewhere on the page (e.g. the hero) and a second one would be redundant. */
+export function getIllustrativePhotos(serviceSlug: string, seed: string): { src: string; label: string }[] {
+  const gallery = getServiceGallery(serviceSlug, seed);
+  if (!gallery) return [];
+  const candidates: { src: string; label: string }[] = [{ src: gallery.after, label: "Resultado" }, ...gallery.slides];
+  for (const v of GALLERY_VARIANTS[serviceSlug] ?? []) {
+    if (!candidates.some(c => c.src === v.after)) candidates.push({ src: v.after, label: "Resultado" });
+  }
+  if (candidates.length <= 2) return candidates;
+  const first = hashSeed(seed) % candidates.length;
+  let second = hashSeed(`${seed}:2`) % candidates.length;
+  if (second === first) second = (second + 1) % candidates.length;
+  return [candidates[first], candidates[second]];
+}
+
 /** Gallery for a service, with the before/after pair picked deterministically
  * from `seed` (e.g. city slug, material slug, problem slug) when the service
  * has more than one real pair available. Falls back to the single pair for

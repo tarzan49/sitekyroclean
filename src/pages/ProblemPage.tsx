@@ -17,7 +17,7 @@ import ServiceAutoCarousel from "@/components/ServiceAutoCarousel";
 import ServiceSnapshotStats from "@/components/ServiceSnapshotStats";
 import { getProblemBySlug, getRelatedProblemLinks } from "@/data/problemSeoData";
 import { CATEGORY_TIPS, CATEGORY_STATS, splitTipsHeading } from "@/data/problemTipsData";
-import { getServiceGallery } from "@/constants/serviceGallery";
+import { getServiceGallery, getIllustrativePhotos } from "@/constants/serviceGallery";
 import { services, cities } from "@/data/locationSeoData";
 import { SERVICE_TO_QUIZ } from "@/constants/serviceToQuiz";
 import { getProblemHeroImage } from "@/lib/problemHeroImages";
@@ -290,17 +290,14 @@ const ProblemPage = () => {
           </section>
         )}
 
-        {/* ═══ GALERIA — ANTES E DEPOIS ═══ */}
+        {/* ═══ GALERIA ILUSTRATIVA (o antes/depois já está no hero) ═══ */}
         {gallery && (
           <ServiceAutoCarousel
-            category={beforeAfterCategory ?? undefined}
+            comparison={false}
             overline="Resultados Reais"
             heading="Antes e depois da intervenção"
             subtitle="Transformações visíveis no próprio dia. Sem químicos agressivos, sem esperas."
-            beforeImage={gallery.before}
-            afterImage={gallery.after}
-            slides={gallery.slides}
-            rotateBeforeAfter={gallery.rotateBeforeAfter}
+            slides={getIllustrativePhotos(data.relatedServices[0], slug ?? "")}
             variant="light"
           />
         )}

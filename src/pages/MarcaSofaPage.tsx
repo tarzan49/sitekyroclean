@@ -33,8 +33,6 @@ import imgHotel       from "@/assets/hero-p-limpeza-sofa-hotel.webp";
 import imgChenille    from "@/assets/hero-p-sofa-chenille.webp";
 import imgStd         from "@/assets/hero-p-limpeza-sofa-std.webp";
 import heroSofa       from "@/assets/hero-sofa-cleaning-new.webp";
-import galAntes      from "@/assets/galeria-sofa-antes.webp";
-import galDepois     from "@/assets/galeria-sofa-depois.webp";
 import galProcesso   from "@/assets/galeria-sofa-processo.webp";
 import galResultado  from "@/assets/galeria-sofa-resultado.webp";
 
@@ -297,14 +295,12 @@ const MarcaSofaPage = () => {
           </div>
         </section>
 
-        {/* ═══ GALERIA — ANTES E DEPOIS ═══ */}
+        {/* ═══ GALERIA ILUSTRATIVA (o antes/depois já está no hero) ═══ */}
         <ServiceAutoCarousel
-            category={"sofa"}
+          comparison={false}
           overline="Resultados Reais"
           heading={`Antes e depois: sofá ${marca.name}`}
           subtitle={`Transformação real em limpeza de sofás ${prep} ${city.name}, resultado visível no próprio dia.`}
-          beforeImage={galAntes}
-          afterImage={galDepois}
           slides={[
             { src: galProcesso, label: "Processo" },
             { src: galResultado, label: "Resultado" },

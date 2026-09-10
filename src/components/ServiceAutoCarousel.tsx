@@ -20,6 +20,10 @@ interface ServiceAutoCarouselProps {
   variant?: "light" | "dark";
   portraitImages?: boolean;
   rotateBeforeAfter?: boolean;
+  /** false when a before/after comparison already exists elsewhere on the
+   * page (e.g. the hero) — renders just the 2 illustrative photos instead of
+   * a second full antes/depois slider. Defaults to true (unchanged). */
+  comparison?: boolean;
 }
 
 const ServiceAutoCarousel = ({
@@ -33,6 +37,7 @@ const ServiceAutoCarousel = ({
   variant = "dark",
   portraitImages = false,
   rotateBeforeAfter = false,
+  comparison = true,
 }: ServiceAutoCarouselProps) => {
   const light = variant === "light";
   const textMain = light ? "text-[#111111]" : "text-white";
@@ -120,7 +125,21 @@ const ServiceAutoCarousel = ({
           </p>
         </div>
 
-        {category && (
+        {/* Illustrative-only mode: a comparison already exists elsewhere on
+            the page (the hero), so this is just 2 standalone photos — no
+            antes/depois slider, no duplicate of that section. */}
+        {!comparison && (
+          <div className="grid grid-cols-2 gap-3 md:gap-4 max-w-3xl">
+            {slides.slice(0, 2).map((slide, i) => slide.src ? (
+              <figure key={slide.src}>
+                <GalleryCell src={slide.src} label={slide.label ?? ""} objectPosition={slide.objectPosition} mirror={slide.mirror} />
+                <figcaption className={`mt-3 text-sm ${textSub}`}>{slide.label || `Pormenor do serviço ${i + 1}`}</figcaption>
+              </figure>
+            ) : null)}
+          </div>
+        )}
+
+        {comparison && category && (
           <div className="grid max-w-5xl items-start gap-6 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)] lg:gap-10">
             <div className="min-w-0 max-w-[640px] w-full">
               <ServiceResultsGallery key={category} category={category} light={light} />
@@ -140,7 +159,7 @@ const ServiceAutoCarousel = ({
         )}
 
         {/* Static gallery for pages without a selected pool. */}
-        {!category && beforeImage && afterImage ? (
+        {comparison && !category && beforeImage && afterImage ? (
           <div className="grid grid-cols-2 gap-1 md:gap-1.5 max-w-5xl">
             {/* Top row — before / after */}
             <GalleryCell src={beforeImage} label="Antes" labelSide="left" portrait={rotateBeforeAfter} />
