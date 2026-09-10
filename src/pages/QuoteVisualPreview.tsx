@@ -13,7 +13,7 @@ export default function QuoteVisualPreview() {
     <IndexV1 />
     {!open && <button className="fixed bottom-6 left-6 z-50 bg-gold text-[#071a12] px-5 py-3 font-bold" onClick={() => setOpen(true)}>Reabrir exemplo do orçamento</button>}
     <QuizForm isOpen={open} onClose={() => setOpen(false)} {...(fromStart ? {} : { initialLocation: "Porto",
-      initialService: service, initialServiceType: original ? 'both' : 'cleaning',
+      initialService: service, initialServiceType: original ? 'both' : example === 'higienizacao' ? 'waterproofing' : 'cleaning',
       initialSofaItems: service === 'sofa' ? [{ sizeId: '3-lugares', qty: original || example === 'varios' ? 3 : 1, packEnabled: original }] : undefined,
       initialMattressSizeId: service === 'mattress' ? 'casal' : undefined,
       initialMattressQty: 1,

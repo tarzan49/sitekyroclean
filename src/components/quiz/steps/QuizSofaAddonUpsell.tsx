@@ -70,6 +70,13 @@ const QuizSofaAddonUpsell = ({ formData, updateFormData, sofaItems, setSofaItems
   const premiumTotal = protectionTotal('premium');
   const premiumDifference = premiumTotal !== null && essencialTotal !== null ? premiumTotal - essencialTotal : null;
   const protectionCount = comparisonItems.reduce((sum, i) => sum + i.qty, 0);
+  const cleaningTotal = comparisonItems.reduce<number | null>((sum, item) => {
+    if (!item.qty) return sum;
+    const option = sofaPrices.find(p => p.id === item.sizeId);
+    if (!option || sum === null) return null;
+    const pack = calcPackPricing(option, true, true, 40, tier);
+    return pack.isSob || pack.packDelta === null ? null : sum + pack.packDelta * item.qty;
+  }, 0);
 
   return (
     <div className="flex flex-col gap-3 overflow-hidden items-center w-full">
@@ -78,9 +85,9 @@ const QuizSofaAddonUpsell = ({ formData, updateFormData, sofaItems, setSofaItems
         {titleBase}
       </h2>
       <QuizCareIntro service="sofa" sizeId={activeItems[0]?.sizeId}>
-        {isWaterproofBase ? 'Limpeza profunda antes da proteção, na mesma visita.' : <ul className="space-y-1.5">
-          {['Repele líquidos', 'Facilita a remoção de manchas', 'Ajuda a conservar o aspeto do sofá'].map(benefit => <li key={benefit} className="flex items-start gap-1.5"><Check aria-hidden="true" className="w-3.5 h-3.5 text-gold shrink-0 mt-0.5" /><span>{benefit}</span></li>)}
-        </ul>}
+        <ul className="space-y-1.5">
+          {(isWaterproofBase ? ['Remove sujidade acumulada', 'Ajuda a reduzir odores', 'Limpeza profunda do tecido'] : ['Repele líquidos', 'Facilita a remoção de manchas', 'Ajuda a conservar o aspeto do sofá']).map(benefit => <li key={benefit} className="flex items-start gap-1.5"><Check aria-hidden="true" className="w-3.5 h-3.5 text-gold shrink-0 mt-0.5" /><span>{benefit}</span></li>)}
+        </ul>
       </QuizCareIntro>
       {!isWaterproofBase && (
         <div ref={tierSectionRef} className="w-full max-w-sm scroll-mt-2">
@@ -107,13 +114,15 @@ const QuizSofaAddonUpsell = ({ formData, updateFormData, sofaItems, setSofaItems
           <Droplets className={cn('w-5 h-5 flex-shrink-0', anyPackOn ? 'text-gold' : 'text-gold/70')} />
           <div className="flex-1 min-w-0">
             <p className={cn('text-sm font-bold', anyPackOn ? 'text-white' : 'text-white/90')}>Higienização Profunda</p>
-            <p className="text-[10px] text-white/65 leading-snug mt-0.5">Limpeza do estofo por extração, antes de aplicar a proteção.</p>
+            <p className="text-[10px] text-white/65 leading-snug mt-0.5">Por extração, antes de aplicar a proteção. Na mesma visita.</p>
+            <p className="text-lg font-bold text-gold mt-2">{cleaningTotal === null ? 'Sob orçamento' : `+${cleaningTotal.toLocaleString('pt-PT')}€`}</p>
+            <p className="text-[10px] text-white/65">para {protectionCount} {protectionCount === 1 ? 'sofá' : 'sofás'} · antes de descontos</p>
           </div>
           <span className={cn(
             'flex-shrink-0 w-7 h-7 rounded-full border-2 flex items-center justify-center transition-all',
             anyPackOn ? 'border-gold bg-gold' : 'border-gold/50 bg-transparent'
           )}>
-            <Plus className={cn('w-3.5 h-3.5 transition-transform', anyPackOn ? 'text-[#12121e] rotate-45' : 'text-gold')} strokeWidth={3} />
+            {anyPackOn ? <Check aria-hidden="true" className="w-3.5 h-3.5 text-[#12121e]" strokeWidth={3} /> : <Plus aria-hidden="true" className="w-3.5 h-3.5 text-gold" strokeWidth={3} />}
           </span>
         </button>
       )}
@@ -130,7 +139,7 @@ const QuizSofaAddonUpsell = ({ formData, updateFormData, sofaItems, setSofaItems
           onClick={onContinue}
           className="flex-1 h-14 bg-gradient-to-r from-gold to-[#d4c57b] hover:from-[#d4c57b] hover:to-gold text-[#12121e] font-black text-xs leading-snug px-2 tracking-wide uppercase touch-manipulation active:scale-[0.98] rounded-sm shadow-[0_0_32px_rgba(212,175,55,0.30)]"
         >
-          {anyPackOn ? 'Continuar com tratamento' : 'Continuar sem extras'}
+          {anyPackOn ? (isWaterproofBase ? 'Continuar com higienização' : 'Continuar com tratamento') : 'Continuar sem extras'}
         </button>
       </div>
     </div>

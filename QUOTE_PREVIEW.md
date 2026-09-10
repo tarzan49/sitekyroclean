@@ -41,3 +41,5 @@ Nova decisão do responsável: um sofá/colchão mantém o clique simples; vári
 Ao selecionar Premium/Essencial no upsell de sofás, a área de opções desloca-se suavemente para cima da zona visível, aproximando as quantidades e Continuar. Os benefícios permanecem acima, acessíveis por scroll. Não desloca ao desmarcar nem ao ajustar quantidades; respeita preferência por movimento reduzido. Verificado em 390×700, com Continuar visível após seleção.
 
 Clarificação do responsável: com um único sofá manter o ecrã sem deslocação automática. Só selecionar proteção para vários sofás aciona a descida para opções e quantidades.
+
+Upsell de higienização do sofá: três benefícios curtos, preço adicional calculado por calcPackPricing visível antes de selecionar, âmbito da quantidade e indicação antes de descontos; seleção com visto e CTA «Continuar com higienização». Exemplo `?exemplo=higienizacao`. Tipos e cinco testes de cuidados aprovados.

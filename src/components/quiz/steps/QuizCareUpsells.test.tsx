@@ -58,6 +58,24 @@ describe('care upsells', () => {
     expect(screen.getByLabelText('Protected quantity').textContent).toBe('0');
   });
 
+  it('shows the actual cleaning extra before selection for a waterproofing order', () => {
+    function CleaningHarness() {
+      const [items, setItems] = useState([{ sizeId: '3-lugares', qty: 1, packEnabled: false }]);
+      return <QuizSofaAddonUpsell formData={{ ...initialFormData, serviceType: 'waterproofing', waterproofingTier: 'premium' }}
+        updateFormData={() => {}} sofaItems={items} setSofaItems={setItems} onBack={() => {}} onContinue={() => {}} />;
+    }
+    render(<CleaningHarness />);
+    const cleaning = screen.getByRole('button', { name: /Higienização Profunda/ });
+    expect(cleaning.textContent).toContain('+60€');
+    expect(screen.getByText('Ajuda a reduzir odores')).toBeTruthy();
+    fireEvent.click(cleaning);
+    expect(cleaning.getAttribute('aria-pressed')).toBe('true');
+    expect(screen.getByRole('button', { name: 'Continuar com higienização' })).toBeTruthy();
+    expect(screen.queryByText('Em quantos pretende aplicar o tratamento?')).toBeNull();
+    fireEvent.click(cleaning);
+    expect(cleaning.getAttribute('aria-pressed')).toBe('false');
+  });
+
   it('keeps both chair protection tiers and the 5 euro unit treatment', () => {
     const update = vi.fn();
     render(<QuizChairsAddonUpsell formData={{ ...initialFormData, serviceType: 'cleaning', chairQuantity: '4' }} updateFormData={update} onBack={() => {}} onContinue={() => {}} />);
