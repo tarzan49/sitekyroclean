@@ -1081,8 +1081,3 @@ Atualização do teste local (2026-09-10): `?teste=quiz-pack` agora demonstra co
 `carpetKind` distingue alcatifa de tapete nas entradas do widget e ServiceHero. As medidas individuais seguem em todos os resumos. `carpetAllItemsValid` bloqueia peças incompletas; `carpetHasValidItems` continua a identificar qualquer peça válida para sinalizar orçamento. Extras sobrevivem ao regresso a etapas anteriores; tratamentos importados não são descartados nem convertidos em limpeza. O desconto do quiz/widget exige dois artigos tabelados, acima de149€, de acordo com as regras comerciais prioritárias.
 
 Cobertura e limites: `AUDITORIA-FORMSPREE-WHATSAPP-2026-09-10.md`. Os testes de serviços intercetam a rede; não provam receção na conta Formspree nem entrega de email.
-
-
-## Entrada visual do quiz (2026-09-10)
-
-O passo de seleção de serviço usa uma área marfim dentro da moldura verde, cartões com fotografias sem sobreposição escura e legendas em base branca. `QuizStep1Service` mantém a seleção e avanço existentes, com estado selecionado e foco visíveis. No passo 1, `QuizForm` mostra apenas o indicador textual, oculta o ticker de preço e a faixa rotativa e disponibiliza “Alterar localização”. A deslocação mantém o cálculo e volta a ser apresentada nas etapas seguintes e no resumo. Os restantes passos conservam o tema atual.
