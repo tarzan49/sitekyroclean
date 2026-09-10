@@ -7,7 +7,8 @@ import imgColchaoStd    from "@/assets/hero-p-limpeza-colchao-std.webp";
 import imgTapetes       from "@/assets/hero-p-limpeza-tapetes.webp";
 import imgCadeiras      from "@/assets/hero-p-limpeza-cadeiras.webp";
 import imgAlergias      from "@/assets/hero-p-alergias-sofa.webp";
-import imgSofaResultado from "@/assets/galeria-sofa-resultado.webp";
+import imgPreparacao from "@/assets/hero-sofa-cleaning-new.webp";
+import imgExtracao from "@/assets/sofa-extracao.webp";
 
 export const BLOG_IMAGES: Record<string, string> = {
   "quanto-custa-limpar-sofa-profissional":      imgSofaTecido,
@@ -18,7 +19,7 @@ export const BLOG_IMAGES: Record<string, string> = {
   "limpeza-tapetes-profissional-guia-completo": imgTapetes,
   "limpeza-cadeiras-estofadas-precos-guia":     imgCadeiras,
   "doencas-causadas-estofos-sujos":             imgAlergias,
-  "como-preparar-casa-visita-tecnico":          imgSofaResultado,
+  "como-preparar-casa-visita-tecnico":          imgPreparacao,
   "como-limpar-sofa-veludo":                    imgSofaTecido,
   "como-tirar-cheiro-sofa":                     imgSofaDesgast,
   "limpeza-alcatifa-escritorio":                imgTapetes,
@@ -31,7 +32,7 @@ export const BLOG_IMAGES: Record<string, string> = {
   "como-limpar-sofa-microfibra":                imgSofaTecido,
   "limpeza-sofa-bebe-crianca":                  imgAlergias,
   "limpeza-colchao-bebe-crianca":               imgAcarosColchao,
-  "o-que-e-extracao-a-vapor-estofos":           imgSofaResultado,
+  "o-que-e-extracao-a-vapor-estofos":           imgExtracao,
   "mitos-limpeza-estofos":                      imgSofaDesgast,
   "limpeza-sofa-couro":                         imgSofaDesgast,
   "como-tirar-manchas-urina-colchao":           imgAcarosColchao,
