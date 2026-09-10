@@ -8,6 +8,7 @@ import { calcChairClean, calcChairWaterproof, calcChairWaterproofPremium } from 
 interface QuizChairsAddonUpsellProps {
   formData: QuizFormData;
   updateFormData: (updates: Partial<QuizFormData>) => void;
+  hideNavigation?: boolean;
   onContinue: () => void;
   onBack: () => void;
 }
@@ -18,7 +19,7 @@ interface QuizChairsAddonUpsellProps {
 // "Continuar" da etapa de quantidades das cadeiras (só quando a limpeza é o
 // serviço principal), para a pessoa pensar só em quantidade nessa etapa e
 // decidir o extra aqui, sem competir visualmente com a quantidade.
-const QuizChairsAddonUpsell = ({ formData, updateFormData, onContinue, onBack }: QuizChairsAddonUpsellProps) => {
+const QuizChairsAddonUpsell = ({ formData, updateFormData, onContinue, onBack, hideNavigation = false }: QuizChairsAddonUpsellProps) => {
   const isWaterproofBase = formData.serviceType === 'waterproofing';
   const qty = Math.max(1, parseInt(formData.chairQuantity) || 1);
   const premiumPrice = calcChairWaterproofPremium(qty);
@@ -73,20 +74,7 @@ const QuizChairsAddonUpsell = ({ formData, updateFormData, onContinue, onBack }:
           </span>
         </button>
 
-        <div className="flex items-center gap-3 w-full max-w-sm mt-1">
-          <button
-            onClick={onBack}
-            className="h-14 px-5 flex-shrink-0 bg-transparent border border-white/[0.14] text-white/70 hover:text-white/80 hover:border-white/30 active:scale-[0.98] touch-manipulation rounded-sm flex items-center justify-center transition-all text-sm font-semibold"
-          >
-            <ChevronLeft className="w-4 h-4 mr-1" /> Voltar
-          </button>
-          <button
-            onClick={onContinue}
-            className="flex-1 h-14 bg-gradient-to-r from-gold to-[#d4c57b] hover:from-[#d4c57b] hover:to-gold text-[#12121e] font-black text-xs leading-snug px-2 tracking-wide uppercase touch-manipulation active:scale-[0.98] rounded-sm shadow-[0_0_32px_rgba(212,175,55,0.30)]"
-          >
-            {addonOn ? 'Adicionar e Continuar' : 'Continuar'}
-          </button>
-        </div>
+        {!hideNavigation && <ChairAddonActions selected={addonOn} onBack={onBack} onContinue={onContinue} />}
       </div>
     );
   }
@@ -132,7 +120,15 @@ const QuizChairsAddonUpsell = ({ formData, updateFormData, onContinue, onBack }:
         <p className="text-[10px] text-white/65 mt-1">Incluídos em qualquer proteção</p>
       </div>
 
-      <div className="flex items-center gap-3 w-full max-w-sm mt-1">
+      {!hideNavigation && <ChairAddonActions selected={anySelected} onBack={onBack} onContinue={onContinue} />}
+    </div>
+  );
+};
+
+export default QuizChairsAddonUpsell;
+
+export function ChairAddonActions({ selected, onBack, onContinue }: { selected: boolean; onBack: () => void; onContinue: () => void }) {
+  return (<div className="flex items-center gap-3 w-full max-w-sm mt-1">
         <button
           onClick={onBack}
           className="h-14 px-5 flex-shrink-0 bg-transparent border border-white/[0.14] text-white/70 hover:text-white/80 hover:border-white/30 active:scale-[0.98] touch-manipulation rounded-sm flex items-center justify-center transition-all text-sm font-semibold"
@@ -143,11 +139,7 @@ const QuizChairsAddonUpsell = ({ formData, updateFormData, onContinue, onBack }:
           onClick={onContinue}
           className="flex-1 h-14 bg-gradient-to-r from-gold to-[#d4c57b] hover:from-[#d4c57b] hover:to-gold text-[#12121e] font-black text-xs leading-snug px-2 tracking-wide uppercase touch-manipulation active:scale-[0.98] rounded-sm shadow-[0_0_32px_rgba(212,175,55,0.30)]"
         >
-          {anySelected ? 'Continuar com tratamento' : 'Continuar sem extras'}
+          {selected ? 'Continuar com tratamento' : 'Continuar sem extras'}
         </button>
-      </div>
-    </div>
-  );
-};
-
-export default QuizChairsAddonUpsell;
+      </div>);
+}

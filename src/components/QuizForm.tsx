@@ -20,7 +20,7 @@ import type { QuizFormData, SofaItem, MattressItem, CarpetItem, UpsellItemConfig
 import QuizStepLocation from './quiz/steps/QuizStepLocation';
 import QuizStepConfig from './quiz/steps/QuizStepConfig';
 import QuizComboUpsellScreen from './quiz/steps/QuizComboUpsellScreen';
-import QuizChairsAddonUpsell from './quiz/steps/QuizChairsAddonUpsell';
+import QuizChairsAddonUpsell, { ChairAddonActions } from './quiz/steps/QuizChairsAddonUpsell';
 import QuizSofaAddonUpsell from './quiz/steps/QuizSofaAddonUpsell';
 import QuizMattressAddonUpsell from './quiz/steps/QuizMattressAddonUpsell';
 import QuizStepContact from './quiz/steps/QuizStepContact';
@@ -890,6 +890,7 @@ ${formData.description || 'Sem observações adicionais'}
             {currentStep === 3 && activeUpsellScreen === 'chairs' && (
               <div className="flex-1 flex flex-col w-full items-center text-center overflow-y-auto">
                 <QuizChairsAddonUpsell
+                  hideNavigation
                   formData={formData}
                   updateFormData={updateFormData}
                   onContinue={() => {
@@ -985,6 +986,16 @@ ${formData.description || 'Sem observações adicionais'}
 
       </div>
     </div>
+
+    {currentStep === 3 && activeUpsellScreen === 'chairs' && (
+      <div className="shrink-0 w-full flex justify-center px-4 sm:px-6 pt-2 pb-3 border-t border-gold/15 bg-[#071a12]" style={{ paddingBottom: 'max(0.75rem, env(safe-area-inset-bottom))' }}>
+        <ChairAddonActions
+          selected={formData.serviceType === 'waterproofing' ? formData.chairWaterproofQty > 0 : formData.chairWaterproofing}
+          onBack={() => { (document.activeElement as HTMLElement)?.blur(); setActiveUpsellScreen(null); }}
+          onContinue={() => { (document.activeElement as HTMLElement)?.blur(); proceedPastConfig(); }}
+        />
+      </div>
+    )}
 
     {/* Footer — hidden on step 0 (auto-advances on city selection) */}
     {currentStep <= totalSteps && activeUpsellScreen === null && currentStep > 0 && (

@@ -51,3 +51,5 @@ Impermeabilização adicional de cadeiras alinhada com os sofás: benefícios cu
 Cadeiras: decisão 2026-09-10 substitui o extra separado de antiácaros. Desbacterização e antiácaros passam a benefício incluído na impermeabilização; sem terceiro cartão e sem cobrança extra quando há proteção. Conjunto de quatro cadeiras: Essencial 70€, Premium 90€. Outros escalões preservados até instrução específica.
 
 Cadeiras: cartões Premium/Essencial e título da comparação centrados; benefício incluído apresentado em duas linhas centradas («Desbacterização + Antiácaros» / «Incluídos em qualquer proteção»). Preços e seleções preservados.
+
+Rodapé das cadeiras: ChairAddonActions colocado fora da área de scroll no QuizForm. Voltar e Continuar sem extras ficam visíveis desde a entrada; após selecionar, o mesmo botão confirma o tratamento. Conteúdo conserva scroll independente. Tipos e testes aprovados; verificado visualmente no browser.
