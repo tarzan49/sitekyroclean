@@ -3,7 +3,6 @@ import { useMemo } from 'react';
 import type { QuizFormData, SofaItem, MattressItem, CarpetItem, UpsellItemConfig } from '@/components/quiz';
 import { sofaPrices, mattressPrices, locationPrices } from '@/components/quiz';
 import { calcPackPricing, calcChairClean, calcChairWaterproof, calcChairWaterproofPremium, carpetHasValidItems } from '@/components/quiz/quizHelpers';
-import { PACK_DISCOUNT_MIN_UPSELL_ITEM, PACK_DISCOUNT_MIN_TOTAL } from '@/lib/priceWidgetCalc';
 
 export function useQuizPricing(
   formData: QuizFormData,
@@ -11,19 +10,10 @@ export function useQuizPricing(
   mattressItems: MattressItem[],
   upsellItems: UpsellItemConfig[],
   carpetItems: CarpetItem[],
-  offerPreview = false,
 ) {
   // Calculate total price early for analytics (moved up for hook dependency).
-  // Em paralelo, calcula também o "artigo base" de cada item (preço SEM addon,
-  // por unidade) — usado só para decidir se o Pack Família qualifica (ver
-  // packDiscountActive mais abaixo), nunca para o preço real cobrado.
-  const { calculateServicePrice, articleBaseTotal, minQualifyingArticle } = useMemo(() => {
+  const calculateServicePrice = useMemo(() => {
     let price = 0;
-    let baseTotal = 0;
-    let minQualifying: number | null = null;
-    const noteCandidate = (p: number) => {
-      if (p >= PACK_DISCOUNT_MIN_UPSELL_ITEM && (minQualifying === null || p < minQualifying)) minQualifying = p;
-    };
 
     switch (formData.service) {
       case 'sofa': {
@@ -33,7 +23,7 @@ export function useQuizPricing(
           if (!opt) return;
           const isWaterproofBase = formData.serviceType === 'waterproofing';
           const unitPrice = calcPackPricing(opt, item.packEnabled, isWaterproofBase, null, formData.waterproofingTier).displayPrice ?? 0;
-          if (unitPrice > 0) { price += unitPrice * item.qty; baseTotal += unitPrice * item.qty; noteCandidate(unitPrice); }
+          if (unitPrice > 0) price += unitPrice * item.qty;
         });
         break;
       }
@@ -49,7 +39,7 @@ export function useQuizPricing(
             : (typeof opt.cleaningPrice === 'number' ? (opt.cleaningPrice as number) : 0);
           const bothP = typeof opt.bothPrice === 'number' ? (opt.bothPrice as number) : baseP + 30;
           const unitPrice = item.packEnabled ? bothP : baseP;
-          if (unitPrice > 0) { price += unitPrice * item.qty; baseTotal += unitPrice * item.qty; noteCandidate(unitPrice); }
+          if (unitPrice > 0) price += unitPrice * item.qty;
         });
         break;
       }
@@ -58,45 +48,33 @@ export function useQuizPricing(
         const isPremium = formData.waterproofingTier === 'premium';
         const calcWaterproof = isPremium ? calcChairWaterproofPremium : calcChairWaterproof;
         const chairQty = parseInt(formData.chairQuantity);
-        let primaryChairPrice = 0;
         if (!isNaN(chairQty) && chairQty > 0) {
-          primaryChairPrice = formData.serviceType === 'waterproofing'
+          price += formData.serviceType === 'waterproofing'
             ? (calcWaterproof(chairQty) ?? 0)
             : (calcChairClean(chairQty) ?? 0);
-          price += primaryChairPrice;
         }
         const addonQty = formData.chairWaterproofQty;
-        let addonChairPrice = 0;
         if (addonQty > 0) {
-          addonChairPrice = formData.serviceType === 'waterproofing'
+          price += formData.serviceType === 'waterproofing'
             ? (calcChairClean(addonQty) ?? 0)
             : (calcWaterproof(addonQty) ?? 0);
-          price += addonChairPrice;
         }
         // Anti Ácaros das cadeiras (upsell pós-quantidade, 2026-09-06): sempre
         // 5€/cadeira fixo, mutuamente exclusivo com o addon de impermeabilização
         // acima (a UI do upsell garante nunca terem os dois ligados ao mesmo tempo).
-        let antiAcarosChairPrice = 0;
         if (formData.chairAntiAcaros && formData.serviceType !== 'waterproofing' && !formData.chairWaterproofing && addonQty <= 0 && !isNaN(chairQty) && chairQty > 0) {
-          antiAcarosChairPrice = chairQty * 5;
-          price += antiAcarosChairPrice;
+          price += chairQty * 5;
         }
-        // Cadeiras (serviço principal + addon de impermeabilização ou Anti
-        // Ácaros, quando ligado) contam como 1 artigo só, ao preço total do
-        // lote incluindo o addon — os addons contam para o Pack Família (2026-09-01).
-        const totalChairArticle = primaryChairPrice + addonChairPrice + antiAcarosChairPrice;
-        if (totalChairArticle > 0) { baseTotal += totalChairArticle; noteCandidate(totalChairArticle); }
         break;
       }
 
       case 'carpet': {
-        // Sem preço fixo (2026-09-06): tapetes nunca contam para o preço nem
-        // para o Pack Família, ficam sempre sob orçamento (ver hasSobOrcamento).
+        // Sem preço fixo (2026-09-06): tapetes ficam sempre sob orçamento (ver hasSobOrcamento).
         break;
       }
     }
 
-    return { calculateServicePrice: price, articleBaseTotal: baseTotal, minQualifyingArticle: minQualifying };
+    return price;
   }, [formData, sofaItems, mattressItems, carpetItems]);
 
   // Calculate travel cost: uses expanded locationPrices from QuizTypes.
@@ -143,29 +121,6 @@ export function useQuizPricing(
     chairAddonNeedsQuote;
   // Any upsell item with price=0 is a SOB item (chairs ≥10, tapetes (sempre), sofa 4+ lugares)
   const hasUpsellSobItem = upsellItems.some(i => i.price === 0);
-  // Regra comercial 2026-09-10: pelo menos dois artigos tabelados, soma >149€
-  // e um artigo >=49€. Cadeiras contam como um lote; tratamento não é artigo.
-  // Artigos sob orçamento nunca desbloqueiam um desconto por terem preço zero.
-  const NON_ARTICLE_UPSELL_IDS = new Set(['sofa-anti-acaros', 'chairs-anti-acaros']);
-  const articleUpsellItems = upsellItems.filter(i => !NON_ARTICLE_UPSELL_IDS.has(i.id));
-  const upsellArticleTotal = articleUpsellItems.reduce((sum, item) => sum + safePrice(item.price), 0);
-  const hasSubstantialUpsellArticle = articleUpsellItems.some(i => i.price >= PACK_DISCOUNT_MIN_UPSELL_ITEM);
-  const totalArticleValue = articleBaseTotal + upsellArticleTotal;
-  const hasSubstantialArticle = minQualifyingArticle !== null || hasSubstantialUpsellArticle;
-  const primaryArticleCount = formData.service === 'sofa' ? sofaItems.reduce((sum, i) => sum + (i.qty > 0 && i.sizeId !== '4+-lugares' ? i.qty : 0), 0)
-    : formData.service === 'mattress' ? mattressItems.reduce((sum, i) => sum + Math.max(0, i.qty), 0)
-    : formData.service === 'chairs' && !chairPrimaryNeedsQuote && chairQtyNum > 0 ? 1 : 0;
-  const articleCount = primaryArticleCount + articleUpsellItems.reduce((sum, i) => sum + (i.price <= 0 ? 0 : i.id === 'chairs' ? 1 : (i.qty ?? 1)), 0);
-  const previewDiscount = offerPreview;
-  const packDiscountActive = previewDiscount
-    ? false // Local fixed-price offer already includes its saving; never stack 10%.
-    : (articleCount >= 2 && totalArticleValue > PACK_DISCOUNT_MIN_TOTAL && hasSubstantialArticle);
-  const packDiscountPct = packDiscountActive ? 0.10 : 0;
-  const serviceOnlyTotal = calculateServicePrice + upsellItemsTotal + 0;
-  const discountedPrice = Math.round(totalPrice);
-  const packDiscountedPrice = packDiscountActive && totalPrice > 0
-    ? (previewDiscount ? Math.round(serviceOnlyTotal * 90) / 100 : Math.round(serviceOnlyTotal * 0.9)) + finalTravelCost
-    : discountedPrice;
 
   return {
     calculateServicePrice,
@@ -174,10 +129,5 @@ export function useQuizPricing(
     totalPrice,
     hasSobOrcamento,
     hasUpsellSobItem,
-    packDiscountActive,
-    packDiscountPct,
-    serviceOnlyTotal,
-    discountedPrice,
-    packDiscountedPrice,
   };
 }

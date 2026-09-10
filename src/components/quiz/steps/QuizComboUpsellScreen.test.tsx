@@ -6,15 +6,14 @@ import type { UpsellItemConfig } from '../QuizTypes';
 
 afterEach(cleanup);
 
-function Harness({ primaryService = 'other', packDiscountActive = false, offerPreview = false } = {}) {
+function Harness({ primaryService = 'other', offerPreview = false } = {}) {
   const [items, setItems] = useState<UpsellItemConfig[]>([]);
   const [contact, setContact] = useState(false);
   return <>
     <output data-testid="items">{JSON.stringify(items)}</output>
     {contact ? <button onClick={() => setContact(false)}>Voltar aos extras</button> :
       <QuizComboUpsellScreen offerPreview={offerPreview} primaryService={primaryService} upsellItems={items} setUpsellItems={setItems}
-        onContinue={() => setContact(true)} onBack={() => {}}
-        totalPrice={207} packDiscountActive={packDiscountActive} packDiscountedPrice={packDiscountActive ? 187 : 207} />}
+        onContinue={() => setContact(true)} onBack={() => {}} />}
   </>;
 }
 const click = (name: string | RegExp) => fireEvent.click(screen.getByRole('button', { name }));
@@ -40,18 +39,17 @@ describe('final upsell navigation', () => {
     expect(screen.getByRole('button', { name: 'Finalizar Orçamento' })).toBeTruthy();
   });
 
-  it('acknowledges an existing discount and follows changes to eligibility', () => {
-    const { rerender } = render(<Harness primaryService="sofa" packDiscountActive />);
+  // 2026-09-10 (pedido explícito do dono): sem desconto de 10% sobre o
+  // pedido todo — cada artigo extra já vem com o seu preço reduzido, sem
+  // nenhuma condição de elegibilidade a cumprir.
+  it('never mentions a 10%-off-the-order discount, in offerPreview mode or not', () => {
+    const { rerender } = render(<Harness primaryService="sofa" offerPreview />);
     expect(screen.getByText('APROVEITE A MESMA VISITA')).toBeTruthy();
     expect(screen.getByRole('heading', { name: 'Quer limpar mais alguma coisa?' })).toBeTruthy();
-    expect(screen.getByText(/Já tem 10% de desconto/)).toBeTruthy();
-    expect(screen.queryByText(/Válido com um artigo/)).toBeNull();
-    roundTrip();
-    expect(savedItems()).toEqual([]);
-    expect(screen.getByText(/Já tem 10% de desconto/)).toBeTruthy();
-    rerender(<Harness primaryService="sofa" packDiscountActive={false} />);
-    expect(screen.getByRole('heading', { name: 'Poupe 10% nos serviços' })).toBeTruthy();
-    expect(screen.getByText(/Válido com um artigo/)).toBeTruthy();
+    expect(screen.queryByText(/10%/)).toBeNull();
+    rerender(<Harness primaryService="sofa" offerPreview={false} />);
+    expect(screen.getByRole('heading', { name: 'Adicione mais um serviço' })).toBeTruthy();
+    expect(screen.queryByText(/10%/)).toBeNull();
   });
 
   it('preserves all categories and individual carpet dimensions when returning from contact', () => {
@@ -100,13 +98,13 @@ describe('final upsell navigation', () => {
 it('preserves imported anti-mite treatment instead of silently dropping it', () => {
   const treatment = { id: 'sofa-anti-acaros', qty: 1, price: 25, label: 'Anti Ácaros (sofá)' };
   let latest: UpsellItemConfig[] = [];
-  render(<QuizComboUpsellScreen primaryService="sofa" upsellItems={[treatment]} setUpsellItems={items => { latest = items; }} onContinue={() => {}} onBack={() => {}} totalPrice={104} packDiscountActive={false} packDiscountedPrice={104} />);
+  render(<QuizComboUpsellScreen primaryService="sofa" upsellItems={[treatment]} setUpsellItems={items => { latest = items; }} onContinue={() => {}} onBack={() => {}} />);
   expect(latest).toContainEqual(treatment);
 });
 
 it('preserves Premium waterproofing chairs imported from the widget', () => {
   let latest: UpsellItemConfig[] = [];
-  render(<QuizComboUpsellScreen primaryService="sofa" upsellItems={[{ id: 'chairs', chairQty: '5', qty: 5, price: 95, label: '5 cadeiras (Impermeabilização Premium)', waterproof: true, waterproofingTier: 'premium' }]} setUpsellItems={items => { latest = items; }} onContinue={() => {}} onBack={() => {}} totalPrice={244} packDiscountActive packDiscountedPrice={221} />);
+  render(<QuizComboUpsellScreen primaryService="sofa" upsellItems={[{ id: 'chairs', chairQty: '5', qty: 5, price: 95, label: '5 cadeiras (Impermeabilização Premium)', waterproof: true, waterproofingTier: 'premium' }]} setUpsellItems={items => { latest = items; }} onContinue={() => {}} onBack={() => {}} />);
   expect(latest[0].price).toBe(95);
   expect(latest[0].label).toContain('Impermeabilização Premium');
 });

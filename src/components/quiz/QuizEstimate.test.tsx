@@ -5,32 +5,45 @@ import QuizEstimate from './QuizEstimate';
 beforeEach(() => vi.stubGlobal('matchMedia', () => ({ matches: true })));
 afterEach(() => { cleanup(); vi.unstubAllGlobals(); });
 
-const base = { totalPrice: 607, discountedPrice: 547, discountActive: true, needsQuote: false, travelOnly: false, location: 'Porto' };
+const base = { totalPrice: 607, needsQuote: false, travelOnly: false, location: 'Porto' };
 
-describe('quote savings presentation', () => {
-  it('uses the actual rounded quote amount and savings, keeping travel out of the discount', () => {
+describe('quote total presentation', () => {
+  it('shows the rounded total, with no discount concept involved', () => {
     render(<QuizEstimate {...base} />);
-    expect(screen.getByLabelText('547 euros')).toBeTruthy();
-    expect(screen.getByRole('status').textContent).toContain('Poupa 60€ nesta visita');
-    expect(screen.getByText('607€').tagName).toBe('S');
+    expect(screen.getByLabelText('607 euros')).toBeTruthy();
   });
 
-  it('updates when extras are added and removes the savings when eligibility is lost', () => {
+  it('updates the amount as extras are added', () => {
     const { rerender } = render(<QuizEstimate {...base} />);
-    rerender(<QuizEstimate {...base} totalPrice={676} discountedPrice={609} />);
-    expect(screen.getByLabelText('609 euros')).toBeTruthy();
-    expect(screen.getByRole('status').textContent).toContain('Poupa 67€');
-    rerender(<QuizEstimate {...base} totalPrice={89} discountedPrice={89} discountActive={false} />);
-    expect(screen.getByLabelText('89 euros')).toBeTruthy();
-    expect(screen.queryByRole('status')).toBeNull();
+    rerender(<QuizEstimate {...base} totalPrice={676} />);
+    expect(screen.getByLabelText('676 euros')).toBeTruthy();
   });
 
-  it('keeps unpriced services explicit and does not claim a saving on travel alone', () => {
+  it('keeps unpriced services explicit', () => {
     const { rerender } = render(<QuizEstimate {...base} needsQuote />);
     expect(screen.getByText('+ Sob orçamento')).toBeTruthy();
-    expect(screen.getByRole('status').textContent).toContain('aos valores estimados');
-    rerender(<QuizEstimate {...base} needsQuote travelOnly totalPrice={10} discountedPrice={10} />);
+    rerender(<QuizEstimate {...base} needsQuote travelOnly totalPrice={10} />);
     expect(screen.getByLabelText('10 euros')).toBeTruthy();
-    expect(screen.queryByRole('status')).toBeNull();
+  });
+});
+
+// Bug real reportado: 1 cadeira (20€) + 10€ de deslocação aparecia só como
+// "30€" no topo, sem nada visível a explicar a diferença — o cliente achava
+// que a cadeira sozinha custava 30€. A composição detalhada já existia mas
+// estava escondida atrás de um <details> fechado por omissão.
+describe('travel cost visibility', () => {
+  it('always shows the travel cost inline, without needing to open the breakdown', () => {
+    render(<QuizEstimate {...base} totalPrice={30} travelCost={10} />);
+    expect(screen.getByText(/Inclui 10€ de deslocação a Porto/)).toBeTruthy();
+  });
+
+  it('stays silent when there is no travel cost to explain', () => {
+    render(<QuizEstimate {...base} />);
+    expect(screen.queryByText(/deslocação/)).toBeNull();
+  });
+
+  it('does not repeat itself on the travel-only step', () => {
+    render(<QuizEstimate {...base} travelOnly totalPrice={10} travelCost={10} />);
+    expect(screen.queryByText(/Inclui/)).toBeNull();
   });
 });

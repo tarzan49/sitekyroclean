@@ -37,9 +37,6 @@ export interface QuizLeadPayload {
   totalPrice: number;
   hasSobOrcamento: boolean;
   hasUpsellSobItem: boolean;
-  packDiscountActive: boolean;
-  packDiscountedPrice: number;
-  packDiscountPct: number;
   finalTravelCost: number;
 
   hypoallergenic: boolean | null;
@@ -123,13 +120,12 @@ export function buildWaUrl(payload: QuizLeadPayload, bookingId: string): string 
   return `${WHATSAPP_BASE}?text=${encodeURIComponent(text)}`;
 }
 
-export function formatQuotePrice(payload: Pick<QuizLeadPayload, 'totalPrice' | 'packDiscountActive' | 'packDiscountedPrice' | 'packDiscountPct' | 'hasSobOrcamento' | 'hasUpsellSobItem'>): string {
-  const value = payload.packDiscountActive ? payload.packDiscountedPrice : payload.totalPrice;
+export function formatQuotePrice(payload: Pick<QuizLeadPayload, 'totalPrice' | 'hasSobOrcamento' | 'hasUpsellSobItem'>): string {
+  const value = payload.totalPrice;
   const price = `${Number(value.toFixed(2)).toLocaleString('pt-PT')}€`;
-  const discount = payload.packDiscountActive ? ` (Pack -${Math.round(payload.packDiscountPct * 100)}% nos serviços tabelados)` : '';
   return payload.hasSobOrcamento || payload.hasUpsellSobItem
-    ? `${price} de subtotal conhecido${discount} + serviços sob orçamento`
-    : value > 0 ? `${price}${discount}` : 'Sob orçamento';
+    ? `${price} de subtotal conhecido + serviços sob orçamento`
+    : value > 0 ? price : 'Sob orçamento';
 }
 
 export function buildReceiptLines(payload: Pick<QuizLeadPayload, 'service' | 'serviceType' | 'waterproofingTier' | 'sofaItems' | 'mattressItems' | 'upsellItems' | 'carpetItems' | 'chairQuantity' | 'chairWaterproofQty' | 'chairAntiAcaros' | 'finalTravelCost' | 'finalLocation' | 'carpetKind'>) {
@@ -217,14 +213,12 @@ export function buildReceiptLines(payload: Pick<QuizLeadPayload, 'service' | 'se
 
 function persistObrigadoData(payload: QuizLeadPayload, bookingId: string, waUrl: string): void {
   const {
-    totalPrice, hasSobOrcamento, hasUpsellSobItem, packDiscountActive, packDiscountedPrice, packDiscountPct,
+    totalPrice, hasSobOrcamento, hasUpsellSobItem,
     serviceLabel, serviceTypeLabel, finalLocation, slotLabel, name,
   } = payload;
 
   const isSobOrcamento = hasSobOrcamento || hasUpsellSobItem;
   const finalPriceText = formatQuotePrice(payload);
-
-  const discountAmt = packDiscountActive ? Math.round((totalPrice - packDiscountedPrice) * 100) / 100 : 0;
 
   safeSessionSet('kyro_booking_id', bookingId);
   safeSessionSet('kyro_wa_url', waUrl);
@@ -236,9 +230,9 @@ function persistObrigadoData(payload: QuizLeadPayload, bookingId: string, waUrl:
   safeSessionSet('kyro_receipt', JSON.stringify({
     lines: buildReceiptLines(payload),
     subtotal: totalPrice,
-    discountLabel: packDiscountActive ? `Pack Família −${Math.round(packDiscountPct * 100)}%` : null,
-    discountAmount: discountAmt,
-    total: packDiscountActive ? packDiscountedPrice : totalPrice,
+    discountLabel: null,
+    discountAmount: 0,
+    total: totalPrice,
     sobOrcamento: isSobOrcamento,
     location: finalLocation,
     slot: slotLabel,

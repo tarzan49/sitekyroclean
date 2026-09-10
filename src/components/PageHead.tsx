@@ -108,16 +108,16 @@ const routeMeta: Record<string, { pt: PageMeta; en: PageMeta; es: PageMeta }> = 
   },
   "/packs": {
     pt: {
-      title: "Packs Limpeza + Impermeabilização | Kyro Clean Solutions | Até 10% Desconto",
-      description: "Packs exclusivos de limpeza e impermeabilização com até 15% de desconto. Proteja os seus estofos com o melhor preço.",
+      title: "Packs Limpeza + Impermeabilização | Kyro Clean Solutions",
+      description: "Monte o seu pack: escolha os artigos, tamanhos e tratamentos para a mesma visita. Preços de tabela transparentes, sem surpresas.",
     },
     en: {
-      title: "Cleaning + Waterproofing Packs | Kyro Clean Solutions | Up to 10% Off",
-      description: "Exclusive cleaning and waterproofing packs with up to 10% discount. Protect your upholstery at the best price.",
+      title: "Cleaning + Waterproofing Packs | Kyro Clean Solutions",
+      description: "Build your pack: pick the items, sizes and treatments for the same visit. Transparent table prices, no surprises.",
     },
     es: {
-      title: "Packs Limpieza + Impermeabilización | Kyro Clean Solutions | Hasta 10% Descuento",
-      description: "Packs exclusivos de limpieza e impermeabilización con hasta 10% de descuento.",
+      title: "Packs Limpieza + Impermeabilización | Kyro Clean Solutions",
+      description: "Cree su pack: elija los artículos, tamaños y tratamientos para la misma visita. Precios de tabla transparentes, sin sorpresas.",
     },
   },
   "/blog": {

@@ -157,7 +157,7 @@ function exportCSV(leads: Lead[]) {
 function getSalesInsight(lead: Lead): { emoji: string; text: string; type: 'price' | 'ghost' | 'hot' } | null {
   const txt = `${lead.notes ?? ''} ${lead.next_step ?? ''}`.toLowerCase();
   if (/preço|caro|apreensiv|analis|pensar|cust|barato|desconto/.test(txt))
-    return { emoji: '', text: 'Objeção de preço: propor 10% desconto', type: 'price' };
+    return { emoji: '', text: 'Objeção de preço: sugerir juntar outro artigo na mesma visita (preço reduzido)', type: 'price' };
   if (/não respondeu|sem retorno|parou de respond|não quer mais|arquiv/.test(txt))
     return { emoji: '', text: 'Sem resposta: considerar mudar para Frio', type: 'ghost' };
   if (/urgent|esta semana|hoje|confirmo|quer para/.test(txt))
@@ -979,7 +979,7 @@ const AdminDashboard = ({ embedded = false }: { embedded?: boolean }) => {
                                 {(stale || getSalesInsight(lead)) && waPhone.length >= 9 && (
                                   <div className="flex gap-1 mt-1 flex-wrap">
                                     <a
-                                      href={`https://wa.me/351${waPhone}?text=${encodeURIComponent(`Olá ${lead.name}, aqui é o António da Kyro Clean Solutions. Temos uma promoção especial esta semana: 10% de desconto. Posso enviar um orçamento atualizado?`)}`}
+                                      href={`https://wa.me/351${waPhone}?text=${encodeURIComponent(`Olá ${lead.name}, aqui é o António da Kyro Clean Solutions. Se juntar outro artigo à mesma visita, esse artigo fica com preço reduzido. Posso enviar um orçamento atualizado?`)}`}
                                       target="_blank" rel="noopener noreferrer"
                                       className="flex items-center gap-1 h-6 px-2 text-[9px] font-bold bg-[#25D366]/15 text-[#25D366] border border-[#25D366]/25 rounded-md hover:bg-[#25D366]/25 transition-colors whitespace-nowrap"
                                     >

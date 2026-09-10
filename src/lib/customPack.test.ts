@@ -23,19 +23,17 @@ describe('custom pack commercial rules', () => {
     expect(result.travel).toBeNull(); expect(result.quote).toBe(true);
     expect(result.total).toBe(49);
   });
-  it('applies the existing discount threshold and never discounts travel', () => {
+  // 2026-09-10 (pedido explícito do dono): sem desconto de 10% sobre o
+  // pedido todo — cada linha soma ao preço de tabela, sem limiar a cumprir.
+  it('sums the full table price for each item, with no discount concept, and never discounts travel', () => {
     const items = [{ ...makePackItem('sofa', 's'), size: '3-lugares' }, { ...makePackItem('mattress', 'm'), size: 'king' }];
     const result = calculateCustomPack(items, 'Barcelos');
-    expect(result.subtotal).toBe(158); expect(result.discountActive).toBe(true);
-    expect(result.travel).toBe(20); expect(result.total).toBe(Math.round(158 * .9) + 20);
-    expect(calculateCustomPack([makePackItem('sofa','s'), makePackItem('mattress','m')], 'Braga').discountActive).toBe(false);
+    expect(result.subtotal).toBe(158);
+    expect(result.travel).toBe(20); expect(result.total).toBe(158 + 20);
   });
   it('keeps ten chairs under quote even when split across rows', () => {
     const result = calculateCustomPack([{ ...makePackItem('chairs','a'), qty: 5 }, { ...makePackItem('chairs','b'), qty: 5 }], 'Braga');
     expect(result.lines.every(line => line.amount === null)).toBe(true);
     expect(result.quote).toBe(true);
-  });
-  it('does not mistake one expensive sofa for two articles', () => {
-    expect(calculateCustomPack([{ ...makePackItem('sofa', 's'), size: '3-lugares', extra: 'premium' }], 'Porto').discountActive).toBe(false);
   });
 });

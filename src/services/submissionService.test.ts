@@ -65,7 +65,6 @@ describe('specific regressions and delivery failures', () => {
   it('3-seat Premium pack uses the approved 30€ override, not the 40€ standalone difference', () => {
     const p = payload({ service: 'sofa', serviceType: 'cleaning', waterproofingTier: 'premium' }, [{ sizeId: '3-lugares', qty: 1, packEnabled: true }]);
     expect(p.calculateServicePrice).toBe(199);
-    expect(p.packDiscountActive).toBe(false);
     expect(buildReceiptLines(p)[0].total).toBe(199);
   });
   it('4+ sofa pack never invents a 40€ fixed price', () => {

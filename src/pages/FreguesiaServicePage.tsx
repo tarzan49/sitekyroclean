@@ -36,7 +36,7 @@ import { pickServiceHero } from "@/constants/serviceContent";
 import { buildServiceWaMessage } from "@/lib/whatsappMessages";
 import { SITE_URL, WHATSAPP_BASE, REVIEW_RATING, REVIEW_COUNT } from "@/constants/business";
 import { PRICE_TABLE, PRICE_TABLE_QUIZ_CONFIG, type PriceRowQuizConfig } from "@/data/locationPriceTestimonialsData";
-import { calcWidgetTotal, calcChairBracket, buildWidgetQuizConfig, calcRowAddonDelta, calcSofaAntiAcarosDelta, calcChairAddonWaterproofTotal, calcChairAntiAcarosTotal, calcWidgetPricing, calcWidgetArticles, PACK_DISCOUNT_MIN_SERVICE, PACK_DISCOUNT_MIN_UPSELL_ITEM, type WidgetTier } from "@/lib/priceWidgetCalc";
+import { calcWidgetTotal, calcChairBracket, buildWidgetQuizConfig, calcRowAddonDelta, calcSofaAntiAcarosDelta, calcChairAddonWaterproofTotal, calcChairAntiAcarosTotal, type WidgetTier } from "@/lib/priceWidgetCalc";
 import { locationPrices, type CarpetItem } from "@/components/quiz/QuizTypes";
 import { PROBLEM_IMAGES, PRICE_HEADING_VERB, SERVICE_DURATION } from "@/constants/problemCardHelpers";
 import { ServiceTrustDesktop, ServiceTrustMobile } from "@/components/ServiceTrustBlock";

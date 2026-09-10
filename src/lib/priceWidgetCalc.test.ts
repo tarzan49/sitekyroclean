@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import {
-  calcChairBracket, calcWidgetPricing, calcWidgetArticles,
-  calcWidgetTotal, buildWidgetQuizConfig, PACK_DISCOUNT_MIN_TOTAL,
+  calcChairBracket, calcWidgetPricing,
+  calcWidgetTotal, buildWidgetQuizConfig,
 } from './priceWidgetCalc';
 
 describe('calcChairBracket', () => {
@@ -23,8 +23,8 @@ describe('calcChairBracket', () => {
 
 // calcCarpetWidget foi removida (2026-09-09, pedido explícito: "limpeza de
 // alcatifa e sempre sob orçamento assim como tapete") — carpet (tapete e
-// alcatifa) nunca mais entra em calcWidgetTotal/calcWidgetArticles, ver o
-// early-return "sempre sob orçamento" nessas duas funções.
+// alcatifa) nunca mais entra em calcWidgetTotal, ver o early-return "sempre
+// sob orçamento".
 describe('calcWidgetTotal — carpet (tapete e alcatifa) nunca soma ao total', () => {
   it('linhas de carpet são ignoradas mesmo com qty > 0', () => {
     expect(calcWidgetTotal('limpeza-tapetes', { 0: 20 }, 0)).toBe(0);
@@ -32,61 +32,21 @@ describe('calcWidgetTotal — carpet (tapete e alcatifa) nunca soma ao total', (
   });
 });
 
-// Este é o bug real reportado nesta sessão: "o desconto ativou sem o valor
-// ser mais que 100 eur. eu fiz upsell de um item de 49 eur e o desconto
-// ativou automaticamente" — a regra certa exige DOIS critérios ao mesmo
-// tempo (soma > 149€ E pelo menos um artigo isolado >= 49€), não um sozinho.
-describe('calcWidgetPricing — regra do desconto Pack Família (100€ base + 49€ artigo extra)', () => {
-  it('does not activate for a single 49€ article alone, even if that IS the qualifying threshold', () => {
-    const pricing = calcWidgetPricing(49, 10, { articleCount: 2, articleTotal: 49, minQualifyingArticle: 49 });
-    expect(pricing.discountActive).toBe(false);
-  });
-  it('does not activate exactly at the 149€ boundary — must be strictly greater than', () => {
-    expect(PACK_DISCOUNT_MIN_TOTAL).toBe(149);
-    const pricing = calcWidgetPricing(149, 0, { articleCount: 2, articleTotal: 149, minQualifyingArticle: 49 });
-    expect(pricing.discountActive).toBe(false);
-  });
-  it('activates just above 149€ when a qualifying (>=49€) article exists', () => {
-    const pricing = calcWidgetPricing(150, 0, { articleCount: 2, articleTotal: 150, minQualifyingArticle: 49 });
-    expect(pricing.discountActive).toBe(true);
-  });
-  it('does NOT activate above 149€ if every individual article is under 49€ (e.g. many small chairs)', () => {
-    const pricing = calcWidgetPricing(200, 0, { articleCount: 2, articleTotal: 200, minQualifyingArticle: null });
-    expect(pricing.discountActive).toBe(false);
-  });
-  it('discountedTotal applies 10% only to the service total, travel fee stays full price', () => {
-    const pricing = calcWidgetPricing(200, 10, { articleCount: 2, articleTotal: 200, minQualifyingArticle: 60 });
-    expect(pricing.discountActive).toBe(true);
-    expect(pricing.discountedTotal).toBe(Math.round(200 * 0.9) + 10);
+// 2026-09-10 (pedido explícito do dono): o desconto Pack Família de 10% sobre
+// o pedido todo foi removido do site e do código — calcWidgetArticles e o
+// limiar de 149€ deixaram de existir. calcWidgetPricing agora só soma
+// serviço + deslocação.
+describe('calcWidgetPricing — sem conceito de desconto', () => {
+  it('grandTotal is just serviceTotal + travelFee', () => {
+    expect(calcWidgetPricing(200, 10)).toEqual({ serviceTotal: 200, travelFee: 10, grandTotal: 210 });
   });
 });
 
-describe('calcWidgetArticles + calcWidgetTotal (limpeza-sofas, dados reais)', () => {
-  it('a single "Sofá 1 lugar" (49€) is one article of 49€, not enough alone to qualify the discount', () => {
-    const rowQuantities = { 0: 1 };
-    const articles = calcWidgetArticles('limpeza-sofas', rowQuantities);
-    expect(articles.articleTotal).toBe(49);
-    expect(articles.minQualifyingArticle).toBe(49);
-    const total = calcWidgetTotal('limpeza-sofas', rowQuantities, 0);
-    const pricing = calcWidgetPricing(total, 10, articles);
-    expect(pricing.discountActive).toBe(false);
-  });
-
-  it('sofa 1 lugar + 2 lugares + 3 lugares together cross 149€ and qualify', () => {
-    const rowQuantities = { 0: 1, 1: 1, 2: 1 }; // 49 + 69 + 79 = 197
-    const articles = calcWidgetArticles('limpeza-sofas', rowQuantities);
-    expect(articles.articleTotal).toBe(197);
-    const total = calcWidgetTotal('limpeza-sofas', rowQuantities, 0);
-    const pricing = calcWidgetPricing(total, 0, articles);
-    expect(pricing.discountActive).toBe(true);
-  });
-
+describe('calcWidgetTotal (limpeza-sofas, dados reais)', () => {
   it('"Sofá de 4+ lugares" (sob orçamento) never silently contributes 0€ as if it were free', () => {
     const rowQuantities = { 4: 1 }; // index 4 = 4+ lugares
     const total = calcWidgetTotal('limpeza-sofas', rowQuantities, 0);
-    expect(total).toBe(0); // sob orçamento: não soma preço nenhum...
-    const articles = calcWidgetArticles('limpeza-sofas', rowQuantities);
-    expect(articles.articleTotal).toBe(0); // ...e também não finge ser um artigo de 0€ que "conta".
+    expect(total).toBe(0); // sob orçamento: não soma preço nenhum.
   });
 
   it('a row without quizConfig (chaise longue) still prices from its flat PRICE_TABLE price if set via rowQuantities directly', () => {
@@ -134,7 +94,6 @@ describe('waterproof widget handoff', () => {
     expect(config.waterproofingTier).toBe(tier);
     expect(config.sofaItems?.[0].qty).toBe(2);
     expect(config.initialUpsellItems?.[0].price).toBe(chairs);
-    expect(calcWidgetArticles('impermeabilizacao', quantities, new Set(), tier).articleTotal).toBe(total);
   });
   it('keeps ten chairs as quote-only in a mixed selection', () => {
     const config = buildWidgetQuizConfig('impermeabilizacao', { 0: 1, 5: 10 }, 0)!;

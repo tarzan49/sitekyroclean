@@ -1,4 +1,4 @@
-import { SOFA_ANTI_ACAROS_PRICE, PACK_DISCOUNT_MIN_TOTAL, PACK_DISCOUNT_MIN_UPSELL_ITEM } from './priceWidgetCalc';
+import { SOFA_ANTI_ACAROS_PRICE } from './priceWidgetCalc';
 import { sofaPrices, mattressPrices, sofaChaisePrice } from '../components/quiz/QuizTypes';
 import { calcChairClean, calcChairWaterproof, calcChairWaterproofPremium, calcPackPricing } from '../components/quiz/quizHelpers';
 import { locationPrices } from '../constants/travel';
@@ -48,10 +48,6 @@ export function calculateCustomPack(items: CustomPackItem[], city: string) {
   const totalChairs = items.filter(i => i.kind === 'chairs').reduce((sum, i) => sum + i.qty, 0);
   const lines = items.map(item => item.kind === 'chairs' && totalChairs >= 10 ? { ...customPackLine(item), amount: null, quote: true } : customPackLine(item));
   const subtotal = lines.reduce((sum, line) => sum + (line.amount ?? 0), 0);
-  const articleCount = items.reduce((sum, item, i) => sum + (lines[i].amount === null || item.kind === 'chairs' ? 0 : item.qty), 0) + (totalChairs > 0 && totalChairs < 10 ? 1 : 0);
-  // Existing live Pack Família threshold. A new configurator does not authorise changing the promotion.
-  const discountActive = articleCount >= 2 && subtotal > PACK_DISCOUNT_MIN_TOTAL && lines.some(l => (l.amount ?? 0) >= PACK_DISCOUNT_MIN_UPSELL_ITEM);
-  const servicesTotal = discountActive ? Math.round(subtotal * 0.9) : subtotal;
   const travel = locationPrices[city] ?? null;
-  return { lines, subtotal, discountActive, discount: subtotal - servicesTotal, servicesTotal, travel, total: servicesTotal + (travel ?? 0), quote: lines.some(l => l.quote) || travel === null, valid: items.length > 0 && items.every(packItemValid) && Boolean(city.trim()) };
+  return { lines, subtotal, servicesTotal: subtotal, travel, total: subtotal + (travel ?? 0), quote: lines.some(l => l.quote) || travel === null, valid: items.length > 0 && items.every(packItemValid) && Boolean(city.trim()) };
 }

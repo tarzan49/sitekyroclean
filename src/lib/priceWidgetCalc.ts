@@ -128,89 +128,14 @@ export function calcWidgetTotal(
   return Math.round(total * 10) / 10;
 }
 
-// 2026-08-31 (reformulado x4, confirmado com 3 exemplos concretos) — espelha
-// use-quiz-pricing.ts: conta-se cada UNIDADE de mobília (sofá, colchão,
-// cadeiras-como-lote, tapete) como um artigo ao seu preço BASE (sem addon).
-// Regra final: soma de todos os artigos > 149€ (100€ de base + 49€ do artigo
-// extra, não sobrepostos) E pelo menos um artigo, sozinho, vale 49€ ou mais.
-// Limiar do artigo extra baixado de 60€ para 49€ 2026-09-08 (pedido explícito
-// do dono, secção final do upsell) — use-quiz-pricing.ts importa estas
-// constantes em vez de duplicar o número, para nunca mais dessincronizar.
-export const PACK_DISCOUNT_MIN_SERVICE = 100;
-export const PACK_DISCOUNT_MIN_UPSELL_ITEM = 49;
-export const PACK_DISCOUNT_MIN_TOTAL = PACK_DISCOUNT_MIN_SERVICE + PACK_DISCOUNT_MIN_UPSELL_ITEM;
-
-export interface WidgetArticleInfo {
-  articleTotal: number;
-  articleCount?: number;
-  minQualifyingArticle: number | null;
-}
-
-export function calcWidgetArticles(
-  serviceSlug: string,
-  rowQuantities: Record<number, number>,
-  addonRows: Set<number> = new Set(),
-  addonTier: WidgetTier = 'essencial',
-  antiAcarosRows: Set<number> = new Set()
-): WidgetArticleInfo {
-  const rows = PRICE_TABLE[serviceSlug] ?? [];
-  const configs = PRICE_TABLE_QUIZ_CONFIG[serviceSlug] ?? [];
-  const isWaterproof = serviceSlug === 'impermeabilizacao';
-  let articleTotal = 0;
-  let articleCount = 0;
-  let minQualifyingArticle: number | null = null;
-  const noteCandidate = (p: number) => {
-    if (p >= PACK_DISCOUNT_MIN_UPSELL_ITEM && (minQualifyingArticle === null || p < minQualifyingArticle)) minQualifyingArticle = p;
-  };
-
-  rows.forEach((row, i) => {
-    const qty = rowQuantities[i] ?? 0;
-    if (qty <= 0) return;
-    const cfg = configs[i];
-    if (!cfg) return; // chaise longue: addon, não é um artigo próprio
-    if (cfg.service === 'chairs') {
-      let total = calcChairBracket(qty, isWaterproof, addonTier) ?? 0;
-      // Addons contam para o artigo (pedido explícito 2026-09-01: o valor
-      // do addon ligado tem de entrar na conta do Pack Família, tal como já
-      // acontece no total realmente cobrado — mesma lógica do modal).
-      if (!isWaterproof) {
-        if (addonRows.has(i)) total += calcChairAddonWaterproofTotal(qty, addonTier) ?? 0;
-        if (antiAcarosRows.has(i)) total += calcChairAntiAcarosTotal(qty) ?? 0;
-      }
-      if (total > 0) { articleCount += 1; articleTotal += total; noteCandidate(total); }
-      return;
-    }
-    if (cfg.service === 'carpet') return; // sempre sob orçamento (tapete e alcatifa) — nunca conta para o Pack Família
-    // Sofá / colchão: cada unidade é um artigo separado ao preço da linha,
-    // incluindo o addon quando está ligado (mesma lógica do chairs acima).
-    let unitPrice = isWaterproof ? (widgetWaterproofPrice(cfg, addonTier) ?? 0) : parseRowPrice(row.price);
-    if (addonRows.has(i)) unitPrice += calcRowAddonDelta(cfg, addonTier) ?? 0;
-    if (antiAcarosRows.has(i)) unitPrice += calcSofaAntiAcarosDelta(cfg) ?? 0;
-    if (unitPrice > 0) {
-      articleCount += qty;
-      articleTotal += unitPrice * qty;
-      noteCandidate(unitPrice);
-    }
-  });
-
-  return { articleTotal, articleCount, minQualifyingArticle };
-}
-
 export interface WidgetPricing {
   serviceTotal: number;
   travelFee: number;
   grandTotal: number;
-  discountActive: boolean;
-  discountedTotal: number;
-  remaining: number;
 }
 
-export function calcWidgetPricing(serviceTotal: number, travelFee: number, articles: WidgetArticleInfo): WidgetPricing {
-  const grandTotal = serviceTotal + travelFee;
-  const discountActive = (articles.articleCount ?? 0) >= 2 && articles.minQualifyingArticle !== null
-    && articles.articleTotal > PACK_DISCOUNT_MIN_TOTAL;
-  const discountedTotal = discountActive ? Math.round(serviceTotal * 0.9) + travelFee : grandTotal;
-  return { serviceTotal, travelFee, grandTotal, discountActive, discountedTotal, remaining: 0 };
+export function calcWidgetPricing(serviceTotal: number, travelFee: number): WidgetPricing {
+  return { serviceTotal, travelFee, grandTotal: serviceTotal + travelFee };
 }
 
 /**

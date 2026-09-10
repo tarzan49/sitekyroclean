@@ -11,68 +11,6 @@ function pricing(formData: Partial<QuizFormData>, upsellItems: UpsellItemConfig[
   return result.current;
 }
 
-// Bug real reportado nesta sessão, literalmente: "o desconto ativou sem o
-// valor ser mais que 100 eur. eu fiz upsell de um item de 49 eur e o
-// desconto ativou automaticamente, corrige primeiro essa logica antes de
-// tudo". A causa era um comentário/limiar desalinhado (160€/60€ vs 149€/49€)
-// — este teste fixa o comportamento correto para nunca mais regredir em
-// silêncio.
-describe('useQuizPricing — packDiscountActive não pode ativar com um único upsell de 49€', () => {
-  it('a single 49€ upsell item alone (no other service value) does NOT activate the discount', () => {
-    const p = pricing(
-      { service: 'sofa', serviceType: 'cleaning' },
-      [{ id: 'mattress', price: 49, qty: 1, label: 'Colchão Casal' }],
-    );
-    expect(p.packDiscountActive).toBe(false);
-  });
-
-  it('does not activate exactly at the 149€ combined boundary', () => {
-    const p = pricing(
-      { service: 'sofa', serviceType: 'cleaning' },
-      [{ id: 'mattress', price: 149, qty: 1, label: 'Colchão Casal' }],
-    );
-    expect(p.packDiscountActive).toBe(false);
-  });
-
-  it('does not discount a single article even above 149€', () => {
-    const p = pricing(
-      { service: 'sofa', serviceType: 'cleaning' },
-      [{ id: 'mattress', price: 150, qty: 1, label: 'Colchão Casal' }],
-    );
-    expect(p.packDiscountActive).toBe(false);
-  });
-
-  it('combining the primary sofa item with a qualifying upsell crosses the threshold correctly', () => {
-    const p = pricing(
-      {
-        service: 'sofa', serviceType: 'cleaning',
-      },
-      [{ id: 'mattress', price: 49, qty: 1, label: 'Colchão Casal' }],
-    );
-    // Sem sofaItems preenchidos o serviço primário vale 0€ — sozinho com o
-    // upsell de 49€ fica em 49€, insuficiente (replica o cenário exato do
-    // bug reportado).
-    expect(p.packDiscountActive).toBe(false);
-  });
-
-  it('sofa-anti-acaros / chairs-anti-acaros upsell ids never count as their own qualifying article', () => {
-    const p = pricing(
-      { service: 'sofa', serviceType: 'cleaning' },
-      [{ id: 'sofa-anti-acaros', price: 200, qty: 1, label: 'Anti Ácaros (sofá)' }],
-    );
-    expect(p.packDiscountActive).toBe(false);
-  });
-
-  it('a quote-only extra never unlocks an unearned discount', () => {
-    const p = pricing(
-      { service: 'sofa', serviceType: 'cleaning' },
-      [{ id: 'chairs', price: 0, qty: 12, label: '12 cadeiras' }],
-    );
-    expect(p.packDiscountActive).toBe(false);
-    expect(p.hasUpsellSobItem).toBe(true);
-  });
-});
-
 describe('useQuizPricing — chairs "sob orçamento" thresholds stay in sync across serviceType', () => {
   it('10 chairs + waterproofing addon never silently falls back to charging cleaning alone (real bug fixed 2026-08-31)', () => {
     const p = pricing({
@@ -92,7 +30,6 @@ describe('useQuizPricing — chairs "sob orçamento" thresholds stay in sync acr
   });
 });
 
-
 describe('partial treatment quantities', () => {
   it('charges Premium for only one of three sofas, including the pack delta override', () => {
     const { result } = renderHook(() => useQuizPricing(
@@ -108,30 +45,21 @@ describe('partial treatment quantities', () => {
   });
 });
 
-it('does not stack the pack discount on local fixed-price offers', () => {
-  const { result } = renderHook(() => useQuizPricing(
-    { ...initialFormData, location: 'Lisboa', service: 'sofa', serviceType: 'cleaning' },
-    [{ sizeId: '3-lugares', qty: 1, packEnabled: false }], [],
-    [{ id: 'mattress-casal', price: 55, qty: 1, label: 'Colchão casal' }, { id: 'chairs', price: 80, qty: 4, label: '4 cadeiras' }], [], true,
-  ));
-  expect(result.current.totalPrice).toBe(224);
-  expect(result.current.packDiscountActive).toBe(false);
-});
-
-describe('local quiz pack proposal', () => {
+// 2026-09-10 (pedido explícito do dono, sessão da tarde): o desconto geral de
+// 10% sobre o pedido todo foi removido do site e do código. O upsell final
+// (QuizComboUpsellScreen) agora oferece um preço reduzido por artigo em vez
+// de um desconto condicional sobre o total — não há mais nenhum limiar de
+// "2 artigos, soma >149€" a testar aqui.
+describe('quote total with upsell items', () => {
   const sofa = [{ id: 'test-sofa', sizeId: '3-lugares', qty: 1, packEnabled: false, chaiseLongue: false }];
   const extra = [{ id: 'mattress-casal', mattressSize: 'casal', qty: 1, price: 55, label: '1x Colchão Casal' }];
   const form = { ...initialFormData, location: 'Lisboa', service: 'sofa', serviceType: 'cleaning' as const };
-  it('keeps the fixed extra price without stacking a pack discount', () => {
-    const actual = renderHook(() => useQuizPricing(form, sofa, [], extra, []));
-    expect(actual.result.current.packDiscountActive).toBe(false);
-    const demo = renderHook(() => useQuizPricing(form, sofa, [], extra, [], true));
-    expect(demo.result.current.packDiscountActive).toBe(false);
-    expect(demo.result.current.totalPrice).toBe(144);
+  it('adds the upsell item price straight into the total, no discount concept involved', () => {
+    const { result } = renderHook(() => useQuizPricing(form, sofa, [], extra, []));
+    expect(result.current.totalPrice).toBe(144);
   });
   it('keeps the original price when the extra is declined', () => {
-    const demo = renderHook(() => useQuizPricing(form, sofa, [], [], [], true));
-    expect(demo.result.current.packDiscountActive).toBe(false);
-    expect(demo.result.current.totalPrice).toBe(89);
+    const { result } = renderHook(() => useQuizPricing(form, sofa, [], [], []));
+    expect(result.current.totalPrice).toBe(89);
   });
 });

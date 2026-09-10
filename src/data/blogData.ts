@@ -265,7 +265,7 @@ const posts: BlogPost[] = [
       {
         heading: "Tabela de preços por tamanho (2025)",
         body: "Os preços da Kyro Clean Solutions para limpeza profissional de colchões são:\n\n**Colchão solteiro**: 59€\n\n**Colchão casal**: 69€\n\n**Colchão king / queen**: 79€\n\nTodos os preços incluem pré-tratamento de manchas, limpeza por extração a vapor e secagem rápida; a deslocação é cobrada à parte, consoante a localização. O colchão fica pronto a usar em 3 a 6 horas.",
-        tip: "Combine com a limpeza do sofá no mesmo dia e poupe 10% no total com o Pack Sofá + Colchão.",
+        tip: "Combine com a limpeza do sofá no mesmo dia e beneficie de um preço reduzido no Pack Sofá + Colchão.",
       },
       {
         heading: "O que inclui uma limpeza profissional de colchão?",

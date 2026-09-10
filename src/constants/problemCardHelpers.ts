@@ -13,6 +13,7 @@ import painpointTapeteColor  from "@/assets/hero-p-tapete-persa.webp";
 import painpointCadeiraDirt  from "@/assets/hero-p-limpeza-cadeiras.webp";
 import painpointCadeiraStain from "@/assets/hero-p-mancha-tinta.webp";
 import painpointCadeiraOdor  from "@/assets/hero-p-limpeza-puff.webp";
+import painpointCadeiraWear  from "@/assets/cadeira-antes.webp";
 import painpointAlcatifaDirt from "@/assets/hero-p-limpeza-alcatifas.webp";
 import painpointAlcatifaAllergens from "@/assets/hero-p-mofo-alcatifa.webp";
 import painpointAlcatifaStain from "@/assets/alcatifa-cleaning.webp";
@@ -24,7 +25,7 @@ export const PROBLEM_IMAGES: Record<string, string[]> = {
   "limpeza-sofas":     [painpointSofaStain, painpointSofaMites, painpointSofaOdor, painpointSofaWear],
   "limpeza-colchoes":  [painpointColchaoMites, painpointColchaoStain, painpointColchaoOdor, painpointColchaoAllergy],
   "limpeza-tapetes":   [painpointTapeteDirt, painpointTapeteStain, painpointTapeteAllergens, painpointTapeteColor],
-  "limpeza-cadeiras":  [painpointCadeiraDirt, painpointCadeiraStain, painpointCadeiraOdor],
+  "limpeza-cadeiras":  [painpointCadeiraDirt, painpointCadeiraStain, painpointCadeiraOdor, painpointCadeiraWear],
   "limpeza-alcatifas": [painpointAlcatifaDirt, painpointAlcatifaAllergens, painpointAlcatifaStain],
   "impermeabilizacao": [painpointImperProtect, painpointImperStain, painpointImperWear],
 };

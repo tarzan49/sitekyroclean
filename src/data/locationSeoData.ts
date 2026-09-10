@@ -237,6 +237,7 @@ function generateCadeirasContent(city: string, cityDesc: string): Omit<LocationS
       { title: "Sujidade do uso diário", description: `Cadeiras de escritório e jantar acumulam manchas de suor, gordura e líquidos diariamente. ${Prep} ${city}, muitos escritórios e restaurantes necessitam de limpeza regular.` },
       { title: "Manchas visíveis", description: `Manchas de café, alimentos e tinta que deixam as cadeiras com aspecto descuidado, prejudicando a imagem do seu espaço.` },
       { title: "Odores retidos", description: `O tecido das cadeiras absorve odores de suor e comida, criando um ambiente desagradável no escritório ou restaurante.` },
+      { title: "Desgaste e descoloração do tecido", description: `O uso intensivo desgasta e desbota o tecido das cadeiras. A impermeabilização protege o estofo e prolonga a vida útil das cadeiras.` },
     ],
     howItWorks: `Limpeza de cadeiras ${prep} ${city}: 1) Inspeção do tecido, 2) Pulverização com produto específico, 3) Escovação para penetrar nas fibras, 4) Extração profunda com equipamento profissional, 5) Secagem rápida. Ideal para lotes de cadeiras em escritórios e restaurantes.`,
     benefits: [

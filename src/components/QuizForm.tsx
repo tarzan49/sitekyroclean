@@ -244,12 +244,7 @@ const QuizForm = ({
     totalPrice,
     hasSobOrcamento,
     hasUpsellSobItem,
-    packDiscountActive,
-    packDiscountPct,
-    serviceOnlyTotal,
-    discountedPrice,
-    packDiscountedPrice,
-  } = useQuizPricing(formData, sofaItems, mattressItems, upsellItems, carpetItems, offerPreview);
+  } = useQuizPricing(formData, sofaItems, mattressItems, upsellItems, carpetItems);
 
   const updateFormData = useCallback((updates: Partial<QuizFormData>) => {
     setFormData(prev => ({ ...prev, ...updates }));
@@ -309,7 +304,7 @@ const QuizForm = ({
     location: formData.location === 'other' ? formData.otherLocation : formData.location,
     timing: formData.timing,
     contactMethod: formData.contactMethod,
-    totalValue: hasSobOrcamento || hasUpsellSobItem ? undefined : packDiscountActive ? packDiscountedPrice : totalPrice,
+    totalValue: hasSobOrcamento || hasUpsellSobItem ? undefined : totalPrice,
   });
 
   // Re-apply the initial* props whenever the quiz transitions closed → open.
@@ -392,7 +387,7 @@ const QuizForm = ({
     chairAntiAcaros: formData.chairAntiAcaros, carpetKind: formData.carpetKind, finalTravelCost,
     finalLocation: formData.location === 'other' ? formData.otherLocation : formData.location,
   });
-  const quotePriceText = formatQuotePrice({ totalPrice, packDiscountActive, packDiscountedPrice, packDiscountPct, hasSobOrcamento, hasUpsellSobItem });
+  const quotePriceText = formatQuotePrice({ totalPrice, hasSobOrcamento, hasUpsellSobItem });
   const buildDetailsSummary = () => quoteLines.filter(line => !line.label.startsWith('Deslocação:'))
     .map(line => `${line.qty}x ${line.label}: ${fmtEuro(line.total)}`).join('\n');
 
@@ -455,9 +450,6 @@ ${formData.description || 'Sem observações adicionais'}
       totalPrice,
       hasSobOrcamento,
       hasUpsellSobItem,
-      packDiscountActive,
-      packDiscountedPrice,
-      packDiscountPct,
       finalTravelCost,
       hypoallergenic,
       hypoSurcharge,
@@ -636,9 +628,7 @@ ${formData.description || 'Sem observações adicionais'}
           {currentStep !== totalSteps && (totalPrice > 0 || hasSobOrcamento) && (activeUpsellScreen === 'combo' || finalTravelCost > 0 || (currentStep !== 1 && currentStep !== 2)) && (
             <QuizEstimate
               totalPrice={totalPrice}
-              discountedPrice={packDiscountedPrice}
               travelCost={finalTravelCost}
-              discountActive={packDiscountActive}
               needsQuote={hasSobOrcamento || hasUpsellSobItem}
               travelOnly={calculateServicePrice === 0 && finalTravelCost > 0}
               location={formData.location}
@@ -823,9 +813,6 @@ ${formData.description || 'Sem observações adicionais'}
                 primaryService={formData.service}
                 upsellItems={upsellItems}
                 setUpsellItems={setUpsellItems}
-                totalPrice={totalPrice}
-                packDiscountActive={packDiscountActive}
-                packDiscountedPrice={packDiscountedPrice}
                 onContinue={() => { (document.activeElement as HTMLElement)?.blur(); setActiveUpsellScreen(null); setCurrentStep(4); }}
                 onBack={() => {
                   (document.activeElement as HTMLElement)?.blur();
