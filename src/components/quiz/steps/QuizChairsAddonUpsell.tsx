@@ -59,7 +59,6 @@ const QuizChairsAddonUpsell = ({ formData, updateFormData, onContinue, onBack }:
             addonOn ? 'border-gold bg-[#1a2a1a] shadow-[0_0_18px_rgba(212,175,55,0.30)]' : 'border-dashed border-gold/40 bg-gold/[0.04] hover:border-gold/70 hover:bg-gold/[0.07]'
           )}
         >
-          <QuizTopBadge className="absolute -top-3 right-3 z-10" />
           <Droplets className={cn('w-5 h-5 flex-shrink-0', addonOn ? 'text-gold' : 'text-gold/70')} />
           <div className="flex-1 min-w-0">
             <p className={cn('text-sm font-bold', addonOn ? 'text-white' : 'text-white/90')}>Higienização Profunda</p>
@@ -156,7 +155,6 @@ const QuizChairsAddonUpsell = ({ formData, updateFormData, onContinue, onBack }:
             waterproofTier === 'essencial' ? 'border-gold bg-[#1a2a1a] shadow-[0_0_10px_rgba(212,175,55,0.18)]' : 'border-gold/20 bg-[#1a2a1a] hover:border-gold/40'
           )}
         >
-          <QuizTopBadge className="absolute -top-3 right-3 z-10" />
           <div className="flex items-center gap-1.5 mb-0.5">
             {waterproofTier === 'essencial' && <Check className="w-3 h-3 text-gold flex-shrink-0" />}
             <p className={cn('text-xs font-bold', waterproofTier === 'essencial' ? 'text-white' : 'text-white/60')}>Essencial</p>

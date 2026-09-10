@@ -74,3 +74,5 @@ Pedido de simplificação (2026-09-10): nos upsells de colchão e sofá, clicar 
 ## Selo dos extras (2026-09-10)
 
 Pedido do responsável: usar o selo TOP em todas as opções extra do orçamento, incluindo Essencial e Premium, tratamentos e categorias de serviços adicionais. Na pré-visualização, reutilizar `QuizTopBadge` (coroa e acabamento dourado), sem duplicar markup nem introduzir animações de urgência. O selo não indica que o extra já está selecionado.
+
+Revisão aprovada do selo TOP (2026-09-10): reservar apenas para impermeabilização Premium e desbacterização/antiácaros. Essencial, higienização adicional e categorias de artigos deixam de ter selo. Substitui o pedido anterior de selo em todos os extras. A pré-visualização sem parâmetros abre agora no início, sem seleções; `?exemplo=pack` conserva o exemplo preenchido.
