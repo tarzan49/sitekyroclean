@@ -224,6 +224,7 @@ const PricePage = () => {
         {/* ═══ GALERIA — ANTES E DEPOIS ═══ */}
         {gallery && (
           <ServiceAutoCarousel
+            category={beforeAfterCategory ?? undefined}
             overline="Resultados Reais"
             heading={`Antes e depois: ${data.serviceName}`}
             subtitle={`Transformação real ${prep} ${data.cityName}, resultado visível no próprio dia.`}

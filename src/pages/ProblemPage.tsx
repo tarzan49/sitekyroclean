@@ -344,6 +344,7 @@ const ProblemPage = () => {
         {/* ═══ GALERIA — ANTES E DEPOIS ═══ */}
         {gallery && (
           <ServiceAutoCarousel
+            category={beforeAfterCategory ?? undefined}
             overline="Resultados Reais"
             heading="Antes e depois da intervenção"
             subtitle="Transformações visíveis no próprio dia. Sem químicos agressivos, sem esperas."

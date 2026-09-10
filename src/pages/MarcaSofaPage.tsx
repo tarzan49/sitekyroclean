@@ -311,6 +311,7 @@ const MarcaSofaPage = () => {
 
         {/* ═══ GALERIA — ANTES E DEPOIS ═══ */}
         <ServiceAutoCarousel
+            category={"sofa"}
           overline="Resultados Reais"
           heading={`Antes e depois: sofá ${marca.name}`}
           subtitle={`Transformação real em limpeza de sofás ${prep} ${city.name}, resultado visível no próprio dia.`}
