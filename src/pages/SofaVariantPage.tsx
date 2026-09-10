@@ -1,3 +1,4 @@
+import DirectoryGroup from "@/components/DirectoryGroup";
 import SofaLeadActions from "@/components/SofaLeadActions";
 import { AdsLandingHeader, AdsLandingFooter, isAdsVisit } from "@/components/AdsLandingNavigation";
 ﻿// Handles all keyword variant pages:
@@ -288,16 +289,16 @@ const SofaVariantPage = () => {
         <section className="relative pt-6 md:pt-16 lg:pt-20 pb-8 md:pb-16">
           <div className="container mx-auto px-5 sm:px-6 lg:px-8 relative z-10">
             <div className="max-w-6xl mx-auto grid lg:grid-cols-2 gap-4 lg:gap-12 items-center">
-                {!isPaidLanding && <>
               <div>
+                {!isPaidLanding && <>
                 <nav className="flex items-center gap-1.5 text-xs text-white/50 mb-6 flex-wrap" aria-label="Breadcrumb">
                   <Link to="/" className="hover:text-white/80 transition-colors">Início</Link>
                   <span>/</span>
                   <Link to={data.canonical} className="hover:text-white/80 transition-colors">{data.locationName}</Link>
                   <span>/</span>
                   <span className="text-white/70">{variantLabel}</span>
-                </>}
                 </nav>
+                </>}
 
                 <div className="inline-flex items-start mb-3 lg:mb-5">
                   <div className="flex flex-col gap-1">
@@ -575,27 +576,20 @@ const SofaVariantPage = () => {
             <div className="mb-10 md:mb-14">
               <div className="flex items-center gap-3 mb-4">
                 <div className="h-px w-8 flex-shrink-0" style={{ backgroundColor: "#D4AF37", opacity: 0.65 }} />
-                <p className="text-[10px] font-bold tracking-[0.28em] uppercase" style={{ color: "#D4AF37", opacity: 0.85 }}>Cobertura</p>
+                <p className="text-[10px] font-bold tracking-[0.28em] uppercase" style={{ color: "#D4AF37", opacity: 0.85 }}>Explore por categoria</p>
               </div>
               <h2 className="font-playfair text-[1.85rem] sm:text-4xl md:text-[2.6rem] font-bold leading-[1.1] text-[#111111]">
-                {`Área de serviço ${prep}`}{" "}<em className="not-italic" style={{ color: "#D4AF37" }}>{data.locationName}</em>
+                {`Serviços e zonas de atendimento ${prep}`}{" "}<em className="not-italic" style={{ color: "#D4AF37" }}>{data.locationName}</em>
               </h2>
             </div>
-            <div className="grid md:grid-cols-2 gap-4">
+            <div className="max-w-4xl border-t border-[#D4AF37]/25">
 
               {/* Zonas / Freguesias da cidade */}
               {(() => {
                 const mun = municipiosComFreguesias.find(m => m.slug === parsed.locationPart);
                 if (!mun || !mun.freguesias.length) return null;
                 return (
-                  <div className="p-5 rounded-xl" style={{ background: "#FDFDF9", border: "1px solid rgba(17,17,17,0.08)" }}>
-                    <div className="flex items-center gap-3 mb-3">
-                      <div className="h-px w-8 flex-shrink-0" style={{ backgroundColor: "#D4AF37", opacity: 0.65 }} />
-                      <p className="text-[10px] font-bold tracking-[0.26em] uppercase" style={{ color: "#D4AF37", opacity: 0.85 }}>
-                        Zonas {prep} {data.locationName}
-                      </p>
-                    </div>
-                    <div className="flex flex-wrap gap-2">
+                  <DirectoryGroup title={<>Zonas {prep} {data.locationName}</>}>
                       {mun.freguesias.slice(0, 8).map(f => (
                         <Link
                           key={f.slug}
@@ -606,20 +600,12 @@ const SofaVariantPage = () => {
                           {f.name}
                         </Link>
                       ))}
-                    </div>
-                  </div>
+                    </DirectoryGroup>
                 );
               })()}
 
               {/* Outras cidades */}
-              <div className="p-5 rounded-xl" style={{ background: "#FDFDF9", border: "1px solid rgba(17,17,17,0.08)" }}>
-                <div className="flex items-center gap-3 mb-3">
-                  <div className="h-px w-8 flex-shrink-0" style={{ backgroundColor: "#D4AF37", opacity: 0.65 }} />
-                  <p className="text-[10px] font-bold tracking-[0.26em] uppercase" style={{ color: "#D4AF37", opacity: 0.85 }}>
-                    Também disponível em
-                  </p>
-                </div>
-                <div className="flex flex-wrap gap-2">
+              <DirectoryGroup title={<>Também disponível em</>}>
                   {cities.filter(c => c.slug !== parsed.locationPart).slice(0, 8).map(city => (
                     <Link
                       key={city.slug}
@@ -629,18 +615,10 @@ const SofaVariantPage = () => {
                       {city.name}
                     </Link>
                   ))}
-                </div>
-              </div>
+                </DirectoryGroup>
 
               {/* Outros serviços na mesma cidade */}
-              <div className="p-5 rounded-xl" style={{ background: "#FDFDF9", border: "1px solid rgba(17,17,17,0.08)" }}>
-                <div className="flex items-center gap-3 mb-3">
-                  <div className="h-px w-8 flex-shrink-0" style={{ backgroundColor: "#D4AF37", opacity: 0.65 }} />
-                  <p className="text-[10px] font-bold tracking-[0.26em] uppercase" style={{ color: "#D4AF37", opacity: 0.85 }}>
-                    Outros serviços {prep} {data.locationName}
-                  </p>
-                </div>
-                <div className="flex flex-wrap gap-2">
+              <DirectoryGroup title={<>Outros serviços {prep} {data.locationName}</>}>
                   {(SERVICES.filter(s => s !== parsed.serviceKey) as ServiceKey[]).map(svcKey => (
                     <Link
                       key={svcKey}
@@ -657,14 +635,12 @@ const SofaVariantPage = () => {
                   >
                     Página principal
                   </Link>
-                </div>
-              </div>
-        </>}
+                </DirectoryGroup>
 
             </div>
           </div>
         </section>
-
+        </>}
       </main>
       {isPaidLanding ? <AdsLandingFooter /> : <Footer />}
     </>

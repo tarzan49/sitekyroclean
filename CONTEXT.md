@@ -1059,3 +1059,6 @@ Proposta para avaliação, ainda não integrada em master: `QuizEstimate.tsx` ap
 Na branch `codex/quote-visual-preview`, `QuizCareIntro` reutiliza `QuizFurnitureImage` para contextualizar os tratamentos; `QuizCarpetMeasureGuide` é partilhado pelos detalhes de tapetes principais e extras. A rota DEV `/__preview/orcamento` aceita `exemplo=antiacaros|impermeabilizacao|cadeiras|tapetes` para revisão dos ecrãs reais com dados iniciais. Não altera o motor de preços.
 
 A seleção parcial de cuidados em sofás/colchões usa `packQty?: number` com `packEnabled`. `QuizTreatmentQuantities` aparece apenas para várias unidades. `treatmentQty` limita ao número de artigos; `splitTreatmentItems` produz linhas com e sem tratamento para cálculo/resumo/recibo, mantendo compatibilidade com seleções antigas. Os preços comparativos no upsell usam `calcPackPricing` e respeitam `packPremiumDelta`.
+## Diretórios finais compactos (2026-09-10)
+
+`src/components/DirectoryGroup.tsx` uniformiza a navegação final das famílias de páginas com grupos fechados por defeito e pesquisa nas listas maiores. Preserva os links no HTML e repõe o estado ao mudar de página. `AreasDeServico` organiza região, concelho, serviços e freguesias com pesquisa global; as seis páginas principais continuam a usar `ServiceCityLinks`. Inventário e verificação em `docs/directory-navigation.md`.

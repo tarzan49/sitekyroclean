@@ -1,3 +1,4 @@
+import DirectoryGroup from "@/components/DirectoryGroup";
 ﻿import { Link } from "react-router-dom";
 import { ArrowRight, Map } from "lucide-react";
 import Header from "@/components/Header";
@@ -104,7 +105,7 @@ const PacksSitemap = () => {
                   </div>
 
                   {/* Cities grid */}
-                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2">
+                  <DirectoryGroup title="Localidades disponíveis">
                     {packCities.map(city => (
                       <Link
                         key={city.slug}
@@ -118,7 +119,7 @@ const PacksSitemap = () => {
                         <ArrowRight className="w-3.5 h-3.5 text-[#111111]/25 group-hover:text-gold group-hover:translate-x-0.5 transition-all flex-shrink-0" />
                       </Link>
                     ))}
-                  </div>
+                  </DirectoryGroup>
 
                   {/* Divider */}
                   <div className="mt-8 h-px bg-[#E8E4DE]" />

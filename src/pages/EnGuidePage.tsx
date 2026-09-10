@@ -1,3 +1,4 @@
+import DirectoryGroup from "@/components/DirectoryGroup";
 import { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { MessageCircle, Phone, CheckCircle2, Camera, Clock, Euro } from "lucide-react";
@@ -236,7 +237,7 @@ const EnGuidePage = () => {
             <h2 className="font-playfair text-xl md:text-2xl font-bold text-[#111111] mb-6">
               Cleaning help by <span style={{ color: "#D4AF37" }}>region</span>
             </h2>
-            <div className="flex flex-wrap items-center justify-center gap-3">
+            <DirectoryGroup title="Cleaning by region" language="en">
               {RELATED_HOST_PAGES.map(p => (
                 <Link
                   key={p.to}
@@ -246,7 +247,7 @@ const EnGuidePage = () => {
                   {p.label}
                 </Link>
               ))}
-            </div>
+            </DirectoryGroup>
           </div>
         </section>
       </main>

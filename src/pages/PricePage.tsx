@@ -1,3 +1,4 @@
+import DirectoryGroup from "@/components/DirectoryGroup";
 import { useEffect, useMemo } from "react";
 import { useLocation, Link } from "react-router-dom";
 import { QuizLocationProvider, QuizServiceProvider } from "@/context/QuizLocationContext";
@@ -275,22 +276,17 @@ const PricePage = () => {
         {/* ═══ REDE INTERNA ═══ */}
         <section className="py-14 md:py-20 bg-[#FDFDF9]">
           <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
-            <SectionHeader overline="Cobertura" heading="Explore" goldWord="mais" light={true} />
-            <div className="grid md:grid-cols-3 gap-4">
-              <div className="p-5 rounded-xl bg-white" style={{ border: "1px solid rgba(17,17,17,0.08)", boxShadow: "0 4px 16px rgba(7,26,18,0.04)" }}>
-                <p className="text-[10px] font-bold tracking-[0.26em] uppercase mb-3" style={{ color: "#D4AF37" }}>Ver página completa</p>
-                <div className="flex flex-wrap gap-2">
+            <SectionHeader overline="Explore por categoria" heading="Serviços e preços por" goldWord="localidade" light={true} />
+            <div className="max-w-4xl border-t border-[#D4AF37]/25">
+              <DirectoryGroup title={<>Ver página completa</>}>
                   <Link to={`/${data.serviceSlug}-${data.citySlug}`}
                     className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full text-sm font-medium text-[#111111] bg-white border border-[#E8E4DE] hover:border-[#D4AF37]/40 hover:bg-[#D4AF37]/5 transition-all">
                     <ArrowRight className="w-3 h-3" style={{ color: "#D4AF37" }} />
                     {data.serviceName} {prep} {data.cityName}
                   </Link>
-                </div>
-              </div>
+                </DirectoryGroup>
 
-              <div className="p-5 rounded-xl bg-white" style={{ border: "1px solid rgba(17,17,17,0.08)", boxShadow: "0 4px 16px rgba(7,26,18,0.04)" }}>
-                <p className="text-[10px] font-bold tracking-[0.26em] uppercase mb-3" style={{ color: "#D4AF37" }}>Outros serviços {prep} {data.cityName}</p>
-                <div className="flex flex-wrap gap-2">
+              <DirectoryGroup title={<>Outros serviços {prep} {data.cityName}</>}>
                   {relatedServices.map(svc => (
                     <Link key={svc.slug} to={`/preco-${svc.slug}-${data.citySlug}`}
                       className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full text-sm font-medium text-[#111111] bg-white border border-[#E8E4DE] hover:border-[#D4AF37]/40 hover:bg-[#D4AF37]/5 transition-all">
@@ -298,12 +294,9 @@ const PricePage = () => {
                       {svc.name}
                     </Link>
                   ))}
-                </div>
-              </div>
+                </DirectoryGroup>
 
-              <div className="p-5 rounded-xl bg-white" style={{ border: "1px solid rgba(17,17,17,0.08)", boxShadow: "0 4px 16px rgba(7,26,18,0.04)" }}>
-                <p className="text-[10px] font-bold tracking-[0.26em] uppercase mb-3" style={{ color: "#D4AF37" }}>Preços noutras cidades</p>
-                <div className="flex flex-wrap gap-2">
+              <DirectoryGroup title={<>Preços noutras cidades</>}>
                   {nearbyCities.map(city => (
                     <Link key={city.slug} to={`/preco-${data.serviceSlug}-${city.slug}`}
                       className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full text-sm font-medium text-[#111111] bg-white border border-[#E8E4DE] hover:border-[#D4AF37]/40 hover:bg-[#D4AF37]/5 transition-all">
@@ -311,8 +304,7 @@ const PricePage = () => {
                       {city.name}
                     </Link>
                   ))}
-                </div>
-              </div>
+                </DirectoryGroup>
             </div>
           </div>
         </section>

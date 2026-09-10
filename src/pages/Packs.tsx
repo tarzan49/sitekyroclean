@@ -184,8 +184,7 @@ const Packs = () => {
 
             {/* City selector note */}
             <p className="text-center text-sm text-[#111111]/40 mt-8">
-              Preços para {defaultCity.name} · Disponível também em{" "}
-              {packCities.slice(1).map(c => c.name).join(", ")}
+              Preços para {defaultCity.name}. Consulte as restantes localidades no guia de packs.
             </p>
 
             {/* Sitemap link */}

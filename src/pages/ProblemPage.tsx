@@ -1,3 +1,4 @@
+import DirectoryGroup from "@/components/DirectoryGroup";
 import { useEffect, useMemo } from "react";
 import { useParams, Link } from "react-router-dom";
 import { QuizServiceProvider } from "@/context/QuizLocationContext";
@@ -371,12 +372,10 @@ const ProblemPage = () => {
         {/* ═══ REDE INTERNA ═══ */}
         <section className="py-14 md:py-20 bg-[#FDFDF9]">
           <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
-            <SectionHeader overline="Explore" heading="Continue a" goldWord="explorar" light={true} />
-            <div className="grid md:grid-cols-2 gap-4">
+            <SectionHeader overline="Explore por categoria" heading="Serviços, soluções e" goldWord="localidades" light={true} />
+            <div className="max-w-4xl border-t border-[#D4AF37]/25">
               {relatedServiceData.length > 0 && (
-                <div className="p-5 rounded-xl bg-white" style={{ border: "1px solid rgba(17,17,17,0.08)", boxShadow: "0 4px 16px rgba(7,26,18,0.04)" }}>
-                  <p className="text-[10px] font-bold tracking-[0.26em] uppercase mb-3" style={{ color: "#D4AF37" }}>Serviços relacionados</p>
-                  <div className="flex flex-wrap gap-2">
+                <DirectoryGroup title={<>Serviços relacionados</>}>
                     {relatedServiceData.map(svc => (
                       <Link key={svc.slug} to={svc.baseRoute}
                         className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full text-sm font-medium text-[#111111] bg-white border border-[#E8E4DE] hover:border-[#D4AF37]/40 hover:bg-[#D4AF37]/5 transition-all">
@@ -384,14 +383,11 @@ const ProblemPage = () => {
                         {svc.name}
                       </Link>
                     ))}
-                  </div>
-                </div>
+                  </DirectoryGroup>
               )}
 
               {relatedProblemLinks.length > 0 && (
-                <div className="p-5 rounded-xl bg-white" style={{ border: "1px solid rgba(17,17,17,0.08)", boxShadow: "0 4px 16px rgba(7,26,18,0.04)" }}>
-                  <p className="text-[10px] font-bold tracking-[0.26em] uppercase mb-3" style={{ color: "#D4AF37" }}>Problemas relacionados</p>
-                  <div className="flex flex-wrap gap-2">
+                <DirectoryGroup title={<>Problemas relacionados</>}>
                     {relatedProblemLinks.map(link => (
                       <Link key={link.path} to={link.path}
                         className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full text-sm font-medium text-[#111111] bg-white border border-[#E8E4DE] hover:border-[#D4AF37]/40 hover:bg-[#D4AF37]/5 transition-all">
@@ -399,14 +395,11 @@ const ProblemPage = () => {
                         {link.name}
                       </Link>
                     ))}
-                  </div>
-                </div>
+                  </DirectoryGroup>
               )}
 
               {relatedCityData.length > 0 && (
-                <div className="p-5 rounded-xl bg-white" style={{ border: "1px solid rgba(17,17,17,0.08)", boxShadow: "0 4px 16px rgba(7,26,18,0.04)" }}>
-                  <p className="text-[10px] font-bold tracking-[0.26em] uppercase mb-3" style={{ color: "#D4AF37" }}>Disponível em</p>
-                  <div className="flex flex-wrap gap-2">
+                <DirectoryGroup title={<>Disponível em</>}>
                     {relatedCityData.map(city => (
                       <Link key={city.slug} to={`/${data.slug}-${city.slug}`}
                         className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full text-sm font-medium text-[#111111] bg-white border border-[#E8E4DE] hover:border-[#D4AF37]/40 hover:bg-[#D4AF37]/5 transition-all">
@@ -414,8 +407,7 @@ const ProblemPage = () => {
                         {city.name}
                       </Link>
                     ))}
-                  </div>
-                </div>
+                  </DirectoryGroup>
               )}
             </div>
           </div>
