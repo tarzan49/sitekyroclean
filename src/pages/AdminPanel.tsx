@@ -1,15 +1,16 @@
 import { useState, lazy, Suspense } from "react";
 import { Link } from "react-router-dom";
-import { AlertTriangle, BarChart3, Home, Settings2, Lock, LogOut, Users, Globe } from "lucide-react";
+import { AlertTriangle, BarChart3, Home, Settings2, Lock, LogOut, Users, Globe, MessageCircle } from "lucide-react";
 import { isSupabaseConfigured, supabase } from "@/integrations/supabase/client";
 import { useAdminSession } from "@/hooks/use-admin-session";
 
-const AdminDashboard = lazy(() => import("./AdminDashboard"));
+const CrmPanel = lazy(() => import("./admin/CrmPanel"));
 const SitemapMonitor = lazy(() => import("./admin/SitemapMonitor"));
 const ErrorLogPanel = lazy(() => import("./admin/ErrorLogPanel"));
 const QuizMetricsPanel = lazy(() => import("./admin/QuizMetricsPanel"));
+const WhatsAppPanel = lazy(() => import("./admin/WhatsAppPanel"));
 
-type Tab = "sitemap" | "errors" | "metrics" | "crm";
+type Tab = "sitemap" | "errors" | "metrics" | "crm" | "whatsapp";
 
 const TabFallback = () => (
   <div className="flex items-center justify-center py-16">
@@ -121,6 +122,7 @@ const AdminPanel = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 flex gap-1 pb-0 overflow-x-auto scrollbar-none">
           {([
             { id: "crm",       label: "CRM",          icon: Users },
+            { id: "whatsapp",  label: "WhatsApp",      icon: MessageCircle },
             { id: "sitemap",   label: "Sitemaps",      icon: Globe },
             { id: "errors",    label: "Error Log",     icon: AlertTriangle },
             { id: "metrics",   label: "Métricas Quiz", icon: BarChart3 },
@@ -175,11 +177,15 @@ const AdminPanel = () => {
         )}
 
         {activeTab === "crm" && (
-          <div className="bg-[#071a12] rounded-2xl p-4 -mx-2">
-            <Suspense fallback={<TabFallback />}>
-              <AdminDashboard embedded />
-            </Suspense>
-          </div>
+          <Suspense fallback={<TabFallback />}>
+            <CrmPanel />
+          </Suspense>
+        )}
+
+        {activeTab === "whatsapp" && (
+          <Suspense fallback={<TabFallback />}>
+            <WhatsAppPanel />
+          </Suspense>
         )}
       </main>
     </div>
