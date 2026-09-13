@@ -18,17 +18,15 @@ const FinalCTA = () => {
 
             {/* CTA Button */}
             <div className="relative group w-full sm:w-auto">
-              <div className="absolute -inset-1.5 bg-gradient-to-r from-[#C9A84C]/50 to-[#E8D070]/40 opacity-30 blur-lg group-hover:opacity-55 transition-opacity duration-400 pointer-events-none" />
               <button
                 onClick={openQuiz}
                 className={[
-                  'relative w-full sm:w-auto font-bold text-[#12121e] touch-manipulation',
-                  'h-14 px-8 w-full sm:w-auto',
-                  'bg-gradient-to-r from-[#C9A84C] via-[#EDD96A] to-[#C9A84C]',
-                  'shadow-[0_6px_22px_rgba(201,168,76,0.42),0_2px_6px_rgba(0,0,0,0.28),inset_0_1px_0_rgba(255,255,255,0.32),inset_0_-2px_0_rgba(0,0,0,0.12)]',
-                  'hover:shadow-[0_10px_32px_rgba(201,168,76,0.60),0_4px_10px_rgba(0,0,0,0.32),inset_0_1px_0_rgba(255,255,255,0.36)]',
-                  'hover:scale-[1.025] active:scale-[0.95]',
-                  'active:shadow-[0_2px_8px_rgba(201,168,76,0.30),inset_0_2px_4px_rgba(0,0,0,0.18)]',
+                  'relative w-full border border-[#D4AF37]/70 bg-black/35 font-bold text-white touch-manipulation backdrop-blur-md',
+                  'h-[48px] px-4 sm:w-auto sm:px-8',
+                  'shadow-[0_8px_24px_rgba(0,0,0,0.22)]',
+                  'hover:border-[#D4AF37] hover:bg-black/50 hover:shadow-[0_10px_30px_rgba(0,0,0,0.30)]',
+                  'hover:scale-[1.025]',
+                  'active:scale-[0.95]',
                   'transition-all duration-150',
                 ].join(' ')}
               >
