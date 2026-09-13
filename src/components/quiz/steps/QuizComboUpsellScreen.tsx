@@ -26,9 +26,9 @@ interface QuizComboUpsellScreenProps {
 // desconto de 10% sobre o pedido todo; cada artigo extra já vem com o seu
 // próprio preço reduzido, mostrado sempre lado a lado com o preço normal).
 const PriceCompare = ({ original, promo, suffix = '' }: { original: number; promo: number; suffix?: string }) => (
-  <span className="inline-flex items-baseline gap-1.5">
+  <span className="inline-flex items-baseline gap-1.5 tabular-nums">
     <s className="text-white/35 font-normal">{original}€</s>
-    <span className="text-gold font-bold">{promo}€{suffix}</span>
+    <span className="text-gold font-black tracking-tight">{promo}€{suffix}</span>
   </span>
 );
 
@@ -140,7 +140,7 @@ const QuizComboUpsellScreen = ({ offerPreview = false, travelFee = 10, primarySe
     ? (chairsRegularPrice !== null && chairsCleanPrice !== null
         ? <PriceCompare original={chairsRegularPrice} promo={chairsCleanPrice} />
         : 'Sob orçamento')
-    : '4 cadeiras pelo preço de 3';
+    : 'Limpe 4, pague 3';
 
   // Sincroniza o subtotal e os itens em tempo real com o formData do quiz —
   // a "Estimativa" no topo do modal tem de acompanhar cada +1/-1 aqui dentro,
@@ -390,7 +390,7 @@ const QuizComboUpsellScreen = ({ offerPreview = false, travelFee = 10, primarySe
     { view: 'mattress', imagePosition: '0% 0%', label: 'Colchão', summary: mattressSummary, priceLine: mattressPriceLine, selected: mattressQtyTotal > 0 },
     { view: 'sofa', imagePosition: '100% 0%', label: 'Sofá', summary: sofaSummary, priceLine: sofaPriceLine, selected: sofaQtyTotal > 0 },
     { view: 'chairs', imagePosition: '0% 100%', label: 'Cadeiras', summary: chairsSummary, priceLine: chairsPriceLine, selected: chairsQty > 0 },
-    { view: 'carpet', imagePosition: '100% 100%', label: 'Tapete', summary: carpetSummary, priceLine: '5 m² pelo preço de 4', selected: carpetValidCount > 0 },
+    { view: 'carpet', imagePosition: '100% 100%', label: 'Tapete', summary: carpetSummary, priceLine: 'Limpe 5 m², pague 4', selected: carpetValidCount > 0 },
   ];
 
   const visibleRows = rowConfig.filter(row => row.view !== primaryService || row.selected);
@@ -441,7 +441,10 @@ const QuizComboUpsellScreen = ({ offerPreview = false, travelFee = 10, primarySe
             />
             <span className={cn('min-w-0 flex flex-col gap-1', !compactRows && 'w-full')}>
               <span className="text-sm font-bold text-white">{row.label}</span>
-              <span className="text-[12px] font-normal leading-relaxed text-gold/75">{offerPreview ? row.priceLine : row.summary}</span>
+              {offerPreview ? <span className="flex flex-col gap-1">
+                <span className="text-[9px] font-bold uppercase tracking-[0.16em] text-white/45">Preço nesta visita</span>
+                <span className="text-lg font-black leading-none text-gold">{row.priceLine}</span>
+              </span> : <span className="text-[12px] font-normal leading-relaxed text-gold/75">{row.summary}</span>}
               {offerPreview && row.selected && <span className="text-[10px] text-white/45">{row.summary}</span>}
             </span>
           </button>

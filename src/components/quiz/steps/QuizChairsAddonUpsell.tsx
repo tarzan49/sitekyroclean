@@ -60,11 +60,10 @@ const QuizChairsAddonUpsell = ({ formData, updateFormData, onContinue, onBack, h
           <div className="flex-1 min-w-0">
             <p className={cn('text-sm font-bold', addonOn ? 'text-white' : 'text-white/90')}>Higienização Profunda</p>
             <p className="text-[10px] text-white/65 leading-snug mt-0.5">Limpeza de manchas e resíduos das fibras. Tratamentos adicionais são opcionais.</p>
-            {higienizacaoPrice !== null && (
-              <p className={cn('text-[11px] font-semibold mt-1', addonOn ? 'text-gold' : 'text-gold/60')}>
-                Por apenas <span className="font-black">+{fmt(higienizacaoPrice)}€</span>
-              </p>
-            )}
+            {higienizacaoPrice !== null && <div className="border-t border-gold/15 mt-2 pt-2">
+              <p className="text-[9px] font-bold uppercase tracking-[0.16em] text-white/45 mb-1">Acréscimo</p>
+              <p className={cn('text-xl leading-none font-black tracking-tight tabular-nums', addonOn ? 'text-gold' : 'text-gold/75')}>+{fmt(higienizacaoPrice)}€</p>
+            </div>}
           </div>
           <span className={cn(
             'flex-shrink-0 w-7 h-7 rounded-full border-2 flex items-center justify-center transition-all',
@@ -137,7 +136,7 @@ export function ChairAddonActions({ selected, onBack, onContinue }: { selected: 
         </button>
         <button
           onClick={onContinue}
-          className="flex-1 h-14 bg-gradient-to-r from-gold to-[#d4c57b] hover:from-[#d4c57b] hover:to-gold text-[#12121e] font-black text-xs leading-snug px-2 tracking-wide uppercase touch-manipulation active:scale-[0.98] rounded-sm shadow-[0_0_32px_rgba(212,175,55,0.30)]"
+          className="flex-1 h-14 bg-gradient-to-r from-gold to-[#d4c57b] hover:from-[#d4c57b] hover:to-gold text-[#12121e] font-black text-sm leading-snug px-2 tracking-wider uppercase touch-manipulation active:scale-[0.98] rounded-sm shadow-[0_0_32px_rgba(212,175,55,0.30)]"
         >
           {selected ? 'Continuar com tratamento' : 'Continuar sem extras'}
         </button>

@@ -63,7 +63,10 @@ const QuizMattressAddonUpsell = ({ mattressItems, setMattressItems, onContinue, 
         <div className="flex-1 min-w-0">
           <p className={cn('text-sm font-bold', anyOn ? 'text-white' : 'text-white/90')}>Desbacterização e Anti Ácaros</p>
           <p className="text-[10px] text-white/65 leading-snug mt-0.5">Dois cuidados num só tratamento complementar para o seu colchão.</p>
-          <p className="mt-1.5 text-sm font-bold text-gold">{addonPriceLabel}</p>
+          <div className="border-t border-gold/15 mt-2 pt-2">
+            <p className="text-[9px] font-bold uppercase tracking-[0.16em] text-white/45 mb-1">Acréscimo</p>
+            <p className="text-xl leading-none font-black tracking-tight tabular-nums text-gold">{addonPriceLabel}</p>
+          </div>
         </div>
         <span className={cn(
           'flex-shrink-0 w-7 h-7 rounded-full border-2 flex items-center justify-center transition-all',
@@ -84,7 +87,7 @@ const QuizMattressAddonUpsell = ({ mattressItems, setMattressItems, onContinue, 
         </button>
         <button
           onClick={onContinue}
-          className="flex-1 h-14 bg-gradient-to-r from-gold to-[#d4c57b] hover:from-[#d4c57b] hover:to-gold text-[#12121e] font-black text-xs leading-snug px-2 tracking-wide uppercase touch-manipulation active:scale-[0.98] rounded-sm shadow-[0_0_32px_rgba(212,175,55,0.30)]"
+          className="flex-1 h-14 bg-gradient-to-r from-gold to-[#d4c57b] hover:from-[#d4c57b] hover:to-gold text-[#12121e] font-black text-sm leading-snug px-2 tracking-wider uppercase touch-manipulation active:scale-[0.98] rounded-sm shadow-[0_0_32px_rgba(212,175,55,0.30)]"
         >
           {anyOn ? 'Continuar com tratamento' : 'Continuar sem extras'}
         </button>
