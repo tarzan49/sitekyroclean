@@ -83,7 +83,7 @@ export default function PriceWidget({ serviceSlug, initialLocation }: Props) {
       </div>}
       <div className="px-4 sm:px-6 pt-5 pb-4 text-center">
         <p className="text-gold text-[11px] font-bold tracking-[0.28em] uppercase mb-3">{isWaterproofService ? 'PROTEÇÃO' : 'QUANTIDADES'}</p>
-        <h3 className="font-playfair text-white font-bold text-2xl sm:text-3xl leading-tight">{isWaterproofService ? 'Escolha a sua impermeabilização' : serviceSlug === 'limpeza-sofas' ? 'Detalhes do(s) Sofá(s)' : serviceSlug === 'limpeza-colchoes' ? 'Detalhes do(s) Colchão(ões)' : 'Detalhes do serviço'}</h3>
+        <h3 className="font-playfair text-white font-bold text-2xl sm:text-3xl leading-tight">{isWaterproofService ? 'Escolha a sua impermeabilização' : serviceSlug === 'limpeza-sofas' ? 'Detalhes do(s) Sofá(s)' : serviceSlug === 'limpeza-colchoes' ? (import.meta.env.DEV ? <><span className="kyro-original-label">Detalhes do(s) Colchão(ões)</span><span className="kyro-avenir-label" style={{ display: 'none' }}>Escolha os colchões</span></> : 'Detalhes do(s) Colchão(ões)') : 'Detalhes do serviço'}</h3>
         <p className="text-sm mt-2 text-white/65">Escolha o tamanho e a quantidade.</p>
       </div>
 
