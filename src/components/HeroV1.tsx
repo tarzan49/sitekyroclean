@@ -1,6 +1,6 @@
 import { useEffect, lazy, Suspense } from "react";
 import { trackWhatsAppClick } from "@/lib/quizTracking";
-import { BadgeCheck, MessageCircle } from "lucide-react";
+import { MessageCircle } from "lucide-react";
 import { WHATSAPP_BASE } from "@/constants/business";
 import TrustRatingBadge from "@/components/TrustRatingBadge";
 import { useQuizLauncher } from "@/hooks/use-quiz-launcher";
@@ -89,16 +89,11 @@ const Hero = () => {
               Especialistas em limpeza de estofos ao domicílio. Cuidado profissional, orçamento transparente e resposta em menos de 10 minutos. Equipas em Braga, Porto, Lisboa e Algarve.
             </p>
 
-            {/* Mobile presents both trust signals as a compact pair. */}
-            <div className="grid w-full max-w-[430px] grid-cols-2 gap-2 md:hidden">
-              <div className="flex min-h-[66px] items-center gap-2.5 rounded-2xl border border-white/80 bg-[#F9F5E5]/95 px-3 py-2.5 shadow-[0_12px_28px_rgba(0,0,0,0.24)] backdrop-blur-md">
-                <span className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl bg-[#0B2F2A]">
-                  <BadgeCheck className="h-[18px] w-[18px] text-[#E7CE73]" strokeWidth={1.9} aria-hidden="true" />
-                </span>
-                <span className="min-w-0">
-                  <span className="block font-playfair text-xl font-bold leading-none text-[#0B2F2A]">{STATS[0].value}</span>
-                  <span className="mt-1 block text-[8px] font-bold uppercase leading-tight tracking-[0.1em] text-[#0B2F2A]/60">{STATS[0].label}</span>
-                </span>
+            {/* Mobile keeps the service count quiet beside the Google card. */}
+            <div className="flex w-full max-w-[430px] items-center gap-3 md:hidden">
+              <div className="flex min-h-[58px] flex-1 items-center gap-2.5 border-l-2 border-[#D4AF37] pl-3">
+                <span className="font-playfair text-2xl font-bold leading-none text-[#E7CE73]">{STATS[0].value}</span>
+                <span className="max-w-[70px] text-[9px] font-semibold uppercase leading-[1.25] tracking-[0.1em] text-white/70">{STATS[0].label}</span>
               </div>
               <TrustRatingBadge variant="heroMobile" />
             </div>
@@ -160,18 +155,10 @@ const Hero = () => {
           <TrustRatingBadge variant="floatingHero" />
         </div>
 
-        <div className="absolute bottom-[7%] left-8 z-10 hidden min-h-[88px] min-w-[330px] items-center gap-4 overflow-hidden rounded-[22px] border border-white/80 bg-[linear-gradient(115deg,rgba(249,245,229,0.97),rgba(255,255,255,0.95))] px-5 py-4 shadow-[0_22px_55px_rgba(0,0,0,0.38),inset_0_1px_0_rgba(255,255,255,0.9)] backdrop-blur-xl md:flex lg:left-16 xl:left-20 2xl:left-[calc((100vw-1400px)/2+5rem)]">
-          <span className="absolute inset-x-6 top-0 h-px bg-gradient-to-r from-transparent via-[#E7CE73] to-transparent" aria-hidden="true" />
-          <span className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-2xl bg-[#0B2F2A] shadow-[inset_0_1px_0_rgba(255,255,255,0.14)]">
-            <BadgeCheck className="h-6 w-6 text-[#E7CE73]" strokeWidth={1.9} aria-hidden="true" />
-          </span>
-          <span className="min-w-0">
-            <span className="block text-[10px] font-bold uppercase tracking-[0.2em] text-[#0B2F2A]/60">Experiência Kyro</span>
-            <span className="mt-1 flex items-end gap-2">
-              <span className="font-playfair text-[2rem] font-bold leading-[0.9] text-[#0B2F2A]">{STATS[0].value}</span>
-              <span className="pb-0.5 text-[11px] font-semibold uppercase tracking-[0.12em] text-[#0B2F2A]/65">{STATS[0].label}</span>
-            </span>
-          </span>
+        <div className="absolute bottom-[7%] left-8 z-10 hidden items-center md:flex lg:left-16 xl:left-20 2xl:left-[calc((100vw-1400px)/2+5rem)]">
+          <span className="font-playfair text-[2.6rem] font-bold leading-none text-[#E7CE73] [text-shadow:0_3px_18px_rgba(0,0,0,0.65)]">{STATS[0].value}</span>
+          <span className="mx-4 h-10 w-px bg-[#D4AF37]/70" aria-hidden="true" />
+          <span className="max-w-[110px] text-[11px] font-semibold uppercase leading-[1.35] tracking-[0.16em] text-white/80 [text-shadow:0_2px_10px_rgba(0,0,0,0.75)]">{STATS[0].label}</span>
         </div>
 
         <Suspense fallback={null}>
