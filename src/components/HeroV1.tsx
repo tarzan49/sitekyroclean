@@ -8,7 +8,7 @@ import { useQuizLauncher } from "@/hooks/use-quiz-launcher";
 const QuizForm = lazy(() => import('./QuizFormLazy'));
 
 const imgDesktop = '/images/hero-sofa-v1.jpeg';
-const imgMobile  = '/images/hero-sofa-v1.jpeg';
+const imgMobile = '/images/hero-sofa-mobile-extended.webp';
 
 const STATS = [
   { value: '+1200', label: 'serviços realizados' },
@@ -29,11 +29,15 @@ const Hero = () => {
         className="relative bg-[#0B2F2A] md:min-h-[95vh] flex items-center z-[1] pt-[84px] md:pt-[100px] pb-7 md:pb-[100px] overflow-hidden"
         aria-label="Kyro Clean Solutions - Higienização de Estofos ao Domicílio"
       >
+        {/* One continuous outpainted scene behind all three mobile content rows. */}
+        <div className="absolute inset-x-0 bottom-0 top-14 md:hidden" aria-hidden="true">
+          <img src={imgMobile} alt="" className="h-full w-full object-cover object-center" loading="eager" fetchPriority="high" />
+          <div className="absolute inset-0" style={{ background: 'linear-gradient(to bottom, rgba(5,28,23,.86) 0%, rgba(5,28,23,.78) 29%, rgba(5,28,23,.18) 43%, transparent 49%, transparent 68%, rgba(5,28,23,.72) 79%, rgba(5,28,23,.94) 100%)' }} />
+        </div>
         {/* Background */}
         <div className="absolute inset-0 z-0 hidden md:block">
           <picture>
-            <source media="(max-width: 767px)" srcSet={imgMobile} type="image/webp" />
-            <source srcSet={imgDesktop} type="image/webp" />
+            <source srcSet={imgDesktop} type="image/jpeg" />
             <img
               src={imgDesktop}
               alt=""
@@ -89,16 +93,8 @@ const Hero = () => {
 
           </div>
 
-          {/* A dedicated image row keeps the cleaning result unobstructed on mobile. */}
-          <div className="-mx-5 md:hidden">
-            <img
-              src={imgMobile}
-              alt="Limpeza de um sofá, com a diferença visível entre o tecido limpo e por limpar"
-              className="block aspect-[4/3] w-full object-cover"
-              loading="eager"
-              fetchPriority="high"
-            />
-          </div>
+          {/* Reserve clear space for the extractor and the clean/dirty boundary. */}
+          <div className="-mx-5 aspect-[4/3] md:hidden" role="img" aria-label="Limpeza de um sofá, com a diferença visível entre o tecido limpo e por limpar" />
           <div className="flex items-center justify-center gap-2 whitespace-nowrap py-4 text-[11px] min-[375px]:text-xs text-white/85 md:hidden">
             <span><strong className="font-semibold text-[#E7CE73]">{STATS[0].value}</strong> serviços realizados</span>
             <span aria-hidden="true" className="text-white/35">·</span>
