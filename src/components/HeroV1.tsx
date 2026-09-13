@@ -81,8 +81,16 @@ const Hero = () => {
               <span style={{ color: '#D4AF37' }}>ao domicílio.</span>
             </h1>
 
+            {/* Short value proposition stays on the dark sofa area, away from the extractor. */}
+            <p
+              className="mb-5 max-w-[430px] text-sm leading-relaxed text-white sm:text-base md:mb-6 md:max-w-[360px] md:text-base lg:max-w-[390px]"
+              style={{ textShadow: '0 1px 10px rgba(0,0,0,0.55)' }}
+            >
+              Especialistas em limpeza de estofos ao domicílio. Cuidado profissional, orçamento transparente e resposta em menos de 10 minutos. Equipas em Braga, Porto, Lisboa e Algarve.
+            </p>
+
             {/* Mobile keeps the compact trust row; desktop moves Google to the open right side. */}
-            <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mb-5">
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
               <div className="flex items-baseline gap-1.5">
                 <span
                   className="font-playfair text-xl md:text-2xl font-bold text-gold leading-none"
@@ -97,14 +105,6 @@ const Hero = () => {
                 <TrustRatingBadge variant="mapsLink" />
               </span>
             </div>
-
-            {/* Subtitle */}
-            <p
-              className="text-sm sm:text-base md:text-lg text-white leading-relaxed mb-6 md:mb-8 max-w-lg"
-              style={{ textShadow: '0 1px 10px rgba(0,0,0,0.55)' }}
-            >
-              Limpeza profissional de manchas e resíduos, com equipas em Braga, Porto, Lisboa e Algarve. Procuramos atender no próprio dia ou no dia seguinte, mediante disponibilidade. Anti-ácaros e desbacterização são extras opcionais.
-            </p>
 
           </div>
 
