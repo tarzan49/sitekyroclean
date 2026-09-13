@@ -63,3 +63,11 @@
   .kyro-header-mobile { display: none; }
   .kyro-header-brand { flex: none; text-align: left; }
 }
+
+.service-process { container-type: inline-size; }
+.service-process-vertical { display: flex; }
+.service-process-horizontal { display: none; }
+@container (min-width: 48rem) {
+  .service-process-vertical { display: none; }
+  .service-process-horizontal { display: block; }
+}

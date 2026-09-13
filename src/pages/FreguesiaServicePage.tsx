@@ -359,7 +359,7 @@ const FreguesiaServicePage = () => {
         )}
 
         {/* ═══ COMO FUNCIONA ═══ */}
-        {isSofaCleaning ? <SofaProcessGuide city={data.name} cityPrep="em" /> : <section className="py-14 md:py-20 bg-[#FDFDF9]">
+        {isSofaCleaning ? <SofaProcessGuide city={data.name} cityPrep="em" /> : <section className="service-process py-14 md:py-20 bg-[#FDFDF9]">
           <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
             <SectionHeader
               overline="Processo"
@@ -371,7 +371,7 @@ const FreguesiaServicePage = () => {
             {/* Timeline vertical em mobile, horizontal a partir de md — substitui
                 a antiga grelha plana de 2 colunas (pedido do dono: "pouco
                 interessante o visual dos passos", 2026-09-06). */}
-            <div className="flex flex-col md:hidden mt-2">
+            <div className="service-process-vertical flex-col mt-2">
               {processSteps.map((step, idx) => (
                 <div key={idx} className="flex gap-4">
                   <div className="flex flex-col items-center flex-shrink-0">
@@ -393,7 +393,7 @@ const FreguesiaServicePage = () => {
               ))}
             </div>
 
-            <div className="hidden md:block relative mt-4">
+            <div className="service-process-horizontal relative mt-4">
               <div
                 className="absolute h-px"
                 style={{ left: "10%", right: "10%", top: "22px", background: "linear-gradient(to right, rgba(212,175,55,0.15), rgba(212,175,55,0.6), rgba(212,175,55,0.6), rgba(212,175,55,0.15))" }}

@@ -21,7 +21,7 @@ Implementação na branch `codex/avenir-accessibility`, com pré-visualização 
 - Navegador: homepage, página de Paranhos, artigo e packs; 320 e 390 px, mais janela de computador. Percurso colchão → tratamento sem extra → sugestões sem extra → contacto → saída, sem enviar pedido.
 - Medidas observadas a 320 px: h1 32 px, secção 28 px, orçamento 24 px, artigo h2 24 px. Texto de artigo 18 px / entrelinha 30,6 px.
 - Página de preços a 320 px com entrelinha 1,5, espaço entre letras 0,12 em, palavras 0,16 em e parágrafos 2 em: controlos utilizáveis e documento sem alargamento horizontal.
-- Simulação de raiz tipográfica a 200% em janela de 1280 px: página de Paranhos sem alargamento horizontal. Não equivale a certificação de zoom nativo.
+- Simulação de raiz tipográfica a 200% em janelas de 877 e 1280 px: página de Paranhos sem alargamento horizontal. A disposição dos passos de limpeza adapta-se ao texto aumentado, tal como a navegação. Não equivale a certificação de zoom nativo.
 
 ## Limites
 
