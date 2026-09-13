@@ -1,3 +1,4 @@
+import ServiceProcessGuide from '@/components/ServiceProcessGuide';
 import impermeabilizacaoAntes from "@/assets/galeria-impermeabilizacao-antes.webp";
 import impermeabilizacaoDepois from "@/assets/galeria-impermeabilizacao-depois.webp";
 import impermeabilizacaoResultado from "@/assets/galeria-impermeabilizacao-resultado.webp";
@@ -225,6 +226,7 @@ const Impermeabilizacao = () => {
           ]}
           variant="dark"
         />
+        <ServiceProcessGuide serviceSlug="impermeabilizacao" />
         <ServiceEliteGuarantee
           heading="A nossa promessa em cada impermeabilização"
           items={impermeabilizacaoGuarantee}

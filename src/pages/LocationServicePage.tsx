@@ -1,3 +1,5 @@
+import ServiceProcessGuide from '@/components/ServiceProcessGuide';
+import { type ProcessServiceSlug } from '@/data/serviceProcessGuides';
 import SofaProcessGuide from '@/components/SofaProcessGuide';
 import ProblemCarousel from '@/components/ProblemCarousel';
 import DirectoryGroup from "@/components/DirectoryGroup";
@@ -23,7 +25,6 @@ import { QuizLocationProvider, QuizServiceProvider } from "@/context/QuizLocatio
 import { municipiosComFreguesias } from "@/data/freguesiaSeoData";
 import { getAllProblems } from "@/data/problemSeoData";
 import { getMaterialsByService } from "@/data/materialSeoData";
-import { GENERIC_PROCESS_STEPS, IMPERMEABILIZACAO_STEPS } from "@/constants/serviceProcesses";
 import { SERVICE_PACK_SLUGS } from "@/constants/servicePackSlugs";
 import { SERVICE_TO_QUIZ } from "@/constants/serviceToQuiz";
 import { METRO_CITIES } from "@/constants/metroCities";
@@ -162,7 +163,6 @@ const LocationServicePage = () => {
     { value: "<10min", label: "Resposta durante o horário de atendimento", icon: Clock },
   ];
 
-  const processSteps = data.serviceSlug === 'impermeabilizacao' ? IMPERMEABILIZACAO_STEPS : GENERIC_PROCESS_STEPS;
 
   const problemImages = PROBLEM_IMAGES[data.serviceSlug] ?? [];
   const sofaProblemDescriptions: Record<string, string> = {
@@ -369,62 +369,7 @@ const LocationServicePage = () => {
         )}
 
         {/* ═══ COMO FUNCIONA ═══ */}
-        {isSofaCleaning ? <SofaProcessGuide city={data.city} cityPrep={cityPrep} /> : <section className="py-14 md:py-20 bg-[#FDFDF9]">
-          <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
-            <SectionHeader
-              overline="Processo"
-              heading={`Os passos da nossa ${data.serviceSlug === 'impermeabilizacao' ? 'impermeabilização' : 'limpeza profunda'} ${cityPrep}`}
-              goldWord={data.city}
-              subtitle={data.howItWorks}
-              light={true}
-            />
-            {/* Timeline vertical em mobile, horizontal a partir de md — substitui
-                a antiga grelha plana de 2 colunas (pedido do dono: "pouco
-                interessante o visual dos passos", 2026-09-06). */}
-            <div className="flex flex-col md:hidden mt-2">
-              {processSteps.map((step, idx) => (
-                <div key={idx} className="flex gap-4">
-                  <div className="flex flex-col items-center flex-shrink-0">
-                    <div
-                      className="w-11 h-11 rounded-full flex items-center justify-center font-playfair font-bold text-base flex-shrink-0"
-                      style={{ background: "linear-gradient(135deg, #C9A84C, #EDD96A, #C9A84C)", color: "#111111", boxShadow: "0 4px 14px rgba(212,175,55,0.35)" }}
-                    >
-                      {idx + 1}
-                    </div>
-                    {idx < processSteps.length - 1 && (
-                      <div className="flex-1 w-px my-1" style={{ background: "linear-gradient(to bottom, rgba(212,175,55,0.5), rgba(212,175,55,0.15))" }} />
-                    )}
-                  </div>
-                  <div className={idx < processSteps.length - 1 ? "pb-7 pt-2.5" : "pt-2.5"}>
-                    <p className="text-sm font-bold text-[#111111] mb-1">{step.label}</p>
-                    <p className="text-xs text-[#111111]/55 leading-relaxed">{step.desc}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            <div className="hidden md:block relative mt-4">
-              <div
-                className="absolute h-px"
-                style={{ left: "10%", right: "10%", top: "22px", background: "linear-gradient(to right, rgba(212,175,55,0.15), rgba(212,175,55,0.6), rgba(212,175,55,0.6), rgba(212,175,55,0.15))" }}
-              />
-              <div className="grid relative" style={{ gridTemplateColumns: `repeat(${processSteps.length}, 1fr)` }}>
-                {processSteps.map((step, idx) => (
-                  <div key={idx} className="flex flex-col items-center text-center px-3">
-                    <div
-                      className="w-11 h-11 rounded-full flex items-center justify-center font-playfair font-bold text-base mb-4 relative z-10"
-                      style={{ background: "linear-gradient(135deg, #C9A84C, #EDD96A, #C9A84C)", color: "#111111", boxShadow: "0 4px 14px rgba(212,175,55,0.35)" }}
-                    >
-                      {idx + 1}
-                    </div>
-                    <p className="text-sm font-bold text-[#111111] mb-1.5">{step.label}</p>
-                    <p className="text-xs text-[#111111]/55 leading-relaxed max-w-[170px]">{step.desc}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </section>}
+        {isSofaCleaning ? <SofaProcessGuide city={data.city} cityPrep={cityPrep} /> : <ServiceProcessGuide key={data.serviceSlug} serviceSlug={data.serviceSlug as ProcessServiceSlug} city={data.city} cityPrep={cityPrep} />}
 
         {/* ═══ PACKS ═══ */}
         <ServicePackBanner

@@ -1,3 +1,4 @@
+import ServiceProcessGuide from '@/components/ServiceProcessGuide';
 import { SATISFACTION_PROMISE } from '../constants/commercialPolicy';
 import Header from "@/components/Header";
 import { QuizServiceProvider } from "@/context/QuizLocationContext";
@@ -90,6 +91,7 @@ const LimpezaTapetes = () => {
           ]}
           variant="dark"
         />
+        <ServiceProcessGuide serviceSlug="limpeza-tapetes" />
         <ServiceEliteGuarantee
           heading="A nossa promessa em cada limpeza de tapete"
           items={tapetesGuarantee}

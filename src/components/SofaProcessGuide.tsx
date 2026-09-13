@@ -1,6 +1,7 @@
 import { useId, useState } from 'react';
 import { ArrowLeft, ArrowRight, Download } from 'lucide-react';
 import SectionHeader from '@/components/SectionHeader';
+import { DRYING_PROMISE } from '@/constants/commercialPolicy';
 
 const image = '/images/services/sofa-cleaning-process-guide.png';
 const steps = [
@@ -8,7 +9,7 @@ const steps = [
   { label: 'Aplicação', title: 'O produto certo, no sítio certo.', description: 'Aplicamos o produto adequado ao tecido e às zonas que precisam de tratamento.', y: 395, height: 222, alt: 'Aplicação de produto no tecido com um pulverizador' },
   { label: 'Escovação', title: 'Soltamos a sujidade das fibras.', description: 'Escovamos o tecido para distribuir o produto e ajudar a desprender a sujidade.', y: 632, height: 225, alt: 'Escovação suave do tecido do sofá' },
   { label: 'Extração', title: 'Retiramos a sujidade e a água.', description: 'O equipamento de extração aspira a sujidade e a água do tecido, reduzindo a humidade que fica no sofá.', y: 875, height: 230, alt: 'Extração da água e sujidade com um bocal de estofos' },
-  { label: 'Secagem', title: 'Depois, é deixar o tecido secar.', description: 'Normalmente demora 4 a 6 horas, conforme o tecido e a ventilação. Use o sofá apenas quando estiver completamente seco.', y: 1124, height: 270, alt: 'Sofá junto de uma janela aberta durante a secagem' },
+  { label: 'Secagem', title: 'Depois, é deixar o tecido secar.', description: `${DRYING_PROMISE} Use o sofá apenas quando estiver completamente seco.`, y: 1124, height: 270, alt: 'Sofá junto de uma janela aberta durante a secagem' },
 ];
 
 export default function SofaProcessGuide({ city = 'Lisboa', cityPrep = 'em' }: { city?: string; cityPrep?: string }) {

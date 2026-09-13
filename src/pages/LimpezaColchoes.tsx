@@ -1,3 +1,4 @@
+import ServiceProcessGuide from '@/components/ServiceProcessGuide';
 import { SATISFACTION_PROMISE } from '../constants/commercialPolicy';
 import Header from "@/components/Header";
 import { QuizServiceProvider } from "@/context/QuizLocationContext";
@@ -93,6 +94,7 @@ const LimpezaColchoes = () => {
           ]}
           variant="dark"
         />
+        <ServiceProcessGuide serviceSlug="limpeza-colchoes" />
         <ServiceEliteGuarantee
           heading="A nossa promessa em cada higienização de colchão"
           items={colchoesGuarantee}
