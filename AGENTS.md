@@ -116,3 +116,7 @@ O passo «Os seus dados» começa pelo nome e telemóvel, com preenchimento auto
 No mobile, título e descrição precedem uma fotografia própria no fluxo, sem CTAs ou indicadores sobre o antes/depois. Abaixo, uma única linha sem cartão reúne +1200 serviços realizados e REVIEW_RATING com estrela/Google. WhatsApp é a ação principal; calcular preço mantém o tratamento escuro com contorno dourado do desktop. Marca e controlos do cabeçalho têm o mesmo centro vertical e alvos de 44px. Desktop mantém a composição sobre a imagem.
 
 Revisão visual (13/09/2026): o mobile usa agora uma fotografia vertical prolongada por IA (`hero-sofa-mobile-extended.webp`) como fundo contínuo do texto, zona livre da limpeza e CTAs. Gradientes suaves garantem contraste, sem cortes ou cartões opacos entre as três zonas. Preservar a faixa central sem sobreposição.
+
+## Avaliações e confiança na homepage (13/09/2026)
+
+Responsável confirmou 110+ avaliações Google, nota 4.9. REVIEW_COUNT é 110 e SERVICES_COMPLETED_LABEL é +1200 (serviços, não clientes). HomeHeroTrust reúne serviços e avaliações numa faixa transparente, com símbolo Google e estrelas, legendas abaixo para legibilidade. Substitui a antiga linha simples mobile e os dois indicadores separados desktop. Conteúdo inglês e schemas usam a contagem atual; não alterar transcrições reais.

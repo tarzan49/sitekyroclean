@@ -1,18 +1,14 @@
 import { useEffect, lazy, Suspense } from "react";
 import { trackWhatsAppClick } from "@/lib/quizTracking";
-import { MessageCircle, Star } from "lucide-react";
-import { WHATSAPP_BASE, REVIEW_RATING } from "@/constants/business";
-import TrustRatingBadge from "@/components/TrustRatingBadge";
+import { MessageCircle } from "lucide-react";
+import { WHATSAPP_BASE } from "@/constants/business";
+import HomeHeroTrust from "@/components/HomeHeroTrust";
 import { useQuizLauncher } from "@/hooks/use-quiz-launcher";
 
 const QuizForm = lazy(() => import('./QuizFormLazy'));
 
 const imgDesktop = '/images/hero-sofa-v1.jpeg';
 const imgMobile = '/images/hero-sofa-mobile-extended.webp';
-
-const STATS = [
-  { value: '+1200', label: 'serviços realizados' },
-];
 
 const Hero = () => {
   const { isQuizOpen, openQuiz: handleOpenQuiz, closeQuiz } = useQuizLauncher();
@@ -95,14 +91,8 @@ const Hero = () => {
 
           {/* Reserve clear space for the extractor and the clean/dirty boundary. */}
           <div className="-mx-5 aspect-[4/3] md:hidden" role="img" aria-label="Limpeza de um sofá, com a diferença visível entre o tecido limpo e por limpar" />
-          <div className="flex items-center justify-center gap-2 whitespace-nowrap py-4 text-[11px] min-[375px]:text-xs text-white/85 md:hidden">
-            <span><strong className="font-semibold text-[#E7CE73]">{STATS[0].value}</strong> serviços realizados</span>
-            <span aria-hidden="true" className="text-white/35">·</span>
-            <span className="inline-flex items-center gap-1" aria-label={`${REVIEW_RATING} de 5 estrelas no Google`}>
-              <strong className="font-semibold text-white">{REVIEW_RATING}</strong>
-              <Star className="h-3 w-3 fill-[#D4AF37] text-[#D4AF37]" aria-hidden="true" />
-              Google
-            </span>
+          <div className="py-4 md:hidden">
+            <HomeHeroTrust />
           </div>
 
           {/* Desktop CTAs occupy the clean right side of the sofa, away from the extraction line. */}
@@ -153,14 +143,8 @@ const Hero = () => {
           </div>
         </div>
 
-        <div className="absolute bottom-[7%] right-8 z-10 hidden md:block 2xl:right-[calc((100vw-1400px)/2+2rem)]">
-          <TrustRatingBadge variant="floatingHero" />
-        </div>
-
-        <div className="absolute bottom-[7%] left-8 z-10 hidden items-center md:flex lg:left-16 xl:left-20 2xl:left-[calc((100vw-1400px)/2+5rem)]">
-          <span className="font-playfair text-[2.6rem] font-bold leading-none text-[#E7CE73] [text-shadow:0_3px_18px_rgba(0,0,0,0.65)]">{STATS[0].value}</span>
-          <span className="mx-4 h-10 w-px bg-[#D4AF37]/70" aria-hidden="true" />
-          <span className="max-w-[110px] text-[11px] font-semibold uppercase leading-[1.35] tracking-[0.16em] text-white/80 [text-shadow:0_2px_10px_rgba(0,0,0,0.75)]">{STATS[0].label}</span>
+        <div className="absolute inset-x-0 bottom-[5%] z-10 hidden md:block">
+          <HomeHeroTrust />
         </div>
 
         <Suspense fallback={null}>

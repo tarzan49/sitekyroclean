@@ -1,3 +1,7 @@
+## Confiança na homepage (13/09/2026)
+
+`HomeHeroTrust` reúne serviços realizados e avaliações Google numa faixa transparente responsiva, reutilizada no mobile e desktop de `HeroV1`. Usa `SERVICES_COMPLETED_LABEL`, `REVIEW_RATING` e `REVIEW_COUNT` de `business.ts`. Contagem atual: 110+ avaliações, 4.9, +1200 serviços. Os dados SEO ingleses e de problemas importam REVIEW_COUNT por caminho relativo, compatível com os geradores.
+
 ## Pontos de alcatifas (13/09/2026)
 
 As páginas de cidade e freguesia usam os quatro pontos de `src/data/alcatifaProblems.ts`, em ordem fixa para corresponder às quatro imagens próprias em `PROBLEM_IMAGES`: passagem, café, rodapés e escadas. Imagens ilustrativas e prompts documentados em `docs/alcatifa-problem-images.md`.

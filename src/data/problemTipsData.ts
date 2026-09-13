@@ -40,7 +40,7 @@ export const CATEGORY_STATS: Record<string, { value: string; label: string; icon
   ],
   preco: [
     { value: "4.9★", label: `+${REVIEW_COUNT} avaliações Google`, icon: GoogleG },
-    { value: "100+", label: "Avaliações verificadas", icon: ShieldCheck },
+    { value: `${REVIEW_COUNT}+`, label: "Avaliações verificadas", icon: ShieldCheck },
     { value: "<10min", label: "Resposta ao pedido", icon: Clock },
     { value: "Grátis", label: "Orçamento sem compromisso", icon: CheckCircle2 },
   ],
