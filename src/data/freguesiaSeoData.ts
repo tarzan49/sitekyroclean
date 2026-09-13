@@ -2,6 +2,8 @@
 // Each freguesia × service generates a unique landing page
 
 import { services } from "./locationSeoData";
+import { getLandingEditorial } from './landingEditorial';
+import type { LandingService } from './landingFaqPool';
 
 export interface Freguesia {
   name: string;
@@ -1114,7 +1116,10 @@ export function generateFreguesiaContent(
   freguesiaSlug: string,
   municipio: string,
 ) {
-  return getDynamicContent(serviceName, serviceSlug, priceFrom, freguesia, freguesiaSlug, municipio);
+  return {
+    ...getDynamicContent(serviceName, serviceSlug, priceFrom, freguesia, freguesiaSlug, municipio),
+    ...getLandingEditorial({ family: 'freguesia', serviceSlug: serviceSlug as LandingService, serviceLabel: serviceName, place: freguesia, municipality: municipio }),
+  };
 }
 
 // ─── Stats ────────────────────────────────────────────────────────

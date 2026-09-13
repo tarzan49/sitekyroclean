@@ -10,7 +10,7 @@ import ServiceSnapshotStats from "@/components/ServiceSnapshotStats";
 import SofaLeadActions from "@/components/SofaLeadActions";
 import { REVIEW_COUNT, REVIEW_RATING, SITE_URL, WHATSAPP_BASE } from "@/constants/business";
 import { SERVICE_DURATION } from "@/constants/problemCardHelpers";
-import { pickServiceHero, SERVICE_RESULT_CONTENT } from "@/constants/serviceContent";
+import { pickServiceHero } from "@/constants/serviceContent";
 import { SERVICE_TO_QUIZ } from "@/constants/serviceToQuiz";
 import { QuizLocationProvider, QuizServiceProvider } from "@/context/QuizLocationContext";
 import { categoryForServiceSlug } from "@/data/beforeAfterPool";
@@ -78,7 +78,6 @@ const LocationServicePage = () => {
   const quizService = SERVICE_TO_QUIZ[data.serviceSlug];
 
   const heroImgs = pickServiceHero(data.serviceSlug, data.city);
-  const resultContent = (SERVICE_RESULT_CONTENT[data.serviceSlug] ?? SERVICE_RESULT_CONTENT['limpeza-sofas'])(data.city);
   const beforeAfterCategory = categoryForServiceSlug(data.serviceSlug);
   const isSofaCleaning = data.serviceSlug === "limpeza-sofas";
   const isPaidLanding = isSofaCleaning && isAdsVisit(location.search);
@@ -110,7 +109,7 @@ const LocationServicePage = () => {
         serviceName={data.service}
         serviceBaseUrl={serviceBaseUrl}
         placeName={data.city}
-        description={resultContent.desc}
+        description={data.metaDescription}
         pageUrl={location.pathname}
         priceFrom={data.priceFrom}
       />
@@ -160,12 +159,7 @@ const LocationServicePage = () => {
                 </h1>
 
                 <p className="text-sm sm:text-base md:text-lg text-white/70 leading-relaxed mb-4 lg:mb-6 max-w-lg">
-                  {/* Corta na 1ª frase (ponto OU interrogação) — os templates
-                      de intro começam sempre por uma pergunta ("Precisa de
-                      limpeza de sofás em X?"), .split('.') sozinho ignorava
-                      o "?" e arrastava o parágrafo inteiro para o hero,
-                      empurrando a barra de estatísticas para fora do ecrã. */}
-                  {isSofaCleaning ? "Limpeza ao domicílio por extração profunda. Consulte os preços por tamanho e envie uma foto para avaliarmos as manchas." : (data.intro.match(/^[^.?]*[.?]/)?.[0] ?? data.intro)}
+                  {data.intro}
                 </p>
 
 

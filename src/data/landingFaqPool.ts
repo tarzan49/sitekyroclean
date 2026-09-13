@@ -1,5 +1,6 @@
 import { AVAILABILITY_PROMISE, DRYING_PROMISE, PRICE_PROMISE, RESPONSE_PROMISE, SATISFACTION_PROMISE, TREATMENT_EXTRAS } from '../constants/commercialPolicy';
 import { locationPrices } from '../constants/travel';
+import { LANDING_FAQ_EXPANSION } from './landingFaqExpansion';
 
 /** Shared by React and prerender. Do not import assets, React or locationSeoData here. */
 export const LANDING_FAQ_COUNT = 4;
@@ -18,6 +19,8 @@ export interface FaqEntry {
   topic: FaqTopic;
   question: string;
   answer: string | ((context: LandingFaqContext) => string);
+  /** Limits piece-specific questions on sofa/chair waterproofing variant pages. */
+  article?: 'sofa' | 'cadeiras';
 }
 
 const topics: readonly FaqTopic[] = ['orcamento', 'preparacao', 'tratamento', 'cuidados'];
@@ -41,8 +44,8 @@ const common: readonly FaqEntry[] = [
   { id: 'manutencao', topic: 'cuidados', question: 'Como devo escolher os produtos de manutenção?', answer: 'Siga a etiqueta do artigo e as orientações dadas pela equipa para o material e tratamento realizados. Evite misturar produtos ou aplicar um produto novo numa zona visível sem verificar a compatibilidade.' },
 ];
 
-/** Initial editorial library: 12 specific + 12 shared questions per service. */
-const byService: Record<LandingService, readonly FaqEntry[]> = {
+/** Original entries retain their IDs so expanding the pool does not reshuffle everything. */
+const initialByService: Record<LandingService, readonly FaqEntry[]> = {
   'limpeza-sofas': [
     { id: 'sofa-quantidade', topic: 'orcamento', question: 'Como indico o tamanho do sofá para receber orçamento?', answer: 'Indique o número de lugares e se tem chaise longue, canto ou módulos separados. Uma fotografia completa ajuda a confirmar a configuração. Use a tabela do simulador para os tamanhos disponíveis; peças fora dessa tabela são avaliadas por orçamento.' },
     { id: 'sofa-chaise', topic: 'orcamento', question: 'A chaise longue deve ser indicada no simulador?', answer: 'Sim. A chaise faz parte da configuração a limpar e deve ser selecionada além do número de lugares. Confirme também se existem outros módulos para que o orçamento corresponda ao sofá completo.' },
@@ -129,6 +132,11 @@ const byService: Record<LandingService, readonly FaqEntry[]> = {
   ],
 };
 
+const byService = { ...initialByService };
+for (const service of Object.keys(initialByService) as LandingService[]) {
+  byService[service] = [...initialByService[service], ...LANDING_FAQ_EXPANSION[service]];
+}
+
 export function getLandingFaqPool(serviceSlug: LandingService): readonly FaqEntry[] {
   if (!byService[serviceSlug]) throw new Error(`Unknown landing service: ${serviceSlug}`);
   return [...common, ...byService[serviceSlug]];
@@ -145,7 +153,8 @@ function hash(value: string): number {
 
 /** One answer per topic; never pad with unrelated services or change per visit. */
 export function selectLandingFaqEntries(context: LandingFaqContext): FaqEntry[] {
-  const pool = getLandingFaqPool(context.serviceSlug);
+  const article = context.serviceSlug === 'impermeabilizacao' ? context.pageKey.match(/^\/impermeabilizacao-(sofa|cadeiras)-/)?.[1] : undefined;
+  const pool = getLandingFaqPool(context.serviceSlug).filter(entry => !article || !entry.article || entry.article === article);
   const selections = topics.map(topic => {
     const eligible = pool.filter(entry => entry.topic === topic);
     // Price pages keep a service-specific budgeting question as their first answer.

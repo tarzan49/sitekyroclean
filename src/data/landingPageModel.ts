@@ -111,7 +111,7 @@ export function getLandingPageModel(pathname: string) {
   if (family !== 'localidade') directory.push({ title: parish ? `Serviço no município de ${municipalityName}` : 'Página do serviço', links: [{ label: `${service.name} em ${municipalityName}`, href: `/${serviceSlug}-${municipalitySlug}` }, ...(family === 'variante' && parish ? [{ label: `${service.name} em ${locationName}`, href: `/${serviceSlug}-${locationPart}` }] : [])] });
   return {
     path, family, serviceSlug, serviceKey, serviceLabel, municipalitySlug, municipalityName, locationName, prep,
-    title: data.title, h1: data.h1, intro: data.intro,
+    title: data.title, metaDescription: data.metaDescription, h1: data.h1, intro: data.intro,
     priceHeading: `Quanto custa ${priceVerb} ${prep} ${locationName}`,
     priceVerb, pricingDescription, pricePolicy: PRICE_PROMISE,
     variantExplanation: family === 'variante' ? (serviceSlug === 'impermeabilizacao' ? 'A impermeabilização é uma proteção opcional de tecidos compatíveis. A limpeza prévia, se necessária, é combinada e orçamentada separadamente.' : `Limpeza, lavagem e higienização podem descrever o mesmo pedido. O procedimento é escolhido pelo material e pelo estado da peça. ${TREATMENT_EXTRAS}`) : undefined,

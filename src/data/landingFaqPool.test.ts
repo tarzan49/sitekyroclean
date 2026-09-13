@@ -13,7 +13,7 @@ describe('landing FAQ library', () => {
     const distinctQuestions = new Set<string>();
     for (const service of services) {
       const pool = getLandingFaqPool(service.slug as LandingService);
-      expect(pool.length).toBe(24);
+      expect(pool.length).toBe(40);
       expect(new Set(pool.map(faq => faq.id)).size).toBe(pool.length);
       expect(new Set(pool.map(faq => faq.question)).size).toBe(pool.length);
       expect(new Set(pool.map(faq => faq.topic)).size).toBe(4);
@@ -24,7 +24,7 @@ describe('landing FAQ library', () => {
         expect(answer).not.toMatch(/—|\{city\}|\{travelFee\}|99\s*%|esteriliza[çc][aã]o garantida/);
       }
     }
-    expect(distinctQuestions.size).toBe(84);
+    expect(distinctQuestions.size).toBe(180);
   });
 
   it('uses the canonical municipality fee, never a fee guessed from a parish name', () => {
@@ -34,6 +34,20 @@ describe('landing FAQ library', () => {
       expect(entry.answer({ ...context, municipality })).toContain(`${locationPrices[municipality]}€`);
     }
     expect(entry.answer({ ...context, municipality: 'localidade desconhecida' })).not.toMatch(/\d+€/);
+  });
+
+  it('uses the expanded library across real pages and respects waterproofing article scope', () => {
+    const used = new Set<string>();
+    for (const record of getLandingFaqRoutes()) {
+      for (const entry of selectLandingFaqEntries(record.context)) {
+        used.add(entry.id);
+        const article = record.path.match(/^\/impermeabilizacao-(sofa|cadeiras)-/)?.[1];
+        if (article && entry.article) expect(entry.article, record.path).toBe(article);
+      }
+    }
+    const available = new Set(services.flatMap(service => getLandingFaqPool(service.slug as LandingService).map(entry => entry.id)));
+    expect([...available].filter(id => !used.has(id))).toEqual([]);
+    expect(used.size).toBe(180);
   });
 
   it('does not silently substitute sofas for an unsupported service', () => {

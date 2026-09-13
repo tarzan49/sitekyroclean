@@ -22,6 +22,8 @@ for (const record of records) {
   const file = path.resolve('dist', `${record.path.slice(1)}.html`);
   if (!model || !fs.existsSync(file)) { failures.push(`${record.path}: missing model/HTML`); continue; }
   const html = fs.readFileSync(file, 'utf8');
+  const escapedDescription = model.metaDescription.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  if (!html.includes(`name="description" content="${escapedDescription}"`)) failures.push(`${record.path}: metadata/model mismatch`);
   const main = html.match(/<main>[\s\S]*?<\/main>/)?.[0];
   const order = [...html.matchAll(/data-landing-section="([^"]+)"/g)].map(match => match[1]);
   if (JSON.stringify(order) !== JSON.stringify(LANDING_SECTION_ORDER)) failures.push(`${record.path}: wrong section order`);

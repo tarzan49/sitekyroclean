@@ -2,6 +2,7 @@ import { ALCATIFA_PROBLEMS } from "./alcatifaProblems";
 import { WATERPROOFING_PROBLEMS } from "./waterproofingProblems";
 import { locationPrices } from '../constants/travel';
 import { getLandingFaqs, type LandingService } from './landingFaqPool';
+import { getLandingEditorial } from './landingEditorial';
 
 export interface LocationService {
   slug: string;
@@ -307,6 +308,7 @@ export function getLocationServiceData(serviceSlug: string, citySlug: string): L
   const content = generator(city.name, city.description);
   return {
     ...content,
+    ...getLandingEditorial({ family: 'localidade', serviceSlug: serviceSlug as LandingService, serviceLabel: service.name, place: city.name, municipality: city.name }),
     faqs: getLandingFaqs({ serviceSlug: serviceSlug as LandingService, pageKey: `/${serviceSlug}-${citySlug}`, municipality: city.name, family: 'localidade' }),
     slug: `${serviceSlug}-${citySlug}`,
     city: city.name,

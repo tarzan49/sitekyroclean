@@ -5,6 +5,7 @@
 import { cities, cityPrep } from './locationSeoData';
 import { municipiosComFreguesias } from './freguesiaSeoData';
 import { getLandingFaqs, type LandingService } from './landingFaqPool';
+import { getLandingEditorial } from './landingEditorial';
 
 // ─── Types ─────────────────────────────────────────────────────────
 
@@ -787,9 +788,9 @@ function buildData(
     variantKey,
     canonical: `/${canonicalBase}-${canonicalSuffix}`,
     title: `${variantLabel} de ${svc.label} ${prep} ${locationName} | Kyro Clean Solutions`,
-    metaDescription: content.intro.slice(0, 155).trimEnd(),
     h1: `${variantLabel} Profissional de ${svc.label} ${prep} ${locationName}`,
     ...content,
+    ...getLandingEditorial({ family: 'variante', serviceSlug: variantKey === 'impermeabilizacao' ? 'impermeabilizacao' : ({ sofa: 'limpeza-sofas', colchao: 'limpeza-colchoes', tapetes: 'limpeza-tapetes', cadeiras: 'limpeza-cadeiras', alcatifas: 'limpeza-alcatifas' } as const)[serviceKey], serviceLabel: `${variantLabel} de ${svc.label}`, place: locationName, municipality }),
     faqs: getLandingFaqs({
       serviceSlug: variantKey === 'impermeabilizacao' ? 'impermeabilizacao' : ({ sofa: 'limpeza-sofas', colchao: 'limpeza-colchoes', tapetes: 'limpeza-tapetes', cadeiras: 'limpeza-cadeiras', alcatifas: 'limpeza-alcatifas' } satisfies Record<ServiceKey, LandingService>)[serviceKey],
       pageKey: `/${variantKey}-${serviceKey}-${locationPart}`,

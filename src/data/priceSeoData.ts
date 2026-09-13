@@ -3,6 +3,7 @@
 
 import { cities, services, cityPrep } from "./locationSeoData";
 import { getLandingFaqs, type LandingService } from './landingFaqPool';
+import { getLandingEditorial } from './landingEditorial';
 
 export interface PricePageData {
   serviceSlug: string;
@@ -127,9 +128,8 @@ export function getPricePageData(serviceSlug: string, citySlug: string): PricePa
     citySlug: city.slug,
     cityName: city.name,
     title: `Preço ${service.name} ${city.name} | Tabela de Preços | Kyro Clean Solutions`,
-    metaDescription: `Preços de ${service.name.toLowerCase()} ${prep} ${city.name}. Tabela de preços atualizada.${/^\d/.test(service.priceFrom) ? ` Desde ${service.priceFrom}.` : ''} Orçamento gratuito e sem compromisso.`,
+    ...getLandingEditorial({ family: 'preco', serviceSlug: serviceSlug as LandingService, serviceLabel: service.name, place: city.name, municipality: city.name }),
     h1: `Preço de ${service.name} ${prep} ${city.name}`,
-    intro: `Consulte os preços de ${service.name.toLowerCase()} ${prep} ${city.name}. Preços transparentes, sem custos escondidos: a deslocação é calculada consoante a localização, equipamento de extração profissional e produtos certificados. Orçamento gratuito e sem compromisso.`,
     priceTable: table,
     factors,
     faqs,

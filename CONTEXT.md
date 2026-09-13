@@ -1,4 +1,10 @@
-## Biblioteca de FAQ das landing pages (13/09/2026)
+## Expansão editorial das landing pages (13/09/2026)
+
+Etapa 3 substitui as contagens iniciais abaixo: 180 perguntas distintas, 40 candidatas por serviço (12 comuns + 28 específicas). `landingFaqExpansion.ts` acrescenta 16 por serviço. `landingFaqPool.ts` filtra perguntas marcadas com `article` nas variantes de impermeabilização de sofá/cadeiras antes da seleção estável. Mantém exatamente quatro perguntas, uma por assunto e pelo menos duas específicas. Os testes verificam que todas as 180 são utilizadas no inventário real.
+
+`landingEditorial.ts` é a fonte pura de `intro` e `metaDescription` dos quatro geradores. Os heroes mostram a introdução completa; o modelo partilhado inclui a descrição SEO e a auditoria compara-a com o HTML inicial. Distingue intenção de preços, serviço e contexto administrativo sem inventar condições locais ou métodos exclusivos de sinónimos. Aveiro/Coimbra explicitam disponibilidade sob consulta. Campos legados não consumidos pelas novas secções continuam nos geradores e não representam conteúdo aprovado. Detalhes em `docs/landing-editorial-review.md`. Validação: 1.928 testes, build de 16.045 rotas, auditorias de 12.912 páginas sem divergências. Imagens ainda pendentes.
+
+## Biblioteca de FAQ das landing pages (13/09/2026, estado inicial da etapa 1)
 
 `src/data/landingFaqPool.ts` é a fonte das FAQ de localidade × serviço, freguesia × serviço, preços e variantes keyword. Biblioteca inicial de 84 perguntas distintas: 12 comuns e 12 específicas de cada serviço (24 candidatas por serviço). Cada gerador devolve exatamente quatro, uma por assunto (orçamento, preparação, tratamento, cuidados), com pelo menos duas específicas do serviço. A seleção usa a identidade estável da página, incluindo município nas freguesias; não usa aleatoriedade por visita nem parâmetros Ads. Páginas de preços reservam o primeiro assunto a uma pergunta de orçamento específica do serviço. As taxas são lidas de `travel.ts`; respostas comerciais reutilizam `commercialPolicy.ts`. As antigas listas FAQ das quatro famílias foram removidas, sem alterar os outros campos dos geradores.
 

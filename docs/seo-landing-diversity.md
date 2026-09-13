@@ -50,9 +50,15 @@ Validação: 1.924 testes aprovados em 30 ficheiros, TypeScript e lint dos compo
 
 Esta entrega não produz a biblioteca de 240 imagens nem prova unicidade, indexação ou melhoria de ranking. Os quatro problemas comuns de cada serviço são a base para a próxima correspondência editorial e visual.
 
+## Etapa 3: expansão editorial
+
+Biblioteca ampliada de 84 para 180 perguntas distintas, com 40 candidatas por serviço, mantendo exatamente quatro por página. Introduções e descrições SEO passam por uma fonte partilhada, removendo promessas sanitárias sem comprovação nesses campos. Diferenciação por assunto, serviço e intenção, sem inventar métodos para sinónimos ou factos locais. Relatório, fontes e limites: [revisão editorial](landing-editorial-review.md).
+
+Validação: 1.928 testes aprovados, TypeScript e lint dos ficheiros novos/componentes alterados, build de 16.045 rotas e auditorias das 12.912 páginas sem divergências. Amostra dos seis serviços em mobile 390 × 844, quatro FAQ funcionais, sete secções, sem overflow horizontal e introdução integral igual ao HTML inicial. Esta etapa não gera imagens nem demonstra unicidade SEO de cada página.
+
 ## Próximas entregas
 
-1. Expandir as FAQ por assunto e rever o restante conteúdo de cada família. Reutilizar factos técnicos verdadeiros; diferenciar preços, condições de visita e perguntas relevantes. Limpeza, lavagem e higienização podem descrever a mesma intervenção: não inventar métodos distintos para justificar keywords.
+1. Concluir a revisão dos restantes campos legados e mensagens partilhadas fora das FAQ/introduções/descrições agora revistas, sem alargar automaticamente o trabalho às famílias de problemas e materiais. Limpeza, lavagem e higienização podem descrever a mesma intervenção: não inventar métodos distintos para justificar keywords.
 2. Validar a correspondência texto/imagem dos quatro problemas por serviço e produzir um piloto de sofás antes da expansão visual.
 3. Criar a biblioteca de imagens: dez alternativas por problema, quatro problemas por serviço, 240 imagens no total. Reutilizar imagens adequadas existentes quando validadas. Uma imagem por cartão, com seleção independente e estável; não gerar milhares de ficheiros por URL. Ilustrações identificadas como tal, nunca atribuídas a clientes/localidades.
 4. Auditar todas as rotas e a semelhança de conteúdo; verificar links, sitemaps, metadados, fontes comerciais, cobertura das secções, desempenho e imagens. Inspeção visual em mobile por família e serviço. Possíveis alterações de URLs, redirecionamentos ou indexação são decisões separadas, suportadas por análise e, quando disponíveis, dados do Search Console.

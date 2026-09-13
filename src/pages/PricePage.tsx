@@ -126,7 +126,7 @@ const PricePage = () => {
                 </h1>
 
                 <p className="text-sm sm:text-base md:text-lg text-white/70 leading-relaxed mb-4 lg:mb-6 max-w-lg">
-                  {data.intro.match(/^[^.?]*[.?]/)?.[0] ?? data.intro}
+                  {data.intro}
                 </p>
 
 
