@@ -27,7 +27,7 @@ const Hero = () => {
       >
         {/* One continuous outpainted scene behind all three mobile content rows. */}
         <div className="absolute inset-x-0 bottom-0 top-14 md:hidden" aria-hidden="true">
-          <img src={imgMobile} alt="" className="h-full w-full object-cover object-center" loading="eager" fetchPriority="high" />
+          <img src={imgMobile} alt="" className="h-full w-full object-cover object-[center_58%]" loading="eager" fetchPriority="high" />
           <div className="absolute inset-0" style={{ background: 'linear-gradient(to bottom, rgba(5,28,23,.86) 0%, rgba(5,28,23,.78) 29%, rgba(5,28,23,.18) 43%, transparent 49%, transparent 68%, rgba(5,28,23,.72) 79%, rgba(5,28,23,.94) 100%)' }} />
         </div>
         {/* Background */}
@@ -89,9 +89,9 @@ const Hero = () => {
 
           </div>
 
-          {/* Reserve clear space for the extractor and the clean/dirty boundary. */}
-          <div className="-mx-5 aspect-[4/3] md:hidden" role="img" aria-label="Limpeza de um sofá, com a diferença visível entre o tecido limpo e por limpar" />
-          <div className="py-4 md:hidden">
+          {/* Keep the cleaning line visible while bringing trust and both CTAs into the first mobile viewport. */}
+          <div className="-mx-5 h-[clamp(9rem,40vw,11rem)] md:hidden" role="img" aria-label="Limpeza de um sofá, com a diferença visível entre o tecido limpo e por limpar" />
+          <div className="py-3 md:hidden">
             <HomeHeroTrust />
           </div>
 
