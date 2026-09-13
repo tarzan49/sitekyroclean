@@ -1,6 +1,7 @@
-import { useMemo } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { getLandingPageModel } from '@/data/landingPageModel';
+import { bootstrapLandingModel } from '@/data/landingModelBootstrap';
+import type { LandingPageModel } from '@/data/landingPageModel';
 import { LANDING_SECTION_ORDER } from '@/data/landingServiceCopy';
 import { PROBLEM_IMAGES } from '@/constants/problemCardHelpers';
 import { SERVICE_TO_QUIZ, SERVICEKEY_TO_QUIZ } from '@/constants/serviceToQuiz';
@@ -24,7 +25,19 @@ const container = 'max-w-7xl mx-auto px-5 sm:px-6 lg:px-8';
 /** The seven-section composition for the four SEO landing families only. */
 export default function LandingServiceSections() {
   const { pathname, search } = useLocation();
-  const model = useMemo(() => getLandingPageModel(pathname), [pathname]);
+  // Entrada normal (vinda do Google): o modelo veio no HTML, sem catálogos.
+  const fromHtml = bootstrapLandingModel(pathname);
+  // Navegação dentro do site: aí sim o catálogo é preciso, e só aí.
+  const [loaded, setLoaded] = useState<{ path: string; model: LandingPageModel | null } | null>(null);
+  useEffect(() => {
+    if (fromHtml) return;
+    let current = true;
+    void import('@/data/landingPageModel').then(({ getLandingPageModel }) => {
+      if (current) setLoaded({ path: pathname, model: getLandingPageModel(pathname) });
+    });
+    return () => { current = false; };
+  }, [pathname, fromHtml]);
+  const model = fromHtml ?? (loaded?.path === pathname ? loaded.model : null);
   const { isQuizOpen, openQuiz, closeQuiz } = useQuizLauncher();
   if (!model) return null;
   const hideDirectory = model.serviceSlug === 'limpeza-sofas' && ['localidade', 'variante'].includes(model.family) && isAdsVisit(search);

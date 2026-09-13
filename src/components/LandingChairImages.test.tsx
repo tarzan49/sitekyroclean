@@ -3,6 +3,7 @@ import { MemoryRouter } from 'react-router-dom';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import type { ReactNode } from 'react';
 import LandingServiceSections from './LandingServiceSections';
+import { installLandingModel, clearLandingModel } from '../test/landingModelDom';
 import { LANDING_SECTION_ORDER } from '../data/landingServiceCopy';
 import { getLandingPageModel } from '../data/landingPageModel';
 
@@ -12,13 +13,14 @@ vi.mock('./PriceWidget', () => ({ default: (props: object) => <div data-testid="
 vi.mock('./SofaProcessGuide', () => ({ default: () => <div>Processo sofá</div> }));
 vi.mock('./ServiceProcessGuide', () => ({ default: () => <div>Processo serviço</div> }));
 vi.mock('./QuizFormLazy', () => ({ default: ({ isOpen, ...props }: { isOpen: boolean; [key: string]: unknown }) => isOpen ? <div data-testid="quiz">{JSON.stringify(props)}</div> : null }));
-afterEach(cleanup);
+afterEach(() => { cleanup(); clearLandingModel(); });
 
 describe('chair image integration', () => {
   it('uses the chair selection in React across all four families', () => {
     for (const route of ['/limpeza-cadeiras-lisboa', '/limpeza-cadeiras-porto-paranhos', '/preco-limpeza-cadeiras-lisboa', '/higienizacao-cadeiras-lisboa']) {
       const model = getLandingPageModel(route)!;
       expect(model).not.toBeNull();
+      installLandingModel(route);
       const { container } = render(<MemoryRouter initialEntries={[route]}><LandingServiceSections /></MemoryRouter>);
       const images = [...container.querySelectorAll('[data-problem-id] img')];
       expect(images).toHaveLength(4);

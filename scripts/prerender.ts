@@ -353,6 +353,14 @@ export function prerenderRoutes(outDir: string): number {
     }
     html = preloadComparison(html, landing?.serviceSlug ?? heroServices.get(routePath) ?? routePath.slice(1));
     html = injectContent(html, landing ? renderLandingPageHtml(landing) : generatePageBody(content ?? { h1: title.split(" | ")[0], intro: desc }, lang));
+    if (landing) {
+      // O modelo resolvido viaja no HTML para o cliente não voltar a montar
+      // uma página que já recebeu pronta. Custa ~1,4 KB comprimidos (o texto
+      // já está no HTML, o gzip deduplica-o) e evita ~100 KB de catálogos.
+      // `<` escapado para nenhum conteúdo conseguir fechar o <script>.
+      const modelJson = JSON.stringify(landing).replace(/</g, '\\u003c');
+      html = html.replace('</body>', `<script type="application/json" id="kyro-landing-model">${modelJson}</script>\n</body>`);
+    }
     // LocalBusiness on every page
     html = injectJsonLd(html, LOCAL_BIZ);
     // Caller-provided schemas (FAQ, Service, BreadcrumbList, etc.)
