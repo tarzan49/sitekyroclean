@@ -37,14 +37,18 @@ export function WaterproofingTierPicker({ formData, updateFormData, onSelect, ac
         {!compact && <ShieldCheck aria-hidden="true" className="w-7 h-7 text-gold mb-2" />}
         <div className={cn("flex items-center gap-1.5 mb-0.5", centered && "justify-center")}>
           {tier === 'premium' && <Check className="w-3 h-3 text-gold flex-shrink-0" />}
-          <p className={cn('text-sm font-bold', tier === 'premium' ? 'text-white' : 'text-white/85')}>Premium</p>
+          <p className="text-sm font-bold text-[#D4AF37]">Premium</p>
         </div>
         {prices && <div className="w-full mt-1.5 mb-3">
-          <p className={cn('font-bold tracking-tight tabular-nums text-white', prices.premium === null ? 'text-base' : 'text-2xl leading-tight')}>{prices.premium === null ? 'Sob orçamento' : `+${prices.premium.toLocaleString('pt-PT')}€`}</p>
+          <p className={cn('font-bold tracking-tight tabular-nums text-[#D4AF37]', prices.premium === null ? 'text-base' : 'text-2xl leading-tight')}>{prices.premium === null ? 'Sob orçamento' : `+${prices.premium.toLocaleString('pt-PT')}€`}</p>
           {!compact && <p className="text-[10px] text-white/60 mt-1">{priceScope} · antes de descontos</p>}
         </div>}
-        <p className="text-[11px] leading-relaxed text-white/75">{compact ? 'Até 10 anos · até 5 lavagens' : 'Até 10 anos de proteção · até 5 lavagens'}</p>
-        {premiumDifference != null && premiumDifference > 0 && <p className="text-[11px] font-medium text-gold mt-2 leading-snug">Só mais {premiumDifference.toLocaleString('pt-PT')}€ que o Essencial</p>}
+        <p className="text-[11px] leading-relaxed text-[#D4AF37]">{compact ? 'Até 10 anos · até 5 lavagens' : 'Até 10 anos de proteção · até 5 lavagens'}</p>
+        {premiumDifference != null && premiumDifference > 0 && <div className="flex items-center gap-1.5 mt-2 text-[10px]" aria-label={`Mais ${premiumDifference.toLocaleString('pt-PT')}€ que o Essencial`}>
+          <span className="text-white/60">Essencial</span>
+          <span aria-hidden="true" className="text-white/40">→</span>
+          <span className="rounded-sm bg-[#D4AF37]/10 px-1.5 py-0.5 font-semibold tabular-nums text-[#D4AF37]">+{premiumDifference.toLocaleString('pt-PT')}€</span>
+        </div>}
       </button>
       <button
         type="button"
