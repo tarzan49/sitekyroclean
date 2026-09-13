@@ -77,15 +77,10 @@ const Header = () => {
           onClick={(e) => {
             if (location.pathname === "/") { e.preventDefault(); window.scrollTo({ top: 0, behavior: "smooth" }); }
           }}
-          className="flex h-11 min-w-0 flex-1 items-center justify-center text-center leading-none md:h-auto md:block md:flex-none md:text-left md:shrink-0"
+          className="flex h-11 min-w-0 flex-1 items-center justify-start leading-none md:h-auto md:block md:flex-none md:text-left md:shrink-0"
         >
-          <span className="flex flex-col items-center gap-1 md:hidden">
-            <span className="font-playfair text-[16px] font-medium tracking-[-0.02em] text-[#111111]">
-              Kyro Clean
-            </span>
-            <span className="pl-[0.24em] text-[7px] font-bold uppercase tracking-[0.24em] text-[#9A7A18]">
-              Solutions
-            </span>
+          <span className="inline-flex h-11 items-center whitespace-nowrap font-playfair text-[15px] font-medium tracking-[-0.025em] text-[#5F6368] md:hidden">
+            Kyro Clean Solutions
           </span>
           <span className="hidden font-playfair text-[17px] font-normal tracking-tight text-[#111111] md:inline">
             Kyro Clean Solutions
