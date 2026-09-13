@@ -68,7 +68,7 @@ const Header = () => {
 
   return (
     <>
-    <header className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-[#111111]/8">
+    <header className="kyro-header fixed top-0 left-0 right-0 z-50 bg-white border-b border-[#111111]/8">
       <div className="mx-auto px-3 sm:px-5 2xl:px-8 max-w-7xl h-14 2xl:h-[60px] flex items-center justify-between gap-2 2xl:gap-4">
 
         {/* ── LEFT: logo text ── */}
@@ -77,13 +77,13 @@ const Header = () => {
           onClick={(e) => {
             if (location.pathname === "/") { e.preventDefault(); window.scrollTo({ top: 0, behavior: "smooth" }); }
           }}
-          className="font-playfair text-base 2xl:text-[17px] font-normal text-[#111111] tracking-tight leading-none min-w-0 truncate flex-1 text-center 2xl:flex-none 2xl:text-left 2xl:shrink-0"
+          className="kyro-header-brand font-playfair text-base 2xl:text-[17px] font-normal text-[#111111] tracking-tight leading-none min-w-0 truncate flex-1 text-center 2xl:flex-none 2xl:text-left 2xl:shrink-0"
         >
           Kyro Clean Solutions
         </Link>
 
         {/* ── CENTER: desktop nav ── */}
-        <nav className="hidden 2xl:flex items-center gap-7 mx-auto">
+        <nav className="kyro-header-desktop items-center gap-7 mx-auto">
 
           <button onClick={scrollToTop} className={navItem(location.pathname === '/')}>
             Início
@@ -136,7 +136,7 @@ const Header = () => {
         </nav>
 
         {/* ── RIGHT: three solid buttons (desktop) ── */}
-        <div className="hidden 2xl:flex items-center gap-2.5 shrink-0">
+        <div className="kyro-header-desktop items-center gap-2.5 shrink-0">
           <a
             href={`tel:${PHONE_TEL}`}
             onClick={() => trackCallClick('header_desktop')}
@@ -164,7 +164,7 @@ const Header = () => {
         </div>
 
         {/* ── MOBILE: call, WhatsApp and menu controls on the right ── */}
-        <div className="flex items-center gap-1.5 sm:gap-2 2xl:hidden shrink-0">
+        <div className="kyro-header-mobile items-center gap-1.5 sm:gap-2 shrink-0">
           {/* Call icon only */}
           <a
             href={`tel:${PHONE_TEL}`}

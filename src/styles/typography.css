@@ -53,3 +53,13 @@
   .price-widget-row { display: grid; grid-template-columns: auto minmax(0, 1fr); }
   .price-widget-stepper { grid-column: 2; justify-self: start; margin-top: .25rem; }
 }
+
+/* The menu breakpoint follows the available width and the user's text size. */
+.kyro-header { container-type: inline-size; }
+.kyro-header-desktop { display: none; }
+.kyro-header-mobile { display: flex; }
+@container (min-width: 78rem) {
+  .kyro-header-desktop { display: flex; }
+  .kyro-header-mobile { display: none; }
+  .kyro-header-brand { flex: none; text-align: left; }
+}
