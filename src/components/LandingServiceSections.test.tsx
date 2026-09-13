@@ -15,6 +15,18 @@ vi.mock('./QuizFormLazy', () => ({ default: ({ isOpen, ...props }: { isOpen: boo
 afterEach(cleanup);
 
 describe('landing section integration', () => {
+  it('uses the mattress selection in React across all four families', () => {
+    for (const route of ['/limpeza-colchoes-lisboa', '/limpeza-colchoes-porto-paranhos', '/preco-limpeza-colchoes-lisboa', '/higienizacao-colchao-lisboa']) {
+      const model = getLandingPageModel(route)!;
+      expect(model).not.toBeNull();
+      const { container } = render(<MemoryRouter initialEntries={[route]}><LandingServiceSections /></MemoryRouter>);
+      const images = [...container.querySelectorAll('[data-problem-id] img')];
+      expect(images).toHaveLength(4);
+      expect(images.map(img => ({ src: img.getAttribute('src'), alt: img.getAttribute('alt') }))).toEqual(model.problems.map(card => ({ src: card.image!.src, alt: card.image!.alt })));
+      expect(container.querySelectorAll('#duvidas button[aria-expanded]')).toHaveLength(4);
+      cleanup();
+    }
+  });
   it('uses the public sofa library with or without the old preview parameter', () => {
     for (const [route, expected] of [
       ['/limpeza-sofas-lisboa?teste=imagens-sofas', 4],

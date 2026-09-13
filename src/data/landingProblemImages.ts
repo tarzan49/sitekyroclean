@@ -1,3 +1,7 @@
+import { MATTRESS_PROBLEM_IMAGES } from './mattressProblemImages';
+
+export interface LandingProblemImage { id: string; problemId: string; src: string; alt: string }
+
 /** Public illustrative library. Pure data shared by React and Node prerender. */
 export const SOFA_PROBLEM_IMAGES = [
   {
@@ -250,10 +254,11 @@ function score(value: string): number {
 
 /** Rendezvous selection: independent by problem, stable by URL, never by visit. */
 export function selectLandingProblemImage(serviceSlug: string, problemId: string, pagePath: string) {
-  if (serviceSlug !== 'limpeza-sofas') return undefined;
+  const library: readonly LandingProblemImage[] = serviceSlug === 'limpeza-sofas' ? SOFA_PROBLEM_IMAGES
+    : serviceSlug === 'limpeza-colchoes' ? MATTRESS_PROBLEM_IMAGES : [];
   const path = pagePath.split(/[?#]/)[0].replace(/\/+$/, '') || '/';
-  const candidates = SOFA_PROBLEM_IMAGES.filter(image => image.problemId === problemId);
-  return candidates.reduce<(typeof SOFA_PROBLEM_IMAGES)[number] | undefined>((best, image) => {
+  const candidates = library.filter(image => image.problemId === problemId);
+  return candidates.reduce<LandingProblemImage | undefined>((best, image) => {
     const seed = path + ':' + problemId + ':';
     return !best || score(seed + image.id) > score(seed + best.id) ? image : best;
   }, undefined);
