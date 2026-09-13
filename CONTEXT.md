@@ -1,6 +1,6 @@
 ## Processo da homepage (13/09/2026)
 
-`HowItWorksV1` apresenta a composição aprovada para a homepage: imagem existente do catálogo, três passos e descrição abaixo do título («Orçamento claro, visita combinada e acompanhamento após o serviço.»). Retirados desta secção o bloco de garantia e o CTA, por pedido do responsável. A garantia comercial mantém-se; a remoção é apenas editorial neste bloco. A composição está integrada na homepage, sem modo isolado `?preview=processo`. Mantida uma altura generosa no desktop e fluxo compacto no telemóvel.
+`HowItWorksV1` apresenta a composição aprovada para a homepage: imagem existente do catálogo, três passos e descrição abaixo do título («Orçamento claro, visita combinada e acompanhamento após o serviço.»). Retirados desta secção o bloco de garantia e o CTA, por pedido do responsável. A garantia comercial mantém-se; a remoção é apenas editorial neste bloco. A composição está integrada na homepage, sem modo isolado `?preview=processo`. Revisão de compacidade: no desktop, imagem à esquerda ocupa as duas linhas da grelha; título, descrição e passos ficam juntos à direita, sem cabeçalho de largura inteira nem altura mínima de 590px. No telemóvel, título, imagem horizontal e passos. Números simples, divisórias finas e sem legenda sobre a imagem.
 
 ## Correções comerciais e packs personalizáveis (10/09/2026)
 
