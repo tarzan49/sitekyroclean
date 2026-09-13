@@ -54,12 +54,12 @@ export default function ServicePriceSection({ serviceSlug, initialLocation }: Pr
           >
             <div className="flex-1 min-w-0">
               {point.stat && (
-                <p className="font-playfair text-xl font-bold leading-none mb-1" style={{ color: "#1A4E30" }}>
+                <p className="font-playfair text-xl font-bold leading-none mb-1" style={{ color: "#D4AF37" }}>
                   {point.stat}
                 </p>
               )}
               <p className="text-base font-semibold leading-snug mb-0.5">
-                <span style={{ color: "#1A4E30" }}>{point.titleGold}</span>
+                <span style={{ color: "#D4AF37" }}>{point.titleGold}</span>
                 {point.titleRest && <span style={{ color: "#111111" }}>{point.titleRest}</span>}
               </p>
               {fullDesc && (
@@ -132,7 +132,7 @@ export default function ServicePriceSection({ serviceSlug, initialLocation }: Pr
             <span className="text-base font-semibold" style={{ color: "#111111" }}>Porquê escolher a Kyro Clean?</span>
             <ChevronDown
               className="w-4 h-4 transition-transform duration-200 flex-shrink-0"
-              style={{ color: "#1A4E30", transform: infoOpen ? "rotate(180deg)" : "rotate(0deg)" }}
+              style={{ color: "#D4AF37", transform: infoOpen ? "rotate(180deg)" : "rotate(0deg)" }}
             />
           </button>
           {infoOpen && (

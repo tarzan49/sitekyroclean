@@ -1,4 +1,4 @@
-﻿import { Link } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useEffect, useRef, useState, useCallback } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import sofaImg         from "@/assets/hero-sofa-v4.jpeg";
@@ -280,13 +280,13 @@ const Services = () => {
         <div className={`mb-10 md:mb-14 transition-all duration-700 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-5"}`}>
           <div className="flex items-center gap-3 mb-5">
             <div className="h-px w-8" style={{ backgroundColor: "#D4AF37", opacity: 0.65 }} />
-            <p className="text-sm font-bold tracking-[0.08em] uppercase" style={{ color: "#1A4E30" }}>
+            <p className="text-sm font-bold tracking-[0.08em] uppercase" style={{ color: "#D4AF37" }}>
               OS NOSSOS SERVIÇOS
             </p>
           </div>
           <h2 className="type-section-title font-playfair      text-[#111111] max-w-xl">
             Cada estofo tratado{" "}
-            <em className="not-italic" style={{ color: "#1A4E30" }}>com precisão.</em>
+            <em className="not-italic" style={{ color: "#D4AF37" }}>com precisão.</em>
           </h2>
           <p className="mt-4 text-base md:text-base text-[#505650] max-w-lg leading-relaxed">
             Sofás, colchões, tapetes, cadeiras e alcatifas: higienização profissional ao domicílio, resultado garantido no próprio dia.
@@ -294,14 +294,13 @@ const Services = () => {
         </div>
       </div>
 
-      {/* ── Mobile Grid (2-col, shows all 6) ── */}
-      <div className={`block md:hidden px-5 grid grid-cols-2 gap-3 transition-opacity duration-700 ${isVisible ? "opacity-100" : "opacity-0"}`}>
+      {/* ── Mobile grid: columns follow the space needed by full service names ── */}
+      <div className={`md:hidden px-5 grid grid-cols-[repeat(auto-fit,minmax(min(100%,16rem),1fr))] gap-3 transition-opacity duration-700 ${isVisible ? "opacity-100" : "opacity-0"}`}>
         {services.map((service, i) => (
           <Link
             key={i}
             to={service.link}
-            className="relative overflow-hidden rounded-xl block"
-            style={{ height: 210 }}
+            className="relative overflow-hidden rounded-xl flex items-end min-h-[210px]"
           >
             <picture className="absolute inset-0 w-full h-full">
               <img
@@ -324,7 +323,7 @@ const Services = () => {
                 {service.badge}
               </span>
             </div>
-            <div className="absolute bottom-0 left-0 right-0 px-3 pb-3">
+            <div className="relative w-full px-4 pb-4 pt-24">
               <div className="mb-1.5 rounded-full" style={{ width: "14px", height: "1.5px", backgroundColor: "#D4AF37", opacity: 0.60 }} />
               <h3 className="type-card-title font-playfair  text-white ">
                 {service.title}

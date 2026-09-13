@@ -28,18 +28,18 @@ const HomepageBlogSection = () => {
           <div>
             <div className="flex items-center gap-3 mb-5">
               <div className="h-px w-8" style={{ backgroundColor: '#D4AF37', opacity: 0.65 }} />
-              <p className="text-sm font-bold tracking-[0.08em] uppercase" style={{ color: '#1A4E30', opacity: 0.85 }}>
+              <p className="text-sm font-bold tracking-[0.08em] uppercase" style={{ color: '#D4AF37', opacity: 0.85 }}>
                 DICAS & CONSELHOS
               </p>
             </div>
             <h2 className="type-section-title font-playfair      text-[#111111]">
               Últimos{" "}
-              <em className="not-italic" style={{ color: '#1A4E30' }}>artigos</em>
+              <em className="not-italic" style={{ color: '#D4AF37' }}>artigos</em>
             </h2>
           </div>
           <Link
             to="/blog"
-            className="hidden md:flex items-center gap-1.5 text-sm font-medium text-[#505650] hover:text-[#1A4E30] transition-colors duration-200 pb-0.5 border-b border-transparent hover:border-[#D4AF37]/30 flex-shrink-0"
+            className="hidden md:flex items-center gap-1.5 text-sm font-medium text-[#505650] hover:text-[#D4AF37] transition-colors duration-200 pb-0.5 border-b border-transparent hover:border-[#D4AF37]/30 flex-shrink-0"
           >
             Ver todos <ArrowRight className="w-3 h-3" />
           </Link>
@@ -56,7 +56,7 @@ const HomepageBlogSection = () => {
             className="group relative bg-white rounded-2xl overflow-hidden border border-[#111111]/[0.07] shadow-[0_2px_16px_rgba(0,0,0,0.06)] hover:shadow-[0_8px_32px_rgba(0,0,0,0.11)] transition-shadow duration-300 flex flex-col p-7 md:p-9"
           >
             <div className="flex items-center justify-between mb-5">
-              <span className="text-sm font-bold tracking-[0.24em] uppercase" style={{ color: '#1A4E30', opacity: 0.90 }}>
+              <span className="text-sm font-bold tracking-[0.24em] uppercase" style={{ color: '#D4AF37', opacity: 0.90 }}>
                 {featured.category}
               </span>
               <span className="font-mono text-sm font-bold" style={{ color: 'rgba(26,26,46,0.14)' }}>
@@ -81,7 +81,7 @@ const HomepageBlogSection = () => {
               </span>
               <span
                 className="flex items-center gap-1 text-sm font-semibold group-hover:gap-2 transition-all duration-200"
-                style={{ color: '#1A4E30' }}
+                style={{ color: '#D4AF37' }}
               >
                 Ler artigo <ArrowRight className="w-3 h-3" />
               </span>
@@ -102,7 +102,7 @@ const HomepageBlogSection = () => {
                 className="group relative bg-white rounded-2xl overflow-hidden border border-[#111111]/[0.07] shadow-[0_2px_12px_rgba(0,0,0,0.05)] hover:shadow-[0_6px_24px_rgba(0,0,0,0.10)] transition-shadow duration-300 flex flex-col flex-1 p-6"
               >
                 <div className="flex items-center justify-between mb-4">
-                  <span className="text-sm font-bold tracking-[0.24em] uppercase" style={{ color: '#1A4E30', opacity: 0.90 }}>
+                  <span className="text-sm font-bold tracking-[0.24em] uppercase" style={{ color: '#D4AF37', opacity: 0.90 }}>
                     {post.category}
                   </span>
                   <span className="font-mono text-sm font-bold" style={{ color: 'rgba(26,26,46,0.14)' }}>
@@ -123,7 +123,7 @@ const HomepageBlogSection = () => {
                   </span>
                   <span
                     className="flex items-center gap-1 text-sm font-semibold group-hover:gap-2 transition-all duration-200"
-                    style={{ color: '#1A4E30' }}
+                    style={{ color: '#D4AF37' }}
                   >
                     Ler <ArrowRight className="w-3 h-3" />
                   </span>
@@ -145,7 +145,7 @@ const HomepageBlogSection = () => {
         >
           <Link
             to="/blog"
-            className="inline-flex items-center gap-1.5 text-base font-medium text-[#505650] hover:text-[#1A4E30] transition-colors"
+            className="inline-flex items-center gap-1.5 text-base font-medium text-[#505650] hover:text-[#D4AF37] transition-colors"
           >
             Ver todos os artigos <ArrowRight className="w-3.5 h-3.5" />
           </Link>

@@ -39,12 +39,12 @@ function Points({ points, fullDesc }: { points: TrustPoint[]; fullDesc: boolean 
           >
             <div className="flex-1 min-w-0">
               {p.stat && (
-                <p className="font-playfair text-xl font-bold leading-none mb-1" style={{ color: "#1A4E30" }}>
+                <p className="font-playfair text-xl font-bold leading-none mb-1" style={{ color: "#D4AF37" }}>
                   {p.stat}
                 </p>
               )}
               <p className="text-base font-semibold leading-snug mb-0.5">
-                <span style={{ color: "#1A4E30" }}>{p.titleGold}</span>
+                <span style={{ color: "#D4AF37" }}>{p.titleGold}</span>
                 {p.titleRest && <span style={{ color: "#111111" }}>{p.titleRest}</span>}
               </p>
               {fullDesc && (
@@ -103,7 +103,7 @@ export function ServiceTrustMobile({ serviceSlug, variant = 0, seedKey }: Props)
         <span className="text-base font-semibold" style={{ color: "#111111" }}>Porquê escolher a Kyro Clean?</span>
         <ChevronDown
           className="w-4 h-4 transition-transform duration-200 flex-shrink-0"
-          style={{ color: "#1A4E30", transform: open ? "rotate(180deg)" : "rotate(0deg)" }}
+          style={{ color: "#D4AF37", transform: open ? "rotate(180deg)" : "rotate(0deg)" }}
         />
       </button>
       {open && (

@@ -24,18 +24,18 @@ const ServiceExpertTips = ({ tips, variant = "dark" }: ServiceExpertTipsProps) =
           <div>
             <div className="flex items-center gap-3 mb-3">
               <span className="h-px w-6 bg-[#D4AF37]/70" aria-hidden="true" />
-              <p className={`text-sm font-bold tracking-[0.08em] uppercase ${light ? "text-[#1A4E30]" : "text-[#D4AF37]"}`}>
+              <p className="text-sm font-bold tracking-[0.08em] uppercase text-[#D4AF37]">
                 Dicas de especialista
               </p>
             </div>
             <h2 className="type-section-title font-playfair      max-w-lg">
-              Guias e conselhos <span className={light ? "text-[#1A4E30]" : "text-[#D4AF37]"}>profissionais</span>
+              Guias e conselhos <span className="text-[#D4AF37]">profissionais</span>
             </h2>
             <p className={`mt-3 text-base leading-relaxed ${light ? "text-[#505650]" : "text-white/80"}`}>
               Pequenos cuidados que fazem a diferença em casa.
             </p>
           </div>
-          <Link to="/blog" className={`hidden md:inline-flex shrink-0 items-center gap-2 min-h-11 text-base font-semibold hover:underline underline-offset-4 focus-visible:outline-[#D4AF37] ${light ? "text-[#1A4E30]" : "text-[#D4AF37]"}`}>
+          <Link to="/blog" className="hidden md:inline-flex shrink-0 items-center gap-2 min-h-11 text-base font-semibold hover:underline underline-offset-4 focus-visible:outline-[#D4AF37] text-[#D4AF37]">
             Explorar todos os guias <ArrowRight size={16} aria-hidden="true" />
           </Link>
         </div>

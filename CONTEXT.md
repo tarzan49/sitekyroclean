@@ -1,3 +1,7 @@
+## Cartões e dourado da marca (13/09/2026)
+
+`Services` adapta a grelha móvel à largura disponível, com colunas de pelo menos 16rem (limitadas a 100% do contentor). Em telemóveis estreitos apresenta um cartão por linha para manter os nomes completos com Avenir; o conteúdo determina a altura mínima, sem estar preso ao fundo por posicionamento absoluto. Desktop conserva o carrossel. Por correção explícita do responsável, os destaques de títulos, overlines e categorias continuam dourados #D4AF37 em fundos claros e escuros; a substituição por verde durante a revisão tipográfica não foi autorizada.
+
 ## Processo da homepage (13/09/2026)
 
 `HowItWorksV1` apresenta a composição aprovada para a homepage: imagem existente do catálogo, três passos e descrição abaixo do título («Orçamento claro, visita combinada e acompanhamento após o serviço.»). Retirados desta secção o bloco de garantia e o CTA, por pedido do responsável. A garantia comercial mantém-se; a remoção é apenas editorial neste bloco. A composição está integrada na homepage, sem modo isolado `?preview=processo`. Revisão de compacidade: no desktop, imagem à esquerda ocupa as duas linhas da grelha; título, descrição e passos ficam juntos à direita, sem cabeçalho de largura inteira nem altura mínima de 590px. No telemóvel, título, imagem horizontal e passos. Números simples, divisórias finas e sem legenda sobre a imagem.
