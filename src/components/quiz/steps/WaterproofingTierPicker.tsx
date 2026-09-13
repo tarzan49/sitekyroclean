@@ -45,9 +45,8 @@ export function WaterproofingTierPicker({ formData, updateFormData, onSelect, ac
         </div>}
         <p className="text-[11px] leading-relaxed text-[#D4AF37]">{compact ? 'Até 10 anos · até 5 lavagens' : 'Até 10 anos de proteção · até 5 lavagens'}</p>
         {premiumDifference != null && premiumDifference > 0 && <div className="flex items-center gap-1.5 mt-2 text-[10px]" aria-label={`Mais ${premiumDifference.toLocaleString('pt-PT')}€ que o Essencial`}>
-          <span className="text-white/60">Essencial</span>
-          <span aria-hidden="true" className="text-white/40">→</span>
           <span className="rounded-sm bg-[#D4AF37]/10 px-1.5 py-0.5 font-semibold tabular-nums text-[#D4AF37]">+{premiumDifference.toLocaleString('pt-PT')}€</span>
+          <span className="text-white/60">vs. Essencial</span>
         </div>}
       </button>
       <button
