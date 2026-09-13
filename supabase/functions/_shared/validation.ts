@@ -11,6 +11,8 @@ const PHONE_REGEX = /^(\+351)?[0-9]{9}$/;
 // Dangerous patterns for header injection
 const HEADER_INJECTION_PATTERNS = [
   /[\r\n]/,           // CRLF injection
+  // O byte nulo e precisamente o que esta verificacao existe para apanhar.
+  // eslint-disable-next-line no-control-regex
   /\x00/,             // Null byte
   /%0[aAdD]/gi,       // URL encoded newlines
 ];
@@ -71,6 +73,8 @@ export function sanitizeString(input: string, maxLength: number = 1000): string 
   return input
     .trim()
     .slice(0, maxLength)
+    // Remover caracteres de controlo e o objetivo desta linha.
+    // eslint-disable-next-line no-control-regex
     .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, '') // Remove control characters except tab, newline, carriage return
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;');
@@ -114,6 +118,8 @@ export function sanitizeMessage(message: string, maxLength: number = 5000): stri
   return message
     .trim()
     .slice(0, maxLength)
+    // Remover caracteres de controlo e o objetivo desta linha.
+    // eslint-disable-next-line no-control-regex
     .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, ''); // Remove control characters
 }
 
@@ -127,7 +133,9 @@ export interface ValidationResult {
 }
 
 // deno-lint-ignore no-explicit-any
+// Aceita o corpo cru de qualquer pedido; o schema e que define o que e valido.
 export function validateFormData(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   data: any,
   schema: {
     [key: string]: {
@@ -171,7 +179,7 @@ export function validateFormData(
     
     // Type-specific validation and sanitization
     switch (rules.type) {
-      case 'email':
+      case 'email': {
         const sanitizedEmail = sanitizeEmail(value);
         if (!isValidEmail(sanitizedEmail)) {
           errors.push(`Invalid email format`);
@@ -179,12 +187,13 @@ export function validateFormData(
           sanitizedData[field] = sanitizedEmail;
         }
         break;
+      }
         
       case 'name':
         sanitizedData[field] = sanitizeName(value, rules.maxLength || 100);
         break;
         
-      case 'phone':
+      case 'phone': {
         const sanitizedPhone = sanitizePhone(value);
         if (value && !isValidPhone(sanitizedPhone)) {
           errors.push(`Invalid phone format`);
@@ -192,6 +201,7 @@ export function validateFormData(
           sanitizedData[field] = sanitizedPhone;
         }
         break;
+      }
         
       case 'message':
         sanitizedData[field] = sanitizeMessage(value, rules.maxLength || 5000);

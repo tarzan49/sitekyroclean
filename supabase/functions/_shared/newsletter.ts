@@ -91,13 +91,14 @@ export function createMailerLiteHeaders(apiKey: string): Record<string, string> 
 /**
  * Handle MailerLite API errors
  */
-export function handleMailerLiteError(error: any): string {
-  if (error.error && error.error.message) {
-    return error.error.message;
-  }
-
+export function handleMailerLiteError(error: unknown): string {
   if (typeof error === "string") {
     return error;
+  }
+
+  const nested = (error as { error?: { message?: unknown } } | null)?.error?.message;
+  if (typeof nested === "string") {
+    return nested;
   }
 
   return "An unexpected error occurred";

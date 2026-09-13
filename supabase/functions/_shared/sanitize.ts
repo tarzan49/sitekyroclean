@@ -19,7 +19,7 @@ const HTML_ESCAPE_MAP: Record<string, string> = {
  */
 export function escapeHtml(text: string): string {
   if (!text) return "";
-  return String(text).replace(/[&<>"'\/]/g, (char) => HTML_ESCAPE_MAP[char] || char);
+  return String(text).replace(/[&<>"'/]/g, (char) => HTML_ESCAPE_MAP[char] || char);
 }
 
 /**

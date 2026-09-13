@@ -1,5 +1,5 @@
 import { getTreatmentRoutes } from '../src/data/treatmentSeoData';
-﻿/**
+/**
  * Sitemap Generator for Kyro Clean Solutions
  * Generates a Sitemap Index + sub-sitemaps covering all ~1700+ URLs
  * 
