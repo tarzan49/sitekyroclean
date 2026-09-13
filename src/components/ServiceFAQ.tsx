@@ -13,7 +13,7 @@ interface ServiceFAQProps {
   faqs: FAQItem[];
   heading?: string;
   overline?: string;
-  variant?: "dark";
+  variant?: "dark" | "light";
   includeSchema?: boolean;
   description?: string;
 }
@@ -23,11 +23,12 @@ const ServiceFAQ = ({
   heading = "Perguntas Frequentes",
   overline = "Dúvidas Frequentes",
   includeSchema = true,
+  variant = "dark",
   description = "Preços, cuidados e o que esperar da visita. Toque numa pergunta para ver a resposta.",
 }: ServiceFAQProps) => {
   const [open, setOpen] = useState<number | null>(0);
   const id = useId();
-  const light = false;
+  const light = variant === "light";
   useEffect(() => {
     const revealHash = () => {
       const index = faqs.findIndex(faq => faq.id && `#${faq.id}` === window.location.hash);

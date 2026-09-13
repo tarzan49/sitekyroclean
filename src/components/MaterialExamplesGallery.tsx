@@ -24,9 +24,9 @@ export default function MaterialExamplesGallery({ materialSlug }: { materialSlug
   );
 
   return (
-    <section id="material" className="scroll-mt-24 py-14 md:py-20 bg-kyro-green">
+    <section id="material" className="scroll-mt-24 py-14 md:py-20 bg-[#FDFDF9]">
       <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
-        <SectionHeader overline="Material" heading="Veja exemplos de" goldWord={gallery.name} light={false} />
+        <SectionHeader overline="Material" heading="Veja exemplos de" goldWord={gallery.name} light={true} />
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5">
           {gallery.examples.map((example, index) => (
             <figure key={example.label} className="min-w-0">
@@ -41,11 +41,11 @@ export default function MaterialExamplesGallery({ materialSlug }: { materialSlug
                   <ZoomIn className="h-4 w-4" />
                 </span>
               </button>
-              <figcaption className="pt-3 text-sm sm:text-base leading-snug text-white/90">{example.label}</figcaption>
+              <figcaption className="pt-3 text-sm sm:text-base leading-snug text-[#173629]">{example.label}</figcaption>
             </figure>
           ))}
         </div>
-        <p className="mt-5 text-xs leading-relaxed text-white/55">Exemplos ilustrativos. Toque numa imagem para ver o pormenor.</p>
+        <p className="mt-5 text-xs leading-relaxed text-[#536259]">Exemplos ilustrativos. Toque numa imagem para ver o pormenor.</p>
         <Dialog.Root open={selected !== null} onOpenChange={open => { if (!open) setSelected(null); }}>
           <Dialog.Portal>
           <Dialog.Overlay className="fixed inset-0 z-[100] bg-black/75" />

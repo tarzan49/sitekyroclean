@@ -2,13 +2,13 @@
 
 Pedido de 13/09/2026: retirar a secção intermédia de antes/depois e reunir demonstração e explicação do processo num guia específico para cada tipo de sofá. As avaliações ficam entre a tabela de preços e a galeria dos exemplos.
 
-Sete guias: tecido, veludo, pele, microfibra, linho, camurça e sintético. Cinco passos ilustrados por guia, 35 passos no total. Cada ficheiro contém uma grelha 3×2; a sexta célula é um pormenor do material. O componente partilhado mostra apenas as cinco etapas, por recorte CSS. Fotografias ilustrativas geradas, não resultados reais nem intervenções em clientes.
+Sete guias: tecido, veludo, pele, microfibra, linho, camurça e sintético. Seis passos nos materiais exceto pele/couro (cinco), 41 passos no total. Os novos ficheiros `-six.webp` contêm as seis etapas em grelha 3×2: avaliação, aspiração, aplicação, escovação, extração e secagem. Couro preserva a folha anterior de cinco etapas e um detalhe. Fotografias ilustrativas geradas, não resultados reais nem intervenções em clientes.
 
 Geração com ImageGen integrado. Originais em `$CODEX_HOME/generated_images/01a09b5e-acd2-70f3-93fc-f1dfa5a6bab5/`; ficheiros finais em `public/images/materials/process-sofa-*.webp`.
 
-O método depende da avaliação, acabamento e indicações do fabricante. A demonstração de sintético usa pele sintética; a legenda explica a adaptação para outros revestimentos. Não existe promessa de restauro de fissuras, remoção total de manchas ou tratamentos anti-ácaros incluídos. Secagem húmida dos tecidos usa a constante comercial.
+O método depende da avaliação, acabamento e indicações do fabricante. A demonstração atual de sintético usa tecido de poliéster; a legenda explica a adaptação para outros revestimentos. Não existe promessa de restauro de fissuras, remoção total de manchas ou tratamentos anti-ácaros incluídos. Secagem húmida dos tecidos usa a constante comercial.
 
-## Prompt comum
+## Prompts da primeira versão (substituída, exceto couro)
 
 Use case: photorealistic-natural. Asset type: single educational photo contact sheet for an upholstery-cleaning step guide. Generate one LANDSCAPE 3:2 image made of exactly SIX equally sized square photographs, precisely THREE columns and TWO rows, edge to edge, no gaps or borders. Same sofa, same Portuguese home and natural lighting in all six cells. Only cropped forearms of a technician wearing dark green plain workwear and black nitrile gloves in cells 1-4, anatomically correct hands; no faces. The sofa upholstery must be exactly consistent. No text, labels, numbers, brand logos, watermark, graphic overlays. Believable editorial photography, technically restrained gentle material care, no exaggerated grime, no before-after comparisons, no health claims. Keep each key action centered within its square cell.
 
@@ -60,3 +60,31 @@ Six cells in reading order: inspect concealed seam and condition of faux-leather
 ## Validação
 
 Build de produção concluído (16045 rotas), TypeScript e ESLint dos componentes/dados partilhados sem erros. Confirmadas as cinco imagens do processo nas 434 rotas de sofá prerenderizadas. Verificadas em preview mobile de 390 px as 35 etapas dos sete materiais, as imagens próprias e a ordem preços → avaliações → exemplos → processo.
+
+## Correção para seis etapas
+
+### tecido
+
+Create a photorealistic professional upholstery cleaning demonstration contact sheet, landscape 1536x1024, EXACTLY 3 columns by 2 rows of six equally sized square photographs, no gutters, no borders, no text. Same beige woven fabric sofa throughout in bright Portuguese living room. Six distinct scenes in reading order: 1 gloved hand inspecting a concealed seam with white cloth; 2 vacuum upholstery nozzle removing dry dust; 3 trigger spray bottle applying a small controlled amount of cleaning solution; 4 gloved hand using a soft upholstery brush to agitate cleaning solution across cushion, brush clearly visible; 5 professional transparent extraction nozzle drawing moisture from cushion; 6 whole sofa drying untouched beside open window in ventilated room. Realistic tools and anatomy, natural daylight, no logos, no before-after, no extra panels. Each action centered in its cell, photo documentary style.
+
+### veludo
+
+Create a photorealistic professional upholstery cleaning demonstration contact sheet, landscape 1536x1024, EXACTLY 3 columns by 2 rows of six equally sized square photographs, no gutters, no borders, no text. Same green velvet sofa throughout in bright Portuguese living room. Six distinct scenes in reading order: 1 gloved hand inspecting a concealed seam with white cloth; 2 vacuum upholstery nozzle removing dry dust; 3 trigger spray bottle applying a small controlled amount of cleaning solution; 4 gloved hand using a soft upholstery brush to agitate cleaning solution across cushion, brush clearly visible; 5 professional transparent extraction nozzle drawing moisture from cushion; 6 whole sofa drying untouched beside open window in ventilated room. Realistic tools and anatomy, natural daylight, no logos, no before-after, no extra panels. Each action centered in its cell, photo documentary style.
+
+### microfibra
+
+Create a photorealistic professional upholstery cleaning demonstration contact sheet, landscape 1536x1024, EXACTLY 3 columns by 2 rows of six equally sized square photographs, no gutters, no borders, no text. Same grey microfiber sofa throughout in bright Portuguese living room. Six distinct scenes in reading order: 1 gloved hand inspecting a concealed seam with white cloth; 2 vacuum upholstery nozzle removing dry dust; 3 trigger spray bottle applying a small controlled amount of cleaning solution; 4 gloved hand using a soft upholstery brush to agitate cleaning solution across cushion, brush clearly visible; 5 professional transparent extraction nozzle drawing moisture from cushion; 6 whole sofa drying untouched beside open window in ventilated room. Realistic tools and anatomy, natural daylight, no logos, no before-after, no extra panels. Each action centered in its cell, photo documentary style.
+
+### linho
+
+Create a photorealistic professional upholstery cleaning demonstration contact sheet, landscape 1536x1024, EXACTLY 3 columns by 2 rows of six equally sized square photographs, no gutters, no borders, no text. Same natural cream linen sofa throughout in bright Portuguese living room. Six distinct scenes in reading order: 1 gloved hand inspecting a concealed seam with white cloth; 2 vacuum upholstery nozzle removing dry dust; 3 trigger spray bottle applying a small controlled amount of cleaning solution; 4 gloved hand using a soft upholstery brush to agitate cleaning solution across cushion, brush clearly visible; 5 professional transparent extraction nozzle drawing moisture from cushion; 6 whole sofa drying untouched beside open window in ventilated room. Realistic tools and anatomy, natural daylight, no logos, no before-after, no extra panels. Each action centered in its cell, photo documentary style.
+
+### camurca
+
+Create a photorealistic professional upholstery cleaning demonstration contact sheet, landscape 1536x1024, EXACTLY 3 columns by 2 rows of six equally sized square photographs, no gutters, no borders, no text. Same camel suede-effect upholstery sofa throughout in bright Portuguese living room. Six distinct scenes in reading order: 1 gloved hand inspecting a concealed seam with white cloth; 2 vacuum upholstery nozzle removing dry dust; 3 trigger spray bottle applying a small controlled amount of cleaning solution; 4 gloved hand using a soft upholstery brush to agitate cleaning solution across cushion, brush clearly visible; 5 professional transparent extraction nozzle drawing moisture from cushion; 6 whole sofa drying untouched beside open window in ventilated room. Realistic tools and anatomy, natural daylight, no logos, no before-after, no extra panels. Each action centered in its cell, photo documentary style.
+
+### sintetico
+
+Create a photorealistic professional upholstery cleaning demonstration contact sheet, landscape 1536x1024, EXACTLY 3 columns by 2 rows of six equally sized square photographs, no gutters, no borders, no text. Same blue woven synthetic polyester sofa throughout in bright Portuguese living room. Six distinct scenes in reading order: 1 gloved hand inspecting a concealed seam with white cloth; 2 vacuum upholstery nozzle removing dry dust; 3 trigger spray bottle applying a small controlled amount of cleaning solution; 4 gloved hand using a soft upholstery brush to agitate cleaning solution across cushion, brush clearly visible; 5 professional transparent extraction nozzle drawing moisture from cushion; 6 whole sofa drying untouched beside open window in ventilated room. Realistic tools and anatomy, natural daylight, no logos, no before-after, no extra panels. Each action centered in its cell, photo documentary style.
+
+Validação: TypeScript, ESLint e build concluídos. Sete guias verificados em mobile: seis com seis etapas, couro com cinco. Fundos de exemplos/processo/FAQ/pack confirmados como branco/verde/branco/verde.

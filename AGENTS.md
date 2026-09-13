@@ -144,4 +144,10 @@ Pedido do responsável: a secção dos materiais usa quatro exemplos visuais pr�
 
 ## Processo dos materiais e avaliações (13/09/2026)
 
-Pedido do responsável: nas páginas de material, avaliações imediatamente após os preços e antes dos exemplos visuais. Retirada a galeria intermédia «Antes e depois». Os sete materiais de sofá usam cinco passos ilustrados próprios, em `materialProcessGuides.ts` e no apresentador partilhado `IllustratedProcessGuide`. Não repor o processo escrito duplicado nestes sofás nem chamar resultados reais às imagens geradas. Preservar a comparação do hero e as transcrições das avaliações.
+Pedido do responsável: nas páginas de material, avaliações imediatamente após os preços e antes dos exemplos visuais. Retirada a galeria intermédia «Antes e depois». Os materiais de sofá usam seis passos ilustrados próprios (pele/couro mantém cinco), em `materialProcessGuides.ts` e no apresentador partilhado `IllustratedProcessGuide`. Não repor o processo escrito duplicado nestes sofás nem chamar resultados reais às imagens geradas. Preservar a comparação do hero e as transcrições das avaliações.
+
+## Correção do processo por material (13/09/2026)
+
+Os guias de sofá, exceto pele/couro, têm seis etapas: avaliação, aspiração, aplicação, escovação, extração e secagem. A escovação fica obrigatoriamente entre aplicação e extração. Couro mantém os cinco cuidados próprios. No mobile, seis separadores usam duas linhas de três para manter os rótulos legíveis.
+
+Materiais: sequência de fundos aprovada: exemplos branco, processo verde, perguntas branco, pack «Aproveite a mesma visita» verde. A variante clara das FAQs é explícita, sem alterar as restantes páginas.

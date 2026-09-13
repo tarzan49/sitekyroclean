@@ -1,6 +1,6 @@
 ## Guias dos materiais de sofá e posição das avaliações (13/09/2026)
 
-`IllustratedProcessGuide` é o apresentador partilhado extraído de `ServiceProcessGuide`, que conserva a sua API e os cinco guias existentes. `materialProcessGuides.ts` fornece cinco etapas para cada um dos sete materiais de sofá, com imagens próprias em `public/images/materials/process-sofa-*.webp`; o prerender usa o mesmo texto e imagens. `MaterialPage` deixou de apresentar a galeria intermédia «Antes e depois», conserva a comparação do hero e usa o guia no lugar do processo escrito nos sofás. Os quatro materiais de tapete mantêm o processo existente. Avaliações movidas para entre a tabela de preços e `MaterialExamplesGallery`, sem duplicação nem alteração das transcrições/pools.
+`IllustratedProcessGuide` é o apresentador partilhado extraído de `ServiceProcessGuide`, que conserva a sua API e os cinco guias existentes. `materialProcessGuides.ts` fornece seis etapas para os materiais de sofá, exceto pele/couro, que mantém cinco cuidados próprios, com imagens próprias em `public/images/materials/process-sofa-*.webp`; o prerender usa o mesmo texto e imagens. `MaterialPage` deixou de apresentar a galeria intermédia «Antes e depois», conserva a comparação do hero e usa o guia no lugar do processo escrito nos sofás. Os quatro materiais de tapete mantêm o processo existente. Avaliações movidas para entre a tabela de preços e `MaterialExamplesGallery`, sem duplicação nem alteração das transcrições/pools.
 
 ## Exemplos visuais dos materiais (13/09/2026)
 
@@ -1188,3 +1188,9 @@ A página de colchões em Paranhos mantém o comparador exclusivamente DEV: `?te
 ## Avaliações compactas no mobile (13/09/2026)
 
 Os cartões partilhados de avaliações (`CustomerReviewCard`, usados por `CustomerReviews` na homepage e páginas de serviços/localidades) têm altura uniforme de 340px abaixo de 640px, texto de 18px com até seis linhas e abertura da transcrição integral num diálogo acessível quando necessário. O carrossel deixou de ajustar a altura à avaliação selecionada. Preservar as transcrições e a apresentação desktop.
+
+## Correção do processo por material (13/09/2026)
+
+Os guias de sofá, exceto pele/couro, têm seis etapas: avaliação, aspiração, aplicação, escovação, extração e secagem. A escovação fica obrigatoriamente entre aplicação e extração. Couro mantém os cinco cuidados próprios. No mobile, seis separadores usam duas linhas de três para manter os rótulos legíveis.
+
+Materiais: sequência de fundos aprovada: exemplos branco, processo verde, perguntas branco, pack «Aproveite a mesma visita» verde. A variante clara das FAQs é explícita, sem alterar as restantes páginas.

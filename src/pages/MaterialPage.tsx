@@ -197,7 +197,7 @@ const MaterialPage = () => {
 
         {/* ═══ PROCESSO DE LIMPEZA ═══ */}
         {processGuide ? (
-          <IllustratedProcessGuide key={data.slug} guide={processGuide} heading="Como limpamos o seu" goldWord={data.name.toLowerCase()} downloadName={data.slug} />
+          <IllustratedProcessGuide dark key={data.slug} guide={processGuide} heading="Como limpamos o seu" goldWord={data.name.toLowerCase()} downloadName={data.slug} />
         ) : (
         <section className="py-14 md:py-20 bg-kyro-green">
           <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
@@ -235,14 +235,14 @@ const MaterialPage = () => {
 
         {/* ═══ FAQ ═══ */}
         {data.faqs.length > 0 && (
-          <ServiceFAQ faqs={data.faqs} heading={`Perguntas sobre ${data.name.toLowerCase()}`} variant="dark" />
+          <ServiceFAQ faqs={data.faqs} heading={`Perguntas sobre ${data.name.toLowerCase()}`} variant="light" />
         )}
 
         {/* ═══ PACKS ═══ */}
         <ServicePackBanner
           packSlugs={SERVICE_PACK_SLUGS[data.serviceSlug] ?? ["pack-sala-completa"]}
           city={citySlug || undefined}
-          variant="light"
+          variant="dark"
         />
 
         {/* ═══ REDE INTERNA ═══ */}

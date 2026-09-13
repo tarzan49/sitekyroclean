@@ -3,16 +3,16 @@ import { ArrowLeft, ArrowRight, Download } from 'lucide-react';
 import SectionHeader from '@/components/SectionHeader';
 import type { ProcessGuide } from '@/data/serviceProcessGuides';
 
-export default function IllustratedProcessGuide({ guide, heading, goldWord = '', downloadName }: { guide: ProcessGuide; heading?: string; goldWord?: string; downloadName: string }) {
+export default function IllustratedProcessGuide({ guide, heading, goldWord = '', downloadName, dark = false }: { guide: ProcessGuide; heading?: string; goldWord?: string; downloadName: string; dark?: boolean }) {
   const { steps, image } = guide;
   const [active, setActive] = useState(0);
   const id = useId();
   const step = steps[active];
-  return <section id="processo" className="scroll-mt-20 py-14 md:py-20 bg-[#FDFDF9]">
+  return <section id="processo" className={`scroll-mt-20 py-14 md:py-20 ${dark ? "bg-kyro-green" : "bg-[#FDFDF9]"}`}>
     <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
-      <SectionHeader overline="Como funciona" heading={heading ?? `${guide.heading}, passo a passo`} goldWord={goldWord} subtitle={guide.subtitle} />
+      <SectionHeader overline="Como funciona" heading={heading ?? `${guide.heading}, passo a passo`} goldWord={goldWord} subtitle={guide.subtitle} light={!dark} />
       <div className="border border-[#173629]/15 bg-white rounded-sm overflow-hidden">
-        <div className="grid grid-cols-5 border-b border-[#173629]/15" role="tablist" aria-label="Etapas do serviço">
+        <div className={`grid ${steps.length === 6 ? "grid-cols-3 sm:grid-cols-6" : "grid-cols-5"} border-b border-[#173629]/15`} role="tablist" aria-label="Etapas do serviço">
           {steps.map((item, i) => <button key={item.label} id={`${id}-tab-${i}`} role="tab" aria-selected={active === i} aria-controls={`${id}-panel`} tabIndex={active === i ? 0 : -1}
             onClick={() => setActive(i)} onKeyDown={event => {
               const next = event.key === 'ArrowRight' ? (i + 1) % steps.length : event.key === 'ArrowLeft' ? (i + steps.length - 1) % steps.length : event.key === 'Home' ? 0 : event.key === 'End' ? steps.length - 1 : null;
@@ -41,7 +41,7 @@ export default function IllustratedProcessGuide({ guide, heading, goldWord = '',
           </div>
         </div>
       </div>
-      <a href={image} download={`Kyro-Clean-${downloadName}-etapas.webp`} className="inline-flex items-center gap-2 min-h-11 mt-4 text-xs text-[#536259] underline underline-offset-4 hover:text-[#173629]"><Download className="w-4 h-4" />Guardar as imagens das etapas</a>
+      <a href={image} download={`Kyro-Clean-${downloadName}-etapas.webp`} className={`inline-flex items-center gap-2 min-h-11 mt-4 text-xs underline underline-offset-4 ${dark ? "text-white/70 hover:text-white" : "text-[#536259] hover:text-[#173629]"}`}><Download className="w-4 h-4" />Guardar as imagens das etapas</a>
     </div>
   </section>;
 }
