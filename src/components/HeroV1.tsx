@@ -94,7 +94,7 @@ const Hero = () => {
           </div>
 
           {/* Reserve clear space for the extractor and the clean/dirty boundary. */}
-          <div className="-mx-5 aspect-[5/3] md:hidden" role="img" aria-label="Limpeza de um sofá, com a diferença visível entre o tecido limpo e por limpar" />
+          <div className="-mx-5 aspect-[4/3] md:hidden" role="img" aria-label="Limpeza de um sofá, com a diferença visível entre o tecido limpo e por limpar" />
           <div className="flex items-center justify-center gap-2 whitespace-nowrap py-4 text-[11px] min-[375px]:text-xs text-white/85 md:hidden">
             <span><strong className="font-semibold text-[#E7CE73]">{STATS[0].value}</strong> serviços realizados</span>
             <span aria-hidden="true" className="text-white/35">·</span>
