@@ -220,3 +220,6 @@ Fundo dos exemplos nacionais (13/09/2026): a galeria 2×2 nos seis serviços pri
 ## Promessas dos seis serviços (13/09/2026)
 
 Secção «A nossa promessa» simplificada por pedido do responsável: uma fotografia ilustrativa por serviço e três compromissos com divisórias discretas, sem cartões escuros nem texto sobre imagens. `ServiceEliteGuarantee` mantém o título Avenir/dourado e o fundo claro. Fotografias WebP de 400/800px em `public/images/service-promises/`, carregamento diferido. Textos curtos preservam repetição até 48h, secagem média e condições da proteção.
+
+
+Revisão das promessas (13/09/2026): o responsável rejeitou a fotografia única com três parágrafos. Nos seis serviços, apresentar três imagens que ilustrem os compromissos, cada uma apenas com uma legenda curta. Sem os parágrafos explicativos; a condição de repetição até 48h fica numa nota discreta no final. Esta decisão substitui a composição anterior. Manter imagens WebP responsivas e lazy loading.

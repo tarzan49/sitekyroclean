@@ -18,19 +18,19 @@ const impermeabilizacaoGuarantee: GuaranteeItem[] = [
     label: "Eficácia",
     title: "Aplicação com avaliação prévia",
     body: "Confirmamos a compatibilidade do tecido e explicamos os cuidados e o tempo de ativação da proteção.",
-    image: "/images/service-promises/Impermeabilizacao-800.webp",
+    image: "/images/service-promises/Impermeabilizacao-promise-1-800.webp",
   },
   {
     label: "Durabilidade",
     title: "Premium: até 10 anos e 5 lavagens",
     body: "A Essencial suporta até 2 lavagens. A Premium oferece garantia de até 10 anos e 5 lavagens, conforme os cuidados recomendados.",
-    image: "/images/impermeabilizacao/v2.webp",
+    image: "/images/service-promises/Impermeabilizacao-promise-2-800.webp",
   },
   {
     label: "Segurança",
     title: "O toque do seu tecido",
     body: "Escolhemos uma proteção adequada ao revestimento e indicamos quando voltar a utilizar os estofos.",
-    image: "/images/impermeabilizacao/v3.webp",
+    image: "/images/service-promises/Impermeabilizacao-promise-3-800.webp",
   },
 ];
 

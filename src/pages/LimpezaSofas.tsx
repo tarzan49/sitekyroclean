@@ -18,19 +18,19 @@ const sofaGuarantee: GuaranteeItem[] = [
     label: "Satisfação",
     title: "Repetimos se for necessário",
     body: SATISFACTION_PROMISE,
-    image: "/images/service-promises/LimpezaSofas-800.webp",
+    image: "/images/service-promises/LimpezaSofas-promise-1-800.webp",
   },
   {
     label: "Cuidado",
     title: "Cuidado adaptado ao tecido",
     body: "Avaliamos o revestimento e ajustamos os produtos, a escova e a pressão ao seu sofá.",
-    image: "/images/guarantee/sofa-veludo.webp",
+    image: "/images/service-promises/LimpezaSofas-promise-2-800.webp",
   },
   {
     label: "Rapidez",
     title: "Secagem média de 3 a 6 horas",
     body: "A extração reduz a humidade. O tempo de secagem depende do tecido, da ventilação e das condições do espaço.",
-    image: "/images/guarantee/sofa-microfibras.webp",
+    image: "/images/service-promises/LimpezaSofas-promise-3-800.webp",
   },
 ];
 

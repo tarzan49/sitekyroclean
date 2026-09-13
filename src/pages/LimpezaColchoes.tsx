@@ -20,19 +20,19 @@ const colchoesGuarantee: GuaranteeItem[] = [
     label: "Satisfação",
     title: "Repetimos se for necessário",
     body: SATISFACTION_PROMISE,
-    image: "/images/service-promises/LimpezaColchoes-800.webp",
+    image: "/images/service-promises/LimpezaColchoes-promise-1-800.webp",
   },
   {
     label: "Higiene",
     title: "Extras à sua escolha",
     body: "Anti-ácaros e desbacterização são tratamentos opcionais, apresentados separadamente da limpeza.",
-    image: "/images/colchoes/v5.webp",
+    image: "/images/service-promises/LimpezaColchoes-promise-2-800.webp",
   },
   {
     label: "Segurança",
     title: "Utilize depois de secar",
     body: "A secagem demora, em média, 3 a 6 horas com ventilação. Confirmamos os cuidados antes de terminar.",
-    image: colchaoResultado,
+    image: "/images/service-promises/LimpezaColchoes-promise-3-800.webp",
   },
 ];
 

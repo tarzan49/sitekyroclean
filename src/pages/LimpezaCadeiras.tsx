@@ -19,20 +19,19 @@ const cadeirasGuarantee: GuaranteeItem[] = [
     label: "Satisfação",
     title: "Repetimos se for necessário",
     body: SATISFACTION_PROMISE,
-    image: "/images/service-promises/LimpezaCadeiras-800.webp",
-    mirror: true,
+    image: "/images/service-promises/LimpezaCadeiras-promise-1-800.webp",
   },
   {
     label: "Precisão",
     title: "Atenção aos pormenores",
     body: "Tratamos assentos, encostos e costuras com os acessórios adequados a cada peça.",
-    image: "/images/cadeiras/v2.webp",
+    image: "/images/service-promises/LimpezaCadeiras-promise-2-800.webp",
   },
   {
     label: "Tecido",
     title: "Um cuidado por material",
     body: "Identificamos o revestimento e escolhemos produtos e métodos compatíveis com o tecido.",
-    image: "/images/cadeiras/v1.webp",
+    image: "/images/service-promises/LimpezaCadeiras-promise-3-800.webp",
   },
 ];
 

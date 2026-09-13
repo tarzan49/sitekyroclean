@@ -19,19 +19,19 @@ const alcatifasGuarantee: GuaranteeItem[] = [
     label: "Satisfação",
     title: "Repetimos se for necessário",
     body: SATISFACTION_PROMISE,
-    image: "/images/service-promises/LimpezaAlcatifas-800.webp",
+    image: "/images/service-promises/LimpezaAlcatifas-promise-1-800.webp",
   },
   {
     label: "Cobertura",
     title: "Cuidado em toda a área",
     body: "Avaliamos as zonas de passagem e os pormenores para ajustar a limpeza ao estado da alcatifa.",
-    image: "/images/alcatifas/v1.jpg",
+    image: "/images/service-promises/LimpezaAlcatifas-promise-2-800.webp",
   },
   {
     label: "Secagem",
     title: "Secagem média de 3 a 6 horas",
     body: "Controlamos a humidade e reforçamos a extração. A utilização depende da secagem e da ventilação.",
-    image: alcatifaProcesso,
+    image: "/images/service-promises/LimpezaAlcatifas-promise-3-800.webp",
   },
 ];
 

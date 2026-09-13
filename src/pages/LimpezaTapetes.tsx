@@ -19,19 +19,19 @@ const tapetesGuarantee: GuaranteeItem[] = [
     label: "Manchas",
     title: "Repetimos se for necessário",
     body: SATISFACTION_PROMISE,
-    image: "/images/service-promises/LimpezaTapetes-800.webp",
+    image: "/images/service-promises/LimpezaTapetes-promise-1-800.webp",
   },
   {
     label: "Fibras",
     title: "Respeito pelas fibras",
     body: "Avaliamos a composição, a base e as cores para escolher um método compatível com o tapete.",
-    image: "/images/tapetes/v2.webp",
+    image: "/images/service-promises/LimpezaTapetes-promise-2-800.webp",
   },
   {
     label: "Odores",
     title: "Odores avaliados na origem",
     body: "Adaptamos o tratamento à origem e à profundidade do odor. Explicamos os limites antes de começar.",
-    image: tapeteDepois,
+    image: "/images/service-promises/LimpezaTapetes-promise-3-800.webp",
   },
 ];
 

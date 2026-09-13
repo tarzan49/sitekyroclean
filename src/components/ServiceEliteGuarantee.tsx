@@ -62,36 +62,28 @@ const ServiceEliteGuarantee = ({
             {restHeading}{" "}
             <em className="not-italic" style={{ color: '#D4AF37' }}>{goldWord}</em>
           </h2>
-          <p className={`text-base md:text-base leading-relaxed max-w-xl ${textSub}`}>
-            {subtitle}
-          </p>
         </div>
 
-        <div className="grid items-start gap-7 md:grid-cols-2 md:gap-12">
-          {items[0]?.image && <figure className="min-w-0 overflow-hidden">
-            <img
-              src={items[0].image}
-              srcSet={items[0].image.replace('-800.webp', '-400.webp') + ' 400w, ' + items[0].image + ' 800w'}
-              sizes="(max-width: 767px) calc(100vw - 40px), 580px"
-              width={800}
-              height={500}
-              alt=""
-              loading="lazy"
-              decoding="async"
-              className="aspect-[8/5] w-full rounded-xl object-cover"
-            />
-            <figcaption className={`mt-2 text-xs ${textSub}`}>Imagem ilustrativa</figcaption>
-          </figure>}
-          <div className="min-w-0">
-            {items.map((item, i) => (
-              <div key={item.label} className={`py-5 first:pt-0 last:pb-0 ${i ? dark ? "border-t border-white/15" : "border-t border-[#173629]/15" : ""}`}>
-                <p className="mb-2 text-xs font-semibold uppercase tracking-[0.16em] text-[#D4AF37]">{item.label}</p>
-                <h3 className={`mb-2 text-xl font-semibold leading-snug ${textMain}`}>{item.title}</h3>
-                <p className={`text-base leading-relaxed ${textSub}`}>{item.body}</p>
-              </div>
-            ))}
-          </div>
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-3 sm:gap-5">
+          {items.map(item => (
+            <figure key={item.label} className="min-w-0">
+              {item.image && <img
+                src={item.image}
+                srcSet={item.image.endsWith('-800.webp') ? `${item.image.replace('-800.webp', '-400.webp')} 400w, ${item.image} 800w` : undefined}
+                sizes="(max-width: 639px) calc(100vw - 40px), (max-width: 1279px) 30vw, 390px"
+                width={800}
+                height={500}
+                alt={item.title}
+                loading="lazy"
+                decoding="async"
+                className="aspect-[8/5] w-full rounded-xl object-cover"
+              />}
+              <figcaption className={`mt-3 text-lg font-semibold leading-snug ${textMain}`}>{item.title}</figcaption>
+            </figure>
+          ))}
         </div>
+        <p className={`mt-6 text-xs leading-relaxed ${textSub}`}>Imagens ilustrativas.</p>
+        <p className={`mt-2 text-sm leading-relaxed ${textSub}`}>{subtitle}</p>
 
       </div>
     </section>
