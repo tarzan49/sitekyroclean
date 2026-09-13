@@ -1149,3 +1149,5 @@ A recolha, IDs de tentativa/visita, fila persistente, tratamento do histórico e
 ## Pré-visualização de tipografia (2026-09-13)
 
 Na branch `codex/libre-franklin-preview`, `?fonte=nova` carrega Libre Franklin e ajustes de peso tipográfico/botões sobre as páginas reais; `?fonte=atual` permite comparar o original. Entrada em `src/main.tsx`, módulo e estilos em `src/dev/fontPreview.*`, exclusivamente com `import.meta.env.DEV`. A barra permite alternar entre homepage e `/limpeza-sofas-porto-paranhos`. Sem alterações de conteúdo, preços ou publicação da proposta em produção. Validado TypeScript, build e ausência do módulo de pré-visualização nos assets de produção.
+
+Verificação de cobertura da fonte (2026-09-13): o seletor da pré-visualização abrange também elementos fora de `#root`, incluindo o portal do orçamento e menus. A opção fica em sessionStorage para sobreviver a navegação e recarregamentos sem parâmetros; `?fonte=atual` permite regressar ao original. Inspeção no navegador sem elementos de texto com família antiga em Paranhos, orçamento aberto e blog. A troca não altera texto incorporado em imagens.

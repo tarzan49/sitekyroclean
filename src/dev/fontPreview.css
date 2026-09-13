@@ -1,6 +1,6 @@
 /* This module is loaded only by the explicit DEV comparison URLs. */
 html[data-font-preview="nova"] body,
-html[data-font-preview="nova"] #root * {
+html[data-font-preview="nova"] body * {
   font-family: 'Libre Franklin', sans-serif !important;
 }
 html[data-font-preview="nova"] :is(h1,h2,h3,h4,h5,h6,.font-playfair,.heading-editorial,.heading-refined,.text-premium-title) {

@@ -39,7 +39,16 @@ if (import.meta.env.DEV) {
 
 // Local typography comparison, excluded from production.
 if (import.meta.env.DEV) {
-  const preview = new URLSearchParams(window.location.search).get('fonte');
+  let preview = new URLSearchParams(window.location.search).get('fonte');
+  try {
+    if (preview === 'nova' || preview === 'atual') {
+      sessionStorage.setItem('kyro-font-preview', preview);
+    } else {
+      preview = sessionStorage.getItem('kyro-font-preview');
+    }
+  } catch {
+    // Explicit comparison URLs still work if browser storage is unavailable.
+  }
   if (preview === 'nova' || preview === 'atual') {
     import('./dev/fontPreview').then(({ initFontPreview }) => initFontPreview(preview));
   }
