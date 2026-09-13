@@ -11,7 +11,12 @@ describe('problem-specific treatments', () => {
     const sequences = new Set();
     for (const problem of problems) {
       const layout = getProblemLayout(problem);
-      expect(layout.process).toHaveLength(4);
+      expect(layout.process).toHaveLength(problem.relatedServices[0] === 'impermeabilizacao' || problem.slug.startsWith('mofo-') ? 4 : 5);
+      if (layout.process.length === 5) {
+        expect(layout.process[1].label).toBe('Tratar');
+        expect(['Escovar', 'Cuidar']).toContain(layout.process[2].label);
+      }
+      if (problem.relatedServices[0] === 'limpeza-tapetes' && !problem.slug.startsWith('mofo-')) expect(layout.process[2].description).toMatch(/juta, sisal, seda/);
       expect(layout.faqs).toHaveLength(4);
       expect(layout).toEqual(getProblemLayout(problem));
       sequences.add(layout.process.map(s => s.description).join('\n'));

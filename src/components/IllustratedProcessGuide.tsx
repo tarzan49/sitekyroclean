@@ -14,7 +14,7 @@ export default function IllustratedProcessGuide({ guide, heading, goldWord = '',
     <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
       <SectionHeader overline="Como funciona" heading={heading ?? `${guide.heading}, passo a passo`} goldWord={goldWord} subtitle={guide.subtitle} light={!dark} />
       <div className="border border-[#173629]/15 bg-white rounded-sm overflow-hidden">
-        <div className={`grid ${steps.length === 6 ? "grid-cols-3 sm:grid-cols-6" : steps.length === 4 ? "grid-cols-2 sm:grid-cols-4" : "grid-cols-5"} border-b border-[#173629]/15`} role="tablist" aria-label="Etapas do serviço">
+        <div className={`grid ${steps.length === 6 ? "grid-cols-3 sm:grid-cols-6" : steps.length === 4 ? "grid-cols-2 sm:grid-cols-4" : "grid-cols-3 sm:grid-cols-5"} border-b border-[#173629]/15`} role="tablist" aria-label="Etapas do serviço">
           {steps.map((item, i) => <button key={item.label} id={`${id}-tab-${i}`} role="tab" aria-selected={active === i} aria-controls={`${id}-panel`} tabIndex={active === i ? 0 : -1}
             onClick={() => setActive(i)} onKeyDown={event => {
               const next = event.key === 'ArrowRight' ? (i + 1) % steps.length : event.key === 'ArrowLeft' ? (i + steps.length - 1) % steps.length : event.key === 'Home' ? 0 : event.key === 'End' ? steps.length - 1 : null;

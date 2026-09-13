@@ -66,11 +66,17 @@ export function getProblemTreatmentGuide(problem: ProblemPage): ProblemTreatment
   const base = sofa ? MATERIAL_PROCESS_GUIDES['limpeza-sofa-tecido'] : SERVICE_PROCESS_GUIDES[service as ProcessServiceSlug];
   const protective = service === 'impermeabilizacao';
   const mould = problem.slug.startsWith('mofo-');
+  const rug = service === 'limpeza-tapetes';
+  const delicate = /juta|sisal|seda|silk|persa/.test(problem.slug);
   const step = (label: string, title: string, description: string, index: number): TreatmentStep => ({
     label, title, description,
     alt: base.steps[index].alt,
     image: base.image, cell: index,
   });
+  const brushing = step(delicate ? 'Cuidar' : 'Escovar', delicate ? 'Respeitar as fibras delicadas' : 'Escovar depois de tratar', delicate
+    ? 'Confirmamos a composição e as instruções do fabricante. Em juta, sisal, seda ou fibras incompatíveis, não seguimos automaticamente a limpeza com água nem a escovagem forte; definimos primeiro o método adequado.'
+    : 'Depois do tratamento, escovamos para distribuir a solução e soltar a sujidade, ajustando a escova e a pressão ao revestimento.' + (rug ? ' Se identificarmos juta, sisal, seda ou outra fibra incompatível, esta etapa é substituída pelo cuidado adequado, sem assumir água ou escovagem forte.' : ''), sofa ? 3 : 2);
+  if (rug) brushing.alt = 'Cuidado profissional das fibras de um tapete';
   const illustrated = (label: string, title: string, description: string, index: number, photo: string): TreatmentStep => {
     const item = step(label, title, description, index);
     return sofa ? { ...item, image: `/images/problem-treatments/sofa-${photo}.webp`, cell: undefined, alt: ({inspect: 'Avaliação de uma costura com pano branco', apply: 'Aplicação localizada de solução no tecido', extract: 'Bocal de extração sobre o assento', dry: 'Sofá com almofadas afastadas para ventilar'} as Record<string, string>)[photo] } : item;
@@ -80,7 +86,8 @@ export function getProblemTreatmentGuide(problem: ProblemPage): ProblemTreatment
     steps: [
       illustrated('Avaliar', 'Perceber antes de intervir', p.focus + ' Testamos o material antes de avançar.', 0, 'inspect'),
       illustrated('Tratar', protective ? 'Aplicar a proteção escolhida' : mould ? 'Definir se é possível intervir' : 'O cuidado específico para este caso', p.action, protective ? 2 : sofa ? 2 : 1, ['preco', 'urgencia'].includes(problem.category) ? 'inspect' : 'apply'),
-      illustrated('Finalizar', protective ? 'Respeitar a aplicação' : mould ? 'Resolver a origem da humidade' : 'Retirar os resíduos da limpeza', protective ? 'Conferimos a aplicação e indicamos as condições necessárias para a proteção ativar.' : mould ? 'A limpeza da peça não resolve infiltrações nem humidade persistente. Explicamos o que necessita de avaliação adicional.' : 'Quando o material e o tratamento permitem, retiramos os resíduos e reduzimos a humidade com equipamento adequado. Ajustamos a intervenção à resposta do revestimento.', protective ? 3 : mould ? 0 : sofa ? 4 : 3, 'extract'),
+      ...(!protective && !mould ? [brushing] : []),
+      illustrated(!protective && !mould ? (delicate ? 'Finalizar' : 'Extrair') : 'Finalizar', protective ? 'Respeitar a aplicação' : mould ? 'Resolver a origem da humidade' : 'Retirar os resíduos da limpeza', protective ? 'Conferimos a aplicação e indicamos as condições necessárias para a proteção ativar.' : mould ? 'A limpeza da peça não resolve infiltrações nem humidade persistente. Explicamos o que necessita de avaliação adicional.' : 'Quando o material e o tratamento permitem, retiramos os resíduos e reduzimos a humidade com equipamento adequado. Ajustamos a intervenção à resposta do revestimento.', protective ? 3 : mould ? 0 : sofa ? 4 : 3, 'extract'),
       illustrated('Conferir', protective ? 'Cuidados depois da proteção' : mould ? 'Conferir os limites da intervenção' : 'Conferir o resultado e deixar secar', p.limit + (protective ? ' Respeite o tempo de ativação indicado para a proteção escolhida.' : mould ? '' : ` ${DRYING_PROMISE}`), base.steps.length - 1, 'dry'),
     ],
   };

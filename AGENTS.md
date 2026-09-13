@@ -1,3 +1,7 @@
+## Escovagem depois do tratamento (13/09/2026)
+
+Na limpeza, a sequência é tratar, escovar, extrair e conferir/secagem, após avaliação. A escova e a pressão respeitam o revestimento. Juta, sisal, seda e materiais incompatíveis não seguem automaticamente limpeza com água nem escovagem forte; avaliar composição e método. Não confundir aplicação de impermeabilizante ou avaliação de bolor com esta sequência de limpeza. Preservar a etapa explícita nos guias dos problemas.
+
 ## Exemplos e tratamentos dos problemas (13/09/2026)
 
 Usar a grelha de quatro exemplos com ampliação também em localidades, freguesias, preços e variantes, partilhando `VisualExamplesGallery`. Tratamentos das páginas de problemas têm avaliação, ação e limites próprios por problema em `problemTreatmentGuides.ts`, partilhados com o HTML inicial. Não inventar métodos diferentes por cidade ou por sinónimo. A secção «Como tratamos este problema» usa o fundo verde canónico e a mesma navegação por separadores dos materiais, com imagem, explicação e botões anterior/próxima dentro do painel claro de `IllustratedProcessGuide`. Não voltar ao acordeão. Etapas com imagens guardadas uma vez no site, ficheiros antigos preservados e opção discreta de guardar. Materiais conservam exemplos específicos do revestimento.

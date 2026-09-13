@@ -17,6 +17,6 @@ it('navigates treatments with the shared material tabs and preserves local downl
   fireEvent.click(screen.getByRole('button', {name:'Próxima etapa'}));
   expect(screen.getByRole('tabpanel').textContent).toContain('resíduos da bebida');
   fireEvent.keyDown(screen.getByRole('tab', {name:/Tratar/}), {key:'ArrowRight'});
-  expect(screen.getByRole('tab', {name:/Finalizar/}).getAttribute('aria-selected')).toBe('true');
+  expect(screen.getByRole('tab', {name:/Escovar/}).getAttribute('aria-selected')).toBe('true');
   expect([...container.querySelectorAll('a[download]')].map(a => a.getAttribute('href'))).toEqual([...new Set(guide.steps.map(s => s.image))]);
 });
