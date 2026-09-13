@@ -87,13 +87,13 @@ describe('specific regressions and delivery failures', () => {
     expect((mocks.fetch.mock.calls[0][1].body.get('foto_1') as File).name).toBe('teste.jpg');
   });
   it('rejects when CRM returns an error object and Formspree returns HTTP error', async () => {
-    mocks.invoke.mockResolvedValue({ data: null, error: { message: 'down' } }); mocks.insert.mockResolvedValue({ error: { message: 'denied' } }); mocks.fetch.mockResolvedValue({ ok: false, status: 422 });
+    mocks.invoke.mockResolvedValue({ data: null, error: { message: 'down' } }); mocks.fetch.mockResolvedValue({ ok: false, status: 422 });
     await expect(submitQuizLead(payload({ service: 'carpet' }))).rejects.toThrow('Both');
     expect(sessionStorage.getItem('kyro_receipt')).toBeNull();
   });
   it.each(['crm', 'formspree'])('succeeds when only %s delivers', async channel => {
     if (channel === 'crm') mocks.fetch.mockResolvedValue({ ok: false, status: 500 });
-    else { mocks.invoke.mockResolvedValue({ data: null, error: { message: 'down' } }); mocks.insert.mockResolvedValue({ error: { message: 'denied' } }); }
+    else mocks.invoke.mockResolvedValue({ data: null, error: { message: 'down' } });
     await expect(submitQuizLead(payload({ service: 'carpet' }))).resolves.toBeUndefined();
   });
   it('retries one network failure', async () => {
@@ -148,11 +148,13 @@ describe('reCAPTCHA no canal do CRM', () => {
     expect(mocks.insert).not.toHaveBeenCalled();
   });
 
-  it('quando a função ainda não existe, o insert de recurso garante o lead', async () => {
-    mocks.invoke.mockResolvedValue({ data: null, error: { message: 'not found', context: { status: 404 } } });
-    await submitQuizLead(payload({ service: 'carpet' }));
-    expect(mocks.insert).toHaveBeenCalledTimes(1);
-    expect(mocks.insert.mock.calls[0][0].name).toBe('Teste Auditoria');
+  it('nunca insere diretamente: a função é o único caminho para o CRM', async () => {
+    // A politica de insert anonimo foi fechada, por isso um insert direto
+    // falharia em silencio em producao. Qualquer falha da funcao tem de contar
+    // como falha do canal do CRM, nao como motivo para tentar o caminho antigo.
+    mocks.invoke.mockResolvedValue({ data: null, error: { message: 'indisponível', context: { status: 503 } } });
+    await expect(submitQuizLead(payload({ service: 'carpet' }))).resolves.toBeUndefined();
+    expect(mocks.insert).not.toHaveBeenCalled();
   });
 
   it('um pedido real nunca se perde quando o reCAPTCHA falha em carregar', async () => {

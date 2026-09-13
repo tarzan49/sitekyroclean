@@ -1,0 +1,14 @@
+-- Passo 3 da proteção do funil de pedidos (docs/lead-spam-protection.md).
+--
+-- Até aqui, `leads` aceitava insert de qualquer visitante anónimo, porque o
+-- quiz escrevia na tabela a partir do browser com a chave pública. Isso deixava
+-- qualquer script escrever diretamente no endpoint REST do Supabase, sem passar
+-- pelo site nem pela verificação do reCAPTCHA.
+--
+-- A partir de agora a única forma de criar um lead é a Edge Function
+-- `submit-lead`, que verifica o reCAPTCHA e insere com a chave de serviço (a
+-- chave de serviço ignora RLS, por isso não precisa de política).
+--
+-- Aplicar só depois de confirmar um pedido real a entrar pela função. O canal
+-- de email é independente disto e continua a entregar em qualquer cenário.
+drop policy if exists "Allow anonymous insert" on public.leads;

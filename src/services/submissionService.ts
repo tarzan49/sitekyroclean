@@ -128,26 +128,11 @@ async function insertCrmLead(payload: QuizLeadPayload, bookingId: string): Promi
 
   if (!error && data?.success) return;
 
-  // Rejeição explícita do servidor (reCAPTCHA reprovado ou limite de pedidos):
-  // não insistir pelo caminho antigo, senão a verificação não serve de nada.
-  // O pedido chega na mesma ao negócio pelo canal de email.
-  const status = (error as { context?: { status?: number } } | null)?.context?.status;
-  if (status === 403 || status === 429 || status === 400) {
-    throw new Error(`submit-lead recusou o pedido (HTTP ${status})`);
-  }
-
-  // TEMPORÁRIO — remover depois de confirmar a função publicada em produção.
-  // Enquanto a função não existir (404) ou estiver indisponível, o insert
-  // direto continua a valer, para a publicação deste código não perder
-  // nenhum pedido. Ver supabase/functions/submit-lead/index.ts.
-  console.warn('[submissionService] submit-lead indisponível, a inserir diretamente:', error);
-  const { error: insertError } = await supabase.from('leads').insert({
-    ...row,
-    status: 'pending',
-    source: 'Website',
-    priority: 'Quente',
-  });
-  if (insertError) throw insertError;
+  // A partir daqui o insert direto deixou de existir: a politica de insert
+  // anonimo foi fechada (migracao 20260914000000), por isso a funcao e o unico
+  // caminho para criar um lead. Uma falha aqui e uma falha do canal do CRM, e o
+  // canal de email trata do resto — ver submitQuizLead.
+  throw new Error(`submit-lead falhou: ${error?.message ?? 'resposta inesperada'}`);
 }
 
 export function buildWaUrl(payload: QuizLeadPayload, bookingId: string): string {

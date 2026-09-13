@@ -56,20 +56,22 @@ incidente em que o build de produção compilou com variáveis por definir.
 Fazer um pedido real pelo quiz e verificar que a linha aparece em `leads` e que
 os registos da função mostram a pontuação do reCAPTCHA. Só depois disto avançar.
 
-**Passo 3. Fechar a inserção anónima.**
+**Passo 3. Fechar a inserção anónima. ✅ feito em 2026-09-14.**
 
-Só depois do passo 2 confirmado. Criar então a migração com:
+Confirmado em produção com um pedido real (`source: Website`), e a função
+verificada a responder o seu próprio 400 de validação.
 
-```sql
-drop policy if exists "Allow anonymous insert" on public.leads;
+A migração `20260914000000_close_anonymous_lead_insert.sql` remove a política
+de insert anónimo, e o insert direto de recurso saiu de
+`src/services/submissionService.ts`. A partir daqui **a única forma de criar um
+lead é a Edge Function**, que insere com a chave de serviço (essa ignora RLS,
+por isso não precisa de política).
+
+Falta correr a migração contra a base de dados:
+
+```bash
+npx supabase db push
 ```
-
-E remover de `src/services/submissionService.ts` o bloco marcado
-`TEMPORÁRIO`, que é o insert direto de recurso. A partir daí, a única forma de
-escrever em `leads` é através da função.
-
-**Não criar esta migração antes do passo 2.** Aplicada cedo, o insert de
-recurso deixa de funcionar e os pedidos passam a depender só do canal de email.
 
 ## Quando o Formspree passar a Resend
 
