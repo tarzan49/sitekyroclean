@@ -69,7 +69,7 @@ const Header = () => {
   return (
     <>
     <header className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-[#111111]/8">
-      <div className="mx-auto px-5 md:px-8 max-w-7xl h-14 md:h-[60px] flex items-center justify-between gap-4">
+      <div className="mx-auto px-3 sm:px-5 md:px-8 max-w-7xl h-14 md:h-[60px] flex items-center justify-between gap-2 md:gap-4">
 
         {/* ── LEFT: logo text ── */}
         <Link
@@ -77,7 +77,7 @@ const Header = () => {
           onClick={(e) => {
             if (location.pathname === "/") { e.preventDefault(); window.scrollTo({ top: 0, behavior: "smooth" }); }
           }}
-          className="font-playfair text-base md:text-[17px] font-normal text-[#111111] tracking-tight shrink-0 leading-none"
+          className="font-playfair text-[15px] md:text-[17px] font-normal text-[#111111] tracking-tight leading-none flex-1 text-center md:flex-none md:text-left md:shrink-0"
         >
           Kyro Clean Solutions
         </Link>
@@ -135,19 +135,19 @@ const Header = () => {
           </Link>
         </nav>
 
-        {/* ── RIGHT: three outline buttons (desktop) ── */}
+        {/* ── RIGHT: three filled buttons (desktop) ── */}
         <div className="hidden md:flex items-center gap-2.5 shrink-0">
           <a
             href={`tel:${PHONE_TEL}`}
             onClick={() => trackCallClick('header_desktop')}
-            className="border border-[#111111]/25 text-[#111111] text-[10px] font-semibold tracking-[0.18em] uppercase px-4 py-2.5 hover:bg-[#111111]/4 transition-colors flex items-center gap-2 whitespace-nowrap"
+            className="border border-[#111111] bg-[#111111] text-white text-[10px] font-semibold tracking-[0.18em] uppercase px-4 py-2.5 hover:bg-[#2a2a2a] hover:border-[#2a2a2a] transition-colors flex items-center gap-2 whitespace-nowrap"
           >
-            <Phone className="w-3.5 h-3.5 text-[#111111]/70 flex-shrink-0" strokeWidth={2} />
+            <Phone className="w-3.5 h-3.5 text-white flex-shrink-0" strokeWidth={2} />
             Ligar
           </a>
           <button
             onClick={openQuiz}
-            className="border border-[#D4AF37] text-[#111111] text-[10px] font-semibold tracking-[0.18em] uppercase px-5 py-2.5 hover:bg-[#D4AF37]/6 transition-colors whitespace-nowrap"
+            className="border border-[#D4AF37] bg-[#D4AF37] text-[#111111] text-[10px] font-semibold tracking-[0.18em] uppercase px-5 py-2.5 hover:bg-[#c6a22f] hover:border-[#c6a22f] transition-colors whitespace-nowrap"
           >
             Agendar limpeza
           </button>
@@ -156,23 +156,23 @@ const Header = () => {
             target="_blank"
             rel="noopener noreferrer"
             onClick={() => trackWhatsAppClick('header_desktop')}
-            className="border border-[#25D366] text-[#111111] text-[10px] font-semibold tracking-[0.18em] uppercase px-4 py-2.5 hover:bg-[#25D366]/6 transition-colors flex items-center gap-2 whitespace-nowrap"
+            className="border border-[#25D366] bg-[#25D366] text-[#0b2b16] text-[10px] font-semibold tracking-[0.18em] uppercase px-4 py-2.5 hover:bg-[#20bd5a] hover:border-[#20bd5a] transition-colors flex items-center gap-2 whitespace-nowrap"
           >
-            <MessageCircle className="w-3.5 h-3.5 text-[#25D366] flex-shrink-0" strokeWidth={2} />
+            <MessageCircle className="w-3.5 h-3.5 text-[#0b2b16] flex-shrink-0" strokeWidth={2} />
             WhatsApp
           </a>
         </div>
 
-        {/* ── MOBILE: hamburger left + call/WA icons right ── */}
-        <div className="flex items-center gap-2 md:hidden">
+        {/* ── MOBILE: call, WhatsApp and menu controls on the right ── */}
+        <div className="flex items-center gap-1.5 sm:gap-2 md:hidden shrink-0">
           {/* Call icon only */}
           <a
             href={`tel:${PHONE_TEL}`}
             onClick={() => trackCallClick('header_mobile')}
-            className="w-11 h-11 border border-[#111111]/25 flex items-center justify-center touch-manipulation"
+            className="w-11 h-11 border border-[#111111] bg-[#111111] flex items-center justify-center touch-manipulation transition-colors active:bg-[#2a2a2a]"
             aria-label="Ligar"
           >
-            <Phone className="w-4 h-4 text-[#111111]/70" strokeWidth={2} />
+            <Phone className="w-4 h-4 text-white" strokeWidth={2} />
           </a>
 
           {/* WhatsApp icon only */}
@@ -181,10 +181,10 @@ const Header = () => {
             target="_blank"
             rel="noopener noreferrer"
             onClick={() => trackWhatsAppClick('header_mobile')}
-            className="w-11 h-11 border border-[#25D366] flex items-center justify-center touch-manipulation"
+            className="w-11 h-11 border border-[#25D366] bg-[#25D366] flex items-center justify-center touch-manipulation transition-colors active:bg-[#20bd5a]"
             aria-label="WhatsApp"
           >
-            <MessageCircle className="w-4 h-4 text-[#25D366]" strokeWidth={2} />
+            <MessageCircle className="w-4 h-4 text-[#0b2b16]" strokeWidth={2} />
           </a>
 
           {/* Hamburger */}
@@ -196,7 +196,7 @@ const Header = () => {
               >
                 <span className="block w-5 h-px bg-[#111111]" />
                 <span className="block w-5 h-px bg-[#111111]" />
-                <span className="block w-3.5 h-px bg-[#111111] self-start" />
+                <span className="block w-5 h-px bg-[#111111]" />
               </button>
             </SheetTrigger>
 
