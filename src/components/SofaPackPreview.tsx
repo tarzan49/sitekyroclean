@@ -52,7 +52,7 @@ export default function SofaPackPreview({ base, travel, city, items, onClose }: 
             </div>
           </div>
           <button className={primary} onClick={() => { setAdded(true); setStep('summary'); }}>Adicionar colchão por +{money(pack.additional)}</button>
-          <button className="w-full min-h-11 text-sm text-white/75 underline underline-offset-4" onClick={() => { setAdded(false); setStep('summary'); }}>Continuar só com o sofá por {money(base + travel)}</button>
+          <button className="w-full min-h-11 text-sm text-white/75 tracking-wide uppercase underline underline-offset-4" onClick={() => { setAdded(false); setStep('summary'); }}>Continuar só com o sofá por {money(base + travel)}</button>
         </> : step === 'summary' ? <>
           <div className="rounded-lg border border-white/15 p-4 space-y-4 text-sm">
             <div className="flex justify-between gap-3"><span>{items.join(' + ')}</span><span>{money(base)}</span></div>

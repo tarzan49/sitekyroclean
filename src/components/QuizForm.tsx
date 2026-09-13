@@ -905,7 +905,7 @@ ${formData.description || 'Sem observações adicionais'}
               <Button
                 onClick={handleNext}
                 disabled={!canProceed()}
-                className="flex-1 h-12 bg-gradient-to-r from-gold to-[#d4c57b] hover:from-[#d4c57b] hover:to-gold text-[#12121e] font-bold touch-manipulation active:scale-[0.98] disabled:opacity-35 rounded-sm shadow-[0_4px_28px_rgba(212,175,55,0.40)] transition-shadow"
+                className="flex-1 h-12 bg-gradient-to-r from-gold to-[#d4c57b] hover:from-[#d4c57b] hover:to-gold text-[#12121e] font-bold tracking-wider uppercase touch-manipulation active:scale-[0.98] disabled:opacity-35 rounded-sm shadow-[0_4px_28px_rgba(212,175,55,0.40)] transition-shadow"
               >
                 Continuar
                 <ChevronRight className="w-4 h-4 ml-1" />
@@ -948,7 +948,7 @@ ${formData.description || 'Sem observações adicionais'}
           <div className="flex flex-col gap-3 mt-5">
             <Button
               onClick={() => setShowExitIntent(false)}
-              className="w-full h-12 bg-gradient-to-r from-gold to-[#d4c57b] hover:from-[#d4c57b] hover:to-gold text-[#12121e] font-black rounded-sm shadow-[0_0_20px_rgba(212,175,55,0.3)] touch-manipulation active:scale-[0.98]"
+              className="w-full h-12 bg-gradient-to-r from-gold to-[#d4c57b] hover:from-[#d4c57b] hover:to-gold text-[#12121e] font-black tracking-wider uppercase rounded-sm shadow-[0_0_20px_rgba(212,175,55,0.3)] touch-manipulation active:scale-[0.98]"
             >
               Continuar o meu orçamento
             </Button>

@@ -221,7 +221,7 @@ export default function PriceWidget({ serviceSlug, initialLocation }: Props) {
 
       <div className="px-3 sm:px-0 pb-5 w-full max-w-sm mx-auto">
         {!hasSelection && <p className="text-xs text-white/80 mb-3">{initialLocation ? `Deslocação a ${initialLocation}: ${travelFee} €` : 'Deslocação calculada conforme a localidade.'}</p>}
-        <button type="button" onClick={handleContinue} disabled={!hasSelection || incompleteMeasures} className={cn("w-full h-12 flex items-center justify-center gap-3 bg-gradient-to-r from-gold to-[#d4c57b] hover:from-[#d4c57b] hover:to-gold text-[#12121e] font-bold text-base touch-manipulation active:scale-[0.98] rounded-sm shadow-[0_4px_28px_rgba(212,175,55,0.40)] transition-all focus-visible:outline focus-visible:outline-2 focus-visible:outline-white", !hasSelection && "opacity-60")}>
+        <button type="button" onClick={handleContinue} disabled={!hasSelection || incompleteMeasures} className={cn("w-full h-12 flex items-center justify-center gap-3 bg-gradient-to-r from-gold to-[#d4c57b] hover:from-[#d4c57b] hover:to-gold text-[#12121e] font-bold text-base tracking-wider uppercase touch-manipulation active:scale-[0.98] rounded-sm shadow-[0_4px_28px_rgba(212,175,55,0.40)] transition-all focus-visible:outline focus-visible:outline-2 focus-visible:outline-white", !hasSelection && "opacity-60")}>
           Continuar <ChevronRight className="w-5 h-5" />
         </button>
         <p className="flex justify-center items-center gap-2 text-xs mt-3 text-white/80"><ShieldCheck className="w-4 h-4" />Gratuito e sem compromisso</p>

@@ -28,7 +28,7 @@ export default function QuizSofaPackTest({ base, travel, onChoose, onBack }: {
       </div>
     </div>
     <button className="w-full min-h-12 bg-gold text-[#071a12] font-bold p-3 rounded-sm" onClick={() => onChoose({id: 'mattress-casal', mattressSize: 'casal', qty: 1, price: TEST_CASAL_ADDON_PRICE, label: '1x Colchão Casal (oferta na mesma visita)'})}>Adicionar colchão por +{eur(TEST_CASAL_ADDON_PRICE)}</button>
-    <button className="w-full min-h-11 text-sm text-white/75 underline" onClick={() => onChoose(null)}>Continuar só com o sofá por {eur(base + travel)}</button>
+    <button className="w-full min-h-11 text-sm text-white/75 tracking-wide uppercase underline" onClick={() => onChoose(null)}>Continuar só com o sofá por {eur(base + travel)}</button>
     <button className="w-full min-h-11 text-sm text-white/50" onClick={onBack}>Voltar aos tratamentos</button>
   </div>;
 }

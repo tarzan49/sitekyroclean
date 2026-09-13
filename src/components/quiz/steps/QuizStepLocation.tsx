@@ -77,7 +77,7 @@ const QuizStepLocation = ({ location, locationQuery, setLocationQuery, scrollCon
       </div>}
 
       {selected && <div className="pt-4 mt-4 border-t border-white/10" aria-live="polite"><div className="flex justify-between gap-3 text-sm text-white/85"><span>Deslocação para {selected}</span><span className="font-semibold whitespace-nowrap">{locationPrices[selected]} €</span></div><p className="text-xs text-white/55 mt-2">Este valor será somado ao serviço no total.</p></div>}
-      <Button type="button" disabled={!selected || editing} onClick={() => { if (selected) { request.current?.abort(); onCitySelect(selected); } }} className="w-full h-12 mt-6 bg-gradient-to-r from-gold to-[#d4c57b] text-[#12121e] font-bold rounded-xl disabled:opacity-35">Continuar<ChevronRight className="w-4 h-4 ml-2" /></Button>
+      <Button type="button" disabled={!selected || editing} onClick={() => { if (selected) { request.current?.abort(); onCitySelect(selected); } }} className="w-full h-12 mt-6 bg-gradient-to-r from-gold to-[#d4c57b] text-[#12121e] font-bold tracking-wider uppercase rounded-xl disabled:opacity-35">Continuar<ChevronRight className="w-4 h-4 ml-2" /></Button>
     </div>
   );
 };
