@@ -27,4 +27,6 @@ Atualização de apresentação: por pedido do responsável, o aviso visível fo
 
 ## Continuação
 
+Exemplo na página real, apenas em desenvolvimento: `/limpeza-sofas-lisboa?teste=imagens-sofas#problemas`. `LandingServiceSections` mostra quatro exemplos fixos (manchas 07, resíduos 03, odores 02, desgaste 05), com a legenda aprovada. Sem o parâmetro, noutro serviço ou no build de produção, mantém as imagens anteriores. O exemplo não implementa ainda a distribuição das 40 imagens por URL.
+
 A biblioteca de sofás está completa; faltam as 200 imagens dos outros cinco serviços para chegar às 240 previstas e a integração nas páginas. Na integração, selecionar por ID do problema e identidade estável da página, manter alternativa fixa entre React e HTML inicial, legenda «Imagem ilustrativa» e textos alternativos sem localidades inventadas. Não integrar estas imagens nos comparadores antes/depois ou nas galerias de trabalhos reais. A navegação manual deste painel é apenas para revisão, não é a seleção estável das páginas públicas.

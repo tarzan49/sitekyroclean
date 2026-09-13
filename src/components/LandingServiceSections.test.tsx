@@ -14,6 +14,18 @@ vi.mock('./QuizFormLazy', () => ({ default: ({ isOpen, ...props }: { isOpen: boo
 afterEach(cleanup);
 
 describe('landing section integration', () => {
+  it('shows the image demonstration only on explicitly requested sofa previews', () => {
+    for (const [route, expected] of [
+      ['/limpeza-sofas-lisboa?teste=imagens-sofas', 4],
+      ['/limpeza-sofas-lisboa', 0],
+      ['/limpeza-colchoes-lisboa?teste=imagens-sofas', 0],
+    ] as const) {
+      const { container } = render(<MemoryRouter initialEntries={[route]}><LandingServiceSections /></MemoryRouter>);
+      expect(container.querySelectorAll('img[src^="/docs/sofa-image-pilot/"]')).toHaveLength(expected);
+      expect(container.querySelectorAll('[data-problem-id]')).toHaveLength(4);
+      cleanup();
+    }
+  });
   it('keeps the seven-section order and four problem/FAQ cards in every family', () => {
     for (const route of ['/limpeza-sofas-lisboa', '/limpeza-colchoes-porto-paranhos', '/preco-limpeza-alcatifas-lisboa', '/higienizacao-tapetes-lisboa']) {
       const { container } = render(<MemoryRouter initialEntries={[route]}><LandingServiceSections /></MemoryRouter>);
