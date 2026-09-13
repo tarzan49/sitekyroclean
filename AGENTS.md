@@ -16,6 +16,8 @@ Legenda das imagens ilustrativas (13/09/2026): por pedido do responsável, apres
 
 ## Fecho dos oito alertas comerciais (10/09/2026)
 
+Contenção das imagens dos guias (13/09/2026): em `SofaProcessGuide` e `ServiceProcessGuide`, o contentor da imagem usa `min-w-0 w-full self-start overflow-hidden` e a coluna de texto `min-w-0`. A largura definida e o alinhamento independente impedem que a proporção da imagem/altura mínima a façam invadir o texto em desktop. Preservar esta contenção em todas as etapas e serviços.
+
 Pré-visualização das imagens em página real (13/09/2026): `?teste=imagens-sofas#problemas` nas landing pages de sofás, apenas com `import.meta.env.DEV`, mostra quatro exemplos da biblioteca no carrossel existente. Não ativar a demonstração em produção nem confundir a seleção fixa do exemplo com a futura distribuição estável por página.
 
 A regra dos 10 minutos aplica-se também ao inglês e aos testes locais. Em inglês, usar EN_RESPONSE_PROMISE, EN_AVAILABILITY_PROMISE e EN_COVERAGE_PROMISE; não voltar a apresentar “Same-day” como prazo de resposta. A disponibilidade é próprio dia ou seguinte sob confirmação, nunca uma regra geral de 48h para Lisboa. Secagem média 3–6h também em marcas (IKEA/Pikolin), variantes e glossário. A existência de manchas preexistentes não exclui a repetição gratuita comunicada até48h; explicar limitações antes de executar. Limpeza/higienização não inclui automaticamente anti-ácaros ou desbacterização. Não reintroduzir promessas de eliminação de germes, benefícios clínicos ou bactericida incluído. Homepage usa PUBLISHED_REVIEWS, só transcrições; localidades apenas quando confirmadas. Retirados os blocos independentes de reviews sem origem dos schemas. Preservar estas regras em merges de ramos de teste.

@@ -24,13 +24,13 @@ export default function SofaProcessGuide({ city = 'Lisboa', cityPrep = 'em' }: {
           </button>)}
         </div>
         <div id={`${id}-panel`} role="tabpanel" aria-labelledby={`${id}-tab-${active}`} tabIndex={0} className="grid md:grid-cols-2 focus-visible:outline focus-visible:outline-[#D4AF37]">
-          <div className="relative overflow-hidden bg-[#efeee7] min-h-[190px] md:min-h-[340px]" style={{ aspectRatio: '560 / 300' }}>
+          <div className="relative min-w-0 w-full self-start overflow-hidden bg-[#efeee7] min-h-[190px] md:min-h-[340px]" style={{ aspectRatio: '560 / 300' }}>
             <div key={step.label} className="absolute inset-x-0 top-1/2 -translate-y-1/2 scale-150 overflow-hidden" style={{ aspectRatio: `560 / ${step.height}` }}>
               <img src={image} alt={step.alt} className="absolute !max-w-none" style={{ width: '182.8572%', left: '-4.6429%', top: `${-step.y / step.height * 100}%` }} />
             </div>
             <span className="absolute bottom-3 left-3 text-[10px] bg-white/90 px-2 py-1 text-[#536259]">Imagem ilustrativa</span>
           </div>
-          <div className="p-5 sm:p-8 flex flex-col">
+          <div className="min-w-0 p-5 sm:p-8 flex flex-col">
             <p className="text-[10px] uppercase tracking-[0.2em] text-[#536259] mb-3">Etapa {active + 1} de {steps.length}</p>
             <h3 className="font-playfair text-2xl sm:text-3xl leading-tight text-[#173629] mb-3">{step.title}</h3>
             <p className="text-sm sm:text-base text-[#536259] leading-relaxed min-h-[84px]">{step.description}</p>
