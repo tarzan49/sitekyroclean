@@ -36,6 +36,7 @@ import { getAllProblems, getProblemBySlug } from '../src/data/problemSeoData';
 import { getProblemLayout } from '../src/data/problemLayout';
 import { getProblemHero } from '../src/data/problemHero';
 import { getAllProblemCityRoutes } from '../src/data/problemCitySeoData';
+import { getProblemCityFaqs, getProblemCityReviews, getProblemCityCoverage } from '../src/data/problemCityContent';
 import { getAllMaterials, getAllMaterialCityRoutes, getMaterialCityData } from '../src/data/materialSeoData';
 import { getAllPriceRoutes, getPricePageData } from '../src/data/priceSeoData';
 import { getAllPackComboRoutes, getPackByCityAndId } from '../src/data/packComboData';
@@ -155,6 +156,7 @@ interface PageContent {
   processSteps?: { step: number; title: string; description: string; alt?: string }[];
   priceTable?: { item: string; price: string; note?: string }[];
   links?: { href: string; label: string }[];
+  reviews?: { name: string; city?: string; text: string }[];
 }
 
 function generatePageBody(c: PageContent, lang: 'pt' | 'en' = 'pt'): string {
@@ -226,6 +228,15 @@ function generatePageBody(c: PageContent, lang: 'pt' | 'en' = 'pt'): string {
     html += `<section><ul>\n`;
     for (const b of c.benefits) html += `<li>${escHtml(b)}</li>\n`;
     html += `</ul></section>\n`;
+  }
+
+  if (c.reviews?.length) {
+    html += `<section><h2>Avaliações de clientes</h2>\n`;
+    for (const r of c.reviews) {
+      const quem = r.city ? `${r.name}, ${r.city}` : r.name;
+      html += `<blockquote><p>${escHtml(r.text)}</p><footer>${escHtml(quem)}</footer></blockquote>\n`;
+    }
+    html += `</section>\n`;
   }
 
   if (c.faqs?.length) {
@@ -520,7 +531,24 @@ export function prerenderRoutes(outDir: string): number {
         route.path,
         title,
         desc,
-        { hero, h1: hero.heading, intro: hero.intro, localSection: desc, problems: getProblemLayout(problem).examples.map(example => ({ title: example.title, description: "Imagem ilustrativa.", image: example.image })), processSteps: getProblemLayout(problem).process.map((step, index) => ({ step: index + 1, ...step })), benefits: problem.benefits, faqs: problem.faqs },
+        {
+          hero,
+          h1: hero.heading,
+          intro: hero.intro,
+          // Cobertura e taxa reais desta cidade, em vez de repetir a meta description.
+          localSection: getProblemCityCoverage(city.name),
+          problems: getProblemLayout(problem).examples.map(example => ({ title: example.title, description: "Imagem ilustrativa.", image: example.image })),
+          processSteps: getProblemLayout(problem).process.map((step, index) => ({ step: index + 1, ...step })),
+          benefits: problem.benefits,
+          // Quatro perguntas escolhidas pela identidade da pagina e seis
+          // avaliacoes da regiao: e o que distingue esta cidade da seguinte.
+          faqs: getProblemCityFaqs(problem, city.name, route.path),
+          reviews: getProblemCityReviews(problem, city.slug),
+          links: [
+            { href: `/problemas/${route.problemSlug}`, label: `${problem.h1} (pagina nacional)` },
+            ...cities.filter(c => c.slug !== city.slug).slice(0, 6).map(c => ({ href: `/${route.problemSlug}-${c.slug}`, label: `${problem.h1} em ${c.name}` })),
+          ],
+        },
         schemas,
       );
     }

@@ -14,6 +14,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import SectionHeader from "@/components/SectionHeader";
 import ServiceFAQ from "@/components/ServiceFAQ";
+import { getProblemCityFaqs } from "@/data/problemCityContent";
 import ServicePriceSection from "@/components/ServicePriceSection";
 import ServiceAutoCarousel from "@/components/ServiceAutoCarousel";
 import ServiceLocationSchema from "@/components/ServiceLocationSchema";
@@ -86,12 +87,9 @@ const ProblemCityPage = () => {
     .filter(c => c.slug !== city.slug && validCitySlugs.has(c.slug))
     .slice(0, 8);
 
-  const localFaqs = problem.faqs.map(faq => ({
-    question: faq.question,
-    answer: faq.answer.includes(city.name)
-      ? faq.answer
-      : `${faq.answer} Prestamos este serviço ao domicílio ${prep} ${city.name} e arredores.`,
-  }));
+  // Mesma fonte que o prerender usa, para o HTML e o React nao divergirem.
+  // Antes eram as mesmas quatro perguntas nas 26 cidades do mesmo problema.
+  const localFaqs = getProblemCityFaqs(problem, city.name, pathname);
 
   return (
     <QuizLocationProvider value={city.name}>
