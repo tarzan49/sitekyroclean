@@ -1,3 +1,4 @@
+import CommercialHero from "@/components/CommercialHero";
 import DirectoryGroup from "@/components/DirectoryGroup";
 import SofaLeadActions from "@/components/SofaLeadActions";
 import { useMemo, useEffect } from "react";
@@ -123,70 +124,7 @@ const MarcaCadeirasPage = () => {
       <Header />
       <main>
 
-        {/* ═══ HERO + SNAPSHOT (fundo fotográfico contínuo) ═══ */}
-        <div className="relative overflow-hidden">
-          <div className="absolute inset-0" style={{ background: "#071a12" }} />
-          <div className="absolute inset-0 overflow-hidden" aria-hidden="true">
-            <img src={heroImg} alt={pageTitle} className="w-full h-full object-cover" loading="eager" />
-          </div>
-          <div className="absolute inset-0" style={{ background: "linear-gradient(to bottom, rgba(7,26,18,0.42) 0%, rgba(7,26,18,0.65) 40%, rgba(7,26,18,0.90) 78%, rgba(7,26,18,0.97) 100%)" }} />
-
-          <section className="relative pt-16 md:pt-24 lg:pt-28 pb-16 md:pb-24">
-            <div className="container mx-auto px-5 sm:px-6 lg:px-8 relative z-10">
-              <div className="max-w-6xl mx-auto grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
-                <div>
-                  <PageBreadcrumb items={[
-                    { label: "Início", to: "/" },
-                    { label: "Limpeza de Cadeiras", to: "/limpeza-cadeiras" },
-                    { label: `${marca.name}, ${city.name}` },
-                  ]} />
-
-                  <div className="inline-flex items-start mb-3 lg:mb-5">
-                    <div className="flex flex-col gap-1">
-                      <div className="w-7 h-px bg-gradient-to-r from-gold to-transparent" />
-                      <span
-                        className="text-[10px] font-bold text-gold/90 tracking-[0.30em] uppercase"
-                        style={{ textShadow: "0 1px 6px rgba(0,0,0,0.6)" }}
-                      >
-                        Especialistas em {marca.name}
-                      </span>
-                    </div>
-                  </div>
-
-                  <h1
-                    className="font-playfair text-[1.75rem] sm:text-4xl md:text-5xl lg:text-6xl font-semibold text-white mb-3 lg:mb-4 leading-[1.12]"
-                    style={{ textShadow: "0 2px 16px rgba(0,0,0,0.65)" }}
-                  >
-                    Limpeza de Cadeiras {marca.name} {prep} {city.name}
-                  </h1>
-
-                  <p className="text-sm sm:text-base md:text-lg text-white/70 leading-relaxed mb-4 lg:mb-6 max-w-lg">
-                    {marca.materialDescription.split('.')[0]}.
-                  </p>
-
-
-                  <SofaLeadActions
-                    city={city.name}
-                    price={`${minPriceLabel}€/unidade`}
-                    href={`${WHATSAPP_BASE}?text=${encodeURIComponent(`Olá! Gostaria de pedir um orçamento para limpeza das minhas cadeiras ${marca.name} ${prep} ${city.name}.`)}`}
-                    source={`marca_cadeiras_hero_${marca.slug}`}
-                  />
-                </div>
-
-                <div className="mt-8 lg:mt-0">
-                  <div className="relative">
-                    <div className="absolute -inset-4 blur-2xl opacity-20" style={{ background: "linear-gradient(135deg, #D4AF37, transparent)" }} />
-                    <div className="relative shadow-2xl" style={{ borderTop: "2px solid #D4AF37" }}>
-                      <HeroBeforeAfterPool category="cadeiras" className="w-full" />
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </section>
-
-          <ServiceSnapshotStats stats={snapshotStats} />
-        </div>
+        <CommercialHero title={`Limpeza de Cadeiras ${marca.name} ${prep} ${city.name}`} serviceSlug="limpeza-cadeiras" city={city.name} price={`${marca.minPrice}€`} image={heroImg} whatsappHref={`${WHATSAPP_BASE}?text=${encodeURIComponent(`Olá! Gostaria de pedir um orçamento para limpeza de cadeiras ${marca.name} ${prep} ${city.name}.`)}`} source={`marca_hero_${marca.slug}`} />
 
         {/* ═══ ORÇAMENTO (primeira secção a seguir ao hero) ═══ */}
         <ServicePriceSection serviceSlug="limpeza-cadeiras" initialLocation={city.name} />

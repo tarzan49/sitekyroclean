@@ -1,3 +1,4 @@
+import CommercialHero from "@/components/CommercialHero";
 import { AdsLandingFooter, AdsLandingHeader, isAdsVisit } from "@/components/AdsLandingNavigation";
 import LandingServiceSections from '@/components/LandingServiceSections';
 import SofaLeadActions from "@/components/SofaLeadActions";
@@ -193,77 +194,7 @@ const SofaVariantPage = () => {
       {isPaidLanding ? <AdsLandingHeader /> : <Header />}
       <main>
 
-        {/* ═══ HERO + LOCAL SNAPSHOT (fundo fotográfico contínuo) ═══ */}
-        <div className="relative overflow-hidden">
-          <div className="absolute inset-0" style={{ background: "#071a12" }} />
-          <div className="absolute inset-0 overflow-hidden" aria-hidden="true">
-            <img src={heroImg} alt={data.h1} className="w-full h-full object-cover" loading="eager" />
-          </div>
-          <div className="absolute inset-0" style={{ background: "linear-gradient(to bottom, rgba(7,26,18,0.42) 0%, rgba(7,26,18,0.65) 40%, rgba(7,26,18,0.90) 78%, rgba(7,26,18,0.97) 100%)" }} />
-
-        <section className="relative pt-6 md:pt-16 lg:pt-20 pb-8 md:pb-16">
-          <div className="container mx-auto px-5 sm:px-6 lg:px-8 relative z-10">
-            <div className="max-w-6xl mx-auto grid lg:grid-cols-2 gap-4 lg:gap-12 items-center">
-              <div>
-                {!isPaidLanding && <>
-                <nav className="flex items-center gap-1.5 text-xs text-white/50 mb-6 flex-wrap" aria-label="Breadcrumb">
-                  <Link to="/" className="hover:text-white/80 transition-colors">Início</Link>
-                  <span>/</span>
-                  <Link to={data.canonical} className="hover:text-white/80 transition-colors">{data.locationName}</Link>
-                  <span>/</span>
-                  <span className="text-white/70">{variantLabel}</span>
-                </nav>
-                </>}
-
-                <div className="inline-flex items-start mb-3 lg:mb-5">
-                  <div className="flex flex-col gap-1">
-                    <div className="w-7 h-px bg-gradient-to-r from-gold to-transparent" />
-                    <span
-                      className="text-[10px] font-bold text-gold/90 tracking-[0.30em] uppercase"
-                      style={{ textShadow: "0 1px 6px rgba(0,0,0,0.6)" }}
-                    >
-                      {variantLabel} · {data.locationName}
-                    </span>
-                  </div>
-                </div>
-
-                <h1
-                  className="font-playfair text-[1.75rem] sm:text-4xl md:text-5xl lg:text-6xl font-semibold text-white mb-3 lg:mb-4 leading-[1.12]"
-                  style={{ textShadow: "0 2px 16px rgba(0,0,0,0.65)" }}
-                >
-                  {data.h1}
-                </h1>
-
-                <p className="text-sm sm:text-base md:text-lg text-white/70 leading-relaxed mb-4 lg:mb-6 max-w-lg">
-                  {data.intro}
-                </p>
-                <SofaLeadActions city={data.locationName} price={data.priceFrom} href={`${WHATSAPP_BASE}?text=${encodeURIComponent(buildVariantWaMessage(data.variantKey === 'impermeabilizacao', SERVICE_LABEL[data.serviceKey], VARIANT_LABEL[data.variantKey], data.locationName))}`} source={`variant_hero_${parsed.variantKey}_${parsed.serviceKey}`} />
-              </div>
-
-              <div id="resultados" className="mt-2 lg:mt-0 scroll-mt-6">
-                <div className="relative">
-                  <div className="absolute -inset-4 blur-2xl opacity-20" style={{ background: "linear-gradient(135deg, #D4AF37, transparent)" }} />
-                  {beforeAfterCategory ? (
-                    <div className="relative shadow-2xl" style={{ borderTop: "2px solid #D4AF37" }}>
-                      <HeroBeforeAfterPool category={beforeAfterCategory} className="w-full" />
-                    </div>
-                  ) : (
-                    <img
-                      src={heroImg}
-                      alt={`${variantLabel} profissional ${prep} ${data.locationName}`}
-                      className="relative w-full max-h-[440px] object-cover shadow-2xl"
-                      style={{ borderTop: "2px solid #D4AF37" }}
-                      loading="eager"
-                    />
-                  )}
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <ServiceSnapshotStats stats={snapshotStats} />
-        </div>
+        <CommercialHero title={data.h1} serviceSlug={durationSlug} city={data.locationName} price={data.priceFrom} image={heroImg} whatsappHref={`${WHATSAPP_BASE}?text=${encodeURIComponent(buildVariantWaMessage(data.variantKey === "impermeabilizacao", SERVICE_LABEL[data.serviceKey], VARIANT_LABEL[data.variantKey], data.locationName))}`} source={`variant_hero_${parsed.variantKey}_${parsed.serviceKey}`} />
 
         <LandingServiceSections />
       </main>

@@ -90,7 +90,7 @@ const ProblemPage = () => {
       <main>
 
         <ProblemHero problem={data} />
-        <div id="precos" className="scroll-mt-20"><ServicePriceSection serviceSlug={data.relatedServices[0]} /></div>
+        <ServicePriceSection serviceSlug={data.relatedServices[0]} />
 
         {/* ═══ AVALIAÇÕES REAIS ═══ */}
         <section className="py-14 md:py-20 bg-kyro-green">

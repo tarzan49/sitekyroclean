@@ -35,11 +35,11 @@ describe('problem hero content', () => {
   });
   it('distinguishes cleaning from treatment and protection', () => {
     const mites = getProblemHero(problem('acaros-colchao'));
-    expect(mites.intro).toContain('cuidados distintos');
+    expect(mites.intro).toContain('tratamentos opcionais');
     expect(mites.priceLabel).toMatch(/^Limpeza desde /);
     expect(getProblemHero(problem('impermeabilizar-sofa')).priceLabel).toMatch(/^Proteção desde /);
   });
   it('makes urgent availability conditional', () => {
-    expect(getProblemHero(problem('limpeza-sofa-urgente')).intro).toContain('disponibilidade confirmada');
+    expect(getProblemHero(problem('limpeza-sofa-urgente')).intro).toContain('sob confirmação');
   });
 });

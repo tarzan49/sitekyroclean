@@ -1,158 +1,17 @@
-import { useEffect, lazy, Suspense } from "react";
-import { trackWhatsAppClick } from "@/lib/quizTracking";
-import { MessageCircle } from "lucide-react";
-import { WHATSAPP_BASE } from "@/constants/business";
-import HomeHeroTrust from "@/components/HomeHeroTrust";
-import { useQuizLauncher } from "@/hooks/use-quiz-launcher";
+import { useEffect } from 'react';
+import CommercialHero from './CommercialHero';
+import QuizForm from './QuizFormLazy';
+import { useQuizLauncher } from '@/hooks/use-quiz-launcher';
+import { WHATSAPP_BASE } from '@/constants/business';
 
-const QuizForm = lazy(() => import('./QuizFormLazy'));
-
-const imgDesktop = '/images/hero-sofa-v1.jpeg';
-const imgMobile = '/images/hero-sofa-mobile-extended.webp';
-
-const Hero = () => {
-  const { isQuizOpen, openQuiz: handleOpenQuiz, closeQuiz } = useQuizLauncher();
-
+export default function HeroV1() {
+  const { isQuizOpen, openQuiz, closeQuiz } = useQuizLauncher();
   useEffect(() => {
-    window.addEventListener('openQuiz', handleOpenQuiz);
-    return () => window.removeEventListener('openQuiz', handleOpenQuiz);
-  }, [handleOpenQuiz]);
-
-  return (
-    <>
-      <section
-        id="orcamento"
-        className="relative bg-[#0B2F2A] md:min-h-[95vh] flex items-center z-[1] pt-[84px] md:pt-[100px] pb-7 md:pb-[100px] overflow-hidden"
-        aria-label="Kyro Clean Solutions - Higienização de Estofos ao Domicílio"
-      >
-        {/* One continuous outpainted scene behind all three mobile content rows. */}
-        <div className="absolute inset-x-0 bottom-0 top-14 md:hidden" aria-hidden="true">
-          <img src={imgMobile} alt="" className="h-full w-full object-cover object-center" loading="eager" fetchPriority="high" />
-          <div className="absolute inset-0" style={{ background: 'linear-gradient(to bottom, rgba(5,28,23,.86) 0%, rgba(5,28,23,.78) 29%, rgba(5,28,23,.18) 43%, transparent 49%, transparent 68%, rgba(5,28,23,.72) 79%, rgba(5,28,23,.94) 100%)' }} />
-        </div>
-        {/* Background */}
-        <div className="absolute inset-0 z-0 hidden md:block">
-          <picture>
-            <source srcSet={imgDesktop} type="image/jpeg" />
-            <img
-              src={imgDesktop}
-              alt=""
-              aria-hidden="true"
-              className="absolute inset-0 w-full h-full object-cover"
-              style={{ objectPosition: 'center 30%' }}
-              loading="eager"
-              decoding="sync"
-              fetchPriority="high"
-            />
-          </picture>
-          <div className="absolute inset-0" style={{ background: 'rgba(8, 10, 30, 0.42)' }} />
-        </div>
-
-        {/* Left gradient */}
-        <div className="hidden md:block absolute inset-0 z-[1] bg-gradient-to-r from-[#0B2F2A]/88 via-[#0B2F2A]/55 to-transparent pointer-events-none" />
-        {/* Bottom gradient */}
-        <div className="hidden md:block absolute inset-x-0 bottom-0 z-[1] h-48 bg-gradient-to-t from-black/75 via-black/20 to-transparent pointer-events-none" />
-
-        {/* Content */}
-        <div className="relative z-10 mx-auto grid w-full max-w-[1400px] px-5 md:grid-cols-[minmax(0,52%)_minmax(300px,1fr)] md:gap-4 md:px-8 lg:grid-cols-[minmax(0,610px)_1fr] lg:px-16 xl:px-20">
-          <div className="max-w-[610px]">
-
-            {/* Tag */}
-            <div className="inline-flex items-start mb-5">
-              <div className="flex flex-col gap-1">
-                <div className="w-7 h-px bg-gradient-to-r from-gold to-transparent" />
-                <span
-                  className="text-[10px] font-bold text-gold/90 tracking-[0.30em] uppercase"
-                  style={{ textShadow: '0 1px 6px rgba(0,0,0,0.6)' }}
-                >
-                  KYRO CLEAN SOLUTIONS
-                </span>
-              </div>
-            </div>
-
-            {/* H1 */}
-            <h1
-              className="font-playfair text-[2rem] min-[375px]:text-[2.375rem] sm:text-[2.625rem] md:text-5xl lg:text-6xl font-semibold text-white leading-[1.1] md:leading-[1.15] tracking-[-0.025em] mb-4 md:mb-5"
-              style={{ textShadow: '0 2px 16px rgba(0,0,0,0.65)' }}
-            >
-              Estofos como novos,<br />
-              <span style={{ color: '#D4AF37' }}>ao domicílio.</span>
-            </h1>
-
-            {/* Short value proposition stays on the dark sofa area, away from the extractor. */}
-            <p
-              className="mb-5 max-w-[430px] text-sm leading-relaxed text-white sm:text-base md:mb-6 md:max-w-[360px] md:text-base lg:max-w-[390px]"
-              style={{ textShadow: '0 1px 10px rgba(0,0,0,0.55)' }}
-            >
-              Especialistas em limpeza de estofos ao domicílio. Cuidado profissional, orçamento transparente e resposta em menos de 10 minutos. Equipas em Braga, Porto, Lisboa e Algarve.
-            </p>
-
-          </div>
-
-          {/* Reserve clear space for the extractor and the clean/dirty boundary. */}
-          <div className="-mx-5 aspect-[4/3] md:hidden" role="img" aria-label="Limpeza de um sofá, com a diferença visível entre o tecido limpo e por limpar" />
-          <div className="py-4 md:hidden">
-            <HomeHeroTrust />
-          </div>
-
-          {/* Desktop CTAs occupy the clean right side of the sofa, away from the extraction line. */}
-          <div className="mx-auto flex w-full max-w-sm flex-col gap-2.5 md:mb-8 md:mt-0 md:w-[92%] md:max-w-[400px] md:self-end md:justify-self-center">
-
-              {/* Price CTA keeps the same secondary treatment on mobile and desktop. */}
-              <div className="group relative order-2">
-                <button
-                  onClick={handleOpenQuiz}
-                  className={[
-                    'relative w-full border border-[#D4AF37]/70 bg-black/35 font-bold text-white touch-manipulation backdrop-blur-md',
-                    'h-[48px] px-4 md:px-8 text-base md:text-[17px]',
-                    'shadow-[0_8px_24px_rgba(0,0,0,0.22)]',
-                    'hover:border-[#D4AF37] hover:bg-black/50 hover:shadow-[0_10px_30px_rgba(0,0,0,0.30)]',
-                    'hover:scale-[1.025]',
-                    'active:scale-[0.95]',
-                    'transition-all duration-150',
-                  ].join(' ')}
-                >
-                  <span className="text-[13px] font-semibold tracking-[0.18em] uppercase">Calcular o meu preço</span>
-                </button>
-              </div>
-
-              {/* WhatsApp is the primary CTA on mobile and desktop. */}
-              <div className="group relative order-1">
-                <div className="absolute -inset-2 rounded-full bg-[#25D366]/45 opacity-50 blur-xl transition-opacity duration-400 pointer-events-none group-hover:opacity-70" />
-                <a
-                  href={`${WHATSAPP_BASE}?text=${encodeURIComponent('Olá, gostaria de saber mais sobre os vossos serviços de higienização.')}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onClick={() => trackWhatsAppClick('hero')}
-                  className={[
-                    'relative flex items-center justify-center gap-2 w-full font-bold text-white touch-manipulation',
-                    'h-[56px] md:h-[60px] px-4 md:px-8 text-base md:text-[17px]',
-                    'bg-gradient-to-r from-[#1DA851] via-[#25D366] to-[#1DA851]',
-                    'shadow-[0_6px_22px_rgba(37,211,102,0.42),0_2px_6px_rgba(0,0,0,0.28),inset_0_1px_0_rgba(255,255,255,0.20),inset_0_-2px_0_rgba(0,0,0,0.12)]',
-                    'hover:shadow-[0_10px_32px_rgba(37,211,102,0.60),0_4px_10px_rgba(0,0,0,0.32)]',
-                    'hover:scale-[1.025]',
-                    'active:scale-[0.95] active:shadow-[0_2px_8px_rgba(37,211,102,0.30),inset_0_2px_4px_rgba(0,0,0,0.18)]',
-                    'transition-all duration-150',
-                  ].join(' ')}
-                >
-                  <MessageCircle className="w-[18px] h-[18px] text-white flex-shrink-0" strokeWidth={2} />
-                  <span className="text-[13px] font-semibold tracking-[0.18em] uppercase">Falar por WhatsApp</span>
-                </a>
-              </div>
-
-          </div>
-        </div>
-
-        <div className="absolute inset-x-0 bottom-[5%] z-10 hidden md:block">
-          <HomeHeroTrust />
-        </div>
-
-        <Suspense fallback={null}>
-          <QuizForm isOpen={isQuizOpen} onClose={closeQuiz} />
-        </Suspense>
-      </section>
-    </>
-  );
-};
-
-export default Hero;
+    window.addEventListener('openQuiz', openQuiz);
+    return () => window.removeEventListener('openQuiz', openQuiz);
+  }, [openQuiz]);
+  return <>
+    <CommercialHero title="Estofos como novos, ao domicílio." subtitle="Limpeza profissional de sofás, colchões, cadeiras e tapetes." serviceSlug="limpeza-sofas" image={{ m: '/images/hero-sofa-mobile-extended.webp', d: '/images/hero-sofa-v1.jpeg' }} breadcrumbs={[{ label: 'Início' }]} whatsappHref={`${WHATSAPP_BASE}?text=${encodeURIComponent('Olá! Gostaria de pedir um orçamento para limpeza de estofos.')}`} source="home_hero" pricesHref="#servicos" />
+    <QuizForm isOpen={isQuizOpen} onClose={closeQuiz} />
+  </>;
+}

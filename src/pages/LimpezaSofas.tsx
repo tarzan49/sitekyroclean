@@ -75,7 +75,6 @@ const LimpezaSofas = () => {
       <main>
         <ServiceHero
           title="Higienização Profissional de Sofás"
-          subtitle="Remoção eficaz de sujidade, manchas e alergénios, devolvendo higiene, conforto e uma aparência cuidada ao sofá."
           serviceSlug="limpeza-sofas"
         />
         <ServicePriceSection serviceSlug="limpeza-sofas" />

@@ -1,3 +1,7 @@
+## Estrutura obrigatória dos heroes (13/09/2026, revisão mais recente)
+
+Pedido do responsável: breadcrumb na fonte Avenir Next, título, subtítulo curto de apoio, WhatsApp principal, «Ver preços» por baixo, antes/depois imediatamente a seguir e faixa com avaliações, resposta e secagem (ou informação adequada à proteção). Usar `CommercialHero` nas famílias comerciais, incluindo materiais e problemas, sem duplicar a estrutura. A revisão da imagem de fundo foi adiada explicitamente; reutilizar os fundos existentes por agora. Esta decisão substitui as composições anteriores dos problemas e da homepage. Manter previews exclusivamente mobile.
+
 ## Uniformização e diversidade SEO (13/09/2026)
 
 Pedido aprovado: localidade × serviço, freguesia × serviço, preços e variantes keyword seguem, depois do hero/indicadores, a ordem orçamento/widget, avaliações, quatro problemas, FAQ, processo específico, mesma visita, serviços/zonas. Problemas e materiais como famílias de páginas ficam para trabalho separado.

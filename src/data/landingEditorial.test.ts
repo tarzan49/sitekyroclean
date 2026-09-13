@@ -10,7 +10,8 @@ describe('landing editorial descriptions', () => {
       const text = `${model.intro} ${model.metaDescription}`;
       expect(text, route.path).not.toMatch(/certificad|milhões|elimina|saudáve|saúde|sem resíduos|recolha.*incluíd|residentes.*confiam|referência|—|99\s*%/i);
       expect(model.intro.length, route.path).toBeLessThan(500);
-      expect(model.intro).toContain(model.locationName);
+      expect(model.h1).toContain(model.locationName);
+      expect(model.intro.length).toBeLessThan(180);
       expect(model.metaDescription).toContain(model.locationName);
       if (['Aveiro', 'Coimbra'].includes(model.municipalityName)) {
         expect(model.intro).toContain('Disponibilidade sob consulta');
@@ -22,11 +23,11 @@ describe('landing editorial descriptions', () => {
   });
   it('explains price intent without presenting waterproofing as extraction cleaning', () => {
     const protection = getLandingPageModel('/preco-impermeabilizacao-lisboa')!;
-    expect(protection.intro).toContain('Essencial e Premium');
+    expect(protection.intro).toContain('Proteção');
     expect(protection.intro).not.toMatch(/extração|água quente/);
     const cleaning = getLandingPageModel('/preco-limpeza-sofas-lisboa')!;
-    expect(cleaning.intro).toContain('configurações');
-    expect(cleaning.intro).not.toBe(getLandingPageModel('/limpeza-sofas-lisboa')!.intro);
+    expect(cleaning.priceHeading).toContain('sofá');
+    expect(cleaning.metaDescription).not.toBe(getLandingPageModel('/limpeza-sofas-lisboa')!.metaDescription);
   });
   it('does not fabricate municipal facts to create local variation', () => {
     const base = { serviceSlug: 'limpeza-colchoes', serviceLabel: 'Limpeza de Colchões', family: 'freguesia', municipality: 'Porto' } as const;

@@ -75,7 +75,6 @@ const LimpezaAlcatifas = () => {
       <main>
         <ServiceHero
           title="Higienização Profissional de Alcatifas"
-          subtitle="Limpeza técnica adaptada a grandes superfícies, garantindo higiene uniforme, frescura e preservação das fibras ao longo do tempo."
           serviceSlug="limpeza-alcatifas"
         />
         <ServicePriceSection serviceSlug="limpeza-alcatifas" />

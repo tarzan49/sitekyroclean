@@ -1,3 +1,4 @@
+import { commercialHeroSubtitle } from '../src/data/commercialHeroCopy';
 import { MATERIAL_PROCESS_GUIDES } from "../src/data/materialProcessGuides";
 import { MATERIAL_EXAMPLES, type MaterialExamples } from "../src/data/materialExamples";
 import { getTreatmentRoutes, getExpansionRoutes, getTreatmentPage, getExpansionPage } from '../src/data/treatmentSeoData';
@@ -466,7 +467,7 @@ export function prerenderRoutes(outDir: string): number {
         mat.metaDescription,
         {
           h1: mat.h1,
-          intro: mat.intro,
+          intro: `Cuidados profissionais para ${mat.name.toLowerCase()}.`,
           materialExamples: MATERIAL_EXAMPLES[mat.slug],
           // cleaningProcess → ordered process steps
           processImage: MATERIAL_PROCESS_GUIDES[mat.slug]?.image,
@@ -498,7 +499,7 @@ export function prerenderRoutes(outDir: string): number {
         data.metaDescription,
         {
           h1: data.h1,
-          intro: data.intro,
+          intro: `Cuidados profissionais para ${data.name.toLowerCase()}.`,
           materialExamples: MATERIAL_EXAMPLES[data.slug],
           processImage: MATERIAL_PROCESS_GUIDES[data.slug]?.image,
           processSteps: MATERIAL_PROCESS_GUIDES[data.slug]?.steps.map((step, i) => ({ step: i + 1, title: step.title, description: step.description, alt: step.alt })) ?? data.cleaningProcess.map((step, i) => ({ step: i + 1, title: step, description: '' })),
@@ -581,7 +582,7 @@ export function prerenderRoutes(outDir: string): number {
         ]),
       ];
       if (data.marca.faqs?.length) schemas.push(buildFaqSchema(data.marca.faqs));
-      emit(route.path, title, desc, { h1: title.split(" | ")[0], intro: data.marca.materialDescription, howItWorks: data.marca.cleaningProcess, benefits: data.marca.doThis, faqs: data.marca.faqs }, schemas);
+      emit(route.path, title, desc, { h1: title.split(" | ")[0], intro: commercialHeroSubtitle(data.marca.serviceSlug, data.city.name), howItWorks: data.marca.cleaningProcess, benefits: data.marca.doThis, faqs: data.marca.faqs }, schemas);
     }
     console.log(`  Marca Sofá pages:        ${count - prev}`);
   }
@@ -604,7 +605,7 @@ export function prerenderRoutes(outDir: string): number {
         ]),
       ];
       if (data.marca.faqs?.length) schemas.push(buildFaqSchema(data.marca.faqs));
-      emit(route.path, title, desc, { h1: title.split(" | ")[0], intro: data.marca.materialDescription, howItWorks: data.marca.cleaningProcess, benefits: data.marca.doThis, faqs: data.marca.faqs }, schemas);
+      emit(route.path, title, desc, { h1: title.split(" | ")[0], intro: commercialHeroSubtitle(data.marca.serviceSlug, data.city.name), howItWorks: data.marca.cleaningProcess, benefits: data.marca.doThis, faqs: data.marca.faqs }, schemas);
     }
     console.log(`  Marca Colchão pages:     ${count - prev}`);
   }
@@ -627,7 +628,7 @@ export function prerenderRoutes(outDir: string): number {
         ]),
       ];
       if (data.marca.faqs?.length) schemas.push(buildFaqSchema(data.marca.faqs));
-      emit(route.path, title, desc, { h1: title.split(" | ")[0], intro: data.marca.materialDescription, howItWorks: data.marca.cleaningProcess, benefits: data.marca.doThis, faqs: data.marca.faqs }, schemas);
+      emit(route.path, title, desc, { h1: title.split(" | ")[0], intro: commercialHeroSubtitle(data.marca.serviceSlug, data.city.name), howItWorks: data.marca.cleaningProcess, benefits: data.marca.doThis, faqs: data.marca.faqs }, schemas);
     }
     console.log(`  Marca Cadeiras pages:    ${count - prev}`);
   }
@@ -939,6 +940,8 @@ export function prerenderRoutes(outDir: string): number {
     ];
 
     for (const page of CORE) {
+      const service = services.find(item => item.baseRoute === page.path);
+      if (service) page.content.intro = commercialHeroSubtitle(service.slug);
       const schemas = [...(page.extraSchemas ?? [])];
       if (page.content.faqs?.length) schemas.push(buildFaqSchema(page.content.faqs));
       emit(page.path, page.title, page.desc, page.content, schemas);
@@ -1090,7 +1093,7 @@ export function prerenderRoutes(outDir: string): number {
   {
     const homeBody = generatePageBody({
       h1: 'Estofos como novos, ao domicílio.',
-      intro: 'O seu sofá, colchão ou tapete como novo em 1h, ao domicílio, sem sair de casa. Avaliação 4.9 Google. Extração profissional. Porto, Gaia, Lisboa e todo o país. Orçamento grátis.',
+      intro: 'Limpeza profissional de sofás, colchões, cadeiras e tapetes.',
     });
     const homeHtml = injectContent(rawTemplate, homeBody);
     fs.writeFileSync(templatePath, homeHtml, 'utf-8');

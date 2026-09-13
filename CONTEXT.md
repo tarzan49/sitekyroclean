@@ -1,6 +1,8 @@
-## Hero partilhado dos problemas (13/09/2026)
+## Estrutura partilhada dos heroes (13/09/2026)
 
-`ProblemHero` é usado por `ProblemPage` e `ProblemCityPage`: fundo verde sem fotografia atrás do texto, título e introdução completos, avaliações Google, WhatsApp, resposta em menos de 10 minutos, preço/deslocação e galeria antes/depois separada. A cidade tem uma linha própria no H1 e entra na mensagem de WhatsApp. `problemHero.ts` fornece texto por intenção, valores das tabelas reais e mensagem contextual; também é usado no prerender. Tapetes/alcatifas mostram «Sob orçamento» e preços de limpeza são identificados como limpeza, sem os confundir com extras. Os dois templates têm agora o destino `#precos` no widget. A antiga faixa de indicadores de `ProblemCityPage` foi retirada do hero. A composição das secções seguintes permanece independente entre páginas nacionais e variantes locais.
+`CommercialHero` centraliza a composição da homepage, serviços nacionais, materiais, problemas nacionais/locais, localidades, freguesias, preços, variantes e marcas. Ordem mobile obrigatória: breadcrumb em Avenir Next, H1, subtítulo curto, WhatsApp, «Ver preços», comparação antes/depois e três indicadores (avaliações, resposta, secagem ou ativação da proteção). Materiais passam também a incluir os indicadores. `ServiceHero` e `ProblemHero` são adaptadores. `ServicePriceSection` fornece o destino `#precos`; homepage aponta para `#servicos`. A escolha/revisão da fotografia de fundo fica adiada por pedido do responsável; as imagens existentes são reutilizadas provisoriamente.
+
+`commercialHeroCopy.ts` fornece os subtítulos curtos por serviço, também usados pelo modelo das quatro famílias e pelo prerender. `problemHero.ts` preserva o contexto do problema e da cidade. Metadados SEO continuam específicos. Navegação reduzida Ads, município real das freguesias, preços, FAQ e composição das secções seguintes permanecem independentes do hero. Esta estrutura substitui os anteriores heroes de problemas e a composição específica da homepage.
 
 ## Biblioteca de problemas de colchões (13/09/2026)
 
@@ -18,7 +20,7 @@
 
 Etapa 3 substitui as contagens iniciais abaixo: 180 perguntas distintas, 40 candidatas por serviço (12 comuns + 28 específicas). `landingFaqExpansion.ts` acrescenta 16 por serviço. `landingFaqPool.ts` filtra perguntas marcadas com `article` nas variantes de impermeabilização de sofá/cadeiras antes da seleção estável. Mantém exatamente quatro perguntas, uma por assunto e pelo menos duas específicas. Os testes verificam que todas as 180 são utilizadas no inventário real.
 
-`landingEditorial.ts` é a fonte pura de `intro` e `metaDescription` dos quatro geradores. Os heroes mostram a introdução completa; o modelo partilhado inclui a descrição SEO e a auditoria compara-a com o HTML inicial. Distingue intenção de preços, serviço e contexto administrativo sem inventar condições locais ou métodos exclusivos de sinónimos. Aveiro/Coimbra explicitam disponibilidade sob consulta. Campos legados não consumidos pelas novas secções continuam nos geradores e não representam conteúdo aprovado. Detalhes em `docs/landing-editorial-review.md`. Validação: 1.928 testes, build de 16.045 rotas, auditorias de 12.912 páginas sem divergências. Imagens ainda pendentes.
+`landingEditorial.ts` é a fonte pura de `intro` e `metaDescription` dos quatro geradores. Os heroes usam agora os subtítulos curtos de `commercialHeroCopy.ts`; o modelo partilhado inclui a descrição SEO e a auditoria compara-a com o HTML inicial. Distingue intenção de preços, serviço e contexto administrativo sem inventar condições locais ou métodos exclusivos de sinónimos. Aveiro/Coimbra explicitam disponibilidade sob consulta. Campos legados não consumidos pelas novas secções continuam nos geradores e não representam conteúdo aprovado. Detalhes em `docs/landing-editorial-review.md`. Validação: 1.928 testes, build de 16.045 rotas, auditorias de 12.912 páginas sem divergências. Imagens ainda pendentes.
 
 ## Biblioteca de FAQ das landing pages (13/09/2026, estado inicial da etapa 1)
 
@@ -52,7 +54,7 @@ A configuração Avenir Next do ramo principal está integrada neste ramo: `main
 
 ## Confiança na homepage (13/09/2026)
 
-`HomeHeroTrust` reúne serviços realizados e avaliações Google numa faixa transparente responsiva, reutilizada no mobile e desktop de `HeroV1`. Usa `SERVICES_COMPLETED_LABEL`, `REVIEW_RATING` e `REVIEW_COUNT` de `business.ts`. Contagem atual: 110+ avaliações, 4.9, +1200 serviços. Os dados SEO ingleses e de problemas importam REVIEW_COUNT por caminho relativo, compatível com os geradores.
+`HomeHeroTrust` reúne serviços realizados e avaliações Google numa faixa transparente responsiva, anteriormente usada no mobile e desktop de `HeroV1`; o hero atual usa os três indicadores de `CommercialHero`. Usa `SERVICES_COMPLETED_LABEL`, `REVIEW_RATING` e `REVIEW_COUNT` de `business.ts`. Contagem atual: 110+ avaliações, 4.9, +1200 serviços. Os dados SEO ingleses e de problemas importam REVIEW_COUNT por caminho relativo, compatível com os geradores.
 
 ## Pontos de alcatifas (13/09/2026)
 

@@ -77,7 +77,6 @@ const LimpezaCadeiras = () => {
       <main>
         <ServiceHero
           title="Higienização Profissional de Cadeiras"
-          subtitle="Limpeza profissional que elimina sujidade do uso diário, ajudando a prolongar a vida do tecido e a manter a higiene do espaço."
           serviceSlug="limpeza-cadeiras"
         />
         <ServicePriceSection serviceSlug="limpeza-cadeiras" />

@@ -76,7 +76,6 @@ const LimpezaColchoes = () => {
       <main>
         <ServiceHero
           title="Higienização Profissional de Colchões"
-          subtitle="Higienização profunda que remove ácaros, bactérias e odores acumulados, promovendo um ambiente mais saudável e confortável."
           serviceSlug="limpeza-colchoes"
         />
 

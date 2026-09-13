@@ -208,7 +208,6 @@ const Impermeabilizacao = () => {
       <main>
         <ServiceHero
           title="Impermeabilização Profissional de Estofos"
-          subtitle="Proteção invisível que cria uma barreira contra líquidos e manchas, preservando o tecido sem alterar o toque ou a aparência."
           serviceSlug="impermeabilizacao"
         />
         <ServicePriceSection serviceSlug="impermeabilizacao" />

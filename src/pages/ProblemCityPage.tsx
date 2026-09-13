@@ -114,7 +114,7 @@ const ProblemCityPage = () => {
       <main>
 
         <ProblemHero problem={problem} city={city.name} />
-        <div id="precos" className="scroll-mt-20"><ServicePriceSection serviceSlug={problem.relatedServices[0]} initialLocation={city.name} /></div>
+        <ServicePriceSection serviceSlug={problem.relatedServices[0]} initialLocation={city.name} />
 
         {/* ═══ AVALIAÇÕES REAIS — logo abaixo do widget ═══ */}
         <section className="py-14 md:py-20 bg-[#FDFDF9]">

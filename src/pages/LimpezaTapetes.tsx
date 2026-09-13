@@ -75,7 +75,6 @@ const LimpezaTapetes = () => {
       <main>
         <ServiceHero
           title="Higienização Profissional de Tapetes"
-          subtitle="Extração profunda que remove resíduos acumulados nas fibras, revitalizando o tapete e melhorando a qualidade do ar interior."
           serviceSlug="limpeza-tapetes"
         />
         <ServicePriceSection serviceSlug="limpeza-tapetes" />

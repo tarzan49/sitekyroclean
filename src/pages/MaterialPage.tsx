@@ -1,3 +1,4 @@
+import CommercialHero from "@/components/CommercialHero";
 import MaterialExamplesGallery from "@/components/MaterialExamplesGallery";
 import DirectoryGroup from "@/components/DirectoryGroup";
 import SofaLeadActions from "@/components/SofaLeadActions";
@@ -118,70 +119,8 @@ const MaterialPage = () => {
       <Header />
       <main>
 
-        {/* ═══ HERO ═══ */}
-        <section className="relative pt-24 md:pt-28 pb-16 md:pb-24 overflow-hidden">
-          <div className="absolute inset-0" style={{ background: "#071a12" }} />
-          <div className="absolute inset-0 overflow-hidden" aria-hidden="true">
-            <img src={heroImg} alt="" className="w-full h-full object-cover" loading="eager" />
-          </div>
-          <div className="absolute inset-0" style={{ background: "linear-gradient(to bottom, rgba(7,26,18,0.42) 0%, rgba(7,26,18,0.65) 40%, rgba(7,26,18,0.88) 75%, rgba(7,26,18,0.97) 100%)" }} />
+        <CommercialHero title={data.h1} subtitle={`Cuidados profissionais para ${data.name.toLowerCase()}.`} serviceSlug={data.serviceSlug} city={cityName ?? undefined} price={servicePrice} image={heroImg} breadcrumbs={[{ label: "Início", to: "/" }, { label: data.serviceName, to: `/${data.serviceSlug}` }, { label: `${data.name}${cityName ? ` · ${cityName}` : ""}` }]} whatsappHref={waHref} source={`material_hero_${data.slug}`} />
 
-          <div className="container mx-auto px-5 sm:px-6 lg:px-8 relative z-10">
-            <div className="max-w-6xl mx-auto grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
-              <div>
-                <PageBreadcrumb items={[
-                  { label: "Início", to: "/" },
-                  { label: data.serviceName, to: `/${data.serviceSlug}` },
-                  { label: `${data.name}${cityName ? ` · ${cityName}` : ""}` },
-                ]} />
-
-                <div className="inline-flex items-start mb-5">
-                  <div className="flex flex-col gap-1">
-                    <div className="w-7 h-px bg-gradient-to-r from-gold to-transparent" />
-                    <span className="text-[10px] font-bold text-gold/90 tracking-[0.30em] uppercase" style={{ textShadow: "0 1px 6px rgba(0,0,0,0.6)" }}>
-                      {data.serviceName}{cityName ? ` · ${cityName}` : ""}
-                    </span>
-                  </div>
-                </div>
-
-                <h1 className="font-playfair text-[1.75rem] sm:text-4xl md:text-5xl lg:text-6xl font-semibold text-white mb-4 leading-[1.12]" style={{ textShadow: "0 2px 16px rgba(0,0,0,0.65)" }}>
-                  {h1Rest}{" "}<span style={{ color: "#D4AF37" }}>{h1Gold}</span>
-                </h1>
-
-                <p className="text-sm sm:text-base md:text-lg text-white/70 leading-relaxed mb-6 max-w-lg line-clamp-2">
-                  {data.intro.match(/^[^.?]*[.?]/)?.[0] ?? data.intro}
-                </p>
-
-                <div className="mb-6">
-                  <TrustRatingBadge variant="mapsLinkClients" />
-                </div>
-
-                <SofaLeadActions city={cityName || "a sua zona"} price={servicePrice} href={waHref} source={`material_hero_${data.slug}`} />
-              </div>
-
-              <div className="mt-8 lg:mt-0">
-                <div className="relative">
-                  <div className="absolute -inset-4 blur-2xl opacity-20" style={{ background: "linear-gradient(135deg, #D4AF37, transparent)" }} />
-                  {beforeAfterCategory ? (
-                    <div className="relative shadow-2xl" style={{ borderTop: "2px solid #D4AF37" }}>
-                      <HeroBeforeAfterPool category={beforeAfterCategory} className="w-full" />
-                    </div>
-                  ) : (
-                    <img
-                      src={heroImg}
-                      alt={`${data.name} profissional`}
-                      className="relative w-full max-h-[440px] object-cover shadow-2xl"
-                      style={{ borderTop: "2px solid #D4AF37" }}
-                      loading="eager"
-                    />
-                  )}
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* ═══ TABELA DE PREÇOS ═══ */}
         <ServicePriceSection serviceSlug={data.serviceSlug} initialLocation={cityName ?? undefined} />
 
         {/* ═══ AVALIAÇÕES REAIS ═══ */}
