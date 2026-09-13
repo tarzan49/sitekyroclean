@@ -140,3 +140,8 @@ Nas páginas de localidades, freguesias, variantes, marcas e preços, a faixa `S
 ## Galeria de materiais (13/09/2026)
 
 Pedido do responsável: a secção dos materiais usa quatro exemplos visuais próprios por tipo, incluindo páginas por localidade. `MaterialExamplesGallery` e `materialExamples.ts` são a fonte partilhada. São imagens ilustrativas geradas, não trabalhos reais nem antes/depois. Manter identificação discreta, texto alternativo e ampliação acessível. Não voltar aos quatro blocos de características escritos.
+
+
+## Processo dos materiais e avaliações (13/09/2026)
+
+Pedido do responsável: nas páginas de material, avaliações imediatamente após os preços e antes dos exemplos visuais. Retirada a galeria intermédia «Antes e depois». Os sete materiais de sofá usam cinco passos ilustrados próprios, em `materialProcessGuides.ts` e no apresentador partilhado `IllustratedProcessGuide`. Não repor o processo escrito duplicado nestes sofás nem chamar resultados reais às imagens geradas. Preservar a comparação do hero e as transcrições das avaliações.

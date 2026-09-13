@@ -1,7 +1,7 @@
 import { DRYING_PROMISE } from '@/constants/commercialPolicy';
 
-interface ProcessStep { label: string; title: string; description: string; alt: string }
-interface ProcessGuide { heading: string; subtitle: string; image: string; steps: ProcessStep[] }
+export interface ProcessStep { label: string; title: string; description: string; alt: string }
+export interface ProcessGuide { heading: string; subtitle: string; image: string; steps: ProcessStep[] }
 const step = (label: string, title: string, description: string, alt: string): ProcessStep => ({ label, title, description, alt });
 const drying = (article: string) => step('Secagem', 'O último cuidado é deixar secar.', `${DRYING_PROMISE} Use ${article} apenas quando estiver completamente seco.`, `${article} a secar num espaço ventilado`);
 const subtitle = 'Do primeiro cuidado à secagem. Explore as cinco etapas da nossa visita.';

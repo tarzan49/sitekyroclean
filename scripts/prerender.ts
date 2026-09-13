@@ -1,3 +1,4 @@
+import { MATERIAL_PROCESS_GUIDES } from "../src/data/materialProcessGuides";
 import { MATERIAL_EXAMPLES, type MaterialExamples } from "../src/data/materialExamples";
 import { getTreatmentRoutes, getExpansionRoutes, getTreatmentPage, getExpansionPage } from '../src/data/treatmentSeoData';
 import { PRICE_PROMISE, SATISFACTION_PROMISE, DRYING_PROMISE, COVERAGE_PROMISE, RESPONSE_PROMISE, AVAILABILITY_PROMISE } from '../src/constants/commercialPolicy';
@@ -141,7 +142,8 @@ interface PageContent {
   benefits?: string[];
   materialExamples?: MaterialExamples;
   faqs?: { question: string; answer: string }[];
-  processSteps?: { step: number; title: string; description: string }[];
+  processImage?: string;
+  processSteps?: { step: number; title: string; description: string; alt?: string }[];
   priceTable?: { item: string; price: string; note?: string }[];
 }
 
@@ -164,7 +166,8 @@ function generatePageBody(c: PageContent, lang: 'pt' | 'en' = 'pt'): string {
     html += `<section><ol>\n`;
     for (const s of c.processSteps) {
       const desc = s.description ? ` ${escHtml(s.description)}` : '';
-      html += `<li><strong>${escHtml(s.title)}</strong>${desc}</li>\n`;
+      const image = c.processImage ? `<div style="position:relative;aspect-ratio:1;overflow:hidden;max-width:400px"><img src="${escHtml(c.processImage)}" alt="${escHtml(s.alt ?? s.title)}" loading="lazy" style="position:absolute;max-width:none;width:300%;height:200%;left:-${((s.step - 1) % 3) * 100}%;top:-${Math.floor((s.step - 1) / 3) * 100}%"></div>` : '';
+      html += `<li>${image}<strong>${escHtml(s.title)}</strong>${desc}</li>\n`;
     }
     html += `</ol></section>\n`;
   }
@@ -452,11 +455,8 @@ export function prerenderRoutes(outDir: string): number {
           intro: mat.intro,
           materialExamples: MATERIAL_EXAMPLES[mat.slug],
           // cleaningProcess → ordered process steps
-          processSteps: mat.cleaningProcess.map((step, i) => ({
-            step: i + 1,
-            title: step,
-            description: '',
-          })),
+          processImage: MATERIAL_PROCESS_GUIDES[mat.slug]?.image,
+          processSteps: MATERIAL_PROCESS_GUIDES[mat.slug]?.steps.map((step, i) => ({ step: i + 1, title: step.title, description: step.description, alt: step.alt })) ?? mat.cleaningProcess.map((step, i) => ({ step: i + 1, title: step, description: '' })),
           faqs: mat.faqs,
         },
         schemas,
@@ -486,11 +486,8 @@ export function prerenderRoutes(outDir: string): number {
           h1: data.h1,
           intro: data.intro,
           materialExamples: MATERIAL_EXAMPLES[data.slug],
-          processSteps: data.cleaningProcess.map((step, i) => ({
-            step: i + 1,
-            title: step,
-            description: '',
-          })),
+          processImage: MATERIAL_PROCESS_GUIDES[data.slug]?.image,
+          processSteps: MATERIAL_PROCESS_GUIDES[data.slug]?.steps.map((step, i) => ({ step: i + 1, title: step.title, description: step.description, alt: step.alt })) ?? data.cleaningProcess.map((step, i) => ({ step: i + 1, title: step, description: '' })),
           faqs: data.faqs,
         },
         schemas,

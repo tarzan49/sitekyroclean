@@ -1,3 +1,7 @@
+## Guias dos materiais de sofá e posição das avaliações (13/09/2026)
+
+`IllustratedProcessGuide` é o apresentador partilhado extraído de `ServiceProcessGuide`, que conserva a sua API e os cinco guias existentes. `materialProcessGuides.ts` fornece cinco etapas para cada um dos sete materiais de sofá, com imagens próprias em `public/images/materials/process-sofa-*.webp`; o prerender usa o mesmo texto e imagens. `MaterialPage` deixou de apresentar a galeria intermédia «Antes e depois», conserva a comparação do hero e usa o guia no lugar do processo escrito nos sofás. Os quatro materiais de tapete mantêm o processo existente. Avaliações movidas para entre a tabela de preços e `MaterialExamplesGallery`, sem duplicação nem alteração das transcrições/pools.
+
 ## Exemplos visuais dos materiais (13/09/2026)
 
 `MaterialExamplesGallery` substitui as características escritas em `MaterialPage` por quatro fotografias ilustrativas por material: duas peças e dois pormenores. Catálogo partilhado com o prerender em `src/data/materialExamples.ts`, imagens WebP em `public/images/materials/`, prompts em `docs/material-examples-images.md`. Abrange os 11 materiais e todas as variantes por cidade. Grelha 2×2 em mobile, ampliação acessível por toque/teclado, sem avanço automático.
