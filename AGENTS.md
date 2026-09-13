@@ -207,3 +207,8 @@ O responsável rejeitou expressamente a inclusão da homepage na uniformização
 ## Garantia no cartão de cadeiras da homepage (13/09/2026)
 
 Pedido do responsável: na secção «Os 4 problemas que resolvemos no próprio dia», o cartão de cadeiras apresenta «Impermeabilização com garantia de até 10 anos e 5 lavagens». Substitui o texto antigo de 12 meses neste cartão.
+
+
+## Exemplos nos seis serviços principais (13/09/2026)
+
+Pedido do responsável: substituir a secção secundária de antes/depois nas seis páginas nacionais por quatro fotos ilustrativas específicas do serviço, em grelha 2×2 também mobile e com ampliação. `ServiceExamplesGallery` reutiliza `VisualExamplesGallery`; preservar a comparação do hero. As imagens dos cartões têm versões WebP de 400/800px, carregamento diferido e original apenas na ampliação. Aplicar esta otimização aos seis serviços.

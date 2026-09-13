@@ -1,8 +1,4 @@
 import ServiceProcessGuide from '@/components/ServiceProcessGuide';
-import impermeabilizacaoAntes from "@/assets/galeria-impermeabilizacao-antes.webp";
-import impermeabilizacaoDepois from "@/assets/galeria-impermeabilizacao-depois.webp";
-import impermeabilizacaoResultado from "@/assets/galeria-impermeabilizacao-resultado.webp";
-import impermeabilizacaoProcesso from "@/assets/galeria-impermeabilizacao-processo.webp";
 import { Check, Droplet, FlaskConical } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -10,7 +6,7 @@ import ServiceCityLinks from "@/components/ServiceCityLinks";
 import ServiceFAQ from "@/components/ServiceFAQ";
 import ServiceSchema from "@/components/ServiceSchema";
 import ServiceHero from "@/components/ServiceHero";
-import ServiceAutoCarousel from "@/components/ServiceAutoCarousel";
+import ServiceExamplesGallery from "@/components/ServiceExamplesGallery";
 import ServiceExpertTips from "@/components/ServiceExpertTips";
 import ServicePriceSection from "@/components/ServicePriceSection";
 import SectionHeader from "@/components/SectionHeader";
@@ -212,19 +208,7 @@ const Impermeabilizacao = () => {
         />
         <ServicePriceSection serviceSlug="impermeabilizacao" />
         <WaterproofingTierComparison />
-        <ServiceAutoCarousel
-          category="impermeabilizacao"
-          heading="Antes e depois da proteção"
-          subtitle="Explore os exemplos de proteção dos tecidos. As demonstrações ilustrativas estão identificadas em cada comparação."
-          overline="A Barreira Invisível"
-          beforeImage={impermeabilizacaoAntes}
-          afterImage={impermeabilizacaoDepois}
-          slides={[
-            { src: impermeabilizacaoResultado, label: "Pormenor" },
-            { src: impermeabilizacaoProcesso, label: "Impermeável" },
-          ]}
-          variant="dark"
-        />
+        <ServiceExamplesGallery serviceSlug="impermeabilizacao" />
         <ServiceProcessGuide serviceSlug="impermeabilizacao" />
         <ServiceEliteGuarantee
           heading="A nossa promessa em cada impermeabilização"

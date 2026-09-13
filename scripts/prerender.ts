@@ -1,3 +1,4 @@
+import { getServiceExamples } from '../src/data/serviceExamples';
 import { commercialHeroSubtitle } from '../src/data/commercialHeroCopy';
 import { MATERIAL_PROCESS_GUIDES } from "../src/data/materialProcessGuides";
 import { MATERIAL_EXAMPLES, type MaterialExamples } from "../src/data/materialExamples";
@@ -139,6 +140,7 @@ function buildFaqSchema(faqs: { question: string; answer: string }[]) {
 // ─── Content HTML generators ───────────────────────────────────────────────
 
 interface PageContent {
+  serviceExamples?: ReturnType<typeof getServiceExamples>;
   hero?: ReturnType<typeof getProblemHero>;
   h1: string;
   intro: string;
@@ -158,6 +160,14 @@ function generatePageBody(c: PageContent, lang: 'pt' | 'en' = 'pt'): string {
 
   if (c.hero) {
     html += `<p>${escHtml(c.hero.eyebrow)}</p><p>${escHtml(c.hero.priceLabel)} + ${escHtml(c.hero.travelLabel)}</p><a href="${escHtml(c.hero.waHref)}">Pedir orçamento por WhatsApp</a><p>${escHtml(c.hero.response)} · Sem compromisso</p><a href="#precos">${escHtml(c.hero.priceLinkLabel)}</a><div id="precos"><a href="${escHtml(c.hero.service.baseRoute)}#precos">Orçamento de ${escHtml(c.hero.service.name.toLowerCase())}</a></div>\n`;
+  }
+
+  if (c.serviceExamples) {
+    html += `<section id="exemplos"><h2>Veja alguns exemplos</h2><div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px">`;
+    for (const image of c.serviceExamples) {
+      html += `<figure><img src="${escHtml(image.thumbnailSrc)}" srcset="${escHtml(image.thumbnailSrcSet)}" sizes="${escHtml(image.thumbnailSizes)}" alt="${escHtml(image.alt)}" loading="lazy" decoding="async" style="width:100%;aspect-ratio:1;object-fit:cover"><figcaption>${escHtml(image.label)}</figcaption></figure>`;
+    }
+    html += `</div><p>Imagens ilustrativas. Toque para ampliar.</p></section>`;
   }
 
   if (c.localSection) {
@@ -941,7 +951,10 @@ export function prerenderRoutes(outDir: string): number {
 
     for (const page of CORE) {
       const service = services.find(item => item.baseRoute === page.path);
-      if (service) page.content.intro = commercialHeroSubtitle(service.slug);
+      if (service) {
+        page.content.intro = commercialHeroSubtitle(service.slug);
+        page.content.serviceExamples = getServiceExamples(service.slug);
+      }
       const schemas = [...(page.extraSchemas ?? [])];
       if (page.content.faqs?.length) schemas.push(buildFaqSchema(page.content.faqs));
       emit(page.path, page.title, page.desc, page.content, schemas);

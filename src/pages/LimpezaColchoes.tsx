@@ -8,15 +8,12 @@ import { DEFAULT_PRICE_FROM } from "@/data/locationSeoData";
 import ServiceFAQ from "@/components/ServiceFAQ";
 import ServiceSchema from "@/components/ServiceSchema";
 import ServiceHero from "@/components/ServiceHero";
-import ServiceAutoCarousel from "@/components/ServiceAutoCarousel";
+import ServiceExamplesGallery from "@/components/ServiceExamplesGallery";
 import ServiceExpertTips from "@/components/ServiceExpertTips";
 import ServicePriceSection from "@/components/ServicePriceSection";
 import ServiceEliteGuarantee, { GuaranteeItem } from "@/components/ServiceEliteGuarantee";
 import { ExpertTip } from "@/components/ServiceExpertTips";
-import colchaoAntes from "@/assets/galeria-colchao-antes.webp";
-import colchaoDepois from "@/assets/galeria-colchao-depois.webp";
 import colchaoResultado from "@/assets/galeria-colchao-resultado.webp";
-import colchaoProcesso from "@/assets/galeria-colchao-processo.webp";
 
 const colchoesGuarantee: GuaranteeItem[] = [
   {
@@ -81,18 +78,7 @@ const LimpezaColchoes = () => {
 
         <ServicePriceSection serviceSlug="limpeza-colchoes" />
 
-        <ServiceAutoCarousel
-          category="colchao"
-          subtitle="Explore a galeria e arraste a divisória para comparar o antes e o depois de cada limpeza."
-          overline="Higiene Revelada"
-          beforeImage={colchaoDepois}
-          afterImage={colchaoAntes}
-          slides={[
-            { src: '/images/colchoes/v3.webp', label: "Pormenor" },
-            { src: colchaoProcesso, label: "Extração" },
-          ]}
-          variant="dark"
-        />
+        <ServiceExamplesGallery serviceSlug="limpeza-colchoes" />
         <ServiceProcessGuide serviceSlug="limpeza-colchoes" />
         <ServiceEliteGuarantee
           heading="A nossa promessa em cada higienização de colchão"

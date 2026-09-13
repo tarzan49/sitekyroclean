@@ -7,14 +7,11 @@ import ServiceCityLinks from "@/components/ServiceCityLinks";
 import ServiceFAQ from "@/components/ServiceFAQ";
 import ServiceSchema from "@/components/ServiceSchema";
 import ServiceHero from "@/components/ServiceHero";
-import ServiceAutoCarousel from "@/components/ServiceAutoCarousel";
+import ServiceExamplesGallery from "@/components/ServiceExamplesGallery";
 import ServiceExpertTips from "@/components/ServiceExpertTips";
 import ServicePriceSection from "@/components/ServicePriceSection";
 import ServiceEliteGuarantee, { GuaranteeItem } from "@/components/ServiceEliteGuarantee";
 import { ExpertTip } from "@/components/ServiceExpertTips";
-import tapeteAntes from "@/assets/tapete-antes.webp";
-import tapeteDepois from "@/assets/tapete-depois.webp";
-import alcatifaResultado from "@/assets/galeria-alcatifa-resultado.webp";
 import alcatifaProcesso from "@/assets/galeria-alcatifa-processo.webp";
 
 const alcatifasGuarantee: GuaranteeItem[] = [
@@ -78,18 +75,7 @@ const LimpezaAlcatifas = () => {
           serviceSlug="limpeza-alcatifas"
         />
         <ServicePriceSection serviceSlug="limpeza-alcatifas" />
-        <ServiceAutoCarousel
-          category="tapete"
-          subtitle="Explore a galeria e arraste a divisória para comparar o antes e o depois de cada limpeza."
-          overline="O Resultado Final"
-          beforeImage={tapeteAntes}
-          afterImage={tapeteDepois}
-          slides={[
-            { src: alcatifaProcesso, label: "Pormenor" },
-            { src: '/images/alcatifas/v1.jpg', label: "Extração" },
-          ]}
-          variant="dark"
-        />
+        <ServiceExamplesGallery serviceSlug="limpeza-alcatifas" />
         <ServiceProcessGuide serviceSlug="limpeza-alcatifas" />
         <ServiceEliteGuarantee
           heading="A nossa promessa em cada limpeza de alcatifa"

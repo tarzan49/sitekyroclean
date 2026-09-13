@@ -7,16 +7,12 @@ import ServiceCityLinks from "@/components/ServiceCityLinks";
 import ServiceFAQ from "@/components/ServiceFAQ";
 import ServiceSchema from "@/components/ServiceSchema";
 import ServiceHero from "@/components/ServiceHero";
-import ServiceAutoCarousel from "@/components/ServiceAutoCarousel";
+import ServiceExamplesGallery from "@/components/ServiceExamplesGallery";
 import ServiceExpertTips from "@/components/ServiceExpertTips";
 import ServicePriceSection from "@/components/ServicePriceSection";
 import ServiceEliteGuarantee, { GuaranteeItem } from "@/components/ServiceEliteGuarantee";
 import { ExpertTip } from "@/components/ServiceExpertTips";
-import cadeiraAntes from "@/assets/galeria-cadeira-antes.webp";
-import cadeiraDepois from "@/assets/galeria-cadeira-depois.webp";
-import cadeiraResultado from "@/assets/galeria-cadeira-resultado.webp";
 import cadeiraProcesso from "@/assets/galeria-cadeira-processo.webp";
-import cadeirasHero from "@/assets/service-chairs-new.webp";
 
 const cadeirasGuarantee: GuaranteeItem[] = [
   {
@@ -80,19 +76,7 @@ const LimpezaCadeiras = () => {
           serviceSlug="limpeza-cadeiras"
         />
         <ServicePriceSection serviceSlug="limpeza-cadeiras" />
-        <ServiceAutoCarousel
-          category="cadeiras"
-          subtitle="Explore a galeria e arraste a divisória para comparar o antes e o depois de cada limpeza."
-          overline="Do Uso ao Novo"
-          beforeImage={cadeiraAntes}
-          afterImage={cadeiraDepois}
-          slides={[
-            { src: cadeiraResultado, label: "Pormenor" },
-            { src: cadeirasHero, label: "Extração" },
-          ]}
-          variant="dark"
-          rotateBeforeAfter
-        />
+        <ServiceExamplesGallery serviceSlug="limpeza-cadeiras" />
         <ServiceProcessGuide serviceSlug="limpeza-cadeiras" />
         <ServiceEliteGuarantee
           heading="A nossa promessa em cada limpeza de cadeiras"

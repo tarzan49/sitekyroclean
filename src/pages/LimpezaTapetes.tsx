@@ -7,15 +7,12 @@ import ServiceCityLinks from "@/components/ServiceCityLinks";
 import ServiceFAQ from "@/components/ServiceFAQ";
 import ServiceSchema from "@/components/ServiceSchema";
 import ServiceHero from "@/components/ServiceHero";
-import ServiceAutoCarousel from "@/components/ServiceAutoCarousel";
+import ServiceExamplesGallery from "@/components/ServiceExamplesGallery";
 import ServiceExpertTips from "@/components/ServiceExpertTips";
 import ServicePriceSection from "@/components/ServicePriceSection";
 import ServiceEliteGuarantee, { GuaranteeItem } from "@/components/ServiceEliteGuarantee";
 import { ExpertTip } from "@/components/ServiceExpertTips";
-import tapeteAntes from "@/assets/galeria-tapete-antes.webp";
 import tapeteDepois from "@/assets/galeria-tapete-depois.webp";
-import tapeteResultado from "@/assets/galeria-alcatifa-resultado.webp";
-import tapeteProcesso from "@/assets/galeria-tapete-processo.webp";
 
 const tapetesGuarantee: GuaranteeItem[] = [
   {
@@ -78,18 +75,7 @@ const LimpezaTapetes = () => {
           serviceSlug="limpeza-tapetes"
         />
         <ServicePriceSection serviceSlug="limpeza-tapetes" />
-        <ServiceAutoCarousel
-          category="tapete"
-          subtitle="Explore a galeria e arraste a divisória para comparar o antes e o depois de cada limpeza."
-          overline="A Transformação"
-          beforeImage={tapeteAntes}
-          afterImage={tapeteDepois}
-          slides={[
-            { src: '/images/tapetes/v2.webp', label: "Técnico" },
-            { src: tapeteProcesso, label: "Extração" },
-          ]}
-          variant="dark"
-        />
+        <ServiceExamplesGallery serviceSlug="limpeza-tapetes" />
         <ServiceProcessGuide serviceSlug="limpeza-tapetes" />
         <ServiceEliteGuarantee
           heading="A nossa promessa em cada limpeza de tapete"

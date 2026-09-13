@@ -1261,3 +1261,8 @@ Materiais: sequência de fundos aprovada: exemplos branco, processo verde, pergu
 ## Verde suave e heroes mobile (13/09/2026)
 
 Pedido aprovado: a paleta verde suave do piloto passa a ser partilhada pelo site, em `src/styles/surfaces.css`, sem a antiga textura. As áreas claras continuam claras. Em mobile (até 767px), os heroes usam fundo verde com degradé e fotografia/comparação separada do texto; no computador conserva-se a fotografia de fundo. `data-mobile-hero` delimita o tratamento nos heroes comerciais, marcas, materiais, problemas, páginas informativas, packs, blog e inglês. `CommercialHero` mantém a composição única e usa `preserveMobileHero` apenas na homepage: preservar a aparência e as fotografias do seu hero em todos os tamanhos. O piloto `scripts/preview-hero-mobile.mjs` passou a servir os estilos reais, sem uma segunda cópia da proposta CSS. Não confundir esta aprovação visual com alterações de preços, conteúdo, FAQ ou fluxos comerciais.
+
+
+## Exemplos dos serviços nacionais (13/09/2026)
+
+`ServiceExamplesGallery` substitui `ServiceAutoCarousel` nas seis páginas principais, com quatro exemplos em duas colunas. `serviceExamples.ts` seleciona imagens estáveis das bibliotecas existentes e partilha os dados com o prerender. `VisualExamplesGallery` aceita miniatura, srcset e sizes opcionais; as restantes galerias conservam os valores anteriores. Versões 400/800px em `public/images/service-examples/`; originais da biblioteca só na ampliação. Miniaturas mobile entre 7 e 25 KB, 24 imagens nos seis serviços.

@@ -7,15 +7,11 @@ import { DEFAULT_PRICE_FROM } from "@/data/locationSeoData";
 import ServiceFAQ from "@/components/ServiceFAQ";
 import ServiceSchema from "@/components/ServiceSchema";
 import ServiceHero from "@/components/ServiceHero";
-import ServiceAutoCarousel from "@/components/ServiceAutoCarousel";
+import ServiceExamplesGallery from "@/components/ServiceExamplesGallery";
 import ServiceExpertTips from "@/components/ServiceExpertTips";
 import ServicePriceSection from "@/components/ServicePriceSection";
 import ServiceEliteGuarantee, { GuaranteeItem } from "@/components/ServiceEliteGuarantee";
 import { ExpertTip } from "@/components/ServiceExpertTips";
-import sofaBeforeNew from "@/assets/galeria-sofa-antes-2.webp";
-import sofaAfterNew from "@/assets/galeria-sofa-depois-2.webp";
-import sofaResultado from "@/assets/sofa-pele-pormenor.webp";
-import sofaProcesso from "@/assets/sofa-extracao.webp";
 
 const sofaGuarantee: GuaranteeItem[] = [
   {
@@ -78,18 +74,7 @@ const LimpezaSofas = () => {
           serviceSlug="limpeza-sofas"
         />
         <ServicePriceSection serviceSlug="limpeza-sofas" />
-        <ServiceAutoCarousel
-          category="sofa"
-          subtitle="Explore a galeria e arraste a divisória para comparar o antes e o depois de cada limpeza."
-          overline="Antes e Depois"
-          beforeImage={sofaBeforeNew}
-          afterImage={sofaAfterNew}
-          slides={[
-            { src: sofaResultado, label: "Pormenor" },
-            { src: sofaProcesso, label: "Extração Profissional", objectPosition: "bottom" },
-          ]}
-          variant="dark"
-        />
+        <ServiceExamplesGallery serviceSlug="limpeza-sofas" />
         <ServiceEliteGuarantee
           heading="A nossa promessa em cada limpeza de sofá"
           items={sofaGuarantee}

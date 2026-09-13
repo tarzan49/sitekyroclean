@@ -5,7 +5,7 @@ import SectionHeader from "@/components/SectionHeader";
 import * as Dialog from "@radix-ui/react-dialog";
 import type { CSSProperties } from "react";
 
-export interface VisualExample { label: string; alt: string; src: string; imageStyle?: CSSProperties; id?: string; description?: string }
+export interface VisualExample { label: string; alt: string; src: string; thumbnailSrc?: string; thumbnailSrcSet?: string; thumbnailSizes?: string; imageStyle?: CSSProperties; id?: string; description?: string }
 
 export default function VisualExamplesGallery({ examples, name, overline = "Material", heading = "Veja exemplos de", id = "material", imageDescription, onEnquire }: { examples: VisualExample[]; name: string; overline?: string; heading?: string; id?: string; imageDescription?: string; onEnquire?: () => void }) {
   const [selected, setSelected] = useState<number | null>(null);
@@ -13,7 +13,9 @@ export default function VisualExamplesGallery({ examples, name, overline = "Mate
   const photo = (index: number, loading: "lazy" | "eager" = "lazy") => (
     <div className="relative aspect-square overflow-hidden bg-[#173629]">
       <img
-        src={examples[index].src}
+        src={loading === "lazy" ? examples[index].thumbnailSrc ?? examples[index].src : examples[index].src}
+        srcSet={loading === "lazy" ? examples[index].thumbnailSrcSet : undefined}
+        sizes={loading === "lazy" ? examples[index].thumbnailSizes : undefined}
         alt={examples[index].alt}
         loading={loading}
         decoding="async"
