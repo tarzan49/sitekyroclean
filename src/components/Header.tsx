@@ -152,7 +152,7 @@ const Header = () => {
           </a>
           <button
             onClick={openQuiz}
-            className="border border-[#D4AF37] bg-[#111111] text-white text-[10px] font-semibold tracking-[0.18em] uppercase px-5 py-2.5 hover:bg-[#2A2A2A] transition-colors whitespace-nowrap"
+            className="border border-[#D4AF37] bg-gradient-to-r from-[#202020] to-[#4A4A4A] text-white text-[10px] font-semibold tracking-[0.18em] uppercase px-5 py-2.5 hover:from-[#2A2A2A] hover:to-[#555555] transition-colors whitespace-nowrap"
           >
             Agendar limpeza
           </button>
