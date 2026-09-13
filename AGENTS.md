@@ -126,3 +126,7 @@ Responsável confirmou 110+ avaliações Google, nota 4.9. REVIEW_COUNT é 110 e
 Avenir Next é a fonte do site, incluindo toda a homepage. Usar `src/styles/typography.css`, `--font-kyro` e as faces web em `public/fonts/avenir-next/`, integradas do ramo principal. O alias legado `font-playfair` também resolve para Avenir. Não repor Cormorant/Inter na homepage.
 
 Peso dos títulos do site (13/09/2026): manter H1 como aprovado; títulos secundários H2–H6 usam Avenir Demi 600, não Bold 700, em todo o site. Regra global em `typography.css`, por pedido explícito do responsável.
+
+## Avaliações compactas no mobile (13/09/2026)
+
+Os cartões partilhados de avaliações (`CustomerReviewCard`, usados por `CustomerReviews` na homepage e páginas de serviços/localidades) têm altura uniforme de 340px abaixo de 640px, texto de 18px com até seis linhas e abertura da transcrição integral num diálogo acessível quando necessário. O carrossel deixou de ajustar a altura à avaliação selecionada. Preservar as transcrições e a apresentação desktop.

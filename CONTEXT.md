@@ -1174,3 +1174,7 @@ A recolha, IDs de tentativa/visita, fila persistente, tratamento do histórico e
 ## Pré-visualização Avenir Next (13/09/2026)
 
 A página de colchões em Paranhos mantém o comparador exclusivamente DEV: `?teste=fontes&fonte=avenir#precos`. `FontComparisonPanel` oferece Atual/Avenir Next e conserva os testes anteriores em detalhes. A proposta ajusta pesos, escala, contraste e alinhamento através de estilos limitados ao atributo de pré-visualização; usa apenas fontes locais do dispositivo, sem distribuir ficheiros comerciais. Mostra aviso quando as faces locais não estão disponíveis. `PriceWidget` apresenta «Escolha os colchões» apenas na proposta DEV. Produção mantém a tipografia e o texto anteriores. Avenir Next ainda é uma proposta, não uma decisão de marca; publicação exige licença web.
+
+## Avaliações compactas no mobile (13/09/2026)
+
+Os cartões partilhados de avaliações (`CustomerReviewCard`, usados por `CustomerReviews` na homepage e páginas de serviços/localidades) têm altura uniforme de 340px abaixo de 640px, texto de 18px com até seis linhas e abertura da transcrição integral num diálogo acessível quando necessário. O carrossel deixou de ajustar a altura à avaliação selecionada. Preservar as transcrições e a apresentação desktop.
