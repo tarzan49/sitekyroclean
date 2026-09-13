@@ -79,7 +79,7 @@ const QuizSofaAddonUpsell = ({ formData, updateFormData, sofaItems, setSofaItems
   }, 0);
 
   return (
-    <div className="flex flex-col gap-3 overflow-hidden items-center w-full">
+    <div data-typography="sofa-care" className="flex flex-col gap-3 overflow-hidden items-center w-full">
       <p className="text-gold text-[10px] font-bold tracking-[0.28em] uppercase mb-0.5 text-center w-full">ANTES DE SEGUIR</p>
       <h2 className="font-playfair text-2xl sm:text-3xl font-bold text-white text-center w-full leading-snug">
         {titleBase}

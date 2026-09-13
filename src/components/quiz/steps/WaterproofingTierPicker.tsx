@@ -37,9 +37,9 @@ export function WaterproofingTierPicker({ formData, updateFormData, onSelect, ac
         {!compact && <ShieldCheck aria-hidden="true" className="w-7 h-7 text-gold mb-2" />}
         <div className={cn("flex items-center gap-1.5 mb-0.5", centered && "justify-center")}>
           {tier === 'premium' && <Check className="w-3 h-3 text-gold flex-shrink-0" />}
-          <p className={cn('text-xs font-bold', tier === 'premium' ? 'text-white' : 'text-white/85')}>Premium</p>
+          <p data-typography="tier-name" className={cn('text-xs font-bold', tier === 'premium' ? 'text-white' : 'text-white/85')}>Premium</p>
         </div>
-        {prices && <p className="text-xl font-bold text-gold mt-2 mb-1">{prices.premium === null ? 'Sob orçamento' : `+${prices.premium.toLocaleString('pt-PT')}€`}</p>}
+        {prices && <p data-typography="tier-price" className="text-xl font-bold text-gold mt-2 mb-1">{prices.premium === null ? 'Sob orçamento' : `+${prices.premium.toLocaleString('pt-PT')}€`}</p>}
         {prices && !compact && <p className="text-[10px] text-white/65 mb-2">{priceScope} · antes de descontos</p>}
         {premiumDifference != null && premiumDifference > 0 && <p className="text-[11px] font-semibold text-gold mb-2 leading-snug">Só mais {premiumDifference.toLocaleString('pt-PT')}€ que o Essencial</p>}
         <p className={cn('text-[11px] leading-relaxed font-semibold', tier === 'premium' ? 'text-gold/70' : 'text-gold/80')}>{compact ? 'Até 10 anos · até 5 lavagens' : 'Até 10 anos de proteção · até 5 lavagens'}</p>
@@ -54,9 +54,9 @@ export function WaterproofingTierPicker({ formData, updateFormData, onSelect, ac
         {!compact && <Droplets aria-hidden="true" className="w-7 h-7 text-gold/75 mb-2" />}
         <div className={cn("flex items-center gap-1.5 mb-0.5", centered && "justify-center")}>
           {tier === 'essencial' && <Check className="w-3 h-3 text-gold flex-shrink-0" />}
-          <p className={cn('text-xs font-bold', tier === 'essencial' ? 'text-white' : 'text-white/80')}>Essencial</p>
+          <p data-typography="tier-name" className={cn('text-xs font-bold', tier === 'essencial' ? 'text-white' : 'text-white/80')}>Essencial</p>
         </div>
-        {prices && <p className="text-xl font-bold text-white mt-2 mb-1">{prices.essencial === null ? 'Sob orçamento' : `+${prices.essencial.toLocaleString('pt-PT')}€`}</p>}
+        {prices && <p data-typography="tier-price" className="text-xl font-bold text-white mt-2 mb-1">{prices.essencial === null ? 'Sob orçamento' : `+${prices.essencial.toLocaleString('pt-PT')}€`}</p>}
         {prices && !compact && <p className="text-[10px] text-white/65 mb-2">{priceScope} · antes de descontos</p>}
         <p className="text-[10px] text-white/70 leading-snug">{compact ? '1 a 2 anos · até 2 lavagens' : '1 a 2 anos de proteção · até 2 lavagens'}</p>
       </button>
