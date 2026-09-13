@@ -140,7 +140,7 @@ const QuizComboUpsellScreen = ({ offerPreview = false, travelFee = 10, primarySe
     ? (chairsRegularPrice !== null && chairsCleanPrice !== null
         ? <PriceCompare original={chairsRegularPrice} promo={chairsCleanPrice} />
         : 'Sob orçamento')
-    : '4 cadeiras pelo preço de 3';
+    : <span className="inline-flex flex-wrap items-baseline gap-x-1.5"><span className="text-xs font-normal text-white/70">4 cadeiras:</span><PriceCompare original={calcChairClean(4)!} promo={calcChairClean(4)! * 3 / 4} /></span>;
 
   // Sincroniza o subtotal e os itens em tempo real com o formData do quiz —
   // a "Estimativa" no topo do modal tem de acompanhar cada +1/-1 aqui dentro,
@@ -386,11 +386,11 @@ const QuizComboUpsellScreen = ({ offerPreview = false, travelFee = 10, primarySe
     );
   }
 
-  const rowConfig: { view: View; label: string; summary: string; priceLine: ReactNode; selected: boolean; imagePosition: string }[] = [
+  const rowConfig: { view: View; label: string; summary: string; priceLine: ReactNode; benefit?: string; condition?: string; selected: boolean; imagePosition: string }[] = [
     { view: 'mattress', imagePosition: '0% 0%', label: 'Colchão', summary: mattressSummary, priceLine: mattressPriceLine, selected: mattressQtyTotal > 0 },
     { view: 'sofa', imagePosition: '100% 0%', label: 'Sofá', summary: sofaSummary, priceLine: sofaPriceLine, selected: sofaQtyTotal > 0 },
-    { view: 'chairs', imagePosition: '0% 100%', label: 'Cadeiras', summary: chairsSummary, priceLine: chairsPriceLine, selected: chairsQty > 0 },
-    { view: 'carpet', imagePosition: '100% 100%', label: 'Tapete', summary: carpetSummary, priceLine: '5 m² pelo preço de 4', selected: carpetValidCount > 0 },
+    { view: 'chairs', imagePosition: '0% 100%', label: 'Cadeiras', summary: chairsSummary, priceLine: chairsPriceLine, benefit: initialChairs?.waterproof ? undefined : '1 cadeira de oferta', condition: 'Por cada 4 cadeiras que juntar.', selected: chairsQty > 0 },
+    { view: 'carpet', imagePosition: '100% 100%', label: 'Tapete', summary: carpetSummary, priceLine: 'Valor sob orçamento', benefit: '1 m² de oferta', condition: 'Por cada 5 m² de tapete.', selected: carpetValidCount > 0 },
   ];
 
   const visibleRows = rowConfig.filter(row => row.view !== primaryService || row.selected);
@@ -402,11 +402,11 @@ const QuizComboUpsellScreen = ({ offerPreview = false, travelFee = 10, primarySe
         {offerPreview ? 'APROVEITE A MESMA VISITA' : 'UM BÓNUS PARA SI'}
       </p>
       <h2 className="font-playfair text-2xl sm:text-3xl font-bold text-white text-center w-full">
-        {offerPreview ? 'Quer limpar mais alguma coisa?' : 'Adicione mais um serviço'}
+        {offerPreview ? 'Mais limpeza. Menos a pagar.' : 'Adicione mais um serviço'}
       </h2>
       <p className="text-xs text-white/55 text-center max-w-xs leading-relaxed -mt-1">
         {offerPreview
-          ? <>Preço reduzido em cada artigo que juntar a esta visita. Deslocação excluída.</>
+          ? <>Junte o que falta limpar e aproveite estas ofertas na mesma visita. Deslocação excluída.</>
           : <>Combine mais um serviço na mesma visita e poupe no preço de cada artigo. Deslocação excluída.</>}
       </p>
 
@@ -419,10 +419,10 @@ const QuizComboUpsellScreen = ({ offerPreview = false, travelFee = 10, primarySe
             onClick={() => { if (offerPreview && row.view === 'mattress' && mattressQtyTotal === 0) setMattQty('casal', 1); setView(row.view); }}
             className={cn(
               'group relative flex items-center gap-3 rounded-sm border px-3 text-left transition-all duration-200 touch-manipulation active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold',
-              compactRows ? 'min-h-[78px] py-1.5 pr-12' : 'min-h-[132px] flex-col justify-center py-2.5',
+              compactRows ? 'min-h-[78px] py-3 pr-10 sm:pr-12' : 'min-h-[132px] flex-col justify-center py-2.5',
               row.selected
                 ? offerPreview ? 'border-gold/40 bg-white/[0.04]' : 'border-gold bg-[#1a2a1a] shadow-[0_0_14px_rgba(212,175,55,0.20)]'
-                : offerPreview ? 'border-white/10 bg-white/[0.025] hover:border-gold/30' : 'border-dashed border-gold/55 bg-gold/[0.025] hover:border-gold hover:bg-gold/[0.05]'
+                : offerPreview ? 'border-[#D4AF37]/35 bg-gradient-to-br from-[#D4AF37]/[0.09] to-transparent hover:border-[#D4AF37]/70' : 'border-dashed border-gold/55 bg-gold/[0.025] hover:border-gold hover:bg-gold/[0.05]'
             )}
           >
             <span className={cn(
@@ -436,12 +436,19 @@ const QuizComboUpsellScreen = ({ offerPreview = false, travelFee = 10, primarySe
             </span>
             <span
               aria-hidden="true"
-              className="block w-16 h-16 shrink-0 transition-transform duration-200 group-hover:scale-105 motion-reduce:transform-none"
+              className="block w-12 h-12 sm:w-16 sm:h-16 shrink-0 transition-transform duration-200 group-hover:scale-105 motion-reduce:transform-none"
               style={{ backgroundImage: 'url(/images/services/quote-furniture.png)', backgroundSize: '200% 200%', backgroundPosition: row.imagePosition }}
             />
             <span className={cn('min-w-0 flex flex-col gap-1', !compactRows && 'w-full')}>
               <span className="text-sm font-bold text-white">{row.label}</span>
-              <span className="text-[12px] font-normal leading-relaxed text-gold/75">{offerPreview ? row.priceLine : row.summary}</span>
+              {offerPreview && row.benefit && (
+                <span className="flex flex-col items-start gap-1">
+                  <span className="rounded-sm bg-[#D4AF37] px-2 py-0.5 text-[10px] font-extrabold tracking-wider text-[#071a12]">OFERTA</span>
+                  <span className="text-base sm:text-lg font-extrabold leading-tight text-[#D4AF37]">{row.benefit}</span>
+                  <span className="text-xs leading-snug text-white/70">{row.condition}</span>
+                </span>
+              )}
+              <span className={cn('leading-relaxed', offerPreview ? 'text-sm font-semibold text-[#D4AF37]' : 'text-[12px] font-normal text-gold/75')}>{offerPreview ? row.priceLine : row.summary}</span>
               {offerPreview && row.selected && <span className="text-[10px] text-white/45">{row.summary}</span>}
             </span>
           </button>

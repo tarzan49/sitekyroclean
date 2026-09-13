@@ -45,7 +45,7 @@ describe('final upsell navigation', () => {
   it('never mentions a 10%-off-the-order discount, in offerPreview mode or not', () => {
     const { rerender } = render(<Harness primaryService="sofa" offerPreview />);
     expect(screen.getByText('APROVEITE A MESMA VISITA')).toBeTruthy();
-    expect(screen.getByRole('heading', { name: 'Quer limpar mais alguma coisa?' })).toBeTruthy();
+    expect(screen.getByRole('heading', { name: 'Mais limpeza. Menos a pagar.' })).toBeTruthy();
     expect(screen.queryByText(/10%/)).toBeNull();
     rerender(<Harness primaryService="sofa" offerPreview={false} />);
     expect(screen.getByRole('heading', { name: 'Adicione mais um serviço' })).toBeTruthy();
