@@ -77,9 +77,19 @@ const Header = () => {
           onClick={(e) => {
             if (location.pathname === "/") { e.preventDefault(); window.scrollTo({ top: 0, behavior: "smooth" }); }
           }}
-          className="font-playfair text-[15px] md:text-[17px] font-normal text-[#111111] tracking-tight leading-none flex-1 text-center md:flex-none md:text-left md:shrink-0"
+          className="flex h-11 min-w-0 flex-1 items-center justify-center text-center leading-none md:h-auto md:block md:flex-none md:text-left md:shrink-0"
         >
-          Kyro Clean Solutions
+          <span className="flex flex-col items-center gap-1 md:hidden">
+            <span className="font-playfair text-[16px] font-medium tracking-[-0.02em] text-[#111111]">
+              Kyro Clean
+            </span>
+            <span className="pl-[0.24em] text-[7px] font-bold uppercase tracking-[0.24em] text-[#9A7A18]">
+              Solutions
+            </span>
+          </span>
+          <span className="hidden font-playfair text-[17px] font-normal tracking-tight text-[#111111] md:inline">
+            Kyro Clean Solutions
+          </span>
         </Link>
 
         {/* ── CENTER: desktop nav ── */}
@@ -191,7 +201,7 @@ const Header = () => {
           <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
             <SheetTrigger asChild>
               <button
-                className="flex flex-col justify-center items-center w-10 h-10 gap-[5px]"
+                className="flex flex-col justify-center items-center w-11 h-11 gap-[5px]"
                 aria-label="Menu"
               >
                 <span className="block w-5 h-px bg-[#111111]" />

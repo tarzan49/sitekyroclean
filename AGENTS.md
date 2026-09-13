@@ -110,3 +110,7 @@ Atualização do teste local (2026-09-10): `?teste=quiz-pack` agora demonstra co
 ## Contacto simples (2026-09-10)
 
 O passo «Os seus dados» começa pelo nome e telemóvel, com preenchimento automático. Resumo do pedido fechado por defeito e abaixo dos campos. Não colocar recibos abertos, avaliações, estimativa fixa no topo nem totais repetidos no rodapé deste passo. A ação principal é «Enviar pedido». Preservar preços, detalhes e validação do envio.
+
+## Hero mobile da homepage (13/09/2026)
+
+No mobile, título e descrição precedem uma fotografia própria no fluxo, sem CTAs ou indicadores sobre o antes/depois. Abaixo, uma única linha sem cartão reúne +1200 serviços realizados e REVIEW_RATING com estrela/Google. WhatsApp é a ação principal; calcular preço mantém o tratamento escuro com contorno dourado do desktop. Marca e controlos do cabeçalho têm o mesmo centro vertical e alvos de 44px. Desktop mantém a composição sobre a imagem.

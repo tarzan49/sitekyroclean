@@ -1,7 +1,7 @@
 import { useEffect, lazy, Suspense } from "react";
 import { trackWhatsAppClick } from "@/lib/quizTracking";
-import { MessageCircle } from "lucide-react";
-import { WHATSAPP_BASE } from "@/constants/business";
+import { MessageCircle, Star } from "lucide-react";
+import { WHATSAPP_BASE, REVIEW_RATING } from "@/constants/business";
 import TrustRatingBadge from "@/components/TrustRatingBadge";
 import { useQuizLauncher } from "@/hooks/use-quiz-launcher";
 
@@ -26,11 +26,11 @@ const Hero = () => {
     <>
       <section
         id="orcamento"
-        className="relative min-h-[92vh] md:min-h-[95vh] flex items-center z-[1] pt-[56px] sm:pt-[70px] md:pt-[100px] pb-[60px] md:pb-[100px] overflow-hidden"
+        className="relative bg-[#0B2F2A] md:min-h-[95vh] flex items-center z-[1] pt-[84px] md:pt-[100px] pb-7 md:pb-[100px] overflow-hidden"
         aria-label="Kyro Clean Solutions - Higienização de Estofos ao Domicílio"
       >
         {/* Background */}
-        <div className="absolute inset-0 z-0">
+        <div className="absolute inset-0 z-0 hidden md:block">
           <picture>
             <source media="(max-width: 767px)" srcSet={imgMobile} type="image/webp" />
             <source srcSet={imgDesktop} type="image/webp" />
@@ -49,11 +49,9 @@ const Hero = () => {
         </div>
 
         {/* Left gradient */}
-        <div className="absolute inset-0 z-[1] bg-gradient-to-r from-[#0B2F2A]/88 via-[#0B2F2A]/55 to-transparent pointer-events-none" />
-        {/* Mobile overlay */}
-        <div className="md:hidden absolute inset-0 z-[1] bg-kyro-green/72 pointer-events-none" />
+        <div className="hidden md:block absolute inset-0 z-[1] bg-gradient-to-r from-[#0B2F2A]/88 via-[#0B2F2A]/55 to-transparent pointer-events-none" />
         {/* Bottom gradient */}
-        <div className="absolute inset-x-0 bottom-0 z-[1] h-48 bg-gradient-to-t from-black/75 via-black/20 to-transparent pointer-events-none" />
+        <div className="hidden md:block absolute inset-x-0 bottom-0 z-[1] h-48 bg-gradient-to-t from-black/75 via-black/20 to-transparent pointer-events-none" />
 
         {/* Content */}
         <div className="relative z-10 mx-auto grid w-full max-w-[1400px] px-5 md:grid-cols-[minmax(0,52%)_minmax(300px,1fr)] md:gap-4 md:px-8 lg:grid-cols-[minmax(0,610px)_1fr] lg:px-16 xl:px-20">
@@ -89,34 +87,42 @@ const Hero = () => {
               Especialistas em limpeza de estofos ao domicílio. Cuidado profissional, orçamento transparente e resposta em menos de 10 minutos. Equipas em Braga, Porto, Lisboa e Algarve.
             </p>
 
-            {/* Mobile keeps the service count quiet beside the Google card. */}
-            <div className="flex w-full max-w-[430px] items-center gap-3 md:hidden">
-              <div className="flex min-h-[58px] flex-1 items-center gap-2.5 border-l-2 border-[#D4AF37] pl-3">
-                <span className="font-playfair text-2xl font-bold leading-none text-[#E7CE73]">{STATS[0].value}</span>
-                <span className="max-w-[70px] text-[9px] font-semibold uppercase leading-[1.25] tracking-[0.1em] text-white/70">{STATS[0].label}</span>
-              </div>
-              <TrustRatingBadge variant="heroMobile" />
-            </div>
+          </div>
 
+          {/* A dedicated image row keeps the cleaning result unobstructed on mobile. */}
+          <div className="-mx-5 md:hidden">
+            <img
+              src={imgMobile}
+              alt="Limpeza de um sofá, com a diferença visível entre o tecido limpo e por limpar"
+              className="block aspect-[4/3] w-full object-cover"
+              loading="eager"
+              fetchPriority="high"
+            />
+          </div>
+          <div className="flex items-center justify-center gap-2 whitespace-nowrap py-4 text-[11px] min-[375px]:text-xs text-white/85 md:hidden">
+            <span><strong className="font-semibold text-[#E7CE73]">{STATS[0].value}</strong> serviços realizados</span>
+            <span aria-hidden="true" className="text-white/35">·</span>
+            <span className="inline-flex items-center gap-1" aria-label={`${REVIEW_RATING} de 5 estrelas no Google`}>
+              <strong className="font-semibold text-white">{REVIEW_RATING}</strong>
+              <Star className="h-3 w-3 fill-[#D4AF37] text-[#D4AF37]" aria-hidden="true" />
+              Google
+            </span>
           </div>
 
           {/* Desktop CTAs occupy the clean right side of the sofa, away from the extraction line. */}
-          <div className="flex w-full max-w-sm flex-col gap-2.5 md:mb-8 md:w-[92%] md:max-w-[400px] md:self-end md:justify-self-center">
+          <div className="mx-auto flex w-full max-w-sm flex-col gap-2.5 md:mb-8 md:mt-0 md:w-[92%] md:max-w-[400px] md:self-end md:justify-self-center">
 
-              {/* Price CTA stays primary on mobile and becomes secondary on desktop. */}
-              <div className="group relative order-1 md:order-2">
-                <div className="absolute -inset-1.5 rounded-full bg-gradient-to-r from-[#C9A84C]/50 to-[#E8D070]/40 opacity-30 blur-lg transition-opacity duration-400 pointer-events-none group-hover:opacity-55 md:opacity-15" />
+              {/* Price CTA keeps the same secondary treatment on mobile and desktop. */}
+              <div className="group relative order-2">
                 <button
                   onClick={handleOpenQuiz}
                   className={[
-                    'relative w-full font-bold text-[#12121e] touch-manipulation',
-                    'h-[58px] md:h-[48px] px-8 text-base md:text-[17px]',
-                    'bg-gradient-to-r from-[#C9A84C] via-[#EDD96A] to-[#C9A84C]',
-                    'shadow-[0_6px_22px_rgba(201,168,76,0.42),0_2px_6px_rgba(0,0,0,0.28),inset_0_1px_0_rgba(255,255,255,0.32),inset_0_-2px_0_rgba(0,0,0,0.12)]',
-                    'md:border md:border-[#D4AF37]/70 md:bg-none md:bg-black/35 md:text-white md:shadow-[0_8px_24px_rgba(0,0,0,0.22)] md:backdrop-blur-md',
-                    'hover:shadow-[0_10px_32px_rgba(201,168,76,0.60),0_4px_10px_rgba(0,0,0,0.32),inset_0_1px_0_rgba(255,255,255,0.36)]',
+                    'relative w-full border border-[#D4AF37]/70 bg-black/35 font-bold text-white touch-manipulation backdrop-blur-md',
+                    'h-[48px] px-4 md:px-8 text-base md:text-[17px]',
+                    'shadow-[0_8px_24px_rgba(0,0,0,0.22)]',
+                    'hover:border-[#D4AF37] hover:bg-black/50 hover:shadow-[0_10px_30px_rgba(0,0,0,0.30)]',
                     'hover:scale-[1.025]',
-                    'active:scale-[0.95] active:shadow-[0_2px_8px_rgba(201,168,76,0.30),inset_0_2px_4px_rgba(0,0,0,0.18)]',
+                    'active:scale-[0.95]',
                     'transition-all duration-150',
                   ].join(' ')}
                 >
@@ -124,9 +130,9 @@ const Hero = () => {
                 </button>
               </div>
 
-              {/* WhatsApp becomes the primary desktop CTA. */}
-              <div className="group relative order-2 md:order-1">
-                <div className="absolute -inset-2 rounded-full bg-[#25D366]/45 opacity-30 blur-xl transition-opacity duration-400 pointer-events-none group-hover:opacity-65 md:opacity-50" />
+              {/* WhatsApp is the primary CTA on mobile and desktop. */}
+              <div className="group relative order-1">
+                <div className="absolute -inset-2 rounded-full bg-[#25D366]/45 opacity-50 blur-xl transition-opacity duration-400 pointer-events-none group-hover:opacity-70" />
                 <a
                   href={`${WHATSAPP_BASE}?text=${encodeURIComponent('Olá, gostaria de saber mais sobre os vossos serviços de higienização.')}`}
                   target="_blank"
@@ -134,7 +140,7 @@ const Hero = () => {
                   onClick={() => trackWhatsAppClick('hero')}
                   className={[
                     'relative flex items-center justify-center gap-2 w-full font-bold text-white touch-manipulation',
-                    'h-[58px] md:h-[60px] px-8 text-base md:text-[17px]',
+                    'h-[56px] md:h-[60px] px-4 md:px-8 text-base md:text-[17px]',
                     'bg-gradient-to-r from-[#1DA851] via-[#25D366] to-[#1DA851]',
                     'shadow-[0_6px_22px_rgba(37,211,102,0.42),0_2px_6px_rgba(0,0,0,0.28),inset_0_1px_0_rgba(255,255,255,0.20),inset_0_-2px_0_rgba(0,0,0,0.12)]',
                     'hover:shadow-[0_10px_32px_rgba(37,211,102,0.60),0_4px_10px_rgba(0,0,0,0.32)]',
