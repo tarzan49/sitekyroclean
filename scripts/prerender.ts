@@ -786,6 +786,7 @@ export function prerenderRoutes(outDir: string): number {
             { q: 'A limpeza remove manchas antigas do sofá?', a: 'Sim. Tratamos manchas de vinho, café, gordura e sangue com pré-tratamento específico. Manchas muito antigas podem não sair completamente, mas apresentamos sempre o melhor resultado possível.' },
             { q: 'Em que zonas fazem limpeza de sofás ao domicílio?', a: 'Temos equipas em Braga, Porto, Lisboa e Algarve. Aveiro e Coimbra sob consulta.' },
           ]),
+          links: cities.map(city => ({ href: `/limpeza-sofas-${city.slug}`, label: city.name })),
         },
         extraSchemas: [
           buildServiceSchema('Limpeza de Sofás', 'Portugal', '49€'),
@@ -822,6 +823,7 @@ export function prerenderRoutes(outDir: string): number {
             { q: 'A limpeza inclui tratamento anti-ácaros?', a: 'Não. A limpeza remove sujidade e resíduos das fibras. Anti-ácaros e desbacterização são tratamentos complementares opcionais, orçamentados separadamente.' },
             { q: 'Fazem limpeza de colchões ao domicílio?', a: 'Sim. O técnico desloca-se a sua casa com todo o equipamento. Não precisa de retirar o colchão nem de se deslocar.' },
           ]),
+          links: cities.map(city => ({ href: `/limpeza-colchoes-${city.slug}`, label: city.name })),
         },
         extraSchemas: [
           buildServiceSchema('Limpeza de Colchões', 'Portugal', '59€'),
@@ -1183,6 +1185,7 @@ export function prerenderRoutes(outDir: string): number {
         {
           h1: data.h1,
           intro: data.intro,
+          localSection: data.coverage,
           problems: data.segments.map(s => ({ title: s.label, description: `${s.painPoints.join(' ')} ${s.solution}` })),
           benefits: data.benefits,
           faqs: data.faqs,

@@ -1,3 +1,4 @@
+import { locationPrices } from '../constants/travel';
 // B2B / commercial SEO pages — restaurantes, hotéis e escritórios que precisam
 // de limpeza de estofos em regime de contrato recorrente, não o cliente
 // avulso do quiz. CTA e tom diferentes de propósito: orçamento personalizado
@@ -100,6 +101,7 @@ export interface CommercialPageData {
   segments: SegmentContent[];
   benefits: string[];
   faqs: { question: string; answer: string }[];
+  coverage: string;
 }
 
 const BENEFITS: string[] = [
@@ -111,7 +113,25 @@ const BENEFITS: string[] = [
   "Equipa fixa, familiarizada com o espaço, sem repetir explicações a cada visita",
 ];
 
-function faqsFor(cityName: string, prep: string): { question: string; answer: string }[] {
+// Seleção estável por cidade. As 20 páginas comerciais partilhavam exatamente
+// as mesmas perguntas e beneficios, o que as punha nos 0,90 de sobreposição
+// entre si. Sem uma biblioteca B2B maior, o que se pode fazer honestamente é
+// variar quais aparecem e por que ordem, e acrescentar a cobertura real da
+// cidade. Não se inventam factos nem testemunhos: a lista de clientes reais
+// ainda não foi entregue (ver CLAUDE.md).
+function stableOrder<T>(items: T[], seed: string): T[] {
+  let hash = 2166136261;
+  for (let i = 0; i < seed.length; i += 1) {
+    hash ^= seed.charCodeAt(i);
+    hash = Math.imul(hash, 16777619);
+  }
+  return items
+    .map((item, index) => ({ item, key: Math.imul(hash ^ (index + 1), 2654435761) >>> 0 }))
+    .sort((a, b) => a.key - b.key)
+    .map(entry => entry.item);
+}
+
+function allFaqs(cityName: string, prep: string): { question: string; answer: string }[] {
   return [
     { question: "Como funciona a faturação de um contrato?", answer: "Emitimos uma fatura mensal única para todas as visitas do período, com o detalhe de peças tratadas. Não precisa de aprovar cada visita individualmente." },
     { question: "Conseguem trabalhar fora do horário de funcionamento?", answer: `Sim, é o modelo mais comum nos nossos contratos ${prep} ${cityName}: antes da abertura, depois do fecho, ou aos fins de semana, consoante o que for melhor para o seu negócio.` },
@@ -119,6 +139,10 @@ function faqsFor(cityName: string, prep: string): { question: string; answer: st
     { question: "Como é feito o acesso ao espaço se não estivermos presentes?", answer: "Coordenamos diretamente com o responsável do espaço (gerente, rececionista, facilities). Muitos dos nossos contratos funcionam com chave ou código de acesso entregue à equipa fixa." },
     { question: "O preço é fixo como no site para clientes particulares?", answer: "Não. O preço de um contrato depende do número e tipo de peças, frequência e volume. Enviamos uma proposta personalizada após uma primeira visita de avaliação, gratuita e sem compromisso." },
   ];
+}
+
+function faqsFor(cityName: string, prep: string, citySlug: string) {
+  return stableOrder(allFaqs(cityName, prep), `faq:${citySlug}`).slice(0, 4);
 }
 
 export function getCommercialPageData(citySlug: string): CommercialPageData | null {
@@ -138,8 +162,11 @@ export function getCommercialPageData(citySlug: string): CommercialPageData | nu
     h1: `Limpeza Comercial de Estofos ${prep} ${city.name}`,
     intro: `Contratos de limpeza recorrente para restaurantes, hotéis e escritórios ${prep} ${city.name}. A mesma extração profissional que usamos em milhares de casas particulares, adaptada ao ritmo do seu negócio: fora de horas, com fatura mensal e uma equipa fixa que já conhece o espaço.`,
     segments,
-    benefits: BENEFITS,
-    faqs: faqsFor(city.name, prep),
+    benefits: stableOrder(BENEFITS, `ben:${city.slug}`),
+    faqs: faqsFor(city.name, prep, city.slug),
+    // Cobertura e taxa reais desta cidade: o dado mais honesto que a distingue
+    // da seguinte, porque varia mesmo entre 10, 15 e 20 euros.
+    coverage: `Servimos ${prep} ${city.name} e arredores.${locationPrices[city.name] === undefined ? ' Deslocação confirmada na proposta.' : ` Deslocação ${prep} ${city.name}: +${locationPrices[city.name]}€ por visita, incluída na proposta de contrato.`} Avaliação inicial gratuita e sem compromisso.`,
   };
 }
 
