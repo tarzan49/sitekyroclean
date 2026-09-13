@@ -4,13 +4,13 @@ import SectionHeader from '@/components/SectionHeader';
 import { SOFA_PROCESS_IMAGE as image, SOFA_PROCESS_STEPS as steps } from '@/data/sofaProcessGuide';
 
 
-export default function SofaProcessGuide({ city = 'Lisboa', cityPrep = 'em' }: { city?: string; cityPrep?: string }) {
+export default function SofaProcessGuide({ city, cityPrep = 'em' }: { city?: string; cityPrep?: string }) {
   const [active, setActive] = useState(0);
   const id = useId();
   const step = steps[active];
   return <section id="processo" className="scroll-mt-20 py-14 md:py-20 bg-[#FDFDF9]">
     <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
-      <SectionHeader overline="Como funciona" heading={`A limpeza do seu sofá, passo a passo ${cityPrep}`} goldWord={city} subtitle="Do primeiro cuidado à secagem. Explore as cinco etapas da nossa visita." />
+      <SectionHeader overline="Como funciona" heading={`A limpeza do seu sofá, passo a passo${city ? ` ${cityPrep}` : ''}`} goldWord={city || ''} subtitle="Do primeiro cuidado à secagem. Explore as cinco etapas da nossa visita." />
       <div className="border border-[#173629]/15 bg-white rounded-sm overflow-hidden">
         <div className="grid grid-cols-5 border-b border-[#173629]/15" role="tablist" aria-label="Etapas da limpeza">
           {steps.map((item, i) => <button key={item.label} id={`${id}-tab-${i}`} role="tab" aria-selected={active === i} aria-controls={`${id}-panel`} tabIndex={active === i ? 0 : -1}

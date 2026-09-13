@@ -10,6 +10,7 @@ import ServiceHero from "@/components/ServiceHero";
 import ServiceExamplesGallery from "@/components/ServiceExamplesGallery";
 import ServiceExpertTips from "@/components/ServiceExpertTips";
 import ServicePriceSection from "@/components/ServicePriceSection";
+import SofaProcessGuide from "@/components/SofaProcessGuide";
 import ServiceEliteGuarantee, { GuaranteeItem } from "@/components/ServiceEliteGuarantee";
 import { ExpertTip } from "@/components/ServiceExpertTips";
 
@@ -75,13 +76,14 @@ const LimpezaSofas = () => {
         />
         <ServicePriceSection serviceSlug="limpeza-sofas" />
         <ServiceExamplesGallery serviceSlug="limpeza-sofas" />
+        <SofaProcessGuide />
         <ServiceEliteGuarantee
           heading="A nossa promessa em cada limpeza de sofá"
           items={sofaGuarantee}
-          variant="light"
+          variant="dark"
         />
-        <ServiceFAQ faqs={faqs} heading="Perguntas Frequentes" variant="dark" />
-        <ServiceExpertTips tips={expertTips} variant="light" />
+        <ServiceFAQ faqs={faqs} heading="Perguntas Frequentes" variant="light" />
+        <ServiceExpertTips tips={expertTips} variant="dark" />
         <ServiceCityLinks serviceSlug="limpeza-sofas" serviceLabel="Limpeza de Sofás" />
         <ServiceSchema
           serviceName="Limpeza de Sofás"

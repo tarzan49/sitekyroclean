@@ -213,10 +213,10 @@ const Impermeabilizacao = () => {
         <ServiceEliteGuarantee
           heading="A nossa promessa em cada impermeabilização"
           items={impermeabilizacaoGuarantee}
-          variant="light"
+          variant="dark"
         />
-        <ServiceFAQ faqs={faqs} heading="Perguntas Frequentes" variant="dark" />
-        <ServiceExpertTips tips={expertTips} variant="light" />
+        <ServiceFAQ faqs={faqs} heading="Perguntas Frequentes" variant="light" />
+        <ServiceExpertTips tips={expertTips} variant="dark" />
         <ServiceCityLinks serviceSlug="impermeabilizacao" serviceLabel="Impermeabilização de Estofos" />
         <ServiceSchema
           serviceName="Impermeabilização de Estofos"

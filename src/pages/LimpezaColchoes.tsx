@@ -83,10 +83,10 @@ const LimpezaColchoes = () => {
         <ServiceEliteGuarantee
           heading="A nossa promessa em cada higienização de colchão"
           items={colchoesGuarantee}
-          variant="light"
+          variant="dark"
         />
-        <ServiceFAQ faqs={faqs} heading="Perguntas Frequentes" variant="dark" />
-        <ServiceExpertTips tips={expertTips} variant="light" />
+        <ServiceFAQ faqs={faqs} heading="Perguntas Frequentes" variant="light" />
+        <ServiceExpertTips tips={expertTips} variant="dark" />
         <ServiceCityLinks serviceSlug="limpeza-colchoes" serviceLabel="Limpeza de Colchões" />
         <ServiceSchema
           serviceName="Limpeza de Colchões"

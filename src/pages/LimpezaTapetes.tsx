@@ -80,10 +80,10 @@ const LimpezaTapetes = () => {
         <ServiceEliteGuarantee
           heading="A nossa promessa em cada limpeza de tapete"
           items={tapetesGuarantee}
-          variant="light"
+          variant="dark"
         />
-        <ServiceFAQ faqs={faqs} heading="Perguntas Frequentes" variant="dark" />
-        <ServiceExpertTips tips={expertTips} variant="light" />
+        <ServiceFAQ faqs={faqs} heading="Perguntas Frequentes" variant="light" />
+        <ServiceExpertTips tips={expertTips} variant="dark" />
         <ServiceCityLinks serviceSlug="limpeza-tapetes" serviceLabel="Limpeza de Tapetes" />
         <ServiceSchema
           serviceName="Limpeza de Tapetes"
