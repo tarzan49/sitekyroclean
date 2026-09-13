@@ -190,3 +190,14 @@ export function buildFaqNode(faqs: { question: string; answer: string }[]) {
 export function clearPrerenderedSchema() {
   document.querySelectorAll('script[data-ssr-schema]').forEach((el) => el.remove());
 }
+
+/** Replace only the standalone FAQ node; keep server business/service metadata. */
+export function clearPrerenderedFaqSchema() {
+  document.querySelectorAll('script[data-ssr-schema]').forEach(el => {
+    try {
+      if (JSON.parse(el.textContent || '{}')['@type'] === 'FAQPage') el.remove();
+    } catch {
+      // Unrelated malformed metadata must not prevent a page from rendering.
+    }
+  });
+}

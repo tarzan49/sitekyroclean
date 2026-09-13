@@ -34,6 +34,7 @@ import {
   buildBreadcrumbNode,
   buildServiceNode,
   buildOfferNode,
+  clearPrerenderedFaqSchema,
 } from "@/lib/seoSchema";
 
 const PricePage = () => {
@@ -48,6 +49,7 @@ const PricePage = () => {
 
   useEffect(() => {
     if (data) {
+      clearPrerenderedFaqSchema();
       document.title = data.title;
       const desc = document.querySelector('meta[name="description"]');
       if (desc) desc.setAttribute("content", data.metaDescription);

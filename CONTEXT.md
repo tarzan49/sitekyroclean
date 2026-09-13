@@ -1,3 +1,9 @@
+## Biblioteca de FAQ das landing pages (13/09/2026)
+
+`src/data/landingFaqPool.ts` é a fonte das FAQ de localidade × serviço, freguesia × serviço, preços e variantes keyword. Biblioteca inicial de 84 perguntas distintas: 12 comuns e 12 específicas de cada serviço (24 candidatas por serviço). Cada gerador devolve exatamente quatro, uma por assunto (orçamento, preparação, tratamento, cuidados), com pelo menos duas específicas do serviço. A seleção usa a identidade estável da página, incluindo município nas freguesias; não usa aleatoriedade por visita nem parâmetros Ads. Páginas de preços reservam o primeiro assunto a uma pergunta de orçamento específica do serviço. As taxas são lidas de `travel.ts`; respostas comerciais reutilizam `commercialPolicy.ts`. As antigas listas FAQ das quatro famílias foram removidas, sem alterar os outros campos dos geradores.
+
+O prerender já consome esses mesmos geradores. `scripts/audit-landing-faqs.mjs` compara as quatro perguntas e respostas com os HTMLs e schemas de todas as rotas após o build; `--inventory-only` apresenta contagens e conjuntos distintos de perguntas. `scripts/landing-faq-routes.ts` delimita o inventário às quatro famílias. Preços e variantes removem apenas o FAQPage estático quando montam a versão cliente, via `clearPrerenderedFaqSchema`, preservando os outros metadados. A uniformização das secções e as 240 imagens continuam pendentes; plano em `docs/seo-landing-diversity.md`.
+
 ## Tipografia integrada (13/09/2026)
 
 A configuração Avenir Next do ramo principal está integrada neste ramo: `main.tsx` importa `styles/typography.css`; CSS base e aliases Tailwind usam `--font-kyro`; `index.html` pré-carrega regular e demi. Ficheiros WOFF2 servidos localmente.

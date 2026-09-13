@@ -1,6 +1,7 @@
 import { ALCATIFA_PROBLEMS } from "./alcatifaProblems";
 import { WATERPROOFING_PROBLEMS } from "./waterproofingProblems";
 import { locationPrices } from '../constants/travel';
+import { getLandingFaqs, type LandingService } from './landingFaqPool';
 
 export interface LocationService {
   slug: string;
@@ -125,7 +126,7 @@ export const cityPrepCap = (city: string) => {
 };
 
 // Content generators: unique per city × service to avoid duplicate content
-function generateSofaContent(city: string, cityDesc: string): Omit<LocationService, 'slug' | 'city' | 'citySlug' | 'service' | 'serviceSlug' | 'relatedServices' | 'priceFrom'> {
+function generateSofaContent(city: string, cityDesc: string): Omit<LocationService, 'slug' | 'city' | 'citySlug' | 'service' | 'serviceSlug' | 'relatedServices' | 'priceFrom' | 'faqs'> {
   const prep = cityPrep(city);
   return {
     title: `Limpeza de Sofás ${city} | Desde 49€ ao Domicílio | Kyro Clean Solutions`,
@@ -148,18 +149,10 @@ function generateSofaContent(city: string, cityDesc: string): Omit<LocationServi
       `Conhecemos bem as necessidades de quem vive ${prep} ${city}, ${cityDesc}, e adaptamos o horário à sua disponibilidade`,
     ],
     localSection: `Servimos toda a área de ${city} e arredores, incluindo as principais freguesias e zonas residenciais. A nossa equipa desloca-se diretamente à sua casa ${prep} ${city} com taxa de deslocação de ${locationPrices[city] ?? 10}€. Atendemos clientes residenciais e comerciais: escritórios, restaurantes, hotéis e clínicas ${prep} ${city}.`,
-    faqs: [
-      { question: `Quanto custa a limpeza de sofá ${prep} ${city}?`, answer: `A limpeza de sofá ${prep} ${city} começa a partir de 49€ para sofás de 1 lugar. Os preços da tabela são por tamanho e a deslocação é cobrada à parte conforme a morada. Sofás de quatro ou mais lugares e tratamentos adicionais exigem orçamento, confirmado antes do serviço.` },
-      { question: `Quanto tempo demora a limpeza do sofá ${prep} ${city}?`, answer: `O serviço de limpeza de sofá ao domicílio ${prep} ${city} demora entre 1 a 3 horas, dependendo do tamanho e estado do sofá. A secagem demora normalmente 3 a 6 horas, podendo variar com o tecido, a humidade e a ventilação. Use apenas quando estiver completamente seco.` },
-      { question: `A limpeza remove manchas antigas do sofá?`, answer: `Sim, o nosso processo de extração profunda remove a grande maioria das manchas, incluindo manchas antigas de café, vinho, gordura e líquidos. Manchas muito antigas podem necessitar de tratamento adicional.` },
-      { question: `A limpeza de sofá remove ácaros e bactérias?`, answer: `A extração remove sujidade e resíduos acumulados nas fibras. O resultado depende do material e do tratamento; não prometemos uma percentagem de eliminação de microrganismos nem melhoria de sintomas de alergia.` },
-      { question: `Fazem limpeza de sofás ao domicílio ${prep} ${city}?`, answer: `Sim! A Kyro Clean Solutions faz limpeza de sofás ao domicílio ${prep} ${city} e toda a área envolvente. A nossa equipa desloca-se à sua casa com todo o equipamento necessário.` },
-      { question: `A limpeza pode danificar o tecido do sofá?`, answer: `Inspecionamos o tecido antes de iniciar e escolhemos o processo adequado ao material. Se identificarmos limitações ou riscos, explicamos as opções antes de avançar.` },
-    ],
   };
 }
 
-function generateColchaoContent(city: string, cityDesc: string): Omit<LocationService, 'slug' | 'city' | 'citySlug' | 'service' | 'serviceSlug' | 'relatedServices' | 'priceFrom'> {
+function generateColchaoContent(city: string, cityDesc: string): Omit<LocationService, 'slug' | 'city' | 'citySlug' | 'service' | 'serviceSlug' | 'relatedServices' | 'priceFrom' | 'faqs'> {
   const prep = cityPrep(city);
   const Prep = cityPrepCap(city);
   return {
@@ -183,17 +176,10 @@ function generateColchaoContent(city: string, cityDesc: string): Omit<LocationSe
       `Ideal para famílias e alérgicos ${prep} ${city} que procuram noites de sono mais saudáveis`,
     ],
     localSection: `A nossa equipa de higienização de colchões cobre toda a área de ${city} e arredores. Atendemos residências, hotéis, residências seniores e alojamentos locais ${prep} ${city}. Taxa de deslocação de ${locationPrices[city] ?? 10}€.`,
-    faqs: [
-      { question: `Quanto custa a limpeza de colchão ${prep} ${city}?`, answer: `A higienização de colchão ${prep} ${city} começa a partir de 59€ para colchão de solteiro. Colchões de casal têm preços a partir de 69€. Contacte-nos para orçamento personalizado.` },
-      { question: `A limpeza de colchão remove ácaros?`, answer: `Sim. O nosso processo de higienização profissional ajuda a remover resíduos associados a ácaros, bactérias e fungos presentes no colchão, ideal para quem sofre de alergias.` },
-      { question: `A limpeza remove cheiro de urina do colchão?`, answer: `Sim. A nossa extração profunda combinada com desodorização enzimática elimina completamente odores de urina, incluindo manchas antigas.` },
-      { question: `Quanto tempo demora a secagem do colchão?`, answer: `O colchão fica pronto a usar no mesmo dia, tipicamente em 3 a 6 horas após a limpeza. Em dias mais secos, pode estar pronto ainda mais cedo.` },
-      { question: `Com que frequência devo higienizar o colchão?`, answer: `Recomendamos higienização profissional a cada 6-12 meses para manter o colchão livre de ácaros e bactérias, especialmente para alérgicos.` },
-    ],
   };
 }
 
-function generateTapetesContent(city: string, cityDesc: string): Omit<LocationService, 'slug' | 'city' | 'citySlug' | 'service' | 'serviceSlug' | 'relatedServices' | 'priceFrom'> {
+function generateTapetesContent(city: string, cityDesc: string): Omit<LocationService, 'slug' | 'city' | 'citySlug' | 'service' | 'serviceSlug' | 'relatedServices' | 'priceFrom' | 'faqs'> {
   const prep = cityPrep(city);
   const Prep = cityPrepCap(city);
   return {
@@ -217,17 +203,10 @@ function generateTapetesContent(city: string, cityDesc: string): Omit<LocationSe
       "Secagem controlada que preserva a textura e estrutura das fibras",
     ],
     localSection: `Recolhemos e entregamos tapetes em toda a área de ${city}. Atendemos clientes residenciais e comerciais: restaurantes, hotéis e escritórios ${prep} ${city} e arredores.`,
-    faqs: [
-      { question: `Quanto custa a limpeza de tapetes ${prep} ${city}?`, answer: `A limpeza de tapetes ${prep} ${city} é sempre orçamentada à medida de cada tapete, conforme o tipo, dimensão e estado de sujidade. Peça orçamento gratuito.` },
-      { question: `Fazem lavagem de tapetes persas ${prep} ${city}?`, answer: `Sim. Temos experiência na lavagem de tapetes persas, orientais e delicados. Utilizamos produtos e técnicas específicas para preservar as fibras e cores.` },
-      { question: `Têm serviço de recolha de tapetes ${prep} ${city}?`, answer: `Sim! Oferecemos recolha e entrega de tapetes ao domicílio ${prep} ${city} e toda a área envolvente, com condições e custo de deslocação confirmados no orçamento.` },
-      { question: `Quanto tempo demora a lavagem de tapetes?`, answer: `O processo completo de lavagem e secagem demora tipicamente 3-5 dias úteis, dependendo do tipo e tamanho do tapete.` },
-      { question: `A limpeza de tapetes remove odor a animal de estimação?`, answer: `Sim. A nossa lavagem profunda com desodorização enzimática elimina completamente odores de animais de estimação dos tapetes.` },
-    ],
   };
 }
 
-function generateCadeirasContent(city: string, cityDesc: string): Omit<LocationService, 'slug' | 'city' | 'citySlug' | 'service' | 'serviceSlug' | 'relatedServices' | 'priceFrom'> {
+function generateCadeirasContent(city: string, cityDesc: string): Omit<LocationService, 'slug' | 'city' | 'citySlug' | 'service' | 'serviceSlug' | 'relatedServices' | 'priceFrom' | 'faqs'> {
   const prep = cityPrep(city);
   const Prep = cityPrepCap(city);
   return {
@@ -251,15 +230,10 @@ function generateCadeirasContent(city: string, cityDesc: string): Omit<LocationS
       "Secagem rápida: cadeiras prontas a usar no mesmo dia",
     ],
     localSection: `Atendemos escritórios, restaurantes, hotéis, clínicas e residências ${prep} ${city}. Oferecemos preços especiais para limpeza de lotes de cadeiras em empresas da zona de ${city} e arredores.`,
-    faqs: [
-      { question: `Quanto custa limpar cadeiras estofadas ${prep} ${city}?`, answer: `A limpeza de cadeiras estofadas ${prep} ${city} começa a partir de 20€ por cadeira (1ª a 4ª), com preço decrescente por unidade a partir da 5ª. Ideal para escritórios e restaurantes.` },
-      { question: `Fazem limpeza de cadeiras de escritório ${prep} ${city}?`, answer: `Sim! Limpamos cadeiras de escritório, cadeiras de conferência e cadeiras executivas. Deslocamo-nos ao seu escritório ${prep} ${city} sem interrupção do trabalho.` },
-      { question: `Qual o desconto para limpeza de muitas cadeiras?`, answer: `O preço desce por escalão à medida que o número de cadeiras aumenta: 20€/cadeira até 4 unidades, 15€ da 5ª à 6ª, e 12,50€ da 7ª à 10ª. Acima de 10 cadeiras preparamos um orçamento personalizado para o seu escritório ou restaurante ${prep} ${city}.` },
-    ],
   };
 }
 
-function generateAlcatifasContent(city: string, cityDesc: string): Omit<LocationService, 'slug' | 'city' | 'citySlug' | 'service' | 'serviceSlug' | 'relatedServices' | 'priceFrom'> {
+function generateAlcatifasContent(city: string, cityDesc: string): Omit<LocationService, 'slug' | 'city' | 'citySlug' | 'service' | 'serviceSlug' | 'relatedServices' | 'priceFrom' | 'faqs'> {
   const prep = cityPrep(city);
   const Prep = cityPrepCap(city);
   return {
@@ -278,15 +252,10 @@ function generateAlcatifasContent(city: string, cityDesc: string): Omit<Location
       `Conhecemos as necessidades de empresas ${prep} ${city}, ${cityDesc}`,
     ],
     localSection: `Atendemos escritórios, hotéis, escolas, clínicas e espaços comerciais com alcatifas ${prep} ${city} e toda a área metropolitana. Oferecemos orçamentos para grandes superfícies.`,
-    faqs: [
-      { question: `Quanto custa limpar alcatifas ${prep} ${city}?`, answer: `A limpeza de alcatifas ${prep} ${city} é sempre orçamentada à medida da área e do estado da alcatifa, sem preço fixo por m². Peça orçamento gratuito.` },
-      { question: `Fazem limpeza de alcatifas em escritórios ${prep} ${city}?`, answer: `Sim! Realizamos limpeza de alcatifas em escritórios, hotéis e espaços comerciais ${prep} ${city}. Podemos agendar fora do horário de trabalho para mínima interrupção.` },
-      { question: `Quanto tempo demora a secar a alcatifa?`, answer: `Com o nosso processo de extração profissional, a alcatifa fica seca em 3 a 6 horas. Utilizamos equipamento de alta sucção que minimiza o tempo de secagem.` },
-    ],
   };
 }
 
-function generateImpermeabilizacaoContent(city: string, cityDesc: string): Omit<LocationService, 'slug' | 'city' | 'citySlug' | 'service' | 'serviceSlug' | 'relatedServices' | 'priceFrom'> {
+function generateImpermeabilizacaoContent(city: string, cityDesc: string): Omit<LocationService, 'slug' | 'city' | 'citySlug' | 'service' | 'serviceSlug' | 'relatedServices' | 'priceFrom' | 'faqs'> {
   const prep = cityPrep(city);
   return {
     title: `Impermeabilização de Estofos ${city} | Essencial ou Premium | Kyro Clean Solutions`,
@@ -304,17 +273,11 @@ function generateImpermeabilizacaoContent(city: string, cityDesc: string): Omit<
       `Recomendado para quem vive ${prep} ${city} e quer proteger sofás e cadeiras a longo prazo`,
     ],
     localSection: `Oferecemos impermeabilização de estofos ${prep} ${city} e toda a região envolvente, nas versões Essencial e Premium. Ideal combinar a Essencial com limpeza profissional: peça o Pack Proteção Total com desconto.`,
-    faqs: [
-      { question: `Quanto custa impermeabilizar um sofá ${prep} ${city}?`, answer: `Versão Essencial: 59€ (1 lugar), 79€ (2 lugares) e 99€ (3 lugares). Versão Premium: 89€ (1 lugar), 109€ (2 lugares) e 139€ (3 lugares). O pack limpeza + impermeabilização Essencial numa única visita começa em 99€ para 1 lugar. Orçamento gratuito ${prep} ${city}.` },
-      { question: `A impermeabilização altera a textura do sofá?`, answer: `Não. Nas duas versões, o produto de impermeabilização é completamente invisível e não altera a cor, textura ou respirabilidade do tecido.` },
-      { question: `Quanto tempo dura a impermeabilização?`, answer: `Depende da versão. A Essencial, à base de água, aguenta até 2 lavagens e dura 1 a 2 anos consoante o uso. A Premium, à base de diluente e mais resistente ao desgaste, aguenta até 5 lavagens e dura até 10 anos.` },
-      { question: `Vale a pena impermeabilizar o sofá?`, answer: `Sim, especialmente se tem crianças ou animais, caso em que a versão Premium costuma compensar mais a longo prazo. A impermeabilização previne manchas e facilita a limpeza, poupando na substituição de estofos.` },
-    ],
   };
 }
 
 // Content generator map
-const contentGenerators: Record<string, (city: string, cityDesc: string) => Omit<LocationService, 'slug' | 'city' | 'citySlug' | 'service' | 'serviceSlug' | 'relatedServices' | 'priceFrom'>> = {
+const contentGenerators: Record<string, (city: string, cityDesc: string) => Omit<LocationService, 'slug' | 'city' | 'citySlug' | 'service' | 'serviceSlug' | 'relatedServices' | 'priceFrom' | 'faqs'>> = {
   'limpeza-sofas': generateSofaContent,
   'limpeza-colchoes': generateColchaoContent,
   'limpeza-tapetes': generateTapetesContent,
@@ -344,6 +307,7 @@ export function getLocationServiceData(serviceSlug: string, citySlug: string): L
   const content = generator(city.name, city.description);
   return {
     ...content,
+    faqs: getLandingFaqs({ serviceSlug: serviceSlug as LandingService, pageKey: `/${serviceSlug}-${citySlug}`, municipality: city.name, family: 'localidade' }),
     slug: `${serviceSlug}-${citySlug}`,
     city: city.name,
     citySlug: city.slug,

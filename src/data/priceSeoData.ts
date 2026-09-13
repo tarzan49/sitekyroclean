@@ -2,6 +2,7 @@
 // Targets searches like "preço limpeza sofá porto", "quanto custa limpar colchão"
 
 import { cities, services, cityPrep } from "./locationSeoData";
+import { getLandingFaqs, type LandingService } from './landingFaqPool';
 
 export interface PricePageData {
   serviceSlug: string;
@@ -107,35 +108,6 @@ const priceFactors: Record<string, string[]> = {
   ],
 };
 
-const priceFaqs: Record<string, { question: string; answer: string }[]> = {
-  "limpeza-sofas": [
-    { question: "Quanto custa limpar um sofá em {city}?", answer: "A limpeza de sofás em {city} começa a partir de 69€ para sofás de 2 lugares. O preço final depende do tamanho, tipo de tecido e estado do sofá. Peça um orçamento grátis para saber o preço exato." },
-    { question: "O orçamento é gratuito?", answer: "Sim, todos os nossos orçamentos são 100% gratuitos e sem compromisso. Pode pedir por WhatsApp, telefone ou através do nosso formulário online." },
-    { question: "Há custos adicionais de deslocação em {city}?", answer: "A deslocação em {city} e arredores custa a partir de {travelFee}, consoante a distância ao centro. O valor exato é mostrado no orçamento antes de confirmar." },
-    { question: "Oferecem descontos para múltiplas peças?", answer: "Sim! Se combinar vários serviços (ex: sofá + colchão + cadeiras) aplicamos desconto no valor total. Peça um orçamento personalizado." },
-  ],
-  "limpeza-colchoes": [
-    { question: "Quanto custa limpar um colchão em {city}?", answer: "A limpeza de colchões em {city} começa a partir de 59€ para colchões de solteiro e 69€ para colchões de casal. O preço depende do tamanho e estado do colchão." },
-    { question: "O preço inclui anti-ácaros?", answer: "Sim, o nosso serviço standard inclui tratamento anti-ácaros. Para tratamentos intensivos, pode haver um suplemento." },
-    { question: "A deslocação em {city} tem custo?", answer: "Sim, a partir de {travelFee} em {city} e arredores, consoante a distância ao centro. O valor exato é mostrado no orçamento antes de confirmar." },
-  ],
-  "limpeza-tapetes": [
-    { question: "Quanto custa limpar um tapete em {city}?", answer: "A limpeza de tapetes em {city} é sempre orçamentada à medida de cada tapete, conforme a dimensão e o tipo de fibra. Tapetes artesanais, persas ou de seda podem ter preços especiais. Peça orçamento gratuito." },
-    { question: "Recolhem e entregam tapetes em {city}?", answer: "Sim, podemos recolher o tapete em {city}, limpá-lo no nosso centro e entregá-lo limpo na sua casa. O serviço de recolha e entrega está incluído." },
-  ],
-  "limpeza-cadeiras": [
-    { question: "Quanto custa limpar cadeiras em {city}?", answer: "A limpeza de cadeiras em {city} começa a partir de 20€ por cadeira (1ª a 4ª), com preço decrescente por unidade a partir da 5ª cadeira." },
-    { question: "Limpam cadeiras de escritório?", answer: "Sim, limpamos todo o tipo de cadeiras estofadas: cadeiras de jantar, de escritório, poltronas e cadeirões." },
-  ],
-  "limpeza-alcatifas": [
-    { question: "Quanto custa limpar alcatifas em {city}?", answer: "A limpeza de alcatifas em {city} é sempre orçamentada à medida da área total e estado da alcatifa, sem preço fixo por m². Peça orçamento gratuito." },
-  ],
-  "impermeabilizacao": [
-    { question: "Quanto custa impermeabilizar um sofá em {city}?", answer: "Versão Essencial: desde 59€ (1 lugar), 79€ (2 lugares) e 99€ (3 lugares). Versão Premium, mais resistente e duradoura: desde 89€ (1 lugar), 109€ (2 lugares) e 139€ (3 lugares). Recomendamos combinar a Essencial com limpeza para preço especial." },
-    { question: "Qual a diferença entre a Essencial e a Premium?", answer: "A Essencial, à base de água, aguenta até 2 lavagens e protege por 1 a 2 anos. A Premium, à base de diluente e mais resistente ao desgaste, aguenta até 5 lavagens e protege até 10 anos. Para famílias com crianças ou animais, a Premium costuma compensar mais." },
-    { question: "A impermeabilização vale a pena?", answer: "Sim. A impermeabilização protege contra manchas de líquidos e prolonga a vida útil do estofamento. É especialmente recomendada para famílias com crianças ou animais, sobretudo na versão Premium." },
-  ],
-};
 
 // ── Generate price page data ──
 
@@ -147,13 +119,7 @@ export function getPricePageData(serviceSlug: string, citySlug: string): PricePa
   const table = priceTables[serviceSlug] || [];
   const factors = priceFactors[serviceSlug] || [];
   const prep = cityPrep(city.name);
-  const travelFee = '10€'; // minimo sitewide
-  const faqs = (priceFaqs[serviceSlug] || []).map(faq => ({
-    question: faq.question.replace(/em \{city\}/g, `${prep} ${city.name}`),
-    answer: faq.answer
-      .replace(/em \{city\}/g, `${prep} ${city.name}`)
-      .replace(/\{travelFee\}/g, travelFee),
-  }));
+  const faqs = getLandingFaqs({ serviceSlug: serviceSlug as LandingService, pageKey: `/preco-${serviceSlug}-${citySlug}`, municipality: city.name, family: 'preco' });
 
   return {
     serviceSlug: service.slug,

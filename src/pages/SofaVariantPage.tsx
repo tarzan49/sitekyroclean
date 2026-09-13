@@ -1,4 +1,5 @@
 import DirectoryGroup from "@/components/DirectoryGroup";
+import { clearPrerenderedFaqSchema } from '@/lib/seoSchema';
 import SofaLeadActions from "@/components/SofaLeadActions";
 import { AdsLandingHeader, AdsLandingFooter, isAdsVisit } from "@/components/AdsLandingNavigation";
 // Handles all keyword variant pages:
@@ -205,6 +206,7 @@ const SofaVariantPage = () => {
 
   useEffect(() => {
     if (!data) return;
+    clearPrerenderedFaqSchema();
     document.title = data.title;
     document.querySelector('meta[name="description"]')?.setAttribute('content', data.metaDescription);
     document.querySelector('meta[property="og:title"]')?.setAttribute('content', data.title);
