@@ -993,6 +993,7 @@ export function prerenderRoutes(outDir: string): number {
             'Aveiro e Coimbra: disponibilidade sob consulta',
             COVERAGE_PROMISE,
           ],
+          links: cities.map(city => ({ href: `/limpeza-sofas-${city.slug}`, label: city.name })),
         },
       },
       {
@@ -1181,6 +1182,7 @@ export function prerenderRoutes(outDir: string): number {
       intro: 'Limpeza profissional de sofás, colchões, cadeiras e tapetes.',
       links: [
         ...services.map(service => ({ href: service.baseRoute, label: service.name })),
+        { href: '/areas-de-servico', label: 'Áreas de Serviço' },
         { href: '/perguntas-frequentes-limpeza-estofos', label: 'Perguntas Frequentes' },
         { href: '/glossario-limpeza-estofos', label: 'Glossário' },
         { href: '/blog', label: 'Blog' },
