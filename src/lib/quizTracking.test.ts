@@ -1,9 +1,18 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 // Tests use a fake production URL with a mocked network. No real events are sent.
 let cleanup: (()=>void) | undefined;
-beforeEach(()=>{ vi.resetModules(); sessionStorage.clear(); localStorage.clear(); document.body.innerHTML=''; vi.stubGlobal('location',new URL('https://cleansolutions.com.pt/limpeza-sofas?utm_source=test')); vi.stubEnv('VITE_SUPABASE_URL','https://example.invalid'); vi.stubEnv('VITE_SUPABASE_PUBLISHABLE_KEY','fake'); vi.stubGlobal('fetch',vi.fn().mockResolvedValue({ok:true})); window.gtag=vi.fn(); });
+beforeEach(()=>{ vi.resetModules(); sessionStorage.clear(); localStorage.clear(); localStorage.setItem('kyro_cookie_consent','accepted'); document.body.innerHTML=''; vi.stubGlobal('location',new URL('https://cleansolutions.com.pt/limpeza-sofas?utm_source=test')); vi.stubEnv('VITE_SUPABASE_URL','https://example.invalid'); vi.stubEnv('VITE_SUPABASE_PUBLISHABLE_KEY','fake'); vi.stubGlobal('fetch',vi.fn().mockResolvedValue({ok:true})); window.gtag=vi.fn(); });
 afterEach(()=>{cleanup?.(); cleanup=undefined;vi.unstubAllGlobals();vi.unstubAllEnvs();});
 describe('all public contact links',()=>{
+  it('does not send or retain analytics before consent or after refusal',async()=>{
+    localStorage.removeItem('kyro_cookie_consent');
+    const m=await import('./quizTracking'); cleanup=m.initContactTracking();
+    m.trackCallClickEvent('before'); m.trackSessionTime(15);
+    expect(fetch).not.toHaveBeenCalled(); expect(sessionStorage.length).toBe(0);
+    localStorage.setItem('kyro_cookie_consent','declined');
+    m.trackWhatsAppClick('declined');
+    expect(fetch).not.toHaveBeenCalled(); expect(window.gtag).not.toHaveBeenCalled();
+  });
   it('captures newly added buttons and nested icons without an explicit handler',async()=>{
     const m=await import('./quizTracking'); cleanup=m.initContactTracking();
     document.body.innerHTML='<a href="https://wa.me/351000000000?text=private"><span>Icon</span></a>';

@@ -1,6 +1,6 @@
 import CommercialHero from "@/components/CommercialHero";
 import { AdsLandingFooter, AdsLandingHeader, isAdsVisit } from "@/components/AdsLandingNavigation";
-import LandingServiceSections from '@/components/LandingServiceSections';
+import LandingServiceSections from '@/components/LazyLandingServiceSections';
 import SofaLeadActions from "@/components/SofaLeadActions";
 import { clearPrerenderedFaqSchema } from '@/lib/seoSchema';
 // Handles all keyword variant pages:

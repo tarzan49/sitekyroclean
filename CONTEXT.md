@@ -1,3 +1,11 @@
+## Desempenho mobile e entrada por HTML (13/09/2026)
+
+`GeneratedRoutePage` recebe `kyro-route-page`/`kyro-route-path` do prerender e só importa `generatedRouteIndex.ts` para navegação interna ou rotas sem metadados. Conserva o inventário e a precedência, sem milhares de elementos React Route. `LazyLandingServiceSections` mantém o hero independente do código das sete secções. `QuizFormLazy` só importa o formulário na primeira abertura, preservando o estado nas seguintes.
+
+O build emite manifest e preloads específicos por página/par de comparação. `resultThumbnails.ts`, `responsiveImages.ts` e os derivados WebP evitam carregar originais grandes nos cartões. Avenir tem subconjuntos latinos, com os originais preservados para outros caracteres. Não repor PNG nos guiões/ícones nem blur de secções no mobile. Scripts e evidências em `docs/performance-optimization-2026-09-13.md`.
+
+Tags Google e eventos analíticos próprios aguardam consentimento. `leadAttribution.ts` guarda parâmetros permitidos de campanha por sessão autorizada e transmite-os nas notas existentes do CRM/Formspree. Não confundir atribuição de pedido com receita paga. Os sitemaps omitem lastmod até haver uma data editorial fiável por página.
+
 ## Revisão SEO das quatro famílias (13/09/2026)
 
 Variantes transportam `municipality` separadamente do nome apresentado: `CommercialHero` e o orçamento usam o município real para deslocação e disponibilidade sob consulta. O modelo partilhado preserva o subtítulo curto aprovado e fornece `editorialIntro` na secção de preços. `getLandingTrustPoints` centraliza os três blocos de confiança para React e HTML inicial; o mobile permite ler as descrições completas. Foram revistas promessas legadas sem alterar preços ou condições comerciais. Freguesias homónimas incluem o município no H1, sem alterar URLs.

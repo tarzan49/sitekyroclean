@@ -21,7 +21,7 @@ import { packs, packCities } from '../src/data/packComboData';
 import { MARCA_CITY_SLUGS } from '../src/data/marcaCities';
 
 const BASE_URL = 'https://cleansolutions.com.pt';
-const TODAY = new Date().toISOString().split('T')[0];
+// Omit lastmod until a reliable per-page editorial modification date is available.
 
 // cities/services/municipiosComFreguesias imported directly from src/data/
 // above (2026-08-25) — this file used to keep a hand-maintained duplicate of
@@ -48,7 +48,6 @@ const problemSlugs = getVisibleProblems().map(p => p.slug);
 function xmlUrl(loc: string, changefreq: string, priority: string): string {
   return `  <url>
     <loc>${BASE_URL}${loc}</loc>
-    <lastmod>${TODAY}</lastmod>
     <changefreq>${changefreq}</changefreq>
     <priority>${priority}</priority>
   </url>`;
@@ -66,7 +65,6 @@ function wrapSitemapIndex(sitemaps: string[]): string {
 <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 ${sitemaps.map(s => `  <sitemap>
     <loc>${BASE_URL}/${s}</loc>
-    <lastmod>${TODAY}</lastmod>
   </sitemap>`).join('\n')}
 </sitemapindex>`;
 }

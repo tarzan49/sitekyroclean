@@ -437,7 +437,7 @@ const QuizComboUpsellScreen = ({ offerPreview = false, travelFee = 10, primarySe
             <span
               aria-hidden="true"
               className="block w-16 h-16 shrink-0 transition-transform duration-200 group-hover:scale-105 motion-reduce:transform-none"
-              style={{ backgroundImage: 'url(/images/services/quote-furniture.png)', backgroundSize: '200% 200%', backgroundPosition: row.imagePosition }}
+              style={{ backgroundImage: 'url(/images/services/quote-furniture.webp)', backgroundSize: '200% 200%', backgroundPosition: row.imagePosition }}
             />
             <span className={cn('min-w-0 flex flex-col gap-1', !compactRows && 'w-full')}>
               <span className="text-base font-bold text-white">{row.label}</span>

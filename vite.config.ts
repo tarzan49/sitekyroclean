@@ -53,8 +53,11 @@ export default defineConfig(({ mode }) => ({
   },
   build: {
     chunkSizeWarningLimit: 2000,
+    assetsInlineLimit: 0,
+    manifest: true,
     rollupOptions: {
       output: {
+        onlyExplicitManualChunks: true,
         manualChunks: (id) => {
           // React core — tiny, always cached
           if (id.includes('node_modules/react/') || id.includes('node_modules/react-dom/')) {

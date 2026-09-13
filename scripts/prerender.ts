@@ -1,4 +1,5 @@
 import { getServiceExamples } from '../src/data/serviceExamples';
+import { generatedPageForPath } from '../src/data/generatedRouteIndex';
 import { commercialHeroSubtitle } from '../src/data/commercialHeroCopy';
 import { MATERIAL_PROCESS_GUIDES } from "../src/data/materialProcessGuides";
 import { MATERIAL_EXAMPLES, type MaterialExamples } from "../src/data/materialExamples";
@@ -263,7 +264,7 @@ export function prerenderRoutes(outDir: string): number {
   // (buildWebPageNode() on subpages cross-references it by @id).
   const rawTemplate = fs.readFileSync(templatePath, 'utf-8');
   const STRIP_TYPES = new Set(['LocalBusiness', 'Service']);
-  const template = rawTemplate.replace(
+  const template = rawTemplate.replace(/\s*<link rel="preload" as="image"[^>]*>/g, '').replace(
     /\s*<script type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/g,
     (match, jsonText) => {
       try {
@@ -278,6 +279,54 @@ export function prerenderRoutes(outDir: string): number {
 
   // Pre-built constant — injected into every single page for local pack ranking.
   const LOCAL_BIZ = buildLocalBusinessSchema();
+
+  // Resolve the actual first comparison from emitted, hashed assets. Only hero
+  // photographs receive priority; homepage preloads stay on the homepage.
+  const assetNames = fs.readdirSync(path.join(outDir, 'assets'));
+  const heroServices = new Map<string, string>();
+  const heroPages = new Map<string, string>();
+  for (const material of getAllMaterials()) {
+    heroServices.set(`/${material.slug}`, material.serviceSlug);
+    heroPages.set(`/${material.slug}`, 'MaterialPage');
+  }
+  for (const route of getAllMaterialCityRoutes()) {
+    const material = getAllMaterials().find(item => item.slug === route.materialSlug);
+    if (material) { heroServices.set(route.path, material.serviceSlug); heroPages.set(route.path, 'MaterialPage'); }
+  }
+  for (const problem of getAllProblems()) heroServices.set(`/problemas/${problem.slug}`, getProblemHero(problem).service.slug);
+  for (const route of getAllProblemCityRoutes()) {
+    const problem = getProblemBySlug(route.problemSlug);
+    if (problem) { heroServices.set(route.path, getProblemHero(problem).service.slug); heroPages.set(route.path, 'ProblemCityPage'); }
+  }
+  for (const [routes, service] of [[getAllMarcaSofaRoutes(), 'limpeza-sofas'], [getAllMarcaColchaoRoutes(), 'limpeza-colchoes'], [getAllMarcaCadeirasRoutes(), 'limpeza-cadeiras']] as const) {
+    for (const route of routes) { heroServices.set(route.path, service); heroPages.set(route.path, service === 'limpeza-sofas' ? 'MarcaSofaPage' : service === 'limpeza-colchoes' ? 'MarcaColchaoPage' : 'MarcaCadeirasPage'); }
+  }
+  const firstPair: Record<string, string> = { 'limpeza-sofas': 'sofa', 'limpeza-colchoes': 'colchao', 'limpeza-cadeiras': 'cadeiras', 'limpeza-tapetes': 'tapete', 'limpeza-alcatifas': 'tapete', impermeabilizacao: 'impermeabilizacao' };
+  const manifest = JSON.parse(fs.readFileSync(path.join(outDir, '.vite/manifest.json'), 'utf8')) as Record<string, { file: string; imports?: string[]; name?: string }>;
+  function preloadPage(html: string, page: string, generated = false) {
+    const files = new Set<string>();
+    function collect(key: string) {
+      const entry = manifest[key];
+      if (!entry || files.has(entry.file)) return;
+      files.add(entry.file);
+      for (const dependency of entry.imports ?? []) collect(dependency);
+    }
+    collect(manifest[`src/pages/${page}.tsx`] ? `src/pages/${page}.tsx` : Object.keys(manifest).find(key => manifest[key].name === page) ?? '');
+    if (generated) collect('src/pages/GeneratedRoutePage.tsx');
+    const links = [...files].filter(file => !html.includes(`href="/${file}"`)).map(file => `<link rel="modulepreload" crossorigin href="/${file}">`).join('\n');
+    return html.replace('</head>', `${links}\n</head>`);
+  }
+  // Homepage is emitted separately from the SEO families.
+
+  function preloadComparison(html: string, service: string | undefined) {
+    const prefix = service && firstPair[service];
+    if (!prefix) return html;
+    const links = ['antes', 'depois'].map(side => {
+      const asset = assetNames.find(name => new RegExp(`^${prefix}-01-${side}-[^.]+\\.webp$`).test(name) && !name.includes('-thumb-'));
+      return asset ? `<link rel="preload" as="image" href="/assets/${asset}" fetchpriority="high">` : '';
+    }).join('\n');
+    return html.replace('</head>', `${links}\n</head>`);
+  }
 
   /**
    * Emit a page: inject meta + optional body content + LocalBusiness on all
@@ -295,6 +344,14 @@ export function prerenderRoutes(outDir: string): number {
     let html = injectMeta(template, title, desc, canonical);
     if (lang !== 'pt') html = html.replace('<html lang="pt">', `<html lang="${lang}">`);
     const landing = lang === 'pt' ? getLandingPageModel(routePath) : null;
+    const familyPages = { localidade: 'LocationServicePage', freguesia: 'FreguesiaServicePage', preco: 'PricePage', variante: 'SofaVariantPage' };
+    const basePages: Record<string, string> = { '/limpeza-sofas': 'LimpezaSofas', '/limpeza-colchoes': 'LimpezaColchoes', '/limpeza-cadeiras': 'LimpezaCadeiras', '/limpeza-tapetes': 'LimpezaTapetes', '/limpeza-alcatifas': 'LimpezaAlcatifas', '/impermeabilizacao': 'Impermeabilizacao' };
+    const page = landing ? familyPages[landing.family] : basePages[routePath] ?? (routePath.startsWith('/problemas/') ? 'ProblemPage' : heroPages.get(routePath) ?? generatedPageForPath(routePath));
+    if (page) {
+      html = preloadPage(html, page, !basePages[routePath] && !routePath.startsWith('/problemas/'));
+      html = html.replace('</head>', `<meta name="kyro-route-path" content="${escHtml(routePath)}"><meta name="kyro-route-page" content="${escHtml(page)}">\n</head>`);
+    }
+    html = preloadComparison(html, landing?.serviceSlug ?? heroServices.get(routePath) ?? routePath.slice(1));
     html = injectContent(html, landing ? renderLandingPageHtml(landing) : generatePageBody(content ?? { h1: title.split(" | ")[0], intro: desc }, lang));
     // LocalBusiness on every page
     html = injectJsonLd(html, LOCAL_BIZ);
@@ -662,14 +719,14 @@ export function prerenderRoutes(outDir: string): number {
       {
         path: '/limpeza-sofas',
         title: 'Limpeza de Sofás ao Domicílio | Desde 49€ | Kyro Clean Solutions',
-        desc: 'Limpeza profissional de sofás ao domicílio. Remoção de manchas, ácaros e odores com extração profissional. Resultados visíveis no momento. Porto, Lisboa e todo o país.',
+        desc: 'Limpeza profissional de sofás ao domicílio. Limpeza de sujidade e resíduos com extração profissional. Tratamentos antiácaros opcionais. Equipas em Braga, Porto, Lisboa e Algarve.',
         content: {
           h1: 'Limpeza de Sofás ao Domicílio',
-          intro: 'Serviço profissional de limpeza de sofás ao domicílio em todo o país. Removemos manchas, ácaros e odores com equipamento de extração profissional. Resultados visíveis no momento, sem necessidade de sair de casa.',
+          intro: 'Limpeza de sofás ao domicílio, adaptada ao tecido e ao estado do artigo. Equipas em Braga, Porto, Lisboa e Algarve. Antiácaros e desbacterização são extras opcionais.',
           processSteps: [
             { step: 1, title: 'Diagnóstico gratuito', description: 'Avaliamos o material e o estado do estofo no local.' },
             { step: 2, title: 'Pré-tratamento', description: 'Aplicamos produto específico nas manchas e zonas críticas.' },
-            { step: 3, title: 'Extração profissional', description: 'Máquina de extração a vapor remove sujidade em profundidade.' },
+            { step: 3, title: 'Extração profissional', description: 'O equipamento extrai a sujidade e a água após o tratamento e a escovação adequada ao tecido.' },
             { step: 4, title: 'Resultado garantido', description: 'Sofá limpo e seco em 3 a 6 horas, pronto a usar.' },
           ],
           benefits: [
@@ -684,7 +741,7 @@ export function prerenderRoutes(outDir: string): number {
             { q: 'Quanto custa a limpeza de sofá?', a: 'A limpeza de sofá começa a partir de 49€ para sofás de 1 lugar, 69€ para 2 lugares e 79€ para 3 lugares. Peça orçamento gratuito sem compromisso.' },
             { q: 'Quanto tempo demora a limpeza de sofá?', a: 'O serviço demora entre 1 a 3 horas conforme o tamanho e estado do sofá. O sofá fica pronto a usar em 3 a 6 horas após a limpeza.' },
             { q: 'A limpeza remove manchas antigas do sofá?', a: 'Sim. Tratamos manchas de vinho, café, gordura e sangue com pré-tratamento específico. Manchas muito antigas podem não sair completamente, mas apresentamos sempre o melhor resultado possível.' },
-            { q: 'Fazem limpeza de sofás ao domicílio em todo o país?', a: 'Sim. O nosso serviço cobre todo o país: Porto, Lisboa, Braga, Coimbra e arredores.' },
+            { q: 'Em que zonas fazem limpeza de sofás ao domicílio?', a: 'Temos equipas em Braga, Porto, Lisboa e Algarve. Aveiro e Coimbra sob consulta.' },
           ]),
         },
         extraSchemas: [
@@ -698,7 +755,7 @@ export function prerenderRoutes(outDir: string): number {
       {
         path: '/limpeza-colchoes',
         title: 'Limpeza e Higienização de Colchões | Desde 59€ | Kyro Clean Solutions',
-        desc: 'Higienização profissional de colchões ao domicílio. Removemos sujidade e resíduos; anti-ácaros e desbacterização são extras opcionais. Desde 59€. Porto, Lisboa e todo o país.',
+        desc: 'Higienização profissional de colchões ao domicílio. Removemos sujidade e resíduos; anti-ácaros e desbacterização são extras opcionais. Desde 59€. Equipas em Braga, Porto, Lisboa e Algarve.',
         content: {
           h1: 'Limpeza e Higienização de Colchões ao Domicílio',
           intro: 'Serviço de higienização profunda de colchões ao domicílio. Removemos resíduos e partículas acumuladas nas fibras com extração profissional. Noites mais saudáveis a partir de 59€.',
@@ -734,7 +791,7 @@ export function prerenderRoutes(outDir: string): number {
       {
         path: '/limpeza-tapetes',
         title: 'Limpeza e Lavagem de Tapetes | Orçamento Grátis | Kyro Clean Solutions',
-        desc: 'Lavagem profissional de tapetes com extração profunda. Removemos sujidade, manchas e alergénios. Serviço ao domicílio em todo o país. Orçamento à medida de cada tapete.',
+        desc: 'Lavagem profissional de tapetes com extração profunda. Removemos sujidade, manchas e alergénios. Serviço ao domicílio nas zonas de atendimento, após avaliação do material. Orçamento à medida de cada tapete.',
         content: {
           h1: 'Limpeza e Lavagem de Tapetes ao Domicílio',
           intro: 'Limpeza profissional de tapetes ao domicílio com extração profunda. Removemos sujidade acumulada, manchas difíceis e alergénios. Tapetes persas, shaggy, sisal e todos os tipos tratados com produto específico ao material.',
@@ -800,7 +857,7 @@ export function prerenderRoutes(outDir: string): number {
       {
         path: '/limpeza-alcatifas',
         title: 'Limpeza de Alcatifas | Sob Orçamento | Kyro Clean Solutions',
-        desc: 'Limpeza profissional de alcatifas com extração profunda. Removemos sujidade acumulada, manchas e alergénios. Secagem rápida. Porto, Lisboa e todo o país.',
+        desc: 'Limpeza profissional de alcatifas com extração profunda. Removemos sujidade acumulada, manchas e alergénios. Secagem rápida. Equipas em Braga, Porto, Lisboa e Algarve.',
         content: {
           h1: 'Limpeza de Alcatifas ao Domicílio',
           intro: 'Serviço profissional de limpeza de alcatifas ao domicílio com extração profunda. Tratamos alcatifas residenciais e comerciais, removendo sujidade acumulada nas fibras, manchas de passagem e alergénios em profundidade.',
@@ -1108,7 +1165,7 @@ export function prerenderRoutes(outDir: string): number {
       h1: 'Estofos como novos, ao domicílio.',
       intro: 'Limpeza profissional de sofás, colchões, cadeiras e tapetes.',
     });
-    const homeHtml = injectContent(rawTemplate, homeBody);
+    const homeHtml = injectContent(preloadPage(rawTemplate, 'IndexV1'), homeBody);
     fs.writeFileSync(templatePath, homeHtml, 'utf-8');
     console.log('  Homepage h1/intro:       injected');
   }

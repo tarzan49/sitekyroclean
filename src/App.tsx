@@ -1,4 +1,4 @@
-import { getTreatmentRoutes, getExpansionRoutes } from './data/treatmentSeoData';
+import { captureLeadAttribution } from './lib/leadAttribution';
 import { lazy, Suspense, useEffect } from "react";
 import { trackSessionTime, isPublicTrackingPage } from "@/lib/quizTracking";
 import { Toaster } from "@/components/ui/toaster";
@@ -13,29 +13,17 @@ import PageHead from "@/components/PageHead";
 import TopProgressBar from "@/components/TopProgressBar";
 import MobileStickyBar from "@/components/MobileStickyBar";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
-import { getAllLocationRoutes } from "@/data/locationSeoData";
-import { getAllFreguesiaRoutes } from "@/data/freguesiaSeoData";
-import { getAllMaterialRoutes, getAllMaterialCityRoutes } from "@/data/materialSeoData";
-import { getAllPriceRoutes } from "@/data/priceSeoData";
-import { getAllProblemCityRoutes } from "@/data/problemCitySeoData";
-import { getAllKeywordVariantRoutes } from "@/data/keywordVariantRouteData";
-import { getAllPackComboRoutes } from "@/data/packComboData";
-import { getAllMarcaSofaRoutes } from "@/data/marcaSofaData";
-import { getAllMarcaColchaoRoutes } from "@/data/marcaColchaoData";
-import { getAllMarcaCadeirasRoutes } from "@/data/marcaCadeirasData";
-import { getAllCommercialRoutes } from "@/data/commercialSeoData";
 
 const LocationPreview = import.meta.env.DEV ? lazy(() => import("./pages/LocationPreview")) : null;
 
-const TreatmentPage = lazy(() => import('./pages/TreatmentPage'));
 
 // Critical path - load immediately
-import IndexV1 from "./pages/IndexV1";
+const IndexV1 = lazy(() => import("./pages/IndexV1"));
+const GeneratedRoutePage = lazy(() => import("./pages/GeneratedRoutePage"));
 
 const QuoteVisualPreview = import.meta.env.DEV ? lazy(() => import('./pages/QuoteVisualPreview')) : null;
 
 // Lazy load non-critical routes for better initial load
-const NotFound = lazy(() => import("./pages/NotFound"));
 const LimpezaSofas = lazy(() => import("./pages/LimpezaSofas"));
 const Impermeabilizacao = lazy(() => import("./pages/Impermeabilizacao"));
 const LimpezaTapetes = lazy(() => import("./pages/LimpezaTapetes"));
@@ -43,30 +31,19 @@ const LimpezaColchoes = lazy(() => import("./pages/LimpezaColchoes"));
 const LimpezaCadeiras = lazy(() => import("./pages/LimpezaCadeiras"));
 const LimpezaAlcatifas = lazy(() => import("./pages/LimpezaAlcatifas"));
 const Obrigado = lazy(() => import("./pages/Obrigado"));
-const LocationServicePage = lazy(() => import("./pages/LocationServicePage"));
-const FreguesiaServicePage = lazy(() => import("./pages/FreguesiaServicePage"));
 const ProblemPage = lazy(() => import("./pages/ProblemPage"));
-const ProblemCityPage = lazy(() => import("./pages/ProblemCityPage"));
 const EnServicePage = lazy(() => import("./pages/EnServicePage"));
 const EnGuidePage = lazy(() => import("./pages/EnGuidePage"));
-const CommercialPage = lazy(() => import("./pages/CommercialPage"));
-const MaterialPage = lazy(() => import("./pages/MaterialPage"));
-const PricePage = lazy(() => import("./pages/PricePage"));
 const BeforeAfterPage = lazy(() => import("./pages/BeforeAfterPage"));
 const AdminPanel = lazy(() => import("./pages/AdminPanel"));
 const AdminDeslocacoes = lazy(() => import("./pages/AdminDeslocacoes"));
 const AreasDeServico = lazy(() => import("./pages/AreasDeServico"));
 
-const SofaVariantPage = lazy(() => import("./pages/SofaVariantPage"));
 const ReviewRequest = lazy(() => import("./pages/ReviewRequest"));
 const FAQEstofos = lazy(() => import("./pages/FAQEstofos"));
 const GlossarioEstofos = lazy(() => import("./pages/GlossarioEstofos"));
-const PackComboPage = lazy(() => import("./pages/PackComboPage"));
 const Packs = lazy(() => import("./pages/Packs"));
 const PacksSitemap = lazy(() => import("./pages/PacksSitemap"));
-const MarcaSofaPage = lazy(() => import("./pages/MarcaSofaPage"));
-const MarcaColchaoPage = lazy(() => import("./pages/MarcaColchaoPage"));
-const MarcaCadeirasPage = lazy(() => import("./pages/MarcaCadeirasPage"));
 const Blog = lazy(() => import("./pages/Blog"));
 const BlogPost = lazy(() => import("./pages/BlogPost"));
 const PoliticaPrivacidade = lazy(() => import("./pages/PoliticaPrivacidade"));
@@ -81,26 +58,15 @@ const PageLoader = () => (
 );
 
 
-// Pre-generate all explicit route lists (just path strings — cheap at module load)
-// React Router v6 requires * to follow /; patterns like /pack-* are treated as /pack-/*
-// and never match /pack-foo-bar. Explicit routes are the only reliable solution.
-const locationRoutes = getAllLocationRoutes();
-const frequesiaRoutes = getAllFreguesiaRoutes();
-const materialRoutes = getAllMaterialRoutes();
-const materialCityRoutes = getAllMaterialCityRoutes();
-const priceRoutes = getAllPriceRoutes();
-const problemCityRoutes = getAllProblemCityRoutes();
-const keywordVariantRoutes = getAllKeywordVariantRoutes();
-const packComboRoutes = getAllPackComboRoutes();
-const marcaSofaRoutes = getAllMarcaSofaRoutes();
-const marcaColchaoRoutes = getAllMarcaColchaoRoutes();
-const marcaCadeirasRoutes = getAllMarcaCadeirasRoutes();
-const commercialRoutes = getAllCommercialRoutes();
-
 // ── Inner router component, must be inside <BrowserRouter> to use useLocation
 const AppRoutes = () => {
   const location = useLocation();
   useScrollReveal();
+  useEffect(() => {
+    captureLeadAttribution();
+    window.addEventListener('kyro:consent-changed', captureLeadAttribution);
+    return () => window.removeEventListener('kyro:consent-changed', captureLeadAttribution);
+  }, [location.pathname, location.search]);
 
   return (
     <>
@@ -110,7 +76,7 @@ const AppRoutes = () => {
       <ScrollToTop />
       <PageHead />
 
-      <div key={location.pathname} className="page-fade-in" style={{ width: '100%', minHeight: '100vh' }}>
+      <div key={location.pathname} className="page-content" style={{ width: '100%', minHeight: '100vh' }}>
           <ErrorBoundary>
             <Suspense fallback={<PageLoader />}>
               <Routes>
@@ -127,61 +93,11 @@ const AppRoutes = () => {
                 <Route path="/packs" element={<Packs />} />
                 <Route path="/guia-de-packs" element={<PacksSitemap />} />
                 <Route path="/antes-depois-limpeza" element={<BeforeAfterPage />} />
-                {/* Location × Service SEO pages: 150 explicit routes */}
-                {locationRoutes.map(route => (
-                  <Route key={route.path} path={route.path} element={<LocationServicePage />} />
-                ))}
-                {/* Freguesia × Service SEO pages: 792 explicit routes */}
-                {frequesiaRoutes.map(route => (
-                  <Route key={route.path} path={route.path} element={<FreguesiaServicePage />} />
-                ))}
-                {/* Keyword variant pages (higienizacao/lavagem/impermeabilizacao × service × location).
-                    Registered BEFORE problem×city to win on overlapping paths like
-                    /higienizacao-colchao-porto or /lavagem-tapetes-braga. */}
-                {keywordVariantRoutes.map(route => (
-                  <Route key={route.path} path={route.path} element={<SofaVariantPage />} />
-                ))}
                 {/* Problem SEO pages */}
                 <Route path="/problemas/:slug" element={<ProblemPage />} />
                 {/* English tourist SEO pages — isolated /en/ namespace, no PT overlap */}
                 <Route path="/en/airbnb-portugal-cleaning-guide" element={<EnGuidePage />} />
                 <Route path="/en/:slug" element={<EnServicePage />} />
-                {/* Problem × City explicit routes (higienizacao-* and lavagem-* filtered out above) */}
-                {problemCityRoutes.map(route => (
-                  <Route key={route.path} path={route.path} element={<ProblemCityPage />} />
-                ))}
-                {/* Commercial B2B pages: restaurantes/hotéis/escritórios × cidade */}
-                {commercialRoutes.map(route => (
-                  <Route key={route.path} path={route.path} element={<CommercialPage />} />
-                ))}
-                {/* Marca Sofá pages: 8 brands × cities */}
-                {marcaSofaRoutes.map(route => (
-                  <Route key={route.path} path={route.path} element={<MarcaSofaPage />} />
-                ))}
-                {/* Marca Colchão pages: 6 brands × cities */}
-                {marcaColchaoRoutes.map(route => (
-                  <Route key={route.path} path={route.path} element={<MarcaColchaoPage />} />
-                ))}
-                {/* Marca Cadeiras pages: 6 brands × cities */}
-                {marcaCadeirasRoutes.map(route => (
-                  <Route key={route.path} path={route.path} element={<MarcaCadeirasPage />} />
-                ))}
-                {/* Material base pages */}
-                {materialRoutes.map(route => (
-                  <Route key={route.path} path={route.path} element={<MaterialPage />} />
-                ))}
-                {/* Material × City pages */}
-                {materialCityRoutes.map(route => (
-                  <Route key={route.path} path={route.path} element={<MaterialPage />} />
-                ))}
-                {/* Price pages */}
-                {priceRoutes.map(route => (
-                  <Route key={route.path} path={route.path} element={<PricePage />} />
-                ))}
-                {/* Pack/Combo pages: 4 packs × 5 cities = 20 pages */}
-                {packComboRoutes.map(route => (
-                  <Route key={route.path} path={route.path} element={<PackComboPage />} />
-                ))}
                 {/* Resource pages */}
                 {/* Blog */}
                 <Route path="/blog" element={<Blog />} />
@@ -198,8 +114,8 @@ const AppRoutes = () => {
                 <Route path="/admin/deslocacoes" element={<AdminDeslocacoes />} />
                 <Route path="/areas-de-servico" element={<AreasDeServico />} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-                {[...getTreatmentRoutes(), ...getExpansionRoutes()].map(route => <Route key={route.path} path={route.path} element={<TreatmentPage />} />)}
-                <Route path="*" element={<NotFound />} />
+
+                <Route path="*" element={<GeneratedRoutePage />} />
               </Routes>
             </Suspense>
           </ErrorBoundary>

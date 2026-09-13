@@ -1,3 +1,5 @@
+import { leadAttributionNote } from '@/lib/leadAttribution';
+import { trackEvent } from '@/lib/analytics';
 /**
  * contactService.ts
  * Submits the simple contact form to Formspree.
@@ -22,8 +24,10 @@ export async function submitContactForm(data: ContactPayload): Promise<void> {
       email: data.email,
       location: data.localidade,
       message: data.mensagem,
+      campaign_attribution: leadAttributionNote() || undefined,
     }),
   });
 
   if (!response.ok) throw new Error('Erro ao enviar');
+  trackEvent('generate_lead', { form: 'contact', delivery: 'formspree' });
 }

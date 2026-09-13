@@ -1,6 +1,7 @@
 import { useState, useRef, useCallback, useEffect } from "react";
 
 interface BeforeAfterSliderProps {
+  priority?: boolean;
   beforeImage: string;
   afterImage: string;
   beforeLabel?: string;
@@ -20,6 +21,7 @@ interface BeforeAfterSliderProps {
 }
 
 const BeforeAfterSlider = ({
+  priority = false,
   beforeImage,
   afterImage,
   beforeLabel = "Antes",
@@ -205,7 +207,7 @@ const BeforeAfterSlider = ({
           src={afterImage}
           alt="Depois da limpeza profissional | Kyro Clean Solutions"
           width={800} height={800}
-          loading="lazy" decoding="async"
+          loading={priority ? "eager" : "lazy"} fetchPriority={priority ? "high" : "auto"} decoding="async"
           draggable={false}
           onDragStart={(e) => e.preventDefault()}
           className="w-full h-full object-cover"
@@ -230,7 +232,7 @@ const BeforeAfterSlider = ({
           src={beforeImage}
           alt="Antes da limpeza profissional | Kyro Clean Solutions"
           width={800} height={800}
-          loading="lazy" decoding="async"
+          loading={priority ? "eager" : "lazy"} fetchPriority={priority ? "high" : "auto"} decoding="async"
           draggable={false}
           onDragStart={(e) => e.preventDefault()}
           className="w-full h-full object-cover"

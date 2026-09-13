@@ -7,7 +7,7 @@ const mattressCrops: Record<string, { width: number; start: number }> = { soltei
 export default function QuizFurnitureImage({ service, sizeId, className }: { service: keyof typeof positions; sizeId?: string; className?: string }) {
   const sofaSize = service === 'sofa' && sizeId ? sofaPositions[sizeId] : undefined;
   const mattressSize = service === 'mattress' && sizeId ? mattressCrops[sizeId] : undefined;
-  const asset = sofaSize ? 'quote-sofa-sizes.png' : mattressSize ? 'quote-mattress-sizes.png' : 'quote-furniture.png';
+  const asset = sofaSize ? 'quote-sofa-sizes.webp' : mattressSize ? 'quote-mattress-sizes.webp' : 'quote-furniture.webp';
   if (mattressSize) {
     return <span aria-hidden="true" className={cn('flex items-center justify-center w-12 h-12 sm:w-14 sm:h-14 shrink-0', className)}>
       <span className="block h-full bg-no-repeat" style={{ width: `${mattressSize.width / 812 * 100}%`, backgroundImage: `url(/images/services/${asset})`, backgroundSize: `${2172 / mattressSize.width * 100}% ${724 / 812 * 100}%`, backgroundPosition: `${mattressSize.start / (2172 - mattressSize.width) * 100}% 50%` }} />

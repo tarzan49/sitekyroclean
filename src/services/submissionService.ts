@@ -1,3 +1,4 @@
+import { leadAttributionNote } from '@/lib/leadAttribution';
 import { splitTreatmentItems } from '@/components/quiz/quizHelpers';
 import { sofaPrices, mattressPrices } from '@/components/quiz/QuizTypes';
 import type { SofaItem, MattressItem, CarpetItem, UpsellItemConfig } from '@/components/quiz/QuizTypes';
@@ -60,6 +61,8 @@ async function postToFormspree(payload: QuizLeadPayload, bookingId: string): Pro
   formPayload.append('location', finalLocation);
   formPayload.append('message', `${message}\nReferência do pedido: #${bookingId}`);
   formPayload.append('booking_id', bookingId);
+  const attribution = leadAttributionNote();
+  if (attribution) formPayload.append('campaign_attribution', attribution);
   formPayload.append('subject', `Pedido de orçamento - ${serviceLabel}`);
   photos.forEach((photo, i) => {
     formPayload.append(`foto_${i + 1}`, photo, photo.name);
@@ -107,7 +110,7 @@ async function insertCrmLead(payload: QuizLeadPayload, bookingId: string): Promi
     status: 'pending',
     source: 'Website',
     priority: 'Quente',
-    notes: upsellItems.map(item => item.label).join(' | '),
+    notes: [upsellItems.map(item => item.label).join(' | '), leadAttributionNote()].filter(Boolean).join('\n'),
   });
   if (error) throw error;
 }

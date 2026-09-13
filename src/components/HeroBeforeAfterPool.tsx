@@ -11,7 +11,7 @@ interface Props {
 export default function HeroBeforeAfterPool({ category, className, intervalMs }: Props) {
   return (
     <div className={className}>
-      <ServiceResultsGallery key={category} category={category} intervalMs={intervalMs} />
+      <ServiceResultsGallery priority key={category} category={category} intervalMs={intervalMs} />
     </div>
   );
 }

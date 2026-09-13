@@ -1,5 +1,5 @@
 import { DRYING_PROMISE } from '../constants/commercialPolicy';
-export const SOFA_PROCESS_IMAGE = '/images/services/sofa-cleaning-process-guide.png';
+export const SOFA_PROCESS_IMAGE = '/images/services/sofa-cleaning-process-guide.webp';
 export const SOFA_PROCESS_STEPS = [
   { label: 'Avaliação', title: 'Primeiro, conhecemos o tecido.', description: 'Observamos o material, as manchas e o estado do sofá para escolher o tratamento adequado.', y: 170, height: 210, alt: 'Inspeção do tecido e das costuras do sofá' },
   { label: 'Aplicação', title: 'O produto certo, no sítio certo.', description: 'Aplicamos o produto adequado ao tecido e às zonas que precisam de tratamento.', y: 395, height: 222, alt: 'Aplicação de produto no tecido com um pulverizador' },

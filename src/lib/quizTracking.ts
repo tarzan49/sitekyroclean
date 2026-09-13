@@ -1,3 +1,4 @@
+import { getConsent } from './consent';
 import { createEventDelivery, sendStoredEvent } from './eventDelivery';
 
 export const IS_PRODUCTION = typeof window !== 'undefined' && window.location.hostname === 'cleansolutions.com.pt';
@@ -7,7 +8,7 @@ try { storage = window.sessionStorage; } catch { /* private browsing */ }
 let outboxStorage: Storage | undefined;
 try { outboxStorage = window.localStorage; } catch { /* unavailable */ }
 let reported = false;
-const outbox = createEventDelivery(e => sendStoredEvent(import.meta.env.VITE_SUPABASE_URL, import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY, e), outboxStorage, message => {
+const outbox = createEventDelivery(async e => { if (getConsent() === 'accepted') await sendStoredEvent(import.meta.env.VITE_SUPABASE_URL, import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY, e); }, outboxStorage, message => {
   if (reported) return;
   reported = true;
   void import('./errorTracking').then(({ logError }) => logError({ message, source: 'TrackingDelivery', severity: 'warning' }));
@@ -30,13 +31,13 @@ function context() {
     device: window.innerWidth < 768 ? 'mobile' : window.innerWidth < 1024 ? 'tablet' : 'desktop' };
 }
 function emit(payload: Record<string, unknown>) {
-  if (!IS_PRODUCTION || /^\/admin(?:\/|$)/.test(String(payload.page_path ?? window.location.pathname))) return;
+  if (getConsent() !== 'accepted' || !IS_PRODUCTION || /^\/admin(?:\/|$)/.test(String(payload.page_path ?? window.location.pathname))) return;
   try { outbox.enqueue({ ...context(), ...payload }); } catch (error) { console.warn('[Tracking] Could not enqueue event', error); }
 }
 export function trackQuizEvent(params: { step: number; action: 'start' | 'complete' | 'abandon'; service?: string; city?: string; value?: number; service_type?: string; session_id?: string }) { emit(params); }
 let delegatedClick = false;
 function contact(action: 'whatsapp_click' | 'call_click', source: string) {
-  if (!IS_PRODUCTION || !isPublicTrackingPage()) return;
+  if (getConsent() !== 'accepted' || !IS_PRODUCTION || !isPublicTrackingPage()) return;
   emit({ action, step: 0, service: source });
   try { window.gtag?.('event', action, { event_category: 'engagement', event_label: source, page_path: window.location.pathname }); } catch { /* contact navigation must remain available */ }
 }
@@ -46,7 +47,7 @@ export function trackSessionTime(seconds: number, page_path = window.location.pa
 
 export function initContactTracking() {
   if (!IS_PRODUCTION) return () => {};
-  context();
+  if (getConsent() === 'accepted') context();
   const click = (event: MouseEvent) => {
     if (event.type === 'auxclick' && event.button !== 1) return;
     const link = event.target instanceof Element ? event.target.closest('a[href]') : null;
@@ -62,8 +63,13 @@ export function initContactTracking() {
   document.addEventListener('click', click, true);
   document.addEventListener('auxclick', click, true);
   const flush = () => { void outbox.flush(); };
+  const consentChanged = () => {
+    if (getConsent() !== 'accepted') { session = undefined!; try { storage?.removeItem('kyro_visit_v2'); } catch { /* unavailable */ } }
+    flush();
+  };
+  window.addEventListener('kyro:consent-changed', consentChanged);
   window.addEventListener('online', flush);
   const interval = window.setInterval(flush, 30000);
   flush();
-  return () => { document.removeEventListener('click', click, true); document.removeEventListener('auxclick', click, true); window.removeEventListener('online', flush); clearInterval(interval); };
+  return () => { document.removeEventListener('click', click, true); document.removeEventListener('auxclick', click, true); window.removeEventListener('online', flush); window.removeEventListener('kyro:consent-changed', consentChanged); clearInterval(interval); };
 }

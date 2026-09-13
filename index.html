@@ -3,8 +3,10 @@
 
 <head>
   <meta charset="UTF-8" />
-  <link rel="preload" href="/fonts/avenir-next/regular.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="preload" href="/fonts/avenir-next/demi.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/fonts/avenir-next/regular.latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/fonts/avenir-next/demi.latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/fonts/avenir-next/medium.latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/fonts/avenir-next/bold.latin.woff2" as="font" type="font/woff2" crossorigin>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
@@ -20,8 +22,8 @@
   <link rel="dns-prefetch" href="https://www.google-analytics.com">
   
   <!-- Critical hero image preload for LCP (Slide 0 — desktop e mobile) -->
-  <link rel="preload" as="image" href="/images/fotos%20hero/novafotoheropc.webp" fetchpriority="high" media="(min-width: 768px)">
-  <link rel="preload" as="image" href="/images/fotos%20hero/imagemiphoneheronova.webp" fetchpriority="high" media="(max-width: 767px)">
+  <link rel="preload" as="image" href="/images/hero-sofa-v1.webp" fetchpriority="high" media="(min-width: 768px)">
+  <link rel="preload" as="image" href="/images/hero-sofa-mobile-extended.webp" fetchpriority="high" media="(max-width: 767px)">
   
   <!-- Critical inline CSS for faster FCP -->
   <style>
@@ -34,11 +36,9 @@
   </style>
   
   <!-- Google tag (gtag.js) - GA4 + Google Ads -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-T45T5FBNC3"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
     // GDPR Consent Mode v2 — default denied until user accepts
     gtag('consent', 'default', {
       analytics_storage: 'denied',
@@ -47,12 +47,11 @@
       ad_personalization: 'denied',
       wait_for_update: 500
     });
-    gtag('config', 'G-T45T5FBNC3');
-    gtag('config', 'AW-17779872363');
+    // Tags are loaded by consent.ts only after acceptance.
   </script>
   
   <title>Kyro Clean Solutions | Limpeza de Sofás, Colchões e Tapetes ao Domicílio</title>
-  <meta name="description" content="O seu sofá, colchão ou tapete como novo em 1h, ao domicílio, sem sair de casa. Avaliação 4.9 Google. Extração profissional. Porto, Gaia, Lisboa e todo o país. Orçamento grátis.">
+  <meta name="description" content="Limpeza profissional de sofás, colchões e tapetes ao domicílio. Equipas em Braga, Porto, Lisboa e Algarve. Orçamento claro e resposta em menos de 10 minutos.">
   
   <!-- Open Graph / Facebook -->
   <meta property="og:type" content="website" />
@@ -180,8 +179,8 @@
   </script>
   <meta property="og:title" content="Kyro Clean Solutions | Limpeza de Sofás, Colchões e Tapetes ao Domicílio">
   <meta name="twitter:title" content="Kyro Clean Solutions | Limpeza de Sofás, Colchões e Tapetes ao Domicílio">
-  <meta property="og:description" content="O seu sofá, colchão ou tapete como novo em 1h, ao domicílio, sem sair de casa. Avaliação 4.9 Google. Extração profissional. Porto, Gaia, Lisboa e todo o país. Orçamento grátis.">
-  <meta name="twitter:description" content="O seu sofá, colchão ou tapete como novo em 1h, ao domicílio, sem sair de casa. Avaliação 4.9 Google. Extração profissional. Porto, Gaia, Lisboa e todo o país. Orçamento grátis.">
+  <meta property="og:description" content="Limpeza profissional de sofás, colchões e tapetes ao domicílio. Equipas em Braga, Porto, Lisboa e Algarve. Orçamento claro e resposta em menos de 10 minutos.">
+  <meta name="twitter:description" content="Limpeza profissional de sofás, colchões e tapetes ao domicílio. Equipas em Braga, Porto, Lisboa e Algarve. Orçamento claro e resposta em menos de 10 minutos.">
 </head>
 
 <body>

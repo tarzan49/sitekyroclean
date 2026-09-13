@@ -1,3 +1,4 @@
+import { exampleImageSrcSet, EXAMPLE_IMAGE_SIZES } from '@/lib/responsiveImages';
 import "@/styles/visual-examples.css";
 import { useRef, useState } from "react";
 import { ZoomIn, X } from "lucide-react";
@@ -14,8 +15,9 @@ export default function VisualExamplesGallery({ examples, name, overline = "Mate
     <div className="relative aspect-square overflow-hidden bg-[#173629]">
       <img
         src={loading === "lazy" ? examples[index].thumbnailSrc ?? examples[index].src : examples[index].src}
-        srcSet={loading === "lazy" ? examples[index].thumbnailSrcSet : undefined}
-        sizes={loading === "lazy" ? examples[index].thumbnailSizes : undefined}
+        srcSet={loading === "lazy" ? examples[index].thumbnailSrcSet ?? exampleImageSrcSet(examples[index].src) : undefined}
+        sizes={loading === "lazy" ? examples[index].thumbnailSizes ?? EXAMPLE_IMAGE_SIZES : undefined}
+        fetchPriority={loading === "lazy" ? "low" : "auto"}
         alt={examples[index].alt}
         loading={loading}
         decoding="async"

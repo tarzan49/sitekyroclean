@@ -1,3 +1,4 @@
+import { getConsent } from './consent';
 /**
  * Analytics & Tracking Utilities
  * Comprehensive event tracking for quiz funnel, conversions, and Core Web Vitals
@@ -16,7 +17,7 @@ export function trackEvent(
   eventName: string,
   params?: Record<string, string | number | boolean>
 ) {
-  if (typeof window !== 'undefined' && window.gtag) {
+  if (getConsent() === 'accepted' && typeof window !== 'undefined' && window.gtag) {
     window.gtag('event', eventName, params);
   }
   

@@ -4,7 +4,7 @@
  * All components that render the quiz modal should import this instead
  * of importing QuizForm directly.
  */
-import { lazy, Suspense } from 'react';
+import { lazy, Suspense, useEffect, useState } from 'react';
 
 const QuizForm = lazy(() => import('./QuizForm'));
 
@@ -31,12 +31,12 @@ interface Props {
   initialUpsellItems?: import('./quiz/QuizTypes').UpsellItemConfig[];
 }
 
-const QuizFormLazy = (props: Props) => (
-  // Fallback is null, the modal manages its own visibility,
-  // so there is nothing to show while the chunk loads.
-  <Suspense fallback={null}>
-    <QuizForm {...props} />
-  </Suspense>
-);
+const QuizFormLazy = (props: Props) => {
+  // Import on first opening, then retain the form across closing/reopening.
+  const [hasOpened, setHasOpened] = useState(props.isOpen);
+  useEffect(() => { if (props.isOpen) setHasOpened(true); }, [props.isOpen]);
+  if (!hasOpened && !props.isOpen) return null;
+  return <Suspense fallback={null}><QuizForm {...props} /></Suspense>;
+};
 
 export default QuizFormLazy;

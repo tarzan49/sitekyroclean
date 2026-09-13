@@ -1,9 +1,10 @@
+import { resultThumbnail } from '@/data/resultThumbnails';
 import { useEffect, useRef, useState } from "react";
 import { ChevronLeft, ChevronRight, Pause, Play } from "lucide-react";
 import BeforeAfterSlider from "@/components/BeforeAfterSlider";
 import { BEFORE_AFTER_POOL, type BeforeAfterCategory } from "@/data/beforeAfterPool";
 
-export default function ServiceResultsGallery({ category, light = false, intervalMs = 6000 }: { category: BeforeAfterCategory; light?: boolean; intervalMs?: number }) {
+export default function ServiceResultsGallery({ category, light = false, intervalMs = 6000, priority = false }: { priority?: boolean; category: BeforeAfterCategory; light?: boolean; intervalMs?: number }) {
   const pool = BEFORE_AFTER_POOL[category];
   const [index, setIndex] = useState(0);
   const [playing, setPlaying] = useState(false);
@@ -46,7 +47,7 @@ export default function ServiceResultsGallery({ category, light = false, interva
           <BeforeAfterSlider key={index} beforeImage={item.before} afterImage={item.after}
             beforeLabel={category === "impermeabilizacao" ? "Sem proteção" : "Antes"}
             afterLabel={category === "impermeabilizacao" ? "Com proteção" : "Depois"}
-            noFrame illustrative={item.illustrative} onDraggingChange={setDragging} />
+            priority={priority && index === 0} noFrame illustrative={item.illustrative} onDraggingChange={setDragging} />
         ) : (
           <img src={item.image} alt="Resultado de limpeza de tapete, fotografia sem comparação" loading="lazy" decoding="async" className="w-full h-full object-contain" />
         )}
@@ -67,7 +68,7 @@ export default function ServiceResultsGallery({ category, light = false, interva
           <button key={i} type="button" aria-label={`Ver exemplo ${i + 1}${example.kind === "pair" && example.illustrative ? ", efeito ilustrativo" : ""}`}
             aria-pressed={i === index} onClick={() => select(i)}
             className={`relative h-12 w-16 shrink-0 overflow-hidden border-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-gold ${i === index ? "border-gold" : "border-transparent opacity-60 hover:opacity-100"}`}>
-            <img src={example.kind === "pair" ? example.after : example.image} alt="" loading="lazy" decoding="async" className="w-full h-full object-cover" />
+            <img src={resultThumbnail(example.kind === "pair" ? example.after : example.image)} alt="" loading="lazy" decoding="async" className="w-full h-full object-cover" />
             <span className="absolute bottom-0 right-0 bg-black/75 text-white text-sm px-1.5 py-0.5">{i + 1}</span>
           </button>
         ))}

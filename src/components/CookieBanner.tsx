@@ -8,12 +8,16 @@ const CookieBanner = () => {
   const isEn = pathname.startsWith('/en/');
 
   useEffect(() => {
+    const reopen = () => setVisible(true);
+    window.addEventListener('kyro:open-consent', reopen);
+    let t: ReturnType<typeof setTimeout>;
     // Show only when no decision has been recorded yet
     if (getConsent() === null) {
       // Slight delay so it doesn't flash immediately on load
-      const t = setTimeout(() => setVisible(true), 800);
-      return () => clearTimeout(t);
+      t = setTimeout(() => setVisible(true), 800);
+
     }
+    return () => { clearTimeout(t); window.removeEventListener('kyro:open-consent', reopen); };
   }, []);
 
   if (!visible) return null;
@@ -41,7 +45,7 @@ const CookieBanner = () => {
             <p className="text-sm sm:text-base text-white/70 leading-relaxed">
               {isEn ? (
                 <>
-                  We use cookies and Google Analytics to improve your experience and analyse site traffic. See our{' '}
+                  With your permission, we use analytics and advertising cookies to measure visits and campaigns. See our{' '}
                   <Link
                     to="/politica-de-privacidade"
                     className="text-[#D4AF37] underline underline-offset-2 hover:text-[#f0dc8a] transition-colors"
@@ -53,7 +57,7 @@ const CookieBanner = () => {
                 </>
               ) : (
                 <>
-                  Cookies e Google Analytics para analisar visitas. Consulte a nossa{' '}
+                  Com a sua autorização, usamos cookies de análise e publicidade para medir visitas e campanhas. Consulte a nossa{' '}
                   <Link
                     to="/politica-de-privacidade"
                     className="text-[#D4AF37] underline underline-offset-2 hover:text-[#f0dc8a] transition-colors"

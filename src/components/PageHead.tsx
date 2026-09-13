@@ -11,25 +11,25 @@ const routeMeta: Record<string, { pt: PageMeta; en: PageMeta; es: PageMeta }> = 
   "/": {
     pt: {
       title: "Kyro Clean Solutions | Limpeza de Sofás, Colchões e Tapetes ao Domicílio",
-      description: "O seu sofá, colchão ou tapete como novo em 1h, ao domicílio, sem sair de casa. Avaliação 4.9 Google. Extração profissional. Porto, Gaia, Lisboa e todo o país. Orçamento grátis.",
+      description: "Limpeza profissional de sofás, colchões e tapetes ao domicílio. Equipas em Braga, Porto, Lisboa e Algarve. Orçamento claro e resposta em menos de 10 minutos.",
     },
     en: {
       title: "Kyro Clean Solutions | Professional Sofa, Mattress & Rug Cleaning at Home",
-      description: "Your sofa, mattress or rug like new in 1h, at your home, no hassle. 4.9 Google rating. Professional extraction. Porto, Lisbon and nationwide. Free quote.",
+      description: "Professional sofa, mattress and rug cleaning at home. Teams in Braga, Porto, Lisbon and Algarve. Clear quotes and a response in under 10 minutes.",
     },
     es: {
       title: "Kyro Clean Solutions | Limpieza de Sofás, Colchones y Alfombras a Domicilio",
-      description: "Su sofá, colchón o alfombra como nuevo en 1h, a domicilio, sin salir de casa. Valoración 4.9 Google. Extracción profesional. Presupuesto gratis.",
+      description: "Limpieza profesional de sofás, colchones y alfombras a domicilio. Equipos en Braga, Oporto, Lisboa y Algarve. Presupuesto claro y respuesta en menos de 10 minutos.",
     },
   },
   "/limpeza-sofas": {
     pt: {
       title: "Limpeza e Lavagem de Sofás ao Domicílio | Desde 49€ | Kyro Clean Solutions",
-      description: "Limpeza e lavagem profissional de sofás ao domicílio. Remoção de manchas, ácaros e odores com extração profissional. Resultados visíveis no momento. Porto, Lisboa e todo o país.",
+      description: "Limpeza e lavagem profissional de sofás ao domicílio. Limpeza de sujidade e resíduos com extração profissional. Tratamentos antiácaros opcionais. Equipas em Braga, Porto, Lisboa e Algarve.",
     },
     en: {
       title: "Sofa Cleaning & Washing Service | From €49 | Kyro Clean Solutions",
-      description: "Professional sofa cleaning and washing at your home. Stain, mite and odour removal with professional extraction equipment. Visible results on the spot.",
+      description: "Professional sofa cleaning and washing at your home. Professional extraction adapted to the fabric. Anti-mite treatments are optional extras.",
     },
     es: {
       title: "Limpieza y Lavado de Sofás a Domicilio | Desde 49€ | Kyro Clean Solutions",
@@ -53,7 +53,7 @@ const routeMeta: Record<string, { pt: PageMeta; en: PageMeta; es: PageMeta }> = 
   "/limpeza-tapetes": {
     pt: {
       title: "Limpeza e Lavagem de Tapetes | Orçamento Grátis | Kyro Clean Solutions",
-      description: "Lavagem profissional de tapetes com extração profunda. Removemos sujidade, manchas e alergénios. Recolha e entrega disponível em todo o país.",
+      description: "Lavagem profissional de tapetes com extração profunda. Removemos sujidade, manchas e alergénios. Método avaliado pela composição do tapete. Sempre sob orçamento.",
     },
     en: {
       title: "Rug Cleaning & Washing | Free Quote | Kyro Clean Solutions",
@@ -81,7 +81,7 @@ const routeMeta: Record<string, { pt: PageMeta; en: PageMeta; es: PageMeta }> = 
   "/limpeza-alcatifas": {
     pt: {
       title: "Limpeza e Lavagem de Alcatifas | Orçamento Grátis | Kyro Clean Solutions",
-      description: "Limpeza e lavagem profunda de alcatifas com extração profissional. Removemos sujidade acumulada e alergénios. Secagem rápida. Porto, Lisboa e todo o país.",
+      description: "Limpeza e lavagem profunda de alcatifas com extração profissional. Removemos sujidade acumulada e alergénios. Secagem média de 3 a 6 horas, conforme a ventilação. Equipas em Braga, Porto, Lisboa e Algarve.",
     },
     en: {
       title: "Carpet Cleaning & Deep Wash | Free Quote | Kyro Clean Solutions",

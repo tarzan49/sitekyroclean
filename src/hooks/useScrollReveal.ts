@@ -36,6 +36,8 @@ export function useScrollReveal() {
   const { pathname } = useLocation();
 
   useEffect(() => {
+    // Avoid full-page blur layers and layout reads while scrolling on phones.
+    if (window.matchMedia('(max-width: 767px)').matches) return;
     let heroSection: HTMLElement | null = null;
     let contentSections: HTMLElement[] = [];
     let rafId = 0;

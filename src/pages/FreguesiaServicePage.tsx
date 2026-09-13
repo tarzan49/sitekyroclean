@@ -3,7 +3,7 @@ import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import HeroBeforeAfterPool from "@/components/HeroBeforeAfterPool";
 import { GoogleG } from "@/components/icons/GoogleG";
-import LandingServiceSections from '@/components/LandingServiceSections';
+import LandingServiceSections from '@/components/LazyLandingServiceSections';
 import PageBreadcrumb from "@/components/PageBreadcrumb";
 import ServiceLocationSchema from "@/components/ServiceLocationSchema";
 import ServiceSnapshotStats from "@/components/ServiceSnapshotStats";

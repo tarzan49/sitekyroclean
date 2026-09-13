@@ -7,7 +7,7 @@ import { useQuizLauncher } from "@/hooks/use-quiz-launcher";
 
 const QuizForm = lazy(() => import('./QuizFormLazy'));
 
-const imgDesktop = '/images/hero-sofa-v1.jpeg';
+const imgDesktop = '/images/hero-sofa-v1.webp';
 const imgMobile = '/images/hero-sofa-mobile-extended.webp';
 
 const Hero = () => {
@@ -33,7 +33,7 @@ const Hero = () => {
         {/* Background */}
         <div className="absolute inset-0 z-0 hidden md:block">
           <picture>
-            <source srcSet={imgDesktop} type="image/jpeg" />
+            <source media="(max-width: 767px)" srcSet="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" />
             <img
               src={imgDesktop}
               alt=""

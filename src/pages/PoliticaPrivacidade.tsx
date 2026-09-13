@@ -20,7 +20,7 @@ const PoliticaPrivacidade = () => (
           <h1 className="type-page-title font-playfair    text-[#111111] ">
             Política de Privacidade
           </h1>
-          <p className="text-base text-[#555] mt-3">Última atualização: abril de 2026</p>
+          <p className="text-base text-[#555] mt-3">Última atualização: setembro de 2026</p>
         </div>
 
         <Section title="1. Quem somos">
@@ -120,6 +120,11 @@ const PoliticaPrivacidade = () => (
           <p>
             Tem o direito de apresentar reclamação junto da autoridade de supervisão competente em Portugal: a <strong>CNPD, Comissão Nacional de Proteção de Dados</strong> (<a href="https://www.cnpd.pt" target="_blank" rel="noopener noreferrer" className="text-[#1A4E30] underline underline-offset-2 hover:text-[#D4AF37] transition-colors">www.cnpd.pt</a>).
           </p>
+        </Section>
+
+        <Section title="Preferências de medição">
+          <p>As ferramentas Google Analytics e Google Ads e a medição própria de visitas só são ativadas após aceitar. Com essa autorização, os parâmetros da campanha e a página de entrada podem ser associados ao pedido para medir a origem dos contactos. Recusar não impede pedir um orçamento.</p>
+          <button type="button" className="min-h-11 underline" onClick={() => window.dispatchEvent(new Event('kyro:open-consent'))}>Rever preferências de cookies</button>
         </Section>
 
         <Section title="11. Contacto">

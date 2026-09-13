@@ -10,6 +10,19 @@ export function getConsent(): ConsentStatus {
   }
 }
 
+let tagsLoaded = false;
+function loadGoogleTags() {
+  if (tagsLoaded || typeof window === 'undefined') return;
+  tagsLoaded = true;
+  window.gtag?.('js', new Date());
+  window.gtag?.('config', 'G-T45T5FBNC3');
+  window.gtag?.('config', 'AW-17779872363');
+  const script = document.createElement('script');
+  script.async = true;
+  script.src = 'https://www.googletagmanager.com/gtag/js?id=G-T45T5FBNC3';
+  document.head.appendChild(script);
+}
+
 function applyGtagConsent(granted: boolean) {
   if (typeof window === 'undefined' || !window.gtag) return;
   const val = granted ? 'granted' : 'denied';
@@ -26,10 +39,13 @@ export function setConsent(status: 'accepted' | 'declined') {
     localStorage.setItem(CONSENT_KEY, status);
   } catch { /* storage blocked */ }
   applyGtagConsent(status === 'accepted');
+  if (status === 'accepted') loadGoogleTags();
+  window.dispatchEvent(new Event('kyro:consent-changed'));
 }
 
 /** Call once on app start to restore previously given consent */
 export function restoreConsent() {
   const stored = getConsent();
   if (stored !== null) applyGtagConsent(stored === 'accepted');
+  if (stored === 'accepted') loadGoogleTags();
 }
