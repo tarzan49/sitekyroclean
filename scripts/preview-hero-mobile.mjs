@@ -3,31 +3,50 @@ import { createServer } from 'vite';
 // Local design pilot only. This plugin is never loaded by the production build.
 const route = '/limpeza-sofas-porto';
 const css = `
+:root{
+  --pilot-green:#12372c;
+  --pilot-green-deep:#102b23;
+  --pilot-paper:#f4f7f4;
+  --pilot-surface:radial-gradient(ellipse at 90% 0%,rgba(93,154,122,.16),transparent 65%),linear-gradient(155deg,#173e31 0%,#12372c 48%,#102b23 100%);
+}
+.bg-kyro-green,.bg-checker-dark,.bg-checker-modal{
+  background:var(--pilot-surface)!important;
+}
+section[class*="bg-[#071a12]"]{background:var(--pilot-surface)!important}
+section[class*="bg-[#FDFDF9]"]{background:var(--pilot-paper)!important}
+[data-problem-id]{background:var(--pilot-surface)!important;border-radius:12px;border-color:#294d3d;box-shadow:0 8px 24px #102b230a}
+#precos .bg-checker-modal{border-radius:14px;border-color:#ffffff20;box-shadow:0 12px 32px #102b2310}
+#avaliacoes figure{background:#f4f7f2;border-color:#ffffff18;border-radius:12px;box-shadow:none}
+#processo>.max-w-7xl>div{border-radius:12px;box-shadow:0 6px 24px #102b2306}
+[data-landing-section="duvidas"] button,[data-landing-section="faq"] button{border-radius:8px}
 @media(max-width:767px){
-  [data-commercial-hero]{background:#071a12;padding-top:88px!important}
+  [data-commercial-hero]{background:radial-gradient(ellipse 120% 65% at 100% 8%,rgba(112,177,139,.17),transparent 72%),linear-gradient(170deg,#183f32 0%,#12372c 55%,#102b23 100%);padding-top:88px!important}
   [data-commercial-hero]>picture,[data-commercial-hero]>div[aria-hidden]{display:none}
   [data-commercial-hero]>div.mx-auto{padding-bottom:24px}
   [data-commercial-hero]>.mx-auto>.grid{gap:28px}
-  [data-hero-part="breadcrumb"]{font-size:12px;gap:6px;margin-bottom:18px;color:#b7c5bc}
+  [data-hero-part="breadcrumb"]{font-size:12px;gap:6px;margin-bottom:18px;color:#c0d0c5}
   [data-hero-part="breadcrumb"] a{min-height:44px}
   [data-hero-part="title"]{font-size:32px;line-height:1.14;letter-spacing:-.025em;text-shadow:none!important;max-width:24ch}
   [data-hero-part="subtitle"]{font-size:16px;line-height:1.6;color:#d0dad3;margin-top:16px;margin-bottom:24px;text-shadow:none!important}
-  [data-hero-part="whatsapp"]{min-height:54px;font-size:15px;background:#16833e;border-radius:4px;padding:14px 10px}
+  [data-hero-part="whatsapp"]{min-height:54px;font-size:15px;background:linear-gradient(135deg,#188344,#13753b);border:1px solid #ffffff12;border-radius:10px;padding:14px 10px;box-shadow:0 5px 16px #061b1312}
   [data-hero-part="prices"]{min-height:48px;font-size:14px;margin-top:4px}
   [data-hero-part="prices"]+p{font-size:13px;line-height:1.6;color:#c4d0c8;text-align:center;margin-top:4px}
   [data-hero-part="comparison"]>div{border-top:0}
-  [data-hero-part="comparison"] [role="region"]>div:first-child{border-radius:4px;overflow:hidden}
+  [data-hero-part="comparison"] [role="region"]>div:first-child{border-radius:12px;overflow:hidden;box-shadow:0 8px 24px #061b131a}
   [data-hero-part="comparison"] [role="region"]>div:nth-child(2){padding-top:12px;padding-bottom:8px;gap:0}
   [data-hero-part="comparison"] [aria-label="Reproduzir galeria"],
   [data-hero-part="comparison"] [aria-label="Pausar galeria"]{display:none}
   [data-hero-part="comparison"] [aria-label="Escolher exemplo"]{gap:8px;padding-bottom:0}
-  [data-hero-part="comparison"] [aria-label="Escolher exemplo"] button{border-radius:2px}
+  [data-hero-part="comparison"] [aria-label="Escolher exemplo"] button{border-radius:6px}
   [data-hero-part="comparison"] .text-gold{color:#D4AF37}
-  [data-hero-part="stats"]{background:#071a12}
-  [data-hero-part="stats"] section{border-color:#ffffff14}
+  [data-hero-part="stats"]{background:transparent}
+  [data-hero-part="stats"] section{border-color:#ffffff0f}
   [data-hero-part="stats"] .grid{padding-top:24px;padding-bottom:24px}
   [data-hero-part="stats"] .grid>div>p{font-size:12px;line-height:1.4}
   [data-commercial-hero]~*{scroll-margin-top:80px}
+  [data-landing-section="precos"]{background:var(--pilot-green-deep)}
+  [data-landing-section="precos"]>section{border-radius:24px 24px 0 0}
+  [data-landing-section]>section{padding-top:48px;padding-bottom:48px}
 }
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto!important}}
 `;
