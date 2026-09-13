@@ -1,13 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import painpointStains from "@/assets/painpoint-stains.webp";
-import heroAcarosColchao from "@/assets/hero-p-acaros-colchao.webp";
-import heroMauCheiroTapete from "@/assets/hero-p-mau-cheiro-tapete.webp";
-import galeriaCadeiraResultado from "@/assets/galeria-cadeira-resultado.webp";
-
 const PROBLEMS = [
   {
-    image: painpointStains,
+    image: "/images/landing-problems/sofas/sofa-manchas-02.webp",
     alt: "Mancha de vinho num sofá",
     type: "Sofás",
     link: "/limpeza-sofas",
@@ -16,8 +11,8 @@ const PROBLEMS = [
     pos: "center",
   },
   {
-    image: heroAcarosColchao,
-    alt: "Ácaros e bactérias microscópicas num colchão",
+    image: "/images/landing-problems/colchoes/colchao-residuos-02.webp",
+    alt: "Pormenor do tecido e das costuras de um colchão",
     type: "Colchões",
     link: "/limpeza-colchoes",
     title: "Ácaros e bactérias\ninvisíveis ao olho nu",
@@ -25,8 +20,8 @@ const PROBLEMS = [
     pos: "center",
   },
   {
-    image: heroMauCheiroTapete,
-    alt: "Odores acumulados num tapete",
+    image: "/images/landing-problems/tapetes/tapete-pelos-04.webp",
+    alt: "Tapete numa sala com um cão ao fundo",
     type: "Tapetes",
     link: "/limpeza-tapetes",
     title: "Odores que se\nacumulam meses a fio",
@@ -34,8 +29,8 @@ const PROBLEMS = [
     pos: "center",
   },
   {
-    image: galeriaCadeiraResultado,
-    alt: "Cadeira antes e depois da limpeza, tecido renovado",
+    image: "/images/landing-problems/cadeiras/cadeira-desgaste-04.webp",
+    alt: "Cadeira estofada com marcas de uso no assento",
     type: "Cadeiras",
     link: "/limpeza-cadeiras",
     title: "Desgaste acelerado\nsem proteção",
@@ -58,7 +53,7 @@ const PainPointsSolutionsV1 = () => {
   }, []);
 
   return (
-    <section ref={sectionRef} className="py-14 md:py-20 bg-white overflow-hidden">
+    <section id="problemas-home" ref={sectionRef} className="py-14 md:py-20 bg-white overflow-hidden">
       <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
 
         {/* Header */}
@@ -83,29 +78,32 @@ const PainPointsSolutionsV1 = () => {
             <Link
               key={i}
               to={problem.link}
-              className={`relative overflow-hidden rounded-2xl group block transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}
-              style={{ height: "clamp(220px, 26vw, 300px)", transitionDelay: `${i * 90}ms` }}
+              className={`overflow-hidden rounded-2xl group flex flex-col bg-[#071a12] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#D4AF37] transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}
+              style={{ transitionDelay: `${i * 90}ms` }}
             >
-              <img
-                src={problem.image}
-                alt={problem.alt}
-                className="absolute inset-0 w-full h-full object-cover saturate-[0.6] group-hover:saturate-[0.85] group-hover:scale-[1.03] transition-all duration-700 ease-out"
-                style={{ objectPosition: problem.pos }}
-                loading="lazy"
-                decoding="async"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-[#071a12]/90 via-[#071a12]/35 to-transparent" />
-              <div className="absolute inset-x-0 top-0 h-20 bg-gradient-to-b from-[#071a12]/60 to-transparent" />
-
-              <div className="absolute top-4 left-5 md:top-5 md:left-7 flex items-center gap-2.5">
-                <div className="h-px w-4" style={{ backgroundColor: "#D4AF37", opacity: 0.75 }} />
-                <span className="text-sm font-bold uppercase tracking-[0.24em] text-white/85">
-                  {problem.type}
+              <div className="relative aspect-[16/10] sm:aspect-[16/9] overflow-hidden">
+                <img
+                  src={problem.image}
+                  alt={problem.alt}
+                  width={1200}
+                  height={675}
+                  className="w-full h-full object-cover motion-safe:group-hover:scale-[1.03] transition-transform duration-700 ease-out"
+                  style={{ objectPosition: problem.pos }}
+                  loading="lazy"
+                  decoding="async"
+                />
+                <span className="absolute bottom-3 right-3 rounded-full bg-black/55 px-2.5 py-1 text-[10px] text-white">
+                  Imagem ilustrativa
                 </span>
               </div>
 
-              <div className="absolute bottom-0 left-0 right-0 p-5 md:p-7">
-                <div className="h-px w-8 mb-3" style={{ backgroundColor: "#D4AF37", opacity: 0.65 }} />
+              <div className="flex-1 p-5 md:p-7">
+                <div className="flex items-center gap-2.5 mb-3">
+                  <div className="h-px w-4 bg-[#D4AF37]" />
+                  <span className="text-xs font-semibold uppercase tracking-[0.2em] text-[#D4AF37]">
+                    {problem.type}
+                  </span>
+                </div>
                 <h3 className="type-card-title font-playfair  text-white  mb-2 whitespace-pre-line  ">
                   {problem.title}
                 </h3>
