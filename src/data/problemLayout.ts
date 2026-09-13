@@ -1,3 +1,7 @@
+import { getLandingProblems } from './landingServiceCopy';
+import type { LandingService } from './landingFaqPool';
+import { MATERIAL_PROCESS_GUIDES } from './materialProcessGuides';
+import { SERVICE_PROCESS_GUIDES, type ProcessServiceSlug } from './serviceProcessGuides';
 import type { ProblemPage } from './problemSeoData';
 import { PRICE_PROMISE, RESPONSE_PROMISE, SATISFACTION_PROMISE } from '../constants/commercialPolicy';
 
@@ -14,19 +18,13 @@ export function getProblemLayout(problem: ProblemPage) {
     if (faqs.length >= 4) break;
     if (!faqs.some(item => item.question === faq.question)) faqs.push(faq);
   }
+  const serviceSlug = problem.relatedServices[0];
+  const processGuide = MATERIAL_PROCESS_GUIDES[problem.slug]
+    ?? (serviceSlug === 'limpeza-sofas' ? MATERIAL_PROCESS_GUIDES['limpeza-sofa-tecido'] : SERVICE_PROCESS_GUIDES[serviceSlug as ProcessServiceSlug]);
   return {
-    characteristics: [
-      'O tipo de tecido e as indicações do fabricante.',
-      'A origem e a antiguidade das manchas ou odores.',
-      'Os produtos e tratamentos já aplicados no artigo.',
-      'O estado do estofo e os limites da intervenção.',
-    ],
-    process: [
-      { title: 'Avaliação do artigo', description: 'Identificamos o material, o estado do estofo e o cuidado pretendido.' },
-      { title: 'Confirmação do serviço', description: 'Explicamos o tratamento adequado, as limitações e o orçamento antes de começar.' },
-      { title: 'Intervenção', description: 'Executamos os cuidados acordados, de acordo com o material e as condições do artigo.' },
-      { title: 'Verificação e cuidados', description: 'Revemos o resultado consigo e indicamos os cuidados e o tempo de espera antes de voltar a usar.' },
-    ],
+    processGuide,
+    examples: getLandingProblems(serviceSlug as LandingService),
+    process: processGuide.steps,
     faqs: faqs.slice(0, 4),
   };
 }

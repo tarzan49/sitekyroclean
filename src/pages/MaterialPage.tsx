@@ -1,3 +1,4 @@
+import MaterialExamplesGallery from "@/components/MaterialExamplesGallery";
 import DirectoryGroup from "@/components/DirectoryGroup";
 import SofaLeadActions from "@/components/SofaLeadActions";
 import { useEffect, useMemo } from "react";
@@ -14,10 +15,10 @@ import SectionHeader from "@/components/SectionHeader";
 import ServiceFAQ from "@/components/ServiceFAQ";
 import ServicePriceSection from "@/components/ServicePriceSection";
 import ServicePackBanner from "@/components/ServicePackBanner";
-import ServiceAutoCarousel from "@/components/ServiceAutoCarousel";
+import IllustratedProcessGuide from "@/components/IllustratedProcessGuide";
+import { MATERIAL_PROCESS_GUIDES } from "@/data/materialProcessGuides";
 import { SERVICE_TO_QUIZ } from "@/constants/serviceToQuiz";
 import { SERVICE_PACK_SLUGS } from "@/constants/servicePackSlugs";
-import { getServiceGallery } from "@/constants/serviceGallery";
 import {
   getMaterialBySlug,
   getAllMaterialCityRoutes,
@@ -108,7 +109,7 @@ const MaterialPage = () => {
   const h1Gold = h1Words.pop() ?? "";
   const h1Rest = h1Words.join(" ");
 
-  const gallery = getServiceGallery(data.serviceSlug, `${data.slug}-${citySlug}`);
+  const processGuide = MATERIAL_PROCESS_GUIDES[data.slug];
 
   return (
     <QuizLocationProvider value={cityName ?? undefined}>
@@ -183,44 +184,21 @@ const MaterialPage = () => {
         {/* ═══ TABELA DE PREÇOS ═══ */}
         <ServicePriceSection serviceSlug={data.serviceSlug} initialLocation={cityName ?? undefined} />
 
-        {/* ═══ CARACTERÍSTICAS DO MATERIAL ═══ */}
+        {/* ═══ AVALIAÇÕES REAIS ═══ */}
         <section className="py-14 md:py-20 bg-kyro-green">
           <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
-            <SectionHeader
-              overline="Material"
-              heading="Características de"
-              goldWord={data.name}
-              light={false}
-            />
-            <div className="grid grid-cols-2 gap-px" style={{ backgroundColor: "rgba(255,255,255,0.08)" }}>
-              {data.characteristics.slice(0, 4).map((c, i) => (
-                <div key={i} className="relative overflow-hidden flex items-start gap-3 p-6 md:p-7" style={{ backgroundColor: "#0d241b", borderTop: "2px solid rgba(212,175,55,0.55)" }}>
-                  <span className="font-playfair font-bold flex-shrink-0 leading-none" style={{ fontSize: "1.75rem", color: "rgba(212,175,55,0.4)" }}>
-                    {String(i + 1).padStart(2, "0")}
-                  </span>
-                  <span className="text-sm text-white/65 leading-relaxed pt-1">{c}</span>
-                </div>
-              ))}
-            </div>
+            <SectionHeader overline="Avaliações Reais" heading="O que dizem os nossos" goldWord="clientes" subtitle="Nas palavras de quem já nos recebeu em casa." light={false} />
+            <ServiceReviewsGrid serviceSlug={data.serviceSlug} seed={`${data.slug}-${citySlug}`} heading="" />
           </div>
         </section>
 
-        {/* ═══ GALERIA ILUSTRATIVA (o antes/depois já está no hero) ═══ */}
-        {gallery && (
-          <ServiceAutoCarousel
-            comparison={false}
-            overline="Resultados Reais"
-            heading={`Antes e depois: ${data.name}`}
-            subtitle={`Transformação real em ${data.serviceName.toLowerCase()}, resultado visível no próprio dia.`}
-            slides={[
-              { src: heroImg, label: "Pormenor" },
-              gallery.slides[1],
-            ]}
-            variant="light"
-          />
-        )}
+        {/* Exemplos específicos, partilhados com as variantes por cidade. */}
+        <MaterialExamplesGallery key={data.slug} materialSlug={data.slug} />
 
         {/* ═══ PROCESSO DE LIMPEZA ═══ */}
+        {processGuide ? (
+          <IllustratedProcessGuide dark key={data.slug} guide={processGuide} heading="Como limpamos o seu" goldWord={data.name.toLowerCase()} downloadName={data.slug} />
+        ) : (
         <section className="py-14 md:py-20 bg-kyro-green">
           <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
             <SectionHeader
@@ -253,25 +231,18 @@ const MaterialPage = () => {
             </div>
           </div>
         </section>
+        )}
 
         {/* ═══ FAQ ═══ */}
         {data.faqs.length > 0 && (
-          <ServiceFAQ faqs={data.faqs} heading={`Perguntas sobre ${data.name.toLowerCase()}`} variant="dark" />
+          <ServiceFAQ faqs={data.faqs} heading={`Perguntas sobre ${data.name.toLowerCase()}`} variant="light" />
         )}
-
-        {/* ═══ AVALIAÇÕES REAIS ═══ */}
-        <section className="py-14 md:py-20 bg-kyro-green">
-          <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
-            <SectionHeader overline="Avaliações Reais" heading="O que dizem os nossos" goldWord="clientes" subtitle="Nas palavras de quem já nos recebeu em casa." light={false} />
-            <ServiceReviewsGrid serviceSlug={data.serviceSlug} seed={`${data.slug}-${citySlug}`} heading="" />
-          </div>
-        </section>
 
         {/* ═══ PACKS ═══ */}
         <ServicePackBanner
           packSlugs={SERVICE_PACK_SLUGS[data.serviceSlug] ?? ["pack-sala-completa"]}
           city={citySlug || undefined}
-          variant="light"
+          variant="dark"
         />
 
         {/* ═══ REDE INTERNA ═══ */}

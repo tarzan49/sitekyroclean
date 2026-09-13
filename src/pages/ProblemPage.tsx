@@ -13,14 +13,15 @@ import { categoryForServiceSlug } from "@/data/beforeAfterPool";
 import Footer from "@/components/Footer";
 import SectionHeader from "@/components/SectionHeader";
 import ServiceFAQ from "@/components/ServiceFAQ";
-import ServiceAutoCarousel from "@/components/ServiceAutoCarousel";
+import VisualExamplesGallery from "@/components/VisualExamplesGallery";
+import IllustratedProcessGuide from "@/components/IllustratedProcessGuide";
+import { PROBLEM_IMAGES } from "@/constants/problemCardHelpers";
 import TrustRatingBadge from "@/components/TrustRatingBadge";
 import ServicePriceSection from "@/components/ServicePriceSection";
 import ServicePackBanner from "@/components/ServicePackBanner";
 import { SERVICE_PACK_SLUGS } from "@/constants/servicePackSlugs";
 import { getProblemLayout } from "@/data/problemLayout";
 import { getProblemBySlug, getRelatedProblemLinks } from "@/data/problemSeoData";
-import { getServiceGallery, getIllustrativePhotos } from "@/constants/serviceGallery";
 import { services, cities } from "@/data/locationSeoData";
 import { SERVICE_TO_QUIZ } from "@/constants/serviceToQuiz";
 import { getProblemHeroImage } from "@/lib/problemHeroImages";
@@ -89,7 +90,6 @@ const ProblemPage = () => {
     .filter(Boolean) as typeof cities[number][];
   const servicePrice = relatedService?.priceFrom ?? "49€";
   const layout = getProblemLayout(data);
-  const gallery = getServiceGallery(data.relatedServices[0], slug ?? "");
   const heroImg = getProblemHeroImage(slug ?? "");
   const beforeAfterCategory = categoryForServiceSlug(data.relatedServices[0]);
   const waHref = `${WHATSAPP_BASE}?text=${encodeURIComponent(buildProblemWaMessage(slug ?? ""))}`;
@@ -168,59 +168,6 @@ const ProblemPage = () => {
 
         <ServicePriceSection serviceSlug={data.relatedServices[0]} />
 
-        <section className="py-14 md:py-20 bg-kyro-green">
-          <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
-            <SectionHeader overline="Avaliação" heading="O que temos em" goldWord="conta" light={false} />
-            <div className="grid grid-cols-2 gap-px" style={{ backgroundColor: "rgba(255,255,255,0.08)" }}>
-              {layout.characteristics.map((item, i) => (
-                <div key={item} className="relative overflow-hidden flex items-start gap-3 p-6 md:p-7" style={{ backgroundColor: "#0d241b", borderTop: "2px solid rgba(212,175,55,0.55)" }}>
-                  <span className="font-playfair font-bold flex-shrink-0 leading-none" style={{ fontSize: "1.75rem", color: "rgba(212,175,55,0.4)" }}>
-                    {String(i + 1).padStart(2, "0")}
-                  </span>
-                  <span className="text-sm text-white/65 leading-relaxed pt-1">{item}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* ═══ GALERIA ILUSTRATIVA (o antes/depois já está no hero) ═══ */}
-        {gallery && (
-          <ServiceAutoCarousel
-            comparison={false}
-            overline="O serviço"
-            heading="Cuidados com os seus estofos"
-            subtitle="Conheça o serviço. A intervenção é adaptada ao artigo e ao seu estado."
-            slides={getIllustrativePhotos(data.relatedServices[0], slug ?? "")}
-            variant="light"
-          />
-        )}
-
-        <section className="py-14 md:py-20 bg-kyro-green">
-          <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
-            <SectionHeader overline="Processo" heading="Como tratamos este" goldWord="problema" light={false} />
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-px" style={{ backgroundColor: "rgba(255,255,255,0.08)" }}>
-              {[0, 1].map(col => (
-                <div key={col} className="grid gap-px" style={{ backgroundColor: "rgba(255,255,255,0.08)" }}>
-                  {layout.process.slice(col * 2, col * 2 + 2).map((step, idx) => (
-                    <div key={step.title} className="relative overflow-hidden flex items-start gap-4 p-5 md:p-6" style={{ backgroundColor: "#0d241b", borderTop: "2px solid rgba(212,175,55,0.55)" }}>
-                      <span className="font-playfair font-bold flex-shrink-0 leading-none" style={{ fontSize: "1.5rem", color: "#D4AF37" }}>
-                        {String(col * 2 + idx + 1).padStart(2, "0")}
-                      </span>
-                      <p className="text-sm text-white/70 leading-relaxed pt-1"><strong className="font-semibold">{step.title}.</strong> {step.description}</p>
-                    </div>
-                  ))}
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* ═══ FAQ ═══ */}
-        {data.faqs.length > 0 && (
-          <ServiceFAQ faqs={layout.faqs} heading={`Perguntas sobre ${data.h1.toLowerCase()}`} variant="dark" />
-        )}
-
         {/* ═══ AVALIAÇÕES REAIS ═══ */}
         <section className="py-14 md:py-20 bg-kyro-green">
           <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
@@ -229,9 +176,37 @@ const ProblemPage = () => {
           </div>
         </section>
 
+        <VisualExamplesGallery
+          key={`examples-${slug}`}
+          id="exemplos"
+          overline="Problemas comuns"
+          heading="Veja alguns"
+          name="exemplos"
+          imageDescription="Imagem ilustrativa do serviço."
+          examples={layout.examples.map(example => ({
+            label: example.title,
+            alt: example.title,
+            src: PROBLEM_IMAGES[data.relatedServices[0]][example.imageIndex],
+          }))}
+        />
+
+        <IllustratedProcessGuide
+          dark
+          key={`process-${slug}`}
+          guide={layout.processGuide}
+          heading="Como tratamos este"
+          goldWord="problema"
+          downloadName={data.slug}
+        />
+
+        {/* ═══ FAQ ═══ */}
+        {data.faqs.length > 0 && (
+          <ServiceFAQ faqs={layout.faqs} heading={`Perguntas sobre ${data.h1.toLowerCase()}`} variant="light" />
+        )}
+
         <ServicePackBanner
           packSlugs={SERVICE_PACK_SLUGS[data.relatedServices[0]] ?? ["pack-sala-completa"]}
-          variant="light"
+          variant="dark"
         />
 
         {/* ═══ REDE INTERNA ═══ */}

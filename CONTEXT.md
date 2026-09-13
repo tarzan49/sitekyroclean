@@ -1,6 +1,6 @@
 ## Base visual das páginas de problemas (13/09/2026)
 
-`ProblemPage` (rotas `/problemas/:slug`) passa a seguir a base de `MaterialPage`: hero, `ServicePriceSection`, quatro cartões de avaliação, galeria, processo em linhas numeradas, quatro FAQ, avaliações, `ServicePackBanner` e diretório. Retirados os indicadores antigos e os blocos separados de vantagens/dicas. `problemLayout.ts` fornece os cartões, processo e quatro FAQ ao React e ao prerender, que inclui FAQPage. Mantêm-se os títulos, imagens e destinos específicos. `ProblemCityPage` e as páginas de materiais não foram alteradas. Esta é a base para a próxima revisão visual/editorial dos problemas.
+`ProblemPage` (rotas `/problemas/:slug`) segue a versão de materiais do commit `6f1c60e`, integrada neste ramo: hero, orçamento, avaliações, quatro exemplos visuais, processo ilustrado, quatro FAQ claras, packs em verde e diretório claro. `VisualExamplesGallery` partilha a grelha 2×2 e ampliação acessível com `MaterialExamplesGallery`; os problemas usam as imagens existentes por serviço. `IllustratedProcessGuide` é o mesmo apresentador dos materiais, preservando a correção que impede sobreposição das imagens. Sofás usam o guia de tecido ou o material específico quando identificado; outros serviços usam os seus guias existentes. `problemLayout.ts` partilha exemplos, passos e quatro FAQ com o prerender. `ProblemCityPage` permanece separado. Esta é a base para a próxima revisão editorial dos problemas.
 
 ## Expansão editorial das landing pages (13/09/2026)
 
@@ -23,6 +23,16 @@ O prerender já consome esses mesmos geradores. `scripts/audit-landing-faqs.mjs`
 `landingServiceCopy.ts` fornece quatro problemas estáveis por serviço, com ID e índice para as imagens existentes. Não se deve continuar a consumir os antigos problemas dos geradores nestas quatro páginas. `sofaProcessGuide.ts` e `serviceProcessGuides.ts` fornecem os cinco passos dos guias e do HTML inicial. `priceFactors.ts` contém os três fatores por serviço; `PriceFactors` aceita `embedded` para aparecer dentro de um painel expansível na secção de preços. `PriceWidget` e o cálculo do orçamento não foram duplicados nem alterados.
 
 Verificação: `npm test` (1.924 testes), TypeScript, lint dos ficheiros alterados, build, `audit-landing-faqs.mjs` e `audit-landing-layout.mjs`; auditorias das 12.912 páginas sem divergências nem destinos em falta. Amostra de 28 entradas mobile (390 × 844), incluindo os seis serviços, quatro famílias e Ads; abertura adicional do orçamento pelo widget e pelos problemas sem enviar contactos. A expansão de imagens/conteúdo continua separada desta entrega estrutural.
+
+## Guias dos materiais de sofá e posição das avaliações (13/09/2026)
+
+`IllustratedProcessGuide` é o apresentador partilhado extraído de `ServiceProcessGuide`, que conserva a sua API e os cinco guias existentes. `materialProcessGuides.ts` fornece seis etapas para os materiais de sofá, exceto pele/couro, que mantém cinco cuidados próprios, com imagens próprias em `public/images/materials/process-sofa-*.webp`; o prerender usa o mesmo texto e imagens. `MaterialPage` deixou de apresentar a galeria intermédia «Antes e depois», conserva a comparação do hero e usa o guia no lugar do processo escrito nos sofás. Os quatro materiais de tapete mantêm o processo existente. Avaliações movidas para entre a tabela de preços e `MaterialExamplesGallery`, sem duplicação nem alteração das transcrições/pools.
+
+## Exemplos visuais dos materiais (13/09/2026)
+
+`MaterialExamplesGallery` substitui as características escritas em `MaterialPage` por quatro fotografias ilustrativas por material: duas peças e dois pormenores. Catálogo partilhado com o prerender em `src/data/materialExamples.ts`, imagens WebP em `public/images/materials/`, prompts em `docs/material-examples-images.md`. Abrange os 11 materiais e todas as variantes por cidade. Grelha 2×2 em mobile, ampliação acessível por toque/teclado, sem avanço automático.
+
+Pré-visualização mobile persistente: `node scripts/preview-mobile.mjs` abre um servidor dedicado na porta 8086. Todas as páginas HTML abertas diretamente neste servidor são encaminhadas para uma moldura de 390px; links em novas abas também passam pela moldura. O seletor permite ver os 11 materiais. Só afeta este servidor local.
 
 ## Tipografia integrada (13/09/2026)
 
@@ -1204,3 +1214,9 @@ A página de colchões em Paranhos mantém o comparador exclusivamente DEV: `?te
 ## Avaliações compactas no mobile (13/09/2026)
 
 Os cartões partilhados de avaliações (`CustomerReviewCard`, usados por `CustomerReviews` na homepage e páginas de serviços/localidades) têm altura uniforme de 340px abaixo de 640px, texto de 18px com até seis linhas e abertura da transcrição integral num diálogo acessível quando necessário. O carrossel deixou de ajustar a altura à avaliação selecionada. Preservar as transcrições e a apresentação desktop.
+
+## Correção do processo por material (13/09/2026)
+
+Os guias de sofá, exceto pele/couro, têm seis etapas: avaliação, aspiração, aplicação, escovação, extração e secagem. A escovação fica obrigatoriamente entre aplicação e extração. Couro mantém os cinco cuidados próprios. No mobile, seis separadores usam duas linhas de três para manter os rótulos legíveis.
+
+Materiais: sequência de fundos aprovada: exemplos branco, processo verde, perguntas branco, pack «Aproveite a mesma visita» verde. A variante clara das FAQs é explícita, sem alterar as restantes páginas.
