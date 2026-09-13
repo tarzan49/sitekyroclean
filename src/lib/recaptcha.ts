@@ -49,4 +49,26 @@ export async function getRecaptchaToken(action: string): Promise<string | null> 
   return recaptcha.execute(siteKey, { action });
 }
 
+/**
+ * Versão que nunca parte a submissão de um pedido.
+ *
+ * A primeira tentativa de pôr reCAPTCHA neste site partiu o formulário: se o
+ * script não carrega, se um bloqueador o trava ou se a promessa nunca resolve,
+ * um `await` direto a `getRecaptchaToken` fica pendurado e o cliente carrega em
+ * enviar e não acontece nada. Aqui qualquer falha, e qualquer demora acima do
+ * tempo limite, devolve `null` em vez de propagar. Sem token, o servidor deixa
+ * passar de propósito: perder um cliente real custa muito mais do que deixar
+ * entrar um pedido de spam.
+ */
+export async function getRecaptchaTokenSafe(action: string, timeoutMs = 3000): Promise<string | null> {
+  try {
+    return await Promise.race([
+      getRecaptchaToken(action),
+      new Promise<null>((resolve) => setTimeout(() => resolve(null), timeoutMs)),
+    ]);
+  } catch {
+    return null;
+  }
+}
+
 export {};

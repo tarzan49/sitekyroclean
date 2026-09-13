@@ -5,11 +5,14 @@ import type { QuizFormData, SofaItem, MattressItem, UpsellItemConfig } from '@/c
 import { useQuizPricing } from '@/hooks/use-quiz-pricing';
 import { buildReceiptLines, formatQuotePrice, submitQuizLead, type QuizLeadPayload } from './submissionService';
 
-const mocks = vi.hoisted(() => ({ insert: vi.fn(), fetch: vi.fn(), log: vi.fn() }));
+const mocks = vi.hoisted(() => ({ insert: vi.fn(), invoke: vi.fn(), fetch: vi.fn(), log: vi.fn() }));
 vi.mock('@/lib/quizTracking', () => ({ IS_PRODUCTION: true }));
-vi.mock('@/lib/supabase', () => ({ isSupabaseConfigured: true, supabase: { from: () => ({ insert: mocks.insert }) } }));
+vi.mock('@/lib/supabase', () => ({ isSupabaseConfigured: true, supabase: { from: () => ({ insert: mocks.insert }), functions: { invoke: mocks.invoke } } }));
+// O token nunca é pedido a sério nos testes: interessa o payload que sai, não
+// o script da Google.
+vi.mock('@/lib/recaptcha', () => ({ getRecaptchaTokenSafe: () => Promise.resolve('token-de-teste') }));
 vi.mock('@/lib/errorTracking', () => ({ logError: mocks.log }));
-beforeEach(() => { sessionStorage.clear(); vi.stubGlobal('fetch', mocks.fetch); mocks.fetch.mockReset().mockResolvedValue({ ok: true }); mocks.insert.mockReset().mockResolvedValue({ error: null }); });
+beforeEach(() => { sessionStorage.clear(); vi.stubGlobal('fetch', mocks.fetch); mocks.fetch.mockReset().mockResolvedValue({ ok: true }); mocks.insert.mockReset().mockResolvedValue({ error: null }); mocks.invoke.mockReset().mockResolvedValue({ data: { success: true }, error: null }); });
 afterEach(() => { cleanup(); vi.unstubAllGlobals(); });
 
 function payload(form: Partial<QuizFormData>, sofas: SofaItem[] = [], mattresses: MattressItem[] = [], extras: UpsellItemConfig[] = []): QuizLeadPayload {
@@ -56,7 +59,7 @@ describe('quote channel parity: table sizes, tiers, quantities, brackets, extras
     expect(receipt.lines.reduce((n: number, l: { total: number | null }) => n + (l.total ?? 0), 0)).toBe(p.totalPrice);
     expect(receipt.subtotal - receipt.discountAmount).toBeCloseTo(receipt.total);
     expect(receipt.lines.at(-1).total).toBe(locationPrices[form.location!]);
-    expect(mocks.insert.mock.calls[0][0].value).toBe(p.priceText);
+    expect(mocks.invoke.mock.calls[0][1].body.lead.value).toBe(p.priceText);
     if (p.hasSobOrcamento || p.hasUpsellSobItem) expect(wa).toContain('subtotal conhecido');
   });
 });
@@ -84,13 +87,13 @@ describe('specific regressions and delivery failures', () => {
     expect((mocks.fetch.mock.calls[0][1].body.get('foto_1') as File).name).toBe('teste.jpg');
   });
   it('rejects when CRM returns an error object and Formspree returns HTTP error', async () => {
-    mocks.insert.mockResolvedValue({ error: { message: 'denied' } }); mocks.fetch.mockResolvedValue({ ok: false, status: 422 });
+    mocks.invoke.mockResolvedValue({ data: null, error: { message: 'down' } }); mocks.insert.mockResolvedValue({ error: { message: 'denied' } }); mocks.fetch.mockResolvedValue({ ok: false, status: 422 });
     await expect(submitQuizLead(payload({ service: 'carpet' }))).rejects.toThrow('Both');
     expect(sessionStorage.getItem('kyro_receipt')).toBeNull();
   });
   it.each(['crm', 'formspree'])('succeeds when only %s delivers', async channel => {
     if (channel === 'crm') mocks.fetch.mockResolvedValue({ ok: false, status: 500 });
-    else mocks.insert.mockResolvedValue({ error: { message: 'denied' } });
+    else { mocks.invoke.mockResolvedValue({ data: null, error: { message: 'down' } }); mocks.insert.mockResolvedValue({ error: { message: 'denied' } }); }
     await expect(submitQuizLead(payload({ service: 'carpet' }))).resolves.toBeUndefined();
   });
   it('retries one network failure', async () => {
@@ -118,4 +121,45 @@ it.each([
   expect(sent.get('message')).toContain('Tapete 2: 1 × 4 m (4 m²)');
   expect(sent.get('message')).toContain('Sob orçamento');
   expect(new URL(sessionStorage.getItem('kyro_wa_url')!).searchParams.get('text')).toContain(p.message);
+});
+
+describe('reCAPTCHA no canal do CRM', () => {
+  it('não envia o token para o canal de email', async () => {
+    await submitQuizLead(payload({ service: 'carpet' }));
+    const body = mocks.fetch.mock.calls[0][1].body as FormData;
+    for (const [, value] of body.entries()) {
+      expect(String(value)).not.toContain('token-de-teste');
+    }
+    expect([...body.keys()].some(k => /recaptcha|captcha|token/i.test(k))).toBe(false);
+  });
+
+  it('envia o token à função de servidor, fora do corpo do lead', async () => {
+    await submitQuizLead(payload({ service: 'carpet' }));
+    const sent = mocks.invoke.mock.calls[0][1].body;
+    expect(mocks.invoke.mock.calls[0][0]).toBe('submit-lead');
+    expect(sent.recaptchaToken).toBe('token-de-teste');
+    expect(sent.lead.recaptchaToken).toBeUndefined();
+  });
+
+  it('quando o servidor recusa por reCAPTCHA, não insere pelo caminho antigo', async () => {
+    mocks.invoke.mockResolvedValue({ data: null, error: { message: 'forbidden', context: { status: 403 } } });
+    // O email entrega, por isso o pedido nao se perde e a submissao resolve.
+    await expect(submitQuizLead(payload({ service: 'carpet' }))).resolves.toBeUndefined();
+    expect(mocks.insert).not.toHaveBeenCalled();
+  });
+
+  it('quando a função ainda não existe, o insert de recurso garante o lead', async () => {
+    mocks.invoke.mockResolvedValue({ data: null, error: { message: 'not found', context: { status: 404 } } });
+    await submitQuizLead(payload({ service: 'carpet' }));
+    expect(mocks.insert).toHaveBeenCalledTimes(1);
+    expect(mocks.insert.mock.calls[0][0].name).toBe('Teste Auditoria');
+  });
+
+  it('um pedido real nunca se perde quando o reCAPTCHA falha em carregar', async () => {
+    // Sem token, o servidor deixa passar de proposito: aqui confirma-se apenas
+    // que a submissao segue e entrega, em vez de ficar pendurada.
+    mocks.invoke.mockResolvedValue({ data: { success: true }, error: null });
+    await expect(submitQuizLead(payload({ service: 'carpet' }))).resolves.toBeUndefined();
+    expect(mocks.invoke).toHaveBeenCalledTimes(1);
+  });
 });

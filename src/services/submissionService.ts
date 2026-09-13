@@ -7,6 +7,7 @@ import { WHATSAPP_BASE } from '@/constants/business';
 import { safeSessionSet } from '@/lib/safeStorage';
 import { logError } from '@/lib/errorTracking';
 import { IS_PRODUCTION } from '@/lib/quizTracking';
+import { getRecaptchaTokenSafe } from '@/lib/recaptcha';
 
 /** All the data the submission pipeline needs. Assembled by useQuizSubmission. */
 export interface QuizLeadPayload {
@@ -88,15 +89,13 @@ async function postToFormspree(payload: QuizLeadPayload, bookingId: string): Pro
   }
 }
 
-async function insertCrmLead(payload: QuizLeadPayload, bookingId: string): Promise<void> {
+/** Os campos do lead, iguais para a função de servidor e para o insert direto. */
+function buildLeadRow(payload: QuizLeadPayload, bookingId: string) {
   const {
     name, phone, email, crmServiceLabel, serviceTypeLabel, detailsSummary,
     finalLocation, priceText, message, upsellItems,
   } = payload;
-
-  const { supabase, isSupabaseConfigured } = await import('@/lib/supabase');
-  if (!isSupabaseConfigured) throw new Error('CRM não configurado');
-  const { error } = await supabase.from('leads').insert({
+  return {
     name,
     phone,
     email: email || null,
@@ -107,12 +106,48 @@ async function insertCrmLead(payload: QuizLeadPayload, bookingId: string): Promi
     value: priceText,
     booking_id: bookingId,
     message,
+    notes: [upsellItems.map(item => item.label).join(' | '), leadAttributionNote()].filter(Boolean).join('\n'),
+  };
+}
+
+async function insertCrmLead(payload: QuizLeadPayload, bookingId: string): Promise<void> {
+  const { supabase, isSupabaseConfigured } = await import('@/lib/supabase');
+  if (!isSupabaseConfigured) throw new Error('CRM não configurado');
+
+  const row = buildLeadRow(payload, bookingId);
+
+  // O token é obtido sem nunca bloquear: se o reCAPTCHA não carregar, demorar
+  // ou estar bloqueado, segue sem ele e o servidor deixa passar. Não vai, e
+  // nunca deve ir, para o canal de email: foi exatamente isso que partiu o
+  // formulário da primeira vez que se tentou pôr reCAPTCHA neste site.
+  const recaptchaToken = await getRecaptchaTokenSafe('submit_quote');
+
+  const { data, error } = await supabase.functions.invoke('submit-lead', {
+    body: { lead: { ...row, email: row.email ?? undefined }, recaptchaToken },
+  });
+
+  if (!error && data?.success) return;
+
+  // Rejeição explícita do servidor (reCAPTCHA reprovado ou limite de pedidos):
+  // não insistir pelo caminho antigo, senão a verificação não serve de nada.
+  // O pedido chega na mesma ao negócio pelo canal de email.
+  const status = (error as { context?: { status?: number } } | null)?.context?.status;
+  if (status === 403 || status === 429 || status === 400) {
+    throw new Error(`submit-lead recusou o pedido (HTTP ${status})`);
+  }
+
+  // TEMPORÁRIO — remover depois de confirmar a função publicada em produção.
+  // Enquanto a função não existir (404) ou estiver indisponível, o insert
+  // direto continua a valer, para a publicação deste código não perder
+  // nenhum pedido. Ver supabase/functions/submit-lead/index.ts.
+  console.warn('[submissionService] submit-lead indisponível, a inserir diretamente:', error);
+  const { error: insertError } = await supabase.from('leads').insert({
+    ...row,
     status: 'pending',
     source: 'Website',
     priority: 'Quente',
-    notes: [upsellItems.map(item => item.label).join(' | '), leadAttributionNote()].filter(Boolean).join('\n'),
   });
-  if (error) throw error;
+  if (insertError) throw insertError;
 }
 
 export function buildWaUrl(payload: QuizLeadPayload, bookingId: string): string {
