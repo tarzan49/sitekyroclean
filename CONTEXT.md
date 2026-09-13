@@ -8,6 +8,10 @@
 
 `commercialHeroCopy.ts` fornece os subtítulos curtos por serviço, também usados pelo modelo das quatro famílias e pelo prerender. `problemHero.ts` preserva o contexto do problema e da cidade. Metadados SEO continuam específicos. Navegação reduzida Ads, município real das freguesias, preços, FAQ e composição das secções seguintes permanecem independentes do hero. Esta estrutura substitui os anteriores heroes de problemas. A homepage mantém o HeroV1 independente, reposto da versão anterior a `033d483`, com fotografia contínua, HomeHeroTrust, WhatsApp e «Calcular o meu preço», sem galeria acrescentada.
 
+## Biblioteca de problemas de cadeiras (13/09/2026)
+
+`chairProblemImages.ts` acrescenta 40 imagens ilustrativas, dez por tema: resíduos, manchas, odores e desgaste. WebP em `public/images/landing-problems/cadeiras/`; prompts/documentação em `docs/chair-image-library/`. `selectLandingProblemImage` inclui cadeiras sem mudar a seleção dos restantes serviços. As 2.152 landing pages das quatro famílias usam quatro imagens estáveis pelo URL, iguais no React e no HTML inicial. Mantém preços e quatro perguntas. A integração usa o apresentador de problemas partilhado existente, sem substituir alterações de layout paralelas. Testes em `chairProblemImages.test.ts` e `LandingChairImages.test.tsx`; auditoria em `scripts/audit-chair-image-library.mjs`.
+
 ## Biblioteca de problemas de tapetes (13/09/2026)
 
 `rugProblemImages.ts` acrescenta 40 imagens ilustrativas, dez por tema: resíduos, manchas, pelos e desgaste. Ficheiros em `public/images/landing-problems/tapetes/`, prompts/documentação em `docs/rug-image-library/`. `selectLandingProblemImage` inclui a biblioteca de tapetes sem mudar a seleção dos sofás/colchões. As 2.152 landing pages das quatro famílias recebem quatro imagens estáveis por URL, iguais no React e no HTML inicial. Mantém quatro FAQ, identificação «Imagem ilustrativa» e tapetes sob orçamento. Não altera alcatifas, galerias de trabalhos reais, materiais ou problemas autónomos. Testes em `rugProblemImages.test.ts`; auditoria binária em `scripts/audit-rug-image-library.mjs`.
