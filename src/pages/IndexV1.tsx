@@ -21,7 +21,7 @@ const IndexV1 = () => {
   return (
     <div className="min-h-screen">
       <Header />
-      <main className="homepage-content">
+      <main>
         <HeroV1 />
 
         <Suspense fallback={<SectionLoader />}>

@@ -72,5 +72,5 @@
   .service-process-horizontal { display: block; }
 }
 
-/* Homepage section and card titles share the hero’s Avenir Demi weight. */
-.homepage-content :is(h2, h3, h4, h5, h6) { font-weight: 600; }
+/* Secondary headings use Avenir Demi consistently across the entire site. */
+:is(h2, h3, h4, h5, h6) { font-weight: 600; }
