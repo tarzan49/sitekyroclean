@@ -87,3 +87,11 @@ html[data-font-preview="nova"] [data-typography="sofa-care"] [data-typography="t
   line-height: 1.45;
   letter-spacing: normal;
 }
+
+/* Keep tier names aligned even when descriptions have different heights. */
+html[data-font-preview="nova"] [data-typography="sofa-care"] button:has([data-typography="tier-name"]) {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+}
