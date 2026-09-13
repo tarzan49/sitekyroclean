@@ -25,7 +25,7 @@ export default function HowItWorksV1() {
             <li key={step.title} className="flex gap-4 py-4 last:pb-0 sm:gap-5">
               <span className="pt-0.5 text-sm font-medium tabular-nums text-[#D4AF37]">0{index + 1}</span>
               <div>
-                <h3 className="mb-1 text-lg font-semibold leading-snug text-white">{step.title}</h3>
+                <h3 className="mb-1 font-sans text-xl font-bold leading-snug tracking-normal text-white">{step.title}</h3>
                 <p className="text-base leading-relaxed text-white/75">{step.text}</p>
                 {step.note && <p className="mt-1 text-sm leading-relaxed text-white/75">{step.note}</p>}
               </div>
