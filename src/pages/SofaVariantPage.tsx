@@ -1,90 +1,35 @@
-import DirectoryGroup from "@/components/DirectoryGroup";
-import { clearPrerenderedFaqSchema } from '@/lib/seoSchema';
+import { AdsLandingFooter, AdsLandingHeader, isAdsVisit } from "@/components/AdsLandingNavigation";
+import LandingServiceSections from '@/components/LandingServiceSections';
 import SofaLeadActions from "@/components/SofaLeadActions";
-import { AdsLandingHeader, AdsLandingFooter, isAdsVisit } from "@/components/AdsLandingNavigation";
+import { clearPrerenderedFaqSchema } from '@/lib/seoSchema';
 // Handles all keyword variant pages:
 // /higienizacao-[service]-[city-or-parish]
 // /lavagem-[service]-[city-or-parish]
 // Each page is self-canonical and independently indexable.
 
-import { useEffect, useMemo } from "react";
-import { useLocation, Link } from "react-router-dom";
-import { QuizLocationProvider, QuizServiceProvider } from "@/context/QuizLocationContext";
-import { CheckCircle, Star, MapPin, Clock, Timer } from "lucide-react";
-import { GoogleG } from "@/components/icons/GoogleG";
-import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import ServiceReviewsGrid from "@/components/ServiceReviewsGrid";
-import ServiceFAQ from "@/components/ServiceFAQ";
-import ServicePackBanner from "@/components/ServicePackBanner";
-import ServicePriceSection from "@/components/ServicePriceSection";
+import Header from "@/components/Header";
+import HeroBeforeAfterPool from "@/components/HeroBeforeAfterPool";
+import { GoogleG } from "@/components/icons/GoogleG";
 import ServiceSnapshotStats from "@/components/ServiceSnapshotStats";
+import { REVIEW_COUNT, REVIEW_RATING, SITE_URL, WHATSAPP_BASE } from "@/constants/business";
+import { SERVICE_DURATION } from "@/constants/problemCardHelpers";
 import { SERVICEKEY_TO_QUIZ } from "@/constants/serviceToQuiz";
+import { QuizLocationProvider, QuizServiceProvider } from "@/context/QuizLocationContext";
+import { categoryForServiceSlug } from "@/data/beforeAfterPool";
 import {
   getKeywordVariantData,
-  type VariantKey,
   type ServiceKey,
+  type VariantKey,
 } from "@/data/keywordVariantData";
-import { cities, cityPrep } from "@/data/locationSeoData";
-import { municipiosComFreguesias } from "@/data/freguesiaSeoData";
-import { GENERIC_PROCESS_STEPS, IMPERMEABILIZACAO_STEPS } from "@/constants/serviceProcesses";
-import { SITE_URL, WHATSAPP_BASE, REVIEW_RATING, REVIEW_COUNT } from "@/constants/business";
-import { SERVICE_DURATION } from "@/constants/problemCardHelpers";
+import { cityPrep } from "@/data/locationSeoData";
 import { buildVariantWaMessage } from "@/lib/whatsappMessages";
-import HeroBeforeAfterPool from "@/components/HeroBeforeAfterPool";
-import { categoryForServiceSlug } from "@/data/beforeAfterPool";
+import { Clock, Timer } from "lucide-react";
+import { useEffect, useMemo } from "react";
+import { Link, useLocation } from "react-router-dom";
 
 
 // Problem card backgrounds
-import imgAlergiasSofa     from "@/assets/hero-p-alergias-sofa.webp";
-import imgMauCheiro        from "@/assets/hero-p-mau-cheiro-sofa.webp";
-import imgFamiliaSofa      from "@/assets/hero-family-sofa.webp";
-import imgAlergiaColchao   from "@/assets/hero-p-alergias-colchao.webp";
-import imgMauCheiroColchao from "@/assets/hero-p-mau-cheiro-colchao.webp";
-import imgAcarosColchao    from "@/assets/hero-p-acaros-colchao.webp";
-import imgAcarosTapete     from "@/assets/hero-p-acaros-tapete.webp";
-import imgPelosTapete      from "@/assets/hero-p-pelos-tapete.webp";
-import imgManchaTapete     from "@/assets/hero-p-manchas-tapete.webp";
-import imgTapetePersa      from "@/assets/hero-p-tapete-persa.webp";
-import imgMofAlcatifa      from "@/assets/hero-p-mofo-alcatifa.webp";
-import imgLimpAlcatifas    from "@/assets/hero-p-limpeza-alcatifas.webp";
-import imgManchasCafe      from "@/assets/hero-p-manchas-cafe-sofa.webp";
-import imgSofaDesgastado   from "@/assets/hero-p-sofa-desgastado.webp";
-import imgManchasColchao   from "@/assets/hero-p-manchas-colchao.webp";
-import imgSangueColchao    from "@/assets/hero-p-sangue-colchao.webp";
-import imgWaterproofing    from "@/assets/hero-waterproofing.webp";
-import imgSofaVeludo       from "@/assets/hero-p-limpeza-sofa-veludo.webp";
-import imgLimpCadeiras     from "@/assets/hero-p-limpeza-cadeiras.webp";
-import imgLimpTapetes      from "@/assets/hero-p-limpeza-tapetes.webp";
-import imgCadeiraAntes     from "@/assets/galeria-cadeira-antes.webp";
-import imgCadeiraProcesso  from "@/assets/galeria-cadeira-processo.webp";
-import imgAlcatifaProcesso from "@/assets/galeria-alcatifa-processo.webp";
-import imgColchaoAntes     from "@/assets/galeria-colchao-antes.webp";
-
-const SERVICE_PLURAL: Record<ServiceKey, string> = {
-  sofa: 'sofás', colchao: 'colchões', tapetes: 'tapetes', cadeiras: 'cadeiras', alcatifas: 'alcatifas',
-};
-
-const VARIANT_PROBLEM_LABELS: Record<VariantKey, [string, string, string]> = {
-  higienizacao:      ['Saúde',    'Higiene',  'Família'],
-  lavagem:           ['Manchas',  'Aspeto',   'Odores'],
-  impermeabilizacao: ['Proteção', 'Família',  'Material'],
-};
-
-const PROBLEM_IMAGES: Record<string, [string, string, string]> = {
-  'higienizacao-sofa':           [imgAlergiasSofa,    imgMauCheiro,        imgFamiliaSofa],
-  'higienizacao-colchao':        [imgAlergiaColchao,  imgMauCheiroColchao, imgAcarosColchao],
-  'higienizacao-tapetes':        [imgAcarosTapete,    imgPelosTapete,      imgMauCheiro],
-  'higienizacao-cadeiras':       [imgLimpCadeiras,    imgCadeiraProcesso,  imgCadeiraAntes],
-  'higienizacao-alcatifas':      [imgMofAlcatifa,     imgLimpAlcatifas,    imgAlcatifaProcesso],
-  'lavagem-sofa':                [imgManchasCafe,     imgSofaDesgastado,   imgMauCheiro],
-  'lavagem-colchao':             [imgManchasColchao,  imgSangueColchao,    imgMauCheiroColchao],
-  'lavagem-tapetes':             [imgManchaTapete,    imgLimpTapetes,      imgTapetePersa],
-  'lavagem-cadeiras':            [imgCadeiraAntes,    imgLimpCadeiras,     imgCadeiraProcesso],
-  'lavagem-alcatifas':           [imgMofAlcatifa,     imgAlcatifaProcesso, imgManchasCafe],
-  'impermeabilizacao-sofa':      [imgWaterproofing,   imgFamiliaSofa,      imgSofaVeludo],
-  'impermeabilizacao-cadeiras':  [imgCadeiraAntes,    imgLimpCadeiras,     imgCadeiraProcesso],
-};
 
 // Pool de heroes por serviço — rotação determinística por slug de localidade
 const HERO_POOL: Record<string, string[]> = {
@@ -135,17 +80,6 @@ function pickHero(serviceKey: string, variantKey: string, locationPart: string):
   return pool[hash % pool.length];
 }
 
-
-
-
-const SERVICE_PACK_SLUGS: Record<ServiceKey, string[]> = {
-  sofa:      ["pack-sofa-e-colchao", "pack-sofa-impermeabilizacao"],
-  colchao:   ["pack-sofa-e-colchao", "pack-quarto-completo"],
-  cadeiras:  ["pack-sala-completa"],
-  tapetes:   ["pack-sala-completa"],
-  alcatifas: ["pack-sala-completa"],
-};
-
 const VARIANTS: VariantKey[]  = ['higienizacao', 'lavagem', 'impermeabilizacao'];
 const SERVICES: ServiceKey[]  = ['sofa', 'colchao', 'tapetes', 'cadeiras', 'alcatifas'];
 
@@ -184,18 +118,6 @@ const SERVICE_LABEL: Record<ServiceKey, string> = {
   alcatifas: 'Alcatifas',
 };
 
-const QUIZ_CTA: Record<VariantKey, string> = {
-  higienizacao:      'Calcular o meu preço',
-  lavagem:           'Calcular o meu preço',
-  impermeabilizacao: 'Calcular o meu preço',
-};
-
-const WA_BTN_LABEL: Record<VariantKey, string> = {
-  higienizacao:      'Falar por WhatsApp',
-  lavagem:           'Falar por WhatsApp',
-  impermeabilizacao: 'Falar por WhatsApp',
-};
-
 const SofaVariantPage = () => {
   const location = useLocation();
   const parsed = useMemo(() => parseRoute(location.pathname), [location.pathname]);
@@ -221,7 +143,7 @@ const SofaVariantPage = () => {
     }
     robotsMeta.setAttribute('content', 'index, follow');
     return () => { robotsMeta?.setAttribute('content', 'index, follow'); };
-  }, [data]);
+  }, [data, location.pathname]);
 
   if (!data || !parsed) {
     return (
@@ -251,8 +173,6 @@ const SofaVariantPage = () => {
   const beforeAfterCategory = categoryForServiceSlug(
     parsed?.variantKey === 'impermeabilizacao' ? 'impermeabilizacao' : SERVICEKEY_TO_SLUG[data.serviceKey]
   );
-  const problemImgs = PROBLEM_IMAGES[`${data.variantKey}-${data.serviceKey}`];
-  const problemLabels = VARIANT_PROBLEM_LABELS[data.variantKey];
 
   // "impermeabilizacao" pode ser o variantKey mesmo quando serviceKey é
   // sofa/colchão/etc (mesma condição já usada acima para beforeAfterCategory)
@@ -345,258 +265,7 @@ const SofaVariantPage = () => {
         <ServiceSnapshotStats stats={snapshotStats} />
         </div>
 
-        {/* ═══ TABELA DE PREÇOS ═══ */}
-        <div id="precos" className="scroll-mt-6"><ServicePriceSection
-          serviceSlug={parsed.variantKey === 'impermeabilizacao' ? 'impermeabilizacao' : SERVICEKEY_TO_SLUG[parsed.serviceKey]}
-          initialLocation={data.locationName}
-        /></div>
-
-        {/* ═══ PROBLEMAS ═══ */}
-        <section className="py-12 md:py-16 bg-kyro-green">
-          <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
-              <div className="mb-10 md:mb-14">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="h-px w-8 flex-shrink-0" style={{ backgroundColor: "#D4AF37", opacity: 0.65 }} />
-                  <p className="text-[10px] font-bold tracking-[0.28em] uppercase" style={{ color: "#D4AF37", opacity: 0.85 }}>O Que Resolvemos</p>
-                </div>
-                <h2 className="font-playfair text-[1.85rem] sm:text-4xl md:text-[2.6rem] font-bold leading-[1.1] text-white">
-                  {`Problemas que resolvemos ${prep}`}{" "}<em className="not-italic" style={{ color: "#D4AF37" }}>{data.locationName}</em>
-                </h2>
-                <p className="mt-4 text-[15px] leading-relaxed max-w-2xl text-white/50">Se reconhece algum destes cenários, envie uma fotografia para avaliarmos o tratamento adequado.</p>
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 md:gap-8">
-                {data.problems.map((problem, idx) => (
-                  <div
-                    key={idx}
-                    className="relative overflow-hidden flex flex-col justify-end min-h-[280px] sm:min-h-[400px]"
-                    style={{ borderTop: "2px solid rgba(212,175,55,0.70)" }}
-                  >
-                    {/* Background image */}
-                    {problemImgs?.[idx] && (
-                      <div
-                        className="absolute inset-0 bg-cover bg-center"
-                        style={{ backgroundImage: `url(${problemImgs[idx]})` }}
-                      />
-                    )}
-                    {/* Gradient overlay */}
-                    <div className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(7,26,18,0.98) 0%, rgba(7,26,18,0.72) 50%, rgba(7,26,18,0.18) 100%)" }} />
-                    {/* Content */}
-                    <div className="relative z-10 p-7 md:p-8 flex flex-col gap-4">
-                      <p className="text-[10px] font-bold tracking-[0.26em] uppercase" style={{ color: "#D4AF37" }}>
-                        {problemLabels[idx]}
-                      </p>
-                      <h3 className="font-playfair font-bold leading-snug text-white" style={{ fontSize: "1.25rem" }}>
-                        {problem.title}
-                      </h3>
-                      <div className="w-8 h-px" style={{ background: "linear-gradient(90deg, rgba(212,175,55,0.8) 0%, rgba(212,175,55,0.15) 100%)" }} />
-                      <p className="leading-relaxed text-white/70" style={{ fontSize: "14px" }}>
-                        {problem.description}
-                      </p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-          </div>
-        </section>
-
-        {/* ═══ VANTAGENS ═══ */}
-        <section className="py-12 md:py-16 bg-[#FDFDF9]">
-          <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
-            <div className="mb-10 md:mb-14">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="h-px w-8 flex-shrink-0" style={{ backgroundColor: "#D4AF37", opacity: 0.65 }} />
-                <p className="text-[10px] font-bold tracking-[0.28em] uppercase" style={{ color: "#D4AF37", opacity: 0.85 }}>Vantagens</p>
-              </div>
-              <h2 className="font-playfair text-[1.85rem] sm:text-4xl md:text-[2.6rem] font-bold leading-[1.1] text-[#111111]">
-                {`${variantLabel} profissional ${prep}`}{" "}<em className="not-italic" style={{ color: "#D4AF37" }}>{data.locationName}</em>
-              </h2>
-              <p className="mt-4 text-[15px] leading-relaxed max-w-2xl text-[#111111]/55">{data.whatIs}</p>
-            </div>
-            <div className="grid grid-cols-2 gap-px" style={{ backgroundColor: "#E8E4DE" }}>
-              {data.benefits.map((benefit, idx) => (
-                <div key={idx} className="bg-white p-5 sm:p-7 md:p-8" style={{ borderTop: "2px solid #D4AF37" }}>
-                  <p className="font-playfair font-bold mb-2 leading-none text-3xl sm:text-[2.25rem]" style={{ color: "rgba(212,175,55,0.30)" }}>
-                    {String(idx + 1).padStart(2, "0")}
-                  </p>
-                  <p className="text-[13px] sm:text-[15px] font-semibold text-[#111111] leading-snug">{benefit}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* ═══ PORQUE A KYRO CLEAN + AVALIAÇÕES ═══ */}
-        <section className="py-12 md:py-16 bg-kyro-green">
-          <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
-            <div className="mb-10 md:mb-14">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="h-px w-8 flex-shrink-0" style={{ backgroundColor: "#D4AF37", opacity: 0.65 }} />
-                <p className="text-[10px] font-bold tracking-[0.28em] uppercase" style={{ color: "#D4AF37", opacity: 0.85 }}>Porque a Kyro Clean</p>
-              </div>
-              <h2 className="font-playfair text-[1.85rem] sm:text-4xl md:text-[2.6rem] font-bold leading-[1.1] text-white">
-                A escolha certa para os seus{" "}<em className="not-italic" style={{ color: "#D4AF37" }}>estofos</em>
-              </h2>
-              <p className="mt-4 text-[15px] leading-relaxed max-w-2xl text-white/50">Orçamento claro, cuidado com os tecidos e avaliações de clientes que já utilizaram o serviço.</p>
-            </div>
-
-            {/* 3 stats */}
-            <div className="grid grid-cols-3 gap-px mb-10" style={{ backgroundColor: "rgba(255,255,255,0.06)" }}>
-              {[
-                { stat: "< 10 min", label: "Resposta ao orçamento" },
-                { stat: `${REVIEW_RATING} ★`, label: `+${REVIEW_COUNT} avaliações Google` },
-                { stat: "Por foto", label: "Avaliação prévia das manchas" },
-              ].map((item, i) => (
-                <div key={i} className="p-5 sm:p-6 md:p-7" style={{ background: "rgba(255,255,255,0.04)", borderTop: "2px solid rgba(212,175,55,0.55)" }}>
-                  <p className="font-playfair font-bold text-xl sm:text-2xl mb-1" style={{ color: "#D4AF37" }}>{item.stat}</p>
-                  <p className="text-[11px] sm:text-sm text-white/55 leading-snug">{item.label}</p>
-                </div>
-              ))}
-            </div>
-
-            <div id="avaliacoes" className="scroll-mt-6"><ServiceReviewsGrid
-              serviceSlug={parsed.variantKey === 'impermeabilizacao' ? 'impermeabilizacao' : SERVICEKEY_TO_SLUG[parsed.serviceKey]}
-              seed={data.locationName}
-            /></div>
-          </div>
-        </section>
-
-        {/* ═══ PROCESSO ═══ */}
-        <section className="py-12 md:py-16 bg-white">
-          <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
-            <div className="mb-10 md:mb-14">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="h-px w-8 flex-shrink-0" style={{ backgroundColor: "#D4AF37", opacity: 0.65 }} />
-                <p className="text-[10px] font-bold tracking-[0.28em] uppercase" style={{ color: "#D4AF37", opacity: 0.85 }}>Processo</p>
-              </div>
-              <h2 className="font-playfair text-[1.85rem] sm:text-4xl md:text-[2.6rem] font-bold leading-[1.1] text-[#111111]">
-                Como funciona a{" "}<em className="not-italic" style={{ color: "#D4AF37" }}>{variantLabel}</em>
-              </h2>
-            </div>
-            {(() => {
-              const steps = data.variantKey === 'impermeabilizacao' ? IMPERMEABILIZACAO_STEPS : GENERIC_PROCESS_STEPS;
-              const splitAt = Math.ceil(steps.length / 2);
-              return (
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-px" style={{ backgroundColor: "#E8E4DE" }}>
-                  {[0, 1].map((colIdx) => {
-                    const colSteps = colIdx === 0 ? steps.slice(0, splitAt) : steps.slice(splitAt);
-                    const offset = colIdx === 0 ? 0 : splitAt;
-                    return (
-                      <div key={colIdx} className="grid gap-px" style={{ backgroundColor: "#E8E4DE" }}>
-                        {colSteps.map((step, idx) => {
-                          const num = offset + idx;
-                          return (
-                            <div
-                              key={num}
-                              className="relative overflow-hidden flex items-start gap-4 p-5 md:p-6 bg-white"
-                              style={{ borderTop: "2px solid rgba(212,175,55,0.55)" }}
-                            >
-                              <span
-                                className="font-playfair font-bold flex-shrink-0 leading-none"
-                                style={{ fontSize: "1.75rem", color: "rgba(212,175,55,0.45)" }}
-                              >
-                                {String(num + 1).padStart(2, "0")}
-                              </span>
-                              <div>
-                                <p className="text-sm font-semibold text-[#111111] mb-1">{step.label}</p>
-                                <p className="text-xs text-[#111111]/50 leading-relaxed">{step.desc}</p>
-                              </div>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    );
-                  })}
-                </div>
-              );
-            })()}
-          </div>
-        </section>
-
-        {/* ═══ FAQ ═══ */}
-        <div id="duvidas" className="scroll-mt-6"><ServiceFAQ
-          faqs={data.faqs}
-          heading={`Perguntas sobre ${variantLabel.toLowerCase()} de ${SERVICE_PLURAL[data.serviceKey]} ${prep} ${data.locationName}`}
-          variant="dark"
-        /></div>
-
-        <>
-        {/* ═══ PACKS ═══ */}
-        <ServicePackBanner
-          packSlugs={SERVICE_PACK_SLUGS[data.serviceKey] ?? ["pack-sala-completa"]}
-          city={parsed.locationPart}
-        />
-
-        {/* ═══ COBERTURA ═══ */}
-        <section className="py-12 md:py-16 bg-white">
-          <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
-            <div className="mb-10 md:mb-14">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="h-px w-8 flex-shrink-0" style={{ backgroundColor: "#D4AF37", opacity: 0.65 }} />
-                <p className="text-[10px] font-bold tracking-[0.28em] uppercase" style={{ color: "#D4AF37", opacity: 0.85 }}>Explore por categoria</p>
-              </div>
-              <h2 className="font-playfair text-[1.85rem] sm:text-4xl md:text-[2.6rem] font-bold leading-[1.1] text-[#111111]">
-                {`Serviços e zonas de atendimento ${prep}`}{" "}<em className="not-italic" style={{ color: "#D4AF37" }}>{data.locationName}</em>
-              </h2>
-            </div>
-            <div className="max-w-4xl border-t border-[#D4AF37]/25">
-
-              {/* Zonas / Freguesias da cidade */}
-              {(() => {
-                const mun = municipiosComFreguesias.find(m => m.slug === parsed.locationPart);
-                if (!mun || !mun.freguesias.length) return null;
-                return (
-                  <DirectoryGroup title={<>Zonas {prep} {data.locationName}</>}>
-                      {mun.freguesias.slice(0, 8).map(f => (
-                        <Link
-                          key={f.slug}
-                          to={`/${parsed.variantKey}-${parsed.serviceKey}-${parsed.locationPart}-${f.slug}`}
-                          className="inline-flex items-center gap-1.5 bg-white px-3.5 py-2 rounded-full text-sm font-medium text-[#111111] border border-[#E8E4DE] hover:border-[#D4AF37]/40 hover:bg-[#D4AF37]/5 hover:shadow-sm transition-all"
-                        >
-                          <MapPin className="w-3 h-3 flex-shrink-0" style={{ color: "#D4AF37" }} />
-                          {f.name}
-                        </Link>
-                      ))}
-                    </DirectoryGroup>
-                );
-              })()}
-
-              {/* Outras cidades */}
-              <DirectoryGroup title={<>Também disponível em</>}>
-                  {cities.filter(c => c.slug !== parsed.locationPart).slice(0, 8).map(city => (
-                    <Link
-                      key={city.slug}
-                      to={`/${parsed.variantKey}-${parsed.serviceKey}-${city.slug}`}
-                      className="inline-flex items-center gap-1.5 bg-white px-3.5 py-2 rounded-full text-sm font-medium text-[#111111] border border-[#E8E4DE] hover:border-[#D4AF37]/40 hover:bg-[#D4AF37]/5 hover:shadow-sm transition-all"
-                    >
-                      {city.name}
-                    </Link>
-                  ))}
-                </DirectoryGroup>
-
-              {/* Outros serviços na mesma cidade */}
-              <DirectoryGroup title={<>Outros serviços {prep} {data.locationName}</>}>
-                  {(SERVICES.filter(s => s !== parsed.serviceKey) as ServiceKey[]).map(svcKey => (
-                    <Link
-                      key={svcKey}
-                      to={`/${SERVICEKEY_TO_SLUG[svcKey]}-${parsed.locationPart}`}
-                      className="inline-flex items-center gap-1.5 bg-white px-3.5 py-2 rounded-full text-sm font-medium text-[#111111] border border-[#E8E4DE] hover:border-[#D4AF37]/40 hover:bg-[#D4AF37]/5 hover:shadow-sm transition-all"
-                    >
-                      {SERVICE_LABEL[svcKey]}
-                    </Link>
-                  ))}
-                  <Link
-                    to={data.canonical}
-                    className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full text-sm font-semibold border hover:shadow-sm transition-all"
-                    style={{ color: "#D4AF37", borderColor: "rgba(212,175,55,0.45)", background: "rgba(212,175,55,0.04)" }}
-                  >
-                    Página principal
-                  </Link>
-                </DirectoryGroup>
-
-            </div>
-          </div>
-        </section>
-        </>
+        <LandingServiceSections />
       </main>
       {isPaidLanding ? <AdsLandingFooter /> : <Footer />}
     </>

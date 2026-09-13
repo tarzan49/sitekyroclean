@@ -1,4 +1,4 @@
-import { DRYING_PROMISE } from '@/constants/commercialPolicy';
+import { DRYING_PROMISE } from '../constants/commercialPolicy';
 
 interface ProcessStep { label: string; title: string; description: string; alt: string }
 interface ProcessGuide { heading: string; subtitle: string; image: string; steps: ProcessStep[] }

@@ -21,6 +21,8 @@ import { PRICE_PROMISE, SATISFACTION_PROMISE, DRYING_PROMISE, COVERAGE_PROMISE, 
 
 import fs from 'fs';
 import path from 'path';
+import { getLandingPageModel } from '../src/data/landingPageModel';
+import { renderLandingPageHtml } from './landing-page-html';
 
 import { getLocationServiceData, getAllLocationRoutes, services, cities } from '../src/data/locationSeoData';
 import { getAllFreguesiaRoutes, getFreguesia, generateFreguesiaContent } from '../src/data/freguesiaSeoData';
@@ -260,7 +262,8 @@ export function prerenderRoutes(outDir: string): number {
     const canonical = `${BASE_URL}${routePath}`;
     let html = injectMeta(template, title, desc, canonical);
     if (lang !== 'pt') html = html.replace('<html lang="pt">', `<html lang="${lang}">`);
-    html = injectContent(html, generatePageBody(content ?? { h1: title.split(" | ")[0], intro: desc }, lang));
+    const landing = lang === 'pt' ? getLandingPageModel(routePath) : null;
+    html = injectContent(html, landing ? renderLandingPageHtml(landing) : generatePageBody(content ?? { h1: title.split(" | ")[0], intro: desc }, lang));
     // LocalBusiness on every page
     html = injectJsonLd(html, LOCAL_BIZ);
     // Caller-provided schemas (FAQ, Service, BreadcrumbList, etc.)

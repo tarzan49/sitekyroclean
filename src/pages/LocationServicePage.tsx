@@ -1,44 +1,24 @@
-import ServiceProcessGuide from '@/components/ServiceProcessGuide';
-import { type ProcessServiceSlug } from '@/data/serviceProcessGuides';
-import SofaProcessGuide from '@/components/SofaProcessGuide';
-import ProblemCarousel from '@/components/ProblemCarousel';
-import DirectoryGroup from "@/components/DirectoryGroup";
-import SofaLeadActions from "@/components/SofaLeadActions";
-import { AdsLandingHeader, AdsLandingFooter, isAdsVisit } from "@/components/AdsLandingNavigation";
-import { useEffect, useMemo } from "react";
-import { useLocation, Link } from "react-router-dom";
-import { MapPin, Star, ArrowRight, Clock, Timer } from "lucide-react";
-import { GoogleG } from "@/components/icons/GoogleG";
-import Header from "@/components/Header";
+import { AdsLandingFooter, AdsLandingHeader, isAdsVisit } from "@/components/AdsLandingNavigation";
 import Footer from "@/components/Footer";
-import QuizFormLazy from "@/components/QuizFormLazy";
-import { useQuizLauncher } from "@/hooks/use-quiz-launcher";
-import ServiceLocationSchema from "@/components/ServiceLocationSchema";
-import ServiceFAQ from "@/components/ServiceFAQ";
-import ServicePackBanner from "@/components/ServicePackBanner";
-import ServiceSnapshotStats from "@/components/ServiceSnapshotStats";
-import PageBreadcrumb from "@/components/PageBreadcrumb";
+import Header from "@/components/Header";
 import HeroBeforeAfterPool from "@/components/HeroBeforeAfterPool";
-import { categoryForServiceSlug } from "@/data/beforeAfterPool";
-import { getLocationServiceData, services, cities, getCityLinksForService } from "@/data/locationSeoData";
-import { QuizLocationProvider, QuizServiceProvider } from "@/context/QuizLocationContext";
-import { municipiosComFreguesias } from "@/data/freguesiaSeoData";
-import { getAllProblems } from "@/data/problemSeoData";
-import { getMaterialsByService } from "@/data/materialSeoData";
-import { SERVICE_PACK_SLUGS } from "@/constants/servicePackSlugs";
+import { GoogleG } from "@/components/icons/GoogleG";
+import LandingServiceSections from '@/components/LandingServiceSections';
+import PageBreadcrumb from "@/components/PageBreadcrumb";
+import ServiceLocationSchema from "@/components/ServiceLocationSchema";
+import ServiceSnapshotStats from "@/components/ServiceSnapshotStats";
+import SofaLeadActions from "@/components/SofaLeadActions";
+import { REVIEW_COUNT, REVIEW_RATING, SITE_URL, WHATSAPP_BASE } from "@/constants/business";
+import { SERVICE_DURATION } from "@/constants/problemCardHelpers";
+import { pickServiceHero, SERVICE_RESULT_CONTENT } from "@/constants/serviceContent";
 import { SERVICE_TO_QUIZ } from "@/constants/serviceToQuiz";
-import { METRO_CITIES } from "@/constants/metroCities";
-import { SERVICE_RESULT_CONTENT, pickServiceHero } from "@/constants/serviceContent";
+import { QuizLocationProvider, QuizServiceProvider } from "@/context/QuizLocationContext";
+import { categoryForServiceSlug } from "@/data/beforeAfterPool";
+import { cities, getLocationServiceData, services } from "@/data/locationSeoData";
 import { buildServiceWaMessage } from "@/lib/whatsappMessages";
-import { SITE_URL, WHATSAPP_BASE, REVIEW_RATING, REVIEW_COUNT } from "@/constants/business";
-import SectionHeader from "@/components/SectionHeader";
-import { PRICE_TABLE } from "@/data/locationPriceTestimonialsData";
-import { locationPrices } from "@/components/quiz/QuizTypes";
-import { MARCA_CITY_SLUGS } from "@/data/marcaCities";
-import { PROBLEM_IMAGES, PRICE_HEADING_VERB, SERVICE_DURATION } from "@/constants/problemCardHelpers";
-import { ServiceTrustDesktop, ServiceTrustMobile } from "@/components/ServiceTrustBlock";
-import ServiceReviewsGrid from "@/components/ServiceReviewsGrid";
-import PriceWidget from "@/components/PriceWidget";
+import { Clock, Timer } from "lucide-react";
+import { useEffect, useMemo } from "react";
+import { Link, useLocation } from "react-router-dom";
 
 
 function parseLocationRoute(pathname: string): { serviceSlug: string; citySlug: string } | null {
@@ -58,7 +38,6 @@ const LocationServicePage = () => {
   const location = useLocation();
   const parsed = useMemo(() => parseLocationRoute(location.pathname), [location.pathname]);
   const data = useMemo(() => (parsed ? getLocationServiceData(parsed.serviceSlug, parsed.citySlug) : null), [parsed]);
-  const { isQuizOpen: isProblemQuizOpen, openQuiz: openProblemQuiz, closeQuiz: closeProblemQuiz } = useQuizLauncher();
 
   useEffect(() => {
     if (data) {
@@ -73,18 +52,6 @@ const LocationServicePage = () => {
       if (canonical) canonical.setAttribute("href", `${SITE_URL}${location.pathname}`);
     }
   }, [location.pathname, data]);
-
-  const relatedProblems = useMemo(() => {
-    if (!data) return [];
-    return getAllProblems()
-      .filter(p =>
-        p.visible &&
-        p.relatedServices.includes(data.serviceSlug) &&
-        (METRO_CITIES.has(data.citySlug) || p.relatedCities.includes(data.citySlug))
-      )
-      .slice(0, 5)
-      .map(p => ({ slug: p.slug, keyword: p.keyword }));
-  }, [data]);
 
   if (!data) {
     return (
@@ -111,36 +78,11 @@ const LocationServicePage = () => {
   const quizService = SERVICE_TO_QUIZ[data.serviceSlug];
 
   const heroImgs = pickServiceHero(data.serviceSlug, data.city);
+  const resultContent = (SERVICE_RESULT_CONTENT[data.serviceSlug] ?? SERVICE_RESULT_CONTENT['limpeza-sofas'])(data.city);
   const beforeAfterCategory = categoryForServiceSlug(data.serviceSlug);
-  const otherServices = data.relatedServices
-    .map(slug => {
-      const svc = services.find(s => s.slug === slug);
-      return svc ? { ...svc, locationPath: `/${slug}-${data.citySlug}` } : null;
-    })
-    .filter(Boolean) as (typeof services[number] & { locationPath: string })[];
-
-  const cityFreguesias = municipiosComFreguesias.find(m => m.slug === data.citySlug);
   const isSofaCleaning = data.serviceSlug === "limpeza-sofas";
   const isPaidLanding = isSofaCleaning && isAdsVisit(location.search);
-
-  const materialLinks = getMaterialsByService(data.serviceSlug);
-
-  const MARCA_SLUGS = ['ikea', 'natuzzi', 'kave-home', 'leroy-merlin', 'moviflor', 'conforama', 'el-corte-ingles', 'roche-bobois'];
-  const MARCA_COLCHAO_SLUGS = ['ikea', 'conforama', 'molaflex', 'pikolin', 'colmol', 'mindol'];
-  const MARCA_CADEIRAS_SLUGS = ['ikea', 'conforama', 'leroy-merlin', 'herman-miller', 'moviflor', 'el-corte-ingles'];
-  // Páginas de marca (sofá, colchão, cadeiras) cobrem as mesmas 34 cidades mais povoadas do site
-  const hasMarcaCity = (MARCA_CITY_SLUGS as readonly string[]).includes(data.citySlug);
-  const hasMarcaSofaCity = hasMarcaCity;
-  const hasMarcaColchaoCity = hasMarcaCity;
-  const hasMarcaCadeirasCity = hasMarcaCity;
-
-  const resultContent = (SERVICE_RESULT_CONTENT[data.serviceSlug] ?? SERVICE_RESULT_CONTENT['limpeza-sofas'])(data.city);
   const serviceBaseUrl = services.find(s => s.slug === data.serviceSlug)?.baseRoute ?? `/${data.serviceSlug}`;
-
-  // "Limpeza de Sofás" → "sofás" (categoria no plural para headings tipo "Problemas de sofás...")
-  const serviceCategory = data.service.startsWith("Limpeza de ")
-    ? data.service.replace("Limpeza de ", "").toLowerCase()
-    : data.service.toLowerCase();
 
   // H1: last word (the city name) rendered in gold
   const h1Words = data.h1.trim().split(" ");
@@ -159,22 +101,6 @@ const LocationServicePage = () => {
     { value: "<10min", label: "Resposta durante o horário de atendimento", icon: Clock },
     { value: serviceDuration.value, label: serviceDuration.label, icon: Timer },
   ];
-
-
-  const problemImages = PROBLEM_IMAGES[data.serviceSlug] ?? [];
-  const sofaProblemDescriptions: Record<string, string> = {
-    'Manchas difíceis no sofá': 'Café, vinho ou gordura? Avaliamos o tecido e a mancha para escolher o tratamento adequado.',
-    'Ácaros e bactérias invisíveis': 'A sujidade também se acumula no interior das fibras. Conheça as opções de higienização para o seu sofá.',
-    'Odores desagradáveis': 'Animais, humidade ou uso diário? Identificamos a origem do odor para recomendar o tratamento.',
-    'Desgaste prematuro do tecido': 'Proteja o tecido do uso diário. Descubra se a impermeabilização é adequada ao seu sofá.',
-  };
-  const problemCards = data.problems.map((problem, idx) => ({
-    title: problem.title,
-    description: isSofaCleaning ? (sofaProblemDescriptions[problem.title] ?? problem.description) : problem.description,
-    alt: problem.description,
-    image: problemImages[idx],
-
-  })).filter(card => card.image);
 
 
   return (
@@ -275,233 +201,7 @@ const LocationServicePage = () => {
         <ServiceSnapshotStats stats={snapshotStats} />
         </div>
 
-        {/* ═══ TABELA DE PREÇOS ═══ */}
-        {PRICE_TABLE[data.serviceSlug] && (
-          <section id="precos" className="scroll-mt-6 py-14 md:py-20 bg-[#FDFDF9]">
-            <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
-              <div className="grid md:grid-cols-2 gap-10 md:gap-16 items-center">
-                <div>
-                  <SectionHeader
-                    overline="Tabela de Preços"
-                    heading={`Quanto custa ${PRICE_HEADING_VERB[data.serviceSlug] ?? data.service.toLowerCase()} ${cityPrep}`}
-                    goldWord={data.city}
-                    subtitle={data.serviceSlug === 'limpeza-tapetes'
-                      ? `Orçamento à medida de cada tapete. Deslocação +${locationPrices[data.city] ?? 10}€ a ${data.city}. Sem surpresas, sem custos escondidos.`
-                      : data.serviceSlug === 'limpeza-alcatifas'
-                      ? `Orçamento à medida de cada espaço. Deslocação +${locationPrices[data.city] ?? 10}€ a ${data.city}. Sem preço fixo por m², sem surpresas.`
-                      : `Estimativa confirmada antes da marcação. Deslocação +${locationPrices[data.city] ?? 10}€ a ${data.city}. Orçamento gratuito antes de qualquer compromisso.`}
-                  />
-                  {/* Trust facts — desktop only (variante 1) */}
-                  <div className="hidden md:block">
-                    <ServiceTrustDesktop serviceSlug={data.serviceSlug} variant={1} seedKey={data.city} />
-                  </div>
-                </div>
-                <PriceWidget serviceSlug={data.serviceSlug} initialLocation={data.city} />
-              </div>
-              {/* Trust mobile colapsável — abaixo do widget */}
-              <div className="lg:hidden">
-                <ServiceTrustMobile serviceSlug={data.serviceSlug} variant={1} seedKey={data.city} />
-              </div>
-            </div>
-          </section>
-        )}
-
-        <QuizFormLazy
-          isOpen={isProblemQuizOpen}
-          onClose={closeProblemQuiz}
-          initialLocation={data.city}
-          initialService={quizService}
-        />
-
-        {/* ═══ TESTEMUNHOS ═══ */}
-        <section id="avaliacoes" className="scroll-mt-6 py-14 md:py-20 bg-kyro-green">
-          <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
-            <SectionHeader overline="Avaliações Reais" heading="O que dizem os nossos" goldWord="clientes" subtitle="Nas palavras de quem já nos recebeu em casa." light={false} />
-            <ServiceReviewsGrid serviceSlug={data.serviceSlug} seed={data.city} heading="" />
-          </div>
-        </section>
-
-        {/* ═══ PROBLEMAS COMUNS ═══ */}
-        {problemCards.length > 0 && (
-          <section id="problemas" className="scroll-mt-6 py-14 md:py-20 bg-[#FDFDF9]">
-            <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
-              <SectionHeader
-                overline="O Que Resolvemos"
-                heading={`Problemas de ${serviceCategory} que resolvemos ${cityPrep}`}
-                goldWord={data.city}
-                light={true}
-              />
-              <p className="-mt-5 mb-7 max-w-xl text-sm sm:text-base leading-relaxed text-[#536259]">
-                Reconhece algum destes sinais? Peça uma avaliação e descubra o tratamento adequado ao seu caso.
-              </p>
-              <ProblemCarousel>
-                {problemCards.map((card, idx) => (
-                  <article key={card.title} className="snap-start flex-none w-[84vw] max-w-[380px] md:max-w-none md:w-auto overflow-hidden rounded-sm border border-[#183b2c]/15 bg-[#0c241a] group flex flex-col shadow-[0_8px_24px_rgba(7,26,18,0.10)]">
-                    <div className="relative h-[185px] sm:h-[220px] overflow-hidden">
-                      <img src={card.image} alt={card.title} className="w-full h-full object-cover saturate-[0.85] motion-safe:group-hover:scale-[1.03] transition-transform duration-700" loading="lazy" decoding="async" />
-                      <div className="absolute inset-0 bg-gradient-to-t from-[#0c241a]/35 to-transparent" />
-                      <span className="absolute top-4 left-4 px-2.5 py-1.5 bg-[#071a12]/85 border border-white/20 text-[#e1c477] text-[10px] font-semibold tracking-[0.16em]">{String(idx + 1).padStart(2, '0')} / {String(problemCards.length).padStart(2, '0')}</span>
-                    </div>
-                    <div className="p-5 sm:p-6 flex flex-col flex-1">
-                      <div className="w-7 h-px bg-gold mb-4" />
-                      <h3 className="font-playfair font-semibold text-white text-[23px] leading-tight mb-3">{card.title}</h3>
-                      <p className="text-white/75 text-sm leading-relaxed mb-6">{card.description}</p>
-                      <div className="mt-auto">
-                        <button type="button" onClick={openProblemQuiz} aria-label={`Pedir avaliação: ${card.title}`} className="w-full min-h-12 flex items-center justify-between gap-3 rounded-sm px-4 py-3 text-sm font-bold text-[#071a12] bg-gradient-to-r from-gold to-[#d4c57b] hover:from-[#d4c57b] hover:to-gold focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-gold active:scale-[0.98] transition-all touch-manipulation">
-                          Pedir avaliação <ArrowRight className="w-5 h-5 shrink-0" />
-                        </button>
-                        <p className="text-white/60 text-[11px] text-center mt-2.5">Orçamento gratuito · Sem compromisso</p>
-                      </div>
-                    </div>
-                  </article>
-                ))}
-              </ProblemCarousel>
-            </div>
-          </section>
-        )}
-
-        {/* ═══ FAQ ═══ */}
-        {data.faqs && data.faqs.length > 0 && (
-          <div id="duvidas" className="scroll-mt-6"><ServiceFAQ faqs={data.faqs} heading={`Perguntas sobre ${data.service.toLowerCase()} ${cityPrep} ${data.city}`} variant="dark" /></div>
-        )}
-
-        {/* ═══ COMO FUNCIONA ═══ */}
-        {isSofaCleaning ? <SofaProcessGuide city={data.city} cityPrep={cityPrep} /> : <ServiceProcessGuide key={data.serviceSlug} serviceSlug={data.serviceSlug as ProcessServiceSlug} city={data.city} cityPrep={cityPrep} />}
-
-        {/* ═══ PACKS ═══ */}
-        <ServicePackBanner
-          packSlugs={SERVICE_PACK_SLUGS[data.serviceSlug] ?? ["pack-sala-completa"]}
-          city={data.citySlug}
-          variant="dark"
-        />
-
-        <>
-        {/* ═══ ÁREA DE SERVIÇO (DIRETÓRIO) ═══ */}
-        <section className="py-14 md:py-20" style={{ backgroundColor: "#FDFDF9" }}>
-          <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
-            <SectionHeader
-              overline="Explore por categoria"
-              heading={`Serviços e zonas de atendimento ${cityPrep}`}
-              goldWord={data.city}
-              subtitle="Encontre a sua zona, explore outros serviços ou consulte as opções por problema, material e marca. Abra uma categoria para ver mais."
-            />
-
-            <div className="max-w-4xl border-t border-[#D4AF37]/25">
-              {cityFreguesias && cityFreguesias.freguesias.length > 0 && (
-                <DirectoryGroup title={<>Zonas {cityPrep} {data.city}</>}>
-                    {cityFreguesias.freguesias.slice(0, 8).map(f => (
-                      <Link
-                        key={f.slug}
-                        to={`/${data.serviceSlug}-${data.citySlug}-${f.slug}`}
-                        className="inline-flex items-center gap-1.5 bg-white px-3.5 py-2 rounded-full text-sm font-medium text-[#111111] border border-[#E8E4DE] hover:border-[#D4AF37]/40 hover:bg-[#D4AF37]/5 hover:shadow-sm transition-all"
-                      >
-                        <MapPin className="w-3 h-3" style={{ color: "#D4AF37" }} />
-                        {f.name}
-                      </Link>
-                    ))}
-                  </DirectoryGroup>
-              )}
-
-              <DirectoryGroup title={<>Também disponível em</>}>
-                  {getCityLinksForService(data.serviceSlug, data.city).filter(c => c.name !== data.city).slice(0, 6).map(city => (
-                    <Link
-                      key={city.name}
-                      to={city.path}
-                      className="inline-flex items-center gap-1.5 bg-white px-3.5 py-2 rounded-full text-sm font-medium text-[#111111] border border-[#E8E4DE] hover:border-[#D4AF37]/40 hover:bg-[#D4AF37]/5 hover:shadow-sm transition-all"
-                    >
-                      {city.name}
-                    </Link>
-                  ))}
-                </DirectoryGroup>
-
-              {otherServices.length > 0 && (
-                <DirectoryGroup title={<>Outros serviços {cityPrep} {data.city}</>}>
-                    {otherServices.map(svc => (
-                      <Link
-                        key={svc.slug}
-                        to={svc.locationPath}
-                        className="inline-flex items-center gap-1.5 bg-white px-3.5 py-2 rounded-full text-sm font-medium text-[#111111] border border-[#E8E4DE] hover:border-[#D4AF37]/40 hover:bg-[#D4AF37]/5 hover:shadow-sm transition-all"
-                      >
-                        {svc.name}
-                      </Link>
-                    ))}
-                  </DirectoryGroup>
-              )}
-
-              {relatedProblems.length > 0 && (
-                <DirectoryGroup title={<>Problemas que resolvemos {cityPrep} {data.city}</>}>
-                    {relatedProblems.map(p => (
-                      <Link
-                        key={p.slug}
-                        to={`/${p.slug}-${data.citySlug}`}
-                        className="inline-flex items-center gap-1.5 bg-white px-3.5 py-2 rounded-full text-sm font-medium text-[#111111] border border-[#E8E4DE] hover:border-[#D4AF37]/40 hover:bg-[#D4AF37]/5 hover:shadow-sm transition-all"
-                      >
-                        {p.keyword}
-                      </Link>
-                    ))}
-                  </DirectoryGroup>
-              )}
-
-              {materialLinks.length > 0 && (
-                <DirectoryGroup title={<>Por tipo de material {cityPrep} {data.city}</>}>
-                    {materialLinks.map(m => (
-                      <Link
-                        key={m.slug}
-                        to={`/${m.slug}-${data.citySlug}`}
-                        className="inline-flex items-center gap-1.5 bg-white px-3.5 py-2 rounded-full text-sm font-medium text-[#111111] border border-[#E8E4DE] hover:border-[#D4AF37]/40 hover:bg-[#D4AF37]/5 hover:shadow-sm transition-all"
-                      >
-                        {m.name}
-                      </Link>
-                    ))}
-                  </DirectoryGroup>
-              )}
-
-              {hasMarcaSofaCity && data.serviceSlug === 'limpeza-sofas' && (
-                <DirectoryGroup title={<>Marcas de sofá {cityPrep} {data.city}</>}>
-                    {MARCA_SLUGS.map(slug => (
-                      <Link
-                        key={slug}
-                        to={`/limpeza-sofa-${slug}-${data.citySlug}`}
-                        className="inline-flex items-center gap-1.5 bg-white px-3.5 py-2 rounded-full text-sm font-medium text-[#111111] border border-[#E8E4DE] hover:border-[#D4AF37]/40 hover:bg-[#D4AF37]/5 hover:shadow-sm transition-all capitalize"
-                      >
-                        {slug.replace(/-/g, ' ')}
-                      </Link>
-                    ))}
-                  </DirectoryGroup>
-              )}
-
-              {hasMarcaColchaoCity && data.serviceSlug === 'limpeza-colchoes' && (
-                <DirectoryGroup title={<>Marcas de colchão {cityPrep} {data.city}</>}>
-                    {MARCA_COLCHAO_SLUGS.map(slug => (
-                      <Link
-                        key={slug}
-                        to={`/limpeza-colchao-${slug}-${data.citySlug}`}
-                        className="inline-flex items-center gap-1.5 bg-white px-3.5 py-2 rounded-full text-sm font-medium text-[#111111] border border-[#E8E4DE] hover:border-[#D4AF37]/40 hover:bg-[#D4AF37]/5 hover:shadow-sm transition-all capitalize"
-                      >
-                        {slug.replace(/-/g, ' ')}
-                      </Link>
-                    ))}
-                  </DirectoryGroup>
-              )}
-
-              {hasMarcaCadeirasCity && data.serviceSlug === 'limpeza-cadeiras' && (
-                <DirectoryGroup title={<>Marcas de cadeiras {cityPrep} {data.city}</>}>
-                    {MARCA_CADEIRAS_SLUGS.map(slug => (
-                      <Link
-                        key={slug}
-                        to={`/limpeza-cadeiras-${slug}-${data.citySlug}`}
-                        className="inline-flex items-center gap-1.5 bg-white px-3.5 py-2 rounded-full text-sm font-medium text-[#111111] border border-[#E8E4DE] hover:border-[#D4AF37]/40 hover:bg-[#D4AF37]/5 hover:shadow-sm transition-all capitalize"
-                      >
-                        {slug.replace(/-/g, ' ')}
-                      </Link>
-                    ))}
-                  </DirectoryGroup>
-              )}
-            </div>
-          </div>
-        </section>
-
-        </>
+        <LandingServiceSections />
       </main>
       {isPaidLanding ? <AdsLandingFooter /> : <Footer />}
     </QuizServiceProvider>

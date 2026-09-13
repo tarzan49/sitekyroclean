@@ -18,7 +18,7 @@ O agrupamento pelo serviço efetivamente prestado resulta em 2.152 rotas por ser
 
 Depois do hero e dos indicadores: orçamento/widget; avaliações reais; quatro problemas do serviço; exatamente quatro FAQ; guia do processo específico do serviço; mesma visita; serviços e zonas. Avenir e identidade visual existentes preservados. Pré-visualizações exclusivamente mobile.
 
-Localidade e freguesia já têm esta ordem no ramo analisado. Preços precisa de processo e mesma visita, integrando fatores de preço no orçamento. Variantes precisa de reposicionamento das avaliações e FAQs, substituição da apresentação antiga do processo e integração dos blocos adicionais. Os componentes partilhados não devem alterar acidentalmente as páginas de problemas, materiais, marcas ou homepage.
+Esta ordem está implementada na etapa 2. Preços inclui agora processo e mesma visita, integrando fatores de preço no orçamento. Variantes recebeu o reposicionamento das avaliações e FAQs, o guia específico do serviço e quatro problemas. As páginas de problemas, materiais, marcas e homepage não usam a nova composição.
 
 ## Etapa 1: biblioteca e limite de FAQ implementados
 
@@ -35,21 +35,36 @@ Localidade e freguesia já têm esta ordem no ramo analisado. Preços precisa de
 
 Não existe promessa de que cada conjunto de quatro perguntas seja exclusivo. Há reutilização intencional de respostas úteis. A contagem de conjuntos distintos exclui a ordem das perguntas e não é uma métrica de qualidade, de ranking ou uma simulação de unicidade baseada no nome da localidade.
 
+## Etapa 2: sete secções uniformizadas
+
+- Composição única em `LandingServiceSections`, com dados puros de `landingPageModel.ts` e ordem declarada em `landingServiceCopy.ts`.
+- Heroes, indicadores, URLs e metadados preservados. Widget real reutilizado, sem alterações ao motor de cálculo ou às taxas. Freguesias e variantes passam o município ao orçamento.
+- Quatro problemas por serviço associados às quatro imagens existentes. Corrigida a utilização de problemas de tapetes nos preços de alcatifas. Textos dos novos cartões explicam limitações sem promessas clínicas ou de remoção total; a revisão dos restantes textos dos geradores não está concluída.
+- Cinco passos por guia, reutilizando as apresentações existentes. Dados de sofás extraídos para partilha com o HTML inicial; dourado do guia alinhado com a regra canónica existente.
+- Avaliações regionais e transcrições preservadas. Packs e diretórios têm destinos existentes no build e nos sitemaps.
+- Fatores de preço conservados num painel expansível dentro do orçamento, sem acrescentar uma oitava secção principal.
+- Navegação reduzida Ads preservada: nas entradas pagas de sofás continua a não aparecer o diretório. As páginas orgânicas mostram as sete secções.
+- HTML inicial sem JavaScript gerado a partir do mesmo modelo, com texto dos quatro problemas, quatro FAQ, cinco passos e avaliações reais. Não é uma renderização visual do widget interativo; mantém uma tabela de preços como alternativa sem JavaScript.
+
+Validação: 1.924 testes aprovados em 30 ficheiros, TypeScript e lint dos componentes/dados alterados sem erros. Build com 16.045 rotas; auditorias de estrutura, conteúdo, quatro FAQ e FAQPage nas 12.912 rotas abrangidas sem divergências. Links dos diretórios/packs presentes nos HTMLs e sitemaps. Amostra mobile a 390 × 844: 28 entradas, cobrindo os seis serviços nas quatro famílias, variantes de freguesia e Ads, sem overflow, com quatro perguntas e cinco etapas funcionais. Inspeção visual de preços, avaliações, problemas, FAQ e processo. Orçamento aberto pelo widget em higienização de sofá Paranhos e preços de cadeiras Lisboa, e pelos problemas em alcatifas Paranhos e impermeabilização de cadeiras Lisboa. Nenhum contacto enviado.
+
+Esta entrega não produz a biblioteca de 240 imagens nem prova unicidade, indexação ou melhoria de ranking. Os quatro problemas comuns de cada serviço são a base para a próxima correspondência editorial e visual.
+
 ## Próximas entregas
 
-1. Uniformizar as sete secções das quatro famílias com componentes partilhados. Começar por exemplos representativos dos seis serviços, conservando o widget real, orçamento e navegação Ads. Alinhar também a estrutura do HTML inicial, que atualmente usa um gerador separado.
-2. Expandir as FAQ por assunto e rever o restante conteúdo de cada família. Reutilizar factos técnicos verdadeiros; diferenciar preços, condições de visita e perguntas relevantes. Limpeza, lavagem e higienização podem descrever a mesma intervenção: não inventar métodos distintos para justificar keywords.
-3. Definir os quatro problemas e a correspondência texto/imagem de cada serviço; produzir e validar um piloto de sofás antes da expansão visual.
-4. Criar a biblioteca de imagens: dez alternativas por problema, quatro problemas por serviço, 240 imagens no total. Reutilizar imagens adequadas existentes quando validadas. Uma imagem por cartão, com seleção independente e estável; não gerar milhares de ficheiros por URL. Ilustrações identificadas como tal, nunca atribuídas a clientes/localidades.
-5. Auditar todas as rotas e a semelhança de conteúdo; verificar links, sitemaps, metadados, fontes comerciais, cobertura das secções, desempenho e imagens. Inspeção visual em mobile por família e serviço. Possíveis alterações de URLs, redirecionamentos ou indexação são decisões separadas, suportadas por análise e, quando disponíveis, dados do Search Console.
+1. Expandir as FAQ por assunto e rever o restante conteúdo de cada família. Reutilizar factos técnicos verdadeiros; diferenciar preços, condições de visita e perguntas relevantes. Limpeza, lavagem e higienização podem descrever a mesma intervenção: não inventar métodos distintos para justificar keywords.
+2. Validar a correspondência texto/imagem dos quatro problemas por serviço e produzir um piloto de sofás antes da expansão visual.
+3. Criar a biblioteca de imagens: dez alternativas por problema, quatro problemas por serviço, 240 imagens no total. Reutilizar imagens adequadas existentes quando validadas. Uma imagem por cartão, com seleção independente e estável; não gerar milhares de ficheiros por URL. Ilustrações identificadas como tal, nunca atribuídas a clientes/localidades.
+4. Auditar todas as rotas e a semelhança de conteúdo; verificar links, sitemaps, metadados, fontes comerciais, cobertura das secções, desempenho e imagens. Inspeção visual em mobile por família e serviço. Possíveis alterações de URLs, redirecionamentos ou indexação são decisões separadas, suportadas por análise e, quando disponíveis, dados do Search Console.
 
 ## Verificação repetível
 
 ```sh
-npx vitest run src/data/landingFaqPool.test.ts src/data/commercialCompletion.test.ts src/data/travelPrices.test.ts src/components/AdsLandingNavigation.test.tsx src/lib/seoFaqSchema.test.ts
+npm test
 npx tsc --noEmit -p tsconfig.app.json
 npm run build
 node scripts/audit-landing-faqs.mjs
+node scripts/audit-landing-layout.mjs
 ```
 
 O teste percorre as 12.912 rotas e verifica quantidade, respostas não vazias, perguntas distintas, assuntos, adequação ao serviço, identidade da seleção e igualdade das listas de rotas de variantes do navegador/gerador. O verificador pós-build compara texto e FAQPage com os dados de cada rota. Isto não demonstra indexação nem valida o conteúdo fora das FAQs.
