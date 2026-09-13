@@ -6,7 +6,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import QuizButton from "@/components/QuizButton";
 import SectionHeader from "@/components/SectionHeader";
-import { cities, services } from "@/data/locationSeoData";
+import { cities, services } from "@/data/serviceCatalog";
 import { municipiosComFreguesias, getFreguesiaStats } from "@/data/freguesiaSeoData";
 import { SITE_URL, PHONE_TEL, PHONE_DISPLAY } from "@/constants/business";
 

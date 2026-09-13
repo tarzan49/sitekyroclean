@@ -26,7 +26,7 @@ import {
   getMaterialCityData,
   getRelatedMaterialLinks,
 } from "@/data/materialSeoData";
-import { cities, services, DEFAULT_PRICE_FROM, cityPrep } from "@/data/locationSeoData";
+import { cities, services, DEFAULT_PRICE_FROM, cityPrep } from "@/data/serviceCatalog";
 import { SITE_URL, WHATSAPP_BASE } from "@/constants/business";
 import ServiceReviewsGrid from "@/components/ServiceReviewsGrid";
 import { buildMaterialWaMessage } from "@/lib/whatsappMessages";

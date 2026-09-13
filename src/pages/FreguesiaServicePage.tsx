@@ -14,12 +14,7 @@ import { pickServiceHero } from "@/constants/serviceContent";
 import { SERVICE_TO_QUIZ } from "@/constants/serviceToQuiz";
 import { QuizLocationProvider, QuizServiceProvider } from "@/context/QuizLocationContext";
 import { categoryForServiceSlug } from "@/data/beforeAfterPool";
-import {
-  generateFreguesiaContent,
-  getFreguesia,
-  municipiosComFreguesias
-} from "@/data/freguesiaSeoData";
-import { services } from "@/data/locationSeoData";
+import { useLandingModel } from "@/hooks/use-landing-model";
 import { buildServiceWaMessage } from "@/lib/whatsappMessages";
 import { Clock, Timer } from "lucide-react";
 import { lazy, Suspense, useEffect, useMemo } from "react";
@@ -29,33 +24,19 @@ const FontComparisonPanel = import.meta.env.DEV
   ? lazy(() => import("@/components/FontComparisonPanel"))
   : null;
 
-function parseFreguesiaRoute(pathname: string): { serviceSlug: string; citySlug: string; freguesiaSlug: string } | null {
-  const path = pathname.replace(/^\//, '');
-  for (const svc of services) {
-    for (const m of municipiosComFreguesias) {
-      for (const f of m.freguesias) {
-        if (path === `${svc.slug}-${m.slug}-${f.slug}`) {
-          return { serviceSlug: svc.slug, citySlug: m.slug, freguesiaSlug: f.slug };
-        }
-      }
-    }
-  }
-  return null;
-}
 
 const FreguesiaServicePage = () => {
   const location = useLocation();
-  const parsed = useMemo(() => parseFreguesiaRoute(location.pathname), [location.pathname]);
-
-  const data = useMemo(() => {
-    if (!parsed) return null;
-    const freguesia = getFreguesia(parsed.citySlug, parsed.freguesiaSlug);
-    if (!freguesia) return null;
-    const svc = services.find(s => s.slug === parsed.serviceSlug);
-    if (!svc) return null;
-    const content = generateFreguesiaContent(svc.name, svc.slug, svc.priceFrom, freguesia.name, freguesia.slug, freguesia.municipio);
-    return { ...content, ...freguesia, service: svc.name, serviceSlug: svc.slug, priceFrom: svc.priceFrom };
-  }, [parsed]);
+  // O modelo ja traz tudo o que o hero desta pagina usa.
+  const resolved = useLandingModel(location.pathname);
+  const model = resolved.status === 'ready' ? resolved.model : null;
+  const data = useMemo(() => (model && model.family === 'freguesia' ? {
+    title: model.title, metaDescription: model.metaDescription, h1: model.h1,
+    name: model.locationName, slug: model.parishSlug ?? '',
+    municipio: model.municipalityName, municipioSlug: model.municipalitySlug,
+    service: model.serviceName, serviceSlug: model.serviceSlug, priceFrom: model.priceFrom,
+    serviceBaseRoute: model.serviceBaseRoute,
+  } : null), [model]);
 
   useEffect(() => {
     if (data) {
@@ -68,6 +49,7 @@ const FreguesiaServicePage = () => {
   }, [location.pathname, data]);
 
   if (!data) {
+    if (resolved.status === 'loading') return <div className="min-h-screen bg-background" aria-busy="true" />;
     return (
       <>
         <Header />
@@ -92,7 +74,7 @@ const FreguesiaServicePage = () => {
   const quizService = SERVICE_TO_QUIZ[data.serviceSlug];
   const heroImgs = pickServiceHero(data.serviceSlug, data.name);
   const beforeAfterCategory = categoryForServiceSlug(data.serviceSlug);
-  const serviceBaseUrl = services.find(s => s.slug === data.serviceSlug)?.baseRoute ?? `/${data.serviceSlug}`;
+  const serviceBaseUrl = data.serviceBaseRoute ?? `/${data.serviceSlug}`;
   const isSofaCleaning = data.serviceSlug === "limpeza-sofas";
   const isFontComparison = import.meta.env.DEV
     && data.serviceSlug === "limpeza-colchoes"

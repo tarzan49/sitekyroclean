@@ -17,7 +17,7 @@ import ServicePackBanner from "@/components/ServicePackBanner";
 import { SERVICE_PACK_SLUGS } from "@/constants/servicePackSlugs";
 import { getProblemLayout } from "@/data/problemLayout";
 import { getProblemBySlug, getRelatedProblemLinks } from "@/data/problemSeoData";
-import { services, cities } from "@/data/locationSeoData";
+import { services, cities } from "@/data/serviceCatalog";
 import { SERVICE_TO_QUIZ } from "@/constants/serviceToQuiz";
 import { SITE_URL } from "@/constants/business";
 import ServiceReviewsGrid from "@/components/ServiceReviewsGrid";

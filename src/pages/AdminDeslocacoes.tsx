@@ -1,5 +1,5 @@
 import { locationPrices } from "@/components/quiz/QuizTypes";
-import { cities } from "@/data/locationSeoData";
+import { cities } from "@/data/serviceCatalog";
 
 type Area = "porto" | "braga" | "lisboa" | "algarve";
 

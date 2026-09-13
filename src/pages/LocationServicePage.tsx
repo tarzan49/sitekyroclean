@@ -15,30 +15,24 @@ import { pickServiceHero } from "@/constants/serviceContent";
 import { SERVICE_TO_QUIZ } from "@/constants/serviceToQuiz";
 import { QuizLocationProvider, QuizServiceProvider } from "@/context/QuizLocationContext";
 import { categoryForServiceSlug } from "@/data/beforeAfterPool";
-import { cities, getLocationServiceData, services } from "@/data/locationSeoData";
+import { useLandingModel } from "@/hooks/use-landing-model";
 import { buildServiceWaMessage } from "@/lib/whatsappMessages";
 import { Clock, Timer } from "lucide-react";
 import { useEffect, useMemo } from "react";
 import { Link, useLocation } from "react-router-dom";
 
 
-function parseLocationRoute(pathname: string): { serviceSlug: string; citySlug: string } | null {
-  const path = pathname.replace(/^\//, '');
-  for (const service of services) {
-    for (const city of cities) {
-      if (path === `${service.slug}-${city.slug}`) {
-        return { serviceSlug: service.slug, citySlug: city.slug };
-      }
-    }
-  }
-  return null;
-}
-
-
 const LocationServicePage = () => {
   const location = useLocation();
-  const parsed = useMemo(() => parseLocationRoute(location.pathname), [location.pathname]);
-  const data = useMemo(() => (parsed ? getLocationServiceData(parsed.serviceSlug, parsed.citySlug) : null), [parsed]);
+  // O modelo traz o que o hero precisa: titulo, h1, cidade, servico e preco.
+  const resolved = useLandingModel(location.pathname);
+  const model = resolved.status === 'ready' ? resolved.model : null;
+  const data = useMemo(() => (model && model.family === 'localidade' ? {
+    title: model.title, metaDescription: model.metaDescription, h1: model.h1,
+    city: model.municipalityName, citySlug: model.municipalitySlug,
+    service: model.serviceName, serviceSlug: model.serviceSlug, priceFrom: model.priceFrom,
+    serviceBaseRoute: model.serviceBaseRoute,
+  } : null), [model]);
 
   useEffect(() => {
     if (data) {
@@ -55,6 +49,7 @@ const LocationServicePage = () => {
   }, [location.pathname, data]);
 
   if (!data) {
+    if (resolved.status === 'loading') return <div className="min-h-screen bg-background" aria-busy="true" />;
     return (
       <>
         <Header />
@@ -82,7 +77,7 @@ const LocationServicePage = () => {
   const beforeAfterCategory = categoryForServiceSlug(data.serviceSlug);
   const isSofaCleaning = data.serviceSlug === "limpeza-sofas";
   const isPaidLanding = isSofaCleaning && isAdsVisit(location.search);
-  const serviceBaseUrl = services.find(s => s.slug === data.serviceSlug)?.baseRoute ?? `/${data.serviceSlug}`;
+  const serviceBaseUrl = data.serviceBaseRoute ?? `/${data.serviceSlug}`;
 
   // H1: last word (the city name) rendered in gold
   const h1Words = data.h1.trim().split(" ");

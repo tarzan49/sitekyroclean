@@ -2,7 +2,7 @@
 // Only imports location data — keeps the 13 large content functions in
 // keywordVariantData.ts out of the initial bundle.
 
-import { cities } from './locationSeoData';
+import { cities } from './serviceCatalog';
 import { municipiosComFreguesias } from './freguesiaSeoData';
 
 export type ServiceKey = 'sofa' | 'colchao' | 'tapetes' | 'cadeiras' | 'alcatifas';

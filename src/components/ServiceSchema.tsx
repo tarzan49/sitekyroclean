@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { SITE_URL } from "@/constants/business";
-import { cities, DEFAULT_PRICE_FROM } from "@/data/locationSeoData";
+import { cities, DEFAULT_PRICE_FROM } from "@/data/serviceCatalog";
 import {
   buildWebPageNode,
   buildBreadcrumbNode,

@@ -1,4 +1,4 @@
-import { cities, services, cityPrep } from './locationSeoData';
+import { cities, services, cityPrep } from './serviceCatalog';
 import { AVAILABILITY_PROMISE, COVERAGE_PROMISE, DRYING_PROMISE, PRICE_PROMISE, RESPONSE_PROMISE, SATISFACTION_PROMISE } from '../constants/commercialPolicy';
 export const treatments = [
   { slug: 'tratamento-anti-acaros', name: 'Tratamento anti-ácaros', intro: 'Um cuidado específico para colchões, sofás e cadeiras, que pode acrescentar à limpeza. O tratamento anti-ácaros é escolhido para atuar sobre ácaros; não deve ser confundido com a extração de sujidade do serviço habitual.', benefits: ['Tratamento dirigido ao objetivo de reduzir a presença de ácaros no artigo.', 'Pode juntar o tratamento à limpeza do colchão ou sofá na mesma visita.', 'Avaliação do tecido e das condições de aplicação antes de começar.'], detail: 'A limpeza remove pó, resíduos e partículas acumuladas. O tratamento anti-ácaros é uma intervenção complementar, com produto e aplicação definidos para esse fim. Não prometemos eliminação total, percentagens de eficácia ou alívio de sintomas.' },

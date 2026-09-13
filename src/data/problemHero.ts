@@ -1,5 +1,5 @@
 import type { ProblemPage } from './problemSeoData';
-import { services, cityPrep } from './locationSeoData';
+import { services, cityPrep } from './serviceCatalog';
 import { locationPrices } from '../constants/travel';
 import { WHATSAPP_BASE } from '../constants/business';
 import { RESPONSE_PROMISE } from '../constants/commercialPolicy';

@@ -4,7 +4,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { Plus, Trash2, MessageCircle } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-import { cities } from '@/data/locationSeoData';
+import { cities } from '@/data/serviceCatalog';
 import { getAllPackComboRoutes, getPackByCityAndId } from '@/data/packComboData';
 import { sofaPrices, mattressPrices } from '@/components/quiz/QuizTypes';
 import { calculateCustomPack, makePackItem, PACK_KIND_LABEL, EXTRA_LABEL, type PackKind, type CustomPackItem, type PackExtra } from '@/lib/customPack';

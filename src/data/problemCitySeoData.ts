@@ -2,7 +2,7 @@
 // Targets searches like "tirar manchas sofá porto", "remover cheiro urina sofá matosinhos"
 
 import { PROBLEM_ROUTE_SLUGS } from "./problemRouteData";
-import { cities } from "./locationSeoData";
+import { cities } from "./serviceCatalog";
 import { METRO_CITIES as TOP_METRO } from "../constants/metroCities";
 
 export interface ProblemCityRoute {

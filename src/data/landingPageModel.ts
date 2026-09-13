@@ -114,6 +114,16 @@ export function getLandingPageModel(pathname: string) {
   if (family !== 'localidade') directory.push({ title: parish ? `Serviço no município de ${municipalityName}` : 'Página do serviço', links: [{ label: `${service.name} em ${municipalityName}`, href: `/${serviceSlug}-${municipalitySlug}` }, ...(family === 'variante' && parish ? [{ label: `${service.name} em ${locationName}`, href: `/${serviceSlug}-${locationPart}` }] : [])] });
   return {
     path, family, serviceSlug, serviceKey, serviceLabel, municipalitySlug, municipalityName, locationName, prep,
+    // Campos que os heroes das quatro familias liam do catalogo da sua
+    // familia. Vindos daqui, o hero monta-se a partir do HTML e o catalogo
+    // deixa de ser preciso na entrada normal.
+    variantKey, parishSlug: parish?.slug ?? null, locationPart,
+    // Nas variantes, o nome que o hero mostra inclui o municipio
+    // ("Santa Clara, Coimbra"), ao contrario de `locationName`, que os
+    // titulos das seccoes usam. Preserva-se o texto exato de cada familia.
+    heroLocationName: ('locationName' in data && typeof data.locationName === 'string') ? data.locationName : locationName,
+    serviceName: service.name, serviceBaseRoute: service.baseRoute,
+    priceFrom: ('priceFrom' in data && typeof data.priceFrom === 'string') ? data.priceFrom : service.priceFrom,
     title: data.title, metaDescription: data.metaDescription, h1: data.h1, intro: commercialHeroSubtitle(serviceSlug, municipalityName),
     editorialIntro: data.intro,
     trustPoints: getLandingTrustPoints(serviceSlug, family, municipalityName, locationName),

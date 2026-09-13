@@ -9,7 +9,7 @@
 // critério já usado em packComboData.ts/marcaSofaData.ts para escolher
 // "cidades grandes" sem replicar as ~53 cidades todas.
 
-import { cityPrep } from "./locationSeoData";
+import { cityPrep } from "./serviceCatalog";
 
 export interface CommercialCity {
   name: string;

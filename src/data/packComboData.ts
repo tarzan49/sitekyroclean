@@ -1,4 +1,4 @@
-import { cities } from './locationSeoData';
+import { cities } from './serviceCatalog';
 // These are editable starting combinations, not separate price lists.
 // Live amounts come from the same article tables used by the quote form.
 export interface PackCombo { id: string; name: string; slug: string; tagline: string; description: string; service1Slug: string; service2Slug: string; }

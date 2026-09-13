@@ -9,7 +9,7 @@ import { categoryForServiceSlug } from '@/data/beforeAfterPool';
 import { pickServiceHero } from '@/constants/serviceContent';
 import { REVIEW_COUNT, REVIEW_RATING } from '@/constants/business';
 import { locationPrices } from '@/constants/travel';
-import { services } from '@/data/locationSeoData';
+import { services } from '@/data/serviceCatalog';
 import { trackWhatsAppClick } from '@/lib/quizTracking';
 import { commercialHeroSubtitle } from '@/data/commercialHeroCopy';
 

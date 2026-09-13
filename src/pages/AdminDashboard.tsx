@@ -2,7 +2,7 @@ import { useEffect, useState, useCallback, Fragment } from 'react';
 import { MessageCircle, Download, RefreshCw, LogOut, TrendingUp, Users, Filter, Bell, Plus, Zap, X, Trash2, Check, Lock, AlertTriangle, CalendarDays, MapPin, Globe } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { supabase, type Lead, type LeadStatus } from '@/lib/supabase';
-import { cities as ALL_CITIES } from '@/data/locationSeoData';
+import { cities as ALL_CITIES } from '@/data/serviceCatalog';
 import { useAdminSession } from '@/hooks/use-admin-session';
 import { supabase as authClient } from '@/integrations/supabase/client';
 

@@ -1,7 +1,7 @@
 import { useId, useState } from "react";
 import { Link } from "react-router-dom";
 import { ChevronDown, MapPin, Search, X } from "lucide-react";
-import { cities } from "@/data/locationSeoData";
+import { cities } from "@/data/serviceCatalog";
 
 interface Props {
   serviceSlug: string;

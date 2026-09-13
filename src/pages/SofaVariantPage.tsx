@@ -18,12 +18,9 @@ import { SERVICE_DURATION } from "@/constants/problemCardHelpers";
 import { SERVICEKEY_TO_QUIZ } from "@/constants/serviceToQuiz";
 import { QuizLocationProvider, QuizServiceProvider } from "@/context/QuizLocationContext";
 import { categoryForServiceSlug } from "@/data/beforeAfterPool";
-import {
-  getKeywordVariantData,
-  type ServiceKey,
-  type VariantKey,
-} from "@/data/keywordVariantData";
-import { cityPrep } from "@/data/locationSeoData";
+import type { ServiceKey, VariantKey } from "@/data/keywordVariantData";
+import { useLandingModel } from "@/hooks/use-landing-model";
+import { cityPrep } from "@/data/serviceCatalog";
 import { buildVariantWaMessage } from "@/lib/whatsappMessages";
 import { Clock, Timer } from "lucide-react";
 import { useEffect, useMemo } from "react";
@@ -92,18 +89,6 @@ const SERVICEKEY_TO_SLUG: Record<ServiceKey, string> = {
   alcatifas: 'limpeza-alcatifas',
 };
 
-function parseRoute(pathname: string): { variantKey: VariantKey; serviceKey: ServiceKey; locationPart: string } | null {
-  const path = pathname.replace(/^\//, '');
-  for (const v of VARIANTS) {
-    for (const s of SERVICES) {
-      const prefix = `${v}-${s}-`;
-      if (path.startsWith(prefix)) {
-        return { variantKey: v, serviceKey: s, locationPart: path.slice(prefix.length) };
-      }
-    }
-  }
-  return null;
-}
 
 const VARIANT_LABEL: Record<VariantKey, string> = {
   higienizacao:      'Higienização',
@@ -121,11 +106,19 @@ const SERVICE_LABEL: Record<ServiceKey, string> = {
 
 const SofaVariantPage = () => {
   const location = useLocation();
-  const parsed = useMemo(() => parseRoute(location.pathname), [location.pathname]);
-  const data = useMemo(() => {
-    if (!parsed) return null;
-    return getKeywordVariantData(parsed.variantKey, parsed.serviceKey, parsed.locationPart);
-  }, [parsed]);
+  // 8.364 paginas: e a familia onde o catalogo pesava mais (66K comprimidos).
+  const resolved = useLandingModel(location.pathname);
+  const model = resolved.status === 'ready' && resolved.model.family === 'variante' ? resolved.model : null;
+  const parsed = useMemo(() => (model && model.variantKey && model.serviceKey ? {
+    variantKey: model.variantKey as VariantKey,
+    serviceKey: model.serviceKey as ServiceKey,
+    locationPart: model.locationPart,
+  } : null), [model]);
+  const data = useMemo(() => (model && parsed ? {
+    title: model.title, metaDescription: model.metaDescription, h1: model.h1,
+    locationName: model.heroLocationName, municipality: model.municipalityName,
+    priceFrom: model.priceFrom, serviceKey: parsed.serviceKey, variantKey: parsed.variantKey,
+  } : null), [model, parsed]);
 
   useEffect(() => {
     if (!data) return;
@@ -147,6 +140,7 @@ const SofaVariantPage = () => {
   }, [data, location.pathname]);
 
   if (!data || !parsed) {
+    if (resolved.status === 'loading') return <div className="min-h-screen bg-background" aria-busy="true" />;
     return (
       <>
         <Header />

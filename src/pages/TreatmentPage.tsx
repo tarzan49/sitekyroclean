@@ -7,7 +7,7 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import TrustRatingBadge from '@/components/TrustRatingBadge';
 import { getTreatmentPage, getExpansionPage, treatments, expansionCities } from '@/data/treatmentSeoData';
-import { cities, services } from '@/data/locationSeoData';
+import { cities, services } from '@/data/serviceCatalog';
 import { SITE_URL, WHATSAPP_BASE } from '@/constants/business';
 import { PRICE_PROMISE } from '@/constants/commercialPolicy';
 export default function TreatmentPage() {

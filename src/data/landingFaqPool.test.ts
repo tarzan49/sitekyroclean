@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { getLandingFaqs, getLandingFaqPool, LANDING_FAQ_COUNT, selectLandingFaqEntries, type LandingFaqContext, type LandingService } from './landingFaqPool';
 import { getLandingFaqRoutes } from '../../scripts/landing-faq-routes';
 import { locationPrices } from '../constants/travel';
-import { services } from './locationSeoData';
+import { services } from './serviceCatalog';
 import { getAllKeywordVariantRoutes as browserRoutes } from './keywordVariantRouteData';
 import { getAllKeywordVariantRoutes as generatedRoutes } from './keywordVariantData';
 

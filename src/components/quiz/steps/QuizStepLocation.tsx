@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { MapPin, Navigation, Check, ChevronRight, Loader2 } from 'lucide-react';
 import { locationPrices } from '@/components/quiz/QuizTypes';
-import { cities } from '@/data/locationSeoData';
+import { cities } from '@/data/serviceCatalog';
 import { detectServiceCity, normalizeCity } from '@/lib/locationDetection';
 import { Button } from '@/components/ui/button';
 

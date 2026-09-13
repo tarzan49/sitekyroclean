@@ -1,5 +1,5 @@
 ﻿import { useEffect } from "react";
-import { cities } from "@/data/locationSeoData";
+import { cities } from "@/data/serviceCatalog";
 import { SITE_URL } from "@/constants/business";
 import { buildLocalBusinessNode, clearPrerenderedSchema } from "@/lib/seoSchema";
 

@@ -7,7 +7,7 @@ import Footer from "@/components/Footer";
 import SectionHeader from "@/components/SectionHeader";
 import ServiceFAQ from "@/components/ServiceFAQ";
 import { getCommercialPageData, SegmentKey } from "@/data/commercialSeoData";
-import { cityPrep } from "@/data/locationSeoData";
+import { cityPrep } from "@/data/serviceCatalog";
 import { getProblemHeroImage } from "@/lib/problemHeroImages";
 import { buildCommercialWaMessage } from "@/lib/whatsappMessages";
 import { SITE_URL, WHATSAPP_BASE, PHONE_TEL, PHONE_DISPLAY, REVIEW_RATING, REVIEW_COUNT } from "@/constants/business";

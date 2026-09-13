@@ -2,7 +2,7 @@
 // higienizacao/lavagem × sofa/colchao/tapetes/cadeiras/alcatifas × all cities + parishes
 // Content generated on demand — no 1 570-entry array kept in memory at module load.
 
-import { cities, cityPrep } from './locationSeoData';
+import { cities, cityPrep } from './serviceCatalog';
 import { municipiosComFreguesias } from './freguesiaSeoData';
 import { getLandingFaqs, type LandingService } from './landingFaqPool';
 import { getLandingEditorial } from './landingEditorial';

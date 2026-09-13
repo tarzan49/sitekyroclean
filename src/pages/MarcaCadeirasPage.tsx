@@ -16,7 +16,7 @@ import ServicePriceSection from "@/components/ServicePriceSection";
 import ServiceAutoCarousel from "@/components/ServiceAutoCarousel";
 import ServiceFAQ from "@/components/ServiceFAQ";
 import { getAllMarcaCadeirasRoutes, getMarcaCadeirasByCityAndSlug } from "@/data/marcaCadeirasData";
-import { cityPrep } from "@/data/locationSeoData";
+import { cityPrep } from "@/data/serviceCatalog";
 import { SITE_URL, WHATSAPP_BASE, REVIEW_RATING, REVIEW_COUNT } from "@/constants/business";
 import { SERVICE_DURATION } from "@/constants/problemCardHelpers";
 import {

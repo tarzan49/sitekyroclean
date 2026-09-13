@@ -20,7 +20,7 @@ import ServiceLocationSchema from "@/components/ServiceLocationSchema";
 import { getProblemBySlug, getRelatedProblemLinks } from "@/data/problemSeoData";
 import { CATEGORY_TIPS, splitTipsHeading } from "@/data/problemTipsData";
 import { getServiceGallery, getIllustrativePhotos } from "@/constants/serviceGallery";
-import { cities, services, DEFAULT_PRICE_FROM, cityPrep } from "@/data/locationSeoData";
+import { cities, services, DEFAULT_PRICE_FROM, cityPrep } from "@/data/serviceCatalog";
 import { SERVICE_TO_QUIZ } from "@/constants/serviceToQuiz";
 import { METRO_CITY_SLUGS } from "@/constants/metroCities";
 import { getAllProblemCityRoutes } from "@/data/problemCitySeoData";

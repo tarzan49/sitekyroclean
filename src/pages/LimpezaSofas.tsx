@@ -3,7 +3,7 @@ import Header from "@/components/Header";
 import { QuizServiceProvider } from "@/context/QuizLocationContext";
 import Footer from "@/components/Footer";
 import ServiceCityLinks from "@/components/ServiceCityLinks";
-import { DEFAULT_PRICE_FROM } from "@/data/locationSeoData";
+import { DEFAULT_PRICE_FROM } from "@/data/serviceCatalog";
 import ServiceFAQ from "@/components/ServiceFAQ";
 import ServiceSchema from "@/components/ServiceSchema";
 import ServiceHero from "@/components/ServiceHero";

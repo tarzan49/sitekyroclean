@@ -13,8 +13,8 @@ import { pickServiceHero } from "@/constants/serviceContent";
 import { SERVICE_TO_QUIZ } from "@/constants/serviceToQuiz";
 import { QuizLocationProvider, QuizServiceProvider } from "@/context/QuizLocationContext";
 import { categoryForServiceSlug } from "@/data/beforeAfterPool";
-import { cityPrep, services } from "@/data/locationSeoData";
-import { getAllPriceRoutes, getPricePageData } from "@/data/priceSeoData";
+import { cityPrep, services } from "@/data/serviceCatalog";
+import { useLandingModel } from "@/hooks/use-landing-model";
 import {
   buildBreadcrumbNode,
   buildOfferNode,
@@ -30,12 +30,13 @@ import { Link, useLocation } from "react-router-dom";
 const PricePage = () => {
   const { pathname } = useLocation();
 
-  const data = useMemo(() => {
-    const allRoutes = getAllPriceRoutes();
-    const route = allRoutes.find(r => r.path === pathname);
-    if (!route) return null;
-    return getPricePageData(route.serviceSlug, route.citySlug);
-  }, [pathname]);
+  const resolved = useLandingModel(pathname);
+  const model = resolved.status === 'ready' ? resolved.model : null;
+  const data = useMemo(() => (model && model.family === 'preco' ? {
+    title: model.title, metaDescription: model.metaDescription,
+    cityName: model.municipalityName, citySlug: model.municipalitySlug,
+    serviceName: model.serviceName, serviceSlug: model.serviceSlug,
+  } : null), [model]);
 
   useEffect(() => {
     if (data) {
@@ -53,6 +54,7 @@ const PricePage = () => {
   }, [pathname, data]);
 
   if (!data) {
+    if (resolved.status === 'loading') return <div className="min-h-screen bg-background" aria-busy="true" />;
     return (
       <>
         <Header />

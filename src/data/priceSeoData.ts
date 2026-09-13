@@ -1,7 +1,7 @@
 // Programmatic SEO: Price pages data engine
 // Targets searches like "preço limpeza sofá porto", "quanto custa limpar colchão"
 
-import { cities, services, cityPrep } from "./locationSeoData";
+import { cities, services, cityPrep } from "./serviceCatalog";
 import { getLandingFaqs, type LandingService } from './landingFaqPool';
 import { getLandingEditorial } from './landingEditorial';
 

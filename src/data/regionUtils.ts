@@ -3,7 +3,7 @@
 // separates the Área Metropolitana do Porto (AMP, 17 municípios) from the two Norte
 // cities that aren't actually part of AMP (Braga, Guimarães). Used only in the admin
 // panel to browse Localidade×Serviço / Freguesia×Serviço / Variantes Keyword by region.
-import { cities } from "./locationSeoData";
+import { cities } from "./serviceCatalog";
 import { municipiosComFreguesias } from "./freguesiaSeoData";
 
 export type AdminRegion = "amp" | "norte" | "lisboa" | "algarve";

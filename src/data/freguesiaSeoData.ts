@@ -1,7 +1,7 @@
 // Hyper-local SEO: Freguesia (neighborhood) level pages
 // Each freguesia × service generates a unique landing page
 
-import { services } from "./locationSeoData";
+import { services } from "./serviceCatalog";
 import { getLandingEditorial } from './landingEditorial';
 import type { LandingService } from './landingFaqPool';
 
