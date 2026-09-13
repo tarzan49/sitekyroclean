@@ -58,20 +58,20 @@ const BeforeAfterPage = () => {
       <Header />
       <main>
         {/* Hero */}
-        <section data-mobile-hero="text" className="pt-24 md:pt-28 pb-10 md:pb-14 bg-[#FDFDF9]">
+        <section data-mobile-hero="text" className="pt-24 md:pt-28 pb-10 md:pb-14 bg-checker-dark">
           <div className="container mx-auto px-4">
             <div className="max-w-4xl mx-auto text-center">
-              <nav className="flex items-center justify-center gap-1.5 text-sm md:text-base text-[#1A4E30]/60 mb-6" aria-label="Breadcrumb">
-                <Link to="/" className="hover:text-[#1A4E30] transition-colors">Início</Link>
+              <nav className="flex items-center justify-center gap-1.5 text-sm md:text-base text-white/60 mb-6" aria-label="Breadcrumb">
+                <Link to="/" className="hover:text-gold transition-colors">Início</Link>
                 <span>/</span>
-                <span className="text-[#1A4E30] font-medium">Antes e Depois</span>
+                <span className="text-white font-medium">Antes e Depois</span>
               </nav>
               <p className="text-sm font-bold tracking-[0.08em] uppercase text-[#D4AF37] mb-3">Resultados reais</p>
-              <h1 className="type-page-title font-playfair     text-[#111111] mb-4 ">
+              <h1 className="type-page-title font-playfair     text-white mb-4 ">
                 Antes e Depois da Limpeza Profissional
               </h1>
               <div className="w-12 h-px bg-[#D4AF37] mx-auto mb-5 opacity-60" />
-              <p className="text-base md:text-lg text-[#555] leading-relaxed max-w-2xl mx-auto">
+              <p className="text-base md:text-lg text-white/80 leading-relaxed max-w-2xl mx-auto">
                 Explore os resultados por serviço. As demonstrações de impermeabilização estão identificadas quando são ilustrativas.
               </p>
             </div>
