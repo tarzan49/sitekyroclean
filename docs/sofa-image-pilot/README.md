@@ -1,6 +1,6 @@
 # Biblioteca visual dos problemas de sofás
 
-13/09/2026. Biblioteca completa de sofás: 40 imagens, dez por problema, produzidas com a ferramenta integrada de geração de imagens (não foi usada a API/CLI). Inclui as quatro do piloto e 36 novas alternativas. Não estão ligadas ao site público, ao prerender, aos sitemaps ou às galerias de trabalhos reais.
+13/09/2026. Biblioteca completa de sofás: 40 imagens, dez por problema, produzidas com a ferramenta integrada de geração de imagens (não foi usada a API/CLI). Inclui as quatro do piloto e 36 novas alternativas. Integrada no código das landing pages de sofás e respetivo HTML inicial; não integra galerias de trabalhos reais. Publicação em produção depende do ramo de deployment.
 
 Abrir `index.html` em viewport mobile de 390 × 844. O painel usa Avenir local e recortes de 185px de altura. Cada cartão permite selecionar as dez alternativas e avançar/recuar com botões de 44px; os cartões são independentes. As ilustrações mostram uma situação ou a sua avaliação, não um resultado de limpeza.
 
@@ -27,6 +27,6 @@ Atualização de apresentação: por pedido do responsável, o aviso visível fo
 
 ## Continuação
 
-Exemplo na página real, apenas em desenvolvimento: `/limpeza-sofas-lisboa?teste=imagens-sofas#problemas`. `LandingServiceSections` mostra quatro exemplos fixos (manchas 07, resíduos 03, odores 02, desgaste 05), com a legenda aprovada. Sem o parâmetro, noutro serviço ou no build de produção, mantém as imagens anteriores. O exemplo não implementa ainda a distribuição das 40 imagens por URL.
+Integração: `/limpeza-sofas-lisboa#problemas` já usa seleção estável, sem parâmetro de teste. Os ficheiros servidos estão em `public/images/landing-problems/sofas/`; `src/data/landingProblemImages.ts` fornece dados e seleção, partilhados pelo modelo das páginas. A pontuação de cada imagem depende apenas da rota normalizada, do problema e do ID da imagem. Query/hash não alteram a escolha. O exemplo fixo foi removido. Testes verificam cópias dos ficheiros, seleção nas 2.152 páginas de sofás, alcance das 40 alternativas e paridade React/HTML inicial. Não é uma promessa de combinação exclusiva por página.
 
-A biblioteca de sofás está completa; faltam as 200 imagens dos outros cinco serviços para chegar às 240 previstas e a integração nas páginas. Na integração, selecionar por ID do problema e identidade estável da página, manter alternativa fixa entre React e HTML inicial, legenda «Imagem ilustrativa» e textos alternativos sem localidades inventadas. Não integrar estas imagens nos comparadores antes/depois ou nas galerias de trabalhos reais. A navegação manual deste painel é apenas para revisão, não é a seleção estável das páginas públicas.
+A biblioteca de sofás está completa e integrada; faltam as 200 imagens dos outros cinco serviços para chegar às 240 previstas. Manter alternativa fixa entre React e HTML inicial, legenda «Imagem ilustrativa» e textos alternativos sem localidades inventadas. Não integrar estas imagens nos comparadores antes/depois ou nas galerias de trabalhos reais. A navegação manual deste painel continua apenas para revisão.

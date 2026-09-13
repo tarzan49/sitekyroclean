@@ -4,6 +4,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import type { ReactNode } from 'react';
 import LandingServiceSections from './LandingServiceSections';
 import { LANDING_SECTION_ORDER } from '../data/landingServiceCopy';
+import { getLandingPageModel } from '../data/landingPageModel';
 
 vi.mock('./ProblemCarousel', () => ({ default: ({ children }: { children: ReactNode }) => <div>{children}</div> }));
 vi.mock('./CustomerReviews', () => ({ default: () => <div>Avaliações</div> }));
@@ -14,14 +15,21 @@ vi.mock('./QuizFormLazy', () => ({ default: ({ isOpen, ...props }: { isOpen: boo
 afterEach(cleanup);
 
 describe('landing section integration', () => {
-  it('shows the image demonstration only on explicitly requested sofa previews', () => {
+  it('uses the public sofa library with or without the old preview parameter', () => {
     for (const [route, expected] of [
       ['/limpeza-sofas-lisboa?teste=imagens-sofas', 4],
-      ['/limpeza-sofas-lisboa', 0],
+      ['/limpeza-sofas-lisboa', 4],
+      ['/limpeza-sofas-porto-paranhos', 4],
+      ['/preco-limpeza-sofas-lisboa', 4],
+      ['/higienizacao-sofa-lisboa', 4],
       ['/limpeza-colchoes-lisboa?teste=imagens-sofas', 0],
     ] as const) {
       const { container } = render(<MemoryRouter initialEntries={[route]}><LandingServiceSections /></MemoryRouter>);
-      expect(container.querySelectorAll('img[src^="/docs/sofa-image-pilot/"]')).toHaveLength(expected);
+      expect(container.querySelectorAll('img[src^="/images/landing-problems/sofas/"]')).toHaveLength(expected);
+      if (expected) {
+        const selected = getLandingPageModel(route)!.problems.map(card => card.image!);
+        expect([...container.querySelectorAll('[data-problem-id] img')].map(img => ({ src: img.getAttribute('src'), alt: img.getAttribute('alt') }))).toEqual(selected.map(image => ({ src: image.src, alt: image.alt })));
+      }
       expect(container.querySelectorAll('[data-problem-id]')).toHaveLength(4);
       cleanup();
     }

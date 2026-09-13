@@ -3,6 +3,7 @@ import { municipiosComFreguesias, getFreguesia, generateFreguesiaContent } from 
 import { getPricePageData } from './priceSeoData';
 import { getKeywordVariantData, type VariantKey, type ServiceKey } from './keywordVariantData';
 import { getLandingProblems, LANDING_PRICE_VERBS } from './landingServiceCopy';
+import { selectLandingProblemImage } from './landingProblemImages';
 import { PRICE_TABLE } from './locationPriceTestimonialsData';
 import { PRICE_FACTORS } from './priceFactors';
 import { SERVICE_PROCESS_GUIDES } from './serviceProcessGuides';
@@ -117,7 +118,7 @@ export function getLandingPageModel(pathname: string) {
     variantExplanation: family === 'variante' ? (serviceSlug === 'impermeabilizacao' ? 'A impermeabilização é uma proteção opcional de tecidos compatíveis. A limpeza prévia, se necessária, é combinada e orçamentada separadamente.' : `Limpeza, lavagem e higienização podem descrever o mesmo pedido. O procedimento é escolhido pelo material e pelo estado da peça. ${TREATMENT_EXTRAS}`) : undefined,
     priceRows: family === 'preco' ? getPricePageData(serviceSlug, municipalitySlug)!.priceTable : PRICE_TABLE[serviceSlug],
     priceFactors: family === 'preco' ? PRICE_FACTORS[serviceSlug] : [],
-    problems: getLandingProblems(serviceSlug),
+    problems: getLandingProblems(serviceSlug).map(problem => ({ ...problem, image: selectLandingProblemImage(serviceSlug, problem.id, path) })),
     problemHeading: serviceSlug === 'impermeabilizacao' ? `Derrames e situações em que a proteção pode ajudar ${prep} ${locationName}` : `Problemas de ${service.name.replace('Limpeza de ', '').toLowerCase()} que resolvemos ${prep} ${locationName}`,
     reviews: pickReviewSubset(serviceSlug, `${path}:${reviewSeed}`, 6),
     faqs: data.faqs,

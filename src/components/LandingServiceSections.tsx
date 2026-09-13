@@ -32,9 +32,6 @@ export default function LandingServiceSections() {
   const trustVariant = model.family === 'freguesia' ? 2 : 1;
   const trustSeed = model.family === 'freguesia' ? `${model.municipalityName}-${model.locationName}` : model.locationName;
   const quizService = model.serviceKey ? SERVICEKEY_TO_QUIZ[model.serviceKey] : SERVICE_TO_QUIZ[model.serviceSlug];
-  // Local demonstration only; public pages retain their current image sources.
-  const imagePreview = import.meta.env.DEV && model.serviceSlug === 'limpeza-sofas' && new URLSearchParams(search).get('teste') === 'imagens-sofas';
-  const previewImages = ['sofa-manchas-07', 'sofa-residuos-03', 'sofa-odores-02', 'sofa-desgaste-05'];
   const sections = {
     precos: <section id="precos" className="scroll-mt-20 py-14 md:py-20 bg-[#FDFDF9]">
       <div className={container}>
@@ -66,9 +63,9 @@ export default function LandingServiceSections() {
         <ProblemCarousel key={model.path}>
           {model.problems.map((card, index) => <article key={card.id} data-problem-id={card.id} className="snap-start flex-none w-[84vw] max-w-[380px] md:max-w-none md:w-auto overflow-hidden rounded-sm border border-[#183b2c]/15 bg-[#0c241a] group flex flex-col shadow-[0_8px_24px_rgba(7,26,18,0.10)]">
             <div className="relative h-[185px] sm:h-[220px] overflow-hidden">
-              <img src={imagePreview ? `/docs/sofa-image-pilot/assets/${previewImages[card.imageIndex]}.webp` : PROBLEM_IMAGES[model.serviceSlug][card.imageIndex]} alt={imagePreview ? `Imagem ilustrativa: ${card.title}` : card.title} className="w-full h-full object-cover saturate-[0.85] motion-safe:group-hover:scale-[1.03] transition-transform duration-700" loading="lazy" decoding="async" />
+              <img src={card.image?.src ?? PROBLEM_IMAGES[model.serviceSlug][card.imageIndex]} alt={card.image?.alt ?? card.title} width={card.image ? 1200 : undefined} height={card.image ? 675 : undefined} className="w-full h-full object-cover saturate-[0.85] motion-safe:group-hover:scale-[1.03] transition-transform duration-700" loading="lazy" decoding="async" />
               <div className="absolute inset-0 bg-gradient-to-t from-[#0c241a]/35 to-transparent" />
-              {imagePreview && <span className="absolute bottom-2 left-2 bg-[#071a12]/90 px-2 py-1 text-[11px] text-white">Imagem ilustrativa</span>}
+              {card.image && <span className="absolute bottom-2 left-2 bg-[#071a12]/90 px-2 py-1 text-[11px] text-white">Imagem ilustrativa</span>}
               <span className="absolute top-4 left-4 px-2.5 py-1.5 bg-[#071a12]/85 border border-white/20 text-[#e1c477] text-[10px] font-semibold tracking-[0.16em]">{String(index + 1).padStart(2, '0')} / 04</span>
             </div>
             <div className="p-5 sm:p-6 flex flex-col flex-1">

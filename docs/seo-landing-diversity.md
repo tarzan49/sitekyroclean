@@ -62,6 +62,8 @@ Criadas inicialmente quatro imagens ilustrativas, uma por problema. Após aprova
 
 ## Próximas entregas
 
+Integração de sofás concluída no código: as 2.152 rotas das quatro famílias selecionam uma das dez imagens por problema através de `landingProblemImages.ts`, com seleção estável por endereço e igual em React/HTML inicial. Ficheiros em `public/images/landing-problems/sofas/`; removido o exemplo fixo DEV. Verificação: 1.938 testes, TypeScript/lint, build de 16.045 rotas e auditorias das 12.912 páginas sem divergências ou imagens em falta. Amostra mobile 390 × 844 de localidade, freguesia, preço e variante com quatro FAQ e sem overflow. As 40 alternativas são utilizadas no inventário real. Isto não implica combinações exclusivas nem melhoria de ranking; faltam 200 imagens dos outros serviços.
+
 1. Concluir a revisão dos restantes campos legados e mensagens partilhadas fora das FAQ/introduções/descrições agora revistas, sem alargar automaticamente o trabalho às famílias de problemas e materiais. Limpeza, lavagem e higienização podem descrever a mesma intervenção: não inventar métodos distintos para justificar keywords.
 2. Validar a correspondência texto/imagem dos outros cinco serviços antes da expansão visual; a biblioteca de sofás já tem dez alternativas por problema.
 3. Criar a biblioteca de imagens: dez alternativas por problema, quatro problemas por serviço, 240 imagens no total. Reutilizar imagens adequadas existentes quando validadas. Uma imagem por cartão, com seleção independente e estável; não gerar milhares de ficheiros por URL. Ilustrações identificadas como tal, nunca atribuídas a clientes/localidades.

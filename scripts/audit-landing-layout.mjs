@@ -28,6 +28,9 @@ for (const record of records) {
   const order = [...html.matchAll(/data-landing-section="([^"]+)"/g)].map(match => match[1]);
   if (JSON.stringify(order) !== JSON.stringify(LANDING_SECTION_ORDER)) failures.push(`${record.path}: wrong section order`);
   if (main !== renderLandingPageHtml(model)) failures.push(`${record.path}: HTML/model mismatch`);
+  for (const problem of model.problems) {
+    if (problem.image && !fs.existsSync(path.resolve('dist', problem.image.src.slice(1)))) failures.push(`${record.path}: missing problem image ${problem.image.src}`);
+  }
   if ([...html.matchAll(/data-problem-id=/g)].length !== 4 || model.faqs.length !== 4 || model.processSteps.length !== 5) failures.push(`${record.path}: wrong card/FAQ/process count`);
   for (const link of [...model.packLinks, ...model.directory.flatMap(group => group.links)]) {
     if (!fs.existsSync(path.resolve('dist', `${link.href.slice(1)}.html`)) || !sitemapUrls.has(link.href)) missingLinks.add(link.href);
