@@ -60,7 +60,13 @@ Validação: 1.928 testes aprovados, TypeScript e lint dos ficheiros novos/compo
 
 Criadas inicialmente quatro imagens ilustrativas, uma por problema. Após aprovação, a biblioteca de sofás foi completada com mais 36: dez por problema, 40 no total, 4,56 MB de WebP. Ficheiros, prompts, textos alternativos e painel com controlos independentes em [sofa-image-pilot](sofa-image-pilot/README.md). As 40 opções foram revistas e testadas em mobile. Não houve substituição nas páginas públicas nem nas galerias reais. Faltam 200 imagens dos restantes serviços e a integração com seleção estável.
 
-## Próximas entregas
+## Estado atual das bibliotecas (13/09/2026)
+
+Concluídas as seis bibliotecas: 240 imagens ilustrativas, 40 por serviço e dez por problema. As 12.912 landing pages selecionam quatro imagens estáveis por URL, iguais em React e HTML inicial. Catálogos e prompts: `docs/sofa-image-pilot/`, `docs/mattress-image-library/`, `docs/rug-image-library/`, `docs/chair-image-library/`, `docs/alcatifa-image-library/` e `docs/waterproofing-image-library/`. Ficheiros finais em `public/images/landing-problems/`. Todos os serviços mantêm exatamente quatro FAQ por página.
+
+Validação final desta expansão: 1.967 testes, TypeScript/lint, build de 16.045 rotas, auditorias de layout/FAQ das 12.912 páginas sem divergências e verificadores das seis bibliotecas aprovados. Alcatifas e impermeabilização verificadas em mobile nas quatro famílias, sem imagens em falta ou overflow. As etapas anteriores registam as verificações mobile dos outros quatro serviços. Isto conclui a expansão visual, não a análise de indexação, semelhança editorial ou desempenho em produção. Integração no ramo de pré-visualização.
+
+## Próximas entregas (plano histórico; expansão visual concluída acima)
 
 Integração de sofás concluída no código: as 2.152 rotas das quatro famílias selecionam uma das dez imagens por problema através de `landingProblemImages.ts`, com seleção estável por endereço e igual em React/HTML inicial. Ficheiros em `public/images/landing-problems/sofas/`; removido o exemplo fixo DEV. Verificação: 1.938 testes, TypeScript/lint, build de 16.045 rotas e auditorias das 12.912 páginas sem divergências ou imagens em falta. Amostra mobile 390 × 844 de localidade, freguesia, preço e variante com quatro FAQ e sem overflow. As 40 alternativas são utilizadas no inventário real. Isto não implica combinações exclusivas nem melhoria de ranking; faltam 200 imagens dos outros serviços.
 

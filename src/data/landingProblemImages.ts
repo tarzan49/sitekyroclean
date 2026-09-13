@@ -1,6 +1,8 @@
 import { MATTRESS_PROBLEM_IMAGES } from './mattressProblemImages';
 import { RUG_PROBLEM_IMAGES } from './rugProblemImages';
 import { CHAIR_PROBLEM_IMAGES } from './chairProblemImages';
+import { ALCATIFA_PROBLEM_IMAGES } from './alcatifaProblemImages';
+import { WATERPROOFING_PROBLEM_IMAGES } from './waterproofingProblemImages';
 
 export interface LandingProblemImage { id: string; problemId: string; src: string; alt: string }
 
@@ -259,7 +261,9 @@ export function selectLandingProblemImage(serviceSlug: string, problemId: string
   const library: readonly LandingProblemImage[] = serviceSlug === 'limpeza-sofas' ? SOFA_PROBLEM_IMAGES
     : serviceSlug === 'limpeza-colchoes' ? MATTRESS_PROBLEM_IMAGES
     : serviceSlug === 'limpeza-tapetes' ? RUG_PROBLEM_IMAGES
-    : serviceSlug === 'limpeza-cadeiras' ? CHAIR_PROBLEM_IMAGES : [];
+    : serviceSlug === 'limpeza-cadeiras' ? CHAIR_PROBLEM_IMAGES
+    : serviceSlug === 'limpeza-alcatifas' ? ALCATIFA_PROBLEM_IMAGES
+    : serviceSlug === 'impermeabilizacao' ? WATERPROOFING_PROBLEM_IMAGES : [];
   const path = pagePath.split(/[?#]/)[0].replace(/\/+$/, '') || '/';
   const candidates = library.filter(image => image.problemId === problemId);
   return candidates.reduce<LandingProblemImage | undefined>((best, image) => {

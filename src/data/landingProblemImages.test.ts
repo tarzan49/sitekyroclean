@@ -42,7 +42,7 @@ describe('public sofa problem image selection', () => {
   it('does not introduce sofa images on other services or standalone page families', () => {
     expect(selectLandingProblemImage('limpeza-colchoes', 'limpeza-sofas-1', '/example')).toBeUndefined();
     expect(selectLandingProblemImage('limpeza-sofas', 'unknown', '/example')).toBeUndefined();
-    expect(getLandingPageModel('/impermeabilizacao-sofa-lisboa')!.problems.every(p => !p.image)).toBe(true);
+    expect(getLandingPageModel('/impermeabilizacao-sofa-lisboa')!.problems.every(p => p.image?.src.startsWith('/images/landing-problems/impermeabilizacao/'))).toBe(true);
     expect(getLandingPageModel('/problemas/manchas-sofa')).toBeNull();
   });
 });
