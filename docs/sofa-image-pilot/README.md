@@ -21,6 +21,8 @@ Inspeção dos quatro originais e dos quatro cartões em mobile 390 × 844: imag
 
 Como apenas foram acrescentados documentos/ativos fora do build, não se voltou a executar a suite do site nem se reivindica uma validação de produção nesta etapa.
 
+Atualização de apresentação: por pedido do responsável, o aviso visível foi simplificado para «Imagens ilustrativas» e as quatro legendas para «Imagem ilustrativa». A proveniência permanece neste documento e no manifesto.
+
 ## Continuação
 
-Este é o piloto, não a biblioteca completa. Faltam nove alternativas por problema de sofás (36 imagens), além dos outros cinco serviços. Validar primeiro a direção visual. Na integração, selecionar por ID do problema e identidade estável da página, manter alternativa fixa entre React e HTML inicial, legenda de IA e textos alternativos sem localidades inventadas. Não integrar estas imagens nos comparadores antes/depois ou nas galerias de trabalhos reais.
+Este é o piloto, não a biblioteca completa. Faltam nove alternativas por problema de sofás (36 imagens), além dos outros cinco serviços. Validar primeiro a direção visual. Na integração, selecionar por ID do problema e identidade estável da página, manter alternativa fixa entre React e HTML inicial, legenda «Imagem ilustrativa» e textos alternativos sem localidades inventadas. Não integrar estas imagens nos comparadores antes/depois ou nas galerias de trabalhos reais.

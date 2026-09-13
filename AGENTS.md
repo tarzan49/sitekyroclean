@@ -12,6 +12,8 @@ Etapa 3: biblioteca com 180 perguntas distintas, 40 candidatas por serviço (12 
 
 Piloto visual de sofás criado em `docs/sofa-image-pilot/`: quatro WebP, um por problema, prompts no manifesto e painel mobile autónomo. São ilustrações de IA, não trabalhos reais; ainda não estão ligados às páginas públicas. Não os inserir nos comparadores antes/depois. Falta validar a direção visual e criar as restantes alternativas antes da expansão. Detalhes no README do piloto.
 
+Legenda das imagens ilustrativas (13/09/2026): por pedido do responsável, apresentar apenas «Imagem ilustrativa» nos cartões e «Imagens ilustrativas» no aviso geral, sem disclaimer de IA ou texto adicional sobre clientes/resultados. Preservar a proveniência nos registos internos e não atribuir estas imagens a trabalhos reais.
+
 ## Fecho dos oito alertas comerciais (10/09/2026)
 
 A regra dos 10 minutos aplica-se também ao inglês e aos testes locais. Em inglês, usar EN_RESPONSE_PROMISE, EN_AVAILABILITY_PROMISE e EN_COVERAGE_PROMISE; não voltar a apresentar “Same-day” como prazo de resposta. A disponibilidade é próprio dia ou seguinte sob confirmação, nunca uma regra geral de 48h para Lisboa. Secagem média 3–6h também em marcas (IKEA/Pikolin), variantes e glossário. A existência de manchas preexistentes não exclui a repetição gratuita comunicada até48h; explicar limitações antes de executar. Limpeza/higienização não inclui automaticamente anti-ácaros ou desbacterização. Não reintroduzir promessas de eliminação de germes, benefícios clínicos ou bactericida incluído. Homepage usa PUBLISHED_REVIEWS, só transcrições; localidades apenas quando confirmadas. Retirados os blocos independentes de reviews sem origem dos schemas. Preservar estas regras em merges de ramos de teste.
