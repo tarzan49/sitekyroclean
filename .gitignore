@@ -41,3 +41,6 @@ GOOGLE-ADS-PORTO-CAMPANHA.md
 
 # Google Ads strategy docs (budget/keywords, not for the public repo)
 g-ads/
+
+# Ad-hoc CRM data scripts (customer addresses + commission figures, not for the public repo)
+/supabase/*.sql
