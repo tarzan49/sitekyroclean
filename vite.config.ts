@@ -59,6 +59,8 @@ export default defineConfig(({ mode }) => ({
       output: {
         onlyExplicitManualChunks: true,
         manualChunks: (id) => {
+          // One tree-shaken icon module instead of a request for each icon.
+          if (id.includes('node_modules/lucide-react/')) return 'vendor-icons';
           // React core — tiny, always cached
           if (id.includes('node_modules/react/') || id.includes('node_modules/react-dom/')) {
             return 'vendor-react';

@@ -92,7 +92,6 @@ const BeforeAfterSlider = ({
       const p = Math.min((ts - start) / duration, 1);
       const e = p < 0.5 ? 2 * p * p : -1 + (4 - 2 * p) * p;
       const pos = from + (to - from) * e;
-      setSliderPosition(pos);
       applyPosition(pos);
       if (p < 1) {
         frame = requestAnimationFrame(animate);
@@ -104,9 +103,9 @@ const BeforeAfterSlider = ({
           const p2 = Math.min((ts2 - start) / duration, 1);
           const e2 = p2 < 0.5 ? 2 * p2 * p2 : -1 + (4 - 2 * p2) * p2;
           const pos2 = to + (from - to) * e2;
-          setSliderPosition(pos2);
           applyPosition(pos2);
           if (p2 < 1) frame = requestAnimationFrame(reverse);
+          else setSliderPosition(from);
         };
         frame = requestAnimationFrame(reverse);
       }
