@@ -56,8 +56,8 @@ const Hero = () => {
         <div className="absolute inset-x-0 bottom-0 z-[1] h-48 bg-gradient-to-t from-black/75 via-black/20 to-transparent pointer-events-none" />
 
         {/* Content */}
-        <div className="container mx-auto px-5 md:px-8 relative z-10">
-          <div className="max-w-2xl">
+        <div className="relative z-10 mx-auto grid w-full max-w-[1400px] px-5 md:px-8 lg:grid-cols-[minmax(0,610px)_1fr] lg:px-16 xl:px-20">
+          <div className="max-w-[610px]">
 
             {/* Tag */}
             <div className="inline-flex items-start mb-5">
@@ -81,7 +81,7 @@ const Hero = () => {
               <span style={{ color: '#D4AF37' }}>ao domicílio.</span>
             </h1>
 
-            {/* Trust row: main stat + Google rating, one compact line */}
+            {/* Mobile keeps the compact trust row; desktop moves Google to the open right side. */}
             <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mb-5">
               <div className="flex items-baseline gap-1.5">
                 <span
@@ -92,8 +92,10 @@ const Hero = () => {
                 </span>
                 <span className="text-[10px] text-white/55 font-medium tracking-[0.14em] uppercase">{STATS[0].label}</span>
               </div>
-              <span className="w-px h-4 bg-white/15 flex-shrink-0" />
-              <TrustRatingBadge variant="mapsLink" />
+              <span className="h-4 w-px flex-shrink-0 bg-white/15 lg:hidden" />
+              <span className="lg:hidden">
+                <TrustRatingBadge variant="mapsLink" />
+              </span>
             </div>
 
             {/* Subtitle */}
@@ -104,19 +106,22 @@ const Hero = () => {
               Limpeza profissional de manchas e resíduos, com equipas em Braga, Porto, Lisboa e Algarve. Procuramos atender no próprio dia ou no dia seguinte, mediante disponibilidade. Anti-ácaros e desbacterização são extras opcionais.
             </p>
 
-            {/* CTAs */}
-            <div className="flex flex-col gap-2.5 w-full max-w-sm">
+          </div>
 
-              {/* Primary — gold */}
-              <div className="relative group">
-                <div className="absolute -inset-1.5 rounded-full bg-gradient-to-r from-[#C9A84C]/50 to-[#E8D070]/40 opacity-30 blur-lg group-hover:opacity-55 transition-opacity duration-400 pointer-events-none" />
+          {/* Desktop CTAs occupy the clean right side of the sofa, away from the extraction line. */}
+          <div className="flex w-full max-w-sm flex-col gap-2.5 lg:mb-8 lg:w-[400px] lg:max-w-none lg:self-end lg:justify-self-center">
+
+              {/* Price CTA stays primary on mobile and becomes secondary on desktop. */}
+              <div className="group relative order-1 lg:order-2">
+                <div className="absolute -inset-1.5 rounded-full bg-gradient-to-r from-[#C9A84C]/50 to-[#E8D070]/40 opacity-30 blur-lg transition-opacity duration-400 pointer-events-none group-hover:opacity-55 lg:opacity-15" />
                 <button
                   onClick={handleOpenQuiz}
                   className={[
                     'relative w-full font-bold text-[#12121e] touch-manipulation',
-                    'h-[58px] md:h-[52px] px-8 text-base md:text-[17px]',
+                    'h-[58px] md:h-[52px] lg:h-[48px] px-8 text-base md:text-[17px]',
                     'bg-gradient-to-r from-[#C9A84C] via-[#EDD96A] to-[#C9A84C]',
                     'shadow-[0_6px_22px_rgba(201,168,76,0.42),0_2px_6px_rgba(0,0,0,0.28),inset_0_1px_0_rgba(255,255,255,0.32),inset_0_-2px_0_rgba(0,0,0,0.12)]',
+                    'lg:border lg:border-[#D4AF37]/70 lg:bg-none lg:bg-black/35 lg:text-white lg:shadow-[0_8px_24px_rgba(0,0,0,0.22)] lg:backdrop-blur-md',
                     'hover:shadow-[0_10px_32px_rgba(201,168,76,0.60),0_4px_10px_rgba(0,0,0,0.32),inset_0_1px_0_rgba(255,255,255,0.36)]',
                     'hover:scale-[1.025]',
                     'active:scale-[0.95] active:shadow-[0_2px_8px_rgba(201,168,76,0.30),inset_0_2px_4px_rgba(0,0,0,0.18)]',
@@ -127,9 +132,9 @@ const Hero = () => {
                 </button>
               </div>
 
-              {/* Secondary — WhatsApp */}
-              <div className="relative group">
-                <div className="absolute -inset-1.5 rounded-full bg-[#25D366]/40 opacity-30 blur-lg group-hover:opacity-55 transition-opacity duration-400 pointer-events-none" />
+              {/* WhatsApp becomes the primary desktop CTA. */}
+              <div className="group relative order-2 lg:order-1">
+                <div className="absolute -inset-2 rounded-full bg-[#25D366]/45 opacity-30 blur-xl transition-opacity duration-400 pointer-events-none group-hover:opacity-65 lg:opacity-50" />
                 <a
                   href={`${WHATSAPP_BASE}?text=${encodeURIComponent('Olá, gostaria de saber mais sobre os vossos serviços de higienização.')}`}
                   target="_blank"
@@ -137,7 +142,7 @@ const Hero = () => {
                   onClick={() => trackWhatsAppClick('hero')}
                   className={[
                     'relative flex items-center justify-center gap-2 w-full font-bold text-white touch-manipulation',
-                    'h-[58px] md:h-[52px] px-8 text-base md:text-[17px]',
+                    'h-[58px] md:h-[52px] lg:h-[60px] px-8 text-base md:text-[17px]',
                     'bg-gradient-to-r from-[#1DA851] via-[#25D366] to-[#1DA851]',
                     'shadow-[0_6px_22px_rgba(37,211,102,0.42),0_2px_6px_rgba(0,0,0,0.28),inset_0_1px_0_rgba(255,255,255,0.20),inset_0_-2px_0_rgba(0,0,0,0.12)]',
                     'hover:shadow-[0_10px_32px_rgba(37,211,102,0.60),0_4px_10px_rgba(0,0,0,0.32)]',
@@ -151,8 +156,11 @@ const Hero = () => {
                 </a>
               </div>
 
-            </div>
           </div>
+        </div>
+
+        <div className="absolute bottom-[7%] right-8 z-10 hidden lg:block 2xl:right-[calc((100vw-1400px)/2+2rem)]">
+          <TrustRatingBadge variant="floatingHero" />
         </div>
 
         <Suspense fallback={null}>
