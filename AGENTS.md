@@ -202,3 +202,8 @@ Pedido aprovado: a paleta verde suave do piloto passa a ser partilhada pelo site
 ## Reposição da homepage (13/09/2026)
 
 O responsável rejeitou expressamente a inclusão da homepage na uniformização dos heroes. Reposto `HeroV1` exatamente da versão anterior a `033d483`, com fotografia contínua, título, descrição, HomeHeroTrust, WhatsApp e botão «Calcular o meu preço». Não aplicar à homepage a estrutura comercial com breadcrumb, galeria antes/depois e três indicadores. Alterações futuras à homepage exigem pedido específico.
+
+
+## Garantia no cartão de cadeiras da homepage (13/09/2026)
+
+Pedido do responsável: na secção «Os 4 problemas que resolvemos no próprio dia», o cartão de cadeiras apresenta «Impermeabilização com garantia de até 10 anos e 5 lavagens». Substitui o texto antigo de 12 meses neste cartão.

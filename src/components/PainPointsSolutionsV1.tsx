@@ -34,7 +34,7 @@ const PROBLEMS = [
     type: "Cadeiras",
     link: "/limpeza-cadeiras",
     title: "Desgaste acelerado\nsem proteção",
-    solution: "Impermeabilização com garantia até 12 meses",
+    solution: "Impermeabilização com garantia de até 10 anos e 5 lavagens",
     pos: "center",
   },
 ];
