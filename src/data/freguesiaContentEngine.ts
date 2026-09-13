@@ -1,3 +1,4 @@
+import { WATERPROOFING_PROBLEMS } from "./waterproofingProblems";
 // ─── Dynamic Content Engine ───────────────────────────────────────
 // Generates unique, deterministic content for each freguesia × service page.
 // All pools are SERVICE-SPECIFIC and all templates reference the parish (f) and city (c).
@@ -668,7 +669,7 @@ export function getDynamicContent(
     h1: `${serviceName} em ${freguesiaName}`,
     intro: `${intro} ${localSection}`,
     localSection,
-    problems: selectedProblems,
+    problems: serviceSlug === "impermeabilizacao" ? WATERPROOFING_PROBLEMS : selectedProblems,
     howItWorks,
     benefits,
     faqs: selectedFaqs,

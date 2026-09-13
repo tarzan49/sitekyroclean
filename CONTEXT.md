@@ -1,3 +1,7 @@
+## Problemas de impermeabilização (13/09/2026)
+
+As páginas de cidade e freguesia usam quatro cartões na mesma ordem: café, vinho, sumo em cadeira e patas molhadas. Texto partilhado em `src/data/waterproofingProblems.ts`, imagens em `src/assets/impermeabilizacao-problema-*.webp`, ligadas por `PROBLEM_IMAGES`. Cenas ilustrativas geradas, com prompts em `docs/waterproofing-problem-images.md`.
+
 ## Guias ilustrados dos cinco serviços (13/09/2026)
 
 `ServiceProcessGuide` substitui as timelines com medalhas de colchões, cadeiras, tapetes, alcatifas e impermeabilização nas páginas de cidade e freguesia. Também integra as cinco páginas nacionais. Conteúdo específico em `src/data/serviceProcessGuides.ts`; imagens ilustrativas geradas em `public/images/services/process-*.webp`. Cada ficheiro contém uma grelha 3×2; as primeiras cinco células são apresentadas individualmente, com recorte CSS e navegação acessível por tabs, setas, Home/End e botões. A sexta célula é um detalhe do tecido e só aparece no ficheiro descarregado. Sem avanço automático. O guia de sofás continua em `SofaProcessGuide`, agora com `DRYING_PROMISE` (média 3–6h). A impermeabilização distingue cura até 24h de secagem da limpeza. Plano e prompts em `docs/service-process-guides.md`.

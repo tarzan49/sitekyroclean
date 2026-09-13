@@ -1,3 +1,4 @@
+import { WATERPROOFING_PROBLEMS } from "./waterproofingProblems";
 import { locationPrices } from '../constants/travel';
 
 export interface LocationService {
@@ -295,11 +296,7 @@ function generateImpermeabilizacaoContent(city: string, cityDesc: string): Omit<
     metaDescription: `Impermeabilização profissional de sofás e cadeiras ${prep} ${city}. Versão Essencial e versão Premium, com proteção invisível real até 10 anos.`,
     h1: `Impermeabilização de Estofos ${prep} ${city}`,
     intro: `Proteja os seus estofos contra manchas e líquidos ${prep} ${city}. A Kyro Clean Solutions aplica impermeabilização profissional invisível que cria uma barreira protetora nos tecidos, repelindo líquidos e facilitando a limpeza. Duas versões disponíveis, Essencial e Premium, ${prep} ${city}, ${cityDesc}.`,
-    problems: [
-      { title: "Sofá sem proteção", description: `Sem impermeabilização, qualquer derrame penetra rapidamente nas fibras do sofá, causando manchas permanentes e danos ao estofamento.` },
-      { title: "Manchas frequentes com crianças e animais", description: `Famílias ${prep} ${city} com crianças e animais de estimação sofrem com manchas constantes. A versão Premium, mais resistente ao desgaste, é a recomendada para estes casos.` },
-      { title: "Desgaste acelerado dos tecidos", description: `Tecidos não protegidos desgastam-se mais rapidamente. A impermeabilização prolonga significativamente a vida útil dos estofos.` },
-    ],
+    problems: WATERPROOFING_PROBLEMS,
     howItWorks: `Processo de impermeabilização ${prep} ${city}: 1) Limpeza prévia dos estofos (se necessário), 2) Escolha entre a versão Essencial (à base de água) ou Premium (à base de diluente), 3) Aplicação uniforme do produto, 4) Secagem e teste de repelência.`,
     benefits: [
       "Barreira protetora invisível que não altera a cor nem a textura do tecido",

@@ -17,9 +17,10 @@ import painpointCadeiraWear  from "@/assets/cadeira-tecido-desgastado.webp";
 import painpointAlcatifaDirt from "@/assets/hero-p-limpeza-alcatifas.webp";
 import painpointAlcatifaAllergens from "@/assets/hero-p-mofo-alcatifa.webp";
 import painpointAlcatifaStain from "@/assets/alcatifa-cleaning.webp";
-import painpointImperProtect from "@/assets/hero-waterproofing.webp";
-import painpointImperStain   from "@/assets/hero-p-mancha-gordura-sofa.webp";
-import painpointImperWear    from "@/assets/service-waterproof-new.webp";
+import painpointImperCafe from "@/assets/impermeabilizacao-problema-cafe.webp";
+import painpointImperVinho from "@/assets/impermeabilizacao-problema-vinho.webp";
+import painpointImperSumo from "@/assets/impermeabilizacao-problema-sumo.webp";
+import painpointImperPatas from "@/assets/impermeabilizacao-problema-patas.webp";
 
 export const PROBLEM_IMAGES: Record<string, string[]> = {
   "limpeza-sofas":     [painpointSofaStain, painpointSofaMites, painpointSofaOdor, painpointSofaWear],
@@ -27,7 +28,7 @@ export const PROBLEM_IMAGES: Record<string, string[]> = {
   "limpeza-tapetes":   [painpointTapeteDirt, painpointTapeteStain, painpointTapeteAllergens, painpointTapeteColor],
   "limpeza-cadeiras":  [painpointCadeiraDirt, painpointCadeiraStain, painpointCadeiraOdor, painpointCadeiraWear],
   "limpeza-alcatifas": [painpointAlcatifaDirt, painpointAlcatifaAllergens, painpointAlcatifaStain],
-  "impermeabilizacao": [painpointImperProtect, painpointImperStain, painpointImperWear],
+  "impermeabilizacao": [painpointImperCafe, painpointImperVinho, painpointImperSumo, painpointImperPatas],
 };
 
 // CTA labels for LocationServicePage problem cards (keyed by locationSeoData problem titles)
