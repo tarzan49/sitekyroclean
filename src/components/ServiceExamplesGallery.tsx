@@ -8,6 +8,7 @@ export default function ServiceExamplesGallery({ serviceSlug }: { serviceSlug: L
     <div className="[&_[data-visual-gallery]_.grid]:!grid-cols-2">
       <VisualExamplesGallery
         id="exemplos"
+        variant="dark"
         overline="Exemplos"
         heading="Veja alguns"
         name="exemplos"

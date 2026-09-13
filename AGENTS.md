@@ -212,3 +212,6 @@ Pedido do responsável: na secção «Os 4 problemas que resolvemos no próprio 
 ## Exemplos nos seis serviços principais (13/09/2026)
 
 Pedido do responsável: substituir a secção secundária de antes/depois nas seis páginas nacionais por quatro fotos ilustrativas específicas do serviço, em grelha 2×2 também mobile e com ampliação. `ServiceExamplesGallery` reutiliza `VisualExamplesGallery`; preservar a comparação do hero. As imagens dos cartões têm versões WebP de 400/800px, carregamento diferido e original apenas na ampliação. Aplicar esta otimização aos seis serviços.
+
+
+Fundo dos exemplos nacionais (13/09/2026): a galeria 2×2 nos seis serviços principais usa o verde canónico `bg-kyro-green`, com títulos e legendas claras e destaques dourados. `ServiceExamplesGallery` ativa a variante escura de `VisualExamplesGallery`; restantes famílias preservam a sua variante.

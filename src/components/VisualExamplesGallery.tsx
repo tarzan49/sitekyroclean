@@ -8,7 +8,7 @@ import type { CSSProperties } from "react";
 
 export interface VisualExample { label: string; alt: string; src: string; thumbnailSrc?: string; thumbnailSrcSet?: string; thumbnailSizes?: string; imageStyle?: CSSProperties; id?: string; description?: string }
 
-export default function VisualExamplesGallery({ examples, name, overline = "Material", heading = "Veja exemplos de", id = "material", imageDescription, onEnquire }: { examples: VisualExample[]; name: string; overline?: string; heading?: string; id?: string; imageDescription?: string; onEnquire?: () => void }) {
+export default function VisualExamplesGallery({ examples, name, overline = "Material", heading = "Veja exemplos de", id = "material", imageDescription, onEnquire, variant = "light" }: { variant?: "light" | "dark"; examples: VisualExample[]; name: string; overline?: string; heading?: string; id?: string; imageDescription?: string; onEnquire?: () => void }) {
   const [selected, setSelected] = useState<number | null>(null);
   const opener = useRef<HTMLButtonElement | null>(null);
   const photo = (index: number, loading: "lazy" | "eager" = "lazy") => (
@@ -28,9 +28,9 @@ export default function VisualExamplesGallery({ examples, name, overline = "Mate
   );
 
   return (
-    <section data-visual-gallery id={id} className="scroll-mt-24 py-14 md:py-20 bg-[#FDFDF9]">
+    <section data-visual-gallery id={id} className={`scroll-mt-24 py-14 md:py-20 ${variant === "dark" ? "bg-kyro-green" : "bg-[#FDFDF9]"}`}>
       <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
-        <SectionHeader overline={overline} heading={heading} goldWord={name} light={true} />
+        <SectionHeader overline={overline} heading={heading} goldWord={name} light={variant === "light"} />
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5">
           {examples.map((example, index) => (
             <figure data-problem-id={example.id} key={example.label} className="min-w-0">
@@ -45,11 +45,11 @@ export default function VisualExamplesGallery({ examples, name, overline = "Mate
                   <ZoomIn className="h-4 w-4" />
                 </span>
               </button>
-              <figcaption className="pt-3 text-sm sm:text-base leading-snug text-[#173629]">{example.label}</figcaption>
+              <figcaption className={`pt-3 text-sm sm:text-base leading-snug ${variant === "dark" ? "text-white/90" : "text-[#173629]"}`}>{example.label}</figcaption>
             </figure>
           ))}
         </div>
-        <p className="mt-5 text-xs leading-relaxed text-[#536259]">Imagens ilustrativas. Toque para ampliar.</p>
+        <p className={`mt-5 text-xs leading-relaxed ${variant === "dark" ? "text-white/70" : "text-[#536259]"}`}>Imagens ilustrativas. Toque para ampliar.</p>
         <Dialog.Root open={selected !== null} onOpenChange={open => { if (!open) setSelected(null); }}>
           <Dialog.Portal>
           <Dialog.Overlay className="fixed inset-0 z-[100] bg-black/75" />

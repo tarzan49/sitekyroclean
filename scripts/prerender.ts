@@ -164,7 +164,7 @@ function generatePageBody(c: PageContent, lang: 'pt' | 'en' = 'pt'): string {
   }
 
   if (c.serviceExamples) {
-    html += `<section id="exemplos"><h2>Veja alguns exemplos</h2><div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px">`;
+    html += `<section id="exemplos" class="bg-kyro-green" style="color:white"><h2>Veja alguns exemplos</h2><div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px">`;
     for (const image of c.serviceExamples) {
       html += `<figure><img src="${escHtml(image.thumbnailSrc)}" srcset="${escHtml(image.thumbnailSrcSet)}" sizes="${escHtml(image.thumbnailSizes)}" alt="${escHtml(image.alt)}" loading="lazy" decoding="async" style="width:100%;aspect-ratio:1;object-fit:cover"><figcaption>${escHtml(image.label)}</figcaption></figure>`;
     }
