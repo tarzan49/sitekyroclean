@@ -1,3 +1,7 @@
+## Pré-visualização do processo da homepage (13/09/2026)
+
+Em desenvolvimento, `/?preview=processo` abre `HowItWorksPreview` através de `IndexV1`: imagem existente do catálogo, três passos, garantia de repetição até 48 horas e botão do orçamento. O componente é carregado apenas com `import.meta.env.DEV`. A homepage pública mantém `HowItWorksV1`; a proposta ainda é uma pré-visualização local.
+
 ## Correções comerciais e packs personalizáveis (10/09/2026)
 
 Regras atuais: `CORRECOES-COMERCIAIS-2026-09-10.md`. `src/constants/travel.ts` é a fonte única de deslocações, reexportada por QuizTypes e importada sem alias pelos geradores. `commercialPolicy.ts` centraliza as mensagens comuns. `CustomPackPage` serve `/packs` e as antigas rotas de PackComboPage, com cálculo puro em `customPack.ts`; `packComboData.ts` contém apenas combinações iniciais e rotas, sem segunda tabela de preços. `treatmentSeoData.ts` fornece conteúdo/rotas partilhados pelo React, prerender, sitemap e monitor para anti-ácaros, desbacterização e expansão Aveiro/Coimbra. `TreatmentPage` apresenta essas páginas. Nenhuma equipa permanente nova é anunciada no Centro. `locationSeoData.cities.area` inclui `braga` independente de `porto`. O conteúdo inicial de marcas e problemas passa a incluir processo, benefícios e FAQs.
