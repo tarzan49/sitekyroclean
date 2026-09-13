@@ -14,13 +14,6 @@ const STATS = [
   { value: '+1200', label: 'serviços realizados' },
 ];
 
-const SERVICES = [
-  { value: '800+',  label: 'sofás' },
-  { value: '500+',  label: 'colchões' },
-  { value: '1000+', label: 'tapetes' },
-  { value: '+1600', label: 'cadeiras' },
-];
-
 const Hero = () => {
   const { isQuizOpen, openQuiz: handleOpenQuiz, closeQuiz } = useQuizLauncher();
 
@@ -101,16 +94,6 @@ const Hero = () => {
               </div>
               <span className="w-px h-4 bg-white/15 flex-shrink-0" />
               <TrustRatingBadge variant="mapsLink" />
-            </div>
-
-            {/* Services breakdown — desktop only, keeps mobile hero uncluttered */}
-            <div className="hidden md:flex flex-wrap gap-x-6 gap-y-3 mb-7">
-              {SERVICES.map((s, i) => (
-                <div key={i} className="flex-shrink-0">
-                  <p className="font-playfair text-lg font-bold text-gold leading-none mb-1">{s.value}</p>
-                  <p className="text-[9px] font-medium tracking-[0.14em] uppercase" style={{ color: 'rgba(255,255,255,0.45)' }}>{s.label}</p>
-                </div>
-              ))}
             </div>
 
             {/* Subtitle */}
