@@ -72,7 +72,7 @@ const Hero = () => {
 
             {/* H1 */}
             <h1
-              className="font-playfair text-[1.75rem] sm:text-4xl md:text-5xl lg:text-6xl font-semibold text-white leading-[1.15] mb-4 md:mb-5"
+              className="font-playfair text-[2rem] min-[375px]:text-[2.375rem] sm:text-[2.625rem] md:text-5xl lg:text-6xl font-semibold text-white leading-[1.1] md:leading-[1.15] tracking-[-0.025em] mb-4 md:mb-5"
               style={{ textShadow: '0 2px 16px rgba(0,0,0,0.65)' }}
             >
               Estofos como novos,<br />
