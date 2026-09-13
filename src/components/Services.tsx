@@ -1,4 +1,4 @@
-﻿import { Link } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useEffect, useRef, useState, useCallback } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import sofaImg         from "@/assets/hero-sofa-v4.jpeg";
@@ -114,7 +114,7 @@ const ServiceCard = ({ service, prominence }: CardProps) => {
       {/* Badge — apenas desktop */}
       <div className="hidden sm:block absolute top-3.5 left-4 z-10">
         <span
-          className="block text-[9px] font-semibold uppercase tracking-[0.16em]"
+          className="block text-sm font-semibold uppercase tracking-[0.16em]"
           style={{ color: "rgba(255,255,255,0.45)", textShadow: "0 1px 4px rgba(0,0,0,0.8)" }}
         >
           {service.badge}
@@ -135,9 +135,9 @@ const ServiceCard = ({ service, prominence }: CardProps) => {
           }}
         />
         <h3
-          className="font-playfair font-bold leading-tight text-white group-hover:text-[#D4AF37] transition-colors duration-300"
+          className="type-card-title font-playfair   text-white group-hover:text-[#D4AF37] transition-colors duration-300"
           style={{
-            fontSize: isHero ? "1.2rem" : "1rem",
+
             textShadow: "0 1px 8px rgba(0,0,0,0.95), 0 2px 20px rgba(0,0,0,0.70)",
             transition: `font-size ${SLIDE_MS}ms ease`,
           }}
@@ -145,12 +145,12 @@ const ServiceCard = ({ service, prominence }: CardProps) => {
           {service.title}
         </h3>
         <div className="flex items-center justify-between mt-2">
-          <p className="text-[11px] font-medium" style={{ color: "rgba(255,255,255,0.55)" }}>
+          <p className="text-sm font-medium" style={{ color: "rgba(255,255,255,0.55)" }}>
             a partir de{" "}
             <span style={{ color: "#D4AF37", fontWeight: 700 }}>{service.price}</span>
           </p>
           {isHero && (
-            <span className="text-[10px] font-semibold tracking-wide text-white/40 group-hover:text-gold/70 transition-colors duration-300">
+            <span className="text-sm font-semibold tracking-wide text-white/80 group-hover:text-gold/70 transition-colors duration-300">
               Ver serviço →
             </span>
           )}
@@ -280,28 +280,27 @@ const Services = () => {
         <div className={`mb-10 md:mb-14 transition-all duration-700 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-5"}`}>
           <div className="flex items-center gap-3 mb-5">
             <div className="h-px w-8" style={{ backgroundColor: "#D4AF37", opacity: 0.65 }} />
-            <p className="text-[10px] font-bold tracking-[0.28em] uppercase" style={{ color: "#D4AF37", opacity: 0.85 }}>
+            <p className="text-sm font-bold tracking-[0.08em] uppercase" style={{ color: "#D4AF37" }}>
               OS NOSSOS SERVIÇOS
             </p>
           </div>
-          <h2 className="font-playfair text-[1.85rem] sm:text-4xl md:text-[2.6rem] font-bold leading-[1.1] text-[#111111] max-w-xl">
+          <h2 className="type-section-title font-playfair      text-[#111111] max-w-xl">
             Cada estofo tratado{" "}
             <em className="not-italic" style={{ color: "#D4AF37" }}>com precisão.</em>
           </h2>
-          <p className="mt-4 text-sm md:text-base text-[#111111]/50 max-w-lg leading-relaxed">
+          <p className="mt-4 text-base md:text-base text-[#505650] max-w-lg leading-relaxed">
             Sofás, colchões, tapetes, cadeiras e alcatifas: higienização profissional ao domicílio, resultado garantido no próprio dia.
           </p>
         </div>
       </div>
 
-      {/* ── Mobile Grid (2-col, shows all 6) ── */}
-      <div className={`block md:hidden px-5 grid grid-cols-2 gap-3 transition-opacity duration-700 ${isVisible ? "opacity-100" : "opacity-0"}`}>
+      {/* ── Mobile grid: columns follow the space needed by full service names ── */}
+      <div className={`md:hidden px-5 grid grid-cols-[repeat(auto-fit,minmax(min(100%,16rem),1fr))] gap-3 transition-opacity duration-700 ${isVisible ? "opacity-100" : "opacity-0"}`}>
         {services.map((service, i) => (
           <Link
             key={i}
             to={service.link}
-            className="relative overflow-hidden rounded-xl block"
-            style={{ height: 210 }}
+            className="relative overflow-hidden rounded-xl flex items-end min-h-[210px]"
           >
             <picture className="absolute inset-0 w-full h-full">
               <img
@@ -318,18 +317,18 @@ const Services = () => {
             />
             <div className="hidden sm:block absolute top-2.5 left-3">
               <span
-                className="text-[8px] font-semibold uppercase tracking-[0.14em]"
+                className="text-sm font-semibold uppercase tracking-[0.14em]"
                 style={{ color: "rgba(255,255,255,0.38)", textShadow: "0 1px 4px rgba(0,0,0,0.8)" }}
               >
                 {service.badge}
               </span>
             </div>
-            <div className="absolute bottom-0 left-0 right-0 px-3 pb-3">
+            <div className="relative w-full px-4 pb-4 pt-24">
               <div className="mb-1.5 rounded-full" style={{ width: "14px", height: "1.5px", backgroundColor: "#D4AF37", opacity: 0.60 }} />
-              <h3 className="font-playfair font-bold text-white leading-tight" style={{ fontSize: "0.88rem" }}>
+              <h3 className="type-card-title font-playfair  text-white ">
                 {service.title}
               </h3>
-              <p className="text-[10px] mt-1" style={{ color: "rgba(255,255,255,0.45)" }}>
+              <p className="text-sm mt-1" style={{ color: "rgba(255,255,255,0.45)" }}>
                 a partir de <span style={{ color: "#D4AF37", fontWeight: 700 }}>{service.price}</span>
               </p>
             </div>
@@ -422,7 +421,7 @@ const Services = () => {
 
       {/* ── Counter (desktop only) ── */}
       <div className="hidden md:flex justify-center mt-7">
-        <span className="text-[10px] text-[#111111]/30 font-mono tracking-widest">
+        <span className="text-sm text-[#505650] font-mono tracking-widest">
           {realIndex + 1}/{N}
         </span>
       </div>

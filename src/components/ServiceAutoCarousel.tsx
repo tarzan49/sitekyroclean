@@ -41,7 +41,7 @@ const ServiceAutoCarousel = ({
 }: ServiceAutoCarouselProps) => {
   const light = variant === "light";
   const textMain = light ? "text-[#111111]" : "text-white";
-  const textSub  = light ? "text-[#111111]/55" : "text-white/50";
+  const textSub  = light ? "text-[#505650]" : "text-white/80";
 
   const words = heading.trim().split(" ");
   const goldWord = words.pop() ?? "";
@@ -94,9 +94,9 @@ const ServiceAutoCarousel = ({
         className={`${category ? "hidden" : "hidden sm:block"} absolute bottom-3 font-bold tracking-[0.2em] uppercase text-white backdrop-blur-sm px-3 py-1.5 ${
           labelSide === "right" ? "right-3" : "left-3"
         } ${
-          label === "Antes" ? "text-xs bg-red-900/70 border-l-2 border-red-400"
-          : label === "Depois" ? "text-xs bg-green-900/70 border-l-2 border-green-400"
-          : "text-[10px] bg-black/45"
+          label === "Antes" ? "text-sm bg-red-900/70 border-l-2 border-red-400"
+          : label === "Depois" ? "text-sm bg-green-900/70 border-l-2 border-green-400"
+          : "text-sm bg-black/45"
         }`}
       >
         {label}
@@ -112,15 +112,15 @@ const ServiceAutoCarousel = ({
         <div className="mb-6 md:mb-8">
           <div className="flex items-center gap-3 mb-5">
             <div className="h-px w-8 flex-shrink-0" style={{ backgroundColor: '#D4AF37', opacity: 0.65 }} />
-            <p className="text-[10px] font-bold tracking-[0.28em] uppercase" style={{ color: '#D4AF37', opacity: 0.85 }}>
+            <p className="text-sm font-bold tracking-[0.08em] uppercase" style={{ color: '#D4AF37', opacity: 0.85 }}>
               {overline}
             </p>
           </div>
-          <h2 className={`font-playfair text-[1.85rem] sm:text-4xl md:text-[2.6rem] font-bold leading-[1.1] mb-4 ${textMain}`}>
+          <h2 className={`type-section-title font-playfair      mb-4 ${textMain}`}>
             {restTitle}{" "}
             <em className="not-italic" style={{ color: '#D4AF37' }}>{goldWord}</em>
           </h2>
-          <p className={`text-sm md:text-base leading-relaxed max-w-xl ${textSub}`}>
+          <p className={`text-base md:text-base leading-relaxed max-w-xl ${textSub}`}>
             {subtitle}
           </p>
         </div>
@@ -133,7 +133,7 @@ const ServiceAutoCarousel = ({
             {slides.slice(0, 2).map((slide, i) => slide.src ? (
               <figure key={slide.src}>
                 <GalleryCell src={slide.src} label={slide.label ?? ""} objectPosition={slide.objectPosition} mirror={slide.mirror} />
-                <figcaption className={`mt-3 text-sm ${textSub}`}>{slide.label || `Pormenor do serviço ${i + 1}`}</figcaption>
+                <figcaption className={`mt-3 text-base ${textSub}`}>{slide.label || `Pormenor do serviço ${i + 1}`}</figcaption>
               </figure>
             ) : null)}
           </div>
@@ -145,12 +145,12 @@ const ServiceAutoCarousel = ({
               <ServiceResultsGallery key={category} category={category} light={light} />
             </div>
             <div className={`min-w-0 pt-5 border-t lg:pt-0 lg:border-t-0 ${light ? "border-black/10" : "border-white/15"}`}>
-              <h3 className={`font-playfair text-xl mb-4 ${textMain}`}>O cuidado em cada pormenor</h3>
+              <h3 className={`type-card-title font-playfair  mb-4 ${textMain}`}>O cuidado em cada pormenor</h3>
               <div className="grid grid-cols-2 lg:grid-cols-1 gap-3 md:gap-4">
                 {slides.slice(0, 2).map((slide, i) => slide.src ? (
                   <figure key={slide.src}>
                     <GalleryCell src={slide.src} label={slide.label ?? ""} objectPosition={slide.objectPosition} mirror={slide.mirror} />
-                    <figcaption className={`mt-3 text-sm ${textSub}`}>{slide.label || `Pormenor do serviço ${i + 1}`}</figcaption>
+                    <figcaption className={`mt-3 text-base ${textSub}`}>{slide.label || `Pormenor do serviço ${i + 1}`}</figcaption>
                   </figure>
                 ) : null)}
               </div>

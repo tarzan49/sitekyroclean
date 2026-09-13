@@ -13,7 +13,7 @@ export interface BreadcrumbItem {
  * text instead of a link.
  */
 const PageBreadcrumb = ({ items }: { items: BreadcrumbItem[] }) => (
-  <nav className="flex items-center gap-1.5 text-xs text-white/50 mb-6 flex-wrap" aria-label="Breadcrumb">
+  <nav className="flex items-center gap-1.5 text-sm text-white/80 mb-6 flex-wrap" aria-label="Breadcrumb">
     {items.map((item, i) => (
       <Fragment key={i}>
         {i > 0 && <span>/</span>}

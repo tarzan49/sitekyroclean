@@ -31,8 +31,8 @@ const QuizStepConfigSofa = ({ formData, updateFormData, sofaItems, setSofaItems 
 
   return (
     <div className="flex flex-col gap-3 [@media(max-height:800px)]:gap-2 w-full overflow-hidden items-center">
-      <p className="text-gold text-[11px] font-bold tracking-[0.28em] uppercase mb-0.5 text-center w-full">{isWaterproofBase ? 'PROTEÇÃO' : 'QUANTIDADES'}</p>
-      <h2 className="font-playfair text-2xl sm:text-3xl [@media(max-height:800px)]:text-2xl font-bold text-white text-center w-full">
+      <p className="text-gold text-sm font-bold tracking-[0.08em] uppercase mb-0.5 text-center w-full">{isWaterproofBase ? 'PROTEÇÃO' : 'QUANTIDADES'}</p>
+      <h2 className="type-quote-title font-playfair   [@media(max-height:800px)]:  text-white text-center w-full">
         {isWaterproofBase ? 'Como quer proteger o sofá?' : 'Que sofás vamos limpar?'}
       </h2>
       {isWaterproofBase && (
@@ -69,23 +69,23 @@ const QuizStepConfigSofa = ({ formData, updateFormData, sofaItems, setSofaItems 
                 <div className="flex items-center gap-2 px-2.5 sm:px-3 py-3 [@media(max-height:800px)]:py-1">
                   <QuizFurnitureImage service="sofa" sizeId={option.id} className="[@media(max-height:800px)]:w-12 [@media(max-height:800px)]:h-12" />
                   <div className="flex-1 min-w-0 text-left">
-                    <span className="text-sm font-semibold text-white">{option.label}</span>{partialTreatment && <p className="text-[10px] text-gold">Tratamento em {treatedQty} de {qty}</p>}
+                    <span className="text-base font-semibold text-white">{option.label}</span>{partialTreatment && <p className="text-sm text-gold">Tratamento em {treatedQty} de {qty}</p>}
                     <div className="flex flex-wrap items-center gap-x-1.5 gap-y-0.5 mt-0.5">
-                      {isActive && packOn && <span className="text-[9px] bg-gold/15 text-gold/80 px-1.5 py-0.5 rounded-full font-bold leading-none">PACK</span>}
+                      {isActive && packOn && <span className="text-sm bg-gold/15 text-gold/80 px-1.5 py-0.5 rounded-full font-bold leading-none">PACK</span>}
                       {isActive && packOn && typeof originalPackPrice === 'number' && (
-                        <span className="text-sm text-white/30 line-through tabular-nums">{originalPackPrice}€</span>
+                        <span className="text-base text-white/80 line-through tabular-nums">{originalPackPrice}€</span>
                       )}
                       {!packOn && isWaterproofBase && packTier === 'premium' && !isSob && typeof dp === 'number' && (
-                        <span className="text-sm text-white/30 line-through tabular-nums">{dp + 10}€</span>
+                        <span className="text-base text-white/80 line-through tabular-nums">{dp + 10}€</span>
                       )}
-                      <span className={cn('text-sm font-bold tabular-nums', isSob ? isActive ? 'text-white/70' : 'text-white/65' : (isActive && packOn) || (isWaterproofBase && packTier === 'premium') ? 'text-gold' : isActive ? 'text-white/80' : 'text-white/70')}>
+                      <span className={cn('text-base font-bold tabular-nums', isSob ? isActive ? 'text-white/70' : 'text-white/80' : (isActive && packOn) || (isWaterproofBase && packTier === 'premium') ? 'text-gold' : isActive ? 'text-white/80' : 'text-white/70')}>
                         {isSob ? 'Sob Orçamento' : `${dp}€/un.`}
                       </span>
                     </div>
                   </div>
                   <div className="flex items-center gap-1 flex-shrink-0">
                     <button onClick={() => setSofaItems(sofaSetQty(sofaItems, option.id, qty - 1))} disabled={qty === 0} className="w-11 h-11 sm:w-12 sm:h-12 rounded-sm border-2 border-white/20 bg-white/[0.05] text-white font-bold text-2xl flex items-center justify-center disabled:opacity-20 disabled:border-transparent disabled:bg-transparent active:scale-95 transition-all touch-manipulation hover:border-gold/50">−</button>
-                    <span className={cn('w-5 text-center font-bold tabular-nums text-base', isActive ? (packOn ? 'text-gold' : 'text-white/80') : 'text-white/30')}>{qty}</span>
+                    <span className={cn('w-5 text-center font-bold tabular-nums text-base', isActive ? (packOn ? 'text-gold' : 'text-white/80') : 'text-white/80')}>{qty}</span>
                     <button onClick={() => setSofaItems(sofaSetQty(sofaItems, option.id, qty + 1))} className="w-11 h-11 sm:w-12 sm:h-12 rounded-sm border-2 border-white/20 bg-white/[0.05] text-white font-bold text-2xl flex items-center justify-center active:scale-95 transition-all touch-manipulation hover:border-gold/50">+</button>
                   </div>
                 </div>
@@ -99,7 +99,7 @@ const QuizStepConfigSofa = ({ formData, updateFormData, sofaItems, setSofaItems 
           })}
         </div>
       )}
-      {(!isWaterproofBase || tierChosen) && has4Plus && <input type="number" inputMode="numeric" pattern="[0-9]*" placeholder="Nº de lugares (ex: 5)" className="w-full max-w-sm bg-white/[0.06] border border-white/15 focus:border-gold focus:outline-none text-white placeholder:text-white/25 rounded-sm h-12 px-4 text-base transition-colors" onChange={(e) => updateFormData({ description: `Sofá com ${e.target.value} lugares` })} />}
+      {(!isWaterproofBase || tierChosen) && has4Plus && <input type="number" inputMode="numeric" pattern="[0-9]*" placeholder="Nº de lugares (ex: 5)" className="w-full max-w-sm bg-white/[0.06] border border-white/15 focus:border-gold focus:outline-none text-white placeholder:text-white/80 rounded-sm h-12 px-4 text-base transition-colors" onChange={(e) => updateFormData({ description: `Sofá com ${e.target.value} lugares` })} />}
     </div>
   );
 };

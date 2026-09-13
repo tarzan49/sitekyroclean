@@ -27,8 +27,8 @@ const QuizStep1Service = ({ onSelect }: QuizStep1ServiceProps) => {
     <div
       style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}
     >
-      <p className="text-gold text-[10px] font-bold tracking-[0.28em] uppercase mb-1 text-center w-full">SERVIÇO</p>
-      <h2 className="font-playfair text-2xl sm:text-3xl font-bold text-white mb-3 text-center w-full">
+      <p className="text-gold text-sm font-bold tracking-[0.08em] uppercase mb-1 text-center w-full">SERVIÇO</p>
+      <h2 className="type-quote-title font-playfair    text-white mb-3 text-center w-full">
         O que precisa de limpar?
       </h2>
 
@@ -63,11 +63,11 @@ const QuizStep1Service = ({ onSelect }: QuizStep1ServiceProps) => {
 
               {/* Label, anchored to bottom */}
               <div className="absolute inset-x-0 bottom-0 z-10 flex flex-col items-center pb-2.5 px-2">
-                <span className="font-playfair text-[15px] font-bold text-white text-center leading-tight"
+                <span className="font-playfair text-base font-bold text-white text-center leading-tight"
                   style={{ textShadow: '0 1px 8px rgba(0,0,0,0.95)' }}>
                   {option.label}
                 </span>
-                <span className="text-[11px] text-gold/80 leading-none mt-0.5"
+                <span className="text-sm text-gold/80 leading-none mt-0.5"
                   style={{ textShadow: '0 1px 4px rgba(0,0,0,0.8)' }}>
                   {option.sublabel}
                 </span>

@@ -35,7 +35,7 @@ const QuizButton = ({ className = '', buttonClassName = '', problema, ctaLabel, 
             buttonClassName,
           ].join(' ')}
         >
-          <span className="text-[13px] font-semibold tracking-[0.18em] uppercase">{label}</span>
+          <span className="text-base font-semibold tracking-[0.18em] uppercase">{label}</span>
         </button>
       </div>
 

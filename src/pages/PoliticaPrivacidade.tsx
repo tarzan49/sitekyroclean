@@ -4,8 +4,8 @@ import { BUSINESS_EMAIL, BUSINESS_EMAIL_HREF, PHONE_TEL, PHONE_DISPLAY, BUSINESS
 
 const Section = ({ title, children }: { title: string; children: React.ReactNode }) => (
   <section className="mb-8">
-    <h2 className="font-playfair text-xl font-bold text-[#1A4E30] mb-3">{title}</h2>
-    <div className="text-[#333] leading-relaxed space-y-3 text-[15px]">{children}</div>
+    <h2 className="type-section-title font-playfair   text-[#1A4E30] mb-3">{title}</h2>
+    <div className="text-[#333] leading-relaxed space-y-3 text-base">{children}</div>
   </section>
 );
 
@@ -16,11 +16,11 @@ const PoliticaPrivacidade = () => (
     <main className="bg-[#FDFDF9] min-h-screen pt-20 pb-16">
       <div className="max-w-2xl mx-auto px-5 sm:px-6">
         <div className="pt-8 pb-6 border-b border-[#1A4E30]/10 mb-8">
-          <p className="text-[10px] font-bold tracking-[0.28em] uppercase text-[#D4AF37] mb-2">Kyro Clean Solutions</p>
-          <h1 className="font-playfair text-3xl sm:text-4xl font-bold text-[#111111] leading-tight">
+          <p className="text-sm font-bold tracking-[0.08em] uppercase text-[#D4AF37] mb-2">Kyro Clean Solutions</p>
+          <h1 className="type-page-title font-playfair    text-[#111111] ">
             Política de Privacidade
           </h1>
-          <p className="text-sm text-[#555] mt-3">Última atualização: abril de 2026</p>
+          <p className="text-base text-[#555] mt-3">Última atualização: abril de 2026</p>
         </div>
 
         <Section title="1. Quem somos">
@@ -124,7 +124,7 @@ const PoliticaPrivacidade = () => (
 
         <Section title="11. Contacto">
           <p>Para qualquer questão relacionada com esta política ou para exercer os seus direitos, contacte o responsável pelo tratamento:</p>
-          <div className="bg-[#f5f9f6] border border-[#1A4E30]/10 rounded-xl px-5 py-4 mt-2 space-y-1 text-sm">
+          <div className="bg-[#f5f9f6] border border-[#1A4E30]/10 rounded-xl px-5 py-4 mt-2 space-y-1 text-base">
             <p><strong>Kyro Clean Solutions</strong></p>
             <p>{BUSINESS_ADDRESS.streetAddress}, {BUSINESS_ADDRESS.postalCode} {BUSINESS_ADDRESS.addressLocality}</p>
             <p>

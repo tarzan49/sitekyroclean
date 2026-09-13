@@ -40,7 +40,7 @@ const NotFound = () => {
     <div className="relative z-10 w-full max-w-2xl mx-auto text-center">
 
       {/* 404 */}
-      <h1 className="font-playfair text-[8rem] md:text-[11rem] font-bold leading-none mb-2 select-none"
+      <h1 className="type-page-title font-playfair     mb-2 select-none"
         style={{
           background: "linear-gradient(135deg, #B8912A 0%, #EDD96A 50%, #B8912A 100%)",
           WebkitBackgroundClip: "text",
@@ -51,33 +51,33 @@ const NotFound = () => {
       </h1>
 
       {/* Message */}
-      <p className="text-[11px] font-bold tracking-[0.28em] uppercase text-gold/70 mb-3">
+      <p className="text-sm font-bold tracking-[0.08em] uppercase text-gold/70 mb-3">
         Página não encontrada
       </p>
-      <h2 className="font-playfair text-2xl md:text-3xl font-bold text-white mb-3 leading-snug">
+      <h2 className="type-section-title font-playfair    text-white mb-3 ">
         Esta página foi limpa, e não deixou rasto.
       </h2>
-      <p className="text-white/50 text-base max-w-md mx-auto mb-10 leading-relaxed">
+      <p className="text-white/80 text-base max-w-md mx-auto mb-10 leading-relaxed">
         O endereço que procura não existe ou foi movido. Mas podemos ajudá-lo a encontrar o que precisa.
       </p>
 
       {/* CTAs */}
       <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-14">
         <Link to="/"
-          className="flex items-center gap-2 bg-gradient-to-r from-[#B8912A] to-[#D4AF37] hover:from-[#D4AF37] hover:to-[#EDD96A] text-[#071a12] font-bold text-sm px-7 py-3.5 rounded-full shadow-[0_4px_20px_rgba(212,175,55,0.35)] hover:shadow-[0_4px_28px_rgba(212,175,55,0.5)] transition-all active:scale-[0.97]">
+          className="flex items-center gap-2 bg-gradient-to-r from-[#B8912A] to-[#D4AF37] hover:from-[#D4AF37] hover:to-[#EDD96A] text-[#071a12] font-bold text-base px-7 py-3.5 rounded-full shadow-[0_4px_20px_rgba(212,175,55,0.35)] hover:shadow-[0_4px_28px_rgba(212,175,55,0.5)] transition-all active:scale-[0.97]">
           <Home className="w-4 h-4" />
           Voltar ao início
         </Link>
         <a href={`tel:${PHONE_TEL}`}
           onClick={() => trackCallClick('not_found_page')}
-          className="flex items-center gap-2 bg-white/8 hover:bg-white/12 border border-white/15 text-white font-semibold text-sm px-7 py-3.5 rounded-full transition-all active:scale-[0.97] backdrop-blur-sm">
+          className="flex items-center gap-2 bg-white/8 hover:bg-white/12 border border-white/15 text-white font-semibold text-base px-7 py-3.5 rounded-full transition-all active:scale-[0.97] backdrop-blur-sm">
           <Phone className="w-4 h-4 text-gold" />
           {PHONE_DISPLAY}
         </a>
       </div>
 
       {/* Popular pages */}
-      <p className="text-[10px] font-bold tracking-[0.28em] uppercase text-white/30 mb-5">
+      <p className="text-sm font-bold tracking-[0.08em] uppercase text-white/80 mb-5">
         Páginas populares
       </p>
       <div className="grid grid-cols-2 gap-3">
@@ -89,10 +89,10 @@ const NotFound = () => {
               <Icon className="w-4 h-4 text-gold" />
             </span>
             <div className="min-w-0">
-              <p className="font-semibold text-white text-sm leading-snug mb-0.5 group-hover:text-gold transition-colors">{label}</p>
-              <p className="text-white/40 text-xs leading-snug">{desc}</p>
+              <p className="font-semibold text-white text-base leading-snug mb-0.5 group-hover:text-gold transition-colors">{label}</p>
+              <p className="text-white/80 text-sm leading-snug">{desc}</p>
             </div>
-            <ArrowRight className="w-3.5 h-3.5 text-white/20 group-hover:text-gold/60 flex-shrink-0 mt-1 ml-auto transition-all group-hover:translate-x-0.5" />
+            <ArrowRight className="w-3.5 h-3.5 text-white/80 group-hover:text-gold/60 flex-shrink-0 mt-1 ml-auto transition-all group-hover:translate-x-0.5" />
           </Link>
         ))}
       </div>

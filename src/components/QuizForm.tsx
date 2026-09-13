@@ -480,13 +480,13 @@ ${formData.description || 'Sem observações adicionais'}
                 href={`${WHATSAPP_BASE}?text=${whatsappMessage}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-1 px-3 py-1.5 bg-green-600 text-white text-sm rounded-lg hover:bg-green-700"
+                className="inline-flex items-center gap-1 px-3 py-1.5 bg-green-600 text-white text-base rounded-lg hover:bg-green-700"
               >
                 WhatsApp
               </a>
               <a
                 href={`mailto:${BUSINESS_EMAIL}?subject=Pedido%20Orçamento&body=${whatsappMessage}`}
-                className="inline-flex items-center gap-1 px-3 py-1.5 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700"
+                className="inline-flex items-center gap-1 px-3 py-1.5 bg-blue-600 text-white text-base rounded-lg hover:bg-blue-700"
               >
                 Email
               </a>
@@ -566,9 +566,9 @@ ${formData.description || 'Sem observações adicionais'}
         {/* Header */}
         <div className="px-5 sm:px-6 pt-3 sm:pt-4 pb-2.5 sm:pb-3 landscape:pt-2 landscape:pb-1.5 grid grid-cols-[1fr_auto_1fr] items-center gap-2 flex-shrink-0">
           <div id="quiz-title" className="flex items-center gap-2">
-            <span className="font-playfair text-[14px] font-bold text-white/90 leading-none">Kyro</span>
+            <span className="font-playfair text-base font-bold text-white/90 leading-none">Kyro</span>
             <span className="h-3 w-px bg-white/20 flex-shrink-0" />
-            <span className="text-[9px] font-bold tracking-[0.22em] uppercase text-gold/65">Orçamento</span>
+            <span className="text-sm font-bold tracking-[0.22em] uppercase text-gold/65">Orçamento</span>
           </div>
           <div className="flex items-center justify-center gap-1.5">
             {currentStep >= 1 && Array.from({ length: totalSteps }, (_, i) => {
@@ -594,7 +594,7 @@ ${formData.description || 'Sem observações adicionais'}
               className="w-11 h-11 flex items-center justify-center hover:bg-white/10 active:bg-white/20 rounded-full transition-colors touch-manipulation"
               aria-label="Fechar"
             >
-              <X className="w-4 h-4 text-white/40" />
+              <X className="w-4 h-4 text-white/80" />
             </button>
           </div>
         </div>
@@ -641,8 +641,8 @@ ${formData.description || 'Sem observações adicionais'}
             {/* Context banner when quiz opened from a problem page */}
             {problema && currentStep !== totalSteps && (
               <div className="w-full max-w-sm mx-auto mb-4 bg-gold/10 border border-gold/30 rounded-sm px-4 py-3 text-center">
-                <p className="text-gold text-xs font-bold mb-0.5">Detectámos o seu problema</p>
-                <p className="text-white/70 text-xs leading-relaxed">
+                <p className="text-gold text-sm font-bold mb-0.5">Detectámos o seu problema</p>
+                <p className="text-white/70 text-sm leading-relaxed">
                   Vamos encontrar a melhor solução para <span className="text-white font-semibold">{problema.replace(/-/g, ' ')}</span>.
                 </p>
               </div>
@@ -708,8 +708,8 @@ ${formData.description || 'Sem observações adicionais'}
               return (
                 <div className="flex-1 flex flex-col gap-4 w-full max-w-sm self-center items-center text-center">
                   <div>
-                    <p className="text-gold text-[10px] font-bold tracking-[0.28em] uppercase mb-1">O QUE PRECISA?</p>
-                    <h2 className="font-playfair text-2xl sm:text-3xl font-bold text-white text-center w-full">
+                    <p className="text-gold text-sm font-bold tracking-[0.08em] uppercase mb-1">O QUE PRECISA?</p>
+                    <h2 className="type-quote-title font-playfair    text-white text-center w-full">
                       Escolha o seu tratamento
                     </h2>
                   </div>
@@ -872,7 +872,7 @@ ${formData.description || 'Sem observações adicionais'}
             <div className="flex items-center gap-3 w-full">
               <button
                 onClick={handlePrev}
-                className="h-14 px-5 flex-shrink-0 bg-transparent border border-white/[0.14] text-white/50 hover:text-white/80 hover:border-white/30 active:scale-[0.98] touch-manipulation rounded-sm flex items-center justify-center transition-all text-sm font-semibold"
+                className="h-14 px-5 flex-shrink-0 bg-transparent border border-white/[0.14] text-white/80 hover:text-white/80 hover:border-white/30 active:scale-[0.98] touch-manipulation rounded-sm flex items-center justify-center transition-all text-base font-semibold"
               >
                 <ChevronLeft className="w-4 h-4 mr-1" /> Voltar
               </button>
@@ -884,7 +884,7 @@ ${formData.description || 'Sem observações adicionais'}
                 {isDemo ? 'CONCLUIR TESTE' : isSubmitting ? 'A enviar...' : 'ENVIAR PEDIDO'}
               </Button>
             </div>
-            <p className="text-center text-[11px] text-white/30 font-medium -mt-0.5">
+            <p className="text-center text-sm text-white/80 font-medium -mt-0.5">
               Sem compromisso · Grátis · Respondemos em menos de 10 min
             </p>
           </div>
@@ -895,7 +895,7 @@ ${formData.description || 'Sem observações adicionais'}
             {currentStep > firstStep && (
               <button
                 onClick={handlePrev}
-                className="h-10 px-5 flex-shrink-0 bg-transparent border border-white/[0.12] text-white/45 hover:text-white/75 hover:border-white/25 active:bg-transparent active:scale-[0.98] touch-manipulation rounded-sm flex items-center justify-center transition-all text-sm"
+                className="h-10 px-5 flex-shrink-0 bg-transparent border border-white/[0.12] text-white/80 hover:text-white/75 hover:border-white/25 active:bg-transparent active:scale-[0.98] touch-manipulation rounded-sm flex items-center justify-center transition-all text-base"
               >
                 <ChevronLeft className="w-3.5 h-3.5 mr-1" />
                 Voltar
@@ -921,13 +921,13 @@ ${formData.description || 'Sem observações adicionais'}
       "border-t border-gold/20 px-4 py-2.5 text-center flex-shrink-0 bg-gradient-to-r from-[#0a1f18] via-[#0d2820] to-[#0a1f18] flex items-center justify-center gap-2 overflow-hidden",
       currentStep === 3 && activeUpsellScreen === null && "[@media(max-height:800px)]:hidden"
     )}>
-      {currentStep === 0 ? <p className="text-xs text-white/65 py-1">Orçamento sem compromisso.</p> : (() => {
+      {currentStep === 0 ? <p className="text-sm text-white/80 py-1">Orçamento sem compromisso.</p> : (() => {
         const current = socialProofMessages[socialProofIdx];
         const Icon = SOCIAL_PROOF_ICON[current.category];
         return (
           <div key={socialProofIdx} className="flex items-center gap-2 kyro-social-proof-in">
             <Icon className="w-3.5 h-3.5 text-gold flex-shrink-0" />
-            <p className="text-xs text-white/75 font-semibold leading-snug">
+            <p className="text-sm text-white/75 font-semibold leading-snug">
               {current.text}
             </p>
           </div>
@@ -939,10 +939,10 @@ ${formData.description || 'Sem observações adicionais'}
       <div className="absolute inset-0 z-50 flex items-center justify-center backdrop-blur-md rounded-t-3xl sm:rounded-2xl" style={{ background: "rgba(5,21,16,0.92)" }}>
         <div className="px-7 py-8 text-center max-w-xs mx-auto">
           <AlertTriangle className="w-12 h-12 text-gold mb-4 mx-auto" />
-          <h3 className="font-playfair text-2xl sm:text-3xl font-bold text-white mb-3 leading-tight">
+          <h3 className="type-quote-title font-playfair    text-white mb-3 ">
             Vamos terminar o seu orçamento?
           </h3>
-          <p className="text-sm text-white/65 mb-2 leading-relaxed">
+          <p className="text-base text-white/80 mb-2 leading-relaxed">
             Ainda pode receber uma proposta à medida, sem compromisso. Termine o pedido e respondemos em menos de 10 minutos.
           </p>
           <div className="flex flex-col gap-3 mt-5">
@@ -954,7 +954,7 @@ ${formData.description || 'Sem observações adicionais'}
             </Button>
             <button
               onClick={confirmClose}
-              className="text-xs text-white/20 hover:text-white/45 py-2 transition-colors"
+              className="text-base text-white/80 hover:text-white/80 py-2 transition-colors"
             >
               Sair por agora
             </button>

@@ -210,7 +210,7 @@ const BeforeAfterSlider = ({
           onDragStart={(e) => e.preventDefault()}
           className="w-full h-full object-cover"
         />
-        <span className="absolute bottom-4 right-4 text-[11px] font-bold tracking-[0.18em] uppercase text-white bg-black/50 backdrop-blur-sm px-3 py-1.5">
+        <span className="absolute bottom-4 right-4 text-sm font-bold tracking-[0.18em] uppercase text-white bg-black/50 backdrop-blur-sm px-3 py-1.5">
           {afterLabel}
         </span>
       </div>
@@ -235,7 +235,7 @@ const BeforeAfterSlider = ({
           onDragStart={(e) => e.preventDefault()}
           className="w-full h-full object-cover"
         />
-        <span className="absolute bottom-4 left-4 text-[11px] font-bold tracking-[0.18em] uppercase text-white bg-black/50 backdrop-blur-sm px-3 py-1.5">
+        <span className="absolute bottom-4 left-4 text-sm font-bold tracking-[0.18em] uppercase text-white bg-black/50 backdrop-blur-sm px-3 py-1.5">
           {beforeLabel}
         </span>
       </div>
@@ -292,7 +292,7 @@ const BeforeAfterSlider = ({
       </div>
 
       {illustrative && (
-        <span className="absolute top-3 left-1/2 -translate-x-1/2 z-20 pointer-events-none text-[9px] font-semibold tracking-[0.12em] uppercase text-white/80 bg-black/45 backdrop-blur-sm px-2.5 py-1 rounded-sm">
+        <span className="absolute top-3 left-1/2 -translate-x-1/2 z-20 pointer-events-none text-sm font-semibold tracking-[0.12em] uppercase text-white/80 bg-black/45 backdrop-blur-sm px-2.5 py-1 rounded-sm">
           Efeito ilustrativo
         </span>
       )}
@@ -306,7 +306,7 @@ const BeforeAfterSlider = ({
       <div className="overflow-hidden shadow-[0_12px_48px_rgba(0,0,0,0.22)]">
         {sliderInner}
       </div>
-      <p className="text-center text-[11px] font-medium tracking-[0.16em] uppercase text-[#111111]/35 mt-3">
+      <p className="text-center text-sm font-medium tracking-[0.16em] uppercase text-[#505650] mt-3">
         Arraste para comparar
       </p>
     </div>

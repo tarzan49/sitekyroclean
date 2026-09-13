@@ -11,8 +11,8 @@ export default function HowItWorksV1() {
     <section aria-labelledby="process-title" className="bg-[#071a12] text-white">
       <div className="mx-auto grid max-w-7xl gap-y-7 px-5 py-10 sm:px-8 sm:py-12 lg:grid-cols-[0.9fr_1.1fr] lg:grid-rows-[auto_1fr] lg:gap-x-12 lg:gap-y-6 lg:py-14">
         <header className="lg:col-start-2 lg:row-start-1">
-          <p className="mb-3 flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.24em] text-[#D4AF37]"><span className="h-px w-7 bg-[#D4AF37]" /> Como funciona</p>
-          <h2 id="process-title" className="font-playfair text-[1.85rem] font-bold leading-[1.1] sm:text-4xl md:text-[2.6rem]">Nós tratamos da limpeza.<br /><span className="text-[#D4AF37]">Você fica tranquilo.</span></h2>
+          <p className="mb-3 flex items-center gap-3 text-sm font-semibold uppercase tracking-[0.08em] text-[#D4AF37]"><span className="h-px w-7 bg-[#D4AF37]" /> Como funciona</p>
+          <h2 id="process-title" className="type-section-title font-playfair">Nós tratamos da limpeza.<br /><span className="text-[#D4AF37]">Você fica tranquilo.</span></h2>
           <p className="mt-4 max-w-lg text-base leading-relaxed text-white/75">Orçamento claro, visita combinada e acompanhamento após o serviço.</p>
         </header>
 
@@ -25,7 +25,7 @@ export default function HowItWorksV1() {
             <li key={step.title} className="flex gap-4 py-4 last:pb-0 sm:gap-5">
               <span className="pt-0.5 text-sm font-medium tabular-nums text-[#D4AF37]">0{index + 1}</span>
               <div>
-                <h3 className="mb-1 font-sans text-xl font-bold leading-snug tracking-normal text-white">{step.title}</h3>
+                <h3 className="mb-1 type-card-title font-sans text-white">{step.title}</h3>
                 <p className="text-base leading-relaxed text-white/75">{step.text}</p>
                 {step.note && <p className="mt-1 text-sm leading-relaxed text-white/75">{step.note}</p>}
               </div>

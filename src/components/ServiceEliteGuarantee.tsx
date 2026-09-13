@@ -54,15 +54,15 @@ const ServiceEliteGuarantee = ({
         <div className="mb-12 md:mb-16">
           <div className="flex items-center gap-3 mb-4">
             <div className="h-px w-8 flex-shrink-0" style={{ backgroundColor: '#D4AF37', opacity: 0.65 }} />
-            <p className="text-[10px] font-bold tracking-[0.28em] uppercase" style={{ color: '#D4AF37', opacity: 0.85 }}>
+            <p className="text-sm font-bold tracking-[0.08em] uppercase" style={{ color: '#D4AF37', opacity: 0.85 }}>
               Garantia de Elite
             </p>
           </div>
-          <h2 className={`font-playfair text-[1.85rem] sm:text-4xl md:text-[2.6rem] font-bold leading-[1.1] mb-4 ${textMain}`}>
+          <h2 className={`type-section-title font-playfair      mb-4 ${textMain}`}>
             {restHeading}{" "}
             <em className="not-italic" style={{ color: '#D4AF37' }}>{goldWord}</em>
           </h2>
-          <p className={`text-sm md:text-[15px] leading-relaxed max-w-xl ${textSub}`}>
+          <p className={`text-base md:text-base leading-relaxed max-w-xl ${textSub}`}>
             {subtitle}
           </p>
         </div>
@@ -112,8 +112,8 @@ const ServiceEliteGuarantee = ({
                     />
                     {item.mirror && (
                       <>
-                        <span className="absolute bottom-4 left-4 text-[9px] font-bold tracking-[0.22em] uppercase text-white/50 z-10">Antes</span>
-                        <span className="absolute bottom-4 right-4 text-[9px] font-bold tracking-[0.22em] uppercase text-white/50 z-10">Depois</span>
+                        <span className="absolute bottom-4 left-4 text-sm font-bold tracking-[0.22em] uppercase text-white/80 z-10">Antes</span>
+                        <span className="absolute bottom-4 right-4 text-sm font-bold tracking-[0.22em] uppercase text-white/80 z-10">Depois</span>
                       </>
                     )}
                   </>
@@ -122,14 +122,14 @@ const ServiceEliteGuarantee = ({
 
                 <div className="relative flex flex-col gap-4 p-7 md:p-8">
                   <p
-                    className="text-[10px] font-bold tracking-[0.26em] uppercase"
+                    className="text-sm font-bold tracking-[0.26em] uppercase"
                     style={{ color: "#D4AF37" }}
                   >
                     {item.label}
                   </p>
 
                   <h3
-                    className={`font-playfair font-bold leading-snug ${cardTextMain}`}
+                    className={`type-card-title font-playfair   ${cardTextMain}`}
                     style={{ fontSize: "1.25rem" }}
                   >
                     {item.title}

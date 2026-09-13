@@ -5,8 +5,8 @@ import { BUSINESS_EMAIL, BUSINESS_EMAIL_HREF, PHONE_E164, PHONE_DISPLAY, BUSINES
 
 const Section = ({ title, children }: { title: string; children: React.ReactNode }) => (
   <section className="mb-8">
-    <h2 className="font-playfair text-xl font-bold text-[#1A4E30] mb-3">{title}</h2>
-    <div className="text-[#333] leading-relaxed space-y-3 text-[15px]">{children}</div>
+    <h2 className="type-section-title font-playfair   text-[#1A4E30] mb-3">{title}</h2>
+    <div className="text-[#333] leading-relaxed space-y-3 text-base">{children}</div>
   </section>
 );
 
@@ -17,11 +17,11 @@ const TermosCondicoes = () => (
     <main className="bg-[#FDFDF9] min-h-screen pt-20 pb-16">
       <div className="max-w-2xl mx-auto px-5 sm:px-6">
         <div className="pt-8 pb-6 border-b border-[#1A4E30]/10 mb-8">
-          <p className="text-[10px] font-bold tracking-[0.28em] uppercase text-[#D4AF37] mb-2">Kyro Clean Solutions</p>
-          <h1 className="font-playfair text-3xl sm:text-4xl font-bold text-[#111111] leading-tight">
+          <p className="text-sm font-bold tracking-[0.08em] uppercase text-[#D4AF37] mb-2">Kyro Clean Solutions</p>
+          <h1 className="type-page-title font-playfair    text-[#111111] ">
             Termos e Condições
           </h1>
-          <p className="text-sm text-[#555] mt-3">Última atualização: setembro de 2026</p>
+          <p className="text-base text-[#555] mt-3">Última atualização: setembro de 2026</p>
         </div>
 
         <Section title="1. Identificação">

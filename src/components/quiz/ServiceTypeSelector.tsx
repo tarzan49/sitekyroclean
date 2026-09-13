@@ -100,7 +100,7 @@ const ServiceTypeSelector = ({
           >
             {/* O MAIS SOLICITADO badge */}
             {opt.recommended && (
-              <span className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-gradient-to-r from-[#C9A84C] to-[#F0DC8A] text-[#12121e] text-[8px] font-black px-3 py-0.5 rounded-full tracking-widest uppercase shadow-md whitespace-nowrap">
+              <span className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-gradient-to-r from-[#C9A84C] to-[#F0DC8A] text-[#12121e] text-sm font-black px-3 py-0.5 rounded-full tracking-widest uppercase shadow-md whitespace-nowrap">
                 O MAIS SOLICITADO
               </span>
             )}
@@ -119,7 +119,7 @@ const ServiceTypeSelector = ({
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-1.5 flex-wrap">
                 <p className={cn(
-                  "text-sm font-bold leading-snug",
+                  "text-base font-bold leading-snug",
                   isSelected ? "text-white" : opt.recommended ? "text-white/90" : "text-white/80"
                 )}>
                   {opt.title}
@@ -129,7 +129,7 @@ const ServiceTypeSelector = ({
                     "text-[7px] font-black tracking-widest uppercase px-1.5 py-0.5 rounded-full leading-none flex-shrink-0",
                     opt.badgeStyle === 'gold'
                       ? "bg-gold/15 text-gold/90"
-                      : "bg-white/10 text-white/50"
+                      : "bg-white/10 text-white/80"
                   )}>
                     {opt.badge}
                   </span>
@@ -137,21 +137,21 @@ const ServiceTypeSelector = ({
               </div>
               {opt.subtitle && (
                 <p className={cn(
-                  "text-[10px] leading-none mt-0.5 font-medium",
+                  "text-sm leading-none mt-0.5 font-medium",
                   isSelected ? "text-gold/70" : "text-gold/40"
                 )}>
                   {opt.subtitle}
                 </p>
               )}
               <p className={cn(
-                "text-xs mt-0.5 leading-snug",
-                isSelected ? "text-white/65" : "text-white/40"
+                "text-sm mt-0.5 leading-snug",
+                isSelected ? "text-white/80" : "text-white/80"
               )}>
                 {opt.desc}
               </p>
               {'subdesc' in opt && opt.subdesc && (
                 <p className={cn(
-                  "text-[10px] italic mt-0.5 leading-snug",
+                  "text-sm italic mt-0.5 leading-snug",
                   isSelected ? "text-gold/60" : "text-gold/40"
                 )}>
                   {opt.subdesc}
@@ -162,7 +162,7 @@ const ServiceTypeSelector = ({
             {/* Price */}
             {opt.price !== undefined && (
               <div className="flex-shrink-0 text-right ml-1">
-                <p className="text-[9px] text-white/30 uppercase leading-none mb-0.5">a partir de</p>
+                <p className="text-sm text-white/80 uppercase leading-none mb-0.5">a partir de</p>
                 {opt.recommended ? (
                   <p
                     className="font-playfair text-xl font-bold tabular-nums leading-none text-gold"
@@ -173,7 +173,7 @@ const ServiceTypeSelector = ({
                 ) : (
                   <p className={cn(
                     "font-playfair text-lg font-bold tabular-nums leading-none",
-                    isSelected ? "text-gold" : "text-white/55"
+                    isSelected ? "text-gold" : "text-white/80"
                   )}>
                     {opt.price}€
                   </p>

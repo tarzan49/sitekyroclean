@@ -65,11 +65,11 @@ const PainPointsSolutionsV1 = () => {
         <div className={`mb-10 md:mb-14 transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-5'}`}>
           <div className="flex items-center gap-3 mb-5">
             <div className="h-px w-8" style={{ backgroundColor: '#D4AF37', opacity: 0.65 }} />
-            <span className="text-[10px] font-bold tracking-[0.28em] uppercase" style={{ color: '#D4AF37', opacity: 0.8 }}>
+            <span className="text-sm font-bold tracking-[0.08em] uppercase" style={{ color: '#D4AF37', opacity: 0.8 }}>
               O QUE TRATAMOS
             </span>
           </div>
-          <h2 className="font-playfair text-[1.85rem] sm:text-4xl md:text-[2.6rem] font-bold text-[#111111] leading-[1.1] max-w-xl">
+          <h2 className="type-section-title font-playfair     text-[#111111]  max-w-xl">
             Os 4 problemas que{' '}
             <em className="not-italic" style={{ color: '#D4AF37' }}>
               resolvemos no próprio dia
@@ -99,17 +99,17 @@ const PainPointsSolutionsV1 = () => {
 
               <div className="absolute top-4 left-5 md:top-5 md:left-7 flex items-center gap-2.5">
                 <div className="h-px w-4" style={{ backgroundColor: "#D4AF37", opacity: 0.75 }} />
-                <span className="text-[10px] font-bold uppercase tracking-[0.24em] text-white/85">
+                <span className="text-sm font-bold uppercase tracking-[0.24em] text-white/85">
                   {problem.type}
                 </span>
               </div>
 
               <div className="absolute bottom-0 left-0 right-0 p-5 md:p-7">
                 <div className="h-px w-8 mb-3" style={{ backgroundColor: "#D4AF37", opacity: 0.65 }} />
-                <h3 className="font-playfair font-bold text-white leading-[1.2] mb-2 whitespace-pre-line text-lg md:text-xl">
+                <h3 className="type-card-title font-playfair  text-white  mb-2 whitespace-pre-line  ">
                   {problem.title}
                 </h3>
-                <p className="text-white/60 text-[13px] leading-relaxed">
+                <p className="text-white/80 text-base leading-relaxed">
                   {problem.solution}
                 </p>
               </div>

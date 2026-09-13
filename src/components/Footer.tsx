@@ -1,5 +1,5 @@
 import BusinessConditions from './BusinessConditions';
-﻿import { Phone, Mail, MapPin, ChevronRight } from "lucide-react";
+import { Phone, Mail, MapPin, ChevronRight } from "lucide-react";
 import { GOOGLE_MAPS_URL } from "@/constants/google";
 import { Link } from "react-router-dom";
 import { trackCallClick } from "@/lib/analytics";
@@ -21,7 +21,7 @@ const Footer = () => {
             />
             <span className="text-lg md:text-xl font-bold text-gold tracking-wide">Kyro Clean Solutions</span>
           </div>
-          <p className="text-sm text-white/55 leading-relaxed max-w-xl mx-auto">
+          <p className="text-base text-white/80 leading-relaxed max-w-xl mx-auto">
             Especialistas em higienização de sofás, colchões, tapetes e cadeiras, e impermeabilização profissional de sofás e cadeiras, ao domicílio. Equipamento de extração profissional e produtos certificados, com cobertura no litoral entre Viana do Castelo e o Algarve; outras zonas mediante confirmação.
           </p>
         </div>
@@ -29,8 +29,8 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-5 md:gap-6 mb-5">
           {/* Services */}
           <div>
-            <h3 className="text-base md:text-lg font-bold mb-3 md:mb-4 text-white">Serviços Kyro Clean Solutions</h3>
-            <ul className="space-y-2 md:space-y-2 text-sm">
+            <h3 className="type-card-title    mb-3 md:mb-4 text-white">Serviços Kyro Clean Solutions</h3>
+            <ul className="space-y-2 md:space-y-2 text-base">
               <li className="flex items-center gap-2">
                 <ChevronRight className="h-3.5 w-3.5 text-turquoise flex-shrink-0" />
                 <Link to="/limpeza-sofas" className="hover:text-turquoise active:text-turquoise transition-colors py-1 touch-manipulation">Higienização de Sofás</Link>
@@ -64,8 +64,8 @@ const Footer = () => {
 
           {/* Resources */}
           <div>
-            <h3 className="text-base md:text-lg font-bold mb-3 md:mb-4 text-white">Recursos</h3>
-            <ul className="space-y-2 text-sm mb-4">
+            <h3 className="type-card-title    mb-3 md:mb-4 text-white">Recursos</h3>
+            <ul className="space-y-2 text-base mb-4">
               <li className="flex items-center gap-2">
                 <ChevronRight className="h-3.5 w-3.5 text-turquoise flex-shrink-0" />
                 <Link to="/blog" className="hover:text-turquoise active:text-turquoise transition-colors py-1 touch-manipulation">Blog</Link>
@@ -79,8 +79,8 @@ const Footer = () => {
                 <Link to="/glossario-limpeza-estofos" className="hover:text-turquoise active:text-turquoise transition-colors py-1 touch-manipulation">Glossário</Link>
               </li>
             </ul>
-            <h3 className="text-base md:text-lg font-bold mb-3 text-white">Packs</h3>
-            <ul className="space-y-2 text-sm">
+            <h3 className="type-card-title    mb-3 text-white">Packs</h3>
+            <ul className="space-y-2 text-base">
               <li className="flex items-center gap-2">
                 <ChevronRight className="h-3.5 w-3.5 text-turquoise flex-shrink-0" />
                 <Link to="/packs" className="hover:text-turquoise active:text-turquoise transition-colors py-1 touch-manipulation">Pack Sofá + Colchão</Link>
@@ -102,8 +102,8 @@ const Footer = () => {
 
           {/* Problems & About */}
           <div>
-            <h3 className="text-base md:text-lg font-bold mb-3 md:mb-4 text-white">Problemas Comuns</h3>
-            <ul className="space-y-2 text-sm mb-4">
+            <h3 className="type-card-title    mb-3 md:mb-4 text-white">Problemas Comuns</h3>
+            <ul className="space-y-2 text-base mb-4">
               <li className="flex items-center gap-2">
                 <ChevronRight className="h-3.5 w-3.5 text-turquoise flex-shrink-0" />
                 <Link to="/problemas/manchas-sofa" className="hover:text-turquoise active:text-turquoise transition-colors py-1 touch-manipulation">Manchas no Sofá</Link>
@@ -133,8 +133,8 @@ const Footer = () => {
 
           {/* Contacts */}
           <div>
-            <h3 className="text-base md:text-lg font-bold mb-3 md:mb-4 text-white">Fale Connosco</h3>
-            <div className="space-y-3 text-sm">
+            <h3 className="type-card-title    mb-3 md:mb-4 text-white">Fale Connosco</h3>
+            <div className="space-y-3 text-base">
               <a href={`tel:${PHONE_TEL}`} onClick={() => trackCallClick('footer')} className="flex items-center gap-2 hover:text-turquoise active:text-turquoise transition-colors py-1 touch-manipulation">
                 <Phone className="h-4 w-4 text-turquoise flex-shrink-0" />
                 <span>{PHONE_DISPLAY}</span>
@@ -153,7 +153,7 @@ const Footer = () => {
                 <div>
                   <p>{BUSINESS_ADDRESS.streetAddress}</p>
                   <p>{BUSINESS_ADDRESS.postalCode} {BUSINESS_ADDRESS.addressLocality}</p>
-                  <p className="text-xs text-turquoise/70 mt-0.5">Ver no Google Maps ↗</p>
+                  <p className="text-sm text-turquoise/70 mt-0.5">Ver no Google Maps ↗</p>
                 </div>
               </a>
             </div>
@@ -163,25 +163,25 @@ const Footer = () => {
         {/* Bottom */}
         <div className="border-t border-white/10 pt-4">
           <div className="flex flex-col items-center gap-2">
-            <p className="text-xs md:text-sm text-white/50 text-center">
+            <p className="text-sm md:text-base text-white/80 text-center">
               © 2025 Kyro Clean Solutions. Todos os direitos reservados.
             </p>
             <div className="flex flex-wrap gap-x-4 gap-y-1 justify-center">
               <Link
                 to="/politica-de-privacidade"
-                className="text-xs text-white/60 hover:text-turquoise active:text-turquoise transition-colors underline underline-offset-2"
+                className="text-sm text-white/80 hover:text-turquoise active:text-turquoise transition-colors underline underline-offset-2"
               >
                 Política de Privacidade
               </Link>
               <Link
                 to="/termos-e-condicoes"
-                className="text-xs text-white/60 hover:text-turquoise active:text-turquoise transition-colors underline underline-offset-2"
+                className="text-sm text-white/80 hover:text-turquoise active:text-turquoise transition-colors underline underline-offset-2"
               >
                 Termos e Condições
               </Link>
               <Link
                 to="/politica-de-devolucoes"
-                className="text-xs text-white/60 hover:text-turquoise active:text-turquoise transition-colors underline underline-offset-2"
+                className="text-sm text-white/80 hover:text-turquoise active:text-turquoise transition-colors underline underline-offset-2"
               >
                 Política de Devoluções
               </Link>
@@ -189,7 +189,7 @@ const Footer = () => {
           </div>
         </div>
       </div>
-    <div className="max-w-7xl mx-auto px-5 py-8 text-sm text-white/70"><p>Equipas em Braga, Porto, Lisboa e Algarve. Outras localidades mediante confirmação.</p><p className="mt-2">Resposta em menos de 10 minutos · Deslocação a partir de 10€</p><div className="flex flex-wrap gap-4 mt-4"><Link to="/tratamento-anti-acaros">Tratamento anti-ácaros</Link><Link to="/desbacterizacao">Desbacterização</Link><Link to="/limpeza-estofos-aveiro">Aveiro: consultar disponibilidade</Link><Link to="/limpeza-estofos-coimbra">Coimbra: consultar disponibilidade</Link></div></div>
+    <div className="max-w-7xl mx-auto px-5 py-8 text-base text-white/70"><p>Equipas em Braga, Porto, Lisboa e Algarve. Outras localidades mediante confirmação.</p><p className="mt-2">Resposta em menos de 10 minutos · Deslocação a partir de 10€</p><div className="flex flex-wrap gap-4 mt-4"><Link to="/tratamento-anti-acaros">Tratamento anti-ácaros</Link><Link to="/desbacterizacao">Desbacterização</Link><Link to="/limpeza-estofos-aveiro">Aveiro: consultar disponibilidade</Link><Link to="/limpeza-estofos-coimbra">Coimbra: consultar disponibilidade</Link></div></div>
     <BusinessConditions />
     </footer>
   );

@@ -101,13 +101,13 @@ const Contact = () => {
                 href={`${WHATSAPP_BASE}?text=${whatsappMessage}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-1 px-3 py-1.5 bg-green-600 text-white text-sm rounded-lg hover:bg-green-700"
+                className="inline-flex items-center gap-1 px-3 py-1.5 bg-green-600 text-white text-base rounded-lg hover:bg-green-700"
               >
                 WhatsApp
               </a>
               <a
                 href={`mailto:${BUSINESS_EMAIL}?subject=Pedido%20Orçamento&body=${whatsappMessage}`}
-                className="inline-flex items-center gap-1 px-3 py-1.5 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700"
+                className="inline-flex items-center gap-1 px-3 py-1.5 bg-blue-600 text-white text-base rounded-lg hover:bg-blue-700"
               >
                 Email
               </a>
@@ -160,12 +160,12 @@ const Contact = () => {
         <div className={`text-center mb-12 md:mb-16 transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-5'}`}>
           <div className="flex items-center justify-center gap-2 mb-4">
             <MessageSquare className="h-5 w-5 text-gold" />
-            <span className="text-gold font-semibold tracking-wide uppercase text-sm">Fale Connosco</span>
+            <span className="text-gold font-semibold tracking-wide uppercase text-base">Fale Connosco</span>
           </div>
-          <h2 className="text-2xl md:text-4xl lg:text-5xl font-bold text-[#111111] mb-3">
+          <h2 className="type-section-title     text-[#111111] mb-3">
             Prepare o seu espaço para impressionar.
           </h2>
-          <p className="text-[#111111]/55 text-base md:text-lg max-w-2xl mx-auto leading-relaxed">
+          <p className="text-[#505650] text-base md:text-lg max-w-2xl mx-auto leading-relaxed">
             A nossa equipa chega à hora marcada, com eficiência e atenção aos detalhes. Garantimos um serviço profissional adaptado ao seu ritmo e à sua casa.
           </p>
           <div className="w-24 h-1 bg-gradient-to-r from-gold to-gold-light mx-auto rounded-full mt-6"></div>
@@ -181,9 +181,9 @@ const Contact = () => {
                   <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-gold/20 to-gold/5 flex items-center justify-center mb-3">
                     <Icon className="w-6 h-6 text-gold" />
                   </div>
-                  <p className="text-xs text-[#111111]/55 font-medium uppercase tracking-wide mb-1">{item.label}</p>
-                  <p className="font-bold text-[#111111] text-sm leading-tight">{item.value}</p>
-                  <p className="text-xs text-[#111111]/55 mt-1">{item.subtext}</p>
+                  <p className="text-sm text-[#505650] font-medium uppercase tracking-wide mb-1">{item.label}</p>
+                  <p className="font-bold text-[#111111] text-base leading-tight">{item.value}</p>
+                  <p className="text-sm text-[#505650] mt-1">{item.subtext}</p>
                 </div>
               );
               return item.href ? (
@@ -208,7 +208,7 @@ const Contact = () => {
               <form onSubmit={handleSubmit} className="relative bg-[#FFFFFF] p-6 md:p-8 rounded-[22px] shadow-xl space-y-5">
                 <div className="grid md:grid-cols-2 gap-5">
                   <div>
-                    <label className="text-sm font-semibold text-[#111111] mb-2 block">
+                    <label className="text-base font-semibold text-[#111111] mb-2 block">
                       Nome <span className="text-red-500">*</span>
                     </label>
                     <Input
@@ -222,7 +222,7 @@ const Contact = () => {
                     />
                   </div>
                   <div>
-                    <label className="text-sm font-semibold text-[#111111] mb-2 block">
+                    <label className="text-base font-semibold text-[#111111] mb-2 block">
                       Telemóvel/Telefone
                     </label>
                     <Input
@@ -238,7 +238,7 @@ const Contact = () => {
 
                 <div className="grid md:grid-cols-2 gap-5">
                   <div>
-                    <label className="text-sm font-semibold text-[#111111] mb-2 block">
+                    <label className="text-base font-semibold text-[#111111] mb-2 block">
                       Email <span className="text-red-500">*</span>
                     </label>
                     <Input
@@ -252,7 +252,7 @@ const Contact = () => {
                     />
                   </div>
                   <div>
-                    <label className="text-sm font-semibold text-[#111111] mb-2 block">
+                    <label className="text-base font-semibold text-[#111111] mb-2 block">
                       Localidade <span className="text-red-500">*</span>
                     </label>
                     <Input
@@ -267,7 +267,7 @@ const Contact = () => {
                 </div>
 
                 <div>
-                  <label className="text-sm font-semibold text-[#111111] mb-2 block">
+                  <label className="text-base font-semibold text-[#111111] mb-2 block">
                     Mensagem <span className="text-red-500">*</span>
                   </label>
                   <Textarea
@@ -281,7 +281,7 @@ const Contact = () => {
                   />
                 </div>
 
-                <p className="text-xs text-[#111111]/55 bg-secondary/30 p-3 rounded-xl">
+                <p className="text-sm text-[#505650] bg-secondary/30 p-3 rounded-xl">
                   - Para orçamentos de Tapetes e Colchões, favor indicar as medidas.
                 </p>
 
@@ -308,7 +308,7 @@ const Contact = () => {
               <div className="absolute -inset-2 bg-gradient-to-br from-gold/20 via-turquoise/20 to-gold/20 rounded-[28px] blur-lg opacity-40"></div>
               
               <div className="relative bg-[#FFFFFF] p-8 rounded-[22px] shadow-xl h-full">
-                <h3 className="text-xl font-bold text-[#111111] mb-6 flex items-center gap-2">
+                <h3 className="type-card-title   text-[#111111] mb-6 flex items-center gap-2">
                   Informações de Contacto
                 </h3>
                 
@@ -321,9 +321,9 @@ const Contact = () => {
                           <Icon className="w-6 h-6 text-gold" />
                         </div>
                         <div className="flex-1">
-                          <span className="text-xs text-[#111111]/55 font-medium uppercase tracking-wider">{item.label}</span>
+                          <span className="text-sm text-[#505650] font-medium uppercase tracking-wider">{item.label}</span>
                           <p className="text-base font-bold text-[#111111] mt-1">{item.value}</p>
-                          <p className="text-sm text-[#111111]/55">{item.subtext}</p>
+                          <p className="text-base text-[#505650]">{item.subtext}</p>
                         </div>
                       </div>
                     );
@@ -341,7 +341,7 @@ const Contact = () => {
 
                 {/* Trust Badge */}
                 <div className="mt-6 p-4 rounded-[18px] bg-gradient-to-r from-gold/10 to-turquoise/10 border border-gold/20">
-                  <p className="text-sm text-[#111111]/80 text-center font-medium">
+                  <p className="text-base text-[#111111]/80 text-center font-medium">
                     Resposta garantida em menos de 10 minutos durante o horário de funcionamento.
                   </p>
                 </div>

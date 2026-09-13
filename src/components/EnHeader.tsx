@@ -22,7 +22,7 @@ const EnHeader = () => {
           <a
             href={`tel:${PHONE_TEL}`}
             onClick={() => trackCallClick("en_header")}
-            className="w-11 h-11 md:w-auto md:h-auto border border-[#111111]/25 flex items-center justify-center md:px-4 md:py-2.5 gap-2 touch-manipulation text-[#111111] text-[10px] font-semibold tracking-[0.18em] uppercase hover:bg-[#111111]/4 transition-colors"
+            className="w-11 h-11 md:w-auto md:h-auto border border-[#111111]/25 flex items-center justify-center md:px-4 md:py-2.5 gap-2 touch-manipulation text-[#111111] text-sm font-semibold tracking-[0.18em] uppercase hover:bg-[#111111]/4 transition-colors"
             aria-label="Call"
           >
             <Phone className="w-4 h-4 md:w-3.5 md:h-3.5 text-[#111111]/70 flex-shrink-0" strokeWidth={2} />
@@ -33,7 +33,7 @@ const EnHeader = () => {
             target="_blank"
             rel="noopener noreferrer"
             onClick={() => trackWhatsAppClick("en_header")}
-            className="h-11 md:h-auto px-4 md:px-4 md:py-2.5 border border-[#25D366] flex items-center justify-center gap-2 touch-manipulation text-[#111111] text-[10px] font-semibold tracking-[0.18em] uppercase hover:bg-[#25D366]/6 transition-colors whitespace-nowrap"
+            className="h-11 md:h-auto px-4 md:px-4 md:py-2.5 border border-[#25D366] flex items-center justify-center gap-2 touch-manipulation text-[#111111] text-sm font-semibold tracking-[0.18em] uppercase hover:bg-[#25D366]/6 transition-colors whitespace-nowrap"
           >
             <MessageCircle className="w-4 h-4 md:w-3.5 md:h-3.5 text-[#25D366] flex-shrink-0" strokeWidth={2} />
             <span>WhatsApp</span>
