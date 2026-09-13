@@ -12,7 +12,7 @@ import painpointTapeteAllergens from "@/assets/hero-p-pelos-tapete.webp";
 import painpointTapeteColor  from "@/assets/hero-p-tapete-persa.webp";
 import painpointCadeiraDirt  from "@/assets/hero-p-limpeza-cadeiras.webp";
 import painpointCadeiraStain from "@/assets/hero-p-mancha-tinta.webp";
-import painpointCadeiraOdor  from "@/assets/hero-p-limpeza-puff.webp";
+import painpointCadeiraOdor  from "@/assets/cadeira-odores-retidos.webp";
 import painpointCadeiraWear  from "@/assets/cadeira-tecido-desgastado.webp";
 import painpointAlcatifaDirt from "@/assets/hero-p-limpeza-alcatifas.webp";
 import painpointAlcatifaAllergens from "@/assets/hero-p-mofo-alcatifa.webp";
