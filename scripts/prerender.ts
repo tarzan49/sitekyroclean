@@ -154,10 +154,17 @@ interface PageContent {
   processImage?: string;
   processSteps?: { step: number; title: string; description: string; alt?: string }[];
   priceTable?: { item: string; price: string; note?: string }[];
+  links?: { href: string; label: string }[];
 }
 
 function generatePageBody(c: PageContent, lang: 'pt' | 'en' = 'pt'): string {
   let html = `<main>\n<h1>${escHtml(c.h1)}</h1>\n<p>${escHtml(c.intro)}</p>\n`;
+
+  if (c.links?.length) {
+    html += `<nav><ul>\n`;
+    for (const link of c.links) html += `<li><a href="${escHtml(link.href)}">${escHtml(link.label)}</a></li>\n`;
+    html += `</ul></nav>\n`;
+  }
 
   if (c.hero) {
     html += `<p>${escHtml(c.hero.eyebrow)}</p><p>${escHtml(c.hero.priceLabel)} + ${escHtml(c.hero.travelLabel)}</p><a href="${escHtml(c.hero.waHref)}">Pedir orçamento por WhatsApp</a><p>${escHtml(c.hero.response)} · Sem compromisso</p><a href="#precos">${escHtml(c.hero.priceLinkLabel)}</a><div id="precos"><a href="${escHtml(c.hero.service.baseRoute)}#precos">Orçamento de ${escHtml(c.hero.service.name.toLowerCase())}</a></div>\n`;
@@ -1172,6 +1179,13 @@ export function prerenderRoutes(outDir: string): number {
     const homeBody = generatePageBody({
       h1: 'Estofos como novos, ao domicílio.',
       intro: 'Limpeza profissional de sofás, colchões, cadeiras e tapetes.',
+      links: [
+        ...services.map(service => ({ href: service.baseRoute, label: service.name })),
+        { href: '/perguntas-frequentes-limpeza-estofos', label: 'Perguntas Frequentes' },
+        { href: '/glossario-limpeza-estofos', label: 'Glossário' },
+        { href: '/blog', label: 'Blog' },
+        { href: '/packs', label: 'Packs' },
+      ],
     });
     const homeHtml = injectContent(preloadPage(rawTemplate, 'IndexV1'), homeBody);
     fs.writeFileSync(templatePath, homeHtml, 'utf-8');
