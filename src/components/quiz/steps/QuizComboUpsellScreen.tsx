@@ -397,29 +397,29 @@ const QuizComboUpsellScreen = ({ offerPreview = false, travelFee = 10, primarySe
   const compactRows = visibleRows.length <= 3;
 
   return (
-    <div className="flex flex-col gap-2 overflow-hidden items-center w-full">
+    <div className="flex flex-col gap-1.5 overflow-hidden items-center w-full">
       <p className="text-gold text-[10px] font-bold tracking-[0.28em] uppercase mb-0.5 text-center w-full">
         {offerPreview ? 'APROVEITE A MESMA VISITA' : 'UM BÓNUS PARA SI'}
       </p>
-      <h2 className="font-playfair text-2xl sm:text-3xl font-bold text-white text-center w-full">
+      <h2 className="font-playfair text-xl sm:text-2xl font-bold text-white text-center w-full">
         {offerPreview ? 'Mais limpeza. Menos a pagar.' : 'Adicione mais um serviço'}
       </h2>
-      <p className="text-xs text-white/55 text-center max-w-xs leading-relaxed -mt-1">
+      <p className="text-xs text-white/55 text-center max-w-sm leading-snug">
         {offerPreview
-          ? <>Aproveite a deslocação e pague menos pela limpeza dos restantes artigos. Deslocação excluída.</>
+          ? <>Preços especiais na mesma visita. Deslocação excluída.</>
           : <>Combine mais um serviço na mesma visita e poupe no preço de cada artigo. Deslocação excluída.</>}
       </p>
 
       {/* Até três sugestões: linhas compactas, sem cartão isolado à esquerda.
           Com quatro sugestões, preservar a grelha 2x2 para limitar a altura. */}
-      <div className={cn('grid gap-2 w-full max-w-sm mt-2', compactRows ? 'grid-cols-1' : 'grid-cols-2')}>
+      <div className={cn('grid gap-1.5 w-full max-w-sm mt-1', compactRows ? 'grid-cols-1' : 'grid-cols-2')}>
         {visibleRows.map(row => (
           <button
             key={row.view}
             onClick={() => { if (offerPreview && row.view === 'mattress' && mattressQtyTotal === 0) setMattQty('casal', 1); setView(row.view); }}
             className={cn(
               'group relative flex items-center gap-3 rounded-sm border px-3 text-left transition-all duration-200 touch-manipulation active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold',
-              compactRows ? 'min-h-[78px] py-3 pr-10 sm:pr-12' : 'min-h-[132px] flex-col justify-center py-2.5',
+              compactRows ? 'min-h-[72px] py-2 pr-10 sm:pr-12' : 'min-h-[108px] flex-col justify-center py-2',
               row.selected
                 ? offerPreview ? 'border-gold/40 bg-white/[0.04]' : 'border-gold bg-[#1a2a1a] shadow-[0_0_14px_rgba(212,175,55,0.20)]'
                 : offerPreview ? 'border-[#D4AF37]/35 bg-gradient-to-br from-[#D4AF37]/[0.09] to-transparent hover:border-[#D4AF37]/70' : 'border-dashed border-gold/55 bg-gold/[0.025] hover:border-gold hover:bg-gold/[0.05]'
@@ -436,34 +436,34 @@ const QuizComboUpsellScreen = ({ offerPreview = false, travelFee = 10, primarySe
             </span>
             <span
               aria-hidden="true"
-              className="block w-12 h-12 sm:w-16 sm:h-16 shrink-0 transition-transform duration-200 group-hover:scale-105 motion-reduce:transform-none"
+              className="block w-12 h-12 shrink-0 transition-transform duration-200 group-hover:scale-105 motion-reduce:transform-none"
               style={{ backgroundImage: 'url(/images/services/quote-furniture.png)', backgroundSize: '200% 200%', backgroundPosition: row.imagePosition }}
             />
-            <span className={cn('min-w-0 flex flex-col gap-1', !compactRows && 'w-full')}>
-              <span className="text-sm font-bold text-white">{row.label}</span>
+            <span className={cn('min-w-0 flex flex-col gap-0.5', !compactRows && 'w-full')}>
+              <span className="text-sm leading-tight font-bold text-white">{row.label}</span>
               {offerPreview && row.benefit && (
                 <span className="flex flex-col items-start gap-1">
-                  <span className="text-base sm:text-lg font-extrabold leading-tight text-[#D4AF37]">{row.benefit}</span>
+                  <span className="text-base font-extrabold leading-tight text-[#D4AF37]">{row.benefit}</span>
                 </span>
               )}
-              <span className={cn('leading-relaxed', offerPreview ? 'text-sm font-semibold text-[#D4AF37]' : 'text-[12px] font-normal text-gold/75')}>{offerPreview ? row.priceLine : row.summary}</span>
-              {offerPreview && <span className="text-xs leading-snug text-white/60">{row.condition ?? (row.selected ? row.summary : '')}</span>}
+              <span className={cn('leading-tight', offerPreview ? 'text-sm font-semibold text-[#D4AF37]' : 'text-[12px] font-normal text-gold/75')}>{offerPreview ? <>{!row.selected && (row.view === 'mattress' || row.view === 'sofa') && <span className="text-xs font-normal text-white/60">{row.view === 'mattress' ? 'Casal' : '2 lugares'} · </span>}{row.priceLine}</> : row.summary}</span>
+              {offerPreview && row.selected && <span className="text-xs leading-snug text-white/60">{row.condition ?? (row.selected ? row.summary : '')}</span>}
             </span>
           </button>
         ))}
       </div>
 
-      <div className="flex items-center gap-3 w-full max-w-sm mt-2">
+      <div className="flex items-center gap-3 w-full max-w-sm mt-1">
         <button
           onClick={onBack}
-          className="h-14 px-5 flex-shrink-0 bg-transparent border border-white/[0.14] text-white/50 hover:text-white/80 hover:border-white/30 active:scale-[0.98] touch-manipulation rounded-sm flex items-center justify-center transition-all text-sm font-semibold"
+          className="h-11 px-4 flex-shrink-0 bg-transparent border border-white/[0.14] text-white/50 hover:text-white/80 hover:border-white/30 active:scale-[0.98] touch-manipulation rounded-sm flex items-center justify-center transition-all text-sm font-semibold"
         >
           <ChevronLeft className="w-4 h-4 mr-1" /> Voltar
         </button>
         <button
           disabled={incompleteCarpets}
           onClick={onContinue}
-          className="flex-1 h-14 bg-gradient-to-r from-gold to-[#d4c57b] hover:from-[#d4c57b] hover:to-gold text-[#12121e] font-black text-sm tracking-wider uppercase touch-manipulation active:scale-[0.98] rounded-sm shadow-[0_0_32px_rgba(212,175,55,0.30)]"
+          className="flex-1 h-11 bg-gradient-to-r from-gold to-[#d4c57b] hover:from-[#d4c57b] hover:to-gold text-[#12121e] font-black text-sm tracking-wider uppercase touch-manipulation active:scale-[0.98] rounded-sm shadow-[0_0_32px_rgba(212,175,55,0.30)]"
         >
           Finalizar Orçamento
         </button>
