@@ -10,7 +10,6 @@ const HowItWorksV1         = lazy(() => import("@/components/HowItWorksV1"));
 const TestimonialsV1       = lazy(() => import("@/components/TestimonialsV1"));
 const FinalCTAV1           = lazy(() => import("@/components/FinalCTAV1"));
 const Footer               = lazy(() => import("@/components/Footer"));
-const HowItWorksPreview = import.meta.env.DEV ? lazy(() => import("@/components/HowItWorksPreview")) : null;
 
 const SectionLoader = () => (
   <div className="py-8 flex justify-center">
@@ -19,9 +18,6 @@ const SectionLoader = () => (
 );
 
 const IndexV1 = () => {
-  if (HowItWorksPreview && new URLSearchParams(window.location.search).get("preview") === "processo") {
-    return <div className="min-h-screen bg-[#071a12]"><Header /><main className="pt-24"><Suspense fallback={<SectionLoader />}><HowItWorksPreview /></Suspense></main></div>;
-  }
   return (
     <div className="min-h-screen">
       <Header />

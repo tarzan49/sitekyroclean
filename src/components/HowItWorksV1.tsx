@@ -1,181 +1,49 @@
-import { useEffect, useRef, useState } from "react";
-import { ShieldCheck, HandCoins, Droplets } from "lucide-react";
-import QuizButton from "./QuizButton";
-import TrustRatingBadge from "@/components/TrustRatingBadge";
+import { DRYING_PROMISE, RESPONSE_PROMISE } from "@/constants/commercialPolicy";
 
 const steps = [
-  {
-    number: "01",
-    titleFallback: "Peça orçamento",
-    descFallback: "Quiz em 30 segundos. Preço imediato, sem compromisso.",
-  },
-  {
-    number: "02",
-    titleFallback: "Agendamos a visita",
-    descFallback: "Deslocamo-nos à sua casa na data que escolher.",
-  },
-  {
-    number: "03",
-    titleFallback: "Resultados no momento",
-    descFallback: "Estofos como novos no próprio dia da visita.",
-  },
+  { title: "Peça o seu orçamento", text: "Diga-nos o que precisa de limpar. Recebe uma estimativa sem compromisso.", note: RESPONSE_PROMISE },
+  { title: "Combine a visita", text: "Confirmamos consigo o preço, os tratamentos e a deslocação antes de marcar.", note: "Data e disponibilidade confirmadas consigo" },
+  { title: "Nós cuidamos do resto", text: "Limpamos em sua casa e explicamos os cuidados a ter após o serviço.", note: DRYING_PROMISE },
 ];
 
-const guarantees = [
-  {
-    icon: ShieldCheck,
-    titleFallback: "Satisfação garantida",
-    textFallback: "Se não ficou satisfeito, contacte-nos até 48 horas após o serviço: repetimos sem custos.",
-  },
-  {
-    icon: HandCoins,
-    titleFallback: "Orçamento transparente",
-    textFallback: "Confirmamos o preço antes da marcação, incluindo artigos, medidas, tratamentos e deslocação.",
-  },
-  {
-    icon: Droplets,
-    titleFallback: "Proteção duradoura",
-    textFallback: "Impermeabilização Premium com proteção real até 10 anos.",
-  },
-];
-
-const HowItWorks = () => {
-  const [isVisible, setIsVisible] = useState(false);
-  const sectionRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => { if (entry.isIntersecting) { setIsVisible(true); observer.disconnect(); } },
-      { threshold: 0.08 }
-    );
-    if (sectionRef.current) observer.observe(sectionRef.current);
-    return () => observer.disconnect();
-  }, []);
-
+export default function HowItWorksV1() {
   return (
-    <section ref={sectionRef} className="overflow-hidden scroll-mt-16 bg-kyro-green">
-
-      {/* ── Cabeçalhos das duas colunas ─────────────────────────────────── */}
-      <div className="grid lg:grid-cols-2" style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
-
-        {/* Left header */}
-        <div
-          className={`px-6 sm:px-10 lg:px-14 py-10 md:py-14 transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-5'}`}
-          style={{ borderRight: "1px solid rgba(255,255,255,0.06)" }}
-        >
-          <div className="flex items-center gap-3 mb-3">
-            <div className="h-px w-8 flex-shrink-0" style={{ backgroundColor: '#D4AF37', opacity: 0.65 }} />
-            <p className="text-[9px] font-bold tracking-[0.30em] uppercase" style={{ color: '#D4AF37', opacity: 0.80 }}>
-              O NOSSO PROCESSO
-            </p>
+    <section aria-labelledby="process-title" className="bg-[#071a12] text-white">
+      <div className="mx-auto max-w-7xl px-5 py-12 sm:px-8 sm:py-16 lg:py-20">
+        <div className="mb-9 lg:mb-12">
+          <div className="max-w-2xl">
+            <p className="mb-4 flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.24em] text-[#D4AF37]"><span className="h-px w-9 bg-[#D4AF37]" /> Do primeiro contacto à limpeza</p>
+            <h2 id="process-title" className="font-playfair text-[1.85rem] font-bold leading-[1.1] sm:text-4xl md:text-[2.6rem]">Nós tratamos da limpeza.<br /><span className="text-[#D4AF37]">Você fica tranquilo.</span></h2>
           </div>
-          <h2 className="font-playfair text-3xl sm:text-4xl md:text-[2.6rem] font-bold text-white leading-[1.1]">
-            Como{" "}
-            <em className="not-italic" style={{ color: '#D4AF37' }}>funciona</em>
-          </h2>
+          <p className="mt-5 max-w-2xl text-base leading-relaxed text-white/75">Orçamento claro, visita combinada e acompanhamento após o serviço.</p>
         </div>
 
-        {/* Right header — oculto em mobile (os itens aparecem intercalados abaixo) */}
-        <div
-          className={`hidden lg:block px-6 sm:px-10 lg:px-14 py-10 md:py-14 transition-all duration-700 delay-150 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-5'}`}
-        >
-          <div className="flex items-center gap-3 mb-3">
-            <div className="h-px w-8 flex-shrink-0" style={{ backgroundColor: '#D4AF37', opacity: 0.65 }} />
-            <p className="text-[9px] font-bold tracking-[0.30em] uppercase" style={{ color: '#D4AF37', opacity: 0.80 }}>
-              A NOSSA PROMESSA
-            </p>
-          </div>
-          <h2 className="font-playfair text-3xl sm:text-4xl md:text-[2.6rem] font-bold text-white leading-[1.1]">
-            Qualidade{" "}
-            <em className="not-italic" style={{ color: '#D4AF37' }}>garantida</em>
-          </h2>
+        <div className="grid gap-9 lg:grid-cols-[1.05fr_1fr] lg:gap-14">
+          <figure className="relative min-h-60 overflow-hidden rounded-[3px] lg:min-h-[590px]">
+            <img src="/images/services/sofa.webp" alt="Limpeza de um sofá com equipamento de extração" width="1280" height="720" className="h-64 w-full object-cover object-[56%_center] sm:h-80 lg:absolute lg:h-full" />
+            <div className="absolute inset-0 bg-gradient-to-t from-[#04110b]/90 via-transparent to-transparent" />
+            <figcaption className="absolute bottom-6 left-6 right-6 border-l-2 border-[#D4AF37] pl-4 sm:bottom-8 sm:left-8">
+              <p className="mb-1 text-xs font-semibold uppercase tracking-[0.2em] text-[#D4AF37]">No conforto da sua casa</p>
+              <p className="font-playfair text-2xl text-white">Cuidado em cada detalhe.</p>
+            </figcaption>
+          </figure>
+
+          <ol className="flex flex-col justify-center lg:py-8">
+            {steps.map((step, index) => (
+              <li key={step.title} className="relative flex gap-5 pb-8 last:pb-0 lg:pb-14">
+                {index < steps.length - 1 && <span aria-hidden="true" className="absolute bottom-0 left-[19px] top-11 w-px bg-[#D4AF37]/25" />}
+                <span className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-[#D4AF37]/45 bg-[#10271d] text-sm font-semibold text-[#D4AF37]">0{index + 1}</span>
+                <div className="pt-1">
+                  <h3 className="mb-2 font-playfair text-[1.4rem] font-semibold leading-tight sm:text-2xl">{step.title}</h3>
+                  <p className="max-w-md text-base leading-relaxed text-white/75">{step.text}</p>
+                  <p className="mt-2 text-sm leading-relaxed text-[#E3CD85]">{step.note}</p>
+                </div>
+              </li>
+            ))}
+          </ol>
         </div>
+
       </div>
-
-      {/* ── Linhas partilhadas — garante alinhamento perfeito no desktop ── */}
-      {steps.map((step, i) => {
-        const g = guarantees[i];
-        const Icon = g.icon;
-        const isLast = i === steps.length - 1;
-        return (
-          <div
-            key={i}
-            className="grid lg:grid-cols-2"
-            style={!isLast ? { borderBottom: "1px solid rgba(255,255,255,0.06)" } : undefined}
-          >
-            {/* LEFT: step */}
-            <div
-              className={`flex gap-5 px-6 sm:px-10 lg:px-14 py-8 transition-all duration-500 ${isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-5'}`}
-              style={{
-                transitionDelay: `${(i + 1) * 100}ms`,
-                borderRight: "1px solid rgba(255,255,255,0.06)",
-                borderBottom: "1px solid rgba(255,255,255,0.06)",
-              }}
-            >
-              {/* Number badge */}
-              <div
-                className="flex-shrink-0 w-11 h-11 flex items-center justify-center mt-0.5"
-                style={{
-                  border: "1px solid rgba(212,175,55,0.20)",
-                  background: "rgba(212,175,55,0.06)",
-                }}
-              >
-                <span className="font-mono text-[11px] font-bold" style={{ color: "rgba(212,175,55,0.70)" }}>
-                  {step.number}
-                </span>
-              </div>
-              <div>
-                <h3 className="font-playfair text-xl font-bold text-white mb-1.5 leading-snug">
-                  {step.titleFallback}
-                </h3>
-                <p className="text-white/50 text-[13px] leading-relaxed">
-                  {step.descFallback}
-                </p>
-              </div>
-            </div>
-
-            {/* RIGHT: guarantee */}
-            <div
-              className={`flex gap-5 px-6 sm:px-10 lg:px-14 py-8 transition-all duration-500 ${isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-5'}`}
-              style={{
-                transitionDelay: `${200 + i * 100}ms`,
-                borderBottom: "1px solid rgba(255,255,255,0.06)",
-              }}
-            >
-              {/* Icon badge */}
-              <div
-                className="flex-shrink-0 w-11 h-11 flex items-center justify-center mt-0.5"
-                style={{
-                  border: "1px solid rgba(212,175,55,0.22)",
-                  background: "rgba(212,175,55,0.07)",
-                }}
-              >
-                <Icon className="w-4 h-4" style={{ color: "#D4AF37" }} strokeWidth={1.5} />
-              </div>
-              <div>
-                <h3 className="font-playfair text-xl font-bold text-white mb-1.5 leading-snug">
-                  {g.titleFallback}
-                </h3>
-                <p className="text-white/50 text-[13px] leading-relaxed">
-                  {g.textFallback}
-                </p>
-              </div>
-            </div>
-          </div>
-        );
-      })}
-
-      {/* ── Bottom CTA strip ─────────────────────────────────────────────── */}
-      <div
-        className={`py-6 px-6 flex flex-col items-center gap-4 transition-all duration-700 ${isVisible ? 'opacity-100' : 'opacity-0'}`}
-        style={{ transitionDelay: '500ms', borderTop: "1px solid rgba(255,255,255,0.06)" }}
-      >
-        <QuizButton />
-        <TrustRatingBadge variant="horizontal" />
-      </div>
-
     </section>
   );
-};
-
-export default HowItWorks;
+}

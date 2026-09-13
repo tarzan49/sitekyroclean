@@ -1,6 +1,6 @@
-## Pré-visualização do processo da homepage (13/09/2026)
+## Processo da homepage (13/09/2026)
 
-Em desenvolvimento, `/?preview=processo` abre `HowItWorksPreview` através de `IndexV1`: imagem existente do catálogo, três passos, garantia de repetição até 48 horas e botão do orçamento. O componente é carregado apenas com `import.meta.env.DEV`. A homepage pública mantém `HowItWorksV1`; a proposta ainda é uma pré-visualização local.
+`HowItWorksV1` apresenta a composição aprovada para a homepage: imagem existente do catálogo, três passos e descrição abaixo do título («Orçamento claro, visita combinada e acompanhamento após o serviço.»). Retirados desta secção o bloco de garantia e o CTA, por pedido do responsável. A garantia comercial mantém-se; a remoção é apenas editorial neste bloco. A composição está integrada na homepage, sem modo isolado `?preview=processo`. Mantida uma altura generosa no desktop e fluxo compacto no telemóvel.
 
 ## Correções comerciais e packs personalizáveis (10/09/2026)
 
