@@ -2,6 +2,10 @@
 
 Na limpeza, a sequência é tratar, escovar, extrair e conferir/secagem, após avaliação. A escova e a pressão respeitam o revestimento. Juta, sisal, seda e materiais incompatíveis não seguem automaticamente limpeza com água nem escovagem forte; avaliar composição e método. Não confundir aplicação de impermeabilizante ou avaliação de bolor com esta sequência de limpeza. Preservar a etapa explícita nos guias dos problemas.
 
+## Imagens das promessas dos seis serviços (13/09/2026)
+
+Nas secções «A nossa promessa» dos seis serviços, preservar pelo menos uma fotografia antiga adequada por serviço; as fotografias existentes de técnicos Kyro com a identidade real não devem ser descartadas sem motivo. Uma imagem nova só pode mostrar um trabalhador quando reproduzir fielmente um técnico Kyro e a identidade visual verdadeira. Se isso não puder ser garantido, criar a cena sem pessoas e sem logótipos, uniformes ou equipamentos inventados. Cada imagem tem de representar diretamente o título e a informação do respetivo cartão.
+
 ## Exemplos e tratamentos dos problemas (13/09/2026)
 
 Usar a grelha de quatro exemplos com ampliação também em localidades, freguesias, preços e variantes, partilhando `VisualExamplesGallery`. Tratamentos das páginas de problemas têm avaliação, ação e limites próprios por problema em `problemTreatmentGuides.ts`, partilhados com o HTML inicial. Não inventar métodos diferentes por cidade ou por sinónimo. A secção «Como tratamos este problema» usa o fundo verde canónico e a mesma navegação por separadores dos materiais, com imagem, explicação e botões anterior/próxima dentro do painel claro de `IllustratedProcessGuide`. Não voltar ao acordeão. Etapas com imagens guardadas uma vez no site, ficheiros antigos preservados e opção discreta de guardar. Materiais conservam exemplos específicos do revestimento.
