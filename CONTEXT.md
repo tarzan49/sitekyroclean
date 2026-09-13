@@ -1,3 +1,9 @@
+## Exemplos visuais dos materiais (13/09/2026)
+
+`MaterialExamplesGallery` substitui as características escritas em `MaterialPage` por quatro fotografias ilustrativas por material: duas peças e dois pormenores. Catálogo partilhado com o prerender em `src/data/materialExamples.ts`, imagens WebP em `public/images/materials/`, prompts em `docs/material-examples-images.md`. Abrange os 11 materiais e todas as variantes por cidade. Grelha 2×2 em mobile, ampliação acessível por toque/teclado, sem avanço automático.
+
+Pré-visualização mobile persistente: `node scripts/preview-mobile.mjs` abre um servidor dedicado na porta 8086. Todas as páginas HTML abertas diretamente neste servidor são encaminhadas para uma moldura de 390px; links em novas abas também passam pela moldura. O seletor permite ver os 11 materiais. Só afeta este servidor local.
+
 ## Tipografia integrada (13/09/2026)
 
 A configuração Avenir Next do ramo principal está integrada neste ramo: `main.tsx` importa `styles/typography.css`; CSS base e aliases Tailwind usam `--font-kyro`; `index.html` pré-carrega regular e demi. Ficheiros WOFF2 servidos localmente.

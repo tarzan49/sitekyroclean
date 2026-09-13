@@ -1,3 +1,4 @@
+import MaterialExamplesGallery from "@/components/MaterialExamplesGallery";
 import DirectoryGroup from "@/components/DirectoryGroup";
 import SofaLeadActions from "@/components/SofaLeadActions";
 import { useEffect, useMemo } from "react";
@@ -183,27 +184,8 @@ const MaterialPage = () => {
         {/* ═══ TABELA DE PREÇOS ═══ */}
         <ServicePriceSection serviceSlug={data.serviceSlug} initialLocation={cityName ?? undefined} />
 
-        {/* ═══ CARACTERÍSTICAS DO MATERIAL ═══ */}
-        <section className="py-14 md:py-20 bg-kyro-green">
-          <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
-            <SectionHeader
-              overline="Material"
-              heading="Características de"
-              goldWord={data.name}
-              light={false}
-            />
-            <div className="grid grid-cols-2 gap-px" style={{ backgroundColor: "rgba(255,255,255,0.08)" }}>
-              {data.characteristics.slice(0, 4).map((c, i) => (
-                <div key={i} className="relative overflow-hidden flex items-start gap-3 p-6 md:p-7" style={{ backgroundColor: "#0d241b", borderTop: "2px solid rgba(212,175,55,0.55)" }}>
-                  <span className="font-playfair font-bold flex-shrink-0 leading-none" style={{ fontSize: "1.75rem", color: "rgba(212,175,55,0.4)" }}>
-                    {String(i + 1).padStart(2, "0")}
-                  </span>
-                  <span className="text-sm text-white/65 leading-relaxed pt-1">{c}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
+        {/* Exemplos específicos, partilhados com as variantes por cidade. */}
+        <MaterialExamplesGallery key={data.slug} materialSlug={data.slug} />
 
         {/* ═══ GALERIA ILUSTRATIVA (o antes/depois já está no hero) ═══ */}
         {gallery && (

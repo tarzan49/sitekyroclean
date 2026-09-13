@@ -1,3 +1,4 @@
+import { MATERIAL_EXAMPLES, type MaterialExamples } from "../src/data/materialExamples";
 import { getTreatmentRoutes, getExpansionRoutes, getTreatmentPage, getExpansionPage } from '../src/data/treatmentSeoData';
 import { PRICE_PROMISE, SATISFACTION_PROMISE, DRYING_PROMISE, COVERAGE_PROMISE, RESPONSE_PROMISE, AVAILABILITY_PROMISE } from '../src/constants/commercialPolicy';
 /**
@@ -138,6 +139,7 @@ interface PageContent {
   problems?: { title: string; description: string }[];
   howItWorks?: string;
   benefits?: string[];
+  materialExamples?: MaterialExamples;
   faqs?: { question: string; answer: string }[];
   processSteps?: { step: number; title: string; description: string }[];
   priceTable?: { item: string; price: string; note?: string }[];
@@ -178,6 +180,15 @@ function generatePageBody(c: PageContent, lang: 'pt' | 'en' = 'pt'): string {
 
   if (c.howItWorks) {
     html += `<section><p>${escHtml(c.howItWorks)}</p></section>\n`;
+  }
+
+  if (c.materialExamples) {
+    const gallery = c.materialExamples;
+    html += `<section id="material"><h2>Veja exemplos de ${escHtml(gallery.name)}</h2><div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px">`;
+    gallery.examples.forEach((example, index) => {
+      html += `<figure style="margin:0"><div style="position:relative;aspect-ratio:1;overflow:hidden"><img src="${escHtml(gallery.image)}" alt="${escHtml(example.alt)}" loading="lazy" decoding="async" style="position:absolute;width:200%;height:200%;max-width:none;left:-${(index % 2) * 100}%;top:-${Math.floor(index / 2) * 100}%"></div><figcaption>${escHtml(example.label)}</figcaption></figure>`;
+    });
+    html += `</div><p>Exemplos ilustrativos.</p></section>\n`;
   }
 
   if (c.benefits?.length) {
@@ -439,8 +450,7 @@ export function prerenderRoutes(outDir: string): number {
         {
           h1: mat.h1,
           intro: mat.intro,
-          // characteristics → benefits ul list
-          benefits: mat.characteristics,
+          materialExamples: MATERIAL_EXAMPLES[mat.slug],
           // cleaningProcess → ordered process steps
           processSteps: mat.cleaningProcess.map((step, i) => ({
             step: i + 1,
@@ -475,7 +485,7 @@ export function prerenderRoutes(outDir: string): number {
         {
           h1: data.h1,
           intro: data.intro,
-          benefits: data.characteristics,
+          materialExamples: MATERIAL_EXAMPLES[data.slug],
           processSteps: data.cleaningProcess.map((step, i) => ({
             step: i + 1,
             title: step,

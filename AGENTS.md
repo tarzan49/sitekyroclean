@@ -135,3 +135,8 @@ Os cartões partilhados de avaliações (`CustomerReviewCard`, usados por `Custo
 ## Faixa de indicadores dos serviços (13/09/2026)
 
 Nas páginas de localidades, freguesias, variantes, marcas e preços, a faixa `ServiceSnapshotStats` apresenta apenas avaliações, resposta e secagem (ou ativação da proteção), nesta ordem e numa única linha também em mobile. Retirar o preço repetido desta faixa, preservando-o no hero e na tabela. Estrela da avaliação sempre dourada `#D4AF37`. Esta decisão substitui a grelha mobile 2×2 proposta anteriormente.
+
+
+## Galeria de materiais (13/09/2026)
+
+Pedido do responsável: a secção dos materiais usa quatro exemplos visuais próprios por tipo, incluindo páginas por localidade. `MaterialExamplesGallery` e `materialExamples.ts` são a fonte partilhada. São imagens ilustrativas geradas, não trabalhos reais nem antes/depois. Manter identificação discreta, texto alternativo e ampliação acessível. Não voltar aos quatro blocos de características escritos.
