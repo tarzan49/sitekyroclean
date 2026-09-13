@@ -1,6 +1,6 @@
 ## Estrutura obrigatória dos heroes (13/09/2026, revisão mais recente)
 
-Pedido do responsável: breadcrumb na fonte Avenir Next, título, subtítulo curto de apoio, WhatsApp principal, «Ver preços» por baixo, antes/depois imediatamente a seguir e faixa com avaliações, resposta e secagem (ou informação adequada à proteção). Usar `CommercialHero` nas famílias comerciais, incluindo materiais e problemas, sem duplicar a estrutura. A revisão da imagem de fundo foi adiada explicitamente; reutilizar os fundos existentes por agora. Esta decisão substitui as composições anteriores dos problemas e da homepage. Manter previews exclusivamente mobile.
+Pedido do responsável: breadcrumb na fonte Avenir Next, título, subtítulo curto de apoio, WhatsApp principal, «Ver preços» por baixo, antes/depois imediatamente a seguir e faixa com avaliações, resposta e secagem (ou informação adequada à proteção). Usar `CommercialHero` nas famílias comerciais, incluindo materiais e problemas, sem duplicar a estrutura. A revisão da imagem de fundo foi adiada explicitamente; reutilizar os fundos existentes por agora. Esta decisão substitui as composições anteriores dos problemas. A homepage está excluída: mantém HeroV1 e a composição própria aprovada. Manter previews exclusivamente mobile.
 
 ## Uniformização e diversidade SEO (13/09/2026)
 
@@ -188,4 +188,9 @@ Pedido do responsável: redesenhar o hero em todas as páginas de problemas, nac
 
 ## Verde suave e heroes mobile (13/09/2026)
 
-Pedido aprovado: a paleta verde suave do piloto passa a ser partilhada pelo site, em `src/styles/surfaces.css`, sem a antiga textura. As áreas claras continuam claras. Em mobile (até 767px), os heroes usam fundo verde com degradé e fotografia/comparação separada do texto; no computador conserva-se a fotografia de fundo. `data-mobile-hero` delimita o tratamento nos heroes comerciais, marcas, materiais, problemas, páginas informativas, packs, blog e inglês. `CommercialHero` mantém a composição única e usa `preserveMobileHero` apenas na homepage: preservar a aparência e as fotografias do seu hero em todos os tamanhos. O piloto `scripts/preview-hero-mobile.mjs` passou a servir os estilos reais, sem uma segunda cópia da proposta CSS. Não confundir esta aprovação visual com alterações de preços, conteúdo, FAQ ou fluxos comerciais.
+Pedido aprovado: a paleta verde suave do piloto passa a ser partilhada pelo site, em `src/styles/surfaces.css`, sem a antiga textura. As áreas claras continuam claras. Em mobile (até 767px), os heroes usam fundo verde com degradé e fotografia/comparação separada do texto; no computador conserva-se a fotografia de fundo. `data-mobile-hero` delimita o tratamento nos heroes comerciais, marcas, materiais, problemas, páginas informativas, packs, blog e inglês. `CommercialHero` mantém a composição única nas famílias comerciais. A homepage usa o seu `HeroV1` independente, com a fotografia contínua e `HomeHeroTrust`, sem a galeria antes/depois acrescentada pela uniformização. O piloto `scripts/preview-hero-mobile.mjs` passou a servir os estilos reais, sem uma segunda cópia da proposta CSS. Não confundir esta aprovação visual com alterações de preços, conteúdo, FAQ ou fluxos comerciais.
+
+
+## Reposição da homepage (13/09/2026)
+
+O responsável rejeitou expressamente a inclusão da homepage na uniformização dos heroes. Reposto `HeroV1` exatamente da versão anterior a `033d483`, com fotografia contínua, título, descrição, HomeHeroTrust, WhatsApp e botão «Calcular o meu preço». Não aplicar à homepage a estrutura comercial com breadcrumb, galeria antes/depois e três indicadores. Alterações futuras à homepage exigem pedido específico.

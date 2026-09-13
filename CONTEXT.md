@@ -1,8 +1,8 @@
 ## Estrutura partilhada dos heroes (13/09/2026)
 
-`CommercialHero` centraliza a composição da homepage, serviços nacionais, materiais, problemas nacionais/locais, localidades, freguesias, preços, variantes e marcas. Ordem mobile obrigatória: breadcrumb em Avenir Next, H1, subtítulo curto, WhatsApp, «Ver preços», comparação antes/depois e três indicadores (avaliações, resposta, secagem ou ativação da proteção). Materiais passam também a incluir os indicadores. `ServiceHero` e `ProblemHero` são adaptadores. `ServicePriceSection` fornece o destino `#precos`; homepage aponta para `#servicos`. A escolha/revisão da fotografia de fundo fica adiada por pedido do responsável; as imagens existentes são reutilizadas provisoriamente.
+`CommercialHero` centraliza a composição dos serviços nacionais, materiais, problemas nacionais/locais, localidades, freguesias, preços, variantes e marcas. Ordem mobile obrigatória: breadcrumb em Avenir Next, H1, subtítulo curto, WhatsApp, «Ver preços», comparação antes/depois e três indicadores (avaliações, resposta, secagem ou ativação da proteção). Materiais passam também a incluir os indicadores. `ServiceHero` e `ProblemHero` são adaptadores. `ServicePriceSection` fornece o destino `#precos`. A escolha/revisão da fotografia de fundo fica adiada por pedido do responsável; as imagens existentes são reutilizadas provisoriamente.
 
-`commercialHeroCopy.ts` fornece os subtítulos curtos por serviço, também usados pelo modelo das quatro famílias e pelo prerender. `problemHero.ts` preserva o contexto do problema e da cidade. Metadados SEO continuam específicos. Navegação reduzida Ads, município real das freguesias, preços, FAQ e composição das secções seguintes permanecem independentes do hero. Esta estrutura substitui os anteriores heroes de problemas e a composição específica da homepage.
+`commercialHeroCopy.ts` fornece os subtítulos curtos por serviço, também usados pelo modelo das quatro famílias e pelo prerender. `problemHero.ts` preserva o contexto do problema e da cidade. Metadados SEO continuam específicos. Navegação reduzida Ads, município real das freguesias, preços, FAQ e composição das secções seguintes permanecem independentes do hero. Esta estrutura substitui os anteriores heroes de problemas. A homepage mantém o HeroV1 independente, reposto da versão anterior a `033d483`, com fotografia contínua, HomeHeroTrust, WhatsApp e «Calcular o meu preço», sem galeria acrescentada.
 
 ## Biblioteca de problemas de tapetes (13/09/2026)
 
@@ -58,7 +58,7 @@ A configuração Avenir Next do ramo principal está integrada neste ramo: `main
 
 ## Confiança na homepage (13/09/2026)
 
-`HomeHeroTrust` reúne serviços realizados e avaliações Google numa faixa transparente responsiva, anteriormente usada no mobile e desktop de `HeroV1`; o hero atual usa os três indicadores de `CommercialHero`. Usa `SERVICES_COMPLETED_LABEL`, `REVIEW_RATING` e `REVIEW_COUNT` de `business.ts`. Contagem atual: 110+ avaliações, 4.9, +1200 serviços. Os dados SEO ingleses e de problemas importam REVIEW_COUNT por caminho relativo, compatível com os geradores.
+`HomeHeroTrust` reúne serviços realizados e avaliações Google numa faixa transparente responsiva, usada no mobile e desktop de `HeroV1`. Usa `SERVICES_COMPLETED_LABEL`, `REVIEW_RATING` e `REVIEW_COUNT` de `business.ts`. Contagem atual: 110+ avaliações, 4.9, +1200 serviços. Os dados SEO ingleses e de problemas importam REVIEW_COUNT por caminho relativo, compatível com os geradores.
 
 ## Pontos de alcatifas (13/09/2026)
 
