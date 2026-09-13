@@ -5,13 +5,35 @@ import { trackCallClick } from "@/lib/analytics";
 import { GoogleG } from "@/components/icons/GoogleG";
 
 type TrustRatingBadgeProps = {
-  variant: "hero" | "compact" | "mapsLink" | "floatingHero" | "mapsLinkClients" | "pillSmall" | "horizontal" | "card";
+  variant: "hero" | "heroMobile" | "compact" | "mapsLink" | "floatingHero" | "mapsLinkClients" | "pillSmall" | "horizontal" | "card";
 };
 
 const pillClass = "flex items-center gap-2 bg-black/30 border border-white/[0.14] rounded-full px-4 py-2 backdrop-blur-sm";
 
 const TrustRatingBadge = ({ variant }: TrustRatingBadgeProps) => {
   switch (variant) {
+    case "heroMobile":
+      return (
+        <a
+          href={GOOGLE_REVIEWS_VIEW_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex min-h-[66px] items-center gap-2.5 rounded-2xl border border-white/80 bg-white/[0.96] px-3 py-2.5 shadow-[0_12px_28px_rgba(0,0,0,0.24)] backdrop-blur-md"
+          aria-label={`${REVIEW_RATING} de 5, ${REVIEW_COUNT}+ avaliações no Google`}
+        >
+          <span className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl bg-[#F7F8F8]">
+            <GoogleG className="h-5 w-5" />
+          </span>
+          <span className="min-w-0">
+            <span className="flex items-center gap-1.5">
+              <span className="font-playfair text-xl font-bold leading-none text-[#0B2F2A]">{REVIEW_RATING}</span>
+              <Star className="h-3.5 w-3.5 fill-[#D4AF37] text-[#D4AF37]" aria-hidden="true" />
+            </span>
+            <span className="mt-1 block text-[8px] font-bold uppercase leading-tight tracking-[0.1em] text-[#0B2F2A]/60">{REVIEW_COUNT}+ avaliações Google</span>
+          </span>
+        </a>
+      );
+
     case "hero":
       return (
         <div className="mb-8">
@@ -77,26 +99,30 @@ const TrustRatingBadge = ({ variant }: TrustRatingBadgeProps) => {
           href={GOOGLE_REVIEWS_VIEW_URL}
           target="_blank"
           rel="noopener noreferrer"
-          className="group flex min-w-[330px] items-center gap-3 rounded-2xl border border-[#D4AF37]/45 bg-[#071f1b]/90 px-4 py-3 shadow-[0_16px_42px_rgba(0,0,0,0.32)] backdrop-blur-xl transition-all duration-200 hover:-translate-y-0.5 hover:border-[#D4AF37]/75 hover:bg-[#092922]/95"
+          className="group relative flex min-h-[88px] min-w-[330px] items-center gap-4 overflow-hidden rounded-[22px] border border-white/80 bg-white/[0.96] px-5 py-4 shadow-[0_22px_55px_rgba(0,0,0,0.38),inset_0_1px_0_rgba(255,255,255,0.9)] backdrop-blur-xl transition-all duration-200 hover:-translate-y-0.5 hover:bg-white"
           aria-label={`${REVIEW_RATING} de 5, ${REVIEW_COUNT}+ avaliações no Google`}
         >
-          <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-white shadow-sm">
-            <GoogleG className="h-6 w-6" />
+          <span className="absolute inset-x-6 top-0 h-px bg-gradient-to-r from-transparent via-[#D4AF37] to-transparent" aria-hidden="true" />
+          <span className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-2xl border border-black/[0.06] bg-[#F7F8F8] shadow-[inset_0_1px_0_rgba(255,255,255,0.9)]">
+            <GoogleG className="h-7 w-7" />
           </span>
           <span className="min-w-0 flex-1">
-            <span className="flex items-center gap-2">
-              <span className="font-playfair text-xl font-bold leading-none text-white">{REVIEW_RATING}</span>
-              <span className="flex gap-0.5" aria-hidden="true">
+            <span className="block text-[10px] font-bold uppercase tracking-[0.2em] text-[#0B2F2A]/60">Avaliação Google</span>
+            <span className="mt-1 flex items-end gap-2">
+              <span className="font-playfair text-[2rem] font-bold leading-[0.9] text-[#0B2F2A]">{REVIEW_RATING}</span>
+              <span className="flex gap-0.5 pb-0.5" aria-hidden="true">
                 {[...Array(5)].map((_, i) => (
-                  <Star key={i} className="h-3.5 w-3.5 fill-[#D4AF37] text-[#D4AF37]" />
+                  <Star key={i} className="h-4 w-4 fill-[#D4AF37] text-[#D4AF37]" />
                 ))}
               </span>
             </span>
-            <span className="mt-1 block text-[11px] font-medium tracking-wide text-white/65">
-              {REVIEW_COUNT}+ avaliações no Google
+            <span className="mt-1.5 block text-[11px] font-semibold tracking-wide text-[#0B2F2A]/65">
+              {REVIEW_COUNT}+ avaliações de clientes
             </span>
           </span>
-          <ExternalLink className="h-4 w-4 flex-shrink-0 text-[#D4AF37]/75 transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
+          <span className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-[#0B2F2A] text-white shadow-sm transition-transform group-hover:translate-x-0.5">
+            <ExternalLink className="h-3.5 w-3.5" aria-hidden="true" />
+          </span>
         </a>
       );
 

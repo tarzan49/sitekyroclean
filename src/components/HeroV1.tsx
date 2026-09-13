@@ -89,21 +89,18 @@ const Hero = () => {
               Especialistas em limpeza de estofos ao domicílio. Cuidado profissional, orçamento transparente e resposta em menos de 10 minutos. Equipas em Braga, Porto, Lisboa e Algarve.
             </p>
 
-            {/* Mobile keeps both trust signals together below the message. */}
-            <div className="flex flex-wrap items-center gap-2 md:hidden">
-              <div className="flex items-center gap-2 rounded-full border border-white/[0.14] bg-black/30 px-4 py-2 backdrop-blur-sm">
-                <BadgeCheck className="h-3.5 w-3.5 flex-shrink-0 text-[#D4AF37]" strokeWidth={2} aria-hidden="true" />
-                <span
-                  className="font-playfair text-lg font-bold leading-none text-gold"
-                  style={{ textShadow: '0 1px 8px rgba(0,0,0,0.5)' }}
-                >
-                  {STATS[0].value}
+            {/* Mobile presents both trust signals as a compact pair. */}
+            <div className="grid w-full max-w-[430px] grid-cols-2 gap-2 md:hidden">
+              <div className="flex min-h-[66px] items-center gap-2.5 rounded-2xl border border-white/80 bg-[#F9F5E5]/95 px-3 py-2.5 shadow-[0_12px_28px_rgba(0,0,0,0.24)] backdrop-blur-md">
+                <span className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl bg-[#0B2F2A]">
+                  <BadgeCheck className="h-[18px] w-[18px] text-[#E7CE73]" strokeWidth={1.9} aria-hidden="true" />
                 </span>
-                <span className="text-[9px] font-semibold uppercase tracking-[0.12em] text-white/65">{STATS[0].label}</span>
+                <span className="min-w-0">
+                  <span className="block font-playfair text-xl font-bold leading-none text-[#0B2F2A]">{STATS[0].value}</span>
+                  <span className="mt-1 block text-[8px] font-bold uppercase leading-tight tracking-[0.1em] text-[#0B2F2A]/60">{STATS[0].label}</span>
+                </span>
               </div>
-              <span>
-                <TrustRatingBadge variant="mapsLink" />
-              </span>
+              <TrustRatingBadge variant="heroMobile" />
             </div>
 
           </div>
@@ -163,13 +160,17 @@ const Hero = () => {
           <TrustRatingBadge variant="floatingHero" />
         </div>
 
-        <div className="absolute bottom-[7%] left-8 z-10 hidden items-center gap-3 rounded-2xl border border-[#D4AF37]/40 bg-[#071f1b]/90 px-4 py-3 shadow-[0_16px_42px_rgba(0,0,0,0.32)] backdrop-blur-xl md:flex lg:left-16 xl:left-20 2xl:left-[calc((100vw-1400px)/2+5rem)]">
-          <span className="flex h-10 w-10 items-center justify-center rounded-full border border-[#D4AF37]/35 bg-[#D4AF37]/10">
-            <BadgeCheck className="h-5 w-5 text-[#D4AF37]" strokeWidth={1.8} aria-hidden="true" />
+        <div className="absolute bottom-[7%] left-8 z-10 hidden min-h-[88px] min-w-[330px] items-center gap-4 overflow-hidden rounded-[22px] border border-white/80 bg-[linear-gradient(115deg,rgba(249,245,229,0.97),rgba(255,255,255,0.95))] px-5 py-4 shadow-[0_22px_55px_rgba(0,0,0,0.38),inset_0_1px_0_rgba(255,255,255,0.9)] backdrop-blur-xl md:flex lg:left-16 xl:left-20 2xl:left-[calc((100vw-1400px)/2+5rem)]">
+          <span className="absolute inset-x-6 top-0 h-px bg-gradient-to-r from-transparent via-[#E7CE73] to-transparent" aria-hidden="true" />
+          <span className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-2xl bg-[#0B2F2A] shadow-[inset_0_1px_0_rgba(255,255,255,0.14)]">
+            <BadgeCheck className="h-6 w-6 text-[#E7CE73]" strokeWidth={1.9} aria-hidden="true" />
           </span>
-          <span>
-            <span className="block font-playfair text-2xl font-bold leading-none text-[#D4AF37]">{STATS[0].value}</span>
-            <span className="mt-1 block text-[10px] font-semibold uppercase tracking-[0.14em] text-white/65">{STATS[0].label}</span>
+          <span className="min-w-0">
+            <span className="block text-[10px] font-bold uppercase tracking-[0.2em] text-[#0B2F2A]/60">Experiência Kyro</span>
+            <span className="mt-1 flex items-end gap-2">
+              <span className="font-playfair text-[2rem] font-bold leading-[0.9] text-[#0B2F2A]">{STATS[0].value}</span>
+              <span className="pb-0.5 text-[11px] font-semibold uppercase tracking-[0.12em] text-[#0B2F2A]/65">{STATS[0].label}</span>
+            </span>
           </span>
         </div>
 
