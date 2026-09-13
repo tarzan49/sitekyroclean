@@ -1,31 +1,27 @@
 import DirectoryGroup from "@/components/DirectoryGroup";
-import SofaLeadActions from "@/components/SofaLeadActions";
+import ProblemHero from "@/components/ProblemHero";
+import { getProblemHero } from "@/data/problemHero";
 import { useEffect, useMemo } from "react";
 import { useLocation, Link } from "react-router-dom";
 import { QuizLocationProvider, QuizServiceProvider } from "@/context/QuizLocationContext";
 import {
-  MapPin, Star, ArrowRight, AlertTriangle,
+  MapPin, ArrowRight, AlertTriangle,
 } from "lucide-react";
 import Header from "@/components/Header";
-import PageBreadcrumb from "@/components/PageBreadcrumb";
-import HeroBeforeAfterPool from "@/components/HeroBeforeAfterPool";
-import { categoryForServiceSlug } from "@/data/beforeAfterPool";
 import Footer from "@/components/Footer";
 import SectionHeader from "@/components/SectionHeader";
 import ServiceFAQ from "@/components/ServiceFAQ";
 import ServicePriceSection from "@/components/ServicePriceSection";
 import ServiceAutoCarousel from "@/components/ServiceAutoCarousel";
-import ServiceSnapshotStats from "@/components/ServiceSnapshotStats";
 import ServiceLocationSchema from "@/components/ServiceLocationSchema";
 import { getProblemBySlug, getRelatedProblemLinks } from "@/data/problemSeoData";
-import { CATEGORY_TIPS, CATEGORY_STATS, splitTipsHeading } from "@/data/problemTipsData";
+import { CATEGORY_TIPS, splitTipsHeading } from "@/data/problemTipsData";
 import { getServiceGallery, getIllustrativePhotos } from "@/constants/serviceGallery";
 import { cities, services, DEFAULT_PRICE_FROM, cityPrep } from "@/data/locationSeoData";
 import { SERVICE_TO_QUIZ } from "@/constants/serviceToQuiz";
 import { METRO_CITY_SLUGS } from "@/constants/metroCities";
 import { getAllProblemCityRoutes } from "@/data/problemCitySeoData";
-import { getProblemHeroImage } from "@/lib/problemHeroImages";
-import { SITE_URL, WHATSAPP_BASE } from "@/constants/business";
+import { SITE_URL } from "@/constants/business";
 import ServiceReviewsGrid from "@/components/ServiceReviewsGrid";
 
 const PROCESS_STEPS = [
@@ -80,6 +76,7 @@ const ProblemCityPage = () => {
   }
 
   const prep = cityPrep(city.name);
+  const hero = getProblemHero(problem, city.name);
   const quizService = SERVICE_TO_QUIZ[problem.relatedServices[0]] ?? 'sofa';
 
   const relatedProblemLinks = getRelatedProblemLinks(problem.relatedProblems);
@@ -89,11 +86,6 @@ const ProblemCityPage = () => {
   const servicePrice = relatedServiceData[0]?.priceFrom ?? DEFAULT_PRICE_FROM;
   const categoryTips = CATEGORY_TIPS[problem.category];
   const gallery = getServiceGallery(problem.relatedServices[0], `${problem.slug}-${city.slug}`);
-  const heroImg = getProblemHeroImage(problem.slug);
-  const beforeAfterCategory = categoryForServiceSlug(problem.relatedServices[0]);
-  const waHref = WHATSAPP_BASE;
-  const snapshotStats = CATEGORY_STATS[problem.category] ?? CATEGORY_STATS.manchas;
-
   const validCitySlugs = new Set([...METRO_CITY_SLUGS, ...problem.relatedCities]);
   const nearbyCities = cities
     .filter(c => c.slug !== city.slug && validCitySlugs.has(c.slug))
@@ -106,10 +98,6 @@ const ProblemCityPage = () => {
       : `${faq.answer} Prestamos este serviço ao domicílio ${prep} ${city.name} e arredores.`,
   }));
 
-  const h1Words = problem.h1.trim().split(" ");
-  const h1Gold = h1Words.pop() ?? "";
-  const h1Rest = h1Words.join(" ");
-
   return (
     <QuizLocationProvider value={city.name}>
     <QuizServiceProvider value={quizService}>
@@ -118,79 +106,15 @@ const ProblemCityPage = () => {
         serviceName={problem.h1}
         serviceBaseUrl={`/problemas/${problem.slug}`}
         placeName={city.name}
-        description={`${problem.intro.match(/^[^.?]*[.?]/)?.[0] ?? problem.intro} ${prep} ${city.name}. Serviço profissional ao domicílio.`}
+        description={hero.intro}
         pageUrl={pathname}
         priceFrom={servicePrice}
       />
       <Header />
       <main>
 
-        {/* ═══ HERO + SNAPSHOT (fundo fotográfico contínuo) ═══ */}
-        <div className="relative overflow-hidden">
-          <div className="absolute inset-0" style={{ background: "#071a12" }} />
-          <div className="absolute inset-0 overflow-hidden" aria-hidden="true">
-            <img src={heroImg} alt="" className="w-full h-full object-cover" loading="eager" />
-          </div>
-          <div className="absolute inset-0" style={{ background: "linear-gradient(to bottom, rgba(7,26,18,0.42) 0%, rgba(7,26,18,0.65) 40%, rgba(7,26,18,0.88) 75%, rgba(7,26,18,0.97) 100%)" }} />
-
-        <section className="relative pt-16 md:pt-24 lg:pt-28 pb-16 md:pb-24">
-          <div className="container mx-auto px-5 sm:px-6 lg:px-8 relative z-10">
-            <div className="max-w-6xl mx-auto grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
-              <div>
-                <PageBreadcrumb items={[
-                  { label: "Início", to: "/" },
-                  { label: problem.h1, to: `/problemas/${problem.slug}` },
-                  { label: city.name },
-                ]} />
-
-                <div className="inline-flex items-start mb-3 lg:mb-5">
-                  <div className="flex flex-col gap-1">
-                    <div className="w-7 h-px bg-gradient-to-r from-gold to-transparent" />
-                    <span className="text-[10px] font-bold text-gold/90 tracking-[0.30em] uppercase" style={{ textShadow: "0 1px 6px rgba(0,0,0,0.6)" }}>
-                      Como resolver {prep} {city.name}
-                    </span>
-                  </div>
-                </div>
-
-                <h1 className="font-playfair text-[1.75rem] sm:text-4xl md:text-5xl lg:text-6xl font-semibold text-white mb-3 lg:mb-4 leading-[1.12]" style={{ textShadow: "0 2px 16px rgba(0,0,0,0.65)" }}>
-                  {h1Rest} {h1Gold} {prep} <span style={{ color: "#D4AF37" }}>{city.name}</span>
-                </h1>
-
-                <p className="text-sm sm:text-base md:text-lg text-white/70 leading-relaxed mb-4 lg:mb-6 max-w-lg line-clamp-2">
-                  {problem.intro.replace(/no Porto|ao domicílio/g, `${prep} ${city.name}`).match(/^[^.?]*[.?]/)?.[0] ?? problem.intro}
-                </p>
-
-
-                <SofaLeadActions city={city.name} price={servicePrice} href={waHref} source={`problem_city_hero_${problem.slug}_${city.slug}`} />
-              </div>
-
-              <div className="mt-8 lg:mt-0">
-                <div className="relative">
-                  <div className="absolute -inset-4 blur-2xl opacity-20" style={{ background: "linear-gradient(135deg, #D4AF37, transparent)" }} />
-                  {beforeAfterCategory ? (
-                    <div className="relative shadow-2xl" style={{ borderTop: "2px solid #D4AF37" }}>
-                      <HeroBeforeAfterPool category={beforeAfterCategory} className="w-full" />
-                    </div>
-                  ) : (
-                    <img
-                      src={heroImg}
-                      alt={`${problem.h1} ${prep} ${city.name}`}
-                      className="relative w-full max-h-[440px] object-cover shadow-2xl"
-                      style={{ borderTop: "2px solid #D4AF37" }}
-                      loading="eager"
-                    />
-                  )}
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <ServiceSnapshotStats stats={snapshotStats} />
-        </div>
-
-        {/* ═══ TABELA DE PREÇOS ═══ */}
-        <ServicePriceSection serviceSlug={problem.relatedServices[0]} initialLocation={city.name} />
+        <ProblemHero problem={problem} city={city.name} />
+        <div id="precos" className="scroll-mt-20"><ServicePriceSection serviceSlug={problem.relatedServices[0]} initialLocation={city.name} /></div>
 
         {/* ═══ AVALIAÇÕES REAIS — logo abaixo do widget ═══ */}
         <section className="py-14 md:py-20 bg-[#FDFDF9]">

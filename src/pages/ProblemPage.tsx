@@ -1,5 +1,5 @@
 import DirectoryGroup from "@/components/DirectoryGroup";
-import SofaLeadActions from "@/components/SofaLeadActions";
+import ProblemHero from "@/components/ProblemHero";
 import { useEffect, useMemo } from "react";
 import { useParams, Link } from "react-router-dom";
 import { QuizServiceProvider } from "@/context/QuizLocationContext";
@@ -7,16 +7,12 @@ import {
   MapPin, ArrowRight,
 } from "lucide-react";
 import Header from "@/components/Header";
-import PageBreadcrumb from "@/components/PageBreadcrumb";
-import HeroBeforeAfterPool from "@/components/HeroBeforeAfterPool";
-import { categoryForServiceSlug } from "@/data/beforeAfterPool";
 import Footer from "@/components/Footer";
 import SectionHeader from "@/components/SectionHeader";
 import ServiceFAQ from "@/components/ServiceFAQ";
 import VisualExamplesGallery from "@/components/VisualExamplesGallery";
 import IllustratedProcessGuide from "@/components/IllustratedProcessGuide";
 import { PROBLEM_IMAGES } from "@/constants/problemCardHelpers";
-import TrustRatingBadge from "@/components/TrustRatingBadge";
 import ServicePriceSection from "@/components/ServicePriceSection";
 import ServicePackBanner from "@/components/ServicePackBanner";
 import { SERVICE_PACK_SLUGS } from "@/constants/servicePackSlugs";
@@ -24,9 +20,7 @@ import { getProblemLayout } from "@/data/problemLayout";
 import { getProblemBySlug, getRelatedProblemLinks } from "@/data/problemSeoData";
 import { services, cities } from "@/data/locationSeoData";
 import { SERVICE_TO_QUIZ } from "@/constants/serviceToQuiz";
-import { getProblemHeroImage } from "@/lib/problemHeroImages";
-import { buildProblemWaMessage } from "@/lib/whatsappMessages";
-import { SITE_URL, WHATSAPP_BASE } from "@/constants/business";
+import { SITE_URL } from "@/constants/business";
 import ServiceReviewsGrid from "@/components/ServiceReviewsGrid";
 import {
   buildLocalBusinessNode,
@@ -88,85 +82,15 @@ const ProblemPage = () => {
   const relatedCityData = data.relatedCities
     .map(s => cities.find(c => c.slug === s))
     .filter(Boolean) as typeof cities[number][];
-  const servicePrice = relatedService?.priceFrom ?? "49€";
   const layout = getProblemLayout(data);
-  const heroImg = getProblemHeroImage(slug ?? "");
-  const beforeAfterCategory = categoryForServiceSlug(data.relatedServices[0]);
-  const waHref = `${WHATSAPP_BASE}?text=${encodeURIComponent(buildProblemWaMessage(slug ?? ""))}`;
-
-  const h1Words = data.h1.trim().split(" ");
-  const h1Gold = h1Words.pop() ?? "";
-  const h1Rest = h1Words.join(" ");
-
   return (
     <QuizServiceProvider value={quizService}>
     <>
       <Header />
       <main>
 
-        {/* Hero com a mesma composição das páginas de materiais. */}
-        <section className="relative pt-24 md:pt-28 pb-16 md:pb-24 overflow-hidden">
-          <div className="absolute inset-0" style={{ background: "#071a12" }} />
-          <div className="absolute inset-0 overflow-hidden" aria-hidden="true">
-            <img src={heroImg} alt="" className="w-full h-full object-cover" loading="eager" />
-          </div>
-          <div className="absolute inset-0" style={{ background: "linear-gradient(to bottom, rgba(7,26,18,0.42) 0%, rgba(7,26,18,0.65) 40%, rgba(7,26,18,0.88) 75%, rgba(7,26,18,0.97) 100%)" }} />
-
-          <div className="container mx-auto px-5 sm:px-6 lg:px-8 relative z-10">
-            <div className="max-w-6xl mx-auto grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
-              <div>
-                <PageBreadcrumb items={[
-                  { label: "Início", to: "/" },
-                  { label: data.h1 },
-                ]} />
-
-                <div className="inline-flex items-start mb-5">
-                  <div className="flex flex-col gap-1">
-                    <div className="w-7 h-px bg-gradient-to-r from-gold to-transparent" />
-                    <span className="text-[10px] font-bold text-gold/90 tracking-[0.30em] uppercase" style={{ textShadow: "0 1px 6px rgba(0,0,0,0.6)" }}>
-                      Como Resolver
-                    </span>
-                  </div>
-                </div>
-
-                <h1 className="font-playfair text-[1.75rem] sm:text-4xl md:text-5xl lg:text-6xl font-semibold text-white mb-4 leading-[1.12]" style={{ textShadow: "0 2px 16px rgba(0,0,0,0.65)" }}>
-                  {h1Rest}{" "}<span style={{ color: "#D4AF37" }}>{h1Gold}</span>
-                </h1>
-
-                <p className="text-sm sm:text-base md:text-lg text-white/70 leading-relaxed mb-6 max-w-lg line-clamp-2">
-                  {data.intro.match(/^[^.?]*[.?]/)?.[0] ?? data.intro}
-                </p>
-
-                <div className="mb-6">
-                  <TrustRatingBadge variant="mapsLinkClients" />
-                </div>
-
-                <SofaLeadActions city="a sua zona" price={servicePrice} href={waHref} source={`problem_hero_${slug}`} />
-              </div>
-
-              <div className="mt-8 lg:mt-0">
-                <div className="relative">
-                  <div className="absolute -inset-4 blur-2xl opacity-20" style={{ background: "linear-gradient(135deg, #D4AF37, transparent)" }} />
-                  {beforeAfterCategory ? (
-                    <div className="relative shadow-2xl" style={{ borderTop: "2px solid #D4AF37" }}>
-                      <HeroBeforeAfterPool category={beforeAfterCategory} className="w-full" />
-                    </div>
-                  ) : (
-                    <img
-                      src={heroImg}
-                      alt={data.h1}
-                      className="relative w-full max-h-[440px] object-cover shadow-2xl"
-                      style={{ borderTop: "2px solid #D4AF37" }}
-                      loading="eager"
-                    />
-                  )}
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <ServicePriceSection serviceSlug={data.relatedServices[0]} />
+        <ProblemHero problem={data} />
+        <div id="precos" className="scroll-mt-20"><ServicePriceSection serviceSlug={data.relatedServices[0]} /></div>
 
         {/* ═══ AVALIAÇÕES REAIS ═══ */}
         <section className="py-14 md:py-20 bg-kyro-green">

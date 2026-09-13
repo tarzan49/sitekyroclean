@@ -175,3 +175,8 @@ Pedido do responsável: nas páginas de material, avaliações imediatamente ap�
 Os guias de sofá, exceto pele/couro, têm seis etapas: avaliação, aspiração, aplicação, escovação, extração e secagem. A escovação fica obrigatoriamente entre aplicação e extração. Couro mantém os cinco cuidados próprios. No mobile, seis separadores usam duas linhas de três para manter os rótulos legíveis.
 
 Materiais: sequência de fundos aprovada: exemplos branco, processo verde, perguntas branco, pack «Aproveite a mesma visita» verde. A variante clara das FAQs é explícita, sem alterar as restantes páginas.
+
+
+## Hero de problemas (13/09/2026)
+
+Pedido do responsável: redesenhar o hero em todas as páginas de problemas, nacionais e por localidade. Usar `ProblemHero`, sem voltar a duplicar markup nas duas páginas. Preservar identificação do problema, galeria antes/depois, WhatsApp principal, link funcional ao orçamento, avaliações reais, resposta inferior a 10 minutos e deslocação explícita. Texto separado da fotografia, sem cortes na introdução; cidade em linha própria e na mensagem. `problemHero.ts` partilha o conteúdo com o HTML inicial. Não voltar às introduções antigas com promessas sanitárias ou remoção garantida.

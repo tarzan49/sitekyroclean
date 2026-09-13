@@ -31,6 +31,7 @@ import { getAllFreguesiaRoutes, getFreguesia, generateFreguesiaContent } from '.
 import { getAllKeywordVariantRoutes, getKeywordVariantData } from '../src/data/keywordVariantData';
 import { getAllProblems, getProblemBySlug } from '../src/data/problemSeoData';
 import { getProblemLayout } from '../src/data/problemLayout';
+import { getProblemHero } from '../src/data/problemHero';
 import { getAllProblemCityRoutes } from '../src/data/problemCitySeoData';
 import { getAllMaterials, getAllMaterialCityRoutes, getMaterialCityData } from '../src/data/materialSeoData';
 import { getAllPriceRoutes, getPricePageData } from '../src/data/priceSeoData';
@@ -137,6 +138,7 @@ function buildFaqSchema(faqs: { question: string; answer: string }[]) {
 // ─── Content HTML generators ───────────────────────────────────────────────
 
 interface PageContent {
+  hero?: ReturnType<typeof getProblemHero>;
   h1: string;
   intro: string;
   localSection?: string;
@@ -152,6 +154,10 @@ interface PageContent {
 
 function generatePageBody(c: PageContent, lang: 'pt' | 'en' = 'pt'): string {
   let html = `<main>\n<h1>${escHtml(c.h1)}</h1>\n<p>${escHtml(c.intro)}</p>\n`;
+
+  if (c.hero) {
+    html += `<p>${escHtml(c.hero.eyebrow)}</p><p>${escHtml(c.hero.priceLabel)} + ${escHtml(c.hero.travelLabel)}</p><a href="${escHtml(c.hero.waHref)}">Pedir orçamento por WhatsApp</a><p>${escHtml(c.hero.response)} · Sem compromisso</p><a href="#precos">${escHtml(c.hero.priceLinkLabel)}</a><div id="precos"><a href="${escHtml(c.hero.service.baseRoute)}#precos">Orçamento de ${escHtml(c.hero.service.name.toLowerCase())}</a></div>\n`;
+  }
 
   if (c.localSection) {
     html += `<p>${escHtml(c.localSection)}</p>\n`;
@@ -398,11 +404,12 @@ export function prerenderRoutes(outDir: string): number {
     const prev = count;
     for (const p of getAllProblems()) {
       const layout = getProblemLayout(p);
+      const hero = getProblemHero(p);
       emit(
         `/problemas/${p.slug}`,
         p.title,
         p.metaDescription,
-        { h1: p.h1 ?? p.title, intro: p.intro.match(/^[^.?]*[.?]/)?.[0] ?? p.intro, problems: layout.examples.map(example => ({ title: example.title, description: "Exemplo ilustrativo." })), processSteps: layout.process.map((step, index) => ({ step: index + 1, ...step })), faqs: layout.faqs },
+        { hero, h1: hero.heading, intro: hero.intro, problems: layout.examples.map(example => ({ title: example.title, description: "Exemplo ilustrativo." })), processSteps: layout.process.map((step, index) => ({ step: index + 1, ...step })), faqs: layout.faqs },
         [buildFaqSchema(layout.faqs)],
       );
     }
@@ -416,6 +423,7 @@ export function prerenderRoutes(outDir: string): number {
       const problem = getProblemBySlug(route.problemSlug);
       const city    = cities.find(c => c.slug === route.citySlug);
       if (!problem || !city) continue;
+      const hero = getProblemHero(problem, city.name);
       const title = `${problem.h1} em ${city.name} | Kyro Clean Solutions`;
       const desc  = `${problem.h1} em ${city.name}: serviço profissional ao domicílio. ${problem.metaDescription.split('.')[0]}. Resposta em menos de 10 minutos.`;
       const schemas: object[] = [
@@ -429,7 +437,7 @@ export function prerenderRoutes(outDir: string): number {
         route.path,
         title,
         desc,
-        { h1: `${problem.h1} em ${city.name}`, intro: problem.intro, localSection: desc, howItWorks: problem.solutionDetail, benefits: problem.benefits, faqs: problem.faqs },
+        { hero, h1: hero.heading, intro: hero.intro, localSection: desc, howItWorks: problem.solutionDetail, benefits: problem.benefits, faqs: problem.faqs },
         schemas,
       );
     }
