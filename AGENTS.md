@@ -110,3 +110,8 @@ Atualização do teste local (2026-09-10): `?teste=quiz-pack` agora demonstra co
 ## Contacto simples (2026-09-10)
 
 O passo «Os seus dados» começa pelo nome e telemóvel, com preenchimento automático. Resumo do pedido fechado por defeito e abaixo dos campos. Não colocar recibos abertos, avaliações, estimativa fixa no topo nem totais repetidos no rodapé deste passo. A ação principal é «Enviar pedido». Preservar preços, detalhes e validação do envio.
+
+
+## Apresentação dos extras (2026-09-13)
+
+Na pré-visualização `codex/libre-franklin-preview`, os cartões de sofá, colchão, cadeiras e tapete seguem a mesma estrutura: nome, vantagem em destaque, preço/comparação e condição. Não repetir selos OFERTA em cada cartão. Comunicar a poupança real de sofá/colchão e «Limpe 4, pague 3» / «Limpe 5 m², pague 4» nas ofertas existentes. Sem alterações de preços ou urgência artificial.

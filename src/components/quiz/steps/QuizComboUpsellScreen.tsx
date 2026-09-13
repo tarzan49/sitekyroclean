@@ -387,10 +387,10 @@ const QuizComboUpsellScreen = ({ offerPreview = false, travelFee = 10, primarySe
   }
 
   const rowConfig: { view: View; label: string; summary: string; priceLine: ReactNode; benefit?: string; condition?: string; selected: boolean; imagePosition: string }[] = [
-    { view: 'mattress', imagePosition: '0% 0%', label: 'Colchão', summary: mattressSummary, priceLine: mattressPriceLine, selected: mattressQtyTotal > 0 },
-    { view: 'sofa', imagePosition: '100% 0%', label: 'Sofá', summary: sofaSummary, priceLine: sofaPriceLine, selected: sofaQtyTotal > 0 },
-    { view: 'chairs', imagePosition: '0% 100%', label: 'Cadeiras', summary: chairsSummary, priceLine: chairsPriceLine, benefit: initialChairs?.waterproof ? undefined : '1 cadeira de oferta', condition: 'Por cada 4 cadeiras que juntar.', selected: chairsQty > 0 },
-    { view: 'carpet', imagePosition: '100% 100%', label: 'Tapete', summary: carpetSummary, priceLine: 'Valor sob orçamento', benefit: '1 m² de oferta', condition: 'Por cada 5 m² de tapete.', selected: carpetValidCount > 0 },
+    { view: 'mattress', imagePosition: '0% 0%', label: 'Colchão', summary: mattressSummary, priceLine: mattressPriceLine, benefit: `Poupa ${fmt(Number(mattressCasal.cleaningPrice) - Number(mattressUnitPrice(mattressCasal)))}€/un.`, condition: mattressQtyTotal > 0 ? mattressSummary : 'Colchão casal · nesta visita', selected: mattressQtyTotal > 0 },
+    { view: 'sofa', imagePosition: '100% 0%', label: 'Sofá', summary: sofaSummary, priceLine: sofaQty['4+-lugares'] ? <>{sofaQtyTotal > sofaQty['4+-lugares'] && <>{sofaPriceLine} + </>}Sob orçamento</> : sofaPriceLine, benefit: sofaQty['4+-lugares'] ? 'Avaliação personalizada' : `Poupa ${fmt(Number(sofaReference.cleaningPrice) - Number(sofaUnitPrice(sofaReference)))}€/un.`, condition: sofaQtyTotal > 0 ? sofaSummary : 'Sofá de 2 lugares · nesta visita', selected: sofaQtyTotal > 0 },
+    { view: 'chairs', imagePosition: '0% 100%', label: 'Cadeiras', summary: chairsSummary, priceLine: chairsPriceLine, benefit: initialChairs?.waterproof ? undefined : 'Limpe 4, pague 3', condition: initialChairs?.waterproof ? chairsSummary : chairsQty > 0 ? `${chairsQty} cadeiras · ${chairsFree} incluída${chairsFree === 1 ? '' : 's'} sem custo` : '1 cadeira grátis por conjunto de 4', selected: chairsQty > 0 },
+    { view: 'carpet', imagePosition: '100% 100%', label: 'Tapete', summary: carpetSummary, priceLine: 'Valor sob orçamento', benefit: 'Limpe 5 m², pague 4', condition: '1 m² grátis por cada 5 m²', selected: carpetValidCount > 0 },
   ];
 
   const visibleRows = rowConfig.filter(row => row.view !== primaryService || row.selected);
@@ -406,7 +406,7 @@ const QuizComboUpsellScreen = ({ offerPreview = false, travelFee = 10, primarySe
       </h2>
       <p className="text-xs text-white/55 text-center max-w-xs leading-relaxed -mt-1">
         {offerPreview
-          ? <>Junte o que falta limpar e aproveite estas ofertas na mesma visita. Deslocação excluída.</>
+          ? <>Aproveite a deslocação e pague menos pela limpeza dos restantes artigos. Deslocação excluída.</>
           : <>Combine mais um serviço na mesma visita e poupe no preço de cada artigo. Deslocação excluída.</>}
       </p>
 
@@ -443,13 +443,11 @@ const QuizComboUpsellScreen = ({ offerPreview = false, travelFee = 10, primarySe
               <span className="text-sm font-bold text-white">{row.label}</span>
               {offerPreview && row.benefit && (
                 <span className="flex flex-col items-start gap-1">
-                  <span className="rounded-sm bg-[#D4AF37] px-2 py-0.5 text-[10px] font-extrabold tracking-wider text-[#071a12]">OFERTA</span>
                   <span className="text-base sm:text-lg font-extrabold leading-tight text-[#D4AF37]">{row.benefit}</span>
-                  <span className="text-xs leading-snug text-white/70">{row.condition}</span>
                 </span>
               )}
               <span className={cn('leading-relaxed', offerPreview ? 'text-sm font-semibold text-[#D4AF37]' : 'text-[12px] font-normal text-gold/75')}>{offerPreview ? row.priceLine : row.summary}</span>
-              {offerPreview && row.selected && <span className="text-[10px] text-white/45">{row.summary}</span>}
+              {offerPreview && <span className="text-xs leading-snug text-white/60">{row.condition ?? (row.selected ? row.summary : '')}</span>}
             </span>
           </button>
         ))}
