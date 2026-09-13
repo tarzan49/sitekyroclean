@@ -25,7 +25,7 @@ export default function TreatmentPage() {
   if (!page) return null;
   const wa = `${WHATSAPP_BASE}?text=${encodeURIComponent(`Olá! Gostaria de pedir orçamento: ${page.h1}.\nArtigo e quantidade: \nMedidas: \nLocalidade: ${page.city?.name ?? ''}\nPosso enviar fotografias para avaliação.`)}`;
   return <><Header /><main className="bg-[#FDFDF9] text-[#111111]">
-    <section className="bg-[#071a12] text-white pt-28 pb-16 px-5"><div className="max-w-5xl mx-auto">
+    <section data-mobile-hero="text" className="bg-[#071a12] text-white pt-28 pb-16 px-5"><div className="max-w-5xl mx-auto">
       <p className="text-gold uppercase tracking-widest text-xs mb-5">Cuidado à medida dos seus estofos</p>
       <h1 className="font-playfair text-4xl md:text-6xl max-w-4xl mb-6">{page.h1}</h1>
       <p className="text-white/75 max-w-2xl text-lg leading-relaxed mb-7">{page.intro}</p>

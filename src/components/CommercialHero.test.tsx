@@ -6,6 +6,16 @@ vi.mock('./HeroBeforeAfterPool', () => ({ default: () => <div>Antes e depois</di
 afterEach(cleanup);
 
 describe('mandatory commercial hero', () => {
+  it('opts the homepage out of mobile restyling and preserves its original photo', () => {
+    const props = { title: 'Homepage', serviceSlug: 'limpeza-sofas', whatsappHref: 'https://wa.me/351925530647', source: 'home_hero', image: { m: '/mobile.webp', d: '/desktop.webp' } };
+    const { container, rerender } = render(<MemoryRouter><CommercialHero {...props} preserveMobileHero /></MemoryRouter>);
+    expect(container.querySelector('[data-mobile-hero]')).toBeNull();
+    expect(container.querySelector('source')?.getAttribute('srcset')).toBe('/mobile.webp');
+    rerender(<MemoryRouter><CommercialHero {...props} /></MemoryRouter>);
+    expect(container.querySelector('[data-mobile-hero]')).not.toBeNull();
+    expect(container.querySelector('source')?.getAttribute('srcset')).toMatch(/^data:image\/gif/);
+    expect(container.querySelector('picture img')?.getAttribute('src')).toBe('/desktop.webp');
+  });
   it('keeps the approved order and a real background for every service', () => {
     for (const serviceSlug of ['limpeza-sofas', 'limpeza-colchoes', 'limpeza-tapetes', 'limpeza-alcatifas', 'limpeza-cadeiras', 'impermeabilizacao']) {
       const { container } = render(<MemoryRouter><CommercialHero title="Cuidado profissional" serviceSlug={serviceSlug} whatsappHref="https://wa.me/351925530647" source="test" /></MemoryRouter>);

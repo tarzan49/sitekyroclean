@@ -185,7 +185,7 @@ const GlossarioEstofos = () => {
         <Header />
 
         {/* ── Hero dark band ── */}
-        <div className="pt-24 pb-10 bg-checker-dark">
+        <div data-mobile-hero="text" className="pt-24 pb-10 bg-checker-dark">
           <div className="max-w-4xl mx-auto px-4 sm:px-6">
             <nav className="flex items-center gap-1.5 text-xs text-white/30 mb-6" aria-label="Breadcrumb">
               <Link to="/" className="hover:text-gold transition-colors">Início</Link>

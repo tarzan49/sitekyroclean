@@ -75,7 +75,7 @@ const AreasDeServico = () => {
       <Header />
       <main>
         {/* Hero */}
-        <section className="pt-24 md:pt-28 pb-10 md:pb-14 bg-background">
+        <section data-mobile-hero="text" className="pt-24 md:pt-28 pb-10 md:pb-14 bg-background">
           <div className="container mx-auto px-4 max-w-4xl">
             <div className="flex items-center gap-3 mb-4">
               <div className="h-px w-8 flex-shrink-0" style={{ backgroundColor: "#D4AF37", opacity: 0.65 }} />

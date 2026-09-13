@@ -121,7 +121,7 @@ const EnGuidePage = () => {
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }} />
 
         {/* ═══ HERO ═══ */}
-        <div className="relative overflow-hidden">
+        <div data-mobile-hero="photo" className="relative overflow-hidden">
           <div className="absolute inset-0" style={{ background: "#071a12" }} />
           <div className="absolute inset-0 overflow-hidden" aria-hidden="true">
             <img src={heroImg} alt="" className="w-full h-full object-cover" loading="eager" />
@@ -177,6 +177,7 @@ const EnGuidePage = () => {
                 </div>
               </div>
             </div>
+            <img src={heroImg} alt="Professional upholstery cleaning" width="720" height="540" loading="lazy" decoding="async" className="mx-5 mt-8 w-[calc(100%-2.5rem)] aspect-[4/3] object-cover rounded-xl md:hidden" />
           </section>
         </div>
 

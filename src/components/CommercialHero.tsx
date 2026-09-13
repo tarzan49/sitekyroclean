@@ -24,10 +24,11 @@ interface Props {
   whatsappHref: string;
   source: string;
   pricesHref?: string;
+  preserveMobileHero?: boolean;
 }
 
 /** Mandatory commercial hero order, shared by every service page family. */
-export default function CommercialHero({ title, subtitle, serviceSlug, city, price, image, breadcrumbs, whatsappHref, source, pricesHref = '#precos' }: Props) {
+export default function CommercialHero({ title, subtitle, serviceSlug, city, price, image, breadcrumbs, whatsappHref, source, pricesHref = '#precos', preserveMobileHero = false }: Props) {
   const service = services.find(item => item.slug === serviceSlug);
   const background = image ?? pickServiceHero(serviceSlug, city ?? title);
   const imgs = typeof background === 'string' ? { m: background, d: background } : background;
@@ -45,9 +46,9 @@ export default function CommercialHero({ title, subtitle, serviceSlug, city, pri
       ? { value: 'Até 24 h', label: 'Ativação da proteção', icon: Timer }
       : { value: '3 a 6 h', label: 'Secagem média', icon: Timer },
   ];
-  return <section data-commercial-hero className="relative isolate overflow-hidden pt-[68px] sm:pt-24 text-white">
+  return <section data-commercial-hero data-mobile-hero={preserveMobileHero ? undefined : true} className="relative isolate overflow-hidden pt-[68px] sm:pt-24 text-white">
     <picture className="absolute inset-0 -z-20" aria-hidden="true">
-      <source media="(max-width: 767px)" srcSet={imgs.m} />
+      <source media="(max-width: 767px)" srcSet={preserveMobileHero ? imgs.m : 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'} />
       <img src={imgs.d} alt="" className="h-full w-full object-cover object-center" loading="eager" fetchPriority="high" />
     </picture>
     <div className="absolute inset-0 -z-10" aria-hidden="true" style={{ background: 'linear-gradient(180deg, rgba(0,0,0,.48) 0%, rgba(0,0,0,.54) 55%, rgba(0,0,0,.68) 100%)' }} />

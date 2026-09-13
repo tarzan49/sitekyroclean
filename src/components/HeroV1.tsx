@@ -11,7 +11,7 @@ export default function HeroV1() {
     return () => window.removeEventListener('openQuiz', openQuiz);
   }, [openQuiz]);
   return <>
-    <CommercialHero title="Estofos como novos, ao domicílio." subtitle="Limpeza profissional de sofás, colchões, cadeiras e tapetes." serviceSlug="limpeza-sofas" image={{ m: '/images/hero-sofa-mobile-extended.webp', d: '/images/hero-sofa-v1.jpeg' }} breadcrumbs={[{ label: 'Início' }]} whatsappHref={`${WHATSAPP_BASE}?text=${encodeURIComponent('Olá! Gostaria de pedir um orçamento para limpeza de estofos.')}`} source="home_hero" pricesHref="#servicos" />
+    <CommercialHero preserveMobileHero title="Estofos como novos, ao domicílio." subtitle="Limpeza profissional de sofás, colchões, cadeiras e tapetes." serviceSlug="limpeza-sofas" image={{ m: '/images/hero-sofa-mobile-extended.webp', d: '/images/hero-sofa-v1.jpeg' }} breadcrumbs={[{ label: 'Início' }]} whatsappHref={`${WHATSAPP_BASE}?text=${encodeURIComponent('Olá! Gostaria de pedir um orçamento para limpeza de estofos.')}`} source="home_hero" pricesHref="#servicos" />
     <QuizForm isOpen={isQuizOpen} onClose={closeQuiz} />
   </>;
 }

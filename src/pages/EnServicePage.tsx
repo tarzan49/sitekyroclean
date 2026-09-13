@@ -111,7 +111,7 @@ const EnServicePage = () => {
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }} />
 
         {/* ═══ HERO + SNAPSHOT ═══ */}
-        <div className="relative overflow-hidden">
+        <div data-mobile-hero="photo" className="relative overflow-hidden">
           <div className="absolute inset-0" style={{ background: "#071a12" }} />
           <div className="absolute inset-0 overflow-hidden" aria-hidden="true">
             <img src={heroImg} alt="" className="w-full h-full object-cover" loading="eager" />
@@ -184,6 +184,7 @@ const EnServicePage = () => {
                 <p className="text-white/60 text-sm mt-4">{EN_AVAILABILITY_PROMISE}</p><p className="text-white/60 text-sm mt-2">{EN_DRYING_PROMISE}</p><p className="text-white/40 text-xs mt-4">Free quote · No obligation · {EN_RESPONSE_PROMISE}</p>
               </div>
             </div>
+            <img src={heroImg} alt="Professional upholstery cleaning" width="720" height="540" loading="lazy" decoding="async" className="mx-5 mt-8 w-[calc(100%-2.5rem)] aspect-[4/3] object-cover rounded-xl md:hidden" />
           </section>
 
           <ServiceSnapshotStats stats={stats} />

@@ -58,7 +58,7 @@ const BeforeAfterPage = () => {
       <Header />
       <main>
         {/* Hero */}
-        <section className="pt-24 md:pt-28 pb-10 md:pb-14 bg-[#FDFDF9]">
+        <section data-mobile-hero="text" className="pt-24 md:pt-28 pb-10 md:pb-14 bg-[#FDFDF9]">
           <div className="container mx-auto px-4">
             <div className="max-w-4xl mx-auto text-center">
               <nav className="flex items-center justify-center gap-1.5 text-xs md:text-sm text-[#1A4E30]/60 mb-6" aria-label="Breadcrumb">

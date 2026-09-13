@@ -86,7 +86,7 @@ const CommercialPage = () => {
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }} />
 
         {/* ═══ HERO ═══ */}
-        <div className="relative overflow-hidden">
+        <div data-mobile-hero="photo" className="relative overflow-hidden">
           <div className="absolute inset-0" style={{ background: "#071a12" }} />
           <div className="absolute inset-0 overflow-hidden" aria-hidden="true">
             <img src={heroImg} alt="" className="w-full h-full object-cover" loading="eager" />
@@ -147,6 +147,7 @@ const CommercialPage = () => {
                 <p className="text-white/40 text-xs mt-4">Orçamento personalizado · Visita de avaliação gratuita · Sem compromisso</p>
               </div>
             </div>
+            <img src={heroImg} alt="Limpeza profissional de estofos" width="720" height="540" loading="lazy" decoding="async" className="mx-5 mt-8 w-[calc(100%-2.5rem)] aspect-[4/3] object-cover rounded-xl md:hidden" />
           </section>
         </div>
 

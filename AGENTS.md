@@ -184,3 +184,8 @@ Materiais: sequência de fundos aprovada: exemplos branco, processo verde, pergu
 ## Hero de problemas (13/09/2026)
 
 Pedido do responsável: redesenhar o hero em todas as páginas de problemas, nacionais e por localidade. Usar `ProblemHero`, sem voltar a duplicar markup nas duas páginas. Preservar identificação do problema, galeria antes/depois, WhatsApp principal, link funcional ao orçamento, avaliações reais, resposta inferior a 10 minutos e deslocação explícita. Texto separado da fotografia, sem cortes na introdução; cidade em linha própria e na mensagem. `problemHero.ts` partilha o conteúdo com o HTML inicial. Não voltar às introduções antigas com promessas sanitárias ou remoção garantida.
+
+
+## Verde suave e heroes mobile (13/09/2026)
+
+Pedido aprovado: a paleta verde suave do piloto passa a ser partilhada pelo site, em `src/styles/surfaces.css`, sem a antiga textura. As áreas claras continuam claras. Em mobile (até 767px), os heroes usam fundo verde com degradé e fotografia/comparação separada do texto; no computador conserva-se a fotografia de fundo. `data-mobile-hero` delimita o tratamento nos heroes comerciais, marcas, materiais, problemas, páginas informativas, packs, blog e inglês. `CommercialHero` mantém a composição única e usa `preserveMobileHero` apenas na homepage: preservar a aparência e as fotografias do seu hero em todos os tamanhos. O piloto `scripts/preview-hero-mobile.mjs` passou a servir os estilos reais, sem uma segunda cópia da proposta CSS. Não confundir esta aprovação visual com alterações de preços, conteúdo, FAQ ou fluxos comerciais.

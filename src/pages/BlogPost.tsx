@@ -104,7 +104,7 @@ const BlogPost = () => {
       <main className="min-h-screen bg-[#FDFDF9]">
 
         {/* ── Hero com imagem ── */}
-        <section className="relative pt-24 pb-14 md:pb-20 overflow-hidden">
+        <section data-mobile-hero="text" className="relative pt-24 pb-14 md:pb-20 overflow-hidden">
           <div className="absolute inset-0" aria-hidden="true">
             <img
               src={heroImg}
@@ -154,6 +154,7 @@ const BlogPost = () => {
               </span>
             </div>
           </div>
+          <img src={heroImg} alt={post.heroAlt} width="720" height="540" loading="lazy" decoding="async" className="mx-5 mt-8 w-[calc(100%-2.5rem)] aspect-[4/3] object-cover rounded-xl md:hidden" />
         </section>
 
         {/* ── Conteúdo ── */}

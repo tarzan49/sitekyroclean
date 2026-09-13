@@ -64,7 +64,7 @@ const Blog = () => {
       <main className="bg-[#FDFDF9] min-h-screen">
 
         {/* ── Hero ── */}
-        <section className="bg-kyro-green text-white py-14 md:py-20">
+        <section data-mobile-hero="text" className="bg-kyro-green text-white py-14 md:py-20">
           <div className="container mx-auto px-4 max-w-4xl">
             <nav className="flex items-center gap-1.5 text-xs text-white/40 mb-6">
               <Link to="/" className="hover:text-gold transition-colors">Início</Link>

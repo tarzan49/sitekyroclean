@@ -184,7 +184,7 @@ const FAQEstofos = () => {
         <Header />
 
         {/* Hero */}
-        <div className="bg-kyro-green pt-24 pb-10 md:pb-14">
+        <div data-mobile-hero="text" className="bg-kyro-green pt-24 pb-10 md:pb-14">
           <div className="max-w-5xl mx-auto px-5 sm:px-6 lg:px-8">
             <nav className="flex items-center gap-1.5 text-xs text-white/30 mb-6" aria-label="Breadcrumb">
               <Link to="/" className="hover:text-white/60 transition-colors">Início</Link>

@@ -46,7 +46,7 @@ const PacksSitemap = () => {
       <main>
 
         {/* Hero */}
-        <section className="pt-24 md:pt-28 pb-10 bg-checker-dark">
+        <section data-mobile-hero="text" className="pt-24 md:pt-28 pb-10 bg-checker-dark">
           <div className="max-w-5xl mx-auto px-5 sm:px-6 lg:px-8">
             <nav className="flex items-center gap-1.5 text-xs text-white/40 mb-6">
               <Link to="/" className="hover:text-white/70">Início</Link>
