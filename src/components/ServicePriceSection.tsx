@@ -54,16 +54,16 @@ export default function ServicePriceSection({ serviceSlug, initialLocation }: Pr
           >
             <div className="flex-1 min-w-0">
               {point.stat && (
-                <p className="font-playfair text-xl font-bold leading-none mb-1" style={{ color: "#D4AF37" }}>
+                <p className="font-playfair text-xl font-bold leading-none mb-1" style={{ color: "#1A4E30" }}>
                   {point.stat}
                 </p>
               )}
-              <p className="text-sm font-semibold leading-snug mb-0.5">
-                <span style={{ color: "#B8912A" }}>{point.titleGold}</span>
+              <p className="text-base font-semibold leading-snug mb-0.5">
+                <span style={{ color: "#1A4E30" }}>{point.titleGold}</span>
                 {point.titleRest && <span style={{ color: "#111111" }}>{point.titleRest}</span>}
               </p>
               {fullDesc && (
-                <p className="text-[13px] leading-relaxed" style={{ color: "rgba(17,17,17,0.50)" }}>
+                <p className="text-base leading-relaxed" style={{ color: "#505650" }}>
                   {point.desc}
                 </p>
               )}
@@ -83,8 +83,8 @@ export default function ServicePriceSection({ serviceSlug, initialLocation }: Pr
           {[...Array(5)].map((_, k) => <Star key={k} className="w-3.5 h-3.5 fill-[#D4AF37] text-[#D4AF37]" />)}
         </div>
         <div className="h-3.5 w-px" style={{ background: "rgba(17,17,17,0.12)" }} />
-        <span className="text-sm font-semibold" style={{ color: "#111111" }}>{REVIEW_RATING}</span>
-        <span className="text-xs flex-1" style={{ color: "rgba(17,17,17,0.45)" }}>+{REVIEW_COUNT} avaliações · Deixar avaliação</span>
+        <span className="text-base font-semibold" style={{ color: "#111111" }}>{REVIEW_RATING}</span>
+        <span className="text-sm flex-1" style={{ color: "#505650" }}>+{REVIEW_COUNT} avaliações · Deixar avaliação</span>
         <ExternalLink className="w-3 h-3 opacity-30 group-hover:opacity-60 transition-opacity flex-shrink-0" style={{ color: "#111111" }} />
       </a>
     </>
@@ -129,10 +129,10 @@ export default function ServicePriceSection({ serviceSlug, initialLocation }: Pr
             className="w-full flex items-center justify-between px-4 py-3.5 border transition-all"
             style={{ borderColor: "rgba(17,17,17,0.12)", background: "white" }}
           >
-            <span className="text-sm font-semibold" style={{ color: "#111111" }}>Porquê escolher a Kyro Clean?</span>
+            <span className="text-base font-semibold" style={{ color: "#111111" }}>Porquê escolher a Kyro Clean?</span>
             <ChevronDown
               className="w-4 h-4 transition-transform duration-200 flex-shrink-0"
-              style={{ color: "#D4AF37", transform: infoOpen ? "rotate(180deg)" : "rotate(0deg)" }}
+              style={{ color: "#1A4E30", transform: infoOpen ? "rotate(180deg)" : "rotate(0deg)" }}
             />
           </button>
           {infoOpen && (

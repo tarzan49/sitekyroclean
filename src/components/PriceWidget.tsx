@@ -66,25 +66,25 @@ export default function PriceWidget({ serviceSlug, initialLocation }: Props) {
 
   return (
     <div
-      className="w-full max-w-lg mx-auto rounded-sm overflow-hidden border border-white/[0.18] bg-checker-modal text-left"
+      className="price-widget w-full max-w-lg mx-auto rounded-sm overflow-hidden border border-white/[0.18] bg-checker-modal text-left"
       style={{ boxShadow: "0 8px 60px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.07)" }}
     >
       <div className="px-5 sm:px-6 py-4 flex items-center justify-between gap-2 border-b border-gold/20">
         <div className="flex items-center gap-2">
-          <span className="font-playfair text-[14px] font-bold text-white/90 leading-none">Kyro</span>
+          <span className="font-playfair text-base font-bold text-white/90 leading-none">Kyro</span>
           <span className="h-3 w-px bg-white/20" />
-          <span className="text-[9px] font-bold tracking-[0.22em] uppercase text-gold/65">Orçamento</span>
+          <span className="text-sm font-bold tracking-[0.22em] uppercase text-gold">Orçamento</span>
         </div>
-        {initialLocation && <span className="inline-flex items-center gap-1 text-xs text-white/65"><MapPin className="h-3.5 w-3.5" />{initialLocation}</span>}
+        {initialLocation && <span className="inline-flex items-center gap-1 text-base text-white/80"><MapPin className="h-3.5 w-3.5" />{initialLocation}</span>}
       </div>
       {hasSelection && <div className="px-4 sm:px-6">
         <QuizEstimate totalPrice={total > 0 ? pricing.grandTotal : 0} needsQuote={hasUnpricedSelection} travelOnly={false} location={initialLocation ?? ''} travelCost={initialLocation && total > 0 ? travelFee : undefined} />
-        {!initialLocation && <p className="pt-2 text-center text-xs text-white/65">Deslocação a confirmar conforme a localidade.</p>}
+        {!initialLocation && <p className="pt-2 text-center text-base text-white/80">Deslocação a confirmar conforme a localidade.</p>}
       </div>}
       <div className="px-4 sm:px-6 pt-5 pb-4 text-center">
-        <p className="text-gold text-[11px] font-bold tracking-[0.28em] uppercase mb-3">{isWaterproofService ? 'PROTEÇÃO' : 'QUANTIDADES'}</p>
-        <h3 className="font-playfair text-white font-bold text-2xl sm:text-3xl leading-tight">{isWaterproofService ? 'Escolha a sua impermeabilização' : serviceSlug === 'limpeza-sofas' ? 'Detalhes do(s) Sofá(s)' : serviceSlug === 'limpeza-colchoes' ? (import.meta.env.DEV ? <><span className="kyro-original-label">Detalhes do(s) Colchão(ões)</span><span className="kyro-avenir-label" style={{ display: 'none' }}>Escolha os colchões</span></> : 'Detalhes do(s) Colchão(ões)') : 'Detalhes do serviço'}</h3>
-        <p className="text-sm mt-2 text-white/65">Escolha o tamanho e a quantidade.</p>
+        <p className="text-gold text-sm font-bold tracking-[0.08em] uppercase mb-3">{isWaterproofService ? 'PROTEÇÃO' : 'QUANTIDADES'}</p>
+        <h3 className="type-quote-title font-playfair text-white    ">{isWaterproofService ? 'Escolha a sua impermeabilização' : serviceSlug === 'limpeza-sofas' ? 'Detalhes do(s) Sofá(s)' : serviceSlug === 'limpeza-colchoes' ? 'Escolha os colchões' : 'Detalhes do serviço'}</h3>
+        <p className="text-base mt-2 text-white/80">Escolha o tamanho e a quantidade.</p>
       </div>
 
       {isWaterproofService && (
@@ -95,7 +95,7 @@ export default function PriceWidget({ serviceSlug, initialLocation }: Props) {
             updateFormData={updates => { if (updates.waterproofingTier) w.setAddonTier(updates.waterproofingTier); }}
             onSelect={() => w.setTierChosen(true)}
           />
-          <p className="text-xs text-white/60 mt-3">{w.tierChosen ? 'Escolha agora os artigos e as quantidades a proteger.' : 'Selecione uma opção para ver os preços e as quantidades.'}</p>
+          <p className="text-base text-white/80 mt-3">{w.tierChosen ? 'Escolha agora os artigos e as quantidades a proteger.' : 'Selecione uma opção para ver os preços e as quantidades.'}</p>
         </div>
       )}
       {/* Linhas */}
@@ -147,13 +147,13 @@ export default function PriceWidget({ serviceSlug, initialLocation }: Props) {
                     return (
                       <div key={item.id} className="rounded-sm border border-white/15 bg-white/[0.03] px-3 py-2.5 flex flex-col gap-2">
                         <div className="flex items-center justify-between">
-                          <span className="text-[9px] font-bold uppercase tracking-wide text-white/35">{pieceLabel} {idx + 1}</span>
+                          <span className="text-sm font-bold uppercase tracking-wide text-white/80">{pieceLabel} {idx + 1}</span>
                           <div className="flex items-center gap-2">
-                            <span className={cn("text-xs font-bold tabular-nums", area > 0 ? "text-gold" : "text-white/25")}>
+                            <span className={cn("text-sm font-bold tabular-nums", area > 0 ? "text-gold" : "text-white/80")}>
                               {area > 0 ? `${Math.round(area * 100) / 100} m²` : ''}
                             </span>
                             {items.length > 1 && (
-                              <button type="button" onClick={() => w.removeCarpetItem(i, item.id)} aria-label={`Remover ${pieceLabel.toLowerCase()}`} className="w-5 h-5 flex items-center justify-center flex-shrink-0 text-white/30 hover:text-white/70 text-base leading-none">×</button>
+                              <button type="button" onClick={() => w.removeCarpetItem(i, item.id)} aria-label={`Remover ${pieceLabel.toLowerCase()}`} className="w-5 h-5 flex items-center justify-center flex-shrink-0 text-white/80 hover:text-white/70 text-base leading-none">×</button>
                             )}
                           </div>
                         </div>
@@ -165,13 +165,13 @@ export default function PriceWidget({ serviceSlug, initialLocation }: Props) {
                           <input
                             type="number" min={0} step={0.1} inputMode="decimal" placeholder="Larg." value={item.largura}
                             onChange={e => w.updateCarpetItem(i, item.id, 'largura', e.target.value)}
-                            className="flex-1 min-w-0 text-center text-lg font-semibold outline-none rounded-sm border border-white/20 bg-white/[0.05] text-white placeholder:text-white/25 px-2 py-2.5 focus:border-gold [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                            className="flex-1 min-w-0 text-center text-lg font-semibold outline-none rounded-sm border border-white/20 bg-white/[0.05] text-white placeholder:text-white/80 px-2 py-2.5 focus:border-gold [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                           />
-                          <span className="text-sm flex-shrink-0 text-white/25">×</span>
+                          <span className="text-base flex-shrink-0 text-white/80">×</span>
                           <input
                             type="number" min={0} step={0.1} inputMode="decimal" placeholder="Compr." value={item.comprimento}
                             onChange={e => w.updateCarpetItem(i, item.id, 'comprimento', e.target.value)}
-                            className="flex-1 min-w-0 text-center text-lg font-semibold outline-none rounded-sm border border-white/20 bg-white/[0.05] text-white placeholder:text-white/25 px-2 py-2.5 focus:border-gold [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                            className="flex-1 min-w-0 text-center text-lg font-semibold outline-none rounded-sm border border-white/20 bg-white/[0.05] text-white placeholder:text-white/80 px-2 py-2.5 focus:border-gold [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                           />
                         </div>
                       </div>
@@ -180,19 +180,19 @@ export default function PriceWidget({ serviceSlug, initialLocation }: Props) {
                   <button
                     type="button"
                     onClick={() => w.addCarpetItem(i)}
-                    className="w-full flex items-center justify-center gap-1.5 py-1.5 rounded-sm border-2 border-dashed border-gold/30 text-gold/80 text-[11px] font-bold hover:border-gold/60 hover:bg-gold/[0.04] transition-all touch-manipulation"
+                    className="w-full flex items-center justify-center gap-1.5 py-1.5 rounded-sm border-2 border-dashed border-gold/30 text-gold/80 text-sm font-bold hover:border-gold/60 hover:bg-gold/[0.04] transition-all touch-manipulation"
                   >
                     <Plus className="w-3 h-3" /> Adicionar outra {pieceLabel.toLowerCase()}
                   </button>
                   {isAlcatifaService && (
                     <div className="flex items-center justify-between px-1">
-                      <span className="text-[10px] text-white/35">Área total</span>
-                      <span className={cn("text-xs font-bold tabular-nums", qty > 0 ? "text-gold" : "text-white/25")}>
+                      <span className="text-base text-white/80">Área total</span>
+                      <span className={cn("text-sm font-bold tabular-nums", qty > 0 ? "text-gold" : "text-white/80")}>
                         {qty > 0 ? `${Math.round(qty * 100) / 100} m²` : '—'}
                       </span>
                     </div>
                   )}
-                  <p className="text-[10px] text-center text-white/35">
+                  <p className="text-sm text-center text-white/80">
                     Cada {pieceLabel.toLowerCase()} é sempre <span className="text-gold font-bold">sob orçamento</span>
                   </p>
                 </div>
@@ -202,13 +202,13 @@ export default function PriceWidget({ serviceSlug, initialLocation }: Props) {
 
           return (
             <div key={i} className={cn("rounded-sm border-2 transition-all duration-200 overflow-hidden", active ? "border-gold/50 bg-[#1a2a1a] shadow-[0_0_8px_rgba(212,175,55,0.10)]" : "border-dashed border-gold/30 bg-gold/[0.03]")}>
-              <div className="flex items-center gap-2 px-2.5 sm:px-3 py-3">
+              <div className="price-widget-row flex items-center gap-2 px-2.5 sm:px-3 py-3">
                 <QuizFurnitureImage service={quizConfig.service as 'sofa' | 'mattress' | 'chairs'} sizeId={quizConfig.sofaSizeId ?? quizConfig.mattressSizeId} />
                 <div className="flex-1 min-w-0">
-                  <p className="text-[13px] sm:text-sm font-semibold leading-snug text-white">{row.item}</p>
-                  {dynamicPrice !== null && <p className={cn("text-sm font-bold mt-0.5 tabular-nums", active ? "text-white/80" : "text-white/70")}>{dynamicPrice}</p>}
+                  <p className="text-base sm:text-base font-semibold leading-snug text-white">{row.item}</p>
+                  {dynamicPrice !== null && <p className={cn("text-lg font-semibold mt-0.5 tabular-nums", active ? "text-white/80" : "text-white/70")}>{dynamicPrice}</p>}
                 </div>
-                <div className="flex items-center gap-1 shrink-0">
+                <div className="price-widget-stepper flex items-center gap-1 shrink-0">
                   <button type="button" onClick={() => w.adjustQty(i, -1)} disabled={qty === 0} aria-label={`Diminuir ${row.item}`} className="w-11 h-11 sm:w-12 sm:h-12 rounded-sm border-2 border-white/20 bg-white/[0.05] text-white flex items-center justify-center disabled:opacity-35 active:scale-95 transition-all touch-manipulation focus-visible:outline focus-visible:outline-2 focus-visible:outline-gold"><Minus className="w-4 h-4" /></button>
                   <span className="w-5 text-center text-base font-bold tabular-nums text-white">{qty}</span>
                   <button type="button" onClick={() => w.adjustQty(i, 1)} aria-label={`Aumentar ${row.item}`} className="w-11 h-11 sm:w-12 sm:h-12 rounded-sm border-2 border-white/20 bg-white/[0.05] text-white flex items-center justify-center active:scale-95 transition-all touch-manipulation hover:border-gold/50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-gold"><Plus className="w-4 h-4" /></button>
@@ -220,11 +220,11 @@ export default function PriceWidget({ serviceSlug, initialLocation }: Props) {
       </div>
 
       <div className="px-3 sm:px-0 pb-5 w-full max-w-sm mx-auto">
-        {!hasSelection && <p className="text-xs text-white/80 mb-3">{initialLocation ? `Deslocação a ${initialLocation}: ${travelFee} €` : 'Deslocação calculada conforme a localidade.'}</p>}
-        <button type="button" onClick={handleContinue} disabled={!hasSelection || incompleteMeasures} className={cn("w-full h-12 flex items-center justify-center gap-3 bg-gradient-to-r from-gold to-[#d4c57b] hover:from-[#d4c57b] hover:to-gold text-[#12121e] font-bold text-base tracking-wider uppercase touch-manipulation active:scale-[0.98] rounded-sm shadow-[0_4px_28px_rgba(212,175,55,0.40)] transition-all focus-visible:outline focus-visible:outline-2 focus-visible:outline-white", !hasSelection && "opacity-60")}>
+        {!hasSelection && <p className="text-base text-white/80 mb-3">{initialLocation ? `Deslocação a ${initialLocation}: ${travelFee} €` : 'Deslocação calculada conforme a localidade.'}</p>}
+        <button type="button" onClick={handleContinue} disabled={!hasSelection || incompleteMeasures} className={cn("w-full min-h-12 py-3 flex items-center justify-center gap-3 bg-gradient-to-r from-gold to-[#d4c57b] hover:from-[#d4c57b] hover:to-gold text-[#12121e] font-bold text-base tracking-wider uppercase touch-manipulation active:scale-[0.98] rounded-sm shadow-[0_4px_28px_rgba(212,175,55,0.40)] transition-all focus-visible:outline focus-visible:outline-2 focus-visible:outline-white", !hasSelection && "opacity-60")}>
           Continuar <ChevronRight className="w-5 h-5" />
         </button>
-        <p className="flex justify-center items-center gap-2 text-xs mt-3 text-white/80"><ShieldCheck className="w-4 h-4" />Gratuito e sem compromisso</p>
+        <p className="flex justify-center items-center gap-2 text-sm mt-3 text-white/80"><ShieldCheck className="w-4 h-4" />Gratuito e sem compromisso</p>
       </div>
 
       {isPackPreview && showPackPreview && <Suspense fallback={<p className="p-4 text-white">A abrir oferta…</p>}><SofaPackPreview

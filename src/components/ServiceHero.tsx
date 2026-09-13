@@ -111,7 +111,7 @@ const ServiceHero = ({
               <div className="flex flex-col gap-1">
                 <div className="w-7 h-px bg-gradient-to-r from-gold to-transparent" />
                 <span
-                  className="text-[10px] font-bold text-gold/90 tracking-[0.30em] uppercase"
+                  className="text-sm font-bold text-gold/90 tracking-[0.30em] uppercase"
                   style={{ textShadow: "0 1px 6px rgba(0,0,0,0.6)" }}
                 >
                   {badge}
@@ -121,7 +121,7 @@ const ServiceHero = ({
 
             {/* H1 */}
             <h1
-              className="font-playfair text-[1.75rem] sm:text-4xl md:text-5xl lg:text-6xl font-semibold text-white leading-[1.15] mb-4 md:mb-5"
+              className="type-page-title font-playfair      text-white  mb-4 md:mb-5"
               style={{ textShadow: "0 2px 16px rgba(0,0,0,0.65)" }}
             >
               {whitePart && <>{whitePart}<br /></>}
@@ -130,7 +130,7 @@ const ServiceHero = ({
 
             {/* Subtitle */}
             <p
-              className="text-sm sm:text-base md:text-lg text-white leading-relaxed mb-8 max-w-lg"
+              className="text-base sm:text-base md:text-lg text-white leading-relaxed mb-8 max-w-lg"
               style={{ textShadow: "0 1px 10px rgba(0,0,0,0.55)" }}
             >
               {subtitle}
@@ -154,7 +154,7 @@ const ServiceHero = ({
                     "transition-all duration-150",
                   ].join(" ")}
                 >
-                  <span className="text-[13px] font-semibold tracking-[0.18em] uppercase">Calcular o meu preço</span>
+                  <span className="text-base font-semibold tracking-[0.18em] uppercase">Calcular o meu preço</span>
                 </button>
               </div>
 
@@ -177,7 +177,7 @@ const ServiceHero = ({
                   ].join(" ")}
                 >
                   <MessageCircle className="w-[18px] h-[18px] text-white flex-shrink-0" strokeWidth={2} />
-                  <span className="text-[13px] font-semibold tracking-[0.18em] uppercase">Falar por WhatsApp</span>
+                  <span className="text-base font-semibold tracking-[0.18em] uppercase">Falar por WhatsApp</span>
                 </a>
               </div>
 
@@ -190,7 +190,7 @@ const ServiceHero = ({
               <a
                 href={`tel:${PHONE_TEL}`}
                 onClick={() => trackCallClick('service_hero_mobile')}
-                className="md:hidden flex justify-center items-center gap-1.5 text-white/45 text-xs mt-3 hover:text-white/70 transition-colors"
+                className="md:hidden flex justify-center items-center gap-1.5 text-white/80 text-sm mt-3 hover:text-white/70 transition-colors"
               >
                 <Phone className="w-3 h-3 flex-shrink-0" strokeWidth={2} />
                 Prefere ligar? {PHONE_DISPLAY}

@@ -12,11 +12,11 @@ export default function CustomerReviewCard({ review, google = true }: { review: 
     </div>
     <blockquote className="flex-1 mb-7">
       <span aria-hidden="true" className="block font-playfair text-5xl h-9 text-[#aa862b]">“</span>
-      {split > 0 ? <><p className="font-playfair text-[24px] sm:text-[27px] leading-snug font-semibold">{review.text.slice(0,split)}</p><p className="mt-4 text-[15px] leading-7 text-[#465b4e]">{review.text.slice(split).trim()}</p></> : <p className={`font-playfair font-semibold leading-relaxed ${review.text.length > 230 ? 'text-xl' : 'text-[24px] sm:text-[27px]'}`}>{review.text}</p>}
+      {split > 0 ? <><p className="font-playfair text-[24px] sm:text-[27px] leading-snug font-semibold">{review.text.slice(0,split)}</p><p className="mt-4 text-base leading-7 text-[#465b4e]">{review.text.slice(split).trim()}</p></> : <p className={`font-playfair font-semibold leading-relaxed ${review.text.length > 230 ? 'text-xl' : 'text-[24px] sm:text-[27px]'}`}>{review.text}</p>}
     </blockquote>
     <figcaption className="flex gap-3 items-center border-t border-[#173629]/15 pt-4">
       <span aria-hidden="true" className="w-11 h-11 shrink-0 rounded-full bg-[#173629] text-[#e3cb85] flex items-center justify-center font-semibold">{review.name.charAt(0)}</span>
-      <div><p className="text-sm font-semibold">{review.name}</p><p className="text-xs mt-1 text-[#617166]">{review.city ? `${review.city} · ` : ''}{google ? 'Avaliação no Google' : 'Testemunho de cliente'}</p></div>
+      <div><p className="text-base font-semibold">{review.name}</p><p className="text-sm mt-1 text-[#617166]">{review.city ? `${review.city} · ` : ''}{google ? 'Avaliação no Google' : 'Testemunho de cliente'}</p></div>
     </figcaption>
   </figure>;
 }

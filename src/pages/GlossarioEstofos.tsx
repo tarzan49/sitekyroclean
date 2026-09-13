@@ -187,25 +187,25 @@ const GlossarioEstofos = () => {
         {/* ── Hero dark band ── */}
         <div className="pt-24 pb-10 bg-checker-dark">
           <div className="max-w-4xl mx-auto px-4 sm:px-6">
-            <nav className="flex items-center gap-1.5 text-xs text-white/30 mb-6" aria-label="Breadcrumb">
+            <nav className="flex items-center gap-1.5 text-sm text-white/80 mb-6" aria-label="Breadcrumb">
               <Link to="/" className="hover:text-gold transition-colors">Início</Link>
               <ChevronRight className="w-3 h-3" />
               <Link to="/blog" className="hover:text-gold transition-colors">Recursos</Link>
               <ChevronRight className="w-3 h-3" />
-              <span className="text-white/60">Glossário</span>
+              <span className="text-white/80">Glossário</span>
             </nav>
 
             <div className="flex items-center gap-3 mb-4">
               <div className="w-9 h-9 rounded-xl bg-gold/10 border border-gold/20 flex items-center justify-center">
                 <BookOpen className="w-4 h-4 text-gold" />
               </div>
-              <p className="text-gold text-[10px] font-bold tracking-[0.28em] uppercase">KYRO CLEAN SOLUTIONS</p>
+              <p className="text-gold text-sm font-bold tracking-[0.08em] uppercase">KYRO CLEAN SOLUTIONS</p>
             </div>
 
-            <h1 className="font-playfair text-3xl sm:text-4xl font-bold text-white leading-tight mb-4">
+            <h1 className="type-page-title font-playfair    text-white  mb-4">
               Glossário de Limpeza de Estofos
             </h1>
-            <p className="text-white/55 text-base leading-relaxed max-w-2xl mb-6">
+            <p className="text-white/80 text-base leading-relaxed max-w-2xl mb-6">
               {terms.length} termos técnicos explicados com rigor e acessibilidade: definições citáveis, com exemplo prático e link para o serviço relevante.
             </p>
 
@@ -215,7 +215,7 @@ const GlossarioEstofos = () => {
                 <a
                   key={term.id}
                   href={`#${term.id}`}
-                  className="flex-shrink-0 text-[11px] font-medium text-white/40 hover:text-gold border border-white/10 hover:border-gold/30 px-2.5 py-1 rounded-full transition-all"
+                  className="flex-shrink-0 text-sm font-medium text-white/80 hover:text-gold border border-white/10 hover:border-gold/30 px-2.5 py-1 rounded-full transition-all"
                 >
                   {String(i + 1).padStart(2, "0")} {term.term.split(" ")[0]}
                 </a>
@@ -238,12 +238,12 @@ const GlossarioEstofos = () => {
               <div className="p-6 md:p-7">
                 {/* Header row */}
                 <div className="flex items-start gap-3 mb-4">
-                  <span className="flex-shrink-0 w-7 h-7 rounded-lg bg-gold/10 border border-gold/20 flex items-center justify-center text-[11px] font-bold text-gold mt-0.5">
+                  <span className="flex-shrink-0 w-7 h-7 rounded-lg bg-gold/10 border border-gold/20 flex items-center justify-center text-sm font-bold text-gold mt-0.5">
                     {String(idx + 1).padStart(2, "0")}
                   </span>
                   <div className="flex-1 min-w-0">
                     <a href={`#${term.id}`} title="Link direto">
-                      <h2 className="font-playfair text-lg md:text-xl font-bold text-[#111111] leading-snug hover:text-gold transition-colors">
+                      <h2 className="type-section-title font-playfair    text-[#111111]  hover:text-gold transition-colors">
                         {term.term}
                       </h2>
                     </a>
@@ -251,17 +251,17 @@ const GlossarioEstofos = () => {
                 </div>
 
                 {/* Definition */}
-                <p className="text-[15px] text-[#111111]/70 leading-relaxed mb-4 pl-10">
+                <p className="text-base text-[#111111]/70 leading-relaxed mb-4 pl-10">
                   {term.definition}
                 </p>
 
                 {/* Example */}
                 <div className="pl-10 mb-4">
                   <div className="bg-gray-50 border border-gray-100 rounded-xl px-4 py-3">
-                    <p className="text-[10px] font-bold text-[#111111]/50 uppercase tracking-widest mb-1.5">
+                    <p className="text-sm font-bold text-[#505650] uppercase tracking-widest mb-1.5">
                       Exemplo prático
                     </p>
-                    <p className="text-sm text-[#111111]/60 leading-relaxed italic">{term.example}</p>
+                    <p className="text-base text-[#505650] leading-relaxed italic">{term.example}</p>
                   </div>
                 </div>
 
@@ -270,7 +270,7 @@ const GlossarioEstofos = () => {
                   <div className="pl-10">
                     <Link
                       to={term.serviceLink.to}
-                      className="inline-flex items-center gap-1.5 text-sm font-semibold text-gold hover:text-[#B8912A] transition-colors"
+                      className="inline-flex items-center gap-1.5 text-base font-semibold text-gold hover:text-[#B8912A] transition-colors"
                     >
                       <ArrowRight className="w-3.5 h-3.5" />
                       {term.serviceLink.label}
@@ -284,16 +284,16 @@ const GlossarioEstofos = () => {
           {/* ── Final CTA ── */}
           <div className="rounded-2xl overflow-hidden" style={{ background: "#071a12" }}>
             <div className="px-6 py-8 flex flex-col items-center text-center">
-              <p className="text-[10px] font-bold tracking-[0.28em] uppercase text-gold/70 mb-2">PRONTO PARA AGENDAR?</p>
-              <h2 className="font-playfair text-2xl font-bold text-white mb-2">Orçamento gratuito em 30 segundos</h2>
-              <p className="text-white/50 text-sm mb-6">Técnico contacta em menos de 10 minutos · Sem compromisso</p>
+              <p className="text-sm font-bold tracking-[0.08em] uppercase text-gold/70 mb-2">PRONTO PARA AGENDAR?</p>
+              <h2 className="type-section-title font-playfair   text-white mb-2">Orçamento gratuito em 30 segundos</h2>
+              <p className="text-white/80 text-base mb-6">Técnico contacta em menos de 10 minutos · Sem compromisso</p>
               <QuizButton ctaLabel="Calcular preço grátis" />
             </div>
           </div>
 
           {/* ── Related links ── */}
           <div className="pt-6 border-t border-gray-200">
-            <p className="text-xs font-bold text-[#111111]/40 uppercase tracking-widest mb-3">Recursos relacionados</p>
+            <p className="text-sm font-bold text-[#505650] uppercase tracking-widest mb-3">Recursos relacionados</p>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
               {[
                 { to: "/perguntas-frequentes-limpeza-estofos", label: "FAQ Estofos" },
@@ -302,7 +302,7 @@ const GlossarioEstofos = () => {
                 { to: "/limpeza-colchoes", label: "Limpeza de Colchões" },
               ].map(link => (
                 <Link key={link.to} to={link.to}
-                  className="flex items-center gap-2 text-sm text-[#111111]/70 hover:text-gold transition-colors px-3 py-2 rounded-xl border border-gray-200 hover:border-gold/20 bg-white">
+                  className="flex items-center gap-2 text-base text-[#111111]/70 hover:text-gold transition-colors px-3 py-2 rounded-xl border border-gray-200 hover:border-gold/20 bg-white">
                   <ChevronRight className="w-3.5 h-3.5 text-gold/50 flex-shrink-0" />
                   {link.label}
                 </Link>

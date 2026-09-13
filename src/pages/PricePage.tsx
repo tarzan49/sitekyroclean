@@ -77,7 +77,7 @@ const PricePage = () => {
         <Header />
         <main className="pt-28 pb-16 min-h-screen bg-white">
           <div className="container mx-auto px-4 text-center">
-            <h1 className="font-playfair text-3xl font-bold text-[#111111] mb-4">Página não encontrada</h1>
+            <h1 className="type-page-title font-playfair   text-[#111111] mb-4">Página não encontrada</h1>
             <Link to="/" style={{ color: "#D4AF37" }} className="hover:underline">Voltar ao início</Link>
           </div>
         </main>
@@ -160,17 +160,17 @@ const PricePage = () => {
                 <div className="inline-flex items-start mb-3 lg:mb-5">
                   <div className="flex flex-col gap-1">
                     <div className="w-7 h-px bg-gradient-to-r from-gold to-transparent" />
-                    <span className="text-[10px] font-bold text-gold/90 tracking-[0.30em] uppercase" style={{ textShadow: "0 1px 6px rgba(0,0,0,0.6)" }}>
+                    <span className="text-sm font-bold text-gold/90 tracking-[0.30em] uppercase" style={{ textShadow: "0 1px 6px rgba(0,0,0,0.6)" }}>
                       Tabela de Preços · {data.cityName}
                     </span>
                   </div>
                 </div>
 
-                <h1 className="font-playfair text-[1.75rem] sm:text-4xl md:text-5xl lg:text-6xl font-semibold text-white mb-3 lg:mb-4 leading-[1.12]" style={{ textShadow: "0 2px 16px rgba(0,0,0,0.65)" }}>
+                <h1 className="type-page-title font-playfair      text-white mb-3 lg:mb-4 " style={{ textShadow: "0 2px 16px rgba(0,0,0,0.65)" }}>
                   Preço de {data.serviceName} {prep} <span style={{ color: "#D4AF37" }}>{data.cityName}</span>
                 </h1>
 
-                <p className="text-sm sm:text-base md:text-lg text-white/70 leading-relaxed mb-4 lg:mb-6 max-w-lg">
+                <p className="text-base sm:text-base md:text-lg text-white/70 leading-relaxed mb-4 lg:mb-6 max-w-lg">
                   {data.intro.match(/^[^.?]*[.?]/)?.[0] ?? data.intro}
                 </p>
 
@@ -235,7 +235,7 @@ const PricePage = () => {
                 goldWord={data.cityName}
                 light={true}
               />
-              <p className="-mt-5 mb-7 max-w-xl text-sm sm:text-base leading-relaxed text-[#536259]">
+              <p className="-mt-5 mb-7 max-w-xl text-base sm:text-base leading-relaxed text-[#536259]">
                 Reconhece algum destes sinais? Peça uma avaliação e descubra o tratamento adequado ao seu caso.
               </p>
               <ProblemCarousel>
@@ -244,17 +244,17 @@ const PricePage = () => {
                     <div className="relative h-[185px] sm:h-[220px] overflow-hidden">
                       <img src={card.image} alt={card.title} className="w-full h-full object-cover saturate-[0.85] motion-safe:group-hover:scale-[1.03] transition-transform duration-700" loading="lazy" decoding="async" />
                       <div className="absolute inset-0 bg-gradient-to-t from-[#0c241a]/35 to-transparent" />
-                      <span className="absolute top-4 left-4 px-2.5 py-1.5 bg-[#071a12]/85 border border-white/20 text-[#e1c477] text-[10px] font-semibold tracking-[0.16em]">{String(idx + 1).padStart(2, '0')} / {String(problemCards.length).padStart(2, '0')}</span>
+                      <span className="absolute top-4 left-4 px-2.5 py-1.5 bg-[#071a12]/85 border border-white/20 text-[#e1c477] text-sm font-semibold tracking-[0.16em]">{String(idx + 1).padStart(2, '0')} / {String(problemCards.length).padStart(2, '0')}</span>
                     </div>
                     <div className="p-5 sm:p-6 flex flex-col flex-1">
                       <div className="w-7 h-px bg-gold mb-4" />
-                      <h3 className="font-playfair font-semibold text-white text-[23px] leading-tight mb-3">{card.title}</h3>
-                      <p className="text-white/75 text-sm leading-relaxed mb-6">{card.description}</p>
+                      <h3 className="type-card-title font-playfair  text-white   mb-3">{card.title}</h3>
+                      <p className="text-white/75 text-base leading-relaxed mb-6">{card.description}</p>
                       <div className="mt-auto">
-                        <button type="button" onClick={openProblemQuiz} aria-label={`Pedir avaliação: ${card.title}`} className="w-full min-h-12 flex items-center justify-between gap-3 rounded-sm px-4 py-3 text-sm font-bold text-[#071a12] bg-gradient-to-r from-gold to-[#d4c57b] hover:from-[#d4c57b] hover:to-gold focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-gold active:scale-[0.98] transition-all touch-manipulation">
+                        <button type="button" onClick={openProblemQuiz} aria-label={`Pedir avaliação: ${card.title}`} className="w-full min-h-12 flex items-center justify-between gap-3 rounded-sm px-4 py-3 text-base font-bold text-[#071a12] bg-gradient-to-r from-gold to-[#d4c57b] hover:from-[#d4c57b] hover:to-gold focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-gold active:scale-[0.98] transition-all touch-manipulation">
                           Pedir avaliação <ArrowRight className="w-5 h-5 shrink-0" />
                         </button>
-                        <p className="text-white/60 text-[11px] text-center mt-2.5">Orçamento gratuito · Sem compromisso</p>
+                        <p className="text-white/80 text-sm text-center mt-2.5">Orçamento gratuito · Sem compromisso</p>
                       </div>
                     </div>
                   </article>
@@ -279,7 +279,7 @@ const PricePage = () => {
             <div className="max-w-4xl border-t border-[#D4AF37]/25">
               <DirectoryGroup title={<>Ver página completa</>}>
                   <Link to={`/${data.serviceSlug}-${data.citySlug}`}
-                    className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full text-sm font-medium text-[#111111] bg-white border border-[#E8E4DE] hover:border-[#D4AF37]/40 hover:bg-[#D4AF37]/5 transition-all">
+                    className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full text-base font-medium text-[#111111] bg-white border border-[#E8E4DE] hover:border-[#D4AF37]/40 hover:bg-[#D4AF37]/5 transition-all">
                     <ArrowRight className="w-3 h-3" style={{ color: "#D4AF37" }} />
                     {data.serviceName} {prep} {data.cityName}
                   </Link>
@@ -288,7 +288,7 @@ const PricePage = () => {
               <DirectoryGroup title={<>Outros serviços {prep} {data.cityName}</>}>
                   {relatedServices.map(svc => (
                     <Link key={svc.slug} to={`/preco-${svc.slug}-${data.citySlug}`}
-                      className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full text-sm font-medium text-[#111111] bg-white border border-[#E8E4DE] hover:border-[#D4AF37]/40 hover:bg-[#D4AF37]/5 transition-all">
+                      className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full text-base font-medium text-[#111111] bg-white border border-[#E8E4DE] hover:border-[#D4AF37]/40 hover:bg-[#D4AF37]/5 transition-all">
                       <ArrowRight className="w-3 h-3" style={{ color: "#D4AF37" }} />
                       {svc.name}
                     </Link>
@@ -298,7 +298,7 @@ const PricePage = () => {
               <DirectoryGroup title={<>Preços noutras cidades</>}>
                   {nearbyCities.map(city => (
                     <Link key={city.slug} to={`/preco-${data.serviceSlug}-${city.slug}`}
-                      className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full text-sm font-medium text-[#111111] bg-white border border-[#E8E4DE] hover:border-[#D4AF37]/40 hover:bg-[#D4AF37]/5 transition-all">
+                      className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full text-base font-medium text-[#111111] bg-white border border-[#E8E4DE] hover:border-[#D4AF37]/40 hover:bg-[#D4AF37]/5 transition-all">
                       <MapPin className="w-3 h-3" style={{ color: "#D4AF37" }} />
                       {city.name}
                     </Link>

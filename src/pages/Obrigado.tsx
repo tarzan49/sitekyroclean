@@ -75,11 +75,11 @@ const Obrigado = () => {
               </div>
             </div>
 
-            <p className="text-gold text-[10px] font-bold tracking-[0.28em] uppercase mb-1">KYRO CLEAN SOLUTIONS</p>
-            <h1 className="font-playfair text-2xl sm:text-3xl font-bold text-white text-center leading-tight mb-2">
+            <p className="text-gold text-sm font-bold tracking-[0.08em] uppercase mb-1">KYRO CLEAN SOLUTIONS</p>
+            <h1 className="type-page-title font-playfair    text-white text-center  mb-2">
               Pedido de Orçamento Registado
             </h1>
-            <div className="flex items-center gap-1.5 text-[11px] text-white/35">
+            <div className="flex items-center gap-1.5 text-sm text-white/80">
               <Clock className="w-3.5 h-3.5" />
               {isOpenNow
                 ? "Especialista contacta em menos de 10 minutos"
@@ -94,10 +94,10 @@ const Obrigado = () => {
             <div className="px-5 py-3 border-b border-white/[0.07] flex items-center justify-between bg-white/[0.02]">
               <div className="flex items-center gap-2">
                 <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse flex-shrink-0" />
-                <span className="text-green-400 text-[10px] font-bold uppercase tracking-wider">Registado no sistema</span>
+                <span className="text-green-400 text-sm font-bold uppercase tracking-wider">Registado no sistema</span>
               </div>
               {receipt?.bookingId && (
-                <span className="text-[10px] font-mono font-bold text-gold/70 bg-gold/10 border border-gold/20 px-2 py-0.5 rounded-full tracking-widest">
+                <span className="text-sm font-mono font-bold text-gold/70 bg-gold/10 border border-gold/20 px-2 py-0.5 rounded-full tracking-widest">
                   #{receipt.bookingId}
                 </span>
               )}
@@ -107,13 +107,13 @@ const Obrigado = () => {
             {receipt && (receipt.location || receipt.slot) && (
               <div className="px-5 py-3 border-b border-white/[0.07] flex flex-col gap-1.5">
                 {receipt.location && (
-                  <div className="flex items-center gap-2 text-xs text-white/50">
+                  <div className="flex items-center gap-2 text-sm text-white/80">
                     <MapPin className="w-3.5 h-3.5 text-gold/50 flex-shrink-0" />
                     <span>{receipt.location}</span>
                   </div>
                 )}
                 {receipt.slot && receipt.slot !== 'Não especificado' && (
-                  <div className="flex items-center gap-2 text-xs text-white/50">
+                  <div className="flex items-center gap-2 text-sm text-white/80">
                     <CalendarDays className="w-3.5 h-3.5 text-gold/50 flex-shrink-0" />
                     <span>{receipt.slot}</span>
                   </div>
@@ -126,17 +126,17 @@ const Obrigado = () => {
               <>
                 {/* Table header */}
                 <div className="grid grid-cols-[1fr_auto_auto] gap-2 px-5 py-2 bg-white/[0.02] border-b border-white/[0.07]">
-                  <span className="text-[9px] font-black uppercase tracking-widest text-white/30">Item</span>
-                  <span className="text-[9px] font-black uppercase tracking-widest text-white/30 text-right">Qtd.</span>
-                  <span className="text-[9px] font-black uppercase tracking-widest text-white/30 text-right">Preço</span>
+                  <span className="text-sm font-black uppercase tracking-widest text-white/80">Item</span>
+                  <span className="text-sm font-black uppercase tracking-widest text-white/80 text-right">Qtd.</span>
+                  <span className="text-sm font-black uppercase tracking-widest text-white/80 text-right">Preço</span>
                 </div>
 
                 {/* Lines */}
                 {receipt.lines.map((line, i) => (
                   <div key={i} className="grid grid-cols-[1fr_auto_auto] gap-2 items-center px-5 py-2.5 border-b border-white/[0.05] last:border-0">
-                    <span className="text-sm text-white/80 leading-snug pr-2">{line.label}</span>
-                    <span className="text-xs text-white/40 text-right tabular-nums w-8">{line.qty}×</span>
-                    <span className="text-sm font-bold text-white text-right tabular-nums whitespace-nowrap">
+                    <span className="text-base text-white/80 leading-snug pr-2">{line.label}</span>
+                    <span className="text-sm text-white/80 text-right tabular-nums w-8">{line.qty}×</span>
+                    <span className="text-base font-bold text-white text-right tabular-nums whitespace-nowrap">
                       {fmt(line.total)}
                     </span>
                   </div>
@@ -150,27 +150,27 @@ const Obrigado = () => {
                 {/* Subtotal (only if there's a discount) */}
                 {receipt.discountLabel && receipt.discountAmount > 0 && (
                   <div className="flex justify-between items-center px-5 py-2.5 border-b border-white/[0.05]">
-                    <span className="text-xs text-white/40">Subtotal</span>
-                    <span className="text-sm text-white/50 tabular-nums">{fmt(receipt.subtotal)}</span>
+                    <span className="text-sm text-white/80">Subtotal</span>
+                    <span className="text-base text-white/80 tabular-nums">{fmt(receipt.subtotal)}</span>
                   </div>
                 )}
 
                 {/* Discount line */}
                 {receipt.discountLabel && receipt.discountAmount > 0 && (
                   <div className="flex justify-between items-center px-5 py-2.5 border-b border-white/[0.05] bg-gold/[0.05]">
-                    <span className="text-xs font-bold text-gold">{receipt.discountLabel}</span>
-                    <span className="text-sm font-bold text-gold tabular-nums">−{fmt(receipt.discountAmount)}</span>
+                    <span className="text-sm font-bold text-gold">{receipt.discountLabel}</span>
+                    <span className="text-base font-bold text-gold tabular-nums">−{fmt(receipt.discountAmount)}</span>
                   </div>
                 )}
 
                 {/* Total */}
                 <div className="flex flex-col items-start gap-3 px-5 py-4 sm:flex-row sm:justify-between">
                   <div>
-                    <span className="text-sm font-black text-white uppercase tracking-wide">{isSobOrcamento ? 'Subtotal conhecido' : 'Total estimado'}</span>
-                    <p className="text-[9px] text-white/25 uppercase tracking-wide mt-0.5">Sujeito a confirmação</p>
+                    <span className="text-base font-black text-white uppercase tracking-wide">{isSobOrcamento ? 'Subtotal conhecido' : 'Total estimado'}</span>
+                    <p className="text-sm text-white/80 uppercase tracking-wide mt-0.5">Sujeito a confirmação</p>
                   </div>
                   <span className="font-playfair text-2xl font-bold text-gold tabular-nums">
-                    {isSobOrcamento ? <>{fmt(receipt.total)}<span className="block text-xs font-sans text-white/65 mt-1">Subtotal conhecido + serviços sob orçamento</span></> : fmt(receipt.total)}
+                    {isSobOrcamento ? <>{fmt(receipt.total)}<span className="block text-sm font-sans text-white/80 mt-1">Subtotal conhecido + serviços sob orçamento</span></> : fmt(receipt.total)}
                   </span>
                 </div>
               </div>
@@ -179,7 +179,7 @@ const Obrigado = () => {
             {/* No receipt data fallback */}
             {!receipt && (
               <div className="px-5 py-6 text-center">
-                <p className="text-white/40 text-sm">Os dados do seu pedido foram enviados com sucesso.</p>
+                <p className="text-white/80 text-base">Os dados do seu pedido foram enviados com sucesso.</p>
               </div>
             )}
           </div>
@@ -198,13 +198,13 @@ const Obrigado = () => {
             </a>
             <div className="flex items-start gap-2 px-1">
               <Check className="w-3.5 h-3.5 text-gold flex-shrink-0 mt-0.5" />
-              <p className="text-white/45 text-xs leading-relaxed text-left">
+              <p className="text-white/80 text-sm leading-relaxed text-left">
                 A forma mais rápida de confirmar. Um especialista Kyro trata dos detalhes finais e agenda a visita.
               </p>
             </div>
             <button
               onClick={() => navigate("/")}
-              className="flex items-center justify-center gap-1.5 text-xs text-white/20 hover:text-white/45 py-2 transition-colors"
+              className="flex items-center justify-center gap-1.5 text-sm text-white/80 hover:text-white/80 py-2 transition-colors"
             >
               <ArrowLeft className="w-3.5 h-3.5" />
               Voltar à página inicial
@@ -218,13 +218,13 @@ const Obrigado = () => {
                 <Star key={i} className="w-4 h-4 text-gold fill-gold" />
               ))}
             </div>
-            <p className="text-white/30 text-xs text-center leading-snug">
+            <p className="text-white/80 text-sm text-center leading-snug">
               Classificação {REVIEW_RATING} com base em mais de {REVIEW_COUNT} avaliações verificadas no{' '}
               <a
                 href={GOOGLE_REVIEWS_URL}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-white/50 font-semibold underline underline-offset-2 hover:text-white/75 transition-colors"
+                className="text-white/80 font-semibold underline underline-offset-2 hover:text-white/75 transition-colors"
               >
                 Google
               </a>

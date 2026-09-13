@@ -27,7 +27,7 @@ interface QuizComboUpsellScreenProps {
 // próprio preço reduzido, mostrado sempre lado a lado com o preço normal).
 const PriceCompare = ({ original, promo, suffix = '' }: { original: number; promo: number; suffix?: string }) => (
   <span className="inline-flex items-baseline gap-1.5 tabular-nums">
-    <s className="text-white/35 font-normal">{original}€</s>
+    <s className="text-white/80 font-normal">{original}€</s>
     <span className="text-gold font-black tracking-tight">{promo}€{suffix}</span>
   </span>
 );
@@ -216,12 +216,12 @@ const QuizComboUpsellScreen = ({ offerPreview = false, travelFee = 10, primarySe
     )}>
       <QuizFurnitureImage service={view === 'sofa' ? 'sofa' : 'mattress'} sizeId={sizeId} />
       <div className="flex-1 min-w-0 text-left">
-        <p className="text-sm font-semibold text-white">{label}</p>
-        <p className="text-xs text-white/70">{unitLabel}</p>
+        <p className="text-base font-semibold text-white">{label}</p>
+        <p className="text-sm text-white/70">{unitLabel}</p>
       </div>
       <div className="flex items-center gap-1 flex-shrink-0">
         <button onClick={onDec} disabled={qty <= 0} className="w-11 h-11 sm:w-12 sm:h-12 rounded-sm border-2 border-white/20 bg-white/[0.05] text-white font-bold text-2xl flex items-center justify-center disabled:opacity-20 disabled:border-transparent disabled:bg-transparent active:scale-95 transition-all touch-manipulation hover:border-gold/50">−</button>
-        <span className={cn('w-5 text-center font-bold tabular-nums text-base', qty > 0 ? 'text-gold' : 'text-white/30')}>{qty}</span>
+        <span className={cn('w-5 text-center font-bold tabular-nums text-base', qty > 0 ? 'text-gold' : 'text-white/80')}>{qty}</span>
         <button onClick={onInc} className="w-11 h-11 sm:w-12 sm:h-12 rounded-sm border-2 border-white/20 bg-white/[0.05] text-white font-bold text-2xl flex items-center justify-center active:scale-95 transition-all touch-manipulation hover:border-gold/50">+</button>
       </div>
     </div>
@@ -236,14 +236,14 @@ const QuizComboUpsellScreen = ({ offerPreview = false, travelFee = 10, primarySe
             fora do ecrã em telemóvel quando as 4 linhas já estavam reveladas
             (pedido explícito: "importante o botão continuar aparecer
             sempre"). O rodapé já tem Voltar + Confirmar, chega. */}
-        <p className="text-gold text-[10px] font-bold tracking-[0.28em] uppercase mb-0.5 text-center w-full">QUANTIDADES</p>
-        <h2 className="font-playfair text-2xl sm:text-3xl font-bold text-white text-center w-full">
+        <p className="text-gold text-sm font-bold tracking-[0.08em] uppercase mb-0.5 text-center w-full">QUANTIDADES</p>
+        <h2 className="type-quote-title font-playfair    text-white text-center w-full">
           Detalhes do{view === 'sofa' || view === 'carpet' ? '(s)' : ''} {label}
         </h2>
 
         {view === 'carpet' && <QuizCarpetMeasureGuide />}
-        {offerPreview && view === 'mattress' && <p className="text-xs text-white/50 text-center">Casal: 55 € nesta visita. Poupa {casalSeparate - 55} € face a uma visita separada de {casalSeparate} €.</p>}
-        {offerPreview && view === 'carpet' && <p className="text-xs text-white/50 text-center">Por cada 5 m², paga 4. Preço por m² confirmado após avaliação.{carpetValidCount > 0 && ` Área: ${fmt(carpetTotalAreaValue)} m² · paga ${fmt(carpetTotalAreaValue - Math.floor(carpetTotalAreaValue / 5))} m².`}</p>}
+        {offerPreview && view === 'mattress' && <p className="text-sm text-white/80 text-center">Casal: 55 € nesta visita. Poupa {casalSeparate - 55} € face a uma visita separada de {casalSeparate} €.</p>}
+        {offerPreview && view === 'carpet' && <p className="text-sm text-white/80 text-center">Por cada 5 m², paga 4. Preço por m² confirmado após avaliação.{carpetValidCount > 0 && ` Área: ${fmt(carpetTotalAreaValue)} m² · paga ${fmt(carpetTotalAreaValue - Math.floor(carpetTotalAreaValue / 5))} m².`}</p>}
         {view === 'mattress' && (
           // Scroll interno próprio (não a página toda) acima de ~3 linhas —
           // garante que o rodapé Voltar/Confirmar fica sempre à vista mesmo
@@ -301,12 +301,12 @@ const QuizComboUpsellScreen = ({ offerPreview = false, travelFee = 10, primarySe
                 ? <PriceCompare original={chairsRegularPrice} promo={chairsCleanPrice} />
                 : <span className="text-gold">Sob orçamento</span>}
             </p>
-            <p className="text-xs text-white/40 text-center leading-snug">{offerPreview ? `${chairsQty} cadeiras · paga ${chairsQty - chairsFree}. Uma oferta por conjunto de 4.` : `Mínimo de ${CHAIRS_MIN_QTY} cadeiras`}</p>
+            <p className="text-sm text-white/80 text-center leading-snug">{offerPreview ? `${chairsQty} cadeiras · paga ${chairsQty - chairsFree}. Uma oferta por conjunto de 4.` : `Mínimo de ${CHAIRS_MIN_QTY} cadeiras`}</p>
           </>
         )}
         {view === 'carpet' && (
           <div className="flex flex-col gap-2 w-full max-w-xs">
-            <p className="text-xs text-white/35 text-center leading-snug -mt-1 mb-1">
+            <p className="text-sm text-white/80 text-center leading-snug -mt-1 mb-1">
               {offerPreview ? "A oferta fica incluída no pedido de avaliação." : "Sem preço fixo por m², cada tapete é sempre orçamentado à parte."}
             </p>
             {/* Scroll interno próprio a partir do 2º tapete — o rodapé
@@ -318,12 +318,12 @@ const QuizComboUpsellScreen = ({ offerPreview = false, travelFee = 10, primarySe
               return (
                 <div key={item.id} className="rounded-sm border border-gold/15 bg-[#1a2a1a] p-3 flex flex-col gap-2">
                   <div className="flex items-center justify-between">
-                    <span className="text-[11px] font-bold uppercase tracking-wider text-white/40">Tapete {i + 1}</span>
+                    <span className="text-sm font-bold uppercase tracking-wider text-white/80">Tapete {i + 1}</span>
                     {carpetItems.length > 1 && (
                       <button
                         onClick={() => setCarpetItems(prev => carpetRemoveItem(prev, item.id))}
                         aria-label="Remover tapete"
-                        className="w-5 h-5 rounded-sm flex items-center justify-center text-white/30 hover:text-white/70 hover:bg-white/10 transition-colors touch-manipulation"
+                        className="w-5 h-5 rounded-sm flex items-center justify-center text-white/80 hover:text-white/70 hover:bg-white/10 transition-colors touch-manipulation"
                       >×</button>
                     )}
                   </div>
@@ -333,31 +333,31 @@ const QuizComboUpsellScreen = ({ offerPreview = false, travelFee = 10, primarySe
                         type="number" inputMode="decimal" min="0" step="0.1" placeholder="0"
                         value={item.largura}
                         onChange={(e) => setCarpetItems(prev => carpetUpdateItem(prev, item.id, 'largura', e.target.value))}
-                        className="w-full h-11 text-center text-base font-bold bg-white/[0.05] text-white placeholder:text-white/25 rounded-sm border-2 border-white/15 focus:border-gold focus:outline-none transition-colors"
+                        className="w-full h-11 text-center text-base font-bold bg-white/[0.05] text-white placeholder:text-white/80 rounded-sm border-2 border-white/15 focus:border-gold focus:outline-none transition-colors"
                       />
-                      <span className="text-[9px] text-center uppercase tracking-wide text-white/30">Largura (m)</span>
+                      <span className="text-sm text-center uppercase tracking-wide text-white/80">Largura (m)</span>
                     </div>
-                    <span className="text-white/25 text-sm pb-4">×</span>
+                    <span className="text-white/80 text-base pb-4">×</span>
                     <div className="flex-1 flex flex-col gap-1">
                       <input
                         type="number" inputMode="decimal" min="0" step="0.1" placeholder="0"
                         value={item.comprimento}
                         onChange={(e) => setCarpetItems(prev => carpetUpdateItem(prev, item.id, 'comprimento', e.target.value))}
-                        className="w-full h-11 text-center text-base font-bold bg-white/[0.05] text-white placeholder:text-white/25 rounded-sm border-2 border-white/15 focus:border-gold focus:outline-none transition-colors"
+                        className="w-full h-11 text-center text-base font-bold bg-white/[0.05] text-white placeholder:text-white/80 rounded-sm border-2 border-white/15 focus:border-gold focus:outline-none transition-colors"
                       />
-                      <span className="text-[9px] text-center uppercase tracking-wide text-white/30">Comprimento (m)</span>
+                      <span className="text-sm text-center uppercase tracking-wide text-white/80">Comprimento (m)</span>
                     </div>
                   </div>
                   <div className="text-right pt-1 border-t border-white/[0.06]">
-                    <span className="text-[10px] text-white/30">Área </span>
-                    <span className="text-sm font-bold text-gold tabular-nums">{area !== null ? `${area % 1 === 0 ? area : area.toFixed(2).replace('.', ',')} m²` : '0 m²'}</span>
+                    <span className="text-sm text-white/80">Área </span>
+                    <span className="text-base font-bold text-gold tabular-nums">{area !== null ? `${area % 1 === 0 ? area : area.toFixed(2).replace('.', ',')} m²` : '0 m²'}</span>
                   </div>
                 </div>
               );
             })}
             <button
               onClick={() => setCarpetItems(prev => carpetAddItem(prev))}
-              className="w-full flex items-center justify-center gap-2 py-3 rounded-sm border-2 border-dashed border-gold/30 text-gold/80 text-sm font-bold hover:border-gold/60 hover:bg-gold/[0.04] transition-all touch-manipulation"
+              className="w-full flex items-center justify-center gap-2 py-3 rounded-sm border-2 border-dashed border-gold/30 text-gold/80 text-base font-bold hover:border-gold/60 hover:bg-gold/[0.04] transition-all touch-manipulation"
             >
               <Plus className="w-3.5 h-3.5" />
               Adicionar outro tapete
@@ -366,18 +366,18 @@ const QuizComboUpsellScreen = ({ offerPreview = false, travelFee = 10, primarySe
           </div>
         )}
 
-        {view === 'carpet' && incompleteCarpets && <p className="text-xs text-amber-200">Preencha as duas medidas de cada tapete ou remova a peça incompleta.</p>}
+        {view === 'carpet' && incompleteCarpets && <p className="text-sm text-amber-200">Preencha as duas medidas de cada tapete ou remova a peça incompleta.</p>}
         <div className="flex items-center gap-3 w-full max-w-xs mt-1">
           <button
             onClick={() => setView('summary')}
-            className="h-14 px-5 flex-shrink-0 bg-transparent border border-white/[0.14] text-white/50 hover:text-white/80 hover:border-white/30 active:scale-[0.98] touch-manipulation rounded-sm flex items-center justify-center transition-all text-sm font-semibold"
+            className="h-14 px-5 flex-shrink-0 bg-transparent border border-white/[0.14] text-white/80 hover:text-white/80 hover:border-white/30 active:scale-[0.98] touch-manipulation rounded-sm flex items-center justify-center transition-all text-base font-semibold"
           >
             <ChevronLeft className="w-4 h-4 mr-1" /> Voltar
           </button>
           <button
             disabled={view === 'carpet' && incompleteCarpets}
             onClick={() => setView('summary')}
-            className="disabled:opacity-40 flex-1 h-14 bg-gradient-to-r from-gold to-[#d4c57b] hover:from-[#d4c57b] hover:to-gold text-[#12121e] font-black text-sm tracking-wider uppercase touch-manipulation active:scale-[0.98] rounded-sm shadow-[0_0_32px_rgba(212,175,55,0.30)]"
+            className="disabled:opacity-40 flex-1 h-14 bg-gradient-to-r from-gold to-[#d4c57b] hover:from-[#d4c57b] hover:to-gold text-[#12121e] font-black text-base   touch-manipulation active:scale-[0.98] rounded-sm shadow-[0_0_32px_rgba(212,175,55,0.30)]"
           >
             Confirmar
           </button>
@@ -398,13 +398,13 @@ const QuizComboUpsellScreen = ({ offerPreview = false, travelFee = 10, primarySe
 
   return (
     <div className="flex flex-col gap-2 overflow-hidden items-center w-full">
-      <p className="text-gold text-[10px] font-bold tracking-[0.28em] uppercase mb-0.5 text-center w-full">
+      <p className="text-gold text-sm font-bold tracking-[0.08em] uppercase mb-0.5 text-center w-full">
         {offerPreview ? 'APROVEITE A MESMA VISITA' : 'UM BÓNUS PARA SI'}
       </p>
-      <h2 className="font-playfair text-2xl sm:text-3xl font-bold text-white text-center w-full">
+      <h2 className="type-quote-title font-playfair    text-white text-center w-full">
         {offerPreview ? 'Quer limpar mais alguma coisa?' : 'Adicione mais um serviço'}
       </h2>
-      <p className="text-xs text-white/55 text-center max-w-xs leading-relaxed -mt-1">
+      <p className="text-sm text-white/80 text-center max-w-xs leading-relaxed -mt-1">
         {offerPreview
           ? <>Preço reduzido em cada artigo que juntar a esta visita. Deslocação excluída.</>
           : <>Combine mais um serviço na mesma visita e poupe no preço de cada artigo. Deslocação excluída.</>}
@@ -440,12 +440,12 @@ const QuizComboUpsellScreen = ({ offerPreview = false, travelFee = 10, primarySe
               style={{ backgroundImage: 'url(/images/services/quote-furniture.png)', backgroundSize: '200% 200%', backgroundPosition: row.imagePosition }}
             />
             <span className={cn('min-w-0 flex flex-col gap-1', !compactRows && 'w-full')}>
-              <span className="text-sm font-bold text-white">{row.label}</span>
+              <span className="text-base font-bold text-white">{row.label}</span>
               {offerPreview ? <span className="flex flex-col gap-1">
-                <span className="text-[9px] font-bold uppercase tracking-[0.16em] text-white/45">Preço nesta visita</span>
+                <span className="text-sm font-bold uppercase tracking-[0.16em] text-white/80">Preço nesta visita</span>
                 <span className="text-lg font-black leading-none text-gold">{row.priceLine}</span>
-              </span> : <span className="text-[12px] font-normal leading-relaxed text-gold/75">{row.summary}</span>}
-              {offerPreview && row.selected && <span className="text-[10px] text-white/45">{row.summary}</span>}
+              </span> : <span className="text-sm font-normal leading-relaxed text-gold/75">{row.summary}</span>}
+              {offerPreview && row.selected && <span className="text-sm text-white/80">{row.summary}</span>}
             </span>
           </button>
         ))}
@@ -454,14 +454,14 @@ const QuizComboUpsellScreen = ({ offerPreview = false, travelFee = 10, primarySe
       <div className="flex items-center gap-3 w-full max-w-sm mt-2">
         <button
           onClick={onBack}
-          className="h-14 px-5 flex-shrink-0 bg-transparent border border-white/[0.14] text-white/50 hover:text-white/80 hover:border-white/30 active:scale-[0.98] touch-manipulation rounded-sm flex items-center justify-center transition-all text-sm font-semibold"
+          className="h-14 px-5 flex-shrink-0 bg-transparent border border-white/[0.14] text-white/80 hover:text-white/80 hover:border-white/30 active:scale-[0.98] touch-manipulation rounded-sm flex items-center justify-center transition-all text-base font-semibold"
         >
           <ChevronLeft className="w-4 h-4 mr-1" /> Voltar
         </button>
         <button
           disabled={incompleteCarpets}
           onClick={onContinue}
-          className="flex-1 h-14 bg-gradient-to-r from-gold to-[#d4c57b] hover:from-[#d4c57b] hover:to-gold text-[#12121e] font-black text-sm tracking-wider uppercase touch-manipulation active:scale-[0.98] rounded-sm shadow-[0_0_32px_rgba(212,175,55,0.30)]"
+          className="flex-1 h-14 bg-gradient-to-r from-gold to-[#d4c57b] hover:from-[#d4c57b] hover:to-gold text-[#12121e] font-black text-base   touch-manipulation active:scale-[0.98] rounded-sm shadow-[0_0_32px_rgba(212,175,55,0.30)]"
         >
           Finalizar Orçamento
         </button>

@@ -37,7 +37,7 @@ const RegionSection = ({ heading, goldWord, area, query }: { heading: string; go
       <summary className="flex min-h-16 cursor-pointer list-none items-center gap-3 py-5 text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#D4AF37] [&::-webkit-details-marker]:hidden">
         <MapPin aria-hidden="true" className="h-5 w-5 shrink-0 text-[#B8912A]" />
         <span className="flex-1 font-semibold text-[#111111]">{heading} {goldWord}</span>
-        <span className="text-xs text-[#666]">{areaCities.length}</span>
+        <span className="text-sm text-[#666]">{areaCities.length}</span>
         <ChevronDown aria-hidden="true" className="h-4 w-4 text-[#B8912A] group-open/region:rotate-180" />
       </summary>
       <div className="pb-5 pl-3 sm:pl-8">
@@ -46,7 +46,7 @@ const RegionSection = ({ heading, goldWord, area, query }: { heading: string; go
           const freguesias = (municipality?.freguesias ?? []).filter(f => !search || normalize(city.name).includes(search) || normalize(f.name).includes(search));
           return <details key={city.slug} open={search ? true : undefined} className="group/city border-t border-[#E8E4DE]">
             <summary className="flex min-h-14 cursor-pointer list-none items-center gap-3 py-4 text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#D4AF37] [&::-webkit-details-marker]:hidden">
-              <span className="flex-1 text-sm font-semibold text-[#111111]">{city.name}</span>
+              <span className="flex-1 text-base font-semibold text-[#111111]">{city.name}</span>
               <ChevronDown aria-hidden="true" className="h-4 w-4 text-[#B8912A] group-open/city:rotate-180" />
             </summary>
             <div className="pl-3 sm:pl-5">
@@ -79,23 +79,23 @@ const AreasDeServico = () => {
           <div className="container mx-auto px-4 max-w-4xl">
             <div className="flex items-center gap-3 mb-4">
               <div className="h-px w-8 flex-shrink-0" style={{ backgroundColor: "#D4AF37", opacity: 0.65 }} />
-              <p className="text-[10px] font-bold tracking-[0.28em] uppercase" style={{ color: "#D4AF37", opacity: 0.85 }}>
+              <p className="text-sm font-bold tracking-[0.08em] uppercase" style={{ color: "#D4AF37", opacity: 0.85 }}>
                 Cobertura Nacional
               </p>
             </div>
-            <h1 className="font-playfair text-3xl md:text-4xl lg:text-5xl font-bold leading-[1.1] text-[#111111]">
+            <h1 className="type-page-title font-playfair      text-[#111111]">
               Áreas de{" "}
               <em className="not-italic" style={{ color: "#D4AF37" }}>Serviço</em>
             </h1>
-            <p className="mt-4 text-base md:text-lg text-[#111111]/55 leading-relaxed max-w-2xl">
+            <p className="mt-4 text-base md:text-lg text-[#505650] leading-relaxed max-w-2xl">
               A Kyro Clean Solutions presta serviços de limpeza profissional de estofos ao domicílio em {stats.municipios} municípios e {stats.freguesias} freguesias, de Viana do Castelo ao Algarve, com equipas em Braga, Porto, Lisboa e Algarve.
             </p>
-            <p className="text-sm text-[#111111]/55 mt-2 mb-6">
+            <p className="text-base text-[#505650] mt-2 mb-6">
               Outras zonas, incluindo Aveiro e Coimbra, mediante confirmação de disponibilidade.
             </p>
             <div className="flex flex-wrap gap-3">
               <QuizButton />
-              <a href={`tel:${PHONE_TEL}`} className="inline-flex items-center gap-2 bg-secondary text-[#111111] font-semibold text-sm px-5 py-2.5 rounded-full border border-border/30 hover:bg-secondary/80 transition-colors">
+              <a href={`tel:${PHONE_TEL}`} className="inline-flex items-center gap-2 bg-secondary text-[#111111] font-semibold text-base px-5 py-2.5 rounded-full border border-border/30 hover:bg-secondary/80 transition-colors">
                 <Phone className="w-4 h-4" /> {PHONE_DISPLAY}
               </a>
             </div>
@@ -104,7 +104,7 @@ const AreasDeServico = () => {
 
         <section className="bg-[#FDFDF9] py-10 md:py-14">
           <div className="mx-auto max-w-4xl px-5 sm:px-6 lg:px-8">
-            <p className="mb-5 text-sm leading-relaxed text-[#666]">Escolha a região, depois o concelho e o serviço. Também pode pesquisar diretamente uma localidade ou freguesia.</p>
+            <p className="mb-5 text-base leading-relaxed text-[#666]">Escolha a região, depois o concelho e o serviço. Também pode pesquisar diretamente uma localidade ou freguesia.</p>
             <div className="relative mb-6">
               <label htmlFor="area-search" className="sr-only">Pesquisar localidade ou freguesia</label>
               <Search aria-hidden="true" className="absolute left-4 top-4 h-4 w-4 text-[#857443]" />
@@ -114,7 +114,7 @@ const AreasDeServico = () => {
             <div className="border-t border-[#E8E4DE]">
               {REGIONS.map(r => <RegionSection key={`${r.area}-${Boolean(search)}`} {...r} query={query} />)}
             </div>
-            <p role="status" className="mt-4 text-sm text-[#666]">{!hasResults ? "Não encontrámos essa localidade. Experimente outro nome ou pesquise pelo concelho." : search ? "Resultados nas regiões abaixo." : ""}</p>
+            <p role="status" className="mt-4 text-base text-[#666]">{!hasResults ? "Não encontrámos essa localidade. Experimente outro nome ou pesquise pelo concelho." : search ? "Resultados nas regiões abaixo." : ""}</p>
           </div>
         </section>
 

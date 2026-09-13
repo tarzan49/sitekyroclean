@@ -38,7 +38,7 @@ const CookieBanner = () => {
         <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
           {/* Text */}
           <div className="flex-1 min-w-0">
-            <p className="text-xs sm:text-sm text-white/70 leading-relaxed">
+            <p className="text-sm sm:text-base text-white/70 leading-relaxed">
               {isEn ? (
                 <>
                   We use cookies and Google Analytics to improve your experience and analyse site traffic. See our{' '}
@@ -71,13 +71,13 @@ const CookieBanner = () => {
           <div className="flex items-center gap-2 flex-shrink-0">
             <button
               onClick={decline}
-              className="h-11 px-4 text-xs font-medium text-white/80 hover:text-white transition-colors touch-manipulation rounded-lg"
+              className="h-11 px-4 text-sm font-medium text-white/80 hover:text-white transition-colors touch-manipulation rounded-lg"
             >
               {isEn ? "Decline" : "Recusar"}
             </button>
             <button
               onClick={accept}
-              className="h-11 px-5 text-xs font-bold rounded-full bg-[#D4AF37] hover:bg-[#f0dc8a] text-[#0B2F2A] transition-colors touch-manipulation shadow-md"
+              className="h-11 px-5 text-sm font-bold rounded-full bg-[#D4AF37] hover:bg-[#f0dc8a] text-[#0B2F2A] transition-colors touch-manipulation shadow-md"
             >
               {isEn ? "Accept" : "Aceitar"}
             </button>

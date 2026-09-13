@@ -9,7 +9,7 @@ export default function QuizTopBadge({ className }: { className?: string }) {
       className
     )}>
       <Crown aria-hidden="true" className="h-3 w-3" strokeWidth={1.8} />
-      <span className="text-[9px] font-black leading-none tracking-[0.12em]">TOP</span>
+      <span className="text-sm font-black leading-none tracking-[0.12em]">TOP</span>
     </span>
   );
 }

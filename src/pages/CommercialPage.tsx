@@ -49,7 +49,7 @@ const CommercialPage = () => {
         <Header />
         <main className="pt-28 pb-16 min-h-screen bg-white">
           <div className="container mx-auto px-4 text-center">
-            <h1 className="font-playfair text-3xl font-bold text-[#111111] mb-4">Página não encontrada</h1>
+            <h1 className="type-page-title font-playfair   text-[#111111] mb-4">Página não encontrada</h1>
             <Link to="/" style={{ color: "#D4AF37" }} className="hover:underline">Voltar ao início</Link>
           </div>
         </main>
@@ -104,23 +104,23 @@ const CommercialPage = () => {
                 <div className="inline-flex items-start mb-5">
                   <div className="flex flex-col gap-1">
                     <div className="w-7 h-px bg-gradient-to-r from-gold to-transparent" />
-                    <span className="text-[10px] font-bold text-gold/90 tracking-[0.30em] uppercase" style={{ textShadow: "0 1px 6px rgba(0,0,0,0.6)" }}>
+                    <span className="text-sm font-bold text-gold/90 tracking-[0.30em] uppercase" style={{ textShadow: "0 1px 6px rgba(0,0,0,0.6)" }}>
                       Restaurantes · Hotéis · Escritórios
                     </span>
                   </div>
                 </div>
 
-                <h1 className="font-playfair text-[1.75rem] sm:text-4xl md:text-5xl lg:text-6xl font-semibold text-white mb-4 leading-[1.12]" style={{ textShadow: "0 2px 16px rgba(0,0,0,0.65)" }}>
+                <h1 className="type-page-title font-playfair      text-white mb-4 " style={{ textShadow: "0 2px 16px rgba(0,0,0,0.65)" }}>
                   {data.h1}
                 </h1>
 
-                <p className="text-sm sm:text-base md:text-lg text-white/70 leading-relaxed mb-6 max-w-lg">
+                <p className="text-base sm:text-base md:text-lg text-white/70 leading-relaxed mb-6 max-w-lg">
                   {data.intro}
                 </p>
 
                 <div className="flex items-center gap-2 mb-6">
-                  <span className="text-white font-bold text-sm">{REVIEW_RATING}★</span>
-                  <span className="text-white/50 text-xs">Google · {REVIEW_COUNT}+ avaliações</span>
+                  <span className="text-white font-bold text-base">{REVIEW_RATING}★</span>
+                  <span className="text-white/80 text-sm">Google · {REVIEW_COUNT}+ avaliações</span>
                 </div>
 
                 <div className="flex flex-col sm:flex-row gap-3 max-w-md">
@@ -133,7 +133,7 @@ const CommercialPage = () => {
                       className="relative flex items-center justify-center gap-2 w-full h-[58px] md:h-[52px] px-6 font-bold text-white touch-manipulation bg-gradient-to-r from-[#1DA851] via-[#25D366] to-[#1DA851] shadow-[0_6px_22px_rgba(37,211,102,0.42),0_2px_6px_rgba(0,0,0,0.28),inset_0_1px_0_rgba(255,255,255,0.20),inset_0_-2px_0_rgba(0,0,0,0.12)] hover:shadow-[0_10px_32px_rgba(37,211,102,0.60),0_4px_10px_rgba(0,0,0,0.32)] hover:scale-[1.025] active:scale-[0.95] transition-all duration-150"
                     >
                       <MessageCircle className="w-[18px] h-[18px] flex-shrink-0" strokeWidth={2} />
-                      <span className="text-[13px] font-semibold tracking-[0.18em] uppercase">Pedir Proposta</span>
+                      <span className="text-base font-semibold tracking-[0.18em] uppercase">Pedir Proposta</span>
                     </a>
                   </div>
                   <a
@@ -141,10 +141,10 @@ const CommercialPage = () => {
                     className="flex-1 flex items-center justify-center gap-2 h-[58px] md:h-[52px] px-6 font-bold border border-white/25 text-white hover:bg-white/10 transition-colors"
                   >
                     <Phone className="w-[16px] h-[16px] flex-shrink-0" strokeWidth={2} />
-                    <span className="text-[13px] font-semibold tracking-[0.18em] uppercase">{PHONE_DISPLAY}</span>
+                    <span className="text-base font-semibold tracking-[0.18em] uppercase">{PHONE_DISPLAY}</span>
                   </a>
                 </div>
-                <p className="text-white/40 text-xs mt-4">Orçamento personalizado · Visita de avaliação gratuita · Sem compromisso</p>
+                <p className="text-white/80 text-sm mt-4">Orçamento personalizado · Visita de avaliação gratuita · Sem compromisso</p>
               </div>
             </div>
           </section>
@@ -165,13 +165,13 @@ const CommercialPage = () => {
                     <p className="font-playfair text-lg font-bold mb-3 text-[#111111]">{seg.label}</p>
                     <ul className="space-y-2 mb-4">
                       {seg.painPoints.map((p, i) => (
-                        <li key={i} className="text-sm text-[#111111]/55 leading-relaxed flex items-start gap-2">
+                        <li key={i} className="text-base text-[#505650] leading-relaxed flex items-start gap-2">
                           <span className="w-1 h-1 rounded-full bg-[#D4AF37] flex-shrink-0 mt-2" />
                           {p}
                         </li>
                       ))}
                     </ul>
-                    <p className="text-sm text-[#111111]/70 leading-relaxed pt-4" style={{ borderTop: "1px solid #E8E4DE" }}>{seg.solution}</p>
+                    <p className="text-base text-[#111111]/70 leading-relaxed pt-4" style={{ borderTop: "1px solid #E8E4DE" }}>{seg.solution}</p>
                   </div>
                 );
               })}
@@ -189,7 +189,7 @@ const CommercialPage = () => {
                   <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0" style={{ backgroundColor: "rgba(212,175,55,0.12)", border: "1px solid rgba(212,175,55,0.3)" }}>
                     <CheckCircle2 className="w-4 h-4" style={{ color: "#D4AF37" }} />
                   </div>
-                  <span className="text-sm text-white/75 leading-relaxed pt-1.5">{benefit}</span>
+                  <span className="text-base text-white/75 leading-relaxed pt-1.5">{benefit}</span>
                 </div>
               ))}
             </div>
@@ -204,8 +204,8 @@ const CommercialPage = () => {
               <p className="font-playfair text-lg md:text-xl text-[#111111]/85 leading-relaxed mb-5">
                 "Somos um restaurante que prima pela qualidade e gostamos de contratar empresas de excelência com o mesmo reflexo! São eles que tornam o nosso ambiente mais limpo e charmoso! Recomendo 5⭐️"
               </p>
-              <p className="text-sm font-bold text-[#111111]">Lumiere Restaurante</p>
-              <p className="text-xs text-[#111111]/50">Avaliação Google verificada</p>
+              <p className="text-base font-bold text-[#111111]">Lumiere Restaurante</p>
+              <p className="text-sm text-[#505650]">Avaliação Google verificada</p>
             </div>
           </div>
         </section>
@@ -216,10 +216,10 @@ const CommercialPage = () => {
         {/* ═══ CTA FINAL ═══ */}
         <section className="py-14 md:py-16 bg-[#FDFDF9] border-t border-[#111111]/8">
           <div className="max-w-2xl mx-auto px-5 sm:px-6 lg:px-8 text-center">
-            <h2 className="font-playfair text-2xl md:text-3xl font-bold text-[#111111] mb-3">
+            <h2 className="type-section-title font-playfair    text-[#111111] mb-3">
               Peça uma proposta <span style={{ color: "#D4AF37" }}>sem compromisso</span>
             </h2>
-            <p className="text-[#111111]/60 text-sm mb-8 max-w-lg mx-auto">
+            <p className="text-[#505650] text-base mb-8 max-w-lg mx-auto">
               Fazemos uma visita de avaliação gratuita ao seu espaço {cityPrep(data.city.name)} {data.city.name} e enviamos uma proposta ajustada ao seu volume e frequência.
             </p>
             <div className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
@@ -230,14 +230,14 @@ const CommercialPage = () => {
                 className="flex-1 flex items-center justify-center gap-2 h-[56px] px-6 font-bold text-white bg-gradient-to-r from-[#1DA851] via-[#25D366] to-[#1DA851] shadow-[0_6px_22px_rgba(37,211,102,0.42)]"
               >
                 <MessageCircle className="w-[18px] h-[18px] flex-shrink-0" strokeWidth={2} />
-                <span className="text-[13px] font-semibold tracking-[0.18em] uppercase">WhatsApp</span>
+                <span className="text-base font-semibold tracking-[0.18em] uppercase">WhatsApp</span>
               </a>
               <a
                 href={`tel:${PHONE_TEL}`}
                 className="flex-1 flex items-center justify-center gap-2 h-[56px] px-6 font-bold border border-[#111111]/20 text-[#111111] hover:bg-[#111111]/5 transition-colors"
               >
                 <Phone className="w-[16px] h-[16px] flex-shrink-0" strokeWidth={2} />
-                <span className="text-[13px] font-semibold tracking-[0.18em] uppercase">{PHONE_DISPLAY}</span>
+                <span className="text-base font-semibold tracking-[0.18em] uppercase">{PHONE_DISPLAY}</span>
               </a>
             </div>
           </div>

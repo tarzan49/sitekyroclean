@@ -7,5 +7,5 @@ interface Props { serviceSlug: string; seed: string; heading?: string }
 export default function ServiceReviewsGrid({serviceSlug,seed,heading='Avaliações reais'}:Props) {
   const {pathname}=useLocation();
   const reviews=pickReviewSubset(serviceSlug,`${pathname}:${seed}`,6);
-  return <div>{heading&&<p className="text-[10px] font-bold tracking-[0.28em] uppercase text-gold mb-6">{heading}</p>}<CustomerReviews reviews={reviews} /></div>;
+  return <div>{heading&&<p className="text-sm font-bold tracking-[0.08em] uppercase text-gold mb-6">{heading}</p>}<CustomerReviews reviews={reviews} /></div>;
 }

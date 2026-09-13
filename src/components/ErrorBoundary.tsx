@@ -55,16 +55,16 @@ class ErrorBoundary extends Component<Props, State> {
             </div>
 
             {/* Label */}
-            <p className="text-[11px] font-bold tracking-[0.28em] uppercase mb-3" style={{ color: "#D4AF37" }}>
+            <p className="text-sm font-bold tracking-[0.08em] uppercase mb-3" style={{ color: "#D4AF37" }}>
               Algo correu mal
             </p>
 
             {/* Heading */}
-            <h1 className="font-playfair text-2xl sm:text-3xl font-bold text-white leading-snug mb-4">
+            <h1 className="type-page-title font-playfair    text-white  mb-4">
               Não foi possível carregar esta página
             </h1>
 
-            <p className="text-white/50 text-base max-w-sm mx-auto mb-10 leading-relaxed">
+            <p className="text-white/80 text-base max-w-sm mx-auto mb-10 leading-relaxed">
               Ocorreu um erro inesperado. Pedimos desculpa pelo incómodo, pode tentar recarregar ou voltar ao início.
             </p>
 
@@ -75,7 +75,7 @@ class ErrorBoundary extends Component<Props, State> {
                   this.setState({ hasError: false, error: undefined });
                   window.location.reload();
                 }}
-                className="flex items-center gap-2 bg-gradient-to-r from-[#B8912A] to-[#D4AF37] hover:from-[#D4AF37] hover:to-[#EDD96A] text-[#071a12] font-bold text-sm px-7 py-3.5 rounded-full shadow-[0_4px_20px_rgba(212,175,55,0.35)] hover:shadow-[0_4px_28px_rgba(212,175,55,0.5)] transition-all active:scale-[0.97] w-full sm:w-auto justify-center"
+                className="flex items-center gap-2 bg-gradient-to-r from-[#B8912A] to-[#D4AF37] hover:from-[#D4AF37] hover:to-[#EDD96A] text-[#071a12] font-bold text-base px-7 py-3.5 rounded-full shadow-[0_4px_20px_rgba(212,175,55,0.35)] hover:shadow-[0_4px_28px_rgba(212,175,55,0.5)] transition-all active:scale-[0.97] w-full sm:w-auto justify-center"
               >
                 <RefreshCw className="w-4 h-4" strokeWidth={2.5} />
                 Tentar novamente
@@ -84,7 +84,7 @@ class ErrorBoundary extends Component<Props, State> {
               <Link
                 to="/"
                 onClick={() => this.setState({ hasError: false, error: undefined })}
-                className="flex items-center gap-2 bg-white/[0.06] hover:bg-white/[0.10] border border-white/15 text-white font-semibold text-sm px-7 py-3.5 rounded-full transition-all active:scale-[0.97] backdrop-blur-sm w-full sm:w-auto justify-center"
+                className="flex items-center gap-2 bg-white/[0.06] hover:bg-white/[0.10] border border-white/15 text-white font-semibold text-base px-7 py-3.5 rounded-full transition-all active:scale-[0.97] backdrop-blur-sm w-full sm:w-auto justify-center"
               >
                 <Home className="w-4 h-4 text-gold" />
                 Página inicial
@@ -92,7 +92,7 @@ class ErrorBoundary extends Component<Props, State> {
             </div>
 
             {/* Support nudge */}
-            <p className="text-white/30 text-xs">
+            <p className="text-white/80 text-sm">
               Continua a ter problemas?{' '}
               <a
                 href={WHATSAPP_BASE}
@@ -107,7 +107,7 @@ class ErrorBoundary extends Component<Props, State> {
 
             {/* Dev error trace */}
             {import.meta.env.DEV && this.state.error && (
-              <div className="mt-8 p-4 bg-red-950/40 border border-red-500/20 text-red-400 text-xs text-left rounded-2xl overflow-auto max-h-40 font-mono">
+              <div className="mt-8 p-4 bg-red-950/40 border border-red-500/20 text-red-400 text-sm text-left rounded-2xl overflow-auto max-h-40 font-mono">
                 {this.state.error.toString()}
               </div>
             )}

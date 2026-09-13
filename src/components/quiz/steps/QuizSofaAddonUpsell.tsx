@@ -80,8 +80,8 @@ const QuizSofaAddonUpsell = ({ formData, updateFormData, sofaItems, setSofaItems
 
   return (
     <div className="flex flex-col gap-3 overflow-hidden items-center w-full">
-      <p className="text-gold text-[10px] font-bold tracking-[0.28em] uppercase mb-0.5 text-center w-full">ANTES DE SEGUIR</p>
-      <h2 className="font-playfair text-2xl sm:text-3xl font-bold text-white text-center w-full leading-snug">
+      <p className="text-gold text-sm font-bold tracking-[0.08em] uppercase mb-0.5 text-center w-full">ANTES DE SEGUIR</p>
+      <h2 className="type-quote-title font-playfair    text-white text-center w-full ">
         {titleBase}
       </h2>
       <QuizCareIntro service="sofa" sizeId={activeItems[0]?.sizeId}>
@@ -113,12 +113,12 @@ const QuizSofaAddonUpsell = ({ formData, updateFormData, sofaItems, setSofaItems
         >
           <Droplets className={cn('w-5 h-5 flex-shrink-0', anyPackOn ? 'text-gold' : 'text-gold/70')} />
           <div className="flex-1 min-w-0">
-            <p className={cn('text-sm font-bold', anyPackOn ? 'text-white' : 'text-white/90')}>Higienização Profunda</p>
-            <p className="text-[10px] text-white/65 leading-snug mt-0.5">Por extração, antes de aplicar a proteção. Na mesma visita.</p>
+            <p className={cn('text-base font-bold', anyPackOn ? 'text-white' : 'text-white/90')}>Higienização Profunda</p>
+            <p className="text-sm text-white/80 leading-snug mt-0.5">Por extração, antes de aplicar a proteção. Na mesma visita.</p>
             <div className="border-t border-gold/15 mt-2 pt-2">
-              <p className="text-[9px] font-bold uppercase tracking-[0.16em] text-white/45 mb-1">Acréscimo</p>
+              <p className="text-sm font-bold uppercase tracking-[0.16em] text-white/80 mb-1">Acréscimo</p>
               <p className="text-2xl leading-none font-black tracking-tight tabular-nums text-gold">{cleaningTotal === null ? 'Sob orçamento' : `+${cleaningTotal.toLocaleString('pt-PT')}€`}</p>
-              <p className="text-[11px] text-white/65 mt-1.5">para {protectionCount} {protectionCount === 1 ? 'sofá' : 'sofás'} · antes de descontos</p>
+              <p className="text-sm text-white/80 mt-1.5">para {protectionCount} {protectionCount === 1 ? 'sofá' : 'sofás'} · antes de descontos</p>
             </div>
           </div>
           <span className={cn(
@@ -134,13 +134,13 @@ const QuizSofaAddonUpsell = ({ formData, updateFormData, sofaItems, setSofaItems
       <div className="flex items-center gap-3 w-full max-w-sm mt-1">
         <button
           onClick={onBack}
-          className="h-14 px-5 flex-shrink-0 bg-transparent border border-white/[0.14] text-white/70 hover:text-white/80 hover:border-white/30 active:scale-[0.98] touch-manipulation rounded-sm flex items-center justify-center transition-all text-sm font-semibold"
+          className="h-14 px-5 flex-shrink-0 bg-transparent border border-white/[0.14] text-white/70 hover:text-white/80 hover:border-white/30 active:scale-[0.98] touch-manipulation rounded-sm flex items-center justify-center transition-all text-base font-semibold"
         >
           <ChevronLeft className="w-4 h-4 mr-1" /> Voltar
         </button>
         <button
           onClick={onContinue}
-          className="flex-1 h-14 bg-gradient-to-r from-gold to-[#d4c57b] hover:from-[#d4c57b] hover:to-gold text-[#12121e] font-black text-sm leading-snug px-2 tracking-wider uppercase touch-manipulation active:scale-[0.98] rounded-sm shadow-[0_0_32px_rgba(212,175,55,0.30)]"
+          className="flex-1 h-14 bg-gradient-to-r from-gold to-[#d4c57b] hover:from-[#d4c57b] hover:to-gold text-[#12121e] font-black text-base leading-snug px-2   touch-manipulation active:scale-[0.98] rounded-sm shadow-[0_0_32px_rgba(212,175,55,0.30)]"
         >
           {anyPackOn ? (isWaterproofBase ? 'Continuar com higienização' : 'Continuar com tratamento') : 'Continuar sem extras'}
         </button>

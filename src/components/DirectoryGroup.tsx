@@ -33,7 +33,7 @@ export default function DirectoryGroup({ title, children, dark = false, language
     <details key={pathname} open={open} className={`group/directory border-b ${dark ? "border-white/15 text-white" : "border-[#E8E4DE] text-[#111111]"}`}>
       <summary className="flex min-h-16 cursor-pointer list-none items-center gap-4 py-4 text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#D4AF37] [&::-webkit-details-marker]:hidden">
         <span className="flex-1 text-base font-semibold leading-relaxed">{title}</span>
-        <span className={`text-xs tabular-nums ${dark ? "text-white/60" : "text-[#666]"}`}>{links.length}</span>
+        <span className={`text-sm tabular-nums ${dark ? "text-white/80" : "text-[#666]"}`}>{links.length}</span>
         <ChevronDown aria-hidden="true" className="h-4 w-4 shrink-0 text-[#B8912A] transition-transform group-open/directory:rotate-180" />
       </summary>
       <div className="pb-5">
@@ -41,10 +41,10 @@ export default function DirectoryGroup({ title, children, dark = false, language
           <label htmlFor={id} className="sr-only">{en ? "Search" : "Pesquisar"}: {title}</label>
           <Search aria-hidden="true" className="absolute left-3 top-4 h-4 w-4 text-[#857443]" />
           <input id={id} type="search" value={query} onChange={event => setQuery(event.target.value)} placeholder={en ? "Search this list…" : "Pesquisar nesta lista…"}
-            className={`min-h-12 w-full rounded-md border py-3 pl-10 pr-12 text-base focus:outline-none focus:ring-2 focus:ring-[#D4AF37]/60 [&::-webkit-search-cancel-button]:appearance-none ${dark ? "border-white/20 bg-white/5 text-white placeholder:text-white/50" : "border-[#E8E4DE] bg-white text-[#111111] placeholder:text-[#777]"}`} />
+            className={`min-h-12 w-full rounded-md border py-3 pl-10 pr-12 text-base focus:outline-none focus:ring-2 focus:ring-[#D4AF37]/60 [&::-webkit-search-cancel-button]:appearance-none ${dark ? "border-white/20 bg-white/5 text-white placeholder:text-white/80" : "border-[#E8E4DE] bg-white text-[#111111] placeholder:text-[#777]"}`} />
           {query && <button type="button" aria-label={en ? "Clear search" : "Limpar pesquisa"} onClick={() => setQuery("")} className="absolute right-0 top-0 flex h-12 w-12 items-center justify-center rounded-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#D4AF37]"><X aria-hidden="true" className="h-4 w-4" /></button>}
         </div>}
-        {search && <p role="status" className={`mb-2 text-sm ${dark ? "text-white/65" : "text-[#666]"}`}>{matches.length ? `${matches.length} ${en ? "results" : "resultados"}` : en ? "No results. Try another name." : "Sem resultados. Experimente outro nome."}</p>}
+        {search && <p role="status" className={`mb-2 text-base ${dark ? "text-white/80" : "text-[#666]"}`}>{matches.length ? `${matches.length} ${en ? "results" : "resultados"}` : en ? "No results. Try another name." : "Sem resultados. Experimente outro nome."}</p>}
         <div className="grid gap-x-6 sm:grid-cols-2 lg:grid-cols-3">
           {links.map(link => cloneElement(link, {
             // Keep every destination in the HTML, including while filtering.

@@ -50,19 +50,19 @@ export default function PriceFactors({ serviceSlug }: { serviceSlug: string }) {
                 <div className={`flex h-16 w-16 items-center justify-center rounded-2xl ${index === 1 ? "bg-white/10 text-[#D4AF37]" : "bg-[#f2f4ed] text-[#183e2e]"}`}>
                   <Icon aria-hidden="true" className="h-9 w-9" strokeWidth={1.4} />
                 </div>
-                <span aria-hidden="true" className={`text-xs font-semibold tracking-[0.15em] ${index === 1 ? "text-[#D4AF37]" : "text-[#637367]"}`}>0{index + 1}</span>
+                <span aria-hidden="true" className={`text-sm font-semibold tracking-[0.15em] ${index === 1 ? "text-[#D4AF37]" : "text-[#637367]"}`}>0{index + 1}</span>
               </div>
-              <h3 className="font-playfair text-2xl leading-tight">{title}</h3>
+              <h3 className="type-card-title font-playfair  ">{title}</h3>
               <p className={`mt-3 text-base leading-relaxed ${index === 1 ? "text-[#d6e1da]" : "text-[#46564e]"}`}>{description}</p>
               <ul className={`mt-6 space-y-3 border-t pt-5 ${index === 1 ? "border-white/20" : "border-[#e5e9e2]"}`}>
-                {examples.map(example => <li key={example} className="flex items-start gap-2.5 text-sm leading-relaxed"><Check aria-hidden="true" className={`mt-0.5 h-4 w-4 shrink-0 ${index === 1 ? "text-[#D4AF37]" : "text-[#326448]"}`} />{example}</li>)}
+                {examples.map(example => <li key={example} className="flex items-start gap-2.5 text-base leading-relaxed"><Check aria-hidden="true" className={`mt-0.5 h-4 w-4 shrink-0 ${index === 1 ? "text-[#D4AF37]" : "text-[#326448]"}`} />{example}</li>)}
               </ul>
             </article>
           ))}
         </div>
         <div className="mt-6 flex items-start gap-3 rounded-xl bg-[#eef2ea] px-5 py-5 sm:items-center">
           <ShieldCheck aria-hidden="true" className="h-6 w-6 shrink-0 text-[#28523b]" />
-          <p className="text-sm leading-relaxed text-[#344b3b]"><strong className="font-semibold text-[#0d241b]">Sabe o valor antes de marcar.</strong> Confirmamos os detalhes, os extras escolhidos e a deslocação no orçamento. Gratuito e sem compromisso.</p>
+          <p className="text-base leading-relaxed text-[#344b3b]"><strong className="font-semibold text-[#0d241b]">Sabe o valor antes de marcar.</strong> Confirmamos os detalhes, os extras escolhidos e a deslocação no orçamento. Gratuito e sem compromisso.</p>
         </div>
       </div>
     </section>

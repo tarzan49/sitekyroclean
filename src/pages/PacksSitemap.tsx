@@ -1,5 +1,5 @@
 import DirectoryGroup from "@/components/DirectoryGroup";
-﻿import { Link } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { ArrowRight, Map } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -48,25 +48,25 @@ const PacksSitemap = () => {
         {/* Hero */}
         <section className="pt-24 md:pt-28 pb-10 bg-checker-dark">
           <div className="max-w-5xl mx-auto px-5 sm:px-6 lg:px-8">
-            <nav className="flex items-center gap-1.5 text-xs text-white/40 mb-6">
+            <nav className="flex items-center gap-1.5 text-sm text-white/80 mb-6">
               <Link to="/" className="hover:text-white/70">Início</Link>
               <span>/</span>
               <Link to="/packs" className="hover:text-white/70">Packs</Link>
               <span>/</span>
-              <span className="text-white/60">Guia de Packs</span>
+              <span className="text-white/80">Guia de Packs</span>
             </nav>
             <div className="flex items-start gap-4">
               <div className="w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0 border" style={{ background: "rgba(212,175,55,0.1)", borderColor: "rgba(212,175,55,0.3)" }}>
                 <Map className="w-6 h-6" style={{ color: "#D4AF37" }} />
               </div>
               <div>
-                <p className="text-[10px] font-bold tracking-[0.28em] uppercase mb-2" style={{ color: "#D4AF37" }}>
+                <p className="text-sm font-bold tracking-[0.08em] uppercase mb-2" style={{ color: "#D4AF37" }}>
                   {packs.length} packs · {packCities.length} cidades · {packs.length * packCities.length} páginas
                 </p>
-                <h1 className="font-playfair text-3xl md:text-4xl font-bold text-white mb-3">
+                <h1 className="type-page-title font-playfair    text-white mb-3">
                   Guia Completo de Packs
                 </h1>
-                <p className="text-white/60 text-base max-w-xl">
+                <p className="text-white/80 text-base max-w-xl">
                   Todos os packs Kyro Clean disponíveis por cidade. Clique no pack que pretende para configurar e pedir confirmação via WhatsApp.
                 </p>
               </div>
@@ -87,18 +87,18 @@ const PacksSitemap = () => {
                   <div className="flex flex-wrap items-start justify-between gap-3 mb-5">
                     <div>
                       <div className="flex items-center gap-2 mb-1">
-                        <span className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full border ${badgeClass}`}>
+                        <span className={`text-sm font-bold px-2.5 py-0.5 rounded-full border ${badgeClass}`}>
                           {savingsLabel}
                         </span>
-                        <span className="text-xs text-[#111111]/40">
+                        <span className="text-sm text-[#505650]">
                           Artigos e tratamentos à escolha
                         </span>
                       </div>
-                      <h2 className="font-playfair text-xl font-bold text-[#111111]">{pack.name}</h2>
-                      <p className="text-sm text-[#111111]/50 mt-0.5">{pack.tagline}</p>
+                      <h2 className="type-section-title font-playfair   text-[#111111]">{pack.name}</h2>
+                      <p className="text-base text-[#505650] mt-0.5">{pack.tagline}</p>
                     </div>
                     <div className="text-right">
-                      <p className="text-xs text-[#111111]/35 mb-0.5">à sua medida</p>
+                      <p className="text-sm text-[#505650] mb-0.5">à sua medida</p>
                       <p className="font-playfair text-2xl font-bold" style={{ color: "#D4AF37" }}>Personalizável</p>
                     </div>
                   </div>
@@ -112,10 +112,10 @@ const PacksSitemap = () => {
                         className="group flex items-center justify-between px-4 py-3 bg-white rounded-xl border border-[#E8E4DE] hover:border-[#D4AF37]/40 hover:shadow-sm transition-all"
                       >
                         <div>
-                          <p className="text-sm font-semibold text-[#111111] group-hover:text-[#0d3c47]">{city.name}</p>
-                          <p className="text-[10px] text-[#111111]/35">Configurar artigos</p>
+                          <p className="text-base font-semibold text-[#111111] group-hover:text-[#0d3c47]">{city.name}</p>
+                          <p className="text-sm text-[#505650]">Configurar artigos</p>
                         </div>
-                        <ArrowRight className="w-3.5 h-3.5 text-[#111111]/25 group-hover:text-gold group-hover:translate-x-0.5 transition-all flex-shrink-0" />
+                        <ArrowRight className="w-3.5 h-3.5 text-[#505650] group-hover:text-gold group-hover:translate-x-0.5 transition-all flex-shrink-0" />
                       </Link>
                     ))}
                   </DirectoryGroup>
@@ -131,15 +131,15 @@ const PacksSitemap = () => {
         {/* Quick reference table */}
         <section className="py-10 bg-[#FDFDF9]">
           <div className="max-w-5xl mx-auto px-5 sm:px-6 lg:px-8">
-            <h2 className="font-playfair text-xl font-bold text-[#111111] mb-6">Comparação rápida dos packs</h2>
+            <h2 className="type-section-title font-playfair   text-[#111111] mb-6">Comparação rápida dos packs</h2>
             <div className="overflow-x-auto rounded-2xl border border-[#E8E4DE]">
-              <table className="w-full text-sm">
+              <table className="w-full text-base">
                 <thead>
                   <tr className="border-b border-[#E8E4DE] bg-[#FDFDF9]">
-                    <th className="text-left px-5 py-3 font-bold text-[#111111]/60 text-xs uppercase tracking-wide">Pack</th>
-                    <th className="text-left px-5 py-3 font-bold text-[#111111]/60 text-xs uppercase tracking-wide">Serviços</th>
-                    <th className="text-left px-5 py-3 font-bold text-[#111111]/60 text-xs uppercase tracking-wide">Desconto</th>
-                    <th className="text-left px-5 py-3 font-bold text-[#111111]/60 text-xs uppercase tracking-wide">Desde</th>
+                    <th className="text-left px-5 py-3 font-bold text-[#505650] text-sm uppercase tracking-wide">Pack</th>
+                    <th className="text-left px-5 py-3 font-bold text-[#505650] text-sm uppercase tracking-wide">Serviços</th>
+                    <th className="text-left px-5 py-3 font-bold text-[#505650] text-sm uppercase tracking-wide">Desconto</th>
+                    <th className="text-left px-5 py-3 font-bold text-[#505650] text-sm uppercase tracking-wide">Desde</th>
                     <th className="px-5 py-3" />
                   </tr>
                 </thead>
@@ -149,13 +149,13 @@ const PacksSitemap = () => {
                       <tr key={pack.id} className={i < packs.length - 1 ? "border-b border-[#E8E4DE]" : ""}>
                         <td className="px-5 py-4">
                           <p className="font-semibold text-[#111111]">{pack.name}</p>
-                          <p className="text-[11px] text-[#111111]/40 mt-0.5 max-w-[200px]">{pack.tagline.split(':')[0]}</p>
+                          <p className="text-sm text-[#505650] mt-0.5 max-w-[200px]">{pack.tagline.split(':')[0]}</p>
                         </td>
-                        <td className="px-5 py-4 text-[#111111]/60">
+                        <td className="px-5 py-4 text-[#505650]">
                           Escolha os seus artigos
                         </td>
                         <td className="px-5 py-4">
-                          <span className="text-xs font-bold text-green-700 bg-green-50 border border-green-200 px-2 py-0.5 rounded-full">
+                          <span className="text-sm font-bold text-green-700 bg-green-50 border border-green-200 px-2 py-0.5 rounded-full">
                             Conforme configuração
                           </span>
                         </td>
@@ -165,7 +165,7 @@ const PacksSitemap = () => {
                         <td className="px-5 py-4">
                           <Link
                             to="/packs"
-                            className="inline-flex items-center gap-1 text-xs font-semibold text-gold hover:underline"
+                            className="inline-flex items-center gap-1 text-sm font-semibold text-gold hover:underline"
                           >
                             Ver pack <ArrowRight className="w-3 h-3" />
                           </Link>
@@ -182,12 +182,12 @@ const PacksSitemap = () => {
         {/* Back to packs */}
         <section className="py-8 bg-[#FDFDF9] border-t border-[#E8E4DE]">
           <div className="max-w-5xl mx-auto px-5 sm:px-6 lg:px-8 flex items-center justify-between flex-wrap gap-4">
-            <p className="text-sm text-[#111111]/50">
+            <p className="text-base text-[#505650]">
               {packs.length * packCities.length} combinações disponíveis · Pedido por WhatsApp · Resposta em menos de 10 min
             </p>
             <Link
               to="/packs"
-              className="inline-flex items-center gap-2 text-sm font-semibold text-[#111111] hover:text-gold transition-colors"
+              className="inline-flex items-center gap-2 text-base font-semibold text-[#111111] hover:text-gold transition-colors"
             >
               <ArrowRight className="w-4 h-4 rotate-180" />
               Ver página de packs

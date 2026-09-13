@@ -73,7 +73,7 @@ const EnServicePage = () => {
         <EnHeader />
         <main className="pt-28 pb-16 min-h-screen bg-white">
           <div className="container mx-auto px-4 text-center">
-            <h1 className="font-playfair text-3xl font-bold text-[#111111] mb-4">Page not found</h1>
+            <h1 className="type-page-title font-playfair   text-[#111111] mb-4">Page not found</h1>
             <Link to="/" style={{ color: "#D4AF37" }} className="hover:underline">Back to homepage</Link>
           </div>
         </main>
@@ -129,17 +129,17 @@ const EnServicePage = () => {
                 <div className="inline-flex items-start mb-5">
                   <div className="flex flex-col gap-1">
                     <div className="w-7 h-px bg-gradient-to-r from-gold to-transparent" />
-                    <span className="text-[10px] font-bold text-gold/90 tracking-[0.30em] uppercase" style={{ textShadow: "0 1px 6px rgba(0,0,0,0.6)" }}>
+                    <span className="text-sm font-bold text-gold/90 tracking-[0.30em] uppercase" style={{ textShadow: "0 1px 6px rgba(0,0,0,0.6)" }}>
                       {page.audience === "host" ? "For Hosts & Property Managers" : "Local cleaning team"}
                     </span>
                   </div>
                 </div>
 
-                <h1 className="font-playfair text-[1.75rem] sm:text-4xl md:text-5xl lg:text-6xl font-semibold text-white mb-4 leading-[1.12]" style={{ textShadow: "0 2px 16px rgba(0,0,0,0.65)" }}>
+                <h1 className="type-page-title font-playfair      text-white mb-4 " style={{ textShadow: "0 2px 16px rgba(0,0,0,0.65)" }}>
                   {page.h1}{" "}<span style={{ color: "#D4AF37" }}>{page.h1Gold}</span>
                 </h1>
 
-                <p className="text-sm sm:text-base md:text-lg text-white/70 leading-relaxed mb-6 max-w-lg">
+                <p className="text-base sm:text-base md:text-lg text-white/70 leading-relaxed mb-6 max-w-lg">
                   {page.intro}
                 </p>
 
@@ -150,13 +150,13 @@ const EnServicePage = () => {
                         <Star key={i} className="w-4 h-4 fill-[#D4AF37]" style={{ color: "#D4AF37" }} />
                       ))}
                     </div>
-                    <span className="text-white font-bold text-sm">{REVIEW_RATING}</span>
-                    <span className="text-white/50 text-xs">Google</span>
+                    <span className="text-white font-bold text-base">{REVIEW_RATING}</span>
+                    <span className="text-white/80 text-sm">Google</span>
                   </div>
                   <div className="h-4 w-px bg-white/20" />
-                  <span className="text-white/60 text-xs font-medium">{REVIEW_COUNT}+ reviews</span>
+                  <span className="text-white/80 text-sm font-medium">{REVIEW_COUNT}+ reviews</span>
                   <div className="h-4 w-px bg-white/20" />
-                  <span className="text-white/60 text-xs font-medium">{CLIENTS_SERVED_LABEL} clients</span>
+                  <span className="text-white/80 text-sm font-medium">{CLIENTS_SERVED_LABEL} clients</span>
                 </div>
 
                 <div className="flex flex-col sm:flex-row gap-3 max-w-md">
@@ -169,7 +169,7 @@ const EnServicePage = () => {
                       className="relative flex items-center justify-center gap-2 w-full h-[58px] md:h-[52px] px-6 font-bold text-white touch-manipulation bg-gradient-to-r from-[#1DA851] via-[#25D366] to-[#1DA851] shadow-[0_6px_22px_rgba(37,211,102,0.42),0_2px_6px_rgba(0,0,0,0.28),inset_0_1px_0_rgba(255,255,255,0.20),inset_0_-2px_0_rgba(0,0,0,0.12)] hover:shadow-[0_10px_32px_rgba(37,211,102,0.60),0_4px_10px_rgba(0,0,0,0.32)] hover:scale-[1.025] active:scale-[0.95] transition-all duration-150"
                     >
                       <MessageCircle className="w-[18px] h-[18px] flex-shrink-0" strokeWidth={2} />
-                      <span className="text-[13px] font-semibold tracking-[0.18em] uppercase">Message on WhatsApp</span>
+                      <span className="text-base font-semibold tracking-[0.18em] uppercase">Message on WhatsApp</span>
                     </a>
                   </div>
                   <a
@@ -177,11 +177,11 @@ const EnServicePage = () => {
                     className="flex-1 flex items-center justify-center gap-2 h-[58px] md:h-[52px] px-6 font-bold border border-white/25 text-white hover:bg-white/10 transition-colors"
                   >
                     <Phone className="w-[16px] h-[16px] flex-shrink-0" strokeWidth={2} />
-                    <span className="text-[13px] font-semibold tracking-[0.18em] uppercase">{PHONE_DISPLAY}</span>
+                    <span className="text-base font-semibold tracking-[0.18em] uppercase">{PHONE_DISPLAY}</span>
                   </a>
                 </div>
 
-                <p className="text-white/60 text-sm mt-4">{EN_AVAILABILITY_PROMISE}</p><p className="text-white/60 text-sm mt-2">{EN_DRYING_PROMISE}</p><p className="text-white/40 text-xs mt-4">Free quote · No obligation · {EN_RESPONSE_PROMISE}</p>
+                <p className="text-white/80 text-base mt-4">{EN_AVAILABILITY_PROMISE}</p><p className="text-white/80 text-base mt-2">{EN_DRYING_PROMISE}</p><p className="text-white/80 text-sm mt-4">Free quote · No obligation · {EN_RESPONSE_PROMISE}</p>
               </div>
             </div>
           </section>
@@ -197,7 +197,7 @@ const EnServicePage = () => {
               {page.scenarios.map((s, idx) => (
                 <div key={idx} className="relative overflow-hidden flex flex-col p-6 md:p-7 bg-white" style={{ borderTop: "2px solid #D4AF37" }}>
                   <p className="font-playfair text-lg font-bold mb-2 leading-tight text-[#111111]">{s.title}</p>
-                  <p className="text-sm text-[#111111]/60 leading-relaxed">{s.body}</p>
+                  <p className="text-base text-[#505650] leading-relaxed">{s.body}</p>
                 </div>
               ))}
             </div>
@@ -214,7 +214,7 @@ const EnServicePage = () => {
                   <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0" style={{ backgroundColor: "rgba(212,175,55,0.12)", border: "1px solid rgba(212,175,55,0.3)" }}>
                     <CheckCircle2 className="w-4 h-4" style={{ color: "#D4AF37" }} />
                   </div>
-                  <span className="text-sm text-white/75 leading-relaxed pt-1.5">{reason}</span>
+                  <span className="text-base text-white/75 leading-relaxed pt-1.5">{reason}</span>
                 </div>
               ))}
             </div>
@@ -226,7 +226,7 @@ const EnServicePage = () => {
 
         {page.audience === "host" && (
           <section className="py-8 bg-[#FDFDF9] border-t border-[#111111]/8 text-center px-5">
-            <p className="text-sm text-[#111111]/60">
+            <p className="text-base text-[#505650]">
               Want more detail on documentation and pricing?{" "}
               <Link to="/en/airbnb-portugal-cleaning-guide" className="font-semibold underline underline-offset-4" style={{ color: "#D4AF37" }}>
                 Read the full host guide
@@ -238,10 +238,10 @@ const EnServicePage = () => {
         {/* ═══ FINAL CTA ═══ */}
         <section className="py-14 md:py-16 bg-kyro-green border-t border-white/10">
           <div className="max-w-3xl mx-auto px-5 sm:px-6 lg:px-8 text-center">
-            <h2 className="font-playfair text-2xl md:text-3xl font-bold text-white mb-3">
+            <h2 className="type-section-title font-playfair    text-white mb-3">
               Need help <span style={{ color: "#D4AF37" }}>right now?</span>
             </h2>
-            <p className="text-white/60 text-sm mb-8 max-w-lg mx-auto">
+            <p className="text-white/80 text-base mb-8 max-w-lg mx-auto">
               Message us on WhatsApp with a photo of the problem, or call us directly. {EN_RESPONSE_PROMISE}.
             </p>
             <div className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
@@ -252,14 +252,14 @@ const EnServicePage = () => {
                 className="flex-1 flex items-center justify-center gap-2 h-[56px] px-6 font-bold text-white bg-gradient-to-r from-[#1DA851] via-[#25D366] to-[#1DA851] shadow-[0_6px_22px_rgba(37,211,102,0.42)]"
               >
                 <MessageCircle className="w-[18px] h-[18px] flex-shrink-0" strokeWidth={2} />
-                <span className="text-[13px] font-semibold tracking-[0.18em] uppercase">WhatsApp</span>
+                <span className="text-base font-semibold tracking-[0.18em] uppercase">WhatsApp</span>
               </a>
               <a
                 href={`tel:${PHONE_TEL}`}
                 className="flex-1 flex items-center justify-center gap-2 h-[56px] px-6 font-bold border border-white/25 text-white hover:bg-white/10 transition-colors"
               >
                 <Phone className="w-[16px] h-[16px] flex-shrink-0" strokeWidth={2} />
-                <span className="text-[13px] font-semibold tracking-[0.18em] uppercase">{PHONE_DISPLAY}</span>
+                <span className="text-base font-semibold tracking-[0.18em] uppercase">{PHONE_DISPLAY}</span>
               </a>
             </div>
           </div>

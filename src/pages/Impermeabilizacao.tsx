@@ -129,7 +129,7 @@ const WaterproofingTierComparison = () => (
           >
             {tier.badge && (
               <span
-                className="absolute top-5 right-5 text-[9px] font-bold tracking-[0.18em] uppercase px-2.5 py-1"
+                className="absolute top-5 right-5 text-sm font-bold tracking-[0.18em] uppercase px-2.5 py-1"
                 style={{ background: "linear-gradient(90deg,#B8912A,#EDD96A)", color: "#071a12" }}
               >
                 {tier.badge}
@@ -141,12 +141,12 @@ const WaterproofingTierComparison = () => (
             >
               <div className="flex items-center gap-2.5 mb-4">
                 <tier.icon className="w-4 h-4" style={{ color: "#D4AF37" }} strokeWidth={1.75} />
-                <p className="text-[10px] font-bold tracking-[0.24em] uppercase" style={{ color: tier.highlighted ? "rgba(255,255,255,0.55)" : "rgba(17,17,17,0.50)" }}>
+                <p className="text-sm font-bold tracking-[0.24em] uppercase" style={{ color: tier.highlighted ? "rgba(255,255,255,0.55)" : "rgba(17,17,17,0.50)" }}>
                   {tier.base}
                 </p>
               </div>
               <h3
-                className="font-playfair text-2xl md:text-[1.75rem] font-bold mb-5"
+                className="type-card-title font-playfair    mb-5"
                 style={{ color: tier.highlighted ? "#ffffff" : "#111111" }}
               >
                 {tier.name}
@@ -154,19 +154,19 @@ const WaterproofingTierComparison = () => (
 
               <div className="space-y-2.5 mb-6 pb-6" style={{ borderBottom: `1px solid ${tier.highlighted ? "rgba(255,255,255,0.10)" : "rgba(17,17,17,0.08)"}` }}>
                 <div className="flex items-baseline justify-between gap-3">
-                  <span className="text-[13px]" style={{ color: tier.highlighted ? "rgba(255,255,255,0.55)" : "rgba(17,17,17,0.55)" }}>Sofá 1L / 2L / 3L</span>
-                  <span className="font-playfair font-bold text-sm tabular-nums" style={{ color: tier.highlighted ? "#D4AF37" : "#111111" }}>{tier.sofaPrice}</span>
+                  <span className="text-base" style={{ color: tier.highlighted ? "rgba(255,255,255,0.55)" : "rgba(17,17,17,0.55)" }}>Sofá 1L / 2L / 3L</span>
+                  <span className="font-playfair font-bold text-base tabular-nums" style={{ color: tier.highlighted ? "#D4AF37" : "#111111" }}>{tier.sofaPrice}</span>
                 </div>
                 <div className="flex items-baseline justify-between gap-3">
-                  <span className="text-[13px]" style={{ color: tier.highlighted ? "rgba(255,255,255,0.55)" : "rgba(17,17,17,0.55)" }}>Cadeiras</span>
-                  <span className="font-playfair font-bold text-sm tabular-nums text-right" style={{ color: tier.highlighted ? "#D4AF37" : "#111111" }}>{tier.chairPrice}</span>
+                  <span className="text-base" style={{ color: tier.highlighted ? "rgba(255,255,255,0.55)" : "rgba(17,17,17,0.55)" }}>Cadeiras</span>
+                  <span className="font-playfair font-bold text-base tabular-nums text-right" style={{ color: tier.highlighted ? "#D4AF37" : "#111111" }}>{tier.chairPrice}</span>
                 </div>
               </div>
 
-              <p className="text-sm font-semibold mb-1" style={{ color: tier.highlighted ? "#ffffff" : "#111111" }}>
+              <p className="text-base font-semibold mb-1" style={{ color: tier.highlighted ? "#ffffff" : "#111111" }}>
                 {tier.durability}
               </p>
-              <p className="text-[13px] mb-6" style={{ color: tier.highlighted ? "rgba(255,255,255,0.50)" : "rgba(17,17,17,0.50)" }}>
+              <p className="text-base mb-6" style={{ color: tier.highlighted ? "rgba(255,255,255,0.50)" : "rgba(17,17,17,0.50)" }}>
                 {tier.washes}
               </p>
 
@@ -174,7 +174,7 @@ const WaterproofingTierComparison = () => (
                 {tier.features.map((f, i) => (
                   <div key={i} className="flex items-start gap-2.5">
                     <Check className="w-3.5 h-3.5 flex-shrink-0 mt-0.5" style={{ color: "#D4AF37" }} strokeWidth={2.5} />
-                    <span className="text-[13px] leading-snug" style={{ color: tier.highlighted ? "rgba(255,255,255,0.75)" : "rgba(17,17,17,0.70)" }}>
+                    <span className="text-base leading-snug" style={{ color: tier.highlighted ? "rgba(255,255,255,0.75)" : "rgba(17,17,17,0.70)" }}>
                       {f.label}
                     </span>
                   </div>
@@ -184,7 +184,7 @@ const WaterproofingTierComparison = () => (
           </div>
         ))}
       </div>
-      <p className="text-center text-[13px] mt-8" style={{ color: "rgba(17,17,17,0.45)" }}>
+      <p className="text-center text-base mt-8" style={{ color: "rgba(17,17,17,0.45)" }}>
         Colchões continuam a ter apenas higienização, sem opção de impermeabilização. O Pack Proteção Total está sempre associado à versão Essencial.
       </p>
     </div>

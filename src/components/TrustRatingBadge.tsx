@@ -29,7 +29,7 @@ const TrustRatingBadge = ({ variant }: TrustRatingBadgeProps) => {
               <span className="font-playfair text-xl font-bold leading-none text-[#0B2F2A]">{REVIEW_RATING}</span>
               <Star className="h-3.5 w-3.5 fill-[#D4AF37] text-[#D4AF37]" aria-hidden="true" />
             </span>
-            <span className="mt-1 block text-[8px] font-bold uppercase leading-tight tracking-[0.1em] text-[#0B2F2A]/60">{REVIEW_COUNT}+ avaliações Google</span>
+            <span className="mt-1 block text-sm font-bold uppercase leading-tight tracking-[0.1em] text-[#0B2F2A]/60">{REVIEW_COUNT}+ avaliações Google</span>
           </span>
         </a>
       );
@@ -44,18 +44,18 @@ const TrustRatingBadge = ({ variant }: TrustRatingBadgeProps) => {
                   <Star key={i} className="w-4 h-4 fill-[#D4AF37]" style={{ color: "#D4AF37" }} />
                 ))}
               </div>
-              <span className="text-white font-bold text-sm">{REVIEW_RATING}</span>
-              <span className="text-white/50 text-xs">Google</span>
+              <span className="text-white font-bold text-base">{REVIEW_RATING}</span>
+              <span className="text-white/80 text-sm">Google</span>
             </div>
             <div className="h-4 w-px bg-white/20" />
-            <span className="text-white/60 text-xs font-medium">{REVIEW_COUNT}+ avaliações</span>
+            <span className="text-white/80 text-sm font-medium">{REVIEW_COUNT}+ avaliações</span>
             <div className="h-4 w-px bg-white/20" />
-            <span className="text-white/60 text-xs font-medium">+1100 clientes</span>
+            <span className="text-white/80 text-sm font-medium">+1100 clientes</span>
           </div>
           <a
             href={`tel:${PHONE_TEL}`}
             onClick={() => trackCallClick('hero_mobile')}
-            className="md:hidden inline-flex items-center gap-1.5 text-white/45 text-xs mt-2.5 hover:text-white/70 transition-colors"
+            className="md:hidden inline-flex items-center gap-1.5 text-white/80 text-sm mt-2.5 hover:text-white/70 transition-colors"
           >
             <Phone className="w-3 h-3 flex-shrink-0" strokeWidth={2} />
             Prefere ligar? {PHONE_DISPLAY}
@@ -69,7 +69,7 @@ const TrustRatingBadge = ({ variant }: TrustRatingBadgeProps) => {
           {[...Array(5)].map((_, i) => (
             <Star key={i} className="w-4 h-4 fill-[#D4AF37]" style={{ color: "#D4AF37" }} />
           ))}
-          <span className="text-sm text-white/60 ml-1">{REVIEW_RATING} · {REVIEW_COUNT}+ avaliações</span>
+          <span className="text-base text-white/80 ml-1">{REVIEW_RATING} · {REVIEW_COUNT}+ avaliações</span>
         </div>
       );
 
@@ -87,7 +87,7 @@ const TrustRatingBadge = ({ variant }: TrustRatingBadgeProps) => {
               <Star key={i} className="w-2.5 h-2.5 fill-[#D4AF37] text-[#D4AF37]" />
             ))}
           </div>
-          <span className="text-white/80 text-[11px] font-semibold tracking-wide">
+          <span className="text-white/80 text-sm font-semibold tracking-wide">
             {REVIEW_RATING} · {REVIEW_COUNT}+ avaliações Google
           </span>
         </a>
@@ -107,7 +107,7 @@ const TrustRatingBadge = ({ variant }: TrustRatingBadgeProps) => {
             <GoogleG className="h-7 w-7" />
           </span>
           <span className="min-w-0 flex-1">
-            <span className="block text-[10px] font-bold uppercase tracking-[0.2em] text-[#0B2F2A]/60">Avaliação Google</span>
+            <span className="block text-sm font-bold uppercase tracking-[0.2em] text-[#0B2F2A]/60">Avaliação Google</span>
             <span className="mt-1 flex items-end gap-2">
               <span className="font-playfair text-[2rem] font-bold leading-[0.9] text-[#0B2F2A]">{REVIEW_RATING}</span>
               <span className="flex gap-0.5 pb-0.5" aria-hidden="true">
@@ -116,7 +116,7 @@ const TrustRatingBadge = ({ variant }: TrustRatingBadgeProps) => {
                 ))}
               </span>
             </span>
-            <span className="mt-1.5 block text-[11px] font-semibold tracking-wide text-[#0B2F2A]/65">
+            <span className="mt-1.5 block text-sm font-semibold tracking-wide text-[#0B2F2A]/65">
               {REVIEW_COUNT}+ avaliações de clientes
             </span>
           </span>
@@ -147,13 +147,13 @@ const TrustRatingBadge = ({ variant }: TrustRatingBadgeProps) => {
                 <Star key={i} className="w-2.5 h-2.5 fill-[#D4AF37] text-[#D4AF37]" />
               ))}
             </div>
-            <span className="text-white/80 text-[11px] font-semibold tracking-wide">
+            <span className="text-white/80 text-sm font-semibold tracking-wide">
               {REVIEW_RATING} · {REVIEW_COUNT}+ avaliações Google
             </span>
           </a>
           <div className={`${pillClass} justify-center whitespace-nowrap`}>
             <Users className="w-3.5 h-3.5 text-gold flex-shrink-0" strokeWidth={2} />
-            <span className="text-white/80 text-[11px] font-semibold tracking-wide">+1100 clientes</span>
+            <span className="text-white/80 text-sm font-semibold tracking-wide">+1100 clientes</span>
           </div>
         </div>
       );
@@ -166,7 +166,7 @@ const TrustRatingBadge = ({ variant }: TrustRatingBadgeProps) => {
               <Star key={i} className="w-3 h-3 fill-gold text-gold" />
             ))}
           </div>
-          <span className="text-white/50 text-[11px]">{REVIEW_RATING} · {REVIEW_COUNT}+ avaliações</span>
+          <span className="text-white/80 text-sm">{REVIEW_RATING} · {REVIEW_COUNT}+ avaliações</span>
         </div>
       );
 
@@ -178,9 +178,9 @@ const TrustRatingBadge = ({ variant }: TrustRatingBadgeProps) => {
               <Star key={i} className="w-3.5 h-3.5 fill-gold text-gold" />
             ))}
           </div>
-          <span className="text-white font-bold text-sm">{REVIEW_RATING}</span>
+          <span className="text-white font-bold text-base">{REVIEW_RATING}</span>
           <div className="w-px h-4 bg-white/20" />
-          <span className="text-white/45 text-[12px]">{REVIEW_COUNT}+ avaliações no Google</span>
+          <span className="text-white/80 text-sm">{REVIEW_COUNT}+ avaliações no Google</span>
         </div>
       );
 
@@ -195,7 +195,7 @@ const TrustRatingBadge = ({ variant }: TrustRatingBadgeProps) => {
               ))}
             </div>
           </div>
-          <p className="text-sm text-[#777]">{REVIEW_COUNT}+ avaliações no Google</p>
+          <p className="text-base text-[#777]">{REVIEW_COUNT}+ avaliações no Google</p>
         </div>
       );
   }

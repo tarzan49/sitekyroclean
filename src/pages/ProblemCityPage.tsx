@@ -70,7 +70,7 @@ const ProblemCityPage = () => {
         <Header />
         <main className="pt-28 pb-16 min-h-screen bg-white">
           <div className="container mx-auto px-4 text-center">
-            <h1 className="font-playfair text-3xl font-bold text-[#111111] mb-4">Página não encontrada</h1>
+            <h1 className="type-page-title font-playfair   text-[#111111] mb-4">Página não encontrada</h1>
             <Link to="/" style={{ color: "#D4AF37" }} className="hover:underline">Voltar ao início</Link>
           </div>
         </main>
@@ -146,17 +146,17 @@ const ProblemCityPage = () => {
                 <div className="inline-flex items-start mb-3 lg:mb-5">
                   <div className="flex flex-col gap-1">
                     <div className="w-7 h-px bg-gradient-to-r from-gold to-transparent" />
-                    <span className="text-[10px] font-bold text-gold/90 tracking-[0.30em] uppercase" style={{ textShadow: "0 1px 6px rgba(0,0,0,0.6)" }}>
+                    <span className="text-sm font-bold text-gold/90 tracking-[0.30em] uppercase" style={{ textShadow: "0 1px 6px rgba(0,0,0,0.6)" }}>
                       Como resolver {prep} {city.name}
                     </span>
                   </div>
                 </div>
 
-                <h1 className="font-playfair text-[1.75rem] sm:text-4xl md:text-5xl lg:text-6xl font-semibold text-white mb-3 lg:mb-4 leading-[1.12]" style={{ textShadow: "0 2px 16px rgba(0,0,0,0.65)" }}>
+                <h1 className="type-page-title font-playfair      text-white mb-3 lg:mb-4 " style={{ textShadow: "0 2px 16px rgba(0,0,0,0.65)" }}>
                   {h1Rest} {h1Gold} {prep} <span style={{ color: "#D4AF37" }}>{city.name}</span>
                 </h1>
 
-                <p className="text-sm sm:text-base md:text-lg text-white/70 leading-relaxed mb-4 lg:mb-6 max-w-lg line-clamp-2">
+                <p className="text-base sm:text-base md:text-lg text-white/70 leading-relaxed mb-4 lg:mb-6 max-w-lg line-clamp-2">
                   {problem.intro.replace(/no Porto|ao domicílio/g, `${prep} ${city.name}`).match(/^[^.?]*[.?]/)?.[0] ?? problem.intro}
                 </p>
 
@@ -213,8 +213,8 @@ const ProblemCityPage = () => {
                   >
                     {String(idx + 1).padStart(2, "0")}
                   </span>
-                  <p className="relative text-sm font-semibold text-white mb-1.5">{step.title}</p>
-                  <p className="relative text-sm text-white/55 leading-relaxed">{step.body}</p>
+                  <p className="relative text-base font-semibold text-white mb-1.5">{step.title}</p>
+                  <p className="relative text-base text-white/80 leading-relaxed">{step.body}</p>
                 </div>
               ))}
             </div>
@@ -234,7 +234,7 @@ const ProblemCityPage = () => {
                   >
                     {String(idx + 1).padStart(2, "0")}
                   </span>
-                  <span className="relative text-sm text-[#111111]/65 leading-relaxed">{benefit}</span>
+                  <span className="relative text-base text-[#505650] leading-relaxed">{benefit}</span>
                 </div>
               ))}
             </div>
@@ -250,16 +250,16 @@ const ProblemCityPage = () => {
                 <ol className="space-y-4 mb-8">
                   {categoryTips.steps.map((step, i) => (
                     <li key={i} className="flex items-start gap-4">
-                      <span className="font-black text-xs w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5" style={{ backgroundColor: "rgba(212,175,55,0.18)", color: "#D4AF37" }}>
+                      <span className="font-black text-sm w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5" style={{ backgroundColor: "rgba(212,175,55,0.18)", color: "#D4AF37" }}>
                         {i + 1}
                       </span>
-                      <p className="text-sm text-white/70 leading-relaxed">{step}</p>
+                      <p className="text-base text-white/70 leading-relaxed">{step}</p>
                     </li>
                   ))}
                 </ol>
                 <div className="flex items-start gap-3 p-4" style={{ backgroundColor: "rgba(212,175,55,0.05)", border: "1px solid rgba(212,175,55,0.2)" }}>
                   <AlertTriangle className="w-4 h-4 flex-shrink-0 mt-0.5" style={{ color: "#D4AF37" }} />
-                  <p className="text-xs text-white/50 leading-relaxed">{categoryTips.warning}</p>
+                  <p className="text-sm text-white/80 leading-relaxed">{categoryTips.warning}</p>
                 </div>
               </div>
             </div>
@@ -292,7 +292,7 @@ const ProblemCityPage = () => {
                 <DirectoryGroup title={<>Serviços {prep} {city.name}</>} dark>
                     {relatedServiceData.map(svc => (
                       <Link key={svc.slug} to={`/${svc.slug}-${city.slug}`}
-                        className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full text-sm font-medium text-white border border-white/15 hover:border-[#D4AF37]/40 hover:bg-white/5 transition-all">
+                        className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full text-base font-medium text-white border border-white/15 hover:border-[#D4AF37]/40 hover:bg-white/5 transition-all">
                         <ArrowRight className="w-3 h-3" style={{ color: "#D4AF37" }} />
                         {svc.name}
                       </Link>
@@ -304,7 +304,7 @@ const ProblemCityPage = () => {
                 <DirectoryGroup title={<>Problemas relacionados</>} dark>
                     {relatedProblemLinks.map(link => (
                       <Link key={link.path} to={link.path}
-                        className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full text-sm font-medium text-white border border-white/15 hover:border-[#D4AF37]/40 hover:bg-white/5 transition-all">
+                        className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full text-base font-medium text-white border border-white/15 hover:border-[#D4AF37]/40 hover:bg-white/5 transition-all">
                         <ArrowRight className="w-3 h-3" style={{ color: "#D4AF37" }} />
                         {link.name}
                       </Link>
@@ -315,7 +315,7 @@ const ProblemCityPage = () => {
               <DirectoryGroup title={<>Este problema noutras cidades</>} dark>
                   {nearbyCities.map(c => (
                     <Link key={c.slug} to={`/${problem.slug}-${c.slug}`}
-                      className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full text-sm font-medium text-white border border-white/15 hover:border-[#D4AF37]/40 hover:bg-white/5 transition-all">
+                      className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full text-base font-medium text-white border border-white/15 hover:border-[#D4AF37]/40 hover:bg-white/5 transition-all">
                       <MapPin className="w-3 h-3" style={{ color: "#D4AF37" }} />
                       {c.name}
                     </Link>

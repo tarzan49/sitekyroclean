@@ -110,3 +110,12 @@ Atualização do teste local (2026-09-10): `?teste=quiz-pack` agora demonstra co
 ## Contacto simples (2026-09-10)
 
 O passo «Os seus dados» começa pelo nome e telemóvel, com preenchimento automático. Resumo do pedido fechado por defeito e abaixo dos campos. Não colocar recibos abertos, avaliações, estimativa fixa no topo nem totais repetidos no rodapé deste passo. A ação principal é «Enviar pedido». Preservar preços, detalhes e validação do envio.
+
+
+## Tipografia Avenir e legibilidade (2026-09-13)
+
+O responsável aprovou Avenir Next e confirmou licença web, fornecendo os WOFF2. A implementação usa `src/styles/typography.css`, importado depois de `index.css`; `public/fonts/avenir-next` contém apenas os pesos usados pelo website. Não depender da fonte instalada no dispositivo. `font-playfair` permanece como alias de compatibilidade para a família Kyro, sem serifas.
+
+Usar os papéis `type-page-title`, `type-section-title`, `type-article-title`, `type-quote-title` e `type-card-title`, com Demi 600. Não aplicar a mesma dimensão a todos os h2. Texto de leitura longa 18 px, opções e campos 16 px, notas secundárias pelo menos 14 px. Preservar adaptação a 320 px e espaçamento de leitura aumentado.
+
+Na revisão aprovada, títulos/destaques de texto em superfícies claras usam verde escuro #1A4E30; descrições secundárias #505650. Dourado #D4AF37 conserva-se nos fundos escuros e em detalhes gráficos. Esta decisão substitui a exigência histórica de texto dourado sobre fundo claro nos guias. Não extrapolar a aprovação para mudanças de preços, promessas ou fluxos comerciais.

@@ -40,9 +40,9 @@ const QuizChairsAddonUpsell = ({ formData, updateFormData, onContinue, onBack, h
     const toggleAddon = () => updateFormData({ chairWaterproofQty: addonOn ? 0 : qty });
     return (
       <div className="flex flex-col gap-2 overflow-hidden items-center w-full">
-        <p className="text-gold text-[10px] font-bold tracking-[0.28em] uppercase mb-0.5 text-center w-full">ANTES DE SEGUIR</p>
-        <h2 className="font-playfair text-2xl sm:text-3xl font-bold text-white text-center w-full">Quer também Higienização Profunda?</h2>
-        <p className="text-xs text-white/70 text-center max-w-sm leading-relaxed">
+        <p className="text-gold text-sm font-bold tracking-[0.08em] uppercase mb-0.5 text-center w-full">ANTES DE SEGUIR</p>
+        <h2 className="type-quote-title font-playfair    text-white text-center w-full">Quer também Higienização Profunda?</h2>
+        <p className="text-sm text-white/70 text-center max-w-sm leading-relaxed">
           Limpeza profunda das suas cadeiras antes da aplicação da proteção. Opcional.
         </p>
 
@@ -58,10 +58,10 @@ const QuizChairsAddonUpsell = ({ formData, updateFormData, onContinue, onBack, h
         >
           <Droplets className={cn('w-5 h-5 flex-shrink-0', addonOn ? 'text-gold' : 'text-gold/70')} />
           <div className="flex-1 min-w-0">
-            <p className={cn('text-sm font-bold', addonOn ? 'text-white' : 'text-white/90')}>Higienização Profunda</p>
-            <p className="text-[10px] text-white/65 leading-snug mt-0.5">Limpeza de manchas e resíduos das fibras. Tratamentos adicionais são opcionais.</p>
+            <p className={cn('text-base font-bold', addonOn ? 'text-white' : 'text-white/90')}>Higienização Profunda</p>
+            <p className="text-sm text-white/80 leading-snug mt-0.5">Limpeza de manchas e resíduos das fibras. Tratamentos adicionais são opcionais.</p>
             {higienizacaoPrice !== null && <div className="border-t border-gold/15 mt-2 pt-2">
-              <p className="text-[9px] font-bold uppercase tracking-[0.16em] text-white/45 mb-1">Acréscimo</p>
+              <p className="text-sm font-bold uppercase tracking-[0.16em] text-white/80 mb-1">Acréscimo</p>
               <p className={cn('text-xl leading-none font-black tracking-tight tabular-nums', addonOn ? 'text-gold' : 'text-gold/75')}>+{fmt(higienizacaoPrice)}€</p>
             </div>}
           </div>
@@ -95,16 +95,16 @@ const QuizChairsAddonUpsell = ({ formData, updateFormData, onContinue, onBack, h
 
   return (
     <div className="flex flex-col gap-1.5 overflow-hidden items-center w-full">
-      <h2 className="font-playfair text-2xl font-bold text-white text-center w-full">Impermeabilização das cadeiras</h2>
+      <h2 className="type-quote-title font-playfair   text-white text-center w-full">Impermeabilização das cadeiras</h2>
       <QuizCareIntro service="chairs">
         <ul className="space-y-1.5">{['Repele líquidos', 'Facilita a remoção de manchas', 'Ajuda a conservar o tecido'].map(benefit => <li key={benefit} className="flex items-start gap-1.5"><Check aria-hidden="true" className="w-3.5 h-3.5 text-gold shrink-0 mt-0.5" /><span>{benefit}</span></li>)}</ul>
       </QuizCareIntro>
 
       <div className="w-full max-w-sm py-1 text-center">
-        <p className="flex items-center justify-center gap-1.5 text-xs font-semibold text-gold"><Check aria-hidden="true" className="w-3.5 h-3.5 shrink-0" />Desbacterização + Antiácaros</p>
-        <p className="text-[10px] text-white/65 mt-1">Incluídos na impermeabilização</p>
+        <p className="flex items-center justify-center gap-1.5 text-sm font-semibold text-gold"><Check aria-hidden="true" className="w-3.5 h-3.5 shrink-0" />Desbacterização + Antiácaros</p>
+        <p className="text-sm text-white/80 mt-1">Incluídos na impermeabilização</p>
       </div>
-      <p className="text-[10px] text-white/65 text-center">Preço para {qty} {qty === 1 ? 'cadeira' : 'cadeiras'} · antes de descontos</p>
+      <p className="text-sm text-white/80 text-center">Preço para {qty} {qty === 1 ? 'cadeira' : 'cadeiras'} · antes de descontos</p>
       <WaterproofingTierPicker
         compact
         centered
@@ -130,13 +130,13 @@ export function ChairAddonActions({ selected, onBack, onContinue }: { selected: 
   return (<div className="flex items-center gap-3 w-full max-w-sm mt-1">
         <button
           onClick={onBack}
-          className="h-14 px-5 flex-shrink-0 bg-transparent border border-white/[0.14] text-white/70 hover:text-white/80 hover:border-white/30 active:scale-[0.98] touch-manipulation rounded-sm flex items-center justify-center transition-all text-sm font-semibold"
+          className="h-14 px-5 flex-shrink-0 bg-transparent border border-white/[0.14] text-white/70 hover:text-white/80 hover:border-white/30 active:scale-[0.98] touch-manipulation rounded-sm flex items-center justify-center transition-all text-base font-semibold"
         >
           <ChevronLeft className="w-4 h-4 mr-1" /> Voltar
         </button>
         <button
           onClick={onContinue}
-          className="flex-1 h-14 bg-gradient-to-r from-gold to-[#d4c57b] hover:from-[#d4c57b] hover:to-gold text-[#12121e] font-black text-sm leading-snug px-2 tracking-wider uppercase touch-manipulation active:scale-[0.98] rounded-sm shadow-[0_0_32px_rgba(212,175,55,0.30)]"
+          className="flex-1 h-14 bg-gradient-to-r from-gold to-[#d4c57b] hover:from-[#d4c57b] hover:to-gold text-[#12121e] font-black text-base leading-snug px-2   touch-manipulation active:scale-[0.98] rounded-sm shadow-[0_0_32px_rgba(212,175,55,0.30)]"
         >
           {selected ? 'Continuar com tratamento' : 'Continuar sem extras'}
         </button>

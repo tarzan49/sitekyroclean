@@ -62,7 +62,7 @@ const MarcaCadeirasPage = () => {
         <Header />
         <main className="pt-28 pb-16 min-h-screen bg-white">
           <div className="container mx-auto px-4 text-center">
-            <h1 className="font-playfair text-3xl font-bold text-[#111111] mb-4">Página não encontrada</h1>
+            <h1 className="type-page-title font-playfair   text-[#111111] mb-4">Página não encontrada</h1>
             <Link to="/" style={{ color: "#D4AF37" }} className="hover:underline">Voltar ao início</Link>
           </div>
         </main>
@@ -146,7 +146,7 @@ const MarcaCadeirasPage = () => {
                     <div className="flex flex-col gap-1">
                       <div className="w-7 h-px bg-gradient-to-r from-gold to-transparent" />
                       <span
-                        className="text-[10px] font-bold text-gold/90 tracking-[0.30em] uppercase"
+                        className="text-sm font-bold text-gold/90 tracking-[0.30em] uppercase"
                         style={{ textShadow: "0 1px 6px rgba(0,0,0,0.6)" }}
                       >
                         Especialistas em {marca.name}
@@ -155,13 +155,13 @@ const MarcaCadeirasPage = () => {
                   </div>
 
                   <h1
-                    className="font-playfair text-[1.75rem] sm:text-4xl md:text-5xl lg:text-6xl font-semibold text-white mb-3 lg:mb-4 leading-[1.12]"
+                    className="type-page-title font-playfair      text-white mb-3 lg:mb-4 "
                     style={{ textShadow: "0 2px 16px rgba(0,0,0,0.65)" }}
                   >
                     Limpeza de Cadeiras {marca.name} {prep} {city.name}
                   </h1>
 
-                  <p className="text-sm sm:text-base md:text-lg text-white/70 leading-relaxed mb-4 lg:mb-6 max-w-lg">
+                  <p className="text-base sm:text-base md:text-lg text-white/70 leading-relaxed mb-4 lg:mb-6 max-w-lg">
                     {marca.materialDescription.split('.')[0]}.
                   </p>
 
@@ -202,20 +202,20 @@ const MarcaCadeirasPage = () => {
               subtitle={marca.materialDescription}
               light={false}
             />
-            <p className="text-[10px] font-bold tracking-[0.28em] uppercase mb-5" style={{ color: "#D4AF37" }}>
+            <p className="text-sm font-bold tracking-[0.08em] uppercase mb-5" style={{ color: "#D4AF37" }}>
               {marca.material}
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {marca.doNots.map((doNot, i) => (
                 <div key={`no-${i}`} className="flex items-start gap-3 p-6 md:p-7 rounded-xl" style={{ backgroundColor: "rgba(255,255,255,0.04)", border: "1px solid rgba(239,68,68,0.35)" }}>
                   <XCircle className="w-4 h-4 flex-shrink-0 mt-0.5" style={{ color: "#ef4444" }} />
-                  <span className="text-sm text-white/70 leading-relaxed">{doNot}</span>
+                  <span className="text-base text-white/70 leading-relaxed">{doNot}</span>
                 </div>
               ))}
               {marca.doThis.map((doThis, i) => (
                 <div key={`yes-${i}`} className="relative flex items-start gap-3 p-6 md:p-7 rounded-xl" style={{ backgroundColor: "rgba(212,175,55,0.08)", border: "1.5px solid #D4AF37", boxShadow: "0 0 24px rgba(212,175,55,0.15)" }}>
                   <CheckCircle2 className="w-4 h-4 flex-shrink-0 mt-0.5" style={{ color: "#D4AF37" }} />
-                  <span className="text-sm text-white/90 leading-relaxed font-medium">{doThis}</span>
+                  <span className="text-base text-white/90 leading-relaxed font-medium">{doThis}</span>
                 </div>
               ))}
             </div>
@@ -239,8 +239,8 @@ const MarcaCadeirasPage = () => {
                       <Icon className="w-4 h-4" style={{ color: "#D4AF37" }} />
                     </div>
                     <div>
-                      <p className="text-sm font-semibold text-[#111111] mb-1">{step.title}</p>
-                      <p className="text-xs text-[#111111]/55 leading-relaxed">{step.desc}</p>
+                      <p className="text-base font-semibold text-[#111111] mb-1">{step.title}</p>
+                      <p className="text-sm text-[#505650] leading-relaxed">{step.desc}</p>
                     </div>
                   </div>
                 );
@@ -280,7 +280,7 @@ const MarcaCadeirasPage = () => {
             />
             <Link
               to={`/limpeza-cadeiras-${city.slug}`}
-              className="inline-flex items-center gap-1.5 text-sm font-semibold mb-8 hover:underline"
+              className="inline-flex items-center gap-1.5 text-base font-semibold mb-8 hover:underline"
               style={{ color: "#D4AF37" }}
             >
               Ver tabela completa de preços em {city.name}
@@ -291,7 +291,7 @@ const MarcaCadeirasPage = () => {
                 .filter(slug => slug !== marca.slug)
                 .map(slug => (
                   <Link key={slug} to={`/limpeza-cadeiras-${slug}-${city.slug}`}
-                    className="inline-flex items-center gap-1.5 bg-white px-3.5 py-2 rounded-full text-sm font-medium text-[#111111] border border-[#E8E4DE] hover:border-[#D4AF37]/40 hover:bg-[#D4AF37]/5 hover:shadow-sm transition-all capitalize">
+                    className="inline-flex items-center gap-1.5 bg-white px-3.5 py-2 rounded-full text-base font-medium text-[#111111] border border-[#E8E4DE] hover:border-[#D4AF37]/40 hover:bg-[#D4AF37]/5 hover:shadow-sm transition-all capitalize">
                     <ArrowRight className="w-3 h-3" style={{ color: "#D4AF37" }} />
                     {slug.replace(/-/g, " ")}
                   </Link>

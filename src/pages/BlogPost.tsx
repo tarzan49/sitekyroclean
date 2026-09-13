@@ -1,6 +1,6 @@
 import ServiceFAQ from "@/components/ServiceFAQ";
 import DirectoryGroup from "@/components/DirectoryGroup";
-﻿import { useMemo, useEffect } from "react";
+import { useMemo, useEffect } from "react";
 import { useLocation, Link } from "react-router-dom";
 import { Clock, ArrowRight, ChevronRight, Calendar, User, Lightbulb } from "lucide-react";
 import Header from "@/components/Header";
@@ -31,8 +31,8 @@ const BlogPost = () => {
         <Header />
         <main className="min-h-screen flex items-center justify-center">
           <div className="text-center">
-            <h1 className="text-2xl font-bold text-[#111111] mb-4">Artigo não encontrado</h1>
-            <Link to="/blog" className="text-gold hover:underline">← Ver todos os artigos</Link>
+            <h1 className="type-page-title   text-[#111111] mb-4">Artigo não encontrado</h1>
+            <Link to="/blog" className="text-[#1A4E30] hover:underline">← Ver todos os artigos</Link>
           </div>
         </main>
         <Footer />
@@ -120,24 +120,24 @@ const BlogPost = () => {
 
           <div className="relative z-10 container mx-auto px-4 max-w-3xl">
             {/* Breadcrumb */}
-            <nav className="flex items-center gap-1.5 text-xs text-white/40 mb-6">
+            <nav className="flex items-center gap-1.5 text-sm text-white/80 mb-6">
               <Link to="/" className="hover:text-gold transition-colors">Início</Link>
               <ChevronRight className="w-3 h-3" />
               <Link to="/blog" className="hover:text-gold transition-colors">Blog</Link>
               <ChevronRight className="w-3 h-3" />
-              <span className="text-white/60 truncate max-w-[200px]">{post.title}</span>
+              <span className="text-white/80 truncate max-w-[200px]">{post.title}</span>
             </nav>
 
-            <span className="inline-block text-xs font-bold text-gold bg-gold/10 border border-gold/20 px-3 py-1 rounded-full mb-4">
+            <span className="inline-block text-sm font-bold text-gold bg-gold/10 border border-gold/20 px-3 py-1 rounded-full mb-4">
               {post.category}
             </span>
-            <h1 className="font-playfair text-2xl md:text-4xl font-bold text-white mb-4 leading-tight">
+            <h1 className="type-page-title font-playfair    text-white mb-4 ">
               {post.title}
             </h1>
             <p className="text-white/70 text-base md:text-lg leading-relaxed mb-6">{post.intro}</p>
 
             {/* Meta bar */}
-            <div className="flex flex-wrap items-center gap-4 text-xs text-white/45">
+            <div className="flex flex-wrap items-center gap-4 text-sm text-white/80">
               <span className="flex items-center gap-1.5">
                 <User className="w-3.5 h-3.5" />
                 {post.author}
@@ -161,10 +161,10 @@ const BlogPost = () => {
           <div className="space-y-10">
             {post.sections.map((section, i) => (
               <div key={i}>
-                <h2 className="font-playfair text-xl md:text-2xl font-bold text-[#111111] mb-4">
+                <h2 className="type-article-title font-playfair    text-[#111111] mb-4">
                   {section.heading}
                 </h2>
-                <div className="text-[#111111]/70 leading-relaxed space-y-3">
+                <div className="type-reading text-[#505650] space-y-3">
                   {section.body.split("\n\n").map((para, j) => (
                     <p key={j} dangerouslySetInnerHTML={{
                       __html: para
@@ -175,7 +175,7 @@ const BlogPost = () => {
                 </div>
                 {section.tip && (
                   <div className="mt-4 bg-gold/8 border-l-4 border-gold rounded-r-xl px-4 py-3">
-                    <p className="text-sm text-[#111111]/80 leading-relaxed">
+                    <p className="text-base text-[#111111]/80 leading-relaxed">
                       <span className="inline-flex items-center gap-1 font-bold text-[#111111]"><Lightbulb className="w-3.5 h-3.5 text-gold" strokeWidth={1.5} /> Dica: </span>
                       {section.tip}
                     </p>
@@ -187,11 +187,11 @@ const BlogPost = () => {
 
           {/* CTA no meio */}
           <div className="my-12 bg-kyro-green rounded-2xl p-8 text-center">
-            <p className="text-gold text-sm font-bold uppercase tracking-widest mb-2">Kyro Clean Solutions</p>
-            <h3 className="font-playfair text-2xl text-white font-bold mb-3">
+            <p className="text-gold text-base font-bold uppercase tracking-widest mb-2">Kyro Clean Solutions</p>
+            <h3 className="type-card-title font-playfair  text-white  mb-3">
               Precisa de ajuda profissional?
             </h3>
-            <p className="text-white/60 text-sm mb-6 max-w-md mx-auto">
+            <p className="text-white/80 text-base mb-6 max-w-md mx-auto">
               Orçamento gratuito em 2 minutos. Deslocação a partir de 10€ na área do Porto.
             </p>
             <QuizButton />
@@ -226,7 +226,7 @@ const BlogPost = () => {
         )}
 
         <div className="py-8 text-center border-t border-[#E8E4DE]">
-          <Link to="/blog" className="text-sm text-gold hover:underline font-medium">
+          <Link to="/blog" className="text-base text-[#1A4E30] hover:underline font-medium">
             ← Ver todos os artigos do blog
           </Link>
         </div>

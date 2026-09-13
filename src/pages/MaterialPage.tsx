@@ -89,7 +89,7 @@ const MaterialPage = () => {
         <Header />
         <main className="pt-28 pb-16 min-h-screen bg-white">
           <div className="container mx-auto px-4 text-center">
-            <h1 className="font-playfair text-3xl font-bold text-[#111111] mb-4">Página não encontrada</h1>
+            <h1 className="type-page-title font-playfair   text-[#111111] mb-4">Página não encontrada</h1>
             <Link to="/" style={{ color: "#D4AF37" }} className="hover:underline">Voltar ao início</Link>
           </div>
         </main>
@@ -137,17 +137,17 @@ const MaterialPage = () => {
                 <div className="inline-flex items-start mb-5">
                   <div className="flex flex-col gap-1">
                     <div className="w-7 h-px bg-gradient-to-r from-gold to-transparent" />
-                    <span className="text-[10px] font-bold text-gold/90 tracking-[0.30em] uppercase" style={{ textShadow: "0 1px 6px rgba(0,0,0,0.6)" }}>
+                    <span className="text-sm font-bold text-gold/90 tracking-[0.30em] uppercase" style={{ textShadow: "0 1px 6px rgba(0,0,0,0.6)" }}>
                       {data.serviceName}{cityName ? ` · ${cityName}` : ""}
                     </span>
                   </div>
                 </div>
 
-                <h1 className="font-playfair text-[1.75rem] sm:text-4xl md:text-5xl lg:text-6xl font-semibold text-white mb-4 leading-[1.12]" style={{ textShadow: "0 2px 16px rgba(0,0,0,0.65)" }}>
+                <h1 className="type-page-title font-playfair      text-white mb-4 " style={{ textShadow: "0 2px 16px rgba(0,0,0,0.65)" }}>
                   {h1Rest}{" "}<span style={{ color: "#D4AF37" }}>{h1Gold}</span>
                 </h1>
 
-                <p className="text-sm sm:text-base md:text-lg text-white/70 leading-relaxed mb-6 max-w-lg line-clamp-2">
+                <p className="text-base sm:text-base md:text-lg text-white/70 leading-relaxed mb-6 max-w-lg line-clamp-2">
                   {data.intro.match(/^[^.?]*[.?]/)?.[0] ?? data.intro}
                 </p>
 
@@ -198,7 +198,7 @@ const MaterialPage = () => {
                   <span className="font-playfair font-bold flex-shrink-0 leading-none" style={{ fontSize: "1.75rem", color: "rgba(212,175,55,0.4)" }}>
                     {String(i + 1).padStart(2, "0")}
                   </span>
-                  <span className="text-sm text-white/65 leading-relaxed pt-1">{c}</span>
+                  <span className="text-base text-white/80 leading-relaxed pt-1">{c}</span>
                 </div>
               ))}
             </div>
@@ -243,7 +243,7 @@ const MaterialPage = () => {
                           <span className="font-playfair font-bold flex-shrink-0 leading-none" style={{ fontSize: "1.5rem", color: "#D4AF37" }}>
                             {String(num + 1).padStart(2, "0")}
                           </span>
-                          <p className="text-sm text-white/70 leading-relaxed pt-1">{step}</p>
+                          <p className="text-base text-white/70 leading-relaxed pt-1">{step}</p>
                         </div>
                       );
                     })}
@@ -283,7 +283,7 @@ const MaterialPage = () => {
                 <DirectoryGroup title={<>Outros materiais</>}>
                     {relatedLinks.map(link => (
                       <Link key={link.path} to={link.path}
-                        className="inline-flex items-center gap-1.5 bg-white px-3.5 py-2 rounded-full text-sm font-medium text-[#111111] border border-[#E8E4DE] hover:border-[#D4AF37]/40 hover:bg-[#D4AF37]/5 hover:shadow-sm transition-all">
+                        className="inline-flex items-center gap-1.5 bg-white px-3.5 py-2 rounded-full text-base font-medium text-[#111111] border border-[#E8E4DE] hover:border-[#D4AF37]/40 hover:bg-[#D4AF37]/5 hover:shadow-sm transition-all">
                         <ArrowRight className="w-3 h-3" style={{ color: "#D4AF37" }} />
                         {link.name}
                       </Link>
@@ -295,7 +295,7 @@ const MaterialPage = () => {
                 <DirectoryGroup title={<>Disponível em</>}>
                     {topCities.map(city => (
                       <Link key={city.slug} to={`/${data.slug}-${city.slug}`}
-                        className="inline-flex items-center gap-1.5 bg-white px-3.5 py-2 rounded-full text-sm font-medium text-[#111111] border border-[#E8E4DE] hover:border-[#D4AF37]/40 hover:bg-[#D4AF37]/5 hover:shadow-sm transition-all">
+                        className="inline-flex items-center gap-1.5 bg-white px-3.5 py-2 rounded-full text-base font-medium text-[#111111] border border-[#E8E4DE] hover:border-[#D4AF37]/40 hover:bg-[#D4AF37]/5 hover:shadow-sm transition-all">
                         <MapPin className="w-3 h-3" style={{ color: "#D4AF37" }} />
                         {city.name}
                       </Link>
@@ -307,7 +307,7 @@ const MaterialPage = () => {
                 <DirectoryGroup title={<>Também disponível em</>}>
                     {cities.filter(c => c.slug !== citySlug).slice(0, 8).map(city => (
                       <Link key={city.slug} to={`/${data.slug}-${city.slug}`}
-                        className="inline-flex items-center gap-1.5 bg-white px-3.5 py-2 rounded-full text-sm font-medium text-[#111111] border border-[#E8E4DE] hover:border-[#D4AF37]/40 hover:bg-[#D4AF37]/5 hover:shadow-sm transition-all">
+                        className="inline-flex items-center gap-1.5 bg-white px-3.5 py-2 rounded-full text-base font-medium text-[#111111] border border-[#E8E4DE] hover:border-[#D4AF37]/40 hover:bg-[#D4AF37]/5 hover:shadow-sm transition-all">
                         <MapPin className="w-3 h-3" style={{ color: "#D4AF37" }} />
                         {city.name}
                       </Link>

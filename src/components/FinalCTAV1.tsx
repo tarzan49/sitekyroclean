@@ -32,7 +32,7 @@ const FinalCTA = () => {
                   'transition-all duration-150',
                 ].join(' ')}
               >
-                <span className="text-[13px] font-semibold tracking-[0.18em] uppercase">Calcular o meu preço</span>
+                <span className="text-base font-semibold tracking-[0.18em] uppercase">Calcular o meu preço</span>
               </button>
             </div>
 
@@ -44,12 +44,12 @@ const FinalCTA = () => {
               <a
                 href={`tel:${PHONE_TEL}`}
                 onClick={() => trackCallClick('final_cta')}
-                className="inline-flex items-center gap-1.5 text-white/70 hover:text-white text-sm font-medium transition-colors"
+                className="inline-flex items-center gap-1.5 text-white/70 hover:text-white text-base font-medium transition-colors"
               >
                 <Phone className="h-3.5 w-3.5 flex-shrink-0" />
                 {`Ligue: ${PHONE_DISPLAY}`}
               </a>
-              <span className="inline-flex items-center gap-1 text-white/35 text-[11px]">
+              <span className="inline-flex items-center gap-1 text-white/80 text-sm">
                 <MapPin className="h-3 w-3 flex-shrink-0" />
                 Servimos todo o Grande Porto e Norte de Portugal
               </span>

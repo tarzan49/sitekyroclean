@@ -66,18 +66,18 @@ const Blog = () => {
         {/* ── Hero ── */}
         <section className="bg-kyro-green text-white py-14 md:py-20">
           <div className="container mx-auto px-4 max-w-4xl">
-            <nav className="flex items-center gap-1.5 text-xs text-white/40 mb-6">
+            <nav className="flex items-center gap-1.5 text-sm text-white/80 mb-6">
               <Link to="/" className="hover:text-gold transition-colors">Início</Link>
               <ChevronRight className="w-3 h-3" />
-              <span className="text-white/60">Blog</span>
+              <span className="text-white/80">Blog</span>
             </nav>
-            <p className="text-[10px] font-bold tracking-[0.28em] uppercase mb-3" style={{ color: '#D4AF37' }}>
+            <p className="text-sm font-bold tracking-[0.08em] uppercase mb-3" style={{ color: '#D4AF37' }}>
               Kyro Clean Solutions
             </p>
-            <h1 className="font-playfair text-3xl md:text-5xl font-bold text-white mb-4">
+            <h1 className="type-page-title font-playfair    text-white mb-4">
               Blog Kyro Clean
             </h1>
-            <p className="text-white/65 text-lg max-w-2xl">
+            <p className="text-white/80 text-lg max-w-2xl">
               Guias práticos, dicas de manutenção e tudo o que precisa saber sobre limpeza profissional de estofos.
             </p>
           </div>
@@ -99,17 +99,17 @@ const Blog = () => {
                 loading="lazy"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
-              <span className="absolute top-4 left-4 text-xs font-bold text-gold bg-black/50 backdrop-blur-sm border border-gold/30 px-3 py-1 rounded-full">
+              <span className="absolute top-4 left-4 text-sm font-bold text-gold bg-black/50 backdrop-blur-sm border border-gold/30 px-3 py-1 rounded-full">
                 {featured.category}
               </span>
             </div>
             <div className="p-6 md:p-8">
-              <h2 className="font-playfair text-2xl md:text-3xl font-bold text-[#111111] mb-3 group-hover:text-gold transition-colors leading-tight">
+              <h2 className="type-section-title font-playfair    text-[#111111] mb-3 group-hover:text-gold transition-colors ">
                 {featured.title}
               </h2>
-              <p className="text-[#111111]/60 leading-relaxed mb-5 line-clamp-2">{featured.intro}</p>
+              <p className="text-[#505650] leading-relaxed mb-5 line-clamp-2">{featured.intro}</p>
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3 text-xs text-[#111111]/40">
+                <div className="flex items-center gap-3 text-sm text-[#505650]">
                   <span className="flex items-center gap-1">
                     <User className="w-3.5 h-3.5" />{featured.author}
                   </span>
@@ -118,7 +118,7 @@ const Blog = () => {
                   </span>
                   <span>{new Date(featured.publishDate).toLocaleDateString("pt-PT", { day: "numeric", month: "long" })}</span>
                 </div>
-                <span className="flex items-center gap-1.5 text-sm font-semibold text-gold group-hover:gap-2.5 transition-all">
+                <span className="flex items-center gap-1.5 text-base font-semibold text-gold group-hover:gap-2.5 transition-all">
                   Ler artigo <ArrowRight className="w-4 h-4" />
                 </span>
               </div>
@@ -141,20 +141,20 @@ const Blog = () => {
                     loading="lazy"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/25 to-transparent" />
-                  <span className="absolute top-3 left-3 text-[10px] font-bold text-gold bg-black/50 backdrop-blur-sm border border-gold/30 px-2 py-0.5 rounded-full">
+                  <span className="absolute top-3 left-3 text-sm font-bold text-gold bg-black/50 backdrop-blur-sm border border-gold/30 px-2 py-0.5 rounded-full">
                     {post.category}
                   </span>
                 </div>
                 <div className="p-5 flex flex-col flex-1">
-                  <h2 className="font-playfair text-base font-bold text-[#111111] mb-2 group-hover:text-gold transition-colors leading-snug flex-1">
+                  <h2 className="type-section-title font-playfair   text-[#111111] mb-2 group-hover:text-gold transition-colors  flex-1">
                     {post.title}
                   </h2>
-                  <p className="text-[#111111]/55 text-sm leading-relaxed mb-4 line-clamp-2">{post.intro}</p>
+                  <p className="text-[#505650] text-base leading-relaxed mb-4 line-clamp-2">{post.intro}</p>
                   <div className="flex items-center justify-between mt-auto">
-                    <span className="flex items-center gap-1 text-xs text-[#111111]/40">
+                    <span className="flex items-center gap-1 text-sm text-[#505650]">
                       <Clock className="w-3.5 h-3.5" /> {post.readingTime} min
                     </span>
-                    <span className="flex items-center gap-1 text-xs font-semibold text-gold group-hover:gap-2 transition-all">
+                    <span className="flex items-center gap-1 text-sm font-semibold text-gold group-hover:gap-2 transition-all">
                       Ler <ArrowRight className="w-3.5 h-3.5" />
                     </span>
                   </div>
@@ -167,9 +167,9 @@ const Blog = () => {
         {/* ── CTA ── */}
         <section className="bg-kyro-green py-14">
           <div className="container mx-auto px-4 text-center max-w-xl">
-            <p className="text-gold text-sm font-bold uppercase tracking-widest mb-3">Pronto para começar?</p>
-            <h2 className="font-playfair text-3xl text-white font-bold mb-4">Orçamento gratuito em 2 minutos</h2>
-            <p className="text-white/60 mb-8">Preço transparente, sem surpresas. Resultado garantido ou devolvemos o dinheiro.</p>
+            <p className="text-gold text-base font-bold uppercase tracking-widest mb-3">Pronto para começar?</p>
+            <h2 className="type-section-title font-playfair  text-white  mb-4">Orçamento gratuito em 2 minutos</h2>
+            <p className="text-white/80 mb-8">Preço transparente, sem surpresas. Resultado garantido ou devolvemos o dinheiro.</p>
             <QuizButton />
           </div>
         </section>

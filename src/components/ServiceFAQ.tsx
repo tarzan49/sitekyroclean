@@ -51,15 +51,15 @@ const ServiceFAQ = ({
         <div className="mb-10 md:mb-14">
           <div className="flex items-center gap-3 mb-4">
             <div className="h-px w-8 flex-shrink-0" style={{ backgroundColor: '#D4AF37', opacity: 0.65 }} />
-            <p className="text-[10px] font-bold tracking-[0.28em] uppercase" style={{ color: '#D4AF37', opacity: 0.85 }}>
+            <p className="text-sm font-bold tracking-[0.08em] uppercase" style={{ color: '#D4AF37', opacity: 0.85 }}>
               {overline}
             </p>
           </div>
-          <h2 className={`font-playfair text-[1.85rem] sm:text-4xl md:text-[2.6rem] font-bold leading-[1.1] ${light ? "text-[#111111]" : "text-white"}`}>
+          <h2 className={`type-section-title font-playfair      ${light ? "text-[#111111]" : "text-white"}`}>
             {restHeading}{" "}
             <em className="not-italic" style={{ color: '#D4AF37' }}>{goldWord}</em>
           </h2>
-          <p className={`text-sm mt-4 leading-relaxed ${light ? 'text-[#536259]' : 'text-white/65'}`}>{description}</p>
+          <p className={`text-base mt-4 leading-relaxed ${light ? 'text-[#536259]' : 'text-white/80'}`}>{description}</p>
         </div>
 
         {/* FAQ items */}
@@ -83,7 +83,7 @@ const ServiceFAQ = ({
                 >
                   {/* Number */}
                   <span
-                    className="font-playfair font-bold text-[11px] tracking-[0.18em] flex-shrink-0 mt-[3px] select-none"
+                    className="font-playfair font-bold text-sm tracking-[0.18em] flex-shrink-0 mt-[3px] select-none"
                     style={{ color: isOpen ? "#D4AF37" : "#a9904e", transition: "color 0.2s" }}
                   >
                     {String(idx + 1).padStart(2, "0")}
@@ -93,7 +93,7 @@ const ServiceFAQ = ({
                   <span
                     className="flex-1 font-semibold leading-snug"
                     style={{
-                      fontSize: "15px",
+                      fontSize: "1.125rem",
                       color: isOpen ? "#D4AF37" : light ? "#111111" : "rgba(255,255,255,0.9)",
                       transition: "color 0.2s",
                     }}
@@ -120,7 +120,7 @@ const ServiceFAQ = ({
                   <div className="overflow-hidden min-h-0">
                     <div className="px-4 sm:px-5 pb-5">
                       <div className="border-t border-gold/20 pt-4">
-                        <div className="text-sm leading-7" style={{ color: light ? '#47574c' : 'rgba(255,255,255,0.80)' }}>{faq.answer}</div>
+                        <div className="text-base leading-relaxed" style={{ color: light ? '#47574c' : 'rgba(255,255,255,0.80)' }}>{faq.answer}</div>
                       </div>
                     </div>
                   </div>

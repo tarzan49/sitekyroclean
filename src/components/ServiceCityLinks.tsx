@@ -37,16 +37,16 @@ const ServiceCityLinks = ({ serviceSlug, serviceLabel }: Props) => {
         <div className="mb-8">
           <div className="flex items-center gap-3 mb-4">
             <div className="h-px w-8 flex-shrink-0" style={{ backgroundColor: "#D4AF37", opacity: 0.65 }} />
-            <p className="text-[10px] font-bold tracking-[0.28em] uppercase" style={{ color: "#D4AF37", opacity: 0.85 }}>
+            <p className="text-sm font-bold tracking-[0.08em] uppercase" style={{ color: "#D4AF37", opacity: 0.85 }}>
               Áreas de serviço
             </p>
           </div>
-          <h2 className="font-playfair text-[1.85rem] sm:text-4xl md:text-[2.6rem] font-bold leading-[1.1] text-[#111111]">
+          <h2 className="type-section-title font-playfair      text-[#111111]">
             {restLabel}{" "}
             <em className="not-italic" style={{ color: "#D4AF37" }}>{goldWord}</em>
             {" "}perto de si
           </h2>
-          <p className="mt-4 text-[15px] leading-relaxed text-[#111111]/55 max-w-xl">
+          <p className="mt-4 text-base leading-relaxed text-[#505650] max-w-xl">
             Escolha a sua região ou pesquise a localidade para consultar o serviço na sua zona.
           </p>
         </div>
@@ -67,7 +67,7 @@ const ServiceCityLinks = ({ serviceSlug, serviceLabel }: Props) => {
               <X aria-hidden="true" className="h-4 w-4" />
             </button>}
           </div>
-          <p role="status" className={search ? "mb-3 text-sm text-[#666]" : "sr-only"}>
+          <p role="status" className={search ? "mb-3 text-base text-[#666]" : "sr-only"}>
             {search ? `${resultCount} ${resultCount === 1 ? "localidade encontrada" : "localidades encontradas"}` : ""}
           </p>
           <div className="divide-y divide-[#E8E4DE] border-y border-[#E8E4DE]">
@@ -87,15 +87,15 @@ const ServiceCityLinks = ({ serviceSlug, serviceLabel }: Props) => {
                     <MapPin aria-hidden="true" className="h-5 w-5 shrink-0 text-[#B8912A]" />
                     <span className="min-w-0 flex-1">
                       <span className="block text-base font-semibold text-[#111111] sm:text-lg">{region.label}</span>
-                      <span className="mt-1 block text-xs leading-relaxed text-[#666] sm:text-sm">{region.hint}</span>
+                      <span className="mt-1 block text-sm leading-relaxed text-[#666] sm:text-base">{region.hint}</span>
                     </span>
-                    <span className="text-xs tabular-nums text-[#666]">{region.cities.length}<span className="hidden sm:inline"> {region.cities.length === 1 ? "localidade" : "localidades"}</span></span>
+                    <span className="text-sm tabular-nums text-[#666]">{region.cities.length}<span className="hidden sm:inline"> {region.cities.length === 1 ? "localidade" : "localidades"}</span></span>
                     <ChevronDown aria-hidden="true" className={`h-4 w-4 shrink-0 text-[#857443] transition-transform ${open ? "rotate-180" : ""}`} />
                   </button>
                   <div id={`${id}-${region.area}`} role="region" aria-labelledby={`${id}-${region.area}-trigger`} hidden={!open}>
                     <div className="grid grid-cols-1 gap-x-6 pb-5 pl-8 sm:grid-cols-2 sm:pl-9 lg:grid-cols-3">
                       {region.cities.map(city => (
-                        <Link key={city.slug} to={`/${serviceSlug}-${city.slug}`} className="flex min-h-11 items-center rounded-sm py-2 pr-2 text-sm text-[#444] transition-colors hover:text-[#96731D] hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#D4AF37]">
+                        <Link key={city.slug} to={`/${serviceSlug}-${city.slug}`} className="flex min-h-11 items-center rounded-sm py-2 pr-2 text-base text-[#444] transition-colors hover:text-[#96731D] hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#D4AF37]">
                           {city.name}
                         </Link>
                       ))}
@@ -105,7 +105,7 @@ const ServiceCityLinks = ({ serviceSlug, serviceLabel }: Props) => {
               );
             })}
           </div>
-          {resultCount === 0 && <p className="py-5 text-sm leading-relaxed text-[#666]">Não encontrámos essa localidade. Experimente pesquisar pelo nome do concelho.</p>}
+          {resultCount === 0 && <p className="py-5 text-base leading-relaxed text-[#666]">Não encontrámos essa localidade. Experimente pesquisar pelo nome do concelho.</p>}
         </div>
 
       </div>

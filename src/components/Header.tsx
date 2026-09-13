@@ -62,14 +62,14 @@ const Header = () => {
 
   // Shared nav label style
   const navItem = (active: boolean) =>
-    `text-[11px] font-medium tracking-[0.16em] uppercase transition-colors ${
-      active ? 'text-[#111111]' : 'text-[#111111]/45 hover:text-[#111111]'
+    `text-base font-medium tracking-[0.04em] uppercase transition-colors ${
+      active ? 'text-[#111111]' : 'text-[#505650] hover:text-[#111111]'
     }`;
 
   return (
     <>
     <header className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-[#111111]/8">
-      <div className="mx-auto px-3 sm:px-5 md:px-8 max-w-7xl h-14 md:h-[60px] flex items-center justify-between gap-2 md:gap-4">
+      <div className="mx-auto px-3 sm:px-5 2xl:px-8 max-w-7xl h-14 2xl:h-[60px] flex items-center justify-between gap-2 2xl:gap-4">
 
         {/* ── LEFT: logo text ── */}
         <Link
@@ -77,13 +77,13 @@ const Header = () => {
           onClick={(e) => {
             if (location.pathname === "/") { e.preventDefault(); window.scrollTo({ top: 0, behavior: "smooth" }); }
           }}
-          className="font-playfair text-[15px] md:text-[17px] font-normal text-[#111111] tracking-tight leading-none flex-1 text-center md:flex-none md:text-left md:shrink-0"
+          className="font-playfair text-base 2xl:text-[17px] font-normal text-[#111111] tracking-tight leading-none min-w-0 truncate flex-1 text-center 2xl:flex-none 2xl:text-left 2xl:shrink-0"
         >
           Kyro Clean Solutions
         </Link>
 
         {/* ── CENTER: desktop nav ── */}
-        <nav className="hidden md:flex items-center gap-7 mx-auto">
+        <nav className="hidden 2xl:flex items-center gap-7 mx-auto">
 
           <button onClick={scrollToTop} className={navItem(location.pathname === '/')}>
             Início
@@ -104,10 +104,10 @@ const Header = () => {
                 <Link
                   key={s.to}
                   to={s.to}
-                  className={`block text-[11px] tracking-[0.08em] uppercase px-3 py-2.5 transition-colors ${
+                  className={`block text-base tracking-[0.08em] uppercase px-3 py-2.5 transition-colors ${
                     location.pathname === s.to
                       ? 'text-[#111111] bg-[#D4AF37]/10'
-                      : 'text-[#111111]/55 hover:text-[#111111] hover:bg-[#111111]/4'
+                      : 'text-[#505650] hover:text-[#111111] hover:bg-[#111111]/4'
                   }`}
                 >
                   {s.label}
@@ -136,18 +136,18 @@ const Header = () => {
         </nav>
 
         {/* ── RIGHT: three solid buttons (desktop) ── */}
-        <div className="hidden md:flex items-center gap-2.5 shrink-0">
+        <div className="hidden 2xl:flex items-center gap-2.5 shrink-0">
           <a
             href={`tel:${PHONE_TEL}`}
             onClick={() => trackCallClick('header_desktop')}
-            className="border border-[#D1D5DB] bg-[#E5E7EB] text-[#111111] text-[10px] font-semibold tracking-[0.18em] uppercase px-4 py-2.5 hover:bg-[#DDE0E4] transition-colors flex items-center gap-2 whitespace-nowrap"
+            className="border border-[#D1D5DB] bg-[#E5E7EB] text-[#111111] text-base font-semibold tracking-[0.04em] uppercase px-4 py-2.5 hover:bg-[#DDE0E4] transition-colors flex items-center gap-2 whitespace-nowrap"
           >
             <Phone className="w-3.5 h-3.5 text-[#555555] flex-shrink-0" strokeWidth={2} />
             Ligar
           </a>
           <button
             onClick={openQuiz}
-            className="border border-[#D4AF37] bg-[#111111] text-white text-[10px] font-semibold tracking-[0.18em] uppercase px-5 py-2.5 hover:bg-[#2A2A2A] transition-colors whitespace-nowrap"
+            className="border border-[#D4AF37] bg-[#111111] text-white text-base font-semibold tracking-[0.04em] uppercase px-5 py-2.5 hover:bg-[#2A2A2A] transition-colors whitespace-nowrap"
           >
             Agendar limpeza
           </button>
@@ -156,7 +156,7 @@ const Header = () => {
             target="_blank"
             rel="noopener noreferrer"
             onClick={() => trackWhatsAppClick('header_desktop')}
-            className="border border-[#25D366] bg-[#25D366] text-white text-[10px] font-semibold tracking-[0.18em] uppercase px-4 py-2.5 hover:bg-[#20BD5A] hover:border-[#20BD5A] transition-colors flex items-center gap-2 whitespace-nowrap"
+            className="border border-[#25D366] bg-[#25D366] text-[#071a12] text-base font-semibold tracking-[0.04em] uppercase px-4 py-2.5 hover:bg-[#20BD5A] hover:border-[#20BD5A] transition-colors flex items-center gap-2 whitespace-nowrap"
           >
             <MessageCircle className="w-3.5 h-3.5 text-white flex-shrink-0" strokeWidth={2} />
             WhatsApp
@@ -164,12 +164,12 @@ const Header = () => {
         </div>
 
         {/* ── MOBILE: call, WhatsApp and menu controls on the right ── */}
-        <div className="flex items-center gap-1.5 sm:gap-2 md:hidden shrink-0">
+        <div className="flex items-center gap-1.5 sm:gap-2 2xl:hidden shrink-0">
           {/* Call icon only */}
           <a
             href={`tel:${PHONE_TEL}`}
             onClick={() => trackCallClick('header_mobile')}
-            className="w-11 h-11 border border-[#D1D5DB] bg-[#E5E7EB] flex items-center justify-center touch-manipulation transition-colors active:bg-[#DDE0E4]"
+            className="w-[44px] h-[44px] border border-[#D1D5DB] bg-[#E5E7EB] flex items-center justify-center touch-manipulation transition-colors active:bg-[#DDE0E4]"
             aria-label="Ligar"
           >
             <Phone className="w-4 h-4 text-[#555555]" strokeWidth={2} />
@@ -181,17 +181,17 @@ const Header = () => {
             target="_blank"
             rel="noopener noreferrer"
             onClick={() => trackWhatsAppClick('header_mobile')}
-            className="w-11 h-11 border border-[#25D366] bg-[#25D366] flex items-center justify-center touch-manipulation transition-colors active:bg-[#20BD5A]"
+            className="w-[44px] h-[44px] border border-[#25D366] bg-[#25D366] flex items-center justify-center touch-manipulation transition-colors active:bg-[#20BD5A]"
             aria-label="WhatsApp"
           >
-            <MessageCircle className="w-4 h-4 text-white" strokeWidth={2} />
+            <MessageCircle className="w-4 h-4 text-[#071a12]" strokeWidth={2} />
           </a>
 
           {/* Hamburger */}
           <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
             <SheetTrigger asChild>
               <button
-                className="flex flex-col justify-center items-center w-10 h-10 gap-[5px]"
+                className="flex flex-col justify-center items-center w-[44px] h-[44px] gap-[5px]"
                 aria-label="Menu"
               >
                 <span className="block w-5 h-px bg-[#111111]" />
@@ -214,7 +214,7 @@ const Header = () => {
               <nav className="flex-1 flex flex-col px-4 py-4 gap-0.5 overflow-y-auto">
                 <button
                   onClick={scrollToTop}
-                  className="text-left text-[11px] font-medium tracking-[0.16em] uppercase text-[#111111]/50 hover:text-[#111111] py-4 px-3 transition-colors"
+                  className="text-left text-base font-medium tracking-[0.04em] uppercase text-[#505650] hover:text-[#111111] py-4 px-3 transition-colors"
                 >
                   Início
                 </button>
@@ -222,7 +222,7 @@ const Header = () => {
                 <div>
                   <button
                     onClick={() => setMobileServicesOpen(!mobileServicesOpen)}
-                    className="w-full text-left text-[11px] font-medium tracking-[0.16em] uppercase text-[#111111]/50 hover:text-[#111111] py-4 px-3 flex items-center justify-between transition-colors"
+                    className="w-full text-left text-base font-medium tracking-[0.04em] uppercase text-[#505650] hover:text-[#111111] py-4 px-3 flex items-center justify-between transition-colors"
                   >
                     Serviços
                     <ChevronDown className={`w-3.5 h-3.5 transition-transform ${mobileServicesOpen ? 'rotate-180' : ''}`} />
@@ -234,10 +234,10 @@ const Header = () => {
                           key={s.to}
                           to={s.to}
                           onClick={() => setMobileMenuOpen(false)}
-                          className={`block text-[11px] tracking-[0.08em] uppercase py-3 px-3 transition-colors ${
+                          className={`block text-base tracking-[0.08em] uppercase py-3 px-3 transition-colors ${
                             location.pathname === s.to
                               ? 'text-[#111111]'
-                              : 'text-[#111111]/40 hover:text-[#111111]'
+                              : 'text-[#505650] hover:text-[#111111]'
                           }`}
                         >
                           {s.label}
@@ -249,7 +249,7 @@ const Header = () => {
 
                 <button
                   onClick={() => scrollToSection('testemunhos')}
-                  className="text-left text-[11px] font-medium tracking-[0.16em] uppercase text-[#111111]/50 hover:text-[#111111] py-4 px-3 transition-colors"
+                  className="text-left text-base font-medium tracking-[0.04em] uppercase text-[#505650] hover:text-[#111111] py-4 px-3 transition-colors"
                 >
                   Testemunhos
                 </button>
@@ -257,7 +257,7 @@ const Header = () => {
                 <Link
                   to="/blog"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="text-[11px] font-medium tracking-[0.16em] uppercase text-[#111111]/50 hover:text-[#111111] py-4 px-3 transition-colors"
+                  className="text-base font-medium tracking-[0.04em] uppercase text-[#505650] hover:text-[#111111] py-4 px-3 transition-colors"
                 >
                   Blog
                 </Link>
@@ -265,7 +265,7 @@ const Header = () => {
                 <Link
                   to="/perguntas-frequentes-limpeza-estofos"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="text-[11px] font-medium tracking-[0.16em] uppercase text-[#111111]/50 hover:text-[#111111] py-4 px-3 transition-colors"
+                  className="text-base font-medium tracking-[0.04em] uppercase text-[#505650] hover:text-[#111111] py-4 px-3 transition-colors"
                 >
                   FAQ
                 </Link>
@@ -274,7 +274,7 @@ const Header = () => {
               <div className="px-4 pb-6 pt-3 border-t border-[#111111]/8 space-y-2.5">
                 <button
                   onClick={() => { setMobileMenuOpen(false); openQuiz(); }}
-                  className="w-full border border-[#D4AF37] text-[#111111] text-[10px] font-semibold tracking-[0.18em] uppercase py-3.5 hover:bg-[#D4AF37]/6 transition-colors"
+                  className="w-full border border-[#D4AF37] text-[#111111] text-base font-semibold tracking-[0.04em] uppercase py-3.5 hover:bg-[#D4AF37]/6 transition-colors"
                 >
                   Agendar limpeza
                 </button>
@@ -283,7 +283,7 @@ const Header = () => {
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={() => trackWhatsAppClick('header_mobile_menu')}
-                  className="w-full border border-[#25D366] text-[#111111] text-[10px] font-semibold tracking-[0.18em] uppercase py-3.5 hover:bg-[#25D366]/6 transition-colors flex items-center justify-center gap-2"
+                  className="w-full border border-[#25D366] text-[#111111] text-base font-semibold tracking-[0.04em] uppercase py-3.5 hover:bg-[#25D366]/6 transition-colors flex items-center justify-center gap-2"
                 >
                   <MessageCircle className="w-3.5 h-3.5 text-[#25D366]" strokeWidth={2} />
                   WhatsApp
@@ -291,7 +291,7 @@ const Header = () => {
                 <a
                   href={`tel:${PHONE_TEL}`}
                   onClick={() => { setMobileMenuOpen(false); trackCallClick('header_mobile_menu'); }}
-                  className="w-full border border-[#111111]/25 text-[#111111] text-[10px] font-semibold tracking-[0.18em] uppercase py-3.5 hover:bg-[#111111]/4 transition-colors flex items-center justify-center gap-2"
+                  className="w-full border border-[#111111]/25 text-[#111111] text-base font-semibold tracking-[0.04em] uppercase py-3.5 hover:bg-[#111111]/4 transition-colors flex items-center justify-center gap-2"
                 >
                   <Phone className="w-3.5 h-3.5 text-[#111111]/70" strokeWidth={2} />
                   Ligar

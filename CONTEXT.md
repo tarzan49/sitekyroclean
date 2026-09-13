@@ -1154,3 +1154,8 @@ A recolha, IDs de tentativa/visita, fila persistente, tratamento do histórico e
 ## Pré-visualização Avenir Next (13/09/2026)
 
 A página de colchões em Paranhos mantém o comparador exclusivamente DEV: `?teste=fontes&fonte=avenir#precos`. `FontComparisonPanel` oferece Atual/Avenir Next e conserva os testes anteriores em detalhes. A proposta ajusta pesos, escala, contraste e alinhamento através de estilos limitados ao atributo de pré-visualização; usa apenas fontes locais do dispositivo, sem distribuir ficheiros comerciais. Mostra aviso quando as faces locais não estão disponíveis. `PriceWidget` apresenta «Escolha os colchões» apenas na proposta DEV. Produção mantém a tipografia e o texto anteriores. Avenir Next ainda é uma proposta, não uma decisão de marca; publicação exige licença web.
+
+
+### Tipografia partilhada (13/09/2026)
+
+`src/styles/typography.css` define as faces WOFF2 de Avenir Next e as escalas por função. É importado após o CSS principal em `main.tsx`, para que os papéis tipográficos prevaleçam sobre antigas dimensões Tailwind. `font-playfair` e `font-sans` usam `--font-kyro`. O widget de preços usa uma container query para colocar os controlos abaixo do nome quando a sua largura não comporta tudo na mesma linha. O comparador histórico fica reservado ao parâmetro DEV `teste=fontes-antigas`; as páginas normais usam os ficheiros web fornecidos.

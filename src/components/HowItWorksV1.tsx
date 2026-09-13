@@ -12,8 +12,8 @@ export default function HowItWorksV1() {
       <div className="mx-auto max-w-7xl px-5 py-12 sm:px-8 sm:py-16 lg:py-20">
         <div className="mb-9 lg:mb-12">
           <div className="max-w-2xl">
-            <p className="mb-4 flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.24em] text-[#D4AF37]"><span className="h-px w-9 bg-[#D4AF37]" /> Do primeiro contacto à limpeza</p>
-            <h2 id="process-title" className="font-playfair text-[1.85rem] font-bold leading-[1.1] sm:text-4xl md:text-[2.6rem]">Nós tratamos da limpeza.<br /><span className="text-[#D4AF37]">Você fica tranquilo.</span></h2>
+            <p className="mb-4 flex items-center gap-3 text-sm font-semibold uppercase tracking-[0.24em] text-[#D4AF37]"><span className="h-px w-9 bg-[#D4AF37]" /> Do primeiro contacto à limpeza</p>
+            <h2 id="process-title" className="type-section-title font-playfair     ">Nós tratamos da limpeza.<br /><span className="text-[#D4AF37]">Você fica tranquilo.</span></h2>
           </div>
           <p className="mt-5 max-w-2xl text-base leading-relaxed text-white/75">Orçamento claro, visita combinada e acompanhamento após o serviço.</p>
         </div>
@@ -23,7 +23,7 @@ export default function HowItWorksV1() {
             <img src="/images/services/sofa.webp" alt="Limpeza de um sofá com equipamento de extração" width="1280" height="720" className="h-64 w-full object-cover object-[56%_center] sm:h-80 lg:absolute lg:h-full" />
             <div className="absolute inset-0 bg-gradient-to-t from-[#04110b]/90 via-transparent to-transparent" />
             <figcaption className="absolute bottom-6 left-6 right-6 border-l-2 border-[#D4AF37] pl-4 sm:bottom-8 sm:left-8">
-              <p className="mb-1 text-xs font-semibold uppercase tracking-[0.2em] text-[#D4AF37]">No conforto da sua casa</p>
+              <p className="mb-1 text-sm font-semibold uppercase tracking-[0.2em] text-[#D4AF37]">No conforto da sua casa</p>
               <p className="font-playfair text-2xl text-white">Cuidado em cada detalhe.</p>
             </figcaption>
           </figure>
@@ -32,11 +32,11 @@ export default function HowItWorksV1() {
             {steps.map((step, index) => (
               <li key={step.title} className="relative flex gap-5 pb-8 last:pb-0 lg:pb-14">
                 {index < steps.length - 1 && <span aria-hidden="true" className="absolute bottom-0 left-[19px] top-11 w-px bg-[#D4AF37]/25" />}
-                <span className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-[#D4AF37]/45 bg-[#10271d] text-sm font-semibold text-[#D4AF37]">0{index + 1}</span>
+                <span className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-[#D4AF37]/45 bg-[#10271d] text-base font-semibold text-[#D4AF37]">0{index + 1}</span>
                 <div className="pt-1">
-                  <h3 className="mb-2 font-playfair text-[1.4rem] font-semibold leading-tight sm:text-2xl">{step.title}</h3>
+                  <h3 className="type-card-title mb-2 font-playfair    ">{step.title}</h3>
                   <p className="max-w-md text-base leading-relaxed text-white/75">{step.text}</p>
-                  <p className="mt-2 text-sm leading-relaxed text-[#E3CD85]">{step.note}</p>
+                  <p className="mt-2 text-base leading-relaxed text-[#E3CD85]">{step.note}</p>
                 </div>
               </li>
             ))}

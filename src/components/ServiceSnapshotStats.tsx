@@ -39,7 +39,7 @@ const ServiceSnapshotStats = ({ stats }: { stats: SnapshotStat[] }) => {
               <p className="font-playfair font-bold text-[clamp(19px,5.8vw,24px)] sm:text-2xl md:text-3xl leading-none mb-1.5" style={{ color: "#D4AF37" }}>
                 {s.value}
               </p>
-              <p className="text-[11px] leading-snug md:text-[10px] font-medium text-white/75 md:text-white/60 md:tracking-[0.22em] md:uppercase">
+              <p className="text-sm leading-snug md:text-sm font-medium text-white/75 md:text-white/80 md:tracking-[0.22em] md:uppercase">
                 <span className="md:hidden">{s.label.startsWith('Desde,') ? 'Desde' : s.label.startsWith('Orçamento,') ? 'Orçamento' : s.label.includes('avaliações Google') ? s.label.replace(' Google', '') : s.label === 'Resposta durante o horário de atendimento' ? 'Resposta*' : s.label.startsWith('Respondemos em menos') ? 'Resposta' : s.label}</span>
                 <span className="hidden md:inline">{s.label}</span>
               </p>
@@ -47,7 +47,7 @@ const ServiceSnapshotStats = ({ stats }: { stats: SnapshotStat[] }) => {
           ))}
         </div>
         {stats.some(s => s.label === 'Resposta durante o horário de atendimento') && (
-          <p className="md:hidden text-center text-[10px] leading-relaxed text-white/65 pb-3 pt-1">*Durante o horário de atendimento.</p>
+          <p className="md:hidden text-center text-sm leading-relaxed text-white/80 pb-3 pt-1">*Durante o horário de atendimento.</p>
         )}
       </div>
     </section>

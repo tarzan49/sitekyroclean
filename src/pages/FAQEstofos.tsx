@@ -1,6 +1,6 @@
 import ServiceFAQ from "@/components/ServiceFAQ";
 import { SATISFACTION_PROMISE, COVERAGE_PROMISE, AVAILABILITY_PROMISE, DRYING_PROMISE } from '../constants/commercialPolicy';
-﻿import { useEffect } from "react";
+import { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { ChevronRight, MessageCircle, Phone } from "lucide-react";
 import Header from "@/components/Header";
@@ -186,18 +186,18 @@ const FAQEstofos = () => {
         {/* Hero */}
         <div className="bg-kyro-green pt-24 pb-10 md:pb-14">
           <div className="max-w-5xl mx-auto px-5 sm:px-6 lg:px-8">
-            <nav className="flex items-center gap-1.5 text-xs text-white/30 mb-6" aria-label="Breadcrumb">
-              <Link to="/" className="hover:text-white/60 transition-colors">Início</Link>
+            <nav className="flex items-center gap-1.5 text-sm text-white/80 mb-6" aria-label="Breadcrumb">
+              <Link to="/" className="hover:text-white/80 transition-colors">Início</Link>
               <ChevronRight className="w-3 h-3" />
-              <span className="text-white/60">Perguntas Frequentes</span>
+              <span className="text-white/80">Perguntas Frequentes</span>
             </nav>
-            <p className="text-[10px] font-bold tracking-[0.28em] uppercase mb-3" style={{ color: '#D4AF37' }}>
+            <p className="text-sm font-bold tracking-[0.08em] uppercase mb-3" style={{ color: '#D4AF37' }}>
               Kyro Clean Solutions
             </p>
-            <h1 className="font-playfair text-3xl sm:text-4xl font-bold text-white leading-tight mb-4">
+            <h1 className="type-page-title font-playfair    text-white  mb-4">
               Perguntas Frequentes
             </h1>
-            <p className="text-white/55 text-base leading-relaxed max-w-xl">
+            <p className="text-white/80 text-base leading-relaxed max-w-xl">
               16 respostas com dados reais: preços, tempos de secagem, garantias, materiais e áreas de serviço. Com condições do serviço explicadas.
             </p>
           </div>
@@ -217,13 +217,13 @@ const FAQEstofos = () => {
 
               {/* CTA card */}
               <div className="bg-kyro-green rounded-2xl p-5">
-                <p className="text-[10px] font-bold tracking-[0.28em] uppercase mb-1" style={{ color: '#D4AF37' }}>
+                <p className="text-sm font-bold tracking-[0.08em] uppercase mb-1" style={{ color: '#D4AF37' }}>
                   Orçamento grátis
                 </p>
                 <p className="font-playfair text-white font-bold text-base leading-snug mb-1">
                   Preço em 30 segundos
                 </p>
-                <p className="text-white/45 text-xs mb-4 leading-relaxed">
+                <p className="text-white/80 text-sm mb-4 leading-relaxed">
                   Sem compromisso · Técnico contacta em menos de 10 min
                 </p>
                 <QuizButton ctaLabel="Calcular preço" />
@@ -232,14 +232,14 @@ const FAQEstofos = () => {
                     href={WHATSAPP_BASE}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center justify-center gap-2 px-4 py-2.5 border border-white/20 rounded-full text-white/70 font-medium text-xs hover:bg-white/[0.07] hover:text-white transition-all"
+                    className="inline-flex items-center justify-center gap-2 px-4 py-2.5 border border-white/20 rounded-full text-white/70 font-medium text-sm hover:bg-white/[0.07] hover:text-white transition-all"
                   >
                     <MessageCircle className="w-3.5 h-3.5 text-[#25D366] flex-shrink-0" strokeWidth={2} />
                     WhatsApp
                   </a>
                   <a
                     href={`tel:${PHONE_E164}`}
-                    className="inline-flex items-center justify-center gap-1.5 text-white/55 hover:text-gold text-xs font-medium transition-colors"
+                    className="inline-flex items-center justify-center gap-1.5 text-white/80 hover:text-gold text-sm font-medium transition-colors"
                   >
                     <Phone className="w-3 h-3 text-gold flex-shrink-0" strokeWidth={2.5} />
                     {PHONE_DISPLAY}
@@ -251,7 +251,7 @@ const FAQEstofos = () => {
 
               {/* Related services */}
               <div className="bg-white rounded-2xl p-4 border border-[#E8E4DE]">
-                <p className="text-[10px] font-bold tracking-[0.28em] uppercase text-[#111111]/40 mb-3">
+                <p className="text-sm font-bold tracking-[0.08em] uppercase text-[#505650] mb-3">
                   Serviços
                 </p>
                 <div className="space-y-1">
@@ -259,7 +259,7 @@ const FAQEstofos = () => {
                     <Link
                       key={s.to}
                       to={s.to}
-                      className="flex items-center gap-2 text-[13px] text-[#111111]/65 hover:text-[#D4AF37] transition-colors py-1.5 border-b border-[#E8E4DE] last:border-0"
+                      className="flex items-center gap-2 text-base text-[#505650] hover:text-[#D4AF37] transition-colors py-1.5 border-b border-[#E8E4DE] last:border-0"
                     >
                       <ChevronRight className="w-3 h-3 text-[#D4AF37]/50 flex-shrink-0" />
                       {s.label}
@@ -274,14 +274,14 @@ const FAQEstofos = () => {
           {/* Mobile CTA, below FAQ list */}
           <div className="lg:hidden mt-8 bg-kyro-green rounded-2xl p-6 text-center">
             <p className="font-playfair text-white font-bold text-lg mb-1">Orçamento gratuito</p>
-            <p className="text-white/50 text-sm mb-5">30 segundos · Sem compromisso</p>
+            <p className="text-white/80 text-base mb-5">30 segundos · Sem compromisso</p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
               <QuizButton ctaLabel="Calcular preço grátis" />
               <a
                 href={WHATSAPP_BASE}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center justify-center gap-2 px-6 py-3 border border-white/20 rounded-full text-white/75 font-medium text-sm hover:bg-white/[0.07] hover:text-white transition-all"
+                className="inline-flex items-center justify-center gap-2 px-6 py-3 border border-white/20 rounded-full text-white/75 font-medium text-base hover:bg-white/[0.07] hover:text-white transition-all"
               >
                 <MessageCircle className="w-4 h-4 text-[#25D366] flex-shrink-0" strokeWidth={2} />
                 WhatsApp

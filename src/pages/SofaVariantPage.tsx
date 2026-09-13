@@ -1,7 +1,7 @@
 import DirectoryGroup from "@/components/DirectoryGroup";
 import SofaLeadActions from "@/components/SofaLeadActions";
 import { AdsLandingHeader, AdsLandingFooter, isAdsVisit } from "@/components/AdsLandingNavigation";
-﻿// Handles all keyword variant pages:
+// Handles all keyword variant pages:
 // /higienizacao-[service]-[city-or-parish]
 // /lavagem-[service]-[city-or-parish]
 // Each page is self-canonical and independently indexable.
@@ -227,7 +227,7 @@ const SofaVariantPage = () => {
         <Header />
         <main className="pt-28 pb-16 min-h-screen bg-white">
           <div className="container mx-auto px-4 text-center">
-            <h1 className="font-playfair text-3xl font-bold text-[#111111] mb-4">Página não encontrada</h1>
+            <h1 className="type-page-title font-playfair   text-[#111111] mb-4">Página não encontrada</h1>
             <Link to="/" style={{ color: "#D4AF37" }} className="hover:underline">Voltar ao início</Link>
           </div>
         </main>
@@ -287,7 +287,7 @@ const SofaVariantPage = () => {
             <div className="max-w-6xl mx-auto grid lg:grid-cols-2 gap-4 lg:gap-12 items-center">
               <div>
                 {!isPaidLanding && <>
-                <nav className="flex items-center gap-1.5 text-xs text-white/50 mb-6 flex-wrap" aria-label="Breadcrumb">
+                <nav className="flex items-center gap-1.5 text-sm text-white/80 mb-6 flex-wrap" aria-label="Breadcrumb">
                   <Link to="/" className="hover:text-white/80 transition-colors">Início</Link>
                   <span>/</span>
                   <Link to={data.canonical} className="hover:text-white/80 transition-colors">{data.locationName}</Link>
@@ -300,7 +300,7 @@ const SofaVariantPage = () => {
                   <div className="flex flex-col gap-1">
                     <div className="w-7 h-px bg-gradient-to-r from-gold to-transparent" />
                     <span
-                      className="text-[10px] font-bold text-gold/90 tracking-[0.30em] uppercase"
+                      className="text-sm font-bold text-gold/90 tracking-[0.30em] uppercase"
                       style={{ textShadow: "0 1px 6px rgba(0,0,0,0.6)" }}
                     >
                       {variantLabel} · {data.locationName}
@@ -309,13 +309,13 @@ const SofaVariantPage = () => {
                 </div>
 
                 <h1
-                  className="font-playfair text-[1.75rem] sm:text-4xl md:text-5xl lg:text-6xl font-semibold text-white mb-3 lg:mb-4 leading-[1.12]"
+                  className="type-page-title font-playfair      text-white mb-3 lg:mb-4 "
                   style={{ textShadow: "0 2px 16px rgba(0,0,0,0.65)" }}
                 >
                   {data.h1}
                 </h1>
 
-                <p className="text-sm sm:text-base md:text-lg text-white/70 leading-relaxed mb-4 lg:mb-6 max-w-lg">
+                <p className="text-base sm:text-base md:text-lg text-white/70 leading-relaxed mb-4 lg:mb-6 max-w-lg">
                   {isSofaCleaning ? "Limpeza ao domicílio por extração profunda. Consulte os preços por tamanho e envie uma foto para avaliarmos as manchas." : (data.intro.match(/^[^.?]*[.?]/)?.[0] ?? data.intro)}
                 </p>
                 <SofaLeadActions city={data.locationName} price={data.priceFrom} href={`${WHATSAPP_BASE}?text=${encodeURIComponent(buildVariantWaMessage(data.variantKey === 'impermeabilizacao', SERVICE_LABEL[data.serviceKey], VARIANT_LABEL[data.variantKey], data.locationName))}`} source={`variant_hero_${parsed.variantKey}_${parsed.serviceKey}`} />
@@ -358,12 +358,12 @@ const SofaVariantPage = () => {
               <div className="mb-10 md:mb-14">
                 <div className="flex items-center gap-3 mb-4">
                   <div className="h-px w-8 flex-shrink-0" style={{ backgroundColor: "#D4AF37", opacity: 0.65 }} />
-                  <p className="text-[10px] font-bold tracking-[0.28em] uppercase" style={{ color: "#D4AF37", opacity: 0.85 }}>O Que Resolvemos</p>
+                  <p className="text-sm font-bold tracking-[0.08em] uppercase" style={{ color: "#D4AF37", opacity: 0.85 }}>O Que Resolvemos</p>
                 </div>
-                <h2 className="font-playfair text-[1.85rem] sm:text-4xl md:text-[2.6rem] font-bold leading-[1.1] text-white">
+                <h2 className="type-section-title font-playfair      text-white">
                   {`Problemas que resolvemos ${prep}`}{" "}<em className="not-italic" style={{ color: "#D4AF37" }}>{data.locationName}</em>
                 </h2>
-                <p className="mt-4 text-[15px] leading-relaxed max-w-2xl text-white/50">Se reconhece algum destes cenários, envie uma fotografia para avaliarmos o tratamento adequado.</p>
+                <p className="mt-4 text-base leading-relaxed max-w-2xl text-white/80">Se reconhece algum destes cenários, envie uma fotografia para avaliarmos o tratamento adequado.</p>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 md:gap-8">
                 {data.problems.map((problem, idx) => (
@@ -383,10 +383,10 @@ const SofaVariantPage = () => {
                     <div className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(7,26,18,0.98) 0%, rgba(7,26,18,0.72) 50%, rgba(7,26,18,0.18) 100%)" }} />
                     {/* Content */}
                     <div className="relative z-10 p-7 md:p-8 flex flex-col gap-4">
-                      <p className="text-[10px] font-bold tracking-[0.26em] uppercase" style={{ color: "#D4AF37" }}>
+                      <p className="text-sm font-bold tracking-[0.26em] uppercase" style={{ color: "#D4AF37" }}>
                         {problemLabels[idx]}
                       </p>
-                      <h3 className="font-playfair font-bold leading-snug text-white" style={{ fontSize: "1.25rem" }}>
+                      <h3 className="type-card-title font-playfair   text-white" style={{ fontSize: "1.25rem" }}>
                         {problem.title}
                       </h3>
                       <div className="w-8 h-px" style={{ background: "linear-gradient(90deg, rgba(212,175,55,0.8) 0%, rgba(212,175,55,0.15) 100%)" }} />
@@ -406,12 +406,12 @@ const SofaVariantPage = () => {
             <div className="mb-10 md:mb-14">
               <div className="flex items-center gap-3 mb-4">
                 <div className="h-px w-8 flex-shrink-0" style={{ backgroundColor: "#D4AF37", opacity: 0.65 }} />
-                <p className="text-[10px] font-bold tracking-[0.28em] uppercase" style={{ color: "#D4AF37", opacity: 0.85 }}>Vantagens</p>
+                <p className="text-sm font-bold tracking-[0.08em] uppercase" style={{ color: "#D4AF37", opacity: 0.85 }}>Vantagens</p>
               </div>
-              <h2 className="font-playfair text-[1.85rem] sm:text-4xl md:text-[2.6rem] font-bold leading-[1.1] text-[#111111]">
+              <h2 className="type-section-title font-playfair      text-[#111111]">
                 {`${variantLabel} profissional ${prep}`}{" "}<em className="not-italic" style={{ color: "#D4AF37" }}>{data.locationName}</em>
               </h2>
-              <p className="mt-4 text-[15px] leading-relaxed max-w-2xl text-[#111111]/55">{data.whatIs}</p>
+              <p className="mt-4 text-base leading-relaxed max-w-2xl text-[#505650]">{data.whatIs}</p>
             </div>
             <div className="grid grid-cols-2 gap-px" style={{ backgroundColor: "#E8E4DE" }}>
               {data.benefits.map((benefit, idx) => (
@@ -419,7 +419,7 @@ const SofaVariantPage = () => {
                   <p className="font-playfair font-bold mb-2 leading-none text-3xl sm:text-[2.25rem]" style={{ color: "rgba(212,175,55,0.30)" }}>
                     {String(idx + 1).padStart(2, "0")}
                   </p>
-                  <p className="text-[13px] sm:text-[15px] font-semibold text-[#111111] leading-snug">{benefit}</p>
+                  <p className="text-base sm:text-base font-semibold text-[#111111] leading-snug">{benefit}</p>
                 </div>
               ))}
             </div>
@@ -432,12 +432,12 @@ const SofaVariantPage = () => {
             <div className="mb-10 md:mb-14">
               <div className="flex items-center gap-3 mb-4">
                 <div className="h-px w-8 flex-shrink-0" style={{ backgroundColor: "#D4AF37", opacity: 0.65 }} />
-                <p className="text-[10px] font-bold tracking-[0.28em] uppercase" style={{ color: "#D4AF37", opacity: 0.85 }}>Porque a Kyro Clean</p>
+                <p className="text-sm font-bold tracking-[0.08em] uppercase" style={{ color: "#D4AF37", opacity: 0.85 }}>Porque a Kyro Clean</p>
               </div>
-              <h2 className="font-playfair text-[1.85rem] sm:text-4xl md:text-[2.6rem] font-bold leading-[1.1] text-white">
+              <h2 className="type-section-title font-playfair      text-white">
                 A escolha certa para os seus{" "}<em className="not-italic" style={{ color: "#D4AF37" }}>estofos</em>
               </h2>
-              <p className="mt-4 text-[15px] leading-relaxed max-w-2xl text-white/50">Orçamento claro, cuidado com os tecidos e avaliações de clientes que já utilizaram o serviço.</p>
+              <p className="mt-4 text-base leading-relaxed max-w-2xl text-white/80">Orçamento claro, cuidado com os tecidos e avaliações de clientes que já utilizaram o serviço.</p>
             </div>
 
             {/* 3 stats */}
@@ -449,7 +449,7 @@ const SofaVariantPage = () => {
               ].map((item, i) => (
                 <div key={i} className="p-5 sm:p-6 md:p-7" style={{ background: "rgba(255,255,255,0.04)", borderTop: "2px solid rgba(212,175,55,0.55)" }}>
                   <p className="font-playfair font-bold text-xl sm:text-2xl mb-1" style={{ color: "#D4AF37" }}>{item.stat}</p>
-                  <p className="text-[11px] sm:text-sm text-white/55 leading-snug">{item.label}</p>
+                  <p className="text-sm sm:text-base text-white/80 leading-snug">{item.label}</p>
                 </div>
               ))}
             </div>
@@ -467,9 +467,9 @@ const SofaVariantPage = () => {
             <div className="mb-10 md:mb-14">
               <div className="flex items-center gap-3 mb-4">
                 <div className="h-px w-8 flex-shrink-0" style={{ backgroundColor: "#D4AF37", opacity: 0.65 }} />
-                <p className="text-[10px] font-bold tracking-[0.28em] uppercase" style={{ color: "#D4AF37", opacity: 0.85 }}>Processo</p>
+                <p className="text-sm font-bold tracking-[0.08em] uppercase" style={{ color: "#D4AF37", opacity: 0.85 }}>Processo</p>
               </div>
-              <h2 className="font-playfair text-[1.85rem] sm:text-4xl md:text-[2.6rem] font-bold leading-[1.1] text-[#111111]">
+              <h2 className="type-section-title font-playfair      text-[#111111]">
                 Como funciona a{" "}<em className="not-italic" style={{ color: "#D4AF37" }}>{variantLabel}</em>
               </h2>
             </div>
@@ -498,8 +498,8 @@ const SofaVariantPage = () => {
                                 {String(num + 1).padStart(2, "0")}
                               </span>
                               <div>
-                                <p className="text-sm font-semibold text-[#111111] mb-1">{step.label}</p>
-                                <p className="text-xs text-[#111111]/50 leading-relaxed">{step.desc}</p>
+                                <p className="text-base font-semibold text-[#111111] mb-1">{step.label}</p>
+                                <p className="text-sm text-[#505650] leading-relaxed">{step.desc}</p>
                               </div>
                             </div>
                           );
@@ -533,9 +533,9 @@ const SofaVariantPage = () => {
             <div className="mb-10 md:mb-14">
               <div className="flex items-center gap-3 mb-4">
                 <div className="h-px w-8 flex-shrink-0" style={{ backgroundColor: "#D4AF37", opacity: 0.65 }} />
-                <p className="text-[10px] font-bold tracking-[0.28em] uppercase" style={{ color: "#D4AF37", opacity: 0.85 }}>Explore por categoria</p>
+                <p className="text-sm font-bold tracking-[0.08em] uppercase" style={{ color: "#D4AF37", opacity: 0.85 }}>Explore por categoria</p>
               </div>
-              <h2 className="font-playfair text-[1.85rem] sm:text-4xl md:text-[2.6rem] font-bold leading-[1.1] text-[#111111]">
+              <h2 className="type-section-title font-playfair      text-[#111111]">
                 {`Serviços e zonas de atendimento ${prep}`}{" "}<em className="not-italic" style={{ color: "#D4AF37" }}>{data.locationName}</em>
               </h2>
             </div>
@@ -551,7 +551,7 @@ const SofaVariantPage = () => {
                         <Link
                           key={f.slug}
                           to={`/${parsed.variantKey}-${parsed.serviceKey}-${parsed.locationPart}-${f.slug}`}
-                          className="inline-flex items-center gap-1.5 bg-white px-3.5 py-2 rounded-full text-sm font-medium text-[#111111] border border-[#E8E4DE] hover:border-[#D4AF37]/40 hover:bg-[#D4AF37]/5 hover:shadow-sm transition-all"
+                          className="inline-flex items-center gap-1.5 bg-white px-3.5 py-2 rounded-full text-base font-medium text-[#111111] border border-[#E8E4DE] hover:border-[#D4AF37]/40 hover:bg-[#D4AF37]/5 hover:shadow-sm transition-all"
                         >
                           <MapPin className="w-3 h-3 flex-shrink-0" style={{ color: "#D4AF37" }} />
                           {f.name}
@@ -567,7 +567,7 @@ const SofaVariantPage = () => {
                     <Link
                       key={city.slug}
                       to={`/${parsed.variantKey}-${parsed.serviceKey}-${city.slug}`}
-                      className="inline-flex items-center gap-1.5 bg-white px-3.5 py-2 rounded-full text-sm font-medium text-[#111111] border border-[#E8E4DE] hover:border-[#D4AF37]/40 hover:bg-[#D4AF37]/5 hover:shadow-sm transition-all"
+                      className="inline-flex items-center gap-1.5 bg-white px-3.5 py-2 rounded-full text-base font-medium text-[#111111] border border-[#E8E4DE] hover:border-[#D4AF37]/40 hover:bg-[#D4AF37]/5 hover:shadow-sm transition-all"
                     >
                       {city.name}
                     </Link>
@@ -580,14 +580,14 @@ const SofaVariantPage = () => {
                     <Link
                       key={svcKey}
                       to={`/${SERVICEKEY_TO_SLUG[svcKey]}-${parsed.locationPart}`}
-                      className="inline-flex items-center gap-1.5 bg-white px-3.5 py-2 rounded-full text-sm font-medium text-[#111111] border border-[#E8E4DE] hover:border-[#D4AF37]/40 hover:bg-[#D4AF37]/5 hover:shadow-sm transition-all"
+                      className="inline-flex items-center gap-1.5 bg-white px-3.5 py-2 rounded-full text-base font-medium text-[#111111] border border-[#E8E4DE] hover:border-[#D4AF37]/40 hover:bg-[#D4AF37]/5 hover:shadow-sm transition-all"
                     >
                       {SERVICE_LABEL[svcKey]}
                     </Link>
                   ))}
                   <Link
                     to={data.canonical}
-                    className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full text-sm font-semibold border hover:shadow-sm transition-all"
+                    className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full text-base font-semibold border hover:shadow-sm transition-all"
                     style={{ color: "#D4AF37", borderColor: "rgba(212,175,55,0.45)", background: "rgba(212,175,55,0.04)" }}
                   >
                     Página principal

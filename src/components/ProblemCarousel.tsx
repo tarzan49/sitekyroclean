@@ -65,6 +65,6 @@ export default function ProblemCarousel({ children }: { children: ReactNode }) {
         <button type="button" onClick={() => go(active + 1, true)} aria-label="Próximo problema" aria-controls={id} className="w-11 h-11 flex items-center justify-center bg-[#173629] rounded-sm text-white"><ArrowRight className="w-4 h-4" /></button>
       </div>
     </div>
-    <p className="text-xs text-[#536259] mt-1 md:hidden">{active + 1} de {items.length} · {paused || reduced ? 'Explore com as setas ou deslize.' : 'Avança automaticamente a cada 6 segundos.'}</p>
+    <p className="text-sm text-[#536259] mt-1 md:hidden">{active + 1} de {items.length} · {paused || reduced ? 'Explore com as setas ou deslize.' : 'Avança automaticamente a cada 6 segundos.'}</p>
   </div>;
 }

@@ -101,27 +101,27 @@
 
   body {
     @apply bg-background text-foreground;
-    font-family: 'Inter', system-ui, sans-serif;
+    font-family: var(--font-kyro);
     -webkit-tap-highlight-color: transparent;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
 
-  /* Kyro Typography System — Cormorant Garamond for editorial premium feel */
+  /* Kyro typography: shared family with role-specific scales */
   h1, h2 {
-    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-family: var(--font-kyro);
     line-height: 1.1;
     letter-spacing: -0.01em;
   }
 
   h3 {
-    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-family: var(--font-kyro);
     line-height: 1.2;
     letter-spacing: -0.005em;
   }
 
   h4, h5, h6 {
-    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-family: var(--font-kyro);
   }
 
   /* Better touch targets on mobile - minimum 44px for accessibility */
@@ -176,7 +176,7 @@ body,
 @layer utilities {
   /* Editorial headline — Cormorant 300, very large, tight leading */
   .heading-editorial {
-    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-family: var(--font-kyro);
     font-weight: 300;
     line-height: 1.05;
     letter-spacing: -0.02em;
@@ -184,7 +184,7 @@ body,
 
   /* Refined headline — Cormorant 400, slightly less dramatic */
   .heading-refined {
-    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-family: var(--font-kyro);
     font-weight: 400;
     line-height: 1.1;
     letter-spacing: -0.015em;
@@ -192,7 +192,7 @@ body,
 
   /* Label above headings — Inter small caps style */
   .label-overline {
-    font-family: 'Inter', system-ui, sans-serif;
+    font-family: var(--font-kyro);
     font-weight: 500;
     font-size: 0.65rem;
     letter-spacing: 0.22em;
@@ -201,7 +201,7 @@ body,
 
   .text-premium-title {
     @apply text-4xl md:text-5xl lg:text-6xl leading-tight tracking-tight;
-    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-family: var(--font-kyro);
     font-weight: 400;
   }
 

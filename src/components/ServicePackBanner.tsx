@@ -47,7 +47,7 @@ export default function ServicePackBanner({ packSlugs, city, variant = 'light' }
             >
               <span className="min-w-0">
                 <span className="block font-playfair text-xl sm:text-2xl font-bold leading-tight">{option.title}</span>
-                <span className={`block mt-2 text-sm leading-relaxed ${light ? 'text-black/60' : 'text-white/65'}`}>
+                <span className={`block mt-2 text-base leading-relaxed ${light ? 'text-black/60' : 'text-white/80'}`}>
                   {option.description}
                 </span>
               </span>

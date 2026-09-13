@@ -29,17 +29,17 @@ const QuizStepContact = ({ formData, updateFormData, scrollContainerRef, quoteLi
       className="flex-1"
     >
       <div className="w-full max-w-sm text-left">
-        <p className="text-gold text-[10px] font-bold tracking-[0.28em] uppercase mb-1">CONTACTO</p>
-        <h2 className="font-playfair text-2xl sm:text-3xl font-bold text-white mb-2 leading-[1.3]">
+        <p className="text-gold text-sm font-bold tracking-[0.08em] uppercase mb-1">CONTACTO</p>
+        <h2 className="type-quote-title font-playfair    text-white mb-2 ">
           Os seus dados
         </h2>
-        <p className="text-sm text-white/60 mb-6">
+        <p className="text-base text-white/80 mb-6">
           {preview ? "Modo de teste: não precisa de preencher dados. Nenhum pedido será enviado." : "Deixe o seu contacto para confirmarmos o pedido."}
         </p>
 
         <div className="flex flex-col gap-4">
           <div>
-            <label htmlFor="quote-name" className="block text-[11px] font-bold text-white/65 uppercase tracking-wider mb-1.5">Nome *</label>
+            <label htmlFor="quote-name" className="block text-base font-bold text-white/80   mb-1.5">Nome *</label>
             <Input
               id="quote-name"
               placeholder="O seu nome"
@@ -49,11 +49,11 @@ const QuizStepContact = ({ formData, updateFormData, scrollContainerRef, quoteLi
               autoCorrect="off"
               autoCapitalize="words"
               onFocus={(e) => scrollToVisible(e.target)}
-              className="text-base h-12 bg-[#1a2a1a] border-gold/25 text-white placeholder:text-white/40 focus-visible:ring-gold rounded-sm"
+              className="text-base h-12 bg-[#1a2a1a] border-gold/25 text-white placeholder:text-white/80 focus-visible:ring-gold rounded-sm"
             />
           </div>
           <div>
-            <label htmlFor="quote-phone" className="block text-[11px] font-bold text-white/65 uppercase tracking-wider mb-1.5">Telemóvel / WhatsApp *</label>
+            <label htmlFor="quote-phone" className="block text-base font-bold text-white/80   mb-1.5">Telemóvel / WhatsApp *</label>
             <Input
               id="quote-phone"
               type="tel"
@@ -63,22 +63,22 @@ const QuizStepContact = ({ formData, updateFormData, scrollContainerRef, quoteLi
               autoComplete="tel"
               inputMode="tel"
               onFocus={(e) => scrollToVisible(e.target)}
-              className="text-base h-12 bg-[#1a2a1a] border-gold/25 text-white placeholder:text-white/40 focus-visible:ring-gold rounded-sm"
+              className="text-base h-12 bg-[#1a2a1a] border-gold/25 text-white placeholder:text-white/80 focus-visible:ring-gold rounded-sm"
             />
           </div>
-          {formData.phone && formData.phone.replace(/\D/g, '').length < 9 && <p className="text-xs text-amber-200 text-left">Introduza um contacto válido, com indicativo se for estrangeiro.</p>}
+          {formData.phone && formData.phone.replace(/\D/g, '').length < 9 && <p className="text-sm text-amber-200 text-left">Introduza um contacto válido, com indicativo se for estrangeiro.</p>}
         </div>
         <details className="mt-5 border-t border-white/10 text-left">
-          <summary className="cursor-pointer py-3 text-sm text-white/65 focus-visible:outline focus-visible:outline-2 focus-visible:outline-gold">
+          <summary className="cursor-pointer py-3 text-base text-white/80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-gold">
             Ver resumo do pedido
           </summary>
           <div className="pb-3 space-y-2">
-            {quoteLines.map((line, i) => <div key={i} className="flex items-start justify-between gap-3 text-xs text-white/75">
+            {quoteLines.map((line, i) => <div key={i} className="flex items-start justify-between gap-3 text-sm text-white/75">
               <span className="min-w-0 break-words">{line.qty}× {line.label}</span>
               <span className="shrink-0">{line.total === null ? 'Sob orçamento' : `${line.total.toLocaleString('pt-PT')}€`}</span>
             </div>)}
-            <p className="border-t border-white/10 pt-2 text-sm font-semibold text-[#D4AF37]">{quotePriceText}</p>
-            <p className="text-xs text-white/60">Estimativa sujeita a confirmação.</p>
+            <p className="border-t border-white/10 pt-2 text-base font-semibold text-[#D4AF37]">{quotePriceText}</p>
+            <p className="text-sm text-white/80">Estimativa sujeita a confirmação.</p>
           </div>
         </details>
       </div>

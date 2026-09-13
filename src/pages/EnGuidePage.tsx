@@ -131,7 +131,7 @@ const EnGuidePage = () => {
           <section className="relative pt-24 md:pt-28 pb-16 md:pb-24">
             <div className="container mx-auto px-5 sm:px-6 lg:px-8 relative z-10">
               <div className="max-w-2xl">
-                <nav className="flex items-center gap-1.5 text-xs text-white/50 mb-6 flex-wrap" aria-label="Breadcrumb">
+                <nav className="flex items-center gap-1.5 text-sm text-white/80 mb-6 flex-wrap" aria-label="Breadcrumb">
                   <Link to="/" className="hover:text-white/80 transition-colors">Home</Link>
                   <span>/</span>
                   <span className="text-white/70">Host Guide</span>
@@ -140,17 +140,17 @@ const EnGuidePage = () => {
                 <div className="inline-flex items-start mb-5">
                   <div className="flex flex-col gap-1">
                     <div className="w-7 h-px bg-gradient-to-r from-gold to-transparent" />
-                    <span className="text-[10px] font-bold text-gold/90 tracking-[0.30em] uppercase" style={{ textShadow: "0 1px 6px rgba(0,0,0,0.6)" }}>
+                    <span className="text-sm font-bold text-gold/90 tracking-[0.30em] uppercase" style={{ textShadow: "0 1px 6px rgba(0,0,0,0.6)" }}>
                       For Hosts & Property Managers
                     </span>
                   </div>
                 </div>
 
-                <h1 className="font-playfair text-[1.75rem] sm:text-4xl md:text-5xl font-semibold text-white mb-4 leading-[1.12]" style={{ textShadow: "0 2px 16px rgba(0,0,0,0.65)" }}>
+                <h1 className="type-page-title font-playfair     text-white mb-4 " style={{ textShadow: "0 2px 16px rgba(0,0,0,0.65)" }}>
                   Airbnb & short-term rental cleaning in <span style={{ color: "#D4AF37" }}>Portugal</span>
                 </h1>
 
-                <p className="text-sm sm:text-base md:text-lg text-white/70 leading-relaxed mb-6 max-w-lg">
+                <p className="text-base sm:text-base md:text-lg text-white/70 leading-relaxed mb-6 max-w-lg">
                   A practical guide for hosts: turnover timelines, what to document when a guest causes damage, and realistic costs, based on what we see cleaning rental properties across Porto, Lisbon and the Algarve.
                 </p>
 
@@ -164,7 +164,7 @@ const EnGuidePage = () => {
                       className="relative flex items-center justify-center gap-2 w-full h-[58px] md:h-[52px] px-6 font-bold text-white touch-manipulation bg-gradient-to-r from-[#1DA851] via-[#25D366] to-[#1DA851] shadow-[0_6px_22px_rgba(37,211,102,0.42),0_2px_6px_rgba(0,0,0,0.28),inset_0_1px_0_rgba(255,255,255,0.20),inset_0_-2px_0_rgba(0,0,0,0.12)] hover:shadow-[0_10px_32px_rgba(37,211,102,0.60),0_4px_10px_rgba(0,0,0,0.32)] hover:scale-[1.025] active:scale-[0.95] transition-all duration-150"
                     >
                       <MessageCircle className="w-[18px] h-[18px] flex-shrink-0" strokeWidth={2} />
-                      <span className="text-[13px] font-semibold tracking-[0.18em] uppercase">Message on WhatsApp</span>
+                      <span className="text-base font-semibold tracking-[0.18em] uppercase">Message on WhatsApp</span>
                     </a>
                   </div>
                   <a
@@ -172,7 +172,7 @@ const EnGuidePage = () => {
                     className="flex-1 flex items-center justify-center gap-2 h-[58px] md:h-[52px] px-6 font-bold border border-white/25 text-white hover:bg-white/10 transition-colors"
                   >
                     <Phone className="w-[16px] h-[16px] flex-shrink-0" strokeWidth={2} />
-                    <span className="text-[13px] font-semibold tracking-[0.18em] uppercase">{PHONE_DISPLAY}</span>
+                    <span className="text-base font-semibold tracking-[0.18em] uppercase">{PHONE_DISPLAY}</span>
                   </a>
                 </div>
               </div>
@@ -183,10 +183,10 @@ const EnGuidePage = () => {
         {/* ═══ TABLE OF CONTENTS ═══ */}
         <section className="py-10 md:py-12 bg-[#FDFDF9] border-b border-[#111111]/8">
           <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
-            <p className="text-[10px] font-bold tracking-[0.28em] uppercase mb-4" style={{ color: "#D4AF37", opacity: 0.85 }}>On this page</p>
+            <p className="text-sm font-bold tracking-[0.08em] uppercase mb-4" style={{ color: "#D4AF37", opacity: 0.85 }}>On this page</p>
             <div className="flex flex-wrap gap-x-6 gap-y-2">
               {SECTIONS.map(s => (
-                <a key={s.id} href={`#${s.id}`} className="text-sm text-[#111111]/60 hover:text-[#111111] transition-colors underline underline-offset-4 decoration-[#D4AF37]/40">
+                <a key={s.id} href={`#${s.id}`} className="text-base text-[#505650] hover:text-[#111111] transition-colors underline underline-offset-4 decoration-[#D4AF37]/40">
                   {s.title}
                 </a>
               ))}
@@ -199,9 +199,9 @@ const EnGuidePage = () => {
           <div className="max-w-3xl mx-auto px-5 sm:px-6 lg:px-8 space-y-14">
             {SECTIONS.map(s => (
               <div key={s.id} id={s.id} className="scroll-mt-24">
-                <h2 className="font-playfair text-2xl md:text-3xl font-bold text-[#111111] mb-4">{s.title}</h2>
+                <h2 className="type-article-title font-playfair    text-[#111111] mb-4">{s.title}</h2>
                 {s.body.map((p, i) => (
-                  <p key={i} className="text-[15px] text-[#111111]/65 leading-relaxed mb-4">{p}</p>
+                  <p key={i} className="text-base text-[#505650] leading-relaxed mb-4">{p}</p>
                 ))}
               </div>
             ))}
@@ -221,7 +221,7 @@ const EnGuidePage = () => {
               ].map((item, idx) => (
                 <div key={idx} className="relative overflow-hidden p-5 md:p-6" style={{ backgroundColor: "#0d241b", borderTop: "2px solid rgba(212,175,55,0.55)" }}>
                   <item.icon className="w-5 h-5 mb-3" style={{ color: "#D4AF37" }} strokeWidth={1.75} />
-                  <p className="text-sm text-white/70 leading-relaxed">{item.text}</p>
+                  <p className="text-base text-white/70 leading-relaxed">{item.text}</p>
                 </div>
               ))}
             </div>
@@ -234,7 +234,7 @@ const EnGuidePage = () => {
         {/* ═══ RELATED HOST PAGES ═══ */}
         <section className="py-14 md:py-16 bg-[#FDFDF9] border-t border-[#111111]/8">
           <div className="max-w-3xl mx-auto px-5 sm:px-6 lg:px-8 text-center">
-            <h2 className="font-playfair text-xl md:text-2xl font-bold text-[#111111] mb-6">
+            <h2 className="type-article-title font-playfair    text-[#111111] mb-6">
               Cleaning help by <span style={{ color: "#D4AF37" }}>region</span>
             </h2>
             <DirectoryGroup title="Cleaning by region" language="en">
@@ -242,7 +242,7 @@ const EnGuidePage = () => {
                 <Link
                   key={p.to}
                   to={p.to}
-                  className="px-5 py-3 border border-[#111111]/15 text-sm font-medium text-[#111111]/70 hover:border-[#D4AF37] hover:text-[#111111] transition-colors"
+                  className="px-5 py-3 border border-[#111111]/15 text-base font-medium text-[#111111]/70 hover:border-[#D4AF37] hover:text-[#111111] transition-colors"
                 >
                   {p.label}
                 </Link>

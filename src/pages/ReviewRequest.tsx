@@ -51,15 +51,15 @@ const ReviewRequest = () => {
         </div>
 
         {/* Brand */}
-        <p className="text-gold text-[10px] font-bold tracking-[0.28em] uppercase mb-3">
+        <p className="text-gold text-sm font-bold tracking-[0.08em] uppercase mb-3">
           KYRO CLEAN SOLUTIONS
         </p>
 
         {/* Personalized message */}
-        <h1 className="font-playfair text-2xl font-bold text-white leading-snug mb-3">
+        <h1 className="type-page-title font-playfair   text-white  mb-3">
           Obrigado, {nome}!
         </h1>
-        <p className="text-white/60 text-base leading-relaxed mb-8">
+        <p className="text-white/80 text-base leading-relaxed mb-8">
           Foi um prazer limpar o seu <span className="text-white font-semibold">{servico}</span> em <span className="text-white font-semibold">{cidade}</span>.
           Esperamos que tenha ficado completamente satisfeito!
         </p>
@@ -70,7 +70,7 @@ const ReviewRequest = () => {
             <Star key={i} className="w-7 h-7 text-gold fill-gold" />
           ))}
         </div>
-        <p className="text-white/40 text-xs mb-8">
+        <p className="text-white/80 text-sm mb-8">
           A sua opinião ajuda mais clientes em {cidade} a encontrar-nos
         </p>
 
@@ -96,14 +96,14 @@ const ReviewRequest = () => {
           href={WHATSAPP_BASE}
           target="_blank"
           rel="noopener noreferrer"
-          className="w-full flex items-center justify-center gap-2 bg-white/5 hover:bg-white/10 border border-white/10 text-white/70 text-sm h-11 rounded-xl transition-colors touch-manipulation"
+          className="w-full flex items-center justify-center gap-2 bg-white/5 hover:bg-white/10 border border-white/10 text-white/70 text-base h-11 rounded-xl transition-colors touch-manipulation"
         >
           <MessageCircle className="w-4 h-4 text-[#25D366]" />
           Ou partilhar feedback por WhatsApp
         </a>
 
         {/* Incentive note */}
-        <p className="text-white/25 text-[11px] mt-8 leading-relaxed max-w-xs">
+        <p className="text-white/80 text-sm mt-8 leading-relaxed max-w-xs">
           A sua avaliação ajuda outros clientes em {cidade} a tomar uma decisão informada
           e permite-nos continuar a melhorar o serviço. Demora menos de 1 minuto.
         </p>
