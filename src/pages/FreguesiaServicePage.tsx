@@ -2,7 +2,7 @@ import SofaProcessGuide from '@/components/SofaProcessGuide';
 import ProblemCarousel from '@/components/ProblemCarousel';
 import DirectoryGroup from "@/components/DirectoryGroup";
 import SofaLeadActions from "@/components/SofaLeadActions";
-import { useEffect, useMemo } from "react";
+import { lazy, Suspense, useEffect, useMemo } from "react";
 import { useLocation, Link } from "react-router-dom";
 import { MapPin, Star, ArrowRight, Euro, Clock, Timer } from "lucide-react";
 import { GoogleG } from "@/components/icons/GoogleG";
@@ -41,6 +41,10 @@ import { locationPrices, type CarpetItem } from "@/components/quiz/QuizTypes";
 import { PROBLEM_IMAGES, PRICE_HEADING_VERB, SERVICE_DURATION } from "@/constants/problemCardHelpers";
 import { ServiceTrustDesktop, ServiceTrustMobile } from "@/components/ServiceTrustBlock";
 import ServiceReviewsGrid from "@/components/ServiceReviewsGrid";
+
+const FontComparisonPanel = import.meta.env.DEV
+  ? lazy(() => import("@/components/FontComparisonPanel"))
+  : null;
 
 function parseFreguesiaRoute(pathname: string): { serviceSlug: string; citySlug: string; freguesiaSlug: string } | null {
   const path = pathname.replace(/^\//, '');
@@ -124,6 +128,11 @@ const FreguesiaServicePage = () => {
   const serviceBaseUrl = services.find(s => s.slug === data.serviceSlug)?.baseRoute ?? `/${data.serviceSlug}`;
   const processSteps = data.serviceSlug === 'impermeabilizacao' ? IMPERMEABILIZACAO_STEPS : GENERIC_PROCESS_STEPS;
   const isSofaCleaning = data.serviceSlug === "limpeza-sofas";
+  const isFontComparison = import.meta.env.DEV
+    && data.serviceSlug === "limpeza-colchoes"
+    && data.municipioSlug === "porto"
+    && data.slug === "paranhos"
+    && new URLSearchParams(location.search).get("teste") === "fontes";
 
   const h1Words = data.h1.trim().split(" ");
   const h1Gold = h1Words.pop() ?? "";
@@ -174,6 +183,9 @@ const FreguesiaServicePage = () => {
         priceFrom={data.priceFrom}
       />
       <Header />
+      {isFontComparison && FontComparisonPanel && (
+        <Suspense fallback={null}><FontComparisonPanel /></Suspense>
+      )}
       <main>
 
         {/* ═══ HERO + LOCAL SNAPSHOT (fundo fotográfico contínuo) ═══ */}
