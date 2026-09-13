@@ -1,48 +1,37 @@
 import { DRYING_PROMISE, RESPONSE_PROMISE } from "@/constants/commercialPolicy";
 
 const steps = [
-  { title: "Peça o seu orçamento", text: "Diga-nos o que precisa de limpar. Recebe uma estimativa sem compromisso.", note: RESPONSE_PROMISE },
-  { title: "Combine a visita", text: "Confirmamos consigo o preço, os tratamentos e a deslocação antes de marcar.", note: "Data e disponibilidade confirmadas consigo" },
-  { title: "Nós cuidamos do resto", text: "Limpamos em sua casa e explicamos os cuidados a ter após o serviço.", note: DRYING_PROMISE },
+  { title: "Peça o seu orçamento", text: "Diga-nos o que precisa de limpar. Estimativa sem compromisso.", note: RESPONSE_PROMISE },
+  { title: "Combine a visita", text: "Confirmamos o preço, a deslocação e a disponibilidade antes de marcar." },
+  { title: "Nós cuidamos do resto", text: "Limpeza em sua casa, com orientação sobre os cuidados finais.", note: DRYING_PROMISE },
 ];
 
 export default function HowItWorksV1() {
   return (
     <section aria-labelledby="process-title" className="bg-[#071a12] text-white">
-      <div className="mx-auto max-w-7xl px-5 py-12 sm:px-8 sm:py-16 lg:py-20">
-        <div className="mb-9 lg:mb-12">
-          <div className="max-w-2xl">
-            <p className="mb-4 flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.24em] text-[#D4AF37]"><span className="h-px w-9 bg-[#D4AF37]" /> Do primeiro contacto à limpeza</p>
-            <h2 id="process-title" className="font-playfair text-[1.85rem] font-bold leading-[1.1] sm:text-4xl md:text-[2.6rem]">Nós tratamos da limpeza.<br /><span className="text-[#D4AF37]">Você fica tranquilo.</span></h2>
-          </div>
-          <p className="mt-5 max-w-2xl text-base leading-relaxed text-white/75">Orçamento claro, visita combinada e acompanhamento após o serviço.</p>
-        </div>
+      <div className="mx-auto grid max-w-7xl gap-y-7 px-5 py-10 sm:px-8 sm:py-12 lg:grid-cols-[0.9fr_1.1fr] lg:grid-rows-[auto_1fr] lg:gap-x-12 lg:gap-y-6 lg:py-14">
+        <header className="lg:col-start-2 lg:row-start-1">
+          <p className="mb-3 flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.24em] text-[#D4AF37]"><span className="h-px w-7 bg-[#D4AF37]" /> Como funciona</p>
+          <h2 id="process-title" className="font-playfair text-[1.85rem] font-bold leading-[1.1] sm:text-4xl md:text-[2.6rem]">Nós tratamos da limpeza.<br /><span className="text-[#D4AF37]">Você fica tranquilo.</span></h2>
+          <p className="mt-4 max-w-lg text-base leading-relaxed text-white/75">Orçamento claro, visita combinada e acompanhamento após o serviço.</p>
+        </header>
 
-        <div className="grid gap-9 lg:grid-cols-[1.05fr_1fr] lg:gap-14">
-          <figure className="relative min-h-60 overflow-hidden rounded-[3px] lg:min-h-[590px]">
-            <img src="/images/services/sofa.webp" alt="Limpeza de um sofá com equipamento de extração" width="1280" height="720" className="h-64 w-full object-cover object-[56%_center] sm:h-80 lg:absolute lg:h-full" />
-            <div className="absolute inset-0 bg-gradient-to-t from-[#04110b]/90 via-transparent to-transparent" />
-            <figcaption className="absolute bottom-6 left-6 right-6 border-l-2 border-[#D4AF37] pl-4 sm:bottom-8 sm:left-8">
-              <p className="mb-1 text-xs font-semibold uppercase tracking-[0.2em] text-[#D4AF37]">No conforto da sua casa</p>
-              <p className="font-playfair text-2xl text-white">Cuidado em cada detalhe.</p>
-            </figcaption>
-          </figure>
+        <figure className="relative overflow-hidden lg:col-start-1 lg:row-span-2 lg:row-start-1">
+          <img src="/images/services/sofa.webp" alt="Limpeza de um sofá com equipamento de extração" width="1280" height="720" loading="lazy" className="aspect-[16/9] w-full object-cover object-[56%_center] lg:absolute lg:h-full lg:aspect-auto" />
+        </figure>
 
-          <ol className="flex flex-col justify-center lg:py-8">
-            {steps.map((step, index) => (
-              <li key={step.title} className="relative flex gap-5 pb-8 last:pb-0 lg:pb-14">
-                {index < steps.length - 1 && <span aria-hidden="true" className="absolute bottom-0 left-[19px] top-11 w-px bg-[#D4AF37]/25" />}
-                <span className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-[#D4AF37]/45 bg-[#10271d] text-sm font-semibold text-[#D4AF37]">0{index + 1}</span>
-                <div className="pt-1">
-                  <h3 className="mb-2 font-playfair text-[1.4rem] font-semibold leading-tight sm:text-2xl">{step.title}</h3>
-                  <p className="max-w-md text-base leading-relaxed text-white/75">{step.text}</p>
-                  <p className="mt-2 text-sm leading-relaxed text-[#E3CD85]">{step.note}</p>
-                </div>
-              </li>
-            ))}
-          </ol>
-        </div>
-
+        <ol className="divide-y divide-white/10 border-t border-white/15 lg:col-start-2 lg:row-start-2">
+          {steps.map((step, index) => (
+            <li key={step.title} className="flex gap-4 py-4 last:pb-0 sm:gap-5">
+              <span className="pt-0.5 text-sm font-medium tabular-nums text-[#D4AF37]">0{index + 1}</span>
+              <div>
+                <h3 className="mb-1 text-lg font-semibold leading-snug text-white">{step.title}</h3>
+                <p className="text-base leading-relaxed text-white/75">{step.text}</p>
+                {step.note && <p className="mt-1 text-sm leading-relaxed text-white/75">{step.note}</p>}
+              </div>
+            </li>
+          ))}
+        </ol>
       </div>
     </section>
   );
