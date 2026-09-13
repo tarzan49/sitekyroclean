@@ -58,12 +58,12 @@ Validação: 1.928 testes aprovados, TypeScript e lint dos ficheiros novos/compo
 
 ## Etapa 4: piloto visual de sofás
 
-Criadas quatro imagens ilustrativas de IA, uma por problema, com recortes mobile verificados. Ficheiros finais WebP, prompts e painel de avaliação em [sofa-image-pilot](sofa-image-pilot/README.md). Não houve substituição nas páginas públicas nem nas galerias reais. O piloto é a base de validação visual; faltam 36 alternativas de sofás e as dos restantes serviços para completar a biblioteca de 240.
+Criadas inicialmente quatro imagens ilustrativas, uma por problema. Após aprovação, a biblioteca de sofás foi completada com mais 36: dez por problema, 40 no total, 4,56 MB de WebP. Ficheiros, prompts, textos alternativos e painel com controlos independentes em [sofa-image-pilot](sofa-image-pilot/README.md). As 40 opções foram revistas e testadas em mobile. Não houve substituição nas páginas públicas nem nas galerias reais. Faltam 200 imagens dos restantes serviços e a integração com seleção estável.
 
 ## Próximas entregas
 
 1. Concluir a revisão dos restantes campos legados e mensagens partilhadas fora das FAQ/introduções/descrições agora revistas, sem alargar automaticamente o trabalho às famílias de problemas e materiais. Limpeza, lavagem e higienização podem descrever a mesma intervenção: não inventar métodos distintos para justificar keywords.
-2. Validar a direção visual do piloto de sofás já produzido e a correspondência texto/imagem dos outros cinco serviços antes da expansão visual.
+2. Validar a correspondência texto/imagem dos outros cinco serviços antes da expansão visual; a biblioteca de sofás já tem dez alternativas por problema.
 3. Criar a biblioteca de imagens: dez alternativas por problema, quatro problemas por serviço, 240 imagens no total. Reutilizar imagens adequadas existentes quando validadas. Uma imagem por cartão, com seleção independente e estável; não gerar milhares de ficheiros por URL. Ilustrações identificadas como tal, nunca atribuídas a clientes/localidades.
 4. Auditar todas as rotas e a semelhança de conteúdo; verificar links, sitemaps, metadados, fontes comerciais, cobertura das secções, desempenho e imagens. Inspeção visual em mobile por família e serviço. Possíveis alterações de URLs, redirecionamentos ou indexação são decisões separadas, suportadas por análise e, quando disponíveis, dados do Search Console.
 

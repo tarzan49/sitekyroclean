@@ -5,6 +5,88 @@
     "file": "sofa-manchas-01.webp",
     "prompt": "Use case: photorealistic-natural. Asset type: illustrative problem-card photograph for a sofa-cleaning website, not evidence of a real customer job. Create one standalone landscape 16:9 image. Natural soft window light, credible everyday home, real upholstery texture, restrained editorial photography, moderately close framing. The subject must remain legible in a centered mobile crop around 1.77:1 and 330px wide. No text, no logos, no watermark, no split screen, no before/after, no cleaning results, no microscopic overlays, no smoke or colored odor clouds. Subject: close three-quarter view of the seat and lower backrest of a pale oatmeal woven sofa, one ordinary irregular dried brown coffee stain about 12cm wide on the center of the seat, subtle absorbed edges. No cup or person needed. Stain must be clearly visible but realistic, not a massive splash or catastrophic damage. Background quietly out of focus.",
     "origin": "ai-generated",
+    "status": "pilot-not-published",
+    "alt": "Imagem ilustrativa: Mancha de café no assento de um sofá claro"
+  },
+  {
+    "id": "sofa-manchas-02",
+    "problemId": "limpeza-sofas-1",
+    "file": "sofa-manchas-02.webp",
+    "prompt": "Use case: photorealistic-natural. Asset type: illustrative sofa problem-card photograph. One standalone landscape 16:9 composition, natural window light, authentic upholstery texture, ordinary domestic setting softly blurred, restrained realistic editorial style. Close framing, main problem visible in centered 330px-wide mobile card. No text, watermark, branding, comparisons, before/after, clean result, cleaning tools, microscopic views, germs, colored odor clouds or fantastical effects. Subject: small dried red wine stain with absorbed burgundy edges on a light grey linen sofa seat, oblique overhead framing. Show only the problem or its assessment, not a successful treatment.",
+    "alt": "Imagem ilustrativa: Mancha de vinho no assento de um sofá cinzento",
+    "origin": "ai-generated",
+    "status": "pilot-not-published"
+  },
+  {
+    "id": "sofa-manchas-03",
+    "problemId": "limpeza-sofas-1",
+    "file": "sofa-manchas-03.webp",
+    "prompt": "Use case: photorealistic-natural. Asset type: illustrative sofa problem-card photograph. One standalone landscape 16:9 composition, natural window light, authentic upholstery texture, ordinary domestic setting softly blurred, restrained realistic editorial style. Close framing, main problem visible in centered 330px-wide mobile card. No text, watermark, branding, comparisons, before/after, clean result, cleaning tools, microscopic views, germs, colored odor clouds or fantastical effects. Subject: a localized irregular dark greasy food mark on the center of a muted blue woven sofa seat, side daylight, three-quarter framing. Show only the problem or its assessment, not a successful treatment.",
+    "alt": "Imagem ilustrativa: Marca de gordura num assento de tecido azul",
+    "origin": "ai-generated",
+    "status": "pilot-not-published"
+  },
+  {
+    "id": "sofa-manchas-04",
+    "problemId": "limpeza-sofas-1",
+    "file": "sofa-manchas-04.webp",
+    "prompt": "Use case: photorealistic-natural. Asset type: illustrative sofa problem-card photograph. One standalone landscape 16:9 composition, natural window light, authentic upholstery texture, ordinary domestic setting softly blurred, restrained realistic editorial style. Close framing, main problem visible in centered 330px-wide mobile card. No text, watermark, branding, comparisons, before/after, clean result, cleaning tools, microscopic views, germs, colored odor clouds or fantastical effects. Subject: a light brown dried tea tide mark on an ivory textured sofa seat beside its armrest, clearly visible but modest. Show only the problem or its assessment, not a successful treatment.",
+    "alt": "Imagem ilustrativa: Marca de chá junto ao braço de um sofá claro",
+    "origin": "ai-generated",
+    "status": "pilot-not-published"
+  },
+  {
+    "id": "sofa-manchas-05",
+    "problemId": "limpeza-sofas-1",
+    "file": "sofa-manchas-05.webp",
+    "prompt": "Use case: photorealistic-natural. Asset type: illustrative sofa problem-card photograph. One standalone landscape 16:9 composition, natural window light, authentic upholstery texture, ordinary domestic setting softly blurred, restrained realistic editorial style. Close framing, main problem visible in centered 330px-wide mobile card. No text, watermark, branding, comparisons, before/after, clean result, cleaning tools, microscopic views, germs, colored odor clouds or fantastical effects. Subject: two small brown chocolate smears on the front half of a sand-colored chenille sofa cushion, three-quarter close view. Show only the problem or its assessment, not a successful treatment.",
+    "alt": "Imagem ilustrativa: Pequenas marcas de chocolate num sofá de chenille",
+    "origin": "ai-generated",
+    "status": "pilot-not-published"
+  },
+  {
+    "id": "sofa-manchas-06",
+    "problemId": "limpeza-sofas-1",
+    "file": "sofa-manchas-06.webp",
+    "prompt": "Use case: photorealistic-natural. Asset type: illustrative sofa problem-card photograph. One standalone landscape 16:9 composition, natural window light, authentic upholstery texture, ordinary domestic setting softly blurred, restrained realistic editorial style. Close framing, main problem visible in centered 330px-wide mobile card. No text, watermark, branding, comparisons, before/after, clean result, cleaning tools, microscopic views, germs, colored odor clouds or fantastical effects. Subject: a small dried orange juice spill with a subtle yellow-orange irregular boundary on a pale grey sofa cushion, no dripping. Show only the problem or its assessment, not a successful treatment.",
+    "alt": "Imagem ilustrativa: Marca de sumo numa almofada cinzenta",
+    "origin": "ai-generated",
+    "status": "pilot-not-published"
+  },
+  {
+    "id": "sofa-manchas-07",
+    "problemId": "limpeza-sofas-1",
+    "file": "sofa-manchas-07.webp",
+    "prompt": "Use case: photorealistic-natural. Asset type: illustrative sofa problem-card photograph. One standalone landscape 16:9 composition, natural window light, authentic upholstery texture, ordinary domestic setting softly blurred, restrained realistic editorial style. Close framing, main problem visible in centered 330px-wide mobile card. No text, watermark, branding, comparisons, before/after, clean result, cleaning tools, microscopic views, germs, colored odor clouds or fantastical effects. Subject: one dried coffee ring with irregular edges on a sage green upholstered sofa seat, low three-quarter view including the cushion seam. Show only the problem or its assessment, not a successful treatment.",
+    "alt": "Imagem ilustrativa: Marca de café num assento verde",
+    "origin": "ai-generated",
+    "status": "pilot-not-published"
+  },
+  {
+    "id": "sofa-manchas-08",
+    "problemId": "limpeza-sofas-1",
+    "file": "sofa-manchas-08.webp",
+    "prompt": "Use case: photorealistic-natural. Asset type: illustrative sofa problem-card photograph. One standalone landscape 16:9 composition, natural window light, authentic upholstery texture, ordinary domestic setting softly blurred, restrained realistic editorial style. Close framing, main problem visible in centered 330px-wide mobile card. No text, watermark, branding, comparisons, before/after, clean result, cleaning tools, microscopic views, germs, colored odor clouds or fantastical effects. Subject: a localized matte reddish food-sauce stain on a light taupe woven sofa seat, close view from above, no liquid pools. Show only the problem or its assessment, not a successful treatment.",
+    "alt": "Imagem ilustrativa: Mancha de molho num sofá de tecido taupe",
+    "origin": "ai-generated",
+    "status": "pilot-not-published"
+  },
+  {
+    "id": "sofa-manchas-09",
+    "problemId": "limpeza-sofas-1",
+    "file": "sofa-manchas-09.webp",
+    "prompt": "Use case: photorealistic-natural. Asset type: illustrative sofa problem-card photograph. One standalone landscape 16:9 composition, natural window light, authentic upholstery texture, ordinary domestic setting softly blurred, restrained realistic editorial style. Close framing, main problem visible in centered 330px-wide mobile card. No text, watermark, branding, comparisons, before/after, clean result, cleaning tools, microscopic views, germs, colored odor clouds or fantastical effects. Subject: a faded brown irregular beverage stain on an off-white modular sofa seat, broad cushion with seam in view, diffused daylight. Show only the problem or its assessment, not a successful treatment.",
+    "alt": "Imagem ilustrativa: Mancha antiga de bebida num sofá modular",
+    "origin": "ai-generated",
+    "status": "pilot-not-published"
+  },
+  {
+    "id": "sofa-manchas-10",
+    "problemId": "limpeza-sofas-1",
+    "file": "sofa-manchas-10.webp",
+    "prompt": "Use case: photorealistic-natural. Asset type: illustrative sofa problem-card photograph. One standalone landscape 16:9 composition, natural window light, authentic upholstery texture, ordinary domestic setting softly blurred, restrained realistic editorial style. Close framing, main problem visible in centered 330px-wide mobile card. No text, watermark, branding, comparisons, before/after, clean result, cleaning tools, microscopic views, germs, colored odor clouds or fantastical effects. Subject: a few small brown drink spots on the seat of a dusty rose fabric sofa beside a rounded armrest, natural close view. Show only the problem or its assessment, not a successful treatment.",
+    "alt": "Imagem ilustrativa: Pequenas manchas de bebida num sofá rosa",
+    "origin": "ai-generated",
     "status": "pilot-not-published"
   },
   {
@@ -12,6 +94,88 @@
     "problemId": "limpeza-sofas-2",
     "file": "sofa-residuos-01.webp",
     "prompt": "Use case: photorealistic-natural. Asset type: illustrative problem-card photograph for a sofa-cleaning website, not evidence of a real customer job. Create one standalone landscape 16:9 image. Natural soft window light, credible everyday home, real upholstery texture, restrained editorial photography, moderately close framing. The subject must remain legible in a centered mobile crop around 1.77:1 and 330px wide. No text, no logos, no watermark, no split screen, no before/after, no cleaning results, no microscopic overlays, no smoke or colored odor clouds. Subject: close three-quarter view into the join of two grey woven sofa cushions, visible ordinary household lint, small crumbs and a modest accumulation of dust caught along the central seam. Clearly recognizable sofa with part of backrest. Focus on visible residues between fibers and seams, not a macro magnification or cross-section. No creatures, mites, germs or medical imagery. No exaggerated piles of dirt.",
+    "origin": "ai-generated",
+    "status": "pilot-not-published",
+    "alt": "Imagem ilustrativa: Pó, cotão e migalhas na união dos assentos de um sofá cinzento"
+  },
+  {
+    "id": "sofa-residuos-02",
+    "problemId": "limpeza-sofas-2",
+    "file": "sofa-residuos-02.webp",
+    "prompt": "Use case: photorealistic-natural. Asset type: illustrative sofa problem-card photograph. One standalone landscape 16:9 composition, natural window light, authentic upholstery texture, ordinary domestic setting softly blurred, restrained realistic editorial style. Close framing, main problem visible in centered 330px-wide mobile card. No text, watermark, branding, comparisons, before/after, clean result, cleaning tools, microscopic views, germs, colored odor clouds or fantastical effects. Subject: ordinary lint and fine dust trapped along the piping of a beige sofa seat, close side view, modest visible residues, no magnification. Show only the problem or its assessment, not a successful treatment.",
+    "alt": "Imagem ilustrativa: Cotão e pó na costura de um sofá bege",
+    "origin": "ai-generated",
+    "status": "pilot-not-published"
+  },
+  {
+    "id": "sofa-residuos-03",
+    "problemId": "limpeza-sofas-2",
+    "file": "sofa-residuos-03.webp",
+    "prompt": "Use case: photorealistic-natural. Asset type: illustrative sofa problem-card photograph. One standalone landscape 16:9 composition, natural window light, authentic upholstery texture, ordinary domestic setting softly blurred, restrained realistic editorial style. Close framing, main problem visible in centered 330px-wide mobile card. No text, watermark, branding, comparisons, before/after, clean result, cleaning tools, microscopic views, germs, colored odor clouds or fantastical effects. Subject: a few crumbs and light lint in the crease between the backrest and seat of a navy woven sofa, natural close view. Show only the problem or its assessment, not a successful treatment.",
+    "alt": "Imagem ilustrativa: Migalhas na união do encosto e assento azul",
+    "origin": "ai-generated",
+    "status": "pilot-not-published"
+  },
+  {
+    "id": "sofa-residuos-04",
+    "problemId": "limpeza-sofas-2",
+    "file": "sofa-residuos-04.webp",
+    "prompt": "Use case: photorealistic-natural. Asset type: illustrative sofa problem-card photograph. One standalone landscape 16:9 composition, natural window light, authentic upholstery texture, ordinary domestic setting softly blurred, restrained realistic editorial style. Close framing, main problem visible in centered 330px-wide mobile card. No text, watermark, branding, comparisons, before/after, clean result, cleaning tools, microscopic views, germs, colored odor clouds or fantastical effects. Subject: small visible pet hairs and household lint caught in a charcoal sofa cushion seam, no animal, modest realistic accumulation. Show only the problem or its assessment, not a successful treatment.",
+    "alt": "Imagem ilustrativa: Pelos e cotão numa costura de tecido escuro",
+    "origin": "ai-generated",
+    "status": "pilot-not-published"
+  },
+  {
+    "id": "sofa-residuos-05",
+    "problemId": "limpeza-sofas-2",
+    "file": "sofa-residuos-05.webp",
+    "prompt": "Use case: photorealistic-natural. Asset type: illustrative sofa problem-card photograph. One standalone landscape 16:9 composition, natural window light, authentic upholstery texture, ordinary domestic setting softly blurred, restrained realistic editorial style. Close framing, main problem visible in centered 330px-wide mobile card. No text, watermark, branding, comparisons, before/after, clean result, cleaning tools, microscopic views, germs, colored odor clouds or fantastical effects. Subject: sand-colored grains and ordinary dry dust caught between the woven fibers at a grey-beige sofa seat edge, visible natural scale not macro. Show only the problem or its assessment, not a successful treatment.",
+    "alt": "Imagem ilustrativa: Grãos e resíduos junto ao rebordo do assento",
+    "origin": "ai-generated",
+    "status": "pilot-not-published"
+  },
+  {
+    "id": "sofa-residuos-06",
+    "problemId": "limpeza-sofas-2",
+    "file": "sofa-residuos-06.webp",
+    "prompt": "Use case: photorealistic-natural. Asset type: illustrative sofa problem-card photograph. One standalone landscape 16:9 composition, natural window light, authentic upholstery texture, ordinary domestic setting softly blurred, restrained realistic editorial style. Close framing, main problem visible in centered 330px-wide mobile card. No text, watermark, branding, comparisons, before/after, clean result, cleaning tools, microscopic views, germs, colored odor clouds or fantastical effects. Subject: a small accumulation of crumbs in the corner where a terracotta upholstered sofa armrest meets its seat, close diagonal view. Show only the problem or its assessment, not a successful treatment.",
+    "alt": "Imagem ilustrativa: Resíduos no canto de um sofá terracota",
+    "origin": "ai-generated",
+    "status": "pilot-not-published"
+  },
+  {
+    "id": "sofa-residuos-07",
+    "problemId": "limpeza-sofas-2",
+    "file": "sofa-residuos-07.webp",
+    "prompt": "Use case: photorealistic-natural. Asset type: illustrative sofa problem-card photograph. One standalone landscape 16:9 composition, natural window light, authentic upholstery texture, ordinary domestic setting softly blurred, restrained realistic editorial style. Close framing, main problem visible in centered 330px-wide mobile card. No text, watermark, branding, comparisons, before/after, clean result, cleaning tools, microscopic views, germs, colored odor clouds or fantastical effects. Subject: a natural shallow crease of a cream corduroy sofa seat holding fine household lint, close view including surrounding backrest. Show only the problem or its assessment, not a successful treatment.",
+    "alt": "Imagem ilustrativa: Cotão nas pregas de um sofá de bombazina",
+    "origin": "ai-generated",
+    "status": "pilot-not-published"
+  },
+  {
+    "id": "sofa-residuos-08",
+    "problemId": "limpeza-sofas-2",
+    "file": "sofa-residuos-08.webp",
+    "prompt": "Use case: photorealistic-natural. Asset type: illustrative sofa problem-card photograph. One standalone landscape 16:9 composition, natural window light, authentic upholstery texture, ordinary domestic setting softly blurred, restrained realistic editorial style. Close framing, main problem visible in centered 330px-wide mobile card. No text, watermark, branding, comparisons, before/after, clean result, cleaning tools, microscopic views, germs, colored odor clouds or fantastical effects. Subject: ordinary dry household debris along the central gap of a green modular sofa, close top-down oblique view, not severe neglect. Show only the problem or its assessment, not a successful treatment.",
+    "alt": "Imagem ilustrativa: Resíduos na junção de um sofá modular verde",
+    "origin": "ai-generated",
+    "status": "pilot-not-published"
+  },
+  {
+    "id": "sofa-residuos-09",
+    "problemId": "limpeza-sofas-2",
+    "file": "sofa-residuos-09.webp",
+    "prompt": "Use case: photorealistic-natural. Asset type: illustrative sofa problem-card photograph. One standalone landscape 16:9 composition, natural window light, authentic upholstery texture, ordinary domestic setting softly blurred, restrained realistic editorial style. Close framing, main problem visible in centered 330px-wide mobile card. No text, watermark, branding, comparisons, before/after, clean result, cleaning tools, microscopic views, germs, colored odor clouds or fantastical effects. Subject: small flecks of lint and a few crumbs near the seam of a brown woven sofa cushion, natural angled daylight. Show only the problem or its assessment, not a successful treatment.",
+    "alt": "Imagem ilustrativa: Migalhas e cotão num assento castanho",
+    "origin": "ai-generated",
+    "status": "pilot-not-published"
+  },
+  {
+    "id": "sofa-residuos-10",
+    "problemId": "limpeza-sofas-2",
+    "file": "sofa-residuos-10.webp",
+    "prompt": "Use case: photorealistic-natural. Asset type: illustrative sofa problem-card photograph. One standalone landscape 16:9 composition, natural window light, authentic upholstery texture, ordinary domestic setting softly blurred, restrained realistic editorial style. Close framing, main problem visible in centered 330px-wide mobile card. No text, watermark, branding, comparisons, before/after, clean result, cleaning tools, microscopic views, germs, colored odor clouds or fantastical effects. Subject: a modest line of light dust and lint in the seat-backrest join of a muted blue-grey sofa, clearly recognizable cushions. Show only the problem or its assessment, not a successful treatment.",
+    "alt": "Imagem ilustrativa: Pó acumulado na junção dos estofos",
     "origin": "ai-generated",
     "status": "pilot-not-published"
   },
@@ -21,6 +185,88 @@
     "file": "sofa-odores-01.webp",
     "prompt": "Use case: photorealistic-natural. Asset type: illustrative problem-card photograph for a sofa-cleaning website, not evidence of a real customer job. Create one standalone landscape 16:9 image. Natural soft window light, credible everyday home, real upholstery texture, restrained editorial photography, moderately close framing. The subject must remain legible in a centered mobile crop around 1.77:1 and 330px wide. No text, no logos, no watermark, no split screen, no before/after, no cleaning results, no microscopic overlays, no smoke or colored odor clouds. Subject: an adult sitting next to a taupe fabric sofa cushion, lifting one loose cushion slightly toward their nose while checking its smell with a subtle concerned expression, candid ordinary gesture. Frame waist-up and cushion, face and both naturally positioned hands visible within central area, room softly blurred. The cushion is visibly used but no liquid or gross stains. This illustrates assessing odor, not proof of a particular source or a health problem. No nose-pinching theatrical disgust, no masks, no animals, no cleaning tools.",
     "origin": "ai-generated",
+    "status": "pilot-not-published",
+    "alt": "Imagem ilustrativa: Pessoa a verificar o odor de uma almofada do sofá"
+  },
+  {
+    "id": "sofa-odores-02",
+    "problemId": "limpeza-sofas-3",
+    "file": "sofa-odores-02.webp",
+    "prompt": "Use case: photorealistic-natural. Asset type: illustrative sofa problem-card photograph. One standalone landscape 16:9 composition, natural window light, authentic upholstery texture, ordinary domestic setting softly blurred, restrained realistic editorial style. Close framing, main problem visible in centered 330px-wide mobile card. No text, watermark, branding, comparisons, before/after, clean result, cleaning tools, microscopic views, germs, colored odor clouds or fantastical effects. Subject: an adult man in a plain casual shirt seated beside a light grey sofa holding a loose backrest cushion near his nose to check its odor, subtle concerned expression, one anatomically natural visible hand and other supporting the cushion, waist-up framing, no theatrical disgust. Show only the problem or its assessment, not a successful treatment.",
+    "alt": "Imagem ilustrativa: Pessoa a verificar o odor de uma almofada cinzenta",
+    "origin": "ai-generated",
+    "status": "pilot-not-published"
+  },
+  {
+    "id": "sofa-odores-03",
+    "problemId": "limpeza-sofas-3",
+    "file": "sofa-odores-03.webp",
+    "prompt": "Use case: photorealistic-natural. Asset type: illustrative sofa problem-card photograph. One standalone landscape 16:9 composition, natural window light, authentic upholstery texture, ordinary domestic setting softly blurred, restrained realistic editorial style. Close framing, main problem visible in centered 330px-wide mobile card. No text, watermark, branding, comparisons, before/after, clean result, cleaning tools, microscopic views, germs, colored odor clouds or fantastical effects. Subject: an older adult woman leaning slightly toward a beige sofa cushion held in both hands to assess its smell, restrained thoughtful expression, natural domestic posture, close waist-up view. Show only the problem or its assessment, not a successful treatment.",
+    "alt": "Imagem ilustrativa: Verificação de odor numa almofada bege",
+    "origin": "ai-generated",
+    "status": "pilot-not-published"
+  },
+  {
+    "id": "sofa-odores-04",
+    "problemId": "limpeza-sofas-3",
+    "file": "sofa-odores-04.webp",
+    "prompt": "Use case: photorealistic-natural. Asset type: illustrative sofa problem-card photograph. One standalone landscape 16:9 composition, natural window light, authentic upholstery texture, ordinary domestic setting softly blurred, restrained realistic editorial style. Close framing, main problem visible in centered 330px-wide mobile card. No text, watermark, branding, comparisons, before/after, clean result, cleaning tools, microscopic views, germs, colored odor clouds or fantastical effects. Subject: an adult woman with tied-back hair holding a small blue sofa cushion near her face and assessing its odor, relaxed realistic hands, muted domestic light, close framing. Show only the problem or its assessment, not a successful treatment.",
+    "alt": "Imagem ilustrativa: Pessoa a avaliar o odor de uma almofada azul",
+    "origin": "ai-generated",
+    "status": "pilot-not-published"
+  },
+  {
+    "id": "sofa-odores-05",
+    "problemId": "limpeza-sofas-3",
+    "file": "sofa-odores-05.webp",
+    "prompt": "Use case: photorealistic-natural. Asset type: illustrative sofa problem-card photograph. One standalone landscape 16:9 composition, natural window light, authentic upholstery texture, ordinary domestic setting softly blurred, restrained realistic editorial style. Close framing, main problem visible in centered 330px-wide mobile card. No text, watermark, branding, comparisons, before/after, clean result, cleaning tools, microscopic views, germs, colored odor clouds or fantastical effects. Subject: an adult man with short curly hair lifting a green sofa back cushion toward his nose while sitting on the sofa, natural subdued concern, anatomically plausible hands, medium close view. Show only the problem or its assessment, not a successful treatment.",
+    "alt": "Imagem ilustrativa: Avaliação do odor de uma almofada verde",
+    "origin": "ai-generated",
+    "status": "pilot-not-published"
+  },
+  {
+    "id": "sofa-odores-06",
+    "problemId": "limpeza-sofas-3",
+    "file": "sofa-odores-06.webp",
+    "prompt": "Use case: photorealistic-natural. Asset type: illustrative sofa problem-card photograph. One standalone landscape 16:9 composition, natural window light, authentic upholstery texture, ordinary domestic setting softly blurred, restrained realistic editorial style. Close framing, main problem visible in centered 330px-wide mobile card. No text, watermark, branding, comparisons, before/after, clean result, cleaning tools, microscopic views, germs, colored odor clouds or fantastical effects. Subject: an adult woman in a plain grey top kneeling beside a sofa and bringing a loose taupe seat cushion near her face to check its smell, upper body and cushion central, natural discreet expression. Show only the problem or its assessment, not a successful treatment.",
+    "alt": "Imagem ilustrativa: Pessoa a verificar o odor do assento solto",
+    "origin": "ai-generated",
+    "status": "pilot-not-published"
+  },
+  {
+    "id": "sofa-odores-07",
+    "problemId": "limpeza-sofas-3",
+    "file": "sofa-odores-07.webp",
+    "prompt": "Use case: photorealistic-natural. Asset type: illustrative sofa problem-card photograph. One standalone landscape 16:9 composition, natural window light, authentic upholstery texture, ordinary domestic setting softly blurred, restrained realistic editorial style. Close framing, main problem visible in centered 330px-wide mobile card. No text, watermark, branding, comparisons, before/after, clean result, cleaning tools, microscopic views, germs, colored odor clouds or fantastical effects. Subject: an older adult man wearing a plain knitted jumper checking the smell of a cream sofa cushion, slight furrowed brow without exaggerated disgust, believable grip, close waist-up framing. Show only the problem or its assessment, not a successful treatment.",
+    "alt": "Imagem ilustrativa: Verificação de odor numa almofada clara",
+    "origin": "ai-generated",
+    "status": "pilot-not-published"
+  },
+  {
+    "id": "sofa-odores-08",
+    "problemId": "limpeza-sofas-3",
+    "file": "sofa-odores-08.webp",
+    "prompt": "Use case: photorealistic-natural. Asset type: illustrative sofa problem-card photograph. One standalone landscape 16:9 composition, natural window light, authentic upholstery texture, ordinary domestic setting softly blurred, restrained realistic editorial style. Close framing, main problem visible in centered 330px-wide mobile card. No text, watermark, branding, comparisons, before/after, clean result, cleaning tools, microscopic views, germs, colored odor clouds or fantastical effects. Subject: an adult woman with short dark hair sitting on a brown sofa and checking the odor of a rectangular loose cushion, natural quiet domestic scene, hands correctly gripping edges. Show only the problem or its assessment, not a successful treatment.",
+    "alt": "Imagem ilustrativa: Pessoa a avaliar uma almofada castanha",
+    "origin": "ai-generated",
+    "status": "pilot-not-published"
+  },
+  {
+    "id": "sofa-odores-09",
+    "problemId": "limpeza-sofas-3",
+    "file": "sofa-odores-09.webp",
+    "prompt": "Use case: photorealistic-natural. Asset type: illustrative sofa problem-card photograph. One standalone landscape 16:9 composition, natural window light, authentic upholstery texture, ordinary domestic setting softly blurred, restrained realistic editorial style. Close framing, main problem visible in centered 330px-wide mobile card. No text, watermark, branding, comparisons, before/after, clean result, cleaning tools, microscopic views, germs, colored odor clouds or fantastical effects. Subject: an adult man seated on a beige sofa holding a muted rust cushion near his nose to assess its odor, side three-quarter view, face and cushion remain near center, natural anatomy. Show only the problem or its assessment, not a successful treatment.",
+    "alt": "Imagem ilustrativa: Verificação do odor de uma almofada terracota",
+    "origin": "ai-generated",
+    "status": "pilot-not-published"
+  },
+  {
+    "id": "sofa-odores-10",
+    "problemId": "limpeza-sofas-3",
+    "file": "sofa-odores-10.webp",
+    "prompt": "Use case: photorealistic-natural. Asset type: illustrative sofa problem-card photograph. One standalone landscape 16:9 composition, natural window light, authentic upholstery texture, ordinary domestic setting softly blurred, restrained realistic editorial style. Close framing, main problem visible in centered 330px-wide mobile card. No text, watermark, branding, comparisons, before/after, clean result, cleaning tools, microscopic views, germs, colored odor clouds or fantastical effects. Subject: an adult woman with curly hair wearing a plain light top assessing the smell of a light grey loose sofa cushion, gentle concerned expression, waist-up close shot, credible hands and fabric. Show only the problem or its assessment, not a successful treatment.",
+    "alt": "Imagem ilustrativa: Pessoa a verificar uma almofada de sofá cinzenta",
+    "origin": "ai-generated",
     "status": "pilot-not-published"
   },
   {
@@ -28,6 +274,88 @@
     "problemId": "limpeza-sofas-4",
     "file": "sofa-desgaste-01.webp",
     "prompt": "Use case: photorealistic-natural. Asset type: illustrative problem-card photograph for a sofa-cleaning website, not evidence of a real customer job. Create one standalone landscape 16:9 image. Natural soft window light, credible everyday home, real upholstery texture, restrained editorial photography, moderately close framing. The subject must remain legible in a centered mobile crop around 1.77:1 and 330px wide. No text, no logos, no watermark, no split screen, no before/after, no cleaning results, no microscopic overlays, no smoke or colored odor clouds. Subject: close view of an olive-grey woven sofa armrest and adjoining seat, a realistic localized patch of pilling and flattened rubbed fibers on the rounded armrest edge. Slight surface wear, intact structure, no tears, no stuffing emerging. The wear should be recognizable at card size and not confused with a spill. Keep armrest patch central. No repair or restored half.",
+    "origin": "ai-generated",
+    "status": "pilot-not-published",
+    "alt": "Imagem ilustrativa: Borboto e fibras gastas no braço de um sofá"
+  },
+  {
+    "id": "sofa-desgaste-02",
+    "problemId": "limpeza-sofas-4",
+    "file": "sofa-desgaste-02.webp",
+    "prompt": "Use case: photorealistic-natural. Asset type: illustrative sofa problem-card photograph. One standalone landscape 16:9 composition, natural window light, authentic upholstery texture, ordinary domestic setting softly blurred, restrained realistic editorial style. Close framing, main problem visible in centered 330px-wide mobile card. No text, watermark, branding, comparisons, before/after, clean result, cleaning tools, microscopic views, germs, colored odor clouds or fantastical effects. Subject: a localized patch of ordinary pilling on the rounded edge of a light grey woven sofa armrest, intact fabric, close side view. Show only the problem or its assessment, not a successful treatment.",
+    "alt": "Imagem ilustrativa: Borboto no braço de um sofá cinzento",
+    "origin": "ai-generated",
+    "status": "pilot-not-published"
+  },
+  {
+    "id": "sofa-desgaste-03",
+    "problemId": "limpeza-sofas-4",
+    "file": "sofa-desgaste-03.webp",
+    "prompt": "Use case: photorealistic-natural. Asset type: illustrative sofa problem-card photograph. One standalone landscape 16:9 composition, natural window light, authentic upholstery texture, ordinary domestic setting softly blurred, restrained realistic editorial style. Close framing, main problem visible in centered 330px-wide mobile card. No text, watermark, branding, comparisons, before/after, clean result, cleaning tools, microscopic views, germs, colored odor clouds or fantastical effects. Subject: flattened rubbed velvet nap on the center front edge of a muted blue velvet sofa seat, clearly worn texture not a stain, no tearing. Show only the problem or its assessment, not a successful treatment.",
+    "alt": "Imagem ilustrativa: Pelo achatado na borda de um sofá de veludo",
+    "origin": "ai-generated",
+    "status": "pilot-not-published"
+  },
+  {
+    "id": "sofa-desgaste-04",
+    "problemId": "limpeza-sofas-4",
+    "file": "sofa-desgaste-04.webp",
+    "prompt": "Use case: photorealistic-natural. Asset type: illustrative sofa problem-card photograph. One standalone landscape 16:9 composition, natural window light, authentic upholstery texture, ordinary domestic setting softly blurred, restrained realistic editorial style. Close framing, main problem visible in centered 330px-wide mobile card. No text, watermark, branding, comparisons, before/after, clean result, cleaning tools, microscopic views, germs, colored odor clouds or fantastical effects. Subject: small surface pills and slightly thinned weave on the front edge of a beige chenille sofa cushion, intact material, close oblique view. Show only the problem or its assessment, not a successful treatment.",
+    "alt": "Imagem ilustrativa: Desgaste superficial num assento de chenille",
+    "origin": "ai-generated",
+    "status": "pilot-not-published"
+  },
+  {
+    "id": "sofa-desgaste-05",
+    "problemId": "limpeza-sofas-4",
+    "file": "sofa-desgaste-05.webp",
+    "prompt": "Use case: photorealistic-natural. Asset type: illustrative sofa problem-card photograph. One standalone landscape 16:9 composition, natural window light, authentic upholstery texture, ordinary domestic setting softly blurred, restrained realistic editorial style. Close framing, main problem visible in centered 330px-wide mobile card. No text, watermark, branding, comparisons, before/after, clean result, cleaning tools, microscopic views, germs, colored odor clouds or fantastical effects. Subject: a worn contact patch on a rust-colored fabric sofa armrest, textured fibers rubbed and pilled, no holes or tears. Show only the problem or its assessment, not a successful treatment.",
+    "alt": "Imagem ilustrativa: Fibras gastas num braço de tecido terracota",
+    "origin": "ai-generated",
+    "status": "pilot-not-published"
+  },
+  {
+    "id": "sofa-desgaste-06",
+    "problemId": "limpeza-sofas-4",
+    "file": "sofa-desgaste-06.webp",
+    "prompt": "Use case: photorealistic-natural. Asset type: illustrative sofa problem-card photograph. One standalone landscape 16:9 composition, natural window light, authentic upholstery texture, ordinary domestic setting softly blurred, restrained realistic editorial style. Close framing, main problem visible in centered 330px-wide mobile card. No text, watermark, branding, comparisons, before/after, clean result, cleaning tools, microscopic views, germs, colored odor clouds or fantastical effects. Subject: a flattened surface on the usual seating area of a grey corduroy sofa cushion, worn rib texture compared to surrounding intact ribs, not split-screen. Show only the problem or its assessment, not a successful treatment.",
+    "alt": "Imagem ilustrativa: Marcas de uso numa almofada de bombazina",
+    "origin": "ai-generated",
+    "status": "pilot-not-published"
+  },
+  {
+    "id": "sofa-desgaste-07",
+    "problemId": "limpeza-sofas-4",
+    "file": "sofa-desgaste-07.webp",
+    "prompt": "Use case: photorealistic-natural. Asset type: illustrative sofa problem-card photograph. One standalone landscape 16:9 composition, natural window light, authentic upholstery texture, ordinary domestic setting softly blurred, restrained realistic editorial style. Close framing, main problem visible in centered 330px-wide mobile card. No text, watermark, branding, comparisons, before/after, clean result, cleaning tools, microscopic views, germs, colored odor clouds or fantastical effects. Subject: visible small pills and rubbed texture along the top of a sage green woven sofa armrest, close view, intact structure. Show only the problem or its assessment, not a successful treatment.",
+    "alt": "Imagem ilustrativa: Borboto e atrito num braço de sofá verde",
+    "origin": "ai-generated",
+    "status": "pilot-not-published"
+  },
+  {
+    "id": "sofa-desgaste-08",
+    "problemId": "limpeza-sofas-4",
+    "file": "sofa-desgaste-08.webp",
+    "prompt": "Use case: photorealistic-natural. Asset type: illustrative sofa problem-card photograph. One standalone landscape 16:9 composition, natural window light, authentic upholstery texture, ordinary domestic setting softly blurred, restrained realistic editorial style. Close framing, main problem visible in centered 330px-wide mobile card. No text, watermark, branding, comparisons, before/after, clean result, cleaning tools, microscopic views, germs, colored odor clouds or fantastical effects. Subject: an ivory boucle sofa armrest with a modest flattened matted patch from contact, intact loops around it, close natural view. Show only the problem or its assessment, not a successful treatment.",
+    "alt": "Imagem ilustrativa: Textura achatada num braço de sofá bouclé",
+    "origin": "ai-generated",
+    "status": "pilot-not-published"
+  },
+  {
+    "id": "sofa-desgaste-09",
+    "problemId": "limpeza-sofas-4",
+    "file": "sofa-desgaste-09.webp",
+    "prompt": "Use case: photorealistic-natural. Asset type: illustrative sofa problem-card photograph. One standalone landscape 16:9 composition, natural window light, authentic upholstery texture, ordinary domestic setting softly blurred, restrained realistic editorial style. Close framing, main problem visible in centered 330px-wide mobile card. No text, watermark, branding, comparisons, before/after, clean result, cleaning tools, microscopic views, germs, colored odor clouds or fantastical effects. Subject: the seat edge of a brown woven sofa with a modest abrasion patch and loose surface fuzz, no open holes or stuffing, three-quarter view. Show only the problem or its assessment, not a successful treatment.",
+    "alt": "Imagem ilustrativa: Atrito na borda de um assento castanho",
+    "origin": "ai-generated",
+    "status": "pilot-not-published"
+  },
+  {
+    "id": "sofa-desgaste-10",
+    "problemId": "limpeza-sofas-4",
+    "file": "sofa-desgaste-10.webp",
+    "prompt": "Use case: photorealistic-natural. Asset type: illustrative sofa problem-card photograph. One standalone landscape 16:9 composition, natural window light, authentic upholstery texture, ordinary domestic setting softly blurred, restrained realistic editorial style. Close framing, main problem visible in centered 330px-wide mobile card. No text, watermark, branding, comparisons, before/after, clean result, cleaning tools, microscopic views, germs, colored odor clouds or fantastical effects. Subject: a navy sofa armrest with slightly faded rubbed high-contact fabric and fine pilling, recognizable upholstery weave, no repair or clean section. Show only the problem or its assessment, not a successful treatment.",
+    "alt": "Imagem ilustrativa: Tecido marcado pelo uso num braço azul-escuro",
     "origin": "ai-generated",
     "status": "pilot-not-published"
   }
