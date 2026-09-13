@@ -17,7 +17,7 @@ export interface SnapshotStat {
 /** Premium 4-stat strip shown right below the hero on Localidade/Freguesia/Variante
  * pages (avaliação Google, preço desde, duração do serviço, tempo de resposta —
  * conteúdo revisto 2026-09-09, ver nota em cada página que constrói o array).
- * Compact four-column strip on mobile and desktop.
+ * Two-column strip on mobile; four columns on desktop.
  * Transparent by design: the caller wraps this together with the hero inside one
  * shared photo-background container so the image reads as one continuous shot,
  * not a re-cropped copy. */
@@ -26,21 +26,21 @@ const ServiceSnapshotStats = ({ stats }: { stats: SnapshotStat[] }) => {
     <section className="relative border-t border-white/10">
       <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
         <div
-          className="grid grid-cols-4"
-          style={{ gap: "1px", backgroundColor: "rgba(255,255,255,0.08)" }}
+          className="grid grid-cols-2 py-2 md:grid-cols-4 md:gap-px md:py-0 md:bg-white/[0.08]"
         >
           {stats.map((s, i) => (
             <div
               key={i}
-              className="min-w-0 py-4 md:py-9 px-1 md:px-3 text-center"
-              style={{ borderTop: "2px solid rgba(212,175,55,0.55)" }}
+              className="min-w-0 px-3 py-4 text-center border-white/10 odd:border-r [&:nth-child(n+3)]:border-t md:odd:border-r-0 md:border-t-2 md:[&:nth-child(n+3)]:border-t-2 md:border-[#D4AF37]/55 md:py-9"
             >
-              <s.icon className="w-4 h-4 mx-auto mb-2 md:mb-2.5" style={{ color: "#D4AF37" }} strokeWidth={1.75} />
-              <p className="font-playfair font-bold text-[clamp(19px,5.8vw,24px)] sm:text-2xl md:text-3xl leading-none mb-1.5" style={{ color: "#D4AF37" }}>
-                {s.value}
-              </p>
-              <p className="text-[11px] leading-snug md:text-[10px] font-medium text-white/75 md:text-white/60 md:tracking-[0.22em] md:uppercase">
-                <span className="md:hidden">{s.label.startsWith('Desde,') ? 'Desde' : s.label.startsWith('Orçamento,') ? 'Orçamento' : s.label.includes('avaliações Google') ? s.label.replace(' Google', '') : s.label === 'Resposta durante o horário de atendimento' ? 'Resposta*' : s.label.startsWith('Respondemos em menos') ? 'Resposta' : s.label}</span>
+              <div className="flex items-center justify-center gap-2 mb-1.5 md:block">
+                <s.icon className="w-4 h-4 shrink-0 md:mx-auto md:mb-2.5" style={{ color: "#D4AF37" }} strokeWidth={1.75} />
+                <p className="min-w-0 font-playfair font-semibold text-[22px] leading-tight text-white md:font-bold md:text-3xl md:leading-none md:text-[#D4AF37]">
+                  {s.value.replace('<10min', '<10 min').replace('3 a 6h', '3 a 6 h')}
+                </p>
+              </div>
+              <p className="text-xs leading-snug md:text-[10px] font-medium text-white/75 md:text-white/60 md:tracking-[0.22em] md:uppercase">
+                <span className="md:hidden">{s.label.startsWith('Desde,') ? 'Desde' : s.label.startsWith('Orçamento,') ? 'Orçamento' : s.label === 'Pronto a usar' ? 'Secagem média' : s.label === 'Resposta durante o horário de atendimento' ? 'Resposta*' : s.label.startsWith('Respondemos em menos') ? 'Resposta' : s.label}</span>
                 <span className="hidden md:inline">{s.label}</span>
               </p>
             </div>
