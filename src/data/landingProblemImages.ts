@@ -1,4 +1,5 @@
 import { MATTRESS_PROBLEM_IMAGES } from './mattressProblemImages';
+import { RUG_PROBLEM_IMAGES } from './rugProblemImages';
 
 export interface LandingProblemImage { id: string; problemId: string; src: string; alt: string }
 
@@ -255,7 +256,8 @@ function score(value: string): number {
 /** Rendezvous selection: independent by problem, stable by URL, never by visit. */
 export function selectLandingProblemImage(serviceSlug: string, problemId: string, pagePath: string) {
   const library: readonly LandingProblemImage[] = serviceSlug === 'limpeza-sofas' ? SOFA_PROBLEM_IMAGES
-    : serviceSlug === 'limpeza-colchoes' ? MATTRESS_PROBLEM_IMAGES : [];
+    : serviceSlug === 'limpeza-colchoes' ? MATTRESS_PROBLEM_IMAGES
+    : serviceSlug === 'limpeza-tapetes' ? RUG_PROBLEM_IMAGES : [];
   const path = pagePath.split(/[?#]/)[0].replace(/\/+$/, '') || '/';
   const candidates = library.filter(image => image.problemId === problemId);
   return candidates.reduce<LandingProblemImage | undefined>((best, image) => {

@@ -4,6 +4,10 @@
 
 `commercialHeroCopy.ts` fornece os subtítulos curtos por serviço, também usados pelo modelo das quatro famílias e pelo prerender. `problemHero.ts` preserva o contexto do problema e da cidade. Metadados SEO continuam específicos. Navegação reduzida Ads, município real das freguesias, preços, FAQ e composição das secções seguintes permanecem independentes do hero. Esta estrutura substitui os anteriores heroes de problemas e a composição específica da homepage.
 
+## Biblioteca de problemas de tapetes (13/09/2026)
+
+`rugProblemImages.ts` acrescenta 40 imagens ilustrativas, dez por tema: resíduos, manchas, pelos e desgaste. Ficheiros em `public/images/landing-problems/tapetes/`, prompts/documentação em `docs/rug-image-library/`. `selectLandingProblemImage` inclui a biblioteca de tapetes sem mudar a seleção dos sofás/colchões. As 2.152 landing pages das quatro famílias recebem quatro imagens estáveis por URL, iguais no React e no HTML inicial. Mantém quatro FAQ, identificação «Imagem ilustrativa» e tapetes sob orçamento. Não altera alcatifas, galerias de trabalhos reais, materiais ou problemas autónomos. Testes em `rugProblemImages.test.ts`; auditoria binária em `scripts/audit-rug-image-library.mjs`.
+
 ## Biblioteca de problemas de colchões (13/09/2026)
 
 `mattressProblemImages.ts` acrescenta 40 imagens ilustrativas, dez por tema: resíduos, manchas, odores e cuidados. WebP em `public/images/landing-problems/colchoes/`, prompts e documentação em `docs/mattress-image-library/`. `selectLandingProblemImage` seleciona agora a biblioteca do serviço antes de pontuar as alternativas; a seleção dos sofás permanece inalterada. As 2.152 landing pages de colchões das quatro famílias recebem quatro imagens estáveis por URL, partilhadas pelo React e pelo HTML inicial. A legenda continua «Imagem ilustrativa». Não altera as quatro FAQ, preços, galerias de trabalhos reais nem páginas autónomas de materiais/problemas. Testes em `mattressProblemImages.test.ts`, verificador de ficheiros em `scripts/audit-mattress-image-library.mjs`.
