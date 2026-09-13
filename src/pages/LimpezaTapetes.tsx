@@ -17,20 +17,20 @@ import tapeteDepois from "@/assets/galeria-tapete-depois.webp";
 const tapetesGuarantee: GuaranteeItem[] = [
   {
     label: "Manchas",
-    title: "Manchas fora ou voltamos",
+    title: "Repetimos se for necessário",
     body: SATISFACTION_PROMISE,
-    image: "/images/tapetes/v1.webp",
+    image: "/images/service-promises/LimpezaTapetes-800.webp",
   },
   {
     label: "Fibras",
-    title: "Fibras íntegras, cores preservadas",
-    body: "Analisamos o tipo de fibra antes de qualquer intervenção. Técnica e produtos são adaptados para preservar a trama e a tonalidade original do tapete.",
+    title: "Respeito pelas fibras",
+    body: "Avaliamos a composição, a base e as cores para escolher um método compatível com o tapete.",
     image: "/images/tapetes/v2.webp",
   },
   {
     label: "Odores",
-    title: "Frescura que fica meses",
-    body: "Enzimas de última geração eliminam os compostos orgânicos na raiz, incluindo odores de animais. O resultado não mascara o cheiro, destrói-o definitivamente.",
+    title: "Odores avaliados na origem",
+    body: "Adaptamos o tratamento à origem e à profundidade do odor. Explicamos os limites antes de começar.",
     image: tapeteDepois,
   },
 ];

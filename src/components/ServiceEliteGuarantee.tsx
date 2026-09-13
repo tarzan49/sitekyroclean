@@ -47,15 +47,15 @@ const ServiceEliteGuarantee = ({
   const restHeading = words.join(" ");
 
   return (
-    <section className={`py-14 md:py-20 ${dark ? "bg-kyro-green" : "bg-[#FDFDF9]"}`}>
+    <section id="compromisso" className={`py-14 md:py-20 ${dark ? "bg-kyro-green" : "bg-[#FDFDF9]"}`}>
       <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
 
         {/* Editorial header */}
-        <div className="mb-12 md:mb-16">
+        <div className="mb-7 md:mb-10">
           <div className="flex items-center gap-3 mb-4">
             <div className="h-px w-8 flex-shrink-0" style={{ backgroundColor: '#D4AF37', opacity: 0.65 }} />
             <p className="text-sm font-bold tracking-[0.08em] uppercase" style={{ color: '#D4AF37', opacity: 0.85 }}>
-              Garantia de Elite
+              O nosso compromisso
             </p>
           </div>
           <h2 className={`type-section-title font-playfair      mb-4 ${textMain}`}>
@@ -67,88 +67,30 @@ const ServiceEliteGuarantee = ({
           </p>
         </div>
 
-        {/* Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5 md:gap-6">
-          {items.map((item, i) => {
-            const hasImage = !!item.image;
-            const cardTextMain = hasImage ? "text-white" : textMain;
-            const cardTextSub  = hasImage ? "text-white/70" : textSub;
-
-            return (
-              <div
-                key={i}
-                className="relative flex flex-col overflow-hidden"
-                style={
-                  hasImage
-                    ? { borderTop: "2px solid rgba(212,175,55,0.7)", minHeight: "320px" }
-                    : dark
-                    ? {
-                        background: "rgba(255,255,255,0.04)",
-                        borderTop: "2px solid rgba(212,175,55,0.55)",
-                        borderRight: "1px solid rgba(255,255,255,0.06)",
-                        borderBottom: "1px solid rgba(255,255,255,0.06)",
-                        borderLeft: "1px solid rgba(255,255,255,0.06)",
-                      }
-                    : {
-                        background: "#ffffff",
-                        borderTop: "2px solid #D4AF37",
-                        boxShadow: "0 2px 24px rgba(0,0,0,0.07), 0 1px 4px rgba(0,0,0,0.04)",
-                      }
-                }
-              >
-                {/* Background image */}
-                {hasImage && (
-                  <>
-                    <img
-                      src={item.image}
-                      alt=""
-                      aria-hidden="true"
-                      className="absolute inset-0 w-full h-full object-cover"
-                      style={item.mirror ? { transform: "scaleX(-1)" } : undefined}
-                    />
-                    <div
-                      className="absolute inset-0"
-                      style={{ background: "linear-gradient(to bottom, rgba(7,26,18,0.82) 0%, rgba(7,26,18,0.55) 55%, rgba(7,26,18,0.82) 100%)" }}
-                    />
-                    {item.mirror && (
-                      <>
-                        <span className="absolute bottom-4 left-4 text-sm font-bold tracking-[0.22em] uppercase text-white/80 z-10">Antes</span>
-                        <span className="absolute bottom-4 right-4 text-sm font-bold tracking-[0.22em] uppercase text-white/80 z-10">Depois</span>
-                      </>
-                    )}
-                  </>
-                )}
-
-
-                <div className="relative flex flex-col gap-4 p-7 md:p-8">
-                  <p
-                    className="text-sm font-bold tracking-[0.26em] uppercase"
-                    style={{ color: "#D4AF37" }}
-                  >
-                    {item.label}
-                  </p>
-
-                  <h3
-                    className={`type-card-title font-playfair   ${cardTextMain}`}
-                    style={{ fontSize: "1.25rem" }}
-                  >
-                    {item.title}
-                  </h3>
-
-                  <div
-                    className="w-8 h-px"
-                    style={{
-                      background: "linear-gradient(90deg, rgba(212,175,55,0.8) 0%, rgba(212,175,55,0.15) 100%)",
-                    }}
-                  />
-
-                  <p className={`leading-relaxed ${cardTextSub}`} style={{ fontSize: "14px" }}>
-                    {item.body}
-                  </p>
-                </div>
+        <div className="grid items-start gap-7 md:grid-cols-2 md:gap-12">
+          {items[0]?.image && <figure className="min-w-0 overflow-hidden">
+            <img
+              src={items[0].image}
+              srcSet={items[0].image.replace('-800.webp', '-400.webp') + ' 400w, ' + items[0].image + ' 800w'}
+              sizes="(max-width: 767px) calc(100vw - 40px), 580px"
+              width={800}
+              height={500}
+              alt=""
+              loading="lazy"
+              decoding="async"
+              className="aspect-[8/5] w-full rounded-xl object-cover"
+            />
+            <figcaption className={`mt-2 text-xs ${textSub}`}>Imagem ilustrativa</figcaption>
+          </figure>}
+          <div className="min-w-0">
+            {items.map((item, i) => (
+              <div key={item.label} className={`py-5 first:pt-0 last:pb-0 ${i ? dark ? "border-t border-white/15" : "border-t border-[#173629]/15" : ""}`}>
+                <p className="mb-2 text-xs font-semibold uppercase tracking-[0.16em] text-[#D4AF37]">{item.label}</p>
+                <h3 className={`mb-2 text-xl font-semibold leading-snug ${textMain}`}>{item.title}</h3>
+                <p className={`text-base leading-relaxed ${textSub}`}>{item.body}</p>
               </div>
-            );
-          })}
+            ))}
+          </div>
         </div>
 
       </div>

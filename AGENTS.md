@@ -215,3 +215,8 @@ Pedido do responsável: substituir a secção secundária de antes/depois nas se
 
 
 Fundo dos exemplos nacionais (13/09/2026): a galeria 2×2 nos seis serviços principais usa o verde canónico `bg-kyro-green`, com títulos e legendas claras e destaques dourados. `ServiceExamplesGallery` ativa a variante escura de `VisualExamplesGallery`; restantes famílias preservam a sua variante.
+
+
+## Promessas dos seis serviços (13/09/2026)
+
+Secção «A nossa promessa» simplificada por pedido do responsável: uma fotografia ilustrativa por serviço e três compromissos com divisórias discretas, sem cartões escuros nem texto sobre imagens. `ServiceEliteGuarantee` mantém o título Avenir/dourado e o fundo claro. Fotografias WebP de 400/800px em `public/images/service-promises/`, carregamento diferido. Textos curtos preservam repetição até 48h, secagem média e condições da proteção.

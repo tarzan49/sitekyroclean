@@ -18,20 +18,20 @@ import colchaoResultado from "@/assets/galeria-colchao-resultado.webp";
 const colchoesGuarantee: GuaranteeItem[] = [
   {
     label: "Satisfação",
-    title: "Resultado visível ou repetimos",
+    title: "Repetimos se for necessário",
     body: SATISFACTION_PROMISE,
-    image: "/images/colchoes/v4.webp",
+    image: "/images/service-promises/LimpezaColchoes-800.webp",
   },
   {
     label: "Higiene",
-    title: "Cuidados adicionais à sua escolha",
-    body: "A limpeza remove sujidade e resíduos. Pode acrescentar tratamento anti-ácaros ou desbacterização ao seu colchão; estes extras são definidos e orçamentados separadamente.",
+    title: "Extras à sua escolha",
+    body: "Anti-ácaros e desbacterização são tratamentos opcionais, apresentados separadamente da limpeza.",
     image: "/images/colchoes/v5.webp",
   },
   {
     label: "Segurança",
-    title: "Pode dormir logo a seguir",
-    body: "Produtos hipoalergénicos sem resíduos tóxicos. O colchão fica seguro para crianças e pessoas com alergias desde a primeira noite após a secagem.",
+    title: "Utilize depois de secar",
+    body: "A secagem demora, em média, 3 a 6 horas com ventilação. Confirmamos os cuidados antes de terminar.",
     image: colchaoResultado,
   },
 ];

@@ -16,20 +16,20 @@ import { ExpertTip } from "@/components/ServiceExpertTips";
 const impermeabilizacaoGuarantee: GuaranteeItem[] = [
   {
     label: "Eficácia",
-    title: "Proteção testada, comprovada",
-    body: "Cada aplicação é verificada com teste de repelência no final do processo. Só saímos quando a barreira está ativa e uniforme em toda a superfície tratada.",
-    image: "/images/impermeabilizacao/v5.webp",
+    title: "Aplicação com avaliação prévia",
+    body: "Confirmamos a compatibilidade do tecido e explicamos os cuidados e o tempo de ativação da proteção.",
+    image: "/images/service-promises/Impermeabilizacao-800.webp",
   },
   {
     label: "Durabilidade",
-    title: "Até 10 anos com a versão Premium",
-    body: "Temos duas versões: a Essencial (à base de água), que aguenta até 2 lavagens, e a Premium (à base de diluente), mais resistente ao desgaste, que aguenta até 5 lavagens e mantém a proteção por até 10 anos.",
+    title: "Premium: até 10 anos e 5 lavagens",
+    body: "A Essencial suporta até 2 lavagens. A Premium oferece garantia de até 10 anos e 5 lavagens, conforme os cuidados recomendados.",
     image: "/images/impermeabilizacao/v2.webp",
   },
   {
     label: "Segurança",
-    title: "Sem alteração visível nem tátil",
-    body: "O produto seca sem resíduos, sem alterar a cor, o toque nem o aspeto do tecido. Crianças e animais podem regressar ao espaço imediatamente após a secagem.",
+    title: "O toque do seu tecido",
+    body: "Escolhemos uma proteção adequada ao revestimento e indicamos quando voltar a utilizar os estofos.",
     image: "/images/impermeabilizacao/v3.webp",
   },
 ];

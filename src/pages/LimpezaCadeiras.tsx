@@ -17,21 +17,21 @@ import cadeiraProcesso from "@/assets/galeria-cadeira-processo.webp";
 const cadeirasGuarantee: GuaranteeItem[] = [
   {
     label: "Satisfação",
-    title: "Cadeiras como novas ou voltamos",
+    title: "Repetimos se for necessário",
     body: SATISFACTION_PROMISE,
-    image: cadeiraProcesso,
+    image: "/images/service-promises/LimpezaCadeiras-800.webp",
     mirror: true,
   },
   {
     label: "Precisão",
-    title: "Cada costura, cada dobra",
-    body: "Cadeiras acumulam gordura e sujidade em zonas de difícil acesso. Tratamos cada detalhe com bicos específicos para garantir higiene em toda a peça.",
+    title: "Atenção aos pormenores",
+    body: "Tratamos assentos, encostos e costuras com os acessórios adequados a cada peça.",
     image: "/images/cadeiras/v2.webp",
   },
   {
     label: "Tecido",
-    title: "Veludo, couro, linho: todos seguros",
-    body: "Cada material tem o seu protocolo próprio. Nunca aplicamos um produto genérico quando o tecido exige uma abordagem especializada e cuidadosa.",
+    title: "Um cuidado por material",
+    body: "Identificamos o revestimento e escolhemos produtos e métodos compatíveis com o tecido.",
     image: "/images/cadeiras/v1.webp",
   },
 ];

@@ -16,20 +16,20 @@ import { ExpertTip } from "@/components/ServiceExpertTips";
 const sofaGuarantee: GuaranteeItem[] = [
   {
     label: "Satisfação",
-    title: "100% ou repetimos",
+    title: "Repetimos se for necessário",
     body: SATISFACTION_PROMISE,
-    image: "/images/guarantee/sofa-tecido.webp",
+    image: "/images/service-promises/LimpezaSofas-800.webp",
   },
   {
     label: "Cuidado",
-    title: "Zero danos no seu sofá",
-    body: "Avaliamos cada tecido antes de começar. Os produtos e a pressão são ajustados ao material exato do seu sofá para garantir segurança total.",
+    title: "Cuidado adaptado ao tecido",
+    body: "Avaliamos o revestimento e ajustamos os produtos, a escova e a pressão ao seu sofá.",
     image: "/images/guarantee/sofa-veludo.webp",
   },
   {
     label: "Rapidez",
-    title: "Seco em 3 a 6 horas",
-    body: "Extração de alta potência reduz a humidade residual ao mínimo. Pode sentar-se no sofá no mesmo dia, sem esperas longas.",
+    title: "Secagem média de 3 a 6 horas",
+    body: "A extração reduz a humidade. O tempo de secagem depende do tecido, da ventilação e das condições do espaço.",
     image: "/images/guarantee/sofa-microfibras.webp",
   },
 ];

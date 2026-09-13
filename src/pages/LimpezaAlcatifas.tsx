@@ -17,20 +17,20 @@ import alcatifaProcesso from "@/assets/galeria-alcatifa-processo.webp";
 const alcatifasGuarantee: GuaranteeItem[] = [
   {
     label: "Satisfação",
-    title: "Higiene uniforme ou repetimos",
+    title: "Repetimos se for necessário",
     body: SATISFACTION_PROMISE,
-    image: "/images/alcatifas/v3.webp",
+    image: "/images/service-promises/LimpezaAlcatifas-800.webp",
   },
   {
     label: "Cobertura",
-    title: "Metro a metro, sem exceção",
-    body: "Mapeamos a alcatifa antes de começar e dividimos em zonas de tratamento. Nenhum centímetro fica sem extração, mesmo em cantos e áreas sob mobília.",
+    title: "Cuidado em toda a área",
+    body: "Avaliamos as zonas de passagem e os pormenores para ajustar a limpeza ao estado da alcatifa.",
     image: "/images/alcatifas/v1.jpg",
   },
   {
     label: "Secagem",
-    title: "Transitável em menos de 6 horas",
-    body: "O nosso equipamento de alta extração minimiza a humidade residual. Em condições normais, a alcatifa está pronta a usar em menos de 6 horas.",
+    title: "Secagem média de 3 a 6 horas",
+    body: "Controlamos a humidade e reforçamos a extração. A utilização depende da secagem e da ventilação.",
     image: alcatifaProcesso,
   },
 ];
