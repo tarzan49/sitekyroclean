@@ -1,0 +1,34 @@
+[
+  {
+    "id": "sofa-manchas-01",
+    "problemId": "limpeza-sofas-1",
+    "file": "sofa-manchas-01.webp",
+    "prompt": "Use case: photorealistic-natural. Asset type: illustrative problem-card photograph for a sofa-cleaning website, not evidence of a real customer job. Create one standalone landscape 16:9 image. Natural soft window light, credible everyday home, real upholstery texture, restrained editorial photography, moderately close framing. The subject must remain legible in a centered mobile crop around 1.77:1 and 330px wide. No text, no logos, no watermark, no split screen, no before/after, no cleaning results, no microscopic overlays, no smoke or colored odor clouds. Subject: close three-quarter view of the seat and lower backrest of a pale oatmeal woven sofa, one ordinary irregular dried brown coffee stain about 12cm wide on the center of the seat, subtle absorbed edges. No cup or person needed. Stain must be clearly visible but realistic, not a massive splash or catastrophic damage. Background quietly out of focus.",
+    "origin": "ai-generated",
+    "status": "pilot-not-published"
+  },
+  {
+    "id": "sofa-residuos-01",
+    "problemId": "limpeza-sofas-2",
+    "file": "sofa-residuos-01.webp",
+    "prompt": "Use case: photorealistic-natural. Asset type: illustrative problem-card photograph for a sofa-cleaning website, not evidence of a real customer job. Create one standalone landscape 16:9 image. Natural soft window light, credible everyday home, real upholstery texture, restrained editorial photography, moderately close framing. The subject must remain legible in a centered mobile crop around 1.77:1 and 330px wide. No text, no logos, no watermark, no split screen, no before/after, no cleaning results, no microscopic overlays, no smoke or colored odor clouds. Subject: close three-quarter view into the join of two grey woven sofa cushions, visible ordinary household lint, small crumbs and a modest accumulation of dust caught along the central seam. Clearly recognizable sofa with part of backrest. Focus on visible residues between fibers and seams, not a macro magnification or cross-section. No creatures, mites, germs or medical imagery. No exaggerated piles of dirt.",
+    "origin": "ai-generated",
+    "status": "pilot-not-published"
+  },
+  {
+    "id": "sofa-odores-01",
+    "problemId": "limpeza-sofas-3",
+    "file": "sofa-odores-01.webp",
+    "prompt": "Use case: photorealistic-natural. Asset type: illustrative problem-card photograph for a sofa-cleaning website, not evidence of a real customer job. Create one standalone landscape 16:9 image. Natural soft window light, credible everyday home, real upholstery texture, restrained editorial photography, moderately close framing. The subject must remain legible in a centered mobile crop around 1.77:1 and 330px wide. No text, no logos, no watermark, no split screen, no before/after, no cleaning results, no microscopic overlays, no smoke or colored odor clouds. Subject: an adult sitting next to a taupe fabric sofa cushion, lifting one loose cushion slightly toward their nose while checking its smell with a subtle concerned expression, candid ordinary gesture. Frame waist-up and cushion, face and both naturally positioned hands visible within central area, room softly blurred. The cushion is visibly used but no liquid or gross stains. This illustrates assessing odor, not proof of a particular source or a health problem. No nose-pinching theatrical disgust, no masks, no animals, no cleaning tools.",
+    "origin": "ai-generated",
+    "status": "pilot-not-published"
+  },
+  {
+    "id": "sofa-desgaste-01",
+    "problemId": "limpeza-sofas-4",
+    "file": "sofa-desgaste-01.webp",
+    "prompt": "Use case: photorealistic-natural. Asset type: illustrative problem-card photograph for a sofa-cleaning website, not evidence of a real customer job. Create one standalone landscape 16:9 image. Natural soft window light, credible everyday home, real upholstery texture, restrained editorial photography, moderately close framing. The subject must remain legible in a centered mobile crop around 1.77:1 and 330px wide. No text, no logos, no watermark, no split screen, no before/after, no cleaning results, no microscopic overlays, no smoke or colored odor clouds. Subject: close view of an olive-grey woven sofa armrest and adjoining seat, a realistic localized patch of pilling and flattened rubbed fibers on the rounded armrest edge. Slight surface wear, intact structure, no tears, no stuffing emerging. The wear should be recognizable at card size and not confused with a spill. Keep armrest patch central. No repair or restored half.",
+    "origin": "ai-generated",
+    "status": "pilot-not-published"
+  }
+]

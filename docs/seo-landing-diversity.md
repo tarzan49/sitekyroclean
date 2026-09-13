@@ -56,10 +56,14 @@ Biblioteca ampliada de 84 para 180 perguntas distintas, com 40 candidatas por se
 
 Validação: 1.928 testes aprovados, TypeScript e lint dos ficheiros novos/componentes alterados, build de 16.045 rotas e auditorias das 12.912 páginas sem divergências. Amostra dos seis serviços em mobile 390 × 844, quatro FAQ funcionais, sete secções, sem overflow horizontal e introdução integral igual ao HTML inicial. Esta etapa não gera imagens nem demonstra unicidade SEO de cada página.
 
+## Etapa 4: piloto visual de sofás
+
+Criadas quatro imagens ilustrativas de IA, uma por problema, com recortes mobile verificados. Ficheiros finais WebP, prompts e painel de avaliação em [sofa-image-pilot](sofa-image-pilot/README.md). Não houve substituição nas páginas públicas nem nas galerias reais. O piloto é a base de validação visual; faltam 36 alternativas de sofás e as dos restantes serviços para completar a biblioteca de 240.
+
 ## Próximas entregas
 
 1. Concluir a revisão dos restantes campos legados e mensagens partilhadas fora das FAQ/introduções/descrições agora revistas, sem alargar automaticamente o trabalho às famílias de problemas e materiais. Limpeza, lavagem e higienização podem descrever a mesma intervenção: não inventar métodos distintos para justificar keywords.
-2. Validar a correspondência texto/imagem dos quatro problemas por serviço e produzir um piloto de sofás antes da expansão visual.
+2. Validar a direção visual do piloto de sofás já produzido e a correspondência texto/imagem dos outros cinco serviços antes da expansão visual.
 3. Criar a biblioteca de imagens: dez alternativas por problema, quatro problemas por serviço, 240 imagens no total. Reutilizar imagens adequadas existentes quando validadas. Uma imagem por cartão, com seleção independente e estável; não gerar milhares de ficheiros por URL. Ilustrações identificadas como tal, nunca atribuídas a clientes/localidades.
 4. Auditar todas as rotas e a semelhança de conteúdo; verificar links, sitemaps, metadados, fontes comerciais, cobertura das secções, desempenho e imagens. Inspeção visual em mobile por família e serviço. Possíveis alterações de URLs, redirecionamentos ou indexação são decisões separadas, suportadas por análise e, quando disponíveis, dados do Search Console.
 
