@@ -42,15 +42,16 @@ const FontComparisonPanel = () => {
 
   useEffect(() => {
     const fontStylesheetId = "kyro-font-comparison-stylesheet";
+    const fontStylesheetHref = "https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600;700&family=Newsreader:wght@400;500;600;700&family=Source+Sans+3:wght@400;500;600;700&family=Source+Serif+4:wght@400;500;600;700&display=swap";
     let stylesheet = document.getElementById(fontStylesheetId) as HTMLLinkElement | null;
 
     if (!stylesheet) {
       stylesheet = document.createElement("link");
       stylesheet.id = fontStylesheetId;
       stylesheet.rel = "stylesheet";
-      stylesheet.href = "https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,400;500;600;700&family=Source+Sans+3:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;500;600;700&display=swap";
       document.head.appendChild(stylesheet);
     }
+    stylesheet.href = fontStylesheetHref;
 
     document.documentElement.dataset.kyroFontPreview = "true";
 
