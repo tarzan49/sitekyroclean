@@ -124,3 +124,5 @@ Responsável confirmou 110+ avaliações Google, nota 4.9. REVIEW_COUNT é 110 e
 ## Fonte atual (13/09/2026)
 
 Avenir Next é a fonte do site, incluindo toda a homepage. Usar `src/styles/typography.css`, `--font-kyro` e as faces web em `public/fonts/avenir-next/`, integradas do ramo principal. O alias legado `font-playfair` também resolve para Avenir. Não repor Cormorant/Inter na homepage.
+
+Peso dos títulos da homepage (13/09/2026): manter H1 como aprovado; restantes títulos no conteúdo da homepage usam Avenir Demi 600, não Bold 700. Regra limitada a `.homepage-content` em `typography.css`.
