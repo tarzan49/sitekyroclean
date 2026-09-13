@@ -37,6 +37,14 @@ if (import.meta.env.DEV) {
   });
 }
 
+// Local typography comparison, excluded from production.
+if (import.meta.env.DEV) {
+  const preview = new URLSearchParams(window.location.search).get('fonte');
+  if (preview === 'nova' || preview === 'atual') {
+    import('./dev/fontPreview').then(({ initFontPreview }) => initFontPreview(preview));
+  }
+}
+
 // Render app
 const container = document.getElementById("root");
 if (container) {
