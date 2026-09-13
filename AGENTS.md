@@ -1,6 +1,6 @@
 ## Exemplos e tratamentos dos problemas (13/09/2026)
 
-Usar a grelha de quatro exemplos com ampliação também em localidades, freguesias, preços e variantes, partilhando `VisualExamplesGallery`. Tratamentos das páginas de problemas têm avaliação, ação e limites próprios por problema em `problemTreatmentGuides.ts`, partilhados com o HTML inicial. Não inventar métodos diferentes por cidade ou por sinónimo. Etapas com imagens guardadas uma vez no site, ficheiros antigos preservados e opção discreta de guardar. Materiais conservam exemplos específicos do revestimento.
+Usar a grelha de quatro exemplos com ampliação também em localidades, freguesias, preços e variantes, partilhando `VisualExamplesGallery`. Tratamentos das páginas de problemas têm avaliação, ação e limites próprios por problema em `problemTreatmentGuides.ts`, partilhados com o HTML inicial. Não inventar métodos diferentes por cidade ou por sinónimo. A secção «Como tratamos este problema» usa o fundo verde canónico do site, texto branco e destaques dourados. Etapas com imagens guardadas uma vez no site, ficheiros antigos preservados e opção discreta de guardar. Materiais conservam exemplos específicos do revestimento.
 
 ## Estrutura obrigatória dos heroes (13/09/2026, revisão mais recente)
 
