@@ -1,4 +1,4 @@
-import { REVIEW_COUNT } from '../constants/business';
+import { REVIEW_COUNT, REVIEW_RATING } from '../constants/business';
 import { EN_RESPONSE_PROMISE, EN_AVAILABILITY_PROMISE, EN_COVERAGE_PROMISE } from '../constants/commercialPolicy';
 // English-language tourist SEO pages; isolated pilot, fully separate from the
 // Portuguese programmatic SEO (own route namespace /en/*, own sitemap, no
@@ -73,7 +73,7 @@ const LOCAL_EN_PAGES: EnPageData[] = [
       "English-speaking technicians: no language barrier when you're already stressed",
       EN_AVAILABILITY_PROMISE,
       "Professional hot-water extraction equipment, not a rented carpet cleaner",
-      `4.9★ rating on Google from over ${REVIEW_COUNT} verified reviews`,
+      `${REVIEW_RATING}★ rating on Google from over ${REVIEW_COUNT} verified reviews`,
     ],
     faqs: [
       { question: "Can you come today?", answer: EN_RESPONSE_PROMISE + ". " + EN_AVAILABILITY_PROMISE },
@@ -101,7 +101,7 @@ const LOCAL_EN_PAGES: EnPageData[] = [
       "English-speaking team: explain the problem once, clearly",
       EN_AVAILABILITY_PROMISE,
       "Professional hot-water extraction, not a supermarket carpet shampoo",
-      `4.9★ on Google, ${REVIEW_COUNT}+ verified reviews`,
+      `${REVIEW_RATING}★ on Google, ${REVIEW_COUNT}+ verified reviews`,
     ],
     faqs: [
       { question: "How quickly can you get here?", answer: EN_RESPONSE_PROMISE + ". " + EN_AVAILABILITY_PROMISE },
@@ -129,7 +129,7 @@ const LOCAL_EN_PAGES: EnPageData[] = [
       "English-speaking technicians",
       EN_AVAILABILITY_PROMISE,
       "Professional equipment, hotel and holiday-rental grade",
-      `4.9★ rating on Google from over ${REVIEW_COUNT} verified reviews`,
+      `${REVIEW_RATING}★ rating on Google from over ${REVIEW_COUNT} verified reviews`,
     ],
     faqs: [
       { question: "Can you come the same day?", answer: EN_RESPONSE_PROMISE + ". " + EN_AVAILABILITY_PROMISE },
@@ -155,7 +155,7 @@ const LOCAL_EN_PAGES: EnPageData[] = [
       "English-speaking team, quick to coordinate by WhatsApp",
       EN_AVAILABILITY_PROMISE,
       "Professional extraction equipment: most items usable again within hours",
-      `4.9★ on Google, ${REVIEW_COUNT}+ verified reviews`,
+      `${REVIEW_RATING}★ on Google, ${REVIEW_COUNT}+ verified reviews`,
     ],
     faqs: [
       { question: "I fly out in a few hours, can you still help?", answer: "Message us straight away with your address and flight time; we'll do our best to fit you in, but the earlier you contact us, the more likely we can help." },
@@ -184,7 +184,7 @@ const LOCAL_EN_PAGES: EnPageData[] = [
       "English-speaking team, direct WhatsApp coordination",
       EN_AVAILABILITY_PROMISE,
       "Before/after photo documentation on every job",
-      `4.9★ on Google, ${REVIEW_COUNT}+ verified reviews, professional insured technicians`,
+      `${REVIEW_RATING}★ on Google, ${REVIEW_COUNT}+ verified reviews, professional insured technicians`,
     ],
     faqs: [
       { question: "Can you invoice for accounting/tax purposes?", answer: "Yes, we can provide a receipt for every job." },
@@ -214,7 +214,7 @@ const LOCAL_EN_PAGES: EnPageData[] = [
       "English-speaking technicians: no language barrier",
       EN_AVAILABILITY_PROMISE,
       "Professional hot-water extraction equipment",
-      `4.9★ rating on Google, ${REVIEW_COUNT}+ verified reviews`,
+      `${REVIEW_RATING}★ rating on Google, ${REVIEW_COUNT}+ verified reviews`,
     ],
     faqs: [
       { question: "Can you come today?", answer: EN_RESPONSE_PROMISE + ". " + EN_AVAILABILITY_PROMISE },
@@ -240,7 +240,7 @@ const LOCAL_EN_PAGES: EnPageData[] = [
       "English-speaking team",
       EN_AVAILABILITY_PROMISE,
       "Professional hot-water extraction, not a rented carpet cleaner",
-      `4.9★ on Google, ${REVIEW_COUNT}+ verified reviews`,
+      `${REVIEW_RATING}★ on Google, ${REVIEW_COUNT}+ verified reviews`,
     ],
     faqs: [
       { question: "How quickly can you get here?", answer: EN_RESPONSE_PROMISE + ". " + EN_AVAILABILITY_PROMISE },
@@ -267,7 +267,7 @@ const LOCAL_EN_PAGES: EnPageData[] = [
       "English-speaking team",
       EN_AVAILABILITY_PROMISE,
       "Professional hot-water extraction equipment",
-      `4.9★ on Google, ${REVIEW_COUNT}+ verified reviews`,
+      `${REVIEW_RATING}★ on Google, ${REVIEW_COUNT}+ verified reviews`,
     ],
     faqs: [
       { question: "How quickly can you get here?", answer: EN_RESPONSE_PROMISE + ". " + EN_AVAILABILITY_PROMISE },
@@ -294,7 +294,7 @@ const LOCAL_EN_PAGES: EnPageData[] = [
       "English-speaking team",
       EN_AVAILABILITY_PROMISE,
       "Professional hot-water extraction, not a rented carpet cleaner",
-      `4.9★ on Google, ${REVIEW_COUNT}+ verified reviews`,
+      `${REVIEW_RATING}★ on Google, ${REVIEW_COUNT}+ verified reviews`,
     ],
     faqs: [
       { question: "How quickly can you get here?", answer: EN_RESPONSE_PROMISE + ". " + EN_AVAILABILITY_PROMISE },
@@ -320,7 +320,7 @@ const LOCAL_EN_PAGES: EnPageData[] = [
       "English-speaking team",
       EN_AVAILABILITY_PROMISE,
       "Professional hot-water extraction equipment",
-      `4.9★ on Google, ${REVIEW_COUNT}+ verified reviews`,
+      `${REVIEW_RATING}★ on Google, ${REVIEW_COUNT}+ verified reviews`,
     ],
     faqs: [
       { question: "Can you come today?", answer: EN_RESPONSE_PROMISE + ". " + EN_AVAILABILITY_PROMISE },
@@ -346,7 +346,7 @@ const LOCAL_EN_PAGES: EnPageData[] = [
       "English-speaking team",
       EN_AVAILABILITY_PROMISE,
       "Professional hot-water extraction, not a rented carpet cleaner",
-      `4.9★ on Google, ${REVIEW_COUNT}+ verified reviews`,
+      `${REVIEW_RATING}★ on Google, ${REVIEW_COUNT}+ verified reviews`,
     ],
     faqs: [
       { question: "How quickly can you get here?", answer: EN_RESPONSE_PROMISE + ". " + EN_AVAILABILITY_PROMISE },
@@ -372,7 +372,7 @@ const LOCAL_EN_PAGES: EnPageData[] = [
       "English-speaking team",
       EN_AVAILABILITY_PROMISE,
       "Professional hot-water extraction equipment",
-      `4.9★ on Google, ${REVIEW_COUNT}+ verified reviews`,
+      `${REVIEW_RATING}★ on Google, ${REVIEW_COUNT}+ verified reviews`,
     ],
     faqs: [
       { question: "Can you come today?", answer: EN_RESPONSE_PROMISE + ". " + EN_AVAILABILITY_PROMISE },
@@ -398,7 +398,7 @@ const LOCAL_EN_PAGES: EnPageData[] = [
       "English-speaking team",
       EN_AVAILABILITY_PROMISE,
       "Professional hot-water extraction, not a rented carpet cleaner",
-      `4.9★ on Google, ${REVIEW_COUNT}+ verified reviews`,
+      `${REVIEW_RATING}★ on Google, ${REVIEW_COUNT}+ verified reviews`,
     ],
     faqs: [
       { question: "How quickly can you get here?", answer: EN_RESPONSE_PROMISE + ". " + EN_AVAILABILITY_PROMISE },
@@ -426,7 +426,7 @@ const LOCAL_EN_PAGES: EnPageData[] = [
       "English-speaking team, direct WhatsApp coordination",
       EN_AVAILABILITY_PROMISE,
       "Before/after photo documentation on every job",
-      "4.9★ on Google, professional insured technicians",
+      "${REVIEW_RATING}★ on Google, professional insured technicians",
     ],
     faqs: [
       { question: "Can you invoice for accounting purposes?", answer: "Yes, we provide a receipt for every job." },
@@ -455,7 +455,7 @@ const LOCAL_EN_PAGES: EnPageData[] = [
       "English-speaking technicians: no language barrier",
       EN_AVAILABILITY_PROMISE,
       "Professional hot-water extraction equipment",
-      `4.9★ rating on Google, ${REVIEW_COUNT}+ verified reviews`,
+      `${REVIEW_RATING}★ rating on Google, ${REVIEW_COUNT}+ verified reviews`,
     ],
     faqs: [
       { question: "Can you come today?", answer: EN_RESPONSE_PROMISE + ". " + EN_AVAILABILITY_PROMISE },
@@ -481,7 +481,7 @@ const LOCAL_EN_PAGES: EnPageData[] = [
       "English-speaking team",
       EN_AVAILABILITY_PROMISE,
       "Professional hot-water extraction equipment",
-      `4.9★ on Google, ${REVIEW_COUNT}+ verified reviews`,
+      `${REVIEW_RATING}★ on Google, ${REVIEW_COUNT}+ verified reviews`,
     ],
     faqs: [
       { question: "How quickly can you get here?", answer: EN_RESPONSE_PROMISE + ". " + EN_AVAILABILITY_PROMISE },
@@ -507,7 +507,7 @@ const LOCAL_EN_PAGES: EnPageData[] = [
       "English-speaking team",
       EN_AVAILABILITY_PROMISE,
       "Professional hot-water extraction, not a rented carpet cleaner",
-      `4.9★ on Google, ${REVIEW_COUNT}+ verified reviews`,
+      `${REVIEW_RATING}★ on Google, ${REVIEW_COUNT}+ verified reviews`,
     ],
     faqs: [
       { question: "Can you come today?", answer: EN_RESPONSE_PROMISE + ". " + EN_AVAILABILITY_PROMISE },
@@ -534,7 +534,7 @@ const LOCAL_EN_PAGES: EnPageData[] = [
       "English-speaking team",
       EN_AVAILABILITY_PROMISE,
       "Professional hot-water extraction equipment",
-      `4.9★ on Google, ${REVIEW_COUNT}+ verified reviews`,
+      `${REVIEW_RATING}★ on Google, ${REVIEW_COUNT}+ verified reviews`,
     ],
     faqs: [
       { question: "Can you come today?", answer: EN_RESPONSE_PROMISE + ". " + EN_AVAILABILITY_PROMISE },
@@ -560,7 +560,7 @@ const LOCAL_EN_PAGES: EnPageData[] = [
       "English-speaking team",
       EN_AVAILABILITY_PROMISE,
       "Professional hot-water extraction, not a rented carpet cleaner",
-      `4.9★ on Google, ${REVIEW_COUNT}+ verified reviews`,
+      `${REVIEW_RATING}★ on Google, ${REVIEW_COUNT}+ verified reviews`,
     ],
     faqs: [
       { question: "How quickly can you get here?", answer: EN_RESPONSE_PROMISE + ". " + EN_AVAILABILITY_PROMISE },
@@ -586,7 +586,7 @@ const LOCAL_EN_PAGES: EnPageData[] = [
       "English-speaking team",
       EN_AVAILABILITY_PROMISE,
       "Professional hot-water extraction equipment",
-      `4.9★ on Google, ${REVIEW_COUNT}+ verified reviews`,
+      `${REVIEW_RATING}★ on Google, ${REVIEW_COUNT}+ verified reviews`,
     ],
     faqs: [
       { question: "Can you come today?", answer: EN_RESPONSE_PROMISE + ". " + EN_AVAILABILITY_PROMISE },
@@ -612,7 +612,7 @@ const LOCAL_EN_PAGES: EnPageData[] = [
       "English-speaking team",
       EN_AVAILABILITY_PROMISE,
       "Professional hot-water extraction equipment",
-      `4.9★ on Google, ${REVIEW_COUNT}+ verified reviews`,
+      `${REVIEW_RATING}★ on Google, ${REVIEW_COUNT}+ verified reviews`,
     ],
     faqs: [
       { question: "How quickly can you get here?", answer: EN_RESPONSE_PROMISE + ". " + EN_AVAILABILITY_PROMISE },
@@ -638,7 +638,7 @@ const LOCAL_EN_PAGES: EnPageData[] = [
       "English-speaking team",
       EN_AVAILABILITY_PROMISE,
       "Professional hot-water extraction equipment",
-      `4.9★ on Google, ${REVIEW_COUNT}+ verified reviews`,
+      `${REVIEW_RATING}★ on Google, ${REVIEW_COUNT}+ verified reviews`,
     ],
     faqs: [
       { question: "How quickly can you get here?", answer: EN_RESPONSE_PROMISE + ". " + EN_AVAILABILITY_PROMISE },
@@ -666,7 +666,7 @@ const LOCAL_EN_PAGES: EnPageData[] = [
       "English-speaking team, direct WhatsApp coordination",
       EN_AVAILABILITY_PROMISE,
       "Before/after photo documentation on every job",
-      "4.9★ on Google, professional insured technicians",
+      "${REVIEW_RATING}★ on Google, professional insured technicians",
     ],
     faqs: [
       { question: "Can you invoice for accounting purposes?", answer: "Yes, we provide a receipt for every job." },

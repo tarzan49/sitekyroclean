@@ -1,4 +1,4 @@
-import { REVIEW_COUNT } from '../constants/business';
+import { REVIEW_COUNT, REVIEW_RATING } from '../constants/business';
 // Programmatic SEO: Problem pages data engine
 // Each problem page targets a specific long-tail search query cluster
 
@@ -820,13 +820,13 @@ const problemDefinitions: ProblemPage[] = [
     category: "metodo",
     keyword: "empresa de limpeza de estofos",
     title: "Empresa de Limpeza de Estofos Porto | Kyro Clean Solutions",
-    metaDescription: "Kyro Clean Solutions: empresa profissional de limpeza de estofos no Porto. Sofás, colchões, cadeiras, tapetes. 4.9 Google. Orçamento grátis.",
+    metaDescription: `Kyro Clean Solutions: empresa profissional de limpeza de estofos no Porto. Sofás, colchões, cadeiras, tapetes. ${REVIEW_RATING} Google. Orçamento grátis.`,
     h1: "Empresa Profissional de Limpeza de Estofos",
-    intro: "Procura uma empresa fiável de limpeza de estofos? A Kyro Clean Solutions é especializada em limpeza profissional de sofás, colchões, cadeiras, tapetes e alcatifas no Porto e Norte de Portugal. Com 4.9 no Google e mais de 1000 clientes satisfeitos.",
+    intro: "Procura uma empresa fiável de limpeza de estofos? A Kyro Clean Solutions é especializada em limpeza profissional de sofás, colchões, cadeiras, tapetes e alcatifas no Porto e Norte de Portugal. Com ${REVIEW_RATING} no Google e mais de 1000 clientes satisfeitos.",
     problemDetail: "Escolher a empresa certa para limpar os seus estofos é importante. Equipamento inadequado pode danificar tecidos, e produtos baratos podem deixar resíduos prejudiciais. Uma empresa profissional garante resultados seguros e eficazes.",
     solutionDetail: "A Kyro Clean Solutions utiliza equipamento de extração profissional, produtos certificados e tem técnicos formados. Oferecemos serviço ao domicílio em todo o Porto e Norte de Portugal, com garantia de satisfação.",
     benefits: [
-      `4.9 Google: ${REVIEW_COUNT}+ avaliações reais`,
+      `${REVIEW_RATING} Google: ${REVIEW_COUNT}+ avaliações reais`,
       "+1100 clientes satisfeitos",
       "Equipamento de extração profissional",
       "Produtos certificados e seguros",
@@ -834,7 +834,7 @@ const problemDefinitions: ProblemPage[] = [
       "Serviço ao domicílio",
     ],
     faqs: [
-      { question: "A Kyro Clean Solutions é uma empresa certificada?", answer: "Sim. Temos certificação Clean & Safe, utilizamos produtos certificados e hipoalergénicos, e temos 4.9 estrelas no Google com avaliações reais." },
+      { question: "A Kyro Clean Solutions é uma empresa certificada?", answer: `Sim. Temos certificação Clean & Safe, utilizamos produtos certificados e hipoalergénicos, e temos ${REVIEW_RATING} estrelas no Google com avaliações reais.` },
       { question: "Que serviços de limpeza de estofos oferecem?", answer: "Limpamos sofás, colchões, cadeiras, tapetes, alcatifas e oferecemos impermeabilização de sofás e cadeiras. Todos os serviços são realizados ao domicílio." },
     ],
     relatedProblems: ["limpeza-profunda-sofa", "preco-limpeza-sofa", "limpeza-sofa-domicilio"],
@@ -1164,9 +1164,9 @@ const problemDefinitions: ProblemPage[] = [
     metaDescription: "Limpeza profissional de sofá perto de si. Serviço ao domicílio no Porto, Lisboa e Norte de Portugal. Desde 49€. Orçamento grátis.",
     h1: "Limpeza de Sofá Perto de Si: Serviço ao Domicílio",
     intro: "Procura limpeza de sofá perto de si? A Kyro Clean Solutions cobre Porto, Lisboa e todo o Norte de Portugal com serviço ao domicílio. A nossa equipa desloca-se até à sua casa com todo o equipamento.",
-    problemDetail: "Quando pesquisa 'limpeza de sofá perto de mim', quer um serviço local, fiável e com boas avaliações. A Kyro Clean Solutions tem 4.9 no Google, +1100 clientes satisfeitos e cobertura em todo o Norte de Portugal e região de Lisboa.",
+    problemDetail: "Quando pesquisa 'limpeza de sofá perto de mim', quer um serviço local, fiável e com boas avaliações. A Kyro Clean Solutions tem ${REVIEW_RATING} no Google, +1100 clientes satisfeitos e cobertura em todo o Norte de Portugal e região de Lisboa.",
     solutionDetail: "Atuamos no Porto e em Matosinhos, Maia, Gaia, Gondomar, Valongo, Braga, Guimarães, Póvoa de Varzim, Vila do Conde, Lisboa, Cascais, Oeiras, Sintra, Almada e Setúbal. Deslocação a partir de 10€, consoante a distância.",
-    benefits: ["Cobertura Norte de Portugal + Lisboa", "4.9 Google", "+1100 clientes satisfeitos", "Deslocação a partir de 10€", "Desde 49€", "Resposta em menos de 10 minutos"],
+    benefits: ["Cobertura Norte de Portugal + Lisboa", "${REVIEW_RATING} Google", "+1100 clientes satisfeitos", "Deslocação a partir de 10€", "Desde 49€", "Resposta em menos de 10 minutos"],
     faqs: [
       { question: "Em que cidades fazem limpeza de sofá?", answer: "Servimos Porto e toda a área metropolitana, Braga, Guimarães, e região de Lisboa (Cascais, Oeiras, Sintra, Almada, Setúbal). Contacte-nos para confirmar disponibilidade na sua zona." },
     ],

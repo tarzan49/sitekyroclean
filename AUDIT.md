@@ -6,6 +6,23 @@ Severidade: **CRITICAL** (bug real que afeta dinheiro, dados de clientes, ou seg
 
 ---
 
+## Estado em 2026-09-14 (reverificado no código, não assumido)
+
+- **#1 RLS aberta nas tabelas `leads`/`quiz_events`/`error_logs`: ✅ corrigido.** A migração `20260908000000_restrict_admin_tables_to_authenticated.sql` restringe select/update/delete a `authenticated`; o insert público continua aberto só onde o quiz precisa.
+- **#2 e #3 password de admin no bundle e fallback `'kyro2025'`: ✅ corrigidos.** `AdminPanel.tsx` usa `supabase.auth.signInWithPassword`; já não existe nenhum `ADMIN_PASSWORD` nem password literal em `src/`.
+- **#4 sofá 4+ lugares no upsell: ✅ corrigido** (ver "Correções aplicadas" abaixo).
+- **#5 reCAPTCHA existe mas não está ligado: 🟡 continua aberto.** `src/lib/recaptcha.ts` é importado por zero ficheiros. **Não apagar este ficheiro** — a correção é ligá-lo a `submissionService.ts`, não removê-lo.
+- **#10 `QuizForm.tsx` com responsabilidades a mais: parcialmente resolvido.** Desceu de 1224 para 972 linhas com a extração dos hooks `use-quiz-*`.
+### Novo finding (2026-09-14): os leads do quiz continuam a entrar na base de dados, mas nenhuma rota chega à UI que os lê
+
+`src/services/submissionService.ts:99` continua a inserir cada pedido em `public.leads`. A única interface que lê, edita ou apaga essa tabela é `src/pages/AdminDashboard.tsx` — e esse componente **não está registado em nenhuma rota** de `App.tsx`. A aba "CRM" atual (`src/pages/admin/CrmPanel.tsx`) lê `service_requests`, que é outra tabela; `QuizMetricsPanel.tsx` só conta linhas de `leads` para o funil, não as mostra.
+
+Consequência prática: os pedidos continuam a chegar por Formspree (email), por isso nada se perde do lado comercial, mas a cópia em base de dados está a acumular sem forma de ser consultada no painel.
+
+**Não apagar `AdminDashboard.tsx` como "código morto"** sem decidir isto primeiro. É código órfão, não código inútil: a tabela que ele gere está viva. As opções são voltar a ligá-lo como aba do painel, ou aposentar a tabela `leads` de forma explícita. Qualquer das duas é uma decisão do dono.
+
+- **Restantes findings: não reverificados** nesta passagem. Verificar antes de agir, não assumir que continuam válidos.
+
 ## 🔴 CRITICAL
 
 ### 1. Tabelas `leads`, `quiz_events` e `error_logs` são legíveis e escrevíveis por qualquer pessoa, sem autenticação nenhuma

@@ -2,14 +2,14 @@ import type { LucideIcon } from "lucide-react";
 import type { ComponentType, CSSProperties } from "react";
 import { Clock, Users, CheckCircle2, ShieldCheck, Timer } from "lucide-react";
 import { GoogleG } from "@/components/icons/GoogleG";
-import { REVIEW_COUNT } from "@/constants/business";
+import { REVIEW_COUNT, REVIEW_RATING } from "@/constants/business";
 
 type StatIcon = LucideIcon | ComponentType<{ className?: string; style?: CSSProperties; strokeWidth?: number }>;
 
 // Resposta em menos de 10 minutos em todas as categorias e no restante site.
 export const CATEGORY_STATS: Record<string, { value: string; label: string; icon: StatIcon }[]> = {
   manchas: [
-    { value: "4.9★", label: `+${REVIEW_COUNT} avaliações Google`, icon: GoogleG },
+    { value: `${REVIEW_RATING}★`, label: `+${REVIEW_COUNT} avaliações Google`, icon: GoogleG },
     { value: "<10min", label: "Respondemos em menos de 10 minutos", icon: Clock },
     { value: "3 a 6h", label: "Pronto a usar", icon: Timer },
     { value: "+1100", label: "Clientes satisfeitos", icon: Users },
@@ -18,16 +18,16 @@ export const CATEGORY_STATS: Record<string, { value: string; label: string; icon
     { value: "Extra", label: "Tratamento específico sob consulta", icon: CheckCircle2 },
     { value: "24-48h", label: "Resultado permanente", icon: ShieldCheck },
     { value: "<10min", label: "Respondemos em menos de 10 minutos", icon: Clock },
-    { value: "4.9★", label: `+${REVIEW_COUNT} avaliações Google`, icon: GoogleG },
+    { value: "${REVIEW_RATING}★", label: `+${REVIEW_COUNT} avaliações Google`, icon: GoogleG },
   ],
   saude: [
     { value: "Extra", label: "Tratamento específico sob consulta", icon: CheckCircle2 },
     { value: "<10min", label: "Respondemos em menos de 10 minutos", icon: Clock },
-    { value: "4.9★", label: `+${REVIEW_COUNT} avaliações Google`, icon: GoogleG },
+    { value: "${REVIEW_RATING}★", label: `+${REVIEW_COUNT} avaliações Google`, icon: GoogleG },
     { value: "+1100", label: "Clientes satisfeitos", icon: Users },
   ],
   materiais: [
-    { value: "4.9★", label: `+${REVIEW_COUNT} avaliações Google`, icon: GoogleG },
+    { value: "${REVIEW_RATING}★", label: `+${REVIEW_COUNT} avaliações Google`, icon: GoogleG },
     { value: "<10min", label: "Respondemos em menos de 10 minutos", icon: Clock },
     { value: "3 a 6h", label: "Tempo de secagem", icon: Timer },
     { value: "+1100", label: "Clientes satisfeitos", icon: Users },
@@ -36,10 +36,10 @@ export const CATEGORY_STATS: Record<string, { value: string; label: string; icon
     { value: "Extra", label: "Tratamento específico sob consulta", icon: CheckCircle2 },
     { value: "<10min", label: "Respondemos em menos de 10 minutos", icon: Clock },
     { value: "3 a 6h", label: "Pronto a usar", icon: Timer },
-    { value: "4.9★", label: `+${REVIEW_COUNT} avaliações Google`, icon: GoogleG },
+    { value: "${REVIEW_RATING}★", label: `+${REVIEW_COUNT} avaliações Google`, icon: GoogleG },
   ],
   preco: [
-    { value: "4.9★", label: `+${REVIEW_COUNT} avaliações Google`, icon: GoogleG },
+    { value: "${REVIEW_RATING}★", label: `+${REVIEW_COUNT} avaliações Google`, icon: GoogleG },
     { value: `${REVIEW_COUNT}+`, label: "Avaliações verificadas", icon: ShieldCheck },
     { value: "<10min", label: "Resposta ao pedido", icon: Clock },
     { value: "Grátis", label: "Orçamento sem compromisso", icon: CheckCircle2 },
@@ -47,19 +47,19 @@ export const CATEGORY_STATS: Record<string, { value: string; label: string; icon
   urgencia: [
     { value: "<10min", label: "Respondemos em menos de 10 minutos", icon: Clock },
     { value: "24h", label: "Disponibilidade", icon: ShieldCheck },
-    { value: "4.9★", label: `+${REVIEW_COUNT} avaliações Google`, icon: GoogleG },
+    { value: "${REVIEW_RATING}★", label: `+${REVIEW_COUNT} avaliações Google`, icon: GoogleG },
     { value: "3 a 6h", label: "Pronto a usar", icon: Timer },
   ],
   metodo: [
     { value: "Extra", label: "Tratamento específico sob consulta", icon: CheckCircle2 },
     { value: "3 a 6h", label: "Tempo de secagem", icon: Timer },
-    { value: "4.9★", label: `+${REVIEW_COUNT} avaliações Google`, icon: GoogleG },
+    { value: "${REVIEW_RATING}★", label: `+${REVIEW_COUNT} avaliações Google`, icon: GoogleG },
     { value: "+1100", label: "Clientes satisfeitos", icon: Users },
   ],
   protecao: [
     { value: "12-18m", label: "Duração da proteção", icon: ShieldCheck },
     { value: "24h", label: "Proteção já ativa", icon: Clock },
-    { value: "4.9★", label: `+${REVIEW_COUNT} avaliações Google`, icon: GoogleG },
+    { value: "${REVIEW_RATING}★", label: `+${REVIEW_COUNT} avaliações Google`, icon: GoogleG },
     { value: "+1100", label: "Clientes satisfeitos", icon: Users },
   ],
 };
