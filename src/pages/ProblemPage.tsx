@@ -4,7 +4,7 @@ import { useEffect, useMemo } from "react";
 import { useParams, Link } from "react-router-dom";
 import { QuizServiceProvider } from "@/context/QuizLocationContext";
 import {
-  MapPin, Star, ArrowRight, AlertTriangle,
+  MapPin, ArrowRight,
 } from "lucide-react";
 import Header from "@/components/Header";
 import PageBreadcrumb from "@/components/PageBreadcrumb";
@@ -14,9 +14,12 @@ import Footer from "@/components/Footer";
 import SectionHeader from "@/components/SectionHeader";
 import ServiceFAQ from "@/components/ServiceFAQ";
 import ServiceAutoCarousel from "@/components/ServiceAutoCarousel";
-import ServiceSnapshotStats from "@/components/ServiceSnapshotStats";
+import TrustRatingBadge from "@/components/TrustRatingBadge";
+import ServicePriceSection from "@/components/ServicePriceSection";
+import ServicePackBanner from "@/components/ServicePackBanner";
+import { SERVICE_PACK_SLUGS } from "@/constants/servicePackSlugs";
+import { getProblemLayout } from "@/data/problemLayout";
 import { getProblemBySlug, getRelatedProblemLinks } from "@/data/problemSeoData";
-import { CATEGORY_TIPS, CATEGORY_STATS, splitTipsHeading } from "@/data/problemTipsData";
 import { getServiceGallery, getIllustrativePhotos } from "@/constants/serviceGallery";
 import { services, cities } from "@/data/locationSeoData";
 import { SERVICE_TO_QUIZ } from "@/constants/serviceToQuiz";
@@ -33,22 +36,6 @@ import {
   clearPrerenderedSchema,
   DEFAULT_AREA_SERVED,
 } from "@/lib/seoSchema";
-
-const WHEN_TO_CALL = [
-  "A situação tem mais de 24 horas e produtos caseiros não surtiram efeito",
-  "O odor persiste mesmo após arejar e usar neutralizadores domésticos",
-  "O material é delicado (veludo, pele, linho) e não quer arriscar danos",
-  "Envolve urina, sangue, mofo ou qualquer líquido orgânico",
-  "Tentou limpar e a área aumentou ou a situação piorou",
-  "Quer proteger o estofo com impermeabilização após a limpeza",
-];
-
-const PROCESS_STEPS = [
-  { title: "Identificação do tecido", body: "Avaliamos o tipo de material e a extensão do problema antes de aplicar qualquer produto ou equipamento." },
-  { title: "Pulverização",            body: "Aplicação de solução específica, adequada ao tecido identificado e ao problema a tratar." },
-  { title: "Escovação",               body: "Escovagem para distribuir o produto e soltar a sujidade nas fibras, preparando para a extração." },
-  { title: "Extração",                body: "Extração profissional a alta temperatura remove resíduos e sujidade das camadas mais profundas das fibras." },
-];
 
 const ProblemPage = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -101,12 +88,11 @@ const ProblemPage = () => {
     .map(s => cities.find(c => c.slug === s))
     .filter(Boolean) as typeof cities[number][];
   const servicePrice = relatedService?.priceFrom ?? "49€";
-  const categoryTips = CATEGORY_TIPS[data.category];
+  const layout = getProblemLayout(data);
   const gallery = getServiceGallery(data.relatedServices[0], slug ?? "");
   const heroImg = getProblemHeroImage(slug ?? "");
   const beforeAfterCategory = categoryForServiceSlug(data.relatedServices[0]);
   const waHref = `${WHATSAPP_BASE}?text=${encodeURIComponent(buildProblemWaMessage(slug ?? ""))}`;
-  const snapshotStats = CATEGORY_STATS[data.category] ?? CATEGORY_STATS.manchas;
 
   const h1Words = data.h1.trim().split(" ");
   const h1Gold = h1Words.pop() ?? "";
@@ -118,15 +104,14 @@ const ProblemPage = () => {
       <Header />
       <main>
 
-        {/* ═══ HERO + SNAPSHOT (fundo fotográfico contínuo) ═══ */}
-        <div className="relative overflow-hidden">
+        {/* Hero com a mesma composição das páginas de materiais. */}
+        <section className="relative pt-24 md:pt-28 pb-16 md:pb-24 overflow-hidden">
           <div className="absolute inset-0" style={{ background: "#071a12" }} />
           <div className="absolute inset-0 overflow-hidden" aria-hidden="true">
             <img src={heroImg} alt="" className="w-full h-full object-cover" loading="eager" />
           </div>
           <div className="absolute inset-0" style={{ background: "linear-gradient(to bottom, rgba(7,26,18,0.42) 0%, rgba(7,26,18,0.65) 40%, rgba(7,26,18,0.88) 75%, rgba(7,26,18,0.97) 100%)" }} />
 
-        <section className="relative pt-16 md:pt-24 lg:pt-28 pb-16 md:pb-24">
           <div className="container mx-auto px-5 sm:px-6 lg:px-8 relative z-10">
             <div className="max-w-6xl mx-auto grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
               <div>
@@ -135,7 +120,7 @@ const ProblemPage = () => {
                   { label: data.h1 },
                 ]} />
 
-                <div className="inline-flex items-start mb-3 lg:mb-5">
+                <div className="inline-flex items-start mb-5">
                   <div className="flex flex-col gap-1">
                     <div className="w-7 h-px bg-gradient-to-r from-gold to-transparent" />
                     <span className="text-[10px] font-bold text-gold/90 tracking-[0.30em] uppercase" style={{ textShadow: "0 1px 6px rgba(0,0,0,0.6)" }}>
@@ -144,14 +129,17 @@ const ProblemPage = () => {
                   </div>
                 </div>
 
-                <h1 className="font-playfair text-[1.75rem] sm:text-4xl md:text-5xl lg:text-6xl font-semibold text-white mb-3 lg:mb-4 leading-[1.12]" style={{ textShadow: "0 2px 16px rgba(0,0,0,0.65)" }}>
+                <h1 className="font-playfair text-[1.75rem] sm:text-4xl md:text-5xl lg:text-6xl font-semibold text-white mb-4 leading-[1.12]" style={{ textShadow: "0 2px 16px rgba(0,0,0,0.65)" }}>
                   {h1Rest}{" "}<span style={{ color: "#D4AF37" }}>{h1Gold}</span>
                 </h1>
 
-                <p className="text-sm sm:text-base md:text-lg text-white/70 leading-relaxed mb-4 lg:mb-6 max-w-lg line-clamp-2">
+                <p className="text-sm sm:text-base md:text-lg text-white/70 leading-relaxed mb-6 max-w-lg line-clamp-2">
                   {data.intro.match(/^[^.?]*[.?]/)?.[0] ?? data.intro}
                 </p>
 
+                <div className="mb-6">
+                  <TrustRatingBadge variant="mapsLinkClients" />
+                </div>
 
                 <SofaLeadActions city="a sua zona" price={servicePrice} href={waHref} source={`problem_hero_${slug}`} />
               </div>
@@ -178,111 +166,73 @@ const ProblemPage = () => {
           </div>
         </section>
 
-        <ServiceSnapshotStats stats={snapshotStats} />
-        </div>
+        <ServicePriceSection serviceSlug={data.relatedServices[0]} />
 
-        {/* ═══ QUANDO CHAMAR + PROCESSO — fundidas, fundo verde único ═══ */}
         <section className="py-14 md:py-20 bg-kyro-green">
           <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
-            <SectionHeader overline="Quando Agir" heading="Quando chamar um" goldWord="profissional" light={false} />
-            <div className="grid sm:grid-cols-2 gap-px mb-16 md:mb-20" style={{ backgroundColor: "rgba(255,255,255,0.08)" }}>
-              {WHEN_TO_CALL.map((sign, idx) => (
-                <div key={idx} className="relative overflow-hidden flex items-start gap-3.5 p-5 md:p-6" style={{ backgroundColor: "#0d241b", borderTop: "2px solid rgba(212,175,55,0.55)" }}>
-                  <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0" style={{ backgroundColor: "rgba(212,175,55,0.12)", border: "1px solid rgba(212,175,55,0.3)" }}>
-                    <AlertTriangle className="w-4 h-4" style={{ color: "#D4AF37" }} />
-                  </div>
-                  <span className="text-sm text-white/75 leading-relaxed pt-1.5">{sign}</span>
-                </div>
-              ))}
-            </div>
-
-            <SectionHeader overline="Processo" heading="Como tratamos este" goldWord="problema" light={false} />
-            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-px" style={{ backgroundColor: "rgba(255,255,255,0.08)" }}>
-              {PROCESS_STEPS.map((step, idx) => (
-                <div key={idx} className="relative overflow-hidden p-5 md:p-6" style={{ backgroundColor: "#0d241b", borderTop: "2px solid rgba(212,175,55,0.55)" }}>
-                  <span
-                    className="absolute bottom-2 right-3 font-playfair font-bold leading-none select-none pointer-events-none"
-                    style={{ fontSize: "5rem", color: "rgba(212,175,55,0.08)" }}
-                  >
-                    {String(idx + 1).padStart(2, "0")}
+            <SectionHeader overline="Avaliação" heading="O que temos em" goldWord="conta" light={false} />
+            <div className="grid grid-cols-2 gap-px" style={{ backgroundColor: "rgba(255,255,255,0.08)" }}>
+              {layout.characteristics.map((item, i) => (
+                <div key={item} className="relative overflow-hidden flex items-start gap-3 p-6 md:p-7" style={{ backgroundColor: "#0d241b", borderTop: "2px solid rgba(212,175,55,0.55)" }}>
+                  <span className="font-playfair font-bold flex-shrink-0 leading-none" style={{ fontSize: "1.75rem", color: "rgba(212,175,55,0.4)" }}>
+                    {String(i + 1).padStart(2, "0")}
                   </span>
-                  <p className="relative text-sm font-semibold text-white mb-1.5">{step.title}</p>
-                  <p className="relative text-sm text-white/55 leading-relaxed">{step.body}</p>
+                  <span className="text-sm text-white/65 leading-relaxed pt-1">{item}</span>
                 </div>
               ))}
             </div>
           </div>
         </section>
-
-        {/* ═══ BENEFÍCIOS ═══ */}
-        <section className="py-14 md:py-20 bg-[#FDFDF9]">
-          <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
-            <SectionHeader overline="Vantagens" heading="O que muda depois da nossa" goldWord="intervenção" light={true} />
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-px" style={{ backgroundColor: "#E8E4DE" }}>
-              {data.benefits.map((benefit, idx) => (
-                <div key={idx} className="relative overflow-hidden flex items-start gap-3 p-6 md:p-7 bg-white" style={{ borderTop: "2px solid #D4AF37" }}>
-                  <span
-                    className="absolute bottom-2 right-3 font-playfair font-bold leading-none select-none pointer-events-none"
-                    style={{ fontSize: "5rem", color: "rgba(212,175,55,0.1)" }}
-                  >
-                    {String(idx + 1).padStart(2, "0")}
-                  </span>
-                  <span className="relative text-sm text-[#111111]/65 leading-relaxed">{benefit}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* ═══ DICA DE ESPECIALISTA ═══ */}
-        {categoryTips && (
-          <section className="py-14 md:py-20 bg-kyro-green">
-            <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
-              <SectionHeader overline="Dica de Especialista" heading={splitTipsHeading(categoryTips.title).heading} goldWord={splitTipsHeading(categoryTips.title).goldWord} light={false} />
-              <div className="max-w-2xl">
-                <ol className="space-y-4 mb-8">
-                  {categoryTips.steps.map((step, i) => (
-                    <li key={i} className="flex items-start gap-4">
-                      <span className="font-black text-xs w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5" style={{ backgroundColor: "rgba(212,175,55,0.18)", color: "#D4AF37" }}>
-                        {i + 1}
-                      </span>
-                      <p className="text-sm text-white/70 leading-relaxed">{step}</p>
-                    </li>
-                  ))}
-                </ol>
-                <div className="flex items-start gap-3 p-4" style={{ backgroundColor: "rgba(212,175,55,0.05)", border: "1px solid rgba(212,175,55,0.2)" }}>
-                  <AlertTriangle className="w-4 h-4 flex-shrink-0 mt-0.5" style={{ color: "#D4AF37" }} />
-                  <p className="text-xs text-white/50 leading-relaxed">{categoryTips.warning}</p>
-                </div>
-              </div>
-            </div>
-          </section>
-        )}
 
         {/* ═══ GALERIA ILUSTRATIVA (o antes/depois já está no hero) ═══ */}
         {gallery && (
           <ServiceAutoCarousel
             comparison={false}
-            overline="Resultados Reais"
-            heading="Antes e depois da intervenção"
-            subtitle="Transformações visíveis no próprio dia. Sem químicos agressivos, sem esperas."
+            overline="O serviço"
+            heading="Cuidados com os seus estofos"
+            subtitle="Conheça o serviço. A intervenção é adaptada ao artigo e ao seu estado."
             slides={getIllustrativePhotos(data.relatedServices[0], slug ?? "")}
             variant="light"
           />
         )}
 
+        <section className="py-14 md:py-20 bg-kyro-green">
+          <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
+            <SectionHeader overline="Processo" heading="Como tratamos este" goldWord="problema" light={false} />
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-px" style={{ backgroundColor: "rgba(255,255,255,0.08)" }}>
+              {[0, 1].map(col => (
+                <div key={col} className="grid gap-px" style={{ backgroundColor: "rgba(255,255,255,0.08)" }}>
+                  {layout.process.slice(col * 2, col * 2 + 2).map((step, idx) => (
+                    <div key={step.title} className="relative overflow-hidden flex items-start gap-4 p-5 md:p-6" style={{ backgroundColor: "#0d241b", borderTop: "2px solid rgba(212,175,55,0.55)" }}>
+                      <span className="font-playfair font-bold flex-shrink-0 leading-none" style={{ fontSize: "1.5rem", color: "#D4AF37" }}>
+                        {String(col * 2 + idx + 1).padStart(2, "0")}
+                      </span>
+                      <p className="text-sm text-white/70 leading-relaxed pt-1"><strong className="font-semibold">{step.title}.</strong> {step.description}</p>
+                    </div>
+                  ))}
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
         {/* ═══ FAQ ═══ */}
         {data.faqs.length > 0 && (
-          <ServiceFAQ faqs={data.faqs} heading={`Perguntas sobre ${data.h1.toLowerCase()}`} variant="dark" />
+          <ServiceFAQ faqs={layout.faqs} heading={`Perguntas sobre ${data.h1.toLowerCase()}`} variant="dark" />
         )}
 
         {/* ═══ AVALIAÇÕES REAIS ═══ */}
-        <section className="py-14 md:py-20 bg-[#FDFDF9]">
+        <section className="py-14 md:py-20 bg-kyro-green">
           <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
-            <SectionHeader overline="Avaliações Reais" heading="O que dizem os nossos" goldWord="clientes" subtitle="Nas palavras de quem já nos recebeu em casa." light={true} />
+            <SectionHeader overline="Avaliações Reais" heading="O que dizem os nossos" goldWord="clientes" subtitle="Nas palavras de quem já nos recebeu em casa." light={false} />
             <ServiceReviewsGrid serviceSlug={data.relatedServices[0]} seed={data.slug} heading="" />
           </div>
         </section>
+
+        <ServicePackBanner
+          packSlugs={SERVICE_PACK_SLUGS[data.relatedServices[0]] ?? ["pack-sala-completa"]}
+          variant="light"
+        />
 
         {/* ═══ REDE INTERNA ═══ */}
         <section className="py-14 md:py-20 bg-[#FDFDF9]">

@@ -1,3 +1,7 @@
+## Base visual das páginas de problemas (13/09/2026)
+
+`ProblemPage` (rotas `/problemas/:slug`) passa a seguir a base de `MaterialPage`: hero, `ServicePriceSection`, quatro cartões de avaliação, galeria, processo em linhas numeradas, quatro FAQ, avaliações, `ServicePackBanner` e diretório. Retirados os indicadores antigos e os blocos separados de vantagens/dicas. `problemLayout.ts` fornece os cartões, processo e quatro FAQ ao React e ao prerender, que inclui FAQPage. Mantêm-se os títulos, imagens e destinos específicos. `ProblemCityPage` e as páginas de materiais não foram alteradas. Esta é a base para a próxima revisão visual/editorial dos problemas.
+
 ## Expansão editorial das landing pages (13/09/2026)
 
 Etapa 3 substitui as contagens iniciais abaixo: 180 perguntas distintas, 40 candidatas por serviço (12 comuns + 28 específicas). `landingFaqExpansion.ts` acrescenta 16 por serviço. `landingFaqPool.ts` filtra perguntas marcadas com `article` nas variantes de impermeabilização de sofá/cadeiras antes da seleção estável. Mantém exatamente quatro perguntas, uma por assunto e pelo menos duas específicas. Os testes verificam que todas as 180 são utilizadas no inventário real.

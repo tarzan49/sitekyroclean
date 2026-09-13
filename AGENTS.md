@@ -155,3 +155,8 @@ Os cartões partilhados de avaliações (`CustomerReviewCard`, usados por `Custo
 ## Faixa de indicadores dos serviços (13/09/2026)
 
 Nas páginas de localidades, freguesias, variantes, marcas e preços, a faixa `ServiceSnapshotStats` apresenta apenas avaliações, resposta e secagem (ou ativação da proteção), nesta ordem e numa única linha também em mobile. Retirar o preço repetido desta faixa, preservando-o no hero e na tabela. Estrela da avaliação sempre dourada `#D4AF37`. Esta decisão substitui a grelha mobile 2×2 proposta anteriormente.
+
+
+## Base visual de problemas (13/09/2026)
+
+Pedido do responsável: usar o layout das páginas de materiais como ponto de partida para `/problemas/:slug`. Hero, orçamento, quatro cartões, galeria, processo, quatro FAQ, avaliações, packs e diretório. `problemLayout.ts` partilha conteúdo com o prerender. A revisão específica dos conteúdos continua separada; não repor os antigos blocos de indicadores, vantagens e dicas nesta base sem pedido. Variantes por cidade permanecem separadas.

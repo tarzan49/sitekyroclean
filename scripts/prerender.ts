@@ -28,6 +28,7 @@ import { getLocationServiceData, getAllLocationRoutes, services, cities } from '
 import { getAllFreguesiaRoutes, getFreguesia, generateFreguesiaContent } from '../src/data/freguesiaSeoData';
 import { getAllKeywordVariantRoutes, getKeywordVariantData } from '../src/data/keywordVariantData';
 import { getAllProblems, getProblemBySlug } from '../src/data/problemSeoData';
+import { getProblemLayout } from '../src/data/problemLayout';
 import { getAllProblemCityRoutes } from '../src/data/problemCitySeoData';
 import { getAllMaterials, getAllMaterialCityRoutes, getMaterialCityData } from '../src/data/materialSeoData';
 import { getAllPriceRoutes, getPricePageData } from '../src/data/priceSeoData';
@@ -382,11 +383,13 @@ export function prerenderRoutes(outDir: string): number {
   {
     const prev = count;
     for (const p of getAllProblems()) {
+      const layout = getProblemLayout(p);
       emit(
         `/problemas/${p.slug}`,
         p.title,
         p.metaDescription,
-        { h1: p.h1 ?? p.title, intro: p.intro, localSection: p.problemDetail, howItWorks: p.solutionDetail, benefits: p.benefits, faqs: p.faqs },
+        { h1: p.h1 ?? p.title, intro: p.intro.match(/^[^.?]*[.?]/)?.[0] ?? p.intro, problems: layout.characteristics.map(description => ({ title: "O que temos em conta", description })), processSteps: layout.process.map((step, index) => ({ step: index + 1, ...step })), faqs: layout.faqs },
+        [buildFaqSchema(layout.faqs)],
       );
     }
     console.log(`  Problem pages:           ${count - prev}`);
