@@ -3,7 +3,7 @@ import SofaLeadActions from "@/components/SofaLeadActions";
 import { useMemo, useEffect } from "react";
 import { useLocation, Link } from "react-router-dom";
 import { QuizLocationProvider, QuizServiceProvider } from "@/context/QuizLocationContext";
-import { XCircle, CheckCircle2, ArrowRight, Search, Droplets, Wind, ShieldCheck, Star, Euro, Clock, Timer } from "lucide-react";
+import { XCircle, CheckCircle2, ArrowRight, Search, Droplets, Wind, ShieldCheck, Star, Clock, Timer } from "lucide-react";
 import { GoogleG } from "@/components/icons/GoogleG";
 import Header from "@/components/Header";
 import PageBreadcrumb from "@/components/PageBreadcrumb";
@@ -81,9 +81,8 @@ const MarcaCadeirasPage = () => {
   const serviceDuration = SERVICE_DURATION['limpeza-cadeiras'];
   const snapshotStats = [
     { value: `${REVIEW_RATING}★`, label: `+${REVIEW_COUNT} avaliações Google`, icon: GoogleG },
-    { value: `${minPriceLabel}€`, label: `Desde, ${prep} ${city.name}`, icon: Euro },
-    { value: serviceDuration.value, label: serviceDuration.label, icon: Timer },
     { value: "<10min", label: "Respondemos em menos de 10 minutos", icon: Clock },
+    { value: serviceDuration.value, label: serviceDuration.label, icon: Timer },
   ];
 
   const jsonLd = {

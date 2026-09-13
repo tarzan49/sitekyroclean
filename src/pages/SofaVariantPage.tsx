@@ -1,7 +1,7 @@
 import DirectoryGroup from "@/components/DirectoryGroup";
 import SofaLeadActions from "@/components/SofaLeadActions";
 import { AdsLandingHeader, AdsLandingFooter, isAdsVisit } from "@/components/AdsLandingNavigation";
-﻿// Handles all keyword variant pages:
+// Handles all keyword variant pages:
 // /higienizacao-[service]-[city-or-parish]
 // /lavagem-[service]-[city-or-parish]
 // Each page is self-canonical and independently indexable.
@@ -9,7 +9,7 @@ import { AdsLandingHeader, AdsLandingFooter, isAdsVisit } from "@/components/Ads
 import { useEffect, useMemo } from "react";
 import { useLocation, Link } from "react-router-dom";
 import { QuizLocationProvider, QuizServiceProvider } from "@/context/QuizLocationContext";
-import { CheckCircle, Star, MapPin, Euro, Clock, Timer } from "lucide-react";
+import { CheckCircle, Star, MapPin, Clock, Timer } from "lucide-react";
 import { GoogleG } from "@/components/icons/GoogleG";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -260,11 +260,8 @@ const SofaVariantPage = () => {
   // Resposta alinhada com o orçamento: menos de 10 minutos no horário de atendimento.
   const snapshotStats = [
     { value: `${REVIEW_RATING}★`, label: `+${REVIEW_COUNT} avaliações Google`, icon: GoogleG },
-    (data.serviceKey === 'tapetes' || data.serviceKey === 'alcatifas')
-      ? { value: "Á Medida", label: `Orçamento, ${prep} ${data.locationName.split(',')[0].trim()}`, icon: Euro }
-      : { value: data.priceFrom, label: `Desde, ${prep} ${data.locationName.split(',')[0].trim()}`, icon: Euro },
-    { value: serviceDuration.value, label: serviceDuration.label, icon: Timer },
     { value: "<10min", label: "Resposta durante o horário de atendimento", icon: Clock },
+    { value: serviceDuration.value, label: serviceDuration.label, icon: Timer },
   ];
 
   return (

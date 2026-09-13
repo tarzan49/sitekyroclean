@@ -7,7 +7,7 @@ import SofaLeadActions from "@/components/SofaLeadActions";
 import { AdsLandingHeader, AdsLandingFooter, isAdsVisit } from "@/components/AdsLandingNavigation";
 import { useEffect, useMemo } from "react";
 import { useLocation, Link } from "react-router-dom";
-import { MapPin, Star, ArrowRight, Euro, Clock, Timer } from "lucide-react";
+import { MapPin, Star, ArrowRight, Clock, Timer } from "lucide-react";
 import { GoogleG } from "@/components/icons/GoogleG";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -156,11 +156,8 @@ const LocationServicePage = () => {
   // Resposta alinhada com o orçamento: menos de 10 minutos no horário de atendimento.
   const snapshotStats = [
     { value: `${REVIEW_RATING}★`, label: `+${REVIEW_COUNT} avaliações Google`, icon: GoogleG },
-    (data.serviceSlug === 'limpeza-tapetes' || data.serviceSlug === 'limpeza-alcatifas')
-      ? { value: "Á Medida", label: `Orçamento, ${cityPrep} ${data.city}`, icon: Euro }
-      : { value: data.priceFrom, label: `Desde, ${cityPrep} ${data.city}`, icon: Euro },
-    { value: serviceDuration.value, label: serviceDuration.label, icon: Timer },
     { value: "<10min", label: "Resposta durante o horário de atendimento", icon: Clock },
+    { value: serviceDuration.value, label: serviceDuration.label, icon: Timer },
   ];
 
 

@@ -5,7 +5,7 @@ import SofaLeadActions from "@/components/SofaLeadActions";
 import { useEffect, useMemo } from "react";
 import { useLocation, Link } from "react-router-dom";
 import { QuizLocationProvider, QuizServiceProvider } from "@/context/QuizLocationContext";
-import { MapPin, Star, ArrowRight, Clock, Euro, Timer } from "lucide-react";
+import { MapPin, Star, ArrowRight, Clock, Timer } from "lucide-react";
 import { GoogleG } from "@/components/icons/GoogleG";
 import Header from "@/components/Header";
 import PageBreadcrumb from "@/components/PageBreadcrumb";
@@ -121,11 +121,8 @@ const PricePage = () => {
 
   const snapshotStats = [
     { value: `${REVIEW_RATING}★`, label: `+${REVIEW_COUNT} avaliações Google`, icon: GoogleG },
-    (data.serviceSlug === 'limpeza-tapetes' || data.serviceSlug === 'limpeza-alcatifas')
-      ? { value: "Á Medida", label: `Orçamento, em ${data.cityName}`, icon: Euro }
-      : { value: servicePrice, label: `Desde, em ${data.cityName}`, icon: Euro },
-    { value: serviceDuration.value, label: serviceDuration.label, icon: Timer },
     { value: "<10min", label: "Respondemos em menos de 10 minutos", icon: Clock },
+    { value: serviceDuration.value, label: serviceDuration.label, icon: Timer },
   ];
 
   return (

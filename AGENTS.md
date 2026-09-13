@@ -131,3 +131,7 @@ Peso dos títulos do site (13/09/2026): manter H1 como aprovado; títulos secund
 ## Avaliações compactas no mobile (13/09/2026)
 
 Os cartões partilhados de avaliações (`CustomerReviewCard`, usados por `CustomerReviews` na homepage e páginas de serviços/localidades) têm altura uniforme de 340px abaixo de 640px, texto de 18px com até seis linhas e abertura da transcrição integral num diálogo acessível quando necessário. O carrossel deixou de ajustar a altura à avaliação selecionada. Preservar as transcrições e a apresentação desktop.
+
+## Faixa de indicadores dos serviços (13/09/2026)
+
+Nas páginas de localidades, freguesias, variantes, marcas e preços, a faixa `ServiceSnapshotStats` apresenta apenas avaliações, resposta e secagem (ou ativação da proteção), nesta ordem e numa única linha também em mobile. Retirar o preço repetido desta faixa, preservando-o no hero e na tabela. Estrela da avaliação sempre dourada `#D4AF37`. Esta decisão substitui a grelha mobile 2×2 proposta anteriormente.
