@@ -2,6 +2,7 @@ import { createRoot } from "react-dom/client";
 import { StrictMode } from "react";
 import App from "./App.tsx";
 import "./index.css";
+import "./styles/typography.css";
 import { initErrorTracking } from "./lib/errorTracking";
 import { restoreConsent } from "./lib/consent";
 

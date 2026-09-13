@@ -1,3 +1,7 @@
+## Tipografia integrada (13/09/2026)
+
+A configuração Avenir Next do ramo principal está integrada neste ramo: `main.tsx` importa `styles/typography.css`; CSS base e aliases Tailwind usam `--font-kyro`; `index.html` pré-carrega regular e demi. Ficheiros WOFF2 servidos localmente.
+
 ## Confiança na homepage (13/09/2026)
 
 `HomeHeroTrust` reúne serviços realizados e avaliações Google numa faixa transparente responsiva, reutilizada no mobile e desktop de `HeroV1`. Usa `SERVICES_COMPLETED_LABEL`, `REVIEW_RATING` e `REVIEW_COUNT` de `business.ts`. Contagem atual: 110+ avaliações, 4.9, +1200 serviços. Os dados SEO ingleses e de problemas importam REVIEW_COUNT por caminho relativo, compatível com os geradores.

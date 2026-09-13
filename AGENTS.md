@@ -120,3 +120,7 @@ Revisão visual (13/09/2026): o mobile usa agora uma fotografia vertical prolong
 ## Avaliações e confiança na homepage (13/09/2026)
 
 Responsável confirmou 110+ avaliações Google, nota 4.9. REVIEW_COUNT é 110 e SERVICES_COMPLETED_LABEL é +1200 (serviços, não clientes). HomeHeroTrust reúne serviços e avaliações numa faixa transparente, com símbolo Google e estrelas, legendas abaixo para legibilidade. Substitui a antiga linha simples mobile e os dois indicadores separados desktop. Conteúdo inglês e schemas usam a contagem atual; não alterar transcrições reais.
+
+## Fonte atual (13/09/2026)
+
+Avenir Next é a fonte do site, incluindo toda a homepage. Usar `src/styles/typography.css`, `--font-kyro` e as faces web em `public/fonts/avenir-next/`, integradas do ramo principal. O alias legado `font-playfair` também resolve para Avenir. Não repor Cormorant/Inter na homepage.
