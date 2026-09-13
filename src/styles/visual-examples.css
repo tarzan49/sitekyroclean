@@ -1,0 +1,7 @@
+/* Gallery captions sit on the page, independent of the dark problem-card theme. */
+[data-visual-gallery] figure[data-problem-id] {
+  background: transparent !important;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}

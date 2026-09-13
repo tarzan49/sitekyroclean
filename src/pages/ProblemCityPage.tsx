@@ -1,3 +1,6 @@
+import ProblemExamplesGallery from "@/components/ProblemExamplesGallery";
+import ProblemTreatmentGuide from "@/components/ProblemTreatmentGuide";
+import { getProblemLayout } from "@/data/problemLayout";
 import DirectoryGroup from "@/components/DirectoryGroup";
 import ProblemHero from "@/components/ProblemHero";
 import { getProblemHero } from "@/data/problemHero";
@@ -23,14 +26,6 @@ import { METRO_CITY_SLUGS } from "@/constants/metroCities";
 import { getAllProblemCityRoutes } from "@/data/problemCitySeoData";
 import { SITE_URL } from "@/constants/business";
 import ServiceReviewsGrid from "@/components/ServiceReviewsGrid";
-
-const PROCESS_STEPS = [
-  { title: "Identificação do tecido", body: "Avaliamos o tipo de material e a extensão do problema antes de aplicar qualquer produto ou equipamento." },
-  { title: "Pulverização",            body: "Aplicação de solução específica, adequada ao tecido identificado e ao problema a tratar." },
-  { title: "Escovação",               body: "Escovagem para distribuir o produto e soltar a sujidade nas fibras, preparando para a extração." },
-  { title: "Extração",                body: "Extração profissional a alta temperatura remove resíduos e sujidade das camadas mais profundas das fibras." },
-];
-
 
 const ProblemCityPage = () => {
   const { pathname } = useLocation();
@@ -124,26 +119,9 @@ const ProblemCityPage = () => {
           </div>
         </section>
 
-        {/* ═══ PROCESSO — timeline horizontal ligada por linha ═══ */}
-        <section className="py-14 md:py-20 bg-kyro-green">
-          <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
-            <SectionHeader overline="Processo" heading="Como tratamos este problema" goldWord={city.name} light={false} />
-            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-px" style={{ backgroundColor: "rgba(255,255,255,0.08)" }}>
-              {PROCESS_STEPS.map((step, idx) => (
-                <div key={idx} className="relative overflow-hidden p-5 md:p-6" style={{ backgroundColor: "#0d241b", borderTop: "2px solid rgba(212,175,55,0.55)" }}>
-                  <span
-                    className="absolute bottom-2 right-3 font-playfair font-bold leading-none select-none pointer-events-none"
-                    style={{ fontSize: "5rem", color: "rgba(212,175,55,0.08)" }}
-                  >
-                    {String(idx + 1).padStart(2, "0")}
-                  </span>
-                  <p className="relative text-sm font-semibold text-white mb-1.5">{step.title}</p>
-                  <p className="relative text-sm text-white/55 leading-relaxed">{step.body}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
+        <ProblemExamplesGallery key={`examples-${problem.slug}`} problem={problem} />
+
+        <ProblemTreatmentGuide key={problem.slug} guide={getProblemLayout(problem).processGuide} slug={problem.slug} />
 
         {/* ═══ BENEFÍCIOS ═══ */}
         <section className="py-14 md:py-20 bg-[#FDFDF9]">

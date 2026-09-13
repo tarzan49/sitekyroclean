@@ -1,0 +1,38 @@
+{
+  "tool": "built-in image_gen",
+  "date": "2026-09-13",
+  "images": [
+    {
+      "path": "public/images/problem-examples/sofa-stain.webp",
+      "prompt": "Create ONE premium photorealistic square editorial image for a Portuguese upholstery care website, 1024x1024 or higher. Close editorial photograph of a warm ivory woven sofa seat with a modest dried coffee ring and a few small brown splash marks, ceramic coffee cup on a side table at the edge. Show real woven fiber detail and a natural lived-in Portuguese apartment. No split screen. Consistent art direction: warm neutral natural colors, soft daylight, honest realistic scale, restrained styling, sophisticated magazine photography, strong focal subject centered within middle 65 percent for small square gallery cards. Full bleed single photo. No text, lettering, watermarks, logos, borders, collages, cartoon effects, glowing particles, medical claims or exaggerated dirt. This is an illustrative example, not a documented customer job."
+    },
+    {
+      "path": "public/images/problem-examples/sofa-fibers.webp",
+      "prompt": "Create ONE premium photorealistic square editorial image for a Portuguese upholstery care website, 1024x1024 or higher. Macro editorial photograph of a grey blue woven sofa seam and cushion gap with a few visible crumbs, dust and lint caught between the fibers. Beautiful directional window light, tactile textile detail. No microscopic organisms, no inset diagrams. Consistent art direction: warm neutral natural colors, soft daylight, honest realistic scale, restrained styling, sophisticated magazine photography, strong focal subject centered within middle 65 percent for small square gallery cards. Full bleed single photo. No text, lettering, watermarks, logos, borders, collages, cartoon effects, glowing particles, medical claims or exaggerated dirt. This is an illustrative example, not a documented customer job."
+    },
+    {
+      "path": "public/images/problem-examples/sofa-pets.webp",
+      "prompt": "Create ONE premium photorealistic square editorial image for a Portuguese upholstery care website, 1024x1024 or higher. Editorial photograph of the arm and cushion of an olive fabric sofa with a few naturally shed golden dog hairs visible in side light, a calm golden dog resting softly out of focus in the background. No colored vapor or smell graphics. Consistent art direction: warm neutral natural colors, soft daylight, honest realistic scale, restrained styling, sophisticated magazine photography, strong focal subject centered within middle 65 percent for small square gallery cards. Full bleed single photo. No text, lettering, watermarks, logos, borders, collages, cartoon effects, glowing particles, medical claims or exaggerated dirt. This is an illustrative example, not a documented customer job."
+    },
+    {
+      "path": "public/images/problem-examples/sofa-wear.webp",
+      "prompt": "Create ONE premium photorealistic square editorial image for a Portuguese upholstery care website, 1024x1024 or higher. Macro editorial photograph of a taupe textured sofa arm showing gentle pilling and everyday wear along the curved edge, fine threads clearly visible, softly blurred elegant neutral living room behind. Not ripped, not a before after comparison. Consistent art direction: warm neutral natural colors, soft daylight, honest realistic scale, restrained styling, sophisticated magazine photography, strong focal subject centered within middle 65 percent for small square gallery cards. Full bleed single photo. No text, lettering, watermarks, logos, borders, collages, cartoon effects, glowing particles, medical claims or exaggerated dirt. This is an illustrative example, not a documented customer job."
+    },
+    {
+      "path": "public/images/problem-treatments/sofa-inspect.webp",
+      "prompt": "Create one square full bleed premium editorial photograph, natural warm daylight, realistic subtle texture, calm neutral colors, clean uncluttered composition centered for mobile use. A professional's hands wearing fitted dark gloves gently pressing a clean white testing cloth onto a discreet seam of a light beige woven sofa. Close-up, small stain visible nearby, realistic hands and intact upholstery. For an illustrative upholstery cleaning process guide. Single photograph, no collage, no text, no logo, no watermark, no diagrams, no inset, no artificial green effects. Save high resolution."
+    },
+    {
+      "path": "public/images/problem-treatments/sofa-apply.webp",
+      "prompt": "Create one square full bleed premium editorial photograph, natural warm daylight, realistic subtle texture, calm neutral colors, clean uncluttered composition centered for mobile use. A professional's dark gloved hand applying a small controlled amount of textile cleaning solution from an unbranded plain spray bottle onto a small brown stain on a beige woven sofa cushion. No visible cloud of spray, no foam blanket, no chemical label. For an illustrative upholstery cleaning process guide. Single photograph, no collage, no text, no logo, no watermark, no diagrams, no inset, no artificial green effects. Save high resolution."
+    },
+    {
+      "path": "public/images/problem-treatments/sofa-extract.webp",
+      "prompt": "Create one square full bleed premium editorial photograph, natural warm daylight, realistic subtle texture, calm neutral colors, clean uncluttered composition centered for mobile use. Close-up of a professional upholstery extractor with realistic transparent triangular extraction nozzle lying flush against a beige woven sofa seat. A single dark-gloved hand holds its handle. Realistic equipment, controlled moisture, no dramatic before-after clean stripe. For an illustrative upholstery cleaning process guide. Single photograph, no collage, no text, no logo, no watermark, no diagrams, no inset, no artificial green effects. Save high resolution."
+    },
+    {
+      "path": "public/images/problem-treatments/sofa-dry.webp",
+      "prompt": "Create one square full bleed premium editorial photograph, natural warm daylight, realistic subtle texture, calm neutral colors, clean uncluttered composition centered for mobile use. A pale beige woven sofa with cushions upright and separated for ventilation in a daylight living room beside an open window, simple neutral setting, no human, no equipment, no text. For an illustrative upholstery cleaning process guide. Single photograph, no collage, no text, no logo, no watermark, no diagrams, no inset, no artificial green effects. Save high resolution."
+    }
+  ]
+}

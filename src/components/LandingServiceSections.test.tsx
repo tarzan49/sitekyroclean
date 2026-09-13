@@ -85,7 +85,8 @@ describe('landing section integration', () => {
     for (const { route, serviceSlug, ...expected } of cases) {
       render(<MemoryRouter initialEntries={[route]}><LandingServiceSections /></MemoryRouter>);
       expect(JSON.parse(screen.getByTestId('widget').textContent!)).toEqual({ initialLocation: 'Porto', serviceSlug });
-      fireEvent.click(screen.getAllByRole('button', { name: /^Pedir avaliação:/ })[0]);
+      fireEvent.click(screen.getAllByRole('button', { name: /^Ampliar imagem:/ })[0]);
+      fireEvent.click(screen.getByRole('button', { name: /^Pedir avaliação:/ }));
       expect(JSON.parse(screen.getByTestId('quiz').textContent!)).toMatchObject({ initialLocation: 'Porto', ...expected });
       cleanup();
     }

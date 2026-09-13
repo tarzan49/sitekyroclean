@@ -143,7 +143,7 @@ interface PageContent {
   h1: string;
   intro: string;
   localSection?: string;
-  problems?: { title: string; description: string }[];
+  problems?: { title: string; description: string; image?: { src: string; alt: string } }[];
   howItWorks?: string;
   benefits?: string[];
   materialExamples?: MaterialExamples;
@@ -167,7 +167,7 @@ function generatePageBody(c: PageContent, lang: 'pt' | 'en' = 'pt'): string {
   if (c.problems?.length) {
     html += `<section>\n`;
     for (const p of c.problems) {
-      html += `<div><h2>${escHtml(p.title)}</h2><p>${escHtml(p.description)}</p></div>\n`;
+      html += `<div>${p.image ? `<img src="${escHtml(p.image.src)}" alt="${escHtml(p.image.alt)}" loading="lazy" decoding="async">` : ""}<h2>${escHtml(p.title)}</h2><p>${escHtml(p.description)}</p></div>\n`;
     }
     html += `</section>\n`;
   }
@@ -410,7 +410,7 @@ export function prerenderRoutes(outDir: string): number {
         `/problemas/${p.slug}`,
         p.title,
         p.metaDescription,
-        { hero, h1: hero.heading, intro: hero.intro, problems: layout.examples.map(example => ({ title: example.title, description: "Exemplo ilustrativo." })), processSteps: layout.process.map((step, index) => ({ step: index + 1, ...step })), faqs: layout.faqs },
+        { hero, h1: hero.heading, intro: hero.intro, problems: layout.examples.map(example => ({ title: example.title, description: "Imagem ilustrativa.", image: example.image })), processSteps: layout.process.map((step, index) => ({ step: index + 1, ...step })), faqs: layout.faqs },
         [buildFaqSchema(layout.faqs)],
       );
     }
@@ -438,7 +438,7 @@ export function prerenderRoutes(outDir: string): number {
         route.path,
         title,
         desc,
-        { hero, h1: hero.heading, intro: hero.intro, localSection: desc, howItWorks: problem.solutionDetail, benefits: problem.benefits, faqs: problem.faqs },
+        { hero, h1: hero.heading, intro: hero.intro, localSection: desc, problems: getProblemLayout(problem).examples.map(example => ({ title: example.title, description: "Imagem ilustrativa.", image: example.image })), processSteps: getProblemLayout(problem).process.map((step, index) => ({ step: index + 1, ...step })), benefits: problem.benefits, faqs: problem.faqs },
         schemas,
       );
     }

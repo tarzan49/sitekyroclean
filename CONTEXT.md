@@ -1,3 +1,7 @@
+## Galerias ampliáveis e tratamentos por problema (13/09/2026)
+
+`VisualExamplesGallery` é agora usado nas quatro famílias de `LandingServiceSections`, além de materiais e problemas. Quatro imagens em 2×2 no mobile; descrição e pedido de avaliação no diálogo, conservando serviço e município. `ProblemExamplesGallery` liga problemas à biblioteca visual por serviço. `problemTreatmentGuides.ts` contém perfis explícitos por problema; `ProblemTreatmentGuide` substitui o guia genérico nas páginas nacionais e locais por quatro etapas expansíveis. Prerender usa os mesmos textos e exemplos. Imagens novas locais reutilizadas, ficheiros antigos preservados, download discreto sem duplicar imagens. Detalhes, prompts e limites em `docs/problem-visual-refresh/README.md`.
+
 ## Estrutura partilhada dos heroes (13/09/2026)
 
 `CommercialHero` centraliza a composição dos serviços nacionais, materiais, problemas nacionais/locais, localidades, freguesias, preços, variantes e marcas. Ordem mobile obrigatória: breadcrumb em Avenir Next, H1, subtítulo curto, WhatsApp, «Ver preços», comparação antes/depois e três indicadores (avaliações, resposta, secagem ou ativação da proteção). Materiais passam também a incluir os indicadores. `ServiceHero` e `ProblemHero` são adaptadores. `ServicePriceSection` fornece o destino `#precos`. A escolha/revisão da fotografia de fundo fica adiada por pedido do responsável; as imagens existentes são reutilizadas provisoriamente.

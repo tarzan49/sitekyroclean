@@ -1,3 +1,7 @@
+## Exemplos e tratamentos dos problemas (13/09/2026)
+
+Usar a grelha de quatro exemplos com ampliação também em localidades, freguesias, preços e variantes, partilhando `VisualExamplesGallery`. Tratamentos das páginas de problemas têm avaliação, ação e limites próprios por problema em `problemTreatmentGuides.ts`, partilhados com o HTML inicial. Não inventar métodos diferentes por cidade ou por sinónimo. Etapas com imagens guardadas uma vez no site, ficheiros antigos preservados e opção discreta de guardar. Materiais conservam exemplos específicos do revestimento.
+
 ## Estrutura obrigatória dos heroes (13/09/2026, revisão mais recente)
 
 Pedido do responsável: breadcrumb na fonte Avenir Next, título, subtítulo curto de apoio, WhatsApp principal, «Ver preços» por baixo, antes/depois imediatamente a seguir e faixa com avaliações, resposta e secagem (ou informação adequada à proteção). Usar `CommercialHero` nas famílias comerciais, incluindo materiais e problemas, sem duplicar a estrutura. A revisão da imagem de fundo foi adiada explicitamente; reutilizar os fundos existentes por agora. Esta decisão substitui as composições anteriores dos problemas. A homepage está excluída: mantém HeroV1 e a composição própria aprovada. Manter previews exclusivamente mobile.

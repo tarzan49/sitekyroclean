@@ -1,7 +1,7 @@
+import { getProblemTreatmentGuide } from './problemTreatmentGuides';
+import { selectLandingProblemImage } from './landingProblemImages';
 import { getLandingProblems } from './landingServiceCopy';
 import type { LandingService } from './landingFaqPool';
-import { MATERIAL_PROCESS_GUIDES } from './materialProcessGuides';
-import { SERVICE_PROCESS_GUIDES, type ProcessServiceSlug } from './serviceProcessGuides';
 import type { ProblemPage } from './problemSeoData';
 import { PRICE_PROMISE, RESPONSE_PROMISE, SATISFACTION_PROMISE } from '../constants/commercialPolicy';
 
@@ -19,11 +19,16 @@ export function getProblemLayout(problem: ProblemPage) {
     if (!faqs.some(item => item.question === faq.question)) faqs.push(faq);
   }
   const serviceSlug = problem.relatedServices[0];
-  const processGuide = MATERIAL_PROCESS_GUIDES[problem.slug]
-    ?? (serviceSlug === 'limpeza-sofas' ? MATERIAL_PROCESS_GUIDES['limpeza-sofa-tecido'] : SERVICE_PROCESS_GUIDES[serviceSlug as ProcessServiceSlug]);
+  const processGuide = getProblemTreatmentGuide(problem);
   return {
     processGuide,
-    examples: getLandingProblems(serviceSlug as LandingService),
+    examples: getLandingProblems(serviceSlug as LandingService).map((example, index) => ({ ...example,
+      title: problem.slug === 'manchas-sofa' && index === 2 ? 'Estofos com animais em casa' : example.title,
+      image: problem.slug === 'manchas-sofa' ? {
+        src: `/images/problem-examples/sofa-${['stain', 'fibers', 'pets', 'wear'][index]}.webp`,
+        alt: ['Mancha de café num sofá claro', 'Resíduos nas costuras de tecido cinzento', 'Pelos de animal num sofá verde', 'Borboto e desgaste num braço de sofá'][index],
+      } : selectLandingProblemImage(serviceSlug, example.id, `/problemas/${problem.slug}`),
+    })),
     process: processGuide.steps,
     faqs: faqs.slice(0, 4),
   };

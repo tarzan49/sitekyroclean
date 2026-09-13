@@ -10,9 +10,8 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import SectionHeader from "@/components/SectionHeader";
 import ServiceFAQ from "@/components/ServiceFAQ";
-import VisualExamplesGallery from "@/components/VisualExamplesGallery";
-import IllustratedProcessGuide from "@/components/IllustratedProcessGuide";
-import { PROBLEM_IMAGES } from "@/constants/problemCardHelpers";
+import ProblemExamplesGallery from "@/components/ProblemExamplesGallery";
+import ProblemTreatmentGuide from "@/components/ProblemTreatmentGuide";
 import ServicePriceSection from "@/components/ServicePriceSection";
 import ServicePackBanner from "@/components/ServicePackBanner";
 import { SERVICE_PACK_SLUGS } from "@/constants/servicePackSlugs";
@@ -100,28 +99,9 @@ const ProblemPage = () => {
           </div>
         </section>
 
-        <VisualExamplesGallery
-          key={`examples-${slug}`}
-          id="exemplos"
-          overline="Problemas comuns"
-          heading="Veja alguns"
-          name="exemplos"
-          imageDescription="Imagem ilustrativa do serviço."
-          examples={layout.examples.map(example => ({
-            label: example.title,
-            alt: example.title,
-            src: PROBLEM_IMAGES[data.relatedServices[0]][example.imageIndex],
-          }))}
-        />
+        <ProblemExamplesGallery key={`examples-${slug}`} problem={data} />
 
-        <IllustratedProcessGuide
-          dark
-          key={`process-${slug}`}
-          guide={layout.processGuide}
-          heading="Como tratamos este"
-          goldWord="problema"
-          downloadName={data.slug}
-        />
+        <ProblemTreatmentGuide key={`process-${slug}`} guide={layout.processGuide} slug={data.slug} />
 
         {/* ═══ FAQ ═══ */}
         {data.faqs.length > 0 && (
