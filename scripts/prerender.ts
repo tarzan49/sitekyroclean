@@ -854,6 +854,7 @@ export function prerenderRoutes(outDir: string): number {
             { q: 'Que tipos de tapete limpam?', a: 'Limpamos todos os tipos: persas, shaggy, sisal, juta, lã, acrílico, polipropileno e fibras naturais. O produto é sempre adaptado ao material.' },
             { q: 'Fazem limpeza de tapetes ao domicílio?', a: 'Sim. O técnico desloca-se a sua casa com equipamento de extração profissional. Não precisa de entregar o tapete.' },
           ]),
+          links: cities.map(city => ({ href: `/limpeza-tapetes-${city.slug}`, label: city.name })),
         },
         extraSchemas: [
           {
@@ -890,6 +891,7 @@ export function prerenderRoutes(outDir: string): number {
             { q: 'Quanto tempo demora a limpeza de cadeiras?', a: 'Cada cadeira demora 15 a 30 minutos. Um conjunto de 6 cadeiras leva cerca de 2 horas. As cadeiras ficam secas em 3 a 6 horas.' },
             { q: 'Fazem limpeza de cadeiras em quantidade para restaurantes?', a: 'Sim. Para restaurantes, hotéis e escritórios temos condições especiais. Contacte-nos para orçamento personalizado.' },
           ]),
+          links: cities.map(city => ({ href: `/limpeza-cadeiras-${city.slug}`, label: city.name })),
         },
         extraSchemas: [
           buildServiceSchema('Limpeza de Cadeiras', 'Portugal', '20€'),
@@ -920,6 +922,7 @@ export function prerenderRoutes(outDir: string): number {
             { q: 'Limpam alcatifas de escritório?', a: 'Sim. Temos disponibilidade para escritórios, hotéis, clínicas e outros espaços comerciais, incluindo fora do horário comercial.' },
             { q: 'A alcatifa fica molhada muito tempo?', a: 'Com o nosso equipamento de extração profissional, a alcatifa fica seca em 3 a 6 horas dependendo da espessura e ventilação.' },
           ]),
+          links: cities.map(city => ({ href: `/limpeza-alcatifas-${city.slug}`, label: city.name })),
         },
         extraSchemas: [
           buildServiceSchema('Limpeza de Alcatifas', 'Portugal', ''),
@@ -950,6 +953,7 @@ export function prerenderRoutes(outDir: string): number {
             { q: 'Quanto tempo dura a impermeabilização?', a: 'Depende da versão. A Essencial, à base de água, dura 1 a 2 anos e aguenta até 2 lavagens. A Premium, à base de diluente e mais resistente ao desgaste, dura até 10 anos e aguenta até 5 lavagens.' },
             { q: 'Posso fazer impermeabilização sem limpeza prévia?', a: 'Recomendamos sempre limpeza prévia para maior eficácia. Temos o Pack Proteção Total, que combina limpeza com a versão Essencial com desconto.' },
           ]),
+          links: cities.map(city => ({ href: `/impermeabilizacao-${city.slug}`, label: city.name })),
         },
         extraSchemas: [
           buildServiceSchema('Impermeabilização de Estofos', 'Portugal', '59€'),
