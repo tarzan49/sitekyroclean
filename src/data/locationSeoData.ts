@@ -1,3 +1,4 @@
+import { ALCATIFA_PROBLEMS } from "./alcatifaProblems";
 import { WATERPROOFING_PROBLEMS } from "./waterproofingProblems";
 import { locationPrices } from '../constants/travel';
 
@@ -266,11 +267,7 @@ function generateAlcatifasContent(city: string, cityDesc: string): Omit<Location
     metaDescription: `Limpeza profunda de alcatifas ${prep} ${city}. Remoção de sujidade acumulada e alergénios. Secagem rápida. Orçamento sempre à medida do espaço, sem compromisso.`,
     h1: `Limpeza Profunda de Alcatifas ${prep} ${city}`,
     intro: `As alcatifas do seu espaço ${prep} ${city} precisam de limpeza profissional? A Kyro Clean Solutions oferece limpeza profunda de alcatifas com extração profissional ${prep} ${city}, ${cityDesc}. Removemos sujidade acumulada, manchas e alergénios, devolvendo frescura e higiene. Cada espaço é medido e orçamentado à medida, sem preço fixo por m².`,
-    problems: [
-      { title: "Sujidade profunda acumulada", description: `As alcatifas acumulam poeira, terra e resíduos nas camadas profundas das fibras. O aspirador convencional remove apenas a sujidade superficial.` },
-      { title: "Alergénios e ácaros", description: `${Prep} ${city}, as alcatifas são reservatórios de ácaros e alergénios que afetam a qualidade do ar interior e causam problemas respiratórios.` },
-      { title: "Manchas em grandes superfícies", description: `Manchas em alcatifas de escritórios, hotéis e residências que afetam a imagem profissional do espaço.` },
-    ],
+    problems: ALCATIFA_PROBLEMS,
     howItWorks: `Processo de limpeza de alcatifas ${prep} ${city}: 1) Aspiração industrial, 2) Pulverização com detergente profissional, 3) Escovação para penetrar nas fibras, 4) Extração a quente com equipamento profissional, 5) Secagem rápida com ventilação. Ideal para grandes superfícies em escritórios e hotéis.`,
     benefits: [
       "Limpeza de grandes superfícies em escritórios, hotéis, escolas e clínicas",

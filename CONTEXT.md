@@ -1,3 +1,7 @@
+## Pontos de alcatifas (13/09/2026)
+
+As páginas de cidade e freguesia usam os quatro pontos de `src/data/alcatifaProblems.ts`, em ordem fixa para corresponder às quatro imagens próprias em `PROBLEM_IMAGES`: passagem, café, rodapés e escadas. Imagens ilustrativas e prompts documentados em `docs/alcatifa-problem-images.md`.
+
 ## Problemas de impermeabilização (13/09/2026)
 
 As páginas de cidade e freguesia usam quatro cartões na mesma ordem: café, vinho, sumo em cadeira e patas molhadas. Texto partilhado em `src/data/waterproofingProblems.ts`, imagens em `src/assets/impermeabilizacao-problema-*.webp`, ligadas por `PROBLEM_IMAGES`. Cenas ilustrativas geradas, com prompts em `docs/waterproofing-problem-images.md`.

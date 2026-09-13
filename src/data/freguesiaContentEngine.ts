@@ -1,3 +1,4 @@
+import { ALCATIFA_PROBLEMS } from "./alcatifaProblems";
 import { WATERPROOFING_PROBLEMS } from "./waterproofingProblems";
 // ─── Dynamic Content Engine ───────────────────────────────────────
 // Generates unique, deterministic content for each freguesia × service page.
@@ -669,7 +670,7 @@ export function getDynamicContent(
     h1: `${serviceName} em ${freguesiaName}`,
     intro: `${intro} ${localSection}`,
     localSection,
-    problems: serviceSlug === "impermeabilizacao" ? WATERPROOFING_PROBLEMS : selectedProblems,
+    problems: serviceSlug === "limpeza-alcatifas" ? ALCATIFA_PROBLEMS : serviceSlug === "impermeabilizacao" ? WATERPROOFING_PROBLEMS : selectedProblems,
     howItWorks,
     benefits,
     faqs: selectedFaqs,
