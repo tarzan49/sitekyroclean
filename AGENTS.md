@@ -55,6 +55,7 @@ Segunda instância do mesmo problema: `src/pages/AdminPanel.tsx` mantém o seu p
 - **Nunca usar em dash (—)** em conteúdo visível do site (títulos, descrições, FAQs, blog). Não confundir com `---` usado como divisor Markdown nas minhas próprias respostas de chat.
 - **Nunca usar o ícone Sparkles** (lucide-react) como decoração. `Star` continua permitido em contexto de rating/avaliação.
 - **Mobile-first sempre** — qualquer alteração de UI/layout, mobile é prioridade absoluta, não um afterthought.
+- **Previews obrigatoriamente em mobile (13/09/2026):** qualquer preview aberto pelo Codex tem de usar uma viewport mobile. Não abrir, apresentar nem validar previews em viewport desktop, sem exceções.
 - **Regra revogada em 2026-09-06:** já não é verdade que o Step 3 das cadeiras deva replicar o ecrã de upsell pixel a pixel — foi decisão explícita separar os dois (ver "Cadeiras: decisão de addon movida" acima). Se esta frase aparecer num commit antigo ou numa memória vinda de outra sessão, ignorá-la.
 - Ao corrigir uma regra de preço (ex. um mínimo errado), mudar só o valor que viola a regra. Não extrapolar a outros valores sem perguntar primeiro.
 - Não adicionar mecânicas de urgência (timers, badges) que não foram pedidas explicitamente.
