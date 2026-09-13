@@ -14,6 +14,7 @@ interface Props {
   /** Identifica a página de forma estável (cidade/freguesia) para escolher
    *  sempre o mesmo item de um pool nessa página — só usado para sofá/colchão. */
   seedKey?: string;
+  points?: TrustPoint[];
 }
 
 // Todos os 6 serviços já usam pools de variedade (ver getTrustPointsForSeed
@@ -77,8 +78,8 @@ function Points({ points, fullDesc }: { points: TrustPoint[]; fullDesc: boolean 
 }
 
 /** Versão desktop (always visible, with full descriptions) */
-export function ServiceTrustDesktop({ serviceSlug, variant = 0, seedKey }: Props) {
-  const points = resolvePoints(serviceSlug, variant, seedKey);
+export function ServiceTrustDesktop({ serviceSlug, variant = 0, seedKey, points: suppliedPoints }: Props) {
+  const points = suppliedPoints ?? resolvePoints(serviceSlug, variant, seedKey);
   if (!points.length) return null;
   return (
     <div className="mt-8">
@@ -88,9 +89,9 @@ export function ServiceTrustDesktop({ serviceSlug, variant = 0, seedKey }: Props
 }
 
 /** Versão mobile colapsável (compact, no descriptions) */
-export function ServiceTrustMobile({ serviceSlug, variant = 0, seedKey }: Props) {
+export function ServiceTrustMobile({ serviceSlug, variant = 0, seedKey, points: suppliedPoints }: Props) {
   const [open, setOpen] = useState(false);
-  const points = resolvePoints(serviceSlug, variant, seedKey);
+  const points = suppliedPoints ?? resolvePoints(serviceSlug, variant, seedKey);
   if (!points.length) return null;
   return (
     <div className="mt-6">
@@ -108,7 +109,7 @@ export function ServiceTrustMobile({ serviceSlug, variant = 0, seedKey }: Props)
       </button>
       {open && (
         <div className="border-x border-b px-4 pt-4 pb-2" style={{ borderColor: "rgba(17,17,17,0.12)" }}>
-          <Points points={points} fullDesc={false} />
+          <Points points={points} fullDesc={Boolean(suppliedPoints)} />
         </div>
       )}
     </div>

@@ -17,6 +17,7 @@ export interface KeywordVariantData {
   slug: string;
   locationPart: string;
   locationName: string;
+  municipality: string;
   serviceKey: ServiceKey;
   variantKey: VariantKey;
   canonical: string;
@@ -784,6 +785,7 @@ function buildData(
     slug: `${variantKey}-${serviceKey}-${locationPart}`,
     locationPart,
     locationName,
+    municipality,
     serviceKey,
     variantKey,
     canonical: `/${canonicalBase}-${canonicalSuffix}`,

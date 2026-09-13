@@ -6,6 +6,13 @@ vi.mock('./HeroBeforeAfterPool', () => ({ default: () => <div>Antes e depois</di
 afterEach(cleanup);
 
 describe('mandatory commercial hero', () => {
+  it('keeps parish labels but uses the municipality for travel and consultation', () => {
+    const { container } = render(<MemoryRouter><CommercialHero title="Higienização em Santa Clara, Coimbra" serviceSlug="limpeza-sofas" city="Santa Clara, Coimbra" municipality="Coimbra" whatsappHref="https://wa.me/351925530647" source="test" /></MemoryRouter>);
+    expect(container.querySelector('nav')?.textContent).toContain('Santa Clara, Coimbra');
+    expect(container.querySelector('[data-hero-part="subtitle"]')?.textContent).toContain('Disponibilidade sob consulta.');
+    expect(container.textContent).toContain('deslocação 15€');
+    expect(container.textContent).not.toContain('a partir de 10€');
+  });
   it('opts the homepage out of mobile restyling and preserves its original photo', () => {
     const props = { title: 'Homepage', serviceSlug: 'limpeza-sofas', whatsappHref: 'https://wa.me/351925530647', source: 'home_hero', image: { m: '/mobile.webp', d: '/desktop.webp' } };
     const { container, rerender } = render(<MemoryRouter><CommercialHero {...props} preserveMobileHero /></MemoryRouter>);

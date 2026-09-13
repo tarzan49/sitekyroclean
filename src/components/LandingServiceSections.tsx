@@ -28,8 +28,6 @@ export default function LandingServiceSections() {
   const { isQuizOpen, openQuiz, closeQuiz } = useQuizLauncher();
   if (!model) return null;
   const hideDirectory = model.serviceSlug === 'limpeza-sofas' && ['localidade', 'variante'].includes(model.family) && isAdsVisit(search);
-  const trustVariant = model.family === 'freguesia' ? 2 : 1;
-  const trustSeed = model.family === 'freguesia' ? `${model.municipalityName}-${model.locationName}` : model.locationName;
   const quizService = model.serviceKey ? SERVICEKEY_TO_QUIZ[model.serviceKey] : SERVICE_TO_QUIZ[model.serviceSlug];
   const sections = {
     precos: <section id="precos" className="scroll-mt-20 py-14 md:py-20 bg-[#FDFDF9]">
@@ -37,12 +35,13 @@ export default function LandingServiceSections() {
         <div className="grid md:grid-cols-2 gap-10 md:gap-16 items-center">
           <div>
             <SectionHeader overline="Tabela de Preços" heading={`Quanto custa ${model.priceVerb} ${model.prep}`} goldWord={model.locationName} subtitle={model.pricingDescription} />
+            <p data-landing-editorial className="text-sm sm:text-base leading-relaxed text-[#536259] mb-6">{model.editorialIntro}</p>
             {model.variantExplanation && <p className="text-sm leading-relaxed text-[#536259] mb-6">{model.variantExplanation}</p>}
-            <div className="hidden md:block"><ServiceTrustDesktop serviceSlug={model.serviceSlug} variant={trustVariant} seedKey={trustSeed} /></div>
+            <div className="hidden md:block"><ServiceTrustDesktop serviceSlug={model.serviceSlug} points={model.trustPoints} /></div>
           </div>
           <PriceWidget key={`${model.serviceSlug}:${model.municipalityName}`} serviceSlug={model.serviceSlug} initialLocation={model.municipalityName} />
         </div>
-        <div className="md:hidden"><ServiceTrustMobile serviceSlug={model.serviceSlug} variant={trustVariant} seedKey={trustSeed} /></div>
+        <div className="md:hidden"><ServiceTrustMobile serviceSlug={model.serviceSlug} points={model.trustPoints} /></div>
         {model.family === 'preco' && <details className="mt-7 border-t border-[#173629]/20">
           <summary className="min-h-12 py-4 cursor-pointer font-semibold text-[#173629]">Como é calculado o preço?</summary>
           <PriceFactors serviceSlug={model.serviceSlug} embedded />

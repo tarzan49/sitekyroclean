@@ -188,13 +188,13 @@ const SofaVariantPage = () => {
   ];
 
   return (
-    <QuizLocationProvider value={data.locationName}>
+    <QuizLocationProvider value={data.municipality}>
     <QuizServiceProvider value={quizService}>
     <>
       {isPaidLanding ? <AdsLandingHeader /> : <Header />}
       <main>
 
-        <CommercialHero title={data.h1} serviceSlug={durationSlug} city={data.locationName} price={data.priceFrom} image={heroImg} whatsappHref={`${WHATSAPP_BASE}?text=${encodeURIComponent(buildVariantWaMessage(data.variantKey === "impermeabilizacao", SERVICE_LABEL[data.serviceKey], VARIANT_LABEL[data.variantKey], data.locationName))}`} source={`variant_hero_${parsed.variantKey}_${parsed.serviceKey}`} />
+        <CommercialHero title={data.h1} serviceSlug={durationSlug} city={data.locationName} municipality={data.municipality} price={data.priceFrom} image={heroImg} whatsappHref={`${WHATSAPP_BASE}?text=${encodeURIComponent(buildVariantWaMessage(data.variantKey === "impermeabilizacao", SERVICE_LABEL[data.serviceKey], VARIANT_LABEL[data.variantKey], data.locationName))}`} source={`variant_hero_${parsed.variantKey}_${parsed.serviceKey}`} />
 
         <LandingServiceSections />
       </main>

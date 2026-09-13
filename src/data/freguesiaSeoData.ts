@@ -1108,6 +1108,15 @@ export function getNearbyFreguesias(municipioSlug: string, nearbySlugs: string[]
 // ─── Content generator for freguesia pages (uses dynamic spintax engine) ────
 import { getDynamicContent } from "./freguesiaContentEngine";
 
+const parishMunicipalities = new Map<string, Set<string>>();
+for (const municipality of municipiosComFreguesias) {
+  for (const parish of municipality.freguesias) {
+    const owners = parishMunicipalities.get(parish.name) ?? new Set<string>();
+    owners.add(municipality.name);
+    parishMunicipalities.set(parish.name, owners);
+  }
+}
+
 export function generateFreguesiaContent(
   serviceName: string,
   serviceSlug: string,
@@ -1116,8 +1125,10 @@ export function generateFreguesiaContent(
   freguesiaSlug: string,
   municipio: string,
 ) {
+  const content = getDynamicContent(serviceName, serviceSlug, priceFrom, freguesia, freguesiaSlug, municipio);
   return {
-    ...getDynamicContent(serviceName, serviceSlug, priceFrom, freguesia, freguesiaSlug, municipio),
+    ...content,
+    h1: (parishMunicipalities.get(freguesia)?.size ?? 0) > 1 ? `${content.h1}, ${municipio}` : content.h1,
     ...getLandingEditorial({ family: 'freguesia', serviceSlug: serviceSlug as LandingService, serviceLabel: serviceName, place: freguesia, municipality: municipio }),
   };
 }

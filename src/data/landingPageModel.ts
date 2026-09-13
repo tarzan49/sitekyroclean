@@ -1,4 +1,5 @@
 import { commercialHeroSubtitle } from './commercialHeroCopy';
+import { getLandingTrustPoints } from '../constants/serviceTrustPool';
 import { cities, services, cityPrep, getCityLinksForService, getLocationServiceData } from './locationSeoData';
 import { municipiosComFreguesias, getFreguesia, generateFreguesiaContent } from './freguesiaSeoData';
 import { getPricePageData } from './priceSeoData';
@@ -114,6 +115,8 @@ export function getLandingPageModel(pathname: string) {
   return {
     path, family, serviceSlug, serviceKey, serviceLabel, municipalitySlug, municipalityName, locationName, prep,
     title: data.title, metaDescription: data.metaDescription, h1: data.h1, intro: commercialHeroSubtitle(serviceSlug, municipalityName),
+    editorialIntro: data.intro,
+    trustPoints: getLandingTrustPoints(serviceSlug, family, municipalityName, locationName),
     priceHeading: `Quanto custa ${priceVerb} ${prep} ${locationName}`,
     priceVerb, pricingDescription, pricePolicy: PRICE_PROMISE,
     variantExplanation: family === 'variante' ? (serviceSlug === 'impermeabilizacao' ? 'A impermeabilização é uma proteção opcional de tecidos compatíveis. A limpeza prévia, se necessária, é combinada e orçamentada separadamente.' : `Limpeza, lavagem e higienização podem descrever o mesmo pedido. O procedimento é escolhido pelo material e pelo estado da peça. ${TREATMENT_EXTRAS}`) : undefined,

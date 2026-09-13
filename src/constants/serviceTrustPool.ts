@@ -4,7 +4,16 @@
 // upsell, ou o conceito central quando não existe) + `titleRest` (o resto,
 // a preto). Nada de regex a adivinhar a partir de um título único — cada
 // pool escreve as duas partes explicitamente.
+import { DRYING_PROMISE } from './commercialPolicy';
+
 export interface TrustPoint { stat?: string; titleGold: string; titleRest?: string; desc: string; }
+
+/** Shared landing selection, including the HTML delivered before JavaScript. */
+export function getLandingTrustPoints(serviceSlug: string, family: string, municipality: string, place: string): TrustPoint[] {
+  const variant = family === 'freguesia' ? 2 : 1;
+  const seed = family === 'freguesia' ? `${municipality}-${place}` : place;
+  return getTrustPointsForSeed(serviceSlug, `${serviceSlug}:${variant}:${seed}`) ?? [];
+}
 
 // Escolha determinística mas com variedade: a mesma seed (serviço+variante+
 // localização) escolhe sempre o mesmo item do pool, mas seeds diferentes
@@ -29,11 +38,31 @@ function pickFromPool<T>(pool: T[], seed: string): T {
 // intercala entre um estudo/facto e o convite a juntar outro estofo.
 
 const SOFA_IMPERM_UPSELL_POOL: TrustPoint[] = [
-  { titleGold: 'A partir de 50€ Impermeabilização', titleRest: ' para nunca mais temer uma mancha', desc: 'Sem proteção, o café ou o vinho atravessa o tecido em apenas 30 segundos, irrecuperável em 70% dos casos. Aplicada já nesta visita, a mancha fica à superfície, pronta a limpar com um pano.' },
-  { titleGold: 'A partir de 50€ Impermeabilização', titleRest: ' que trava o desgaste do tecido', desc: 'A fricção diária com células mortas e gordura corporal pode antecipar o desgaste visível do tecido para os 18 meses de uso. A Impermeabilização cria uma barreira que reduz esse desgaste e prolonga a vida do estofo.' },
-  { titleGold: 'A partir de 50€ Impermeabilização', titleRest: ' para proteger de crianças e animais', desc: 'Urina, patas sujas e comida caída são as principais causas de manchas permanentes. A Impermeabilização repele líquidos à superfície, dando tempo a limpar antes de absorverem.' },
-  { titleGold: 'A partir de 50€ Impermeabilização', titleRest: ' que sai muito mais barato que substituir', desc: 'Substituir um sofá custa centenas de euros. Impermeabilizá-lo custa uma fração disso e mantém o aspeto de novo durante muito mais tempo.' },
-  { titleGold: 'A partir de 50€ Impermeabilização', titleRest: ' no momento certo: aproveite agora', desc: 'Com o tecido limpo e sem gordura, o produto de impermeabilização adere melhor e dura mais. Aplicado sobre sujidade acumulada, a proteção nunca é tão eficaz.' },
+  {
+    "titleGold": "Impermeabilização opcional",
+    "titleRest": " para facilitar os cuidados",
+    "desc": "A proteção ajuda a reduzir a absorção de derrames em tecidos compatíveis. Absorva o líquido prontamente; não existe garantia de evitar todas as manchas."
+  },
+  {
+    "titleGold": "Proteção do tecido",
+    "titleRest": " não é reparação",
+    "desc": "A impermeabilização não reconstrói fibras gastas nem corrige rasgões. Avaliamos o estado do sofá antes de propor a aplicação."
+  },
+  {
+    "titleGold": "Cuidados após derrames",
+    "titleRest": " de bebidas ou alimentos",
+    "desc": "Remova os resíduos com cuidado e siga as instruções fornecidas para o tecido. A proteção não dispensa a manutenção."
+  },
+  {
+    "titleGold": "Essencial e Premium",
+    "titleRest": " para comparar antes de escolher",
+    "desc": "Compare o âmbito, os cuidados e o preço das duas opções no orçamento. A escolha depende da compatibilidade do tecido e das peças a proteger."
+  },
+  {
+    "titleGold": "Limpeza prévia",
+    "titleRest": " avaliada separadamente",
+    "desc": "Mostre as manchas e indique produtos já aplicados. A limpeza necessária antes da proteção é combinada e discriminada no orçamento."
+  }
 ];
 
 const SOFA_ANTIACAROS_UPSELL_POOL: TrustPoint[] = [
@@ -44,7 +73,7 @@ const SOFA_ANTIACAROS_UPSELL_POOL: TrustPoint[] = [
   {"titleGold": "A partir de 20€ Anti Ácaros", "titleRest": ", com orçamento claro", "desc": "O extra não está incluído automaticamente na limpeza. Pode escolhê-lo ao configurar o artigo e confirmar o valor com a equipa."},
 ];
 
-const SOFA_FIXED_CROSSSELL: TrustPoint = { titleGold: 'Uma visita,', titleRest: ' vários estofos limpos', desc: 'Sofá, colchão, tapete ou cadeiras: o mesmo técnico trata tudo no mesmo dia, com desconto de pack.' };
+const SOFA_FIXED_CROSSSELL: TrustPoint = { titleGold: 'Uma visita,', titleRest: ' vários estofos limpos', desc: 'Pode juntar outros artigos na mesma visita. O orçamento identifica os serviços, os descontos aplicáveis e a deslocação, que não recebe desconto.' };
 
 function getSofaTrustPoints(seed: string): TrustPoint[] {
   return [
@@ -55,11 +84,31 @@ function getSofaTrustPoints(seed: string): TrustPoint[] {
 }
 
 const COLCHAO_ADVICE_POOL: TrustPoint[] = [
-  { stat: '6–12', titleGold: 'Frequência recomendada', titleRest: ' para higienizar o colchão', desc: 'É o intervalo recomendado por especialistas para higienizar um colchão em uso diário. O seu, há quanto tempo não é tratado?' },
-  { titleGold: 'Vire o colchão', titleRest: ' a cada 3 meses', desc: 'Ajuda a distribuir o desgaste e o suor absorvido de forma mais uniforme, prolongando a vida útil entre limpezas profissionais.' },
-  { titleGold: 'Lençóis lavados', titleRest: ' não bastam', desc: 'A roupa de cama protege a superfície, mas o suor e as células mortas acumulam-se por baixo, no próprio colchão, ao longo de meses.' },
-  { titleGold: 'Alergias sazonais', titleRest: ' podem vir do colchão', desc: 'Em quartos pouco ventilados, o colchão acumula ácaros e pólen que pioram sintomas respiratórios, sobretudo na mudança de estação.' },
-  { titleGold: 'Colchão novo', titleRest: ' também precisa de cuidado', desc: 'A limpeza regular não é só para manchas visíveis: remove também o que se acumula desde o primeiro dia de uso, mesmo sem se notar.' },
+  {
+    "titleGold": "Frequência de limpeza",
+    "titleRest": " adaptada ao uso",
+    "desc": "O estado do colchão, as instruções do fabricante e a utilização ajudam a decidir quando limpar, sem impor um intervalo universal."
+  },
+  {
+    "titleGold": "Rodar ou virar o colchão",
+    "titleRest": " apenas quando indicado",
+    "desc": "Consulte a etiqueta e as instruções do fabricante. Nem todos os colchões podem ser virados ou usados nas duas faces."
+  },
+  {
+    "titleGold": "Roupa de cama",
+    "titleRest": " e revestimento do colchão",
+    "desc": "Lavar os lençóis não substitui a avaliação do revestimento. Mostre manchas ou outras alterações para definir os cuidados adequados."
+  },
+  {
+    "titleGold": "Ventilação do quarto",
+    "titleRest": " antes e depois da visita",
+    "desc": "Informe as condições de ventilação para preparar a secagem. Não cubra o colchão enquanto estiver húmido."
+  },
+  {
+    "titleGold": "Colchão recente",
+    "titleRest": " com cuidados próprios",
+    "desc": "Consulte as instruções de manutenção e mostre a etiqueta antes de aplicar produtos ou pedir uma intervenção."
+  }
 ];
 
 const COLCHAO_ANTIACAROS_UPSELL_POOL: TrustPoint[] = [
@@ -74,9 +123,9 @@ const COLCHAO_ANTIACAROS_UPSELL_POOL: TrustPoint[] = [
 // por construção, a seed decide qual dos 4 aparece em cada página).
 const COLCHAO_POINT3_POOL: TrustPoint[] = [
   { titleGold: 'Cuidado regular', titleRest: ' para o seu colchão', desc: 'A limpeza ajuda a remover suor, pó e resíduos acumulados nas fibras. Anti-ácaros e desbacterização podem ser acrescentados como extras.' },
-  { titleGold: 'Sofá ou tapete', titleRest: ' na mesma visita?', desc: 'Peça o colchão e outro estofo no mesmo agendamento: o técnico já está em sua casa e o desconto aplica-se a tudo.' },
+  { titleGold: 'Sofá ou tapete', titleRest: ' na mesma visita?', desc: 'Pode juntar outros artigos na mesma visita. O orçamento identifica os serviços, os descontos aplicáveis e a deslocação, que não recebe desconto.' },
   { titleGold: 'Tratamentos opcionais', titleRest: ' conforme o seu objetivo', desc: 'Diga-nos o que pretende tratar. Explicamos a diferença entre limpeza, anti-ácaros e desbacterização antes de escolher.' },
-  { titleGold: 'Aproveite o técnico', titleRest: ' já em sua casa', desc: 'Junte sofá, tapete ou cadeiras à limpeza do colchão: mesma visita, mesmo dia, com desconto de pack.' },
+  { titleGold: 'Aproveite o técnico', titleRest: ' já em sua casa', desc: 'Pode juntar outros artigos na mesma visita. O orçamento identifica os serviços, os descontos aplicáveis e a deslocação, que não recebe desconto.' },
 ];
 
 function getColchaoTrustPoints(seed: string): TrustPoint[] {
@@ -92,22 +141,42 @@ function getColchaoTrustPoints(seed: string): TrustPoint[] {
 // (Pack Família). Preços "a partir de": 20€ Impermeabilização (mínimo, 1-4
 // cadeiras Essencial) e 7,5€ Anti Ácaros (preço fixo por cadeira) — 2026-08-31.
 const CADEIRAS_IMPERM_UPSELL_POOL: TrustPoint[] = [
-  { titleGold: 'A partir de 20€ Impermeabilização', titleRest: ' para nunca mais temer uma mancha', desc: 'Sem proteção, um copo entornado numa cadeira de jantar absorve em apenas 30 segundos, difícil de remover depois. Aplicada já nesta visita, a mancha fica à superfície, pronta a limpar com um pano.' },
-  { titleGold: 'A partir de 20€ Impermeabilização', titleRest: ' que trava o desgaste do tecido', desc: 'O uso diário à mesa pode antecipar o desgaste visível do tecido para os 18 meses. A Impermeabilização cria uma barreira que reduz esse desgaste e prolonga a vida da cadeira.' },
-  { titleGold: 'A partir de 20€ Impermeabilização', titleRest: ' para proteger de crianças e animais', desc: 'Sumo entornado, patas sujas ou comida caída são as principais causas de manchas permanentes em cadeiras de jantar. A Impermeabilização repele líquidos à superfície, dando tempo a limpar antes de absorverem.' },
-  { titleGold: 'A partir de 20€ Impermeabilização', titleRest: ' que sai muito mais barato que substituir', desc: 'Substituir um conjunto de cadeiras custa centenas de euros. Impermeabilizá-las custa uma fração disso e mantém o aspeto de novo durante muito mais tempo.' },
-  { titleGold: 'A partir de 20€ Impermeabilização', titleRest: ' no momento certo: aproveite agora', desc: 'Com o tecido limpo e sem gordura, o produto de impermeabilização adere melhor e dura mais. Aplicado sobre sujidade acumulada, a proteção nunca é tão eficaz.' },
+  {
+    "titleGold": "Impermeabilização opcional",
+    "titleRest": " para cadeiras estofadas",
+    "desc": "A proteção pode ajudar a reduzir a absorção de líquidos em tecidos compatíveis. Derrames devem ser absorvidos prontamente."
+  },
+  {
+    "titleGold": "Estado do revestimento",
+    "titleRest": " avaliado antes da proteção",
+    "desc": "Tecido gasto, rasgado ou desbotado não é restaurado pela impermeabilização. Mostre essas zonas antes de escolher o serviço."
+  },
+  {
+    "titleGold": "Cuidados à mesa",
+    "titleRest": " após pequenos acidentes",
+    "desc": "Sumo, café e alimentos exigem atenção mesmo numa cadeira protegida. Siga as instruções de manutenção fornecidas."
+  },
+  {
+    "titleGold": "Essencial e Premium",
+    "titleRest": " para o conjunto escolhido",
+    "desc": "Indique a quantidade e os modelos das cadeiras. Compare as opções e os respetivos preços antes de confirmar."
+  },
+  {
+    "titleGold": "Limpeza e proteção",
+    "titleRest": " discriminadas no orçamento",
+    "desc": "A necessidade de limpeza prévia é avaliada pelo estado do estofo. Confirme quais as partes da cadeira incluídas na aplicação."
+  }
 ];
 
 const CADEIRAS_ANTIACAROS_UPSELL_POOL: TrustPoint[] = [
-  {"titleGold": "5€/un. Anti Ácaros", "titleRest": ", como complemento à limpeza", "desc": "A limpeza remove sujidade e resíduos do cadeira. O tratamento anti-ácaros é opcional e é confirmado separadamente no orçamento."},
-  {"titleGold": "5€/un. Anti Ácaros", "titleRest": ", na mesma visita", "desc": "Pode acrescentar este tratamento ao seu cadeira sem marcar outra intervenção. Avaliamos o material e as condições de aplicação antes de começar."},
-  {"titleGold": "5€/un. Anti Ácaros", "titleRest": ", com aplicação adequada ao tecido", "desc": "Escolhemos o tratamento conforme o tecido e o uso do cadeira. Explicamos os cuidados após a aplicação e confirmamos o preço antes da marcação."},
+  {"titleGold": "5€/un. Anti Ácaros", "titleRest": ", como complemento à limpeza", "desc": "A limpeza remove sujidade e resíduos da cadeira. O tratamento anti-ácaros é opcional e é confirmado separadamente no orçamento."},
+  {"titleGold": "5€/un. Anti Ácaros", "titleRest": ", na mesma visita", "desc": "Pode acrescentar este tratamento ao sua cadeira sem marcar outra intervenção. Avaliamos o material e as condições de aplicação antes de começar."},
+  {"titleGold": "5€/un. Anti Ácaros", "titleRest": ", com aplicação adequada ao tecido", "desc": "Escolhemos o tratamento conforme o tecido e o uso da cadeira. Explicamos os cuidados após a aplicação e confirmamos o preço antes da marcação."},
   {"titleGold": "5€/un. Anti Ácaros", "titleRest": ", dirigido a ácaros", "desc": "Anti-ácaros e desbacterização têm objetivos distintos. Indique o cuidado pretendido para receber uma proposta adequada."},
   {"titleGold": "5€/un. Anti Ácaros", "titleRest": ", com orçamento claro", "desc": "O extra não está incluído automaticamente na limpeza. Pode escolhê-lo ao configurar o artigo e confirmar o valor com a equipa."},
 ];
 
-const CADEIRAS_FIXED_CROSSSELL: TrustPoint = { titleGold: 'Uma visita,', titleRest: ' vários estofos limpos', desc: 'Cadeiras, sofá, colchão ou tapete: o mesmo técnico trata tudo no mesmo dia, com desconto de pack.' };
+const CADEIRAS_FIXED_CROSSSELL: TrustPoint = { titleGold: 'Uma visita,', titleRest: ' vários estofos limpos', desc: 'Pode juntar outros artigos na mesma visita. O orçamento identifica os serviços, os descontos aplicáveis e a deslocação, que não recebe desconto.' };
 
 function getCadeirasTrustPoints(seed: string): TrustPoint[] {
   return [
@@ -125,22 +194,62 @@ function getCadeirasTrustPoints(seed: string): TrustPoint[] {
 // limpar. 3º fixo (Pack Família) — 2026-08-31, títulos revistos 2026-09-01,
 // preço removido 2026-09-06.
 const TAPETES_PROBLEMA_POOL: TrustPoint[] = [
-  { titleGold: 'Higienização de Tapetes', titleRest: ' que remove resíduos das fibras', desc: 'Tapetes retêm e libertam no ar partículas a cada passo: pólenes, ácaros e poluentes invisíveis, até 8× mais que um pavimento liso. A higienização profissional remove o que a aspiração doméstica nunca chega.' },
-  { titleGold: 'Higienização de Tapetes', titleRest: ' com extração de sujidade das fibras', desc: 'A sujidade acumula-se entre as fibras. A limpeza é orçamentada mediante medidas; tratamentos adicionais são avaliados e confirmados à parte.' },
-  { titleGold: 'Higienização de Tapetes', titleRest: ' que remove o pó acumulado há meses', desc: 'Um tapete médio acumula até 2 kg de matéria orgânica, pó e resíduos por metro quadrado ao longo de 12 meses, mesmo com aspiração regular.' },
-  { titleGold: 'Higienização de Tapetes', titleRest: ' que remove odores que a aspiração nunca tira', desc: 'Suor, animais de estimação e humidade ficam retidos nas fibras profundas do tapete. Só a extração profissional a quente remove o odor pela raiz, não só à superfície.' },
-  { titleGold: 'Higienização de Tapetes', titleRest: ' para cuidar das fibras em casa', desc: 'Espirros e olhos irritados em casa podem vir do tapete, não do ar exterior. Fibras densas acumulam ácaros e pólen que a ventilação normal não remove.' },
+  {
+    "titleGold": "Resíduos nas fibras",
+    "titleRest": " além da superfície",
+    "desc": "O material, a base e a sujidade observada orientam a avaliação. Envie fotografias da frente e do verso do tapete."
+  },
+  {
+    "titleGold": "Orçamento por peça",
+    "titleRest": " com medidas e material",
+    "desc": "Indique largura e comprimento de cada tapete. O valor é confirmado após avaliação, sem preço fixo por m²."
+  },
+  {
+    "titleGold": "Pó e sujidade",
+    "titleRest": " acumulados com o uso",
+    "desc": "Aspiração e limpeza profissional têm funções distintas. O procedimento é escolhido após verificar as fibras, as cores e a base."
+  },
+  {
+    "titleGold": "Odores no tapete",
+    "titleRest": " avaliados pela origem",
+    "desc": "Indique quando o odor começou e se houve derrames ou humidade. A avaliação define o que pode ser tratado, sem prometer remoção total."
+  },
+  {
+    "titleGold": "Produtos já aplicados",
+    "titleRest": " importam na avaliação",
+    "desc": "Informe tentativas de limpeza anteriores. Essa informação ajuda a escolher o procedimento e a explicar eventuais limitações."
+  }
 ];
 
 const TAPETES_QUALIDADE_POOL: TrustPoint[] = [
-  { titleGold: 'Aparência renovada', titleRest: ' sem substituir o tapete', desc: 'Tapetes considerados "inutilizáveis" ficam como novos com extração profissional a quente, recuperando até 90% da aparência original. Sem gastar em tapete novo.' },
-  { titleGold: 'Pronto a usar', titleRest: ' em poucas horas', desc: 'O nosso equipamento de alta extração minimiza a humidade residual. Em condições normais de ventilação, o tapete está pronto a pisar em 3 a 6 horas.' },
-  { titleGold: 'Recuperação de cores', titleRest: ' sem tratamentos agressivos', desc: 'Enzimas específicas por tipo de fibra restauram a tonalidade original sem branqueamento nem produtos corrosivos que danificam o tapete a longo prazo.' },
-  { titleGold: 'A técnica certa', titleRest: ' para cada tipo de fibra', desc: 'Lã, seda, sisal ou sintético: cada material exige um método e produto próprios. Aplicar a técnica errada pode encolher ou destingir o tapete.' },
-  { titleGold: 'Tapetes delicados', titleRest: ' tratados com o cuidado que merecem', desc: 'Tapetes antigos, de família ou artesanais recebem um processo mais cuidadoso, testado numa zona pouco visível antes de tratar a peça toda.' },
+  {
+    "titleGold": "Aparência mais cuidada",
+    "titleRest": " sem prometer restauro",
+    "desc": "A limpeza trata sujidade e resíduos. Não repõe corantes perdidos nem repara desgaste permanente das fibras."
+  },
+  {
+    "titleGold": "Secagem da limpeza",
+    "titleRest": " dependente das condições",
+    "desc": `${DRYING_PROMISE} Confirme quando pode voltar a usar o tapete.`
+  },
+  {
+    "titleGold": "Cores e acabamento",
+    "titleRest": " avaliados antes de limpar",
+    "desc": "Verificamos a estabilidade das cores e as instruções do fabricante antes de escolher produtos e método."
+  },
+  {
+    "titleGold": "Método adequado",
+    "titleRest": " às fibras e à base",
+    "desc": "Lã, seda, sisal e sintéticos podem exigir cuidados diferentes. A modalidade e a viabilidade do serviço são confirmadas após avaliação."
+  },
+  {
+    "titleGold": "Peças delicadas",
+    "titleRest": " com avaliação individual",
+    "desc": "Mostre a etiqueta e o estado da peça. Quando adequado, testa-se numa zona discreta antes de avançar."
+  }
 ];
 
-const TAPETES_FIXED_CROSSSELL: TrustPoint = { titleGold: 'Uma visita,', titleRest: ' vários espaços tratados', desc: 'Sofá, colchão ou cadeiras na mesma visita do tapete: um único agendamento, desconto de pack incluído.' };
+const TAPETES_FIXED_CROSSSELL: TrustPoint = { titleGold: 'Uma visita,', titleRest: ' vários espaços tratados', desc: 'Pode juntar outros artigos na mesma visita. O orçamento identifica os serviços, os descontos aplicáveis e a deslocação, que não recebe desconto.' };
 
 function getTapetesTrustPoints(seed: string): TrustPoint[] {
   return [
@@ -157,22 +266,62 @@ function getTapetesTrustPoints(seed: string): TrustPoint[] {
 // removido dos dois pools (2026-09-09: "limpeza de alcatifa e sempre sob
 // orçamento assim como tapete" — nunca voltar a pôr "desde X€/m²" aqui).
 const ALCATIFA_PROBLEMA_POOL: TrustPoint[] = [
-  { stat: '1 kg/m²', titleGold: 'Sujidade invisível', titleRest: ' acumulada em cada m² da alcatifa', desc: 'Fibras compactadas retêm o que não se vê mas que respira todos os dias. Nem a aspiração profissional chega às camadas mais profundas.' },
-  { stat: '2,5×', titleGold: 'Pior qualidade do ar', titleRest: ' sem limpeza regular', desc: 'Alcatifas sem manutenção anual degradam significativamente o ar interior. Crítico em escritórios, quartos e espaços com pouca ventilação.' },
-  { stat: '10×', titleGold: '10× mais poluentes', titleRest: ' retidos do que no ar', desc: 'Fibras densas de alcatifa retêm compostos orgânicos voláteis, poluentes e toxinas que a ventilação normal não remove.' },
-  { stat: '1.000', titleGold: '1.000 pessoas/dia', titleRest: ' em zonas comerciais de tráfego intenso', desc: 'Uma alcatifa de escritório ou loja com uso diário intenso acumula sujidade a um ritmo muito mais rápido do que uma alcatifa doméstica.' },
-  { stat: '5×', titleGold: '5× mais sujidade', titleRest: ' nas zonas de passagem', desc: 'Corredores e entradas acumulam muito mais sujidade por cm² do que zonas estáticas, e são as mais negligenciadas na limpeza doméstica.' },
+  {
+    "titleGold": "Zonas de passagem",
+    "titleRest": " com sujidade acumulada",
+    "desc": "Entradas e corredores podem precisar de atenção localizada. Indique as faixas mais marcadas ao pedir o orçamento."
+  },
+  {
+    "titleGold": "Áreas de trabalho",
+    "titleRest": " preparadas para a visita",
+    "desc": "Indique o mobiliário e as zonas acessíveis. Planeamos as áreas a tratar sem assumir que todos os móveis podem ser deslocados."
+  },
+  {
+    "titleGold": "Margens e rodapés",
+    "titleRest": " incluídos na avaliação",
+    "desc": "Mostre linhas de pó nos limites da alcatifa. O acesso aos cantos é confirmado antes da intervenção."
+  },
+  {
+    "titleGold": "Uso do espaço",
+    "titleRest": " considerado no planeamento",
+    "desc": "Informe os horários e as restrições de circulação. A organização da visita depende da disponibilidade confirmada."
+  },
+  {
+    "titleGold": "Escadas e recortes",
+    "titleRest": " medidos separadamente",
+    "desc": "Indique degraus, corredores e áreas irregulares para preparar uma proposta adequada, sempre sob orçamento."
+  }
 ];
 
 const ALCATIFA_QUALIDADE_POOL: TrustPoint[] = [
-  { titleGold: 'Aparência renovada', titleRest: ' sem substituir a alcatifa', desc: 'Alcatifas consideradas gastas ou descoloridas recuperam até 85% da tonalidade original com extração profissional a quente, sem gastar em revestimento novo.' },
-  { titleGold: 'Pronto a usar', titleRest: ' em poucas horas', desc: 'O nosso equipamento de alta sucção minimiza a humidade residual. Em condições normais de ventilação, a alcatifa fica seca em 3 a 6 horas.' },
-  { titleGold: 'Sem interromper', titleRest: ' a atividade do espaço', desc: 'Em escritórios, clínicas ou lojas, trabalhamos frequentemente fora do horário de expediente para não afetar o funcionamento do negócio.' },
-  { titleGold: 'Remoção de resíduos', titleRest: ' dos alergénios e ácaros', desc: 'A extração profunda a quente remove o que a aspiração doméstica nunca chega, reduzindo significativamente alergénios acumulados nas fibras.' },
-  { titleGold: 'Equipamento certo', titleRest: ' para cada tipo de alcatifa', desc: 'Alcatifas de pelo alto, baixo ou de alta densidade (comum em hotéis) exigem pressão e técnica diferentes. Usamos o equipamento adequado a cada caso.' },
+  {
+    "titleGold": "Sujidade e desgaste",
+    "titleRest": " são situações diferentes",
+    "desc": "A limpeza pode melhorar o aspeto ao remover resíduos, mas não repõe fibras gastas nem recupera cor perdida."
+  },
+  {
+    "titleGold": "Secagem da limpeza",
+    "titleRest": " com ventilação adequada",
+    "desc": `${DRYING_PROMISE} Confirme a circulação e a recolocação dos móveis.`
+  },
+  {
+    "titleGold": "Horário da intervenção",
+    "titleRest": " combinado previamente",
+    "desc": "Indique quando o espaço está disponível. A equipa confirma a possibilidade de execução e as condições de acesso."
+  },
+  {
+    "titleGold": "Limpeza de resíduos",
+    "titleRest": " sem tratamentos implícitos",
+    "desc": "A limpeza não inclui automaticamente anti-ácaros ou desbacterização. Tratamentos adicionais são avaliados e orçamentados separadamente."
+  },
+  {
+    "titleGold": "Instalação e fibras",
+    "titleRest": " orientam o procedimento",
+    "desc": "Avaliamos o tipo de revestimento, a base e a instalação para escolher o método e explicar limitações antes de executar."
+  }
 ];
 
-const ALCATIFA_FIXED_CROSSSELL: TrustPoint = { titleGold: 'Uma visita,', titleRest: ' todos os espaços tratados', desc: 'Sofá, colchão, tapete ou cadeiras na mesma visita da alcatifa: um único agendamento, desconto de pack incluído.' };
+const ALCATIFA_FIXED_CROSSSELL: TrustPoint = { titleGold: 'Uma visita,', titleRest: ' todos os espaços tratados', desc: 'Pode juntar outros artigos na mesma visita. O orçamento identifica os serviços, os descontos aplicáveis e a deslocação, que não recebe desconto.' };
 
 function getAlcatifaTrustPoints(seed: string): TrustPoint[] {
   return [
@@ -190,22 +339,22 @@ function getAlcatifaTrustPoints(seed: string): TrustPoint[] {
 // keywordVariantData.ts: "proteção real até 10 anos"), não um número novo.
 // 3º ponto fica exatamente como estava (fixo, não fazia parte do pedido).
 const IMPERMEABILIZACAO_SOFA_POOL: TrustPoint[] = [
-  { titleGold: 'Premium desde 89€,', titleRest: ' proteja até 10 anos o seu sofá de linho', desc: 'A versão Premium cria uma barreira invisível que resiste a até 5 lavagens e mantém o linho protegido de manchas e líquidos durante uma década.' },
+  { titleGold: 'Premium desde 89€,', titleRest: ' proteja até 10 anos o seu sofá de linho', desc: 'A versão Premium cria uma barreira invisível que resiste a até 5 lavagens e pode ajudar a proteger o linho, com duração dependente do uso e da manutenção.' },
   { titleGold: 'Premium desde 89€,', titleRest: ' proteja até 10 anos o seu sofá de veludo', desc: 'O veludo absorve líquidos em segundos e mancha com facilidade. A Premium cria uma barreira que repele manchas sem alterar o toque aveludado.' },
-  { titleGold: 'Premium desde 89€,', titleRest: ' proteja até 10 anos o seu sofá de chenille', desc: 'O chenille retém sujidade nas fibras entrelaçadas. Com a Premium, líquidos e gordura ficam à superfície, prontos a limpar com um pano.' },
-  { titleGold: 'Premium desde 89€,', titleRest: ' proteja até 10 anos o seu sofá de algodão', desc: 'Tecidos de algodão absorvem manchas com muita facilidade. A Premium cria uma barreira invisível que reduz esse risco ao mínimo, sem alterar a cor.' },
+  { titleGold: 'Premium desde 89€,', titleRest: ' proteja até 10 anos o seu sofá de chenille', desc: 'O chenille retém sujidade nas fibras entrelaçadas. A Premium ajuda a reduzir a absorção de derrames; a remoção deve ser imediata e conforme as instruções.' },
+  { titleGold: 'Premium desde 89€,', titleRest: ' proteja até 10 anos o seu sofá de algodão', desc: 'Tecidos de algodão absorvem manchas com muita facilidade. A Premium cria uma barreira invisível que ajuda a reduzir a absorção, mediante compatibilidade confirmada.' },
   { titleGold: 'Premium desde 89€,', titleRest: ' proteja até 10 anos o seu sofá de bouclé', desc: 'A textura em laçada do bouclé retém sujidade nos relevos. A Premium protege sem esconder a textura nem alterar o aspeto do tecido.' },
 ];
 
 const IMPERMEABILIZACAO_CADEIRA_POOL: TrustPoint[] = [
-  { titleGold: 'A partir de 20€,', titleRest: ' proteja até 10 anos a sua cadeira de tecido', desc: 'Cadeiras de jantar recebem sumo, molho e gordura todos os dias. A Premium cria uma barreira que dá tempo a limpar antes de a mancha absorver.' },
-  { titleGold: 'Desde 20€,', titleRest: ' proteja até 10 anos a sua cadeira de veludo', desc: 'O veludo das cadeiras estofadas marca com facilidade. A Premium repele líquidos à superfície sem alterar o brilho nem o toque do tecido.' },
-  { titleGold: 'A partir de 20€,', titleRest: ' proteja até 10 anos a sua cadeira de linho', desc: 'Linho claro mostra qualquer mancha de imediato. Com a Premium, derrames à mesa ficam à superfície, prontos a remover com um pano seco.' },
-  { titleGold: 'Desde 20€,', titleRest: ' proteja até 10 anos a sua cadeira de chenille', desc: 'As fibras entrelaçadas do chenille retêm sujidade nas costuras. A Premium cria uma barreira que impede que os líquidos cheguem lá.' },
-  { titleGold: 'A partir de 20€,', titleRest: ' proteja até 10 anos a sua cadeira estofada', desc: 'Cadeiras de restaurante ou de uso diário sofrem o desgaste mais rápido de todos os estofos. A Premium prolonga o aspeto de novo durante uma década.' },
+  { titleGold: 'Proteção Premium,', titleRest: ' até 10 anos para a sua cadeira de tecido', desc: 'Cadeiras de jantar recebem sumo, molho e gordura todos os dias. A Premium cria uma barreira que dá tempo a limpar antes de a mancha absorver.' },
+  { titleGold: 'Proteção Premium,', titleRest: ' até 10 anos para a sua cadeira de veludo', desc: 'O veludo das cadeiras estofadas marca com facilidade. A Premium repele líquidos à superfície sem alterar o brilho nem o toque do tecido.' },
+  { titleGold: 'Proteção Premium,', titleRest: ' até 10 anos para a sua cadeira de linho', desc: 'Linho claro mostra qualquer mancha de imediato. Com a Premium, derrames à mesa ficam à superfície, prontos a remover com um pano seco.' },
+  { titleGold: 'Proteção Premium,', titleRest: ' até 10 anos para a sua cadeira de chenille', desc: 'As fibras entrelaçadas do chenille retêm sujidade nas costuras. A Premium cria uma barreira que ajuda a evitar que os líquidos sejam absorvidos tão rapidamente, sem dispensar cuidados imediatos.' },
+  { titleGold: 'Proteção Premium,', titleRest: ' até 10 anos para a sua cadeira estofada', desc: 'Cadeiras de restaurante ou de uso diário sofrem o desgaste mais rápido de todos os estofos. A duração anunciada da Premium é até 10 anos, dependendo do uso e dos cuidados recomendados.' },
 ];
 
-const IMPERMEABILIZACAO_FIXED_POINT3: TrustPoint = { titleGold: 'Combine com a limpeza', titleRest: ' e poupe', desc: 'Peça a impermeabilização junto com a limpeza profunda: o Pack Proteção Total tem desconto sobre os dois serviços em separado.' };
+const IMPERMEABILIZACAO_FIXED_POINT3: TrustPoint = { titleGold: 'Combine com a limpeza', titleRest: ' num orçamento detalhado', desc: 'Pode juntar outros artigos na mesma visita. O orçamento identifica os serviços, os descontos aplicáveis e a deslocação, que não recebe desconto.' };
 
 function getImpermeabilizacaoTrustPoints(seed: string): TrustPoint[] {
   return [

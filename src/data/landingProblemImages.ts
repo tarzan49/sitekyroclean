@@ -253,7 +253,10 @@ export const SOFA_PROBLEM_IMAGES = [
 function score(value: string): number {
   let hash = 2166136261;
   for (let i = 0; i < value.length; i++) hash = Math.imul(hash ^ value.charCodeAt(i), 16777619);
-  return hash >>> 0;
+  // Avalanche the complete key: neighbouring variant IDs must not get correlated scores.
+  hash = Math.imul(hash ^ (hash >>> 16), 0x85ebca6b);
+  hash = Math.imul(hash ^ (hash >>> 13), 0xc2b2ae35);
+  return (hash ^ (hash >>> 16)) >>> 0;
 }
 
 /** Rendezvous selection: independent by problem, stable by URL, never by visit. */

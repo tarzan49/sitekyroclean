@@ -18,6 +18,7 @@ interface Props {
   subtitle?: string;
   serviceSlug: string;
   city?: string;
+  municipality?: string;
   price?: string;
   image?: string | { m: string; d: string };
   breadcrumbs?: BreadcrumbItem[];
@@ -28,13 +29,13 @@ interface Props {
 }
 
 /** Mandatory commercial hero order, shared by every service page family. */
-export default function CommercialHero({ title, subtitle, serviceSlug, city, price, image, breadcrumbs, whatsappHref, source, pricesHref = '#precos', preserveMobileHero = false }: Props) {
+export default function CommercialHero({ title, subtitle, serviceSlug, city, municipality = city, price, image, breadcrumbs, whatsappHref, source, pricesHref = '#precos', preserveMobileHero = false }: Props) {
   const service = services.find(item => item.slug === serviceSlug);
   const background = image ?? pickServiceHero(serviceSlug, city ?? title);
   const imgs = typeof background === 'string' ? { m: background, d: background } : background;
   const category = categoryForServiceSlug(serviceSlug);
   const items = breadcrumbs ?? [{ label: 'Início', to: '/' }, { label: service?.name ?? title, to: service?.baseRoute }, ...(city ? [{ label: city }] : [])];
-  const fee = city ? locationPrices[city] : undefined;
+  const fee = municipality ? locationPrices[municipality] : undefined;
   const value = price ?? service?.priceFrom ?? 'Sob orçamento';
   const priceText = /orçamento/i.test(value) ? 'Sob orçamento' : `Desde ${value}`;
   const words = title.trim().split(' ');
@@ -62,7 +63,7 @@ export default function CommercialHero({ title, subtitle, serviceSlug, city, pri
             </Fragment>)}
           </nav>
           <h1 data-hero-part="title" className="font-playfair text-[1.75rem] sm:text-4xl lg:text-5xl font-semibold leading-[1.12] text-white" style={{ textShadow: '0 2px 12px rgba(0,0,0,.5)' }}>{words.join(' ')} <span className="text-[#D4AF37]">{gold}</span></h1>
-          <p data-hero-part="subtitle" className="mt-3 mb-4 max-w-lg text-sm sm:text-base leading-relaxed text-white/90" style={{ textShadow: '0 1px 6px rgba(0,0,0,.65)' }}>{subtitle ?? commercialHeroSubtitle(serviceSlug, city)}</p>
+          <p data-hero-part="subtitle" className="mt-3 mb-4 max-w-lg text-sm sm:text-base leading-relaxed text-white/90" style={{ textShadow: '0 1px 6px rgba(0,0,0,.65)' }}>{subtitle ?? commercialHeroSubtitle(serviceSlug, municipality)}</p>
           <a data-hero-part="whatsapp" href={whatsappHref} target="_blank" rel="noopener noreferrer" onClick={() => trackWhatsAppClick(source)} className="flex min-h-[52px] items-center justify-center gap-2 bg-[#16833e] px-3 py-3 text-sm font-semibold text-white hover:bg-[#116b32] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#D4AF37]"><MessageCircle className="h-5 w-5 shrink-0" />Pedir orçamento por WhatsApp</a>
           <a data-hero-part="prices" href={pricesHref} className="flex min-h-11 items-center justify-center text-sm text-white underline underline-offset-4">Ver preços</a>
           <p className="text-[11px] leading-relaxed text-white/85">{priceText} + deslocação {fee === undefined ? 'a partir de 10€' : `${fee}€`}.</p>
