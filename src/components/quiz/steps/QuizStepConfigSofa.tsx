@@ -30,9 +30,9 @@ const QuizStepConfigSofa = ({ formData, updateFormData, sofaItems, setSofaItems 
   const has4Plus = (sofaItems.find(i => i.sizeId === '4+-lugares')?.qty ?? 0) > 0;
 
   return (
-    <div className="flex flex-col gap-3 w-full overflow-hidden items-center">
+    <div className="flex flex-col gap-3 [@media(max-height:800px)]:gap-2 w-full overflow-hidden items-center">
       <p className="text-gold text-[11px] font-bold tracking-[0.28em] uppercase mb-0.5 text-center w-full">{isWaterproofBase ? 'PROTEÇÃO' : 'QUANTIDADES'}</p>
-      <h2 className="font-playfair text-2xl sm:text-3xl font-bold text-white text-center w-full">
+      <h2 className="font-playfair text-2xl sm:text-3xl [@media(max-height:800px)]:text-2xl font-bold text-white text-center w-full">
         {isWaterproofBase ? 'Como quer proteger o sofá?' : 'Que sofás vamos limpar?'}
       </h2>
       {isWaterproofBase && (
@@ -44,7 +44,7 @@ const QuizStepConfigSofa = ({ formData, updateFormData, sofaItems, setSofaItems 
         />
       )}
       {(!isWaterproofBase || tierChosen) && (
-        <div className="flex flex-col gap-2 w-full max-w-sm">
+        <div className="flex flex-col gap-2 [@media(max-height:800px)]:gap-1 w-full max-w-sm">
           {sofaPrices.map(option => {
             const item = sofaItems.find(i => i.sizeId === option.id);
             const qty = item?.qty ?? 0;
@@ -66,8 +66,8 @@ const QuizStepConfigSofa = ({ formData, updateFormData, sofaItems, setSofaItems 
               : option.originalBothPrice;
             return (
               <div key={option.id} className={cn('rounded-sm border-2 transition-all duration-200 overflow-hidden', isActive && packOn ? 'border-gold bg-[#1a2a1a] shadow-[0_0_12px_rgba(212,175,55,0.20)]' : isActive ? 'border-gold/50 bg-[#1a2a1a] shadow-[0_0_8px_rgba(212,175,55,0.10)]' : 'border-dashed border-gold/30 bg-gold/[0.03]')}>
-                <div className="flex items-center gap-2 px-2.5 sm:px-3 py-3">
-                  <QuizFurnitureImage service="sofa" sizeId={option.id} />
+                <div className="flex items-center gap-2 px-2.5 sm:px-3 py-3 [@media(max-height:800px)]:py-1">
+                  <QuizFurnitureImage service="sofa" sizeId={option.id} className="[@media(max-height:800px)]:w-12 [@media(max-height:800px)]:h-12" />
                   <div className="flex-1 min-w-0 text-left">
                     <span className="text-sm font-semibold text-white">{option.label}</span>{partialTreatment && <p className="text-[10px] text-gold">Tratamento em {treatedQty} de {qty}</p>}
                     <div className="flex flex-wrap items-center gap-x-1.5 gap-y-0.5 mt-0.5">

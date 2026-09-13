@@ -559,7 +559,7 @@ ${formData.description || 'Sem observações adicionais'}
       <div
         className={cn(
           "relative w-full sm:max-w-lg sm:rounded-sm shadow-[0_8px_60px_rgba(0,0,0,0.6),inset_0_1px_0_rgba(255,255,255,0.07)] sm:border border-white/[0.18] overflow-hidden animate-scale-in flex flex-col sm:gpu-accelerated bg-checker-modal",
-          "h-[100dvh] sm:h-auto sm:max-h-[92dvh]"
+          "h-[100dvh] sm:h-auto sm:max-h-[calc(100dvh-2rem)]"
         )}>
 
 
@@ -635,7 +635,7 @@ ${formData.description || 'Sem observações adicionais'}
             />
           )}
 
-          <div className={cn("flex shrink-0 flex-col py-4 w-full items-center text-center", currentStep !== totalSteps && "my-auto")}>
+          <div className={cn("flex shrink-0 flex-col py-4 [@media(max-height:800px)]:py-2 w-full items-center text-center", currentStep !== totalSteps && "my-auto")}>
 
             {/* Step 0, Location Autocomplete VIP */}
             {/* Context banner when quiz opened from a problem page */}
@@ -917,7 +917,10 @@ ${formData.description || 'Sem observações adicionais'}
     )}
 
     {/* Social proof stays outside the contact step. */}
-    {currentStep !== totalSteps && <div className="border-t border-gold/20 px-4 py-2.5 text-center flex-shrink-0 bg-gradient-to-r from-[#0a1f18] via-[#0d2820] to-[#0a1f18] flex items-center justify-center gap-2 overflow-hidden">
+    {currentStep !== totalSteps && <div className={cn(
+      "border-t border-gold/20 px-4 py-2.5 text-center flex-shrink-0 bg-gradient-to-r from-[#0a1f18] via-[#0d2820] to-[#0a1f18] flex items-center justify-center gap-2 overflow-hidden",
+      currentStep === 3 && activeUpsellScreen === null && "[@media(max-height:800px)]:hidden"
+    )}>
       {currentStep === 0 ? <p className="text-xs text-white/65 py-1">Orçamento sem compromisso.</p> : (() => {
         const current = socialProofMessages[socialProofIdx];
         const Icon = SOCIAL_PROOF_ICON[current.category];
