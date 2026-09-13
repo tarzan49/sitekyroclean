@@ -1,6 +1,6 @@
 import { useEffect, lazy, Suspense } from "react";
 import { trackWhatsAppClick } from "@/lib/quizTracking";
-import { MessageCircle } from "lucide-react";
+import { BadgeCheck, MessageCircle } from "lucide-react";
 import { WHATSAPP_BASE } from "@/constants/business";
 import TrustRatingBadge from "@/components/TrustRatingBadge";
 import { useQuizLauncher } from "@/hooks/use-quiz-launcher";
@@ -89,19 +89,19 @@ const Hero = () => {
               Especialistas em limpeza de estofos ao domicílio. Cuidado profissional, orçamento transparente e resposta em menos de 10 minutos. Equipas em Braga, Porto, Lisboa e Algarve.
             </p>
 
-            {/* Mobile keeps the compact trust row; desktop moves Google to the open right side. */}
-            <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
-              <div className="flex items-baseline gap-1.5">
+            {/* Mobile keeps both trust signals together below the message. */}
+            <div className="flex flex-wrap items-center gap-2 md:hidden">
+              <div className="flex items-center gap-2 rounded-full border border-white/[0.14] bg-black/30 px-4 py-2 backdrop-blur-sm">
+                <BadgeCheck className="h-3.5 w-3.5 flex-shrink-0 text-[#D4AF37]" strokeWidth={2} aria-hidden="true" />
                 <span
-                  className="font-playfair text-xl md:text-2xl font-bold text-gold leading-none"
+                  className="font-playfair text-lg font-bold leading-none text-gold"
                   style={{ textShadow: '0 1px 8px rgba(0,0,0,0.5)' }}
                 >
                   {STATS[0].value}
                 </span>
-                <span className="text-[10px] text-white/55 font-medium tracking-[0.14em] uppercase">{STATS[0].label}</span>
+                <span className="text-[9px] font-semibold uppercase tracking-[0.12em] text-white/65">{STATS[0].label}</span>
               </div>
-              <span className="h-4 w-px flex-shrink-0 bg-white/15 md:hidden" />
-              <span className="md:hidden">
+              <span>
                 <TrustRatingBadge variant="mapsLink" />
               </span>
             </div>
@@ -161,6 +161,16 @@ const Hero = () => {
 
         <div className="absolute bottom-[7%] right-8 z-10 hidden md:block 2xl:right-[calc((100vw-1400px)/2+2rem)]">
           <TrustRatingBadge variant="floatingHero" />
+        </div>
+
+        <div className="absolute bottom-[7%] left-8 z-10 hidden items-center gap-3 rounded-2xl border border-[#D4AF37]/40 bg-[#071f1b]/90 px-4 py-3 shadow-[0_16px_42px_rgba(0,0,0,0.32)] backdrop-blur-xl md:flex lg:left-16 xl:left-20 2xl:left-[calc((100vw-1400px)/2+5rem)]">
+          <span className="flex h-10 w-10 items-center justify-center rounded-full border border-[#D4AF37]/35 bg-[#D4AF37]/10">
+            <BadgeCheck className="h-5 w-5 text-[#D4AF37]" strokeWidth={1.8} aria-hidden="true" />
+          </span>
+          <span>
+            <span className="block font-playfair text-2xl font-bold leading-none text-[#D4AF37]">{STATS[0].value}</span>
+            <span className="mt-1 block text-[10px] font-semibold uppercase tracking-[0.14em] text-white/65">{STATS[0].label}</span>
+          </span>
         </div>
 
         <Suspense fallback={null}>
