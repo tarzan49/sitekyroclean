@@ -21,6 +21,8 @@ export default function VisualExamplesGallery({ examples, name, overline = "Mate
         alt={examples[index].alt}
         loading={loading}
         decoding="async"
+        width={400}
+        height={400}
         className="absolute w-full h-full object-cover !max-w-none"
         style={examples[index].imageStyle}
       />

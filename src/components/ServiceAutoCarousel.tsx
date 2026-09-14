@@ -69,6 +69,8 @@ const ServiceAutoCarousel = ({
           alt={label}
           loading="lazy"
           decoding="async"
+          width={400}
+          height={600}
           style={{
             width: '100%',
             height: '100%',
@@ -82,6 +84,8 @@ const ServiceAutoCarousel = ({
           alt={label}
           loading="lazy"
           decoding="async"
+          width={600}
+          height={400}
           className="w-full h-full object-cover transition-transform duration-700 hover:scale-105"
           style={{
             ...(objectPosition ? { objectPosition } : {}),

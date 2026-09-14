@@ -39,7 +39,7 @@ export default function SofaPackPreview({ base, travel, city, items, onClose }: 
         </div>
         {step === 'offer' ? <>
           <div className="rounded-lg overflow-hidden border border-[#D4AF37]/35 bg-white/[0.04]">
-            <img src={mattressImage} alt="Colchão após limpeza Kyro Clean" className="w-full h-24 object-cover" />
+            <img src={mattressImage} alt="Colchão após limpeza Kyro Clean" className="w-full h-24 object-cover" width={800} height={450} />
             <div className="p-4 space-y-3">
               <label className="block text-xs text-white/75" htmlFor="preview-mattress">Tamanho do colchão</label>
               <select id="preview-mattress" value={size} onChange={event => setSize(event.target.value)} className="w-full h-11 rounded border border-white/25 bg-[#102a1e] px-3 text-sm">

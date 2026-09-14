@@ -50,7 +50,7 @@ export default function CommercialHero({ title, subtitle, serviceSlug, city, mun
   return <section data-commercial-hero data-mobile-hero={preserveMobileHero ? undefined : true} className="relative isolate overflow-hidden pt-[68px] sm:pt-24 text-white">
     <picture className="absolute inset-0 -z-20" aria-hidden="true">
       <source media="(max-width: 767px)" srcSet={preserveMobileHero ? imgs.m : 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'} />
-      <img src={imgs.d} alt="" className="h-full w-full object-cover object-center" loading="eager" fetchPriority="high" />
+      <img src={imgs.d} alt="" className="h-full w-full object-cover object-center" loading="eager" fetchPriority="high" width={1280} height={720} />
     </picture>
     <div className="absolute inset-0 -z-10" aria-hidden="true" style={{ background: 'linear-gradient(180deg, rgba(0,0,0,.48) 0%, rgba(0,0,0,.54) 55%, rgba(0,0,0,.68) 100%)' }} />
     <div className="mx-auto max-w-6xl px-5 sm:px-6 lg:px-8 pb-4 sm:pb-8">

@@ -82,6 +82,8 @@ const ServiceCard = ({ service, prominence }: CardProps) => {
           alt={service.altText}
           loading="lazy"
           decoding="async"
+          width={480}
+          height={358}
           className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.06]"
         />
       </picture>
@@ -308,6 +310,8 @@ const Services = () => {
                 alt={service.altText}
                 loading="lazy"
                 decoding="async"
+                width={280}
+                height={210}
                 className="w-full h-full object-cover"
               />
             </picture>

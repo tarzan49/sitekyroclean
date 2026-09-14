@@ -16,7 +16,7 @@ const EnFooter = () => {
       <div className="container mx-auto px-4">
         <div className="text-center mb-8">
           <div className="inline-flex flex-col items-center gap-2 mb-4">
-            <img src={kyroLogo} alt="Kyro Clean Solutions" className="h-16 md:h-20 w-auto object-contain" loading="lazy" />
+            <img src={kyroLogo} alt="Kyro Clean Solutions" className="h-16 md:h-20 w-auto object-contain" loading="lazy" width={1024} height={1024} />
             <span className="text-lg md:text-xl font-bold text-gold tracking-wide">Kyro Clean Solutions</span>
           </div>
           <p className="text-base text-white/80 leading-relaxed max-w-xl mx-auto">

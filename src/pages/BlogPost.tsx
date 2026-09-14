@@ -111,6 +111,8 @@ const BlogPost = () => {
               alt={post.heroAlt}
               className="w-full h-full object-cover"
               loading="eager"
+              width={1280}
+              height={720}
             />
           </div>
           <div

@@ -27,8 +27,8 @@ export default function IllustratedProcessGuide({ guide, heading, goldWord = '',
         </div>
         <div id={`${id}-panel`} role="tabpanel" aria-labelledby={`${id}-tab-${active}`} tabIndex={0} className="grid md:grid-cols-2 focus-visible:outline focus-visible:outline-[#D4AF37]">
           <div className="relative min-w-0 w-full self-start overflow-hidden bg-[#efeee7]" style={{ aspectRatio: '560 / 340' }}>
-            {step.image && step.cell === undefined ? <img src={step.image} alt={step.alt} loading="lazy" decoding="async" className="absolute inset-0 h-full w-full object-cover" /> : <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 aspect-square">
-              <img src={step.image ?? image} alt={step.alt} loading="lazy" decoding="async" className="absolute !max-w-none" style={{ width: '300%', height: '200%', left: `${-(cell % 3) * 100}%`, top: `${-Math.floor(cell / 3) * 100}%` }} />
+            {step.image && step.cell === undefined ? <img src={step.image} alt={step.alt} loading="lazy" decoding="async" className="absolute inset-0 h-full w-full object-cover" width={560} height={340} /> : <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 aspect-square">
+              <img src={step.image ?? image} alt={step.alt} loading="lazy" decoding="async" className="absolute !max-w-none" style={{ width: '300%', height: '200%', left: `${-(cell % 3) * 100}%`, top: `${-Math.floor(cell / 3) * 100}%` }} width={400} height={400} />
             </div>}
             <span className="absolute bottom-3 left-3 text-[10px] bg-white/90 px-2 py-1 text-[#536259]">Imagem ilustrativa</span>
           </div>

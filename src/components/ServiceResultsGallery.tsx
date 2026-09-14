@@ -49,7 +49,7 @@ export default function ServiceResultsGallery({ category, light = false, interva
             afterLabel={category === "impermeabilizacao" ? "Com proteção" : "Depois"}
             priority={priority && index === 0} noFrame illustrative={item.illustrative} onDraggingChange={setDragging} />
         ) : (
-          <img src={item.image} alt="Resultado de limpeza de tapete, fotografia sem comparação" loading="lazy" decoding="async" className="w-full h-full object-contain" />
+          <img src={item.image} alt="Resultado de limpeza de tapete, fotografia sem comparação" loading="lazy" decoding="async" className="w-full h-full object-contain" width={800} height={600} />
         )}
       </div>
       <div className="flex flex-wrap items-center justify-between gap-2 py-2">
@@ -68,7 +68,7 @@ export default function ServiceResultsGallery({ category, light = false, interva
           <button key={i} type="button" aria-label={`Ver exemplo ${i + 1}${example.kind === "pair" && example.illustrative ? ", efeito ilustrativo" : ""}`}
             aria-pressed={i === index} onClick={() => select(i)}
             className={`relative h-12 w-16 shrink-0 overflow-hidden border-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-gold ${i === index ? "border-gold" : "border-transparent opacity-60 hover:opacity-100"}`}>
-            <img src={resultThumbnail(example.kind === "pair" ? example.after : example.image)} alt="" loading="lazy" decoding="async" className="w-full h-full object-cover" />
+            <img src={resultThumbnail(example.kind === "pair" ? example.after : example.image)} alt="" loading="lazy" decoding="async" className="w-full h-full object-cover" width={64} height={48} />
             <span className="absolute bottom-0 right-0 bg-black/75 text-white text-sm px-1.5 py-0.5">{i + 1}</span>
           </button>
         ))}

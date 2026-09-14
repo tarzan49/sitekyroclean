@@ -48,6 +48,8 @@ const QuizStep1Service = ({ onSelect }: QuizStep1ServiceProps) => {
                 <img
                   src={SERVICE_IMAGES[option.id].replace('.webp', '.png')}
                   alt={option.label}
+                  width={360}
+                  height={260}
                   className={cn(
                     "absolute inset-0 w-full h-full object-cover",
                     imgPos,

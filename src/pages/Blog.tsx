@@ -97,6 +97,8 @@ const Blog = () => {
                 alt={featured.heroAlt}
                 className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-500"
                 loading="lazy"
+                width={960}
+                height={540}
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
               <span className="absolute top-4 left-4 text-sm font-bold text-gold bg-black/50 backdrop-blur-sm border border-gold/30 px-3 py-1 rounded-full">
@@ -139,6 +141,8 @@ const Blog = () => {
                     alt={post.heroAlt}
                     className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-500"
                     loading="lazy"
+                    width={640}
+                    height={360}
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/25 to-transparent" />
                   <span className="absolute top-3 left-3 text-sm font-bold text-gold bg-black/50 backdrop-blur-sm border border-gold/30 px-2 py-0.5 rounded-full">
