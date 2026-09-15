@@ -211,7 +211,7 @@ const BeforeAfterSlider = ({
           onDragStart={(e) => e.preventDefault()}
           className="w-full h-full object-cover"
         />
-        <span className="absolute bottom-4 right-4 text-sm font-bold tracking-[0.18em] uppercase text-white bg-black/50 backdrop-blur-sm px-3 py-1.5">
+        <span className="absolute top-4 right-4 text-sm font-bold tracking-[0.18em] uppercase text-white bg-black/50 backdrop-blur-sm px-3 py-1.5">
           {afterLabel}
         </span>
       </div>
@@ -236,7 +236,7 @@ const BeforeAfterSlider = ({
           onDragStart={(e) => e.preventDefault()}
           className="w-full h-full object-cover"
         />
-        <span className="absolute bottom-4 left-4 text-sm font-bold tracking-[0.18em] uppercase text-white bg-black/50 backdrop-blur-sm px-3 py-1.5">
+        <span className="absolute top-4 left-4 text-sm font-bold tracking-[0.18em] uppercase text-white bg-black/50 backdrop-blur-sm px-3 py-1.5">
           {beforeLabel}
         </span>
       </div>

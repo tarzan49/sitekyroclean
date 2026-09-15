@@ -29,7 +29,8 @@ describe('mandatory commercial hero', () => {
       expect([...container.querySelectorAll('[data-hero-part]')].map(node => node.getAttribute('data-hero-part'))).toEqual(['breadcrumb', 'title', 'subtitle', 'whatsapp', 'prices', 'comparison', 'stats']);
       expect(container.querySelector('picture img')?.getAttribute('src')).toBeTruthy();
       expect(container.querySelector('[data-hero-part="subtitle"]')!.textContent!.length).toBeLessThan(120);
-      expect(container.querySelector('[data-hero-part="prices"]')!.textContent).toBe('Ver preços');
+      expect(container.querySelector('[data-hero-part="prices"]')!.textContent).toContain('Ver preços');
+      expect(container.querySelector('[data-hero-part="prices"]')!.textContent).toContain('deslocação');
       expect(container.querySelector('[data-hero-part="prices"]')?.getAttribute('href')).toBe('#precos');
       const stats = container.querySelector('[data-hero-part="stats"]')!.textContent!;
       expect(stats).toContain('avaliações');

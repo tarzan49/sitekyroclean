@@ -47,10 +47,11 @@ export default function LandingServiceSections() {
       <div className={container}>
         <div className="grid md:grid-cols-2 gap-10 md:gap-16 items-center">
           <div>
-            <SectionHeader overline="Tabela de Preços" heading={`Quanto custa ${model.priceVerb} ${model.prep}`} goldWord={model.locationName} subtitle={model.pricingDescription} />
-            <p data-landing-editorial className="text-sm sm:text-base leading-relaxed text-[#536259] mb-6">{model.editorialIntro}</p>
-            {model.variantExplanation && <p className="text-sm leading-relaxed text-[#536259] mb-6">{model.variantExplanation}</p>}
-            <div className="hidden md:block"><ServiceTrustDesktop serviceSlug={model.serviceSlug} points={model.trustPoints} /></div>
+            <SectionHeader overline="Tabela de Preços" heading={`Quanto custa ${model.priceVerb} ${model.prep}`} goldWord={model.locationName} />
+            <div className="hidden md:block">
+              {model.variantExplanation && <p className="mt-4 text-sm leading-relaxed text-[#536259] mb-6">{model.variantExplanation}</p>}
+              <ServiceTrustDesktop serviceSlug={model.serviceSlug} points={model.trustPoints} />
+            </div>
           </div>
           <PriceWidget key={`${model.serviceSlug}:${model.municipalityName}`} serviceSlug={model.serviceSlug} initialLocation={model.municipalityName} />
         </div>

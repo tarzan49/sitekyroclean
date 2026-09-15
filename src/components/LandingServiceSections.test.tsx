@@ -16,12 +16,11 @@ vi.mock('./QuizFormLazy', () => ({ default: ({ isOpen, ...props }: { isOpen: boo
 afterEach(() => { cleanup(); clearLandingModel(); });
 
 describe('landing section integration', () => {
-  it('shows the editorial introduction and the same trust descriptions as initial HTML', () => {
+  it('shows the same trust descriptions as initial HTML', () => {
     for (const route of ['/limpeza-sofas-lisboa', '/limpeza-sofas-porto-paranhos', '/preco-limpeza-sofas-lisboa', '/higienizacao-sofa-coimbra-santa-clara']) {
       const model = getLandingPageModel(route)!;
       installLandingModel(route);
       const { container } = render(<MemoryRouter initialEntries={[route]}><LandingServiceSections /></MemoryRouter>);
-      expect(container.querySelector('[data-landing-editorial]')?.textContent).toBe(model.editorialIntro);
       fireEvent.click(screen.getByRole('button', { name: 'Porquê escolher a Kyro Clean?' }));
       for (const point of model.trustPoints) expect(screen.getAllByText(point.desc)).toHaveLength(2);
       expect(container.querySelectorAll('#duvidas button[aria-expanded]')).toHaveLength(4);
@@ -118,9 +117,9 @@ describe('landing section integration', () => {
     const model = getLandingPageModel(route)!;
     clearLandingModel();
     const { container } = render(<MemoryRouter initialEntries={[route]}><LandingServiceSections /></MemoryRouter>);
-    expect(container.querySelector('[data-landing-editorial]')).toBeNull();
+    expect(container.querySelector('#precos')).toBeNull();
     await screen.findByText(model.priceHeading.replace(`${model.prep} ${model.locationName}`, '').trim(), { exact: false });
-    expect(container.querySelector('[data-landing-editorial]')?.textContent).toBe(model.editorialIntro);
+    expect(container.querySelector('#precos')).not.toBeNull();
     expect(container.querySelectorAll('#duvidas button[aria-expanded]')).toHaveLength(4);
     expect([...container.querySelectorAll('[data-problem-id] img')]).toHaveLength(4);
   });

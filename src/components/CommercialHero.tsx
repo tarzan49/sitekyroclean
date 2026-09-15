@@ -65,8 +65,10 @@ export default function CommercialHero({ title, subtitle, serviceSlug, city, mun
           <h1 data-hero-part="title" className="font-playfair text-[1.75rem] sm:text-4xl lg:text-5xl font-semibold leading-[1.12] text-white" style={{ textShadow: '0 2px 12px rgba(0,0,0,.5)' }}>{words.join(' ')} <span className="text-[#D4AF37]">{gold}</span></h1>
           <p data-hero-part="subtitle" className="mt-3 mb-4 max-w-lg text-sm sm:text-base leading-relaxed text-white/90" style={{ textShadow: '0 1px 6px rgba(0,0,0,.65)' }}>{subtitle ?? commercialHeroSubtitle(serviceSlug, municipality)}</p>
           <a data-hero-part="whatsapp" href={whatsappHref} target="_blank" rel="noopener noreferrer" onClick={() => trackWhatsAppClick(source)} className="flex min-h-[52px] items-center justify-center gap-2 bg-[#16833e] px-3 py-3 text-sm font-semibold text-white hover:bg-[#116b32] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#D4AF37]"><MessageCircle className="h-5 w-5 shrink-0" />Pedir orçamento por WhatsApp</a>
-          <a data-hero-part="prices" href={pricesHref} className="flex min-h-11 items-center justify-center text-sm text-white underline underline-offset-4">Ver preços</a>
-          <p className="text-[11px] leading-relaxed text-white/85">{priceText} + deslocação {fee === undefined ? 'a partir de 10€' : `${fee}€`}.</p>
+          <a data-hero-part="prices" href={pricesHref} className="flex min-h-9 flex-wrap items-center justify-center gap-x-1.5 text-center">
+            <span className="text-sm font-medium text-white underline underline-offset-4">Ver preços</span>
+            <span className="text-[11px] leading-relaxed text-white/85">· {priceText} + deslocação {fee === undefined ? 'a partir de 10€' : `${fee}€`}.</span>
+          </a>
         </div>
         <div data-hero-part="comparison" id="resultados" className="min-w-0 scroll-mt-20">
           {category && <HeroBeforeAfterPool category={category} className="border-t-2 border-[#D4AF37]" />}

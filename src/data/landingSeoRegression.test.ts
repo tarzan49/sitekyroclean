@@ -24,7 +24,6 @@ describe('final landing SEO regression coverage', () => {
       expect(model.editorialIntro).not.toBe(model.intro);
       expect(model.editorialIntro.length).toBeLessThan(600);
       const html = renderLandingPageHtml(model);
-      expect(html).toContain(escapeLandingHtml(model.editorialIntro));
       expect(model.faqs).toHaveLength(4);
       expect(model.trustPoints).toHaveLength(3);
       for (const point of model.trustPoints) {
