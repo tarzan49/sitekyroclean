@@ -10,6 +10,8 @@ import ServiceHero from "@/components/ServiceHero";
 import ServiceExamplesGallery from "@/components/ServiceExamplesGallery";
 import ServiceExpertTips from "@/components/ServiceExpertTips";
 import ServicePriceSection from "@/components/ServicePriceSection";
+import ServiceReviewsGrid from "@/components/ServiceReviewsGrid";
+import SectionHeader from "@/components/SectionHeader";
 import ServiceEliteGuarantee, { GuaranteeItem } from "@/components/ServiceEliteGuarantee";
 import { ExpertTip } from "@/components/ServiceExpertTips";
 import alcatifaProcesso from "@/assets/galeria-alcatifa-processo.webp";
@@ -75,6 +77,15 @@ const LimpezaAlcatifas = () => {
           serviceSlug="limpeza-alcatifas"
         />
         <ServicePriceSection serviceSlug="limpeza-alcatifas" />
+
+        {/* ═══ AVALIAÇÕES REAIS ═══ */}
+        <section className="py-14 md:py-20 bg-kyro-green">
+          <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
+            <SectionHeader overline="Avaliações Reais" heading="O que dizem os nossos" goldWord="clientes" subtitle="Nas palavras de quem já nos recebeu em casa." light={false} />
+            <ServiceReviewsGrid serviceSlug="limpeza-alcatifas" seed="limpeza-alcatifas" heading="" />
+          </div>
+        </section>
+
         <ServiceExamplesGallery serviceSlug="limpeza-alcatifas" />
         <ServiceProcessGuide serviceSlug="limpeza-alcatifas" />
         <ServiceEliteGuarantee

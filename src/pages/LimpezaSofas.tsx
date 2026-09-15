@@ -10,6 +10,8 @@ import ServiceHero from "@/components/ServiceHero";
 import ServiceExamplesGallery from "@/components/ServiceExamplesGallery";
 import ServiceExpertTips from "@/components/ServiceExpertTips";
 import ServicePriceSection from "@/components/ServicePriceSection";
+import ServiceReviewsGrid from "@/components/ServiceReviewsGrid";
+import SectionHeader from "@/components/SectionHeader";
 import SofaProcessGuide from "@/components/SofaProcessGuide";
 import ServiceEliteGuarantee, { GuaranteeItem } from "@/components/ServiceEliteGuarantee";
 import { ExpertTip } from "@/components/ServiceExpertTips";
@@ -75,6 +77,15 @@ const LimpezaSofas = () => {
           serviceSlug="limpeza-sofas"
         />
         <ServicePriceSection serviceSlug="limpeza-sofas" />
+
+        {/* ═══ AVALIAÇÕES REAIS ═══ */}
+        <section className="py-14 md:py-20 bg-kyro-green">
+          <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
+            <SectionHeader overline="Avaliações Reais" heading="O que dizem os nossos" goldWord="clientes" subtitle="Nas palavras de quem já nos recebeu em casa." light={false} />
+            <ServiceReviewsGrid serviceSlug="limpeza-sofas" seed="limpeza-sofas" heading="" />
+          </div>
+        </section>
+
         <ServiceExamplesGallery serviceSlug="limpeza-sofas" />
         <SofaProcessGuide />
         <ServiceEliteGuarantee

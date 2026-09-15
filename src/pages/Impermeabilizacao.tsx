@@ -9,6 +9,7 @@ import ServiceHero from "@/components/ServiceHero";
 import ServiceExamplesGallery from "@/components/ServiceExamplesGallery";
 import ServiceExpertTips from "@/components/ServiceExpertTips";
 import ServicePriceSection from "@/components/ServicePriceSection";
+import ServiceReviewsGrid from "@/components/ServiceReviewsGrid";
 import SectionHeader from "@/components/SectionHeader";
 import ServiceEliteGuarantee, { GuaranteeItem } from "@/components/ServiceEliteGuarantee";
 import { ExpertTip } from "@/components/ServiceExpertTips";
@@ -208,6 +209,15 @@ const Impermeabilizacao = () => {
         />
         <ServicePriceSection serviceSlug="impermeabilizacao" />
         <WaterproofingTierComparison />
+
+        {/* ═══ AVALIAÇÕES REAIS ═══ */}
+        <section className="py-14 md:py-20 bg-kyro-green">
+          <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
+            <SectionHeader overline="Avaliações Reais" heading="O que dizem os nossos" goldWord="clientes" subtitle="Nas palavras de quem já nos recebeu em casa." light={false} />
+            <ServiceReviewsGrid serviceSlug="impermeabilizacao" seed="impermeabilizacao" heading="" />
+          </div>
+        </section>
+
         <ServiceExamplesGallery serviceSlug="impermeabilizacao" />
         <ServiceProcessGuide serviceSlug="impermeabilizacao" />
         <ServiceEliteGuarantee
