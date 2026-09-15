@@ -30,11 +30,6 @@ const MAX_LENGTHS: Record<string, number> = {
 
 const SUBJECT_MAX_LENGTH = 200;
 
-const FIELD_LABELS: Record<string, string> = {
-  service: "Serviço", service_type: "Tipo", details: "Detalhes",
-  location: "Localização", value: "Valor", booking_id: "Referência", notes: "Notas",
-};
-
 interface SendLeadEmailRequest {
   lead?: Record<string, unknown>;
   subject?: string;
@@ -63,20 +58,46 @@ function escapeHtml(value: string): string {
     .replace(/>/g, "&gt;");
 }
 
+// Pedidos do quiz já trazem service/details/value estruturados — o campo
+// `message` deles é só o mesmo conteúdo outra vez em bloco de texto (montado
+// em QuizForm.tsx para a versão antiga, texto corrido), por isso é omitido
+// aqui para não duplicar. O contacto simples não tem service/details/value,
+// só `message` (a mensagem livre do cliente) — aí é a única fonte e é mostrado.
 function buildEmailHtml(lead: Record<string, string>): string {
-  const rows = LEAD_FIELDS
-    .filter((field) => field !== "name" && field !== "phone" && field !== "message" && lead[field])
-    .map((field) => `<p><strong>${FIELD_LABELS[field] ?? field}:</strong> ${escapeHtml(lead[field]).replace(/\n/g, "<br>")}</p>`)
-    .join("\n");
+  const isStructuredLead = Boolean(lead.service || lead.details || lead.value);
+  const waLink = lead.phone ? `https://wa.me/351${lead.phone.replace(/\D/g, "")}` : null;
+
+  const row = (label: string, value: string, preserveLines = false) => `
+    <tr>
+      <td style="padding:10px 4px;border-bottom:1px solid #e5e7eb;color:#6b7280;font-size:13px;width:130px;vertical-align:top;white-space:nowrap;">${label}</td>
+      <td style="padding:10px 4px;border-bottom:1px solid #e5e7eb;color:#111111;font-size:15px;${preserveLines ? "white-space:pre-line;" : ""}">${escapeHtml(value)}</td>
+    </tr>`;
+
+  const rows: string[] = [];
+  rows.push(row("Nome", lead.name));
+  if (lead.phone) rows.push(row("Telemóvel", lead.phone));
+  if (lead.email) rows.push(row("Email", lead.email));
+  if (lead.service) rows.push(row("Serviço", lead.service));
+  if (lead.service_type) rows.push(row("Tipo", lead.service_type));
+  if (lead.details) rows.push(row("Detalhes", lead.details, true));
+  if (lead.location) rows.push(row("Localização", lead.location));
+  if (lead.value) rows.push(row("Valor", lead.value));
+  if (!isStructuredLead && lead.message) rows.push(row("Mensagem", lead.message, true));
+  if (lead.notes) rows.push(row("Notas", lead.notes, true));
+  if (lead.booking_id) rows.push(row("Referência", `#${lead.booking_id}`));
 
   return `
-    <div style="font-family: Helvetica, Arial, sans-serif; color: #111111; max-width: 600px;">
-      <h2 style="color: #0D3C47;">Novo pedido</h2>
-      <p><strong>Nome:</strong> ${escapeHtml(lead.name)}</p>
-      ${lead.phone ? `<p><strong>Telemóvel:</strong> ${escapeHtml(lead.phone)}</p>` : ""}
-      ${lead.email ? `<p><strong>Email:</strong> ${escapeHtml(lead.email)}</p>` : ""}
-      ${rows}
-      ${lead.message ? `<p><strong>Mensagem:</strong><br>${escapeHtml(lead.message).replace(/\n/g, "<br>")}</p>` : ""}
+    <div style="font-family: -apple-system, Helvetica, Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #ffffff; border: 1px solid #e5e7eb; border-radius: 10px; overflow: hidden;">
+      <div style="background: #1A4E30; padding: 20px 24px;">
+        <p style="margin: 0 0 4px; color: #C3A94B; font-size: 12px; letter-spacing: 1px; text-transform: uppercase;">Kyro Clean Solutions</p>
+        <h1 style="margin: 0; color: #ffffff; font-size: 20px; font-weight: 600;">Novo pedido</h1>
+      </div>
+      <div style="padding: 20px 24px;">
+        <table style="width: 100%; border-collapse: collapse;">
+          ${rows.join("\n")}
+        </table>
+        ${waLink ? `<a href="${waLink}" style="display: inline-block; margin-top: 20px; background: #25D366; color: #ffffff; text-decoration: none; padding: 11px 20px; border-radius: 6px; font-size: 14px; font-weight: 600;">Responder no WhatsApp</a>` : ""}
+      </div>
     </div>
   `;
 }
