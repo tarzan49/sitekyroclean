@@ -4,10 +4,14 @@ import { ChevronLeft, ChevronRight, Pause, Play } from "lucide-react";
 import BeforeAfterSlider from "@/components/BeforeAfterSlider";
 import { BEFORE_AFTER_POOL, type BeforeAfterCategory } from "@/data/beforeAfterPool";
 
-export default function ServiceResultsGallery({ category, light = false, intervalMs = 6000, priority = false }: { priority?: boolean; category: BeforeAfterCategory; light?: boolean; intervalMs?: number }) {
+// `autoplay` (usado só pelos heroes, via HeroBeforeAfterPool) arranca a
+// galeria já a rodar e faz cada par varrer sozinho de "Antes" para "Depois"
+// ao longo do mesmo intervalo — fora dos heroes a galeria continua parada até
+// a pessoa carregar em reproduzir.
+export default function ServiceResultsGallery({ category, light = false, intervalMs = 6000, priority = false, autoplay = false }: { priority?: boolean; category: BeforeAfterCategory; light?: boolean; intervalMs?: number; autoplay?: boolean }) {
   const pool = BEFORE_AFTER_POOL[category];
   const [index, setIndex] = useState(0);
-  const [playing, setPlaying] = useState(false);
+  const [playing, setPlaying] = useState(autoplay);
   const [dragging, setDragging] = useState(false);
   const [hovered, setHovered] = useState(false);
   const [focused, setFocused] = useState(false);
@@ -47,7 +51,8 @@ export default function ServiceResultsGallery({ category, light = false, interva
           <BeforeAfterSlider key={index} beforeImage={item.before} afterImage={item.after}
             beforeLabel={category === "impermeabilizacao" ? "Sem proteção" : "Antes"}
             afterLabel={category === "impermeabilizacao" ? "Com proteção" : "Depois"}
-            priority={priority && index === 0} noFrame illustrative={item.illustrative} onDraggingChange={setDragging} />
+            priority={priority && index === 0} noFrame illustrative={item.illustrative} onDraggingChange={setDragging}
+            sweepMs={autoplay ? intervalMs : undefined} />
         ) : (
           <img src={item.image} alt="Resultado de limpeza de tapete, fotografia sem comparação" loading="lazy" decoding="async" className="w-full h-full object-contain" width={800} height={600} />
         )}

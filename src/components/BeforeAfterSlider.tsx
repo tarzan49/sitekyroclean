@@ -18,6 +18,12 @@ interface BeforeAfterSliderProps {
   // rotação automática enquanto a pessoa está mesmo a arrastar — sem isto,
   // um par podia ser trocado a meio de uma interação real.
   onDraggingChange?: (dragging: boolean) => void;
+  // Varrimento automático do hero (pedido explícito 2026-09-15): em vez da
+  // animação de dica curta, o par começa inteiro em "Antes" e a comparação
+  // desliza devagar até "Depois" ao longo deste tempo total, que é o mesmo
+  // intervalo com que a galeria troca de par — assim cada par mostra o ciclo
+  // completo antes de sair. Ausente = comportamento antigo (dica de 50→30→50).
+  sweepMs?: number;
 }
 
 const BeforeAfterSlider = ({
@@ -30,6 +36,7 @@ const BeforeAfterSlider = ({
   noFrame = false,
   illustrative = false,
   onDraggingChange,
+  sweepMs,
 }: BeforeAfterSliderProps) => {
   // sliderPosition (state) só é a fonte de verdade para o RENDER inicial e
   // para a animação de dica ao montar — nunca é escrita a cada movimento
@@ -41,14 +48,14 @@ const BeforeAfterSlider = ({
   // — testei também agendar por requestAnimationFrame, mas isso falha em
   // silêncio sempre que a aba/página não está em primeiro plano (o
   // navegador pausa rAF nesse caso), por isso o caminho direto é o seguro.
-  const [sliderPosition, setSliderPosition] = useState(50);
+  const [sliderPosition, setSliderPosition] = useState(() => (sweepMs ? 100 : 50));
   const [isDragging, setIsDragging] = useState(false);
   const [hasInteracted, setHasInteracted] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const clipRef = useRef<HTMLDivElement>(null);
   const handleWrapRef = useRef<HTMLDivElement>(null);
   const isDraggingRef = useRef(false);
-  const positionRef = useRef(50);
+  const positionRef = useRef(sweepMs ? 100 : 50);
   const cancelHintRef = useRef<() => void>(() => {});
 
   // Escreve a posição diretamente no DOM (clip-path + posição do puxador),
@@ -76,10 +83,48 @@ const BeforeAfterSlider = ({
     return Math.min(Math.max(pct, 0), 100);
   }, [orientation]);
 
+  // Varrimento automático "Antes -> Depois" (só quando sweepMs vem definido,
+  // hoje apenas nos heroes via HeroBeforeAfterPool). Arranca em "Antes" e
+  // ocupa os sweepMs inteiros a chegar a "Depois" — sem pausa no início nem
+  // no fim (pedido explícito 2026-09-15: "tem que ir do antes para o depois e
+  // mais devagar, tens que demorar os 4 segundos"; a primeira versão parava
+  // meio segundo em cada ponta e o meio do percurso ficava rápido demais).
+  // Como a animação de dica, para de imediato se alguém começar a arrastar.
+  useEffect(() => {
+    if (!sweepMs) return;
+    if (typeof window !== "undefined" && window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) {
+      applyPosition(50);
+      return;
+    }
+
+    let frame = 0;
+    let start: number | null = null;
+    let cancelled = false;
+
+    applyPosition(100);
+
+    const animate = (ts: number) => {
+      if (cancelled) return;
+      if (start === null) start = ts;
+      const p = Math.min((ts - start) / sweepMs, 1);
+      // easeInOutSine — arranca e acaba suave mas quase constante no meio; o
+      // easeInOutCubic de antes despachava metade do percurso em meio segundo.
+      const e = (1 - Math.cos(Math.PI * p)) / 2;
+      applyPosition(100 - 100 * e);
+      if (p < 1) frame = requestAnimationFrame(animate);
+      else setSliderPosition(0);
+    };
+
+    frame = requestAnimationFrame(animate);
+    cancelHintRef.current = () => { cancelled = true; cancelAnimationFrame(frame); };
+    return () => cancelHintRef.current();
+  }, [applyPosition, sweepMs]);
+
   // Hint animation on mount — para de imediato se a pessoa começar a
   // arrastar a sério a meio (senão ficava a competir com o dedo/rato pelo
   // controlo da posição).
   useEffect(() => {
+    if (sweepMs) return;
     let frame: number;
     let start: number | null = null;
     let cancelled = false;
@@ -114,7 +159,7 @@ const BeforeAfterSlider = ({
     const timeout = setTimeout(() => { frame = requestAnimationFrame(animate); }, 700);
     cancelHintRef.current = () => { cancelled = true; clearTimeout(timeout); cancelAnimationFrame(frame); };
     return () => cancelHintRef.current();
-  }, [applyPosition]);
+  }, [applyPosition, sweepMs]);
 
   useEffect(() => {
     onDraggingChange?.(isDragging);

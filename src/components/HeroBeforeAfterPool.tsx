@@ -7,11 +7,14 @@ interface Props {
   intervalMs?: number;
 }
 
-// All hero galleries share the same controls and complete category pool.
-export default function HeroBeforeAfterPool({ category, className, intervalMs }: Props) {
+// Todos os heroes partilham os mesmos controlos e a pool completa da categoria.
+// Nos heroes a galeria anda sozinha: 4 segundos por par (pedido explícito
+// 2026-09-15), durante os quais a comparação começa em "Antes" e desliza
+// devagar até "Depois" antes de trocar para o par seguinte.
+export default function HeroBeforeAfterPool({ category, className, intervalMs = 4000 }: Props) {
   return (
     <div className={className}>
-      <ServiceResultsGallery priority key={category} category={category} intervalMs={intervalMs} />
+      <ServiceResultsGallery autoplay priority key={category} category={category} intervalMs={intervalMs} />
     </div>
   );
 }
