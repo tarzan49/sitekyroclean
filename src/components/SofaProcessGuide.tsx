@@ -25,7 +25,7 @@ export default function SofaProcessGuide({ city, cityPrep = 'em' }: { city?: str
         </div>
         <div id={`${id}-panel`} role="tabpanel" aria-labelledby={`${id}-tab-${active}`} tabIndex={0} className="grid md:grid-cols-2 focus-visible:outline focus-visible:outline-[#D4AF37]">
           <div className="relative min-w-0 w-full self-start overflow-hidden bg-[#efeee7] min-h-[190px] md:min-h-[340px]" style={{ aspectRatio: '560 / 300' }}>
-            <div key={step.label} className="absolute inset-x-0 top-1/2 -translate-y-1/2 scale-150 overflow-hidden" style={{ aspectRatio: `560 / ${step.height}` }}>
+            <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 scale-150 overflow-hidden" style={{ aspectRatio: `560 / ${step.height}` }}>
               <img loading="lazy" decoding="async" src={image} alt={step.alt} className="absolute !max-w-none" style={{ width: '182.8572%', left: '-4.6429%', top: `${-step.y / step.height * 100}%` }} width={1024} height={1536} />
             </div>
             <span className="absolute bottom-3 left-3 text-[10px] bg-white/90 px-2 py-1 text-[#536259]">Imagem ilustrativa</span>

@@ -36,3 +36,28 @@ describe('process guide image containment', () => {
     });
   }
 });
+
+describe('process guide image node reuse', () => {
+  const cases = [
+    { name: 'sofa', component: <SofaProcessGuide /> },
+    ...Object.keys(SERVICE_PROCESS_GUIDES).map(serviceSlug => ({
+      name: serviceSlug,
+      component: <ServiceProcessGuide serviceSlug={serviceSlug as keyof typeof SERVICE_PROCESS_GUIDES} />,
+    })),
+  ];
+  for (const { name, component } of cases) {
+    // Um <img loading="lazy"> recriado já dentro do viewport não chega a carregar
+    // no Safari do iOS: as etapas seguintes à primeira ficavam em branco. O nó tem
+    // de sobreviver à troca de etapa, só as posições mudam.
+    it(`keeps the same img element across steps: ${name}`, () => {
+      render(component);
+      const tabs = screen.getAllByRole('tab');
+      const first = screen.getByRole('tabpanel').querySelector('img');
+      expect(first).not.toBeNull();
+      for (const tab of tabs.slice(1)) {
+        fireEvent.click(tab);
+        expect(screen.getByRole('tabpanel').querySelector('img')).toBe(first);
+      }
+    });
+  }
+});
