@@ -5,10 +5,16 @@ import type { ProcessGuide } from '@/data/serviceProcessGuides';
 
 export default function IllustratedProcessGuide({ guide, heading, goldWord = '', downloadName, dark = false }: { guide: Omit<ProcessGuide, "steps"> & { steps: (ProcessGuide["steps"][number] & { image?: string; cell?: number })[] }; heading?: string; goldWord?: string; downloadName: string; dark?: boolean }) {
   const { steps, image } = guide;
-  const [active, setActive] = useState(0);
+  const [active, setActiveStep] = useState(0);
+  // Depois da primeira troca de etapa a secção está garantidamente à vista, e o
+  // Safari do iOS não chega a carregar um src novo posto num <img loading="lazy">
+  // que já esteja dentro do viewport. Mantemos lazy só para a carga inicial.
+  const [touched, setTouched] = useState(false);
+  const setActive: typeof setActiveStep = value => { setTouched(true); setActiveStep(value); };
   const id = useId();
   const step = steps[active];
   const cell = step.cell ?? active;
+  const full = Boolean(step.image) && step.cell === undefined;
   const downloads = [...new Map(steps.filter(item => item.image).map(item => [item.image!, item])).values()];
   return <section id="processo" className={`scroll-mt-20 py-14 md:py-20 ${dark ? "bg-kyro-green" : "bg-[#FDFDF9]"}`}>
     <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
@@ -27,9 +33,10 @@ export default function IllustratedProcessGuide({ guide, heading, goldWord = '',
         </div>
         <div id={`${id}-panel`} role="tabpanel" aria-labelledby={`${id}-tab-${active}`} tabIndex={0} className="grid md:grid-cols-2 focus-visible:outline focus-visible:outline-[#D4AF37]">
           <div className="relative min-w-0 w-full self-start overflow-hidden bg-[#efeee7]" style={{ aspectRatio: '560 / 340' }}>
-            {step.image && step.cell === undefined ? <img src={step.image} alt={step.alt} loading="lazy" decoding="async" className="absolute inset-0 h-full w-full object-cover" width={560} height={340} /> : <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 aspect-square">
-              <img src={step.image ?? image} alt={step.alt} loading="lazy" decoding="async" className="absolute !max-w-none" style={{ width: '300%', height: '200%', left: `${-(cell % 3) * 100}%`, top: `${-Math.floor(cell / 3) * 100}%` }} width={400} height={400} />
-            </div>}
+            <div className={full ? 'absolute inset-0' : 'absolute inset-x-0 top-1/2 -translate-y-1/2 aspect-square'}>
+              <img src={step.image ?? image} alt={step.alt} loading={touched ? 'eager' : 'lazy'} decoding="async" className={full ? 'absolute inset-0 h-full w-full object-cover' : 'absolute !max-w-none'}
+                style={full ? { width: '100%', height: '100%', left: 0, top: 0 } : { width: '300%', height: '200%', left: `${-(cell % 3) * 100}%`, top: `${-Math.floor(cell / 3) * 100}%` }} width={full ? 560 : 400} height={full ? 340 : 400} />
+            </div>
             <span className="absolute bottom-3 left-3 text-[10px] bg-white/90 px-2 py-1 text-[#536259]">Imagem ilustrativa</span>
           </div>
           <div className="min-w-0 p-5 sm:p-8 flex flex-col">

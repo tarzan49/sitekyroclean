@@ -3,6 +3,11 @@ import { afterEach, describe, expect, it } from 'vitest';
 import SofaProcessGuide from './SofaProcessGuide';
 import ServiceProcessGuide from './ServiceProcessGuide';
 import { SERVICE_PROCESS_GUIDES } from '../data/serviceProcessGuides';
+import IllustratedProcessGuide from './IllustratedProcessGuide';
+import ProblemTreatmentGuide from './ProblemTreatmentGuide';
+import { getAllProblems } from '../data/problemSeoData';
+import { getProblemTreatmentGuide } from '../data/problemTreatmentGuides';
+import { MATERIAL_PROCESS_GUIDES } from '../data/materialProcessGuides';
 
 afterEach(cleanup);
 
@@ -44,6 +49,14 @@ describe('process guide image node reuse', () => {
       name: serviceSlug,
       component: <ServiceProcessGuide serviceSlug={serviceSlug as keyof typeof SERVICE_PROCESS_GUIDES} />,
     })),
+    ...getAllProblems().map(problem => ({
+      name: `problema/${problem.slug}`,
+      component: <ProblemTreatmentGuide guide={getProblemTreatmentGuide(problem)} slug={problem.slug} />,
+    })),
+    ...Object.entries(MATERIAL_PROCESS_GUIDES).map(([slug, guide]) => ({
+      name: `material/${slug}`,
+      component: <IllustratedProcessGuide guide={guide} downloadName={slug} />,
+    })),
   ];
   for (const { name, component } of cases) {
     // Um <img loading="lazy"> recriado já dentro do viewport não chega a carregar
@@ -54,9 +67,14 @@ describe('process guide image node reuse', () => {
       const tabs = screen.getAllByRole('tab');
       const first = screen.getByRole('tabpanel').querySelector('img');
       expect(first).not.toBeNull();
+      const firstSrc = first?.getAttribute('src');
       for (const tab of tabs.slice(1)) {
         fireEvent.click(tab);
-        expect(screen.getByRole('tabpanel').querySelector('img')).toBe(first);
+        const img = screen.getByRole('tabpanel').querySelector('img');
+        expect(img).toBe(first);
+        // Trocar o src de um lazy image já à vista tem o mesmo efeito no iOS que
+        // recriar o nó, por isso depois da primeira interação tem de ser eager.
+        if (img?.getAttribute('src') !== firstSrc) expect(img?.getAttribute('loading')).toBe('eager');
       }
     });
   }
