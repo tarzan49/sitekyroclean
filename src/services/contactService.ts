@@ -2,7 +2,7 @@ import { leadAttributionNote } from '@/lib/leadAttribution';
 import { trackEvent } from '@/lib/analytics';
 /**
  * contactService.ts
- * Submits the simple contact form to Formspree.
+ * Submits the simple contact form by email (Resend, via the send-lead-email function).
  * Pure async function — no React, no hooks.
  */
 
@@ -15,19 +15,22 @@ export interface ContactPayload {
 }
 
 export async function submitContactForm(data: ContactPayload): Promise<void> {
-  const response = await fetch('https://formspree.io/f/xreozzbp', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-    body: JSON.stringify({
-      name: data.nome,
-      phone: data.telefone,
-      email: data.email,
-      location: data.localidade,
-      message: data.mensagem,
-      campaign_attribution: leadAttributionNote() || undefined,
-    }),
+  const { supabase } = await import('@/lib/supabase');
+  const attribution = leadAttributionNote();
+  const { data: result, error } = await supabase.functions.invoke('send-lead-email', {
+    body: {
+      lead: {
+        name: data.nome,
+        phone: data.telefone,
+        email: data.email || undefined,
+        location: data.localidade,
+        message: data.mensagem,
+        notes: attribution || undefined,
+      },
+      subject: 'Novo contacto do site',
+    },
   });
 
-  if (!response.ok) throw new Error('Erro ao enviar');
-  trackEvent('generate_lead', { form: 'contact', delivery: 'formspree' });
+  if (error || !result?.success) throw new Error('Erro ao enviar');
+  trackEvent('generate_lead', { form: 'contact', delivery: 'email' });
 }

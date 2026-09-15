@@ -1,13 +1,29 @@
-import { afterEach, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 import { submitContactForm } from './contactService';
+
+const mocks = vi.hoisted(() => ({ invoke: vi.fn() }));
+vi.mock('@/lib/supabase', () => ({ supabase: { functions: { invoke: mocks.invoke } } }));
+
+beforeEach(() => { mocks.invoke.mockReset().mockResolvedValue({ data: { success: true }, error: null }); });
 afterEach(() => vi.unstubAllGlobals());
-it('keeps every field and special characters in the simple contact Formspree payload', async () => {
-  const fetch = vi.fn().mockResolvedValue({ ok: true }); vi.stubGlobal('fetch', fetch);
+
+it('keeps every field and special characters in the simple contact lead payload', async () => {
   const data = { nome: 'Teste Ç &', telefone: '+351 900000000', email: 'audit@example.invalid', localidade: 'Póvoa de Lanhoso', mensagem: 'Sofá e alcatifa\n2,5 × 3 m' };
   await submitContactForm(data);
-  expect(JSON.parse(fetch.mock.calls[0][1].body)).toEqual({ name: data.nome, phone: data.telefone, email: data.email, location: data.localidade, message: data.mensagem });
+  expect(mocks.invoke).toHaveBeenCalledWith('send-lead-email', {
+    body: {
+      lead: { name: data.nome, phone: data.telefone, email: data.email, location: data.localidade, message: data.mensagem, notes: undefined },
+      subject: 'Novo contacto do site',
+    },
+  });
 });
-it('reports an HTTP failure instead of confirming a failed contact', async () => {
-  vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: false, status: 422 }));
+
+it('reports a failure instead of confirming a failed contact', async () => {
+  mocks.invoke.mockResolvedValue({ data: null, error: { message: 'down' } });
   await expect(submitContactForm({ nome: 'Teste', telefone: '900000000', email: '', localidade: 'Lisboa', mensagem: 'Teste' })).rejects.toThrow();
+});
+
+it('reports a failure when the function responds without success', async () => {
+  mocks.invoke.mockResolvedValue({ data: { success: false }, error: null });
+  await expect(submitContactForm({ nome: 'Teste', telefone: '900000000', email: 'a@a.pt', localidade: 'Lisboa', mensagem: 'Teste' })).rejects.toThrow();
 });

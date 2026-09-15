@@ -117,7 +117,7 @@ export function useQuizNavigation({
       // Commita o valor implícito de 1 cadeira ao avançar (canProceedStep3
       // já aceita '' como válido para não bloquear "Continuar" com o ecrã a
       // mostrar 1) — sem isto o preço, o resumo do pedido e o payload do
-      // Formspree ficavam todos a tratar '' como "sem cadeiras" (0€, linha
+      // de email ficavam todos a tratar '' como "sem cadeiras" (0€, linha
       // de cadeiras omitida da mensagem), mesmo o cliente tendo avançado
       // com 1 cadeira visível no ecrã.
       if (formData.service === 'chairs' && formData.chairQuantity === '') {

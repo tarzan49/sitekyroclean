@@ -53,42 +53,6 @@ function generateBookingId(): string {
   return Math.random().toString(36).substr(2, 8).toUpperCase();
 }
 
-async function postToFormspree(payload: QuizLeadPayload, bookingId: string): Promise<Response> {
-  const { name, phone, email, photos, finalLocation, message, serviceLabel } = payload;
-  const formPayload = new FormData();
-  formPayload.append('name', name);
-  formPayload.append('phone', phone);
-  if (email) formPayload.append('email', email);
-  formPayload.append('location', finalLocation);
-  formPayload.append('message', `${message}\nReferência do pedido: #${bookingId}`);
-  formPayload.append('booking_id', bookingId);
-  const attribution = leadAttributionNote();
-  if (attribution) formPayload.append('campaign_attribution', attribution);
-  formPayload.append('subject', `Pedido de orçamento - ${serviceLabel}`);
-  photos.forEach((photo, i) => {
-    formPayload.append(`foto_${i + 1}`, photo, photo.name);
-  });
-
-  const doFetch = () => {
-    const ctrl = new AbortController();
-    const timer = setTimeout(() => ctrl.abort(), 30000);
-    return fetch('https://formspree.io/f/xreozzbp', {
-      method: 'POST',
-      headers: { Accept: 'application/json' },
-      body: formPayload,
-      signal: ctrl.signal,
-    }).finally(() => clearTimeout(timer));
-  };
-
-  try {
-    return await doFetch();
-  } catch (networkErr) {
-    console.warn('[submissionService] Formspree first attempt failed, retrying once:', networkErr);
-    await new Promise((resolve) => setTimeout(resolve, 300));
-    return await doFetch();
-  }
-}
-
 /** Os campos do lead, iguais para a função de servidor e para o insert direto. */
 function buildLeadRow(payload: QuizLeadPayload, bookingId: string) {
   const {
@@ -110,8 +74,9 @@ function buildLeadRow(payload: QuizLeadPayload, bookingId: string) {
   };
 }
 
-async function insertCrmLead(payload: QuizLeadPayload, bookingId: string): Promise<void> {
-  const { supabase, isSupabaseConfigured } = await import('@/lib/supabase');
+type SupabaseClient = (typeof import('@/lib/supabase'))['supabase'];
+
+async function insertCrmLead(supabase: SupabaseClient, isSupabaseConfigured: boolean, payload: QuizLeadPayload, bookingId: string): Promise<void> {
   if (!isSupabaseConfigured) throw new Error('CRM não configurado');
 
   const row = buildLeadRow(payload, bookingId);
@@ -133,6 +98,31 @@ async function insertCrmLead(payload: QuizLeadPayload, bookingId: string): Promi
   // caminho para criar um lead. Uma falha aqui e uma falha do canal do CRM, e o
   // canal de email trata do resto — ver submitQuizLead.
   throw new Error(`submit-lead falhou: ${error?.message ?? 'resposta inesperada'}`);
+}
+
+/** Segundo canal, independente do CRM: envia o mesmo lead por email (Resend). */
+async function postToLeadEmail(supabase: SupabaseClient, payload: QuizLeadPayload, bookingId: string): Promise<void> {
+  const row = buildLeadRow(payload, bookingId);
+  const body = { lead: { ...row, email: row.email ?? undefined }, subject: `Pedido de orçamento - ${payload.serviceLabel}` };
+
+  // Deliberadamente sem recaptchaToken aqui — ver o comentário em insertCrmLead
+  // sobre porque o token nunca deve ir para o canal de email.
+  const doInvoke = () => supabase.functions.invoke('send-lead-email', { body });
+
+  // O antigo envio direto ao Formspree repetia uma vez em caso de falha de
+  // rede (comum em dados móveis) — mantém-se esse comportamento aqui.
+  let result;
+  try {
+    result = await doInvoke();
+  } catch (networkErr) {
+    console.warn('[submissionService] send-lead-email first attempt failed, retrying once:', networkErr);
+    await new Promise((resolve) => setTimeout(resolve, 300));
+    result = await doInvoke();
+  }
+
+  const { data, error } = result;
+  if (!error && data?.success) return;
+  throw new Error(`send-lead-email falhou: ${error?.message ?? 'resposta inesperada'}`);
 }
 
 export function buildWaUrl(payload: QuizLeadPayload, bookingId: string): string {
@@ -278,22 +268,28 @@ export async function submitQuizLead(payload: QuizLeadPayload): Promise<void> {
   if (!IS_PRODUCTION) {
     persist();
     // eslint-disable-next-line no-console
-    console.warn(`[submissionService] Fora de produção — pedido #${bookingId} NÃO enviado ao CRM nem ao Formspree (simulado).`);
+    console.warn(`[submissionService] Fora de produção — pedido #${bookingId} NÃO enviado ao CRM nem por email (simulado).`);
     return;
   }
+
+  // Um único import, partilhado pelos dois canais: chamar `import('@/lib/supabase')`
+  // em paralelo a partir de duas funções diferentes (uma por canal) confundia o
+  // mock nos testes — cada chamada podia resolver para uma instância diferente
+  // do módulo. Resolvendo uma vez aqui, ambos os canais usam sempre o mesmo cliente.
+  const { supabase, isSupabaseConfigured } = await import('@/lib/supabase');
 
   // Await both channels: if EITHER one lands, the lead reached the business
   // and we resolve normally. Only reject (both failed) so the caller can fall
   // back to the WhatsApp/email toast — silently swallowing a total failure
   // means the customer thinks they're booked and the business never hears.
-  const [crmResult, formspreeResult] = await Promise.allSettled([
-    insertCrmLead(payload, bookingId),
-    postToFormspree(payload, bookingId),
+  const [crmResult, emailResult] = await Promise.allSettled([
+    insertCrmLead(supabase, isSupabaseConfigured, payload, bookingId),
+    postToLeadEmail(supabase, payload, bookingId),
   ]);
 
   const crmOk = crmResult.status === 'fulfilled';
-  const formspreeOk = formspreeResult.status === 'fulfilled' && formspreeResult.value.ok;
-  const bothFailed = !crmOk && !formspreeOk;
+  const emailOk = emailResult.status === 'fulfilled';
+  const bothFailed = !crmOk && !emailOk;
 
   if (!crmOk) {
     const err = crmResult.status === 'rejected' ? crmResult.reason : null;
@@ -305,20 +301,18 @@ export async function submitQuizLead(payload: QuizLeadPayload): Promise<void> {
     });
   }
 
-  if (!formspreeOk) {
-    const err = formspreeResult.status === 'rejected'
-      ? formspreeResult.reason
-      : `Formspree HTTP ${formspreeResult.value.status}`;
+  if (!emailOk) {
+    const err = emailResult.status === 'rejected' ? emailResult.reason : null;
     logError({
       message: err instanceof Error ? err.message : String(err),
-      source: 'QuizForm-formspree',
+      source: 'QuizForm-email',
       severity: bothFailed ? 'error' : 'warning',
       stack: err instanceof Error ? err.stack ?? null : null,
     });
   }
 
   if (bothFailed) {
-    throw new Error('Both CRM insert and Formspree submission failed');
+    throw new Error('Both CRM insert and lead email submission failed');
   }
   persist();
 }

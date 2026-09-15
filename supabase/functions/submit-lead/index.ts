@@ -8,12 +8,11 @@
 // fechada.
 //
 // Regra que manda em tudo o resto: **um pedido real nunca se perde.** O quiz
-// continua a enviar em paralelo pelo segundo canal (email), por isso mesmo que
-// esta função falhe, rejeite por engano, ou nem sequer esteja publicada, o
-// pedido chega na mesma ao negócio. Ver `src/services/submissionService.ts`.
-//
-// Quando o Formspree for substituído pelo Resend, é aqui que o envio do email
-// passa a ser feito: a chave do Resend não pode viver no browser.
+// continua a enviar em paralelo pelo segundo canal (email, função `send-lead-email`),
+// por isso mesmo que esta função falhe, rejeite por engano, ou nem sequer esteja
+// publicada, o pedido chega na mesma ao negócio. Ver `src/services/submissionService.ts`.
+// O email é enviado por uma função à parte, não por esta, de propósito: se
+// vivesse aqui, os dois canais dependeriam do mesmo ponto de falha.
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { checkRateLimit, getClientIP, getRateLimitHeaders } from "../_shared/rate-limit.ts";

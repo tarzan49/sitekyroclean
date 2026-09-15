@@ -131,7 +131,7 @@ O dono trabalha neste projeto a partir de **duas máquinas** — um PC Windows e
 - WhatsApp: 351925530647
 - Email: cleansolutions.pt25@gmail.com
 
-**Stack:** React 18 + TypeScript + Vite + Tailwind CSS + shadcn/ui + react-i18next + Supabase (CRM PostgreSQL) + Formspree (captura principal) + React Router
+**Stack:** React 18 + TypeScript + Vite + Tailwind CSS + shadcn/ui + react-i18next + Supabase (CRM PostgreSQL + Edge Functions) + Resend (email, via função `send-lead-email`) + React Router
 
 **Raiz do projeto:** `C:\Users\im a god bruh\Downloads\spotless-pro-flow-main\`
 
@@ -539,17 +539,20 @@ escolha mudou.
 ## Submissão
 
 ```ts
-// 1. Formspree (primário)
-POST https://formspree.io/f/xreozzbp  (suporta fotos)
+// Dois canais independentes, chamados em paralelo via Promise.allSettled;
+// só rejeita se AMBOS falharem. Migrado do Formspree para o Resend em 2026-09-14
+// (ver oitava armadilha no CLAUDE.md) — deixou de haver insert direto no browser.
 
-// 2. Supabase (backup CRM silencioso)
-supabase.from('leads').insert({
+// 1. CRM (função Edge submit-lead, chave de serviço, insert anónimo fechado)
+supabase.functions.invoke('submit-lead', { body: { lead: {
   name, phone, email, service, service_type,
-  details,  // buildDetailsSummary()
-  location, value, slot, booking_id, message,
-  status: 'pending', source: 'Website', priority: 'Quente',
+  details,  // buildReceiptLines() resumido
+  location, value, booking_id, message,
   notes,    // "Sofá: 2 Lugares + Pack | Colchão: Casal"
-})
+}, recaptchaToken } })
+
+// 2. Email (função Edge send-lead-email, Resend) — mesmo lead, sem recaptchaToken
+supabase.functions.invoke('send-lead-email', { body: { lead: {...}, subject } })
 
 // 3. sessionStorage → /obrigado
 kyro_booking_id, kyro_wa_url, kyro_summary
@@ -1186,9 +1189,9 @@ A secção completa de serviços e zonas de atendimento permanece visível tamb�
 
 ## Galerias de antes e depois (2026-09-10)
 
-`ServiceResultsGallery` centraliza comparação, miniaturas numa faixa horizontal, anterior/seguinte e reprodução opcional (parada por defeito). A miniatura selecionada mantém-se visível sem deslocar a página; a contenção de largura impede que a faixa alargue as grelhas dos heroes em mobile. Usa toda a categoria de `BEFORE_AFTER_POOL`, com cadeiras em 9:16, alcatifas a reutilizar tapetes e identificação de fotos avulsas/efeitos ilustrativos.
+`ServiceResultsGallery` centraliza comparação, miniaturas numa faixa horizontal, anterior/seguinte e reprodução opcional (parada por defeito fora dos heroes; com `autoplay` arranca já a rodar e cada par varre sozinho de Antes para Depois durante o mesmo intervalo, via `sweepMs` do `BeforeAfterSlider`). A miniatura selecionada mantém-se visível sem deslocar a página; a contenção de largura impede que a faixa alargue as grelhas dos heroes em mobile. Usa toda a categoria de `BEFORE_AFTER_POOL`, com cadeiras em 9:16, alcatifas a reutilizar tapetes e identificação de fotos avulsas/efeitos ilustrativos.
 
-`HeroBeforeAfterPool` reutiliza esta galeria nos heroes de cidades, freguesias, variantes, marcas, preços, materiais e problemas. `ServiceAutoCarousel` recebe `category` em todos os seus consumidores atuais e mantém as duas imagens de trabalho/pormenor: ao lado em desktop, por baixo em mobile. A comparação da secção tem largura máxima de 640px. `/antes-depois-limpeza` permite escolher entre os seis serviços e consultar a pool completa. Consumidores futuros sem `category` conservam o fallback estático.
+`HeroBeforeAfterPool` reutiliza esta galeria nos heroes de cidades, freguesias, variantes, marcas, preços, materiais e problemas, sempre com `autoplay` e 4 segundos por par. `ServiceAutoCarousel` recebe `category` em todos os seus consumidores atuais e mantém as duas imagens de trabalho/pormenor: ao lado em desktop, por baixo em mobile. A comparação da secção tem largura máxima de 640px. `/antes-depois-limpeza` permite escolher entre os seis serviços e consultar a pool completa. Consumidores futuros sem `category` conservam o fallback estático.
 
 
 ## Teste de pack dentro do quiz (2026-09-10)

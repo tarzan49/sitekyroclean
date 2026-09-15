@@ -5,14 +5,25 @@ import type { QuizFormData, SofaItem, MattressItem, UpsellItemConfig } from '@/c
 import { useQuizPricing } from '@/hooks/use-quiz-pricing';
 import { buildReceiptLines, formatQuotePrice, submitQuizLead, type QuizLeadPayload } from './submissionService';
 
-const mocks = vi.hoisted(() => ({ insert: vi.fn(), invoke: vi.fn(), fetch: vi.fn(), log: vi.fn() }));
+const mocks = vi.hoisted(() => ({ insert: vi.fn(), invokeCrm: vi.fn(), invokeEmail: vi.fn(), log: vi.fn() }));
 vi.mock('@/lib/quizTracking', () => ({ IS_PRODUCTION: true }));
-vi.mock('@/lib/supabase', () => ({ isSupabaseConfigured: true, supabase: { from: () => ({ insert: mocks.insert }), functions: { invoke: mocks.invoke } } }));
+vi.mock('@/lib/supabase', () => ({
+  isSupabaseConfigured: true,
+  supabase: {
+    from: () => ({ insert: mocks.insert }),
+    functions: { invoke: (name: string, opts: unknown) => (name === 'submit-lead' ? mocks.invokeCrm(opts) : mocks.invokeEmail(opts)) },
+  },
+}));
 // O token nunca é pedido a sério nos testes: interessa o payload que sai, não
 // o script da Google.
 vi.mock('@/lib/recaptcha', () => ({ getRecaptchaTokenSafe: () => Promise.resolve('token-de-teste') }));
 vi.mock('@/lib/errorTracking', () => ({ logError: mocks.log }));
-beforeEach(() => { sessionStorage.clear(); vi.stubGlobal('fetch', mocks.fetch); mocks.fetch.mockReset().mockResolvedValue({ ok: true }); mocks.insert.mockReset().mockResolvedValue({ error: null }); mocks.invoke.mockReset().mockResolvedValue({ data: { success: true }, error: null }); });
+beforeEach(() => {
+  sessionStorage.clear();
+  mocks.insert.mockReset().mockResolvedValue({ error: null });
+  mocks.invokeCrm.mockReset().mockResolvedValue({ data: { success: true }, error: null });
+  mocks.invokeEmail.mockReset().mockResolvedValue({ data: { success: true }, error: null });
+});
 afterEach(() => { cleanup(); vi.unstubAllGlobals(); });
 
 function payload(form: Partial<QuizFormData>, sofas: SofaItem[] = [], mattresses: MattressItem[] = [], extras: UpsellItemConfig[] = []): QuizLeadPayload {
@@ -46,20 +57,20 @@ describe('quote channel parity: table sizes, tiers, quantities, brackets, extras
   it.each(cases)('%s', async (_, form, sofas, mattresses, extra) => {
     const p = payload(form, sofas, mattresses, extra);
     await submitQuizLead(p);
-    const sent = mocks.fetch.mock.calls[0][1].body as FormData;
+    const emailBody = mocks.invokeEmail.mock.calls[0][0].body;
     const receipt = JSON.parse(sessionStorage.getItem('kyro_receipt')!);
     const wa = new URL(sessionStorage.getItem('kyro_wa_url')!).searchParams.get('text')!;
-    expect(sent.get('message')).toContain(p.message);
+    expect(emailBody.lead.message).toBe(p.message);
     expect(wa).toContain(p.message);
     expect(wa).toContain(p.name);
     expect(wa).toContain(p.phone);
     expect(wa).toContain(p.description);
-    expect(sent.get('booking_id')).toBe(receipt.bookingId);
+    expect(emailBody.lead.booking_id).toBe(receipt.bookingId);
     expect(wa).toContain(receipt.bookingId);
     expect(receipt.lines.reduce((n: number, l: { total: number | null }) => n + (l.total ?? 0), 0)).toBe(p.totalPrice);
     expect(receipt.subtotal - receipt.discountAmount).toBeCloseTo(receipt.total);
     expect(receipt.lines.at(-1).total).toBe(locationPrices[form.location!]);
-    expect(mocks.invoke.mock.calls[0][1].body.lead.value).toBe(p.priceText);
+    expect(mocks.invokeCrm.mock.calls[0][0].body.lead.value).toBe(p.priceText);
     if (p.hasSobOrcamento || p.hasUpsellSobItem) expect(wa).toContain('subtotal conhecido');
   });
 });
@@ -80,26 +91,21 @@ describe('specific regressions and delivery failures', () => {
     await submitQuizLead(p);
     expect(new URL(sessionStorage.getItem('kyro_wa_url')!).searchParams.get('text')).toContain('2,5 × 3 m');
   });
-  it('preserves file contents and filenames in the Formspree request', async () => {
-    const p = payload({ service: 'carpet' });
-    p.photos = [new File(['sample'], 'teste.jpg', { type: 'image/jpeg' })];
-    await submitQuizLead(p);
-    expect((mocks.fetch.mock.calls[0][1].body.get('foto_1') as File).name).toBe('teste.jpg');
-  });
-  it('rejects when CRM returns an error object and Formspree returns HTTP error', async () => {
-    mocks.invoke.mockResolvedValue({ data: null, error: { message: 'down' } }); mocks.fetch.mockResolvedValue({ ok: false, status: 422 });
+  it('rejects when both the CRM and the email channel fail', async () => {
+    mocks.invokeCrm.mockResolvedValue({ data: null, error: { message: 'down' } });
+    mocks.invokeEmail.mockResolvedValue({ data: null, error: { message: 'down' } });
     await expect(submitQuizLead(payload({ service: 'carpet' }))).rejects.toThrow('Both');
     expect(sessionStorage.getItem('kyro_receipt')).toBeNull();
   });
-  it.each(['crm', 'formspree'])('succeeds when only %s delivers', async channel => {
-    if (channel === 'crm') mocks.fetch.mockResolvedValue({ ok: false, status: 500 });
-    else mocks.invoke.mockResolvedValue({ data: null, error: { message: 'down' } });
+  it.each(['crm', 'email'])('succeeds when only %s delivers', async channel => {
+    if (channel === 'crm') mocks.invokeEmail.mockResolvedValue({ data: null, error: { message: 'down' } });
+    else mocks.invokeCrm.mockResolvedValue({ data: null, error: { message: 'down' } });
     await expect(submitQuizLead(payload({ service: 'carpet' }))).resolves.toBeUndefined();
   });
-  it('retries one network failure', async () => {
-    mocks.fetch.mockRejectedValueOnce(new Error('offline')).mockResolvedValue({ ok: true });
+  it('retries one network failure on the email channel', async () => {
+    mocks.invokeEmail.mockRejectedValueOnce(new Error('offline')).mockResolvedValue({ data: { success: true }, error: null });
     await submitQuizLead(payload({ service: 'carpet' }));
-    expect(mocks.fetch).toHaveBeenCalledTimes(2);
+    expect(mocks.invokeEmail).toHaveBeenCalledTimes(2);
   });
 });
 
@@ -110,39 +116,36 @@ it('retains Alcatifa instead of mislabelling it as a rug', async () => {
 
 it.each([
   ['2,5', '3', '7.5'], ['2.5', '3', '7.5'], ['1,25', '2,4', '3'], ['0.75', '1.5', '1.13'],
-])('sends both dimensions and correct rounded area to Formspree: %s × %s', async (largura, comprimento, area) => {
+])('sends both dimensions and correct rounded area to the email channel: %s × %s', async (largura, comprimento, area) => {
   const p = payload({ service: 'carpet', serviceType: 'cleaning' });
   p.carpetItems = [{ id: 'first', largura, comprimento }, { id: 'second', largura: '1', comprimento: '4' }];
   p.detailsSummary = buildReceiptLines(p).map(l => `${l.qty}x ${l.label}: ${l.total ?? 'Sob orçamento'}`).join('\n');
   p.message = `Detalhes: ${p.detailsSummary}\nEstimativa: ${p.priceText}`;
   await submitQuizLead(p);
-  const sent = mocks.fetch.mock.calls[0][1].body as FormData;
-  expect(sent.get('message')).toContain(`Tapete 1: ${largura} × ${comprimento} m (${area} m²)`);
-  expect(sent.get('message')).toContain('Tapete 2: 1 × 4 m (4 m²)');
-  expect(sent.get('message')).toContain('Sob orçamento');
+  const emailBody = mocks.invokeEmail.mock.calls[0][0].body;
+  expect(emailBody.lead.message).toContain(`Tapete 1: ${largura} × ${comprimento} m (${area} m²)`);
+  expect(emailBody.lead.message).toContain('Tapete 2: 1 × 4 m (4 m²)');
+  expect(emailBody.lead.message).toContain('Sob orçamento');
   expect(new URL(sessionStorage.getItem('kyro_wa_url')!).searchParams.get('text')).toContain(p.message);
 });
 
 describe('reCAPTCHA no canal do CRM', () => {
   it('não envia o token para o canal de email', async () => {
     await submitQuizLead(payload({ service: 'carpet' }));
-    const body = mocks.fetch.mock.calls[0][1].body as FormData;
-    for (const [, value] of body.entries()) {
-      expect(String(value)).not.toContain('token-de-teste');
-    }
-    expect([...body.keys()].some(k => /recaptcha|captcha|token/i.test(k))).toBe(false);
+    const body = mocks.invokeEmail.mock.calls[0][0].body;
+    expect(JSON.stringify(body)).not.toContain('token-de-teste');
+    expect(body.recaptchaToken).toBeUndefined();
   });
 
   it('envia o token à função de servidor, fora do corpo do lead', async () => {
     await submitQuizLead(payload({ service: 'carpet' }));
-    const sent = mocks.invoke.mock.calls[0][1].body;
-    expect(mocks.invoke.mock.calls[0][0]).toBe('submit-lead');
+    const sent = mocks.invokeCrm.mock.calls[0][0].body;
     expect(sent.recaptchaToken).toBe('token-de-teste');
     expect(sent.lead.recaptchaToken).toBeUndefined();
   });
 
   it('quando o servidor recusa por reCAPTCHA, não insere pelo caminho antigo', async () => {
-    mocks.invoke.mockResolvedValue({ data: null, error: { message: 'forbidden', context: { status: 403 } } });
+    mocks.invokeCrm.mockResolvedValue({ data: null, error: { message: 'forbidden', context: { status: 403 } } });
     // O email entrega, por isso o pedido nao se perde e a submissao resolve.
     await expect(submitQuizLead(payload({ service: 'carpet' }))).resolves.toBeUndefined();
     expect(mocks.insert).not.toHaveBeenCalled();
@@ -152,7 +155,7 @@ describe('reCAPTCHA no canal do CRM', () => {
     // A politica de insert anonimo foi fechada, por isso um insert direto
     // falharia em silencio em producao. Qualquer falha da funcao tem de contar
     // como falha do canal do CRM, nao como motivo para tentar o caminho antigo.
-    mocks.invoke.mockResolvedValue({ data: null, error: { message: 'indisponível', context: { status: 503 } } });
+    mocks.invokeCrm.mockResolvedValue({ data: null, error: { message: 'indisponível', context: { status: 503 } } });
     await expect(submitQuizLead(payload({ service: 'carpet' }))).resolves.toBeUndefined();
     expect(mocks.insert).not.toHaveBeenCalled();
   });
@@ -160,8 +163,8 @@ describe('reCAPTCHA no canal do CRM', () => {
   it('um pedido real nunca se perde quando o reCAPTCHA falha em carregar', async () => {
     // Sem token, o servidor deixa passar de proposito: aqui confirma-se apenas
     // que a submissao segue e entrega, em vez de ficar pendurada.
-    mocks.invoke.mockResolvedValue({ data: { success: true }, error: null });
+    mocks.invokeCrm.mockResolvedValue({ data: { success: true }, error: null });
     await expect(submitQuizLead(payload({ service: 'carpet' }))).resolves.toBeUndefined();
-    expect(mocks.invoke).toHaveBeenCalledTimes(1);
+    expect(mocks.invokeCrm).toHaveBeenCalledTimes(1);
   });
 });

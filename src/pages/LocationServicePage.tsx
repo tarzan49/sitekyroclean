@@ -70,7 +70,7 @@ const LocationServicePage = () => {
   // skipToUpsell incondicional, o que saltava reto para o contacto com
   // service='' e nunca deixava o cliente escolher sofa/colchao/cadeiras -
   // formData.service ficava vazio no lead todo (preco, "Servico:" e
-  // "Detalhes:" em branco no Formspree, valor total so a deslocacao).
+  // "Detalhes:" em branco no email, valor total so a deslocacao).
   const quizService = SERVICE_TO_QUIZ[data.serviceSlug];
 
   const heroImgs = pickServiceHero(data.serviceSlug, data.city);
