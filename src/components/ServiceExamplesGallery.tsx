@@ -6,7 +6,7 @@ export default function ServiceExamplesGallery({ serviceSlug }: { serviceSlug: L
   return (
     <VisualExamplesGallery
       id="exemplos"
-      variant="dark"
+      variant="light"
       overline="Exemplos"
       heading="Veja alguns"
       name="exemplos"

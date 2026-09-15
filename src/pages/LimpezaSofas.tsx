@@ -79,9 +79,9 @@ const LimpezaSofas = () => {
         <ServicePriceSection serviceSlug="limpeza-sofas" />
 
         {/* ═══ AVALIAÇÕES REAIS ═══ */}
-        <section className="py-14 md:py-20 bg-[#FDFDF9]">
+        <section className="py-14 md:py-20 bg-kyro-green">
           <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
-            <SectionHeader overline="Avaliações Reais" heading="O que dizem os nossos" goldWord="clientes" subtitle="Nas palavras de quem já nos recebeu em casa." light={true} />
+            <SectionHeader overline="Avaliações Reais" heading="O que dizem os nossos" goldWord="clientes" subtitle="Nas palavras de quem já nos recebeu em casa." light={false} />
             <ServiceReviewsGrid serviceSlug="limpeza-sofas" seed="limpeza-sofas" heading="" />
           </div>
         </section>
