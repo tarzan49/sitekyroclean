@@ -44,7 +44,7 @@ export function usePriceWidgetState(serviceSlug: string) {
   }, [serviceSlug]);
 
   const getCarpetItems = (i: number): CarpetItem[] => carpetItemsByRow[i] ?? [{ id: `tapete-${i}-1`, largura: '', comprimento: '' }];
-  const carpetItemArea = (item: CarpetItem): number => measureCarpet(item) ?? 0;
+  const carpetItemArea = (item: CarpetItem): number => measureCarpet(item, isAlcatifaService ? 'alcatifa' : 'tapete') ?? 0;
   const setCarpetRow = (i: number, items: CarpetItem[]) => {
     setCarpetItemsByRow(prev => ({ ...prev, [i]: items }));
     const value = isAlcatifaService

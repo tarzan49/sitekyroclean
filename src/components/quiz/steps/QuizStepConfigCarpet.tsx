@@ -13,7 +13,7 @@ const formatArea = (area: number) => area.toLocaleString('pt-PT', { maximumFract
 
 const QuizStepConfigCarpet = ({ carpetItems, setCarpetItems, carpetKind = 'tapete' }: Props) => {
   const fieldPrefix = useId();
-  const totalArea = carpetTotalArea(carpetItems);
+  const totalArea = carpetTotalArea(carpetItems, carpetKind);
 
   return (
     <div className="flex w-full flex-col items-center gap-3">
@@ -35,9 +35,9 @@ const QuizStepConfigCarpet = ({ carpetItems, setCarpetItems, carpetKind = 'tapet
       </details>
 
       <div className="flex w-full max-w-sm flex-col gap-2">
-        {carpetItems.some(item => carpetItemArea(item) === null) && <p className="text-sm text-white/80">Preencha as duas medidas de cada peça para continuar.</p>}
+        {carpetItems.some(item => carpetItemArea(item, carpetKind) === null) && <p className="text-sm text-white/80">Preencha as duas medidas de cada peça para continuar.</p>}
         {carpetItems.map((item, i) => {
-          const area = carpetItemArea(item);
+          const area = carpetItemArea(item, carpetKind);
           return (
             <fieldset key={item.id} className="min-w-0 rounded-xl border border-white/15 bg-[#183026] p-3 shadow-sm">
               <legend className="sr-only">Medidas do tapete {i + 1}</legend>
