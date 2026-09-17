@@ -270,7 +270,7 @@ export function buildStudyTables(): StudyTable[] {
     {
       id: "servicos",
       heading: "Que peça as pessoas querem tratar",
-      columns: ["Serviço", "Pedidos", "Percentagem dos pedidos"],
+      columns: ["Serviço", "Pedidos", `% dos ${STUDY_TOTAL_REQUESTS} pedidos`],
       rows: [
         ...STUDY_SERVICES.map(countRow),
         [`Outras categorias, abaixo do corte de ${STUDY_MIN_GROUP_SIZE} pedidos`, String(servicesRemainder), formatShare(servicesRemainder)],
@@ -282,7 +282,7 @@ export function buildStudyTables(): StudyTable[] {
     {
       id: "cidades",
       heading: "Onde estão os pedidos",
-      columns: ["Cidade", "Pedidos", "Percentagem dos pedidos"],
+      columns: ["Cidade", "Pedidos", `% dos ${STUDY_TOTAL_REQUESTS} pedidos`],
       rows: [
         ...STUDY_CITIES.map(countRow),
         [`Outras cidades, cada uma abaixo do corte de ${STUDY_MIN_GROUP_SIZE} pedidos`, String(citiesRemainder), formatShare(citiesRemainder)],
@@ -294,7 +294,7 @@ export function buildStudyTables(): StudyTable[] {
     {
       id: "meses",
       heading: "Quando chegam os pedidos",
-      columns: ["Mês", "Pedidos", "Percentagem dos pedidos"],
+      columns: ["Mês", "Pedidos", `% dos ${STUDY_TOTAL_REQUESTS} pedidos`],
       rows: STUDY_MONTHS.map(month => [
         month.partial ? `${month.label} (mês incompleto)` : month.label,
         String(month.requests),
@@ -308,7 +308,7 @@ export function buildStudyTables(): StudyTable[] {
     {
       id: "tipo-de-servico",
       heading: "Limpeza ou impermeabilização",
-      columns: ["Tipo de serviço", "Pedidos", "Percentagem dos pedidos"],
+      columns: ["Tipo de serviço", "Pedidos", `% dos ${STUDY_TOTAL_REQUESTS} pedidos`],
       rows: [
         ...STUDY_SERVICE_TYPES.map(countRow),
         ["Sem tipo registado ou em categoria abaixo do corte", String(typesRemainder), formatShare(typesRemainder)],

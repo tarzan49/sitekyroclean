@@ -169,7 +169,7 @@ const StudySection = ({ table }: { table: StudyTable }) => (
     <h2 className="font-playfair text-2xl sm:text-3xl mb-4">{table.heading}</h2>
 
     <div className="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0">
-      <table className="w-full min-w-[420px] bg-white border border-neutral-200 rounded-xl overflow-hidden text-sm">
+      <table className="w-full bg-white border border-neutral-200 rounded-xl overflow-hidden text-sm">
         <caption className="sr-only">{table.heading}</caption>
         <thead>
           <tr className="bg-neutral-50">
@@ -177,7 +177,7 @@ const StudySection = ({ table }: { table: StudyTable }) => (
               <th
                 key={column}
                 scope="col"
-                className={`p-3 font-semibold text-neutral-600 border-b border-neutral-200 ${index === 0 ? "text-left" : "text-right"}`}
+                className={`p-2 sm:p-3 font-semibold text-neutral-600 border-b border-neutral-200 ${index === 0 ? "text-left" : "text-right"}`}
               >
                 {column}
               </th>
@@ -189,11 +189,11 @@ const StudySection = ({ table }: { table: StudyTable }) => (
             <tr key={row[0]} className="border-b border-neutral-100 last:border-0">
               {row.map((cell, index) =>
                 index === 0 ? (
-                  <th key={index} scope="row" className="p-3 text-left font-medium text-neutral-800">
+                  <th key={index} scope="row" className="p-2 sm:p-3 text-left font-medium text-neutral-800">
                     {cell}
                   </th>
                 ) : (
-                  <td key={index} className="p-3 text-right tabular-nums text-neutral-700">
+                  <td key={index} className="p-2 sm:p-3 text-right tabular-nums whitespace-nowrap text-neutral-700">
                     {cell}
                   </td>
                 ),

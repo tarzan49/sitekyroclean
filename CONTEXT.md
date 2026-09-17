@@ -112,6 +112,41 @@ Regras atuais: `CORRECOES-COMERCIAIS-2026-09-10.md`. `src/constants/travel.ts` �
 
 ---
 
+## Estudo com dados próprios (17/09/2026, fase 7 do GEO)
+
+`/estudo-limpeza-estofos-portugal` (`src/pages/Estudo.tsx`) publica os agregados
+dos pedidos que passaram pelo simulador do site. É a única página do site cujo
+conteúdo nenhum concorrente consegue reproduzir.
+
+- **Os números vivem em `src/data/studyData.ts`**, e só lá. O ficheiro guarda
+  contagens brutas, nunca percentagens: as percentagens que a consulta SQL
+  devolve são calculadas sobre os grupos que sobreviveram ao corte dos 20
+  registos, não sobre o total, e publicá-las diretamente dava afirmações
+  falsas (o Porto aparecia a "100,0%" quando são 65 dos 224 pedidos). Tudo o
+  que é percentagem, soma, resto ou formatação é derivado em código.
+- **A cópia da página também vive no módulo de dados**, incluindo as frases do
+  método e dos limites. É o que garante a regra anti-cloaking: `Estudo.tsx` e
+  `scripts/prerender.ts` renderizam exatamente o mesmo texto e as mesmas
+  tabelas (`buildStudyTables()`), de duas maneiras diferentes.
+- **Atualizar os números** é correr `supabase/queries/estudo-dados-proprios.sql`
+  no SQL Editor do dashboard e substituir as contagens no módulo de dados. A
+  chave anónima não lê `quiz_events` (é preciso sessão autenticada), e este
+  projeto nunca usa `supabase db push`. As verificações no fim do módulo
+  rebentam o build se as contagens deixarem de bater certo com o total.
+- **O `<caption>` de cada tabela repete o `<h2>`** e a primeira coluna é
+  `<th scope="row">`, como nas tabelas de preços: uma tabela extraída da página
+  tem de continuar a dizer do que fala.
+- `PageContent` no prerender ganhou dois campos para esta página: `tables`
+  (tabelas com cabeçalhos) e `closingSections` (secções que têm de vir depois
+  das tabelas, porque `articleSections` é renderizado antes delas).
+- Schema: `buildStudySchemas()` em `src/lib/seoSchema.ts` devolve `Article` +
+  `Dataset` no mesmo sítio, partilhados pelas duas audiências. O `Article`
+  aponta para o `Dataset` por `mainEntity`; os dois creditam a empresa por
+  `@id` (`#business`) e o `Article` credita a pessoa por
+  `/autor/antonio-peixoto#person`.
+
+---
+
 ## ⚠️ Duas máquinas, um repositório (ler primeiro)
 
 O dono trabalha neste projeto a partir de **duas máquinas** — um PC Windows e um MacBook — cada uma com a sua própria instância do Claude Code e a sua própria memória local (a memória de uma não é visível à outra; só este ficheiro CONTEXT.md viaja entre as duas, via Git).
@@ -164,6 +199,9 @@ O dono trabalha neste projeto a partir de **duas máquinas** — um PC Windows e
 | `/impermeabilizacao` | Impermeabilizacao |
 | `/obrigado` | Obrigado (pós-submissão) |
 | `/blog/*` | Artigos de blog |
+| `/sobre` | Sobre (entidade) |
+| `/autor/:slug` | Autor (assinatura editorial) |
+| `/estudo-limpeza-estofos-portugal` | Estudo (dados próprios da operação) |
 
 ---
 
