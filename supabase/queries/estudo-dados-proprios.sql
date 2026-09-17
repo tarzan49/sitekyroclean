@@ -18,6 +18,11 @@
 -- Não toca em nome, telefone, email nem morada.
 --
 -- Formato longo (metrica, chave, ...) para caber tudo numa tabela só.
+--
+-- Todos os `null` levam `::numeric` de propósito. Um NULL sem tipo é resolvido
+-- como `text` na fronteira de uma CTE, e o `union all` final rebenta com
+-- "UNION types numeric and text cannot be matched" (42804). Aconteceu na
+-- primeira execução real deste ficheiro.
 
 with concluidos as (
   select * from public.quiz_events where action = 'complete'
@@ -43,15 +48,15 @@ totais as (
   from concluidos
   union all
   select 'totais', 'com_servico', count(*) filter (where service is not null),
-         null, null, null, null
+         null::numeric, null::numeric, null::numeric, null::numeric
   from concluidos
   union all
   select 'totais', 'com_cidade', count(*) filter (where city is not null),
-         null, null, null, null
+         null::numeric, null::numeric, null::numeric, null::numeric
   from concluidos
   union all
   select 'totais', 'com_valor', count(*) filter (where value is not null and value > 0),
-         null, null, null, null
+         null::numeric, null::numeric, null::numeric, null::numeric
   from concluidos
 ),
 
@@ -69,7 +74,7 @@ servicos as (
 cidades as (
   select 'cidade', city, count(*),
          round(100.0 * count(*) / sum(count(*)) over (), 1),
-         null, null, null
+         null::numeric, null::numeric, null::numeric
   from concluidos where city is not null
   group by city having count(*) >= 20
 ),
@@ -80,7 +85,7 @@ cidades as (
 meses as (
   select 'mes', to_char(created_at, 'YYYY-MM'), count(*),
          round(100.0 * count(*) / sum(count(*)) over (), 1),
-         null, null, null
+         null::numeric, null::numeric, null::numeric
   from concluidos
   group by 2 having count(*) >= 20
 ),
@@ -89,7 +94,7 @@ meses as (
 tipos as (
   select 'tipo_servico', service_type, count(*),
          round(100.0 * count(*) / sum(count(*)) over (), 1),
-         null, null, null
+         null::numeric, null::numeric, null::numeric
   from concluidos where service_type is not null
   group by service_type having count(*) >= 20
 ),
@@ -97,7 +102,7 @@ tipos as (
 -- 5. Distribuição de valores. Mediana e quartis, não média: a média de um
 --    serviço com "sob orçamento" pelo meio não diz nada.
 valores as (
-  select 'valor_por_servico', service, count(*), null,
+  select 'valor_por_servico', service, count(*), null::numeric,
          percentile_cont(0.25) within group (order by value),
          percentile_cont(0.50) within group (order by value),
          percentile_cont(0.75) within group (order by value)
@@ -111,10 +116,10 @@ valores as (
 --    aberturas e conclusões é maior do que os abandonos registados.
 funil as (
   select 'funil_passo', step::text,
-         count(*) filter (where action = 'start'), null,
+         count(*) filter (where action = 'start'), null::numeric,
          count(*) filter (where action = 'abandon')::numeric,
          count(*) filter (where action = 'complete')::numeric,
-         null
+         null::numeric
   from public.quiz_events
   group by step
 )

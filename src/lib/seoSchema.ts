@@ -312,6 +312,43 @@ export function buildDatasetSchema(input: DatasetSchemaInput) {
   };
 }
 
+export interface StudySchemaInput extends DatasetSchemaInput {
+  /** Slug do autor que assina o estudo, para o creditar por `@id`. */
+  authorSlug: string;
+}
+
+/**
+ * Os dois nós da página de estudo, na mesma função.
+ *
+ * O `Article` diz que a página é um texto assinado; o `Dataset` diz que os
+ * números dentro dela são um conjunto de dados com origem, período e dimensão.
+ * O `Article` aponta para o `Dataset` por `mainEntity`, para os dois não
+ * ficarem a viver lado a lado sem relação declarada.
+ *
+ * Devolve um array porque a página React e o prerender consomem exatamente o
+ * mesmo resultado: se um dia divergirem, divergem aqui, num sítio só.
+ */
+export function buildStudySchemas(input: StudySchemaInput) {
+  return [
+    {
+      "@context": "https://schema.org",
+      "@type": "Article",
+      "@id": `${input.url}#article`,
+      "url": input.url,
+      "headline": input.name,
+      "description": input.description,
+      "inLanguage": "pt-PT",
+      "datePublished": input.datePublished,
+      "dateModified": input.datePublished,
+      "author": { "@id": `${SITE_URL}/autor/${input.authorSlug}#person` },
+      "publisher": { "@id": `${SITE_URL}/#business` },
+      "isPartOf": { "@id": `${SITE_URL}/#website` },
+      "mainEntity": { "@id": `${input.url}#dataset` },
+    },
+    buildDatasetSchema(input),
+  ];
+}
+
 export interface PersonSchemaInput {
   slug: string;
   name: string;

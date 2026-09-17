@@ -1,4 +1,8 @@
-// Auto-extracted route metadata from problemSeoData.ts
+// Route metadata espelhada de problemSeoData.ts.
+// ARMADILHA: esta lista e escrita a mao. Um problema novo em problemSeoData.ts
+// gera a sua propria pagina mas NENHUMA pagina problema x cidade enquanto nao
+// for acrescentado aqui tambem. Aconteceu em 2026-09-17 com oito problemas.
+// O teste em problemRouteData.test.ts passou a apanhar a divergencia.
 // Only slug + visible + relatedCities — no text content.
 // Keeps problemSeoData.ts out of the initial bundle.
 
@@ -54,4 +58,12 @@ export const PROBLEM_ROUTE_SLUGS: ProblemRouteSlug[] = [
   { slug: "acaros-tapete", relatedCities: ["porto", "braga", "lisboa"] },
   { slug: "limpeza-sofa-perto-de-mim", relatedCities: ["porto", "matosinhos", "lisboa", "cascais", "braga"] },
   { slug: "limpeza-sofa-antes-depois", relatedCities: ["porto", "matosinhos", "braga"] },
+  { slug: "etiqueta-limpeza-sofa", relatedCities: ["porto", "lisboa", "braga", "matosinhos"] },
+  { slug: "manchas-castanhas-apos-limpeza", relatedCities: ["porto", "lisboa", "vila-nova-de-gaia", "braga"] },
+  { slug: "mancha-volta-apos-limpeza", relatedCities: ["porto", "lisboa", "maia", "faro"] },
+  { slug: "sofa-demora-secar", relatedCities: ["porto", "lisboa", "faro", "braga"] },
+  { slug: "cheiro-mofo-sofa", relatedCities: ["porto", "lisboa", "matosinhos", "faro"] },
+  { slug: "tapete-encolheu", relatedCities: ["porto", "lisboa", "braga", "vila-nova-de-gaia"] },
+  { slug: "impermeabilizacao-duracao", relatedCities: ["porto", "lisboa", "braga", "faro"] },
+  { slug: "sofa-couro-ressecado", relatedCities: ["porto", "lisboa", "braga", "matosinhos"] },
 ];

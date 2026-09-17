@@ -22,6 +22,7 @@ import { packs, packCities } from '../src/data/packComboData';
 import { MARCA_CITY_SLUGS } from '../src/data/marcaCities';
 import { getAllPosts } from '../src/data/blogData';
 import { getContentDate } from './content-dates';
+import { STUDY_ROUTE } from '../src/data/studyData';
 
 const BASE_URL = 'https://cleansolutions.com.pt';
 // <lastmod> per page family, from the git history of the data modules that
@@ -81,6 +82,7 @@ const DATES = {
   areas: getContentDate(['src/pages/AreasDeServico.tsx', 'src/data/locationSeoData.ts']),
   sobre: getContentDate(['src/pages/Sobre.tsx', 'src/constants/commercialPolicy.ts']),
   autor: getContentDate(['src/pages/Autor.tsx', 'src/data/authors.ts', 'src/constants/editorialPolicy.ts']),
+  estudo: getContentDate(['src/data/studyData.ts', 'src/pages/Estudo.tsx']),
   antesDepois: getContentDate(['src/data/beforeAfterPool.ts']),
   blogIndex: getContentDate(['src/data/blogData.ts']),
 };
@@ -152,6 +154,7 @@ export function generateSitemaps(outDir: string) {
     xmlUrl('/areas-de-servico', 'monthly', '0.7', DATES.areas),
     xmlUrl('/sobre', 'monthly', '0.6', DATES.sobre),
     xmlUrl(`/autor/${DEFAULT_AUTHOR.slug}`, 'monthly', '0.5', DATES.autor),
+    xmlUrl(STUDY_ROUTE, 'monthly', '0.6', DATES.estudo),
     xmlUrl('/antes-depois-limpeza', 'monthly', '0.7', DATES.antesDepois),
   ];
 

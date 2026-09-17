@@ -40,6 +40,7 @@ const AdminDeslocacoes = lazy(() => import("./pages/AdminDeslocacoes"));
 const AreasDeServico = lazy(() => import("./pages/AreasDeServico"));
 const Sobre = lazy(() => import("./pages/Sobre"));
 const Autor = lazy(() => import("./pages/Autor"));
+const Estudo = lazy(() => import("./pages/Estudo"));
 
 const ReviewRequest = lazy(() => import("./pages/ReviewRequest"));
 const FAQEstofos = lazy(() => import("./pages/FAQEstofos"));
@@ -117,6 +118,7 @@ const AppRoutes = () => {
                 <Route path="/areas-de-servico" element={<AreasDeServico />} />
                 <Route path="/sobre" element={<Sobre />} />
                 <Route path="/autor/:slug" element={<Autor />} />
+                <Route path="/estudo-limpeza-estofos-portugal" element={<Estudo />} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
 
                 <Route path="*" element={<GeneratedRoutePage />} />

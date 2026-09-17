@@ -7,7 +7,7 @@ import { getTreatmentRoutes, getExpansionRoutes, getTreatmentPage, getExpansionP
 import { PRICE_PROMISE, SATISFACTION_PROMISE, DRYING_PROMISE, COVERAGE_PROMISE, RESPONSE_PROMISE, AVAILABILITY_PROMISE, WEEKLY_REQUESTS, TREATMENT_EXTRAS } from '../src/constants/commercialPolicy';
 import { REVIEW_RATING, REVIEW_COUNT, CLIENTS_SERVED_LABEL, SERVICES_COMPLETED_LABEL, PHONE_DISPLAY, BUSINESS_EMAIL } from '../src/constants/business';
 import { locationPrices } from '../src/constants/travel';
-import { buildAboutPageSchema, buildProfilePageSchema, buildPersonNode } from '../src/lib/seoSchema';
+import { buildAboutPageSchema, buildProfilePageSchema, buildPersonNode, buildStudySchemas } from '../src/lib/seoSchema';
 /**
  * Static prerender for Kyro Clean Solutions
  *
@@ -54,6 +54,11 @@ import { buildLocalBusinessNode, buildBreadcrumbNode, buildServiceNode, buildFaq
 import { renderBlogBody } from '../src/lib/blogMarkdown';
 import { getBlogSources } from '../src/data/blogSources';
 import { DEFAULT_AUTHOR } from '../src/data/authors';
+import {
+  STUDY_ROUTE, STUDY_TITLE, STUDY_H1, STUDY_META_DESCRIPTION, STUDY_INTRO,
+  STUDY_METHOD_POINTS, STUDY_LIMIT_POINTS, STUDY_PERIOD, STUDY_RUN_ON,
+  STUDY_TOTAL_REQUESTS, buildStudyTables, formatStudyDate,
+} from '../src/data/studyData';
 import { EDITORIAL_RULES } from '../src/constants/editorialPolicy';
 
 const BASE_URL = 'https://cleansolutions.com.pt';
@@ -191,6 +196,11 @@ interface PageContent {
   // repete o <h2> pela mesma razão que nas tabelas de preços das páginas
   // landing: uma tabela arrancada da página leva a legenda e perde o título.
   tables?: { heading: string; caption?: string; columns: string[]; rows: string[][]; note?: string }[];
+  // Secções que têm de vir DEPOIS das tabelas. `articleSections` é renderizado
+  // antes delas, e há texto que só faz sentido depois dos números: os limites
+  // de um estudo lidos antes dos dados são um aviso solto, lidos a seguir são
+  // a leitura dos dados.
+  closingSections?: { heading: string; body: string }[];
   links?: { href: string; label: string }[];
   reviews?: { name: string; city?: string; text: string }[];
   definitions?: { term: string; definition: string; example?: string }[];
@@ -279,6 +289,12 @@ function generatePageBody(c: PageContent, lang: 'pt' | 'en' = 'pt'): string {
       html += `<section><h2>${escHtml(table.heading)}</h2><table><caption>${escHtml(table.caption ?? table.heading)}</caption><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table>`;
       if (table.note) html += `<p>${escHtml(table.note)}</p>`;
       html += `</section>\n`;
+    }
+  }
+
+  if (c.closingSections?.length) {
+    for (const section of c.closingSections) {
+      html += `<section><h2>${escHtml(section.heading)}</h2>\n${renderBlogBody(section.body)}\n</section>\n`;
     }
   }
 
@@ -1192,6 +1208,60 @@ export function prerenderRoutes(outDir: string): number {
           ],
         },
         extraSchemas: [buildProfilePageSchema(DEFAULT_AUTHOR)],
+      },
+      {
+        // Estudo com dados próprios. Sai inteiro no HTML estático de propósito:
+        // um estudo que só existe depois do JavaScript correr não é lido por
+        // nenhum motor generativo, e era exatamente para esses que foi escrito.
+        // Todo o texto e todas as tabelas vêm de src/data/studyData.ts, os
+        // mesmos que a página React usa, por causa da regra anti-cloaking.
+        path: STUDY_ROUTE,
+        title: STUDY_TITLE,
+        desc: STUDY_META_DESCRIPTION,
+        content: {
+          h1: STUDY_H1,
+          intro: STUDY_INTRO,
+          byline: { author: DEFAULT_AUTHOR.name, authorHref: `/autor/${DEFAULT_AUTHOR.slug}`, published: STUDY_RUN_ON },
+          articleSections: [{
+            heading: 'Método',
+            body: 'Está primeiro, e não no fim, porque um número sem método não é verificável. Quem quiser contestar qualquer valor desta página precisa de saber isto antes de o ler.\n\n'
+              + STUDY_METHOD_POINTS.map(point => `- ${point}`).join('\n'),
+          }],
+          tables: buildStudyTables().map(table => ({
+            heading: table.heading,
+            columns: table.columns,
+            rows: table.rows,
+            note: table.note,
+          })),
+          closingSections: [{
+            heading: 'O que estes números não dizem',
+            body: 'Um estudo que só diz aquilo que lhe convém não serve para ser citado. Estes são os limites reais destes dados.\n\n'
+              + STUDY_LIMIT_POINTS.map(point => `- ${point}`).join('\n'),
+          }, {
+            heading: 'Usar estes dados',
+            body: `Os números desta página podem ser citados com atribuição à Kyro Clean Solutions, indicando o período (${formatStudyDate(STUDY_PERIOD.start)} a ${formatStudyDate(STUDY_PERIOD.end)}) e o número de pedidos (${STUDY_TOTAL_REQUESTS}). Se algum valor for atualizado, a data desta página muda com ele.`,
+          }],
+          links: [
+            { href: `/autor/${DEFAULT_AUTHOR.slug}`, label: 'Como escrevemos o que está aqui' },
+            { href: '/sobre', label: 'Sobre a Kyro Clean Solutions' },
+          ],
+        },
+        extraSchemas: [
+          ...buildStudySchemas({
+            url: `${BASE_URL}${STUDY_ROUTE}`,
+            name: STUDY_H1,
+            description: STUDY_META_DESCRIPTION,
+            temporalCoverage: `${STUDY_PERIOD.start}/${STUDY_PERIOD.end}`,
+            size: STUDY_TOTAL_REQUESTS,
+            variables: buildStudyTables().map(table => table.heading),
+            datePublished: STUDY_RUN_ON,
+            authorSlug: DEFAULT_AUTHOR.slug,
+          }),
+          buildBreadcrumbSchema([
+            { name: 'Início', url: BASE_URL + '/' },
+            { name: STUDY_H1, url: `${BASE_URL}${STUDY_ROUTE}` },
+          ]),
+        ],
       },
       {
         path: '/glossario-limpeza-estofos',
