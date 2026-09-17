@@ -23,6 +23,38 @@ with concluidos as (
   select * from public.quiz_events where action = 'complete'
 ),
 
+-- 0. Denominadores do estudo. Sem isto não há secção de método: uma página
+--    que publica percentagens sem dizer sobre quantos registos e entre que
+--    datas não é citável, é uma afirmação. Serve também para a página poder
+--    calcular sozinha quantos pedidos ficaram de fora do corte dos 20, em vez
+--    de alguém escrever esse número à mão.
+totais as (
+  -- A data vai dentro da `chave` porque as outras colunas do formato longo
+  -- são todas numéricas. Uma linha só, com o total e o intervalo juntos,
+  -- para não haver dúvida sobre qual data é o início.
+  select 'totais' as metrica,
+         'periodo: ' || to_char(min(created_at), 'YYYY-MM-DD')
+                     || ' a ' || to_char(max(created_at), 'YYYY-MM-DD') as chave,
+         count(*) as pedidos,
+         null::numeric as percentagem,
+         null::numeric as q1,
+         null::numeric as mediana,
+         null::numeric as q3
+  from concluidos
+  union all
+  select 'totais', 'com_servico', count(*) filter (where service is not null),
+         null, null, null, null
+  from concluidos
+  union all
+  select 'totais', 'com_cidade', count(*) filter (where city is not null),
+         null, null, null, null
+  from concluidos
+  union all
+  select 'totais', 'com_valor', count(*) filter (where value is not null and value > 0),
+         null, null, null, null
+  from concluidos
+),
+
 -- 1. Que serviços as pessoas pedem.
 servicos as (
   select 'servico' as metrica, service as chave, count(*) as pedidos,
@@ -87,7 +119,8 @@ funil as (
   group by step
 )
 
-select * from servicos
+select * from totais
+union all select * from servicos
 union all select * from cidades
 union all select * from meses
 union all select * from tipos

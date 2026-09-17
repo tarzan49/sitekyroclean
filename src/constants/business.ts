@@ -10,7 +10,10 @@ export const WHATSAPP_BASE = "https://wa.me/351925530647";
 // estiver vazio, nada disso e emitido, em vez de sair um campo vazio ou
 // inventado. E o unico dado que falta para uma entidade poder ser confirmada
 // fora do proprio site.
-export const BUSINESS_TAX_ID = "";
+// Anotado como `string` e nao deixado a inferir `""`: sem a anotacao o tipo
+// literal da constante vazia fazia `...(BUSINESS_TAX_ID && { vatID })` em
+// seoSchema.ts rebentar no typecheck (TS2698).
+export const BUSINESS_TAX_ID: string = "";
 
 // Perfis proprios noutras plataformas, para o `sameAs`. Confirmado em
 // 2026-09-17 que nao existe nenhum. Acrescentar um URL aqui basta: o

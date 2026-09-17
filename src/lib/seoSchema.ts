@@ -268,6 +268,50 @@ export function buildAboutPageSchema() {
   };
 }
 
+export interface DatasetSchemaInput {
+  /** URL da página que publica o conjunto de dados. */
+  url: string;
+  name: string;
+  description: string;
+  /** Intervalo ISO 8601, no formato "2025-11-03/2026-09-15". */
+  temporalCoverage: string;
+  /** Número de registos agregados, para o tamanho ser afirmado e não estimado. */
+  size: number;
+  /** O que foi medido. Um nome por variável publicada. */
+  variables: string[];
+  datePublished: string;
+}
+
+/**
+ * Dataset dos dados próprios da operação.
+ *
+ * Um `Article` diz que a página é um texto; o `Dataset` diz que os números
+ * dentro dela são um conjunto de dados com origem, período e dimensão. É a
+ * diferença entre uma afirmação citável e uma afirmação atribuível.
+ *
+ * `creator` aponta por `@id` para o nó do negócio, como o resto do grafo: a
+ * entidade é descrita num sítio só.
+ */
+export function buildDatasetSchema(input: DatasetSchemaInput) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "Dataset",
+    "@id": `${input.url}#dataset`,
+    "url": input.url,
+    "name": input.name,
+    "description": input.description,
+    "inLanguage": "pt-PT",
+    "temporalCoverage": input.temporalCoverage,
+    "datePublished": input.datePublished,
+    "creator": { "@id": `${SITE_URL}/#business` },
+    "publisher": { "@id": `${SITE_URL}/#business` },
+    "isAccessibleForFree": true,
+    "variableMeasured": input.variables,
+    "size": `${input.size} pedidos concluídos`,
+    "spatialCoverage": { "@type": "Country", "name": "Portugal" },
+  };
+}
+
 export interface PersonSchemaInput {
   slug: string;
   name: string;

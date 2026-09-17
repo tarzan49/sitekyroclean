@@ -185,6 +185,12 @@ interface PageContent {
   processImage?: string;
   processSteps?: { step: number; title: string; description: string; alt?: string }[];
   priceTable?: { item: string; price: string; note?: string }[];
+  // Tabelas de dados com cabeçalhos. Existe porque números publicados em
+  // prosa não se extraem: uma percentagem dentro de uma frase é texto, a mesma
+  // percentagem numa <table> com <th scope> é um valor com nome. O <caption>
+  // repete o <h2> pela mesma razão que nas tabelas de preços das páginas
+  // landing: uma tabela arrancada da página leva a legenda e perde o título.
+  tables?: { heading: string; caption?: string; columns: string[]; rows: string[][]; note?: string }[];
   links?: { href: string; label: string }[];
   reviews?: { name: string; city?: string; text: string }[];
   definitions?: { term: string; definition: string; example?: string }[];
@@ -262,6 +268,18 @@ function generatePageBody(c: PageContent, lang: 'pt' | 'en' = 'pt'): string {
       html += `<li>${escHtml(row.item)}: ${escHtml(row.price)}${escHtml(note)}</li>\n`;
     }
     html += `</ul></section>\n`;
+  }
+
+  if (c.tables?.length) {
+    for (const table of c.tables) {
+      const head = table.columns.map(col => `<th scope="col">${escHtml(col)}</th>`).join('');
+      const body = table.rows.map(row => `<tr>${row.map((cell, index) => index === 0
+        ? `<th scope="row">${escHtml(cell)}</th>`
+        : `<td>${escHtml(cell)}</td>`).join('')}</tr>`).join('');
+      html += `<section><h2>${escHtml(table.heading)}</h2><table><caption>${escHtml(table.caption ?? table.heading)}</caption><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table>`;
+      if (table.note) html += `<p>${escHtml(table.note)}</p>`;
+      html += `</section>\n`;
+    }
   }
 
   if (c.definitions?.length) {
