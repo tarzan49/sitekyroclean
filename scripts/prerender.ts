@@ -214,6 +214,10 @@ interface PageContent {
   // a leitura dos dados.
   closingSections?: { heading: string; body: string }[];
   links?: { href: string; label: string }[];
+  /** Título do bloco de `links`. Sem ele, uma lista de nomes de cidade fica a
+   *  flutuar sem dizer do que é a lista. O React mostra-os debaixo de um
+   *  DirectoryGroup com título; isto é o equivalente no HTML estático. */
+  linksHeading?: string;
   reviews?: { name: string; city?: string; text: string }[];
   definitions?: { term: string; definition: string; example?: string }[];
 }
@@ -248,6 +252,7 @@ function generatePageBody(c: PageContent, lang: 'pt' | 'en' = 'pt'): string {
   html += `<p>${escHtml(c.intro)}</p>\n`;
 
   if (c.links?.length) {
+    if (c.linksHeading) html += `<h2>${escHtml(c.linksHeading)}</h2>\n`;
     html += `<nav><ul>\n`;
     for (const link of c.links) html += `<li><a href="${escHtml(link.href)}">${escHtml(link.label)}</a></li>\n`;
     html += `</ul></nav>\n`;
@@ -665,7 +670,21 @@ export function prerenderRoutes(outDir: string): number {
         `/problemas/${p.slug}`,
         p.title,
         p.metaDescription,
-        { hero, h1: hero.heading, intro: hero.intro, problems: layout.examples.map(example => ({ title: example.title, description: "Imagem ilustrativa.", image: example.image })), processSteps: layout.process.map((step, index) => ({ step: index + 1, ...step })), faqs: layout.faqs },
+        {
+          hero, h1: hero.heading, intro: hero.intro,
+          // "Disponível em": as mesmas cidades que a página React já mostra no
+          // seu DirectoryGroup. Sem isto, a página de problema não ligava a
+          // nenhuma das suas variantes de cidade no HTML estático e elas
+          // ficavam órfãs — o mesmo hub sem spokes que o índice do blog era.
+          linksHeading: 'Disponível em',
+          links: p.relatedCities
+            .map(citySlug => cities.find(city => city.slug === citySlug))
+            .filter((city): city is (typeof cities)[number] => Boolean(city))
+            .map(city => ({ href: `/${p.slug}-${city.slug}`, label: city.name })),
+          problems: layout.examples.map(example => ({ title: example.title, description: "Imagem ilustrativa.", image: example.image })),
+          processSteps: layout.process.map((step, index) => ({ step: index + 1, ...step })),
+          faqs: layout.faqs,
+        },
         [buildFaqSchema(layout.faqs)],
       );
     }
