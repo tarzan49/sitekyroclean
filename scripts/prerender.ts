@@ -173,6 +173,11 @@ interface PageContent {
   // 16.262 páginas, porque a ligação que sobe da página de cidade para o
   // serviço existia para quem vê a página e não para quem a lê sem JavaScript.
   breadcrumb?: { label: string; href?: string }[];
+  // Índice do blog. O /blog estático tinha <h1> e introdução desde sempre, mas
+  // a lista de artigos era desenhada só pelo React: o HTML que os crawlers
+  // leem não tinha uma única ligação para nenhum dos 26 artigos, e todos eles
+  // ficavam órfãos. Mesma falha do glossário na fase 2 e da migalha na fase 8.
+  postList?: { href: string; title: string; category?: string; date?: string; readingTime?: number }[];
   serviceExamples?: ReturnType<typeof getServiceExamples>;
   hero?: ReturnType<typeof getProblemHero>;
   h1: string;
@@ -246,6 +251,18 @@ function generatePageBody(c: PageContent, lang: 'pt' | 'en' = 'pt'): string {
     html += `<nav><ul>\n`;
     for (const link of c.links) html += `<li><a href="${escHtml(link.href)}">${escHtml(link.label)}</a></li>\n`;
     html += `</ul></nav>\n`;
+  }
+
+  if (c.postList?.length) {
+    html += `<section><ul>\n`;
+    for (const post of c.postList) {
+      const meta: string[] = [];
+      if (post.category) meta.push(escHtml(post.category));
+      if (post.date) meta.push(`<time datetime="${escHtml(post.date)}">${formatDatePt(post.date)}</time>`);
+      if (post.readingTime) meta.push(`${post.readingTime} min de leitura`);
+      html += `<li><a href="${escHtml(post.href)}">${escHtml(post.title)}</a>${meta.length ? ` · ${meta.join(' · ')}` : ''}</li>\n`;
+    }
+    html += `</ul></section>\n`;
   }
 
   if (c.hero) {
@@ -1147,6 +1164,16 @@ export function prerenderRoutes(outDir: string): number {
         content: {
           h1: 'Blog Kyro Clean Solutions',
           intro: 'Artigos especializados sobre limpeza profissional de estofos. Dicas de manutenção, guias de preços, comparações de materiais e conselhos do técnico.',
+          // A mesma lista que a página React desenha, pela mesma ordem e com os
+          // mesmos campos que ela mostra em cada cartão. Sem isto o índice do
+          // blog era um hub que não ligava a nenhum dos seus artigos.
+          postList: getAllPosts().map(post => ({
+            href: `/blog/${post.slug}`,
+            title: post.title,
+            category: post.category,
+            date: post.updatedDate || post.publishDate,
+            readingTime: post.readingTime,
+          })),
         },
       },
       {
