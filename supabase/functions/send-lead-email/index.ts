@@ -77,10 +77,20 @@ function buildWhatsAppMessage(lead: Record<string, string>): string {
   return `Olá ${lead.name}, tudo bem? Aqui é o António da Kyro Clean Solutions. Recebemos o seu pedido de orçamento${service}${loc}. Tenho disponibilidade [DIA] às [HORA] ou [DIA] às [HORA], qual funciona melhor para si? Só preciso da sua morada completa para confirmar a reserva.`;
 }
 
+// O campo de telefone do quiz aceita indicativo estrangeiro ("com indicativo
+// se for estrangeiro", ver QuizStepContact.tsx) — nem todos os leads são
+// portugueses. Um número português sem indicativo tem sempre 9 dígitos
+// (91x/92x/93x/96x); qualquer outra contagem já vem com indicativo (seja
+// +351 explícito ou de outro país) e não deve ser mexida.
+function toWhatsAppNumber(phone: string): string {
+  const digits = phone.replace(/\D/g, "");
+  return digits.length === 9 ? `351${digits}` : digits;
+}
+
 function buildEmailHtml(lead: Record<string, string>): string {
   const isStructuredLead = Boolean(lead.service || lead.details || lead.value);
   const waLink = lead.phone
-    ? `https://wa.me/351${lead.phone.replace(/\D/g, "")}?text=${encodeURIComponent(buildWhatsAppMessage(lead))}`
+    ? `https://wa.me/${toWhatsAppNumber(lead.phone)}?text=${encodeURIComponent(buildWhatsAppMessage(lead))}`
     : null;
 
   const row = (label: string, value: string, preserveLines = false) => `
