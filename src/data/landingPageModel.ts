@@ -27,6 +27,88 @@ const articleLabels = { sofa: 'sofás', colchao: 'colchões', tapetes: 'tapetes'
 export interface LandingLink { label: string; href: string }
 export interface LandingDirectoryGroup { title: string; links: LandingLink[] }
 
+/**
+ * Janelas de cobertura dos blocos de diretório ("Também disponível em" e
+ * "Zonas ...").
+ *
+ * Eram os dois um `.slice(0, n)` sobre uma lista ordenada. Como a ordem é
+ * estável, as n primeiras entradas recebiam sempre todas as ligações e as
+ * restantes não recebiam nenhuma. Mediu-se: 384 variantes de keyword (32
+ * cidades × 12) e as freguesias a partir da nona de cada município ficavam
+ * sem uma única ligação interna em todo o site, sem nada no conteúdo que o
+ * justificasse. É a mesma falha da lista "Disponível em" dos problemas, que
+ * mostrava 179 cidades quando existiam 1.354 páginas: uma lista cortada não
+ * é uma lista de cobertura.
+ *
+ * A janela continua a mostrar `size` ligações por página, porque o bloco não
+ * pode crescer no telemóvel (Barcelos tem 65 freguesias). O que muda é o
+ * ponto de partida: derivado da posição da própria página, de modo que as
+ * páginas de um município, entre todas, cobrem a lista inteira. A ordem de
+ * partida tem de ser independente da página — foi por isso que a primeira
+ * tentativa falhou em Faro e Lisboa: partia da lista já ordenada por área,
+ * que muda conforme a cidade que está a ser desenhada.
+ *
+ * `landingDirectoryCoverage.test.ts` percorre os municípios e as cidades
+ * todas e rebenta se alguma entrada deixar de ser alcançada.
+ */
+export function coverageWindow<T>(items: readonly T[], start: number, size: number): T[] {
+  if (items.length <= size) return [...items];
+  const offset = ((start % items.length) + items.length) % items.length;
+  return Array.from({ length: size }, (_, i) => items[(offset + i) % items.length]);
+}
+
+/** Posição da página dentro do seu município: serviço × variante. Determinística
+ *  e independente da ordenação por área, ao contrário do nome da cidade. */
+export function directorySlot(serviceSlug: string, variantKey: string | undefined): number {
+  const serviceIndex = Math.max(0, services.findIndex(item => item.slug === serviceSlug));
+  const variantIndex = variantKey === undefined ? 0 : variantKey === 'higienizacao' ? 1 : variantKey === 'lavagem' ? 2 : 3;
+  return serviceIndex * 4 + variantIndex;
+}
+
+/**
+ * As freguesias do bloco "Zonas ...".
+ *
+ * Aqui a janela rotativa não chega, e a razão é específica das variantes: o
+ * bloco de `/lavagem-colchao-porto` só emite URLs `/lavagem-colchao-porto-*`,
+ * por isso é a **única** página do site que pode ligar a essas freguesias.
+ * Rodar a janela entre serviços e variantes não cobre nada, porque cada par
+ * serviço × variante liga apenas às suas próprias páginas.
+ *
+ * A outra fonte de ligações para uma freguesia é o bloco "Freguesias
+ * próximas" das freguesias vizinhas, que usa o mesmo par serviço × variante.
+ * O que fica por cobrir são as freguesias que nenhum `nearby` menciona: no
+ * máximo quatro por município (Maia tem quatro, Porto tem duas). Essas vêm
+ * primeiro e o resto da janela é preenchido a rodar, por isso o bloco
+ * continua a mostrar oito ligações e não cresce no telemóvel.
+ */
+export function zoneLinks<T extends { slug: string; nearby?: string[] }>(freguesias: readonly T[], slot: number, size: number): T[] {
+  const alcancadas = new Set(freguesias.flatMap(freg => freg.nearby ?? []));
+  const semOrigem = freguesias.filter(freg => !alcancadas.has(freg.slug));
+  const restantes = freguesias.filter(freg => alcancadas.has(freg.slug));
+  const preenchimento = coverageWindow(restantes, slot * size, Math.max(0, size - semOrigem.length));
+  return [...semOrigem, ...preenchimento];
+}
+
+/**
+ * As cidades do bloco "Também disponível em".
+ *
+ * A janela corre sobre a ordem canónica de `cities`, que é igual em todas as
+ * páginas, e só depois o resultado é ordenado por área para ser mostrado. Se
+ * a janela corresse já sobre a lista ordenada por área — como na primeira
+ * versão — o ponto de partida mudava de página para página e a cobertura
+ * deixava de estar garantida: Faro e Lisboa, as primeiras das suas áreas,
+ * continuavam sem receber ligação nenhuma.
+ */
+export function coverageCityLinks(serviceSlug: string, municipalityName: string, variantKey: string | undefined, size: number) {
+  const canonical = cities.filter(city => city.name !== municipalityName);
+  const index = cities.findIndex(city => city.name === municipalityName);
+  const chosen = coverageWindow(canonical, (index < 0 ? 0 : index) + directorySlot(serviceSlug, variantKey), size);
+  const area = cities.find(city => city.name === municipalityName)?.area;
+  return [...chosen]
+    .sort((a, b) => Number(b.area === area) - Number(a.area === area))
+    .map(city => ({ name: city.name, path: `/${serviceSlug}-${city.slug}` }));
+}
+
 /** Resolves only the four landing families. Existing URL definitions are unchanged. */
 export function getLandingPageModel(pathname: string) {
   const path = pathname.split(/[?#]/)[0].replace(/\/$/, '');
@@ -92,10 +174,10 @@ export function getLandingPageModel(pathname: string) {
     const nearby = municipality.freguesias.filter(freg => parish.nearby.includes(freg.slug));
     if (nearby.length) directory.push({ title: 'Freguesias próximas', links: nearby.map(freg => ({ label: freg.name, href: variantKey ? `/${variantKey}-${serviceKey}-${municipalitySlug}-${freg.slug}` : `/${serviceSlug}-${municipalitySlug}-${freg.slug}` })) });
   } else if (family !== 'preco' && municipality) {
-    directory.push({ title: `Zonas ${prep} ${locationName}`, links: municipality.freguesias.slice(0, 8).map(freg => ({ label: freg.name, href: variantKey ? `/${variantKey}-${serviceKey}-${municipalitySlug}-${freg.slug}` : `/${serviceSlug}-${municipalitySlug}-${freg.slug}` })) });
+    directory.push({ title: `Zonas ${prep} ${locationName}`, links: zoneLinks(municipality.freguesias, directorySlot(serviceSlug, variantKey), 8).map(freg => ({ label: freg.name, href: variantKey ? `/${variantKey}-${serviceKey}-${municipalitySlug}-${freg.slug}` : `/${serviceSlug}-${municipalitySlug}-${freg.slug}` })) });
   }
   directory.push({ title: `Outros serviços ${prep} ${locationName}`, links: services.filter(item => item.slug !== serviceSlug).map(item => ({ label: item.name, href: localPath(item.slug) })) });
-  if (family !== 'freguesia') directory.push({ title: family === 'preco' ? 'Preços noutras cidades' : 'Também disponível em', links: getCityLinksForService(serviceSlug, municipalityName).filter(item => item.name !== municipalityName).slice(0, family === 'localidade' ? 6 : 8).map(item => ({ label: item.name, href: variantKey ? `/${variantKey}-${serviceKey}-${cities.find(city => city.name === item.name)!.slug}` : family === 'preco' ? `/preco-${item.path.slice(1)}` : item.path })) });
+  if (family !== 'freguesia') directory.push({ title: family === 'preco' ? 'Preços noutras cidades' : 'Também disponível em', links: coverageCityLinks(serviceSlug, municipalityName, variantKey, family === 'localidade' ? 6 : 8).map(item => ({ label: item.name, href: variantKey ? `/${variantKey}-${serviceKey}-${cities.find(city => city.name === item.name)!.slug}` : family === 'preco' ? `/preco-${item.path.slice(1)}` : item.path })) });
   if (family === 'freguesia' || family === 'localidade') {
     const relatedProblems = getAllProblems().filter(problem => problem.visible && problem.relatedServices.includes(serviceSlug!) && (METRO_CITIES.has(municipalitySlug) || problem.relatedCities.includes(municipalitySlug))).slice(0, 5);
     if (relatedProblems.length) directory.push({ title: `Problemas que resolvemos em ${municipalityName}`, links: relatedProblems.map(problem => ({ label: problem.keyword, href: `/${problem.slug}-${municipalitySlug}` })) });

@@ -2,7 +2,7 @@ import BusinessConditions from './BusinessConditions';
 import { Phone, Mail, MapPin, ChevronRight } from "lucide-react";
 import { GOOGLE_MAPS_URL } from "@/constants/google";
 import { Link } from "react-router-dom";
-import { DEFAULT_AUTHOR } from "@/data/authors";
+import { FOOTER_NAV, FOOTER_STRIP_LINKS, FOOTER_LEGAL_LINKS } from "@/data/siteFooterNav";
 import { trackCallClick } from "@/lib/analytics";
 import kyroLogo from "@/assets/kyro-logo.webp";
 import { PHONE_TEL, PHONE_DISPLAY, BUSINESS_EMAIL_HREF, BUSINESS_EMAIL, BUSINESS_ADDRESS, BUSINESS_TAX_ID } from "@/constants/business";
@@ -30,121 +30,39 @@ const Footer = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-4 gap-5 md:gap-6 mb-5">
-          {/* Services */}
-          <div>
-            <h3 className="type-card-title    mb-3 md:mb-4 text-white">Serviços Kyro Clean Solutions</h3>
-            <ul className="space-y-2 md:space-y-2 text-base">
-              <li className="flex items-center gap-2">
-                <ChevronRight className="h-3.5 w-3.5 text-turquoise flex-shrink-0" />
-                <Link to="/limpeza-sofas" className="hover:text-turquoise active:text-turquoise transition-colors py-1 touch-manipulation">Higienização de Sofás</Link>
-              </li>
-              <li className="flex items-center gap-2">
-                <ChevronRight className="h-3.5 w-3.5 text-turquoise flex-shrink-0" />
-                <Link to="/impermeabilizacao" className="hover:text-turquoise active:text-turquoise transition-colors py-1 touch-manipulation">Impermeabilização de Sofás</Link>
-              </li>
-              <li className="flex items-center gap-2">
-                <ChevronRight className="h-3.5 w-3.5 text-turquoise flex-shrink-0" />
-                <Link to="/limpeza-tapetes" className="hover:text-turquoise active:text-turquoise transition-colors py-1 touch-manipulation">Higienização de Tapetes</Link>
-              </li>
-              <li className="flex items-center gap-2">
-                <ChevronRight className="h-3.5 w-3.5 text-turquoise flex-shrink-0" />
-                <Link to="/limpeza-colchoes" className="hover:text-turquoise active:text-turquoise transition-colors py-1 touch-manipulation">Higienização de Colchões</Link>
-              </li>
-              <li className="flex items-center gap-2">
-                <ChevronRight className="h-3.5 w-3.5 text-turquoise flex-shrink-0" />
-                <Link to="/limpeza-cadeiras" className="hover:text-turquoise active:text-turquoise transition-colors py-1 touch-manipulation">Higienização de Cadeiras</Link>
-              </li>
-              <li className="flex items-center gap-2">
-                <ChevronRight className="h-3.5 w-3.5 text-turquoise flex-shrink-0" />
-                <Link to="/impermeabilizacao" className="hover:text-turquoise active:text-turquoise transition-colors py-1 touch-manipulation">Impermeabilização de Cadeiras</Link>
-              </li>
-              <li className="flex items-center gap-2">
-                <ChevronRight className="h-3.5 w-3.5 text-turquoise flex-shrink-0" />
-                <Link to="/limpeza-alcatifas" className="hover:text-turquoise active:text-turquoise transition-colors py-1 touch-manipulation">Higienização de Alcatifas</Link>
-              </li>
-            </ul>
-          </div>
-
-          {/* Resources */}
-          <div>
-            <h3 className="type-card-title    mb-3 md:mb-4 text-white">Recursos</h3>
-            <ul className="space-y-2 text-base mb-4">
-              <li className="flex items-center gap-2">
-                <ChevronRight className="h-3.5 w-3.5 text-turquoise flex-shrink-0" />
-                <Link to="/blog" className="hover:text-turquoise active:text-turquoise transition-colors py-1 touch-manipulation">Blog</Link>
-              </li>
-              <li className="flex items-center gap-2">
-                <ChevronRight className="h-3.5 w-3.5 text-turquoise flex-shrink-0" />
-                <Link to="/perguntas-frequentes-limpeza-estofos" className="hover:text-turquoise active:text-turquoise transition-colors py-1 touch-manipulation">Perguntas Frequentes</Link>
-              </li>
-              <li className="flex items-center gap-2">
-                <ChevronRight className="h-3.5 w-3.5 text-turquoise flex-shrink-0" />
-                <Link to="/glossario-limpeza-estofos" className="hover:text-turquoise active:text-turquoise transition-colors py-1 touch-manipulation">Glossário</Link>
-              </li>
-              <li className="flex items-center gap-2">
-                <ChevronRight className="h-3.5 w-3.5 text-turquoise flex-shrink-0" />
-                <Link to="/sobre" className="hover:text-turquoise active:text-turquoise transition-colors py-1 touch-manipulation">Sobre nós</Link>
-              </li>
-              <li className="flex items-center gap-2">
-                <ChevronRight className="h-3.5 w-3.5 text-turquoise flex-shrink-0" />
-                <Link to="/estudo-limpeza-estofos-portugal" className="hover:text-turquoise active:text-turquoise transition-colors py-1 touch-manipulation">Estudo: o que as pessoas pedem</Link>
-              </li>
-              <li className="flex items-center gap-2">
-                <ChevronRight className="h-3.5 w-3.5 text-turquoise flex-shrink-0" />
-                <Link to={`/autor/${DEFAULT_AUTHOR.slug}`} className="hover:text-turquoise active:text-turquoise transition-colors py-1 touch-manipulation">Quem assina o que escrevemos</Link>
-              </li>
-            </ul>
-            <h3 className="type-card-title    mb-3 text-white">Packs</h3>
-            <ul className="space-y-2 text-base">
-              <li className="flex items-center gap-2">
-                <ChevronRight className="h-3.5 w-3.5 text-turquoise flex-shrink-0" />
-                <Link to="/packs" className="hover:text-turquoise active:text-turquoise transition-colors py-1 touch-manipulation">Pack Sofá + Colchão</Link>
-              </li>
-              <li className="flex items-center gap-2">
-                <ChevronRight className="h-3.5 w-3.5 text-turquoise flex-shrink-0" />
-                <Link to="/packs" className="hover:text-turquoise active:text-turquoise transition-colors py-1 touch-manipulation">Pack Sofá + Impermeabilização</Link>
-              </li>
-              <li className="flex items-center gap-2">
-                <ChevronRight className="h-3.5 w-3.5 text-turquoise flex-shrink-0" />
-                <Link to="/packs" className="hover:text-turquoise active:text-turquoise transition-colors py-1 touch-manipulation">Pack Sala Completa</Link>
-              </li>
-              <li className="flex items-center gap-2">
-                <ChevronRight className="h-3.5 w-3.5 text-turquoise flex-shrink-0" />
-                <Link to="/packs" className="hover:text-turquoise active:text-turquoise transition-colors py-1 touch-manipulation">Pack Quarto Completo</Link>
-              </li>
-            </ul>
-          </div>
-
-          {/* Problems & About */}
-          <div>
-            <h3 className="type-card-title    mb-3 md:mb-4 text-white">Problemas Comuns</h3>
-            <ul className="space-y-2 text-base mb-4">
-              <li className="flex items-center gap-2">
-                <ChevronRight className="h-3.5 w-3.5 text-turquoise flex-shrink-0" />
-                <Link to="/problemas/manchas-sofa" className="hover:text-turquoise active:text-turquoise transition-colors py-1 touch-manipulation">Manchas no Sofá</Link>
-              </li>
-              <li className="flex items-center gap-2">
-                <ChevronRight className="h-3.5 w-3.5 text-turquoise flex-shrink-0" />
-                <Link to="/problemas/cheiro-sofa" className="hover:text-turquoise active:text-turquoise transition-colors py-1 touch-manipulation">Cheiro no Sofá</Link>
-              </li>
-              <li className="flex items-center gap-2">
-                <ChevronRight className="h-3.5 w-3.5 text-turquoise flex-shrink-0" />
-                <Link to="/problemas/acaros-colchao" className="hover:text-turquoise active:text-turquoise transition-colors py-1 touch-manipulation">Ácaros no Colchão</Link>
-              </li>
-              <li className="flex items-center gap-2">
-                <ChevronRight className="h-3.5 w-3.5 text-turquoise flex-shrink-0" />
-                <Link to="/problemas/urina-colchao" className="hover:text-turquoise active:text-turquoise transition-colors py-1 touch-manipulation">Urina no Colchão</Link>
-              </li>
-              <li className="flex items-center gap-2">
-                <ChevronRight className="h-3.5 w-3.5 text-turquoise flex-shrink-0" />
-                <Link to="/problemas/pelos-animais-sofa" className="hover:text-turquoise active:text-turquoise transition-colors py-1 touch-manipulation">Pelos de Animais</Link>
-              </li>
-              <li className="flex items-center gap-2">
-                <ChevronRight className="h-3.5 w-3.5 text-turquoise flex-shrink-0" />
-                <Link to="/problemas/impermeabilizar-sofa" className="hover:text-turquoise active:text-turquoise transition-colors py-1 touch-manipulation">Impermeabilizar Sofá</Link>
-              </li>
-            </ul>
-          </div>
+          {/* As três primeiras colunas e a coluna Empresas saem de
+              FOOTER_NAV, que é a mesma lista que o prerender escreve no HTML
+              estático. Escritas à mão dos dois lados, divergiam em silêncio. */}
+          {FOOTER_NAV.map(group => (
+            <div key={group.title}>
+              <h3 className="type-card-title    mb-3 md:mb-4 text-white">{group.title}</h3>
+              <ul className="space-y-2 text-base mb-4">
+                {group.links.map(link => (
+                  <li key={link.href + link.label} className="flex items-center gap-2">
+                    <ChevronRight className="h-3.5 w-3.5 text-turquoise flex-shrink-0" />
+                    <Link to={link.href} className="hover:text-turquoise active:text-turquoise transition-colors py-1 touch-manipulation">{link.label}</Link>
+                  </li>
+                ))}
+              </ul>
+              {/* O bloco Packs fica de fora do FOOTER_NAV de propósito: as
+                  quatro entradas apontam todas para /packs, que já é a página
+                  mais ligada do site e está a ser retrabalhada. Ver o
+                  comentário em siteFooterNav.ts. */}
+              {group.title === 'Recursos' && (
+                <>
+                  <h3 className="type-card-title    mb-3 text-white">Packs</h3>
+                  <ul className="space-y-2 text-base">
+                    {['Pack Sofá + Colchão', 'Pack Sofá + Impermeabilização', 'Pack Sala Completa', 'Pack Quarto Completo'].map(label => (
+                      <li key={label} className="flex items-center gap-2">
+                        <ChevronRight className="h-3.5 w-3.5 text-turquoise flex-shrink-0" />
+                        <Link to="/packs" className="hover:text-turquoise active:text-turquoise transition-colors py-1 touch-manipulation">{label}</Link>
+                      </li>
+                    ))}
+                  </ul>
+                </>
+              )}
+            </div>
+          ))}
 
           {/* Contacts */}
           <div>
@@ -183,24 +101,15 @@ const Footer = () => {
               {BUSINESS_TAX_ID && <> NIF {BUSINESS_TAX_ID}.</>}
             </p>
             <div className="flex flex-wrap gap-x-4 gap-y-1 justify-center">
-              <Link
-                to="/politica-de-privacidade"
-                className="text-sm text-white/80 hover:text-turquoise active:text-turquoise transition-colors underline underline-offset-2"
-              >
-                Política de Privacidade
-              </Link>
-              <Link
-                to="/termos-e-condicoes"
-                className="text-sm text-white/80 hover:text-turquoise active:text-turquoise transition-colors underline underline-offset-2"
-              >
-                Termos e Condições
-              </Link>
-              <Link
-                to="/politica-de-devolucoes"
-                className="text-sm text-white/80 hover:text-turquoise active:text-turquoise transition-colors underline underline-offset-2"
-              >
-                Política de Devoluções
-              </Link>
+              {FOOTER_LEGAL_LINKS.map(link => (
+                <Link
+                  key={link.href}
+                  to={link.href}
+                  className="text-sm text-white/80 hover:text-turquoise active:text-turquoise transition-colors underline underline-offset-2"
+                >
+                  {link.label}
+                </Link>
+              ))}
               {/* Exigência legal para quem vende a consumidores em Portugal e,
                   ao mesmo tempo, um sinal de confiança que o site não dava:
                   aponta para a plataforma oficial, não para uma página nossa. */}
@@ -216,7 +125,7 @@ const Footer = () => {
           </div>
         </div>
       </div>
-    <div className="max-w-7xl mx-auto px-5 py-8 text-base text-white/70"><p>Equipas em Braga, Porto, Lisboa e Algarve. Outras localidades mediante confirmação.</p><p className="mt-2">Resposta em menos de 10 minutos · Deslocação a partir de 10€</p><div className="flex flex-wrap gap-4 mt-4"><Link to="/tratamento-anti-acaros">Tratamento anti-ácaros</Link><Link to="/desbacterizacao">Desbacterização</Link><Link to="/limpeza-estofos-aveiro">Limpeza de estofos em Aveiro</Link><Link to="/limpeza-estofos-coimbra">Limpeza de estofos em Coimbra</Link></div></div>
+    <div className="max-w-7xl mx-auto px-5 py-8 text-base text-white/70"><p>Equipas em Braga, Porto, Lisboa e Algarve. Outras localidades mediante confirmação.</p><p className="mt-2">Resposta em menos de 10 minutos · Deslocação a partir de 10€</p><div className="flex flex-wrap gap-4 mt-4">{FOOTER_STRIP_LINKS.map(link => <Link key={link.href} to={link.href}>{link.label}</Link>)}</div></div>
     <BusinessConditions />
     </footer>
   );

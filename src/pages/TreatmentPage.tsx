@@ -6,6 +6,7 @@ import { CheckCircle2, MessageCircle } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import TrustRatingBadge from '@/components/TrustRatingBadge';
+import PageBreadcrumb from '@/components/PageBreadcrumb';
 import { getTreatmentPage, getExpansionPage, treatments, expansionCities } from '@/data/treatmentSeoData';
 import { cities, services } from '@/data/serviceCatalog';
 import { SITE_URL, WHATSAPP_BASE } from '@/constants/business';
@@ -23,10 +24,12 @@ export default function TreatmentPage() {
     for (const key of ['og:description', 'twitter:description']) document.querySelector(`meta[property="${key}"],meta[name="${key}"]`)?.setAttribute('content', page.metaDescription);
   }, [pathname, page?.title]);
   if (!page) return null;
+  const treatment = treatments.find(item => pathname.startsWith('/' + item.slug));
   const wa = `${WHATSAPP_BASE}?text=${encodeURIComponent(`Olá! Gostaria de pedir orçamento: ${page.h1}.\nArtigo e quantidade: \nMedidas: \nLocalidade: ${page.city?.name ?? ''}\nPosso enviar fotografias para avaliação.`)}`;
   return <><Header /><main className="bg-[#FDFDF9] text-[#111111]">
     <section data-mobile-hero="text" className="bg-[#071a12] text-white pt-28 pb-16 px-5"><div className="max-w-5xl mx-auto">
       <p className="text-gold uppercase tracking-widest text-xs mb-5">Cuidado à medida dos seus estofos</p>
+      <PageBreadcrumb items={[{ label: 'Início', to: '/' }, ...(treatment ? [{ label: treatment.name, ...(page.city ? { to: `/${treatment.slug}` } : {}) }] : []), ...(page.city ? [{ label: page.city.name }] : [])]} />
       <h1 className="font-playfair text-4xl md:text-6xl max-w-4xl mb-6">{page.h1}</h1>
       <p className="text-white/75 max-w-2xl text-lg leading-relaxed mb-7">{page.intro}</p>
       <a href={wa} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-3 bg-gold text-[#071a12] font-bold rounded-lg px-6 py-4"><MessageCircle className="w-5 h-5" />Pedir orçamento personalizado</a>

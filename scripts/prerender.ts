@@ -3,7 +3,7 @@ import { generatedPageForPath } from '../src/data/generatedRouteIndex';
 import { commercialHeroSubtitle } from '../src/data/commercialHeroCopy';
 import { MATERIAL_PROCESS_GUIDES } from "../src/data/materialProcessGuides";
 import { MATERIAL_EXAMPLES, type MaterialExamples } from "../src/data/materialExamples";
-import { getTreatmentRoutes, getExpansionRoutes, getTreatmentPage, getExpansionPage } from '../src/data/treatmentSeoData';
+import { getTreatmentRoutes, getExpansionRoutes, getTreatmentPage, getExpansionPage, treatments } from '../src/data/treatmentSeoData';
 import { PRICE_PROMISE, SATISFACTION_PROMISE, DRYING_PROMISE, COVERAGE_PROMISE, RESPONSE_PROMISE, AVAILABILITY_PROMISE, WEEKLY_REQUESTS, TREATMENT_EXTRAS } from '../src/constants/commercialPolicy';
 import { REVIEW_RATING, REVIEW_COUNT, CLIENTS_SERVED_LABEL, SERVICES_COMPLETED_LABEL, PHONE_DISPLAY, BUSINESS_EMAIL } from '../src/constants/business';
 import { locationPrices } from '../src/constants/travel';
@@ -32,7 +32,7 @@ import path from 'path';
 import { getLandingPageModel } from '../src/data/landingPageModel';
 import { renderLandingPageHtml, ENTITY_FOOTER_HTML } from './landing-page-html';
 
-import { getLocationServiceData, getAllLocationRoutes, services, cities } from '../src/data/locationSeoData';
+import { getLocationServiceData, getAllLocationRoutes, services, cities, cityPrep } from '../src/data/locationSeoData';
 import { getAllFreguesiaRoutes, getFreguesia, generateFreguesiaContent } from '../src/data/freguesiaSeoData';
 import { getAllKeywordVariantRoutes, getKeywordVariantData } from '../src/data/keywordVariantData';
 import { getAllProblems, getProblemBySlug } from '../src/data/problemSeoData';
@@ -49,7 +49,7 @@ import { getAllMarcaCadeirasRoutes, getMarcaCadeirasByCityAndSlug } from '../src
 import { EN_PAGES } from '../src/data/enTouristSeoData';
 import { getAllPosts } from '../src/data/blogData';
 import { glossaryTerms } from '../src/data/glossaryTerms';
-import { getAllCommercialRoutes, getCommercialPageData } from '../src/data/commercialSeoData';
+import { getAllCommercialRoutes, getCommercialPageData, COMMERCIAL_CITIES } from '../src/data/commercialSeoData';
 import { buildLocalBusinessNode, buildBreadcrumbNode, buildServiceNode, buildFaqNode, buildOfferNode, buildHowToNode } from '../src/lib/seoSchema';
 import { renderBlogBody } from '../src/lib/blogMarkdown';
 import { getBlogSources } from '../src/data/blogSources';
@@ -836,7 +836,34 @@ export function prerenderRoutes(outDir: string): number {
 
   for (const route of [...getTreatmentRoutes(), ...getExpansionRoutes()]) {
     const page = getTreatmentPage(route.path) ?? getExpansionPage(route.path);
-    if (page) emit(route.path, page.title, page.metaDescription, { h1: page.h1, intro: page.intro, localSection: page.coverage, howItWorks: page.detail, benefits: page.benefits, faqs: page.faqs }, [buildFaqSchema(page.faqs)]);
+    if (!page) continue;
+    // O hub do tratamento mostra a quem visita a página uma lista de serviços
+    // na mesma localidade e, nas páginas nacionais, um <details> "Consultar
+    // localidades" com as 61 cidades. Nada disso chegava ao HTML estático, por
+    // isso as 122 páginas de tratamento × cidade não recebiam uma única
+    // ligação interna: o hub tinha os spokes só no React. É o mesmo padrão do
+    // glossário na fase 2 e do índice do blog nesta fase.
+    const treatment = treatments.find(item => route.path.startsWith('/' + item.slug));
+    const citySuffix = page.city ? `-${page.city.slug}` : '';
+    const links = [
+      ...services.map(item => ({ href: `/${item.slug}${citySuffix}`, label: `${item.name}${page.city ? ` ${cityPrep(page.city.name)} ${page.city.name}` : ''}` })),
+      ...treatments.filter(item => item.slug !== treatment?.slug).map(item => ({ href: `/${item.slug}${citySuffix}`, label: `${item.name}${page.city ? ` ${cityPrep(page.city.name)} ${page.city.name}` : ''}` })),
+      // As cidades só na página nacional, tal como o <details> do React.
+      ...(page.city || !treatment ? [] : cities.map(city => ({ href: `/${treatment.slug}-${city.slug}`, label: `${treatment.name} ${cityPrep(city.name)} ${city.name}` }))),
+    ];
+    // Migalha: Início › tratamento nacional › cidade. Não passa por /packs.
+    const crumbs = [
+      { name: 'Início', url: BASE_URL + '/' },
+      ...(treatment ? [{ name: treatment.name, url: BASE_URL + '/' + treatment.slug }] : []),
+      ...(page.city ? [{ name: page.city.name, url: BASE_URL + route.path }] : []),
+    ];
+    emit(
+      route.path,
+      page.title,
+      page.metaDescription,
+      { h1: page.h1, intro: page.intro, localSection: page.coverage, howItWorks: page.detail, benefits: page.benefits, faqs: page.faqs, links, linksHeading: page.city ? 'Escolha os artigos e os tratamentos' : 'Escolha os artigos, os tratamentos e a localidade' },
+      [buildFaqSchema(page.faqs), buildBreadcrumbSchema(crumbs)],
+    );
   }
 
   // ── 8. Pack / Combo pages (4 × 5 = 20) ──────────────────────────────────
@@ -1516,6 +1543,11 @@ export function prerenderRoutes(outDir: string): number {
           problems: data.segments.map(s => ({ title: s.label, description: `${s.painPoints.join(' ')} ${s.solution}` })),
           benefits: data.benefits,
           faqs: data.faqs,
+          // As 20 páginas B2B não tinham nenhuma ligação interna: nunca houve
+          // hub para elas. O rodapé passou a ligar as quatro cabeças de
+          // região; estas ligações entre cidades alcançam as restantes.
+          links: COMMERCIAL_CITIES.filter(city => city.slug !== route.citySlug).map(city => ({ href: `/limpeza-comercial-${city.slug}`, label: `Limpeza comercial ${cityPrep(city.name)} ${city.name}` })),
+          linksHeading: 'Limpeza comercial noutras cidades',
         },
         schemas,
       );

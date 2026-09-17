@@ -112,6 +112,36 @@ Regras atuais: `CORRECOES-COMERCIAIS-2026-09-10.md`. `src/constants/travel.ts` �
 
 ---
 
+## Ligações internas: navegação partilhada e janelas de cobertura (18/09/2026, fase 8 do GEO)
+
+`src/data/siteFooterNav.ts` é a fonte única da navegação do rodapé. O
+`Footer.tsx` renderiza-a para as pessoas e o `scripts/landing-page-html.ts`
+escreve-a no HTML estático (`ENTITY_FOOTER_HTML`, que deixou de ser só as três
+páginas de entidade e passou a ser o rodapé). Antes disto o cabeçalho e o
+rodapé eram React puro: das ~25 ligações do rodapé, o HTML que um crawler lê
+tinha três. Não acrescentar ligações a um dos lados; acrescentar ao ficheiro
+de dados. O bloco Packs está deliberadamente fora dele, para não alterar o
+peso de `/packs`.
+
+`src/data/landingPageModel.ts` deixou de cortar os blocos de diretório com
+`.slice(0, n)`. `coverageWindow`, `coverageCityLinks` e `zoneLinks` mostram o
+mesmo número de ligações por página, mas fazem variar o ponto de partida por
+serviço × variante, de modo que as páginas de um município cobrem a lista
+inteira. Duas condições não óbvias, ambas já falharam uma vez: a ordem sobre a
+qual a janela corre tem de ser independente da página (a ordenação por área
+muda conforme a cidade desenhada), e a cobertura das freguesias tem de fechar
+por par serviço × variante, porque o bloco de `/lavagem-colchao-porto` só emite
+URLs `/lavagem-colchao-porto-*`. As freguesias que nenhum `nearby` alcança (no
+máximo quatro por município) ocupam os primeiros lugares da janela por isso
+mesmo. `src/data/landingDirectoryCoverage.test.ts` fixa as duas invariantes.
+
+As páginas de tratamento passaram a emitir no prerender os links de serviço e
+a lista de cidades que o `TreatmentPage.tsx` já mostrava, mais migalha nos dois
+lados. As páginas B2B (`CommercialPage.tsx`) ganharam um bloco de cidades
+irmãs, também nos dois lados. Resultado medido em `dist`: páginas sem nenhuma
+ligação interna de 558 para 30, e os seis serviços-pilar de 2.206–3.691
+ligações para 16.233 cada, com `/packs` inalterado.
+
 ## Estudo com dados próprios (17/09/2026, fase 7 do GEO)
 
 `/estudo-limpeza-estofos-portugal` (`src/pages/Estudo.tsx`) publica os agregados
@@ -146,6 +176,32 @@ conteúdo nenhum concorrente consegue reproduzir.
   `/autor/antonio-peixoto#person`.
 
 ---
+
+## Infraestrutura de medição e atribuição (18/09/2026)
+
+Camada nova, montada para o investimento em Google Ads. Regras e armadilhas no `CLAUDE.md`; referência completa em `docs/tracking-google-ads.md`.
+
+**Módulos, de baixo para cima:**
+
+- `src/constants/tracking.ts` — identificadores (GA4, Ads, Google Tag), etiquetas de conversão, modo de consentimento, deteção de ambiente (`production` / `preview` / `development` / `test`) e modo de depuração (`?kyro_debug=1`). Tudo por env var, com valores por omissão que mantêm o site a funcionar sem configuração nenhuma.
+- `src/lib/consentStorage.ts` — só a leitura/escrita da decisão de cookies. Existe para quebrar o ciclo entre `consent.ts` e `gtag.ts`.
+- `src/lib/gtag.ts` — carrega a `gtag.js` uma só vez, regista os destinos, aplica o Consent Mode v2, envia eventos (com as três portas: consentimento, ambiente, tag carregada), envia conversões do Ads e guarda o registo de deduplicação em `localStorage`.
+- `src/lib/enhancedConversions.ts` — normaliza e faz SHA-256 de email/telefone para o canal `user_data`. Desligado por omissão.
+- `src/lib/leadAttribution.ts` — captura de campanha (UTMs, `gclid`/`gbraid`/`wbraid`, ValueTrack), first touch em `localStorage` (90 dias, nunca reescrito) e last touch em `sessionStorage` (30 min, substituído por campanha nova). `getAttributionSnapshot()` é o registo plano que segue com o lead.
+- `src/lib/leadTracking.ts` — o que é um lead, o `lead_id`, os estados do funil e o mapa para os eventos recomendados do GA4.
+- `src/lib/analytics.ts` — a fachada que os componentes importam: `trackEvent`, `trackPageView`, `trackContactClick`, `trackLeadEvent`, `trackQuoteFormStart`, `trackQuoteFormStep`.
+- `src/hooks/use-page-tracking.ts` — `page_view` por mudança de rota, com guarda contra repetição e reenvio quando o consentimento chega a meio da visita.
+- `src/lib/marketingMetrics.ts` — as contas do painel, puras e testadas (funil, campanhas, landing pages, canais, CSV de conversões offline).
+- `src/pages/admin/MarketingPanel.tsx` — separador "Google Ads" do painel de administração.
+
+**Base de dados** (migração `20260918000000_marketing_attribution.sql`, aplicada à mão no SQL Editor):
+
+- `quiz_events` ganhou as colunas de campanha e a ação `page_view`.
+- `leads` ganhou `lead_id`, `funnel_status`, `quoted_value`, `booked_value`, `final_revenue`, `completed_at`.
+- `lead_attribution` — uma linha por lead, com first touch, last touch, identificadores de clique e ValueTrack.
+- `lead_status_history` — cada mudança de estado, com autor e data.
+
+**Funções Edge:** `submit-lead` passou a aceitar um objeto `attribution` (lista fechada de campos, nenhum deles pessoal), a gravar `lead_attribution` e a abrir o histórico com `NEW`. Uma falha a gravar a atribuição **não** falha o pedido. `send-lead-email` passou a mostrar o `lead_id` no email.
 
 ## ⚠️ Duas máquinas, um repositório (ler primeiro)
 

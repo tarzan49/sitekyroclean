@@ -2,8 +2,7 @@ import { exampleImageSrcSet, EXAMPLE_IMAGE_SIZES } from '../src/lib/responsiveIm
 import type { LandingPageModel } from '../src/data/landingPageModel';
 import { LANDING_SECTION_ORDER } from '../src/data/landingServiceCopy';
 import { commercialHeroPriceLine, commercialHeroStats } from '../src/data/commercialHeroCopy';
-import { DEFAULT_AUTHOR } from '../src/data/authors';
-import { STUDY_ROUTE } from '../src/data/studyData';
+import { FOOTER_NAV, FOOTER_STRIP_LINKS, FOOTER_LEGAL_LINKS } from '../src/data/siteFooterNav';
 
 export const escapeLandingHtml = (value: string) => value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 const e = escapeLandingHtml;
@@ -45,11 +44,28 @@ const links = (items: { href: string; label: string }[]) => `<ul>${items.map(ite
  * Os mesmos três destinos estão no rodapé React (Footer.tsx, coluna Recursos),
  * por isso isto não acrescenta nada que a pessoa não receba.
  */
+/**
+ * Fase 8, segunda passagem: passou a ser o rodapé inteiro, não só as três
+ * páginas de entidade. A medição que motivou isto está em `siteFooterNav.ts`
+ * — resumindo, o glossário está no rodapé de todas as páginas e recebia uma
+ * ligação interna no HTML estático; o "Antes e Depois", que está na navegação
+ * do cabeçalho, recebia zero.
+ *
+ * As listas vêm de `siteFooterNav.ts`, que é o que o `Footer.tsx` também
+ * renderiza: mesma informação, renderização diferente. O bloco Packs fica
+ * de fora de propósito (ver o comentário lá).
+ */
 export const ENTITY_FOOTER_HTML =
-  '<nav aria-label="Sobre a empresa"><ul>'
-  + '<li><a href="/sobre">Sobre a Kyro Clean Solutions</a></li>'
-  + `<li><a href="/autor/${DEFAULT_AUTHOR.slug}">Quem assina o que escrevemos</a></li>`
-  + `<li><a href="${STUDY_ROUTE}">Estudo: o que as pessoas pedem quando limpam estofos</a></li>`
+  FOOTER_NAV.map(group =>
+    `<nav aria-label="${e(group.title)}"><h2>${e(group.title)}</h2><ul>`
+    + group.links.map(link => `<li><a href="${e(link.href)}">${e(link.label)}</a></li>`).join('')
+    + '</ul></nav>').join('')
+  + '<nav aria-label="Outros serviços e zonas"><ul>'
+  + FOOTER_STRIP_LINKS.map(link => `<li><a href="${e(link.href)}">${e(link.label)}</a></li>`).join('')
+  + '</ul></nav>'
+  + '<nav aria-label="Informação legal"><ul>'
+  + FOOTER_LEGAL_LINKS.map(link => `<li><a href="${e(link.href)}">${e(link.label)}</a></li>`).join('')
+  + '<li><a href="https://www.livroreclamacoes.pt/inicio" rel="nofollow noopener">Livro de Reclamações</a></li>'
   + '</ul></nav>';
 
 /** Semantic no-JS fallback, with the same model and order as the React composition. */

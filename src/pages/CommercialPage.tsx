@@ -6,7 +6,7 @@ import PageBreadcrumb from "@/components/PageBreadcrumb";
 import Footer from "@/components/Footer";
 import SectionHeader from "@/components/SectionHeader";
 import ServiceFAQ from "@/components/ServiceFAQ";
-import { getCommercialPageData, SegmentKey } from "@/data/commercialSeoData";
+import { getCommercialPageData, COMMERCIAL_CITIES, SegmentKey } from "@/data/commercialSeoData";
 import { cityPrep } from "@/data/serviceCatalog";
 import { getProblemHeroImage } from "@/lib/problemHeroImages";
 import { buildCommercialWaMessage } from "@/lib/whatsappMessages";
@@ -241,6 +241,21 @@ const CommercialPage = () => {
                 <span className="text-base font-semibold tracking-[0.18em] uppercase">{PHONE_DISPLAY}</span>
               </a>
             </div>
+          </div>
+        </section>
+
+        {/* As outras cidades com página B2B. Sem isto, estas 20 páginas não
+            tinham nenhuma ligação interna em lado nenhum do site: nunca houve
+            um hub para elas. O rodapé liga as quatro cabeças de região e este
+            bloco alcança as restantes. */}
+        <section className="container mx-auto px-4 pb-16">
+          <h2 className="type-section-title font-playfair text-[#111111] mb-5">Limpeza comercial noutras cidades</h2>
+          <div className="flex flex-wrap gap-3">
+            {COMMERCIAL_CITIES.filter(c => c.slug !== citySlug).map(c => (
+              <Link key={c.slug} to={`/limpeza-comercial-${c.slug}`} className="border border-[#111111]/15 rounded-lg px-4 py-3 text-base hover:bg-[#111111]/5 transition-colors">
+                {c.name}
+              </Link>
+            ))}
           </div>
         </section>
       </main>
