@@ -113,6 +113,16 @@ export function buildOfferNode(
     "@type": "Offer",
     "priceCurrency": "EUR",
     "price": price,
+    // `price` sozinho afirma que o serviço custa exatamente este valor, o que é
+    // falso: 49€ é o ponto de partida de um sofá de 1 lugar, e a página inteira
+    // diz "Desde 49€". `minPrice` é a forma correta de exprimir isso, e deixa um
+    // leitor automático perceber que há valores acima sem os inventar.
+    // `price` fica porque é o campo que a maioria dos consumidores lê.
+    "priceSpecification": {
+      "@type": "PriceSpecification",
+      "priceCurrency": "EUR",
+      "minPrice": price,
+    },
     "availability": "https://schema.org/InStock",
     ...(opts?.validFrom && { "validFrom": opts.validFrom }),
     ...(opts?.priceValidUntil && { "priceValidUntil": opts.priceValidUntil }),
@@ -200,4 +210,29 @@ export function clearPrerenderedFaqSchema() {
       // Unrelated malformed metadata must not prevent a page from rendering.
     }
   });
+}
+
+/**
+ * HowTo — o processo do serviço em passos numerados.
+ *
+ * Não é para rich results: a Google retirou-os para HowTo em 2023. Serve para
+ * o processo deixar de ser apenas uma lista de parágrafos e passar a ter
+ * ordem, título e texto por passo de forma legível por máquina, que é o que
+ * um motor generativo precisa para responder "como é que limpam um sofá" sem
+ * ter de adivinhar onde começa e acaba cada etapa.
+ *
+ * O conteúdo já existia em serviceProcessGuides/sofaProcessGuide e já era
+ * escrito no HTML; isto só o marca.
+ */
+export function buildHowToNode(name: string, steps: { title: string; description: string }[]) {
+  return {
+    "@type": "HowTo",
+    "name": name,
+    "step": steps.map((step, index) => ({
+      "@type": "HowToStep",
+      "position": index + 1,
+      "name": step.title,
+      "text": step.description,
+    })),
+  };
 }

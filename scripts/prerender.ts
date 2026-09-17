@@ -45,8 +45,9 @@ import { getAllMarcaColchaoRoutes, getMarcaColchaoByCityAndSlug } from '../src/d
 import { getAllMarcaCadeirasRoutes, getMarcaCadeirasByCityAndSlug } from '../src/data/marcaCadeirasData';
 import { EN_PAGES } from '../src/data/enTouristSeoData';
 import { getAllPosts } from '../src/data/blogData';
+import { glossaryTerms } from '../src/data/glossaryTerms';
 import { getAllCommercialRoutes, getCommercialPageData } from '../src/data/commercialSeoData';
-import { buildLocalBusinessNode, buildBreadcrumbNode, buildServiceNode, buildFaqNode, buildOfferNode } from '../src/lib/seoSchema';
+import { buildLocalBusinessNode, buildBreadcrumbNode, buildServiceNode, buildFaqNode, buildOfferNode, buildHowToNode } from '../src/lib/seoSchema';
 
 const BASE_URL = 'https://cleansolutions.com.pt';
 
@@ -157,6 +158,7 @@ interface PageContent {
   priceTable?: { item: string; price: string; note?: string }[];
   links?: { href: string; label: string }[];
   reviews?: { name: string; city?: string; text: string }[];
+  definitions?: { term: string; definition: string; example?: string }[];
 }
 
 function generatePageBody(c: PageContent, lang: 'pt' | 'en' = 'pt'): string {
@@ -209,6 +211,15 @@ function generatePageBody(c: PageContent, lang: 'pt' | 'en' = 'pt'): string {
       html += `<li>${escHtml(row.item)}: ${escHtml(row.price)}${escHtml(note)}</li>\n`;
     }
     html += `</ul></section>\n`;
+  }
+
+  if (c.definitions?.length) {
+    html += `<section><dl>\n`;
+    for (const entry of c.definitions) {
+      const example = entry.example ? `<dd>Exemplo: ${escHtml(entry.example)}</dd>` : '';
+      html += `<dt>${escHtml(entry.term)}</dt><dd>${escHtml(entry.definition)}</dd>${example}\n`;
+    }
+    html += `</dl></section>\n`;
   }
 
   if (c.howItWorks) {
@@ -381,6 +392,16 @@ export function prerenderRoutes(outDir: string): number {
     }
     // LocalBusiness on every page
     html = injectJsonLd(html, LOCAL_BIZ);
+    // HowTo nas paginas landing: o processo ja estava escrito no HTML como uma
+    // lista ordenada, aqui passa a ter ordem, titulo e texto por passo de forma
+    // legivel por maquina. Fica neste ponto e nao em cada uma das quatro
+    // familias porque todas partilham o mesmo `landing.processSteps`.
+    if (landing?.processSteps?.length) {
+      html = injectJsonLd(html, {
+        '@context': 'https://schema.org',
+        ...buildHowToNode(`Como funciona: ${landing.serviceLabel.toLowerCase()}`, landing.processSteps),
+      });
+    }
     // Caller-provided schemas (FAQ, Service, BreadcrumbList, etc.)
     for (const schema of schemas ?? []) {
       html = injectJsonLd(html, schema);
@@ -1052,7 +1073,21 @@ export function prerenderRoutes(outDir: string): number {
         content: {
           h1: 'Glossário de Limpeza de Estofos',
           intro: 'Dicionário com os principais termos técnicos de limpeza profissional de estofos. Perceba o que significam extração, higienização, impermeabilização e outros conceitos.',
+          definitions: glossaryTerms.map(entry => ({ term: entry.term, definition: entry.definition, example: entry.example })),
         },
+        extraSchemas: [{
+          '@context': 'https://schema.org',
+          '@type': 'DefinedTermSet',
+          name: 'Glossário de Limpeza de Estofos',
+          url: `${BASE_URL}/glossario-limpeza-estofos`,
+          hasDefinedTerm: glossaryTerms.map(entry => ({
+            '@type': 'DefinedTerm',
+            '@id': `${BASE_URL}/glossario-limpeza-estofos#${entry.id}`,
+            name: entry.term,
+            description: entry.definition,
+            inDefinedTermSet: `${BASE_URL}/glossario-limpeza-estofos`,
+          })),
+        }],
       },
     ];
 
