@@ -1,4 +1,37 @@
+# Kyro Clean Solutions — https://cleansolutions.com.pt
+
 User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /obrigado
+Disallow: /obrigado-pelo-servico
+Disallow: /api/
+Disallow: /*.json$
+
+# ─── Motores generativos e assistentes de IA ──────────────────────────────
+# Estes agentes já estavam autorizados pela regra `*` acima; este grupo não
+# lhes abre nada de novo. Existe por duas razões. Primeira: os grupos de
+# robots.txt não herdam regras uns dos outros, por isso um `Disallow`
+# acrescentado ao `*` no futuro deixaria de os afetar, e a exclusão passaria
+# despercebida. Segunda: torna a autorização explícita e legível, para que
+# não seja retirada por engano ao mexer no ficheiro.
+#
+# Retirar um user-agent desta lista remove o site das respostas desse
+# assistente. É uma decisão de negócio, não uma limpeza técnica.
+User-agent: GPTBot
+User-agent: OAI-SearchBot
+User-agent: ChatGPT-User
+User-agent: ClaudeBot
+User-agent: Claude-SearchBot
+User-agent: Claude-User
+User-agent: PerplexityBot
+User-agent: Perplexity-User
+User-agent: Google-Extended
+User-agent: Applebot-Extended
+User-agent: meta-externalagent
+User-agent: Amazonbot
+User-agent: DuckAssistBot
+User-agent: CCBot
 Allow: /
 Disallow: /admin/
 Disallow: /obrigado

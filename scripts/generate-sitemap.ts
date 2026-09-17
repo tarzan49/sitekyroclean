@@ -19,9 +19,68 @@ import { getAllEnRoutes } from '../src/data/enTouristSeoData';
 import { getAllCommercialRoutes } from '../src/data/commercialSeoData';
 import { packs, packCities } from '../src/data/packComboData';
 import { MARCA_CITY_SLUGS } from '../src/data/marcaCities';
+import { getAllPosts } from '../src/data/blogData';
+import { getContentDate } from './content-dates';
 
 const BASE_URL = 'https://cleansolutions.com.pt';
-// Omit lastmod until a reliable per-page editorial modification date is available.
+// <lastmod> per page family, from the git history of the data modules that
+// generate each family (see scripts/content-dates.ts for why it is derived
+// rather than set to the build date, and why it degrades to no lastmod at all
+// when git history is unavailable). Blog posts are the one family with real
+// per-page editorial dates and use their own `updatedDate` instead.
+const DATES = {
+  landing: getContentDate([
+    'src/data/landingPageModel.ts',
+    'src/data/landingServiceCopy.ts',
+    'src/data/landingEditorial.ts',
+    'src/data/landingFaqPool.ts',
+    'scripts/landing-page-html.ts',
+  ]),
+  location: getContentDate([
+    'src/data/locationSeoData.ts',
+    'src/data/serviceCatalog.ts',
+    'src/constants/travel.ts',
+  ]),
+  freguesia: getContentDate([
+    'src/data/freguesiaSeoData.ts',
+    'src/data/freguesiaContentEngine.ts',
+  ]),
+  problem: getContentDate([
+    'src/data/problemSeoData.ts',
+    'src/data/problemCitySeoData.ts',
+    'src/data/problemCityContent.ts',
+    'src/data/problemTipsData.ts',
+    'src/data/problemHero.ts',
+  ]),
+  material: getContentDate([
+    'src/data/materialSeoData.ts',
+    'src/data/materialProcessGuides.ts',
+    'src/data/materialExamples.ts',
+  ]),
+  keywordVariant: getContentDate([
+    'src/data/keywordVariantData.ts',
+    'src/data/keywordVariantRouteData.ts',
+  ]),
+  price: getContentDate(['src/data/priceSeoData.ts']),
+  packs: getContentDate(['src/data/packComboData.ts']),
+  marcas: getContentDate([
+    'src/data/marcaSofaData.ts',
+    'src/data/marcaColchaoData.ts',
+    'src/data/marcaCadeirasData.ts',
+    'src/data/marcaCities.ts',
+  ]),
+  en: getContentDate(['src/data/enTouristSeoData.ts']),
+  comercial: getContentDate([
+    'src/data/commercialSeoData.ts',
+    'src/data/commercialHeroCopy.ts',
+  ]),
+  tratamentos: getContentDate(['src/data/treatmentSeoData.ts']),
+  faq: getContentDate(['src/pages/FAQEstofos.tsx', 'src/data/landingFaqPool.ts']),
+  glossario: getContentDate(['src/pages/GlossarioEstofos.tsx']),
+  areas: getContentDate(['src/pages/AreasDeServico.tsx', 'src/data/locationSeoData.ts']),
+  antesDepois: getContentDate(['src/data/beforeAfterPool.ts']),
+  blogIndex: getContentDate(['src/data/blogData.ts']),
+};
 
 // cities/services/municipiosComFreguesias imported directly from src/data/
 // above (2026-08-25) — this file used to keep a hand-maintained duplicate of
@@ -45,9 +104,10 @@ const problemSlugs = getVisibleProblems().map(p => p.slug);
 
 // ─── XML Helpers ─────────────────────────────────────────────────
 
-function xmlUrl(loc: string, changefreq: string, priority: string): string {
+function xmlUrl(loc: string, changefreq: string, priority: string, lastmod?: string): string {
   return `  <url>
-    <loc>${BASE_URL}${loc}</loc>
+    <loc>${BASE_URL}${loc}</loc>${lastmod ? `
+    <lastmod>${lastmod}</lastmod>` : ''}
     <changefreq>${changefreq}</changefreq>
     <priority>${priority}</priority>
   </url>`;
@@ -74,20 +134,20 @@ ${sitemaps.map(s => `  <sitemap>
 export function generateSitemaps(outDir: string) {
   // 1. Core pages
   const coreUrls = [
-    xmlUrl('/', 'weekly', '1.0'),
-    xmlUrl('/limpeza-sofas', 'weekly', '0.9'),
-    xmlUrl('/limpeza-colchoes', 'weekly', '0.9'),
-    xmlUrl('/limpeza-tapetes', 'weekly', '0.9'),
-    xmlUrl('/limpeza-cadeiras', 'weekly', '0.9'),
-    xmlUrl('/limpeza-alcatifas', 'weekly', '0.9'),
-    xmlUrl('/impermeabilizacao', 'weekly', '0.9'),
-    xmlUrl('/packs', 'weekly', '0.8'),
-    xmlUrl('/guia-de-packs', 'monthly', '0.7'),
-    xmlUrl('/blog', 'weekly', '0.8'),
-    xmlUrl('/perguntas-frequentes-limpeza-estofos', 'monthly', '0.7'),
-    xmlUrl('/glossario-limpeza-estofos', 'monthly', '0.6'),
-    xmlUrl('/areas-de-servico', 'monthly', '0.7'),
-    xmlUrl('/antes-depois-limpeza', 'monthly', '0.7'),
+    xmlUrl('/', 'weekly', '1.0', DATES.landing),
+    xmlUrl('/limpeza-sofas', 'weekly', '0.9', DATES.landing),
+    xmlUrl('/limpeza-colchoes', 'weekly', '0.9', DATES.landing),
+    xmlUrl('/limpeza-tapetes', 'weekly', '0.9', DATES.landing),
+    xmlUrl('/limpeza-cadeiras', 'weekly', '0.9', DATES.landing),
+    xmlUrl('/limpeza-alcatifas', 'weekly', '0.9', DATES.landing),
+    xmlUrl('/impermeabilizacao', 'weekly', '0.9', DATES.landing),
+    xmlUrl('/packs', 'weekly', '0.8', DATES.packs),
+    xmlUrl('/guia-de-packs', 'monthly', '0.7', DATES.packs),
+    xmlUrl('/blog', 'weekly', '0.8', DATES.blogIndex),
+    xmlUrl('/perguntas-frequentes-limpeza-estofos', 'monthly', '0.7', DATES.faq),
+    xmlUrl('/glossario-limpeza-estofos', 'monthly', '0.6', DATES.glossario),
+    xmlUrl('/areas-de-servico', 'monthly', '0.7', DATES.areas),
+    xmlUrl('/antes-depois-limpeza', 'monthly', '0.7', DATES.antesDepois),
   ];
 
   // 2. Location pages (service × city)
@@ -95,7 +155,7 @@ export function generateSitemaps(outDir: string) {
   for (const svc of services) {
     for (const city of cities) {
       const priority = city.region === 'primary' ? '0.8' : '0.7';
-      locationUrls.push(xmlUrl(`/${svc.slug}-${city.slug}`, 'monthly', priority));
+      locationUrls.push(xmlUrl(`/${svc.slug}-${city.slug}`, 'monthly', priority, DATES.location));
     }
   }
 
@@ -104,7 +164,7 @@ export function generateSitemaps(outDir: string) {
   for (const mun of municipiosComFreguesias) {
     for (const freg of mun.freguesias) {
       for (const svc of services) {
-        freguesiaUrls.push(xmlUrl(`/${svc.slug}-${mun.slug}-${freg.slug}`, 'monthly', '0.5'));
+        freguesiaUrls.push(xmlUrl(`/${svc.slug}-${mun.slug}-${freg.slug}`, 'monthly', '0.5', DATES.freguesia));
       }
     }
   }
@@ -112,19 +172,19 @@ export function generateSitemaps(outDir: string) {
   // 4. Problem pages (standalone + city combos) — imported, mirrors prerender.ts exactly
   const problemUrls: string[] = [];
   for (const slug of problemSlugs) {
-    problemUrls.push(xmlUrl(`/problemas/${slug}`, 'monthly', '0.7'));
+    problemUrls.push(xmlUrl(`/problemas/${slug}`, 'monthly', '0.7', DATES.problem));
   }
   for (const route of getAllProblemCityRoutes()) {
-    problemUrls.push(xmlUrl(route.path, 'monthly', '0.6'));
+    problemUrls.push(xmlUrl(route.path, 'monthly', '0.6', DATES.problem));
   }
 
   // 5. Material pages (standalone + city combos) — imported, mirrors prerender.ts exactly
   const materialUrls: string[] = [];
   for (const route of getAllMaterialRoutes()) {
-    materialUrls.push(xmlUrl(route.path, 'monthly', '0.7'));
+    materialUrls.push(xmlUrl(route.path, 'monthly', '0.7', DATES.material));
   }
   for (const route of getAllMaterialCityRoutes()) {
-    materialUrls.push(xmlUrl(route.path, 'monthly', '0.6'));
+    materialUrls.push(xmlUrl(route.path, 'monthly', '0.6', DATES.material));
   }
 
   // 6. Keyword variant pages: higienização/lavagem/impermeabilização × services × cities + parishes
@@ -133,51 +193,33 @@ export function generateSitemaps(outDir: string) {
   // being submitted to Google via sitemap).
   const keywordVariantUrls: string[] = [];
   for (const route of getAllKeywordVariantRoutes()) {
-    keywordVariantUrls.push(xmlUrl(route.path, 'monthly', '0.6'));
+    keywordVariantUrls.push(xmlUrl(route.path, 'monthly', '0.6', DATES.keywordVariant));
   }
 
   // 7. Price pages (service × city)
   const priceUrls: string[] = [];
   for (const svc of services) {
     for (const city of cities) {
-      priceUrls.push(xmlUrl(`/preco-${svc.slug}-${city.slug}`, 'monthly', '0.6'));
+      priceUrls.push(xmlUrl(`/preco-${svc.slug}-${city.slug}`, 'monthly', '0.6', DATES.price));
     }
   }
 
   // 8. Resource pages (FAQ + Glossário + Blog)
-  const blogSlugs = [
-    'quanto-custa-limpar-sofa-profissional',
-    'como-tirar-manchas-sofa-tecido',
-    'impermeabilizacao-sofa-vale-pena',
-    'acaros-sofas-colchoes-riscos-saude',
-    'quanto-custa-limpar-colchao-profissional',
-    'limpeza-tapetes-profissional-guia-completo',
-    'limpeza-cadeiras-estofadas-precos-guia',
-    'doencas-causadas-estofos-sujos',
-    'como-preparar-casa-visita-tecnico',
-    'como-limpar-sofa-veludo',
-    'como-tirar-cheiro-sofa',
-    'limpeza-alcatifa-escritorio',
-    'guia-acaros-em-casa',
-    'limpeza-sofa-animais-domesticos',
-    'como-manter-sofa-limpo-entre-limpezas',
-    'higienizacao-vs-impermeabilizacao-sofa',
-    'com-que-frequencia-limpar-sofa',
-    'sinais-sofa-precisa-limpeza-profissional',
-    'como-limpar-sofa-microfibra',
-    'limpeza-sofa-bebe-crianca',
-    'limpeza-colchao-bebe-crianca',
-    'o-que-e-extracao-a-vapor-estofos',
-    'mitos-limpeza-estofos',
-    'limpeza-sofa-couro',
-    'como-tirar-manchas-urina-colchao',
-    'quanto-custa-limpar-alcatifa',
-  ];
+  //
+  // Posts are read from blogData.ts, not listed here. This block used to hold a
+  // hand-copied array of all 26 slugs, the same duplication trap that already
+  // bit the city and pack lists: a post added to blogData.ts existed, was
+  // navigable and was prerendered, but never reached the sitemap. Reading the
+  // real source also gives each post its own editorial `updatedDate`, which is
+  // a genuine per-page lastmod rather than the per-family one everything else
+  // gets.
   const resourceUrls: string[] = [
-    xmlUrl('/perguntas-frequentes-limpeza-estofos', 'monthly', '0.8'),
-    xmlUrl('/glossario-limpeza-estofos', 'monthly', '0.7'),
-    xmlUrl('/blog', 'weekly', '0.8'),
-    ...blogSlugs.map(s => xmlUrl(`/blog/${s}`, 'monthly', '0.8')),
+    xmlUrl('/perguntas-frequentes-limpeza-estofos', 'monthly', '0.8', DATES.faq),
+    xmlUrl('/glossario-limpeza-estofos', 'monthly', '0.7', DATES.glossario),
+    xmlUrl('/blog', 'weekly', '0.8', DATES.blogIndex),
+    ...getAllPosts().map(post =>
+      xmlUrl(`/blog/${post.slug}`, 'monthly', '0.8', post.updatedDate || post.publishDate),
+    ),
   ];
 
   // 9. Pack/Combo pages — packs + packCities imported directly from
@@ -188,7 +230,7 @@ export function generateSitemaps(outDir: string) {
   const packUrls: string[] = [];
   for (const pack of packs) {
     for (const city of packCities) {
-      packUrls.push(xmlUrl(`/${pack.slug}-${city.slug}`, 'monthly', '0.7'));
+      packUrls.push(xmlUrl(`/${pack.slug}-${city.slug}`, 'monthly', '0.7', DATES.packs));
     }
   }
 
@@ -201,7 +243,7 @@ export function generateSitemaps(outDir: string) {
   const marcaUrls: string[] = [];
   for (const marca of marcaSlugs) {
     for (const city of marcaCities) {
-      marcaUrls.push(xmlUrl(`/limpeza-sofa-${marca}-${city}`, 'monthly', '0.7'));
+      marcaUrls.push(xmlUrl(`/limpeza-sofa-${marca}-${city}`, 'monthly', '0.7', DATES.marcas));
     }
   }
 
@@ -209,7 +251,7 @@ export function generateSitemaps(outDir: string) {
   const marcaColchaoSlugs = ['ikea', 'conforama', 'molaflex', 'pikolin', 'colmol', 'mindol'];
   for (const marca of marcaColchaoSlugs) {
     for (const city of marcaCities) {
-      marcaUrls.push(xmlUrl(`/limpeza-colchao-${marca}-${city}`, 'monthly', '0.7'));
+      marcaUrls.push(xmlUrl(`/limpeza-colchao-${marca}-${city}`, 'monthly', '0.7', DATES.marcas));
     }
   }
 
@@ -217,7 +259,7 @@ export function generateSitemaps(outDir: string) {
   const marcaCadeirasSlugs = ['ikea', 'conforama', 'leroy-merlin', 'herman-miller', 'moviflor', 'el-corte-ingles'];
   for (const marca of marcaCadeirasSlugs) {
     for (const city of marcaCities) {
-      marcaUrls.push(xmlUrl(`/limpeza-cadeiras-${marca}-${city}`, 'monthly', '0.7'));
+      marcaUrls.push(xmlUrl(`/limpeza-cadeiras-${marca}-${city}`, 'monthly', '0.7', DATES.marcas));
     }
   }
 
@@ -225,17 +267,17 @@ export function generateSitemaps(outDir: string) {
   // kept separate from all PT sitemaps above so it can be reviewed/analysed
   // on its own.
   const enUrls: string[] = [
-    ...getAllEnRoutes().map(r => xmlUrl(r.path, 'monthly', '0.6')),
-    xmlUrl('/en/airbnb-portugal-cleaning-guide', 'monthly', '0.7'),
+    ...getAllEnRoutes().map(r => xmlUrl(r.path, 'monthly', '0.6', DATES.en)),
+    xmlUrl('/en/airbnb-portugal-cleaning-guide', 'monthly', '0.7', DATES.en),
   ];
 
   // 14. Commercial B2B pages (restaurantes/hotéis/escritórios × cidade) — own
   // dedicated sitemap, separate from the consumer-facing sitemaps above.
-  const commercialUrls: string[] = getAllCommercialRoutes().map(r => xmlUrl(r.path, 'monthly', '0.6'));
+  const commercialUrls: string[] = getAllCommercialRoutes().map(r => xmlUrl(r.path, 'monthly', '0.6', DATES.comercial));
 
   // Write sub-sitemaps
   const sitemapFiles = [
-    { name: 'sitemap-tratamentos.xml', urls: getTreatmentRoutes().map(r => xmlUrl(r.path, 'monthly', '0.7')) },
+    { name: 'sitemap-tratamentos.xml', urls: getTreatmentRoutes().map(r => xmlUrl(r.path, 'monthly', '0.7', DATES.tratamentos)) },
     { name: 'sitemap-core.xml', urls: coreUrls },
     { name: 'sitemap-location.xml', urls: locationUrls },
     { name: 'sitemap-freguesia.xml', urls: freguesiaUrls },

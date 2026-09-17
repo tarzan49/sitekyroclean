@@ -18,6 +18,22 @@ function sitemapPlugin(): Plugin {
   };
 }
 
+// llms.txt plugin — the plain-text site summary read by generative engines
+function llmsTxtPlugin(): Plugin {
+  return {
+    name: 'generate-llms-txt',
+    closeBundle: {
+      sequential: true,
+      async handler() {
+        const { generateLlmsTxt } = await import('./scripts/generate-llms-txt');
+        const outDir = path.resolve(__dirname, 'dist');
+        console.log('\n🔧 Generating llms.txt...\n');
+        generateLlmsTxt(outDir);
+      },
+    },
+  };
+}
+
 // Static prerender plugin — injects per-route meta tags for Google indexing
 function prerenderPlugin(): Plugin {
   return {
@@ -44,6 +60,7 @@ export default defineConfig(({ mode }) => ({
   plugins: [
     react(),
     sitemapPlugin(),
+    llmsTxtPlugin(),
     prerenderPlugin(),
   ],
   resolve: {
