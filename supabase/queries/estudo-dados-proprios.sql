@@ -6,81 +6,91 @@
 -- Uma página de estudo com estes números, com o método à vista, é o tipo de
 -- facto que um motor generativo cita e atribui à fonte.
 --
--- Como correr: cola no SQL Editor do dashboard do Supabase (a chave anónima
--- não lê estas tabelas, de propósito, e este projeto não usa `supabase db
--- push`). Devolve só agregados, nunca linhas individuais, e corta qualquer
--- grupo com menos de 20 registos para nenhum número poder ser ligado a uma
--- pessoa. Nenhuma consulta toca em nome, telefone, email ou morada.
+-- Como correr: cola no SQL Editor do dashboard do Supabase e carrega em Run
+-- uma vez. **É uma só instrução de propósito**: o SQL Editor mostra apenas o
+-- resultado da última instrução de um script, por isso um ficheiro com seis
+-- SELECTs separados deita fora cinco resultados sem avisar (aconteceu na
+-- primeira versão deste ficheiro). A chave anónima não lê estas tabelas, de
+-- propósito, e este projeto não usa `supabase db push`.
+--
+-- Devolve só agregados, nunca linhas individuais, e corta qualquer grupo com
+-- menos de 20 registos para nenhum número poder ser ligado a uma pessoa.
+-- Não toca em nome, telefone, email nem morada.
+--
+-- Formato longo (metrica, chave, ...) para caber tudo numa tabela só.
 
--- 1. Que serviços as pessoas pedem, e quanto pesa cada um.
-select
-  service,
-  count(*) as pedidos,
-  round(100.0 * count(*) / sum(count(*)) over (), 1) as percentagem
-from public.quiz_events
-where action = 'complete' and service is not null
-group by service
-having count(*) >= 20
-order by pedidos desc;
+with concluidos as (
+  select * from public.quiz_events where action = 'complete'
+),
 
--- 2. Onde estão os pedidos. Alimenta as páginas de localidade com um facto
---    que hoje elas não têm: quanta procura existe mesmo em cada cidade.
-select
-  city,
-  count(*) as pedidos,
-  round(100.0 * count(*) / sum(count(*)) over (), 1) as percentagem
-from public.quiz_events
-where action = 'complete' and city is not null
-group by city
-having count(*) >= 20
-order by pedidos desc;
+-- 1. Que serviços as pessoas pedem.
+servicos as (
+  select 'servico' as metrica, service as chave, count(*) as pedidos,
+         round(100.0 * count(*) / sum(count(*)) over (), 1) as percentagem,
+         null::numeric as q1, null::numeric as mediana, null::numeric as q3
+  from concluidos where service is not null
+  group by service having count(*) >= 20
+),
+
+-- 2. Onde estão os pedidos. Dá às páginas de localidade um facto que hoje
+--    elas não têm: quanta procura existe mesmo em cada cidade.
+cidades as (
+  select 'cidade', city, count(*),
+         round(100.0 * count(*) / sum(count(*)) over (), 1),
+         null, null, null
+  from concluidos where city is not null
+  group by city having count(*) >= 20
+),
 
 -- 3. Sazonalidade. A SPAIC diz que o outono é a altura de maior proliferação
 --    de ácaros; se os pedidos acompanharem, é uma observação própria que
---    corrobora uma fonte externa, e isso vale mais do que qualquer das duas
---    isolada.
-select
-  to_char(created_at, 'YYYY-MM') as mes,
-  count(*) as pedidos
-from public.quiz_events
-where action = 'complete'
-group by 1
-having count(*) >= 20
-order by 1;
+--    corrobora uma fonte externa, e isso vale mais do que as duas isoladas.
+meses as (
+  select 'mes', to_char(created_at, 'YYYY-MM'), count(*),
+         round(100.0 * count(*) / sum(count(*)) over (), 1),
+         null, null, null
+  from concluidos
+  group by 2 having count(*) >= 20
+),
 
--- 4. Limpeza contra impermeabilização: o que as pessoas escolhem quando lhes
---    é dada a escolha.
-select
-  service_type,
-  count(*) as pedidos,
-  round(100.0 * count(*) / sum(count(*)) over (), 1) as percentagem
-from public.quiz_events
-where action = 'complete' and service_type is not null
-group by service_type
-having count(*) >= 20
-order by pedidos desc;
+-- 4. Limpeza contra impermeabilização: o que escolhem quando podem escolher.
+tipos as (
+  select 'tipo_servico', service_type, count(*),
+         round(100.0 * count(*) / sum(count(*)) over (), 1),
+         null, null, null
+  from concluidos where service_type is not null
+  group by service_type having count(*) >= 20
+),
 
--- 5. Distribuição de valores por serviço. Mediana e quartis, não média: a
---    média de um serviço com "sob orçamento" pelo meio não diz nada.
-select
-  service,
-  count(*) as pedidos,
-  percentile_cont(0.25) within group (order by value) as q1,
-  percentile_cont(0.50) within group (order by value) as mediana,
-  percentile_cont(0.75) within group (order by value) as q3
-from public.quiz_events
-where action = 'complete' and value is not null and value > 0
-group by service
-having count(*) >= 20
-order by pedidos desc;
+-- 5. Distribuição de valores. Mediana e quartis, não média: a média de um
+--    serviço com "sob orçamento" pelo meio não diz nada.
+valores as (
+  select 'valor_por_servico', service, count(*), null,
+         percentile_cont(0.25) within group (order by value),
+         percentile_cont(0.50) within group (order by value),
+         percentile_cont(0.75) within group (order by value)
+  from concluidos where value is not null and value > 0
+  group by service having count(*) >= 20
+),
 
--- 6. Em que passo o quiz perde as pessoas. Este não vai para a página
---    pública: é para decidires onde mexer no quiz.
-select
-  step,
-  count(*) filter (where action = 'start')    as chegaram,
-  count(*) filter (where action = 'abandon')  as desistiram,
-  count(*) filter (where action = 'complete') as concluiram
-from public.quiz_events
-group by step
-order by step;
+-- 6. Funil do quiz. Este não vai para a página pública: serve para decidir
+--    onde mexer no quiz. Atenção ao que mede: 'start' é disparado à abertura
+--    e 'abandon' só em condições específicas, por isso a diferença entre
+--    aberturas e conclusões é maior do que os abandonos registados.
+funil as (
+  select 'funil_passo', step::text,
+         count(*) filter (where action = 'start'), null,
+         count(*) filter (where action = 'abandon')::numeric,
+         count(*) filter (where action = 'complete')::numeric,
+         null
+  from public.quiz_events
+  group by step
+)
+
+select * from servicos
+union all select * from cidades
+union all select * from meses
+union all select * from tipos
+union all select * from valores
+union all select * from funil
+order by metrica, pedidos desc nulls last, chave;
