@@ -101,9 +101,12 @@ function buildWhatsAppMessage(lead: Record<string, string>): string {
     : "";
   return [
     `Olá ${firstName(lead.name)}, tudo bem?`,
-    `Aqui é o António da Kyro Clean Solutions. Recebemos o seu pedido de orçamento${service}${loc} e agradecemos a confiança.`,
-    `Temos disponibilidade para ______ ou para ______. Qual lhe dá mais jeito?`,
-    `Só preciso que me envie a morada completa e deixo já a reserva confirmada.`,
+    `Aqui é o António, da Kyro Clean Solutions. Recebi o seu pedido de orçamento${service}${loc}.`,
+    // Sem "para" antes dos espaços em branco de propósito: assim a frase
+    // funciona tanto com horas ("quinta às 15h") como com períodos do dia
+    // ("sábado de manhã"), seja o que for que se escreva à mão antes de enviar.
+    `Tenho disponibilidade ______ ou ______. Qual lhe dá mais jeito?`,
+    `É só enviar-me a morada completa e deixo a reserva confirmada.`,
   ].join("\n\n");
 }
 
