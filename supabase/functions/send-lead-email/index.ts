@@ -102,7 +102,7 @@ function buildWhatsAppMessage(lead: Record<string, string>): string {
   return [
     `Olá ${firstName(lead.name)}, tudo bem?`,
     `Aqui é o António da Kyro Clean Solutions. Recebemos o seu pedido de orçamento${service}${loc} e agradecemos a confiança.`,
-    `Temos disponibilidade para ______ ou para ______. Qual destes horários lhe fica melhor?`,
+    `Temos disponibilidade para ______ ou para ______. Qual lhe dá mais jeito?`,
     `Só preciso que me envie a morada completa e deixo já a reserva confirmada.`,
   ].join("\n\n");
 }
