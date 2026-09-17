@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import {
   calcChairClean, calcChairWaterproof, calcChairWaterproofPremium,
-  calcPackPricing, carpetItemArea, carpetHasValidItems, carpetItemDisplayDimensions,
+  calcPackPricing, carpetItemArea, carpetHasValidItems,
 } from './quizHelpers';
 import { sofaPrices, mattressPrices } from './QuizTypes';
 
@@ -101,38 +101,5 @@ describe('carpetItemArea / carpetHasValidItems', () => {
       { id: 't2', largura: '2', comprimento: '3' },
     ])).toBe(true);
     expect(carpetHasValidItems([{ id: 't1', largura: '', comprimento: '' }])).toBe(false);
-  });
-
-  // Bug real (2026-09-18): uma cliente mediu o tapete em centímetros (170×240,
-  // o tamanho mais comum em Portugal) e escreveu esses números nos campos que
-  // pedem metros. A mensagem de orçamento saiu com "170 × 240 m (40800 m²)" —
-  // sem sentido nenhum para um tapete. Acima de 20m num lado, assume-se cm.
-  it('treats values above the plausible-meters threshold as centimeters', () => {
-    expect(carpetItemArea({ id: 't1', largura: '170', comprimento: '240' })).toBeCloseTo(4.08);
-  });
-  it('does not touch plausible meter values, even close to the threshold', () => {
-    expect(carpetItemArea({ id: 't1', largura: '20', comprimento: '3' })).toBeCloseTo(60);
-  });
-
-  // Alcatifa (carpete fixo — salas, corredores, espaços comerciais) pode
-  // legitimamente ter um lado maior do que o limite de tapete (2026-09-18,
-  // pedido explícito do dono): usa um limite bem mais alto, para não estragar
-  // um pedido comercial real a tratá-lo como erro de centímetros.
-  it('uses a higher threshold for alcatifa, so a real large room is not miscorrected', () => {
-    expect(carpetItemArea({ id: 'a1', largura: '25', comprimento: '4' }, 'alcatifa')).toBeCloseTo(100);
-  });
-  it('still corrects an alcatifa value that is impossibly large even by its higher threshold', () => {
-    expect(carpetItemArea({ id: 'a1', largura: '250', comprimento: '400' }, 'alcatifa')).toBeCloseTo(10);
-  });
-});
-
-describe('carpetItemDisplayDimensions', () => {
-  it('echoes the raw string the person typed when the value is plausible in meters', () => {
-    expect(carpetItemDisplayDimensions({ id: 't1', largura: '2,5', comprimento: '3' }))
-      .toEqual({ largura: '2,5', comprimento: '3', area: 7.5 });
-  });
-  it('shows the corrected meter value, not the raw cm number, once the cm heuristic kicks in', () => {
-    expect(carpetItemDisplayDimensions({ id: 't1', largura: '170', comprimento: '240' }))
-      .toEqual({ largura: '1.7', comprimento: '2.4', area: 4.08 });
   });
 });

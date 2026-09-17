@@ -4,7 +4,7 @@ import { clearSubmissionId, currentSubmissionId } from '@/lib/submissionId';
 import { splitTreatmentItems } from '@/components/quiz/quizHelpers';
 import { sofaPrices, mattressPrices } from '@/components/quiz/QuizTypes';
 import type { SofaItem, MattressItem, CarpetItem, UpsellItemConfig } from '@/components/quiz/QuizTypes';
-import { calcChairClean, calcChairWaterproof, calcChairWaterproofPremium, carpetItemDisplayDimensions, calcPackPricing } from '@/components/quiz/quizHelpers';
+import { calcChairClean, calcChairWaterproof, calcChairWaterproofPremium, carpetItemArea, calcPackPricing } from '@/components/quiz/quizHelpers';
 import { WHATSAPP_BASE } from '@/constants/business';
 import { safeSessionSet } from '@/lib/safeStorage';
 import { logError } from '@/lib/errorTracking';
@@ -232,19 +232,16 @@ export function buildReceiptLines(payload: Pick<QuizLeadPayload, 'service' | 'se
     // Sem preço fixo (2026-09-06): cada tapete medido vira a sua própria linha,
     // sempre sob orçamento, nunca um total calculado por m².
     carpetItems.forEach((item, i) => {
-      const dims = carpetItemDisplayDimensions(item, payload.carpetKind);
-      if (!dims) return;
-      receiptLines.push({ label: `${payload.carpetKind === 'alcatifa' ? 'Alcatifa' : 'Tapete'} ${i + 1}: ${dims.largura} × ${dims.comprimento} m (${Number(dims.area.toFixed(2))} m²)`, qty: 1, unitPrice: null, total: null });
+      const area = carpetItemArea(item);
+      if (area === null) return;
+      receiptLines.push({ label: `${payload.carpetKind === 'alcatifa' ? 'Alcatifa' : 'Tapete'} ${i + 1}: ${item.largura} × ${item.comprimento} m (${Number(area.toFixed(2))} m²)`, qty: 1, unitPrice: null, total: null });
     });
   }
 
   upsellItems.forEach(item => {
     const q = item.qty ?? 1;
     const unitP = q > 0 && item.price > 0 ? Math.round(item.price / q * 100) / 100 : null;
-    const measures = item.carpetItems?.map((rug, i) => {
-      const dims = carpetItemDisplayDimensions(rug);
-      return dims ? `peça ${i + 1}: ${dims.largura} × ${dims.comprimento} m` : null;
-    }).filter((m): m is string => m !== null).join('; ');
+    const measures = item.carpetItems?.map((rug, i) => `peça ${i + 1}: ${rug.largura} × ${rug.comprimento} m`).join('; ');
     receiptLines.push({ label: `${item.label.replace(/^\d+\s*[x×]\s*/i, '')}${measures ? ` (${measures})` : ''}`, qty: q, unitPrice: unitP, total: item.price > 0 ? item.price : null });
     if (item.waterproof && item.waterproofPrice && item.waterproofPrice > 0) {
       receiptLines.push({ label: `Impermeabilização (${item.label})`, qty: 1, unitPrice: item.waterproofPrice, total: item.waterproofPrice });

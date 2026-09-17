@@ -57,61 +57,17 @@ export function carpetRemoveItem(items: CarpetItem[], id: string): CarpetItem[] 
 export function carpetUpdateItem(items: CarpetItem[], id: string, field: 'largura' | 'comprimento', value: string): CarpetItem[] {
   return items.map(i => i.id === id ? { ...i, [field]: value } : i);
 }
-// Nenhum tapete solto mede mais do que isto num só lado; acima disto a pessoa
-// quase de certeza escreveu centímetros no campo que pede metros (170×240 é o
-// tamanho de tapete mais comum em Portugal) — corrige-se dividindo por 100 em
-// vez de produzir uma área sem sentido. Alcatifa (carpete fixo — salas,
-// corredores, espaços comerciais) pode legitimamente ultrapassar isto, por
-// isso tem um limite bem mais alto: a correção só entra quando o valor é
-// claramente impossível, nunca para uma sala grande real (pedido explícito do
-// dono em 2026-09-18, depois de a mesma correção quase ter estragado um
-// pedido de alcatifa comercial).
-const CARPET_LIKELY_CM_THRESHOLD: Record<'tapete' | 'alcatifa', number> = { tapete: 20, alcatifa: 60 };
-
-interface NormalizedCarpetDimension { value: number; corrected: boolean; raw: string; }
-
-function normalizeCarpetDimension(raw: string, kind: 'tapete' | 'alcatifa'): NormalizedCarpetDimension | null {
-  const trimmed = raw.trim();
-  const n = Number(trimmed.replace(',', '.'));
-  if (!Number.isFinite(n) || n <= 0) return null;
-  const corrected = n > CARPET_LIKELY_CM_THRESHOLD[kind];
-  return { value: corrected ? n / 100 : n, corrected, raw: trimmed };
+export function carpetItemArea(item: CarpetItem): number | null {
+  const l = Number(item.largura.trim().replace(',', '.'));
+  const c = Number(item.comprimento.trim().replace(',', '.'));
+  if (!Number.isFinite(l * c) || l <= 0 || c <= 0) return null;
+  return l * c;
 }
-
-export function carpetItemDimensions(item: CarpetItem, kind: 'tapete' | 'alcatifa' = 'tapete'): { largura: number; comprimento: number } | null {
-  const largura = normalizeCarpetDimension(item.largura, kind);
-  const comprimento = normalizeCarpetDimension(item.comprimento, kind);
-  if (!largura || !comprimento) return null;
-  return { largura: largura.value, comprimento: comprimento.value };
+export function carpetHasValidItems(items: CarpetItem[]): boolean {
+  return items.some(i => carpetItemArea(i) !== null);
 }
-
-export function carpetItemArea(item: CarpetItem, kind: 'tapete' | 'alcatifa' = 'tapete'): number | null {
-  const dims = carpetItemDimensions(item, kind);
-  return dims ? dims.largura * dims.comprimento : null;
-}
-
-/**
- * Medidas prontas a mostrar num recibo/mensagem: o texto tal como a pessoa
- * escreveu (preserva vírgula, zeros à esquerda, etc.) quando o valor é
- * plausível em metros, ou o valor já corrigido quando a pessoa escreveu
- * centímetros por engano — nunca o número absurdo em bruto.
- */
-export function carpetItemDisplayDimensions(item: CarpetItem, kind: 'tapete' | 'alcatifa' = 'tapete'): { largura: string; comprimento: string; area: number } | null {
-  const largura = normalizeCarpetDimension(item.largura, kind);
-  const comprimento = normalizeCarpetDimension(item.comprimento, kind);
-  if (!largura || !comprimento) return null;
-  const formatCorrected = (n: number) => String(Number(n.toFixed(2)));
-  return {
-    largura: largura.corrected ? formatCorrected(largura.value) : largura.raw,
-    comprimento: comprimento.corrected ? formatCorrected(comprimento.value) : comprimento.raw,
-    area: largura.value * comprimento.value,
-  };
-}
-export function carpetHasValidItems(items: CarpetItem[], kind: 'tapete' | 'alcatifa' = 'tapete'): boolean {
-  return items.some(i => carpetItemArea(i, kind) !== null);
-}
-export function carpetTotalArea(items: CarpetItem[], kind: 'tapete' | 'alcatifa' = 'tapete'): number {
-  return items.reduce((sum, i) => sum + (carpetItemArea(i, kind) ?? 0), 0);
+export function carpetTotalArea(items: CarpetItem[]): number {
+  return items.reduce((sum, i) => sum + (carpetItemArea(i) ?? 0), 0);
 }
 
 // ── Pack pricing (sofa + mattress) ────────────────────────────────────────────
