@@ -63,9 +63,24 @@ function escapeHtml(value: string): string {
 // em QuizForm.tsx para a versão antiga, texto corrido), por isso é omitido
 // aqui para não duplicar. O contacto simples não tem service/details/value,
 // só `message` (a mensagem livre do cliente) — aí é a única fonte e é mostrado.
+// Mensagem pré-preenchida no clique de "Responder no WhatsApp". Estes leads já
+// viram o preço no quiz e mesmo assim avançaram, por isso o objetivo não é
+// "confirmar interesse" mas fechar o agendamento o mais depressa possível:
+// dá logo duas opções concretas de horário (pergunta fechada, decide-se em
+// segundos) em vez de "quando pode?", e só depois pede o único dado em falta
+// (morada). [DIA/HORA] fica como marcador para preencher à mão consoante a
+// agenda antes de enviar, a mensagem abre editável na caixa do WhatsApp.
+function buildWhatsAppMessage(lead: Record<string, string>): string {
+  const service = lead.service ? ` para ${lead.service.toLowerCase()}` : "";
+  const loc = lead.location ? ` em ${lead.location}` : "";
+  return `Olá ${lead.name}, tudo bem? Aqui é o António da Kyro Clean Solutions. Recebemos o seu pedido de orçamento${service}${loc}. Tenho disponibilidade [DIA] às [HORA] ou [DIA] às [HORA], qual funciona melhor para si? Só preciso da sua morada completa para confirmar a reserva.`;
+}
+
 function buildEmailHtml(lead: Record<string, string>): string {
   const isStructuredLead = Boolean(lead.service || lead.details || lead.value);
-  const waLink = lead.phone ? `https://wa.me/351${lead.phone.replace(/\D/g, "")}` : null;
+  const waLink = lead.phone
+    ? `https://wa.me/351${lead.phone.replace(/\D/g, "")}?text=${encodeURIComponent(buildWhatsAppMessage(lead))}`
+    : null;
 
   const row = (label: string, value: string, preserveLines = false) => `
     <tr>
