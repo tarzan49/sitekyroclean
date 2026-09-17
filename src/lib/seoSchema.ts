@@ -264,3 +264,49 @@ export function buildAboutPageSchema() {
     "publisher": { "@id": `${SITE_URL}/#business` },
   };
 }
+
+export interface PersonSchemaInput {
+  slug: string;
+  name: string;
+  jobTitle: string;
+  summary: string;
+}
+
+/**
+ * Nó da pessoa que assina o conteúdo.
+ *
+ * `worksFor` aponta para o nó do negócio por `@id` em vez de o redescrever:
+ * é o mesmo princípio da página /sobre, uma entidade descrita num sítio só e
+ * referenciada em todos os outros.
+ */
+export function buildPersonNode(author: PersonSchemaInput) {
+  return {
+    "@type": "Person",
+    "@id": `${SITE_URL}/autor/${author.slug}#person`,
+    "name": author.name,
+    "jobTitle": author.jobTitle,
+    "description": author.summary,
+    "url": `${SITE_URL}/autor/${author.slug}`,
+    "worksFor": { "@id": `${SITE_URL}/#business` },
+  };
+}
+
+export function buildProfilePageSchema(author: PersonSchemaInput) {
+  return {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "ProfilePage",
+        "@id": `${SITE_URL}/autor/${author.slug}#webpage`,
+        "url": `${SITE_URL}/autor/${author.slug}`,
+        "name": `${author.name} | Kyro Clean Solutions`,
+        "description": author.summary,
+        "inLanguage": "pt-PT",
+        "isPartOf": { "@id": `${SITE_URL}/#website` },
+        "mainEntity": { "@id": `${SITE_URL}/autor/${author.slug}#person` },
+        "publisher": { "@id": `${SITE_URL}/#business` },
+      },
+      buildPersonNode(author),
+    ],
+  };
+}

@@ -39,6 +39,7 @@ const AdminPanel = lazy(() => import("./pages/AdminPanel"));
 const AdminDeslocacoes = lazy(() => import("./pages/AdminDeslocacoes"));
 const AreasDeServico = lazy(() => import("./pages/AreasDeServico"));
 const Sobre = lazy(() => import("./pages/Sobre"));
+const Autor = lazy(() => import("./pages/Autor"));
 
 const ReviewRequest = lazy(() => import("./pages/ReviewRequest"));
 const FAQEstofos = lazy(() => import("./pages/FAQEstofos"));
@@ -115,6 +116,7 @@ const AppRoutes = () => {
                 <Route path="/admin/deslocacoes" element={<AdminDeslocacoes />} />
                 <Route path="/areas-de-servico" element={<AreasDeServico />} />
                 <Route path="/sobre" element={<Sobre />} />
+                <Route path="/autor/:slug" element={<Autor />} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
 
                 <Route path="*" element={<GeneratedRoutePage />} />

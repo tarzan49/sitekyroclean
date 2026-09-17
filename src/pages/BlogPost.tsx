@@ -10,6 +10,8 @@ import { getPostBySlug, getRelatedPosts } from "@/data/blogData";
 import { SITE_URL } from "@/constants/business";
 import { renderBlogBody } from "@/lib/blogMarkdown";
 import { getBlogSources } from "@/data/blogSources";
+import { DEFAULT_AUTHOR } from "@/data/authors";
+import { buildPersonNode } from "@/lib/seoSchema";
 
 import { BLOG_IMAGES, DEFAULT_BLOG_IMAGE } from "@/constants/blogImages";
 
@@ -82,12 +84,13 @@ const BlogPost = () => {
         "datePublished": post.publishDate,
         "dateModified": post.updatedDate,
         "inLanguage": "pt-PT",
-        "author": { "@id": `${SITE_URL}/#business` },
+        "author": { "@id": `${SITE_URL}/autor/${DEFAULT_AUTHOR.slug}#person` },
         "publisher": { "@id": `${SITE_URL}/#business` },
         "mainEntityOfPage": { "@id": `${pageUrl}#webpage` },
         ...(heroImg && { "image": heroImg }),
         ...(sources.length > 0 && { "citation": sources.map(source => ({ "@type": "CreativeWork", "name": source.label, "publisher": { "@type": "Organization", "name": source.publisher }, "url": source.url })) }),
       },
+      buildPersonNode(DEFAULT_AUTHOR),
       {
         "@type": "FAQPage",
         "mainEntity": post.faq.map(f => ({
@@ -146,7 +149,9 @@ const BlogPost = () => {
             <div className="flex flex-wrap items-center gap-4 text-sm text-white/80">
               <span className="flex items-center gap-1.5">
                 <User className="w-3.5 h-3.5" />
-                {post.author}
+                <Link to={`/autor/${DEFAULT_AUTHOR.slug}`} className="underline underline-offset-2 hover:text-gold transition-colors">
+                  {post.author}
+                </Link>
               </span>
               <span className="w-px h-3 bg-white/20" />
               <span className="flex items-center gap-1.5">

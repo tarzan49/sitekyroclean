@@ -7,7 +7,7 @@ import { getTreatmentRoutes, getExpansionRoutes, getTreatmentPage, getExpansionP
 import { PRICE_PROMISE, SATISFACTION_PROMISE, DRYING_PROMISE, COVERAGE_PROMISE, RESPONSE_PROMISE, AVAILABILITY_PROMISE, WEEKLY_REQUESTS, TREATMENT_EXTRAS } from '../src/constants/commercialPolicy';
 import { REVIEW_RATING, REVIEW_COUNT, CLIENTS_SERVED_LABEL, SERVICES_COMPLETED_LABEL, PHONE_DISPLAY, BUSINESS_EMAIL } from '../src/constants/business';
 import { locationPrices } from '../src/constants/travel';
-import { buildAboutPageSchema } from '../src/lib/seoSchema';
+import { buildAboutPageSchema, buildProfilePageSchema, buildPersonNode } from '../src/lib/seoSchema';
 /**
  * Static prerender for Kyro Clean Solutions
  *
@@ -53,6 +53,8 @@ import { getAllCommercialRoutes, getCommercialPageData } from '../src/data/comme
 import { buildLocalBusinessNode, buildBreadcrumbNode, buildServiceNode, buildFaqNode, buildOfferNode, buildHowToNode } from '../src/lib/seoSchema';
 import { renderBlogBody } from '../src/lib/blogMarkdown';
 import { getBlogSources } from '../src/data/blogSources';
+import { DEFAULT_AUTHOR } from '../src/data/authors';
+import { EDITORIAL_RULES } from '../src/constants/editorialPolicy';
 
 const BASE_URL = 'https://cleansolutions.com.pt';
 
@@ -167,7 +169,7 @@ interface PageContent {
   // saltava do <h1> para o texto: quem lê a página via o autor e a data, o
   // crawler não via nenhum dos dois, que são precisamente os sinais de
   // autoria que o E-E-A-T pede.
-  byline?: { author: string; published: string; updated?: string; readingTime?: number };
+  byline?: { author: string; authorHref?: string; published: string; updated?: string; readingTime?: number };
   // Secções de artigo com markdown leve (negrito e listas), ao contrário de
   // `problems`, que é texto simples escapado. Ver src/lib/blogMarkdown.ts.
   articleSections?: { heading: string; body: string; tip?: string }[];
@@ -192,7 +194,10 @@ function generatePageBody(c: PageContent, lang: 'pt' | 'en' = 'pt'): string {
   let html = `<main>\n<h1>${escHtml(c.h1)}</h1>\n`;
 
   if (c.byline) {
-    const parts = [`Por ${escHtml(c.byline.author)}`, `Publicado em <time datetime="${escHtml(c.byline.published)}">${formatDatePt(c.byline.published)}</time>`];
+    const authorLabel = c.byline.authorHref
+      ? `<a href="${escHtml(c.byline.authorHref)}">${escHtml(c.byline.author)}</a>`
+      : escHtml(c.byline.author);
+    const parts = [`Por ${authorLabel}`, `Publicado em <time datetime="${escHtml(c.byline.published)}">${formatDatePt(c.byline.published)}</time>`];
     if (c.byline.updated && c.byline.updated !== c.byline.published) {
       parts.push(`Atualizado em <time datetime="${escHtml(c.byline.updated)}">${formatDatePt(c.byline.updated)}</time>`);
     }
@@ -1153,6 +1158,24 @@ export function prerenderRoutes(outDir: string): number {
         extraSchemas: [buildAboutPageSchema()],
       },
       {
+        // Página de autor. O prerender é o que os motores leem, por isso a
+        // política editorial tem de sair aqui inteira: é ela que torna a
+        // assinatura verificável em vez de decorativa.
+        path: `/autor/${DEFAULT_AUTHOR.slug}`,
+        title: `${DEFAULT_AUTHOR.name} | Kyro Clean Solutions`,
+        desc: DEFAULT_AUTHOR.summary,
+        content: {
+          h1: DEFAULT_AUTHOR.name,
+          intro: `${DEFAULT_AUTHOR.jobTitle}. ${DEFAULT_AUTHOR.bio.join(' ')}`,
+          definitions: EDITORIAL_RULES.map(rule => ({ term: rule.title, definition: rule.detail })),
+          links: [
+            { href: '/blog', label: 'Artigos publicados' },
+            { href: '/sobre', label: 'Sobre a Kyro Clean Solutions' },
+          ],
+        },
+        extraSchemas: [buildProfilePageSchema(DEFAULT_AUTHOR)],
+      },
+      {
         path: '/glossario-limpeza-estofos',
         title: 'Glossário de Limpeza de Estofos | Termos Técnicos | Kyro Clean',
         desc: 'Dicionário completo com termos técnicos de limpeza profissional de estofos. Saiba o que significa extração, impermeabilização e muito mais.',
@@ -1266,7 +1289,7 @@ export function prerenderRoutes(outDir: string): number {
         // mesmo nome não se liga ao negócio, e era esta a versão que os
         // crawlers liam (a página React já apontava para `#business`). Assim o
         // artigo passa a creditar a entidade que o resto do grafo descreve.
-        author: { '@id': `${BASE_URL}/#business` },
+        author: { '@id': `${BASE_URL}/autor/${DEFAULT_AUTHOR.slug}#person` },
         publisher: { '@id': `${BASE_URL}/#business` },
         mainEntityOfPage: `${pageUrl}#webpage`,
         ...(postSources.length > 0 && {
@@ -1285,6 +1308,7 @@ export function prerenderRoutes(outDir: string): number {
           { name: post.title, url: pageUrl },
         ]),
         blogPostingSchema,
+        { '@context': 'https://schema.org', ...buildPersonNode(DEFAULT_AUTHOR) },
       ];
       if (post.faq?.length) {
         schemas.push(buildFaqSchema(post.faq.map(f => ({ question: f.q, answer: f.a }))));
@@ -1296,7 +1320,7 @@ export function prerenderRoutes(outDir: string): number {
         {
           h1: post.title,
           intro: post.intro,
-          byline: { author: post.author, published: post.publishDate, updated: post.updatedDate, readingTime: post.readingTime },
+          byline: { author: post.author, authorHref: `/autor/${DEFAULT_AUTHOR.slug}`, published: post.publishDate, updated: post.updatedDate, readingTime: post.readingTime },
           articleSections: post.sections.map(s => ({ heading: s.heading, body: s.body, tip: s.tip })),
           sources: postSources,
           faqs: post.faq?.map(f => ({ question: f.q, answer: f.a })),

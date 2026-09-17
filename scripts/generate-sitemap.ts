@@ -1,4 +1,5 @@
 import { getTreatmentRoutes } from '../src/data/treatmentSeoData';
+import { DEFAULT_AUTHOR } from '../src/data/authors';
 /**
  * Sitemap Generator for Kyro Clean Solutions
  * Generates a Sitemap Index + sub-sitemaps covering all ~1700+ URLs
@@ -79,6 +80,7 @@ const DATES = {
   glossario: getContentDate(['src/pages/GlossarioEstofos.tsx']),
   areas: getContentDate(['src/pages/AreasDeServico.tsx', 'src/data/locationSeoData.ts']),
   sobre: getContentDate(['src/pages/Sobre.tsx', 'src/constants/commercialPolicy.ts']),
+  autor: getContentDate(['src/pages/Autor.tsx', 'src/data/authors.ts', 'src/constants/editorialPolicy.ts']),
   antesDepois: getContentDate(['src/data/beforeAfterPool.ts']),
   blogIndex: getContentDate(['src/data/blogData.ts']),
 };
@@ -149,6 +151,7 @@ export function generateSitemaps(outDir: string) {
     xmlUrl('/glossario-limpeza-estofos', 'monthly', '0.6', DATES.glossario),
     xmlUrl('/areas-de-servico', 'monthly', '0.7', DATES.areas),
     xmlUrl('/sobre', 'monthly', '0.6', DATES.sobre),
+    xmlUrl(`/autor/${DEFAULT_AUTHOR.slug}`, 'monthly', '0.5', DATES.autor),
     xmlUrl('/antes-depois-limpeza', 'monthly', '0.7', DATES.antesDepois),
   ];
 
