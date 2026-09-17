@@ -74,17 +74,42 @@ valores as (
 ),
 
 -- 6. Funil do quiz. Este não vai para a página pública: serve para decidir
---    onde mexer no quiz. Atenção ao que mede: 'start' é disparado à abertura
---    e 'abandon' só em condições específicas, por isso a diferença entre
---    aberturas e conclusões é maior do que os abandonos registados.
-funil as (
-  select 'funil_passo', step::text,
-         count(*) filter (where action = 'start'), null,
-         count(*) filter (where action = 'abandon')::numeric,
-         count(*) filter (where action = 'complete')::numeric,
-         null
+--    onde mexer no quiz.
+--
+--    Conta TENTATIVAS, não linhas. Cada abertura do quiz gera o seu próprio
+--    `session_id` (`v2:q:<uuid>`) e escreve um 'start' por cada passo que
+--    chega a ver, mais um 'start' com step = -1 na abertura. Somar linhas de
+--    'start' soma passos vistos, não pessoas: era daí que vinham os 751
+--    'start' contra 224 'complete' de 2026-09-17, uma comparação entre duas
+--    unidades diferentes. Aqui cada tentativa conta uma vez, arrumada pelo
+--    passo mais longe que chegou, e as colunas desistiram/concluiram somam
+--    exatamente o total de tentativas: o funil fecha, sem diferença por
+--    explicar.
+--
+--    'abandon' não é usado para decidir quem desistiu (desistiu = não tem
+--    'complete'), só para saber onde. Uma tentativa pode ter mais do que uma
+--    linha 'abandon' (sair, voltar, avançar, sair outra vez), por isso
+--    contar linhas de 'abandon' também enganaria.
+--
+--    Só tentativas v2 (`v2:q:%`): as antigas usavam step = 0 para a abertura
+--    e misturá-las deslocava o funil um passo.
+tentativas as (
+  select session_id,
+         max(step) filter (where action = 'start') as passo_max,
+         bool_or(action = 'complete') as concluiu
   from public.quiz_events
-  group by step
+  where session_id like 'v2:q:%'
+    and coalesce(page_path, '') not like '/admin%'
+  group by session_id
+),
+funil as (
+  select 'funil_passo', coalesce(passo_max, -1)::text, count(*),
+         round(100.0 * count(*) / sum(count(*)) over (), 1),
+         count(*) filter (where not concluiu)::numeric,
+         count(*) filter (where concluiu)::numeric,
+         null
+  from tentativas
+  group by 2
 )
 
 select * from servicos

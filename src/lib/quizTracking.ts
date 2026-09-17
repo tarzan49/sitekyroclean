@@ -69,7 +69,14 @@ export function initContactTracking() {
   };
   window.addEventListener('kyro:consent-changed', consentChanged);
   window.addEventListener('online', flush);
+  // Última oportunidade de entregar o que está na outbox: a seguir a isto o
+  // separador pode ser morto sem nunca voltar a correr JavaScript. O `fetch`
+  // de `sendStoredEvent` usa `keepalive`, por isso sobrevive ao descarregamento
+  // da página; o que não for entregue fica em localStorage e é retentado na
+  // visita seguinte.
+  const flushOnHidden = () => { if (document.visibilityState === 'hidden') flush(); };
+  document.addEventListener('visibilitychange', flushOnHidden);
   const interval = window.setInterval(flush, 30000);
   flush();
-  return () => { document.removeEventListener('click', click, true); document.removeEventListener('auxclick', click, true); window.removeEventListener('online', flush); window.removeEventListener('kyro:consent-changed', consentChanged); clearInterval(interval); };
+  return () => { document.removeEventListener('click', click, true); document.removeEventListener('auxclick', click, true); window.removeEventListener('online', flush); window.removeEventListener('kyro:consent-changed', consentChanged); document.removeEventListener('visibilitychange', flushOnHidden); clearInterval(interval); };
 }
