@@ -7,11 +7,9 @@ import ServiceSnapshotStats from './ServiceSnapshotStats';
 import type { BreadcrumbItem } from './PageBreadcrumb';
 import { categoryForServiceSlug } from '@/data/beforeAfterPool';
 import { pickServiceHero } from '@/constants/serviceContent';
-import { REVIEW_COUNT, REVIEW_RATING } from '@/constants/business';
-import { locationPrices } from '@/constants/travel';
 import { services } from '@/data/serviceCatalog';
 import { trackWhatsAppClick } from '@/lib/quizTracking';
-import { commercialHeroSubtitle } from '@/data/commercialHeroCopy';
+import { commercialHeroPriceLine, commercialHeroStats, commercialHeroSubtitle } from '@/data/commercialHeroCopy';
 
 interface Props {
   title: string;
@@ -35,18 +33,13 @@ export default function CommercialHero({ title, subtitle, serviceSlug, city, mun
   const imgs = typeof background === 'string' ? { m: background, d: background } : background;
   const category = categoryForServiceSlug(serviceSlug);
   const items = breadcrumbs ?? [{ label: 'Início', to: '/' }, { label: service?.name ?? title, to: service?.baseRoute }, ...(city ? [{ label: city }] : [])];
-  const fee = municipality ? locationPrices[municipality] : undefined;
-  const value = price ?? service?.priceFrom ?? 'Sob orçamento';
-  const priceText = /orçamento/i.test(value) ? 'Sob orçamento' : `Desde ${value}`;
+  const priceLine = commercialHeroPriceLine(serviceSlug, municipality, price);
   const words = title.trim().split(' ');
   const gold = words.pop();
-  const stats = [
-    { value: `${REVIEW_RATING}★`, label: `+${REVIEW_COUNT} avaliações Google`, icon: GoogleG },
-    { value: '<10 min', label: 'Resposta', icon: Clock },
-    serviceSlug === 'impermeabilizacao'
-      ? { value: 'Até 24 h', label: 'Ativação da proteção', icon: Timer }
-      : { value: '3 a 6 h', label: 'Secagem média', icon: Timer },
-  ];
+  // Os ícones ficam deste lado: são componentes React e não cabem no módulo de
+  // copy, que o prerender importa em Node para gerar o HTML estático.
+  const statIcons = [GoogleG, Clock, Timer];
+  const stats = commercialHeroStats(serviceSlug).map((stat, index) => ({ ...stat, icon: statIcons[index] }));
   return <section data-commercial-hero data-mobile-hero={preserveMobileHero ? undefined : true} className="relative isolate overflow-hidden pt-[68px] sm:pt-24 text-white">
     <picture className="absolute inset-0 -z-20" aria-hidden="true">
       <source media="(max-width: 767px)" srcSet={preserveMobileHero ? imgs.m : 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'} />
@@ -67,7 +60,7 @@ export default function CommercialHero({ title, subtitle, serviceSlug, city, mun
           <a data-hero-part="whatsapp" href={whatsappHref} target="_blank" rel="noopener noreferrer" onClick={() => trackWhatsAppClick(source)} className="flex min-h-[52px] items-center justify-center gap-2 bg-[#16833e] px-3 py-3 text-sm font-semibold text-white hover:bg-[#116b32] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#D4AF37]"><MessageCircle className="h-5 w-5 shrink-0" />Pedir orçamento por WhatsApp</a>
           <a data-hero-part="prices" href={pricesHref} className="flex min-h-9 flex-wrap items-center justify-center gap-x-1.5 text-center">
             <span className="text-sm font-medium text-white underline underline-offset-4">Ver preços</span>
-            <span className="text-[11px] leading-relaxed text-white/85">· {priceText} + deslocação {fee === undefined ? 'a partir de 10€' : `${fee}€`}.</span>
+            <span className="text-[11px] leading-relaxed text-white/85">· {priceLine}</span>
           </a>
         </div>
         <div data-hero-part="comparison" id="resultados" className="min-w-0 scroll-mt-20">

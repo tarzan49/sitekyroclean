@@ -1,6 +1,7 @@
 import { exampleImageSrcSet, EXAMPLE_IMAGE_SIZES } from '../src/lib/responsiveImages';
 import type { LandingPageModel } from '../src/data/landingPageModel';
 import { LANDING_SECTION_ORDER } from '../src/data/landingServiceCopy';
+import { commercialHeroPriceLine, commercialHeroStats } from '../src/data/commercialHeroCopy';
 
 export const escapeLandingHtml = (value: string) => value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 const e = escapeLandingHtml;
@@ -40,5 +41,12 @@ export function renderLandingPageHtml(model: LandingPageModel): string {
     'mesma-visita': `<h2>Aproveite a mesma visita</h2>${links(model.packLinks)}`,
     zonas: `<h2>Serviços e zonas de atendimento ${e(model.prep)} ${e(model.locationName)}</h2>${model.directory.map(group => `<details><summary>${e(group.title)}</summary>${links(group.links)}</details>`).join('')}`,
   };
-  return `<main><h1>${e(model.h1)}</h1><p>${e(model.intro)}</p>${LANDING_SECTION_ORDER.map(section => `<section id="${section}" data-landing-section="${section}">${sections[section]}</section>`).join('\n')}</main>`;
+    // Os factos do hero, escritos com as mesmas funções que o CommercialHero usa
+  // para os desenhar. Nenhum destes valores é novo na página: o preço de
+  // partida, a deslocação da cidade, a avaliação, o tempo de resposta e o de
+  // secagem já estavam todos no hero para quem visita o site. O que faltava era
+  // chegarem aqui: "Desde 49€" e "deslocação 10€" não apareciam uma única vez
+  // no HTML estático, que é o único que um crawler sem JavaScript lê.
+  const heroFacts = `<p>${e(commercialHeroPriceLine(model.serviceSlug, model.municipalityName, model.priceFrom))}</p><ul>${commercialHeroStats(model.serviceSlug).map(stat => `<li>${e(stat.value)} · ${e(stat.label)}</li>`).join('')}</ul>`;
+  return `<main><h1>${e(model.h1)}</h1><p>${e(model.intro)}</p>${heroFacts}${LANDING_SECTION_ORDER.map(section => `<section id="${section}" data-landing-section="${section}">${sections[section]}</section>`).join('\n')}</main>`;
 }
