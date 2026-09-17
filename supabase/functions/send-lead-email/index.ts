@@ -72,7 +72,10 @@ function escapeHtml(value: string): string {
 // pede o único dado em falta (a morada). Os espaços em branco dos horários
 // ficam por preencher à mão consoante a agenda: a mensagem abre editável na
 // caixa do WhatsApp, não é enviada automaticamente. Parágrafos separados por
-// linha em branco para não chegar como um bloco de texto corrido.
+// linha em branco para não chegar como um bloco de texto corrido. Tudo na
+// primeira pessoa do plural (recebemos, temos, enviar-nos, deixamos): quem
+// presta o serviço é a equipa, não o António sozinho. O nome fica só na
+// apresentação, para a pessoa saber com quem fala.
 function firstName(fullName: string): string {
   const first = fullName.trim().split(/\s+/)[0] ?? "";
   return first ? first.charAt(0).toUpperCase() + first.slice(1) : fullName;
@@ -101,12 +104,12 @@ function buildWhatsAppMessage(lead: Record<string, string>): string {
     : "";
   return [
     `Olá ${firstName(lead.name)}, tudo bem?`,
-    `Aqui é o António, da Kyro Clean Solutions. Recebi o seu pedido de orçamento${service}${loc}.`,
+    `Aqui é o António, da Kyro Clean Solutions. Recebemos o seu pedido de orçamento${service}${loc}.`,
     // Sem "para" antes dos espaços em branco de propósito: assim a frase
     // funciona tanto com horas ("quinta às 15h") como com períodos do dia
     // ("sábado de manhã"), seja o que for que se escreva à mão antes de enviar.
-    `Tenho disponibilidade ______ ou ______. Qual lhe dá mais jeito?`,
-    `É só enviar-me a morada completa e deixo a reserva confirmada.`,
+    `Temos disponibilidade ______ ou ______. Qual horário prefere?`,
+    `É só enviar-nos a morada completa e deixamos a reserva confirmada.`,
   ].join("\n\n");
 }
 
