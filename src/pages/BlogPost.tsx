@@ -9,6 +9,7 @@ import QuizButton from "@/components/QuizButton";
 import { getPostBySlug, getRelatedPosts } from "@/data/blogData";
 import { SITE_URL } from "@/constants/business";
 import { renderBlogBody } from "@/lib/blogMarkdown";
+import { getBlogSources } from "@/data/blogSources";
 
 import { BLOG_IMAGES, DEFAULT_BLOG_IMAGE } from "@/constants/blogImages";
 
@@ -43,6 +44,7 @@ const BlogPost = () => {
 
   const related = getRelatedPosts(post.relatedPosts);
   const heroImg = BLOG_IMAGES[post.slug] ?? DEFAULT_BLOG_IMAGE;
+  const sources = getBlogSources(post.sources);
   const formattedDate = new Date(post.publishDate).toLocaleDateString("pt-PT", {
     day: "numeric", month: "long", year: "numeric",
   });
@@ -84,6 +86,7 @@ const BlogPost = () => {
         "publisher": { "@id": `${SITE_URL}/#business` },
         "mainEntityOfPage": { "@id": `${pageUrl}#webpage` },
         ...(heroImg && { "image": heroImg }),
+        ...(sources.length > 0 && { "citation": sources.map(source => ({ "@type": "CreativeWork", "name": source.label, "publisher": { "@type": "Organization", "name": source.publisher }, "url": source.url })) }),
       },
       {
         "@type": "FAQPage",
@@ -183,6 +186,31 @@ const BlogPost = () => {
               </div>
             ))}
           </div>
+
+          {sources.length > 0 && (
+            <section className="mt-12 border-t border-neutral-200 pt-6">
+              <h2 className="font-playfair text-xl text-[#111111] mb-3">Fontes</h2>
+              <p className="text-sm text-[#505650] mb-4">
+                As afirmações sobre saúde deste artigo remetem para as fontes abaixo. Onde não
+                encontrámos fonte que sustentasse um número, retirámos o número.
+              </p>
+              <ol className="space-y-2 text-sm text-[#505650] list-decimal pl-5">
+                {sources.map(source => (
+                  <li key={source.id}>
+                    <a
+                      href={source.url}
+                      target="_blank"
+                      rel="noopener noreferrer nofollow"
+                      className="underline underline-offset-2 hover:text-gold transition-colors"
+                    >
+                      {source.label}
+                    </a>
+                    <span className="text-[#505650]/80">, {source.publisher}. Verificada a {source.checkedOn}.</span>
+                  </li>
+                ))}
+              </ol>
+            </section>
+          )}
 
           {/* CTA no meio */}
           <div className="my-12 bg-kyro-green rounded-2xl p-8 text-center">

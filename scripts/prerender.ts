@@ -52,6 +52,7 @@ import { glossaryTerms } from '../src/data/glossaryTerms';
 import { getAllCommercialRoutes, getCommercialPageData } from '../src/data/commercialSeoData';
 import { buildLocalBusinessNode, buildBreadcrumbNode, buildServiceNode, buildFaqNode, buildOfferNode, buildHowToNode } from '../src/lib/seoSchema';
 import { renderBlogBody } from '../src/lib/blogMarkdown';
+import { getBlogSources } from '../src/data/blogSources';
 
 const BASE_URL = 'https://cleansolutions.com.pt';
 
@@ -170,6 +171,9 @@ interface PageContent {
   // Secções de artigo com markdown leve (negrito e listas), ao contrário de
   // `problems`, que é texto simples escapado. Ver src/lib/blogMarkdown.ts.
   articleSections?: { heading: string; body: string; tip?: string }[];
+  // As fontes citadas vão para o HTML estático pela mesma razão que a
+  // assinatura: é onde um motor generativo verifica de onde vem a afirmação.
+  sources?: { id: string; label: string; publisher: string; url: string; checkedOn: string }[];
   localSection?: string;
   problems?: { title: string; description: string; image?: { src: string; alt: string } }[];
   howItWorks?: string;
@@ -298,6 +302,14 @@ function generatePageBody(c: PageContent, lang: 'pt' | 'en' = 'pt'): string {
       html += `<div><h2>${escHtml(f.question)}</h2><p>${escHtml(f.answer)}</p></div>\n`;
     }
     html += `</section>\n`;
+  }
+
+  if (c.sources?.length) {
+    html += `<section><h2>Fontes</h2><p>As afirmações sobre saúde deste artigo remetem para as fontes abaixo. Onde não encontrámos fonte que sustentasse um número, retirámos o número.</p><ol>\n`;
+    for (const source of c.sources) {
+      html += `<li><a href="${escHtml(source.url)}" rel="nofollow noopener">${escHtml(source.label)}</a>, ${escHtml(source.publisher)}. Verificada a ${escHtml(source.checkedOn)}.</li>\n`;
+    }
+    html += `</ol></section>\n`;
   }
 
   if (lang === 'pt') html += `<details><summary>Condições do serviço e garantia</summary>${[PRICE_PROMISE, SATISFACTION_PROMISE, DRYING_PROMISE, AVAILABILITY_PROMISE, COVERAGE_PROMISE, RESPONSE_PROMISE + '. Deslocação a partir de 10€.'].map(text => `<p>${escHtml(text)}</p>`).join('')}<a href="/tratamento-anti-acaros">Tratamento anti-ácaros</a> · <a href="/desbacterizacao">Desbacterização</a></details>`;
@@ -1242,6 +1254,7 @@ export function prerenderRoutes(outDir: string): number {
     for (const post of getAllPosts()) {
       const url = `/blog/${post.slug}`;
       const pageUrl = `${BASE_URL}${url}`;
+      const postSources = getBlogSources(post.sources);
       const blogPostingSchema = {
         '@type': 'BlogPosting',
         headline: post.title,
@@ -1256,6 +1269,14 @@ export function prerenderRoutes(outDir: string): number {
         author: { '@id': `${BASE_URL}/#business` },
         publisher: { '@id': `${BASE_URL}/#business` },
         mainEntityOfPage: `${pageUrl}#webpage`,
+        ...(postSources.length > 0 && {
+          citation: postSources.map(source => ({
+            '@type': 'CreativeWork',
+            name: source.label,
+            publisher: { '@type': 'Organization', name: source.publisher },
+            url: source.url,
+          })),
+        }),
       };
       const schemas: object[] = [
         buildBreadcrumbSchema([
@@ -1277,6 +1298,7 @@ export function prerenderRoutes(outDir: string): number {
           intro: post.intro,
           byline: { author: post.author, published: post.publishDate, updated: post.updatedDate, readingTime: post.readingTime },
           articleSections: post.sections.map(s => ({ heading: s.heading, body: s.body, tip: s.tip })),
+          sources: postSources,
           faqs: post.faq?.map(f => ({ question: f.q, answer: f.a })),
         },
         schemas,

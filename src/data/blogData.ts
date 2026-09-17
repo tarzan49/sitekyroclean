@@ -1,4 +1,5 @@
 ﻿import { sofaPrices, mattressPrices, sofaChaisePrice } from "../components/quiz/QuizTypes";
+import { BLOG_SOURCES } from "./blogSources";
 
 export interface BlogPost {
   slug: string;
@@ -16,6 +17,8 @@ export interface BlogPost {
   faq: { q: string; a: string }[];
   relatedService: { label: string; href: string };
   relatedPosts: string[];
+  /** Ids de src/data/blogSources.ts. Artigos que afirmam factos de saúde têm de citar. */
+  sources?: string[];
 }
 
 export interface BlogSection {
@@ -244,6 +247,7 @@ const posts: BlogPost[] = [
     updatedDate: "2025-10-15",
     author: "Equipa Kyro Clean",
     readingTime: 7,
+    sources: ["spaic-acaros", "cochrane-acaros-asma"],
     category: "Saúde",
     heroAlt: "Pessoa a espirrar perto do sofá, alergias causadas por ácaros",
     intro: "Mais de 20% dos portugueses sofrem de alergias a ácaros do pó doméstico. O que a maioria não sabe é que os sofás e colchões são os principais reservatórios destes microscópicos aracnídeos, com até 2 milhões de ácaros por colchão de casal.",
@@ -299,6 +303,7 @@ const posts: BlogPost[] = [
     updatedDate: "2025-11-05",
     author: "Equipa Kyro Clean",
     readingTime: 6,
+    sources: ["spaic-acaros"],
     category: "Preços",
     heroAlt: "Técnico a higienizar colchão de casal com equipamento de extração profissional",
     intro: "Dormimos em média 7 a 8 horas por noite sobre o colchão, é o móvel com que mais contacto físico temos em toda a casa. No entanto, a maioria das pessoas nunca o limpou profissionalmente. Neste artigo mostramos os preços reais praticados pela Kyro Clean Solutions e o que está incluído em cada serviço.",
@@ -356,6 +361,7 @@ const posts: BlogPost[] = [
     updatedDate: "2025-11-12",
     author: "Equipa Kyro Clean",
     readingTime: 7,
+    sources: ["oms-humidade-bolor"],
     category: "Tapetes",
     heroAlt: "Técnico a limpar tapete persa com extração profissional equipamento profissional",
     intro: "Os tapetes são um dos elementos decorativos mais presentes nas casas portuguesas, e um dos mais negligenciados em termos de limpeza. Um tapete de sala acumula em média 4 vezes mais bactérias por cm² do que um sofá. Neste guia explicamos os preços reais, os métodos profissionais e a diferença entre tapete e alcatifa.",
@@ -375,7 +381,7 @@ const posts: BlogPost[] = [
       },
       {
         heading: "Manchas mais difíceis em tapetes e como tratá-las",
-        body: "Os tapetes têm um problema que os sofás não têm: estão no chão. Acumulam não só manchas de derrame mas também sujidade seca pisada, que penetra nas fibras com o calor dos pés.\n\n**Vinho tinto**, A mancha mais temida. Em tapetes de cor clara, pode ser permanente após 48h. Tratamento profissional com produto oxidante específico remove até 95% das manchas frescas.\n\n**Urina de animais**, A urina atravessa as fibras e pode atingir o backing (base) do tapete. Sem tratamento enzimático que quebre o ácido úrico, o cheiro regressa sempre com humidade.\n\n**Tinta e marcador**, Dependendo da tinta (à base de água vs. solvente), o tratamento varia. Tinta de base aquosa recente é removível com produto desengordurante. Tinta de esmalte seca dificilmente sai sem dano ao tecido.\n\n**Bolor e fungos**, Tapetes em divisões húmidas ou que ficaram molhados podem desenvolver bolor na base. Requer tratamento fungicida específico e secagem forçada.",
+        body: "Os tapetes têm um problema que os sofás não têm: estão no chão. Acumulam não só manchas de derrame mas também sujidade seca pisada, que penetra nas fibras com o calor dos pés.\n\n**Vinho tinto**, A mancha mais temida. Em tapetes de cor clara, pode ser permanente após 48h. Tratada a fresco com produto oxidante específico, sai na maioria dos casos; em tapete claro e mancha já seca, nem sempre sai por completo, e dizemos isso antes de começar.\n\n**Urina de animais**, A urina atravessa as fibras e pode atingir o backing (base) do tapete. Sem tratamento enzimático que quebre o ácido úrico, o cheiro regressa sempre com humidade.\n\n**Tinta e marcador**, Dependendo da tinta (à base de água vs. solvente), o tratamento varia. Tinta de base aquosa recente é removível com produto desengordurante. Tinta de esmalte seca dificilmente sai sem dano ao tecido.\n\n**Bolor e fungos**, Tapetes em divisões húmidas ou que ficaram molhados podem desenvolver bolor na base. Requer tratamento fungicida específico e secagem forçada.",
         tip: "Um tapete com bolor visível ou com odor a húmido mesmo seco deve ser higienizado urgentemente. O bolor liberta esporos no ar que agravam alergias respiratórias.",
       },
       {
@@ -441,7 +447,7 @@ const posts: BlogPost[] = [
       },
       {
         heading: "Cadeiras de escritório: o caso especial",
-        body: "As cadeiras de escritório têm um detalhe específico: são usadas pela mesma pessoa 8 horas por dia, 5 dias por semana. Isso cria uma concentração de suor, células mortas de pele e sebum no assento e costas que é difícil de imaginar a olho nu.\n\nEstudos de higiene ocupacional mostram que uma cadeira de escritório usada diariamente pode ter mais bactérias por cm² do que uma sanita pública.\n\nPara escritórios abertos com hot-desking (várias pessoas na mesma cadeira), a higienização regular é ainda mais importante do ponto de vista de saúde coletiva.",
+        body: "As cadeiras de escritório têm um detalhe específico: são usadas pela mesma pessoa 8 horas por dia, 5 dias por semana. Isso cria uma concentração de suor, células mortas de pele e sebum no assento e costas que é difícil de imaginar a olho nu.\n\nA comparação que circula na internet entre postos de trabalho e sanitas vem de estudos sobre secretárias, teclados e telefones, não sobre cadeiras, e foi financiada por uma marca de produtos de limpeza. O que se pode dizer sem exagero é mais simples: o estofo de uma cadeira absorve suor e células de pele, e ao contrário de uma superfície dura não se limpa passando um pano.\n\nPara escritórios abertos com hot-desking (várias pessoas na mesma cadeira), a higienização regular é ainda mais importante do ponto de vista de saúde coletiva.",
         tip: "No regresso ao escritório pós-pandemia, muitas empresas incluíram a limpeza profissional de cadeiras nos protocolos de higiene. É uma prática que faz sentido manter.",
       },
     ],
@@ -475,18 +481,19 @@ const posts: BlogPost[] = [
     updatedDate: "2025-12-01",
     author: "Equipa Kyro Clean",
     readingTime: 9,
+    sources: ["spaic-acaros", "spaic-rinite-asma", "oms-humidade-bolor", "cochrane-acaros-asma"],
     category: "Saúde",
     heroAlt: "Criança a brincar no sofá, importância da higiene dos estofos para a saúde",
-    intro: "Os estofos domésticos, sofás, colchões, tapetes e alcatifas, são os ecossistemas microbianos mais ricos da casa. Um colchão de casal usado há 2 anos pode albergar até 10 milhões de ácaros do pó. Um sofá de tecido pode ter mais bactérias por cm² do que a tampa do sanita. Neste artigo analisamos o que a ciência sabe sobre os riscos para a saúde e o que fazer para os minimizar.",
+    intro: "Os estofos domésticos, sofás, colchões, tapetes e alcatifas, são os ecossistemas microbianos mais ricos da casa. Circulam números muito citados sobre quantos ácaros vivem num colchão, quase sempre sem fonte que ainda se consiga abrir. Neste artigo ficamo-nos pelo que está publicado e identificado, incluindo a parte que não nos convém comercialmente.",
     sections: [
       {
         heading: "Os agentes patogénicos mais comuns em estofos",
-        body: "A investigação microbiológica sobre estofos domésticos identifica consistentemente os seguintes agentes:\n\n**Ácaros do pó (Dermatophagoides pteronyssinus e D. farinae)**, Os mais prevalentes. Encontrados em 100% dos colchões com mais de 6 meses de uso. Não causam infeções diretas, mas as suas fezes e exoesqueletos são potentes alérgenos respiratórios.\n\n**Staphylococcus aureus**, Bactéria presente na pele humana que se transfere para os estofos. A maioria das estirpes é inofensiva, mas a estirpe MRSA (resistente a antibióticos) pode persistir em tecidos durante semanas.\n\n**Fungos (Aspergillus, Cladosporium, Penicillium)**, Proliferam em estofos com humidade acima de 60%. Os esporos são inalados e podem causar reações alérgicas severas em pessoas sensíveis.\n\n**Enterococcus e coliformes fecais**, Mais comuns em estofos de casas com animais de estimação ou crianças pequenas. Indicadores de contaminação fecal.\n\n**Vírus**, Alguns vírus respiratórios (influenza, norovirus) podem sobreviver em tecidos entre 8 e 24 horas. Em contextos de doença no agregado familiar, os estofos funcionam como reservatórios de transmissão.",
+        body: "A investigação microbiológica sobre estofos domésticos identifica consistentemente os seguintes agentes:\n\n**Ácaros do pó (Dermatophagoides pteronyssinus e D. farinae)**, Os mais prevalentes em ambiente doméstico. Não causam infeções diretas, mas as suas fezes e exoesqueletos são potentes alérgenos respiratórios.\n\n**Staphylococcus aureus**, Bactéria presente na pele humana que se transfere para os estofos. A maioria das estirpes é inofensiva, mas a estirpe MRSA (resistente a antibióticos) pode persistir em tecidos durante semanas.\n\n**Fungos (Aspergillus, Cladosporium, Penicillium)**, Proliferam em estofos com humidade acima de 60%. Os esporos são inalados e podem causar reações alérgicas severas em pessoas sensíveis.\n\n**Enterococcus e coliformes fecais**, Mais comuns em estofos de casas com animais de estimação ou crianças pequenas. Indicadores de contaminação fecal.\n\n**Vírus**, Alguns vírus respiratórios (influenza, norovirus) podem sobreviver em tecidos entre 8 e 24 horas. Em contextos de doença no agregado familiar, os estofos funcionam como reservatórios de transmissão.",
       },
       {
         heading: "Rinite e asma alérgica: a ligação direta com os estofos",
-        body: "A rinite alérgica afeta cerca de 25% da população portuguesa, e os ácaros do pó são o principal desencadeador em ambiente doméstico.\n\nO mecanismo é direto: os ácaros depositam as suas fezes (que contêm a proteína Der p 1) nas fibras dos estofos. Quando nos sentamos, deitamos ou simplesmente andamos na divisão, perturbamos essas partículas que ficam em suspensão no ar e são inaladas.\n\n**Sintomas típicos de rinite por ácaros:**\n- Espirros frequentes, especialmente de manhã\n- Nariz entupido ou a pingar sem infeção aparente\n- Olhos vermelhos e com comichão\n- Sintomas que pioram em casa e melhoram fora\n- Melhoria clara durante férias prolongadas (menos exposição acumulada)\n\n**Asma**, Em crianças com predisposição genética, a exposição contínua a alérgenos de ácaros aumenta significativamente o risco de desenvolvimento de asma brônquica. A Organização Mundial de Saúde estima que a redução da exposição a ácaros em casa pode prevenir 30% dos novos casos de asma pediátrica.",
-        tip: "Se o seu filho tem rinite ou asma e dorme em colchão com mais de 2 anos sem higienização, a relação de causalidade é provável. A higienização profissional é considerada intervenção de primeira linha em pediatria alérgica.",
+        body: "A SPAIC estima que cerca de 930.000 portugueses sofrem de rinite, alérgica ou não, o que corresponde a cerca de 9,55% da população, e aponta os ácaros do pó como a principal causa de alergias respiratórias em ambiente doméstico.\n\nO mecanismo é direto: os ácaros depositam as suas fezes (que contêm a proteína Der p 1) nas fibras dos estofos. Quando nos sentamos, deitamos ou simplesmente andamos na divisão, perturbamos essas partículas que ficam em suspensão no ar e são inaladas.\n\n**Sintomas típicos de rinite por ácaros:**\n- Espirros frequentes, especialmente de manhã\n- Nariz entupido ou a pingar sem infeção aparente\n- Olhos vermelhos e com comichão\n- Sintomas que pioram em casa e melhoram fora\n- Melhoria clara durante férias prolongadas (menos exposição acumulada)\n\n**Asma**, Em crianças com predisposição genética, a exposição contínua a alérgenos de ácaros aumenta significativamente o risco de desenvolvimento de asma brônquica. A SPAIC descreve os ácaros do pó como a principal causa de alergias do aparelho respiratório e considera a redução do seu número em casa um fator importante no acompanhamento de quem é alérgico. Nenhuma entidade de saúde quantifica quantos casos de asma isso evita, e nós também não o fazemos.",
+        tip: "Se o seu filho tem rinite ou asma, fale primeiro com o médico assistente: a higienização do colchão é uma medida de ambiente, não um tratamento nem um diagnóstico. A higienização profissional é considerada intervenção de primeira linha em pediatria alérgica.",
       },
       {
         heading: "Dermatite de contacto e eczema",
@@ -518,7 +525,7 @@ const posts: BlogPost[] = [
       },
       {
         q: "Há estudos que provem que a limpeza profissional reduz os sintomas de alergia?",
-        a: "Sim. Múltiplos ensaios clínicos publicados em revistas como Allergy e JACI mostram redução significativa dos sintomas de rinite e asma após intervenções de redução de ácaros em casa, incluindo higienização profissional de colchões e sofás.",
+        a: "Não, e preferimos dizê-lo. A revisão Cochrane que juntou 54 ensaios com mais de 3.000 doentes asmáticos sensíveis a ácaros não encontrou diferença nos sintomas entre quem aplicou medidas de redução de ácaros em casa e quem não aplicou. O que a limpeza profissional faz, e isso é verificável, é remover pó, alérgenos acumulados, manchas e odores do estofo. Se tem asma ou rinite, o tratamento é com o seu médico, não com uma empresa de limpeza.",
       },
       {
         q: "Os produtos usados na limpeza profissional são seguros para crianças?",
@@ -657,6 +664,7 @@ const posts: BlogPost[] = [
     updatedDate: "2026-05-19",
     author: "Equipa Kyro Clean",
     readingTime: 7,
+    sources: ["oms-humidade-bolor"],
     category: "Dicas",
     heroAlt: "Sofá de tecido bege, eliminação profissional de odores",
     intro: "Um sofá com mau cheiro não é apenas desconfortável: é um sinal de que algo está acumulado nas fibras que não é visível mas está presente. Suor, gordura corporal, comida, animais de estimação ou simplesmente humidade: cada tipo de odor tem a sua causa e a sua solução. Este guia explica o que funciona e o que apenas mascara o problema.",
@@ -725,7 +733,7 @@ const posts: BlogPost[] = [
       },
       {
         heading: "Frequência recomendada de limpeza",
-        body: "**Limpeza de rotina (aspiração)**\n- Escritórios de baixo tráfego (1-5 pessoas): 2x por semana\n- Tráfego médio (5-20 pessoas): diariamente\n- Alto tráfego (20+ pessoas ou espaço de atendimento): 2x por dia em zonas de passagem\n\n**Limpeza intermédia (pré-tratamento de manchas)**\n- Trate manchas imediatamente após ocorrerem: 80% das manchas de café e comida saem com tratamento imediato\n\n**Limpeza profissional por extração**\n- Escritórios de baixo tráfego: anualmente\n- Tráfego médio: cada 6 meses\n- Alto tráfego ou serviço de atendimento ao público: cada 3-4 meses\n- Após derrame grave ou evento: imediatamente\n\nAlgumas seguradoras de edifícios comerciais e fabricantes de alcatifas exigem registo de limpezas profissionais para manter a garantia e cobertura.",
+        body: "**Limpeza de rotina (aspiração)**\n- Escritórios de baixo tráfego (1-5 pessoas): 2x por semana\n- Tráfego médio (5-20 pessoas): diariamente\n- Alto tráfego (20+ pessoas ou espaço de atendimento): 2x por dia em zonas de passagem\n\n**Limpeza intermédia (pré-tratamento de manchas)**\n- Trate manchas imediatamente após ocorrerem: a maioria das manchas de café e comida sai quando é tratada de imediato, e deixa de sair quando seca\n\n**Limpeza profissional por extração**\n- Escritórios de baixo tráfego: anualmente\n- Tráfego médio: cada 6 meses\n- Alto tráfego ou serviço de atendimento ao público: cada 3-4 meses\n- Após derrame grave ou evento: imediatamente\n\nAlgumas seguradoras de edifícios comerciais e fabricantes de alcatifas exigem registo de limpezas profissionais para manter a garantia e cobertura.",
       },
       {
         heading: "Limpeza de rotina vs. extração profissional: qual a diferença?",
@@ -772,6 +780,7 @@ const posts: BlogPost[] = [
     updatedDate: "2026-05-19",
     author: "Equipa Kyro Clean",
     readingTime: 8,
+    sources: ["spaic-acaros", "cochrane-acaros-asma"],
     category: "Saúde",
     heroAlt: "Colchão e sofá, focos principais de ácaros do pó em casa",
     intro: "Os ácaros do pó são responsáveis por cerca de 50% das alergias respiratórias em Portugal. São invisíveis a olho nu mas vivem em milhões nos sofás, colchões e tapetes da maioria das casas. Este guia explica o que são, onde se encontram em maior concentração, que sintomas causam e, mais importante, como os eliminar de forma eficaz e duradoura.",
@@ -787,7 +796,7 @@ const posts: BlogPost[] = [
       },
       {
         heading: "Métodos de controlo: o que funciona e o que não chega",
-        body: "**Medidas de primeira linha (reduzem exposição mas não eliminam)**\n- Capas anti-ácaros de membrana impermeável para colchão e almofadas\n- Lavar roupa de cama a 60°C (mata 100% dos ácaros)\n- Aspiração frequente com filtro HEPA\n- Reduzir humidade interior com desumidificador\n- Remover tapetes em quartos de pessoas alérgicas\n\n**O que não funciona:**\n- Sprays acaricidas de supermercado: eficácia temporária e presença de produtos químicos no ambiente\n- Aspiradores comuns sem filtro HEPA: devolvem os ácaros ao ar durante a aspiração\n- Congelamento de almofadas: mata ácaros mas não remove os alérgenos (excrementos) já presentes\n\n**Eliminação eficaz e duradoura:**\nA extração profissional com água quente a alta temperatura é o único método validado para remover resíduos acumulados nas fibras das camadas internas de colchões e estofados. O calor da água quente mata os ácaros e a aspiração mecânica remove fisicamente os corpos e excrementos, que são os principais alérgenos.",
+        body: "**Medidas de primeira linha (reduzem exposição mas não eliminam)**\n- Capas anti-ácaros de membrana impermeável para colchão e almofadas\n- Lavar roupa de cama acima de 55 ºC, a temperatura que a SPAIC indica para remoção eficaz dos ácaros\n- Aspiração frequente com filtro HEPA\n- Reduzir humidade interior com desumidificador\n- Remover tapetes em quartos de pessoas alérgicas\n\n**O que não funciona:**\n- Sprays acaricidas de supermercado: eficácia temporária e presença de produtos químicos no ambiente\n- Aspiradores comuns sem filtro HEPA: devolvem os ácaros ao ar durante a aspiração\n- Congelamento de almofadas: mata ácaros mas não remove os alérgenos (excrementos) já presentes\n\n**Eliminação eficaz e duradoura:**\nA extração profissional com água quente a alta temperatura é o único método validado para remover resíduos acumulados nas fibras das camadas internas de colchões e estofados. O calor da água quente mata os ácaros e a aspiração mecânica remove fisicamente os corpos e excrementos, que são os principais alérgenos.",
       },
       {
         heading: "Frequência recomendada de higienização profissional",
@@ -1004,6 +1013,7 @@ const posts: BlogPost[] = [
     updatedDate: "2025-10-12",
     author: "Equipa Kyro Clean",
     readingTime: 4,
+    sources: ["spaic-acaros"],
     category: "Dicas",
     heroAlt: "Sofá de tecido bege limpo numa sala com luz natural",
     intro: "«De quanto em quanto tempo devo limpar o sofá?» A resposta honesta é: depende de quem vive lá em casa. Neste artigo damos-lhe um guia por perfil de uso para que possa tomar a decisão certa.",
@@ -1024,7 +1034,7 @@ const posts: BlogPost[] = [
       },
       {
         heading: "Com alergias ou asma: a cada 4 meses",
-        body: "Ácaros do pó são o principal desencadeador de alergias respiratórias em ambientes domésticos. Um sofá de uso regular pode acumular entre 100 mil a 1 milhão de ácaros por metro quadrado.\n\nPara pessoas com asma ou rinite alérgica, recomendamos limpeza profissional a cada 3 a 4 meses. Entre limpezas, uma capa lavável e aspiração com filtro HEPA ajudam a controlar os níveis.",
+        body: "Ácaros do pó são o principal desencadeador de alergias respiratórias em ambientes domésticos. Os números de ácaros por metro quadrado que circulam na internet variam de tal forma entre si que não os repetimos; o que é consensual é onde eles se instalam, e um sofá de uso diário reúne as três condições de que precisam: calor, humidade e células de pele.\n\nPara pessoas com asma ou rinite alérgica, recomendamos limpeza profissional a cada 3 a 4 meses. Entre limpezas, uma capa lavável e aspiração com filtro HEPA ajudam a controlar os níveis.",
         tip: "A limpeza por extração a vapor a alta temperatura é o método mais eficaz contra ácaros, superior a produtos químicos ou aspiração doméstica.",
       },
       {
@@ -1078,7 +1088,7 @@ const posts: BlogPost[] = [
       },
       {
         heading: "3. Crises de alergia ou rinite a piorar em casa",
-        body: "Se notar que espirra mais ou tem olhos a comichão especialmente quando está no sofá, pode ser uma resposta a ácaros acumulados. Um sofá de uso regular pode ter entre 100 mil a 1 milhão de ácaros por metro quadrado. A limpeza por extração a quente ajuda a remover resíduos associados a alérgenos.",
+        body: "Se notar que espirra mais ou tem olhos a comichão especialmente quando está no sofá, pode ser uma resposta a ácaros acumulados. Um sofá de uso diário junta calor, humidade e células de pele, que é exatamente onde os ácaros se instalam. A limpeza por extração a quente ajuda a remover pó e resíduos associados a alérgenos.",
       },
       {
         heading: "4. O tecido está visivelmente desgastado ou com brilho diferente",
@@ -1193,13 +1203,14 @@ const posts: BlogPost[] = [
     updatedDate: "2025-11-10",
     author: "Equipa Kyro Clean",
     readingTime: 5,
+    sources: ["spaic-acaros"],
     category: "Saúde",
     heroAlt: "Criança sentada num sofá limpo e seguro em ambiente familiar",
     intro: "Quando há bebés ou crianças em casa, o sofá deixa de ser apenas mobília e passa a ser um ambiente de saúde. As crianças passam muito tempo em contacto direto com ele, muitas vezes gatinhando, encostando a cara ou dormindo. A qualidade do que está nas fibras importa.",
     sections: [
       {
         heading: "Porque as crianças estão mais expostas",
-        body: "Os bebés e crianças pequenas respiram a uma altura mais próxima do chão e dos estofos do que os adultos. As suas mãos tocam no sofá e depois na boca. O sistema imunitário em desenvolvimento é mais sensível a alérgenos como ácaros, pelos de animais e esporos de fungos.\n\nUm sofá de uso regular pode ter até 1 milhão de ácaros por metro quadrado. Para um adulto saudável, este número pode não causar problemas. Para um bebé ou criança com predisposição alérgica, pode ser o desencadeador de problemas respiratórios recorrentes.",
+        body: "Os bebés e crianças pequenas respiram a uma altura mais próxima do chão e dos estofos do que os adultos. As suas mãos tocam no sofá e depois na boca. O sistema imunitário em desenvolvimento é mais sensível a alérgenos como ácaros, pelos de animais e esporos de fungos.\n\nUm sofá de uso diário acumula pó, células de pele e humidade, que é o ambiente onde os ácaros se instalam. Para um adulto saudável isso costuma passar despercebido; para um bebé ou criança com predisposição alérgica, é uma exposição que vale a pena reduzir, a par das medidas que o pediatra indicar.",
         tip: "Se o seu bebé chora mais ou tosse quando está no sofá, pode ser uma resposta a alérgenos. Uma limpeza profissional com extração a vapor é o teste mais rápido.",
       },
       {
@@ -1251,6 +1262,7 @@ const posts: BlogPost[] = [
     updatedDate: "2025-11-17",
     author: "Equipa Kyro Clean",
     readingTime: 5,
+    sources: ["spaic-acaros"],
     category: "Saúde",
     heroAlt: "Colchão de bebé limpo com roupa de cama branca numa divisão clara",
     intro: "O bebé passa 12 a 16 horas por dia no colchão. É o objeto com que tem mais contacto no mundo. E é também um dos que acumula mais sujidade invisível: suor, leite, saliva, células de pele e ácaros. Manter o colchão do bebé limpo não é exagero, é higiene básica.",
