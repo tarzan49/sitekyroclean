@@ -27,7 +27,9 @@ A entrega da saída é o ponto frágil: o evento é enfileirado no momento em qu
 - Paginação com contagem exata e ordenação estável por created_at/id. Erro numa página invalida o resultado, em vez de mostrar totais parciais.
 - Submissões: exclusivamente complete/4, deduplicadas por tentativa. Dados antigos representam tentativas finais, não garantia de entrega. Cliques nunca entram no funil.
 - Taxa: tentativas abertas nessa semana que também apresentam submissão nessa semana / tentativas abertas nessa semana. Submissões de uma abertura anterior podem contar no total, mas não no numerador dessa taxa.
-- Funil: só v2 e etapas efetivamente vistas. Não fabricar etapas antigas que nunca foram medidas.
+- Funil (cartão "Onde as pessoas desistem"): só v2, e conta **tentativas**, não linhas. Cada tentativa é arrumada no passo mais longe a que chegou; desistiu = tentativa sem `complete`. Desistiram + concluíram fecha no total de aberturas, por construção, e há um teste que o verifica.
+- `chegaram` quer dizer "o passo mais longe desta tentativa é >= a este", e não "viu este passo". Um quiz aberto já preenchido a partir do widget de preços salta passos, e esses contam como passados, porque a resposta já era conhecida. É uma pergunta diferente da antiga "etapas efetivamente vistas", que este cartão substituiu: essa não dizia onde as pessoas se perdiam. Continua a valer não fabricar etapas antigas que nunca foram medidas, e é por isso que tentativas pré-v2 ficam de fora.
+- O mesmo cálculo existe em dois sítios: `src/lib/quizMetrics.ts` (painel) e `supabase/queries/funil-quiz.sql` (dashboard). Mudar um sem o outro põe-nos a dizer coisas diferentes.
 - Pedidos, cidades e serviço mais pedido: linhas do CRM, excluindo importações source=WhatsApp.
 - Valor médio: submissões com valor conhecido; novas submissões usam preço final com desconto e omitem estimativas com componentes sob orçamento.
 - Cliques não equivalem a mensagens recebidas ou chamadas atendidas. Contactos diretos fora do site exigem reconciliação com os serviços de comunicação.

@@ -56,7 +56,10 @@ interface WeekMetrics {
   avgValue: number;
   topService: string;
   topCity: string;
-  stepFunnel: { step: number; label: string; count: number; rate: number }[];
+  dropoff: { step: number; label: string; reached: number; dropped: number; reachedRate: number; dropRate: number }[];
+  attemptsTotal: number;
+  attemptsCompleted: number;
+  attemptsAbandoned: number;
   cityBreakdown: { city: string; count: number }[];
   pageBreakdown: { path: string; count: number }[];
   deviceBreakdown: { device: string; count: number }[];
@@ -465,7 +468,7 @@ const QuizMetricsPanel = () => {
       ]);
       if (request !== requestId.current) return;
       const summary = classifyMetrics(eventRows);
-      const { events, starts, completes, stepFunnel, avgSessionSeconds } = summary;
+      const { events, starts, completes, dropoff, avgSessionSeconds } = summary;
       // "leads" também guarda o histórico de reservas do WhatsApp importado
       // manualmente (source="WhatsApp", booking_id="WA-IMPORT-*", created_at
       // é a data agendada do serviço, não a data do pedido — por isso caem
@@ -538,7 +541,10 @@ const QuizMetricsPanel = () => {
         avgValue,
         topService,
         topCity,
-        stepFunnel,
+        dropoff,
+        attemptsTotal: summary.attemptsTotal,
+        attemptsCompleted: summary.attemptsCompleted,
+        attemptsAbandoned: summary.attemptsAbandoned,
         cityBreakdown,
         pageBreakdown,
         deviceBreakdown,
@@ -820,27 +826,58 @@ const QuizMetricsPanel = () => {
 
           {data.totalStarts > 0 ? (
             <>
-              {/* Step funnel */}
+              {/* Funil de desistência. A barra dourada é quem seguiu em frente,
+                  a vermelha é quem parou naquele passo: o passo com mais
+                  vermelho é onde vale a pena mexer no quiz primeiro. */}
               <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
-                <h3 className="text-sm font-semibold text-navy mb-4 flex items-center gap-2">
-                  <BarChart3 className="w-4 h-4 text-gold" /> Etapas vistas (novas tentativas, esta semana)
+                <h3 className="text-sm font-semibold text-navy flex items-center gap-2">
+                  <BarChart3 className="w-4 h-4 text-gold" /> Onde as pessoas desistem
                 </h3>
-                <div className="space-y-3">
-                  {data.stepFunnel.map(step => (
-                    <div key={step.step}>
-                      <div className="flex items-center justify-between text-xs mb-1">
-                        <span className="text-navy/70 font-medium">Step {step.step} · {step.label}</span>
-                        <span className="text-gray-400">{step.count} ({step.rate.toFixed(1)}%)</span>
-                      </div>
-                      <div className="h-2 rounded-full bg-gray-100 overflow-hidden">
-                        <div
-                          className="h-full rounded-full bg-gradient-to-r from-gold to-[#d4c57b] transition-all duration-500"
-                          style={{ width: `${Math.min(step.rate, 100)}%` }}
-                        />
-                      </div>
+                <p className="mt-1 mb-4 text-xs text-gray-500">
+                  {data.attemptsTotal} {data.attemptsTotal === 1 ? "abertura" : "aberturas"} do quiz esta semana
+                  {" → "}{data.attemptsCompleted} {data.attemptsCompleted === 1 ? "pedido" : "pedidos"}.
+                  {" "}<span className="text-red-500 font-medium">{data.attemptsAbandoned} desistiram.</span>
+                </p>
+                {data.attemptsTotal === 0 ? (
+                  <p className="text-xs text-gray-400">Sem tentativas novas nesta semana.</p>
+                ) : (
+                  <>
+                    <div className="space-y-3">
+                      {data.dropoff.map(step => {
+                        const droppedWidth = data.attemptsTotal ? step.dropped / data.attemptsTotal * 100 : 0;
+                        const passedWidth = Math.max(0, step.reachedRate - droppedWidth);
+                        const worst = step.dropped > 0 && step.dropped === Math.max(...data.dropoff.map(d => d.dropped));
+                        return (
+                          <div key={step.step}>
+                            <div className="flex items-baseline justify-between gap-2 text-xs mb-1">
+                              <span className="font-medium text-navy/80">{step.label}</span>
+                              <span className="text-gray-400 tabular-nums">
+                                {step.reached} {step.reached === 1 ? "chegou" : "chegaram"} · {step.reachedRate.toFixed(0)}%
+                              </span>
+                            </div>
+                            <div className="flex h-3 rounded-full bg-gray-100 overflow-hidden">
+                              <div className="h-full bg-gradient-to-r from-gold to-[#d4c57b] transition-all duration-500" style={{ width: `${passedWidth}%` }} />
+                              <div className="h-full bg-red-400 transition-all duration-500" style={{ width: `${droppedWidth}%` }} />
+                            </div>
+                            {step.dropped > 0 && (
+                              <p className={`mt-1 text-[11px] ${worst ? "text-red-600 font-semibold" : "text-red-500"}`}>
+                                {step.dropped} {step.dropped === 1 ? "desistiu" : "desistiram"} aqui
+                                {" "}({step.dropRate.toFixed(0)}% de quem chegou)
+                                {worst && " · maior perda do funil"}
+                              </p>
+                            )}
+                          </div>
+                        );
+                      })}
                     </div>
-                  ))}
-                </div>
+                    <p className="mt-4 pt-3 border-t border-gray-100 text-[11px] leading-relaxed text-gray-400">
+                      <span className="inline-block w-2 h-2 rounded-full bg-gold align-middle mr-1" />seguiram em frente
+                      <span className="inline-block w-2 h-2 rounded-full bg-red-400 align-middle ml-3 mr-1" />pararam neste passo.
+                      {" "}"Chegaram" conta tentativas que foram pelo menos até este passo: um quiz aberto já
+                      preenchido a partir do widget de preços salta passos, e esses contam como passados.
+                    </p>
+                  </>
+                )}
               </div>
 
               {/* Breakdown grid */}
