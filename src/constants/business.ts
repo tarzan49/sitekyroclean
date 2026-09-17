@@ -5,6 +5,18 @@ export const PHONE_TEL = "925530647";
 export const PHONE_E164 = "+351925530647";
 export const WHATSAPP_BASE = "https://wa.me/351925530647";
 
+// Identidade legal. Preencher o NIF liga automaticamente tres coisas: a linha
+// no rodape, o campo `vatID` no schema do negocio e o `taxID`. Enquanto
+// estiver vazio, nada disso e emitido, em vez de sair um campo vazio ou
+// inventado. E o unico dado que falta para uma entidade poder ser confirmada
+// fora do proprio site.
+export const BUSINESS_TAX_ID = "";
+
+// Perfis proprios noutras plataformas, para o `sameAs`. Confirmado em
+// 2026-09-17 que nao existe nenhum. Acrescentar um URL aqui basta: o
+// `sameAs` do negocio junta-os a ficha do Google sozinho.
+export const BUSINESS_PROFILES: string[] = [];
+
 export const BUSINESS_EMAIL = "cleansolutions.pt25@gmail.com";
 export const BUSINESS_EMAIL_HREF = `mailto:${BUSINESS_EMAIL}`;
 

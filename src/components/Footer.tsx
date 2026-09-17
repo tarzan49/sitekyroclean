@@ -4,7 +4,7 @@ import { GOOGLE_MAPS_URL } from "@/constants/google";
 import { Link } from "react-router-dom";
 import { trackCallClick } from "@/lib/analytics";
 import kyroLogo from "@/assets/kyro-logo.webp";
-import { PHONE_TEL, PHONE_DISPLAY, BUSINESS_EMAIL_HREF, BUSINESS_EMAIL, BUSINESS_ADDRESS } from "@/constants/business";
+import { PHONE_TEL, PHONE_DISPLAY, BUSINESS_EMAIL_HREF, BUSINESS_EMAIL, BUSINESS_ADDRESS, BUSINESS_TAX_ID } from "@/constants/business";
 
 const Footer = () => {
   return (
@@ -171,6 +171,7 @@ const Footer = () => {
           <div className="flex flex-col items-center gap-2">
             <p className="text-sm md:text-base text-white/80 text-center">
               © 2025 Kyro Clean Solutions. Todos os direitos reservados.
+              {BUSINESS_TAX_ID && <> NIF {BUSINESS_TAX_ID}.</>}
             </p>
             <div className="flex flex-wrap gap-x-4 gap-y-1 justify-center">
               <Link
