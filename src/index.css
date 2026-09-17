@@ -643,3 +643,20 @@ section.sr-inactive {
     transition: opacity 0.2s ease;
   }
 }
+
+/* Corpo dos artigos do blog.
+   O HTML vem de renderBlogBody() (src/lib/blogMarkdown.ts), injetado com
+   dangerouslySetInnerHTML, por isso o Tailwind não consegue pôr classes nos
+   elementos: as listas precisam de recuperar aqui os marcadores que o
+   preflight remove. O mesmo HTML é escrito pelo prerender, onde não há CSS
+   nenhum e a estrutura semântica é o que importa. */
+.blog-body ul,
+.blog-body ol {
+  padding-left: 1.5rem;
+  margin: 0.75rem 0;
+  display: grid;
+  gap: 0.35rem;
+}
+.blog-body ul { list-style: disc; }
+.blog-body ol { list-style: decimal; }
+.blog-body li::marker { color: #b8945f; }

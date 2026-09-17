@@ -8,6 +8,7 @@ import Footer from "@/components/Footer";
 import QuizButton from "@/components/QuizButton";
 import { getPostBySlug, getRelatedPosts } from "@/data/blogData";
 import { SITE_URL } from "@/constants/business";
+import { renderBlogBody } from "@/lib/blogMarkdown";
 
 import { BLOG_IMAGES, DEFAULT_BLOG_IMAGE } from "@/constants/blogImages";
 
@@ -167,19 +168,14 @@ const BlogPost = () => {
                 <h2 className="type-article-title font-playfair    text-[#111111] mb-4">
                   {section.heading}
                 </h2>
-                <div className="type-reading text-[#505650] space-y-3">
-                  {section.body.split("\n\n").map((para, j) => (
-                    <p key={j} dangerouslySetInnerHTML={{
-                      __html: para
-                        .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
-                        .replace(/\n/g, "<br/>"),
-                    }} />
-                  ))}
-                </div>
+                <div
+                  className="blog-body type-reading text-[#505650] space-y-3"
+                  dangerouslySetInnerHTML={{ __html: renderBlogBody(section.body) }}
+                />
                 {section.tip && (
                   <div className="mt-4 bg-gold/8 border-l-4 border-gold rounded-r-xl px-4 py-3">
                     <p className="text-base text-[#111111]/80 leading-relaxed">
-                      <span className="inline-flex items-center gap-1 font-bold text-[#111111]"><Lightbulb className="w-3.5 h-3.5 text-gold" strokeWidth={1.5} /> Dica: </span>
+                      <span className="inline-flex items-center gap-1 font-bold text-[#111111]"><Lightbulb className="w-3.5 h-3.5 text-gold" strokeWidth={1.5} /> Dica:</span>{" "}
                       {section.tip}
                     </p>
                   </div>

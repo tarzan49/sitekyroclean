@@ -51,6 +51,7 @@ import { getAllPosts } from '../src/data/blogData';
 import { glossaryTerms } from '../src/data/glossaryTerms';
 import { getAllCommercialRoutes, getCommercialPageData } from '../src/data/commercialSeoData';
 import { buildLocalBusinessNode, buildBreadcrumbNode, buildServiceNode, buildFaqNode, buildOfferNode, buildHowToNode } from '../src/lib/seoSchema';
+import { renderBlogBody } from '../src/lib/blogMarkdown';
 
 const BASE_URL = 'https://cleansolutions.com.pt';
 
@@ -62,6 +63,17 @@ function escHtml(s: string): string {
     .replace(/"/g, '&quot;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;');
+}
+
+/**
+ * `2025-09-10` -> `10 de setembro de 2025`. O atributo datetime mantém o ISO
+ * para a máquina; o texto é para a pessoa. Sem dependências: o prerender corre
+ * em Node puro e o Intl do Node dá-nos isto sem instalar nada.
+ */
+function formatDatePt(iso: string): string {
+  const date = new Date(`${iso}T12:00:00Z`);
+  if (Number.isNaN(date.getTime())) return iso;
+  return new Intl.DateTimeFormat('pt-PT', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' }).format(date);
 }
 
 /** Replace <title>, meta description, canonical and OG tags in <head>. */
@@ -150,6 +162,14 @@ interface PageContent {
   hero?: ReturnType<typeof getProblemHero>;
   h1: string;
   intro: string;
+  // Assinatura e datas do artigo. Sem isto o HTML estático de um post do blog
+  // saltava do <h1> para o texto: quem lê a página via o autor e a data, o
+  // crawler não via nenhum dos dois, que são precisamente os sinais de
+  // autoria que o E-E-A-T pede.
+  byline?: { author: string; published: string; updated?: string; readingTime?: number };
+  // Secções de artigo com markdown leve (negrito e listas), ao contrário de
+  // `problems`, que é texto simples escapado. Ver src/lib/blogMarkdown.ts.
+  articleSections?: { heading: string; body: string; tip?: string }[];
   localSection?: string;
   problems?: { title: string; description: string; image?: { src: string; alt: string } }[];
   howItWorks?: string;
@@ -165,7 +185,18 @@ interface PageContent {
 }
 
 function generatePageBody(c: PageContent, lang: 'pt' | 'en' = 'pt'): string {
-  let html = `<main>\n<h1>${escHtml(c.h1)}</h1>\n<p>${escHtml(c.intro)}</p>\n`;
+  let html = `<main>\n<h1>${escHtml(c.h1)}</h1>\n`;
+
+  if (c.byline) {
+    const parts = [`Por ${escHtml(c.byline.author)}`, `Publicado em <time datetime="${escHtml(c.byline.published)}">${formatDatePt(c.byline.published)}</time>`];
+    if (c.byline.updated && c.byline.updated !== c.byline.published) {
+      parts.push(`Atualizado em <time datetime="${escHtml(c.byline.updated)}">${formatDatePt(c.byline.updated)}</time>`);
+    }
+    if (c.byline.readingTime) parts.push(`${c.byline.readingTime} min de leitura`);
+    html += `<p>${parts.join(' · ')}</p>\n`;
+  }
+
+  html += `<p>${escHtml(c.intro)}</p>\n`;
 
   if (c.links?.length) {
     html += `<nav><ul>\n`;
@@ -187,6 +218,14 @@ function generatePageBody(c: PageContent, lang: 'pt' | 'en' = 'pt'): string {
 
   if (c.localSection) {
     html += `<p>${escHtml(c.localSection)}</p>\n`;
+  }
+
+  if (c.articleSections?.length) {
+    for (const section of c.articleSections) {
+      html += `<section><h2>${escHtml(section.heading)}</h2>\n${renderBlogBody(section.body)}\n`;
+      if (section.tip) html += `<aside><p><strong>Dica:</strong> ${escHtml(section.tip)}</p></aside>\n`;
+      html += `</section>\n`;
+    }
   }
 
   if (c.problems?.length) {
@@ -1210,7 +1249,12 @@ export function prerenderRoutes(outDir: string): number {
         datePublished: post.publishDate,
         dateModified: post.updatedDate,
         inLanguage: 'pt-PT',
-        author: { '@type': 'Organization', name: 'Kyro Clean Solutions' },
+        // Por `@id` e não por um nó `Organization` solto: um nó solto com o
+        // mesmo nome não se liga ao negócio, e era esta a versão que os
+        // crawlers liam (a página React já apontava para `#business`). Assim o
+        // artigo passa a creditar a entidade que o resto do grafo descreve.
+        author: { '@id': `${BASE_URL}/#business` },
+        publisher: { '@id': `${BASE_URL}/#business` },
         mainEntityOfPage: `${pageUrl}#webpage`,
       };
       const schemas: object[] = [
@@ -1231,7 +1275,8 @@ export function prerenderRoutes(outDir: string): number {
         {
           h1: post.title,
           intro: post.intro,
-          problems: post.sections.map(s => ({ title: s.heading, description: s.body })),
+          byline: { author: post.author, published: post.publishDate, updated: post.updatedDate, readingTime: post.readingTime },
+          articleSections: post.sections.map(s => ({ heading: s.heading, body: s.body, tip: s.tip })),
           faqs: post.faq?.map(f => ({ question: f.q, answer: f.a })),
         },
         schemas,

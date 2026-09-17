@@ -1,4 +1,6 @@
-﻿export interface BlogPost {
+﻿import { sofaPrices, mattressPrices, sofaChaisePrice } from "../components/quiz/QuizTypes";
+
+export interface BlogPost {
   slug: string;
   title: string;
   metaTitle: string;
@@ -22,6 +24,45 @@ export interface BlogSection {
   tip?: string;
 }
 
+// ── Preços citados nos artigos ──────────────────────────────────────────────
+// Saem da mesma tabela que o quiz e as páginas de serviço usam. Estavam
+// escritos à mão em prosa, espalhados pelos artigos: é a armadilha das
+// constantes duplicadas que o CLAUDE.md descreve, aplicada ao conteúdo
+// editorial. Um preço que mude em QuizTypes.ts passa a arrastar os artigos
+// consigo, e uma linha que desapareça rebenta no build em vez de deixar um
+// número errado publicado.
+const eur = (value: number | string) => (typeof value === "number" ? `${value}€` : String(value));
+
+const sofaSize = (id: string) => {
+  const size = sofaPrices.find(item => item.id === id);
+  if (!size) throw new Error(`blogData: sofá "${id}" não existe em sofaPrices`);
+  return size;
+};
+const mattressSize = (id: string) => {
+  const size = mattressPrices.find(item => item.id === id);
+  if (!size) throw new Error(`blogData: colchão "${id}" não existe em mattressPrices`);
+  return size;
+};
+
+const SOFA_1 = eur(sofaSize("1-lugar").cleaningPrice);
+const SOFA_2 = eur(sofaSize("2-lugares").cleaningPrice);
+const SOFA_3 = eur(sofaSize("3-lugares").cleaningPrice);
+const IMPER_ESSENCIAL_1 = eur(sofaSize("1-lugar").waterproofingPrice);
+const IMPER_ESSENCIAL_2 = eur(sofaSize("2-lugares").waterproofingPrice);
+const IMPER_ESSENCIAL_3 = eur(sofaSize("3-lugares").waterproofingPrice);
+const IMPER_PREMIUM_1 = eur(sofaSize("1-lugar").waterproofingPremiumPrice!);
+const IMPER_PREMIUM_2 = eur(sofaSize("2-lugares").waterproofingPremiumPrice!);
+const IMPER_PREMIUM_3 = eur(sofaSize("3-lugares").waterproofingPremiumPrice!);
+const COLCHAO_SOLTEIRO = eur(mattressSize("solteiro").cleaningPrice);
+const COLCHAO_CASAL = eur(mattressSize("casal").cleaningPrice);
+const COLCHAO_KING = eur(mattressSize("king").cleaningPrice);
+// Diferença derivada, não escrita: o artigo explica porque é que o casal custa
+// mais, e o número tem de acompanhar os dois preços acima.
+const CHAISE_LIMPEZA = eur(sofaChaisePrice.cleaning);
+const COLCHAO_DELTA = eur(
+  (mattressSize("casal").cleaningPrice as number) - (mattressSize("solteiro").cleaningPrice as number),
+);
+
 const posts: BlogPost[] = [
   {
     slug: "quanto-custa-limpar-sofa-profissional",
@@ -38,7 +79,7 @@ const posts: BlogPost[] = [
     sections: [
       {
         heading: "Preços médios em Portugal (2025)",
-        body: "Em Portugal, o preço médio de limpeza profissional de sofá começa nos 49€. Um sofá de 2 lugares custa 69€ e um sofá de 3 lugares 79€. Chaise longue tem um acréscimo de 10€. Sofás em L ou modulares são orçamentados conforme a dimensão.\n\nEstes valores incluem pré-tratamento de manchas, limpeza por extração a vapor e secagem rápida; a deslocação é cobrada à parte, consoante a localização. O sofá fica utilizável em 3 a 6 horas.",
+        body: `Em Portugal, o preço médio de limpeza profissional de sofá começa nos ${SOFA_1}. Um sofá de 2 lugares custa ${SOFA_2} e um sofá de 3 lugares ${SOFA_3}. Chaise longue tem um acréscimo de ${CHAISE_LIMPEZA}. Sofás em L ou modulares são orçamentados conforme a dimensão.\n\nEstes valores incluem pré-tratamento de manchas, limpeza por extração a vapor e secagem rápida; a deslocação é cobrada à parte, consoante a localização. O sofá fica utilizável em 3 a 6 horas.`,
         tip: "Peça sempre um orçamento com visita ou foto antes de confirmar. Desconfie de preços abaixo de 25€, geralmente não incluem limpeza profunda por extração.",
       },
       {
@@ -170,7 +211,7 @@ const posts: BlogPost[] = [
       },
       {
         heading: "Quanto custa impermeabilizar um sofá?",
-        body: "A versão Essencial custa 59€ (1 lugar), 79€ (2 lugares) e 99€ (3 lugares). A versão Premium, mais resistente e duradoura, custa 89€ (1 lugar), 109€ (2 lugares) e 139€ (3 lugares). Quando a Essencial é contratada em pack com a limpeza, o total é mais baixo do que os dois serviços separados.\n\nConsiderando que a Premium aguenta mais do dobro das lavagens da Essencial e evita reaplicações frequentes, o retorno do investimento é claro para quem tem uso mais intenso do sofá.",
+        body: `A versão Essencial custa ${IMPER_ESSENCIAL_1} (1 lugar), ${IMPER_ESSENCIAL_2} (2 lugares) e ${IMPER_ESSENCIAL_3} (3 lugares). A versão Premium, mais resistente e duradoura, custa ${IMPER_PREMIUM_1} (1 lugar), ${IMPER_PREMIUM_2} (2 lugares) e ${IMPER_PREMIUM_3} (3 lugares). Quando a Essencial é contratada em pack com a limpeza, o total é mais baixo do que os dois serviços separados.\n\nConsiderando que a Premium aguenta mais do dobro das lavagens da Essencial e evita reaplicações frequentes, o retorno do investimento é claro para quem tem uso mais intenso do sofá.`,
       },
     ],
     faq: [
@@ -264,7 +305,7 @@ const posts: BlogPost[] = [
     sections: [
       {
         heading: "Tabela de preços por tamanho (2025)",
-        body: "Os preços da Kyro Clean Solutions para limpeza profissional de colchões são:\n\n**Colchão solteiro**: 59€\n\n**Colchão casal**: 69€\n\n**Colchão king / queen**: 79€\n\nTodos os preços incluem pré-tratamento de manchas, limpeza por extração a vapor e secagem rápida; a deslocação é cobrada à parte, consoante a localização. O colchão fica pronto a usar em 3 a 6 horas.",
+        body: `Os preços da Kyro Clean Solutions para limpeza profissional de colchões são:\n\n**Colchão solteiro**: ${COLCHAO_SOLTEIRO}\n\n**Colchão casal**: ${COLCHAO_CASAL}\n\n**Colchão king / queen**: ${COLCHAO_KING}\n\nTodos os preços incluem pré-tratamento de manchas, limpeza por extração a vapor e secagem rápida; a deslocação é cobrada à parte, consoante a localização. O colchão fica pronto a usar em 3 a 6 horas.`,
         tip: "Combine com a limpeza do sofá no mesmo dia e beneficie de um preço reduzido no Pack Sofá + Colchão.",
       },
       {
@@ -273,7 +314,7 @@ const posts: BlogPost[] = [
       },
       {
         heading: "Colchão de solteiro vs. casal: diferença de preço justificada?",
-        body: "A diferença de 10€ entre o colchão solteiro (59€) e o casal (69€) reflete a diferença de área a tratar. Um colchão casal padrão tem aproximadamente o dobro da superfície de um solteiro, o que exige mais produto, mais tempo de extração e mais produto anti-ácaros.\n\nPara casais, a higienização regular dos dois lados do colchão é especialmente importante, pois cada pessoa contribui com células mortas, suor e temperatura para o seu lado, criando zonas distintas de concentração de ácaros.",
+        body: `A diferença de ${COLCHAO_DELTA} entre o colchão solteiro (${COLCHAO_SOLTEIRO}) e o casal (${COLCHAO_CASAL}) reflete a diferença de área a tratar. Um colchão casal padrão tem aproximadamente o dobro da superfície de um solteiro, o que exige mais produto, mais tempo de extração e mais produto anti-ácaros.\n\nPara casais, a higienização regular dos dois lados do colchão é especialmente importante, pois cada pessoa contribui com células mortas, suor e temperatura para o seu lado, criando zonas distintas de concentração de ácaros.`,
       },
       {
         heading: "Quando é que a limpeza de colchão é urgente?",
@@ -1131,7 +1172,7 @@ const posts: BlogPost[] = [
       },
       {
         q: "Quanto custa limpar um sofá de microfibra profissionalmente?",
-        a: "O preço é igual ao de outros tecidos: a partir de 49€ para sofá de 1 lugar, 69€ para 2 lugares, 79€ para 3 lugares. O tipo de tecido não altera o preço base.",
+        a: `O preço é igual ao de outros tecidos: a partir de ${SOFA_1} para sofá de 1 lugar, ${SOFA_2} para 2 lugares, ${SOFA_3} para 3 lugares. O tipo de tecido não altera o preço base.`,
       },
     ],
     relatedService: { label: "Pedir orçamento de limpeza de sofá", href: "/limpeza-sofas" },
@@ -1253,7 +1294,7 @@ const posts: BlogPost[] = [
       },
       {
         q: "Quanto custa limpar um colchão de bebé?",
-        a: "O colchão de bebé (tamanho berço) tem preço a partir de 59€. Colchões de cama individual a partir de 59€, casal a partir de 69€ e king/queen a partir de 79€.",
+        a: `O colchão de bebé (tamanho berço) tem preço a partir de ${COLCHAO_SOLTEIRO}. Colchões de cama individual a partir de ${COLCHAO_SOLTEIRO}, casal a partir de ${COLCHAO_CASAL} e king/queen a partir de ${COLCHAO_KING}.`,
       },
     ],
     relatedService: { label: "Pedir orçamento de limpeza de colchão", href: "/limpeza-colchoes" },
@@ -1422,7 +1463,7 @@ const posts: BlogPost[] = [
       },
       {
         heading: "Preços de limpeza profissional de sofá de couro em Portugal",
-        body: "Os preços da Kyro Clean para sofás de couro seguem a mesma tabela que para outros materiais:\n\n- Sofá de 1 lugar: a partir de 49€\n- Sofá de 2 lugares: a partir de 69€\n- Sofá de 3 lugares: a partir de 79€\n- Chaise longue: +10€\n\nO processo para couro inclui: limpeza com produto de pH neutro específico para couro, condicionamento das fibras, hidratação e proteção. Não usamos extração a vapor em couro genuíno, o calor e a humidade excessiva danificam o material.",
+        body: `Os preços da Kyro Clean para sofás de couro seguem a mesma tabela que para outros materiais:\n\n- Sofá de 1 lugar: a partir de ${SOFA_1}\n- Sofá de 2 lugares: a partir de ${SOFA_2}\n- Sofá de 3 lugares: a partir de ${SOFA_3}\n- Chaise longue: +${CHAISE_LIMPEZA}\n\nO processo para couro inclui: limpeza com produto de pH neutro específico para couro, condicionamento das fibras, hidratação e proteção. Não usamos extração a vapor em couro genuíno, o calor e a humidade excessiva danificam o material.`,
       },
     ],
     faq: [
@@ -1484,7 +1525,7 @@ const posts: BlogPost[] = [
       },
       {
         heading: "Preços de limpeza profissional de colchão",
-        body: "A Kyro Clean trata colchões com urina com um processo de 2 etapas: aplicação de produto enzimático concentrado seguida de extração a quente.\n\nPreços:\n- Colchão solteiro: a partir de 59€\n- Colchão de casal: a partir de 69€\n- King size / queen size: a partir de 79€\n\nO colchão fica seco em 3 a 6 horas. Recomendamos sempre o uso de um protetor de colchão impermeável após a limpeza para prevenir futuras infiltrações.",
+        body: `A Kyro Clean trata colchões com urina com um processo de 2 etapas: aplicação de produto enzimático concentrado seguida de extração a quente.\n\nPreços:\n- Colchão solteiro: a partir de ${COLCHAO_SOLTEIRO}\n- Colchão de casal: a partir de ${COLCHAO_CASAL}\n- King size / queen size: a partir de ${COLCHAO_KING}\n\nO colchão fica seco em 3 a 6 horas. Recomendamos sempre o uso de um protetor de colchão impermeável após a limpeza para prevenir futuras infiltrações.`,
       },
     ],
     faq: [

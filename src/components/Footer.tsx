@@ -191,11 +191,22 @@ const Footer = () => {
               >
                 Política de Devoluções
               </Link>
+              {/* Exigência legal para quem vende a consumidores em Portugal e,
+                  ao mesmo tempo, um sinal de confiança que o site não dava:
+                  aponta para a plataforma oficial, não para uma página nossa. */}
+              <a
+                href="https://www.livroreclamacoes.pt/inicio"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-sm text-white/80 hover:text-turquoise active:text-turquoise transition-colors underline underline-offset-2"
+              >
+                Livro de Reclamações
+              </a>
             </div>
           </div>
         </div>
       </div>
-    <div className="max-w-7xl mx-auto px-5 py-8 text-base text-white/70"><p>Equipas em Braga, Porto, Lisboa e Algarve. Outras localidades mediante confirmação.</p><p className="mt-2">Resposta em menos de 10 minutos · Deslocação a partir de 10€</p><div className="flex flex-wrap gap-4 mt-4"><Link to="/tratamento-anti-acaros">Tratamento anti-ácaros</Link><Link to="/desbacterizacao">Desbacterização</Link><Link to="/limpeza-estofos-aveiro">Aveiro: consultar disponibilidade</Link><Link to="/limpeza-estofos-coimbra">Coimbra: consultar disponibilidade</Link></div></div>
+    <div className="max-w-7xl mx-auto px-5 py-8 text-base text-white/70"><p>Equipas em Braga, Porto, Lisboa e Algarve. Outras localidades mediante confirmação.</p><p className="mt-2">Resposta em menos de 10 minutos · Deslocação a partir de 10€</p><div className="flex flex-wrap gap-4 mt-4"><Link to="/tratamento-anti-acaros">Tratamento anti-ácaros</Link><Link to="/desbacterizacao">Desbacterização</Link><Link to="/limpeza-estofos-aveiro">Limpeza de estofos em Aveiro</Link><Link to="/limpeza-estofos-coimbra">Limpeza de estofos em Coimbra</Link></div></div>
     <BusinessConditions />
     </footer>
   );
