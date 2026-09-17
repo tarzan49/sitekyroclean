@@ -38,7 +38,7 @@ import { getAllKeywordVariantRoutes, getKeywordVariantData } from '../src/data/k
 import { getAllProblems, getProblemBySlug } from '../src/data/problemSeoData';
 import { getProblemLayout } from '../src/data/problemLayout';
 import { getProblemHero } from '../src/data/problemHero';
-import { getAllProblemCityRoutes } from '../src/data/problemCitySeoData';
+import { getAllProblemCityRoutes, getProblemCities } from '../src/data/problemCitySeoData';
 import { getProblemCityFaqs, getProblemCityReviews, getProblemCityCoverage } from '../src/data/problemCityContent';
 import { getAllMaterials, getAllMaterialCityRoutes, getMaterialCityData } from '../src/data/materialSeoData';
 import { getAllPriceRoutes, getPricePageData } from '../src/data/priceSeoData';
@@ -677,10 +677,7 @@ export function prerenderRoutes(outDir: string): number {
           // nenhuma das suas variantes de cidade no HTML estático e elas
           // ficavam órfãs — o mesmo hub sem spokes que o índice do blog era.
           linksHeading: 'Disponível em',
-          links: p.relatedCities
-            .map(citySlug => cities.find(city => city.slug === citySlug))
-            .filter((city): city is (typeof cities)[number] => Boolean(city))
-            .map(city => ({ href: `/${p.slug}-${city.slug}`, label: city.name })),
+          links: getProblemCities(p.slug).map(city => ({ href: `/${p.slug}-${city.slug}`, label: city.name })),
           problems: layout.examples.map(example => ({ title: example.title, description: "Imagem ilustrativa.", image: example.image })),
           processSteps: layout.process.map((step, index) => ({ step: index + 1, ...step })),
           faqs: layout.faqs,

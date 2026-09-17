@@ -18,6 +18,7 @@ import { SERVICE_PACK_SLUGS } from "@/constants/servicePackSlugs";
 import { getProblemLayout } from "@/data/problemLayout";
 import { getProblemBySlug, getRelatedProblemLinks } from "@/data/problemSeoData";
 import { services, cities } from "@/data/serviceCatalog";
+import { getProblemCities } from "@/data/problemCitySeoData";
 import { SERVICE_TO_QUIZ } from "@/constants/serviceToQuiz";
 import { SITE_URL } from "@/constants/business";
 import ServiceReviewsGrid from "@/components/ServiceReviewsGrid";
@@ -78,9 +79,10 @@ const ProblemPage = () => {
 
   const quizService = SERVICE_TO_QUIZ[data.relatedServices[0]] ?? 'sofa';
   const relatedProblemLinks = getRelatedProblemLinks(data.relatedProblems);
-  const relatedCityData = data.relatedCities
-    .map(s => cities.find(c => c.slug === s))
-    .filter(Boolean) as typeof cities[number][];
+  // Todas as cidades onde esta página existe, não só as `relatedCities`: a
+  // lista vinha de um campo editorial e deixava de fora a maioria das páginas
+  // geradas, que ninguém mais ligava. Ver getProblemCities.
+  const relatedCityData = getProblemCities(data.slug);
   const layout = getProblemLayout(data);
   return (
     <QuizServiceProvider value={quizService}>
