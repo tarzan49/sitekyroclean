@@ -78,6 +78,7 @@ const DATES = {
   faq: getContentDate(['src/pages/FAQEstofos.tsx', 'src/data/landingFaqPool.ts']),
   glossario: getContentDate(['src/pages/GlossarioEstofos.tsx']),
   areas: getContentDate(['src/pages/AreasDeServico.tsx', 'src/data/locationSeoData.ts']),
+  sobre: getContentDate(['src/pages/Sobre.tsx', 'src/constants/commercialPolicy.ts']),
   antesDepois: getContentDate(['src/data/beforeAfterPool.ts']),
   blogIndex: getContentDate(['src/data/blogData.ts']),
 };
@@ -147,6 +148,7 @@ export function generateSitemaps(outDir: string) {
     xmlUrl('/perguntas-frequentes-limpeza-estofos', 'monthly', '0.7', DATES.faq),
     xmlUrl('/glossario-limpeza-estofos', 'monthly', '0.6', DATES.glossario),
     xmlUrl('/areas-de-servico', 'monthly', '0.7', DATES.areas),
+    xmlUrl('/sobre', 'monthly', '0.6', DATES.sobre),
     xmlUrl('/antes-depois-limpeza', 'monthly', '0.7', DATES.antesDepois),
   ];
 

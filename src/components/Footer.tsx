@@ -80,6 +80,10 @@ const Footer = () => {
                 <ChevronRight className="h-3.5 w-3.5 text-turquoise flex-shrink-0" />
                 <Link to="/glossario-limpeza-estofos" className="hover:text-turquoise active:text-turquoise transition-colors py-1 touch-manipulation">Glossário</Link>
               </li>
+              <li className="flex items-center gap-2">
+                <ChevronRight className="h-3.5 w-3.5 text-turquoise flex-shrink-0" />
+                <Link to="/sobre" className="hover:text-turquoise active:text-turquoise transition-colors py-1 touch-manipulation">Sobre nós</Link>
+              </li>
             </ul>
             <h3 className="type-card-title    mb-3 text-white">Packs</h3>
             <ul className="space-y-2 text-base">

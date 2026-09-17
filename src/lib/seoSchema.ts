@@ -60,7 +60,13 @@ export function buildLocalBusinessNode(areaServed?: AreaServed) {
         "closes": "00:00",
       },
     ],
-    "sameAs": [SITE_URL, GOOGLE_MAPS_URL],
+    // O proprio SITE_URL saiu daqui: `sameAs` serve para apontar perfis da
+    // empresa noutros sitios, e o site a apontar para si mesmo nao corrobora
+    // nada (o campo `url` acima ja diz qual e). Ficou so a ficha do Google.
+    // Perfis proprios noutras plataformas (Instagram, Facebook, LinkedIn)
+    // acrescentam-se a esta lista quando existirem: e o sinal que permite a um
+    // motor confirmar que a empresa e real fora do seu proprio dominio.
+    "sameAs": [GOOGLE_MAPS_URL],
     ...(areaServed && { "areaServed": areaServed }),
     "aggregateRating": {
       "@type": "AggregateRating",
@@ -234,5 +240,27 @@ export function buildHowToNode(name: string, steps: { title: string; description
       "name": step.title,
       "text": step.description,
     })),
+  };
+}
+
+/**
+ * AboutPage da página /sobre.
+ *
+ * Não redefine a empresa: aponta com `@id` para o nó LocalBusiness que já
+ * existe em todas as páginas. Duas definições da mesma entidade obrigariam um
+ * leitor a decidir qual delas vale, e é assim que uma delas fica para trás.
+ */
+export function buildAboutPageSchema() {
+  return {
+    "@context": "https://schema.org",
+    "@type": "AboutPage",
+    "@id": `${SITE_URL}/sobre#webpage`,
+    "url": `${SITE_URL}/sobre`,
+    "name": "Sobre a Kyro Clean Solutions",
+    "description": "Quem somos, onde trabalhamos e como trabalhamos: limpeza e higienização de estofos ao domicílio.",
+    "inLanguage": "pt-PT",
+    "isPartOf": { "@id": `${SITE_URL}/#website` },
+    "mainEntity": { "@id": `${SITE_URL}/#business` },
+    "publisher": { "@id": `${SITE_URL}/#business` },
   };
 }

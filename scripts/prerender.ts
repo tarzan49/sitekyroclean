@@ -4,7 +4,10 @@ import { commercialHeroSubtitle } from '../src/data/commercialHeroCopy';
 import { MATERIAL_PROCESS_GUIDES } from "../src/data/materialProcessGuides";
 import { MATERIAL_EXAMPLES, type MaterialExamples } from "../src/data/materialExamples";
 import { getTreatmentRoutes, getExpansionRoutes, getTreatmentPage, getExpansionPage } from '../src/data/treatmentSeoData';
-import { PRICE_PROMISE, SATISFACTION_PROMISE, DRYING_PROMISE, COVERAGE_PROMISE, RESPONSE_PROMISE, AVAILABILITY_PROMISE } from '../src/constants/commercialPolicy';
+import { PRICE_PROMISE, SATISFACTION_PROMISE, DRYING_PROMISE, COVERAGE_PROMISE, RESPONSE_PROMISE, AVAILABILITY_PROMISE, WEEKLY_REQUESTS, TREATMENT_EXTRAS } from '../src/constants/commercialPolicy';
+import { REVIEW_RATING, REVIEW_COUNT, CLIENTS_SERVED_LABEL, SERVICES_COMPLETED_LABEL, PHONE_DISPLAY, BUSINESS_EMAIL } from '../src/constants/business';
+import { locationPrices } from '../src/constants/travel';
+import { buildAboutPageSchema } from '../src/lib/seoSchema';
 /**
  * Static prerender for Kyro Clean Solutions
  *
@@ -1065,6 +1068,38 @@ export function prerenderRoutes(outDir: string): number {
             { q: 'Os produtos são seguros para crianças e animais?', a: 'Sim. Usamos apenas produtos certificados, biodegradáveis e seguros para pessoas, crianças e animais domésticos.' },
           ]),
         },
+      },
+      {
+        path: '/sobre',
+        title: 'Sobre a Kyro Clean Solutions | Limpeza de Estofos ao Domicílio',
+        desc: `Quem somos, onde trabalhamos e como trabalhamos. Limpeza de estofos ao domicílio em ${cities.length} cidades, com equipas no Porto, Braga, Lisboa e Algarve.`,
+        content: {
+          h1: 'Sobre a Kyro Clean Solutions',
+          intro: `Somos uma empresa portuguesa de limpeza e higienização de estofos ao domicílio. Levamos o equipamento a casa do cliente e tratamos sofás, colchões, tapetes, cadeiras e alcatifas no local, em ${cities.length} cidades.`,
+          // Os mesmos factos que a página React mostra, escritos aqui porque o
+          // prerender é o que os crawlers leem. Todos saem das mesmas
+          // constantes, por isso as duas versões não podem divergir.
+          benefits: [
+            `Serviços ao domicílio: ${services.map(item => item.name).join(', ')}.`,
+            `Preços de partida por artigo; a deslocação é cobrada à parte, entre ${Math.min(...Object.values(locationPrices))}€ e ${Math.max(...Object.values(locationPrices))}€ conforme a cidade.`,
+            TREATMENT_EXTRAS,
+            COVERAGE_PROMISE,
+            `${RESPONSE_PROMISE}. ${AVAILABILITY_PROMISE}`,
+            DRYING_PROMISE,
+            `${REVIEW_RATING} de média em ${REVIEW_COUNT} avaliações no Google. ${CLIENTS_SERVED_LABEL} clientes servidos e ${SERVICES_COMPLETED_LABEL} serviços realizados.`,
+            WEEKLY_REQUESTS,
+            `Contactos: ${PHONE_DISPLAY}, ${BUSINESS_EMAIL}, Rua de Ferreira Cardoso 174, 4300-197 Porto.`,
+          ],
+          definitions: [
+            { term: 'Preço confirmado antes da marcação', definition: PRICE_PROMISE },
+            { term: 'Repetição sem custos em 48 horas', definition: SATISFACTION_PROMISE },
+          ],
+          links: [
+            ...services.map(item => ({ href: item.baseRoute, label: item.name })),
+            { href: '/areas-de-servico', label: 'Áreas de serviço' },
+          ],
+        },
+        extraSchemas: [buildAboutPageSchema()],
       },
       {
         path: '/glossario-limpeza-estofos',
