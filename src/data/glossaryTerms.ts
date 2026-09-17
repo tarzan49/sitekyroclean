@@ -36,8 +36,8 @@ export const glossaryTerms: GlossaryTerm[] = [
   {
     id: "extracao-vapor-estofos",
     term: "Extração a Vapor de Estofos",
-    definition: "Técnica profissional que combina injeção de vapor de água a alta pressão (até 8 bar) com aspiração simultânea. O vapor penetra nas fibras, solta a sujidade orgânica e mata microrganismos a temperaturas acima de 60ºC, letal para ácaros, bactérias e fungos. A aspiração remove imediatamente os resíduos e 80 a 90% da humidade, deixando o tecido levemente húmido e com tempo de secagem de 3 a 6 horas. É o método de referência para estofos de tecido porque limpa e higieniza em simultâneo sem produtos químicos agressivos.",
-    example: "Sofá de microfibra com 3 anos de uso intensivo em casa com cão. Após extração a vapor, fibras recuperam cor original, odor a animal eliminado e o dono nota redução imediata de espirros.",
+    definition: "Técnica profissional que combina injeção de água quente sob pressão com aspiração no mesmo movimento. A água quente solta a sujidade agarrada às fibras e a aspiração retira-a logo, juntamente com a maior parte da humidade, o que deixa o tecido apenas fresco ao toque. É a diferença essencial para um vaporizador doméstico, que injeta e não aspira. É o método de referência para estofos de tecido por chegar mais fundo do que uma limpeza de superfície. Remove pó, resíduos e alergénios acumulados; não é um procedimento de desinfeção nem um tratamento de saúde.",
+    example: "Sofá de microfibra com anos de uso em casa com cão: a água aspirada sai visivelmente escura, mostrando sujidade que estava dentro da fibra e não à superfície.",
     serviceLink: { label: "Limpeza de Sofás por Extração", to: "/limpeza-sofas" },
   },
   {
@@ -56,8 +56,8 @@ export const glossaryTerms: GlossaryTerm[] = [
   {
     id: "tratamento-anti-acaros",
     term: "Tratamento Anti-ácaros",
-    definition: "Aplicação de produto acaricida de segurança certificada após a limpeza, que cria uma barreira protetora nas fibras que impede a reinstalação de ácaros por vários meses. Diferente da simples extração de ácaros, o tratamento tem efeito residual. Especialmente recomendado para crianças com alergias respiratórias e para Portugal, onde o clima húmido favorece a proliferação de ácaros.",
-    example: "Criança com asma alérgica a ácaros em Lisboa. Após tratamento anti-ácaros no colchão e sofá, redução de 70% dos episódios de crise em 3 meses (resultado típico reportado por clientes Kyro Clean).",
+    definition: "Aplicação opcional de produto acaricida depois da limpeza, com efeito residual nas fibras. É um extra escolhido e orçamentado à parte, nunca incluído por defeito na limpeza. Convém dizer o que é e o que não é: reduz a presença de ácaros na peça durante algum tempo, não é um tratamento de saúde nem elimina os alergénios que já estão na fibra, que só saem por remoção física. A revisão Cochrane que juntou 54 ensaios não encontrou diferença nos sintomas de asma entre quem aplicou medidas de redução de ácaros em casa e quem não aplicou. Se tem alergia ou asma, o tratamento é com o seu médico.",
+    example: "Família que pede limpeza do colchão e acrescenta o tratamento anti-ácaros como extra: o extra aparece identificado à parte no orçamento, com o objetivo e o preço próprios.",
     serviceLink: { label: "Limpeza de Colchões com Anti-ácaros", to: "/limpeza-colchoes" },
   },
   {
@@ -107,8 +107,8 @@ export const glossaryTerms: GlossaryTerm[] = [
   {
     id: "desodorizacao-estofos",
     term: "Desodorização de Estofos",
-    definition: "Processo de eliminação de odores persistentes (cigarro, animais, humidade, suor) dos estofos. Existem dois níveis: desodorização de superfície (produtos que mascaram o odor, temporário) e desodorização profunda (ozono ou enzimas que destroem as moléculas responsáveis pelo odor, permanente). A Kyro Clean usa técnica enzimática de desodorização profunda, eficaz em mais de 90% dos casos.",
-    example: "Casa de fumador com sofás impregnados de odor a tabaco. Após desodorização enzimática profissional, odor eliminado em 24-48 horas, não apenas mascarado.",
+    definition: "Tratamento de odores persistentes (tabaco, animais, humidade, suor) que atua sobre a origem do cheiro em vez de o mascarar. Perfumar dá algumas horas; um produto enzimático decompõe a matéria orgânica que está a produzir o odor. O resultado depende de onde a origem está: se ficou no tecido e nas zonas acessíveis, a resposta costuma ser boa; se chegou ao enchimento ou à espuma interior, o cheiro pode persistir, e dizemos isso antes de começar em vez de prometer eliminação total.",
+    example: "Sofá de casa de fumador em que o odor do tecido melhora de forma clara, e onde se explica à partida que o que impregnou a espuma interior pode não sair todo.",
     serviceLink: { label: "Limpeza e Desodorização", to: "/limpeza-sofas" },
   },
   {
@@ -198,7 +198,7 @@ export const glossaryTerms: GlossaryTerm[] = [
   {
     id: "agente-oxidante",
     term: "Agente Oxidante",
-    definition: "Produto que destrói a molécula de cor da mancha em vez de a tentar arrancar da fibra. É o método usado em manchas de corante orgânico, como vinho tinto, sumos escuros, chá e café, que não saem por extração porque o corante já se fixou. Usa-se controlado e testado, porque o mesmo mecanismo que apaga a cor do vinho pode apagar a cor do tecido. Quanto mais fresca a mancha, maior a probabilidade de sair por completo.",
+    definition: "Produto que destrói a molécula de cor da mancha em vez de a tentar arrancar da fibra, sendo o peróxido de hidrogénio o mais usado em têxteis por se decompor em água e oxigénio. É o método usado em manchas de corante orgânico, como vinho tinto, sumos escuros, chá e café, que não saem por extração porque o corante já se fixou. Usa-se controlado e testado, porque o mesmo mecanismo que apaga a cor do vinho pode apagar a cor do tecido. Quanto mais fresca a mancha, maior a probabilidade de sair por completo.",
     example: "Vinho tinto derramado num sofá claro: extração sozinha tira o líquido e deixa a sombra rosada; com oxidante testado à parte, a sombra desaparece.",
     serviceLink: { label: "Limpeza de Sofás", to: "/limpeza-sofas" },
   },
@@ -239,7 +239,7 @@ export const glossaryTerms: GlossaryTerm[] = [
   {
     id: "reaplicacao-protetor",
     term: "Reaplicação do Protetor de Tecido",
-    definition: "A impermeabilização é uma camada aplicada sobre a fibra e vai-se perdendo com o uso, com a fricção das zonas de contacto e, sobretudo, com a limpeza por extração. Isto quer dizer uma coisa que raramente se escreve: mandar limpar um sofá impermeabilizado remove parte da proteção, e ela tem de ser reposta a seguir se se quiser continuar protegido. Não é uma venda adicional inventada, é como o produto funciona. Preferimos dizê-lo antes do que deixar alguém descobrir com um derrame que já não faz gota.",
+    definition: "A impermeabilização é uma camada aplicada sobre a fibra e vai-se perdendo com o uso, com a fricção das zonas de contacto e, sobretudo, com a limpeza por extração. É por isso que a duração das duas versões é indicada por número de lavagens e não só por anos: a Essencial aguenta até 2 lavagens, a Premium até 5. Cada limpeza profissional consome uma dessas lavagens, portanto mandar limpar um sofá impermeabilizado devolve-lhe um sofá mais limpo e com menos proteção. Não é uma venda adicional inventada, é como o produto funciona, e está escrito na própria contagem.",
     example: "Sofá impermeabilizado há dois anos e limpo entretanto: a água já não forma gota nas zonas de mais uso, sinal de que a camada se gastou e precisa de ser reposta.",
     serviceLink: { label: "Impermeabilização", to: "/impermeabilizacao" },
   },
@@ -405,10 +405,10 @@ export const glossaryTerms: GlossaryTerm[] = [
     serviceLink: { label: "Limpeza de Alcatifas", to: "/limpeza-alcatifas" },
   },
   {
-    id: "extracao-agua-quente",
-    term: "Extração a Água Quente (HWE)",
-    definition: "Método de referência da limpeza profissional de têxteis: injeta solução quente sob pressão na fibra e aspira no mesmo movimento, arrastando a sujidade dissolvida. A diferença para um vaporizador doméstico é a aspiração simultânea, que é o que evita deixar água dentro da peça. É o método que chega mais fundo, e por isso o mais eficaz em sujidade acumulada, mas também o que exige mais controlo: mal executado, é a causa direta de manchas castanhas e de sujidade que volta ao secar.",
-    example: "Sofá de uso diário em que a água aspirada sai visivelmente escura, mostrando sujidade que estava no interior das fibras e não à superfície.",
+    id: "capa-removivel-maquina",
+    term: "Capa Removível: Lavar na Máquina?",
+    definition: "A capa sair não significa que possa ir à máquina, e é um dos enganos mais caros que existem em estofos. Muitas capas encolhem o suficiente para deixarem de entrar na almofada, e uma capa encolhida não tem volta. Antes de lavar, procure a etiqueta dentro da capa, confirme a temperatura máxima e lave a frio se houver dúvida. Nunca use secador de roupa, que é onde o encolhimento acontece de vez, e volte a vestir a almofada com a capa ainda ligeiramente húmida, porque é assim que ela assenta. Se a capa tiver forro ou enchimento cosido, não é para máquina nenhuma.",
+    example: "Capa de algodão lavada a 40 graus e seca na máquina que ficou dois dedos curta em cada lado e já não fecha sobre a almofada.",
     serviceLink: { label: "Limpeza de Sofás", to: "/limpeza-sofas" },
   },
   {
@@ -503,11 +503,11 @@ export const glossaryTerms: GlossaryTerm[] = [
     serviceLink: { label: "Limpeza de Tapetes", to: "/limpeza-tapetes" },
   },
   {
-    id: "peroxido-hidrogenio",
-    term: "Peróxido de Hidrogénio",
-    definition: "Oxidante usado em manchas de corante orgânico, como vinho, chá, café e sumos escuros. Destrói a molécula de cor em vez de a arrancar da fibra, e decompõe-se em água e oxigénio, o que o torna preferível a alternativas mais agressivas. Exige teste prévio: o mesmo mecanismo que apaga a cor da mancha pode apagar a cor do tecido, sobretudo em peças tingidas com corantes instáveis.",
-    example: "Mancha de chá num sofá claro que não saiu por extração e desapareceu com oxidante, depois de testado numa zona escondida.",
-    serviceLink: { label: "Limpeza de Sofás", to: "/limpeza-sofas" },
+    id: "corante-vs-pigmento",
+    term: "Nódoa de Corante vs Nódoa de Pigmento",
+    definition: "Duas famílias de manchas que exigem caminhos opostos. Uma nódoa de corante (vinho, chá, sumo, tinta de caneta) é cor dissolvida que se fixou quimicamente à fibra: não se arranca, destrói-se por oxidação. Uma nódoa de pigmento (terra, fuligem, tinta de parede, pó de carvão) são partículas sólidas pousadas na fibra: essas removem-se por aspiração e extração, e insistir com um oxidante só arrisca a cor do tecido sem tocar no problema. Identificar qual das duas está à frente é o que decide o produto, e enganar-se aqui é como muitas manchas ficam permanentes.",
+    example: "Marca escura num tapete que não saía com produto de manchas: era terra fina prensada na fibra, resolvida com aspiração profunda e não com química.",
+    serviceLink: { label: "Limpeza de Tapetes", to: "/limpeza-tapetes" },
   },
   {
     id: "enzimas-tipos",

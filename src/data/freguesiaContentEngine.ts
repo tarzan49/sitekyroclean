@@ -271,7 +271,7 @@ const problemsByService: Record<string, ProblemSet[]> = {
   "limpeza-sofas": [
     { title: "Manchas de café e vinho no tecido", description: f => `Manchas de café, vinho e gordura são o problema mais frequente nos sofás de ${f}. A extração profissional remove-as sem danificar o tecido.` },
     { title: "Ácaros invisíveis nas fibras do sofá", description: f => `Os sofás de ${f} acumulam milhões de ácaros que causam alergias respiratórias. A nossa extração profissional ajuda a remover pó e resíduos acumulados nas fibras.` },
-    { title: "Odores de animais domésticos no sofá", description: f => `O cheiro a cão ou gato impregnado no sofá é um dos pedidos mais frequentes em ${f}. Eliminamos os odores na origem, não apenas os mascaramos.` },
+    { title: "Odores de animais domésticos no sofá", description: f => `O cheiro a cão ou gato impregnado no sofá é um dos pedidos mais frequentes em ${f}. Tratamos os odores na origem, em vez de os mascarar.` },
     { title: "Sujidade profunda acumulada ao longo dos anos", description: f => `Anos de uso deixam os sofás de ${f} com uma aparência envelhecida. A limpeza profissional devolve a cor e textura originais.` },
     { title: "Pêlos de animais entranhados no estofo", description: f => `Os pêlos de animais prendem-se profundamente nas fibras do sofá. Em ${f}, muitas famílias com pets beneficiam da nossa limpeza especializada.` },
     { title: "Humidade e manchas de água no tecido", description: f => `Em ${f}, especialmente em apartamentos menos ventilados, a humidade cria manchas de água e início de mofo no tecido do sofá.` },

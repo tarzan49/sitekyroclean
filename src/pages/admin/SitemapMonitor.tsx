@@ -36,7 +36,7 @@ const SITEMAPS = [
   { id: "sitemap-marcas-sofa",      file: "sitemap-marcas.xml",       name: "Marcas de Sofá", description: "8 marcas × 34 concelhos (cidades mais povoadas)", icon: Shield },
   { id: "sitemap-marcas-colchao",   file: "sitemap-marcas.xml",       name: "Marcas de Colchão", description: "6 marcas × 34 concelhos (cidades mais povoadas)", icon: Shield },
   { id: "sitemap-marcas-cadeiras",  file: "sitemap-marcas.xml",       name: "Marcas de Cadeiras", description: "6 marcas × 34 concelhos (cidades mais povoadas)", icon: Shield },
-  { id: "sitemap-en.xml",           file: "sitemap-en.xml",           name: "Inglês (Turismo)", description: "Páginas /en/ para turistas — namespace isolado do PT", icon: Globe },
+  { id: "sitemap-en.xml",           file: "sitemap-en.xml",           name: "Inglês (Turismo)", description: "Páginas /en/ para turistas, com namespace isolado do PT", icon: Globe },
   { id: "sitemap-comercial.xml",    file: "sitemap-comercial.xml",    name: "Comercial (B2B)", description: "Restaurantes/hotéis/escritórios × concelho", icon: Star },
 ];
 

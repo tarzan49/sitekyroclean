@@ -42,7 +42,7 @@ export const marcas: MarcaSofa[] = [
     faqs: [
       {
         question: "Conseguem tirar as manchas dos sofás IKEA?",
-        answer: "Sim. A maioria dos tecidos IKEA responde muito bem à limpeza a vapor. Manchas antigas de comida, café ou gordura são removidas em mais de 90% dos casos.",
+        answer: "Sim. A maioria dos tecidos IKEA responde muito bem à limpeza a vapor. Manchas antigas de comida, café ou gordura respondem bem na maioria das situações, embora o resultado dependa do tempo que a mancha esteve na fibra e do que já foi aplicado antes.",
       },
       {
         question: "O sofá IKEA precisa de ser desmontado para limpeza?",
@@ -76,7 +76,7 @@ export const marcas: MarcaSofa[] = [
     faqs: [
       {
         question: "Podem restaurar o couro do meu Natuzzi que ficou opaco e seco?",
-        answer: "Sim. Com condicionador de couro profissional, restauramos a hidratação e o brilho do couro genuíno Natuzzi em mais de 85% dos casos. O resultado é visível imediatamente após o tratamento.",
+        answer: "Sim. Com condicionador de couro profissional, repomos a hidratação e o aspeto do couro genuíno Natuzzi quando a pele ainda tem condições para isso. Fissuras já abertas e zonas onde o acabamento saltou não se recuperam com limpeza, e dizemos isso antes de começar.",
       },
       {
         question: "A limpeza profissional danifica o couro original do Natuzzi?",
@@ -271,7 +271,7 @@ export const marcas: MarcaSofa[] = [
     ],
     doThis: [
       "Fazemos avaliação prévia gratuita do revestimento antes de qualquer intervenção, tecido ou couro",
-      "Eliminamos odores persistentes como fumo e animais de estimação em mais de 90% dos casos",
+      "Tratamos odores persistentes como fumo e animais na origem, com a ressalva de que o que impregnou o enchimento pode não sair todo",
     ],
     estimatedPriceRange: "49€ - 89€",
     minPrice: 49,
@@ -284,7 +284,7 @@ export const marcas: MarcaSofa[] = [
       },
       {
         question: "Conseguem remover cheiro de cigarro ou animais de um sofá Moviflor?",
-        answer: "Sim. A nossa técnica de desodorização profissional elimina odores persistentes, incluindo fumo e animais de estimação, em mais de 90% dos casos.",
+        answer: "Sim. A nossa técnica de desodorização atua sobre a origem do cheiro em vez de o mascarar. Quando o odor está no tecido e nas zonas acessíveis, a resposta costuma ser boa; se chegou ao enchimento, pode persistir, e explicamos isso à partida.",
       },
       {
         question: "O serviço Kyro Clean inclui transporte ou recolha do sofá Moviflor?",

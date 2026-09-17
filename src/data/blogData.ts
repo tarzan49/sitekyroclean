@@ -369,7 +369,7 @@ const posts: BlogPost[] = [
     sections: [
       {
         heading: "Preços de limpeza de tapetes (2025)",
-        body: "Na Kyro Clean Solutions, cada tapete avulso (recolha e entrega ou ao domicílio) é medido individualmente, largura x comprimento, e orçamentado à medida, sem tabela fixa por m². O valor final depende da dimensão, do tipo de fibra (sintético, lã, seda) e do estado de sujidade, e é sempre confirmado antes de qualquer compromisso.\n\n**Alcatifas (limpeza no local, m² de área):** também sempre orçamentadas à medida da área e do estado, sem preço fixo por m² — por ser um revestimento fixo, a avaliação é feita no local.\n\nAo pedir orçamento pode indicar as medidas de cada tapete que quer lavar, e recebe o valor exato sem surpresas antes de agendar.",
+        body: "Na Kyro Clean Solutions, cada tapete avulso (recolha e entrega ou ao domicílio) é medido individualmente, largura x comprimento, e orçamentado à medida, sem tabela fixa por m². O valor final depende da dimensão, do tipo de fibra (sintético, lã, seda) e do estado de sujidade, e é sempre confirmado antes de qualquer compromisso.\n\n**Alcatifas (limpeza no local, m² de área):** também sempre orçamentadas à medida da área e do estado, sem preço fixo por m²: por ser um revestimento fixo, a avaliação é feita no local.\n\nAo pedir orçamento pode indicar as medidas de cada tapete que quer lavar, e recebe o valor exato sem surpresas antes de agendar.",
         tip: "Tapetes com franjas, de lã natural ou de seda requerem tratamento especializado. Informe sempre o técnico do material antes de agendar.",
       },
       {
@@ -742,7 +742,7 @@ const posts: BlogPost[] = [
       },
       {
         heading: "Quanto custa a limpeza profissional de alcatifa para escritório?",
-        body: "O preço da limpeza profissional de alcatifa comercial em Portugal é sempre orçamentado à medida, sem tabela fixa por m² — depende da área, do estado da alcatifa e do tipo de espaço. Para grandes superfícies (escritórios, comércio, espaços acima de 50m²) o orçamento é personalizado.\n\nEspaços com manchas intensas, colas ou resíduos específicos podem ter sobrecusto de pré-tratamento.\n\nA maioria das empresas profissionais trabalha fora do horário de expediente (tarde, noite ou fim de semana) para não interromper a atividade: inclua esta condição no pedido de orçamento.",
+        body: "O preço da limpeza profissional de alcatifa comercial em Portugal é sempre orçamentado à medida, sem tabela fixa por m², e depende da área, do estado da alcatifa e do tipo de espaço. Para grandes superfícies (escritórios, comércio, espaços acima de 50m²) o orçamento é personalizado.\n\nEspaços com manchas intensas, colas ou resíduos específicos podem ter sobrecusto de pré-tratamento.\n\nA maioria das empresas profissionais trabalha fora do horário de expediente (tarde, noite ou fim de semana) para não interromper a atividade: inclua esta condição no pedido de orçamento.",
         tip: "Peça contratos de limpeza semestral ou anual: habitualmente com 10-15% de desconto face ao preço por intervenção avulsa.",
       },
     ],
@@ -797,7 +797,7 @@ const posts: BlogPost[] = [
       },
       {
         heading: "Métodos de controlo: o que funciona e o que não chega",
-        body: "**Medidas de primeira linha (reduzem exposição mas não eliminam)**\n- Capas anti-ácaros de membrana impermeável para colchão e almofadas\n- Lavar roupa de cama acima de 55 ºC, a temperatura que a SPAIC indica para remoção eficaz dos ácaros\n- Aspiração frequente com filtro HEPA\n- Reduzir humidade interior com desumidificador\n- Remover tapetes em quartos de pessoas alérgicas\n\n**O que não funciona:**\n- Sprays acaricidas de supermercado: eficácia temporária e presença de produtos químicos no ambiente\n- Aspiradores comuns sem filtro HEPA: devolvem os ácaros ao ar durante a aspiração\n- Congelamento de almofadas: mata ácaros mas não remove os alérgenos (excrementos) já presentes\n\n**Eliminação eficaz e duradoura:**\nA extração profissional com água quente a alta temperatura é o único método validado para remover resíduos acumulados nas fibras das camadas internas de colchões e estofados. O calor da água quente mata os ácaros e a aspiração mecânica remove fisicamente os corpos e excrementos, que são os principais alérgenos.",
+        body: "**Medidas de primeira linha (reduzem exposição mas não eliminam)**\n- Capas anti-ácaros de membrana impermeável para colchão e almofadas\n- Lavar roupa de cama acima de 55 ºC, a temperatura que a SPAIC indica para remoção eficaz dos ácaros\n- Aspiração frequente com filtro HEPA\n- Reduzir humidade interior com desumidificador\n- Remover tapetes em quartos de pessoas alérgicas\n\n**O que não funciona:**\n- Sprays acaricidas de supermercado: eficácia temporária e presença de produtos químicos no ambiente\n- Aspiradores comuns sem filtro HEPA: devolvem os ácaros ao ar durante a aspiração\n- Congelamento de almofadas: mata ácaros mas não remove os alérgenos (excrementos) já presentes\n\n**Eliminação eficaz e duradoura:**\nA extração profissional com água quente a alta temperatura é o único método validado para remover resíduos acumulados nas fibras das camadas internas de colchões e estofados. A aspiração mecânica remove fisicamente os corpos e os excrementos, que são os principais alérgenos, e é essa remoção que conta: o que provoca a reação continua na fibra mesmo depois de o ácaro morrer.",
       },
       {
         heading: "Frequência recomendada de higienização profissional",
@@ -853,7 +853,7 @@ const posts: BlogPost[] = [
       },
       {
         heading: "Quando a limpeza profissional é obrigatória",
-        body: "Existem situações em que a limpeza caseira não é suficiente:\n\n**Urina antiga ou repetida**: se o animal urina no mesmo local mais do que uma vez, o ácido úrico cristaliza em profundidade. A extração profissional com produto enzimático específico é a única solução que elimina definitivamente o odor.\n\n**Dander e ácaros**: os alérgenos de animais só são removidos eficazmente por extração a vapor a temperatura superior a 60°C, que mata os ácaros e remove o dander das fibras mais profundas.\n\n**Sebáceos**: as manchas amarelas no encosto requerem pré-tratamento com solvente específico antes da extração.\n\nA Kyro Clean trata anualmente centenas de sofás com animais de estimação. O protocolo inclui pré-tratamento enzimático, extração a quente e avaliação de tratamentos complementares opcionais. Resultado: sofá sem odor, sem dander e com resíduos removidos das fibras.",
+        body: "Existem situações em que a limpeza caseira não é suficiente:\n\n**Urina antiga ou repetida**: se o animal urina no mesmo local mais do que uma vez, o ácido úrico cristaliza em profundidade. A extração profissional com produto enzimático específico é a única solução que elimina definitivamente o odor.\n\n**Dander e ácaros**: os alérgenos de animais só são removidos por extração, que remove o dander e os resíduos alojados nas fibras mais profundas.\n\n**Sebáceos**: as manchas amarelas no encosto requerem pré-tratamento com solvente específico antes da extração.\n\nA Kyro Clean trata anualmente centenas de sofás com animais de estimação. O protocolo inclui pré-tratamento enzimático, extração a quente e avaliação de tratamentos complementares opcionais. Resultado: sofá sem odor, sem dander e com resíduos removidos das fibras.",
       },
       {
         heading: "Impermeabilização: a solução preventiva",
@@ -867,7 +867,7 @@ const posts: BlogPost[] = [
       },
       {
         q: "A limpeza remove os alérgenos de cão e gato?",
-        a: "Sim. A extração a vapor a alta temperatura remove o dander (caspa animal) e mata os ácaros associados a animais de estimação. Clientes com alergias reportam melhoria significativa dos sintomas nas semanas seguintes à limpeza profissional.",
+        a: "Sim. A a extração remove o dander (caspa animal) e os resíduos alojados na fibra. Clientes com alergias reportam melhoria significativa dos sintomas nas semanas seguintes à limpeza profissional.",
       },
       {
         q: "Quantas vezes por ano devo limpar o sofá com animais em casa?",
@@ -1339,7 +1339,7 @@ const posts: BlogPost[] = [
       },
       {
         heading: "O que o processo remove efetivamente",
-        body: "A extração a vapor profissional remove:\n\n**Sujidade estrutural**: poeira, células de pele morta, gordura do corpo, resíduos de alimentos e partículas que se acumulam nas fibras ao longo do tempo.\n\n**Ácaros e alérgenos**: a temperatura de 80 a 100ºC mata os ácaros do pó e desnatura os seus resíduos alérgenos. O tratamento anti-ácaros é um extra específico.\n\n**Manchas orgânicas**: com pré-tratamento enzimático, manchas de café, vinho, urina e gordura são dissolvidas antes da extração.\n\n**Odores**: os compostos orgânicos que causam odores são eliminados na fonte, não mascarados.",
+        body: "A extração a vapor profissional remove:\n\n**Sujidade estrutural**: poeira, células de pele morta, gordura do corpo, resíduos de alimentos e partículas que se acumulam nas fibras ao longo do tempo.\n\n**Ácaros e alérgenos**: o que provoca a reação alérgica são os excrementos e os restos de exoesqueleto já depositados na fibra, e esses removem-se fisicamente, não por calor. O tratamento anti-ácaros é um extra específico.\n\n**Manchas orgânicas**: com pré-tratamento enzimático, manchas de café, vinho, urina e gordura são dissolvidas antes da extração.\n\n**Odores**: os compostos orgânicos que causam odores são eliminados na fonte, não mascarados.",
       },
       {
         heading: "Porque é superior a outros métodos",
