@@ -3,11 +3,12 @@ import { act, cleanup, renderHook } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { useQuizAnalytics } from './use-quiz-analytics';
 const events=vi.hoisted(()=>vi.fn());
+const ga=vi.hoisted(()=>({formStart:vi.fn(),formStep:vi.fn()}));
 vi.mock('@/lib/quizTracking',()=>({trackQuizEvent:events}));
-vi.mock('@/lib/analytics',()=>({trackEvent:vi.fn()}));
+vi.mock('@/lib/analytics',()=>({trackEvent:vi.fn(),trackQuoteFormStart:ga.formStart,trackQuoteFormStep:ga.formStep}));
 const setVisibility=(state:'visible'|'hidden')=>{Object.defineProperty(document,'visibilityState',{value:state,configurable:true});act(()=>{document.dispatchEvent(new Event('visibilitychange'));});};
 const abandons=()=>events.mock.calls.filter(([e])=>e.action==='abandon').map(([e])=>e.step);
-afterEach(()=>{cleanup();events.mockClear();setVisibility('visible');});
+afterEach(()=>{cleanup();events.mockClear();ga.formStart.mockClear();ga.formStep.mockClear();setVisibility('visible');});
 const initial={isOpen:true,currentStep:0,totalSteps:4,service:'sofa',totalValue:89};
 describe('quiz attempts',()=>{
   it('tracks direct transitions, revisits once, and submits only on explicit success',()=>{
@@ -60,5 +61,22 @@ describe('quiz attempts',()=>{
     setVisibility('hidden');
     act(()=>{window.dispatchEvent(new PopStateEvent('popstate'));});
     expect(events).not.toHaveBeenCalled();
+  });
+
+  /**
+   * Abrir o quiz não é começar o formulário: `quiz_started` já mede a abertura.
+   * O `quote_form_start` só sai ao passar do primeiro ecrã, e uma vez por
+   * tentativa — em <StrictMode>, que corre cada efeito duas vezes, incluído.
+   */
+  it('reports quote_form_start once per attempt, and never on the opening screen',()=>{
+    const {rerender}=renderHook(p=>useQuizAnalytics(p),{initialProps:initial,wrapper:StrictMode});
+    expect(ga.formStart).not.toHaveBeenCalled();
+    rerender({...initial,currentStep:1});
+    rerender({...initial,currentStep:2});
+    rerender({...initial,currentStep:1});
+    expect(ga.formStart).toHaveBeenCalledTimes(1);
+    // Um passo revisitado não conta outra vez: 0, 1 e 2 vistos, três chamadas.
+    expect(ga.formStep).toHaveBeenCalledTimes(3);
+    expect(ga.formStep.mock.calls.map(([,step])=>step)).toEqual([0,1,2]);
   });
 });

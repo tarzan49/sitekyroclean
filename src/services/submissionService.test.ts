@@ -100,7 +100,7 @@ describe('specific regressions and delivery failures', () => {
   it.each(['crm', 'email'])('succeeds when only %s delivers', async channel => {
     if (channel === 'crm') mocks.invokeEmail.mockResolvedValue({ data: null, error: { message: 'down' } });
     else mocks.invokeCrm.mockResolvedValue({ data: null, error: { message: 'down' } });
-    await expect(submitQuizLead(payload({ service: 'carpet' }))).resolves.toBeUndefined();
+    await expect(submitQuizLead(payload({ service: 'carpet' }))).resolves.toMatchObject({ leadId: expect.stringMatching(/^L-/) });
   });
   it('retries one network failure on the email channel', async () => {
     mocks.invokeEmail.mockRejectedValueOnce(new Error('offline')).mockResolvedValue({ data: { success: true }, error: null });
@@ -147,7 +147,7 @@ describe('reCAPTCHA no canal do CRM', () => {
   it('quando o servidor recusa por reCAPTCHA, não insere pelo caminho antigo', async () => {
     mocks.invokeCrm.mockResolvedValue({ data: null, error: { message: 'forbidden', context: { status: 403 } } });
     // O email entrega, por isso o pedido nao se perde e a submissao resolve.
-    await expect(submitQuizLead(payload({ service: 'carpet' }))).resolves.toBeUndefined();
+    await expect(submitQuizLead(payload({ service: 'carpet' }))).resolves.toMatchObject({ leadId: expect.stringMatching(/^L-/) });
     expect(mocks.insert).not.toHaveBeenCalled();
   });
 
@@ -156,7 +156,7 @@ describe('reCAPTCHA no canal do CRM', () => {
     // falharia em silencio em producao. Qualquer falha da funcao tem de contar
     // como falha do canal do CRM, nao como motivo para tentar o caminho antigo.
     mocks.invokeCrm.mockResolvedValue({ data: null, error: { message: 'indisponível', context: { status: 503 } } });
-    await expect(submitQuizLead(payload({ service: 'carpet' }))).resolves.toBeUndefined();
+    await expect(submitQuizLead(payload({ service: 'carpet' }))).resolves.toMatchObject({ leadId: expect.stringMatching(/^L-/) });
     expect(mocks.insert).not.toHaveBeenCalled();
   });
 
@@ -164,7 +164,7 @@ describe('reCAPTCHA no canal do CRM', () => {
     // Sem token, o servidor deixa passar de proposito: aqui confirma-se apenas
     // que a submissao segue e entrega, em vez de ficar pendurada.
     mocks.invokeCrm.mockResolvedValue({ data: { success: true }, error: null });
-    await expect(submitQuizLead(payload({ service: 'carpet' }))).resolves.toBeUndefined();
+    await expect(submitQuizLead(payload({ service: 'carpet' }))).resolves.toMatchObject({ leadId: expect.stringMatching(/^L-/) });
     expect(mocks.invokeCrm).toHaveBeenCalledTimes(1);
   });
 });

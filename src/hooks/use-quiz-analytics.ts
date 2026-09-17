@@ -1,5 +1,5 @@
 import { useEffect, useRef, useCallback } from 'react';
-import { trackEvent } from '@/lib/analytics';
+import { trackEvent, trackQuoteFormStart, trackQuoteFormStep } from '@/lib/analytics';
 import { trackQuizEvent } from '@/lib/quizTracking';
 interface QuizAnalyticsOptions {
   isOpen: boolean; currentStep: number; totalSteps: number; service?: string;
@@ -10,7 +10,7 @@ export function useQuizAnalytics(options: QuizAnalyticsOptions) {
   const latest = useRef(options);
   // Closing also resets the form; preserve the last open step and selections.
   if (options.isOpen) latest.current = options;
-  const attempt = useRef<{ id: string; seen: Set<number>; completed: boolean; reportedStep: number | null } | null>(null);
+  const attempt = useRef<{ id: string; seen: Set<number>; completed: boolean; reportedStep: number | null; formStarted: boolean } | null>(null);
   const payload = useCallback(() => ({ session_id: attempt.current?.id, service: latest.current.service,
     city: latest.current.location, service_type: latest.current.serviceType, value: latest.current.totalValue }), []);
   // O abandono é reportado no passo onde a pessoa estava quando saiu. Carregar
@@ -34,16 +34,28 @@ export function useQuizAnalytics(options: QuizAnalyticsOptions) {
   useEffect(() => {
     if (!options.isOpen) { abandon(); attempt.current = null; return; }
     if (!attempt.current) {
-      attempt.current = { id: `v2:q:${crypto.randomUUID()}`, seen: new Set(), completed: false, reportedStep: null };
+      attempt.current = { id: `v2:q:${crypto.randomUUID()}`, seen: new Set(), completed: false, reportedStep: null, formStarted: false };
       trackQuizEvent({ ...payload(), action: 'start', step: -1 });
       trackEvent('quiz_started');
     }
     const a = attempt.current;
     if (!a.seen.has(options.currentStep) && !a.completed) {
       a.seen.add(options.currentStep);
+      const stepName = ['location', 'service', 'treatment', 'quantities', 'contact'][options.currentStep] || 'unknown';
       trackQuizEvent({ ...payload(), action: 'start', step: options.currentStep });
-      trackEvent('quiz_step_view', { step_number: options.currentStep,
-        step_name: ['location', 'service', 'treatment', 'quantities', 'contact'][options.currentStep] || 'unknown' });
+      trackEvent('quiz_step_view', { step_number: options.currentStep, step_name: stepName });
+      // `quote_form_start` é passar do primeiro ecrã, não abrir o quiz. Abrir já
+      // é medido por `quiz_started`; se fossem o mesmo evento, a taxa de
+      // conclusão passava a ser medida contra quem só espreitou e fechou.
+      // A guarda vive na tentativa, não no armazenamento do browser: o
+      // `markFiredOnce` usa localStorage, que num browser em modo privado pode
+      // estar bloqueado e nesse caso deixa passar tudo — e o que interessa aqui
+      // é exatamente não deixar passar duas vezes.
+      if (options.currentStep >= 1 && !a.formStarted) {
+        a.formStarted = true;
+        trackQuoteFormStart(a.id, { service: latest.current.service, city: latest.current.location });
+      }
+      trackQuoteFormStep(a.id, options.currentStep, stepName);
     }
   }, [options.isOpen, options.currentStep, abandon, payload]);
   // Três sinais, porque nenhum sozinho cobre as saídas reais:

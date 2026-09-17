@@ -1,8 +1,10 @@
-import { leadAttributionNote } from '@/lib/leadAttribution';
+import { getAttributionSnapshot, leadAttributionNote } from '@/lib/leadAttribution';
+import { readGaClientId, trackLeadEvent } from '@/lib/leadTracking';
+import { clearSubmissionId, currentSubmissionId } from '@/lib/submissionId';
 import { splitTreatmentItems } from '@/components/quiz/quizHelpers';
 import { sofaPrices, mattressPrices } from '@/components/quiz/QuizTypes';
 import type { SofaItem, MattressItem, CarpetItem, UpsellItemConfig } from '@/components/quiz/QuizTypes';
-import { calcChairClean, calcChairWaterproof, calcChairWaterproofPremium, carpetItemArea, calcPackPricing } from '@/components/quiz/quizHelpers';
+import { calcChairClean, calcChairWaterproof, calcChairWaterproofPremium, carpetItemDisplayDimensions, calcPackPricing } from '@/components/quiz/quizHelpers';
 import { WHATSAPP_BASE } from '@/constants/business';
 import { safeSessionSet } from '@/lib/safeStorage';
 import { logError } from '@/lib/errorTracking';
@@ -53,8 +55,21 @@ function generateBookingId(): string {
   return Math.random().toString(36).substr(2, 8).toUpperCase();
 }
 
+/**
+ * Valor numérico do orçamento, ou `undefined` quando não há preço fechado.
+ *
+ * Um pedido "sob orçamento" não vale zero euros: vale um valor que ainda não
+ * sabemos. Enviar `value: 0` para o Google Ads ensina o Smart Bidding que
+ * aquele tipo de pedido não vale nada, e tapetes — que nunca mostram preço —
+ * seriam os primeiros a desaparecer das campanhas.
+ */
+function conversionValue(payload: QuizLeadPayload): number | undefined {
+  if (payload.hasSobOrcamento || payload.hasUpsellSobItem) return undefined;
+  return payload.totalPrice > 0 ? Number(payload.totalPrice.toFixed(2)) : undefined;
+}
+
 /** Os campos do lead, iguais para a função de servidor e para o insert direto. */
-function buildLeadRow(payload: QuizLeadPayload, bookingId: string) {
+function buildLeadRow(payload: QuizLeadPayload, bookingId: string, leadId: string) {
   const {
     name, phone, email, crmServiceLabel, serviceTypeLabel, detailsSummary,
     finalLocation, priceText, message, upsellItems,
@@ -69,6 +84,7 @@ function buildLeadRow(payload: QuizLeadPayload, bookingId: string) {
     location: finalLocation,
     value: priceText,
     booking_id: bookingId,
+    lead_id: leadId,
     message,
     notes: [upsellItems.map(item => item.label).join(' | '), leadAttributionNote()].filter(Boolean).join('\n'),
   };
@@ -76,10 +92,10 @@ function buildLeadRow(payload: QuizLeadPayload, bookingId: string) {
 
 type SupabaseClient = (typeof import('@/lib/supabase'))['supabase'];
 
-async function insertCrmLead(supabase: SupabaseClient, isSupabaseConfigured: boolean, payload: QuizLeadPayload, bookingId: string): Promise<void> {
+async function insertCrmLead(supabase: SupabaseClient, isSupabaseConfigured: boolean, payload: QuizLeadPayload, bookingId: string, leadId: string): Promise<{ duplicate: boolean }> {
   if (!isSupabaseConfigured) throw new Error('CRM não configurado');
 
-  const row = buildLeadRow(payload, bookingId);
+  const row = buildLeadRow(payload, bookingId, leadId);
 
   // O token é obtido sem nunca bloquear: se o reCAPTCHA não carregar, demorar
   // ou estar bloqueado, segue sem ele e o servidor deixa passar. Não vai, e
@@ -87,11 +103,24 @@ async function insertCrmLead(supabase: SupabaseClient, isSupabaseConfigured: boo
   // formulário da primeira vez que se tentou pôr reCAPTCHA neste site.
   const recaptchaToken = await getRecaptchaTokenSafe('submit_quote');
 
+  // A atribuição viaja num objeto próprio, separado do lead: são dados de
+  // marketing, com o seu próprio destino (`lead_attribution`) e a sua própria
+  // lista de campos aceites do lado do servidor. Misturá-los com o lead fazia
+  // com que qualquer campo novo de campanha tivesse de passar pela validação
+  // dos dados do cliente, que é mais apertada e por boas razões.
   const { data, error } = await supabase.functions.invoke('submit-lead', {
-    body: { lead: { ...row, email: row.email ?? undefined }, recaptchaToken },
+    body: {
+      lead: { ...row, email: row.email ?? undefined },
+      recaptchaToken,
+      attribution: { ...(getAttributionSnapshot() ?? { is_paid: false }), channel: 'form', ga_client_id: readGaClientId() },
+    },
   });
 
-  if (!error && data?.success) return;
+  // `duplicate: true` é a função a dizer "este `lead_id` já existe, não criei
+  // outro". É sucesso, não falha: é exatamente o que tem de acontecer num
+  // duplo clique ou num retry depois de um timeout em que a primeira tentativa
+  // afinal tinha chegado.
+  if (!error && data?.success) return { duplicate: Boolean(data.duplicate) };
 
   // A partir daqui o insert direto deixou de existir: a politica de insert
   // anonimo foi fechada (migracao 20260914000000), por isso a funcao e o unico
@@ -101,8 +130,8 @@ async function insertCrmLead(supabase: SupabaseClient, isSupabaseConfigured: boo
 }
 
 /** Segundo canal, independente do CRM: envia o mesmo lead por email (Resend). */
-async function postToLeadEmail(supabase: SupabaseClient, payload: QuizLeadPayload, bookingId: string): Promise<void> {
-  const row = buildLeadRow(payload, bookingId);
+async function postToLeadEmail(supabase: SupabaseClient, payload: QuizLeadPayload, bookingId: string, leadId: string): Promise<void> {
+  const row = buildLeadRow(payload, bookingId, leadId);
   const body = { lead: { ...row, email: row.email ?? undefined }, subject: `Pedido de orçamento - ${payload.serviceLabel}` };
 
   // Deliberadamente sem recaptchaToken aqui — ver o comentário em insertCrmLead
@@ -203,16 +232,19 @@ export function buildReceiptLines(payload: Pick<QuizLeadPayload, 'service' | 'se
     // Sem preço fixo (2026-09-06): cada tapete medido vira a sua própria linha,
     // sempre sob orçamento, nunca um total calculado por m².
     carpetItems.forEach((item, i) => {
-      const area = carpetItemArea(item);
-      if (area === null) return;
-      receiptLines.push({ label: `${payload.carpetKind === 'alcatifa' ? 'Alcatifa' : 'Tapete'} ${i + 1}: ${item.largura} × ${item.comprimento} m (${Number(area.toFixed(2))} m²)`, qty: 1, unitPrice: null, total: null });
+      const dims = carpetItemDisplayDimensions(item, payload.carpetKind);
+      if (!dims) return;
+      receiptLines.push({ label: `${payload.carpetKind === 'alcatifa' ? 'Alcatifa' : 'Tapete'} ${i + 1}: ${dims.largura} × ${dims.comprimento} m (${Number(dims.area.toFixed(2))} m²)`, qty: 1, unitPrice: null, total: null });
     });
   }
 
   upsellItems.forEach(item => {
     const q = item.qty ?? 1;
     const unitP = q > 0 && item.price > 0 ? Math.round(item.price / q * 100) / 100 : null;
-    const measures = item.carpetItems?.map((rug, i) => `peça ${i + 1}: ${rug.largura} × ${rug.comprimento} m`).join('; ');
+    const measures = item.carpetItems?.map((rug, i) => {
+      const dims = carpetItemDisplayDimensions(rug);
+      return dims ? `peça ${i + 1}: ${dims.largura} × ${dims.comprimento} m` : null;
+    }).filter((m): m is string => m !== null).join('; ');
     receiptLines.push({ label: `${item.label.replace(/^\d+\s*[x×]\s*/i, '')}${measures ? ` (${measures})` : ''}`, qty: q, unitPrice: unitP, total: item.price > 0 ? item.price : null });
     if (item.waterproof && item.waterproofPrice && item.waterproofPrice > 0) {
       receiptLines.push({ label: `Impermeabilização (${item.label})`, qty: 1, unitPrice: item.waterproofPrice, total: item.waterproofPrice });
@@ -254,8 +286,27 @@ function persistObrigadoData(payload: QuizLeadPayload, bookingId: string, waUrl:
   }));
 }
 
-export async function submitQuizLead(payload: QuizLeadPayload): Promise<void> {
+/**
+ * O que aconteceu a cada canal. O chamador precisa de saber, porque "chegou ao
+ * negócio" e "ficou gravado no CRM" não são a mesma coisa: se só o email
+ * passar, o pedido chegou a uma caixa de correio mas não existe em `leads`, e
+ * isso tem de aparecer como aviso operacional no painel em vez de se perder.
+ */
+export interface LeadDeliveryResult {
+  leadId: string;
+  bookingId: string;
+  /** Gravado na tabela `leads` pela função de servidor. */
+  crmOk: boolean;
+  /** Entregue por email ao negócio. */
+  emailOk: boolean;
+  /** O servidor reconheceu este `lead_id` como já existente. */
+  duplicate: boolean;
+}
+
+export async function submitQuizLead(payload: QuizLeadPayload): Promise<LeadDeliveryResult> {
   const bookingId = generateBookingId();
+  // Estável entre tentativas da mesma submissão — ver src/lib/submissionId.ts.
+  const leadId = currentSubmissionId();
 
   const persist = () => {
     const waUrl = buildWaUrl(payload, bookingId);
@@ -269,7 +320,11 @@ export async function submitQuizLead(payload: QuizLeadPayload): Promise<void> {
     persist();
     // eslint-disable-next-line no-console
     console.warn(`[submissionService] Fora de produção — pedido #${bookingId} NÃO enviado ao CRM nem por email (simulado).`);
-    return;
+    // A medição é chamada na mesma: as suas próprias portas (consentimento,
+    // ambiente) decidem se sai alguma coisa.
+    await reportLead(payload, leadId);
+    clearSubmissionId();
+    return { leadId, bookingId, crmOk: false, emailOk: false, duplicate: false };
   }
 
   // Um único import, partilhado pelos dois canais: chamar `import('@/lib/supabase')`
@@ -283,11 +338,12 @@ export async function submitQuizLead(payload: QuizLeadPayload): Promise<void> {
   // back to the WhatsApp/email toast — silently swallowing a total failure
   // means the customer thinks they're booked and the business never hears.
   const [crmResult, emailResult] = await Promise.allSettled([
-    insertCrmLead(supabase, isSupabaseConfigured, payload, bookingId),
-    postToLeadEmail(supabase, payload, bookingId),
+    insertCrmLead(supabase, isSupabaseConfigured, payload, bookingId, leadId),
+    postToLeadEmail(supabase, payload, bookingId, leadId),
   ]);
 
   const crmOk = crmResult.status === 'fulfilled';
+  const duplicate = crmResult.status === 'fulfilled' && crmResult.value.duplicate;
   const emailOk = emailResult.status === 'fulfilled';
   const bothFailed = !crmOk && !emailOk;
 
@@ -312,7 +368,41 @@ export async function submitQuizLead(payload: QuizLeadPayload): Promise<void> {
   }
 
   if (bothFailed) {
+    // O identificador **não** é limpo: a pessoa pode tentar outra vez e a
+    // segunda tentativa tem de ser reconhecida como a mesma submissão.
     throw new Error('Both CRM insert and lead email submission failed');
   }
   persist();
+  await reportLead(payload, leadId);
+  // A partir daqui o pedido está entregue. Um pedido novo da mesma pessoa —
+  // outro serviço, outra semana — recebe um identificador novo.
+  clearSubmissionId();
+  return { leadId, bookingId, crmOk, emailOk, duplicate };
+}
+
+/**
+ * `generate_lead` e a conversão do Google Ads — só aqui.
+ *
+ * Aqui é depois de pelo menos um dos canais ter confirmado a entrega. Disparar
+ * no clique do botão de submissão contaria como lead cada tentativa que acabou
+ * em erro de rede, e é exatamente isso que ensina o Smart Bidding a comprar
+ * tráfego que nunca chega a pedir nada.
+ *
+ * Nunca deixa rebentar a submissão: neste ponto o pedido já chegou ao negócio,
+ * e uma falha a medir não pode transformar-se numa falha a vender.
+ */
+async function reportLead(payload: QuizLeadPayload, leadId: string): Promise<void> {
+  try {
+    await trackLeadEvent({
+      lead_id: leadId,
+      channel: 'form',
+      service: payload.service,
+      city: payload.finalLocation,
+      value: conversionValue(payload),
+      email: payload.email || undefined,
+      phone: payload.phone,
+    });
+  } catch (error) {
+    console.warn('[submissionService] Medição do lead falhou (o pedido já foi entregue):', error);
+  }
 }

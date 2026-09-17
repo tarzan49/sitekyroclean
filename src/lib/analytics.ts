@@ -1,37 +1,138 @@
-import { getConsent } from './consent';
 /**
- * Analytics & Tracking Utilities
- * Comprehensive event tracking for quiz funnel, conversions, and Core Web Vitals
+ * Camada central de medição do site.
+ *
+ * É o único sítio de onde partem eventos para o GA4 e para o Google Ads. Os
+ * componentes importam daqui e nunca tocam em `window.gtag`: uma chamada solta
+ * dentro de um componente React volta a disparar a cada re-render, e foi assim
+ * que este tipo de instrumentação já produziu contagens infladas noutros sites.
+ *
+ * O que está por baixo:
+ * - `src/lib/gtag.ts` — carregar a tag, consentimento, envio, deduplicação;
+ * - `src/lib/leadTracking.ts` — o que é um lead a sério e o que não é;
+ * - `src/lib/leadAttribution.ts` — de onde veio a pessoa, first e last touch.
  */
+import { markFiredOnce, sendGtagEvent, type EventParams } from './gtag';
+import { trackCallClickEvent, trackWhatsAppClick } from '@/lib/quizTracking';
 
-import { trackCallClickEvent } from "@/lib/quizTracking";
+export { trackLeadEvent, newLeadId, type LeadChannel } from './leadTracking';
 
 // ============================================
 // CORE EVENT TRACKING
 // ============================================
 
 /**
- * Track a custom event to Google Analytics
+ * Envia um evento. Ponto de entrada genérico — para leads use `trackLeadEvent`,
+ * que trata da conversão do Ads e da deduplicação.
  */
-export function trackEvent(
-  eventName: string,
-  params?: Record<string, string | number | boolean>
-) {
-  if (getConsent() === 'accepted' && typeof window !== 'undefined' && window.gtag) {
-    window.gtag('event', eventName, params);
-  }
-  
-  // Log to console in development
-  if (import.meta.env.DEV) {
-    console.log('[Analytics]', eventName, params);
-  }
+export function trackEvent(eventName: string, params?: EventParams) {
+  sendGtagEvent(eventName, params);
+}
+
+// ============================================
+// PAGE VIEW (SPA)
+// ============================================
+
+/**
+ * Última página enviada. A `gtag.js` está configurada com
+ * `send_page_view: false`, por isso *todos* os `page_view` saem daqui — e uma
+ * SPA torna a repetição fácil: o React em modo estrito corre os efeitos duas
+ * vezes em desenvolvimento, e uma mudança só de `search` ou de `hash`
+ * revisita a mesma rota. Guardar o último caminho enviado resolve os dois.
+ */
+let lastPageViewKey: string | null = null;
+
+/**
+ * Envia um `page_view`.
+ *
+ * O `page_location` vai **sem query string** de propósito. É onde os
+ * parâmetros de campanha estão, e alguns anúncios trazem no URL coisas que
+ * não devem acabar num relatório partilhável. O que interessa da campanha já
+ * foi lido e guardado pela atribuição; o relatório de páginas fica mais limpo
+ * com um caminho por página em vez de uma linha por combinação de parâmetros.
+ */
+export function trackPageView(path?: string): boolean {
+  if (typeof window === 'undefined') return false;
+  const pagePath = path ?? window.location.pathname;
+  if (pagePath === lastPageViewKey) return false;
+  lastPageViewKey = pagePath;
+  return sendGtagEvent('page_view', {
+    page_path: pagePath,
+    page_location: `${window.location.origin}${pagePath}`,
+    page_title: document.title,
+  });
+}
+
+/** Permite reenviar a página atual — usado quando a tag só carrega depois do consentimento. */
+export function resetPageViewGuard(): void { lastPageViewKey = null; }
+
+// ============================================
+// MICROCONVERSÕES
+// ============================================
+
+export type ContactChannel = 'whatsapp' | 'phone';
+
+export interface ContactClickContext {
+  /** Onde estava o botão: `header`, `footer`, `hero`, `sticky-bar`, `page:/…`. */
+  cta_location: string;
+  service?: string;
+  city?: string;
+}
+
+/**
+ * Clique num CTA de contacto.
+ *
+ * **Não é um lead.** O WhatsApp abre e a conversa pode nunca acontecer; um
+ * `tel:` marca o número e a chamada pode nunca ser atendida. Mede intenção, e é
+ * assim que aparece no painel: numa coluna separada da dos leads.
+ *
+ * O envio para o Supabase continua a passar por `quizTracking`, que já tem a
+ * caixa de saída persistente e o delegado de cliques em todo o site. Aqui trata-se
+ * do lado da Google e do contexto extra (serviço, cidade) que o delegado global
+ * não consegue adivinhar.
+ */
+export function trackContactClick(channel: ContactChannel, context: ContactClickContext): void {
+  // O envio para o GA4 acontece uma vez só, dentro de `quizTracking`, que é o
+  // mesmo caminho por onde passam os cliques apanhados pelo delegado global.
+  // Enviar também aqui contava cada clique com CTA identificado a dobrar.
+  if (channel === 'whatsapp') trackWhatsAppClick(context.cta_location, { service: context.service, city: context.city });
+  else trackCallClickEvent(context.cta_location, { service: context.service, city: context.city });
 }
 
 /**
  * Track phone call button clicks - sends to GA4
+ * @deprecated Use `trackContactClick('phone', { cta_location })`.
  */
 export function trackCallClick(location: string) {
-  trackCallClickEvent(location);
+  trackContactClick('phone', { cta_location: location });
+}
+
+// ============================================
+// FORMULÁRIO DE ORÇAMENTO
+// ============================================
+
+/**
+ * A pessoa começou mesmo o formulário.
+ *
+ * "Começou mesmo" é abrir e avançar do primeiro passo, não abrir. Abrir o quiz
+ * já é medido por `quiz_started`; se as duas coisas fossem o mesmo evento, a
+ * taxa de conclusão passava a ser medida contra quem só espreitou.
+ *
+ * Uma vez por tentativa: a chave leva o identificador da tentativa do quiz.
+ */
+export function trackQuoteFormStart(attemptId: string, context?: { service?: string; city?: string }): void {
+  if (!markFiredOnce(`form_start:${attemptId}`)) return;
+  sendGtagEvent('quote_form_start', {
+    attempt_id: attemptId,
+    service: context?.service,
+    city: context?.city,
+    page_path: typeof window !== 'undefined' ? window.location.pathname : undefined,
+  });
+}
+
+/** Um passo do formulário, uma vez por passo e por tentativa. */
+export function trackQuoteFormStep(attemptId: string, stepNumber: number, stepName: string): void {
+  if (!markFiredOnce(`form_step:${attemptId}:${stepNumber}`)) return;
+  sendGtagEvent('quote_form_step', { attempt_id: attemptId, step_number: stepNumber, step_name: stepName });
 }
 
 // ============================================

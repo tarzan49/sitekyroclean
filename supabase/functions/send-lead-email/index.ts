@@ -5,6 +5,7 @@
 // uma vez. Ver `src/services/submissionService.ts`.
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { Resend } from "https://esm.sh/resend@2.0.0";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { checkRateLimit, getClientIP, getRateLimitHeaders } from "../_shared/rate-limit.ts";
 import { createErrorResponse, createSuccessResponse, handleCORS, safeLog, validateMethod } from "../_shared/security.ts";
 import { hasHeaderInjection } from "../_shared/validation.ts";
@@ -20,16 +21,75 @@ const RECAPTCHA_ACTION = "submit_quote";
 // dois canais recebem o mesmo lead, só o destino muda.
 const LEAD_FIELDS = [
   "name", "phone", "email", "service", "service_type", "details",
-  "location", "value", "booking_id", "message", "notes",
+  "location", "value", "booking_id", "lead_id", "message", "notes",
 ] as const;
 
 const MAX_LENGTHS: Record<string, number> = {
   name: 120, phone: 40, email: 160, service: 120, service_type: 120,
-  details: 4000, location: 120, value: 60, booking_id: 40,
+  details: 4000, location: 120, value: 60, booking_id: 40, lead_id: 64,
   message: 8000, notes: 4000,
 };
 
 const SUBJECT_MAX_LENGTH = 200;
+
+/**
+ * Trinco de idempotência do canal de email.
+ *
+ * Sem isto, um duplo clique ou um retry depois de um timeout enviavam dois
+ * emails do mesmo pedido — e nesse canal não há tabela nem índice único a
+ * travá-los, ao contrário do CRM. A tabela `lead_notifications` tem chave
+ * primária `(lead_id, channel)`: quem conseguir inserir é quem envia.
+ *
+ * **Regra que se sobrepõe a tudo:** se o trinco não puder ser adquirido por um
+ * motivo que não seja "já existe" — base de dados em baixo, variáveis em falta,
+ * tabela ainda não criada — envia-se na mesma. Um email a dobrar é um
+ * incómodo; um pedido perdido é um cliente perdido.
+ */
+function serviceClient() {
+  const supabaseUrl = Deno.env.get("SUPABASE_URL");
+  const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+  if (!supabaseUrl || !serviceKey) return null;
+  return createClient(supabaseUrl, serviceKey);
+}
+
+/**
+ * Larga o trinco quando o envio falhou.
+ *
+ * Sem isto, o trinco protegia contra o email a dobrar e criava um problema
+ * pior: a primeira tentativa tomava o trinco, o Resend recusava, e a segunda
+ * tentativa via "já enviado" e não enviava nada — o pedido desaparecia do canal
+ * de email por causa da proteção contra duplicados. O trinco só vale enquanto
+ * o envio se concretiza.
+ */
+async function releaseNotification(leadId: string | undefined): Promise<void> {
+  if (!leadId) return;
+  try {
+    const supabase = serviceClient();
+    if (!supabase) return;
+    await supabase.from("lead_notifications").delete().eq("lead_id", leadId).eq("channel", "email");
+  } catch {
+    safeLog("warn", "[send-lead-email] Não foi possível largar o trinco", { leadId });
+  }
+}
+
+async function claimNotification(leadId: string | undefined): Promise<{ proceed: boolean; duplicate: boolean }> {
+  if (!leadId) return { proceed: true, duplicate: false };
+  const supabase = serviceClient();
+  if (!supabase) {
+    safeLog("warn", "[send-lead-email] Sem acesso ao trinco de idempotência; a enviar mesmo assim", {});
+    return { proceed: true, duplicate: false };
+  }
+  try {
+    const { error } = await supabase.from("lead_notifications").insert({ lead_id: leadId, channel: "email" });
+    if (!error) return { proceed: true, duplicate: false };
+    if (error.code === "23505") return { proceed: false, duplicate: true };
+    safeLog("warn", "[send-lead-email] Trinco indisponível; a enviar mesmo assim", { code: error.code });
+    return { proceed: true, duplicate: false };
+  } catch {
+    safeLog("warn", "[send-lead-email] Trinco rebentou; a enviar mesmo assim", {});
+    return { proceed: true, duplicate: false };
+  }
+}
 
 interface SendLeadEmailRequest {
   lead?: Record<string, unknown>;
@@ -147,6 +207,10 @@ function buildEmailHtml(lead: Record<string, string>): string {
   if (!isStructuredLead && lead.message) rows.push(row("Mensagem", lead.message, true));
   if (lead.notes) rows.push(row("Notas", lead.notes, true));
   if (lead.booking_id) rows.push(row("Referência", `#${lead.booking_id}`));
+  // O `lead_id` é o identificador que liga este email ao registo no CRM, ao
+  // evento `generate_lead` e à conversão do Google Ads. Vai no email para se
+  // poder procurar o mesmo pedido nos quatro sítios sem adivinhar.
+  if (lead.lead_id) rows.push(row("ID do lead", lead.lead_id));
 
   return `
     <div style="font-family: -apple-system, Helvetica, Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #ffffff; border: 1px solid #e5e7eb; border-radius: 10px; overflow: hidden;">
@@ -213,6 +277,15 @@ serve(async (req: Request): Promise<Response> => {
     return createErrorResponse("Não foi possível validar o pedido.", 403);
   }
 
+  const claim = await claimNotification(lead.lead_id);
+  if (claim.duplicate) {
+    safeLog("info", "[send-lead-email] Email repetido ignorado", { leadId: lead.lead_id });
+    return createSuccessResponse(
+      { sent: false, duplicate: true },
+      getRateLimitHeaders(limit.remaining, limit.resetAt),
+    );
+  }
+
   const resendApiKey = Deno.env.get("RESEND_API_KEY");
   const notificationEmail = Deno.env.get("LEAD_NOTIFICATION_EMAIL");
   if (!resendApiKey || !notificationEmail) {
@@ -233,17 +306,19 @@ serve(async (req: Request): Promise<Response> => {
     // verificar, chave inválida, etc.) — vêm neste campo `error`, não num catch.
     if (resendError) {
       safeLog("error", "[send-lead-email] Resend recusou o envio", { message: resendError.message });
+      await releaseNotification(lead.lead_id);
       return createErrorResponse("Não foi possível enviar o email", 502);
     }
   } catch (error) {
     safeLog("error", "[send-lead-email] Envio falhou", {
       errorType: error instanceof Error ? error.constructor.name : "Unknown",
     });
+    await releaseNotification(lead.lead_id);
     return createErrorResponse("Não foi possível enviar o email", 502);
   }
 
   return createSuccessResponse(
-    { sent: true },
+    { sent: true, duplicate: false },
     getRateLimitHeaders(limit.remaining, limit.resetAt),
   );
 });

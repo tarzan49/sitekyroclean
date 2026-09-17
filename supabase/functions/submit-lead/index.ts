@@ -31,18 +31,52 @@ const RECAPTCHA_ACTION = "submit_quote";
 // em vez de ser escrito na tabela.
 const LEAD_FIELDS = [
   "name", "phone", "email", "service", "service_type", "details",
-  "location", "value", "booking_id", "message", "notes",
+  "location", "value", "booking_id", "lead_id", "message", "notes",
 ] as const;
 
 const MAX_LENGTHS: Record<string, number> = {
   name: 120, phone: 40, email: 160, service: 120, service_type: 120,
-  details: 4000, location: 120, value: 60, booking_id: 40,
+  details: 4000, location: 120, value: 60, booking_id: 40, lead_id: 64,
   message: 8000, notes: 4000,
 };
+
+// Campos de atribuição aceites, por nome exato. Um campo a mais no corpo do
+// pedido é ignorado em vez de ser escrito na tabela — mesma regra de LEAD_FIELDS.
+//
+// Nenhum destes é dado pessoal: são identificadores de clique, nomes de
+// campanha e caminhos de página. Email, telefone e nome vivem só em `leads` e
+// nunca são copiados para aqui.
+const ATTRIBUTION_FIELDS = [
+  "channel",
+  "first_source", "first_medium", "first_campaign", "first_landing_page", "first_seen_at",
+  "last_source", "last_medium", "last_campaign", "last_landing_page", "last_seen_at",
+  "gclid", "gbraid", "wbraid",
+  "campaign_id", "ad_group_id", "keyword", "match_type", "creative_id", "ads_device", "network",
+  "referrer", "referrer_source", "landing_page", "conversion_page", "ga_client_id",
+] as const;
+
+const ATTRIBUTION_MAX_LENGTH = 250;
 
 interface SubmitLeadRequest {
   lead?: Record<string, unknown>;
   recaptchaToken?: string;
+  attribution?: Record<string, unknown>;
+}
+
+/**
+ * Limpa a atribuição: só campos conhecidos, só texto, dentro do comprimento
+ * máximo. `is_paid` é o único booleano e é derivado no cliente a partir de
+ * haver ou não identificador de clique.
+ */
+function cleanAttribution(raw: Record<string, unknown> | undefined): Record<string, string | boolean> | null {
+  if (!raw || typeof raw !== "object") return null;
+  const out: Record<string, string | boolean> = { is_paid: raw.is_paid === true };
+  for (const field of ATTRIBUTION_FIELDS) {
+    const value = raw[field];
+    if (typeof value !== "string" || value === "") continue;
+    out[field] = value.slice(0, ATTRIBUTION_MAX_LENGTH);
+  }
+  return out;
 }
 
 /** Aceita apenas os campos conhecidos, como texto, dentro do comprimento máximo. */
@@ -109,20 +143,85 @@ serve(async (req: Request): Promise<Response> => {
   }
 
   const supabase = createClient(supabaseUrl, serviceKey);
-  const { error } = await supabase.from("leads").insert({
+
+  // ── Idempotência ──────────────────────────────────────────────────────────
+  //
+  // O `lead_id` é gerado uma vez por submissão no browser e sobrevive a duplos
+  // cliques, a retries depois de um timeout e a um refresh com reenvio (ver
+  // src/lib/submissionId.ts). Aqui é a autoridade final: se já existe um lead
+  // com este identificador, devolve-se sucesso sem criar outro.
+  //
+  // Isto não substitui o índice único em `leads.lead_id` — substitui o
+  // *depender* dele. O select apanha o caso normal; o índice apanha a corrida
+  // entre dois pedidos simultâneos, tratada mais abaixo no erro 23505.
+  if (lead.lead_id) {
+    const { data: existing } = await supabase
+      .from("leads").select("id, booking_id").eq("lead_id", lead.lead_id).maybeSingle();
+    if (existing) {
+      safeLog("info", "[submit-lead] Pedido repetido ignorado", { leadId: lead.lead_id });
+      return createSuccessResponse(
+        { bookingId: existing.booking_id ?? lead.booking_id ?? null, leadId: lead.lead_id, duplicate: true },
+        getRateLimitHeaders(limit.remaining, limit.resetAt),
+      );
+    }
+  }
+
+  const { data: inserted, error } = await supabase.from("leads").insert({
     ...lead,
     status: "pending",
+    // Estado inicial do funil de marketing. `status` (2024) fica como estava:
+    // são dois vocabulários diferentes, de propósito — ver a migração
+    // 20260918000000_marketing_attribution.sql.
+    funnel_status: "NEW",
     source: "Website",
     priority: "Quente",
-  });
+  }).select("id").single();
 
   if (error) {
+    // 23505 = violação de unicidade. Com dois pedidos a chegar ao mesmo tempo,
+    // o select acima passa nos dois e é o índice que decide qual ganha. O
+    // perdedor não é um erro: é o mesmo pedido, já gravado.
+    if (error.code === "23505") {
+      safeLog("info", "[submit-lead] Corrida de pedidos repetidos resolvida pelo índice", { leadId: lead.lead_id });
+      return createSuccessResponse(
+        { bookingId: lead.booking_id ?? null, leadId: lead.lead_id ?? null, duplicate: true },
+        getRateLimitHeaders(limit.remaining, limit.resetAt),
+      );
+    }
     safeLog("error", "[submit-lead] Insert falhou", { message: error.message });
     return createErrorResponse("Não foi possível registar o pedido", 500);
   }
 
+  // A atribuição e o histórico de estado são gravados depois, e uma falha aqui
+  // **não** falha o pedido: o lead já existe e o negócio já o vai ver. Perder a
+  // origem de um lead é mau; perder o lead para não perder a origem seria pior.
+  if (lead.lead_id) {
+    const attribution = cleanAttribution(body.attribution);
+    if (attribution) {
+      // `ignoreDuplicates` e não `upsert`: a atribuição do primeiro pedido é a
+      // verdadeira. Um reenvio chega com a mesma sessão mas pode já ter perdido
+      // o `gclid` do URL, e reescrever apagava a origem real.
+      const { error: attributionError } = await supabase.from("lead_attribution").upsert({
+        ...attribution,
+        lead_id: lead.lead_id,
+        lead_row_id: inserted?.id ?? null,
+      }, { onConflict: "lead_id", ignoreDuplicates: true });
+      if (attributionError) safeLog("warn", "[submit-lead] Atribuição não gravada", { message: attributionError.message });
+    }
+
+    const { error: historyError } = await supabase.from("lead_status_history").insert({
+      lead_row_id: inserted?.id ?? null,
+      lead_id: lead.lead_id,
+      previous_status: null,
+      new_status: "NEW",
+      changed_by: "site",
+      note: "Pedido submetido no site",
+    });
+    if (historyError) safeLog("warn", "[submit-lead] Histórico não gravado", { message: historyError.message });
+  }
+
   return createSuccessResponse(
-    { bookingId: lead.booking_id ?? null },
+    { bookingId: lead.booking_id ?? null, leadId: lead.lead_id ?? null, duplicate: false },
     getRateLimitHeaders(limit.remaining, limit.resetAt),
   );
 });

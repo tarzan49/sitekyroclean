@@ -12,10 +12,19 @@ it('keeps every field and special characters in the simple contact lead payload'
   await submitContactForm(data);
   expect(mocks.invoke).toHaveBeenCalledWith('send-lead-email', {
     body: {
-      lead: { name: data.nome, phone: data.telefone, email: data.email, location: data.localidade, message: data.mensagem, notes: undefined },
+      // `lead_id` é gerado a cada submissão; o resto tem de chegar intacto.
+      lead: { name: data.nome, phone: data.telefone, email: data.email, location: data.localidade, message: data.mensagem, notes: undefined, lead_id: expect.stringMatching(/^L-\d{8}-[a-z0-9]+$/) },
       subject: 'Novo contacto do site',
     },
   });
+});
+
+it('gives every contact lead its own id, so a retry is never counted twice', async () => {
+  const data = { nome: 'Teste', telefone: '900000000', email: '', localidade: 'Lisboa', mensagem: 'Olá' };
+  await submitContactForm(data);
+  await submitContactForm(data);
+  const ids = mocks.invoke.mock.calls.map(([, options]) => options.body.lead.lead_id);
+  expect(new Set(ids).size).toBe(2);
 });
 
 it('reports a failure instead of confirming a failed contact', async () => {

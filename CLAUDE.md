@@ -111,26 +111,116 @@ Contexto: o site já tinha a parte difícil resolvida (16.045 páginas em HTML e
 
 ## Medição, Google Ads e atribuição (2026-09-18)
 
-Referência completa em `docs/tracking-google-ads.md`. O que não se pode adivinhar a partir do código:
+Referência completa em `docs/tracking-google-ads.md`, que separa o que está
+implementado, o que está testado localmente, o que depende de configuração
+externa e o que está validado em produção (nada, ainda). Aqui só as regras.
 
-- **Uma só `gtag.js` na página, carregada com o Measurement ID do GA4 (`G-T45T5FBNC3`).** O Google Ads (`AW-18457115875`) entra como destino adicional por `gtag('config', …)`. **O `GT-M6XTKMC7` nunca é carregado como segundo script:** o `GT-` e o `G-` da mesma propriedade são o mesmo contentor com dois nomes, e carregar os dois duplicava cada `page_view`. Há um teste que rebenta se um `GT-` aparecer num `<script src>`.
-- **O ID de Ads estava errado desde a criação da conta nova.** `src/lib/consent.ts` configurava `AW-17779872363`, da conta anterior, escrito à mão dentro de um ficheiro sobre consentimento. Confirmado no bundle em produção. É por isso que os identificadores passaram todos para `src/constants/tracking.ts` e são configuráveis por env var. **Um ID novo muda-se lá, ou no Cloudflare Pages — nunca dentro de um componente.**
-- **Nenhum componente chama `window.gtag` diretamente.** Tudo passa por `src/lib/analytics.ts` (fachada) → `src/lib/gtag.ts` (portas e envio). Uma chamada solta num componente React volta a disparar a cada re-render. Se aparecer uma, é um erro, não um padrão.
-- **Três portas antes de qualquer envio, e nenhuma é opcional:** consentimento aceite, ambiente de produção, tag carregada. O modo de depuração (`?kyro_debug=1`) abre **só** a do ambiente, para se poder verificar um evento num preview. Nunca a do consentimento — há teste para isso.
-- **A tag não se desinstala.** Quem aceita e depois recusa deixa a biblioteca na página; por isso `sendGtagEvent` lê o consentimento **atual** a cada envio, e não só no arranque. Apanhado na verificação em browser: sem isto, recusar as cookies a meio da visita e uma `page_view` e uma conversão do Ads saíam logo a seguir.
-- **`send_page_view: false` no `config` do GA4, e os `page_view` saem todos de `use-page-tracking.ts`.** Numa SPA a `config` enviava a página de entrada e mais nenhuma. **Não voltar a ligar o `page_view` automático:** ficavam dois por carregamento.
-- **Um clique no WhatsApp não é um lead.** `whatsapp_click`/`phone_click` são microconversões e vivem numa coluna separada do painel. `generate_lead` e a conversão do Ads só saem depois de o servidor confirmar a entrega do pedido, nunca no clique do botão de submissão.
-- **Nomes diferentes nos dois lados, de propósito:** o clique para telefonar é `phone_click` no GA4 e **`call_click`** na tabela `quiz_events` — é o nome que a restrição `CHECK` aceita desde 2026-08 e onde está o histórico do painel. Não uniformizar.
-- **Um pedido "sob orçamento" vai sem `value`, nunca com `value: 0`.** Zero ensina o Smart Bidding que aquele tipo de pedido não vale nada, e tapetes (que nunca mostram preço) seriam os primeiros a sair das campanhas.
-- **`keyword` é a palavra-chave da conta (ValueTrack), não o termo de pesquisa.** O que a pessoa escreveu na Google vive só no Search Terms Report e não chega ao site por nenhum parâmetro. Não inventar essa coluna.
-- **As etiquetas de conversão não têm valor por omissão, de propósito.** Uma etiqueta inventada envia conversões para o vazio e parece que funciona. Sem etiqueta o lead é registado na mesma com a atribuição toda, e o painel diz que falta.
-- **Qualificado e cliente são conversões offline, não eventos do browser.** Quem muda o estado é o dono, no painel, dias depois: um evento dali atribuía a conversão à sessão do dono em `/admin/panel`. O painel exporta CSV no formato de importação do Google Ads, a partir do `gclid` guardado no momento do clique.
-- **Nada de custo é estimado.** Sem gasto importado do Google Ads, CPL/CPA/CAC/ROAS aparecem como "Não disponível" e o painel escreve "dados de custo não ligados". **Não preencher com zeros.**
-- **`funnel_status` é uma coluna nova; `leads.status` de 2024 fica como está.** São dois vocabulários diferentes e há código e histórico a depender do antigo.
-- **O painel conta pelo ponto mais alto que o lead atingiu, lido de `lead_status_history`**, não pelo estado atual. Sem isso, a taxa de leads válidos subia sempre que se perdia um cliente.
-- **A migração `20260918000000_marketing_attribution.sql` aplica-se colando no SQL Editor** (sétima armadilha). Enquanto não for aplicada, `sendStoredEvent` deteta o `PGRST204`, deixa cair a coluna que falta e continua a entregar o resto — o pior caso é ficar sem atribuição, nunca sem métricas nenhumas.
-- **Enhanced conversions está desligado** (`VITE_ENHANCED_CONVERSIONS=false`). Ligar obriga a rever a política de privacidade e a ativar a opção na ação de conversão do Google Ads.
-- **Modo de consentimento em vigor: `basic`** — a `gtag.js` só carrega depois de aceitar. O `advanced` existe atrás de `VITE_CONSENT_MODE` e é uma decisão do dono: recupera conversões por modelação, à custa de a Google receber pings sem cookies antes da decisão.
+**Identificadores.** GA4 `G-T45T5FBNC3`, conversões `AW-18457115875`, **número de
+cliente `920-786-3494`** (não é o mesmo que o `AW-` e nunca vai num `send_to`;
+serve para integrações). Todos em `src/constants/tracking.ts`. O
+`AW-17779872363` era da conta anterior e estava escrito à mão em `consent.ts`.
+
+**Uma só `gtag.js`, carregada pelo `G-`.** O Ads entra por `config`. O
+`GT-M6XTKMC7` **não** é carregado: é o mesmo contentor que o `G-` com outro
+nome, e carregar os dois duplicava cada `page_view`. **A ausência do literal
+`GT-` no código não prova que a Google tag estava em falta** — prova só que não
+foi carregada por esse nome. Destinos ligam-se na interface da Google, não aqui.
+
+**`send_page_view: false` não chega.** A opção "alterações de página baseadas no
+histórico do navegador" da Medição otimizada do GA4 é configurada na interface,
+não no código, e duplica o `page_view` em cada navegação da SPA. **Tem de ser
+desligada no GA4** e não é verificável a partir do código nem numa propriedade
+de teste. Até lá, assumir `page_view` duplicado.
+
+**Consentimento não pode travar um pedido.** Registo operacional e medição são
+duas coisas: quem recusa cookies submete o orçamento na mesma, é gravado e
+notificado, e o painel conta-o. O que não existe para essa pessoa é sessão
+observada e atribuição. **Nunca escrever que "quem recusa não existe nos
+relatórios"** — existe como lead operacional, e o painel separa as duas coisas
+em todos os cartões.
+
+**A decisão é um par `{analytics, ads}`**, e os quatro sinais do Consent Mode v2
+derivam dele. Aceitar análise **não** autoriza publicidade. O banner de hoje faz
+uma pergunta só que cobre as duas, por isso coincidem sempre — a separação
+existe para que uma divisão futura do banner seja só uma alteração ao banner.
+
+**Nenhum componente chama `window.gtag`.** Tudo por `src/lib/analytics.ts` →
+`src/lib/gtag.ts`, que verifica consentimento **para aquela finalidade**,
+ambiente, e tag carregada. A tag não se desinstala: o consentimento é lido a
+cada envio, não só no arranque.
+
+**`?kyro_debug=1` é diagnóstico, não autorização.** Enviar fora de produção
+exige `VITE_TRACKING_ALLOW_NON_PRODUCTION=true` **e** identificadores que não
+sejam os reais. A segunda condição é a que impede o localhost de escrever na
+propriedade a sério.
+
+**O `lead_id` é gerado uma vez por submissão** (`src/lib/submissionId.ts`) e
+sobrevive a duplo clique, retry e refresh; é limpo só depois da entrega, para
+quem volta na semana seguinte não ficar bloqueado. A autoridade final é o
+**índice único em `leads.lead_id`**, não o browser. O canal de email tem o seu
+trinco (`lead_notifications`) e **larga-o se o envio falhar** — sem isso, a
+proteção contra duplicados perdia o pedido.
+
+**Sucesso resolve com um canal.** Mas se o CRM falhar o pedido só existe no
+email e não está em `leads`: o painel mostra o número de falhas das últimas 24h
+e avisa que os números estão incompletos. Uma falha de medição nunca trava o
+pedido.
+
+**Website e offline são caminhos diferentes.** O lead confirmado usa uma
+**etiqueta** de gtag; qualificado e cliente usam o **nome da ação** de conversão
+e um identificador de clique. Tratar as três como etiquetas produzia ficheiros
+que o Google Ads rejeita. Uma só conversão principal (o lead); qualificado e
+cliente ficam secundárias. Cliques em WhatsApp/telefone são microações e nunca
+entram num objetivo que os torne relevantes para os lances. **Nunca importar o
+mesmo lead do GA4 e da tag nativa como duas conversões principais.**
+
+**Exportar não é importar.** `conversion_exports` guarda `queued`, `exported`,
+`submitted`, `accepted`, `rejected` em separado, e o CSV só é gerado depois de o
+registo ser escrito. As mudanças no painel **não** enviam conversões pela sessão
+do administrador.
+
+**WhatsApp e chamadas: só medimos cliques.** Conversas e chamadas atendidas
+acontecem fora do site. Há registo manual em `contact_log`; cliques, contactos
+confirmados e leads são três colunas que nunca se somam. **Nunca transformar
+`whatsapp_click` em `generate_lead`** nem atribuir uma conversa a uma campanha
+por suposição.
+
+**Métricas.** Operacional (tabela `leads`, sem cookies) e observado
+(`quiz_events`/`lead_attribution`, com consentimento) nunca partilham um
+denominador. `quoted_value`/`booked_value`/`final_revenue`/`amount_received` são
+quatro momentos do mesmo dinheiro e **nunca se somam**. Faturado ≠ recebido. O
+funil conta o ponto mais alto atingido **por lead** — nove mudanças de estado
+continuam a ser um lead. Fórmulas e origem em `METRIC_DEFINITIONS`, publicadas
+no próprio painel.
+
+**Atribuição:** first touch 90 dias em `localStorage`, nunca reescrito; last
+touch 30 minutos em `sessionStorage`, substituído por campanha nova. Um regresso
+direto depois dos 30 minutos **perde** o last touch e mantém o first. Os dois
+nunca se somam; o agrupamento por campanha usa last touch.
+
+**Sem gasto importado, CPL/CPA/CAC/ROAS são `null` com o motivo escrito.**
+`costMetrics` recusa somar moedas diferentes, avisa quando o período do gasto
+não cobre o dos leads, e diz sempre que custo é por data do clique, leads por
+data do pedido e receita por data do serviço.
+
+**Segurança.** `revoke all … from anon` explícito nas tabelas novas (o Supabase
+concede por omissão). A atribuição e o histórico são **só de leitura** para o
+painel — reescrevê-los permitia fabricar um bom resultado. `changed_by`,
+`logged_by` e `created_by` vêm de um trigger que lê o JWT; o que o browser
+mandar é ignorado. **Não existe autenticado sem privilégios neste projeto**:
+qualquer conta é administradora, e isso está por resolver.
+
+**A migração `20260918000000_marketing_attribution.sql` aplica-se colando no SQL
+Editor** (sétima armadilha). Foi validada contra um Postgres em Docker:
+`supabase/tests/` corre a migração duas vezes (idempotência) e prova as
+permissões papel a papel. **O RLS não gera erro num `SELECT`** — filtra em
+silêncio e devolve zero; só a falta de `GRANT` gera erro. Um teste que espere
+exceção num `SELECT` dá falsos positivos.
+
+**Falhas não ficam escondidas.** O fallback do `PGRST204` mantém a entrega mas
+**não** significa atribuição saudável: o cartão de Cobertura e os avisos do
+painel existem para isso. Cada leitura do painel falha por si, para uma tabela
+em falta não esvaziar tudo.
 
 ## Regras de conteúdo e estilo (fixas, já corrigidas várias vezes)
 

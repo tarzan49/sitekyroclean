@@ -19,6 +19,10 @@ dist-ssr
 # Lockfile — let Cloudflare Pages generate for Linux
 package-lock.json
 
+# Lockfile do Deno gerado na raiz por engano (a config Deno vive em
+# supabase/functions/deno.json, nada no build o le)
+/deno.lock
+
 # Environment variables
 .env
 .env.local

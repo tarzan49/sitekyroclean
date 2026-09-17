@@ -1,4 +1,4 @@
-import { captureLeadAttribution } from './lib/leadAttribution';
+import { usePageTracking } from '@/hooks/use-page-tracking';
 import { lazy, Suspense, useEffect } from "react";
 import { trackSessionTime, isPublicTrackingPage } from "@/lib/quizTracking";
 import { Toaster } from "@/components/ui/toaster";
@@ -63,13 +63,9 @@ const PageLoader = () => (
 
 // ── Inner router component, must be inside <BrowserRouter> to use useLocation
 const AppRoutes = () => {
-  const location = useLocation();
   useScrollReveal();
-  useEffect(() => {
-    captureLeadAttribution();
-    window.addEventListener('kyro:consent-changed', captureLeadAttribution);
-    return () => window.removeEventListener('kyro:consent-changed', captureLeadAttribution);
-  }, [location.pathname, location.search]);
+  // Atribuição + page_view por mudança de rota. Ver o porquê em use-page-tracking.ts.
+  usePageTracking();
 
   return (
     <>

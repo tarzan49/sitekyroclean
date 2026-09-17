@@ -1,6 +1,9 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { getTrackingDeliveryStatus } from '@/lib/quizTracking';
+import { areTagsLoaded } from '@/lib/gtag';
+import { getConsent } from '@/lib/consent';
+import { GA4_MEASUREMENT_ID, GOOGLE_ADS_ID, trackingEnv } from '@/constants/tracking';
 
 /** Read-only signals, never claim that missing error reports prove delivery. */
 export function TrackingHealth() {
@@ -24,6 +27,10 @@ export function TrackingHealth() {
     return () => { active = false; clearInterval(interval); };
   }, []);
   const local = getTrackingDeliveryStatus();
+  // Estado da Google tag **neste** browser. Não diz nada sobre os visitantes:
+  // é um sinal de diagnóstico para quando o painel está a zeros e é preciso
+  // separar "ninguém visitou" de "a recolha está desligada".
+  const consent = getConsent();
   return <div className="rounded-lg border border-slate-200 bg-white p-4 text-sm text-slate-700">
     <strong>Estado da recolha</strong>
     {!health ? <p>A verificar a última gravação...</p> : health.error ? <p role="alert">Não foi possível verificar a recolha. Confirme a ligação e as permissões da base de dados.</p> : <>
@@ -32,6 +39,12 @@ export function TrackingHealth() {
       {(!health.last || Date.now() - Date.parse(health.last) > 86400000) && <p className="font-semibold text-amber-800">Sem eventos nas últimas 24 horas. Verifique a recolha antes de interpretar zeros como ausência de contactos.</p>}
     </>}
     {local.pending > 0 && <p className="text-amber-800">Este navegador tem {local.pending} eventos à espera de confirmação. A entrega é repetida quando há ligação.</p>}
+    <p className="mt-2 text-xs text-slate-600">
+      Google tag neste browser: {areTagsLoaded() ? 'carregada' : 'não carregada'}
+      {' · '}consentimento: {consent ?? 'sem decisão'}
+      {' · '}ambiente: {trackingEnv()}
+      {' · '}GA4 {GA4_MEASUREMENT_ID} · Ads {GOOGLE_ADS_ID}
+    </p>
     <p className="mt-1 text-xs text-slate-500">Atualização automática a cada minuto. A ausência de erros reportados não prova que todos os dispositivos entregaram os eventos.</p>
   </div>;
 }

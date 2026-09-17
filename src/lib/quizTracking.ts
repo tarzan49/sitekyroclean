@@ -1,5 +1,7 @@
 import { getConsent } from './consent';
 import { createEventDelivery, sendStoredEvent } from './eventDelivery';
+import { sendGtagEvent } from './gtag';
+import { getAttributionSnapshot } from './leadAttribution';
 
 export const IS_PRODUCTION = typeof window !== 'undefined' && window.location.hostname === 'cleansolutions.com.pt';
 export const isPublicTrackingPage = () => !/^\/admin(?:\/|$)/.test(window.location.pathname);
@@ -26,23 +28,69 @@ function context() {
   }
   session.last = now;
   try { storage?.setItem('kyro_visit_v2', JSON.stringify(session)); } catch { /* unavailable */ }
+  // A atribuição vem da fotografia partilhada com os leads, em vez de uma
+  // segunda leitura do URL aqui: assim uma sessão que entrou por um anúncio e
+  // depois navegou para uma página sem parâmetros continua a carregar o
+  // `gclid` e a campanha em cada evento, que é o que liga uma sessão do Google
+  // Ads às páginas por onde passou.
+  const ads = getAttributionSnapshot();
   return { session_id: session.id, referrer: session.referrer, utm_source: session.utm_source, utm_medium: session.utm_medium,
     utm_campaign: session.utm_campaign, page_path: window.location.pathname,
-    device: window.innerWidth < 768 ? 'mobile' : window.innerWidth < 1024 ? 'tablet' : 'desktop' };
+    device: window.innerWidth < 768 ? 'mobile' : window.innerWidth < 1024 ? 'tablet' : 'desktop',
+    utm_term: ads?.keyword ?? null, utm_content: ads?.creative_id ?? null,
+    gclid: ads?.gclid ?? null, gbraid: ads?.gbraid ?? null, wbraid: ads?.wbraid ?? null,
+    campaign_id: ads?.campaign_id ?? null, ad_group_id: ads?.ad_group_id ?? null,
+    keyword: ads?.keyword ?? null, match_type: ads?.match_type ?? null, creative_id: ads?.creative_id ?? null,
+    ads_device: ads?.ads_device ?? null, network: ads?.network ?? null,
+    landing_page: ads?.landing_page ?? null, is_paid: ads?.is_paid ?? false };
 }
 function emit(payload: Record<string, unknown>) {
   if (getConsent() !== 'accepted' || !IS_PRODUCTION || /^\/admin(?:\/|$)/.test(String(payload.page_path ?? window.location.pathname))) return;
   try { outbox.enqueue({ ...context(), ...payload }); } catch (error) { console.warn('[Tracking] Could not enqueue event', error); }
 }
 export function trackQuizEvent(params: { step: number; action: 'start' | 'complete' | 'abandon'; service?: string; city?: string; value?: number; service_type?: string; session_id?: string }) { emit(params); }
-let delegatedClick = false;
-function contact(action: 'whatsapp_click' | 'call_click', source: string) {
-  if (getConsent() !== 'accepted' || !IS_PRODUCTION || !isPublicTrackingPage()) return;
-  emit({ action, step: 0, service: source });
-  try { window.gtag?.('event', action, { event_category: 'engagement', event_label: source, page_path: window.location.pathname }); } catch { /* contact navigation must remain available */ }
+
+/**
+ * Uma página vista, para o painel interno.
+ *
+ * Existe em paralelo com o `page_view` do GA4 porque respondem a perguntas
+ * diferentes: o do GA4 alimenta os relatórios da Google, este fica numa tabela
+ * que podemos cruzar com a tabela `leads` para calcular a taxa de conversão de
+ * uma landing page — coisa que o GA4 não faz, porque não sabe o que é um lead
+ * válido nem quanto faturou.
+ *
+ * Uma linha por caminho e por sessão: recarregar a mesma página dez vezes não
+ * inventa dez visitas, e a taxa de conversão continua a ser leads por sessão.
+ */
+const seenPaths = new Set<string>();
+export function trackPageViewEvent(path = window.location.pathname) {
+  if (seenPaths.has(path)) return;
+  seenPaths.add(path);
+  emit({ action: 'page_view', step: 0, page_path: path });
 }
-export function trackWhatsAppClick(source: string) { if (!delegatedClick) contact('whatsapp_click', source); }
-export function trackCallClickEvent(source: string) { if (!delegatedClick) contact('call_click', source); }
+
+/** Contexto extra que o delegado global de cliques não consegue adivinhar. */
+export interface ContactContext { service?: string; city?: string }
+
+let delegatedClick = false;
+function contact(action: 'whatsapp_click' | 'call_click', source: string, ctx?: ContactContext) {
+  if (!isPublicTrackingPage()) return;
+  // O lado da Google passa pela camada central, que tem as suas próprias portas
+  // (ambiente, modo de depuração) e é o único sítio de onde saem eventos para o
+  // GA4. O nome `phone_click` é o do GA4; na tabela `quiz_events` o mesmo clique
+  // continua a chamar-se `call_click`, que é o que a restrição CHECK aceita
+  // desde 2026-08 e onde está o histórico do painel interno.
+  sendGtagEvent(action === 'whatsapp_click' ? 'whatsapp_click' : 'phone_click', {
+    page_path: window.location.pathname, cta_location: source, service: ctx?.service, city: ctx?.city,
+  });
+  if (getConsent() !== 'accepted' || !IS_PRODUCTION) return;
+  // `service` guarda a origem do clique (header, footer, page:/…) desde 2026-08
+  // e é por aí que o painel agrupa "cliques por origem". O serviço a sério,
+  // quando é conhecido, vai em `service_type`, que estava livre para cliques.
+  emit({ action, step: 0, service: source, city: ctx?.city, service_type: ctx?.service });
+}
+export function trackWhatsAppClick(source: string, ctx?: ContactContext) { if (!delegatedClick) contact('whatsapp_click', source, ctx); }
+export function trackCallClickEvent(source: string, ctx?: ContactContext) { if (!delegatedClick) contact('call_click', source, ctx); }
 export function trackSessionTime(seconds: number, page_path = window.location.pathname) { if (seconds > 0) emit({ action: 'session_time', step: 0, value: seconds, page_path }); }
 
 export function initContactTracking() {
