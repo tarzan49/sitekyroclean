@@ -2,6 +2,8 @@ import { exampleImageSrcSet, EXAMPLE_IMAGE_SIZES } from '../src/lib/responsiveIm
 import type { LandingPageModel } from '../src/data/landingPageModel';
 import { LANDING_SECTION_ORDER } from '../src/data/landingServiceCopy';
 import { commercialHeroPriceLine, commercialHeroStats } from '../src/data/commercialHeroCopy';
+import { DEFAULT_AUTHOR } from '../src/data/authors';
+import { STUDY_ROUTE } from '../src/data/studyData';
 
 export const escapeLandingHtml = (value: string) => value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 const e = escapeLandingHtml;
@@ -30,6 +32,26 @@ const links = (items: { href: string; label: string }[]) => `<ul>${items.map(ite
  * PriceWidget reads. The widget and this table cannot disagree on a number,
  * and this change adds no figure the widget doesn't already show.
  */
+/**
+ * As três páginas que respondem por quem é a empresa: a entidade, a pessoa que
+ * assina e o estudo com dados próprios.
+ *
+ * Estavam ligadas só a partir do rodapé React, que é desenhado depois do
+ * JavaScript correr. Para um crawler que não o corre, e é esse o público de
+ * todo este HTML, recebiam respetivamente 2, 27 e 0 ligações em 16.262
+ * páginas. São as páginas que sustentam o E-E-A-T do site inteiro e eram as
+ * menos ligadas dele.
+ *
+ * Os mesmos três destinos estão no rodapé React (Footer.tsx, coluna Recursos),
+ * por isso isto não acrescenta nada que a pessoa não receba.
+ */
+export const ENTITY_FOOTER_HTML =
+  '<nav aria-label="Sobre a empresa"><ul>'
+  + '<li><a href="/sobre">Sobre a Kyro Clean Solutions</a></li>'
+  + `<li><a href="/autor/${DEFAULT_AUTHOR.slug}">Quem assina o que escrevemos</a></li>`
+  + `<li><a href="${STUDY_ROUTE}">Estudo: o que as pessoas pedem quando limpam estofos</a></li>`
+  + '</ul></nav>';
+
 /** Semantic no-JS fallback, with the same model and order as the React composition. */
 export function renderLandingPageHtml(model: LandingPageModel): string {
   const sections = {
@@ -48,5 +70,16 @@ export function renderLandingPageHtml(model: LandingPageModel): string {
   // chegarem aqui: "Desde 49€" e "deslocação 10€" não apareciam uma única vez
   // no HTML estático, que é o único que um crawler sem JavaScript lê.
   const heroFacts = `<p>${e(commercialHeroPriceLine(model.serviceSlug, model.municipalityName, model.priceFrom))}</p><ul>${commercialHeroStats(model.serviceSlug).map(stat => `<li>${e(stat.value)} · ${e(stat.label)}</li>`).join('')}</ul>`;
-  return `<main><h1>${e(model.h1)}</h1><p>${e(model.intro)}</p>${heroFacts}${LANDING_SECTION_ORDER.map(section => `<section id="${section}" data-landing-section="${section}">${sections[section]}</section>`).join('\n')}</main>`;
+  // A mesma migalha que o CommercialHero desenha para quem vê a página:
+  // Início, o serviço (ligado ao seu hub) e a localidade como texto. Não é
+  // informação nova, é a que faltava no HTML estático — e era a razão de os
+  // seis serviços-pilar quase não receberem ligações internas num site de
+  // 16.000 páginas, apesar de cada uma delas pertencer a um.
+  const breadcrumb = `<nav aria-label="Breadcrumb"><ol>`
+    + `<li><a href="/">Início</a></li>`
+    + `<li><a href="${e(model.serviceBaseRoute)}">${e(model.serviceName)}</a></li>`
+    + `<li>${e(model.heroLocationName)}</li>`
+    + `</ol></nav>`;
+
+  return `<main>${breadcrumb}<h1>${e(model.h1)}</h1><p>${e(model.intro)}</p>${heroFacts}${LANDING_SECTION_ORDER.map(section => `<section id="${section}" data-landing-section="${section}">${sections[section]}</section>`).join('\n')}${ENTITY_FOOTER_HTML}</main>`;
 }

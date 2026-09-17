@@ -2,6 +2,7 @@ import BusinessConditions from './BusinessConditions';
 import { Phone, Mail, MapPin, ChevronRight } from "lucide-react";
 import { GOOGLE_MAPS_URL } from "@/constants/google";
 import { Link } from "react-router-dom";
+import { DEFAULT_AUTHOR } from "@/data/authors";
 import { trackCallClick } from "@/lib/analytics";
 import kyroLogo from "@/assets/kyro-logo.webp";
 import { PHONE_TEL, PHONE_DISPLAY, BUSINESS_EMAIL_HREF, BUSINESS_EMAIL, BUSINESS_ADDRESS, BUSINESS_TAX_ID } from "@/constants/business";
@@ -83,6 +84,14 @@ const Footer = () => {
               <li className="flex items-center gap-2">
                 <ChevronRight className="h-3.5 w-3.5 text-turquoise flex-shrink-0" />
                 <Link to="/sobre" className="hover:text-turquoise active:text-turquoise transition-colors py-1 touch-manipulation">Sobre nós</Link>
+              </li>
+              <li className="flex items-center gap-2">
+                <ChevronRight className="h-3.5 w-3.5 text-turquoise flex-shrink-0" />
+                <Link to="/estudo-limpeza-estofos-portugal" className="hover:text-turquoise active:text-turquoise transition-colors py-1 touch-manipulation">Estudo: o que as pessoas pedem</Link>
+              </li>
+              <li className="flex items-center gap-2">
+                <ChevronRight className="h-3.5 w-3.5 text-turquoise flex-shrink-0" />
+                <Link to={`/autor/${DEFAULT_AUTHOR.slug}`} className="hover:text-turquoise active:text-turquoise transition-colors py-1 touch-manipulation">Quem assina o que escrevemos</Link>
               </li>
             </ul>
             <h3 className="type-card-title    mb-3 text-white">Packs</h3>

@@ -30,7 +30,7 @@ import { buildAboutPageSchema, buildProfilePageSchema, buildPersonNode, buildStu
 import fs from 'fs';
 import path from 'path';
 import { getLandingPageModel } from '../src/data/landingPageModel';
-import { renderLandingPageHtml } from './landing-page-html';
+import { renderLandingPageHtml, ENTITY_FOOTER_HTML } from './landing-page-html';
 
 import { getLocationServiceData, getAllLocationRoutes, services, cities } from '../src/data/locationSeoData';
 import { getAllFreguesiaRoutes, getFreguesia, generateFreguesiaContent } from '../src/data/freguesiaSeoData';
@@ -166,6 +166,13 @@ function buildFaqSchema(faqs: { question: string; answer: string }[]) {
 // ─── Content HTML generators ───────────────────────────────────────────────
 
 interface PageContent {
+  // Migalha visível. O React já a mostra em todas as famílias de SEO
+  // (PageBreadcrumb, e o CommercialHero monta-a sozinho a partir do serviço),
+  // mas o HTML estático só a declarava em JSON-LD. O resultado media-se: os
+  // seis serviços-pilar recebiam entre 28 e 785 ligações internas num site de
+  // 16.262 páginas, porque a ligação que sobe da página de cidade para o
+  // serviço existia para quem vê a página e não para quem a lê sem JavaScript.
+  breadcrumb?: { label: string; href?: string }[];
   serviceExamples?: ReturnType<typeof getServiceExamples>;
   hero?: ReturnType<typeof getProblemHero>;
   h1: string;
@@ -207,7 +214,19 @@ interface PageContent {
 }
 
 function generatePageBody(c: PageContent, lang: 'pt' | 'en' = 'pt'): string {
-  let html = `<main>\n<h1>${escHtml(c.h1)}</h1>\n`;
+  let html = `<main>\n`;
+
+  if (c.breadcrumb?.length) {
+    const crumbs = c.breadcrumb.map((crumb, index) => {
+      // O último item é a página atual: texto, não ligação. É o que o
+      // PageBreadcrumb faz no React quando o item vem sem `to`.
+      const last = index === c.breadcrumb!.length - 1;
+      return `<li>${!last && crumb.href ? `<a href="${escHtml(crumb.href)}">${escHtml(crumb.label)}</a>` : escHtml(crumb.label)}</li>`;
+    }).join('');
+    html += `<nav aria-label="Breadcrumb"><ol>${crumbs}</ol></nav>\n`;
+  }
+
+  html += `<h1>${escHtml(c.h1)}</h1>\n`;
 
   if (c.byline) {
     const authorLabel = c.byline.authorHref
@@ -351,7 +370,7 @@ function generatePageBody(c: PageContent, lang: 'pt' | 'en' = 'pt'): string {
     html += `</ol></section>\n`;
   }
 
-  if (lang === 'pt') html += `<details><summary>Condições do serviço e garantia</summary>${[PRICE_PROMISE, SATISFACTION_PROMISE, DRYING_PROMISE, AVAILABILITY_PROMISE, COVERAGE_PROMISE, RESPONSE_PROMISE + '. Deslocação a partir de 10€.'].map(text => `<p>${escHtml(text)}</p>`).join('')}<a href="/tratamento-anti-acaros">Tratamento anti-ácaros</a> · <a href="/desbacterizacao">Desbacterização</a></details>`;
+  if (lang === 'pt') html += `<details><summary>Condições do serviço e garantia</summary>${[PRICE_PROMISE, SATISFACTION_PROMISE, DRYING_PROMISE, AVAILABILITY_PROMISE, COVERAGE_PROMISE, RESPONSE_PROMISE + '. Deslocação a partir de 10€.'].map(text => `<p>${escHtml(text)}</p>`).join('')}<a href="/tratamento-anti-acaros">Tratamento anti-ácaros</a> · <a href="/desbacterizacao">Desbacterização</a></details>` + ENTITY_FOOTER_HTML;
   html += `</main>`;
   return html;
 }
@@ -474,7 +493,19 @@ export function prerenderRoutes(outDir: string): number {
       html = html.replace('</head>', `<meta name="kyro-route-path" content="${escHtml(routePath)}"><meta name="kyro-route-page" content="${escHtml(page)}">\n</head>`);
     }
     html = preloadComparison(html, landing?.serviceSlug ?? heroServices.get(routePath) ?? routePath.slice(1));
-    html = injectContent(html, landing ? renderLandingPageHtml(landing) : generatePageBody(content ?? { h1: title.split(" | ")[0], intro: desc }, lang));
+    // A migalha visível sai do mesmo BreadcrumbList que o chamador já passou em
+    // `schemas`, em vez de ser montada outra vez em cada uma das 21 famílias.
+    // Assim o que a página mostra e o que ela declara não podem discordar, e
+    // nenhuma família fica esquecida quando outra for acrescentada.
+    const crumbNode = schemas?.find(schema => (schema as { '@type'?: string })['@type'] === 'BreadcrumbList') as
+      { itemListElement?: { name: string; item?: string }[] } | undefined;
+    const breadcrumb = crumbNode?.itemListElement?.map(entry => ({
+      label: entry.name,
+      // Relativo, como todas as outras ligações internas do HTML estático.
+      href: entry.item?.startsWith(BASE_URL) ? (entry.item.slice(BASE_URL.length) || '/') : entry.item,
+    }));
+    const pageContent = content ?? { h1: title.split(" | ")[0], intro: desc };
+    html = injectContent(html, landing ? renderLandingPageHtml(landing) : generatePageBody({ ...pageContent, breadcrumb: pageContent.breadcrumb ?? breadcrumb }, lang));
     if (landing) {
       // O modelo resolvido viaja no HTML para o cliente não voltar a montar
       // uma página que já recebeu pronta. Custa ~1,4 KB comprimidos (o texto
