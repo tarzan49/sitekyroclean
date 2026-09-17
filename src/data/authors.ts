@@ -28,7 +28,7 @@ export const AUTHORS: Record<string, Author> = {
     summary:
       "Responsável pela Kyro Clean Solutions. Assina e revê o conteúdo publicado neste site.",
     bio: [
-      "António Peixoto é o responsável pela Kyro Clean Solutions, empresa portuguesa de limpeza e higienização de estofos ao domicílio. Responde pelo serviço prestado às pessoas e pelo que está escrito neste site.",
+      "António Peixoto é o responsável pela Kyro Clean Solutions, empresa portuguesa de limpeza e higienização de estofos ao domicílio, com três anos de atividade no setor. Responde pelo serviço prestado às pessoas e pelo que está escrito neste site.",
       "Os artigos publicados aqui saem da prática do dia a dia: os materiais que aparecem nas casas dos clientes, as manchas que saem e as que não saem, o tempo real de secagem, o que acontece quando alguém tenta resolver o problema sozinho antes de nos chamar. Quando um artigo afirma alguma coisa sobre saúde, essa afirmação remete para uma fonte identificada, e não para a experiência da empresa.",
     ],
   },
