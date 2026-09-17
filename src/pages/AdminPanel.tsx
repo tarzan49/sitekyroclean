@@ -1,6 +1,6 @@
 import { useState, lazy, Suspense } from "react";
 import { Link } from "react-router-dom";
-import { AlertTriangle, BarChart3, Home, Settings2, Lock, LogOut, Users, Globe, MessageCircle } from "lucide-react";
+import { AlertTriangle, BarChart3, Home, Settings2, Lock, LogOut, Users, Globe, MessageCircle, Mail } from "lucide-react";
 import { isSupabaseConfigured, supabase } from "@/integrations/supabase/client";
 import { useAdminSession } from "@/hooks/use-admin-session";
 
@@ -9,8 +9,9 @@ const SitemapMonitor = lazy(() => import("./admin/SitemapMonitor"));
 const ErrorLogPanel = lazy(() => import("./admin/ErrorLogPanel"));
 const QuizMetricsPanel = lazy(() => import("./admin/QuizMetricsPanel"));
 const WhatsAppPanel = lazy(() => import("./admin/WhatsAppPanel"));
+const QuizLeadsPanel = lazy(() => import("./admin/QuizLeadsPanel"));
 
-type Tab = "sitemap" | "errors" | "metrics" | "crm" | "whatsapp";
+type Tab = "sitemap" | "errors" | "metrics" | "crm" | "whatsapp" | "quiz-leads";
 
 const TabFallback = () => (
   <div className="flex items-center justify-center py-16">
@@ -122,6 +123,7 @@ const AdminPanel = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 flex gap-1 pb-0 overflow-x-auto scrollbar-none">
           {([
             { id: "crm",       label: "CRM",          icon: Users },
+            { id: "quiz-leads", label: "Quiz Leads",  icon: Mail },
             { id: "whatsapp",  label: "WhatsApp",      icon: MessageCircle },
             { id: "sitemap",   label: "Sitemaps",      icon: Globe },
             { id: "errors",    label: "Error Log",     icon: AlertTriangle },
@@ -179,6 +181,12 @@ const AdminPanel = () => {
         {activeTab === "crm" && (
           <Suspense fallback={<TabFallback />}>
             <CrmPanel />
+          </Suspense>
+        )}
+
+        {activeTab === "quiz-leads" && (
+          <Suspense fallback={<TabFallback />}>
+            <QuizLeadsPanel />
           </Suspense>
         )}
 

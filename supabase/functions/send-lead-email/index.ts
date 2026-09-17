@@ -9,6 +9,7 @@ import { checkRateLimit, getClientIP, getRateLimitHeaders } from "../_shared/rat
 import { createErrorResponse, createSuccessResponse, handleCORS, safeLog, validateMethod } from "../_shared/security.ts";
 import { hasHeaderInjection } from "../_shared/validation.ts";
 import { verifyRecaptcha } from "../_shared/recaptcha.ts";
+import { LEAD_FROM_ADDRESS } from "../_shared/constants.ts";
 
 const RATE_LIMIT_MAX = 8;
 const RATE_LIMIT_WINDOW = 10 * 60 * 1000;
@@ -176,7 +177,7 @@ serve(async (req: Request): Promise<Response> => {
   try {
     const resend = new Resend(resendApiKey);
     const { error: resendError } = await resend.emails.send({
-      from: "Kyro Clean Solutions <pedidos@cleansolutions.com.pt>",
+      from: `Kyro Clean Solutions <${LEAD_FROM_ADDRESS}>`,
       to: [notificationEmail],
       ...(lead.email ? { reply_to: lead.email } : {}),
       subject,
