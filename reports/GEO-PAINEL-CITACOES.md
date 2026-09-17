@@ -80,6 +80,20 @@ Nota sobre o calendário: as alterações de 17 de setembro de 2026 (factos do h
 |---|---|---|---|---|
 | | | | | |
 
+## Atribuição real, vinda dos clientes
+
+Desde 17 de setembro de 2026, a atribuição de leads regista o `document.referrer`. Quando alguém chega de um assistente, a nota do pedido passa a abrir com **"Chegou por ChatGPT."** (ou Perplexity, Claude, Gemini, Copilot), tanto no email como no CRM. Não é preciso fazer nada: aparece sozinho.
+
+Isto vale mais do que o painel de prompts, porque liga a citação a um pedido real em vez de a uma pergunta de teste. Mas mede por baixo, e é importante saber onde falha:
+
+- Quem copia o endereço em vez de clicar chega sem referrer.
+- Alguns assistentes não enviam referrer.
+- Um clique vindo das AI Overviews da Google chega como `google.com`, indistinguível de uma pesquisa normal.
+
+Ou seja, o número que aparecer é um **mínimo garantido**, nunca o total. Se em dois meses aparecerem 5 pedidos com "Chegou por", foram pelo menos 5, provavelmente mais.
+
+Se quiseres o total a sério, a única forma é perguntar no fluxo de orçamento ("como nos encontrou?"). Isso acrescenta fricção a um formulário que converte, por isso é decisão de negócio e não está feito.
+
 ## Medição complementar, essa automática
 
 Independentemente deste painel, o Cloudflare conta os acessos reais dos crawlers de IA: **Workers & Pages → o projeto → Analytics**, filtrando por user-agent (`GPTBot`, `OAI-SearchBot`, `ClaudeBot`, `PerplexityBot`). Isso não diz se foste citado, mas diz se te foram ler. São perguntas diferentes e as duas interessam: nenhuma citação sem leitura, mas muita leitura sem citação nenhuma.
