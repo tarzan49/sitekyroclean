@@ -66,15 +66,45 @@ function escapeHtml(value: string): string {
 // só `message` (a mensagem livre do cliente) — aí é a única fonte e é mostrado.
 // Mensagem pré-preenchida no clique de "Responder no WhatsApp". Estes leads já
 // viram o preço no quiz e mesmo assim avançaram, por isso o objetivo não é
-// "confirmar interesse" mas fechar o agendamento o mais depressa possível:
-// dá logo duas opções concretas de horário (pergunta fechada, decide-se em
-// segundos) em vez de "quando pode?", e só depois pede o único dado em falta
-// (morada). [DIA/HORA] fica como marcador para preencher à mão consoante a
-// agenda antes de enviar, a mensagem abre editável na caixa do WhatsApp.
+// "confirmar interesse" mas fechar o agendamento logo na primeira mensagem:
+// trata a pessoa pelo primeiro nome, recorda o serviço e a zona que pediu, dá
+// duas opções de horário (pergunta fechada, decide-se em segundos) e só depois
+// pede o único dado em falta (a morada). Os espaços em branco dos horários
+// ficam por preencher à mão consoante a agenda: a mensagem abre editável na
+// caixa do WhatsApp, não é enviada automaticamente. Parágrafos separados por
+// linha em branco para não chegar como um bloco de texto corrido.
+function firstName(fullName: string): string {
+  const first = fullName.trim().split(/\s+/)[0] ?? "";
+  return first ? first.charAt(0).toUpperCase() + first.slice(1) : fullName;
+}
+
+// Quase todas as localidades servidas levam "em" (em Oeiras, em Lisboa), mas
+// um punhado leva artigo contraído e "em Porto" soa logo a mensagem automática.
+// Lista curta e explícita das exceções que existem em `locationPrices`; tudo o
+// resto, incluindo moradas escritas à mão no campo "outra", cai em "em".
+const LOCATION_PREPOSITION: Record<string, string> = {
+  "Porto": "no", "Barreiro": "no", "Seixal": "no", "Montijo": "no",
+  "Amadora": "na", "Maia": "na", "Moita": "na", "Trofa": "na",
+  "Póvoa de Varzim": "na", "Póvoa de Lanhoso": "na",
+};
+
 function buildWhatsAppMessage(lead: Record<string, string>): string {
-  const service = lead.service ? ` para ${lead.service.toLowerCase()}` : "";
-  const loc = lead.location ? ` em ${lead.location}` : "";
-  return `Olá ${lead.name}, tudo bem? Aqui é o António da Kyro Clean Solutions. Recebemos o seu pedido de orçamento${service}${loc}. Tenho disponibilidade [DIA] às [HORA] ou [DIA] às [HORA], qual funciona melhor para si? Só preciso da sua morada completa para confirmar a reserva.`;
+  // Com upsell o campo `service` vem como lista ("Sofá, 2x Colchão Casal");
+  // numa saudação só interessa o serviço principal, o resto está no email.
+  const mainService = (lead.service ?? "").split(",")[0].trim().toLowerCase();
+  const isWaterproofing = /impermeabiliza/i.test(lead.service_type ?? "");
+  const service = mainService
+    ? ` para ${isWaterproofing ? "impermeabilização" : "limpeza"} de ${mainService}`
+    : "";
+  const loc = lead.location
+    ? ` ${LOCATION_PREPOSITION[lead.location] ?? "em"} ${lead.location}`
+    : "";
+  return [
+    `Olá ${firstName(lead.name)}, tudo bem?`,
+    `Aqui é o António da Kyro Clean Solutions. Recebemos o seu pedido de orçamento${service}${loc} e agradecemos a confiança.`,
+    `Temos disponibilidade para ______ ou para ______. Qual destes horários lhe fica melhor?`,
+    `Só preciso que me envie a morada completa e deixo já a reserva confirmada.`,
+  ].join("\n\n");
 }
 
 // O campo de telefone do quiz aceita indicativo estrangeiro ("com indicativo
