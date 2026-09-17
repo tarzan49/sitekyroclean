@@ -21,7 +21,14 @@ for (const { path } of routes) {
     check(!set.has(value), 'duplicate ' + label); set.add(value);
   }
   check(html.includes('<h1>' + e(model.h1) + '</h1>'), 'heading differs from model');
-  check(html.includes('<p data-landing-editorial>' + e(model.editorialIntro) + '</p>'), 'missing editorial content');
+  // O paragrafo editorial deixou de ser emitido no HTML em 3e4c04e (2026-09-15),
+  // por decisao do dono: as duas frases fixas do bloco de precos ("Estimativa
+  // confirmada..." e a introducao editorial) foram consideradas irrelevantes.
+  // Este audit continuou a exigi-lo e passou a falhar nas 12.912 paginas, ou
+  // seja, deixou de conseguir sinalizar qualquer regressao verdadeira nas
+  // restantes verificacoes. A verificacao sai daqui para acompanhar a decisao.
+  // model.editorialIntro continua a existir e a ser coberto por
+  // landingSeoRegression.test.ts, mas ja nao chega a nenhuma pagina.
   check(model.editorialIntro !== model.intro, 'editorial replaced by hero subtitle');
   check(model.faqs.length === 4, 'FAQ count');
   const canonical = [...html.matchAll(/<link[^>]*rel="canonical"[^>]*href="([^"]+)"/g)].map(x => x[1]);
