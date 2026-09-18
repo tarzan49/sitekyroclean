@@ -22,7 +22,7 @@ describe('all public contact links',()=>{
     expect(event.action).toBe('whatsapp_click');expect(event.utm_source).toBe('test');
     expect(JSON.stringify(event)).not.toContain('private');
   });
-  it('deduplicates legacy per-button tracking and records both channels',async()=>{
+  it('deduplicates per-button tracking and records both channels',async()=>{
     // Fora de producao so se envia com autorizacao explicita E identificadores
     // que nao sejam os reais. O `?kyro_debug=1` deixou de servir para isto: e
     // diagnostico, nao autorizacao.
@@ -33,15 +33,20 @@ describe('all public contact links',()=>{
     const m=await import('./quizTracking'); cleanup=m.initContactTracking();
     vi.mocked(window.gtag!).mockClear();
     document.body.innerHTML='<a href="tel:+351000000000">Call</a>';
-    const link=document.querySelector('a')!; link.onclick=()=>m.trackCallClickEvent('legacy');
+    const link=document.querySelector('a')!;
+    // Uma chamada manual deduplica **pelo evento**, que e o que o browser
+    // entrega ao handler. A bandeira temporal que existia aqui antes nao
+    // sobrevivia a um clique a serio — ver a suite "um clique, um evento".
+    let call: Event | undefined;
+    link.onclick=e=>{ call=e; m.trackCallClickEvent('legacy',undefined,e); };
     link.dispatchEvent(new MouseEvent('click',{bubbles:true,cancelable:true}));
-    // Um clique, um evento: o delegado global e o onclick do botao nao contam duas vezes.
+    expect(call).toBeDefined();
     expect(fetch).toHaveBeenCalledTimes(1); expect(window.gtag).toHaveBeenCalledTimes(1);
     // Nome do evento no GA4 e `phone_click`; na tabela `quiz_events` o mesmo
     // clique continua a chamar-se `call_click`.
     expect(window.gtag).toHaveBeenCalledWith('event','phone_click',expect.objectContaining({cta_location:'page:/limpeza-sofas'}));
     expect(JSON.parse(vi.mocked(fetch).mock.calls[0][1]!.body as string).action).toBe('call_click');
-    link.onclick=()=>m.trackWhatsAppClick('legacy');link.href='https://api.whatsapp.com/send?phone=000';
+    link.onclick=e=>m.trackWhatsAppClick('legacy',undefined,e);link.href='https://api.whatsapp.com/send?phone=000';
     link.dispatchEvent(new MouseEvent('click',{bubbles:true,cancelable:true}));
     expect(fetch).toHaveBeenCalledTimes(2);
     expect(window.gtag).toHaveBeenCalledWith('event','whatsapp_click',expect.anything());
@@ -65,5 +70,128 @@ describe('all public contact links',()=>{
     expect(JSON.parse(vi.mocked(fetch).mock.calls[0][1]!.body as string).utm_source).toBe('test');
     vi.stubGlobal('location',new URL('https://cleansolutions.com.pt/admin/panel'));m.trackCallClickEvent('admin');
     expect(fetch).toHaveBeenCalledTimes(1);
+  });
+});
+
+/**
+ * A combinacao real: delegado global no `document` + handler do proprio
+ * componente no mesmo `<a>`.
+ *
+ * Porque e que o teste acima ("deduplicates legacy per-button tracking") passava
+ * e a producao duplicava na mesma: a guarda antiga era reposta por
+ * `queueMicrotask`. Um `dispatchEvent` chamado a partir de codigo mantem a pilha
+ * de JavaScript ocupada durante todo o despacho, por isso o ponto de
+ * verificacao de microtarefas so corre no fim e a guarda aguenta. Num clique a
+ * serio o browser invoca cada listener a partir de codigo nativo, a pilha
+ * esvazia-se entre eles, as microtarefas correm, e a guarda ja esta desligada
+ * quando o handler do componente corre. Medido em producao a 2026-09-18:
+ * `phone_click` e `whatsapp_click` sairam dois de cada vez.
+ *
+ * Estes testes reproduzem essa reposicao de proposito (`await Promise.resolve()`
+ * entre o delegado e o handler) e passam o mesmo objeto de evento ao handler,
+ * que e o que o browser faz.
+ */
+describe('um clique, um evento', () => {
+  const productionTags = async () => {
+    vi.stubEnv('VITE_TRACKING_ALLOW_NON_PRODUCTION', 'true');
+    vi.stubEnv('VITE_GA4_MEASUREMENT_ID', 'G-TESTE00000');
+    vi.stubEnv('VITE_GOOGLE_ADS_ID', 'AW-000000000');
+    const { loadGoogleTags } = await import('./gtag');
+    loadGoogleTags();
+  };
+
+  it('delegado global + handler do componente contam uma vez so', async () => {
+    await productionTags();
+    const m = await import('./quizTracking');
+    cleanup = m.initContactTracking();
+    vi.mocked(window.gtag!).mockClear();
+    document.body.innerHTML = '<a href="tel:+351000000000" data-tracking-source="header_desktop">Ligar</a>';
+    const link = document.querySelector('a')!;
+
+    const event = new MouseEvent('click', { bubbles: true, cancelable: true });
+    link.dispatchEvent(event);
+    // O ponto de verificacao de microtarefas que a guarda antiga nao sobrevivia.
+    await Promise.resolve();
+    // O handler do componente, com o mesmo evento que o browser lhe entrega.
+    m.trackCallClickEvent('header_desktop', undefined, event);
+
+    expect(window.gtag).toHaveBeenCalledTimes(1);
+    expect(window.gtag).toHaveBeenCalledWith('event', 'phone_click', expect.objectContaining({ cta_location: 'header_desktop' }));
+    expect(fetch).toHaveBeenCalledTimes(1);
+    expect(JSON.parse(vi.mocked(fetch).mock.calls[0][1]!.body as string).action).toBe('call_click');
+  });
+
+  it('o mesmo para o WhatsApp', async () => {
+    await productionTags();
+    const m = await import('./quizTracking');
+    cleanup = m.initContactTracking();
+    vi.mocked(window.gtag!).mockClear();
+    document.body.innerHTML = '<a href="https://wa.me/351000000000" data-tracking-source="header_desktop"><span>Icon</span></a>';
+    const icon = document.querySelector('span')!;
+
+    const event = new MouseEvent('click', { bubbles: true, cancelable: true });
+    icon.dispatchEvent(event);
+    await Promise.resolve();
+    m.trackWhatsAppClick('header_desktop', undefined, event);
+
+    expect(window.gtag).toHaveBeenCalledTimes(1);
+    expect(window.gtag).toHaveBeenCalledWith('event', 'whatsapp_click', expect.objectContaining({ cta_location: 'header_desktop' }));
+  });
+
+  it('dois cliques distintos continuam a ser dois eventos', async () => {
+    await productionTags();
+    const m = await import('./quizTracking');
+    cleanup = m.initContactTracking();
+    vi.mocked(window.gtag!).mockClear();
+    document.body.innerHTML = '<a href="tel:+351000000000" data-tracking-source="sticky_bar">Ligar</a>';
+    const link = document.querySelector('a')!;
+
+    link.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }));
+    await Promise.resolve();
+    link.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }));
+
+    expect(window.gtag).toHaveBeenCalledTimes(2);
+    expect(fetch).toHaveBeenCalledTimes(2);
+  });
+
+  it('nao gera lead nem conversao de pedido confirmado', async () => {
+    await productionTags();
+    const m = await import('./quizTracking');
+    cleanup = m.initContactTracking();
+    vi.mocked(window.gtag!).mockClear();
+    document.body.innerHTML = '<a href="tel:+351000000000" data-tracking-source="header_mobile">Ligar</a>';
+    const link = document.querySelector('a')!;
+    const event = new MouseEvent('click', { bubbles: true, cancelable: true });
+    link.dispatchEvent(event);
+    await Promise.resolve();
+    m.trackCallClickEvent('header_mobile', undefined, event);
+
+    const names = vi.mocked(window.gtag!).mock.calls.map(call => String(call[1]));
+    expect(names).not.toContain('generate_lead');
+    expect(names).not.toContain('conversion');
+    expect(localStorage.getItem('kyro_fired_events_v1')).toBeNull();
+  });
+
+  /**
+   * A regra de `cta_location`, por ordem: o atributo declarado pelo componente,
+   * depois o contentor semantico, depois o caminho da pagina.
+   */
+  it('cta_location: atributo, depois header/footer, depois page:', async () => {
+    await productionTags();
+    const m = await import('./quizTracking');
+    cleanup = m.initContactTracking();
+    vi.mocked(window.gtag!).mockClear();
+    document.body.innerHTML = [
+      '<header><a id="h" href="tel:+351000000000">Ligar</a></header>',
+      '<footer><a id="f" href="tel:+351000000000">Ligar</a></footer>',
+      '<a id="p" href="tel:+351000000000">Ligar</a>',
+      '<header><a id="a" href="tel:+351000000000" data-tracking-source="header_desktop">Ligar</a></header>',
+    ].join('');
+    for (const id of ['h', 'f', 'p', 'a']) {
+      document.getElementById(id)!.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }));
+      await Promise.resolve();
+    }
+    const locations = vi.mocked(window.gtag!).mock.calls.map(call => (call[2] as { cta_location?: string }).cta_location);
+    expect(locations).toEqual(['header', 'footer', 'page:/limpeza-sofas', 'header_desktop']);
   });
 });

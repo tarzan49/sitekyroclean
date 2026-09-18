@@ -149,6 +149,25 @@ existe para que uma divisão futura do banner seja só uma alteração ao banner
 ambiente, e tag carregada. A tag não se desinstala: o consentimento é lido a
 cada envio, não só no arranque.
 
+**Nenhum componente mede um clique de contacto (2026-09-18).** O delegado
+global em `initContactTracking` (`src/lib/quizTracking.ts`) é o **único**
+responsável: todos os CTA de WhatsApp e telefone do site são `<a href>` e os
+componentes declaram só a origem em `data-tracking-source`. **Não voltar a pôr
+um `onClick={() => trackWhatsAppClick(...)}` numa âncora** — foi isso que fez
+cada clique contar duas vezes. A guarda que existia (`delegatedClick` reposta
+por `queueMicrotask`) parecia funcionar nos testes e falhava no browser: num
+clique a sério a pilha esvazia-se entre listeners, as microtarefas correm, e a
+guarda já estava desligada quando o `onClick` do React corria — por isso um
+`dispatchEvent` chamado a partir de código nunca reproduzia o defeito. A
+deduplicação passou a ser um `WeakSet` sobre o **próprio objeto do evento**, que
+não tem janela temporal e não junta dois cliques reais seguidos. Regra de
+`cta_location`, por esta ordem: `data-tracking-source`, depois `header`/`footer`
+pelo elemento que a contém, depois `page:<caminho>`. O vocabulário de origens
+(`header_desktop`, `sticky_bar`, …) fica como está: é o que o histórico de
+`quiz_events` tem escrito e o que o `QuizMetricsPanel.tsx` sabe rotular — e é
+por isso que a coluna `service` de um clique guarda a **origem**, não o serviço
+(convenção de 2026-08, o serviço real vai em `service_type`).
+
 **`?kyro_debug=1` é diagnóstico, não autorização.** Enviar fora de produção
 exige `VITE_TRACKING_ALLOW_NON_PRODUCTION=true` **e** identificadores que não
 sejam os reais. A segunda condição é a que impede o localhost de escrever na

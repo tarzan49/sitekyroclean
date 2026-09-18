@@ -1,5 +1,4 @@
 import { useEffect, lazy, Suspense } from "react";
-import { trackWhatsAppClick } from "@/lib/quizTracking";
 import { MessageCircle } from "lucide-react";
 import { WHATSAPP_BASE } from "@/constants/business";
 import HomeHeroTrust from "@/components/HomeHeroTrust";
@@ -125,7 +124,7 @@ const Hero = () => {
                   href={`${WHATSAPP_BASE}?text=${encodeURIComponent('Olá, gostaria de saber mais sobre os vossos serviços de higienização.')}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  onClick={() => trackWhatsAppClick('hero')}
+                  data-tracking-source="hero"
                   className={[
                     'relative flex items-center justify-center gap-2 w-full font-bold text-white touch-manipulation',
                     'h-[56px] md:h-[60px] px-4 md:px-8 text-base md:text-[17px]',

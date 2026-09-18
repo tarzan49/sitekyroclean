@@ -90,20 +90,27 @@ export interface ContactClickContext {
  * do lado da Google e do contexto extra (serviço, cidade) que o delegado global
  * não consegue adivinhar.
  */
-export function trackContactClick(channel: ContactChannel, context: ContactClickContext): void {
+export function trackContactClick(channel: ContactChannel, context: ContactClickContext, sourceEvent?: Event): void {
   // O envio para o GA4 acontece uma vez só, dentro de `quizTracking`, que é o
   // mesmo caminho por onde passam os cliques apanhados pelo delegado global.
   // Enviar também aqui contava cada clique com CTA identificado a dobrar.
-  if (channel === 'whatsapp') trackWhatsAppClick(context.cta_location, { service: context.service, city: context.city });
-  else trackCallClickEvent(context.cta_location, { service: context.service, city: context.city });
+  //
+  // Hoje nenhum componente chama isto: todos os CTA de contacto do site são
+  // `<a href>` e são medidos uma vez só pelo delegado global, que lê a origem
+  // de `data-tracking-source`. Fica como escape para um CTA que não seja uma
+  // âncora — e nesse caso **passa-se o evento original** (`e.nativeEvent`), que
+  // é a chave de deduplicação contra o delegado.
+  const ctx = { service: context.service, city: context.city };
+  if (channel === 'whatsapp') trackWhatsAppClick(context.cta_location, ctx, sourceEvent);
+  else trackCallClickEvent(context.cta_location, ctx, sourceEvent);
 }
 
 /**
  * Track phone call button clicks - sends to GA4
  * @deprecated Use `trackContactClick('phone', { cta_location })`.
  */
-export function trackCallClick(location: string) {
-  trackContactClick('phone', { cta_location: location });
+export function trackCallClick(location: string, sourceEvent?: Event) {
+  trackContactClick('phone', { cta_location: location }, sourceEvent);
 }
 
 // ============================================

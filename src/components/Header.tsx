@@ -15,8 +15,6 @@ import {
 } from "@/components/ui/hover-card";
 import QuizForm from "./QuizFormLazy";
 import { useQuizLocation, useQuizService } from "@/context/QuizLocationContext";
-import { trackWhatsAppClick } from "@/lib/quizTracking";
-import { trackCallClick } from "@/lib/analytics";
 import { WHATSAPP_BASE, PHONE_TEL } from "@/constants/business";
 import { useQuizLauncher } from "@/hooks/use-quiz-launcher";
 
@@ -144,7 +142,7 @@ const Header = () => {
         <div className="hidden md:flex items-center gap-2.5 shrink-0">
           <a
             href={`tel:${PHONE_TEL}`}
-            onClick={() => trackCallClick('header_desktop')}
+            data-tracking-source="header_desktop"
             className="border border-[#D1D5DB] bg-[#E5E7EB] text-[#111111] text-[10px] font-semibold tracking-[0.18em] uppercase px-4 py-2.5 hover:bg-[#DDE0E4] transition-colors flex items-center gap-2 whitespace-nowrap"
           >
             <Phone className="w-3.5 h-3.5 text-[#555555] flex-shrink-0" strokeWidth={2} />
@@ -160,7 +158,7 @@ const Header = () => {
             href={waHref}
             target="_blank"
             rel="noopener noreferrer"
-            onClick={() => trackWhatsAppClick('header_desktop')}
+            data-tracking-source="header_desktop"
             className="border border-[#25D366] bg-[#25D366] text-white text-[10px] font-semibold tracking-[0.18em] uppercase px-4 py-2.5 hover:bg-[#20BD5A] hover:border-[#20BD5A] transition-colors flex items-center gap-2 whitespace-nowrap"
           >
             <MessageCircle className="w-3.5 h-3.5 text-white flex-shrink-0" strokeWidth={2} />
@@ -173,7 +171,7 @@ const Header = () => {
           {/* Call icon only */}
           <a
             href={`tel:${PHONE_TEL}`}
-            onClick={() => trackCallClick('header_mobile')}
+            data-tracking-source="header_mobile"
             className="w-11 h-11 border border-[#D1D5DB] bg-[#E5E7EB] flex items-center justify-center touch-manipulation transition-colors active:bg-[#DDE0E4]"
             aria-label="Ligar"
           >
@@ -185,7 +183,7 @@ const Header = () => {
             href={waHref}
             target="_blank"
             rel="noopener noreferrer"
-            onClick={() => trackWhatsAppClick('header_mobile')}
+            data-tracking-source="header_mobile"
             className="w-11 h-11 border border-[#25D366] bg-[#25D366] flex items-center justify-center touch-manipulation transition-colors active:bg-[#20BD5A]"
             aria-label="WhatsApp"
           >
@@ -287,7 +285,7 @@ const Header = () => {
                   href={waHref}
                   target="_blank"
                   rel="noopener noreferrer"
-                  onClick={() => trackWhatsAppClick('header_mobile_menu')}
+                  data-tracking-source="header_mobile_menu"
                   className="w-full border border-[#25D366] text-[#111111] text-[10px] font-semibold tracking-[0.18em] uppercase py-3.5 hover:bg-[#25D366]/6 transition-colors flex items-center justify-center gap-2"
                 >
                   <MessageCircle className="w-3.5 h-3.5 text-[#25D366]" strokeWidth={2} />
@@ -295,7 +293,8 @@ const Header = () => {
                 </a>
                 <a
                   href={`tel:${PHONE_TEL}`}
-                  onClick={() => { setMobileMenuOpen(false); trackCallClick('header_mobile_menu'); }}
+                  data-tracking-source="header_mobile_menu"
+                  onClick={() => setMobileMenuOpen(false)}
                   className="w-full border border-[#111111]/25 text-[#111111] text-[10px] font-semibold tracking-[0.18em] uppercase py-3.5 hover:bg-[#111111]/4 transition-colors flex items-center justify-center gap-2"
                 >
                   <Phone className="w-3.5 h-3.5 text-[#111111]/70" strokeWidth={2} />
