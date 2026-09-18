@@ -86,6 +86,8 @@ select pg_temp.expect_no_read($$select * from public.lead_status_history$$, 'ano
 select pg_temp.expect_no_read($$select * from public.contact_log$$, 'anon a ler contact_log');
 select pg_temp.expect_no_read($$select * from public.conversion_exports$$, 'anon a ler conversion_exports');
 select pg_temp.expect_no_read($$select * from public.lead_notifications$$, 'anon a ler lead_notifications');
+select pg_temp.expect_no_read($$select * from public.admin_users$$, 'anon a ler admin_users');
+select pg_temp.expect_no_write($$insert into public.admin_users (user_id, email) values ('33333333-3333-3333-3333-333333333333', 'invasor@exemplo.invalid')$$, 'anon a fabricar-se administrador');
 
 select pg_temp.expect_no_write($$insert into public.leads (name, phone) values ('Falso','900')$$, 'anon a criar um lead');
 select pg_temp.expect_no_write($$update public.leads set funnel_status = 'COMPLETED'$$, 'anon a mudar estados');
@@ -106,21 +108,66 @@ select pg_temp.expect_no_read($$select * from public.error_logs$$, 'anon a ler e
 reset role;
 
 -- ════════════════════════════════════════════════════════════════════════════
--- UTILIZADOR AUTENTICADO SEM FUNÇÃO ADMINISTRATIVA
+-- AUTENTICADO SEM `admin_users` (2026-09-18: deixou de haver só "anon" e
+-- "painel" — uma sessão real do Supabase Auth já não basta sozinha)
 -- ════════════════════════════════════════════════════════════════════════════
 --
--- NOTA IMPORTANTE, e é uma limitação real e não um resultado: neste projeto
--- **não existe** o conceito de utilizador autenticado não-administrador. O
--- Supabase Auth só tem as contas criadas à mão para o painel, e as políticas
--- dizem `to authenticated`. Portanto, qualquer conta que exista no projeto é,
--- por construção, administradora.
+-- Mesmo `sub` que nenhuma linha em `admin_users` reclama. `is_admin()` (ver
+-- 20260918010000_admin_authorization.sql) devolve falso, e as políticas
+-- `to authenticated using (public.is_admin())` filtram tudo em silêncio —
+-- mesma regra do bloco anon: RLS não gera erro num SELECT.
+set role authenticated;
+set request.jwt.claims = '{"sub":"22222222-2222-2222-2222-222222222222","email":"sem-privilegio@kyroclean.invalid","role":"authenticated"}';
+
+select pg_temp.expect_no_read($$select * from public.leads$$, 'autenticado sem admin_users a ler leads');
+select pg_temp.expect_no_read($$select * from public.lead_attribution$$, 'autenticado sem admin_users a ler lead_attribution');
+select pg_temp.expect_no_read($$select * from public.lead_status_history$$, 'autenticado sem admin_users a ler lead_status_history');
+select pg_temp.expect_no_read($$select * from public.contact_log$$, 'autenticado sem admin_users a ler contact_log');
+select pg_temp.expect_no_read($$select * from public.conversion_exports$$, 'autenticado sem admin_users a ler conversion_exports');
+select pg_temp.expect_no_read($$select * from public.error_logs$$, 'autenticado sem admin_users a ler error_logs');
+select pg_temp.expect_no_read($$select * from public.quiz_events$$, 'autenticado sem admin_users a ler quiz_events');
+
+select pg_temp.expect_no_write($$update public.leads set funnel_status = 'QUALIFIED'$$, 'autenticado sem admin_users a mudar estados');
+select pg_temp.expect_no_write($$insert into public.contact_log (channel, note) values ('whatsapp', 'sem autorização')$$, 'autenticado sem admin_users a registar contacto');
+select pg_temp.expect_no_write($$insert into public.conversion_exports (lead_id, conversion_action, conversion_time) values ('L-PERM-1', 'Cliente', now())$$, 'autenticado sem admin_users a fabricar conversão');
+
+-- Nem sequer sabe que a tabela de administradores existe, e não se consegue
+-- promover a si próprio.
+select pg_temp.expect_no_read($$select * from public.admin_users$$, 'autenticado sem admin_users a ler admin_users');
+select pg_temp.expect_no_write($$insert into public.admin_users (user_id, email) values ('22222222-2222-2222-2222-222222222222', 'sem-privilegio@kyroclean.invalid')$$, 'autenticado a atribuir-se a si próprio admin_users');
+
+-- A própria função confirma que esta sessão não é admin.
+do $$
+begin
+  if public.is_admin() then
+    raise exception 'FALHA DE SEGURANCA: is_admin() devolveu true para uma sessao sem entrada em admin_users';
+  end if;
+end $$;
+
+reset role;
+
+-- ════════════════════════════════════════════════════════════════════════════
+-- ADMINISTRADOR AUTORIZADO
+-- ════════════════════════════════════════════════════════════════════════════
 --
--- O que este bloco prova é o que essa conta pode e não pode fazer. O que **não**
--- prova é isolamento entre contas, porque esse isolamento não existe. Está
--- registado no relatório como limitação, com a correção proposta (uma coluna de
--- papel e políticas que a leiam).
+-- Registo feito pela chave de serviço, exatamente como o dono faria no SQL
+-- Editor depois de aplicar a migração — nunca por uma sessão autenticada
+-- (confirmado acima: a política de admin_users não dá acesso nenhum a
+-- `authenticated`). É este registo que distingue este bloco do anterior.
+set role service_role;
+insert into public.admin_users (user_id, email, role)
+values ('11111111-1111-1111-1111-111111111111', 'admin@kyroclean.invalid', 'owner');
+reset role;
+
 set role authenticated;
 set request.jwt.claims = '{"sub":"11111111-1111-1111-1111-111111111111","email":"admin@kyroclean.invalid","role":"authenticated"}';
+
+do $$
+begin
+  if not public.is_admin() then
+    raise exception 'FALHA: is_admin() devolveu false para uma sessao registada em admin_users';
+  end if;
+end $$;
 
 select pg_temp.expect_rows($$select id from public.leads where lead_id = 'L-PERM-1'$$, 1, 'painel a ler o lead');
 select pg_temp.expect_rows($$select lead_id from public.lead_attribution$$, 1, 'painel a ler a atribuição');

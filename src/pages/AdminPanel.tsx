@@ -22,7 +22,7 @@ const TabFallback = () => (
 
 // ── Component ─────────────────────────────────────────────────────────────────
 const AdminPanel = () => {
-  const { isAuthed, loading: authLoading } = useAdminSession();
+  const { isAuthed, loading: authLoading, isAdmin, checkingAdmin } = useAdminSession();
   const [email, setEmail] = useState("");
   const [pwd, setPwd] = useState("");
   const [loginError, setLoginError] = useState<string | null>(null);
@@ -42,10 +42,37 @@ const AdminPanel = () => {
   // comparada em JS no browser, visível em texto simples no bundle público
   // do site (achado CRITICAL no audit de código). Cria o utilizador admin
   // em Supabase Dashboard → Authentication → Users → Add user.
-  if (authLoading) {
+  if (authLoading || (isAuthed && checkingAdmin)) {
     return (
       <div className="min-h-screen bg-[#12121e] flex items-center justify-center">
         <div className="w-8 h-8 border-2 border-gold border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  // Sessão válida mas sem entrada em `admin_users` (ver migration
+  // 20260918010000_admin_authorization.sql) — não é a mesma coisa que não
+  // estar autenticado. A fronteira real é o RLS: mesmo que este ecrã fosse
+  // contornado, is_admin() continua a bloquear select/insert/update/delete
+  // nas tabelas do painel.
+  if (isAuthed && !isAdmin) {
+    return (
+      <div className="min-h-screen bg-[#12121e] flex items-center justify-center p-4">
+        <div className="bg-[#13132B] border border-red-500/30 rounded-2xl p-8 w-full max-w-sm shadow-2xl text-center">
+          <div className="w-10 h-10 rounded-xl bg-red-500/10 border border-red-500/20 flex items-center justify-center mx-auto mb-4">
+            <Lock className="w-5 h-5 text-red-400" />
+          </div>
+          <h1 className="font-playfair text-white font-bold mb-2">Sem autorização</h1>
+          <p className="text-sm text-white/50 mb-6">
+            Esta conta está autenticada mas não tem acesso ao painel administrativo.
+          </p>
+          <button
+            onClick={() => supabase.auth.signOut()}
+            className="w-full bg-white/5 border border-white/10 text-white/70 font-medium py-3 rounded-xl hover:bg-white/10 transition-colors text-sm"
+          >
+            Sair
+          </button>
+        </div>
       </div>
     );
   }

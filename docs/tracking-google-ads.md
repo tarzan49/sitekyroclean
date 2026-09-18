@@ -244,9 +244,13 @@ transformava-se em perda do pedido quando o Resend recusava a primeira tentativa
 | Duplo clique | `submissionId` + browser | Mesmo `lead_id` nas duas |
 | Retry após timeout | `leadDelivery.test.ts` | Mesmo `lead_id` reutilizado |
 | Refresh depois do sucesso | `submissionId` | Identificador novo (é um pedido novo) |
-| Mesmo identificador repetido | `supabase/tests/10_permissions.sql` | Índice único rejeita o segundo lead |
-| Mesmo email repetido | idem | Trinco rejeita o segundo envio |
+| Mesmo identificador repetido (corrida real, servidor) | `supabase/functions/submit-lead/index.test.ts` | Devolve o `booking_id` **persistido**, não o do pedido que perdeu a corrida |
+| Conflito de unicidade sem linha correspondente por `lead_id` | idem | Nunca devolve sucesso — `resolveDuplicateLeadConflict` só confirma o que existe mesmo |
+| Mesmo identificador repetido (índice, base de dados) | `supabase/tests/10_permissions.sql` | Índice único rejeita o segundo lead |
+| Mesma **submissão** notificada 2× | idem | Trinco `(lead_id, channel)` rejeita o segundo envio — é por `lead_id`, não por email/telefone do cliente. Um pedido novo do mesmo cliente tem `lead_id` novo e nunca é bloqueado |
 | Mesma conversão exportada 2× | idem | Restrição única rejeita |
+| CRM falha, email tem sucesso | `leadDelivery.test.ts` | Pedido entregue (email), mas **sem** `generate_lead` — sem confirmação do CRM não há conversão |
+| CRM confirma (inserção nova ou duplicado reconhecido), email falha | idem | `generate_lead` dispara na mesma — a confirmação vem só do CRM |
 
 ### O que o "sucesso" mostrado ao cliente significa
 
@@ -258,6 +262,21 @@ fossem: se o canal do CRM falhar, o pedido chegou por email e **não existe na
 tabela `leads`** — não aparece em contagem nenhuma. O painel mostra um aviso
 vermelho com o número de falhas de entrega ao CRM nas últimas 24 horas,
 precisamente para esses números não serem lidos como completos.
+
+**`generate_lead` segue a mesma regra, agora imposta no código, não só no
+comentário — IMPLEMENTADO 2026-09-18:** `submitQuizLead` só chama
+`reportLead` quando `crmOk` é verdadeiro (inserção nova ou duplicado
+reconhecido pelo servidor). Antes disso, o código disparava sempre que "não
+falharam os dois canais" — incluía o caso de só o email ter tido sucesso, sem
+nenhum registo confirmado em `leads` para a conversão apontar.
+
+**Limite real que fica, documentado e não escondido:** se a resposta do canal
+CRM se perder na rede do browser mas o servidor tiver gravado a linha na
+mesma, essa tentativa em concreto não dispara `generate_lead` — o browser não
+tem confirmação, só o servidor tem. Só dispara se a pessoa tentar de novo
+(mesmo `lead_id`, reconhecido como duplicado). Se nunca tentar de novo, essa
+conversão real não é medida. É a mesma escolha que já existe no resto do
+projeto: preferir sub-contar a inventar uma conversão sem confirmação.
 
 **Uma falha de medição nunca trava o pedido:** `trackLeadEvent` corre dentro de
 um `try/catch` depois da entrega, e há testes que submetem com o `gtag` a lançar
@@ -281,15 +300,17 @@ separados.
 
 | Papel | Ação | Resultado |
 |---|---|---|
-| anónimo | ler `leads`, `lead_attribution`, `lead_status_history`, `contact_log`, `conversion_exports`, `lead_notifications` | negado |
-| anónimo | criar lead, mudar estado, mexer em receitas, fabricar qualificação ou conversão, reescrever atribuição, apagar leads | negado |
+| anónimo | ler `leads`, `lead_attribution`, `lead_status_history`, `contact_log`, `conversion_exports`, `lead_notifications`, `admin_users` | negado |
+| anónimo | criar lead, mudar estado, mexer em receitas, fabricar qualificação ou conversão, reescrever atribuição, apagar leads, inserir-se em `admin_users` | negado |
 | anónimo | inserir em `quiz_events` e `error_logs` | permitido (o site precisa) |
 | anónimo | ler `quiz_events` / `error_logs` de volta | negado |
-| painel (autenticado) | ler leads e atribuição | permitido |
-| painel | **reescrever ou apagar a atribuição** | negado |
-| painel | **reescrever ou apagar o histórico de estados** | negado |
-| painel | ler `lead_notifications` | negado |
-| painel | mudar estado, gravar valores, registar contacto, exportar conversão | permitido |
+| **autenticado, sem entrada em `admin_users`** | ler ou escrever qualquer tabela do painel (`leads`, `lead_attribution`, `contact_log`, `conversion_exports`, `error_logs`, `quiz_events`, `admin_users`) | **negado** — mesmo resultado que anónimo |
+| autenticado sem `admin_users` | inserir-se a si próprio em `admin_users` | negado |
+| **administrador** (autenticado + registo em `admin_users`) | ler leads e atribuição | permitido |
+| administrador | **reescrever ou apagar a atribuição** | negado |
+| administrador | **reescrever ou apagar o histórico de estados** | negado |
+| administrador | ler `lead_notifications` | negado |
+| administrador | mudar estado, gravar valores, registar contacto, exportar conversão | permitido |
 
 Além do RLS, há `revoke all … from anon` explícito em todas as tabelas novas: o
 Supabase concede por omissão a `anon` em tabelas novas do schema `public`, e sem
@@ -307,15 +328,31 @@ verifica que o valor gravado é o da sessão.
 `coalesce(new.created_by, actor)` em `conversion_exports`, ou seja aceitava o
 valor do browser quando ele vinha preenchido. Corrigido para sobrepor sempre.
 
-### Limitação real que fica
+### Autorização administrativa — IMPLEMENTADO · TESTADO LOCALMENTE (2026-09-18)
 
-**Não existe utilizador autenticado sem função administrativa.** As políticas
-dizem `to authenticated` e todas as contas do Supabase Auth são contas do
-painel. Logo, qualquer conta autenticada é administradora e o teste do
-"utilizador sem privilégios" não pode existir com o modelo atual.
+Até aqui não existia utilizador autenticado sem função administrativa: as
+políticas diziam `to authenticated` e todas as contas do Supabase Auth eram,
+por construção, administradoras.
 
-Correção proposta, para uma segunda fase: uma tabela `admin_users(user_id, role)`
-e políticas que leiam o papel em vez de aceitarem qualquer `authenticated`.
+Migração `20260918010000_admin_authorization.sql`: tabela `admin_users
+(user_id, email, role, created_at)`, sem nenhuma política para `anon` nem
+`authenticated` (só a chave de serviço lê ou escreve, no SQL Editor), e a
+função `is_admin()` (`security definer`, lê `request.jwt.claims` diretamente,
+mesmo padrão de `set_actor_from_jwt`) usada em todas as políticas do painel
+no lugar de `using (true)`. Não é multiempresa: só distingue quem administra
+a Kyro de quem não.
+
+`supabase/tests/10_permissions.sql` tem agora três blocos (anónimo,
+autenticado sem `admin_users`, administrador), não dois — ver
+`supabase/tests/README.md`.
+
+**Configurar o primeiro administrador é um passo manual, documentado, não
+automático:** não há promoção automática da primeira conta nem de todas as
+contas existentes — ver `docs/tracking-plano-de-publicacao.md`.
+
+**O que fica pendente de "validado em produção":** que a migração foi mesmo
+aplicada na base real e que o primeiro `admin_users` foi mesmo inserido — o
+harness local prova o mecanismo, não o estado da base remota.
 
 ### Segredos
 
@@ -402,6 +439,18 @@ diferentes e resolvem problemas diferentes:
 | Onde viveriam as credenciais | Secrets das Edge Functions do Supabase | idem |
 
 Em ambos os casos: nunca em `VITE_*`.
+
+**O nome da ação não chega para a API — só chega para o CSV.** O CSV de
+importação manual aceita o nome tal como está escrito no Google Ads
+(`VITE_GOOGLE_ADS_QUALIFIED_LEAD_ACTION` / `_CUSTOMER_CONVERSION_ACTION`,
+hoje pendentes do dono). A Data Manager API identifica a ação por **recurso**,
+não por nome: `customers/{id do cliente}/conversionActions/{ID numérico da
+ação}` — precisa do `customer_id` (`920-786-3494`, já em `CLAUDE.md`, sem os
+hífens no formato da API) e do **ID numérico** de cada ação de conversão
+(visível em Google Ads → Objetivos → Conversões → a ação → coluna ID, não o
+mesmo campo que o nome). Nenhum dos dois está recolhido; ficam para quando a
+Fase 2 for mesmo construída, documentados aqui para não se apresentar "o nome
+da ação" como configuração suficiente para a API.
 
 ---
 

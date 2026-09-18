@@ -15,7 +15,7 @@ import { submitQuizLead, type QuizLeadPayload } from './submissionService';
  * aqui as asserções de consentimento tornava os dois ilegíveis.
  */
 
-const mocks = vi.hoisted(() => ({ invokeCrm: vi.fn(), invokeEmail: vi.fn(), log: vi.fn() }));
+const mocks = vi.hoisted(() => ({ invokeCrm: vi.fn(), invokeEmail: vi.fn(), log: vi.fn(), trackLeadEvent: vi.fn() }));
 vi.mock('@/lib/quizTracking', () => ({ IS_PRODUCTION: true }));
 vi.mock('@/lib/supabase', () => ({
   isSupabaseConfigured: true,
@@ -26,6 +26,15 @@ vi.mock('@/lib/supabase', () => ({
 }));
 vi.mock('@/lib/recaptcha', () => ({ getRecaptchaTokenSafe: () => Promise.resolve('token-de-teste') }));
 vi.mock('@/lib/errorTracking', () => ({ logError: mocks.log }));
+// Só `trackLeadEvent` é substituído — `readGaClientId` continua a
+// implementação real, usada por `insertCrmLead` para a atribuição. Isolar
+// só `trackLeadEvent` deixa observar se `submitQuizLead` o chamou ou não sem
+// depender do estado de `tagsLoaded` de `gtag.ts` (que este ficheiro nunca
+// carrega, ao contrário de `gtag.test.ts`).
+vi.mock('@/lib/leadTracking', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/lib/leadTracking')>();
+  return { ...actual, trackLeadEvent: mocks.trackLeadEvent };
+});
 
 beforeEach(() => {
   sessionStorage.clear();
@@ -34,6 +43,7 @@ beforeEach(() => {
   mocks.invokeCrm.mockReset().mockResolvedValue({ data: { success: true, duplicate: false }, error: null });
   mocks.invokeEmail.mockReset().mockResolvedValue({ data: { success: true }, error: null });
   mocks.log.mockReset();
+  mocks.trackLeadEvent.mockReset().mockResolvedValue({ sent: true, duplicate: false, adsConversionSent: true, attribution: null });
   vi.stubGlobal('location', new URL('https://cleansolutions.com.pt/limpeza-sofas-lisboa?gclid=Cj0TESTE'));
 });
 afterEach(() => vi.unstubAllGlobals());
@@ -154,6 +164,38 @@ describe('idempotência do lado do cliente', () => {
     mocks.invokeCrm.mockResolvedValue({ data: { success: true, duplicate: true }, error: null });
     const result = await submitQuizLead(payload());
     expect(result).toMatchObject({ crmOk: true, duplicate: true });
+  });
+});
+
+/**
+ * `generate_lead` só pode sair depois de o CRM confirmar que a linha existe
+ * em `leads` — ver o comentário em `leadTracking.ts` sobre "só aqui que sai
+ * generate_lead... quando o servidor confirmou". Um pedido que só chegou por
+ * email não tem correspondência em `leads` para uma conversão apontar.
+ */
+describe('generate_lead depende da confirmação do CRM, não só de "não falharam os dois"', () => {
+  beforeEach(() => { localStorage.setItem('kyro_cookie_consent', 'accepted'); });
+
+  it('CRM falha e email tem sucesso: pedido entregue na mesma, mas sem generate_lead', async () => {
+    mocks.invokeCrm.mockResolvedValueOnce({ data: null, error: { message: 'crm indisponível' } });
+    const result = await submitQuizLead(payload());
+    expect(result).toMatchObject({ crmOk: false, emailOk: true });
+    expect(mocks.trackLeadEvent).not.toHaveBeenCalled();
+  });
+
+  it('CRM confirma: dispara generate_lead mesmo que o canal de email falhe', async () => {
+    mocks.invokeEmail.mockResolvedValueOnce({ data: null, error: { message: 'resend indisponível' } });
+    const result = await submitQuizLead(payload());
+    expect(result).toMatchObject({ crmOk: true, emailOk: false });
+    expect(mocks.trackLeadEvent).toHaveBeenCalledTimes(1);
+    expect(mocks.trackLeadEvent.mock.calls[0][0]).toMatchObject({ lead_id: result.leadId });
+  });
+
+  it('CRM reconhece duplicado: conta como confirmado e dispara generate_lead', async () => {
+    mocks.invokeCrm.mockResolvedValue({ data: { success: true, duplicate: true }, error: null });
+    const result = await submitQuizLead(payload());
+    expect(result).toMatchObject({ crmOk: true, duplicate: true });
+    expect(mocks.trackLeadEvent).toHaveBeenCalledTimes(1);
   });
 });
 

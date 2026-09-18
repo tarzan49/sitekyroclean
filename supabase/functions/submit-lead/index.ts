@@ -63,6 +63,35 @@ interface SubmitLeadRequest {
   attribution?: Record<string, unknown>;
 }
 
+interface LeadsTable {
+  select(columns: string): {
+    eq(column: string, value: string): { maybeSingle(): PromiseLike<{ data: { id: string; booking_id: string | null } | null }> };
+  };
+}
+
+/**
+ * Resolve um `23505` no insert de `leads`. O único índice único na tabela
+ * além da chave primária é `idx_leads_lead_id` (parcial, onde `lead_id is not
+ * null` — ver 20260918000000_marketing_attribution.sql), por isso este é o
+ * único conflito esperado. Ainda assim não se assume isso: volta a consultar
+ * por `lead_id` e só devolve uma linha persistida se ela existir mesmo. Um
+ * `23505` que não corresponda a nenhuma linha por `lead_id` não é a corrida
+ * esperada, e não pode ser apresentado ao cliente como "pedido recebido".
+ *
+ * Extraída à parte (em vez de inline no handler) para poder ser testada sem
+ * montar todo o `serve()` — ver index.test.ts.
+ */
+export async function resolveDuplicateLeadConflict(
+  leadsTable: LeadsTable,
+  leadId: string | undefined,
+  fallbackBookingId: string | null,
+): Promise<{ bookingId: string | null; leadId: string | null } | null> {
+  if (!leadId) return null;
+  const { data: existing } = await leadsTable.select("id, booking_id").eq("lead_id", leadId).maybeSingle();
+  if (!existing) return null;
+  return { bookingId: existing.booking_id ?? fallbackBookingId, leadId };
+}
+
 /**
  * Limpa a atribuição: só campos conhecidos, só texto, dentro do comprimento
  * máximo. `is_paid` é o único booleano e é derivado no cliente a partir de
@@ -93,7 +122,7 @@ function cleanLead(raw: Record<string, unknown>): Record<string, string> | null 
   return out;
 }
 
-serve(async (req: Request): Promise<Response> => {
+export async function handleRequest(req: Request): Promise<Response> {
   if (req.method === "OPTIONS") return handleCORS();
   if (!validateMethod(req, ["POST"])) {
     return createErrorResponse("Método não permitido", 405);
@@ -154,16 +183,13 @@ serve(async (req: Request): Promise<Response> => {
   // Isto não substitui o índice único em `leads.lead_id` — substitui o
   // *depender* dele. O select apanha o caso normal; o índice apanha a corrida
   // entre dois pedidos simultâneos, tratada mais abaixo no erro 23505.
-  if (lead.lead_id) {
-    const { data: existing } = await supabase
-      .from("leads").select("id, booking_id").eq("lead_id", lead.lead_id).maybeSingle();
-    if (existing) {
-      safeLog("info", "[submit-lead] Pedido repetido ignorado", { leadId: lead.lead_id });
-      return createSuccessResponse(
-        { bookingId: existing.booking_id ?? lead.booking_id ?? null, leadId: lead.lead_id, duplicate: true },
-        getRateLimitHeaders(limit.remaining, limit.resetAt),
-      );
-    }
+  const preCheck = await resolveDuplicateLeadConflict(supabase.from("leads") as unknown as LeadsTable, lead.lead_id, lead.booking_id ?? null);
+  if (preCheck) {
+    safeLog("info", "[submit-lead] Pedido repetido ignorado", { leadId: lead.lead_id });
+    return createSuccessResponse(
+      { bookingId: preCheck.bookingId, leadId: preCheck.leadId, duplicate: true },
+      getRateLimitHeaders(limit.remaining, limit.resetAt),
+    );
   }
 
   const { data: inserted, error } = await supabase.from("leads").insert({
@@ -180,13 +206,24 @@ serve(async (req: Request): Promise<Response> => {
   if (error) {
     // 23505 = violação de unicidade. Com dois pedidos a chegar ao mesmo tempo,
     // o select acima passa nos dois e é o índice que decide qual ganha. O
-    // perdedor não é um erro: é o mesmo pedido, já gravado.
+    // perdedor não é um erro: é o mesmo pedido, já gravado — mas só se
+    // confirma isso voltando a consultar por lead_id (resolveDuplicateLeadConflict),
+    // nunca confiando no booking_id que o próprio pedido perdedor trazia no
+    // corpo, que não é necessariamente o do pedido que ganhou a corrida.
     if (error.code === "23505") {
-      safeLog("info", "[submit-lead] Corrida de pedidos repetidos resolvida pelo índice", { leadId: lead.lead_id });
-      return createSuccessResponse(
-        { bookingId: lead.booking_id ?? null, leadId: lead.lead_id ?? null, duplicate: true },
-        getRateLimitHeaders(limit.remaining, limit.resetAt),
-      );
+      const resolved = await resolveDuplicateLeadConflict(supabase.from("leads") as unknown as LeadsTable, lead.lead_id, lead.booking_id ?? null);
+      if (resolved) {
+        safeLog("info", "[submit-lead] Corrida de pedidos repetidos resolvida pelo índice", { leadId: lead.lead_id });
+        return createSuccessResponse(
+          { bookingId: resolved.bookingId, leadId: resolved.leadId, duplicate: true },
+          getRateLimitHeaders(limit.remaining, limit.resetAt),
+        );
+      }
+      // Um 23505 sem linha correspondente por lead_id não é a corrida
+      // esperada — não se apresenta como sucesso um conflito que não se
+      // confirma (o pedido pode não ter sido gravado de todo).
+      safeLog("error", "[submit-lead] Conflito de unicidade nao correspondeu a um lead_id persistido", { leadId: lead.lead_id, message: error.message });
+      return createErrorResponse("Não foi possível registar o pedido", 500);
     }
     safeLog("error", "[submit-lead] Insert falhou", { message: error.message });
     return createErrorResponse("Não foi possível registar o pedido", 500);
@@ -224,4 +261,13 @@ serve(async (req: Request): Promise<Response> => {
     { bookingId: lead.booking_id ?? null, leadId: lead.lead_id ?? null, duplicate: false },
     getRateLimitHeaders(limit.remaining, limit.resetAt),
   );
-});
+}
+
+// `import.meta.main` só é verdadeiro quando este ficheiro corre como
+// programa principal (o runtime de Edge Functions do Supabase, ou
+// `deno run`) — nunca quando é importado, como faz `index.test.ts`. Sem
+// isto, importar o ficheiro para testar `resolveDuplicateLeadConflict`
+// arrancava sempre um servidor HTTP a sério.
+if (import.meta.main) {
+  serve(handleRequest);
+}

@@ -370,7 +370,17 @@ export async function submitQuizLead(payload: QuizLeadPayload): Promise<LeadDeli
     throw new Error('Both CRM insert and lead email submission failed');
   }
   persist();
-  await reportLead(payload, leadId);
+  // `generate_lead` só sai quando o CRM confirmou (inserção nova ou
+  // duplicado reconhecido — ambos deixam crmOk true): um pedido que só
+  // chegou por email não tem registo confirmado em `leads` para lhe
+  // corresponder, e reportar a conversão nesse caso fabricava um lead que o
+  // painel não consegue mostrar. Ver leadTracking.ts.
+  //
+  // Limite real que fica: se a resposta do canal CRM se perder no browser
+  // mas o servidor tiver gravado a linha na mesma, esta tentativa não
+  // reporta — só a próxima, se a pessoa tentar de novo (mesmo lead_id,
+  // reconhecido como duplicado). Prefere-se sub-contar a inventar.
+  if (crmOk) await reportLead(payload, leadId);
   // A partir daqui o pedido está entregue. Um pedido novo da mesma pessoa —
   // outro serviço, outra semana — recebe um identificador novo.
   clearSubmissionId();

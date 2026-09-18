@@ -207,15 +207,43 @@ data do pedido e receita por data do serviço.
 concede por omissão). A atribuição e o histórico são **só de leitura** para o
 painel — reescrevê-los permitia fabricar um bom resultado. `changed_by`,
 `logged_by` e `created_by` vêm de um trigger que lê o JWT; o que o browser
-mandar é ignorado. **Não existe autenticado sem privilégios neste projeto**:
-qualquer conta é administradora, e isso está por resolver.
+mandar é ignorado.
+
+**Autorização administrativa (resolvida em 2026-09-18).** Já não é verdade que
+qualquer conta autenticada seja administradora. Tabela `admin_users (user_id,
+email, role, created_at)` (migração `20260918010000_admin_authorization.sql`,
+depois da `20260918000000`) e função `is_admin()` (lê `request.jwt.claims`
+diretamente, mesmo padrão do trigger de autoria) usada em todas as políticas
+do painel no lugar de `using (true)`. Sem política nenhuma para `anon` nem
+`authenticated` na própria `admin_users` — só a chave de serviço, no SQL
+Editor, insere um administrador; não há promoção automática da primeira conta
+nem de todas as existentes. **Depois de aplicar a migração, o próprio dono
+fica sem acesso ao painel até correr o insert manual** — ver
+`docs/tracking-plano-de-publicacao.md`, passo B1c. `use-admin-session.ts`
+passou a expor `isAdmin` além de `isAuthed`; `AdminPanel.tsx` mostra um ecrã
+"Sem autorização" (não o painel, não um ecrã em branco) para uma sessão
+autenticada sem `admin_users`.
 
 **A migração `20260918000000_marketing_attribution.sql` aplica-se colando no SQL
 Editor** (sétima armadilha). Foi validada contra um Postgres em Docker:
 `supabase/tests/` corre a migração duas vezes (idempotência) e prova as
 permissões papel a papel. **O RLS não gera erro num `SELECT`** — filtra em
 silêncio e devolve zero; só a falta de `GRANT` gera erro. Um teste que espere
-exceção num `SELECT` dá falsos positivos.
+exceção num `SELECT` dá falsos positivos. Mesma validação feita para
+`20260918010000_admin_authorization.sql`.
+
+**Idempotência do `submit-lead` reforçada (2026-09-18).** No conflito `23505`
+do insert em `leads`, a função já não confia no `booking_id` do corpo do
+pedido perdedor — volta a consultar por `lead_id`
+(`resolveDuplicateLeadConflict`, testada em
+`supabase/functions/submit-lead/index.test.ts` com Deno) e só devolve sucesso
+se encontrar mesmo a linha persistida. Um conflito de unicidade sem linha
+correspondente por `lead_id` passa a erro 500, nunca "pedido recebido". Do
+lado do cliente, `generate_lead` (`submissionService.ts`) só dispara quando o
+CRM confirmou (`crmOk`) — um pedido que só chegou por email não tem registo
+em `leads` para a conversão apontar. Limite que fica, documentado: se a
+resposta do CRM se perder na rede mas o servidor tiver gravado a linha, essa
+tentativa não mede o lead — só a próxima, se a pessoa tentar de novo.
 
 **Falhas não ficam escondidas.** O fallback do `PGRST204` mantém a entrega mas
 **não** significa atribuição saudável: o cartão de Cobertura e os avisos do

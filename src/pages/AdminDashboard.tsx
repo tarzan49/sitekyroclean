@@ -237,7 +237,8 @@ const AdminDashboard = ({ embedded = false }: { embedded?: boolean }) => {
   // gate de password em texto simples no bundle (achado CRITICAL no audit
   // de código). Este componente só é montado dentro de AdminPanel.tsx, que
   // já faz o mesmo check; repete-se aqui como defesa em profundidade.
-  const { isAuthed: authed } = useAdminSession();
+  const { isAuthed, isAdmin, checkingAdmin } = useAdminSession();
+  const authed = isAuthed && (checkingAdmin || isAdmin);
 
   // Data
   const [leads, setLeads] = useState<Lead[]>([]);

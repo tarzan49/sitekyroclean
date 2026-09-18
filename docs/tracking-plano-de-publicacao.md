@@ -16,7 +16,9 @@ Nenhum destes pode ficar para depois.
 
 | # | O quê | Porquê é bloqueador | Estado |
 |---|---|---|---|
-| B1 | Migração aplicada no SQL Editor | Sem ela, `lead_id`, atribuição e histórico não existem | Validada em Docker, por aplicar |
+| B1 | Migração `20260918000000_marketing_attribution.sql` aplicada no SQL Editor | Sem ela, `lead_id`, atribuição e histórico não existem | Validada em Docker, por aplicar |
+| B1b | Migração `20260918010000_admin_authorization.sql` aplicada no SQL Editor, **depois** de B1 | Sem ela, qualquer conta autenticada continua a ser administradora | Validada em Docker (idempotente, permissões provadas), por aplicar |
+| B1c | Inserir o primeiro administrador em `admin_users` (ver secção 1, passo novo abaixo) | Sem isto, **ninguém** entra no painel depois de B1b — a própria conta do dono também precisa do registo | Por executar, depende do dono |
 | B2 | Edge Functions `submit-lead` e `send-lead-email` publicadas | Idempotência e atribuição vivem lá | Por publicar |
 | B3 | Variáveis de ambiente no Cloudflare Pages | O `.env` local não chega ao build | Por configurar |
 | B4 | Etiqueta da conversão principal (lead) | Sem ela não há conversão nenhuma no Ads | Depende do dono |
@@ -25,7 +27,7 @@ Nenhum destes pode ficar para depois.
 
 **Segunda fase**, explicitamente fora deste lançamento: automatização de custos
 (Google Ads API), importação offline por API (Data Manager API), confirmação
-automática de WhatsApp/chamadas, papéis de administração.
+automática de WhatsApp/chamadas.
 
 ---
 
@@ -38,13 +40,40 @@ A ordem importa. Cada passo assume o anterior.
 ```bash
 git status                 # a árvore tem de estar limpa
 git log -1 --oneline
-npm run lint && npx vitest run && npm run build
+npm run lint && npx tsc --noEmit && npx vitest run && npm run build
 ```
 
 Na base de dados, **antes de tocar em nada**:
 
 - Supabase → Database → Backups: confirmar que existe um backup de hoje.
   Se não existir, criar um manualmente e esperar que termine.
+- **Confirmar que o esquema de produção bate certo com o que o baseline local
+  assume** — um backup de hoje não prova isso, só prova que se pode voltar
+  atrás. `supabase/tests/00_baseline_remote_state.sql` é a reconstrução
+  conhecida do esquema; se a produção tiver uma coluna, índice ou política a
+  mais ou a menos que ele não sabe, a migração pode comportar-se de forma
+  diferente do que o Docker mostrou:
+
+```sql
+select table_name, column_name, data_type
+from information_schema.columns
+where table_schema = 'public'
+  and table_name in ('leads','quiz_events','error_logs')
+order by table_name, ordinal_position;
+```
+
+  Comparar à mão com as colunas que `00_baseline_remote_state.sql` declara
+  para essas três tabelas. Uma diferença não é necessariamente um problema,
+  mas é preciso saber que existe antes de colar a migração.
+
+- **Testar a versão *anterior* do frontend e das Edge Functions contra a base
+  já migrada**, antes de avançar para o deploy do frontend novo (passo 4).
+  Acrescentar tabelas e colunas não implica que as permissões e triggers
+  continuem compatíveis — depois de B1b em particular, uma conta autenticada
+  sem registo em `admin_users` deixa de conseguir ler `leads`, o que o código
+  atual (sem essa noção) não espera. Confirmar que o site público (submissão
+  do quiz) continua a funcionar contra a base migrada antes de trocar o
+  frontend.
 - Guardar as contagens atuais, para comparar depois:
 
 ```sql
@@ -56,7 +85,7 @@ select
 
 Anotar os três números.
 
-### 1. Migração (B1)
+### 1. Migrações (B1, B1b, B1c)
 
 Supabase → SQL Editor → colar `supabase/migrations/20260918000000_marketing_attribution.sql`
 inteiro → Run. **Nunca `supabase db push`.**
@@ -91,6 +120,21 @@ curl -s -X POST "$URL/rest/v1/quiz_events" \
   -H "apikey: $ANON" -H "Authorization: Bearer $ANON" \
   -H "Content-Type: application/json" -d '{}'
 ```
+
+**Em seguida, colar `supabase/migrations/20260918010000_admin_authorization.sql`
+inteiro → Run (B1b).** Confirma-se sozinha: qualquer conta autenticada que
+tente ler `leads` a seguir passa a ver zero linhas, incluindo a do dono —
+esperado, é o B1c a seguir que resolve isso, não um sintoma de falha.
+
+**Imediatamente a seguir, B1c — sem este passo ninguém entra no painel:**
+
+```sql
+insert into public.admin_users (user_id, email, role)
+select id, email, 'owner' from auth.users where email = 'o-email-da-conta-do-dono@...';
+```
+
+Confirmar com uma conta real (login em `/admin/panel`) que o painel volta a
+abrir antes de continuar para o passo 2.
 
 ### 2. Edge Functions (B2)
 
@@ -152,6 +196,10 @@ git push        # só depois de 1, 2 e 3
 - Os cartões operacionais batem certo com `select count(*) from leads`.
 - Mudar o estado de um lead de teste → aparece no histórico com o **email da
   sessão** como autor.
+- Login com a conta do dono (já em `admin_users` desde B1c) → painel normal.
+- Se houver uma segunda conta de teste sem registo em `admin_users`: login
+  com ela mostra o ecrã "Sem autorização", nunca o painel nem um ecrã em
+  branco.
 
 **Tags:** GA4 → Administrador → DebugView, com `?kyro_debug=1` no URL, confirmar
 `page_view`, `whatsapp_click` e `generate_lead`. Google Ads → Objetivos →
@@ -183,11 +231,20 @@ simplesmente por preencher. Desfazer a migração apagaria leads e histórico.
 | Painel a dar erro de tabela | Não é urgente. O site não depende disso | Não |
 | Eventos a mais no GA4 | Desligar a medição otimizada (passo 6). Não reverter código | Não |
 | Conversões erradas no Ads | Pausar a ação de conversão no Google Ads. Não reverter código | Não |
+| Ninguém entra no painel depois de B1b | Confirmar que B1c correu (`select * from public.admin_users`). Se a conta certa não estiver lá, inserir — não reverter a migração | Não |
+| Voltar ao código anterior (rollback do frontend, deploy Cloudflare) | Repor também a configuração de `page_view` compatível: se o passo 6 (GA4, B5) já tinha sido feito, **religar** "Alterações de página baseadas em eventos do histórico do navegador" — o código anterior não envia `page_view` próprio nenhum, e sem a medição otimizada a SPA ficava sem `page_view` nenhum em navegação | Não |
 
 **O que não fazer em rollback:** `drop table`, `drop column`, `truncate`, ou
-apagar linhas de `leads`/`lead_attribution`/`lead_status_history`. Se uma coluna
-nova estiver a causar problemas, o caminho é parar de a escrever no código, não
-apagá-la.
+apagar linhas de `leads`/`lead_attribution`/`lead_status_history`/`admin_users`.
+Se uma coluna nova estiver a causar problemas, o caminho é parar de a escrever
+no código, não apagá-la.
+
+**Reverter o frontend para antes de B1b não exige reverter `admin_users` nem
+as suas políticas** — mas só funciona sem sobressaltos se B1c já tiver
+corrido: o código anterior não sabe da distinção admin/autenticado, por isso
+uma conta sem registo em `admin_users` continua a ver zero linhas com o
+frontend antigo também, em vez de um erro. A correção nesse caso é sempre
+B1c (inserir o admin), nunca reverter a migração.
 
 **Se o código antigo voltar com a migração já aplicada:** funciona. O código
 antigo não conhece as colunas novas e não as escreve; os leads continuam a

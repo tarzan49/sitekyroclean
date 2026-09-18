@@ -12,12 +12,15 @@ docker run -d --name kyro-pg-validate -e POSTGRES_PASSWORD=validate -p 55433:543
 
 docker cp supabase/tests/00_baseline_remote_state.sql kyro-pg-validate:/tmp/
 docker cp supabase/migrations/20260918000000_marketing_attribution.sql kyro-pg-validate:/tmp/migration.sql
+docker cp supabase/migrations/20260918010000_admin_authorization.sql kyro-pg-validate:/tmp/migration2.sql
 docker cp supabase/tests/10_permissions.sql kyro-pg-validate:/tmp/
 
 docker exec kyro-pg-validate psql -U postgres -c "create database validate;"
 docker exec kyro-pg-validate psql -U postgres -d validate -v ON_ERROR_STOP=1 -q -f /tmp/00_baseline_remote_state.sql
 docker exec kyro-pg-validate psql -U postgres -d validate -v ON_ERROR_STOP=1 -q -f /tmp/migration.sql
 docker exec kyro-pg-validate psql -U postgres -d validate -v ON_ERROR_STOP=1 -q -f /tmp/migration.sql   # idempotência
+docker exec kyro-pg-validate psql -U postgres -d validate -v ON_ERROR_STOP=1 -q -f /tmp/migration2.sql
+docker exec kyro-pg-validate psql -U postgres -d validate -v ON_ERROR_STOP=1 -q -f /tmp/migration2.sql  # idempotência
 docker exec kyro-pg-validate psql -U postgres -d validate -v ON_ERROR_STOP=1 -f /tmp/10_permissions.sql
 
 docker rm -f kyro-pg-validate
@@ -38,10 +41,27 @@ Não é um dump da produção. Se a base remota tiver algo que não está aqui �
 índice, uma política, uma coluna acrescentada e esquecida — este teste não o
 sabe. É por isso que o plano de publicação manda tirar um backup antes.
 
-## Uma limitação que estes testes não conseguem tapar
+## Autorização administrativa (2026-09-18)
 
-O projeto **não tem** o conceito de utilizador autenticado sem função
-administrativa: as políticas dizem `to authenticated` e todas as contas do
-Supabase Auth são do painel. O bloco "utilizador autenticado" prova o que uma
-conta do painel pode e não pode fazer; não prova isolamento entre contas,
-porque esse isolamento não existe no modelo atual.
+Resolvida a limitação que esta secção descrevia até aqui. As políticas já não
+dizem `to authenticated`: dizem `to authenticated using (public.is_admin())`,
+e `is_admin()` lê a tabela `admin_users` (migração
+`20260918010000_admin_authorization.sql`). `10_permissions.sql` tem agora três
+blocos, não dois:
+
+1. **anónimo** — sem sessão nenhuma.
+2. **autenticado sem `admin_users`** — sessão real do Supabase Auth, mas sem
+   entrada na tabela de administradores. Prova que uma conta existir já não
+   chega: lê e escreve exatamente o mesmo que o anónimo em `leads`,
+   `lead_attribution`, `contact_log`, `conversion_exports`, etc., e não
+   consegue ler `admin_users` nem inserir-se lá a si própria.
+3. **administrador autorizado** — a mesma sessão do bloco anterior teria
+   passado a admin só por autenticar; aqui a distinção é o registo em
+   `admin_users`, feito pela chave de serviço antes do bloco correr, exatamente
+   como o dono faz no SQL Editor.
+
+O que continua por fora deste ficheiro, porque exige um Supabase real: a
+diferença entre isto e "validado em produção" — o harness prova o mecanismo
+(`set role` + `request.jwt.claims`, o que o PostgREST realmente usa), não que
+a base remota tenha a migração aplicada nem que o primeiro `admin_users` já
+esteja lá.
