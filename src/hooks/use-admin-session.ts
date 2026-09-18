@@ -7,7 +7,20 @@ import { supabase } from '@/integrations/supabase/client';
 // (`Functions: { [_ in never]: never }`). `.from()` ainda aceita qualquer
 // nome de tabela; `.rpc()` não, por isso este é o primeiro sítio do projeto a
 // precisar de um cast à mão em vez de regenerar o ficheiro inteiro.
-const callIsAdmin = supabase.rpc as unknown as (fn: 'is_admin') => Promise<{ data: boolean | null; error: { message: string } | null }>;
+//
+// Chamada como `supabase.rpc(fn)`, nunca extraída para uma referência solta
+// (`const x = supabase.rpc; x(...)`) — isso desliga o método do objeto
+// `supabase` a que pertence, e a própria biblioteca do Supabase falha a
+// meio com "undefined is not an object (evaluating 'this.rest')" porque
+// depende de `this` ser o cliente. Foi exatamente isto que partiu o painel
+// admin na primeira versão deste ficheiro.
+interface RpcCapableClient {
+  rpc(fn: 'is_admin'): Promise<{ data: boolean | null; error: { message: string } | null }>;
+}
+// Cast do objeto, não do método: `(supabase as RpcCapableClient).rpc(fn)`
+// continua a chamar `.rpc` por acesso a propriedade no `supabase` real — só
+// o tipo muda, o `this` no runtime é sempre o `supabase` verdadeiro.
+const callIsAdmin = (fn: 'is_admin') => (supabase as unknown as RpcCapableClient).rpc(fn);
 
 // Substitui o antigo gate de password client-side (uma string comparada em
 // JS, visível em texto simples no bundle público — achado CRITICAL no audit
