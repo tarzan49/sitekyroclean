@@ -43,15 +43,23 @@ it('sem sessão: não chama rpc, isAdmin fica falso', async () => {
 it("com sessão: chama rpc('is_admin') sem perder o `this`, reflete admin=true", async () => {
   mocks.client = fakeSupabaseClient({ user: { id: '1' } }, true);
   const { result } = renderHook(() => useAdminSession());
-  await waitFor(() => expect(result.current.checkingAdmin).toBe(false));
-  expect(result.current.isAuthed).toBe(true);
+  // `checkingAdmin` começa falso antes de a sessão carregar (ainda não há
+  // nada a verificar) — esperar só por isso apanhava esse estado inicial
+  // por engano. Tem de esperar pelos dois ao mesmo tempo: sessão carregada
+  // E verificação terminada.
+  await waitFor(() => {
+    expect(result.current.isAuthed).toBe(true);
+    expect(result.current.checkingAdmin).toBe(false);
+  });
   expect(result.current.isAdmin).toBe(true);
 });
 
 it('com sessão mas is_admin() devolve falso: isAdmin fica falso, isAuthed continua true', async () => {
   mocks.client = fakeSupabaseClient({ user: { id: '1' } }, false);
   const { result } = renderHook(() => useAdminSession());
-  await waitFor(() => expect(result.current.checkingAdmin).toBe(false));
-  expect(result.current.isAuthed).toBe(true);
+  await waitFor(() => {
+    expect(result.current.isAuthed).toBe(true);
+    expect(result.current.checkingAdmin).toBe(false);
+  });
   expect(result.current.isAdmin).toBe(false);
 });
