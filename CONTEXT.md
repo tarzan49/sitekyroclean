@@ -1,3 +1,7 @@
+## Pixel da Meta (20/09/2026)
+
+O Pixel da Meta `1083307767504397` é carregado por `src/lib/metaPixel.ts` apenas em produção e depois de consentimento para publicidade. `usePageTracking` envia `PageView` na entrada e nas mudanças de rota públicas da SPA, com deduplicação; páginas `/admin` ficam excluídas. Não inserir o snippet diretamente no `index.html`, porque isso contornaria o consentimento e duplicaria eventos.
+
 ## Desempenho mobile e entrada por HTML (13/09/2026)
 
 `GeneratedRoutePage` recebe `kyro-route-page`/`kyro-route-path` do prerender e só importa `generatedRouteIndex.ts` para navegação interna ou rotas sem metadados. Conserva o inventário e a precedência, sem milhares de elementos React Route. `LazyLandingServiceSections` mantém o hero independente do código das sete secções. `QuizFormLazy` só importa o formulário na primeira abertura, preservando o estado nas seguintes.

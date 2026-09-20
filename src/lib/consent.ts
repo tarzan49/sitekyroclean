@@ -16,6 +16,7 @@
  * separadas, que é outra decisão.
  */
 import { applyConsentMode, loadGoogleTags, updateConsent } from './gtag';
+import { loadMetaPixel } from './metaPixel';
 import { readConsent, readConsentDecision, writeConsent, writeDecision, type ConsentDecision, type ConsentStatus } from './consentStorage';
 
 export type { ConsentStatus, ConsentDecision };
@@ -41,6 +42,7 @@ export function setConsentDecision(decision: { analytics: boolean; ads: boolean 
   // inofensivo antes do carregamento porque fica na fila do `dataLayer` e é
   // lido assim que a biblioteca chega.
   if (decision.analytics || decision.ads) loadGoogleTags();
+  if (decision.ads) loadMetaPixel();
   updateConsent({ ...decision, decidedAt: null });
   window.dispatchEvent(new Event('kyro:consent-changed'));
 }
@@ -49,6 +51,7 @@ export function setConsent(status: 'accepted' | 'declined') {
   writeConsent(status);
   const decision = readConsentDecision();
   if (decision.analytics || decision.ads) loadGoogleTags();
+  if (decision.ads) loadMetaPixel();
   updateConsent(decision);
   window.dispatchEvent(new Event('kyro:consent-changed'));
 }
@@ -58,5 +61,6 @@ export function restoreConsent() {
   const stored = getConsent();
   const decision = readConsentDecision();
   applyConsentMode(decision.analytics || decision.ads);
+  if (decision.ads) loadMetaPixel();
   if (stored !== null) updateConsent(decision);
 }

@@ -33,6 +33,7 @@ function env(name: string): string | undefined {
  */
 export const PRODUCTION_GA4_ID = 'G-T45T5FBNC3';
 export const PRODUCTION_ADS_ID = 'AW-18457115875';
+export const PRODUCTION_META_PIXEL_ID = '1083307767504397';
 
 /**
  * Propriedade GA4. Não mudar sem mudar também a nota no `docs/tracking-google-ads.md`:
@@ -46,6 +47,9 @@ export const GA4_MEASUREMENT_ID = env('VITE_GA4_MEASUREMENT_ID') ?? PRODUCTION_G
  * de a conta deixar de ser usada.
  */
 export const GOOGLE_ADS_ID = env('VITE_GOOGLE_ADS_ID') ?? PRODUCTION_ADS_ID;
+
+/** Pixel da Meta usado para medição de campanhas, sempre sujeito a consentimento. */
+export const META_PIXEL_ID = env('VITE_META_PIXEL_ID') ?? PRODUCTION_META_PIXEL_ID;
 
 /**
  * Número de cliente do Google Ads: **920-786-3494**.
@@ -201,6 +205,13 @@ export function nonProductionSendingAllowed(): boolean {
 export function shouldSendToGoogle(): boolean {
   if (trackingEnv() === 'production') return true;
   return nonProductionSendingAllowed();
+}
+
+/** A mesma proteção de ambiente aplicada ao Pixel da Meta. */
+export function shouldSendToMeta(): boolean {
+  if (trackingEnv() === 'production') return true;
+  return env('VITE_TRACKING_ALLOW_NON_PRODUCTION') === 'true'
+    && META_PIXEL_ID !== PRODUCTION_META_PIXEL_ID;
 }
 
 /** Uma linha legível para o painel de saúde e para os relatórios de teste. */

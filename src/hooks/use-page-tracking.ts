@@ -3,6 +3,7 @@ import { useLocation } from 'react-router-dom';
 import { captureLeadAttribution } from '@/lib/leadAttribution';
 import { resetPageViewGuard, trackPageView } from '@/lib/analytics';
 import { isPublicTrackingPage, trackPageViewEvent } from '@/lib/quizTracking';
+import { resetMetaPageViewGuard, trackMetaPageView } from '@/lib/metaPixel';
 
 /**
  * Uma página vista, por mudança de rota.
@@ -38,6 +39,7 @@ export function usePageTracking(): void {
     if (!isPublicTrackingPage()) return;
     trackPageView(location.pathname);
     trackPageViewEvent(location.pathname);
+    trackMetaPageView(location.pathname);
   }, [location.pathname, location.search]);
 
   useEffect(() => {
@@ -47,6 +49,8 @@ export function usePageTracking(): void {
       resetPageViewGuard();
       trackPageView(window.location.pathname);
       trackPageViewEvent(window.location.pathname);
+      resetMetaPageViewGuard();
+      trackMetaPageView(window.location.pathname);
     };
     window.addEventListener('kyro:consent-changed', onConsentChanged);
     return () => window.removeEventListener('kyro:consent-changed', onConsentChanged);

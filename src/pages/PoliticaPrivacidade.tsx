@@ -37,8 +37,8 @@ const PoliticaPrivacidade = () => (
           <ul className="list-disc pl-5 space-y-1.5">
             <li><strong>Dados de contacto:</strong> nome, número de telemóvel e endereço de e-mail, fornecidos voluntariamente no formulário de orçamento.</li>
             <li><strong>Dados do pedido:</strong> tipo de serviço, localização e detalhes sobre os artigos a limpar, incluindo fotografias opcionais enviadas pelo utilizador.</li>
-            <li><strong>Dados de navegação:</strong> endereço IP, tipo de browser, páginas visitadas, duração da visita e comportamento de navegação, recolhidos automaticamente através do Google Analytics (GA4) mediante consentimento.</li>
-            <li><strong>Cookies:</strong> ficheiros de pequena dimensão guardados no seu dispositivo para garantir o funcionamento do site e, com o seu consentimento, para fins analíticos.</li>
+            <li><strong>Dados de navegação:</strong> endereço IP, tipo de browser, páginas visitadas, duração da visita e comportamento de navegação, recolhidos através do Google Analytics (GA4) e do Pixel da Meta mediante consentimento.</li>
+            <li><strong>Cookies:</strong> ficheiros de pequena dimensão guardados no seu dispositivo para garantir o funcionamento do site e, com o seu consentimento, para fins analíticos e publicitários.</li>
           </ul>
         </Section>
 
@@ -52,12 +52,15 @@ const PoliticaPrivacidade = () => (
           </ul>
         </Section>
 
-        <Section title="4. Google Analytics e cookies">
+        <Section title="4. Ferramentas de medição e cookies">
           <p>
             Este website utiliza o <strong>Google Analytics 4 (GA4)</strong> da Google LLC para recolher dados anónimos sobre o comportamento dos utilizadores. O GA4 utiliza cookies para identificar visitas únicas e analisar padrões de utilização.
           </p>
           <p>
             O GA4 só é ativado <strong>após o seu consentimento explícito</strong>. Caso recuse, nenhum dado analítico é enviado para o Google.
+          </p>
+          <p>
+            Utilizamos também o <strong>Pixel da Meta</strong>, fornecido pela Meta Platforms Ireland Limited, para medir visitas e campanhas publicitárias. Este Pixel só é carregado após o seu consentimento para publicidade.
           </p>
           <p>
             Utilizamos ainda cookies funcionais estritamente necessários para o correto funcionamento do site (por exemplo, guardar a sua preferência de consentimento). Estes não requerem consentimento.
@@ -82,6 +85,7 @@ const PoliticaPrivacidade = () => (
           </p>
           <ul className="list-disc pl-5 space-y-1.5">
             <li><strong>Google LLC</strong>: através do GA4, mediante consentimento, para análise de tráfego;</li>
+            <li><strong>Meta Platforms Ireland Limited</strong>: através do Pixel da Meta, mediante consentimento, para medição de visitas e campanhas;</li>
             <li><strong>Resend</strong>: plataforma utilizada para o envio de emails com os pedidos de orçamento de forma segura;</li>
             <li><strong>Localização opcional (BigDataCloud)</strong>: ao permitir a localização no navegador, as coordenadas atuais são enviadas diretamente ao BigDataCloud para sugerir a localidade do serviço. O fornecedor recebe também o endereço IP e usa estes sinais para melhorar os seus dados de geolocalização. Não guardamos as coordenadas no pedido, apenas a localidade confirmada. Pode recusar a localização e pesquisar manualmente. Consulte a <a href="https://www.bigdatacloud.com/privacy-policy" target="_blank" rel="noopener noreferrer" className="underline">política do fornecedor</a>.</li>
             <li><strong>Supabase</strong>: base de dados segura onde os pedidos são armazenados temporariamente para gestão interna.</li>
