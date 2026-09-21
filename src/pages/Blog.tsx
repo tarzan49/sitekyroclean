@@ -1,187 +1,46 @@
-﻿import { Link } from "react-router-dom";
-import { Clock, ArrowRight, ChevronRight, User } from "lucide-react";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
-import QuizButton from "@/components/QuizButton";
-import { getAllPosts } from "@/data/blogData";
-import { SITE_URL } from "@/constants/business";
-
-import { BLOG_IMAGES, DEFAULT_BLOG_IMAGE } from "@/constants/blogImages";
+import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
+import { ArrowRight, Search } from 'lucide-react';
+import Header from '@/components/Header';
+import Footer from '@/components/Footer';
+import ResourceNav from '@/components/ResourceNav';
+import ResourceHubHero from '@/components/ResourceHubHero';
+import { getAllPosts } from '@/data/blogData';
+import { RESOURCE_BLOG_TITLE, RESOURCE_BLOG_INTRO } from '@/data/resourceContent';
+import { SITE_URL } from '@/constants/business';
+import { BLOG_IMAGES, DEFAULT_BLOG_IMAGE } from '@/constants/blogImages';
 
 const posts = getAllPosts();
-
-const Blog = () => {
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@graph": [
-      {
-        "@type": "WebPage",
-        "@id": `${SITE_URL}/blog#webpage`,
-        "url": `${SITE_URL}/blog`,
-        "name": "Blog | Kyro Clean Solutions",
-        "inLanguage": "pt-PT",
-        "isPartOf": { "@id": `${SITE_URL}/#website` },
-        "publisher": { "@id": `${SITE_URL}/#business` },
-        "breadcrumb": { "@id": `${SITE_URL}/blog#breadcrumb` },
-      },
-      {
-        "@type": "Blog",
-        "@id": `${SITE_URL}/blog#blog`,
-        "name": "Blog Kyro Clean Solutions",
-        "description": "Dicas, guias e informação sobre limpeza profissional de sofás, colchões, tapetes e estofos.",
-        "url": `${SITE_URL}/blog`,
-        "inLanguage": "pt-PT",
-        "publisher": { "@id": `${SITE_URL}/#business` },
-        "blogPost": posts.map(p => ({
-          "@type": "BlogPosting",
-          "headline": p.title,
-          "url": `${SITE_URL}/blog/${p.slug}`,
-          "datePublished": p.publishDate,
-          "dateModified": p.updatedDate,
-          "author": { "@id": `${SITE_URL}/#business` },
-        })),
-      },
-      {
-        "@type": "BreadcrumbList",
-        "@id": `${SITE_URL}/blog#breadcrumb`,
-        "itemListElement": [
-          { "@type": "ListItem", "position": 1, "name": "Início", "item": `${SITE_URL}/` },
-          { "@type": "ListItem", "position": 2, "name": "Blog", "item": `${SITE_URL}/blog` },
-        ],
-      },
-    ],
-  };
-
-  const featured = posts[0];
-  const rest = posts.slice(1);
-
-  return (
-    <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
-
-      <Header />
-
-      <main className="bg-[#FDFDF9] min-h-screen">
-
-        {/* ── Hero ── */}
-        <section data-mobile-hero="text" className="bg-kyro-green text-white py-14 md:py-20">
-          <div className="container mx-auto px-4 max-w-4xl">
-            <nav className="flex items-center gap-1.5 text-sm text-white/80 mb-6">
-              <Link to="/" className="hover:text-gold transition-colors">Início</Link>
-              <ChevronRight className="w-3 h-3" />
-              <span className="text-white/80">Blog</span>
-            </nav>
-            <p className="text-sm font-bold tracking-[0.08em] uppercase mb-3" style={{ color: '#D4AF37' }}>
-              Kyro Clean Solutions
-            </p>
-            <h1 className="type-page-title font-playfair    text-white mb-4">
-              Blog Kyro Clean
-            </h1>
-            <p className="text-white/80 text-lg max-w-2xl">
-              Guias práticos, dicas de manutenção e tudo o que precisa saber sobre limpeza profissional de estofos.
-            </p>
-          </div>
-        </section>
-
-        {/* ── Posts ── */}
-        <section className="container mx-auto px-4 max-w-4xl py-12">
-
-          {/* Artigo em destaque */}
-          <Link
-            to={`/blog/${featured.slug}`}
-            className="block bg-white border border-[#E8E4DE] rounded-2xl shadow-sm hover:shadow-md hover:border-gold/25 transition-all group mb-8 overflow-hidden"
-          >
-            <div className="relative h-52 md:h-64 overflow-hidden">
-              <img
-                src={BLOG_IMAGES[featured.slug] ?? DEFAULT_BLOG_IMAGE}
-                alt={featured.heroAlt}
-                className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-500"
-                loading="lazy"
-                width={960}
-                height={540}
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
-              <span className="absolute top-4 left-4 text-sm font-bold text-gold bg-black/50 backdrop-blur-sm border border-gold/30 px-3 py-1 rounded-full">
-                {featured.category}
-              </span>
-            </div>
-            <div className="p-6 md:p-8">
-              <h2 className="type-section-title font-playfair    text-[#111111] mb-3 group-hover:text-gold transition-colors ">
-                {featured.title}
-              </h2>
-              <p className="text-[#505650] leading-relaxed mb-5 line-clamp-2">{featured.intro}</p>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3 text-sm text-[#505650]">
-                  <span className="flex items-center gap-1">
-                    <User className="w-3.5 h-3.5" />{featured.author}
-                  </span>
-                  <span className="flex items-center gap-1">
-                    <Clock className="w-3.5 h-3.5" />{featured.readingTime} min
-                  </span>
-                  <span>{new Date(featured.publishDate).toLocaleDateString("pt-PT", { day: "numeric", month: "long" })}</span>
-                </div>
-                <span className="flex items-center gap-1.5 text-base font-semibold text-gold group-hover:gap-2.5 transition-all">
-                  Ler artigo <ArrowRight className="w-4 h-4" />
-                </span>
-              </div>
-            </div>
-          </Link>
-
-          {/* Grid de artigos */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-            {rest.map(post => (
-              <Link
-                key={post.slug}
-                to={`/blog/${post.slug}`}
-                className="bg-white border border-[#E8E4DE] rounded-2xl shadow-sm hover:shadow-md hover:border-gold/25 transition-all group overflow-hidden flex flex-col"
-              >
-                <div className="relative h-40 overflow-hidden flex-shrink-0">
-                  <img
-                    src={BLOG_IMAGES[post.slug] ?? DEFAULT_BLOG_IMAGE}
-                    alt={post.heroAlt}
-                    className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-500"
-                    loading="lazy"
-                    width={640}
-                    height={360}
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/25 to-transparent" />
-                  <span className="absolute top-3 left-3 text-sm font-bold text-gold bg-black/50 backdrop-blur-sm border border-gold/30 px-2 py-0.5 rounded-full">
-                    {post.category}
-                  </span>
-                </div>
-                <div className="p-5 flex flex-col flex-1">
-                  <h2 className="type-section-title font-playfair   text-[#111111] mb-2 group-hover:text-gold transition-colors  flex-1">
-                    {post.title}
-                  </h2>
-                  <p className="text-[#505650] text-base leading-relaxed mb-4 line-clamp-2">{post.intro}</p>
-                  <div className="flex items-center justify-between mt-auto">
-                    <span className="flex items-center gap-1 text-sm text-[#505650]">
-                      <Clock className="w-3.5 h-3.5" /> {post.readingTime} min
-                    </span>
-                    <span className="flex items-center gap-1 text-sm font-semibold text-gold group-hover:gap-2 transition-all">
-                      Ler <ArrowRight className="w-3.5 h-3.5" />
-                    </span>
-                  </div>
-                </div>
-              </Link>
-            ))}
-          </div>
-        </section>
-
-        {/* ── CTA ── */}
-        <section className="bg-kyro-green py-14">
-          <div className="container mx-auto px-4 text-center max-w-xl">
-            <p className="text-gold text-base font-bold uppercase tracking-widest mb-3">Pronto para começar?</p>
-            <h2 className="type-section-title font-playfair  text-white  mb-4">Orçamento gratuito em 2 minutos</h2>
-            <p className="text-white/80 mb-8">Preço transparente, sem surpresas. Resultado garantido ou devolvemos o dinheiro.</p>
-            <QuizButton />
-          </div>
-        </section>
-      </main>
-
-      <Footer />
-    </>
-  );
-};
-
-export default Blog;
+const normalize = (text: string) => text.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+export default function Blog() {
+  const [query, setQuery] = useState('');
+  const [category, setCategory] = useState('Todos');
+  const visible = posts.filter(p => (category === 'Todos' || p.category === category) && normalize(`${p.title} ${p.intro}`).includes(normalize(query)));
+  useEffect(() => {
+    document.title = `${RESOURCE_BLOG_TITLE} | Kyro Clean`;
+    document.querySelector('meta[name="description"]')?.setAttribute('content', RESOURCE_BLOG_INTRO);
+    document.querySelector('meta[property="og:title"]')?.setAttribute('content', `${RESOURCE_BLOG_TITLE} | Kyro Clean`);
+    document.querySelector('meta[property="og:description"]')?.setAttribute('content', RESOURCE_BLOG_INTRO);
+    document.querySelector('link[rel="canonical"]')?.setAttribute('href', `${SITE_URL}/blog`);
+  }, []);
+  const schema = { '@context': 'https://schema.org', '@type': 'Blog', name: RESOURCE_BLOG_TITLE, url: `${SITE_URL}/blog`, blogPost: posts.map(p => ({ '@type': 'BlogPosting', headline: p.title, url: `${SITE_URL}/blog/${p.slug}`, datePublished: p.publishDate, dateModified: p.updatedDate })) };
+  return <><Header /><main className="bg-[#FDFDF9] min-h-screen">
+    <script type="application/ld+json" dangerouslySetInnerHTML={{__html:JSON.stringify(schema)}} />
+    <ResourceHubHero title={RESOURCE_BLOG_TITLE} description={RESOURCE_BLOG_INTRO} />
+    <ResourceNav afterHero />
+    <section className="max-w-6xl mx-auto px-5 py-8 sm:py-12" aria-label="Todos os guias">
+      <div className="grid sm:grid-cols-[minmax(0,1fr)_240px] gap-4 mb-6">
+        <label className="block text-sm text-[#435449]">Procurar um assunto<div className="relative mt-2"><Search className="absolute left-3 top-3.5 w-5 h-5" /><input value={query} onChange={e=>setQuery(e.target.value)} placeholder="Ex.: manchas, colchão, alcatifa" className="min-h-12 w-full border border-[#b7c5b7] bg-white rounded-sm pl-10 pr-3 text-base" /></div></label>
+        <label className="block text-sm text-[#435449]">Tema<select value={category} onChange={e=>setCategory(e.target.value)} className="mt-2 w-full min-h-12 px-3 border border-[#b7c5b7] rounded-sm bg-white text-base">{['Todos', ...new Set(posts.map(p=>p.category))].map(c=><option key={c}>{c}</option>)}</select></label>
+      </div>
+      <p role="status" className="text-sm text-[#505650] mb-5">{visible.length} de {posts.length} guias</p>
+      <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        {visible.map(post=><Link key={post.slug} to={`/blog/${post.slug}`} className="group rounded-lg overflow-hidden border border-[#dfe5df] bg-white flex flex-col">
+          <img src={BLOG_IMAGES[post.slug] ?? DEFAULT_BLOG_IMAGE} alt={post.heroAlt} width={640} height={360} loading="lazy" className="w-full aspect-video object-cover" />
+          <div className="p-5 flex flex-col flex-1"><p className="text-sm text-[#505650] mb-2">{post.category} · {post.readingTime} min</p><h2 className="type-card-title text-[#111111] mb-3 group-hover:underline">{post.title}</h2><p className="text-base text-[#505650] leading-relaxed mb-4">{post.intro}</p><span className="text-base font-semibold text-[#111111] flex gap-2 items-center mt-auto">Ler guia<ArrowRight className="w-4 h-4" /></span></div>
+        </Link>)}
+      </div>
+      {!visible.length && <div className="py-10"><p>Nenhum guia encontrado. Experimente outro assunto.</p><button onClick={()=>{setQuery('');setCategory('Todos');}} className="underline py-3 min-h-11">Ver todos os guias</button></div>}
+    </section>
+  </main><Footer /></>;
+}

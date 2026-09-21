@@ -1,3 +1,4 @@
+import { RESOURCE_BLOG_TITLE, RESOURCE_BLOG_INTRO, RESOURCE_FAQ_TITLE, RESOURCE_FAQ_INTRO, RESOURCE_FAQS, RESOURCE_GLOSSARY_TITLE, resourceGlossaryIntro, getResourceOffer, getResourceWhatsapp, RESOURCE_TRAVEL, getResourceCommercial, resourceHeroSubtitle } from '../src/data/resourceContent';
 import { getServiceExamples } from '../src/data/serviceExamples';
 import { generatedPageForPath } from '../src/data/generatedRouteIndex';
 import { commercialHeroSubtitle } from '../src/data/commercialHeroCopy';
@@ -166,6 +167,9 @@ function buildFaqSchema(faqs: { question: string; answer: string }[]) {
 // ─── Content HTML generators ───────────────────────────────────────────────
 
 interface PageContent {
+  resourceCommercial?: ReturnType<typeof getResourceCommercial>;
+  resourceOffer?: ReturnType<typeof getResourceOffer> & { whatsapp: string };
+
   // Migalha visível. O React já a mostra em todas as famílias de SEO
   // (PageBreadcrumb, e o CommercialHero monta-a sozinho a partir do serviço),
   // mas o HTML estático só a declarava em JSON-LD. O resultado media-se: os
@@ -219,7 +223,7 @@ interface PageContent {
    *  DirectoryGroup com título; isto é o equivalente no HTML estático. */
   linksHeading?: string;
   reviews?: { name: string; city?: string; text: string }[];
-  definitions?: { term: string; definition: string; example?: string }[];
+  definitions?: { id?: string; term: string; definition: string; example?: string; source?: {label: string; url: string}; serviceLink?: {label: string; to: string} }[];
 }
 
 function generatePageBody(c: PageContent, lang: 'pt' | 'en' = 'pt'): string {
@@ -250,6 +254,18 @@ function generatePageBody(c: PageContent, lang: 'pt' | 'en' = 'pt'): string {
   }
 
   html += `<p>${escHtml(c.intro)}</p>\n`;
+
+  if (c.resourceOffer) {
+    const offer = c.resourceOffer;
+    html += `<aside aria-label="Pedir avaliação e orçamento"><h2>${escHtml(offer.title)}</h2><p>${escHtml(offer.detail)}</p><a href="${escHtml(offer.whatsapp)}">${escHtml(offer.action)}</a><p><a href="${c.resourceCommercial ? '#precos' : escHtml(offer.href)}">${c.resourceCommercial ? 'Ver preços' : escHtml(offer.link)}</a></p><p>${escHtml(RESOURCE_TRAVEL)}</p><p>${escHtml(RESPONSE_PROMISE)}</p></aside>`;
+  }
+
+  if (c.resourceCommercial) {
+    const commercial = c.resourceCommercial;
+    html += `<p>${escHtml(commercial.priceLine)}</p><ul>${commercial.stats.map(stat => `<li>${escHtml(stat.value)} · ${escHtml(stat.label)}</li>`).join('')}</ul>`;
+    html += `<section id="precos"><h2>Preços e orçamento</h2><table><caption>Valores do serviço, deslocação à parte</caption><thead><tr><th>Artigo</th><th>Preço</th></tr></thead><tbody>${commercial.priceRows.map(row => `<tr><th>${escHtml(row.item)}</th><td>${escHtml(row.price)}</td></tr>`).join('')}</tbody></table><p>${escHtml(PRICE_PROMISE)}</p>${commercial.trustPoints.map(point => `<p>${escHtml([point.stat, point.titleGold, point.titleRest, point.desc].filter(Boolean).join(' '))}</p>`).join('')}</section>`;
+    html += `<section><h2>Nas palavras dos nossos clientes</h2>${commercial.reviews.map(review => `<blockquote><p>${escHtml(review.text)}</p><footer>${escHtml(review.name)}${review.city ? ` · ${escHtml(review.city)}` : ''}</footer></blockquote>`).join('')}</section>`;
+  }
 
   if (c.links?.length) {
     if (c.linksHeading) html += `<h2>${escHtml(c.linksHeading)}</h2>\n`;
@@ -343,7 +359,7 @@ function generatePageBody(c: PageContent, lang: 'pt' | 'en' = 'pt'): string {
     html += `<section><dl>\n`;
     for (const entry of c.definitions) {
       const example = entry.example ? `<dd>Exemplo: ${escHtml(entry.example)}</dd>` : '';
-      html += `<dt>${escHtml(entry.term)}</dt><dd>${escHtml(entry.definition)}</dd>${example}\n`;
+      html += `<dt${entry.id ? ` id="${escHtml(entry.id)}"` : ''}>${escHtml(entry.term)}</dt><dd>${escHtml(entry.definition)}${entry.source ? `<p><a href="${escHtml(entry.source.url)}">${escHtml(entry.source.label)}</a></p>` : ''}${entry.serviceLink ? `<p><a href="${escHtml(entry.serviceLink.to)}">${escHtml(entry.serviceLink.label)}</a></p>` : ''}</dd>${example}\n`;
     }
     html += `</dl></section>\n`;
   }
@@ -448,6 +464,7 @@ export function prerenderRoutes(outDir: string): number {
   const assetNames = fs.readdirSync(path.join(outDir, 'assets'));
   const heroServices = new Map<string, string>();
   const heroPages = new Map<string, string>();
+  for (const post of getAllPosts()) { heroServices.set(`/blog/${post.slug}`, post.relatedService.href.slice(1)); heroPages.set(`/blog/${post.slug}`, 'BlogPost'); }
   for (const material of getAllMaterials()) {
     heroServices.set(`/${material.slug}`, material.serviceSlug);
     heroPages.set(`/${material.slug}`, 'MaterialPage');
@@ -1202,11 +1219,12 @@ export function prerenderRoutes(outDir: string): number {
       },
       {
         path: '/blog',
-        title: 'Blog Limpeza de Estofos | Dicas, Guias e Preços | Kyro Clean',
-        desc: 'Artigos especializados sobre limpeza de sofás, tapetes e colchões. Dicas profissionais, guias de manutenção e preços reais.',
+        title: `${RESOURCE_BLOG_TITLE} | Kyro Clean`,
+        desc: RESOURCE_BLOG_INTRO,
         content: {
-          h1: 'Blog Kyro Clean Solutions',
-          intro: 'Artigos especializados sobre limpeza profissional de estofos. Dicas de manutenção, guias de preços, comparações de materiais e conselhos do técnico.',
+          h1: RESOURCE_BLOG_TITLE,
+          intro: RESOURCE_BLOG_INTRO,
+          resourceOffer: { ...getResourceOffer(), whatsapp: getResourceWhatsapp() },
           // A mesma lista que a página React desenha, pela mesma ordem e com os
           // mesmos campos que ela mostra em cada cartão. Sem isto o índice do
           // blog era um hub que não ligava a nenhum dos seus artigos.
@@ -1247,17 +1265,13 @@ export function prerenderRoutes(outDir: string): number {
       },
       {
         path: '/perguntas-frequentes-limpeza-estofos',
-        title: 'Perguntas Frequentes | Limpeza de Estofos | Kyro Clean Solutions',
-        desc: 'Respostas às perguntas mais comuns sobre limpeza profissional de sofás, colchões e tapetes. Preços, duração, materiais e mais.',
+        title: `${RESOURCE_FAQ_TITLE} | Kyro Clean`,
+        desc: RESOURCE_FAQ_INTRO,
         content: {
-          h1: 'Perguntas Frequentes sobre Limpeza de Estofos',
-          intro: 'Encontre respostas às dúvidas mais comuns sobre limpeza profissional de sofás, colchões, tapetes e cadeiras.',
-          faqs: faqs([
-            { q: 'Qual o preço da limpeza de sofá?', a: 'A limpeza de sofá começa a partir de 49€ para 1 lugar, 69€ para 2 lugares e 79€ para 3 lugares. Peça orçamento grátis.' },
-            { q: 'Fazem serviço ao domicílio?', a: 'Sim, todos os serviços são realizados ao domicílio. O técnico desloca-se até si com todo o equipamento.' },
-            { q: 'Quanto tempo demora o serviço?', a: 'Um sofá demora 1 a 3 horas. Um colchão 1 a 2 horas. O estofo fica seco em 3 a 6 horas.' },
-            { q: 'Os produtos são seguros para crianças e animais?', a: 'Sim. Usamos apenas produtos certificados, biodegradáveis e seguros para pessoas, crianças e animais domésticos.' },
-          ]),
+          h1: RESOURCE_FAQ_TITLE,
+          intro: RESOURCE_FAQ_INTRO,
+          faqs: RESOURCE_FAQS,
+          resourceOffer: { ...getResourceOffer(), whatsapp: getResourceWhatsapp() },
         },
       },
       {
@@ -1366,12 +1380,13 @@ export function prerenderRoutes(outDir: string): number {
       },
       {
         path: '/glossario-limpeza-estofos',
-        title: 'Glossário de Limpeza de Estofos | Termos Técnicos | Kyro Clean',
-        desc: 'Dicionário completo com termos técnicos de limpeza profissional de estofos. Saiba o que significa extração, impermeabilização e muito mais.',
+        title: `${RESOURCE_GLOSSARY_TITLE} | Kyro Clean`,
+        desc: resourceGlossaryIntro(glossaryTerms.length),
         content: {
-          h1: 'Glossário de Limpeza de Estofos',
-          intro: 'Dicionário com os principais termos técnicos de limpeza profissional de estofos. Perceba o que significam extração, higienização, impermeabilização e outros conceitos.',
-          definitions: glossaryTerms.map(entry => ({ term: entry.term, definition: entry.definition, example: entry.example })),
+          h1: RESOURCE_GLOSSARY_TITLE,
+          intro: resourceGlossaryIntro(glossaryTerms.length),
+          resourceOffer: { ...getResourceOffer(), whatsapp: getResourceWhatsapp() },
+          definitions: glossaryTerms,
         },
         extraSchemas: [{
           '@context': 'https://schema.org',
@@ -1508,9 +1523,12 @@ export function prerenderRoutes(outDir: string): number {
         post.metaDescription,
         {
           h1: post.title,
-          intro: post.intro,
+          intro: resourceHeroSubtitle(post),
+          resourceCommercial: getResourceCommercial(post),
+          resourceOffer: { ...getResourceOffer(post), whatsapp: getResourceWhatsapp(post) },
+          links: [{ href: post.relatedService.href, label: post.relatedService.label }, ...post.relatedPosts.map(slug => ({ href: `/blog/${slug}`, label: getAllPosts().find(p => p.slug === slug)?.title ?? slug }))],
           byline: { author: post.author, authorHref: `/autor/${DEFAULT_AUTHOR.slug}`, published: post.publishDate, updated: post.updatedDate, readingTime: post.readingTime },
-          articleSections: post.sections.map(s => ({ heading: s.heading, body: s.body, tip: s.tip })),
+          articleSections: [{ heading: 'O que precisa de saber', body: post.intro }, ...post.sections.map(s => ({ heading: s.heading, body: s.body, tip: s.tip }))],
           sources: postSources,
           faqs: post.faq?.map(f => ({ question: f.q, answer: f.a })),
         },

@@ -1,3 +1,9 @@
+## Recursos: Blog, FAQ e Glossário (21/09/2026)
+
+Os 26 artigos do Blog preservam URLs e passam a reutilizar o desenho comercial: `CommercialHero`, `ServicePriceSection`, `ServiceReviewsGrid`, guia com índice e quatro FAQ, e `ServicePackBanner`. O responsável rejeitou uma identidade editorial diferente das páginas de serviço. Manter verde/dourado canónicos, Avenir e WhatsApp principal. `ResourceHubHero`/`ResourceNav` ligam Blog, FAQ e Glossário; pesquisa nos 26 guias e nos 100 termos. Os 100 são termos na mesma página, não 100 páginas desaparecidas, confirmado pelo responsável.
+
+`resourceContent.ts` partilha condições, oferta/WhatsApp contextual, quatro FAQ do hub, factos comerciais e seleção das avaliações com o prerender. `blogData.ts` e `glossaryTerms.ts` foram revistos para retirar serviços, métodos universais e promessas não confirmadas, mantendo preços das tabelas, extras separados e os limites do revestimento. O glossário conserva os 100 IDs e o HTML inicial contém as mesmas definições, fontes e ligações. Não repor os textos antigos de recolha nacional de tapetes, entrega em 24–48h, devolução do dinheiro, diagnóstico de alergias ou temperaturas universais. Evidências e limites em `docs/resources-review-2026-09-21/README.md`; auditoria em `scripts/audit-resources.mjs`.
+
 ## Pixel da Meta (20/09/2026)
 
 O Pixel da Meta `1083307767504397` é carregado por `src/lib/metaPixel.ts` apenas em produção e depois de consentimento para publicidade. `usePageTracking` envia `PageView` na entrada e nas mudanças de rota públicas da SPA, com deduplicação; páginas `/admin` ficam excluídas. Não inserir o snippet diretamente no `index.html`, porque isso contornaria o consentimento e duplicaria eventos.

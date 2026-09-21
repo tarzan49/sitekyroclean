@@ -1,17 +1,25 @@
 import ServiceFAQ from "@/components/ServiceFAQ";
-import DirectoryGroup from "@/components/DirectoryGroup";
+import ResourceLeadCard from "@/components/ResourceLeadCard";
+import ResourceNav from "@/components/ResourceNav";
+import CommercialHero from '@/components/CommercialHero';
+import ServicePriceSection from '@/components/ServicePriceSection';
+import ServiceReviewsGrid from '@/components/ServiceReviewsGrid';
+import ServicePackBanner from '@/components/ServicePackBanner';
+import SectionHeader from '@/components/SectionHeader';
+import { QuizServiceProvider } from '@/context/QuizLocationContext';
+import { getResourceWhatsapp, resourceQuizService, resourceHeroSubtitle } from '@/data/resourceContent';
 import { useMemo, useEffect } from "react";
 import { useLocation, Link } from "react-router-dom";
-import { Clock, ArrowRight, ChevronRight, Calendar, User, Lightbulb } from "lucide-react";
+import { ArrowRight, Lightbulb } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import QuizButton from "@/components/QuizButton";
+
 import { getPostBySlug, getRelatedPosts } from "@/data/blogData";
 import { SITE_URL } from "@/constants/business";
 import { renderBlogBody } from "@/lib/blogMarkdown";
 import { getBlogSources } from "@/data/blogSources";
 import { DEFAULT_AUTHOR } from "@/data/authors";
-import { buildPersonNode } from "@/lib/seoSchema";
+import { clearPrerenderedFaqSchema, buildPersonNode } from "@/lib/seoSchema";
 
 import { BLOG_IMAGES, DEFAULT_BLOG_IMAGE } from "@/constants/blogImages";
 
@@ -21,6 +29,7 @@ const BlogPost = () => {
   const post = useMemo(() => getPostBySlug(slug), [slug]);
 
   useEffect(() => {
+    clearPrerenderedFaqSchema();
     if (!post) return;
     document.title = post.metaTitle;
     document.querySelector('meta[name="description"]')?.setAttribute("content", post.metaDescription);
@@ -45,11 +54,10 @@ const BlogPost = () => {
   }
 
   const related = getRelatedPosts(post.relatedPosts);
+  const serviceSlug = post.relatedService.href.slice(1);
   const heroImg = BLOG_IMAGES[post.slug] ?? DEFAULT_BLOG_IMAGE;
   const sources = getBlogSources(post.sources);
-  const formattedDate = new Date(post.publishDate).toLocaleDateString("pt-PT", {
-    day: "numeric", month: "long", year: "numeric",
-  });
+
 
   const pageUrl = `${SITE_URL}/blog/${post.slug}`;
 
@@ -103,76 +111,35 @@ const BlogPost = () => {
   };
 
   return (
-    <>
+    <QuizServiceProvider value={resourceQuizService[serviceSlug]}>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
 
       <Header />
 
       <main className="min-h-screen bg-[#FDFDF9]">
 
-        {/* ── Hero com imagem ── */}
-        <section data-mobile-hero="text" className="relative pt-24 pb-14 md:pb-20 overflow-hidden">
-          <div className="absolute inset-0" aria-hidden="true">
-            <img
-              src={heroImg}
-              alt={post.heroAlt}
-              className="w-full h-full object-cover"
-              loading="eager"
-              width={1280}
-              height={720}
-            />
+        <CommercialHero title={post.title} subtitle={resourceHeroSubtitle(post)} serviceSlug={serviceSlug}
+          breadcrumbs={[{label:'Início',to:'/'},{label:'Guias',to:'/blog'},{label:post.category}]}
+          whatsappHref={getResourceWhatsapp(post)} source={`blog-${post.slug}`} />
+        <ServicePriceSection serviceSlug={serviceSlug} />
+        <section className="py-12 md:py-16 bg-kyro-green" aria-label="Avaliações de clientes">
+          <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
+            <SectionHeader overline="Avaliações reais" heading="Nas palavras dos nossos" goldWord="clientes" light={false} subtitle="Transcrições de quem já recebeu a nossa equipa." />
+            <ServiceReviewsGrid serviceSlug={serviceSlug} seed={`blog-${post.slug}`} heading="" />
           </div>
-          <div
-            className="absolute inset-0"
-            style={{ background: "linear-gradient(to bottom, rgba(7,26,18,0.45) 0%, rgba(7,26,18,0.72) 45%, rgba(7,26,18,0.96) 100%)" }}
-          />
-
-          <div className="relative z-10 container mx-auto px-4 max-w-3xl">
-            {/* Breadcrumb */}
-            <nav className="flex items-center gap-1.5 text-sm text-white/80 mb-6">
-              <Link to="/" className="hover:text-gold transition-colors">Início</Link>
-              <ChevronRight className="w-3 h-3" />
-              <Link to="/blog" className="hover:text-gold transition-colors">Blog</Link>
-              <ChevronRight className="w-3 h-3" />
-              <span className="text-white/80 truncate max-w-[200px]">{post.title}</span>
-            </nav>
-
-            <span className="inline-block text-sm font-bold text-gold bg-gold/10 border border-gold/20 px-3 py-1 rounded-full mb-4">
-              {post.category}
-            </span>
-            <h1 className="type-page-title font-playfair    text-white mb-4 ">
-              {post.title}
-            </h1>
-            <p className="text-white/70 text-base md:text-lg leading-relaxed mb-6">{post.intro}</p>
-
-            {/* Meta bar */}
-            <div className="flex flex-wrap items-center gap-4 text-sm text-white/80">
-              <span className="flex items-center gap-1.5">
-                <User className="w-3.5 h-3.5" />
-                <Link to={`/autor/${DEFAULT_AUTHOR.slug}`} className="underline underline-offset-2 hover:text-gold transition-colors">
-                  {post.author}
-                </Link>
-              </span>
-              <span className="w-px h-3 bg-white/20" />
-              <span className="flex items-center gap-1.5">
-                <Calendar className="w-3.5 h-3.5" />
-                {formattedDate}
-              </span>
-              <span className="w-px h-3 bg-white/20" />
-              <span className="flex items-center gap-1.5">
-                <Clock className="w-3.5 h-3.5" />
-                {post.readingTime} min de leitura
-              </span>
-            </div>
-          </div>
-          <img src={heroImg} alt={post.heroAlt} width="720" height="540" loading="lazy" decoding="async" className="mx-5 mt-8 w-[calc(100%-2.5rem)] aspect-[4/3] object-cover rounded-xl md:hidden" />
         </section>
 
         {/* ── Conteúdo ── */}
-        <article className="container mx-auto px-4 max-w-3xl py-12">
-          <div className="space-y-10">
+        <article id="guia" className="container mx-auto px-5 max-w-4xl py-12 sm:py-16 scroll-mt-20">
+          <SectionHeader overline="Guia prático" heading="O que precisa de" goldWord="saber" subtitle={post.intro} />
+          <p className="text-sm text-[#505650] mb-7">Revisto a {new Date(post.updatedDate).toLocaleDateString('pt-PT')} · {post.readingTime} min de leitura · <Link to={`/autor/${DEFAULT_AUTHOR.slug}`} className="underline">{post.author}</Link></p>
+          <nav aria-label="Neste guia" className="mb-8 border-b border-[#dfe5df] pb-6">
+            <h2 className="text-base font-semibold text-[#173e2b] mb-3">Neste guia</h2>
+            <ol className="grid sm:grid-cols-2 gap-x-6 gap-y-1">{post.sections.map((section,i)=><li key={section.heading}><a href={`#passo-${i+1}`} className="flex gap-3 py-2 min-h-11 text-base text-[#435449] underline underline-offset-4"><span className="text-[#49664d]">{i+1}.</span>{section.heading}</a></li>)}</ol>
+          </nav>
+          <div className="space-y-9">
             {post.sections.map((section, i) => (
-              <div key={i}>
+              <section key={i} id={`passo-${i+1}`} className="scroll-mt-24">
                 <h2 className="type-article-title font-playfair    text-[#111111] mb-4">
                   {section.heading}
                 </h2>
@@ -188,7 +155,7 @@ const BlogPost = () => {
                     </p>
                   </div>
                 )}
-              </div>
+              </section>
             ))}
           </div>
 
@@ -196,8 +163,7 @@ const BlogPost = () => {
             <section className="mt-12 border-t border-neutral-200 pt-6">
               <h2 className="font-playfair text-xl text-[#111111] mb-3">Fontes</h2>
               <p className="text-sm text-[#505650] mb-4">
-                As afirmações sobre saúde deste artigo remetem para as fontes abaixo. Onde não
-                encontrámos fonte que sustentasse um número, retirámos o número.
+                Referências para os cuidados descritos neste guia.
               </p>
               <ol className="space-y-2 text-sm text-[#505650] list-decimal pl-5">
                 {sources.map(source => (
@@ -217,21 +183,11 @@ const BlogPost = () => {
             </section>
           )}
 
-          {/* CTA no meio */}
-          <div className="my-12 bg-kyro-green rounded-2xl p-8 text-center">
-            <p className="text-gold text-base font-bold uppercase tracking-widest mb-2">Kyro Clean Solutions</p>
-            <h3 className="type-card-title font-playfair  text-white  mb-3">
-              Precisa de ajuda profissional?
-            </h3>
-            <p className="text-white/80 text-base mb-6 max-w-md mx-auto">
-              Orçamento gratuito em 2 minutos. Deslocação a partir de 10€ na área do Porto.
-            </p>
-            <QuizButton />
-          </div>
+          <div className="my-10"><ResourceLeadCard post={post} /></div>
 
           {/* FAQ */}
           {post.faq.length > 0 && (
-            <ServiceFAQ faqs={post.faq.map(item => ({ question: item.q, answer: item.a }))} includeSchema={false} />
+            <ServiceFAQ faqs={post.faq.map(item => ({ question: item.q, answer: item.a }))} includeSchema={false} variant="light" />
           )}
 
           {/* Link serviço relacionado */}
@@ -246,13 +202,16 @@ const BlogPost = () => {
           </div>
         </article>
 
+        <ServicePackBanner packSlugs={[]} variant="dark" />
+        <ResourceNav afterHero />
+
         {/* Related reading follows the same collapsed navigation pattern. */}
         {related.length > 0 && (
           <section className="bg-[#F5F4F0] border-t border-[#E8E4DE] py-12">
             <div className="container mx-auto px-4 max-w-3xl">
-              <DirectoryGroup title="Artigos relacionados">
-                {related.map(p => <Link key={p.slug} to={`/blog/${p.slug}`}>{p.title}</Link>)}
-              </DirectoryGroup>
+              <h2 className="type-card-title mb-4">Continue a ler</h2><div className="grid gap-3">
+                {related.map(p => <Link key={p.slug} to={`/blog/${p.slug}`} className="flex items-center justify-between gap-4 py-3 border-b border-[#dfe5df] text-[#173e2b]">{p.title}<ArrowRight className="w-4 h-4" /></Link>)}
+              </div>
             </div>
           </section>
         )}
@@ -265,7 +224,7 @@ const BlogPost = () => {
       </main>
 
       <Footer />
-    </>
+    </QuizServiceProvider>
   );
 };
 

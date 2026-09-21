@@ -250,7 +250,7 @@ const SitemapMonitor = () => {
                     <p className="text-xs font-bold text-navy/60 uppercase tracking-widest">
                       {cachedUrls.length.toLocaleString("pt-PT")} URLs {activeRegion ? `· ${ADMIN_REGION_LABELS[activeRegion]}` : "geradas"}
                     </p>
-                    <span className="text-[10px] text-gray-400">a mostrar primeiras 100</span>
+                    <span className="text-[10px] text-gray-400">{cachedUrls.length > 100 ? "a mostrar primeiras 100" : "a mostrar todos os URLs"}</span>
                   </div>
                   <div className="max-h-72 overflow-y-auto space-y-0.5 pr-1">
                     {cachedUrls.slice(0, 100).map((url, i) => (

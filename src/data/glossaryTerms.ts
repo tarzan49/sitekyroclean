@@ -1,715 +1,920 @@
-/**
- * Os 16 termos do glossario de limpeza de estofos.
- *
- * Viviam dentro de src/pages/GlossarioEstofos.tsx, o que os tornava invisiveis
- * para o prerender: a pagina estatica de /glossario-limpeza-estofos tinha 1.200
- * caracteres de cabecalho e rodape e nenhuma definicao. Um crawler sem
- * JavaScript, motores generativos incluidos, nunca leu nenhum destes termos,
- * apesar de serem exatamente o tipo de conteudo que um assistente cita quando
- * lhe perguntam o que e extracao a vapor ou impermeabilizacao.
- *
- * Aqui, sao importaveis pela pagina React e por scripts/prerender.ts.
- */
+// 100 termos revistos em 21/09/2026; identificadores preservados para ligações existentes.
+// Fonte partilhada entre React, HTML inicial e DefinedTermSet.
 export interface GlossaryTerm {
   id: string;
   term: string;
   definition: string;
-  example: string;
+  example?: string;
+  source?: { label: string; url: string };
   serviceLink?: { label: string; to: string };
 }
-
 export const glossaryTerms: GlossaryTerm[] = [
   {
-    id: "higienizacao-vs-limpeza-vs-lavagem",
-    term: "Higienização vs Limpeza vs Lavagem",
-    definition: "No site Kyro Clean, limpeza e higienização referem-se à remoção de sujidade e resíduos das fibras. Lavagem descreve um processo de limpeza adequado ao material. Nenhum destes nomes inclui automaticamente tratamento anti-ácaros ou desbacterização: são extras opcionais, com objetivos e preços distintos, confirmados no orçamento.",
-    example: "Pode pedir limpeza do sofá e acrescentar anti-ácaros ou desbacterização; a equipa explica e confirma cada extra antes de marcar.",
-    serviceLink: { label: "Limpeza e Higienização de Sofás", to: "/limpeza-sofas" },
-  },
-  {
-    id: "impermeabilizacao-sofa",
-    term: "Impermeabilização de Sofá",
-    definition: "Tratamento aplicado após a limpeza que cria uma barreira protetora invisível nas fibras do tecido. Quando um líquido é derramado sobre um sofá impermeabilizado, fica na superfície em forma de gotas (efeito lotus) em vez de ser absorvido pelas fibras. Protege contra vinho, café, sumos, gordura e urina de animais. Existem duas versões: a Essencial (à base de água), com efeito de 1 a 2 anos, e a Premium (à base de diluente, mais resistente ao desgaste), com efeito até 10 anos.",
-    example: "Família com crianças pequenas impermeabiliza o sofá de microfibra após a limpeza. Quando o filho derrama sumo de laranja, basta limpar com um pano, sem mancha.",
-    serviceLink: { label: "Impermeabilização de Estofos", to: "/impermeabilizacao" },
-  },
-  {
-    id: "extracao-vapor-estofos",
-    term: "Extração a Vapor de Estofos",
-    definition: "Técnica profissional que combina injeção de água quente sob pressão com aspiração no mesmo movimento. A água quente solta a sujidade agarrada às fibras e a aspiração retira-a logo, juntamente com a maior parte da humidade, o que deixa o tecido apenas fresco ao toque. É a diferença essencial para um vaporizador doméstico, que injeta e não aspira. É o método de referência para estofos de tecido por chegar mais fundo do que uma limpeza de superfície. Remove pó, resíduos e alergénios acumulados; não é um procedimento de desinfeção nem um tratamento de saúde.",
-    example: "Sofá de microfibra com anos de uso em casa com cão: a água aspirada sai visivelmente escura, mostrando sujidade que estava dentro da fibra e não à superfície.",
-    serviceLink: { label: "Limpeza de Sofás por Extração", to: "/limpeza-sofas" },
-  },
-  {
-    id: "shampoo-estofos",
-    term: "Shampoo de Estofos",
-    definition: "Produto detergente específico para tecidos estofados, formulado para penetrar nas fibras e emulsionar sujidade orgânica (gordura, suor, manchas proteicas). É aplicado em espuma para minimizar a quantidade de água utilizada, fundamental para evitar a deformação das almofadas. Diferente do shampoo de tapetes, que é mais agressivo. Requer aspiração para remoção completa após aplicação.",
-    example: "Sofá de microfibra com manchas de suor no encosto e assento. Aplicação de shampoo de estofos em espuma, seguida de extração a vapor, remove a sujidade acumulada sem ensopar.",
-  },
-  {
-    id: "limpeza-seco-sofa",
-    term: "Limpeza a Seco de Sofá",
-    definition: "Método de limpeza que utiliza solventes ou compostos em pó (sem água ou com humidade mínima inferior a 5%) para dissolver e remover sujidade das fibras. Indicado para tecidos que não toleram humidade: alcântara, veludo de seda, alguns tipos de linho e estofos com enchimentos que deformam com água. O processo aplica o produto, deixa agir 10 a 15 minutos e aspira ou escova. O anti-ácaros não está incluído na limpeza a seco e pode ser avaliado como tratamento complementar opcional.",
-    example: "Sofá de alcântara creme com manchas de café. Limpeza a seco com solvente neutro: manchas removidas sem qualquer risco de marcas de humidade ou deformação do tecido.",
-    serviceLink: { label: "Limpeza Especializada por Material", to: "/limpeza-sofas" },
-  },
-  {
-    id: "tratamento-anti-acaros",
-    term: "Tratamento Anti-ácaros",
-    definition: "Aplicação opcional de produto acaricida depois da limpeza, com efeito residual nas fibras. É um extra escolhido e orçamentado à parte, nunca incluído por defeito na limpeza. Convém dizer o que é e o que não é: reduz a presença de ácaros na peça durante algum tempo, não é um tratamento de saúde nem elimina os alergénios que já estão na fibra, que só saem por remoção física. A revisão Cochrane que juntou 54 ensaios não encontrou diferença nos sintomas de asma entre quem aplicou medidas de redução de ácaros em casa e quem não aplicou. Se tem alergia ou asma, o tratamento é com o seu médico.",
-    example: "Família que pede limpeza do colchão e acrescenta o tratamento anti-ácaros como extra: o extra aparece identificado à parte no orçamento, com o objetivo e o preço próprios.",
-    serviceLink: { label: "Limpeza de Colchões com Anti-ácaros", to: "/limpeza-colchoes" },
-  },
-  {
-    id: "ph-neutro-tecidos",
-    term: "pH Neutro em Limpeza de Tecidos",
-    definition: "Os produtos de limpeza têm pH que vai de ácido (pH 0-6) a alcalino (pH 8-14), passando pelo neutro (pH 7). Tecidos delicados como seda, linho, alcântara e couro exigem produtos de pH neutro para não destruir as fibras ou alterar as cores. Produtos domésticos comuns (lixívia, vinagre, bicarbonato) têm pH extremo e são inadequados para estofos de qualidade.",
-    example: "Sofá de linho bege tratado com produto de pH alcalino fica com manchas amareladas. Tratado com produto de pH neutro profissional, as cores são preservadas.",
-  },
-  {
-    id: "tecido-microsuede",
-    term: "Tecido Microsuede (Microfibra de Camurça)",
-    definition: "Tecido sintético de alta densidade que imita a textura suave da camurça natural, mas com maior resistência e facilidade de manutenção. É composto por fibras de poliéster ultra-finas (menos de 1 dtex). Muito popular em sofás modernos (IKEA KIVIK, modelos Conforama). Resiste bem à limpeza a vapor mas é sensível a produtos alcalinos e ao calor excessivo que pode fundir as microfibras.",
-    example: "Sofá de microsuede cinza com manchas de café. Limpeza a vapor a temperatura moderada com produto neutro: resultado excelente, cor uniforme restaurada.",
-  },
-  {
-    id: "alcantara-sintetica-natural",
-    term: "Alcântara Sintética vs Natural",
-    definition: "Alcântara natural (também chamada Alcantara®) é uma marca registada italiana feita de poliéster e poliuretano, com textura ultra-macia. Alcântara sintética genérica é uma imitação de menor qualidade. Ambas exigem limpeza especializada: nunca vapor a alta pressão, nunca produtos com álcool. A limpeza a seco com escova profissional é a técnica preferida. O couro Alcantara® tem tratamento anti-mancha de fábrica que é parcialmente restaurável.",
-    example: "Sofá de alcântara sintética cinza-escuro com manchas de gordura. Limpeza a seco com produto específico e escova suave: manchas removidas sem alteração da textura.",
-    serviceLink: { label: "Limpeza de Sofás por Material", to: "/limpeza-sofas" },
-  },
-  {
-    id: "veludo-terciopelo-cuidados",
-    term: "Veludo e Terciopelo: Cuidados Especiais",
-    definition: "Veludo tem pelo curto e denso que cria reflexo luminoso característico. Terciopelo é um tipo de veludo com pelo mais longo. Ambos são extremamente sensíveis ao atrito: esfregar contra o pelo cria marcas permanentes e brilho irregular. A limpeza profissional usa escova de pelos macios na direção correta do pelo, seguida de extração controlada. Nunca usar vapor direto a alta pressão.",
-    example: "Sofá de veludo azul petróleo com marcas de uso no assento. Limpeza com escova especializada: as fibras ficam alinhadas e o aspeto premium é restaurado.",
-    serviceLink: { label: "Limpeza Especializada de Veludo", to: "/limpeza-sofas" },
-  },
-  {
-    id: "couro-pu-ecologico",
-    term: "Couro PU (Ecológico / Sintético)",
-    definition: "Couro PU (polyuretano) é um revestimento sintético que imita o couro genuíno a menor custo. É composto por uma base têxtil revestida de poliuretano. Principal fraqueza: o revestimento descasca com o tempo, especialmente em zonas de maior atrito. Não existe tratamento que reverta o descascamento avançado, mas a limpeza correta retarda o processo. Nunca usar vapor de alta pressão ou produtos com solventes.",
-    example: "Sofá de couro PU Conforama com início de descascamento nas costuras. Limpeza suave com produto específico e condicionador de PU: processo estabilizado e aspeto melhorado.",
-  },
-  {
-    id: "manchas-proteicas-oleosas",
-    term: "Manchas Proteicas vs Manchas Oleosas",
-    definition: "Dois tipos com tratamento completamente diferente. Manchas proteicas (sangue, leite, ovo, urina, vómito) são de origem orgânica e requerem tratamento enzimático: as enzimas quebram as proteínas para fácil remoção. Usar calor (vapor) antes do tratamento enzimático 'coze' a proteína e fixa a mancha permanentemente. Manchas oleosas (gordura, manteiga, maquilhagem) requerem desengordurante de base aquosa antes do vapor.",
-    example: "Mancha de sangue fresco: primeiro tratar com produto enzimático frio, depois vapor. Mancha de sangue seco tratada com vapor logo de início: impossível de remover completamente.",
-  },
-  {
-    id: "fungos-bolor-estofos",
-    term: "Fungos e Bolor em Estofos",
-    definition: "Fungos e bolor desenvolvem-se em estofos quando a humidade é superior a 60-70% e a temperatura favorável. Manifestam-se como manchas escuras ou esverdeadas, geralmente nas partes traseiras ou inferiores do sofá. Além do impacto estético, produzem esporos que causam problemas respiratórios. O tratamento inclui eliminação com produto fungicida específico seguido de vapor. Em Portugal, o clima húmido do Norte torna este problema comum.",
-    example: "Sofá encostado a parede exterior em apartamento no Porto com problemas de humidade. Manchas de bolor na parte traseira. Tratamento fungicida + vapor + recomendação de ventilação.",
-  },
-  {
-    id: "desodorizacao-estofos",
-    term: "Desodorização de Estofos",
-    definition: "Tratamento de odores persistentes (tabaco, animais, humidade, suor) que atua sobre a origem do cheiro em vez de o mascarar. Perfumar dá algumas horas; um produto enzimático decompõe a matéria orgânica que está a produzir o odor. O resultado depende de onde a origem está: se ficou no tecido e nas zonas acessíveis, a resposta costuma ser boa; se chegou ao enchimento ou à espuma interior, o cheiro pode persistir, e dizemos isso antes de começar em vez de prometer eliminação total.",
-    example: "Sofá de casa de fumador em que o odor do tecido melhora de forma clara, e onde se explica à partida que o que impregnou a espuma interior pode não sair todo.",
-    serviceLink: { label: "Limpeza e Desodorização", to: "/limpeza-sofas" },
-  },
-  {
-    id: "tapete-vs-alcatifa",
-    term: "Tapete vs Alcatifa: Diferença e Limpeza",
-    definition: "Tapete é uma peça solta com dimensões definidas que pode ser movida e transportada. Inclui tapetes de sala, quarto, persas, kilim e sisal. Alcatifa é um revestimento de piso fixo ou semi-fixo que cobre toda a área de uma divisão e não é removível sem intervenção. Do ponto de vista de limpeza, a distinção é técnica: tapetes avulsos podem ser limpos ao domicílio por extração a vapor ou recolhidos para lavagem nas instalações, acedendo ao anverso e reverso. Alcatifas são sempre tratadas no local por extração a vapor sem remoção. Tapetes e alcatifas são sempre sob orçamento, mediante a largura e o comprimento de cada peça ou área e a avaliação do seu estado.",
-    example: "Tapete persa de 6 m² na sala de jantar: tratado ao domicílio por extração. Alcatifa de quarto de 15 m²: limpa no local sem qualquer remoção, com equipamento profissional transportado pelo técnico.",
-    serviceLink: { label: "Limpeza de Tapetes e Alcatifas", to: "/limpeza-tapetes" },
-  },
-  {
-    id: "limpeza-estofos-exterior",
-    term: "Limpeza de Estofos de Exterior",
-    definition: "Sofás, cadeiras e espreguiçadeiras de exterior (terraço, jardim, piscina) têm tecidos específicos resistentes à humidade e UV (olefin, acrílico, textilene, sling). Estes materiais são mais resistentes à água mas acumulam algas, fungos, terra e gordura solar. A limpeza usa produtos adequados a tecidos outdoor e tem secagem média de 3 a 6 horas, dependendo da ventilação, do tecido e das condições do espaço. Em Portugal, a limpeza sazonal (primavera/outono) é recomendada.",
-    example: "Conjunto de garden lounge com cushions de olefin no Porto. Após inverno: manchas verdes de algas e terra. Limpeza com produto específico outdoor: resultado impecável para o verão.",
-    serviceLink: { label: "Limpeza de Tapetes e Exterior", to: "/limpeza-tapetes" },
-  },
-  {
-    id: "codigos-limpeza-tecido",
-    term: "Códigos de Limpeza do Tecido (W, S, WS, X)",
-    definition: "Letra impressa na etiqueta por baixo do sofá ou da cadeira que diz com o que é que aquele tecido pode ser limpo. W permite produtos à base de água. S só permite solvente, e água nele provoca manchas de água, halos castanhos e encolhimento. WS aceita os dois, e começa-se sempre pelo mais suave. X não aceita líquido nenhum: só aspiração e escovagem seca. É a informação mais importante e menos divulgada em português sobre limpeza de estofos, e é a razão pela qual um tutorial genérico da internet consegue estragar um sofá caro. Nós lemos a etiqueta antes de tocar na peça, e quando ela não existe ou está ilegível, fazemos um teste numa zona escondida.",
-    example: "Sofá de linho com etiqueta S limpo em casa com água e detergente: secou com manchas de água em forma de anel que não saem, porque o problema não é sujidade, é a fibra alterada.",
-    serviceLink: { label: "Limpeza de Sofás", to: "/limpeza-sofas" },
-  },
-  {
-    id: "browning-celulosico",
-    term: "Browning Celulósico (Manchas Castanhas Depois da Limpeza)",
-    definition: "Manchas acastanhadas que aparecem enquanto o estofo seca, sobretudo nas bordas e nas costuras. Não é sujidade que ficou: são taninos e lenhina das fibras vegetais da peça (algodão, linho, viscose, juta da base) que se dissolvem quando o tecido é molhado a mais, dissolvem-se mais ainda com produto alcalino, e migram para a superfície durante uma secagem lenta. Ou seja, é um defeito causado pela limpeza, não revelado por ela. Evita-se controlando a quantidade de água, usando produto pouco alcalino, fazendo enxaguamento ligeiramente ácido no fim e secando depressa com circulação de ar.",
-    example: "Sofá de algodão claro lavado com máquina doméstica de tapetes, muita água e pouca aspiração: no dia seguinte tinha riscas castanhas ao longo de todas as costuras.",
-    serviceLink: { label: "Limpeza de Sofás", to: "/limpeza-sofas" },
-  },
-  {
-    id: "wicking-sujidade-que-volta",
-    term: "Wicking (a Sujidade que Volta a Aparecer ao Secar)",
-    definition: "Mancha que sai durante a limpeza e reaparece horas depois, no mesmo sítio. Acontece porque a sujidade estava mais funda do que a limpeza chegou, na espuma do assento ou na base da alcatifa, e a água que ficou lá dentro sobe por capilaridade à medida que evapora, trazendo o resíduo outra vez à superfície. É o motivo pelo qual uma mancha de urina ou de refrigerante parece resolvida e volta no dia seguinte. A solução não é repetir a limpeza por cima: é extrair o resíduo em profundidade e secar depressa, para a água não ter tempo de fazer a viagem de volta.",
-    example: "Mancha de sumo numa alcatifa que desapareceu à vista durante a limpeza e voltou como um círculo amarelado 12 horas depois, já com o tapete seco.",
-    serviceLink: { label: "Limpeza de Alcatifas", to: "/limpeza-alcatifas" },
-  },
-  {
-    id: "sobremolhagem",
-    term: "Sobremolhagem (Over-wetting)",
-    definition: "Pôr no estofo mais água do que se consegue tirar. É o erro mais comum de quem limpa em casa com máquina de tapetes ou vaporizador, e a causa direta de quase tudo o que corre mal a seguir: manchas castanhas, sujidade que volta ao secar, cheiro a mofo, e nos piores casos bolor dentro da espuma, que já não se resolve limpando. Uma limpeza profissional bem feita deixa o tecido levemente húmido ao toque, nunca encharcado, porque a aspiração retira a maior parte da água no mesmo movimento em que ela entra.",
-    example: "Colchão tratado em casa com vaporizador sem aspiração: seco ao toque à superfície, mas com humidade retida na espuma que deu cheiro a mofo passados três dias.",
-    serviceLink: { label: "Limpeza de Colchões", to: "/limpeza-colchoes" },
-  },
-  {
-    id: "encolhimento-la",
-    term: "Encolhimento de Lã",
-    definition: "A lã encolhe de forma permanente quando é lavada com água quente ou seca com calor direto, porque as escamas da fibra se abrem, prendem umas nas outras e não voltam a soltar-se. Num tapete, o efeito vê-se nas ondulações que aparecem e nas medidas que deixam de bater certo com o sítio onde ele estava. É irreversível: não há limpeza posterior que o desfaça. Por isso um tapete de lã ou um persa é sempre tratado com água morna ou fria, secagem estendido em plano e à sombra, nunca pendurado nem ao sol.",
-    example: "Tapete de lã de 2x3 metros lavado com água quente numa lavagem improvisada: ficou com 1,85x2,80 e com o centro ondulado, sem forma de recuperar.",
-    serviceLink: { label: "Limpeza de Tapetes", to: "/limpeza-tapetes" },
-  },
-  {
-    id: "teste-solidez-cor",
-    term: "Teste de Solidez da Cor",
-    definition: "Teste feito antes de limpar, numa zona escondida da peça (costas, baixo do assento, canto do tapete), humedecendo com o produto que vai ser usado e pressionando com um pano branco. Se o pano ficar com cor, o corante não é estável e o método tem de mudar, sob pena de as cores migrarem umas para as outras durante a secagem. É obrigatório em tapetes de cores fortes, sobretudo vermelhos e azuis de fibras naturais, e em tecidos com padrão contrastante.",
-    example: "Tapete kilim com vermelho e creme: no teste o pano branco saiu rosado, portanto a peça foi tratada com água fria e secagem acelerada para o corante não correr.",
-    serviceLink: { label: "Limpeza de Tapetes", to: "/limpeza-tapetes" },
-  },
-  {
-    id: "pre-tratamento",
-    term: "Pré-tratamento",
-    definition: "Aplicação de produto específico sobre as zonas sujas ou manchadas antes da limpeza geral, deixando-o atuar alguns minutos. Serve para soltar a sujidade da fibra antes da extração, em vez de a arrastar à força. É o que separa uma limpeza que remove manchas de uma limpeza que só refresca o aspeto. O produto varia com o tipo de sujidade: enzimático para matéria orgânica, alcalino suave para gordura, oxidante para corantes.",
-    example: "Sofá com aro de gordura no apoio de braço: sem pré-tratamento a extração passa por cima e a marca fica; com pré-tratamento e alguns minutos de espera, sai na primeira passagem.",
-    serviceLink: { label: "Limpeza de Sofás", to: "/limpeza-sofas" },
-  },
-  {
-    id: "tempo-de-atuacao",
-    term: "Tempo de Atuação (Dwell Time)",
-    definition: "Minutos que um produto precisa de ficar sobre a mancha antes de ser extraído. É a variável que mais resultados dá e a que mais se ignora: o mesmo produto, aplicado e aspirado logo a seguir, faz metade do trabalho. Produtos enzimáticos precisam de mais tempo do que os outros porque as enzimas têm de digerir a matéria orgânica, e param de funcionar se a zona secar. Tempo a mais também tem riscos, sobretudo com produtos alcalinos em fibras naturais.",
-    example: "Produto enzimático numa mancha de urina em colchão: aplicado e aspirado ao fim de um minuto, o cheiro volta; deixado a atuar e mantido húmido, o odor desaparece.",
-    serviceLink: { label: "Limpeza de Colchões", to: "/limpeza-colchoes" },
-  },
-  {
-    id: "tratamento-enzimatico",
-    term: "Tratamento Enzimático",
-    definition: "Produto com enzimas que decompõem matéria orgânica (proteínas, gorduras, resíduos de urina) em vez de a tentar dissolver. É o único método que resolve odores de origem orgânica em profundidade, porque o cheiro não vem da mancha visível mas dos compostos que ficaram na fibra e na espuma. Exige que a zona se mantenha húmida durante o tempo de atuação e não funciona bem depois de a zona ter sido tratada com lixívia ou produtos muito alcalinos, que desnaturam as enzimas.",
-    example: "Almofada de sofá onde o cão urinou repetidamente: limpeza normal tira a mancha e o cheiro volta com o calor; tratamento enzimático resolve a origem.",
-    serviceLink: { label: "Limpeza de Sofás", to: "/limpeza-sofas" },
-  },
-  {
-    id: "acido-urico",
-    term: "Ácido Úrico (Porque o Cheiro a Urina Volta)",
-    definition: "Componente da urina que cristaliza ao secar e deixa de ser solúvel em água. É por isso que uma mancha de urina parece resolvida depois de limpa com água e detergente, e o cheiro regressa sempre que o ambiente aquece ou a humidade sobe: os cristais reativam. Água, vinagre e bicarbonato mascaram o odor durante algum tempo mas não removem os cristais. Só um produto enzimático os decompõe, e em estofo tem de chegar à espuma, não apenas ao tecido.",
-    example: "Colchão com marca antiga de xixi de criança, sem cheiro no inverno, que volta a cheirar assim que chega o calor e a humidade sobe.",
-    serviceLink: { label: "Limpeza de Colchões", to: "/limpeza-colchoes" },
-  },
-  {
-    id: "agente-oxidante",
-    term: "Agente Oxidante",
-    definition: "Produto que destrói a molécula de cor da mancha em vez de a tentar arrancar da fibra, sendo o peróxido de hidrogénio o mais usado em têxteis por se decompor em água e oxigénio. É o método usado em manchas de corante orgânico, como vinho tinto, sumos escuros, chá e café, que não saem por extração porque o corante já se fixou. Usa-se controlado e testado, porque o mesmo mecanismo que apaga a cor do vinho pode apagar a cor do tecido. Quanto mais fresca a mancha, maior a probabilidade de sair por completo.",
-    example: "Vinho tinto derramado num sofá claro: extração sozinha tira o líquido e deixa a sombra rosada; com oxidante testado à parte, a sombra desaparece.",
-    serviceLink: { label: "Limpeza de Sofás", to: "/limpeza-sofas" },
-  },
-  {
-    id: "ph-enxaguamento-acido",
-    term: "pH e Enxaguamento Ácido",
-    definition: "Os produtos que soltam sujidade são alcalinos (pH acima de 7), porque a maior parte da sujidade doméstica é ácida. O problema é que deixar resíduo alcalino no tecido torna a fibra áspera, atrai sujidade mais depressa do que antes e favorece as manchas castanhas durante a secagem. Por isso uma limpeza correta acaba com um enxaguamento ligeiramente ácido, que neutraliza o que ficou e devolve a fibra ao seu pH natural. É a razão pela qual um sofá lavado em casa com detergente volta a sujar mais rápido.",
-    example: "Sofá lavado com detergente da loiça e sem enxaguamento: fica limpo uma semana e a seguir suja mais depressa do que sujava antes, porque o resíduo agarra o pó.",
-    serviceLink: { label: "Limpeza de Sofás", to: "/limpeza-sofas" },
-  },
-  {
-    id: "iicrc-normas",
-    term: "IICRC (Normas S100 e S300)",
-    definition: "Organismo internacional que publica as normas técnicas da limpeza profissional de têxteis, reconhecidas como norma americana pela ANSI. A S100 trata de revestimentos têxteis de piso (alcatifas e tapetes) e a S300 trata de estofos. Definem o que se inspeciona antes de começar, os métodos aceites por tipo de fibra e construção, os limites de humidade e os procedimentos de remoção de manchas. Não são lei em Portugal e quase não são referidas em português, mas são a referência a que qualquer discussão técnica séria sobre limpeza de estofos acaba por voltar.",
-    example: "Quando se diz que um tecido com código S não pode ver água, a origem dessa regra é a normalização do setor, não uma opinião de quem limpa.",
-  },
-  {
-    id: "alergenio-der-p1",
-    term: "Der p 1 (o Alergénio do Ácaro)",
-    definition: "Nome da principal proteína alergénica do ácaro do pó doméstico. O detalhe que importa é que o alergénio não é o ácaro vivo: está nos excrementos e nos restos de exoesqueleto que ficam na fibra. Por isso matar ácaros, por congelação ou por calor, não resolve sozinho o problema de quem é alérgico: o que provoca sintomas continua lá até ser fisicamente removido. A remoção faz-se por aspiração com filtro adequado e por extração, não por spray.",
-    example: "Almofada congelada durante 24 horas: os ácaros morrem, mas o pó alergénico continua na fibra e a pessoa alérgica continua a espirrar.",
-    serviceLink: { label: "Tratamento Anti-Ácaros", to: "/tratamento-anti-acaros" },
-  },
-  {
-    id: "filtro-hepa",
-    term: "Filtro HEPA",
-    definition: "Filtro capaz de reter partículas muito finas, incluindo os fragmentos que transportam alergénios de ácaro. Tem importância prática na limpeza de estofos porque um aspirador sem filtragem adequada agita o pó fino e devolve ao ar da divisão boa parte do que aspirou do sofá, o que explica a sensação de piorar os sintomas logo a seguir a aspirar. Para quem tem rinite ou asma, o tipo de filtragem do aspirador conta tanto como a frequência com que aspira.",
-    example: "Pessoa alérgica que espirra mais durante e logo após aspirar o sofá: o problema não é o sofá, é o aspirador estar a devolver o pó fino ao ar.",
-    serviceLink: { label: "Tratamento Anti-Ácaros", to: "/tratamento-anti-acaros" },
-  },
-  {
-    id: "tempo-secagem-humidade",
-    term: "Tempo de Secagem e Humidade Relativa",
-    definition: "O tempo que um estofo demora a secar não depende só de quanta água levou: depende sobretudo de quanta humidade já existe no ar e de haver ou não circulação. O mesmo sofá, com a mesma limpeza, seca mais depressa num apartamento ventilado do que numa casa fechada junto ao mar num dia húmido. É a razão pela qual damos um intervalo e não um número exato, e pela qual pedimos para deixar uma janela aberta. Secagem lenta não é só incómodo: é o que provoca manchas castanhas e a sujidade a voltar à superfície.",
-    example: "O mesmo serviço feito em dois dias diferentes na mesma casa: com janelas abertas e ar seco, o sofá está pronto em poucas horas; com tempo húmido e casa fechada, demora bastante mais.",
-    serviceLink: { label: "Limpeza de Sofás", to: "/limpeza-sofas" },
-  },
-  {
-    id: "reaplicacao-protetor",
-    term: "Reaplicação do Protetor de Tecido",
-    definition: "A impermeabilização é uma camada aplicada sobre a fibra e vai-se perdendo com o uso, com a fricção das zonas de contacto e, sobretudo, com a limpeza por extração. É por isso que a duração das duas versões é indicada por número de lavagens e não só por anos: a Essencial aguenta até 2 lavagens, a Premium até 5. Cada limpeza profissional consome uma dessas lavagens, portanto mandar limpar um sofá impermeabilizado devolve-lhe um sofá mais limpo e com menos proteção. Não é uma venda adicional inventada, é como o produto funciona, e está escrito na própria contagem.",
-    example: "Sofá impermeabilizado há dois anos e limpo entretanto: a água já não forma gota nas zonas de mais uso, sinal de que a camada se gastou e precisa de ser reposta.",
-    serviceLink: { label: "Impermeabilização", to: "/impermeabilizacao" },
-  },
-  {
-    id: "efeito-lotus",
-    term: "Efeito Lotus",
-    definition: "Nome dado ao comportamento de um líquido que fica em gota à superfície em vez de ser absorvido, por analogia com a folha do lótus. Num estofo impermeabilizado é o sinal visível de que a proteção ainda está ativa, e o teste é simples: pingar um pouco de água numa zona discreta e ver se forma gota ou se escurece o tecido. Se escurecer e entrar, a proteção acabou. Convém saber que o efeito ganha tempo para limpar o derrame, não o torna impossível: um líquido deixado em cima durante horas acaba por passar.",
-    example: "Teste de água numa almofada tratada há um ano: gota perfeita no encosto, absorção imediata no assento, que é onde o atrito do uso gastou a camada.",
-    serviceLink: { label: "Impermeabilização", to: "/impermeabilizacao" },
-  },
-  {
-    id: "fibra-natural-vs-sintetica",
-    term: "Fibra Natural vs Fibra Sintética",
-    definition: "A distinção que decide quase tudo numa limpeza. Fibras naturais (algodão, linho, lã, seda, juta, sisal) absorvem água, reagem ao calor, encolhem, libertam taninos e são sensíveis a produtos alcalinos. Fibras sintéticas (poliéster, nylon, acrílico, olefina) absorvem pouca água, secam depressa, resistem a produtos mais fortes e não encolhem, mas retêm gordura com mais facilidade. Um método que é seguro num grupo pode ser destrutivo no outro, e é por isso que identificar a fibra vem sempre antes de escolher o produto.",
-    example: "O mesmo vaporizador que renova um sofá de poliéster encolhe e mancha um sofá de linho, sem que nada tenha sido feito de diferente.",
-    serviceLink: { label: "Limpeza de Sofás", to: "/limpeza-sofas" },
-  },
-  {
-    id: "algodao-estofos",
-    term: "Algodão em Estofos",
-    definition: "Fibra natural, respirável e confortável, muito usada em sofás de estilo clássico e em capas removíveis. É das fibras mais suscetíveis a manchas castanhas durante a secagem, porque liberta taninos quando molhada em excesso, e pode encolher se for lavada com água quente. Absorve muito líquido, o que significa que um derrame penetra depressa e que a limpeza tem de controlar bem a quantidade de água que entra.",
-    example: "Capa de algodão lavada na máquina a temperatura alta: encolheu o suficiente para deixar de entrar na almofada.",
-    serviceLink: { label: "Limpeza de Sofás", to: "/limpeza-sofas" },
-  },
-  {
-    id: "linho-estofos",
-    term: "Linho em Estofos",
-    definition: "Fibra natural de aspecto rústico e muito procurada em decoração, e das mais difíceis de limpar. Marca com água com facilidade, deixando anéis visíveis mesmo quando o líquido era limpo, amarrota de forma permanente e é sensível a produtos alcalinos. Muitos sofás de linho trazem código S na etiqueta precisamente por isto. Um derrame em linho é dos casos em que agir depressa e sem esfregar faz toda a diferença.",
-    example: "Sofá de linho cru onde alguém limpou uma gota de café com pano molhado: ficou um anel mais claro maior do que a mancha original.",
-    serviceLink: { label: "Limpeza de Sofás", to: "/limpeza-sofas" },
-  },
-  {
-    id: "viscose-rayon",
-    term: "Viscose (Rayon)",
-    definition: "Fibra de celulose regenerada, vendida às vezes como seda artificial ou banana silk. É bonita e barata, e é o material mais problemático que existe em estofos e tapetes: perde resistência quando molhada, amarelece, deixa manchas de água quase inevitáveis e o pelo fica marcado de forma permanente onde foi pressionado. Praticamente qualquer limpeza húmida traz risco, e há peças de viscose que nenhum profissional sério aceita limpar com água.",
-    example: "Tapete anunciado como seda vegetal que ficou com uma marca clara e áspera onde caiu um copo de água, sem produto nenhum envolvido.",
-    serviceLink: { label: "Limpeza de Tapetes", to: "/limpeza-tapetes" },
-  },
-  {
-    id: "poliester-estofos",
-    term: "Poliéster",
-    definition: "A fibra sintética mais comum em estofos atuais. Resiste bem à água, não encolhe, seca depressa e aguenta produtos que destruiriam uma fibra natural. O seu ponto fraco é a gordura: atrai e retém resíduos oleosos, o que se vê nas zonas de contacto das mãos e da cabeça, que escurecem antes do resto. Costuma ter código W ou WS, e é o material em que uma limpeza por extração dá resultados mais previsíveis.",
-    example: "Sofá de poliéster com o apoio de cabeça visivelmente mais escuro: não é sujidade solta, é gordura acumulada que precisa de pré-tratamento específico.",
-    serviceLink: { label: "Limpeza de Sofás", to: "/limpeza-sofas" },
-  },
-  {
-    id: "nylon-poliamida",
-    term: "Nylon (Poliamida)",
-    definition: "Fibra sintética muito resistente ao desgaste, usada sobretudo em alcatifas de zonas de passagem intensa e em estofos comerciais. Recupera bem a forma depois de comprimida, o que a torna adequada a corredores e escritórios. Aceita bem limpeza por extração. É, no entanto, mais suscetível a corantes ácidos do que outras sintéticas, o que significa que uma bebida com corante forte pode tingi-la de forma permanente.",
-    example: "Alcatifa de nylon num corredor de escritório que aguenta anos de passagem, mas onde uma bebida desportiva vermelha deixou marca definitiva.",
-    serviceLink: { label: "Limpeza de Alcatifas", to: "/limpeza-alcatifas" },
-  },
-  {
-    id: "acrilico-estofos",
-    term: "Acrílico",
-    definition: "Fibra sintética com toque semelhante à lã, usada em mantas, almofadas e tecidos de exterior. Resiste ao sol muito melhor do que a maior parte das fibras, razão pela qual aparece em estofos de terraço e jardim. Tem tendência a formar bolinhas na superfície com o atrito, e retém odores com mais facilidade do que o poliéster.",
-    example: "Almofadas de exterior em acrílico que mantêm a cor ao fim de dois verões, mas ganham bolinhas nas zonas onde as costas apoiam.",
-    serviceLink: { label: "Limpeza de Sofás", to: "/limpeza-sofas" },
-  },
-  {
-    id: "olefina-polipropileno",
-    term: "Olefina (Polipropileno)",
-    definition: "Fibra sintética que praticamente não absorve água, o que a torna resistente a manchas de base aquosa e muito usada em tapetes de exterior, alcatifas comerciais e estofos de jardim. A contrapartida é que atrai gordura com facilidade e tem baixa resistência ao calor: a fricção de uma escova rotativa demasiado rápida pode chegar a fundir a superfície das fibras.",
-    example: "Tapete de exterior em olefina que resiste à chuva sem marca, mas onde um salpico de óleo de proteção solar fica visível de imediato.",
-    serviceLink: { label: "Limpeza de Tapetes", to: "/limpeza-tapetes" },
-  },
-  {
-    id: "chenille-tecido",
-    term: "Chenille",
-    definition: "Tecido de aspecto felpudo, feito com fios que têm pelo curto à volta do eixo. É macio e quente ao toque e das superfícies onde o pelo mais facilmente fica marcado: passar a mão no sentido errado deixa uma zona com brilho diferente, que parece mancha e não é. Em limpeza exige escovagem no sentido do pelo e controlo de humidade, porque o peso da água deita o pelo e altera o aspecto da peça inteira.",
-    example: "Sofá de chenille que depois de limpo parecia ter manchas claras: era só o pelo deitado em direções diferentes, resolvido com escovagem.",
-    serviceLink: { label: "Limpeza de Sofás", to: "/limpeza-sofas" },
-  },
-  {
-    id: "boucle-tecido",
-    term: "Bouclé",
-    definition: "Tecido de laçadas em relevo, muito presente em sofás e cadeiras de design recente. A textura fechada prende pó, migalhas e pelo de animal dentro das laçadas, onde uma aspiração normal não chega, e a estrutura em anéis é fácil de puxar: uma unha, uma garra de gato ou uma escova agressiva desfazem a laçada e deixam um fio solto que já não volta ao sítio.",
-    example: "Cadeira em bouclé creme com fios puxados nos cantos por causa de um gato, e pó acumulado dentro das laçadas que só sai com acessório adequado.",
-    serviceLink: { label: "Limpeza de Cadeiras", to: "/limpeza-cadeiras" },
-  },
-  {
-    id: "couro-anilina-pigmentado",
-    term: "Couro Anilina, Semianilina e Pigmentado",
-    definition: "Três acabamentos com comportamentos muito diferentes. O anilina não tem camada de proteção, mostra o veio natural da pele, é o mais bonito e o que mancha com mais facilidade, incluindo com água. O semianilina tem uma proteção ligeira. O pigmentado tem uma camada de cor por cima que o torna resistente e uniforme, e é o mais comum em sofás de família. Confundir os três leva a usar num anilina um produto pensado para pigmentado, e o resultado é uma marca permanente.",
-    example: "Poltrona em anilina onde uma gota de água deixou marca escura visível, coisa que no mesmo modelo em couro pigmentado não aconteceria.",
-    serviceLink: { label: "Limpeza de Sofás", to: "/limpeza-sofas" },
-  },
-  {
-    id: "sisal-fibras-vegetais",
-    term: "Sisal, Coco e Fibras Vegetais",
-    definition: "Fibras vegetais rígidas usadas em tapetes de aspecto natural. Absorvem líquido muito depressa, marcam com água quase sempre, mancham de forma permanente com qualquer bebida com cor e podem encolher e deformar a peça se forem molhadas em excesso. A limpeza destes tapetes é praticamente toda a seco, e um derrame trata-se absorvendo de imediato, nunca esfregando nem molhando à volta.",
-    example: "Tapete de sisal onde alguém entornou chá e limpou com pano húmido: ficou uma mancha maior e mais escura do que a original, agora com anel.",
-    serviceLink: { label: "Limpeza de Tapetes", to: "/limpeza-tapetes" },
-  },
-  {
-    id: "juta-base-tapete",
-    term: "Juta (Base do Tapete)",
-    definition: "Fibra vegetal usada tradicionalmente na base de tapetes e alcatifas. É a origem mais frequente das manchas castanhas que aparecem depois de uma limpeza: quando a base de juta é molhada a mais e seca devagar, liberta taninos que sobem através do pelo e aparecem à superfície. É por isso que, num tapete com base de juta, controlar a água e secar depressa importa mais do que a força do produto.",
-    example: "Tapete lavado com máquina doméstica que no dia seguinte tinha riscas castanhas a acompanhar exatamente a trama da base.",
-    serviceLink: { label: "Limpeza de Tapetes", to: "/limpeza-tapetes" },
-  },
-  {
-    id: "seda-tapetes",
-    term: "Seda em Tapetes",
-    definition: "Fibra proteica de grande valor, usada em tapetes finos e em pormenores de peças orientais. É extremamente sensível: perde brilho com produtos alcalinos, amarelece, marca com água e não tolera escovagem. Os tapetes com seda verdadeira exigem tratamento especializado e são frequentemente casos em que a resposta honesta é recusar uma limpeza corrente.",
-    example: "Tapete de seda com um pormenor lavado com detergente comum: a zona ficou baça e sem o brilho que distinguia a peça.",
-    serviceLink: { label: "Limpeza de Tapetes", to: "/limpeza-tapetes" },
-  },
-  {
-    id: "la-tapetes",
-    term: "Lã em Tapetes",
-    definition: "A fibra tradicional dos bons tapetes. É resiliente, esconde bem a sujidade seca e dura décadas, mas tem três fragilidades: encolhe com calor e humidade, é sensível a produtos alcalinos e a lixívia, que a destroem, e é a fibra preferida da traça. Trata-se com água morna ou fria, produto de pH próximo do neutro e secagem plana à sombra.",
-    example: "Tapete de lã com décadas em bom estado que perdeu textura numa zona onde foi usado um produto de limpeza doméstico alcalino.",
-    serviceLink: { label: "Limpeza de Tapetes", to: "/limpeza-tapetes" },
-  },
-  {
-    id: "trama-urdidura",
-    term: "Trama e Urdidura",
-    definition: "Os dois conjuntos de fios que formam a estrutura de um tapete tecido: a urdidura corre ao comprido e a trama atravessa. O pelo é depois preso a esta estrutura. Interessa na limpeza porque é a trama e a urdidura que definem a forma da peça: quando encolhem de maneira desigual, o tapete deixa de assentar plano e ganha ondulações, e isso não se corrige com mais limpeza.",
-    example: "Tapete que ficou com um dos lados mais curto do que o outro depois de secar pendurado, por deformação da estrutura e não do pelo.",
-    serviceLink: { label: "Limpeza de Tapetes", to: "/limpeza-tapetes" },
-  },
-  {
-    id: "franjas-tapete",
-    term: "Franjas do Tapete",
-    definition: "Nos tapetes tecidos à mão, as franjas são o prolongamento da urdidura, ou seja, fazem parte da estrutura e não são um acabamento colado. Por isso não se escovam com força nem se puxam: um fio arrancado desfaz a extremidade da peça. Sujam mais do que o resto por serem claras e estarem no chão, e limpam-se à parte, com cuidado e no sentido do fio.",
-    example: "Tapete persa com franjas escurecidas pela passagem, limpas separadamente sem escova dura para não desfazer a extremidade.",
-    serviceLink: { label: "Limpeza de Tapetes", to: "/limpeza-tapetes" },
-  },
-  {
-    id: "tufting-tapete",
-    term: "Tufting",
-    definition: "Técnica industrial em que o pelo é inserido numa base têxtil e fixado por trás com cola e uma segunda base. É como se faz a maior parte dos tapetes e alcatifas acessíveis. Importa saber porque o ponto fraco é a cola: excesso de água pode dissolvê-la e provocar delaminação, com a base a soltar-se do pelo e a peça a ficar mole e ondulada.",
-    example: "Tapete de tufting encharcado numa limpeza caseira que ficou com a base descolada e bolhas debaixo do pelo.",
-    serviceLink: { label: "Limpeza de Tapetes", to: "/limpeza-tapetes" },
-  },
-  {
-    id: "kilim",
-    term: "Kilim",
-    definition: "Tapete tecido plano, sem pelo, típico da Turquia, do Irão e dos Balcãs. Por não ter pelo, a sujidade fica à superfície e a limpeza é diferente da de um tapete de nó. O risco principal é a estabilidade das cores: os corantes tradicionais de vermelho e azul migram com facilidade quando molhados, e num kilim de fundo claro basta isso para arruinar o padrão. O teste de cor antes de limpar não é opcional.",
-    example: "Kilim com vermelho intenso sobre creme, lavado em casa, que secou com o creme tingido de rosa ao longo de todas as fronteiras do padrão.",
-    serviceLink: { label: "Limpeza de Tapetes", to: "/limpeza-tapetes" },
-  },
-  {
-    id: "delaminacao",
-    term: "Delaminação",
-    definition: "Separação entre as camadas de um tapete ou alcatifa de fabrico industrial, quando a cola que as une cede. Sente-se ao pisar, como se o pelo deslizasse sobre a base, e vê-se em bolhas e ondulações. As causas habituais são excesso de água numa limpeza, humidade vinda do pavimento e idade da peça. Não tem reparação por limpeza: uma vez descolada, a peça está estruturalmente comprometida.",
-    example: "Alcatifa que depois de uma lavagem muito molhada passou a fazer bolhas em zonas largas, com o pelo a mover-se sobre a base.",
-    serviceLink: { label: "Limpeza de Alcatifas", to: "/limpeza-alcatifas" },
-  },
-  {
-    id: "filtration-soiling",
-    term: "Linhas Pretas junto ao Rodapé (Filtration Soiling)",
-    definition: "Riscos escuros que aparecem na alcatifa ao longo dos rodapés, debaixo das portas e junto às escadas. Não são sujidade pisada: é ar carregado de partículas finas a ser forçado a passar pela alcatifa nessas frestas, que funciona como filtro e retém o que passa. Por isso aparecem sempre nos mesmos sítios e por isso uma aspiração normal não os tira. Removem-se com tratamento específico e voltam se a causa, que é a circulação de ar, continuar igual.",
-    example: "Escritório com linha preta perfeita ao longo de todo o rodapé, exatamente onde o ar passa por baixo do soalho flutuante.",
-    serviceLink: { label: "Limpeza de Alcatifas", to: "/limpeza-alcatifas" },
-  },
-  {
-    id: "corredor-de-passagem",
-    term: "Corredor de Passagem (Traffic Lane)",
-    definition: "Faixa da alcatifa ou do tapete visivelmente mais escura e mais gasta, correspondente ao caminho que as pessoas fazem todos os dias. Combina duas coisas diferentes: sujidade acumulada, que sai com limpeza, e desgaste mecânico das fibras, que já não sai porque a fibra perdeu a forma e reflete a luz de outra maneira. Distinguir as duas antes de limpar evita prometer um resultado que não é possível.",
-    example: "Alcatifa de corredor que depois de limpa ficou com a sujidade removida mas manteve a faixa visível, porque as fibras já estavam achatadas.",
-    serviceLink: { label: "Limpeza de Alcatifas", to: "/limpeza-alcatifas" },
-  },
-  {
-    id: "capa-removivel-maquina",
-    term: "Capa Removível: Lavar na Máquina?",
-    definition: "A capa sair não significa que possa ir à máquina, e é um dos enganos mais caros que existem em estofos. Muitas capas encolhem o suficiente para deixarem de entrar na almofada, e uma capa encolhida não tem volta. Antes de lavar, procure a etiqueta dentro da capa, confirme a temperatura máxima e lave a frio se houver dúvida. Nunca use secador de roupa, que é onde o encolhimento acontece de vez, e volte a vestir a almofada com a capa ainda ligeiramente húmida, porque é assim que ela assenta. Se a capa tiver forro ou enchimento cosido, não é para máquina nenhuma.",
-    example: "Capa de algodão lavada a 40 graus e seca na máquina que ficou dois dedos curta em cada lado e já não fecha sobre a almofada.",
-    serviceLink: { label: "Limpeza de Sofás", to: "/limpeza-sofas" },
-  },
-  {
-    id: "encapsulacao",
-    term: "Encapsulação",
-    definition: "Método de baixa humidade em que o produto envolve as partículas de sujidade em cristais que secam duros e são depois aspirados. Usa uma fração da água da extração, seca em pouco tempo e é adequado a manutenção de alcatifas comerciais que não podem parar. Não substitui uma extração profunda: mantém o aspecto entre limpezas, não remove o que está no fundo da fibra.",
-    example: "Alcatifa de escritório tratada por encapsulação numa sexta-feira à tarde e pronta a usar na segunda de manhã, sem interromper o trabalho.",
-    serviceLink: { label: "Limpeza de Alcatifas", to: "/limpeza-alcatifas" },
-  },
-  {
-    id: "bonnet-cleaning",
-    term: "Bonnet Cleaning",
-    definition: "Limpeza superficial em que um disco absorvente roda sobre a alcatifa humedecida e recolhe a sujidade do topo da fibra. É rápido e seca depressa, o que explica a popularidade em hotelaria. Tem duas limitações que convém dizer: só trata a superfície, e o atrito do disco pode desfibrar o pelo se for usado com frequência excessiva ou em fibras delicadas.",
-    example: "Corredor de hotel com aspecto renovado em duas horas por bonnet, com extração profunda agendada para o período de menor ocupação.",
-    serviceLink: { label: "Limpeza de Alcatifas", to: "/limpeza-alcatifas" },
-  },
-  {
-    id: "agitacao-mecanica",
-    term: "Agitação Mecânica",
-    definition: "A parte física da limpeza: escovar, esfregar, passar a ferramenta com pressão. É um dos quatro fatores que determinam qualquer limpeza, a par do produto, da temperatura e do tempo. Quando um deles é reduzido, outro tem de compensar, e é por isso que em peças delicadas, onde não se pode esfregar, se aumenta o tempo de atuação do produto em vez da força.",
-    example: "Tapete de lã antigo tratado com pouca ação mecânica e mais tempo de produto, porque escovar com força partiria fibras já frágeis.",
-    serviceLink: { label: "Limpeza de Tapetes", to: "/limpeza-tapetes" },
-  },
-  {
-    id: "circulo-de-sinner",
-    term: "Círculo de Sinner",
-    definition: "Princípio técnico que explica qualquer limpeza através de quatro fatores: química, temperatura, ação mecânica e tempo. A soma tem de ser constante, portanto baixar um obriga a subir outro. É a razão pela qual não existe um produto milagroso: num tecido que não aceita calor nem esfrega, o único caminho é produto adequado e mais tempo, e quem tenta compensar com força estraga a peça.",
-    example: "Mancha antiga em veludo, onde não se pode esfregar nem aquecer: resolve-se com o produto certo e paciência, nunca com pressão.",
-    serviceLink: { label: "Limpeza de Sofás", to: "/limpeza-sofas" },
-  },
-  {
-    id: "aspiracao-previa",
-    term: "Aspiração Prévia",
-    definition: "Remoção da sujidade seca antes de qualquer líquido entrar na peça. É o passo que mais resultado dá e o mais ignorado por quem limpa em casa: a maior parte da sujidade de um estofo é seca e sai por aspiração, e se ficar lá quando chega a água transforma-se em lama dentro da fibra, muito mais difícil de remover do que era em pó.",
-    example: "Sofá com migalhas e pó aspirado primeiro em profundidade: a água que sai na extração vem visivelmente menos carregada e o resultado final é melhor.",
-    serviceLink: { label: "Limpeza de Sofás", to: "/limpeza-sofas" },
-  },
-  {
-    id: "ferramenta-estofos",
-    term: "Ferramenta de Estofos",
-    definition: "Boquilha pequena, com injetores e aspiração próprios, desenhada para peças verticais e para superfícies onde não se pode aplicar muito líquido. A dimensão reduzida existe por uma razão: permite injetar pouco e aspirar logo, o que num estofo é essencial porque o excesso de água não tem para onde ir e fica no enchimento.",
-    example: "Encosto de sofá tratado com ferramenta de estofos em passagens curtas, deixando o tecido apenas fresco ao toque e nunca encharcado.",
-    serviceLink: { label: "Limpeza de Sofás", to: "/limpeza-sofas" },
-  },
-  {
-    id: "pressao-de-trabalho",
-    term: "Pressão de Trabalho",
-    definition: "Força com que a solução é injetada na fibra, medida em bar. Mais pressão não é melhor: num tapete de fibra natural ou num estofo delicado, pressão excessiva empurra água para além do que a aspiração consegue recuperar e desfibra a superfície. A pressão certa é a que permite dissolver a sujidade e recuperá-la, e varia com o material e com a construção da peça.",
-    example: "A mesma máquina regulada em baixo para um sofá de veludo e em alto para uma alcatifa comercial de nylon, porque os materiais não pedem o mesmo.",
-    serviceLink: { label: "Limpeza de Alcatifas", to: "/limpeza-alcatifas" },
-  },
-  {
-    id: "vaporizador-domestico",
-    term: "Vaporizador Doméstico (Limitações)",
-    definition: "Aparelho que produz vapor mas não aspira. Esta diferença é tudo: sem aspiração, a água que entra na peça fica lá, e é exatamente a condição que provoca cheiro a mofo, manchas castanhas e sujidade que volta à superfície ao secar. Serve para higienizar superfícies duras e para soltar sujidade, não para limpar estofos em profundidade, apesar de ser vendido para isso.",
-    example: "Colchão vaporizado em casa, seco ao toque à superfície e com humidade retida na espuma que deu cheiro passados três dias.",
-    serviceLink: { label: "Limpeza de Colchões", to: "/limpeza-colchoes" },
-  },
-  {
-    id: "secagem-forcada",
-    term: "Secagem Forçada",
-    definition: "Uso de ventilação dirigida para acelerar a evaporação depois da limpeza. Não é um extra de conforto: é prevenção. A secagem lenta é a condição comum a quase todos os defeitos pós-limpeza, das manchas castanhas ao cheiro a mofo e à sujidade que reaparece. Ar em movimento sobre a peça, e uma janela aberta, fazem mais diferença no resultado final do que qualquer produto.",
-    example: "Duas almofadas iguais do mesmo sofá, uma com ventilador virado para ela e outra não: a segunda secou com marca nas costuras.",
-    serviceLink: { label: "Limpeza de Sofás", to: "/limpeza-sofas" },
-  },
-  {
-    id: "tensioativo",
-    term: "Tensioativo",
-    definition: "Componente que faz a água molhar aquilo em que toca, em vez de escorrer. Reduz a tensão superficial, envolve a sujidade e mantém-na suspensa para poder ser aspirada. É o princípio ativo de qualquer detergente. O problema não é o tensioativo em si: é o que fica na fibra quando não há enxaguamento, porque o resíduo continua pegajoso e passa a atrair pó.",
-    example: "Sofá lavado com detergente e sem enxaguamento que volta a sujar mais depressa do que sujava antes, por causa do resíduo que ficou.",
-    serviceLink: { label: "Limpeza de Sofás", to: "/limpeza-sofas" },
-  },
-  {
-    id: "solvente-limpeza-seco",
-    term: "Solvente",
-    definition: "Líquido que dissolve sujidade sem usar água, base da limpeza a seco e o único caminho em tecidos com código S. Atua sobretudo em gordura e resíduos oleosos, que a água sozinha não remove. Exige ventilação durante a aplicação e é mais caro do que uma limpeza aquosa, mas em certas fibras é a diferença entre limpar e estragar.",
-    example: "Sofá de linho com código S tratado com solvente, sem uma gota de água, evitando os anéis que a água deixaria naquele tecido.",
-    serviceLink: { label: "Limpeza de Sofás", to: "/limpeza-sofas" },
-  },
-  {
-    id: "alcalinidade",
-    term: "Alcalinidade",
-    definition: "Medida de quão básico é um produto, acima de 7 na escala de pH. Os produtos de limpeza são alcalinos porque a maior parte da sujidade doméstica é ácida, e quanto mais alcalinos, mais rápidos. A contrapartida é o risco: alcalinidade alta amarelece a lã, destrói a seda, favorece as manchas castanhas nas fibras vegetais e deixa a fibra áspera. Em fibras naturais trabalha-se sempre perto do neutro.",
-    example: "Produto de uso industrial aplicado num tapete de lã: limpou depressa e deixou a fibra áspera e amarelada, sem forma de recuperar o toque.",
-    serviceLink: { label: "Limpeza de Tapetes", to: "/limpeza-tapetes" },
-  },
-  {
-    id: "quelante",
-    term: "Quelante (Agente Sequestrante)",
-    definition: "Componente que captura os minerais da água dura, como cálcio e magnésio, impedindo-os de se depositarem na fibra e de anularem o detergente. Em zonas de água dura, a diferença é visível: sem quelante, a peça fica com um véu esbranquiçado e o produto rende menos. É um detalhe técnico que quase nunca se explica ao cliente e que muda o resultado.",
-    example: "Tapete limpo com água muito calcária que secou com aspecto baço, resolvido na limpeza seguinte com produto que inclui quelante.",
-    serviceLink: { label: "Limpeza de Tapetes", to: "/limpeza-tapetes" },
-  },
-  {
-    id: "corante-vs-pigmento",
-    term: "Nódoa de Corante vs Nódoa de Pigmento",
-    definition: "Duas famílias de manchas que exigem caminhos opostos. Uma nódoa de corante (vinho, chá, sumo, tinta de caneta) é cor dissolvida que se fixou quimicamente à fibra: não se arranca, destrói-se por oxidação. Uma nódoa de pigmento (terra, fuligem, tinta de parede, pó de carvão) são partículas sólidas pousadas na fibra: essas removem-se por aspiração e extração, e insistir com um oxidante só arrisca a cor do tecido sem tocar no problema. Identificar qual das duas está à frente é o que decide o produto, e enganar-se aqui é como muitas manchas ficam permanentes.",
-    example: "Marca escura num tapete que não saía com produto de manchas: era terra fina prensada na fibra, resolvida com aspiração profunda e não com química.",
-    serviceLink: { label: "Limpeza de Tapetes", to: "/limpeza-tapetes" },
-  },
-  {
-    id: "enzimas-tipos",
-    term: "Protease, Lipase e Amilase",
-    definition: "Os três tipos de enzimas usados em limpeza, cada um para uma família de sujidade: protease para proteínas (sangue, leite, suor, urina), lipase para gorduras e amilase para amidos e açúcares. Escolher a enzima errada equivale a não usar nenhuma. Todas precisam de tempo e de humidade para trabalhar, e são desativadas por calor alto e por produtos muito alcalinos.",
-    example: "Mancha de leite num colchão tratada com produto sem protease: saiu a cor e ficou o cheiro, porque a proteína continuava na fibra.",
-    serviceLink: { label: "Limpeza de Colchões", to: "/limpeza-colchoes" },
-  },
-  {
-    id: "residuo-de-produto",
-    term: "Resíduo de Produto",
-    definition: "Detergente que fica na fibra por não ter sido enxaguado nem aspirado. É a explicação mais comum para um estofo que suja mais depressa depois de ter sido limpo: o resíduo mantém-se pegajoso e agarra o pó que antes passava. Também torna a fibra áspera e contribui para as manchas castanhas. Uma limpeza completa termina sempre com a remoção do que foi aplicado.",
-    example: "Sofá lavado com shampoo de tapetes que ao fim de duas semanas estava com aspecto pior do que antes da limpeza.",
-    serviceLink: { label: "Limpeza de Sofás", to: "/limpeza-sofas" },
-  },
-  {
-    id: "aureola-anel-agua",
-    term: "Auréola (Anel de Água)",
-    definition: "Marca em forma de anel que fica à volta de uma zona limpa, com o contorno mais escuro ou mais claro do que o resto. Forma-se porque a água espalha a sujidade dissolvida para fora da zona molhada e essa sujidade concentra-se no limite, onde a evaporação acontece primeiro. É o resultado clássico de limpar uma mancha só no sítio da mancha, com pano molhado, sem trabalhar a zona inteira.",
-    example: "Mancha pequena de café limpa com pano húmido que deu origem a um anel muito maior e mais visível do que a mancha original.",
-    serviceLink: { label: "Limpeza de Sofás", to: "/limpeza-sofas" },
-  },
-  {
-    id: "migracao-corante",
-    term: "Migração de Corante (Dye Bleed)",
-    definition: "Corante que se solta de uma zona do tecido e passa para outra durante a limpeza. Acontece com corantes instáveis, sobretudo vermelhos e azuis de fibras naturais, e é irreversível: uma vez tingido, o creme não volta a ser creme. É a razão do teste de solidez da cor antes de qualquer limpeza húmida em peça com padrão contrastante.",
-    example: "Almofada às riscas vermelhas e brancas limpa com água morna, em que o branco ficou rosado ao longo de todas as riscas.",
-    serviceLink: { label: "Limpeza de Sofás", to: "/limpeza-sofas" },
-  },
-  {
-    id: "pilling",
-    term: "Pilling (Bolinhas no Tecido)",
-    definition: "Pequenas bolas de fibra que se formam à superfície com o atrito do uso, sobretudo em acrílico, lã de fibra curta e misturas. Não é sujidade e não sai com limpeza: são fibras soltas que se enrolaram. Removem-se mecanicamente com um aparador próprio, e voltam com o uso. Convém saber isto antes de contratar uma limpeza à espera de resolver este problema.",
-    example: "Sofá com bolinhas nas zonas onde as costas apoiam, inalteradas depois da limpeza porque o problema é de fibra e não de sujidade.",
-    serviceLink: { label: "Limpeza de Sofás", to: "/limpeza-sofas" },
-  },
-  {
-    id: "desbotamento-uv",
-    term: "Desbotamento por Sol (UV)",
-    definition: "Perda de cor provocada pela radiação ultravioleta, que degrada os corantes do tecido. Vê-se sobretudo no lado do sofá ou do tapete virado para a janela, e às vezes só se nota depois de mover um móvel e comparar com a zona que estava tapada. É permanente e não tem nada que ver com limpeza: nenhuma lavagem devolve a cor a uma fibra degradada.",
-    example: "Sofá com o apoio de braço junto à janela visivelmente mais claro do que o oposto, diferença que se mantém igual depois de limpo.",
-    serviceLink: { label: "Limpeza de Sofás", to: "/limpeza-sofas" },
-  },
-  {
-    id: "amarelecimento",
-    term: "Amarelecimento",
-    definition: "Tom amarelado que aparece em tecidos claros com o tempo. Tem várias origens que convém separar: oxidação da própria fibra, gases do ambiente doméstico, produtos de limpeza alcalinos, plastificantes que migram das espumas, e resíduo de sabão. Dependendo da causa, pode responder a tratamento ou ser irreversível, e diagnosticá-la antes evita prometer um branco que já não existe.",
-    example: "Sofá branco com tom creme uniforme ao fim de anos, sem manchas localizadas, que a limpeza melhora mas não devolve ao branco de origem.",
-    serviceLink: { label: "Limpeza de Sofás", to: "/limpeza-sofas" },
-  },
-  {
-    id: "acaro-do-po",
-    term: "Ácaro do Pó Doméstico",
-    definition: "Aracnídeo microscópico que vive em colchões, sofás e tapetes e se alimenta de células de pele. Não pica nem transmite doenças: o problema é alérgico, e vem das suas fezes e restos de exoesqueleto. Prefere ambientes húmidos e temperaturas amenas, o que em Portugal significa maior proliferação no outono. A SPAIC descreve-o como a principal causa de alergias respiratórias em ambiente doméstico.",
-    example: "Pessoa que espirra ao acordar e melhora quando passa uns dias fora de casa: padrão típico de exposição doméstica continuada.",
-    serviceLink: { label: "Tratamento Anti-Ácaros", to: "/tratamento-anti-acaros" },
-  },
-  {
-    id: "humidade-relativa-interior",
-    term: "Humidade Relativa Interior",
-    definition: "Quantidade de vapor de água no ar em relação ao máximo que ele suporta àquela temperatura. É a variável que controla três coisas ao mesmo tempo: a rapidez com que um estofo seca depois de limpo, a proliferação de ácaros e o aparecimento de bolor. Ambientes muito húmidos favorecem os três problemas de uma vez. A Organização Mundial de Saúde aponta a prevenção da humidade persistente como a principal medida contra os efeitos do bolor no interior.",
-    example: "Apartamento junto ao mar, com janelas fechadas no inverno, onde o mesmo sofá demora muito mais a secar do que numa casa ventilada.",
-    serviceLink: { label: "Limpeza de Sofás", to: "/limpeza-sofas" },
-  },
-  {
-    id: "capa-anti-acaros",
-    term: "Capa Anti-Ácaros",
-    definition: "Cobertura de tecido de trama muito fechada que envolve o colchão ou a almofada e impede a passagem dos alergénios do ácaro entre o interior e o exterior. Não mata nada: funciona como barreira física, e por isso tem de envolver a peça toda com fecho, e não apenas cobrir a face de cima. É das poucas medidas com aplicação prática consensual, embora a evidência sobre a melhoria de sintomas de asma seja menos clara do que se costuma anunciar.",
-    example: "Colchão com capa integral de fecho, lavada com a restante roupa de cama, em vez de um resguardo que só cobre a superfície.",
-    serviceLink: { label: "Limpeza de Colchões", to: "/limpeza-colchoes" },
-  },
-  {
-    id: "desbacterizacao",
-    term: "Desbacterização",
-    definition: "Tratamento opcional de aplicação de produto com ação antimicrobiana depois da limpeza. É um serviço distinto da limpeza e nunca está incluído por defeito: tem objetivo, produto e preço próprios, e é confirmado no orçamento. Convém ser claro sobre o que é: um tratamento de superfície com efeito temporário, não um procedimento clínico nem uma garantia de ambiente estéril.",
-    example: "Colchão de residência sénior em que a limpeza é acompanhada de desbacterização a pedido, com o extra identificado à parte no orçamento.",
-    serviceLink: { label: "Desbacterização", to: "/desbacterizacao" },
-  },
-  {
-    id: "colchao-face-rotacao",
-    term: "Rotação e Faces do Colchão",
-    definition: "Rodar o colchão ponta a ponta, e virá-lo quando é de dupla face, distribui o desgaste por zonas diferentes em vez de o concentrar onde o corpo assenta. Muitos colchões modernos com camada de conforto são de face única e não se viram, apenas se rodam. Interessa na limpeza porque a face que fica para baixo acumula humidade e pó junto à base, e uma higienização que só trata a face de cima deixa metade por fazer.",
-    example: "Colchão de casal com marca visível dos dois corpos, nunca rodado em anos, onde o desgaste se concentrou sempre nos mesmos pontos.",
-    serviceLink: { label: "Limpeza de Colchões", to: "/limpeza-colchoes" },
-  },
-  {
-    id: "espuma-viscoelastica",
-    term: "Espuma Viscoelástica (Memory Foam)",
-    definition: "Espuma que amolece com o calor do corpo e recupera devagar a forma. Absorve muito líquido e liberta-o com dificuldade, o que a torna o material mais exigente numa higienização: um derrame que a atinge demora a sair e pode dar origem a odor persistente e a bolor no interior. Trata-se com humidade muito controlada e secagem forçada, e há casos em que a resposta honesta é que a espuma interior não é recuperável.",
-    example: "Colchão viscoelástico com derrame antigo em que a superfície limpa bem e o odor regressa, porque o líquido chegou a uma camada que não abre.",
-    serviceLink: { label: "Limpeza de Colchões", to: "/limpeza-colchoes" },
-  },
-  {
-    id: "cadeira-mesh",
-    term: "Cadeira de Rede (Mesh)",
-    definition: "Cadeira de escritório com encosto em malha tensionada em vez de estofo. Acumula muito menos pó e gordura do que um encosto forrado e limpa-se com muito pouca água. O ponto de atenção é outro: a tensão da malha não gosta de esfrega com força, que a deforma de forma permanente, e o assento costuma continuar a ser estofado, portanto a cadeira exige dois tratamentos diferentes na mesma peça.",
-    example: "Cadeira ergonómica com encosto em rede impecável e assento com marca escura de uso, tratados de maneiras distintas na mesma intervenção.",
-    serviceLink: { label: "Limpeza de Cadeiras", to: "/limpeza-cadeiras" },
-  },
-  {
-    id: "hot-desking-higiene",
-    term: "Hot-desking e Higiene de Cadeiras",
-    definition: "Prática em que várias pessoas usam o mesmo posto e a mesma cadeira ao longo da semana. Do ponto de vista de manutenção muda duas coisas: a acumulação de suor e gordura no estofo é mais rápida do que numa cadeira de uso individual, e a perceção do estado da peça deixa de ter um dono. Em escritórios com esta organização, a limpeza dos estofos costuma ser necessária com mais frequência do que o calendário anual habitual.",
-    example: "Sala com dez postos partilhados por vinte pessoas, em que os assentos mostram desgaste ao fim de metade do tempo do que noutros pisos.",
-    serviceLink: { label: "Limpeza de Cadeiras", to: "/limpeza-cadeiras" },
-  },
-  {
-    id: "frequencia-limpeza-estofos",
-    term: "Frequência de Limpeza de Estofos",
-    definition: "Não há um número único: depende do uso, de haver animais ou crianças, de alguém fumar, de alergias na família e da cor do tecido. A orientação comum no setor para estofos comerciais aponta para intervalos entre seis e doze meses, mais curtos em zonas de grande passagem, receções e restauração. Em casa, o critério prático é anterior ao calendário: quando o tecido muda de tom nas zonas de contacto, a sujidade já está instalada.",
-    example: "Sofá de sala com uso diário e um cão, que precisa de limpeza mais cedo do que um sofá de sala formal usado ao fim de semana.",
-    serviceLink: { label: "Limpeza de Sofás", to: "/limpeza-sofas" },
-  },
-  {
-    id: "manutencao-preventiva",
-    term: "Manutenção Preventiva",
-    definition: "Conjunto de hábitos que espaçam a necessidade de limpeza profunda: aspirar com regularidade, tratar derrames no momento em que acontecem, rodar almofadas para distribuir o desgaste, afastar a peça de luz solar direta e de fontes de calor. A diferença não é pequena: quase toda a sujidade entranhada começou como sujidade solta que ficou tempo suficiente para ser pisada e empurrada para dentro da fibra.",
-    example: "Duas casas com o mesmo sofá e o mesmo tempo de uso, uma com aspiração semanal e outra sem, com estados finais que não se comparam.",
-    serviceLink: { label: "Limpeza de Sofás", to: "/limpeza-sofas" },
-  },
-  {
-    id: "derrame-primeiros-minutos",
-    term: "Derrame: os Primeiros Minutos",
-    definition: "O que se faz nos primeiros minutos determina quase todo o resultado final. A regra é absorver, nunca esfregar: pressionar com pano branco seco, de fora para dentro, trocando de zona do pano à medida que recolhe. Esfregar espalha a mancha, empurra o líquido para o enchimento e desfibra a superfície. Pano branco porque um pano colorido pode transferir a sua própria cor para o tecido molhado.",
-    example: "Copo de vinho entornado e absorvido de imediato com pano branco, que depois saiu por completo, contra o mesmo derrame esfregado, que deixou marca.",
-    serviceLink: { label: "Limpeza de Sofás", to: "/limpeza-sofas" },
-  },
-  {
-    id: "teste-zona-escondida",
-    term: "Teste em Zona Escondida",
-    definition: "Aplicar o produto que se vai usar numa parte da peça que não se vê, esperar, e observar antes de o aplicar onde conta. Serve para detetar três coisas: se a cor migra, se a fibra altera o toque e se o acabamento reage. Vale tanto para um profissional como para quem tenta resolver em casa, e é o passo que separa um erro pequeno e invisível de um erro grande à vista de todos.",
-    example: "Produto testado nas costas de um sofá encostado à parede, onde se percebeu que o tecido clareava, antes de tocar no assento.",
-    serviceLink: { label: "Limpeza de Sofás", to: "/limpeza-sofas" },
-  },
-  {
-    id: "inspecao-previa",
-    term: "Inspeção Prévia",
-    definition: "Exame da peça antes de começar: identificação da fibra e do código de limpeza, registo das manchas e da sua provável origem, verificação de rasgões, costuras soltas, desgaste e alterações de cor já existentes. Tem duas funções: escolher o método e deixar claro, antes de qualquer intervenção, o que já estava assim. É a diferença entre um orçamento informado e um preço dito ao telefone.",
-    example: "Rasgão fino junto a uma costura identificado e mostrado ao cliente antes da limpeza, evitando a dúvida de quem o causou.",
-    serviceLink: { label: "Limpeza de Sofás", to: "/limpeza-sofas" },
-  },
-  {
-    id: "limite-do-servico",
-    term: "Limite do Serviço",
-    definition: "Aquilo que uma limpeza não consegue fazer, dito antes de começar e não depois. Desgaste de fibras, cor perdida pelo sol, fissuras em couro, corante que migrou, espuma contaminada por dentro e manchas que já alteraram quimicamente a fibra não são sujidade e não saem. Explicar isto à partida é a parte do trabalho que evita a maior parte das discussões no fim.",
-    example: "Sofá em que se explicou de antemão que a faixa desbotada junto à janela iria manter-se, e que só a sujidade seria removida.",
-    serviceLink: { label: "Limpeza de Sofás", to: "/limpeza-sofas" },
-  },
-  {
-    id: "orcamento-sob-medicao",
-    term: "Orçamento sob Medição",
-    definition: "Preço definido depois de ver e medir a peça, em vez de calculado ao telefone. Aplica-se sempre a tapetes e alcatifas, porque o método muda com a fibra, a construção e o estado, e porque a área sozinha não diz o trabalho que a peça dá. É também uma proteção: permite recusar uma peça que não admite o tratamento pedido antes de haver compromisso.",
-    example: "Tapete de 6 m² cujo preço depende de ser de lã com franjas ou sintético de tufting, duas peças com o mesmo tamanho e trabalhos diferentes.",
-    serviceLink: { label: "Limpeza de Tapetes", to: "/limpeza-tapetes" },
-  },
-  {
-    id: "servico-ao-domicilio",
-    term: "Serviço ao Domicílio",
-    definition: "Limpeza feita em casa do cliente, com o equipamento transportado pela equipa, sem levar a peça. Evita o transporte de móveis pesados e o tempo em que a casa fica sem eles. Exige acesso a água e eletricidade e um espaço de trabalho à volta da peça, e implica que a secagem acontece na divisão, o que torna a ventilação parte do serviço e não um detalhe.",
-    example: "Sofá de três lugares tratado na sala, com a equipa a pedir uma janela aberta e a afastar a peça da parede durante a secagem.",
-    serviceLink: { label: "Limpeza de Sofás", to: "/limpeza-sofas" },
-  },
-  {
-    id: "taxa-de-deslocacao",
-    term: "Taxa de Deslocação",
-    definition: "Valor cobrado à parte do serviço, correspondente à deslocação da equipa e do equipamento até à morada. É apresentado separadamente do preço da limpeza, e não diluído nele, para que se perceba o que se está a pagar. Varia com a localidade e é sempre confirmado no orçamento antes da marcação.",
-    example: "Orçamento com o valor da limpeza numa linha e a deslocação noutra, em vez de um número único que esconde a diferença.",
-    serviceLink: { label: "Áreas de Serviço", to: "/areas-de-servico" },
-  },
-  {
-    id: "antes-e-depois",
-    term: "Antes e Depois",
-    definition: "Registo fotográfico da mesma zona, no mesmo enquadramento e com a mesma luz, antes e depois da intervenção. Feito com honestidade, é a forma mais direta de mostrar o resultado real, incluindo o que não saiu. Feito com luz diferente ou com ângulos diferentes, é publicidade enganosa, e nota-se: a diferença entre os dois é o enquadramento manter-se igual.",
-    example: "Fotografia da mesma almofada, na mesma posição e com a mesma luz, em que se vê o que melhorou e também a marca que permaneceu.",
-    serviceLink: { label: "Antes e Depois", to: "/antes-depois-limpeza" },
-  },
-  {
-    id: "estofo-comercial-vs-domestico",
-    term: "Estofo Comercial vs Doméstico",
-    definition: "Os tecidos de contract, usados em restaurantes, hotéis e escritórios, são fabricados para resistir a um número de ciclos de abrasão muito superior ao de um estofo doméstico e costumam ter acabamentos de proteção de origem. Aguentam limpezas mais frequentes e produtos mais fortes. Um tecido doméstico colocado num espaço comercial desgasta-se numa fração do tempo, e isso não é defeito de fabrico nem de limpeza.",
-    example: "Cadeiras de restaurante forradas com tecido de sala de estar que ao fim de um ano estavam gastas nos apoios e nas costas.",
-    serviceLink: { label: "Limpeza de Cadeiras", to: "/limpeza-cadeiras" },
-  },
-  {
-    id: "ciclos-martindale",
-    term: "Ciclos Martindale",
-    definition: "Medida normalizada da resistência de um tecido à abrasão, obtida esfregando a amostra até aparecer desgaste. Quanto maior o número, mais uso a peça aguenta. Serve para perceber se um tecido foi feito para uma sala de jantar ou para uma sala de espera, e explica porque duas peças com aspecto semelhante envelhecem de forma tão diferente no mesmo espaço.",
-    example: "Dois sofás visualmente parecidos num hall de hotel, um com tecido de contract intacto e outro gasto nos apoios ao fim de poucos meses.",
-    serviceLink: { label: "Limpeza de Cadeiras", to: "/limpeza-cadeiras" },
-  },
-  {
-    id: "alcatifa-losetas",
-    term: "Alcatifa em Losetas",
-    definition: "Alcatifa fornecida em quadrados soltos, muito usada em escritórios. A vantagem prática é grande: uma zona danificada ou manchada de forma irreversível substitui-se sem mexer no resto do piso. Interessa na manutenção porque permite tratar os corredores de passagem com mais frequência do que o resto da sala, e porque uma loseta que não recupera tem solução que uma alcatifa contínua não tem.",
-    example: "Escritório em que três losetas do corredor foram trocadas por unidades de reserva, ficando o piso uniforme sem obra nenhuma.",
-    serviceLink: { label: "Limpeza de Alcatifas", to: "/limpeza-alcatifas" },
-  },
-  {
-    id: "compostos-organicos-volateis",
-    term: "Compostos Orgânicos Voláteis (COV)",
-    definition: "Substâncias que evaporam à temperatura ambiente e ficam no ar da divisão. Em limpeza de estofos vêm sobretudo de solventes e de produtos perfumados, e são a razão para ventilar durante e depois da aplicação. Interessa sobretudo em quartos de crianças e em casas com alguém com problemas respiratórios, onde a escolha do produto e a ventilação contam tanto como o resultado visível.",
-    example: "Quarto de bebé em que se optou por produto de baixo odor e se ventilou a divisão antes de voltar a colocar o colchão em uso.",
-    serviceLink: { label: "Limpeza de Colchões", to: "/limpeza-colchoes" },
-  },
+    "id": "higienizacao-vs-limpeza-vs-lavagem",
+    "term": "Higienização vs Limpeza vs Lavagem",
+    "definition": "Na Kyro, limpeza, lavagem e higienização referem-se à remoção de sujidade pelo método adequado à peça. Os nomes não incluem automaticamente anti-ácaros ou desbacterização. Os tratamentos opcionais são identificados no orçamento.",
+    "serviceLink": {
+      "label": "Limpeza e Higienização de Sofás",
+      "to": "/limpeza-sofas"
+    }
+  },
+  {
+    "id": "impermeabilizacao-sofa",
+    "term": "Impermeabilização de Sofá",
+    "definition": "Proteção que ajuda a reduzir a absorção de líquidos em tecidos compatíveis. É aplicada em sofás e cadeiras nas condições de limpeza e secagem exigidas pelo produto. Essencial e Premium têm condições de duração diferentes. Nenhuma dispensa absorver derrames rapidamente nem impede todas as manchas.",
+    "serviceLink": {
+      "label": "Impermeabilização de Estofos",
+      "to": "/impermeabilizacao"
+    }
+  },
+  {
+    "id": "extracao-vapor-estofos",
+    "term": "Injeção e Extração de Estofos",
+    "definition": "A injeção e extração aplica solução e aspira líquido com resíduos. Não é sinónimo de aplicar vapor: um vaporizador pode não recolher o líquido. O método depende do material e não inclui automaticamente desinfeção. A peça precisa de secar antes de voltar a ser utilizada.",
+    "serviceLink": {
+      "label": "Limpeza de Sofás por Extração",
+      "to": "/limpeza-sofas"
+    }
+  },
+  {
+    "id": "shampoo-estofos",
+    "term": "Shampoo de Estofos",
+    "definition": "Detergente formulado para determinados revestimentos e tipos de sujidade. A escolha, diluição, aplicação e remoção seguem o produto e a compatibilidade da peça. Não é intercambiável com detergente da roupa ou da loiça."
+  },
+  {
+    "id": "limpeza-seco-sofa",
+    "term": "Limpeza a Seco de Sofá",
+    "definition": "Designação de métodos que evitam ou limitam o uso de água, consoante o sistema. Não significa que qualquer tecido delicado aceite solventes ou pós. A disponibilidade do método adequado à peça tem de ser confirmada, antes de contratar.",
+    "serviceLink": {
+      "label": "Limpeza Especializada por Material",
+      "to": "/limpeza-sofas"
+    }
+  },
+  {
+    "id": "tratamento-anti-acaros",
+    "term": "Tratamento Anti-ácaros",
+    "definition": "Tratamento opcional dirigido a ácaros, sujeito à compatibilidade do artigo e às instruções do produto. É escolhido e orçamentado separadamente da limpeza. Não prometemos eliminação total nem tratamento de alergias ou asma.",
+    "serviceLink": {
+      "label": "Avaliar tratamento anti-ácaros",
+      "to": "/tratamento-anti-acaros"
+    },
+    "source": {
+      "label": "SPAIC: ácaros e cuidados",
+      "url": "https://www.spaic.pt/perguntas-frequentes?id=13"
+    }
+  },
+  {
+    "id": "ph-neutro-tecidos",
+    "term": "pH Neutro em Limpeza de Tecidos",
+    "definition": "O pH ajuda a caracterizar a acidez ou basicidade de uma solução. Um produto próximo do neutro não é automaticamente adequado a todos os tecidos: composição, corantes e acabamento também condicionam a escolha."
+  },
+  {
+    "id": "tecido-microsuede",
+    "term": "Tecido Microsuede (Microfibra de Camurça)",
+    "definition": "Revestimento de microfibras com aspeto semelhante à camurça. O nome comercial não determina sozinho a composição ou a resistência à limpeza. É necessário consultar a etiqueta e verificar a resposta da cor e textura."
+  },
+  {
+    "id": "alcantara-sintetica-natural",
+    "term": "Alcantara® e materiais de aspeto semelhante",
+    "definition": "Alcantara® é um material sintético de poliéster e poliuretano, não couro nem uma fibra natural. Outros materiais de toque semelhante podem ter composição diferente. Siga as instruções do fabricante da peça e não deduza o método apenas pelo aspeto.",
+    "serviceLink": {
+      "label": "Limpeza de Sofás por Material",
+      "to": "/limpeza-sofas"
+    },
+    "source": {
+      "label": "Alcantara: material e manutenção",
+      "url": "https://www.alcantara.com/the-material/"
+    }
+  },
+  {
+    "id": "veludo-terciopelo-cuidados",
+    "term": "Veludo e Terciopelo: Cuidados Especiais",
+    "definition": "Veludo descreve uma estrutura de pelo que pode usar fibras diferentes. Terciopelo é a palavra espanhola para veludo, não uma classificação de comprimento do pelo. A orientação do pelo afeta o brilho; a composição e o acabamento determinam os cuidados.",
+    "serviceLink": {
+      "label": "Limpeza Especializada de Veludo",
+      "to": "/limpeza-sofas"
+    }
+  },
+  {
+    "id": "couro-pu-ecologico",
+    "term": "Revestimento de Poliuretano (PU)",
+    "definition": "Revestimento com poliuretano que pode imitar o aspeto do couro. A designação não comprova, por si só, uma vantagem ambiental. Descascamento ou degradação da camada não são resolvidos pela limpeza e devem ser identificados antes da intervenção."
+  },
+  {
+    "id": "manchas-proteicas-oleosas",
+    "term": "Manchas Proteicas vs Manchas Oleosas",
+    "definition": "A composição da sujidade ajuda a escolher o tratamento. Sangue ou leite podem conter proteínas; óleos e gorduras pedem outra avaliação. Não existe uma receita única por mancha: o material, o tempo e os produtos já usados também contam."
+  },
+  {
+    "id": "fungos-bolor-estofos",
+    "term": "Fungos e Bolor em Estofos",
+    "definition": "Bolor visível ou odor a humidade exige avaliação da peça e da origem da humidade. Não tratamos bolor como uma nódoa comum nem prometemos recuperação com fungicida ou vapor. A intervenção pode ser insuficiente se o problema atingir zonas internas ou continuar a haver humidade.",
+    "source": {
+      "label": "OMS: humidade e bolor",
+      "url": "https://www.who.int/publications/i/item/9789289041683"
+    }
+  },
+  {
+    "id": "desodorizacao-estofos",
+    "term": "Desodorização de Estofos",
+    "definition": "Intervenção dirigida à origem de um odor, em vez de apenas o perfumar. O resultado depende de os resíduos estarem acessíveis no tecido ou terem atingido espuma, base ou estrutura. A eliminação total do cheiro não é garantida.",
+    "serviceLink": {
+      "label": "Limpeza e Desodorização",
+      "to": "/limpeza-sofas"
+    }
+  },
+  {
+    "id": "tapete-vs-alcatifa",
+    "term": "Tapete vs Alcatifa: Diferença e Limpeza",
+    "definition": "Tapete é uma peça solta; alcatifa é um revestimento de piso instalado numa área. Ambos são sempre sob orçamento, com largura e comprimento e avaliação do material, base e estado. Recolha e entrega não são anunciadas como serviço geral.",
+    "serviceLink": {
+      "label": "Limpeza de Tapetes e Alcatifas",
+      "to": "/limpeza-tapetes"
+    }
+  },
+  {
+    "id": "limpeza-estofos-exterior",
+    "term": "Limpeza de Estofos de Exterior",
+    "definition": "Avaliação de almofadas e revestimentos usados no exterior. A exposição à chuva ou ao sol não significa que possam receber qualquer produto ou pressão de água. Identifique a composição e confirme o serviço adequado à peça.",
+    "serviceLink": {
+      "label": "Consultar serviços",
+      "to": "/#servicos"
+    }
+  },
+  {
+    "id": "codigos-limpeza-tecido",
+    "term": "Códigos de Limpeza do Tecido (W, S, WS, X)",
+    "definition": "Algumas etiquetas usam W para produtos à base de água, S para solventes, WS para ambas as categorias compatíveis e X para aspiração ou cuidados secos indicados. Estes códigos não substituem as instruções completas do fabricante nem autorizam lavar capas na máquina.",
+    "serviceLink": {
+      "label": "Limpeza de Sofás",
+      "to": "/limpeza-sofas"
+    }
+  },
+  {
+    "id": "browning-celulosico",
+    "term": "Browning Celulósico (Manchas Castanhas Depois da Limpeza)",
+    "definition": "Alteração acastanhada que pode surgir em materiais com componentes celulósicos durante a secagem. Deve ser distinguida de sujidade, corantes ou outras alterações. A prevenção e a correção dependem da composição e do método, sem promessa universal de reversão.",
+    "serviceLink": {
+      "label": "Limpeza de Sofás",
+      "to": "/limpeza-sofas"
+    }
+  },
+  {
+    "id": "wicking-sujidade-que-volta",
+    "term": "Wicking (a Sujidade que Volta a Aparecer ao Secar)",
+    "definition": "Migração de resíduos de camadas inferiores para a superfície durante a secagem, podendo fazer reaparecer uma marca. Repetir produtos à superfície pode não resolver a origem. É necessário avaliar a profundidade e o acesso aos resíduos.",
+    "serviceLink": {
+      "label": "Limpeza de Alcatifas",
+      "to": "/limpeza-alcatifas"
+    }
+  },
+  {
+    "id": "sobremolhagem",
+    "term": "Sobremolhagem (Over-wetting)",
+    "definition": "Humidade excessiva aplicada ou retida numa peça durante a limpeza. Pode dificultar a secagem e afetar o revestimento, base ou enchimento. A quantidade de solução e a extração devem ser ajustadas à compatibilidade do artigo.",
+    "serviceLink": {
+      "label": "Limpeza de Colchões",
+      "to": "/limpeza-colchoes"
+    }
+  },
+  {
+    "id": "encolhimento-la",
+    "term": "Encolhimento de Lã",
+    "definition": "Alteração dimensional que pode ocorrer em peças de lã, influenciada pela construção, humidade, temperatura e ação mecânica. A limpeza não garante recuperar a dimensão original. Evite escolher um método apenas por a peça parecer resistente.",
+    "serviceLink": {
+      "label": "Limpeza de Tapetes",
+      "to": "/limpeza-tapetes"
+    }
+  },
+  {
+    "id": "teste-solidez-cor",
+    "term": "Teste de Solidez da Cor",
+    "definition": "Verificação discreta da resposta do corante ao método previsto. Ajuda a identificar transferência ou alteração de cor, mas não elimina todos os riscos. Se a cor não for estável, é necessário rever o método ou não avançar.",
+    "serviceLink": {
+      "label": "Limpeza de Tapetes",
+      "to": "/limpeza-tapetes"
+    }
+  },
+  {
+    "id": "pre-tratamento",
+    "term": "Pré-tratamento",
+    "definition": "Aplicação de produto adequado antes da extração, dirigida à sujidade identificada. Nas limpezas compatíveis, segue-se escovagem ajustada à fibra e extração. O pré-tratamento não garante a remoção de todas as manchas.",
+    "serviceLink": {
+      "label": "Limpeza de Sofás",
+      "to": "/limpeza-sofas"
+    }
+  },
+  {
+    "id": "tempo-de-atuacao",
+    "term": "Tempo de Atuação (Dwell Time)",
+    "definition": "Período em que o produto atua antes da etapa seguinte. É definido pelas instruções de utilização e pela compatibilidade do revestimento. Mais tempo não significa sempre melhor resultado, e não se deve improvisar a concentração ou deixar o produto secar sem indicação.",
+    "serviceLink": {
+      "label": "Limpeza de Colchões",
+      "to": "/limpeza-colchoes"
+    }
+  },
+  {
+    "id": "tratamento-enzimatico",
+    "term": "Tratamento Enzimático",
+    "definition": "Utilização de produtos com enzimas que atuam sobre componentes específicos da sujidade. O desempenho depende da formulação, das condições de aplicação e do acesso aos resíduos. Não é solução garantida para todo o odor nem está automaticamente incluído em qualquer serviço.",
+    "serviceLink": {
+      "label": "Limpeza de Sofás",
+      "to": "/limpeza-sofas"
+    }
+  },
+  {
+    "id": "acido-urico",
+    "term": "Ácido Úrico e Resíduos de Urina",
+    "definition": "Composto que pode integrar os resíduos de urina. Um odor persistente não permite identificar um único composto nem o método necessário. O tratamento depende do conjunto de resíduos, dos produtos já aplicados e de até onde o líquido chegou.",
+    "serviceLink": {
+      "label": "Limpeza de Colchões",
+      "to": "/limpeza-colchoes"
+    }
+  },
+  {
+    "id": "agente-oxidante",
+    "term": "Agente Oxidante",
+    "definition": "Substância que pode alterar componentes de uma mancha por oxidação. Também pode afetar os corantes e o revestimento. A utilização requer compatibilidade e controlo; não é uma recomendação para aplicar produtos domésticos diretamente no estofo.",
+    "serviceLink": {
+      "label": "Limpeza de Sofás",
+      "to": "/limpeza-sofas"
+    }
+  },
+  {
+    "id": "ph-enxaguamento-acido",
+    "term": "pH e Enxaguamento Ácido",
+    "definition": "Alguns processos utilizam produtos de enxaguamento para gerir resíduos e condições químicas após a limpeza. A escolha depende da formulação e do material. Não significa que todos os detergentes sejam alcalinos ou que qualquer limpeza deva terminar com ácido.",
+    "serviceLink": {
+      "label": "Limpeza de Sofás",
+      "to": "/limpeza-sofas"
+    }
+  },
+  {
+    "id": "iicrc-normas",
+    "term": "IICRC (Normas S100 e S300)",
+    "definition": "A IICRC publica referências técnicas de limpeza. A S100 aborda revestimentos têxteis de piso, incluindo tapetes e alcatifas; a S300 aborda estofos. Mencionar estas referências não significa que a Kyro tenha certificação IICRC.",
+    "source": {
+      "label": "IICRC: catálogo de normas",
+      "url": "https://iicrc.org/iicrcstandards/"
+    }
+  },
+  {
+    "id": "alergenio-der-p1",
+    "term": "Der p 1 (o Alergénio do Ácaro)",
+    "definition": "Designação de um alergénio associado a uma espécie de ácaro do pó. Ácaros e alergénios não são a mesma coisa. A escolha de medidas perante alergias exige orientação clínica e não pode ser substituída por uma promessa de limpeza.",
+    "serviceLink": {
+      "label": "Tratamento Anti-Ácaros",
+      "to": "/tratamento-anti-acaros"
+    },
+    "source": {
+      "label": "SPAIC: ácaros e cuidados",
+      "url": "https://www.spaic.pt/perguntas-frequentes?id=13"
+    }
+  },
+  {
+    "id": "filtro-hepa",
+    "term": "Filtro HEPA",
+    "definition": "Tipo de filtro destinado a reter partículas finas. O desempenho depende da classe do filtro, do equipamento e da sua manutenção. A presença de um filtro não permite prometer melhoria clínica nem diagnosticar a causa de sintomas.",
+    "serviceLink": {
+      "label": "Tratamento Anti-Ácaros",
+      "to": "/tratamento-anti-acaros"
+    },
+    "source": {
+      "label": "SPAIC: ácaros e cuidados",
+      "url": "https://www.spaic.pt/perguntas-frequentes?id=13"
+    }
+  },
+  {
+    "id": "tempo-secagem-humidade",
+    "term": "Tempo de Secagem e Humidade Relativa",
+    "definition": "A secagem depende da humidade retida, da ventilação, do revestimento e das condições do espaço. Na limpeza Kyro, a média comunicada é de 3 a 6 horas. A utilização deve esperar pela secagem completa, mesmo que demore mais.",
+    "serviceLink": {
+      "label": "Limpeza de Sofás",
+      "to": "/limpeza-sofas"
+    }
+  },
+  {
+    "id": "reaplicacao-protetor",
+    "term": "Reaplicação do Protetor de Tecido",
+    "definition": "Nova aplicação de proteção após avaliação do estado do revestimento e do produto existente. O desgaste e os cuidados podem afetar a duração. Confirme as condições Essencial ou Premium antes de decidir reaplicar; uma lavagem não é uma medição exata da proteção restante.",
+    "serviceLink": {
+      "label": "Impermeabilização",
+      "to": "/impermeabilizacao"
+    }
+  },
+  {
+    "id": "efeito-lotus",
+    "term": "Efeito Lotus",
+    "definition": "Formação de gotas à superfície de um material com comportamento repelente à água. Não demonstra resistência a todas as substâncias nem proteção ilimitada. Não teste uma peça com líquidos sem respeitar o período de cura e as instruções recebidas.",
+    "serviceLink": {
+      "label": "Impermeabilização",
+      "to": "/impermeabilizacao"
+    }
+  },
+  {
+    "id": "fibra-natural-vs-sintetica",
+    "term": "Fibra Natural vs Fibra Sintética",
+    "definition": "Fibras naturais incluem lã, algodão e seda; fibras sintéticas incluem poliéster e poliamida. A origem ajuda a caracterizar o tecido, mas não decide tudo: misturas, corantes, acabamentos, bases e enchimentos também condicionam a limpeza.",
+    "serviceLink": {
+      "label": "Limpeza de Sofás",
+      "to": "/limpeza-sofas"
+    }
+  },
+  {
+    "id": "algodao-estofos",
+    "term": "Algodão em Estofos",
+    "definition": "Fibra natural utilizada em tecidos e capas de estofos. Pode ser misturada com outras fibras. Verifique instruções de lavagem, estabilidade da cor e risco de alteração dimensional, sem assumir que uma capa removível admite máquina.",
+    "serviceLink": {
+      "label": "Limpeza de Sofás",
+      "to": "/limpeza-sofas"
+    }
+  },
+  {
+    "id": "linho-estofos",
+    "term": "Linho em Estofos",
+    "definition": "Fibra natural utilizada em revestimentos com diferentes construções e acabamentos. Humidade, produtos e atrito podem alterar o aspeto. A escolha do método exige etiqueta e avaliação, não uma regra automática de água ou solvente.",
+    "serviceLink": {
+      "label": "Limpeza de Sofás",
+      "to": "/limpeza-sofas"
+    }
+  },
+  {
+    "id": "viscose-rayon",
+    "term": "Viscose (Rayon)",
+    "definition": "Fibra de celulose regenerada, presente em tecidos e tapetes. A humidade pode afetar resistência e aspeto. Peças delicadas exigem avaliação própria e podem não admitir a limpeza húmida proposta.",
+    "serviceLink": {
+      "label": "Limpeza de Tapetes",
+      "to": "/limpeza-tapetes"
+    }
+  },
+  {
+    "id": "poliester-estofos",
+    "term": "Poliéster",
+    "definition": "Fibra sintética comum em estofos, também usada em misturas. A composição não garante que a peça completa resista a calor ou a qualquer produto. Acabamento, corantes e base continuam a ser avaliados antes de limpar.",
+    "serviceLink": {
+      "label": "Limpeza de Sofás",
+      "to": "/limpeza-sofas"
+    }
+  },
+  {
+    "id": "nylon-poliamida",
+    "term": "Nylon (Poliamida)",
+    "definition": "Família de fibras sintéticas usada, entre outros artigos, em alcatifas. A resistência ao uso varia com a construção e o acabamento. A limpeza deve considerar manchas, estabilidade da cor e instruções do revestimento.",
+    "serviceLink": {
+      "label": "Limpeza de Alcatifas",
+      "to": "/limpeza-alcatifas"
+    }
+  },
+  {
+    "id": "acrilico-estofos",
+    "term": "Acrílico",
+    "definition": "Fibra sintética presente em têxteis de interior e exterior. A resposta à luz, ao atrito e à limpeza depende da formulação e construção da peça. Consulte a etiqueta em vez de extrapolar a partir de outro tecido acrílico.",
+    "serviceLink": {
+      "label": "Limpeza de Sofás",
+      "to": "/limpeza-sofas"
+    }
+  },
+  {
+    "id": "olefina-polipropileno",
+    "term": "Olefina (Polipropileno)",
+    "definition": "Fibra sintética utilizada em tapetes, alcatifas e alguns revestimentos. A compatibilidade com água não autoriza calor ou atrito excessivos. A base e a instalação também precisam de avaliação.",
+    "serviceLink": {
+      "label": "Limpeza de Tapetes",
+      "to": "/limpeza-tapetes"
+    }
+  },
+  {
+    "id": "chenille-tecido",
+    "term": "Chenille",
+    "definition": "Tecido com fios de aspeto felpudo. A orientação do pelo pode criar diferenças de brilho que parecem manchas. A composição e o estado dos fios determinam os cuidados, incluindo a possibilidade e intensidade de escovagem.",
+    "serviceLink": {
+      "label": "Limpeza de Sofás",
+      "to": "/limpeza-sofas"
+    }
+  },
+  {
+    "id": "boucle-tecido",
+    "term": "Bouclé",
+    "definition": "Tecido com laçadas em relevo, onde podem ficar presos pó e resíduos. Escovas agressivas podem puxar fios. A limpeza não reconstitui laçadas danificadas e deve respeitar a construção e composição.",
+    "serviceLink": {
+      "label": "Limpeza de Cadeiras",
+      "to": "/limpeza-cadeiras"
+    }
+  },
+  {
+    "id": "couro-anilina-pigmentado",
+    "term": "Couro Anilina, Semianilina e Pigmentado",
+    "definition": "Acabamentos de couro com diferentes níveis de cobertura e proteção superficial. O aspeto não basta para escolher um produto. O estado do acabamento deve ser avaliado, e a limpeza não inclui reparação de fissuras ou repigmentação.",
+    "serviceLink": {
+      "label": "Limpeza de Sofás",
+      "to": "/limpeza-sofas"
+    }
+  },
+  {
+    "id": "sisal-fibras-vegetais",
+    "term": "Sisal, Coco e Fibras Vegetais",
+    "definition": "Revestimentos de fibras vegetais como sisal e coco podem ser sensíveis à água e sofrer alterações de aspeto ou dimensão. Não seguem automaticamente limpeza húmida ou escovagem forte. É necessário confirmar composição e método.",
+    "serviceLink": {
+      "label": "Limpeza de Tapetes",
+      "to": "/limpeza-tapetes"
+    }
+  },
+  {
+    "id": "juta-base-tapete",
+    "term": "Juta (Base do Tapete)",
+    "definition": "A juta pode integrar a superfície ou a base de um tapete. A sua presença importa mesmo quando o pelo parece sintético. Humidade e método inadequados podem afetar a peça; a limpeza com água não deve ser assumida.",
+    "serviceLink": {
+      "label": "Limpeza de Tapetes",
+      "to": "/limpeza-tapetes"
+    }
+  },
+  {
+    "id": "seda-tapetes",
+    "term": "Seda em Tapetes",
+    "definition": "Fibra delicada presente em alguns tapetes, isolada ou em mistura. Corantes, construção e estado condicionam a intervenção. Seda não segue automaticamente limpeza com água nem escovagem forte; confirme o método antes de contratar.",
+    "serviceLink": {
+      "label": "Limpeza de Tapetes",
+      "to": "/limpeza-tapetes"
+    }
+  },
+  {
+    "id": "la-tapetes",
+    "term": "Lã em Tapetes",
+    "definition": "Fibra natural utilizada em tapetes com construções muito diferentes. A resposta à humidade, temperatura e ação mecânica deve ser avaliada. O nome lã, por si só, não garante compatibilidade com um método de extração.",
+    "serviceLink": {
+      "label": "Limpeza de Tapetes",
+      "to": "/limpeza-tapetes"
+    }
+  },
+  {
+    "id": "trama-urdidura",
+    "term": "Trama e Urdidura",
+    "definition": "Conjuntos de fios que se cruzam na construção de um tecido. A sua estabilidade influencia a forma e dimensão da peça. Numa avaliação de tapetes, a estrutura deve ser considerada em conjunto com o pelo e a base.",
+    "serviceLink": {
+      "label": "Limpeza de Tapetes",
+      "to": "/limpeza-tapetes"
+    }
+  },
+  {
+    "id": "franjas-tapete",
+    "term": "Franjas do Tapete",
+    "definition": "Acabamento que, nalguns tapetes, faz parte da própria estrutura de fios. Pode exigir tratamento separado e delicado. Evite puxar, escovar com força ou assumir que uma franja danificada pode ser reparada pela limpeza.",
+    "serviceLink": {
+      "label": "Limpeza de Tapetes",
+      "to": "/limpeza-tapetes"
+    }
+  },
+  {
+    "id": "tufting-tapete",
+    "term": "Tufting",
+    "definition": "Construção em que tufos de fio são inseridos numa base. A fixação e as camadas de suporte variam. A avaliação deve considerar a estabilidade do conjunto, não apenas a resistência do pelo visível.",
+    "serviceLink": {
+      "label": "Limpeza de Tapetes",
+      "to": "/limpeza-tapetes"
+    }
+  },
+  {
+    "id": "kilim",
+    "term": "Kilim",
+    "definition": "Tapete de tecelagem plana, geralmente sem pelo. A composição e a estabilidade das cores condicionam o método de limpeza. Padrões contrastantes exigem atenção à eventual transferência de cor; não se deve presumir que a peça aceita lavagem doméstica.",
+    "serviceLink": {
+      "label": "Limpeza de Tapetes",
+      "to": "/limpeza-tapetes"
+    }
+  },
+  {
+    "id": "delaminacao",
+    "term": "Delaminação",
+    "definition": "Separação entre camadas de um revestimento. Pode estar relacionada com degradação, humidade ou outras condições da peça. É um problema estrutural, não sujidade, e não se resolve simplesmente com mais limpeza.",
+    "serviceLink": {
+      "label": "Limpeza de Alcatifas",
+      "to": "/limpeza-alcatifas"
+    }
+  },
+  {
+    "id": "filtration-soiling",
+    "term": "Linhas Pretas junto ao Rodapé (Filtration Soiling)",
+    "definition": "Acumulação de partículas finas em zonas onde o ar atravessa ou contorna a alcatifa, por exemplo junto a frestas. Pode originar linhas escuras difíceis de tratar. O resultado e a recorrência dependem da origem e do estado das fibras.",
+    "serviceLink": {
+      "label": "Limpeza de Alcatifas",
+      "to": "/limpeza-alcatifas"
+    }
+  },
+  {
+    "id": "corredor-de-passagem",
+    "term": "Corredor de Passagem (Traffic Lane)",
+    "definition": "Zona que recebe circulação frequente num tapete ou alcatifa. Pode apresentar simultaneamente sujidade e desgaste. A limpeza pode remover resíduos sem eliminar a diferença de aspeto causada por fibras gastas.",
+    "serviceLink": {
+      "label": "Limpeza de Alcatifas",
+      "to": "/limpeza-alcatifas"
+    }
+  },
+  {
+    "id": "capa-removivel-maquina",
+    "term": "Capa Removível: Lavar na Máquina?",
+    "definition": "Uma capa removível só deve ser lavada na máquina se a etiqueta o permitir. Respeite temperatura, secagem e montagem indicadas pelo fabricante. Não vista uma almofada com capa húmida sem instrução expressa adequada à peça.",
+    "serviceLink": {
+      "label": "Limpeza de Sofás",
+      "to": "/limpeza-sofas"
+    }
+  },
+  {
+    "id": "encapsulacao",
+    "term": "Encapsulação",
+    "definition": "Método em que um produto ajuda a aglomerar resíduos para posterior remoção, geralmente por aspiração após secagem. A adequação depende do sistema e do revestimento. A definição não implica que este método esteja disponível em qualquer pedido Kyro.",
+    "serviceLink": {
+      "label": "Limpeza de Alcatifas",
+      "to": "/limpeza-alcatifas"
+    }
+  },
+  {
+    "id": "bonnet-cleaning",
+    "term": "Bonnet Cleaning",
+    "definition": "Método que utiliza um disco absorvente para recolher sujidade da superfície de um revestimento compatível. Tem limites de profundidade e de ação mecânica. A sua utilização deve ser confirmada para a peça e não é anunciada como método geral da Kyro.",
+    "serviceLink": {
+      "label": "Limpeza de Alcatifas",
+      "to": "/limpeza-alcatifas"
+    }
+  },
+  {
+    "id": "agitacao-mecanica",
+    "term": "Agitação Mecânica",
+    "definition": "Ação física que ajuda a desprender sujidade, incluindo escovagem. Nas limpezas adequadas, ocorre após o tratamento e antes da extração. A escova e a pressão respeitam a fibra; uma peça delicada não deve receber mais força para compensar uma mancha difícil.",
+    "serviceLink": {
+      "label": "Limpeza de Tapetes",
+      "to": "/limpeza-tapetes"
+    }
+  },
+  {
+    "id": "circulo-de-sinner",
+    "term": "Círculo de Sinner",
+    "definition": "Modelo que relaciona química, tempo, temperatura e ação mecânica na limpeza. Ajuda a compreender o processo, mas não é uma equação que garanta resultados. A compatibilidade do material limita o que pode ser alterado.",
+    "serviceLink": {
+      "label": "Limpeza de Sofás",
+      "to": "/limpeza-sofas"
+    }
+  },
+  {
+    "id": "aspiracao-previa",
+    "term": "Aspiração Prévia",
+    "definition": "Remoção de resíduos soltos antes de aplicar solução de limpeza, quando adequada à peça. Deve usar ferramentas e intensidade compatíveis com o revestimento. Não substitui a avaliação de manchas nem autoriza molhar o material em seguida.",
+    "serviceLink": {
+      "label": "Limpeza de Sofás",
+      "to": "/limpeza-sofas"
+    }
+  },
+  {
+    "id": "ferramenta-estofos",
+    "term": "Ferramenta de Estofos",
+    "definition": "Acessório de equipamento destinado ao trabalho em estofos. As funções dependem do modelo, podendo incluir aplicação e aspiração. A ferramenta, as passagens e a quantidade de solução são escolhidas para o material e a construção.",
+    "serviceLink": {
+      "label": "Limpeza de Sofás",
+      "to": "/limpeza-sofas"
+    }
+  },
+  {
+    "id": "pressao-de-trabalho",
+    "term": "Pressão de Trabalho",
+    "definition": "Pressão utilizada na aplicação de solução ou no funcionamento do equipamento. Um valor maior não significa melhor limpeza. A regulação depende do revestimento e da capacidade de controlar a humidade, sem uma pressão universal para todos os artigos.",
+    "serviceLink": {
+      "label": "Limpeza de Alcatifas",
+      "to": "/limpeza-alcatifas"
+    }
+  },
+  {
+    "id": "vaporizador-domestico",
+    "term": "Vaporizador Doméstico (Limitações)",
+    "definition": "Equipamento que aplica vapor e pode não ter recolha de líquido. Não é equivalente a uma extratora. Antes de o utilizar, confirme se o revestimento e o fabricante permitem o método; o vapor não é adequado a todos os estofos.",
+    "serviceLink": {
+      "label": "Limpeza de Colchões",
+      "to": "/limpeza-colchoes"
+    }
+  },
+  {
+    "id": "secagem-forcada",
+    "term": "Secagem Forçada",
+    "definition": "Utilização de meios de circulação de ar ou outros equipamentos adequados para apoiar a secagem. A disponibilidade e necessidade são confirmadas pela equipa. Não significa que todo o serviço inclua ar quente ou garanta um tempo exato.",
+    "serviceLink": {
+      "label": "Limpeza de Sofás",
+      "to": "/limpeza-sofas"
+    }
+  },
+  {
+    "id": "tensioativo",
+    "term": "Tensioativo",
+    "definition": "Componente que altera a tensão superficial e ajuda a solução a interagir com a sujidade. A formulação completa, a diluição e a remoção importam tanto como a presença deste ingrediente. Mais detergente não significa melhor resultado.",
+    "serviceLink": {
+      "label": "Limpeza de Sofás",
+      "to": "/limpeza-sofas"
+    }
+  },
+  {
+    "id": "solvente-limpeza-seco",
+    "term": "Solvente",
+    "definition": "Substância capaz de dissolver outras substâncias. Em limpeza a seco, o termo costuma referir-se a solventes não aquosos. A utilização exige compatibilidade, condições de aplicação e ventilação definidas pelo produto; não autoriza o uso doméstico improvisado.",
+    "serviceLink": {
+      "label": "Limpeza de Sofás",
+      "to": "/limpeza-sofas"
+    }
+  },
+  {
+    "id": "alcalinidade",
+    "term": "Alcalinidade",
+    "definition": "Capacidade de uma solução neutralizar ácidos, relacionada com a sua composição. Não é sinónimo exato de valor de pH. Na escolha de um detergente, avaliam-se ambos e a compatibilidade do material, sem assumir que maior alcalinidade melhora qualquer limpeza.",
+    "serviceLink": {
+      "label": "Limpeza de Tapetes",
+      "to": "/limpeza-tapetes"
+    }
+  },
+  {
+    "id": "quelante",
+    "term": "Quelante (Agente Sequestrante)",
+    "definition": "Ingrediente que se liga a determinados iões metálicos, podendo ajudar uma formulação a lidar com componentes da água ou resíduos. Não é um tratamento universal para manchas e não deve ser adicionado por iniciativa própria a uma solução.",
+    "serviceLink": {
+      "label": "Limpeza de Tapetes",
+      "to": "/limpeza-tapetes"
+    }
+  },
+  {
+    "id": "corante-vs-pigmento",
+    "term": "Nódoa de Corante vs Nódoa de Pigmento",
+    "definition": "Corantes e pigmentos têm comportamentos diferentes, mas a origem da mancha pode envolver vários componentes. O tratamento depende também da fibra e dos produtos já aplicados. Não se escolhe um oxidante apenas pela cor da nódoa.",
+    "serviceLink": {
+      "label": "Limpeza de Tapetes",
+      "to": "/limpeza-tapetes"
+    }
+  },
+  {
+    "id": "enzimas-tipos",
+    "term": "Protease, Lipase e Amilase",
+    "definition": "Proteases, lipases e amilases atuam sobre classes diferentes de substâncias, como proteínas, gorduras e amido. A eficácia depende da formulação e condições de utilização. Não existe uma enzima que resolva qualquer mancha ou odor.",
+    "serviceLink": {
+      "label": "Limpeza de Colchões",
+      "to": "/limpeza-colchoes"
+    }
+  },
+  {
+    "id": "residuo-de-produto",
+    "term": "Resíduo de Produto",
+    "definition": "Material que permanece na peça após a aplicação de um produto. Pode afetar toque ou aspeto e dificultar intervenções posteriores. A remoção necessária deve seguir o sistema utilizado; informe sempre a equipa dos detergentes já aplicados.",
+    "serviceLink": {
+      "label": "Limpeza de Sofás",
+      "to": "/limpeza-sofas"
+    }
+  },
+  {
+    "id": "aureola-anel-agua",
+    "term": "Auréola (Anel de Água)",
+    "definition": "Marca com contorno visível em torno de uma zona molhada ou tratada. Pode envolver migração de resíduos ou alterações do revestimento. Molhar uma área maior sem avaliação pode agravar o problema.",
+    "serviceLink": {
+      "label": "Limpeza de Sofás",
+      "to": "/limpeza-sofas"
+    }
+  },
+  {
+    "id": "migracao-corante",
+    "term": "Migração de Corante (Dye Bleed)",
+    "definition": "Transferência de cor de uma zona para outra ou para um pano durante o tratamento. A estabilidade do corante é avaliada antes de intervir. Uma transferência pode ser difícil ou impossível de corrigir e não deve ser confundida com sujidade.",
+    "serviceLink": {
+      "label": "Limpeza de Sofás",
+      "to": "/limpeza-sofas"
+    }
+  },
+  {
+    "id": "pilling",
+    "term": "Pilling (Bolinhas no Tecido)",
+    "definition": "Bolinhas formadas por fibras à superfície devido ao uso e atrito. Não são sujidade e a limpeza não garante a sua remoção. Qualquer tratamento mecânico de remoção deve ser compatível com o tecido.",
+    "serviceLink": {
+      "label": "Limpeza de Sofás",
+      "to": "/limpeza-sofas"
+    }
+  },
+  {
+    "id": "desbotamento-uv",
+    "term": "Desbotamento por Sol (UV)",
+    "definition": "Perda ou alteração de cor por exposição à luz. Pode tornar-se evidente ao comparar áreas expostas e protegidas. Limpar não repõe cor perdida, embora a remoção de sujidade possa alterar a perceção do conjunto.",
+    "serviceLink": {
+      "label": "Limpeza de Sofás",
+      "to": "/limpeza-sofas"
+    }
+  },
+  {
+    "id": "amarelecimento",
+    "term": "Amarelecimento",
+    "definition": "Alteração de tom com várias causas possíveis, incluindo envelhecimento, produtos ou resíduos. A resposta à limpeza depende da origem. Não se deve prometer recuperar o branco original antes de avaliar.",
+    "serviceLink": {
+      "label": "Limpeza de Sofás",
+      "to": "/limpeza-sofas"
+    }
+  },
+  {
+    "id": "acaro-do-po",
+    "term": "Ácaro do Pó Doméstico",
+    "definition": "Animal microscópico que pode existir no pó e em têxteis domésticos. A sua presença não é confirmada pelo aspeto de uma mancha. Questões de alergia devem ser avaliadas clinicamente; limpeza e tratamentos de estofos não são cuidados médicos.",
+    "serviceLink": {
+      "label": "Tratamento Anti-Ácaros",
+      "to": "/tratamento-anti-acaros"
+    },
+    "source": {
+      "label": "SPAIC: ácaros e cuidados",
+      "url": "https://www.spaic.pt/perguntas-frequentes?id=13"
+    }
+  },
+  {
+    "id": "humidade-relativa-interior",
+    "term": "Humidade Relativa Interior",
+    "definition": "Relação entre o vapor de água presente no ar e a saturação à mesma temperatura. Influencia a secagem dos estofos. Humidade persistente exige atenção à sua origem, sobretudo quando há bolor; uma limpeza de superfície não resolve infiltrações.",
+    "serviceLink": {
+      "label": "Limpeza de Sofás",
+      "to": "/limpeza-sofas"
+    },
+    "source": {
+      "label": "OMS: humidade e bolor",
+      "url": "https://www.who.int/publications/i/item/9789289041683"
+    }
+  },
+  {
+    "id": "capa-anti-acaros",
+    "term": "Capa Anti-Ácaros",
+    "definition": "Cobertura concebida para funcionar como barreira física, conforme as características do produto. Não é equivalente a um tratamento de limpeza. A escolha perante alergias deve seguir orientação adequada, e a lavagem respeita as instruções do fabricante.",
+    "serviceLink": {
+      "label": "Limpeza de Colchões",
+      "to": "/limpeza-colchoes"
+    },
+    "source": {
+      "label": "SPAIC: ácaros e cuidados",
+      "url": "https://www.spaic.pt/perguntas-frequentes?id=13"
+    }
+  },
+  {
+    "id": "desbacterizacao",
+    "term": "Desbacterização",
+    "definition": "Tratamento opcional com objetivo próprio, distinto da remoção normal de sujidade. Produto, compatibilidade, condições de aplicação e preço são confirmados no orçamento. Não representa garantia de esterilidade nem tratamento clínico.",
+    "serviceLink": {
+      "label": "Desbacterização",
+      "to": "/desbacterizacao"
+    }
+  },
+  {
+    "id": "colchao-face-rotacao",
+    "term": "Rotação e Faces do Colchão",
+    "definition": "Rotação e utilização das faces dependem do modelo do colchão. Alguns não podem ser virados. Na limpeza, indique as faces pretendidas e confirme o âmbito do orçamento, sem assumir que todas as faces admitem o mesmo método.",
+    "serviceLink": {
+      "label": "Limpeza de Colchões",
+      "to": "/limpeza-colchoes"
+    }
+  },
+  {
+    "id": "espuma-viscoelastica",
+    "term": "Espuma Viscoelástica (Memory Foam)",
+    "definition": "Espuma utilizada em camadas de conforto de colchões e outros artigos. A capa e o núcleo podem exigir cuidados diferentes. Humidade e resíduos no interior podem ser difíceis de remover; a compatibilidade deve ser confirmada antes da intervenção.",
+    "serviceLink": {
+      "label": "Limpeza de Colchões",
+      "to": "/limpeza-colchoes"
+    }
+  },
+  {
+    "id": "cadeira-mesh",
+    "term": "Cadeira de Rede (Mesh)",
+    "definition": "Cadeira com uma ou mais zonas de malha tensionada. Encosto, assento e estrutura podem exigir cuidados distintos. Evite atrito que deforme a rede e confirme o âmbito do serviço para cada superfície.",
+    "serviceLink": {
+      "label": "Limpeza de Cadeiras",
+      "to": "/limpeza-cadeiras"
+    }
+  },
+  {
+    "id": "hot-desking-higiene",
+    "term": "Hot-desking e Higiene de Cadeiras",
+    "definition": "Uso partilhado de postos de trabalho e cadeiras. A manutenção deve acompanhar o uso e o estado observados, com atenção aos assentos e apoios. Não define, por si só, um calendário obrigatório de limpeza ou desbacterização.",
+    "serviceLink": {
+      "label": "Limpeza de Cadeiras",
+      "to": "/limpeza-cadeiras"
+    }
+  },
+  {
+    "id": "frequencia-limpeza-estofos",
+    "term": "Frequência de Limpeza de Estofos",
+    "definition": "Intervalo entre intervenções, ajustado ao uso, sujidade e instruções de manutenção da peça. Não existe um prazo universal. Derrames ou odores persistentes podem justificar avaliação antes da próxima visita planeada.",
+    "serviceLink": {
+      "label": "Limpeza de Sofás",
+      "to": "/limpeza-sofas"
+    }
+  },
+  {
+    "id": "manutencao-preventiva",
+    "term": "Manutenção Preventiva",
+    "definition": "Cuidados regulares compatíveis com a peça, como aspiração adequada e resposta a derrames. A rotação de almofadas ou lavagem de capas só se faz quando permitida. O objetivo é evitar acumulação de resíduos e preservar o revestimento.",
+    "serviceLink": {
+      "label": "Limpeza de Sofás",
+      "to": "/limpeza-sofas"
+    }
+  },
+  {
+    "id": "derrame-primeiros-minutos",
+    "term": "Derrame: os Primeiros Minutos",
+    "definition": "Absorva o excesso com pano branco limpo, sem esfregar nem espalhar. Consulte a etiqueta antes de aplicar líquidos ou detergentes. Uma resposta rápida ajuda, mas não garante remover totalmente a mancha.",
+    "serviceLink": {
+      "label": "Limpeza de Sofás",
+      "to": "/limpeza-sofas"
+    }
+  },
+  {
+    "id": "teste-zona-escondida",
+    "term": "Teste em Zona Escondida",
+    "definition": "Verificação do método numa zona discreta para observar resposta da cor, textura e acabamento. É uma medida de avaliação, não garantia de ausência de risco em toda a peça. Uma reação desfavorável exige rever ou interromper o procedimento.",
+    "serviceLink": {
+      "label": "Limpeza de Sofás",
+      "to": "/limpeza-sofas"
+    }
+  },
+  {
+    "id": "inspecao-previa",
+    "term": "Inspeção Prévia",
+    "definition": "Avaliação de composição, instruções, manchas, desgaste e acessos antes do trabalho. Serve para definir o método e explicar limites. Fotografias ajudam a preparar a visita, mas podem não mostrar o interior ou todos os danos.",
+    "serviceLink": {
+      "label": "Limpeza de Sofás",
+      "to": "/limpeza-sofas"
+    }
+  },
+  {
+    "id": "limite-do-servico",
+    "term": "Limite do Serviço",
+    "definition": "Condições que a limpeza não consegue corrigir, como desgaste, perda de cor ou dano estrutural. Devem ser explicadas antes de executar. Manchas preexistentes não excluem a garantia de repetição gratuita comunicada até 48 horas.",
+    "serviceLink": {
+      "label": "Limpeza de Sofás",
+      "to": "/limpeza-sofas"
+    }
+  },
+  {
+    "id": "orcamento-sob-medicao",
+    "term": "Orçamento sob Medição",
+    "definition": "Proposta que usa largura e comprimento, material, estado e condições de acesso para definir o serviço. Aplica-se sempre a tapetes e alcatifas, sem preço fixo por metro quadrado. Fotografias e medidas podem ajudar a preparar a confirmação.",
+    "serviceLink": {
+      "label": "Limpeza de Tapetes",
+      "to": "/limpeza-tapetes"
+    }
+  },
+  {
+    "id": "servico-ao-domicilio",
+    "term": "Serviço ao Domicílio",
+    "definition": "Intervenção no local do cliente, com equipamento levado pela equipa. Acesso, água, eletricidade e espaço de trabalho são combinados previamente. A utilização posterior depende da secagem e das instruções dos produtos aplicados.",
+    "serviceLink": {
+      "label": "Limpeza de Sofás",
+      "to": "/limpeza-sofas"
+    }
+  },
+  {
+    "id": "taxa-de-deslocacao",
+    "term": "Taxa de Deslocação",
+    "definition": "Valor apresentado à parte dos serviços, definido pela localidade e confirmado com a morada. Na Kyro começa em 10€. Não é uma promessa de deslocação incluída nem um cálculo automático por quilómetros.",
+    "serviceLink": {
+      "label": "Áreas de Serviço",
+      "to": "/areas-de-servico"
+    }
+  },
+  {
+    "id": "antes-e-depois",
+    "term": "Antes e Depois",
+    "definition": "Comparação fotográfica de uma peça antes e depois de uma intervenção. Deve identificar corretamente o trabalho e permitir uma comparação honesta. Imagens ilustrativas não devem ser apresentadas como resultados reais.",
+    "serviceLink": {
+      "label": "Antes e Depois",
+      "to": "/antes-depois-limpeza"
+    }
+  },
+  {
+    "id": "estofo-comercial-vs-domestico",
+    "term": "Estofo Comercial vs Doméstico",
+    "definition": "Designações ligadas ao uso previsto e às características da peça. Um revestimento comercial pode ter requisitos específicos de resistência e manutenção, mas não aceita automaticamente produtos mais fortes. Consulte as instruções de cada modelo.",
+    "serviceLink": {
+      "label": "Limpeza de Cadeiras",
+      "to": "/limpeza-cadeiras"
+    }
+  },
+  {
+    "id": "ciclos-martindale",
+    "term": "Ciclos Martindale",
+    "definition": "Resultado de ensaio de resistência à abrasão de um tecido. Ajuda a comparar características dentro das condições do ensaio, mas não indica um número exato de anos de vida nem a compatibilidade com produtos de limpeza.",
+    "serviceLink": {
+      "label": "Limpeza de Cadeiras",
+      "to": "/limpeza-cadeiras"
+    }
+  },
+  {
+    "id": "alcatifa-losetas",
+    "term": "Alcatifa em Losetas",
+    "definition": "Alcatifa composta por módulos, que podem permitir intervenção ou substituição localizada conforme a instalação. A limpeza é avaliada pelo material, base e estado. Substituir módulos não está incluído automaticamente no serviço.",
+    "serviceLink": {
+      "label": "Limpeza de Alcatifas",
+      "to": "/limpeza-alcatifas"
+    }
+  },
+  {
+    "id": "compostos-organicos-volateis",
+    "term": "Compostos Orgânicos Voláteis (COV)",
+    "definition": "Substâncias que podem passar para o ar por evaporação nas condições do ambiente. As instruções dos produtos determinam ventilação e cuidados de utilização. Pouco cheiro não comprova, por si só, adequação ou ausência de risco.",
+    "serviceLink": {
+      "label": "Limpeza de Colchões",
+      "to": "/limpeza-colchoes"
+    }
+  }
 ];

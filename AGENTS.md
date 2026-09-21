@@ -227,3 +227,8 @@ Secção «A nossa promessa» simplificada por pedido do responsável: uma fotog
 
 
 Revisão das promessas (13/09/2026): o responsável rejeitou a fotografia única com três parágrafos. Nos seis serviços, apresentar três imagens que ilustrem os compromissos, cada uma apenas com uma legenda curta. Sem os parágrafos explicativos; a condição de repetição até 48h fica numa nota discreta no final. Esta decisão substitui a composição anterior. Manter imagens WebP responsivas e lazy loading.
+
+
+## Recursos e desenho comercial (21/09/2026)
+
+O responsável confirmou que os «100» eram termos do Glossário, todos na mesma página. Preservar os 100 identificadores e os 26 URLs do Blog; não criar páginas artificiais para atingir uma contagem. Os artigos usam o desenho das páginas de serviço, com `CommercialHero`, orçamento partilhado, avaliações reais, guia e quatro FAQ. Não voltar a uma identidade editorial diferente nem a heroes longos sem ação comercial. Blog, FAQ e Glossário partilham `ResourceHubHero`/`ResourceNav`. Manter as correções documentadas em `docs/resources-review-2026-09-21/README.md`, incluindo ausência de recolha/entrega nacional de tapetes prometida, métodos universais ou garantia de devolução de dinheiro. `resourceContent.ts` partilha o conteúdo comercial e as quatro FAQ do hub com o HTML inicial.

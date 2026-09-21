@@ -1,5 +1,5 @@
-﻿import { sofaPrices, mattressPrices, sofaChaisePrice } from "../components/quiz/QuizTypes";
-import { BLOG_SOURCES } from "./blogSources";
+import { sofaPrices, mattressPrices, sofaChaisePrice } from "../components/quiz/QuizTypes";
+import { locationPrices } from "../constants/travel";
 import { DEFAULT_AUTHOR } from "./authors";
 
 export interface BlogPost {
@@ -60,1583 +60,1553 @@ const IMPER_PREMIUM_3 = eur(sofaSize("3-lugares").waterproofingPremiumPrice!);
 const COLCHAO_SOLTEIRO = eur(mattressSize("solteiro").cleaningPrice);
 const COLCHAO_CASAL = eur(mattressSize("casal").cleaningPrice);
 const COLCHAO_KING = eur(mattressSize("king").cleaningPrice);
-// Diferença derivada, não escrita: o artigo explica porque é que o casal custa
-// mais, e o número tem de acompanhar os dois preços acima.
 const CHAISE_LIMPEZA = eur(sofaChaisePrice.cleaning);
-const COLCHAO_DELTA = eur(
-  (mattressSize("casal").cleaningPrice as number) - (mattressSize("solteiro").cleaningPrice as number),
-);
+const TRAVEL_MIN = eur(Math.min(...Object.values(locationPrices)));
 
+
+// Revisão editorial de 21/09/2026. URLs preservados; preços derivados das tabelas reais.
 const posts: BlogPost[] = [
   {
-    slug: "quanto-custa-limpar-sofa-profissional",
-    title: "Quanto custa limpar um sofá profissionalmente em 2025?",
-    metaTitle: "Preço Limpeza Profissional de Sofá 2025 | Kyro Clean",
-    metaDescription: "Descubra os preços reais da limpeza profissional de sofás em Portugal. Fatores que influenciam o custo, o que está incluído e como poupar.",
-    publishDate: "2025-09-10",
-    updatedDate: "2025-09-10",
-    author: DEFAULT_AUTHOR.name,
-    readingTime: 6,
-    category: "Preços",
-    heroAlt: "Técnico a limpar sofá de tecido com equipamento profissional",
-    intro: "Uma das perguntas mais frequentes que recebemos é: «quanto custa limpar um sofá?». A resposta honesta é: depende. Mas vamos dar-lhe os números reais para que possa tomar uma decisão informada.",
-    sections: [
+    "slug": "quanto-custa-limpar-sofa-profissional",
+    "title": "Quanto custa limpar um sofá profissionalmente?",
+    "metaTitle": "Quanto custa limpar um sofá profissionalmente? | Kyro Clean",
+    "metaDescription": "Compare o preço por tamanho, a deslocação e o que inclui a limpeza do sofá. Saiba que informações enviar para confirmar o seu orçamento.",
+    "publishDate": "2025-09-10",
+    "updatedDate": "2026-09-21",
+    "author": DEFAULT_AUTHOR.name,
+    "readingTime": 2,
+    "category": "Preços",
+    "heroAlt": "Imagem ilustrativa sobre quanto custa limpar um sofá profissionalmente",
+    "intro": "Compare o preço por tamanho, a deslocação e o que inclui a limpeza do sofá. Saiba que informações enviar para confirmar o seu orçamento.",
+    "sections": [
       {
-        heading: "Preços médios em Portugal (2025)",
-        body: `Em Portugal, o preço médio de limpeza profissional de sofá começa nos ${SOFA_1}. Um sofá de 2 lugares custa ${SOFA_2} e um sofá de 3 lugares ${SOFA_3}. Chaise longue tem um acréscimo de ${CHAISE_LIMPEZA}. Sofás em L ou modulares são orçamentados conforme a dimensão.\n\nEstes valores incluem pré-tratamento de manchas, limpeza por extração a vapor e secagem rápida; a deslocação é cobrada à parte, consoante a localização. O sofá fica utilizável em 3 a 6 horas.`,
-        tip: "Peça sempre um orçamento com visita ou foto antes de confirmar. Desconfie de preços abaixo de 25€, geralmente não incluem limpeza profunda por extração.",
+        "heading": "Preço por tamanho do sofá",
+        "body": `**1 lugar:** ${SOFA_1}
+**2 lugares:** ${SOFA_2}
+**3 lugares:** ${SOFA_3}
+**Chaise longue:** acréscimo de ${CHAISE_LIMPEZA} na limpeza.
+
+Configurações maiores ou diferentes são avaliadas no orçamento. A deslocação é cobrada à parte, consoante a localidade, a partir de ${TRAVEL_MIN}.`
       },
       {
-        heading: "O que influencia o preço?",
-        body: "Vários fatores determinam o custo final:\n\n**Tamanho e configuração**, Um sofá em L tem mais metros de tecido do que um sofá de 3 lugares reto. O número de chaises e almofadas avulsas também conta.\n\n**Material do tecido**, Tecidos delicados como veludo, alcântara ou chenille requerem produtos específicos. O preço base não varia por tipo de tecido.\n\n**Estado de sujidade**, Manchas antigas, urina de animais ou bolor exigem pré-tratamentos especializados que não estão incluídos no preço base.\n\n**Impermeabilização**, Se adicionar impermeabilização ao serviço (recomendado), o pack limpeza mais impermeabilização fica entre 50€ e 90€ acima do preço da limpeza simples, mas com desconto face à contratação separada.",
+        "heading": "O que está incluído",
+        "body": "Avaliamos o revestimento e as manchas, aspiramos, aplicamos o tratamento adequado, escovamos respeitando a fibra, extraímos a sujidade e conferimos o resultado. A escova, a pressão e a humidade são ajustadas ao material. Materiais incompatíveis com água exigem avaliação de outro método.\n\nA limpeza remove sujidade e resíduos. Anti-ácaros e desbacterização são tratamentos opcionais, escolhidos e orçamentados separadamente. Não prometemos eliminação total de microrganismos nem benefícios clínicos."
       },
       {
-        heading: "Limpeza DIY vs. limpeza profissional: vale a pena?",
-        body: "Muitos clientes tentam primeiro limpar o sofá em casa antes de nos contactar. O resultado habitual: o tecido fica molhado durante horas, podem surgir manchas de água ou o odor não desaparece completamente.\n\nIsso acontece porque os equipamentos domésticos não atingem a temperatura nem a pressão necessárias para extrair a sujidade das fibras em profundidade. Uma limpeza profissional com equipamento de extração a quente ajuda a remover resíduos associados a ácaros e bactérias, impossível de atingir com produtos de supermercado.\n\nConsiderando que um sofá de qualidade custa entre 500€ e 3000€, uma limpeza profissional anual a 60€ é um investimento que prolonga a vida do móvel em vários anos.",
-        tip: "Sofás com garantia do fabricante podem exigir limpeza profissional documentada para manter a garantia válida.",
+        "heading": "Como comparar dois orçamentos",
+        "body": "Confirme o número de lugares, a chaise longue, os extras e a deslocação. Um preço de partida não é o total de qualquer sofá. A simulação é uma estimativa; o valor confirmado mantém-se para o pedido acordado."
       },
       {
-        heading: "Como funciona uma limpeza profissional?",
-        body: "O processo completo tem 5 etapas:\n\n1. **Inspeção**, Identificação do tipo de tecido, manchas existentes e estado geral.\n2. **Aspiração profunda**, Remoção de poeira, pelos e partículas sólidas.\n3. **Pré-tratamento**, Aplicação de produto enzimático nas manchas mais resistentes.\n4. **Extração a vapor**, Limpeza profunda com água quente a alta pressão que dissolve e aspira a sujidade.\n5. **Secagem rápida**, Aplicação de ar quente para acelerar a secagem.",
-      },
+        "heading": "Aproveitar a mesma visita",
+        "body": "Pode juntar colchões ou cadeiras ao pedido e consultar a proposta no configurador. A poupança depende dos artigos e das regras atuais do orçamento. Não aplique uma percentagem fixa a todos os serviços."
+      }
     ],
-    faq: [
+    "faq": [
       {
-        q: "Quanto tempo demora a limpeza de um sofá?",
-        a: "Entre 45 minutos e 2 horas dependendo do tamanho e estado. O sofá fica utilizável em 3 a 6 horas após a limpeza.",
+        "q": "O orçamento inclui deslocação?",
+        "a": "A deslocação aparece separada dos serviços e é confirmada pela localidade e morada."
       },
       {
-        q: "Limpam sofás de pele/couro?",
-        a: "Sim, mas o processo é diferente. Sofás de pele não utilizam extração a vapor, são limpos com produtos específicos para couro que hidratam e protegem o material.",
+        "q": "A limpeza inclui impermeabilização?",
+        "a": "Não. A proteção é uma escolha adicional para sofás e cadeiras compatíveis."
       },
       {
-        q: "É necessário retirar as almofadas do sofá?",
-        a: "Não, fazemos isso nós. As almofadas são limpas individualmente para garantir um resultado uniforme em todo o sofá.",
+        "q": "Quando posso voltar a sentar-me?",
+        "a": "Secagem média de 3 a 6 horas, dependendo da ventilação, do tecido e das condições do espaço. Utilize a peça apenas depois de estar completamente seca."
       },
       {
-        q: "Com que frequência devo limpar o sofá profissionalmente?",
-        a: "Recomendamos pelo menos uma vez por ano para uso normal. Se tem animais de estimação ou crianças pequenas, a cada 6 meses.",
-      },
+        "q": "E se não ficar satisfeito?",
+        "a": "Se não ficar satisfeito, contacte-nos até 48 horas após o serviço e repetimos a intervenção sem custos. Explicamos previamente os limites das manchas e do desgaste; a sua existência não exclui esta garantia."
+      }
     ],
-    relatedService: { label: "Ver preços de limpeza de sofás", href: "/limpeza-sofas" },
-    relatedPosts: [
+    "relatedService": {
+      "label": "Ver preços de limpeza de sofás",
+      "href": "/limpeza-sofas"
+    },
+    "relatedPosts": [
       "como-tirar-manchas-sofa-tecido",
-      "impermeabilizacao-sofa-vale-pena",
+      "impermeabilizacao-sofa-vale-pena"
     ],
+    "sources": []
   },
-
   {
-    slug: "como-tirar-manchas-sofa-tecido",
-    title: "Como tirar manchas de sofá de tecido: guia completo",
-    metaTitle: "Como Tirar Manchas de Sofá de Tecido | Guia 2025",
-    metaDescription: "Guia passo a passo para remover manchas de vinho, café, gordura e urina do sofá em casa. Quando chamar um profissional.",
-    publishDate: "2025-09-18",
-    updatedDate: "2025-09-18",
-    author: DEFAULT_AUTHOR.name,
-    readingTime: 7,
-    category: "Dicas",
-    heroAlt: "Mancha de vinho num sofá de tecido cinza",
-    intro: "Derramar algo no sofá é quase inevitável. A boa notícia é que a maioria das manchas pode ser removida, desde que se atue rapidamente e com a técnica certa. Este guia mostra o que fazer.",
-    sections: [
+    "slug": "como-tirar-manchas-sofa-tecido",
+    "title": "Como tratar uma mancha no sofá de tecido",
+    "metaTitle": "Como tratar uma mancha no sofá de tecido | Kyro Clean",
+    "metaDescription": "Derramou vinho, café ou gordura no sofá? Saiba o que fazer primeiro e quando pedir uma avaliação antes de aplicar mais produtos.",
+    "publishDate": "2025-09-18",
+    "updatedDate": "2026-09-21",
+    "author": DEFAULT_AUTHOR.name,
+    "readingTime": 2,
+    "category": "Dicas",
+    "heroAlt": "Imagem ilustrativa sobre como tratar uma mancha no sofá de tecido",
+    "intro": "Derramou vinho, café ou gordura no sofá? Saiba o que fazer primeiro e quando pedir uma avaliação antes de aplicar mais produtos.",
+    "sections": [
       {
-        heading: "A regra de ouro: aja nos primeiros 5 minutos",
-        body: "O fator mais determinante para remover uma mancha não é o produto que usa, é a velocidade com que age. Uma mancha fresca é removível em casa na maioria dos casos. Uma mancha seca de 24 horas pode já exigir intervenção profissional.\n\nAssim que acontece um derrame, absorva o máximo de líquido com um pano branco seco. Nunca esfregue, isso empurra a mancha para o interior das fibras. Vá sempre do exterior para o interior da mancha.",
-        tip: "Use sempre um pano branco. Panos coloridos podem transferir cor para o tecido do sofá.",
+        "heading": "Primeiro, retire o excesso",
+        "body": "Absorva o líquido com um pano branco limpo, sem esfregar nem espalhar a mancha. Retire resíduos sólidos com cuidado. Consulte a etiqueta antes de aplicar água ou detergente."
       },
       {
-        heading: "Manchas de vinho tinto",
-        body: "1. Absorva o excesso com pano seco imediatamente.\n2. Polvilhe sal grosso sobre a mancha e deixe absorver 2 minutos.\n3. Aspire o sal.\n4. Misture 1 colher de sopa de detergente de louça com 2 colheres de água oxigenada (3%).\n5. Aplique com pano branco, sem esfregar.\n6. Enxague com pano húmido em água fria.\n\nAtenção: a água oxigenada pode clarear alguns tecidos coloridos. Teste sempre numa zona não visível primeiro.",
+        "heading": "Evite transformar uma mancha numa auréola",
+        "body": "Não misture vinagre, bicarbonato, lixívia ou outros produtos. Não use vapor nem encharque o assento. Produtos e atrito inadequados podem alterar a cor e a textura, mesmo que a mancha pareça pequena."
       },
       {
-        heading: "Manchas de café e chá",
-        body: "Para manchas frescas: água fria e detergente suave são suficientes. Para manchas secas:\n\n1. Humedeça a área com água fria.\n2. Aplique uma mistura de vinagre branco e água (50/50) com pano.\n3. Deixe atuar 5 minutos.\n4. Enxague com pano húmido.\n5. Seque com pano absorvente.\n\nO café tem taninos que penetram nas fibras rapidamente, quanto mais tempo passa, mais difícil fica.",
-        tip: "Evite água quente em manchas de café. O calor fixa a proteína do leite nas fibras.",
+        "heading": "O que precisamos de saber",
+        "body": "Envie uma fotografia da peça inteira e outra da mancha. Indique a substância, quando ocorreu o derrame e o que já aplicou. Uma fotografia ajuda a preparar a avaliação, mas não garante que a marca saia."
       },
       {
-        heading: "Manchas de gordura (pizza, manteiga, óleos)",
-        body: "A gordura é hidrofóbica, a água não a dissolve. Precisa de um agente desengordurante:\n\n1. Cubra a mancha com bicarbonato de sódio e deixe 20 minutos para absorver a gordura.\n2. Aspire o bicarbonato.\n3. Aplique um pouco de detergente de louça diretamente na mancha.\n4. Com pano branco húmido, trabalhe em movimentos circulares do exterior para o interior.\n5. Enxague e seque.",
-      },
-      {
-        heading: "Manchas de urina (animais e crianças)",
-        body: "Manchas de urina são as mais difíceis de tratar em casa porque têm dois problemas: a cor e o odor. Os produtos de limpeza comuns eliminam a mancha visível mas não destroem os cristais de ácido úrico que causam o cheiro.\n\nPara casos frescos, pode tentar uma mistura de água fria, vinagre branco e uma gota de detergente. Para manchas secas ou com odor persistente, a única solução eficaz é um tratamento enzimático profissional, os enzimas quebram os cristais de ácido úrico à escala molecular.",
-        tip: "Sofás com manchas de urina tratados em casa frequentemente voltam a cheirar mal em dias húmidos. Um tratamento profissional com enzimas resolve definitivamente.",
-      },
-      {
-        heading: "Quando chamar um profissional",
-        body: "Há situações em que a intervenção profissional é a opção mais segura e económica:\n\n- Manchas antigas secas (mais de 24-48h)\n- Manchas de tinta ou corantes\n- Bolor ou fungos\n- Urina de animal com odor persistente\n- Tecidos delicados (veludo, alcântara, chenille)\n- Sofás de pele ou couro\n- Após tentativas caseiras mal-sucedidas\n\nTentar limpar repetidamente sem resultado pode danificar o tecido e tornar a posterior limpeza profissional mais difícil.",
-      },
+        "heading": "Como intervimos",
+        "body": "Avaliamos o revestimento e as manchas, aspiramos, aplicamos o tratamento adequado, escovamos respeitando a fibra, extraímos a sujidade e conferimos o resultado. A escova, a pressão e a humidade são ajustadas ao material. Materiais incompatíveis com água exigem avaliação de outro método.\n\nA possibilidade de remoção depende da substância, do tempo decorrido, dos produtos já aplicados e do revestimento. Uma alteração de cor ou dano na fibra pode permanecer depois de a sujidade sair."
+      }
     ],
-    faq: [
+    "faq": [
       {
-        q: "Posso usar água quente para limpar manchas?",
-        a: "Depende da mancha. Para gordura, sim. Para manchas proteicas (sangue, urina, ovo), não, o calor fixa as proteínas nas fibras tornando a remoção mais difícil.",
+        "q": "Uma mancha antiga pode sair?",
+        "a": "A possibilidade de remoção depende da substância, do tempo decorrido, dos produtos já aplicados e do revestimento. Uma alteração de cor ou dano na fibra pode permanecer depois de a sujidade sair."
       },
       {
-        q: "O bicarbonato de sódio danifica o tecido do sofá?",
-        a: "Não, o bicarbonato é seguro para a maioria dos tecidos. É um produto suave que absorve odores e gordura sem agredir as fibras.",
+        "q": "Devo esfregar até desaparecer?",
+        "a": "Não. O atrito pode espalhar resíduos e danificar a fibra."
       },
       {
-        q: "A mancha saiu mas ficou uma marca branca. O que fazer?",
-        a: "Esse é um resíduo do produto de limpeza. Humedeça a área com água limpa e seque com pano absorvente. Repita até a marca desaparecer.",
+        "q": "Posso limpar apenas a zona manchada?",
+        "a": "Avaliamos se o tratamento localizado é adequado ou se criaria diferença de aspeto em relação ao resto da peça."
       },
+      {
+        "q": "Quanto tempo demora a secagem?",
+        "a": "Secagem média de 3 a 6 horas, dependendo da ventilação, do tecido e das condições do espaço. Utilize a peça apenas depois de estar completamente seca."
+      }
     ],
-    relatedService: { label: "Serviço profissional de limpeza de sofás", href: "/limpeza-sofas" },
-    relatedPosts: [
+    "relatedService": {
+      "label": "Serviço profissional de limpeza de sofás",
+      "href": "/limpeza-sofas"
+    },
+    "relatedPosts": [
       "quanto-custa-limpar-sofa-profissional",
-      "acaros-sofas-colchoes-riscos-saude",
+      "acaros-sofas-colchoes-riscos-saude"
     ],
+    "sources": []
   },
-
   {
-    slug: "impermeabilizacao-sofa-vale-pena",
-    title: "Impermeabilização de sofá: vale mesmo a pena?",
-    metaTitle: "Impermeabilização de Sofá: Vale a Pena? | Kyro Clean 2025",
-    metaDescription: "Impermeabilizar o sofá protege contra manchas e prolonga a vida do tecido. Descubra como funciona, quanto dura e quanto custa.",
-    publishDate: "2025-10-02",
-    updatedDate: "2025-10-02",
-    author: DEFAULT_AUTHOR.name,
-    readingTime: 5,
-    category: "Impermeabilização",
-    heroAlt: "Gota de líquido a deslizar sobre tecido impermeabilizado",
-    intro: "A impermeabilização de sofás é provavelmente o tratamento com melhor relação custo-benefício em toda a gama de serviços de estofos. Mas o que faz exatamente? E quanto tempo dura?",
-    sections: [
+    "slug": "impermeabilizacao-sofa-vale-pena",
+    "title": "Impermeabilização de sofá: quando vale a pena?",
+    "metaTitle": "Impermeabilização de sofá: quando vale a pena? | Kyro Clean",
+    "metaDescription": "Compare a proteção Essencial e Premium e perceba o que esperar perante um derrame, antes de escolher a opção para o seu sofá.",
+    "publishDate": "2025-10-02",
+    "updatedDate": "2026-09-21",
+    "author": DEFAULT_AUTHOR.name,
+    "readingTime": 2,
+    "category": "Impermeabilização",
+    "heroAlt": "Imagem ilustrativa sobre impermeabilização de sofá: quando vale a pena",
+    "intro": "Compare a proteção Essencial e Premium e perceba o que esperar perante um derrame, antes de escolher a opção para o seu sofá.",
+    "sections": [
       {
-        heading: "Como funciona a impermeabilização?",
-        body: "A impermeabilização profissional aplica uma barreira invisível de nano-partículas sobre as fibras do tecido. Esta barreira não altera a aparência nem a textura do sofá, mas faz com que os líquidos «escoreguem» em vez de serem absorvidos.\n\nQuando derrama vinho ou café num sofá impermeabilizado, o líquido forma gotas na superfície durante 30 a 60 segundos, tempo suficiente para absorver com um pano sem deixar mancha.\n\nNão confunda com sprays de supermercado: a impermeabilização profissional usa produtos de grau industrial aplicados com equipamento específico, com resultados até 10x superiores.",
-        tip: "A impermeabilização não torna o sofá inquebrável, não cobre manchas que já existam nem funciona se o líquido ficar muito tempo. Aja sempre rapidamente.",
+        "heading": "O que a proteção faz",
+        "body": "A impermeabilização ajuda a reduzir a absorção de líquidos e dá mais tempo para agir. É necessário absorver o derrame rapidamente. A proteção não torna o sofá imune a manchas, desgaste ou acidentes."
       },
       {
-        heading: "Quanto dura a impermeabilização?",
-        body: "Depende da versão escolhida. Temos duas: a Essencial, à base de água, e a Premium, à base de diluente e mais resistente ao desgaste.\n\n- **Essencial**, aguenta até 2 lavagens e mantém a proteção real entre 1 e 2 anos, consoante o uso.\n- **Premium**, aguenta até 5 lavagens e mantém a proteção real até 10 anos.\n\nA durabilidade real também varia com:\n\n- **Uso diário**, Sofás muito utilizados perdem eficácia mais rápido.\n- **Limpezas**, Cada limpeza esfrega ligeiramente a barreira protetora, daí a diferença entre 2 e 5 lavagens suportadas.\n- **Animais de estimação**, As unhas dos animais desgastam o tratamento, um argumento a favor da Premium.\n\nRecomendamos renovar a impermeabilização a cada limpeza profissional, é quando o tecido está mais limpo e o produto adere melhor.",
+        "heading": "Essencial e Premium",
+        "body": `**Essencial:** sofá de 1 lugar ${IMPER_ESSENCIAL_1}, 2 lugares ${IMPER_ESSENCIAL_2}, 3 lugares ${IMPER_ESSENCIAL_3}. Duração de referência de 1 a 2 anos.
+
+**Premium:** 1 lugar ${IMPER_PREMIUM_1}, 2 lugares ${IMPER_PREMIUM_2}, 3 lugares ${IMPER_PREMIUM_3}. Proteção anunciada até 10 anos e 5 lavagens, nas condições da garantia.
+
+Deslocação à parte. A duração depende do uso, cuidados e condições aplicáveis; confirme-as no orçamento.`
       },
       {
-        heading: "Para que tipos de sofá é recomendada?",
-        body: "A impermeabilização é recomendada para praticamente todos os sofás de tecido: microfibra, linho, veludo, chenille, poliéster. É especialmente valiosa em:\n\n- **Casas com crianças**, Sumos, iogurte, tinta de dedos.\n- **Casas com animais**, Baba, urina, líquidos derramados.\n- **Sofás de cor clara**, Tecidos beige, creme ou branco mancha muito mais facilmente.\n- **Sofás de alto valor**, Um sofá que custou 1500€ merece proteção.\n\nSofás de pele/couro não se impermeabilizam, recebem um tratamento específico de hidratação e proteção.",
+        "heading": "Antes de aplicar",
+        "body": "Verificamos a compatibilidade, a limpeza e a secagem do tecido. A proteção não apaga manchas antigas. Se precisar de limpeza, essa intervenção é identificada na proposta, antes da aplicação do impermeabilizante."
       },
       {
-        heading: "Quanto custa impermeabilizar um sofá?",
-        body: `A versão Essencial custa ${IMPER_ESSENCIAL_1} (1 lugar), ${IMPER_ESSENCIAL_2} (2 lugares) e ${IMPER_ESSENCIAL_3} (3 lugares). A versão Premium, mais resistente e duradoura, custa ${IMPER_PREMIUM_1} (1 lugar), ${IMPER_PREMIUM_2} (2 lugares) e ${IMPER_PREMIUM_3} (3 lugares). Quando a Essencial é contratada em pack com a limpeza, o total é mais baixo do que os dois serviços separados.\n\nConsiderando que a Premium aguenta mais do dobro das lavagens da Essencial e evita reaplicações frequentes, o retorno do investimento é claro para quem tem uso mais intenso do sofá.`,
-      },
+        "heading": "Depois da aplicação",
+        "body": "Respeite o tempo de cura e os cuidados indicados pela equipa. A cura pode exigir 24 horas e é diferente da secagem de uma limpeza. Não teste a proteção com líquidos antes da autorização de utilização."
+      }
     ],
-    faq: [
+    "faq": [
       {
-        q: "Posso impermeabilizar um sofá já manchado?",
-        a: "Não. A impermeabilização só funciona corretamente sobre tecido limpo. É sempre necessário limpar primeiro e impermeabilizar a seguir.",
+        "q": "A proteção impede qualquer mancha?",
+        "a": "Não. Ajuda perante derrames, mas requer uma resposta rápida e cuidados de manutenção."
       },
       {
-        q: "A impermeabilização tem algum cheiro ou produto químico nocivo?",
-        a: "Os produtos profissionais que utilizamos são certificados, sem cheiro após cura e seguros para crianças e animais. Recomendamos ventilar o espaço durante 2 horas após aplicação.",
+        "q": "Posso proteger um sofá sujo?",
+        "a": "A peça deve estar nas condições de limpeza e secagem exigidas para a aplicação. Avaliamos primeiro."
       },
       {
-        q: "Devo escolher a Essencial ou a Premium?",
-        a: "A Essencial é uma boa opção para uso moderado. A Premium, mais resistente ao desgaste e com maior durabilidade, compensa mais em casas com crianças, animais ou uso intenso do sofá.",
+        "q": "Também impermeabilizam tapetes ou colchões?",
+        "a": "Não. A impermeabilização Kyro destina-se a sofás e cadeiras compatíveis."
       },
+      {
+        "q": "Qual das duas opções devo escolher?",
+        "a": "Compare o uso previsto, o preço e as condições de duração. A Essencial continua disponível; a Premium é uma opção de maior durabilidade."
+      }
     ],
-    relatedService: { label: "Serviço de impermeabilização profissional", href: "/impermeabilizacao" },
-    relatedPosts: [
+    "relatedService": {
+      "label": "Serviço de impermeabilização profissional",
+      "href": "/impermeabilizacao"
+    },
+    "relatedPosts": [
       "quanto-custa-limpar-sofa-profissional",
-      "acaros-sofas-colchoes-riscos-saude",
+      "acaros-sofas-colchoes-riscos-saude"
     ],
+    "sources": []
   },
-
   {
-    slug: "acaros-sofas-colchoes-riscos-saude",
-    title: "Ácaros em sofás e colchões: riscos para a saúde e como eliminar",
-    metaTitle: "Ácaros em Sofás e Colchões: Riscos e Como Eliminar | Kyro Clean",
-    metaDescription: "Os ácaros do pó são a principal causa de alergias em casa. Descubra como identificar, prevenir e eliminar ácaros de sofás e colchões.",
-    publishDate: "2025-10-15",
-    updatedDate: "2025-10-15",
-    author: DEFAULT_AUTHOR.name,
-    readingTime: 7,
-    sources: ["spaic-acaros", "cochrane-acaros-asma"],
-    category: "Saúde",
-    heroAlt: "Pessoa a espirrar perto do sofá, alergias causadas por ácaros",
-    intro: "Mais de 20% dos portugueses sofrem de alergias a ácaros do pó doméstico. O que a maioria não sabe é que os sofás e colchões são os principais reservatórios destes microscópicos aracnídeos, com até 2 milhões de ácaros por colchão de casal.",
-    sections: [
-      {
-        heading: "O que são ácaros do pó?",
-        body: "Os ácaros do pó doméstico (Dermatophagoides pteronyssinus) são aracnídeos microscópicos invisíveis a olho nu que se alimentam de células mortas de pele humana. Prosperam em ambientes quentes (20-25°C) e húmidos.\n\nNão são os próprios ácaros que causam alergias, mas as suas fezes e exoesqueletos, que se tornam partículas aéreas que inalamos. Cada ácaro produz até 20 partículas fecais por dia.",
-        tip: "Os sintomas de alergia a ácaros incluem espirros matinais, nariz entupido, olhos a coçar, asma e dermatite. Se os sintomas pioram em casa e melhoram fora, os ácaros são provavelmente a causa.",
-      },
-      {
-        heading: "Onde vivem os ácaros em casa?",
-        body: "Os ácaros preferem ambientes onde há mais células mortas de pele humana:\n\n- **Colchões**, O local com maior concentração. Passamos 8 horas por noite a «alimentá-los».\n- **Sofás**, O segundo maior reservatório, especialmente sofás de tecido.\n- **Almofadas e edredões**, Acumulam ácaros rapidamente.\n- **Tapetes e alcatifas**, Especialmente de lã natural.\n- **Peluches**, Armadilhas perfeitas para crianças alérgicas.",
-      },
-      {
-        heading: "Riscos para a saúde",
-        body: "As alergias a ácaros podem provocar:\n\n**Rinite alérgica**, Espirros frequentes, congestão nasal e corrimento. Piora de manhã ao acordar (colchão) e à noite no sofá.\n\n**Asma brônquica**, Os ácaros são o principal desencadeador de asma alérgica. Em crianças, a exposição precoce aumenta significativamente o risco de desenvolver asma.\n\n**Eczema/dermatite**, Erupções cutâneas e comichão relacionadas com contacto prolongado (especialmente em bebés deitados no chão).\n\n**Perturbação do sono**, Congestão nasal noturna causada por ácaros no colchão prejudica a qualidade do sono mesmo sem sintomas claros.",
-      },
-      {
-        heading: "Limpeza e tratamento anti-ácaros: o que muda?",
-        body: "A limpeza profissional remove sujidade e resíduos das fibras. O tratamento anti-ácaros é um extra dirigido a ácaros e é escolhido e orçamentado separadamente. A desbacterização tem outro objetivo e não está incluída automaticamente em nenhum destes serviços. Confirmamos a compatibilidade com o tecido, a aplicação e os cuidados posteriores antes de marcar.",
-        tip: "Ao pedir orçamento, distinga a limpeza dos tratamentos opcionais e indique o cuidado pretendido.",
-      },
+    "slug": "acaros-sofas-colchoes-riscos-saude",
+    "title": "Ácaros em sofás e colchões: limpeza e cuidados",
+    "metaTitle": "Ácaros em sofás e colchões: limpeza e cuidados | Kyro Clean",
+    "metaDescription": "Perceba o papel da limpeza e dos tratamentos opcionais nos estofos, sem confundir manutenção da casa com tratamento de alergias.",
+    "publishDate": "2025-10-15",
+    "updatedDate": "2026-09-21",
+    "author": DEFAULT_AUTHOR.name,
+    "readingTime": 2,
+    "sources": [
+      "spaic-acaros"
     ],
-    faq: [
+    "category": "Saúde",
+    "heroAlt": "Imagem ilustrativa sobre ácaros em sofás e colchões: limpeza e cuidados",
+    "intro": "Perceba o papel da limpeza e dos tratamentos opcionais nos estofos, sem confundir manutenção da casa com tratamento de alergias.",
+    "sections": [
       {
-        q: "A limpeza profissional elimina todos os ácaros?",
-        a: "A limpeza por extração a vapor a alta temperatura ajuda a remover resíduos associados a ácaros e remove os seus resíduos alérgenos. Com tratamento anti-ácaros complementar, a eficácia aumenta e o efeito dura mais.",
+        "heading": "O que se pode observar",
+        "body": "Não é possível confirmar ácaros a olho nu nem contar a sua presença por uma fotografia do colchão. Uma mancha ou um espirro, por si só, não identifica a causa de uma alergia."
       },
       {
-        q: "Com que frequência devo limpar o colchão por causa dos ácaros?",
-        a: "Para pessoas saudáveis, uma vez por ano é suficiente. Para alérgicos ou asmáticos, recomendamos a cada 6 meses.",
+        "heading": "Cuidados com os têxteis",
+        "body": "A SPAIC descreve os têxteis domésticos como locais onde podem existir ácaros e recomenda combinar medidas de controlo do pó. Siga as instruções de lavagem da roupa de cama e a orientação clínica para situações de alergia."
       },
       {
-        q: "Os sprays antiácaros de farmácia funcionam?",
-        a: "São úteis como complemento mas não substituem a limpeza profissional. Matam os ácaros na superfície mas não removem os resíduos alérgenos já presentes nas fibras.",
+        "heading": "Limpeza e extras",
+        "body": "A limpeza remove sujidade e resíduos. Anti-ácaros e desbacterização são tratamentos opcionais, escolhidos e orçamentados separadamente. Não prometemos eliminação total de microrganismos nem benefícios clínicos."
       },
+      {
+        "heading": "Pedir o serviço certo",
+        "body": "Indique se procura remover sujidade, tratar uma mancha ou avaliar um extra. Envie fotografias, indique a localidade, as dimensões e o que pretende tratar. Respondemos em menos de 10 minutos. Confirmamos o método, o preço dos serviços e a deslocação antes de marcar."
+      }
     ],
-    relatedService: { label: "Higienização de colchões com tratamento anti-ácaros", href: "/limpeza-colchoes" },
-    relatedPosts: [
+    "faq": [
+      {
+        "q": "A limpeza cura alergias?",
+        "a": "Não. A limpeza é manutenção dos estofos e não substitui avaliação ou tratamento médico."
+      },
+      {
+        "q": "É possível ver ácaros numa fotografia?",
+        "a": "Não. Uma fotografia permite avaliar o estado visível do estofo, não identificar ácaros."
+      },
+      {
+        "q": "O anti-ácaros está incluído?",
+        "a": "A limpeza remove sujidade e resíduos. Anti-ácaros e desbacterização são tratamentos opcionais, escolhidos e orçamentados separadamente. Não prometemos eliminação total de microrganismos nem benefícios clínicos."
+      },
+      {
+        "q": "Tenho de limpar de seis em seis meses?",
+        "a": "Não existe um intervalo único para todas as casas. Avalie o uso, a sujidade e os cuidados indicados para a peça; questões clínicas devem ser tratadas com o médico."
+      }
+    ],
+    "relatedService": {
+      "label": "Ver limpeza de colchões e orçamento",
+      "href": "/limpeza-colchoes"
+    },
+    "relatedPosts": [
       "quanto-custa-limpar-sofa-profissional",
-      "como-preparar-casa-visita-tecnico",
-    ],
+      "como-preparar-casa-visita-tecnico"
+    ]
   },
-
-  // ── NOVOS POSTS ──────────────────────────────────────────────────────────────
-
   {
-    slug: "quanto-custa-limpar-colchao-profissional",
-    title: "Quanto custa limpar um colchão profissionalmente em 2025?",
-    metaTitle: "Preço Limpeza Profissional de Colchão 2025 | Kyro Clean",
-    metaDescription: "Preços reais da limpeza e higienização profissional de colchões em Portugal. Solteiro, casal e king. O que está incluído e quando vale a pena.",
-    publishDate: "2025-11-05",
-    updatedDate: "2025-11-05",
-    author: DEFAULT_AUTHOR.name,
-    readingTime: 6,
-    sources: ["spaic-acaros"],
-    category: "Preços",
-    heroAlt: "Técnico a higienizar colchão de casal com equipamento de extração profissional",
-    intro: "Dormimos em média 7 a 8 horas por noite sobre o colchão, é o móvel com que mais contacto físico temos em toda a casa. No entanto, a maioria das pessoas nunca o limpou profissionalmente. Neste artigo mostramos os preços reais praticados pela Kyro Clean Solutions e o que está incluído em cada serviço.",
-    sections: [
+    "slug": "quanto-custa-limpar-colchao-profissional",
+    "title": "Quanto custa limpar um colchão profissionalmente?",
+    "metaTitle": "Quanto custa limpar um colchão profissionalmente? | Kyro Clean",
+    "metaDescription": "Veja os preços por tamanho e o que confirmar antes de limpar o colchão: faces a tratar, materiais, manchas, extras e deslocação.",
+    "publishDate": "2025-11-05",
+    "updatedDate": "2026-09-21",
+    "author": DEFAULT_AUTHOR.name,
+    "readingTime": 2,
+    "sources": [],
+    "category": "Preços",
+    "heroAlt": "Imagem ilustrativa sobre quanto custa limpar um colchão profissionalmente",
+    "intro": "Veja os preços por tamanho e o que confirmar antes de limpar o colchão: faces a tratar, materiais, manchas, extras e deslocação.",
+    "sections": [
       {
-        heading: "Tabela de preços por tamanho (2025)",
-        body: `Os preços da Kyro Clean Solutions para limpeza profissional de colchões são:\n\n**Colchão solteiro**: ${COLCHAO_SOLTEIRO}\n\n**Colchão casal**: ${COLCHAO_CASAL}\n\n**Colchão king / queen**: ${COLCHAO_KING}\n\nTodos os preços incluem pré-tratamento de manchas, limpeza por extração a vapor e secagem rápida; a deslocação é cobrada à parte, consoante a localização. O colchão fica pronto a usar em 3 a 6 horas.`,
-        tip: "Combine com a limpeza do sofá no mesmo dia e beneficie de um preço reduzido no Pack Sofá + Colchão.",
+        "heading": "Preços por tamanho",
+        "body": `**Solteiro:** ${COLCHAO_SOLTEIRO}
+**Casal:** ${COLCHAO_CASAL}
+**King / queen:** ${COLCHAO_KING}
+
+A deslocação é apresentada à parte. Indique o tamanho real e as faces que pretende tratar para confirmar o âmbito do serviço.`
       },
       {
-        heading: "O que inclui uma limpeza profissional de colchão?",
-        body: "Uma higienização profissional de colchão vai muito além de aspirar a superfície:\n\n1. **Inspeção visual**, Identificação de manchas, zonas de humidade, sinais de bolor ou infestação de ácaros.\n2. **Aspiração profunda**, Remoção de poeira, células mortas de pele, pelos e detritos das fibras superiores.\n3. **Pré-tratamento de manchas**, Aplicação de produto enzimático em manchas orgânicas (urina, suor, sangue) para dissolução antes da extração.\n4. **Extração a vapor a alta temperatura**, Água quente a alta pressão penetra nas fibras, ajuda a remover resíduos associados a ácaros e bactérias e aspira toda a sujidade.\n5. **Tratamento anti-ácaros** (extra opcional), Definido separadamente conforme o artigo e o produto adequado.\n6. **Secagem acelerada**, Aplicação de ar quente para reduzir o tempo de secagem para 3 a 6 horas.",
+        "heading": "Como avaliamos o colchão",
+        "body": "A composição da capa e do núcleo condiciona a intervenção. Informe se é reversível, de espuma, látex ou outro material e envie a etiqueta. Não se deve molhar qualquer colchão apenas por ter uma capa têxtil."
       },
       {
-        heading: "Colchão de solteiro vs. casal: diferença de preço justificada?",
-        body: `A diferença de ${COLCHAO_DELTA} entre o colchão solteiro (${COLCHAO_SOLTEIRO}) e o casal (${COLCHAO_CASAL}) reflete a diferença de área a tratar. Um colchão casal padrão tem aproximadamente o dobro da superfície de um solteiro, o que exige mais produto, mais tempo de extração e mais produto anti-ácaros.\n\nPara casais, a higienização regular dos dois lados do colchão é especialmente importante, pois cada pessoa contribui com células mortas, suor e temperatura para o seu lado, criando zonas distintas de concentração de ácaros.`,
+        "heading": "Manchas e tratamentos",
+        "body": "Avaliamos o revestimento e as manchas, aspiramos, aplicamos o tratamento adequado, escovamos respeitando a fibra, extraímos a sujidade e conferimos o resultado. A escova, a pressão e a humidade são ajustadas ao material. Materiais incompatíveis com água exigem avaliação de outro método.\n\nA limpeza remove sujidade e resíduos. Anti-ácaros e desbacterização são tratamentos opcionais, escolhidos e orçamentados separadamente. Não prometemos eliminação total de microrganismos nem benefícios clínicos."
       },
       {
-        heading: "Quando é que a limpeza de colchão é urgente?",
-        body: "Há situações em que a higienização profissional é imediata e não apenas preventiva:\n\n**Mancha de urina** (crianças ou animais), A urina seca forma cristais de ácido úrico que os produtos caseiros não dissolve. Sem tratamento enzimático profissional, o cheiro regressa sempre em dias húmidos.\n\n**Suor excessivo ou doença prolongada**, Após febre alta ou doença, o colchão absorve quantidades significativas de suor, fluidos corporais e medicação. A higienização elimina agentes patogénicos.\n\n**Compra de casa usada**, Um colchão de segunda mão ou deixado por inquilinos anteriores deve ser sempre higienizado antes de usar.\n\n**Sintomas de alergia noturnos**, Espirros, nariz entupido ou olhos a coçar que melhoram fora de casa são sinal claro de concentração de ácaros no colchão.",
-        tip: "Não esperes ver manchas para chamar um profissional. Um colchão visualmente limpo pode ter centenas de milhar de ácaros nas suas fibras internas.",
-      },
+        "heading": "Preparar a cama para voltar a usar",
+        "body": "Retire lençóis e objetos à volta da cama. Combine a hora da intervenção tendo em conta a secagem. Secagem média de 3 a 6 horas, dependendo da ventilação, do tecido e das condições do espaço. Utilize a peça apenas depois de estar completamente seca."
+      }
     ],
-    faq: [
+    "faq": [
       {
-        q: "Quanto tempo o colchão fica húmido após a limpeza?",
-        a: "Entre 3 a 6 horas. Em dias de verão com boa ventilação pode ser menos. Recomendamos abrir as janelas e, se possível, usar um ventilador para acelerar a secagem.",
+        "q": "O preço inclui as duas faces?",
+        "a": "Indique as faces pretendidas e confirme o âmbito no orçamento. Nem todos os colchões são reversíveis ou permitem o mesmo tratamento."
       },
       {
-        q: "Podem limpar apenas um lado do colchão?",
-        a: "Sim, é possível. No entanto, recomendamos limpar ambos os lados, especialmente se o colchão for reversível. O preço não muda, o serviço já inclui ambos os lados.",
+        "q": "Inclui anti-ácaros?",
+        "a": "A limpeza remove sujidade e resíduos. Anti-ácaros e desbacterização são tratamentos opcionais, escolhidos e orçamentados separadamente. Não prometemos eliminação total de microrganismos nem benefícios clínicos."
       },
       {
-        q: "O serviço inclui tratamento anti-ácaros?",
-        a: "Sim. A limpeza por extração a vapor a alta temperatura já ajuda a remover resíduos associados a ácaros. Pode acrescentar um tratamento anti-ácaros, orçamentado separadamente.",
+        "q": "Limpam espuma e látex?",
+        "a": "A composição e as instruções do fabricante têm de ser avaliadas antes de confirmar o método."
       },
       {
-        q: "Limpam colchões de memory foam e látex?",
-        a: "Sim, com adaptações ao processo. Colchões de memory foam e látex não podem receber muita humidade. Usamos um método de extração a seco adaptado para estes materiais.",
-      },
+        "q": "Uma mancha de urina sai totalmente?",
+        "a": "A possibilidade de remoção depende da substância, do tempo decorrido, dos produtos já aplicados e do revestimento. Uma alteração de cor ou dano na fibra pode permanecer depois de a sujidade sair."
+      }
     ],
-    relatedService: { label: "Ver preços de limpeza de colchões", href: "/limpeza-colchoes" },
-    relatedPosts: [
+    "relatedService": {
+      "label": "Ver limpeza de colchões e orçamento",
+      "href": "/limpeza-colchoes"
+    },
+    "relatedPosts": [
       "acaros-sofas-colchoes-riscos-saude",
+      "doencas-causadas-estofos-sujos"
+    ]
+  },
+  {
+    "slug": "limpeza-tapetes-profissional-guia-completo",
+    "title": "Limpeza profissional de tapetes: medidas, materiais e orçamento",
+    "metaTitle": "Limpeza profissional de tapetes: medidas, materiais e orçamento | Kyro Clean",
+    "metaDescription": "Cada tapete precisa de avaliação própria. Saiba como medir, identificar o material e pedir orçamento sem depender de um preço genérico por metro quadrado.",
+    "publishDate": "2025-11-12",
+    "updatedDate": "2026-09-21",
+    "author": DEFAULT_AUTHOR.name,
+    "readingTime": 2,
+    "sources": [],
+    "category": "Tapetes",
+    "heroAlt": "Imagem ilustrativa sobre limpeza profissional de tapetes: medidas, materiais e orçamento",
+    "intro": "Cada tapete precisa de avaliação própria. Saiba como medir, identificar o material e pedir orçamento sem depender de um preço genérico por metro quadrado.",
+    "sections": [
+      {
+        "heading": "Como pedir o preço",
+        "body": "Tapetes e alcatifas são sempre sob orçamento. Meça a largura e o comprimento de cada peça, indique a localidade e envie fotografias da frente, da base e da etiqueta. As medidas ajudam a avaliar o trabalho, mas não determinam sozinhas o método."
+      },
+      {
+        "heading": "O material vem antes da máquina",
+        "body": "Lã, seda, juta, sisal e fibras sintéticas podem exigir cuidados distintos. A base, os corantes e as franjas também contam. Seda, juta e sisal não seguem automaticamente limpeza com água nem escovagem forte."
+      },
+      {
+        "heading": "Manchas, odores e limites",
+        "body": "A possibilidade de remoção depende da substância, do tempo decorrido, dos produtos já aplicados e do revestimento. Uma alteração de cor ou dano na fibra pode permanecer depois de a sujidade sair.\n\nSe houver bolor ou humidade na base, é necessário avaliar a origem e a possibilidade de recuperação. Uma limpeza não resolve infiltrações."
+      },
+      {
+        "heading": "Local e condições do serviço",
+        "body": "Confirme com a equipa onde será feita a intervenção e as condições adequadas à peça. Não assuma recolha, lavagem em instalações próprias ou entrega num prazo fixo. Secagem média de 3 a 6 horas, dependendo da ventilação, do tecido e das condições do espaço. Utilize a peça apenas depois de estar completamente seca."
+      }
+    ],
+    "faq": [
+      {
+        "q": "Há tabela por metro quadrado?",
+        "a": "Não. Tapetes e alcatifas são sempre sob orçamento, com medidas e avaliação do material e estado."
+      },
+      {
+        "q": "Recolhem e entregam qualquer tapete?",
+        "a": "Não anunciamos recolha e entrega como serviço geral. Confirme as condições possíveis com a equipa antes de marcar."
+      },
+      {
+        "q": "Posso molhar sisal ou juta?",
+        "a": "Não o faça sem verificar a composição e o método adequado. Estas fibras podem ser incompatíveis com limpeza húmida."
+      },
+      {
+        "q": "Quanto tempo demora a secagem?",
+        "a": "Secagem média de 3 a 6 horas, dependendo da ventilação, do tecido e das condições do espaço. Utilize a peça apenas depois de estar completamente seca."
+      }
+    ],
+    "relatedService": {
+      "label": "Ver preços de limpeza de tapetes",
+      "href": "/limpeza-tapetes"
+    },
+    "relatedPosts": [
       "doencas-causadas-estofos-sujos",
-    ],
+      "acaros-sofas-colchoes-riscos-saude"
+    ]
   },
-
   {
-    slug: "limpeza-tapetes-profissional-guia-completo",
-    title: "Limpeza profissional de tapetes: guia completo de preços e métodos",
-    metaTitle: "Limpeza Profissional de Tapetes: Preços e Métodos 2025 | Kyro Clean",
-    metaDescription: "Tudo sobre limpeza profissional de tapetes e alcatifas. Preços reais, métodos, diferença entre tapete e alcatifa, e quando chamar um profissional.",
-    publishDate: "2025-11-12",
-    updatedDate: "2025-11-12",
-    author: DEFAULT_AUTHOR.name,
-    readingTime: 7,
-    sources: ["oms-humidade-bolor"],
-    category: "Tapetes",
-    heroAlt: "Técnico a limpar tapete persa com extração profissional equipamento profissional",
-    intro: "Os tapetes são um dos elementos decorativos mais presentes nas casas portuguesas, e um dos mais negligenciados em termos de limpeza. Um tapete de sala acumula em média 4 vezes mais bactérias por cm² do que um sofá. Neste guia explicamos os preços reais, os métodos profissionais e a diferença entre tapete e alcatifa.",
-    sections: [
+    "slug": "limpeza-cadeiras-estofadas-precos-guia",
+    "title": "Limpeza de cadeiras estofadas: como pedir orçamento",
+    "metaTitle": "Limpeza de cadeiras estofadas: como pedir orçamento | Kyro Clean",
+    "metaDescription": "Indique a quantidade, o revestimento e as zonas estofadas das cadeiras para receber uma proposta de limpeza ajustada ao seu conjunto.",
+    "publishDate": "2025-11-20",
+    "updatedDate": "2026-09-21",
+    "author": DEFAULT_AUTHOR.name,
+    "readingTime": 2,
+    "category": "Preços",
+    "heroAlt": "Imagem ilustrativa sobre limpeza de cadeiras estofadas: como pedir orçamento",
+    "intro": "Indique a quantidade, o revestimento e as zonas estofadas das cadeiras para receber uma proposta de limpeza ajustada ao seu conjunto.",
+    "sections": [
       {
-        heading: "Preços de limpeza de tapetes (2025)",
-        body: "Na Kyro Clean Solutions, cada tapete avulso (recolha e entrega ou ao domicílio) é medido individualmente, largura x comprimento, e orçamentado à medida, sem tabela fixa por m². O valor final depende da dimensão, do tipo de fibra (sintético, lã, seda) e do estado de sujidade, e é sempre confirmado antes de qualquer compromisso.\n\n**Alcatifas (limpeza no local, m² de área):** também sempre orçamentadas à medida da área e do estado, sem preço fixo por m²: por ser um revestimento fixo, a avaliação é feita no local.\n\nAo pedir orçamento pode indicar as medidas de cada tapete que quer lavar, e recebe o valor exato sem surpresas antes de agendar.",
-        tip: "Tapetes com franjas, de lã natural ou de seda requerem tratamento especializado. Informe sempre o técnico do material antes de agendar.",
+        "heading": "O que faz variar o orçamento",
+        "body": "O número de cadeiras, o tipo de revestimento e a superfície estofada ajudam a definir a proposta. Envie uma fotografia que mostre assento, encosto e estrutura. Consulte o configurador para o valor atual do conjunto; a deslocação aparece separada."
       },
       {
-        heading: "Tapete vs. alcatifa: qual é a diferença?",
-        body: "Em Portugal usa-se frequentemente os dois termos de forma intercambiável, mas há uma diferença técnica importante para efeitos de limpeza:\n\n**Tapete**, Peça solta, com dimensões definidas, geralmente com franja. Pode ser movido, virado e transportado para lavagem. Inclui tapetes persas, kilim, sisal, lã, sintético.\n\n**Alcatifa**, Revestimento de piso fixo ou semi-fixo que cobre toda a área de uma divisão. Não é removível sem intervenção. É limpa no local por extração.\n\nDo ponto de vista de limpeza profissional, os tapetes avulsos beneficiam de uma lavagem mais completa pois o técnico acede a ambos os lados. As alcatifas são sempre tratadas no local por extração a seco ou a vapor.",
+        "heading": "Assentos, encostos e estrutura",
+        "body": "Identificamos a sujidade e a compatibilidade do tecido. A limpeza do estofo não é uma reparação da madeira, ferragens ou revestimento descascado. Informe se existem cadeiras de materiais diferentes no mesmo pedido."
       },
       {
-        heading: "Métodos de limpeza profissional de tapetes",
-        body: "Existem três métodos principais, cada um adequado a situações diferentes:\n\n**Extração a vapor (wet extraction)**, O método mais eficaz para tapetes sintéticos e de lã resistente. Água quente a alta pressão dissolve sujidade, gordura e manchas orgânicas. A extração imediata evita que o tapete fique encharcado. Secagem em 3 a 6 horas.\n\n**Limpeza a seco (dry compound)**, Indicada para tapetes delicados (seda, lã fina, tapetes persas antigos) que não toleram humidade excessiva. Um composto absorvente é espalhado sobre o tapete, agitado com escova rotativa e aspirado. Sem tempo de secagem.\n\n**Shampooing com extração**, Combinação de espuma de limpeza com extração a vapor. Ideal para tapetes muito sujos ou com manchas de gordura profundas. Mais indicado para alcatifas de escritório ou uso intensivo.",
+        "heading": "Sequência de limpeza",
+        "body": "Avaliamos o revestimento e as manchas, aspiramos, aplicamos o tratamento adequado, escovamos respeitando a fibra, extraímos a sujidade e conferimos o resultado. A escova, a pressão e a humidade são ajustadas ao material. Materiais incompatíveis com água exigem avaliação de outro método."
       },
       {
-        heading: "Manchas mais difíceis em tapetes e como tratá-las",
-        body: "Os tapetes têm um problema que os sofás não têm: estão no chão. Acumulam não só manchas de derrame mas também sujidade seca pisada, que penetra nas fibras com o calor dos pés.\n\n**Vinho tinto**, A mancha mais temida. Em tapetes de cor clara, pode ser permanente após 48h. Tratada a fresco com produto oxidante específico, sai na maioria dos casos; em tapete claro e mancha já seca, nem sempre sai por completo, e dizemos isso antes de começar.\n\n**Urina de animais**, A urina atravessa as fibras e pode atingir o backing (base) do tapete. Sem tratamento enzimático que quebre o ácido úrico, o cheiro regressa sempre com humidade.\n\n**Tinta e marcador**, Dependendo da tinta (à base de água vs. solvente), o tratamento varia. Tinta de base aquosa recente é removível com produto desengordurante. Tinta de esmalte seca dificilmente sai sem dano ao tecido.\n\n**Bolor e fungos**, Tapetes em divisões húmidas ou que ficaram molhados podem desenvolver bolor na base. Requer tratamento fungicida específico e secagem forçada.",
-        tip: "Um tapete com bolor visível ou com odor a húmido mesmo seco deve ser higienizado urgentemente. O bolor liberta esporos no ar que agravam alergias respiratórias.",
-      },
-      {
-        heading: "Com que frequência limpar tapetes profissionalmente?",
-        body: "A frequência recomendada depende do uso:\n\n- **Tapetes de sala de estar com uso diário:** 1 a 2 vezes por ano\n- **Tapetes de quarto (menos pisados):** 1 vez por ano\n- **Tapetes em casa com animais de estimação:** a cada 6 meses\n- **Tapetes de escritório ou uso comercial:** a cada 3-4 meses\n- **Alcatifas em zonas de entrada:** a cada 2-3 meses\n\nEntre limpezas profissionais, aspire os tapetes pelo menos uma vez por semana. Para remover o pó mais profundo, bata o tapete ao ar livre de 15 em 15 dias se for uma peça transportável.",
-      },
-      {
-        heading: "Tapetes persas e orientais: cuidados especiais",
-        body: "Os tapetes persas, marroquinos e orientais merecem atenção especial porque são frequentemente de lã natural, seda ou misto, com corantes naturais que podem manchar ou desbotar com o produto errado.\n\nRegras fundamentais:\n- Nunca usar água quente em tapetes de seda\n- Nunca usar alcalinos fortes (lixívia, amoníaco) em lã natural\n- Testar sempre o produto numa zona não visível antes\n- A limpeza deve ser feita com produtos de pH neutro\n- A secagem deve ser lenta e à sombra (sol direto degrada os corantes naturais)\n\nUm tapete persa de qualidade pode durar décadas se bem tratado. Uma limpeza profissional inadequada pode danificá-lo permanentemente.",
-        tip: "Se não sabe o material do seu tapete, tire uma foto e envie antes de agendar. Analisamos o tipo de tecido e o método mais adequado sem custo adicional.",
-      },
+        "heading": "Limpeza ou proteção",
+        "body": "Pode pedir limpeza e avaliar impermeabilização Essencial ou Premium em cadeiras compatíveis. Confirme o que inclui cada opção na proposta, sem assumir que a limpeza já protege contra líquidos."
+      }
     ],
-    faq: [
+    "faq": [
       {
-        q: "Recolhem tapetes ao domicílio?",
-        a: "Sim. A Kyro Clean oferece serviço de recolha e entrega de tapetes em Portugal Continental. O tapete é lavado nas nossas instalações e devolvido em 24-48 horas.",
+        "q": "Todas as cadeiras custam o mesmo?",
+        "a": "O configurador considera a quantidade e o serviço. Modelos ou materiais que exijam avaliação são confirmados pela equipa."
       },
       {
-        q: "Conseguem remover manchas antigas de tapete?",
-        a: "Depende do tempo e do tipo de mancha. Manchas com menos de 48h têm uma taxa de remoção superior a 90%. Manchas muito antigas podem não sair completamente, mas o resultado é sempre significativamente melhor do que sem tratamento.",
+        "q": "Posso juntar cadeiras à limpeza do sofá?",
+        "a": "Sim. Adicione as cadeiras ao pedido para receber o valor da mesma visita."
       },
       {
-        q: "Qual o tamanho mínimo de tapete que limpam?",
-        a: "Não temos tamanho mínimo. Limpamos desde capachos pequenos a tapetes de grandes dimensões.",
+        "q": "A impermeabilização é obrigatória?",
+        "a": "Não. É uma opção adicional para cadeiras compatíveis."
       },
       {
-        q: "Quanto tempo seca um tapete após a limpeza?",
-        a: "Um tapete fino sintético seca em 3 a 6 horas. Um tapete de lã espessa pode demorar 3 a 6 horas. Deixamos sempre o tapete com secagem iniciada antes de sair.",
-      },
+        "q": "Quando podemos voltar a usá-las?",
+        "a": "Secagem média de 3 a 6 horas, dependendo da ventilação, do tecido e das condições do espaço. Utilize a peça apenas depois de estar completamente seca."
+      }
     ],
-    relatedService: { label: "Ver preços de limpeza de tapetes", href: "/limpeza-tapetes" },
-    relatedPosts: [
+    "relatedService": {
+      "label": "Ver preços de limpeza de cadeiras",
+      "href": "/limpeza-cadeiras"
+    },
+    "relatedPosts": [
       "doencas-causadas-estofos-sujos",
+      "quanto-custa-limpar-sofa-profissional"
+    ],
+    "sources": []
+  },
+  {
+    "slug": "doencas-causadas-estofos-sujos",
+    "title": "Estofos sujos e saúde: o que a limpeza pode fazer",
+    "metaTitle": "Estofos sujos e saúde: o que a limpeza pode fazer | Kyro Clean",
+    "metaDescription": "Sujidade, humidade e alergias não são a mesma coisa. Saiba distinguir a manutenção dos estofos de problemas que exigem outra avaliação.",
+    "publishDate": "2025-12-01",
+    "updatedDate": "2026-09-21",
+    "author": DEFAULT_AUTHOR.name,
+    "readingTime": 2,
+    "sources": [
+      "oms-humidade-bolor"
+    ],
+    "category": "Saúde",
+    "heroAlt": "Imagem ilustrativa sobre estofos sujos e saúde: o que a limpeza pode fazer",
+    "intro": "Sujidade, humidade e alergias não são a mesma coisa. Saiba distinguir a manutenção dos estofos de problemas que exigem outra avaliação.",
+    "sections": [
+      {
+        "heading": "Sujidade não é um diagnóstico",
+        "body": "Manchas, pelos e pó são motivos para cuidar de um estofo, mas não permitem afirmar que a peça causa uma doença. Não atribuímos sintomas à casa nem estimamos bactérias a partir do seu aspeto."
+      },
+      {
+        "heading": "Humidade precisa de uma solução própria",
+        "body": "A OMS relaciona humidade persistente e bolor em edifícios com problemas de saúde. Se existe uma infiltração ou condensação recorrente, a origem precisa de ser corrigida. Limpar a superfície de um móvel não resolve a causa."
+      },
+      {
+        "heading": "O âmbito da intervenção",
+        "body": "A limpeza remove sujidade e resíduos. Anti-ácaros e desbacterização são tratamentos opcionais, escolhidos e orçamentados separadamente. Não prometemos eliminação total de microrganismos nem benefícios clínicos.\n\nPerante bolor, avaliamos se é possível intervir ou se o estado da peça exige outra solução."
+      },
+      {
+        "heading": "Decidir o próximo passo",
+        "body": "Para manchas e sujidade, envie fotografias e peça avaliação do estofo. Para sintomas persistentes, procure orientação de um profissional de saúde. O orçamento de limpeza não substitui essa avaliação."
+      }
+    ],
+    "faq": [
+      {
+        "q": "Um sofá manchado causa doenças?",
+        "a": "O aspeto de um sofá não permite concluir que causa uma doença."
+      },
+      {
+        "q": "A limpeza resolve bolor recorrente?",
+        "a": "É necessário resolver a origem da humidade e avaliar a peça. A limpeza pode não ser adequada ou suficiente."
+      },
+      {
+        "q": "A desbacterização vem com a limpeza?",
+        "a": "A limpeza remove sujidade e resíduos. Anti-ácaros e desbacterização são tratamentos opcionais, escolhidos e orçamentados separadamente. Não prometemos eliminação total de microrganismos nem benefícios clínicos."
+      },
+      {
+        "q": "Devo deitar fora uma peça com bolor?",
+        "a": "Depende da extensão e do estado do material e enchimento. Solicite avaliação antes de voltar a usar ou tentar tratar a peça."
+      }
+    ],
+    "relatedService": {
+      "label": "Ver limpeza de colchões e orçamento",
+      "href": "/limpeza-colchoes"
+    },
+    "relatedPosts": [
       "acaros-sofas-colchoes-riscos-saude",
-    ],
+      "quanto-custa-limpar-colchao-profissional"
+    ]
   },
-
   {
-    slug: "limpeza-cadeiras-estofadas-precos-guia",
-    title: "Limpeza de cadeiras estofadas: preços, métodos e quando vale a pena",
-    metaTitle: "Limpeza de Cadeiras Estofadas: Preços 2025 | Kyro Clean",
-    metaDescription: "Preços reais da limpeza profissional de cadeiras estofadas em Portugal. Cadeiras de escritório, sala de jantar e restaurante. Desde 20€ por cadeira.",
-    publishDate: "2025-11-20",
-    updatedDate: "2025-11-20",
-    author: DEFAULT_AUTHOR.name,
-    readingTime: 5,
-    category: "Preços",
-    heroAlt: "Cadeiras estofadas de sala de jantar antes e depois da limpeza profissional",
-    intro: "As cadeiras estofadas são frequentemente o móvel mais esquecido na limpeza regular da casa, mas são também um dos que mais acumula sujidade, gordura e bactérias. Especialmente as cadeiras de sala de jantar e de escritório. Aqui estão os preços reais e o que está incluído.",
-    sections: [
+    "slug": "como-preparar-casa-visita-tecnico",
+    "title": "Como preparar a casa para a visita do técnico",
+    "metaTitle": "Como preparar a casa para a visita do técnico | Kyro Clean",
+    "metaDescription": "Poucos preparativos ajudam a equipa a trabalhar e a peça a secar. Veja o que deixar acessível antes da limpeza ao domicílio.",
+    "publishDate": "2025-10-28",
+    "updatedDate": "2026-09-21",
+    "author": DEFAULT_AUTHOR.name,
+    "readingTime": 2,
+    "category": "Dicas",
+    "heroAlt": "Imagem ilustrativa sobre como preparar a casa para a visita do técnico",
+    "intro": "Poucos preparativos ajudam a equipa a trabalhar e a peça a secar. Veja o que deixar acessível antes da limpeza ao domicílio.",
+    "sections": [
       {
-        heading: "Preços de limpeza de cadeiras (2025)",
-        body: "A Kyro Clean Solutions pratica preço decrescente por unidade, quanto mais cadeiras limpar de uma vez:\n\n- 1ª a 4ª cadeira: 20€/unidade\n- 5ª a 6ª cadeira: 15€/unidade\n- 7ª a 9ª cadeira: 12,50€/unidade\n- 10 ou mais cadeiras: orçamento personalizado\n\nO desconto por volume reflete a eficiência do técnico quando tem várias peças no mesmo local, a deslocação e o setup do equipamento são custos fixos que se diluem com mais peças.",
-        tip: "Para restaurantes ou escritórios com mais de 20 cadeiras, solicitamos orçamento personalizado que pode representar uma poupança adicional de 20 a 30%.",
+        "heading": "Antes da visita",
+        "body": "Confirme a morada, os artigos e o serviço acordado. Avise se o acesso tem escadas, elevador pequeno, estacionamento difícil ou horários de entrada condicionados. Isso ajuda a planear o transporte do equipamento."
       },
       {
-        heading: "Que tipos de cadeiras limpamos?",
-        body: "A Kyro Clean trata cadeiras estofadas de todos os contextos:\n\n**Residencial:**\n- Cadeiras de sala de jantar (tecido, veludo, chenille)\n- Cadeiras de escritório em casa (tecido ou mesh)\n- Poltronas e recliners\n- Cadeiras de quarto ou toucador\n\n**Comercial:**\n- Restaurantes e cafés (cadeiras em lotes)\n- Escritórios e salas de reunião\n- Hotéis e alojamentos locais\n- Salas de espera de clínicas e consultórios\n\n**Materiais tratados:** tecido, microfibra, veludo, chenille, couro sintético (PU), couro natural.",
+        "heading": "Junto dos estofos",
+        "body": "Retire objetos soltos e frágeis e deixe espaço de circulação. Não precisa de desmontar o móvel nem de aplicar detergentes antecipadamente. Mostre as manchas e explique que produtos já utilizou."
       },
       {
-        heading: "Por que as cadeiras de restaurante precisam de limpeza frequente?",
-        body: "As cadeiras de restaurante estão sujeitas a um nível de sujidade muito superior às cadeiras domésticas:\n\n- **Gordura alimentar**, Cada refeição deposita partículas de gordura no assento. Ao final de um mês, a concentração é significativa.\n- **Molhos e líquidos**, Derrames frequentes que, se não tratados imediatamente, penetram nas fibras e acidificam o tecido.\n- **Transpiração**, O contacto com diferentes utilizadores ao longo do dia contribui com humidade, bactérias e odores.\n- **Aspeto visual**, Cadeiras sujas transmitem falta de higiene ao cliente. Em restaurantes, a apresentação dos estofos é tão importante quanto a limpeza da cozinha.\n\nRecomendamos limpeza profissional de cadeiras de restaurante a cada 2-3 meses para manter o aspeto e cumprir normas de higiene.",
+        "heading": "Água, eletricidade e circulação",
+        "body": "Disponibilize o acesso a água e eletricidade conforme combinado. Mantenha crianças e animais afastados da zona de trabalho e dos produtos. Informe antecipadamente qualquer dificuldade que possa afetar a intervenção."
       },
       {
-        heading: "Cadeiras de escritório: o caso especial",
-        body: "As cadeiras de escritório têm um detalhe específico: são usadas pela mesma pessoa 8 horas por dia, 5 dias por semana. Isso cria uma concentração de suor, células mortas de pele e sebum no assento e costas que é difícil de imaginar a olho nu.\n\nA comparação que circula na internet entre postos de trabalho e sanitas vem de estudos sobre secretárias, teclados e telefones, não sobre cadeiras, e foi financiada por uma marca de produtos de limpeza. O que se pode dizer sem exagero é mais simples: o estofo de uma cadeira absorve suor e células de pele, e ao contrário de uma superfície dura não se limpa passando um pano.\n\nPara escritórios abertos com hot-desking (várias pessoas na mesma cadeira), a higienização regular é ainda mais importante do ponto de vista de saúde coletiva.",
-        tip: "No regresso ao escritório pós-pandemia, muitas empresas incluíram a limpeza profissional de cadeiras nos protocolos de higiene. É uma prática que faz sentido manter.",
-      },
+        "heading": "Depois da limpeza",
+        "body": "Secagem média de 3 a 6 horas, dependendo da ventilação, do tecido e das condições do espaço. Utilize a peça apenas depois de estar completamente seca.\n\nNão cubra os estofos húmidos. Siga as instruções de ventilação e de utilização dadas no final."
+      }
     ],
-    faq: [
+    "faq": [
       {
-        q: "Limpam cadeiras de couro/pele?",
-        a: "Sim. Cadeiras de couro genuíno ou couro sintético (PU) são limpas com produtos específicos que hidratam e protegem o material sem danificar a superfície.",
+        "q": "Devo limpar antes de o técnico chegar?",
+        "a": "Retire os objetos pessoais e resíduos soltos. Não aplique produtos para tentar preparar as manchas."
       },
       {
-        q: "Quanto tempo demora a limpeza de 6 cadeiras?",
-        a: "Entre 45 minutos e 1 hora e 30 minutos dependendo do estado e do tipo de cadeira. As cadeiras ficam utilizáveis em 3 a 6 horas após a limpeza.",
+        "q": "Tenho de mover móveis pesados?",
+        "a": "Informe a equipa sobre o acesso. Combine previamente qualquer movimentação necessária; não assuma que todo o mobiliário será movido."
       },
       {
-        q: "Fazem deslocação a escritórios fora do Porto?",
-        a: "Sim. Temos capacidade para trabalhos em Lisboa, Braga, Aveiro e outras cidades. Para lotes grandes fora da área do Porto, contacte-nos para orçamento personalizado com o custo de deslocação calculado consoante a distância.",
+        "q": "Posso deixar os animais na divisão?",
+        "a": "Mantenha-os afastados da área de trabalho e siga as indicações para voltar a utilizar a peça."
       },
+      {
+        "q": "Quando pode ser marcada a visita?",
+        "a": "Procuramos disponibilidade no próprio dia ou no dia seguinte, sempre sob confirmação da equipa."
+      }
     ],
-    relatedService: { label: "Ver preços de limpeza de cadeiras", href: "/limpeza-cadeiras" },
-    relatedPosts: [
-      "doencas-causadas-estofos-sujos",
+    "relatedService": {
+      "label": "Agendar limpeza profissional de sofá",
+      "href": "/limpeza-sofas"
+    },
+    "relatedPosts": [
       "quanto-custa-limpar-sofa-profissional",
+      "como-tirar-manchas-sofa-tecido"
     ],
+    "sources": []
   },
-
   {
-    slug: "doencas-causadas-estofos-sujos",
-    title: "Doenças causadas por estofos sujos: o que a ciência diz",
-    metaTitle: "Doenças Causadas por Estofos Sujos | Saúde em Casa | Kyro Clean",
-    metaDescription: "Ácaros, fungos, bactérias e alérgenos em sofás, colchões e tapetes. Que doenças podem causar e como prevenir. Baseado em estudos científicos.",
-    publishDate: "2025-12-01",
-    updatedDate: "2025-12-01",
-    author: DEFAULT_AUTHOR.name,
-    readingTime: 9,
-    sources: ["spaic-acaros", "spaic-rinite-asma", "oms-humidade-bolor", "cochrane-acaros-asma"],
-    category: "Saúde",
-    heroAlt: "Criança a brincar no sofá, importância da higiene dos estofos para a saúde",
-    intro: "Os estofos domésticos, sofás, colchões, tapetes e alcatifas, são os ecossistemas microbianos mais ricos da casa. Circulam números muito citados sobre quantos ácaros vivem num colchão, quase sempre sem fonte que ainda se consiga abrir. Neste artigo ficamo-nos pelo que está publicado e identificado, incluindo a parte que não nos convém comercialmente.",
-    sections: [
+    "slug": "como-limpar-sofa-veludo",
+    "title": "Como cuidar de um sofá de veludo",
+    "metaTitle": "Como cuidar de um sofá de veludo | Kyro Clean",
+    "metaDescription": "O aspeto do veludo depende do pelo e da sua composição. Veja como evitar marcas de atrito e o que confirmar antes de limpar.",
+    "publishDate": "2026-05-19",
+    "updatedDate": "2026-09-21",
+    "author": DEFAULT_AUTHOR.name,
+    "readingTime": 2,
+    "category": "Dicas",
+    "heroAlt": "Imagem ilustrativa sobre como cuidar de um sofá de veludo",
+    "intro": "O aspeto do veludo depende do pelo e da sua composição. Veja como evitar marcas de atrito e o que confirmar antes de limpar.",
+    "sections": [
       {
-        heading: "Os agentes patogénicos mais comuns em estofos",
-        body: "A investigação microbiológica sobre estofos domésticos identifica consistentemente os seguintes agentes:\n\n**Ácaros do pó (Dermatophagoides pteronyssinus e D. farinae)**, Os mais prevalentes em ambiente doméstico. Não causam infeções diretas, mas as suas fezes e exoesqueletos são potentes alérgenos respiratórios.\n\n**Staphylococcus aureus**, Bactéria presente na pele humana que se transfere para os estofos. A maioria das estirpes é inofensiva, mas a estirpe MRSA (resistente a antibióticos) pode persistir em tecidos durante semanas.\n\n**Fungos (Aspergillus, Cladosporium, Penicillium)**, Proliferam em estofos com humidade acima de 60%. Os esporos são inalados e podem causar reações alérgicas severas em pessoas sensíveis.\n\n**Enterococcus e coliformes fecais**, Mais comuns em estofos de casas com animais de estimação ou crianças pequenas. Indicadores de contaminação fecal.\n\n**Vírus**, Alguns vírus respiratórios (influenza, norovirus) podem sobreviver em tecidos entre 8 e 24 horas. Em contextos de doença no agregado familiar, os estofos funcionam como reservatórios de transmissão.",
+        "heading": "Identifique a composição",
+        "body": "Veludo descreve uma estrutura têxtil, não uma fibra única. Pode conter fibras diferentes com tolerâncias distintas à água e ao produto. Procure a etiqueta e fotografe-a para a avaliação."
       },
       {
-        heading: "Rinite e asma alérgica: a ligação direta com os estofos",
-        body: "A SPAIC estima que cerca de 930.000 portugueses sofrem de rinite, alérgica ou não, o que corresponde a cerca de 9,55% da população, e aponta os ácaros do pó como a principal causa de alergias respiratórias em ambiente doméstico.\n\nO mecanismo é direto: os ácaros depositam as suas fezes (que contêm a proteína Der p 1) nas fibras dos estofos. Quando nos sentamos, deitamos ou simplesmente andamos na divisão, perturbamos essas partículas que ficam em suspensão no ar e são inaladas.\n\n**Sintomas típicos de rinite por ácaros:**\n- Espirros frequentes, especialmente de manhã\n- Nariz entupido ou a pingar sem infeção aparente\n- Olhos vermelhos e com comichão\n- Sintomas que pioram em casa e melhoram fora\n- Melhoria clara durante férias prolongadas (menos exposição acumulada)\n\n**Asma**, Em crianças com predisposição genética, a exposição contínua a alérgenos de ácaros aumenta significativamente o risco de desenvolvimento de asma brônquica. A SPAIC descreve os ácaros do pó como a principal causa de alergias do aparelho respiratório e considera a redução do seu número em casa um fator importante no acompanhamento de quem é alérgico. Nenhuma entidade de saúde quantifica quantos casos de asma isso evita, e nós também não o fazemos.",
-        tip: "Se o seu filho tem rinite ou asma, fale primeiro com o médico assistente: a higienização do colchão é uma medida de ambiente, não um tratamento nem um diagnóstico. A higienização profissional é considerada intervenção de primeira linha em pediatria alérgica.",
+        "heading": "Cuidados entre limpezas",
+        "body": "Aspire suavemente com acessório compatível, seguindo as instruções do fabricante. Evite escovas rígidas e atrito insistente. Uma diferença de brilho pode resultar da orientação do pelo, não de sujidade."
       },
       {
-        heading: "Dermatite de contacto e eczema",
-        body: "Os detergentes e amaciadores usados na lavagem de roupa de cama deixam resíduos nas fibras que podem sensibilizar a pele ao longo do tempo. Mas o maior problema são os próprios ácaros.\n\nA Der p 1 (proteína das fezes dos ácaros) é uma protease, uma enzima que digere proteínas. Quando em contacto prolongado com a pele (especialmente pele de bebé durante o sono), pode quebrar a barreira cutânea e facilitar sensibilizações alérgicas.\n\nEstudos publicados no Journal of Allergy and Clinical Immunology mostram que bebés que dormem em colchões com alta concentração de Der p 1 têm 3x mais probabilidade de desenvolver eczema atópico no primeiro ano de vida.",
+        "heading": "Se houver um derrame",
+        "body": "Absorva o excesso sem esfregar e não aplique vapor direto. Não tente uniformizar o brilho molhando toda a almofada. Envie fotografias antes de usar produtos."
       },
       {
-        heading: "Infeções respiratórias e fungos em tapetes",
-        body: "Os tapetes e alcatifas têm uma característica que os torna especialmente problemáticos: acumulam não só pó e ácaros, mas também fungos que crescem nas fibras quando há humidade.\n\nFungos como o Aspergillus fumigatus e o Cladosporium são ubíquos no ambiente, mas em concentrações elevadas num tapete mal mantido, os seus esporos podem causar:\n\n- **Aspergilose broncopulmonar**, Em pessoas imunodeprimidas (pós-quimioterapia, transplantados, VIH) pode ser grave.\n- **Febre do feno perene**, Rinite e conjuntivite persistentes causadas por esporos fúngicos em suspensão.\n- **Sinusite fúngica**, Em pessoas com cavidades nasais predispostas, os esporos inibem a drenagem dos seios perinasais.\n\nTapetes em casas de banho, cozinhas ou divisões com humidade elevada devem ser higienizados com maior frequência, idealmente a cada 3 a 4 meses.",
-        tip: "Um tapete que cheira a húmido mesmo seco já tem colónias de fungos estabelecidas. Nesse caso, a limpeza deve incluir tratamento fungicida específico.",
-      },
-      {
-        heading: "Síndrome de edifício doente (SED) e a qualidade do ar interior",
-        body: "A Síndrome de Edifício Doente é um conjunto de sintomas (fadiga, dores de cabeça, irritação das mucosas, dificuldade de concentração) associados à permanência prolongada em espaços fechados com má qualidade do ar.\n\nOs estofos domésticos são um dos principais contribuidores para a degradação da qualidade do ar interior. Os COV (Compostos Orgânicos Voláteis) libertados por estofos novos, os alérgenos biológicos de estofos velhos e as partículas de poeira fina em suspensão criam uma carga ambiental que afeta sobretudo:\n\n- Crianças (respiram mais ar por kg de peso corporal)\n- Idosos (sistema imunitário menos eficaz)\n- Pessoas com doenças respiratórias crónicas\n- Trabalhadores em teletrabalho (mais horas em casa)\n\nA Agência Europeia do Ambiente estima que passamos 90% do nosso tempo em espaços fechados, tornando a qualidade do ar interior uma prioridade de saúde pública.",
-      },
-      {
-        heading: "O que fazer: higienização como intervenção de saúde",
-        body: "A limpeza de colchões, sofás e tapetes trata a sujidade das fibras. Anti-ácaros e desbacterização são extras opcionais, com avaliação e preço próprios. Confirme com a equipa o cuidado pretendido e as condições de aplicação. A limpeza não é apresentada como tratamento de sintomas nem como garantia de eliminação de microrganismos.",
-        tip: "Para famílias com membros alérgicos ou asmáticos, a higienização profissional de estofos pode ser considerada despesa de saúde e, em alguns casos, recomendada pelo médico assistente.",
-      },
+        "heading": "O que esperar da limpeza",
+        "body": "A equipa avalia a estabilidade da cor e a resposta do pelo. O tratamento e a escovagem são adaptados, sem forçar fibras delicadas. Marcas de desgaste ou pelo danificado podem permanecer."
+      }
     ],
-    faq: [
+    "faq": [
       {
-        q: "Os meus filhos têm alergias, por onde começo?",
-        a: "Comece pelo colchão e sofá, que são os estofos com maior concentração de ácaros. Uma higienização profissional de ambos, com tratamento anti-ácaros, é a intervenção com maior impacto imediato.",
+        "q": "Todo o veludo pode ser lavado com água?",
+        "a": "Não. A composição, a construção e as instruções do fabricante têm de ser avaliadas."
       },
       {
-        q: "Com que frequência devo higienizar os estofos se tenho asma?",
-        a: "Recomendamos colchão a cada 6 meses e sofá anualmente. Complemente com aspiração semanal do colchão com aspirador equipado com filtro HEPA.",
+        "q": "Uma marca brilhante é sempre gordura?",
+        "a": "Não. A orientação ou o desgaste do pelo pode mudar a reflexão da luz."
       },
       {
-        q: "Há estudos que provem que a limpeza profissional reduz os sintomas de alergia?",
-        a: "Não, e preferimos dizê-lo. A revisão Cochrane que juntou 54 ensaios com mais de 3.000 doentes asmáticos sensíveis a ácaros não encontrou diferença nos sintomas entre quem aplicou medidas de redução de ácaros em casa e quem não aplicou. O que a limpeza profissional faz, e isso é verificável, é remover pó, alérgenos acumulados, manchas e odores do estofo. Se tem asma ou rinite, o tratamento é com o seu médico, não com uma empresa de limpeza.",
+        "q": "Posso usar uma escova dura?",
+        "a": "Evite escovas rígidas e atrito que altere o pelo."
       },
       {
-        q: "Os produtos usados na limpeza profissional são seguros para crianças?",
-        a: "Sim. Usamos exclusivamente produtos certificados e sem solventes agressivos. Após a secagem completa (3 a 6 horas), os estofos são completamente seguros para crianças e animais.",
-      },
+        "q": "Como peço avaliação?",
+        "a": "Envie fotografias, indique a localidade, as dimensões e o que pretende tratar. Respondemos em menos de 10 minutos. Confirmamos o método, o preço dos serviços e a deslocação antes de marcar."
+      }
     ],
-    relatedService: { label: "Limpeza de colchões e tratamentos opcionais", href: "/limpeza-colchoes" },
-    relatedPosts: [
+    "relatedService": {
+      "label": "Limpeza profissional de sofás",
+      "href": "/limpeza-sofas"
+    },
+    "relatedPosts": [
+      "quanto-custa-limpar-sofa-profissional",
+      "como-tirar-manchas-sofa-tecido"
+    ],
+    "sources": []
+  },
+  {
+    "slug": "como-tirar-cheiro-sofa",
+    "title": "Como tirar o cheiro do sofá: comece pela origem",
+    "metaTitle": "Como tirar o cheiro do sofá: comece pela origem | Kyro Clean",
+    "metaDescription": "Odores de animais, tabaco ou humidade pedem avaliações diferentes. Saiba o que comunicar e quais os limites de uma limpeza.",
+    "publishDate": "2026-05-19",
+    "updatedDate": "2026-09-21",
+    "author": DEFAULT_AUTHOR.name,
+    "readingTime": 2,
+    "sources": [],
+    "category": "Dicas",
+    "heroAlt": "Imagem ilustrativa sobre como tirar o cheiro do sofá: comece pela origem",
+    "intro": "Odores de animais, tabaco ou humidade pedem avaliações diferentes. Saiba o que comunicar e quais os limites de uma limpeza.",
+    "sections": [
+      {
+        "heading": "Identifique quando o cheiro aparece",
+        "body": "Indique se surgiu após um derrame, se piora com humidade ou se está presente em toda a peça. Veja também se a parede, o pavimento ou objetos próximos podem estar na origem."
+      },
+      {
+        "heading": "Evite perfumes e misturas",
+        "body": "Perfumar não remove os resíduos que causam o odor. Não encharque a espuma nem misture produtos. O líquido pode transportar a sujidade para zonas mais difíceis de alcançar."
+      },
+      {
+        "heading": "Tecido e enchimento têm limites diferentes",
+        "body": "A limpeza trata as zonas acessíveis. Um odor que penetrou na espuma ou na estrutura pode persistir, mesmo depois de melhorar na superfície. A avaliação deve explicar esta possibilidade antes da intervenção."
+      },
+      {
+        "heading": "Tratamento adequado à causa",
+        "body": "Avaliamos o revestimento e as manchas, aspiramos, aplicamos o tratamento adequado, escovamos respeitando a fibra, extraímos a sujidade e conferimos o resultado. A escova, a pressão e a humidade são ajustadas ao material. Materiais incompatíveis com água exigem avaliação de outro método.\n\nSe houver bolor ou humidade recorrente, a prioridade é avaliar a origem antes de decidir limpar."
+      }
+    ],
+    "faq": [
+      {
+        "q": "O cheiro sai sempre?",
+        "a": "Não. Depende da origem, profundidade e acessibilidade dos resíduos."
+      },
+      {
+        "q": "Basta aplicar um ambientador?",
+        "a": "O perfume pode encobrir o odor por algum tempo, mas não substitui a remoção da origem."
+      },
+      {
+        "q": "O cheiro pode voltar?",
+        "a": "Pode, se restarem resíduos no interior ou a causa continuar presente."
+      },
+      {
+        "q": "Que informações devo enviar?",
+        "a": "Diga a origem provável, há quanto tempo sente o odor e o que já aplicou. Inclua fotografias e localidade."
+      }
+    ],
+    "relatedService": {
+      "label": "Limpeza profissional de sofás com desodorização",
+      "href": "/limpeza-sofas"
+    },
+    "relatedPosts": [
       "acaros-sofas-colchoes-riscos-saude",
-      "quanto-custa-limpar-colchao-profissional",
-    ],
+      "como-tirar-manchas-sofa-tecido"
+    ]
   },
-
   {
-    slug: "como-preparar-casa-visita-tecnico",
-    title: "Como preparar a sua casa para a visita do técnico de limpeza",
-    metaTitle: "Como Preparar a Casa Para a Visita do Técnico | Kyro Clean",
-    metaDescription: "5 passos simples para preparar a sua casa antes da visita do técnico de limpeza de sofás. Poupe tempo e obtenha melhores resultados.",
-    publishDate: "2025-10-28",
-    updatedDate: "2025-10-28",
-    author: DEFAULT_AUTHOR.name,
-    readingTime: 4,
-    category: "Dicas",
-    heroAlt: "Sala de estar organizada antes da visita do técnico de limpeza",
-    intro: "Uma boa preparação antes da visita do técnico não só facilita o trabalho como pode fazer a diferença no resultado final. Aqui estão os 5 passos que recomendamos.",
-    sections: [
+    "slug": "limpeza-alcatifa-escritorio",
+    "title": "Limpeza de alcatifa de escritório: planear a intervenção",
+    "metaTitle": "Limpeza de alcatifa de escritório: planear a intervenção | Kyro Clean",
+    "metaDescription": "Organize a limpeza da alcatifa sem esquecer acessos, mobiliário e tempo de secagem. O orçamento depende da área, material e estado.",
+    "publishDate": "2026-05-19",
+    "updatedDate": "2026-09-21",
+    "author": DEFAULT_AUTHOR.name,
+    "readingTime": 2,
+    "category": "Empresas",
+    "heroAlt": "Imagem ilustrativa sobre limpeza de alcatifa de escritório: planear a intervenção",
+    "intro": "Organize a limpeza da alcatifa sem esquecer acessos, mobiliário e tempo de secagem. O orçamento depende da área, material e estado.",
+    "sections": [
       {
-        heading: "1. Retire objetos do sofá e área envolvente",
-        body: "Retire almofadas decorativas, mantas e quaisquer objetos que estejam sobre ou junto ao sofá. O técnico vai necessitar de acesso livre a todas as superfícies do sofá, incluindo as costas e laterais.\n\nSe possível, afaste o sofá uns 30-40cm da parede. Isso permite limpar as costas e facilita a circulação do técnico com o equipamento.",
+        "heading": "Medir e distinguir as zonas",
+        "body": "Indique largura e comprimento das áreas, corredores e salas. Fotografias das zonas de passagem e das manchas ajudam a preparar a proposta. A alcatifa é sempre sob orçamento, sem tabela fixa por metro quadrado."
       },
       {
-        heading: "2. Aspire o sofá com antecedência",
-        body: "Uma aspiração prévia remove pelos, migalhas e poeira grosseira, o que permite ao técnico concentrar-se na limpeza profunda em vez de gastar tempo com a limpeza de superfície.\n\nNão é obrigatório, o técnico aspira de qualquer forma, mas reduz o tempo total da visita e melhora o resultado.",
-        tip: "Use o bocal de fendas do aspirador para chegar entre as almofadas e nos vincos do sofá.",
+        "heading": "Combinar o acesso ao escritório",
+        "body": "Informe horários permitidos, regras do edifício, estacionamento e mobiliário fixo. A intervenção fora do horário habitual depende de disponibilidade confirmada; não existe um contrato ou desconto automático por ser uma empresa."
       },
       {
-        heading: "3. Identifique as manchas e informe o técnico",
-        body: "Antes da visita, identifique todas as manchas que quer tratar. Se souber o que causou a mancha (vinho, café, urina, etc.) e há quanto tempo existe, partilhe essa informação com o técnico.\n\nEsta informação é crucial para o técnico escolher o produto de pré-tratamento correto. Uma mancha de vinho de 2 anos tratada como mancha fresca pode não sair completamente.",
+        "heading": "Escolher o método",
+        "body": "Avaliamos fibra, base, instalação e estado. Nas alcatifas compatíveis, tratamos, escovamos e extraímos a sujidade antes da conferência e secagem. Não prometemos recuperar desgaste ou diferenças de cor por uso."
       },
       {
-        heading: "4. Assegure o acesso à tomada de corrente",
-        body: "O equipamento de limpeza profissional por extração usa eletricidade. Assegure que há uma tomada acessível a menos de 5-10 metros do sofá. Normalmente uma extensão de obra é suficiente e os técnicos costumam trazer a sua.\n\nSe mora num apartamento e o técnico precisa de usar a carrinha na rua, confirme antes se há lugar de estacionamento próximo.",
-      },
-      {
-        heading: "5. Organize as próximas 3-4 horas",
-        body: "Após a limpeza, o sofá precisa de 3 a 6 horas para secar completamente (dependendo do tipo de tecido e ventilação). Planeie estar em casa durante esse período ou deixe o espaço ventilado.\n\nAbra as janelas para acelerar a secagem. Não use o sofá nem coloque objetos sobre ele até estar completamente seco, especialmente almofadas, que podem deixar marcas de humidade no tecido.\n\nO técnico confirmará quando o sofá está pronto a usar antes de sair.",
-        tip: "A secagem demora em média 3 a 6 horas e depende da ventilação e das condições do espaço. Um desumidificador pode ajudar.",
-      },
+        "heading": "Reabrir as áreas tratadas",
+        "body": "Secagem média de 3 a 6 horas, dependendo da ventilação, do tecido e das condições do espaço. Utilize a peça apenas depois de estar completamente seca.\n\nCombine o percurso de circulação para não voltar a sujar as zonas ainda húmidas."
+      }
     ],
-    faq: [
+    "faq": [
       {
-        q: "Preciso de estar em casa durante a limpeza?",
-        a: "Sim, é necessário estar presente no início para indicar as manchas e no final para confirmar o resultado. O técnico avisará quando terminar.",
+        "q": "Existe preço fixo por metro quadrado?",
+        "a": "Não. A proposta depende das medidas e da avaliação do local e revestimento."
       },
       {
-        q: "Tenho de mover os móveis pesados ao redor do sofá?",
-        a: "Não é necessário. O técnico traz o equipamento e trata das posições necessárias. Basta ter um corredor de acesso de cerca de 60cm.",
+        "q": "Limpam por baixo de todos os móveis?",
+        "a": "Confirme as zonas acessíveis e a movimentação possível antes da visita."
       },
       {
-        q: "E se tiver crianças ou animais em casa?",
-        a: "Os produtos que usamos são seguros, mas recomendamos que crianças pequenas e animais não estejam na sala durante o tratamento. Podem voltar quando o sofá estiver seco.",
+        "q": "Podem trabalhar fora do horário?",
+        "a": "Indique o horário pretendido para a equipa confirmar a disponibilidade."
       },
+      {
+        "q": "É obrigatório limpar a cada seis meses?",
+        "a": "Não há uma frequência única. Ajuste o plano ao uso, à sujidade e às instruções de manutenção."
+      }
     ],
-    relatedService: { label: "Agendar limpeza profissional de sofá", href: "/limpeza-sofas" },
-    relatedPosts: [
-      "quanto-custa-limpar-sofa-profissional",
-      "como-tirar-manchas-sofa-tecido",
-    ],
-  },
-
-  // ─── Artigo 10 ───────────────────────────────────────────────────────
-  {
-    slug: "como-limpar-sofa-veludo",
-    title: "Como limpar sofá de veludo sem estragar: guia passo a passo",
-    metaTitle: "Como Limpar Sofá de Veludo | Guia Sem Estragar o Tecido",
-    metaDescription: "Sofá de veludo com manchas ou pelo achatado? Aprende as técnicas certas e os erros que destroem o veludo. Quando o profissional é indispensável.",
-    publishDate: "2026-05-19",
-    updatedDate: "2026-05-19",
-    author: DEFAULT_AUTHOR.name,
-    readingTime: 6,
-    category: "Dicas",
-    heroAlt: "Sofá de veludo azul com textura visível, limpeza profissional",
-    intro: "O veludo é um dos tecidos mais elegantes para sofás mas também um dos mais exigentes na manutenção. A boa notícia é que, com a técnica certa, consegues manter o aspeto impecável sem danificar a fibra. A má notícia: os erros mais comuns, como esfregar com pano molhado, são também os mais difíceis de reverter.",
-    sections: [
-      {
-        heading: "Porque é que o veludo exige cuidado especial?",
-        body: "O veludo é composto por fios cortados que formam uma superfície macia com direção definida (o 'pelo'). Qualquer pressão errada ou líquido excessivo achata esse pelo permanentemente, criando marcas escuras que não saem com aspirador. Ao contrário do tecido liso, o veludo não 'perdoa': um erro de limpeza pode ser irreversível.\n\nA maioria dos sofás de veludo modernos é feita de veludo de poliéster ou viscose, mais resistente que o veludo de seda, mas igualmente sensível à técnica de limpeza.",
-      },
-      {
-        heading: "Limpeza de rotina: o que fazer semanalmente",
-        body: "1. **Aspiração suave**: Use um acessório macio sem escovas rotativas. Passe sempre na direção do pelo (geralmente de cima para baixo ou da frente para trás). Aspirar contra o pelo levanta as fibras mas não as danifica se for feito suavemente.\n\n2. **Restaurar o pelo achatado**: Se houver zonas achatadas por uso ou pressão, passe um pano de microfibra seco na direção contrária do pelo para levantar as fibras, depois passe na direção certa para alinhar.\n\n3. **Vaporizador caseiro com cuidado**: Uma passagem rápida de vapor a 20-25 cm de distância levanta o pelo. Nunca aplique diretamente: o excesso de humidade deixa marcas de água.",
-        tip: "Escove sempre na direção do pelo. Se não souber qual é, observe o reflexo da luz: a direção que brilha mais é a direção do pelo.",
-      },
-      {
-        heading: "Como tratar manchas no veludo",
-        body: "A regra mais importante: **nunca esfregue**. O movimento de fricção achata o pelo e expande a mancha.\n\n**Para manchas secas** (poeira, migalhas): aspire suavemente com acessório sem escovas.\n\n**Para manchas líquidas frescas**:\n1. Absorva com pano branco seco usando pressão vertical (sem movimentos laterais)\n2. Deixe secar completamente ao ar\n3. Depois de seco, passe vapor suave para restaurar o pelo\n\n**Para manchas difíceis** (vinho, café, gordura):\n1. Não aplique água em excesso: uma camada fina de bicarbonato seco pode absorver líquidos gordurosos\n2. Para manchas de tânica (vinho, chá): água fria com uma gota de detergente suave, aplicada com espátula ou cartão, sem esfregar\n3. Se a mancha não sair com estes passos, pare: qualquer tentativa adicional agrava o dano",
-        tip: "Guarde sempre um pedaço de tecido de retalho do mesmo veludo para testar produtos antes de aplicar no sofá.",
-      },
-      {
-        heading: "Quando o profissional é a única opção",
-        body: "Existem situações em que a limpeza caseira do veludo vai inevitavelmente piorar o problema:\n\n- **Manchas de urina ou vinho antigas**: a proteína e os taninos penetraram nas fibras, e os produtos caseiros suficientes para remover a mancha superficial não chegam à profundidade onde está o odor e a cor\n- **Pelo achatado em grandes áreas**: por uso intenso ou mancha de água, só extração profissional a vapor controlada restaura o pelo uniformemente\n- **Sofás de veludo de seda ou veludo com conteúdo de viscose acima de 50%**: materiais que reagem mal a qualquer humidade e requerem limpeza a seco profissional\n\nA Kyro Clean trata veludo com extração profissional de baixa humidade, que limpa em profundidade sem saturar as fibras e restaura o pelo com vapor controlado após a secagem.",
-      },
-    ],
-    faq: [
-      {
-        q: "Posso usar bicarbonato para limpar sofá de veludo?",
-        a: "Bicarbonato seco pode ser usado para absorver líquidos gordurosos ou neutralizar odores ligeiros: aplique, aguarde 30 minutos e aspire suavemente. Nunca use bicarbonato húmido nem o esfregue no tecido.",
-      },
-      {
-        q: "O veludo achatado por uso tem solução?",
-        a: "Na maioria dos casos sim. Vapor suave a distância (20-25 cm) e escovagem suave na direção contrária do pelo restauram as fibras achatadas por pressão. Para zonas muito desgastadas, limpeza profissional com vapor controlado é mais eficaz.",
-      },
-      {
-        q: "Qual o melhor produto doméstico para limpar veludo?",
-        a: "Água fria com uma gota de detergente suave sem fragrância forte é o mais seguro. Aplicado com pano húmido (não encharcado) e sem fricção. Para tudo o resto, os riscos superam os benefícios e recomendamos limpeza profissional.",
-      },
-      {
-        q: "Com que frequência devo limpar um sofá de veludo?",
-        a: "Aspiração suave semanalmente e restauração do pelo com vapor mensalmente. Limpeza profissional a cada 12-18 meses ou sempre que surgir uma mancha que a limpeza caseira não resolve.",
-      },
-    ],
-    relatedService: { label: "Limpeza profissional de sofás", href: "/limpeza-sofas" },
-    relatedPosts: [
-      "quanto-custa-limpar-sofa-profissional",
-      "como-tirar-manchas-sofa-tecido",
-    ],
-  },
-
-  // ─── Artigo 11 ───────────────────────────────────────────────────────
-  {
-    slug: "como-tirar-cheiro-sofa",
-    title: "Como tirar o cheiro do sofá: causas e soluções que realmente funcionam",
-    metaTitle: "Como Tirar o Cheiro do Sofá | Causas e Soluções 2025",
-    metaDescription: "Sofá com mau cheiro que não passa? Descubra as causas, os métodos que funcionam em casa e quando é necessária limpeza profissional para eliminar odores na raiz.",
-    publishDate: "2026-05-19",
-    updatedDate: "2026-05-19",
-    author: DEFAULT_AUTHOR.name,
-    readingTime: 7,
-    sources: ["oms-humidade-bolor"],
-    category: "Dicas",
-    heroAlt: "Sofá de tecido bege, eliminação profissional de odores",
-    intro: "Um sofá com mau cheiro não é apenas desconfortável: é um sinal de que algo está acumulado nas fibras que não é visível mas está presente. Suor, gordura corporal, comida, animais de estimação ou simplesmente humidade: cada tipo de odor tem a sua causa e a sua solução. Este guia explica o que funciona e o que apenas mascara o problema.",
-    sections: [
-      {
-        heading: "Identificar a causa do cheiro é o primeiro passo",
-        body: "O método de tratamento correto depende do tipo de odor. Os mais comuns em sofás portugueses:\n\n**Cheiro a humidade/bolor**: causado por acumulação de humidade nas camadas internas, frequente em casas mal ventiladas ou após derrame não seco corretamente. É o mais difícil de eliminar em casa.\n\n**Cheiro a suor/gordura corporal**: acumulação de óleos naturais da pele e suor ao longo do tempo, especialmente em zonas de contacto frequente (encostos e assentos).\n\n**Cheiro a animal**: combinação de pelos, dander, saliva e possíveis acidentes de urina, que penetra profundamente nas fibras.\n\n**Cheiro a fumo de tabaco**: os compostos do fumo aderem às fibras e são dos mais difíceis de neutralizar com produtos domésticos.\n\n**Cheiro a comida**: geralmente mais superficial e mais fácil de tratar, exceto gorduras que penetram nas fibras.",
-      },
-      {
-        heading: "Métodos domésticos: o que funciona (e o que não funciona)",
-        body: "**Bicarbonato de sódio: funciona para odores superficiais**\nPolvilhe generosamente sobre todo o sofá. Deixe atuar 12 a 24 horas (quanto mais tempo, melhor). Aspire completamente. O bicarbonato absorve ácidos e compostos voláteis responsáveis por odores ligeiros.\n\n**Vinagre branco diluído: funciona para cheiro a animal e comida**\nMisture água e vinagre branco em proporção 2:1 num spray. Aplique levemente (o tecido não deve ficar encharcado) e deixe secar ao ar. O ácido acético neutraliza compostos alcalinos. O cheiro a vinagre desaparece completamente após a secagem.\n\n**Arejamento intensivo: funciona para odores ligeiros**\nColoque o sofá numa divisão com ventilação cruzada durante 24-48 horas. Eficaz para cheiro a fechado ou produtos de limpeza.\n\n**O que NÃO funciona:**\n- Sprays perfumados de supermercado: mascaram o odor temporariamente (horas a dias)\n- Spray de álcool em excesso: pode danificar o tecido e não elimina o odor na raiz\n- Vapor doméstico em tecidos grossos: humedece mas não aspira, podendo piorar o cheiro a bolor",
-        tip: "Deixe o sofá secar completamente após qualquer tratamento húmido. Humidade residual é a principal causa de cheiro a bolor secundário.",
-      },
-      {
-        heading: "Quando os métodos caseiros não chegam",
-        body: "Há situações em que o odor tem origem nas camadas internas do sofá, como o enchimento, a espuma ou o tecido inferior, e nenhum tratamento superficial vai eliminar o problema:\n\n- **Cheiro a urina (pessoas ou animais)**: os compostos de ácido úrico cristalizam nas fibras ao secar e reativam com a humidade. Precisam de tratamento enzimático específico que quebra os cristais, não disponível em produtos domésticos normais.\n- **Cheiro a bolor**: o fungo está nas camadas internas. A limpeza superficial não alcança o problema.\n- **Cheiro a fumo forte**: os compostos do tabaco penetram profundamente e requerem extração com água quente para remoção mecânica.\n- **Odores persistentes após vários tratamentos**: sinal de que a origem está mais funda do que a superfície do tecido.\n\nA extração profissional a quente é o único método que injeta e aspira líquido até às camadas profundas do tecido, removendo os compostos que causam o odor, não apenas cobrindo-os.",
-      },
-      {
-        heading: "Após a limpeza: como prevenir o regresso dos odores",
-        body: "Manter o sofá sem cheiro a longo prazo depende de hábitos simples:\n\n1. **Ventilação regular**: abra as janelas diariamente, especialmente em dias secos\n2. **Capas de sofá laváveis**: protegem das gorduras corporais e são fáceis de lavar\n3. **Impermeabilização profissional**: cria uma barreira que impede líquidos e gorduras de penetrar nas fibras\n4. **Limpeza profissional anual**: remove a acumulação que os métodos domésticos não alcançam antes que se torne um problema de odor",
-      },
-    ],
-    faq: [
-      {
-        q: "O bicarbonato de sódio elimina o cheiro de urina do sofá?",
-        a: "Parcialmente. O bicarbonato absorve odores superficiais e neutros, mas os cristais de ácido úrico da urina requerem tratamento enzimático específico. Para urina, o tratamento enzimático profissional é o único que elimina o odor definitivamente.",
-      },
-      {
-        q: "Quanto tempo demora a eliminar o cheiro de sofá?",
-        a: "Depende do tipo e profundidade do odor. Bicarbonato de sódio precisa de 12-24 horas. Tratamento profissional elimina o odor no momento, com 3 a 6 horas para secagem completa.",
-      },
-      {
-        q: "O sofá pode ficar com cheiro após limpeza profissional?",
-        a: "Não é comum. Se surgir um ligeiro cheiro a limpo nos primeiros dias, é normal: desaparece completamente após secagem (em média 3 a 6 horas, dependendo da ventilação). Um cheiro persistente após limpeza profissional é raro e deve ser comunicado ao serviço.",
-      },
-      {
-        q: "O amaciador de roupa pode ser usado para perfumar o sofá?",
-        a: "Não recomendamos. O amaciador pode deixar resíduos no tecido que atraem sujidade e podem alterar a textura de alguns tecidos. Use bicarbonato ou vinagre diluído para tratamentos caseiros.",
-      },
-    ],
-    relatedService: { label: "Limpeza profissional de sofás com desodorização", href: "/limpeza-sofas" },
-    relatedPosts: [
-      "acaros-sofas-colchoes-riscos-saude",
-      "como-tirar-manchas-sofa-tecido",
-    ],
-  },
-
-  // ─── Artigo 12 ───────────────────────────────────────────────────────
-  {
-    slug: "limpeza-alcatifa-escritorio",
-    title: "Limpeza de alcatifa em escritório: frequência, métodos e custos",
-    metaTitle: "Limpeza de Alcatifa em Escritório | Guia para Empresas 2025",
-    metaDescription: "Guia completo para empresas sobre limpeza de alcatifas: frequência recomendada, diferença entre limpeza de rotina e profissional, e quanto custa. AVAC incluso.",
-    publishDate: "2026-05-19",
-    updatedDate: "2026-05-19",
-    author: DEFAULT_AUTHOR.name,
-    readingTime: 6,
-    category: "Empresas",
-    heroAlt: "Alcatifa de escritório, limpeza profissional por extração",
-    intro: "As alcatifas de escritório acumulam sujidade a um ritmo muito superior às domésticas. Um espaço com 20 pessoas acumula tantos poluentes numa alcatifa em 3 meses como uma alcatifa doméstica em 1 ano. Para gestores de instalações e responsáveis de escritório, perceber quando e como fazer a limpeza correta é fundamental, tanto para a imagem da empresa como para a saúde dos colaboradores.",
-    sections: [
-      {
-        heading: "Quanto sujidade acumula uma alcatifa de escritório?",
-        body: "Estudos de qualidade do ar interior mostram que as alcatifas retêm até 10 vezes o seu peso em sujidade antes de parecerem visivelmente sujas. Isso inclui:\n\n- **Partículas trazidas do exterior**: poeira, pólen, areia e resíduos de sola de sapato\n- **Resíduos orgânicos internos**: células mortas de pele, cabelo, migalhas de comida\n- **Poluentes químicos**: compostos voláteis de tinteiros, carpetes novas, ar condicionado\n- **Ácaros e bactérias**: que se alimentam dos resíduos orgânicos acumulados\n\nA camada visível de sujidade representa apenas 15-20% do total: o resto está nas camadas internas da fibra e no suporte.",
-        tip: "Uma alcatifa de escritório com mau aspeto geralmente já atingiu 5-8 vezes a sua capacidade de retenção de sujidade, o que significa que há muito mais que não se vê.",
-      },
-      {
-        heading: "Frequência recomendada de limpeza",
-        body: "**Limpeza de rotina (aspiração)**\n- Escritórios de baixo tráfego (1-5 pessoas): 2x por semana\n- Tráfego médio (5-20 pessoas): diariamente\n- Alto tráfego (20+ pessoas ou espaço de atendimento): 2x por dia em zonas de passagem\n\n**Limpeza intermédia (pré-tratamento de manchas)**\n- Trate manchas imediatamente após ocorrerem: a maioria das manchas de café e comida sai quando é tratada de imediato, e deixa de sair quando seca\n\n**Limpeza profissional por extração**\n- Escritórios de baixo tráfego: anualmente\n- Tráfego médio: cada 6 meses\n- Alto tráfego ou serviço de atendimento ao público: cada 3-4 meses\n- Após derrame grave ou evento: imediatamente\n\nAlgumas seguradoras de edifícios comerciais e fabricantes de alcatifas exigem registo de limpezas profissionais para manter a garantia e cobertura.",
-      },
-      {
-        heading: "Limpeza de rotina vs. extração profissional: qual a diferença?",
-        body: "A confusão mais comum é pensar que aspiração regular substitui a limpeza profissional. Não substitui: complementa.\n\n**O que a aspiração faz**: remove partículas superficiais e sólidas. Mantém a aparência aceitável e reduz acumulação de alergénios superficiais.\n\n**O que a aspiração não faz**: não remove gorduras e proteínas aderidas às fibras, não elimina bactérias nem ácaros nas camadas internas, não restaura a cor e textura originais.\n\n**O que a extração profissional faz**: injeta água quente a alta pressão nas fibras e aspira imediatamente, removendo gorduras, proteínas e sujidade das camadas mais profundas. Restaura a cor e textura original e aumenta significativamente a vida útil da alcatifa.\n\nUma alcatifa limpa profissionalmente regularmente dura 2 a 3 vezes mais que uma apenas aspirada, reduzindo o custo de substituição que pode chegar a 15-40€/m² de alcatifa comercial.",
-      },
-      {
-        heading: "Quanto custa a limpeza profissional de alcatifa para escritório?",
-        body: "O preço da limpeza profissional de alcatifa comercial em Portugal é sempre orçamentado à medida, sem tabela fixa por m², e depende da área, do estado da alcatifa e do tipo de espaço. Para grandes superfícies (escritórios, comércio, espaços acima de 50m²) o orçamento é personalizado.\n\nEspaços com manchas intensas, colas ou resíduos específicos podem ter sobrecusto de pré-tratamento.\n\nA maioria das empresas profissionais trabalha fora do horário de expediente (tarde, noite ou fim de semana) para não interromper a atividade: inclua esta condição no pedido de orçamento.",
-        tip: "Peça contratos de limpeza semestral ou anual: habitualmente com 10-15% de desconto face ao preço por intervenção avulsa.",
-      },
-    ],
-    faq: [
-      {
-        q: "A alcatifa pode ser usada logo após a limpeza profissional?",
-        a: "A secagem demora em média 3 a 6 horas; aguarde até o tecido estar completamente seco. A ventilação acelera a secagem. Para alto tráfego, agende a limpeza no fim do dia para ter uma noite completa de secagem.",
-      },
-      {
-        q: "A limpeza profissional remove manchas antigas de café e comida?",
-        a: "Na grande maioria dos casos, sim. Manchas tratadas profissionalmente nos primeiros 24 horas saem quase sempre. Manchas com semanas ou meses podem requerer pré-tratamento adicional mas ainda são tratáveis.",
-      },
-      {
-        q: "Que tipo de alcatifa beneficia mais da limpeza profissional?",
-        a: "Alcatifas de pelo cortado (a mais comum em escritórios) beneficiam mais da extração, pois a sujidade acumula-se nas bases das fibras. Alcatifas de loop pile (laçaria) acumulam menos sujidade nas fibras mas mais no suporte.",
-      },
-      {
-        q: "Existe algum risco de dano na alcatifa durante a limpeza profissional?",
-        a: "Com profissionais certificados, o risco é mínimo. Antes de iniciar, o técnico verifica o tipo de fibra e testa a solidez das cores. Fibras naturais como lã requerem tratamento mais delicado mas são igualmente tratáveis.",
-      },
-    ],
-    relatedService: { label: "Limpeza profissional de alcatifas", href: "/limpeza-alcatifas" },
-    relatedPosts: [
+    "relatedService": {
+      "label": "Limpeza profissional de alcatifas",
+      "href": "/limpeza-alcatifas"
+    },
+    "relatedPosts": [
       "limpeza-tapetes-profissional-guia-completo",
-      "doencas-causadas-estofos-sujos",
+      "doencas-causadas-estofos-sujos"
     ],
+    "sources": []
   },
-
-  // ─── Artigo 13 ───────────────────────────────────────────────────────
   {
-    slug: "guia-acaros-em-casa",
-    title: "Ácaros em casa: o guia completo para identificar, eliminar e prevenir",
-    metaTitle: "Ácaros em Casa: Como Eliminar de Vez | Guia Completo 2025",
-    metaDescription: "Tudo sobre ácaros do pó em casa: onde vivem, que danos causam, como testá-los e como eliminar de vez. Guia para famílias com alergias e crianças.",
-    publishDate: "2026-05-19",
-    updatedDate: "2026-05-19",
-    author: DEFAULT_AUTHOR.name,
-    readingTime: 8,
-    sources: ["spaic-acaros", "cochrane-acaros-asma"],
-    category: "Saúde",
-    heroAlt: "Colchão e sofá, focos principais de ácaros do pó em casa",
-    intro: "Os ácaros do pó são responsáveis por cerca de 50% das alergias respiratórias em Portugal. São invisíveis a olho nu mas vivem em milhões nos sofás, colchões e tapetes da maioria das casas. Este guia explica o que são, onde se encontram em maior concentração, que sintomas causam e, mais importante, como os eliminar de forma eficaz e duradoura.",
-    sections: [
-      {
-        heading: "O que são ácaros do pó e onde vivem?",
-        body: "Os ácaros do pó (Dermatophagoides pteronyssinus e D. farinae) são artrópodes microscópicos de 0,2 a 0,3 mm que se alimentam de células mortas de pele humana e animal. Não mordem, não transmitem doenças diretamente, mas os seus excrementos e fragmentos corporais são potentes alérgenos respiratórios.\n\n**Onde se concentram em maior número:**\n- **Colchões**: entre 100.000 a 2 milhões de ácaros por colchão de casal adulto não higienizado\n- **Sofás e estofados**: segundo maior foco, especialmente encostos e assentos\n- **Tapetes e alcatifas**: proporcionam temperatura e humidade ideais para reprodução\n- **Almofadas e edredons**: renovam-se com facilidade mas acumulam rapidamente\n\n**Condições que favorecem proliferação:**\n- Temperatura entre 20-30°C (a de uma casa portuguesa média)\n- Humidade relativa acima de 50-60%\n- Abundância de células mortas de pele (inevitável em ambientes habitados)",
-        tip: "Um colchão de 10 anos pode pesar 2 kg a mais do que quando novo: grande parte desse peso são ácaros, seus excrementos e células mortas de pele.",
-      },
-      {
-        heading: "Sintomas de alergia a ácaros: como reconhecer",
-        body: "A alergia a ácaros é frequentemente confundida com constipações frequentes ou rinite sazonal. A diferença chave é que os sintomas de alergia a ácaros são **perenes** (presentes todo o ano) e agravam-se dentro de casa, especialmente durante a noite e ao acordar.\n\n**Sintomas mais comuns:**\n- Espirros em série, especialmente de manhã\n- Nariz entupido ou com corrimento aquoso persistente\n- Comichão nos olhos, nariz e palato\n- Tosse seca ou pieira, especialmente deitado\n- Olhos vermelhos e lacrimejantes\n- Em casos graves: crises de asma\n\n**Sinal forte de alergia a ácaros**: os sintomas melhoram nas férias (especialmente em altitude ou junto ao mar) e agravam ao regressar a casa.",
-      },
-      {
-        heading: "Métodos de controlo: o que funciona e o que não chega",
-        body: "**Medidas de primeira linha (reduzem exposição mas não eliminam)**\n- Capas anti-ácaros de membrana impermeável para colchão e almofadas\n- Lavar roupa de cama acima de 55 ºC, a temperatura que a SPAIC indica para remoção eficaz dos ácaros\n- Aspiração frequente com filtro HEPA\n- Reduzir humidade interior com desumidificador\n- Remover tapetes em quartos de pessoas alérgicas\n\n**O que não funciona:**\n- Sprays acaricidas de supermercado: eficácia temporária e presença de produtos químicos no ambiente\n- Aspiradores comuns sem filtro HEPA: devolvem os ácaros ao ar durante a aspiração\n- Congelamento de almofadas: mata ácaros mas não remove os alérgenos (excrementos) já presentes\n\n**Eliminação eficaz e duradoura:**\nA extração profissional com água quente a alta temperatura é o único método validado para remover resíduos acumulados nas fibras das camadas internas de colchões e estofados. A aspiração mecânica remove fisicamente os corpos e os excrementos, que são os principais alérgenos, e é essa remoção que conta: o que provoca a reação continua na fibra mesmo depois de o ácaro morrer.",
-      },
-      {
-        heading: "Frequência recomendada de higienização profissional",
-        body: "A frequência ideal depende da sensibilidade dos habitantes e das condições da casa:\n\n**Caso geral (sem alergias diagnosticadas)**: higienização de colchão e sofá uma vez por ano, manutenção preventiva que prolonga a vida útil do estofado e mantém a carga de ácaros abaixo do limiar de sensibilização.\n\n**Com alergias diagnosticadas ou crianças pequenas**: cada 6 meses para colchões, cada 6-12 meses para sofás. Pode ser necessário mais frequente em fase aguda.\n\n**Após entrada de animal de estimação em casa**: higienização imediata e depois cada 6 meses, combinada com impermeabilização para dificultar penetração de pelos e dander.\n\nA Kyro Clean utiliza extração a vapor com temperatura acima de 60°C, limiar térmico de mortalidade dos ácaros, combinada com produtos hipoalergénicos certificados que não deixam resíduos.",
-        tip: "Após a higienização profissional, aplique imediatamente capa anti-ácaros certificada no colchão: protege o investimento da limpeza e mantém os novos ácaros à superfície onde são facilmente removidos pela lavagem.",
-      },
+    "slug": "guia-acaros-em-casa",
+    "title": "Ácaros em casa: cuidados com pó e têxteis",
+    "metaTitle": "Ácaros em casa: cuidados com pó e têxteis | Kyro Clean",
+    "metaDescription": "Organize os cuidados com a cama, o sofá e os têxteis, distinguindo o que pode manter em casa da avaliação de um tratamento adicional.",
+    "publishDate": "2026-05-19",
+    "updatedDate": "2026-09-21",
+    "author": DEFAULT_AUTHOR.name,
+    "readingTime": 2,
+    "sources": [
+      "spaic-acaros"
     ],
-    faq: [
+    "category": "Saúde",
+    "heroAlt": "Imagem ilustrativa sobre ácaros em casa: cuidados com pó e têxteis",
+    "intro": "Organize os cuidados com a cama, o sofá e os têxteis, distinguindo o que pode manter em casa da avaliação de um tratamento adicional.",
+    "sections": [
       {
-        q: "Como saber se tenho muitos ácaros em casa?",
-        a: "A forma mais simples é pelos sintomas: se acordas com espirros e nariz entupido mas melhoram ao longo do dia e pioram dentro de casa, é um sinal forte. Existem também testes de alergia (feitos por alergologista) e kits de teste ambiental de ácaros disponíveis em farmácias.",
+        "heading": "Comece pela manutenção regular",
+        "body": "A SPAIC recomenda uma abordagem combinada ao controlo do pó e dos têxteis. Uma única limpeza não equivale a eliminar permanentemente ácaros da casa."
       },
       {
-        q: "Os ácaros desaparecem no verão?",
-        a: "Não. Na maioria de Portugal, as condições de temperatura e humidade são ideais para ácaros durante todo o ano. O verão pode trazer alguma redução junto à costa, mas a população recupera rapidamente no outono.",
+        "heading": "Roupa de cama e peças laváveis",
+        "body": "Siga a etiqueta de cada peça. Não aplique no colchão os mesmos procedimentos que usa nos lençóis. A capa removível e o núcleo podem ter instruções diferentes."
       },
       {
-        q: "Lavar o colchão profissionalmente substitui a capa anti-ácaros?",
-        a: "São complementares, não alternativos. A higienização elimina os ácaros e alérgenos existentes. A capa anti-ácaros previne a recolonização e facilita a gestão a longo prazo. Use os dois em conjunto para melhor resultado.",
+        "heading": "O que pedir à equipa",
+        "body": "A limpeza remove sujidade e resíduos. Anti-ácaros e desbacterização são tratamentos opcionais, escolhidos e orçamentados separadamente. Não prometemos eliminação total de microrganismos nem benefícios clínicos.\n\nIdentifique a peça e o objetivo do pedido. Se existem sintomas de alergia, a orientação clínica deve vir do profissional de saúde."
       },
       {
-        q: "A limpeza profissional de ácaros é segura para crianças e bebés?",
-        a: "Sim. Os produtos que utilizamos são hipoalergénicos, certificados e sem fragrâncias agressivas. O sofá ou colchão fica pronto a usar após 3 a 6 horas de secagem, sem resíduos no tecido.",
-      },
+        "heading": "Defina uma rotina possível",
+        "body": "Acompanhe a acumulação de pó, pelos e resíduos e intervenha perante derrames. A frequência da limpeza profissional depende do uso e estado, não de uma contagem presumida de ácaros."
+      }
     ],
-    relatedService: { label: "Higienização anti-ácaros de colchões e sofás", href: "/limpeza-colchoes" },
-    relatedPosts: [
+    "faq": [
+      {
+        "q": "Consigo identificar ácaros por manchas?",
+        "a": "Não. Manchas não permitem confirmar ou contar ácaros."
+      },
+      {
+        "q": "A limpeza substitui cuidados regulares?",
+        "a": "Não. Os cuidados com o pó, a roupa de cama e os estofos continuam a ser necessários."
+      },
+      {
+        "q": "O tratamento tem benefício clínico garantido?",
+        "a": "Não prometemos melhoria de sintomas ou tratamento de doenças."
+      },
+      {
+        "q": "Posso pedir só uma avaliação do extra?",
+        "a": "Sim. Indique o artigo e o objetivo para confirmar compatibilidade e preço."
+      }
+    ],
+    "relatedService": {
+      "label": "Ver limpeza de colchões e orçamento",
+      "href": "/limpeza-colchoes"
+    },
+    "relatedPosts": [
       "acaros-sofas-colchoes-riscos-saude",
-      "doencas-causadas-estofos-sujos",
-    ],
+      "doencas-causadas-estofos-sujos"
+    ]
   },
   {
-    slug: "limpeza-sofa-animais-domesticos",
-    title: "Sofá com animais domésticos: como limpar e eliminar pelos, odores e ácaros",
-    metaTitle: "Limpeza de Sofá com Animais Domésticos | Guia Completo | Kyro Clean",
-    metaDescription: "Guia completo para limpar sofás com cães e gatos: como remover pelos, odores de urina e ácaros de animais. Dicas profissionais e soluções duradouras.",
-    publishDate: "2026-05-19",
-    updatedDate: "2026-05-19",
-    author: DEFAULT_AUTHOR.name,
-    readingTime: 7,
-    category: "Guias",
-    heroAlt: "Sofá com pelos de animais antes da limpeza profissional",
-    intro: "Cães e gatos são parte da família, mas os seus sofás pagam um preço alto por isso. Pelos incrustados nas fibras, odores de urina difíceis de eliminar e ácaros associados a animais são os problemas mais comuns que tratamos. Este guia diz-te o que funciona e o que não funciona.",
-    sections: [
+    "slug": "limpeza-sofa-animais-domesticos",
+    "title": "Sofá com animais: pelos, manchas e odores",
+    "metaTitle": "Sofá com animais: pelos, manchas e odores | Kyro Clean",
+    "metaDescription": "Pelos no tecido e urina no enchimento são problemas diferentes. Veja como preparar a limpeza do sofá numa casa com animais.",
+    "publishDate": "2026-05-19",
+    "updatedDate": "2026-09-21",
+    "author": DEFAULT_AUTHOR.name,
+    "readingTime": 2,
+    "category": "Guias",
+    "heroAlt": "Imagem ilustrativa sobre sofá com animais: pelos, manchas e odores",
+    "intro": "Pelos no tecido e urina no enchimento são problemas diferentes. Veja como preparar a limpeza do sofá numa casa com animais.",
+    "sections": [
       {
-        heading: "O problema real: não é só pelo",
-        body: "Os pelos são o que se vê, mas não são o maior problema. Por baixo deles acumulam-se:\n\n**Ácaros dermatophagoides**: os ácaros mais comuns em casa alimentam-se de pele morta (de humanos e animais). Um sofá com animal de estimação pode ter densidades de ácaros 3× a 5× superiores ao normal.\n\n**Dander** (caspa animal): micropartículas de pele seca e saliva que se depositam no tecido e são um dos principais desencadeadores de alergias e asma. Não é visível a olho nu.\n\n**Odores de urina**: quando um animal urina no sofá, a urina penetra pelas fibras até à espuma. Limpar a superfície remove o odor temporariamente, mas o ácido úrico cristaliza na espuma e regressa com a humidade.\n\n**Sebáceos e gordura**: o óleo natural do pelo dos animais deixa manchas amareladas no encosto e nos apoios de braço.",
-        tip: "Se o seu sofá tem cheiro a animal mesmo depois de limpar, o problema está na espuma, não no tecido. Só extração profissional com equipamento de injeção e sucção resolve definitivamente.",
+        "heading": "Pelos e resíduos soltos",
+        "body": "Use um acessório adequado ao revestimento e evite puxar fios com escovas agressivas. Uma manta lavável compatível com o uso do sofá facilita a manutenção, mas não dispensa cuidar das zonas descobertas."
       },
       {
-        heading: "Como limpar em casa (manutenção semanal)",
-        body: "Para manutenção entre limpezas profissionais:\n\n**Pelos:** use uma luva de borracha húmida ou rolo de pelo. Aspire com acessório de estofos pelo menos 2× por semana. Escove o animal antes de o deixar subir ao sofá.\n\n**Odores quotidianos:** bicarbonato de sódio aplicado sobre o tecido durante 15-20 minutos e depois aspirado absorve os odores do dia-a-dia sem danificar as fibras.\n\n**Manchas de urina frescas:** absorva com toalhetes sem esfregar. Aplique uma mistura de água e vinagre branco (50/50) sobre o local. Nunca use água a ferver: cristaliza as proteínas e fixa a mancha.\n\n**O que não fazer:** limpadores com amoníaco intensificam o odor de urina; lixívia danifica as fibras e pode deixar manchas permanentes.",
+        "heading": "Acidentes com urina",
+        "body": "Absorva o excesso sem esfregar nem empurrar o líquido para a espuma. Informe a equipa sobre a zona, quando ocorreu e os produtos utilizados. Não prometa a si próprio remover o cheiro apenas com perfume."
       },
       {
-        heading: "Quando a limpeza profissional é obrigatória",
-        body: "Existem situações em que a limpeza caseira não é suficiente:\n\n**Urina antiga ou repetida**: se o animal urina no mesmo local mais do que uma vez, o ácido úrico cristaliza em profundidade. A extração profissional com produto enzimático específico é a única solução que elimina definitivamente o odor.\n\n**Dander e ácaros**: os alérgenos de animais só são removidos por extração, que remove o dander e os resíduos alojados nas fibras mais profundas.\n\n**Sebáceos**: as manchas amarelas no encosto requerem pré-tratamento com solvente específico antes da extração.\n\nA Kyro Clean trata anualmente centenas de sofás com animais de estimação. O protocolo inclui pré-tratamento enzimático, extração a quente e avaliação de tratamentos complementares opcionais. Resultado: sofá sem odor, sem dander e com resíduos removidos das fibras.",
+        "heading": "O que pode melhorar",
+        "body": "A limpeza procura remover sujidade e tratar as zonas acessíveis. O resultado sobre odores depende da profundidade atingida. Unhas, fios puxados e revestimento gasto não são corrigidos pela limpeza."
       },
       {
-        heading: "Impermeabilização: a solução preventiva",
-        body: "Após a limpeza profissional, recomendamos sempre impermeabilização para donos de animais. O tratamento cria uma barreira invisível nas fibras que:\n\n- Impede que a urina penetre até à espuma (dá tempo para limpar)\n- Facilita a remoção de pelos (não aderem tanto às fibras tratadas)\n- Reduz a absorção de odores e gordura animal\n\nExistem duas versões: a Essencial, com efeito de 1 a 2 anos, e a Premium, mais resistente ao desgaste das unhas e ao uso diário dos animais, com efeito até 10 anos. Para casas com animais de estimação, a Premium é normalmente a escolha que mais compensa a longo prazo. O custo do tratamento é significativamente inferior ao de substituir o sofá antecipadamente.",
-      },
+        "heading": "Planear a visita",
+        "body": "Mantenha os animais afastados da zona de intervenção. Secagem média de 3 a 6 horas, dependendo da ventilação, do tecido e das condições do espaço. Utilize a peça apenas depois de estar completamente seca. Confirme também as instruções dos tratamentos opcionais, se os escolher."
+      }
     ],
-    faq: [
+    "faq": [
       {
-        q: "Conseguem eliminar completamente o cheiro a urina de gato do sofá?",
-        a: "Sim, na grande maioria dos casos. Usamos produto enzimático específico para urina de felinos que quebra as moléculas de ácido úrico em profundidade. Em casos de urina muito antiga ou repetida no mesmo local, o resultado é de 85-95% de eliminação. Após o tratamento, recomendamos impermeabilização para prevenir recorrência.",
+        "q": "O pelo sai todo?",
+        "a": "A remoção depende da fibra, do tipo de pelo e de como está preso ao revestimento."
       },
       {
-        q: "A limpeza remove os alérgenos de cão e gato?",
-        a: "Sim. A a extração remove o dander (caspa animal) e os resíduos alojados na fibra. Clientes com alergias reportam melhoria significativa dos sintomas nas semanas seguintes à limpeza profissional.",
+        "q": "O cheiro de urina tem solução garantida?",
+        "a": "Não. Resíduos no interior da espuma podem manter o odor; avaliamos os limites antes do serviço."
       },
       {
-        q: "Quantas vezes por ano devo limpar o sofá com animais em casa?",
-        a: "Para famílias com animais domésticos, recomendamos limpeza profissional a cada 6 a 12 meses, dependendo do número de animais e se dormem no sofá habitualmente. Com impermeabilização incluída, o intervalo pode ser de 12 meses.",
+        "q": "A limpeza repara arranhões?",
+        "a": "Não. Arranhões e fios danificados exigem avaliação de reparação, fora do serviço de limpeza."
       },
       {
-        q: "O processo de limpeza é seguro para os animais?",
-        a: "Sim. Os produtos que utilizamos são hipoalergénicos, biodegradáveis e sem compostos tóxicos para animais. Recomendamos que o animal fique afastado do sofá durante as 3 a 6 horas de secagem, por conforto e para não afetar o resultado.",
-      },
+        "q": "A impermeabilização torna o sofá à prova de animais?",
+        "a": "Não. Pode ajudar perante líquidos em materiais compatíveis, mas não evita arranhões nem dispensa absorver derrames."
+      }
     ],
-    relatedService: { label: "Limpeza profissional de sofás: remove pelos, odores e ácaros", href: "/limpeza-sofas" },
-    relatedPosts: [
+    "relatedService": {
+      "label": "Limpeza profissional de sofás: remove pelos, odores e ácaros",
+      "href": "/limpeza-sofas"
+    },
+    "relatedPosts": [
       "acaros-sofas-colchoes-riscos-saude",
       "como-tirar-cheiro-sofa",
-      "guia-acaros-em-casa",
+      "guia-acaros-em-casa"
     ],
+    "sources": []
   },
   {
-    slug: "como-manter-sofa-limpo-entre-limpezas",
-    title: "Como manter o sofá limpo entre limpezas profissionais",
-    metaTitle: "Como Manter o Sofá Limpo | Dicas de Manutenção | Kyro Clean",
-    metaDescription: "Aprenda a manter o sofá limpo entre limpezas profissionais: rotina semanal, como tratar manchas imediatamente e o que nunca deve fazer ao limpar o sofá.",
-    publishDate: "2026-05-19",
-    updatedDate: "2026-05-19",
-    author: DEFAULT_AUTHOR.name,
-    readingTime: 5,
-    category: "Manutenção",
-    heroAlt: "Sofá limpo e bem cuidado em sala moderna",
-    intro: "Uma limpeza profissional anual é o padrão para prolongar a vida do sofá. Mas o que acontece nos outros 11 meses? Com uma rotina simples de manutenção, o sofá mantém-se com bom aspeto e a limpeza profissional seguinte é mais eficaz e mais económica.",
-    sections: [
+    "slug": "como-manter-sofa-limpo-entre-limpezas",
+    "title": "Como manter o sofá limpo entre visitas profissionais",
+    "metaTitle": "Como manter o sofá limpo entre visitas profissionais | Kyro Clean",
+    "metaDescription": "Uma rotina simples evita acumular resíduos e ajuda a conservar o revestimento. Adapte os cuidados ao tecido e às instruções do fabricante.",
+    "publishDate": "2026-05-19",
+    "updatedDate": "2026-09-21",
+    "author": DEFAULT_AUTHOR.name,
+    "readingTime": 2,
+    "category": "Manutenção",
+    "heroAlt": "Imagem ilustrativa sobre como manter o sofá limpo entre visitas profissionais",
+    "intro": "Uma rotina simples evita acumular resíduos e ajuda a conservar o revestimento. Adapte os cuidados ao tecido e às instruções do fabricante.",
+    "sections": [
       {
-        heading: "Rotina semanal: 10 minutos que fazem diferença",
-        body: "O maior inimigo do sofá não são as manchas: é a acumulação progressiva de pó, pele morta e sujidade que se incrusta nas fibras ao longo do tempo.\n\n**Aspiração:** aspire o sofá semanalmente com acessório de estofos. Inclui as costuras, os vincos e a zona por baixo das almofadas (onde se acumula 40% da sujidade). Para veludo e alcântara, use bocal suave e aspire no sentido do pelo.\n\n**Almofadas:** vire e bata as almofadas semanalmente para distribuir o enchimento e evitar que deformem permanentemente.\n\n**Encosto e apoios de braço:** são as zonas com mais contacto corporal, passe um pano húmido (bem espremido) nestas superfícies para remover gordura e suor antes que se incruste.",
-        tip: "Nunca use pano molhado em veludo ou boucle. Use apenas aspiração suave para estes materiais.",
+        "heading": "Aspire sem agredir a fibra",
+        "body": "Utilize o acessório apropriado e uma intensidade compatível com a peça. Dê atenção às costuras e frestas acessíveis. Não force almofadas fixas nem escove com pressão excessiva."
       },
       {
-        heading: "Como agir imediatamente numa mancha",
-        body: "Os primeiros 5 minutos depois de uma mancha são decisivos. A maioria das manchas permanentes poderia ter sido evitada com a ação certa nesse período:\n\n**1. Absorva, não esfregue**: use um pano branco limpo ou papel absorvente pressionando de fora para dentro. Esfregar espalha a mancha e incrusta-a nas fibras.\n\n**2. Água fria em primeiro lugar**: para a maioria das manchas (exceto gordura e tinta), água fria aplicada com pano é o primeiro passo. Nunca água quente: coagula as proteínas e fixa manchas de sangue, urina e alimentos.\n\n**3. Teste sempre num local escondido**: qualquer produto de limpeza deve ser testado numa zona discreta do tecido durante 5 minutos antes de aplicar na mancha. Alguns tecidos descoram com certos produtos.\n\n**4. Seque o mais rápido possível**: depois de tratar, passe um pano seco e abra janelas. Humidade prolongada favorece o crescimento de fungos nas fibras.",
+        "heading": "Atue perante um derrame",
+        "body": "Absorva com pano branco limpo e evite esfregar. Leia a etiqueta antes de aplicar qualquer produto. O facto de uma capa sair não significa que possa ir à máquina."
       },
       {
-        heading: "Produtos que funcionam e o que evitar",
-        body: "**Funcionam bem:**\n- Água fria (para manchas frescas de maioria dos alimentos)\n- Bicarbonato de sódio (absorve odores, aplicar e aspirar após 20 min)\n- Produto específico para estofos comprado em loja (testar antes)\n- Misture água + vinagre branco (50/50) para odores quotidianos\n\n**Nunca use:**\n- Lixívia ou água com lixívia: descolora permanentemente\n- Água quente: fixa manchas orgânicas\n- Esponja abrasiva: danifica as fibras superficiais\n- Amaciador de roupa: deixa resíduo pegajoso que atrai mais sujidade\n- Álcool em excesso sobre veludo ou alcântara: deforma as fibras\n\n**Atenção especial:** produtos com amoníaco (muitos limpa-vidros, por exemplo) intensificam o odor de urina. Se tem animais em casa, verifique sempre os ingredientes.",
+        "heading": "Evite humidade retida",
+        "body": "Não cubra estofos húmidos. Mantenha ventilação adequada e procure a origem se houver cheiro a humidade recorrente. Não tente acelerar a secagem com calor intenso diretamente sobre o revestimento."
       },
       {
-        heading: "Quando vale a pena chamar um profissional entre limpezas?",
-        body: "Existem situações em que esperar pela limpeza anual pode ser um erro:\n\n- **Urina de animal**: quanto mais tempo passa, mais difícil é eliminar o odor\n- **Mancha de vinho ou café**: se não saiu completamente em casa, o profissional ainda consegue remover se for tratado nas primeiras semanas\n- **Odor persistente**: bolor, tabaco ou cheiro a húmido indicam crescimento de fungos que requerem tratamento específico\n- **Antes de uma ocasião especial**: casamento, nascimento, visita importante\n\nUma limpeza intercalar não é sinal de que o sofá está em mau estado: é manutenção preventiva que prolonga a sua vida.",
-      },
+        "heading": "Saiba quando pedir ajuda",
+        "body": "Peça avaliação quando as manchas, os resíduos ou o odor persistirem apesar da manutenção compatível. A possibilidade de remoção depende da substância, do tempo decorrido, dos produtos já aplicados e do revestimento. Uma alteração de cor ou dano na fibra pode permanecer depois de a sujidade sair."
+      }
     ],
-    faq: [
+    "faq": [
       {
-        q: "Com que frequência devo aspirar o sofá?",
-        a: "Semanalmente em condições normais. Com animais domésticos ou crianças pequenas, 2 a 3 vezes por semana. A aspiração regular previne que o pó e a pele morta se incrusteme nas fibras, tornando a limpeza profissional anual mais eficaz.",
+        "q": "Devo usar detergente da roupa no sofá?",
+        "a": "Só utilize produtos e métodos compatíveis com as instruções do fabricante. Não improvise detergentes no estofo."
       },
       {
-        q: "Posso usar toalhitas húmidas para limpar o sofá no dia a dia?",
-        a: "Depende do tecido. Em microfibra e tecidos sintéticos resistentes, sim, mas escolha toalhitas sem álcool e sem fragrâncias fortes. Em veludo, alcântara, linho e couro genuíno, não. Estes materiais requerem produtos específicos.",
+        "q": "Uma capa removível pode ir à máquina?",
+        "a": "Apenas se a etiqueta o permitir e seguindo as condições indicadas."
       },
       {
-        q: "O que fazer se o sofá ficar com cheiro a húmido depois de limpar?",
-        a: "O cheiro a húmido indica que o tecido ficou demasiado molhado e pode haver crescimento de fungos. Abra janelas para maximizar a ventilação e use ventoinha apontada ao sofá. Se o cheiro persistir após 24 horas, contacte um profissional: pode ser necessário tratamento anti-fúngico.",
+        "q": "Posso sentar-me ainda com o tecido húmido?",
+        "a": "Espere até a peça estar completamente seca."
       },
       {
-        q: "Quando devo fazer a primeira limpeza profissional de um sofá novo?",
-        a: "Recomendamos entre 6 meses a 1 ano após a compra, mesmo sem manchas visíveis. O sofá novo acumula pó, pele morta e ácaros desde o primeiro dia. A impermeabilização aplicada logo após a primeira limpeza é particularmente eficaz num sofá em bom estado.",
-      },
+        "q": "Qual a frequência de limpeza profissional?",
+        "a": "Ajuste ao uso e estado. Não há um intervalo obrigatório para todos os sofás."
+      }
     ],
-    relatedService: { label: "Limpeza profissional de sofás ao domicílio", href: "/limpeza-sofas" },
-    relatedPosts: [
+    "relatedService": {
+      "label": "Limpeza profissional de sofás ao domicílio",
+      "href": "/limpeza-sofas"
+    },
+    "relatedPosts": [
       "quanto-custa-limpar-sofa-profissional",
       "impermeabilizacao-sofa-vale-pena",
-      "limpeza-sofa-animais-domesticos",
+      "limpeza-sofa-animais-domesticos"
     ],
+    "sources": []
   },
-  // ── Cluster 1: Sofá ──────────────────────────────────────────────────────
   {
-    slug: "higienizacao-vs-impermeabilizacao-sofa",
-    title: "Higienização ou impermeabilização de sofá: qual escolher?",
-    metaTitle: "Higienização vs Impermeabilização de Sofá | Kyro Clean",
-    metaDescription: "Percebe a diferença entre higienização e impermeabilização de sofás, quando fazer cada uma e porquê o pack combinado é a opção mais inteligente.",
-    publishDate: "2025-10-05",
-    updatedDate: "2025-10-05",
-    author: DEFAULT_AUTHOR.name,
-    readingTime: 5,
-    category: "Guias",
-    heroAlt: "Sofá de tecido limpo e impermeabilizado em sala de estar moderna",
-    intro: "Esta é a pergunta que mais recebemos depois de «quanto custa». Higienização ou impermeabilização? A resposta depende do estado do seu sofá e do que quer proteger. Neste artigo explicamos as diferenças de forma clara.",
-    sections: [
+    "slug": "higienizacao-vs-impermeabilizacao-sofa",
+    "title": "Limpeza ou impermeabilização: o que o sofá precisa?",
+    "metaTitle": "Limpeza ou impermeabilização: o que o sofá precisa? | Kyro Clean",
+    "metaDescription": "A limpeza remove sujidade; a impermeabilização acrescenta proteção em tecidos compatíveis. Saiba como escolher e combinar os serviços.",
+    "publishDate": "2025-10-05",
+    "updatedDate": "2026-09-21",
+    "author": DEFAULT_AUTHOR.name,
+    "readingTime": 2,
+    "category": "Guias",
+    "heroAlt": "Imagem ilustrativa sobre limpeza ou impermeabilização: o que o sofá precisa",
+    "intro": "A limpeza remove sujidade; a impermeabilização acrescenta proteção em tecidos compatíveis. Saiba como escolher e combinar os serviços.",
+    "sections": [
       {
-        heading: "O que é a higienização profissional?",
-        body: "A higienização por extração a vapor é um processo de limpeza profunda que remove a sujidade acumulada nas fibras do sofá: manchas, odores, ácaros, bactérias e alérgenos. Utiliza água quente a alta pressão injetada nas fibras e aspirada de imediato, arrastando tudo o que está acumulado.\n\nO resultado é um sofá com aparência renovada, sem odores e com menos resíduos nas fibras. O tempo de secagem é de 3 a 6 horas.",
-        tip: "A higienização é recomendada mesmo que o sofá pareça limpo visualmente. Ácaros e bactérias não são visíveis a olho nu.",
+        "heading": "Quando pedir limpeza",
+        "body": "Manchas, gordura de uso, pó e resíduos são motivos para avaliar uma limpeza. Lavagem e higienização não significam automaticamente um serviço com desinfeção incluída. A limpeza remove sujidade e resíduos. Anti-ácaros e desbacterização são tratamentos opcionais, escolhidos e orçamentados separadamente. Não prometemos eliminação total de microrganismos nem benefícios clínicos."
       },
       {
-        heading: "O que é a impermeabilização?",
-        body: "A impermeabilização é um tratamento preventivo aplicado após a limpeza (ou num sofá já limpo). O produto cria uma barreira microscópica entre as fibras que repele líquidos e gorduras, impedindo que as manchas penetrem no tecido.\n\nQuando derrama algo num sofá impermeabilizado, o líquido fica em cima do tecido em forma de pequenas esferas e basta absorvê-lo com um pano. Existem duas versões: a Essencial, à base de água, com efeito de 1 a 2 anos, e a Premium, à base de diluente e mais resistente ao desgaste, com efeito até 10 anos.",
-        tip: "A impermeabilização não limpa o sofá. Deve ser aplicada sempre após higienização, ou num sofá que esteja genuinamente limpo.",
+        "heading": "Quando avaliar proteção",
+        "body": "Num tecido compatível e nas condições de limpeza e secagem adequadas, a impermeabilização ajuda a reduzir a absorção de líquidos. Não remove manchas existentes nem repara desgaste."
       },
       {
-        heading: "Quando escolher só higienização",
-        body: "Opta pela higienização sozinha quando:\n\n- O sofá tem manchas, mau cheiro ou muita sujidade visível\n- É a primeira vez que faz uma limpeza profissional\n- O sofá já tem impermeabilização e ainda está a funcionar bem\n- Tem um orçamento mais limitado e o sofá fica numa divisão com pouco tráfego\n\nA higienização resolve o problema imediato. É o tratamento de base.",
+        "heading": "Combinar os dois serviços",
+        "body": "A equipa confirma o que é preciso limpar, o estado do tecido e as condições para aplicar o produto de proteção. O orçamento identifica as opções Essencial e Premium e a deslocação, antes da escolha."
       },
       {
-        heading: "Quando escolher só impermeabilização",
-        body: "A impermeabilização isolada faz sentido quando:\n\n- O sofá é novo e ainda não foi usado\n- Acabou de fazer uma limpeza profissional e quer prolongar o efeito\n- O sofá está genuinamente limpo mas fica numa zona de risco elevado (sala de jantar, quarto de crianças)\n\nNão impermeabilize um sofá sujo. O produto sela as sujidades nas fibras.",
-      },
-      {
-        heading: "Pack limpeza mais impermeabilização: a melhor opção para a maioria",
-        body: "Na prática, a grande maioria dos nossos clientes escolhe o pack combinado. E há razões concretas para isso:\n\n1. **Custo por unidade menor**: o pack tem um desconto face à contratação separada dos dois serviços.\n2. **Sequência lógica**: fazer impermeabilização logo a seguir à higienização garante que o produto é aplicado nas fibras mais limpas possível, o que maximiza a durabilidade do efeito.\n3. **Uma deslocação só**: com os dois serviços juntos, paga uma única deslocação.\n\nPara famílias com crianças ou animais de estimação, o pack é quase obrigatório: a higienização remove o que já lá está, a impermeabilização protege do que está para vir.",
-        tip: "Um sofá tratado com o pack pode passar dois a três anos sem precisar de limpeza profissional, contra um ano sem impermeabilização.",
-      },
+        "heading": "Tempos de utilização diferentes",
+        "body": "Secagem média de 3 a 6 horas, dependendo da ventilação, do tecido e das condições do espaço. Utilize a peça apenas depois de estar completamente seca.\n\nA proteção tem um período de cura próprio, que pode exigir 24 horas. Siga as indicações relativas ao produto aplicado."
+      }
     ],
-    faq: [
+    "faq": [
       {
-        q: "A impermeabilização é segura para crianças e animais?",
-        a: "Sim. Os produtos que utilizamos são certificados e seguros após secagem completa, em média 3 a 6 horas, dependendo da ventilação. Não há cheiros residuais nem risco de contacto.",
+        "q": "Higienização inclui proteção?",
+        "a": "Não. São serviços com objetivos distintos."
       },
       {
-        q: "A impermeabilização muda a cor ou textura do sofá?",
-        a: "Não. O produto é incolor e invisível. O toque do tecido mantém-se igual após a aplicação.",
+        "q": "Impermeabilização limpa manchas?",
+        "a": "Não. As manchas são avaliadas na limpeza antes de qualquer proteção."
       },
       {
-        q: "Quanto tempo dura a impermeabilização?",
-        a: "Depende da versão. A Essencial dura 1 a 2 anos em condições normais de uso e aguenta até 2 lavagens. A Premium, mais resistente ao desgaste, dura até 10 anos e aguenta até 5 lavagens, ideal para sofás com muito tráfego.",
+        "q": "Tenho de escolher Premium?",
+        "a": "Não. A Essencial continua disponível para materiais e condições compatíveis."
       },
       {
-        q: "Posso impermeabilizar em casa com produto de loja?",
-        a: "Existem sprays domésticos, mas a cobertura é superficial e desigual. A aplicação profissional garante penetração uniforme nas fibras, o que resulta numa proteção significativamente mais eficaz e duradoura.",
-      },
+        "q": "Podem proteger um colchão?",
+        "a": "A impermeabilização Kyro destina-se a sofás e cadeiras, não a colchões ou tapetes."
+      }
     ],
-    relatedService: { label: "Ver pack higienização mais impermeabilização", href: "/impermeabilizacao" },
-    relatedPosts: [
+    "relatedService": {
+      "label": "Ver pack higienização mais impermeabilização",
+      "href": "/impermeabilizacao"
+    },
+    "relatedPosts": [
       "impermeabilizacao-sofa-vale-pena",
       "quanto-custa-limpar-sofa-profissional",
-      "como-manter-sofa-limpo-entre-limpezas",
+      "como-manter-sofa-limpo-entre-limpezas"
     ],
+    "sources": []
   },
-
   {
-    slug: "com-que-frequencia-limpar-sofa",
-    title: "Com que frequência deve limpar o sofá profissionalmente?",
-    metaTitle: "Com Que Frequência Limpar o Sofá? | Guia Kyro Clean",
-    metaDescription: "Descubra a frequência ideal de limpeza do sofá consoante o seu estilo de vida, se tem animais, crianças ou alergias. Guia prático por perfil.",
-    publishDate: "2025-10-12",
-    updatedDate: "2025-10-12",
-    author: DEFAULT_AUTHOR.name,
-    readingTime: 4,
-    sources: ["spaic-acaros"],
-    category: "Dicas",
-    heroAlt: "Sofá de tecido bege limpo numa sala com luz natural",
-    intro: "«De quanto em quanto tempo devo limpar o sofá?» A resposta honesta é: depende de quem vive lá em casa. Neste artigo damos-lhe um guia por perfil de uso para que possa tomar a decisão certa.",
-    sections: [
+    "slug": "com-que-frequencia-limpar-sofa",
+    "title": "Com que frequência deve limpar o sofá?",
+    "metaTitle": "Com que frequência deve limpar o sofá? | Kyro Clean",
+    "metaDescription": "O estado e o uso do sofá ajudam a decidir melhor do que um calendário igual para todas as casas. Veja os sinais a acompanhar.",
+    "publishDate": "2025-10-12",
+    "updatedDate": "2026-09-21",
+    "author": DEFAULT_AUTHOR.name,
+    "readingTime": 2,
+    "sources": [],
+    "category": "Dicas",
+    "heroAlt": "Imagem ilustrativa sobre com que frequência deve limpar o sofá",
+    "intro": "O estado e o uso do sofá ajudam a decidir melhor do que um calendário igual para todas as casas. Veja os sinais a acompanhar.",
+    "sections": [
       {
-        heading: "O padrão recomendado: uma vez por ano",
-        body: "Para um casal sem crianças nem animais, numa casa limpa, a recomendação base é uma limpeza profissional por ano. Neste ritmo, o sofá mantém-se sem acumulação visível de sujidade, com níveis de ácaros e bactérias dentro do aceitável, e o tecido preserva as suas propriedades.\n\nEste é o mínimo para qualquer sofá de uso regular, independentemente do aspeto visual. Um sofá que parece limpo pode ter colunas de ácaros e bactérias invisíveis a olho nu.",
-        tip: "Mesmo que o sofá pareça impecável, a limpeza anual é recomendada. A sujidade acumulada nas fibras não é sempre visível.",
+        "heading": "Olhe para o uso real",
+        "body": "Uma sala com utilização diária, animais ou refeições no sofá acumula resíduos de forma diferente de uma sala pouco usada. Observe apoios, assentos, costuras e zonas de contacto."
       },
       {
-        heading: "Com crianças pequenas: a cada 6 meses",
-        body: "Crianças são sinónimo de derramamentos, gordura das mãos, snacks partidos e ocasionalmente urina. Num ambiente assim, a frequência recomendada sobe para duas vezes por ano.\n\nO motivo não é apenas estético: crianças passam muito tempo em contacto direto com o sofá, muitas vezes com a cara ou as mãos encostadas. Numa limpeza semestral garante que estão em contacto com um ambiente higienizado.",
-        tip: "Peça sempre o add-on de impermeabilização depois de cada limpeza quando tem crianças. O custo extra paga-se em tranquilidade.",
+        "heading": "Derrames não esperam pelo calendário",
+        "body": "Absorva o excesso e consulte a etiqueta. Uma mancha recente merece avaliação se não souber como agir. Evite aplicar vários produtos durante meses antes de pedir ajuda."
       },
       {
-        heading: "Com animais de estimação: a cada 4 a 6 meses",
-        body: "Animais de estimação, especialmente cães e gatos, deixam uma combinação de pelos, gordura natural da pele, saliva e por vezes urina. O odor característico que alguns sofás com animais têm não sai com aspiração doméstica regular.\n\nCom animais em casa, recomendamos limpeza a cada 4 a 6 meses. Entre limpezas, a aspiração semanal com bocal específico para pelos é essencial para controlar a acumulação.",
+        "heading": "Manutenção e limpeza profissional",
+        "body": "A aspiração compatível e os cuidados regulares ajudam entre intervenções. Uma visita profissional é útil quando existe sujidade acumulada, manchas ou odores que a manutenção normal não resolve."
       },
       {
-        heading: "Com alergias ou asma: a cada 4 meses",
-        body: "Ácaros do pó são o principal desencadeador de alergias respiratórias em ambientes domésticos. Os números de ácaros por metro quadrado que circulam na internet variam de tal forma entre si que não os repetimos; o que é consensual é onde eles se instalam, e um sofá de uso diário reúne as três condições de que precisam: calor, humidade e células de pele.\n\nPara pessoas com asma ou rinite alérgica, recomendamos limpeza profissional a cada 3 a 4 meses. Entre limpezas, uma capa lavável e aspiração com filtro HEPA ajudam a controlar os níveis.",
-        tip: "A limpeza por extração a vapor a alta temperatura é o método mais eficaz contra ácaros, superior a produtos químicos ou aspiração doméstica.",
-      },
-      {
-        heading: "Tabela de frequências por perfil",
-        body: "**Casal sem crianças ou animais**: uma vez por ano\n**Família com crianças (3+ anos)**: cada 6 meses\n**Família com bebés ou crianças pequenas**: cada 4 a 6 meses\n**Casa com animais de estimação**: cada 4 a 6 meses\n**Pessoas com alergias ou asma**: cada 3 a 4 meses\n**Sofá em escritório ou uso intensivo**: cada 6 meses\n\nEntre limpezas profissionais, a aspiração regular (pelo menos semanal) e o tratamento imediato de manchas frescas são as melhores formas de prolongar o resultado.",
-      },
+        "heading": "Decidir sem confundir saúde e limpeza",
+        "body": "Não definimos um calendário clínico para alergias ou asma. Essas questões pertencem ao acompanhamento de saúde. Para o sofá, confirme material, estado e instruções de manutenção."
+      }
     ],
-    faq: [
+    "faq": [
       {
-        q: "O sofá pode ser limpo com demasiada frequência?",
-        a: "Não existe risco de lavar demasiadas vezes desde que se use equipamento adequado. A extração a vapor profissional é suave para os tecidos. Técnicas domésticas agressivas (esfregar com detergentes fortes, molhar excessivamente) é que danificam o tecido.",
+        "q": "É obrigatório limpar todos os anos?",
+        "a": "Não existe uma regra única. O uso, a sujidade e as instruções da peça orientam a decisão."
       },
       {
-        q: "Como sei que o sofá precisa de limpeza mesmo sem manchas visíveis?",
-        a: "O cheiro é o indicador mais fiável. Um sofá com odor a pó, suor ou animal, mesmo sem manchas, tem sujidade acumulada nas fibras que só a extração profissional remove.",
+        "q": "Com animais preciso de mais visitas?",
+        "a": "Pode haver mais pelos e resíduos, mas a necessidade deve ser avaliada pelo estado do sofá."
       },
       {
-        q: "A impermeabilização reduz a frequência das limpezas?",
-        a: "Sim. Um sofá impermeabilizado resiste melhor a manchas e líquidos, o que pode espaçar as limpezas em 3 a 6 meses adicionais.",
+        "q": "Se não houver manchas, está limpo?",
+        "a": "A ausência de manchas não mostra todos os resíduos. Verifique também pó, pelos e zonas de uso."
       },
+      {
+        "q": "Posso pedir avaliação antes de marcar?",
+        "a": "Envie fotografias, indique a localidade, as dimensões e o que pretende tratar. Respondemos em menos de 10 minutos. Confirmamos o método, o preço dos serviços e a deslocação antes de marcar."
+      }
     ],
-    relatedService: { label: "Pedir orçamento de limpeza de sofá", href: "/limpeza-sofas" },
-    relatedPosts: [
+    "relatedService": {
+      "label": "Pedir orçamento de limpeza de sofá",
+      "href": "/limpeza-sofas"
+    },
+    "relatedPosts": [
       "como-manter-sofa-limpo-entre-limpezas",
       "acaros-sofas-colchoes-riscos-saude",
-      "higienizacao-vs-impermeabilizacao-sofa",
-    ],
+      "higienizacao-vs-impermeabilizacao-sofa"
+    ]
   },
-
   {
-    slug: "sinais-sofa-precisa-limpeza-profissional",
-    title: "7 sinais de que o seu sofá precisa de limpeza profissional",
-    metaTitle: "7 Sinais Que o Seu Sofá Precisa de Limpeza Profissional | Kyro",
-    metaDescription: "Manchas que não saem, mau cheiro, alergias a aumentar? Descubra os 7 sinais claros de que é hora de chamar um profissional para limpar o sofá.",
-    publishDate: "2025-10-20",
-    updatedDate: "2025-10-20",
-    author: DEFAULT_AUTHOR.name,
-    readingTime: 4,
-    category: "Dicas",
-    heroAlt: "Sofá de tecido com manchas visíveis antes de limpeza profissional",
-    intro: "Há sinais que o sofá dá quando chegou a hora de uma limpeza profissional, e alguns são menos óbvios do que pensa. Se reconhecer pelo menos um destes, é tempo de agir.",
-    sections: [
+    "slug": "sinais-sofa-precisa-limpeza-profissional",
+    "title": "7 sinais para avaliar a limpeza do seu sofá",
+    "metaTitle": "7 sinais para avaliar a limpeza do seu sofá | Kyro Clean",
+    "metaDescription": "Manchas, resíduos e odores podem justificar uma avaliação. Distinga os sinais de sujidade das marcas que a limpeza não consegue reparar.",
+    "publishDate": "2025-10-20",
+    "updatedDate": "2026-09-21",
+    "author": DEFAULT_AUTHOR.name,
+    "readingTime": 2,
+    "category": "Dicas",
+    "heroAlt": "Imagem ilustrativa sobre 7 sinais para avaliar a limpeza do seu sofá",
+    "intro": "Manchas, resíduos e odores podem justificar uma avaliação. Distinga os sinais de sujidade das marcas que a limpeza não consegue reparar.",
+    "sections": [
       {
-        heading: "1. Manchas que não saem com produtos domésticos",
-        body: "Tentou remover a mancha com os produtos que tinha em casa e ela ficou. Ou ficou mais clara mas não desapareceu. Manchas antigas, especialmente de proteína (café, vinho, urina), fixam-se nas fibras de forma que os produtos domésticos não conseguem quebrar. Um tratamento enzimático profissional atua à escala molecular.",
+        "heading": "Sinais visíveis",
+        "body": "**1. Manchas de derrames:** indique a origem e os produtos utilizados.\n**2. Zonas gordurosas nos apoios:** podem acumular resíduos do uso.\n**3. Pelos presos:** verifique a resposta à aspiração compatível.\n**4. Resíduos nas costuras:** não force o tecido para os retirar."
       },
       {
-        heading: "2. Cheiro persistente mesmo depois de arejar",
-        body: "Um sofá que cheira a animal, comida ou suor mesmo depois de arejado está a libertar compostos orgânicos que estão impregnados nas fibras, não apenas na superfície. A aspiração e o arejamento não chegam. A extração a vapor, seguida de secagem rápida, é o único método eficaz para eliminar estes odores.",
-        tip: "Odores de urina são os mais difíceis. Não são apenas cheiro, são cristais de ácido úrico nas fibras que só enzimas específicas destroem.",
+        "heading": "Odores e humidade",
+        "body": "**5. Odor persistente:** procure a origem e indique quando aparece.\n**6. Derrame que atingiu a espuma:** a profundidade pode limitar o resultado.\n**7. Sinais de humidade ou bolor:** exigem avaliação da origem antes de confirmar uma limpeza."
       },
       {
-        heading: "3. Crises de alergia ou rinite a piorar em casa",
-        body: "Se notar que espirra mais ou tem olhos a comichão especialmente quando está no sofá, pode ser uma resposta a ácaros acumulados. Um sofá de uso diário junta calor, humidade e células de pele, que é exatamente onde os ácaros se instalam. A limpeza por extração a quente ajuda a remover pó e resíduos associados a alérgenos.",
+        "heading": "O que não é sujidade",
+        "body": "Cor desbotada, tecido roto, couro descascado e espuma deformada não se resolvem com mais detergente. Fotografias de conjunto e detalhe ajudam a explicar essas diferenças antes da visita."
       },
       {
-        heading: "4. O tecido está visivelmente desgastado ou com brilho diferente",
-        body: "A gordura das mãos e do corpo acumula-se nos locais de contacto mais frequente (apoios de braço, encosto central). Com o tempo, o tecido nestas zonas muda de tonalidade e parece mais brilhante ou escuro. Esta sujidade está nas fibras e não sai com limpeza de superfície.",
-      },
-      {
-        heading: "5. Nunca fizeste uma limpeza profissional",
-        body: "Se o sofá tem mais de dois anos e nunca passou por uma extração profissional, está na hora, independentemente do aspeto. Mesmo um sofá que parece limpo tem sujidade acumulada, ácaros e bactérias. A regra base é limpeza anual para qualquer sofá em uso regular.",
-      },
-      {
-        heading: "6. O sofá foi exposto a humidade excessiva",
-        body: "Uma janela que ficou aberta com chuva, uma fuga de água ou um derramamento de grandes dimensões que não secou bem pode levar a desenvolvimento de fungos e bolor nas fibras. Um cheiro a humidade ou terra indica presença de fungos que precisam de tratamento específico.",
-        tip: "Não tente secar um sofá molhado com secador de cabelo. O calor concentrado pode deformar o tecido. Ventilação e extração profissional é a forma correta.",
-      },
-      {
-        heading: "7. Acabou de comprar ou receber um sofá em segunda mão",
-        body: "Um sofá usado, mesmo que pareça limpo, carrega a história de quem lá viveu: pele morta, gordura, possivelmente animais de estimação ou fumadores. Uma limpeza profissional antes de integrar o sofá na sua casa é a forma mais simples de começar do zero.",
-      },
+        "heading": "Pedir uma proposta informada",
+        "body": "Envie fotografias, indique a localidade, as dimensões e o que pretende tratar. Respondemos em menos de 10 minutos. Confirmamos o método, o preço dos serviços e a deslocação antes de marcar.\n\nA possibilidade de remoção depende da substância, do tempo decorrido, dos produtos já aplicados e do revestimento. Uma alteração de cor ou dano na fibra pode permanecer depois de a sujidade sair."
+      }
     ],
-    faq: [
+    "faq": [
       {
-        q: "Posso limpar o sofá se tiver manchas de bolor?",
-        a: "Sim, mas precisa de um tratamento específico anti-fúngico antes da limpeza geral. Indique sempre a presença de bolor quando pedir orçamento.",
+        "q": "Uma zona escura é sempre sujidade?",
+        "a": "Não. Pode ser sombra, orientação da fibra, desgaste ou alteração de cor."
       },
       {
-        q: "Quanto tempo depois de comprar um sofá novo devo fazer a primeira limpeza?",
-        a: "Para sofás novos, recomendamos impermeabilização imediatamente após a compra. A primeira limpeza profissional deve ser feita ao fim de 12 a 18 meses de uso normal.",
+        "q": "O sofá pode ficar como novo?",
+        "a": "O resultado depende do estado. A limpeza não reconstitui fibras, cor perdida ou enchimentos danificados."
       },
       {
-        q: "A limpeza profissional resolve todos estes problemas numa visita?",
-        a: "Na grande maioria dos casos, sim. Manchas muito antigas ou bolor severo podem requerer tratamentos específicos adicionais, mas isso é comunicado sempre antes de iniciar o trabalho.",
+        "q": "Bolor é tratado como uma mancha normal?",
+        "a": "Não. É preciso avaliar a origem da humidade e a possibilidade de recuperação."
       },
+      {
+        "q": "Que fotografias ajudam?",
+        "a": "Envie a peça inteira, os detalhes das zonas afetadas e a etiqueta do revestimento."
+      }
     ],
-    relatedService: { label: "Pedir orçamento de limpeza", href: "/limpeza-sofas" },
-    relatedPosts: [
+    "relatedService": {
+      "label": "Pedir orçamento de limpeza",
+      "href": "/limpeza-sofas"
+    },
+    "relatedPosts": [
       "quanto-custa-limpar-sofa-profissional",
       "acaros-sofas-colchoes-riscos-saude",
-      "com-que-frequencia-limpar-sofa",
+      "com-que-frequencia-limpar-sofa"
     ],
+    "sources": []
   },
-
   {
-    slug: "como-limpar-sofa-microfibra",
-    title: "Como limpar um sofá de microfibra: guia completo",
-    metaTitle: "Como Limpar Sofá de Microfibra | Guia Completo Kyro Clean",
-    metaDescription: "Tudo sobre limpeza de sofás de microfibra: o que usar, o que evitar, manchas comuns e quando chamar um profissional. Guia prático.",
-    publishDate: "2025-11-03",
-    updatedDate: "2025-11-03",
-    author: DEFAULT_AUTHOR.name,
-    readingTime: 6,
-    category: "Materiais",
-    heroAlt: "Sofá de microfibra cinza claro numa sala de estar contemporânea",
-    intro: "A microfibra é um dos tecidos mais usados em sofás porque é resistente, agradável ao toque e relativamente fácil de manter. Mas tem as suas regras. Usar o produto errado pode danificá-la permanentemente.",
-    sections: [
+    "slug": "como-limpar-sofa-microfibra",
+    "title": "Como limpar um sofá de microfibra sem improvisar",
+    "metaTitle": "Como limpar um sofá de microfibra sem improvisar | Kyro Clean",
+    "metaDescription": "Microfibra não identifica, por si só, o método de limpeza. Comece pela etiqueta e evite auréolas, atrito e humidade excessiva.",
+    "publishDate": "2025-11-03",
+    "updatedDate": "2026-09-21",
+    "author": DEFAULT_AUTHOR.name,
+    "readingTime": 2,
+    "category": "Materiais",
+    "heroAlt": "Imagem ilustrativa sobre como limpar um sofá de microfibra sem improvisar",
+    "intro": "Microfibra não identifica, por si só, o método de limpeza. Comece pela etiqueta e evite auréolas, atrito e humidade excessiva.",
+    "sections": [
       {
-        heading: "O que é a microfibra e porque reage de forma diferente",
-        body: "A microfibra é um tecido sintético composto por fibras ultra-finas de poliéster e poliamida, muitas vezes com menos de um décimo do diâmetro de um fio de seda. Esta estrutura dá-lhe grande capacidade de absorção, mas também faz com que retenga sujidade nas fibras de forma mais profunda do que tecidos naturais.\n\nA microfibra é sensível a água em excesso: pode criar marcas permanentes de água se for molhada de forma irregular. Por isso, a técnica de limpeza importa mais do que o produto.",
-        tip: "Verifique sempre a etiqueta do sofá. Procure o código de limpeza: W (water-based), S (solvent-based), W/S (ambos) ou X (só aspiração). Microfibra geralmente é W ou W/S.",
+        "heading": "Leia as instruções da peça",
+        "body": "O nome microfibra abrange revestimentos com composições e acabamentos diferentes. Procure a etiqueta e informação do fabricante. Não escolha água, álcool ou vapor apenas pelo toque do tecido."
       },
       {
-        heading: "Manutenção diária e semanal",
-        body: "Para manter a microfibra em boas condições entre limpezas profissionais:\n\n**Aspiração semanal** com bocal de escova macia. A microfibra atrai pelos e poeira eletrostaticamente, aspirar regularmente previne que se fixem nas fibras.\n\n**Escovagem suave** com escova de cerdas macias no sentido do tecido, ao final de cada semana. Mantém o aspeto uniforme e levanta as fibras achatadas.\n\n**Manchas imediatas**: absorva imediatamente com pano branco seco, sem esfregar. A microfibra absorve líquidos rapidamente, por isso a velocidade de reação é crítica.",
+        "heading": "Manutenção sem encharcar",
+        "body": "Aspire com acessório apropriado e retire resíduos soltos. Perante um derrame, absorva suavemente. Não molhe o assento inteiro para tentar esconder uma auréola."
       },
       {
-        heading: "Limpeza de manchas comuns",
-        body: "**Manchas de água e bebidas não gordurosas**: use um pano branco levemente húmido e seque imediatamente com pano seco. Nunca deixe a área húmida, isso causa marcas.\n\n**Manchas de gordura**: aplique uma pequena quantidade de álcool isopropílico (de farmácia) com pano branco. A gordura dissolve-se no álcool sem deixar marca de água.\n\n**Manchas de caneta/tinta**: álcool isopropílico também. Aplique, espere 30 segundos, absorva do exterior para o interior.\n\n**Cheiro a animal ou comida**: bicarbonato de sódio polvilhado sobre a área, deixe 15 minutos, aspire com bocal de escova. Para odores persistentes, precisa de limpeza profissional.",
-        tip: "Evite detergentes de louça diretamente na microfibra. Podem criar manchas de sabão difíceis de remover.",
+        "heading": "Avaliação e tratamento",
+        "body": "A equipa verifica o material, a estabilidade da cor e os produtos já aplicados. Nas peças compatíveis, segue tratamento, escovagem adaptada e extração, com conferência final."
       },
       {
-        heading: "O que nunca fazer numa microfibra",
-        body: "Estas são as situações que causam dano permanente:\n\n- **Molhar excessivamente**: as fibras ficam com marcas circulares de água ao secar\n- **Usar lixívia ou produtos com cloro**: descolorem e enfraquecem as fibras irreversivelmente\n- **Esfregar com força**: achata as fibras e cria zonas brilhantes\n- **Usar esponjas de esfregar**: a abrasão danifica a estrutura da fibra\n- **Secar com calor direto (secador, radiador)**: pode encolher ou deformar o tecido",
-      },
-      {
-        heading: "Quando a limpeza doméstica não chega",
-        body: "A microfibra retém sujidade em profundidade de uma forma que a limpeza doméstica não consegue resolver. Depois de 12 a 18 meses de uso, a acumulação de gordura, pele morta e ácaros dentro das fibras só é removida por extração profissional.\n\nA limpeza profissional de sofá de microfibra é feita com solução específica para tecidos sintéticos e extração controlada que não satura as fibras. O resultado é uma restauração do aspeto original e eliminação de sujidade que não é visível.",
-        tip: "A impermeabilização é especialmente recomendada em microfibra. A barreira protetora impede que as gorduras e líquidos penetrem nas fibras, o que facilita muito a manutenção doméstica.",
-      },
+        "heading": "Textura e secagem",
+        "body": "Marcas por atrito ou desgaste podem continuar visíveis depois de remover a sujidade. Secagem média de 3 a 6 horas, dependendo da ventilação, do tecido e das condições do espaço. Utilize a peça apenas depois de estar completamente seca."
+      }
     ],
-    faq: [
+    "faq": [
       {
-        q: "Posso lavar as almofadas de microfibra na máquina?",
-        a: "Só se a etiqueta indicar que é lavável a máquina. A maioria das almofadas de sofá de microfibra não é lavável a máquina, o enchimento pode ficar deformado. Consulta sempre a etiqueta.",
+        "q": "Posso usar álcool na microfibra?",
+        "a": "Não o aplique sem indicação compatível com a etiqueta e o fabricante."
       },
       {
-        q: "Como remover marcas de água da microfibra?",
-        a: "Humedece toda a área afetada de forma uniforme com spray de água fria e seca imediatamente com pano limpo, usando movimentos circulares suaves. Depois de seco, escova suavemente com escova de cerdas macias.",
+        "q": "Porque apareceu uma auréola?",
+        "a": "Pode resultar da aplicação de líquido, resíduos ou migração de sujidade. É preciso avaliar, sem repetir o tratamento às cegas."
       },
       {
-        q: "A limpeza profissional é segura para sofás de microfibra?",
-        a: "Sim, desde que seja feita por profissionais com experiência neste tipo de tecido. Usamos soluções específicas para sintéticos e controlamos a quantidade de humidade aplicada para não criar marcas.",
+        "q": "Toda a microfibra admite extração?",
+        "a": "O método depende da composição, base e instruções da peça."
       },
       {
-        q: "Quanto custa limpar um sofá de microfibra profissionalmente?",
-        a: `O preço é igual ao de outros tecidos: a partir de ${SOFA_1} para sofá de 1 lugar, ${SOFA_2} para 2 lugares, ${SOFA_3} para 3 lugares. O tipo de tecido não altera o preço base.`,
-      },
+        "q": "A limpeza recupera pelo gasto?",
+        "a": "A possibilidade de remoção depende da substância, do tempo decorrido, dos produtos já aplicados e do revestimento. Uma alteração de cor ou dano na fibra pode permanecer depois de a sujidade sair."
+      }
     ],
-    relatedService: { label: "Pedir orçamento de limpeza de sofá", href: "/limpeza-sofas" },
-    relatedPosts: [
+    "relatedService": {
+      "label": "Pedir orçamento de limpeza de sofá",
+      "href": "/limpeza-sofas"
+    },
+    "relatedPosts": [
       "como-tirar-manchas-sofa-tecido",
       "como-limpar-sofa-veludo",
-      "higienizacao-vs-impermeabilizacao-sofa",
+      "higienizacao-vs-impermeabilizacao-sofa"
     ],
+    "sources": []
   },
-
-  // ── Cluster 2: Saúde e família ────────────────────────────────────────────
   {
-    slug: "limpeza-sofa-bebe-crianca",
-    title: "Limpeza de sofá com bebés e crianças em casa: o que precisa saber",
-    metaTitle: "Limpeza de Sofá com Bebés e Crianças | Segurança | Kyro Clean",
-    metaDescription: "Bebés e crianças estão mais expostos a ácaros e bactérias nos estofos. Descubra com que frequência limpar o sofá, quais os riscos e o que usar.",
-    publishDate: "2025-11-10",
-    updatedDate: "2025-11-10",
-    author: DEFAULT_AUTHOR.name,
-    readingTime: 5,
-    sources: ["spaic-acaros"],
-    category: "Saúde",
-    heroAlt: "Criança sentada num sofá limpo e seguro em ambiente familiar",
-    intro: "Quando há bebés ou crianças em casa, o sofá deixa de ser apenas mobília e passa a ser um ambiente de saúde. As crianças passam muito tempo em contacto direto com ele, muitas vezes gatinhando, encostando a cara ou dormindo. A qualidade do que está nas fibras importa.",
-    sections: [
+    "slug": "limpeza-sofa-bebe-crianca",
+    "title": "Limpeza de sofá numa casa com bebés e crianças",
+    "metaTitle": "Limpeza de sofá numa casa com bebés e crianças | Kyro Clean",
+    "metaDescription": "Prepare a intervenção e o regresso à utilização do sofá, com atenção aos derrames, à ventilação e aos cuidados dos produtos aplicados.",
+    "publishDate": "2025-11-10",
+    "updatedDate": "2026-09-21",
+    "author": DEFAULT_AUTHOR.name,
+    "readingTime": 2,
+    "sources": [],
+    "category": "Saúde",
+    "heroAlt": "Imagem ilustrativa sobre limpeza de sofá numa casa com bebés e crianças",
+    "intro": "Prepare a intervenção e o regresso à utilização do sofá, com atenção aos derrames, à ventilação e aos cuidados dos produtos aplicados.",
+    "sections": [
       {
-        heading: "Porque as crianças estão mais expostas",
-        body: "Os bebés e crianças pequenas respiram a uma altura mais próxima do chão e dos estofos do que os adultos. As suas mãos tocam no sofá e depois na boca. O sistema imunitário em desenvolvimento é mais sensível a alérgenos como ácaros, pelos de animais e esporos de fungos.\n\nUm sofá de uso diário acumula pó, células de pele e humidade, que é o ambiente onde os ácaros se instalam. Para um adulto saudável isso costuma passar despercebido; para um bebé ou criança com predisposição alérgica, é uma exposição que vale a pena reduzir, a par das medidas que o pediatra indicar.",
-        tip: "Se o seu bebé chora mais ou tosse quando está no sofá, pode ser uma resposta a alérgenos. Uma limpeza profissional com extração a vapor é o teste mais rápido.",
+        "heading": "Identifique as manchas",
+        "body": "Informe sobre leite, comida, canetas ou outros derrames, quando ocorreram e os produtos já usados. Não teste misturas domésticas numa área onde a criança brinca."
       },
       {
-        heading: "Com que frequência limpar quando há crianças",
-        body: "A recomendação base muda quando há crianças em casa:\n\n- **Bebés de 0 a 18 meses**: limpeza profissional a cada 3 a 4 meses. Nesta fase, o bebé pode adormecer, babar e gatinhar no sofá.\n- **Crianças de 18 meses a 5 anos**: a cada 4 a 6 meses. Derramamentos são frequentes e a imunidade ainda está a desenvolver-se.\n- **Crianças acima de 5 anos**: a cada 6 meses é suficiente na maioria dos casos.\n\nEntre limpezas profissionais, a aspiração semanal com bocal específico e o tratamento imediato de manchas frescas são fundamentais.",
+        "heading": "Durante o trabalho",
+        "body": "Organize uma zona diferente para as crianças. Produtos, cabos e equipamento devem ficar fora do seu alcance. Diga à equipa se há instruções específicas a considerar antes da visita."
       },
       {
-        heading: "Produtos seguros para crianças",
-        body: "Uma preocupação comum dos pais é a segurança dos produtos de limpeza. Na Kyro Clean utilizamos produtos certificados, biodegradáveis e seguros para crianças e animais de estimação após a secagem completa do sofá.\n\nO sofá pode ser utilizado normalmente assim que estiver seco, geralmente 3 a 6 horas após o tratamento. Não há resíduos químicos no tecido após secagem.",
-        tip: "Peça sempre ao prestador de serviço as fichas técnicas dos produtos utilizados se tiver dúvidas sobre alergias específicas.",
+        "heading": "Quando voltar a usar",
+        "body": "Secagem média de 3 a 6 horas, dependendo da ventilação, do tecido e das condições do espaço. Utilize a peça apenas depois de estar completamente seca.\n\nSiga também os cuidados de utilização indicados para qualquer extra escolhido. Não presumimos que um produto é adequado apenas por ter pouco cheiro."
       },
       {
-        heading: "Impermeabilização: essencial com crianças",
-        body: "Se ainda não impermeabilizou o sofá, um ambiente com crianças é o argumento mais forte para o fazer. A barreira protetora impede que leite, sumos, iogurte e outras substâncias comuns no dia a dia das crianças penetrem nas fibras.\n\nIsso significa que derrama algo, absorve com um pano e não fica mancha. Com crianças, esta diferença pode significar meses de vida extra para o sofá.",
-      },
-      {
-        heading: "Sinais de alerta para agir mais cedo",
-        body: "Não espere pela data da próxima limpeza programada se:\n\n- A criança tosse mais ou tem pieira quando está no sofá\n- Há manchas de alimentos que não saem com limpeza doméstica\n- O sofá tem cheiro persistente\n- Houve um episódio de urina ou vómito no sofá\n\nEm particular, manchas de urina e vómito requerem tratamento enzimático específico que os produtos domésticos não conseguem fazer. Tratar rapidamente evita que os odores se instalem permanentemente.",
-      },
+        "heading": "Proteção e rotina",
+        "body": "Uma proteção compatível pode facilitar a resposta a derrames, mas não evita todos os acidentes. Mantenha os cuidados da peça e absorva líquidos rapidamente. A limpeza normal não é um tratamento clínico."
+      }
     ],
-    faq: [
+    "faq": [
       {
-        q: "Os produtos de limpeza são seguros para bebés?",
-        a: "Sim. Os produtos que utilizamos são certificados e seguros após secagem completa. Recomendamos aguardar 3 a 6 horas antes de usar o sofá após o tratamento.",
+        "q": "A criança pode usar o sofá logo a seguir?",
+        "a": "Aguarde a secagem completa e respeite as instruções do produto aplicado."
       },
       {
-        q: "Como limpar urina de bebé do sofá rapidamente?",
-        a: "Absorva o máximo de líquido com pano seco imediatamente. Aplique uma mistura de água fria e vinagre branco (50/50). Não use água quente, fixa a proteína. Para um resultado completo, o tratamento enzimático profissional é o único que elimina o odor definitivamente.",
+        "q": "Usam produtos sempre inofensivos?",
+        "a": "A equipa seleciona produtos adequados e explica as condições de aplicação e utilização. Não fazemos uma promessa absoluta de ausência de risco."
       },
       {
-        q: "O sofá pode ser usado no próprio dia da limpeza?",
-        a: "Sim. O sofá seca em média em 3 a 6 horas, dependendo da ventilação e do tecido. A partir daí pode ser usado normalmente, incluindo por crianças.",
+        "q": "A limpeza inclui desbacterização?",
+        "a": "A limpeza remove sujidade e resíduos. Anti-ácaros e desbacterização são tratamentos opcionais, escolhidos e orçamentados separadamente. Não prometemos eliminação total de microrganismos nem benefícios clínicos."
       },
+      {
+        "q": "A proteção evita todas as manchas?",
+        "a": "Não. Ajuda em tecidos compatíveis e exige limpar os derrames rapidamente."
+      }
     ],
-    relatedService: { label: "Pedir orçamento de limpeza", href: "/limpeza-sofas" },
-    relatedPosts: [
+    "relatedService": {
+      "label": "Pedir orçamento de limpeza",
+      "href": "/limpeza-sofas"
+    },
+    "relatedPosts": [
       "acaros-sofas-colchoes-riscos-saude",
       "com-que-frequencia-limpar-sofa",
-      "limpeza-sofa-animais-domesticos",
-    ],
+      "limpeza-sofa-animais-domesticos"
+    ]
   },
-
   {
-    slug: "limpeza-colchao-bebe-crianca",
-    title: "Limpeza de colchão para bebés e crianças: guia completo",
-    metaTitle: "Limpeza de Colchão Bebé e Criança | Guia Kyro Clean",
-    metaDescription: "O colchão do bebé acumula ácaros, suor e bactérias rapidamente. Descubra quando limpar, como proteger e os riscos de um colchão sujo para a saúde infantil.",
-    publishDate: "2025-11-17",
-    updatedDate: "2025-11-17",
-    author: DEFAULT_AUTHOR.name,
-    readingTime: 5,
-    sources: ["spaic-acaros"],
-    category: "Saúde",
-    heroAlt: "Colchão de bebé limpo com roupa de cama branca numa divisão clara",
-    intro: "O bebé passa 12 a 16 horas por dia no colchão. É o objeto com que tem mais contacto no mundo. E é também um dos que acumula mais sujidade invisível: suor, leite, saliva, células de pele e ácaros. Manter o colchão do bebé limpo não é exagero, é higiene básica.",
-    sections: [
+    "slug": "limpeza-colchao-bebe-crianca",
+    "title": "Limpeza de colchão de bebé ou criança: o que confirmar",
+    "metaTitle": "Limpeza de colchão de bebé ou criança: o que confirmar | Kyro Clean",
+    "metaDescription": "A capa, o núcleo e as instruções do fabricante são essenciais antes de intervir num colchão infantil. Saiba como preparar o pedido.",
+    "publishDate": "2025-11-17",
+    "updatedDate": "2026-09-21",
+    "author": DEFAULT_AUTHOR.name,
+    "readingTime": 2,
+    "sources": [],
+    "category": "Saúde",
+    "heroAlt": "Imagem ilustrativa sobre limpeza de colchão de bebé ou criança: o que confirmar",
+    "intro": "A capa, o núcleo e as instruções do fabricante são essenciais antes de intervir num colchão infantil. Saiba como preparar o pedido.",
+    "sections": [
       {
-        heading: "O que se acumula num colchão de bebé",
-        body: "Um bebé transpira entre 150 a 200 ml de humidade por noite. Esta humidade cria um ambiente ideal para a proliferação de ácaros do pó. Somam-se episódios de regurgitação, fraldas que vazam e a saliva natural durante o sono.\n\nNão é possível ver esta acumulação a olho nu, mas está lá. Colchões de bebé não limpos durante mais de 3 a 4 meses podem ter níveis de ácaros muito superiores ao que é considerado seguro para crianças com predisposição alérgica.",
-        tip: "Ácaros proliferam com humidade e calor. Os colchões de bebé, por terem muita humidade noturna, são especialmente propícios ao crescimento de colónias de ácaros.",
+        "heading": "Fotografe a etiqueta",
+        "body": "Indique as medidas, o material e se a capa é removível. Um colchão de berço não deve receber automaticamente o mesmo método que um colchão de adulto. A compatibilidade é confirmada antes do serviço."
       },
       {
-        heading: "Com que frequência limpar o colchão do bebé",
-        body: "Para colchões de bebé (0 a 3 anos): **a cada 3 a 4 meses** é a recomendação ideal. Para crianças de 3 a 8 anos, a cada 4 a 6 meses.\n\nEstes são ciclos mais curtos do que para adultos porque a criança passa mais horas na cama proporcionalmente, transpira mais em relação ao volume corporal, e o sistema imunitário está ainda em desenvolvimento.",
+        "heading": "Perante urina ou leite",
+        "body": "Retire a roupa de cama e absorva o excesso sem esfregar. Não encharque o núcleo nem aplique misturas. Conte à equipa o que aconteceu e que produtos já foram utilizados."
       },
       {
-        heading: "Proteção entre limpezas",
-        body: "A proteção começa com um protetor de colchão impermeável e respirável. Este protetor deve ser lavado a 60ºC a cada 2 a 4 semanas para eliminar ácaros.\n\nO protetor não substitui a limpeza profissional do colchão, é uma camada de defesa adicional. A humidade e as partículas orgânicas acabam sempre por penetrar até ao colchão ao longo do tempo.",
-        tip: "Opta sempre por protetores certificados como «anti-ácaros» e «respiráveis». Protetores totalmente impermeáveis retêm mais calor, o que favorece a proliferação de ácaros.",
+        "heading": "Limites da limpeza",
+        "body": "Resíduos que atingiram camadas internas podem manter manchas ou odores. Bolor, deterioração ou incompatibilidade com o método podem impedir a intervenção. A avaliação esclarece o que é possível recuperar."
       },
       {
-        heading: "Riscos de um colchão sujo para bebés",
-        body: "Os principais riscos associados a colchões mal mantidos em bebés e crianças são:\n\n**Alergias respiratórias**: rinite, bronquite recorrente e asma são frequentemente associadas a exposição excessiva a ácaros durante o sono.\n\n**Dermatite atópica**: o contacto prolongado com alérgenos pode agravar eczema em crianças predispostas.\n\n**Fungos e bolor**: humidade acumulada sem extração profissional pode levar a desenvolvimento de fungos nas camadas internas do colchão, invisíveis mas presentes.",
-      },
-      {
-        heading: "O processo de limpeza profissional de colchão de bebé",
-        body: "A limpeza profissional de colchão usa extração a vapor a alta temperatura que:\n\n1. ajuda a remover resíduos associados a ácaros e os seus resíduos alérgenos\n2. Remove manchas de origem orgânica (leite, urina, suor)\n3. Elimina odores na fonte, não com mascaradores\n4. Deixa o colchão utilizável em 3 a 6 horas\n\nOs produtos utilizados são certificados para uso em ambientes infantis. Não há resíduos após secagem.",
-        tip: "Depois da limpeza, use um protetor de colchão impermeável e respirável para reduzir a frequência necessária de novas intervenções.",
-      },
+        "heading": "Planear a secagem",
+        "body": "Secagem média de 3 a 6 horas, dependendo da ventilação, do tecido e das condições do espaço. Utilize a peça apenas depois de estar completamente seca.\n\nGaranta uma alternativa de utilização enquanto a peça seca e respeite as instruções de qualquer produto aplicado."
+      }
     ],
-    faq: [
+    "faq": [
       {
-        q: "Com que idade começa a ser necessário limpar o colchão do bebé?",
-        a: "Desde o início. Mesmo nos primeiros meses, a humidade noturna e os episódios de regurgitação criam condições para acumulação de ácaros. A primeira limpeza profissional deve ser feita aos 3 a 4 meses de uso.",
+        "q": "Podem limpar qualquer colchão de berço?",
+        "a": "É necessário confirmar composição e instruções de manutenção antes de aceitar o serviço."
       },
       {
-        q: "O colchão pode ser limpo sem ser retirado do quarto?",
-        a: "Sim. A limpeza é feita no local. O colchão não precisa de ser movido para outro espaço.",
+        "q": "Posso lavar a capa separadamente?",
+        "a": "Apenas se a etiqueta o permitir, respeitando as condições indicadas."
       },
       {
-        q: "A limpeza danifica o colchão?",
-        a: "Não. A extração a vapor controlada é suave para os materiais do colchão. Usamos a quantidade de humidade adequada para não saturar as camadas internas, garantindo secagem rápida.",
+        "q": "O tratamento anti-ácaros é obrigatório?",
+        "a": "Não. A limpeza e os extras são escolhas distintas, sujeitos a avaliação de compatibilidade."
       },
       {
-        q: "Quanto custa limpar um colchão de bebé?",
-        a: `O colchão de bebé (tamanho berço) tem preço a partir de ${COLCHAO_SOLTEIRO}. Colchões de cama individual a partir de ${COLCHAO_SOLTEIRO}, casal a partir de ${COLCHAO_CASAL} e king/queen a partir de ${COLCHAO_KING}.`,
-      },
+        "q": "Como obtenho o preço?",
+        "a": "Envie medidas, fotografias, etiqueta e localidade para confirmar o âmbito e o orçamento."
+      }
     ],
-    relatedService: { label: "Pedir orçamento de limpeza de colchão", href: "/limpeza-colchoes" },
-    relatedPosts: [
+    "relatedService": {
+      "label": "Ver limpeza de colchões e orçamento",
+      "href": "/limpeza-colchoes"
+    },
+    "relatedPosts": [
       "quanto-custa-limpar-colchao-profissional",
       "acaros-sofas-colchoes-riscos-saude",
-      "limpeza-sofa-bebe-crianca",
-    ],
+      "limpeza-sofa-bebe-crianca"
+    ]
   },
-
-  // ── Cluster 3: Autoridade técnica ─────────────────────────────────────────
   {
-    slug: "o-que-e-extracao-a-vapor-estofos",
-    title: "O que é a extração a vapor e porque é o melhor método para limpar estofos",
-    metaTitle: "O que é Extração a Vapor em Estofos | Kyro Clean Portugal",
-    metaDescription: "Explicação completa do processo de extração a vapor: como funciona, porque é superior a outros métodos, e o que esperar durante e após o tratamento.",
-    publishDate: "2025-11-24",
-    updatedDate: "2025-11-24",
-    author: DEFAULT_AUTHOR.name,
-    readingTime: 5,
-    category: "Técnico",
-    heroAlt: "Técnico a aplicar extração a vapor profissional num sofá de tecido",
-    intro: "«Extração a vapor» é o termo que aparece em quase todas as descrições de limpeza profissional de estofos. Mas o que é exatamente? Como funciona? E porque é considerado o método mais eficaz? Explicamos tudo.",
-    sections: [
+    "slug": "o-que-e-extracao-a-vapor-estofos",
+    "title": "Extração de estofos: como funciona e quando é adequada",
+    "metaTitle": "Extração de estofos: como funciona e quando é adequada | Kyro Clean",
+    "metaDescription": "Perceba a diferença entre extrair sujidade e aplicar vapor. O método deve acompanhar o material e não uma promessa de temperatura universal.",
+    "publishDate": "2025-11-24",
+    "updatedDate": "2026-09-21",
+    "author": DEFAULT_AUTHOR.name,
+    "readingTime": 2,
+    "category": "Técnico",
+    "heroAlt": "Imagem ilustrativa sobre extração de estofos: como funciona e quando é adequada",
+    "intro": "Perceba a diferença entre extrair sujidade e aplicar vapor. O método deve acompanhar o material e não uma promessa de temperatura universal.",
+    "sections": [
       {
-        heading: "Como funciona a extração a vapor (hot water extraction)",
-        body: "O processo técnico chama-se Hot Water Extraction (HWE) e é mais complexo do que o nome sugere. Não se trata simplesmente de aplicar vapor. O equipamento profissional injeta uma solução de água quente (80 a 100ºC) e detergente específico nas fibras do estofo a alta pressão, e aspira imediatamente o líquido de volta, arrastando a sujidade dissolvida.\n\nEste processo acontece em milissegundos para cada área tratada. O resultado é que as fibras ficam limpas em profundidade sem ficarem saturadas de água.",
-        tip: "Máquinas domésticas de limpeza a vapor funcionam de forma diferente: aplicam vapor seco mas não fazem extração. A diferença de resultado é substancial.",
+        "heading": "Extração não é apenas vapor",
+        "body": "A injeção e extração utiliza uma solução de limpeza e aspira líquido com os resíduos. Um vaporizador aplica vapor e não tem necessariamente essa capacidade de recolha. Não tratamos os dois equipamentos como equivalentes."
       },
       {
-        heading: "O que o processo remove efetivamente",
-        body: "A extração a vapor profissional remove:\n\n**Sujidade estrutural**: poeira, células de pele morta, gordura do corpo, resíduos de alimentos e partículas que se acumulam nas fibras ao longo do tempo.\n\n**Ácaros e alérgenos**: o que provoca a reação alérgica são os excrementos e os restos de exoesqueleto já depositados na fibra, e esses removem-se fisicamente, não por calor. O tratamento anti-ácaros é um extra específico.\n\n**Manchas orgânicas**: com pré-tratamento enzimático, manchas de café, vinho, urina e gordura são dissolvidas antes da extração.\n\n**Odores**: os compostos orgânicos que causam odores são eliminados na fonte, não mascarados.",
+        "heading": "Antes de extrair",
+        "body": "Avaliamos o revestimento e as manchas, aspiramos, aplicamos o tratamento adequado, escovamos respeitando a fibra, extraímos a sujidade e conferimos o resultado. A escova, a pressão e a humidade são ajustadas ao material. Materiais incompatíveis com água exigem avaliação de outro método."
       },
       {
-        heading: "Porque é superior a outros métodos",
-        body: "Comparação direta com os métodos alternativos:\n\n**Espuma seca (dry foam)**: aplica espuma que encapsula a sujidade e é aspirada. Não penetra nas fibras, resultado superficial. Eficaz para manutenção, não para limpeza profunda.\n\n**Limpeza com pó absorvente**: resultado ainda mais superficial. Não remove sujidade das fibras.\n\n**Aspiração doméstica**: remove apenas partículas soltas na superfície. Não atinge a sujidade acumulada nas fibras.\n\n**Extração a vapor profissional**: o único método que limpa em profundidade, elimina ácaros a alta temperatura e remove odores orgânicos. É o padrão da indústria a nível mundial.",
-        tip: "Desconfia de serviços de limpeza que prometem resultados idênticos por valores muito abaixo do mercado. Equipamento de extração profissional tem custos de aquisição e manutenção elevados.",
+        "heading": "Material e humidade",
+        "body": "A compatibilidade do revestimento, da base e do enchimento determina o processo. Não anunciamos uma temperatura ou pressão única para todos os artigos. Couro e fibras incompatíveis com água exigem cuidados próprios."
       },
       {
-        heading: "O que esperar durante e após o tratamento",
-        body: "**Durante**: o técnico passa o equipamento em movimentos sobrepostos sobre toda a superfície. Pode ver a água suja a ser aspirada para o reservatório. O processo dura 45 a 90 minutos por sofá de 3 lugares.\n\n**Após**: o sofá vai estar ligeiramente húmido ao toque mas não encharcado. O cheiro inicial de limpeza (solução de extração) desaparece ao secar. A secagem completa leva 3 a 6 horas com ventilação.\n\n**Resultado**: fibras mais macias e limpas, cores mais vivas, ausência de odores e redução drástica de alérgenos.",
-      },
+        "heading": "O que a extração não garante",
+        "body": "A limpeza remove sujidade e resíduos. Anti-ácaros e desbacterização são tratamentos opcionais, escolhidos e orçamentados separadamente. Não prometemos eliminação total de microrganismos nem benefícios clínicos.\n\nSecagem média de 3 a 6 horas, dependendo da ventilação, do tecido e das condições do espaço. Utilize a peça apenas depois de estar completamente seca."
+      }
     ],
-    faq: [
+    "faq": [
       {
-        q: "O sofá fica muito molhado depois da extração a vapor?",
-        a: "Não. O processo extrai quase toda a humidade imediatamente. O sofá fica ligeiramente húmido ao toque, mas utilizável em 3 a 6 horas com ventilação normal.",
+        "q": "Usam sempre vapor a alta temperatura?",
+        "a": "Não existe uma temperatura universal anunciada para todas as peças. O método é ajustado à compatibilidade do material."
       },
       {
-        q: "Todos os tipos de tecido podem ser limpos com extração a vapor?",
-        a: "A grande maioria dos tecidos para estofos suporta o processo. Exceções: veludo antigo, alguns tecidos naturais delicados como seda ou linho puro. O técnico verifica sempre o tipo de tecido antes de iniciar.",
+        "q": "A aspiração retira toda a água?",
+        "a": "Retira líquido, mas o artigo ainda precisa de secar nas condições indicadas."
       },
       {
-        q: "A extração a vapor estraga a cor do tecido?",
-        a: "Não, ao contrário. A sujidade acumulada atenua as cores. Após extração, as cores ficam mais vivas. Testamos sempre numa área não visível antes de proceder ao tratamento completo.",
+        "q": "O método serve para seda, juta e sisal?",
+        "a": "Não automaticamente. Esses materiais exigem avaliação específica e podem ser incompatíveis com limpeza húmida."
       },
+      {
+        "q": "Extração é desinfeção?",
+        "a": "A limpeza remove sujidade e resíduos. Anti-ácaros e desbacterização são tratamentos opcionais, escolhidos e orçamentados separadamente. Não prometemos eliminação total de microrganismos nem benefícios clínicos."
+      }
     ],
-    relatedService: { label: "Saber mais sobre os nossos serviços", href: "/limpeza-sofas" },
-    relatedPosts: [
+    "relatedService": {
+      "label": "Saber mais sobre os nossos serviços",
+      "href": "/limpeza-sofas"
+    },
+    "relatedPosts": [
       "quanto-custa-limpar-sofa-profissional",
       "higienizacao-vs-impermeabilizacao-sofa",
-      "sinais-sofa-precisa-limpeza-profissional",
+      "sinais-sofa-precisa-limpeza-profissional"
     ],
+    "sources": []
   },
-
   {
-    slug: "mitos-limpeza-estofos",
-    title: "8 mitos sobre limpeza de estofos que pode parar de acreditar",
-    metaTitle: "8 Mitos sobre Limpeza de Estofos | Verdade vs Mentira | Kyro",
-    metaDescription: "Vinagre, sal, produtos milagrosos do supermercado: descobre o que funciona mesmo e o que não passa de mito na limpeza de sofás, colchões e tapetes.",
-    publishDate: "2025-12-01",
-    updatedDate: "2025-12-01",
-    author: DEFAULT_AUTHOR.name,
-    readingTime: 5,
-    category: "Dicas",
-    heroAlt: "Sofá de tecido limpo com aspeto renovado após limpeza profissional",
-    intro: "Há muita informação errada a circular sobre limpeza de estofos. Alguns conselhos são inofensivos mas ineficazes. Outros podem danificar irreversivelmente o seu sofá ou colchão. Este artigo vai direto ao ponto.",
-    sections: [
+    "slug": "mitos-limpeza-estofos",
+    "title": "8 ideias erradas sobre limpeza de estofos",
+    "metaTitle": "8 ideias erradas sobre limpeza de estofos | Kyro Clean",
+    "metaDescription": "Reveja as expectativas antes de contratar: manchas, secagem, proteção e preço têm condições que devem ficar claras no orçamento.",
+    "publishDate": "2025-12-01",
+    "updatedDate": "2026-09-21",
+    "author": DEFAULT_AUTHOR.name,
+    "readingTime": 2,
+    "category": "Dicas",
+    "heroAlt": "Imagem ilustrativa sobre 8 ideias erradas sobre limpeza de estofos",
+    "intro": "Reveja as expectativas antes de contratar: manchas, secagem, proteção e preço têm condições que devem ficar claras no orçamento.",
+    "sections": [
       {
-        heading: "Mito 1: o vinagre limpa e desodoriza qualquer mancha",
-        body: "**Verdade parcial.** O vinagre branco é útil para odores ligeiros e pode ajudar com manchas frescas de tânicos (café, chá). Mas não destrói os cristais de ácido úrico da urina, não dissolve gordura, não elimina bolor e pode alterar a cor de alguns tecidos.\n\nO vinagre é uma solução doméstica de último recurso para manchas pequenas e frescas. Para qualquer coisa além disso, não chega.",
-        tip: "Nunca use vinagre em couro natural. Os ácidos degradam o acabamento e ressecam o material.",
+        "heading": "Sobre o resultado",
+        "body": "**1. «Todas as manchas saem.»** O resultado depende da substância e do revestimento.\n**2. «Limpar repara o desgaste.»** A limpeza não repõe fibras, cor ou couro descascado."
       },
       {
-        heading: "Mito 2: sal grosso remove manchas de vinho tinto",
-        body: "**Funciona apenas imediatamente.** O sal absorve o líquido se aplicado nos primeiros 30 segundos após o derrame, antes que o vinho penetre nas fibras. Depois disso, o sal não faz nada que um pano absorvente não faça.\n\nSal numa mancha de vinho de 5 minutos não tem efeito. A mancha já está nas fibras.",
+        "heading": "Sobre o método",
+        "body": "**3. «Mais água limpa melhor.»** O excesso de humidade pode atingir enchimentos e bases.\n**4. «Todo o tecido admite vapor.»** A composição e as instruções da peça determinam a compatibilidade."
       },
       {
-        heading: "Mito 3: os produtos do supermercado são equivalentes aos profissionais",
-        body: "**Falso.** Os produtos de limpeza domésticos têm concentrações de ativos muito inferiores às formulações profissionais e não incluem enzimas específicas para quebrar compostos orgânicos como ácido úrico, proteínas do sangue ou gorduras saturadas.\n\nAlém disso, sem equipamento de extração, o produto fica nas fibras após a limpeza, o que pode atrair mais sujidade e criar resíduos.",
+        "heading": "Sobre os serviços",
+        "body": "**5. «Higienização inclui anti-ácaros.»** Os tratamentos opcionais são identificados à parte.\n**6. «Impermeabilizar impede qualquer mancha.»** A proteção ajuda, mas continua a ser preciso absorver derrames."
       },
       {
-        heading: "Mito 4: se o sofá parece limpo, está limpo",
-        body: "**Completamente falso.** A sujidade mais perigosa do ponto de vista da saúde (ácaros, bactérias, esporos de fungos) é invisível a olho nu. Um sofá sem manchas visíveis pode ter centenas de milhares de ácaros nas fibras.\n\nO aspeto visual não é um indicador de higiene real.",
-      },
-      {
-        heading: "Mito 5: a limpeza profissional estraga os tecidos",
-        body: "**Falso quando feita corretamente.** Este mito provavelmente vem de experiências com limpezas mal executadas: excesso de humidade, produtos errados para o tipo de tecido, ou secagem inadequada.\n\nA extração a vapor profissional, feita com o equipamento e produtos certos para cada tipo de tecido, não danifica as fibras. Pelo contrário, remove resíduos que aceleravam o desgaste.",
-      },
-      {
-        heading: "Mito 6: impermeabilização significa que nunca mais precisa de limpar",
-        body: "**Falso.** A impermeabilização cria uma barreira contra líquidos e gorduras, mas não impede a acumulação de sujidade seca (poeira, pele morta, ácaros) nas fibras. Precisa de manutenção regular e limpeza profissional periódica mesmo com o estofo impermeabilizado.",
-      },
-      {
-        heading: "Mito 7: bicarbonato de sódio remove odores permanentemente",
-        body: "**Funciona apenas a curto prazo.** O bicarbonato absorve e neutraliza odores temporariamente. Para odores persistentes como urina, suor intenso ou bolor, o composto que causa o cheiro está nas fibras. O bicarbonato mascara, não elimina.\n\nÉ uma solução válida para manutenção entre limpezas, não um substituto da limpeza profissional.",
-      },
-      {
-        heading: "Mito 8: lavar o sofá com água e esfregão é equivalente à limpeza profissional",
-        body: "**Falso, e pode ser prejudicial.** Molhar excessivamente um sofá sem extração imediata cria humidade nas camadas internas que demora dias a secar e favorece o crescimento de bolor e fungos. É uma das causas mais comuns de sofás que ficam com cheiro a húmido depois de uma tentativa de limpeza caseira.\n\nA extração profissional injeta e aspira o líquido em milissegundos, deixando as fibras húmidas mas não saturadas.",
-        tip: "Se o seu sofá ficou com cheiro a humidade depois de tentar lavá-lo em casa, agende uma limpeza profissional rapidamente. Bolor instalado é mais difícil e caro de tratar.",
-      },
+        "heading": "Sobre o orçamento e a utilização",
+        "body": "**7. «O preço inicial já inclui deslocação.»** A deslocação aparece separada no orçamento.\n**8. «Posso usar o sofá logo depois.»** Secagem média de 3 a 6 horas, dependendo da ventilação, do tecido e das condições do espaço. Utilize a peça apenas depois de estar completamente seca."
+      }
     ],
-    faq: [
+    "faq": [
       {
-        q: "Água oxigenada remove manchas de sangue?",
-        a: "Água oxigenada a 3% (de farmácia) pode ajudar em manchas de sangue frescas em tecidos claros. Mas pode descolorir tecidos com cores. Teste sempre numa zona não visível antes. Para manchas secas, o tratamento enzimático profissional é mais eficaz e seguro.",
+        "q": "Uma capa removível pode sempre ir à máquina?",
+        "a": "Só se a etiqueta permitir."
       },
       {
-        q: "Posso usar álcool para desinfetar o sofá?",
-        a: "O álcool isopropílico é útil para manchas de gordura e tinta em pontos específicos. Não é indicado para desinfeção geral do sofá, pode ressecar ou descolorir alguns tecidos e não remove a sujidade orgânica das fibras.",
+        "q": "Uma limpeza inclui garantia?",
+        "a": "Se não ficar satisfeito, contacte-nos até 48 horas após o serviço e repetimos a intervenção sem custos. Explicamos previamente os limites das manchas e do desgaste; a sua existência não exclui esta garantia."
       },
       {
-        q: "Os produtos naturais (limão, bicarbonato) são sempre mais seguros para o tecido?",
-        a: "Não necessariamente. O limão é ácido e pode clarear tecidos coloridos. O bicarbonato, se não for bem removido, pode deixar resíduo branco nas fibras escuras. «Natural» não significa inofensivo para todos os materiais.",
+        "q": "O preço depende só do tamanho?",
+        "a": "O tamanho é um fator, mas o serviço, os extras e a deslocação também precisam de confirmação."
       },
+      {
+        "q": "Como esclareço o meu caso?",
+        "a": "Envie fotografias, indique a localidade, as dimensões e o que pretende tratar. Respondemos em menos de 10 minutos. Confirmamos o método, o preço dos serviços e a deslocação antes de marcar."
+      }
     ],
-    relatedService: { label: "Limpeza profissional com garantia de resultado", href: "/limpeza-sofas" },
-    relatedPosts: [
+    "relatedService": {
+      "label": "Limpeza profissional com garantia de resultado",
+      "href": "/limpeza-sofas"
+    },
+    "relatedPosts": [
       "sinais-sofa-precisa-limpeza-profissional",
       "como-tirar-manchas-sofa-tecido",
-      "o-que-e-extracao-a-vapor-estofos",
+      "o-que-e-extracao-a-vapor-estofos"
     ],
+    "sources": []
   },
-
   {
-    slug: "limpeza-sofa-couro",
-    title: "Limpeza de sofá de couro: guia completo e preços 2025",
-    metaTitle: "Limpeza Sofá de Couro: Guia e Preços 2025 | Kyro Clean",
-    metaDescription: "Como limpar sofá de couro em casa e quando chamar um profissional. Produtos certos, técnicas seguras e preços reais para couro, pele e couro sintético.",
-    publishDate: "2026-05-20",
-    updatedDate: "2026-05-20",
-    author: DEFAULT_AUTHOR.name,
-    readingTime: 7,
-    category: "Dicas",
-    heroAlt: "Sofá de couro castanho a ser limpo com produto especializado",
-    intro: "O sofá de couro é elegante e durável, mas exige cuidados específicos que muitos proprietários desconhecem. Usar o produto errado pode secar, rachar ou descolorir o couro de forma irreversível. Este guia mostra o que pode fazer em casa e quando é indispensável chamar um profissional.",
-    sections: [
+    "slug": "limpeza-sofa-couro",
+    "title": "Limpeza de sofá de couro: cuidados e limites",
+    "metaTitle": "Limpeza de sofá de couro: cuidados e limites | Kyro Clean",
+    "metaDescription": "O acabamento do couro determina os cuidados. Saiba distinguir sujidade de desgaste e o que perguntar antes de limpar o sofá.",
+    "publishDate": "2026-05-20",
+    "updatedDate": "2026-09-21",
+    "author": DEFAULT_AUTHOR.name,
+    "readingTime": 2,
+    "category": "Dicas",
+    "heroAlt": "Imagem ilustrativa sobre limpeza de sofá de couro: cuidados e limites",
+    "intro": "O acabamento do couro determina os cuidados. Saiba distinguir sujidade de desgaste e o que perguntar antes de limpar o sofá.",
+    "sections": [
       {
-        heading: "Couro genuíno, pele sintética ou couro reconstituído: qual o seu?",
-        body: "Antes de qualquer limpeza, identifique o material:\n\n**Couro genuíno (full grain / top grain)**: tem marcas naturais, textura irregular e fica mais macio com o tempo. Absorve produtos e precisa de hidratação regular.\n\n**Couro reconstituído (bonded leather)**: feito de resíduos de couro colados. Parece couro genuíno mas descasca passados 3 a 5 anos. Muito comum em sofás de preço médio.\n\n**Couro sintético (PU / faux leather)**: completamente artificial. Mais resistente à humidade mas pode rachar com produtos incorretos.\n\nPara distinguir: o couro genuíno aquece ao toque; o sintético permanece frio. O genuíno tem odor característico; o sintético cheira a plástico.",
-        tip: "Verifique a etiqueta por baixo do assento. Geralmente indica o material e o código de limpeza (S, W, WS ou X).",
+        "heading": "Identifique o revestimento",
+        "body": "Pele natural, revestimento pigmentado e materiais sintéticos não recebem automaticamente o mesmo cuidado. Envie fotografias da etiqueta e das zonas gastas. Não confunda couro com Alcantara ou outros têxteis."
       },
       {
-        heading: "Limpeza de manutenção: o que pode fazer em casa",
-        body: "Para manutenção regular do sofá de couro:\n\n1. **Aspire semanalmente** com bocal suave para remover pó e partículas que riscam o couro.\n2. **Limpe com pano de microfibra húmido** (água morna, sem detergente) para sujidade ligeira.\n3. **Aplique creme hidratante de couro** a cada 3 a 6 meses para evitar que seque e rache. Marcas como Leather Master ou Collonil são de referência.\n4. **Remova manchas frescas** imediatamente com pano absorvente seco, sem esfregar.\n\nO que nunca deve usar: produtos à base de álcool, acetona, lixívia, vinagre ou detergentes domésticos comuns. Todos estes destroem o tratamento superficial do couro.",
+        "heading": "Evite receitas domésticas",
+        "body": "Não aplique óleos alimentares, álcool, lixívia ou vapor sem indicação específica do fabricante. Uma mistura pode alterar o acabamento e deixar uma marca que já não é sujidade removível."
       },
       {
-        heading: "Manchas difíceis: vinho, gordura, tinta e urina",
-        body: "**Vinho e sumos**: absorva o excesso imediatamente com pano seco. Aplique produto de limpeza de couro com pH neutro. Nunca sal nem água com vinagre.\n\n**Gordura (pizza, manteiga)**: bicarbonato de sódio seco deixado 20 minutos absorve parte da gordura. Depois, limpeza com produto neutro específico para couro.\n\n**Tinta de esferográfica**: um produto específico de remoção de tinta para couro é a única opção segura. Produtos caseiros (acetona, álcool) mancharão permanentemente.\n\n**Urina (animais ou crianças)**: absorva imediatamente. Trate com produto enzimático especial para couro. O ácido úrico da urina dissolve o tratamento superficial do couro se não for tratado rapidamente.\n\nNota importante: manchas com mais de 24 horas em couro genuíno raramente saem completamente com limpeza doméstica.",
-        tip: "Para manchas de tinta em couro, teste sempre o produto numa zona oculta antes de aplicar na área visível.",
+        "heading": "Como se decide a limpeza",
+        "body": "A equipa avalia o acabamento e o estado, testa a compatibilidade e define limpeza e cuidados adequados. A sequência húmida de um sofá de tecido não se aplica automaticamente ao couro."
       },
       {
-        heading: "Quando chamar um profissional: sinais que não deve ignorar",
-        body: "Algumas situações exigem tratamento profissional:\n\n**Descoloração generalizada**: o couro perde a pigmentação com o tempo e exposição solar. Um profissional pode repigmentar e restaurar a cor original.\n\n**Couro seco e com rachas**: fissuras profundas podem ser tratadas com reparação de couro profissional antes que se agravem.\n\n**Manchas persistentes**: manchas de gordura antiga, tinta ou urina que não respondem ao tratamento doméstico.\n\n**Odor persistente**: odores a animal ou humidade que penetraram nas camadas do couro.\n\nO custo de uma limpeza profissional de sofá de couro (entre 60€ e 100€) é muito inferior ao custo de substituição do sofá (tipicamente 800€ a 3000€).",
-      },
-      {
-        heading: "Preços de limpeza profissional de sofá de couro em Portugal",
-        body: `Os preços da Kyro Clean para sofás de couro seguem a mesma tabela que para outros materiais:\n\n- Sofá de 1 lugar: a partir de ${SOFA_1}\n- Sofá de 2 lugares: a partir de ${SOFA_2}\n- Sofá de 3 lugares: a partir de ${SOFA_3}\n- Chaise longue: +${CHAISE_LIMPEZA}\n\nO processo para couro inclui: limpeza com produto de pH neutro específico para couro, condicionamento das fibras, hidratação e proteção. Não usamos extração a vapor em couro genuíno, o calor e a humidade excessiva danificam o material.`,
-      },
+        "heading": "O que a limpeza não repara",
+        "body": "Fissuras, descascamento e perda de pigmento podem exigir reparação especializada. Não anunciamos repigmentação nem restauro incluídos no serviço de limpeza. O orçamento confirma o que será tratado."
+      }
     ],
-    faq: [
+    "faq": [
       {
-        q: "Posso usar vinagre para limpar sofá de couro?",
-        a: "Não. O vinagre tem pH ácido que danifica o tratamento superficial do couro genuíno, causando descoloração e ressecamento. Usa sempre produtos com pH neutro formulados especificamente para couro.",
+        "q": "Conseguem reparar couro rachado?",
+        "a": "Reparação e restauro não estão incluídos no serviço de limpeza."
       },
       {
-        q: "O meu sofá de couro está a descascar, podem reparar?",
-        a: "Se o sofá é de couro genuíno, um profissional pode restaurar a superfície. Se for couro reconstituído (bonded leather), o descasque é estrutural e irreversível, a substituição do revestimento é a única solução.",
+        "q": "Posso usar o mesmo produto no couro e no PU?",
+        "a": "Não assuma compatibilidade. Consulte o fabricante e confirme o tipo de revestimento."
       },
       {
-        q: "Com que frequência devo limpar o sofá de couro profissionalmente?",
-        a: "Recomendamos limpeza profissional anual para manutenção e hidratação do couro. Em casas com animais de estimação ou crianças, a cada 6 meses.",
+        "q": "Um brilho irregular sai com limpeza?",
+        "a": "A possibilidade de remoção depende da substância, do tempo decorrido, dos produtos já aplicados e do revestimento. Uma alteração de cor ou dano na fibra pode permanecer depois de a sujidade sair."
       },
       {
-        q: "A limpeza profissional danifica o couro?",
-        a: "Não, desde que o profissional use produtos e técnicas adequadas ao tipo de couro. Na Kyro Clean identificamos sempre o material antes de começar e adaptamos o processo.",
-      },
+        "q": "Como peço orçamento?",
+        "a": "Envie fotografias, indique a localidade, as dimensões e o que pretende tratar. Respondemos em menos de 10 minutos. Confirmamos o método, o preço dos serviços e a deslocação antes de marcar."
+      }
     ],
-    relatedService: { label: "Ver preços de limpeza de sofás", href: "/limpeza-sofas" },
-    relatedPosts: [
+    "relatedService": {
+      "label": "Ver preços de limpeza de sofás",
+      "href": "/limpeza-sofas"
+    },
+    "relatedPosts": [
       "quanto-custa-limpar-sofa-profissional",
       "sinais-sofa-precisa-limpeza-profissional",
-      "impermeabilizacao-sofa-vale-pena",
+      "impermeabilizacao-sofa-vale-pena"
     ],
+    "sources": []
   },
-
   {
-    slug: "como-tirar-manchas-urina-colchao",
-    title: "Como tirar manchas de urina do colchão: guia passo a passo",
-    metaTitle: "Como Tirar Manchas de Urina do Colchão | Guia 2025",
-    metaDescription: "Guia passo a passo para remover manchas e odor de urina do colchão em casa. Soluções para manchas frescas, secas e antigas. Quando é necessária limpeza profissional.",
-    publishDate: "2026-05-20",
-    updatedDate: "2026-05-20",
-    author: DEFAULT_AUTHOR.name,
-    readingTime: 6,
-    category: "Dicas",
-    heroAlt: "Colchão a ser tratado com produto enzimático para remoção de manchas",
-    intro: "Acidentes acontecem, seja com crianças em fase de controlo de esfíncteres, com idosos, ou com animais de estimação. A urina no colchão é uma das situações mais urgentes porque o ácido úrico penetra nas fibras rapidamente e o odor torna-se persistente se não for tratado corretamente. Este guia mostra o que fazer.",
-    sections: [
+    "slug": "como-tirar-manchas-urina-colchao",
+    "title": "Urina no colchão: o que fazer antes da limpeza",
+    "metaTitle": "Urina no colchão: o que fazer antes da limpeza | Kyro Clean",
+    "metaDescription": "Absorva o excesso, evite encharcar e prepare a avaliação. O resultado depende de até onde a urina chegou e do material do colchão.",
+    "publishDate": "2026-05-20",
+    "updatedDate": "2026-09-21",
+    "author": DEFAULT_AUTHOR.name,
+    "readingTime": 2,
+    "category": "Dicas",
+    "heroAlt": "Imagem ilustrativa sobre urina no colchão: o que fazer antes da limpeza",
+    "intro": "Absorva o excesso, evite encharcar e prepare a avaliação. O resultado depende de até onde a urina chegou e do material do colchão.",
+    "sections": [
       {
-        heading: "Porque é tão difícil remover urina do colchão",
-        body: "A urina tem três componentes problemáticos:\n\n**Ureia**: dissolve-se facilmente em água mas deixa manchas amareladas quando seca.\n\n**Ácido úrico**: cria cristais insolúveis nas fibras que libertam odor quando expostos à humidade (por isso o cheiro volta nos dias húmidos mesmo depois de limpar).\n\n**Bactérias**: proliferam nos nutrientes da urina, agravando o odor ao longo do tempo.\n\nOs produtos de limpeza domésticos comuns eliminam a mancha visível mas não destroem os cristais de ácido úrico. Só os **produtos enzimáticos** (que contêm enzimas proteolíticas e uricolíticas) quebram estes cristais definitivamente.",
-        tip: "Se o colchão ainda cheira após limpeza doméstica, é sinal de que os cristais de ácido úrico não foram eliminados. Só tratamento enzimático resolve.",
+        "heading": "Logo após o acidente",
+        "body": "Retire a roupa de cama e absorva o excesso com um pano limpo, pressionando suavemente. Não esfregue nem deite água para diluir. Consulte as instruções do colchão antes de aplicar produtos."
       },
       {
-        heading: "Mancha fresca: aja nos primeiros 30 minutos",
-        body: "Se apanhar a mancha fresca, tem uma grande vantagem. Faça isto por ordem:\n\n1. **Absorva** o máximo de líquido com toalhas absorventes brancas. Pressione firmemente, nunca esfregue.\n2. **Repita** com toalhas secas até não sair mais líquido.\n3. **Misture** na solução: 240ml de água fria + 3 colheres de sopa de bicarbonato de sódio + 1 colher de sopa de detergente de loiça líquido.\n4. **Aplique** a mistura na área afetada com esponja, em movimentos do exterior para o interior.\n5. **Deixe atuar** 10 minutos.\n6. **Absorva** a humidade com toalhas secas e pressão.\n7. **Polvilhe** bicarbonato de sódio seco sobre a área e deixe 8 horas ou toda a noite para neutralizar o odor.\n8. **Aspire** o bicarbonato.\n\nEste método funciona bem para manchas completamente frescas sem penetração profunda.",
+        "heading": "O que não deve esconder da equipa",
+        "body": "Informe quando aconteceu, a zona atingida e os produtos utilizados. Uma fotografia da superfície não mostra tudo o que chegou ao interior, mas ajuda a preparar a avaliação."
       },
       {
-        heading: "Mancha seca ou antiga: o que realmente funciona",
-        body: "Para manchas secas, os produtos domésticos são insuficientes. O que pode tentar:\n\n**Produto enzimático de supermercado** (Anti-Olor Bac, Bio Kleen, etc.): aplique generosamente, cubra com película aderente para manter húmido durante 8 horas. Aspire depois. Funciona para manchas com menos de 1 semana.\n\n**Peróxido de hidrogénio a 3%**: misture com uma gota de detergente de loiça e aplique na mancha. Tem efeito branqueador que pode clarear manchas amareladas. Atenção: pode clarificar tecidos coloridos.\n\n**Manchas com mais de 2 semanas**: os cristais de ácido úrico estão completamente solidificados nas fibras. A limpeza profissional com equipamento de extração a quente e produtos enzimáticos concentrados é a única solução eficaz.",
-        tip: "Nunca use água quente em manchas de urina. O calor fixa as proteínas e os cristais de ácido úrico nas fibras, tornando a remoção permanente impossível.",
+        "heading": "Mancha e odor são avaliados separadamente",
+        "body": "A remoção de uma marca visível e o tratamento do cheiro podem ter resultados diferentes. Resíduos no núcleo podem persistir. Não prometemos eliminar o odor quando não é possível alcançar a sua origem."
       },
       {
-        heading: "Eliminar o odor definitivamente",
-        body: "O odor é frequentemente o problema principal, mesmo depois da mancha visual desaparecer.\n\nO bicarbonato de sódio é o melhor aliado doméstico para neutralizar odores: polvilhe generosamente, deixe 12 horas e aspire.\n\nO vinagre branco (pH ácido) pode ajudar no odor mas não elimina os cristais de ácido úrico.\n\nO que nunca funciona permanentemente: perfumes, ambientadores ou produtos que mascaram o odor. Em dias de humidade o cheiro volta porque os cristais ficam ativados pela humidade.\n\n**A única solução definitiva** para odor persistente é um tratamento enzimático profissional com extração. O equipamento de extração profissional injeta o produto a pressão nas fibras e aspira os resíduos, incluindo os cristais dissolvidos.",
-      },
-      {
-        heading: "Preços de limpeza profissional de colchão",
-        body: `A Kyro Clean trata colchões com urina com um processo de 2 etapas: aplicação de produto enzimático concentrado seguida de extração a quente.\n\nPreços:\n- Colchão solteiro: a partir de ${COLCHAO_SOLTEIRO}\n- Colchão de casal: a partir de ${COLCHAO_CASAL}\n- King size / queen size: a partir de ${COLCHAO_KING}\n\nO colchão fica seco em 3 a 6 horas. Recomendamos sempre o uso de um protetor de colchão impermeável após a limpeza para prevenir futuras infiltrações.`,
-      },
+        "heading": "Intervenção e regresso ao uso",
+        "body": "Avaliamos o revestimento e as manchas, aspiramos, aplicamos o tratamento adequado, escovamos respeitando a fibra, extraímos a sujidade e conferimos o resultado. A escova, a pressão e a humidade são ajustadas ao material. Materiais incompatíveis com água exigem avaliação de outro método.\n\nSecagem média de 3 a 6 horas, dependendo da ventilação, do tecido e das condições do espaço. Utilize a peça apenas depois de estar completamente seca."
+      }
     ],
-    faq: [
+    "faq": [
       {
-        q: "O colchão com mancha de urina pode ser salvo?",
-        a: "Na maioria dos casos sim. Manchas frescas têm taxa de remoção superior a 95%. Manchas antigas com mais de 1 mês são mais difíceis mas geralmente removíveis com tratamento enzimático profissional.",
+        "q": "O cheiro sai sempre?",
+        "a": "Não. A profundidade dos resíduos e a compatibilidade do colchão podem limitar a intervenção."
       },
       {
-        q: "Porque volta o cheiro de urina quando o colchão fica húmido?",
-        a: "Os cristais de ácido úrico na urina reativam-se com a humidade, libertando odor. Produtos domésticos eliminam a mancha visível mas não destroem estes cristais. Só um produto enzimático específico os elimina definitivamente.",
+        "q": "Devo aplicar bicarbonato e vinagre?",
+        "a": "Não improvise misturas. Podem deixar resíduos e acrescentar humidade sem resolver o interior."
       },
       {
-        q: "Quanto tempo depois da limpeza posso usar o colchão?",
-        a: "Após limpeza profissional, o colchão fica utilizável em 3 a 6 horas com ventilação adequada.",
+        "q": "A marca antiga pode permanecer?",
+        "a": "A possibilidade de remoção depende da substância, do tempo decorrido, dos produtos já aplicados e do revestimento. Uma alteração de cor ou dano na fibra pode permanecer depois de a sujidade sair."
       },
       {
-        q: "Vale a pena usar um protetor de colchão após a limpeza?",
-        a: "Altamente recomendado, especialmente em quartos de crianças ou idosos. Um protetor impermeável e respirável impede a penetração de líquidos nas fibras, facilitando enormemente a limpeza de acidentes futuros.",
-      },
+        "q": "Quando volto a fazer a cama?",
+        "a": "Secagem média de 3 a 6 horas, dependendo da ventilação, do tecido e das condições do espaço. Utilize a peça apenas depois de estar completamente seca."
+      }
     ],
-    relatedService: { label: "Ver preços de limpeza de colchões", href: "/limpeza-colchoes" },
-    relatedPosts: [
+    "relatedService": {
+      "label": "Ver limpeza de colchões e orçamento",
+      "href": "/limpeza-colchoes"
+    },
+    "relatedPosts": [
       "quanto-custa-limpar-colchao-profissional",
-      "limpeza-colchao-bebe-crianca",
+      "limpeza-colchao-bebe-crianca"
     ],
+    "sources": []
   },
-
   {
-    slug: "quanto-custa-limpar-alcatifa",
-    title: "Quanto custa limpar uma alcatifa profissionalmente? Preços 2025",
-    metaTitle: "Preço Limpeza de Alcatifa 2025 | Guia Completo | Kyro Clean",
-    metaDescription: "Preços de limpeza profissional de alcatifas em Portugal: sempre orçamentados à medida da área e do estado. O que está incluído, tempo de secagem e como pedir orçamento.",
-    publishDate: "2026-05-20",
-    updatedDate: "2026-05-20",
-    author: DEFAULT_AUTHOR.name,
-    readingTime: 5,
-    category: "Preços",
-    heroAlt: "Técnico a limpar alcatifa de escritório com máquina de extração profissional",
-    intro: "A alcatifa é um dos revestimentos mais difíceis de manter limpa porque acumula pó, ácaros, gordura e partículas em profundidade que a aspiração regular não remove. A limpeza profissional por extração é a única forma de higienizar verdadeiramente. Mas quanto custa? Aqui encontra os preços reais e o que precisa de saber antes de pedir orçamento.",
-    sections: [
+    "slug": "quanto-custa-limpar-alcatifa",
+    "title": "Quanto custa limpar uma alcatifa?",
+    "metaTitle": "Quanto custa limpar uma alcatifa? | Kyro Clean",
+    "metaDescription": "A limpeza de alcatifas é sempre sob orçamento. Saiba quais as medidas, fotografias e condições de acesso necessárias para obter uma proposta.",
+    "publishDate": "2026-05-20",
+    "updatedDate": "2026-09-21",
+    "author": DEFAULT_AUTHOR.name,
+    "readingTime": 2,
+    "category": "Preços",
+    "heroAlt": "Imagem ilustrativa sobre quanto custa limpar uma alcatifa",
+    "intro": "A limpeza de alcatifas é sempre sob orçamento. Saiba quais as medidas, fotografias e condições de acesso necessárias para obter uma proposta.",
+    "sections": [
       {
-        heading: "Quanto custa limpar alcatifa em Portugal (2025)",
-        body: "A limpeza profissional de alcatifas na Kyro Clean é sempre orçamentada à medida, sem tabela fixa por m². O valor final depende de três fatores: a área total a tratar, o estado de sujidade (uma alcatifa nunca aspirada custa mais a tratar do que uma com manutenção regular) e o tipo de espaço (residencial ou comercial, com ou sem restrições de horário).\n\nPara ter uma ideia exata do valor antes de agendar, meça a área e peça orçamento gratuito: a resposta chega tipicamente em menos de 10 minutos.\n\nA deslocação custa a partir de 10€ na área do Porto e aumenta com a distância para outros concelhos.",
-        tip: "Meça a área antes de pedir orçamento: comprimento × largura de cada divisão com alcatifa. Inclua zonas sob mobiliário que também são limpas.",
+        "heading": "Não há preço fixo por metro quadrado",
+        "body": "Indique largura e comprimento de cada área e envie fotografias. A mesma dimensão pode exigir trabalhos diferentes consoante a fibra, a base, as manchas e a instalação."
       },
       {
-        heading: "O que está incluído no preço",
-        body: "Uma limpeza profissional de alcatifa completa inclui:\n\n**Pré-aspiração**: remoção de partículas soltas, pelos e pó antes da limpeza húmida.\n\n**Pré-tratamento de manchas**: identificação e tratamento individual das manchas mais resistentes com produtos específicos.\n\n**Extração a quente**: injeção de água a alta temperatura com agente de limpeza nas fibras, seguida de aspiração imediata da água suja. Remove sujidade, ácaros e bactérias.\n\n**Tratamento de odores**: definido conforme o estado do artigo. A desbacterização pode ser acrescentada como extra opcional.\n\n**Resultado final**: alcatifa higienizada, sem cheiro e seca em 3 a 6 horas dependendo da espessura.",
+        "heading": "O que confirmar no orçamento",
+        "body": "Identifique salas, corredores, escadas e zonas de mobiliário fixo. Confirme as superfícies acessíveis, o horário, a deslocação e eventuais tratamentos escolhidos. A proposta deve explicar o âmbito antes de marcar."
       },
       {
-        heading: "Fatores que influenciam o preço",
-        body: "Além da área, outros fatores afetam o custo final:\n\n**Estado de sujidade**: alcatifas com gordura acumulada, bolor ou manchas antigas requerem pré-tratamentos adicionais que aumentam o tempo de trabalho.\n\n**Tipo de fibra**: alcatifas de lã natural exigem produtos e técnicas específicos. Fibras sintéticas (nylon, polipropileno) toleram processo padrão.\n\n**Acesso e mobiliário**: alcatifas em divisões com muito mobiliário que não pode ser movido têm áreas menos acessíveis.\n\n**Frequência**: clientes com limpeza regular semestral ou anual beneficiam de preços mais baixos porque o estado de sujidade é menor.\n\n**Localização**: taxas de deslocação adicionais fora do Porto.",
+        "heading": "Limpeza ou substituição de uma zona",
+        "body": "O desgaste e a perda de cor não são removidos por detergente. Uma alcatifa com humidade recorrente ou base danificada pode precisar de outra solução. A avaliação explica os limites antes do serviço."
       },
       {
-        heading: "Alcatifa de escritório: diferenças face à residencial",
-        body: "As alcatifas de escritório têm características específicas:\n\n- **Área maior** (tipicamente 50 a 500m²) com preços unitários mais baixos\n- **Uso mais intenso** com mais passagem e sujidade de sapatos\n- **Manchas de café** e comida mais frequentes\n- **Necessidade de minimizar tempo de inatividade**: limpeza geralmente feita ao fim de semana ou fora do horário de trabalho\n\nPara escritórios, a Kyro Clean oferece contratos de manutenção semestral com desconto. O custo de manutenção regular é significativamente inferior ao de uma limpeza de recuperação em alcatifas muito deterioradas.\n\nLimpeza de alcatifa de escritório é também dedutível fiscalmente como despesa de manutenção das instalações.",
-        tip: "Alcatifas de escritório devem ser limpas no mínimo uma vez por ano. Em zonas de entrada e corredores, a cada 6 meses.",
-      },
-      {
-        heading: "Tapete vs alcatifa: qual a diferença para efeitos de preço?",
-        body: "A distinção é importante para o orçamento:\n\n**Tapete**: peça solta com dimensões definidas, colocada sobre o pavimento. Pode ser movido, sacudido e tratado individualmente.\n\n**Alcatifa**: revestimento de piso fixo ou semi-fixo que cobre toda ou parte de uma divisão.\n\nEm ambos os casos, o orçamento é sempre feito à medida (dimensão, tipo de fibra e estado), sem tabela fixa por m², mas o processo de limpeza difere:\n- Tapetes são tratados ao local com possibilidade de movimentação\n- Alcatifas são sempre limpas no local, sem remoção",
-      },
+        "heading": "Tempo para voltar a circular",
+        "body": "Secagem média de 3 a 6 horas, dependendo da ventilação, do tecido e das condições do espaço. Utilize a peça apenas depois de estar completamente seca.\n\nPlaneie a intervenção para permitir secagem e evitar passagem sobre áreas ainda húmidas."
+      }
     ],
-    faq: [
+    "faq": [
       {
-        q: "Quanto tempo seca uma alcatifa após limpeza profissional?",
-        a: "Em média 3 a 6 horas, dependendo da ventilação, espessura da alcatifa e condições do espaço.",
+        "q": "A área basta para saber o preço?",
+        "a": "Não. Também avaliamos material, estado, instalação e acesso."
       },
       {
-        q: "Podem limpar a alcatifa sem tirar os móveis?",
-        a: "Sim. Limpamos à volta do mobiliário e sob peças que possam ser ligeiramente movidas. Peças pesadas como estantes ficam no lugar. O resultado é igualmente eficaz nas áreas acessíveis.",
+        "q": "Existe desconto automático para escritórios?",
+        "a": "Não anunciamos um desconto geral. A equipa confirma a proposta para o trabalho solicitado."
       },
       {
-        q: "A limpeza profissional encolhe a alcatifa?",
-        a: "Não, quando realizada por profissionais com equipamento adequado. O risco de encolhimento existe apenas com lã natural tratada com excesso de água fria. O equipamento de extração a quente controla a quantidade de humidade.",
+        "q": "O preço inclui movimentar todos os móveis?",
+        "a": "Confirme previamente quais as zonas acessíveis e o que pode ser movido."
       },
       {
-        q: "Vale a pena limpar uma alcatifa muito velha?",
-        a: "Depende do estado das fibras. Se as fibras estiverem desgastadas e achatadas, a limpeza não restaura a textura mas remove sujidade e resíduos. Se estiver apenas suja, sim, vale definitivamente a pena limpar.",
-      },
+        "q": "Também limpam tapetes soltos?",
+        "a": "Sim, mediante avaliação própria. Tapetes também são sempre sob orçamento, com medidas de cada peça."
+      }
     ],
-    relatedService: { label: "Ver preços de limpeza de alcatifas", href: "/limpeza-alcatifas" },
-    relatedPosts: [
+    "relatedService": {
+      "label": "Ver preços de limpeza de alcatifas",
+      "href": "/limpeza-alcatifas"
+    },
+    "relatedPosts": [
       "limpeza-tapetes-profissional-guia-completo",
       "limpeza-alcatifa-escritorio",
-      "guia-acaros-em-casa",
+      "guia-acaros-em-casa"
     ],
-  },
+    "sources": []
+  }
 ];
 
-export function getAllPosts(): BlogPost[] {
-  return posts;
-}
-
-export function getPostBySlug(slug: string): BlogPost | undefined {
-  return posts.find(p => p.slug === slug);
-}
-
-export function getRelatedPosts(slugs: string[]): BlogPost[] {
-  return slugs.map(s => posts.find(p => p.slug === s)).filter(Boolean) as BlogPost[];
-}
+export function getAllPosts(): BlogPost[] { return posts; }
+export function getPostBySlug(slug: string): BlogPost | undefined { return posts.find(p => p.slug === slug); }
+export function getRelatedPosts(slugs: string[]): BlogPost[] { return slugs.map(getPostBySlug).filter((p): p is BlogPost => Boolean(p)); }
