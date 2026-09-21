@@ -12,7 +12,7 @@ const WhatsAppPanel = lazy(() => import("./admin/WhatsAppPanel"));
 const QuizLeadsPanel = lazy(() => import("./admin/QuizLeadsPanel"));
 const MarketingPanel = lazy(() => import("./admin/MarketingPanel"));
 
-type Tab = "sitemap" | "errors" | "metrics" | "crm" | "whatsapp" | "quiz-leads" | "marketing";
+type Tab = "sitemap" | "errors" | "metrics" | "crm" | "whatsapp" | "quiz-leads" | "marketing" | "meta-marketing";
 
 const TabFallback = () => (
   <div className="flex items-center justify-center py-16">
@@ -153,6 +153,7 @@ const AdminPanel = () => {
             { id: "crm",       label: "CRM",          icon: Users },
             { id: "quiz-leads", label: "Quiz Leads",  icon: Mail },
             { id: "marketing", label: "Google Ads",  icon: Megaphone },
+            { id: "meta-marketing", label: "Meta Ads", icon: Megaphone },
             { id: "whatsapp",  label: "WhatsApp",      icon: MessageCircle },
             { id: "sitemap",   label: "Sitemaps",      icon: Globe },
             { id: "errors",    label: "Error Log",     icon: AlertTriangle },
@@ -221,8 +222,12 @@ const AdminPanel = () => {
 
         {activeTab === "marketing" && (
           <Suspense fallback={<TabFallback />}>
-            <MarketingPanel />
+            <MarketingPanel key="google" platform="google" />
           </Suspense>
+        )}
+
+        {activeTab === "meta-marketing" && (
+          <Suspense fallback={<TabFallback />}><MarketingPanel key="meta" platform="meta" /></Suspense>
         )}
 
         {activeTab === "whatsapp" && (

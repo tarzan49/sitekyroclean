@@ -1381,3 +1381,7 @@ Pedido aprovado: a paleta verde suave do piloto passa a ser partilhada pelo site
 ## Exemplos dos serviços nacionais (13/09/2026)
 
 `ServiceExamplesGallery` substitui `ServiceAutoCarousel` nas seis páginas principais, com quatro exemplos em duas colunas. `serviceExamples.ts` seleciona imagens estáveis das bibliotecas existentes e partilha os dados com o prerender. `VisualExamplesGallery` aceita miniatura, srcset e sizes opcionais; as restantes galerias conservam os valores anteriores. Versões 400/800px em `public/images/service-examples/`; originais da biblioteca só na ampliação. Miniaturas mobile entre 7 e 25 KB, 24 imagens nos seis serviços.
+
+## CRM por plataforma (22/09/2026)
+
+Admin: `marketing` (Google) e `meta-marketing` partilham `MarketingPanel` com filtro explícito de plataforma (`marketingPlatforms.ts`). `MarketingInputs` permite gasto diário e pedido manual com evidência de origem; `ad_spend_daily`, `register_marketing_lead` e `set_marketing_lead_status` dependem da migração aditiva `20260922000000_meta_marketing.sql`. Meta Pixel inclui Lead apenas após CRM confirmado e eventos personalizados de clique separados. Sem CAPI ou importação automática de mensagens. Regras, limites e publicação em `docs/marketing-meta-crm.md`. Dados financeiros privados da auditoria não entram no repositório público.

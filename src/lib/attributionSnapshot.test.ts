@@ -170,3 +170,12 @@ describe('janela de 30 minutos do last touch', () => {
     expect(depois.first_campaign).toBe('um');
   });
 });
+
+describe('Meta', () => {
+  it('preserva campanha/conjunto/anúncio e não declara uma partilha orgânica como paga', () => {
+    at('https://cleansolutions.com.pt/?fbclid=organic');
+    expect(getAttributionSnapshot()).toMatchObject({last_source:'facebook',last_medium:'social',is_paid:false,fbclid:'organic'});
+    at('https://cleansolutions.com.pt/?utm_source=ig&utm_medium=paid_social&utm_campaign=Sofas&meta_campaign_id=111&meta_adset_id=222&meta_ad_id=333&meta_placement=feed');
+    expect(getAttributionSnapshot()).toMatchObject({last_source:'ig',is_paid:true,meta_campaign_id:'111',meta_adset_id:'222',meta_ad_id:'333',meta_placement:'feed',attribution_method:'website'});
+  });
+});

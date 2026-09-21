@@ -7,19 +7,22 @@ import { supabase } from "@/integrations/supabase/client";
 import { fetchAllRows } from "@/lib/quizMetrics";
 import {
   ADS_CUSTOMER_CONVERSION_ACTION, ADS_LEAD_CONVERSION_LABEL, ADS_QUALIFIED_LEAD_ACTION,
-  GA4_MEASUREMENT_ID, GOOGLE_ADS_CUSTOMER_ID, GOOGLE_ADS_ID,
+  GA4_MEASUREMENT_ID, GOOGLE_ADS_CUSTOMER_ID, GOOGLE_ADS_ID, META_PIXEL_ID,
 } from "@/constants/tracking";
 import {
   buildOfflineConversionsCsv, costMetrics, countFunnel, countObservedSessions, countPaidSessions,
   coverage, groupByCampaign, groupByChannel, groupByLandingPage, joinLeads, observedOnly,
-  offlineCandidates, paidOnly, rate, METRIC_DEFINITIONS, STATUS_RANK, UNKNOWN,
+  offlineCandidates, rate, METRIC_DEFINITIONS, STATUS_RANK, UNKNOWN,
   type AttributionRow, type ContactLogRow, type ConversionExportRow, type JoinedLead,
   type LeadRow, type SessionEventRow, type StatusHistoryRow,
 } from "@/lib/marketingMetrics";
 import { LEAD_STATUSES, type LeadStatusValue } from "@/lib/leadTracking";
 
+import { platformLeads, platformEvents, coveredSpend, periodDates, lisbonMidnight, PLATFORM_LABEL, META_URL_PARAMETERS, type MarketingPlatform, type DailySpend } from '@/lib/marketingPlatforms';
+import { ManualMarketingLead, SpendForm } from './MarketingInputs';
+
 /**
- * Painel operacional de Google Ads.
+ * Painel operacional partilhado, com separação explícita de Google Ads e Meta Ads.
  *
  * Três regras que decidem tudo o que está aqui:
  *
@@ -96,7 +99,7 @@ const Card = ({ label, value, icon: Icon, origin, hint }: {
     </div>
     <p className="text-2xl font-bold text-navy">{value}</p>
     <p className={`text-[11px] mt-1 ${origin === "operacional" ? "text-emerald-700" : "text-sky-700"}`}>
-      {origin === "operacional" ? "Operacional · todos os pedidos" : "Observado · só com consentimento"}
+      {origin === "operacional" ? "Operacional · pedidos selecionados" : "Observado · só com consentimento"}
     </p>
     {hint && <p className="text-xs text-gray-400 mt-0.5">{hint}</p>}
   </div>
@@ -142,7 +145,11 @@ const Notice = ({ tone, title, children }: { tone: "red" | "amber" | "sky"; titl
 
 // ── Componente ───────────────────────────────────────────────────────────────
 
-const MarketingPanel = () => {
+const MarketingPanel = ({ platform = "google" }: { platform?: MarketingPlatform }) => {
+  const isMeta = platform === "meta";
+  const platformLabel = PLATFORM_LABEL[platform];
+  const [spendRows, setSpendRows] = useState<DailySpend[]>([]);
+  const [showManualLead, setShowManualLead] = useState(false);
   const [days, setDays] = useState<number>(30);
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<string[]>([]);
@@ -153,14 +160,14 @@ const MarketingPanel = () => {
   const [contacts, setContacts] = useState<ContactLogRow[]>([]);
   const [exportsRows, setExportsRows] = useState<ConversionExportRow[]>([]);
   const [deliveryFailures, setDeliveryFailures] = useState<number | null>(null);
-  const [onlyPaid, setOnlyPaid] = useState(false);
   const [selected, setSelected] = useState<JoinedLead | null>(null);
   const [saving, setSaving] = useState(false);
   const [showContactForm, setShowContactForm] = useState(false);
 
   const load = useCallback(async () => {
     setLoading(true);
-    const since = new Date(Date.now() - days * 86400000).toISOString();
+    const period = periodDates(days);
+    const since = lisbonMidnight(period.start);
     const failures: string[] = [];
 
     /**
@@ -176,28 +183,32 @@ const MarketingPanel = () => {
       }
     };
 
-    const [leadRows, attributionRows, historyRows, eventRows, contactRows, exportRows, errorCount] = await Promise.all([
+    const [leadRows, attributionRows, historyRows, eventRows, contactRows, exportRows, spend, errorCount] = await Promise.all([
       safe("leads", () => fetchAllRows<LeadRow>((from, to) => db.from("leads")
-        .select("id, created_at, lead_id, service, location, source, funnel_status, quoted_value, booked_value, final_revenue, amount_received, payment_received_at, completed_at", { count: "exact" })
+        .select("id, created_at, lead_id, name, phone, notes, service, location, source, funnel_status, quoted_value, booked_value, final_revenue, amount_received, payment_received_at, completed_at", { count: "exact" })
         .gte("created_at", since).order("created_at", { ascending: false }).order("id").range(from, to))),
       safe("lead_attribution", () => fetchAllRows<AttributionRow>((from, to) => db.from("lead_attribution")
         .select("*", { count: "exact" }).gte("created_at", since).order("created_at").order("lead_id").range(from, to))),
       safe("lead_status_history", () => fetchAllRows<StatusHistoryRow>((from, to) => db.from("lead_status_history")
         .select("*", { count: "exact" }).order("changed_at").range(from, to))),
       safe("quiz_events", () => fetchAllRows<SessionEventRow>((from, to) => db.from("quiz_events")
-        .select("session_id, action, created_at, page_path, landing_page, is_paid, campaign_id", { count: "exact" })
+        .select("session_id, action, created_at, page_path, landing_page, is_paid, campaign_id, utm_source, utm_medium, gclid, gbraid, wbraid, meta_campaign_id, meta_adset_id, meta_ad_id, meta_placement", { count: "exact" })
         .gte("created_at", since).order("created_at").order("session_id").range(from, to))),
       safe("contact_log", () => fetchAllRows<ContactLogRow>((from, to) => db.from("contact_log")
         .select("*", { count: "exact" }).gte("occurred_at", since).order("occurred_at").range(from, to))),
       safe("conversion_exports", () => fetchAllRows<ConversionExportRow>((from, to) => db.from("conversion_exports")
         .select("*", { count: "exact" }).order("created_at").range(from, to))),
+      safe("ad_spend_daily", () => fetchAllRows<DailySpend>((from, to) => db.from("ad_spend_daily")
+        .select("platform, spend_date, amount", { count: "exact" }).eq("platform", platform)
+        .gte("spend_date", period.start).lte("spend_date", period.end).order("spend_date").range(from, to))),
       // Falhas de entrega do canal do CRM nas últimas 24h: um pedido que só
       // chegou por email existe na caixa de correio e não existe em `leads`.
       (async () => {
         try {
-          const { count } = await db.from("error_logs").select("id", { count: "exact", head: true })
+          const { count, error } = await db.from("error_logs").select("id", { count: "exact", head: true })
             .in("source", ["QuizForm-crm", "QuizForm-submit"])
             .gte("created_at", new Date(Date.now() - 86400000).toISOString());
+          if (error) throw error;
           return count ?? 0;
         } catch { return null; }
       })(),
@@ -205,37 +216,46 @@ const MarketingPanel = () => {
 
     setLeads(leadRows); setAttribution(attributionRows); setStatusHistory(historyRows);
     setEvents(eventRows); setContacts(contactRows); setExportsRows(exportRows);
+    setSpendRows(spend);
     setDeliveryFailures(errorCount as number | null);
     setErrors(failures);
     setLoading(false);
-  }, [days]);
+  }, [days, platform]);
 
   useEffect(() => { void load(); }, [load]);
 
   const joinedAll = useMemo(() => joinLeads(leads, attribution, statusHistory), [leads, attribution, statusHistory]);
-  const joined = useMemo(() => (onlyPaid ? paidOnly(joinedAll) : joinedAll), [joinedAll, onlyPaid]);
+  const joined = useMemo(() => platformLeads(joinedAll, platform), [joinedAll, platform]);
+  const filteredEvents = useMemo(() => platformEvents(events, platform), [events, platform]);
+  const linkedContacts = useMemo(() => contacts.filter(c => joined.some(j => j.lead.id === c.lead_row_id)), [contacts, joined]);
+  const period = periodDates(days);
+  const spend = coveredSpend(spendRows, platform, period.start, period.end);
   const funnel = useMemo(() => countFunnel(joined.map(item => item.lead), statusHistory), [joined, statusHistory]);
   const cover = useMemo(() => coverage(joinedAll), [joinedAll]);
 
-  // Sem gasto importado. `null` de propósito, com o motivo por escrito.
-  const cost = useMemo(() => costMetrics(null, funnel), [funnel]);
+  // Só calcula custos quando todos os dias têm gasto explícito e as leituras passaram.
+  const cost = costMetrics(errors.length ? null : spend.rows, funnel);
 
-  const paidSessions = useMemo(() => countPaidSessions(events), [events]);
-  const observedSessions = useMemo(() => countObservedSessions(events), [events]);
-  const campaignRows = useMemo(() => groupByCampaign(observedOnly(joined)), [joined]);
-  const landingRows = useMemo(() => groupByLandingPage(joined, events), [joined, events]);
-  const channelRows = useMemo(() => groupByChannel(joined, events, contacts), [joined, events, contacts]);
+  const paidSessions = useMemo(() => countPaidSessions(filteredEvents), [filteredEvents]);
+  const observedSessions = useMemo(() => countObservedSessions(filteredEvents), [filteredEvents]);
+  const campaignRows = useMemo(() => groupByCampaign(observedOnly(joined).map(j => isMeta && j.attribution ? { ...j, attribution: { ...j.attribution,
+    last_campaign: j.attribution.last_campaign ?? j.attribution.meta_campaign_id ?? null,
+    ad_group_id: j.attribution.meta_adset_id ?? null, keyword: j.attribution.meta_ad_id ?? null,
+    match_type: j.attribution.meta_placement ?? null,
+  } } : j)), [joined, isMeta]);
+  const landingRows = useMemo(() => groupByLandingPage(joined.filter(j => j.attribution?.attribution_method !== 'manual'), filteredEvents), [joined, filteredEvents]);
+  const channelRows = useMemo(() => groupByChannel(joined, filteredEvents, linkedContacts), [joined, filteredEvents, linkedContacts]);
 
   const qualifiedCandidates = useMemo(
     () => ADS_QUALIFIED_LEAD_ACTION
-      ? offlineCandidates(joinedAll, exportsRows, { conversionAction: ADS_QUALIFIED_LEAD_ACTION, minRank: STATUS_RANK.QUALIFIED })
+      ? offlineCandidates(joined, exportsRows, { conversionAction: ADS_QUALIFIED_LEAD_ACTION, minRank: STATUS_RANK.QUALIFIED, history: statusHistory })
       : [],
-    [joinedAll, exportsRows]);
+    [joined, exportsRows, statusHistory]);
   const customerCandidates = useMemo(
     () => ADS_CUSTOMER_CONVERSION_ACTION
-      ? offlineCandidates(joinedAll, exportsRows, { conversionAction: ADS_CUSTOMER_CONVERSION_ACTION, minRank: STATUS_RANK.COMPLETED })
+      ? offlineCandidates(joined, exportsRows, { conversionAction: ADS_CUSTOMER_CONVERSION_ACTION, minRank: STATUS_RANK.COMPLETED, history: statusHistory })
       : [],
-    [joinedAll, exportsRows]);
+    [joined, exportsRows, statusHistory]);
 
   /**
    * Exportar **e registar** que foi exportado, na mesma ação.
@@ -293,32 +313,21 @@ const MarketingPanel = () => {
    */
   const changeStatus = async (item: JoinedLead, next: LeadStatusValue) => {
     setSaving(true);
-    const previous = item.lead.funnel_status;
-    const patch: Record<string, unknown> = { funnel_status: next };
-    if (next === "COMPLETED" && !item.lead.completed_at) patch.completed_at = new Date().toISOString();
-    const { error } = await db.from("leads").update(patch).eq("id", item.lead.id);
-    if (!error) {
-      await db.from("lead_status_history").insert({
-        lead_row_id: item.lead.id, lead_id: item.lead.lead_id,
-        previous_status: previous, new_status: next,
-      });
-      await load();
-      setSelected(null);
-    } else {
-      setErrors(prev => [...prev, `Não foi possível mudar o estado: ${error.message}`]);
-    }
+    const { error } = await db.rpc("set_marketing_lead_status", { row_id: item.lead.id, next_status: next });
+    if (error) setErrors(prev => [...prev, `Não foi possível mudar o estado: ${error.message}`]);
+    else { await load(); setSelected(null); }
     setSaving(false);
   };
 
   const saveValue = async (item: JoinedLead, field: "quoted_value" | "booked_value" | "final_revenue" | "amount_received", value: string) => {
     const parsed = value.trim() === "" ? null : Number(value.replace(",", "."));
-    if (parsed !== null && Number.isNaN(parsed)) return;
+    if (parsed !== null && (!Number.isFinite(parsed) || parsed < 0)) { setErrors(prev => [...prev, "Introduza um valor finito e não negativo."]); return; }
     setSaving(true);
     const patch: Record<string, unknown> = { [field]: parsed };
     if (field === "amount_received") patch.payment_received_at = parsed === null ? null : new Date().toISOString();
     const { error } = await db.from("leads").update(patch).eq("id", item.lead.id);
     if (error) setErrors(prev => [...prev, `Não foi possível gravar o valor: ${error.message}`]);
-    else await load();
+    else { await load(); setSelected(prev => prev?.lead.id === item.lead.id ? { ...prev, lead: { ...prev.lead, [field]: parsed } } : prev); }
     setSaving(false);
   };
 
@@ -332,11 +341,11 @@ const MarketingPanel = () => {
     <div className="space-y-4">
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
-          <h2 className="text-lg font-bold text-navy">Marketing / Google Ads</h2>
+          <h2 className="text-lg font-bold text-navy">Marketing / {platformLabel}</h2>
           <p className="text-sm text-gray-500">
-            GA4 <code className="bg-gray-100 px-1 rounded text-xs">{GA4_MEASUREMENT_ID}</code>
+            {isMeta ? <>Pixel <code className="bg-gray-100 px-1 rounded text-xs">{META_PIXEL_ID}</code></> : <>GA4 <code className="bg-gray-100 px-1 rounded text-xs">{GA4_MEASUREMENT_ID}</code>
             {" · "}Conversões <code className="bg-gray-100 px-1 rounded text-xs">{GOOGLE_ADS_ID}</code>
-            {" · "}Cliente <code className="bg-gray-100 px-1 rounded text-xs">{GOOGLE_ADS_CUSTOMER_ID}</code>
+            {" · "}Cliente <code className="bg-gray-100 px-1 rounded text-xs">{GOOGLE_ADS_CUSTOMER_ID}</code></>}
           </p>
         </div>
         <div className="flex gap-2 flex-wrap">
@@ -348,10 +357,7 @@ const MarketingPanel = () => {
               </button>
             ))}
           </div>
-          <button onClick={() => setOnlyPaid(prev => !prev)}
-            className={`px-3 py-2 text-xs font-medium rounded-lg border transition-colors ${onlyPaid ? "bg-gold/10 border-gold text-navy" : "border-gray-200 text-navy hover:border-navy/30"}`}>
-            {onlyPaid ? "Só tráfego pago" : "Todo o tráfego"}
-          </button>
+          <button onClick={() => setShowManualLead(true)} className="min-h-11 px-3 text-xs rounded-lg bg-navy text-white">Registar pedido real</button>
           <button onClick={() => void load()} disabled={loading}
             className="flex items-center gap-1.5 px-3 py-2 text-xs font-medium rounded-lg border border-gray-200 text-navy hover:border-navy/30 transition-colors disabled:opacity-50">
             <RefreshCw className={`w-3.5 h-3.5 ${loading ? "animate-spin" : ""}`} /> Atualizar
@@ -359,11 +365,24 @@ const MarketingPanel = () => {
         </div>
       </div>
 
+      <Notice tone="sky" title={`Acompanhamento de ${platformLabel}`}>
+        Apenas pedidos e visitas atribuídos a esta plataforma. Pedidos sem origem continuam no separador Quiz Leads e na cobertura global.
+        O funil usa a data do pedido; valores recebidos são os desses pedidos, não um extrato de caixa do período.
+      </Notice>
+      {isMeta && <Section title="Pixel e origem dos anúncios" subtitle="O CRM não é o Gestor de Eventos da Meta e não confirma receção de eventos pela plataforma.">
+        <div className="p-4 space-y-3 text-sm">
+          <p><strong>PageView:</strong> visita. <strong>WhatsAppClick / PhoneClick:</strong> intenção. <strong>Lead:</strong> formulário confirmado pelo CRM, sem valor de venda. Tudo sujeito a consentimento publicitário.</p>
+          <p>Marcações e pagamentos são registados aqui. Não enviamos Purchase a partir do browser do administrador. A Conversions API e a importação automática de mensagens/formulários instantâneos não estão ligadas.</p>
+          <p>Parâmetros de URL a colocar nos anúncios que levam ao site:</p><code className="block break-all rounded bg-gray-50 p-3 text-xs">{META_URL_PARAMETERS}</code>
+          <p>Um fbclid isolado pode vir de uma partilha orgânica. Só uma origem paga explícita entra neste painel. Conversas iniciadas diretamente nos anúncios devem ser registadas como pedidos reais.</p>
+          <a href="https://business.facebook.com/events_manager2/" target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center underline">Verificar eventos na Meta</a>
+        </div>
+      </Section>}
       {/* ── Saúde operacional: primeiro, porque é o que não pode falhar ──── */}
       {errors.length > 0 && (
         <Notice tone="red" title="Leituras que falharam — os números abaixo estão incompletos">
           <ul className="list-disc pl-4 space-y-0.5">{errors.map((message, i) => <li key={i}>{message}</li>)}</ul>
-          <p className="mt-2">Se estas tabelas ainda não existem, falta colar a migração <code className="bg-red-100 px-1 rounded">20260918000000_marketing_attribution.sql</code> no SQL Editor.</p>
+          <p className="mt-2">Confirme o acesso administrativo e as migrações de marketing, incluindo <code className="bg-red-100 px-1 rounded">20260922000000_meta_marketing.sql</code>.</p>
         </Notice>
       )}
 
@@ -383,7 +402,7 @@ const MarketingPanel = () => {
         </Notice>
       )}
 
-      {missingConfig.length > 0 && (
+      {!isMeta && missingConfig.length > 0 && (
         <Notice tone="amber" title="Configuração do Google Ads por fazer">
           <p>Falta: {missingConfig.join("; ")}.</p>
           <p className="mt-1">
@@ -396,7 +415,7 @@ const MarketingPanel = () => {
 
       {/* ── A. Overview ──────────────────────────────────────────────────── */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-        <Card label="Leads" value={String(funnel.leads)} icon={Users} origin="operacional" hint={onlyPaid ? "Filtrado a tráfego pago" : undefined} />
+        <Card label="Leads" value={String(funnel.leads)} icon={Users} origin="operacional" hint={`Pedidos atribuídos a ${platformLabel}; inclui registos manuais identificados.`} />
         <Card label="Leads válidos" value={String(funnel.valid)} icon={CheckCircle} origin="operacional" />
         <Card label="Qualificados" value={String(funnel.qualified)} icon={Target} origin="operacional" />
         <Card label="Marcações" value={String(funnel.bookings)} icon={TrendingUp} origin="operacional" />
@@ -408,20 +427,20 @@ const MarketingPanel = () => {
         <Card label="Taxa lead → cliente" value={percent(rate(funnel.customers, funnel.leads))} icon={TrendingUp} origin="operacional"
           hint="Concluídos / leads operacionais" />
         <Card label="Sessões observadas" value={String(observedSessions)} icon={MousePointerClick} origin="observado" />
-        <Card label="Sessões pagas" value={String(paidSessions)} icon={MousePointerClick} origin="observado" hint="Com identificador de clique" />
-        <Card label="Leads observados" value={String(cover.observedLeads)} icon={Users} origin="observado" hint="Com atribuição registada" />
-        <Card label="Cobertura" value={percent(cover.observedShare)} icon={Info} origin="observado" hint="Leads observados / leads operacionais" />
+        <Card label="Sessões pagas" value={String(paidSessions)} icon={MousePointerClick} origin="observado" hint="Origem paga identificada" />
+        <Card label="Leads observados" value={String(joined.filter(j => j.attribution?.attribution_method !== "manual").length)} icon={Users} origin="observado" hint="Com atribuição registada" />
+        <Card label="Cobertura" value={percent(cover.observedShare)} icon={Info} origin="observado" hint="Cobertura global do CRM; não é a quota desta plataforma" />
       </div>
 
       {/* Economia — explicitamente por ligar */}
-      <Section title="Custo, CAC e ROAS" subtitle="Precisa do gasto publicitário importado do Google Ads.">
+      <Section title="Custo, CAC e ROAS" subtitle="Gasto registado por dia. Indicadores por pedidos recebidos neste período e valores conhecidos desses pedidos.">
         <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 p-4">
           {[
             { label: "Gasto", value: money(cost.cost) },
             { label: "CPL", value: money(cost.cpl) },
             { label: "CPA (marcação)", value: money(cost.cpa) },
-            { label: "CAC (cliente)", value: money(cost.cac) },
-            { label: "ROAS", value: ratio(cost.roas) },
+            { label: "Custo / serviço concluído", value: money(cost.cac) },
+            { label: "Retorno faturado observado", value: ratio(cost.roas) },
           ].map(item => (
             <div key={item.label} className="rounded-xl border border-dashed border-gray-200 p-3">
               <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">{item.label}</p>
@@ -429,21 +448,23 @@ const MarketingPanel = () => {
             </div>
           ))}
         </div>
+        <p className="px-4 text-xs text-gray-500">Período: {period.start} a {period.end}, Portugal. {spend.missing} dias sem gasto registado. Total parcial registado: {euros(spend.total)}.</p>
         <p className="px-4 pb-4 text-xs text-gray-500">
           {cost.unavailableReason ?? cost.warnings.join(" ")} Nenhum destes números é estimado.
-          A receita acima já é real — vem dos valores registados em cada lead.
+          Os valores vêm dos registos manuais. Serviços concluídos não são necessariamente novos clientes. O retorno observado não prova incremento nem corresponde à atribuição da plataforma.
           Ver <code className="bg-gray-100 px-1 rounded">docs/tracking-google-ads.md</code>.
         </p>
+        <SpendForm platform={platform} onSaved={() => void load()} />
       </Section>
 
       {/* ── B. Leads por campanha ────────────────────────────────────────── */}
       <Section title="Leads por campanha"
-        subtitle="Só leads observados (com atribuição). Atribuição last touch, que é a que o Google Ads credita — o first touch está no detalhe de cada lead e nunca é somado a este. Palavra-chave é a da conta (ValueTrack), não o termo que a pessoa escreveu.">
-        {campaignRows.length === 0 ? <Empty>Sem leads observados no período escolhido.</Empty> : (
+        subtitle="Pedidos com origem registada. Última origem conhecida no site, ou origem declarada no registo manual. Pode diferir da atribuição da plataforma. Palavra-chave é a da conta (ValueTrack), não o termo que a pessoa escreveu.">
+        {campaignRows.length === 0 ? <Empty>Sem pedidos atribuídos no período escolhido.</Empty> : (
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead><tr className="border-b border-gray-100 bg-gray-50/80">
-                <Th>Campanha</Th><Th>Grupo</Th><Th>Palavra-chave</Th><Th>Correspondência</Th><Th>Dispositivo</Th>
+                <Th>Campanha</Th><Th>{isMeta ? "Conjunto" : "Grupo"}</Th><Th>{isMeta ? "Anúncio" : "Palavra-chave"}</Th><Th>{isMeta ? "Posicionamento" : "Correspondência"}</Th><Th>Dispositivo</Th>
                 <Th>Landing</Th><Th right>Leads</Th><Th right>Válidos</Th><Th right>Marcações</Th><Th right>Clientes</Th><Th right>Faturado</Th>
               </tr></thead>
               <tbody>
@@ -518,11 +539,11 @@ const MarketingPanel = () => {
             </tbody>
           </table>
         </div>
-        {contacts.length > 0 && (
+        {linkedContacts.length > 0 && (
           <div className="px-4 py-3 border-t border-gray-100">
             <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Últimos contactos registados</p>
             <ul className="space-y-1">
-              {contacts.slice(-8).reverse().map(contact => (
+              {linkedContacts.slice(-8).reverse().map(contact => (
                 <li key={contact.id} className="text-xs text-navy flex flex-wrap gap-x-2">
                   <span className="text-gray-400 tabular-nums">{new Date(contact.occurred_at).toLocaleString("pt-PT")}</span>
                   <span className="font-medium">{contact.channel}</span>
@@ -537,8 +558,8 @@ const MarketingPanel = () => {
       </Section>
 
       {/* ── Conversões offline ───────────────────────────────────────────── */}
-      <Section title="Conversões offline para o Google Ads"
-        subtitle="Exportar não é importar. Exportado, carregado e aceite são três estados diferentes e estão registados em separado.">
+      {!isMeta && <Section title="Conversões offline para o Google Ads"
+        subtitle="CSV legado para GCLID e etapas com data conhecida. GBRAID/WBRAID exigem Data Manager. Exportar não confirma receção pela Google.">
         <div className="p-4 flex flex-wrap gap-2">
           <button
             disabled={saving || !ADS_QUALIFIED_LEAD_ACTION || qualifiedCandidates.length === 0}
@@ -590,7 +611,7 @@ const MarketingPanel = () => {
             </table>
           </div>
         )}
-      </Section>
+      </Section>}
 
       {/* ── E. Leads + atribuição ────────────────────────────────────────── */}
       <Section title="Leads" subtitle="Abrir um lead mostra a atribuição completa e permite mudar o estado do funil.">
@@ -598,7 +619,7 @@ const MarketingPanel = () => {
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead><tr className="border-b border-gray-100 bg-gray-50/80">
-                <Th>Data</Th><Th>Serviço</Th><Th>Local</Th><Th>Origem</Th><Th>Campanha</Th><Th>Estado</Th><Th right>Faturado</Th><Th right>Recebido</Th>
+                <Th>Data</Th><Th>Cliente</Th><Th>Serviço</Th><Th>Local</Th><Th>Origem</Th><Th>Campanha</Th><Th>Estado</Th><Th right>Faturado</Th><Th right>Recebido</Th>
               </tr></thead>
               <tbody>
                 {joined.slice(0, 200).map(item => {
@@ -606,9 +627,10 @@ const MarketingPanel = () => {
                   return (
                     <tr key={item.lead.id} onClick={() => setSelected(item)} className="border-b border-gray-50 hover:bg-gray-50/50 cursor-pointer">
                       <Td>{new Date(item.lead.created_at).toLocaleDateString("pt-PT", { day: "2-digit", month: "2-digit", year: "2-digit" })}</Td>
+                      <Td><button className="min-h-11 underline" onClick={() => setSelected(item)}>{item.lead.name ?? item.lead.lead_id ?? "Abrir pedido"}</button></Td>
                       <Td>{item.lead.service ?? UNKNOWN}</Td>
                       <Td>{item.lead.location ?? UNKNOWN}</Td>
-                      <Td muted={!a?.last_source}>{a?.last_source ?? UNKNOWN}{a?.is_paid ? " (pago)" : ""}</Td>
+                      <Td muted={!a?.last_source}>{a?.last_source ?? UNKNOWN}{a?.attribution_method === "manual" ? " (manual)" : a?.is_paid ? " (pago)" : ""}</Td>
                       <Td muted={!a?.last_campaign}>{a?.last_campaign ?? UNKNOWN}</Td>
                       <Td>
                         <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium border ${STATUS_STYLE[item.lead.funnel_status ?? "NEW"]}`}>
@@ -648,6 +670,7 @@ const MarketingPanel = () => {
         </div>
       </Section>
 
+      {showManualLead && <ManualMarketingLead platform={platform} onClose={() => setShowManualLead(false)} onSaved={() => void load()} />}
       {selected && (
         <LeadDetail
           item={selected}
@@ -661,7 +684,7 @@ const MarketingPanel = () => {
 
       {showContactForm && (
         <ContactForm
-          leads={joinedAll}
+          leads={joined}
           saving={saving}
           onClose={() => setShowContactForm(false)}
           onSave={async payload => {
@@ -697,7 +720,7 @@ const ContactForm = ({ leads, saving, onClose, onSave }: {
   const [channel, setChannel] = useState("whatsapp");
   const [leadRowId, setLeadRowId] = useState("");
   const [note, setNote] = useState("");
-  const [occurredAt, setOccurredAt] = useState(() => new Date().toISOString().slice(0, 16));
+  const [occurredAt, setOccurredAt] = useState(() => { const now = new Date(); return new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString().slice(0, 16); });
 
   return (
     <div className="fixed inset-0 bg-black/40 flex items-center justify-center p-4 z-50" onClick={onClose}>
@@ -722,7 +745,7 @@ const ContactForm = ({ leads, saving, onClose, onSave }: {
             </select>
           </label>
           <label className="block">
-            <span className="text-[11px] text-gray-400">Quando</span>
+            <span className="text-[11px] text-gray-400">Quando (hora deste dispositivo)</span>
             <input type="datetime-local" value={occurredAt} onChange={e => setOccurredAt(e.target.value)}
               className="w-full mt-0.5 border border-gray-200 rounded-lg px-2.5 py-1.5 text-sm text-navy outline-none focus:border-navy/40" />
           </label>
@@ -733,7 +756,7 @@ const ContactForm = ({ leads, saving, onClose, onSave }: {
               <option value="">Sem lead associado</option>
               {leads.slice(0, 100).map(item => (
                 <option key={item.lead.id} value={item.lead.id}>
-                  {new Date(item.lead.created_at).toLocaleDateString("pt-PT")} · {item.lead.service ?? "?"} · {item.lead.location ?? "?"}
+                  {item.lead.name ?? item.lead.lead_id} · {new Date(item.lead.created_at).toLocaleDateString("pt-PT")} · {item.lead.service ?? "?"} · {item.lead.location ?? "?"}
                 </option>
               ))}
             </select>
@@ -795,6 +818,7 @@ const LeadDetail = ({ item, history, saving, onClose, onChangeStatus, onSaveValu
         </div>
 
         <div className="flex-1 overflow-auto p-5 space-y-5">
+          <div><Field label="Nome" value={item.lead.name} /><Field label="Telefone" value={item.lead.phone} /><Field label="Notas / confirmação da origem" value={item.lead.notes} /></div>
           <div>
             <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Estado do funil</p>
             <div className="flex flex-wrap gap-1.5">
@@ -842,7 +866,12 @@ const LeadDetail = ({ item, history, saving, onClose, onChangeStatus, onSaveValu
                   <Field label="Source" value={a.last_source} />
                   <Field label="Medium" value={a.last_medium} />
                   <Field label="Campanha" value={a.last_campaign} />
-                  <Field label="Campaign ID" value={a.campaign_id} />
+                  <Field label="Tipo de atribuição" value={a.attribution_method === "manual" ? "Declaração manual" : "Observada no site"} />
+                  <Field label="Campanha Meta" value={a.meta_campaign_id} />
+                  <Field label="Conjunto Meta" value={a.meta_adset_id} />
+                  <Field label="Anúncio Meta" value={a.meta_ad_id} />
+                  <Field label="Posicionamento Meta" value={a.meta_placement} />
+                  <Field label="Campaign ID Google" value={a.campaign_id} />
                   <Field label="Ad group ID" value={a.ad_group_id} />
                   <Field label="Keyword (da conta)" value={a.keyword} />
                   <Field label="Match type" value={a.match_type} />

@@ -36,9 +36,9 @@ export function loadMetaPixel(): void {
 
 /** Regista uma PageView por rota pública da SPA, sem duplicar a mesma rota. */
 export function trackMetaPageView(path = window.location.pathname): boolean {
-  if (!loaded || !readConsentDecision().ads || !shouldSendToMeta() || !window.fbq || lastPagePath === path) return false;
+  if (!canSend() || lastPagePath === path) return false;
   lastPagePath = path;
-  window.fbq('track', 'PageView');
+  window.fbq!('track', 'PageView');
   return true;
 }
 
@@ -49,4 +49,31 @@ export function resetMetaPageViewGuard(): void {
 
 export function isMetaPixelLoaded(): boolean {
   return loaded;
+}
+
+
+function canSend(): boolean {
+  return typeof window !== 'undefined' && loaded && Boolean(window.fbq)
+    && readConsentDecision().ads && shouldSendToMeta()
+    && !/^\/admin(?:\/|$)/.test(window.location.pathname);
+}
+
+/** A click expresses intent, never a conversation or a Lead. */
+export function trackMetaContactClick(action: 'whatsapp_click' | 'call_click'): boolean {
+  if (!canSend()) return false;
+  window.fbq!('trackCustom', action === 'whatsapp_click' ? 'WhatsAppClick' : 'PhoneClick');
+  return true;
+}
+
+const sentLeads = new Set<string>();
+/** Only invoked after CRM persistence. eventID is opaque and stable across retries. */
+export function trackMetaLead(leadId: string): boolean {
+  if (!canSend() || !/^L-[a-zA-Z0-9-]{1,100}$/.test(leadId)) return false;
+  const key = `kyro_meta_lead:${leadId}`;
+  if (sentLeads.has(leadId)) return false;
+  try { if (localStorage.getItem(key)) return false; } catch { /* in-memory guard remains */ }
+  window.fbq!('track', 'Lead', {}, { eventID: `lead:${leadId}` });
+  sentLeads.add(leadId);
+  try { localStorage.setItem(key, String(Date.now())); } catch { /* in-memory guard remains */ }
+  return true;
 }

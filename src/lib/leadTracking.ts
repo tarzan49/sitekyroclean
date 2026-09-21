@@ -14,6 +14,7 @@
  * Tratar as duas coisas como a mesma é a forma mais rápida de o Smart Bidding
  * aprender a comprar cliques em vez de clientes.
  */
+import { trackMetaLead } from './metaPixel';
 import { ADS_LEAD_CONVERSION_LABEL } from '@/constants/tracking';
 import { markFiredOnce, sendAdsConversion, sendGtagEvent } from './gtag';
 import { setEnhancedConversionUserData } from './enhancedConversions';
@@ -120,6 +121,8 @@ export interface LeadEventResult {
  * mesmo `lead_id` vai como `transaction_id`, que é a segunda rede de segurança.
  */
 export async function trackLeadEvent(input: LeadEventInput): Promise<LeadEventResult> {
+  // Independent consent and deduplication per destination. No quote value is a sale.
+  trackMetaLead(input.lead_id);
   const attribution = getAttributionSnapshot();
   const ga_client_id = readGaClientId();
 

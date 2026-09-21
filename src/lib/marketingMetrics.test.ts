@@ -289,7 +289,7 @@ describe('por canal', () => {
       event({ session_id: 's2', action: 'whatsapp_click' }),
       event({ session_id: 's3', action: 'call_click' }),
     ];
-    const joined = joinLeads([lead({ id: 'a', lead_id: 'L-a', funnel_status: 'COMPLETED' })], [attribution({ lead_id: 'L-a', channel: 'form' })], []);
+    const joined = joinLeads([lead({ id: 'a', lead_id: 'L-a', funnel_status: 'COMPLETED', completed_at: '2026-09-15T14:30:00Z' })], [attribution({ lead_id: 'L-a', channel: 'form' })], []);
     const rows = groupByChannel(joined, events);
     const whatsapp = rows.find(row => row.channel === 'whatsapp')!;
     expect(whatsapp.clicks).toBe(2);
@@ -344,7 +344,7 @@ describe('conversões offline para o Google Ads', () => {
   /** Exportar duas vezes a mesma conversão importa-a duas vezes no Google Ads. */
   it('exclui quem já foi exportado para aquela ação', () => {
     const joined = joinLeads(
-      [lead({ id: 'a', lead_id: 'L-a', funnel_status: 'COMPLETED' })],
+      [lead({ id: 'a', lead_id: 'L-a', funnel_status: 'COMPLETED', completed_at: '2026-09-15T14:30:00Z' })],
       [attribution({ lead_id: 'L-a', gclid: 'Cj1', is_paid: true })], []);
     const exported: ConversionExportRow[] = [{
       id: 'x', lead_id: 'L-a', conversion_action: 'Cliente', click_id: 'Cj1',
@@ -353,15 +353,15 @@ describe('conversões offline para o Google Ads', () => {
     }];
     expect(offlineCandidates(joined, exported, { conversionAction: 'Cliente', minRank: STATUS_RANK.COMPLETED })).toHaveLength(0);
     // ... mas continua elegível para uma ação diferente.
-    expect(offlineCandidates(joined, exported, { conversionAction: 'Lead qualificado', minRank: STATUS_RANK.QUALIFIED })).toHaveLength(1);
+    expect(offlineCandidates(joined, exported, { conversionAction: 'Lead qualificado', minRank: STATUS_RANK.QUALIFIED })).toHaveLength(0); // Sem data de qualificação, não se inventa.
   });
 
-  it('aceita gbraid/wbraid quando o gclid não existe (tráfego iOS e de app)', () => {
+  it('reserva BRAID para Data Manager, não o escreve na coluna GCLID', () => {
     const joined = joinLeads(
-      [lead({ id: 'a', lead_id: 'L-a', funnel_status: 'COMPLETED' })],
+      [lead({ id: 'a', lead_id: 'L-a', funnel_status: 'COMPLETED', completed_at: '2026-09-15T14:30:00Z' })],
       [attribution({ lead_id: 'L-a', gbraid: 'GB123', is_paid: true })], []);
     const candidates = offlineCandidates(joined, noExports, { conversionAction: 'X', minRank: STATUS_RANK.COMPLETED });
-    expect(candidates[0].click_id).toBe('GB123');
+    expect(candidates).toHaveLength(0);
   });
 
   it('escreve o CSV no formato que a Google aceita, com o NOME da ação', () => {
@@ -370,9 +370,24 @@ describe('conversões offline para o Google Ads', () => {
       conversion_time: '2026-09-15T14:30:00.000Z', value: 149.5,
     }], { conversionAction: 'Cliente Kyro' });
     const lines = csv.split('\n');
-    expect(lines[0]).toBe('Parameters:TimeZone=Europe/Lisbon');
+    expect(lines[0]).toBe('Parameters:TimeZone=UTC');
     expect(lines[1]).toBe('Google Click ID,Conversion Name,Conversion Time,Conversion Value,Conversion Currency');
     // Formato de data da Google: sem "T" e sem "Z". Um "T" rejeita o ficheiro todo.
     expect(lines[2]).toBe('CjABCDEF,Cliente Kyro,2026-09-15 14:30:00,149.5,EUR');
+  });
+});
+
+
+describe('datas reais e CSV offline', () => {
+  it('usa a primeira qualificação documentada, nunca a criação nem o orçamento como receita', () => {
+    const l = lead({id:'dated',funnel_status:'BOOKED',quoted_value:999});
+    const h = [history({lead_id:'L-dated',new_status:'QUALIFIED',changed_at:'2026-09-12T09:00:00Z'}),history({lead_id:'L-dated',new_status:'BOOKED',changed_at:'2026-09-13T09:00:00Z'})];
+    const joined = joinLeads([l],[attribution({lead_id:'L-dated',gclid:'click'})],h);
+    expect(offlineCandidates(joined,[],{conversionAction:'Qualificado',minRank:STATUS_RANK.QUALIFIED,history:h})).toMatchObject([{conversion_time:'2026-09-12T09:00:00Z',value:null}]);
+  });
+  it('converte a hora para o fuso declarado e escapa nomes com vírgulas', () => {
+    const csv = buildOfflineConversionsCsv([{lead_id:'L-a',lead_row_id:'a',click_id:'click',conversion_time:'2026-09-12T09:00:00Z',value:null}],{conversionAction:'Pedido, "válido"',timezone:'Europe/Lisbon'});
+    expect(csv).toContain('Parameters:TimeZone=Europe/Lisbon');
+    expect(csv).toContain('click,"Pedido, ""válido""",2026-09-12 10:00:00,,EUR');
   });
 });

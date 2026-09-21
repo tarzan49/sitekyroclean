@@ -25,6 +25,7 @@ const campaignKeys = [
   'utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term',
   'gclid', 'gbraid', 'wbraid', 'fbclid',
   'campaignid', 'adgroupid', 'keyword', 'matchtype', 'creative', 'device', 'network',
+  'meta_campaign_id', 'meta_adset_id', 'meta_ad_id', 'meta_placement',
 ] as const;
 
 type CampaignKey = typeof campaignKeys[number];
@@ -106,7 +107,8 @@ function clean(value: string): string {
 function deriveSourceMedium(attribution: LeadAttribution): { source: string; medium: string } {
   if (attribution.utm_source) return { source: attribution.utm_source, medium: attribution.utm_medium ?? 'unknown' };
   if (attribution.gclid || attribution.gbraid || attribution.wbraid) return { source: 'google', medium: 'cpc' };
-  if (attribution.fbclid) return { source: 'facebook', medium: 'paid_social' };
+  // fbclid also exists on organic/shared links: it does not prove ad spend.
+  if (attribution.fbclid) return { source: 'facebook', medium: 'social' };
   if (attribution.referrer_source) return { source: attribution.referrer_source, medium: 'ai_assistant' };
   if (attribution.referrer) {
     const isSearch = searchHosts.some(host => attribution.referrer!.includes(host));
@@ -192,6 +194,12 @@ export interface AttributionSnapshot {
   gclid?: string;
   gbraid?: string;
   wbraid?: string;
+  fbclid?: string;
+  meta_campaign_id?: string;
+  meta_adset_id?: string;
+  meta_ad_id?: string;
+  meta_placement?: string;
+  attribution_method?: string;
   campaign_id?: string;
   ad_group_id?: string;
   keyword?: string;
@@ -225,7 +233,7 @@ export function getAttributionSnapshot(): AttributionSnapshot | null {
   if (!last) return null;
   const first = readFirstTouch();
   const derived = deriveSourceMedium(last);
-  const isPaid = Boolean(last.gclid || last.gbraid || last.wbraid || last.fbclid || derived.medium === 'cpc' || derived.medium === 'paid_social');
+  const isPaid = Boolean(last.gclid || last.gbraid || last.wbraid || ['cpc', 'ppc', 'paidsearch', 'paid_social', 'paidsocial', 'paid'].includes(derived.medium.toLowerCase()));
 
   const snapshot: AttributionSnapshot = {
     last_source: derived.source,
@@ -241,6 +249,12 @@ export function getAttributionSnapshot(): AttributionSnapshot | null {
     gclid: last.gclid,
     gbraid: last.gbraid,
     wbraid: last.wbraid,
+    fbclid: last.fbclid,
+    meta_campaign_id: last.meta_campaign_id,
+    meta_adset_id: last.meta_adset_id,
+    meta_ad_id: last.meta_ad_id,
+    meta_placement: last.meta_placement,
+    attribution_method: 'website',
     campaign_id: last.campaignid,
     ad_group_id: last.adgroupid,
     keyword: last.keyword,

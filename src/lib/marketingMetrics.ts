@@ -1,3 +1,4 @@
+import { advertisingPlatform } from './marketingPlatforms';
 /**
  * Contas do painel de marketing.
  *
@@ -33,6 +34,9 @@ export const STATUS_RANK: Record<string, number> = {
 export const TERMINAL_STATUSES = ['INVALID', 'LOST', 'CANCELLED'] as const;
 
 export interface LeadRow {
+  name?: string | null;
+  phone?: string | null;
+  notes?: string | null;
   id: string;
   created_at: string;
   lead_id: string | null;
@@ -49,6 +53,12 @@ export interface LeadRow {
 }
 
 export interface AttributionRow {
+  fbclid?: string | null;
+  meta_campaign_id?: string | null;
+  meta_adset_id?: string | null;
+  meta_ad_id?: string | null;
+  meta_placement?: string | null;
+  attribution_method?: string | null;
   lead_id: string;
   lead_row_id: string | null;
   channel: string | null;
@@ -91,6 +101,15 @@ export interface StatusHistoryRow {
 }
 
 export interface SessionEventRow {
+  utm_source?: string | null;
+  utm_medium?: string | null;
+  gclid?: string | null;
+  gbraid?: string | null;
+  wbraid?: string | null;
+  meta_campaign_id?: string | null;
+  meta_adset_id?: string | null;
+  meta_ad_id?: string | null;
+  meta_placement?: string | null;
   session_id: string;
   action: string;
   created_at: string;
@@ -388,8 +407,8 @@ function orUnknown(value: string | null | undefined): string {
  * pessoa escreveu na Google não existe aqui e não pode ser deduzido: vive só no
  * Search Terms Report do Google Ads.
  *
- * Atribuição **last touch**, que é a que o Google Ads credita por omissão e por
- * isso a única que se pode reconciliar com o relatório de lá. O first touch
+ * Atribuição da última origem conhecida no site. Pode diferir dos modelos
+ * e das janelas de atribuição usados pelas plataformas. O first touch
  * existe no detalhe de cada lead e nunca é somado a este: são duas leituras do
  * mesmo lead, não dois leads nem duas receitas.
  */
@@ -597,22 +616,29 @@ export interface OfflineCandidate {
 export function offlineCandidates(
   joined: JoinedLead[],
   exports: ConversionExportRow[],
-  options: { conversionAction: string; minRank: number },
+  options: { conversionAction: string; minRank: number; history?: StatusHistoryRow[] },
 ): OfflineCandidate[] {
   const already = new Set(
     exports.filter(row => row.conversion_action === options.conversionAction).map(row => row.lead_id),
   );
   const out: OfflineCandidate[] = [];
   for (const item of joined) {
-    const clickId = item.attribution?.gclid ?? item.attribution?.gbraid ?? item.attribution?.wbraid;
+    // This legacy CSV supports GCLID. BRAID is retained for Data Manager, not
+    // placed under the wrong column name.
+    const clickId = item.attribution?.gclid;
+    if (advertisingPlatform(item.attribution) !== 'google') continue;
+    const reachedAt = options.history?.filter(h => (h.lead_row_id === item.lead.id || (item.lead.lead_id && h.lead_id === item.lead.lead_id))
+      && (STATUS_RANK[h.new_status] ?? -1) >= options.minRank).map(h => h.changed_at).sort()[0];
+    const conversionTime = reachedAt ?? (options.minRank === STATUS_RANK.COMPLETED ? item.lead.completed_at : null);
+    if (!conversionTime || !Number.isFinite(Date.parse(conversionTime))) continue;
     if (!clickId || item.rank < options.minRank) continue;
     if (!item.lead.lead_id || already.has(item.lead.lead_id)) continue;
     out.push({
       lead_id: item.lead.lead_id,
       lead_row_id: item.lead.id,
       click_id: clickId,
-      conversion_time: item.lead.completed_at ?? item.lead.created_at,
-      value: item.lead.final_revenue,
+      conversion_time: conversionTime,
+      value: options.minRank === STATUS_RANK.COMPLETED ? item.lead.final_revenue : null,
     });
   }
   return out;
@@ -635,12 +661,21 @@ export function offlineCandidates(
  * estado; carregar no Google Ads é outro; ser aceite é um terceiro. Ver a
  * tabela `conversion_exports`.
  */
+function csvCell(value: string): string {
+  return /[",\r\n]/.test(value) ? `"${value.replace(/"/g, '""')}"` : value;
+}
+function formatConversionTime(value: string, timeZone: string): string {
+  const parts = new Intl.DateTimeFormat('en-GB', { timeZone, year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', hourCycle: 'h23' }).formatToParts(new Date(value));
+  const at = (type: string) => parts.find(p => p.type === type)!.value;
+  return `${at('year')}-${at('month')}-${at('day')} ${at('hour')}:${at('minute')}:${at('second')}`;
+}
+
 export function buildOfflineConversionsCsv(
   candidates: OfflineCandidate[],
   options: { conversionAction: string; timezone?: string },
 ): string {
   const lines: string[] = [];
-  lines.push(`Parameters:TimeZone=${options.timezone ?? 'Europe/Lisbon'}`);
+  lines.push(`Parameters:TimeZone=${options.timezone ?? 'UTC'}`);
   lines.push('Google Click ID,Conversion Name,Conversion Time,Conversion Value,Conversion Currency');
   for (const candidate of candidates) {
     lines.push([
@@ -648,10 +683,10 @@ export function buildOfflineConversionsCsv(
       options.conversionAction,
       // "yyyy-MM-dd HH:mm:ss", sem o "T" nem o "Z" do ISO — a Google rejeita o
       // ficheiro inteiro quando uma data não bate certo com o formato.
-      new Date(candidate.conversion_time).toISOString().slice(0, 19).replace('T', ' '),
-      String(candidate.value ?? 0),
+      formatConversionTime(candidate.conversion_time, options.timezone ?? 'UTC'),
+      candidate.value == null ? '' : String(candidate.value),
       'EUR',
-    ].join(','));
+    ].map(csvCell).join(','));
   }
   return lines.join('\n');
 }

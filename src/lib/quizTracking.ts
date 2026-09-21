@@ -1,6 +1,7 @@
 import { getConsent } from './consent';
 import { createEventDelivery, sendStoredEvent } from './eventDelivery';
 import { sendGtagEvent } from './gtag';
+import { trackMetaContactClick } from './metaPixel';
 import { getAttributionSnapshot } from './leadAttribution';
 
 export const IS_PRODUCTION = typeof window !== 'undefined' && window.location.hostname === 'cleansolutions.com.pt';
@@ -34,11 +35,13 @@ function context() {
   // `gclid` e a campanha em cada evento, que é o que liga uma sessão do Google
   // Ads às páginas por onde passou.
   const ads = getAttributionSnapshot();
-  return { session_id: session.id, referrer: session.referrer, utm_source: session.utm_source, utm_medium: session.utm_medium,
-    utm_campaign: session.utm_campaign, page_path: window.location.pathname,
+  return { session_id: session.id, referrer: session.referrer, utm_source: ads?.last_source ?? session.utm_source, utm_medium: ads?.last_medium ?? session.utm_medium,
+    utm_campaign: ads?.last_campaign ?? session.utm_campaign, page_path: window.location.pathname,
     device: window.innerWidth < 768 ? 'mobile' : window.innerWidth < 1024 ? 'tablet' : 'desktop',
     utm_term: ads?.keyword ?? null, utm_content: ads?.creative_id ?? null,
     gclid: ads?.gclid ?? null, gbraid: ads?.gbraid ?? null, wbraid: ads?.wbraid ?? null,
+    meta_campaign_id: ads?.meta_campaign_id ?? null, meta_adset_id: ads?.meta_adset_id ?? null,
+    meta_ad_id: ads?.meta_ad_id ?? null, meta_placement: ads?.meta_placement ?? null,
     campaign_id: ads?.campaign_id ?? null, ad_group_id: ads?.ad_group_id ?? null,
     keyword: ads?.keyword ?? null, match_type: ads?.match_type ?? null, creative_id: ads?.creative_id ?? null,
     ads_device: ads?.ads_device ?? null, network: ads?.network ?? null,
@@ -102,6 +105,7 @@ function contact(action: 'whatsapp_click' | 'call_click', source: string, ctx?: 
   // GA4. O nome `phone_click` é o do GA4; na tabela `quiz_events` o mesmo clique
   // continua a chamar-se `call_click`, que é o que a restrição CHECK aceita
   // desde 2026-08 e onde está o histórico do painel interno.
+  trackMetaContactClick(action);
   sendGtagEvent(action === 'whatsapp_click' ? 'whatsapp_click' : 'phone_click', {
     page_path: window.location.pathname, cta_location: source, service: ctx?.service, city: ctx?.city,
   });

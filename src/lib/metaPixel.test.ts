@@ -45,3 +45,24 @@ describe('Meta Pixel', () => {
     expect(pixel.trackMetaPageView('/private')).toBe(false);
   });
 });
+
+describe('conversões Meta', () => {
+  it('clique não cria Lead; pedido confirmado tem ID estável e não tem valor de venda', async () => {
+    localStorage.setItem('kyro_cookie_consent', 'accepted');
+    const p = await import('./metaPixel'); p.loadMetaPixel();
+    p.trackMetaContactClick('whatsapp_click');
+    expect(window.fbq?.queue).toContainEqual(['trackCustom', 'WhatsAppClick']);
+    expect(p.trackMetaLead('L-test-123')).toBe(true);
+    expect(p.trackMetaLead('L-test-123')).toBe(false);
+    expect(window.fbq?.queue).toContainEqual(['track', 'Lead', {}, { eventID:'lead:L-test-123' }]);
+  });
+  it('não consome ID sem consentimento e bloqueia revogação', async () => {
+    const p = await import('./metaPixel');
+    expect(p.trackMetaLead('L-test-456')).toBe(false);
+    localStorage.setItem('kyro_cookie_consent','accepted'); p.loadMetaPixel();
+    expect(p.trackMetaLead('L-test-456')).toBe(true);
+    localStorage.setItem('kyro_cookie_consent','declined');
+    expect(p.trackMetaContactClick('call_click')).toBe(false);
+    expect(p.trackMetaLead('L-test-789')).toBe(false);
+  });
+});

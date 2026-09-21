@@ -50,7 +50,8 @@ const ATTRIBUTION_FIELDS = [
   "channel",
   "first_source", "first_medium", "first_campaign", "first_landing_page", "first_seen_at",
   "last_source", "last_medium", "last_campaign", "last_landing_page", "last_seen_at",
-  "gclid", "gbraid", "wbraid",
+  "gclid", "gbraid", "wbraid", "fbclid",
+  "meta_campaign_id", "meta_adset_id", "meta_ad_id", "meta_placement",
   "campaign_id", "ad_group_id", "keyword", "match_type", "creative_id", "ads_device", "network",
   "referrer", "referrer_source", "landing_page", "conversion_page", "ga_client_id",
 ] as const;
@@ -99,7 +100,7 @@ export async function resolveDuplicateLeadConflict(
  */
 function cleanAttribution(raw: Record<string, unknown> | undefined): Record<string, string | boolean> | null {
   if (!raw || typeof raw !== "object") return null;
-  const out: Record<string, string | boolean> = { is_paid: raw.is_paid === true };
+  const out: Record<string, string | boolean> = { is_paid: raw.is_paid === true, attribution_method: "website" };
   for (const field of ATTRIBUTION_FIELDS) {
     const value = raw[field];
     if (typeof value !== "string" || value === "") continue;
