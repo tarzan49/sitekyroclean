@@ -22,7 +22,7 @@ const SESSION_TTL = 30 * 60000;
  * um dado em falta em vez de um dado que nunca existiu.
  */
 const campaignKeys = [
-  'utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term',
+  'utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term', 'utm_id',
   'gclid', 'gbraid', 'wbraid', 'fbclid',
   'campaignid', 'adgroupid', 'keyword', 'matchtype', 'creative', 'device', 'network',
   'meta_campaign_id', 'meta_adset_id', 'meta_ad_id', 'meta_placement',
@@ -255,11 +255,11 @@ export function getAttributionSnapshot(): AttributionSnapshot | null {
     meta_ad_id: last.meta_ad_id,
     meta_placement: last.meta_placement,
     attribution_method: 'website',
-    campaign_id: last.campaignid,
+    campaign_id: last.campaignid ?? (derived.source.toLowerCase() === 'google' ? last.utm_id : undefined),
     ad_group_id: last.adgroupid,
-    keyword: last.keyword,
+    keyword: last.keyword ?? (derived.source.toLowerCase() === 'google' ? last.utm_term : undefined),
     match_type: last.matchtype,
-    creative_id: last.creative,
+    creative_id: last.creative ?? (derived.source.toLowerCase() === 'google' ? last.utm_content : undefined),
     ads_device: last.device,
     network: last.network,
     referrer: last.referrer,

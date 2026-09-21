@@ -179,3 +179,14 @@ describe('Meta', () => {
     expect(getAttributionSnapshot()).toMatchObject({last_source:'ig',is_paid:true,meta_campaign_id:'111',meta_adset_id:'222',meta_ad_id:'333',meta_placement:'feed',attribution_method:'website'});
   });
 });
+
+
+it('preserva o sufixo UTM efetivamente configurado na campanha Google', () => {
+  at('https://cleansolutions.com.pt/limpeza-sofas-lisboa?ads=1&utm_source=google&utm_medium=cpc&utm_campaign=lisboa_sofas&utm_id=2426&utm_content=123&utm_term=limpeza%20sofas');
+  expect(getAttributionSnapshot()).toMatchObject({campaign_id:'2426',creative_id:'123',keyword:'limpeza sofas',last_campaign:'lisboa_sofas',is_paid:true});
+});
+it('não interpreta UTM de um anúncio Meta como identificador Google', () => {
+  at('https://cleansolutions.com.pt/?utm_source=facebook&utm_medium=paid_social&utm_id=meta&utm_content=video&utm_term=audience');
+  const a=getAttributionSnapshot()!;
+  expect(a.campaign_id).toBeUndefined(); expect(a.creative_id).toBeUndefined(); expect(a.keyword).toBeUndefined();
+});

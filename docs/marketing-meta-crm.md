@@ -28,6 +28,8 @@ utm_source={{site_source_name}}&utm_medium=paid_social&utm_campaign={{campaign.n
 
 ## Google Ads
 
+O sufixo UTM existente na conta usa `utm_id={campaignid}`, `utm_content={creative}` e `utm_term={keyword}`. A captura aceita estes aliases para origem Google, dando prioridade aos campos ValueTrack explícitos quando existirem. Não deduz grupo, dispositivo ou correspondência que não vieram no URL.
+
 A exportação CSV legada usa GCLID. GBRAID/WBRAID ficam preservados, mas não são colocados na coluna GCLID. Conversões offline exigem data real no histórico (ou conclusão explicitamente registada), nunca a data de criação como substituto. O CSV declara UTC por defeito e converte para o fuso declarado quando indicado. Qualificação não recebe valor de orçamento como receita.
 
 Ações de conversão, objetivos primários/secundários e importação/aceitação continuam a ser configurações da conta Google. O painel não altera campanhas nem orçamento publicitário.
