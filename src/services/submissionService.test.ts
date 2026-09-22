@@ -69,7 +69,7 @@ describe('quote channel parity: table sizes, tiers, quantities, brackets, extras
     expect(wa).toContain(receipt.bookingId);
     expect(receipt.lines.reduce((n: number, l: { total: number | null }) => n + (l.total ?? 0), 0)).toBe(p.totalPrice);
     expect(receipt.subtotal - receipt.discountAmount).toBeCloseTo(receipt.total);
-    expect(receipt.lines.at(-1).total).toBe(locationPrices[form.location!]);
+    expect(receipt.lines.find((line: { label: string }) => line.label.startsWith('Deslocação:'))?.total ?? 0).toBe(p.finalTravelCost);
     expect(mocks.invokeCrm.mock.calls[0][0].body.lead.value).toBe(p.priceText);
     if (p.hasSobOrcamento || p.hasUpsellSobItem) expect(wa).toContain('subtotal conhecido');
   });
@@ -78,8 +78,8 @@ describe('quote channel parity: table sizes, tiers, quantities, brackets, extras
 describe('specific regressions and delivery failures', () => {
   it('3-seat Premium pack uses the approved 30€ override, not the 40€ standalone difference', () => {
     const p = payload({ service: 'sofa', serviceType: 'cleaning', waterproofingTier: 'premium' }, [{ sizeId: '3-lugares', qty: 1, packEnabled: true }]);
-    expect(p.calculateServicePrice).toBe(199);
-    expect(buildReceiptLines(p)[0].total).toBe(199);
+    expect(p.calculateServicePrice).toBe(189);
+    expect(buildReceiptLines(p)[0].total).toBe(189);
   });
   it('4+ sofa pack never invents a 40€ fixed price', () => {
     const p = payload({ service: 'sofa', serviceType: 'cleaning' }, [{ sizeId: '4+-lugares', qty: 1, packEnabled: true }]);

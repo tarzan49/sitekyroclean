@@ -1,3 +1,7 @@
+## Redução do upsell de proteção de sofás (23/09/2026)
+
+Quando a base é limpeza de sofá, o extra de impermeabilização Essencial ou Premium custa menos 10€ por sofá protegido. Preços autónomos de impermeabilização e limpeza adicionada a uma impermeabilização mantêm-se. `waterproofingUpsellDiscount` nas opções de sofá é aplicado por `calcPackPricing`, partilhado com os totais e recibos; colchões e cadeiras não mudam. Sofás de 4+ lugares permanecem sob orçamento, sem inventar preço fixo. A deslocação gratuita usa o valor efetivo já com esta redução.
+
 ## Deslocação gratuita por valor do orçamento (23/09/2026)
 
 Pedido do responsável: taxa base de 10€ fica gratuita acima de 120€ de serviços; taxa de 15€ acima de 135€; taxa de 20€ a partir de 150€ (inclusive). Taxas de 25€ mantêm-se. O limiar usa a soma dos serviços e extras aos preços efetivos, excluindo a própria deslocação. Artigos sob orçamento não recebem um valor fictício; só os montantes conhecidos contam. Sem atingir o limiar mantém-se a taxa da localidade. Esta regra substitui notas antigas de deslocação nunca gratuita/mínimo sempre cobrado, sem alterar as tabelas base.

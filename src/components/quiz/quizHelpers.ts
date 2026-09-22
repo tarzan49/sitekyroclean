@@ -107,7 +107,8 @@ export function calcPackPricing(
   const bothEssencial = typeof option.bothPrice === 'number'
     ? option.bothPrice
     : (fallbackDelta !== null && cleanPrice !== null ? cleanPrice + fallbackDelta : null);
-  const packPrice = bothEssencial !== null ? bothEssencial + tierDelta : null;
+  const upsellDiscount = isWaterproofBase ? 0 : (option.waterproofingUpsellDiscount ?? 0);
+  const packPrice = bothEssencial !== null ? bothEssencial + tierDelta - upsellDiscount : null;
   const packDelta = packPrice !== null && basePrice !== null ? packPrice - basePrice : fallbackDelta;
   const displayPrice = packOn && packPrice !== null ? packPrice : basePrice;
   return { isSob, basePrice, packPrice, packDelta, displayPrice };

@@ -69,8 +69,8 @@ describe('care upsells', () => {
     expect(screen.getByText('2 de 2')).toBeTruthy();
     fireEvent.click(screen.getByRole('button', { name: 'Retirar tratamento: 3 Lugares' }));
     expect(screen.getByText('1 de 2')).toBeTruthy();
-    expect(screen.getByText('+90€')).toBeTruthy();
-    expect(screen.getByText('+120€')).toBeTruthy();
+    expect(screen.getByText('+80€')).toBeTruthy();
+    expect(screen.getByText('+110€')).toBeTruthy();
     expect(screen.getByLabelText('Mais 30€ que o Essencial').textContent).toContain('+30€');
     fireEvent.click(screen.getByRole('button', { name: /^Essencial/ }));
     expect(screen.getByText('1 de 2')).toBeTruthy();

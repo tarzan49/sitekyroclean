@@ -35,7 +35,7 @@ describe('partial treatment quantities', () => {
     const { result } = renderHook(() => useQuizPricing(
       { ...initialFormData, service: 'sofa', serviceType: 'cleaning', waterproofingTier: 'premium' },
       [{ sizeId: '3-lugares', qty: 3, packEnabled: true, packQty: 1 }], [], [], []));
-    expect(result.current.totalPrice).toBe(199 + 79 * 2);
+    expect(result.current.totalPrice).toBe(189 + 79 * 2);
   });
   it('charges treatment for only one of three mattresses', () => {
     const { result } = renderHook(() => useQuizPricing(

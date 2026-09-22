@@ -71,6 +71,8 @@ export interface PriceOption {
   // valor derivado (waterproofingPremiumPrice - waterproofingPrice) não é o desejado
   // só para o combo. Omitido = deriva-se automaticamente como antes.
   packPremiumDelta?: number;
+  // Redução por sofá apenas ao adicionar proteção a uma limpeza.
+  waterproofingUpsellDiscount?: number;
 }
 
 // Sofa pack pricing: limpeza + impermeabilização com desconto
@@ -84,10 +86,10 @@ export const sofaPrices: PriceOption[] = [
   // chegar ao Premium. originalBothPrice (preço riscado) subiu com o 2L para
   // continuar acima do novo bothPrice — nunca pode ficar abaixo, senão o
   // "desconto" mostrado no UI fica ao contrário (bug já visto antes).
-  { id: '1-lugar',    label: '1 Lugar',    cleaningPrice: 49, waterproofingPrice: 59, bothPrice: 99,  originalBothPrice: 108, waterproofingPremiumPrice: 89 },
-  { id: '2-lugares',  label: '2 Lugares',  cleaningPrice: 69, waterproofingPrice: 79, bothPrice: 139, originalBothPrice: 148, waterproofingPremiumPrice: 109, packPremiumDelta: 30 },
-  { id: '3-lugares',  label: '3 Lugares',  cleaningPrice: 79, waterproofingPrice: 99, bothPrice: 169, originalBothPrice: 178, waterproofingPremiumPrice: 139, packPremiumDelta: 30 },
-  { id: '4+-lugares', label: '4+ Lugares', cleaningPrice: 'Sob orçamento', waterproofingPrice: 'Sob orçamento', bothPrice: 'Sob orçamento', waterproofingPremiumPrice: 'Sob orçamento' },
+  { waterproofingUpsellDiscount: 10, id: '1-lugar',    label: '1 Lugar',    cleaningPrice: 49, waterproofingPrice: 59, bothPrice: 99,  originalBothPrice: 108, waterproofingPremiumPrice: 89 },
+  { waterproofingUpsellDiscount: 10, id: '2-lugares',  label: '2 Lugares',  cleaningPrice: 69, waterproofingPrice: 79, bothPrice: 139, originalBothPrice: 148, waterproofingPremiumPrice: 109, packPremiumDelta: 30 },
+  { waterproofingUpsellDiscount: 10, id: '3-lugares',  label: '3 Lugares',  cleaningPrice: 79, waterproofingPrice: 99, bothPrice: 169, originalBothPrice: 178, waterproofingPremiumPrice: 139, packPremiumDelta: 30 },
+  { waterproofingUpsellDiscount: 10, id: '4+-lugares', label: '4+ Lugares', cleaningPrice: 'Sob orçamento', waterproofingPrice: 'Sob orçamento', bothPrice: 'Sob orçamento', waterproofingPremiumPrice: 'Sob orçamento' },
 ];
 
 // Chaise longue: preço fixo (limpeza ou pack)

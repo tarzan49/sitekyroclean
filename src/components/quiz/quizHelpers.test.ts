@@ -72,10 +72,10 @@ describe('calcPackPricing', () => {
     expect(r.displayPrice).toBe(49);
   });
 
-  it('pack (packOn) price uses bothPrice, not basePrice + fallbackDelta, when bothPrice exists', () => {
+  it('protection upsell subtracts 10 euros from the combo price', () => {
     const r = calcPackPricing(sofa1L, true, false, 40, 'essencial');
-    expect(r.packPrice).toBe(99); // bothPrice fixo da tabela, não 49+40
-    expect(r.displayPrice).toBe(99);
+    expect(r.packPrice).toBe(89); // 99 menos 10 euros no upsell
+    expect(r.displayPrice).toBe(89);
   });
 
   it('premium tier price is strictly higher than essencial for the same option', () => {
@@ -101,5 +101,24 @@ describe('carpetItemArea / carpetHasValidItems', () => {
       { id: 't2', largura: '2', comprimento: '3' },
     ])).toBe(true);
     expect(carpetHasValidItems([{ id: 't1', largura: '', comprimento: '' }])).toBe(false);
+  });
+});
+
+describe('sofa waterproofing upsell reduction', () => {
+  it.each(sofaPrices.filter(p => typeof p.bothPrice === 'number'))('reduces both tiers by 10 per $label only on cleaning orders', option => {
+    for (const tier of ['essencial', 'premium'] as const) {
+      const previous = { ...option, waterproofingUpsellDiscount: 0 };
+      expect(calcPackPricing(option, true, false, null, tier).packDelta)
+        .toBe(calcPackPricing(previous, true, false, null, tier).packDelta! - 10);
+      expect(calcPackPricing(option, false, false, null, tier).displayPrice).toBe(option.cleaningPrice);
+      expect(calcPackPricing(option, false, true, null, tier))
+        .toEqual(calcPackPricing(previous, false, true, null, tier));
+      expect(calcPackPricing(option, true, true, null, tier))
+        .toEqual(calcPackPricing(previous, true, true, null, tier));
+    }
+  });
+  it('keeps large sofas subject to quotation', () => {
+    const option = sofaPrices.find(p => p.id === '4+-lugares')!;
+    expect(calcPackPricing(option, true, false).packPrice).toBeNull();
   });
 });
