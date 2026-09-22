@@ -1,3 +1,7 @@
+## Página de obrigado (23/09/2026)
+
+`Obrigado.tsx` conserva a leitura do recibo da sessão e delega a apresentação em `QuoteConfirmation.tsx`. WhatsApp no primeiro ecrã mobile, próximos passos explícitos e cartão claro com artigos, quantidades, deslocação e valores conhecidos. Sem recibo, não afirma que um pedido foi enviado. Serviços sob orçamento mantêm essa indicação e subtotal conhecido separado. A marcação requer confirmação da equipa. `?exemplo=pedido` mostra um pedido ilustrativo apenas em DEV, sem gravar dados nem submeter contactos.
+
 ## Mesmo pack nos dois percursos de sofá (23/09/2026)
 
 A redução de 10€ por sofá no pack aplica-se também quando a impermeabilização é o serviço principal e a limpeza é adicionada. O total limpeza + proteção deve ser idêntico nos dois percursos, para o mesmo tamanho, tier e quantidade tratada. Preços autónomos mantêm-se. O extra de limpeza mostra o preço autónomo da limpeza riscado (sem +) e compara os dois totais. Esta regra substitui a preservação anterior do preço do upsell inverso.
