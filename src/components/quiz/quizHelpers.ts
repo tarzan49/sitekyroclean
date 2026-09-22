@@ -1,3 +1,4 @@
+import { CHAIR_WATERPROOF_ESSENTIAL, CHAIR_WATERPROOF_PREMIUM } from '../../constants/chairPricing';
 import { sofaPrices, mattressPrices } from './QuizTypes';
 import type { SofaItem, MattressItem, CarpetItem, PriceOption } from './QuizTypes';
 
@@ -127,25 +128,13 @@ export function calcChairClean(qty: number): number | null {
   return 4 * 20 + 2 * 15 + (qty - 6) * 12.5;
 }
 
-// Progressive: 1-4 @ 15€, 5-9 @ 10€ each, 10+: sob orçamento — baixado 2026-08-31
-// (era 1-4 @ 20€, 5-10 @ 15€, 11+ sob orçamento).
+// Proteção: preço fixo por unidade em todas as quantidades.
 export function calcChairWaterproof(qty: number): number | null {
-  if (qty <= 0 || qty >= 10) return null;
-  if (qty === 4) return 70; // Approved four-chair bundle, including antibacterial care.
-  if (qty <= 4) return qty * 15;
-  return 4 * 15 + (qty - 4) * 10;
+  return Number.isSafeInteger(qty) && qty > 0 ? qty * CHAIR_WATERPROOF_ESSENTIAL : null;
 }
 
-// Premium (à base de diluente): 1-4 @ 20€, 5-9 @ 15€ each, 10+: sob orçamento
-// — sempre +5€/cadeira sobre a Essencial (2026-09-01, era +10€/cadeira fixo:
-// a 9 cadeiras dava Essencial 110€ vs Premium 200€, +82%, desproporcional
-// face ao gap Premium/Essencial dos sofás, ~+25 a +40%. Com +5€/cadeira fica
-// Essencial 110€ vs Premium 155€, +41%, alinhado).
 export function calcChairWaterproofPremium(qty: number): number | null {
-  if (qty <= 0 || qty >= 10) return null;
-  if (qty === 4) return 90; // Approved four-chair bundle, including antibacterial care.
-  if (qty <= 4) return qty * 20;
-  return 4 * 20 + (qty - 4) * 15;
+  return Number.isSafeInteger(qty) && qty > 0 ? qty * CHAIR_WATERPROOF_PREMIUM : null;
 }
 
 export function fmtN(n: number): string {

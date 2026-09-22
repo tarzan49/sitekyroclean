@@ -12,12 +12,13 @@ function pricing(formData: Partial<QuizFormData>, upsellItems: UpsellItemConfig[
 }
 
 describe('useQuizPricing — chairs "sob orçamento" thresholds stay in sync across serviceType', () => {
-  it('10 chairs + waterproofing addon never silently falls back to charging cleaning alone (real bug fixed 2026-08-31)', () => {
+  it('10 chairs have fixed protection pricing', () => {
     const p = pricing({
       service: 'chairs', serviceType: 'waterproofing',
       chairQuantity: '10', chairWaterproofQty: 0,
     });
-    expect(p.hasSobOrcamento).toBe(true);
+    expect(p.hasSobOrcamento).toBe(false);
+    expect(p.calculateServicePrice).toBe(250);
   });
 
   it('9 chairs (just under the sob-orçamento threshold) still has a real fixed price', () => {

@@ -102,8 +102,8 @@ describe('care upsells', () => {
     const update = vi.fn();
     render(<QuizChairsAddonUpsell formData={{ ...initialFormData, serviceType: 'cleaning', chairQuantity: '4' }} updateFormData={update} onBack={() => {}} onContinue={() => {}} />);
     const premium = screen.getByRole('button', { name: /Premium/ });
-    expect(premium.textContent).toContain('+90€');
-    expect(screen.getByRole('button', { name: /^Essencial/ }).textContent).toContain('+70€');
+    expect(premium.textContent).toContain('+100€');
+    expect(screen.getByRole('button', { name: /^Essencial/ }).textContent).toContain('+72€');
     expect(screen.queryByRole('button', { name: /Desbacterização/ })).toBeNull();
     fireEvent.click(premium);
     expect(update).toHaveBeenCalledWith({ chairWaterproofing: true, chairWaterproofQty: 4, waterproofingTier: 'premium', chairAntiAcaros: false });

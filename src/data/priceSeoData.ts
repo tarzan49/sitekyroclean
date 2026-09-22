@@ -1,3 +1,4 @@
+import { CHAIR_WATERPROOF_ESSENTIAL, CHAIR_WATERPROOF_PREMIUM } from '../constants/chairPricing';
 // Programmatic SEO: Price pages data engine
 // Targets searches like "preço limpeza sofá porto", "quanto custa limpar colchão"
 
@@ -53,7 +54,7 @@ const priceTables: Record<string, { item: string; price: string; note?: string }
     { item: "Sofá 1 lugar", price: "Desde 59€", note: "Essencial, 89€ na Premium" },
     { item: "Sofá 2 lugares", price: "Desde 79€", note: "Essencial, 109€ na Premium" },
     { item: "Sofá 3 lugares", price: "Desde 99€", note: "Essencial, 139€ na Premium" },
-    { item: "Cadeiras (por unidade)", price: "Desde 20€", note: "Essencial, 30€ na Premium" },
+    { item: "Cadeiras (por unidade)", price: `${CHAIR_WATERPROOF_ESSENTIAL}€/un`, note: `Essencial, ${CHAIR_WATERPROOF_PREMIUM}€/un na Premium` },
     { item: "Cabeceira", price: "Desde 15€" },
   ],
 };

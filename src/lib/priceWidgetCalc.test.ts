@@ -9,15 +9,15 @@ describe('calcChairBracket', () => {
     expect(calcChairBracket(0, false)).toBe(0);
     expect(calcChairBracket(-1, false)).toBe(0);
   });
-  it('is null at 10+ regardless of waterproof', () => {
+  it('keeps cleaning under quotation at 10+ but prices protection per unit', () => {
     expect(calcChairBracket(10, false)).toBeNull();
-    expect(calcChairBracket(10, true)).toBeNull();
+    expect(calcChairBracket(10, true)).toBe(180);
   });
   it('uses the same Essential and Premium chair prices as the quiz', () => {
-    expect(calcChairBracket(4, true, 'essencial')).toBe(70);
-    expect(calcChairBracket(9, true, 'essencial')).toBe(110);
-    expect(calcChairBracket(4, true, 'premium')).toBe(90);
-    expect(calcChairBracket(9, true, 'premium')).toBe(155);
+    expect(calcChairBracket(4, true, 'essencial')).toBe(72);
+    expect(calcChairBracket(9, true, 'essencial')).toBe(162);
+    expect(calcChairBracket(4, true, 'premium')).toBe(100);
+    expect(calcChairBracket(9, true, 'premium')).toBe(225);
   });
 });
 
@@ -89,15 +89,15 @@ describe('waterproof widget handoff', () => {
     const total = calcWidgetTotal('impermeabilizacao', quantities, 0, new Set(), tier);
     const config = buildWidgetQuizConfig('impermeabilizacao', quantities, 0, new Set(), tier)!;
     const sofaUnit = tier === 'premium' ? 109 : 79;
-    const chairs = tier === 'premium' ? 90 : 70;
+    const chairs = tier === 'premium' ? 100 : 72;
     expect(total).toBe(sofaUnit * 2 + chairs);
     expect(config.waterproofingTier).toBe(tier);
     expect(config.sofaItems?.[0].qty).toBe(2);
     expect(config.initialUpsellItems?.[0].price).toBe(chairs);
   });
-  it('keeps ten chairs as quote-only in a mixed selection', () => {
+  it('prices ten protected chairs in a mixed selection', () => {
     const config = buildWidgetQuizConfig('impermeabilizacao', { 0: 1, 5: 10 }, 0)!;
-    expect(config.initialUpsellItems?.[0].price).toBe(0);
+    expect(config.initialUpsellItems?.[0].price).toBe(180);
   });
 });
 

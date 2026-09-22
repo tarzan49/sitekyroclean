@@ -1,3 +1,4 @@
+import { CHAIR_WATERPROOF_ESSENTIAL, CHAIR_WATERPROOF_PREMIUM } from '../src/constants/chairPricing';
 import { RESOURCE_BLOG_TITLE, RESOURCE_BLOG_INTRO, RESOURCE_FAQ_TITLE, RESOURCE_FAQ_INTRO, RESOURCE_FAQS, RESOURCE_GLOSSARY_TITLE, resourceGlossaryIntro, getResourceOffer, getResourceWhatsapp, RESOURCE_TRAVEL, getResourceCommercial, resourceHeroSubtitle } from '../src/data/resourceContent';
 import { getServiceExamples } from '../src/data/serviceExamples';
 import { generatedPageForPath } from '../src/data/generatedRouteIndex';
@@ -1171,7 +1172,7 @@ export function prerenderRoutes(outDir: string): number {
           ],
           faqs: faqs([
             { q: 'O que é a impermeabilização de estofos?', a: 'A impermeabilização cria uma barreira invisível na fibra do estofo que repele líquidos e dificulta a penetração de manchas. O tecido mantém a aparência e textura originais.' },
-            { q: 'Quanto custa a impermeabilização?', a: 'A versão Essencial começa a partir de 59€ para sofá de 1 lugar e 20€ por cadeira. A versão Premium começa a partir de 89€ para sofá de 1 lugar e 30€ por cadeira. Peça orçamento gratuito.' },
+            { q: 'Quanto custa a impermeabilização?', a: `A versão Essencial começa a partir de 59€ para sofá de 1 lugar e custa ${CHAIR_WATERPROOF_ESSENTIAL}€ por cadeira. A versão Premium começa a partir de 89€ para sofá de 1 lugar e custa ${CHAIR_WATERPROOF_PREMIUM}€ por cadeira. Peça orçamento gratuito.` },
             { q: 'Quanto tempo dura a impermeabilização?', a: 'Depende da versão. A Essencial, à base de água, dura 1 a 2 anos e aguenta até 2 lavagens. A Premium, à base de diluente e mais resistente ao desgaste, dura até 10 anos e aguenta até 5 lavagens.' },
             { q: 'Posso fazer impermeabilização sem limpeza prévia?', a: 'Recomendamos sempre limpeza prévia para maior eficácia. Temos o Pack Proteção Total, que combina limpeza com a versão Essencial com desconto.' },
           ]),

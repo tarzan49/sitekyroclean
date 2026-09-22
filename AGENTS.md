@@ -1,3 +1,7 @@
+## Impermeabilização de cadeiras por unidade (23/09/2026)
+
+Preço fixo em todas as quantidades: Essencial 18€/cadeira; Premium 25€/cadeira, tanto serviço principal como extra. Substitui escalões, exceção de quatro cadeiras e limite de dez para proteção. Limpeza conserva os escalões e orçamento a partir de dez. Fonte partilhada `src/constants/chairPricing.ts`, usada pelo motor e tabelas/conteúdo inicial.
+
 ## Redução do upsell de proteção de sofás (23/09/2026)
 
 Quando a base é limpeza de sofá, o extra de impermeabilização Essencial ou Premium custa menos 10€ por sofá protegido. Preços autónomos de impermeabilização e limpeza adicionada a uma impermeabilização mantêm-se. `waterproofingUpsellDiscount` nas opções de sofá é aplicado por `calcPackPricing`, partilhado com os totais e recibos; colchões e cadeiras não mudam. Sofás de 4+ lugares permanecem sob orçamento, sem inventar preço fixo. A deslocação gratuita usa o valor efetivo já com esta redução.

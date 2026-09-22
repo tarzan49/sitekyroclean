@@ -1,3 +1,4 @@
+import { CHAIR_WATERPROOF_ESSENTIAL } from '../constants/chairPricing';
 // Maps each PRICE_TABLE row (same serviceSlug + index) to a quiz prefill
 // config so clicking the row jumps straight to the quiz's Config step (3)
 // with that item pre-selected. `null` = row is not directly selectable
@@ -79,6 +80,6 @@ export const PRICE_TABLE: Record<string, { item: string; price: string }[]> = {
     { item: 'Sofá 3 lugares',          price: '99€' },
     { item: 'Sofá de 4+ lugares',        price: 'Sob orçamento' },
     { item: 'Chaise longue (add-on)',  price: '+25€' },
-    { item: 'Cadeiras',               price: '20€/cad' },
+    { item: 'Cadeiras',               price: `${CHAIR_WATERPROOF_ESSENTIAL}€/cad` },
   ],
 };

@@ -29,30 +29,14 @@ describe('calcChairClean (1-4 @ 20€ · 5-6 @ 15€ · 7-9 @ 12.5€ · 10+ sob
   });
 });
 
-describe('calcChairWaterproof (1-4 @ 15€ · 5-9 @ 10€ · 10+ sob orçamento)', () => {
-  it('is null at the 10+ boundary', () => {
-    expect(calcChairWaterproof(10)).toBeNull();
+describe('chair protection fixed unit prices', () => {
+  it.each([1, 4, 5, 9, 10, 11, 100])('prices %i chairs without brackets', qty => {
+    expect(calcChairWaterproof(qty)).toBe(qty * 18);
+    expect(calcChairWaterproofPremium(qty)).toBe(qty * 25);
   });
-  it.each([
-    [1, 15], [4, 70], [5, 70], [9, 110],
-  ])('qty=%i -> %i€', (qty, expected) => {
-    expect(calcChairWaterproof(qty)).toBeCloseTo(expected);
-  });
-});
-
-describe('calcChairWaterproofPremium (1-4 @ 20€ · 5-9 @ 15€ · 10+ sob orçamento, sempre acima da Essencial)', () => {
-  it('is null at the 10+ boundary', () => {
-    expect(calcChairWaterproofPremium(10)).toBeNull();
-  });
-  it.each([
-    [1, 20], [4, 90], [5, 95], [9, 155],
-  ])('qty=%i -> %i€', (qty, expected) => {
-    expect(calcChairWaterproofPremium(qty)).toBeCloseTo(expected);
-  });
-  it('is always more expensive than Essencial for the same qty (1..9)', () => {
-    for (let qty = 1; qty <= 9; qty++) {
-      expect(calcChairWaterproofPremium(qty)!).toBeGreaterThan(calcChairWaterproof(qty)!);
-    }
+  it.each([0, -1, 1.5, NaN, Infinity])('rejects invalid quantity %s', qty => {
+    expect(calcChairWaterproof(qty)).toBeNull();
+    expect(calcChairWaterproofPremium(qty)).toBeNull();
   });
 });
 

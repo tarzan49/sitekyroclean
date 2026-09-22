@@ -1,3 +1,4 @@
+import { CHAIR_WATERPROOF_ESSENTIAL, CHAIR_WATERPROOF_PREMIUM } from '../constants/chairPricing';
 import ServiceProcessGuide from '@/components/ServiceProcessGuide';
 import { Check, Droplet, FlaskConical } from "lucide-react";
 import Header from "@/components/Header";
@@ -76,7 +77,7 @@ const waterproofingTiers: WaterproofingTier[] = [
     name: "Premium",
     base: "À base de diluente",
     sofaPrice: "89€ / 109€ / 139€",
-    chairPrice: "20€/un (1-4) · 15€/un (5-9)",
+    chairPrice: `${CHAIR_WATERPROOF_PREMIUM}€/un`,
     washes: "Aguenta até 5 lavagens",
     durability: "Até 10 anos de proteção real (salvo exceções)",
     badge: "Recomendado",
@@ -93,7 +94,7 @@ const waterproofingTiers: WaterproofingTier[] = [
     name: "Essencial",
     base: "À base de água",
     sofaPrice: "59€ / 79€ / 99€",
-    chairPrice: "15€/un (1-4) · 10€/un (5-9)",
+    chairPrice: `${CHAIR_WATERPROOF_ESSENTIAL}€/un`,
     washes: "Aguenta até 2 lavagens",
     durability: "Até 1 a 2 anos de proteção real, consoante o uso",
     features: [

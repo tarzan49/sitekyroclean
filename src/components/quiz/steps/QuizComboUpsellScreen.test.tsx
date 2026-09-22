@@ -105,7 +105,7 @@ it('preserves imported anti-mite treatment instead of silently dropping it', () 
 it('preserves Premium waterproofing chairs imported from the widget', () => {
   let latest: UpsellItemConfig[] = [];
   render(<QuizComboUpsellScreen primaryService="sofa" upsellItems={[{ id: 'chairs', chairQty: '5', qty: 5, price: 95, label: '5 cadeiras (Impermeabilização Premium)', waterproof: true, waterproofingTier: 'premium' }]} setUpsellItems={items => { latest = items; }} onContinue={() => {}} onBack={() => {}} />);
-  expect(latest[0].price).toBe(95);
+  expect(latest[0].price).toBe(125);
   expect(latest[0].label).toContain('Impermeabilização Premium');
 });
 

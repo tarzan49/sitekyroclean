@@ -1,3 +1,4 @@
+import { CHAIR_WATERPROOF_ESSENTIAL } from '../constants/chairPricing';
 // Central engine for keyword variant pages:
 // higienizacao/lavagem × sofa/colchao/tapetes/cadeiras/alcatifas × all cities + parishes
 // Content generated on demand — no 1 570-entry array kept in memory at module load.
@@ -72,7 +73,7 @@ const SERVICE_META: Record<ServiceKey, {
   sofa:      { label: 'Sofá',      labelPlural: 'Sofás',      canonicalBase: 'limpeza-sofas',     priceFrom: '49€',     waterproofPriceFrom: '59€'      },
   colchao:   { label: 'Colchão',   labelPlural: 'Colchões',   canonicalBase: 'limpeza-colchoes',  priceFrom: '59€' },
   tapetes:   { label: 'Tapetes',   labelPlural: 'Tapetes',    canonicalBase: 'limpeza-tapetes',   priceFrom: 'Sob orçamento'                              },
-  cadeiras:  { label: 'Cadeiras',  labelPlural: 'Cadeiras',   canonicalBase: 'limpeza-cadeiras',  priceFrom: '20€',     waterproofPriceFrom: '20€/cad.'    },
+  cadeiras:  { label: 'Cadeiras',  labelPlural: 'Cadeiras',   canonicalBase: 'limpeza-cadeiras',  priceFrom: '20€',     waterproofPriceFrom: `${CHAIR_WATERPROOF_ESSENTIAL}€/cad.`    },
   alcatifas: { label: 'Alcatifas', labelPlural: 'Alcatifas',  canonicalBase: 'limpeza-alcatifas', priceFrom: 'Sob orçamento'                             },
 };
 
