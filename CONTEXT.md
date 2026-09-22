@@ -1,6 +1,6 @@
 ## Página de obrigado (23/09/2026)
 
-`Obrigado.tsx` conserva a leitura do recibo da sessão e delega a apresentação em `QuoteConfirmation.tsx`. WhatsApp no primeiro ecrã mobile, próximos passos explícitos e cartão claro com artigos, quantidades, deslocação e valores conhecidos. Sem recibo, não afirma que um pedido foi enviado. Serviços sob orçamento mantêm essa indicação e subtotal conhecido separado. A marcação requer confirmação da equipa. `?exemplo=pedido` mostra um pedido ilustrativo apenas em DEV, sem gravar dados nem submeter contactos.
+`Obrigado.tsx` conserva a leitura do recibo da sessão e delega a apresentação em `QuoteConfirmation.tsx`. Composição compacta num único ecrã mobile para pedidos curtos: resumo premium claro com artigos, quantidades, deslocação e valores conhecidos, um único CTA WhatsApp e avaliações Google. Sem introdução longa, próximos passos ou CTAs duplicados. Pedidos extensos conservam todas as linhas e podem exigir scroll. Sem recibo, não afirma que um pedido foi enviado. Serviços sob orçamento mantêm essa indicação e subtotal conhecido separado. A marcação requer confirmação da equipa. `?exemplo=pedido` mostra um pedido ilustrativo apenas em DEV, sem gravar dados nem submeter contactos.
 
 ## Mesmo pack nos dois percursos de sofá (23/09/2026)
 

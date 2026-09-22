@@ -15,10 +15,10 @@ describe('Quote confirmation', () => {
     expect(screen.queryByText('Não especificado')).toBeNull();
     expect(screen.getByText('Lisboa')).toBeTruthy();
   });
-  it('uses the supplied WhatsApp link for both actions', () => {
+  it('uses the supplied WhatsApp link for the single primary action', () => {
     show(receipt);
-    const links = screen.getAllByRole('link', { name: 'Continuar no WhatsApp' });
-    expect(links).toHaveLength(2);
+    const links = screen.getAllByRole('link', { name: 'Confirmar pelo WhatsApp' });
+    expect(links).toHaveLength(1);
     links.forEach(link => expect(link.getAttribute('href')).toBe('https://wa.me/351925530647?text=pedido'));
   });
   it('does not invent a successful submission or a total without session data', () => {

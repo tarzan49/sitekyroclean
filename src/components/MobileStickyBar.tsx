@@ -18,6 +18,8 @@ const MobileStickyBar = () => {
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
+  if (pathname === '/obrigado') return null;
+
   return (
     <div
       className={`fixed bottom-0 inset-x-0 z-30 transition-transform duration-300 ${visible ? 'translate-y-0' : 'translate-y-full'}`}

@@ -1,3 +1,7 @@
+## Página de obrigado compacta (23/09/2026)
+
+Pedido do responsável: apenas resumo premium do pedido, um CTA WhatsApp e avaliações Google. Pedidos curtos devem mostrar estes três elementos num único ecrã mobile. Não repor introduções longas, secção de próximos passos, CTAs duplicados ou barra flutuante nesta página. Preservar todos os artigos, quantidades e valores; pedidos extensos podem exigir scroll em vez de esconder detalhes.
+
 ## Mesmo pack nos dois percursos de sofá (23/09/2026)
 
 A redução de 10€ por sofá no pack aplica-se também quando a impermeabilização é o serviço principal e a limpeza é adicionada. O total limpeza + proteção deve ser idêntico nos dois percursos, para o mesmo tamanho, tier e quantidade tratada. Preços autónomos mantêm-se. O extra de limpeza mostra o preço autónomo da limpeza riscado (sem +) e compara os dois totais. Esta regra substitui a preservação anterior do preço do upsell inverso.
