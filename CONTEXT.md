@@ -1,3 +1,7 @@
+## Comparação do pack de sofá (23/09/2026)
+
+O upsell de proteção mostra o preço autónomo da mesma proteção riscado, pequeno à direita do acréscimo em pack. Abaixo compara o total limpeza + proteção em pack com a soma dos dois serviços autónomos. Usa as tabelas reais e apenas os sofás selecionados para proteção; sem preço fixo não inventa comparação. Não comparar um acréscimo com o preço total dos dois serviços. `WaterproofingTierPicker` recebe os valores opcionais de `QuizSofaAddonUpsell`.
+
 ## Impermeabilização de cadeiras por unidade (23/09/2026)
 
 Preço fixo em todas as quantidades: Essencial 18€/cadeira; Premium 25€/cadeira, tanto serviço principal como extra. Substitui escalões, exceção de quatro cadeiras e limite de dez para proteção. Limpeza conserva os escalões e orçamento a partir de dez. Fonte partilhada `src/constants/chairPricing.ts`, usada pelo motor e tabelas/conteúdo inicial.

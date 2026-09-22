@@ -66,6 +66,17 @@ const QuizSofaAddonUpsell = ({ formData, updateFormData, sofaItems, setSofaItems
     const pack = calcPackPricing(option, true, false, 40, selectedTier);
     return pack.isSob || pack.packDelta === null ? null : sum + pack.packDelta * item.qty;
   }, 0);
+  const originalProtectionTotal = (selectedTier: 'premium' | 'essencial') => comparisonItems.reduce<number | null>((sum, item) => {
+    if (!item.qty) return sum;
+    const option = sofaPrices.find(p => p.id === item.sizeId);
+    const price = selectedTier === 'premium' ? option?.waterproofingPremiumPrice : option?.waterproofingPrice;
+    return sum === null || typeof price !== 'number' ? null : sum + price * item.qty;
+  }, 0);
+  const selectedCleaningTotal = comparisonItems.reduce<number | null>((sum, item) => {
+    if (!item.qty) return sum;
+    const price = sofaPrices.find(p => p.id === item.sizeId)?.cleaningPrice;
+    return sum === null || typeof price !== 'number' ? null : sum + price * item.qty;
+  }, 0);
   const essencialTotal = protectionTotal('essencial');
   const premiumTotal = protectionTotal('premium');
   const premiumDifference = premiumTotal !== null && essencialTotal !== null ? premiumTotal - essencialTotal : null;
@@ -94,6 +105,8 @@ const QuizSofaAddonUpsell = ({ formData, updateFormData, sofaItems, setSofaItems
         <WaterproofingTierPicker
           premiumDifference={premiumDifference}
           prices={{ essencial: essencialTotal, premium: premiumTotal }}
+          originalPrices={{ essencial: originalProtectionTotal('essencial'), premium: originalProtectionTotal('premium') }}
+          packBaseTotal={selectedCleaningTotal}
           priceScope={protectionCount === 1 ? 'para 1 sofá' : `para ${protectionCount} sofás`}
           formData={formData}
           updateFormData={updateFormData}

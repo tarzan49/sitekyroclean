@@ -10,7 +10,7 @@ import type { QuizFormData } from '@/components/quiz/QuizTypes';
 // Extraído de QuizStepConfig.tsx (2026-09-08, thinning do ficheiro monolítico
 // de 417 linhas) — usado por QuizStepConfigSofa, QuizStepConfigChairs, e
 // QuizSofaAddonUpsell.
-export function WaterproofingTierPicker({ formData, updateFormData, onSelect, activeTier, premiumDifference, prices, priceScope, compact = false, centered = false }: { formData: Pick<QuizFormData, 'waterproofingTier'>; updateFormData: (u: Partial<QuizFormData>) => void; onSelect?: (t: 'premium' | 'essencial') => void; activeTier?: 'premium' | 'essencial' | null; premiumDifference?: number | null; prices?: { essencial: number | null; premium: number | null }; priceScope?: string; compact?: boolean; centered?: boolean }) {
+export function WaterproofingTierPicker({ formData, updateFormData, onSelect, activeTier, premiumDifference, prices, originalPrices, packBaseTotal, priceScope, compact = false, centered = false }: { formData: Pick<QuizFormData, 'waterproofingTier'>; updateFormData: (u: Partial<QuizFormData>) => void; onSelect?: (t: 'premium' | 'essencial') => void; activeTier?: 'premium' | 'essencial' | null; premiumDifference?: number | null; prices?: { essencial: number | null; premium: number | null }; originalPrices?: { essencial: number | null; premium: number | null }; packBaseTotal?: number | null; priceScope?: string; compact?: boolean; centered?: boolean }) {
   // activeTier deixa o chamador decidir o que conta como "selecionado" na UI
   // — por omissão é a preferência de tier (formData.waterproofingTier), mas
   // um upsell onde ainda ninguém clicou em nada não pode mostrar um cartão já
@@ -40,8 +40,9 @@ export function WaterproofingTierPicker({ formData, updateFormData, onSelect, ac
           <p className="text-base font-bold text-[#D4AF37]">Premium</p>
         </div>
         {prices && <div className="w-full mt-1.5 mb-3">
-          <p className={cn('font-bold tracking-tight tabular-nums text-[#D4AF37]', prices.premium === null ? 'text-base' : 'text-2xl leading-tight')}>{prices.premium === null ? 'Sob orçamento' : `+${prices.premium.toLocaleString('pt-PT')}€`}</p>
-          {!compact && <p className="text-sm text-white/80 mt-1">{priceScope} · antes de descontos</p>}
+          <p className={cn('font-bold tracking-tight tabular-nums text-[#D4AF37]', prices.premium === null ? 'text-base' : 'text-2xl leading-tight')}>{prices.premium === null ? 'Sob orçamento' : `+${prices.premium.toLocaleString('pt-PT')}€`}{prices.premium !== null && originalPrices?.premium != null && originalPrices.premium > prices.premium && <del aria-label={`Preço original da impermeabilização: ${originalPrices.premium.toLocaleString('pt-PT')} euros`} className="ml-2 text-base font-medium text-white/80 decoration-white/70 whitespace-nowrap">{originalPrices.premium.toLocaleString('pt-PT')}€</del>}</p>
+          {!compact && <p className="text-sm text-white/80 mt-1">{priceScope}{originalPrices ? ' · preço em pack' : ' · antes de descontos'}</p>}
+          {packBaseTotal != null && prices.premium != null && originalPrices?.premium != null && originalPrices.premium > prices.premium && <p className="text-xs leading-relaxed text-white/75 mt-1.5">Pack: {(packBaseTotal + prices.premium).toLocaleString('pt-PT')}€ em vez de {(packBaseTotal + originalPrices.premium).toLocaleString('pt-PT')}€</p>}
         </div>}
         <p className="text-sm leading-relaxed text-[#D4AF37]">{compact ? 'Até 10 anos · até 5 lavagens' : 'Até 10 anos de proteção · até 5 lavagens'}</p>
         {premiumDifference != null && premiumDifference > 0 && <div className="flex items-center gap-1.5 mt-2 text-sm" aria-label={`Mais ${premiumDifference.toLocaleString('pt-PT')}€ que o Essencial`}>
@@ -62,8 +63,9 @@ export function WaterproofingTierPicker({ formData, updateFormData, onSelect, ac
           <p className={cn('text-base font-bold', tier === 'essencial' ? 'text-white' : 'text-white/80')}>Essencial</p>
         </div>
         {prices && <div className="w-full mt-1.5 mb-3">
-          <p className={cn('font-bold tracking-tight tabular-nums text-white', prices.essencial === null ? 'text-base' : 'text-2xl leading-tight')}>{prices.essencial === null ? 'Sob orçamento' : `+${prices.essencial.toLocaleString('pt-PT')}€`}</p>
-          {!compact && <p className="text-sm text-white/80 mt-1">{priceScope} · antes de descontos</p>}
+          <p className={cn('font-bold tracking-tight tabular-nums text-white', prices.essencial === null ? 'text-base' : 'text-2xl leading-tight')}>{prices.essencial === null ? 'Sob orçamento' : `+${prices.essencial.toLocaleString('pt-PT')}€`}{prices.essencial !== null && originalPrices?.essencial != null && originalPrices.essencial > prices.essencial && <del aria-label={`Preço original da impermeabilização: ${originalPrices.essencial.toLocaleString('pt-PT')} euros`} className="ml-2 text-base font-medium text-white/80 decoration-white/70 whitespace-nowrap">{originalPrices.essencial.toLocaleString('pt-PT')}€</del>}</p>
+          {!compact && <p className="text-sm text-white/80 mt-1">{priceScope}{originalPrices ? ' · preço em pack' : ' · antes de descontos'}</p>}
+          {packBaseTotal != null && prices.essencial != null && originalPrices?.essencial != null && originalPrices.essencial > prices.essencial && <p className="text-xs leading-relaxed text-white/75 mt-1.5">Pack: {(packBaseTotal + prices.essencial).toLocaleString('pt-PT')}€ em vez de {(packBaseTotal + originalPrices.essencial).toLocaleString('pt-PT')}€</p>}
         </div>}
         <p className="text-sm leading-relaxed text-white/75">{compact ? '1 a 2 anos · até 2 lavagens' : '1 a 2 anos de proteção · até 2 lavagens'}</p>
       </button>

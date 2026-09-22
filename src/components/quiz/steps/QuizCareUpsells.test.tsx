@@ -71,6 +71,10 @@ describe('care upsells', () => {
     expect(screen.getByText('1 de 2')).toBeTruthy();
     expect(screen.getByText('+80€')).toBeTruthy();
     expect(screen.getByText('+110€')).toBeTruthy();
+    expect(screen.getByLabelText('Preço original da impermeabilização: 139 euros').tagName).toBe('DEL');
+    expect(screen.getByLabelText('Preço original da impermeabilização: 99 euros').tagName).toBe('DEL');
+    expect(screen.getByText('Pack: 189€ em vez de 218€')).toBeTruthy();
+    expect(screen.getByText('Pack: 159€ em vez de 178€')).toBeTruthy();
     expect(screen.getByLabelText('Mais 30€ que o Essencial').textContent).toContain('+30€');
     fireEvent.click(screen.getByRole('button', { name: /^Essencial/ }));
     expect(screen.getByText('1 de 2')).toBeTruthy();
