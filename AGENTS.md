@@ -1,3 +1,7 @@
+## Página de obrigado no PC (23/09/2026)
+
+Pedido explícito do responsável: adaptar também a PC. A partir de 1024px, composição em duas colunas centrada na altura disponível, título/WhatsApp/avaliações à esquerda e resumo à direita, com tipografia e espaçamento próprios. Preservar o mobile compacto. A revisão de PC autoriza pré-visualização desktop desta página, substituindo aqui a restrição histórica de previews apenas mobile.
+
 ## Página de obrigado compacta (23/09/2026)
 
 Pedido do responsável: apenas resumo premium do pedido, um CTA WhatsApp e avaliações Google. Pedidos curtos devem mostrar estes três elementos num único ecrã mobile. Não repor introduções longas, secção de próximos passos, CTAs duplicados ou barra flutuante nesta página. Preservar todos os artigos, quantidades e valores; pedidos extensos podem exigir scroll em vez de esconder detalhes.

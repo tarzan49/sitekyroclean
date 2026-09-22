@@ -1,3 +1,7 @@
+## Página de obrigado no PC (23/09/2026)
+
+Pedido explícito do responsável: adaptar também a PC. A partir de 1024px, composição em duas colunas centrada na altura disponível, título/WhatsApp/avaliações à esquerda e resumo à direita, com tipografia e espaçamento próprios. Preservar o mobile compacto. A revisão de PC autoriza pré-visualização desktop desta página, substituindo aqui a restrição histórica de previews apenas mobile.
+
 ## Página de obrigado (23/09/2026)
 
 `Obrigado.tsx` conserva a leitura do recibo da sessão e delega a apresentação em `QuoteConfirmation.tsx`. Composição compacta num único ecrã mobile para pedidos curtos: resumo premium claro com artigos, quantidades, deslocação e valores conhecidos, um único CTA WhatsApp e avaliações Google. Sem introdução longa, próximos passos ou CTAs duplicados. Pedidos extensos conservam todas as linhas e podem exigir scroll. Sem recibo, não afirma que um pedido foi enviado. Serviços sob orçamento mantêm essa indicação e subtotal conhecido separado. A marcação requer confirmação da equipa. `?exemplo=pedido` mostra um pedido ilustrativo apenas em DEV, sem gravar dados nem submeter contactos.
