@@ -58,7 +58,7 @@ export default function QuizEstimate({ totalPrice, needsQuote, travelOnly, locat
           <summary className="cursor-pointer py-1 text-white/80 hover:text-gold">Ver composição do orçamento</summary>
           <dl className="mt-1 space-y-1 border-t border-white/10 pt-2">
             <div className="flex justify-between gap-3"><dt>Serviços{needsQuote ? ' com preço definido' : ''}</dt><dd>{Math.round(totalPrice - travelCost)}€</dd></div>
-            <div className="flex justify-between gap-3"><dt>Deslocação{location ? ` · ${location}` : ''}</dt><dd>{travelCost}€</dd></div>
+            <div className="flex justify-between gap-3"><dt>Deslocação{location ? ` · ${location}` : ''}</dt><dd>{travelCost === 0 && location ? 'Gratuita' : `${travelCost}€`}</dd></div>
             {needsQuote && <div className="text-gold">Acrescem os serviços sob orçamento.</div>}
           </dl>
         </details>

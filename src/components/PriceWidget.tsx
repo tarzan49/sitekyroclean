@@ -78,7 +78,7 @@ export default function PriceWidget({ serviceSlug, initialLocation }: Props) {
         {initialLocation && <span className="inline-flex items-center gap-1 text-base text-white/80"><MapPin className="h-3.5 w-3.5" />{initialLocation}</span>}
       </div>
       {hasSelection && <div className="px-4 sm:px-6">
-        <QuizEstimate totalPrice={total > 0 ? pricing.grandTotal : 0} needsQuote={hasUnpricedSelection} travelOnly={false} location={initialLocation ?? ''} travelCost={initialLocation && total > 0 ? travelFee : undefined} />
+        <QuizEstimate totalPrice={total > 0 ? pricing.grandTotal : 0} needsQuote={hasUnpricedSelection} travelOnly={false} location={initialLocation ?? ''} travelCost={initialLocation && total > 0 ? pricing.travelFee : undefined} />
         {!initialLocation && <p className="pt-2 text-center text-base text-white/80">Deslocação a confirmar conforme a localidade.</p>}
       </div>}
       <div className="px-4 sm:px-6 pt-5 pb-4 text-center">

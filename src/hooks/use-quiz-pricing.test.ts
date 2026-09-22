@@ -56,10 +56,28 @@ describe('quote total with upsell items', () => {
   const form = { ...initialFormData, location: 'Lisboa', service: 'sofa', serviceType: 'cleaning' as const };
   it('adds the upsell item price straight into the total, no discount concept involved', () => {
     const { result } = renderHook(() => useQuizPricing(form, sofa, [], extra, []));
-    expect(result.current.totalPrice).toBe(144);
+    expect(result.current.totalPrice).toBe(134);
   });
   it('keeps the original price when the extra is declined', () => {
     const { result } = renderHook(() => useQuizPricing(form, sofa, [], [], []));
+    expect(result.current.totalPrice).toBe(89);
+  });
+});
+
+describe('travel recalculation', () => {
+  it('reinstates travel when extras are removed and recalculates on a city change', () => {
+    const sofa = [{ sizeId: '3-lugares', qty: 1, packEnabled: false }];
+    const extra = [{ id: 'mattress-casal', qty: 1, price: 55, label: 'Colchão Casal' }];
+    const { result, rerender } = renderHook(({ city, extras }) => useQuizPricing(
+      { ...initialFormData, service: 'sofa', serviceType: 'cleaning', location: city },
+      sofa, [], extras, []), { initialProps: { city: 'Lisboa', extras: extra } });
+    expect(result.current.finalTravelCost).toBe(0);
+    expect(result.current.totalPrice).toBe(134);
+    rerender({ city: 'Penafiel', extras: extra });
+    expect(result.current.finalTravelCost).toBe(15);
+    expect(result.current.totalPrice).toBe(149);
+    rerender({ city: 'Lisboa', extras: [] });
+    expect(result.current.finalTravelCost).toBe(10);
     expect(result.current.totalPrice).toBe(89);
   });
 });

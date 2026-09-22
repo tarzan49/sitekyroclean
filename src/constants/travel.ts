@@ -89,3 +89,13 @@ export const locationPrices: Record<string, number> = {
   'Vila do Bispo': 25,
   'Alcoutim': 25,
 };
+
+/** Services and extras at their actual quoted prices, excluding travel. */
+export function calculateTravelFee(baseFee: number, servicesTotal: number): number {
+  if (!Number.isFinite(servicesTotal) || servicesTotal < 0) return baseFee;
+  const cents = Math.round(servicesTotal * 100);
+  if ((baseFee === 10 && cents > 12000) ||
+      (baseFee === 15 && cents > 13500) ||
+      (baseFee === 20 && cents >= 15000)) return 0;
+  return baseFee;
+}

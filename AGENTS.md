@@ -1,3 +1,9 @@
+## Deslocação gratuita por valor do orçamento (23/09/2026)
+
+Pedido do responsável: taxa base de 10€ fica gratuita acima de 120€ de serviços; taxa de 15€ acima de 135€; taxa de 20€ a partir de 150€ (inclusive). Taxas de 25€ mantêm-se. O limiar usa a soma dos serviços e extras aos preços efetivos, excluindo a própria deslocação. Artigos sob orçamento não recebem um valor fictício; só os montantes conhecidos contam. Sem atingir o limiar mantém-se a taxa da localidade. Esta regra substitui notas antigas de deslocação nunca gratuita/mínimo sempre cobrado, sem alterar as tabelas base.
+
+`calculateTravelFee` em `src/constants/travel.ts` centraliza a regra no quiz, widget e configurador de packs. Alterar quantidades, extras ou localidade recalcula a oferta; totais e payload do quiz usam `finalTravelCost`.
+
 ## Escovagem depois do tratamento (13/09/2026)
 
 Na limpeza, a sequência é tratar, escovar, extrair e conferir/secagem, após avaliação. A escova e a pressão respeitam o revestimento. Juta, sisal, seda e materiais incompatíveis não seguem automaticamente limpeza com água nem escovagem forte; avaliar composição e método. Não confundir aplicação de impermeabilizante ou avaliação de bolor com esta sequência de limpeza. Preservar a etapa explícita nos guias dos problemas.

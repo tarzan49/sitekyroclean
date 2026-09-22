@@ -1,3 +1,4 @@
+import { calculateTravelFee } from '@/constants/travel';
 import { splitTreatmentItems } from '@/components/quiz/quizHelpers';
 import { useMemo } from 'react';
 import type { QuizFormData, SofaItem, MattressItem, CarpetItem, UpsellItemConfig } from '@/components/quiz';
@@ -78,7 +79,7 @@ export function useQuizPricing(
   }, [formData, sofaItems, mattressItems, carpetItems]);
 
   // Calculate travel cost: uses expanded locationPrices from QuizTypes.
-  // Mínimo é sempre 10€ (sem zona grátis). Antes de escolher localização não há
+  // Taxa base antes da oferta por valor dos serviços. Antes de escolher localização não há
   // preço nenhum a mostrar (0), evitando um "10€" enganoso logo no 1º passo do quiz.
   // "other" (localização fora da tabela) usa o mínimo garantido do site (10€).
   const travelCost = useMemo(() => {
@@ -87,10 +88,10 @@ export function useQuizPricing(
     return locationPrices[formData.location] ?? 10;
   }, [formData.location]);
 
-  const finalTravelCost = travelCost;
 
   const safePrice = (n: number) => (isNaN(n) || n == null) ? 0 : n;
   const upsellItemsTotal = upsellItems.reduce((sum, item) => sum + safePrice(item.price), 0);
+  const finalTravelCost = calculateTravelFee(travelCost, safePrice(calculateServicePrice) + upsellItemsTotal);
   const totalPrice = safePrice(calculateServicePrice) + safePrice(upsellItemsTotal) + safePrice(finalTravelCost) + 0;
   // True when the user has qty>0 of the "4+ lugares" sofa, or any measured
   // carpet (carpets never have a fixed price anymore — always a custom quote,

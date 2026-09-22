@@ -25,11 +25,11 @@ describe('custom pack commercial rules', () => {
   });
   // 2026-09-10 (pedido explícito do dono): sem desconto de 10% sobre o
   // pedido todo — cada linha soma ao preço de tabela, sem limiar a cumprir.
-  it('sums the full table price for each item, with no discount concept, and never discounts travel', () => {
+  it('sums the full table price for each item, with no discount concept, and applies the travel waiver', () => {
     const items = [{ ...makePackItem('sofa', 's'), size: '3-lugares' }, { ...makePackItem('mattress', 'm'), size: 'king' }];
     const result = calculateCustomPack(items, 'Barcelos');
     expect(result.subtotal).toBe(158);
-    expect(result.travel).toBe(20); expect(result.total).toBe(158 + 20);
+    expect(result.travel).toBe(0); expect(result.total).toBe(158);
   });
   it('keeps ten chairs under quote even when split across rows', () => {
     const result = calculateCustomPack([{ ...makePackItem('chairs','a'), qty: 5 }, { ...makePackItem('chairs','b'), qty: 5 }], 'Braga');

@@ -1,3 +1,4 @@
+import { calculateTravelFee } from '../constants/travel';
 import { carpetAllItemsValid } from '@/components/quiz/quizHelpers';
 import { PRICE_TABLE, PRICE_TABLE_QUIZ_CONFIG, type PriceRowQuizConfig } from "@/data/locationPriceTestimonialsData";
 import type { UpsellItemConfig, CarpetItem } from "@/components/quiz/QuizTypes";
@@ -135,7 +136,8 @@ export interface WidgetPricing {
 }
 
 export function calcWidgetPricing(serviceTotal: number, travelFee: number): WidgetPricing {
-  return { serviceTotal, travelFee, grandTotal: serviceTotal + travelFee };
+  const finalTravelFee = calculateTravelFee(travelFee, serviceTotal);
+  return { serviceTotal, travelFee: finalTravelFee, grandTotal: serviceTotal + finalTravelFee };
 }
 
 /**

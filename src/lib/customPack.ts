@@ -1,7 +1,7 @@
 import { SOFA_ANTI_ACAROS_PRICE } from './priceWidgetCalc';
 import { sofaPrices, mattressPrices, sofaChaisePrice } from '../components/quiz/QuizTypes';
 import { calcChairClean, calcChairWaterproof, calcChairWaterproofPremium, calcPackPricing } from '../components/quiz/quizHelpers';
-import { locationPrices } from '../constants/travel';
+import { locationPrices, calculateTravelFee } from '../constants/travel';
 export type PackKind = 'sofa' | 'mattress' | 'chairs' | 'rug' | 'carpet';
 export type PackExtra = 'none' | 'premium' | 'essencial' | 'anti-acaros' | 'desbacterizacao';
 export interface CustomPackItem { id: string; kind: PackKind; size: string; qty: number; chaise: boolean; extra: PackExtra; width: string; length: string; }
@@ -48,6 +48,7 @@ export function calculateCustomPack(items: CustomPackItem[], city: string) {
   const totalChairs = items.filter(i => i.kind === 'chairs').reduce((sum, i) => sum + i.qty, 0);
   const lines = items.map(item => item.kind === 'chairs' && totalChairs >= 10 ? { ...customPackLine(item), amount: null, quote: true } : customPackLine(item));
   const subtotal = lines.reduce((sum, line) => sum + (line.amount ?? 0), 0);
-  const travel = locationPrices[city] ?? null;
+  const baseTravel = locationPrices[city] ?? null;
+  const travel = baseTravel === null ? null : calculateTravelFee(baseTravel, subtotal);
   return { lines, subtotal, servicesTotal: subtotal, travel, total: subtotal + (travel ?? 0), quote: lines.some(l => l.quote) || travel === null, valid: items.length > 0 && items.every(packItemValid) && Boolean(city.trim()) };
 }

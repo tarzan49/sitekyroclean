@@ -1,3 +1,9 @@
+## Deslocação gratuita por valor do orçamento (23/09/2026)
+
+Pedido do responsável: taxa base de 10€ fica gratuita acima de 120€ de serviços; taxa de 15€ acima de 135€; taxa de 20€ a partir de 150€ (inclusive). Taxas de 25€ mantêm-se. O limiar usa a soma dos serviços e extras aos preços efetivos, excluindo a própria deslocação. Artigos sob orçamento não recebem um valor fictício; só os montantes conhecidos contam. Sem atingir o limiar mantém-se a taxa da localidade. Esta regra substitui notas antigas de deslocação nunca gratuita/mínimo sempre cobrado, sem alterar as tabelas base.
+
+`calculateTravelFee` em `src/constants/travel.ts` centraliza a regra no quiz, widget e configurador de packs. Alterar quantidades, extras ou localidade recalcula a oferta; totais e payload do quiz usam `finalTravelCost`.
+
 ## Recursos: Blog, FAQ e Glossário (21/09/2026)
 
 Os 26 artigos do Blog preservam URLs e passam a reutilizar o desenho comercial: `CommercialHero`, `ServicePriceSection`, `ServiceReviewsGrid`, guia com índice e quatro FAQ, e `ServicePackBanner`. O responsável rejeitou uma identidade editorial diferente das páginas de serviço. Manter verde/dourado canónicos, Avenir e WhatsApp principal. `ResourceHubHero`/`ResourceNav` ligam Blog, FAQ e Glossário; pesquisa nos 26 guias e nos 100 termos. Os 100 são termos na mesma página, não 100 páginas desaparecidas, confirmado pelo responsável.

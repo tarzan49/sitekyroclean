@@ -37,8 +37,8 @@ describe('calcWidgetTotal — carpet (tapete e alcatifa) nunca soma ao total', (
 // limiar de 149€ deixaram de existir. calcWidgetPricing agora só soma
 // serviço + deslocação.
 describe('calcWidgetPricing — sem conceito de desconto', () => {
-  it('grandTotal is just serviceTotal + travelFee', () => {
-    expect(calcWidgetPricing(200, 10)).toEqual({ serviceTotal: 200, travelFee: 10, grandTotal: 210 });
+  it('grandTotal applies the travel waiver', () => {
+    expect(calcWidgetPricing(200, 10)).toEqual({ serviceTotal: 200, travelFee: 0, grandTotal: 200 });
   });
 });
 
