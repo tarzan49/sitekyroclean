@@ -89,16 +89,18 @@ describe('carpetItemArea / carpetHasValidItems', () => {
 });
 
 describe('sofa waterproofing upsell reduction', () => {
-  it.each(sofaPrices.filter(p => typeof p.bothPrice === 'number'))('reduces both tiers by 10 per $label only on cleaning orders', option => {
+  it.each(sofaPrices.filter(p => typeof p.bothPrice === 'number'))('reduces both tiers by 10 per $label in either service direction', option => {
     for (const tier of ['essencial', 'premium'] as const) {
       const previous = { ...option, waterproofingUpsellDiscount: 0 };
       expect(calcPackPricing(option, true, false, null, tier).packDelta)
         .toBe(calcPackPricing(previous, true, false, null, tier).packDelta! - 10);
       expect(calcPackPricing(option, false, false, null, tier).displayPrice).toBe(option.cleaningPrice);
-      expect(calcPackPricing(option, false, true, null, tier))
-        .toEqual(calcPackPricing(previous, false, true, null, tier));
-      expect(calcPackPricing(option, true, true, null, tier))
-        .toEqual(calcPackPricing(previous, true, true, null, tier));
+      expect(calcPackPricing(option, false, true, null, tier).displayPrice)
+        .toBe(calcPackPricing(previous, false, true, null, tier).displayPrice);
+      expect(calcPackPricing(option, true, true, null, tier).displayPrice)
+        .toBe(calcPackPricing(option, true, false, null, tier).displayPrice);
+      expect(calcPackPricing(option, true, true, null, tier).packDelta)
+        .toBe(calcPackPricing(previous, true, true, null, tier).packDelta! - 10);
     }
   });
   it('keeps large sofas subject to quotation', () => {

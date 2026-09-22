@@ -1,3 +1,7 @@
+## Mesmo pack nos dois percursos de sofá (23/09/2026)
+
+A redução de 10€ por sofá no pack aplica-se também quando a impermeabilização é o serviço principal e a limpeza é adicionada. O total limpeza + proteção deve ser idêntico nos dois percursos, para o mesmo tamanho, tier e quantidade tratada. Preços autónomos mantêm-se. O extra de limpeza mostra o preço autónomo da limpeza riscado (sem +) e compara os dois totais. Esta regra substitui a preservação anterior do preço do upsell inverso.
+
 ## Comparação do pack de sofá (23/09/2026)
 
 O upsell de proteção mostra o preço autónomo da mesma proteção riscado, pequeno à direita do acréscimo em pack. Abaixo compara o total limpeza + proteção em pack com a soma dos dois serviços autónomos. Usa as tabelas reais e apenas os sofás selecionados para proteção; sem preço fixo não inventa comparação. Não comparar um acréscimo com o preço total dos dois serviços. `WaterproofingTierPicker` recebe os valores opcionais de `QuizSofaAddonUpsell`.

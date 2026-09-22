@@ -81,6 +81,7 @@ const QuizSofaAddonUpsell = ({ formData, updateFormData, sofaItems, setSofaItems
   const premiumTotal = protectionTotal('premium');
   const premiumDifference = premiumTotal !== null && essencialTotal !== null ? premiumTotal - essencialTotal : null;
   const protectionCount = comparisonItems.reduce((sum, i) => sum + i.qty, 0);
+  const selectedProtectionTotal = originalProtectionTotal(tier);
   const cleaningTotal = comparisonItems.reduce<number | null>((sum, item) => {
     if (!item.qty) return sum;
     const option = sofaPrices.find(p => p.id === item.sizeId);
@@ -130,8 +131,9 @@ const QuizSofaAddonUpsell = ({ formData, updateFormData, sofaItems, setSofaItems
             <p className="text-sm text-white/80 leading-snug mt-0.5">Por extração, antes de aplicar a proteção. Na mesma visita.</p>
             <div className="border-t border-gold/15 mt-2 pt-2">
               <p className="text-sm font-bold uppercase tracking-[0.16em] text-white/80 mb-1">Acréscimo</p>
-              <p className="text-2xl leading-none font-black tracking-tight tabular-nums text-gold">{cleaningTotal === null ? 'Sob orçamento' : `+${cleaningTotal.toLocaleString('pt-PT')}€`}</p>
-              <p className="text-sm text-white/80 mt-1.5">para {protectionCount} {protectionCount === 1 ? 'sofá' : 'sofás'} · antes de descontos</p>
+              <p className="text-2xl leading-none font-black tracking-tight tabular-nums text-gold">{cleaningTotal === null ? 'Sob orçamento' : `+${cleaningTotal.toLocaleString('pt-PT')}€`}{cleaningTotal !== null && selectedCleaningTotal !== null && selectedCleaningTotal > cleaningTotal && <del aria-label={`Preço original da limpeza: ${selectedCleaningTotal.toLocaleString('pt-PT')} euros`} className="ml-2 text-base font-medium text-white/80 decoration-white/70 whitespace-nowrap">{selectedCleaningTotal.toLocaleString('pt-PT')}€</del>}</p>
+              <p className="text-sm text-white/80 mt-1.5">para {protectionCount} {protectionCount === 1 ? 'sofá' : 'sofás'} · preço em pack</p>
+              {cleaningTotal !== null && selectedProtectionTotal !== null && selectedCleaningTotal !== null && selectedCleaningTotal > cleaningTotal && <p className="text-xs leading-relaxed text-white/75 mt-1.5">Pack: {(selectedProtectionTotal + cleaningTotal).toLocaleString('pt-PT')}€ em vez de {(selectedProtectionTotal + selectedCleaningTotal).toLocaleString('pt-PT')}€</p>}
             </div>
           </div>
           <span className={cn(

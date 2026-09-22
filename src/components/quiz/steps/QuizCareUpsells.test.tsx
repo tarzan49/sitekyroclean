@@ -92,7 +92,9 @@ describe('care upsells', () => {
     }
     render(<CleaningHarness />);
     const cleaning = screen.getByRole('button', { name: /Higienização Profunda/ });
-    expect(cleaning.textContent).toContain('+60€');
+    expect(cleaning.textContent).toContain('+50€');
+    expect(screen.getByLabelText('Preço original da limpeza: 79 euros').textContent).toBe('79€');
+    expect(screen.getByText('Pack: 189€ em vez de 218€')).toBeTruthy();
     expect(screen.getByText('Ajuda a reduzir odores')).toBeTruthy();
     fireEvent.click(cleaning);
     expect(cleaning.getAttribute('aria-pressed')).toBe('true');

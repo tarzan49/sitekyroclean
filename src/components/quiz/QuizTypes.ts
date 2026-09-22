@@ -71,7 +71,7 @@ export interface PriceOption {
   // valor derivado (waterproofingPremiumPrice - waterproofingPrice) não é o desejado
   // só para o combo. Omitido = deriva-se automaticamente como antes.
   packPremiumDelta?: number;
-  // Redução por sofá apenas ao adicionar proteção a uma limpeza.
+  // Redução por sofá no pack de limpeza e proteção, em ambos os percursos.
   waterproofingUpsellDiscount?: number;
 }
 
