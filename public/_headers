@@ -9,19 +9,41 @@
 # desligava o botão "Usar a minha localização" em silêncio. `clipboard-write`
 # idem, pelo painel de WhatsApp do admin.
 #
-# Não há `Content-Security-Policy` aqui de propósito: uma política a sério tem
-# de autorizar a gtag da Google, o Supabase e as fontes, e uma regra a menos
-# parte a medição ou o envio de pedidos sem dar erro visível. Faz-se com
-# `Content-Security-Policy-Report-Only` primeiro, a ler os relatórios, nunca às
-# cegas de uma vez.
-#
 # O `max-age` do HSTS é de 180 dias e sem `preload`: o preload é praticamente
 # irreversível (entra numa lista compilada nos browsers) e não se pede sem
 # decisão do dono.
+#
+# ── CSP: EM MODO DE RELATÓRIO, NÃO BLOQUEIA NADA ────────────────────────────
+# `Content-Security-Policy-Report-Only` avisa na consola do browser e deixa o
+# pedido passar. É de propósito: uma diretiva a menos não dá erro visível, só
+# deixa de medir ou de entregar pedidos, e isso não se descobre a olhar.
+#
+# Origens, e porque cada uma está aqui (tiradas do código, não de memória):
+#   googletagmanager.com   `src/lib/gtag.ts` carrega daqui a gtag.js
+#   google-analytics.com   destino dos eventos do GA4
+#   *.supabase.co          `submit-lead` e `send-lead-email`, ou seja os DOIS
+#                          canais de um pedido de orçamento: se esta faltar,
+#                          deixam de entrar orçamentos
+#   api.bigdatacloud.net   `src/lib/locationDetection.ts`, o "Usar a minha
+#                          localização" do quiz
+#   localhost:3010         `KyroConnectionStatus.tsx`, só no painel admin e só
+#                          na máquina do dono
+#
+# `'unsafe-inline'` em `script-src` é necessário hoje: o `index.html` tem um
+# script inline executável (411 caracteres). Apertar isso é o passo seguinte, com
+# hash, e o hash muda sempre que esse script mudar. Os `<script>` de JSON-LD e
+# do modelo de landing não contam, porque são dados e não código executado.
+#
+# COMO PASSAR A BLOQUEAR: abrir o site com a consola aberta, percorrer
+# homepage, uma página de serviço, o quiz até ao fim e o painel admin, e
+# recolher os avisos "Content Security Policy". Sem avisos durante uns dias,
+# troca-se o nome do cabeçalho para `Content-Security-Policy`. Com avisos,
+# acrescenta-se a origem em falta ANTES de trocar — nunca ao contrário.
 /*
   Strict-Transport-Security: max-age=15552000
   X-Frame-Options: SAMEORIGIN
   Permissions-Policy: geolocation=(self), clipboard-write=(self), camera=(), microphone=(), payment=(), usb=(), magnetometer=(), accelerometer=(), gyroscope=()
+  Content-Security-Policy-Report-Only: default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://www.google-analytics.com https://www.googletagmanager.com https://googleads.g.doubleclick.net https://www.google.com; font-src 'self' data:; connect-src 'self' https://*.supabase.co https://api.bigdatacloud.net https://www.google-analytics.com https://*.google-analytics.com https://www.googletagmanager.com https://stats.g.doubleclick.net http://localhost:3010; frame-src 'self' https://td.doubleclick.net; base-uri 'self'; form-action 'self'; frame-ancestors 'self'; object-src 'none'
 
 # Vite assets have content hashes: changed files always receive a new URL.
 /assets/*
