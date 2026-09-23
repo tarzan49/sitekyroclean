@@ -50,10 +50,18 @@
 # que se perde em rigor aqui é pouco e o que se ganha é não partir remarketing
 # a um visitante de um país que ninguém listou.
 #
-# `'unsafe-inline'` em `script-src` é necessário hoje: o `index.html` tem um
-# script inline executável (411 caracteres). Apertar isso é o passo seguinte, com
-# hash, e o hash muda sempre que esse script mudar. Os `<script>` de JSON-LD e
-# do modelo de landing não contam, porque são dados e não código executado.
+# `'unsafe-inline'` em `script-src`, aqui no ficheiro fonte, é só o token que
+# o build procura e substitui — nunca chega a produção. `dist/_headers` sai
+# com um hash sha256 do script inline real de `dist/index.html` no lugar
+# (`scripts/generate-csp-hash.ts`, plugin `cspHashPlugin` em `vite.config.ts`,
+# a correr depois do prerender). O hash muda sempre que esse script mudar,
+# por isso não se escreve à mão: escrevê-lo à mão era o motivo de isto ter
+# ficado por fazer. Os `<script>` de JSON-LD e o `type="module"` do
+# `main.tsx` não contam — dados e same-origin, respetivamente, nenhum dos
+# dois precisa de hash. **Nunca correr `_headers` para produção sem passar
+# pelo `vite build`** (por exemplo copiando `public/_headers` à mão): sem o
+# build, o `'unsafe-inline'` literal fica em produção e a proteção esvazia-se
+# em silêncio.
 #
 # ── DOIS CABEÇALHOS, DE PROPÓSITO ───────────────────────────────────────────
 #
@@ -103,9 +111,9 @@
 # Service Worker, não há `<video>`/`<audio>` externos, o único `<iframe>` é
 # same-origin e as fontes são locais.
 #
-# O passo seguinte é tirar o `'unsafe-inline'` do `script-src`, com hash do
-# script inline do `index.html`. Fica por fazer porque o hash muda sempre que
-# esse script mudar, e isso precisa de ser automatizado no build primeiro.
+# `'unsafe-inline'` do `script-src` saiu (2026-09-23): hash automatizado no
+# build, ver a nota acima. Este ficheiro (fonte) mantém o token
+# `'unsafe-inline'` de propósito — é o que o build substitui.
 /*
   Strict-Transport-Security: max-age=15552000
   X-Frame-Options: SAMEORIGIN
