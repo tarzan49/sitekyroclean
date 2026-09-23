@@ -567,6 +567,22 @@ export function prerenderRoutes(outDir: string): number {
         ...buildHowToNode(`Como funciona: ${landing.serviceLabel.toLowerCase()}`, landing.processSteps),
       });
     }
+    // BreadcrumbList nas paginas landing, pela mesma razao que o HowTo acima:
+    // sai do modelo partilhado em vez de ser repetido por familia. As 8.364
+    // variantes de keyword desenhavam a migalha para quem ve a pagina (o
+    // `renderLandingPageHtml` monta-a a partir deste mesmo modelo) e nao a
+    // declaravam em lado nenhum, por isso a pesquisa mostrava o URL cru em vez
+    // do caminho. Os tres campos sao exatamente os que a migalha visivel usa,
+    // para o que a pagina mostra e o que declara nao poderem discordar.
+    // A guarda evita duplicar nas familias que ja passam a sua (localidade,
+    // freguesia, preco), que continuam a mandar na sua propria versao.
+    if (landing && !schemas?.some(schema => (schema as { '@type'?: string })['@type'] === 'BreadcrumbList')) {
+      html = injectJsonLd(html, buildBreadcrumbSchema([
+        { name: 'Início',                  url: `${BASE_URL}/` },
+        { name: landing.serviceName,       url: `${BASE_URL}${landing.serviceBaseRoute}` },
+        { name: landing.heroLocationName,  url: `${BASE_URL}${routePath}` },
+      ]));
+    }
     // Caller-provided schemas (FAQ, Service, BreadcrumbList, etc.)
     for (const schema of schemas ?? []) {
       html = injectJsonLd(html, schema);
@@ -1506,6 +1522,14 @@ export function prerenderRoutes(outDir: string): number {
       const pageUrl = `${BASE_URL}${url}`;
       const postSources = getBlogSources(post.sources);
       const blogPostingSchema = {
+        // Sem `@context` este bloco não é JSON-LD: cada `injectJsonLd` escreve
+        // o seu próprio <script>, e só os nós dentro de um `@graph` herdam o
+        // contexto do pai. Faltava aqui, e só aqui, nos 26 artigos — ou seja o
+        // BlogPosting que carrega autor, datas, `citation` e `publisher` (todo
+        // o trabalho de E-E-A-T das fases 5 e 6) não era lido por nenhum motor.
+        // A página React não tinha o problema: emite um grafo único já com
+        // contexto, por isso a diferença só existia no HTML estático.
+        '@context': 'https://schema.org',
         '@type': 'BlogPosting',
         headline: post.title,
         description: post.metaDescription,
