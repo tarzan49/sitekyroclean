@@ -77,24 +77,40 @@
 #   object-src 'none'    não há `<object>` nem `<embed>` no site.
 # As quatro foram verificadas contra o código antes de ligar, não assumidas.
 #
-# `Content-Security-Policy-Report-Only` continua a observar a política inteira,
-# incluindo `script-src`, `connect-src`, `img-src` e `style-src`. Essas ficam
-# de fora do cabeçalho bloqueador até alguém percorrer o QUIZ ATÉ SUBMETER e o
-# PAINEL ADMIN com a consola aberta — são os dois caminhos que ainda ninguém
-# exercitou, e são precisamente onde um erro custa um orçamento perdido em
-# silêncio. Numa primeira montagem feita só a partir do código, esta política
-# teria bloqueado as conversões do Ads e o Pixel: não se liga o resto sem a
-# mesma evidência para esses dois caminhos.
+# ── A POLÍTICA INTEIRA PASSOU A BLOQUEAR (2026-09-23) ───────────────────────
 #
-# PARA LIGAR O RESTO: percorrer quiz e admin com a consola aberta, acrescentar
-# a origem de cada aviso "Content Security Policy" (ANTES, nunca depois) e só
-# então mover as diretivas do cabeçalho de relatório para o de bloqueio.
+# Só depois de exercitada, não por confiança no que o código mostra. O teste
+# correu com `npx wrangler pages dev dist`, que é o único modo de este ficheiro
+# ser aplicado localmente — o `vite dev` e o `vite preview` ignoram-no.
+#
+# O que foi feito, com a política já ativa:
+#   - um pedido de orçamento REAL, do princípio ao fim (Porto, sofá 3 lugares,
+#     89€), que chegou ao `/obrigado` com recibo e referência;
+#   - as 7 origens do caminho do pedido: os dois canais de entrega
+#     (`submit-lead` e `send-lead-email`), `quiz_events`, a geolocalização,
+#     GA4, Google Ads e o Pixel;
+#   - as 5 do painel admin: auth, `leads`, `list-resend-leads`,
+#     `lead_attribution` e a ponte local.
+#   Zero violações em todas.
+#
+# **O instrumento foi validado antes de se acreditar no zero.** A leitura da
+# consola pela extensão do Chrome NÃO capta violações de CSP: deu "nenhuma
+# mensagem" a uma violação provocada de propósito. A medição boa é o evento
+# `securitypolicyviolation` do DOM, que distingue `enforce` de `report`. Um
+# zero vindo da consola não prova nada — repetir sempre com o evento.
+#
+# Verificado também que nada cai no `default-src`: não há Web Workers nem
+# Service Worker, não há `<video>`/`<audio>` externos, o único `<iframe>` é
+# same-origin e as fontes são locais.
+#
+# O passo seguinte é tirar o `'unsafe-inline'` do `script-src`, com hash do
+# script inline do `index.html`. Fica por fazer porque o hash muda sempre que
+# esse script mudar, e isso precisa de ser automatizado no build primeiro.
 /*
   Strict-Transport-Security: max-age=15552000
   X-Frame-Options: SAMEORIGIN
   Permissions-Policy: geolocation=(self), clipboard-write=(self), camera=(), microphone=(), payment=(), usb=(), magnetometer=(), accelerometer=(), gyroscope=()
-  Content-Security-Policy: base-uri 'self'; form-action 'self' https://www.facebook.com; frame-ancestors 'self'; object-src 'none'
-  Content-Security-Policy-Report-Only: default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com https://googleads.g.doubleclick.net https://www.googleadservices.com https://connect.facebook.net; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; font-src 'self' data:; connect-src 'self' https://*.supabase.co https://api.bigdatacloud.net https://www.google-analytics.com https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com https://*.g.doubleclick.net https://ad.doubleclick.net https://www.google.com https://www.googleadservices.com https://connect.facebook.net https://www.facebook.com http://localhost:3010; frame-src 'self' https://td.doubleclick.net https://www.facebook.com; base-uri 'self'; form-action 'self' https://www.facebook.com; frame-ancestors 'self'; object-src 'none'
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com https://googleads.g.doubleclick.net https://www.googleadservices.com https://connect.facebook.net; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; font-src 'self' data:; connect-src 'self' https://*.supabase.co https://api.bigdatacloud.net https://www.google-analytics.com https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com https://*.g.doubleclick.net https://ad.doubleclick.net https://www.google.com https://www.googleadservices.com https://connect.facebook.net https://www.facebook.com http://localhost:3010; frame-src 'self' https://td.doubleclick.net https://www.facebook.com; base-uri 'self'; form-action 'self' https://www.facebook.com; frame-ancestors 'self'; object-src 'none'
 
 # Vite assets have content hashes: changed files always receive a new URL.
 /assets/*
