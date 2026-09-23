@@ -1,3 +1,4 @@
+import { hasAdminAccess } from '../_shared/admin-authorization.ts';
 // Lista os emails de pedidos enviados pelo Resend, para o separador "Quiz Leads"
 // do admin panel. Os pedidos em si (nome, telefone, detalhes) não ficam guardados
 // em nenhuma tabela do Supabase — o email enviado pelo `send-lead-email` é o único
@@ -34,15 +35,22 @@ interface ResendEmailSummary {
   reply_to?: string[] | null;
 }
 
-async function isAuthenticatedAdmin(req: Request): Promise<boolean> {
+export async function isAuthenticatedAdmin(req: Request): Promise<boolean> {
   const token = req.headers.get("Authorization")?.replace(/^Bearer\s+/i, "");
   const supabaseUrl = Deno.env.get("SUPABASE_URL");
   const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
   if (!token || !supabaseUrl || !serviceKey) return false;
 
   const supabase = createClient(supabaseUrl, serviceKey);
-  const { data, error } = await supabase.auth.getUser(token);
-  return !error && !!data.user;
+  return hasAdminAccess({
+    auth: { getUser: (value) => supabase.auth.getUser(value) },
+    from: (table) => ({ select: (columns) => ({ eq: (column, value) => ({
+      maybeSingle: async () => {
+        const { data, error } = await supabase.from(table).select(columns).eq(column, value).maybeSingle();
+        return { data: data as { user_id: string } | null, error };
+      },
+    }) }) }),
+  }, token);
 }
 
 serve(async (req: Request): Promise<Response> => {
