@@ -280,7 +280,7 @@ mandar é ignorado.
 
 **O `brew install supabase/tap/supabase` não funciona nesta máquina:** as Command Line Tools estão desatualizadas e atualizá-las exige a palavra-passe do dono. Usar `npx -y supabase@latest <comando>`, que traz o mesmo binário sem sudo e sem Xcode. A sessão e o `link` ao projeto já estão feitos, e os comandos têm de correr a partir da raiz do repositório, não de `~`.
 
-**O registo público continua aberto** (`disable_signup: false`). Fechá-lo em Authentication → Providers → Email é independente desta correção e reforça-a: só existe uma conta e não é preciso criar mais.
+**O registo público foi fechado a 2026-09-23** (`disable_signup: true`, confirmado por `GET /auth/v1/settings` com a chave publicável). Em Authentication → Sign In / Providers → User Signups, "Allow new users to sign up". É independente da correção da função e reforça-a: a função tranca o que está atrás da porta, isto fecha a porta. O fornecedor **Email continua ativo** — é o método de login do dono, desligá-lo trancava-o fora. **Uma conta nova cria-se em Users → Add user**, que continua a funcionar com o registo fechado.
 
 **Autorização administrativa (resolvida em 2026-09-18).** Já não é verdade que
 qualquer conta autenticada seja administradora. Tabela `admin_users (user_id,
