@@ -1,7 +1,6 @@
 ﻿import { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Home, Phone, ArrowRight, Sofa, BedDouble, Shield, BookOpen } from "lucide-react";
-import { trackCallClick } from "@/lib/analytics";
 import { PHONE_TEL, PHONE_DISPLAY } from "@/constants/business";
 
 const popularPages = [
@@ -69,7 +68,7 @@ const NotFound = () => {
           Voltar ao início
         </Link>
         <a href={`tel:${PHONE_TEL}`}
-          onClick={() => trackCallClick('not_found_page')}
+          data-tracking-source="not_found_page"
           className="flex items-center gap-2 bg-white/8 hover:bg-white/12 border border-white/15 text-white font-semibold text-base px-7 py-3.5 rounded-full transition-all active:scale-[0.97] backdrop-blur-sm">
           <Phone className="w-4 h-4 text-gold" />
           {PHONE_DISPLAY}

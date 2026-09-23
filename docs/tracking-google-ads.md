@@ -10,7 +10,7 @@ separa isso do que ainda depende de configuração externa.
 | **IMPLEMENTADO** | Está no código, no repositório. |
 | **TESTADO LOCALMENTE** | Verificado por testes automáticos e/ou browser local, com identificadores de teste. |
 | **CONFIG. EXTERNA PENDENTE** | Depende de alguém mexer no Google Ads, no GA4, no Cloudflare ou no Supabase. |
-| **VALIDADO EM PRODUÇÃO** | Confirmado no site real, com dados reais. **Nada está neste estado.** |
+| **VALIDADO EM PRODUÇÃO** | Confirmado no site real, com dados reais. Até 2026-09-23 nada estava neste estado; a instalação das tags e a entrega ao painel passaram a estar (secção 13). |
 
 ---
 
@@ -652,3 +652,48 @@ aviso é escrito.
 - **Papéis de administração**: não existe autenticado sem privilégios.
 - **Instrumentação do abandono do quiz**: problema conhecido de antes,
   ~90% das desistências não são medidas.
+
+---
+
+## 13. Validado em produção (2026-09-23)
+
+Percorrido em `cleansolutions.com.pt` com `?kyro_debug=1`, consola e
+`performance.getEntriesByType('resource')` abertos, antes e depois de aceitar
+as cookies. O que se viu, e só isso:
+
+**Antes de aceitar:** nenhum pedido para a Google, para a Meta ou para o
+Supabase. O `dataLayer` tem só o `consent default` a `denied`. Os eventos
+(`page_view`, `web_vitals`) aparecem na consola com `willSend: false` e ficam
+por aí.
+
+**Depois de aceitar, por esta ordem:**
+
+| O quê | Evidência |
+|---|---|
+| Uma só `gtag.js`, pelo `G-` | `googletagmanager.com/gtag/js?id=G-T45T5FBNC3`; o Ads entra a seguir por `config` (`gtag/js?id=AW-18457115875&cx=c`), não como segundo script. `GT-M6XTKMC7` e `AW-17779872363` não aparecem no bundle. |
+| `consent update` com os 4 sinais a `granted` | `dataLayer`: `consent:default`, `js`, `config:G-`, `config:AW-`, `consent:update`, `event:page_view`. Um só `page_view`. |
+| GA4 a receber | `region1.analytics.google.com/g/collect?tid=G-T45T5FBNC3`; cookies `_ga` e `_ga_T45T5FBNC3` criados. |
+| Google Ads a receber | `googleads.g.doubleclick.net/pagead/viewthroughconversion/18457115875/`, `google.com/ccm/collect`, listas de remarketing (`pagead/1p-user-list`, servido também por `google.dk`, que é o caso que o `img-src https:` cobre); cookies `_gcl_au` e `_gcl_aw`. |
+| Pixel da Meta a receber | `connect.facebook.net/en_US/fbevents.js`, `signals/config/1083307767504397`, `facebook.com/tr/?id=1083307767504397&ev=PageView`; cookie `_fbp`. `window.fbq` é função e a fila está vazia (tudo entregue). |
+| Painel interno a receber | `POST kswapioiaetfccxzfwkg.supabase.co/rest/v1/quiz_events` aceite: zero eventos `kyro_event_v2:*` a sobrar no `localStorage`, nenhum aviso `PGRST204` na consola. Prova que a migração `20260918000000` (CHECK com `page_view`) e a `20260922000000` (colunas `meta_*`) estão aplicadas. |
+| CSP | Nenhuma violação na consola, nem do cabeçalho bloqueador nem do de relatório. |
+
+**O que continua por validar em produção:** o formulário até à `/obrigado`
+(`generate_lead`, `Lead` da Meta, `submit-lead`), e a **conversão do Google
+Ads**, que não pode ser validada porque a etiqueta não existe: o bundle de
+produção não contém nenhum `AW-18457115875/<etiqueta>`, logo
+`sendAdsConversion` devolve `false` em cada lead. Depende de B4 no
+`docs/tracking-plano-de-publicacao.md` (criar a ação de conversão no Google Ads
+e pôr `VITE_GOOGLE_ADS_LEAD_CONVERSION_LABEL` no Cloudflare Pages). O painel
+avisa em Métricas → Estado da recolha e em Marketing enquanto faltar.
+
+**Defeito corrigido na mesma passagem:** cinco âncoras `tel:` (rodapé PT e EN,
+hero mobile, CTA final, página 404) ainda tinham `onClick={() =>
+trackCallClick(…)}` por cima do delegado global. O helper não passava o evento
+original, a guarda de deduplicação não o via, e cada clique nesses cinco saía a
+dobrar para o GA4 (`phone_click`), para a Meta (`PhoneClick`) e para
+`quiz_events` (`call_click`), com duas origens diferentes (`footer`/`footer`,
+`hero_mobile`/`page:/`). Passaram a `data-tracking-source`, `trackCallClick`
+foi removido de `analytics.ts`, e `src/lib/contactCtaDelegation.test.ts`
+rebenta se um componente voltar a chamar um medidor de contacto.
+

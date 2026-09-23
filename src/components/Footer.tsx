@@ -3,7 +3,6 @@ import { Phone, Mail, MapPin, ChevronRight } from "lucide-react";
 import { GOOGLE_MAPS_URL } from "@/constants/google";
 import { Link } from "react-router-dom";
 import { FOOTER_NAV, FOOTER_STRIP_LINKS, FOOTER_LEGAL_LINKS } from "@/data/siteFooterNav";
-import { trackCallClick } from "@/lib/analytics";
 import kyroLogo from "@/assets/kyro-logo.webp";
 import { PHONE_TEL, PHONE_DISPLAY, BUSINESS_EMAIL_HREF, BUSINESS_EMAIL, BUSINESS_ADDRESS, BUSINESS_TAX_ID } from "@/constants/business";
 
@@ -68,7 +67,7 @@ const Footer = () => {
           <div>
             <h3 className="type-card-title    mb-3 md:mb-4 text-white">Fale Connosco</h3>
             <div className="space-y-3 text-base">
-              <a href={`tel:${PHONE_TEL}`} onClick={() => trackCallClick('footer')} className="flex items-center gap-2 hover:text-turquoise active:text-turquoise transition-colors py-1 touch-manipulation">
+              <a href={`tel:${PHONE_TEL}`} data-tracking-source="footer" className="flex items-center gap-2 hover:text-turquoise active:text-turquoise transition-colors py-1 touch-manipulation">
                 <Phone className="h-4 w-4 text-turquoise flex-shrink-0" />
                 <span>{PHONE_DISPLAY}</span>
               </a>

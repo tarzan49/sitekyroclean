@@ -1,7 +1,6 @@
 import { ExternalLink, Star, MapPin, Phone, Users } from "lucide-react";
 import { REVIEW_RATING, REVIEW_COUNT, CLIENTS_SERVED_LABEL, PHONE_TEL, PHONE_DISPLAY } from "@/constants/business";
 import { GOOGLE_REVIEWS_VIEW_URL } from "@/constants/google";
-import { trackCallClick } from "@/lib/analytics";
 import { GoogleG } from "@/components/icons/GoogleG";
 
 type TrustRatingBadgeProps = {
@@ -54,7 +53,7 @@ const TrustRatingBadge = ({ variant }: TrustRatingBadgeProps) => {
           </div>
           <a
             href={`tel:${PHONE_TEL}`}
-            onClick={() => trackCallClick('hero_mobile')}
+            data-tracking-source="hero_mobile"
             className="md:hidden inline-flex items-center gap-1.5 text-white/80 text-sm mt-2.5 hover:text-white/70 transition-colors"
           >
             <Phone className="w-3 h-3 flex-shrink-0" strokeWidth={2} />

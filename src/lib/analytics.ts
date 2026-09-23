@@ -105,14 +105,6 @@ export function trackContactClick(channel: ContactChannel, context: ContactClick
   else trackCallClickEvent(context.cta_location, ctx, sourceEvent);
 }
 
-/**
- * Track phone call button clicks - sends to GA4
- * @deprecated Use `trackContactClick('phone', { cta_location })`.
- */
-export function trackCallClick(location: string, sourceEvent?: Event) {
-  trackContactClick('phone', { cta_location: location }, sourceEvent);
-}
-
 // ============================================
 // FORMULÁRIO DE ORÇAMENTO
 // ============================================

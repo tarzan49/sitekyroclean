@@ -16,14 +16,14 @@ Nenhum destes pode ficar para depois.
 
 | # | O quê | Porquê é bloqueador | Estado |
 |---|---|---|---|
-| B1 | Migração `20260918000000_marketing_attribution.sql` aplicada no SQL Editor | Sem ela, `lead_id`, atribuição e histórico não existem | Validada em Docker, por aplicar |
-| B1b | Migração `20260918010000_admin_authorization.sql` aplicada no SQL Editor, **depois** de B1 | Sem ela, qualquer conta autenticada continua a ser administradora | Validada em Docker (idempotente, permissões provadas), por aplicar |
+| B1 | Migração `20260918000000_marketing_attribution.sql` aplicada no SQL Editor | Sem ela, `lead_id`, atribuição e histórico não existem | **Aplicada.** Confirmado em produção a 2026-09-23: os inserts `page_view` em `quiz_events` são aceites (a CHECK antiga recusava-os) e as colunas `meta_*` da `20260922000000` são reconhecidas (nenhum `PGRST204` na consola) |
+| B1b | Migração `20260918010000_admin_authorization.sql` aplicada no SQL Editor, **depois** de B1 | Sem ela, qualquer conta autenticada continua a ser administradora | **Aplicada** (a conta do dono consta de `admin_users`, confirmado a 2026-09-23 ao publicar `list-resend-leads`) |
 | B1c | Inserir o primeiro administrador em `admin_users` (ver secção 1, passo novo abaixo) | Sem isto, **ninguém** entra no painel depois de B1b — a própria conta do dono também precisa do registo | Por executar, depende do dono |
 | B2 | Edge Functions `submit-lead` e `send-lead-email` publicadas | Idempotência e atribuição vivem lá | Por publicar |
 | B3 | Variáveis de ambiente no Cloudflare Pages | O `.env` local não chega ao build | Por configurar |
-| B4 | Etiqueta da conversão principal (lead) | Sem ela não há conversão nenhuma no Ads | Depende do dono |
+| B4 | Etiqueta da conversão principal (lead) | Sem ela não há conversão nenhuma no Ads | **Depende do dono — continua em falta.** A 2026-09-23 o bundle de produção não contém nenhum `AW-18457115875/<etiqueta>`: `generate_lead` sai para o GA4 e o `Lead` para a Meta, a conversão do Ads não. O painel (Métricas → Estado da recolha, e Marketing) avisa enquanto faltar |
 | B5 | Medição otimizada do GA4: desligar page_view por histórico | Duplica cada `page_view` da SPA | Depende do dono |
-| B6 | Verificação pós-deploy (site, admin, formulário, tags) | — | — |
+| B6 | Verificação pós-deploy (site, admin, formulário, tags) | — | Tags verificadas em produção a 2026-09-23 (ver `docs/tracking-google-ads.md`, secção 13); formulário e admin por percorrer |
 
 **Segunda fase**, explicitamente fora deste lançamento: automatização de custos
 (Google Ads API), importação offline por API (Data Manager API), confirmação

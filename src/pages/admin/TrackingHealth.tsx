@@ -2,8 +2,9 @@ import { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { getTrackingDeliveryStatus } from '@/lib/quizTracking';
 import { areTagsLoaded } from '@/lib/gtag';
+import { isMetaPixelLoaded } from '@/lib/metaPixel';
 import { getConsent } from '@/lib/consent';
-import { GA4_MEASUREMENT_ID, GOOGLE_ADS_ID, trackingEnv } from '@/constants/tracking';
+import { ADS_LEAD_CONVERSION_LABEL, GA4_MEASUREMENT_ID, GOOGLE_ADS_ID, META_PIXEL_ID, trackingEnv } from '@/constants/tracking';
 
 /** Read-only signals, never claim that missing error reports prove delivery. */
 export function TrackingHealth() {
@@ -44,7 +45,9 @@ export function TrackingHealth() {
       {' · '}consentimento: {consent ?? 'sem decisão'}
       {' · '}ambiente: {trackingEnv()}
       {' · '}GA4 {GA4_MEASUREMENT_ID} · Ads {GOOGLE_ADS_ID}
+      {' · '}Pixel Meta {META_PIXEL_ID}: {isMetaPixelLoaded() ? 'carregado' : 'não carregado'}
     </p>
+    {!ADS_LEAD_CONVERSION_LABEL && <p className="mt-1 text-xs font-semibold text-amber-800">Etiqueta da conversão do Google Ads em falta (VITE_GOOGLE_ADS_LEAD_CONVERSION_LABEL no Cloudflare Pages): o lead confirmado sai para o GA4 e para o Pixel da Meta, mas a conversão do Google Ads não é enviada.</p>}
     <p className="mt-1 text-xs text-slate-500">Atualização automática a cada minuto. A ausência de erros reportados não prova que todos os dispositivos entregaram os eventos.</p>
   </div>;
 }

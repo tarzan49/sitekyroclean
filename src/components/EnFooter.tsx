@@ -2,7 +2,6 @@ import { EN_COVERAGE_PROMISE, EN_RESPONSE_PROMISE, EN_AVAILABILITY_PROMISE } fro
 import { Phone, Mail, MapPin } from "lucide-react";
 import { Link } from "react-router-dom";
 import { GOOGLE_MAPS_URL } from "@/constants/google";
-import { trackCallClick } from "@/lib/analytics";
 import kyroLogo from "@/assets/kyro-logo.webp";
 import { PHONE_TEL, PHONE_DISPLAY, BUSINESS_EMAIL_HREF, BUSINESS_EMAIL, BUSINESS_ADDRESS } from "@/constants/business";
 
@@ -28,7 +27,7 @@ const EnFooter = () => {
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-8 max-w-3xl mx-auto text-center sm:text-left">
           <div>
             <h3 className="type-card-title   mb-2 text-white/80 uppercase tracking-wide">Call</h3>
-            <a href={`tel:${PHONE_TEL}`} onClick={() => trackCallClick("en_footer")} className="flex items-center justify-center sm:justify-start gap-2 text-base text-white/80 hover:text-gold transition-colors">
+            <a href={`tel:${PHONE_TEL}`} data-tracking-source="en_footer" className="flex items-center justify-center sm:justify-start gap-2 text-base text-white/80 hover:text-gold transition-colors">
               <Phone className="w-3.5 h-3.5 flex-shrink-0" />
               {PHONE_DISPLAY}
             </a>

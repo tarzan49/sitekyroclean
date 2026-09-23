@@ -1,5 +1,4 @@
 import { Phone, MapPin } from "lucide-react";
-import { trackCallClick } from "@/lib/analytics";
 import QuizForm from './QuizFormLazy';
 import { PHONE_TEL, PHONE_DISPLAY } from "@/constants/business";
 import { useQuizLauncher } from "@/hooks/use-quiz-launcher";
@@ -41,7 +40,7 @@ const FinalCTA = () => {
             <div className="flex flex-col items-center sm:items-start gap-0.5">
               <a
                 href={`tel:${PHONE_TEL}`}
-                onClick={() => trackCallClick('final_cta')}
+                data-tracking-source="final_cta"
                 className="inline-flex items-center gap-1.5 text-white/70 hover:text-white text-base font-medium transition-colors"
               >
                 <Phone className="h-3.5 w-3.5 flex-shrink-0" />
