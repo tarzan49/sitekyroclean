@@ -1,0 +1,408 @@
+--- a/src/lib/consent.test.ts
++++ b/src/lib/consent.test.ts
+@@ -1,5 +1,7 @@
+-import { beforeEach, describe, expect, it, vi } from 'vitest';
+-beforeEach(() => { vi.resetModules(); localStorage.clear(); sessionStorage.clear(); document.head.innerHTML = ''; window.gtag = vi.fn(); });
++import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
++beforeEach(() => { vi.resetModules(); vi.stubEnv('VITE_TRACKING_ALLOW_NON_PRODUCTION', 'true'); vi.stubEnv('VITE_GA4_MEASUREMENT_ID', 'G-TESTE00000'); vi.stubEnv('VITE_GOOGLE_ADS_ID', 'AW-000000000'); localStorage.clear(); sessionStorage.clear(); document.head.innerHTML = ''; window.gtag = vi.fn(); });
++
++afterEach(() => vi.unstubAllEnvs());
+ 
+ describe('consent-gated Google tags', () => {
+   it('does not load tags before a decision or after refusal', async () => {
+@@ -12,8 +14,8 @@
+     localStorage.setItem('kyro_cookie_consent', 'accepted');
+     const consent = await import('./consent'); consent.restoreConsent(); consent.setConsent('accepted');
+     expect(document.querySelectorAll('script[src*="googletagmanager.com"]')).toHaveLength(1);
+-    expect(window.gtag).toHaveBeenCalledWith('config', 'G-T45T5FBNC3', { send_page_view: false });
+-    expect(window.gtag).toHaveBeenCalledWith('config', 'AW-18457115875', { allow_enhanced_conversions: true });
++    expect(window.gtag).toHaveBeenCalledWith('config', 'G-TESTE00000', { send_page_view: false });
++    expect(window.gtag).toHaveBeenCalledWith('config', 'AW-000000000', { allow_enhanced_conversions: true });
+   });
+ 
+   /**
+--- a/src/lib/gtag.test.ts
++++ b/src/lib/gtag.test.ts
+@@ -31,6 +31,8 @@
+     const { loadGoogleTags, sendGtagEvent } = await import('./gtag');
+     loadGoogleTags();
+     expect(sendGtagEvent('teste')).toBe(false);
++    expect(document.querySelector('script[src*="gtag/js"]')).toBeNull();
++    expect(window.gtag).not.toHaveBeenCalled();
+   });
+ 
+   /**
+--- a/src/lib/gtag.ts
++++ b/src/lib/gtag.ts
+@@ -70,7 +70,7 @@
+  * página nem duplica os `config`.
+  */
+ export function loadGoogleTags(): void {
+-  if (tagsLoaded || typeof window === 'undefined') return;
++  if (tagsLoaded || typeof window === 'undefined' || !shouldSendToGoogle()) return;
+   tagsLoaded = true;
+   const gtag = ensureGtag();
+   gtag('js', new Date());
+--- a/src/lib/quizTracking.test.ts
++++ b/src/lib/quizTracking.test.ts
+@@ -213,3 +213,35 @@
+     });
+   });
+ });
++
++
++describe('CTA audit matrix with mocked delivery', () => {
++  it.each(['header_desktop', 'header_mobile', 'header_mobile_menu', 'hero', 'sticky_bar', 'footer', 'location_hero_limpeza-sofas_lisboa', 'quote_confirmation'])('%s survives DOM replacement and keyboard-style activation', async source => {
++    vi.stubEnv('VITE_TRACKING_ALLOW_NON_PRODUCTION', 'true');
++    vi.stubEnv('VITE_GA4_MEASUREMENT_ID', 'G-TESTE00000');
++    vi.stubEnv('VITE_GOOGLE_ADS_ID', 'AW-000000000');
++    const { loadGoogleTags } = await import('./gtag');
++    loadGoogleTags();
++    const m = await import('./quizTracking');
++    cleanup = m.initContactTracking();
++    vi.mocked(window.gtag!).mockClear();
++    for (let i = 0; i < 2; i++) {
++      document.body.innerHTML = `<a href="https://wa.me/351925530647?text=message" data-tracking-source="${source}">WhatsApp</a>`;
++      const link = document.querySelector('a')!;
++      const event = new MouseEvent('click', { bubbles: true, cancelable: true, detail: 0 });
++      expect(link.dispatchEvent(event)).toBe(true);
++      await Promise.resolve();
++    }
++    expect(window.gtag).toHaveBeenCalledTimes(2);
++    expect(fetch).toHaveBeenCalledTimes(2);
++    for (const call of vi.mocked(window.gtag!).mock.calls) {
++      expect(call).toEqual(['event', 'whatsapp_click', expect.objectContaining({ cta_location: source })]);
++      expect(JSON.stringify(call)).not.toContain('link_url');
++      expect(JSON.stringify(call)).not.toContain('message');
++    }
++    localStorage.setItem('kyro_cookie_consent', 'declined');
++    document.querySelector('a')!.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }));
++    expect(fetch).toHaveBeenCalledTimes(2);
++    expect(window.gtag).toHaveBeenCalledTimes(2);
++  });
++});
+--- a/src/lib/whatsappMessages.ts
++++ b/src/lib/whatsappMessages.ts
+@@ -13,7 +13,7 @@
+ 
+ export function buildGeneralWaMessage(isEn = false): string {
+   if (isEn) return 'Hi! I would like a quote for your cleaning service.\n\nCould you tell me the price, including travel, and your next availability? I can send photos and the location so you can provide a more accurate quote.';
+-  return buildQuoteWaMessage('Olá! Gostaria de pedir um orçamento para o vosso serviço ao domicílio.');
++  return 'Olá! Gostaria de saber o preço e a disponibilidade para limpar os meus estofos. Posso enviar fotografias dos artigos e indicar a minha localidade para receber um orçamento.';
+ }
+ 
+ /** Shared by service, location, neighbourhood and price landing pages. */
+@@ -27,7 +27,12 @@
+     'limpeza-alcatifas': 'limpar a minha alcatifa',
+     'impermeabilizacao': 'impermeabilizar os meus estofos',
+   };
+-  return buildQuoteWaMessage(`Olá! Gostaria de pedir um orçamento para ${requests[serviceSlug] ?? 'um serviço ao domicílio'}${loc}.`);
++  const request = requests[serviceSlug];
++  if (!request) return buildGeneralWaMessage();
++  const photos = serviceSlug === 'impermeabilizacao'
++    ? 'Posso enviar fotografias para avaliarem o tecido e confirmarem o orçamento.'
++    : 'Posso enviar fotografias e indicar a minha localidade para confirmarem o orçamento.';
++  return `Olá! Gostaria de saber o preço e a próxima disponibilidade para ${request}${loc}. ${photos}`;
+ }
+ 
+ /** Used on MaterialPage. */
+@@ -118,7 +123,8 @@
+ ): string {
+   const svc = serviceLabel.toLowerCase();
+   if (isWaterproofing) {
+-    return buildQuoteWaMessage(`Olá! Gostaria de pedir um orçamento para impermeabilizar ${svc} ${cityPrep(locationName)} ${locationName}.`);
++    const article = svc === 'sofá' || svc === 'sofa' ? 'o meu sofá' : svc === 'cadeiras' ? 'as minhas cadeiras' : 'os meus estofos';
++    return `Olá! Gostaria de saber o preço e a próxima disponibilidade para impermeabilizar ${article} ${cityPrep(locationName)} ${locationName}. Posso enviar fotografias para avaliarem o tecido e confirmarem o orçamento.`;
+   }
+   if (svc === 'sofá' || svc === 'sofa') return buildServiceWaMessage('limpeza-sofas', locationName);
+   const variant = variantLabel.toLowerCase();
+@@ -129,3 +135,11 @@
+ export function buildCommercialWaMessage(cityName: string): string {
+   return `Olá! Represento um negócio ${cityPrep(cityName)} ${cityName} (restaurante/hotel/escritório) e tenho interesse num contrato de limpeza recorrente de estofos. Podem enviar-me uma proposta?`;
+ }
++
++/** Only an opaque operational reference belongs in a shareable WhatsApp URL. */
++export function buildSubmittedWaMessage(reference?: string | null): string {
++  const value = reference?.trim().replace(/^#/, '');
++  // Current short booking IDs and opaque lead IDs; never interpolate arbitrary input.
++  const safe = value && /^(?:[A-Z0-9]{6,12}|L-\d{8}-[a-z0-9]{8,12})$/.test(value) ? value : null;
++  return `Olá! Acabei de enviar o pedido${safe ? ` #${safe}` : ''}. Gostaria de confirmar o orçamento e a próxima disponibilidade. Posso enviar fotografias dos artigos para avaliação.`;
++}
+--- a/src/pages/Obrigado.tsx
++++ b/src/pages/Obrigado.tsx
+@@ -1,6 +1,7 @@
+ import { useEffect, useState } from "react";
+ import { MessageCircle, ArrowLeft, Star, Check, Clock, MapPin, CalendarDays } from "lucide-react";
+ import { useNavigate } from "react-router-dom";
++import { buildSubmittedWaMessage } from '@/lib/whatsappMessages';
+ import Header from "@/components/Header";
+ import { WHATSAPP_BASE, REVIEW_COUNT, REVIEW_RATING } from "@/constants/business";
+ 
+@@ -39,15 +40,16 @@
+ const Obrigado = () => {
+   const navigate = useNavigate();
+   const [receipt, setReceipt] = useState<ReceiptData | null>(null);
+-  const [waUrl, setWaUrl] = useState(WHATSAPP_BASE);
++  const [waUrl, setWaUrl] = useState(`${WHATSAPP_BASE}?text=${encodeURIComponent(buildSubmittedWaMessage())}`);
+   const [isOpenNow] = useState(() => isWithinBusinessHours(new Date()));
+ 
+   useEffect(() => {
+     try {
+       const raw = sessionStorage.getItem("kyro_receipt");
+-      if (raw) setReceipt(JSON.parse(raw));
+-      const wa = sessionStorage.getItem("kyro_wa_url");
+-      if (wa) setWaUrl(wa);
++      const stored = raw ? JSON.parse(raw) : null;
++      if (stored) setReceipt(stored);
++      // Rebuild legacy stored links too: old URLs contained customer details.
++      setWaUrl(`${WHATSAPP_BASE}?text=${encodeURIComponent(buildSubmittedWaMessage(stored?.bookingId))}`);
+     } catch { /* ignore parse errors */ }
+   }, []);
+ 
+@@ -189,6 +191,7 @@
+           <div className="w-full flex flex-col items-center gap-3 mb-6">
+             <a
+               href={waUrl}
++              data-tracking-source="quote_confirmation"
+               target="_blank"
+               rel="noopener noreferrer"
+               className="w-full h-14 flex items-center justify-center gap-3 bg-[#25D366] hover:bg-[#20bd5a] active:bg-[#1da853] text-white text-base font-bold rounded-2xl transition-all active:scale-[0.98] touch-manipulation shadow-[0_4px_28px_rgba(37,211,102,0.40)]"
+--- a/src/services/submissionService.test.ts
++++ b/src/services/submissionService.test.ts
+@@ -61,17 +61,17 @@
+     const receipt = JSON.parse(sessionStorage.getItem('kyro_receipt')!);
+     const wa = new URL(sessionStorage.getItem('kyro_wa_url')!).searchParams.get('text')!;
+     expect(emailBody.lead.message).toBe(p.message);
+-    expect(wa).toContain(p.message);
+-    expect(wa).toContain(p.name);
+-    expect(wa).toContain(p.phone);
+-    expect(wa).toContain(p.description);
++    expect(wa).not.toContain(p.message);
++    expect(wa).not.toContain(p.name);
++    expect(wa).not.toContain(p.phone);
++    expect(wa).not.toContain(p.description);
+     expect(emailBody.lead.booking_id).toBe(receipt.bookingId);
+     expect(wa).toContain(receipt.bookingId);
+     expect(receipt.lines.reduce((n: number, l: { total: number | null }) => n + (l.total ?? 0), 0)).toBe(p.totalPrice);
+     expect(receipt.subtotal - receipt.discountAmount).toBeCloseTo(receipt.total);
+     expect(receipt.lines.at(-1).total).toBe(locationPrices[form.location!]);
+     expect(mocks.invokeCrm.mock.calls[0][0].body.lead.value).toBe(p.priceText);
+-    if (p.hasSobOrcamento || p.hasUpsellSobItem) expect(wa).toContain('subtotal conhecido');
++    if (p.hasSobOrcamento || p.hasUpsellSobItem) expect(emailBody.lead.message).toContain('subtotal conhecido');
+   });
+ });
+ 
+@@ -86,10 +86,10 @@
+     expect(p.calculateServicePrice).toBe(0);
+     expect(buildReceiptLines(p)[0].total).toBeNull();
+   });
+-  it('keeps dimensions for each carpet in the message', async () => {
++  it('keeps dimensions in the receipt rather than the shareable URL', async () => {
+     const p = payload({ service: 'carpet', serviceType: 'cleaning' });
+     await submitQuizLead(p);
+-    expect(new URL(sessionStorage.getItem('kyro_wa_url')!).searchParams.get('text')).toContain('2,5 × 3 m');
++    expect(sessionStorage.getItem('kyro_receipt')).toContain('2,5 × 3 m');
+   });
+   it('rejects when both the CRM and the email channel fail', async () => {
+     mocks.invokeCrm.mockResolvedValue({ data: null, error: { message: 'down' } });
+@@ -126,7 +126,7 @@
+   expect(emailBody.lead.message).toContain(`Tapete 1: ${largura} × ${comprimento} m (${area} m²)`);
+   expect(emailBody.lead.message).toContain('Tapete 2: 1 × 4 m (4 m²)');
+   expect(emailBody.lead.message).toContain('Sob orçamento');
+-  expect(new URL(sessionStorage.getItem('kyro_wa_url')!).searchParams.get('text')).toContain(p.message);
++  expect(new URL(sessionStorage.getItem('kyro_wa_url')!).searchParams.get('text')).not.toContain(p.message);
+ });
+ 
+ describe('reCAPTCHA no canal do CRM', () => {
+@@ -168,3 +168,12 @@
+     expect(mocks.invokeCrm).toHaveBeenCalledTimes(1);
+   });
+ });
++
++
++it('uses the persisted server reference after a duplicate response', async () => {
++  mocks.invokeCrm.mockResolvedValue({ data: { success: true, duplicate: true, bookingId: 'REAL1234' }, error: null });
++  const result = await submitQuizLead(payload({ service: 'carpet' }));
++  expect(result.bookingId).toBe('REAL1234');
++  expect(JSON.parse(sessionStorage.getItem('kyro_receipt')!).bookingId).toBe('REAL1234');
++  expect(new URL(sessionStorage.getItem('kyro_wa_url')!).searchParams.get('text')).toContain('#REAL1234');
++});
+--- a/src/services/submissionService.ts
++++ b/src/services/submissionService.ts
+@@ -5,6 +5,7 @@
+ import { sofaPrices, mattressPrices } from '@/components/quiz/QuizTypes';
+ import type { SofaItem, MattressItem, CarpetItem, UpsellItemConfig } from '@/components/quiz/QuizTypes';
+ import { calcChairClean, calcChairWaterproof, calcChairWaterproofPremium, carpetItemArea, calcPackPricing } from '@/components/quiz/quizHelpers';
++import { buildSubmittedWaMessage } from '@/lib/whatsappMessages';
+ import { WHATSAPP_BASE } from '@/constants/business';
+ import { safeSessionSet } from '@/lib/safeStorage';
+ import { logError } from '@/lib/errorTracking';
+@@ -92,7 +93,7 @@
+ 
+ type SupabaseClient = (typeof import('@/lib/supabase'))['supabase'];
+ 
+-async function insertCrmLead(supabase: SupabaseClient, isSupabaseConfigured: boolean, payload: QuizLeadPayload, bookingId: string, leadId: string): Promise<{ duplicate: boolean }> {
++async function insertCrmLead(supabase: SupabaseClient, isSupabaseConfigured: boolean, payload: QuizLeadPayload, bookingId: string, leadId: string): Promise<{ duplicate: boolean; bookingId: string }> {
+   if (!isSupabaseConfigured) throw new Error('CRM não configurado');
+ 
+   const row = buildLeadRow(payload, bookingId, leadId);
+@@ -120,7 +121,7 @@
+   // outro". É sucesso, não falha: é exatamente o que tem de acontecer num
+   // duplo clique ou num retry depois de um timeout em que a primeira tentativa
+   // afinal tinha chegado.
+-  if (!error && data?.success) return { duplicate: Boolean(data.duplicate) };
++  if (!error && data?.success) return { duplicate: Boolean(data.duplicate), bookingId: typeof data.bookingId === 'string' && data.bookingId ? data.bookingId : bookingId };
+ 
+   // A partir daqui o insert direto deixou de existir: a politica de insert
+   // anonimo foi fechada (migracao 20260914000000), por isso a funcao e o unico
+@@ -154,12 +155,8 @@
+   throw new Error(`send-lead-email falhou: ${error?.message ?? 'resposta inesperada'}`);
+ }
+ 
+-export function buildWaUrl(payload: QuizLeadPayload, bookingId: string): string {
+-  const text = `Olá Kyro Clean Solutions. Gostaria de confirmar este pedido de orçamento.\n\n` +
+-    `Nome: ${payload.name}\nTelemóvel: ${payload.phone}\n` +
+-    `${payload.message}\n\nReferência do pedido: #${bookingId}\n` +
+-    `Aguardo a confirmação do orçamento e da disponibilidade.`;
+-  return `${WHATSAPP_BASE}?text=${encodeURIComponent(text)}`;
++export function buildWaUrl(_payload: QuizLeadPayload, bookingId: string): string {
++  return `${WHATSAPP_BASE}?text=${encodeURIComponent(buildSubmittedWaMessage(bookingId))}`;
+ }
+ 
+ export function formatQuotePrice(payload: Pick<QuizLeadPayload, 'totalPrice' | 'hasSobOrcamento' | 'hasUpsellSobItem'>): string {
+@@ -301,7 +298,7 @@
+ }
+ 
+ export async function submitQuizLead(payload: QuizLeadPayload): Promise<LeadDeliveryResult> {
+-  const bookingId = generateBookingId();
++  let bookingId = generateBookingId();
+   // Estável entre tentativas da mesma submissão — ver src/lib/submissionId.ts.
+   const leadId = currentSubmissionId();
+ 
+@@ -340,6 +337,7 @@
+   ]);
+ 
+   const crmOk = crmResult.status === 'fulfilled';
++  if (crmResult.status === 'fulfilled') bookingId = crmResult.value.bookingId;
+   const duplicate = crmResult.status === 'fulfilled' && crmResult.value.duplicate;
+   const emailOk = emailResult.status === 'fulfilled';
+   const bothFailed = !crmOk && !emailOk;
+--- a/supabase/functions/list-resend-leads/index.ts
++++ b/supabase/functions/list-resend-leads/index.ts
+@@ -1,3 +1,4 @@
++import { hasAdminAccess } from '../_shared/admin-authorization.ts';
+ // Lista os emails de pedidos enviados pelo Resend, para o separador "Quiz Leads"
+ // do admin panel. Os pedidos em si (nome, telefone, detalhes) não ficam guardados
+ // em nenhuma tabela do Supabase — o email enviado pelo `send-lead-email` é o único
+@@ -34,15 +35,22 @@
+   reply_to?: string[] | null;
+ }
+ 
+-async function isAuthenticatedAdmin(req: Request): Promise<boolean> {
++export async function isAuthenticatedAdmin(req: Request): Promise<boolean> {
+   const token = req.headers.get("Authorization")?.replace(/^Bearer\s+/i, "");
+   const supabaseUrl = Deno.env.get("SUPABASE_URL");
+   const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+   if (!token || !supabaseUrl || !serviceKey) return false;
+ 
+   const supabase = createClient(supabaseUrl, serviceKey);
+-  const { data, error } = await supabase.auth.getUser(token);
+-  return !error && !!data.user;
++  return hasAdminAccess({
++    auth: { getUser: (value) => supabase.auth.getUser(value) },
++    from: (table) => ({ select: (columns) => ({ eq: (column, value) => ({
++      maybeSingle: async () => {
++        const { data, error } = await supabase.from(table).select(columns).eq(column, value).maybeSingle();
++        return { data: data as { user_id: string } | null, error };
++      },
++    }) }) }),
++  }, token);
+ }
+ 
+ serve(async (req: Request): Promise<Response> => {
+--- /dev/null
++++ b/src/lib/whatsappMessages.test.ts
+@@ -0,0 +1,30 @@
++import { describe, expect, it } from 'vitest';
++import { WHATSAPP_BASE } from '@/constants/business';
++import { buildGeneralWaMessage, buildServiceWaMessage, buildSubmittedWaMessage, buildVariantWaMessage } from './whatsappMessages';
++
++describe('WhatsApp enquiry context and privacy', () => {
++  it('matches the approved Lisbon sofa message', () => {
++    expect(buildServiceWaMessage('limpeza-sofas', 'Lisboa')).toBe('Olá! Gostaria de saber o preço e a próxima disponibilidade para limpar o meu sofá em Lisboa. Posso enviar fotografias e indicar a minha localidade para confirmarem o orçamento.');
++  });
++  it('keeps Porto and protection distinct from cleaning', () => {
++    const text = buildVariantWaMessage(true, 'Sofá', 'Impermeabilização', 'Porto');
++    expect(text).toContain('impermeabilizar o meu sofá no Porto');
++    expect(text).toContain('avaliarem o tecido');
++    expect(text).not.toMatch(/Lisboa|limpar/);
++  });
++  it.each(['limpeza-colchoes', 'limpeza-tapetes', 'limpeza-cadeiras', 'limpeza-alcatifas'])('preserves the article for %s', service => {
++    const text = buildServiceWaMessage(service, 'Lisboa');
++    expect(text).not.toContain('sofá');
++    expect(text).toContain('em Lisboa');
++    expect(new URL(`${WHATSAPP_BASE}?text=${encodeURIComponent(text)}`).searchParams.get('text')).toBe(text);
++  });
++  it('does not assume a city on generic links', () => {
++    expect(buildGeneralWaMessage()).toBe('Olá! Gostaria de saber o preço e a disponibilidade para limpar os meus estofos. Posso enviar fotografias dos artigos e indicar a minha localidade para receber um orçamento.');
++  });
++  it.each([undefined, null, '', '{referência}', 'Nome 900000000', 'audit@example.invalid'])('omits missing or unsafe reference %s', reference => {
++    expect(buildSubmittedWaMessage(reference)).toBe('Olá! Acabei de enviar o pedido. Gostaria de confirmar o orçamento e a próxima disponibilidade. Posso enviar fotografias dos artigos para avaliação.');
++  });
++  it('uses only the opaque reference after submission', () => {
++    expect(buildSubmittedWaMessage('ANPNQP3Z')).toContain('pedido #ANPNQP3Z.');
++  });
++});
+--- /dev/null
++++ b/supabase/functions/_shared/admin-authorization.test.ts
+@@ -0,0 +1,24 @@
++import { assertEquals } from 'https://deno.land/std@0.168.0/testing/asserts.ts';
++import { hasAdminAccess } from './admin-authorization.ts';
++
++for (const [label, authenticated, admin, error, expected] of [
++  ['anonymous', false, false, false, false],
++  ['authenticated non-admin', true, false, false, false],
++  ['authorized admin', true, true, false, true],
++  ['database error', true, true, true, false],
++] as const) {
++  Deno.test(label, async () => {
++    const client = {
++      auth: { getUser: async (_token: string) => ({ data: { user: authenticated ? { id: 'verified-user' } : null }, error: null }) },
++      from: (table: string) => {
++        assertEquals(table, 'admin_users');
++        return { select: (_columns: string) => ({ eq: (column: string, value: string) => {
++          assertEquals(column, 'user_id');
++          assertEquals(value, 'verified-user');
++          return { maybeSingle: async () => ({ data: admin ? { user_id: value } : null, error: error ? new Error('unavailable') : null }) };
++        } }) };
++      },
++    };
++    assertEquals(await hasAdminAccess(client, 'test-token'), expected);
++  });
++}
+--- /dev/null
++++ b/supabase/functions/_shared/admin-authorization.ts
+@@ -0,0 +1,23 @@
++interface AdminClient {
++  auth: { getUser(token: string): Promise<{ data: { user: { id: string } | null }; error: unknown }> };
++  from(table: string): {
++    select(columns: string): {
++      eq(column: string, value: string): {
++        maybeSingle(): PromiseLike<{ data: { user_id: string } | null; error: unknown }>;
++      };
++    };
++  };
++}
++
++/** Authentication alone never grants access to customer emails. Fail closed. */
++export async function hasAdminAccess(client: AdminClient, token: string): Promise<boolean> {
++  try {
++    const { data, error } = await client.auth.getUser(token);
++    if (error || !data.user) return false;
++    const { data: admin, error: adminError } = await client.from('admin_users')
++      .select('user_id').eq('user_id', data.user.id).maybeSingle();
++    return !adminError && admin?.user_id === data.user.id;
++  } catch {
++    return false;
++  }
++}

@@ -1,0 +1,287 @@
+diff --git a/src/components/EnHeader.tsx b/src/components/EnHeader.tsx
+index db37f06..1e685d7 100644
+--- a/src/components/EnHeader.tsx
++++ b/src/components/EnHeader.tsx
+@@ -1,3 +1,4 @@
++import { buildGeneralWaMessage } from "@/lib/whatsappMessages";
+ import { Link } from "react-router-dom";
+ import { MessageCircle, Phone } from "lucide-react";
+ import { WHATSAPP_BASE, PHONE_TEL, PHONE_DISPLAY } from "@/constants/business";
+@@ -7,7 +8,7 @@ import { WHATSAPP_BASE, PHONE_TEL, PHONE_DISPLAY } from "@/constants/business";
+  * Portuguese-only and out of scope for this audience. Just logo, phone, and
+  * WhatsApp, matching the focused, high-intent nature of these landing pages. */
+ const EnHeader = () => {
+-  const waHref = `${WHATSAPP_BASE}?text=${encodeURIComponent("Hi! I need help with a cleaning issue.")}`;
++  const waHref = `${WHATSAPP_BASE}?text=${encodeURIComponent(buildGeneralWaMessage(true))}`;
+ 
+   return (
+     <header className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-[#111111]/8">
+diff --git a/src/components/Header.tsx b/src/components/Header.tsx
+index 86cccfa..29186d7 100644
+--- a/src/components/Header.tsx
++++ b/src/components/Header.tsx
+@@ -1,3 +1,4 @@
++import { buildGeneralWaMessage } from "@/lib/whatsappMessages";
+ import { useState } from "react";
+ import { ChevronDown, MessageCircle, Phone } from "lucide-react";
+ import {
+@@ -56,7 +57,7 @@ const Header = () => {
+   };
+ 
+   const isServicePage = serviceLinks.some(s => location.pathname === s.to);
+-  const waHref = `${WHATSAPP_BASE}?text=${encodeURIComponent('Olá! Gostaria de pedir um orçamento para limpeza de estofos.')}`;
++  const waHref = `${WHATSAPP_BASE}?text=${encodeURIComponent(buildGeneralWaMessage())}`;
+ 
+   // Shared nav label style
+   const navItem = (active: boolean) =>
+diff --git a/src/components/HeroV1.tsx b/src/components/HeroV1.tsx
+index d24720b..5c301ff 100644
+--- a/src/components/HeroV1.tsx
++++ b/src/components/HeroV1.tsx
+@@ -1,3 +1,4 @@
++import { buildGeneralWaMessage } from "@/lib/whatsappMessages";
+ import { useEffect, lazy, Suspense } from "react";
+ import { MessageCircle } from "lucide-react";
+ import { WHATSAPP_BASE } from "@/constants/business";
+@@ -121,7 +122,7 @@ const Hero = () => {
+               <div className="group relative order-1">
+                 <div className="absolute -inset-2 rounded-full bg-[#25D366]/45 opacity-50 blur-xl transition-opacity duration-400 pointer-events-none group-hover:opacity-70" />
+                 <a
+-                  href={`${WHATSAPP_BASE}?text=${encodeURIComponent('Olá, gostaria de saber mais sobre os vossos serviços de higienização.')}`}
++                  href={`${WHATSAPP_BASE}?text=${encodeURIComponent(buildGeneralWaMessage())}`}
+                   target="_blank"
+                   rel="noopener noreferrer"
+                   data-tracking-source="hero"
+diff --git a/src/components/MobileStickyBar.tsx b/src/components/MobileStickyBar.tsx
+index adf871d..fc455a3 100644
+--- a/src/components/MobileStickyBar.tsx
++++ b/src/components/MobileStickyBar.tsx
+@@ -1,3 +1,4 @@
++import { buildGeneralWaMessage } from "@/lib/whatsappMessages";
+ import { useState, useEffect } from 'react';
+ import { useLocation } from 'react-router-dom';
+ import { MessageCircle } from 'lucide-react';
+@@ -26,7 +27,7 @@ const MobileStickyBar = () => {
+       <div className="bg-[#071a12]/95 backdrop-blur-md border-t border-white/[0.08] shadow-[0_-4px_24px_rgba(0,0,0,0.4)]">
+         <div className="max-w-2xl mx-auto px-3 pt-2.5 pb-3">
+           <a
+-            href={`${WHATSAPP_BASE}?text=${encodeURIComponent(isEn ? "Hi! I need help with a cleaning issue." : 'Olá! Gostaria de pedir um orçamento para limpeza de estofos.')}`}
++            href={`${WHATSAPP_BASE}?text=${encodeURIComponent(buildGeneralWaMessage(isEn))}`}
+             target="_blank"
+             rel="noopener noreferrer"
+             data-tracking-source="sticky_bar"
+diff --git a/src/data/problemHero.ts b/src/data/problemHero.ts
+index 54773a8..c921fbc 100644
+--- a/src/data/problemHero.ts
++++ b/src/data/problemHero.ts
+@@ -1,3 +1,4 @@
++import { buildQuoteWaMessage } from '../lib/whatsappMessages';
+ import type { ProblemPage } from './problemSeoData';
+ import { services, cityPrep } from './serviceCatalog';
+ import { locationPrices } from '../constants/travel';
+@@ -36,6 +37,6 @@ export function getProblemHero(problem: ProblemPage, city?: string) {
+     response: RESPONSE_PROMISE,
+     priceLinkLabel: isQuote ? 'Como pedir orçamento' : 'Ver preços',
+     service,
+-    waHref: `${WHATSAPP_BASE}?text=${encodeURIComponent(`Olá! Gostaria de pedir uma avaliação e orçamento: ${problem.keyword}${location ? ` ${location}` : ''}. Posso enviar fotografias do artigo.`)}`,
++    waHref: `${WHATSAPP_BASE}?text=${encodeURIComponent(buildQuoteWaMessage(`Olá! Gostaria de pedir uma avaliação e orçamento: ${problem.keyword}${location ? ` ${location}` : ''}.`))}`,
+   };
+ }
+diff --git a/src/lib/quizTracking.test.ts b/src/lib/quizTracking.test.ts
+index a668c15..038ed99 100644
+--- a/src/lib/quizTracking.test.ts
++++ b/src/lib/quizTracking.test.ts
+@@ -195,3 +195,21 @@ describe('um clique, um evento', () => {
+     expect(locations).toEqual(['header', 'footer', 'page:/limpeza-sofas', 'header_desktop']);
+   });
+ });
++
++
++describe('page views after consent', () => {
++  it('records the current page once when consent is accepted after arrival', async () => {
++    localStorage.removeItem('kyro_cookie_consent');
++    const m = await import('./quizTracking');
++    cleanup = m.initContactTracking();
++    m.trackPageViewEvent('/limpeza-sofas-lisboa');
++    expect(fetch).not.toHaveBeenCalled();
++    localStorage.setItem('kyro_cookie_consent', 'accepted');
++    m.trackPageViewEvent('/limpeza-sofas-lisboa');
++    m.trackPageViewEvent('/limpeza-sofas-lisboa');
++    expect(fetch).toHaveBeenCalledTimes(1);
++    expect(JSON.parse(vi.mocked(fetch).mock.calls[0][1]!.body as string)).toMatchObject({
++      action: 'page_view', page_path: '/limpeza-sofas-lisboa',
++    });
++  });
++});
+diff --git a/src/lib/quizTracking.ts b/src/lib/quizTracking.ts
+index caf15e8..3cb4525 100644
+--- a/src/lib/quizTracking.ts
++++ b/src/lib/quizTracking.ts
+@@ -64,6 +64,8 @@ export function trackQuizEvent(params: { step: number; action: 'start' | 'comple
+  */
+ const seenPaths = new Set<string>();
+ export function trackPageViewEvent(path = window.location.pathname) {
++  // Do not consume the page before consent: usePageTracking retries it on acceptance.
++  if (getConsent() !== 'accepted' || !IS_PRODUCTION || !isPublicTrackingPage()) return;
+   if (seenPaths.has(path)) return;
+   seenPaths.add(path);
+   emit({ action: 'page_view', step: 0, page_path: path });
+diff --git a/src/lib/whatsappMessages.ts b/src/lib/whatsappMessages.ts
+index 217e0bd..4386eba 100644
+--- a/src/lib/whatsappMessages.ts
++++ b/src/lib/whatsappMessages.ts
+@@ -1,4 +1,4 @@
+-import { cityPrep } from "@/data/serviceCatalog";
++import { cityPrep } from "../data/serviceCatalog";
+ 
+ /**
+  * WhatsApp opening-message builders.
+@@ -6,49 +6,46 @@ import { cityPrep } from "@/data/serviceCatalog";
+  * `${WHATSAPP_BASE}?text=${encodeURIComponent(message)}`.
+  */
+ 
+-/** Shared opening for sofa cleaning, including hygiene/laundry variants. */
+-function buildSofaWaMessage(placeName?: string | null): string {
+-  const loc = placeName ? ` ${cityPrep(placeName)} ${placeName}` : '';
+-  return `Olá! Gostaria de confirmar o orçamento e a disponibilidade para limpar o meu sofá${loc}.\n\nPosso enviar uma fotografia do sofá e a localização.`;
++/** A first enquiry asks for a quote, never implies a confirmed booking. */
++export function buildQuoteWaMessage(request: string): string {
++  return `${request}\n\nPodem indicar o preço, incluindo a deslocação, e a próxima disponibilidade? Posso enviar fotografias e a localização para receber um orçamento mais preciso.`;
++}
++
++export function buildGeneralWaMessage(isEn = false): string {
++  if (isEn) return 'Hi! I would like a quote for your cleaning service.\n\nCould you tell me the price, including travel, and your next availability? I can send photos and the location so you can provide a more accurate quote.';
++  return buildQuoteWaMessage('Olá! Gostaria de pedir um orçamento para o vosso serviço ao domicílio.');
+ }
+ 
+-/** Used on LocationServicePage, FreguesiaServicePage, PricePage, and MaterialPage. */
++/** Shared by service, location, neighbourhood and price landing pages. */
+ export function buildServiceWaMessage(serviceSlug: string, placeName?: string | null): string {
+   const loc = placeName ? ` ${cityPrep(placeName)} ${placeName}` : '';
+-  switch (serviceSlug) {
+-    case 'limpeza-sofas':
+-      return buildSofaWaMessage(placeName);
+-    case 'limpeza-colchoes':
+-      return `Olá! Preciso de higienização profissional de colchão${loc}. Qual é o preço e disponibilidade?`;
+-    case 'limpeza-tapetes':
+-      return `Olá! Preciso de lavagem profissional de tapetes${loc}. Qual é o preço e disponibilidade?`;
+-    case 'limpeza-cadeiras':
+-      return `Olá! Preciso de limpeza profissional de cadeiras${loc}. Qual é o preço e disponibilidade?`;
+-    case 'limpeza-alcatifas':
+-      return `Olá! Preciso de limpeza profissional de alcatifas${loc}. Qual é o preço e disponibilidade?`;
+-    case 'impermeabilizacao':
+-      return `Olá! Tenho interesse em impermeabilizar os meus estofos${loc}. Qual é o preço e disponibilidade?`;
+-    default:
+-      return `Olá! Gostaria de pedir um orçamento${loc}. Qual é o preço e disponibilidade?`;
+-  }
++  const requests: Record<string, string> = {
++    'limpeza-sofas': 'limpar o meu sofá',
++    'limpeza-colchoes': 'limpar o meu colchão',
++    'limpeza-tapetes': 'limpar os meus tapetes',
++    'limpeza-cadeiras': 'limpar as minhas cadeiras',
++    'limpeza-alcatifas': 'limpar a minha alcatifa',
++    'impermeabilizacao': 'impermeabilizar os meus estofos',
++  };
++  return buildQuoteWaMessage(`Olá! Gostaria de pedir um orçamento para ${requests[serviceSlug] ?? 'um serviço ao domicílio'}${loc}.`);
+ }
+ 
+ /** Used on MaterialPage. */
+ export function buildMaterialWaMessage(slug: string, cityName: string | null): string {
+   const city = cityName ? ` ${cityPrep(cityName)} ${cityName}` : '';
+-  if (slug.includes('pele'))       return `Olá! Tenho um sofá de pele e preciso de limpeza e tratamento${city}. Qual é o preço?`;
+-  if (slug.includes('veludo'))     return `Olá! Tenho um sofá de veludo e preciso de limpeza especializada${city}. Qual é o preço?`;
+-  if (slug.includes('camurca'))    return `Olá! Tenho um sofá de camurça e preciso de limpeza profissional${city}. Qual é o preço?`;
+-  if (slug.includes('microfibra')) return `Olá! Tenho um sofá de microfibra para limpar${city}. Qual é o preço?`;
+-  if (slug.includes('linho'))      return `Olá! Tenho um sofá de linho para limpar${city}. Qual é o preço?`;
+-  if (slug.includes('sintetico') && slug.includes('sofa')) return `Olá! Tenho um sofá sintético para limpar${city}. Qual é o preço?`;
+-  if (slug.includes('sofa'))       return `Olá! Tenho um sofá de tecido e preciso de limpeza profissional${city}. Qual é o preço?`;
+-  if (slug.includes('persa'))      return `Olá! Tenho um tapete persa e preciso de lavagem especializada${city}. Qual é o preço?`;
++  if (slug.includes('pele'))       return buildQuoteWaMessage(`Olá! Tenho um sofá de pele e preciso de limpeza e tratamento${city}.`);
++  if (slug.includes('veludo'))     return buildQuoteWaMessage(`Olá! Tenho um sofá de veludo e preciso de limpeza especializada${city}.`);
++  if (slug.includes('camurca'))    return buildQuoteWaMessage(`Olá! Tenho um sofá de camurça e preciso de limpeza profissional${city}.`);
++  if (slug.includes('microfibra')) return buildQuoteWaMessage(`Olá! Tenho um sofá de microfibra para limpar${city}.`);
++  if (slug.includes('linho'))      return buildQuoteWaMessage(`Olá! Tenho um sofá de linho para limpar${city}.`);
++  if (slug.includes('sintetico') && slug.includes('sofa')) return buildQuoteWaMessage(`Olá! Tenho um sofá sintético para limpar${city}.`);
++  if (slug.includes('sofa'))       return buildQuoteWaMessage(`Olá! Tenho um sofá de tecido e preciso de limpeza profissional${city}.`);
++  if (slug.includes('persa'))      return buildQuoteWaMessage(`Olá! Tenho um tapete persa e preciso de lavagem especializada${city}.`);
+   if (slug.includes('tapete-la') || (slug.includes('tapete') && slug.includes('-la')))
+-                                   return `Olá! Tenho um tapete de lã para lavagem profissional${city}. Qual é o preço?`;
+-  if (slug.includes('sisal'))      return `Olá! Tenho um tapete de sisal para limpar${city}. Qual é o preço?`;
+-  if (slug.includes('tapete'))     return `Olá! Tenho um tapete sintético para limpar${city}. Qual é o preço?`;
+-  return `Olá! Preciso de limpeza profissional${city}. Qual é o preço e disponibilidade?`;
++                                   return buildQuoteWaMessage(`Olá! Tenho um tapete de lã para lavagem profissional${city}.`);
++  if (slug.includes('sisal'))      return buildQuoteWaMessage(`Olá! Tenho um tapete de sisal para limpar${city}.`);
++  if (slug.includes('tapete'))     return buildQuoteWaMessage(`Olá! Tenho um tapete sintético para limpar${city}.`);
++  return buildQuoteWaMessage(`Olá! Preciso de limpeza profissional${city}.`);
+ }
+ 
+ /** Used on ProblemPage. */
+@@ -121,11 +118,11 @@ export function buildVariantWaMessage(
+ ): string {
+   const svc = serviceLabel.toLowerCase();
+   if (isWaterproofing) {
+-    return `Olá! Tenho interesse em impermeabilizar o meu ${svc} em ${locationName}. Qual é o preço e quando têm disponibilidade?`;
++    return buildQuoteWaMessage(`Olá! Gostaria de pedir um orçamento para impermeabilizar ${svc} ${cityPrep(locationName)} ${locationName}.`);
+   }
+-  if (svc === 'sofá' || svc === 'sofa') return buildSofaWaMessage(locationName);
++  if (svc === 'sofá' || svc === 'sofa') return buildServiceWaMessage('limpeza-sofas', locationName);
+   const variant = variantLabel.toLowerCase();
+-  return `Olá! Preciso de ${variant} profissional para o meu ${svc} em ${locationName}. Podem dar-me um orçamento e indicar a vossa disponibilidade?`;
++  return buildQuoteWaMessage(`Olá! Gostaria de pedir um orçamento de ${variant} de ${svc} ${cityPrep(locationName)} ${locationName}.`);
+ }
+ 
+ /** Used on CommercialPage (B2B: restaurantes, hotéis, escritórios). */
+diff --git a/src/pages/MarcaCadeirasPage.tsx b/src/pages/MarcaCadeirasPage.tsx
+index c6c5c83..743037b 100644
+--- a/src/pages/MarcaCadeirasPage.tsx
++++ b/src/pages/MarcaCadeirasPage.tsx
+@@ -1,3 +1,4 @@
++import { buildQuoteWaMessage } from "@/lib/whatsappMessages";
+ import CommercialHero from "@/components/CommercialHero";
+ import DirectoryGroup from "@/components/DirectoryGroup";
+ import SofaLeadActions from "@/components/SofaLeadActions";
+@@ -124,7 +125,7 @@ const MarcaCadeirasPage = () => {
+       <Header />
+       <main>
+ 
+-        <CommercialHero title={`Limpeza de Cadeiras ${marca.name} ${prep} ${city.name}`} serviceSlug="limpeza-cadeiras" city={city.name} price={`${marca.minPrice}€`} image={heroImg} whatsappHref={`${WHATSAPP_BASE}?text=${encodeURIComponent(`Olá! Gostaria de pedir um orçamento para limpeza de cadeiras ${marca.name} ${prep} ${city.name}.`)}`} source={`marca_hero_${marca.slug}`} />
++        <CommercialHero title={`Limpeza de Cadeiras ${marca.name} ${prep} ${city.name}`} serviceSlug="limpeza-cadeiras" city={city.name} price={`${marca.minPrice}€`} image={heroImg} whatsappHref={`${WHATSAPP_BASE}?text=${encodeURIComponent(buildQuoteWaMessage(`Olá! Gostaria de pedir um orçamento para limpeza de cadeiras ${marca.name} ${prep} ${city.name}.`))}`} source={`marca_hero_${marca.slug}`} />
+ 
+         {/* ═══ ORÇAMENTO (primeira secção a seguir ao hero) ═══ */}
+         <ServicePriceSection serviceSlug="limpeza-cadeiras" initialLocation={city.name} />
+diff --git a/src/pages/MarcaColchaoPage.tsx b/src/pages/MarcaColchaoPage.tsx
+index 1525d36..95a55a1 100644
+--- a/src/pages/MarcaColchaoPage.tsx
++++ b/src/pages/MarcaColchaoPage.tsx
+@@ -1,3 +1,4 @@
++import { buildQuoteWaMessage } from "@/lib/whatsappMessages";
+ import CommercialHero from "@/components/CommercialHero";
+ import DirectoryGroup from "@/components/DirectoryGroup";
+ import SofaLeadActions from "@/components/SofaLeadActions";
+@@ -136,7 +137,7 @@ const MarcaColchaoPage = () => {
+       <Header />
+       <main>
+ 
+-        <CommercialHero title={`Limpeza de Colchão ${marca.name} ${prep} ${city.name}`} serviceSlug="limpeza-colchoes" city={city.name} price={`${marca.minPrice}€`} image={heroImg} whatsappHref={`${WHATSAPP_BASE}?text=${encodeURIComponent(`Olá! Gostaria de pedir um orçamento para limpeza de colchão ${marca.name} ${prep} ${city.name}.`)}`} source={`marca_hero_${marca.slug}`} />
++        <CommercialHero title={`Limpeza de Colchão ${marca.name} ${prep} ${city.name}`} serviceSlug="limpeza-colchoes" city={city.name} price={`${marca.minPrice}€`} image={heroImg} whatsappHref={`${WHATSAPP_BASE}?text=${encodeURIComponent(buildQuoteWaMessage(`Olá! Gostaria de pedir um orçamento para limpeza de colchão ${marca.name} ${prep} ${city.name}.`))}`} source={`marca_hero_${marca.slug}`} />
+ 
+         {/* ═══ ORÇAMENTO (primeira secção a seguir ao hero) ═══ */}
+         <ServicePriceSection serviceSlug="limpeza-colchoes" initialLocation={city.name} />
+diff --git a/src/pages/MarcaSofaPage.tsx b/src/pages/MarcaSofaPage.tsx
+index d2db609..388ec15 100644
+--- a/src/pages/MarcaSofaPage.tsx
++++ b/src/pages/MarcaSofaPage.tsx
+@@ -1,3 +1,4 @@
++import { buildQuoteWaMessage } from "@/lib/whatsappMessages";
+ import CommercialHero from "@/components/CommercialHero";
+ import DirectoryGroup from "@/components/DirectoryGroup";
+ import SofaLeadActions from "@/components/SofaLeadActions";
+@@ -141,7 +142,7 @@ const MarcaSofaPage = () => {
+       <Header />
+       <main>
+ 
+-        <CommercialHero title={`Limpeza de Sofá ${marca.name} ${prep} ${city.name}`} serviceSlug="limpeza-sofas" city={city.name} price={`${marca.minPrice}€`} image={heroImg} whatsappHref={`${WHATSAPP_BASE}?text=${encodeURIComponent(`Olá! Gostaria de pedir um orçamento para limpeza de sofá ${marca.name} ${prep} ${city.name}.`)}`} source={`marca_hero_${marca.slug}`} />
++        <CommercialHero title={`Limpeza de Sofá ${marca.name} ${prep} ${city.name}`} serviceSlug="limpeza-sofas" city={city.name} price={`${marca.minPrice}€`} image={heroImg} whatsappHref={`${WHATSAPP_BASE}?text=${encodeURIComponent(buildQuoteWaMessage(`Olá! Gostaria de pedir um orçamento para limpeza de sofá ${marca.name} ${prep} ${city.name}.`))}`} source={`marca_hero_${marca.slug}`} />
+ 
+         {/* ═══ ORÇAMENTO (primeira secção a seguir ao hero) ═══ */}
+         <ServicePriceSection serviceSlug="limpeza-sofas" initialLocation={city.name} />

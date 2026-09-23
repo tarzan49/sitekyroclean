@@ -1,0 +1,23 @@
+{
+  "src/components/EnHeader.tsx": "1ffba2fbeb6b3ad39dd44b0d90b82f2aec201652ed670f66c588517acc8eaa44",
+  "src/components/Header.tsx": "c6d87ecf5802b6d9e36cae7ca191c8aae161d27be7439a01855f2623bed2c405",
+  "src/components/HeroV1.tsx": "875f0c052ee18e9adffca76a78799d7260647f439de8feaac5879a502152e095",
+  "src/components/MobileStickyBar.tsx": "9116300182e391ea8aea765a67264067e873e90d36a83a6190a19a261097d56a",
+  "src/data/problemHero.ts": "191868cf80b9b141d50c9128f4930715dcbd5e4584e87f85cddf696006e1995c",
+  "src/lib/consent.test.ts": "21a4d8bb228760d2b5ce6aa2740146de07bb73b1e0a88c82b8c1ea61d20890c8",
+  "src/lib/gtag.test.ts": "abeaa70658489f4bf47e6dbea1fc00b33ba55917455f1f42bd844ceab04ec91c",
+  "src/lib/gtag.ts": "304e542fa31b1525f1f6e4628e0156ebcf26a5071d2df048a3fcd9ce38281dc3",
+  "src/lib/quizTracking.test.ts": "b96808f71b88802bbcec45ca4f0509a2616592f4680d3d0f6c215aaeb6bdc8f9",
+  "src/lib/quizTracking.ts": "ec8b8a4282258e5a68112890cf0c96f39cd0a7b0beacea15afa2e09215ff469b",
+  "src/lib/whatsappMessages.ts": "d7afc199dc2fe718e6193483f9325f23aec5b1d4393e0c227a16bfbf9a053039",
+  "src/pages/MarcaCadeirasPage.tsx": "a973964a64283dd27471abe952b8c4a6644cfbdff8236401b50e94da20cf40fe",
+  "src/pages/MarcaColchaoPage.tsx": "a4a62d28ecf2d3f13af93e9c101a1feb41a5c0ce877b86d50ac7d1c39ce455b6",
+  "src/pages/MarcaSofaPage.tsx": "6d1232197bad88202dd300b56bd8b91efb85c91913c600aafcf7ad390ad11345",
+  "src/pages/Obrigado.tsx": "c44a7177ad7f6b420f8b50c038d4d741dde6a1e889f25b00c834ad308afefa8e",
+  "src/services/submissionService.test.ts": "8fb7acfa206ab4a65779c5ec949a2516d5b911b3809ea6866eef226c5c2c4cde",
+  "src/services/submissionService.ts": "c7a4e63b1b479e4a06fee05fd8a798a08b9dd0b8b8418e9f9f0204eca0d45c01",
+  "supabase/functions/list-resend-leads/index.ts": "69777ccf0805307bcf4b9e231ea1d9af62474697185f5cffc6e3bfdd782f5fbc",
+  "src/lib/whatsappMessages.test.ts": "d878b0df927ad898cc5699e5ece8406faf62ce0d1e587fc9f38603bb4bc8fce4",
+  "supabase/functions/_shared/admin-authorization.test.ts": "2e6488f6ef443007300eefb76a3eea1ea796f1f7def27d8478ef62f514490969",
+  "supabase/functions/_shared/admin-authorization.ts": "d17df9a935c9b6865fbddd323dff600853e0336efe35ab814bbe7ace8ea4e9f8"
+}
