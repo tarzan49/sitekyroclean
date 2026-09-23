@@ -978,7 +978,7 @@ const problemDefinitions: ProblemPage[] = [
     problemDetail: "Bebés e crianças pequenas passam muito tempo no sofá e levam as mãos à boca após tocar nos tecidos. Produtos de limpeza convencionais podem deixar resíduos químicos prejudiciais. Os pais preocupam-se, com razão, com a segurança dos produtos utilizados.",
     solutionDetail: "Utilizamos exclusivamente produtos certificados, sem fragrâncias artificiais e aprovados para contacto com pele sensível. A extração profissional remove todos os resíduos de produto, deixando o sofá limpo e seguro para o bebé.",
     benefits: [
-      "Produtos 100% seguros para bebés",
+      "Produtos certificados e hipoalergénicos",
       "Hipoalergénicos e certificados",
       "Sem fragrâncias artificiais",
       "Extração remove resíduos de produto",
@@ -987,7 +987,7 @@ const problemDefinitions: ProblemPage[] = [
     ],
     faqs: [
       { question: "Os produtos são seguros para bebés?", answer: "Sim. Utilizamos exclusivamente produtos certificados, hipoalergénicos e aprovados para contacto com pele sensível de bebés." },
-      { question: "Quanto tempo após a limpeza o bebé pode usar o sofá?", answer: "Recomendamos aguardar 3 a 6 horas até à secagem completa. Após seco, o sofá é 100% seguro para bebés." },
+      { question: "Quanto tempo após a limpeza o bebé pode usar o sofá?", answer: "Recomendamos aguardar 3 a 6 horas até à secagem completa, e só depois voltar a usar o sofá. Usamos produtos certificados e hipoalergénicos, escolhidos para casas com bebés." },
     ],
     relatedProblems: ["alergias-sofa", "manchas-sofa", "impermeabilizar-sofa"],
     relatedServices: ["limpeza-sofas", "impermeabilizacao"],
@@ -1119,12 +1119,12 @@ const problemDefinitions: ProblemPage[] = [
     category: "animais",
     keyword: "limpeza colchão bebé",
     title: "Limpeza de Colchão de Bebé | Hipoalergénica | Kyro",
-    metaDescription: "Higienização de colchão de bebé com produtos 100% seguros. Anti-ácaros hipoalergénico. Proteção da saúde do bebé. Orçamento grátis.",
+    metaDescription: "Higienização de colchão de bebé com produtos certificados e hipoalergénicos. Anti-ácaros suave. Secagem completa antes de voltar a usar. Orçamento grátis.",
     h1: "Higienização de Colchão de Bebé",
-    intro: "O colchão do berço ou cama do bebé merece cuidados especiais. A Kyro Clean Solutions faz higienização hipoalergénica de colchões de bebé com produtos 100% seguros e certificados.",
+    intro: "O colchão do berço ou cama do bebé merece cuidados especiais. A Kyro Clean Solutions faz higienização hipoalergénica de colchões de bebé com produtos certificados, escolhidos para quem dorme em contacto direto com a superfície.",
     problemDetail: "Bebés passam até 16 horas por dia no colchão. Resíduos de leite, urina, suor e saliva acumulam-se rapidamente. Os ácaros e bactérias no colchão podem causar problemas respiratórios e irritações na pele sensível do bebé.",
     solutionDetail: "Higienização com produtos hipoalergénicos certificados seguros para bebés. Anti-ácaros suave. Extração de todos os resíduos orgânicos. Secagem rápida para mínima interrupção.",
-    benefits: ["Produtos 100% seguros para bebés", "Hipoalergénico", "Anti-ácaros suave", "Remoção de resíduos de leite e urina", "Secagem rápida", "Certificação de segurança"],
+    benefits: ["Produtos certificados e hipoalergénicos", "Anti-ácaros suave", "Remoção de resíduos de leite e urina", "Secagem completa antes de voltar a usar", "Certificação de segurança"],
     faqs: [
       { question: "A limpeza do colchão de bebé é segura?", answer: "Absolutamente. Utilizamos exclusivamente produtos hipoalergénicos certificados, sem fragrâncias e seguros para pele de bebé." },
     ],
