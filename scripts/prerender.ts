@@ -31,7 +31,7 @@ import { buildAboutPageSchema, buildProfilePageSchema, buildPersonNode, buildStu
 
 import fs from 'fs';
 import path from 'path';
-import { getLandingPageModel } from '../src/data/landingPageModel';
+import { getLandingPageModel, coverageWindow } from '../src/data/landingPageModel';
 import { renderLandingPageHtml, ENTITY_FOOTER_HTML } from './landing-page-html';
 
 import { getLocationServiceData, getAllLocationRoutes, services, cities, cityPrep } from '../src/data/locationSeoData';
@@ -741,9 +741,28 @@ export function prerenderRoutes(outDir: string): number {
           // avaliacoes da regiao: e o que distingue esta cidade da seguinte.
           faqs: getProblemCityFaqs(problem, city.name, route.path),
           reviews: getProblemCityReviews(problem, city.slug),
+          // As cidades saem de `getProblemCities`, a mesma função que decide
+          // que rotas existem, e não do catálogo inteiro: `cities.slice(0, 6)`
+          // ligava às seis primeiras cidades do catálogo sem verificar que a
+          // página existia, e Valongo (a sexta) só tem página nos problemas que
+          // a listam em `relatedCities` — 1.524 ligações mortas em 1.274 das
+          // 1.354 páginas desta família. O React já filtrava bem
+          // (ProblemCityPage.tsx), por isso só o HTML estático as tinha.
+          //
+          // A janela substitui o `.slice()` pela mesma razão da fase 8 no
+          // `landingPageModel.ts`: com uma ordem estável, as n primeiras
+          // entradas recebiam todas as ligações e as restantes nenhuma — só 7
+          // das 26 cidades eram alguma vez ligadas, e Lisboa, Braga, Faro,
+          // Cascais e Sintra não recebiam uma única. O ponto de partida varia
+          // com a cidade desenhada, de modo a cobrir a lista inteira.
           links: [
             { href: `/problemas/${route.problemSlug}`, label: `${problem.h1} (pagina nacional)` },
-            ...cities.filter(c => c.slug !== city.slug).slice(0, 6).map(c => ({ href: `/${route.problemSlug}-${c.slug}`, label: `${problem.h1} em ${c.name}` })),
+            ...(() => {
+              const withPage = getProblemCities(route.problemSlug);
+              const others = withPage.filter(c => c.slug !== city.slug);
+              const start = withPage.findIndex(c => c.slug === city.slug);
+              return coverageWindow(others, start < 0 ? 0 : start, 6);
+            })().map(c => ({ href: `/${route.problemSlug}-${c.slug}`, label: `${problem.h1} em ${c.name}` })),
           ],
         },
         schemas,
