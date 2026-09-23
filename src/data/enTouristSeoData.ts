@@ -426,7 +426,7 @@ const LOCAL_EN_PAGES: EnPageData[] = [
       "English-speaking team, direct WhatsApp coordination",
       EN_AVAILABILITY_PROMISE,
       "Before/after photo documentation on every job",
-      "${REVIEW_RATING}★ on Google, professional insured technicians",
+      `${REVIEW_RATING}★ on Google, professional insured technicians`,
     ],
     faqs: [
       { question: "Can you invoice for accounting purposes?", answer: "Yes, we provide a receipt for every job." },
@@ -666,7 +666,7 @@ const LOCAL_EN_PAGES: EnPageData[] = [
       "English-speaking team, direct WhatsApp coordination",
       EN_AVAILABILITY_PROMISE,
       "Before/after photo documentation on every job",
-      "${REVIEW_RATING}★ on Google, professional insured technicians",
+      `${REVIEW_RATING}★ on Google, professional insured technicians`,
     ],
     faqs: [
       { question: "Can you invoice for accounting purposes?", answer: "Yes, we provide a receipt for every job." },
