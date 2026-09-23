@@ -1,3 +1,4 @@
+import { buildQuoteWaMessage } from '../lib/whatsappMessages';
 import type { ProblemPage } from './problemSeoData';
 import { services, cityPrep } from './serviceCatalog';
 import { locationPrices } from '../constants/travel';
@@ -36,6 +37,6 @@ export function getProblemHero(problem: ProblemPage, city?: string) {
     response: RESPONSE_PROMISE,
     priceLinkLabel: isQuote ? 'Como pedir orçamento' : 'Ver preços',
     service,
-    waHref: `${WHATSAPP_BASE}?text=${encodeURIComponent(`Olá! Gostaria de pedir uma avaliação e orçamento: ${problem.keyword}${location ? ` ${location}` : ''}. Posso enviar fotografias do artigo.`)}`,
+    waHref: `${WHATSAPP_BASE}?text=${encodeURIComponent(buildQuoteWaMessage(`Olá! Gostaria de pedir uma avaliação e orçamento: ${problem.keyword}${location ? ` ${location}` : ''}.`))}`,
   };
 }

@@ -1,17 +1,19 @@
 import { useEffect, useState } from "react";
+import { buildSubmittedWaMessage } from '@/lib/whatsappMessages';
 import QuoteConfirmation, { type ConfirmationReceipt } from "@/components/QuoteConfirmation";
 import { WHATSAPP_BASE } from "@/constants/business";
 
 const Obrigado = () => {
   const [receipt, setReceipt] = useState<ConfirmationReceipt | null>(null);
-  const [waUrl, setWaUrl] = useState(WHATSAPP_BASE);
+  const [waUrl, setWaUrl] = useState(`${WHATSAPP_BASE}?text=${encodeURIComponent(buildSubmittedWaMessage())}`);
 
   useEffect(() => {
     try {
       const raw = sessionStorage.getItem("kyro_receipt");
-      if (raw) setReceipt(JSON.parse(raw));
-      const wa = sessionStorage.getItem("kyro_wa_url");
-      if (wa) setWaUrl(wa);
+      const stored = raw ? JSON.parse(raw) : null;
+      if (stored) setReceipt(stored);
+      // Rebuild legacy stored links too: old URLs contained customer details.
+      setWaUrl(`${WHATSAPP_BASE}?text=${encodeURIComponent(buildSubmittedWaMessage(stored?.bookingId))}`);
     } catch { /* ignore parse errors */ }
   }, []);
 

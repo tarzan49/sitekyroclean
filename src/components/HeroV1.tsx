@@ -1,3 +1,4 @@
+import { buildGeneralWaMessage } from "@/lib/whatsappMessages";
 import { useEffect, lazy, Suspense } from "react";
 import { MessageCircle } from "lucide-react";
 import { WHATSAPP_BASE } from "@/constants/business";
@@ -121,7 +122,7 @@ const Hero = () => {
               <div className="group relative order-1">
                 <div className="absolute -inset-2 rounded-full bg-[#25D366]/45 opacity-50 blur-xl transition-opacity duration-400 pointer-events-none group-hover:opacity-70" />
                 <a
-                  href={`${WHATSAPP_BASE}?text=${encodeURIComponent('Olá, gostaria de saber mais sobre os vossos serviços de higienização.')}`}
+                  href={`${WHATSAPP_BASE}?text=${encodeURIComponent(buildGeneralWaMessage())}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   data-tracking-source="hero"

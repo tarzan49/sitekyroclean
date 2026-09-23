@@ -1,3 +1,4 @@
+import { buildQuoteWaMessage } from "@/lib/whatsappMessages";
 import CommercialHero from "@/components/CommercialHero";
 import DirectoryGroup from "@/components/DirectoryGroup";
 import SofaLeadActions from "@/components/SofaLeadActions";
@@ -124,7 +125,7 @@ const MarcaCadeirasPage = () => {
       <Header />
       <main>
 
-        <CommercialHero title={`Limpeza de Cadeiras ${marca.name} ${prep} ${city.name}`} serviceSlug="limpeza-cadeiras" city={city.name} price={`${marca.minPrice}€`} image={heroImg} whatsappHref={`${WHATSAPP_BASE}?text=${encodeURIComponent(`Olá! Gostaria de pedir um orçamento para limpeza de cadeiras ${marca.name} ${prep} ${city.name}.`)}`} source={`marca_hero_${marca.slug}`} />
+        <CommercialHero title={`Limpeza de Cadeiras ${marca.name} ${prep} ${city.name}`} serviceSlug="limpeza-cadeiras" city={city.name} price={`${marca.minPrice}€`} image={heroImg} whatsappHref={`${WHATSAPP_BASE}?text=${encodeURIComponent(buildQuoteWaMessage(`Olá! Gostaria de pedir um orçamento para limpeza de cadeiras ${marca.name} ${prep} ${city.name}.`))}`} source={`marca_hero_${marca.slug}`} />
 
         {/* ═══ ORÇAMENTO (primeira secção a seguir ao hero) ═══ */}
         <ServicePriceSection serviceSlug="limpeza-cadeiras" initialLocation={city.name} />

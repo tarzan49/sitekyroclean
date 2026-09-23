@@ -1,3 +1,4 @@
+import { buildGeneralWaMessage } from "@/lib/whatsappMessages";
 import { Link } from "react-router-dom";
 import { MessageCircle, Phone } from "lucide-react";
 import { WHATSAPP_BASE, PHONE_TEL, PHONE_DISPLAY } from "@/constants/business";
@@ -7,7 +8,7 @@ import { WHATSAPP_BASE, PHONE_TEL, PHONE_DISPLAY } from "@/constants/business";
  * Portuguese-only and out of scope for this audience. Just logo, phone, and
  * WhatsApp, matching the focused, high-intent nature of these landing pages. */
 const EnHeader = () => {
-  const waHref = `${WHATSAPP_BASE}?text=${encodeURIComponent("Hi! I need help with a cleaning issue.")}`;
+  const waHref = `${WHATSAPP_BASE}?text=${encodeURIComponent(buildGeneralWaMessage(true))}`;
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-[#111111]/8">

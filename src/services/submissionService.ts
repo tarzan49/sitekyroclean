@@ -5,6 +5,7 @@ import { splitTreatmentItems } from '@/components/quiz/quizHelpers';
 import { sofaPrices, mattressPrices } from '@/components/quiz/QuizTypes';
 import type { SofaItem, MattressItem, CarpetItem, UpsellItemConfig } from '@/components/quiz/QuizTypes';
 import { calcChairClean, calcChairWaterproof, calcChairWaterproofPremium, carpetItemArea, calcPackPricing } from '@/components/quiz/quizHelpers';
+import { buildSubmittedWaMessage } from '@/lib/whatsappMessages';
 import { WHATSAPP_BASE } from '@/constants/business';
 import { safeSessionSet } from '@/lib/safeStorage';
 import { logError } from '@/lib/errorTracking';
@@ -92,7 +93,7 @@ function buildLeadRow(payload: QuizLeadPayload, bookingId: string, leadId: strin
 
 type SupabaseClient = (typeof import('@/lib/supabase'))['supabase'];
 
-async function insertCrmLead(supabase: SupabaseClient, isSupabaseConfigured: boolean, payload: QuizLeadPayload, bookingId: string, leadId: string): Promise<{ duplicate: boolean }> {
+async function insertCrmLead(supabase: SupabaseClient, isSupabaseConfigured: boolean, payload: QuizLeadPayload, bookingId: string, leadId: string): Promise<{ duplicate: boolean; bookingId: string }> {
   if (!isSupabaseConfigured) throw new Error('CRM não configurado');
 
   const row = buildLeadRow(payload, bookingId, leadId);
@@ -120,7 +121,7 @@ async function insertCrmLead(supabase: SupabaseClient, isSupabaseConfigured: boo
   // outro". É sucesso, não falha: é exatamente o que tem de acontecer num
   // duplo clique ou num retry depois de um timeout em que a primeira tentativa
   // afinal tinha chegado.
-  if (!error && data?.success) return { duplicate: Boolean(data.duplicate) };
+  if (!error && data?.success) return { duplicate: Boolean(data.duplicate), bookingId: typeof data.bookingId === 'string' && data.bookingId ? data.bookingId : bookingId };
 
   // A partir daqui o insert direto deixou de existir: a politica de insert
   // anonimo foi fechada (migracao 20260914000000), por isso a funcao e o unico
@@ -154,12 +155,8 @@ async function postToLeadEmail(supabase: SupabaseClient, payload: QuizLeadPayloa
   throw new Error(`send-lead-email falhou: ${error?.message ?? 'resposta inesperada'}`);
 }
 
-export function buildWaUrl(payload: QuizLeadPayload, bookingId: string): string {
-  const text = `Olá Kyro Clean Solutions. Gostaria de confirmar este pedido de orçamento.\n\n` +
-    `Nome: ${payload.name}\nTelemóvel: ${payload.phone}\n` +
-    `${payload.message}\n\nReferência do pedido: #${bookingId}\n` +
-    `Aguardo a confirmação do orçamento e da disponibilidade.`;
-  return `${WHATSAPP_BASE}?text=${encodeURIComponent(text)}`;
+export function buildWaUrl(_payload: QuizLeadPayload, bookingId: string): string {
+  return `${WHATSAPP_BASE}?text=${encodeURIComponent(buildSubmittedWaMessage(bookingId))}`;
 }
 
 export function formatQuotePrice(payload: Pick<QuizLeadPayload, 'totalPrice' | 'hasSobOrcamento' | 'hasUpsellSobItem'>): string {
@@ -301,7 +298,7 @@ export interface LeadDeliveryResult {
 }
 
 export async function submitQuizLead(payload: QuizLeadPayload): Promise<LeadDeliveryResult> {
-  const bookingId = generateBookingId();
+  let bookingId = generateBookingId();
   // Estável entre tentativas da mesma submissão — ver src/lib/submissionId.ts.
   const leadId = currentSubmissionId();
 
@@ -340,6 +337,7 @@ export async function submitQuizLead(payload: QuizLeadPayload): Promise<LeadDeli
   ]);
 
   const crmOk = crmResult.status === 'fulfilled';
+  if (crmResult.status === 'fulfilled') bookingId = crmResult.value.bookingId;
   const duplicate = crmResult.status === 'fulfilled' && crmResult.value.duplicate;
   const emailOk = emailResult.status === 'fulfilled';
   const bothFailed = !crmOk && !emailOk;

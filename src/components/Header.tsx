@@ -1,3 +1,4 @@
+import { buildGeneralWaMessage } from "@/lib/whatsappMessages";
 import { useState } from "react";
 import { ChevronDown, MessageCircle, Phone } from "lucide-react";
 import {
@@ -56,7 +57,7 @@ const Header = () => {
   };
 
   const isServicePage = serviceLinks.some(s => location.pathname === s.to);
-  const waHref = `${WHATSAPP_BASE}?text=${encodeURIComponent('Olá! Gostaria de pedir um orçamento para limpeza de estofos.')}`;
+  const waHref = `${WHATSAPP_BASE}?text=${encodeURIComponent(buildGeneralWaMessage())}`;
 
   // Shared nav label style
   const navItem = (active: boolean) =>

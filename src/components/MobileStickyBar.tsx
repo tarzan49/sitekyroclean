@@ -1,3 +1,4 @@
+import { buildGeneralWaMessage } from "@/lib/whatsappMessages";
 import { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { MessageCircle } from 'lucide-react';
@@ -28,7 +29,7 @@ const MobileStickyBar = () => {
       <div className="bg-[#071a12]/95 backdrop-blur-md border-t border-white/[0.08] shadow-[0_-4px_24px_rgba(0,0,0,0.4)]">
         <div className="max-w-2xl mx-auto px-3 pt-2.5 pb-3">
           <a
-            href={`${WHATSAPP_BASE}?text=${encodeURIComponent(isEn ? "Hi! I need help with a cleaning issue." : 'Olá! Gostaria de pedir um orçamento para limpeza de estofos.')}`}
+            href={`${WHATSAPP_BASE}?text=${encodeURIComponent(buildGeneralWaMessage(isEn))}`}
             target="_blank"
             rel="noopener noreferrer"
             data-tracking-source="sticky_bar"

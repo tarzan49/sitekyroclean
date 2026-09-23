@@ -1,4 +1,4 @@
-import { cityPrep } from "@/data/serviceCatalog";
+import { cityPrep } from "../data/serviceCatalog";
 
 /**
  * WhatsApp opening-message builders.
@@ -6,49 +6,51 @@ import { cityPrep } from "@/data/serviceCatalog";
  * `${WHATSAPP_BASE}?text=${encodeURIComponent(message)}`.
  */
 
-/** Shared opening for sofa cleaning, including hygiene/laundry variants. */
-function buildSofaWaMessage(placeName?: string | null): string {
-  const loc = placeName ? ` ${cityPrep(placeName)} ${placeName}` : '';
-  return `Olá! Gostaria de confirmar o orçamento e a disponibilidade para limpar o meu sofá${loc}.\n\nPosso enviar uma fotografia do sofá e a localização.`;
+/** A first enquiry asks for a quote, never implies a confirmed booking. */
+export function buildQuoteWaMessage(request: string): string {
+  return `${request}\n\nPodem indicar o preço, incluindo a deslocação, e a próxima disponibilidade? Posso enviar fotografias e a localização para receber um orçamento mais preciso.`;
 }
 
-/** Used on LocationServicePage, FreguesiaServicePage, PricePage, and MaterialPage. */
+export function buildGeneralWaMessage(isEn = false): string {
+  if (isEn) return 'Hi! I would like a quote for your cleaning service.\n\nCould you tell me the price, including travel, and your next availability? I can send photos and the location so you can provide a more accurate quote.';
+  return 'Olá! Gostaria de saber o preço e a disponibilidade para limpar os meus estofos. Posso enviar fotografias dos artigos e indicar a minha localidade para receber um orçamento.';
+}
+
+/** Shared by service, location, neighbourhood and price landing pages. */
 export function buildServiceWaMessage(serviceSlug: string, placeName?: string | null): string {
   const loc = placeName ? ` ${cityPrep(placeName)} ${placeName}` : '';
-  switch (serviceSlug) {
-    case 'limpeza-sofas':
-      return buildSofaWaMessage(placeName);
-    case 'limpeza-colchoes':
-      return `Olá! Preciso de higienização profissional de colchão${loc}. Qual é o preço e disponibilidade?`;
-    case 'limpeza-tapetes':
-      return `Olá! Preciso de lavagem profissional de tapetes${loc}. Qual é o preço e disponibilidade?`;
-    case 'limpeza-cadeiras':
-      return `Olá! Preciso de limpeza profissional de cadeiras${loc}. Qual é o preço e disponibilidade?`;
-    case 'limpeza-alcatifas':
-      return `Olá! Preciso de limpeza profissional de alcatifas${loc}. Qual é o preço e disponibilidade?`;
-    case 'impermeabilizacao':
-      return `Olá! Tenho interesse em impermeabilizar os meus estofos${loc}. Qual é o preço e disponibilidade?`;
-    default:
-      return `Olá! Gostaria de pedir um orçamento${loc}. Qual é o preço e disponibilidade?`;
-  }
+  const requests: Record<string, string> = {
+    'limpeza-sofas': 'limpar o meu sofá',
+    'limpeza-colchoes': 'limpar o meu colchão',
+    'limpeza-tapetes': 'limpar os meus tapetes',
+    'limpeza-cadeiras': 'limpar as minhas cadeiras',
+    'limpeza-alcatifas': 'limpar a minha alcatifa',
+    'impermeabilizacao': 'impermeabilizar os meus estofos',
+  };
+  const request = requests[serviceSlug];
+  if (!request) return buildGeneralWaMessage();
+  const photos = serviceSlug === 'impermeabilizacao'
+    ? 'Posso enviar fotografias para avaliarem o tecido e confirmarem o orçamento.'
+    : 'Posso enviar fotografias e indicar a minha localidade para confirmarem o orçamento.';
+  return `Olá! Gostaria de saber o preço e a próxima disponibilidade para ${request}${loc}. ${photos}`;
 }
 
 /** Used on MaterialPage. */
 export function buildMaterialWaMessage(slug: string, cityName: string | null): string {
   const city = cityName ? ` ${cityPrep(cityName)} ${cityName}` : '';
-  if (slug.includes('pele'))       return `Olá! Tenho um sofá de pele e preciso de limpeza e tratamento${city}. Qual é o preço?`;
-  if (slug.includes('veludo'))     return `Olá! Tenho um sofá de veludo e preciso de limpeza especializada${city}. Qual é o preço?`;
-  if (slug.includes('camurca'))    return `Olá! Tenho um sofá de camurça e preciso de limpeza profissional${city}. Qual é o preço?`;
-  if (slug.includes('microfibra')) return `Olá! Tenho um sofá de microfibra para limpar${city}. Qual é o preço?`;
-  if (slug.includes('linho'))      return `Olá! Tenho um sofá de linho para limpar${city}. Qual é o preço?`;
-  if (slug.includes('sintetico') && slug.includes('sofa')) return `Olá! Tenho um sofá sintético para limpar${city}. Qual é o preço?`;
-  if (slug.includes('sofa'))       return `Olá! Tenho um sofá de tecido e preciso de limpeza profissional${city}. Qual é o preço?`;
-  if (slug.includes('persa'))      return `Olá! Tenho um tapete persa e preciso de lavagem especializada${city}. Qual é o preço?`;
+  if (slug.includes('pele'))       return buildQuoteWaMessage(`Olá! Tenho um sofá de pele e preciso de limpeza e tratamento${city}.`);
+  if (slug.includes('veludo'))     return buildQuoteWaMessage(`Olá! Tenho um sofá de veludo e preciso de limpeza especializada${city}.`);
+  if (slug.includes('camurca'))    return buildQuoteWaMessage(`Olá! Tenho um sofá de camurça e preciso de limpeza profissional${city}.`);
+  if (slug.includes('microfibra')) return buildQuoteWaMessage(`Olá! Tenho um sofá de microfibra para limpar${city}.`);
+  if (slug.includes('linho'))      return buildQuoteWaMessage(`Olá! Tenho um sofá de linho para limpar${city}.`);
+  if (slug.includes('sintetico') && slug.includes('sofa')) return buildQuoteWaMessage(`Olá! Tenho um sofá sintético para limpar${city}.`);
+  if (slug.includes('sofa'))       return buildQuoteWaMessage(`Olá! Tenho um sofá de tecido e preciso de limpeza profissional${city}.`);
+  if (slug.includes('persa'))      return buildQuoteWaMessage(`Olá! Tenho um tapete persa e preciso de lavagem especializada${city}.`);
   if (slug.includes('tapete-la') || (slug.includes('tapete') && slug.includes('-la')))
-                                   return `Olá! Tenho um tapete de lã para lavagem profissional${city}. Qual é o preço?`;
-  if (slug.includes('sisal'))      return `Olá! Tenho um tapete de sisal para limpar${city}. Qual é o preço?`;
-  if (slug.includes('tapete'))     return `Olá! Tenho um tapete sintético para limpar${city}. Qual é o preço?`;
-  return `Olá! Preciso de limpeza profissional${city}. Qual é o preço e disponibilidade?`;
+                                   return buildQuoteWaMessage(`Olá! Tenho um tapete de lã para lavagem profissional${city}.`);
+  if (slug.includes('sisal'))      return buildQuoteWaMessage(`Olá! Tenho um tapete de sisal para limpar${city}.`);
+  if (slug.includes('tapete'))     return buildQuoteWaMessage(`Olá! Tenho um tapete sintético para limpar${city}.`);
+  return buildQuoteWaMessage(`Olá! Preciso de limpeza profissional${city}.`);
 }
 
 /** Used on ProblemPage. */
@@ -121,14 +123,23 @@ export function buildVariantWaMessage(
 ): string {
   const svc = serviceLabel.toLowerCase();
   if (isWaterproofing) {
-    return `Olá! Tenho interesse em impermeabilizar o meu ${svc} em ${locationName}. Qual é o preço e quando têm disponibilidade?`;
+    const article = svc === 'sofá' || svc === 'sofa' ? 'o meu sofá' : svc === 'cadeiras' ? 'as minhas cadeiras' : 'os meus estofos';
+    return `Olá! Gostaria de saber o preço e a próxima disponibilidade para impermeabilizar ${article} ${cityPrep(locationName)} ${locationName}. Posso enviar fotografias para avaliarem o tecido e confirmarem o orçamento.`;
   }
-  if (svc === 'sofá' || svc === 'sofa') return buildSofaWaMessage(locationName);
+  if (svc === 'sofá' || svc === 'sofa') return buildServiceWaMessage('limpeza-sofas', locationName);
   const variant = variantLabel.toLowerCase();
-  return `Olá! Preciso de ${variant} profissional para o meu ${svc} em ${locationName}. Podem dar-me um orçamento e indicar a vossa disponibilidade?`;
+  return buildQuoteWaMessage(`Olá! Gostaria de pedir um orçamento de ${variant} de ${svc} ${cityPrep(locationName)} ${locationName}.`);
 }
 
 /** Used on CommercialPage (B2B: restaurantes, hotéis, escritórios). */
 export function buildCommercialWaMessage(cityName: string): string {
   return `Olá! Represento um negócio ${cityPrep(cityName)} ${cityName} (restaurante/hotel/escritório) e tenho interesse num contrato de limpeza recorrente de estofos. Podem enviar-me uma proposta?`;
+}
+
+/** Only an opaque operational reference belongs in a shareable WhatsApp URL. */
+export function buildSubmittedWaMessage(reference?: string | null): string {
+  const value = reference?.trim().replace(/^#/, '');
+  // Current short booking IDs and opaque lead IDs; never interpolate arbitrary input.
+  const safe = value && /^(?:[A-Z0-9]{6,12}|L-\d{8}-[a-z0-9]{8,12})$/.test(value) ? value : null;
+  return `Olá! Acabei de enviar o pedido${safe ? ` #${safe}` : ''}. Gostaria de confirmar o orçamento e a próxima disponibilidade. Posso enviar fotografias dos artigos para avaliação.`;
 }

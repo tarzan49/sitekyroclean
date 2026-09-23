@@ -61,17 +61,17 @@ describe('quote channel parity: table sizes, tiers, quantities, brackets, extras
     const receipt = JSON.parse(sessionStorage.getItem('kyro_receipt')!);
     const wa = new URL(sessionStorage.getItem('kyro_wa_url')!).searchParams.get('text')!;
     expect(emailBody.lead.message).toBe(p.message);
-    expect(wa).toContain(p.message);
-    expect(wa).toContain(p.name);
-    expect(wa).toContain(p.phone);
-    expect(wa).toContain(p.description);
+    expect(wa).not.toContain(p.message);
+    expect(wa).not.toContain(p.name);
+    expect(wa).not.toContain(p.phone);
+    expect(wa).not.toContain(p.description);
     expect(emailBody.lead.booking_id).toBe(receipt.bookingId);
     expect(wa).toContain(receipt.bookingId);
     expect(receipt.lines.reduce((n: number, l: { total: number | null }) => n + (l.total ?? 0), 0)).toBe(p.totalPrice);
     expect(receipt.subtotal - receipt.discountAmount).toBeCloseTo(receipt.total);
     expect(receipt.lines.find((line: { label: string }) => line.label.startsWith('Deslocação:'))?.total ?? 0).toBe(p.finalTravelCost);
     expect(mocks.invokeCrm.mock.calls[0][0].body.lead.value).toBe(p.priceText);
-    if (p.hasSobOrcamento || p.hasUpsellSobItem) expect(wa).toContain('subtotal conhecido');
+    if (p.hasSobOrcamento || p.hasUpsellSobItem) expect(emailBody.lead.message).toContain('subtotal conhecido');
   });
 });
 
@@ -86,10 +86,10 @@ describe('specific regressions and delivery failures', () => {
     expect(p.calculateServicePrice).toBe(0);
     expect(buildReceiptLines(p)[0].total).toBeNull();
   });
-  it('keeps dimensions for each carpet in the message', async () => {
+  it('keeps dimensions in the receipt rather than the shareable URL', async () => {
     const p = payload({ service: 'carpet', serviceType: 'cleaning' });
     await submitQuizLead(p);
-    expect(new URL(sessionStorage.getItem('kyro_wa_url')!).searchParams.get('text')).toContain('2,5 × 3 m');
+    expect(sessionStorage.getItem('kyro_receipt')).toContain('2,5 × 3 m');
   });
   it('rejects when both the CRM and the email channel fail', async () => {
     mocks.invokeCrm.mockResolvedValue({ data: null, error: { message: 'down' } });
@@ -126,7 +126,7 @@ it.each([
   expect(emailBody.lead.message).toContain(`Tapete 1: ${largura} × ${comprimento} m (${area} m²)`);
   expect(emailBody.lead.message).toContain('Tapete 2: 1 × 4 m (4 m²)');
   expect(emailBody.lead.message).toContain('Sob orçamento');
-  expect(new URL(sessionStorage.getItem('kyro_wa_url')!).searchParams.get('text')).toContain(p.message);
+  expect(new URL(sessionStorage.getItem('kyro_wa_url')!).searchParams.get('text')).not.toContain(p.message);
 });
 
 describe('reCAPTCHA no canal do CRM', () => {
@@ -167,4 +167,13 @@ describe('reCAPTCHA no canal do CRM', () => {
     await expect(submitQuizLead(payload({ service: 'carpet' }))).resolves.toMatchObject({ leadId: expect.stringMatching(/^L-/) });
     expect(mocks.invokeCrm).toHaveBeenCalledTimes(1);
   });
+});
+
+
+it('uses the persisted server reference after a duplicate response', async () => {
+  mocks.invokeCrm.mockResolvedValue({ data: { success: true, duplicate: true, bookingId: 'REAL1234' }, error: null });
+  const result = await submitQuizLead(payload({ service: 'carpet' }));
+  expect(result.bookingId).toBe('REAL1234');
+  expect(JSON.parse(sessionStorage.getItem('kyro_receipt')!).bookingId).toBe('REAL1234');
+  expect(new URL(sessionStorage.getItem('kyro_wa_url')!).searchParams.get('text')).toContain('#REAL1234');
 });
