@@ -251,7 +251,7 @@ const BeforeAfterSlider = ({
           src={afterImage}
           alt="Depois da limpeza profissional | Kyro Clean Solutions"
           width={800} height={800}
-          loading={priority ? "eager" : "lazy"} fetchPriority={priority ? "high" : "auto"} decoding="async"
+          loading={priority ? "eager" : "lazy"} fetchpriority={priority ? "high" : "auto"} decoding="async"
           draggable={false}
           onDragStart={(e) => e.preventDefault()}
           className="w-full h-full object-cover"
@@ -276,7 +276,7 @@ const BeforeAfterSlider = ({
           src={beforeImage}
           alt="Antes da limpeza profissional | Kyro Clean Solutions"
           width={800} height={800}
-          loading={priority ? "eager" : "lazy"} fetchPriority={priority ? "high" : "auto"} decoding="async"
+          loading={priority ? "eager" : "lazy"} fetchpriority={priority ? "high" : "auto"} decoding="async"
           draggable={false}
           onDragStart={(e) => e.preventDefault()}
           className="w-full h-full object-cover"

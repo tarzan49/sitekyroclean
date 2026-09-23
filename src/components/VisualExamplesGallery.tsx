@@ -17,7 +17,7 @@ export default function VisualExamplesGallery({ examples, name, overline = "Mate
         src={loading === "lazy" ? examples[index].thumbnailSrc ?? examples[index].src : examples[index].src}
         srcSet={loading === "lazy" ? examples[index].thumbnailSrcSet ?? exampleImageSrcSet(examples[index].src) : undefined}
         sizes={loading === "lazy" ? examples[index].thumbnailSizes ?? EXAMPLE_IMAGE_SIZES : undefined}
-        fetchPriority={loading === "lazy" ? "low" : "auto"}
+        fetchpriority={loading === "lazy" ? "low" : "auto"}
         alt={examples[index].alt}
         loading={loading}
         decoding="async"

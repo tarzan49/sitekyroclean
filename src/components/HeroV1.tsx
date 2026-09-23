@@ -26,7 +26,7 @@ const Hero = () => {
       >
         {/* One continuous outpainted scene behind all three mobile content rows. */}
         <div className="absolute inset-x-0 bottom-0 top-14 md:hidden" aria-hidden="true">
-          <img src={imgMobile} alt="" className="h-full w-full object-cover object-[center_58%]" loading="eager" fetchPriority="high" width={887} height={1774} />
+          <img src={imgMobile} alt="" className="h-full w-full object-cover object-[center_58%]" loading="eager" fetchpriority="high" width={887} height={1774} />
           <div className="absolute inset-0" style={{ background: 'linear-gradient(to bottom, rgba(5,28,23,.86) 0%, rgba(5,28,23,.78) 29%, rgba(5,28,23,.18) 43%, transparent 49%, transparent 68%, rgba(5,28,23,.72) 79%, rgba(5,28,23,.94) 100%)' }} />
         </div>
         {/* Background */}
@@ -41,7 +41,7 @@ const Hero = () => {
               style={{ objectPosition: 'center 30%' }}
               loading="eager"
               decoding="sync"
-              fetchPriority="high"
+              fetchpriority="high"
               width={1600}
               height={893}
             />
