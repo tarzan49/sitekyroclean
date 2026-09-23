@@ -1,3 +1,12 @@
+// Um erro sistémico (um script de terceiros a falhar, uma extensão de browser)
+// disparava um insert em `error_logs` por cada ocorrência em cada visitante,
+// sem limite: com tráfego, isso é uma tabela a crescer ao ritmo das páginas
+// vistas. Cada página só reporta cada erro distinto uma vez, e no máximo
+// MAX_REPORTS_PER_PAGE erros distintos. O painel continua a ver o erro; deixa
+// de o ver dez mil vezes.
+const MAX_REPORTS_PER_PAGE = 5;
+const reportedKeys = new Set<string>();
+
 export async function logError(payload: {
   message: string;
   source?: string | null;
@@ -7,6 +16,9 @@ export async function logError(payload: {
   stack?: string | null;
   severity: "error" | "warning" | "unhandled_rejection";
 }) {
+  const key = `${payload.severity}|${payload.message}|${payload.source ?? ""}|${payload.line_number ?? ""}`;
+  if (reportedKeys.has(key) || reportedKeys.size >= MAX_REPORTS_PER_PAGE) return;
+  reportedKeys.add(key);
   // Fora de produção (localhost, previews) — nunca escrever no error_logs
   // partilhado. Antes disto, qualquer erro de JS durante desenvolvimento
   // (ex.: um HMR a meio de uma edição) ficava gravado ali para sempre,

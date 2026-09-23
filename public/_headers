@@ -66,6 +66,13 @@
 #                        Os dois formulários do site (Contact.tsx e
 #                        MarketingInputs.tsx) não têm `action`: submetem por
 #                        fetch, que é governado por `connect-src`, não por esta.
+#                        `https://www.facebook.com` está aqui porque o Pixel da
+#                        Meta, quando o `sendBeacon` não serve, envia o evento
+#                        por um POST de formulário para `facebook.com/tr/`.
+#                        Visto em produção a 2026-09-23, com o modo de relatório
+#                        ligado: "Sending form data to 'https://www.facebook.com/tr/'
+#                        violates ... form-action 'self'". Sem esta origem, as
+#                        conversões da Meta param sem nenhum erro visível.
 #   frame-ancestors      clickjacking. Versão moderna do X-Frame-Options acima.
 #   object-src 'none'    não há `<object>` nem `<embed>` no site.
 # As quatro foram verificadas contra o código antes de ligar, não assumidas.
@@ -86,8 +93,8 @@
   Strict-Transport-Security: max-age=15552000
   X-Frame-Options: SAMEORIGIN
   Permissions-Policy: geolocation=(self), clipboard-write=(self), camera=(), microphone=(), payment=(), usb=(), magnetometer=(), accelerometer=(), gyroscope=()
-  Content-Security-Policy: base-uri 'self'; form-action 'self'; frame-ancestors 'self'; object-src 'none'
-  Content-Security-Policy-Report-Only: default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com https://googleads.g.doubleclick.net https://www.googleadservices.com https://connect.facebook.net; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; font-src 'self' data:; connect-src 'self' https://*.supabase.co https://api.bigdatacloud.net https://www.google-analytics.com https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com https://*.g.doubleclick.net https://ad.doubleclick.net https://www.google.com https://www.googleadservices.com https://connect.facebook.net https://www.facebook.com http://localhost:3010; frame-src 'self' https://td.doubleclick.net https://www.facebook.com; base-uri 'self'; form-action 'self'; frame-ancestors 'self'; object-src 'none'
+  Content-Security-Policy: base-uri 'self'; form-action 'self' https://www.facebook.com; frame-ancestors 'self'; object-src 'none'
+  Content-Security-Policy-Report-Only: default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com https://googleads.g.doubleclick.net https://www.googleadservices.com https://connect.facebook.net; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; font-src 'self' data:; connect-src 'self' https://*.supabase.co https://api.bigdatacloud.net https://www.google-analytics.com https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com https://*.g.doubleclick.net https://ad.doubleclick.net https://www.google.com https://www.googleadservices.com https://connect.facebook.net https://www.facebook.com http://localhost:3010; frame-src 'self' https://td.doubleclick.net https://www.facebook.com; base-uri 'self'; form-action 'self' https://www.facebook.com; frame-ancestors 'self'; object-src 'none'
 
 # Vite assets have content hashes: changed files always receive a new URL.
 /assets/*

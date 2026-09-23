@@ -23,8 +23,10 @@ const MobileStickyBar = () => {
 
   return (
     <div
-      className={`fixed bottom-0 inset-x-0 z-30 transition-transform duration-300 ${visible ? 'translate-y-0' : 'translate-y-full'}`}
-      style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
+      className={`fixed inset-x-0 z-30 transition-[transform,bottom] duration-300 ${visible ? 'translate-y-0' : 'translate-y-full'}`}
+      // `--kyro-consent-h` é a altura do aviso de cookies enquanto está aberto
+      // (CookieBanner.tsx). Com ele fechado vale 0 e a barra fica no fundo.
+      style={{ paddingBottom: 'env(safe-area-inset-bottom)', bottom: 'var(--kyro-consent-h, 0px)' }}
     >
       <div className="bg-[#071a12]/95 backdrop-blur-md border-t border-white/[0.08] shadow-[0_-4px_24px_rgba(0,0,0,0.4)]">
         <div className="max-w-2xl mx-auto px-3 pt-2.5 pb-3">

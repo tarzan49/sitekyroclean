@@ -10,6 +10,7 @@ import {
   BUSINESS_PROFILES,
 } from "../constants/business";
 import { GOOGLE_MAPS_URL } from "../constants/google";
+import { services as catalogServices, cities as catalogCities } from "../data/serviceCatalog";
 
 export interface AreaServedItem {
   "@type": "City" | "Place" | "Country";
@@ -78,6 +79,39 @@ export function buildLocalBusinessNode(areaServed?: AreaServed) {
       "worstRating": "1",
       "reviewCount": REVIEW_COUNT,
       "ratingCount": REVIEW_COUNT,
+    },
+  };
+}
+
+/**
+ * O nó da empresa tal como a homepage o declara: a mesma entidade `#business`
+ * com todas as cidades servidas (Aveiro e Coimbra incluídas, vêm do catálogo)
+ * e o catálogo dos seis serviços com preço "a partir de" (`minPrice`), nunca um
+ * preço exato. Usado pelo `LocalBusinessSchema.tsx` no cliente e pelo
+ * `scripts/prerender.ts` para o `dist/index.html`, para que o que o crawler lê
+ * e o que o React declara sejam a mesma coisa. Antes disto o `index.html`
+ * tinha uma cópia escrita à mão que ficou para trás: perfis sociais que não
+ * existem, cidades em falta, "Limpeza de Carpetes" e `price` exato.
+ */
+export function buildHomepageBusinessNode() {
+  return {
+    ...buildLocalBusinessNode(catalogCities.map(city => ({ "@type": "City" as const, "name": city.name }))),
+    "hasOfferCatalog": {
+      "@type": "OfferCatalog",
+      "name": "Serviços de Limpeza Profissional",
+      "itemListElement": catalogServices.map(service => {
+        const price = service.priceFrom.replace(",", ".").replace(/[^0-9.]/g, "");
+        return {
+          "@type": "Offer",
+          "url": `${SITE_URL}${service.baseRoute}`,
+          "itemOffered": { "@type": "Service", "name": service.name },
+          // Tapetes e alcatifas são "Sob orçamento": sem preço, não se inventa um.
+          ...(price && {
+            "priceCurrency": "EUR",
+            "priceSpecification": { "@type": "PriceSpecification", "minPrice": price, "priceCurrency": "EUR" },
+          }),
+        };
+      }),
     },
   };
 }

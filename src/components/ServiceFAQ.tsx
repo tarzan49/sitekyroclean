@@ -85,7 +85,7 @@ const ServiceFAQ = ({
                   {/* Number */}
                   <span
                     className="font-playfair font-bold text-sm tracking-[0.18em] flex-shrink-0 mt-[3px] select-none"
-                    style={{ color: isOpen ? "#D4AF37" : "#a9904e", transition: "color 0.2s" }}
+                    style={{ color: isOpen ? "#8B6914" : "#7a6a42", transition: "color 0.2s" }}
                   >
                     {String(idx + 1).padStart(2, "0")}
                   </span>

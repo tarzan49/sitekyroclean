@@ -9,6 +9,7 @@ const QuizForm = lazy(() => import('./QuizFormLazy'));
 
 const imgDesktop = '/images/hero-sofa-v1.webp';
 const imgMobile = '/images/hero-sofa-mobile-extended.webp';
+const imgMobile750 = '/images/hero-sofa-mobile-extended-750.webp';
 
 const Hero = () => {
   const { isQuizOpen, openQuiz: handleOpenQuiz, closeQuiz } = useQuizLauncher();
@@ -27,7 +28,10 @@ const Hero = () => {
       >
         {/* One continuous outpainted scene behind all three mobile content rows. */}
         <div className="absolute inset-x-0 bottom-0 top-14 md:hidden" aria-hidden="true">
-          <img src={imgMobile} alt="" className="h-full w-full object-cover object-[center_58%]" loading="eager" fetchPriority="high" width={887} height={1774} />
+          <picture className="block h-full w-full">
+            <source media="(min-width: 768px)" srcSet="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" />
+            <img src={imgMobile} srcSet={`${imgMobile750} 750w, ${imgMobile} 887w`} sizes="100vw" alt="" className="h-full w-full object-cover object-[center_58%]" loading="eager" fetchPriority="high" width={887} height={1774} />
+          </picture>
           <div className="absolute inset-0" style={{ background: 'linear-gradient(to bottom, rgba(5,28,23,.86) 0%, rgba(5,28,23,.78) 29%, rgba(5,28,23,.18) 43%, transparent 49%, transparent 68%, rgba(5,28,23,.72) 79%, rgba(5,28,23,.94) 100%)' }} />
         </div>
         {/* Background */}

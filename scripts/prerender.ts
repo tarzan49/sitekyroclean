@@ -53,7 +53,7 @@ import { EN_PAGES } from '../src/data/enTouristSeoData';
 import { getAllPosts } from '../src/data/blogData';
 import { glossaryTerms } from '../src/data/glossaryTerms';
 import { getAllCommercialRoutes, getCommercialPageData, COMMERCIAL_CITIES } from '../src/data/commercialSeoData';
-import { buildLocalBusinessNode, buildBreadcrumbNode, buildServiceNode, buildFaqNode, buildOfferNode, buildHowToNode } from '../src/lib/seoSchema';
+import { buildLocalBusinessNode, buildHomepageBusinessNode, buildBreadcrumbNode, buildServiceNode, buildFaqNode, buildOfferNode, buildHowToNode } from '../src/lib/seoSchema';
 import { renderBlogBody } from '../src/lib/blogMarkdown';
 import { getBlogSources } from '../src/data/blogSources';
 import { DEFAULT_AUTHOR } from '../src/data/authors';
@@ -1642,10 +1642,16 @@ export function prerenderRoutes(outDir: string): number {
   // single most important page on the site shipped zero <h1> and zero body
   // text to Googlebot's first (no-JS) pass or any crawler that skips JS.
   // Every other route already gets this h1+intro safety net via emit(); the
-  // homepage never did. Written to dist/index.html using rawTemplate (which
-  // still has the homepage's own real LocalBusiness/Service JSON-LD, unlike
-  // the stripped `template`) *after* `template` was captured above, so this
-  // has no effect on the ~15,000 already-generated routes.
+  // homepage never did. Written to dist/index.html *after* `template` was
+  // captured above, so this has no effect on the ~15,000 already-generated
+  // routes.
+  //
+  // O LocalBusiness da homepage (2026-09-23): já não vem escrito à mão no
+  // index.html. É o mesmo nó que o LocalBusinessSchema.tsx declara no cliente
+  // (buildHomepageBusinessNode: todas as cidades do catálogo, seis serviços com
+  // `minPrice`), injetado aqui com `data-ssr-schema` para que o React o
+  // substitua ao montar, como em todas as outras páginas. O WebSite continua no
+  // template: é o mesmo nó em todas as páginas.
   {
     const homeBody = generatePageBody({
       h1: 'Estofos como novos, ao domicílio.',
@@ -1659,7 +1665,8 @@ export function prerenderRoutes(outDir: string): number {
         { href: '/packs', label: 'Packs' },
       ],
     });
-    const homeHtml = injectContent(preloadPage(rawTemplate, 'IndexV1'), homeBody);
+    let homeHtml = injectContent(preloadPage(rawTemplate, 'IndexV1'), homeBody);
+    homeHtml = injectJsonLd(homeHtml, { '@context': 'https://schema.org', ...buildHomepageBusinessNode() });
     fs.writeFileSync(templatePath, homeHtml, 'utf-8');
     console.log('  Homepage h1/intro:       injected');
   }

@@ -2,17 +2,17 @@ import { Link } from "react-router-dom";
 import { useEffect, useRef, useState, useCallback } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import sofaImg         from "@/assets/hero-sofa-v4.webp";
-import sofaImgM        from "@/assets/hero-sofa-v4.webp";
+import sofaImgM        from "@/assets/hero-sofa-v4-m720.webp";
 import waterproofImg   from "@/assets/hero-waterproofing.webp";
-import waterproofImgM  from "@/assets/hero-waterproofing-mobile.webp";
+import waterproofImgM  from "@/assets/hero-waterproofing-m720.webp";
 import carpetImg       from "@/assets/service-carpet-new.webp";
-import carpetImgM      from "@/assets/service-carpet-new-mobile.webp";
+import carpetImgM      from "@/assets/service-carpet-new-m720.webp";
 import mattressImg     from "@/assets/hero-colchao-v2.webp";
-import mattressImgM    from "@/assets/hero-colchao-v2.webp";
+import mattressImgM    from "@/assets/hero-colchao-v2-m720.webp";
 import chairsImg       from "@/assets/service-chairs-new.webp";
-import chairsImgM      from "@/assets/service-chairs-new-mobile.webp";
+import chairsImgM      from "@/assets/service-chairs-new-m720.webp";
 import rugsImg         from "@/assets/hero-alcatifa-hero.webp";
-import rugsImgM        from "@/assets/hero-alcatifa-hero.webp";
+import rugsImgM        from "@/assets/hero-alcatifa-hero-m720.webp";
 import iconSofa      from "@/assets/icon-sofa.webp";
 import iconWaterproof from "@/assets/icon-waterproof.webp";
 import iconCarpet    from "@/assets/icon-carpet.webp";
@@ -282,13 +282,13 @@ const Services = () => {
         <div className={`mb-10 md:mb-14 transition-all duration-700 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-5"}`}>
           <div className="flex items-center gap-3 mb-5">
             <div className="h-px w-8" style={{ backgroundColor: "#D4AF37", opacity: 0.65 }} />
-            <p className="text-sm font-bold tracking-[0.08em] uppercase" style={{ color: "#D4AF37" }}>
+            <p className="text-sm font-bold tracking-[0.08em] uppercase" style={{ color: "#8B6914" }}>
               OS NOSSOS SERVIÇOS
             </p>
           </div>
           <h2 className="type-section-title font-playfair      text-[#111111] max-w-xl">
             Cada estofo tratado{" "}
-            <em className="not-italic" style={{ color: "#D4AF37" }}>com precisão.</em>
+            <em className="not-italic" style={{ color: "#aa862b" }}>com precisão.</em>
           </h2>
           <p className="mt-4 text-base md:text-base text-[#505650] max-w-lg leading-relaxed">
             Sofás, colchões, tapetes, cadeiras e alcatifas: higienização profissional ao domicílio, resultado garantido no próprio dia.
@@ -364,6 +364,7 @@ const Services = () => {
           onTransitionEnd={handleTransitionEnd}
         >
           {extended.map((service, i) => {
+            const isClone = i < CLONES || i >= CLONES + N;
             const dist = i - heroExtIdx;
             const prominence: CardProps["prominence"] =
               dist === 0 ? "hero" : Math.abs(dist) === 1 ? "side" : "far";
@@ -371,6 +372,7 @@ const Services = () => {
             return (
               <div
                 key={i}
+                aria-hidden={isClone || undefined}
                 style={{
                   width:       cardWidth || undefined,
                   flexShrink:  0,

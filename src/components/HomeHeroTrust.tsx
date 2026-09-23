@@ -17,11 +17,11 @@ export default function HomeHeroTrust() {
         target="_blank"
         rel="noopener noreferrer"
         className="group block rounded-sm py-1 outline-offset-4 transition-opacity hover:opacity-80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#D4AF37]"
-        aria-label={`${REVIEW_RATING} de 5 estrelas, mais de ${REVIEW_COUNT} avaliações no Google. Ler avaliações`}
       >
         <span className="flex items-center gap-2">
           <GoogleG className="h-5 w-5 shrink-0 md:h-6 md:w-6" />
           <span className="font-playfair text-[26px] font-semibold leading-none md:text-[34px]">{REVIEW_RATING}</span>
+          <span className="sr-only"> em 5 estrelas,</span>
           <span className="flex gap-0.5" aria-hidden="true">
             {Array.from({ length: 5 }, (_, i) => (
               <span key={i} className="relative block h-2.5 w-2.5 md:h-3 md:w-3">
@@ -33,7 +33,7 @@ export default function HomeHeroTrust() {
             ))}
           </span>
         </span>
-        <span className="mt-1.5 block text-[10px] leading-tight text-white/80 md:text-xs"><strong className="font-semibold text-white">{REVIEW_COUNT}+</strong> avaliações Google</span>
+        <span className="mt-1.5 block text-[10px] leading-tight text-white/80 md:text-xs"><strong className="font-semibold text-white">{REVIEW_COUNT}+</strong> avaliações Google<span className="sr-only">. Ler avaliações</span></span>
       </a>
     </div>
   );

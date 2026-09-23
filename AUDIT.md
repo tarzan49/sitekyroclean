@@ -2,6 +2,8 @@
 
 Segunda auditoria do dia, independente da anterior. Método: build limpo a partir de `git archive HEAD` numa pasta à parte (16.259 rotas, 17.432 ficheiros), `npm run typecheck` (0 erros), `npm run lint` (0 erros, 16 avisos), `vitest` (73 ficheiros, 2.269 testes verdes), Lighthouse mobile contra cleansolutions.com.pt em três páginas, e percurso completo em browser (homepage, landing, 404, quiz do início ao formulário, em 375px e 1440px). Nenhum ficheiro do site foi alterado.
 
+**Estado ao fim do dia (2026-09-23):** corrigidos e publicados os pontos 4 (CSP `form-action`), 5 (imagens da homepage), 7 (mensagem do quiz; a deteção ao abrir fica, por decisão do dono), 8 (aviso de cookies compacto e barra fixa empilhada por cima), 10 (acessibilidade; estrelas mantêm-se `#D4AF37` por decisão do dono) e 11 (schema da homepage partilhado com o React). O ponto 9 não é problema: a oferta é um desconto sobre o orçamento, confirmado pelo dono. O ponto 2 tem código do lado do cliente publicado e a migração de retenção escrita (`20260923120000_metrics_retention.sql`), **por colar no SQL Editor**. Ficam por fazer 1 (limpeza do `public/`), 3 (Redirect Rule no Cloudflare), 6, 12 e 13.
+
 ## Nível atual, em resumo
 
 O site está preparado para muito tráfego de leitura: tudo o que o público vê é HTML estático servido pelo Cloudflare (TTFB medido entre 60 e 210 ms, CLS 0, SEO 100 nas três páginas, consola limpa). O que pode ceder com tráfego elevado não é o site, é o que está à volta dele: o limite de ficheiros do Cloudflare Pages, a tabela de métricas sem retenção, e a Pages Function na homepage. Em UX, o percurso do quiz é curto (6 ecrãs, 2 campos) e coerente; os problemas são de pormenor.

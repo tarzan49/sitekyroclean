@@ -149,6 +149,19 @@ Contexto: o site já tinha a parte difícil resolvida (16.045 páginas em HTML e
 
 **Numeração das fases:** há uma só, a que está nesta lista, e os commits seguem-na. Houve um momento em 2026-09-17 em que começou a correr uma segunda contagem em paralelo (uma numeração nova criada a partir de uma auditoria, a chamar "fase 1" ao que aqui é a fase 4); as mensagens de commit foram reescritas antes do push para ficar tudo na contagem desta lista. **Não abrir uma segunda numeração:** se for preciso planear por fases, mapeia-se para os números daqui.
 
+## Correções da auditoria de 2026-09-23 (regras novas)
+
+- **O schema da homepage vem de `buildHomepageBusinessNode()`** (`src/lib/seoSchema.ts`), usado pelo `LocalBusinessSchema.tsx` no cliente e pelo `scripts/prerender.ts` para o `dist/index.html`. O `index.html` só tem o nó `WebSite`. **Não voltar a escrever LocalBusiness/Service à mão no `index.html`**: foi assim que a homepage ficou meses a apontar para perfis de Instagram/Facebook que não existem, sem Aveiro/Coimbra e com `price` exato. Os seis serviços saem com `minPrice` ("a partir de"); tapetes e alcatifas sem preço. As cidades vêm de `serviceCatalog.ts`.
+- **`form-action` da CSP inclui `https://www.facebook.com`**, nos dois cabeçalhos. O Pixel da Meta envia por POST de formulário para `facebook.com/tr/` quando o `sendBeacon` não serve; visto em produção. Sem isto, com o cabeçalho bloqueador ligado, as conversões da Meta param em silêncio.
+- **Aviso de cookies e barra fixa de WhatsApp empilham-se.** O `CookieBanner` publica a sua altura em `--kyro-consent-h` no `<html>` enquanto está aberto e o `MobileStickyBar` usa-a como `bottom`. Um elemento fixo novo no fundo do ecrã deve fazer o mesmo, não sobrepor-se.
+- **Dourado em fundo claro: `#8B6914` em texto pequeno, `#aa862b` na palavra destacada do título; `#D4AF37` só em fundo escuro.** `#D4AF37` em branco fica a 2,1:1 e chumbava o contraste em todas as páginas. As **estrelas das avaliações ficam `#D4AF37` por decisão do dono** ("bem douradas"), com `role="img"` no contentor.
+- **Imagens da homepage têm variantes próprias:** `hero-sofa-mobile-extended-750.webp` (hero mobile, 750w), `src/assets/*-m720.webp` (grelha de serviços) e `public/images/home/*-900.webp` (bloco dos 4 problemas). Quando um original mudar, regenerar a variante com `sharp` (largura 750/720/900, qualidade 76), senão a página mostra a foto antiga em mobile e a nova em desktop.
+- **`error_logs` tem teto no cliente:** cada página reporta cada erro distinto uma vez e no máximo 5 erros distintos (`errorTracking.ts`).
+- **Retenção de `quiz_events`/`error_logs`: `supabase/migrations/20260923120000_metrics_retention.sql`, por aplicar.** Precisa do `pg_cron` ativo (Dashboard → Database → Extensions) e de ser colado no SQL Editor (sétima armadilha). Apaga `page_view`/`session_time` com mais de 180 dias e erros com mais de 60; os eventos do funil e os cliques ficam para sempre.
+- **"Tapete: Limpe 5 m², pague 4" no upsell final é intencional** (dono, 2026-09-23): é um desconto sobre o orçamento que vier a ser feito, não um preço por m². Não remover.
+- **O quiz continua a pedir a localização ao abrir** (decisão do dono a 2026-09-23: só a mensagem mudou, para "Sem problema. Escreva a sua localidade abaixo e continuamos.").
+- **Por fazer, do lado do Cloudflare:** substituir `functions/_middleware.ts` por uma Redirect Rule (ver AUDIT.md, ponto 3) e tirar de `public/` as pastas nunca referenciadas (`imagenshomepage/`, `Imagens 169/`, `images-optimized/`, 127 ficheiros soltos em `images/`), que contam para o limite de 20.000 ficheiros do Pages.
+
 ## Glossário e longtail (2026-09-17)
 
 - **O glossário tem 100 termos** em `src/data/glossaryTerms.ts`, todos no HTML estático e todos emitidos como `DefinedTerm`. O `<main>` da página passou de 11.398 para 62.316 caracteres. Um termo novo acrescenta-se só a esse ficheiro, mais nada.

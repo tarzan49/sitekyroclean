@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
+/** 900px copy of a landing-problem image, generated for this block only (public/images/home/). */
+const homeVariant = (src: string) => `/images/home/${src.slice(src.lastIndexOf('/') + 1).replace(/\.webp$/, '-900.webp')}`;
 const PROBLEMS = [
   {
     image: "/images/landing-problems/sofas/sofa-manchas-02.webp",
@@ -84,6 +86,8 @@ const PainPointsSolutionsV1 = () => {
               <div className="relative aspect-[16/10] sm:aspect-[16/9] overflow-hidden">
                 <img
                   src={problem.image}
+                  srcSet={`${homeVariant(problem.image)} 900w, ${problem.image} 1200w`}
+                  sizes="(max-width: 767px) calc(100vw - 40px), (max-width: 1279px) 50vw, 25vw"
                   alt={problem.alt}
                   width={1200}
                   height={675}

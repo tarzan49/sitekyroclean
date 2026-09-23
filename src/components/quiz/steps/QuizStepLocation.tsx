@@ -33,7 +33,7 @@ const QuizStepLocation = ({ location, locationQuery, setLocationQuery, scrollCon
     setMessage('');
     const timeout = window.setTimeout(() => {
       controller.abort();
-      if (active) { setLoading(false); setMessage('Pode pesquisar a sua cidade enquanto a localização não está disponível.'); }
+      if (active) { setLoading(false); setMessage('A localização está a demorar. Pode escrever a sua localidade abaixo.'); }
     }, 16000);
     detectServiceCity(controller.signal).then(city => {
       if (!active || controller.signal.aborted || manuallyEdited.current) return;
@@ -41,7 +41,7 @@ const QuizStepLocation = ({ location, locationQuery, setLocationQuery, scrollCon
       setSelected(city);
       setEditing(false);
     }).catch(error => {
-      if (active && !controller.signal.aborted) setMessage(error instanceof Error ? error.message : 'Escolha a sua cidade abaixo.');
+      if (active && !controller.signal.aborted) setMessage(error instanceof Error ? error.message : 'Escreva a sua localidade abaixo e continuamos.');
     }).finally(() => { window.clearTimeout(timeout); if (active) setLoading(false); });
     return () => { active = false; controller.abort(); window.clearTimeout(timeout); };
   }, [location, attempt]);
