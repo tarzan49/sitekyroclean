@@ -18,6 +18,38 @@ O dono trabalha a partir de um PC Windows e de um MacBook, cada um com a sua ins
 
 ---
 
+## Verificar tipos: `npm run typecheck`, nunca `npx tsc --noEmit`
+
+**`npx tsc --noEmit` na raiz não verifica um único ficheiro e sai com 0.** Não é
+lentidão nem cache: o `tsconfig.json` da raiz é um ficheiro-solução, tem
+`"files": []` e só `references` para `tsconfig.app.json` e `tsconfig.node.json`.
+Sem `-b`, o `tsc` verifica a lista de ficheiros da raiz, que está vazia. Quem o
+corresse como passo de validação recebia verde a provar nada — e era o comando
+habitual do projeto, incluindo dentro do portão de release do
+`docs/tracking-plano-de-publicacao.md` e num "`npx tsc --noEmit -p .` limpo"
+registado no `CONTEXT.md` como verificação de uma sessão inteira. Corrigido em
+2026-09-23: existe `npm run typecheck` (`tsc -b --noEmit`), que percorre os dois
+projetos. Medido: 0 ficheiros antes, 431 depois.
+
+**`npm run build` também não verifica tipos** — é `vite build`, e o esbuild/SWC
+deita fora os tipos sem os validar. Um build verde não substitui o `typecheck`;
+são coisas diferentes e é preciso correr as duas.
+
+**O `tsconfig.node.json` cobre o `vite.config.ts` e, por ele, os `scripts/*.ts`**
+(que entram no grafo pelos `import()` dinâmicos dos três plugins do
+`closeBundle`) e os módulos de `src/data`/`src/constants` que os scripts leem.
+Ou seja, o prerender, o sitemap e o `llms.txt` passaram a ser verificados — a
+nota do `CONTEXT.md` de que "`scripts/*.ts` não é coberto por `tsc --noEmit`"
+deixou de valer. Para isso, esse projeto precisou do mesmo `paths` do
+`tsconfig.app.json`: sem ele, um ficheiro de dados alcançado por caminho
+relativo mas que importa por `@/` não resolvia (era o caso de
+`locationPriceTestimonialsData.ts`, com dois `TS2307` de raiz). **Se acrescentares
+um `paths` novo ao `tsconfig.app.json`, acrescenta-o também ao
+`tsconfig.node.json`** — é mais uma instância da armadilha das constantes
+duplicadas, desta vez em configuração.
+
+---
+
 ## Factos de negócio atuais (não hardcodar — importar sempre)
 
 - **Avaliações:** **4.9★**, **110** avaliações, **+1100** clientes servidos. Fonte única: `src/constants/business.ts` (`REVIEW_RATING`, `REVIEW_COUNT`, `CLIENTS_SERVED_LABEL`) — `src/lib/seoSchema.ts` importa isto diretamente e é usado tanto client-side como pelo `scripts/prerender.ts`. **Armadilha resolvida em 2026-09-14:** as cópias de texto solto deixaram de existir. `TestimonialsV1.tsx`, `problemSeoData.ts`, `problemTipsData.ts`, `enTouristSeoData.ts`, `TrustRatingBadge.tsx` e `src/hooks/use-quiz-ui-effects.ts` importam agora `REVIEW_RATING` e `REVIEW_COUNT` (o número de avaliações já importava; o rating 4.9 estava solto em 36 sítios e foi centralizado). **A única cópia à mão que resta é o `index.html`** (schema estático da homepage, linha do `aggregateRating`), que é HTML puro e não consegue importar — sempre que o rating ou o número mudar, mudar `business.ts` e essa linha, mais nada. **Não voltar a acrescentar uma frase separada tipo "Já somos N a recomendar" nas heroes** — foi tentado em 2026-09-06 e removido no mesmo dia por ser redundante com o badge `TrustRatingBadge` (que já mostra "4.9 · N+ avaliações Google" duas linhas acima) e ficar com aspeto forçado/colado.

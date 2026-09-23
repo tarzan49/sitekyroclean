@@ -11,6 +11,10 @@ node_modules
 dist
 dist-ssr
 *.local
+
+# Cache incremental do `tsc -b` (npm run typecheck)
+*.tsbuildinfo
+
 .wrangler/
 
 # Claude Code local settings (contain API tokens)
