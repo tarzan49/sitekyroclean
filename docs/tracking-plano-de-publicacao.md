@@ -40,7 +40,7 @@ A ordem importa. Cada passo assume o anterior.
 ```bash
 git status                 # a árvore tem de estar limpa
 git log -1 --oneline
-npm run lint && npx tsc --noEmit && npx vitest run && npm run build
+npm run lint && npm run typecheck && npx vitest run && npm run build
 ```
 
 Na base de dados, **antes de tocar em nada**:

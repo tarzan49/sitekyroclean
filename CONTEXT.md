@@ -266,6 +266,30 @@ O dono trabalha neste projeto a partir de **duas máquinas** — um PC Windows e
 
 **Raiz do projeto:** `C:\Users\im a god bruh\Downloads\spotless-pro-flow-main\`
 
+### Verificação local (comandos)
+
+| Comando | O que faz |
+|---|---|
+| `npm run dev` | Servidor local (Vite), porta 8080 |
+| `npm run lint` | ESLint |
+| `npm run typecheck` | **Verificação de tipos.** `tsc -b --noEmit`, percorre `tsconfig.app.json` + `tsconfig.node.json` |
+| `npm test` | Vitest |
+| `npm run build` | `vite build` + sitemaps + `llms.txt` + prerender. **Não verifica tipos** |
+
+**`npx tsc --noEmit` na raiz não verifica nada e sai com 0** — o `tsconfig.json`
+da raiz é um ficheiro-solução (`"files": []` + `references`), por isso sem `-b`
+o `tsc` verifica uma lista vazia. É preciso `npm run typecheck`. Detalhe e
+histórico na secção própria do `CLAUDE.md`. O `npm run build` também não
+verifica tipos (o esbuild/SWC deita-os fora sem os validar), por isso um build
+verde não substitui o `typecheck` — correm-se os dois.
+
+O `tsconfig.node.json` cobre o `vite.config.ts` e, por ele, os cinco
+`scripts/*.ts` (`prerender`, `generate-sitemap`, `generate-llms-txt`,
+`landing-page-html`, `content-dates`), que entram no grafo pelos `import()`
+dinâmicos dos plugins do `closeBundle`, mais os módulos de `src/data` e
+`src/constants` que esses scripts leem. Tem de repetir o `paths` do
+`tsconfig.app.json`: um `paths` novo num tem de ir também ao outro.
+
 ---
 
 ## Design Tokens
@@ -1089,7 +1113,7 @@ Correções aplicadas: canonical URLs em branco nas 17 páginas core, Breadcrumb
 **Implementado: colchão × marca × cidade (108 páginas).**
 - Marcas confirmadas por pesquisa web (não inventadas): IKEA, Conforama (retalhistas gerais, reaproveitados da lista de sofá), Molaflex, Pikolin, Colmol, Mindol (marcas de colchão reais do mercado PT). Tapete deixado de fora do scope: marca não é como se pesquisa limpeza de tapetes.
 - `src/data/marcaColchaoData.ts` + `src/pages/MarcaColchaoPage.tsx` replicam exatamente o padrão de `marcaSofaData.ts`/`MarcaSofaPage.tsx` (mesmas 18 cidades, mesma estrutura de conteúdo: material, processo, 4 "não fazer", faixa de preço 49€-79€ igual para todas as marcas — ao contrário do padrão do sofá, o preço de colchão não varia por marca no negócio real, só por tamanho). Ícone `Sparkles` (banido) trocado por `ShieldCheck`.
-- Rotas em `App.tsx`, sitemap (`sitemap-marcas.xml`, agora 252 URLs) e prerender estático (`scripts/prerender.ts`) todos atualizados — **`scripts/*.ts` não é coberto por `tsc --noEmit`** (fora do `tsconfig.app.json`), por isso a validação real foi um `npm run build` completo (confirmado: 8690 rotas prerenderizadas, 0 erros).
+- Rotas em `App.tsx`, sitemap (`sitemap-marcas.xml`, agora 252 URLs) e prerender estático (`scripts/prerender.ts`) todos atualizados — **`scripts/*.ts` não é coberto por `tsc --noEmit`** (fora do `tsconfig.app.json`) [deixou de valer em 2026-09-23: o `npm run typecheck` cobre-os via `tsconfig.node.json`], por isso a validação real foi um `npm run build` completo (confirmado: 8690 rotas prerenderizadas, 0 erros).
 - **Bug pré-existente encontrado e corrigido de caminho:** o bloco "Marcas de sofá" em `LocationServicePage.tsx` linkava para `/limpeza-sofa-{marca}-{cidade}` em todas as ~150 cidades das páginas de localidade, mas páginas de marca só existem nas 18 cidades de `marcaCities` — ~132 links iam para 404. Adicionada guarda `MARCA_CITY_SLUGS.includes(data.citySlug)`, aplicada ao bloco de sofá já existente e ao novo bloco de colchão.
 - Verificado visualmente no browser (mobile 390px + desktop): hero, material, do's/don'ts, processo, FAQ, CTA, links cruzados entre marcas, e o novo bloco "Marcas de colchão" em `/limpeza-colchoes-porto`.
 
@@ -1275,7 +1299,7 @@ Sessão longa e iterativa, muito guiada por mockup (canvas de design) antes de t
 
 **5. Hero: removida a linha "Já somos N a recomendar".** Tinha sido acrescentada mais cedo na mesma sessão (pedido de reforçar psicologicamente as 100 avaliações), mas ficava redundante com o badge `TrustRatingBadge` duas linhas acima (já mostra "5.0 · N+ avaliações Google") — o user apontou que "não acrescentou nada" e "ficou parolo". Removida de `HeroV1.tsx` e `ServiceHero.tsx`; decisão de design foi cortar, não tentar redesenhar uma frase redundante.
 
-**Verificação:** `npx tsc --noEmit -p .` limpo e `npm run build` completo (14993 rotas prerenderizadas) repetidos várias vezes ao longo da sessão, incluindo depois da limpeza final de código morto. Vários fluxos confirmados visualmente com Playwright (tapete multi-item, cadeiras a qty 4 e a qty 10 — 10+ é "sob orçamento" desde sempre, não é bug novo —, upsell de combos a adicionar colchão casal e a aplicar o desconto de 10%).
+**Verificação:** `npx tsc --noEmit -p .` limpo [nota de 2026-09-23: este comando era um no-op, verificava 0 ficheiros e saía sempre 0 — esta sessão ficou verificada só pelo build e pelos testes manuais] e `npm run build` completo (14993 rotas prerenderizadas) repetidos várias vezes ao longo da sessão, incluindo depois da limpeza final de código morto. Vários fluxos confirmados visualmente com Playwright (tapete multi-item, cadeiras a qty 4 e a qty 10 — 10+ é "sob orçamento" desde sempre, não é bug novo —, upsell de combos a adicionar colchão casal e a aplicar o desconto de 10%).
 
 **Trabalho em paralelo:** grande parte desta sessão foi feita por várias sub-tarefas em simultâneo no mesmo worktree (tapete, cadeiras, widgets), o que por vezes gerou commits que misturam ficheiros de mais do que uma tarefa (inevitável quando duas tarefas mexem no mesmo `QuizForm.tsx`/`QuizTypes.ts` ao mesmo tempo) — todos verificados com tsc+build antes e depois, sem problemas encontrados.
 

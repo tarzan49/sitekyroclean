@@ -12,6 +12,13 @@
     "moduleDetection": "force",
     "noEmit": true,
 
+    /* Path alias: must match tsconfig.app.json. This project's import graph
+       reaches src/ through vite.config.ts -> scripts/* -> src/data/*, and those
+       files import via `@/`. */
+    "paths": {
+      "@/*": ["./src/*"]
+    },
+
     /* Linting */
     "strict": true,
     "noUnusedLocals": false,
