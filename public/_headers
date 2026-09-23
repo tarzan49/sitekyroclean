@@ -18,16 +18,37 @@
 # pedido passar. É de propósito: uma diretiva a menos não dá erro visível, só
 # deixa de medir ou de entregar pedidos, e isso não se descobre a olhar.
 #
-# Origens, e porque cada uma está aqui (tiradas do código, não de memória):
-#   googletagmanager.com   `src/lib/gtag.ts` carrega daqui a gtag.js
-#   google-analytics.com   destino dos eventos do GA4
-#   *.supabase.co          `submit-lead` e `send-lead-email`, ou seja os DOIS
-#                          canais de um pedido de orçamento: se esta faltar,
-#                          deixam de entrar orçamentos
-#   api.bigdatacloud.net   `src/lib/locationDetection.ts`, o "Usar a minha
-#                          localização" do quiz
-#   localhost:3010         `KyroConnectionStatus.tsx`, só no painel admin e só
-#                          na máquina do dono
+# Origens, e porque cada uma está aqui. Uma parte saiu do código; as do Google
+# Ads só apareceram a correr o site a sério com o modo de relatório ligado
+# (2026-09-23), porque é a própria gtag.js que as carrega em cadeia e nenhuma
+# está escrita no `src`. É por isto que esta política não se escreve a partir
+# do código e se liga de uma vez: a primeira versão, montada só com o que o
+# `src` mostra, teria bloqueado as conversões do Ads e o Pixel da Meta.
+#   googletagmanager.com    `src/lib/gtag.ts` carrega daqui a gtag.js
+#   google-analytics.com    destino dos eventos do GA4
+#   *.analytics.google.com  o GA4 usa um recolhedor regional
+#                           (`region1.analytics.google.com`), que não é
+#                           subdomínio de google-analytics.com
+#   *.g.doubleclick.net,    conversões e listas de remarketing do Google Ads.
+#   googleadservices.com,   Sem estas, o Ads deixa de medir conversões
+#   www.google.com          exatamente quando se começa a gastar nele.
+#   connect.facebook.net,   Pixel da Meta (`src/lib/metaPixel.ts`), que só
+#   www.facebook.com        carrega depois do consentimento de publicidade —
+#                           `loadMetaPixel` sai se `readConsentDecision().ads`
+#                           for falso, como a política de privacidade promete.
+#   *.supabase.co           `submit-lead` e `send-lead-email`, ou seja os DOIS
+#                           canais de um pedido de orçamento: se esta faltar,
+#                           deixam de entrar orçamentos
+#   api.bigdatacloud.net    `src/lib/locationDetection.ts`, o "Usar a minha
+#                           localização" do quiz
+#   localhost:3010          `KyroConnectionStatus.tsx`, só no painel admin e só
+#                           na máquina do dono
+#
+# `img-src` aceita `https:` de propósito: o pixel de listas do Ads é servido
+# pelo domínio do PAÍS de quem visita (`www.google.dk` numa visita observada),
+# e isso não se consegue enumerar. Uma imagem não executa código, por isso o
+# que se perde em rigor aqui é pouco e o que se ganha é não partir remarketing
+# a um visitante de um país que ninguém listou.
 #
 # `'unsafe-inline'` em `script-src` é necessário hoje: o `index.html` tem um
 # script inline executável (411 caracteres). Apertar isso é o passo seguinte, com
@@ -43,7 +64,7 @@
   Strict-Transport-Security: max-age=15552000
   X-Frame-Options: SAMEORIGIN
   Permissions-Policy: geolocation=(self), clipboard-write=(self), camera=(), microphone=(), payment=(), usb=(), magnetometer=(), accelerometer=(), gyroscope=()
-  Content-Security-Policy-Report-Only: default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://www.google-analytics.com https://www.googletagmanager.com https://googleads.g.doubleclick.net https://www.google.com; font-src 'self' data:; connect-src 'self' https://*.supabase.co https://api.bigdatacloud.net https://www.google-analytics.com https://*.google-analytics.com https://www.googletagmanager.com https://stats.g.doubleclick.net http://localhost:3010; frame-src 'self' https://td.doubleclick.net; base-uri 'self'; form-action 'self'; frame-ancestors 'self'; object-src 'none'
+  Content-Security-Policy-Report-Only: default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com https://googleads.g.doubleclick.net https://www.googleadservices.com https://connect.facebook.net; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; font-src 'self' data:; connect-src 'self' https://*.supabase.co https://api.bigdatacloud.net https://www.google-analytics.com https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com https://*.g.doubleclick.net https://ad.doubleclick.net https://www.google.com https://www.googleadservices.com https://connect.facebook.net https://www.facebook.com http://localhost:3010; frame-src 'self' https://td.doubleclick.net https://www.facebook.com; base-uri 'self'; form-action 'self'; frame-ancestors 'self'; object-src 'none'
 
 # Vite assets have content hashes: changed files always receive a new URL.
 /assets/*
