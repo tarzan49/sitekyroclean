@@ -1,6 +1,15 @@
 import { services } from './serviceCatalog';
 import { locationPrices } from '../constants/travel';
 import { REVIEW_COUNT, REVIEW_RATING } from '../constants/business';
+import { sofaPrices } from '../components/quiz/QuizTypes';
+
+// Preços da impermeabilização vindos da mesma tabela que o quiz usa, nunca
+// escritos à mão: é a linha que os anúncios de Premium prometem, e o preço na
+// prosa não pode divergir do preço que o orçamento apresenta.
+const sofa1 = sofaPrices.find(item => item.id === '1-lugar');
+if (!sofa1) throw new Error('commercialHeroCopy: sofá "1-lugar" não existe em sofaPrices');
+const IMPER_PREMIUM = `${sofa1.waterproofingPremiumPrice}€`;
+const IMPER_ESSENCIAL = `${sofa1.waterproofingPrice}€`;
 
 const subtitles: Record<string, string> = {
   'limpeza-sofas': 'Cuidado profissional para o seu sofá, sem sair de casa.',
@@ -8,7 +17,11 @@ const subtitles: Record<string, string> = {
   'limpeza-cadeiras': 'Cuidamos dos assentos, encostos e tecidos das suas cadeiras.',
   'limpeza-tapetes': 'Cuidados adaptados às fibras e ao estado do seu tapete.',
   'limpeza-alcatifas': 'Limpeza da alcatifa com atenção às zonas de maior uso.',
-  impermeabilizacao: 'Proteção do tecido para facilitar os cuidados do dia a dia.',
+  // A Premium vem primeiro porque é o que os anúncios prometem, e quem chega de
+  // um anúncio tem de reencontrar aqui a mesma versão e o mesmo preço. A
+  // Essencial fica nomeada na mesma linha: continua a existir e continua a ser
+  // o preço de partida do serviço, que é o que a linha de preço do hero mostra.
+  impermeabilizacao: `Proteção Premium desde ${IMPER_PREMIUM}: protege até 10 anos e resiste a até 5 lavagens. Essencial desde ${IMPER_ESSENCIAL}.`,
 };
 export const commercialHeroSubtitle = (serviceSlug: string, city?: string) => `${subtitles[serviceSlug] ?? 'Cuidados profissionais adaptados aos seus estofos.'}${city === 'Aveiro' || city === 'Coimbra' ? ' Disponibilidade sob consulta.' : ''}`;
 

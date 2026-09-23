@@ -1,4 +1,5 @@
 import { CHAIR_WATERPROOF_ESSENTIAL, CHAIR_WATERPROOF_PREMIUM } from '../constants/chairPricing';
+import { sofaPrices, mattressPrices } from '../components/quiz/QuizTypes';
 // Programmatic SEO: Price pages data engine
 // Targets searches like "preço limpeza sofá porto", "quanto custa limpar colchão"
 
@@ -20,21 +21,44 @@ export interface PricePageData {
   faqs: { question: string; answer: string }[];
 }
 
+// ── Preços das tabelas das páginas de preço ─────────────────────────────────
+// Saem da mesma fonte que o quiz (QuizTypes.ts), pelo mesmo padrão já usado em
+// blogData.ts: estes números estavam escritos à mão e alimentam as ~6.000
+// páginas /preco-*, que são das poucas onde um preço errado é o próprio
+// conteúdo da página. Um id que desapareça rebenta no build em vez de deixar
+// um número desatualizado publicado. QuizTypes.ts não tem imports com alias
+// "@/", por isso o scripts/prerender.ts continua a conseguir ler este ficheiro.
+const eur = (value: number | string) => (typeof value === "number" ? `${value}€` : String(value));
+
+const sofaSize = (id: string) => {
+  const size = sofaPrices.find(item => item.id === id);
+  if (!size) throw new Error(`priceSeoData: sofá "${id}" não existe em sofaPrices`);
+  return size;
+};
+const mattressSize = (id: string) => {
+  const size = mattressPrices.find(item => item.id === id);
+  if (!size) throw new Error(`priceSeoData: colchão "${id}" não existe em mattressPrices`);
+  return size;
+};
+
+const desde = (value: number | string) => `Desde ${eur(value)}`;
+
 // Price tables per service
 const priceTables: Record<string, { item: string; price: string; note?: string }[]> = {
   "limpeza-sofas": [
-    { item: "Sofá 1 lugar", price: "Desde 49€" },
-    { item: "Sofá 2 lugares", price: "Desde 69€" },
-    { item: "Sofá 3 lugares", price: "Desde 79€" },
+    { item: "Sofá 1 lugar", price: desde(sofaSize("1-lugar").cleaningPrice) },
+    { item: "Sofá 2 lugares", price: desde(sofaSize("2-lugares").cleaningPrice) },
+    { item: "Sofá 3 lugares", price: desde(sofaSize("3-lugares").cleaningPrice) },
     { item: "Sofá 4-5 lugares", price: "Sob orçamento" },
     { item: "Sofá em L", price: "Sob orçamento" },
-    { item: "Impermeabilização", price: "Desde 59€", note: "add-on recomendado" },
+    { item: "Impermeabilização", price: desde(sofaSize("1-lugar").waterproofingPrice), note: "add-on recomendado" },
   ],
   "limpeza-colchoes": [
-    { item: "Colchão Solteiro", price: "Desde 59€" },
-    { item: "Colchão Casal", price: "Desde 69€" },
-    { item: "Colchão King Size", price: "Desde 79€" },
-    { item: "Colchão berço/criança", price: "Desde 59€" },
+    { item: "Colchão Solteiro", price: desde(mattressSize("solteiro").cleaningPrice) },
+    { item: "Colchão Casal", price: desde(mattressSize("casal").cleaningPrice) },
+    { item: "Colchão King Size", price: desde(mattressSize("king").cleaningPrice) },
+    // Berço/criança não é um tamanho do quiz: cobra como o solteiro, o mais pequeno.
+    { item: "Colchão berço/criança", price: desde(mattressSize("solteiro").cleaningPrice) },
     { item: "Cabeceira estofada", price: "Desde 20€", note: "add-on" },
   ],
   "limpeza-tapetes": [
@@ -51,9 +75,9 @@ const priceTables: Record<string, { item: string; price: string; note?: string }
     { item: "Alcatifas (qualquer dimensão)", price: "Sob orçamento", note: "medida no local, à área" },
   ],
   "impermeabilizacao": [
-    { item: "Sofá 1 lugar", price: "Desde 59€", note: "Essencial, 89€ na Premium" },
-    { item: "Sofá 2 lugares", price: "Desde 79€", note: "Essencial, 109€ na Premium" },
-    { item: "Sofá 3 lugares", price: "Desde 99€", note: "Essencial, 139€ na Premium" },
+    { item: "Sofá 1 lugar", price: desde(sofaSize("1-lugar").waterproofingPrice), note: `Essencial, ${eur(sofaSize("1-lugar").waterproofingPremiumPrice!)} na Premium` },
+    { item: "Sofá 2 lugares", price: desde(sofaSize("2-lugares").waterproofingPrice), note: `Essencial, ${eur(sofaSize("2-lugares").waterproofingPremiumPrice!)} na Premium` },
+    { item: "Sofá 3 lugares", price: desde(sofaSize("3-lugares").waterproofingPrice), note: `Essencial, ${eur(sofaSize("3-lugares").waterproofingPremiumPrice!)} na Premium` },
     { item: "Cadeiras (por unidade)", price: `${CHAIR_WATERPROOF_ESSENTIAL}€/un`, note: `Essencial, ${CHAIR_WATERPROOF_PREMIUM}€/un na Premium` },
     { item: "Cabeceira", price: "Desde 15€" },
   ],
