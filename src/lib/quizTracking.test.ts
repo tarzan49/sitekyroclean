@@ -195,3 +195,53 @@ describe('um clique, um evento', () => {
     expect(locations).toEqual(['header', 'footer', 'page:/limpeza-sofas', 'header_desktop']);
   });
 });
+
+
+describe('page views after consent', () => {
+  it('records the current page once when consent is accepted after arrival', async () => {
+    localStorage.removeItem('kyro_cookie_consent');
+    const m = await import('./quizTracking');
+    cleanup = m.initContactTracking();
+    m.trackPageViewEvent('/limpeza-sofas-lisboa');
+    expect(fetch).not.toHaveBeenCalled();
+    localStorage.setItem('kyro_cookie_consent', 'accepted');
+    m.trackPageViewEvent('/limpeza-sofas-lisboa');
+    m.trackPageViewEvent('/limpeza-sofas-lisboa');
+    expect(fetch).toHaveBeenCalledTimes(1);
+    expect(JSON.parse(vi.mocked(fetch).mock.calls[0][1]!.body as string)).toMatchObject({
+      action: 'page_view', page_path: '/limpeza-sofas-lisboa',
+    });
+  });
+});
+
+
+describe('CTA audit matrix with mocked delivery', () => {
+  it.each(['header_desktop', 'header_mobile', 'header_mobile_menu', 'hero', 'sticky_bar', 'footer', 'location_hero_limpeza-sofas_lisboa', 'quote_confirmation'])('%s survives DOM replacement and keyboard-style activation', async source => {
+    vi.stubEnv('VITE_TRACKING_ALLOW_NON_PRODUCTION', 'true');
+    vi.stubEnv('VITE_GA4_MEASUREMENT_ID', 'G-TESTE00000');
+    vi.stubEnv('VITE_GOOGLE_ADS_ID', 'AW-000000000');
+    const { loadGoogleTags } = await import('./gtag');
+    loadGoogleTags();
+    const m = await import('./quizTracking');
+    cleanup = m.initContactTracking();
+    vi.mocked(window.gtag!).mockClear();
+    for (let i = 0; i < 2; i++) {
+      document.body.innerHTML = `<a href="https://wa.me/351925530647?text=message" data-tracking-source="${source}">WhatsApp</a>`;
+      const link = document.querySelector('a')!;
+      const event = new MouseEvent('click', { bubbles: true, cancelable: true, detail: 0 });
+      expect(link.dispatchEvent(event)).toBe(true);
+      await Promise.resolve();
+    }
+    expect(window.gtag).toHaveBeenCalledTimes(2);
+    expect(fetch).toHaveBeenCalledTimes(2);
+    for (const call of vi.mocked(window.gtag!).mock.calls) {
+      expect(call).toEqual(['event', 'whatsapp_click', expect.objectContaining({ cta_location: source })]);
+      expect(JSON.stringify(call)).not.toContain('link_url');
+      expect(JSON.stringify(call)).not.toContain('message');
+    }
+    localStorage.setItem('kyro_cookie_consent', 'declined');
+    document.querySelector('a')!.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }));
+    expect(fetch).toHaveBeenCalledTimes(2);
+    expect(window.gtag).toHaveBeenCalledTimes(2);
+  });
+});

@@ -70,7 +70,7 @@ let tagsLoaded = false;
  * página nem duplica os `config`.
  */
 export function loadGoogleTags(): void {
-  if (tagsLoaded || typeof window === 'undefined') return;
+  if (tagsLoaded || typeof window === 'undefined' || !shouldSendToGoogle()) return;
   tagsLoaded = true;
   const gtag = ensureGtag();
   gtag('js', new Date());

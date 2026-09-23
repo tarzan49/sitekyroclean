@@ -31,6 +31,8 @@ describe('ambiente: o que impede o localhost de escrever na conta a sério', () 
     const { loadGoogleTags, sendGtagEvent } = await import('./gtag');
     loadGoogleTags();
     expect(sendGtagEvent('teste')).toBe(false);
+    expect(document.querySelector('script[src*="gtag/js"]')).toBeNull();
+    expect(window.gtag).not.toHaveBeenCalled();
   });
 
   /**

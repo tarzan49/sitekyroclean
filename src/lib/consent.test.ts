@@ -1,5 +1,7 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
-beforeEach(() => { vi.resetModules(); localStorage.clear(); sessionStorage.clear(); document.head.innerHTML = ''; window.gtag = vi.fn(); });
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+beforeEach(() => { vi.resetModules(); vi.stubEnv('VITE_TRACKING_ALLOW_NON_PRODUCTION', 'true'); vi.stubEnv('VITE_GA4_MEASUREMENT_ID', 'G-TESTE00000'); vi.stubEnv('VITE_GOOGLE_ADS_ID', 'AW-000000000'); localStorage.clear(); sessionStorage.clear(); document.head.innerHTML = ''; window.gtag = vi.fn(); });
+
+afterEach(() => vi.unstubAllEnvs());
 
 describe('consent-gated Google tags', () => {
   it('does not load tags before a decision or after refusal', async () => {
@@ -12,8 +14,8 @@ describe('consent-gated Google tags', () => {
     localStorage.setItem('kyro_cookie_consent', 'accepted');
     const consent = await import('./consent'); consent.restoreConsent(); consent.setConsent('accepted');
     expect(document.querySelectorAll('script[src*="googletagmanager.com"]')).toHaveLength(1);
-    expect(window.gtag).toHaveBeenCalledWith('config', 'G-T45T5FBNC3', { send_page_view: false });
-    expect(window.gtag).toHaveBeenCalledWith('config', 'AW-18457115875', { allow_enhanced_conversions: true });
+    expect(window.gtag).toHaveBeenCalledWith('config', 'G-TESTE00000', { send_page_view: false });
+    expect(window.gtag).toHaveBeenCalledWith('config', 'AW-000000000', { allow_enhanced_conversions: true });
   });
 
   /**

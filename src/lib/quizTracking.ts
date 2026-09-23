@@ -67,6 +67,8 @@ export function trackQuizEvent(params: { step: number; action: 'start' | 'comple
  */
 const seenPaths = new Set<string>();
 export function trackPageViewEvent(path = window.location.pathname) {
+  // Do not consume the page before consent: usePageTracking retries it on acceptance.
+  if (getConsent() !== 'accepted' || !IS_PRODUCTION || !isPublicTrackingPage()) return;
   if (seenPaths.has(path)) return;
   seenPaths.add(path);
   emit({ action: 'page_view', step: 0, page_path: path });
