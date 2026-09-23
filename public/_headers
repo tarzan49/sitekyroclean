@@ -55,15 +55,38 @@
 # hash, e o hash muda sempre que esse script mudar. Os `<script>` de JSON-LD e
 # do modelo de landing não contam, porque são dados e não código executado.
 #
-# COMO PASSAR A BLOQUEAR: abrir o site com a consola aberta, percorrer
-# homepage, uma página de serviço, o quiz até ao fim e o painel admin, e
-# recolher os avisos "Content Security Policy". Sem avisos durante uns dias,
-# troca-se o nome do cabeçalho para `Content-Security-Policy`. Com avisos,
-# acrescenta-se a origem em falta ANTES de trocar — nunca ao contrário.
+# ── DOIS CABEÇALHOS, DE PROPÓSITO ───────────────────────────────────────────
+#
+# `Content-Security-Policy` (a bloquear) leva só as diretivas ESTRUTURAIS. São
+# as que travam ataques reais e que nenhuma delas pode partir um pedido de
+# orçamento, porque não têm nada que ver com carregar recursos:
+#   base-uri 'self'      impede um `<base>` injetado de sequestrar TODOS os
+#                        URLs relativos da página. O site não tem `<base>`.
+#   form-action 'self'   impede que um formulário passe a submeter para fora.
+#                        Os dois formulários do site (Contact.tsx e
+#                        MarketingInputs.tsx) não têm `action`: submetem por
+#                        fetch, que é governado por `connect-src`, não por esta.
+#   frame-ancestors      clickjacking. Versão moderna do X-Frame-Options acima.
+#   object-src 'none'    não há `<object>` nem `<embed>` no site.
+# As quatro foram verificadas contra o código antes de ligar, não assumidas.
+#
+# `Content-Security-Policy-Report-Only` continua a observar a política inteira,
+# incluindo `script-src`, `connect-src`, `img-src` e `style-src`. Essas ficam
+# de fora do cabeçalho bloqueador até alguém percorrer o QUIZ ATÉ SUBMETER e o
+# PAINEL ADMIN com a consola aberta — são os dois caminhos que ainda ninguém
+# exercitou, e são precisamente onde um erro custa um orçamento perdido em
+# silêncio. Numa primeira montagem feita só a partir do código, esta política
+# teria bloqueado as conversões do Ads e o Pixel: não se liga o resto sem a
+# mesma evidência para esses dois caminhos.
+#
+# PARA LIGAR O RESTO: percorrer quiz e admin com a consola aberta, acrescentar
+# a origem de cada aviso "Content Security Policy" (ANTES, nunca depois) e só
+# então mover as diretivas do cabeçalho de relatório para o de bloqueio.
 /*
   Strict-Transport-Security: max-age=15552000
   X-Frame-Options: SAMEORIGIN
   Permissions-Policy: geolocation=(self), clipboard-write=(self), camera=(), microphone=(), payment=(), usb=(), magnetometer=(), accelerometer=(), gyroscope=()
+  Content-Security-Policy: base-uri 'self'; form-action 'self'; frame-ancestors 'self'; object-src 'none'
   Content-Security-Policy-Report-Only: default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com https://googleads.g.doubleclick.net https://www.googleadservices.com https://connect.facebook.net; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; font-src 'self' data:; connect-src 'self' https://*.supabase.co https://api.bigdatacloud.net https://www.google-analytics.com https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com https://*.g.doubleclick.net https://ad.doubleclick.net https://www.google.com https://www.googleadservices.com https://connect.facebook.net https://www.facebook.com http://localhost:3010; frame-src 'self' https://td.doubleclick.net https://www.facebook.com; base-uri 'self'; form-action 'self'; frame-ancestors 'self'; object-src 'none'
 
 # Vite assets have content hashes: changed files always receive a new URL.
