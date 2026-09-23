@@ -1,6 +1,7 @@
 ﻿import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { SITE_URL } from "@/constants/business";
+import { LEGAL_PAGES } from "@/data/legalPages";
 
 interface PageMeta {
   title: string;
@@ -219,6 +220,18 @@ const routeMeta: Record<string, { pt: PageMeta; en: PageMeta; es: PageMeta }> = 
     },
   },
 };
+
+// As três páginas legais tiram o título e a descrição de `src/data/legalPages.ts`,
+// a mesma fonte que o `scripts/prerender.ts` usa para o HTML estático. Antes
+// disto só a de privacidade tinha entrada aqui: `/termos-e-condicoes` e
+// `/politica-de-devolucoes` não tinham título nem descrição próprios e ficavam
+// com os do `404.html`, que era o ficheiro que o Cloudflare lhes servia.
+// As traduções en/es já escritas são preservadas.
+for (const page of LEGAL_PAGES) {
+  const meta: PageMeta = { title: page.title, description: page.description };
+  const existing = routeMeta[page.path];
+  routeMeta[page.path] = { pt: meta, en: existing?.en ?? meta, es: existing?.es ?? meta };
+}
 
 const PageHead = () => {
   const location = useLocation();

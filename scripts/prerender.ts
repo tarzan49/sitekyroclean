@@ -37,6 +37,7 @@ import { renderLandingPageHtml, ENTITY_FOOTER_HTML } from './landing-page-html';
 import { getLocationServiceData, getAllLocationRoutes, services, cities, cityPrep } from '../src/data/locationSeoData';
 import { getAllFreguesiaRoutes, getFreguesia, generateFreguesiaContent } from '../src/data/freguesiaSeoData';
 import { getAllKeywordVariantRoutes, getKeywordVariantData } from '../src/data/keywordVariantData';
+import { LEGAL_PAGES } from '../src/data/legalPages';
 import { getAllProblems, getProblemBySlug } from '../src/data/problemSeoData';
 import { getProblemLayout } from '../src/data/problemLayout';
 import { getProblemHero } from '../src/data/problemHero';
@@ -1624,6 +1625,37 @@ export function prerenderRoutes(outDir: string): number {
     notFoundHtml = injectJsonLd(notFoundHtml, LOCAL_BIZ);
     fs.writeFileSync(path.join(outDir, '404.html'), notFoundHtml, 'utf-8');
     console.log('  404 page:                generated');
+  }
+
+  // ── Legal pages (real pages, indexable, were returning 404) ────────────
+  // Mesma causa que o bloco a seguir descreve: sem o catch-all do _redirects,
+  // uma rota sem ficheiro estático cai no 404.html com HTTP 404 a sério. Estas
+  // três têm rota em App.tsx e estão no rodapé de todas as páginas, mas ficaram
+  // de fora daquela lista — confirmado em produção a 2026-09-23, as três a
+  // devolver 404. Ao contrário das client-only, são páginas a sério e ficam
+  // indexáveis: o texto legal continua a ser desenhado pelo React, e o HTML
+  // estático leva o título, a descrição, o <h1>, um resumo fiel e os títulos
+  // das secções — a mesma informação, outra renderização, como manda a regra
+  // anti-cloaking. Ver src/data/legalPages.ts.
+  {
+    for (const page of LEGAL_PAGES) {
+      emit(
+        page.path,
+        page.title,
+        page.description,
+        {
+          h1: page.h1,
+          intro: page.intro,
+          localSection: `Última atualização: ${page.updated}.`,
+          benefits: page.sections,
+        },
+        [buildBreadcrumbSchema([
+          { name: 'Início', url: BASE_URL + '/' },
+          { name: page.h1,  url: `${BASE_URL}${page.path}` },
+        ])],
+      );
+    }
+    console.log(`  Legal pages:             ${LEGAL_PAGES.length}`);
   }
 
   // ── Client-only routes (never crawled, never a real "page") ────────────
