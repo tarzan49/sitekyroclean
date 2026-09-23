@@ -143,8 +143,13 @@ Contexto: o site já tinha a parte difícil resolvida (16.045 páginas em HTML e
     - **O `BlogPosting` dos 26 artigos não tinha `@context`,** logo não era JSON-LD e nenhum motor o lia: autor, datas, `citation` e `publisher`, ou seja o E-E-A-T todo das fases 5 e 6, não contavam. `injectJsonLd` escreve um `<script>` por schema e **só os nós dentro de um `@graph` herdam o contexto do pai** — todos os outros blocos traziam o seu, este não. A página React nunca teve o problema (emite um grafo único já com contexto).
     - **As 8.364 variantes de keyword desenhavam a migalha e não a declaravam.** Passaram a receber o `BreadcrumbList` derivado no `emit()` a partir do mesmo modelo que desenha a migalha visível, ao lado do bloco do `HowTo`, que lá está pela mesma razão. Páginas com migalha declarada: 7.589 → 15.953. **Uma família nova de landing não precisa de fazer nada: herda daqui.**
     - **Os 54 hubs de problema declaravam `Início › Problemas › …` a apontar para `/problemas`, que não existe** (sem rota, sem ficheiro, 404 em produção), enquanto a migalha visível dizia `Início › serviço`. Ficaram os dois no serviço. **Uma migalha só se declara com passos que existam mesmo:** o `emit()` transforma o `BreadcrumbList` em ligações reais no HTML, por isso um passo inventado vira link morto.
-    - **O `public/_headers` só tinha cache.** Ganhou HSTS (180 dias, sem `preload`), `X-Frame-Options` e `Permissions-Policy`. **`geolocation=(self)` e `clipboard-write=(self)` são obrigatórios** — o passo da localidade do quiz e o painel de WhatsApp do admin usam-nos, e fechá-los desliga-os em silêncio. **CSP continua por fazer de propósito:** tem de autorizar a gtag, o Supabase e as fontes, e uma diretiva a menos parte a medição ou a entrega de pedidos sem erro visível; faz-se em `Content-Security-Policy-Report-Only` primeiro.
+    - **O `public/_headers` só tinha cache.** Ganhou HSTS (180 dias, sem `preload`), `X-Frame-Options` e `Permissions-Policy`. **`geolocation=(self)` e `clipboard-write=(self)` são obrigatórios** — o passo da localidade do quiz e o painel de WhatsApp do admin usam-nos, e fechá-los desliga-os em silêncio. **CSP feito e a bloquear desde 2026-09-23**, depois de duas rondas em `Report-Only`. Ver a secção própria abaixo.
     - **Medido e são: 62.574 referências de imagem resolvem todas e nenhuma sem `alt`; LCP 1,47 s, TTFB 208 ms, 310 KB por página; sem overflow horizontal a 375px; consola limpa.**
+  - **CSP: a bloquear desde 2026-09-23, e como se lá chegou.** A política vive em `public/_headers` (comentada em detalhe lá). Três coisas para não repetir:
+    - **Uma política escrita a partir do código está errada.** A primeira versão, montada com o que o `src` mostra, teria bloqueado as conversões do Google Ads e o Pixel da Meta: a `gtag.js` carrega em cadeia `googleads.g.doubleclick.net`, `googleadservices.com`, `www.google.com/ccm`, `ad.doubleclick.net` e o recolhedor regional `region1.analytics.google.com`, e nenhum desses nomes existe no `src`. Só apareceram a correr o site com `Report-Only` ligado.
+    - **`form-action 'self'` bloqueou o Pixel da Meta**, que constrói um formulário em runtime e faz POST para `facebook.com/tr/`. Eu tinha verificado que não há `<form action>` no código e concluído que era seguro — a conclusão estava errada pela mesma razão que a anterior.
+    - **A leitura de consola da extensão do Chrome NÃO capta violações de CSP.** Deu "nenhuma mensagem" a uma violação provocada de propósito. Um zero vindo dali não prova nada. A medição boa é o evento `securitypolicyviolation` do DOM, que além disso distingue `enforce` de `report` — e **valida-se o instrumento antes de acreditar num zero**.
+    - **Como testar localmente:** `npx wrangler pages dev dist`. O `vite dev` e o `vite preview` ignoram o `_headers`, por isso não servem para isto. O percurso que dá confiança é um pedido de orçamento a sério, do princípio ao fim, mais as origens do painel admin. `img-src` aceita `https:` porque o pixel de listas do Ads vem do domínio do país de quem visita.
   - **Ao medir sobre o `dist`, confirmar sempre que não está contaminado.** Nesta sessão o `dist` apareceu com os 26 artigos do blog a mostrarem o `<h1>` da homepage e metade do conteúdo em falta. **Não era regressão nenhuma:** era outra sessão a construir para a mesma pasta ao mesmo tempo. O mesmo tinha acontecido minutos antes, com um `cp -R dist` a copiar 9.846 de 16.262 ficheiros. **O método fiável é o que já está escrito acima: `git archive HEAD` para uma pasta à parte, ficheiros da sessão copiados por cima, `node_modules` por symlink, e construir lá.**
 
 **Numeração das fases:** há uma só, a que está nesta lista, e os commits seguem-na. Houve um momento em 2026-09-17 em que começou a correr uma segunda contagem em paralelo (uma numeração nova criada a partir de uma auditoria, a chamar "fase 1" ao que aqui é a fase 4); as mensagens de commit foram reescritas antes do push para ficar tudo na contagem desta lista. **Não abrir uma segunda numeração:** se for preciso planear por fases, mapeia-se para os números daqui.
@@ -228,6 +233,28 @@ pelo elemento que a contém, depois `page:<caminho>`. O vocabulário de origens
 `quiz_events` tem escrito e o que o `QuizMetricsPanel.tsx` sabe rotular — e é
 por isso que a coluna `service` de um clique guarda a **origem**, não o serviço
 (convenção de 2026-08, o serviço real vai em `service_type`).
+**Regressão apanhada a 2026-09-23, cinco dias depois de a regra ser escrita:**
+cinco âncoras `tel:` (rodapé PT e EN, hero mobile, CTA final, página 404) ainda
+tinham `onClick={() => trackCallClick(…)}` por cima do delegado. O helper não
+passava o evento original, a guarda não o via, e cada clique saía a dobrar para
+o GA4, para a Meta e para `quiz_events`, com duas origens diferentes.
+`trackCallClick` foi removido de `analytics.ts` e
+`src/lib/contactCtaDelegation.test.ts` rebenta se um componente voltar a chamar
+`trackCallClick`/`trackWhatsAppClick`/`trackContactClick`. Um CTA de contacto
+novo leva só `data-tracking-source`, mais nada.
+
+**Validado em produção a 2026-09-23 (a primeira vez):** a `gtag.js` do `G-`,
+o `config` do `AW-`, o GA4 (`region1.analytics.google.com`), o remarketing do
+Ads, o Pixel da Meta (`fbevents.js` + `tr/?ev=PageView`) e os inserts em
+`quiz_events` foram todos vistos a sair e a ser aceites depois de aceitar as
+cookies, e nada sai antes. Detalhe em `docs/tracking-google-ads.md`, secção 13.
+**O que continua a não existir é a etiqueta da conversão do Google Ads:** o
+bundle de produção não tem nenhum `AW-18457115875/<etiqueta>`, por isso o lead
+confirmado sai para o GA4 e para a Meta mas o Ads não recebe conversão
+nenhuma. É configuração do dono (ação de conversão no Ads +
+`VITE_GOOGLE_ADS_LEAD_CONVERSION_LABEL` no Cloudflare Pages), e o painel avisa
+em Métricas → Estado da recolha enquanto faltar. Não dar as conversões do Ads
+por instaladas até essa string aparecer no bundle.
 
 **`?kyro_debug=1` é diagnóstico, não autorização.** Enviar fora de produção
 exige `VITE_TRACKING_ALLOW_NON_PRODUCTION=true` **e** identificadores que não
