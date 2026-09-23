@@ -38,7 +38,7 @@ export const BUSINESS_GEO = {
 } as const;
 
 export const REVIEW_RATING = "4.9";
-export const REVIEW_COUNT = "110";
+export const REVIEW_COUNT = "125";
 export const CLIENTS_SERVED_LABEL = "+1100";
 
 export const SERVICES_COMPLETED_LABEL = "+1200";
