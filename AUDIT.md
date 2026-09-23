@@ -1,3 +1,95 @@
+# Auditoria — 2026-09-23 (capacidade para tráfego elevado + UX, medida em produção)
+
+Segunda auditoria do dia, independente da anterior. Método: build limpo a partir de `git archive HEAD` numa pasta à parte (16.259 rotas, 17.432 ficheiros), `npm run typecheck` (0 erros), `npm run lint` (0 erros, 16 avisos), `vitest` (73 ficheiros, 2.269 testes verdes), Lighthouse mobile contra cleansolutions.com.pt em três páginas, e percurso completo em browser (homepage, landing, 404, quiz do início ao formulário, em 375px e 1440px). Nenhum ficheiro do site foi alterado.
+
+## Nível atual, em resumo
+
+O site está preparado para muito tráfego de leitura: tudo o que o público vê é HTML estático servido pelo Cloudflare (TTFB medido entre 60 e 210 ms, CLS 0, SEO 100 nas três páginas, consola limpa). O que pode ceder com tráfego elevado não é o site, é o que está à volta dele: o limite de ficheiros do Cloudflare Pages, a tabela de métricas sem retenção, e a Pages Function na homepage. Em UX, o percurso do quiz é curto (6 ecrãs, 2 campos) e coerente; os problemas são de pormenor.
+
+| Página (mobile, produção) | Perf | LCP | TBT | CLS | A11y | Boas práticas | SEO |
+|---|---|---|---|---|---|---|---|
+| `/` | 78 | 4,0 s | 330 ms | 0 | 96 | 81 | 100 |
+| `/limpeza-sofas` | 85 | 3,6 s | 200 ms | 0,008 | 94 | 81 | 100 |
+| `/limpeza-sofas-porto` | 92 | 2,9 s | 150 ms | 0,007 | 94 | 81 | 100 |
+
+## 🔴 O que cede primeiro com tráfego ou crescimento
+
+### 1. Ficheiros no deploy: 17.432 de um limite de 20.000 do Cloudflare Pages
+O `dist` tem 17.432 ficheiros. O Cloudflare Pages recusa deploys acima de 20.000 ficheiros. Cada cidade nova gera à volta de uma centena de páginas (6 serviços, 12 variantes, preço, material, marcas, freguesias), por isso a margem é de duas ou três cidades, não de tráfego. Ao mesmo tempo, o `public/` envia em cada deploy cerca de 190 ficheiros e 180 MB que nenhuma página referencia: `public/imagenshomepage/` (40 PNG, 104 MB), `public/Imagens 169/` (5, 12 MB), `public/images-optimized/` (17, 6,4 MB) e 127 ficheiros soltos dentro de `public/images/` (57 MB, incluindo `fotos hero/hero-veludo.png` com 7,7 MB e `colchoes/v2.png` com 7,2 MB). Verificado com `grep` por nome de ficheiro em `src`, `scripts` e `index.html`: zero referências.
+**Fix:** tirar essas pastas e ficheiros de `public/` (para `docs/` ou fora do repositório). Não muda nada para o visitante, porque nunca são pedidos. Recupera ~190 ficheiros de margem e encurta o deploy. A margem estrutural continua a ser o limite de 20.000: qualquer plano de expansão de cidades tem de contar com isso.
+
+### 2. `quiz_events` cresce sem retenção, e `error_logs` sem travão
+Cada visita com consentimento escreve em `quiz_events` uma linha por página vista, uma por mudança de rota (`session_time`) e uma por clique de contacto, cada uma com cerca de 40 colunas (a fotografia de atribuição inteira vai em todas). Não existe nenhuma tarefa de limpeza nem agregação (sem `pg_cron`, sem `delete` antigo em nenhuma migração). Ordem de grandeza, assumindo 60% de consentimento, 3 linhas por visita e ~1 KB por linha com os cinco índices:
+
+| Visitas/dia | Linhas/mês | Crescimento/mês |
+|---|---|---|
+| 1.000 | ~54.000 | ~55 MB |
+| 5.000 | ~270.000 | ~270 MB |
+| 20.000 | ~1.100.000 | ~1,1 GB |
+
+O plano gratuito do Supabase tem 500 MB de base de dados; o Pro tem 8 GB. Não consegui confirmar o plano a partir do código. `error_logs` é pior no pico: `src/lib/errorTracking.ts` insere uma linha por cada erro de JavaScript de cada visitante, sem limite por sessão nem deduplicação por mensagem. Um erro sistémico (um script de terceiros a falhar, uma extensão de browser) vira um insert por página vista.
+**Fix:** política de retenção em `quiz_events` (agregar por dia e apagar linhas com mais de 90 dias, num `pg_cron` ou numa função chamada pelo painel), e em `errorTracking.ts` um teto por sessão (3 a 5 erros) mais deduplicação por mensagem.
+
+### 3. A Pages Function corre na homepage, e o plano gratuito corta aos 100.000 pedidos/dia
+`functions/_middleware.ts` só existe para redirecionar `admin.cleansolutions.com.pt/`, mas o `_routes.json` faz com que corra em **todos** os pedidos a `/`, no domínio principal. Acima de 100.000 invocações por dia, o Cloudflare deixa de servir as rotas que a Function cobre, ou seja a homepage cai exatamente no dia de mais tráfego. É a única computação por pedido que o site tem.
+**Fix:** substituir a Function por uma Redirect Rule do Cloudflare (Rules → Redirect Rules, gratuito, com condição de hostname) e apagar `functions/` e `_routes.json`. O site passa a ser 100% estático.
+
+### 4. A CSP em modo de relatório já está a acusar o Pixel da Meta
+Observado em produção, na consola: `Sending form data to 'https://www.facebook.com/tr/' violates ... "form-action 'self'"`. O Pixel envia eventos por POST de formulário quando o `sendBeacon` não serve. No dia em que o cabeçalho passar a `Content-Security-Policy`, as conversões da Meta param sem erro visível.
+**Fix:** acrescentar `https://www.facebook.com` a `form-action` no `public/_headers` antes de trocar o nome do cabeçalho.
+
+## 🟡 Desempenho
+
+### 5. A homepage carrega 743 KB de imagem a mais (LCP 4,0 s)
+O LCP é `hero-sofa-mobile-extended.webp`, 887×1462 (161 KB) servido a 412 px de largura. As seis imagens do carrossel de serviços têm 1900 px e são mostradas a 376 px; as quatro do bloco "4 problemas" têm 1078 px e são mostradas a 413 px. A homepage pesa 1.227 KB contra 519 a 669 KB nas landing pages. O helper `src/lib/responsiveImages.ts` já existe, mas `HeroV1.tsx`, `Services.tsx` e `PainPointsSolutionsV1.tsx` não o usam.
+**Fix:** variantes de 480 e 768 px com `srcset` nestes três componentes. É a única alteração com efeito direto no LCP da página mais visitada.
+
+### 6. CSS a bloquear 150 ms e 19 KB sem uso
+`index-*.css` (148 KB, 24 KB gzip) é render-blocking em todas as páginas e 19 KB nunca são usados. Baixa prioridade: o ganho é de 150 ms no FCP.
+
+## 🟡 UX (percorrido em mobile e desktop)
+
+### 7. O quiz pede a localização ao browser no instante em que abre
+`QuizStepLocation.tsx` chama `detectServiceCity` no `useEffect` de montagem, que corre `navigator.geolocation.getCurrentPosition` logo ali. Quem abre o quiz pela primeira vez vê um pedido de permissão do sistema antes de ler uma linha; quem recusa vê como primeira mensagem "Não foi possível obter a localização" (foi o que aconteceu no teste). No iOS a recusa fica memorizada para o domínio, e o botão "Usar a minha localização" deixa de funcionar nas visitas seguintes.
+**Fix:** só pedir a localização quando a pessoa toca em "Usar a minha localização". A pesquisa por nome já resolve o caso comum em dois toques.
+
+### 8. Na primeira visita, o aviso de cookies tapa a barra fixa de WhatsApp
+`CookieBanner` (`z-[90]`) e `MobileStickyBar` (`z-30`) ficam os dois colados ao fundo. Até a pessoa decidir, o CTA fixo de WhatsApp não existe. O botão do hero continua visível, por isso não é bloqueante.
+**Fix:** um banner de uma linha, ou subir a barra fixa acima do banner enquanto ele está aberto.
+
+### 9. O upsell final anuncia "Tapete: Limpe 5 m², pague 4"
+`QuizComboUpsellScreen.tsx:393`. Desde 2026-09-06 os tapetes nunca têm preço e o quiz deixou de estimar por m². Uma oferta por área contradiz essa decisão e cria uma expectativa de preço por m² no ecrã seguinte. **Confirmar com o dono** se a oferta está em vigor antes de mexer.
+
+### 10. Acessibilidade: três falhas concretas do Lighthouse, nas mesmas páginas todas
+- `CustomerReviewCard.tsx:22`: `aria-label="5 de 5 estrelas"` num `<div>` sem `role`, o que é proibido; passa com `role="img"`.
+- O dourado `#D4AF37` em fundo claro não chega ao contraste mínimo (cerca de 2,1:1). Aparece nos rótulos em maiúsculas e nas palavras destacadas do `SectionHeader.tsx` sempre que a secção é clara. Em fundo escuro passa. O `#aa862b` já usado nas estrelas passa em fundo claro.
+- `HomeHeroTrust.tsx:20`: o `aria-label` da ligação às avaliações não contém o texto visível, o que confunde comandos de voz.
+- O carrossel de serviços da homepage repete os seis `<h3>` três vezes (clones), sem `aria-hidden` nos clones: um leitor de ecrã lê 18 títulos.
+
+## 🟡 SEO e dados estruturados
+
+### 11. A homepage é a única página com o schema escrito à mão, e está desatualizado
+`index.html` mantém três blocos JSON-LD estáticos que o prerender não substitui na rota `/`. O `LocalBusiness` tem `sameAs` a apontar para `instagram.com/kyroclean.pt` e `facebook.com/kyroclean`, perfis que **não existem** (o dono confirmou em 2026-09-17 que não há nenhum, e `business.ts` tem `BUSINESS_PROFILES = []`), mais o próprio site como referência. O `areaServed` não tem Aveiro, Coimbra nem Faro; o catálogo diz "Limpeza de Carpetes"; o bloco `Service` declara `price` exato (49, 20, 59) em vez de `minPrice`, como a fase 2 do GEO corrigiu em todas as outras páginas. O `twitter:site` `@KyroClean` também não existe. O cliente remove o bloco marcado com `data-ssr-schema` ao hidratar, mas os motores leem o HTML estático, e a homepage é a página mais rastreada do site.
+**Fix:** o prerender emitir para `/` o mesmo grafo de `seoSchema.ts` que emite para as outras páginas, e apagar os três blocos do `index.html`.
+
+### 12. `lastmod` continua ausente em produção
+16.231 dos 16.257 URLs dos sitemaps em produção saem sem `lastmod`; só os 26 do blog têm. É o clone shallow do Cloudflare, já descrito no `CLAUDE.md`. Continua por resolver do lado do Cloudflare.
+
+### 13. Sem `hreflang` nas 24 páginas EN
+As páginas `/en/*` têm `lang="en"` mas não declaram alternância com as páginas PT. Baixa prioridade enquanto o `/en` não tiver decisão.
+
+## 🟢 Confirmado a funcionar (não precisa de ação)
+
+- reCAPTCHA v3 está ligado ao `submit-lead` (verificação no servidor), o que fecha o achado #5 da auditoria de 2026-09-08. `submit-lead` e `send-lead-email` têm rate limit de 8 pedidos por 10 minutos por IP.
+- Um só `gtag.js`, Consent Mode v2 por omissão negado, Pixel da Meta só após consentimento: confirmado na rede, com e sem consentimento.
+- Cabeçalhos de segurança em produção (HSTS, X-Frame-Options, Permissions-Policy, CSP report-only) chegam como o `_headers` define.
+- Assets com hash em `immutable` por um ano; `/images/*` com 4 h no edge.
+- 404 real (HTTP 404) para rotas inexistentes, com página útil (ligações, telefone).
+- Percurso do quiz: localidade, serviço, tratamento, quantidades, upsell de proteção com "Continuar sem extras", upsell combinado, contacto com dois campos (`type="tel"`, `autoComplete`). Sem erros na consola em nenhum passo.
+
+---
+---
+
 # Auditoria — 2026-09-08 (código: dead code, segurança, type-safety, arquitetura)
 
 Auditoria realizada com 4 agentes paralelos, cada um numa frente diferente: dead code/duplicação, segurança, type-safety/correção, arquitetura/performance. Apenas leitura — nenhum ficheiro foi alterado durante a investigação. Esta auditoria é **diferente** da de 2026-08-20 mais abaixo neste documento (aquela focou-se em layout/design/SEO/conteúdo); esta foca-se em qualidade e segurança do código em `src/`.
