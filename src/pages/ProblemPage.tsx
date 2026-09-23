@@ -164,9 +164,15 @@ const ProblemPage = () => {
           "@graph": [
             buildLocalBusinessNode(),
             buildWebPageNode({ url: `${SITE_URL}/problemas/${slug}`, name: data.title, description: data.metaDescription }),
+            // O passo do meio é o serviço, não um "/problemas" que nunca
+            // existiu: não há rota em App.tsx nem ficheiro no dist, e em
+            // produção devolve 404. A migalha visível desta página já mostrava
+            // Início › serviço, por isso o que a página mostrava e o que
+            // declarava discordavam, e o que declarava apontava para uma
+            // página inexistente. Passam a ser a mesma coisa.
             buildBreadcrumbNode(`${SITE_URL}/problemas/${slug}#breadcrumb`, [
               { name: "Início", item: `${SITE_URL}/` },
-              { name: "Problemas", item: `${SITE_URL}/problemas` },
+              ...(relatedService ? [{ name: relatedService.name, item: `${SITE_URL}/${relatedService.slug}` }] : []),
               { name: data.h1, item: `${SITE_URL}/problemas/${slug}` },
             ]),
             ...(relatedService ? [buildServiceNode({

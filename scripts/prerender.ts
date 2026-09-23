@@ -717,7 +717,22 @@ export function prerenderRoutes(outDir: string): number {
           processSteps: layout.process.map((step, index) => ({ step: index + 1, ...step })),
           faqs: layout.faqs,
         },
-        [buildFaqSchema(layout.faqs)],
+        // Migalha igual à da página React (Início › serviço › problema). Estas
+        // 54 páginas não declaravam BreadcrumbList nenhum no HTML estático nem
+        // mostravam a migalha ali, apesar de o React a desenhar — e o `emit`
+        // deriva a migalha visível deste mesmo schema, por isso passam a ter as
+        // duas de uma só vez, sem poderem discordar.
+        [
+          buildBreadcrumbSchema([
+            { name: 'Início', url: `${BASE_URL}/` },
+            ...(() => {
+              const service = services.find(s => s.slug === p.relatedServices[0]);
+              return service ? [{ name: service.name, url: `${BASE_URL}/${service.slug}` }] : [];
+            })(),
+            { name: p.h1, url: `${BASE_URL}/problemas/${p.slug}` },
+          ]),
+          buildFaqSchema(layout.faqs),
+        ],
       );
     }
     console.log(`  Problem pages:           ${count - prev}`);

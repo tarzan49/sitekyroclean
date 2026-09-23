@@ -1,3 +1,28 @@
+# Cabeçalhos de segurança, em todas as respostas.
+#
+# Em produção só chegavam `x-content-type-options` e `referrer-policy` (postos
+# do lado do Cloudflare, não deste ficheiro). Faltavam os três abaixo, num site
+# que recolhe nome, telemóvel e morada no formulário de orçamento.
+#
+# `geolocation=(self)` é obrigatório: o passo da localidade do quiz usa
+# `navigator.geolocation` (src/lib/locationDetection.ts) e um `geolocation=()`
+# desligava o botão "Usar a minha localização" em silêncio. `clipboard-write`
+# idem, pelo painel de WhatsApp do admin.
+#
+# Não há `Content-Security-Policy` aqui de propósito: uma política a sério tem
+# de autorizar a gtag da Google, o Supabase e as fontes, e uma regra a menos
+# parte a medição ou o envio de pedidos sem dar erro visível. Faz-se com
+# `Content-Security-Policy-Report-Only` primeiro, a ler os relatórios, nunca às
+# cegas de uma vez.
+#
+# O `max-age` do HSTS é de 180 dias e sem `preload`: o preload é praticamente
+# irreversível (entra numa lista compilada nos browsers) e não se pede sem
+# decisão do dono.
+/*
+  Strict-Transport-Security: max-age=15552000
+  X-Frame-Options: SAMEORIGIN
+  Permissions-Policy: geolocation=(self), clipboard-write=(self), camera=(), microphone=(), payment=(), usb=(), magnetometer=(), accelerometer=(), gyroscope=()
+
 # Vite assets have content hashes: changed files always receive a new URL.
 /assets/*
   Cache-Control: public, max-age=31536000, immutable
