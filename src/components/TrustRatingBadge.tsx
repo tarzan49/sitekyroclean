@@ -1,5 +1,5 @@
 import { ExternalLink, Star, MapPin, Phone, Users } from "lucide-react";
-import { REVIEW_RATING, REVIEW_COUNT, PHONE_TEL, PHONE_DISPLAY } from "@/constants/business";
+import { REVIEW_RATING, REVIEW_COUNT, CLIENTS_SERVED_LABEL, PHONE_TEL, PHONE_DISPLAY } from "@/constants/business";
 import { GOOGLE_REVIEWS_VIEW_URL } from "@/constants/google";
 import { trackCallClick } from "@/lib/analytics";
 import { GoogleG } from "@/components/icons/GoogleG";
@@ -50,7 +50,7 @@ const TrustRatingBadge = ({ variant }: TrustRatingBadgeProps) => {
             <div className="h-4 w-px bg-white/20" />
             <span className="text-white/80 text-sm font-medium">{REVIEW_COUNT}+ avaliações</span>
             <div className="h-4 w-px bg-white/20" />
-            <span className="text-white/80 text-sm font-medium">+1100 clientes</span>
+            <span className="text-white/80 text-sm font-medium">{CLIENTS_SERVED_LABEL} clientes</span>
           </div>
           <a
             href={`tel:${PHONE_TEL}`}
@@ -153,7 +153,7 @@ const TrustRatingBadge = ({ variant }: TrustRatingBadgeProps) => {
           </a>
           <div className={`${pillClass} justify-center whitespace-nowrap`}>
             <Users className="w-3.5 h-3.5 text-gold flex-shrink-0" strokeWidth={2} />
-            <span className="text-white/80 text-sm font-semibold tracking-wide">+1100 clientes</span>
+            <span className="text-white/80 text-sm font-semibold tracking-wide">{CLIENTS_SERVED_LABEL} clientes</span>
           </div>
         </div>
       );

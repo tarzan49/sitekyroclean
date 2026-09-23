@@ -7,7 +7,7 @@ import QuizButton from "@/components/QuizButton";
 import ServiceResultsGallery from "@/components/ServiceResultsGallery";
 import type { BeforeAfterCategory } from "@/data/beforeAfterPool";
 import TrustRatingBadge from "@/components/TrustRatingBadge";
-import { SITE_URL, WHATSAPP_BASE, PHONE_E164 } from "@/constants/business";
+import { SITE_URL, WHATSAPP_BASE, PHONE_E164, CLIENTS_SERVED_LABEL } from "@/constants/business";
 
 const categories: { category: BeforeAfterCategory; label: string; href: string }[] = [
   { category: "sofa", label: "Sofás", href: "/limpeza-sofas" },
@@ -106,7 +106,7 @@ const BeforeAfterPage = () => {
                 </div>
                 <div className="h-px sm:h-12 sm:w-px w-full bg-[#1A4E30]/10" />
                 <div className="text-center sm:text-left">
-                  <p className="text-3xl font-bold text-[#1A4E30]">+1100</p>
+                  <p className="text-3xl font-bold text-[#1A4E30]">{CLIENTS_SERVED_LABEL}</p>
                   <p className="text-base text-[#777]">clientes satisfeitos</p>
                 </div>
                 <div className="sm:ml-auto">

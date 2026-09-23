@@ -1,4 +1,4 @@
-import { REVIEW_COUNT, REVIEW_RATING } from '../constants/business';
+import { REVIEW_COUNT, REVIEW_RATING, CLIENTS_SERVED_LABEL } from '../constants/business';
 // Programmatic SEO: Problem pages data engine
 // Each problem page targets a specific long-tail search query cluster
 
@@ -373,9 +373,14 @@ const problemDefinitions: ProblemPage[] = [
     slug: "alergias-sofa",
     category: "saude",
     keyword: "limpeza sofá alergias",
-    title: "Tratamento Anti-ácaros para Sofá | Extra Opcional | Kyro",
-    metaDescription: "Limpeza do sofá e tratamento anti-ácaros opcional. Saiba o que cada serviço inclui e peça orçamento com resposta em menos de 10 minutos.",
-    h1: "Tratamento Anti-ácaros para Sofá",
+    // Título e <h1> próprios: eram byte a byte iguais aos de `acaros-sofa` e,
+    // com as variantes por cidade, eram 50 páginas a disputar a mesma consulta
+    // com o mesmo título. Os corpos já tinham ângulos distintos desde a
+    // reescrita de 2026-09-17 (aqui o lado dos sintomas e o que a evidência
+    // diz; lá onde os ácaros se alojam) — só o título é que não acompanhou.
+    title: "Alergias e Limpeza do Sofá | O Que Resolve | Kyro",
+    metaDescription: "Espirros no sofá: o que a limpeza profissional resolve, o que não resolve e o que diz a evidência. Peça orçamento com resposta em menos de 10 minutos.",
+    h1: "Alergias e Limpeza do Sofá",
     intro: "Se espirra mais quando está no sofá e melhora quando sai de casa, é natural suspeitar do estofo. Vale a pena perceber o que a limpeza consegue fazer nesse cenário, e o que não consegue, antes de contratar seja o que for.",
     problemDetail: "O padrão que costuma levantar suspeita é reconhecível: sintomas que pioram em casa, aliviam fora dela e melhoram de forma clara em férias prolongadas. Isso aponta para exposição doméstica continuada, mas não identifica sozinho a causa nem o artigo responsável, que pode ser o sofá, o colchão, a alcatifa, um animal ou a humidade da divisão. Um ponto prático que quase ninguém refere: aspirar com um aparelho de filtragem insuficiente agita o pó fino e devolve ao ar boa parte do que retirou, o que explica a sensação de piorar durante e logo a seguir a aspirar. E a evidência sobre estas medidas é mais modesta do que a publicidade do setor sugere: a revisão Cochrane que reuniu 54 ensaios com mais de 3.000 doentes asmáticos sensíveis a ácaros não encontrou diferença nos sintomas entre quem aplicou medidas de redução em casa e quem não aplicou.",
     solutionDetail: "O que fazemos é concreto e limitado, e preferimos dizê-lo assim. Limpamos o sofá com o método adequado ao tecido, com atenção ao pó e aos resíduos acumulados nas costuras, e removemos fisicamente o que está na fibra em vez de o dispersar. Isso melhora o estado do estofo e reduz a carga de pó naquela peça. Não atribuímos sintomas ao sofá, não prometemos melhoria clínica e não substituímos a avaliação de um profissional de saúde. Se alguém lhe garantir que uma limpeza resolve uma alergia, está a vender-lhe uma coisa que não pode entregar.",
@@ -390,9 +395,13 @@ const problemDefinitions: ProblemPage[] = [
     slug: "alergias-colchao",
     category: "saude",
     keyword: "limpeza colchão alergias",
-    title: "Tratamento Anti-ácaros para Colchão | Extra Opcional | Kyro",
-    metaDescription: "Limpeza do colchão e tratamento anti-ácaros opcional. Saiba o que cada serviço inclui e peça orçamento com resposta em menos de 10 minutos.",
-    h1: "Tratamento Anti-ácaros para Colchão",
+    // Mesmo caso do par sofá: o <h1> só diferia de `acaros-colchao` numa
+    // maiúscula ("Anti-ácaros" contra "Anti-Ácaros"), que para um motor de
+    // pesquisa é o mesmo título. O corpo desta página já é o das horas de
+    // contacto direto com o colchão, e o título passa a dizê-lo.
+    title: "Alergias e Limpeza do Colchão | O Que Resolve | Kyro",
+    metaDescription: "Alergias e colchão: o que a limpeza profissional resolve, o que não resolve e o que diz a evidência. Peça orçamento com resposta em menos de 10 minutos.",
+    h1: "Alergias e Limpeza do Colchão",
     intro: "O colchão é o artigo da casa com que se passa mais horas em contacto direto, e com a cara a poucos centímetros da superfície. Isso torna-o diferente de qualquer outro estofo, e vale a pena perceber porquê antes de decidir o que fazer.",
     problemDetail: "São sete ou oito horas por noite de contacto direto, com o calor e a humidade do corpo a criarem exatamente as condições que os ácaros procuram, e com a zona de respiração a centímetros da superfície. A isto junta-se um detalhe de manutenção que passa despercebido: a face que fica virada para baixo acumula humidade junto à base da cama, e um colchão que nunca é rodado concentra sempre o desgaste e a carga nos mesmos pontos. Muitos colchões modernos têm camada de conforto de face única e não se viram, apenas se rodam, e a espuma viscoelástica absorve líquido com facilidade e liberta-o com dificuldade, o que faz de um derrame antigo um problema que a superfície não resolve.",
     solutionDetail: "Limpamos a superfície e as costuras com o método adequado ao revestimento, controlando a humidade que fica no colchão, porque acrescentar água a uma espuma que não seca depressa cria um problema pior do que aquele que se veio resolver. Damos atenção às duas faces sempre que o colchão o permita. Os tratamentos opcionais, como anti-ácaros ou desbacterização, são apresentados separadamente com objetivo e preço próprios. Não prometemos resolver alergias nem melhorar sintomas através da limpeza: é uma medida de ambiente, e o acompanhamento clínico é com o médico assistente.",
@@ -824,12 +833,12 @@ const problemDefinitions: ProblemPage[] = [
     title: "Empresa de Limpeza de Estofos Porto | Kyro Clean Solutions",
     metaDescription: `Kyro Clean Solutions: empresa profissional de limpeza de estofos no Porto. Sofás, colchões, cadeiras, tapetes. ${REVIEW_RATING} Google. Orçamento grátis.`,
     h1: "Empresa Profissional de Limpeza de Estofos",
-    intro: "Procura uma empresa fiável de limpeza de estofos? A Kyro Clean Solutions é especializada em limpeza profissional de sofás, colchões, cadeiras, tapetes e alcatifas no Porto e Norte de Portugal. Com ${REVIEW_RATING} no Google e mais de 1000 clientes satisfeitos.",
+    intro: `Procura uma empresa fiável de limpeza de estofos? A Kyro Clean Solutions é especializada em limpeza profissional de sofás, colchões, cadeiras, tapetes e alcatifas no Porto e Norte de Portugal. Com ${REVIEW_RATING} no Google e mais de 1000 clientes satisfeitos.`,
     problemDetail: "Escolher a empresa certa para limpar os seus estofos é importante. Equipamento inadequado pode danificar tecidos, e produtos baratos podem deixar resíduos prejudiciais. Uma empresa profissional garante resultados seguros e eficazes.",
     solutionDetail: "A Kyro Clean Solutions utiliza equipamento de extração profissional, produtos certificados e tem técnicos formados. Oferecemos serviço ao domicílio em todo o Porto e Norte de Portugal, com garantia de satisfação.",
     benefits: [
       `${REVIEW_RATING} Google: ${REVIEW_COUNT}+ avaliações reais`,
-      "+1100 clientes satisfeitos",
+      `${CLIENTS_SERVED_LABEL} clientes satisfeitos`,
       "Equipamento de extração profissional",
       "Produtos certificados e seguros",
       "Garantia de satisfação",
@@ -1168,9 +1177,9 @@ const problemDefinitions: ProblemPage[] = [
     metaDescription: "Limpeza profissional de sofá perto de si. Serviço ao domicílio no Porto, Lisboa e Norte de Portugal. Desde 49€. Orçamento grátis.",
     h1: "Limpeza de Sofá Perto de Si: Serviço ao Domicílio",
     intro: "Procura limpeza de sofá perto de si? A Kyro Clean Solutions cobre Porto, Lisboa e todo o Norte de Portugal com serviço ao domicílio. A nossa equipa desloca-se até à sua casa com todo o equipamento.",
-    problemDetail: "Quando pesquisa 'limpeza de sofá perto de mim', quer um serviço local, fiável e com boas avaliações. A Kyro Clean Solutions tem ${REVIEW_RATING} no Google, +1100 clientes satisfeitos e cobertura em todo o Norte de Portugal e região de Lisboa.",
+    problemDetail: `Quando pesquisa 'limpeza de sofá perto de mim', quer um serviço local, fiável e com boas avaliações. A Kyro Clean Solutions tem ${REVIEW_RATING} no Google, ${CLIENTS_SERVED_LABEL} clientes satisfeitos e cobertura em todo o Norte de Portugal e região de Lisboa.`,
     solutionDetail: "Atuamos no Porto e em Matosinhos, Maia, Gaia, Gondomar, Valongo, Braga, Guimarães, Póvoa de Varzim, Vila do Conde, Lisboa, Cascais, Oeiras, Sintra, Almada e Setúbal. Deslocação a partir de 10€, consoante a distância.",
-    benefits: ["Cobertura Norte de Portugal + Lisboa", "${REVIEW_RATING} Google", "+1100 clientes satisfeitos", "Deslocação a partir de 10€", "Desde 49€", "Resposta em menos de 10 minutos"],
+    benefits: ["Cobertura Norte de Portugal + Lisboa", `${REVIEW_RATING} Google`, `${CLIENTS_SERVED_LABEL} clientes satisfeitos`, "Deslocação a partir de 10€", "Desde 49€", "Resposta em menos de 10 minutos"],
     faqs: [
       { question: "Em que cidades fazem limpeza de sofá?", answer: "Servimos Porto e toda a área metropolitana, Braga, Guimarães, e região de Lisboa (Cascais, Oeiras, Sintra, Almada, Setúbal). Contacte-nos para confirmar disponibilidade na sua zona." },
     ],

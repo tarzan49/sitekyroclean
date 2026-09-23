@@ -1481,7 +1481,9 @@ export function prerenderRoutes(outDir: string): number {
         h1: 'Airbnb & short-term rental cleaning in Portugal',
         intro: desc,
         benefits: [
-          'Photograph damage before cleaning it — timestamped before/after is the standard most platforms ask for.',
+          // Dois-pontos, não travessão: o EnGuidePage.tsx já escreve esta frase
+          // assim, e o travessão é proibido em conteúdo visível do site.
+          'Photograph damage before cleaning it: timestamped before/after is the standard most platforms ask for.',
           'Same-day is often possible, but the earlier in the day you reach out, the better your odds.',
           'Prices start from €49 (sofa) / €59 (mattress); rugs are quoted per piece, always confirmed before we start.',
           'Before/after photo documentation is standard on every job, no need to request it separately.',
