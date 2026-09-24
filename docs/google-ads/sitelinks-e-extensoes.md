@@ -1,30 +1,32 @@
 # Sitelinks, callouts e snippets
 
-Ainda **não estão criados na conta**: dependem da mesma confirmação de identidade
-que bloqueia os anúncios. Textos prontos, com contagem de carateres, e todos os
-destinos verificados no `dist` (as páginas existem).
+**Sitelinks aplicados a 24/09/2026**, 6 por campanha, ao nível da campanha,
+nas duas campanhas `Kyro | Porto | …` e `Kyro | Lisboa | …`. Confirmado depois
+de recarregar a página: Recursos → Sitelink mostra 18 (os 6 antigos da
+`Campaign #1`, criados a 18/09, mais estes 12). Até esta data as duas campanhas
+estavam ativas **sem nenhum sitelink**: a campanha foi montada por
+carregamento em massa sem recursos e ninguém voltou a este ficheiro.
 
-## Sitelinks, 4 por campanha, ao nível da campanha
+Preços confirmados em `QuizTypes.ts` e `serviceCatalog.ts` no próprio dia:
+Premium desde 89€ (1 lugar), colchões desde 59€, cadeiras desde 20€.
 
-### Porto
+## Sitelinks aplicados (iguais nas duas cidades, só muda o destino)
 
-| Título (≤25) | Linha 1 (≤35) | Linha 2 (≤35) | Destino |
-|---|---|---|---|
-| Preço de Limpeza de Sofá `(24)` | Tabela de preços por tamanho `(28)` | Orçamento grátis em 10 minutos `(30)` | `/preco-limpeza-sofa-porto` |
-| Antes e Depois `(14)` | Fotografias de trabalhos reais `(30)` | Sofás, colchões e tapetes `(25)` | `/antes-depois-limpeza` |
-| Impermeabilização `(17)` | Essencial 59€ ou Premium 89€ `(28)` | Até 10 anos e 5 lavagens `(24)` | `/impermeabilizacao-porto` |
-| Limpeza de Colchões `(19)` | Colchões desde 59€ `(18)` | Com tratamento anti ácaros `(26)` | `/limpeza-colchoes-porto` |
+| Título (≤25) | Linha 1 (≤35) | Linha 2 (≤35) | Destino Porto | Destino Lisboa |
+|---|---|---|---|---|
+| Preço de Limpeza de Sofá | Tabela de preços por tamanho | Orçamento grátis em 10 minutos | `/preco-limpeza-sofa-porto` | `/preco-limpeza-sofa-lisboa` |
+| Antes e Depois | Fotografias de trabalhos reais | Sofás, colchões e tapetes | `/antes-depois-limpeza` | `/antes-depois-limpeza` |
+| Impermeabilização | Escolha Essencial ou Premium | Premium: até 10 anos sob condições | `/impermeabilizacao-porto` | `/impermeabilizacao-lisboa` |
+| Limpeza de Colchões | Colchões desde 59€ | Com tratamento anti ácaros | `/limpeza-colchoes-porto` | `/limpeza-colchoes-lisboa` |
+| Limpeza de Cadeiras | Desde 20€ por cadeira estofada | Preço menor por várias cadeiras | `/limpeza-cadeiras-porto` | `/limpeza-cadeiras-lisboa` |
+| Limpeza de Tapetes | Recolha e entrega ao domicílio | Orçamento à medida do seu tapete | `/limpeza-tapetes-porto` | `/limpeza-tapetes-lisboa` |
 
-### Lisboa
-
-| Título (≤25) | Linha 1 (≤35) | Linha 2 (≤35) | Destino |
-|---|---|---|---|
-| Preço de Limpeza de Sofá `(24)` | Tabela de preços por tamanho `(28)` | Orçamento grátis em 10 minutos `(30)` | `/preco-limpeza-sofa-lisboa` |
-| Antes e Depois `(14)` | Fotografias de trabalhos reais `(30)` | Sofás, colchões e tapetes `(25)` | `/antes-depois-limpeza` |
-| Impermeabilização `(17)` | Essencial 59€ ou Premium 89€ `(28)` | Até 10 anos e 5 lavagens `(24)` | `/impermeabilizacao-lisboa` |
-| Limpeza de Colchões `(19)` | Colchões desde 59€ `(18)` | Com tratamento anti ácaros `(26)` | `/limpeza-colchoes-lisboa` |
+Todos os URLs com `https://cleansolutions.com.pt` à frente; o sufixo de
+rastreio vem do nível da conta, não foi preciso pô-lo aqui.
 
 ## Callouts, partilhados pelas duas campanhas (≤25)
+
+**Aplicados a 24/09/2026 ao nível da conta** (valem para todas as campanhas), os seis abaixo, como estão. Garantia 48h, "menos de 10 minutos", 4,9★ e +1100 confirmados em `commercialPolicy.ts` e `business.ts` no próprio dia.
 
 - Orçamento grátis `(16)`
 - Resposta em 10 minutos `(22)`
@@ -35,6 +37,8 @@ destinos verificados no `dist` (as páginas existem).
 
 ## Structured snippet, cabeçalho "Serviços"
 
+**Aplicado a 24/09/2026 ao nível da conta**, com seis valores: Higienização de sofás · Impermeabilização · Tratamento anti ácaros · Remoção de manchas · Limpeza de colchões · Limpeza de tapetes. (O plano abaixo tinha quatro.)
+
 Higienização · Impermeabilização · Tratamento anti ácaros · Remoção de manchas
 
 
@@ -42,6 +46,20 @@ Higienização · Impermeabilização · Tratamento anti ácaros · Remoção de
 
 Número 925 530 647, com o mesmo horário da campanha (segunda a sábado, 08:00 às 00:00).
 
+
+## Nome da empresa e logótipo
+
+**Aplicados a 24/09/2026 ao nível da conta.** Nome: "Kyro Clean Solutions" (o
+Google exige que corresponda ao domínio ou ao anunciante validado; ficou com o
+"Clean Solutions" do domínio, pode não ser aprovado). Logótipo: a versão com
+fundo transparente que já estava na biblioteca de recursos da conta.
+
+## Imagens
+
+**Nenhuma aplicada.** Foram carregadas e retiradas antes de guardar, a pedido
+do dono: fotos de "antes" sozinhas e a da mancha de vinho não fazem sentido num
+anúncio. As candidatas estão em `~/Documents/KYRO_AD_FACTORY/google_ads_fotos_candidatas/`
+(fora do repositório), para escolher com o dono.
 
 ## Porque não há extensão de WhatsApp
 
