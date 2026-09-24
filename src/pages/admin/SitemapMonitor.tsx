@@ -227,20 +227,20 @@ const SitemapMonitor = () => {
                   </div>
                 )}
 
-                <div className="flex items-center gap-2">
-                  <code className="flex-1 text-[10px] font-mono text-gray-400 bg-gray-50 px-2 py-1.5 rounded-lg border border-gray-100 truncate">
+                <a
+                  href={`${SITE_URL}/${sm.file}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  title="Abrir XML"
+                  className="group/xml flex items-center gap-2"
+                >
+                  <code className="flex-1 text-[10px] font-mono text-gray-400 bg-gray-50 px-2 py-1.5 rounded-lg border border-gray-100 truncate group-hover/xml:text-gold group-hover/xml:border-gold/30 transition-colors">
                     /{sm.file}
                   </code>
-                  <a
-                    href={`${SITE_URL}/${sm.file}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    title="Abrir XML"
-                    className="p-1.5 rounded-lg border border-gray-200 text-gray-400 hover:text-gold hover:border-gold/30 transition-colors flex-shrink-0"
-                  >
+                  <span className="p-1.5 rounded-lg border border-gray-200 text-gray-400 group-hover/xml:text-gold group-hover/xml:border-gold/30 transition-colors flex-shrink-0">
                     <ExternalLink className="w-3.5 h-3.5" />
-                  </a>
-                </div>
+                  </span>
+                </a>
               </div>
 
               {/* ── Drill-down URL list ── */}
@@ -254,18 +254,17 @@ const SitemapMonitor = () => {
                   </div>
                   <div className="max-h-72 overflow-y-auto space-y-0.5 pr-1">
                     {cachedUrls.slice(0, 100).map((url, i) => (
-                      <div key={i} className="flex items-center gap-2 px-2 py-1 rounded-lg hover:bg-white transition-colors group">
-                        <code className="flex-1 text-[11px] font-mono text-gray-500 truncate">{url}</code>
-                        <a
-                          href={`${SITE_URL}${url}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-gray-300 group-hover:text-gray-500 hover:text-gold transition-colors flex-shrink-0"
-                          title="Abrir"
-                        >
-                          <ExternalLink className="w-3 h-3" />
-                        </a>
-                      </div>
+                      <a
+                        key={i}
+                        href={`${SITE_URL}${url}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        title="Abrir"
+                        className="flex items-center gap-2 px-2 py-1 rounded-lg hover:bg-white transition-colors group"
+                      >
+                        <code className="flex-1 text-[11px] font-mono text-gray-500 group-hover:text-gold truncate transition-colors">{url}</code>
+                        <ExternalLink className="w-3 h-3 text-gray-300 group-hover:text-gold transition-colors flex-shrink-0" />
+                      </a>
                     ))}
                     {cachedUrls.length > 100 && (
                       <p className="text-center text-xs text-gray-400 py-2">
