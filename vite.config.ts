@@ -73,6 +73,23 @@ function prerenderPlugin(): Plugin {
   };
 }
 
+// CSP hash plugin — swaps 'unsafe-inline' in _headers for a hash of the
+// actual inline script, once index.html and _headers are both in dist.
+function cspHashPlugin(): Plugin {
+  return {
+    name: 'inject-csp-script-hash',
+    closeBundle: {
+      sequential: true,
+      async handler() {
+        const { injectCspScriptHash } = await import('./scripts/generate-csp-hash');
+        const outDir = path.resolve(__dirname, 'dist');
+        const cspHash = injectCspScriptHash(outDir);
+        console.log(`\n🔒 CSP script-src hash: ${cspHash}\n`);
+      },
+    },
+  };
+}
+
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
   server: {
@@ -84,6 +101,7 @@ export default defineConfig(({ mode }) => ({
     sitemapPlugin(),
     llmsTxtPlugin(),
     prerenderPlugin(),
+    cspHashPlugin(),
   ],
   resolve: {
     alias: {
