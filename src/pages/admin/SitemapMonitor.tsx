@@ -229,8 +229,6 @@ const SitemapMonitor = () => {
 
                 <a
                   href={`${SITE_URL}/${sm.file}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
                   title="Abrir XML"
                   className="group/xml flex items-center gap-2"
                 >
@@ -257,8 +255,6 @@ const SitemapMonitor = () => {
                       <a
                         key={i}
                         href={`${SITE_URL}${url}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
                         title="Abrir"
                         className="flex items-center gap-2 px-2 py-1 rounded-lg hover:bg-white transition-colors group"
                       >
