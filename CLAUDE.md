@@ -292,8 +292,12 @@ pedido.
 **etiqueta** de gtag; qualificado e cliente usam o **nome da ação** de conversão
 e um identificador de clique. Tratar as três como etiquetas produzia ficheiros
 que o Google Ads rejeita. Uma só conversão principal (o lead); qualificado e
-cliente ficam secundárias. Cliques em WhatsApp/telefone são microações e nunca
-entram num objetivo que os torne relevantes para os lances. **Nunca importar o
+cliente ficam secundárias. Cliques em telefone são microações e nunca
+entram num objetivo que os torne relevantes para os lances. **Exceção decidida
+pelo dono a 2026-09-24: o clique no WhatsApp dentro do site ("WhatsApp - clique
+no site", importado do GA4) é conversão principal** no Google Ads, porque é onde
+as pessoas mais clicam e o lead já chega aquecido. Não sugerir passá-lo a
+secundário. No painel interno continua separado dos leads. **Nunca importar o
 mesmo lead do GA4 e da tag nativa como duas conversões principais.**
 
 **Exportar não é importar.** `conversion_exports` guarda `queued`, `exported`,

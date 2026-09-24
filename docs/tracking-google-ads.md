@@ -696,13 +696,16 @@ secundária a **principal** e o objetivo "Enviar formulários de leads" passou a
 **predefinição da conta** (3 de 3 campanhas), confirmado com recarregamento.
 Falta a validação em produção com um pedido real.
 
-**Estado dos cliques de contacto no Google Ads, por decidir:** "WhatsApp -
-clique no site" é uma importação do GA4 e está como **principal** no objetivo
-predefinido "Contactos". Isto contraria a regra de que os cliques são
-microações fora dos lances. Com "Maximizar cliques" não tem efeito nos lances,
-mas conta na coluna "Conversões". **Antes de mudar a estratégia de lances para
-conversões, passar esta ação a secundária.** O `phone_click` não está
-importado no Google Ads.
+**Clique no WhatsApp como conversão principal: decisão do dono (24/09/2026).**
+"WhatsApp - clique no site" (importação do GA4, objetivo predefinido
+"Contactos") fica **principal** de propósito: é onde a maioria das pessoas
+clica e onde o lead chega já aquecido, e cerca de 85-90% dos pedidos vêm por
+WhatsApp. Isto substitui, só para o WhatsApp, a regra de que os cliques de
+contacto são microações fora dos lances. **Não voltar a sugerir passá-la a
+secundária.** Consequência a ter presente ao ler os números: a coluna
+"Conversões" do Google Ads soma cliques no WhatsApp e pedidos confirmados, que
+não são a mesma coisa; o painel interno continua a separá-los. O `phone_click`
+não está importado no Google Ads.
 
 **Defeito corrigido na mesma passagem:** cinco âncoras `tel:` (rodapé PT e EN,
 hero mobile, CTA final, página 404) ainda tinham `onClick={() =>
