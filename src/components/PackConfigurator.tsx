@@ -162,10 +162,11 @@ export default function PackConfigurator({ initialKinds, initialExtra = 'none', 
   };
 
   // Em desktop, localidade e resumo ficam numa coluna à direita dos artigos, para o configurador caber num só ecrã.
-  // Com um só cartão, a grelha dos artigos teria a segunda coluna vazia: o resumo passa a ocupar esse lugar, logo ao lado do cartão.
+  // Com um só cartão, a grelha dos artigos teria a segunda coluna vazia: cartão e resumo ficam juntos e centrados,
+  // com as mesmas larguras que têm quando há vários cartões (metade da coluna dos artigos + 320px).
   const singleGroup = groups.length === 1;
   return (
-    <div className={cn('space-y-4 lg:grid lg:grid-rows-[auto_1fr_auto] lg:gap-x-4 lg:gap-y-3 lg:space-y-0', singleGroup ? 'lg:grid-cols-2' : 'lg:grid-cols-[minmax(0,1fr)_320px]')}>
+    <div className={cn('space-y-4 lg:grid lg:grid-rows-[auto_1fr_auto] lg:gap-x-4 lg:gap-y-3 lg:space-y-0', singleGroup ? 'lg:grid-cols-[minmax(0,calc((100%_-_348px)/2))_320px] lg:justify-center' : 'lg:grid-cols-[minmax(0,1fr)_320px]')}>
       <label className="flex items-center gap-3 rounded-xl border border-white/15 bg-checker-modal text-white px-3 py-2 lg:col-start-2 lg:row-start-1 lg:py-1">
         <span className="shrink-0 text-xs font-semibold uppercase tracking-wider text-white/60">Localidade</span>
         <select className="h-9 min-w-0 flex-1 bg-transparent text-base font-semibold text-white outline-none [&>option]:text-[#111111]" value={city} onChange={e => setCity(e.target.value)}>
