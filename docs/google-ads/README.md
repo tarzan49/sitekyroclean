@@ -66,7 +66,7 @@ Senhor dos Sofás anuncia 1 hora. Isso não se resolve com texto de anúncio.
 
 | Objeto | Estado |
 |---|---|
-| **Kyro \| Porto \| Limpeza e Proteção de Sofás \| Set 2026** | Criada, **em pausa**. 2 grupos: Limpeza de Sofás (12 palavras-chave), Impermeabilização de Sofás (7). Orçamento **13,00 €/dia** (corrigido em 23/09, estava em 13,15), Maximizar cliques com limite de 1,50 €, só Pesquisa do Google |
+| **Kyro \| Porto \| Limpeza e Proteção de Sofás \| Set 2026** | Criada, **em pausa**. 2 grupos: Limpeza de Sofás (12 palavras-chave), Impermeabilização de Sofás (7). Orçamento **13,00 €/dia** (corrigido em 23/09, estava em 13,15), Maximizar cliques com limite de CPC de **2,00 €** (ver nota na secção 3), só Pesquisa do Google |
 | **Kyro \| Lisboa \| Limpeza e Proteção de Sofás \| Set 2026** | Idem, mesma estrutura e definições. Orçamento **27,00 €/dia** |
 | `Kyro \| Negativas partilhadas` | 101 negativas, aplicada às duas campanhas (23/09) |
 | `Campaign #1` | Intocada. É a campanha antiga de **Lisboa** (o anúncio dela lidera com "desde 49€"), em pausa (ativada mas **"Não elegível": todos os anúncios estão em pausa**, por isso não gasta), 15,20 € gastos, 0 conversões |
@@ -103,9 +103,17 @@ Duas campanhas iguais na estrutura, uma por cidade, cada uma com dois grupos:
 | Ângulo | prova social, preço fechado, resposta em 10 min, garantia 48 h | duração declarada, duas versões com preço, pack desde 99€ |
 
 Definições: só Rede de Pesquisa da Google (sem parceiros, sem Display),
-Maximizar cliques com limite de CPC de 1,50 €, orçamento 13,15 €/dia,
+Maximizar cliques com limite de CPC de **2,00 €** ao nível da campanha (as duas),
+orçamento 13,15 €/dia,
 **campanhas em pausa** e grupos ativos. Quando os anúncios existirem, ativar a
 campanha passa a ser o único interruptor que falta.
+
+**Limite de CPC (corrigido a 24/09/2026):** o "1,50 €" estava só no CPC máximo
+dos grupos de anúncios, que a estratégia "Maximizar cliques" ignora. Ao nível da
+campanha não havia limite nenhum. Passou a 2,00 € nas duas campanhas, porque a
+estimativa da Google para o Porto é ~1,56 € e a campanha antiga pagou 1,90 €.
+O limite de uma campanha com "Maximizar cliques" define-se em Definições →
+Lances → "Definir um limite de lance de custo por clique máximo".
 
 O grupo da impermeabilização leva as palavras-chave do pack
 ("limpeza e impermeabilização de sofás", "pack limpeza e impermeabilização
