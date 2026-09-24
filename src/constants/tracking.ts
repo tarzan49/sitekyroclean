@@ -78,16 +78,16 @@ export const GOOGLE_TAG_ID = env('VITE_GOOGLE_TAG_ID') ?? 'GT-M6XTKMC7';
  * Etiqueta da conversão de **website** do lead confirmado.
  *
  * É a parte depois da barra em `AW-18457115875/AbC-D_efGhIj`, e só serve para
- * o `send_to` de um `gtag('event', 'conversion', …)`. Não existe até alguém
- * criar a ação de conversão na interface do Google Ads, por isso **não tem
- * valor por omissão**: uma etiqueta inventada envia conversões para o vazio e
- * parece que funciona.
- *
- * Sem etiqueta, `trackLeadEvent()` continua a enviar o evento para o GA4 e o
- * lead é gravado com a atribuição toda — só a conversão do Ads fica por enviar,
- * e o painel di-lo em vez de mostrar zero.
+ * o `send_to` de um `gtag('event', 'conversion', …)`. O valor por omissão foi
+ * copiado a 24/09/2026 do fragmento do evento da ação "Pedido confirmado
+ * (website)" (ID de tipo de conversão 7776203701), não escrito de memória: uma
+ * etiqueta inventada envia conversões para o vazio e parece que funciona. Se a
+ * ação for recriada, a etiqueta muda e tem de ser copiada de novo de lá.
  */
-export const ADS_LEAD_CONVERSION_LABEL = env('VITE_GOOGLE_ADS_LEAD_CONVERSION_LABEL');
+export const PRODUCTION_ADS_LEAD_CONVERSION_LABEL = 'ewA0CLXn_fscEOP5hOFE';
+
+export const ADS_LEAD_CONVERSION_LABEL =
+  env('VITE_GOOGLE_ADS_LEAD_CONVERSION_LABEL') ?? PRODUCTION_ADS_LEAD_CONVERSION_LABEL;
 
 /**
  * Nomes das ações de conversão **offline** (lead qualificado e cliente).

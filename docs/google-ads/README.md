@@ -13,7 +13,7 @@ título passar dos 30 carateres ou uma descrição dos 90.
 
 | Empresa | Limpeza de sofá | Impermeabilização | Secagem | Prova social | Zona |
 |---|---|---|---|---|---|
-| **Kyro** | 49€ (1L) · 69€ (2L) · 79€ (3L) | **Essencial 59€ · Premium 89€** (1L) | 3 a 6 h | 4,9 · 110 avaliações · +1100 clientes | Porto, Braga, Lisboa, Algarve |
+| **Kyro** | 49€ (1L) · 69€ (2L) · 79€ (3L) | **Essencial 59€ · Premium 89€** (1L) | 3 a 6 h | 4,9 · 125 avaliações · +1100 clientes | Porto, Braga, Lisboa, Algarve |
 | EcoLimpeza | **49€ um sofá de 3 lugares** (+10€/módulo) | não anuncia | 2 a 4 h | 5,0 · 36 avaliações | Porto, Gaia, Matosinhos, Maia, Braga, Aveiro |
 | O Janota | 65€ (2L) · 70€ (3L) · 75€ (4L) | 100€ (2L) · 110€ (3L) · 125€ (4L) | não diz | 5,0 · 115 avaliações | Grande Porto, Grande Lisboa, Margem Sul, Algarve |
 | DeepClean | desde 60€ | sim, 10% de desconto com limpeza, preço não publicado | 4 a 6 h | 5,0 · **400 avaliações** | Grande Lisboa, Grande Porto, Setúbal |
@@ -55,9 +55,10 @@ garantida" sem dizer o que isso significa).
 editorial já tomada e por não ser verificável. Ganha-se a comparação com
 especificidade, não com um número maior.
 
-**Onde a Kyro está em desvantagem, e convém saber:** 110 avaliações é a meio da
-tabela (O Janota 115, DeepClean 400). A EcoLimpeza seca em 2 a 4 horas contra as
-3 a 6 da Kyro. Nenhuma destas se resolve com texto de anúncio.
+**Prova social, onde a Kyro está:** 125 avaliações passam à frente do O Janota
+(115) e da EcoLimpeza (36), e ficam atrás só da DeepClean (400). **Onde está em
+desvantagem:** a EcoLimpeza seca em 2 a 4 horas contra as 3 a 6 da Kyro, e o
+Senhor dos Sofás anuncia 1 hora. Isso não se resolve com texto de anúncio.
 
 ---
 
@@ -65,10 +66,16 @@ tabela (O Janota 115, DeepClean 400). A EcoLimpeza seca em 2 a 4 horas contra as
 
 | Objeto | Estado |
 |---|---|
-| **Kyro \| Porto \| Sofás \| Limpeza e Proteção** | Criada, **em pausa**. 2 grupos: Limpeza de Sofás (12 palavras-chave), Impermeabilização de Sofás (7). Orçamento 13,15 €/dia, Maximizar cliques com limite de 1,50 €, só Pesquisa do Google |
-| **Kyro \| Lisboa \| Limpeza e Proteção de Sofás \| Set 2026** | Idem, mesma estrutura e definições |
-| `Kyro \| Negativas partilhadas` | 101 negativas, aplicada a 0 campanhas |
-| `Campaign #1` | Intocada. É a campanha antiga de **Lisboa** (o anúncio dela lidera com "desde 49€"), em pausa, 15,20 € gastos, 0 conversões |
+| **Kyro \| Porto \| Limpeza e Proteção de Sofás \| Set 2026** | Criada, **em pausa**. 2 grupos: Limpeza de Sofás (12 palavras-chave), Impermeabilização de Sofás (7). Orçamento **13,00 €/dia** (corrigido em 23/09, estava em 13,15), Maximizar cliques com limite de 1,50 €, só Pesquisa do Google |
+| **Kyro \| Lisboa \| Limpeza e Proteção de Sofás \| Set 2026** | Idem, mesma estrutura e definições. Orçamento **27,00 €/dia** |
+| `Kyro \| Negativas partilhadas` | 101 negativas, aplicada às duas campanhas (23/09) |
+| `Campaign #1` | Intocada. É a campanha antiga de **Lisboa** (o anúncio dela lidera com "desde 49€"), em pausa (ativada mas **"Não elegível": todos os anúncios estão em pausa**, por isso não gasta), 15,20 € gastos, 0 conversões |
+| **Localizações (23/09)** | Porto: **Presença**, 16 dos 17 municípios da AMP (todos exceto Arouca — ver armadilha nona abaixo). Lisboa: **Presença**, os 18 municípios da AML + Setúbal. Ver secção 3 |
+| **Idioma (23/09)** | Português, nas duas — estava "Todos os idiomas" |
+| **Horário (23/09)** | Confirmado sem restrição nas duas (o padrão do Google Ads já é 24/7 quando a secção "Programação de anúncios" está vazia) — corresponde à disponibilidade real, não foi preciso criar nada |
+| **Sufixo de URL final (23/09)** | Aplicado em **Definições da conta** (nível de conta, cobre as duas campanhas automaticamente via `{campaignid}`). Testado com "Testar configuração de acompanhamento": resolve para `limpeza-sofas-lisboa?ads=1&utm_source=google&...`, página de destino encontrada |
+| **Chamada (Call asset)** | Já existia antes desta sessão, a nível de **conta** (não por campanha): 925 530 647, Portugal, elegível, relatório de chamadas ativado. Aplica-se às duas campanhas automaticamente por estar ao nível da conta — não foi preciso criar nada |
+| **Objetivo de conversão específico da campanha** | **Não persiste** — ver décima armadilha abaixo. As duas campanhas continuam em "Predefinição da conta" |
 
 **Os 4 anúncios não entraram.** É a única peça que falta e o motivo está no ponto
 3: o Google recusa criar anúncios nesta conta, tanto pelo carregamento em massa
@@ -76,12 +83,14 @@ tabela (O Janota 115, DeepClean 400). A EcoLimpeza seca em 2 a 4 horas contra as
 oferece** a opção de criar um anúncio de pesquisa adaptável dentro do grupo. Sem
 anúncios, as campanhas não podem servir mesmo que sejam ativadas.
 
-**Nota sobre os nomes:** a campanha do Porto não pôde chamar-se
-"Kyro | Porto | Limpeza e Proteção de Sofás | Set 2026" porque existe um rascunho
-do assistente com esse nome exato, e o carregamento em massa aplica-lhe as linhas
-em vez de criar a campanha (foi o que aconteceu à primeira tentativa: Lisboa foi
-criada, Porto desapareceu dentro do rascunho). Ficaram com nomes diferentes;
-uniformizar é uma renomeação manual de um minuto.
+**Nota sobre os nomes.** À primeira tentativa, o Porto não foi criado: existia um
+rascunho do assistente com o nome exato "Kyro | Porto | Limpeza e Proteção de
+Sofás | Set 2026", e o carregamento em massa aplicou-lhe as linhas em vez de
+criar a campanha (Lisboa foi criada, o Porto desapareceu lá dentro). Foi criado
+com um nome provisório e, depois de o rascunho deixar de existir, renomeado para
+o nome definitivo. **Os dois nomes estão agora iguais**, e o `gerar-csv.py` usa
+exatamente estes: mudá-los ali passa a criar campanhas duplicadas em vez de
+atualizar as que existem.
 
 ## 3. As campanhas, como estão desenhadas
 
@@ -122,28 +131,74 @@ as alterações".
 partilhada, que persistiu). Por isso o caminho é o carregamento em massa, não o
 assistente.
 
+**Correção (23/09, mais tarde no mesmo dia):** o dono abriu a conta e não viu
+pedido de identidade nenhum. Confirmado em **Admin → Política → Conta →
+"Validação de anunciantes"**: todas as tarefas concluídas (perguntas a 21/09,
+documentos a 22/09, declaração de anúncios políticos da UE a 22/09), e o sino
+de notificações diz "Obrigado por ter efetuado a validação!". Ou seja, o
+diálogo "Confirme a sua identidade" que apareceu dentro do assistente **não é**
+a validação de anunciantes, ou estava desatualizado. O que continua
+observavelmente bloqueado: em qualquer página de Anúncios (conta inteira ou
+dentro de um grupo), o "+" só oferece "Anúncio dinâmico de pesquisa" e
+"Variação do anúncio", e o menu "Criar" (canto superior esquerdo) não tem a
+entrada "Anúncio". As duas campanhas têm 2 grupos cada, com palavras-chave e
+zero anúncios. **Não voltar a dizer ao dono para confirmar a identidade sem
+apontar para um ecrã concreto.** Passo seguinte: carregamento em massa das 4
+linhas de anúncio do CSV (secção 5, ponto 2), ou suporte do Google Ads.
+
 ---
+
+**Resolvido a 24/09/2026: não havia bloqueio nenhum.** Duas coisas:
+
+1. **A interface em português chama "Anúncio dinâmico de pesquisa" ao anúncio
+   de pesquisa adaptável (RSA).** Os 4 anúncios carregados, com 15 títulos e 4
+   descrições cada, aparecem na coluna "Tipo de anúncio" exatamente com esse
+   nome, e o da `Campaign #1` também é um RSA. A opção do "+" era a certa desde
+   o início. Não confundir com os DSA a sério (que não têm títulos escritos).
+2. **O carregamento em massa recusava os anúncios por causa do valor da coluna
+   `Ad type`:** tem de ser o valor em inglês, `Responsive search ad`, mesmo com
+   a interface em português. `gerar-csv.py` já escreve esse valor.
+3. **Com duas campanhas com o mesmo nome** (a duplicada do `porto-apenas.csv`,
+   removida), o carregamento dá "Valor em falta em ID da campanha". Resolve-se
+   acrescentando a coluna `Campaign ID` (Porto: `24286916320`).
+
+Os 4 anúncios foram criados a 24/09/2026 e as duas campanhas foram **ativadas
+no mesmo dia** (Lisboa 27 €/dia, Porto 13 €/dia; confirmado com recarregamento
+completo). Começam a servir quando a Google aprovar os anúncios. A `Campaign #1`
+continua em pausa. Depois de ativar, o ícone do Porto ainda mostrou pausa durante
+um bocado. **O ícone do estado demora a atualizar:** confirmar sempre com uma
+recarga, e pelo "Total: conta" (que só soma campanhas ativas).
 
 ## 5. O que falta fazer
 
-1. **Confirmar a identidade no Google Ads.** É o que desbloqueia a criação dos
-   anúncios, e só o dono a pode fazer. Deixa de ser ignorável a **7/10/2026**.
+1. ~~Confirmar a identidade no Google Ads.~~ **Já está feita** (ver a correção
+   na secção 4). O que falta descobrir é o que esconde a opção "Anúncio de
+   pesquisa responsivo" nos menus.
 2. **Criar os 4 anúncios.** Os textos estão em `campanhas-porto-lisboa.csv`
    (linhas com `Ad type`), prontos a colar. Ou repetir o carregamento do ficheiro:
    as campanhas, grupos e palavras-chave já existem, por isso só as 4 linhas de
    anúncio é que têm trabalho novo para fazer.
+3. **Repetir a tentativa do objetivo de conversão específico** depois de a
+   identidade estar confirmada — ver décima armadilha.
+4. **Arouca não tem entidade própria no Google Ads** (nem "cidade" nem
+   "município" — só devolve "Localizações relacionadas" sem correspondência
+   direta). Porto ficou com 16 dos 17 municípios da AMP. Se o Google vier a
+   indexar a localização no futuro, adicionar aí.
 
-### Depois de aplicar, na interface (o carregamento não cobre isto)
+### Já aplicado na interface (23/09/2026)
 
 | Definição | Porto | Lisboa |
 |---|---|---|
-| Localizações | Gondomar, Maia e Matosinhos como **município**; Porto, Valongo e Vila Nova de Gaia como **cidade** (estas três não têm entidade "município" no Google) | Lisboa e os concelhos da AML em `src/constants/travel.ts` |
-| Opção de localização | **Presença**, nunca "presença ou interesse" | idem |
+| Localizações | 16 dos 17 municípios da AMP, **município** onde existe essa entidade, **cidade** como alternativa (Amadora, Valongo, Espinho, Felgueiras, Lousada, Vila do Conde\*, etc. só têm "cidade"). Falta só Arouca | Lisboa e os 17 concelhos da AML + Setúbal, mesma lógica município/cidade |
+| Opção de localização | **Presença**, nunca "presença ou interesse" — confirmado | idem |
 | Idioma | Português | Português |
-| Horário | Segunda a sábado, 08:00 às 00:00 | idem |
-| Sufixo de URL final | `docs/tracking-google-ads.md`, secção 10 | idem, com o seu `utm_campaign` |
-| Lista de exclusões | aplicar `Kyro \| Negativas partilhadas` (101 negativas, já criada) | idem |
-| Objetivo de conversão | só **"Kyro \| Pedido confirmado"** | idem |
+| Horário | Sem restrição (= 24/7, o padrão do Google Ads) | idem |
+| Sufixo de URL final | Aplicado ao nível da conta, cobre as duas | idem |
+| Lista de exclusões | `Kyro \| Negativas partilhadas` aplicada | idem |
+| Chamada | 925 530 647, ao nível da conta, cobre as duas | idem |
+| Objetivo de conversão | **Tentado, não persiste** — ver décima armadilha | idem |
+
+\* Vila do Conde tinha também `município`, foi essa a entidade escolhida.
 
 ---
 
@@ -153,9 +208,41 @@ assistente.
    15,20 € em 8 cliques com **0 conversões**. Antes de subir o orçamento,
    confirmar que a ação "Kyro | Pedido confirmado" está mesmo a receber dados;
    `docs/tracking-google-ads.md` diz que nada disto foi validado em produção.
-2. **13,15 €/dia é um teto, não uma previsão.** A estimativa da própria Google
+2. **13,00 €/dia é um teto, não uma previsão.** A estimativa da própria Google
    para as palavras-chave de limpeza do Porto foi de cerca de **14 € por
    semana**, a 1,56 € de CPC.
+
+---
+
+## 7. Décima armadilha (23/09/2026): "Objetivos de conversão específicos da campanha" aceita a escolha e depois não a guarda
+
+Testado nas duas campanhas, duas vezes cada, com confirmação por recarregamento
+completo da página (não só fechar o painel): abrir **Definições da campanha →
+Objetivos de conversão → Específico da campanha → selecionar "Kyro | Pedido
+confirmado" → Guardar**. O painel fecha, mostra a seleção nova, sem erro
+visível. Recarregar a página do zero e reabrir: voltou a "Predefinição da
+conta".
+
+**O que não é isto:** não é o mesmo bloqueio documentado na terceira armadilha
+para o assistente de criação de campanhas — aquele mostrava "Falha ao guardar
+as alterações" no rodapé; este não mostra erro nenhum. E não é um problema
+geral de guardar definições desta campanha: no mesmo painel, **Localizações**
+(16 e 18 municípios) e **Idiomas** (Português) guardaram e sobreviveram ao
+recarregamento sem problema. É especificamente este campo.
+
+**Suspeita, não confirmada:** dado que o resto da conta está bloqueado por
+"Confirme a sua identidade" (quarta seção acima) e o prazo é o mesmo
+(7/10/2026), é razoável assumir que este campo passa pelo mesmo portão —
+gerir objetivos de conversão é uma ação de "conta", tal como criar anúncios.
+Mas isto não foi verificado a sério (não há forma de testar sem a identidade
+confirmada). **Confirmar depois de 7/10/2026:** se persistir mesmo depois da
+identidade confirmada, é um bug à parte, não este bloqueio.
+
+**Impacto enquanto isto não estiver resolvido:** as duas campanhas reportam
+conversões pelos objetivos predefinidos da conta ("Contactos", "Leads a partir
+de mensagens"), não só por "Kyro | Pedido confirmado". Não impede a campanha
+de servir nem de otimizar lances — é só um problema de relatório, o mesmo tipo
+de degradação sem mentir que outras armadilhas desta lista já tiveram.
 
 ---
 

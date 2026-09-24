@@ -29,6 +29,8 @@ IMPER_PREMIUM= le("src/components/quiz/QuizTypes.ts", r"id: '1-lugar',.*?waterpr
 PACK_1L      = le("src/components/quiz/QuizTypes.ts", r"id: '1-lugar',.*?bothPrice: (\d+)")
 
 PREP = {"Porto": "no Porto", "Lisboa": "em Lisboa"}
+# Decisão do dono (23/09/2026): Lisboa arranca com o dobro do Porto.
+ORCAMENTO = {"Porto": "13,00", "Lisboa": "27,00"}
 
 def limpeza(city):
     c, em = city.lower(), PREP[city]
@@ -45,7 +47,7 @@ def limpeza(city):
                    f"{REVIEWS} Avaliações no Google", f"{RATING} Estrelas no Google",
                    f"{CLIENTES} Clientes Servidos", "Resposta em 10 Minutos",
                    "Orçamento Grátis no WhatsApp", "Preço Fechado Antes de Marcar",
-                   "Repetimos se Não Gostar", "Limpeza ao Domicílio", "Seca em 3 a 6 Horas",
+                   "Garantia de Repetição", "Limpeza ao Domicílio", "Seca em 3 a 6 Horas",
                    "Manchas, Pelos e Odores", "Sofá Limpo sem Sair de Casa",
                    f"Equipa Própria {em}", "Limpe e Proteja no Mesmo Dia"],
         descriptions=[
@@ -66,26 +68,22 @@ def imper(city):
                   "impermeabilização de sofás preço", "quanto custa impermeabilizar um sofá",
                   "pack limpeza e impermeabilização sofá"],
         headlines=["Impermeabilização de Sofás", f"Impermeabilizar Sofá {city}",
-                   "Premium: Até 10 Anos", "Resiste a Até 5 Lavagens",
-                   f"Essencial {IMPER_ESSENC}€, Premium {IMPER_PREMIUM}€",
-                   "Duas Versões, Preço à Vista", f"Pack com Limpeza Desde {PACK_1L}€",
-                   f"{RATING} Estrelas no Google", f"{REVIEWS} Avaliações no Google",
-                   f"{CLIENTES} Clientes Servidos", "Orçamento Grátis no WhatsApp",
-                   "Aplicação ao Domicílio", "Limpe e Proteja no Mesmo Dia",
-                   "Resposta em 10 Minutos", "Essencial Dura 1 a 2 Anos"],
+                   "Vinho, Café e Sumo no Sofá", "Derrames Ficam à Superfície",
+                   "Limpa com um Pano, Sem Nódoa", "Proteja Antes da Próxima Nódoa",
+                   "Crianças e Animais em Casa?", "Premium: Até 10 Anos",
+                   "Resiste a Até 5 Lavagens", f"Essencial {IMPER_ESSENC}€, Premium {IMPER_PREMIUM}€",
+                   f"Pack com Limpeza Desde {PACK_1L}€", f"{RATING} Estrelas no Google",
+                   f"{REVIEWS} Avaliações no Google", "Aplicação ao Domicílio",
+                   "Orçamento Grátis no WhatsApp"],
         descriptions=[
+            "Vinho, café ou sumo entornados ficam à superfície e saem com um pano seco.",
             f"Impermeabilização de sofás ao domicílio {em}. Essencial desde {IMPER_ESSENC}€, Premium desde {IMPER_PREMIUM}€.",
             "A Premium protege até 10 anos e resiste a até 5 lavagens. A Essencial, 1 a 2 anos.",
-            f"Limpeza e proteção na mesma visita, em pack desde {PACK_1L}€. Orçamento grátis, sem compromisso.",
-            f"{RATING} estrelas no Google com {REVIEWS} avaliações reais. Resposta em menos de 10 minutos."],
+            f"Limpeza e proteção na mesma visita, em pack desde {PACK_1L}€. {RATING} estrelas no Google."],
     )
 
-# O nome do Porto não pode ser "Kyro | Porto | Limpeza e Proteção de Sofás | Set
-# 2026": existe um rascunho do assistente com esse nome exato, e o carregamento
-# em massa aplica-lhe as linhas em vez de criar a campanha (aconteceu em
-# 2026-09-23). Os dois nomes passaram a seguir este padrão.
-CAMPANHAS = [("Kyro | Porto | Sofás | Limpeza e Proteção", "Porto"),
-             ("Kyro | Lisboa | Sofás | Limpeza e Proteção", "Lisboa")]
+CAMPANHAS = [("Kyro | Porto | Limpeza e Proteção de Sofás | Set 2026", "Porto"),
+             ("Kyro | Lisboa | Limpeza e Proteção de Sofás | Set 2026", "Lisboa")]
 
 cols = ["Campaign", "Campaign Type", "Campaign Status", "Budget", "Bid Strategy Type", "Networks",
         "Anúncios políticos da UE",
@@ -96,14 +94,14 @@ cols += [f"Headline {i}" for i in range(1, 16)] + [f"Description {i}" for i in r
 rows = []
 for nome, city in CAMPANHAS:
     rows.append({"Campaign": nome, "Campaign Type": "Search", "Campaign Status": "Paused",
-                 "Budget": "13,15", "Bid Strategy Type": "Maximize clicks", "Networks": "Google search",
+                 "Budget": ORCAMENTO[city], "Bid Strategy Type": "Maximize clicks", "Networks": "Google search",
                  "Anúncios políticos da UE": "Não"})
     for g in (limpeza(city), imper(city)):
         rows.append({"Campaign": nome, "Ad Group": g["adgroup"], "Ad Group Status": "Enabled", "Max CPC": "1,50"})
         for kw in g["keywords"]:
             rows.append({"Campaign": nome, "Ad Group": g["adgroup"], "Keyword": kw,
                          "Criterion Type": "Expressão", "Status": "Enabled"})
-        ad = {"Campaign": nome, "Ad Group": g["adgroup"], "Ad type": "Anúncio de pesquisa adaptável",
+        ad = {"Campaign": nome, "Ad Group": g["adgroup"], "Ad type": "Responsive search ad",
               "Final URL": g["url"], "Path 1": g["p1"], "Path 2": g["p2"], "Status": "Enabled"}
         ad.update({f"Headline {i}": h for i, h in enumerate(g["headlines"], 1)})
         ad.update({f"Description {i}": d for i, d in enumerate(g["descriptions"], 1)})

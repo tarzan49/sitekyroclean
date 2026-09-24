@@ -687,6 +687,23 @@ produção não contém nenhum `AW-18457115875/<etiqueta>`, logo
 e pôr `VITE_GOOGLE_ADS_LEAD_CONVERSION_LABEL` no Cloudflare Pages). O painel
 avisa em Métricas → Estado da recolha e em Marketing enquanto faltar.
 
+**Atualização 24/09/2026: etiqueta instalada.** A ação "Pedido confirmado
+(website)" (ID de tipo 7776203701) já existia desde 18/09; a etiqueta
+`ewA0CLXn_fscEOP5hOFE` foi copiada do fragmento do evento e ficou como valor por
+omissão em `src/constants/tracking.ts` (é pública, como o `AW-`), por isso já
+não depende de configurar nada no Cloudflare. No Google Ads, a ação passou de
+secundária a **principal** e o objetivo "Enviar formulários de leads" passou a
+**predefinição da conta** (3 de 3 campanhas), confirmado com recarregamento.
+Falta a validação em produção com um pedido real.
+
+**Estado dos cliques de contacto no Google Ads, por decidir:** "WhatsApp -
+clique no site" é uma importação do GA4 e está como **principal** no objetivo
+predefinido "Contactos". Isto contraria a regra de que os cliques são
+microações fora dos lances. Com "Maximizar cliques" não tem efeito nos lances,
+mas conta na coluna "Conversões". **Antes de mudar a estratégia de lances para
+conversões, passar esta ação a secundária.** O `phone_click` não está
+importado no Google Ads.
+
 **Defeito corrigido na mesma passagem:** cinco âncoras `tel:` (rodapé PT e EN,
 hero mobile, CTA final, página 404) ainda tinham `onClick={() =>
 trackCallClick(…)}` por cima do delegado global. O helper não passava o evento
