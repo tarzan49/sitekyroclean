@@ -14,6 +14,9 @@ interface Props {
   title: string;
   subtitle?: string;
   serviceSlug: string;
+  // Páginas de pack combinam dois serviços — a galeria antes/depois
+  // intercala as duas categorias em vez de mostrar só a do serviceSlug.
+  secondaryServiceSlug?: string;
   city?: string;
   municipality?: string;
   price?: string;
@@ -26,11 +29,15 @@ interface Props {
 }
 
 /** Mandatory commercial hero order, shared by every service page family. */
-export default function CommercialHero({ title, subtitle, serviceSlug, city, municipality = city, price, image, breadcrumbs, whatsappHref, source, pricesHref = '#precos', preserveMobileHero = false }: Props) {
+export default function CommercialHero({ title, subtitle, serviceSlug, secondaryServiceSlug, city, municipality = city, price, image, breadcrumbs, whatsappHref, source, pricesHref = '#precos', preserveMobileHero = false }: Props) {
   const service = services.find(item => item.slug === serviceSlug);
   const background = image ?? pickServiceHero(serviceSlug, city ?? title);
   const imgs = typeof background === 'string' ? { m: background, d: background } : background;
-  const category = categoryForServiceSlug(serviceSlug);
+  const primaryCategory = categoryForServiceSlug(serviceSlug);
+  const secondaryCategory = categoryForServiceSlug(secondaryServiceSlug);
+  const category = primaryCategory && secondaryCategory && secondaryCategory !== primaryCategory
+    ? [primaryCategory, secondaryCategory]
+    : primaryCategory;
   const items = breadcrumbs ?? [{ label: 'Início', to: '/' }, { label: service?.name ?? title, to: service?.baseRoute }, ...(city ? [{ label: city }] : [])];
   const priceLine = commercialHeroPriceLine(serviceSlug, municipality, price);
   const words = title.trim().split(' ');

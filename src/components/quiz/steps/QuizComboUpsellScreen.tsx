@@ -14,6 +14,9 @@ import {
 interface QuizComboUpsellScreenProps {
   offerPreview?: boolean;
   travelFee?: number;
+  /** Preço de tabela do serviço principal (o que já vai ser cobrado antes de
+   * qualquer extra deste ecrã) — entra na conta do mínimo do preço de pack. */
+  primaryTablePrice?: number;
   primaryService: string;
   upsellItems: UpsellItemConfig[];
   setUpsellItems: (items: UpsellItemConfig[]) => void;
@@ -21,6 +24,7 @@ interface QuizComboUpsellScreenProps {
   onBack: () => void;
 }
 
+import { PACK_PERK_MIN_ORDER, perkChairsFree, perkChairsPrice, perkMattressPrice, perkSofaPrice } from '@/constants/packPerks';
 // Preço riscado (tabela normal) + preço com desconto em destaque — usado em
 // cada artigo deste upsell (pedido explícito do dono 2026-09-10: nada de
 // desconto de 10% sobre o pedido todo; cada artigo extra já vem com o seu
@@ -48,13 +52,7 @@ function fmt(n: number): string {
 // quantidades com os tamanhos/preços reais do negócio, em vez do fluxo
 // anterior de escolher um item de cada vez. Substitui QuizUpsellOverlay
 // no ponto "antes de finalizar" (pedido explícito, aprovado em mockup).
-const QuizComboUpsellScreen = ({ offerPreview = false, travelFee = 10, primaryService, upsellItems, setUpsellItems, onContinue, onBack }: QuizComboUpsellScreenProps) => {
-  const mattressUnitPrice = (opt: typeof mattressPrices[number]) => offerPreview && typeof opt.cleaningPrice === 'number' ? opt.cleaningPrice - 14 : opt.cleaningPrice;
-  // Preços fixos do sofá neste upsell (pedido explícito do dono, mesmo
-  // padrão do colchão acima): 1L 49→35€, 2L 69→55€, 3L 79→65€. "4+ Lugares"
-  // fica de fora (sempre sob orçamento, sem preço fixo possível).
-  const SOFA_OFFER_PRICE: Record<string, number> = { '1-lugar': 35, '2-lugares': 55, '3-lugares': 65 };
-  const sofaUnitPrice = (opt: typeof sofaPrices[number]) => offerPreview && typeof opt.cleaningPrice === 'number' ? (SOFA_OFFER_PRICE[opt.id] ?? opt.cleaningPrice) : opt.cleaningPrice;
+const QuizComboUpsellScreen = ({ offerPreview = false, travelFee = 10, primaryTablePrice = 0, primaryService, upsellItems, setUpsellItems, onContinue, onBack }: QuizComboUpsellScreenProps) => {
   const casalSeparate = Number(mattressPrices.find(opt => opt.id === 'casal')!.cleaningPrice) + travelFee;
   const [initialChairs] = useState(() => upsellItems.find(i => i.id === 'chairs'));
   const [preservedTreatments] = useState(() => upsellItems.filter(i => i.id.endsWith('-anti-acaros')));
@@ -90,8 +88,29 @@ const QuizComboUpsellScreen = ({ offerPreview = false, travelFee = 10, primarySe
   // principal lá atrás — oferecer proteção outra vez aqui, para um item
   // novo, só complicava um ecrã que é suposto ser rápido e leve.
   const chairsRegularPrice = initialChairs?.waterproof ? (initialChairs.waterproofingTier === 'premium' ? calcChairWaterproofPremium(chairsQty) : calcChairWaterproof(chairsQty)) : calcChairClean(chairsQty);
-  const chairsFree = offerPreview && !initialChairs?.waterproof ? Math.floor(chairsQty / 4) : 0;
-  const chairsCleanPrice = chairsRegularPrice === null ? null : chairsQty > 0 ? Math.round(chairsRegularPrice * (chairsQty - chairsFree) / chairsQty * 100) / 100 : 0;
+
+  // Preço de pack só se pratica a partir de PACK_PERK_MIN_ORDER de subtotal
+  // de tabela — serviço principal + tudo o que já está escolhido aqui, sempre
+  // ao preço cheio (2026-09-24, pedido explícito do dono: sem isto, quem
+  // monta um pedido pequeno neste ecrã ficava com vantagem sobre a mesma
+  // pessoa a pedir um orçamento normal do mesmo pedido pequeno). Artigos sob
+  // orçamento (tapete, "4+ Lugares") não têm preço de tabela para somar,
+  // por isso ficam de fora da conta — nunca desbloqueiam nem são
+  // desbloqueados por ela.
+  const mattressTableTotal = mattressPrices.reduce((sum, opt) => sum + (typeof opt.cleaningPrice === 'number' ? (mattressQty[opt.id] ?? 0) * opt.cleaningPrice : 0), 0);
+  const sofaTableTotal = sofaPrices.reduce((sum, opt) => sum + (typeof opt.cleaningPrice === 'number' ? (sofaQty[opt.id] ?? 0) * opt.cleaningPrice : 0), 0);
+  const chairsTableTotal = chairsQty > 0 && chairsRegularPrice !== null ? chairsRegularPrice : 0;
+  const perkEligible = offerPreview && (primaryTablePrice + mattressTableTotal + sofaTableTotal + chairsTableTotal) >= PACK_PERK_MIN_ORDER;
+
+  const mattressUnitPrice = (opt: typeof mattressPrices[number]) => perkEligible && typeof opt.cleaningPrice === 'number' ? perkMattressPrice(opt.cleaningPrice) : opt.cleaningPrice;
+  // Preços fixos do sofá neste upsell (pedido explícito do dono, mesmo
+  // padrão do colchão acima): 1L 49→35€, 2L 69→55€, 3L 79→65€. "4+ Lugares"
+  // fica de fora (sempre sob orçamento, sem preço fixo possível). Os números
+  // vivem em constants/packPerks.ts desde 2026-09-23, partilhados com o
+  // configurador de packs — não os reescrever aqui.
+  const sofaUnitPrice = (opt: typeof sofaPrices[number]) => perkEligible && typeof opt.cleaningPrice === 'number' ? perkSofaPrice(opt.id, opt.cleaningPrice) : opt.cleaningPrice;
+  const chairsFree = perkEligible && !initialChairs?.waterproof ? perkChairsFree(chairsQty) : 0;
+  const chairsCleanPrice = chairsRegularPrice === null ? null : chairsFree > 0 ? perkChairsPrice(chairsRegularPrice, chairsQty) : chairsQty > 0 ? chairsRegularPrice : 0;
 
   const mattressQtyTotal = Object.values(mattressQty).reduce((a, b) => a + b, 0);
   const sofaQtyTotal = Object.values(sofaQty).reduce((a, b) => a + b, 0);
@@ -187,7 +206,7 @@ const QuizComboUpsellScreen = ({ offerPreview = false, travelFee = 10, primarySe
         chairQty: String(chairsQty),
         qty: chairsQty,
         price: chairsCleanPrice ?? 0,
-        label: `${chairsQty} Cadeira${chairsQty > 1 ? 's' : ''}${initialChairs?.waterproof ? ` (Impermeabilização ${initialChairs.waterproofingTier === 'premium' ? 'Premium' : 'Essencial'})` : offerPreview ? ` (paga ${chairsQty - chairsFree})` : ''}`,
+        label: `${chairsQty} Cadeira${chairsQty > 1 ? 's' : ''}${initialChairs?.waterproof ? ` (Impermeabilização ${initialChairs.waterproofingTier === 'premium' ? 'Premium' : 'Essencial'})` : perkEligible ? ` (paga ${chairsQty - chairsFree})` : ''}`,
       });
     }
     if (carpetValidCount > 0) {
@@ -242,7 +261,7 @@ const QuizComboUpsellScreen = ({ offerPreview = false, travelFee = 10, primarySe
         </h2>
 
         {view === 'carpet' && <QuizCarpetMeasureGuide />}
-        {offerPreview && view === 'mattress' && <p className="text-sm text-white/80 text-center">Casal: 55 € nesta visita. Poupa {casalSeparate - 55} € face a uma visita separada de {casalSeparate} €.</p>}
+        {perkEligible && view === 'mattress' && <p className="text-sm text-white/80 text-center">Casal: {perkMattressPrice(mattressPrices.find(opt => opt.id === 'casal')!.cleaningPrice as number)} € nesta visita. Poupa {casalSeparate - perkMattressPrice(mattressPrices.find(opt => opt.id === 'casal')!.cleaningPrice as number)} € face a uma visita separada de {casalSeparate} €.</p>}
         {offerPreview && view === 'carpet' && <p className="text-sm text-white/80 text-center">Por cada 5 m², paga 4. Preço por m² confirmado após avaliação.{carpetValidCount > 0 && ` Área: ${fmt(carpetTotalAreaValue)} m² · paga ${fmt(carpetTotalAreaValue - Math.floor(carpetTotalAreaValue / 5))} m².`}</p>}
         {view === 'mattress' && (
           // Scroll interno próprio (não a página toda) acima de ~3 linhas —
@@ -301,7 +320,7 @@ const QuizComboUpsellScreen = ({ offerPreview = false, travelFee = 10, primarySe
                 ? <PriceCompare original={chairsRegularPrice} promo={chairsCleanPrice} />
                 : <span className="text-gold">Sob orçamento</span>}
             </p>
-            <p className="text-sm text-white/80 text-center leading-snug">{offerPreview ? `${chairsQty} cadeiras · paga ${chairsQty - chairsFree}. Uma oferta por conjunto de 4.` : `Mínimo de ${CHAIRS_MIN_QTY} cadeiras`}</p>
+            <p className="text-sm text-white/80 text-center leading-snug">{!offerPreview ? `Mínimo de ${CHAIRS_MIN_QTY} cadeiras` : perkEligible ? `${chairsQty} cadeiras · paga ${chairsQty - chairsFree}. Uma oferta por conjunto de 4.` : `${chairsQty} cadeiras`}</p>
           </>
         )}
         {view === 'carpet' && (

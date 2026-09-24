@@ -129,7 +129,7 @@ const WaterproofingTierComparison = () => (
             {tier.badge && (
               <span
                 className="absolute top-5 right-5 text-sm font-bold tracking-[0.18em] uppercase px-2.5 py-1"
-                style={{ background: "linear-gradient(90deg,#B8912A,#EDD96A)", color: "#071a12" }}
+                style={{ background: "linear-gradient(90deg,#D4AF37,#EDD96A)", color: "#071a12" }}
               >
                 {tier.badge}
               </span>

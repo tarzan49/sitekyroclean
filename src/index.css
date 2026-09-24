@@ -46,7 +46,7 @@
     --muted: 140 15% 95%;          /* very light green-tinted muted            */
     --muted-foreground: 240 12% 42%;
 
-    --accent: 47 50% 53%;          /* Gold — same as --gold                    */
+    --accent: 46 65% 52%;          /* Gold — same as --gold, i.e. #D4AF37      */
     --accent-foreground: 240 15% 15%;
 
     --destructive: 0 84.2% 60.2%;
@@ -54,7 +54,7 @@
 
     --border: 140 15% 88%;         /* soft green-tinted border                 */
     --input: 140 15% 88%;
-    --ring: 47 50% 53%;            /* gold focus ring                          */
+    --ring: 46 65% 52%;            /* gold focus ring                          */
 
     /* Exposed as RGB for rgba() usage in JS/inline styles */
     --brand-border-rgb: 26 78 48;
@@ -64,8 +64,8 @@
     /* Premium Brand Colors */
     --teal: 172 40% 18%;
     --teal-dark: 172 45% 14%;
-    --gold: 47 50% 53%;
-    --gold-light: 47 55% 60%;
+    --gold: 46 65% 52%;            /* #D4AF37 — a única regra                  */
+    --gold-light: 51 78% 67%;      /* #EDD96A — já usado nos gradientes gold   */
     --navy: 190 45% 15%;
     --turquoise: 172 40% 18%;
     --forest-green: 140 50% 20%;   /* #1A4E30 — Forest Green principal         */

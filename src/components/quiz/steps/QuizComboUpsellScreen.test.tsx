@@ -6,13 +6,13 @@ import type { UpsellItemConfig } from '../QuizTypes';
 
 afterEach(cleanup);
 
-function Harness({ primaryService = 'other', offerPreview = false } = {}) {
+function Harness({ primaryService = 'other', offerPreview = false, primaryTablePrice = 0 } = {}) {
   const [items, setItems] = useState<UpsellItemConfig[]>([]);
   const [contact, setContact] = useState(false);
   return <>
     <output data-testid="items">{JSON.stringify(items)}</output>
     {contact ? <button onClick={() => setContact(false)}>Voltar aos extras</button> :
-      <QuizComboUpsellScreen offerPreview={offerPreview} primaryService={primaryService} upsellItems={items} setUpsellItems={setItems}
+      <QuizComboUpsellScreen offerPreview={offerPreview} primaryTablePrice={primaryTablePrice} primaryService={primaryService} upsellItems={items} setUpsellItems={setItems}
         onContinue={() => setContact(true)} onBack={() => {}} />}
   </>;
 }
@@ -134,4 +134,19 @@ it('applies the published mattress, chair and carpet offers to the saved request
   expect(savedItems().find(i => i.id === 'carpet')?.price).toBe(0);
   roundTrip();
   expect(savedItems().filter(i => i.mattressSize).map(i => i.price)).toEqual([45, 55, 65]);
+});
+
+// 2026-09-24 (pedido explícito do dono): o preço de pack não se pode praticar
+// abaixo do mínimo de subtotal — senão um pedido pequeno neste ecrã ficava
+// com vantagem sobre a mesma pessoa a pedir um orçamento normal.
+it('charges table price for an extra when the order stays under the pack minimum', () => {
+  render(<Harness primaryService="sofa" offerPreview primaryTablePrice={0} />);
+  click(/^Colchão/); confirm();
+  expect(savedItems().find(i => i.mattressSize === 'casal')?.price).toBe(69);
+});
+
+it('unlocks the pack price once the primary service already reaches the minimum', () => {
+  render(<Harness primaryService="sofa" offerPreview primaryTablePrice={100} />);
+  click(/^Colchão/); confirm();
+  expect(savedItems().find(i => i.mattressSize === 'casal')?.price).toBe(55);
 });

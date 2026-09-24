@@ -19,11 +19,10 @@ import { STUDY_ROUTE } from './studyData';
  * dos dois lados — uma ligação acrescentada só ao `prerender.ts` seria
  * exatamente o que a regra proíbe.
  *
- * O bloco "Packs" do rodapé **não** está aqui de propósito: as suas quatro
- * entradas apontam todas para `/packs`, que já é a página mais ligada do site
- * e que o responsável está a retrabalhar à parte. Continua escrito à mão no
- * `Footer.tsx` e continua a não ir para o HTML estático. Um subconjunto do que
- * a pessoa vê é legítimo; o que não é legítimo é o contrário.
+ * `/packs` (o configurador de raiz, sem localidade) foi removido: os únicos
+ * packs que existem são os 244 `/{pack}-{cidade}`. O rodapé já não tem um
+ * bloco "Packs" à parte — a entrada de "Recursos" abaixo aponta para
+ * `/guia-de-packs`, que lista todas as combinações por cidade.
  */
 export interface FooterLink { href: string; label: string }
 export interface FooterNavGroup { title: string; links: FooterLink[] }
@@ -51,6 +50,7 @@ export const FOOTER_NAV: FooterNavGroup[] = [
       { href: '/sobre', label: 'Sobre nós' },
       { href: STUDY_ROUTE, label: 'Estudo: o que as pessoas pedem' },
       { href: `/autor/${DEFAULT_AUTHOR.slug}`, label: 'Quem assina o que escrevemos' },
+      { href: '/guia-de-packs', label: 'Packs por Cidade' },
     ],
   },
   {

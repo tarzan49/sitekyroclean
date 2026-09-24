@@ -34,7 +34,7 @@ export default function DirectoryGroup({ title, children, dark = false, language
       <summary className="flex min-h-16 cursor-pointer list-none items-center gap-4 py-4 text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#D4AF37] [&::-webkit-details-marker]:hidden">
         <span className="flex-1 text-base font-semibold leading-relaxed">{title}</span>
         <span className={`text-sm tabular-nums ${dark ? "text-white/80" : "text-[#666]"}`}>{links.length}</span>
-        <ChevronDown aria-hidden="true" className="h-4 w-4 shrink-0 text-[#B8912A] transition-transform group-open/directory:rotate-180" />
+        <ChevronDown aria-hidden="true" className="h-4 w-4 shrink-0 text-[#D4AF37] transition-transform group-open/directory:rotate-180" />
       </summary>
       <div className="pb-5">
         {links.length >= 8 && <div className="relative mb-3 max-w-lg">
@@ -48,7 +48,7 @@ export default function DirectoryGroup({ title, children, dark = false, language
         <div className="grid gap-x-6 sm:grid-cols-2 lg:grid-cols-3">
           {links.map(link => cloneElement(link, {
             // Keep every destination in the HTML, including while filtering.
-            className: `${matches.includes(link) ? "flex" : "hidden"} min-h-11 items-center gap-2 py-2 pr-2 text-sm leading-relaxed hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#D4AF37] [&_svg]:hidden ${dark ? "text-white/75 hover:text-white" : "text-[#444] hover:text-[#96731D]"} ${link.props.className?.includes("capitalize") ? "capitalize" : ""}`,
+            className: `${matches.includes(link) ? "flex" : "hidden"} min-h-11 items-center gap-2 py-2 pr-2 text-sm leading-relaxed hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#D4AF37] [&_svg]:hidden ${dark ? "text-white/75 hover:text-white" : "text-[#444] hover:text-[#D4AF37]"} ${link.props.className?.includes("capitalize") ? "capitalize" : ""}`,
           }))}
         </div>
       </div>

@@ -35,10 +35,10 @@ const RegionSection = ({ heading, goldWord, area, query }: { heading: string; go
   return (
     <details open={search ? true : undefined} className="group/region border-b border-[#E8E4DE]">
       <summary className="flex min-h-16 cursor-pointer list-none items-center gap-3 py-5 text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#D4AF37] [&::-webkit-details-marker]:hidden">
-        <MapPin aria-hidden="true" className="h-5 w-5 shrink-0 text-[#B8912A]" />
+        <MapPin aria-hidden="true" className="h-5 w-5 shrink-0 text-[#D4AF37]" />
         <span className="flex-1 font-semibold text-[#111111]">{heading} {goldWord}</span>
         <span className="text-sm text-[#666]">{areaCities.length}</span>
-        <ChevronDown aria-hidden="true" className="h-4 w-4 text-[#B8912A] group-open/region:rotate-180" />
+        <ChevronDown aria-hidden="true" className="h-4 w-4 text-[#D4AF37] group-open/region:rotate-180" />
       </summary>
       <div className="pb-5 pl-3 sm:pl-8">
         {areaCities.map(city => {
@@ -47,7 +47,7 @@ const RegionSection = ({ heading, goldWord, area, query }: { heading: string; go
           return <details key={city.slug} open={search ? true : undefined} className="group/city border-t border-[#E8E4DE]">
             <summary className="flex min-h-14 cursor-pointer list-none items-center gap-3 py-4 text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#D4AF37] [&::-webkit-details-marker]:hidden">
               <span className="flex-1 text-base font-semibold text-[#111111]">{city.name}</span>
-              <ChevronDown aria-hidden="true" className="h-4 w-4 text-[#B8912A] group-open/city:rotate-180" />
+              <ChevronDown aria-hidden="true" className="h-4 w-4 text-[#D4AF37] group-open/city:rotate-180" />
             </summary>
             <div className="pl-3 sm:pl-5">
               <DirectoryGroup title={`Serviços em ${city.name}`}>

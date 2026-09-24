@@ -107,20 +107,6 @@ const routeMeta: Record<string, { pt: PageMeta; en: PageMeta; es: PageMeta }> = 
       description: "Impermeabilización profesional de sofás y sillas. Versión Esencial y versión Premium, con protección invisible real hasta 5 años.",
     },
   },
-  "/packs": {
-    pt: {
-      title: "Packs Limpeza + Impermeabilização | Kyro Clean Solutions",
-      description: "Monte o seu pack: escolha os artigos, tamanhos e tratamentos para a mesma visita. Preços de tabela transparentes, sem surpresas.",
-    },
-    en: {
-      title: "Cleaning + Waterproofing Packs | Kyro Clean Solutions",
-      description: "Build your pack: pick the items, sizes and treatments for the same visit. Transparent table prices, no surprises.",
-    },
-    es: {
-      title: "Packs Limpieza + Impermeabilización | Kyro Clean Solutions",
-      description: "Cree su pack: elija los artículos, tamaños y tratamientos para la misma visita. Precios de tabla transparentes, sin sorpresas.",
-    },
-  },
   "/blog": {
     pt: {
       title: "Blog Limpeza de Estofos | Dicas, Guias e Preços | Kyro Clean",

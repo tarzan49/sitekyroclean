@@ -164,10 +164,7 @@ export function getLandingPageModel(pathname: string) {
   const fee = locationPrices[municipalityName];
   const pricingDescription = `${serviceSlug === 'limpeza-tapetes' ? 'Orçamento à medida de cada tapete.' : serviceSlug === 'limpeza-alcatifas' ? 'Orçamento à medida de cada espaço, sem preço fixo por m².' : 'Estimativa confirmada antes da marcação.'} ${fee === undefined ? 'Deslocação confirmada antes da marcação.' : `Deslocação +${fee}€ para ${municipalityName}.`} Orçamento gratuito e sem compromisso.`;
   const packSlugs = SERVICE_PACK_SLUGS[serviceSlug];
-  const packLinks: LandingLink[] = [
-    ...packs.filter(pack => packSlugs.includes(pack.slug)).map(pack => ({ label: pack.name, href: `/${pack.slug}-${municipalitySlug}` })),
-    { label: 'Montar o meu Pack de raiz', href: '/packs' },
-  ];
+  const packLinks: LandingLink[] = packs.filter(pack => packSlugs.includes(pack.slug)).map(pack => ({ label: pack.name, href: `/${pack.slug}-${municipalitySlug}` }));
   const directory: LandingDirectoryGroup[] = [];
   const localPath = (slug: string, part = locationPart) => `/${family === 'preco' ? 'preco-' : ''}${slug}-${part}`;
   if (parish && municipality) {

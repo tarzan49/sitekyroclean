@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 import SectionHeader from '@/components/SectionHeader';
-import { packs, packCities } from '@/data/packComboData';
+import { packs, packCities, PACK_HOOK } from '@/data/packComboData';
 
 interface Props {
   packSlugs: string[];
@@ -13,20 +13,12 @@ export default function ServicePackBanner({ packSlugs, city, variant = 'light' }
   const local = packCities.find(c => c.slug === city);
   const relevant = packs.filter(p => packSlugs.includes(p.slug));
   const light = variant === 'light';
-  const options = [
-    ...relevant.map(pack => ({
-      id: pack.id,
-      title: pack.name,
-      description: `Personalize esta combinação${local ? ` em ${local.name}` : ''}`,
-      to: local ? `/${pack.slug}-${local.slug}` : '/packs',
-    })),
-    {
-      id: 'custom-pack',
-      title: 'Montar o meu Pack de raiz',
-      description: 'Escolha os artigos e os tratamentos do seu pack',
-      to: '/packs',
-    },
-  ];
+  const options = relevant.map(pack => ({
+    id: pack.id,
+    title: pack.name,
+    description: PACK_HOOK[pack.id] ?? `Personalize esta combinação${local ? ` em ${local.name}` : ''}`,
+    to: local ? `/${pack.slug}-${local.slug}` : '/guia-de-packs',
+  }));
 
   return (
     <section className={`py-14 md:py-20 ${light ? 'bg-[#FDFDF9] text-[#111111]' : 'bg-[#071a12] text-white'}`}>
@@ -36,7 +28,7 @@ export default function ServicePackBanner({ packSlugs, city, variant = 'light' }
           heading="Aproveite a"
           goldWord="mesma visita"
           light={light}
-          subtitle="Escolha os artigos e os tratamentos que precisa. Consulte a estimativa, as condições do desconto e a deslocação antes de pedir a confirmação."
+          subtitle="Escolha os artigos e os tratamentos que precisa. O primeiro fica ao preço de tabela e cada artigo acrescentado entra com preço de pack, com uma só deslocação."
         />
         <div className={`grid gap-3 ${options.length > 3 ? 'sm:grid-cols-2' : ''}`}>
           {options.map(option => (

@@ -43,23 +43,6 @@ const Footer = () => {
                   </li>
                 ))}
               </ul>
-              {/* O bloco Packs fica de fora do FOOTER_NAV de propósito: as
-                  quatro entradas apontam todas para /packs, que já é a página
-                  mais ligada do site e está a ser retrabalhada. Ver o
-                  comentário em siteFooterNav.ts. */}
-              {group.title === 'Recursos' && (
-                <>
-                  <h3 className="type-card-title    mb-3 text-white">Packs</h3>
-                  <ul className="space-y-2 text-base">
-                    {['Pack Sofá + Colchão', 'Pack Sofá + Impermeabilização', 'Pack Sala Completa', 'Pack Quarto Completo'].map(label => (
-                      <li key={label} className="flex items-center gap-2">
-                        <ChevronRight className="h-3.5 w-3.5 text-turquoise flex-shrink-0" />
-                        <Link to="/packs" className="hover:text-turquoise active:text-turquoise transition-colors py-1 touch-manipulation">{label}</Link>
-                      </li>
-                    ))}
-                  </ul>
-                </>
-              )}
             </div>
           ))}
 

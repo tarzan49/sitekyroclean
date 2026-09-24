@@ -161,7 +161,7 @@ const CommercialPage = () => {
                 return (
                   <div key={seg.key} className="relative overflow-hidden flex flex-col p-6 md:p-7 bg-white" style={{ borderTop: "2px solid #D4AF37" }}>
                     <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 mb-4" style={{ backgroundColor: "rgba(212,175,55,0.10)", border: "1px solid rgba(212,175,55,0.25)" }}>
-                      <Icon className="w-5 h-5" style={{ color: "#B8912A" }} />
+                      <Icon className="w-5 h-5" style={{ color: "#D4AF37" }} />
                     </div>
                     <p className="font-playfair text-lg font-bold mb-3 text-[#111111]">{seg.label}</p>
                     <ul className="space-y-2 mb-4">

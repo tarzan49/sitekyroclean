@@ -1,16 +1,17 @@
-import { useId, useState } from 'react';
+import { useId, useState, type ReactNode } from 'react';
 import { ArrowLeft, ArrowRight, Download } from 'lucide-react';
 import SectionHeader from '@/components/SectionHeader';
 import { SOFA_PROCESS_IMAGE as image, SOFA_PROCESS_STEPS as steps } from '@/data/sofaProcessGuide';
 
 
-export default function SofaProcessGuide({ city, cityPrep = 'em' }: { city?: string; cityPrep?: string }) {
+export default function SofaProcessGuide({ city, cityPrep = 'em', dark = false, switcher }: { city?: string; cityPrep?: string; dark?: boolean; switcher?: ReactNode }) {
   const [active, setActive] = useState(0);
   const id = useId();
   const step = steps[active];
-  return <section id="processo" className="scroll-mt-20 py-14 md:py-20 bg-[#FDFDF9]">
+  return <section id="processo" className={`scroll-mt-20 py-14 md:py-20 ${dark ? 'bg-kyro-green' : 'bg-[#FDFDF9]'}`}>
     <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
-      <SectionHeader overline="Como funciona" heading={`A limpeza do seu sofá, passo a passo${city ? ` ${cityPrep}` : ''}`} goldWord={city || ''} subtitle="Do primeiro cuidado à secagem. Explore as cinco etapas da nossa visita." />
+      <SectionHeader overline="Como funciona" heading={`A limpeza do seu sofá, passo a passo${city ? ` ${cityPrep}` : ''}`} goldWord={city || ''} subtitle="Do primeiro cuidado à secagem. Explore as cinco etapas da nossa visita." light={!dark} />
+      {switcher}
       <div className="border border-[#173629]/15 bg-white rounded-sm overflow-hidden">
         <div className="grid grid-cols-5 border-b border-[#173629]/15" role="tablist" aria-label="Etapas da limpeza">
           {steps.map((item, i) => <button key={item.label} id={`${id}-tab-${i}`} role="tab" aria-selected={active === i} aria-controls={`${id}-panel`} tabIndex={active === i ? 0 : -1}
@@ -41,7 +42,7 @@ export default function SofaProcessGuide({ city, cityPrep = 'em' }: { city?: str
           </div>
         </div>
       </div>
-      <a href={image} download="Kyro-Clean-como-limpamos-o-seu-sofa.webp" className="inline-flex items-center gap-2 min-h-11 mt-4 text-xs text-[#536259] underline underline-offset-4 hover:text-[#173629]"><Download className="w-4 h-4" />Guardar o resumo das cinco etapas</a>
+      <a href={image} download="Kyro-Clean-como-limpamos-o-seu-sofa.webp" className={`inline-flex items-center gap-2 min-h-11 mt-4 text-xs underline underline-offset-4 ${dark ? 'text-white/70 hover:text-white' : 'text-[#536259] hover:text-[#173629]'}`}><Download className="w-4 h-4" />Guardar o resumo das cinco etapas</a>
     </div>
   </section>;
 }

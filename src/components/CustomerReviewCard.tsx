@@ -20,11 +20,11 @@ export default function CustomerReviewCard({ review, google = true }: { review: 
   return <figure className="h-[340px] sm:h-[380px] flex flex-col rounded-sm bg-[#faf8f1] border border-[#d5c79d]/60 p-5 sm:p-8 text-[#143426] shadow-[0_12px_32px_rgba(0,0,0,0.08)]">
     <div className="flex items-center justify-between gap-3 mb-3 sm:mb-5">
       <div className="flex gap-1" role="img" aria-label="5 de 5 estrelas">{Array.from({length:5},(_,i)=><Star key={i} aria-hidden="true" className="w-4 h-4 fill-[#D4AF37] text-[#D4AF37]" />)}</div>
-      {google ? <GoogleG className="w-5 h-5" /> : <Quote aria-hidden="true" className="w-5 h-5 text-[#aa862b]" />}
+      {google ? <GoogleG className="w-5 h-5" /> : <Quote aria-hidden="true" className="w-5 h-5 text-[#D4AF37]" />}
     </div>
     <div className="flex-1 min-h-0 flex flex-col">
       <blockquote className="flex-1 min-h-0 overflow-hidden">
-        <span aria-hidden="true" className="hidden sm:block font-playfair text-4xl h-7 text-[#aa862b]">“</span>
+        <span aria-hidden="true" className="hidden sm:block font-playfair text-4xl h-7 text-[#D4AF37]">“</span>
         <p ref={excerpt} className="line-clamp-6 text-[18px] leading-[26px] font-medium sm:font-playfair sm:text-[21px] sm:leading-[28px] sm:font-semibold">{review.text}</p>
       </blockquote>
       {truncated && <Dialog.Root>

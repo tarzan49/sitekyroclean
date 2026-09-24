@@ -13,6 +13,12 @@
 /pack-sofa-colchao                           /pack-sofa-e-colchao-porto             301
 /pack-sofa-impermeabilizacao                 /pack-sofa-impermeabilizacao-porto     301
 
+# /packs (configurador de raiz, sem cidade) removido em 2026-09-24: os únicos
+# packs do site são os /{pack}-{cidade}. Era a página mais ligada do site e
+# estava indexada, por isso redireciona para o hub que a substitui em vez de
+# devolver 404 a quem tinha o link antigo.
+/packs                                       /guia-de-packs                         301
+
 # ── Descontinuado: impermeabilização de colchão (2026-07) ────────────────────
 /impermeabilizacao-colchao-*                /limpeza-colchoes-:splat              301
 

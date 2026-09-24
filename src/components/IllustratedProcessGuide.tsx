@@ -1,9 +1,9 @@
-import { useId, useState } from 'react';
+import { useId, useState, type ReactNode } from 'react';
 import { ArrowLeft, ArrowRight, Download } from 'lucide-react';
 import SectionHeader from '@/components/SectionHeader';
 import type { ProcessGuide } from '@/data/serviceProcessGuides';
 
-export default function IllustratedProcessGuide({ guide, heading, goldWord = '', downloadName, dark = false }: { guide: Omit<ProcessGuide, "steps"> & { steps: (ProcessGuide["steps"][number] & { image?: string; cell?: number })[] }; heading?: string; goldWord?: string; downloadName: string; dark?: boolean }) {
+export default function IllustratedProcessGuide({ guide, heading, goldWord = '', downloadName, dark = false, switcher }: { guide: Omit<ProcessGuide, "steps"> & { steps: (ProcessGuide["steps"][number] & { image?: string; cell?: number })[] }; heading?: string; goldWord?: string; downloadName: string; dark?: boolean; switcher?: ReactNode }) {
   const { steps, image } = guide;
   const [active, setActiveStep] = useState(0);
   // Depois da primeira troca de etapa a secção está garantidamente à vista, e o
@@ -19,6 +19,7 @@ export default function IllustratedProcessGuide({ guide, heading, goldWord = '',
   return <section id="processo" className={`scroll-mt-20 py-14 md:py-20 ${dark ? "bg-kyro-green" : "bg-[#FDFDF9]"}`}>
     <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
       <SectionHeader overline="Como funciona" heading={heading ?? `${guide.heading}, passo a passo`} goldWord={goldWord} subtitle={guide.subtitle} light={!dark} />
+      {switcher}
       <div className="border border-[#173629]/15 bg-white rounded-sm overflow-hidden">
         <div className={`grid ${steps.length === 6 ? "grid-cols-3 sm:grid-cols-6" : steps.length === 4 ? "grid-cols-2 sm:grid-cols-4" : "grid-cols-3 sm:grid-cols-5"} border-b border-[#173629]/15`} role="tablist" aria-label="Etapas do serviço">
           {steps.map((item, i) => <button key={item.label} id={`${id}-tab-${i}`} role="tab" aria-selected={active === i} aria-controls={`${id}-panel`} tabIndex={active === i ? 0 : -1}

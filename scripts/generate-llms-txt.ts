@@ -107,7 +107,7 @@ export function buildLlmsTxt(): string {
   lines.push(`- [Perguntas frequentes sobre limpeza de estofos](${SITE_URL}/perguntas-frequentes-limpeza-estofos): preços, duração, secagem, garantias e o que está incluído.`);
   lines.push(`- [Glossário de limpeza de estofos](${SITE_URL}/glossario-limpeza-estofos): definições dos termos técnicos usados nos orçamentos.`);
   lines.push(`- [Antes e depois](${SITE_URL}/antes-depois-limpeza): fotografias de trabalhos reais, por tipo de artigo e de sujidade.`);
-  lines.push(`- [Packs de serviços](${SITE_URL}/packs): combinações de artigos na mesma visita, com desconto.`);
+  lines.push(`- [Guia de packs](${SITE_URL}/guia-de-packs): combinações de artigos na mesma visita, com preço de pack no artigo acrescentado, por cidade.`);
   lines.push('');
 
   lines.push('## Artigos');

@@ -810,6 +810,7 @@ ${formData.description || 'Sem observações adicionais'}
               <QuizComboUpsellScreen
                 offerPreview={offerPreview}
                 travelFee={finalTravelCost}
+                primaryTablePrice={calculateServicePrice}
                 primaryService={formData.service}
                 upsellItems={upsellItems}
                 setUpsellItems={setUpsellItems}

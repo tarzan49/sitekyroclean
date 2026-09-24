@@ -143,3 +143,8 @@ export function buildSubmittedWaMessage(reference?: string | null): string {
   const safe = value && /^(?:[A-Z0-9]{6,12}|L-\d{8}-[a-z0-9]{8,12})$/.test(value) ? value : null;
   return `Olá! Acabei de enviar o pedido${safe ? ` #${safe}` : ''}. Gostaria de confirmar o orçamento e a próxima disponibilidade. Posso enviar fotografias dos artigos para avaliação.`;
 }
+
+/** Páginas pack × cidade: pede orçamento para a combinação, não para um artigo. */
+export function buildPackWaMessage(packName: string, cityName: string): string {
+  return `Olá! Gostaria de saber o preço e a próxima disponibilidade para uma ${packName.toLowerCase()} ${cityPrep(cityName)} ${cityName}. Posso enviar fotografias dos artigos para confirmarem o orçamento.`;
+}

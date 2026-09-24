@@ -282,13 +282,13 @@ const Services = () => {
         <div className={`mb-10 md:mb-14 transition-all duration-700 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-5"}`}>
           <div className="flex items-center gap-3 mb-5">
             <div className="h-px w-8" style={{ backgroundColor: "#D4AF37", opacity: 0.65 }} />
-            <p className="text-sm font-bold tracking-[0.08em] uppercase" style={{ color: "#8B6914" }}>
+            <p className="text-sm font-bold tracking-[0.08em] uppercase" style={{ color: "#D4AF37" }}>
               OS NOSSOS SERVIÇOS
             </p>
           </div>
           <h2 className="type-section-title font-playfair      text-[#111111] max-w-xl">
             Cada estofo tratado{" "}
-            <em className="not-italic" style={{ color: "#aa862b" }}>com precisão.</em>
+            <em className="not-italic" style={{ color: "#D4AF37" }}>com precisão.</em>
           </h2>
           <p className="mt-4 text-base md:text-base text-[#505650] max-w-lg leading-relaxed">
             Sofás, colchões, tapetes, cadeiras e alcatifas: higienização profissional ao domicílio, resultado garantido no próprio dia.

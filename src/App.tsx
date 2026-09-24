@@ -45,7 +45,6 @@ const Estudo = lazy(() => import("./pages/Estudo"));
 const ReviewRequest = lazy(() => import("./pages/ReviewRequest"));
 const FAQEstofos = lazy(() => import("./pages/FAQEstofos"));
 const GlossarioEstofos = lazy(() => import("./pages/GlossarioEstofos"));
-const Packs = lazy(() => import("./pages/Packs"));
 const PacksSitemap = lazy(() => import("./pages/PacksSitemap"));
 const Blog = lazy(() => import("./pages/Blog"));
 const BlogPost = lazy(() => import("./pages/BlogPost"));
@@ -89,7 +88,6 @@ const AppRoutes = () => {
                 <Route path="/limpeza-cadeiras" element={<LimpezaCadeiras />} />
                 <Route path="/limpeza-alcatifas" element={<LimpezaAlcatifas />} />
                 <Route path="/obrigado" element={<Obrigado />} />
-                <Route path="/packs" element={<Packs />} />
                 <Route path="/guia-de-packs" element={<PacksSitemap />} />
                 <Route path="/antes-depois-limpeza" element={<BeforeAfterPage />} />
                 {/* Problem SEO pages */}

@@ -84,7 +84,7 @@ const ServiceCityLinks = ({ serviceSlug, serviceLabel }: Props) => {
                     onClick={() => { if (!search) setExpanded(open ? null : region.area); }}
                     className="flex w-full items-center gap-3 py-5 text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#D4AF37] sm:gap-4"
                   >
-                    <MapPin aria-hidden="true" className="h-5 w-5 shrink-0 text-[#B8912A]" />
+                    <MapPin aria-hidden="true" className="h-5 w-5 shrink-0 text-[#D4AF37]" />
                     <span className="min-w-0 flex-1">
                       <span className="block text-base font-semibold text-[#111111] sm:text-lg">{region.label}</span>
                       <span className="mt-1 block text-sm leading-relaxed text-[#666] sm:text-base">{region.hint}</span>
@@ -95,7 +95,7 @@ const ServiceCityLinks = ({ serviceSlug, serviceLabel }: Props) => {
                   <div id={`${id}-${region.area}`} role="region" aria-labelledby={`${id}-${region.area}-trigger`} hidden={!open}>
                     <div className="grid grid-cols-1 gap-x-6 pb-5 pl-8 sm:grid-cols-2 sm:pl-9 lg:grid-cols-3">
                       {region.cities.map(city => (
-                        <Link key={city.slug} to={`/${serviceSlug}-${city.slug}`} className="flex min-h-11 items-center rounded-sm py-2 pr-2 text-base text-[#444] transition-colors hover:text-[#96731D] hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#D4AF37]">
+                        <Link key={city.slug} to={`/${serviceSlug}-${city.slug}`} className="flex min-h-11 items-center rounded-sm py-2 pr-2 text-base text-[#444] transition-colors hover:text-[#D4AF37] hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#D4AF37]">
                           {city.name}
                         </Link>
                       ))}

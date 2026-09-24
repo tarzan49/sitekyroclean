@@ -163,6 +163,28 @@ export const BEFORE_AFTER_POOL: Record<BeforeAfterCategory, PoolItem[]> = {
   ],
 };
 
+export type PoolItemWithCategory = PoolItem & { category: BeforeAfterCategory };
+
+// Intercala os pares de duas categorias (páginas de pack, que combinam dois
+// serviços) mantendo cada par intacto — nunca junta o "antes" de um item com
+// o "depois" de outro. Pedido explícito 2026-09-24: nas páginas pack×cidade
+// a galeria só mostrava a categoria do primeiro serviço; passou a alternar
+// entre as duas, uma a uma, sem nunca trocar as imagens A/B de um mesmo par.
+// Cada item sai marcado com a sua própria categoria, para as etiquetas
+// "Antes/Depois" (ou "Sem proteção/Com proteção", na impermeabilização)
+// continuarem certas mesmo intercaladas com outra categoria.
+export function interleavePools(categories: BeforeAfterCategory[]): PoolItemWithCategory[] {
+  const pools = categories.map(category => ({ category, items: BEFORE_AFTER_POOL[category] }));
+  const maxLength = Math.max(...pools.map(pool => pool.items.length));
+  const result: PoolItemWithCategory[] = [];
+  for (let i = 0; i < maxLength; i++) {
+    for (const pool of pools) {
+      if (i < pool.items.length) result.push({ ...pool.items[i], category: pool.category });
+    }
+  }
+  return result;
+}
+
 // serviceSlug -> categoria da pool. Alcatifa reaproveita tapete (pedido
 // explícito, sem fotos próprias). Devolve null para serviços sem pool
 // (a página mantém a foto estática antiga nesse caso).

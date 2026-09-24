@@ -146,7 +146,6 @@ export function generateSitemaps(outDir: string) {
     xmlUrl('/limpeza-cadeiras', 'weekly', '0.9', DATES.landing),
     xmlUrl('/limpeza-alcatifas', 'weekly', '0.9', DATES.landing),
     xmlUrl('/impermeabilizacao', 'weekly', '0.9', DATES.landing),
-    xmlUrl('/packs', 'weekly', '0.8', DATES.packs),
     xmlUrl('/guia-de-packs', 'monthly', '0.7', DATES.packs),
     xmlUrl('/areas-de-servico', 'monthly', '0.7', DATES.areas),
     xmlUrl('/sobre', 'monthly', '0.6', DATES.sobre),

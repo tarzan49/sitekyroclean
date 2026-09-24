@@ -2,14 +2,18 @@ import { resultThumbnail } from '@/data/resultThumbnails';
 import { useEffect, useRef, useState } from "react";
 import { ChevronLeft, ChevronRight, Pause, Play } from "lucide-react";
 import BeforeAfterSlider from "@/components/BeforeAfterSlider";
-import { BEFORE_AFTER_POOL, type BeforeAfterCategory } from "@/data/beforeAfterPool";
+import { BEFORE_AFTER_POOL, interleavePools, type BeforeAfterCategory } from "@/data/beforeAfterPool";
 
 // `autoplay` (usado só pelos heroes, via HeroBeforeAfterPool) arranca a
 // galeria já a rodar e faz cada par varrer sozinho de "Antes" para "Depois"
 // ao longo do mesmo intervalo — fora dos heroes a galeria continua parada até
-// a pessoa carregar em reproduzir.
-export default function ServiceResultsGallery({ category, light = false, intervalMs = 6000, priority = false, autoplay = false }: { priority?: boolean; category: BeforeAfterCategory; light?: boolean; intervalMs?: number; autoplay?: boolean }) {
-  const pool = BEFORE_AFTER_POOL[category];
+// a pessoa carregar em reproduzir. `category` aceita mais do que uma
+// categoria (páginas de pack, que combinam dois serviços): os pares saem
+// intercalados, sempre com o próprio antes/depois de cada item.
+export default function ServiceResultsGallery({ category, light = false, intervalMs = 6000, priority = false, autoplay = false }: { priority?: boolean; category: BeforeAfterCategory | BeforeAfterCategory[]; light?: boolean; intervalMs?: number; autoplay?: boolean }) {
+  const categories = Array.isArray(category) ? category : [category];
+  const pool = categories.length > 1 ? interleavePools(categories) : BEFORE_AFTER_POOL[categories[0]];
+  const singleCategory = categories.length === 1 ? categories[0] : undefined;
   const [index, setIndex] = useState(0);
   const [playing, setPlaying] = useState(autoplay);
   const [dragging, setDragging] = useState(false);
@@ -17,6 +21,7 @@ export default function ServiceResultsGallery({ category, light = false, interva
   const [focused, setFocused] = useState(false);
   const thumbnailsRef = useRef<HTMLDivElement>(null);
   const item = pool[index % pool.length];
+  const itemCategory = singleCategory ?? (item as { category?: BeforeAfterCategory }).category;
 
   useEffect(() => {
     const rail = thumbnailsRef.current;
@@ -46,11 +51,11 @@ export default function ServiceResultsGallery({ category, light = false, interva
       onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)}
       onFocusCapture={() => setFocused(true)}
       onBlurCapture={event => { if (!event.currentTarget.contains(event.relatedTarget)) setFocused(false); }}>
-      <div className={`overflow-hidden ${category === "cadeiras" ? "mx-auto w-[min(100%,270px)] aspect-[9/16]" : "w-full aspect-[4/3]"}`}>
+      <div className={`overflow-hidden ${itemCategory === "cadeiras" ? "mx-auto w-[min(100%,270px)] aspect-[9/16]" : "w-full aspect-[4/3]"}`}>
         {item.kind === "pair" ? (
           <BeforeAfterSlider key={index} beforeImage={item.before} afterImage={item.after}
-            beforeLabel={category === "impermeabilizacao" ? "Sem proteção" : "Antes"}
-            afterLabel={category === "impermeabilizacao" ? "Com proteção" : "Depois"}
+            beforeLabel={itemCategory === "impermeabilizacao" ? "Sem proteção" : "Antes"}
+            afterLabel={itemCategory === "impermeabilizacao" ? "Com proteção" : "Depois"}
             priority={priority && index === 0} noFrame illustrative={item.illustrative} onDraggingChange={setDragging}
             sweepMs={autoplay ? intervalMs : undefined} />
         ) : (

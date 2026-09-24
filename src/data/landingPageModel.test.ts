@@ -23,7 +23,7 @@ describe('shared landing composition', () => {
       expect(model!.processSteps).toHaveLength(5);
       expect(model!.reviews.length).toBeGreaterThan(0);
       expect(model!.directory.length).toBeGreaterThan(0);
-      expect(model!.packLinks.length).toBeGreaterThan(1);
+      expect(model!.packLinks.length).toBeGreaterThan(0);
       const fee = locationPrices[model!.municipalityName];
       if (fee !== undefined) expect(model!.pricingDescription).toContain(`+${fee}€`);
     }

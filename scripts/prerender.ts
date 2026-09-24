@@ -45,7 +45,8 @@ import { getAllProblemCityRoutes, getProblemCities } from '../src/data/problemCi
 import { getProblemCityFaqs, getProblemCityReviews, getProblemCityCoverage } from '../src/data/problemCityContent';
 import { getAllMaterials, getAllMaterialCityRoutes, getMaterialCityData } from '../src/data/materialSeoData';
 import { getAllPriceRoutes, getPricePageData } from '../src/data/priceSeoData';
-import { getAllPackComboRoutes, getPackByCityAndId } from '../src/data/packComboData';
+import { packs, packCities, PACK_HOOK, getAllPackComboRoutes, getPackByCityAndId, packFaqs, packPriceFrom, otherPacksInCity } from '../src/data/packComboData';
+import { PACK_PERK_RULE, PACK_PERK_LIMIT, PACK_PERK_BULLETS } from '../src/constants/packPerks';
 import { getAllMarcaSofaRoutes, getMarcaByCityAndSlug } from '../src/data/marcaSofaData';
 import { getAllMarcaColchaoRoutes, getMarcaColchaoByCityAndSlug } from '../src/data/marcaColchaoData';
 import { getAllMarcaCadeirasRoutes, getMarcaCadeirasByCityAndSlug } from '../src/data/marcaCadeirasData';
@@ -935,15 +936,55 @@ export function prerenderRoutes(outDir: string): number {
     );
   }
 
-  // ── 8. Pack / Combo pages (4 × 5 = 20) ──────────────────────────────────
+  // ── 8. Pack / Combo pages (4 × 61 = 244) ────────────────────────────────
+  // O HTML estático diz exatamente o que a página React mostra: as regalias do
+  // pack (as mesmas do upsell do quiz, vindas de constants/packPerks.ts), o que
+  // a visita inclui, as FAQs e as ligações para os serviços dessa cidade.
+  // Antes de 2026-09-23 anunciava aqui um desconto sobre o pedido que já tinha
+  // sido retirado do código dias antes: uma promessa que só os motores liam.
   {
     const prev = count;
     for (const route of getAllPackComboRoutes()) {
       const data = getPackByCityAndId(route.packId, route.citySlug);
       if (!data) continue;
-      const title = `${data.pack.name} em ${data.city.name} | Monte o seu pack | Kyro Clean`;
-      const desc  = `${data.pack.description} Serviço ao domicílio em ${data.city.name}.`;
-      emit(route.path, title, desc, { h1: `${data.pack.name} em ${data.city.name}`, intro: data.pack.description, howItWorks: 'Escolha os artigos, as quantidades, as medidas e os tratamentos no configurador. A combinação inicial é editável. Tapetes e alcatifas sempre sob orçamento. Desconto Pack Família de 10% nos serviços tabelados acima de 149€, com pelo menos dois artigos e um a partir de 49€. A deslocação não tem desconto.', benefits: [PRICE_PROMISE, SATISFACTION_PROMISE, DRYING_PROMISE, AVAILABILITY_PROMISE] });
+      const prep = cityPrep(data.city.name);
+      const heading = `${data.pack.name} ${prep} ${data.city.name}`;
+      const title = `${heading} | Kyro Clean Solutions`;
+      const desc  = `${data.pack.description} Serviço ao domicílio ${prep} ${data.city.name}.`;
+      const packServiceLinks = [data.pack.service1Slug, data.pack.service2Slug]
+        .map(slug => services.find(item => item.slug === slug))
+        .filter((item): item is typeof services[number] => Boolean(item))
+        .map(item => ({ href: `/${item.slug}-${data.city.slug}`, label: `${item.name} ${prep} ${data.city.name}` }));
+      const links = [
+        ...packServiceLinks,
+        ...otherPacksInCity(data.pack.id, data.city.slug).map(link => ({ href: link.href, label: `${link.label} ${prep} ${data.city.name}` })),
+        { href: '/guia-de-packs', label: 'Ver todos os packs' },
+      ];
+      const crumbs = [
+        { name: 'Início', url: BASE_URL + '/' },
+        { name: 'Packs', url: `${BASE_URL}/guia-de-packs` },
+        { name: heading, url: `${BASE_URL}${route.path}` },
+      ];
+      const faqs = packFaqs(data.pack, data.city.name);
+      emit(
+        route.path,
+        title,
+        desc,
+        {
+          breadcrumb: crumbs.map(crumb => ({ label: crumb.name, href: crumb.url.replace(BASE_URL, '') })),
+          h1: heading,
+          intro: `${data.pack.tagline}. ${data.pack.description}`,
+          howItWorks: `${PACK_PERK_RULE} ${PACK_PERK_LIMIT} Escolha os artigos, as quantidades, as medidas e os tratamentos no configurador desta página: a combinação é editável e tapetes e alcatifas ficam sempre sob orçamento.`,
+          faqs,
+          links,
+          linksHeading: `Serviços e packs ${prep} ${data.city.name}`,
+        },
+        [
+          buildServiceSchema(data.pack.name, data.city.name, packPriceFrom(data.pack)),
+          buildBreadcrumbSchema(crumbs),
+          buildFaqSchema(faqs),
+        ],
+      );
     }
     console.log(`  Pack pages:              ${count - prev}`);
   }
@@ -1238,36 +1279,28 @@ export function prerenderRoutes(outDir: string): number {
         ],
       },
       {
-        path: '/packs',
-        title: 'Packs Limpeza + Impermeabilização | Até 10% Desconto | Kyro Clean Solutions',
-        desc: 'Packs exclusivos de limpeza e impermeabilização com até 10% de desconto. Sofá + Colchão, Sala Completa e mais. Serviço ao domicílio. Peça orçamento grátis.',
+        path: '/guia-de-packs',
+        title: 'Guia de Packs de Limpeza | Kyro Clean Solutions',
+        desc: 'Escolha o pack de limpeza ideal para a sua casa. Sofá, colchão, tapetes e mais na mesma visita, com preço de pack no artigo acrescentado. Orçamento grátis.',
         content: {
-          h1: 'Monte o seu pack de limpeza',
-          intro: 'Adicione sofás, colchões, cadeiras, tapetes e alcatifas e escolha os tratamentos. Tapetes e alcatifas sempre sob orçamento, com medidas obrigatórias. O resumo separa serviços, desconto aplicável e deslocação.',
-          benefits: [
-            'Pack Sofá + Colchão: tratamento completo em uma visita',
-            'Pack Sala Completa: sofá, tapete e cadeiras',
-            'Pack Quarto Completo: colchão e tapete sob orçamento',
-            'Pack Sofá + Impermeabilização: proteção duradoura',
-            '10% nos serviços tabelados acima de 149€, com dois artigos e um a partir de 49€; deslocação sem desconto',
-            'Agendamento flexível, incluindo fins de semana',
-          ],
+          // O mesmo que a página React mostra: os quatro packs, a regra do
+          // preço de pack e o diretório completo. Antes só havia <h1> e
+          // introdução, e o hub não ligava a nenhuma das 244 páginas de pack.
+          breadcrumb: [{ label: 'Início', href: '/' }, { label: 'Guia de Packs' }],
+          h1: 'Packs de Limpeza',
+          intro: 'Vários artigos na mesma visita: uma só deslocação e preço de pack em cada artigo que acrescentar. Escolha a sua localidade e o pack que mais se aproxima do que precisa. Tudo o resto ajusta no configurador.',
+          problems: packs.map(pack => ({ title: pack.name, description: `${pack.tagline}. ${PACK_HOOK[pack.id] ?? pack.description}` })),
+          howItWorks: PACK_PERK_LIMIT,
+          benefits: PACK_PERK_BULLETS,
+          links: packs.flatMap(pack => packCities.map(city => ({ href: `/${pack.slug}-${city.slug}`, label: `${pack.name}: ${city.name}` }))),
+          linksHeading: 'Todos os packs por localidade',
         },
         extraSchemas: [
           buildBreadcrumbSchema([
             { name: 'Início', url: BASE_URL + '/' },
-            { name: 'Packs', url: BASE_URL + '/packs' },
+            { name: 'Guia de Packs', url: BASE_URL + '/guia-de-packs' },
           ]),
         ],
-      },
-      {
-        path: '/guia-de-packs',
-        title: 'Guia de Packs de Limpeza | Kyro Clean Solutions',
-        desc: 'Escolha o pack de limpeza ideal para a sua casa. Packs com desconto para sofá, colchão, tapetes e mais. Orçamento grátis.',
-        content: {
-          h1: 'Guia de Packs de Limpeza',
-          intro: 'Escolha o pack de limpeza profissional mais adequado para a sua casa. Compare todos os packs disponíveis, poupanças e o que cada um inclui.',
-        },
       },
       {
         path: '/blog',
@@ -1662,7 +1695,7 @@ export function prerenderRoutes(outDir: string): number {
         { href: '/perguntas-frequentes-limpeza-estofos', label: 'Perguntas Frequentes' },
         { href: '/glossario-limpeza-estofos', label: 'Glossário' },
         { href: '/blog', label: 'Blog' },
-        { href: '/packs', label: 'Packs' },
+        { href: '/guia-de-packs', label: 'Packs' },
       ],
     });
     let homeHtml = injectContent(preloadPage(rawTemplate, 'IndexV1'), homeBody);
