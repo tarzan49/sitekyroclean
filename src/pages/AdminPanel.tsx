@@ -1,5 +1,5 @@
 import { useState, lazy, Suspense } from "react";
-import { Link } from "react-router-dom";
+import { SITE_URL } from "@/constants/business";
 import { AlertTriangle, BarChart3, Home, Settings2, Lock, LogOut, Users, Globe, MessageCircle, Mail, Megaphone } from "lucide-react";
 import { isSupabaseConfigured, supabase } from "@/integrations/supabase/client";
 import { useAdminSession } from "@/hooks/use-admin-session";
@@ -135,9 +135,9 @@ const AdminPanel = () => {
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <Link to="/" className="flex items-center gap-1.5 text-xs text-white/50 hover:text-gold transition-colors px-3 py-1.5 rounded-lg border border-white/10 hover:border-gold/30">
+            <a href={SITE_URL} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 text-xs text-white/50 hover:text-gold transition-colors px-3 py-1.5 rounded-lg border border-white/10 hover:border-gold/30">
               <Home className="w-3.5 h-3.5" /> Ver Site
-            </Link>
+            </a>
             <button
               onClick={() => supabase.auth.signOut()}
               className="flex items-center gap-1.5 text-xs text-white/50 hover:text-gold transition-colors px-3 py-1.5 rounded-lg border border-white/10 hover:border-gold/30"

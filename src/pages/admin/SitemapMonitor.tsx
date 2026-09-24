@@ -1,6 +1,5 @@
 import { getTreatmentRoutes } from '../../data/treatmentSeoData';
 import { useState, useMemo } from "react";
-import { Link } from "react-router-dom";
 import { Map, AlertTriangle, Globe, FileText, Shield, Zap, Star, Target, ChevronDown, ChevronRight, ExternalLink } from "lucide-react";
 import { getAllLocationRoutes, services } from "@/data/locationSeoData";
 import { getAllFreguesiaRoutes } from "@/data/freguesiaSeoData";
@@ -16,6 +15,7 @@ import { getAllMarcaCadeirasRoutes } from "@/data/marcaCadeirasData";
 import { getAllPosts } from "@/data/blogData";
 import { getAllEnRoutes } from "@/data/enTouristSeoData";
 import { getAllCommercialRoutes } from "@/data/commercialSeoData";
+import { SITE_URL } from "@/constants/business";
 import { getAdminRegion, getRegionForLocationPart, ADMIN_REGIONS, ADMIN_REGION_LABELS, type AdminRegion } from "@/data/regionUtils";
 
 // "Marcas de Sofá" e "Marcas de Colchão" partilham o mesmo ficheiro físico
@@ -232,7 +232,7 @@ const SitemapMonitor = () => {
                     /{sm.file}
                   </code>
                   <a
-                    href={`/${sm.file}`}
+                    href={`${SITE_URL}/${sm.file}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     title="Abrir XML"
@@ -256,14 +256,15 @@ const SitemapMonitor = () => {
                     {cachedUrls.slice(0, 100).map((url, i) => (
                       <div key={i} className="flex items-center gap-2 px-2 py-1 rounded-lg hover:bg-white transition-colors group">
                         <code className="flex-1 text-[11px] font-mono text-gray-500 truncate">{url}</code>
-                        <Link
-                          to={url}
+                        <a
+                          href={`${SITE_URL}${url}`}
                           target="_blank"
-                          className="opacity-0 group-hover:opacity-100 text-gray-300 hover:text-gold transition-all flex-shrink-0"
+                          rel="noopener noreferrer"
+                          className="text-gray-300 group-hover:text-gray-500 hover:text-gold transition-colors flex-shrink-0"
                           title="Abrir"
                         >
                           <ExternalLink className="w-3 h-3" />
-                        </Link>
+                        </a>
                       </div>
                     ))}
                     {cachedUrls.length > 100 && (
