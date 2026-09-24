@@ -15,6 +15,28 @@ function sitemapPlugin(): Plugin {
         generateSitemaps(outDir);
       },
     },
+    // Em dev os sitemaps não existem (são artefactos de build), por isso os
+    // links "Abrir XML" do Sitemap Monitor davam 404 em localhost. Gera-os
+    // para uma pasta temporária à primeira visita e serve-os de lá, sem
+    // tocar em public/ nem mandar ninguém para produção.
+    configureServer(server) {
+      let dir: string | null = null;
+      server.middlewares.use(async (req, res, next) => {
+        const name = req.url?.split('?')[0].slice(1) ?? '';
+        if (!/^sitemap[\w-]*\.xml$/.test(name)) return next();
+        const fs = await import('fs');
+        const os = await import('os');
+        if (!dir) {
+          const { generateSitemaps } = await import('./scripts/generate-sitemap');
+          dir = fs.mkdtempSync(path.join(os.tmpdir(), 'kyro-sitemaps-'));
+          generateSitemaps(dir);
+        }
+        const file = path.join(dir, name);
+        if (!fs.existsSync(file)) return next();
+        res.setHeader('Content-Type', 'application/xml; charset=utf-8');
+        res.end(fs.readFileSync(file));
+      });
+    },
   };
 }
 

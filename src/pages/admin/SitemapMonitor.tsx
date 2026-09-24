@@ -1,5 +1,6 @@
 import { getTreatmentRoutes } from '../../data/treatmentSeoData';
 import { useState, useMemo } from "react";
+import { Link } from "react-router-dom";
 import { Map, AlertTriangle, Globe, FileText, Shield, Zap, Star, Target, ChevronDown, ChevronRight, ExternalLink } from "lucide-react";
 import { getAllLocationRoutes, services } from "@/data/locationSeoData";
 import { getAllFreguesiaRoutes } from "@/data/freguesiaSeoData";
@@ -15,7 +16,6 @@ import { getAllMarcaCadeirasRoutes } from "@/data/marcaCadeirasData";
 import { getAllPosts } from "@/data/blogData";
 import { getAllEnRoutes } from "@/data/enTouristSeoData";
 import { getAllCommercialRoutes } from "@/data/commercialSeoData";
-import { SITE_URL } from "@/constants/business";
 import { getAdminRegion, getRegionForLocationPart, ADMIN_REGIONS, ADMIN_REGION_LABELS, type AdminRegion } from "@/data/regionUtils";
 
 // "Marcas de Sofá" e "Marcas de Colchão" partilham o mesmo ficheiro físico
@@ -228,7 +228,7 @@ const SitemapMonitor = () => {
                 )}
 
                 <a
-                  href={`${SITE_URL}/${sm.file}`}
+                  href={`/${sm.file}`}
                   title="Abrir XML"
                   className="group/xml flex items-center gap-2"
                 >
@@ -252,15 +252,15 @@ const SitemapMonitor = () => {
                   </div>
                   <div className="max-h-72 overflow-y-auto space-y-0.5 pr-1">
                     {cachedUrls.slice(0, 100).map((url, i) => (
-                      <a
+                      <Link
                         key={i}
-                        href={`${SITE_URL}${url}`}
+                        to={url}
                         title="Abrir"
                         className="flex items-center gap-2 px-2 py-1 rounded-lg hover:bg-white transition-colors group"
                       >
                         <code className="flex-1 text-[11px] font-mono text-gray-500 group-hover:text-gold truncate transition-colors">{url}</code>
                         <ExternalLink className="w-3 h-3 text-gray-300 group-hover:text-gold transition-colors flex-shrink-0" />
-                      </a>
+                      </Link>
                     ))}
                     {cachedUrls.length > 100 && (
                       <p className="text-center text-xs text-gray-400 py-2">
