@@ -202,9 +202,13 @@ foi carregada por esse nome. Destinos ligam-se na interface da Google, não aqui
 
 **`send_page_view: false` não chega.** A opção "alterações de página baseadas no
 histórico do navegador" da Medição otimizada do GA4 é configurada na interface,
-não no código, e duplica o `page_view` em cada navegação da SPA. **Tem de ser
-desligada no GA4** e não é verificável a partir do código nem numa propriedade
-de teste. Até lá, assumir `page_view` duplicado.
+não no código, e duplica o `page_view` em cada navegação da SPA. **Desligada em
+2026-09-24** (propriedade GA4 "Clean Solutions", stream `G-T45T5FBNC3` →
+Medição otimizada → engrenagem → "Mostrar definições avançadas" → checkbox
+"Alterações na página com base nos eventos do histórico do navegador",
+confirmada desmarcada e persistida). Não é verificável a partir do código; se
+o `page_view` voltar a aparecer duplicado nos relatórios, confirmar aqui
+primeiro.
 
 **Consentimento não pode travar um pedido.** Registo operacional e medição são
 duas coisas: quem recusa cookies submete o orçamento na mesma, é gravado e
