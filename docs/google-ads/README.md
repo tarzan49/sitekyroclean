@@ -167,6 +167,54 @@ Por resolver:
 - Imagens: parte ainda "Pendente, em verificação".
 - Conversões: as 3 ações principais estão ativas, nenhuma registada ainda.
 
+### Aplicado a 26/09/2026 (decisões do dono)
+
+Tudo confirmado depois de recarregar a página.
+
+- **`Campaign #1` removida.**
+- **Palavras-chave: 50 → 70.** Nos dois grupos "Limpeza de Sofás":
+  "limpeza de sofás", "limpeza sofá", "higienização de sofás", "higienização
+  sofá", "lavagem de sofás", "limpeza de estofos". Nos dois "Impermeabilização
+  de Sofás": "impermeabilização de sofás", "impermeabilização sofá",
+  "impermeabilizar sofá", "impermeabilização de estofos". Todas de expressão.
+- **Negativas partilhadas: 109 → 122** (spray, produto, produtos, máquina,
+  impermeabilizante, caseiro, caseira, sozinho, leroy merlin, worten, amazon,
+  continente, aki), para as palavras gerais não apanharem pesquisas de produto.
+- **Lisboa: 54 localizações, "Presença".** O dono pediu a Margem Sul toda e
+  decidiu incluir o distrito de Setúbal inteiro (região "Setúbal, Portugal"),
+  **incluindo o Alentejo Litoral** (Sines, Grândola, Comporta, Tróia, Santiago
+  do Cacém, Alcácer do Sal), sem exclusões. A norte: localidades de Vila Franca
+  de Xira e Mafra por nome, códigos postais onde o Google os tem, e raios à
+  volta de Alhandra (4 mi), Malveira (5 mi) e Encarnação (2 mi).
+- **Porto: 45 localizações, "Presença", limite de ~45 min** decidido com o
+  dono: os 16 concelhos de antes mais Santa Maria da Feira, S. João da
+  Madeira, Ovar, Oliveira de Azeméis, Famalicão, Guimarães, Braga e Barcelos.
+  **Sem Amarante, Marco de Canaveses nem Baião** ("demasiado longe, poucos
+  clientes"). Raio de 19 mi (≈30 km) à volta do Porto e raios de 3 a 6 mi à
+  volta de cada concelho mais afastado. **Cuidado: "Braga, Portugal" (1,17 M de
+  alcance) é o distrito inteiro, não a cidade**; a cidade é "Braga, Braga".
+- **Códigos postais em Portugal:** o Google só tem alguns CP4 (Lisboa: 2700,
+  2720, 2840, 2890, 2900, 2910, 2970, 2975; Porto: 4050–4350, 4425, 4700). Os
+  outros não existem na base dele, daí os raios.
+- **WhatsApp:** 4 recursos de mensagem, um por grupo de anúncios, com o texto
+  do site (`buildServiceWaMessage`) encurtado aos 140 carateres do Google,
+  apelo "Receber estimativa do custo" e descrição "Resposta em menos de 10 min".
+- **Nome da empresa:** recurso enviado a 25/09 ("Contestar decisão", em curso).
+  O formulário não tem campo de texto. A alternativa é validar com o número de
+  registo da marca no INPI, em nome do anunciante validado.
+  `kyrocleansolutions.pt` não serve como URL final: redireciona para outro
+  domínio (e o `https://` nem responde), o que dava "destino não corresponde".
+- **Pack desde 99 €** passou a aparecer na abertura de
+  `/impermeabilizacao-{cidade}` (`commercialHeroCopy.ts`, lido de
+  `sofaPrices.bothPrice`).
+- **Imagens:** sem nenhuma reprovada (Gestor de Políticas sem problemas de
+  anúncios). Usam as 10 fotos reais de sofás que existem; não há material
+  melhor para trocar sem fotografar trabalhos novos.
+
+**Por fazer no site:** `travel.ts` não tem Santa Maria da Feira, S. João da
+Madeira, Ovar nem Oliveira de Azeméis, que agora recebem anúncios do Porto.
+Falta o dono dizer a taxa de deslocação para esses quatro.
+
 ## 3. As campanhas, como estão desenhadas
 
 Duas campanhas iguais na estrutura, uma por cidade, cada uma com dois grupos:
