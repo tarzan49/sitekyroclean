@@ -10,6 +10,10 @@ const sofa1 = sofaPrices.find(item => item.id === '1-lugar');
 if (!sofa1) throw new Error('commercialHeroCopy: sofá "1-lugar" não existe em sofaPrices');
 const IMPER_PREMIUM = `${sofa1.waterproofingPremiumPrice}€`;
 const IMPER_ESSENCIAL = `${sofa1.waterproofingPrice}€`;
+// Limpeza + Essencial no mesmo sofá e na mesma visita (o `bothPrice` do quiz).
+// Os anúncios de impermeabilização prometem este "pack desde 99€"; quem clica
+// tem de o encontrar logo na abertura da página.
+const IMPER_PACK = `${sofa1.bothPrice}€`;
 
 const subtitles: Record<string, string> = {
   'limpeza-sofas': 'Cuidado profissional para o seu sofá, sem sair de casa.',
@@ -21,7 +25,7 @@ const subtitles: Record<string, string> = {
   // um anúncio tem de reencontrar aqui a mesma versão e o mesmo preço. A
   // Essencial fica nomeada na mesma linha: continua a existir e continua a ser
   // o preço de partida do serviço, que é o que a linha de preço do hero mostra.
-  impermeabilizacao: `Proteção Premium desde ${IMPER_PREMIUM}: protege até 10 anos e resiste a até 5 lavagens. Essencial desde ${IMPER_ESSENCIAL}.`,
+  impermeabilizacao: `Proteção Premium desde ${IMPER_PREMIUM}: até 10 anos e até 5 lavagens. Essencial desde ${IMPER_ESSENCIAL}, ou ${IMPER_PACK} com limpeza.`,
 };
 export const commercialHeroSubtitle = (serviceSlug: string, city?: string) => `${subtitles[serviceSlug] ?? 'Cuidados profissionais adaptados aos seus estofos.'}${city === 'Aveiro' || city === 'Coimbra' ? ' Disponibilidade sob consulta.' : ''}`;
 
