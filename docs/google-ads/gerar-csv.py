@@ -42,13 +42,28 @@ def limpeza(city):
                   f"lavagem de sofás {c}", f"limpar sofá {c}", f"limpeza de estofos {c}",
                   "limpeza de sofás ao domicílio", "empresa de limpeza de sofás",
                   "preço limpeza sofá", "quanto custa limpar um sofá",
-                  "limpeza de sofás preço", "higienização de estofos"],
+                  "limpeza de sofás preço", "higienização de estofos",
+                  # Termos gerais sem cidade (26/09/2026): com a segmentação em
+                  # "Presença", quem pesquisa só "limpeza de sofás" na zona também vê.
+                  "limpeza de sofás", "limpeza sofá", "higienização de sofás",
+                  "higienização sofá", "lavagem de sofás", "limpeza de estofos"],
         headlines=[f"Limpeza de Sofás {city}", "Higienização de Sofás",
                    f"{REVIEWS} Avaliações no Google", f"{RATING} Estrelas no Google",
                    f"{CLIENTES} Clientes Servidos", "Resposta em 10 Minutos",
                    "Orçamento Grátis no WhatsApp", "Preço Fechado Antes de Marcar",
                    "Garantia de Repetição", "Limpeza ao Domicílio", "Seca em 3 a 6 Horas",
                    "Manchas, Pelos e Odores", "Sofá Limpo sem Sair de Casa",
+                   f"Equipa Própria {em}", "Limpe e Proteja no Mesmo Dia"]
+                  if city == "Porto" else
+                  # Lisboa tinha eficácia "Boa" com os títulos do Porto; a Google pedia
+                  # mais palavras-chave populares nos títulos. Com estes três passou a
+                  # "Excelente" (26/09/2026). O Porto já estava em "Excelente".
+                  [f"Limpeza de Sofás {city}", f"Higienização de Sofás {city}",
+                   f"{REVIEWS} Avaliações no Google", f"{RATING} Estrelas no Google",
+                   f"{CLIENTES} Clientes Servidos", "Resposta em 10 Minutos",
+                   "Orçamento Grátis no WhatsApp", "Preço Fechado Antes de Marcar",
+                   "Garantia de Repetição", "Limpeza de Sofás ao Domicílio", "Seca em 3 a 6 Horas",
+                   "Manchas, Pelos e Odores", f"Limpeza de Estofos {em}",
                    f"Equipa Própria {em}", "Limpe e Proteja no Mesmo Dia"],
         descriptions=[
             f"Higienização profissional de sofás ao domicílio {em}. Secagem média de 3 a 6 horas.",
@@ -66,7 +81,9 @@ def imper(city):
         keywords=[f"impermeabilização de sofás {c}", f"impermeabilizar sofá {c}",
                   f"impermeabilização de estofos {c}", "limpeza e impermeabilização de sofás",
                   "impermeabilização de sofás preço", "quanto custa impermeabilizar um sofá",
-                  "pack limpeza e impermeabilização sofá"],
+                  "pack limpeza e impermeabilização sofá",
+                  "impermeabilização de sofás", "impermeabilização sofá",
+                  "impermeabilizar sofá", "impermeabilização de estofos"],
         headlines=["Impermeabilização de Sofás", f"Impermeabilizar Sofá {city}",
                    "Vinho, Café e Sumo no Sofá", "Derrames Ficam à Superfície",
                    "Limpa com um Pano, Sem Nódoa", "Proteja Antes da Próxima Nódoa",

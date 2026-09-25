@@ -80,10 +80,10 @@ parênteses é a contagem real.
 **Página de destino:** `https://cleansolutions.com.pt/limpeza-sofas-lisboa?ads=1`  
 **Caminho apresentado:** `cleansolutions.com.pt/limpeza-sofas/lisboa`
 
-**Títulos (15):**
+**Títulos (15):** (três trocados a 26/09/2026 para passar a eficácia de "Boa" a "Excelente")
 
 1. Limpeza de Sofás Lisboa  `(23)`
-2. Higienização de Sofás  `(21)`
+2. Higienização de Sofás Lisboa  `(28)`
 3. 125 Avaliações no Google  `(24)`
 4. 4,9 Estrelas no Google  `(22)`
 5. +1100 Clientes Servidos  `(23)`
@@ -91,10 +91,10 @@ parênteses é a contagem real.
 7. Orçamento Grátis no WhatsApp  `(28)`
 8. Preço Fechado Antes de Marcar  `(29)`
 9. Garantia de Repetição  `(21)`
-10. Limpeza ao Domicílio  `(20)`
+10. Limpeza de Sofás ao Domicílio  `(29)`
 11. Seca em 3 a 6 Horas  `(19)`
 12. Manchas, Pelos e Odores  `(23)`
-13. Sofá Limpo sem Sair de Casa  `(27)`
+13. Limpeza de Estofos em Lisboa  `(28)`
 14. Equipa Própria em Lisboa  `(24)`
 15. Limpe e Proteja no Mesmo Dia  `(28)`
 
