@@ -54,7 +54,9 @@ describe('nenhuma página de pack promete um desconto que o código não aplica'
   it('não fala em percentagem de desconto nem no limiar antigo', () => {
     for (const path of packFacing) {
       const source = read(path);
-      expect(source, `${path} menciona um desconto em percentagem`).not.toMatch(/\d+\s*%/);
+      // Uma largura em `calc(100% - …)` é CSS, não um desconto anunciado.
+      const text = source.replace(/calc\((?:[^()]|\([^()]*\))*\)/g, '');
+      expect(text, `${path} menciona um desconto em percentagem`).not.toMatch(/\d+\s*%/);
       expect(source, `${path} menciona o limiar de 149€`).not.toContain('149');
     }
   });
