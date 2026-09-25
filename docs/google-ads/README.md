@@ -92,6 +92,81 @@ o nome definitivo. **Os dois nomes estão agora iguais**, e o `gerar-csv.py` usa
 exatamente estes: mudá-los ali passa a criar campanhas duplicadas em vez de
 atualizar as que existem.
 
+### Correções de 24/09/2026 (tarde)
+
+- **Porto estava a mirar a região inteira.** A entrada "Porto, Portugal —
+  região" (alcance 5 160 000, vai até Amarante e além) estava na lista em vez do
+  concelho do Porto; as outras 15 entradas eram redundantes dentro dela e as 20
+  impressões da campanha vieram todas daí. Trocada por "Porto, Porto, Portugal —
+  cidade". "Gondomar — cidade" (alcance limitado) trocada por "Gondomar —
+  município" (253 000). **Nas localizações, "X, Portugal" sem mais nada é uma
+  região; o concelho é "X, X, Portugal".** Lisboa já usava o concelho.
+- **Negativas: 101 → 109.** Os termos de pesquisa mostraram "como impermeabilizar
+  sofá", "produto para impermeabilizar sofás portugal", "biomex limpeza" e
+  "limpeza estofos auto". Acrescentadas: `como`, `produto para impermeabilizar`,
+  `spray impermeabilizante`, `comprar impermeabilizante`, `biomex`, `auto`,
+  `automóvel`, `carro`.
+- **As três campanhas em pausa** a pedido do dono (não arrancam hoje).
+- **Os 4 anúncios existem.** A lista de campanhas dizia "A campanha não tem
+  anúncios" horas depois de eles estarem criados; é um estado desatualizado da
+  Google. Confirmar sempre na página Anúncios.
+- Recursos novos: sitelinks, anotações, fragmento, nome, logótipo e imagens,
+  ver `sitelinks-e-extensoes.md`.
+- **Mais tarde no mesmo dia:** recurso de preço nas duas campanhas (sofá 1/2/3
+  lugares desde 49/69/79 €, impermeabilização desde 59 €), 6 imagens de
+  impermeabilização do site nos dois grupos de impermeabilização (geradas por
+  IA; etiqueta de IA desligada a pedido do dono), chamada confirmada 24/7 pelo dono. O
+  Perfil da Empresa já estava associado. Campanhas continuam em pausa.
+
+### Auditoria de 25/09/2026 (antes do lançamento)
+
+Feita na conta, campanha a campanha, com as três campanhas em pausa.
+
+**Corrigido e confirmado depois de recarregar:** o Porto estava em **"Presença
+ou interesse"**, não em "Presença" como esta página dizia. Passou a
+"Presença". Muito provavelmente nunca tinha sido gravado: no histórico de
+alterações, Lisboa tem uma "Campanha mudou" a 23/09 às 16:42, junto com as
+localizações, e o Porto não tem nenhuma quando as suas localizações entraram,
+às 16:48. A campanha nasceu do carregamento em massa com o valor por defeito
+da Google. **Confirmar a opção de localização depois de recarregar, nunca pelo
+painel que acabou de fechar.**
+
+Visto e certo: só Rede de Pesquisa, português, 24/7, limite de CPC de 2,00 €
+nas duas, correspondência ampla desligada, recursos automáticos desligados,
+Máxima IA desligada, lista de negativas partilhada aplicada nas duas, os 4
+anúncios com 15 títulos e 4 descrições, as 13 páginas de destino e sitelinks a
+responder 200, os 18 sitelinks e os 2 recursos de preço elegíveis. As
+localizações correspondem ao `travel.ts`: no Porto são os concelhos da equipa
+do Porto (incluindo Felgueiras, Lousada, Paços de Ferreira e Penafiel, que
+**não** são da AMP; a etiqueta "16 dos 17 da AMP" estava errada, a lista não).
+
+Por resolver:
+
+- **Nome da empresa "Kyro Clean Solutions" reprovado** ("Irrelevância do nome
+  da empresa"): não corresponde ao domínio `cleansolutions.com.pt`.
+- **Faltam as palavras-chave principais sem cidade** ("limpeza de sofás",
+  "higienização de sofás", "impermeabilização de sofás"). Com a segmentação em
+  "Presença", o nome da cidade na palavra-chave não é preciso, e sem estas
+  quem pesquisa só "limpeza de sofás" no Porto não vê o anúncio. Na
+  `Campaign #1`, "higienização de sofás" foi a palavra com mais impressões (78).
+  5 das 7 palavras de impermeabilização de cada cidade têm "Baixo volume de
+  pesquisa".
+- **"Pack desde 99€"** aparece nos anúncios de impermeabilização e não aparece
+  em `/impermeabilizacao-{cidade}`.
+- **Existe um recurso de WhatsApp** (tipo "Mensagem", ação de conversão
+  "Conversation started"), mas só na `Campaign #1`, com texto de Lisboa.
+- **Cobertura de Lisboa:** Seixal, Vila Franca de Xira, Mafra e Moita só
+  existem como "cidade" (Seixal com alcance de 10 000), o que deixa de fora
+  Amora, Corroios, Alverca, Póvoa de Santa Iria, Ericeira e Baixa da Banheira.
+- **Faturação pré-paga:** crédito de 177,45 € a 25/09, sem pagamento
+  automático. Com 40 €/dia de orçamento somado, dura 4 a 5 dias se o gasto for
+  total.
+- **A promoção existe na conta:** 1200 € de crédito por gastar 2400 € até
+  **16/11/2026**, resgatada a 18/09, requisitos por cumprir (22,55 € gastos).
+  Com 40 €/dia não se chega lá.
+- Imagens: parte ainda "Pendente, em verificação".
+- Conversões: as 3 ações principais estão ativas, nenhuma registada ainda.
+
 ## 3. As campanhas, como estão desenhadas
 
 Duas campanhas iguais na estrutura, uma por cidade, cada uma com dois grupos:
@@ -198,7 +273,7 @@ recarga, e pelo "Total: conta" (que só soma campanhas ativas).
 | Definição | Porto | Lisboa |
 |---|---|---|
 | Localizações | 16 dos 17 municípios da AMP, **município** onde existe essa entidade, **cidade** como alternativa (Amadora, Valongo, Espinho, Felgueiras, Lousada, Vila do Conde\*, etc. só têm "cidade"). Falta só Arouca | Lisboa e os 17 concelhos da AML + Setúbal, mesma lógica município/cidade |
-| Opção de localização | **Presença**, nunca "presença ou interesse" — confirmado | idem |
+| Opção de localização | **Presença**, nunca "presença ou interesse". O Porto só ficou assim a 25/09 (ver a auditoria na secção 2) | Presença, confirmado a 25/09 |
 | Idioma | Português | Português |
 | Horário | Sem restrição (= 24/7, o padrão do Google Ads) | idem |
 | Sufixo de URL final | Aplicado ao nível da conta, cobre as duas | idem |

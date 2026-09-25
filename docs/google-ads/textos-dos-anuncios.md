@@ -1,8 +1,9 @@
 # Textos dos anúncios, Porto e Lisboa
 
-Gerado a partir de `campanhas-porto-lisboa.csv`. **Estes anúncios ainda não
-existem no Google Ads**: a conta recusa criar anúncios até a identidade estar
-confirmada. Quando existirem, vêem-se em Campanhas → Anúncios.
+Gerado a partir de `campanhas-porto-lisboa.csv`. **Os 4 anúncios existem no
+Google Ads desde 24/09/2026**, com estes textos (confirmado a 25/09). Vêem-se em
+Campanhas → Anúncios, onde a interface em português os chama "Anúncio dinâmico
+de pesquisa".
 
 Limites do Google: título ≤30 carateres, descrição ≤90. O número entre
 parênteses é a contagem real.

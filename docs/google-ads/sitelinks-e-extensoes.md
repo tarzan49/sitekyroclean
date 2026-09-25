@@ -44,7 +44,8 @@ Higienização · Impermeabilização · Tratamento anti ácaros · Remoção de
 
 ## Extensão de chamada
 
-Número 925 530 647, com o mesmo horário da campanha (segunda a sábado, 08:00 às 00:00).
+Número 925 530 647, ao nível da conta. **Sem restrição de horário, 24/7**
+(confirmado pelo dono a 24/09/2026: atende a qualquer hora). Não criar programação.
 
 
 ## Nome da empresa e logótipo
@@ -56,15 +57,75 @@ fundo transparente que já estava na biblioteca de recursos da conta.
 
 ## Imagens
 
-**Nenhuma aplicada.** Foram carregadas e retiradas antes de guardar, a pedido
-do dono: fotos de "antes" sozinhas e a da mancha de vinho não fazem sentido num
-anúncio. As candidatas estão em `~/Documents/KYRO_AD_FACTORY/google_ads_fotos_candidatas/`
-(fora do repositório), para escolher com o dono.
+**Aplicadas a 24/09/2026, em revisão pela Google.** As fotos são reais, de
+trabalhos da Kyro (pasta `before_after/` da KYRO_AD_FACTORY), já cortadas nos
+formatos exatos do Google (quadrado 1200×1200, horizontal 1200×628), sem texto
+por cima. Seleção e critérios em
+`~/Documents/KYRO_AD_FACTORY/google_ads_fotos_candidatas/05_selecao_final/BALANCO.md`.
 
-## Porque não há extensão de WhatsApp
+- **Nível de campanha, Porto e Lisboa (20 cada, o máximo):** 6 sofás em antes e
+  depois (A1–A6, 60%) e 4 em resultado final (F1–F4, 40%). Nenhum sofá aparece
+  nos dois grupos. As mesmas nas duas cidades: as fotos não dizem a cidade, e
+  dividir só dava ao Google menos por onde escolher em cada campanha.
+- **Nível de grupo, os dois "Impermeabilização de Sofás" (11 cada):** 3 imagens
+  do teste real de água a escorrer num assento tratado (vídeo
+  `assets/99_rever/rever_cadeira_agua_em_gotas_01.mov`) + os 4 resultados
+  finais. Imagens de grupo substituem as de campanha nesse grupo, por isso quem
+  pesquisa impermeabilização não vê manchas a sair, vê o líquido a escorrer.
+  Antes e depois de manchas ficam de fora deste grupo de propósito.
+- **Colchões e tapetes ficam de fora:** as campanhas só têm palavras-chave de
+  sofás e o Google mostra a imagem ao lado dessas pesquisas.
+- **Acrescentadas a 24/09/2026, nos mesmos dois grupos (passam a 17 cada):** os
+  3 pares antes/depois de impermeabilização que o site já usa no hero
+  (`src/assets/before-after-pool/impermeabilizacao-0{1,2,3}-*`: vinho,
+  refrigerante, leite), montados lado a lado em quadrado e horizontal (6 imagens,
+  `05_selecao_final/impermeabilizacao_site/`). O par 04 ficou de fora porque é
+  limpeza (sofá sujo → limpo), não proteção. **Estas imagens são geradas por IA,
+  não fotos de clientes**, e a própria Google detetou-o no carregamento. Foram
+  carregadas com a etiqueta de IA ativada e, no mesmo dia, **o dono pediu para a
+  desligar** (imagens mantidas, sem o selo "AI"). Alterado em Ferramentas →
+  Asset Studio → Biblioteca de recursos → vista Tabela → coluna "Etiqueta de IA".
+  A Google não a torna obrigatória; o risco que fica é a regra europeia de
+  transparência sobre imagens geradas, avisado ao dono antes de desligar. Continua a valer a pena filmar um antes/depois real
+  (água numa almofada antes e depois de tratar) para as substituir.
 
-O Google não tem recurso nativo de WhatsApp, e a extensão de mensagem envia **SMS**,
-que é um canal que a Kyro não acompanha. Um sitelink para `wa.me` também não serve:
+## Preço
+
+**Aplicado a 24/09/2026 ao nível de campanha** (Porto e Lisboa, um recurso cada,
+porque os URLs são da cidade). Idioma português (Portugal), tipo Serviços,
+qualificador "Desde", EUR. Preços de `src/components/quiz/QuizTypes.ts`
+(`sofaPrices`): se mudarem lá, mudar aqui.
+
+| Cabeçalho | Preço | Descrição | Destino |
+|---|---|---|---|
+| Limpeza Sofá 1 Lugar | desde 49 € | Ao domicílio + deslocação | `/limpeza-sofas-{cidade}` |
+| Limpeza Sofá 2 Lugares | desde 69 € | Ao domicílio + deslocação | `/limpeza-sofas-{cidade}` |
+| Limpeza Sofá 3 Lugares | desde 79 € | Ao domicílio + deslocação | `/limpeza-sofas-{cidade}` |
+| Impermeabilizar Sofá | desde 59 € | Proteção + deslocação | `/impermeabilizacao-{cidade}` |
+
+Porquê: mostrar o preço antes do clique filtra quem procura mais barato e poupa
+cliques pagos; o texto dos anúncios deixou de abrir com preço, por isso o preço
+vive aqui. "+ deslocação" em todas as linhas para não parecer preço fechado.
+Tapetes nunca (regra do site).
+
+## Perfil da Empresa (ficha do Google)
+
+**Já estava associado** (Ferramentas → Gestor de dados → Google Business Profile:
+"Associado", 2 estabelecimentos) e em uso num recurso de localização ao nível da
+conta com "todas as localizações", que cobre Porto e Lisboa. Nada a fazer.
+
+## WhatsApp
+
+**Correção de 25/09/2026:** a conta já tem um recurso de WhatsApp. É do tipo
+"Mensagem" (Beta), com o número +351 925 530 647 e uma mensagem pré-escrita de
+Lisboa, e está associado **só à `Campaign #1`** (criado a 18/09). Cada conversa
+aberta a partir dele conta na ação de conversão "Conversation started" (alojada
+na Google, principal, objetivo "Leads a partir de mensagens"). A nota antiga
+abaixo dizia que o Google não tinha recurso nativo de WhatsApp, o que já não é
+verdade. Por decidir com o dono: acrescentá-lo ao Porto e a Lisboa, com uma
+mensagem de cada cidade.
+
+Nota antiga: um sitelink para `wa.me` não serve:
 o domínio de destino tem de ser o do anúncio. O caminho certo é o que o site já faz,
 ou seja o botão de WhatsApp na própria página de destino, com a mensagem pré-escrita
 a depender da página. Ver `src/lib/whatsappMessages.ts`.
