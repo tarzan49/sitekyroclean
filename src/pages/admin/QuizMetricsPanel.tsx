@@ -1,5 +1,5 @@
 import { TrackingHealth } from './TrackingHealth';
-import { classifyMetrics, fetchAllRows } from '@/lib/quizMetrics';
+import { classifyMetrics, consentEra, estimateTotal, fetchAllRows, measurementCoverage, type ConsentEra } from '@/lib/quizMetrics';
 import { useState, useCallback, useEffect, useRef } from "react";
 import {
   RefreshCw, Trash2, Activity, TrendingUp, Users, DollarSign, Target,
@@ -76,6 +76,15 @@ interface WeekMetrics {
   waDetailRows: DetailRow[];
   callDetailRows: DetailRow[];
   leadsDetailRows: DetailRow[];
+  /** Que parte dos pedidos a medição viu, e o que isso diz dos cliques. */
+  coverage: {
+    era: ConsentEra;
+    measured: number;
+    operational: number;
+    share: number | null;
+    waEstimate: number | null;
+    callEstimate: number | null;
+  };
 }
 
 const WEEKDAY_SHORT = ["Seg", "Ter", "Qua", "Qui", "Sex", "Sáb", "Dom"];
@@ -441,6 +450,65 @@ function WeekLineChart({
   );
 }
 
+/**
+ * Que parte da realidade esta semana mostra.
+ *
+ * Existe porque, desde 10/09/2026, quase tudo neste painel só conta quem
+ * aceitou as cookies, e nada o dizia: o dono via os números descer sem o
+ * negócio descer e concluiu que o tracking estava avariado. Os pedidos do CRM
+ * são a referência que conta toda a gente, por isso são eles que dão a escala.
+ */
+function CoverageNotice({ coverage, waClicks, callClicks }: { coverage: WeekMetrics["coverage"]; waClicks: number; callClicks: number }) {
+  const box = "rounded-2xl border border-sky-200 bg-sky-50 p-4 text-sm text-sky-950 space-y-1.5";
+  if (coverage.era === "before") {
+    return (
+      <div className={box}>
+        <p className="font-semibold">Semana anterior a 10/09/2026: a medição contava todos os visitantes</p>
+        <p>Nesta altura os cliques e as submissões eram gravados com ou sem cookies. A partir de 10/09 passaram a contar só quem aceita as cookies, por isso uma descida nas semanas seguintes pode ser só esta mudança de regra.</p>
+      </div>
+    );
+  }
+  if (coverage.era === "transition") {
+    return (
+      <div className={box}>
+        <p className="font-semibold">Semana de transição: a regra da medição mudou a 10/09/2026</p>
+        <p>Até dia 10 a medição contava todos os visitantes; a partir daí, só quem aceita as cookies. Os números desta semana misturam as duas regras e não se comparam com as outras.</p>
+      </div>
+    );
+  }
+  if (coverage.share === null) {
+    return (
+      <div className={box}>
+        <p className="font-semibold">A medição só conta quem aceitou as cookies</p>
+        <p>
+          {coverage.operational > 0 && coverage.measured === 0
+            ? `Chegaram ${coverage.operational} pedidos ao CRM e a medição não registou nenhum, por isso não há base para estimar.`
+            : `Só ${coverage.operational} ${coverage.operational === 1 ? "pedido" : "pedidos"} no CRM esta semana: poucos para estimar que parte a medição está a ver.`}
+          {" "}Cliques, aberturas, visitas e funil estão abaixo da realidade; os pedidos recebidos contam toda a gente.
+        </p>
+      </div>
+    );
+  }
+  const pct = Math.round(coverage.share * 100);
+  return (
+    <div className={box}>
+      <p className="font-semibold">A medição está a ver {pct}% dos pedidos desta semana</p>
+      <p>
+        Chegaram {coverage.operational} pedidos ao CRM e a medição registou {coverage.measured}. A diferença são pessoas que
+        não carregaram em "Aceitar" no aviso de cookies. Os cliques, as aberturas do quiz, as visitas e o funil têm o mesmo corte.
+      </p>
+      {(coverage.waEstimate !== null || coverage.callEstimate !== null) && (
+        <p>
+          Estimativa à mesma proporção: <strong>cerca de {coverage.waEstimate} cliques no WhatsApp</strong> (registados: {waClicks})
+          {" "}e <strong>cerca de {coverage.callEstimate} em ligar</strong> (registados: {callClicks}). Provavelmente é um mínimo: quem
+          carrega logo no WhatsApp tem menos tempo para responder ao aviso do que quem preenche o quiz.
+        </p>
+      )}
+      <p className="text-xs text-sky-900/70">Nada disto conta quem contacta a Kyro diretamente pelo WhatsApp, pela ficha do Google ou por recomendação, sem passar pelo site.</p>
+    </div>
+  );
+}
+
 const QuizMetricsPanel = () => {
   const [weekStart, setWeekStart] = useState<Date>(() => getWeekStart(new Date(), DASHBOARD_TZ));
   const [data, setData] = useState<WeekMetrics | null>(null);
@@ -478,6 +546,9 @@ const QuizMetricsPanel = () => {
       // "pedido" datado para hoje ainda antes de ser meio-dia.
       const allLeadsRows: { id: string; created_at: string; service: string | null; location: string | null; source: string | null }[] = leadRows;
       const leadsRows = allLeadsRows.filter(r => r.source !== "WhatsApp");
+      // Denominador da cobertura: só pedidos feitos no site. Os `Manual` são
+      // leads que o dono escreveu à mão no CRM, nunca passaram pelo quiz.
+      const websiteLeads = leadsRows.filter(r => r.source !== "Manual").length;
 
       const countByDay = (rows: { created_at: string }[]): ChartPoint[] => {
         const map: Record<string, number> = {};
@@ -532,7 +603,17 @@ const QuizMetricsPanel = () => {
       callEvents.forEach(e => { const s = groupClickOrigin(e.service ?? "desconhecido"); callSourceCounts[s] = (callSourceCounts[s] ?? 0) + 1; });
       const callClicksBySource = Object.entries(callSourceCounts).sort((a, b) => b[1] - a[1]).map(([source, count]) => ({ source, count }));
 
+      const cover = measurementCoverage(completes.length, websiteLeads);
+
       setData({
+        coverage: {
+          era: consentEra(ws, new Date(endISO)),
+          measured: cover.measured,
+          operational: cover.operational,
+          share: cover.share,
+          waEstimate: estimateTotal(waEvents.length, cover.share),
+          callEstimate: estimateTotal(callEvents.length, cover.share),
+        },
         legacy: summary.legacy,
         modernStarts: summary.modernStarts,
         totalStarts: starts.length,
@@ -610,6 +691,7 @@ const QuizMetricsPanel = () => {
       <TrackingHealth />
       <details className="rounded-lg border border-amber-300 bg-amber-50 p-4 text-sm text-amber-950">
         <summary className="cursor-pointer font-semibold">Como interpretar as métricas e o histórico</summary>
+        <p>Desde 10/09/2026, tudo o que vem da medição do site (cliques, aberturas do quiz, submissões registadas, visitas, funil e tempo) só conta quem carregou em "Aceitar" no aviso de cookies. Antes dessa data contava toda a gente, por isso as semanas anteriores não se comparam com as seguintes. Os pedidos recebidos vêm do CRM e contam sempre toda a gente. A caixa azul no topo de cada semana mostra que parte a medição está a ver.</p>
         <p>WhatsApp e telefone contam cliques nos links do site, não mensagens recebidas nem chamadas atendidas. Contactos diretos ficam fora desta medição.</p>
         <p>Os pedidos recebidos são os registos do CRM. Uma submissão entregue apenas por email pode ainda não existir no CRM.</p>
         {data?.legacy && <p className="mt-2 font-semibold">Esta semana inclui dados anteriores à correção: cliques em falta não são recuperáveis as antigas submissões não confirmavam a entrega e a duração antiga inclui tempo em segundo plano. O funil abaixo usa apenas as novas tentativas ({data.modernStarts}).</p>}
@@ -698,22 +780,27 @@ const QuizMetricsPanel = () => {
 
       {!loading && !error && data && (
         <>
+          <CoverageNotice coverage={data.coverage} waClicks={data.waClicks} callClicks={data.callClicks} />
+
           {/* KPI cards, all scoped to the selected week */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             {[
-              { label: "Total iniciados", value: data.totalStarts, icon: Users, color: "text-navy" },
-              { label: "Submissões registadas", value: data.totalCompletes, icon: CheckCircle, color: "text-green-500" },
-              { label: "Taxa de submissão", value: `${data.completionRate.toFixed(1)}%`, icon: Target, color: "text-gold" },
-              { label: "Valor médio orçamento", value: `${data.avgValue.toFixed(0)}€`, icon: DollarSign, color: "text-emerald-600" },
-              { label: "Pedidos recebidos", value: data.leadsCount, icon: Inbox, color: "text-gold" },
-              { label: "Clicks WhatsApp", value: data.waClicks, icon: MessageCircle, color: "text-[#25D366]" },
-              { label: "Cliques em ligar", value: data.callClicks, icon: Phone, color: "text-blue-500" },
-              { label: "Tempo por sessão registada", value: data.avgSessionSeconds >= 60 ? `${Math.floor(data.avgSessionSeconds / 60)}m ${data.avgSessionSeconds % 60}s` : `${data.avgSessionSeconds}s`, icon: Clock, color: "text-purple-500" },
+              { label: "Total iniciados", value: data.totalStarts, icon: Users, color: "text-navy", consented: true },
+              { label: "Submissões registadas", value: data.totalCompletes, icon: CheckCircle, color: "text-green-500", consented: true },
+              { label: "Taxa de submissão", value: `${data.completionRate.toFixed(1)}%`, icon: Target, color: "text-gold", consented: true },
+              { label: "Valor médio orçamento", value: `${data.avgValue.toFixed(0)}€`, icon: DollarSign, color: "text-emerald-600", consented: true },
+              { label: "Pedidos recebidos", value: data.leadsCount, icon: Inbox, color: "text-gold", consented: false },
+              { label: "Clicks WhatsApp", value: data.waClicks, icon: MessageCircle, color: "text-[#25D366]", consented: true },
+              { label: "Cliques em ligar", value: data.callClicks, icon: Phone, color: "text-blue-500", consented: true },
+              { label: "Tempo por sessão registada", value: data.avgSessionSeconds >= 60 ? `${Math.floor(data.avgSessionSeconds / 60)}m ${data.avgSessionSeconds % 60}s` : `${data.avgSessionSeconds}s`, icon: Clock, color: "text-purple-500", consented: true },
             ].map((kpi, i) => (
               <div key={i} className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 text-center">
                 <kpi.icon className={`w-5 h-5 mx-auto mb-2 ${kpi.color}`} />
                 <p className="text-xl font-bold text-navy font-playfair">{kpi.value}</p>
                 <p className="text-[11px] text-gray-400 mt-0.5 leading-tight">{kpi.label}</p>
+                {data.coverage.era !== "before" && (
+                  <p className="text-[10px] text-gray-400/80 mt-0.5 leading-tight">{kpi.consented ? "só quem aceitou cookies" : "todos, com ou sem cookies"}</p>
+                )}
               </div>
             ))}
           </div>
@@ -724,6 +811,7 @@ const QuizMetricsPanel = () => {
               icon={MessageCircle}
               iconColorClass="text-[#25D366]"
               title="Clicks WhatsApp"
+              helper={data.coverage.era === "before" ? "Cliques nos links do WhatsApp." : "Cliques nos links do WhatsApp, só de quem aceitou cookies."}
               data={data.waChart}
               loading={false}
               error={false}
@@ -751,7 +839,7 @@ const QuizMetricsPanel = () => {
               icon={Phone}
               iconColorClass="text-blue-500"
               title="Cliques em ligar"
-              helper="Cliques no botão de ligar, não chamadas efetivamente atendidas."
+              helper={data.coverage.era === "before" ? "Cliques no botão de ligar, não chamadas efetivamente atendidas." : "Cliques no botão de ligar, só de quem aceitou cookies. Não são chamadas atendidas."}
               data={data.callChart}
               loading={false}
               error={false}

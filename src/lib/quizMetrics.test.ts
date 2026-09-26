@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { classifyMetrics, fetchAllRows, type MetricEvent } from './quizMetrics';
+import { classifyMetrics, consentEra, estimateTotal, fetchAllRows, measurementCoverage, type MetricEvent } from './quizMetrics';
 const e = (id: string, action: string, step: number, session_id = 'legacy', value: number | null = null, page_path = '/'): MetricEvent => ({ id, action, step, session_id, value, page_path });
 describe('metrics integrity', () => {
   it('never counts quantity progression or contact clicks as submissions', () => {
@@ -42,5 +42,27 @@ describe('metrics integrity', () => {
   });
   it('does not present partial results after a page fails', async () => {
     await expect(fetchAllRows(async from=>from?{data:null,error:new Error('denied')}:{data:[1],error:null,count:2})).rejects.toThrow('denied');
+  });
+});
+
+describe('measurement coverage (consent since 10/09/2026)', () => {
+  it('compares measured submissions with CRM requests and estimates the unseen part', () => {
+    const c = measurementCoverage(6, 10);
+    expect(c.share).toBeCloseTo(0.6);
+    expect(estimateTotal(24, c.share)).toBe(40);
+  });
+  it('refuses to estimate from a tiny week or from zero measured', () => {
+    expect(measurementCoverage(2, 3).share).toBeNull();
+    expect(estimateTotal(10, null)).toBeNull();
+    expect(estimateTotal(10, measurementCoverage(0, 8).share)).toBeNull();
+  });
+  it('caps coverage at 100% when email-only deliveries push measured above the CRM', () => {
+    expect(measurementCoverage(7, 5).share).toBe(1);
+  });
+  it('places weeks before, across and after the consent rule', () => {
+    const d = (s: string) => new Date(s);
+    expect(consentEra(d('2026-08-31T00:00:00+01:00'), d('2026-09-07T00:00:00+01:00'))).toBe('before');
+    expect(consentEra(d('2026-09-07T00:00:00+01:00'), d('2026-09-14T00:00:00+01:00'))).toBe('transition');
+    expect(consentEra(d('2026-09-14T00:00:00+01:00'), d('2026-09-21T00:00:00+01:00'))).toBe('after');
   });
 });

@@ -75,3 +75,56 @@ export async function fetchAllRows<T>(page: (from: number, to: number) => Promis
     // Without a count, continue until an empty page rather than assuming a cap.
   }
 }
+
+/**
+ * A partir de quando a recolha passou a depender do aviso de cookies.
+ *
+ * Até ao commit `0a21422` (10/09/2026) o `quizTracking.ts` gravava todos os
+ * visitantes; desde aí o `emit()` só grava quem carregou em "Aceitar". A
+ * mudança nunca foi assinalada no painel, e o dono leu a descida que se seguiu
+ * como tracking avariado: o negócio continuava igual, o painel é que passou a
+ * ver só uma parte. Os pedidos recebidos (tabela `leads`) nunca dependeram
+ * disto.
+ */
+export const CONSENT_GATED_SINCE = new Date('2026-09-10T00:00:00+01:00');
+
+export type ConsentEra = 'before' | 'transition' | 'after';
+
+/** Em que regra de recolha cai a semana [start, end). */
+export function consentEra(start: Date, end: Date): ConsentEra {
+  if (end.getTime() <= CONSENT_GATED_SINCE.getTime()) return 'before';
+  if (start.getTime() < CONSENT_GATED_SINCE.getTime()) return 'transition';
+  return 'after';
+}
+
+/** Abaixo disto uma proporção semanal é ruído, não se estima nada com ela. */
+export const MIN_COVERAGE_SAMPLE = 5;
+
+export interface MeasurementCoverage {
+  /** Submissões que a medição registou (só com cookies aceites). */
+  measured: number;
+  /** Pedidos do site que chegaram ao CRM (todos, com ou sem cookies). */
+  operational: number;
+  /** measured / operational, limitado a 1; `null` com amostra pequena. */
+  share: number | null;
+}
+
+/**
+ * Que parte dos pedidos a medição conseguiu ver.
+ *
+ * As duas pontas contam o mesmo acontecimento (um pedido entregue pelo quiz)
+ * por dois caminhos: o CRM grava sempre, `quiz_events` só com consentimento. A
+ * razão entre elas é a melhor medida disponível da fatia que o resto do painel
+ * vê. Pode passar de 1 quando o pedido só chegou por email e não ao CRM, por
+ * isso é limitada.
+ */
+export function measurementCoverage(measured: number, operational: number): MeasurementCoverage {
+  const share = operational >= MIN_COVERAGE_SAMPLE ? Math.min(1, measured / operational) : null;
+  return { measured, operational, share };
+}
+
+/** Total provável de um número observado, à mesma cobertura. `null` se não houver base. */
+export function estimateTotal(observed: number, share: number | null): number | null {
+  if (share === null || share <= 0) return null;
+  return Math.round(observed / share);
+}

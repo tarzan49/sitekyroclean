@@ -175,7 +175,7 @@ Contexto: o site já tinha a parte difícil resolvida (16.045 páginas em HTML e
 - **"Tapete: Limpe 5 m², pague 4" no upsell final é intencional** (dono, 2026-09-23): é um desconto sobre o orçamento que vier a ser feito, não um preço por m². Não remover.
 - **O quiz continua a pedir a localização ao abrir** (decisão do dono a 2026-09-23: só a mensagem mudou, para "Sem problema. Escreva a sua localidade abaixo e continuamos.").
 - **`archive/public-nao-usado/` guarda 130 ficheiros (~150 MB) que estavam em `public/` sem nenhuma página os usar** (movidos a 2026-09-23: `imagenshomepage/`, `Imagens 169/`, `images-optimized/`, `images/fotos hero/`, e ficheiros soltos em `service-promises/`, `materials/`, `colchoes/` e outros). Método: o nome de cada ficheiro foi procurado em `src`, `scripts`, `index.html`, no JS/CSS construído e nos 16.000 HTML do `dist`; só saiu o que não aparecia em lado nenhum. **Ficaram de propósito, mesmo sem referência literal,** as pastas cujos caminhos são montados em runtime (`images/home/`, `images/problem-treatments/`, `images/services/`, `images/service-examples/`, `images/problem-examples/`, `images/landing-problems/`): um nome construído com `${...}` não aparece no código e a verificação por nome dá falso negativo. **Uma imagem nova só vai para `public/` se uma página a usar;** a pasta `archive/` não é servida.
-- **Por fazer, do lado do Cloudflare:** substituir `functions/_middleware.ts` por uma Redirect Rule (ver AUDIT.md, ponto 3).
+- **Por fazer, do lado do Cloudflare:** substituir `functions/_middleware.ts` por uma Redirect Rule (ver AUDIT.md, ponto 3). E criar o registo DNS `www`: a 2026-09-26 `www.cleansolutions.com.pt` não resolvia, por isso quem escreve o endereço com `www` recebe um erro do browser em vez do site.
 
 ## Glossário e longtail (2026-09-17)
 
@@ -283,6 +283,8 @@ já corrigida:** ver a nota da nona armadilha / secção CSP sobre `connect-src`
 e o domínio `www.google.<tld-do-país>`. Continua por confirmar do lado do
 dono: que a ação de conversão no Ads está a registar entradas (só ele vê o
 painel do Ads).
+
+**Desde 10/09/2026 o painel de Métricas só vê quem aceita as cookies, e antes via toda a gente.** O commit `0a21422` meteu a porta do consentimento no `emit()` do `quizTracking.ts` sem o dizer em lado nenhum; a 26/09 o dono achou que o tracking estava avariado por ver os números descer com o negócio igual. Medido: cerca de **60%** dos pedidos do site aparecem na medição. O separador Métricas mostra agora essa cobertura por semana e uma estimativa dos cliques reais. Detalhe e consulta em `METRICS.md` ("Consentimento") e `supabase/queries/cobertura-medicao.sql`. **Nunca comparar semanas antes e depois de 10/09 como se fosse a mesma régua**, e não voltar a contar quem recusou sem decisão do dono.
 
 **`?kyro_debug=1` é diagnóstico, não autorização.** Enviar fora de produção
 exige `VITE_TRACKING_ALLOW_NON_PRODUCTION=true` **e** identificadores que não

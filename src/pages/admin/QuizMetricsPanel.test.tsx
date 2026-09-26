@@ -20,3 +20,24 @@ it('renders seven submissions rather than twenty-seven completed steps',async()=
  expect(screen.queryByText('48.2%')).toBeNull();
  expect(screen.getByText(/Esta semana inclui dados anteriores/)).toBeTruthy();
 });
+it('says how much of the week the measurement saw and estimates the unseen clicks', async () => {
+ const at = new Date().toISOString();
+ const ev = (id: string, action: string, step: number, session_id: string) => ({ id, action, step, session_id, created_at: at, value: null, service: 'hero', city: null, page_path: '/', device: 'mobile' });
+ fixtures.events = [
+  ...Array.from({ length: 6 }, (_, i) => ev(`c${i}`, 'complete', 4, `v2:q:${i}`)),
+  ...Array.from({ length: 24 }, (_, i) => ev(`w${i}`, 'whatsapp_click', 0, `v2:v${i}`)),
+  ...Array.from({ length: 6 }, (_, i) => ev(`t${i}`, 'call_click', 0, `v2:t${i}`)),
+ ];
+ fixtures.leads = [
+  ...Array.from({ length: 10 }, (_, i) => ({ id: `l${i}`, created_at: at, service: 'Sofás', location: 'Porto', source: 'Website' })),
+  // Nem as reservas importadas do WhatsApp nem os leads escritos à mão passaram pelo quiz.
+  { id: 'wa', created_at: at, service: 'Sofás', location: 'Porto', source: 'WhatsApp' },
+  { id: 'm', created_at: at, service: 'Sofás', location: 'Porto', source: 'Manual' },
+ ];
+ render(<QuizMetricsPanel/>);
+ await waitFor(() => expect(screen.getByText(/A medição está a ver 60% dos pedidos/)).toBeTruthy());
+ expect(screen.getByText(/cerca de 40 cliques no WhatsApp/)).toBeTruthy();
+ expect(screen.getByText(/cerca de 10 em ligar/)).toBeTruthy();
+ expect(screen.getByText('Pedidos recebidos').parentElement!.textContent).toContain('todos, com ou sem cookies');
+ expect(screen.getByText('Clicks WhatsApp', { selector: 'p' }).parentElement!.textContent).toContain('só quem aceitou cookies');
+});

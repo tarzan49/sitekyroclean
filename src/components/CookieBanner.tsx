@@ -38,6 +38,11 @@ const CookieBanner = () => {
 
   if (!visible) return null;
 
+  // O link da política de privacidade não fecha o aviso. Fechava, e como o
+  // aviso só volta a abrir num carregamento novo da página, quem ia ler a
+  // política ficava o resto da visita sem decisão: nem aceitava nem recusava,
+  // e por isso nunca era medido nem voltava a ser perguntado.
+
   const accept = () => {
     setConsent('accepted');
     setVisible(false);
@@ -67,7 +72,6 @@ const CookieBanner = () => {
                   <Link
                     to="/politica-de-privacidade"
                     className="text-[#D4AF37] underline underline-offset-2 hover:text-[#f0dc8a] transition-colors"
-                    onClick={() => setVisible(false)}
                   >
                     Privacy Policy
                   </Link>
@@ -79,7 +83,6 @@ const CookieBanner = () => {
                   <Link
                     to="/politica-de-privacidade"
                     className="text-[#D4AF37] underline underline-offset-2 hover:text-[#f0dc8a] transition-colors"
-                    onClick={() => setVisible(false)}
                   >
                     Política de Privacidade
                   </Link>

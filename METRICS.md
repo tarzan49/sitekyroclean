@@ -12,6 +12,14 @@
 - Os ecrãs de upsell (combo, cadeiras, sofá, colchão) não têm número de passo próprio: sobrepõem-se ao passo 3, e um abandono aí fica registado como passo 3. Distingui-los exigia uma coluna nova em `quiz_events`.
 - `session_time` v2 transporta incrementos de tempo em primeiro plano. Admin excluído. O painel soma por visita; para o histórico anterior considera o maior snapshot por ID, sem conseguir remover tempo de fundo já incorporado.
 
+## Consentimento: a regra mudou a 10/09/2026
+
+- **Até 10/09/2026 (commit `0a21422`) o `quizTracking.ts` gravava todos os visitantes, com ou sem cookies.** O mesmo commit meteu no `emit()` a porta `getConsent() !== 'accepted'`, e desde aí `quiz_events` só tem quem carregou em "Aceitar". Quem recusa, e quem ignora o aviso e carrega logo no WhatsApp, não aparece. A mudança não ficou escrita em lado nenhum nem assinalada no painel, e a 26/09/2026 o dono leu a descida que se seguiu como "tracking avariado": o negócio estava igual, o painel é que passou a ver só uma parte.
+- **Medido a 26/09/2026** (`supabase/queries/cobertura-medicao.sql`): nas semanas de 14/09 e 21/09 chegaram 10 pedidos do site ao CRM em cada uma e a medição registou 6, ou seja **60% de cobertura**. Cliques de WhatsApp e de telefone, aberturas, visitas, funil e tempo têm o mesmo corte, provavelmente maior: quem carrega logo no WhatsApp tem menos tempo para responder ao aviso do que quem preenche o quiz.
+- **Os pedidos recebidos (tabela `leads`) nunca dependeram disto** e são a referência. O cartão azul do separador Métricas (`CoverageNotice`) mostra por semana a razão submissões medidas / pedidos do site no CRM, e só estima cliques reais com pelo menos 5 pedidos (`measurementCoverage` e `estimateTotal` em `src/lib/quizMetrics.ts`). Semanas anteriores a 10/09 levam aviso próprio: não se comparam com as seguintes.
+- **Nenhuma medição do site vê contactos que não passam por ele:** WhatsApp direto, ficha do Google, recomendações. No CRM (`service_requests`) quase todos os serviços têm origem WhatsApp.
+- Voltar a contar quem não aceitou cookies é uma decisão de privacidade do dono, não uma correção técnica. Não reabrir a porta sem essa decisão.
+
 ## Entrega e diagnóstico
 
 `eventDelivery.ts` guarda cada evento sem contactos pessoais em localStorage antes do envio, sob chave própria com UUID. POST keepalive permite a troca para a aplicação WhatsApp. Falhas de rede/HTTP mantêm o evento para nova tentativa a cada 30 segundos, no regresso da rede e em novas visitas. O mesmo ID é reenviado, e apenas a duplicação da chave primária confirma uma entrega anterior. Retenção máxima de sete dias e limite de 200 eventos por instância. Armazenamento indisponível conserva apenas a fila em memória. Nenhum mecanismo no browser garante recolha perante bloqueadores, limpeza do armazenamento ou ausência definitiva de rede.
