@@ -240,11 +240,21 @@ opcional" (ver `sitelinks-e-extensoes.md`).
   revisão pode só acontecer depois de ativar.
 - Conversões principais: "Pedido confirmado (website)" (etiqueta reconhecida,
   "Nenhuma conversão recente"), "WhatsApp - clique no site" (GA4) e
-  "Conversation started" (WhatsApp do anúncio). **O objetivo "Pedir
-  estimativa do custo" aparece como "Configuração incorreta":** está nas
+  "Conversation started" (WhatsApp do anúncio). O objetivo "Solicitar
+  estimativas do custo" aparecia como "Configuração incorreta": estava nas
   predefinições da conta sem nenhuma ação principal (a única é antiga, inativa
-  e secundária). Não mexe em nada com Maximizar cliques; convém tirá-lo das
-  predefinições antes de passar a uma estratégia por conversões.
+  e secundária). **Corrigido no mesmo dia, a pedido do dono:** saiu das
+  predefinições (0 de 2 campanhas; o aviso continua no cartão, mas nenhuma
+  campanha o usa).
+- **Objetivo novo, "Chamada telefónica de lead"** (26/09/2026, a pedido do
+  dono): ação "Chamada do anúncio (60 s ou mais)", principal, contagem "Uma",
+  30 dias, valor 1 €. Conta só chamadas feitas pelo botão de chamada do anúncio
+  que durem pelo menos 60 s; os relatórios de chamadas já estavam ligados na
+  conta. **As sugestões da Google de importar `call_click` e `phone_click` do
+  GA4 ficaram por aceitar de propósito:** são cliques no número do site, e
+  cliques em telefone nunca entram num objetivo (regra do `CLAUDE.md`). Os
+  objetivos predefinidos passaram a ser quatro: formulário, chamada, contacto
+  (WhatsApp no site) e mensagens (WhatsApp do anúncio).
 - Faturação: crédito pré-pago de 177,45 €, pagamentos manuais, sem pagamento
   automático. Com 40 €/dia dá para 4 a 5 dias; depois os anúncios param.
 - Páginas: os 13 destinos (anúncios e sitelinks) respondem 200 em menos de
