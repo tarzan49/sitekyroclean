@@ -116,22 +116,26 @@ export const ADS_CUSTOMER_CONVERSION_ACTION = env('VITE_GOOGLE_ADS_CUSTOMER_CONV
 export const ENHANCED_CONVERSIONS_ENABLED = env('VITE_ENHANCED_CONVERSIONS') === 'true';
 
 /**
- * Modo de consentimento.
+ * Modo de consentimento. **Em vigor: `advanced`, decidido pelo dono a
+ * 26/09/2026**, para as campanhas do Google Ads recuperarem por modelação as
+ * conversões de quem recusa as cookies.
  *
- * - `basic` (o que o site faz hoje): a `gtag.js` só é carregada depois de a
- *   pessoa aceitar. Quem recusa, ou ainda não decidiu, não gera pedido nenhum
- *   para a Google. É a postura mais conservadora e é a que fica por omissão.
- * - `advanced`: a `gtag.js` carrega sempre, com todos os sinais de
- *   consentimento a `denied`. Nesse estado a Google não escreve nem lê cookies
- *   e não guarda identificadores; envia pings sem cookies que alimentam a
- *   modelação de conversões. É o que a Google recomenda e recupera parte das
- *   conversões perdidas, mas é uma decisão do dono, não do código.
+ * - `advanced`: a `gtag.js` carrega sempre, com os quatro sinais a `denied`
+ *   (declarados no script inline do `index.html`). Nesse estado a Google não lê
+ *   nem grava cookies e não guarda identificadores; recebe pings sem cookies
+ *   (data e hora, browser, página de origem, se a visita veio de um anúncio, o
+ *   estado do consentimento), que alimentam a modelação de conversões.
+ * - `basic`: a `gtag.js` só carrega depois de a pessoa aceitar. Quem recusa, ou
+ *   ainda não decidiu, não gera pedido nenhum para a Google.
  *
- * Trocar para `advanced` é mudar `VITE_CONSENT_MODE=advanced` no Cloudflare
- * Pages. Não muda o banner nem o que acontece quando a pessoa aceita.
+ * O que **não** muda com o modo: o Pixel da Meta, a medição própria em
+ * `quiz_events` e os dados das conversões melhoradas continuam a exigir a
+ * aceitação. A política de privacidade descreve o modo avançado; voltar ao
+ * básico (`VITE_CONSENT_MODE=basic` no Cloudflare Pages) obriga a corrigir
+ * também esse texto, senão a política passa a descrever o que o site não faz.
  */
 export const CONSENT_MODE: 'basic' | 'advanced' =
-  env('VITE_CONSENT_MODE') === 'advanced' ? 'advanced' : 'basic';
+  env('VITE_CONSENT_MODE') === 'basic' ? 'basic' : 'advanced';
 
 /** O domínio real. Fora daqui nada é enviado para o GA4/Ads (ver `trackingEnv`). */
 export const PRODUCTION_HOSTNAME = 'cleansolutions.com.pt';

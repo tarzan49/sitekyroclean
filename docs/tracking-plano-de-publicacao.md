@@ -158,7 +158,8 @@ VITE_GOOGLE_ADS_CUSTOMER_CONVERSION_ACTION=<nome da ação offline>
 
 Não acrescentar `VITE_TRACKING_ALLOW_NON_PRODUCTION` em produção. Deixar
 `VITE_CONSENT_MODE` e `VITE_ENHANCED_CONVERSIONS` por definir (os valores por
-omissão são os corretos).
+omissão são os corretos; desde 26/09/2026 o de `VITE_CONSENT_MODE` é
+`advanced`, e pôr `basic` obriga a corrigir a política de privacidade).
 
 Confirmar que `VITE_SUPABASE_URL` e `VITE_SUPABASE_PUBLISHABLE_KEY` continuam
 configuradas — foi a sua ausência que cegou o painel durante quatro dias em

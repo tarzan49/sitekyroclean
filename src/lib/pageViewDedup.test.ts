@@ -18,6 +18,9 @@ beforeEach(() => {
   vi.stubEnv('VITE_TRACKING_ALLOW_NON_PRODUCTION', 'true');
   vi.stubEnv('VITE_GA4_MEASUREMENT_ID', 'G-TESTE00000');
   vi.stubEnv('VITE_GOOGLE_ADS_ID', 'AW-000000000');
+  // A deduplicação é igual nos dois modos; a porta de consentimento testada
+  // aqui é a do básico. O avançado está em `gtag.test.ts`.
+  vi.stubEnv('VITE_CONSENT_MODE', 'basic');
   localStorage.setItem('kyro_cookie_consent', 'accepted');
   vi.stubGlobal('location', new URL('https://cleansolutions.com.pt/limpeza-sofas-lisboa'));
 });

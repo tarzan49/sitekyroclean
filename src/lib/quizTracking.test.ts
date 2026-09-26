@@ -217,6 +217,7 @@ describe('page views after consent', () => {
 
 describe('CTA audit matrix with mocked delivery', () => {
   it.each(['header_desktop', 'header_mobile', 'header_mobile_menu', 'hero', 'sticky_bar', 'footer', 'location_hero_limpeza-sofas_lisboa', 'quote_confirmation'])('%s survives DOM replacement and keyboard-style activation', async source => {
+    vi.stubEnv('VITE_CONSENT_MODE', 'basic');
     vi.stubEnv('VITE_TRACKING_ALLOW_NON_PRODUCTION', 'true');
     vi.stubEnv('VITE_GA4_MEASUREMENT_ID', 'G-TESTE00000');
     vi.stubEnv('VITE_GOOGLE_ADS_ID', 'AW-000000000');
@@ -243,5 +244,30 @@ describe('CTA audit matrix with mocked delivery', () => {
     document.querySelector('a')!.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }));
     expect(fetch).toHaveBeenCalledTimes(2);
     expect(window.gtag).toHaveBeenCalledTimes(2);
+  });
+});
+
+/**
+ * Modo avançado (em vigor desde 26/09/2026): depois de recusar, a Google tag
+ * continua a receber o clique como ping sem cookies, mas a medição própria em
+ * `quiz_events` não recebe nada. A política de privacidade diz exatamente isto.
+ */
+describe('advanced consent mode and our own measurement', () => {
+  it('a refused visitor reaches Google as a cookieless ping and never quiz_events', async () => {
+    vi.stubEnv('VITE_CONSENT_MODE', '');
+    vi.stubEnv('VITE_TRACKING_ALLOW_NON_PRODUCTION', 'true');
+    vi.stubEnv('VITE_GA4_MEASUREMENT_ID', 'G-TESTE00000');
+    vi.stubEnv('VITE_GOOGLE_ADS_ID', 'AW-000000000');
+    localStorage.setItem('kyro_cookie_consent', 'declined');
+    const { loadGoogleTags } = await import('./gtag');
+    loadGoogleTags();
+    const m = await import('./quizTracking');
+    cleanup = m.initContactTracking();
+    vi.mocked(window.gtag!).mockClear();
+    document.body.innerHTML = '<a href="https://wa.me/351925530647" data-tracking-source="hero">WhatsApp</a>';
+    document.querySelector('a')!.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }));
+    await Promise.resolve();
+    expect(window.gtag).toHaveBeenCalledWith('event', 'whatsapp_click', expect.objectContaining({ cta_location: 'hero' }));
+    expect(fetch).not.toHaveBeenCalled();
   });
 });

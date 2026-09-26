@@ -47,7 +47,9 @@
       ad_personalization: 'denied',
       wait_for_update: 500
     });
-    // Tags are loaded by consent.ts only after acceptance.
+    // Advanced consent mode (owner decision, 26 Sep 2026): gtag.js is loaded by
+    // consent.ts on every visit with these defaults, so Google gets cookieless
+    // pings until the visitor accepts. The Meta Pixel still waits for acceptance.
   </script>
   
   <title>Kyro Clean Solutions | Limpeza de Sofás, Colchões e Tapetes ao Domicílio</title>

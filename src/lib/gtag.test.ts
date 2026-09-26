@@ -13,6 +13,10 @@ beforeEach(() => {
   vi.stubEnv('VITE_TRACKING_ALLOW_NON_PRODUCTION', 'true');
   vi.stubEnv('VITE_GA4_MEASUREMENT_ID', 'G-TESTE00000');
   vi.stubEnv('VITE_GOOGLE_ADS_ID', 'AW-000000000');
+  // As portas de consentimento abaixo são as do modo básico, que continua a
+  // existir (`VITE_CONSENT_MODE=basic`). O modo em vigor, o avançado, tem o seu
+  // próprio bloco no fim do ficheiro.
+  vi.stubEnv('VITE_CONSENT_MODE', 'basic');
   localStorage.setItem('kyro_cookie_consent', 'accepted');
 });
 
@@ -212,5 +216,34 @@ describe('sinais de consentimento', () => {
     expect(sendGtagEvent('page_view', {}, 'analytics')).toBe(true);
     expect(sendGtagEvent('generate_lead', {}, 'ads')).toBe(false);
     expect(sendAdsConversion({ label: 'AbC', value: 10 })).toBe(false);
+  });
+});
+
+/**
+ * Modo avançado, em vigor desde 26/09/2026 (decisão do dono). A tag carrega
+ * sem esperar pelo banner e os eventos saem com os quatro sinais negados: a
+ * Google recebe pings sem cookies e usa-os para modelar conversões. O que
+ * este bloco fixa é o que **não** pode mudar com isso: nenhum sinal passa a
+ * `granted` sem a pessoa aceitar.
+ */
+describe('modo avançado (em vigor)', () => {
+  beforeEach(() => { vi.stubEnv('VITE_CONSENT_MODE', ''); });
+
+  it('é o modo por omissão', async () => {
+    const { CONSENT_MODE } = await import('@/constants/tracking');
+    expect(CONSENT_MODE).toBe('advanced');
+  });
+
+  it('envia sem decisão e depois de recusar, sem nunca conceder um sinal', async () => {
+    localStorage.removeItem('kyro_cookie_consent');
+    const { loadGoogleTags, sendGtagEvent, sendAdsConversion } = await import('./gtag');
+    loadGoogleTags();
+    expect(sendGtagEvent('page_view')).toBe(true);
+    localStorage.setItem('kyro_cookie_consent', 'declined');
+    expect(sendAdsConversion({ label: 'AbC', value: 50 })).toBe(true);
+    const granted = vi.mocked(window.gtag!).mock.calls
+      .filter(call => call[0] === 'consent')
+      .some(call => Object.values(call[2] as Record<string, string>).includes('granted'));
+    expect(granted).toBe(false);
   });
 });

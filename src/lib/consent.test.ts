@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-beforeEach(() => { vi.resetModules(); vi.stubEnv('VITE_TRACKING_ALLOW_NON_PRODUCTION', 'true'); vi.stubEnv('VITE_GA4_MEASUREMENT_ID', 'G-TESTE00000'); vi.stubEnv('VITE_GOOGLE_ADS_ID', 'AW-000000000'); localStorage.clear(); sessionStorage.clear(); document.head.innerHTML = ''; window.gtag = vi.fn(); });
+beforeEach(() => { vi.resetModules(); vi.stubEnv('VITE_TRACKING_ALLOW_NON_PRODUCTION', 'true'); vi.stubEnv('VITE_GA4_MEASUREMENT_ID', 'G-TESTE00000'); vi.stubEnv('VITE_GOOGLE_ADS_ID', 'AW-000000000'); vi.stubEnv('VITE_CONSENT_MODE', 'basic'); localStorage.clear(); sessionStorage.clear(); document.head.innerHTML = ''; window.gtag = vi.fn(); });
 
 afterEach(() => vi.unstubAllEnvs());
 
@@ -51,5 +51,24 @@ describe('consent-gated Google tags', () => {
     expect(window.gtag).toHaveBeenCalledWith('consent', 'update', {
       analytics_storage: 'granted', ad_storage: 'granted', ad_user_data: 'granted', ad_personalization: 'granted',
     });
+  });
+});
+
+/**
+ * Modo avançado (em vigor desde 26/09/2026): a Google tag carrega sem decisão,
+ * com tudo negado. O Pixel da Meta não tem modo avançado e continua a exigir a
+ * aceitação — é isso que a política de privacidade promete.
+ */
+describe('advanced consent mode', () => {
+  beforeEach(() => { vi.stubEnv('VITE_CONSENT_MODE', ''); vi.stubEnv('VITE_META_PIXEL_ID', '0000000000'); });
+
+  it('loads the Google tag once without a decision, never the Meta Pixel', async () => {
+    const consent = await import('./consent'); consent.restoreConsent();
+    const sources = [...document.querySelectorAll('script[src]')].map(s => s.getAttribute('src') ?? '');
+    expect(sources.filter(src => src.includes('googletagmanager.com'))).toHaveLength(1);
+    expect(sources.join(' ')).not.toContain('fbevents');
+    consent.setConsent('declined');
+    expect([...document.querySelectorAll('script[src]')].map(s => s.getAttribute('src')).join(' ')).not.toContain('fbevents');
+    expect(window.gtag).toHaveBeenLastCalledWith('consent', 'update', { analytics_storage: 'denied', ad_storage: 'denied', ad_user_data: 'denied', ad_personalization: 'denied' });
   });
 });

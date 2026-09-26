@@ -37,7 +37,7 @@ const PoliticaPrivacidade = () => (
           <ul className="list-disc pl-5 space-y-1.5">
             <li><strong>Dados de contacto:</strong> nome, número de telemóvel e endereço de e-mail, fornecidos voluntariamente no formulário de orçamento.</li>
             <li><strong>Dados do pedido:</strong> tipo de serviço, localização e detalhes sobre os artigos a limpar, incluindo fotografias opcionais enviadas pelo utilizador.</li>
-            <li><strong>Dados de navegação:</strong> endereço IP, tipo de browser, páginas visitadas, duração da visita e comportamento de navegação, recolhidos através do Google Analytics (GA4) e do Pixel da Meta mediante consentimento.</li>
+            <li><strong>Dados de navegação:</strong> endereço IP, tipo de browser, páginas visitadas, duração da visita e comportamento de navegação, recolhidos através do Google Analytics (GA4) e do Pixel da Meta mediante consentimento. Sem consentimento, a Google recebe apenas os sinais sem cookies descritos na secção 4.</li>
             <li><strong>Cookies:</strong> ficheiros de pequena dimensão guardados no seu dispositivo para garantir o funcionamento do site e, com o seu consentimento, para fins analíticos e publicitários.</li>
           </ul>
         </Section>
@@ -57,7 +57,7 @@ const PoliticaPrivacidade = () => (
             Este website utiliza o <strong>Google Analytics 4 (GA4)</strong> da Google LLC para recolher dados anónimos sobre o comportamento dos utilizadores. O GA4 utiliza cookies para identificar visitas únicas e analisar padrões de utilização.
           </p>
           <p>
-            O GA4 só é ativado <strong>após o seu consentimento explícito</strong>. Caso recuse, nenhum dado analítico é enviado para o Google.
+            Os cookies do GA4 e do Google Ads só são usados <strong>após o seu consentimento explícito</strong>. Antes de decidir, ou se recusar, as ferramentas da Google funcionam no <strong>modo de consentimento avançado</strong>: não leem nem gravam cookies nem identificadores no seu dispositivo, e enviam à Google apenas sinais sem cookies (data e hora, tipo de browser, página de origem, se a visita veio de um anúncio e o estado do seu consentimento). A Google usa esses sinais de forma agregada para estimar os resultados das campanhas.
           </p>
           <p>
             Utilizamos também o <strong>Pixel da Meta</strong>, fornecido pela Meta Platforms Ireland Limited, para medir visitas e campanhas publicitárias. Este Pixel só é carregado após o seu consentimento para publicidade.
@@ -75,7 +75,7 @@ const PoliticaPrivacidade = () => (
           <ul className="list-disc pl-5 space-y-1.5">
             <li><strong>Execução de contrato</strong> (Art. 6.º, n.º 1, al. b) do RGPD): para processar o seu pedido de orçamento e prestar o serviço.</li>
             <li><strong>Consentimento</strong> (Art. 6.º, n.º 1, al. a) do RGPD): para cookies analíticos e comunicações de marketing.</li>
-            <li><strong>Interesses legítimos</strong> (Art. 6.º, n.º 1, al. f) do RGPD): para melhorar o website e prevenir fraudes.</li>
+            <li><strong>Interesses legítimos</strong> (Art. 6.º, n.º 1, al. f) do RGPD): para melhorar o website, prevenir fraudes e medir de forma agregada, sem cookies, os resultados das campanhas publicitárias (secção 4).</li>
           </ul>
         </Section>
 
@@ -84,7 +84,7 @@ const PoliticaPrivacidade = () => (
             Não vendemos nem cedemos os seus dados pessoais a terceiros para fins comerciais. Os seus dados podem ser partilhados com:
           </p>
           <ul className="list-disc pl-5 space-y-1.5">
-            <li><strong>Google LLC</strong>: através do GA4, mediante consentimento, para análise de tráfego;</li>
+            <li><strong>Google LLC</strong>: através do GA4 e do Google Ads, com o seu consentimento, para análise de tráfego e medição de campanhas; sem consentimento, apenas os sinais sem cookies descritos na secção 4;</li>
             <li><strong>Meta Platforms Ireland Limited</strong>: através do Pixel da Meta, mediante consentimento, para medição de visitas e campanhas;</li>
             <li><strong>Resend</strong>: plataforma utilizada para o envio de emails com os pedidos de orçamento de forma segura;</li>
             <li><strong>Localização opcional (BigDataCloud)</strong>: ao permitir a localização no navegador, as coordenadas atuais são enviadas diretamente ao BigDataCloud para sugerir a localidade do serviço. O fornecedor recebe também o endereço IP e usa estes sinais para melhorar os seus dados de geolocalização. Não guardamos as coordenadas no pedido, apenas a localidade confirmada. Pode recusar a localização e pesquisar manualmente. Consulte a <a href="https://www.bigdatacloud.com/privacy-policy" target="_blank" rel="noopener noreferrer" className="underline">política do fornecedor</a>.</li>
@@ -127,7 +127,7 @@ const PoliticaPrivacidade = () => (
         </Section>
 
         <Section title="Preferências de medição">
-          <p>As ferramentas Google Analytics e Google Ads e a medição própria de visitas só são ativadas após aceitar. Com essa autorização, os parâmetros da campanha e a página de entrada podem ser associados ao pedido para medir a origem dos contactos. Recusar não impede pedir um orçamento.</p>
+          <p>A medição própria de visitas e o Pixel da Meta só são ativados após aceitar. Com essa autorização, os parâmetros da campanha e a página de entrada podem ser associados ao pedido para medir a origem dos contactos. O Google Analytics e o Google Ads carregam em todas as visitas, mas só usam cookies depois de aceitar; até lá, funcionam como descrito na secção 4. Recusar não impede pedir um orçamento.</p>
           <button type="button" className="min-h-11 underline" onClick={() => window.dispatchEvent(new Event('kyro:open-consent'))}>Rever preferências de cookies</button>
         </Section>
 

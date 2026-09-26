@@ -219,6 +219,17 @@ observada e atribuição. **Nunca escrever que "quem recusa não existe nos
 relatórios"** — existe como lead operacional, e o painel separa as duas coisas
 em todos os cartões.
 
+**Modo de consentimento avançado desde 26/09/2026 (decisão do dono).** A
+`gtag.js` carrega em todas as visitas com tudo `denied` e a Google recebe pings
+sem cookies de quem ainda não decidiu ou recusou; é o valor por omissão de
+`CONSENT_MODE` (`src/constants/tracking.ts`). **O Pixel da Meta, o `quiz_events`
+e o `user_data` das conversões melhoradas continuam a exigir "Aceitar"**, e há
+testes a fixá-lo. A política de privacidade descreve este modo: voltar ao
+básico (`VITE_CONSENT_MODE=basic`) sem mudar esse texto deixa a política a
+prometer o que o site não faz, e o contrário também (a política dizia "caso
+recuse, nenhum dado é enviado para o Google" e teve de ser reescrita no mesmo
+commit).
+
 **A decisão é um par `{analytics, ads}`**, e os quatro sinais do Consent Mode v2
 derivam dele. Aceitar análise **não** autoriza publicidade. O banner de hoje faz
 uma pergunta só que cobre as duas, por isso coincidem sempre — a separação

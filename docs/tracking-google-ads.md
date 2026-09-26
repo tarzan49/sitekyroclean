@@ -176,8 +176,21 @@ ter a biblioteca carregada e não há pedido nenhum.
 
 ### Modo em vigor
 
-`basic`: a `gtag.js` só carrega depois de haver aceitação. O `advanced` existe
-atrás de `VITE_CONSENT_MODE` e está desligado. Não foi ativado.
+**`advanced`, desde 26/09/2026 (decisão do dono).** A `gtag.js` carrega em
+todas as visitas com os quatro sinais a `denied` (script inline do
+`index.html`); até a pessoa aceitar, a Google não lê nem grava cookies e recebe
+só pings sem cookies (data e hora, browser, página de origem, se a visita veio
+de um anúncio, estado do consentimento), que usa para modelar conversões. O
+Pixel da Meta, a medição própria em `quiz_events` e o `user_data` das conversões
+melhoradas continuam a exigir a aceitação. O modo passou a ser o valor por
+omissão de `CONSENT_MODE` em `src/constants/tracking.ts`;
+`VITE_CONSENT_MODE=basic` no Cloudflare Pages volta ao comportamento antigo, e
+**obriga a corrigir a política de privacidade**, que descreve o modo avançado.
+
+Consequência para o parágrafo anterior: com o banner atual, quem recusa **passa
+a ter** a biblioteca carregada e gera pings sem cookies. Os nossos eventos
+(`page_view`, `whatsapp_click`, a conversão do lead) saem como pings sem
+cookies; é isso que permite à Google modelar as conversões perdidas.
 
 ### O que os números do painel são
 
