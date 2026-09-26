@@ -16,7 +16,7 @@ interface Props {
   initialServiceType?: 'cleaning' | 'waterproofing' | 'both';
   initialSofaSizeId?: string;
   initialSofaQty?: number;
-  initialSofaItems?: { sizeId: string; qty: number; chaiseLongue?: boolean; packEnabled?: boolean }[];
+  initialSofaItems?: { sizeId: string; qty: number; packEnabled?: boolean }[];
   initialMattressSizeId?: string;
   initialMattressQty?: number;
   initialMattressItems?: { sizeId: string; qty: number; packEnabled?: boolean }[];

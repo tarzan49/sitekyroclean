@@ -3,9 +3,9 @@ import Header from "@/components/Header";
 import { QuizServiceProvider } from "@/context/QuizLocationContext";
 import Footer from "@/components/Footer";
 import ServiceCityLinks from "@/components/ServiceCityLinks";
-import { DEFAULT_PRICE_FROM } from "@/data/serviceCatalog";
 import ServiceFAQ from "@/components/ServiceFAQ";
 import ServiceSchema from "@/components/ServiceSchema";
+import { getPillarPage } from "@/data/pillarPages";
 import ServiceHero from "@/components/ServiceHero";
 import ServiceExamplesGallery from "@/components/ServiceExamplesGallery";
 import ServiceExpertTips from "@/components/ServiceExpertTips";
@@ -60,20 +60,18 @@ const expertTips: ExpertTip[] = [
   },
 ];
 
-const LimpezaSofas = () => {
-  const faqs = [
-    { question: 'Quanto tempo demora a limpeza de um sofá?', answer: 'A duração depende do tamanho e do estado do sofá, mas, em média, varia entre 45 minutos e 2 horas. Trabalhamos com máquinas de extração profissional, por isso o processo é rápido, mas sem nunca comprometer o detalhe em cada zona do estofos.' },
-    { question: 'O sofá fica muito molhado? Quanto tempo leva a secar?', answer: 'Não. Usamos extração profunda com forte capacidade de sucção, o que retira a maior parte da água usada na limpeza. Em condições normais de ventilação, o sofá fica seco entre 3 a 6 horas. Em dias mais húmidos pode demorar um pouco mais, mas nunca deixamos o tecido encharcado.' },
-    { question: 'A limpeza pode danificar o tecido ou desbotar a cor?', answer: 'Pelo contrário: os produtos que utilizamos são específicos para estofos, com pH equilibrado e adequados a cada tipo de tecido. Fazemos sempre uma avaliação prévia e, se necessário, teste numa zona pouco visível. O objetivo é recuperar a cor e a textura original, sem danificar fibras.' },
-  ];
+// Título, h1, FAQs e schema vêm de src/data/pillarPages.ts, a mesma fonte do
+// PageHead e do HTML estático (scripts/prerender.ts).
+const pillar = getPillarPage('/limpeza-sofas');
 
+const LimpezaSofas = () => {
   return (
     <QuizServiceProvider value="sofa">
     <>
       <Header />
       <main>
         <ServiceHero
-          title="Higienização Profissional de Sofás"
+          title={pillar.h1}
           serviceSlug="limpeza-sofas"
         />
         <ServicePriceSection serviceSlug="limpeza-sofas" />
@@ -93,14 +91,15 @@ const LimpezaSofas = () => {
           items={sofaGuarantee}
           variant="dark"
         />
-        <ServiceFAQ faqs={faqs} heading="Perguntas Frequentes" variant="light" />
+        <ServiceFAQ faqs={pillar.faqs} heading="Perguntas Frequentes" variant="light" />
         <ServiceExpertTips tips={expertTips} variant="dark" />
-        <ServiceCityLinks serviceSlug="limpeza-sofas" serviceLabel="Limpeza de Sofás" />
+        <ServiceCityLinks serviceSlug="limpeza-sofas" serviceLabel={pillar.serviceName} />
         <ServiceSchema
-          serviceName="Limpeza de Sofás"
-          description="Limpeza e lavagem profissional de sofás ao domicílio no Porto. Remoção de manchas, ácaros e odores."
-          url="/limpeza-sofas"
-          priceFrom={DEFAULT_PRICE_FROM}
+          serviceName={pillar.serviceName}
+          description={pillar.description}
+          url={pillar.path}
+          priceFrom={pillar.priceFrom}
+          breadcrumbLabel={pillar.breadcrumbLabel}
         />
       </main>
       <Footer />

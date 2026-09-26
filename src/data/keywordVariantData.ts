@@ -1,4 +1,5 @@
 import { CHAIR_WATERPROOF_ESSENTIAL } from '../constants/chairPricing';
+import { CHAIR_ANTI_ACAROS_UNIT_LABEL } from '../constants/antiAcarosPricing';
 // Central engine for keyword variant pages:
 // higienizacao/lavagem × sofa/colchao/tapetes/cadeiras/alcatifas × all cities + parishes
 // Content generated on demand — no 1 570-entry array kept in memory at module load.
@@ -239,10 +240,10 @@ function content_higienizacao_cadeiras(loc: string, ctx: string): ContentBlock {
     intro: pick([
       `Cadeiras de jantar, escritório ou restaurante acumulam manchas e resíduos com o uso diário. Fazemos higienização de cadeiras em ${loc}, ${ctx}, com avaliação do tecido antes de começar.`,
       `Precisa de renovar o aspeto das cadeiras em ${loc}? A limpeza profunda trata gordura e sujidade das zonas de contacto, com um processo adaptado ao material de cada cadeira.`,
-      `Para casas e espaços de uso partilhado em ${loc}, a Kyro Clean Solutions limpa cadeiras estofadas ao domicílio. Pode acrescentar anti-ácaros ou desbacterização, como tratamentos opcionais com orçamento separado.`,
+      `Para casas e espaços de uso partilhado em ${loc}, a Kyro Clean Solutions limpa cadeiras estofadas ao domicílio. Pode acrescentar o tratamento anti-ácaros (desbacterização), opcional, a ${CHAIR_ANTI_ACAROS_UNIT_LABEL}`,
     ] as const, seed),
-    whatIs: `A higienização de cadeiras em ${loc} remove sujidade e resíduos das fibras. A desbacterização é um tratamento adicional dirigido a bactérias; o anti-ácaros tem outro objetivo e é também opcional. Confirmamos o produto, a compatibilidade com o tecido e o preço de cada extra antes da marcação.`,
-    benefits: ['Tratamento localizado de manchas e gordura', 'Processo adaptado ao tecido de cada cadeira', 'Anti-ácaros opcional, a 5€ por cadeira', 'Desbacterização opcional sob orçamento', 'Lotes de dez ou mais cadeiras sob orçamento', 'Secagem média de 3 a 6 horas, conforme ventilação'],
+    whatIs: `A higienização de cadeiras em ${loc} remove sujidade e resíduos das fibras. O tratamento anti-ácaros, que é o mesmo que a desbacterização, é opcional e custa ${CHAIR_ANTI_ACAROS_UNIT_LABEL} Confirmamos o produto e a compatibilidade com o tecido antes da marcação.`,
+    benefits: ['Tratamento localizado de manchas e gordura', 'Processo adaptado ao tecido de cada cadeira', `Anti-ácaros opcional, a ${CHAIR_ANTI_ACAROS_UNIT_LABEL}`, `Desbacterização: é o mesmo tratamento anti-ácaros, a ${CHAIR_ANTI_ACAROS_UNIT_LABEL}`, 'Lotes de dez ou mais cadeiras sob orçamento', 'Secagem média de 3 a 6 horas, conforme ventilação'],
     processSteps: [
       { step: 1, title: 'Avaliação do material', description: `Inspeção do tecido, das manchas e das costuras em ${loc}.` },
       { step: 2, title: 'Pré-tratamento', description: 'Aplicação de solução de limpeza adequada à sujidade e ao tecido.' },
@@ -251,7 +252,7 @@ function content_higienizacao_cadeiras(loc: string, ctx: string): ContentBlock {
     ],
     problems: [
       { title: 'Manchas e gordura nos assentos', description: 'Comida, bebidas e contacto diário deixam resíduos que podem exigir um tratamento localizado.' },
-      { title: 'Cadeiras de uso partilhado', description: 'Peça limpeza e, se pretender um cuidado adicional, indique desbacterização ou anti-ácaros no orçamento.' },
+      { title: 'Cadeiras de uso partilhado', description: 'Peça limpeza e, se pretender um cuidado adicional, indique o tratamento anti-ácaros (desbacterização) no orçamento.' },
       { title: 'Renovar o aspeto do espaço', description: 'Cadeiras com tecido cuidado ajudam a manter uma apresentação uniforme na sala, escritório ou restaurante.' },
     ],
     testimonials: [],

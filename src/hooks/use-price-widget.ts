@@ -12,11 +12,8 @@ import { buildWidgetQuizConfig, type WidgetTier } from '@/lib/priceWidgetCalc';
 // PriceWidget.tsx.
 export function usePriceWidgetState(serviceSlug: string) {
   const [rowQuantities, setRowQuantities] = useState<Record<number, number>>({});
-  const [chaiseLongueAddon, setChaiseLongueAddon] = useState(0);
-  const [addonRows, setAddonRows] = useState<Set<number>>(new Set());
   const [tierChosen, setTierChosen] = useState(false);
   const [addonTier, setAddonTier] = useState<WidgetTier>('premium');
-  const [antiAcarosRows, setAntiAcarosRows] = useState<Set<number>>(new Set());
   // Simulador de tapetes (2026-09-06): várias peças medidas por linha, mesma
   // lógica do quiz — nunca uma área única.
   //
@@ -37,9 +34,6 @@ export function usePriceWidgetState(serviceSlug: string) {
     setTierChosen(false);
     setAddonTier('premium');
     setRowQuantities({});
-    setChaiseLongueAddon(0);
-    setAddonRows(new Set());
-    setAntiAcarosRows(new Set());
     setCarpetItemsByRow({});
   }, [serviceSlug]);
 
@@ -63,29 +57,19 @@ export function usePriceWidgetState(serviceSlug: string) {
   };
 
   const adjustQty = (i: number, delta: number) => {
-    setRowQuantities(prev => {
-      const next = Math.min(99, Math.max(0, (prev[i] ?? 0) + delta));
-      if (next === 0) {
-        setAddonRows(a => { if (!a.has(i)) return a; const n = new Set(a); n.delete(i); return n; });
-        setAntiAcarosRows(a => { if (!a.has(i)) return a; const n = new Set(a); n.delete(i); return n; });
-      }
-      return { ...prev, [i]: next };
-    });
+    setRowQuantities(prev => ({ ...prev, [i]: Math.min(99, Math.max(0, (prev[i] ?? 0) + delta)) }));
   };
 
-  const toggleAddonRow = (i: number) => {
-    setAddonRows(prev => { const n = new Set(prev); if (n.has(i)) n.delete(i); else n.add(i); return n; });
-  };
-  const toggleAntiAcarosRow = (i: number) => {
-    setAntiAcarosRows(prev => { const n = new Set(prev); if (n.has(i)) n.delete(i); else n.add(i); return n; });
-  };
-
+  // Impermeabilização e anti-ácaros não se escolhem aqui: decidem-se no ecrã
+  // de tratamento do quiz, a seguir ao "Continuar" (pedido explícito
+  // 2026-09-08). O caminho de extras que existia neste widget nunca corria e
+  // guardava preços próprios; foi apagado a 2026-09-26.
   const buildConfig = (): PriceRowQuizConfig | null =>
-    buildWidgetQuizConfig(serviceSlug, rowQuantities, chaiseLongueAddon, addonRows, addonTier, antiAcarosRows, carpetItemsByRow);
+    buildWidgetQuizConfig(serviceSlug, rowQuantities, addonTier, carpetItemsByRow);
 
   return {
-    carpetItemsByRow, tierChosen, setTierChosen, rowQuantities, chaiseLongueAddon, setChaiseLongueAddon, addonRows, addonTier, setAddonTier, antiAcarosRows,
+    carpetItemsByRow, tierChosen, setTierChosen, rowQuantities, addonTier, setAddonTier,
     getCarpetItems, updateCarpetItem, addCarpetItem, removeCarpetItem, carpetItemArea,
-    adjustQty, toggleAddonRow, toggleAntiAcarosRow, buildConfig,
+    adjustQty, buildConfig,
   };
 }

@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { sofaPrices } from '@/components/quiz/QuizTypes';
 import type { QuizFormData, SofaItem } from '@/components/quiz/QuizTypes';
-import { sofaSetQty, calcPackPricing } from '@/components/quiz/quizHelpers';
+import { sofaSetQty, calcSofaUnitPrice } from '@/components/quiz/quizHelpers';
 import { WaterproofingTierPicker } from './WaterproofingTierPicker';
 
 interface Props {
@@ -53,13 +53,17 @@ const QuizStepConfigSofa = ({ formData, updateFormData, sofaItems, setSofaItems 
             const packOn = (item?.packEnabled ?? false) && !partialTreatment;
             const isActive = qty > 0;
             const packTier = formData.waterproofingTier;
-            const { isSob, displayPrice: dp } = calcPackPricing(option, packOn, isWaterproofBase, 40, packTier);
+            // Anti-ácaros (escolhido no ecrã a seguir às quantidades): limpeza
+            // + acréscimo por tamanho, sem preço riscado, porque não há redução.
+            const antiOn = packOn && formData.sofaAntiAcaros && !isWaterproofBase;
+            const isSob = typeof option.cleaningPrice !== 'number';
+            const dp = calcSofaUnitPrice(option, packOn, formData.serviceType, packTier, formData.sofaAntiAcaros);
             // originalBothPrice (108/148/178) é a soma essencial fixa (limpeza + imperm.
             // essencial) — só serve de referência "preço riscado" para o pack Essencial.
             // No pack Premium a soma separada é maior (o waterproofing premium custa mais),
             // por isso recalcula-se aqui; sem isto o preço riscado ficava ABAIXO do preço
             // do pack Premium, mostrando um "desconto" que na verdade custava mais caro.
-            const originalPackPrice = packTier === 'premium'
+            const originalPackPrice = antiOn ? null : packTier === 'premium'
               && typeof option.cleaningPrice === 'number'
               && typeof option.waterproofingPremiumPrice === 'number'
               ? option.cleaningPrice + option.waterproofingPremiumPrice
@@ -71,15 +75,15 @@ const QuizStepConfigSofa = ({ formData, updateFormData, sofaItems, setSofaItems 
                   <div className="flex-1 min-w-0 text-left">
                     <span className="text-base font-semibold text-white">{option.label}</span>{partialTreatment && <p className="text-sm text-gold">Tratamento em {treatedQty} de {qty}</p>}
                     <div className="flex flex-wrap items-center gap-x-1.5 gap-y-0.5 mt-0.5">
-                      {isActive && packOn && <span className="text-sm bg-gold/15 text-gold/80 px-1.5 py-0.5 rounded-full font-bold leading-none">PACK</span>}
-                      {isActive && packOn && typeof originalPackPrice === 'number' && (
+                      {isActive && packOn && <span className="text-sm bg-gold/15 text-gold px-1.5 py-0.5 rounded-full font-bold leading-none">{antiOn ? 'ANTI-ÁCAROS' : 'PACK'}</span>}
+                      {isActive && packOn && typeof originalPackPrice === 'number' && typeof dp === 'number' && originalPackPrice > dp && (
                         <span className="text-base text-white/80 line-through tabular-nums">{originalPackPrice}€</span>
                       )}
-                      {!packOn && isWaterproofBase && packTier === 'premium' && !isSob && typeof dp === 'number' && (
-                        <span className="text-base text-white/80 line-through tabular-nums">{dp + 10}€</span>
-                      )}
+                      {/* Sem preço riscado no Premium como serviço principal: o
+                          "preço anterior" que aqui aparecia (+10€) nunca foi
+                          praticado (removido 2026-09-26). */}
                       <span className={cn('text-base font-bold tabular-nums', isSob ? isActive ? 'text-white/70' : 'text-white/80' : (isActive && packOn) || (isWaterproofBase && packTier === 'premium') ? 'text-gold' : isActive ? 'text-white/80' : 'text-white/70')}>
-                        {isSob ? 'Sob Orçamento' : `${dp}€/un.`}
+                        {isSob || dp === null ? 'Sob Orçamento' : `${dp}€/un.`}
                       </span>
                     </div>
                   </div>

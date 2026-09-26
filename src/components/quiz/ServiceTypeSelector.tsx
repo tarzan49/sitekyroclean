@@ -71,7 +71,7 @@ const ServiceTypeSelector = ({
       badge: undefined,
       badgeStyle: undefined,
       desc: bothDesc,
-      subdesc: 'A melhor qualidade do mercado com desconto de pack apenas hoje.',
+      subdesc: 'Limpeza e proteção na mesma visita, com preço de pack.',
       price: packPrice,
       recommended: true,
     },
@@ -138,7 +138,7 @@ const ServiceTypeSelector = ({
               {opt.subtitle && (
                 <p className={cn(
                   "text-sm leading-none mt-0.5 font-medium",
-                  isSelected ? "text-gold/70" : "text-gold/40"
+                  isSelected ? "text-gold" : "text-gold/80"
                 )}>
                   {opt.subtitle}
                 </p>
@@ -152,7 +152,7 @@ const ServiceTypeSelector = ({
               {'subdesc' in opt && opt.subdesc && (
                 <p className={cn(
                   "text-sm italic mt-0.5 leading-snug",
-                  isSelected ? "text-gold/60" : "text-gold/40"
+                  isSelected ? "text-gold" : "text-gold/80"
                 )}>
                   {opt.subdesc}
                 </p>

@@ -18,6 +18,12 @@ import { PRICE_PROMISE, TREATMENT_EXTRAS } from '../constants/commercialPolicy';
 import type { LandingService, LandingFaqContext } from './landingFaqPool';
 import { getAllProblems } from './problemSeoData';
 import { getMaterialsByService } from './materialSeoData';
+import { marcas } from './marcaSofaData';
+import { marcasColchao } from './marcaColchaoData';
+import { marcasCadeiras } from './marcaCadeirasData';
+
+// Nome real de cada marca ("El Corte Inglés", "IKEA"), não o slug com espaços.
+const BRAND_NAMES = new Map<string, string>([...marcas, ...marcasColchao, ...marcasCadeiras].map(m => [m.slug, m.name]));
 import { METRO_CITIES } from '../constants/metroCities';
 import { MARCA_CITY_SLUGS } from './marcaCities';
 
@@ -187,10 +193,10 @@ export function getLandingPageModel(pathname: string) {
       : serviceSlug === 'limpeza-cadeiras' ? ['ikea', 'conforama', 'leroy-merlin', 'herman-miller', 'moviflor', 'el-corte-ingles'] : [];
     if ((MARCA_CITY_SLUGS as readonly string[]).includes(municipalitySlug) && brands.length) {
       const prefix = serviceSlug === 'limpeza-sofas' ? 'limpeza-sofa' : serviceSlug === 'limpeza-colchoes' ? 'limpeza-colchao' : 'limpeza-cadeiras';
-      directory.push({ title: 'Por marca', links: brands.map(brand => ({ label: brand.replace(/-/g, ' '), href: `/${prefix}-${brand}-${municipalitySlug}` })) });
+      directory.push({ title: 'Por marca', links: brands.map(brand => ({ label: BRAND_NAMES.get(brand) ?? brand.replace(/-/g, ' '), href: `/${prefix}-${brand}-${municipalitySlug}` })) });
     }
   }
-  if (family !== 'localidade') directory.push({ title: parish ? `Serviço no município de ${municipalityName}` : 'Página do serviço', links: [{ label: `${service.name} em ${municipalityName}`, href: `/${serviceSlug}-${municipalitySlug}` }, ...(family === 'variante' && parish ? [{ label: `${service.name} em ${locationName}`, href: `/${serviceSlug}-${locationPart}` }] : [])] });
+  if (family !== 'localidade') directory.push({ title: parish ? `Serviço no município de ${municipalityName}` : 'Página do serviço', links: [{ label: `${service.name} ${cityPrep(municipalityName)} ${municipalityName}`, href: `/${serviceSlug}-${municipalitySlug}` }, ...(family === 'variante' && parish ? [{ label: `${service.name} ${prep} ${locationName}`, href: `/${serviceSlug}-${locationPart}` }] : [])] });
   return {
     path, family, serviceSlug, serviceKey, serviceLabel, municipalitySlug, municipalityName, locationName, prep,
     // Campos que os heroes das quatro familias liam do catalogo da sua

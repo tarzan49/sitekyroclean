@@ -27,7 +27,7 @@ import {
   buildWebPageNode,
   buildBreadcrumbNode,
   buildServiceNode,
-  buildOfferNode,
+  offerForPriceLabel,
   clearPrerenderedSchema,
   DEFAULT_AREA_SERVED,
 } from "@/lib/seoSchema";
@@ -181,11 +181,11 @@ const ProblemPage = () => {
               description: data.metaDescription,
               serviceType: relatedService.name,
               areaServed: DEFAULT_AREA_SERVED,
-              ...(relatedService.priceFrom.replace(',', '.').replace(/[^0-9.]/g, '') && {
-                offers: buildOfferNode(relatedService.priceFrom.replace(',', '.').replace(/[^0-9.]/g, ''), {
-                  validFrom: "2025-01-01",
-                  priceValidUntil: "2026-12-31",
-                }),
+              // Mesmo helper do resto do site: sem número no rótulo não há
+              // oferta, e sem `priceValidUntil` escrito à mão (expirava a
+              // 2026-12-31).
+              ...(offerForPriceLabel(relatedService.priceFrom) && {
+                offers: offerForPriceLabel(relatedService.priceFrom),
               }),
             })] : []),
           ],

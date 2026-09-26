@@ -1,9 +1,11 @@
 import { WaterproofingTierPicker } from './WaterproofingTierPicker';
 import QuizCareIntro from '../QuizCareIntro';
-import { ChevronLeft, Check, Droplets, Plus } from 'lucide-react';
+import QuizTopBadge from '../QuizTopBadge';
+import { ChevronLeft, Check, Droplets, Plus, Bug } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { QuizFormData } from '@/components/quiz/QuizTypes';
 import { calcChairClean, calcChairWaterproof, calcChairWaterproofPremium } from '@/components/quiz/quizHelpers';
+import { CHAIR_ANTI_ACAROS_UNIT_LABEL } from '@/constants/antiAcarosPricing';
 
 interface QuizChairsAddonUpsellProps {
   formData: QuizFormData;
@@ -13,7 +15,13 @@ interface QuizChairsAddonUpsellProps {
   onBack: () => void;
 }
 
-// Desbacterização e antiácaros incluídos na impermeabilização, sem opção separada.
+// Com a limpeza como serviço principal, o tratamento das cadeiras é uma
+// escolha só, como no configurador de packs (2026-09-26): impermeabilização
+// Premium ou Essencial, ou anti-ácaros. O anti-ácaros é 5€ por cadeira e
+// mostra-se sempre como taxa unitária ("5€/un."), nunca como total (pedido
+// explícito do dono, repetido duas vezes). A frase "desbacterização e
+// antiácaros incluídos na impermeabilização" saiu: passou a ser um
+// tratamento à parte, com preço próprio.
 
 // Upsell "estilo companhia aérea": aparece uma única vez, logo a seguir ao
 // "Continuar" da etapa de quantidades das cadeiras (só quando a limpeza é o
@@ -81,7 +89,8 @@ const QuizChairsAddonUpsell = ({ formData, updateFormData, onContinue, onBack, h
   const waterproofTier: 'premium' | 'essencial' | null = formData.chairWaterproofing
     ? (formData.waterproofingTier === 'premium' ? 'premium' : 'essencial')
     : null;
-  const anySelected = waterproofTier !== null;
+  const antiAcarosOn = formData.chairAntiAcaros && waterproofTier === null;
+  const anySelected = waterproofTier !== null || antiAcarosOn;
 
   const selectWaterproof = (tier: 'premium' | 'essencial') => {
     const turningOff = waterproofTier === tier;
@@ -91,20 +100,22 @@ const QuizChairsAddonUpsell = ({ formData, updateFormData, onContinue, onBack, h
         : { chairWaterproofing: true, chairWaterproofQty: qty, waterproofingTier: tier, chairAntiAcaros: false }
     );
   };
+  const selectAntiAcaros = () => {
+    updateFormData(antiAcarosOn
+      ? { chairAntiAcaros: false }
+      : { chairAntiAcaros: true, chairWaterproofing: false, chairWaterproofQty: 0 });
+  };
 
 
   return (
     <div className="flex flex-col gap-1.5 overflow-hidden items-center w-full">
-      <h2 className="type-quote-title font-playfair   text-white text-center w-full">Impermeabilização das cadeiras</h2>
+      <h2 className="type-quote-title font-playfair   text-white text-center w-full">Proteja as suas cadeiras</h2>
       <QuizCareIntro service="chairs">
-        <ul className="space-y-1.5">{['Repele líquidos', 'Facilita a remoção de manchas', 'Ajuda a conservar o tecido'].map(benefit => <li key={benefit} className="flex items-start gap-1.5"><Check aria-hidden="true" className="w-3.5 h-3.5 text-gold shrink-0 mt-0.5" /><span>{benefit}</span></li>)}</ul>
+        <ul className="space-y-1.5">{['Impermeabilização repele líquidos', 'Anti-ácaros trata o tecido', 'Um tratamento, na mesma visita'].map(benefit => <li key={benefit} className="flex items-start gap-1.5"><Check aria-hidden="true" className="w-3.5 h-3.5 text-gold shrink-0 mt-0.5" /><span>{benefit}</span></li>)}</ul>
       </QuizCareIntro>
 
-      <div className="w-full max-w-sm py-1 text-center">
-        <p className="flex items-center justify-center gap-1.5 text-sm font-semibold text-gold"><Check aria-hidden="true" className="w-3.5 h-3.5 shrink-0" />Desbacterização + Antiácaros</p>
-        <p className="text-sm text-white/80 mt-1">Incluídos na impermeabilização</p>
-      </div>
-      <p className="text-sm text-white/80 text-center">Preço para {qty} {qty === 1 ? 'cadeira' : 'cadeiras'} · antes de descontos</p>
+      <p className="w-full max-w-sm text-sm font-bold uppercase tracking-[0.12em] text-white/80 text-left mt-1">Impermeabilização</p>
+      <p className="w-full max-w-sm text-sm text-white/80 text-left">Preço para {qty} {qty === 1 ? 'cadeira' : 'cadeiras'}</p>
       <WaterproofingTierPicker
         compact
         centered
@@ -117,7 +128,33 @@ const QuizChairsAddonUpsell = ({ formData, updateFormData, onContinue, onBack, h
         premiumDifference={premiumPrice !== null && essencialPrice !== null ? premiumPrice - essencialPrice : null}
       />
 
-
+      <p className="w-full max-w-sm text-sm font-bold uppercase tracking-[0.12em] text-white/80 text-left mt-1">Ou, em vez disso</p>
+      <button
+        type="button"
+        onClick={selectAntiAcaros}
+        aria-pressed={antiAcarosOn}
+        className={cn(
+          'relative w-full max-w-sm min-h-[76px] flex items-center gap-3 pl-5 pr-3.5 py-3 rounded-sm border-2 text-left transition-all duration-200 touch-manipulation',
+          antiAcarosOn ? 'border-gold bg-[#1a2a1a] shadow-[0_0_18px_rgba(212,175,55,0.30)]' : 'border-dashed border-gold/40 bg-gold/[0.04] hover:border-gold/70 hover:bg-gold/[0.07]'
+        )}
+      >
+        <QuizTopBadge className="absolute -top-3 right-3 z-10" />
+        <Bug aria-hidden="true" className={cn('w-5 h-5 flex-shrink-0', antiAcarosOn ? 'text-gold' : 'text-gold/80')} />
+        <div className="flex-1 min-w-0">
+          <p className={cn('text-base font-bold', antiAcarosOn ? 'text-white' : 'text-white/90')}>Anti-ácaros</p>
+          <p className="text-sm text-white/80 leading-snug mt-0.5">Limpeza com tratamento anti-ácaros do tecido, na mesma visita.</p>
+          <div className="border-t border-gold/15 mt-2 pt-2">
+            <p className="text-sm font-bold uppercase tracking-[0.16em] text-white/80 mb-1">Acréscimo</p>
+            <p className="text-xl leading-none font-black tracking-tight tabular-nums text-gold">+{CHAIR_ANTI_ACAROS_UNIT_LABEL}</p>
+          </div>
+        </div>
+        <span className={cn(
+          'flex-shrink-0 w-7 h-7 rounded-full border-2 flex items-center justify-center transition-all',
+          antiAcarosOn ? 'border-gold bg-gold' : 'border-gold/50 bg-transparent'
+        )}>
+          {antiAcarosOn ? <Check aria-hidden="true" className="w-3.5 h-3.5 text-[#071a12]" strokeWidth={3} /> : <Plus aria-hidden="true" className="w-3.5 h-3.5 text-gold" strokeWidth={3} />}
+        </span>
+      </button>
 
       {!hideNavigation && <ChairAddonActions selected={anySelected} onBack={onBack} onContinue={onContinue} />}
     </div>

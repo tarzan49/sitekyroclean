@@ -1,5 +1,6 @@
 import { CHAIR_WATERPROOF_ESSENTIAL, CHAIR_WATERPROOF_PREMIUM } from '../constants/chairPricing';
 import { sofaPrices, mattressPrices } from '../components/quiz/QuizTypes';
+import { formatEuro, chairTierRows, SOFA_CLEAN_AND_PROTECT_FROM, SOFA_PROTECT_WITH_CLEANING_FROM } from './enginePrices';
 // Programmatic SEO: Price pages data engine
 // Targets searches like "preço limpeza sofá porto", "quanto custa limpar colchão"
 
@@ -51,7 +52,10 @@ const priceTables: Record<string, { item: string; price: string; note?: string }
     { item: "Sofá 3 lugares", price: desde(sofaSize("3-lugares").cleaningPrice) },
     { item: "Sofá 4-5 lugares", price: "Sob orçamento" },
     { item: "Sofá em L", price: "Sob orçamento" },
-    { item: "Impermeabilização", price: desde(sofaSize("1-lugar").waterproofingPrice), note: "add-on recomendado" },
+    // Acrescentada à limpeza, a impermeabilização não custa o preço de
+    // tabela (esse é o do serviço sozinho): custa a diferença que o quiz cobra
+    // pelo pack de limpeza + Essencial no mesmo sofá.
+    { item: "Impermeabilização Essencial com a limpeza (1 lugar)", price: `+${formatEuro(SOFA_PROTECT_WITH_CLEANING_FROM)}`, note: `${formatEuro(SOFA_CLEAN_AND_PROTECT_FROM)} no total` },
   ],
   "limpeza-colchoes": [
     { item: "Colchão Solteiro", price: desde(mattressSize("solteiro").cleaningPrice) },
@@ -66,10 +70,8 @@ const priceTables: Record<string, { item: string; price: string; note?: string }
     { item: "Tapete persa/oriental", price: "Sob orçamento", note: "tratamento premium" },
   ],
   "limpeza-cadeiras": [
-    { item: "1ª a 4ª cadeira", price: "20€/un" },
-    { item: "5ª a 6ª cadeira", price: "15€/un" },
-    { item: "7ª a 9ª cadeira", price: "12,50€/un" },
-    { item: "10+ cadeiras", price: "Sob orçamento" },
+    // Os escalões lidos do próprio calcChairClean do quiz.
+    ...chairTierRows(),
   ],
   "limpeza-alcatifas": [
     { item: "Alcatifas (qualquer dimensão)", price: "Sob orçamento", note: "medida no local, à área" },
@@ -90,7 +92,7 @@ const priceFactors: Record<string, string[]> = {
     "Gravidade e tipo de manchas",
     "Necessidade de desodorização extra",
     "Impermeabilização adicional",
-    "Presença de chaise longue ou módulos extra",
+    "Configuração em L ou módulos extra",
   ],
   "limpeza-colchoes": [
     "Dimensão do colchão (solteiro, casal, king)",
@@ -128,9 +130,9 @@ const priceFactors: Record<string, string[]> = {
     "Tipo de peça a impermeabilizar",
     "Tamanho da superfície",
     "Material do tecido",
-    "Combinação com limpeza (pack com desconto)",
+    "Combinação com limpeza na mesma visita (preço de pack)",
     "Exposição a crianças ou animais domésticos",
-    "Nível de proteção desejado (padrão ou reforçada)",
+    "Versão escolhida (Essencial ou Premium)",
   ],
 };
 

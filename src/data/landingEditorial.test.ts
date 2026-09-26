@@ -34,4 +34,19 @@ describe('landing editorial descriptions', () => {
     expect(getLandingEditorial({ ...base, place: 'Paranhos' }).intro).toContain('município de Porto');
     expect(getLandingEditorial({ ...base, place: 'Ramalde' }).intro).not.toMatch(/habitantes|edifícios|humidade|turismo|já confiam/);
   });
+  it('uses the same preposition as the h1 for every city, not only Porto', () => {
+    const base = { serviceSlug: 'limpeza-sofas', serviceLabel: 'Limpeza de Sofás', family: 'localidade' } as const;
+    expect(getLandingEditorial({ ...base, place: 'Barreiro', municipality: 'Barreiro' }).intro).toContain('no Barreiro');
+    expect(getLandingEditorial({ ...base, place: 'Amadora', municipality: 'Amadora' }).metaDescription).toContain('na Amadora');
+    expect(getLandingEditorial({ ...base, place: 'Braga', municipality: 'Braga' }).intro).toContain('em Braga');
+    const model = getLandingPageModel('/preco-limpeza-sofas-seixal')!;
+    expect(model.h1).toContain('no Seixal');
+    expect(model.metaDescription).toContain('no Seixal');
+  });
+  it('no longer asks about or prices the chaise longue', () => {
+    for (const family of ['localidade', 'preco', 'variante'] as const) {
+      const editorial = getLandingEditorial({ serviceSlug: 'limpeza-sofas', serviceLabel: 'Limpeza de Sofás', family, place: 'Porto', municipality: 'Porto' });
+      expect(`${editorial.intro} ${editorial.metaDescription}`).not.toMatch(/chaise/i);
+    }
+  });
 });

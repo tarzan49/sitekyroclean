@@ -6,13 +6,13 @@ import type { UpsellItemConfig } from '../QuizTypes';
 
 afterEach(cleanup);
 
-function Harness({ primaryService = 'other', offerPreview = false, primaryTablePrice = 0 } = {}) {
+function Harness({ primaryService = 'other', primaryTablePrice = 0 } = {}) {
   const [items, setItems] = useState<UpsellItemConfig[]>([]);
   const [contact, setContact] = useState(false);
   return <>
     <output data-testid="items">{JSON.stringify(items)}</output>
     {contact ? <button onClick={() => setContact(false)}>Voltar aos extras</button> :
-      <QuizComboUpsellScreen offerPreview={offerPreview} primaryTablePrice={primaryTablePrice} primaryService={primaryService} upsellItems={items} setUpsellItems={setItems}
+      <QuizComboUpsellScreen primaryTablePrice={primaryTablePrice} primaryService={primaryService} upsellItems={items} setUpsellItems={setItems}
         onContinue={() => setContact(true)} onBack={() => {}} />}
   </>;
 }
@@ -42,19 +42,17 @@ describe('final upsell navigation', () => {
   // 2026-09-10 (pedido explícito do dono): sem desconto de 10% sobre o
   // pedido todo — cada artigo extra já vem com o seu preço reduzido, sem
   // nenhuma condição de elegibilidade a cumprir.
-  it('never mentions a 10%-off-the-order discount, in offerPreview mode or not', () => {
-    const { rerender } = render(<Harness primaryService="sofa" offerPreview />);
+  it('never mentions a 10%-off-the-order discount', () => {
+    render(<Harness primaryService="sofa" />);
     expect(screen.getByText('APROVEITE A MESMA VISITA')).toBeTruthy();
     expect(screen.getByRole('heading', { name: 'Quer limpar mais alguma coisa?' })).toBeTruthy();
-    expect(screen.queryByText(/10%/)).toBeNull();
-    rerender(<Harness primaryService="sofa" offerPreview={false} />);
-    expect(screen.getByRole('heading', { name: 'Adicione mais um serviço' })).toBeTruthy();
     expect(screen.queryByText(/10%/)).toBeNull();
   });
 
   it('preserves all categories and individual carpet dimensions when returning from contact', () => {
     render(<Harness />);
-    click(/^Colchão/); increment(1); confirm();
+    // Abrir o colchão já acrescenta um Casal.
+    click(/^Colchão/); confirm();
     click(/^Sofá/); increment(0); increment(3); confirm();
     click(/^Cadeiras/); increment(); confirm();
     addCarpet();
@@ -74,15 +72,12 @@ describe('final upsell navigation', () => {
     expect(savedItems().some(item => item.mattressSize)).toBe(false);
   });
 
-  it('keeps category selection free of prices while preserving quote-only extras', () => {
+  it('keeps quote-only extras at zero and charges table price below the minimum', () => {
     render(<Harness />);
-    for (const label of [/^Colchão/, /^Sofá/, /^Cadeiras/, /^Tapete/]) {
-      expect(screen.getByRole('button', { name: label }).textContent).not.toContain('€');
-    }
     addCarpet();
     expect(screen.getByRole('button', { name: /Tapete.*sob orçamento/ })).toBeTruthy();
     expect(savedItems().find(item => item.id === 'carpet')?.price).toBe(0);
-    click(/^Colchão/); increment(1); confirm();
+    click(/^Colchão/); confirm();
     expect(savedItems().find(item => item.mattressSize === 'casal')?.price).toBe(69);
     expect(screen.queryByText('Subtotal do extra')).toBeNull();
   });
@@ -93,13 +88,6 @@ describe('final upsell navigation', () => {
     expect(savedItems()).toEqual([]);
     expect(screen.queryByText('Subtotal do extra')).toBeNull();
   });
-});
-
-it('preserves imported anti-mite treatment instead of silently dropping it', () => {
-  const treatment = { id: 'sofa-anti-acaros', qty: 1, price: 25, label: 'Anti Ácaros (sofá)' };
-  let latest: UpsellItemConfig[] = [];
-  render(<QuizComboUpsellScreen primaryService="sofa" upsellItems={[treatment]} setUpsellItems={items => { latest = items; }} onContinue={() => {}} onBack={() => {}} />);
-  expect(latest).toContainEqual(treatment);
 });
 
 it('preserves Premium waterproofing chairs imported from the widget', () => {
@@ -120,7 +108,7 @@ it('blocks a partially measured second rug instead of silently omitting it', () 
 
 
 it('applies the published mattress, chair and carpet offers to the saved request', () => {
-  render(<Harness primaryService="sofa" offerPreview />);
+  render(<Harness primaryService="sofa" />);
   click(/^Colchão/); increment(0); increment(2); confirm();
   expect(savedItems().filter(i => i.mattressSize).map(i => i.price)).toEqual([45, 55, 65]);
   click(/^Cadeiras/); increment(); confirm();
@@ -140,13 +128,54 @@ it('applies the published mattress, chair and carpet offers to the saved request
 // abaixo do mínimo de subtotal — senão um pedido pequeno neste ecrã ficava
 // com vantagem sobre a mesma pessoa a pedir um orçamento normal.
 it('charges table price for an extra when the order stays under the pack minimum', () => {
-  render(<Harness primaryService="sofa" offerPreview primaryTablePrice={0} />);
+  render(<Harness primaryService="sofa" primaryTablePrice={0} />);
   click(/^Colchão/); confirm();
   expect(savedItems().find(i => i.mattressSize === 'casal')?.price).toBe(69);
 });
 
 it('unlocks the pack price once the primary service already reaches the minimum', () => {
-  render(<Harness primaryService="sofa" offerPreview primaryTablePrice={100} />);
+  render(<Harness primaryService="sofa" primaryTablePrice={100} />);
   click(/^Colchão/); confirm();
   expect(savedItems().find(i => i.mattressSize === 'casal')?.price).toBe(55);
+});
+
+// Bug visto em produção (2026-09-26): com um pedido principal de 69€ (sofá de
+// 2 lugares), o cartão do colchão mostrava "69€ 69€/un." debaixo de "Preço
+// reduzido em cada artigo". A elegibilidade era calculada sem o próprio
+// colchão, que já leva o pedido para cima do mínimo (69 + 69 = 138€).
+describe('summary previews price the reference item as if it were added', () => {
+  const card = (label: RegExp) => screen.getByRole('button', { name: label });
+
+  it('shows the pack price for a casal mattress added to a 69€ sofa', () => {
+    render(<Harness primaryService="sofa" primaryTablePrice={69} />);
+    const mattress = card(/^Colchão/);
+    expect(mattress.textContent).toContain('55€/un.');
+    expect(mattress.querySelector('s')?.textContent).toBe('69€');
+  });
+
+  it('shows the pack price for a 2-seat sofa added to a 69€ mattress', () => {
+    render(<Harness primaryService="mattress" primaryTablePrice={69} />);
+    const sofa = card(/^Sofá/);
+    expect(sofa.textContent).toContain('55€/un.');
+    expect(sofa.querySelector('s')?.textContent).toBe('69€');
+  });
+
+  it('never strikes a price through to repeat the same price', () => {
+    render(<Harness primaryService="carpet" primaryTablePrice={0} />);
+    const mattress = card(/^Colchão/);
+    expect(mattress.textContent).toContain('69€/un.');
+    expect(mattress.querySelector('s')).toBeNull();
+    const sofa = card(/^Sofá/);
+    expect(sofa.textContent).toContain('69€/un.');
+    expect(sofa.querySelector('s')).toBeNull();
+    // Abaixo do mínimo nem as cadeiras nem o tapete prometem a regalia.
+    expect(card(/^Cadeiras/).textContent).not.toContain('pague');
+    expect(card(/^Cadeiras/).textContent).toContain('Desde 80€');
+  });
+
+  it('keeps the rug offer on the card when the pack applies', () => {
+    render(<Harness primaryService="sofa" primaryTablePrice={100} />);
+    expect(card(/^Tapete/).textContent).toContain('Limpe 5 m², pague 4');
+    expect(card(/^Cadeiras/).textContent).toContain('Limpe 4, pague 3');
+  });
 });

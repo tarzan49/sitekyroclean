@@ -5,6 +5,7 @@ import { Link } from "react-router-dom";
 import { FOOTER_NAV, FOOTER_STRIP_LINKS, FOOTER_LEGAL_LINKS } from "@/data/siteFooterNav";
 import kyroLogo from "@/assets/kyro-logo.webp";
 import { PHONE_TEL, PHONE_DISPLAY, BUSINESS_EMAIL_HREF, BUSINESS_EMAIL, BUSINESS_ADDRESS, BUSINESS_TAX_ID } from "@/constants/business";
+import { COVERAGE_PROMISE, RESPONSE_PROMISE, TRAVEL_FEE_MIN } from "@/constants/commercialPolicy";
 
 const Footer = () => {
   return (
@@ -107,7 +108,7 @@ const Footer = () => {
           </div>
         </div>
       </div>
-    <div className="max-w-7xl mx-auto px-5 py-8 text-base text-white/70"><p>Equipas em Braga, Porto, Lisboa e Algarve. Outras localidades mediante confirmação.</p><p className="mt-2">Resposta em menos de 10 minutos · Deslocação a partir de 10€</p><div className="flex flex-wrap gap-4 mt-4">{FOOTER_STRIP_LINKS.map(link => <Link key={link.href} to={link.href}>{link.label}</Link>)}</div></div>
+    <div className="max-w-7xl mx-auto px-5 py-8 text-base text-white/70"><p>{COVERAGE_PROMISE}</p><p className="mt-2">{RESPONSE_PROMISE} · Deslocação a partir de {TRAVEL_FEE_MIN}€</p><div className="flex flex-wrap gap-4 mt-4">{FOOTER_STRIP_LINKS.map(link => <Link key={link.href} to={link.href}>{link.label}</Link>)}</div></div>
     <BusinessConditions />
     </footer>
   );

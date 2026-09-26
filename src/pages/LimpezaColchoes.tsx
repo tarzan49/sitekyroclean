@@ -4,9 +4,9 @@ import Header from "@/components/Header";
 import { QuizServiceProvider } from "@/context/QuizLocationContext";
 import Footer from "@/components/Footer";
 import ServiceCityLinks from "@/components/ServiceCityLinks";
-import { DEFAULT_PRICE_FROM } from "@/data/serviceCatalog";
 import ServiceFAQ from "@/components/ServiceFAQ";
 import ServiceSchema from "@/components/ServiceSchema";
+import { getPillarPage } from "@/data/pillarPages";
 import ServiceHero from "@/components/ServiceHero";
 import ServiceExamplesGallery from "@/components/ServiceExamplesGallery";
 import ServiceExpertTips from "@/components/ServiceExpertTips";
@@ -61,20 +61,18 @@ const expertTips: ExpertTip[] = [
   },
 ];
 
-const LimpezaColchoes = () => {
-  const faqs = [
-    { question: 'Para que serve a limpeza de colchões se uso sempre lençóis?', answer: 'A limpeza remove sujidade e resíduos das fibras. Anti-ácaros e desbacterização são extras opcionais, com objetivos e preços distintos. Não prometemos eliminação total nem melhoria de sintomas.' },
-    { question: 'A limpeza elimina totalmente ácaros e bactérias?', answer: 'A limpeza remove sujidade e resíduos das fibras. Anti-ácaros e desbacterização são extras opcionais, com objetivos e preços distintos. Não prometemos eliminação total nem melhoria de sintomas.' },
-    { question: 'Com que frequência devo limpar o colchão?', answer: 'Para uso doméstico, recomendamos uma limpeza profunda a cada 12 a 18 meses. Em casos de alergias, problemas respiratórios, crianças pequenas ou colchões muito utilizados (AL, hotéis), o ideal é encurtar o intervalo para 6 a 12 meses.' },
-  ];
+// Título, h1, FAQs e schema vêm de src/data/pillarPages.ts, a mesma fonte do
+// PageHead e do HTML estático (scripts/prerender.ts).
+const pillar = getPillarPage('/limpeza-colchoes');
 
+const LimpezaColchoes = () => {
   return (
     <QuizServiceProvider value="mattress">
     <>
       <Header />
       <main>
         <ServiceHero
-          title="Higienização Profissional de Colchões"
+          title={pillar.h1}
           serviceSlug="limpeza-colchoes"
         />
 
@@ -95,14 +93,15 @@ const LimpezaColchoes = () => {
           items={colchoesGuarantee}
           variant="dark"
         />
-        <ServiceFAQ faqs={faqs} heading="Perguntas Frequentes" variant="light" />
+        <ServiceFAQ faqs={pillar.faqs} heading="Perguntas Frequentes" variant="light" />
         <ServiceExpertTips tips={expertTips} variant="dark" />
-        <ServiceCityLinks serviceSlug="limpeza-colchoes" serviceLabel="Limpeza de Colchões" />
+        <ServiceCityLinks serviceSlug="limpeza-colchoes" serviceLabel={pillar.serviceName} />
         <ServiceSchema
-          serviceName="Limpeza de Colchões"
-          description="Higienização profissional de colchões no Porto. Limpeza de sujidade e resíduos. Anti-ácaros e desbacterização opcionais."
-          url="/limpeza-colchoes"
-          priceFrom={DEFAULT_PRICE_FROM}
+          serviceName={pillar.serviceName}
+          description={pillar.description}
+          url={pillar.path}
+          priceFrom={pillar.priceFrom}
+          breadcrumbLabel={pillar.breadcrumbLabel}
         />
       </main>
       <Footer />

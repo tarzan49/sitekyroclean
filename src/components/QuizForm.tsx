@@ -1,4 +1,4 @@
-import { splitTreatmentItems } from '@/components/quiz/quizHelpers';
+import { quizServiceTypeLabel } from '@/components/quiz/quizHelpers';
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
@@ -18,7 +18,6 @@ import {
 import type { QuizFormData, SofaItem, MattressItem, CarpetItem, UpsellItemConfig } from './quiz';
 import QuizStepLocation from './quiz/steps/QuizStepLocation';
 import QuizStepConfig from './quiz/steps/QuizStepConfig';
-import QuizSofaPackTest from './quiz/steps/QuizSofaPackTest';
 import QuizComboUpsellScreen from './quiz/steps/QuizComboUpsellScreen';
 import QuizChairsAddonUpsell, { ChairAddonActions } from './quiz/steps/QuizChairsAddonUpsell';
 import QuizSofaAddonUpsell from './quiz/steps/QuizSofaAddonUpsell';
@@ -51,7 +50,7 @@ interface QuizFormProps {
   initialServiceType?: 'cleaning' | 'waterproofing' | 'both';
   initialSofaSizeId?: string;
   initialSofaQty?: number;
-  initialSofaItems?: { sizeId: string; qty: number; chaiseLongue?: boolean; packEnabled?: boolean }[];
+  initialSofaItems?: { sizeId: string; qty: number; packEnabled?: boolean }[];
   initialMattressSizeId?: string;
   initialMattressQty?: number;
   initialMattressItems?: { sizeId: string; qty: number; packEnabled?: boolean }[];
@@ -103,9 +102,7 @@ const QuizForm = ({
   initialMattressSizeId, initialMattressQty, initialMattressItems, initialChairQty, initialChairWaterproofing, initialCarpetArea, initialCarpetItems, initialCarpetKind,
   initialWaterproofingTier, skipToUpsell, initialUpsellItems,
 }: QuizFormProps) => {
-  const offerPreview = true;
   const isDemo = import.meta.env.DEV && ["ofertas", "quiz-pack"].includes(new URLSearchParams(window.location.search).get("teste") ?? "");
-  const localPackPreview = false;
   const { toast } = useToast();
   const navigate = useNavigate();
   const hasInitialItem = Boolean(
@@ -135,7 +132,7 @@ const QuizForm = ({
     if (initialSofaItems?.length) {
       return initialSofaItems
         .filter(i => i.qty > 0)
-        .map(i => ({ sizeId: i.sizeId, qty: i.qty, packEnabled: i.packEnabled ?? false, chaiseLongue: i.chaiseLongue }));
+        .map(i => ({ sizeId: i.sizeId, qty: i.qty, packEnabled: i.packEnabled ?? false }));
     }
     return initialSofaSizeId ? [{ sizeId: initialSofaSizeId, qty: initialSofaQty ?? 1, packEnabled: false }] : [];
   };
@@ -365,17 +362,9 @@ const QuizForm = ({
     return labels[formData.service] || formData.service;
   };
 
-  const getServiceTypeLabel = () => {
-    if (formData.serviceType === 'waterproofing') {
-      if (formData.service === 'mattress') return 'Desbacterização e Anti Ácaros';
-      return formData.waterproofingTier === 'premium' ? 'Impermeabilização Premium' : 'Impermeabilização Essencial';
-    }
-    const labels: Record<string, string> = {
-      cleaning: 'Higienização Profunda',
-      both: formData.service === 'mattress' ? 'Pack: Limpeza + Desbacterização e Anti Ácaros' : 'Pack Proteção Total',
-    };
-    return labels[formData.serviceType] || '';
-  };
+  // Leva o tratamento escolhido (impermeabilização ou anti-ácaros), para
+  // chegar à mensagem, ao CRM e ao WhatsApp de recurso.
+  const getServiceTypeLabel = () => quizServiceTypeLabel(formData, sofaItems, mattressItems);
 
   // "Sob orçamento" for null (invalid/out-of-table), otherwise "X€" or "X,YZ€".
   const fmtEuro = (n: number | null) => (n === null ? 'Sob orçamento' : n % 1 === 0 ? `${n}€` : `${n.toFixed(2).replace('.', ',')}€`);
@@ -384,7 +373,7 @@ const QuizForm = ({
     service: formData.service, serviceType: formData.serviceType,
     waterproofingTier: formData.waterproofingTier, sofaItems, mattressItems, upsellItems, carpetItems,
     chairQuantity: formData.chairQuantity, chairWaterproofQty: formData.chairWaterproofQty,
-    chairAntiAcaros: formData.chairAntiAcaros, carpetKind: formData.carpetKind, finalTravelCost,
+    chairAntiAcaros: formData.chairAntiAcaros, sofaAntiAcaros: formData.sofaAntiAcaros, carpetKind: formData.carpetKind, finalTravelCost,
     finalLocation: formData.location === 'other' ? formData.otherLocation : formData.location,
   });
   const quotePriceText = formatQuotePrice({ totalPrice, hasSobOrcamento, hasUpsellSobItem });
@@ -446,6 +435,7 @@ ${formData.description || 'Sem observações adicionais'}
       chairQuantity: formData.chairQuantity,
       chairWaterproofQty: formData.chairWaterproofQty,
       chairAntiAcaros: formData.chairAntiAcaros,
+      sofaAntiAcaros: formData.sofaAntiAcaros,
       calculateServicePrice,
       totalPrice,
       hasSobOrcamento,
@@ -677,7 +667,7 @@ ${formData.description || 'Sem observações adicionais'}
                     // existe como serviço primário, só como upsell dependente de uma
                     // limpeza — ver shouldSkipServiceType acima para mais contexto.
                     const skipServiceType = service === 'carpet' || service === 'mattress';
-                    updateFormData({ service, carpetKind: 'tapete', serviceType: skipServiceType ? 'cleaning' : '', sofaSize: '', mattressSize: '', chairType: '', carpetArea: '', chairWaterproofing: false, chairWaterproofQty: 0, chairAntiAcaros: false });
+                    updateFormData({ service, carpetKind: 'tapete', serviceType: skipServiceType ? 'cleaning' : '', sofaSize: '', mattressSize: '', chairType: '', carpetArea: '', chairWaterproofing: false, chairWaterproofQty: 0, chairAntiAcaros: false, sofaAntiAcaros: false });
                     setSofaItems([]);
                     setMattressItems([]);
                     setCarpetItems(buildInitialCarpetItems());
@@ -716,7 +706,7 @@ ${formData.description || 'Sem observações adicionais'}
                   <ServiceTypeSelector
                     selectedType={formData.serviceType}
                     onSelect={(type) => {
-                      updateFormData({ serviceType: type });
+                      updateFormData({ serviceType: type, sofaAntiAcaros: false, chairAntiAcaros: false });
                       if (formData.service === 'mattress') setMattressItems([]);
                       if (formData.service === 'sofa') setSofaItems([]);
                       setTimeout(() => setCurrentStep(3), 180);
@@ -802,13 +792,8 @@ ${formData.description || 'Sem observações adicionais'}
                 categorias (Colchão, Sofá, Cadeiras), substitui o antigo fluxo
                 QuizUpsellOverlay de escolher um item de cada vez (pedido
                 explícito, aprovado em mockup 2026-09-06). */}
-            {activeUpsellScreen === 'combo' && localPackPreview && formData.service === 'sofa' && !hasSobOrcamento ? (
-              <QuizSofaPackTest base={calculateServicePrice} travel={finalTravelCost} items={upsellItems}
-                onChoose={item => { setUpsellItems(item ? [item] : []); setActiveUpsellScreen(null); setCurrentStep(4); }}
-                onBack={() => { setActiveUpsellScreen('sofa'); }} />
-            ) : activeUpsellScreen === 'combo' && (
+            {activeUpsellScreen === 'combo' && (
               <QuizComboUpsellScreen
-                offerPreview={offerPreview}
                 travelFee={finalTravelCost}
                 primaryTablePrice={calculateServicePrice}
                 primaryService={formData.service}
@@ -842,7 +827,6 @@ ${formData.description || 'Sem observações adicionais'}
             {/* Step 4 - Contact */}
             {currentStep === 4 && activeUpsellScreen !== 'combo' && (
               <QuizStepContact
-                preview={localPackPreview}
                 quoteLines={quoteLines}
                 quotePriceText={quotePriceText}
                 formData={formData}
@@ -858,7 +842,7 @@ ${formData.description || 'Sem observações adicionais'}
     {currentStep === 3 && activeUpsellScreen === 'chairs' && (
       <div className="shrink-0 w-full flex justify-center px-4 sm:px-6 pt-2 pb-3 border-t border-gold/15 bg-[#071a12]" style={{ paddingBottom: 'max(0.75rem, env(safe-area-inset-bottom))' }}>
         <ChairAddonActions
-          selected={formData.serviceType === 'waterproofing' ? formData.chairWaterproofQty > 0 : formData.chairWaterproofing}
+          selected={formData.serviceType === 'waterproofing' ? formData.chairWaterproofQty > 0 : formData.chairWaterproofing || formData.chairAntiAcaros}
           onBack={() => { (document.activeElement as HTMLElement)?.blur(); setActiveUpsellScreen(null); }}
           onContinue={() => { (document.activeElement as HTMLElement)?.blur(); proceedPastConfig(); }}
         />
@@ -879,7 +863,7 @@ ${formData.description || 'Sem observações adicionais'}
               </button>
               <Button
                 onClick={handleSubmit}
-                disabled={isSubmitting || (!localPackPreview && !canProceed())}
+                disabled={isSubmitting || !canProceed()}
                 className="flex-1 h-14 bg-gradient-to-r from-gold to-[#d4c57b] hover:from-[#d4c57b] hover:to-gold text-[#12121e] font-black text-base tracking-wider uppercase touch-manipulation active:scale-[0.98] rounded-sm shadow-[0_0_32px_rgba(212,175,55,0.30)]"
               >
                 {isDemo ? 'CONCLUIR TESTE' : isSubmitting ? 'A enviar...' : 'ENVIAR PEDIDO'}
@@ -887,6 +871,16 @@ ${formData.description || 'Sem observações adicionais'}
             </div>
             <p className="text-center text-sm text-white/80 font-medium -mt-0.5">
               Sem compromisso · Grátis · Respondemos em menos de 10 min
+            </p>
+            {/* O selo flutuante do reCAPTCHA fica escondido por CSS (tapava a
+                barra de WhatsApp); a Google só o permite com esta atribuição
+                visível junto do envio. */}
+            <p className="text-center text-sm text-white/80 leading-snug">
+              Protegido por reCAPTCHA. Aplicam-se a{' '}
+              <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-white">Política de Privacidade</a>
+              {' '}e os{' '}
+              <a href="https://policies.google.com/terms" target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-white">Termos de Serviço</a>
+              {' '}da Google.
             </p>
           </div>
         ) : (

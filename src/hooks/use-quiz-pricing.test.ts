@@ -52,7 +52,7 @@ describe('partial treatment quantities', () => {
 // de um desconto condicional sobre o total — não há mais nenhum limiar de
 // "2 artigos, soma >149€" a testar aqui.
 describe('quote total with upsell items', () => {
-  const sofa = [{ id: 'test-sofa', sizeId: '3-lugares', qty: 1, packEnabled: false, chaiseLongue: false }];
+  const sofa = [{ sizeId: '3-lugares', qty: 1, packEnabled: false }];
   const extra = [{ id: 'mattress-casal', mattressSize: 'casal', qty: 1, price: 55, label: '1x Colchão Casal' }];
   const form = { ...initialFormData, location: 'Lisboa', service: 'sofa', serviceType: 'cleaning' as const };
   it('adds the upsell item price straight into the total, no discount concept involved', () => {
@@ -80,5 +80,35 @@ describe('travel recalculation', () => {
     rerender({ city: 'Lisboa', extras: [] });
     expect(result.current.finalTravelCost).toBe(10);
     expect(result.current.totalPrice).toBe(89);
+  });
+});
+
+// 2026-09-26: anti-ácaros no sofá e nas cadeiras, com os mesmos preços do
+// configurador de packs (constants/antiAcarosPricing.ts).
+describe('anti-acaros on sofas and chairs', () => {
+  it.each([['1-lugar', 49 + 20], ['2-lugares', 69 + 40], ['3-lugares', 79 + 50]])('charges cleaning plus the per-size treatment for a %s sofa', (sizeId, expected) => {
+    const { result } = renderHook(() => useQuizPricing(
+      { ...initialFormData, service: 'sofa', serviceType: 'cleaning', sofaAntiAcaros: true },
+      [{ sizeId, qty: 1, packEnabled: true }], [], [], []));
+    expect(result.current.calculateServicePrice).toBe(expected);
+  });
+  it('charges the treatment only on the treated units', () => {
+    const { result } = renderHook(() => useQuizPricing(
+      { ...initialFormData, service: 'sofa', serviceType: 'cleaning', sofaAntiAcaros: true },
+      [{ sizeId: '2-lugares', qty: 3, packEnabled: true, packQty: 1 }], [], [], []));
+    expect(result.current.calculateServicePrice).toBe(69 * 3 + 40);
+  });
+  it('ignores the sofa anti-acaros flag when waterproofing is the main service', () => {
+    const { result } = renderHook(() => useQuizPricing(
+      { ...initialFormData, service: 'sofa', serviceType: 'waterproofing', waterproofingTier: 'essencial', sofaAntiAcaros: true },
+      [{ sizeId: '2-lugares', qty: 1, packEnabled: false }], [], [], []));
+    expect(result.current.calculateServicePrice).toBe(79);
+  });
+  it('charges 5€ per chair, only without waterproofing', () => {
+    expect(pricing({ service: 'chairs', serviceType: 'cleaning', chairQuantity: '4', chairAntiAcaros: true }).calculateServicePrice).toBe(80 + 20);
+    // Nunca as duas coisas: com impermeabilização, o anti-ácaros não conta
+    // (mesma regra que o recibo, chairAntiAcarosQty).
+    expect(pricing({ service: 'chairs', serviceType: 'cleaning', chairQuantity: '4', chairAntiAcaros: true, chairWaterproofing: true, chairWaterproofQty: 4, waterproofingTier: 'essencial' }).calculateServicePrice).toBe(80 + 72);
+    expect(pricing({ service: 'chairs', serviceType: 'waterproofing', waterproofingTier: 'essencial', chairQuantity: '4', chairAntiAcaros: true }).calculateServicePrice).toBe(72);
   });
 });

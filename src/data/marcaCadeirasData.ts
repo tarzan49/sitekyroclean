@@ -12,9 +12,6 @@ export interface MarcaCadeiras {
   cleaningProcess: string;
   doNots: string[];
   doThis: string[];
-  estimatedPriceRange: string;
-  minPrice: number;
-  maxPrice: number;
   serviceSlug: string;
   faqs: { question: string; answer: string }[];
 }
@@ -35,9 +32,6 @@ export const marcasCadeiras: MarcaCadeiras[] = [
       "Tratamos separadamente cada tipo de acabamento IKEA, tecido, mesh ou couro sintético",
       "Removemos gordura e sujidade das zonas de maior contacto sem danificar as costuras",
     ],
-    estimatedPriceRange: "12,50€ - 20€/unidade",
-    minPrice: 12.5,
-    maxPrice: 20,
     serviceSlug: "limpeza-cadeiras",
     faqs: [
       { question: "Limpam cadeiras IKEA de escritório e de sala de jantar?", answer: "Sim, tratamos os dois tipos. A técnica adapta-se ao material: mesh respirável para cadeiras de escritório, tecido ou couro sintético para sala de jantar." },
@@ -60,9 +54,6 @@ export const marcasCadeiras: MarcaCadeiras[] = [
       "Removemos manchas de comida, gordura e bebidas com produto específico para têxteis de sala de jantar",
       "Tratamos o conjunto todo na mesma visita, garantindo cor e textura uniformes em todas as cadeiras",
     ],
-    estimatedPriceRange: "12,50€ - 20€/unidade",
-    minPrice: 12.5,
-    maxPrice: 20,
     serviceSlug: "limpeza-cadeiras",
     faqs: [
       { question: "Conseguem remover manchas antigas de vinho ou molho nas cadeiras Conforama?", answer: "Na maioria dos casos sim, com pré-tratamento específico antes da extração geral. Manchas muito antigas podem não sair a 100%, mas o resultado é sempre muito visível." },
@@ -85,9 +76,6 @@ export const marcasCadeiras: MarcaCadeiras[] = [
       "Adaptamos a técnica ao tipo exato de cadeira Leroy Merlin, escritório ou sala de jantar",
       "Limpamos rodízios e mecanismos com cuidado, sem comprometer a mobilidade da cadeira",
     ],
-    estimatedPriceRange: "12,50€ - 20€/unidade",
-    minPrice: 12.5,
-    maxPrice: 20,
     serviceSlug: "limpeza-cadeiras",
     faqs: [
       { question: "Limpam cadeiras de escritório Leroy Merlin com mesh?", answer: "Sim, com técnica de baixa pressão específica para mesh respirável, que remove sujidade sem esticar ou rasgar a rede." },
@@ -110,9 +98,6 @@ export const marcasCadeiras: MarcaCadeiras[] = [
       "Preservamos a elasticidade e o desempenho ergonómico do mesh técnico Herman Miller",
       "Usamos produtos de pH neutro certificados, próprios para materiais técnicos de alta gama",
     ],
-    estimatedPriceRange: "12,50€ - 20€/unidade",
-    minPrice: 12.5,
-    maxPrice: 20,
     serviceSlug: "limpeza-cadeiras",
     faqs: [
       { question: "A limpeza profissional afeta o desempenho ergonómico da Herman Miller Aeron?", answer: "Não. Usamos produtos e técnica específicos para mesh técnico, que preservam a elasticidade e o suporte ergonómico original da cadeira." },
@@ -135,9 +120,6 @@ export const marcasCadeiras: MarcaCadeiras[] = [
       "Fazemos avaliação prévia gratuita do revestimento de cada cadeira Moviflor antes de qualquer intervenção",
       "Tratamos conjuntos mistos, tecido e couro, na mesma visita, com a técnica certa para cada material",
     ],
-    estimatedPriceRange: "12,50€ - 20€/unidade",
-    minPrice: 12.5,
-    maxPrice: 20,
     serviceSlug: "limpeza-cadeiras",
     faqs: [
       { question: "Tratam tanto cadeiras de tecido como de couro do Moviflor?", answer: "Sim, tratamos todos os materiais Moviflor. A avaliação prévia gratuita garante o tratamento adequado para cada revestimento." },
@@ -160,9 +142,6 @@ export const marcasCadeiras: MarcaCadeiras[] = [
       "Usamos produtos de pH neutro que deixam as cores das cadeiras El Corte Inglés mais vivas e definidas",
       "Hidratamos acabamentos em couro premium, prolongando a vida útil do revestimento",
     ],
-    estimatedPriceRange: "12,50€ - 20€/unidade",
-    minPrice: 12.5,
-    maxPrice: 20,
     serviceSlug: "limpeza-cadeiras",
     faqs: [
       { question: "Conseguem manter as cores originais das cadeiras El Corte Inglés?", answer: "Sim. Usamos produtos de pH neutro que preservam as cores, na maioria dos casos deixando-as mais vivas e definidas após a limpeza." },

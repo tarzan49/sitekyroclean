@@ -2,7 +2,6 @@ import { Input } from '@/components/ui/input';
 import type { QuizFormData } from '@/components/quiz/QuizTypes';
 
 interface QuizStepContactProps {
-  preview?: boolean;
   quoteLines: Array<{ label: string; qty: number; total: number | null }>;
   quotePriceText: string;
   formData: QuizFormData;
@@ -10,7 +9,7 @@ interface QuizStepContactProps {
   scrollContainerRef: React.RefObject<HTMLDivElement>;
 }
 
-const QuizStepContact = ({ formData, updateFormData, scrollContainerRef, quoteLines, quotePriceText, preview = false }: QuizStepContactProps) => {
+const QuizStepContact = ({ formData, updateFormData, scrollContainerRef, quoteLines, quotePriceText }: QuizStepContactProps) => {
   const scrollToVisible = (el: HTMLElement) => {
     setTimeout(() => {
       const sc = scrollContainerRef.current;
@@ -34,7 +33,7 @@ const QuizStepContact = ({ formData, updateFormData, scrollContainerRef, quoteLi
           Os seus dados
         </h2>
         <p className="text-base text-white/80 mb-6">
-          {preview ? "Modo de teste: não precisa de preencher dados. Nenhum pedido será enviado." : "Deixe o seu contacto para confirmarmos o pedido."}
+          Deixe o seu contacto para confirmarmos o pedido.
         </p>
 
         <div className="flex flex-col gap-4">

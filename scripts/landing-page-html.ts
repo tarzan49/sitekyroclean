@@ -3,6 +3,7 @@ import type { LandingPageModel } from '../src/data/landingPageModel';
 import { LANDING_SECTION_ORDER } from '../src/data/landingServiceCopy';
 import { commercialHeroPriceLine, commercialHeroStats } from '../src/data/commercialHeroCopy';
 import { FOOTER_NAV, FOOTER_STRIP_LINKS, FOOTER_LEGAL_LINKS } from '../src/data/siteFooterNav';
+import { SERVICE_CONDITIONS, SERVICE_CONDITIONS_LINKS } from '../src/constants/commercialPolicy';
 
 export const escapeLandingHtml = (value: string) => value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 const e = escapeLandingHtml;
@@ -23,9 +24,9 @@ const links = (items: { href: string; label: string }[]) => `<ul>${items.map(ite
  * euros belonging to no service and no city.
  *
  * The header is "Preço", not "Preço desde": PRICE_TABLE rows are not all
- * starting prices. "Chaise longue (add-on): +10€" is an increment and
- * "Sob orçamento" is not a price at all, so the narrower header would state
- * something untrue about two rows out of five.
+ * starting prices. An add-on row is an increment and "Sob orçamento" is not a
+ * price at all, so the narrower header would state something untrue about
+ * those rows.
  *
  * Rows come from model.priceRows, which is PRICE_TABLE, the same array
  * PriceWidget reads. The widget and this table cannot disagree on a number,
@@ -68,6 +69,18 @@ export const ENTITY_FOOTER_HTML =
   + '<li><a href="https://www.livroreclamacoes.pt/inicio" rel="nofollow noopener">Livro de Reclamações</a></li>'
   + '</ul></nav>';
 
+/**
+ * "Condições do serviço e garantia": o bloco que o rodapé React desenha em
+ * todas as páginas (BusinessConditions.tsx), a partir da mesma lista. As
+ * páginas landing não o tinham no HTML estático e as restantes tinham uma
+ * versão diferente da do React, com outras frases e outra deslocação.
+ */
+export const SERVICE_CONDITIONS_HTML =
+  '<details><summary>Condições do serviço e garantia</summary>'
+  + SERVICE_CONDITIONS.map(text => `<p>${e(text)}</p>`).join('')
+  + `<p>${SERVICE_CONDITIONS_LINKS.map(link => `<a href="${e(link.href)}">${e(link.label)}</a>`).join(' · ')}</p>`
+  + '</details>';
+
 /** Semantic no-JS fallback, with the same model and order as the React composition. */
 export function renderLandingPageHtml(model: LandingPageModel): string {
   const sections = {
@@ -97,5 +110,5 @@ export function renderLandingPageHtml(model: LandingPageModel): string {
     + `<li>${e(model.heroLocationName)}</li>`
     + `</ol></nav>`;
 
-  return `<main>${breadcrumb}<h1>${e(model.h1)}</h1><p>${e(model.intro)}</p>${heroFacts}${LANDING_SECTION_ORDER.map(section => `<section id="${section}" data-landing-section="${section}">${sections[section]}</section>`).join('\n')}${ENTITY_FOOTER_HTML}</main>`;
+  return `<main>${breadcrumb}<h1>${e(model.h1)}</h1><p>${e(model.intro)}</p>${heroFacts}${LANDING_SECTION_ORDER.map(section => `<section id="${section}" data-landing-section="${section}">${sections[section]}</section>`).join('\n')}${SERVICE_CONDITIONS_HTML}${ENTITY_FOOTER_HTML}</main>`;
 }

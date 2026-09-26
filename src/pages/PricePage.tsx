@@ -17,7 +17,7 @@ import { cityPrep, services } from "@/data/serviceCatalog";
 import { useLandingModel } from "@/hooks/use-landing-model";
 import {
   buildBreadcrumbNode,
-  buildOfferNode,
+  offerForPriceLabel,
   buildServiceNode,
   buildWebPageNode,
   clearPrerenderedFaqSchema,
@@ -74,7 +74,7 @@ const PricePage = () => {
   const heroImgs = pickServiceHero(data.serviceSlug, data.cityName);
   const beforeAfterCategory = categoryForServiceSlug(data.serviceSlug);
   const service = services.find(s => s.slug === data.serviceSlug);
-  const servicePrice = service?.priceFrom ?? "49€";
+  const servicePrice = service?.priceFrom ?? "Sob orçamento";
   const waHref = `${WHATSAPP_BASE}?text=${encodeURIComponent(buildServiceWaMessage(data.serviceSlug, data.cityName))}`;
 
   const serviceDuration = SERVICE_DURATION[data.serviceSlug] ?? { value: "3 a 6h", label: "Pronto a usar" };
@@ -114,7 +114,7 @@ const PricePage = () => {
                   name: `${data.serviceName} ${prep} ${data.cityName}`,
                   description: data.metaDescription,
                   areaServed: { "@type": "City", name: data.cityName },
-                  ...(servicePrice.replace(/[^0-9]/g, "") && { offers: buildOfferNode(servicePrice.replace(/[^0-9]/g, "")) }),
+                  offers: offerForPriceLabel(servicePrice),
                 }),
               ],
             }),

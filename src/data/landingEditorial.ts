@@ -1,5 +1,6 @@
 import type { LandingFaqContext, LandingService } from './landingFaqPool';
 import { EXTENDED_TRIP_CITIES } from '../constants/travel';
+import { cityPrep } from './serviceCatalog';
 
 interface EditorialContext {
   family: LandingFaqContext['family'];
@@ -11,7 +12,7 @@ interface EditorialContext {
 
 // Differentiate the purpose of the page, not an invented local condition or method.
 const briefs: Record<LandingService, { assessment: string; request: string; budget: string }> = {
-  'limpeza-sofas': { assessment: 'avaliação do tecido, das manchas e do estado do sofá', request: 'Indique os lugares, a chaise longue e os módulos e envie uma fotografia do conjunto.', budget: 'Compare as configurações por número de lugares e identifique chaise longue e módulos adicionais.' },
+  'limpeza-sofas': { assessment: 'avaliação do tecido, das manchas e do estado do sofá', request: 'Indique os lugares e os módulos e envie uma fotografia do conjunto.', budget: 'Compare as configurações por número de lugares e identifique os módulos adicionais.' },
   'limpeza-colchoes': { assessment: 'avaliação do revestimento, das manchas e das condições de secagem', request: 'Envie as medidas e a etiqueta do colchão e indique as faces que pretende tratar.', budget: 'Identifique o tamanho, o número de colchões e os tratamentos opcionais pretendidos.' },
   'limpeza-tapetes': { assessment: 'avaliação das fibras, das cores e da base de cada peça', request: 'Envie as medidas e fotografias da frente e do verso para confirmar o método e a modalidade do serviço.', budget: 'Cada tapete é avaliado pelas medidas, pelo material e pelo estado; não existe um preço fixo por m².' },
   'limpeza-cadeiras': { assessment: 'avaliação dos assentos, encostos e restantes partes estofadas', request: 'Indique a quantidade de cada modelo e mostre as zonas que pretende limpar.', budget: 'Compare o escalão da quantidade pretendida e identifique os modelos e as partes estofadas.' },
@@ -22,7 +23,10 @@ const briefs: Record<LandingService, { assessment: string; request: string; budg
 export function getLandingEditorial(context: EditorialContext) {
   const { family, serviceSlug, serviceLabel, place, municipality } = context;
   const brief = briefs[serviceSlug];
-  const where = `${place === 'Porto' ? 'no' : 'em'} ${place}`;
+  // A mesma preposição que o <h1> usa ("no Barreiro", "na Amadora"). Aqui só
+  // o Porto levava artigo, e a introdução e a meta description diziam "em
+  // Barreiro" na mesma página cujo título dizia "no Barreiro".
+  const where = `${cityPrep(place)} ${place}`;
   const consultation = EXTENDED_TRIP_CITIES.has(municipality);
   const quoteOnly = serviceSlug === 'limpeza-tapetes' || serviceSlug === 'limpeza-alcatifas';
   const metaWhere = family === 'freguesia' ? `em ${place}, ${municipality}` : where;

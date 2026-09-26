@@ -7,12 +7,12 @@ import { cn } from '@/lib/utils';
 import { sofaPrices, mattressPrices } from '@/components/quiz/QuizTypes';
 import type { UpsellItemConfig, CarpetItem } from '@/components/quiz/QuizTypes';
 import {
-  calcChairWaterproof, calcChairWaterproofPremium, calcChairClean,
+  calcChairClean, priceComboExtras, type ComboExtrasInput,
   carpetAddItem, carpetRemoveItem, carpetUpdateItem, carpetItemArea, carpetTotalArea,
 } from '@/components/quiz/quizHelpers';
+import { PACK_PERK_CHAIRS_SET, PACK_PERK_MIN_ORDER, PACK_PERK_RUG_NOTE, PACK_PERK_RUG_SET_M2, perkMattressPrice, perkRugPaidArea } from '@/constants/packPerks';
 
 interface QuizComboUpsellScreenProps {
-  offerPreview?: boolean;
   travelFee?: number;
   /** Preço de tabela do serviço principal (o que já vai ser cobrado antes de
    * qualquer extra deste ecrã) — entra na conta do mínimo do preço de pack. */
@@ -24,15 +24,15 @@ interface QuizComboUpsellScreenProps {
   onBack: () => void;
 }
 
-import { PACK_PERK_MIN_ORDER, perkChairsFree, perkChairsPrice, perkMattressPrice, perkSofaPrice } from '@/constants/packPerks';
-// Preço riscado (tabela normal) + preço com desconto em destaque — usado em
-// cada artigo deste upsell (pedido explícito do dono 2026-09-10: nada de
-// desconto de 10% sobre o pedido todo; cada artigo extra já vem com o seu
-// próprio preço reduzido, mostrado sempre lado a lado com o preço normal).
+// Preço de tabela riscado + preço de pack em destaque, por artigo (pedido
+// explícito do dono 2026-09-10: cada artigo extra vem com o seu próprio preço
+// reduzido, sempre ao lado do preço normal). Quando o preço de pack não se
+// aplica (abaixo do mínimo), mostra só o preço: riscar um preço para o
+// repetir ao lado ("69€ 69€") não é uma redução, é ruído que parece truque.
 const PriceCompare = ({ original, promo, suffix = '' }: { original: number; promo: number; suffix?: string }) => (
   <span className="inline-flex items-baseline gap-1.5 tabular-nums">
-    <s className="text-white/80 font-normal">{original}€</s>
-    <span className="text-gold font-black tracking-tight">{promo}€{suffix}</span>
+    {promo < original && <s className="text-white/80 font-normal">{fmt(original)}€</s>}
+    <span className="text-gold font-black tracking-tight">{fmt(promo)}€{suffix}</span>
   </span>
 );
 
@@ -43,19 +43,23 @@ type View = 'summary' | 'mattress' | 'sofa' | 'chairs' | 'carpet';
 // standard), fica mais realista que 3 como ponto de partida do upsell.
 const CHAIRS_MIN_QTY = 4;
 
+// Artigos de referência para o resumo, antes de haver escolha: o preço
+// mostrado é o que esse artigo teria se fosse acrescentado agora.
+const MATTRESS_REFERENCE = 'casal';
+const SOFA_REFERENCE = '2-lugares';
+
 function fmt(n: number): string {
   return n % 1 === 0 ? String(n) : n.toFixed(1).replace('.', ',');
 }
 
-// Upsell final "estilo companhia aérea": uma única tela com as 3 categorias
-// (Colchão, Sofá, Cadeiras), cada uma abre a sua própria página de
-// quantidades com os tamanhos/preços reais do negócio, em vez do fluxo
-// anterior de escolher um item de cada vez. Substitui QuizUpsellOverlay
-// no ponto "antes de finalizar" (pedido explícito, aprovado em mockup).
-const QuizComboUpsellScreen = ({ offerPreview = false, travelFee = 10, primaryTablePrice = 0, primaryService, upsellItems, setUpsellItems, onContinue, onBack }: QuizComboUpsellScreenProps) => {
+// Upsell final "estilo companhia aérea": uma única tela com as 4 categorias
+// (Colchão, Sofá, Cadeiras, Tapete), cada uma abre a sua própria página de
+// quantidades com os tamanhos/preços reais do negócio. Os preços de pack
+// saem de priceComboExtras (quizHelpers.ts), que aplica a mesma regra do
+// configurador de packs (priceWithPackPerks, constants/packPerks.ts).
+const QuizComboUpsellScreen = ({ travelFee = 10, primaryTablePrice = 0, primaryService, upsellItems, setUpsellItems, onContinue, onBack }: QuizComboUpsellScreenProps) => {
   const casalSeparate = Number(mattressPrices.find(opt => opt.id === 'casal')!.cleaningPrice) + travelFee;
   const [initialChairs] = useState(() => upsellItems.find(i => i.id === 'chairs'));
-  const [preservedTreatments] = useState(() => upsellItems.filter(i => i.id.endsWith('-anti-acaros')));
   const [view, setView] = useState<View>('summary');
   // This screen remounts when returning from contact. Restore the selection
   // before the synchronization effect can overwrite the parent's items.
@@ -76,47 +80,50 @@ const QuizComboUpsellScreen = ({ offerPreview = false, travelFee = 10, primaryTa
 
   const setMattQty = (id: string, qty: number) => setMattressQty(prev => ({ ...prev, [id]: Math.max(0, Math.min(9, qty)) }));
   const setSofaQtyFor = (id: string, qty: number) => setSofaQty(prev => ({ ...prev, [id]: Math.max(0, Math.min(9, qty)) }));
-  // Cadeiras no upsell só compensam a partir de 4un (80€, acima do mínimo de
-  // 49€ do artigo extra para o desconto de 10% do pack) — pedido explícito do
-  // dono para não deixar escolher 1-3 cadeiras aqui e nunca chegar ao
-  // desconto anunciado. 4 também é o nº mais comum de cadeiras numa casa.
+  // Cadeiras neste ecrã só a partir de 4 (o conjunto que dá uma cadeira
+  // oferecida), pedido explícito do dono. 4 também é o nº mais comum de
+  // cadeiras numa casa.
   const decChairs = () => setChairsQty(q => (q <= CHAIRS_MIN_QTY ? 0 : q - 1));
   const incChairs = () => setChairsQty(q => (q <= 0 ? CHAIRS_MIN_QTY : Math.min(9, q + 1)));
 
-  // Este upsell final é sempre e só limpeza (2026-09-08, pedido explícito do
-  // dono): quem queria impermeabilização já teve essa opção como serviço
-  // principal lá atrás — oferecer proteção outra vez aqui, para um item
-  // novo, só complicava um ecrã que é suposto ser rápido e leve.
-  const chairsRegularPrice = initialChairs?.waterproof ? (initialChairs.waterproofingTier === 'premium' ? calcChairWaterproofPremium(chairsQty) : calcChairWaterproof(chairsQty)) : calcChairClean(chairsQty);
-
-  // Preço de pack só se pratica a partir de PACK_PERK_MIN_ORDER de subtotal
-  // de tabela — serviço principal + tudo o que já está escolhido aqui, sempre
-  // ao preço cheio (2026-09-24, pedido explícito do dono: sem isto, quem
-  // monta um pedido pequeno neste ecrã ficava com vantagem sobre a mesma
-  // pessoa a pedir um orçamento normal do mesmo pedido pequeno). Artigos sob
-  // orçamento (tapete, "4+ Lugares") não têm preço de tabela para somar,
-  // por isso ficam de fora da conta — nunca desbloqueiam nem são
-  // desbloqueados por ela.
-  const mattressTableTotal = mattressPrices.reduce((sum, opt) => sum + (typeof opt.cleaningPrice === 'number' ? (mattressQty[opt.id] ?? 0) * opt.cleaningPrice : 0), 0);
-  const sofaTableTotal = sofaPrices.reduce((sum, opt) => sum + (typeof opt.cleaningPrice === 'number' ? (sofaQty[opt.id] ?? 0) * opt.cleaningPrice : 0), 0);
-  const chairsTableTotal = chairsQty > 0 && chairsRegularPrice !== null ? chairsRegularPrice : 0;
-  const perkEligible = offerPreview && (primaryTablePrice + mattressTableTotal + sofaTableTotal + chairsTableTotal) >= PACK_PERK_MIN_ORDER;
-
-  const mattressUnitPrice = (opt: typeof mattressPrices[number]) => perkEligible && typeof opt.cleaningPrice === 'number' ? perkMattressPrice(opt.cleaningPrice) : opt.cleaningPrice;
-  // Preços fixos do sofá neste upsell (pedido explícito do dono, mesmo
-  // padrão do colchão acima): 1L 49→35€, 2L 69→55€, 3L 79→65€. "4+ Lugares"
-  // fica de fora (sempre sob orçamento, sem preço fixo possível). Os números
-  // vivem em constants/packPerks.ts desde 2026-09-23, partilhados com o
-  // configurador de packs — não os reescrever aqui.
-  const sofaUnitPrice = (opt: typeof sofaPrices[number]) => perkEligible && typeof opt.cleaningPrice === 'number' ? perkSofaPrice(opt.id, opt.cleaningPrice) : opt.cleaningPrice;
-  const chairsFree = perkEligible && !initialChairs?.waterproof ? perkChairsFree(chairsQty) : 0;
-  const chairsCleanPrice = chairsRegularPrice === null ? null : chairsFree > 0 ? perkChairsPrice(chairsRegularPrice, chairsQty) : chairsQty > 0 ? chairsRegularPrice : 0;
-
-  const mattressQtyTotal = Object.values(mattressQty).reduce((a, b) => a + b, 0);
-  const sofaQtyTotal = Object.values(sofaQty).reduce((a, b) => a + b, 0);
   const carpetTotalAreaValue = carpetTotalArea(carpetItems);
   const incompleteCarpets = carpetItems.some(item => item.largura || item.comprimento) && carpetItems.some(item => carpetItemArea(item) === null);
   const carpetValidCount = carpetItems.filter(it => carpetItemArea(it) !== null).length;
+
+  // Este ecrã é sempre e só limpeza (2026-09-08, pedido explícito do dono):
+  // quem queria impermeabilização já teve essa opção no serviço principal.
+  // A exceção são cadeiras que chegam do widget de impermeabilização, que
+  // mantêm a proteção e, por terem tratamento, o preço de tabela.
+  const chairsWaterproofTier = initialChairs?.waterproof ? (initialChairs.waterproofingTier === 'premium' ? 'premium' : 'essencial') : null;
+  const state: ComboExtrasInput = { primaryService, primaryTablePrice, mattressQty, sofaQty, chairsQty, chairsWaterproofTier, rugCount: carpetValidCount };
+  // Preço de pack só a partir de PACK_PERK_MIN_ORDER de subtotal de tabela
+  // (serviço principal + extras, todos ao preço cheio; artigos sob orçamento
+  // não contam). Ver priceWithPackPerks.
+  const pricing = priceComboExtras(state);
+  const perkEligible = pricing.eligible;
+  // O preço que um tamanho teria se fosse acrescentado agora (pelo menos uma
+  // unidade). É isto que se mostra antes de haver escolha: calcular o
+  // mínimo sem o próprio artigo mostrava "69€ 69€" num pedido de 69€, quando
+  // juntar o colchão já o põe acima do mínimo (bug visto em produção).
+  const mattressPreview = (id: string) => {
+    const qty = Math.max(1, mattressQty[id] ?? 0);
+    const line = priceComboExtras({ ...state, mattressQty: { ...mattressQty, [id]: qty } }).mattress[id];
+    return line ? { table: line.table / qty, amount: line.amount / qty } : null;
+  };
+  const sofaPreview = (id: string) => {
+    const qty = Math.max(1, sofaQty[id] ?? 0);
+    const line = priceComboExtras({ ...state, sofaQty: { ...sofaQty, [id]: qty } }).sofa[id];
+    return line && line.table !== null && line.amount !== null ? { table: line.table / qty, amount: line.amount / qty } : null;
+  };
+  const chairsPreview = priceComboExtras({ ...state, chairsQty: Math.max(CHAIRS_MIN_QTY, chairsQty) }).chairs;
+
+  const chairsRegularPrice = pricing.chairs.table;
+  const chairsCleanPrice = chairsQty > 0 ? pricing.chairs.amount : 0;
+  const chairsFree = pricing.chairs.free;
+  const rugPerk = pricing.rugPerk;
+
+  const mattressQtyTotal = Object.values(mattressQty).reduce((a, b) => a + b, 0);
+  const sofaQtyTotal = Object.values(sofaQty).reduce((a, b) => a + b, 0);
   // Na escolha de extras mostramos o próximo passo, sem antecipar preços.
   const mattressSummary = mattressPrices
     .filter(opt => (mattressQty[opt.id] ?? 0) > 0)
@@ -134,24 +141,20 @@ const QuizComboUpsellScreen = ({ offerPreview = false, travelFee = 10, primaryTa
     ? `${carpetValidCount} tapete${carpetValidCount > 1 ? 's' : ''} · sob orçamento`
     : 'Indicar medidas';
 
-  // Preço riscado + preço com desconto, por artigo — mostrado no resumo e nos
-  // ecrãs de quantidade. Sem seleção ainda, usa-se um tamanho de referência
-  // (Casal para colchão, 2 Lugares para sofá) como "a partir de".
-  const mattressCasal = mattressPrices.find(opt => opt.id === 'casal')!;
+  // Preço de tabela + preço de pack, por artigo, no resumo. Sem escolha
+  // ainda, usa um tamanho de referência (Casal no colchão, 2 Lugares no sofá)
+  // e o preço que ele teria se fosse acrescentado agora.
+  const sum = (values: number[]) => values.reduce((a, b) => a + b, 0);
+  const casalPreview = mattressPreview(MATTRESS_REFERENCE)!;
   const mattressPriceLine = mattressQtyTotal > 0
-    ? <PriceCompare
-        original={mattressPrices.reduce((sum, opt) => sum + (mattressQty[opt.id] ?? 0) * Number(opt.cleaningPrice), 0)}
-        promo={mattressPrices.reduce((sum, opt) => sum + (mattressQty[opt.id] ?? 0) * Number(mattressUnitPrice(opt)), 0)}
-      />
-    : <PriceCompare original={Number(mattressCasal.cleaningPrice)} promo={Number(mattressUnitPrice(mattressCasal))} suffix="/un." />;
+    ? <PriceCompare original={sum(Object.values(pricing.mattress).map(l => l.table))} promo={sum(Object.values(pricing.mattress).map(l => l.amount))} />
+    : <PriceCompare original={casalPreview.table} promo={casalPreview.amount} suffix="/un." />;
 
-  const sofaReference = sofaPrices.find(opt => opt.id === '2-lugares')!;
-  const sofaPriceLine = sofaQtyTotal > 0
-    ? <PriceCompare
-        original={sofaPrices.reduce((sum, opt) => sum + (typeof opt.cleaningPrice === 'number' ? (sofaQty[opt.id] ?? 0) * opt.cleaningPrice : 0), 0)}
-        promo={sofaPrices.reduce((sum, opt) => sum + (typeof opt.cleaningPrice === 'number' ? (sofaQty[opt.id] ?? 0) * Number(sofaUnitPrice(opt)) : 0), 0)}
-      />
-    : <PriceCompare original={Number(sofaReference.cleaningPrice)} promo={Number(sofaUnitPrice(sofaReference))} suffix="/un." />;
+  const pricedSofas = Object.values(pricing.sofa).filter((l): l is { table: number; amount: number } => l.table !== null && l.amount !== null);
+  const sofaReference = sofaPreview(SOFA_REFERENCE)!;
+  const sofaPriceLine: ReactNode = sofaQtyTotal > 0
+    ? (pricedSofas.length > 0 ? <PriceCompare original={sum(pricedSofas.map(l => l.table))} promo={sum(pricedSofas.map(l => l.amount))} /> : 'Sob orçamento')
+    : <PriceCompare original={sofaReference.table} promo={sofaReference.amount} suffix="/un." />;
 
   // Cadeiras não têm preço fixo por unidade (é por escalão), por isso o
   // desconto mostra-se sempre no total do lote, nunca por cadeira.
@@ -159,18 +162,21 @@ const QuizComboUpsellScreen = ({ offerPreview = false, travelFee = 10, primaryTa
     ? (chairsRegularPrice !== null && chairsCleanPrice !== null
         ? <PriceCompare original={chairsRegularPrice} promo={chairsCleanPrice} />
         : 'Sob orçamento')
-    : 'Limpe 4, pague 3';
+    : chairsPreview.free > 0
+      ? `Limpe ${PACK_PERK_CHAIRS_SET}, pague ${PACK_PERK_CHAIRS_SET - 1}`
+      : `Desde ${fmt(calcChairClean(CHAIRS_MIN_QTY) ?? 0)}€`;
 
   // Sincroniza o subtotal e os itens em tempo real com o formData do quiz —
   // a "Estimativa" no topo do modal tem de acompanhar cada +1/-1 aqui dentro,
   // não só depois de "Confirmar"/"Finalizar Orçamento" (bug real: a pessoa
   // ficava sem feedback nenhum de preço enquanto ajustava quantidades).
   useEffect(() => {
-    const items: UpsellItemConfig[] = [...preservedTreatments];
+    const items: UpsellItemConfig[] = [];
     mattressPrices.forEach(opt => {
       const q = mattressQty[opt.id] ?? 0;
-      if (q > 0 && typeof opt.cleaningPrice === 'number') {
-        items.push({ id: `mattress-${opt.id}`, mattressSize: opt.id, qty: q, price: q * Number(mattressUnitPrice(opt)), label: `${q}x Colchão ${opt.label}` });
+      const line = pricing.mattress[opt.id];
+      if (q > 0 && line) {
+        items.push({ id: `mattress-${opt.id}`, mattressSize: opt.id, qty: q, price: line.amount, label: `${q}x Colchão ${opt.label}` });
       }
     });
     sofaPrices.forEach(opt => {
@@ -181,12 +187,13 @@ const QuizComboUpsellScreen = ({ offerPreview = false, travelFee = 10, primaryTa
       // selecionado mas nunca chegava a upsellItems, nunca era cobrado nem
       // enviado ao negócio (bug real, achado no audit 2026-09-08). Mesmo
       // padrão já usado para tapete: price:0 para acionar hasUpsellSobItem.
-      if (typeof opt.cleaningPrice === 'number') {
+      const amount = pricing.sofa[opt.id]?.amount ?? null;
+      if (amount !== null) {
         items.push({
           id: `sofa-${opt.id}`,
           sofaSize: opt.id,
           qty: q,
-          price: q * Number(sofaUnitPrice(opt)),
+          price: amount,
           label: `${q}x Sofá ${opt.label}`,
         });
       } else {
@@ -206,7 +213,7 @@ const QuizComboUpsellScreen = ({ offerPreview = false, travelFee = 10, primaryTa
         chairQty: String(chairsQty),
         qty: chairsQty,
         price: chairsCleanPrice ?? 0,
-        label: `${chairsQty} Cadeira${chairsQty > 1 ? 's' : ''}${initialChairs?.waterproof ? ` (Impermeabilização ${initialChairs.waterproofingTier === 'premium' ? 'Premium' : 'Essencial'})` : perkEligible ? ` (paga ${chairsQty - chairsFree})` : ''}`,
+        label: `${chairsQty} Cadeira${chairsQty > 1 ? 's' : ''}${chairsWaterproofTier ? ` (Impermeabilização ${chairsWaterproofTier === 'premium' ? 'Premium' : 'Essencial'})` : chairsFree > 0 ? ` (paga ${chairsQty - chairsFree})` : ''}`,
       });
     }
     if (carpetValidCount > 0) {
@@ -216,12 +223,12 @@ const QuizComboUpsellScreen = ({ offerPreview = false, travelFee = 10, primaryTa
         carpetItems,
         qty: carpetValidCount,
         price: 0,
-        label: `${carpetValidCount} Tapete${carpetValidCount > 1 ? 's' : ''} (sob orçamento)${offerPreview ? ` · ${fmt(carpetTotalAreaValue)} m², paga ${fmt(carpetTotalAreaValue - Math.floor(carpetTotalAreaValue / 5))} m²` : ''}`,
+        label: `${carpetValidCount} Tapete${carpetValidCount > 1 ? 's' : ''} (sob orçamento)${rugPerk ? ` · ${fmt(carpetTotalAreaValue)} m², paga ${fmt(perkRugPaidArea(carpetTotalAreaValue))} m²` : ''}`,
       });
     }
     setUpsellItems(items);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [mattressQty, sofaQty, chairsQty, carpetItems]);
+  }, [mattressQty, sofaQty, chairsQty, carpetItems, primaryTablePrice]);
 
   // Mesmo tamanho/peso visual das linhas do início do orçamento
   // (QuizStepConfig: botões w-14 h-14, container max-w-sm) — estava mais
@@ -262,7 +269,7 @@ const QuizComboUpsellScreen = ({ offerPreview = false, travelFee = 10, primaryTa
 
         {view === 'carpet' && <QuizCarpetMeasureGuide />}
         {perkEligible && view === 'mattress' && <p className="text-sm text-white/80 text-center">Casal: {perkMattressPrice(mattressPrices.find(opt => opt.id === 'casal')!.cleaningPrice as number)} € nesta visita. Poupa {casalSeparate - perkMattressPrice(mattressPrices.find(opt => opt.id === 'casal')!.cleaningPrice as number)} € face a uma visita separada de {casalSeparate} €.</p>}
-        {offerPreview && view === 'carpet' && <p className="text-sm text-white/80 text-center">Por cada 5 m², paga 4. Preço por m² confirmado após avaliação.{carpetValidCount > 0 && ` Área: ${fmt(carpetTotalAreaValue)} m² · paga ${fmt(carpetTotalAreaValue - Math.floor(carpetTotalAreaValue / 5))} m².`}</p>}
+        {rugPerk && view === 'carpet' && <p className="text-sm text-white/80 text-center">Por cada {PACK_PERK_RUG_SET_M2} m², paga {PACK_PERK_RUG_SET_M2 - 1}. Preço por m² confirmado após avaliação.{carpetValidCount > 0 && ` Área: ${fmt(carpetTotalAreaValue)} m² · paga ${fmt(perkRugPaidArea(carpetTotalAreaValue))} m².`}</p>}
         {view === 'mattress' && (
           // Scroll interno próprio (não a página toda) acima de ~3 linhas —
           // garante que o rodapé Voltar/Confirmar fica sempre à vista mesmo
@@ -275,7 +282,7 @@ const QuizComboUpsellScreen = ({ offerPreview = false, travelFee = 10, primaryTa
                 key={opt.id}
                 sizeId={opt.id}
                 label={opt.label}
-                unitLabel={typeof opt.cleaningPrice === 'number' ? <PriceCompare original={opt.cleaningPrice} promo={Number(mattressUnitPrice(opt))} suffix="/un." /> : 'Sob orçamento'}
+                unitLabel={(() => { const unit = mattressPreview(opt.id); return unit ? <PriceCompare original={unit.table} promo={unit.amount} suffix="/un." /> : 'Sob orçamento'; })()}
                 qty={mattressQty[opt.id] ?? 0}
                 onDec={() => setMattQty(opt.id, (mattressQty[opt.id] ?? 0) - 1)}
                 onInc={() => setMattQty(opt.id, (mattressQty[opt.id] ?? 0) + 1)}
@@ -293,7 +300,7 @@ const QuizComboUpsellScreen = ({ offerPreview = false, travelFee = 10, primaryTa
                 key={opt.id}
                 sizeId={opt.id}
                 label={opt.label}
-                unitLabel={typeof opt.cleaningPrice === 'number' ? <PriceCompare original={opt.cleaningPrice} promo={Number(sofaUnitPrice(opt))} suffix="/un." /> : 'Sob orçamento'}
+                unitLabel={(() => { const unit = sofaPreview(opt.id); return unit ? <PriceCompare original={unit.table} promo={unit.amount} suffix="/un." /> : 'Sob orçamento'; })()}
                 qty={sofaQty[opt.id] ?? 0}
                 onDec={() => setSofaQtyFor(opt.id, (sofaQty[opt.id] ?? 0) - 1)}
                 onInc={() => setSofaQtyFor(opt.id, (sofaQty[opt.id] ?? 0) + 1)}
@@ -316,17 +323,19 @@ const QuizComboUpsellScreen = ({ offerPreview = false, travelFee = 10, primaryTa
                 colchão/sofá que mostram sempre "X€/un." (pedido explícito
                 2026-09-08: "senão o cliente não sabe o que está a pagar"). */}
             <p className="font-playfair text-2xl font-bold tabular-nums">
-              {chairsRegularPrice !== null && chairsCleanPrice !== null
-                ? <PriceCompare original={chairsRegularPrice} promo={chairsCleanPrice} />
-                : <span className="text-gold">Sob orçamento</span>}
+              {chairsQty === 0
+                ? <span className="text-gold">{chairsPriceLine}</span>
+                : chairsRegularPrice !== null && chairsCleanPrice !== null
+                  ? <PriceCompare original={chairsRegularPrice} promo={chairsCleanPrice} />
+                  : <span className="text-gold">Sob orçamento</span>}
             </p>
-            <p className="text-sm text-white/80 text-center leading-snug">{!offerPreview ? `Mínimo de ${CHAIRS_MIN_QTY} cadeiras` : perkEligible ? `${chairsQty} cadeiras · paga ${chairsQty - chairsFree}. Uma oferta por conjunto de 4.` : `${chairsQty} cadeiras`}</p>
+            <p className="text-sm text-white/80 text-center leading-snug">{chairsFree > 0 ? `${chairsQty} cadeiras · paga ${chairsQty - chairsFree}. Uma oferta por conjunto de ${PACK_PERK_CHAIRS_SET}.` : `${chairsQty} cadeiras`}</p>
           </>
         )}
         {view === 'carpet' && (
           <div className="flex flex-col gap-2 w-full max-w-xs">
             <p className="text-sm text-white/80 text-center leading-snug -mt-1 mb-1">
-              {offerPreview ? "A oferta fica incluída no pedido de avaliação." : "Sem preço fixo por m², cada tapete é sempre orçamentado à parte."}
+              {rugPerk ? "A oferta fica incluída no pedido de avaliação." : "Sem preço fixo por m², cada tapete é sempre orçamentado à parte."}
             </p>
             {/* Scroll interno próprio a partir do 2º tapete — o rodapé
                 Voltar/Confirmar nunca deve ficar de fora (pedido explícito
@@ -409,7 +418,7 @@ const QuizComboUpsellScreen = ({ offerPreview = false, travelFee = 10, primaryTa
     { view: 'mattress', imagePosition: '0% 0%', label: 'Colchão', summary: mattressSummary, priceLine: mattressPriceLine, selected: mattressQtyTotal > 0 },
     { view: 'sofa', imagePosition: '100% 0%', label: 'Sofá', summary: sofaSummary, priceLine: sofaPriceLine, selected: sofaQtyTotal > 0 },
     { view: 'chairs', imagePosition: '0% 100%', label: 'Cadeiras', summary: chairsSummary, priceLine: chairsPriceLine, selected: chairsQty > 0 },
-    { view: 'carpet', imagePosition: '100% 100%', label: 'Tapete', summary: carpetSummary, priceLine: 'Limpe 5 m², pague 4', selected: carpetValidCount > 0 },
+    { view: 'carpet', imagePosition: '100% 100%', label: 'Tapete', summary: carpetSummary, priceLine: rugPerk ? PACK_PERK_RUG_NOTE : 'Sob orçamento', selected: carpetValidCount > 0 },
   ];
 
   const visibleRows = rowConfig.filter(row => row.view !== primaryService || row.selected);
@@ -418,15 +427,13 @@ const QuizComboUpsellScreen = ({ offerPreview = false, travelFee = 10, primaryTa
   return (
     <div className="flex flex-col gap-2 overflow-hidden items-center w-full">
       <p className="text-gold text-sm font-bold tracking-[0.08em] uppercase mb-0.5 text-center w-full">
-        {offerPreview ? 'APROVEITE A MESMA VISITA' : 'UM BÓNUS PARA SI'}
+        APROVEITE A MESMA VISITA
       </p>
       <h2 className="type-quote-title font-playfair    text-white text-center w-full">
-        {offerPreview ? 'Quer limpar mais alguma coisa?' : 'Adicione mais um serviço'}
+        Quer limpar mais alguma coisa?
       </h2>
       <p className="text-sm text-white/80 text-center max-w-xs leading-relaxed -mt-1">
-        {offerPreview
-          ? <>Preço reduzido em cada artigo que juntar a esta visita. Deslocação excluída.</>
-          : <>Combine mais um serviço na mesma visita e poupe no preço de cada artigo. Deslocação excluída.</>}
+        Preço reduzido em cada artigo que juntar a esta visita, a partir de {PACK_PERK_MIN_ORDER}€ de subtotal. Deslocação excluída.
       </p>
 
       {/* Até três sugestões: linhas compactas, sem cartão isolado à esquerda.
@@ -435,13 +442,13 @@ const QuizComboUpsellScreen = ({ offerPreview = false, travelFee = 10, primaryTa
         {visibleRows.map(row => (
           <button
             key={row.view}
-            onClick={() => { if (offerPreview && row.view === 'mattress' && mattressQtyTotal === 0) setMattQty('casal', 1); setView(row.view); }}
+            onClick={() => { if (row.view === 'mattress' && mattressQtyTotal === 0) setMattQty(MATTRESS_REFERENCE, 1); setView(row.view); }}
             className={cn(
               'group relative flex items-center gap-3 rounded-sm border px-3 text-left transition-all duration-200 touch-manipulation active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold',
               compactRows ? 'min-h-[78px] py-1.5 pr-12' : 'min-h-[132px] flex-col justify-center py-2.5',
               row.selected
-                ? offerPreview ? 'border-gold/40 bg-white/[0.04]' : 'border-gold bg-[#1a2a1a] shadow-[0_0_14px_rgba(212,175,55,0.20)]'
-                : offerPreview ? 'border-white/10 bg-white/[0.025] hover:border-gold/30' : 'border-dashed border-gold/55 bg-gold/[0.025] hover:border-gold hover:bg-gold/[0.05]'
+                ? 'border-gold/40 bg-white/[0.04]'
+                : 'border-white/10 bg-white/[0.025] hover:border-gold/30'
             )}
           >
             <span className={cn(
@@ -460,11 +467,11 @@ const QuizComboUpsellScreen = ({ offerPreview = false, travelFee = 10, primaryTa
             />
             <span className={cn('min-w-0 flex flex-col gap-1', !compactRows && 'w-full')}>
               <span className="text-base font-bold text-white">{row.label}</span>
-              {offerPreview ? <span className="flex flex-col gap-1">
+              <span className="flex flex-col gap-1">
                 <span className="text-sm font-bold uppercase tracking-[0.16em] text-white/80">Preço nesta visita</span>
                 <span className="text-lg font-black leading-none text-gold">{row.priceLine}</span>
-              </span> : <span className="text-sm font-normal leading-relaxed text-gold/75">{row.summary}</span>}
-              {offerPreview && row.selected && <span className="text-sm text-white/80">{row.summary}</span>}
+              </span>
+              {row.selected && <span className="text-sm text-white/80">{row.summary}</span>}
             </span>
           </button>
         ))}

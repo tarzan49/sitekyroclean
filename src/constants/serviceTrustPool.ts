@@ -5,6 +5,7 @@
 // a preto). Nada de regex a adivinhar a partir de um título único — cada
 // pool escreve as duas partes explicitamente.
 import { DRYING_PROMISE } from './commercialPolicy';
+import { formatEuro, SOFA_WATERPROOF_PREMIUM_FROM, SOFA_ANTI_MITE_WITH_CLEANING_FROM, CHAIR_ANTI_MITE_UNIT_LABEL } from '../data/enginePrices';
 
 export interface TrustPoint { stat?: string; titleGold: string; titleRest?: string; desc: string; }
 
@@ -66,11 +67,11 @@ const SOFA_IMPERM_UPSELL_POOL: TrustPoint[] = [
 ];
 
 const SOFA_ANTIACAROS_UPSELL_POOL: TrustPoint[] = [
-  {"titleGold": "A partir de 20€ Anti Ácaros", "titleRest": ", como complemento à limpeza", "desc": "A limpeza remove sujidade e resíduos do sofá. O tratamento anti-ácaros é opcional e é confirmado separadamente no orçamento."},
-  {"titleGold": "A partir de 20€ Anti Ácaros", "titleRest": ", na mesma visita", "desc": "Pode acrescentar este tratamento ao seu sofá sem marcar outra intervenção. Avaliamos o material e as condições de aplicação antes de começar."},
-  {"titleGold": "A partir de 20€ Anti Ácaros", "titleRest": ", com aplicação adequada ao tecido", "desc": "Escolhemos o tratamento conforme o tecido e o uso do sofá. Explicamos os cuidados após a aplicação e confirmamos o preço antes da marcação."},
-  {"titleGold": "A partir de 20€ Anti Ácaros", "titleRest": ", dirigido a ácaros", "desc": "Anti-ácaros e desbacterização têm objetivos distintos. Indique o cuidado pretendido para receber uma proposta adequada."},
-  {"titleGold": "A partir de 20€ Anti Ácaros", "titleRest": ", com orçamento claro", "desc": "O extra não está incluído automaticamente na limpeza. Pode escolhê-lo ao configurar o artigo e confirmar o valor com a equipa."},
+  {"titleGold": `A partir de ${formatEuro(SOFA_ANTI_MITE_WITH_CLEANING_FROM)} Anti Ácaros`, "titleRest": ", como complemento à limpeza", "desc": "A limpeza remove sujidade e resíduos do sofá. O tratamento anti-ácaros é opcional e é confirmado separadamente no orçamento."},
+  {"titleGold": `A partir de ${formatEuro(SOFA_ANTI_MITE_WITH_CLEANING_FROM)} Anti Ácaros`, "titleRest": ", na mesma visita", "desc": "Pode acrescentar este tratamento ao seu sofá sem marcar outra intervenção. Avaliamos o material e as condições de aplicação antes de começar."},
+  {"titleGold": `A partir de ${formatEuro(SOFA_ANTI_MITE_WITH_CLEANING_FROM)} Anti Ácaros`, "titleRest": ", com aplicação adequada ao tecido", "desc": "Escolhemos o tratamento conforme o tecido e o uso do sofá. Explicamos os cuidados após a aplicação e confirmamos o preço antes da marcação."},
+  {"titleGold": `A partir de ${formatEuro(SOFA_ANTI_MITE_WITH_CLEANING_FROM)} Anti Ácaros`, "titleRest": ", dirigido a ácaros", "desc": "Anti-ácaros e desbacterização são o mesmo tratamento. Indique o cuidado pretendido para receber uma proposta adequada."},
+  {"titleGold": `A partir de ${formatEuro(SOFA_ANTI_MITE_WITH_CLEANING_FROM)} Anti Ácaros`, "titleRest": ", com orçamento claro", "desc": "O extra não está incluído automaticamente na limpeza. Pode escolhê-lo ao configurar o artigo e confirmar o valor com a equipa."},
 ];
 
 const SOFA_FIXED_CROSSSELL: TrustPoint = { titleGold: 'Uma visita,', titleRest: ' vários estofos limpos', desc: 'Pode juntar outros artigos na mesma visita. O orçamento identifica os serviços, os descontos aplicáveis e a deslocação, que não recebe desconto.' };
@@ -115,7 +116,7 @@ const COLCHAO_ANTIACAROS_UPSELL_POOL: TrustPoint[] = [
   {"titleGold": "Tratamento Anti Ácaros", "titleRest": ", como complemento à limpeza", "desc": "A limpeza remove sujidade e resíduos do colchão. O tratamento anti-ácaros é opcional e é confirmado separadamente no orçamento."},
   {"titleGold": "Tratamento Anti Ácaros", "titleRest": ", na mesma visita", "desc": "Pode acrescentar este tratamento ao seu colchão sem marcar outra intervenção. Avaliamos o material e as condições de aplicação antes de começar."},
   {"titleGold": "Tratamento Anti Ácaros", "titleRest": ", com aplicação adequada ao tecido", "desc": "Escolhemos o tratamento conforme o tecido e o uso do colchão. Explicamos os cuidados após a aplicação e confirmamos o preço antes da marcação."},
-  {"titleGold": "Tratamento Anti Ácaros", "titleRest": ", dirigido a ácaros", "desc": "Anti-ácaros e desbacterização têm objetivos distintos. Indique o cuidado pretendido para receber uma proposta adequada."},
+  {"titleGold": "Tratamento Anti Ácaros", "titleRest": ", dirigido a ácaros", "desc": "Anti-ácaros e desbacterização são o mesmo tratamento. Indique o cuidado pretendido para receber uma proposta adequada."},
   {"titleGold": "Tratamento Anti Ácaros", "titleRest": ", com orçamento claro", "desc": "O extra não está incluído automaticamente na limpeza. Pode escolhê-lo ao configurar o artigo e confirmar o valor com a equipa."},
 ];
 
@@ -138,8 +139,8 @@ function getColchaoTrustPoints(seed: string): TrustPoint[] {
 
 // Cadeiras: mesmo padrão do sofá — 1º ponto sempre upsell de Impermeabilização
 // (pool de 5), 2º ponto sempre upsell de Anti Ácaros (pool de 5), 3º fixo
-// (Pack Família). Preços "a partir de": 20€ Impermeabilização (mínimo, 1-4
-// cadeiras Essencial) e 7,5€ Anti Ácaros (preço fixo por cadeira) — 2026-08-31.
+// (Pack Família). O anti-ácaros das cadeiras escreve-se sempre como taxa
+// unitária, "5€/un." (decisão do responsável), nunca como total calculado.
 const CADEIRAS_IMPERM_UPSELL_POOL: TrustPoint[] = [
   {
     "titleGold": "Impermeabilização opcional",
@@ -169,11 +170,11 @@ const CADEIRAS_IMPERM_UPSELL_POOL: TrustPoint[] = [
 ];
 
 const CADEIRAS_ANTIACAROS_UPSELL_POOL: TrustPoint[] = [
-  {"titleGold": "5€/un. Anti Ácaros", "titleRest": ", como complemento à limpeza", "desc": "A limpeza remove sujidade e resíduos da cadeira. O tratamento anti-ácaros é opcional e é confirmado separadamente no orçamento."},
-  {"titleGold": "5€/un. Anti Ácaros", "titleRest": ", na mesma visita", "desc": "Pode acrescentar este tratamento ao sua cadeira sem marcar outra intervenção. Avaliamos o material e as condições de aplicação antes de começar."},
-  {"titleGold": "5€/un. Anti Ácaros", "titleRest": ", com aplicação adequada ao tecido", "desc": "Escolhemos o tratamento conforme o tecido e o uso da cadeira. Explicamos os cuidados após a aplicação e confirmamos o preço antes da marcação."},
-  {"titleGold": "5€/un. Anti Ácaros", "titleRest": ", dirigido a ácaros", "desc": "Anti-ácaros e desbacterização têm objetivos distintos. Indique o cuidado pretendido para receber uma proposta adequada."},
-  {"titleGold": "5€/un. Anti Ácaros", "titleRest": ", com orçamento claro", "desc": "O extra não está incluído automaticamente na limpeza. Pode escolhê-lo ao configurar o artigo e confirmar o valor com a equipa."},
+  {"titleGold": `${CHAIR_ANTI_MITE_UNIT_LABEL} Anti Ácaros`, "titleRest": ", como complemento à limpeza", "desc": "A limpeza remove sujidade e resíduos da cadeira. O tratamento anti-ácaros é opcional e é confirmado separadamente no orçamento."},
+  {"titleGold": `${CHAIR_ANTI_MITE_UNIT_LABEL} Anti Ácaros`, "titleRest": ", na mesma visita", "desc": "Pode acrescentar este tratamento à sua cadeira sem marcar outra intervenção. Avaliamos o material e as condições de aplicação antes de começar."},
+  {"titleGold": `${CHAIR_ANTI_MITE_UNIT_LABEL} Anti Ácaros`, "titleRest": ", com aplicação adequada ao tecido", "desc": "Escolhemos o tratamento conforme o tecido e o uso da cadeira. Explicamos os cuidados após a aplicação e confirmamos o preço antes da marcação."},
+  {"titleGold": `${CHAIR_ANTI_MITE_UNIT_LABEL} Anti Ácaros`, "titleRest": ", dirigido a ácaros", "desc": "Anti-ácaros e desbacterização são o mesmo tratamento. Indique o cuidado pretendido para receber uma proposta adequada."},
+  {"titleGold": `${CHAIR_ANTI_MITE_UNIT_LABEL} Anti Ácaros`, "titleRest": ", com orçamento claro", "desc": "O extra não está incluído automaticamente na limpeza. Pode escolhê-lo ao configurar o artigo e confirmar o valor com a equipa."},
 ];
 
 const CADEIRAS_FIXED_CROSSSELL: TrustPoint = { titleGold: 'Uma visita,', titleRest: ' vários estofos limpos', desc: 'Pode juntar outros artigos na mesma visita. O orçamento identifica os serviços, os descontos aplicáveis e a deslocação, que não recebe desconto.' };
@@ -339,11 +340,11 @@ function getAlcatifaTrustPoints(seed: string): TrustPoint[] {
 // keywordVariantData.ts: "proteção real até 10 anos"), não um número novo.
 // 3º ponto fica exatamente como estava (fixo, não fazia parte do pedido).
 const IMPERMEABILIZACAO_SOFA_POOL: TrustPoint[] = [
-  { titleGold: 'Premium desde 89€,', titleRest: ' proteja até 10 anos o seu sofá de linho', desc: 'A versão Premium cria uma barreira invisível que resiste a até 5 lavagens e pode ajudar a proteger o linho, com duração dependente do uso e da manutenção.' },
-  { titleGold: 'Premium desde 89€,', titleRest: ' proteja até 10 anos o seu sofá de veludo', desc: 'O veludo absorve líquidos em segundos e mancha com facilidade. A Premium cria uma barreira que repele manchas sem alterar o toque aveludado.' },
-  { titleGold: 'Premium desde 89€,', titleRest: ' proteja até 10 anos o seu sofá de chenille', desc: 'O chenille retém sujidade nas fibras entrelaçadas. A Premium ajuda a reduzir a absorção de derrames; a remoção deve ser imediata e conforme as instruções.' },
-  { titleGold: 'Premium desde 89€,', titleRest: ' proteja até 10 anos o seu sofá de algodão', desc: 'Tecidos de algodão absorvem manchas com muita facilidade. A Premium cria uma barreira invisível que ajuda a reduzir a absorção, mediante compatibilidade confirmada.' },
-  { titleGold: 'Premium desde 89€,', titleRest: ' proteja até 10 anos o seu sofá de bouclé', desc: 'A textura em laçada do bouclé retém sujidade nos relevos. A Premium protege sem esconder a textura nem alterar o aspeto do tecido.' },
+  { titleGold: `Premium desde ${formatEuro(SOFA_WATERPROOF_PREMIUM_FROM)},`, titleRest: ' proteja até 10 anos o seu sofá de linho', desc: 'A versão Premium cria uma barreira invisível que resiste a até 5 lavagens e pode ajudar a proteger o linho, com duração dependente do uso e da manutenção.' },
+  { titleGold: `Premium desde ${formatEuro(SOFA_WATERPROOF_PREMIUM_FROM)},`, titleRest: ' proteja até 10 anos o seu sofá de veludo', desc: 'O veludo absorve líquidos em segundos e mancha com facilidade. A Premium cria uma barreira que repele manchas sem alterar o toque aveludado.' },
+  { titleGold: `Premium desde ${formatEuro(SOFA_WATERPROOF_PREMIUM_FROM)},`, titleRest: ' proteja até 10 anos o seu sofá de chenille', desc: 'O chenille retém sujidade nas fibras entrelaçadas. A Premium ajuda a reduzir a absorção de derrames; a remoção deve ser imediata e conforme as instruções.' },
+  { titleGold: `Premium desde ${formatEuro(SOFA_WATERPROOF_PREMIUM_FROM)},`, titleRest: ' proteja até 10 anos o seu sofá de algodão', desc: 'Tecidos de algodão absorvem manchas com muita facilidade. A Premium cria uma barreira invisível que ajuda a reduzir a absorção, mediante compatibilidade confirmada.' },
+  { titleGold: `Premium desde ${formatEuro(SOFA_WATERPROOF_PREMIUM_FROM)},`, titleRest: ' proteja até 10 anos o seu sofá de bouclé', desc: 'A textura em laçada do bouclé retém sujidade nos relevos. A Premium protege sem esconder a textura nem alterar o aspeto do tecido.' },
 ];
 
 const IMPERMEABILIZACAO_CADEIRA_POOL: TrustPoint[] = [

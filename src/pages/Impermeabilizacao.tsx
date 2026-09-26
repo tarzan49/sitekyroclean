@@ -1,4 +1,6 @@
 import { CHAIR_WATERPROOF_ESSENTIAL, CHAIR_WATERPROOF_PREMIUM } from '../constants/chairPricing';
+import { sofaPrices } from '@/components/quiz/QuizTypes';
+import { formatEuro } from '@/data/enginePrices';
 import ServiceProcessGuide from '@/components/ServiceProcessGuide';
 import { Check, Droplet, FlaskConical } from "lucide-react";
 import Header from "@/components/Header";
@@ -6,6 +8,7 @@ import Footer from "@/components/Footer";
 import ServiceCityLinks from "@/components/ServiceCityLinks";
 import ServiceFAQ from "@/components/ServiceFAQ";
 import ServiceSchema from "@/components/ServiceSchema";
+import { getPillarPage } from "@/data/pillarPages";
 import ServiceHero from "@/components/ServiceHero";
 import ServiceExamplesGallery from "@/components/ServiceExamplesGallery";
 import ServiceExpertTips from "@/components/ServiceExpertTips";
@@ -71,13 +74,21 @@ interface WaterproofingTier {
   highlighted?: boolean;
 }
 
+// "59€ / 79€ / 99€": os três tamanhos com preço, lidos da tabela do quiz. Estava
+// escrito à mão e é a tabela que o cliente compara com o orçamento.
+const sofaTierPrices = (field: 'waterproofingPrice' | 'waterproofingPremiumPrice') => sofaPrices
+  .map(size => size[field])
+  .filter((price): price is number => typeof price === 'number')
+  .map(formatEuro)
+  .join(' / ');
+
 const waterproofingTiers: WaterproofingTier[] = [
   {
     icon: FlaskConical,
     name: "Premium",
     base: "À base de diluente",
-    sofaPrice: "89€ / 109€ / 139€",
-    chairPrice: `${CHAIR_WATERPROOF_PREMIUM}€/un`,
+    sofaPrice: sofaTierPrices('waterproofingPremiumPrice'),
+    chairPrice: `${formatEuro(CHAIR_WATERPROOF_PREMIUM)}/un`,
     washes: "Aguenta até 5 lavagens",
     durability: "Até 10 anos de proteção real (salvo exceções)",
     badge: "Recomendado",
@@ -93,8 +104,8 @@ const waterproofingTiers: WaterproofingTier[] = [
     icon: Droplet,
     name: "Essencial",
     base: "À base de água",
-    sofaPrice: "59€ / 79€ / 99€",
-    chairPrice: `${CHAIR_WATERPROOF_ESSENTIAL}€/un`,
+    sofaPrice: sofaTierPrices('waterproofingPrice'),
+    chairPrice: `${formatEuro(CHAIR_WATERPROOF_ESSENTIAL)}/un`,
     washes: "Aguenta até 2 lavagens",
     durability: "Até 1 a 2 anos de proteção real, consoante o uso",
     features: [
@@ -190,22 +201,17 @@ const WaterproofingTierComparison = () => (
   </section>
 );
 
-const Impermeabilizacao = () => {
-  const faqs = [
-    { question: 'O que é exatamente a impermeabilização e como funciona?', answer: 'A impermeabilização cria uma camada de proteção invisível e respirável à volta das fibras do tecido. Líquidos e sujidade deixam de ser absorvidos com facilidade, formando gotas à superfície que podem ser limpas rapidamente antes de penetrarem no estofo.' },
-    { question: 'Qual a diferença entre a Essencial e a Premium?', answer: 'A Essencial é à base de água, aguenta até 2 lavagens e mantém a proteção real por 1 a 2 anos, consoante o uso. A Premium é à base de diluente, mais resistente ao desgaste, aguenta até 5 lavagens e dura até 10 anos. Para casas com crianças, animais ou uso intenso, a Premium compensa a longo prazo.' },
-    { question: 'Quanto tempo dura a impermeabilização?', answer: 'Depende da versão escolhida. Com a Essencial, a proteção real dura 1 a 2 anos, consoante o uso. Com a Premium, mais resistente ao desgaste, a proteção dura até 10 anos. Para manter o efeito repelente visível no dia a dia, podem ser recomendadas reaplicações localizadas ou manutenções preventivas, sobretudo em zonas de maior uso.' },
-    { question: 'A impermeabilização é definitiva?', answer: 'O tratamento não cria uma película rígida nem permanente. A proteção mantém-se ativa durante o período correspondente à versão aplicada, mas o seu desempenho pode ser reforçado com manutenção adequada.' },
-    { question: 'A impermeabilização precisa de manutenção?', answer: 'Sim. A manutenção preventiva permite preservar o nível máximo de proteção e prolongar a vida útil dos estofos. Recomendamos avaliações periódicas, especialmente em contextos de uso intensivo.' },
-    { question: 'A impermeabilização altera a cor, o toque ou o conforto do tecido?', answer: 'Não. O tecido mantém o mesmo aspeto e toque natural em ambas as versões. O tratamento é hidrorrepelente e respirável, não criando película rígida. O que muda é a forma como reage a líquidos: em vez de serem rapidamente absorvidos, formam pequenas gotas à superfície, facilitando a limpeza imediata.' },
-  ];
+// Título, h1, FAQs e schema vêm de src/data/pillarPages.ts, a mesma fonte do
+// PageHead e do HTML estático (scripts/prerender.ts).
+const pillar = getPillarPage('/impermeabilizacao');
 
+const Impermeabilizacao = () => {
   return (
     <>
       <Header />
       <main>
         <ServiceHero
-          title="Impermeabilização Profissional de Estofos"
+          title={pillar.h1}
           serviceSlug="impermeabilizacao"
         />
         <ServicePriceSection serviceSlug="impermeabilizacao" />
@@ -226,14 +232,15 @@ const Impermeabilizacao = () => {
           items={impermeabilizacaoGuarantee}
           variant="dark"
         />
-        <ServiceFAQ faqs={faqs} heading="Perguntas Frequentes" variant="light" />
+        <ServiceFAQ faqs={pillar.faqs} heading="Perguntas Frequentes" variant="light" />
         <ServiceExpertTips tips={expertTips} variant="dark" />
-        <ServiceCityLinks serviceSlug="impermeabilizacao" serviceLabel="Impermeabilização de Estofos" />
+        <ServiceCityLinks serviceSlug="impermeabilizacao" serviceLabel={pillar.serviceName} />
         <ServiceSchema
-          serviceName="Impermeabilização de Estofos"
-          description="Impermeabilização profissional de sofás e cadeiras com equipas em Braga, Porto, Lisboa e Algarve. Versão Essencial e versão Premium, com proteção real até 10 anos."
-          url="/impermeabilizacao"
-          priceFrom="59€"
+          serviceName={pillar.serviceName}
+          description={pillar.description}
+          url={pillar.path}
+          priceFrom={pillar.priceFrom}
+          breadcrumbLabel={pillar.breadcrumbLabel}
         />
       </main>
       <Footer />

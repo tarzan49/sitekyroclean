@@ -2,6 +2,13 @@
 // Zero competition in the market:no competitor has brand-specific pages
 
 import { MARCA_CITIES } from "./marcaCities";
+import { formatEuro, SOFA_CLEANING_FROM } from "./enginePrices";
+
+// Sem preços por marca. Existiam intervalos próprios (Natuzzi "79€ - 129€",
+// Kave Home "59€ - 89€", Roche Bobois "Sob consulta"...) que ninguém tinha
+// definido e que o quiz da mesma página não praticava: ele cobra pela tabela
+// de tamanhos, seja qual for a marca. O preço destas páginas é o do motor,
+// escrito por marcaPageCopy() em marcaCities.ts.
 
 export interface MarcaSofa {
   id: string;
@@ -12,9 +19,6 @@ export interface MarcaSofa {
   cleaningProcess: string;
   doNots: string[];
   doThis: string[];
-  estimatedPriceRange: string;
-  minPrice: number;
-  maxPrice: number;
   serviceSlug: string;
   faqs: { question: string; answer: string }[];
 }
@@ -35,9 +39,6 @@ export const marcas: MarcaSofa[] = [
       "Extraímos a sujidade acumulada nas fibras de microfibra sem danificar o tecido sintético IKEA",
       "Tratamos separadamente as capas removíveis de modelos como o EKTORP, para um resultado mais completo",
     ],
-    estimatedPriceRange: "49€ - 79€",
-    minPrice: 49,
-    maxPrice: 79,
     serviceSlug: "limpeza-sofas",
     faqs: [
       {
@@ -69,9 +70,6 @@ export const marcas: MarcaSofa[] = [
       "Hidratamos e restauramos o brilho natural do couro genuíno Natuzzi com condicionador profissional certificado",
       "Usamos técnica manual sem vapor direto no couro, preservando a elasticidade original do material",
     ],
-    estimatedPriceRange: "79€ - 129€",
-    minPrice: 79,
-    maxPrice: 129,
     serviceSlug: "limpeza-sofas",
     faqs: [
       {
@@ -103,9 +101,6 @@ export const marcas: MarcaSofa[] = [
       "Fazemos sempre avaliação prévia gratuita do tecido antes de qualquer intervenção em peças de design Roche Bobois",
       "Temos seguro de responsabilidade civil que cobre eventuais danos em sofás de valor elevado",
     ],
-    estimatedPriceRange: "Sob consulta",
-    minPrice: 89,
-    maxPrice: 200,
     serviceSlug: "limpeza-sofas",
     faqs: [
       {
@@ -114,7 +109,7 @@ export const marcas: MarcaSofa[] = [
       },
       {
         question: "O preço é diferente para sofás Roche Bobois?",
-        answer: "Sim, o preço é personalizado conforme o material e estado do sofá. Fazemos orçamento gratuito antes de iniciar. A complexidade do material exige produtos e tempo adicional.",
+        answer: `Não. O preço depende do tamanho do sofá, não da marca: a limpeza começa em ${formatEuro(SOFA_CLEANING_FROM)} num sofá de 1 lugar. Fazemos sempre avaliação prévia gratuita do material e confirmamos o valor antes de iniciar.`,
       },
       {
         question: "Têm seguro para danos em sofás de valor elevado como o Roche Bobois?",
@@ -137,9 +132,6 @@ export const marcas: MarcaSofa[] = [
       "Usamos técnica específica para couro PU que não agride nem descasca o material",
       "Damos atenção redobrada às costuras, o ponto mais frágil do couro sintético Conforama",
     ],
-    estimatedPriceRange: "49€ - 79€",
-    minPrice: 49,
-    maxPrice: 79,
     serviceSlug: "limpeza-sofas",
     faqs: [
       {
@@ -171,9 +163,6 @@ export const marcas: MarcaSofa[] = [
       "Usamos produtos de pH neutro que deixam as cores do tecido El Corte Inglés mais vivas e definidas",
       "Tratamos almofadas removíveis e fixas com o método adequado a cada uma",
     ],
-    estimatedPriceRange: "49€ - 89€",
-    minPrice: 49,
-    maxPrice: 89,
     serviceSlug: "limpeza-sofas",
     faqs: [
       {
@@ -205,9 +194,6 @@ export const marcas: MarcaSofa[] = [
       "Escovamos o veludo sempre na direção do pelo com fibras profissionais suaves, sem deixar marcas",
       "Usamos vapor a pressão mínima e temperatura controlada para preservar a textura característica do boucle",
     ],
-    estimatedPriceRange: "59€ - 89€",
-    minPrice: 59,
-    maxPrice: 89,
     serviceSlug: "limpeza-sofas",
     faqs: [
       {
@@ -239,9 +225,6 @@ export const marcas: MarcaSofa[] = [
       "Removemos manchas de uso quotidiano com desengordurante específico para poliéster, sem alterar as cores",
       "Extraímos a humidade por completo, eliminando o risco de bolor nas costuras",
     ],
-    estimatedPriceRange: "49€ - 79€",
-    minPrice: 49,
-    maxPrice: 79,
     serviceSlug: "limpeza-sofas",
     faqs: [
       {
@@ -250,7 +233,7 @@ export const marcas: MarcaSofa[] = [
       },
       {
         question: "Vale a pena investir em limpeza num sofá Leroy Merlin?",
-        answer: "Absolutamente. O preço começa nos 49€, muito menos que um sofá novo (tipicamente 300-800€ no Leroy Merlin). A limpeza prolonga a vida útil em vários anos.",
+        answer: `Absolutamente. O preço começa nos ${formatEuro(SOFA_CLEANING_FROM)}, muito menos que um sofá novo (tipicamente 300-800€ no Leroy Merlin). A limpeza prolonga a vida útil em vários anos.`,
       },
       {
         question: "Com que frequência devo limpar um sofá Leroy Merlin?",
@@ -273,9 +256,6 @@ export const marcas: MarcaSofa[] = [
       "Fazemos avaliação prévia gratuita do revestimento antes de qualquer intervenção, tecido ou couro",
       "Tratamos odores persistentes como fumo e animais na origem, com a ressalva de que o que impregnou o enchimento pode não sair todo",
     ],
-    estimatedPriceRange: "49€ - 89€",
-    minPrice: 49,
-    maxPrice: 89,
     serviceSlug: "limpeza-sofas",
     faqs: [
       {

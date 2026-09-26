@@ -6,6 +6,7 @@ import Footer from "@/components/Footer";
 import ServiceCityLinks from "@/components/ServiceCityLinks";
 import ServiceFAQ from "@/components/ServiceFAQ";
 import ServiceSchema from "@/components/ServiceSchema";
+import { getPillarPage } from "@/data/pillarPages";
 import ServiceHero from "@/components/ServiceHero";
 import ServiceExamplesGallery from "@/components/ServiceExamplesGallery";
 import ServiceExpertTips from "@/components/ServiceExpertTips";
@@ -60,20 +61,18 @@ const expertTips: ExpertTip[] = [
   },
 ];
 
-const LimpezaTapetes = () => {
-  const faqs = [
-    { question: 'A limpeza profunda remove mesmo cheiros e manchas antigas?', answer: 'Conseguimos reduzir significativamente cheiros a humidade, animais e uso diário, e remover a grande maioria das manchas. Em alguns casos muito antigos ou já oxidado o tecido pode não voltar a 100%, mas explicamos sempre o cenário realista antes de avançar.' },
-    { question: 'A carpete precisa de ser retirada de casa para ser limpa?', answer: 'Na maioria dos casos, não. Fazemos a limpeza diretamente no local, com equipamento profissional de extração. Assim evitam-se deslocações, tempo de espera e riscos de danos no transporte.' },
-    { question: 'De quanto em quanto tempo devo limpar a carpete/tapete?', answer: 'Para uso doméstico, recomendamos uma limpeza profunda a cada 12 meses. Em casas com crianças, animais ou alergias, o ideal é a cada 6 a 9 meses. Em empresas, hotéis ou restaurantes, a frequência deve ser ajustada ao nível de tráfego (trimestral, semestral ou anual).' },
-  ];
+// Título, h1, FAQs e schema vêm de src/data/pillarPages.ts, a mesma fonte do
+// PageHead e do HTML estático (scripts/prerender.ts).
+const pillar = getPillarPage('/limpeza-tapetes');
 
+const LimpezaTapetes = () => {
   return (
     <QuizServiceProvider value="carpet">
     <>
       <Header />
       <main>
         <ServiceHero
-          title="Higienização Profissional de Tapetes"
+          title={pillar.h1}
           serviceSlug="limpeza-tapetes"
         />
         <ServicePriceSection serviceSlug="limpeza-tapetes" />
@@ -93,14 +92,15 @@ const LimpezaTapetes = () => {
           items={tapetesGuarantee}
           variant="dark"
         />
-        <ServiceFAQ faqs={faqs} heading="Perguntas Frequentes" variant="light" />
+        <ServiceFAQ faqs={pillar.faqs} heading="Perguntas Frequentes" variant="light" />
         <ServiceExpertTips tips={expertTips} variant="dark" />
-        <ServiceCityLinks serviceSlug="limpeza-tapetes" serviceLabel="Limpeza de Tapetes" />
+        <ServiceCityLinks serviceSlug="limpeza-tapetes" serviceLabel={pillar.serviceName} />
         <ServiceSchema
-          serviceName="Limpeza de Tapetes"
-          description="Lavagem e limpeza profissional de tapetes no Porto. Remoção de manchas e odores."
-          url="/limpeza-tapetes"
-          priceFrom="Sob orçamento"
+          serviceName={pillar.serviceName}
+          description={pillar.description}
+          url={pillar.path}
+          priceFrom={pillar.priceFrom}
+          breadcrumbLabel={pillar.breadcrumbLabel}
         />
       </main>
       <Footer />

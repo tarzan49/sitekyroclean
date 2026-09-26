@@ -1,19 +1,19 @@
 import { services } from './serviceCatalog';
 import { EXTENDED_TRIP_CITIES, locationPrices } from '../constants/travel';
 import { REVIEW_COUNT, REVIEW_RATING } from '../constants/business';
-import { sofaPrices } from '../components/quiz/QuizTypes';
+import { TRAVEL_FEE_MIN } from '../constants/commercialPolicy';
+import { formatEuro, SOFA_WATERPROOF_ESSENCIAL_FROM, SOFA_WATERPROOF_PREMIUM_FROM, SOFA_CLEAN_AND_PROTECT_FROM } from './enginePrices';
 
-// Preços da impermeabilização vindos da mesma tabela que o quiz usa, nunca
+// Preços da impermeabilização vindos do mesmo motor que o quiz usa, nunca
 // escritos à mão: é a linha que os anúncios de Premium prometem, e o preço na
 // prosa não pode divergir do preço que o orçamento apresenta.
-const sofa1 = sofaPrices.find(item => item.id === '1-lugar');
-if (!sofa1) throw new Error('commercialHeroCopy: sofá "1-lugar" não existe em sofaPrices');
-const IMPER_PREMIUM = `${sofa1.waterproofingPremiumPrice}€`;
-const IMPER_ESSENCIAL = `${sofa1.waterproofingPrice}€`;
-// Limpeza + Essencial no mesmo sofá e na mesma visita (o `bothPrice` do quiz).
-// Os anúncios de impermeabilização prometem este "pack desde 99€"; quem clica
-// tem de o encontrar logo na abertura da página.
-const IMPER_PACK = `${sofa1.bothPrice}€`;
+const IMPER_PREMIUM = formatEuro(SOFA_WATERPROOF_PREMIUM_FROM);
+const IMPER_ESSENCIAL = formatEuro(SOFA_WATERPROOF_ESSENCIAL_FROM);
+// Limpeza + Essencial no mesmo sofá e na mesma visita, como o quiz a cobra
+// (`calcPackPricing(...).packPrice`). Estava a ler o `bothPrice` de tabela, que
+// é 10€ acima do que o orçamento apresenta: a página prometia 99€ e o quiz, na
+// mesma página, calculava 89€.
+const IMPER_PACK = formatEuro(SOFA_CLEAN_AND_PROTECT_FROM);
 
 const subtitles: Record<string, string> = {
   'limpeza-sofas': 'Cuidado profissional para o seu sofá, sem sair de casa.',
@@ -52,7 +52,7 @@ export const commercialHeroPriceLine = (serviceSlug: string, municipality?: stri
   const fee = municipality ? locationPrices[municipality] : undefined;
   const value = price ?? service?.priceFrom ?? 'Sob orçamento';
   const priceText = /orçamento/i.test(value) ? 'Sob orçamento' : `Desde ${value}`;
-  return `${priceText} + deslocação ${fee === undefined ? 'a partir de 10€' : `${fee}€`}.`;
+  return `${priceText} + deslocação ${fee === undefined ? `a partir de ${TRAVEL_FEE_MIN}€` : `${fee}€`}.`;
 };
 
 export interface HeroStat { value: string; label: string }

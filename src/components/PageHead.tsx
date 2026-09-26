@@ -23,90 +23,6 @@ const routeMeta: Record<string, { pt: PageMeta; en: PageMeta; es: PageMeta }> = 
       description: "Limpieza profesional de sofás, colchones y alfombras a domicilio. Equipos en Braga, Oporto, Lisboa y Algarve. Presupuesto claro y respuesta en menos de 10 minutos.",
     },
   },
-  "/limpeza-sofas": {
-    pt: {
-      title: "Limpeza e Lavagem de Sofás ao Domicílio | Desde 49€ | Kyro Clean Solutions",
-      description: "Limpeza e lavagem profissional de sofás ao domicílio. Limpeza de sujidade e resíduos com extração profissional. Tratamentos antiácaros opcionais. Equipas em Braga, Porto, Lisboa e Algarve.",
-    },
-    en: {
-      title: "Sofa Cleaning & Washing Service | From €49 | Kyro Clean Solutions",
-      description: "Professional sofa cleaning and washing at your home. Professional extraction adapted to the fabric. Anti-mite treatments are optional extras.",
-    },
-    es: {
-      title: "Limpieza y Lavado de Sofás a Domicilio | Desde 49€ | Kyro Clean Solutions",
-      description: "Limpieza y lavado profesional de sofás a domicilio. Limpieza de manchas y residuos con extracción profesional. Tratamientos antiácaros y antibacterianos opcionales.",
-    },
-  },
-  "/limpeza-colchoes": {
-    pt: {
-      title: "Limpeza e Higienização de Colchões | Desde 59€ | Kyro Clean Solutions",
-      description: "Higienização e lavagem profunda de colchões ao domicílio. Removemos sujidade e resíduos das fibras. Anti-ácaros e desbacterização opcionais. Equipas em Braga, Porto, Lisboa e Algarve.",
-    },
-    en: {
-      title: "Mattress Cleaning & Sanitization | From €59 | Kyro Clean Solutions",
-      description: "Deep mattress cleaning at your home. Anti-mite and antibacterial treatments are optional extras, quoted separately.",
-    },
-    es: {
-      title: "Limpieza e Higienización de Colchones | Desde 59€ | Kyro Clean Solutions",
-      description: "Higienización y lavado profundo de colchones a domicilio. Limpieza de suciedad y residuos. Tratamientos antiácaros y antibacterianos opcionales.",
-    },
-  },
-  "/limpeza-tapetes": {
-    pt: {
-      title: "Limpeza e Lavagem de Tapetes | Orçamento Grátis | Kyro Clean Solutions",
-      description: "Lavagem profissional de tapetes com extração profunda. Removemos sujidade, manchas e alergénios. Método avaliado pela composição do tapete. Sempre sob orçamento.",
-    },
-    en: {
-      title: "Rug Cleaning & Washing | Free Quote | Kyro Clean Solutions",
-      description: "Professional rug cleaning with deep professional extraction. We remove dirt, stains and allergens. Pick-up and delivery available.",
-    },
-    es: {
-      title: "Limpieza y Lavado de Alfombras | Presupuesto Gratis | Kyro Clean Solutions",
-      description: "Lavado profesional de alfombras con extracción profunda. Eliminamos suciedad, manchas y alérgenos.",
-    },
-  },
-  "/limpeza-cadeiras": {
-    pt: {
-      title: "Limpeza e Lavagem de Cadeiras Estofadas | Desde 20€ | Kyro Clean Solutions",
-      description: "Limpeza e lavagem profissional de cadeiras estofadas ao domicílio. Ideal para escritórios, restaurantes e residências. Resultados no momento.",
-    },
-    en: {
-      title: "Upholstered Chair Cleaning | From €20 | Kyro Clean Solutions",
-      description: "Professional upholstered chair cleaning at your location. Ideal for offices, restaurants and homes. Instant results.",
-    },
-    es: {
-      title: "Limpieza y Lavado de Sillas Tapizadas | Desde 20€ | Kyro Clean Solutions",
-      description: "Limpieza profesional de sillas tapizadas a domicilio. Ideal para oficinas, restaurantes y hogares.",
-    },
-  },
-  "/limpeza-alcatifas": {
-    pt: {
-      title: "Limpeza e Lavagem de Alcatifas | Orçamento Grátis | Kyro Clean Solutions",
-      description: "Limpeza e lavagem profunda de alcatifas com extração profissional. Removemos sujidade acumulada e alergénios. Secagem média de 3 a 6 horas, conforme a ventilação. Equipas em Braga, Porto, Lisboa e Algarve.",
-    },
-    en: {
-      title: "Carpet Cleaning & Deep Wash | Free Quote | Kyro Clean Solutions",
-      description: "Deep carpet cleaning and washing with professional extraction equipment. We remove accumulated dirt and allergens. Fast drying.",
-    },
-    es: {
-      title: "Limpieza y Lavado de Moquetas | Presupuesto Gratis | Kyro Clean Solutions",
-      description: "Limpieza y lavado profundo de moquetas con extracción profesional. Eliminamos suciedad acumulada y alérgenos.",
-    },
-  },
-  "/impermeabilizacao": {
-    pt: {
-      title: "Impermeabilização de Estofos | Kyro Clean Solutions | Essencial ou Premium",
-      description: "Impermeabilização profissional de sofás e cadeiras. Versão Essencial e versão Premium, com proteção invisível e real até 10 anos.",
-    },
-    en: {
-      title: "Upholstery Waterproofing | Kyro Clean Solutions | Essential or Premium",
-      description: "Professional waterproofing for sofas and chairs. Essential and Premium tiers, with invisible protection lasting up to 5 years.",
-    },
-    es: {
-      title: "Impermeabilización de Tapizados | Kyro Clean Solutions | Esencial o Premium",
-      description: "Impermeabilización profesional de sofás y sillas. Versión Esencial y versión Premium, con protección invisible real hasta 5 años.",
-    },
-  },
   "/blog": {
     pt: {
       title: "Blog Limpeza de Estofos | Dicas, Guias e Preços | Kyro Clean",
@@ -194,15 +110,15 @@ const routeMeta: Record<string, { pt: PageMeta; en: PageMeta; es: PageMeta }> = 
   "/guia-de-packs": {
     pt: {
       title: "Guia de Packs de Limpeza | Kyro Clean Solutions",
-      description: "Escolha o pack de limpeza ideal para a sua casa. Packs com desconto para sofá, colchão, tapetes e mais. Orçamento grátis.",
+      description: "Escolha o pack de limpeza ideal para a sua casa. Sofá, colchão, tapetes e mais na mesma visita, com preço de pack no artigo acrescentado. Orçamento grátis.",
     },
     en: {
       title: "Cleaning Packs Guide | Kyro Clean Solutions",
-      description: "Choose the ideal cleaning pack for your home. Discounted packs for sofa, mattress, rugs and more. Free quote.",
+      description: "Choose the ideal cleaning pack for your home. Sofa, mattress, rugs and more in the same visit, with a pack price on each added item. Free quote.",
     },
     es: {
       title: "Guía de Packs de Limpieza | Kyro Clean Solutions",
-      description: "Elija el pack de limpieza ideal para su hogar. Packs con descuento para sofá, colchón, alfombras y más.",
+      description: "Elija el pack de limpieza ideal para su hogar. Sofá, colchón, alfombras y más en la misma visita, con precio de pack en cada artículo añadido.",
     },
   },
 };
@@ -219,41 +135,62 @@ for (const page of LEGAL_PAGES) {
   routeMeta[page.path] = { pt: meta, en: existing?.en ?? meta, es: existing?.es ?? meta };
 }
 
+// As seis páginas-pilar não estão em `routeMeta`: o título e a descrição vêm
+// de `src/data/pillarPages.ts`, a mesma fonte do h1, das FAQs e do HTML
+// estático (`scripts/prerender.ts`). Antes havia aqui uma terceira cópia, e os
+// títulos divergiam do HTML estático em quatro das seis páginas.
+// O módulo é importado só nestes caminhos: traz as FAQs e o motor de preços, e
+// o PageHead está no pacote inicial de todas as páginas. A página-pilar já o
+// carregou, por isso a importação não faz novo pedido.
+// `pillarPages.test.ts` confirma que esta lista é a de PILLAR_PAGES.
+const PILLAR_PATHS = new Set(["/limpeza-sofas", "/limpeza-colchoes", "/limpeza-tapetes", "/limpeza-cadeiras", "/limpeza-alcatifas", "/impermeabilizacao"]);
+
+const applyMeta = (path: string, meta: PageMeta) => {
+  document.title = meta.title;
+
+  // Meta description
+  const descTag = document.querySelector('meta[name="description"]');
+  if (descTag) descTag.setAttribute("content", meta.description);
+
+  // OG tags
+  const ogTitle = document.querySelector('meta[property="og:title"]');
+  if (ogTitle) ogTitle.setAttribute("content", meta.title);
+  const ogDesc = document.querySelector('meta[property="og:description"]');
+  if (ogDesc) ogDesc.setAttribute("content", meta.description);
+  const ogUrl = document.querySelector('meta[property="og:url"]');
+  if (ogUrl) ogUrl.setAttribute("content", `${SITE_URL}${path}`);
+
+  // Twitter tags
+  const twTitle = document.querySelector('meta[name="twitter:title"]');
+  if (twTitle) twTitle.setAttribute("content", meta.title);
+  const twDesc = document.querySelector('meta[name="twitter:description"]');
+  if (twDesc) twDesc.setAttribute("content", meta.description);
+
+  // Canonical
+  const canonical = document.querySelector('link[rel="canonical"]');
+  if (canonical) canonical.setAttribute("href", `${SITE_URL}${path}`);
+};
+
 const PageHead = () => {
   const location = useLocation();
   const lang = "pt" as "pt" | "en" | "es";
 
   useEffect(() => {
     const path = location.pathname;
-    const meta = routeMeta[path]?.[lang] || routeMeta[path]?.pt;
+    let cancelled = false;
 
-    if (meta) {
-      document.title = meta.title;
-
-      // Meta description
-      const descTag = document.querySelector('meta[name="description"]');
-      if (descTag) descTag.setAttribute("content", meta.description);
-
-      // OG tags
-      const ogTitle = document.querySelector('meta[property="og:title"]');
-      if (ogTitle) ogTitle.setAttribute("content", meta.title);
-      const ogDesc = document.querySelector('meta[property="og:description"]');
-      if (ogDesc) ogDesc.setAttribute("content", meta.description);
-      const ogUrl = document.querySelector('meta[property="og:url"]');
-      if (ogUrl) ogUrl.setAttribute("content", `${SITE_URL}${path}`);
-
-      // Twitter tags
-      const twTitle = document.querySelector('meta[name="twitter:title"]');
-      if (twTitle) twTitle.setAttribute("content", meta.title);
-      const twDesc = document.querySelector('meta[name="twitter:description"]');
-      if (twDesc) twDesc.setAttribute("content", meta.description);
-
-      // Canonical
-      const canonical = document.querySelector('link[rel="canonical"]');
-      if (canonical) canonical.setAttribute("href", `${SITE_URL}${path}`);
+    if (PILLAR_PATHS.has(path)) {
+      import("@/data/pillarPages").then(({ getPillarPage }) => {
+        if (cancelled) return;
+        const page = getPillarPage(path);
+        applyMeta(path, { title: page.title, description: page.description });
+      });
+    } else {
+      const meta = routeMeta[path]?.[lang] || routeMeta[path]?.pt;
+      if (meta) applyMeta(path, meta);
     }
 
-    return () => {};
+    return () => { cancelled = true; };
   }, [location.pathname, lang]);
 
   return null;

@@ -1,6 +1,6 @@
 import { cities, services, cityPrep } from './serviceCatalog';
 import { locationPrices } from '../constants/travel';
-import { PACK_PERK_MATTRESS_OFF, PACK_PERK_CHAIRS_SET, PACK_PERK_LIMIT, PACK_PERK_RULE, PACK_PERK_MIN_ORDER } from '../constants/packPerks';
+import { PACK_PERK_MATTRESS_OFF, PACK_PERK_CHAIRS_SET, PACK_PERK_LIMIT, PACK_PERK_RULE, PACK_PERK_MIN_ORDER, PACK_PERK_RUG_NOTE } from '../constants/packPerks';
 import { RESPONSE_PROMISE, DRYING_PROMISE, SATISFACTION_PROMISE } from '../constants/commercialPolicy';
 import type { PackKind, PackExtra } from '../lib/customPack';
 // These are editable starting combinations, not separate price lists.
@@ -36,12 +36,14 @@ export const PACK_INITIAL_EXTRA: Record<string, PackExtra> = { 'sofa-impermeabil
 
 /** Frase curta que diz o que se ganha com cada combinação, para os blocos que
  * levam às páginas de pack (serviços, localidades, blog). Os números vêm de
- * packPerks.ts, nunca escritos à mão. */
+ * packPerks.ts, nunca escritos à mão. O preço de pack é só para artigos de
+ * outro tipo que o principal: um segundo colchão num pack de colchão paga
+ * tabela (priceWithPackPerks), por isso nenhuma frase o pode prometer. */
 export const PACK_HOOK: Record<string, string> = {
   'sofa-colchao': `A partir de ${PACK_PERK_MIN_ORDER}€ de subtotal, o colchão acrescentado fica ${PACK_PERK_MATTRESS_OFF}€ mais barato. Uma só deslocação.`,
   'sofa-impermeabilizacao': 'Limpeza e proteção contra nódoas na mesma visita, até 10 anos com a Premium.',
   'sala-completa': `Sofá, cadeiras e tapete numa só visita. A partir de ${PACK_PERK_MIN_ORDER}€ de subtotal, uma cadeira oferecida por cada ${PACK_PERK_CHAIRS_SET}.`,
-  'quarto-completo': `Colchão e tapete numa só visita. A partir de ${PACK_PERK_MIN_ORDER}€ de subtotal, o segundo colchão fica ${PACK_PERK_MATTRESS_OFF}€ mais barato.`,
+  'quarto-completo': `Colchão e tapete numa só visita. A partir de ${PACK_PERK_MIN_ORDER}€ de subtotal, no tapete acrescentado: ${PACK_PERK_RUG_NOTE.toLowerCase()}.`,
 };
 
 /** Preço de partida do pack: o mais baixo dos serviços que o compõem. */

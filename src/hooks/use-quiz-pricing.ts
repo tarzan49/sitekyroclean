@@ -3,7 +3,7 @@ import { splitTreatmentItems } from '@/components/quiz/quizHelpers';
 import { useMemo } from 'react';
 import type { QuizFormData, SofaItem, MattressItem, CarpetItem, UpsellItemConfig } from '@/components/quiz';
 import { sofaPrices, mattressPrices, locationPrices } from '@/components/quiz';
-import { calcPackPricing, calcChairClean, calcChairWaterproof, calcChairWaterproofPremium, carpetHasValidItems } from '@/components/quiz/quizHelpers';
+import { calcSofaUnitPrice, calcMattressUnitPrice, calcChairAntiAcaros, calcChairClean, calcChairWaterproof, calcChairWaterproofPremium, carpetHasValidItems } from '@/components/quiz/quizHelpers';
 
 export function useQuizPricing(
   formData: QuizFormData,
@@ -22,8 +22,7 @@ export function useQuizPricing(
           if (item.qty <= 0) return;
           const opt = sofaPrices.find(p => p.id === item.sizeId);
           if (!opt) return;
-          const isWaterproofBase = formData.serviceType === 'waterproofing';
-          const unitPrice = calcPackPricing(opt, item.packEnabled, isWaterproofBase, null, formData.waterproofingTier).displayPrice ?? 0;
+          const unitPrice = calcSofaUnitPrice(opt, item.packEnabled, formData.serviceType, formData.waterproofingTier, formData.sofaAntiAcaros) ?? 0;
           if (unitPrice > 0) price += unitPrice * item.qty;
         });
         break;
@@ -34,12 +33,7 @@ export function useQuizPricing(
           if (item.qty <= 0) return;
           const opt = mattressPrices.find(p => p.id === item.sizeId);
           if (!opt) return;
-          const isWaterproofBase = formData.serviceType === 'waterproofing';
-          const baseP = isWaterproofBase
-            ? (typeof opt.waterproofingPrice === 'number' ? (opt.waterproofingPrice as number) : 0)
-            : (typeof opt.cleaningPrice === 'number' ? (opt.cleaningPrice as number) : 0);
-          const bothP = typeof opt.bothPrice === 'number' ? (opt.bothPrice as number) : baseP + 30;
-          const unitPrice = item.packEnabled ? bothP : baseP;
+          const unitPrice = calcMattressUnitPrice(opt, item.packEnabled, formData.serviceType) ?? 0;
           if (unitPrice > 0) price += unitPrice * item.qty;
         });
         break;
@@ -60,12 +54,9 @@ export function useQuizPricing(
             ? (calcChairClean(addonQty) ?? 0)
             : (calcWaterproof(addonQty) ?? 0);
         }
-        // Anti Ácaros das cadeiras (upsell pós-quantidade, 2026-09-06): sempre
-        // 5€/cadeira fixo, mutuamente exclusivo com o addon de impermeabilização
-        // acima (a UI do upsell garante nunca terem os dois ligados ao mesmo tempo).
-        if (formData.chairAntiAcaros && formData.serviceType !== 'waterproofing' && !formData.chairWaterproofing && addonQty <= 0 && !isNaN(chairQty) && chairQty > 0) {
-          price += chairQty * 5;
-        }
+        // Anti-ácaros das cadeiras: mesma regra e mesmo preço que o recibo
+        // (chairAntiAcarosQty), nunca junto com a impermeabilização.
+        price += calcChairAntiAcaros(formData);
         break;
       }
 

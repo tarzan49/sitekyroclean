@@ -1,4 +1,4 @@
-import { sofaPrices, mattressPrices, sofaChaisePrice } from "../components/quiz/QuizTypes";
+import { sofaPrices, mattressPrices } from "../components/quiz/QuizTypes";
 import { locationPrices } from "../constants/travel";
 import { DEFAULT_AUTHOR } from "./authors";
 
@@ -60,7 +60,6 @@ const IMPER_PREMIUM_3 = eur(sofaSize("3-lugares").waterproofingPremiumPrice!);
 const COLCHAO_SOLTEIRO = eur(mattressSize("solteiro").cleaningPrice);
 const COLCHAO_CASAL = eur(mattressSize("casal").cleaningPrice);
 const COLCHAO_KING = eur(mattressSize("king").cleaningPrice);
-const CHAISE_LIMPEZA = eur(sofaChaisePrice.cleaning);
 const TRAVEL_MIN = eur(Math.min(...Object.values(locationPrices)));
 
 
@@ -84,7 +83,6 @@ const posts: BlogPost[] = [
         "body": `**1 lugar:** ${SOFA_1}
 **2 lugares:** ${SOFA_2}
 **3 lugares:** ${SOFA_3}
-**Chaise longue:** acréscimo de ${CHAISE_LIMPEZA} na limpeza.
 
 Configurações maiores ou diferentes são avaliadas no orçamento. A deslocação é cobrada à parte, consoante a localidade, a partir de ${TRAVEL_MIN}.`
       },

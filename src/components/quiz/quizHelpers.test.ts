@@ -2,8 +2,9 @@ import { describe, it, expect } from 'vitest';
 import {
   calcChairClean, calcChairWaterproof, calcChairWaterproofPremium,
   calcPackPricing, carpetItemArea, carpetHasValidItems,
+  calcSofaUnitPrice, chairAntiAcarosQty, quizServiceTypeLabel,
 } from './quizHelpers';
-import { sofaPrices, mattressPrices } from './QuizTypes';
+import { sofaPrices, mattressPrices, initialFormData } from './QuizTypes';
 
 // Estas funções já causaram bugs reais nesta sessão (limiares desalinhados
 // entre calcChairClean/Waterproof/WaterproofPremium, "Sob orçamento" a cair
@@ -106,5 +107,35 @@ describe('sofa waterproofing upsell reduction', () => {
   it('keeps large sofas subject to quotation', () => {
     const option = sofaPrices.find(p => p.id === '4+-lugares')!;
     expect(calcPackPricing(option, true, false).packPrice).toBeNull();
+  });
+});
+
+describe('treatment helpers shared by the totals, the receipt and the configurator', () => {
+  const form = { ...initialFormData, service: 'sofa', serviceType: 'cleaning' as const };
+  it('prices a sofa unit with anti-acaros as cleaning plus the per-size rate, 4+ under quote', () => {
+    const [one, two, three, fourPlus] = sofaPrices;
+    expect(calcSofaUnitPrice(one, true, 'cleaning', 'essencial', true)).toBe(69);
+    expect(calcSofaUnitPrice(two, true, 'cleaning', 'premium', true)).toBe(109);
+    expect(calcSofaUnitPrice(three, true, 'cleaning', 'essencial', true)).toBe(129);
+    expect(calcSofaUnitPrice(fourPlus, true, 'cleaning', 'essencial', true)).toBeNull();
+    // Sem anti-ácaros, o tratamento é o pack de impermeabilização (89€ no 1 lugar Essencial).
+    expect(calcSofaUnitPrice(one, true, 'cleaning', 'essencial', false)).toBe(89);
+    // Com impermeabilização como serviço principal o anti-ácaros não se aplica.
+    expect(calcSofaUnitPrice(one, true, 'waterproofing', 'essencial', true)).toBe(calcPackPricing(one, true, true, null, 'essencial').displayPrice);
+  });
+  it('applies chair anti-acaros only with cleaning as the main service and never with waterproofing', () => {
+    expect(chairAntiAcarosQty({ serviceType: 'cleaning', chairAntiAcaros: true, chairWaterproofQty: 0, chairQuantity: '6' })).toBe(6);
+    expect(chairAntiAcarosQty({ serviceType: 'cleaning', chairAntiAcaros: true, chairWaterproofQty: 6, chairQuantity: '6' })).toBe(0);
+    expect(chairAntiAcarosQty({ serviceType: 'waterproofing', chairAntiAcaros: true, chairWaterproofQty: 0, chairQuantity: '6' })).toBe(0);
+    expect(chairAntiAcarosQty({ serviceType: 'cleaning', chairAntiAcaros: false, chairWaterproofQty: 0, chairQuantity: '6' })).toBe(0);
+  });
+  it('names the chosen treatment in the lead type', () => {
+    const treated = [{ sizeId: '2-lugares', qty: 1, packEnabled: true }];
+    expect(quizServiceTypeLabel({ ...form, sofaAntiAcaros: true }, treated, [])).toBe('Higienização Profunda + Anti-ácaros');
+    expect(quizServiceTypeLabel({ ...form, waterproofingTier: 'premium' }, treated, [])).toBe('Higienização Profunda + Impermeabilização Premium');
+    expect(quizServiceTypeLabel(form, [{ sizeId: '2-lugares', qty: 1, packEnabled: false }], [])).toBe('Higienização Profunda');
+    expect(quizServiceTypeLabel({ ...form, service: 'chairs', chairQuantity: '4', chairAntiAcaros: true }, [], [])).toBe('Higienização Profunda + Anti-ácaros');
+    expect(quizServiceTypeLabel({ ...form, service: 'mattress' }, [], [{ sizeId: 'casal', qty: 1, packEnabled: true }])).toBe('Higienização Profunda + Desbacterização e Anti Ácaros');
+    expect(quizServiceTypeLabel({ ...form, serviceType: 'waterproofing', waterproofingTier: 'essencial' }, treated, [])).toBe('Impermeabilização Essencial + Higienização Profunda');
   });
 });

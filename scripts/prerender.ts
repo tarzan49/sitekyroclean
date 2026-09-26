@@ -1,12 +1,15 @@
-import { CHAIR_WATERPROOF_ESSENTIAL, CHAIR_WATERPROOF_PREMIUM } from '../src/constants/chairPricing';
 import { RESOURCE_BLOG_TITLE, RESOURCE_BLOG_INTRO, RESOURCE_FAQ_TITLE, RESOURCE_FAQ_INTRO, RESOURCE_FAQS, RESOURCE_GLOSSARY_TITLE, resourceGlossaryIntro, getResourceOffer, getResourceWhatsapp, RESOURCE_TRAVEL, getResourceCommercial, resourceHeroSubtitle } from '../src/data/resourceContent';
 import { getServiceExamples } from '../src/data/serviceExamples';
 import { generatedPageForPath } from '../src/data/generatedRouteIndex';
-import { commercialHeroSubtitle } from '../src/data/commercialHeroCopy';
+import { commercialHeroSubtitle, commercialHeroPriceLine, commercialHeroStats, type HeroStat } from '../src/data/commercialHeroCopy';
+import { PILLAR_PAGES, type PillarSlug } from '../src/data/pillarPages';
+import { SOFA_CLEANING_FROM, MATTRESS_CLEANING_FROM } from '../src/data/enginePrices';
+import { SOFA_PROCESS_STEPS } from '../src/data/sofaProcessGuide';
+import { SERVICE_PROCESS_GUIDES } from '../src/data/serviceProcessGuides';
 import { MATERIAL_PROCESS_GUIDES } from "../src/data/materialProcessGuides";
 import { MATERIAL_EXAMPLES, type MaterialExamples } from "../src/data/materialExamples";
 import { getTreatmentRoutes, getExpansionRoutes, getTreatmentPage, getExpansionPage, treatments } from '../src/data/treatmentSeoData';
-import { PRICE_PROMISE, SATISFACTION_PROMISE, DRYING_PROMISE, COVERAGE_PROMISE, RESPONSE_PROMISE, AVAILABILITY_PROMISE, WEEKLY_REQUESTS, TREATMENT_EXTRAS } from '../src/constants/commercialPolicy';
+import { PRICE_PROMISE, SATISFACTION_PROMISE, DRYING_PROMISE, COVERAGE_PROMISE, RESPONSE_PROMISE, AVAILABILITY_PROMISE, WEEKLY_REQUESTS, TREATMENT_EXTRAS, TRAVEL_FEE_MIN, TRAVEL_FEE_MAX } from '../src/constants/commercialPolicy';
 import { REVIEW_RATING, REVIEW_COUNT, CLIENTS_SERVED_LABEL, SERVICES_COMPLETED_LABEL, PHONE_DISPLAY, BUSINESS_EMAIL } from '../src/constants/business';
 import { locationPrices } from '../src/constants/travel';
 import { buildAboutPageSchema, buildProfilePageSchema, buildPersonNode, buildStudySchemas } from '../src/lib/seoSchema';
@@ -31,8 +34,8 @@ import { buildAboutPageSchema, buildProfilePageSchema, buildPersonNode, buildStu
 
 import fs from 'fs';
 import path from 'path';
-import { getLandingPageModel, coverageWindow } from '../src/data/landingPageModel';
-import { renderLandingPageHtml, ENTITY_FOOTER_HTML } from './landing-page-html';
+import { getLandingPageModel } from '../src/data/landingPageModel';
+import { renderLandingPageHtml, ENTITY_FOOTER_HTML, SERVICE_CONDITIONS_HTML } from './landing-page-html';
 
 import { getLocationServiceData, getAllLocationRoutes, services, cities, cityPrep } from '../src/data/locationSeoData';
 import { getAllFreguesiaRoutes, getFreguesia, generateFreguesiaContent } from '../src/data/freguesiaSeoData';
@@ -41,20 +44,21 @@ import { LEGAL_PAGES } from '../src/data/legalPages';
 import { getAllProblems, getProblemBySlug } from '../src/data/problemSeoData';
 import { getProblemLayout } from '../src/data/problemLayout';
 import { getProblemHero } from '../src/data/problemHero';
-import { getAllProblemCityRoutes, getProblemCities } from '../src/data/problemCitySeoData';
+import { getAllProblemCityRoutes, getProblemCities, problemCityMeta, problemCityNeighbours } from '../src/data/problemCitySeoData';
 import { getProblemCityFaqs, getProblemCityReviews, getProblemCityCoverage } from '../src/data/problemCityContent';
 import { getAllMaterials, getAllMaterialCityRoutes, getMaterialCityData } from '../src/data/materialSeoData';
 import { getAllPriceRoutes, getPricePageData } from '../src/data/priceSeoData';
 import { packs, packCities, PACK_HOOK, getAllPackComboRoutes, getPackByCityAndId, packFaqs, packPriceFrom, otherPacksInCity } from '../src/data/packComboData';
 import { PACK_PERK_RULE, PACK_PERK_LIMIT, PACK_PERK_BULLETS } from '../src/constants/packPerks';
-import { getAllMarcaSofaRoutes, getMarcaByCityAndSlug } from '../src/data/marcaSofaData';
-import { getAllMarcaColchaoRoutes, getMarcaColchaoByCityAndSlug } from '../src/data/marcaColchaoData';
-import { getAllMarcaCadeirasRoutes, getMarcaCadeirasByCityAndSlug } from '../src/data/marcaCadeirasData';
+import { getAllMarcaSofaRoutes, getMarcaByCityAndSlug, marcas } from '../src/data/marcaSofaData';
+import { marcaPageCopy, otherMarcaLinks, MARCA_PROCESS_STEPS } from '../src/data/marcaCities';
+import { getAllMarcaColchaoRoutes, getMarcaColchaoByCityAndSlug, marcasColchao } from '../src/data/marcaColchaoData';
+import { getAllMarcaCadeirasRoutes, getMarcaCadeirasByCityAndSlug, marcasCadeiras } from '../src/data/marcaCadeirasData';
 import { EN_PAGES } from '../src/data/enTouristSeoData';
 import { getAllPosts } from '../src/data/blogData';
 import { glossaryTerms } from '../src/data/glossaryTerms';
 import { getAllCommercialRoutes, getCommercialPageData, COMMERCIAL_CITIES } from '../src/data/commercialSeoData';
-import { buildLocalBusinessNode, buildHomepageBusinessNode, buildBreadcrumbNode, buildServiceNode, buildFaqNode, buildOfferNode, buildHowToNode } from '../src/lib/seoSchema';
+import { buildLocalBusinessNode, buildHomepageBusinessNode, buildBreadcrumbNode, buildServiceNode, buildFaqNode, buildHowToNode, buildServicePageSchema, offerForPriceLabel } from '../src/lib/seoSchema';
 import { renderBlogBody } from '../src/lib/blogMarkdown';
 import { getBlogSources } from '../src/data/blogSources';
 import { DEFAULT_AUTHOR } from '../src/data/authors';
@@ -151,13 +155,15 @@ function buildBreadcrumbSchema(items: { name: string; url: string }[]) {
 
 /** Service — signals what's offered, where, at what price, with ratings. */
 function buildServiceSchema(serviceName: string, cityName: string, priceFrom: string) {
-  const price = priceFrom.replace(',', '.').replace(/[^0-9.]/g, '');
+  // Sem número no rótulo ("Sob orçamento"), sem oferta: o mesmo helper que os
+  // componentes de schema do React usam, para as duas versões não divergirem.
+  const offers = offerForPriceLabel(priceFrom);
   return {
     '@context': 'https://schema.org',
     ...buildServiceNode({
       name: serviceName,
       areaServed: { '@type': 'City', name: cityName },
-      ...(price && { offers: buildOfferNode(price) }),
+      ...(offers && { offers }),
     }),
   };
 }
@@ -189,6 +195,9 @@ interface PageContent {
   hero?: ReturnType<typeof getProblemHero>;
   h1: string;
   intro: string;
+  // A linha de preço e os três indicadores do hero (CommercialHero), escritos
+  // com as mesmas funções que o React usa para os desenhar.
+  heroFacts?: { priceLine: string; stats: HeroStat[] };
   // Assinatura e datas do artigo. Sem isto o HTML estático de um post do blog
   // saltava do <h1> para o texto: quem lê a página via o autor e a data, o
   // crawler não via nenhum dos dois, que são precisamente os sinais de
@@ -257,6 +266,10 @@ function generatePageBody(c: PageContent, lang: 'pt' | 'en' = 'pt'): string {
   }
 
   html += `<p>${escHtml(c.intro)}</p>\n`;
+
+  if (c.heroFacts) {
+    html += `<p>${escHtml(c.heroFacts.priceLine)}</p><ul>${c.heroFacts.stats.map(stat => `<li>${escHtml(stat.value)} · ${escHtml(stat.label)}</li>`).join('')}</ul>\n`;
+  }
 
   if (c.resourceOffer) {
     const offer = c.resourceOffer;
@@ -411,7 +424,9 @@ function generatePageBody(c: PageContent, lang: 'pt' | 'en' = 'pt'): string {
     html += `</ol></section>\n`;
   }
 
-  if (lang === 'pt') html += `<details><summary>Condições do serviço e garantia</summary>${[PRICE_PROMISE, SATISFACTION_PROMISE, DRYING_PROMISE, AVAILABILITY_PROMISE, COVERAGE_PROMISE, RESPONSE_PROMISE + '. Deslocação a partir de 10€.'].map(text => `<p>${escHtml(text)}</p>`).join('')}<a href="/tratamento-anti-acaros">Tratamento anti-ácaros</a> · <a href="/desbacterizacao">Desbacterização</a></details>` + ENTITY_FOOTER_HTML;
+  // O mesmo bloco que o rodapé React desenha (BusinessConditions.tsx), a partir
+  // da mesma lista (SERVICE_CONDITIONS em commercialPolicy.ts).
+  if (lang === 'pt') html += SERVICE_CONDITIONS_HTML + ENTITY_FOOTER_HTML;
   html += `</main>`;
   return html;
 }
@@ -747,8 +762,8 @@ export function prerenderRoutes(outDir: string): number {
       const city    = cities.find(c => c.slug === route.citySlug);
       if (!problem || !city) continue;
       const hero = getProblemHero(problem, city.name);
-      const title = `${problem.h1} em ${city.name} | Kyro Clean Solutions`;
-      const desc  = `${problem.h1} em ${city.name}: serviço profissional ao domicílio. ${problem.metaDescription.split('.')[0]}. Resposta em menos de 10 minutos.`;
+      // O mesmo título e a mesma descrição que o ProblemCityPage.tsx aplica.
+      const { title, description: desc } = problemCityMeta(problem, city.name);
       const schemas: object[] = [
         buildBreadcrumbSchema([
           { name: 'Início',      url: BASE_URL + '/' },
@@ -787,14 +802,12 @@ export function prerenderRoutes(outDir: string): number {
           // das 26 cidades eram alguma vez ligadas, e Lisboa, Braga, Faro,
           // Cascais e Sintra não recebiam uma única. O ponto de partida varia
           // com a cidade desenhada, de modo a cobrir a lista inteira.
+          // `problemCityNeighbours` é a mesma função que a página React usa
+          // para o bloco "Este problema noutras cidades".
           links: [
-            { href: `/problemas/${route.problemSlug}`, label: `${problem.h1} (pagina nacional)` },
-            ...(() => {
-              const withPage = getProblemCities(route.problemSlug);
-              const others = withPage.filter(c => c.slug !== city.slug);
-              const start = withPage.findIndex(c => c.slug === city.slug);
-              return coverageWindow(others, start < 0 ? 0 : start, 6);
-            })().map(c => ({ href: `/${route.problemSlug}-${c.slug}`, label: `${problem.h1} em ${c.name}` })),
+            { href: `/problemas/${route.problemSlug}`, label: `${problem.h1} (página nacional)` },
+            ...problemCityNeighbours(route.problemSlug, city.slug)
+              .map(c => ({ href: `/${route.problemSlug}-${c.slug}`, label: `${problem.h1} ${cityPrep(c.name)} ${c.name}` })),
           ],
         },
         schemas,
@@ -809,7 +822,7 @@ export function prerenderRoutes(outDir: string): number {
 
     // Material base pages (no city)
     for (const mat of getAllMaterials()) {
-      const matPriceFrom = services.find(s => s.slug === mat.serviceSlug)?.priceFrom ?? '49€';
+      const matPriceFrom = services.find(s => s.slug === mat.serviceSlug)?.priceFrom ?? 'Sob orçamento';
       const schemas: object[] = [
         buildServiceSchema(mat.serviceName, 'Portugal', matPriceFrom),
         buildBreadcrumbSchema([
@@ -840,7 +853,7 @@ export function prerenderRoutes(outDir: string): number {
     for (const route of getAllMaterialCityRoutes()) {
       const data = getMaterialCityData(route.materialSlug, route.citySlug);
       if (!data) continue;
-      const dataPriceFrom = services.find(s => s.slug === data.serviceSlug)?.priceFrom ?? '49€';
+      const dataPriceFrom = services.find(s => s.slug === data.serviceSlug)?.priceFrom ?? 'Sob orçamento';
       const schemas: object[] = [
         buildServiceSchema(data.serviceName, data.city, dataPriceFrom),
         buildBreadcrumbSchema([
@@ -877,11 +890,12 @@ export function prerenderRoutes(outDir: string): number {
       if (!data) continue;
       const svc = services.find(s => s.slug === route.serviceSlug);
       const schemas: object[] = [
-        buildServiceSchema(data.serviceName, data.cityName, svc?.priceFrom ?? '49€'),
+        buildServiceSchema(data.serviceName, data.cityName, svc?.priceFrom ?? 'Sob orçamento'),
         buildBreadcrumbSchema([
           { name: 'Início',                     url: BASE_URL + '/' },
           { name: data.serviceName,             url: `${BASE_URL}/${route.serviceSlug}` },
-          { name: `Preço em ${data.cityName}`,  url: `${BASE_URL}${route.path}` },
+          // O mesmo nome que o PricePage.tsx declara no seu BreadcrumbList.
+          { name: `Preços ${cityPrep(data.cityName)} ${data.cityName}`, url: `${BASE_URL}${route.path}` },
         ]),
       ];
       if (data.faqs?.length) schemas.push(buildFaqSchema(data.faqs));
@@ -989,73 +1003,52 @@ export function prerenderRoutes(outDir: string): number {
     console.log(`  Pack pages:              ${count - prev}`);
   }
 
-  // ── 9. Marca Sofá pages (8 × 18 = 144) ──────────────────────────────────
+  // ── 9. Marca pages: sofá (8 × 40), colchão (6 × 40), cadeiras (6 × 40) ─
+  // O mesmo título, descrição, <h1>, migalha, preço e passos que os
+  // componentes Marca*Page.tsx mostram (marcaPageCopy em marcaCities.ts). O
+  // preço é o de partida do serviço no motor: as marcas não têm tabela
+  // própria, e os intervalos por marca que aqui estavam não vinham de lado
+  // nenhum. O HTML leva também o que a página mostra e antes só existia no
+  // React: o material, o que não fazer, o processo e as outras marcas.
   {
-    const prev = count;
-    for (const route of getAllMarcaSofaRoutes()) {
-      const data = getMarcaByCityAndSlug(route.marcaSlug, route.citySlug);
-      if (!data) continue;
-      const title = `Limpeza Sofá ${data.marca.name} em ${data.city.name}, Especialistas | Kyro Clean`;
-      const desc  = `Especialistas em limpeza de sofás ${data.marca.name} em ${data.city.name}. ${data.marca.material}. ${data.marca.estimatedPriceRange}. Serviço ao domicílio.`;
-      const svc = services.find(s => s.slug === data.marca.serviceSlug);
-      const schemas: object[] = [
-        buildServiceSchema(`Limpeza de Sofá ${data.marca.name}`, data.city.name, String(data.marca.minPrice)),
-        buildBreadcrumbSchema([
-          { name: 'Início', url: BASE_URL + '/' },
-          ...(svc ? [{ name: svc.name, url: `${BASE_URL}${svc.baseRoute}` }] : []),
-          { name: `${data.marca.name} - ${data.city.name}`, url: `${BASE_URL}${route.path}` },
-        ]),
-      ];
-      if (data.marca.faqs?.length) schemas.push(buildFaqSchema(data.marca.faqs));
-      emit(route.path, title, desc, { h1: title.split(" | ")[0], intro: commercialHeroSubtitle(data.marca.serviceSlug, data.city.name), howItWorks: data.marca.cleaningProcess, benefits: data.marca.doThis, faqs: data.marca.faqs }, schemas);
+    const families = [
+      { label: 'Marca Sofá pages:        ', kind: 'sofa' as const, routes: getAllMarcaSofaRoutes(), find: getMarcaByCityAndSlug, brands: marcas },
+      { label: 'Marca Colchão pages:     ', kind: 'colchao' as const, routes: getAllMarcaColchaoRoutes(), find: getMarcaColchaoByCityAndSlug, brands: marcasColchao },
+      { label: 'Marca Cadeiras pages:    ', kind: 'cadeiras' as const, routes: getAllMarcaCadeirasRoutes(), find: getMarcaCadeirasByCityAndSlug, brands: marcasCadeiras },
+    ];
+    for (const family of families) {
+      const prev = count;
+      for (const route of family.routes) {
+        const data = family.find(route.marcaSlug, route.citySlug);
+        if (!data) continue;
+        const copy = marcaPageCopy(family.kind, data.marca, data.city);
+        const schemas: object[] = [
+          buildServiceSchema(copy.h1, data.city.name, copy.priceFrom),
+          buildBreadcrumbSchema([
+            { name: 'Início', url: BASE_URL + '/' },
+            { name: copy.serviceName, url: `${BASE_URL}${copy.serviceBaseRoute}` },
+            { name: copy.breadcrumbName, url: `${BASE_URL}${route.path}` },
+          ]),
+        ];
+        if (data.marca.faqs?.length) schemas.push(buildFaqSchema(data.marca.faqs));
+        emit(route.path, copy.title, copy.description, {
+          h1: copy.h1,
+          intro: commercialHeroSubtitle(copy.serviceSlug, data.city.name),
+          heroFacts: { priceLine: commercialHeroPriceLine(copy.serviceSlug, data.city.name, copy.priceFrom), stats: commercialHeroStats(copy.serviceSlug) },
+          localSection: `${data.marca.materialDescription} ${data.marca.material}.`,
+          benefits: [...data.marca.doNots, ...data.marca.doThis],
+          howItWorks: data.marca.cleaningProcess,
+          processSteps: MARCA_PROCESS_STEPS[family.kind].map((step, index) => ({ step: index + 1, title: step.title, description: step.desc })),
+          faqs: data.marca.faqs,
+          linksHeading: `Outras marcas que limpamos ${cityPrep(data.city.name)} ${data.city.name}`,
+          links: [
+            ...otherMarcaLinks(family.kind, family.brands, data.marca.slug, data.city.slug),
+            { href: copy.cityServiceHref, label: copy.cityServiceLabel },
+          ],
+        }, schemas);
+      }
+      console.log(`  ${family.label}${count - prev}`);
     }
-    console.log(`  Marca Sofá pages:        ${count - prev}`);
-  }
-
-  // ── 9b. Marca Colchão pages (6 × 18 = 108) ──────────────────────────────
-  {
-    const prev = count;
-    for (const route of getAllMarcaColchaoRoutes()) {
-      const data = getMarcaColchaoByCityAndSlug(route.marcaSlug, route.citySlug);
-      if (!data) continue;
-      const title = `Limpeza Colchão ${data.marca.name} em ${data.city.name}, Especialistas | Kyro Clean`;
-      const desc  = `Especialistas em limpeza de colchões ${data.marca.name} em ${data.city.name}. ${data.marca.material}. ${data.marca.estimatedPriceRange}. Serviço ao domicílio.`;
-      const svc = services.find(s => s.slug === data.marca.serviceSlug);
-      const schemas: object[] = [
-        buildServiceSchema(`Limpeza de Colchão ${data.marca.name}`, data.city.name, String(data.marca.minPrice)),
-        buildBreadcrumbSchema([
-          { name: 'Início', url: BASE_URL + '/' },
-          ...(svc ? [{ name: svc.name, url: `${BASE_URL}${svc.baseRoute}` }] : []),
-          { name: `${data.marca.name} - ${data.city.name}`, url: `${BASE_URL}${route.path}` },
-        ]),
-      ];
-      if (data.marca.faqs?.length) schemas.push(buildFaqSchema(data.marca.faqs));
-      emit(route.path, title, desc, { h1: title.split(" | ")[0], intro: commercialHeroSubtitle(data.marca.serviceSlug, data.city.name), howItWorks: data.marca.cleaningProcess, benefits: data.marca.doThis, faqs: data.marca.faqs }, schemas);
-    }
-    console.log(`  Marca Colchão pages:     ${count - prev}`);
-  }
-
-  // ── 9c. Marca Cadeiras pages (6 × 34 = 204) ─────────────────────────────
-  {
-    const prev = count;
-    for (const route of getAllMarcaCadeirasRoutes()) {
-      const data = getMarcaCadeirasByCityAndSlug(route.marcaSlug, route.citySlug);
-      if (!data) continue;
-      const title = `Limpeza Cadeiras ${data.marca.name} em ${data.city.name}, Especialistas | Kyro Clean`;
-      const desc  = `Especialistas em limpeza de cadeiras ${data.marca.name} em ${data.city.name}. ${data.marca.material}. ${data.marca.estimatedPriceRange}. Serviço ao domicílio.`;
-      const svc = services.find(s => s.slug === data.marca.serviceSlug);
-      const schemas: object[] = [
-        buildServiceSchema(`Limpeza de Cadeiras ${data.marca.name}`, data.city.name, String(data.marca.minPrice)),
-        buildBreadcrumbSchema([
-          { name: 'Início', url: BASE_URL + '/' },
-          ...(svc ? [{ name: svc.name, url: `${BASE_URL}${svc.baseRoute}` }] : []),
-          { name: `${data.marca.name} - ${data.city.name}`, url: `${BASE_URL}${route.path}` },
-        ]),
-      ];
-      if (data.marca.faqs?.length) schemas.push(buildFaqSchema(data.marca.faqs));
-      emit(route.path, title, desc, { h1: title.split(" | ")[0], intro: commercialHeroSubtitle(data.marca.serviceSlug, data.city.name), howItWorks: data.marca.cleaningProcess, benefits: data.marca.doThis, faqs: data.marca.faqs }, schemas);
-    }
-    console.log(`  Marca Cadeiras pages:    ${count - prev}`);
   }
 
   // ── 10. Core static pages (service hubs, editorial, packs) ─────────────
@@ -1073,211 +1066,96 @@ export function prerenderRoutes(outDir: string): number {
       extraSchemas?: object[];
     };
 
+    // Os seis serviços-pilar. Título, descrição, <h1> e FAQs vêm de
+    // src/data/pillarPages.ts, a mesma fonte que o componente React de cada
+    // página e o PageHead usam: antes eram três cópias, e o que os motores
+    // liam aqui não era o que as pessoas viam (h1 e FAQs diferentes, títulos
+    // diferentes em quatro das seis). O processo é o mesmo que a página
+    // desenha (SofaProcessGuide / ServiceProcessGuide) e o schema é o mesmo
+    // grafo que o ServiceSchema.tsx declara depois de montar. Os benefícios
+    // ficam só aqui, como estavam (decisão do responsável).
+    const PILLAR_BENEFITS: Record<PillarSlug, string[]> = {
+      'limpeza-sofas': [
+        'Remoção de sujidade e resíduos das fibras',
+        'Eliminação de manchas de vinho, café, gordura e sangue',
+        'Eliminação de odores de animais domésticos e fumo',
+        'Secagem rápida em 3 a 6 horas',
+        'Técnicos certificados com produtos eco-friendly',
+        'Serviço ao domicílio sem custos ocultos',
+      ],
+      'limpeza-colchoes': [
+        'Remoção de pó e resíduos nas fibras',
+        'Remoção de manchas de suor, líquidos e acidentes',
+        'Eliminação de odores e fungos',
+        'Redução de alergias e problemas respiratórios',
+        'Secagem em 3 a 6 horas',
+        'Produto certificado e seguro para crianças e animais',
+      ],
+      'limpeza-tapetes': [
+        'Remoção de manchas de vinho, café, gordura e tinta',
+        'Remoção de sujidade e resíduos das fibras',
+        'Recuperação das cores e textura original',
+        'Tratamento específico por tipo de fibra',
+        'Secagem em 3 a 6 horas',
+        'Serviço ao domicílio sem necessidade de recolha',
+      ],
+      'limpeza-cadeiras': [
+        'Remoção de manchas de comida, bebida e gordura',
+        'Remoção de sujidade e resíduos da superfície',
+        'Eliminação de odores de cozinha e uso intenso',
+        'Tratamento específico por tipo de tecido',
+        'Secagem rápida em 3 a 6 horas',
+        'Preço por volume: quanto mais cadeiras, menor o preço unitário',
+      ],
+      'limpeza-alcatifas': [
+        'Limpeza em profundidade das fibras compactadas',
+        'Remoção de manchas de zonas de passagem intensa',
+        'Remoção de sujidade e resíduos das fibras',
+        'Recuperação da textura e cor original',
+        'Ideal para escritórios, hotéis e grandes superfícies',
+        'Secagem em 3 a 6 horas',
+      ],
+      impermeabilizacao: [
+        'Proteção invisível que não altera a textura nem a cor',
+        'Repelência a líquidos, manchas de vinho e gordura',
+        'Essencial: até 2 lavagens, 1 a 2 anos de proteção real. Premium: até 5 lavagens, até 10 anos',
+        'Reduz a frequência de limpezas necessárias',
+        'Ideal para famílias com crianças e animais domésticos (recomendamos a Premium)',
+        'Produto certificado e eco-friendly',
+      ],
+    };
+    const pillarProcess = (slug: PillarSlug) =>
+      slug === 'limpeza-sofas' ? SOFA_PROCESS_STEPS : SERVICE_PROCESS_GUIDES[slug].steps;
+
+    const PILLAR_CORE: CorePage[] = PILLAR_PAGES.map(pillar => ({
+      path: pillar.path,
+      title: pillar.title,
+      desc: pillar.description,
+      content: {
+        // A migalha que o hero desenha: Início › nome do serviço no catálogo.
+        breadcrumb: [{ label: 'Início', href: '/' }, { label: pillar.breadcrumbLabel }],
+        h1: pillar.h1,
+        intro: commercialHeroSubtitle(pillar.serviceSlug),
+        heroFacts: { priceLine: commercialHeroPriceLine(pillar.serviceSlug), stats: commercialHeroStats(pillar.serviceSlug) },
+        serviceExamples: getServiceExamples(pillar.serviceSlug),
+        processSteps: pillarProcess(pillar.serviceSlug).map((step, index) => ({ step: index + 1, title: step.title, description: step.description, alt: step.alt })),
+        benefits: PILLAR_BENEFITS[pillar.serviceSlug],
+        faqs: pillar.faqs,
+        // O mesmo bloco que o ServiceCityLinks desenha, com o mesmo título.
+        linksHeading: `${pillar.serviceName} perto de si`,
+        links: cities.map(city => ({ href: `/${pillar.serviceSlug}-${city.slug}`, label: city.name })),
+      },
+      extraSchemas: [buildServicePageSchema({
+        url: pillar.path,
+        serviceName: pillar.serviceName,
+        description: pillar.description,
+        priceFrom: pillar.priceFrom,
+        breadcrumbLabel: pillar.breadcrumbLabel,
+      })],
+    }));
+
     const CORE: CorePage[] = [
-      {
-        path: '/limpeza-sofas',
-        title: 'Limpeza de Sofás ao Domicílio | Desde 49€ | Kyro Clean Solutions',
-        desc: 'Limpeza profissional de sofás ao domicílio. Limpeza de sujidade e resíduos com extração profissional. Tratamentos antiácaros opcionais. Equipas em Braga, Porto, Lisboa e Algarve.',
-        content: {
-          h1: 'Limpeza de Sofás ao Domicílio',
-          intro: 'Limpeza de sofás ao domicílio, adaptada ao tecido e ao estado do artigo. Equipas em Braga, Porto, Lisboa e Algarve. Antiácaros e desbacterização são extras opcionais.',
-          processSteps: [
-            { step: 1, title: 'Diagnóstico gratuito', description: 'Avaliamos o material e o estado do estofo no local.' },
-            { step: 2, title: 'Pré-tratamento', description: 'Aplicamos produto específico nas manchas e zonas críticas.' },
-            { step: 3, title: 'Extração profissional', description: 'O equipamento extrai a sujidade e a água após o tratamento e a escovação adequada ao tecido.' },
-            { step: 4, title: 'Resultado garantido', description: 'Sofá limpo e seco em 3 a 6 horas, pronto a usar.' },
-          ],
-          benefits: [
-            'Remoção de sujidade e resíduos das fibras',
-            'Eliminação de manchas de vinho, café, gordura e sangue',
-            'Eliminação de odores de animais domésticos e fumo',
-            'Secagem rápida em 3 a 6 horas',
-            'Técnicos certificados com produtos eco-friendly',
-            'Serviço ao domicílio sem custos ocultos',
-          ],
-          faqs: faqs([
-            { q: 'Quanto custa a limpeza de sofá?', a: 'A limpeza de sofá começa a partir de 49€ para sofás de 1 lugar, 69€ para 2 lugares e 79€ para 3 lugares. Peça orçamento gratuito sem compromisso.' },
-            { q: 'Quanto tempo demora a limpeza de sofá?', a: 'O serviço demora entre 1 a 3 horas conforme o tamanho e estado do sofá. O sofá fica pronto a usar em 3 a 6 horas após a limpeza.' },
-            { q: 'A limpeza remove manchas antigas do sofá?', a: 'Sim. Tratamos manchas de vinho, café, gordura e sangue com pré-tratamento específico. Manchas muito antigas podem não sair completamente, mas apresentamos sempre o melhor resultado possível.' },
-            { q: 'Em que zonas fazem limpeza de sofás ao domicílio?', a: 'Temos equipas em Braga, Porto, Lisboa e Algarve. Aveiro, Coimbra e Alentejo Litoral sob consulta.' },
-          ]),
-          links: cities.map(city => ({ href: `/limpeza-sofas-${city.slug}`, label: city.name })),
-        },
-        extraSchemas: [
-          buildServiceSchema('Limpeza de Sofás', 'Portugal', '49€'),
-          buildBreadcrumbSchema([
-            { name: 'Início', url: BASE_URL + '/' },
-            { name: 'Limpeza de Sofás', url: BASE_URL + '/limpeza-sofas' },
-          ]),
-        ],
-      },
-      {
-        path: '/limpeza-colchoes',
-        title: 'Limpeza e Higienização de Colchões | Desde 59€ | Kyro Clean Solutions',
-        desc: 'Higienização profissional de colchões ao domicílio. Removemos sujidade e resíduos; anti-ácaros e desbacterização são extras opcionais. Desde 59€. Equipas em Braga, Porto, Lisboa e Algarve.',
-        content: {
-          h1: 'Limpeza e Higienização de Colchões ao Domicílio',
-          intro: 'Serviço de higienização profunda de colchões ao domicílio. Removemos resíduos e partículas acumuladas nas fibras com extração profissional. Noites mais saudáveis a partir de 59€.',
-          processSteps: [
-            { step: 1, title: 'Aspiração profunda', description: 'Remoção de ácaros e partículas superficiais com aspirador HEPA.' },
-            { step: 2, title: 'Pré-tratamento de limpeza', description: 'Aplicação de solução de limpeza adequada ao tecido. Os tratamentos anti-ácaros e de desbacterização são opcionais.' },
-            { step: 3, title: 'Extração e higienização', description: 'Lavagem em profundidade com extração de vapor profissional.' },
-            { step: 4, title: 'Secagem controlada', description: 'Colchão pronto a usar em 3 a 6 horas.' },
-          ],
-          benefits: [
-            'Remoção de pó e resíduos nas fibras',
-            'Remoção de manchas de suor, líquidos e acidentes',
-            'Eliminação de odores e fungos',
-            'Redução de alergias e problemas respiratórios',
-            'Secagem em 3 a 6 horas',
-            'Produto certificado e seguro para crianças e animais',
-          ],
-          faqs: faqs([
-            { q: 'Quanto custa a limpeza de colchão?', a: 'A limpeza de colchão começa a partir de 59€ para solteiro, 69€ para casal e 79€ para king. Peça orçamento gratuito.' },
-            { q: 'Com que frequência devo limpar o colchão?', a: 'Recomendamos higienização profissional a cada 6 a 12 meses. Em casos de alergias, gravidez ou crianças pequenas, idealmente cada 6 meses.' },
-            { q: 'A limpeza inclui tratamento anti-ácaros?', a: 'Não. A limpeza remove sujidade e resíduos das fibras. Anti-ácaros e desbacterização são tratamentos complementares opcionais, orçamentados separadamente.' },
-            { q: 'Fazem limpeza de colchões ao domicílio?', a: 'Sim. O técnico desloca-se a sua casa com todo o equipamento. Não precisa de retirar o colchão nem de se deslocar.' },
-          ]),
-          links: cities.map(city => ({ href: `/limpeza-colchoes-${city.slug}`, label: city.name })),
-        },
-        extraSchemas: [
-          buildServiceSchema('Limpeza de Colchões', 'Portugal', '59€'),
-          buildBreadcrumbSchema([
-            { name: 'Início', url: BASE_URL + '/' },
-            { name: 'Limpeza de Colchões', url: BASE_URL + '/limpeza-colchoes' },
-          ]),
-        ],
-      },
-      {
-        path: '/limpeza-tapetes',
-        title: 'Limpeza e Lavagem de Tapetes | Orçamento Grátis | Kyro Clean Solutions',
-        desc: 'Lavagem profissional de tapetes com extração profunda. Removemos sujidade, manchas e alergénios. Serviço ao domicílio nas zonas de atendimento, após avaliação do material. Orçamento à medida de cada tapete.',
-        content: {
-          h1: 'Limpeza e Lavagem de Tapetes ao Domicílio',
-          intro: 'Limpeza profissional de tapetes ao domicílio com extração profunda. Removemos sujidade acumulada, manchas difíceis e alergénios. Tapetes persas, shaggy, sisal e todos os tipos tratados com produto específico ao material.',
-          benefits: [
-            'Remoção de manchas de vinho, café, gordura e tinta',
-            'Remoção de sujidade e resíduos das fibras',
-            'Recuperação das cores e textura original',
-            'Tratamento específico por tipo de fibra',
-            'Secagem em 3 a 6 horas',
-            'Serviço ao domicílio sem necessidade de recolha',
-          ],
-          faqs: faqs([
-            { q: 'Quanto custa a limpeza de tapete?', a: 'Cada tapete é medido (largura x comprimento) e orçamentado individualmente, sem preço fixo por m². Peça um orçamento gratuito e sem compromisso.' },
-            { q: 'Quanto tempo demora a limpeza de tapete?', a: 'O serviço demora 1 a 2 horas. O tapete fica seco em 3 a 6 horas, dependendo da espessura e material.' },
-            { q: 'Que tipos de tapete limpam?', a: 'Limpamos todos os tipos: persas, shaggy, sisal, juta, lã, acrílico, polipropileno e fibras naturais. O produto é sempre adaptado ao material.' },
-            { q: 'Fazem limpeza de tapetes ao domicílio?', a: 'Sim. O técnico desloca-se a sua casa com equipamento de extração profissional. Não precisa de entregar o tapete.' },
-          ]),
-          links: cities.map(city => ({ href: `/limpeza-tapetes-${city.slug}`, label: city.name })),
-        },
-        extraSchemas: [
-          {
-            '@context': 'https://schema.org',
-            ...buildServiceNode({
-              name: 'Limpeza de Tapetes',
-              areaServed: { '@type': 'City', name: 'Portugal' },
-            }),
-          },
-          buildBreadcrumbSchema([
-            { name: 'Início', url: BASE_URL + '/' },
-            { name: 'Limpeza de Tapetes', url: BASE_URL + '/limpeza-tapetes' },
-          ]),
-        ],
-      },
-      {
-        path: '/limpeza-cadeiras',
-        title: 'Limpeza de Cadeiras Estofadas | Desde 20€ | Kyro Clean Solutions',
-        desc: 'Limpeza profissional de cadeiras estofadas ao domicílio. Ideal para residências, escritórios e restaurantes. Resultados visíveis no momento. Desde 20€/cadeira.',
-        content: {
-          h1: 'Limpeza de Cadeiras Estofadas ao Domicílio',
-          intro: 'Serviço profissional de limpeza de cadeiras estofadas ao domicílio. Removemos sujidade de uso diário, manchas de comida e odores com extração profissional. Ideal para residências, escritórios e restaurantes.',
-          benefits: [
-            'Remoção de manchas de comida, bebida e gordura',
-            'Remoção de sujidade e resíduos da superfície',
-            'Eliminação de odores de cozinha e uso intenso',
-            'Tratamento específico por tipo de tecido',
-            'Secagem rápida em 3 a 6 horas',
-            'Preço por volume: quanto mais cadeiras, menor o preço unitário',
-          ],
-          faqs: faqs([
-            { q: 'Quanto custa a limpeza de cadeiras?', a: 'O preço por cadeira diminui com a quantidade: até 4 cadeiras é 20€/unid., de 5 a 6 é 15€/unid., de 7 a 10 é 12,50€/unid. e a partir de 11 cadeiras por orçamento.' },
-            { q: 'Limpam cadeiras de escritório?', a: 'Sim. Limpamos cadeiras de escritório, sala de jantar, poltronas e bancos. O serviço é ao domicílio ou no local de trabalho.' },
-            { q: 'Quanto tempo demora a limpeza de cadeiras?', a: 'Cada cadeira demora 15 a 30 minutos. Um conjunto de 6 cadeiras leva cerca de 2 horas. As cadeiras ficam secas em 3 a 6 horas.' },
-            { q: 'Fazem limpeza de cadeiras em quantidade para restaurantes?', a: 'Sim. Para restaurantes, hotéis e escritórios temos condições especiais. Contacte-nos para orçamento personalizado.' },
-          ]),
-          links: cities.map(city => ({ href: `/limpeza-cadeiras-${city.slug}`, label: city.name })),
-        },
-        extraSchemas: [
-          buildServiceSchema('Limpeza de Cadeiras', 'Portugal', '20€'),
-          buildBreadcrumbSchema([
-            { name: 'Início', url: BASE_URL + '/' },
-            { name: 'Limpeza de Cadeiras', url: BASE_URL + '/limpeza-cadeiras' },
-          ]),
-        ],
-      },
-      {
-        path: '/limpeza-alcatifas',
-        title: 'Limpeza de Alcatifas | Sob Orçamento | Kyro Clean Solutions',
-        desc: 'Limpeza profissional de alcatifas com extração profunda. Removemos sujidade acumulada, manchas e alergénios. Secagem rápida. Equipas em Braga, Porto, Lisboa e Algarve.',
-        content: {
-          h1: 'Limpeza de Alcatifas ao Domicílio',
-          intro: 'Serviço profissional de limpeza de alcatifas ao domicílio com extração profunda. Tratamos alcatifas residenciais e comerciais, removendo sujidade acumulada nas fibras, manchas de passagem e alergénios em profundidade.',
-          benefits: [
-            'Limpeza em profundidade das fibras compactadas',
-            'Remoção de manchas de zonas de passagem intensa',
-            'Remoção de sujidade e resíduos das fibras',
-            'Recuperação da textura e cor original',
-            'Ideal para escritórios, hotéis e grandes superfícies',
-            'Secagem em 3 a 6 horas',
-          ],
-          faqs: faqs([
-            { q: 'Quanto custa a limpeza de alcatifa?', a: 'A limpeza de alcatifa é sempre sob orçamento. Indique a largura e o comprimento de cada área, a localidade e envie fotografias.' },
-            { q: 'Qual a diferença entre tapete e alcatifa?', a: 'Tapetes são peças soltas; alcatifas são revestimentos fixos que cobrem toda a divisão. Tratamos ambos ao domicílio com equipamento profissional.' },
-            { q: 'Limpam alcatifas de escritório?', a: 'Sim. Temos disponibilidade para escritórios, hotéis, clínicas e outros espaços comerciais, incluindo fora do horário comercial.' },
-            { q: 'A alcatifa fica molhada muito tempo?', a: 'Com o nosso equipamento de extração profissional, a alcatifa fica seca em 3 a 6 horas dependendo da espessura e ventilação.' },
-          ]),
-          links: cities.map(city => ({ href: `/limpeza-alcatifas-${city.slug}`, label: city.name })),
-        },
-        extraSchemas: [
-          buildServiceSchema('Limpeza de Alcatifas', 'Portugal', ''),
-          buildBreadcrumbSchema([
-            { name: 'Início', url: BASE_URL + '/' },
-            { name: 'Limpeza de Alcatifas', url: BASE_URL + '/limpeza-alcatifas' },
-          ]),
-        ],
-      },
-      {
-        path: '/impermeabilizacao',
-        title: 'Impermeabilização de Estofos | Essencial ou Premium | Kyro Clean Solutions',
-        desc: 'Impermeabilização profissional de sofás e cadeiras. Essencial de 1 a 2 anos desde 59€. Premium até 10 anos desde 89€. Serviço ao domicílio.',
-        content: {
-          h1: 'Impermeabilização de Estofos',
-          intro: 'Proteja os seus estofos com impermeabilização profissional ao domicílio. Barreira invisível contra manchas, líquidos e desgaste, em duas versões: Essencial e Premium. Ideal após limpeza ou em estofos novos.',
-          benefits: [
-            'Proteção invisível que não altera a textura nem a cor',
-            'Repelência a líquidos, manchas de vinho e gordura',
-            'Essencial: até 2 lavagens, 1 a 2 anos de proteção real. Premium: até 5 lavagens, até 10 anos',
-            'Reduz a frequência de limpezas necessárias',
-            'Ideal para famílias com crianças e animais domésticos (recomendamos a Premium)',
-            'Produto certificado e eco-friendly',
-          ],
-          faqs: faqs([
-            { q: 'O que é a impermeabilização de estofos?', a: 'A impermeabilização cria uma barreira invisível na fibra do estofo que repele líquidos e dificulta a penetração de manchas. O tecido mantém a aparência e textura originais.' },
-            { q: 'Quanto custa a impermeabilização?', a: `A versão Essencial começa a partir de 59€ para sofá de 1 lugar e custa ${CHAIR_WATERPROOF_ESSENTIAL}€ por cadeira. A versão Premium começa a partir de 89€ para sofá de 1 lugar e custa ${CHAIR_WATERPROOF_PREMIUM}€ por cadeira. Peça orçamento gratuito.` },
-            { q: 'Quanto tempo dura a impermeabilização?', a: 'Depende da versão. A Essencial, à base de água, dura 1 a 2 anos e aguenta até 2 lavagens. A Premium, à base de diluente e mais resistente ao desgaste, dura até 10 anos e aguenta até 5 lavagens.' },
-            { q: 'Posso fazer impermeabilização sem limpeza prévia?', a: 'Recomendamos sempre limpeza prévia para maior eficácia. Temos o Pack Proteção Total, que combina limpeza com a versão Essencial com desconto.' },
-          ]),
-          links: cities.map(city => ({ href: `/impermeabilizacao-${city.slug}`, label: city.name })),
-        },
-        extraSchemas: [
-          buildServiceSchema('Impermeabilização de Estofos', 'Portugal', '59€'),
-          buildBreadcrumbSchema([
-            { name: 'Início', url: BASE_URL + '/' },
-            { name: 'Impermeabilização', url: BASE_URL + '/impermeabilizacao' },
-          ]),
-        ],
-      },
+      ...PILLAR_CORE,
       {
         path: '/guia-de-packs',
         title: 'Guia de Packs de Limpeza | Kyro Clean Solutions',
@@ -1339,7 +1217,7 @@ export function prerenderRoutes(outDir: string): number {
           h1: 'Áreas de Serviço',
           intro: 'Equipas em Braga, Porto, Lisboa e Algarve, com cobertura regular do litoral entre Viana do Castelo e o Algarve. Aveiro, Coimbra, Alentejo Litoral e outras zonas mediante confirmação de disponibilidade.',
           benefits: [
-            'Porto e Grande Porto: deslocação a partir de 10€',
+            `Porto e Grande Porto: deslocação a partir de ${locationPrices['Porto']}€`,
             'Equipa local em Braga, com disponibilidade confirmada antes da marcação',
             AVAILABILITY_PROMISE,
             'Aveiro, Coimbra e Alentejo Litoral: disponibilidade sob consulta',
@@ -1371,7 +1249,7 @@ export function prerenderRoutes(outDir: string): number {
           // constantes, por isso as duas versões não podem divergir.
           benefits: [
             `Serviços ao domicílio: ${services.map(item => item.name).join(', ')}.`,
-            `Preços de partida por artigo; a deslocação é cobrada à parte, entre ${Math.min(...Object.values(locationPrices))}€ e ${Math.max(...Object.values(locationPrices))}€ conforme a cidade.`,
+            `Preços de partida por artigo; a deslocação é cobrada à parte, entre ${TRAVEL_FEE_MIN}€ e ${TRAVEL_FEE_MAX}€ conforme a cidade.`,
             TREATMENT_EXTRAS,
             COVERAGE_PROMISE,
             `${RESPONSE_PROMISE}. ${AVAILABILITY_PROMISE}`,
@@ -1490,11 +1368,6 @@ export function prerenderRoutes(outDir: string): number {
     ];
 
     for (const page of CORE) {
-      const service = services.find(item => item.baseRoute === page.path);
-      if (service) {
-        page.content.intro = commercialHeroSubtitle(service.slug);
-        page.content.serviceExamples = getServiceExamples(service.slug);
-      }
       const schemas = [...(page.extraSchemas ?? [])];
       if (page.content.faqs?.length) schemas.push(buildFaqSchema(page.content.faqs));
       emit(page.path, page.title, page.desc, page.content, schemas);
@@ -1549,7 +1422,7 @@ export function prerenderRoutes(outDir: string): number {
           // assim, e o travessão é proibido em conteúdo visível do site.
           'Photograph damage before cleaning it: timestamped before/after is the standard most platforms ask for.',
           'Same-day is often possible, but the earlier in the day you reach out, the better your odds.',
-          'Prices start from €49 (sofa) / €59 (mattress); rugs are quoted per piece, always confirmed before we start.',
+          `Prices start from €${SOFA_CLEANING_FROM} (sofa) / €${MATTRESS_CLEANING_FROM} (mattress); rugs are quoted per piece, always confirmed before we start.`,
           'Before/after photo documentation is standard on every job, no need to request it separately.',
         ],
       },

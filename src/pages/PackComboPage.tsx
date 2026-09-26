@@ -16,7 +16,7 @@ import { getAllPackComboRoutes, getPackByCityAndId, packFaqs, packPriceFrom, oth
 import { services, cityPrep } from '@/data/serviceCatalog';
 import { pickReviewSubset } from '@/data/reviewsPool';
 import { locationPrices } from '@/constants/travel';
-import { PACK_PERK_MIN_ORDER, PACK_PERK_MATTRESS_OFF, PACK_PERK_SOFA_PRICE, PACK_PERK_CHAIRS_SET } from '@/constants/packPerks';
+import { PACK_PERK_MIN_ORDER, PACK_PERK_PRICES, PACK_PERK_SUMMARY } from '@/constants/packPerks';
 import { PRICE_PROMISE, AVAILABILITY_PROMISE, SATISFACTION_PROMISE } from '@/constants/commercialPolicy';
 import { SITE_URL, WHATSAPP_BASE } from '@/constants/business';
 import { buildPackWaMessage } from '@/lib/whatsappMessages';
@@ -67,7 +67,7 @@ export default function PackComboPage() {
   const perks = [
     {
       title: 'Preço de pack no que acrescentar',
-      text: `Sofá a partir de ${PACK_PERK_SOFA_PRICE['1-lugar']}€, menos ${PACK_PERK_MATTRESS_OFF}€ em cada colchão e uma cadeira oferecida por cada ${PACK_PERK_CHAIRS_SET}.`,
+      text: PACK_PERK_PRICES,
       image: '/images/pack-perks/pack-artigos-800.webp',
       alt: 'Colchão, sofá, cadeira e tapete: os artigos que pode juntar no mesmo pack',
     },
@@ -93,6 +93,7 @@ export default function PackComboPage() {
       description={description}
       pageUrl={pathname}
       priceFrom={priceFrom}
+      breadcrumb={[{ name: 'Início', path: '/' }, { name: 'Packs', path: '/guia-de-packs' }, { name: heading, path: pathname }]}
     />
     <Header />
     <main>
@@ -116,7 +117,7 @@ export default function PackComboPage() {
             overline={pack.name}
             heading="Monte o seu pack"
             goldWord={`${cityPrep(city.name)} ${city.name}`}
-            subtitle={`Preço de pack a partir de ${PACK_PERK_MIN_ORDER}€.`}
+            subtitle={`Preço de pack a partir de ${PACK_PERK_MIN_ORDER}€ de subtotal.`}
             className="lg:!mb-5"
           />
           <div className="bg-white border border-[#E5E0D3] rounded-2xl p-3 sm:p-5 md:p-6 lg:p-4">
@@ -145,7 +146,7 @@ export default function PackComboPage() {
             overline="Vantagens do pack"
             heading="Porquê juntar tudo"
             goldWord="numa visita"
-            subtitle={`A partir de ${PACK_PERK_MIN_ORDER}€ de subtotal, o primeiro artigo fica ao preço de tabela e os que acrescentar entram com preço de pack.`}
+            subtitle={PACK_PERK_SUMMARY}
           />
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {perks.map(perk => <article key={perk.title} className="overflow-hidden rounded-2xl bg-white border border-[#E5E0D3]">
@@ -183,7 +184,7 @@ export default function PackComboPage() {
       })()}
 
       {/* 5. Dúvidas do pack, com schema. Branco: alterna com o verde da secção 4. */}
-      <ServiceFAQ faqs={faqs} heading={`Perguntas sobre o ${pack.name.toLowerCase()} ${cityPrep(city.name)} ${city.name}`} variant="light" />
+      <ServiceFAQ faqs={faqs} heading={`Perguntas sobre a ${pack.name.toLowerCase()} ${cityPrep(city.name)} ${city.name}`} variant="light" />
 
       {/* 6. Onde ir a seguir, sem deixar a página sem saída. Mesma estrutura e paleta da secção "Áreas de serviço" (ServiceCityLinks): cabeçalho editorial e linhas em acordeão (pedido do dono, 2026-09-24). */}
       {(() => {

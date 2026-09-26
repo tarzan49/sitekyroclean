@@ -1,10 +1,8 @@
 import QuizEstimate from '@/components/quiz/QuizEstimate';
 import QuizFurnitureImage from '@/components/quiz/QuizFurnitureImage';
 import { WaterproofingTierPicker } from "@/components/quiz/steps/WaterproofingTierPicker";
-import { lazy, Suspense, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useState } from "react";
 import { carpetAllItemsValid } from "@/components/quiz/quizHelpers";
-const SofaPackPreview = lazy(() => import("@/components/SofaPackPreview"));
 import { Minus, Plus, ChevronRight, MapPin, ShieldCheck } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { usePriceWidgetState } from "@/hooks/use-price-widget";
@@ -24,9 +22,6 @@ interface Props {
 }
 
 export default function PriceWidget({ serviceSlug, initialLocation }: Props) {
-  const { search } = useLocation();
-  const isPackPreview = import.meta.env.DEV && new URLSearchParams(search).get('teste') === 'pack' && serviceSlug === 'limpeza-sofas';
-  const [showPackPreview, setShowPackPreview] = useState(false);
   const rows = PRICE_TABLE[serviceSlug];
   const { isQuizOpen, openQuiz, closeQuiz } = useQuizLauncher();
   const [activeConfig, setActiveConfig] = useState<PriceRowQuizConfig | null>(null);
@@ -39,10 +34,6 @@ export default function PriceWidget({ serviceSlug, initialLocation }: Props) {
   const isWaterproofService = serviceSlug === 'impermeabilizacao';
 
   const handleContinue = () => {
-    if (isPackPreview) {
-      if ((w.rowQuantities[3] ?? 0) === 0) setShowPackPreview(true);
-      return;
-    }
     const config = w.buildConfig();
     if (!config) return;
     setActiveConfig(config);
@@ -53,11 +44,11 @@ export default function PriceWidget({ serviceSlug, initialLocation }: Props) {
   // 2026-09-08): ao clicar "Continuar", essa escolha faz-se no ecrã de upsell
   // dedicado que o próprio quiz já mostra a seguir às quantidades — nunca
   // duplicar a mesma decisão em dois sítios.
-  const total = calcWidgetTotal(serviceSlug, w.rowQuantities, w.chaiseLongueAddon, new Set(), w.addonTier);
+  const total = calcWidgetTotal(serviceSlug, w.rowQuantities, w.addonTier);
   const travelFee = initialLocation ? (locationPrices[initialLocation] ?? 10) : 0;
   const pricing = calcWidgetPricing(total, travelFee);
   const incompleteMeasures = Object.values(w.carpetItemsByRow).some(items => !carpetAllItemsValid(items));
-  const hasSelection = total > 0 || Object.values(w.rowQuantities).some(q => q > 0) || w.chaiseLongueAddon > 0;
+  const hasSelection = total > 0 || Object.values(w.rowQuantities).some(q => q > 0);
 
   const hasUnpricedSelection = quizConfigs.some((cfg, i) => cfg && (w.rowQuantities[i] ?? 0) > 0 && (
     cfg.service === 'carpet' || cfg.sofaSizeId === '4+-lugares' ||
@@ -103,8 +94,8 @@ export default function PriceWidget({ serviceSlug, initialLocation }: Props) {
         {(!isWaterproofService || w.tierChosen) && rows.map((row, i) => {
           const quizConfig = quizConfigs[i] ?? null;
 
-          // Linhas sem quizConfig (ex. chaise longue) não têm equivalente real
-          // no quiz — pedido explícito 2026-09-08 para não as mostrar aqui.
+          // Uma linha sem quizConfig não tem equivalente no quiz e não se mostra
+          // aqui (pedido explícito 2026-09-08).
           if (!quizConfig) return null;
 
           const qty = w.rowQuantities[i] ?? 0;
@@ -227,11 +218,6 @@ export default function PriceWidget({ serviceSlug, initialLocation }: Props) {
         <p className="flex justify-center items-center gap-2 text-sm mt-3 text-white/80"><ShieldCheck className="w-4 h-4" />Gratuito e sem compromisso</p>
       </div>
 
-      {isPackPreview && showPackPreview && <Suspense fallback={<p className="p-4 text-white">A abrir oferta…</p>}><SofaPackPreview
-        base={total} travel={travelFee} city={initialLocation ?? 'Lisboa'}
-        items={rows.flatMap((row, index) => (w.rowQuantities[index] ?? 0) > 0 ? [`${w.rowQuantities[index]} × ${row.item}`] : [])}
-        onClose={() => setShowPackPreview(false)}
-      /></Suspense>}
       {activeConfig && (
         <QuizFormLazy
           isOpen={isQuizOpen}

@@ -34,7 +34,7 @@ function payload(form: Partial<QuizFormData>, sofas: SofaItem[] = [], mattresses
     service: data.service, serviceType: data.serviceType, waterproofingTier: data.waterproofingTier, serviceLabel: data.service,
     serviceTypeLabel: data.serviceType, crmServiceLabel: data.service, detailsSummary: '', priceText: '', message: '',
     sofaItems: sofas, mattressItems: mattresses, carpetItems: carpets, upsellItems: extras, chairQuantity: data.chairQuantity,
-    chairWaterproofQty: data.chairWaterproofQty, chairAntiAcaros: data.chairAntiAcaros, hypoallergenic: false, hypoSurcharge: 0, slotLabel: '', description: 'Campainha B & acesso pelo pátio' };
+    chairWaterproofQty: data.chairWaterproofQty, chairAntiAcaros: data.chairAntiAcaros, sofaAntiAcaros: data.sofaAntiAcaros, hypoallergenic: false, hypoSurcharge: 0, slotLabel: '', description: 'Campainha B & acesso pelo pátio' };
   p.detailsSummary = buildReceiptLines(p).map(l => `${l.qty}x ${l.label}: ${l.total ?? 'Sob orçamento'}`).join('\n');
   p.priceText = formatQuotePrice(p);
   p.message = `Detalhes: ${p.detailsSummary}\nEstimativa: ${p.priceText}\nObservações: ${p.description}`;
@@ -45,11 +45,12 @@ const cases: Array<[string, Partial<QuizFormData>, SofaItem[], MattressItem[], U
 const extras: UpsellItemConfig[][] = [[], [{ id: 'mattress-casal', mattressSize: 'casal', qty: 1, price: 69, label: '1x Colchão Casal' }], [{ id: 'carpet', qty: 1, price: 0, label: 'Tapete', carpetItems: [{ id: 'r', largura: '2', comprimento: '4' }] }]];
 for (const location of ['Lisboa', 'Barcelos', 'Lagos', 'Monchique']) {
   for (const opt of sofaPrices) for (const serviceType of ['cleaning', 'waterproofing'] as const) for (const waterproofingTier of ['essencial', 'premium'] as const) for (const packEnabled of [false, true]) for (const qty of [1, 2, 9]) for (const extra of extras)
-    cases.push([`sofa ${opt.id}/${serviceType}/${waterproofingTier}/${packEnabled}/${qty}/${location}/${extra.length ? extra[0].id : 'none'}`, { service: 'sofa', serviceType, waterproofingTier, location }, [{ sizeId: opt.id, qty, packEnabled }], [], extra]);
+    for (const sofaAntiAcaros of [false, true])
+      cases.push([`sofa ${opt.id}/${serviceType}/${waterproofingTier}/${packEnabled}/${qty}/${location}/${extra.length ? extra[0].id : 'none'}/${sofaAntiAcaros ? 'anti' : 'no-anti'}`, { service: 'sofa', serviceType, waterproofingTier, location, sofaAntiAcaros }, [{ sizeId: opt.id, qty, packEnabled }], [], extra]);
   for (const opt of mattressPrices) for (const packEnabled of [false, true]) for (const qty of [1, 2, 9]) for (const extra of extras)
     cases.push([`mattress ${opt.id}/${packEnabled}/${qty}/${location}/${extra.length ? extra[0].id : 'none'}`, { service: 'mattress', serviceType: 'cleaning', location }, [], [{ sizeId: opt.id, qty, packEnabled }], extra]);
-  for (const qty of [1, 4, 5, 6, 7, 9, 10, 11]) for (const serviceType of ['cleaning', 'waterproofing'] as const) for (const waterproofingTier of ['essencial', 'premium'] as const) for (const addon of ['none', 'waterproof', 'anti'] as const)
-    cases.push([`chairs ${qty}/${serviceType}/${waterproofingTier}/${addon}/${location}`, { service: 'chairs', serviceType, waterproofingTier, chairQuantity: String(qty), chairWaterproofQty: addon === 'waterproof' ? qty : 0, chairAntiAcaros: addon === 'anti', location }, [], [], []]);
+  for (const qty of [1, 4, 5, 6, 7, 9, 10, 11]) for (const serviceType of ['cleaning', 'waterproofing'] as const) for (const waterproofingTier of ['essencial', 'premium'] as const) for (const addon of ['none', 'waterproof', 'anti', 'both-flags'] as const)
+    cases.push([`chairs ${qty}/${serviceType}/${waterproofingTier}/${addon}/${location}`, { service: 'chairs', serviceType, waterproofingTier, chairQuantity: String(qty), chairWaterproofing: addon === 'waterproof' || addon === 'both-flags', chairWaterproofQty: addon === 'waterproof' || addon === 'both-flags' ? qty : 0, chairAntiAcaros: addon === 'anti' || addon === 'both-flags', location }, [], [], []]);
   cases.push([`carpet ${location}`, { service: 'carpet', serviceType: 'cleaning', location }, [], [], extras[1]]);
 }
 
@@ -176,4 +177,21 @@ it('uses the persisted server reference after a duplicate response', async () =>
   expect(result.bookingId).toBe('REAL1234');
   expect(JSON.parse(sessionStorage.getItem('kyro_receipt')!).bookingId).toBe('REAL1234');
   expect(new URL(sessionStorage.getItem('kyro_wa_url')!).searchParams.get('text')).toContain('#REAL1234');
+});
+
+describe('anti-acaros reaches the lead', () => {
+  it('names the sofa treatment and its price in the receipt', () => {
+    const p = payload({ service: 'sofa', serviceType: 'cleaning', sofaAntiAcaros: true }, [{ sizeId: '3-lugares', qty: 2, packEnabled: true, packQty: 1 }]);
+    const lines = buildReceiptLines(p);
+    expect(lines).toContainEqual({ label: 'Sofá 3 Lugares + Anti-ácaros', qty: 1, unitPrice: 129, total: 129 });
+    expect(lines).toContainEqual({ label: 'Sofá 3 Lugares', qty: 1, unitPrice: 79, total: 79 });
+    expect(p.calculateServicePrice).toBe(208);
+  });
+  it('shows the chair treatment at its unit rate and never with the waterproofing', () => {
+    const anti = buildReceiptLines(payload({ service: 'chairs', serviceType: 'cleaning', chairQuantity: '4', chairAntiAcaros: true }));
+    expect(anti).toContainEqual({ label: 'Anti-ácaros Cadeiras (5€/un.)', qty: 4, unitPrice: 5, total: 20 });
+    const both = buildReceiptLines(payload({ service: 'chairs', serviceType: 'cleaning', chairQuantity: '4', chairAntiAcaros: true, chairWaterproofing: true, chairWaterproofQty: 4 }));
+    expect(both.some(line => /anti-ácaros/i.test(line.label))).toBe(false);
+    expect(both.some(line => /incluídos/.test(line.label))).toBe(false);
+  });
 });

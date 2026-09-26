@@ -6,6 +6,7 @@ import Footer from "@/components/Footer";
 import ServiceCityLinks from "@/components/ServiceCityLinks";
 import ServiceFAQ from "@/components/ServiceFAQ";
 import ServiceSchema from "@/components/ServiceSchema";
+import { getPillarPage } from "@/data/pillarPages";
 import ServiceHero from "@/components/ServiceHero";
 import ServiceExamplesGallery from "@/components/ServiceExamplesGallery";
 import ServiceExpertTips from "@/components/ServiceExpertTips";
@@ -60,20 +61,18 @@ const expertTips: ExpertTip[] = [
   },
 ];
 
-const LimpezaAlcatifas = () => {
-  const faqs = [
-    { question: 'A limpeza profunda substitui a aspiração do dia a dia?', answer: 'Não. A aspiração regular é essencial para remover o pó superficial. A nossa limpeza profunda atua onde o aspirador não chega: fibras internas, manchas entranhadas, resíduos de sujidade e gordura acumulada.' },
-    { question: 'A alcatifa pode encolher, ondular ou descolar com a limpeza?', answer: 'Usamos equipamentos adequados para alcatifas fixas, com controlo de humidade e extração forte, evitando excesso de água. Em condições normais, a alcatifa não encolhe nem ondula. Se houver alguma fragilidade estrutural prévia, sinalizamos antes.' },
-    { question: 'A limpeza ajuda mesmo em casos de alergias e má qualidade do ar?', answer: 'Sim. As alcatifas funcionam como "filtros" que retêm pó, ácaros e partículas. Quando não são limpas, tudo isso volta ao ar a cada passo. A limpeza profunda reduz estes agentes, contribuindo para um ambiente mais saudável, especialmente em casas com crianças, idosos ou pessoas alérgicas.' },
-  ];
+// Título, h1, FAQs e schema vêm de src/data/pillarPages.ts, a mesma fonte do
+// PageHead e do HTML estático (scripts/prerender.ts).
+const pillar = getPillarPage('/limpeza-alcatifas');
 
+const LimpezaAlcatifas = () => {
   return (
     <QuizServiceProvider value="carpet">
     <>
       <Header />
       <main>
         <ServiceHero
-          title="Higienização Profissional de Alcatifas"
+          title={pillar.h1}
           serviceSlug="limpeza-alcatifas"
         />
         <ServicePriceSection serviceSlug="limpeza-alcatifas" />
@@ -93,14 +92,15 @@ const LimpezaAlcatifas = () => {
           items={alcatifasGuarantee}
           variant="dark"
         />
-        <ServiceFAQ faqs={faqs} heading="Perguntas Frequentes" variant="light" />
+        <ServiceFAQ faqs={pillar.faqs} heading="Perguntas Frequentes" variant="light" />
         <ServiceExpertTips tips={expertTips} variant="dark" />
-        <ServiceCityLinks serviceSlug="limpeza-alcatifas" serviceLabel="Limpeza de Alcatifas" />
+        <ServiceCityLinks serviceSlug="limpeza-alcatifas" serviceLabel={pillar.serviceName} />
         <ServiceSchema
-          serviceName="Limpeza de Alcatifas"
-          description="Limpeza profissional de alcatifas no Porto. Remoção de sujidade profunda."
-          url="/limpeza-alcatifas"
-          priceFrom="Sob orçamento"
+          serviceName={pillar.serviceName}
+          description={pillar.description}
+          url={pillar.path}
+          priceFrom={pillar.priceFrom}
+          breadcrumbLabel={pillar.breadcrumbLabel}
         />
       </main>
       <Footer />

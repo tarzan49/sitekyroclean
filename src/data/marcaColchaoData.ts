@@ -12,9 +12,6 @@ export interface MarcaColchao {
   cleaningProcess: string;
   doNots: string[];
   doThis: string[];
-  estimatedPriceRange: string;
-  minPrice: number;
-  maxPrice: number;
   serviceSlug: string;
   faqs: { question: string; answer: string }[];
 }
@@ -35,9 +32,6 @@ export const marcasColchao: MarcaColchao[] = [
       "Tratamos os dois lados do colchão com extração profissional, removendo ácaros e sujidade que a aspiração doméstica não alcança",
       "Usamos vapor de baixa humidade calibrado para colchões de espuma IKEA, sem comprometer a garantia do produto",
     ],
-    estimatedPriceRange: "59€ - 79€",
-    minPrice: 59,
-    maxPrice: 79,
     serviceSlug: "limpeza-colchoes",
     faqs: [
       { question: "O colchão IKEA de espuma pode ser lavado a vapor?", answer: "Sim. Usamos vapor de baixa humidade calibrado especificamente para não saturar a espuma viscoelástica. O processo remove sujidade e ácaros sem comprometer a estrutura do núcleo." },
@@ -60,9 +54,6 @@ export const marcasColchao: MarcaColchao[] = [
       "Adaptamos a técnica ao tipo de núcleo, espuma ou molas, de cada modelo Conforama, sem margem de erro",
       "Devolvemos o colchão pronto a usar em poucas horas, sem interromper a sua rotina",
     ],
-    estimatedPriceRange: "59€ - 79€",
-    minPrice: 59,
-    maxPrice: 79,
     serviceSlug: "limpeza-colchoes",
     faqs: [
       { question: "Todos os colchões da Conforama respondem bem à limpeza profissional?", answer: "Sim, o processo adapta-se ao tipo de núcleo (espuma ou molas), mas a técnica de extração a vapor no tecido exterior é semelhante em toda a gama." },
@@ -85,9 +76,6 @@ export const marcasColchao: MarcaColchao[] = [
       "Preservamos o tratamento anti-ácaros de fábrica com produtos de pH neutro certificados",
       "Renovamos a eficácia do tratamento Molaflex original em vez de o substituir por químicos agressivos",
     ],
-    estimatedPriceRange: "59€ - 79€",
-    minPrice: 59,
-    maxPrice: 79,
     serviceSlug: "limpeza-colchoes",
     faqs: [
       { question: "A limpeza remove o tratamento anti-ácaros de fábrica do Molaflex?", answer: "Não. Usamos produtos de pH neutro compatíveis, sem agentes agressivos que degradem o tratamento anti-ácaros original do tecido." },
@@ -110,9 +98,6 @@ export const marcasColchao: MarcaColchao[] = [
       "Mantemos a respirabilidade do tecido Pikolin com vapor de baixa humidade, sem obstruir os poros",
       "Preservamos o suporte ortopédico do núcleo, prolongando o desempenho e o conforto do colchão",
     ],
-    estimatedPriceRange: "59€ - 79€",
-    minPrice: 59,
-    maxPrice: 79,
     serviceSlug: "limpeza-colchoes",
     faqs: [
       { question: "O tecido respirável do Pikolin precisa de cuidados especiais?", answer: "Sim, usamos vapor de baixa humidade e evitamos produtos que obstruam os poros do tecido, para preservar a respirabilidade original." },
@@ -135,9 +120,6 @@ export const marcasColchao: MarcaColchao[] = [
       "Usamos produtos biodegradáveis e de pH neutro, alinhados com a filosofia sustentável Colmol",
       "Preservamos as propriedades hipoalergénicas das fibras naturais e recicladas em cada limpeza",
     ],
-    estimatedPriceRange: "59€ - 79€",
-    minPrice: 59,
-    maxPrice: 79,
     serviceSlug: "limpeza-colchoes",
     faqs: [
       { question: "Os produtos usados na limpeza são compatíveis com as fibras naturais do Colmol?", answer: "Sim. Usamos produtos biodegradáveis e de pH neutro, próprios para tecidos naturais e reciclados, sem comprometer as propriedades hipoalergénicas do colchão." },
@@ -160,9 +142,6 @@ export const marcasColchao: MarcaColchao[] = [
       "Tratamos as fibras naturais com produtos suaves que preservam a qualidade Mindol",
       "Removemos suor e resíduos com um processo adequado ao material do colchão",
     ],
-    estimatedPriceRange: "59€ - 79€",
-    minPrice: 59,
-    maxPrice: 79,
     serviceSlug: "limpeza-colchoes",
     faqs: [
       { question: "A limpeza profissional é segura para as fibras naturais do Mindol?", answer: "Sim. Usamos produtos suaves e de pH neutro, próprios para fibras naturais, sem comprometer a qualidade ou durabilidade do material." },

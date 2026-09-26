@@ -1,6 +1,8 @@
 import { CHAIR_WATERPROOF_ESSENTIAL, CHAIR_WATERPROOF_PREMIUM } from '../../constants/chairPricing';
+import { sofaAntiAcarosPrice, chairAntiAcarosTotal } from '../../constants/antiAcarosPricing';
+import { priceWithPackPerks, perkChairsFree, type PerkLineInput } from '../../constants/packPerks';
 import { sofaPrices, mattressPrices } from './QuizTypes';
-import type { SofaItem, MattressItem, CarpetItem, PriceOption } from './QuizTypes';
+import type { SofaItem, MattressItem, CarpetItem, PriceOption, QuizFormData } from './QuizTypes';
 
 // Undefined packQty preserves legacy all-or-nothing selections.
 export function treatmentQty(item: SofaItem | MattressItem): number {
@@ -115,6 +117,71 @@ export function calcPackPricing(
   return { isSob, basePrice, packPrice, packDelta, displayPrice };
 }
 
+// ── Preço por unidade, com o tratamento escolhido ─────────────────────────────
+// Usados pelos totais do quiz (use-quiz-pricing.ts), pelo recibo
+// (submissionService.ts), pelos ecrãs do quiz e pelo configurador de packs
+// (lib/customPack.ts). Uma só conta para os quatro sítios.
+
+type Tier = 'essencial' | 'premium';
+
+/** Sofá: `treated` = esta unidade leva o tratamento. Com a limpeza como
+ * serviço principal, o tratamento é impermeabilização (pack, pelo `tier`) ou
+ * anti-ácaros (`antiAcaros`); com a impermeabilização como serviço
+ * principal, o "tratamento" é a higienização acrescentada. */
+export function calcSofaUnitPrice(option: PriceOption, treated: boolean, serviceType: string, tier: Tier, antiAcaros: boolean): number | null {
+  if (treated && antiAcaros && serviceType !== 'waterproofing') {
+    const extra = sofaAntiAcarosPrice(option.id);
+    return typeof option.cleaningPrice === 'number' && extra !== null ? option.cleaningPrice + extra : null;
+  }
+  return calcPackPricing(option, treated, serviceType === 'waterproofing', null, tier).displayPrice;
+}
+
+/** Colchão: `treated` = limpeza + anti-ácaros (bothPrice). */
+export function calcMattressUnitPrice(option: PriceOption, treated: boolean, serviceType: string): number | null {
+  const price = treated ? option.bothPrice : serviceType === 'waterproofing' ? option.waterproofingPrice : option.cleaningPrice;
+  return typeof price === 'number' ? price : null;
+}
+
+/** Quantas cadeiras levam anti-ácaros. Uma só regra para o total e para o
+ * recibo: só com a limpeza como serviço principal e nunca junto com a
+ * impermeabilização (chairWaterproofQty é o que o preço lê). */
+interface ChairTreatmentState { serviceType: string; chairAntiAcaros: boolean; chairWaterproofQty: number; chairQuantity: string }
+
+export function chairAntiAcarosQty(form: ChairTreatmentState): number {
+  const qty = parseInt(form.chairQuantity);
+  if (!form.chairAntiAcaros || form.serviceType === 'waterproofing' || form.chairWaterproofQty > 0) return 0;
+  return Number.isSafeInteger(qty) && qty > 0 ? qty : 0;
+}
+
+export function calcChairAntiAcaros(form: ChairTreatmentState): number {
+  return chairAntiAcarosTotal(chairAntiAcarosQty(form)) ?? 0;
+}
+
+/** "Tipo" do pedido, com o tratamento escolhido: vai na mensagem, no
+ * `service_type` do CRM e no WhatsApp de recurso. */
+export function quizServiceTypeLabel(
+  form: Pick<QuizFormData, 'service' | 'serviceType' | 'waterproofingTier' | 'sofaAntiAcaros' | 'chairAntiAcaros' | 'chairWaterproofQty' | 'chairQuantity'>,
+  sofaItems: SofaItem[],
+  mattressItems: MattressItem[],
+): string {
+  const tierLabel = form.waterproofingTier === 'premium' ? 'Impermeabilização Premium' : 'Impermeabilização Essencial';
+  const sofaTreated = sofaItems.some(i => treatmentQty(i) > 0);
+  const mattressTreated = mattressItems.some(i => treatmentQty(i) > 0);
+  if (form.serviceType === 'waterproofing') {
+    if (form.service === 'mattress') return 'Desbacterização e Anti Ácaros';
+    const withCleaning = (form.service === 'sofa' && sofaTreated) || (form.service === 'chairs' && form.chairWaterproofQty > 0);
+    return `${tierLabel}${withCleaning ? ' + Higienização Profunda' : ''}`;
+  }
+  if (form.serviceType === 'both') return form.service === 'mattress' ? 'Pack: Limpeza + Desbacterização e Anti Ácaros' : 'Pack Proteção Total';
+  if (form.serviceType !== 'cleaning') return '';
+  const treatment = form.service === 'sofa' && sofaTreated ? (form.sofaAntiAcaros ? 'Anti-ácaros' : tierLabel)
+    : form.service === 'chairs' && form.chairWaterproofQty > 0 ? tierLabel
+    : form.service === 'chairs' && chairAntiAcarosQty(form) > 0 ? 'Anti-ácaros'
+    : form.service === 'mattress' && mattressTreated ? 'Desbacterização e Anti Ácaros'
+    : null;
+  return `Higienização Profunda${treatment ? ` + ${treatment}` : ''}`;
+}
+
 // ── Chairs ────────────────────────────────────────────────────────────────────
 // Bracket pricing: 1-4 @ 20€ · 5-6 @ 15€ · 7-9 @ 12.5€ · 10+: sob orçamento
 // — limiar alinhado com calcChairWaterproof(Premium) 2026-08-31: 10 cadeiras
@@ -144,4 +211,69 @@ export function fmtN(n: number): string {
 
 export function carpetAllItemsValid(items: CarpetItem[]): boolean {
   return items.length > 0 && items.every(i => carpetItemArea(i) !== null);
+}
+
+// ── Extras do ecrã "Aproveite a mesma visita" ─────────────────────────────────
+// O ecrã de extras do quiz monta aqui as suas linhas e passa-as à regra do
+// pack (priceWithPackPerks, em constants/packPerks.ts), a mesma que o
+// configurador de packs usa. O serviço principal fica ao preço de tabela; os
+// extras são sempre de outra categoria (o ecrã esconde a do serviço principal).
+
+export interface ComboExtrasInput {
+  primaryService: string;
+  /** Preço de tabela do serviço principal, já com o tratamento escolhido. */
+  primaryTablePrice: number;
+  mattressQty: Record<string, number>;
+  sofaQty: Record<string, number>;
+  chairsQty: number;
+  /** Cadeiras que chegaram do widget de preços já com impermeabilização. */
+  chairsWaterproofTier?: Tier | null;
+  rugCount: number;
+}
+
+export interface ComboExtrasPricing {
+  eligible: boolean;
+  mattress: Record<string, { table: number; amount: number }>;
+  sofa: Record<string, { table: number | null; amount: number | null }>;
+  chairs: { table: number | null; amount: number | null; free: number };
+  rugPerk: boolean;
+}
+
+// No quiz, "carpet" é o tapete (ou a alcatifa) como serviço principal.
+const QUIZ_MAIN_KIND: Record<string, string> = { carpet: 'rug' };
+
+export function priceComboExtras(input: ComboExtrasInput): ComboExtrasPricing {
+  const mainKind = QUIZ_MAIN_KIND[input.primaryService] ?? input.primaryService;
+  const lines: PerkLineInput[] = [{ kind: mainKind, qty: 1, tablePrice: input.primaryTablePrice }];
+  const at: { mattress: Record<string, number>; sofa: Record<string, number>; chairs: number; rug: number } = { mattress: {}, sofa: {}, chairs: -1, rug: -1 };
+  mattressPrices.forEach(opt => {
+    const qty = input.mattressQty[opt.id] ?? 0;
+    if (qty <= 0 || typeof opt.cleaningPrice !== 'number') return;
+    at.mattress[opt.id] = lines.push({ kind: 'mattress', sizeId: opt.id, qty, tablePrice: qty * opt.cleaningPrice }) - 1;
+  });
+  sofaPrices.forEach(opt => {
+    const qty = input.sofaQty[opt.id] ?? 0;
+    if (qty <= 0) return;
+    at.sofa[opt.id] = lines.push({ kind: 'sofa', sizeId: opt.id, qty, tablePrice: typeof opt.cleaningPrice === 'number' ? qty * opt.cleaningPrice : null }) - 1;
+  });
+  if (input.chairsQty > 0) {
+    const tier = input.chairsWaterproofTier ?? null;
+    const table = tier === 'premium' ? calcChairWaterproofPremium(input.chairsQty) : tier === 'essencial' ? calcChairWaterproof(input.chairsQty) : calcChairClean(input.chairsQty);
+    at.chairs = lines.push({ kind: 'chairs', qty: input.chairsQty, tablePrice: table, treatment: tier ? 'waterproofing' : 'none' }) - 1;
+  }
+  if (input.rugCount > 0) at.rug = lines.push({ kind: 'rug', qty: input.rugCount, tablePrice: null }) - 1;
+
+  const priced = priceWithPackPerks(lines, mainKind);
+  const chairsLine = at.chairs >= 0 ? priced.lines[at.chairs] : null;
+  return {
+    eligible: priced.eligible,
+    mattress: Object.fromEntries(Object.entries(at.mattress).map(([id, i]) => [id, { table: priced.lines[i].tablePrice!, amount: priced.lines[i].amount! }])),
+    sofa: Object.fromEntries(Object.entries(at.sofa).map(([id, i]) => [id, { table: priced.lines[i].tablePrice, amount: priced.lines[i].amount }])),
+    chairs: {
+      table: chairsLine?.tablePrice ?? null,
+      amount: chairsLine?.amount ?? null,
+      free: chairsLine?.perkApplied ? perkChairsFree(input.chairsQty) : 0,
+    },
+    rugPerk: at.rug >= 0 ? priced.lines[at.rug].perkNote !== null : priced.eligible && mainKind !== 'rug',
+  };
 }

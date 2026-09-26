@@ -26,7 +26,7 @@ import {
   getMaterialCityData,
   getRelatedMaterialLinks,
 } from "@/data/materialSeoData";
-import { cities, services, DEFAULT_PRICE_FROM, cityPrep } from "@/data/serviceCatalog";
+import { cities, services, cityPrep } from "@/data/serviceCatalog";
 import { SITE_URL, WHATSAPP_BASE } from "@/constants/business";
 import ServiceReviewsGrid from "@/components/ServiceReviewsGrid";
 import { buildMaterialWaMessage } from "@/lib/whatsappMessages";
@@ -35,7 +35,7 @@ import {
   buildWebPageNode,
   buildBreadcrumbNode,
   buildServiceNode,
-  buildOfferNode,
+  offerForPriceLabel,
   DEFAULT_AREA_SERVED,
 } from "@/lib/seoSchema";
 
@@ -62,8 +62,9 @@ const MaterialPage = () => {
   const quizService = data ? SERVICE_TO_QUIZ[data.serviceSlug] : undefined;
 
   const servicePrice = useMemo(() => {
-    if (!data) return DEFAULT_PRICE_FROM;
-    return services.find(s => s.slug === data.serviceSlug)?.priceFrom ?? DEFAULT_PRICE_FROM;
+    // Sem serviço, sem preço: nunca um valor por omissão inventado.
+    if (!data) return "Sob orçamento";
+    return services.find(s => s.slug === data.serviceSlug)?.priceFrom ?? "Sob orçamento";
   }, [data]);
 
   useEffect(() => {
@@ -243,7 +244,7 @@ const MaterialPage = () => {
               name: data.title,
               description: data.metaDescription,
               areaServed: isCityVariant && cityName ? { "@type": "City", name: cityName } : DEFAULT_AREA_SERVED,
-              ...(servicePrice.replace(/[^0-9]/g, "") && { offers: buildOfferNode(servicePrice.replace(/[^0-9]/g, "")) }),
+              offers: offerForPriceLabel(servicePrice),
             }),
           ],
         }) }} />

@@ -5,7 +5,7 @@ import { ChevronLeft, Bug, Plus, Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { mattressPrices } from '@/components/quiz/QuizTypes';
 import type { QuizFormData, MattressItem } from '@/components/quiz/QuizTypes';
-import { calcPackPricing } from '@/components/quiz/quizHelpers';
+import { mattressAntiAcarosPrice } from '@/constants/antiAcarosPricing';
 
 interface QuizMattressAddonUpsellProps {
   formData: QuizFormData;
@@ -28,11 +28,12 @@ const QuizMattressAddonUpsell = ({ mattressItems, setMattressItems, onContinue, 
   // tamanho continuava a mostrar a gama inteira dos outros colchões do pedido,
   // nunca o preço exato do que ficou selecionado.
   const priceRelevantItems = anyOn ? activeItems.filter(i => i.packEnabled && (i.packQty ?? 0) > 0) : activeItems;
+  // Mesmo acréscimo que o total e o configurador de packs cobram
+  // (constants/antiAcarosPricing.ts).
   const addonPrices = priceRelevantItems.flatMap(item => {
     const option = mattressPrices.find(p => p.id === item.sizeId);
-    if (!option) return [];
-    const pack = calcPackPricing(option, true, false, 30);
-    return pack.isSob || pack.packDelta === null ? [] : [pack.packDelta];
+    const price = option ? mattressAntiAcarosPrice(option) : null;
+    return price === null ? [] : [price];
   });
   const addonPriceLabel = addonPrices.length === 0 ? 'Sob orçamento'
     : Math.min(...addonPrices) === Math.max(...addonPrices)

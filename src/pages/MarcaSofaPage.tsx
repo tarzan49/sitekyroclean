@@ -16,7 +16,8 @@ import ServiceSnapshotStats from "@/components/ServiceSnapshotStats";
 import ServicePriceSection from "@/components/ServicePriceSection";
 import ServiceAutoCarousel from "@/components/ServiceAutoCarousel";
 import ServiceFAQ from "@/components/ServiceFAQ";
-import { getAllMarcaSofaRoutes, getMarcaByCityAndSlug } from "@/data/marcaSofaData";
+import { getAllMarcaSofaRoutes, getMarcaByCityAndSlug, marcas } from "@/data/marcaSofaData";
+import { marcaPageCopy, otherMarcaLinks, MARCA_PROCESS_STEPS } from "@/data/marcaCities";
 import { cityPrep } from "@/data/serviceCatalog";
 import { SITE_URL, WHATSAPP_BASE, REVIEW_RATING, REVIEW_COUNT } from "@/constants/business";
 import { SERVICE_DURATION } from "@/constants/problemCardHelpers";
@@ -24,6 +25,7 @@ import {
   buildWebPageNode,
   buildBreadcrumbNode,
   buildServiceNode,
+  offerForPriceLabel,
 } from "@/lib/seoSchema";
 import imgPele        from "@/assets/hero-p-limpeza-sofa-pele.webp";
 import imgVeludo      from "@/assets/hero-p-limpeza-sofa-veludo.webp";
@@ -47,12 +49,9 @@ const MARCA_HERO: Record<string, string> = {
   "moviflor":        imgStd,        // poliéster e tecido resistente
 };
 
-const PROCESS_STEPS = [
-  { icon: Search,      label: "01", title: "Inspeção do tecido", desc: "Avaliação do material, estado das fibras e manchas antes de qualquer intervenção." },
-  { icon: Droplets,    label: "02", title: "Pré-tratamento", desc: "Aplicação de produto específico para dissolver manchas e sujidade incrustada." },
-  { icon: ShieldCheck, label: "03", title: "Extração profissional", desc: "Limpeza em profundidade com equipamento de vapor e água quente calibrado ao tecido." },
-  { icon: Wind,        label: "04", title: "Verificação final", desc: "Inspecção do resultado, escovagem e recolocação das almofadas." },
-];
+// Texto dos passos em marcaCities.ts, o mesmo que o HTML estático escreve.
+const PROCESS_ICONS = [Search, Droplets, ShieldCheck, Wind];
+const PROCESS_STEPS = MARCA_PROCESS_STEPS.sofa.map((step, index) => ({ ...step, icon: PROCESS_ICONS[index] ?? Search, label: String(index + 1).padStart(2, "0") }));
 
 const MarcaSofaPage = () => {
   const { pathname } = useLocation();
@@ -64,8 +63,11 @@ const MarcaSofaPage = () => {
   }, [pathname]);
 
   const pageUrl = `${SITE_URL}${pathname}`;
-  const pageTitle = data ? `Limpeza Sofá ${data.marca.name} ${cityPrep(data.city.name)} ${data.city.name}, Especialistas | Kyro Clean` : '';
-  const pageDesc = data ? `Especialistas em limpeza de sofás ${data.marca.name} ${cityPrep(data.city.name)} ${data.city.name}. ${data.marca.material}. ${data.marca.estimatedPriceRange}. Serviço ao domicílio.` : '';
+  // Título, descrição, <h1>, migalha e preço: os mesmos que o scripts/prerender.ts
+  // escreve no HTML estático (marcaPageCopy em marcaCities.ts).
+  const copy = data ? marcaPageCopy('sofa', data.marca, data.city) : null;
+  const pageTitle = copy?.title ?? '';
+  const pageDesc = copy?.description ?? '';
 
   useEffect(() => {
     if (!data) return;
@@ -92,6 +94,7 @@ const MarcaSofaPage = () => {
   }
 
   const { marca, city } = data;
+  const pageCopy = copy!;
   const prep = cityPrep(city.name);
   const heroImg = MARCA_HERO[marca.slug] ?? heroSofa;
 
@@ -110,25 +113,16 @@ const MarcaSofaPage = () => {
       buildWebPageNode({ url: pageUrl, name: pageTitle, description: pageDesc }),
       buildBreadcrumbNode(`${pageUrl}#breadcrumb`, [
         { name: "Início", item: `${SITE_URL}/` },
-        { name: "Limpeza de Sofás", item: `${SITE_URL}/limpeza-sofas` },
-        { name: `Sofá ${marca.name} ${prep} ${city.name}`, item: pageUrl },
+        { name: pageCopy.serviceName, item: `${SITE_URL}${pageCopy.serviceBaseRoute}` },
+        { name: pageCopy.breadcrumbName, item: pageUrl },
       ]),
       buildServiceNode({
         url: pageUrl,
-        name: `Limpeza de Sofá ${marca.name} ${prep} ${city.name}`,
+        name: pageCopy.h1,
         description: pageDesc,
         areaServed: { "@type": "City", name: city.name },
-        offers: {
-          "@type": "Offer",
-          "availability": "https://schema.org/InStock",
-          "areaServed": { "@type": "City", "name": city.name },
-          "priceSpecification": {
-            "@type": "PriceSpecification",
-            "minPrice": String(marca.minPrice),
-            "maxPrice": String(marca.maxPrice),
-            "priceCurrency": "EUR",
-          },
-        },
+        // O preço de partida do serviço no motor, sem máximo inventado por marca.
+        offers: offerForPriceLabel(pageCopy.priceFrom, { areaServed: { "@type": "City", name: city.name } }),
       }),
     ],
   };
@@ -142,7 +136,7 @@ const MarcaSofaPage = () => {
       <Header />
       <main>
 
-        <CommercialHero title={`Limpeza de Sofá ${marca.name} ${prep} ${city.name}`} serviceSlug="limpeza-sofas" city={city.name} price={`${marca.minPrice}€`} image={heroImg} whatsappHref={`${WHATSAPP_BASE}?text=${encodeURIComponent(buildQuoteWaMessage(`Olá! Gostaria de pedir um orçamento para limpeza de sofá ${marca.name} ${prep} ${city.name}.`))}`} source={`marca_hero_${marca.slug}`} />
+        <CommercialHero title={pageCopy.h1} serviceSlug="limpeza-sofas" city={city.name} price={pageCopy.priceFrom} breadcrumbs={[{ label: "Início", to: "/" }, { label: pageCopy.serviceName, to: pageCopy.serviceBaseRoute }, { label: pageCopy.breadcrumbName }]} image={heroImg} whatsappHref={`${WHATSAPP_BASE}?text=${encodeURIComponent(buildQuoteWaMessage(`Olá! Gostaria de pedir um orçamento para limpeza de sofá ${marca.name} ${prep} ${city.name}.`))}`} source={`marca_hero_${marca.slug}`} />
 
         {/* ═══ ORÇAMENTO (primeira secção a seguir ao hero) ═══ */}
         <ServicePriceSection serviceSlug="limpeza-sofas" initialLocation={city.name} />
@@ -184,6 +178,7 @@ const MarcaSofaPage = () => {
               overline="Como Trabalhamos"
               heading="O nosso processo de limpeza para o"
               goldWord={marca.name}
+              subtitle={marca.cleaningProcess}
             />
             <div className="grid sm:grid-cols-2 gap-px" style={{ backgroundColor: "#E8E4DE" }}>
               {PROCESS_STEPS.map((step) => {
@@ -229,28 +224,26 @@ const MarcaSofaPage = () => {
           <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
             <SectionHeader
               overline="Mais Opções"
-              heading="Outras marcas que limpamos em"
+              heading={`Outras marcas que limpamos ${prep}`}
               goldWord={city.name}
               subtitle={`Veja também a tabela completa de materiais e preços de limpeza de sofás ${prep} ${city.name}.`}
             />
             <Link
-              to={`/limpeza-sofas-${city.slug}`}
+              to={pageCopy.cityServiceHref}
               className="inline-flex items-center gap-1.5 text-sm font-semibold mb-8 hover:underline"
               style={{ color: "#D4AF37" }}
             >
-              Ver todos os materiais e preços em {city.name}
+              {pageCopy.cityServiceLabel}
               <ArrowRight className="w-3.5 h-3.5" />
             </Link>
             <DirectoryGroup title="Outras marcas de sofás">
-              {["ikea", "natuzzi", "kave-home", "leroy-merlin", "moviflor", "conforama", "el-corte-ingles", "roche-bobois"]
-                .filter(slug => slug !== marca.slug)
-                .map(slug => (
-                  <Link key={slug} to={`/limpeza-sofa-${slug}-${city.slug}`}
-                    className="inline-flex items-center gap-1.5 bg-white px-3.5 py-2 rounded-full text-sm font-medium text-[#111111] border border-[#E8E4DE] hover:border-[#D4AF37]/40 hover:bg-[#D4AF37]/5 hover:shadow-sm transition-all capitalize">
-                      <ArrowRight className="w-3 h-3" style={{ color: "#D4AF37" }} />
-                      {slug.replace(/-/g, " ")}
-                    </Link>
-                  ))}
+              {otherMarcaLinks('sofa', marcas, marca.slug, city.slug).map(link => (
+                  <Link key={link.href} to={link.href}
+                    className="inline-flex items-center gap-1.5 bg-white px-3.5 py-2 rounded-full text-sm font-medium text-[#111111] border border-[#E8E4DE] hover:border-[#D4AF37]/40 hover:bg-[#D4AF37]/5 hover:shadow-sm transition-all">
+                    <ArrowRight className="w-3 h-3" style={{ color: "#D4AF37" }} />
+                    {link.label}
+                  </Link>
+                ))}
             </DirectoryGroup>
           </div>
         </section>

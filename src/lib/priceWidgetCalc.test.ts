@@ -1,8 +1,11 @@
 import { describe, it, expect } from 'vitest';
 import {
   calcChairBracket, calcWidgetPricing,
-  calcWidgetTotal, buildWidgetQuizConfig,
+  calcWidgetTotal, buildWidgetQuizConfig, SOFA_ANTI_ACAROS_PRICE,
 } from './priceWidgetCalc';
+import * as widgetCalc from './priceWidgetCalc';
+import { PRICE_TABLE, PRICE_TABLE_QUIZ_CONFIG } from '@/data/locationPriceTestimonialsData';
+import { SOFA_ANTI_ACAROS_PRICE as SHARED_SOFA_ANTI_ACAROS_PRICE } from '@/constants/antiAcarosPricing';
 
 describe('calcChairBracket', () => {
   it('is 0 for 0/negative qty, never null (0€ is a valid "nothing selected" price)', () => {
@@ -27,8 +30,8 @@ describe('calcChairBracket', () => {
 // sob orçamento".
 describe('calcWidgetTotal — carpet (tapete e alcatifa) nunca soma ao total', () => {
   it('linhas de carpet são ignoradas mesmo com qty > 0', () => {
-    expect(calcWidgetTotal('limpeza-tapetes', { 0: 20 }, 0)).toBe(0);
-    expect(calcWidgetTotal('limpeza-alcatifas', { 0: 30 }, 0)).toBe(0);
+    expect(calcWidgetTotal('limpeza-tapetes', { 0: 20 })).toBe(0);
+    expect(calcWidgetTotal('limpeza-alcatifas', { 0: 30 })).toBe(0);
   });
 });
 
@@ -44,39 +47,54 @@ describe('calcWidgetPricing — sem conceito de desconto', () => {
 
 describe('calcWidgetTotal (limpeza-sofas, dados reais)', () => {
   it('"Sofá de 4+ lugares" (sob orçamento) never silently contributes 0€ as if it were free', () => {
-    const rowQuantities = { 4: 1 }; // index 4 = 4+ lugares
-    const total = calcWidgetTotal('limpeza-sofas', rowQuantities, 0);
+    const rowQuantities = { 3: 1 }; // index 3 = 4+ lugares
+    const total = calcWidgetTotal('limpeza-sofas', rowQuantities);
     expect(total).toBe(0); // sob orçamento: não soma preço nenhum.
   });
 
-  it('a row without quizConfig (chaise longue) still prices from its flat PRICE_TABLE price if set via rowQuantities directly', () => {
-    // Na prática a UI do widget nunca escreve aqui — o stepper da chaise
-    // longue foi removido (pedido explícito 2026-09-08) e o parâmetro
-    // chaiseLongueAddon dedicado ficou sempre a 0. Este teste documenta o
-    // comportamento genérico da própria função de cálculo, não da UI atual.
-    const rowQuantities = { 3: 2 }; // index 3 = chaise longue, +10€ cada
-    const total = calcWidgetTotal('limpeza-sofas', rowQuantities, 0);
-    expect(total).toBe(20);
+  it('prices sofas from the same table the quiz charges', () => {
+    expect(calcWidgetTotal('limpeza-sofas', { 0: 1, 1: 1, 2: 1 })).toBe(49 + 69 + 79);
   });
-  it('the dedicated chaiseLongueAddon parameter prices at 10€/un. (cleaning) independently of rowQuantities', () => {
-    const total = calcWidgetTotal('limpeza-sofas', {}, 2);
-    expect(total).toBe(20);
+});
+
+// 2026-09-26: a chaise longue era anunciada a +10€ (limpeza) e +25€
+// (impermeabilização) mas o quiz nunca a perguntava nem cobrava.
+describe('no price table row advertises something the quiz cannot charge', () => {
+  it('has no chaise longue row and every row maps to a quiz config', () => {
+    for (const [slug, rows] of Object.entries(PRICE_TABLE)) {
+      expect(rows.some(row => /chaise/i.test(row.item)), slug).toBe(false);
+      expect(rows.some(row => row.price.startsWith('+')), slug).toBe(false);
+      expect(PRICE_TABLE_QUIZ_CONFIG[slug]).toHaveLength(rows.length);
+      expect(PRICE_TABLE_QUIZ_CONFIG[slug].every(Boolean), slug).toBe(true);
+    }
+  });
+});
+
+// O caminho de extras do widget (toggles de impermeabilização e anti-ácaros)
+// nunca corria e guardava uma terceira tabela de anti-ácaros (10€ + 7,50€ por
+// cadeira). Foi apagado; o preço do sofá continua reexportado daqui.
+describe('dead add-on path stays deleted', () => {
+  it('only exposes the shared anti-acaros sofa price', () => {
+    expect(SOFA_ANTI_ACAROS_PRICE).toBe(SHARED_SOFA_ANTI_ACAROS_PRICE);
+    for (const name of ['calcChairAntiAcarosTotal', 'calcSofaAntiAcarosDelta', 'calcRowAddonDelta', 'CHAIR_ANTI_ACAROS_FIRST_PRICE', 'CHAIR_ANTI_ACAROS_UNIT_PRICE']) {
+      expect(name in widgetCalc, name).toBe(false);
+    }
   });
 });
 
 describe('buildWidgetQuizConfig', () => {
   it('returns null when nothing is selected', () => {
-    expect(buildWidgetQuizConfig('limpeza-sofas', {}, 0)).toBeNull();
+    expect(buildWidgetQuizConfig('limpeza-sofas', {})).toBeNull();
   });
 
   it('builds a sofa config from a selected row', () => {
-    const cfg = buildWidgetQuizConfig('limpeza-sofas', { 0: 2 }, 0);
+    const cfg = buildWidgetQuizConfig('limpeza-sofas', { 0: 2 });
     expect(cfg?.service).toBe('sofa');
-    expect(cfg?.sofaItems).toEqual([{ sizeId: '1-lugar', qty: 2, packEnabled: false, chaiseLongue: false }]);
+    expect(cfg?.sofaItems).toEqual([{ sizeId: '1-lugar', qty: 2, packEnabled: false }]);
   });
 
   it('builds a chairs config from limpeza-cadeiras', () => {
-    const cfg = buildWidgetQuizConfig('limpeza-cadeiras', { 0: 3 }, 0);
+    const cfg = buildWidgetQuizConfig('limpeza-cadeiras', { 0: 3 });
     expect(cfg?.service).toBe('chairs');
     expect(cfg?.chairQty).toBe('3');
   });
@@ -85,9 +103,9 @@ describe('buildWidgetQuizConfig', () => {
 
 describe('waterproof widget handoff', () => {
   it.each(['essencial', 'premium'] as const)('preserves %s prices and quantities for sofa plus chairs', tier => {
-    const quantities = { 1: 2, 5: 4 };
-    const total = calcWidgetTotal('impermeabilizacao', quantities, 0, new Set(), tier);
-    const config = buildWidgetQuizConfig('impermeabilizacao', quantities, 0, new Set(), tier)!;
+    const quantities = { 1: 2, 4: 4 };
+    const total = calcWidgetTotal('impermeabilizacao', quantities, tier);
+    const config = buildWidgetQuizConfig('impermeabilizacao', quantities, tier)!;
     const sofaUnit = tier === 'premium' ? 109 : 79;
     const chairs = tier === 'premium' ? 100 : 72;
     expect(total).toBe(sofaUnit * 2 + chairs);
@@ -96,11 +114,11 @@ describe('waterproof widget handoff', () => {
     expect(config.initialUpsellItems?.[0].price).toBe(chairs);
   });
   it('prices ten protected chairs in a mixed selection', () => {
-    const config = buildWidgetQuizConfig('impermeabilizacao', { 0: 1, 5: 10 }, 0)!;
+    const config = buildWidgetQuizConfig('impermeabilizacao', { 0: 1, 4: 10 })!;
     expect(config.initialUpsellItems?.[0].price).toBe(180);
   });
 });
 
 it('does not drop an incomplete piece when launching a carpet quote', () => {
-  expect(buildWidgetQuizConfig('limpeza-tapetes', { 0: 1 }, 0, new Set(), 'premium', new Set(), { 0: [{ id: 'one', largura: '2', comprimento: '3' }, { id: 'two', largura: '1', comprimento: '' }] })).toBeNull();
+  expect(buildWidgetQuizConfig('limpeza-tapetes', { 0: 1 }, 'premium', { 0: [{ id: 'one', largura: '2', comprimento: '3' }, { id: 'two', largura: '1', comprimento: '' }] })).toBeNull();
 });

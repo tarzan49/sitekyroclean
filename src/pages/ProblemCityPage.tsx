@@ -21,10 +21,9 @@ import ServiceLocationSchema from "@/components/ServiceLocationSchema";
 import { getProblemBySlug, getRelatedProblemLinks } from "@/data/problemSeoData";
 import { CATEGORY_TIPS, splitTipsHeading } from "@/data/problemTipsData";
 import { getServiceGallery, getIllustrativePhotos } from "@/constants/serviceGallery";
-import { cities, services, DEFAULT_PRICE_FROM, cityPrep } from "@/data/serviceCatalog";
+import { cities, services, cityPrep } from "@/data/serviceCatalog";
 import { SERVICE_TO_QUIZ } from "@/constants/serviceToQuiz";
-import { METRO_CITY_SLUGS } from "@/constants/metroCities";
-import { getAllProblemCityRoutes } from "@/data/problemCitySeoData";
+import { getAllProblemCityRoutes, problemCityMeta, problemCityNeighbours } from "@/data/problemCitySeoData";
 import { SITE_URL } from "@/constants/business";
 import ServiceReviewsGrid from "@/components/ServiceReviewsGrid";
 
@@ -41,10 +40,9 @@ const ProblemCityPage = () => {
 
   useEffect(() => {
     if (problem && city) {
-      const prep = cityPrep(city.name);
-      const title = `${problem.h1} ${prep} ${city.name} | Kyro Clean Solutions`;
+      // A mesma função que o scripts/prerender.ts usa para o HTML estático.
+      const { title, description: metaDesc } = problemCityMeta(problem, city.name);
       document.title = title;
-      const metaDesc = `${problem.h1} ${prep} ${city.name}: serviço profissional ao domicílio. ${problem.metaDescription.split('.')[0]}. Orçamento grátis em menos de 10 minutos.`;
       const desc = document.querySelector('meta[name="description"]');
       if (desc) desc.setAttribute("content", metaDesc);
       const ogTitle = document.querySelector('meta[property="og:title"]');
@@ -79,13 +77,15 @@ const ProblemCityPage = () => {
   const relatedServiceData = problem.relatedServices
     .map(slug => services.find(s => s.slug === slug))
     .filter(Boolean) as typeof services[number][];
-  const servicePrice = relatedServiceData[0]?.priceFrom ?? DEFAULT_PRICE_FROM;
+  // "Sob orçamento" (tapetes, alcatifas) passa como está: sem número, o schema
+  // não declara oferta. Antes caía para 49€ nas páginas de problemas de tapete.
+  const servicePrice = relatedServiceData[0]?.priceFrom ?? "Sob orçamento";
   const categoryTips = CATEGORY_TIPS[problem.category];
   const gallery = getServiceGallery(problem.relatedServices[0], `${problem.slug}-${city.slug}`);
-  const validCitySlugs = new Set([...METRO_CITY_SLUGS, ...problem.relatedCities]);
-  const nearbyCities = cities
-    .filter(c => c.slug !== city.slug && validCitySlugs.has(c.slug))
-    .slice(0, 8);
+  // As mesmas cidades que o HTML estático liga (problemCityNeighbours): só
+  // páginas que existem, numa janela que roda com a cidade em vez de um
+  // `.slice()` que deixava as últimas cidades sem nenhuma ligação.
+  const nearbyCities = problemCityNeighbours(problem.slug, city.slug);
 
   // Mesma fonte que o prerender usa, para o HTML e o React nao divergirem.
   // Antes eram as mesmas quatro perguntas nas 26 cidades do mesmo problema.

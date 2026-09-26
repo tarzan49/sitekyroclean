@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { cleanup, fireEvent, render, screen } from '@testing-library/react';
-import { initialFormData, type QuizFormData, type MattressItem } from '../QuizTypes';
+import { initialFormData, type QuizFormData, type MattressItem, type SofaItem } from '../QuizTypes';
 import QuizMattressAddonUpsell from './QuizMattressAddonUpsell';
 import QuizSofaAddonUpsell from './QuizSofaAddonUpsell';
 import QuizChairsAddonUpsell from './QuizChairsAddonUpsell';
@@ -104,15 +104,97 @@ describe('care upsells', () => {
     expect(cleaning.getAttribute('aria-pressed')).toBe('false');
   });
 
-  it('includes antibacterial care in both four-chair protection bundles', () => {
+  it('keeps both chair protection tiers and offers anti-acaros as a separate choice', () => {
     const update = vi.fn();
     render(<QuizChairsAddonUpsell formData={{ ...initialFormData, serviceType: 'cleaning', chairQuantity: '4' }} updateFormData={update} onBack={() => {}} onContinue={() => {}} />);
     const premium = screen.getByRole('button', { name: /Premium/ });
     expect(premium.textContent).toContain('+100€');
     expect(screen.getByRole('button', { name: /^Essencial/ }).textContent).toContain('+72€');
-    expect(screen.queryByRole('button', { name: /Desbacterização/ })).toBeNull();
+    // A impermeabilização deixou de "incluir" anti-ácaros: é um tratamento à parte.
+    expect(screen.queryByText(/incluídos/i)).toBeNull();
     fireEvent.click(premium);
     expect(update).toHaveBeenCalledWith({ chairWaterproofing: true, chairWaterproofQty: 4, waterproofingTier: 'premium', chairAntiAcaros: false });
+    fireEvent.click(screen.getByRole('button', { name: /Anti-ácaros/ }));
+    expect(update).toHaveBeenLastCalledWith({ chairAntiAcaros: true, chairWaterproofing: false, chairWaterproofQty: 0 });
+  });
+
+  // Pedido explícito do dono, repetido duas vezes: nas cadeiras o
+  // anti-ácaros mostra-se sempre como "5€/un.", nunca como total.
+  it.each([1, 4, 9])('shows the chair anti-acaros as a 5€ unit rate, never as a total (%i chairs)', qty => {
+    render(<QuizChairsAddonUpsell formData={{ ...initialFormData, serviceType: 'cleaning', chairQuantity: String(qty) }} updateFormData={() => {}} onBack={() => {}} onContinue={() => {}} />);
+    const anti = screen.getByRole('button', { name: /Anti-ácaros/ });
+    expect(anti.textContent).toContain('+5€/un.');
+    if (qty > 1) expect(anti.textContent).not.toContain(`${qty * 5}€`);
+  });
+
+  it('makes chair anti-acaros and waterproofing mutually exclusive', () => {
+    function ChairsHarness() {
+      const [form, setForm] = useState<QuizFormData>({ ...initialFormData, serviceType: 'cleaning', chairQuantity: '4' });
+      return <><QuizChairsAddonUpsell formData={form} updateFormData={u => setForm(prev => ({ ...prev, ...u }))} onBack={() => {}} onContinue={() => {}} />
+        <output aria-label="state">{JSON.stringify({ anti: form.chairAntiAcaros, wq: form.chairWaterproofQty })}</output></>;
+    }
+    render(<ChairsHarness />);
+    const anti = screen.getByRole('button', { name: /Anti-ácaros/ });
+    const essencial = screen.getByRole('button', { name: /^Essencial/ });
+    fireEvent.click(anti);
+    expect(anti.getAttribute('aria-pressed')).toBe('true');
+    expect(screen.getByLabelText('state').textContent).toBe('{"anti":true,"wq":0}');
+    fireEvent.click(essencial);
+    expect(anti.getAttribute('aria-pressed')).toBe('false');
+    expect(essencial.getAttribute('aria-pressed')).toBe('true');
+    expect(screen.getByLabelText('state').textContent).toBe('{"anti":false,"wq":4}');
+    fireEvent.click(anti);
+    expect(essencial.getAttribute('aria-pressed')).toBe('false');
+    expect(screen.getByLabelText('state').textContent).toBe('{"anti":true,"wq":0}');
+  });
+
+  describe('sofa anti-acaros', () => {
+    function SofaAntiHarness({ items: initial }: { items: SofaItem[] }) {
+      const [form, setForm] = useState<QuizFormData>({ ...initialFormData, serviceType: 'cleaning' });
+      const [items, setItems] = useState(initial);
+      return <><QuizSofaAddonUpsell formData={form} updateFormData={u => setForm(prev => ({ ...prev, ...u }))}
+        sofaItems={items} setSofaItems={setItems} onBack={() => {}} onContinue={() => {}} />
+        <output aria-label="state">{JSON.stringify({ anti: form.sofaAntiAcaros, treated: items.filter(i => i.packEnabled).reduce((n, i) => n + (i.packQty ?? i.qty), 0) })}</output></>;
+    }
+
+    it('shows the price per sofa, per size, from the shared table', () => {
+      render(<SofaAntiHarness items={[{ sizeId: '1-lugar', qty: 1, packEnabled: false }, { sizeId: '3-lugares', qty: 2, packEnabled: false }]} />);
+      const anti = screen.getByRole('button', { name: /Anti-ácaros/ });
+      expect(anti.textContent).toContain('Acréscimo por sofá');
+      expect(anti.textContent).toContain('1 Lugar+20€');
+      expect(anti.textContent).toContain('3 Lugares+50€');
+      expect(anti.textContent).toContain('+120€ para 3 sofás');
+    });
+
+    it('keeps 4+ seats under quote', () => {
+      render(<SofaAntiHarness items={[{ sizeId: '4+-lugares', qty: 1, packEnabled: false }]} />);
+      expect(screen.getByRole('button', { name: /Anti-ácaros/ }).textContent).toContain('Sob orçamento');
+    });
+
+    it('is one treatment per sofa: anti-acaros and waterproofing switch each other off', () => {
+      render(<SofaAntiHarness items={[{ sizeId: '2-lugares', qty: 1, packEnabled: false }]} />);
+      const anti = screen.getByRole('button', { name: /Anti-ácaros/ });
+      const premium = screen.getByRole('button', { name: /Premium/ });
+      fireEvent.click(anti);
+      expect(anti.getAttribute('aria-pressed')).toBe('true');
+      expect(premium.getAttribute('aria-pressed')).toBe('false');
+      expect(screen.getByLabelText('state').textContent).toBe('{"anti":true,"treated":1}');
+      expect(screen.getByRole('button', { name: 'Continuar com tratamento' })).toBeTruthy();
+      fireEvent.click(premium);
+      expect(anti.getAttribute('aria-pressed')).toBe('false');
+      expect(premium.getAttribute('aria-pressed')).toBe('true');
+      expect(screen.getByLabelText('state').textContent).toBe('{"anti":false,"treated":1}');
+      fireEvent.click(anti);
+      fireEvent.click(anti);
+      expect(anti.getAttribute('aria-pressed')).toBe('false');
+      expect(screen.getByLabelText('state').textContent).toBe('{"anti":false,"treated":0}');
+    });
+
+    it('is not offered when waterproofing is the main service', () => {
+      render(<QuizSofaAddonUpsell formData={{ ...initialFormData, serviceType: 'waterproofing' }} updateFormData={() => {}}
+        sofaItems={[{ sizeId: '2-lugares', qty: 1, packEnabled: false }]} setSofaItems={() => {}} onBack={() => {}} onContinue={() => {}} />);
+      expect(screen.queryByRole('button', { name: /Anti-ácaros/ })).toBeNull();
+    });
   });
 
   it('explains carpet dimensions and shows area without introducing a price', () => {

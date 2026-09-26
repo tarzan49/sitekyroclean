@@ -6,7 +6,8 @@ import QuizFurnitureImage from '@/components/quiz/QuizFurnitureImage';
 import QuizTopBadge from '@/components/quiz/QuizTopBadge';
 import { sofaPrices, mattressPrices } from '@/components/quiz/QuizTypes';
 import { calculateCustomPack, makePackItem, PACK_KIND_LABEL, type PackKind, type CustomPackItem, type PackExtra } from '@/lib/customPack';
-import { PACK_PERK_MATTRESS_OFF, PACK_PERK_SOFA_PRICE, PACK_PERK_CHAIRS_SET, PACK_PERK_MIN_ORDER } from '@/constants/packPerks';
+import { PACK_PERK_CHAIRS_SET, PACK_PERK_MIN_ORDER, PACK_PERK_PRICES } from '@/constants/packPerks';
+import { CHAIR_ANTI_ACAROS_UNIT_LABEL } from '@/constants/antiAcarosPricing';
 import { WHATSAPP_BASE } from '@/constants/business';
 
 const money = (n: number) => n.toLocaleString('pt-PT', { style: 'currency', currency: 'EUR' });
@@ -55,7 +56,7 @@ const TierCard = ({ active, onClick, title, price, note, top }: { active: boolea
   </button>
 );
 
-/** Chip compacto (tamanho, tratamento, chaise longue): ativo com borda dourada. */
+/** Chip compacto (tamanho): ativo com borda dourada. */
 const Chip = ({ active, onClick, children, className, check = true }: { active: boolean; onClick: () => void; children: ReactNode; className?: string; check?: boolean }) => (
   <button type="button" aria-pressed={active} onClick={onClick}
     className={cn('inline-flex h-9 shrink-0 items-center justify-center gap-1 whitespace-nowrap rounded-lg border px-2.5 text-[13px] font-semibold transition-colors touch-manipulation',
@@ -109,11 +110,13 @@ export default function PackConfigurator({ initialKinds, initialExtra = 'none', 
   }, [initialCity, initialExtra, initialKinds]);
 
   const prices = calculateCustomPack(items, city);
+  /** Há artigos de outro tipo além do principal (os únicos com preço de pack). */
+  const hasExtras = prices.lines.some(line => !line.isMain);
   const patch = (id: string, values: Partial<CustomPackItem>) => setItems(old => old.map(item => item.id === id ? { ...item, ...values } : item));
   /** Sofás e colchões ficam num só cartão por tipo, com um tamanho por linha:
    * a pessoa escolhe vários tamanhos (Solteiro e Casal) e a quantidade de
-   * cada um. Por baixo continuam a ser artigos separados, por isso o cálculo
-   * do preço de pack (primeiro artigo a tabela) não muda. */
+   * cada um. Por baixo continuam a ser artigos separados; o tipo do primeiro
+   * artigo é o serviço principal e fica todo ao preço de tabela. */
   const groupKey = (item: CustomPackItem) => item.kind === 'sofa' || item.kind === 'mattress' ? item.kind : item.id;
   const groups = items.reduce<{ key: string; kind: PackKind; idx: number[] }[]>((acc, item, i) => {
     const key = groupKey(item);
@@ -139,7 +142,7 @@ export default function PackConfigurator({ initialKinds, initialExtra = 'none', 
 
   const msg = [
     `Olá! Gostaria de confirmar este pack personalizado em ${city}:`,
-    ...prices.lines.map(l => `${l.label}: ${l.amount === null ? 'sob orçamento' : money(l.amount)}${l.perkApplied ? ` (preço de pack, tabela ${money(l.tablePrice ?? 0)})` : ''}${l.quote && l.amount !== null ? ' + extra sob orçamento' : ''}`),
+    ...prices.lines.map(l => `${l.label}: ${l.amount === null ? 'sob orçamento' : money(l.amount)}${l.perkApplied ? ` (preço de pack, tabela ${money(l.tablePrice ?? 0)})` : ''}${!l.perkApplied && l.perkNote ? ` (preço de pack: ${l.perkNote.toLowerCase()})` : ''}${l.quote && l.amount !== null ? ' + extra sob orçamento' : ''}`),
     `Serviços: ${money(prices.subtotal)}`,
     ...(prices.savings > 0 ? [`Poupança do pack: ${money(prices.savings)}`] : []),
     `Deslocação: ${prices.travel === null ? 'a confirmar' : money(prices.travel)}`,
@@ -156,7 +159,6 @@ export default function PackConfigurator({ initialKinds, initialExtra = 'none', 
       PACK_KIND_LABEL[item.kind],
       size,
       item.kind === 'rug' || item.kind === 'carpet' ? (item.width && item.length ? `${item.width} × ${item.length} m` : null) : `×${item.qty}`,
-      item.kind === 'sofa' && item.chaise ? 'chaise' : null,
       item.extra !== 'none' && item.kind !== 'rug' && item.kind !== 'carpet' ? EXTRA_CHIP_LABEL[item.extra] : null,
     ].filter(Boolean).join(' · ');
   };
@@ -184,11 +186,13 @@ export default function PackConfigurator({ initialKinds, initialExtra = 'none', 
           const lines = group.idx.map(i => prices.lines[i]).filter(Boolean);
           const sizeOptions = group.kind === 'sofa' ? sofaPrices : group.kind === 'mattress' ? mattressPrices : null;
           const measured = group.kind === 'rug' || group.kind === 'carpet';
-          const isMain = group.idx.includes(0);
-          const perk = lines.some(l => l.perkApplied);
+          const isMain = lead.kind === prices.mainKind;
+          // Tapete acrescentado: fica sob orçamento, a regalia é por m².
+          const rugPerkNote = lines.find(l => !l.perkApplied && l.perkNote)?.perkNote ?? null;
+          const perk = lines.some(l => l.perkApplied) || rugPerkNote !== null;
           const amount = lines.some(l => l.amount === null) ? null : lines.reduce((sum, l) => sum + (l.amount ?? 0), 0);
           const table = lines.reduce((sum, l) => sum + (l.tablePrice ?? 0), 0);
-          const perkNote = lines.length === 1 && lines[0].perkNote && lines[0].perkNote !== 'preço de pack' ? lines[0].perkNote : null;
+          const perkNote = rugPerkNote ?? (lines.length === 1 && lines[0].perkNote && lines[0].perkNote !== 'preço de pack' ? lines[0].perkNote : null);
           return <article key={group.key} className={cn('space-y-2.5 rounded-xl border bg-checker-modal p-3 text-white', isMain ? 'border-white/15' : 'border-gold/45')}>
             <div className="flex items-center gap-2.5">
               <QuizFurnitureImage service={KIND_ICON[group.kind]} sizeId={sizeOptions ? lead.size : undefined} className="!h-9 !w-9 shrink-0 rounded-lg bg-[#F5F2E8]" />
@@ -198,11 +202,11 @@ export default function PackConfigurator({ initialKinds, initialExtra = 'none', 
                   ? <p className="text-[11px] text-white/60">Artigo principal</p>
                   : perk
                     ? <p className="flex items-center gap-1 text-[11px] font-semibold text-[#D4AF37]"><BadgePercent className="h-3 w-3 shrink-0" />{perkNote ? `Preço de pack · ${perkNote}` : 'Preço de pack'}</p>
-                    : <p className="text-[11px] text-white/60">{lead.extra !== 'none' ? 'Com tratamento: preço de tabela' : !prices.perkEligible ? 'Preço de tabela' : 'Preço de pack'}</p>}
+                    : <p className="text-[11px] text-white/60">{lead.extra !== 'none' ? 'Com tratamento: preço de tabela' : !prices.perkEligible ? 'Preço de tabela' : group.kind === 'chairs' ? `Uma oferecida por cada ${PACK_PERK_CHAIRS_SET}` : 'Preço de pack'}</p>}
               </div>
               <div className="shrink-0 text-right leading-tight tabular-nums">
                 {amount === null ? <span className="text-xs font-semibold text-white/75">Sob orçamento</span> : <>
-                  {perk && <s className="block text-[11px] text-white/45">{money(table)}</s>}
+                  {perk && table > amount && <s className="block text-[11px] text-white/45">{money(table)}</s>}
                   <span className={cn('text-sm font-bold', perk && 'text-[#D4AF37]')}>{money(amount)}</span>
                 </>}
               </div>
@@ -224,7 +228,6 @@ export default function PackConfigurator({ initialKinds, initialExtra = 'none', 
                         {line.perkApplied && line.tablePrice !== null && <s className="mr-1">{money(line.tablePrice)}</s>}{money(line.amount)}
                       </p>}
                     </div>
-                    {group.kind === 'sofa' && <Chip active={item.chaise} onClick={() => patch(item.id, { chaise: !item.chaise })} className="h-8 px-2 text-xs">Chaise</Chip>}
                     <Stepper value={item.qty || 1} onChange={n => patch(item.id, { qty: n })} />
                   </li>;
                 })}
@@ -261,7 +264,7 @@ export default function PackConfigurator({ initialKinds, initialExtra = 'none', 
               const base = totalWith('none');
               const delta = (extra: PackExtra) => {
                 // Anti-ácaros nas cadeiras: sempre a taxa unitária, nunca um total.
-                if (extra === 'anti-acaros' && group.kind === 'chairs') return '+5€/un.';
+                if (extra === 'anti-acaros' && group.kind === 'chairs') return `+${CHAIR_ANTI_ACAROS_UNIT_LABEL}`;
                 const value = totalWith(extra);
                 return value === null || base === null ? 'Sob orçamento' : `+${(value - base).toLocaleString('pt-PT')}€`;
               };
@@ -322,11 +325,11 @@ export default function PackConfigurator({ initialKinds, initialExtra = 'none', 
             {prices.savings > 0 && <div className="flex items-baseline justify-between font-semibold text-[#D4AF37]"><dt className="flex items-center gap-1"><BadgePercent className="h-4 w-4" />Poupa com o pack</dt><dd className="tabular-nums">{money(prices.savings)}</dd></div>}
           </dl>
           {prices.quote && <p className="mt-1.5 text-xs text-[#D4AF37]">+ artigos ou extras sob orçamento</p>}
-          {items.length > 1 && !prices.perkEligible && <p className="mt-1.5 text-xs leading-snug text-gold">
+          {hasExtras && !prices.perkEligible && <p className="mt-1.5 text-xs leading-snug text-gold">
             Faltam {money(PACK_PERK_MIN_ORDER - prices.tableSubtotal)} de subtotal para o preço de pack nos artigos acrescentados.
           </p>}
-          {items.length === 1 && <p className="mt-1.5 text-xs leading-snug text-white/60">
-            A partir de {PACK_PERK_MIN_ORDER}€ de subtotal, cada artigo que acrescentar entra com preço de pack: sofá desde {PACK_PERK_SOFA_PRICE['1-lugar']}€, menos {PACK_PERK_MATTRESS_OFF}€ em cada colchão, uma cadeira oferecida por cada {PACK_PERK_CHAIRS_SET}.
+          {!hasExtras && items.length > 0 && <p className="mt-1.5 text-xs leading-snug text-white/60">
+            A partir de {PACK_PERK_MIN_ORDER}€ de subtotal, cada artigo de outro tipo que acrescentar entra com preço de pack. {PACK_PERK_PRICES}
           </p>}
         </div>
 

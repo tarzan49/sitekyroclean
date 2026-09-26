@@ -16,7 +16,8 @@ import ServiceSnapshotStats from "@/components/ServiceSnapshotStats";
 import ServicePriceSection from "@/components/ServicePriceSection";
 import ServiceAutoCarousel from "@/components/ServiceAutoCarousel";
 import ServiceFAQ from "@/components/ServiceFAQ";
-import { getAllMarcaColchaoRoutes, getMarcaColchaoByCityAndSlug } from "@/data/marcaColchaoData";
+import { getAllMarcaColchaoRoutes, getMarcaColchaoByCityAndSlug, marcasColchao } from "@/data/marcaColchaoData";
+import { marcaPageCopy, otherMarcaLinks, MARCA_PROCESS_STEPS } from "@/data/marcaCities";
 import { cityPrep } from "@/data/serviceCatalog";
 import { SITE_URL, WHATSAPP_BASE, REVIEW_RATING, REVIEW_COUNT } from "@/constants/business";
 import { SERVICE_DURATION } from "@/constants/problemCardHelpers";
@@ -24,6 +25,7 @@ import {
   buildWebPageNode,
   buildBreadcrumbNode,
   buildServiceNode,
+  offerForPriceLabel,
 } from "@/lib/seoSchema";
 import imgStd        from "@/assets/hero-p-limpeza-colchao-std.webp";
 import imgAcaros     from "@/assets/hero-p-acaros-colchao.webp";
@@ -42,12 +44,9 @@ const MARCA_HERO: Record<string, string> = {
   "mindol":     heroColchao, // espuma e fibras naturais
 };
 
-const PROCESS_STEPS = [
-  { icon: Search,      label: "01", title: "Inspeção do colchão", desc: "Avaliação do tipo de núcleo (espuma ou molas), tecido exterior e manchas antes de qualquer intervenção." },
-  { icon: Droplets,    label: "02", title: "Pré-tratamento", desc: "Aplicação de produto específico para dissolver manchas e sujidade incrustada no tecido acolchoado." },
-  { icon: ShieldCheck, label: "03", title: "Extração profissional", desc: "Vapor de baixa humidade calibrado ao núcleo interior, com tratamento anti-ácaros certificado." },
-  { icon: Wind,        label: "04", title: "Secagem e verificação", desc: "Ventilação assistida e inspeção final antes de o colchão voltar a estar pronto a usar." },
-];
+// Texto dos passos em marcaCities.ts, o mesmo que o HTML estático escreve.
+const PROCESS_ICONS = [Search, Droplets, ShieldCheck, Wind];
+const PROCESS_STEPS = MARCA_PROCESS_STEPS.colchao.map((step, index) => ({ ...step, icon: PROCESS_ICONS[index] ?? Search, label: String(index + 1).padStart(2, "0") }));
 
 const MarcaColchaoPage = () => {
   const { pathname } = useLocation();
@@ -59,8 +58,11 @@ const MarcaColchaoPage = () => {
   }, [pathname]);
 
   const pageUrl = `${SITE_URL}${pathname}`;
-  const pageTitle = data ? `Limpeza Colchão ${data.marca.name} ${cityPrep(data.city.name)} ${data.city.name}, Especialistas | Kyro Clean` : '';
-  const pageDesc = data ? `Especialistas em limpeza de colchões ${data.marca.name} ${cityPrep(data.city.name)} ${data.city.name}. ${data.marca.material}. ${data.marca.estimatedPriceRange}. Serviço ao domicílio.` : '';
+  // Título, descrição, <h1>, migalha e preço: os mesmos que o scripts/prerender.ts
+  // escreve no HTML estático (marcaPageCopy em marcaCities.ts).
+  const copy = data ? marcaPageCopy('colchao', data.marca, data.city) : null;
+  const pageTitle = copy?.title ?? '';
+  const pageDesc = copy?.description ?? '';
 
   useEffect(() => {
     if (!data) return;
@@ -87,6 +89,7 @@ const MarcaColchaoPage = () => {
   }
 
   const { marca, city } = data;
+  const pageCopy = copy!;
   const prep = cityPrep(city.name);
   const heroImg = MARCA_HERO[marca.slug] ?? heroColchao;
 
@@ -105,25 +108,16 @@ const MarcaColchaoPage = () => {
       buildWebPageNode({ url: pageUrl, name: pageTitle, description: pageDesc }),
       buildBreadcrumbNode(`${pageUrl}#breadcrumb`, [
         { name: "Início", item: `${SITE_URL}/` },
-        { name: "Limpeza de Colchões", item: `${SITE_URL}/limpeza-colchoes` },
-        { name: `Colchão ${marca.name} ${prep} ${city.name}`, item: pageUrl },
+        { name: pageCopy.serviceName, item: `${SITE_URL}${pageCopy.serviceBaseRoute}` },
+        { name: pageCopy.breadcrumbName, item: pageUrl },
       ]),
       buildServiceNode({
         url: pageUrl,
-        name: `Limpeza de Colchão ${marca.name} ${prep} ${city.name}`,
+        name: pageCopy.h1,
         description: pageDesc,
         areaServed: { "@type": "City", name: city.name },
-        offers: {
-          "@type": "Offer",
-          "availability": "https://schema.org/InStock",
-          "areaServed": { "@type": "City", "name": city.name },
-          "priceSpecification": {
-            "@type": "PriceSpecification",
-            "minPrice": String(marca.minPrice),
-            "maxPrice": String(marca.maxPrice),
-            "priceCurrency": "EUR",
-          },
-        },
+        // O preço de partida do serviço no motor, sem máximo inventado por marca.
+        offers: offerForPriceLabel(pageCopy.priceFrom, { areaServed: { "@type": "City", name: city.name } }),
       }),
     ],
   };
@@ -137,7 +131,7 @@ const MarcaColchaoPage = () => {
       <Header />
       <main>
 
-        <CommercialHero title={`Limpeza de Colchão ${marca.name} ${prep} ${city.name}`} serviceSlug="limpeza-colchoes" city={city.name} price={`${marca.minPrice}€`} image={heroImg} whatsappHref={`${WHATSAPP_BASE}?text=${encodeURIComponent(buildQuoteWaMessage(`Olá! Gostaria de pedir um orçamento para limpeza de colchão ${marca.name} ${prep} ${city.name}.`))}`} source={`marca_hero_${marca.slug}`} />
+        <CommercialHero title={pageCopy.h1} serviceSlug="limpeza-colchoes" city={city.name} price={pageCopy.priceFrom} breadcrumbs={[{ label: "Início", to: "/" }, { label: pageCopy.serviceName, to: pageCopy.serviceBaseRoute }, { label: pageCopy.breadcrumbName }]} image={heroImg} whatsappHref={`${WHATSAPP_BASE}?text=${encodeURIComponent(buildQuoteWaMessage(`Olá! Gostaria de pedir um orçamento para limpeza de colchão ${marca.name} ${prep} ${city.name}.`))}`} source={`marca_hero_${marca.slug}`} />
 
         {/* ═══ ORÇAMENTO (primeira secção a seguir ao hero) ═══ */}
         <ServicePriceSection serviceSlug="limpeza-colchoes" initialLocation={city.name} />
@@ -179,6 +173,7 @@ const MarcaColchaoPage = () => {
               overline="Como Trabalhamos"
               heading="O nosso processo de limpeza para o"
               goldWord={marca.name}
+              subtitle={marca.cleaningProcess}
             />
             <div className="grid sm:grid-cols-2 gap-px" style={{ backgroundColor: "#E8E4DE" }}>
               {PROCESS_STEPS.map((step) => {
@@ -224,26 +219,24 @@ const MarcaColchaoPage = () => {
           <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
             <SectionHeader
               overline="Mais Opções"
-              heading="Outras marcas que limpamos em"
+              heading={`Outras marcas que limpamos ${prep}`}
               goldWord={city.name}
               subtitle={`Veja também a tabela completa de tamanhos e preços de limpeza de colchões ${prep} ${city.name}.`}
             />
             <Link
-              to={`/limpeza-colchoes-${city.slug}`}
+              to={pageCopy.cityServiceHref}
               className="inline-flex items-center gap-1.5 text-sm font-semibold mb-8 hover:underline"
               style={{ color: "#D4AF37" }}
             >
-              Ver todos os tamanhos e preços em {city.name}
+              {pageCopy.cityServiceLabel}
               <ArrowRight className="w-3.5 h-3.5" />
             </Link>
             <DirectoryGroup title="Outras marcas de colchões">
-              {["ikea", "conforama", "molaflex", "pikolin", "colmol", "mindol"]
-                .filter(slug => slug !== marca.slug)
-                .map(slug => (
-                  <Link key={slug} to={`/limpeza-colchao-${slug}-${city.slug}`}
-                    className="inline-flex items-center gap-1.5 bg-white px-3.5 py-2 rounded-full text-sm font-medium text-[#111111] border border-[#E8E4DE] hover:border-[#D4AF37]/40 hover:bg-[#D4AF37]/5 hover:shadow-sm transition-all capitalize">
+              {otherMarcaLinks('colchao', marcasColchao, marca.slug, city.slug).map(link => (
+                  <Link key={link.href} to={link.href}
+                    className="inline-flex items-center gap-1.5 bg-white px-3.5 py-2 rounded-full text-sm font-medium text-[#111111] border border-[#E8E4DE] hover:border-[#D4AF37]/40 hover:bg-[#D4AF37]/5 hover:shadow-sm transition-all">
                     <ArrowRight className="w-3 h-3" style={{ color: "#D4AF37" }} />
-                    {slug.replace(/-/g, " ")}
+                    {link.label}
                   </Link>
                 ))}
             </DirectoryGroup>

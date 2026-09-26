@@ -100,7 +100,7 @@ export function buildHomepageBusinessNode() {
       "@type": "OfferCatalog",
       "name": "Serviços de Limpeza Profissional",
       "itemListElement": catalogServices.map(service => {
-        const price = service.priceFrom.replace(",", ".").replace(/[^0-9.]/g, "");
+        const price = priceFromLabel(service.priceFrom);
         return {
           "@type": "Offer",
           "url": `${SITE_URL}${service.baseRoute}`,
@@ -173,6 +173,38 @@ export function buildOfferNode(
   };
 }
 
+/**
+ * O número de um rótulo de preço, pronto para o schema: "49€" → "49",
+ * "Desde 12,50€" → "12.5", `20` → "20". Devolve `null` quando o rótulo não tem
+ * preço ("Sob orçamento", "Sob consulta", vazio).
+ *
+ * Havia nove cópias desta conversão espalhadas pelo site, e duas regras
+ * diferentes: umas caíam para `DEFAULT_PRICE_FROM` quando não havia número, e
+ * por isso /limpeza-tapetes, /limpeza-alcatifas e todas as suas páginas de
+ * cidade declaravam uma oferta de 49€ num serviço que é sempre sob orçamento;
+ * outras tiravam tudo o que não fosse dígito, o que transformava "12,5€" em
+ * 125. Um rótulo sem preço não tem oferta, nunca um preço inventado.
+ */
+export function priceFromLabel(label: string | number | null | undefined): string | null {
+  if (typeof label === "number") return Number.isFinite(label) && label > 0 ? String(label) : null;
+  if (!label || /orçamento|consulta/i.test(label)) return null;
+  const match = /\d+(?:[.,]\d+)?/.exec(label);
+  if (!match) return null;
+  const value = Number(match[0].replace(",", "."));
+  return Number.isFinite(value) && value > 0 ? String(value) : null;
+}
+
+/**
+ * O nó `Offer` de um rótulo de preço, ou `undefined` quando não há preço. Sem
+ * `priceValidUntil`: a data que estava escrita à mão ("2026-12-31") caducava
+ * sozinha e o HTML estático nunca a teve, por isso as duas versões da mesma
+ * página declaravam coisas diferentes.
+ */
+export function offerForPriceLabel(label: string | number | null | undefined, opts?: { areaServed?: AreaServed }) {
+  const price = priceFromLabel(label);
+  return price ? buildOfferNode(price, opts) : undefined;
+}
+
 export interface ServiceReview {
   author: string;
   city: string;
@@ -230,6 +262,53 @@ export function buildFaqNode(faqs: { question: string; answer: string }[]) {
       "name": faq.question,
       "acceptedAnswer": { "@type": "Answer", "text": faq.answer },
     })),
+  };
+}
+
+/**
+ * O grafo de uma página de serviço nacional (os seis serviços-pilar): WebPage,
+ * migalha, a empresa e o serviço, com oferta só quando há preço.
+ *
+ * Usado pelo `ServiceSchema.tsx` no cliente e pelo `scripts/prerender.ts` no
+ * HTML estático. Antes, o prerender emitia o seu próprio `Service` sem
+ * descrição, com `areaServed` a declarar Portugal como cidade e com o preço
+ * escrito à mão, e o React substituía-o por outro depois de montar: duas
+ * declarações diferentes da mesma página.
+ */
+export function buildServicePageSchema(opts: {
+  url: string;
+  serviceName: string;
+  description: string;
+  priceFrom: string;
+  breadcrumbLabel?: string;
+  imageUrl?: string;
+  reviews?: ServiceReview[];
+}) {
+  const fullUrl = `${SITE_URL}${opts.url}`;
+  const offers = offerForPriceLabel(opts.priceFrom);
+  return {
+    "@context": "https://schema.org",
+    "@graph": [
+      buildWebPageNode({ url: fullUrl, name: `${opts.serviceName} | Kyro Clean Solutions`, description: opts.description }),
+      buildBreadcrumbNode(`${fullUrl}#breadcrumb`, [
+        { name: "Início", item: SITE_URL },
+        { name: opts.breadcrumbLabel || opts.serviceName, item: fullUrl },
+      ]),
+      buildLocalBusinessNode(),
+      buildServiceNode({
+        url: fullUrl,
+        name: opts.serviceName,
+        description: opts.description,
+        imageUrl: opts.imageUrl,
+        serviceType: opts.serviceName,
+        areaServed: [
+          ...catalogCities.map(city => ({ "@type": "City" as const, "name": city.name })),
+          { "@type": "Country", "name": "Portugal" },
+        ],
+        ...(offers && { offers }),
+        reviews: opts.reviews,
+      }),
+    ],
   };
 }
 

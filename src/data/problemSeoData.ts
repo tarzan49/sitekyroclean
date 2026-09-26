@@ -1,4 +1,5 @@
 import { REVIEW_COUNT, REVIEW_RATING, CLIENTS_SERVED_LABEL } from '../constants/business';
+import { formatEuro, sofaSizeList, SOFA_CLEAN_AND_PROTECT_FROM, SOFA_PROTECT_WITH_CLEANING_FROM } from './enginePrices';
 // Programmatic SEO: Problem pages data engine
 // Each problem page targets a specific long-tail search query cluster
 
@@ -609,7 +610,7 @@ const problemDefinitions: ProblemPage[] = [
       "Facilita limpeza diária",
     ],
     faqs: [
-      { question: "Quanto custa impermeabilizar o sofá?", answer: "Versão Essencial: 59€ (1 lugar), 79€ (2 lugares) e 99€ (3 lugares). Versão Premium: 89€ (1 lugar), 109€ (2 lugares) e 139€ (3 lugares). O pack limpeza + impermeabilização Essencial começa em 99€ para 1 lugar." },
+      { question: "Quanto custa impermeabilizar o sofá?", answer: `Versão Essencial: ${sofaSizeList('waterproofingPrice')}. Versão Premium: ${sofaSizeList('waterproofingPremiumPrice')}. Limpeza e impermeabilização Essencial na mesma visita começam em ${formatEuro(SOFA_CLEAN_AND_PROTECT_FROM)} para 1 lugar.` },
       { question: "A impermeabilização altera o tecido?", answer: "Não. Em ambas as versões, o produto é completamente invisível e não altera a cor, textura, toque ou respirabilidade do tecido." },
       { question: "Quanto tempo dura a impermeabilização?", answer: "A Essencial, à base de água, dura 1 a 2 anos consoante o uso e aguenta até 2 lavagens. A Premium, à base de diluente e mais resistente ao desgaste, dura até 10 anos e aguenta até 5 lavagens." },
     ],
@@ -629,9 +630,9 @@ const problemDefinitions: ProblemPage[] = [
     title: "Quanto Custa Limpar um Sofá? | Preços 2025 | Kyro",
     metaDescription: "Preços de limpeza de sofá profissional. Desde 49€. Veja tabela de preços por tamanho e tipo. Peça orçamento grátis personalizado.",
     h1: "Quanto Custa Limpar um Sofá Profissionalmente?",
-    intro: "Está a pesquisar preços de limpeza de sofá? Os preços da Kyro Clean Solutions começam a partir de 49€ para sofás de 1 lugar (69€ para 2 lugares), com opções de impermeabilização e packs com desconto.",
+    intro: "Está a pesquisar preços de limpeza de sofá? Os preços da Kyro Clean Solutions começam a partir de 49€ para sofás de 1 lugar (69€ para 2 lugares), com impermeabilização opcional na mesma visita e preço de pack nos artigos que acrescentar.",
     problemDetail: "Os preços de limpeza de sofá variam conforme vários fatores: tamanho do sofá (2, 3 ou mais lugares), tipo de tecido, estado de sujidade, tipo de manchas e serviços adicionais como impermeabilização. Muitas empresas não são transparentes com preços, mas na Kyro acreditamos em transparência.",
-    solutionDetail: "Oferecemos preços transparentes e competitivos: sofá de 1 lugar desde 49€, sofá de 2 lugares desde 69€, sofá de 3 lugares desde 79€, sofá em L ou 4+ lugares sob orçamento. Impermeabilização adicional desde 59€. Packs de limpeza + impermeabilização com desconto. Orçamento personalizado gratuito e sem compromisso.",
+    solutionDetail: `Oferecemos preços transparentes e competitivos: limpeza desde ${sofaSizeList('cleaningPrice')}; sofá em L ou 4+ lugares sob orçamento. Impermeabilização Essencial na mesma visita: mais ${formatEuro(SOFA_PROTECT_WITH_CLEANING_FROM)} num sofá de 1 lugar, ${formatEuro(SOFA_CLEAN_AND_PROTECT_FROM)} no total. Orçamento personalizado gratuito e sem compromisso.`,
     benefits: [
       "Preços transparentes desde 49€",
       "Orçamento gratuito sem compromisso",
@@ -666,7 +667,7 @@ const problemDefinitions: ProblemPage[] = [
       "Desodorização incluída",
       "Orçamento grátis",
       "Sem custos ocultos",
-      "Packs com desconto",
+      "Preço de pack nos artigos acrescentados",
       "Pagamento após serviço",
     ],
     faqs: [
@@ -1088,7 +1089,7 @@ const problemDefinitions: ProblemPage[] = [
     solutionDetail: "Limpeza completa do puff com extração profissional, tratamento de manchas e desodorização. O serviço é feito ao domicílio no mesmo dia que outros estofos.",
     benefits: ["Todos os tipos de tecido", "Ideal combinar com limpeza de sofá", "Preço acessível", "Ao domicílio", "Desodorização incluída", "Secagem rápida"],
     faqs: [
-      { question: "Quanto custa limpar um puff?", answer: "A limpeza de puffs começa a partir de 10€. Aproveite para combinar com a limpeza do sofá com desconto." },
+      { question: "Quanto custa limpar um puff?", answer: "A limpeza de puffs começa a partir de 10€. Pode ser feita na mesma visita da limpeza do sofá, com uma só deslocação." },
     ],
     relatedProblems: ["manchas-sofa", "limpeza-profunda-sofa", "pelos-animais-sofa"],
     relatedServices: ["limpeza-sofas", "limpeza-cadeiras"],

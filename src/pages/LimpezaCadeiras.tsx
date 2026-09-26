@@ -6,6 +6,7 @@ import Footer from "@/components/Footer";
 import ServiceCityLinks from "@/components/ServiceCityLinks";
 import ServiceFAQ from "@/components/ServiceFAQ";
 import ServiceSchema from "@/components/ServiceSchema";
+import { getPillarPage } from "@/data/pillarPages";
 import ServiceHero from "@/components/ServiceHero";
 import ServiceExamplesGallery from "@/components/ServiceExamplesGallery";
 import ServiceExpertTips from "@/components/ServiceExpertTips";
@@ -60,20 +61,18 @@ const expertTips: ExpertTip[] = [
   },
 ];
 
-const LimpezaCadeiras = () => {
-  const faqs = [
-    { question: 'A limpeza de cadeiras é recomendada só quando estão muito manchadas?', answer: 'Não. Quanto mais cedo se intervém, melhores são os resultados e maior é a durabilidade do tecido. A limpeza regular evita acumulação de nódoas, cheiros e gordura corporal, mantendo o aspeto "como novo" por muito mais tempo.' },
-    { question: 'É seguro limpar cadeiras de tecido mais delicado (veludo, linho, etc.)?', answer: 'Sim. Antes de iniciar, avaliamos sempre o tipo de tecido e escolhemos produtos adequados. Em materiais mais delicados, ajustamos a pressão, a quantidade de água e os movimentos para garantir segurança máxima.' },
-    { question: 'Quanto tempo as cadeiras ficam fora de uso após a limpeza?', answer: 'Normalmente entre 3 e 6 horas, consoante o tecido e a ventilação do espaço. Quando terminamos o serviço, deixamos sempre orientações simples para acelerar a secagem (circular ar, abrir janelas, evitar sentar até estar seco).' },
-  ];
+// Título, h1, FAQs e schema vêm de src/data/pillarPages.ts, a mesma fonte do
+// PageHead e do HTML estático (scripts/prerender.ts).
+const pillar = getPillarPage('/limpeza-cadeiras');
 
+const LimpezaCadeiras = () => {
   return (
     <QuizServiceProvider value="chairs">
     <>
       <Header />
       <main>
         <ServiceHero
-          title="Higienização Profissional de Cadeiras"
+          title={pillar.h1}
           serviceSlug="limpeza-cadeiras"
         />
         <ServicePriceSection serviceSlug="limpeza-cadeiras" />
@@ -93,14 +92,15 @@ const LimpezaCadeiras = () => {
           items={cadeirasGuarantee}
           variant="dark"
         />
-        <ServiceFAQ faqs={faqs} heading="Perguntas Frequentes" variant="light" />
+        <ServiceFAQ faqs={pillar.faqs} heading="Perguntas Frequentes" variant="light" />
         <ServiceExpertTips tips={expertTips} variant="dark" />
-        <ServiceCityLinks serviceSlug="limpeza-cadeiras" serviceLabel="Limpeza de Cadeiras" />
+        <ServiceCityLinks serviceSlug="limpeza-cadeiras" serviceLabel={pillar.serviceName} />
         <ServiceSchema
-          serviceName="Limpeza de Cadeiras"
-          description="Limpeza profissional de cadeiras e estofos no Porto."
-          url="/limpeza-cadeiras"
-          priceFrom="20€"
+          serviceName={pillar.serviceName}
+          description={pillar.description}
+          url={pillar.path}
+          priceFrom={pillar.priceFrom}
+          breadcrumbLabel={pillar.breadcrumbLabel}
         />
       </main>
       <Footer />

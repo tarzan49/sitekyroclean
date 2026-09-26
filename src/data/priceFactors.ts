@@ -1,7 +1,7 @@
 export type PriceFactor = { icon: string; title: string; description: string; examples: string[] };
 export const PRICE_FACTORS: Record<string, PriceFactor[]> = {
   "limpeza-sofas": [
-    { icon: 'Sofa', title: "Como é o seu sofá?", description: "O tamanho e o tecido ajudam a definir o trabalho necessário.", examples: ["Número de lugares e tipo de tecido", "Chaise longue ou módulos extra"] },
+    { icon: 'Sofa', title: "Como é o seu sofá?", description: "O tamanho e o tecido ajudam a definir o trabalho necessário.", examples: ["Número de lugares e tipo de tecido", "Sofás de canto ou com mais de 3 lugares"] },
     { icon: 'ScanLine', title: "Como está neste momento?", description: "Avaliamos as manchas para escolher os cuidados adequados.", examples: ["Tipo de manchas", "Intensidade e extensão da sujidade"] },
     { icon: 'ShieldCheck', title: "Quer algum cuidado extra?", description: "Os tratamentos adicionais são opcionais e avaliados à parte.", examples: ["Tratamento de odores", "Impermeabilização do tecido"] },
   ],

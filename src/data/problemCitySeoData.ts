@@ -2,8 +2,9 @@
 // Targets searches like "tirar manchas sofá porto", "remover cheiro urina sofá matosinhos"
 
 import { PROBLEM_ROUTE_SLUGS } from "./problemRouteData";
-import { cities } from "./serviceCatalog";
+import { cities, cityPrep } from "./serviceCatalog";
 import { METRO_CITIES as TOP_METRO } from "../constants/metroCities";
+import { RESPONSE_PROMISE } from "../constants/commercialPolicy";
 
 export interface ProblemCityRoute {
   path: string;
@@ -52,4 +53,48 @@ export function getProblemCities(problemSlug: string): (typeof cities)[number][]
       .map(route => route.citySlug),
   );
   return cities.filter(city => slugs.has(city.slug));
+}
+
+/**
+ * Título e descrição de uma página problema × cidade.
+ *
+ * O React (ProblemCityPage.tsx) e o scripts/prerender.ts escreviam cada um o
+ * seu: "{problema} no Porto ... Orçamento grátis em menos de 10 minutos" para
+ * as pessoas e "{problema} em Porto ... Resposta em menos de 10 minutos" para
+ * os motores. Uma função, lida pelos dois.
+ */
+export function problemCityMeta(problem: { h1: string; metaDescription: string }, cityName: string) {
+  const where = `${cityPrep(cityName)} ${cityName}`;
+  return {
+    title: `${problem.h1} ${where} | Kyro Clean Solutions`,
+    description: `${problem.h1} ${where}: serviço profissional ao domicílio. ${problem.metaDescription.split('.')[0]}. ${RESPONSE_PROMISE}.`,
+  };
+}
+
+/** Rotação sobre uma ordem fixa: `size` elementos a partir de `start`. */
+function rotatingWindow<T>(items: readonly T[], start: number, size: number): T[] {
+  if (items.length <= size) return [...items];
+  const offset = ((start % items.length) + items.length) % items.length;
+  return Array.from({ length: size }, (_, index) => items[(offset + index) % items.length]);
+}
+
+/** Quantas cidades vizinhas cada página problema × cidade liga. */
+export const PROBLEM_CITY_NEIGHBOURS = 6;
+
+/**
+ * "Este problema noutras cidades": as cidades a ligar a partir de uma página.
+ *
+ * Só cidades onde a página existe mesmo (`getProblemCities`), e numa janela
+ * que roda com a cidade desenhada em vez de um `.slice()`: com uma ordem fixa,
+ * as primeiras entradas recebiam todas as ligações e as restantes nenhuma. É a
+ * correção da fase 8 que o HTML estático já tinha e a página React não (ainda
+ * fazia `.slice(0, 8)`). A mesma regra de `coverageWindow` em
+ * landingPageModel.ts, repetida aqui para a página React não ter de carregar o
+ * modelo das páginas landing inteiro.
+ */
+export function problemCityNeighbours(problemSlug: string, citySlug: string, size = PROBLEM_CITY_NEIGHBOURS): (typeof cities)[number][] {
+  const withPage = getProblemCities(problemSlug);
+  const others = withPage.filter(city => city.slug !== citySlug);
+  const start = withPage.findIndex(city => city.slug === citySlug);
+  return rotatingWindow(others, start < 0 ? 0 : start, size);
 }

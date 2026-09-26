@@ -6,7 +6,11 @@ export interface QuizFormData {
   // à base de diluente (novo, 2026-08-30, dura até 10 anos/5 lavagens, preço mais alto).
   waterproofingTier: 'essencial' | 'premium';
   sofaSize: string;
-  sofaHasChaise: boolean;
+  // Tratamento dos sofás quando a limpeza é o serviço principal: as unidades
+  // marcadas em SofaItem.packEnabled/packQty levam anti-ácaros em vez de
+  // impermeabilização. Um só tratamento por sofá, como no configurador de
+  // packs (2026-09-26). Ignorado quando o serviço principal é impermeabilização.
+  sofaAntiAcaros: boolean;
   carpetArea: string;
   carpetKind?: 'tapete' | 'alcatifa';
   mattressSize: string;
@@ -14,8 +18,9 @@ export interface QuizFormData {
   chairQuantity: string;
   chairWaterproofing: boolean;
   chairWaterproofQty: number;
-  // Anti Ácaros das cadeiras: serviço próprio, mutuamente exclusivo com a
-  // impermeabilização addon acima (decisão feita no upsell pós-quantidade).
+  // Anti-ácaros das cadeiras: tratamento próprio (5€ por cadeira, ver
+  // constants/antiAcarosPricing.ts), mutuamente exclusivo com a
+  // impermeabilização acima (decisão feita no ecrã a seguir às quantidades).
   chairAntiAcaros: boolean;
   location: string;
   otherLocation: string;
@@ -36,7 +41,7 @@ export const initialFormData: QuizFormData = {
   // primeiro. Nunca reverter para 'essencial' aqui sem pedido explícito.
   waterproofingTier: 'premium',
   sofaSize: '',
-  sofaHasChaise: false,
+  sofaAntiAcaros: false,
   carpetArea: '',
   mattressSize: '',
   chairType: '',
@@ -75,40 +80,37 @@ export interface PriceOption {
   waterproofingUpsellDiscount?: number;
 }
 
-// Sofa pack pricing: limpeza + impermeabilização com desconto
-// originalBothPrice = soma separada (preço riscado no UI)
-// delta (upsell text) = bothPrice - cleaningPrice
+// Sofá: preços de tabela.
+// cleaningPrice          = limpeza (49 / 69 / 79)
+// waterproofingPrice     = impermeabilização Essencial sozinha (59 / 79 / 99)
+// waterproofingPremiumPrice = impermeabilização Premium sozinha (89 / 109 / 139)
+// bothPrice              = limpeza + Essencial antes da redução (99 / 139 / 169)
+// waterproofingUpsellDiscount = redução por sofá no pack limpeza + proteção (10)
+// O pack Essencial cobrado é bothPrice - redução: 89 / 129 / 159 (calcPackPricing).
+// O Premium soma a diferença Premium - Essencial (30 em todos os tamanhos,
+// packPremiumDelta onde é fixado à mão): 119 / 159 / 189.
+// originalBothPrice (preço riscado) é a soma separada limpeza + Essencial
+// (108 / 148 / 178) e nunca pode ficar abaixo do preço do pack, senão o
+// "desconto" mostrado fica ao contrário (bug já visto antes).
 export const sofaPrices: PriceOption[] = [
-  // Pack (limpeza + impermeabilização) corrigido 2026-09-08 para valores fixos
-  // aprovados — Essencial: 1L=99€, 2L=149€, 3L=159€. Premium = Essencial + 30€
-  // em todos os tamanhos (regra consistente confirmada pelo dono). bothPrice é
-  // o total Essencial; packPremiumDelta é o que falta somar a esse total para
-  // chegar ao Premium. originalBothPrice (preço riscado) subiu com o 2L para
-  // continuar acima do novo bothPrice — nunca pode ficar abaixo, senão o
-  // "desconto" mostrado no UI fica ao contrário (bug já visto antes).
   { waterproofingUpsellDiscount: 10, id: '1-lugar',    label: '1 Lugar',    cleaningPrice: 49, waterproofingPrice: 59, bothPrice: 99,  originalBothPrice: 108, waterproofingPremiumPrice: 89 },
   { waterproofingUpsellDiscount: 10, id: '2-lugares',  label: '2 Lugares',  cleaningPrice: 69, waterproofingPrice: 79, bothPrice: 139, originalBothPrice: 148, waterproofingPremiumPrice: 109, packPremiumDelta: 30 },
   { waterproofingUpsellDiscount: 10, id: '3-lugares',  label: '3 Lugares',  cleaningPrice: 79, waterproofingPrice: 99, bothPrice: 169, originalBothPrice: 178, waterproofingPremiumPrice: 139, packPremiumDelta: 30 },
   { waterproofingUpsellDiscount: 10, id: '4+-lugares', label: '4+ Lugares', cleaningPrice: 'Sob orçamento', waterproofingPrice: 'Sob orçamento', bothPrice: 'Sob orçamento', waterproofingPremiumPrice: 'Sob orçamento' },
 ];
 
-// Chaise longue: preço fixo (limpeza ou pack)
-export const sofaChaisePrice = { cleaning: 10, waterproofing: 25 };
-
-// Mattress pricing (2026-08-30: waterproofingPrice/bothPrice/originalBothPrice
-// reaproveitados para "Anti Ácaros" — mesmo motor de preços da impermeabilização do
-// sofá (standalone + pack com desconto), só o rótulo na UI é que muda. Não confundir
-// com impermeabilização real: colchões não têm essa opção, só anti-ácaros.
-// Anti Ácaros sozinho: 35 / 40 / 45 (varia por tamanho, ao contrário do sofá)
-// Limpeza:             59 / 69 / 79
-// Pack Total:          84 / 99 / 114 (2026-08-31: king corrigido de 104 para 114 —
-// o delta do pack tem de subir com o tamanho: solteiro +25, casal +30, king +35;
-// 104 dava só +25, abaixo do casal, o que não fazia sentido)
-// originalBothPrice = soma sem desconto (limpeza + anti-ácaros sozinho, preço riscado)
+// Colchão: waterproofingPrice/bothPrice/originalBothPrice são reaproveitados
+// para o anti-ácaros (colchões não se impermeabilizam, 2026-08-30).
+// cleaningPrice      = limpeza (59 / 69 / 79)
+// waterproofingPrice = anti-ácaros sozinho (35 / 40 / 45)
+// bothPrice          = limpeza + anti-ácaros (74 / 89 / 104), ou seja um
+//                      acréscimo de 15 / 20 / 25 sobre a limpeza
+//                      (mattressAntiAcarosPrice em constants/antiAcarosPricing.ts)
+// originalBothPrice  = soma sem desconto, preço riscado (94 / 109 / 124)
 export const mattressPrices: PriceOption[] = [
-  // bothPrice (= preço do upsell Anti Ácaros) baixado em 10€ em cada tamanho
-  // 2026-09-08, teste explícito do dono para ver se um preço mais atrativo
-  // melhora a conversão deste upsell — reverter se não compensar.
+  // bothPrice baixado em 10€ em cada tamanho a 2026-09-08, teste explícito do
+  // dono para ver se um preço mais atrativo melhora a conversão deste
+  // tratamento — reverter se não compensar.
   { id: 'solteiro', label: 'Solteiro',     cleaningPrice: 59, waterproofingPrice: 35, bothPrice: 74,  originalBothPrice: 94 },
   { id: 'casal',    label: 'Casal',        cleaningPrice: 69, waterproofingPrice: 40, bothPrice: 89,  originalBothPrice: 109 },
   { id: 'king',     label: 'King / Queen', cleaningPrice: 79, waterproofingPrice: 45, bothPrice: 104, originalBothPrice: 124 },
@@ -137,5 +139,4 @@ export interface UpsellItemConfig {
   waterproof?: boolean;
   waterproofingTier?: 'essencial' | 'premium';
   waterproofPrice?: number;
-  chaiseLongue?: boolean;
 }
