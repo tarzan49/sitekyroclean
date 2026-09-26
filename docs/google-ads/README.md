@@ -211,9 +211,15 @@ Tudo confirmado depois de recarregar a página.
   anúncios). Usam as 10 fotos reais de sofás que existem; não há material
   melhor para trocar sem fotografar trabalhos novos.
 
-**Por fazer no site:** `travel.ts` não tem Santa Maria da Feira, S. João da
-Madeira, Ovar nem Oliveira de Azeméis, que agora recebem anúncios do Porto.
-Falta o dono dizer a taxa de deslocação para esses quatro.
+**Resolvido no site a 26/09/2026:** as oito localidades que as campanhas
+abrangem e o questionário recusava (Santa Maria da Feira, S. João da Madeira,
+Ovar e Oliveira de Azeméis no Porto; Sines, Grândola, Santiago do Cacém e
+Alcácer do Sal em Lisboa) passaram a cidades servidas, com página própria e
+taxa: Feira 10€, as outras sete 15€ (deduzido das zonas do `travel.ts`, não
+confirmado pelo dono). A pesquisa do questionário também encontra Comporta,
+Tróia, Porto Covo, Esmoriz e outras freguesias. **Regra:** uma localidade nova
+na segmentação tem de entrar em `travel.ts` e em `serviceCatalog.ts` no mesmo
+dia; `travelPrices.test.ts` exige que as duas listas coincidam.
 
 ### Textos revistos e verificação final (26/09/2026, noite)
 

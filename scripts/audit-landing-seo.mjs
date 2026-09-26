@@ -10,7 +10,7 @@ const { getLandingFaqRoutes } = require('./landing-faq-routes.ts');
 const { getLandingPageModel } = require('../src/data/landingPageModel.ts');
 const { escapeLandingHtml: e } = require('./landing-page-html.ts');
 const { getAllKeywordVariantRoutes, getKeywordVariantData } = require('../src/data/keywordVariantData.ts');
-const { locationPrices } = require('../src/constants/travel.ts');
+const { locationPrices, EXTENDED_TRIP_CITIES } = require('../src/constants/travel.ts');
 const failures = [], titles = new Set(), descriptions = new Set(), headings = new Set(), imageUse = new Map(), combinations = new Map();
 const routes = getLandingFaqRoutes();
 for (const { path } of routes) {
@@ -47,7 +47,7 @@ for (const route of getAllKeywordVariantRoutes()) {
   const model = getLandingPageModel(route.path);
   if (data.municipality !== model.municipalityName || locationPrices[data.municipality] === undefined) failures.push(route.path + ': invalid municipality');
   if (data.locationName !== data.municipality) {
-    if (['Aveiro', 'Coimbra'].includes(data.municipality)) consultationVariants++;
+    if (EXTENDED_TRIP_CITIES.has(data.municipality)) consultationVariants++;
     if (locationPrices[data.municipality] > 10) higherTravelVariants++;
   }
 }

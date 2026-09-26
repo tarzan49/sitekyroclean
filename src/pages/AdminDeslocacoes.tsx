@@ -6,7 +6,7 @@ type Area = "porto" | "braga" | "lisboa" | "algarve";
 const REGIONS: { area: Area; label: string; color: string }[] = [
   { area: "porto", label: "Porto", color: "border-emerald-500/30" },
   { area: "braga", label: "Braga / Minho", color: "border-amber-500/30" },
-  { area: "lisboa", label: "Lisboa / Área Metropolitana", color: "border-blue-500/30" },
+  { area: "lisboa", label: "Lisboa / AML e Alentejo Litoral", color: "border-blue-500/30" },
   { area: "algarve", label: "Algarve", color: "border-orange-500/30" },
 ];
 

@@ -23,7 +23,7 @@ export const RESOURCE_SERVICES = [
 ];
 export const RESOURCE_FAQS = [
   { id: 'preco-e-deslocacao', question: 'Como sei o preço e o que está incluído?', answer: `${PRICE_PROMISE} ${RESOURCE_TRAVEL} Tapetes e alcatifas são sempre sob orçamento, com largura e comprimento de cada peça ou área. ${TREATMENT_EXTRAS}` },
-  { id: 'preparar-e-marcar', question: 'Como preparo a visita e confirmo a disponibilidade?', answer: `Envie fotografias, medidas e localidade. Deixe espaço de trabalho e acesso a água e eletricidade conforme combinado; não aplique produtos previamente. ${RESPONSE_PROMISE}. ${AVAILABILITY_PROMISE} ${COVERAGE_PROMISE} Aveiro e Coimbra sob consulta.` },
+  { id: 'preparar-e-marcar', question: 'Como preparo a visita e confirmo a disponibilidade?', answer: `Envie fotografias, medidas e localidade. Deixe espaço de trabalho e acesso a água e eletricidade conforme combinado; não aplique produtos previamente. ${RESPONSE_PROMISE}. ${AVAILABILITY_PROMISE} ${COVERAGE_PROMISE} Aveiro, Coimbra e Alentejo Litoral sob consulta.` },
   { id: 'secagem-e-protecao', question: 'Quando posso voltar a utilizar a peça?', answer: `${DRYING_PROMISE} Aguarde a secagem completa e siga as instruções dadas no final. A impermeabilização tem um tempo de cura próprio, que pode exigir 24 horas. A proteção é aplicada apenas em sofás e cadeiras compatíveis.` },
   { id: 'garantia-e-manchas', question: 'E se as manchas não saírem ou eu não ficar satisfeito?', answer: `Avaliamos o tecido, a origem da mancha e os produtos já aplicados. Não prometemos remover todas as manchas nem reparar desgaste. Esses limites são explicados antes do trabalho e as manchas preexistentes não excluem a repetição gratuita. ${SATISFACTION_PROMISE}` },
 ];

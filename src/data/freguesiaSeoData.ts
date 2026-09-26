@@ -238,6 +238,52 @@ export const municipiosComFreguesias: MunicipioGroup[] = [
       { name: "Moldes", slug: "moldes", nearby: ["arouca-centro"] },
     ],
   },
+  // Sul do Douro (2026-09-26). Nomes e proximidade confirmados na GeoAPI
+  // (json.geoapi.pt, centroides das freguesias). A sede de cada concelho fica
+  // de fora: seria uma página igual à da cidade. São João da Madeira tem uma
+  // única freguesia, que é a própria cidade, por isso não tem entrada aqui.
+  {
+    name: "Santa Maria da Feira", slug: "santa-maria-da-feira",
+    freguesias: [
+      { name: "Lourosa", slug: "lourosa", nearby: ["mozelos", "santa-maria-de-lamas", "fiaes"] },
+      { name: "Fiães", slug: "fiaes", nearby: ["lourosa", "argoncilhe", "mozelos"] },
+      { name: "Argoncilhe", slug: "argoncilhe", nearby: ["mozelos", "fiaes", "lourosa"] },
+      { name: "Mozelos", slug: "mozelos", nearby: ["santa-maria-de-lamas", "lourosa", "nogueira-da-regedoura"] },
+      { name: "Santa Maria de Lamas", slug: "santa-maria-de-lamas", nearby: ["mozelos", "lourosa", "pacos-de-brandao"] },
+      { name: "Nogueira da Regedoura", slug: "nogueira-da-regedoura", nearby: ["mozelos", "sao-paio-de-oleiros", "santa-maria-de-lamas"] },
+      { name: "São Paio de Oleiros", slug: "sao-paio-de-oleiros", nearby: ["pacos-de-brandao", "nogueira-da-regedoura", "santa-maria-de-lamas"] },
+      { name: "Paços de Brandão", slug: "pacos-de-brandao", nearby: ["sao-paio-de-oleiros", "santa-maria-de-lamas", "rio-meao"] },
+      { name: "Rio Meão", slug: "rio-meao", nearby: ["pacos-de-brandao", "sao-joao-de-ver", "santa-maria-de-lamas"] },
+      { name: "São João de Ver", slug: "sao-joao-de-ver", nearby: ["rio-meao", "santa-maria-de-lamas", "lourosa"] },
+      { name: "Arrifana", slug: "arrifana", nearby: ["milheiros-de-poiares", "sao-joao-de-ver"] },
+      { name: "Milheirós de Poiares", slug: "milheiros-de-poiares", nearby: ["arrifana", "sao-joao-de-ver"] },
+    ],
+  },
+  {
+    name: "Oliveira de Azeméis", slug: "oliveira-de-azemeis",
+    freguesias: [
+      { name: "Cucujães", slug: "cucujaes", nearby: ["sao-roque", "macieira-de-sarnes", "nogueira-do-cravo"] },
+      { name: "São Roque", slug: "sao-roque", nearby: ["nogueira-do-cravo", "macieira-de-sarnes", "cucujaes"] },
+      { name: "Nogueira do Cravo", slug: "nogueira-do-cravo", nearby: ["macieira-de-sarnes", "sao-roque", "cesar"] },
+      { name: "Macieira de Sarnes", slug: "macieira-de-sarnes", nearby: ["nogueira-do-cravo", "cesar", "sao-roque"] },
+      { name: "Cesar", slug: "cesar", nearby: ["macieira-de-sarnes", "fajoes", "nogueira-do-cravo"] },
+      { name: "Fajões", slug: "fajoes", nearby: ["carregosa", "cesar", "macieira-de-sarnes"] },
+      { name: "Carregosa", slug: "carregosa", nearby: ["fajoes", "cesar"] },
+      { name: "Loureiro", slug: "loureiro", nearby: ["pinheiro-da-bemposta", "cucujaes"] },
+      { name: "Pinheiro da Bemposta", slug: "pinheiro-da-bemposta", nearby: ["loureiro"] },
+    ],
+  },
+  {
+    name: "Ovar", slug: "ovar",
+    freguesias: [
+      { name: "Esmoriz", slug: "esmoriz", nearby: ["cortegaca", "maceda"] },
+      { name: "Cortegaça", slug: "cortegaca", nearby: ["esmoriz", "maceda"] },
+      { name: "Maceda", slug: "maceda", nearby: ["arada", "cortegaca", "furadouro"] },
+      { name: "Arada", slug: "arada", nearby: ["maceda", "furadouro"] },
+      { name: "Furadouro", slug: "furadouro", nearby: ["arada", "maceda"] },
+      { name: "Válega", slug: "valega", nearby: ["arada", "furadouro"] },
+    ],
+  },
   // ═══════════════ Centro (Aveiro/Coimbra, expansão 2026-09-10) ═══════════════
   {
     name: "Aveiro", slug: "aveiro",
@@ -491,6 +537,39 @@ export const municipiosComFreguesias: MunicipioGroup[] = [
     freguesias: [
       { name: "Sesimbra (Castelo) e Quinta do Conde", slug: "sesimbra-castelo", nearby: ["santiago-sesimbra"] },
       { name: "Santiago", slug: "santiago-sesimbra", nearby: ["sesimbra-castelo"] },
+    ],
+  },
+  // Alentejo Litoral (2026-09-26), mesma fonte e mesmo critério. Tróia não é
+  // freguesia (pertence ao Carvalhal), mas entra como Vilamoura em Loulé: é o
+  // nome que as pessoas escrevem. Alvalade e Carvalhal ficaram de fora porque
+  // o nome já existe em Lisboa e em Barcelos, e a deteção de localização
+  // resolve freguesias pelo nome.
+  {
+    name: "Alcácer do Sal", slug: "alcacer-do-sal",
+    freguesias: [
+      { name: "Comporta", slug: "comporta", nearby: [] },
+      { name: "Torrão", slug: "torrao", nearby: [] },
+    ],
+  },
+  {
+    name: "Grândola", slug: "grandola",
+    freguesias: [
+      { name: "Tróia", slug: "troia", nearby: [] },
+      { name: "Melides", slug: "melides", nearby: [] },
+    ],
+  },
+  {
+    name: "Santiago do Cacém", slug: "santiago-do-cacem",
+    freguesias: [
+      { name: "Vila Nova de Santo André", slug: "vila-nova-de-santo-andre", nearby: [] },
+      { name: "Cercal do Alentejo", slug: "cercal-do-alentejo", nearby: [] },
+      { name: "Ermidas-Sado", slug: "ermidas-sado", nearby: [] },
+    ],
+  },
+  {
+    name: "Sines", slug: "sines",
+    freguesias: [
+      { name: "Porto Covo", slug: "porto-covo", nearby: [] },
     ],
   },
   // ═══════════════ Algarve ═══════════════

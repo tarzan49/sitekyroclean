@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { MapPin, Navigation, Check, ChevronRight, Loader2 } from 'lucide-react';
 import { locationPrices } from '@/components/quiz/QuizTypes';
 import { cities } from '@/data/serviceCatalog';
-import { detectServiceCity, normalizeCity } from '@/lib/locationDetection';
+import { detectServiceCity, searchServiceLocations, type LocationOption } from '@/lib/locationDetection';
 import { Button } from '@/components/ui/button';
 
 interface QuizStepLocationProps {
@@ -50,7 +50,7 @@ const QuizStepLocation = ({ location, locationQuery, setLocationQuery, scrollCon
   const choose = (city: string) => { stopDetection(); setSelected(city); setEditing(false); setLocationQuery(''); };
   const area = cities.find(city => city.name === (detected || selected))?.area;
   const regional = area ? cities.filter(city => city.area === area && city.name !== selected && locationPrices[city.name] !== undefined).map(city => city.name).slice(0, 4) : [];
-  const matches = locationQuery.trim() ? Object.keys(locationPrices).filter(city => normalizeCity(city).includes(normalizeCity(locationQuery))).slice(0, 6) : regional;
+  const matches: LocationOption[] = locationQuery.trim() ? searchServiceLocations(locationQuery) : regional.map(city => ({ city }));
 
   return (
     <div className="w-full max-w-sm mx-auto text-left py-3 sm:py-1 pr-4 sm:pr-0">
@@ -71,7 +71,7 @@ const QuizStepLocation = ({ location, locationQuery, setLocationQuery, scrollCon
         <label htmlFor="quiz-location-search" className="block text-base text-white/80 mb-2">{selected ? 'Onde pretende o serviço?' : 'Localidade do serviço'}</label>
         <input ref={input} id="quiz-location-search" type="search" placeholder="Pesquisar localidade" value={locationQuery} onChange={event => { stopDetection(); setLocationQuery(event.target.value); }} onFocus={() => { if (scrollContainerRef.current) scrollContainerRef.current.scrollTop = 0; }} autoComplete="off" className="w-full h-12 px-4 text-base bg-[#1a2a1a] border border-gold/25 focus:border-gold rounded-xl text-white placeholder:text-white/80" />
         {!locationQuery && regional.length > 0 && <p className="pt-2 text-sm text-white/80">Outras localidades na sua região</p>}
-        {matches.length > 0 && <div className="border border-white/10 rounded-xl overflow-hidden bg-[#1a2a1a]">{matches.map(city => <button type="button" key={city} onClick={() => choose(city)} className="w-full min-h-12 flex justify-between items-center gap-3 px-4 py-3 text-left text-base text-white border-b border-white/5 last:border-0 hover:bg-gold/10">{city}<ChevronRight className="w-4 h-4 text-white/80 shrink-0" /></button>)}</div>}
+        {matches.length > 0 && <div className="border border-white/10 rounded-xl overflow-hidden bg-[#1a2a1a]">{matches.map(({ city, parish }) => <button type="button" key={`${parish ?? ''}|${city}`} onClick={() => choose(city)} className="w-full min-h-12 flex justify-between items-center gap-3 px-4 py-3 text-left text-base text-white border-b border-white/5 last:border-0 hover:bg-gold/10">{parish ? <span>{parish}<span className="text-white/70">, {city}</span></span> : city}<ChevronRight className="w-4 h-4 text-white/80 shrink-0" /></button>)}</div>}
         {locationQuery && matches.length === 0 && <p className="text-base text-white/80 py-2">Localidade não encontrada. Tente o nome do concelho.</p>}
         {!loading && <button type="button" onClick={() => { manuallyEdited.current = false; setAttempt(value => value + 1); }} className="min-h-11 text-base text-gold flex items-center gap-2"><Navigation className="w-4 h-4" />Usar a minha localização</button>}
       </div>}

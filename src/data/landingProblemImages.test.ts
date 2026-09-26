@@ -35,7 +35,7 @@ describe('public sofa problem image selection', () => {
       }
       expect((html.match(/<figcaption>Imagem ilustrativa<\/figcaption>/g) || []).length).toBe(4);
     }
-    expect(pages).toBe(2152);
+    expect(pages).toBe(2289);
     expect(families.size).toBe(4);
     expect(used.size).toBe(40);
   });

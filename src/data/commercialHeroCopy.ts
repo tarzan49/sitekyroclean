@@ -1,5 +1,5 @@
 import { services } from './serviceCatalog';
-import { locationPrices } from '../constants/travel';
+import { EXTENDED_TRIP_CITIES, locationPrices } from '../constants/travel';
 import { REVIEW_COUNT, REVIEW_RATING } from '../constants/business';
 import { sofaPrices } from '../components/quiz/QuizTypes';
 
@@ -27,7 +27,7 @@ const subtitles: Record<string, string> = {
   // o preço de partida do serviço, que é o que a linha de preço do hero mostra.
   impermeabilizacao: `Proteção Premium desde ${IMPER_PREMIUM}: até 10 anos e até 5 lavagens. Essencial desde ${IMPER_ESSENCIAL}, ou ${IMPER_PACK} com limpeza.`,
 };
-export const commercialHeroSubtitle = (serviceSlug: string, city?: string) => `${subtitles[serviceSlug] ?? 'Cuidados profissionais adaptados aos seus estofos.'}${city === 'Aveiro' || city === 'Coimbra' ? ' Disponibilidade sob consulta.' : ''}`;
+export const commercialHeroSubtitle = (serviceSlug: string, city?: string) => `${subtitles[serviceSlug] ?? 'Cuidados profissionais adaptados aos seus estofos.'}${city && EXTENDED_TRIP_CITIES.has(city) ? ' Disponibilidade sob consulta.' : ''}`;
 
 /**
  * Os factos que o hero mostra: a linha de preço e os três indicadores.

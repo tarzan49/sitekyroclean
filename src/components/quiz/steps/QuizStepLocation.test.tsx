@@ -40,4 +40,14 @@ describe('location step', () => {
     expect(screen.getByText('Outras localidades na sua região')).toBeTruthy();
     expect(screen.queryByRole('button', { name: 'Matosinhos' })).toBeNull();
   });
+  it('finds a served parish by its own name and charges its municipality', async () => {
+    vi.mocked(detectServiceCity).mockRejectedValue(new Error('Localização recusada'));
+    render(<QuizStepLocation {...props} locationQuery="Comporta" />);
+    await screen.findByText('Localização recusada');
+    expect(screen.queryByText(/Localidade não encontrada/)).toBeNull();
+    fireEvent.click(screen.getByRole('button', { name: 'Comporta, Alcácer do Sal' }));
+    expect(screen.getByText('Deslocação para Alcácer do Sal')).toBeTruthy();
+    fireEvent.click(screen.getByRole('button', { name: 'Continuar' }));
+    expect(props.onCitySelect).toHaveBeenCalledWith('Alcácer do Sal');
+  });
 });

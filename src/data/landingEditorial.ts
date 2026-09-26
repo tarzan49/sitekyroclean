@@ -1,4 +1,5 @@
 import type { LandingFaqContext, LandingService } from './landingFaqPool';
+import { EXTENDED_TRIP_CITIES } from '../constants/travel';
 
 interface EditorialContext {
   family: LandingFaqContext['family'];
@@ -22,7 +23,7 @@ export function getLandingEditorial(context: EditorialContext) {
   const { family, serviceSlug, serviceLabel, place, municipality } = context;
   const brief = briefs[serviceSlug];
   const where = `${place === 'Porto' ? 'no' : 'em'} ${place}`;
-  const consultation = municipality === 'Aveiro' || municipality === 'Coimbra';
+  const consultation = EXTENDED_TRIP_CITIES.has(municipality);
   const quoteOnly = serviceSlug === 'limpeza-tapetes' || serviceSlug === 'limpeza-alcatifas';
   const metaWhere = family === 'freguesia' ? `em ${place}, ${municipality}` : where;
   let intro: string;

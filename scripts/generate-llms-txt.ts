@@ -38,7 +38,7 @@ const AREA_LABELS: Record<string, string> = {
   // haver equipa própria no Centro — daí o rótulo não ser só "Norte".
   porto: 'Grande Porto, Norte e Centro',
   braga: 'Braga e Minho',
-  lisboa: 'Lisboa e Vale do Tejo',
+  lisboa: 'Lisboa, Setúbal e Alentejo Litoral',
   algarve: 'Algarve',
 };
 

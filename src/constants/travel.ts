@@ -16,11 +16,17 @@ export const locationPrices: Record<string, number> = {
   'Santo Tirso': 10,
   'Trofa': 10,
   'Paredes': 10,
+  'Santa Maria da Feira': 10, // ~27 min pela A1, vizinha de Espinho (2026-09-26)
   // Zona 3 — Interior norte, ~35-45 min
   'Penafiel': 15,
   'Paços de Ferreira': 15,
   'Felgueiras': 15,
   'Lousada': 15,
+  // Zona 3 — Sul do Douro, ~33-37 min, como Penafiel (2026-09-26, entraram na
+  // campanha de Google Ads do Porto e o questionário recusava-as)
+  'São João da Madeira': 15,
+  'Ovar': 15,
+  'Oliveira de Azeméis': 15,
   // Zona 4 — Mais afastado, ~45-55 min
   'Arouca': 20,
   // Zona 3 — Centro, sem equipa própria, deslocação a partir do Porto (2026-09-10, corrigido a pedido do dono)
@@ -63,6 +69,14 @@ export const locationPrices: Record<string, number> = {
   'Alcochete': 15,
   'Palmela': 15,
   'Sesimbra': 15,
+  // Alentejo Litoral — equipa Lisboa, ~1h a 1h35. Ficam no teto de Lisboa
+  // (15€), pelo mesmo critério que o dono aplicou a Coimbra: 20€/25€ para as
+  // cidades mais afastadas foi rejeitado. Disponibilidade sob consulta, ver
+  // EXTENDED_TRIP_CITIES. (2026-09-26, entraram na campanha de Lisboa.)
+  'Alcácer do Sal': 15,
+  'Grândola': 15,
+  'Santiago do Cacém': 15,
+  'Sines': 15,
 
   // ═══ Algarve (equipa local) ═══
   // Algarve: 10€ no centro, 15€ na zona ocidental e 25€ nos extremos/interior.
@@ -89,6 +103,17 @@ export const locationPrices: Record<string, number> = {
   'Vila do Bispo': 25,
   'Alcoutim': 25,
 };
+
+/**
+ * Cidades sem equipa por perto, servidas por deslocação alargada a partir de
+ * outra base: Aveiro e Coimbra pela equipa do Porto, o Alentejo Litoral pela
+ * de Lisboa. As páginas destas cidades dizem "Disponibilidade sob consulta".
+ * Fonte única: a lista vivia escrita à mão (`Aveiro || Coimbra`) em três sítios.
+ */
+export const EXTENDED_TRIP_CITIES: ReadonlySet<string> = new Set([
+  'Aveiro', 'Coimbra',
+  'Alcácer do Sal', 'Grândola', 'Santiago do Cacém', 'Sines',
+]);
 
 /** Services and extras at their actual quoted prices, excluding travel. */
 export function calculateTravelFee(baseFee: number, servicesTotal: number): number {

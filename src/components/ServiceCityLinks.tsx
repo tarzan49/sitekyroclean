@@ -17,7 +17,7 @@ const ServiceCityLinks = ({ serviceSlug, serviceLabel }: Props) => {
   const regions = [
     { area: "porto", label: "Porto", hint: "Grande Porto e concelhos próximos" },
     { area: "braga", label: "Braga e Minho", hint: "Braga, Viana do Castelo e concelhos próximos" },
-    { area: "lisboa", label: "Lisboa e Margem Sul", hint: "Lisboa, Cascais, Sintra e Setúbal" },
+    { area: "lisboa", label: "Lisboa, Setúbal e Alentejo Litoral", hint: "Lisboa, Cascais, Sintra, Setúbal e Sines" },
     { area: "algarve", label: "Algarve", hint: "De Aljezur a Vila Real de Santo António" },
   ].map(region => ({
     ...region,

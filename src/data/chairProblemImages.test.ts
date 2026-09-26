@@ -27,7 +27,7 @@ describe('chair problem image library', () => {
     const used = new Set<string>();
     const families = new Set<string>();
     const routes = getLandingFaqRoutes().filter(record => record.context.serviceSlug === 'limpeza-cadeiras');
-    expect(routes).toHaveLength(2152);
+    expect(routes).toHaveLength(2289);
     for (const record of routes) {
       const model = getLandingPageModel(record.path)!;
       families.add(model.family);

@@ -1099,7 +1099,7 @@ export function prerenderRoutes(outDir: string): number {
             { q: 'Quanto custa a limpeza de sofá?', a: 'A limpeza de sofá começa a partir de 49€ para sofás de 1 lugar, 69€ para 2 lugares e 79€ para 3 lugares. Peça orçamento gratuito sem compromisso.' },
             { q: 'Quanto tempo demora a limpeza de sofá?', a: 'O serviço demora entre 1 a 3 horas conforme o tamanho e estado do sofá. O sofá fica pronto a usar em 3 a 6 horas após a limpeza.' },
             { q: 'A limpeza remove manchas antigas do sofá?', a: 'Sim. Tratamos manchas de vinho, café, gordura e sangue com pré-tratamento específico. Manchas muito antigas podem não sair completamente, mas apresentamos sempre o melhor resultado possível.' },
-            { q: 'Em que zonas fazem limpeza de sofás ao domicílio?', a: 'Temos equipas em Braga, Porto, Lisboa e Algarve. Aveiro e Coimbra sob consulta.' },
+            { q: 'Em que zonas fazem limpeza de sofás ao domicílio?', a: 'Temos equipas em Braga, Porto, Lisboa e Algarve. Aveiro, Coimbra e Alentejo Litoral sob consulta.' },
           ]),
           links: cities.map(city => ({ href: `/limpeza-sofas-${city.slug}`, label: city.name })),
         },
@@ -1337,12 +1337,12 @@ export function prerenderRoutes(outDir: string): number {
         desc: 'Serviços de limpeza profissional de estofos disponíveis em todo o país. Porto, Gaia, Matosinhos, Lisboa, Braga e muito mais.',
         content: {
           h1: 'Áreas de Serviço',
-          intro: 'Equipas em Braga, Porto, Lisboa e Algarve, com cobertura regular do litoral entre Viana do Castelo e o Algarve. Aveiro, Coimbra e outras zonas mediante confirmação de disponibilidade.',
+          intro: 'Equipas em Braga, Porto, Lisboa e Algarve, com cobertura regular do litoral entre Viana do Castelo e o Algarve. Aveiro, Coimbra, Alentejo Litoral e outras zonas mediante confirmação de disponibilidade.',
           benefits: [
             'Porto e Grande Porto: deslocação a partir de 10€',
             'Equipa local em Braga, com disponibilidade confirmada antes da marcação',
             AVAILABILITY_PROMISE,
-            'Aveiro e Coimbra: disponibilidade sob consulta',
+            'Aveiro, Coimbra e Alentejo Litoral: disponibilidade sob consulta',
             COVERAGE_PROMISE,
           ],
           links: cities.map(city => ({ href: `/limpeza-sofas-${city.slug}`, label: city.name })),

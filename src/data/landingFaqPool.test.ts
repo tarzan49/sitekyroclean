@@ -56,7 +56,7 @@ describe('landing FAQ library', () => {
 
   it('covers every current route with exactly four complete, stable and relevant FAQs', () => {
     const records = getLandingFaqRoutes();
-    expect(records.length).toBe(12912);
+    expect(records.length).toBe(13734);
     expect(new Set(records.map(record => record.path)).size).toBe(records.length);
     const problems: string[] = [];
     for (const record of records) {

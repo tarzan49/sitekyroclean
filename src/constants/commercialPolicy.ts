@@ -9,7 +9,7 @@ export const WEEKLY_REQUESTS = 'Recebemos habitualmente 50 a 60 pedidos de orça
 
 export const EN_RESPONSE_PROMISE = 'We reply in under 10 minutes';
 export const EN_AVAILABILITY_PROMISE = 'We aim for same-day or next-day service, subject to availability confirmed by the local team.';
-export const EN_COVERAGE_PROMISE = 'Teams in Braga, Porto, Lisbon and the Algarve, with regular coverage along the coast from Viana do Castelo to the Algarve. Aveiro, Coimbra and other locations are subject to availability confirmation.';
+export const EN_COVERAGE_PROMISE = 'Teams in Braga, Porto, Lisbon and the Algarve, with regular coverage along the coast from Viana do Castelo to the Algarve. Aveiro, Coimbra, the Alentejo coast and other locations are subject to availability confirmation.';
 export const EN_DRYING_PROMISE = 'Average drying time is 3 to 6 hours, depending on ventilation, fabric and room conditions.';
 export const TREATMENT_EXTRAS = 'A limpeza remove sujidade e resíduos das fibras. O tratamento anti-ácaros e a desbacterização são extras opcionais, escolhidos e orçamentados separadamente.';
 

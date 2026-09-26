@@ -13,7 +13,7 @@ export const ADMIN_REGIONS: AdminRegion[] = ["amp", "norte", "lisboa", "algarve"
 export const ADMIN_REGION_LABELS: Record<AdminRegion, string> = {
   amp: "Área Metropolitana do Porto",
   norte: "Norte (sem Porto)",
-  lisboa: "Área Metropolitana de Lisboa",
+  lisboa: "Lisboa, Setúbal e Alentejo Litoral",
   algarve: "Algarve",
 };
 

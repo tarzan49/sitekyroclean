@@ -1439,3 +1439,14 @@ Pedido aprovado: a paleta verde suave do piloto passa a ser partilhada pelo site
 ## CRM por plataforma (22/09/2026)
 
 Admin: `marketing` (Google) e `meta-marketing` partilham `MarketingPanel` com filtro explícito de plataforma (`marketingPlatforms.ts`). `MarketingInputs` permite gasto diário e pedido manual com evidência de origem; `ad_spend_daily`, `register_marketing_lead` e `set_marketing_lead_status` dependem da migração aditiva `20260922000000_meta_marketing.sql`. Meta Pixel inclui Lead apenas após CRM confirmado e eventos personalizados de clique separados. Sem CAPI ou importação automática de mensagens. Regras, limites e publicação em `docs/marketing-meta-crm.md`. Dados financeiros privados da auditoria não entram no repositório público.
+
+## Oito cidades novas: Sul do Douro e Alentejo Litoral (26/09/2026)
+
+As campanhas de Google Ads (Porto e Lisboa) passaram a abranger Santa Maria da Feira, São João da Madeira, Ovar, Oliveira de Azeméis, Alcácer do Sal, Grândola, Santiago do Cacém e Sines, que não tinham taxa em `travel.ts`: o passo de localidade só aceita chaves de `locationPrices` e respondia "Localidade não encontrada". Entraram pelo mesmo caminho de Aveiro/Coimbra: `travel.ts` (taxa), `cities` em `serviceCatalog.ts` (área `porto` ou `lisboa`) e `municipiosComFreguesias` em `freguesiaSeoData.ts`. Tudo o resto é gerado: localidade × serviço, preço, variantes, freguesias, packs, materiais e tratamentos. 61 → 69 cidades, 12.912 → 13.734 páginas landing (+137 por serviço), 17.216 rotas prerenderizadas, 0 ligações mortas, auditoria `audit-landing-seo.mjs` sem falhas.
+
+- **Taxas por zona existente:** Feira 10€; São João da Madeira, Ovar e Oliveira de Azeméis 15€; as quatro do Alentejo Litoral 15€ (teto de Lisboa, critério de Coimbra) e "Disponibilidade sob consulta".
+- **Freguesias** confirmadas na GeoAPI (`json.geoapi.pt/municipio/{nome}/freguesias`), com `nearby` calculado pelos centroides (até 9 km). Sem a sede de cada concelho (seria uma cópia da página da cidade) e sem São João da Madeira (uma só freguesia, a própria cidade). Alvalade e Carvalhal ficaram de fora por já existirem em Lisboa e Barcelos.
+- **`EXTENDED_TRIP_CITIES`** (`travel.ts`) substitui os três `Aveiro || Coimbra` (`landingEditorial.ts`, `commercialHeroCopy.ts`, `audit-landing-seo.mjs`).
+- **`searchServiceLocations`** (`locationDetection.ts`) é a pesquisa do `QuizStepLocation`: concelhos primeiro, depois freguesias dos concelhos servidos que ainda não apareceram, no máximo 6; expande "S."/"Sta."/"Sto.".
+- Rótulo da área `lisboa` passou a "Lisboa, Setúbal e Alentejo Litoral" (`ServiceCityLinks`, `AreasDeServico`, `llms.txt`, admin). `/areas-de-servico` conta municípios por `cities.length`, não pelos concelhos com freguesias.
+- Contagens fixadas nos testes de imagens/FAQ/modelo atualizadas (2152 → 2289 por serviço, 12912 → 13734).
