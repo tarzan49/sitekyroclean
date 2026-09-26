@@ -16,6 +16,7 @@ import {
   SERVICES_COMPLETED_LABEL,
 } from "@/constants/business";
 import { services, cities } from "@/data/serviceCatalog";
+import { isPricedPerChair, startingPriceLabel } from "@/data/enginePrices";
 import { locationPrices } from "@/constants/travel";
 import {
   RESPONSE_PROMISE,
@@ -103,7 +104,9 @@ const Sobre = () => {
                   <p className="text-sm text-neutral-600 mt-1">
                     {service.priceFrom === "Sob orçamento"
                       ? "Sob orçamento, conforme as medidas"
-                      : `Desde ${service.priceFrom} por artigo`}
+                      : isPricedPerChair(service.slug)
+                        ? startingPriceLabel(service.slug, service.priceFrom)
+                        : `${startingPriceLabel(service.slug, service.priceFrom)} por artigo`}
                   </p>
                 </li>
               ))}

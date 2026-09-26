@@ -151,8 +151,9 @@ Por resolver:
   `Campaign #1`, "higienização de sofás" foi a palavra com mais impressões (78).
   5 das 7 palavras de impermeabilização de cada cidade têm "Baixo volume de
   pesquisa".
-- **"Pack desde 99€"** aparece nos anúncios de impermeabilização e não aparece
-  em `/impermeabilizacao-{cidade}`.
+- **"Pack desde 99€"** aparecia nos anúncios de impermeabilização e não aparecia
+  em `/impermeabilizacao-{cidade}`. (26/09/2026: passou a "desde 89€" nos
+  anúncios e no site, que é o preço que o quiz cobra.)
 - **Existe um recurso de WhatsApp** (tipo "Mensagem", ação de conversão
   "Conversation started"), mas só na `Campaign #1`, com texto de Lisboa.
 - **Cobertura de Lisboa:** Seixal, Vila Franca de Xira, Mafra e Moita só
@@ -204,9 +205,10 @@ Tudo confirmado depois de recarregar a página.
   registo da marca no INPI, em nome do anunciante validado.
   `kyrocleansolutions.pt` não serve como URL final: redireciona para outro
   domínio (e o `https://` nem responde), o que dava "destino não corresponde".
-- **Pack desde 99 €** passou a aparecer na abertura de
-  `/impermeabilizacao-{cidade}` (`commercialHeroCopy.ts`, lido de
-  `sofaPrices.bothPrice`).
+- **Pack desde 89 €** aparece na abertura de `/impermeabilizacao-{cidade}`
+  (`commercialHeroCopy.ts`, lido do motor `calcPackPricing`: `bothPrice` menos
+  o desconto de pack). Até 26/09/2026 lia o `bothPrice` cru e dizia 99 €,
+  como os anúncios.
 - **Imagens:** sem nenhuma reprovada (Gestor de Políticas sem problemas de
   anúncios). Usam as 10 fotos reais de sofás que existem; não há material
   melhor para trocar sem fotografar trabalhos novos.
@@ -265,7 +267,7 @@ opcional" (ver `sitelinks-e-extensoes.md`).
   automático. Com 40 €/dia dá para 4 a 5 dias; depois os anúncios param.
 - Páginas: os 13 destinos (anúncios e sitelinks) respondem 200 em menos de
   0,3 s. Na impermeabilização, todas as promessas do anúncio estão visíveis
-  (59/89/99 €, 10 anos, 5 lavagens, 1 a 2 anos, 4,9, 125). **Na limpeza
+  (59/89/89 €: Essencial, Premium e pack de 1 lugar; 10 anos, 5 lavagens, 1 a 2 anos, 4,9, 125). **Na limpeza
   (`?ads=1`), "+1100 clientes servidos", "preço fechado antes de marcar" e
   "equipa própria" não aparecem na página**, e a garantia de 48 h só existe
   dentro de uma secção fechada. Não é motivo de reprovação, mas é o anúncio a
@@ -279,7 +281,7 @@ Duas campanhas iguais na estrutura, uma por cidade, cada uma com dois grupos:
 |---|---|---|
 | Página | `/limpeza-sofas-{cidade}?ads=1` | `/impermeabilizacao-{cidade}?ads=1` |
 | Palavras-chave | 12, correspondência de expressão | 7, correspondência de expressão |
-| Ângulo | prova social, preço fechado, resposta em 10 min, garantia 48 h | duração declarada, duas versões com preço, pack desde 99€ |
+| Ângulo | prova social, preço fechado, resposta em 10 min, garantia 48 h | duração declarada, duas versões com preço, pack desde 89€ |
 
 Definições: só Rede de Pesquisa da Google (sem parceiros, sem Display),
 Maximizar cliques com limite de CPC de **2,00 €** ao nível da campanha (as duas),

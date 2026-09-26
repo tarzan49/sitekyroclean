@@ -1,6 +1,7 @@
 import { ALCATIFA_PROBLEMS } from "./alcatifaProblems";
 import { WATERPROOFING_PROBLEMS } from "./waterproofingProblems";
 import { getLandingFaqs, type LandingService } from './landingFaqPool';
+import { startingPriceLabel } from './enginePrices';
 // ─── Dynamic Content Engine ───────────────────────────────────────
 // Generates unique, deterministic content for each freguesia × service page.
 // All pools are SERVICE-SPECIFIC and all templates reference the parish (f) and city (c).
@@ -15,12 +16,19 @@ function pick<T>(arr: readonly T[], seed: number): T {
   return arr[seed % arr.length];
 }
 
-/** Tapetes não têm preço fixo (2026-09-06, sempre "Sob orçamento") — os templates
- * partilhados por todos os serviços dizem sempre "desde {price}", o que fica
- * quebrado para tapetes ("desde Sob orçamento"). Esta função devolve a cláusula
- * "desde X" pronta a inserir, já adaptada quando não há preço numérico. */
-function priceClause(price: string, capitalized = false): string {
-  const clause = /^\d/.test(price) ? `desde ${price}` : 'com orçamento sempre à medida';
+/** O preço de partida de uma página: o serviço (as cadeiras dizem-se por
+ * cadeira) e o rótulo do catálogo ("49€", "Sob orçamento"). */
+interface PriceRef { serviceSlug: string; price: string }
+
+/** Tapetes não têm preço fixo (2026-09-06, sempre "Sob orçamento") e as
+ * cadeiras cobram-se por cadeira (26/09/2026, "20€ por cadeira", nunca
+ * "desde"). Os templates partilhados por todos os serviços diziam sempre
+ * "desde {price}", o que ficava quebrado para os dois. Esta função devolve a
+ * cláusula pronta a inserir: "desde 49€", "a 20€ por cadeira" ou, sem preço
+ * numérico, "com orçamento sempre à medida". */
+function priceClause({ serviceSlug, price }: PriceRef, capitalized = false): string {
+  if (/^\d/.test(price)) return startingPriceLabel(serviceSlug, price, capitalized ? 'start' : 'mid');
+  const clause = 'com orçamento sempre à medida';
   return capitalized ? clause.charAt(0).toUpperCase() + clause.slice(1) : clause;
 }
 
@@ -228,7 +236,7 @@ export function getLocalData(slug: string, freguesia: string, municipio: string)
 
 // ─── Intro Templates ─────────────────────────────────────────────
 
-type ContentTemplate = (f: string, c: string, svc: string, price: string) => string;
+type ContentTemplate = (f: string, c: string, svc: string, price: PriceRef) => string;
 
 const introTemplates: ContentTemplate[] = [
   (f, c, svc, price) => `Procura ${svc.toLowerCase()} profissional em ${f}, ${c}? A Kyro Clean Solutions presta serviços ao domicílio com equipamento de extração profissional. Resultados visíveis no momento, ${priceClause(price)}.`,
@@ -253,7 +261,7 @@ const howItWorksTemplates: ContentTemplate[] = [
 
 // ─── Meta Description Templates ──────────────────────────────────
 
-const metaDescTemplates: Array<(svc: string, f: string, c: string, price: string) => string> = [
+const metaDescTemplates: Array<(svc: string, f: string, c: string, price: PriceRef) => string> = [
   (svc, f, c, price) => `${svc} profissional em ${f}, ${c}. Ao domicílio com resultados visíveis. ${priceClause(price, true)}. Orçamento grátis.`,
   (svc, f, c, price) => `${svc} em ${f}, ${c}. Remoção de manchas, ácaros e odores ao domicílio. ${priceClause(price, true)}. Peça orçamento gratuito.`,
   (svc, f, c, price) => `Serviço profissional de ${svc.toLowerCase()} em ${f}. Equipamento de extração profissional. ${priceClause(price, true)} em ${c}.`,
@@ -423,9 +431,10 @@ export function getDynamicContent(
   const seed = getSeed(`${serviceSlug}-${freguesiaSlug}`);
   const localData = getLocalData(freguesiaSlug, freguesiaName, municipio);
 
-  const intro = pick(introTemplates, seed)(freguesiaName, municipio, serviceName, priceFrom);
-  const metaDescription = pick(metaDescTemplates, seed + 3)(serviceName, freguesiaName, municipio, priceFrom);
-  const howItWorks = pick(howItWorksTemplates, seed + 7)(freguesiaName, municipio, serviceName, priceFrom);
+  const price: PriceRef = { serviceSlug, price: priceFrom };
+  const intro = pick(introTemplates, seed)(freguesiaName, municipio, serviceName, price);
+  const metaDescription = pick(metaDescTemplates, seed + 3)(serviceName, freguesiaName, municipio, price);
+  const howItWorks = pick(howItWorksTemplates, seed + 7)(freguesiaName, municipio, serviceName, price);
 
   // Problems: service-specific pool, pick 4
   const serviceProblems = problemsByService[serviceSlug] ?? problemsByService["limpeza-sofas"];
@@ -444,7 +453,7 @@ export function getDynamicContent(
   const localSection = `Prestamos serviço em ${freguesiaName}, perto de ${landmarkList}. ${localData.localTip}`;
 
   return {
-    title: `${serviceName} em ${freguesiaName}, ${municipio} | ${/^\d/.test(priceFrom) ? `Desde ${priceFrom}` : 'Orçamento Grátis'} | Kyro Clean Solutions`,
+    title: `${serviceName} em ${freguesiaName}, ${municipio} | ${/^\d/.test(priceFrom) ? startingPriceLabel(serviceSlug, priceFrom, 'title') : 'Orçamento Grátis'} | Kyro Clean Solutions`,
     metaDescription,
     h1: `${serviceName} em ${freguesiaName}`,
     intro: `${intro} ${localSection}`,

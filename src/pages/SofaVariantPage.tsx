@@ -118,6 +118,9 @@ const SofaVariantPage = () => {
     title: model.title, metaDescription: model.metaDescription, h1: model.h1,
     locationName: model.heroLocationName, municipality: model.municipalityName,
     priceFrom: model.priceFrom, serviceKey: parsed.serviceKey, variantKey: parsed.variantKey,
+    // O subtítulo do hero vem do modelo, como no HTML estático: a
+    // impermeabilização de cadeiras tem o seu, com preço por cadeira.
+    subtitle: model.intro,
   } : null), [model, parsed]);
 
   useEffect(() => {
@@ -188,7 +191,7 @@ const SofaVariantPage = () => {
       {isPaidLanding ? <AdsLandingHeader /> : <Header />}
       <main>
 
-        <CommercialHero title={data.h1} serviceSlug={durationSlug} city={data.locationName} municipality={data.municipality} price={data.priceFrom} image={heroImg} whatsappHref={`${WHATSAPP_BASE}?text=${encodeURIComponent(buildVariantWaMessage(data.variantKey === "impermeabilizacao", SERVICE_LABEL[data.serviceKey], VARIANT_LABEL[data.variantKey], data.locationName))}`} source={`variant_hero_${parsed.variantKey}_${parsed.serviceKey}`} />
+        <CommercialHero title={data.h1} subtitle={data.subtitle} serviceSlug={durationSlug} city={data.locationName} municipality={data.municipality} price={data.priceFrom} image={heroImg} whatsappHref={`${WHATSAPP_BASE}?text=${encodeURIComponent(buildVariantWaMessage(data.variantKey === "impermeabilizacao", SERVICE_LABEL[data.serviceKey], VARIANT_LABEL[data.variantKey], data.locationName))}`} source={`variant_hero_${parsed.variantKey}_${parsed.serviceKey}`} />
 
         <LandingServiceSections />
       </main>

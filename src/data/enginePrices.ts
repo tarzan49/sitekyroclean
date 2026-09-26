@@ -127,6 +127,55 @@ export function chairTierRows(): { item: string; price: string }[] {
   ];
 }
 
+// ─── Rótulo do preço de partida ─────────────────────────────────────
+// As cadeiras cobram-se por cadeira, com o preço a descer a partir da 5.ª.
+// "Desde 20€" lia-se como o total do serviço e não fazia sentido a quem o lia
+// (pedido do dono, 26/09/2026: "não digas desde em cadeiras"). Nas cadeiras o
+// preço diz-se sempre por unidade, "20€ por cadeira"; os outros serviços
+// mantêm o "Desde". Qualquer rótulo de preço de partida passa por aqui, para
+// não voltar a haver um "Desde" de cadeiras escrito num canto.
+
+/** `20` → "20€ por cadeira". Também aceita um rótulo já formatado ("18€"). */
+export const perChairPrice = (unit: number | string): string =>
+  `${typeof unit === 'number' ? formatEuro(unit) : unit} por cadeira`;
+/** "20€ por cadeira": a limpeza de uma cadeira, tal como o motor a cobra. */
+export const CHAIR_PRICE_LABEL = perChairPrice(CHAIR_CLEANING_FROM);
+/** "20€ por Cadeira", para títulos em maiúsculas iniciais. */
+export const CHAIR_PRICE_TITLE = CHAIR_PRICE_LABEL.replace(/cadeira$/, 'Cadeira');
+
+/**
+ * Onde o rótulo entra: `start` num rótulo solto ou a abrir a frase, `mid` a
+ * meio da frase, `title` num título com maiúsculas iniciais.
+ */
+export type PriceLabelPosition = 'start' | 'mid' | 'title';
+
+const PER_CHAIR = / por cadeira$/;
+
+/** O serviço cujo preço se diz por cadeira. */
+export const isPricedPerChair = (serviceSlug: string | undefined): boolean => serviceSlug === 'limpeza-cadeiras';
+
+/**
+ * O preço de partida de um serviço, pronto a escrever:
+ *
+ * | posição | outros serviços | cadeiras            |
+ * |---------|-----------------|---------------------|
+ * | start   | "Desde 49€"     | "20€ por cadeira"   |
+ * | mid     | "desde 49€"     | "a 20€ por cadeira" |
+ * | title   | "Desde 49€"     | "20€ por Cadeira"   |
+ *
+ * `price` é o rótulo numérico do catálogo ("49€"). Um preço que já venha por
+ * cadeira ("18€ por cadeira", a impermeabilização das cadeiras) é tratado como
+ * cadeira seja qual for o serviço. Os preços sob orçamento ficam a cargo de
+ * quem chama, porque cada sítio os escreve à sua maneira.
+ */
+export function startingPriceLabel(serviceSlug: string | undefined, price: string, position: PriceLabelPosition = 'start'): string {
+  const alreadyPerChair = PER_CHAIR.test(price);
+  if (!isPricedPerChair(serviceSlug) && !alreadyPerChair) return `${position === 'mid' ? 'desde' : 'Desde'} ${price}`;
+  const label = alreadyPerChair ? price : perChairPrice(price);
+  if (position === 'title') return label.replace(/cadeira$/, 'Cadeira');
+  return position === 'mid' ? `a ${label}` : label;
+}
+
 /** Preço de partida da limpeza por serviço, como o hero e o schema o mostram. */
 export const CLEANING_FROM_BY_SERVICE: Record<string, number | null> = {
   'limpeza-sofas': SOFA_CLEANING_FROM,

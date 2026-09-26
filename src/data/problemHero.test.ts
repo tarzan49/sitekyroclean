@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { getAllProblems, getProblemBySlug } from './problemSeoData';
 import { getProblemHero } from './problemHero';
 import { locationPrices } from '../constants/travel';
+import { CHAIR_PRICE_LABEL } from './enginePrices';
 
 const problem = (slug: string) => getProblemBySlug(slug)!;
 
@@ -38,6 +39,8 @@ describe('problem hero content', () => {
     expect(mites.intro).toContain('tratamentos opcionais');
     expect(mites.priceLabel).toMatch(/^Limpeza desde /);
     expect(getProblemHero(problem('impermeabilizar-sofa')).priceLabel).toMatch(/^Proteção desde /);
+    // Cadeiras: o preço é por cadeira, nunca "desde" (pedido do dono, 26/09/2026).
+    expect(getProblemHero(problem('limpeza-cadeiras-escritorio')).priceLabel).toBe(`Limpeza a ${CHAIR_PRICE_LABEL}`);
   });
   it('makes urgent availability conditional', () => {
     expect(getProblemHero(problem('limpeza-sofa-urgente')).intro).toContain('sob confirmação');

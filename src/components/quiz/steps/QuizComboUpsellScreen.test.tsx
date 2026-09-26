@@ -3,6 +3,7 @@ import { afterEach, describe, expect, it } from 'vitest';
 import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import QuizComboUpsellScreen from './QuizComboUpsellScreen';
 import type { UpsellItemConfig } from '../QuizTypes';
+import { CHAIR_PRICE_LABEL } from '@/data/enginePrices';
 
 afterEach(cleanup);
 
@@ -170,7 +171,9 @@ describe('summary previews price the reference item as if it were added', () => 
     expect(sofa.querySelector('s')).toBeNull();
     // Abaixo do mínimo nem as cadeiras nem o tapete prometem a regalia.
     expect(card(/^Cadeiras/).textContent).not.toContain('pague');
-    expect(card(/^Cadeiras/).textContent).toContain('Desde 80€');
+    // Por cadeira, nunca "Desde" (pedido do dono, 26/09/2026).
+    expect(card(/^Cadeiras/).textContent).toContain(CHAIR_PRICE_LABEL);
+    expect(card(/^Cadeiras/).textContent).not.toContain('Desde');
   });
 
   it('keeps the rug offer on the card when the pack applies', () => {

@@ -31,6 +31,7 @@ import {
   CLIENTS_SERVED_LABEL,
 } from '../src/constants/business';
 import { getAllPosts } from '../src/data/blogData';
+import { chairTierSentence, isPricedPerChair, startingPriceLabel } from '../src/data/enginePrices';
 
 /** Human labels for the four coverage areas in serviceCatalog's `area` field. */
 const AREA_LABELS: Record<string, string> = {
@@ -79,10 +80,14 @@ export function buildLlmsTxt(): string {
   lines.push('## Serviços');
   lines.push('');
   for (const service of services) {
+    // Cadeiras: "20€ por cadeira" e os escalões do motor, nunca "desde 20€",
+    // que se lia como o total do serviço (ver `startingPriceLabel`).
     const price = service.priceFrom === 'Sob orçamento'
-      ? 'sob orçamento, conforme as medidas'
-      : `desde ${service.priceFrom} por artigo`;
-    lines.push(`- [${service.name}](${SITE_URL}${service.baseRoute}): ${price}.`);
+      ? 'sob orçamento, conforme as medidas.'
+      : isPricedPerChair(service.slug)
+        ? `${startingPriceLabel(service.slug, service.priceFrom)}. ${chairTierSentence()}`
+        : `${startingPriceLabel(service.slug, service.priceFrom, 'mid')} por artigo.`;
+    lines.push(`- [${service.name}](${SITE_URL}${service.baseRoute}): ${price}`);
   }
   lines.push('');
 

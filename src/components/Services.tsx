@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { useEffect, useRef, useState, useCallback } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { CHAIR_PRICE_LABEL } from "@/data/enginePrices";
 import sofaImg         from "@/assets/hero-sofa-v4.webp";
 import sofaImgM        from "@/assets/hero-sofa-v4-m720.webp";
 import waterproofImg   from "@/assets/hero-waterproofing.webp";
@@ -48,6 +49,8 @@ function heroOffset(vc: number): number {
 interface CardProps {
   service: {
     title: string; price: string;
+    /** O preço já diz a unidade ("20€ por cadeira") e não leva "a partir de". */
+    perUnit?: boolean;
     image: string; imageM: string; icon: string;
     link: string; altText: string; badge: string;
   };
@@ -148,7 +151,7 @@ const ServiceCard = ({ service, prominence }: CardProps) => {
         </h3>
         <div className="flex items-center justify-between mt-2">
           <p className="text-sm font-medium" style={{ color: "rgba(255,255,255,0.55)" }}>
-            a partir de{" "}
+            {!service.perUnit && !/orçamento/i.test(service.price) && <>a partir de{" "}</>}
             <span style={{ color: "#D4AF37", fontWeight: 700 }}>{service.price}</span>
           </p>
           {isHero && (
@@ -254,7 +257,8 @@ const Services = () => {
     { title: "Impermeabilização",            price: "59€",    image: waterproofImg, imageM: waterproofImgM, icon: iconWaterproof, link: "/impermeabilizacao",  altText: "Impermeabilização de Estofos", badge: "Proteção invisível total"      },
     { title: "Limpeza de Colchões", price: "59€",   image: mattressImg,   imageM: mattressImgM,   icon: iconMattress,   link: "/limpeza-colchoes",   altText: "Limpeza de Colchões",          badge: "Durma em ambiente puro"         },
     { title: "Limpeza de Sofás",   price: "49€",    image: sofaImg,       imageM: sofaImgM,       icon: iconSofa,       link: "/limpeza-sofas",      altText: "Limpeza de Sofás",             badge: "O seu sofá novo outra vez"      },
-    { title: "Limpeza de Cadeiras", price: "20€",    image: chairsImg,     imageM: chairsImgM,     icon: iconChair,      link: "/limpeza-cadeiras",   altText: "Limpeza de Cadeiras",          badge: "Detalhe e higiene profunda"     },
+    // Cadeiras: por cadeira, nunca "a partir de" (pedido do dono, 26/09/2026).
+    { title: "Limpeza de Cadeiras", price: CHAIR_PRICE_LABEL, perUnit: true, image: chairsImg,     imageM: chairsImgM,     icon: iconChair,      link: "/limpeza-cadeiras",   altText: "Limpeza de Cadeiras",          badge: "Detalhe e higiene profunda"     },
     { title: "Limpeza de Tapetes", price: "Sob orçamento", image: carpetImg,     imageM: carpetImgM,     icon: iconCarpet,     link: "/limpeza-tapetes",    altText: "Limpeza de Tapetes",           badge: "Cuidado delicado fibra a fibra" },
     { title: "Limpeza de Alcatifas", price: "Sob orçamento", image: rugsImg,      imageM: rugsImgM,       icon: iconRug,        link: "/limpeza-alcatifas",  altText: "Limpeza de Alcatifas",         badge: "Renovação total do espaço"      },
   ];
@@ -333,7 +337,7 @@ const Services = () => {
                 {service.title}
               </h3>
               <p className="text-sm mt-1" style={{ color: "rgba(255,255,255,0.45)" }}>
-                a partir de <span style={{ color: "#D4AF37", fontWeight: 700 }}>{service.price}</span>
+                {!service.perUnit && !/orçamento/i.test(service.price) && <>a partir de </>}<span style={{ color: "#D4AF37", fontWeight: 700 }}>{service.price}</span>
               </p>
             </div>
             <div className="absolute inset-0 rounded-xl ring-1 ring-white/[0.06] pointer-events-none" />

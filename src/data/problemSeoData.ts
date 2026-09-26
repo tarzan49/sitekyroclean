@@ -1,5 +1,5 @@
 import { REVIEW_COUNT, REVIEW_RATING, CLIENTS_SERVED_LABEL } from '../constants/business';
-import { formatEuro, sofaSizeList, SOFA_CLEAN_AND_PROTECT_FROM, SOFA_PROTECT_WITH_CLEANING_FROM } from './enginePrices';
+import { formatEuro, sofaSizeList, chairTierSentence, CHAIR_PRICE_LABEL, SOFA_CLEAN_AND_PROTECT_FROM, SOFA_PROTECT_WITH_CLEANING_FROM } from './enginePrices';
 // Programmatic SEO: Problem pages data engine
 // Each problem page targets a specific long-tail search query cluster
 
@@ -903,11 +903,11 @@ const problemDefinitions: ProblemPage[] = [
       "Desconto por volume",
       "Agendamento fora do horário laboral",
       "Todos os tipos de estofamento",
-      "Desde 20€ por cadeira",
+      CHAIR_PRICE_LABEL,
       "Higienização antibacteriana",
     ],
     faqs: [
-      { question: "Quanto custa limpar cadeiras de escritório?", answer: "Cadeiras individuais desde 20€. Para empresas com muitas cadeiras, oferecemos preços por volume decrescentes por unidade. Peça cotação personalizada." },
+      { question: "Quanto custa limpar cadeiras de escritório?", answer: `O preço é por cadeira e desce com a quantidade. ${chairTierSentence()} Peça cotação personalizada.` },
       { question: "Fazem limpeza de cadeiras fora do horário de trabalho?", answer: "Sim. Para empresas, podemos agendar o serviço ao fim do dia, à noite ou ao fim de semana." },
     ],
     relatedProblems: ["empresa-limpeza-estofos", "limpeza-sofa-profissional"],

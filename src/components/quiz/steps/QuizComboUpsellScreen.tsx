@@ -7,10 +7,11 @@ import { cn } from '@/lib/utils';
 import { sofaPrices, mattressPrices } from '@/components/quiz/QuizTypes';
 import type { UpsellItemConfig, CarpetItem } from '@/components/quiz/QuizTypes';
 import {
-  calcChairClean, priceComboExtras, type ComboExtrasInput,
+  priceComboExtras, type ComboExtrasInput,
   carpetAddItem, carpetRemoveItem, carpetUpdateItem, carpetItemArea, carpetTotalArea,
 } from '@/components/quiz/quizHelpers';
 import { PACK_PERK_CHAIRS_SET, PACK_PERK_MIN_ORDER, PACK_PERK_RUG_NOTE, PACK_PERK_RUG_SET_M2, perkMattressPrice, perkRugPaidArea } from '@/constants/packPerks';
+import { CHAIR_PRICE_LABEL } from '@/data/enginePrices';
 
 interface QuizComboUpsellScreenProps {
   travelFee?: number;
@@ -157,14 +158,17 @@ const QuizComboUpsellScreen = ({ travelFee = 10, primaryTablePrice = 0, primaryS
     : <PriceCompare original={sofaReference.table} promo={sofaReference.amount} suffix="/un." />;
 
   // Cadeiras não têm preço fixo por unidade (é por escalão), por isso o
-  // desconto mostra-se sempre no total do lote, nunca por cadeira.
+  // desconto mostra-se sempre no total do lote, nunca por cadeira. Antes de
+  // escolher, o cartão diz o preço por cadeira ("20€ por cadeira"): um
+  // "Desde 80€" lia-se como um total sem dizer de quê (pedido do dono,
+  // 26/09/2026: "não digas desde em cadeiras").
   const chairsPriceLine: ReactNode = chairsQty > 0
     ? (chairsRegularPrice !== null && chairsCleanPrice !== null
         ? <PriceCompare original={chairsRegularPrice} promo={chairsCleanPrice} />
         : 'Sob orçamento')
     : chairsPreview.free > 0
       ? `Limpe ${PACK_PERK_CHAIRS_SET}, pague ${PACK_PERK_CHAIRS_SET - 1}`
-      : `Desde ${fmt(calcChairClean(CHAIRS_MIN_QTY) ?? 0)}€`;
+      : CHAIR_PRICE_LABEL;
 
   // Sincroniza o subtotal e os itens em tempo real com o formData do quiz —
   // a "Estimativa" no topo do modal tem de acompanhar cada +1/-1 aqui dentro,

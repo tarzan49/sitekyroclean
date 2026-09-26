@@ -1,5 +1,5 @@
 import { cityPrep } from './serviceCatalog';
-import { formatEuro, SOFA_CLEANING_FROM, MATTRESS_CLEANING_FROM, CHAIR_CLEANING_FROM } from './enginePrices';
+import { formatEuro, startingPriceLabel, SOFA_CLEANING_FROM, MATTRESS_CLEANING_FROM, CHAIR_CLEANING_FROM } from './enginePrices';
 
 // Lista partilhada de cidades para todas as páginas Marca × Item × Cidade
 // (sofá, colchão, cadeiras, tapetes). As 34 cidades mais povoadas do país
@@ -63,14 +63,16 @@ export const MARCA_CITY_SLUGS = MARCA_CITIES.map(c => c.slug);
 // "em Porto" no outro, um <h1> diferente, uma migalha com três nomes
 // diferentes, "Desde 12.5€" (o preço da 7.ª cadeira, com ponto) no hero e um
 // intervalo de preços inventado por marca na meta description e no schema.
+// Nas cadeiras, o preço diz-se por cadeira ("Limpeza a 20€ por cadeira"),
+// nunca "desde": ver `startingPriceLabel` em enginePrices.ts.
 // Tudo o que as duas versões mostram sai daqui. Sem imports com alias `@/`.
 
 export type MarcaKind = 'sofa' | 'colchao' | 'cadeiras';
 
 const MARCA_KINDS = {
-  sofa: { serviceSlug: 'limpeza-sofas', serviceName: 'Limpeza de Sofás', routePrefix: 'limpeza-sofa', titleNoun: 'Sofá', item: 'Sofá', plural: 'sofás', from: SOFA_CLEANING_FROM, unit: '', cityLink: 'Ver todos os materiais e preços' },
-  colchao: { serviceSlug: 'limpeza-colchoes', serviceName: 'Limpeza de Colchões', routePrefix: 'limpeza-colchao', titleNoun: 'Colchão', item: 'Colchão', plural: 'colchões', from: MATTRESS_CLEANING_FROM, unit: '', cityLink: 'Ver todos os tamanhos e preços' },
-  cadeiras: { serviceSlug: 'limpeza-cadeiras', serviceName: 'Limpeza de Cadeiras', routePrefix: 'limpeza-cadeiras', titleNoun: 'Cadeiras', item: 'Cadeiras', plural: 'cadeiras', from: CHAIR_CLEANING_FROM, unit: ' por cadeira', cityLink: 'Ver tabela completa de preços' },
+  sofa: { serviceSlug: 'limpeza-sofas', serviceName: 'Limpeza de Sofás', routePrefix: 'limpeza-sofa', titleNoun: 'Sofá', item: 'Sofá', plural: 'sofás', from: SOFA_CLEANING_FROM, cityLink: 'Ver todos os materiais e preços' },
+  colchao: { serviceSlug: 'limpeza-colchoes', serviceName: 'Limpeza de Colchões', routePrefix: 'limpeza-colchao', titleNoun: 'Colchão', item: 'Colchão', plural: 'colchões', from: MATTRESS_CLEANING_FROM, cityLink: 'Ver todos os tamanhos e preços' },
+  cadeiras: { serviceSlug: 'limpeza-cadeiras', serviceName: 'Limpeza de Cadeiras', routePrefix: 'limpeza-cadeiras', titleNoun: 'Cadeiras', item: 'Cadeiras', plural: 'cadeiras', from: CHAIR_CLEANING_FROM, cityLink: 'Ver tabela completa de preços' },
 } as const;
 
 /**
@@ -88,7 +90,7 @@ export function marcaPageCopy(kind: MarcaKind, marca: { name: string; slug: stri
     serviceBaseRoute: `/${k.serviceSlug}`,
     path: `/${k.routePrefix}-${marca.slug}-${city.slug}`,
     title: `Limpeza ${k.titleNoun} ${marca.name} ${where}, Especialistas | Kyro Clean`,
-    description: `Especialistas em limpeza de ${k.plural} ${marca.name} ${where}. ${marca.material}. Limpeza desde ${priceFrom}${k.unit}. Serviço ao domicílio.`,
+    description: `Especialistas em limpeza de ${k.plural} ${marca.name} ${where}. ${marca.material}. Limpeza ${startingPriceLabel(k.serviceSlug, priceFrom, 'mid')}. Serviço ao domicílio.`,
     h1: `Limpeza de ${k.item} ${marca.name} ${where}`,
     breadcrumbName: `${k.item} ${marca.name} ${where}`,
     /** Rótulo do preço de partida ("49€", "20€"), com vírgula quando for preciso. */

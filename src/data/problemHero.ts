@@ -4,6 +4,7 @@ import { services, cityPrep } from './serviceCatalog';
 import { locationPrices } from '../constants/travel';
 import { WHATSAPP_BASE } from '../constants/business';
 import { RESPONSE_PROMISE } from '../constants/commercialPolicy';
+import { startingPriceLabel } from './enginePrices';
 
 const introductions: Record<ProblemPage['category'], string> = {
   manchas: 'Cuidados profissionais para as manchas no seu estofo.',
@@ -24,7 +25,8 @@ export function getProblemHero(problem: ProblemPage, city?: string) {
   const price = service.priceFrom;
   const isQuote = /orçamento/i.test(price);
   const fee = city ? locationPrices[city] : undefined;
-  const priceLabel = isQuote ? 'Sob orçamento' : `${service.slug === 'impermeabilizacao' ? 'Proteção' : 'Limpeza'} desde ${price}`;
+  // "Limpeza desde 49€"; nas cadeiras "Limpeza a 20€ por cadeira" (ver `startingPriceLabel`).
+  const priceLabel = isQuote ? 'Sob orçamento' : `${service.slug === 'impermeabilizacao' ? 'Proteção' : 'Limpeza'} ${startingPriceLabel(service.slug, price, 'mid')}`;
   const travelLabel = fee === undefined ? 'Deslocação a partir de 10€' : `Deslocação ${fee}€`;
   return {
     heading: `${problem.h1}${location ? ` ${location}` : ''}`,

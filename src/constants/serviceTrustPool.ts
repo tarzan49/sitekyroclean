@@ -5,14 +5,19 @@
 // a preto). Nada de regex a adivinhar a partir de um título único — cada
 // pool escreve as duas partes explicitamente.
 import { DRYING_PROMISE } from './commercialPolicy';
-import { formatEuro, SOFA_WATERPROOF_PREMIUM_FROM, SOFA_ANTI_MITE_WITH_CLEANING_FROM, CHAIR_ANTI_MITE_UNIT_LABEL } from '../data/enginePrices';
+import { formatEuro, SOFA_WATERPROOF_PREMIUM_FROM, SOFA_ANTI_MITE_WITH_CLEANING_FROM, CHAIR_ANTI_MITE_UNIT_LABEL, CHAIR_WATERPROOF_PREMIUM_UNIT, CHAIR_WATERPROOF_ESSENCIAL_UNIT, perChairPrice } from '../data/enginePrices';
 
 export interface TrustPoint { stat?: string; titleGold: string; titleRest?: string; desc: string; }
 
 /** Shared landing selection, including the HTML delivered before JavaScript. */
-export function getLandingTrustPoints(serviceSlug: string, family: string, municipality: string, place: string): TrustPoint[] {
+export function getLandingTrustPoints(serviceSlug: string, family: string, municipality: string, place: string, serviceKey?: string): TrustPoint[] {
   const variant = family === 'freguesia' ? 2 : 1;
   const seed = family === 'freguesia' ? `${municipality}-${place}` : place;
+  // As páginas /impermeabilizacao-cadeiras-* mostravam o ponto do sofá
+  // ("Premium desde 89€, proteja o seu sofá de linho") numa página de cadeiras.
+  if (serviceSlug === 'impermeabilizacao' && serviceKey === 'cadeiras') {
+    return getImpermeabilizacaoCadeiraTrustPoints(`${serviceSlug}:cadeiras:${variant}:${seed}`);
+  }
   return getTrustPointsForSeed(serviceSlug, `${serviceSlug}:${variant}:${seed}`) ?? [];
 }
 
@@ -356,6 +361,20 @@ const IMPERMEABILIZACAO_CADEIRA_POOL: TrustPoint[] = [
 ];
 
 const IMPERMEABILIZACAO_FIXED_POINT3: TrustPoint = { titleGold: 'Combine com a limpeza', titleRest: ' num orçamento detalhado', desc: 'Pode juntar outros artigos na mesma visita. O orçamento identifica os serviços, os descontos aplicáveis e a deslocação, que não recebe desconto.' };
+
+/** Impermeabilização de cadeiras: preço por cadeira, nunca "desde" (dono,
+ *  2026-09-26), e nada sobre sofás. */
+function getImpermeabilizacaoCadeiraTrustPoints(seed: string): TrustPoint[] {
+  return [
+    {
+      titleGold: `Essencial a ${perChairPrice(CHAIR_WATERPROOF_ESSENCIAL_UNIT)},`,
+      titleRest: ` Premium a ${perChairPrice(CHAIR_WATERPROOF_PREMIUM_UNIT)}`,
+      desc: 'A Essencial protege de 1 a 2 anos e a Premium até 10 anos, com até 5 lavagens. O valor final da visita inclui a deslocação e é confirmado antes da marcação.',
+    },
+    pickFromPool(IMPERMEABILIZACAO_CADEIRA_POOL, `${seed}:cadeira`),
+    IMPERMEABILIZACAO_FIXED_POINT3,
+  ];
+}
 
 function getImpermeabilizacaoTrustPoints(seed: string): TrustPoint[] {
   return [

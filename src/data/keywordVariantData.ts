@@ -1,5 +1,7 @@
 import { CHAIR_WATERPROOF_ESSENTIAL } from '../constants/chairPricing';
 import { CHAIR_ANTI_ACAROS_UNIT_LABEL } from '../constants/antiAcarosPricing';
+// "18€ por cadeira": o hero das cadeiras nunca diz "desde" (ver `startingPriceLabel`).
+import { perChairPrice } from './enginePrices';
 // Central engine for keyword variant pages:
 // higienizacao/lavagem × sofa/colchao/tapetes/cadeiras/alcatifas × all cities + parishes
 // Content generated on demand — no 1 570-entry array kept in memory at module load.
@@ -74,7 +76,7 @@ const SERVICE_META: Record<ServiceKey, {
   sofa:      { label: 'Sofá',      labelPlural: 'Sofás',      canonicalBase: 'limpeza-sofas',     priceFrom: '49€',     waterproofPriceFrom: '59€'      },
   colchao:   { label: 'Colchão',   labelPlural: 'Colchões',   canonicalBase: 'limpeza-colchoes',  priceFrom: '59€' },
   tapetes:   { label: 'Tapetes',   labelPlural: 'Tapetes',    canonicalBase: 'limpeza-tapetes',   priceFrom: 'Sob orçamento'                              },
-  cadeiras:  { label: 'Cadeiras',  labelPlural: 'Cadeiras',   canonicalBase: 'limpeza-cadeiras',  priceFrom: '20€',     waterproofPriceFrom: `${CHAIR_WATERPROOF_ESSENTIAL}€/cad.`    },
+  cadeiras:  { label: 'Cadeiras',  labelPlural: 'Cadeiras',   canonicalBase: 'limpeza-cadeiras',  priceFrom: '20€',     waterproofPriceFrom: perChairPrice(CHAIR_WATERPROOF_ESSENTIAL) },
   alcatifas: { label: 'Alcatifas', labelPlural: 'Alcatifas',  canonicalBase: 'limpeza-alcatifas', priceFrom: 'Sob orçamento'                             },
 };
 
@@ -514,7 +516,7 @@ function content_lavagem_cadeiras(loc: string, ctx: string): ContentBlock {
     whatIs: pick([
       `A lavagem profissional remove manchas de gordura, comida e suor que se acumularam nas fibras das cadeiras ao longo do tempo. Cadeiras com aspeto cuidado transmitem profissionalismo, e a secagem é rápida para que o espaço não fique parado. Feita ao domicílio em ${loc}.`,
       `Gordura, comida e suor acumulam-se nas fibras das cadeiras ao longo do tempo, mesmo com limpeza regular. A lavagem profissional remove essa sujidade em profundidade, com secagem rápida para o espaço não ficar parado, feita ao domicílio em ${loc}.`,
-      `Cadeiras com aspeto cuidado transmitem profissionalismo — as manchas de gordura, comida e suor que se acumulam nas fibras ao longo do tempo não conseguem. A lavagem profissional remove-as com secagem rápida, ao domicílio em ${loc}.`,
+      `Cadeiras com aspeto cuidado transmitem profissionalismo, e as manchas de gordura, comida e suor que se acumulam nas fibras ao longo do tempo tiram-lhes isso. A lavagem profissional remove-as com secagem rápida, ao domicílio em ${loc}.`,
     ] as const, seed2),
     benefits: pick([
       [
@@ -703,7 +705,7 @@ function content_impermeabilizacao_cadeiras(loc: string, ctx: string): ContentBl
         'Essencial: até 2 lavagens. Premium: até 5 lavagens, mais resistente ao desgaste',
         'Ideal para restaurantes, hotéis e escritórios de uso intenso (recomendamos a Premium)',
         `Aplicação ao domicílio em ${loc}, sem transporte`,
-        'Descontos progressivos para lotes acima de 4 cadeiras',
+        'Preço fixo por cadeira; lotes grandes sob orçamento',
       ],
       [
         `Derramamentos, café e gordura repelidos pelo tecido em ${loc}`,
@@ -711,7 +713,7 @@ function content_impermeabilizacao_cadeiras(loc: string, ctx: string): ContentBl
         'Essencial: até 2 lavagens. Premium: até 5 lavagens, maior resistência ao desgaste',
         'Indicado para restaurantes, hotéis e escritórios de uso intenso (recomendamos a Premium)',
         `Aplicação ao domicílio em ${loc}, sem transportar nada`,
-        'Desconto progressivo a partir de 4 cadeiras no lote',
+        'Orçamento por cadeira, confirmado antes da marcação',
       ],
     ] as const, seedB),
     processSteps: [

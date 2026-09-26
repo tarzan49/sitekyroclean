@@ -27,7 +27,11 @@ A contagem é feita por esse texto.
 - Porto: "Equipa Própria no Norte", porque a mesma equipa serve Braga e Guimarães.
 - Impermeabilização: saíram "Limpa com um Pano, Sem Nódoa" e "saem com um pano
   seco" (resultado garantido que a proteção não dá); os preços passaram a
-  "Desde", porque 59€ e 99€ são os preços de 1 lugar.
+  "Desde", porque 59€ e o pack são os preços de 1 lugar.
+- 26/09/2026: o pack passou de "desde 99€" para "desde 89€" nos dois anúncios de
+  impermeabilização (título 11 e descrição 4), a pedido do dono. 89€ é o que o
+  quiz e o site cobram (`bothPrice` menos o desconto de pack); o 99€ era o
+  `bothPrice` cru. Editado na conta a 26/09 e verificado depois de recarregar.
 
 ---
 
@@ -80,7 +84,7 @@ A contagem é feita por esse texto.
 8. Premium: Até 10 Anos  `(20)`
 9. Resiste a Até 5 Lavagens  `(24)`
 10. Impermeabilização Desde 59€  `(27)`
-11. Limpeza + Proteção Desde 99€  `(28)`
+11. Limpeza + Proteção Desde 89€  `(28)`
 12. Avaliação Média de 4,9  `(22)`
 13. +125 Avaliações de Clientes  `(27)`
 14. Aplicação ao Domicílio  `(22)`
@@ -91,7 +95,7 @@ A contagem é feita por esse texto.
 1. Com a proteção, vinho, café ou sumo ficam à superfície e limpam-se com mais facilidade.  `(87)`
 2. Impermeabilização de sofás ao domicílio. Essencial desde 59€, Premium desde 89€.  `(80)`
 3. A Premium protege até 10 anos e resiste a até 5 lavagens. A Essencial, 1 a 2 anos.  `(82)`
-4. Limpeza e proteção na mesma visita, em pack desde 99€. Avaliação média de 4,9.  `(78)`
+4. Limpeza e proteção na mesma visita, em pack desde 89€. Avaliação média de 4,9.  `(78)`
 
 ---
 
@@ -144,7 +148,7 @@ A contagem é feita por esse texto.
 8. Premium: Até 10 Anos  `(20)`
 9. Resiste a Até 5 Lavagens  `(24)`
 10. Impermeabilização Desde 59€  `(27)`
-11. Limpeza + Proteção Desde 99€  `(28)`
+11. Limpeza + Proteção Desde 89€  `(28)`
 12. Avaliação Média de 4,9  `(22)`
 13. +125 Avaliações de Clientes  `(27)`
 14. Aplicação ao Domicílio  `(22)`
@@ -155,4 +159,4 @@ A contagem é feita por esse texto.
 1. Com a proteção, vinho, café ou sumo ficam à superfície e limpam-se com mais facilidade.  `(87)`
 2. Impermeabilização de sofás ao domicílio. Essencial desde 59€, Premium desde 89€.  `(80)`
 3. A Premium protege até 10 anos e resiste a até 5 lavagens. A Essencial, 1 a 2 anos.  `(82)`
-4. Limpeza e proteção na mesma visita, em pack desde 99€. Avaliação média de 4,9.  `(78)`
+4. Limpeza e proteção na mesma visita, em pack desde 89€. Avaliação média de 4,9.  `(78)`

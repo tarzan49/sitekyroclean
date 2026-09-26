@@ -26,7 +26,11 @@ CLIENTES = le("src/constants/business.ts", r'CLIENTS_SERVED_LABEL\s*=\s*"([^"]+)
 LIMPEZA_1L   = le("src/components/quiz/QuizTypes.ts", r"id: '1-lugar',.*?cleaningPrice: (\d+)")
 IMPER_ESSENC = le("src/components/quiz/QuizTypes.ts", r"id: '1-lugar',.*?waterproofingPrice: (\d+)")
 IMPER_PREMIUM= le("src/components/quiz/QuizTypes.ts", r"id: '1-lugar',.*?waterproofingPremiumPrice: (\d+)")
-PACK_1L      = le("src/components/quiz/QuizTypes.ts", r"id: '1-lugar',.*?bothPrice: (\d+)")
+# O pack é o que o motor cobra (calcPackPricing): bothPrice MENOS o
+# waterproofingUpsellDiscount. Ler só o bothPrice deu "desde 99€" nos anúncios
+# enquanto o site cobrava 89€ (corrigido a 26/09/2026, dono: "pack desde 89").
+PACK_1L      = str(int(le("src/components/quiz/QuizTypes.ts", r"id: '1-lugar',.*?bothPrice: (\d+)"))
+                   - int(le("src/components/quiz/QuizTypes.ts", r"waterproofingUpsellDiscount: (\d+), id: '1-lugar'")))
 
 # A equipa do Porto também serve Braga, Guimarães e o resto do Norte.
 EQUIPA = {"Porto": "Equipa Própria no Norte", "Lisboa": "Equipa Própria em Lisboa"}
@@ -98,7 +102,7 @@ def imper(city):
                   "impermeabilizar sofá", "impermeabilização de estofos"],
         # "Limpa com um Pano, Sem Nódoa" e "saem com um pano seco" saíram a
         # 26/09/2026: prometiam um resultado garantido que a proteção não dá.
-        # Os preços passaram a "Desde", porque o 59€ e o 99€ são de 1 lugar.
+        # Os preços passaram a "Desde", porque o 59€ e o pack são de 1 lugar.
         headlines=["Impermeabilização de Sofás", f"Impermeabilizar Sofá {cidade(city)}",
                    "Vinho, Café e Sumo no Sofá", "Derrames Ficam à Superfície",
                    "Impermeabilização de Estofos", "Proteja Antes da Próxima Nódoa",

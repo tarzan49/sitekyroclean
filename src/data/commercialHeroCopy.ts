@@ -2,7 +2,7 @@ import { services } from './serviceCatalog';
 import { EXTENDED_TRIP_CITIES, locationPrices } from '../constants/travel';
 import { REVIEW_COUNT, REVIEW_RATING } from '../constants/business';
 import { TRAVEL_FEE_MIN } from '../constants/commercialPolicy';
-import { formatEuro, SOFA_WATERPROOF_ESSENCIAL_FROM, SOFA_WATERPROOF_PREMIUM_FROM, SOFA_CLEAN_AND_PROTECT_FROM } from './enginePrices';
+import { formatEuro, perChairPrice, startingPriceLabel, SOFA_WATERPROOF_ESSENCIAL_FROM, SOFA_WATERPROOF_PREMIUM_FROM, SOFA_CLEAN_AND_PROTECT_FROM, CHAIR_WATERPROOF_ESSENCIAL_UNIT, CHAIR_WATERPROOF_PREMIUM_UNIT } from './enginePrices';
 
 // Preços da impermeabilização vindos do mesmo motor que o quiz usa, nunca
 // escritos à mão: é a linha que os anúncios de Premium prometem, e o preço na
@@ -15,6 +15,10 @@ const IMPER_ESSENCIAL = formatEuro(SOFA_WATERPROOF_ESSENCIAL_FROM);
 // mesma página, calculava 89€.
 const IMPER_PACK = formatEuro(SOFA_CLEAN_AND_PROTECT_FROM);
 
+/** A chave do subtítulo da impermeabilização de cadeiras, que não é um serviço
+ * do catálogo mas tem preços próprios (por cadeira). */
+export const CHAIR_WATERPROOF_SUBTITLE_KEY = 'impermeabilizacao-cadeiras';
+
 const subtitles: Record<string, string> = {
   'limpeza-sofas': 'Cuidado profissional para o seu sofá, sem sair de casa.',
   'limpeza-colchoes': 'Limpeza do colchão com cuidados adaptados ao tecido.',
@@ -26,6 +30,10 @@ const subtitles: Record<string, string> = {
   // Essencial fica nomeada na mesma linha: continua a existir e continua a ser
   // o preço de partida do serviço, que é o que a linha de preço do hero mostra.
   impermeabilizacao: `Proteção Premium desde ${IMPER_PREMIUM}: até 10 anos e até 5 lavagens. Essencial desde ${IMPER_ESSENCIAL}, ou ${IMPER_PACK} com limpeza.`,
+  // As páginas /impermeabilizacao-cadeiras-* mostravam a linha de cima, com os
+  // preços do sofá ("Premium desde 89€"). Nas cadeiras o preço é por cadeira e
+  // nunca leva "desde" (pedido do dono, 26/09/2026).
+  [CHAIR_WATERPROOF_SUBTITLE_KEY]: `Proteção Premium a ${perChairPrice(CHAIR_WATERPROOF_PREMIUM_UNIT)}: até 10 anos e até 5 lavagens. Essencial a ${perChairPrice(CHAIR_WATERPROOF_ESSENCIAL_UNIT)}.`,
 };
 export const commercialHeroSubtitle = (serviceSlug: string, city?: string) => `${subtitles[serviceSlug] ?? 'Cuidados profissionais adaptados aos seus estofos.'}${city && EXTENDED_TRIP_CITIES.has(city) ? ' Disponibilidade sob consulta.' : ''}`;
 
@@ -51,7 +59,8 @@ export const commercialHeroPriceLine = (serviceSlug: string, municipality?: stri
   const service = services.find(item => item.slug === serviceSlug);
   const fee = municipality ? locationPrices[municipality] : undefined;
   const value = price ?? service?.priceFrom ?? 'Sob orçamento';
-  const priceText = /orçamento/i.test(value) ? 'Sob orçamento' : `Desde ${value}`;
+  // Cadeiras: "20€ por cadeira", nunca "Desde 20€" (ver `startingPriceLabel`).
+  const priceText = /orçamento/i.test(value) ? 'Sob orçamento' : startingPriceLabel(serviceSlug, value);
   return `${priceText} + deslocação ${fee === undefined ? `a partir de ${TRAVEL_FEE_MIN}€` : `${fee}€`}.`;
 };
 

@@ -1,4 +1,4 @@
-import { commercialHeroSubtitle } from './commercialHeroCopy';
+import { commercialHeroSubtitle, CHAIR_WATERPROOF_SUBTITLE_KEY } from './commercialHeroCopy';
 import { getLandingTrustPoints } from '../constants/serviceTrustPool';
 import { cities, services, cityPrep, getCityLinksForService, getLocationServiceData } from './locationSeoData';
 import { municipiosComFreguesias, getFreguesia, generateFreguesiaContent } from './freguesiaSeoData';
@@ -209,9 +209,9 @@ export function getLandingPageModel(pathname: string) {
     heroLocationName: ('locationName' in data && typeof data.locationName === 'string') ? data.locationName : locationName,
     serviceName: service.name, serviceBaseRoute: service.baseRoute,
     priceFrom: ('priceFrom' in data && typeof data.priceFrom === 'string') ? data.priceFrom : service.priceFrom,
-    title: data.title, metaDescription: data.metaDescription, h1: data.h1, intro: commercialHeroSubtitle(serviceSlug, municipalityName),
+    title: data.title, metaDescription: data.metaDescription, h1: data.h1, intro: commercialHeroSubtitle(variantKey === 'impermeabilizacao' && serviceKey === 'cadeiras' ? CHAIR_WATERPROOF_SUBTITLE_KEY : serviceSlug, municipalityName),
     editorialIntro: data.intro,
-    trustPoints: getLandingTrustPoints(serviceSlug, family, municipalityName, locationName),
+    trustPoints: getLandingTrustPoints(serviceSlug, family, municipalityName, locationName, serviceKey),
     priceHeading: `Quanto custa ${priceVerb} ${prep} ${locationName}`,
     priceVerb, pricingDescription, pricePolicy: PRICE_PROMISE,
     variantExplanation: family === 'variante' ? (serviceSlug === 'impermeabilizacao' ? 'A impermeabilização é uma proteção opcional de tecidos compatíveis. A limpeza prévia, se necessária, é combinada e orçamentada separadamente.' : `Limpeza, lavagem e higienização podem descrever o mesmo pedido. O procedimento é escolhido pelo material e pelo estado da peça. ${TREATMENT_EXTRAS}`) : undefined,
