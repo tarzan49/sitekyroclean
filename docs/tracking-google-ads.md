@@ -478,6 +478,21 @@ O painel não sugere medição completa destes canais porque não a temos.
 | **WhatsApp direto no anúncio** (extensão de mensagem / anúncio de clique-para-WhatsApp) | **Nada.** A pessoa nunca passa pelo site | Métricas de mensagem do Google Ads, dentro da conta. Nunca chegam ao site |
 | **Chamada direta no anúncio** (extensão de chamada) | **Nada.** Idem | Conversões de chamada do Google Ads, com número de reencaminhamento, configuradas na conta |
 
+**Mensagem marcada para quem vem do Google Ads — IMPLEMENTADO (26/09/2026).**
+No primeiro dia das campanhas o dono fechou cinco serviços vindos dos anúncios,
+todos por WhatsApp, e o Google Ads mostrava zero conversões: das 33 visitas
+pagas, o GA4 só viu 6, porque quem vem do anúncio carrega no WhatsApp sem
+responder ao aviso de cookies, e sem consentimento a Google não liga o clique ao
+anúncio. `src/lib/adsWhatsAppMessage.ts` lê o endereço de entrada no arranque
+(`gclid`/`gbraid`/`wbraid`, ou `utm_source=google` com `ads=1` ou meio pago) e,
+no momento do clique, troca a abertura da mensagem por "Olá! Vi o vosso anúncio
+no Google e gostaria…". Não usa cookies nem armazenamento, por isso vale para
+toda a gente; é o dono que conta, no WhatsApp, pedidos e serviços fechados de
+cada origem. Limites: quem sai e volta mais tarde por outro caminho perde a
+marca, e a pessoa pode apagar a frase. **As mensagens pré-preenchidas das
+extensões de mensagem do Google Ads (WhatsApp direto do anúncio) são
+configuradas na conta e não passam por aqui.**
+
 **Disponível agora — IMPLEMENTADO:** registo manual de um contacto real no
 painel (tabela `contact_log`): canal, data, nota, e associação opcional a um
 lead existente. A associação é uma afirmação de uma pessoa que sabe que são a

@@ -318,6 +318,18 @@ as pessoas mais clicam e o lead já chega aquecido. Não sugerir passá-lo a
 secundário. No painel interno continua separado dos leads. **Nunca importar o
 mesmo lead do GA4 e da tag nativa como duas conversões principais.**
 
+**Quem vem do Google Ads envia "Olá! Vi o vosso anúncio no Google e
+gostaria…" no WhatsApp (pedido do dono, 26/09/2026).** É a única forma de ele
+separar clientes pagos de orgânicos: no primeiro dia fechou cinco serviços dos
+anúncios e o Google Ads mostrava zero conversões, porque quem vem do anúncio
+carrega no WhatsApp sem responder às cookies. A marca é posta no clique por
+`src/lib/adsWhatsAppMessage.ts`, registado no `main.tsx`, e nunca nos
+construtores de `whatsappMessages.ts` nem nas páginas. **Uma mensagem nova de
+WhatsApp não precisa de fazer nada: herda a marca**, desde que comece por
+"Olá". A deteção é só Google (`gclid`, ou `utm_source=google` pago), não o
+`isAdsVisit`, que aceita qualquer `cpc`: um anúncio da Meta não pode dizer
+"Google". Não usa cookies nem armazenamento, e é assim que tem de ficar.
+
 **Exportar não é importar.** `conversion_exports` guarda `queued`, `exported`,
 `submitted`, `accepted`, `rejected` em separado, e o CSV só é gerado depois de o
 registo ser escrito. As mudanças no painel **não** enviam conversões pela sessão

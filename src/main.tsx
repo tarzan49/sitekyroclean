@@ -10,6 +10,10 @@ import { restoreConsent } from "./lib/consent";
 import { initContactTracking } from './lib/quizTracking';
 initContactTracking();
 
+// Lê o endereço de entrada antes de qualquer navegação. Ver o porquê no módulo.
+import { initAdsWhatsAppMessage } from './lib/adsWhatsAppMessage';
+initAdsWhatsAppMessage();
+
 // Start error tracking (all environments)
 initErrorTracking();
 
