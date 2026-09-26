@@ -40,13 +40,13 @@ Os 6 sitelinks de 18/09 que continuam na lista de recursos são da
 - Resposta em 10 minutos `(22)`
 - Deslocação desde 10€ `(20)`
 - Garantia de repetição 48h `(25)`
-- 4,9 estrelas no Google `(22)`
+- Avaliação média de 4,9 `(22)` (era "4,9 estrelas no Google" até 26/09/2026)
 - +1100 clientes servidos `(23)`
 
-**Por decidir (26/09/2026):** os anúncios deixaram de dizer "no Google" nas
-avaliações, porque as fichas do Google mostram números por estabelecimento que
-não coincidem com o total. Este callout ficou com "4,9 estrelas no Google". A
-alternativa coerente com os anúncios é "Avaliação média de 4,9" `(22)`.
+**26/09/2026, a pedido do dono:** os anúncios deixaram de dizer "no Google"
+nas avaliações, porque as fichas do Google mostram números por estabelecimento
+que não coincidem com o total. O callout acompanhou: "4,9 estrelas no Google"
+passou a "Avaliação média de 4,9".
 
 ## Structured snippet, cabeçalho "Serviços"
 
