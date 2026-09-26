@@ -117,7 +117,7 @@ ser executada na propriedade real.
 | sem consentimento de análise | nada | ✅ |
 
 Confirmado também em browser com navegação real da SPA, incluindo
-`history.back()`: `/limpeza-sofas` → `/packs` → `/limpeza-sofas` produziu
+`history.back()`: `/limpeza-sofas` → `/packs` (rota removida a 2026-09-24) → `/limpeza-sofas` produziu
 exatamente três `page_view`.
 
 A guarda é o **último caminho enviado**, não uma lista de caminhos já vistos: é

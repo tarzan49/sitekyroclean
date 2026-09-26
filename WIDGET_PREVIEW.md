@@ -1,13 +1,21 @@
-# Widget de orçamento
+# Pré-visualização do widget de orçamento
 
-Pré-visualização local: http://127.0.0.1:5188/widget-preview.html
+Com `npm run dev` a correr: http://localhost:8080/widget-preview.html
 
-O componente partilhado PriceWidget usa as imagens do quiz, controlos à direita, contraste mais alto, seleção dourada e resumo de serviços, deslocação e poupança em euros. Os preços e a elegibilidade do desconto continuam no motor existente. Artigos sem preço são identificados como sob orçamento. Promoções de extras continuam no quiz.
+`widget-preview.html` carrega `src/widget-preview.tsx`, que monta o
+`PriceWidget` real, sozinho, numa coluna de 390px, com um seletor de serviço
+(sofás, colchões, cadeiras, tapetes, impermeabilização) e Lisboa como
+localidade inicial. É independente do `App.tsx`, só renderiza em
+desenvolvimento (`import.meta.env.DEV`) e não entra no build de produção: o
+`vite.config.ts` só constrói o `index.html`.
 
-A entrada widget-preview.html é independente de App.tsx e só renderiza em desenvolvimento. Não é incluída no build de produção padrão. As alterações do widget estão na branch de pré-visualização, não na produção.
+O que se vê é o componente que as páginas usam, sem cópias: `PriceWidget.tsx`
+(apresentação, com o `QuizEstimate` do quiz no topo e o
+`WaterproofingTierPicker`) e `use-price-widget.ts` (estado). Os preços vêm de
+`src/lib/priceWidgetCalc.ts` sobre as tabelas do quiz; artigos sem preço
+(tapetes, alcatifas, sofás de 4+ lugares) aparecem como sob orçamento. Não há
+desconto percentual. «Continuar» abre o quiz com a seleção.
 
-Verificado: 20 testes existentes de cálculo; lint dos ficheiros alterados; visual e ausência de overflow horizontal a 390 e 320 px; 79 + 10 = 89; dois sofás de 79 mostram poupança de 16 e total 152 conforme arredondamento existente; Continuar transporta a seleção para o quiz com estimativa 89.
-
-## Continuidade com o quiz
-
-Após revisão do utilizador, o widget passou a replicar o ecrã de quantidades do quiz: bg-checker-modal, cantos rounded-sm, picotado dourado, controlos quadrados e CTA com os mesmos tokens. Reutiliza diretamente QuizEstimate no topo, incluindo composição expansível e poupança. Largura limitada à do modal. Verificado em 390 px sem overflow e passagem para o quiz com a seleção preservada.
+A versão anterior desta nota falava da porta 5188 e de uma branch de
+pré-visualização que já não existem, e de uma poupança calculada por desconto
+que saiu do código a 2026-09-10.

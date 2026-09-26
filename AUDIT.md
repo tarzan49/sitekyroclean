@@ -82,7 +82,7 @@ As páginas `/en/*` têm `lang="en"` mas não declaram alternância com as pági
 
 ## 🟢 Confirmado a funcionar (não precisa de ação)
 
-- reCAPTCHA v3 está ligado ao `submit-lead` (verificação no servidor), o que fecha o achado #5 da auditoria de 2026-09-08. `submit-lead` e `send-lead-email` têm rate limit de 8 pedidos por 10 minutos por IP.
+- ~~reCAPTCHA v3 está ligado ao `submit-lead`~~ **Correção de 2026-09-26: não estava a funcionar.** O código estava ligado, mas a CSP (`public/_headers`, a bloquear desde 2026-09-23) não deixava carregar o script da Google: o token ia sempre vazio e o servidor, que deixa passar pedidos sem token, aceitava tudo. Corrigido a 2026-09-26 (a CSP passou a permitir o reCAPTCHA); a partir daí o servidor só recusa um token validado pela Google com pontuação abaixo de 0.3, nunca por erro de configuração. `submit-lead` e `send-lead-email` têm rate limit de 8 pedidos por 10 minutos por IP.
 - Um só `gtag.js`, Consent Mode v2 por omissão negado, Pixel da Meta só após consentimento: confirmado na rede, com e sem consentimento.
 - Cabeçalhos de segurança em produção (HSTS, X-Frame-Options, Permissions-Policy, CSP report-only) chegam como o `_headers` define.
 - Assets com hash em `immutable` por um ano; `/images/*` com 4 h no edge.

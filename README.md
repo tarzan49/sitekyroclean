@@ -1,93 +1,60 @@
-# Welcome to your Lovable project
+# Kyro Clean Solutions
 
-## Project info
+Website and quote quiz for Kyro Clean Solutions, an at-home upholstery cleaning
+company in Portugal: https://cleansolutions.com.pt
 
-**URL**: https://lovable.dev/projects/f968d87b-01e8-4878-b380-6c28e69f8c80
+The project started as a Lovable template; it is no longer edited or deployed
+through Lovable.
 
-## How can I edit this code?
+## Before changing anything
 
-There are several ways of editing your application.
+The project rules and business facts live in [`CLAUDE.md`](./CLAUDE.md) (in
+Portuguese). Read it first. Architecture notes are in
+[`CONTEXT.md`](./CONTEXT.md). Prices, travel fees and review counts are read
+from the code, never from a `.md` file.
 
-**Use Lovable**
+## Stack
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/f968d87b-01e8-4878-b380-6c28e69f8c80) and start prompting.
+- Vite, React 18, TypeScript, Tailwind CSS, shadcn/ui, React Router
+- Supabase: CRM (Postgres) and Edge Functions (`supabase/functions/`)
+- Resend for the lead notification email (Edge Function `send-lead-email`)
+- Cloudflare Pages for hosting
 
-Changes made via Lovable will be committed automatically to this repo.
+## Local development
 
-**Use your preferred IDE**
-
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
+Requires Node.js and npm.
 
 ```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
 npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
+cp .env.example .env   # fill in the values; .env is per machine and never committed
+npm run dev            # http://localhost:8080
 ```
 
-**Edit a file directly in GitHub**
+Checks (all four are different; a green build does not type-check):
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+```sh
+npm run typecheck   # tsc -b --noEmit. Do not use `npx tsc --noEmit`: it checks zero files
+npm test
+npm run lint
+npm run build       # vite build + sitemaps + llms.txt + prerender
+```
 
-**Use GitHub Codespaces**
+## Email (Resend)
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+Quote requests go to two independent Supabase Edge Functions: `submit-lead`
+(CRM) and `send-lead-email` (email through Resend, sender domain
+`cleansolutions.com.pt`). The email function needs two secrets in the Supabase
+dashboard (Project Settings → Edge Functions → Secrets): `RESEND_API_KEY` and
+`LEAD_NOTIFICATION_EMAIL`. Edge Functions are deployed separately from the
+site (`npx -y supabase@latest functions deploy <name>`).
 
-## What technologies are used for this project?
+Details: the Resend notes in `CLAUDE.md` (eighth trap) and
+[`docs/lead-spam-protection.md`](./docs/lead-spam-protection.md) (reCAPTCHA
+and rate limits). Database changes are pasted into the Supabase SQL Editor;
+never run `supabase db push` on this project (see `CLAUDE.md`, seventh trap).
 
-This project is built with:
+## Deployment
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-- Supabase (Backend & Edge Functions)
-- Resend (Email delivery)
-
-## Email Configuration
-
-This project uses Resend for sending quote request emails from the contact form.
-
-### Setup Instructions:
-
-1. **Create a Resend account** at [https://resend.com](https://resend.com) (free tier: 3,000 emails/month)
-
-2. **Get your API key** from [https://resend.com/api-keys](https://resend.com/api-keys)
-
-3. **Configure in Lovable/Supabase:**
-   - Go to Backend → Secrets
-   - Add: `RESEND_API_KEY` = your_api_key_here
-
-4. **Environment variables** are already configured in `.env`
-
-For detailed setup instructions, see [RESEND_SETUP.md](./RESEND_SETUP.md)
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/f968d87b-01e8-4878-b380-6c28e69f8c80) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+Pushing to `master` on GitHub triggers a Cloudflare Pages build
+(`npm run build`, output `dist`). The Cloudflare project needs its own
+`VITE_*` environment variables, because `.env` is not in the repository.

@@ -1,3 +1,39 @@
+> **Como ler este ficheiro.** O `CLAUDE.md` tem as regras e os factos de
+> negócio e é a fonte que prevalece. Este ficheiro é a referência de
+> arquitetura: as secções datadas no topo são as mais recentes, depois vêm a
+> arquitetura (rotas, quiz, preços) e, a partir do título «Registo histórico»,
+> o diário das sessões antigas, que não serve como fonte de valores.
+
+## Decisões comerciais de 26/09/2026 (dono)
+
+Regras completas e fontes na secção «Preços: fontes e regras».
+- Pack de sofá limpeza + impermeabilização Essencial: **a partir de 89€**, o
+  valor que o motor dá (`calcPackPricing`), não o `bothPrice` cru.
+- Anti-ácaros em sofás, colchões e cadeiras, no quiz e no configurador;
+  desbacterização é o mesmo tratamento; cadeiras a «5€/un.».
+- Chaise longue deixou de ser opção com preço à parte.
+- Uma só regra de preço de pack no quiz e no configurador
+  (`priceWithPackPerks` em `src/constants/packPerks.ts`), a partir de 100€ de
+  subtotal de tabela; nenhum desconto percentual em lado nenhum.
+- Páginas de marca com os preços normais, sem intervalos por marca.
+- reCAPTCHA v3 a funcionar (a CSP passou a permiti-lo) e modo de
+  consentimento `advanced` por omissão. Ver «Submissão».
+
+## Oito cidades novas: Sul do Douro e Alentejo Litoral (26/09/2026)
+
+As campanhas de Google Ads (Porto e Lisboa) passaram a abranger Santa Maria da Feira, São João da Madeira, Ovar, Oliveira de Azeméis, Alcácer do Sal, Grândola, Santiago do Cacém e Sines, que não tinham taxa em `travel.ts`: o passo de localidade só aceita chaves de `locationPrices` e respondia "Localidade não encontrada". Entraram pelo mesmo caminho de Aveiro/Coimbra: `travel.ts` (taxa), `cities` em `serviceCatalog.ts` (área `porto` ou `lisboa`) e `municipiosComFreguesias` em `freguesiaSeoData.ts`. Tudo o resto é gerado: localidade × serviço, preço, variantes, freguesias, packs, materiais e tratamentos. 61 → 69 cidades, 12.912 → 13.734 páginas landing (+137 por serviço), 17.216 rotas prerenderizadas, 0 ligações mortas, auditoria `audit-landing-seo.mjs` sem falhas.
+
+- **Taxas por zona existente:** Feira 10€; São João da Madeira, Ovar e Oliveira de Azeméis 15€; as quatro do Alentejo Litoral 15€ (teto de Lisboa, critério de Coimbra) e "Disponibilidade sob consulta".
+- **Freguesias** confirmadas na GeoAPI (`json.geoapi.pt/municipio/{nome}/freguesias`), com `nearby` calculado pelos centroides (até 9 km). Sem a sede de cada concelho (seria uma cópia da página da cidade) e sem São João da Madeira (uma só freguesia, a própria cidade). Alvalade e Carvalhal ficaram de fora por já existirem em Lisboa e Barcelos.
+- **`EXTENDED_TRIP_CITIES`** (`travel.ts`) substitui os três `Aveiro || Coimbra` (`landingEditorial.ts`, `commercialHeroCopy.ts`, `audit-landing-seo.mjs`).
+- **`searchServiceLocations`** (`locationDetection.ts`) é a pesquisa do `QuizStepLocation`: concelhos primeiro, depois freguesias dos concelhos servidos que ainda não apareceram, no máximo 6; expande "S."/"Sta."/"Sto.".
+- Rótulo da área `lisboa` passou a "Lisboa, Setúbal e Alentejo Litoral" (`ServiceCityLinks`, `AreasDeServico`, `llms.txt`, admin). `/areas-de-servico` conta municípios por `cities.length`, não pelos concelhos com freguesias.
+- Contagens fixadas nos testes de imagens/FAQ/modelo atualizadas (2152 → 2289 por serviço, 12912 → 13734).
+
+## CRM por plataforma (22/09/2026)
+
+Admin: `marketing` (Google) e `meta-marketing` partilham `MarketingPanel` com filtro explícito de plataforma (`marketingPlatforms.ts`). `MarketingInputs` permite gasto diário e pedido manual com evidência de origem; `ad_spend_daily`, `register_marketing_lead` e `set_marketing_lead_status` dependem da migração aditiva `20260922000000_meta_marketing.sql`. Meta Pixel inclui Lead apenas após CRM confirmado e eventos personalizados de clique separados. Sem CAPI ou importação automática de mensagens. Regras, limites e publicação em `docs/marketing-meta-crm.md`. Dados financeiros privados da auditoria não entram no repositório público.
+
 ## Página de obrigado no PC (23/09/2026)
 
 Pedido explícito do responsável: adaptar também a PC. A partir de 1024px, composição em duas colunas centrada na altura disponível, título/WhatsApp/avaliações à esquerda e resumo à direita, com tipografia e espaçamento próprios. Preservar o mobile compacto. A revisão de PC autoriza pré-visualização desktop desta página, substituindo aqui a restrição histórica de previews apenas mobile.
@@ -44,7 +80,7 @@ O Pixel da Meta `1083307767504397` é carregado por `src/lib/metaPixel.ts` apena
 
 O build emite manifest e preloads específicos por página/par de comparação. `resultThumbnails.ts`, `responsiveImages.ts` e os derivados WebP evitam carregar originais grandes nos cartões. Avenir tem subconjuntos latinos, com os originais preservados para outros caracteres. Não repor PNG nos guiões/ícones nem blur de secções no mobile. Scripts e evidências em `docs/performance-optimization-2026-09-13.md`.
 
-Tags Google e eventos analíticos próprios aguardam consentimento. `leadAttribution.ts` guarda parâmetros permitidos de campanha por sessão autorizada e transmite-os nas notas existentes do CRM/Formspree. Não confundir atribuição de pedido com receita paga. Os sitemaps omitem lastmod até haver uma data editorial fiável por página.
+Tags Google e eventos analíticos próprios aguardam consentimento. `leadAttribution.ts` guarda parâmetros permitidos de campanha por sessão autorizada e transmite-os ao CRM (desde 18/09 no objeto `attribution` do `submit-lead`, gravado em `lead_attribution`; o Formspree foi substituído pelo Resend a 2026-09-14). Não confundir atribuição de pedido com receita paga. [Nota de 2026-09-26: os sitemaps já têm `lastmod`, vindo do histórico do git por família de páginas (`scripts/content-dates.ts`), ver a secção GEO do `CLAUDE.md`.]
 
 ## Revisão SEO das quatro famílias (13/09/2026)
 
@@ -124,7 +160,7 @@ A configuração Avenir Next do ramo principal está integrada neste ramo: `main
 
 ## Confiança na homepage (13/09/2026)
 
-`HomeHeroTrust` reúne serviços realizados e avaliações Google numa faixa transparente responsiva, usada no mobile e desktop de `HeroV1`. Usa `SERVICES_COMPLETED_LABEL`, `REVIEW_RATING` e `REVIEW_COUNT` de `business.ts`. Contagem atual: 110+ avaliações, 4.9, +1200 serviços. Os dados SEO ingleses e de problemas importam REVIEW_COUNT por caminho relativo, compatível com os geradores.
+`HomeHeroTrust` reúne serviços realizados e avaliações Google numa faixa transparente responsiva, usada no mobile e desktop de `HeroV1`. Usa `SERVICES_COMPLETED_LABEL`, `REVIEW_RATING` e `REVIEW_COUNT` de `business.ts`. Os valores leem-se em `business.ts`, não aqui (a nota de 13/09 dizia 110+ avaliações; a 2026-09-26 são 125). Os dados SEO ingleses e de problemas importam REVIEW_COUNT por caminho relativo, compatível com os geradores.
 
 ## Pontos de alcatifas (13/09/2026)
 
@@ -144,11 +180,198 @@ As páginas de cidade e freguesia usam quatro cartões na mesma ordem: café, vi
 
 ## Correções comerciais e packs personalizáveis (10/09/2026)
 
-Regras atuais: `CORRECOES-COMERCIAIS-2026-09-10.md`. `src/constants/travel.ts` é a fonte única de deslocações, reexportada por QuizTypes e importada sem alias pelos geradores. `commercialPolicy.ts` centraliza as mensagens comuns. `CustomPackPage` serve `/packs` e as antigas rotas de PackComboPage, com cálculo puro em `customPack.ts`; `packComboData.ts` contém apenas combinações iniciais e rotas, sem segunda tabela de preços. `treatmentSeoData.ts` fornece conteúdo/rotas partilhados pelo React, prerender, sitemap e monitor para anti-ácaros, desbacterização e expansão Aveiro/Coimbra. `TreatmentPage` apresenta essas páginas. Nenhuma equipa permanente nova é anunciada no Centro. `locationSeoData.cities.area` inclui `braga` independente de `porto`. O conteúdo inicial de marcas e problemas passa a incluir processo, benefícios e FAQs.
+Regras atuais: `CORRECOES-COMERCIAIS-2026-09-10.md`. `src/constants/travel.ts` é a fonte única de deslocações, reexportada por QuizTypes e importada sem alias pelos geradores. `commercialPolicy.ts` centraliza as mensagens comuns. O cálculo puro dos packs está em `customPack.ts` e `packComboData.ts` contém as combinações e rotas, sem segunda tabela de preços. [Desatualizado desde 2026-09-24: `CustomPackPage` e `/packs` foram removidos (301 para `/guia-de-packs`); as páginas de pack são `/{pack}-{cidade}`, servidas por `PackComboPage.tsx` com `PackConfigurator.tsx`. O `CORRECOES-COMERCIAIS-2026-09-10.md` ainda fala do configurador em `/packs`.] `treatmentSeoData.ts` fornece conteúdo/rotas partilhados pelo React, prerender, sitemap e monitor para anti-ácaros, desbacterização e expansão Aveiro/Coimbra. `TreatmentPage` apresenta essas páginas. Nenhuma equipa permanente nova é anunciada no Centro. `locationSeoData.cities.area` inclui `braga` independente de `porto`. O conteúdo inicial de marcas e problemas passa a incluir processo, benefícios e FAQs.
 
-﻿# Kyro Clean Solutions — Full Project Context
+## Widget de impermeabilização (2026-09-10)
 
-> O `CLAUDE.md` na raiz carrega automaticamente em qualquer sessão do Claude Code aberta nesta pasta (regras fixas e factos de negócio atuais). Este ficheiro é a referência de arquitetura mais profunda — lê-o quando precisares de detalhe sobre rotas, fluxo do quiz, design tokens ou tabelas de preços.
+`PriceWidget.tsx` reutiliza `WaterproofingTierPicker`: mostra Premium e Essencial sem seleção inicial e revela as quantidades após a escolha. `use-price-widget.ts` conserva o plano ao abrir o quiz e reinicia a seleção quando muda o serviço. Os preços dos sofás vêm de `sofaPrices`; as cadeiras usam `calcChairWaterproof`/`calcChairWaterproofPremium` (desde 2026-09-23, preço fixo por unidade de `chairPricing.ts`, sem o antigo limite de 10 cadeiras). Total e artigos enviados ao quiz usam o mesmo plano; já não há desconto. Os addons dos serviços de limpeza continuam no upsell do quiz.
+
+## Seleção regional de avaliações (2026-09-10)
+
+`ServiceReviewsGrid` usa o caminho da página e a seed para selecionar avaliações por serviço/região em `reviewsPool.ts`. As variantes `SofaVariantPage` partilham agora esta grelha. `LISBON_REVIEWS` guarda as 13 transcrições com texto confirmadas pelo responsável como sendo de Lisboa; `CONFIRMED_REVIEW_LOCATIONS` associa a localidade à fonte. Páginas da região com pool confirmada não são preenchidas com testemunhos de outras regiões. Sem localização confirmada, não mostrar cidade.
+
+## Entrada de anúncios e contacto nas páginas de sofás (2026-09-10)
+
+`SofaLeadActions` centraliza WhatsApp, âncora `#precos` e preço com deslocação. `AdsLandingNavigation` fornece cabeçalho/rodapé reduzidos e `isAdsVisit`; o modo Ads é ativado explicitamente por `ads=1` ou pelos parâmetros de entrada Google Ads, mantendo o URL canónico sem parâmetros. `LocationServicePage` e `SofaVariantPage` conservam as páginas orgânicas e usam esta apresentação quando o serviço é limpeza de sofás. As âncoras são `resultados`, `precos`, `avaliacoes`, `duvidas`. O clique no WhatsApp é medido pelo delegado global `initContactTracking` (os componentes só declaram `data-tracking-source`, nunca um `onClick` de medição: regra no `CLAUDE.md`); envia `whatsapp_click` ao GA4 e UTM ao registo interno e não representa uma conversa confirmada.
+
+
+## Pré-visualização visual do orçamento (2026-09-10, integrada em master)
+
+Nasceu na branch `codex/quote-visual-preview` e está hoje em master: `QuizEstimate.tsx` apresenta o total calculado pelo motor existente (também usado pelo `PriceWidget`). A animação respeita redução de movimento e substitui confettis/toast. `QuizComboUpsellScreen.tsx` usa imagens de mobiliário, cartões tracejados e botão +; os preços estão nos detalhes de cada categoria. A rota `/__preview/orcamento` existe apenas em desenvolvimento e abre o componente real com dados iniciais. [O exemplo «607€ antes e 547€ depois do desconto» que aqui estava deixou de valer: não há desconto percentual desde 2026-09-10.] Origem das imagens e validação em `QUOTE_PREVIEW.md`.
+
+### Pré-visualização dos cuidados adicionais (2026-09-10)
+
+`QuizCareIntro` reutiliza `QuizFurnitureImage` para contextualizar os tratamentos; `QuizCarpetMeasureGuide` é partilhado pelos detalhes de tapetes principais e extras. A rota DEV `/__preview/orcamento` aceita `exemplo=antiacaros|impermeabilizacao|cadeiras|tapetes` para revisão dos ecrãs reais com dados iniciais. Não altera o motor de preços.
+
+A seleção parcial de cuidados em sofás/colchões usa `packQty?: number` com `packEnabled`. `QuizTreatmentQuantities` aparece apenas para várias unidades. `treatmentQty` limita ao número de artigos; `splitTreatmentItems` produz linhas com e sem tratamento para cálculo/resumo/recibo, mantendo compatibilidade com seleções antigas. Os preços comparativos no upsell usam `calcPackPricing` e respeitam `packPremiumDelta`.
+## Diretórios finais compactos (2026-09-10)
+
+`src/components/DirectoryGroup.tsx` uniformiza a navegação final das famílias de páginas com grupos fechados por defeito e pesquisa nas listas maiores. Preserva os links no HTML e repõe o estado ao mudar de página. `AreasDeServico` organiza região, concelho, serviços e freguesias com pesquisa global; as seis páginas principais continuam a usar `ServiceCityLinks`. Inventário e verificação em `docs/directory-navigation.md`.
+
+## Testemunhos partilhados (10 setembro 2026)
+CustomerReviews e CustomerReviewCard uniformizam homepage, páginas de serviços/localidades e cartões de packs. Textos existentes e seleção regional preservados; ligação Google usa constantes. Carrossel de 9 segundos com pausa manual, interação, visibilidade e reduced-motion; altura adaptativa mobile. Pré-visualização em mobile-preview.html#avaliacoes. Verificados mobile Lisboa, desktop e lint dos componentes; TypeScript validado.
+
+## Ofertas do upsell (2026-09-10, histórico resumido)
+As ofertas testadas em DEV com `?teste=ofertas` (colchão acrescentado −14€, uma cadeira oferecida por cada 4, tapetes «5 m², paga 4» sempre sob orçamento) foram publicadas nesse mesmo dia (ver «Publicação autorizada das ofertas») e vivem hoje em `src/constants/packPerks.ts`. `?teste=ofertas` continua a existir só para impedir o envio em DEV. Os servidores 5188/8090 desta branch já não existem.
+
+### Secção de cobertura nas landing pages (2026-09-10)
+A secção completa de serviços e zonas de atendimento permanece visível também em modo Ads, por pedido do dono. Não a substituir pelo resumo «Serviço ao domicílio».
+
+## Galerias de antes e depois (2026-09-10)
+
+`ServiceResultsGallery` centraliza comparação, miniaturas numa faixa horizontal, anterior/seguinte e reprodução opcional (parada por defeito fora dos heroes; com `autoplay` arranca já a rodar e cada par varre sozinho de Antes para Depois durante o mesmo intervalo, via `sweepMs` do `BeforeAfterSlider`). A miniatura selecionada mantém-se visível sem deslocar a página; a contenção de largura impede que a faixa alargue as grelhas dos heroes em mobile. Usa toda a categoria de `BEFORE_AFTER_POOL`, com cadeiras em 9:16, alcatifas a reutilizar tapetes e identificação de fotos avulsas/efeitos ilustrativos.
+
+`HeroBeforeAfterPool` reutiliza esta galeria nos heroes de cidades, freguesias, variantes, marcas, preços, materiais e problemas, sempre com `autoplay` e 4 segundos por par. `ServiceAutoCarousel` recebe `category` em todos os seus consumidores atuais e mantém as duas imagens de trabalho/pormenor: ao lado em desktop, por baixo em mobile. A comparação da secção tem largura máxima de 640px. `/antes-depois-limpeza` permite escolher entre os seis serviços e consultar a pool completa. Consumidores futuros sem `category` conservam o fallback estático.
+
+
+## Teste de pack dentro do quiz (2026-09-10, histórico)
+
+Foi um protótipo DEV (`?teste=quiz-pack` com `QuizSofaPackTest`). Hoje `QuizSofaPackTest.tsx` continua no repositório mas não é renderizado (`localPackPreview = false` em `QuizForm.tsx`), `useQuizPricing` já não tem parâmetro de teste nem aplica 10%, e `?teste=quiz-pack` só impede o envio em DEV. O protótipo `?teste=pack` do widget (`PriceWidget.tsx`, só DEV, só limpeza de sofás) continua separado.
+
+
+## Guias e conselhos nas páginas de serviço (2026-09-10)
+
+`ServiceExpertTips` usa cartões horizontais compactos com fotografia do artigo, título completo e ligação no cartão inteiro. Em mobile, oculta os resumos; em desktop, mostra duas linhas e distribui quatro guias em 2x2 ou três numa fila. A ligação ao blog permite explorar os restantes guias. `src/constants/blogImages.ts` centraliza as imagens antes duplicadas em `Blog.tsx`/`BlogPost.tsx`, reutilizadas também nos cartões sem carregar o texto integral dos artigos nas páginas de serviço.
+
+
+## Auditoria do envio e WhatsApp (2026-09-10; o canal de email era o Formspree, hoje é o Resend)
+
+`submissionService.buildReceiptLines` é a fonte partilhada do detalhe, resumo pré-envio e recibo; `formatQuotePrice` distingue subtotal conhecido de serviços sob orçamento. O email (função `send-lead-email`, Resend, desde 2026-09-14) recebe também `booking_id`. O WhatsApp depois do envio leva só uma mensagem curta com a referência do pedido (`buildSubmittedWaMessage` em `src/lib/whatsappMessages.ts`). O recibo só é persistido após sucesso de pelo menos um canal (ou simulação local). Erros devolvidos pelo Supabase são tratados como falha.
+
+`carpetKind` distingue alcatifa de tapete nas entradas do widget e ServiceHero. As medidas individuais seguem em todos os resumos. `carpetAllItemsValid` bloqueia peças incompletas; `carpetHasValidItems` continua a identificar qualquer peça válida para sinalizar orçamento. Extras sobrevivem ao regresso a etapas anteriores; tratamentos importados não são descartados nem convertidos em limpeza. [O desconto de 10% acima de 149€ que aqui se descrevia saiu do código nesse mesmo dia. Hoje vale a regra do pack de `packPerks.ts`: preço de pack para artigos de outro tipo, a partir de 100€ de subtotal de tabela.]
+
+Cobertura e limites (da altura do Formspree): `AUDITORIA-FORMSPREE-WHATSAPP-2026-09-10.md`.
+
+## Publicação autorizada das ofertas (2026-09-10)
+O dono autorizou publicar a versão visual e as ofertas no quiz real: colchão acrescentado −14€, cadeiras 4 paga 3, tapetes 5 m² paga 4 sob orçamento. [Hoje: fonte `packPerks.ts`, só a partir de 100€ de subtotal de tabela (2026-09-24), e o 10% com que «não acumulavam» já não existe.] O bloqueio de envio aplica-se apenas à simulação DEV explícita; produção envia os pedidos normalmente. Substitui as notas históricas de teste apenas.
+## Localidade automática no início do orçamento (2026-09-10)
+
+`QuizStepLocation` pede a posição atual ao navegador quando não existe uma localidade previamente escolhida. `src/lib/locationDetection.ts` usa o endpoint client-side do BigDataCloud, apenas após autorização do navegador, sem guardar coordenadas. Só aceita nomes portugueses que correspondam à tabela canónica de deslocações; não converte um distrito numa cidade. A localidade é pré-selecionada, mas o cliente confirma com Continuar, vendo antes a taxa real. Alterar permite pesquisa global e sugestões da mesma região (`cities.area`); não se afirma que sejam as cidades geometricamente mais próximas. Recusa, falha, timeout ou zona não servida mantêm a pesquisa manual disponível. Uma resposta tardia nunca substitui a escolha manual. A política de privacidade identifica o fornecedor e o uso dos sinais de localização/IP.
+
+O primeiro passo mostra “Orçamento sem compromisso” no rodapé. As restantes etapas conservam o seu comportamento. `/__preview/localizacao` e `?mobile=1` existem apenas em DEV, mostrando o quiz real sobre a homepage. Não há cidade demonstrativa codificada nem simulação em produção. Capturas de QA com Maia usam respostas de geolocalização interceptadas apenas no navegador de teste, sem enviar coordenadas de teste ao fornecedor.
+
+
+## FAQ uniformes (2026-09-10)
+Todas as FAQ públicas usam `ServiceFAQ`, com o fundo verde e apresentação da página Limpeza Sofás Lisboa. Inclui marcas, materiais, páginas inglesas, tratamentos, artigos e FAQ geral. Não criar acordões FAQ inline ou variantes claras. O componente aceita respostas React com `plainAnswer`, âncoras `id` e `includeSchema={false}` quando a página já fornece FAQPage, evitando schema duplicado. `description` permite traduzir a instrução nas páginas inglesas.
+
+## Métricas v2 (2026-09-10)
+
+A recolha, IDs de tentativa/visita, fila persistente, tratamento do histórico e fórmulas estão documentados em `METRICS.md`. `useQuizAnalytics` centraliza etapas vistas e conclusão após confirmação de entrega; nunca voltar a emitir `complete` no avanço das etapas. `initContactTracking` cobre links WhatsApp/telefone globalmente e evita duplicação com handlers legados. `quizMetrics.ts` centraliza cálculo e paginação. O painel inclui diagnóstico de recolha e distingue cliques de pedidos recebidos.
+
+## Validação de release + fatores de preço redesenhados (2026-09-10)
+
+**Validação pré-atendimento de 11/09** (`3d05a31`): a cópia principal estava 77 commits atrás de `origin/master`, atualizada por fast-forward (alterações locais salvaguardadas em stash antes disso). `vitest.config.ts` passou a incluir também `scripts/**/*.test.mjs` (os 10 testes de `scripts/response-policy.test.mjs` estavam a ser escritos mas nunca corriam na suite normal). `eslint.config.js` ganhou `.claude/worktrees/**` nos `ignores` (estava a duplicar erros de cópias de trabalho paralelas). Confirmado: 1920 testes ok, TypeScript limpo, build com 15.171 rotas pré-renderizadas, 15.176 HTMLs auditados sem H1 em falta/rota órfã, fluxo do quiz até contacto testado em mobile (Lisboa, sofá 3 lugares, 79€+10€=89€) sem envio real. Ficam por resolver (pré-existentes, não é regressão desta sessão) 15 erros/17 avisos de lint fora do projeto principal. Detalhe completo em `VALIDACAO-RELEASE-2026-09-10.md`.
+
+**Cartões de diagnóstico removidos de `ProblemPage.tsx`** (`26e0786`): a secção "O problema, a solução" (2 cartões fotográficos lado a lado, foto dessaturada com acento vermelho vs. foto normal com acento verde) foi removida por completo — decisão de simplificar a página, não um bug. `getSolutionImage` ficou sem uso nesta página (import removido); `getServiceGallery` continua a ser usado noutro sítio da mesma página.
+
+**Fatores de preço redesenhados como cartões acessíveis** (`b898848`, `07b2120`): a secção "O que influencia o valor final" da `PricePage.tsx` — que era uma grelha escura numerada (1 a 6 fatores, texto solto por serviço em `priceSeoData.ts`) — foi substituída por `src/components/PriceFactors.tsx`, um componente novo e independente com exatamente 3 fatores fixos por serviço (título em forma de pergunta + descrição + 2 exemplos), mapeados a um ícone Lucide por serviço (`services` slug → `factors[slug]`, os 6 serviços de sempre: sofás/colchões/tapetes/cadeiras/alcatifas/impermeabilização). Os `data.factors` antigos de `priceSeoData.ts` deixaram de ser consumidos por esta secção (continuam a existir no ficheiro, sem leitores). Destaque visual (cartão escuro/dourado) inicialmente no 1º cartão, movido para o cartão do **meio** (`index === 1`) no commit seguinte, a pedido do dono. Termina com uma nota fixa "Sabe o valor antes de marcar."
+
+## Unificação de layout Freguesia/Preço + expansão Aveiro/Coimbra (2026-09-10)
+
+**Layout unificado (pedido do dono, achado real no Ramalde):** `LocationServicePage.tsx` e `SofaVariantPage.tsx` já tinham o layout "novo"; `FreguesiaServicePage.tsx` e `PricePage.tsx` ainda tinham o antigo — mesmas ~940 páginas de freguesia já publicadas a mostrar uma versão visualmente desatualizada. Corrigido nas duas: espaçamento do hero alinhado (`pt-6 md:pt-16 lg:pt-20`/`gap-4 lg:gap-12`, era `pt-16 md:pt-24 lg:pt-28`/`gap-8 lg:gap-12`), âncoras de scroll adicionadas (`#resultados`, `#precos`, `#avaliacoes`, `#duvidas`, e `#problemas` em `FreguesiaServicePage`). Só em `FreguesiaServicePage.tsx`: cartões de "Problemas comuns" trocaram o design antigo (imagem cheia com texto sobreposto, `h-[400px]`, sem contador) pelo `ProblemCarousel` novo (igual ao de `LocationServicePage`); `SofaLeadActions` e `SofaProcessGuide` passaram a aparecer para o serviço de sofás (antes só o CTA genérico + timeline genérica, mesmo em sofás). `PricePage.tsx` só precisou do espaçamento e das âncoras — a estrutura de conteúdo já era suficientemente diferente por natureza (tabela de preços, não problemas) para não fazer sentido replicar cartões de problema aqui.
+
+**Aveiro e Coimbra passam a cidades reais** (pedido do dono, "replica a estrutura, torna o conteúdo original"): adicionadas a `cities` em `locationSeoData.ts` (`area: "porto"`, servidas pela equipa Porto por não haver equipa própria no Centro) e a `municipiosComFreguesias` em `freguesiaSeoData.ts` — Aveiro com 14 freguesias, Coimbra com 31 (nomes pré-2012, mesmo padrão granular já usado no Porto: uniões administrativas pós-2013 como "Eixo e Eirol" ou "Taveiro, Ameal e Arzila" foram desdobradas nos nomes de bairro individuais, confirmados via Wikipédia/GeoAPI antes de publicar). Como `LocationServicePage`/`FreguesiaServicePage`/`PricePage`/`SofaVariantPage` geram conteúdo 100% a partir de templates (`getLocationServiceData`/`generateFreguesiaContent`/`getAllPriceRoutes`/`keywordVariantData.ts`, todos lendo `cities`/`municipiosComFreguesias` diretamente, sem cópia paralela nos scripts Node), só estas duas listas precisaram de edição — desbloqueou automaticamente Localidade×Serviço, Freguesia×Serviço, Preço e Variantes Keyword para as duas cidades. Deslocação em `src/constants/travel.ts` (fonte única, `QuizTypes.ts` só reexporta): **Aveiro 15€, Coimbra 15€** (corrigido a pedido do dono — a 1ª tentativa tinha posto 20€/25€ seguindo o padrão de zonas mais afastadas, errado).
+
+**Bug real encontrado e corrigido antes de publicar: colisão de rotas com o sistema de expansão antigo.** `src/data/treatmentSeoData.ts` já tinha Aveiro/Coimbra num array `expansionCities` separado, usado por `getExpansionRoutes()` para gerar páginas placeholder "Disponibilidade sob consulta" nas mesmas rotas `/{serviço}-{cidade}` que `LocationServicePage` agora também gera. No React Router o `LocationServicePage` ganhava (registado primeiro em `App.tsx`), mas no `scripts/prerender.ts` o loop de `getExpansionRoutes()` corre depois e reescrevia o ficheiro HTML — o Google (e qualquer visita sem JS) via sempre o placeholder, nunca a página real; ao hidratar no cliente o conteúdo trocava visivelmente. Corrigido esvaziando `expansionCities` para `[]` (Aveiro/Coimbra já não são "cobertura por confirmar"; as páginas de tratamento `tratamento-anti-acaros-aveiro` etc. continuam geradas normalmente, agora via `cities`). **Padrão a vigiar:** qualquer cidade nova adicionada a `locationSeoData.ts` tem de ser verificada contra `expansionCities`/`getExpansionRoutes()` em `treatmentSeoData.ts` — é o mesmo tipo de colisão de slugs já avisado no ficheiro para `materialSeoData.ts`/`keywordVariantData.ts`/`problemCitySeoData.ts`, só que desta vez entre um sistema "definitivo" e um "placeholder" para as mesmas cidades.
+
+**Sitemap reorganizado:** removido `sitemap-centro.xml` (ficava permanentemente vazio depois da correção acima — `getExpansionRoutes()` passou a devolver `[]`) de `scripts/generate-sitemap.ts` e do cartão correspondente em `src/pages/admin/SitemapMonitor.tsx` ("Aveiro e Coimbra · Cobertura sob consulta", agora obsoleto). O texto fixo "12 sub-sitemaps" no cabeçalho do painel (desatualizado, já eram 14 antes desta limpeza) passou a ser calculado (`SUB_SITEMAP_COUNT`, conta ficheiros `.xml` distintos em `SITEMAPS`) para nunca mais dessincronizar.
+
+**Bug real de deteção de localização corrigido** (reportado pelo dono, testado em zona servida e mesmo assim caía no "não identificámos uma localidade"): `src/lib/locationDetection.ts` só comparava `city`/`locality`/`localityName` da resposta do BigDataCloud contra as chaves de `locationPrices` (nomes de município). Em Portugal esse endpoint devolve frequentemente o nome da **freguesia**, não do município (ex.: alguém em Ramalde recebe `city: "Ramalde"`, que nunca bate com "Porto"). Adicionado fallback: se nenhum candidato bater diretamente, procura o nome numa tabela freguesia→município construída de `municipiosComFreguesias` (só para municípios já servidos) e devolve o município. Testado (`locationDetection.test.ts`): Ramalde→Porto, Glória→Aveiro. Continua a não inventar uma cidade a partir de um distrito não servido (comportamento antigo, inalterado).
+
+**Pendente no fim desta sessão (reportado pelo dono via screenshots, não corrigido — risco de regressão no quiz de orçamento sem conseguir testar visualmente):** cartão "Desbacterização e Anti Ácaros" do colchão mostra sempre o intervalo "+15€ a +25€/un." mesmo quando só um tamanho está selecionado (devia mostrar o preço exato desse tamanho); texto do intervalo pouco claro; ecrã de impermeabilização de cadeiras cortado no mobile (conteúdo não cabe no ecrã); barras laterais do slider antes/depois em cadeiras deviam ser transparentes (mostrar o hero por trás) em vez de sólidas; layout do passo de tapetes por unificar — o dono quer a versão simples de "Que tapetes vamos limpar?" (inputs de texto simples) a substituir a versão mais carregada usada no upsell/oferta (ícone + explicação do "por cada 5m² paga 4" + steppers), com a oferta explicada de forma simples em vez do cartão atual. Também reportado (não verificado): página de preço "parece zoomed in" comparada com a página de localidade — o código-fonte das duas ficou idêntico nesta sessão (só o `alt` da imagem difere), pode ser cache/HMR desatualizado no browser do dono; confirmar com hard-refresh antes de investigar mais.
+
+
+## Pré-visualização Avenir Next (13/09/2026, ultrapassada)
+
+[Ultrapassada no mesmo dia: Avenir Next passou a ser a fonte do site, ver «Tipografia integrada». O texto abaixo descreve a fase de proposta.]
+
+A página de colchões em Paranhos mantém o comparador exclusivamente DEV: `?teste=fontes&fonte=avenir#precos`. `FontComparisonPanel` oferece Atual/Avenir Next e conserva os testes anteriores em detalhes. A proposta ajusta pesos, escala, contraste e alinhamento através de estilos limitados ao atributo de pré-visualização; usa apenas fontes locais do dispositivo, sem distribuir ficheiros comerciais. Mostra aviso quando as faces locais não estão disponíveis. `PriceWidget` apresenta «Escolha os colchões» apenas na proposta DEV. Produção mantém a tipografia e o texto anteriores. Avenir Next ainda é uma proposta, não uma decisão de marca; publicação exige licença web.
+
+## Avaliações compactas no mobile (13/09/2026)
+
+Os cartões partilhados de avaliações (`CustomerReviewCard`, usados por `CustomerReviews` na homepage e páginas de serviços/localidades) têm altura uniforme de 340px abaixo de 640px, texto de 18px com até seis linhas e abertura da transcrição integral num diálogo acessível quando necessário. O carrossel deixou de ajustar a altura à avaliação selecionada. Preservar as transcrições e a apresentação desktop.
+
+## Correção do processo por material (13/09/2026)
+
+Os guias de sofá, exceto pele/couro, têm seis etapas: avaliação, aspiração, aplicação, escovação, extração e secagem. A escovação fica obrigatoriamente entre aplicação e extração. Couro mantém os cinco cuidados próprios. No mobile, seis separadores usam duas linhas de três para manter os rótulos legíveis.
+
+Materiais: sequência de fundos aprovada: exemplos branco, processo verde, perguntas branco, pack «Aproveite a mesma visita» verde. A variante clara das FAQs é explícita, sem alterar as restantes páginas.
+
+
+## Verde suave e heroes mobile (13/09/2026)
+
+Pedido aprovado: a paleta verde suave do piloto passa a ser partilhada pelo site, em `src/styles/surfaces.css`, sem a antiga textura. As áreas claras continuam claras. Em mobile (até 767px), os heroes usam fundo verde com degradé e fotografia/comparação separada do texto; no computador conserva-se a fotografia de fundo. `data-mobile-hero` delimita o tratamento nos heroes comerciais, marcas, materiais, problemas, páginas informativas, packs, blog e inglês. `CommercialHero` mantém a composição única e usa `preserveMobileHero` apenas na homepage: preservar a aparência e as fotografias do seu hero em todos os tamanhos. O piloto `scripts/preview-hero-mobile.mjs` passou a servir os estilos reais, sem uma segunda cópia da proposta CSS. Não confundir esta aprovação visual com alterações de preços, conteúdo, FAQ ou fluxos comerciais.
+
+
+## Exemplos dos serviços nacionais (13/09/2026)
+
+`ServiceExamplesGallery` substitui `ServiceAutoCarousel` nas seis páginas principais, com quatro exemplos em duas colunas. `serviceExamples.ts` seleciona imagens estáveis das bibliotecas existentes e partilha os dados com o prerender. `VisualExamplesGallery` aceita miniatura, srcset e sizes opcionais; as restantes galerias conservam os valores anteriores. Versões 400/800px em `public/images/service-examples/`; originais da biblioteca só na ampliação. Miniaturas mobile entre 7 e 25 KB, 24 imagens nos seis serviços.
+
+
+## Decisões de desenho e conteúdo que viviam só no `AGENTS.md` (até 21/09/2026)
+
+O `AGENTS.md` (instruções do Codex) acumulou decisões do dono que nenhuma
+sessão do Claude lia. A 2026-09-26 foi reduzido a um ponteiro para o
+`CLAUDE.md`, e as decisões ainda válidas passaram para aqui. As que estavam
+ultrapassadas não foram copiadas (contagens de avaliações antigas, desconto de
+10%, cadeiras com anti-ácaros incluído na impermeabilização e conjuntos de
+4 cadeiras a 70/90€, «`text-gold` resolve para outro tom»).
+
+- **Promessas comerciais em todo o site, incluindo inglês e testes locais:**
+  resposta em menos de 10 minutos (em inglês, `EN_RESPONSE_PROMISE`,
+  `EN_AVAILABILITY_PROMISE`, `EN_COVERAGE_PROMISE`; nunca «Same-day» como
+  prazo de resposta); disponibilidade no próprio dia ou no seguinte, sob
+  confirmação; secagem média de 3 a 6 horas, dependente da ventilação
+  (`DRYING_PROMISE`); repetição gratuita acionada até 48 horas. A limpeza não
+  inclui anti-ácaros nem desbacterização. Sem promessas de eliminação de
+  germes, benefícios clínicos, percentagens ou certificações sem prova. Sem
+  reservas fictícias, contadores de atividade simulada nem ameaças de perda de
+  vaga ou desconto ao sair.
+- **Avaliações:** a homepage usa `PUBLISHED_REVIEWS` (só transcrições reais).
+  Nunca inventar testemunhos, alterar estrelas nem atribuir cidade ou
+  freguesia sem confirmação (`CONFIRMED_REVIEW_LOCATIONS`). A avaliação de
+  quatro estrelas sem texto (Sara Rochete) não entra nos cartões.
+  `SERVICES_COMPLETED_LABEL` conta serviços, `CLIENTS_SERVED_LABEL` clientes.
+- **Processo de limpeza:** avaliação, depois tratar, escovar, extrair e
+  conferir/secar. A escova e a pressão respeitam o revestimento. Juta, sisal,
+  seda e materiais incompatíveis não seguem automaticamente limpeza com água
+  nem escovagem forte. Não confundir com a aplicação de impermeabilizante nem
+  com a avaliação de bolor. Nos guias (`SofaProcessGuide`,
+  `ServiceProcessGuide`) o contentor da imagem usa
+  `min-w-0 w-full self-start overflow-hidden` e a coluna de texto `min-w-0`,
+  para a imagem não invadir o texto em desktop.
+- **«A nossa promessa» dos seis serviços:** três imagens, cada uma só com uma
+  legenda curta, sem parágrafos; a condição da repetição até 48h numa nota
+  discreta no fim. Preservar pelo menos uma fotografia antiga real por
+  serviço; uma imagem nova só mostra um trabalhador se reproduzir fielmente
+  um técnico Kyro e a identidade verdadeira, senão a cena fica sem pessoas,
+  logótipos, fardas ou equipamento inventado.
+- **Imagens ilustrativas:** legenda só «Imagem ilustrativa» nos cartões e
+  «Imagens ilustrativas» no aviso geral, sem aviso de IA; nunca apresentadas
+  como trabalhos reais. Seleção estável por URL, nunca aleatória por visita,
+  por parâmetros de Ads ou por localidade sem município.
+- **Faixa `ServiceSnapshotStats`** (localidades, freguesias, variantes, marcas,
+  preços): só avaliações, resposta e secagem (ou ativação da proteção), por
+  esta ordem e numa linha também em mobile; sem preço; estrela `#D4AF37`.
+- **Homepage:** o cartão de cadeiras de «Os 4 problemas que resolvemos no
+  próprio dia» diz «Impermeabilização com garantia de até 10 anos e 5
+  lavagens». Alterações à homepage exigem pedido específico (ver «Estrutura
+  partilhada dos heroes»).
+- **Passo de contacto do quiz:** nome e telemóvel primeiro, com
+  preenchimento automático; resumo do pedido fechado por omissão e abaixo dos
+  campos; ação principal «Enviar pedido». Sem recibos abertos, avaliações,
+  estimativa fixa no topo ou totais repetidos no rodapé deste passo.
+- **Tipografia:** H1 como aprovado; H2 a H6 em Avenir Demi 600, não Bold 700
+  (`typography.css`).
+- **Selo TOP** (`QuizTopBadge`): só na impermeabilização Premium e no
+  anti-ácaros.
+- **Página de obrigado:** sem introdução longa, próximos passos, CTAs
+  duplicados nem barra flutuante (ver «Página de obrigado»).
+
+
+# Kyro Clean Solutions — Full Project Context
+
+> O `CLAUDE.md` na raiz carrega automaticamente em qualquer sessão do Claude Code aberta nesta pasta (regras fixas e factos de negócio atuais). Este ficheiro é a referência de arquitetura mais profunda — lê-o quando precisares de detalhe sobre rotas, fluxo do quiz, design tokens ou onde vivem os preços (os valores estão no código, não aqui).
 
 ---
 
@@ -160,8 +383,9 @@ escreve-a no HTML estático (`ENTITY_FOOTER_HTML`, que deixou de ser só as trê
 páginas de entidade e passou a ser o rodapé). Antes disto o cabeçalho e o
 rodapé eram React puro: das ~25 ligações do rodapé, o HTML que um crawler lê
 tinha três. Não acrescentar ligações a um dos lados; acrescentar ao ficheiro
-de dados. O bloco Packs está deliberadamente fora dele, para não alterar o
-peso de `/packs`.
+de dados. [Desde 2026-09-24 já não há bloco Packs à parte nem `/packs`: o
+rodapé liga a `/guia-de-packs` («Packs por Cidade»), ver o comentário em
+`siteFooterNav.ts`.]
 
 `src/data/landingPageModel.ts` deixou de cortar os blocos de diretório com
 `.slice(0, n)`. `coverageWindow`, `coverageCityLinks` e `zoneLinks` mostram o
@@ -180,7 +404,8 @@ a lista de cidades que o `TreatmentPage.tsx` já mostrava, mais migalha nos dois
 lados. As páginas B2B (`CommercialPage.tsx`) ganharam um bloco de cidades
 irmãs, também nos dois lados. Resultado medido em `dist`: páginas sem nenhuma
 ligação interna de 558 para 30, e os seis serviços-pilar de 2.206–3.691
-ligações para 16.233 cada, com `/packs` inalterado.
+ligações para 16.233 cada, com `/packs` inalterado (medição de 18/09; `/packs`
+foi removida a 2026-09-24).
 
 ## Estudo com dados próprios (17/09/2026, fase 7 do GEO)
 
@@ -229,7 +454,7 @@ Camada nova, montada para o investimento em Google Ads. Regras e armadilhas no `
 - `src/lib/enhancedConversions.ts` — normaliza e faz SHA-256 de email/telefone para o canal `user_data`. Desligado por omissão.
 - `src/lib/leadAttribution.ts` — captura de campanha (UTMs, `gclid`/`gbraid`/`wbraid`, ValueTrack), first touch em `localStorage` (90 dias, nunca reescrito) e last touch em `sessionStorage` (30 min, substituído por campanha nova). `getAttributionSnapshot()` é o registo plano que segue com o lead.
 - `src/lib/leadTracking.ts` — o que é um lead, o `lead_id`, os estados do funil e o mapa para os eventos recomendados do GA4.
-- `src/lib/analytics.ts` — a fachada que os componentes importam: `trackEvent`, `trackPageView`, `trackContactClick`, `trackLeadEvent`, `trackQuoteFormStart`, `trackQuoteFormStep`.
+- `src/lib/analytics.ts` — a fachada que os componentes importam: `trackEvent`, `trackPageView`, `trackContactClick`, `trackLeadEvent`, `trackQuoteFormStart`, `trackQuoteFormStep`. [Os CTAs de WhatsApp e telefone não chamam `trackContactClick`: são medidos só pelo delegado global `initContactTracking`, e um teste rebenta se um componente o fizer. Ver `CLAUDE.md`.]
 - `src/hooks/use-page-tracking.ts` — `page_view` por mudança de rota, com guarda contra repetição e reenvio quando o consentimento chega a meio da visita.
 - `src/lib/marketingMetrics.ts` — as contas do painel, puras e testadas (funil, campanhas, landing pages, canais, CSV de conversões offline).
 - `src/pages/admin/MarketingPanel.tsx` — separador "Google Ads" do painel de administração.
@@ -245,7 +470,7 @@ Camada nova, montada para o investimento em Google Ads. Regras e armadilhas no `
 
 ## ⚠️ Duas máquinas, um repositório (ler primeiro)
 
-O dono trabalha neste projeto a partir de **duas máquinas** — um PC Windows e um MacBook — cada uma com a sua própria instância do Claude Code e a sua própria memória local (a memória de uma não é visível à outra; só este ficheiro CONTEXT.md viaja entre as duas, via Git).
+O dono trabalha neste projeto a partir de **duas máquinas** — um PC Windows e um MacBook — cada uma com a sua própria instância do Claude Code e a sua própria memória local (a memória de uma não é visível à outra; só o `CLAUDE.md`, este ficheiro e o resto do repositório viajam entre as duas, via Git).
 
 **Não há sincronização automática.** Antes de tocares em código:
 1. Corre `git status` e `git log -5 --oneline`. Se não estiveres alinhado com `origin/master`, faz `git pull` primeiro.
@@ -257,14 +482,14 @@ O dono trabalha neste projeto a partir de **duas máquinas** — um PC Windows e
 
 ## Projeto
 
-**Kyro Clean Solutions** — site React/TypeScript de landing + quiz de orçamento para empresa de limpeza de estofos em Porto, Portugal.
-- Área de serviço: Norte e Centro de Portugal
+**Kyro Clean Solutions** — site React/TypeScript de landing + quiz de orçamento para empresa de limpeza de estofos ao domicílio em Portugal (cleansolutions.com.pt).
+- Área de serviço: quatro equipas/áreas em `cities` de `src/data/serviceCatalog.ts` (Porto, Braga, Lisboa/Setúbal/Alentejo Litoral, Algarve), mais deslocação alargada a Aveiro, Coimbra e Alentejo Litoral (`EXTENDED_TRIP_CITIES` em `travel.ts`). Contar as cidades no ficheiro, não aqui.
 - WhatsApp: 351925530647
 - Email: cleansolutions.pt25@gmail.com
 
-**Stack:** React 18 + TypeScript + Vite + Tailwind CSS + shadcn/ui + react-i18next + Supabase (CRM PostgreSQL + Edge Functions) + Resend (email, via função `send-lead-email`) + React Router
+**Stack:** React 18 + TypeScript + Vite + Tailwind CSS + shadcn/ui + Supabase (CRM PostgreSQL + Edge Functions) + Resend (email, via função `send-lead-email`) + React Router. Alojamento: Cloudflare Pages, que constrói a cada push para `master`. Sem i18n: as 24 páginas EN são componentes próprios em `/en/`.
 
-**Raiz do projeto:** `C:\Users\im a god bruh\Downloads\spotless-pro-flow-main\`
+**Raiz do projeto:** o clone de `tarzan49/sitekyroclean` (a pasta antiga `spotless-pro-flow-main` já não existe).
 
 ### Verificação local (comandos)
 
@@ -294,12 +519,16 @@ dinâmicos dos plugins do `closeBundle`, mais os módulos de `src/data` e
 
 ## Design Tokens
 
+As regras visuais (dourado, ícones, travessões) estão no `CLAUDE.md`. Os
+valores reais vivem em `src/index.css`, `src/styles/typography.css`,
+`src/styles/surfaces.css` e `tailwind.config.ts`.
+
 | Token | Valor |
 |---|---|
-| Gold (Kyro) | `#D4AF37` / alias Tailwind `text-gold`, `bg-gold`, `border-gold` |
-| Dark bg | `#12121e` / `#13132B` (modal) |
-| Lavender bg | `#F2EBFF` |
-| Heading font | Playfair Display (`font-playfair`) |
+| Dourado Kyro | `#D4AF37` (`--gold`; alias Tailwind `text-gold`, `bg-gold`, `border-gold`). Única exceção: texto corrido pequeno em fundo claro (`#8B6914` / `#aa862b`), ver `CLAUDE.md` |
+| Verde canónico | `bg-kyro-green` (`--kyro-green` em `src/styles/surfaces.css`) |
+| Escuro do quiz | `#12121e` / `#13132B` (modal) |
+| Fonte | Avenir Next (`--font-kyro`, faces locais em `public/fonts/avenir-next/`). `font-playfair` é um alias antigo e também resolve para Avenir |
 | Container padrão | `max-w-7xl mx-auto px-5 sm:px-6 lg:px-8` |
 | Botão primário | `bg-gradient-to-r from-gold to-[#d4c57b]` texto `#12121e` font-bold, shadow `0_4px_28px_rgba(212,175,55,0.40)` |
 | Borda card hover | `hover:border-gold/50` |
@@ -308,389 +537,174 @@ dinâmicos dos plugins do `closeBundle`, mais os módulos de `src/data` e
 
 ## Rotas
 
+As rotas explícitas estão em `src/App.tsx`. Todas as páginas geradas
+(localidade × serviço, freguesias, preços, variantes, materiais, marcas,
+problema × cidade, tratamentos, packs × cidade, B2B) passam pelo catch-all
+`GeneratedRoutePage`, que escolhe o componente por `generatedRouteIndex.ts`
+ou pelos metadados que o prerender deixa no HTML. Uma rota sem ficheiro
+estático no `dist` serve o `404.html` com HTTP 404 (nona armadilha do
+`CLAUDE.md`).
+
 | Rota | Página |
 |---|---|
-| `/` | Index (homepage) |
-| `/limpeza-sofas` | LimpezaSofas |
-| `/limpeza-colchoes` | LimpezaColchoes |
-| `/limpeza-tapetes` | LimpezaTapetes |
-| `/limpeza-alcatifas` | LimpezaAlcatifas |
-| `/limpeza-cadeiras` | LimpezaCadeiras |
-| `/impermeabilizacao` | Impermeabilizacao |
-| `/obrigado` | Obrigado (pós-submissão) |
-| `/blog/*` | Artigos de blog |
-| `/sobre` | Sobre (entidade) |
-| `/autor/:slug` | Autor (assinatura editorial) |
-| `/estudo-limpeza-estofos-portugal` | Estudo (dados próprios da operação) |
+| `/` | `IndexV1` (homepage) |
+| `/limpeza-sofas`, `/limpeza-colchoes`, `/limpeza-tapetes`, `/limpeza-cadeiras`, `/limpeza-alcatifas`, `/impermeabilizacao` | as seis páginas-pilar |
+| `/{pack}-{cidade}` | `PackComboPage` + `PackConfigurator` (via catch-all) |
+| `/guia-de-packs` | `PacksSitemap` |
+| `/packs` | **removida a 2026-09-24**: 301 para `/guia-de-packs` (`public/_redirects`). `CustomPackPage.tsx` já não existe |
+| `/problemas/:slug` | `ProblemPage` |
+| `/blog`, `/blog/:slug` | `Blog`, `BlogPost` |
+| `/perguntas-frequentes-limpeza-estofos`, `/glossario-limpeza-estofos` | `FAQEstofos`, `GlossarioEstofos` |
+| `/antes-depois-limpeza` | `BeforeAfterPage` |
+| `/areas-de-servico` | `AreasDeServico` |
+| `/sobre`, `/autor/:slug`, `/estudo-limpeza-estofos-portugal` | `Sobre`, `Autor`, `Estudo` |
+| `/en/:slug`, `/en/airbnb-portugal-cleaning-guide` | `EnServicePage`, `EnGuidePage` |
+| `/obrigado`, `/obrigado-pelo-servico` | `Obrigado`, `ReviewRequest` |
+| `/politica-de-privacidade`, `/termos-e-condicoes`, `/politica-de-devolucoes` | páginas legais |
+| `/admin/panel`, `/admin/deslocacoes` | `AdminPanel`, `AdminDeslocacoes` |
+| `/__preview/orcamento`, `/__preview/localizacao` | só em desenvolvimento |
 
 ---
 
-## Quiz Form — Arquitetura Completa
+## Quiz de orçamento — arquitetura atual
 
-**Ficheiro principal:** `src/components/QuizForm.tsx`
-**Sub-componentes:** `src/components/quiz/`
+**Ficheiro principal:** `src/components/QuizForm.tsx`. Passos em
+`src/components/quiz/` e `src/components/quiz/steps/`. A lógica saiu do
+componente para hooks: `use-quiz-navigation.ts` (máquina de passos),
+`use-quiz-pricing.ts` (totais), `use-quiz-submission.ts`,
+`use-quiz-analytics.ts` e `use-quiz-ui-effects.ts`.
 
 ### Fluxo de passos
 
 ```
-Step 0 — Localização (cards Porto/Lisboa/Braga + autocomplete)
-Step 1 — Seleção de serviço (sofa/mattress/carpet/chairs/headboard/other)
-Step 2 — Tipo de tratamento (cleaning/waterproofing/both) — SALTADO para carpet/chairs/headboard/other
-Step 3 — Quantidades / detalhes do serviço
-Step 4 — Seletor de vaga/calendário
-── ECRÃ DE UPSELL (intercetado entre step 4 e 5, só uma vez) ──
-Step 5 — Formulário de contacto (nome + telefone + foto)
-→ Submissão → /obrigado
+Step 0 — Localidade (QuizStepLocation: deteção automática + pesquisa;
+         só aceita chaves de locationPrices)
+Step 1 — Serviço (QuizStep1Service: sofá, colchão, tapete, cadeiras)
+Step 2 — Tratamento (ServiceTypeSelector: Higienização / Impermeabilização)
+         só sofá e cadeiras; colchão e tapete saltam este passo e ficam em 'cleaning'
+Step 3 — Quantidades (QuizStepConfig → QuizStepConfigSofa / Mattress / Chairs / Carpet)
+── ecrã de extras do próprio serviço, logo a seguir ao Continuar do step 3:
+   sofá → QuizSofaAddonUpsell · colchão → QuizMattressAddonUpsell · cadeiras → QuizChairsAddonUpsell
+── ecrã «Aproveite a mesma visita» (QuizComboUpsellScreen)
+Step 4 — Contacto (QuizStepContact: nome + telemóvel) → submissão → /obrigado
 ```
 
-**Regra de navegação:**
-- `shouldSkipServiceType` = carpet / chairs / headboard / other → salta step 2
-- Back de step 3 → step 1 (se shouldSkipServiceType), senão step 2
-- Back de step 5 → volta ao ecrã de upsell (se `upsellShown=true`)
-- Step 4 (calendário) usa `!showUpsell` na condição — ao activar upsell, calendário some do DOM
+- O ecrã visível entre o step 3 e o 4 é um só estado, `activeUpsellScreen`
+  (`'sofa' | 'mattress' | 'chairs' | 'combo' | null`), que unificou em
+  2026-09-08 os booleans independentes de antes. `upsellShown` evita
+  reintercetar.
+- O total aparece sempre no topo em `QuizEstimate` (o mesmo componente que o
+  `PriceWidget` usa).
+- `QuizComboUpsellScreen` mostra Colchão, Sofá, Cadeiras e Tapete, exclui a
+  categoria do serviço principal (`primaryService`) e cada categoria abre a sua
+  página de quantidades com tamanhos e preços reais. Os preços dos artigos
+  acrescentados seguem a regra do pack (ver «Preços: fontes e regras»).
+  "Continuar sem adicionar" nunca bloqueia.
+- `?teste=ofertas` e `?teste=quiz-pack` só existem em desenvolvimento e
+  impedem o envio. `QuizSofaPackTest.tsx` continua no repositório mas não é
+  renderizado (`localPackPreview = false`).
 
----
-
-## Sub-componentes do Quiz (`src/components/quiz/`)
+### Ficheiros do quiz (`src/components/quiz/`)
 
 | Ficheiro | Responsabilidade |
 |---|---|
-| `QuizTypes.ts` | Interfaces + todas as tabelas de preços |
-| `QuizStep1Service.tsx` | Grelha de serviços com imagens |
-| `ServiceTypeSelector.tsx` | Cards Higienização / Impermeabilização / Pack |
-| `QuizStep2Sofa.tsx` | Config sofás (qty [-/+], toggle Pack por item) |
-| `QuizStep2Mattress.tsx` | Config colchões (qty [-/+], toggle Pack por item) |
-| `QuizStep2Carpet.tsx` | Config tapetes |
-| `QuizStep2Chairs.tsx` | Config cadeiras |
-| `QuizStep2Headboard.tsx` | Config cabeceiras |
-| `QuizStep2Other.tsx` | Config outros |
-| `QuizStepCalendar.tsx` | Seletor de slot |
-| `index.ts` | Re-exports de todos os sub-componentes e tipos |
+| `QuizTypes.ts` | Tipos (`QuizFormData`, `SofaItem`, `MattressItem`, `CarpetItem`, `UpsellItemConfig`) e tabelas `sofaPrices` / `mattressPrices`; reexporta `locationPrices` de `travel.ts` |
+| `quizHelpers.ts` | `calcPackPricing`, `calcChairClean`, `calcChairWaterproof(Premium)`, `splitTreatmentItems`, tapetes |
+| `QuizStep1Service.tsx` | Grelha de serviços |
+| `ServiceTypeSelector.tsx` | Higienização / Impermeabilização (o cartão de pack já não aparece: `packPrice` é sempre `undefined`) |
+| `QuizEstimate.tsx` | Estimativa no topo |
+| `QuizTreatmentQuantities.tsx` | Escolha parcial («1 de 3») com `packQty` |
+| `steps/QuizStepLocation.tsx`, `steps/QuizStepConfig*.tsx`, `steps/QuizStepContact.tsx` | Passos 0, 3 e 4 |
+| `steps/QuizSofaAddonUpsell.tsx`, `steps/QuizMattressAddonUpsell.tsx`, `steps/QuizChairsAddonUpsell.tsx` | Extras do serviço principal |
+| `steps/WaterproofingTierPicker.tsx` | Premium / Essencial (partilhado com o `PriceWidget`) |
+| `steps/QuizComboUpsellScreen.tsx` | «Aproveite a mesma visita» |
+
+**Histórico do que já não existe** (não procurar nem recriar):
+`QuizStep2Sofa/Mattress/Carpet/Chairs/Headboard/Other.tsx` (partidos em
+`QuizStepConfig*` a 2026-06-06), `QuizStepCalendar.tsx` e o passo de
+calendário (removidos a 2026-05-19), `QuizUpsellOverlay.tsx` e
+`useUpsellSelection.ts` (2026-09-06), `QuizMinimumGate.tsx` (gate do mínimo
+de pedido, removido a 2026-09-08), o desconto de 10% do pack
+(`packDiscountActive`, removido a 2026-09-10) e o contador de −5%
+(`countdown`, `kyro_timer_expiry`, removido a 2026-09-10).
 
 ---
 
-## Tabelas de Preços (`QuizTypes.ts`) — VALORES SAGRADOS
+## Preços: fontes e regras (atualizado a 2026-09-26)
 
-```ts
-// SOFÁS
-sofaPrices = [
-  { id: '1-lugar',    label: '1 Lugar',    cleaningPrice: 49, waterproofingPrice: 49, bothPrice: 79,  originalBothPrice: 98  },
-  { id: '2-lugares',  label: '2 Lugares',  cleaningPrice: 69, waterproofingPrice: 59, bothPrice: 89,  originalBothPrice: 128 },
-  { id: '3-lugares',  label: '3 Lugares',  cleaningPrice: 79, waterproofingPrice: 69, bothPrice: 99,  originalBothPrice: 148 },
-  { id: '4+-lugares', label: '4+ Lugares', cleaningPrice: 'Sob orçamento', waterproofingPrice: 'Sob orçamento', bothPrice: 'Sob orçamento' },
-]
-sofaChaisePrice = { cleaning: 10, waterproofing: 10 }
+**Não copiar preços para este ficheiro.** Esta secção era uma tabela de
+«valores sagrados» copiada do código, e ficou errada: a 2026-09-26 ainda dizia
+impermeabilização de sofá 49/59/69€ e pack 79/89/99€ quando o código tinha
+59/79/99€ e 99/139/169€, mais uma chaise longue que já não se vende. Um número
+escrito aqui volta a ficar desatualizado. Os preços leem-se no código:
 
-// COLCHÕES — não alterar sem aprovação
-mattressPrices = [
-  { id: 'solteiro', label: 'Solteiro',     cleaningPrice: 49, waterproofingPrice: 45, bothPrice: 79,  originalBothPrice: 94  },
-  { id: 'casal',    label: 'Casal',        cleaningPrice: 59, waterproofingPrice: 50, bothPrice: 89,  originalBothPrice: 109 },
-  { id: 'king',     label: 'King / Queen', cleaningPrice: 69, waterproofingPrice: 55, bothPrice: 99,  originalBothPrice: 124 },
-]
+| O quê | Fonte |
+|---|---|
+| Sofás e colchões: limpeza, proteção / anti-ácaros, pack | `sofaPrices`, `mattressPrices` em `src/components/quiz/QuizTypes.ts` |
+| Preço efetivo com proteção (redução do pack, delta Premium) | `calcPackPricing` em `src/components/quiz/quizHelpers.ts` |
+| Cadeiras: limpeza por escalões | `calcChairClean` em `quizHelpers.ts` |
+| Cadeiras: impermeabilização por unidade (Essencial / Premium) | `src/constants/chairPricing.ts` |
+| Preço de pack dos artigos acrescentados, e a própria regra | `src/constants/packPerks.ts` (`priceWithPackPerks`, `PACK_PERK_*`) |
+| Deslocação por localidade e oferta por valor | `src/constants/travel.ts` (`locationPrices`, `calculateTravelFee`) |
+| Widget de marketing | `src/lib/priceWidgetCalc.ts` (motor próprio sobre as mesmas tabelas) |
+| Configurador das páginas de pack | `src/lib/customPack.ts` + `packPerks.ts` |
 
-// CADEIRAS
-≤3  cadeiras → 17.5€/cad
-≤6  cadeiras → 15€/cad
-≤10 cadeiras → 12.5€/cad
->10           → sob orçamento
-waterproofing → +7.5€/cad
+**As regras (decisões do dono), que não mudam com os números:**
 
-// TAPETES
-≤5m²  → 10€/m²
-≤10m² → 8€/m²
-≤15m² → 7€/m²
->15m² → sob orçamento
-
-// LOCALIZAÇÃO
-Porto → 0€, Matosinhos/Maia/Gaia/Gondomar/Valongo/Trofa/Santo Tirso/Espinho → 5€
-Braga/Guimarães/Póvoa/Vila do Conde/Paredes/Penafiel/Lousada/Paços/Felgueiras/Arouca/Aveiro → 10€
-Lisboa/Cascais/Oeiras/Sintra/Almada/Setúbal → 15€
-isFreeTravel: quando calculateServicePrice >= 150€
-```
-
----
-
-## Interfaces TypeScript Chave
-
-```ts
-// QuizTypes.ts
-interface PriceOption {
-  id: string; label: string;
-  cleaningPrice: number | string;
-  waterproofingPrice: number | string;
-  bothPrice: number | string;
-  originalBothPrice?: number | string;  // soma cleaning+waterproofing para risco
-}
-
-// QuizStep2Sofa.tsx (exportado)
-export interface SofaItem {
-  sizeId: string;
-  qty: number;
-  packEnabled: boolean;   // toggle de Proteção Total por item
-}
-
-// QuizStep2Mattress.tsx (exportado)
-export interface MattressItem {
-  sizeId: string;
-  qty: number;
-  waterproof: boolean;    // legacy
-  packEnabled: boolean;   // toggle de Proteção Total por item
-}
-
-// QuizForm.tsx (local)
-interface UpsellItemConfig {
-  id: string;             // 'sofa' | 'mattress' | 'carpet' | 'chairs'
-  sofaSize?: string;
-  mattressSize?: string;
-  carpetArea?: string;
-  chairQty?: string;
-  qty?: number;
-  price: number;
-  label: string;
-  waterproof?: boolean;
-  waterproofPrice?: number;
-}
-```
+- **Nenhum desconto percentual, em lado nenhum.** Os 10% do pack e o −5% do
+  contador saíram a 2026-09-10. Não reintroduzir nem anunciar
+  (`packPerks.test.ts` rebenta se uma página de pack falar em percentagem).
+- **Uma só regra de pack, no quiz e no configurador** (`priceWithPackPerks`):
+  o artigo principal, e mais unidades do mesmo tipo, fica ao preço de tabela;
+  cada artigo de outro tipo acrescentado à mesma visita entra com preço de
+  pack (hoje: sofá 35/55/65€ por tamanho, colchão −14€, uma cadeira oferecida
+  por cada 4, tapete «limpe 5 m², pague 4» sobre o orçamento), e só a partir
+  de 100€ de subtotal de tabela (`PACK_PERK_MIN_ORDER`). O preço de pack é
+  sobre a limpeza: sofá ou cadeiras acrescentados com tratamento ficam ao
+  preço de tabela desse tratamento; colchão com anti-ácaros mantém o desconto.
+- **Pack de sofá limpeza + impermeabilização Essencial: a partir de 89€**
+  (1 lugar). É o valor do motor, `calcPackPricing`: `bothPrice` 99€ menos
+  `waterproofingUpsellDiscount` 10€. Nunca usar o `bothPrice` cru como "preço
+  do pack". O total é o mesmo nos dois percursos (limpeza + proteção ou
+  proteção + limpeza).
+- **Anti-ácaros vende-se em sofás, colchões e cadeiras**, no quiz e no
+  configurador. Desbacterização é o mesmo tratamento: não se vende como dois.
+  Cadeiras: 5€ por cadeira, mostrado sempre como «5€/un.», nunca como total.
+  Sofá: preço por tamanho. Na mesma peça, anti-ácaros e impermeabilização são
+  alternativos.
+- **Chaise longue: já não é uma opção com preço à parte** (retirada do site a
+  2026-09-26). Não voltar a acrescentar.
+- **Páginas de marca mostram os preços normais**, sem intervalos de preço
+  próprios por marca.
+- **Tapetes e alcatifas: sempre «Sob orçamento»** (tapetes desde 2026-09-06,
+  alcatifas desde 2026-09-09, também no widget: `priceWidgetCalc.ts`). Sofás
+  de 4+ lugares também. Cadeiras: limpeza sob orçamento a partir de 10; impermeabilização
+  por unidade, sem limite.
+- **Deslocação:** mínimo 10€; fica gratuita acima de um valor de serviços que
+  depende da taxa (`calculateTravelFee`); as taxas de 25€ nunca são oferecidas.
 
 ---
 
-## Lógica de Preços e Descontos
+## Tipos principais
 
-```ts
-// Preço do serviço principal — calculateServicePrice (useMemo)
-// Sofá: usa item.packEnabled como prioridade (bothPrice se ON, else cleaning/waterproofing)
-// Colchão: idem com item.packEnabled
-// 4+ lugares: não soma (string, não number)
-
-// Deslocação
-travelCost = locationPrices[formData.location] ?? 0
-isFreeTravel = calculateServicePrice >= 150
-finalTravelCost = isFreeTravel ? 0 : travelCost
-
-// Total
-totalPrice = calculateServicePrice + upsellItemsTotal + finalTravelCost
-
-// Descontos — NÃO ACUMULAM
-isDiscountActive = countdown > 0          // timer 10min
-discountedPrice = Math.round(totalPrice * 0.95)    // −5% timer
-
-packDiscountActive = upsellItems.length > 0 && totalPrice > 200  // gatilho 200€
-packDiscountPct = 0.10
-packDiscountedPrice = Math.round(totalPrice * 0.90)  // −10% pack (substitui timer)
-
-// Todos os preços exibidos usam Math.round() — números inteiros
-```
+Vivem todos em `src/components/quiz/QuizTypes.ts`; ler lá. Dois pormenores
+que não se adivinham: `SofaItem`/`MattressItem` têm `packEnabled` (tratamento
+ligado) e `packQty?` (quantas unidades o recebem; ausente = todas), e
+`splitTreatmentItems` parte cada linha em "com" e "sem" tratamento para o
+cálculo, o resumo e o recibo. No colchão, `waterproofingPrice` e `bothPrice`
+guardam o anti-ácaros (colchões não têm impermeabilização).
 
 ---
 
-## Toggle de Proteção Total (Pack por Item)
+## Cálculo do total no quiz
 
-Implementado em **Sofás** e **Colchões**, funciona de forma idêntica:
-
-```
-serviceType === 'both' (Pack global):
-  → Todos os cards dourados (borda gold, badge VIP, preço riscado)
-  → Preços: bothPrice (79/89/99€)
-  → Sem toggle individual — Pack já incluído
-  → Banner: "🏆 Pack Proteção Total VIP — Poupa até X€ vs. separado"
-
-serviceType === 'cleaning' ou 'waterproofing':
-  → Cards neutros enquanto qty = 0
-  → Ao adicionar qty > 0: toggle "Adicionar Proteção Total (+X€)" aparece abaixo
-  → Toggle ON → borda dourada, badge VIP, preço salta para bothPrice
-  → Toggle OFF → reverte instantaneamente
-
-defaultPack = (serviceType === 'both')  → novos itens herdam estado global
-upgradeAmt = bothPrice - basePrice  (calculado por item)
-
-Sofá 1L: +30€ | 2L: +20€ | 3L: +20€
-Colchão: +30€ em todos os tamanhos
-```
-
----
-
-## Estados Principais do QuizForm
-
-> **⚠️ 2026-09-06: o bloco de "Upsell em curso" abaixo está desatualizado.**
-> `QuizUpsellOverlay.tsx` foi removido por completo (nunca mais `pendingUpsellId`,
-> `pendingMattressSize/Qty`, `pendingCarpetArea`, `pendingChairQty(Num)`,
-> `pendingWaterproof`, `upsellSubStep` — todo esse hook (`useUpsellSelection.ts`)
-> e a função `computePendingUpsellTotal` foram apagados, já não existem no
-> código). O ecrã de upsell final é agora `QuizComboUpsellScreen.tsx`: sem
-> sub-passo `select`/`config`, sem "artigo pendente" — cada categoria
-> (Colchão/Sofá/Cadeiras) tem o seu próprio mini-estado interno
-> (`mattressQty`/`sofaQty`/`chairsQty`, tudo dentro do próprio componente) e
-> escreve directamente para `upsellItems`/`setUpsellItems` só ao confirmar.
-> `showUpsell`/`upsellShown`/`upsellItems` continuam a existir e a significar
-> o mesmo. Ver secção "Upsell final — Aproveite e poupe 10%" mais abaixo
-> (substitui a secção "Ecrã de Upsell — Pack Família" antiga, que ficou só
-> como registo histórico da versão anterior).
->
-> Também novo em 2026-09-06: `carpetItems: CarpetItem[]` substituiu
-> `carpetArea`/`pendingCarpetArea` como estado dos tapetes (ver secção própria
-> de Tapetes), e existe um novo ecrã intercalado `QuizChairsAddonUpsell.tsx`
-> (estado `showChairsAddonUpsell`) que só aparece quando `service==='chairs'`
-> e `serviceType==='cleaning'`, logo a seguir ao "Continuar" da etapa de
-> quantidades das cadeiras.
-
-```ts
-// Navegação
-currentStep: number                   // 0–5
-showUpsell: boolean                   // ecrã de upsell final visível (QuizComboUpsellScreen)
-upsellShown: boolean                  // já foi mostrado (evita re-intercetar)
-showChairsAddonUpsell: boolean        // NOVO 2026-09-06: upsell de addon logo após quantidades de cadeiras
-showSummary: boolean                  // ecrã de resumo (actualmente false hardcoded)
-
-// Itens
-sofaItems: SofaItem[]
-mattressItems: MattressItem[]
-carpetItems: CarpetItem[]             // NOVO 2026-09-06, substitui carpetArea (string única)
-upsellItems: UpsellItemConfig[]       // agora escrito de uma vez pelo QuizComboUpsellScreen
-
-// Preço e UI
-countdown: number                     // timer 10min em segundos (localStorage 'kyro_timer_expiry')
-displayPrice: number                  // preço animado (ticker, step de 35ms)
-hypoallergenic: boolean | null
-
-// Reset ao trocar serviço no step 1:
-setSofaItems([]), setMattressItems([]), setCarpetItems([blank]), setUpsellItems([]), setUpsellShown(false)
-```
-
----
-
-## Ticker de Preço (Header Sticky)
-
-```tsx
-// Visível quando:
-(totalPrice > 0 || hasSobOrcamento)
-&& (showUpsell || (currentStep !== 1 && currentStep !== 2 && currentStep !== 4))
-
-// hasSobOrcamento = sofaItems.some(i => i.sizeId === '4+-lugares' && i.qty > 0)
-// Quando hasSobOrcamento: mostra "X€ + Sob Orçamento" ou apenas "Sob Orçamento"
-
-// Estilo: sticky top-0 z-20, bg-[#13132B] sólido, pr-8 (afastamento borda direita)
-// Preço: sempre style={{ color: '#D4AF37' }} — nasce dourado, nunca muda de cor
-// Animação: displayPrice sobe/desce em incrementos de Math.ceil(diff/6), a cada 35ms
-// Scroll reset: scrollContainerRef.current?.scrollTo({ top: 0 }) em cada mudança de step/showUpsell
-```
-
----
-
-## Ecrã de Upsell — Pack Família (HISTÓRICO, já não corresponde ao código)
-
-Descrição de uma versão anterior do fluxo (nem sequer a imediatamente anterior
-a 2026-09-06 — os números "200€"/emoji "🎉" já não batiam com o código antes
-de hoje). Mantido só como registo de como o upsell já foi desenhado. **Para o
-comportamento atual, ver a secção seguinte.**
-
-```
-Gatilho: após step 4 (calendário), só uma vez (upsellShown)
-
-Sub-passo 'select':
-  - Barra de progresso: totalPrice / 200 × 100%
-  - Canto esq: "X€ no carrinho" (Math.round(totalPrice))
-  - Canto dir: ">200€ → 10%"
-  - Texto: "Faltam apenas X€ para ganhares 10% de desconto imediato!"
-  - Quando ≥200€: "🎉 Pack Família: 10% de desconto ativado!"
-  - Cards de sugestão (por ordem de prioridade):
-      Sofá → Colchão → Tapete → Cadeiras
-      (o serviço principal do utilizador é excluído automaticamente)
-  - Botões: [Voltar (outline)] [Continuar (dourado, flex-1)]
-  - Voltar: fecha upsell → regressa ao calendário (step 4)
-
-Sub-passo 'config':
-  - Sofá: seletor de tamanho (1/2/3 lugares) + qty stepper + botão Adicionar
-  - Colchão: seletor tamanho + qty stepper + toggle impermeabilização
-  - Tapete: input área m² + estimativa em tempo real
-  - Cadeiras: stepper qty + toggle impermeabilização (+5€/cad)
-  - Botão "Voltar" → 'select'
-```
-
----
-
-## Upsell final — "Aproveite e poupe 10%" (atual, desde 2026-09-06)
-
-**Personalização (2026-09-10):** `QuizForm` passa `formData.service` como
-`primaryService` ao `QuizComboUpsellScreen`, que exclui essa categoria das
-sugestões (mantendo extras já selecionados editáveis). A mensagem acompanha
-`packDiscountActive`: com desconto, "APROVEITE A MESMA VISITA" / "Quer limpar
-mais alguma coisa?" e confirmação de que os 10% também abrangem os extras;
-sem desconto, mantém a oferta e as condições de elegibilidade. Não altera o
-cálculo de preços nem obriga a adicionar extras para finalizar.
-
-**Correção de navegação (2026-09-10):** ao regressar do contacto, o
-`QuizComboUpsellScreen` inicializa as quantidades a partir de `upsellItems`,
-antes de sincronizar alterações com o formulário. `UpsellItemConfig.carpetItems`
-guarda as medidas individuais dos tapetes; `carpetArea` mantém a área agregada
-para os consumidores existentes. O subtotal mostra "Sob orçamento" para extras
-sem preço, ou "X€ + Sob orçamento" quando também há extras com preço conhecido.
-O aviso de cookies fica abaixo do modal do quiz (`z-90` vs. `z-100`), para não
-intercetar os botões em mobile; a escolha de cookies continua disponível ao fechar.
-
-Componente: `src/components/quiz/steps/QuizComboUpsellScreen.tsx`. Substitui
-por completo o `QuizUpsellOverlay.tsx` da secção anterior (apagado do repo).
-Gatilho: mesmo `showUpsell` de sempre, disparado pelo `QuizMinimumGate` (gate
-do mínimo de pedido) quando o total já chega ao mínimo, ou diretamente quando
-não há gate a bloquear.
-
-```
-Ecrã "summary" (default):
-  - 3 linhas clicáveis: Colchão / Sofá / Cadeiras, cada uma mostra um resumo
-    ("a partir de X€" se vazia, ou "1x Casal" etc. se já configurada)
-  - Clicar numa linha abre a página de quantidades real dessa categoria
-    (tamanhos e preços de verdade — sofaPrices/mattressPrices de QuizTypes.ts,
-    calcChairClean de quizHelpers.ts — nunca uma quantidade genérica sem
-    tamanho, isso já foi tentado e rejeitado)
-  - Caixa de subtotal: "DESCONTO DE 10% ATIVO" (gold) assim que qualquer
-    categoria tem qty>0, subtotal do extra sempre visível
-  - Botão "Finalizar Orçamento": sempre ativo, escreve os itens escolhidos em
-    upsellItems/setUpsellItems (um UpsellItemConfig por categoria com qty>0) e
-    avança
-  - "Continuar sem adicionar": limpa upsellItems e avança na mesma — nunca
-    bloqueia quem não quer adicionar nada
-
-Ecrã de quantidades por categoria (view: 'mattress' | 'sofa' | 'chairs'):
-  - Colchão: Solteiro 59€ / Casal 69€ / King-Queen 79€, stepper por tamanho
-  - Sofá: 1/2/3 Lugares a 49€/69€/79€, stepper por tamanho
-  - Cadeiras: um único stepper de quantidade, bracket 20€/15€/12,5€
-  - Botão "Confirmar" volta ao summary
-
-Reaproveita a infraestrutura já existente (packDiscountActive, o array
-upsellItems, o recibo em submissionService.ts) sem alterações — só a UI de
-escolha mudou.
-```
-
----
-
-## ServiceTypeSelector
-
-```tsx
-// Títulos das opções:
-'cleaning'      → 'Higienização Profunda'         // ← terminologia final
-'waterproofing' → 'Impermeabilização Premium'
-'both'          → 'PACK PROTEÇÃO TOTAL'  (badge "O MAIS SOLICITADO")
-
-// Pack só aparece quando packPrice !== undefined
-// Para carpet/chairs/headboard/other → packPrice=undefined → Pack escondido
-// Para sofa e mattress → packPrice=79 → Pack visível
-
-// Props: cleaningPrice, waterproofingPrice, packPrice, waterproofingDesc
-```
-
----
-
-## Toggle na QuizStep2Sofa / QuizStep2Mattress
-
-```tsx
-// Texto quando toggle ATIVO:
-'Proteção Total ativa — Higienização + Impermeabilização'
-
-// Texto quando toggle INATIVO (serviceType = cleaning):
-`Adicionar Proteção Total (+${upgradeAmt}€)`
-
-// 4+ Lugares (Sofá): sem toggle, sem preço, mensagem:
-'Um técnico irá preparar o seu orçamento personalizado no próximo passo.'
-```
+`use-quiz-pricing.ts`: serviço principal (sofá e colchão por `calcPackPricing`
+e pelas tabelas; cadeiras por `calcChairClean` / `chairPricing.ts`, mais o
+anti-ácaros por unidade; tapete sem preço) + `upsellItems` (já com os preços de
+pack, escritos pelo `QuizComboUpsellScreen`) + `finalTravelCost =
+calculateTravelFee(taxa da localidade, serviços)`. `hasSobOrcamento` e
+`hasUpsellSobItem` marcam artigos sem preço, para o total nunca parecer só a
+deslocação. Sem descontos percentuais nem contadores.
 
 ---
 
@@ -718,7 +732,29 @@ kyro_booking_id, kyro_wa_url, kyro_summary
 // Em caso de erro: toast com links diretos WhatsApp + Email
 ```
 
+**reCAPTCHA v3 funciona desde 2026-09-26.** O token vem de
+`getRecaptchaTokenSafe('submit_quote')` (`src/lib/recaptcha.ts`, com limite de
+tempo) e só vai para o `submit-lead`. De 2026-09-23 a 2026-09-26 a CSP
+bloqueava o script da Google: o token ia vazio e o servidor deixava passar
+tudo. A regra do servidor (`supabase/functions/_shared/recaptcha.ts`): um
+problema de configuração nosso (sem token, chave errada, API da Google em
+baixo) nunca recusa um pedido; só se recusa um token que a Google validou com
+pontuação abaixo de 0.3, ou emitido para outra ação.
+
+**Consentimento:** o modo por omissão é `advanced` (`CONSENT_MODE` em
+`src/constants/tracking.ts`, desde 2026-09-26). Regras no `CLAUDE.md`.
+
 ---
+
+# Registo histórico (maio a setembro de 2026)
+
+**Tudo o que está daqui até ao fim do ficheiro é registo do que foi feito em
+cada sessão, com os preços, nomes de ficheiros e regras dessa altura.** Muitos
+já não valem: tabelas de preços, `QuizStep2*`, o calendário, o Formspree, o
+desconto de 10%, a chaise longue, `/packs`, o limite de 10 cadeiras na
+impermeabilização. Serve para perceber o porquê de uma decisão, nunca como
+fonte de um valor. O estado atual está no código, no `CLAUDE.md` e nas secções
+acima deste título.
 
 ## Tudo o que foi feito — Sessão 1
 
@@ -825,7 +861,7 @@ dist=0 → "hero" | dist=1 → "side" | dist≥2 → "far"
 
 ---
 
-## Estado do Fluxo do Quiz (atualizado)
+## Estado do Fluxo do Quiz (maio de 2026, histórico)
 
 ```
 Step 0 — Localização (cards Porto/Lisboa/Braga + autocomplete)
@@ -973,7 +1009,7 @@ Step 5 — Seletor de vaga/calendário
 2. Google Business Profile: adicionar fotos (antes/depois), categorias secundárias, posts semanais
 3. Diretórios PT: Habitissimo.pt, Fixando.pt, Páginas Amarelas, Bing Places, Yelp PT, Facebook Business, LinkedIn
 4. Adicionar Instagram/Facebook URLs ao `sameAs` do LocalBusinessSchema (comment já está no código)
-5. `VITE_ADMIN_PASSWORD=kyro@admin2025` — variável de ambiente no Cloudflare Pages (user faz manualmente)
+5. [Obsoleto: o painel usava uma palavra-passe em `VITE_ADMIN_PASSWORD`, escrita aqui em claro num repositório público. O código já não a lê: o acesso ao admin é por conta Supabase + `admin_users` desde 2026-09-18. O valor foi retirado deste ficheiro a 2026-09-26.]
 6. Blog — artigos long-tail ("como limpar sofá em casa", "limpeza colchões porto")
 
 ---
@@ -990,9 +1026,9 @@ Step 5 — Seletor de vaga/calendário
 
 ---
 
-## ⚠️ AVISO: este ficheiro está desatualizado desde a Sessão 5 (2026-05-19)
+## Nota sobre as sessões 6 a 46 (maio a julho de 2026)
 
-Este ficheiro não foi mantido em sincronia nas sessões seguintes. O histórico completo e atualizado (sessões 6-46+, incluindo redesigns, SEO técnico, quiz refactor, auditorias) está na memória do Claude Code (`project_kyro.md`), não aqui. Pasta local também mudou: `spotless-pro-flow-main` → `sitekyroclean`.
+Entre a Sessão 5 e julho este ficheiro não foi mantido; esse histórico ficou numa memória local do Claude Code de uma das máquinas, que a outra não vê. A partir de julho o registo voltou a ser feito aqui, e desde setembro as secções atuais estão no topo do ficheiro. Pasta local: `spotless-pro-flow-main` → `sitekyroclean`.
 
 ## Sessão pós-férias — Audit SEO técnico + conversão (2026-07-13)
 
@@ -1304,149 +1340,3 @@ Sessão longa e iterativa, muito guiada por mockup (canvas de design) antes de t
 **Trabalho em paralelo:** grande parte desta sessão foi feita por várias sub-tarefas em simultâneo no mesmo worktree (tapete, cadeiras, widgets), o que por vezes gerou commits que misturam ficheiros de mais do que uma tarefa (inevitável quando duas tarefas mexem no mesmo `QuizForm.tsx`/`QuizTypes.ts` ao mesmo tempo) — todos verificados com tsc+build antes e depois, sem problemas encontrados.
 
 Commits desta sessão (ordem cronológica, todos em `worktree-kyro-minorder-emdash`, nenhum em `master`): `35ec931`, `aba750a`, `1bf6340`, `56535b3`, `6f9439a`, `d2fca49`, `68f7aad`, `7a01cfe`, `26321ee`, `36f8088`, `b613174`, `7744d2a`, `612800a`. Branch não foi integrado em `master` — fica ao critério do dono.
-
-
-## Widget de impermeabilização (2026-09-10)
-
-`PriceWidget.tsx` reutiliza `WaterproofingTierPicker`: mostra Premium e Essencial sem seleção inicial e revela as quantidades após a escolha. `use-price-widget.ts` conserva o plano ao abrir o quiz e reinicia a seleção quando muda o serviço. Os preços dos sofás vêm de `sofaPrices`; as cadeiras usam `calcChairWaterproof`/`calcChairWaterproofPremium`, incluindo o limite de 10 cadeiras sob orçamento. Total, desconto e artigos enviados ao quiz usam o mesmo plano. Os addons dos serviços de limpeza continuam no upsell do quiz.
-
-## Seleção regional de avaliações (2026-09-10)
-
-`ServiceReviewsGrid` usa o caminho da página e a seed para selecionar avaliações por serviço/região em `reviewsPool.ts`. As variantes `SofaVariantPage` partilham agora esta grelha. `LISBON_REVIEWS` guarda as 13 transcrições com texto confirmadas pelo responsável como sendo de Lisboa; `CONFIRMED_REVIEW_LOCATIONS` associa a localidade à fonte. Páginas da região com pool confirmada não são preenchidas com testemunhos de outras regiões. Sem localização confirmada, não mostrar cidade.
-
-## Entrada de anúncios e contacto nas páginas de sofás (2026-09-10)
-
-`SofaLeadActions` centraliza WhatsApp, âncora `#precos` e preço com deslocação. `AdsLandingNavigation` fornece cabeçalho/rodapé reduzidos e `isAdsVisit`; o modo Ads é ativado explicitamente por `ads=1` ou pelos parâmetros de entrada Google Ads, mantendo o URL canónico sem parâmetros. `LocationServicePage` e `SofaVariantPage` conservam as páginas orgânicas e usam esta apresentação quando o serviço é limpeza de sofás. As âncoras são `resultados`, `precos`, `avaliacoes`, `duvidas`. `trackWhatsAppClick` envia também `whatsapp_click` ao GA4 e UTM ao registo interno; não representa uma conversa confirmada.
-
-
-## Pré-visualização visual do orçamento (2026-09-10, branch codex/quote-visual-preview)
-
-Proposta para avaliação, ainda não integrada em master: `QuizEstimate.tsx` apresenta o total calculado pelo motor existente, o preço anterior e a poupança. A animação respeita redução de movimento e substitui confettis/toast de desconto. `QuizComboUpsellScreen.tsx` usa imagens de mobiliário, cartões tracejados e botão +, sem preços na seleção de categorias; os preços continuam nos detalhes. A rota `/__preview/orcamento` existe apenas em desenvolvimento e abre o componente real com três sofás de 3 lugares, limpeza + impermeabilização Premium em Porto: 607€ antes e 547€ depois do desconto. A origem das imagens e validação estão em `QUOTE_PREVIEW.md`.
-
-### Pré-visualização dos cuidados adicionais (2026-09-10)
-
-Na branch `codex/quote-visual-preview`, `QuizCareIntro` reutiliza `QuizFurnitureImage` para contextualizar os tratamentos; `QuizCarpetMeasureGuide` é partilhado pelos detalhes de tapetes principais e extras. A rota DEV `/__preview/orcamento` aceita `exemplo=antiacaros|impermeabilizacao|cadeiras|tapetes` para revisão dos ecrãs reais com dados iniciais. Não altera o motor de preços.
-
-A seleção parcial de cuidados em sofás/colchões usa `packQty?: number` com `packEnabled`. `QuizTreatmentQuantities` aparece apenas para várias unidades. `treatmentQty` limita ao número de artigos; `splitTreatmentItems` produz linhas com e sem tratamento para cálculo/resumo/recibo, mantendo compatibilidade com seleções antigas. Os preços comparativos no upsell usam `calcPackPricing` e respeitam `packPremiumDelta`.
-## Diretórios finais compactos (2026-09-10)
-
-`src/components/DirectoryGroup.tsx` uniformiza a navegação final das famílias de páginas com grupos fechados por defeito e pesquisa nas listas maiores. Preserva os links no HTML e repõe o estado ao mudar de página. `AreasDeServico` organiza região, concelho, serviços e freguesias com pesquisa global; as seis páginas principais continuam a usar `ServiceCityLinks`. Inventário e verificação em `docs/directory-navigation.md`.
-
-## Testemunhos partilhados (10 setembro 2026)
-CustomerReviews e CustomerReviewCard uniformizam homepage, páginas de serviços/localidades e cartões de packs. Textos existentes e seleção regional preservados; ligação Google usa constantes. Carrossel de 9 segundos com pausa manual, interação, visibilidade e reduced-motion; altura adaptativa mobile. Pré-visualização em mobile-preview.html#avaliacoes. Verificados mobile Lisboa, desktop e lint dos componentes; TypeScript validado.
-
-## Teste de ofertas no upsell com imagens (2026-09-10)
-Nesta branch de pré-visualização, `?teste=ofertas` em DEV mantém `QuizComboUpsellScreen` com as imagens existentes e todas as categorias. Só o colchão casal tem preço experimental de55€/un.; comparação com69€ + deslocação de uma visita separada. Sem acumular10%. O botão final do quiz não envia pedidos neste modo. Produção e entradas sem a flag conservam preços e desconto existentes. Servidor desta cópia:5188. Não confundir com a cópia master em8090 sem estas imagens.
-
-Teste `?teste=ofertas`: cartões simplificados com uma linha promocional. Casal55€/un.; cadeiras: uma unidade oferecida por conjunto completo de4, com preço unitário do escalão da quantidade escolhida; tapetes:1m² oferecido por cada5m² completos no conjunto, guardando área real e área a cobrar no rótulo, euros sempre sob orçamento. Sem acumulação de10%, apenas DEV.
-
-Atualização do teste de ofertas: desconto de14€ por unidade em todos os tamanhos de colchão (solteiro45€, casal55€, King/Queen65€), pedido explícito do responsável. Apenas no modo DEV `teste=ofertas`; tabela pública inalterada.
-
-### Secção de cobertura nas landing pages (2026-09-10)
-A secção completa de serviços e zonas de atendimento permanece visível também em modo Ads, por pedido do dono. Não a substituir pelo resumo «Serviço ao domicílio».
-
-## Galerias de antes e depois (2026-09-10)
-
-`ServiceResultsGallery` centraliza comparação, miniaturas numa faixa horizontal, anterior/seguinte e reprodução opcional (parada por defeito fora dos heroes; com `autoplay` arranca já a rodar e cada par varre sozinho de Antes para Depois durante o mesmo intervalo, via `sweepMs` do `BeforeAfterSlider`). A miniatura selecionada mantém-se visível sem deslocar a página; a contenção de largura impede que a faixa alargue as grelhas dos heroes em mobile. Usa toda a categoria de `BEFORE_AFTER_POOL`, com cadeiras em 9:16, alcatifas a reutilizar tapetes e identificação de fotos avulsas/efeitos ilustrativos.
-
-`HeroBeforeAfterPool` reutiliza esta galeria nos heroes de cidades, freguesias, variantes, marcas, preços, materiais e problemas, sempre com `autoplay` e 4 segundos por par. `ServiceAutoCarousel` recebe `category` em todos os seus consumidores atuais e mantém as duas imagens de trabalho/pormenor: ao lado em desktop, por baixo em mobile. A comparação da secção tem largura máxima de 640px. `/antes-depois-limpeza` permite escolher entre os seis serviços e consultar a pool completa. Consumidores futuros sem `category` conservam o fallback estático.
-
-
-## Teste de pack dentro do quiz (2026-09-10)
-
-Apenas em desenvolvimento, `?teste=quiz-pack` mantém o fluxo real do `QuizForm` e substitui o combo de extras de sofá por `QuizSofaPackTest`. O extra escreve em `upsellItems` e avança para o contacto real. `useQuizPricing` recebe um parâmetro opcional de teste (default false, também protegido por DEV) para aplicar 10% aos serviços quando é acrescentado um artigo de pelo menos 49€, sem o limiar de 149€, mantendo cêntimos. O botão final do teste não submete dados; apenas confirma a simulação. Produção conserva as regras existentes. O protótipo anterior `?teste=pack` continua separado no widget.
-
-
-## Guias e conselhos nas páginas de serviço (2026-09-10)
-
-`ServiceExpertTips` usa cartões horizontais compactos com fotografia do artigo, título completo e ligação no cartão inteiro. Em mobile, oculta os resumos; em desktop, mostra duas linhas e distribui quatro guias em 2x2 ou três numa fila. A ligação ao blog permite explorar os restantes guias. `src/constants/blogImages.ts` centraliza as imagens antes duplicadas em `Blog.tsx`/`BlogPost.tsx`, reutilizadas também nos cartões sem carregar o texto integral dos artigos nas páginas de serviço.
-
-
-Atualização do teste local (2026-09-10): `?teste=quiz-pack` agora demonstra colchão casal a +55€, sem acumular desconto de 10%. Compara com limpeza individual (69€ da tabela) + deslocação da localidade, explicitamente uma visita separada. Lisboa: 79€ separado vs +55€ na visita existente, poupança24€, sofá79€ + deslocação10€ + extra55€ =144€. Substitui a proposta anterior de143,20€ neste modo; produção inalterada.
-
-
-## Auditoria Formspree e WhatsApp (2026-09-10)
-
-`submissionService.buildReceiptLines` é a fonte partilhada do detalhe, resumo pré-envio e recibo; `formatQuotePrice` distingue subtotal conhecido de serviços sob orçamento. WhatsApp reutiliza a mensagem do Formspree, acrescentando nome, telefone e a mesma referência. O Formspree recebe também `booking_id`. O recibo só é persistido após sucesso de pelo menos um canal (ou simulação local). Erros devolvidos pelo Supabase são tratados como falha.
-
-`carpetKind` distingue alcatifa de tapete nas entradas do widget e ServiceHero. As medidas individuais seguem em todos os resumos. `carpetAllItemsValid` bloqueia peças incompletas; `carpetHasValidItems` continua a identificar qualquer peça válida para sinalizar orçamento. Extras sobrevivem ao regresso a etapas anteriores; tratamentos importados não são descartados nem convertidos em limpeza. O desconto do quiz/widget exige dois artigos tabelados, acima de149€, de acordo com as regras comerciais prioritárias.
-
-Cobertura e limites: `AUDITORIA-FORMSPREE-WHATSAPP-2026-09-10.md`. Os testes de serviços intercetam a rede; não provam receção na conta Formspree nem entrega de email.
-
-## Publicação autorizada das ofertas (2026-09-10)
-O dono autorizou publicar a versão visual e as ofertas no quiz real: colchões extra45/55/65€, cadeiras4paga3, tapetes5m²paga4 sob orçamento. Ofertas não acumulam10%. O bloqueio de envio aplica-se apenas à simulação DEV explícita; produção envia os pedidos normalmente. Substitui as notas históricas de teste apenas.
-## Localidade automática no início do orçamento (2026-09-10)
-
-`QuizStepLocation` pede a posição atual ao navegador quando não existe uma localidade previamente escolhida. `src/lib/locationDetection.ts` usa o endpoint client-side do BigDataCloud, apenas após autorização do navegador, sem guardar coordenadas. Só aceita nomes portugueses que correspondam à tabela canónica de deslocações; não converte um distrito numa cidade. A localidade é pré-selecionada, mas o cliente confirma com Continuar, vendo antes a taxa real. Alterar permite pesquisa global e sugestões da mesma região (`cities.area`); não se afirma que sejam as cidades geometricamente mais próximas. Recusa, falha, timeout ou zona não servida mantêm a pesquisa manual disponível. Uma resposta tardia nunca substitui a escolha manual. A política de privacidade identifica o fornecedor e o uso dos sinais de localização/IP.
-
-O primeiro passo mostra “Orçamento sem compromisso” no rodapé. As restantes etapas conservam o seu comportamento. `/__preview/localizacao` e `?mobile=1` existem apenas em DEV, mostrando o quiz real sobre a homepage. Não há cidade demonstrativa codificada nem simulação em produção. Capturas de QA com Maia usam respostas de geolocalização interceptadas apenas no navegador de teste, sem enviar coordenadas de teste ao fornecedor.
-
-
-## FAQ uniformes (2026-09-10)
-Todas as FAQ públicas usam `ServiceFAQ`, com o fundo verde e apresentação da página Limpeza Sofás Lisboa. Inclui marcas, materiais, páginas inglesas, tratamentos, artigos e FAQ geral. Não criar acordões FAQ inline ou variantes claras. O componente aceita respostas React com `plainAnswer`, âncoras `id` e `includeSchema={false}` quando a página já fornece FAQPage, evitando schema duplicado. `description` permite traduzir a instrução nas páginas inglesas.
-
-## Métricas v2 (2026-09-10)
-
-A recolha, IDs de tentativa/visita, fila persistente, tratamento do histórico e fórmulas estão documentados em `METRICS.md`. `useQuizAnalytics` centraliza etapas vistas e conclusão após confirmação de entrega; nunca voltar a emitir `complete` no avanço das etapas. `initContactTracking` cobre links WhatsApp/telefone globalmente e evita duplicação com handlers legados. `quizMetrics.ts` centraliza cálculo e paginação. O painel inclui diagnóstico de recolha e distingue cliques de pedidos recebidos.
-
-## Validação de release + fatores de preço redesenhados (2026-09-10)
-
-**Validação pré-atendimento de 11/09** (`3d05a31`): a cópia principal estava 77 commits atrás de `origin/master`, atualizada por fast-forward (alterações locais salvaguardadas em stash antes disso). `vitest.config.ts` passou a incluir também `scripts/**/*.test.mjs` (os 10 testes de `scripts/response-policy.test.mjs` estavam a ser escritos mas nunca corriam na suite normal). `eslint.config.js` ganhou `.claude/worktrees/**` nos `ignores` (estava a duplicar erros de cópias de trabalho paralelas). Confirmado: 1920 testes ok, TypeScript limpo, build com 15.171 rotas pré-renderizadas, 15.176 HTMLs auditados sem H1 em falta/rota órfã, fluxo do quiz até contacto testado em mobile (Lisboa, sofá 3 lugares, 79€+10€=89€) sem envio real. Ficam por resolver (pré-existentes, não é regressão desta sessão) 15 erros/17 avisos de lint fora do projeto principal. Detalhe completo em `VALIDACAO-RELEASE-2026-09-10.md`.
-
-**Cartões de diagnóstico removidos de `ProblemPage.tsx`** (`26e0786`): a secção "O problema, a solução" (2 cartões fotográficos lado a lado, foto dessaturada com acento vermelho vs. foto normal com acento verde) foi removida por completo — decisão de simplificar a página, não um bug. `getSolutionImage` ficou sem uso nesta página (import removido); `getServiceGallery` continua a ser usado noutro sítio da mesma página.
-
-**Fatores de preço redesenhados como cartões acessíveis** (`b898848`, `07b2120`): a secção "O que influencia o valor final" da `PricePage.tsx` — que era uma grelha escura numerada (1 a 6 fatores, texto solto por serviço em `priceSeoData.ts`) — foi substituída por `src/components/PriceFactors.tsx`, um componente novo e independente com exatamente 3 fatores fixos por serviço (título em forma de pergunta + descrição + 2 exemplos), mapeados a um ícone Lucide por serviço (`services` slug → `factors[slug]`, os 6 serviços de sempre: sofás/colchões/tapetes/cadeiras/alcatifas/impermeabilização). Os `data.factors` antigos de `priceSeoData.ts` deixaram de ser consumidos por esta secção (continuam a existir no ficheiro, sem leitores). Destaque visual (cartão escuro/dourado) inicialmente no 1º cartão, movido para o cartão do **meio** (`index === 1`) no commit seguinte, a pedido do dono. Termina com uma nota fixa "Sabe o valor antes de marcar."
-
-## Unificação de layout Freguesia/Preço + expansão Aveiro/Coimbra (2026-09-10)
-
-**Layout unificado (pedido do dono, achado real no Ramalde):** `LocationServicePage.tsx` e `SofaVariantPage.tsx` já tinham o layout "novo"; `FreguesiaServicePage.tsx` e `PricePage.tsx` ainda tinham o antigo — mesmas ~940 páginas de freguesia já publicadas a mostrar uma versão visualmente desatualizada. Corrigido nas duas: espaçamento do hero alinhado (`pt-6 md:pt-16 lg:pt-20`/`gap-4 lg:gap-12`, era `pt-16 md:pt-24 lg:pt-28`/`gap-8 lg:gap-12`), âncoras de scroll adicionadas (`#resultados`, `#precos`, `#avaliacoes`, `#duvidas`, e `#problemas` em `FreguesiaServicePage`). Só em `FreguesiaServicePage.tsx`: cartões de "Problemas comuns" trocaram o design antigo (imagem cheia com texto sobreposto, `h-[400px]`, sem contador) pelo `ProblemCarousel` novo (igual ao de `LocationServicePage`); `SofaLeadActions` e `SofaProcessGuide` passaram a aparecer para o serviço de sofás (antes só o CTA genérico + timeline genérica, mesmo em sofás). `PricePage.tsx` só precisou do espaçamento e das âncoras — a estrutura de conteúdo já era suficientemente diferente por natureza (tabela de preços, não problemas) para não fazer sentido replicar cartões de problema aqui.
-
-**Aveiro e Coimbra passam a cidades reais** (pedido do dono, "replica a estrutura, torna o conteúdo original"): adicionadas a `cities` em `locationSeoData.ts` (`area: "porto"`, servidas pela equipa Porto por não haver equipa própria no Centro) e a `municipiosComFreguesias` em `freguesiaSeoData.ts` — Aveiro com 14 freguesias, Coimbra com 31 (nomes pré-2012, mesmo padrão granular já usado no Porto: uniões administrativas pós-2013 como "Eixo e Eirol" ou "Taveiro, Ameal e Arzila" foram desdobradas nos nomes de bairro individuais, confirmados via Wikipédia/GeoAPI antes de publicar). Como `LocationServicePage`/`FreguesiaServicePage`/`PricePage`/`SofaVariantPage` geram conteúdo 100% a partir de templates (`getLocationServiceData`/`generateFreguesiaContent`/`getAllPriceRoutes`/`keywordVariantData.ts`, todos lendo `cities`/`municipiosComFreguesias` diretamente, sem cópia paralela nos scripts Node), só estas duas listas precisaram de edição — desbloqueou automaticamente Localidade×Serviço, Freguesia×Serviço, Preço e Variantes Keyword para as duas cidades. Deslocação em `src/constants/travel.ts` (fonte única, `QuizTypes.ts` só reexporta): **Aveiro 15€, Coimbra 15€** (corrigido a pedido do dono — a 1ª tentativa tinha posto 20€/25€ seguindo o padrão de zonas mais afastadas, errado).
-
-**Bug real encontrado e corrigido antes de publicar: colisão de rotas com o sistema de expansão antigo.** `src/data/treatmentSeoData.ts` já tinha Aveiro/Coimbra num array `expansionCities` separado, usado por `getExpansionRoutes()` para gerar páginas placeholder "Disponibilidade sob consulta" nas mesmas rotas `/{serviço}-{cidade}` que `LocationServicePage` agora também gera. No React Router o `LocationServicePage` ganhava (registado primeiro em `App.tsx`), mas no `scripts/prerender.ts` o loop de `getExpansionRoutes()` corre depois e reescrevia o ficheiro HTML — o Google (e qualquer visita sem JS) via sempre o placeholder, nunca a página real; ao hidratar no cliente o conteúdo trocava visivelmente. Corrigido esvaziando `expansionCities` para `[]` (Aveiro/Coimbra já não são "cobertura por confirmar"; as páginas de tratamento `tratamento-anti-acaros-aveiro` etc. continuam geradas normalmente, agora via `cities`). **Padrão a vigiar:** qualquer cidade nova adicionada a `locationSeoData.ts` tem de ser verificada contra `expansionCities`/`getExpansionRoutes()` em `treatmentSeoData.ts` — é o mesmo tipo de colisão de slugs já avisado no ficheiro para `materialSeoData.ts`/`keywordVariantData.ts`/`problemCitySeoData.ts`, só que desta vez entre um sistema "definitivo" e um "placeholder" para as mesmas cidades.
-
-**Sitemap reorganizado:** removido `sitemap-centro.xml` (ficava permanentemente vazio depois da correção acima — `getExpansionRoutes()` passou a devolver `[]`) de `scripts/generate-sitemap.ts` e do cartão correspondente em `src/pages/admin/SitemapMonitor.tsx` ("Aveiro e Coimbra · Cobertura sob consulta", agora obsoleto). O texto fixo "12 sub-sitemaps" no cabeçalho do painel (desatualizado, já eram 14 antes desta limpeza) passou a ser calculado (`SUB_SITEMAP_COUNT`, conta ficheiros `.xml` distintos em `SITEMAPS`) para nunca mais dessincronizar.
-
-**Bug real de deteção de localização corrigido** (reportado pelo dono, testado em zona servida e mesmo assim caía no "não identificámos uma localidade"): `src/lib/locationDetection.ts` só comparava `city`/`locality`/`localityName` da resposta do BigDataCloud contra as chaves de `locationPrices` (nomes de município). Em Portugal esse endpoint devolve frequentemente o nome da **freguesia**, não do município (ex.: alguém em Ramalde recebe `city: "Ramalde"`, que nunca bate com "Porto"). Adicionado fallback: se nenhum candidato bater diretamente, procura o nome numa tabela freguesia→município construída de `municipiosComFreguesias` (só para municípios já servidos) e devolve o município. Testado (`locationDetection.test.ts`): Ramalde→Porto, Glória→Aveiro. Continua a não inventar uma cidade a partir de um distrito não servido (comportamento antigo, inalterado).
-
-**Pendente no fim desta sessão (reportado pelo dono via screenshots, não corrigido — risco de regressão no quiz de orçamento sem conseguir testar visualmente):** cartão "Desbacterização e Anti Ácaros" do colchão mostra sempre o intervalo "+15€ a +25€/un." mesmo quando só um tamanho está selecionado (devia mostrar o preço exato desse tamanho); texto do intervalo pouco claro; ecrã de impermeabilização de cadeiras cortado no mobile (conteúdo não cabe no ecrã); barras laterais do slider antes/depois em cadeiras deviam ser transparentes (mostrar o hero por trás) em vez de sólidas; layout do passo de tapetes por unificar — o dono quer a versão simples de "Que tapetes vamos limpar?" (inputs de texto simples) a substituir a versão mais carregada usada no upsell/oferta (ícone + explicação do "por cada 5m² paga 4" + steppers), com a oferta explicada de forma simples em vez do cartão atual. Também reportado (não verificado): página de preço "parece zoomed in" comparada com a página de localidade — o código-fonte das duas ficou idêntico nesta sessão (só o `alt` da imagem difere), pode ser cache/HMR desatualizado no browser do dono; confirmar com hard-refresh antes de investigar mais.
-
-
-## Pré-visualização Avenir Next (13/09/2026)
-
-A página de colchões em Paranhos mantém o comparador exclusivamente DEV: `?teste=fontes&fonte=avenir#precos`. `FontComparisonPanel` oferece Atual/Avenir Next e conserva os testes anteriores em detalhes. A proposta ajusta pesos, escala, contraste e alinhamento através de estilos limitados ao atributo de pré-visualização; usa apenas fontes locais do dispositivo, sem distribuir ficheiros comerciais. Mostra aviso quando as faces locais não estão disponíveis. `PriceWidget` apresenta «Escolha os colchões» apenas na proposta DEV. Produção mantém a tipografia e o texto anteriores. Avenir Next ainda é uma proposta, não uma decisão de marca; publicação exige licença web.
-
-## Avaliações compactas no mobile (13/09/2026)
-
-Os cartões partilhados de avaliações (`CustomerReviewCard`, usados por `CustomerReviews` na homepage e páginas de serviços/localidades) têm altura uniforme de 340px abaixo de 640px, texto de 18px com até seis linhas e abertura da transcrição integral num diálogo acessível quando necessário. O carrossel deixou de ajustar a altura à avaliação selecionada. Preservar as transcrições e a apresentação desktop.
-
-## Correção do processo por material (13/09/2026)
-
-Os guias de sofá, exceto pele/couro, têm seis etapas: avaliação, aspiração, aplicação, escovação, extração e secagem. A escovação fica obrigatoriamente entre aplicação e extração. Couro mantém os cinco cuidados próprios. No mobile, seis separadores usam duas linhas de três para manter os rótulos legíveis.
-
-Materiais: sequência de fundos aprovada: exemplos branco, processo verde, perguntas branco, pack «Aproveite a mesma visita» verde. A variante clara das FAQs é explícita, sem alterar as restantes páginas.
-
-
-## Verde suave e heroes mobile (13/09/2026)
-
-Pedido aprovado: a paleta verde suave do piloto passa a ser partilhada pelo site, em `src/styles/surfaces.css`, sem a antiga textura. As áreas claras continuam claras. Em mobile (até 767px), os heroes usam fundo verde com degradé e fotografia/comparação separada do texto; no computador conserva-se a fotografia de fundo. `data-mobile-hero` delimita o tratamento nos heroes comerciais, marcas, materiais, problemas, páginas informativas, packs, blog e inglês. `CommercialHero` mantém a composição única e usa `preserveMobileHero` apenas na homepage: preservar a aparência e as fotografias do seu hero em todos os tamanhos. O piloto `scripts/preview-hero-mobile.mjs` passou a servir os estilos reais, sem uma segunda cópia da proposta CSS. Não confundir esta aprovação visual com alterações de preços, conteúdo, FAQ ou fluxos comerciais.
-
-
-## Exemplos dos serviços nacionais (13/09/2026)
-
-`ServiceExamplesGallery` substitui `ServiceAutoCarousel` nas seis páginas principais, com quatro exemplos em duas colunas. `serviceExamples.ts` seleciona imagens estáveis das bibliotecas existentes e partilha os dados com o prerender. `VisualExamplesGallery` aceita miniatura, srcset e sizes opcionais; as restantes galerias conservam os valores anteriores. Versões 400/800px em `public/images/service-examples/`; originais da biblioteca só na ampliação. Miniaturas mobile entre 7 e 25 KB, 24 imagens nos seis serviços.
-
-## CRM por plataforma (22/09/2026)
-
-Admin: `marketing` (Google) e `meta-marketing` partilham `MarketingPanel` com filtro explícito de plataforma (`marketingPlatforms.ts`). `MarketingInputs` permite gasto diário e pedido manual com evidência de origem; `ad_spend_daily`, `register_marketing_lead` e `set_marketing_lead_status` dependem da migração aditiva `20260922000000_meta_marketing.sql`. Meta Pixel inclui Lead apenas após CRM confirmado e eventos personalizados de clique separados. Sem CAPI ou importação automática de mensagens. Regras, limites e publicação em `docs/marketing-meta-crm.md`. Dados financeiros privados da auditoria não entram no repositório público.
-
-## Oito cidades novas: Sul do Douro e Alentejo Litoral (26/09/2026)
-
-As campanhas de Google Ads (Porto e Lisboa) passaram a abranger Santa Maria da Feira, São João da Madeira, Ovar, Oliveira de Azeméis, Alcácer do Sal, Grândola, Santiago do Cacém e Sines, que não tinham taxa em `travel.ts`: o passo de localidade só aceita chaves de `locationPrices` e respondia "Localidade não encontrada". Entraram pelo mesmo caminho de Aveiro/Coimbra: `travel.ts` (taxa), `cities` em `serviceCatalog.ts` (área `porto` ou `lisboa`) e `municipiosComFreguesias` em `freguesiaSeoData.ts`. Tudo o resto é gerado: localidade × serviço, preço, variantes, freguesias, packs, materiais e tratamentos. 61 → 69 cidades, 12.912 → 13.734 páginas landing (+137 por serviço), 17.216 rotas prerenderizadas, 0 ligações mortas, auditoria `audit-landing-seo.mjs` sem falhas.
-
-- **Taxas por zona existente:** Feira 10€; São João da Madeira, Ovar e Oliveira de Azeméis 15€; as quatro do Alentejo Litoral 15€ (teto de Lisboa, critério de Coimbra) e "Disponibilidade sob consulta".
-- **Freguesias** confirmadas na GeoAPI (`json.geoapi.pt/municipio/{nome}/freguesias`), com `nearby` calculado pelos centroides (até 9 km). Sem a sede de cada concelho (seria uma cópia da página da cidade) e sem São João da Madeira (uma só freguesia, a própria cidade). Alvalade e Carvalhal ficaram de fora por já existirem em Lisboa e Barcelos.
-- **`EXTENDED_TRIP_CITIES`** (`travel.ts`) substitui os três `Aveiro || Coimbra` (`landingEditorial.ts`, `commercialHeroCopy.ts`, `audit-landing-seo.mjs`).
-- **`searchServiceLocations`** (`locationDetection.ts`) é a pesquisa do `QuizStepLocation`: concelhos primeiro, depois freguesias dos concelhos servidos que ainda não apareceram, no máximo 6; expande "S."/"Sta."/"Sto.".
-- Rótulo da área `lisboa` passou a "Lisboa, Setúbal e Alentejo Litoral" (`ServiceCityLinks`, `AreasDeServico`, `llms.txt`, admin). `/areas-de-servico` conta municípios por `cities.length`, não pelos concelhos com freguesias.
-- Contagens fixadas nos testes de imagens/FAQ/modelo atualizadas (2152 → 2289 por serviço, 12912 → 13734).

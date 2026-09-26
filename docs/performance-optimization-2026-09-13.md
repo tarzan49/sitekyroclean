@@ -11,7 +11,7 @@ Pedido: corrigir os bloqueios encontrados na auditoria e superar 90/100 em desem
 - As quatro famílias carregam as secções inferiores com uma fronteira Suspense própria, permitindo mostrar o hero antes.
 - `QuizFormLazy` importa o formulário apenas na primeira abertura e conserva-o após fechar. A configuração e preços permanecem no mesmo motor.
 - Fontes Avenir com subconjunto latino de 11–12 KB por peso e ficheiros originais para caracteres adicionais. Retiradas as camadas de desfoque/releituras de layout durante scroll mobile e a animação de entrada da página.
-- Google Analytics/Ads e medição própria só são ativados depois de aceitar. A política permite reabrir preferências. A campanha autorizada acompanha o pedido no campo existente `notes` do CRM e no Formspree, sem novas colunas nem alteração da origem Website. O formulário simples emite `generate_lead` apenas após entrega, sem valor de receita.
+- Google Analytics/Ads e medição própria só são ativados depois de aceitar. A política permite reabrir preferências. A campanha autorizada acompanha o pedido no campo existente `notes` do CRM e no Formspree, sem novas colunas nem alteração da origem Website. O formulário simples emite `generate_lead` apenas após entrega, sem valor de receita. [Nota de 2026-09-26: o Formspree foi substituído pelo Resend (função Edge `send-lead-email`) a 2026-09-14; a atribuição segue desde 18/09 para `lead_attribution` pelo `submit-lead`; e desde 26/09 o modo de consentimento é `advanced`, ou seja a `gtag.js` carrega com tudo negado antes da decisão. Ver `CLAUDE.md`.]
 - Removidas datas de alteração inventadas a cada build dos sitemaps. Corrigidos textos principais de metadados com promessas antigas de uma hora/cobertura nacional e tratamentos incluídos.
 
 ## Reproduzir
@@ -40,4 +40,4 @@ Referências: [headers Cloudflare Pages](https://developers.cloudflare.com/pages
 
 ## Contas e serviços por verificar
 
-Configuração/importação de conversões Google Ads, identificação/configuração Meta, Search Console, quotas do Formspree, DNS de www e verificação de permissões da base de dados não são demonstradas por estes testes de código. Não se inventou acesso às contas nem foram enviados pedidos comerciais. Confirmação rápida após apenas um canal e entrega durável do segundo exigem rever a entrega no servidor; mantida a espera pelos dois canais para não perder fotografias/email.
+Configuração/importação de conversões Google Ads, identificação/configuração Meta, Search Console, quotas do Formspree (canal substituído pelo Resend a 2026-09-14), DNS de www e verificação de permissões da base de dados não são demonstradas por estes testes de código. Não se inventou acesso às contas nem foram enviados pedidos comerciais. Confirmação rápida após apenas um canal e entrega durável do segundo exigem rever a entrega no servidor; mantida a espera pelos dois canais para não perder fotografias/email.
