@@ -1,4 +1,3 @@
-import { hasAdminAccess } from '../_shared/admin-authorization.ts';
 // Lista os emails de pedidos enviados pelo Resend, para o separador "Quiz Leads"
 // do admin panel. Os pedidos em si (nome, telefone, detalhes) não ficam guardados
 // em nenhuma tabela do Supabase — o email enviado pelo `send-lead-email` é o único
@@ -9,10 +8,10 @@ import { hasAdminAccess } from '../_shared/admin-authorization.ts';
 // a mesma usada para entrar no /admin. Sem esse gate, qualquer visitante do site
 // conseguiria ler nomes, telefones e emails de todos os clientes.
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { checkRateLimit, getClientIP, getRateLimitHeaders } from "../_shared/rate-limit.ts";
 import { createErrorResponse, createSuccessResponse, handleCORS, safeLog, validateMethod } from "../_shared/security.ts";
 import { LEAD_FROM_ADDRESS } from "../_shared/constants.ts";
+import { isAuthenticatedAdmin } from "../_shared/admin-request.ts";
 
 const RATE_LIMIT_MAX = 30;
 const RATE_LIMIT_WINDOW = 10 * 60 * 1000;
@@ -33,24 +32,6 @@ interface ResendEmailSummary {
   created_at: string;
   last_event: string;
   reply_to?: string[] | null;
-}
-
-export async function isAuthenticatedAdmin(req: Request): Promise<boolean> {
-  const token = req.headers.get("Authorization")?.replace(/^Bearer\s+/i, "");
-  const supabaseUrl = Deno.env.get("SUPABASE_URL");
-  const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
-  if (!token || !supabaseUrl || !serviceKey) return false;
-
-  const supabase = createClient(supabaseUrl, serviceKey);
-  return hasAdminAccess({
-    auth: { getUser: (value) => supabase.auth.getUser(value) },
-    from: (table) => ({ select: (columns) => ({ eq: (column, value) => ({
-      maybeSingle: async () => {
-        const { data, error } = await supabase.from(table).select(columns).eq(column, value).maybeSingle();
-        return { data: data as { user_id: string } | null, error };
-      },
-    }) }) }),
-  }, token);
 }
 
 serve(async (req: Request): Promise<Response> => {

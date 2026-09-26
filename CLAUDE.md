@@ -412,6 +412,16 @@ tentativa não mede o lead — só a próxima, se a pessoa tentar de novo.
 painel existem para isso. Cada leitura do painel falha por si, para uma tabela
 em falta não esvaziar tudo.
 
+## CRM ligado ao Google Calendar (2026-09-26)
+
+Detalhe em `docs/crm-google-calendar.md`. As regras que não se adivinham do código:
+
+- **O separador CRM cria sozinho as linhas dos eventos "Serviço X€ (Y€) …"** do Google Calendar do dono, ao abrir e no botão "Sincronizar calendário". O primeiro valor é a parte dele e o valor entre parênteses é o faturado (a mesma leitura da importação de 11/09). Não há tarefa agendada no servidor: a região precisa dos dados das freguesias do site, por isso o parser (`src/lib/calendarServices.ts`) corre no painel. **O dono deixou de passar os serviços à mão para o CRM**; se voltar a fazê-lo com um evento criado depois de 26/09 às 15:00 UTC, fica duplicado.
+- **`booked_at` é o dia em que o serviço foi fechado** (criação do evento, ou entrada da linha no CRM) e é a base da aba "Fechos". `request_date` continua a ser o dia do serviço. Não confundir os dois numa métrica nova.
+- **A sincronização nunca apaga uma linha**: evento apagado ou cancelado marca a linha, e quem decide é o dono. Ganha a edição mais recente entre o CRM e o calendário; o "pago" nunca é tocado.
+- **Secret `GOOGLE_CALENDAR_ICS_URL`** (endereço secreto iCal do calendário) nas secrets das Edge Functions. Se a Google o repuser, o CRM passa a mostrar "Google Calendar por ligar" até a secret ser atualizada. A função `calendar-events` publica-se à parte (`npx supabase functions deploy calendar-events`) e só responde a `admin_users`.
+- **Testes do parser só com dados inventados**: o repositório é público. Os eventos reais usados para o afinar ficaram numa pasta temporária fora do repositório.
+
 ## Regras de conteúdo e estilo (fixas, já corrigidas várias vezes)
 
 - **Varredura de afirmações absolutas (2026-09-17, segunda passagem).** A revisão do glossário encontrou as mesmas afirmações noutros sítios do site, algumas a contradizer o que a página ao lado dizia. Removidas: "redução de 70% dos episódios de crise" atribuída ao tratamento anti-ácaros (um resultado clínico atribuído ao serviço), "eficaz em mais de 90% dos casos" na desodorização e nas páginas de marca, "mais de 85% dos casos" no couro Natuzzi, "mata microrganismos acima de 60ºC, letal para ácaros, bactérias e fungos" na extração, "eliminação total de odores" em tapetes (no mesmo ficheiro que já dizia "não prometemos eliminação total") e três passagens no blog sobre calor que mata ácaros. **O princípio que ficou: o que provoca a reação alérgica são os excrementos e os restos de exoesqueleto já depositados na fibra, e esses removem-se fisicamente, não por calor.** Antes de escrever uma percentagem de eficácia ou um verbo como eliminar, matar ou garantir, verificar se a mesma página noutro sítio já promete o contrário.
