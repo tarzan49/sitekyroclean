@@ -1,12 +1,13 @@
 // Lista os emails de pedidos enviados pelo Resend, para o separador "Quiz Leads"
-// do admin panel. Os pedidos em si (nome, telefone, detalhes) não ficam guardados
-// em nenhuma tabela do Supabase — o email enviado pelo `send-lead-email` é o único
-// registo que existe deles. Esta função é a forma de os rever depois.
+// do admin panel. Os pedidos também ficam na tabela `leads` (via `submit-lead`,
+// visíveis no separador de Marketing); esta lista é a cópia do canal de email,
+// útil quando o CRM falhou e o pedido só chegou por email.
 //
 // Ao contrário de `submit-lead`/`send-lead-email` (públicas de propósito, para o
-// site as poder chamar sem sessão), esta exige uma sessão real do Supabase Auth —
-// a mesma usada para entrar no /admin. Sem esse gate, qualquer visitante do site
-// conseguiria ler nomes, telefones e emails de todos os clientes.
+// site as poder chamar sem sessão), esta exige uma sessão real do Supabase Auth
+// **e** que essa conta esteja em `admin_users` (`hasAdminAccess`). Sem esse gate,
+// qualquer visitante do site conseguiria ler nomes, telefones e emails de todos
+// os clientes.
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { checkRateLimit, getClientIP, getRateLimitHeaders } from "../_shared/rate-limit.ts";
 import { createErrorResponse, createSuccessResponse, handleCORS, safeLog, validateMethod } from "../_shared/security.ts";

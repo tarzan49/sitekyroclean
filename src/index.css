@@ -10,6 +10,14 @@
   animation: pageFadeIn 0.28s ease-in-out;
 }
 
+/* O selo flutuante do reCAPTCHA tapava a barra fixa de WhatsApp e os botões
+   do quiz. A Google permite escondê-lo desde que o aviso "Protegido por
+   reCAPTCHA…" apareça no fluxo: está por baixo do botão de envio do quiz
+   (QuizStepContact). Não esconder o selo sem esse aviso. */
+.grecaptcha-badge {
+  visibility: hidden;
+}
+
 @layer utilities {
   .bg-kyro-green,
   .bg-checker-dark,

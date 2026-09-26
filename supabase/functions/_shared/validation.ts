@@ -14,7 +14,9 @@ const HEADER_INJECTION_PATTERNS = [
   // O byte nulo e precisamente o que esta verificacao existe para apanhar.
   // eslint-disable-next-line no-control-regex
   /\x00/,             // Null byte
-  /%0[aAdD]/gi,       // URL encoded newlines
+  // Sem a flag `g`: com ela, `.test()` guarda `lastIndex` entre chamadas e o
+  // mesmo isolate passava a responder de forma diferente ao pedido seguinte.
+  /%0[aAdD]/i,        // URL encoded newlines
 ];
 
 // XSS patterns to detect

@@ -65,6 +65,10 @@ const AppRoutes = () => {
   useScrollReveal();
   // Atribuição + page_view por mudança de rota. Ver o porquê em use-page-tracking.ts.
   usePageTracking();
+  // Do router, não o `location` global: a `key` abaixo é o que remonta a página
+  // e reinicia o ErrorBoundary a cada navegação, e só atualizava por acaso,
+  // porque o usePageTracking já subscrevia o router.
+  const { pathname } = useLocation();
 
   return (
     <>
@@ -74,7 +78,7 @@ const AppRoutes = () => {
       <ScrollToTop />
       <PageHead />
 
-      <div key={location.pathname} className="page-content" style={{ width: '100%', minHeight: '100vh' }}>
+      <div key={pathname} className="page-content" style={{ width: '100%', minHeight: '100vh' }}>
           <ErrorBoundary>
             <Suspense fallback={<PageLoader />}>
               <Routes>

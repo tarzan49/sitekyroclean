@@ -1,6 +1,15 @@
+-- NUNCA correr este ficheiro contra a base de produção (nem por `supabase db
+-- push`, ver a sétima armadilha do CLAUDE.md). É o registo do estado de 2024.
+--
+-- Até 2026-09-26 esta linha era `drop table if exists public.leads cascade;`
+-- seguida de `create table public.leads`. O `db push --include-all` de
+-- 2026-09-14 reaplicou o histórico desde este ficheiro, por isso uma reaplicação
+-- apagava a tabela `leads` inteira (as outras duas tabelas daqui já usavam
+-- `if not exists` e sobreviviam). Passou a `create table if not exists`, para
+-- que uma nova reaplicação por engano nunca volte a destruir pedidos.
+
 -- leads
-drop table if exists public.leads cascade;
-create table public.leads (
+create table if not exists public.leads (
   id uuid primary key default gen_random_uuid(),
   created_at timestamptz default now(),
   name text,

@@ -13,10 +13,10 @@
 # irreversível (entra numa lista compilada nos browsers) e não se pede sem
 # decisão do dono.
 #
-# ── CSP: EM MODO DE RELATÓRIO, NÃO BLOQUEIA NADA ────────────────────────────
-# `Content-Security-Policy-Report-Only` avisa na consola do browser e deixa o
-# pedido passar. É de propósito: uma diretiva a menos não dá erro visível, só
-# deixa de medir ou de entregar pedidos, e isso não se descobre a olhar.
+# ── CSP: A BLOQUEAR DESDE 2026-09-23 (ver o fim deste comentário) ───────────
+# Começou em `Content-Security-Policy-Report-Only`, que só avisava. Uma
+# diretiva a menos não dá erro visível, só deixa de medir ou de entregar
+# pedidos, e isso não se descobre a olhar.
 #
 # Origens, e porque cada uma está aqui. Uma parte saiu do código; as do Google
 # Ads só apareceram a correr o site a sério com o modo de relatório ligado
@@ -43,6 +43,13 @@
 #                           localização" do quiz
 #   localhost:3010          `KyroConnectionStatus.tsx`, só no painel admin e só
 #                           na máquina do dono
+#   www.google.com/recaptcha/, www.gstatic.com/recaptcha/, recaptcha.google.com
+#                           reCAPTCHA v3 (`src/lib/recaptcha.ts`), carregado
+#                           só no momento de enviar um pedido. Faltaram aqui de
+#                           2026-09-23 a 2026-09-26: o script era bloqueado, o
+#                           token saía vazio e o servidor deixava passar tudo,
+#                           ou seja a proteção contra spam estava desligada sem
+#                           ninguém dar por isso.
 #
 # `img-src` aceita `https:` de propósito: o pixel de listas do Ads é servido
 # pelo domínio do PAÍS de quem visita (`www.google.dk` numa visita observada),
@@ -85,9 +92,9 @@
 #   base-uri 'self'      impede um `<base>` injetado de sequestrar TODOS os
 #                        URLs relativos da página. O site não tem `<base>`.
 #   form-action 'self'   impede que um formulário passe a submeter para fora.
-#                        Os dois formulários do site (Contact.tsx e
-#                        MarketingInputs.tsx) não têm `action`: submetem por
-#                        fetch, que é governado por `connect-src`, não por esta.
+#                        Os formulários do site (quiz e MarketingInputs.tsx)
+#                        não têm `action`: submetem por fetch, que é governado
+#                        por `connect-src`, não por esta.
 #                        `https://www.facebook.com` está aqui porque o Pixel da
 #                        Meta, quando o `sendBeacon` não serve, envia o evento
 #                        por um POST de formulário para `facebook.com/tr/`.
@@ -132,7 +139,7 @@
   Strict-Transport-Security: max-age=15552000
   X-Frame-Options: SAMEORIGIN
   Permissions-Policy: geolocation=(self), clipboard-write=(self), camera=(), microphone=(), payment=(), usb=(), magnetometer=(), accelerometer=(), gyroscope=()
-  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com https://googleads.g.doubleclick.net https://www.googleadservices.com https://connect.facebook.net; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; font-src 'self' data:; connect-src 'self' https://*.supabase.co https://api.bigdatacloud.net https://www.google-analytics.com https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com https://*.g.doubleclick.net https://ad.doubleclick.net https://www.googleadservices.com https://connect.facebook.net https://www.facebook.com https: http://localhost:3010; frame-src 'self' https://td.doubleclick.net https://www.facebook.com; base-uri 'self'; form-action 'self' https://www.facebook.com; frame-ancestors 'self'; object-src 'none'
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com https://googleads.g.doubleclick.net https://www.googleadservices.com https://connect.facebook.net https://www.google.com/recaptcha/ https://www.gstatic.com/recaptcha/; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; font-src 'self' data:; connect-src 'self' https://*.supabase.co https://api.bigdatacloud.net https://www.google-analytics.com https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com https://*.g.doubleclick.net https://ad.doubleclick.net https://www.googleadservices.com https://connect.facebook.net https://www.facebook.com https: http://localhost:3010; frame-src 'self' https://td.doubleclick.net https://www.facebook.com https://www.google.com/recaptcha/ https://recaptcha.google.com/recaptcha/; base-uri 'self'; form-action 'self' https://www.facebook.com; frame-ancestors 'self'; object-src 'none'
 
 # Vite assets have content hashes: changed files always receive a new URL.
 /assets/*

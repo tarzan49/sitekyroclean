@@ -256,7 +256,13 @@ serve(async (req: Request): Promise<Response> => {
     return createErrorResponse("Pedido inválido", 400);
   }
 
-  if (hasHeaderInjection(JSON.stringify(body))) {
+  // Só os campos que vão parar a cabeçalhos do email (assunto e reply-to). Sobre
+  // `JSON.stringify(body)` a verificação não apanhava nada (o JSON escapa CR/LF)
+  // e recusava pedidos reais com um "%0A" colado num URL da mensagem.
+  const replyTo = typeof (body.lead as Record<string, unknown>).email === "string"
+    ? (body.lead as Record<string, unknown>).email as string
+    : "";
+  if (hasHeaderInjection(typeof body.subject === "string" ? body.subject : "") || hasHeaderInjection(replyTo)) {
     safeLog("warn", "[send-lead-email] Tentativa de injeção detetada", { ip: clientIP });
     return createErrorResponse("Pedido inválido", 400);
   }
@@ -277,6 +283,21 @@ serve(async (req: Request): Promise<Response> => {
     return createErrorResponse("Não foi possível validar o pedido.", 403);
   }
 
+  // As variáveis verificam-se ANTES de tomar o trinco. Ao contrário, um 503
+  // por variável em falta deixava o trinco tomado, e a tentativa seguinte do
+  // mesmo pedido recebia "duplicate" — que o cliente trata como entregue. Com o
+  // CRM também em baixo, a pessoa via a confirmação e o pedido não existia em
+  // lado nenhum.
+  const resendApiKey = Deno.env.get("RESEND_API_KEY");
+  const notificationEmail = Deno.env.get("LEAD_NOTIFICATION_EMAIL");
+  if (!resendApiKey || !notificationEmail) {
+    safeLog("error", "[send-lead-email] Variáveis do Resend em falta", {});
+    return createErrorResponse("Serviço indisponível", 503);
+  }
+
+  // Daqui para baixo, todo o caminho que não termine num envio aceite larga o
+  // trinco: um "duplicate" só pode significar que outra tentativa já enviou (ou
+  // está a enviar) este pedido.
   const claim = await claimNotification(lead.lead_id);
   if (claim.duplicate) {
     safeLog("info", "[send-lead-email] Email repetido ignorado", { leadId: lead.lead_id });
@@ -284,13 +305,6 @@ serve(async (req: Request): Promise<Response> => {
       { sent: false, duplicate: true },
       getRateLimitHeaders(limit.remaining, limit.resetAt),
     );
-  }
-
-  const resendApiKey = Deno.env.get("RESEND_API_KEY");
-  const notificationEmail = Deno.env.get("LEAD_NOTIFICATION_EMAIL");
-  if (!resendApiKey || !notificationEmail) {
-    safeLog("error", "[send-lead-email] Variáveis do Resend em falta", {});
-    return createErrorResponse("Serviço indisponível", 503);
   }
 
   try {

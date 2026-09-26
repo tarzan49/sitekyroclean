@@ -4,8 +4,11 @@ const RECAPTCHA_VERIFY_URL = 'https://www.google.com/recaptcha/api/siteverify';
 // Check if reCAPTCHA is enabled (defaults to true if not set)
 const RECAPTCHA_ENABLED = Deno.env.get('RECAPTCHA_ENABLED')?.toLowerCase() !== 'false';
 
-// Minimum score threshold (0.0 to 1.0, higher = more likely human)
-const MIN_SCORE_THRESHOLD = 0.5;
+// Minimum score threshold (0.0 to 1.0, higher = more likely human).
+// 0.3 e não o 0.5 do exemplo da Google: navegadores com proteção de
+// privacidade, VPN e telemóveis novos dão pontuações entre 0.3 e 0.5 a pessoas
+// reais, e aqui recusar um cliente real custa muito mais do que um spam.
+const MIN_SCORE_THRESHOLD = 0.3;
 
 interface RecaptchaResponse {
   success: boolean;
@@ -71,21 +74,28 @@ export async function verifyRecaptcha(
       body: params.toString(),
     });
 
+    // Regra desde 2026-09-26: um problema NOSSO (API da Google em baixo, chave
+    // secreta que não corresponde à do site, domínio por registar) nunca recusa
+    // um pedido. Antes recusava — e como a CSP bloqueava o script, isso nunca
+    // se viu; ao desbloquear, uma chave mal emparelhada teria recusado todos os
+    // pedidos no CRM. Um bot não ganha nada com isto: já podia simplesmente
+    // não mandar token. Só se recusa um token que a Google validou e que tem
+    // pontuação de robô.
     if (!response.ok) {
-      console.error('[reCAPTCHA] Verification API error:', response.status);
-      return { valid: false, error: 'reCAPTCHA verification failed' };
+      console.error('[reCAPTCHA] Verification API error, bypassing:', response.status);
+      return { valid: true, bypassed: true, error: 'reCAPTCHA verification unavailable' };
     }
 
     const data: RecaptchaResponse = await response.json();
 
     // Check if verification succeeded
     if (!data.success) {
-      console.warn('[reCAPTCHA] Verification failed:', data['error-codes']);
-      return { 
-        valid: false, 
-        error: 'reCAPTCHA verification failed',
-        score: data.score 
-      };
+      // Chave secreta errada, token expirado ou de outra chave: não dá para
+      // distinguir um erro de configuração nosso de um token forjado, e um bot
+      // que forja tokens podia simplesmente não mandar nenhum. Deixa passar e
+      // regista, para o erro de configuração aparecer nos logs da função.
+      console.error('[reCAPTCHA] Token not verified, bypassing:', data['error-codes']);
+      return { valid: true, bypassed: true, error: 'reCAPTCHA token not verified' };
     }
 
     // Verify action matches expected
@@ -111,7 +121,7 @@ export async function verifyRecaptcha(
     return { valid: true, score: data.score };
 
   } catch (error) {
-    console.error('[reCAPTCHA] Verification error:', error);
-    return { valid: false, error: 'reCAPTCHA verification error' };
+    console.error('[reCAPTCHA] Verification error, bypassing:', error);
+    return { valid: true, bypassed: true, error: 'reCAPTCHA verification error' };
   }
 }

@@ -79,7 +79,7 @@ const ErrorLogPanel = () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { error } = await (supabase as any).from("error_logs").delete().eq("id", id);
     if (error) {
-      alert(`Erro ao apagar: ${error.message}\n\nSolução: vai ao Supabase Dashboard → SQL Editor e corre:\nCREATE POLICY "allow_delete" ON public.error_logs FOR DELETE USING (true);`);
+      alert(`Erro ao apagar: ${error.message}`);
       return;
     }
     setErrors(prev => prev.filter(e => e.id !== id));
@@ -90,7 +90,7 @@ const ErrorLogPanel = () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { error } = await (supabase as any).from("error_logs").delete().neq("id", "00000000-0000-0000-0000-000000000000");
     if (error) {
-      alert(`Erro ao apagar: ${error.message}\n\nSolução: vai ao Supabase Dashboard → SQL Editor e corre:\nCREATE POLICY "allow_delete" ON public.error_logs FOR DELETE USING (true);`);
+      alert(`Erro ao apagar: ${error.message}`);
       return;
     }
     setErrors([]);

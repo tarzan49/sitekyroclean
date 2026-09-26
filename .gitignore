@@ -55,3 +55,6 @@ g-ads/
 
 # Estado local da CLI do Supabase (por máquina)
 supabase/.temp/
+
+# Exportações de conversas/serviços com valores por trabalho: nunca no repositório público.
+scripts/*-raw.txt

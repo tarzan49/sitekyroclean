@@ -15,6 +15,11 @@ ponto único de falha:
 - Sem token, `verifyRecaptcha` deixa passar de propósito. reCAPTCHA bloqueado
   por uma extensão, script em falha ou chave ausente no build não podem custar
   um cliente.
+- **Um problema nosso também deixa passar (desde 2026-09-26):** API da Google
+  em baixo, chave secreta que não corresponde à do site, token expirado. Só se
+  recusa um token que a Google validou com pontuação de robô (abaixo de 0.3) ou
+  com outra ação. Um bot não ganha nada com esta tolerância: já podia não mandar
+  token nenhum.
 - O token **nunca** vai no canal de email. Foi isso que partiu o formulário na
   primeira tentativa de pôr reCAPTCHA neste site. Há um teste que o garante.
 - Mesmo quando o servidor recusa um pedido, o canal de email entrega na mesma,
@@ -23,65 +28,43 @@ ponto único de falha:
 ## Como está montado
 
 ```
-quiz → canal de email (Formspree, a passar a Resend)   ← inalterado
-     → supabase/functions/submit-lead                  ← verifica e insere
+quiz → supabase/functions/send-lead-email   ← email ao dono (Resend), sem token
+     → supabase/functions/submit-lead       ← verifica o reCAPTCHA e insere em `leads`
 ```
 
-`submit-lead` limita a 8 pedidos por IP em 10 minutos, verifica o reCAPTCHA
-(ação `submit_quote`), aceita só os campos conhecidos com comprimento máximo, e
-insere com a chave de serviço.
+`submit-lead` limita a 8 pedidos por IP em 10 minutos (em memória, por
+isolate), verifica o reCAPTCHA (ação `submit_quote`), aceita só os campos
+conhecidos com comprimento máximo, e insere com a chave de serviço. A inserção
+anónima em `leads` está fechada desde 2026-09-14: **a única forma de criar um
+lead é a Edge Function.**
 
-## Publicação, por ordem
+## Configuração
 
-O código já publicado é seguro antes da função existir: enquanto `submit-lead`
-responder 404 ou estiver indisponível, `insertCrmLead` volta ao insert direto e
-nenhum pedido se perde.
+- `VITE_RECAPTCHA_SITE_KEY` no Cloudflare Pages (está definida: a chave vai no
+  bundle de produção).
+- `RECAPTCHA_SECRET_KEY` nos segredos das Edge Functions do Supabase (definida
+  desde 2026-09-13).
+- A CSP (`public/_headers`) tem de permitir `www.google.com/recaptcha/` e
+  `www.gstatic.com/recaptcha/` em `script-src` e `frame-src`. **Faltaram de
+  2026-09-23 a 2026-09-26:** o script era bloqueado, o token saía vazio e o
+  servidor deixava passar tudo, ou seja a proteção estava desligada sem ninguém
+  dar por isso.
+- As Edge Functions publicam-se à parte do site: um push para o GitHub não as
+  atualiza. `node_modules/.bin/supabase functions deploy <nome>` a partir da
+  raiz do repositório.
 
-**Passo 1. Publicar a função e os segredos.**
+## Alterações à base de dados
 
-```bash
-supabase functions deploy submit-lead
-supabase secrets set RECAPTCHA_SECRET_KEY=<a chave secreta do reCAPTCHA>
-```
-
-`SUPABASE_URL` e `SUPABASE_SERVICE_ROLE_KEY` já são injetadas pelo Supabase nas
-Edge Functions, não é preciso defini-las.
-
-Confirmar que `VITE_RECAPTCHA_SITE_KEY` está definida **no Cloudflare Pages**,
-não só no `.env` local. Ver a quinta armadilha do `CLAUDE.md`: já houve um
-incidente em que o build de produção compilou com variáveis por definir.
-
-**Passo 2. Confirmar em produção antes de fechar a porta.**
-
-Fazer um pedido real pelo quiz e verificar que a linha aparece em `leads` e que
-os registos da função mostram a pontuação do reCAPTCHA. Só depois disto avançar.
-
-**Passo 3. Fechar a inserção anónima. ✅ feito em 2026-09-14.**
-
-Confirmado em produção com um pedido real (`source: Website`), e a função
-verificada a responder o seu próprio 400 de validação.
-
-A migração `20260914000000_close_anonymous_lead_insert.sql` remove a política
-de insert anónimo, e o insert direto de recurso saiu de
-`src/services/submissionService.ts`. A partir daqui **a única forma de criar um
-lead é a Edge Function**, que insere com a chave de serviço (essa ignora RLS,
-por isso não precisa de política).
-
-Falta correr a migração contra a base de dados:
-
-```bash
-npx supabase db push
-```
-
-## Quando o Formspree passar a Resend
-
-`submit-lead` é o sítio certo para o envio do email: a chave do Resend não pode
-viver no browser. Manter os dois canais independentes, para que uma falha do
-email não impeça o registo do lead nem o contrário.
+**Nunca `supabase db push`** (sétima armadilha do `CLAUDE.md`): a base foi
+sempre gerida à mão e o `db push` reaplica o histórico todo. As migrações
+colam-se no SQL Editor do dashboard; o ficheiro em `supabase/migrations/` fica
+só como registo.
 
 ## Ajustes
 
-`MIN_SCORE_THRESHOLD` em `supabase/functions/_shared/recaptcha.ts` está a 0.5.
-Se aparecerem clientes reais recusados, baixar para 0.3 antes de desligar a
-verificação. `RECAPTCHA_ENABLED=false` desliga-a por completo sem publicar
-código, se for preciso com urgência.
+`MIN_SCORE_THRESHOLD` em `supabase/functions/_shared/recaptcha.ts` está a 0.3.
+`RECAPTCHA_ENABLED=false` nos segredos das Edge Functions desliga a
+verificação por completo sem publicar código, se for preciso com urgência. Os
+registos da função `submit-lead` mostram `Token not verified, bypassing` quando
+a chave secreta não corresponde à do site: se isso aparecer, a proteção não
+está a funcionar e é preciso rever as duas chaves na consola do reCAPTCHA.

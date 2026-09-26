@@ -108,10 +108,10 @@ export function updateConsent(decision: ConsentDecision | boolean): void {
 }
 
 /**
- * No modo avançado a biblioteca carrega já, com tudo negado. Nesse estado a
- * Google não escreve cookies nem guarda identificadores — só recebe pings sem
- * cookies. No modo básico (o que está em vigor) isto não faz nada e a
- * biblioteca fica à espera da aceitação.
+ * No modo avançado (o que está em vigor desde 2026-09-26) a biblioteca carrega
+ * já, com tudo negado. Nesse estado a Google não escreve cookies nem guarda
+ * identificadores — só recebe pings sem cookies. No modo básico isto não faz
+ * nada e a biblioteca fica à espera da aceitação.
  */
 export function applyConsentMode(anyConsentGiven: boolean): void {
   if (anyConsentGiven || CONSENT_MODE === 'advanced') loadGoogleTags();

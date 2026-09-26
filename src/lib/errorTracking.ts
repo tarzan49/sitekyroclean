@@ -1,3 +1,5 @@
+import { isProductionHost } from "@/constants/tracking";
+
 // Um erro sistémico (um script de terceiros a falhar, uma extensão de browser)
 // disparava um insert em `error_logs` por cada ocorrência em cada visitante,
 // sem limite: com tráfego, isso é uma tabela a crescer ao ritmo das páginas
@@ -25,9 +27,10 @@ export async function logError(payload: {
   // inundando o painel de admin com ruído e escondendo erros reais de
   // clientes por trás de centenas de entradas de "localhost" (achado real
   // 2026-09-09, ao investigar um lead em falta no Error Log). Mesmo padrão
-  // já usado em quizTracking.ts (IS_PRODUCTION).
-  const { IS_PRODUCTION } = await import("@/lib/quizTracking");
-  if (!IS_PRODUCTION) {
+  // já usado em quizTracking.ts (IS_PRODUCTION). Lido de constants/tracking
+  // e não por import dinâmico de quizTracking, que criava um ciclo entre os
+  // dois módulos só para ler esta flag.
+  if (typeof window === "undefined" || !isProductionHost(window.location.hostname)) {
     // eslint-disable-next-line no-console
     console.warn('[errorTracking] Fora de produção — erro NÃO gravado no error_logs (simulado):', payload.message);
     return;

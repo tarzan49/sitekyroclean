@@ -140,6 +140,20 @@ export const CONSENT_MODE: 'basic' | 'advanced' =
 /** O domínio real. Fora daqui nada é enviado para o GA4/Ads (ver `trackingEnv`). */
 export const PRODUCTION_HOSTNAME = 'cleansolutions.com.pt';
 
+/**
+ * O domínio real **e os seus subdomínios** (`www`, `admin`). Um só critério
+ * para a medição e para a entrega dos pedidos.
+ *
+ * Antes, só o domínio exato contava como produção. Como `submissionService`
+ * simula o envio fora de produção (a pessoa vê a página de obrigado e nada é
+ * gravado nem enviado), bastava o `www` passar a servir o site para todos os
+ * pedidos feitos lá desaparecerem em silêncio. `*.pages.dev`, `localhost` e
+ * qualquer outro domínio continuam a ser pré-visualização.
+ */
+export function isProductionHost(hostname: string): boolean {
+  return hostname === PRODUCTION_HOSTNAME || hostname.endsWith(`.${PRODUCTION_HOSTNAME}`);
+}
+
 export type TrackingEnv = 'production' | 'preview' | 'development' | 'test';
 
 /**
@@ -155,7 +169,7 @@ export function trackingEnv(): TrackingEnv {
   if (typeof window === 'undefined') return 'test';
   if (import.meta.env.MODE === 'test') return 'test';
   if (import.meta.env.DEV) return 'development';
-  return window.location.hostname === PRODUCTION_HOSTNAME ? 'production' : 'preview';
+  return isProductionHost(window.location.hostname) ? 'production' : 'preview';
 }
 
 const DEBUG_KEY = 'kyro_tracking_debug';

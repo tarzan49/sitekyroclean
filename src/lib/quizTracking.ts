@@ -3,8 +3,9 @@ import { createEventDelivery, sendStoredEvent } from './eventDelivery';
 import { sendGtagEvent } from './gtag';
 import { trackMetaContactClick } from './metaPixel';
 import { getAttributionSnapshot } from './leadAttribution';
+import { isProductionHost } from '@/constants/tracking';
 
-export const IS_PRODUCTION = typeof window !== 'undefined' && window.location.hostname === 'cleansolutions.com.pt';
+export const IS_PRODUCTION = typeof window !== 'undefined' && isProductionHost(window.location.hostname);
 export const isPublicTrackingPage = () => !/^\/admin(?:\/|$)/.test(window.location.pathname);
 let storage: Storage | undefined;
 try { storage = window.sessionStorage; } catch { /* private browsing */ }

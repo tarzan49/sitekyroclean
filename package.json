@@ -13,7 +13,8 @@
     "typecheck": "tsc -b --noEmit",
     "preview": "vite preview",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "test:functions": "deno test --no-lock --allow-env --allow-net supabase/functions/"
   },
   "dependencies": {
     "@radix-ui/react-accordion": "^1.2.11",
