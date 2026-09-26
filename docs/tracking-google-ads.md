@@ -491,7 +491,10 @@ toda a gente; é o dono que conta, no WhatsApp, pedidos e serviços fechados de
 cada origem. Limites: quem sai e volta mais tarde por outro caminho perde a
 marca, e a pessoa pode apagar a frase. **As mensagens pré-preenchidas das
 extensões de mensagem do Google Ads (WhatsApp direto do anúncio) são
-configuradas na conta e não passam por aqui.**
+configuradas na conta e não passam por aqui.** O dono decidiu mantê-las com o
+texto atual (26/09/2026), por isso uma conversa aberta diretamente no anúncio
+chega sem a frase. A frase prova que o cliente veio do anúncio; a falta dela
+não prova que é orgânico, e a contagem dos clientes pagos é um mínimo.
 
 **Disponível agora — IMPLEMENTADO:** registo manual de um contacto real no
 painel (tabela `contact_log`): canal, data, nota, e associação opcional a um
