@@ -17,12 +17,20 @@ Premium desde 89€ (1 lugar), colchões desde 59€, cadeiras desde 20€.
 | Preço de Limpeza de Sofá | Tabela de preços por tamanho | Orçamento grátis em 10 minutos | `/preco-limpeza-sofa-porto` | `/preco-limpeza-sofa-lisboa` |
 | Antes e Depois | Fotografias de trabalhos reais | Sofás, colchões e tapetes | `/antes-depois-limpeza` | `/antes-depois-limpeza` |
 | Impermeabilização | Escolha Essencial ou Premium | Premium: até 10 anos sob condições | `/impermeabilizacao-porto` | `/impermeabilizacao-lisboa` |
-| Limpeza de Colchões | Colchões desde 59€ | Com tratamento anti ácaros | `/limpeza-colchoes-porto` | `/limpeza-colchoes-lisboa` |
+| Limpeza de Colchões | Colchões desde 59€ | Anti ácaros opcional | `/limpeza-colchoes-porto` | `/limpeza-colchoes-lisboa` |
 | Limpeza de Cadeiras | Desde 20€ por cadeira estofada | Preço menor por várias cadeiras | `/limpeza-cadeiras-porto` | `/limpeza-cadeiras-lisboa` |
 | Limpeza de Tapetes | Recolha e entrega ao domicílio | Orçamento à medida do seu tapete | `/limpeza-tapetes-porto` | `/limpeza-tapetes-lisboa` |
 
 Todos os URLs com `https://cleansolutions.com.pt` à frente; o sufixo de
 rastreio vem do nível da conta, não foi preciso pô-lo aqui.
+
+**26/09/2026:** a linha 2 de colchões era "Com tratamento anti ácaros", ao lado
+de "desde 59€". Lido junto, prometia o tratamento incluído nos 59€, quando o
+anti-ácaros é um extra orçamentado à parte (`TREATMENT_EXTRAS` em
+`commercialPolicy.ts`). Passou a "Anti ácaros opcional" nas duas campanhas.
+
+Os 6 sitelinks de 18/09 que continuam na lista de recursos são da
+`Campaign #1`, removida a 26/09: não servem, não é preciso apagá-los.
 
 ## Callouts, partilhados pelas duas campanhas (≤25)
 
@@ -34,6 +42,11 @@ rastreio vem do nível da conta, não foi preciso pô-lo aqui.
 - Garantia de repetição 48h `(25)`
 - 4,9 estrelas no Google `(22)`
 - +1100 clientes servidos `(23)`
+
+**Por decidir (26/09/2026):** os anúncios deixaram de dizer "no Google" nas
+avaliações, porque as fichas do Google mostram números por estabelecimento que
+não coincidem com o total. Este callout ficou com "4,9 estrelas no Google". A
+alternativa coerente com os anúncios é "Avaliação média de 4,9" `(22)`.
 
 ## Structured snippet, cabeçalho "Serviços"
 
@@ -122,8 +135,17 @@ Lisboa, e está associado **só à `Campaign #1`** (criado a 18/09). Cada conver
 aberta a partir dele conta na ação de conversão "Conversation started" (alojada
 na Google, principal, objetivo "Leads a partir de mensagens"). A nota antiga
 abaixo dizia que o Google não tinha recurso nativo de WhatsApp, o que já não é
-verdade. Por decidir com o dono: acrescentá-lo ao Porto e a Lisboa, com uma
-mensagem de cada cidade.
+verdade.
+
+**Aplicado a 26/09/2026:** um recurso de mensagem por grupo de anúncios (4),
+número 925 530 647, botão "Receber estimativa do custo", descrição "Resposta em
+menos de 10 min". A mensagem pré-escrita segue o texto que o botão de WhatsApp
+do site gera (`buildServiceWaMessage` em `src/lib/whatsappMessages.ts`), com o
+serviço e a cidade do grupo: "Olá! Gostaria de saber o preço e a próxima
+disponibilidade para limpar o meu sofá no Porto. Posso enviar fotografias para
+o orçamento." (e as variantes de impermeabilização e de Lisboa). Estavam "Em
+verificação" no fim do dia; com as campanhas em pausa, a Google pode só as rever
+depois de ativar.
 
 Nota antiga: um sitelink para `wa.me` não serve:
 o domínio de destino tem de ser o do anúncio. O caminho certo é o que o site já faz,

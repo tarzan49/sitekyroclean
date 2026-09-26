@@ -28,12 +28,28 @@ IMPER_ESSENC = le("src/components/quiz/QuizTypes.ts", r"id: '1-lugar',.*?waterpr
 IMPER_PREMIUM= le("src/components/quiz/QuizTypes.ts", r"id: '1-lugar',.*?waterproofingPremiumPrice: (\d+)")
 PACK_1L      = le("src/components/quiz/QuizTypes.ts", r"id: '1-lugar',.*?bothPrice: (\d+)")
 
-PREP = {"Porto": "no Porto", "Lisboa": "em Lisboa"}
+# A equipa do Porto também serve Braga, Guimarães e o resto do Norte.
+EQUIPA = {"Porto": "Equipa Própria no Norte", "Lisboa": "Equipa Própria em Lisboa"}
 # Decisão do dono (23/09/2026): Lisboa arranca com o dobro do Porto.
 ORCAMENTO = {"Porto": "13,00", "Lisboa": "27,00"}
 
+# Inserção automática da cidade (26/09/2026): quem pesquisa em Gaia ou no
+# Seixal lê "Limpeza de Sofás Gaia"; sem cidade reconhecida, sai o texto a
+# seguir aos dois pontos. A Google conta os carateres por esse texto.
+def cidade(city):
+    return "{LOCATION(City):" + city + "}"
+
+def visivel(texto):
+    return re.sub(r"\{LOCATION\(City\):([^}]*)\}", r"\1", texto)
+
+# Sem "no Google" (26/09/2026): a ficha do Google mostra números por
+# estabelecimento que não coincidem com o total, e o anúncio não pode prometer
+# o que a ficha ao lado desmente.
+AVAL_TITULO  = f"+{REVIEWS} Avaliações de Clientes"
+RATING_TITULO = f"Avaliação Média de {RATING}"
+
 def limpeza(city):
-    c, em = city.lower(), PREP[city]
+    c = city.lower()
     return dict(
         adgroup="Limpeza de Sofás",
         url=f"https://cleansolutions.com.pt/limpeza-sofas-{c}?ads=1",
@@ -47,33 +63,29 @@ def limpeza(city):
                   # "Presença", quem pesquisa só "limpeza de sofás" na zona também vê.
                   "limpeza de sofás", "limpeza sofá", "higienização de sofás",
                   "higienização sofá", "lavagem de sofás", "limpeza de estofos"],
-        headlines=[f"Limpeza de Sofás {city}", "Higienização de Sofás",
-                   f"{REVIEWS} Avaliações no Google", f"{RATING} Estrelas no Google",
+        # Os títulos com palavra-chave de procura (higienização, estofos, ao
+        # domicílio) levaram Lisboa de "Boa" a "Excelente"; a 26/09/2026 os dois
+        # anúncios de limpeza ficaram iguais, só muda a equipa.
+        headlines=[f"Limpeza de Sofás {cidade(city)}", f"Higienização de Sofás {cidade(city)}",
+                   AVAL_TITULO, RATING_TITULO,
                    f"{CLIENTES} Clientes Servidos", "Resposta em 10 Minutos",
                    "Orçamento Grátis no WhatsApp", "Preço Fechado Antes de Marcar",
-                   "Garantia de Repetição", "Limpeza ao Domicílio", "Seca em 3 a 6 Horas",
-                   "Manchas, Pelos e Odores", "Sofá Limpo sem Sair de Casa",
-                   f"Equipa Própria {em}", "Limpe e Proteja no Mesmo Dia"]
-                  if city == "Porto" else
-                  # Lisboa tinha eficácia "Boa" com os títulos do Porto; a Google pedia
-                  # mais palavras-chave populares nos títulos. Com estes três passou a
-                  # "Excelente" (26/09/2026). O Porto já estava em "Excelente".
-                  [f"Limpeza de Sofás {city}", f"Higienização de Sofás {city}",
-                   f"{REVIEWS} Avaliações no Google", f"{RATING} Estrelas no Google",
-                   f"{CLIENTES} Clientes Servidos", "Resposta em 10 Minutos",
-                   "Orçamento Grátis no WhatsApp", "Preço Fechado Antes de Marcar",
-                   "Garantia de Repetição", "Limpeza de Sofás ao Domicílio", "Seca em 3 a 6 Horas",
-                   "Manchas, Pelos e Odores", f"Limpeza de Estofos {em}",
-                   f"Equipa Própria {em}", "Limpe e Proteja no Mesmo Dia"],
+                   "Garantia de Repetição", "Limpeza de Sofás ao Domicílio",
+                   "Secagem Média de 3 a 6 Horas", "Manchas, Pelos e Odores",
+                   f"Limpeza de Estofos {cidade(city)}", EQUIPA[city],
+                   "Limpe e Proteja no Mesmo Dia"],
+        # Descrições sem cidade: a cidade já está nos títulos, e quem está em
+        # Almada não deve ler "em Lisboa".
         descriptions=[
-            f"Higienização profissional de sofás ao domicílio {em}. Secagem média de 3 a 6 horas.",
-            f"{RATING} estrelas no Google, {REVIEWS} avaliações reais e mais de 1100 clientes servidos.",
+            "Higienização profissional de sofás ao domicílio. Secagem média de 3 a 6 horas.",
+            f"Avaliação média de {RATING} em mais de {REVIEWS} avaliações e mais de "
+            f"{CLIENTES.lstrip('+')} clientes servidos.",
             "Preço fechado antes da marcação, sem surpresas. Orçamento grátis pelo WhatsApp.",
             "Se não ficar satisfeito, avise em 48 horas e repetimos a limpeza sem custos."],
     )
 
 def imper(city):
-    c, em = city.lower(), PREP[city]
+    c = city.lower()
     return dict(
         adgroup="Impermeabilização de Sofás",
         url=f"https://cleansolutions.com.pt/impermeabilizacao-{c}?ads=1",
@@ -84,19 +96,22 @@ def imper(city):
                   "pack limpeza e impermeabilização sofá",
                   "impermeabilização de sofás", "impermeabilização sofá",
                   "impermeabilizar sofá", "impermeabilização de estofos"],
-        headlines=["Impermeabilização de Sofás", f"Impermeabilizar Sofá {city}",
+        # "Limpa com um Pano, Sem Nódoa" e "saem com um pano seco" saíram a
+        # 26/09/2026: prometiam um resultado garantido que a proteção não dá.
+        # Os preços passaram a "Desde", porque o 59€ e o 99€ são de 1 lugar.
+        headlines=["Impermeabilização de Sofás", f"Impermeabilizar Sofá {cidade(city)}",
                    "Vinho, Café e Sumo no Sofá", "Derrames Ficam à Superfície",
-                   "Limpa com um Pano, Sem Nódoa", "Proteja Antes da Próxima Nódoa",
+                   "Impermeabilização de Estofos", "Proteja Antes da Próxima Nódoa",
                    "Crianças e Animais em Casa?", "Premium: Até 10 Anos",
-                   "Resiste a Até 5 Lavagens", f"Essencial {IMPER_ESSENC}€, Premium {IMPER_PREMIUM}€",
-                   f"Pack com Limpeza Desde {PACK_1L}€", f"{RATING} Estrelas no Google",
-                   f"{REVIEWS} Avaliações no Google", "Aplicação ao Domicílio",
+                   "Resiste a Até 5 Lavagens", f"Impermeabilização Desde {IMPER_ESSENC}€",
+                   f"Limpeza + Proteção Desde {PACK_1L}€", RATING_TITULO,
+                   AVAL_TITULO, "Aplicação ao Domicílio",
                    "Orçamento Grátis no WhatsApp"],
         descriptions=[
-            "Vinho, café ou sumo entornados ficam à superfície e saem com um pano seco.",
-            f"Impermeabilização de sofás ao domicílio {em}. Essencial desde {IMPER_ESSENC}€, Premium desde {IMPER_PREMIUM}€.",
+            "Com a proteção, vinho, café ou sumo ficam à superfície e limpam-se com mais facilidade.",
+            f"Impermeabilização de sofás ao domicílio. Essencial desde {IMPER_ESSENC}€, Premium desde {IMPER_PREMIUM}€.",
             "A Premium protege até 10 anos e resiste a até 5 lavagens. A Essencial, 1 a 2 anos.",
-            f"Limpeza e proteção na mesma visita, em pack desde {PACK_1L}€. {RATING} estrelas no Google."],
+            f"Limpeza e proteção na mesma visita, em pack desde {PACK_1L}€. Avaliação média de {RATING}."],
     )
 
 CAMPANHAS = [("Kyro | Porto | Limpeza e Proteção de Sofás | Set 2026", "Porto"),
@@ -128,10 +143,10 @@ erros = []
 for r in rows:
     for i in range(1, 16):
         v = r.get(f"Headline {i}", "")
-        if len(v) > 30: erros.append(f"título {len(v)}: {v}")
+        if len(visivel(v)) > 30: erros.append(f"título {len(visivel(v))}: {v}")
     for i in range(1, 5):
         v = r.get(f"Description {i}", "")
-        if len(v) > 90: erros.append(f"descrição {len(v)}: {v}")
+        if len(visivel(v)) > 90: erros.append(f"descrição {len(visivel(v))}: {v}")
     for p in ("Path 1", "Path 2"):
         if len(r.get(p, "")) > 15: erros.append(f"caminho: {r[p]}")
 if erros:

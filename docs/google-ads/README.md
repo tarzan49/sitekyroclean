@@ -215,6 +215,46 @@ Tudo confirmado depois de recarregar a página.
 Madeira, Ovar nem Oliveira de Azeméis, que agora recebem anúncios do Porto.
 Falta o dono dizer a taxa de deslocação para esses quatro.
 
+### Textos revistos e verificação final (26/09/2026, noite)
+
+**Textos:** os 4 anúncios foram reescritos com o dono (avaliações sem "no
+Google", cidade automática, descrições sem cidade, "Secagem Média", "Equipa
+Própria no Norte", impermeabilização sem "sai com um pano" e com preços
+"Desde"). Estão em `textos-dos-anuncios.md`, com o porquê de cada mudança. Os
+4 em "Excelente", lidos de volta da conta e iguais ao CSV que o
+`gerar-csv.py` gera. Sitelink de colchões: linha 2 passou a "Anti ácaros
+opcional" (ver `sitelinks-e-extensoes.md`).
+
+**Verificado na conta, depois de recarregar:**
+
+- Definições iguais nas duas campanhas: só Rede de Pesquisa, português,
+  "Presença", Maximizar cliques (13 €/dia Porto, 27 €/dia Lisboa), início a
+  23/09 sem fim, correspondência ampla desligada, recursos automáticos
+  desligados, personalização de texto e expansão do URL final desligadas.
+  Ou seja, só servem os textos acima e só para as páginas acima.
+- Política: o único problema da conta é o nome da empresa (contestação "Em
+  curso" desde 25/09). Nenhum anúncio nem recurso reprovado.
+- Recursos "Elegível": 6 callouts, snippet, chamada, logótipo, 2 de preço,
+  sitelinks. "Em verificação": os 2 sitelinks de colchões editados, 4 de
+  WhatsApp e 48 das 74 imagens (26 já elegíveis). Com as campanhas em pausa, a
+  revisão pode só acontecer depois de ativar.
+- Conversões principais: "Pedido confirmado (website)" (etiqueta reconhecida,
+  "Nenhuma conversão recente"), "WhatsApp - clique no site" (GA4) e
+  "Conversation started" (WhatsApp do anúncio). **O objetivo "Pedir
+  estimativa do custo" aparece como "Configuração incorreta":** está nas
+  predefinições da conta sem nenhuma ação principal (a única é antiga, inativa
+  e secundária). Não mexe em nada com Maximizar cliques; convém tirá-lo das
+  predefinições antes de passar a uma estratégia por conversões.
+- Faturação: crédito pré-pago de 177,45 €, pagamentos manuais, sem pagamento
+  automático. Com 40 €/dia dá para 4 a 5 dias; depois os anúncios param.
+- Páginas: os 13 destinos (anúncios e sitelinks) respondem 200 em menos de
+  0,3 s. Na impermeabilização, todas as promessas do anúncio estão visíveis
+  (59/89/99 €, 10 anos, 5 lavagens, 1 a 2 anos, 4,9, 125). **Na limpeza
+  (`?ads=1`), "+1100 clientes servidos", "preço fechado antes de marcar" e
+  "equipa própria" não aparecem na página**, e a garantia de 48 h só existe
+  dentro de uma secção fechada. Não é motivo de reprovação, mas é o anúncio a
+  prometer mais do que a página mostra.
+
 ## 3. As campanhas, como estão desenhadas
 
 Duas campanhas iguais na estrutura, uma por cidade, cada uma com dois grupos:
