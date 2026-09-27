@@ -203,7 +203,7 @@ Saídas da auditoria de código de 2026-09-26 (`CODE_AUDIT.md`, secção do topo
 - **"Condições do serviço e garantia" = `SERVICE_CONDITIONS` em `commercialPolicy.ts`**, desenhado pelo `BusinessConditions.tsx` e pelo HTML estático (antes eram listas diferentes em todas as páginas). As taxas de deslocação que lá aparecem vêm de `locationPrices` (`TRAVEL_FEE_MIN`/`TRAVEL_FEE_MAX`).
 - **Problema × cidade:** título e cidades vizinhas saem de `problemCityMeta`/`problemCityNeighbours` (`problemCitySeoData.ts`), para o React e o estático. O React voltara a usar `.slice(0, 8)`.
 - **Preposição das localidades é sempre `cityPrep`** ("no Barreiro", "na Amadora"), também no `landingEditorial.ts` e no `landingPageModel.ts`, que escreviam "em" à mão. Nas freguesias continua "em" de propósito.
-- **Por decidir pelo dono: o preço da cabeceira estofada.** O site diz "Desde 20€" (`priceSeoData.ts`, página de preço do colchão) e "Desde 15€"/"a partir de 15€" (`priceSeoData.ts` e a página de problema da cabeceira). O motor não tem preço de cabeceira; não escolher um sem o dono.
+- **Cabeceira estofada: sob orçamento (dono, 2026-09-27).** O site dizia "Desde 20€" num sítio e 15€ noutros dois; passou a "Sob orçamento" em todo o lado. Não voltar a pôr um preço sem o dono.
 - **Consola de produção:** os únicos erros que sobram vêm do script de deteção de bots que o **Cloudflare injeta** (`/cdn-cgi/challenge-platform`), bloqueado pela CSP em todas as páginas porque o token muda a cada pedido (não há hash possível). Se a "JavaScript detection" do Cloudflare não fizer falta, desligá-la no dashboard (Security → Bots); não abrir a CSP por causa disto.
 
 ## Glossário e longtail (2026-09-17)

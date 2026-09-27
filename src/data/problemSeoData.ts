@@ -1051,7 +1051,7 @@ const problemDefinitions: ProblemPage[] = [
     solutionDetail: "Extração profunda com produtos específicos para manchas orgânicas. O tratamento remove suor, óleos e resíduos acumulados, devolvendo a frescura e aparência original à cabeceira.",
     benefits: ["Remove suor e óleos capilares", "Anti-ácaros opcional", "Tratamento de manchas amareladas", "Desodorização incluída", "Ao domicílio", "Desde 15€"],
     faqs: [
-      { question: "Quanto custa limpar uma cabeceira de cama?", answer: "A limpeza de cabeceira estofada começa a partir de 15€, dependendo do tamanho e estado de sujidade." },
+      { question: "Quanto custa limpar uma cabeceira de cama?", answer: "A limpeza de cabeceira estofada é sob orçamento, porque depende do tamanho, do tecido e do estado de sujidade. Envie uma fotografia pelo WhatsApp e respondemos com o valor." },
     ],
     relatedProblems: ["manchas-colchao", "acaros-colchao", "cheiro-colchao"],
     relatedServices: ["limpeza-colchoes", "limpeza-cadeiras"],

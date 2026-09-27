@@ -63,7 +63,7 @@ const priceTables: Record<string, { item: string; price: string; note?: string }
     { item: "Colchão King Size", price: desde(mattressSize("king").cleaningPrice) },
     // Berço/criança não é um tamanho do quiz: cobra como o solteiro, o mais pequeno.
     { item: "Colchão berço/criança", price: desde(mattressSize("solteiro").cleaningPrice) },
-    { item: "Cabeceira estofada", price: "Desde 20€", note: "add-on" },
+    { item: "Cabeceira estofada", price: "Sob orçamento", note: "add-on" },
   ],
   "limpeza-tapetes": [
     { item: "Tapetes (qualquer dimensão)", price: "Sob orçamento", note: "medido à peça, largura x comprimento" },
@@ -81,7 +81,7 @@ const priceTables: Record<string, { item: string; price: string; note?: string }
     { item: "Sofá 2 lugares", price: desde(sofaSize("2-lugares").waterproofingPrice), note: `Essencial, ${eur(sofaSize("2-lugares").waterproofingPremiumPrice!)} na Premium` },
     { item: "Sofá 3 lugares", price: desde(sofaSize("3-lugares").waterproofingPrice), note: `Essencial, ${eur(sofaSize("3-lugares").waterproofingPremiumPrice!)} na Premium` },
     { item: "Cadeiras (por unidade)", price: `${CHAIR_WATERPROOF_ESSENTIAL}€/un`, note: `Essencial, ${CHAIR_WATERPROOF_PREMIUM}€/un na Premium` },
-    { item: "Cabeceira", price: "Desde 15€" },
+    { item: "Cabeceira", price: "Sob orçamento" },
   ],
 };
 
