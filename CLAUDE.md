@@ -355,6 +355,14 @@ WhatsApp não precisa de fazer nada: herda a marca**, desde que comece por
 "Olá". A deteção é só Google (`gclid`, ou `utm_source=google` pago), não o
 `isAdsVisit`, que aceita qualquer `cpc`: um anúncio da Meta não pode dizer
 "Google". Não usa cookies nem armazenamento, e é assim que tem de ficar.
+**Desde 28/09/2026, numa visita de anúncio os botões genéricos (barra fixa do
+telemóvel, cabeçalho) mandam a mensagem do botão principal da página**, com
+serviço e cidade: antes, a maior parte das mensagens chegava a dizer só
+"limpar os meus estofos" e o dono não sabia se era Lisboa ou Porto, limpeza ou
+impermeabilização. E as páginas de serviço mandam uma mensagem para preencher
+(localidade, tamanho, dia; na impermeabilização, também se quer a limpeza),
+pedida pelo dono para poder dar o preço na primeira resposta. Vive em
+`buildServiceWaMessage`; não voltar a uma frase corrida sem os campos.
 
 **Exportar não é importar.** `conversion_exports` guarda `queued`, `exported`,
 `submitted`, `accepted`, `rejected` em separado, e o CSV só é gerado depois de o
