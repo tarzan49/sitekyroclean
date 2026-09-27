@@ -61,6 +61,10 @@ describe('parseServiceEvent', () => {
     const nameAfterAddress = parse('Serviço 40€ (80€) Limpeza tapete - Rua das Flores 25 - Dora - +351 912 345 678');
     expect(nameAfterAddress?.client_name).toBe('Dora');
 
+    // Apelido que também é freguesia (Costa, Luz): continua a ser nome.
+    const surnameIsParish = parse('Serviço 45€ (90€) Limpeza sofá de 4 lugares - ‪+351 912 345 678‬ - Rita Costa - Rua Inventada n 12 nogueira maia');
+    expect(surnameIsParish).toMatchObject({ client_name: 'Rita Costa', city: 'Maia', locality: 'Porto' });
+
     const descriptionLater = parse('Serviço 40€(80€) -Rua das Flores porta 25 \n2830-345 Barreiro - limpeza tapete 4m2 - 912 345 678');
     expect(descriptionLater).toMatchObject({ description: 'Limpeza tapete 4m2', city: 'Barreiro', locality: 'Lisboa' });
   });

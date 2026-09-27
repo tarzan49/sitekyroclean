@@ -6,6 +6,7 @@
 // - Evento editado no calendário depois da última sincronização → a linha é
 //   atualizada. Uma edição feita no CRM mantém-se até o evento voltar a ser
 //   editado: ganha a alteração mais recente. O "pago" e a origem nunca são tocados.
+//   Exceção: um cliente vazio no CRM é preenchido se o evento tiver nome.
 // - Evento que desaparece (apagado, cancelado, ou deixou de começar por
 //   "Serviço") → a linha fica marcada, nunca é apagada. Se voltar, desmarca-se.
 import {
@@ -24,6 +25,7 @@ export const CALENDAR_SOURCE = 'Google Calendar';
 
 export interface SyncableRow {
   id: string;
+  client_name?: string | null;
   city: string | null;
   locality: CrmLocality | null;
   needs_review: string | null;
@@ -92,6 +94,11 @@ export function planCalendarSync(
     }
     if (!(time(row.calendar_updated_at) >= time(event.updated))) {
       Object.assign(patch, parsed, { calendar_updated_at: event.updated });
+      plan.counts.updated++;
+    } else if (!row.client_name && parsed.client_name) {
+      // Nome que a leitura antiga do evento não apanhou: preenche-se só o que
+      // está vazio, sem mexer no que o dono tenha editado no CRM.
+      patch.client_name = parsed.client_name;
       plan.counts.updated++;
     }
     if (Object.keys(patch).length) plan.updates.push({ id: row.id, patch });

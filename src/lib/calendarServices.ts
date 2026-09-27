@@ -179,7 +179,12 @@ function findPlace(text: string, list: Place[]): Place | null {
   return best?.place ?? null;
 }
 
-const isKnownPlace = (s: string) => Boolean(findPlace(s, municipalityPlaces) ?? findPlace(s, parishPlaces));
+// Só conta como sítio se o segmento começar por ele ("Nogueira Maia"). Um
+// apelido que também é freguesia ("Paula Costa", "Maria da Luz") é nome.
+const startsWithPlace = (s: string) => {
+  const hay = ` ${normalizeCity(s).replace(/[^a-z0-9]+/g, ' ').trim()} `;
+  return [...municipalityPlaces, ...parishPlaces].some(p => hay.startsWith(` ${p.key.replace(/[^a-z0-9]+/g, ' ')} `));
+};
 
 // ── Segmentos ─────────────────────────────────────────────────────────────
 
@@ -201,7 +206,7 @@ const isServiceLike = (s: string) => SERVICE_WORDS.test(normalizeCity(s));
 const isNameLike = (s: string) => {
   const words = s.split(/\s+/).filter(Boolean);
   return words.length >= 1 && words.length <= 4 && !/\d/.test(s) && /^[\p{L}][\p{L}'.\s-]*$/u.test(s)
-    && !isServiceLike(s) && !STREET_WORDS.test(normalizeCity(s)) && !isKnownPlace(s);
+    && !isServiceLike(s) && !STREET_WORDS.test(normalizeCity(s)) && !startsWithPlace(s);
 };
 
 const tidy = (s: string) => s.replace(/\s+/g, ' ').replace(/^[\s,.;:-]+|[\s,;:-]+$/g, '').trim();

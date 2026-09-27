@@ -39,8 +39,15 @@ describe('planCalendarSync', () => {
   });
 
   it('never inserts an event that is already linked', () => {
-    const linked = row('r1', { calendar_event_id: 'e1', calendar_updated_at: '2026-09-27T10:00:00+00:00' });
+    const linked = row('r1', { client_name: 'Ana', calendar_event_id: 'e1', calendar_updated_at: '2026-09-27T10:00:00+00:00' });
     expect(plan([linked], [event('e1')])).toMatchObject({ inserts: [], updates: [] });
+  });
+
+  it('fills an empty client name without waiting for a calendar edit, and leaves a written one alone', () => {
+    const linked = { calendar_event_id: 'e1', calendar_updated_at: '2026-09-27T10:00:00+00:00' };
+    expect(plan([row('r1', { ...linked, client_name: null })], [event('e1')]).updates)
+      .toEqual([{ id: 'r1', patch: { client_name: 'Ana' } }]);
+    expect(plan([row('r1', { ...linked, client_name: 'Ana Maria' })], [event('e1')]).updates).toEqual([]);
   });
 
   it('applies an edit made in the calendar after the last sync, but never touches "paid"', () => {
@@ -54,7 +61,7 @@ describe('planCalendarSync', () => {
   });
 
   it('marks a synced row whose event disappeared, and unmarks it if it comes back', () => {
-    const linked = row('r1', { calendar_event_id: 'e1', calendar_updated_at: '2026-09-27T10:00:00+00:00' });
+    const linked = row('r1', { client_name: 'Ana', calendar_event_id: 'e1', calendar_updated_at: '2026-09-27T10:00:00+00:00' });
     const gone = plan([linked], [event('other', { summary: 'Jantar' })]);
     expect(gone.updates).toEqual([{ id: 'r1', patch: { calendar_missing_since: now } }]);
     expect(gone.counts.missing).toBe(1);
