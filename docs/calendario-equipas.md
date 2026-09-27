@@ -55,18 +55,29 @@ Para desligar: função `desligar`. Os calendários ficam como estão.
   serviço sem preço escrito tem de ser feito na mesma.
 - **Equipa de cada serviço**, por esta ordem: "equipa porto" (ou lisboa,
   braga, algarve) escrito no evento; o código postal; os concelhos servidos;
-  as freguesias desses concelhos. São as mesmas regras e as mesmas listas que
-  o CRM usa para a região (`src/lib/calendarServices.ts`): uma equipa por
-  região (dono, 28/09/2026). Aveiro e Coimbra vão para o Porto e o Alentejo
-  para Lisboa, como no `travel.ts`.
-- **Serviço sem equipa:** não é copiado, e o dono recebe um email a pedir o
-  código postal ou "equipa porto" (braga, lisboa, algarve) no evento. Assim que o
-  evento for guardado, segue para a equipa. Não se adivinha: um palpite
-  errado mandava o serviço para quem não o vai fazer, sem ninguém dar por
-  isso. Com os serviços marcados a 28/09, 15 em 18 tinham equipa (10 Lisboa,
-  4 Porto, 1 Algarve); os 3 que
-  faltavam não tinham código postal nem uma localidade conhecida ("via
-  longa", "Pucariça" e uma rua sem cidade).
+  as freguesias desses concelhos; e, se nada disso chegar, **a morada no
+  Google Maps** (dono, 28/09/2026: "pela morada deve saber automaticamente").
+  As quatro primeiras são as mesmas regras e listas que o CRM usa para a
+  região (`src/lib/calendarServices.ts`): uma equipa por região. Aveiro e
+  Coimbra vão para o Porto e o Alentejo para Lisboa, como no `travel.ts`.
+- **O Maps** (serviço Maps do próprio Apps Script, sem chave) recebe só a
+  morada: o título sem o primeiro bocado (serviço e valores), sem telefones e
+  sem o nome ao lado do telefone. A equipa sai do código postal do sítio
+  encontrado, com a mesma regra do CRM. Um sítio fora de todas as regiões
+  (Leiria, Beira Interior) vai para a equipa com a base mais perto; ilhas e
+  estrangeiro ficam sem equipa. Quando a equipa veio do Maps e o evento não
+  tem local, a morada que o Maps encontrou vai para o "Onde" da cópia: a
+  equipa vê o sítio que foi escolhido e pode navegar até lá. Cada morada
+  procura-se uma vez e fica guardada (o Maps tem limite diário). Se o Maps
+  falhar, o serviço espera pela volta seguinte e a cópia que já tiver não é
+  tocada.
+- **Serviço sem equipa:** só quando nem o Maps encontra a morada (ou o título
+  não tem morada à parte, como "Serviço 70€ (130€) imper cadeiras"). Não é
+  copiado, e o dono recebe um email a pedir o código postal ou "equipa porto"
+  (braga, lisboa, algarve) no evento. Assim que o evento for guardado, segue
+  para a equipa. Na primeira volta, a 28/09, ainda sem o Maps, ficaram assim
+  4 serviços: uma aldeia que o site não conhece, "via longa" em vez de
+  Vialonga e duas ruas sem cidade.
 - **A hora é a de Portugal.** A hora que o dono escreve no evento é a hora de
   Portugal (dono, 28/09/2026). O calendário dele está no fuso de Copenhaga
   desde 23/08/2026, por isso um serviço marcado às 15:00 fica guardado como

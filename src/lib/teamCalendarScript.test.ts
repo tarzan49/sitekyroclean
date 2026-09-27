@@ -233,6 +233,61 @@ describe('o que muda nos calendários das equipas', () => {
     expect(mensagem.texto).toContain('Está no calendário "Kyro · Equipa Lisboa".');
   });
 
+  describe('quando o código postal e as listas do site não chegam, procura a morada no Maps', () => {
+    // Moradas inventadas, com respostas do Maps inventadas.
+    const semCidade = evento('m1', 'Serviço 45€ (89€) Limpeza de sofá - +351 910 000 003 - Rua Inventada 376, 1º');
+    const aldeia = evento('m2', 'Serviço 115€ (230€) Limpeza de colchões - Joana Teste - 910000004 - Rua Central, 06 -Aldeia Inventada');
+    const mapaDeTeste = (respostas: Record<string, unknown>) => {
+      const perguntas: string[] = [];
+      return { perguntas, procurar: (morada: string) => { perguntas.push(morada); return respostas[morada]; } };
+    };
+
+    it('manda ao Maps só a morada, sem o serviço, o telefone e o nome', () => {
+      expect(gs.moradaDoEvento(semCidade)).toBe('Rua Inventada 376, 1º');
+      expect(gs.moradaDoEvento(aldeia)).toBe('Rua Central, 06, Aldeia Inventada');
+      expect(gs.moradaDoEvento(evento('m3', 'Serviço 45€ (89€) sofá - +351 910 000 005 Rita Exemplo - Rua Nova 11, Vale Inventado'))).toBe('Rua Nova 11, Vale Inventado');
+      expect(gs.moradaDoEvento(evento('m4', 'Serviço 70€ (130€) imper cadeiras'))).toBe('');
+    });
+
+    it('decide a equipa pelo código postal do sítio encontrado, e dá o sítio à equipa', () => {
+      const mapa = mapaDeTeste({
+        'Rua Inventada 376, 1º': { encontrado: true, morada: 'Rua Inventada 376, 4000-000 Porto, Portugal', codigoPostal: '4000-000', lat: 41.15, lng: -8.61 },
+      });
+      const { copias, pendentes } = gs.copiasDesejadas([semCidade, lisboa], COPENHAGA, mapa.procurar);
+      expect(copias.get('m1').equipaId).toBe('porto');
+      expect(copias.get('m1').corpo.location).toBe('Rua Inventada 376, 4000-000 Porto, Portugal');
+      expect(pendentes).toEqual([]);
+      // O que já se resolve pelo código postal nunca vai ao Maps.
+      expect(mapa.perguntas).toEqual(['Rua Inventada 376, 1º']);
+    });
+
+    it('fora de todas as regiões, vai para a equipa mais perto; nas ilhas não adivinha', () => {
+      expect(gs.equipaPeloMapa({ encontrado: true, codigoPostal: '2400-000', lat: 39.74, lng: -8.81 }).id).toBe('lisboa');
+      expect(gs.equipaPeloMapa({ encontrado: true, codigoPostal: '6300-000', lat: 40.54, lng: -7.27 }).id).toBe('porto');
+      expect(gs.equipaPeloMapa({ encontrado: true, codigoPostal: null, lat: 37.95, lng: -8.87 }).id).toBe('lisboa');
+      expect(gs.equipaPeloMapa({ encontrado: true, codigoPostal: '9000-000', lat: 32.65, lng: -16.91 })).toBeNull();
+      expect(gs.equipaPeloMapa({ encontrado: false })).toBeNull();
+    });
+
+    it('avisa o dono só quando nem o Maps encontra a morada', () => {
+      const mapa = mapaDeTeste({ 'Rua Central, 06, Aldeia Inventada': { encontrado: false } });
+      const { copias, pendentes } = gs.copiasDesejadas([aldeia], COPENHAGA, mapa.procurar);
+      expect(copias.size).toBe(0);
+      expect(pendentes.map((e: Evento) => e.id)).toEqual(['m2']);
+    });
+
+    it('se o Maps não responder, não mexe na cópia que já existe nem avisa ninguém', () => {
+      const encontrado = mapaDeTeste({ 'Rua Inventada 376, 1º': { encontrado: true, morada: 'Porto', codigoPostal: '4000-000', lat: 41.15, lng: -8.61 } });
+      const { copias } = gs.copiasDesejadas([semCidade], COPENHAGA, encontrado.procurar);
+      const existentes = [...copias].map(([origemId, c]: [string, { equipaId: string; corpo: Evento & { extendedProperties: unknown } }]) =>
+        ({ equipaId: c.equipaId, origemId, evento: copiaGravada(c.corpo, 'copia-m1') }));
+      const semResposta = gs.copiasDesejadas([{ ...semCidade, summary: `${semCidade.summary} B` }], COPENHAGA, mapaDeTeste({}).procurar);
+      expect([...semResposta.adiados]).toEqual(['m1']);
+      expect(semResposta.pendentes).toEqual([]);
+      expect(gs.planear(semResposta.copias, existentes, AGORA, false, semResposta.adiados)).toEqual([]);
+    });
+  });
+
   it('avisa o dono uma vez de cada serviço sem equipa, e outra vez se ele o mudar', () => {
     const primeira = gs.pendentesNovos([semMorada], {}, AGORA);
     expect(primeira.novos.map((e: Evento) => e.id)).toEqual(['c3']);
