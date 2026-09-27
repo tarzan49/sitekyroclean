@@ -222,6 +222,10 @@ function pessoasDoCalendario(calendario) {
     .map(function (r) { return r.scope.value; });
 }
 
+// Muda quando o que se guarda de cada morada muda, para as respostas antigas
+// não servirem (a primeira versão não guardava se a resposta era parcial).
+const MEMORIA_DO_MAPA = 'mapa2:';
+
 /**
  * O Google Maps com memória: cada morada procura-se uma vez, porque o script
  * corre a cada 15 minutos e o Maps tem limite diário. Só fica guardado o que
@@ -233,7 +237,7 @@ function mapaComMemoria(propriedades) {
   const usadas = {};
   return {
     procurar: function (morada) {
-      const chave = 'mapa:' + resumo(morada);
+      const chave = MEMORIA_DO_MAPA + resumo(morada);
       if (chave in todas) {
         usadas[chave] = todas[chave];
         return JSON.parse(todas[chave]);
@@ -250,7 +254,7 @@ function mapaComMemoria(propriedades) {
     },
     guardar: function (apagarAsOutras) {
       if (apagarAsOutras !== false) {
-        for (const chave in todas) if (chave.indexOf('mapa:') === 0 && !(chave in usadas)) propriedades.deleteProperty(chave);
+        for (const chave in todas) if (/^mapa\d*:/.test(chave) && !(chave in usadas)) propriedades.deleteProperty(chave);
       }
       propriedades.setProperties(usadas);
     },
@@ -281,11 +285,22 @@ function lerMapa(morada) {
       if (codigoPostal) break;
     }
   }
-  return { encontrado: true, morada: lugar.formatted_address, codigoPostal: codigoPostal || null, lat: ponto.lat, lng: ponto.lng };
+  const nomes = ['locality', 'sublocality', 'neighborhood', 'administrative_area_level_3', 'administrative_area_level_2']
+    .map(function (tipo) { return componenteDoMapa(lugar, tipo, 'long_name'); })
+    .filter(Boolean);
+  return {
+    encontrado: true,
+    parcial: Boolean(lugar.partial_match),
+    nomes: nomes,
+    morada: lugar.formatted_address,
+    codigoPostal: codigoPostal || null,
+    lat: ponto.lat,
+    lng: ponto.lng,
+  };
 }
 
-function componenteDoMapa(lugar, tipo) {
-  for (const parte of lugar.address_components || []) if (parte.types.indexOf(tipo) >= 0) return parte.short_name;
+function componenteDoMapa(lugar, tipo, campo) {
+  for (const parte of lugar.address_components || []) if (parte.types.indexOf(tipo) >= 0) return parte[campo || 'short_name'];
   return null;
 }
 
@@ -409,6 +424,22 @@ function noContinente(lat, lng) {
  * do CRM; fora de todas as regiões (Leiria, Beira Interior), a equipa com a
  * base mais perto. Ilhas e estrangeiro ficam sem equipa.
  */
+/**
+ * Uma resposta parcial do Maps (só encontrou parte da morada) só vale se o
+ * sítio que devolveu estiver escrito na morada. Visto a 28/09/2026: "Rua
+ * Central, 06, Pucariça" deu "Pocariça" (Cantanhede), quando a certa é a de
+ * Mafra; e uma rua sem cidade deu a de Braga, quando há outra em Coimbra.
+ * Uma resposta completa vale sempre.
+ */
+function mapaConfere(resultado, morada) {
+  if (!resultado.parcial) return true;
+  const escrito = normalizar(morada).replace(/[^a-z0-9]/g, '');
+  return (resultado.nomes || []).some(function (nome) {
+    const chave = normalizar(nome).replace(/[^a-z0-9]/g, '');
+    return chave.length >= 4 && escrito.indexOf(chave) >= 0;
+  });
+}
+
 function equipaPeloMapa(resultado) {
   if (!resultado || !resultado.encontrado) return null;
   const regiao = resultado.codigoPostal ? regiaoPorCodigoPostal(resultado.codigoPostal) : null;
@@ -505,7 +536,7 @@ function copiasDesejadas(origens, fusoDoCalendario, procurarNoMapa) {
         adiados.add(origem.id);
         continue;
       }
-      equipa = equipaPeloMapa(resultado);
+      equipa = resultado && mapaConfere(resultado, morada) ? equipaPeloMapa(resultado) : null;
       if (equipa) pelaMorada = resultado.morada;
     }
     if (!equipa) {

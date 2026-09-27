@@ -269,6 +269,20 @@ describe('o que muda nos calendários das equipas', () => {
       expect(gs.equipaPeloMapa({ encontrado: false })).toBeNull();
     });
 
+    it('não aceita uma resposta parcial com outro sítio que não o escrito', () => {
+      // Como "Pucariça" → "Pocariça" (Cantanhede), visto a 28/09/2026.
+      const parecido = { encontrado: true, parcial: true, nomes: ['Aldeia Inventoda', 'Concelho Longe'], morada: 'Aldeia Inventoda, Portugal', codigoPostal: '3060-000', lat: 40.35, lng: -8.59 };
+      // Como uma rua sem cidade que existe em duas cidades.
+      const ruaNoutraCidade = { encontrado: true, parcial: true, nomes: ['Braga', 'São Qualquer'], morada: 'Rua Inventada 376, 4710-000 Braga', codigoPostal: '4710-000', lat: 41.55, lng: -8.42 };
+      const mapa = mapaDeTeste({ 'Rua Central, 06, Aldeia Inventada': parecido, 'Rua Inventada 376, 1º': ruaNoutraCidade });
+      const { copias, pendentes } = gs.copiasDesejadas([aldeia, semCidade], COPENHAGA, mapa.procurar);
+      expect(copias.size).toBe(0);
+      expect(pendentes.map((e: Evento) => e.id)).toEqual(['m2', 'm1']);
+      // Parcial, mas com o sítio escrito na morada: vale.
+      expect(gs.mapaConfere({ ...parecido, nomes: ['Aldeia Inventada'] }, 'Rua Central, 06, Aldeia Inventada')).toBe(true);
+      expect(gs.mapaConfere({ ...ruaNoutraCidade, parcial: false }, 'Rua Inventada 376, 1º')).toBe(true);
+    });
+
     it('avisa o dono só quando nem o Maps encontra a morada', () => {
       const mapa = mapaDeTeste({ 'Rua Central, 06, Aldeia Inventada': { encontrado: false } });
       const { copias, pendentes } = gs.copiasDesejadas([aldeia], COPENHAGA, mapa.procurar);
