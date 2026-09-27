@@ -38,7 +38,7 @@ const EQUIPAS = [
 
 // Muda quando as cores das equipas (ou o que se faz na lista do dono) mudarem,
 // para os calendários voltarem a ser arrumados.
-const VERSAO_DAS_CORES = '3';
+const VERSAO_DAS_CORES = '4';
 
 const FUSO_PORTUGAL = 'Europe/Lisbon';
 const DIAS_ANTES = 2;
@@ -205,18 +205,18 @@ function pintarServicos(copias, agora) {
 }
 
 /**
- * Os calendários das equipas na lista do dono: com a cor da equipa e
- * escondidos. São dele (o script corre na conta dele), por isso a Google
- * mostrava-lhe cada serviço duas vezes, o original e a cópia (dono,
- * 28/09/2026: "porque é que eu estou a ver a cópia?"). Escondidos continuam
- * a funcionar para as equipas; para ver um, Definições → o calendário →
- * "Mostrar na lista". Uma vez por versão.
+ * Os calendários das equipas na lista do dono, com a cor da equipa e
+ * visíveis: é por eles que o dono vê que equipa vai a cada serviço (dono,
+ * 28/09/2026: "só quero que me apareça no calendário o que aparece às
+ * equipas"). Para não ver cada serviço duas vezes, o dono esconde o seu
+ * próprio calendário no telemóvel. Estiveram escondidos umas horas nesse
+ * dia, quando ele via os dois. Uma vez por versão.
  */
 function pintarCalendarios(calendarios, propriedades) {
   if (propriedades.getProperty('coresDosCalendarios') === VERSAO_DAS_CORES) return;
   for (const equipa of EQUIPAS) {
     Calendar.CalendarList.patch(
-      { backgroundColor: equipa.corDoCalendario, foregroundColor: '#ffffff', hidden: true, selected: false },
+      { backgroundColor: equipa.corDoCalendario, foregroundColor: '#ffffff', hidden: false, selected: true },
       calendarios[equipa.id],
       { colorRgbFormat: true }
     );
