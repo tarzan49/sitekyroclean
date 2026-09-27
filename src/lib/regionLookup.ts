@@ -1,6 +1,6 @@
 // A região de um serviço cujo texto não a diz (2026-09-28). Ex.: "Limpeza de
 // sofá - 936 000 000 - Rua D. João IV 376, 1º, 105", sem cidade nem código
-// postal. Duas pistas, por esta ordem:
+// postal. Três pistas, por esta ordem:
 //
 // 1. O telefone: um cliente que já está no CRM com a região confirmada. Se o
 //    mesmo número aparecer em regiões diferentes, não decide.
@@ -9,11 +9,13 @@
 //    primeira (a mais relevante para o mapa) e a linha pede confirmação, com a
 //    alternativa escrita: "Rua D. João IV" é quase toda no Porto, mas há uma
 //    em Famalicão.
+// 3. A linha "Equipa: X" que o script dos calendários das equipas escreve na
+//    descrição do evento.
 //
 // Corre no separador CRM, depois de `planCalendarSync`, que fica síncrono e
 // testável sem rede.
 import {
-  localityFromPostalCode, parseServiceEvent, placeByName, streetForMap,
+  localityFromPostalCode, parseServiceEvent, placeByName, streetForMap, teamRegionOf,
   type CalendarEvent, type CrmLocality,
 } from './calendarServices';
 import type { SyncPlan } from './calendarSync';
@@ -146,6 +148,12 @@ export async function resolveMissingRegions(
       } catch {
         found = null;
       }
+    }
+    // Por fim, a equipa que o script dos calendários escolheu. Quando ele não
+    // tem a certeza, já mandou email ao dono.
+    if (!found && target.event) {
+      const team = teamRegionOf(target.event);
+      if (team) found = { locality: team, city: null, note: null };
     }
     if (!found) continue;
     target.apply({ locality: found.locality, city: target.city ?? found.city, needs_review: withoutUnknown(target.review, found.note) });

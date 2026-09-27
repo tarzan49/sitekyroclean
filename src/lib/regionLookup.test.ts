@@ -96,6 +96,21 @@ describe('resolveMissingRegions', () => {
     expect(plan.updates[0].patch).toMatchObject({ locality: 'Braga', city: 'Braga' });
   });
 
+  it('falls back to the team line written by the team calendars script', async () => {
+    const withTeam = { ...event('e1', noAddress), description: 'Equipa: Lisboa 2\n\nNotas' };
+    const plan = planCalendarSync([], [withTeam], { since, now });
+    expect(plan.inserts[0].city).toBeNull(); // "Lisboa" da equipa não é a cidade
+    await resolveMissingRegions([], plan, [withTeam], { search: search([]), pauseMs: 0 });
+    expect(plan.inserts[0]).toMatchObject({ locality: 'Lisboa', city: null, needs_review: null });
+  });
+
+  it('prefers the map to the team line, for the city', async () => {
+    const withTeam = { ...event('e1', noAddress), description: 'Equipa: Porto' };
+    const plan = planCalendarSync([], [withTeam], { since, now });
+    await resolveMissingRegions([], plan, [withTeam], { search: search([braga]), pauseMs: 0 });
+    expect(plan.inserts[0]).toMatchObject({ locality: 'Braga', city: 'Braga' });
+  });
+
   it('leaves the row as it was when the map is down', async () => {
     const plan = planCalendarSync([], [event('e1', noAddress)], { since, now });
     const failing: MapSearch = async () => { throw new Error('offline'); };
