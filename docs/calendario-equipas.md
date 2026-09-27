@@ -53,14 +53,17 @@ Para desligar: função `desligar`. Os calendários ficam como estão.
   "Limpeza" seguido de um valor em euros. É a regra do CRM, com uma diferença
   de propósito: um "Serviço" sem valor também vai para a equipa, porque um
   serviço sem preço escrito tem de ser feito na mesma.
-- **Duas equipas em Lisboa** (dono, 28/09/2026, "escolho em cada serviço"):
-  tudo o que for da região Lisboa vai sozinho para a **Lisboa 1**; a
-  **Lisboa 2** só recebe o que tiver "equipa lisboa 2" escrito no evento (no
-  título ou na descrição). Não tem região nem base, por isso nunca é
-  escolhida pela morada nem por ser a mais perto. A equipa escrita conta
-  como certa e não gera aviso. Quando o dono escreve "equipa lisboa 2" num
-  serviço que já estava na Lisboa 1, ele sai de uma e entra na outra, com
-  email às duas.
+- **Duas equipas em Lisboa** (dono, 28/09/2026). A equipa sai da parte do
+  dono no valor: "o serviço que for 65 ou 70% para mim é a equipa 2". Um
+  serviço da região Lisboa em que o primeiro valor é 60% a 80% do valor entre
+  parênteses ("Serviço 70€ (100€)") vai para a **Lisboa 2**; os outros, a
+  meias como nas outras equipas ("45€ (89€)"), vão para a **Lisboa 1**. A
+  margem aguenta arredondamentos e fica longe dos 50%. Sem os dois valores
+  escritos fica na Lisboa 1. Noutras regiões a parte não conta. "equipa
+  lisboa 1" ou "equipa lisboa 2" escrito no evento ganha a tudo. A Lisboa 2
+  não tem região nem base, por isso nunca é escolhida pela morada nem por ser
+  a mais perto. Quando um serviço passa de uma para a outra, sai de uma e
+  entra na outra, com email às duas.
 - **Equipa de cada serviço**, por esta ordem: "equipa porto" (ou lisboa,
   braga, algarve) escrito no evento; o código postal; os concelhos servidos;
   as freguesias desses concelhos; e, se nada disso chegar, **a morada no

@@ -135,6 +135,24 @@ describe('região e equipa de cada serviço', () => {
     expect(gs.equipaPeloMapa({ encontrado: true, codigoPostal: '2400-000', lat: 39.74, lng: -8.81 }).id).toBe('lisboa');
   });
 
+  it('manda para a Lisboa 2 os serviços de Lisboa em que a parte do dono é 65% ou 70%', () => {
+    // Dono, 28/09/2026: "o serviço que for 65 ou 70% para mim é a equipa 2".
+    const equipa = (summary: string) => gs.copiasDesejadas([evento('p1', summary)]).copias.get('p1').equipaId;
+    expect(gs.parteDoDono('Serviço 70€ (100€) sofá')).toBeCloseTo(0.7);
+    expect(gs.parteDoDono('Serviço 32,5€ (65€) colchão')).toBeCloseTo(0.5);
+    expect(gs.parteDoDono('Serviço 50€/100€ tapetes')).toBeCloseTo(0.5);
+    expect(gs.parteDoDono('Serviço 1.200€ (1.500€) hotel')).toBeCloseTo(0.8);
+    expect(gs.parteDoDono('Serviço 80€ sofá')).toBeNull();
+    expect(equipa('Serviço 65€ (100€) sofá - Rua X 3, 1600-000 Lisboa')).toBe('lisboa2');
+    expect(equipa('Serviço 70€ (99€) sofá - Rua X 3, Seixal')).toBe('lisboa2');
+    expect(equipa('Serviço 45€ (89€) sofá - Rua X 3, 1600-000 Lisboa')).toBe('lisboa');
+    expect(equipa('Serviço 80€ sofá - Rua X 3, 1600-000 Lisboa')).toBe('lisboa');
+    // Só em Lisboa: noutra região a parte não muda a equipa.
+    expect(equipa('Serviço 70€ (100€) sofá - Rua X 3, 4000-000 Porto')).toBe('porto');
+    // O que está escrito ganha à parte.
+    expect(equipa('Serviço 70€ (100€) sofá - Rua X 3, 1600-000 Lisboa - equipa lisboa 1')).toBe('lisboa');
+  });
+
   it('não confunde o nome da rua com a cidade', () => {
     expect(gs.regiaoDoEvento({ summary: 'Serviço 50€ (99€) sofá - Rua de Braga 12, Almada' })).toBe('Lisboa');
   });

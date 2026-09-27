@@ -25,8 +25,9 @@
 // 10 Basílico, 6 Tangerina, 5 Banana, 3 Uva) e `corDoCalendario` é a mesma
 // cor no calendário da equipa, para as duas coisas baterem certo.
 // `escrito` é o que o dono escreve depois de "equipa" para forçar a equipa.
-// A Lisboa 2 não tem região nem base (dono, 28/09/2026: "escolho em cada
-// serviço"): só recebe o que tiver "equipa lisboa 2" escrito.
+// A Lisboa 2 não tem região nem base: recebe os serviços de Lisboa em que a
+// parte do dono é 60% a 80% do valor (ver `equipaPelaParte`) e o que tiver
+// "equipa lisboa 2" escrito.
 const EQUIPAS = [
   { id: 'porto', nome: 'Kyro · Equipa Porto', escrito: ['porto'], regioes: ['Porto'], base: [41.1496, -8.6110], cor: '9', corDoCalendario: '#3f51b5' },
   { id: 'braga', nome: 'Kyro · Equipa Braga', escrito: ['braga'], regioes: ['Braga'], base: [41.5454, -8.4265], cor: '10', corDoCalendario: '#0b8043' },
@@ -472,6 +473,36 @@ function equipaEscrita(evento) {
   return EQUIPAS.find(function (e) { return e.escrito.indexOf(nome) >= 0; }) || null;
 }
 
+function numeroDoValor(texto) {
+  const semMilhares = /^\d{1,3}(\.\d{3})+(,\d{1,2})?$/.test(texto) ? texto.replace(/\./g, '') : texto;
+  return Number(semMilhares.replace(',', '.'));
+}
+
+/**
+ * A parte do dono no valor faturado: "70€ (100€)" dá 0,7. A mesma leitura
+ * dos valores que o CRM faz. Sem os dois valores escritos, null.
+ */
+function parteDoDono(titulo) {
+  const valor = VALOR.exec(limpar(titulo));
+  if (!valor) return null;
+  const faturado = valor[2] || valor[3] || valor[4];
+  const total = faturado ? numeroDoValor(faturado) : 0;
+  return total > 0 ? numeroDoValor(valor[1]) / total : null;
+}
+
+// Dono, 28/09/2026: "o serviço que for 65 ou 70% para mim é a equipa 2".
+// A margem (60% a 80%) aguenta os arredondamentos (70€ de 99€ são 71%) e fica
+// longe da divisão a meias das outras equipas (45€ de 89€ são 51%).
+const PARTE_DA_LISBOA_2 = [0.6, 0.8];
+
+/** Um serviço de Lisboa em que a parte do dono é de 60% a 80% vai para a Lisboa 2. */
+function equipaPelaParte(equipa, evento) {
+  if (!equipa || equipa.id !== 'lisboa') return equipa;
+  const parte = parteDoDono(evento.summary);
+  if (parte === null || parte < PARTE_DA_LISBOA_2[0] || parte > PARTE_DA_LISBOA_2[1]) return equipa;
+  return EQUIPAS.find(function (e) { return e.id === 'lisboa2'; }) || equipa;
+}
+
 function equipaDaRegiao(regiao) {
   return EQUIPAS.find(function (e) { return e.regioes.indexOf(regiao) >= 0; }) || null;
 }
@@ -665,6 +696,7 @@ function copiasDesejadas(origens, procurarNoMapa) {
         duvida = duvidaDoMapa(resultado);
       }
     }
+    if (!escrita) equipa = equipaPelaParte(equipa, origem);
     if (!equipa) {
       pendentes.push(origem);
       continue;
