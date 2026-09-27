@@ -580,7 +580,7 @@ const CrmPanel = () => {
             <thead>
               <tr className="border-b border-gray-200 bg-gray-50">
                 {["Dia", "Fechado", "Descrição", "Cliente", "Localidade", "Cidade", "Telefone", "Origem", "Faturado", "Meu cut", "Pago", ""].map(h => (
-                  <th key={h} className="text-left px-3 py-2 text-[10.5px] font-bold text-gray-500 uppercase tracking-wider whitespace-nowrap">{h}</th>
+                  <th key={h} className={`text-left px-3 py-2 text-[10.5px] font-bold text-gray-500 uppercase tracking-wider whitespace-nowrap ${h === "" ? "sticky right-0 bg-gray-50" : ""}`}>{h}</th>
                 ))}
               </tr>
             </thead>
@@ -626,7 +626,7 @@ const CrmPanel = () => {
                       {r.paid ? "Pago" : "Por pagar"}
                     </button>
                   </td>
-                  <td className="px-3 py-2 whitespace-nowrap">
+                  <td className="px-3 py-2 whitespace-nowrap sticky right-0 bg-white shadow-[-6px_0_8px_-6px_rgba(0,0,0,0.12)]">
                     <div className="flex items-center gap-1">
                       {r.calendar_missing_since && (
                         <button onClick={() => keepMissing(r)} title="O serviço fez-se: manter a linha e desligá-la do calendário"
