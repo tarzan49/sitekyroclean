@@ -7,6 +7,8 @@
 
 export interface ClosingRow {
   booked_at: string | null;
+  /** Dia do serviço (AAAA-MM-DD). Só serve para separar o que foi fechado para meses seguintes. */
+  request_date?: string;
   billed_value: number;
   my_cut: number;
 }
@@ -32,6 +34,8 @@ export interface ClosingsSummary {
   byWeekday: WeekdayTotals[];
   /** Linhas sem data de fecho: ficam de fora, e a página diz quantas são. */
   withoutDate: number;
+  /** Fechados no período para um dia de serviço depois de `aheadAfter` (já contam no total). */
+  ahead: { count: number; billed: number; cut: number };
 }
 
 export const WEEKDAY_SHORT = ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'];
@@ -56,11 +60,26 @@ export function weekdayOf(day: string): number {
   return (new Date(toUtcNoon(day)).getUTCDay() + 6) % 7;
 }
 
-export function summarizeClosings(rows: ClosingRow[], from: string, to: string): ClosingsSummary {
+/** Primeiro e último dia de um mês AAAA-MM. */
+export function monthBounds(month: string): { first: string; last: string } {
+  const first = `${month}-01`;
+  const next = new Date(toUtcNoon(first));
+  next.setUTCMonth(next.getUTCMonth() + 1);
+  return { first, last: addDays(fromUtc(next.getTime()), -1) };
+}
+
+export function shiftMonth(month: string, n: number): string {
+  const d = new Date(toUtcNoon(`${month}-01`));
+  d.setUTCMonth(d.getUTCMonth() + n);
+  return fromUtc(d.getTime()).slice(0, 7);
+}
+
+export function summarizeClosings(rows: ClosingRow[], from: string, to: string, aheadAfter: string = to): ClosingsSummary {
   const perDayMap = new Map<string, DayTotals>();
   for (let d = from; d <= to; d = addDays(d, 1)) perDayMap.set(d, { day: d, count: 0, billed: 0, cut: 0 });
 
   let withoutDate = 0;
+  const ahead = { count: 0, billed: 0, cut: 0 };
   for (const r of rows) {
     if (!r.booked_at) { withoutDate++; continue; }
     const bucket = perDayMap.get(lisbonDay(r.booked_at));
@@ -68,6 +87,11 @@ export function summarizeClosings(rows: ClosingRow[], from: string, to: string):
     bucket.count++;
     bucket.billed += Number(r.billed_value) || 0;
     bucket.cut += Number(r.my_cut) || 0;
+    if (r.request_date && r.request_date > aheadAfter) {
+      ahead.count++;
+      ahead.billed += Number(r.billed_value) || 0;
+      ahead.cut += Number(r.my_cut) || 0;
+    }
   }
 
   const perDay = [...perDayMap.values()];
@@ -89,5 +113,6 @@ export function summarizeClosings(rows: ClosingRow[], from: string, to: string):
     perDay,
     byWeekday,
     withoutDate,
+    ahead,
   };
 }

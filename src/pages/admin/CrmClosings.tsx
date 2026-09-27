@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
-import { addDays, lisbonDay, summarizeClosings, WEEKDAY_LONG, WEEKDAY_SHORT, type ClosingRow } from "@/lib/crmClosings";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import { addDays, lisbonDay, monthBounds, shiftMonth, summarizeClosings, WEEKDAY_LONG, WEEKDAY_SHORT, type ClosingRow } from "@/lib/crmClosings";
 
 // Aba "Fechos" do CRM: em que dias da semana se fecham mais serviços.
 // Uma só série, por isso sem legenda: o título diz o que está desenhado. O
@@ -9,7 +10,10 @@ import { addDays, lisbonDay, summarizeClosings, WEEKDAY_LONG, WEEKDAY_SHORT, typ
 const GOLD = "#D4AF37";
 const GOLD_HOVER = "#E3C45F";
 
+// "Mês" = o que foi fechado nesse mês de calendário, incluindo serviços marcados
+// para meses seguintes (pedido do dono, 27/09/2026). É o período por omissão.
 const PERIODS = [
+  { id: "month", label: "Mês", days: null },
   { id: "7", label: "7 dias", days: 7 },
   { id: "30", label: "30 dias", days: 30 },
   { id: "90", label: "90 dias", days: 90 },
@@ -19,17 +23,27 @@ type PeriodId = (typeof PERIODS)[number]["id"];
 
 const money = (n: number) => `${(Math.round(n * 100) / 100).toLocaleString("pt-PT", { maximumFractionDigits: 2 })}€`;
 const decimal = (n: number) => n.toLocaleString("pt-PT", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+const MONTH_FMT = new Intl.DateTimeFormat("pt-PT", { month: "long", year: "numeric", timeZone: "UTC" });
+const monthName = (month: string) => MONTH_FMT.format(new Date(`${month}-15T12:00:00Z`));
 const DAY_FMT = new Intl.DateTimeFormat("pt-PT", { weekday: "short", day: "numeric", month: "short", timeZone: "UTC" });
 const dayLabel = (day: string) => DAY_FMT.format(new Date(`${day}T12:00:00Z`));
 
 interface Hover { chart: "weekday" | "day"; index: number }
 
 const CrmClosings = ({ records }: { records: ClosingRow[] }) => {
-  const [period, setPeriod] = useState<PeriodId>("30");
+  const [period, setPeriod] = useState<PeriodId>("month");
+  const currentMonth = lisbonDay(new Date()).slice(0, 7);
+  const [month, setMonth] = useState(currentMonth);
   const [hover, setHover] = useState<Hover | null>(null);
 
   const summary = useMemo(() => {
-    const to = lisbonDay(new Date());
+    const today = lisbonDay(new Date());
+    if (period === "month") {
+      // O mês corrente conta só até hoje, para a média por dia não contar dias que ainda não passaram.
+      const { first, last } = monthBounds(month);
+      return summarizeClosings(records, first, last < today ? last : today, last);
+    }
+    const to = today;
     const chosen = PERIODS.find(p => p.id === period)!;
     let from: string;
     if (chosen.days) from = addDays(to, -(chosen.days - 1));
@@ -38,7 +52,7 @@ const CrmClosings = ({ records }: { records: ClosingRow[] }) => {
       from = first && first < to ? first : to;
     }
     return summarizeClosings(records, from, to);
-  }, [records, period]);
+  }, [records, period, month]);
 
   const days = summary.perDay.length;
   const maxAverage = Math.max(...summary.byWeekday.map(w => w.average));
@@ -55,6 +69,19 @@ const CrmClosings = ({ records }: { records: ClosingRow[] }) => {
         <p className="text-sm text-gray-500">
           Dia em que cada serviço foi fechado (criado no calendário ou metido no CRM), não o dia do serviço.
         </p>
+        <div className="flex items-center gap-2 flex-wrap">
+        {period === "month" && (
+          <div className="flex items-center gap-1 border border-gray-200 rounded-lg">
+            <button onClick={() => setMonth(m => shiftMonth(m, -1))} aria-label="Mês anterior" className="p-1.5 text-navy hover:bg-gray-50 rounded-l-lg">
+              <ChevronLeft className="w-4 h-4" />
+            </button>
+            <span className="px-1 text-xs font-semibold text-navy capitalize min-w-[120px] text-center">{monthName(month)}</span>
+            <button onClick={() => setMonth(m => shiftMonth(m, 1))} disabled={month >= currentMonth} aria-label="Mês seguinte"
+              className="p-1.5 text-navy hover:bg-gray-50 rounded-r-lg disabled:opacity-30">
+              <ChevronRight className="w-4 h-4" />
+            </button>
+          </div>
+        )}
         <div className="flex items-center gap-1 border border-gray-200 rounded-lg p-0.5" role="group" aria-label="Período">
           {PERIODS.map(p => (
             <button key={p.id} onClick={() => setPeriod(p.id)} aria-pressed={period === p.id}
@@ -62,6 +89,7 @@ const CrmClosings = ({ records }: { records: ClosingRow[] }) => {
               {p.label}
             </button>
           ))}
+        </div>
         </div>
       </div>
 
@@ -84,6 +112,11 @@ const CrmClosings = ({ records }: { records: ClosingRow[] }) => {
           <p className="text-[10.5px] font-bold text-gray-500 uppercase tracking-wider mb-1">Faturado / a tua parte</p>
           <p className="text-xl font-bold text-navy">{money(summary.billed)}</p>
           <p className="text-[11px] text-gray-500">{money(summary.cut)} para ti</p>
+          {period === "month" && summary.ahead.count > 0 && (
+            <p className="text-[11px] text-gray-500">
+              inclui {summary.ahead.count} para depois de {monthName(month).split(" ")[0]} ({money(summary.ahead.billed)})
+            </p>
+          )}
         </div>
       </div>
 

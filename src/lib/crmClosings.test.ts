@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { addDays, lisbonDay, summarizeClosings, weekdayOf } from './crmClosings';
+import { addDays, lisbonDay, monthBounds, shiftMonth, summarizeClosings, weekdayOf } from './crmClosings';
 
 describe('calendar helpers', () => {
   it('counts the day in Lisbon, not in UTC or Copenhagen', () => {
@@ -45,5 +45,27 @@ describe('summarizeClosings', () => {
     expect(saturday).toMatchObject({ count: 2, occurrences: 2, average: 1 });
     expect(s.byWeekday[0]).toMatchObject({ count: 1, occurrences: 2, average: 0.5 });
     expect(s.byWeekday[2]).toMatchObject({ count: 0, occurrences: 2, average: 0 });
+  });
+});
+
+describe('closings by calendar month', () => {
+  it('bounds months, including February and December', () => {
+    expect(monthBounds('2026-09')).toEqual({ first: '2026-09-01', last: '2026-09-30' });
+    expect(monthBounds('2028-02')).toEqual({ first: '2028-02-01', last: '2028-02-29' });
+    expect(shiftMonth('2026-12', 1)).toBe('2027-01');
+    expect(shiftMonth('2026-01', -1)).toBe('2025-12');
+  });
+
+  it('counts what was closed in the month, and says how much is for later months', () => {
+    const rows = [
+      { booked_at: '2026-08-26T10:00:00Z', request_date: '2026-09-01', billed_value: 105, my_cut: 47 }, // fechado em agosto
+      { booked_at: '2026-09-10T10:00:00Z', request_date: '2026-09-20', billed_value: 100, my_cut: 50 },
+      { booked_at: '2026-09-25T10:00:00Z', request_date: '2026-10-03', billed_value: 150, my_cut: 75 }, // para outubro
+    ];
+    const { first, last } = monthBounds('2026-09');
+    const s = summarizeClosings(rows, first, last, last);
+    expect(s.count).toBe(2);
+    expect(s.billed).toBe(250);
+    expect(s.ahead).toEqual({ count: 1, billed: 150, cut: 75 });
   });
 });
