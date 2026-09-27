@@ -20,13 +20,19 @@
 // região Porto e o Alentejo da região Lisboa, como no travel.ts. Uma equipa
 // nova é uma linha nova, e o `configurar()` cria-lhe o calendário. A `base`
 // (latitude, longitude) só decide as moradas fora de todas as regiões
-// (Leiria, Beira Interior): vão para a equipa mais perto.
+// (Leiria, Beira Interior): vão para a equipa mais perto. A `cor` pinta os
+// serviços novos no calendário do dono (cores de evento da Google: 9 Mirtilo,
+// 10 Basílico, 6 Tangerina, 5 Banana) e `corDoCalendario` é a mesma cor no
+// calendário da equipa, para as duas coisas baterem certo.
 const EQUIPAS = [
-  { id: 'porto', nome: 'Kyro · Equipa Porto', regioes: ['Porto'], base: [41.1496, -8.6110] },
-  { id: 'braga', nome: 'Kyro · Equipa Braga', regioes: ['Braga'], base: [41.5454, -8.4265] },
-  { id: 'lisboa', nome: 'Kyro · Equipa Lisboa', regioes: ['Lisboa'], base: [38.7223, -9.1393] },
-  { id: 'algarve', nome: 'Kyro · Equipa Algarve', regioes: ['Algarve'], base: [37.0194, -7.9304] },
+  { id: 'porto', nome: 'Kyro · Equipa Porto', regioes: ['Porto'], base: [41.1496, -8.6110], cor: '9', corDoCalendario: '#3f51b5' },
+  { id: 'braga', nome: 'Kyro · Equipa Braga', regioes: ['Braga'], base: [41.5454, -8.4265], cor: '10', corDoCalendario: '#0b8043' },
+  { id: 'lisboa', nome: 'Kyro · Equipa Lisboa', regioes: ['Lisboa'], base: [38.7223, -9.1393], cor: '6', corDoCalendario: '#f4511e' },
+  { id: 'algarve', nome: 'Kyro · Equipa Algarve', regioes: ['Algarve'], base: [37.0194, -7.9304], cor: '5', corDoCalendario: '#f6bf26' },
 ];
+
+// Muda quando as cores das equipas mudarem, para os calendários voltarem a ser pintados.
+const VERSAO_DAS_CORES = '1';
 
 const FUSO_PORTUGAL = 'Europe/Lisbon';
 const DIAS_ANTES = 2;
@@ -163,7 +169,39 @@ function sincronizarAgora() {
     MailApp.sendEmail({ to: Session.getEffectiveUser().getEmail(), subject: mensagem.assunto, body: mensagem.texto, name: 'Calendários das equipas' });
   }
 
+  pintarServicos(desejadas.copias, propriedades, agora);
+  pintarCalendarios(calendarios, propriedades);
+
   if (silencioso) propriedades.setProperty('primeiraVoltaFeita', new Date(agora).toISOString());
+}
+
+/**
+ * Pinta no calendário do dono os serviços novos com a cor da equipa (dono,
+ * 28/09/2026: "pinta apenas os novos"). Os que já existiam quando as cores
+ * foram ligadas não se tocam: mudar um evento mexe na data de alteração, e o
+ * CRM trata um evento alterado depois da linha como a versão mais recente,
+ * por isso apagaria as correções que o dono lá fez. Um serviço novo é pintado
+ * segundos depois de ser criado, antes de haver correções.
+ */
+function pintarServicos(copias, propriedades, agora) {
+  let desde = Number(propriedades.getProperty('coresDesde'));
+  if (!desde) {
+    desde = agora;
+    propriedades.setProperty('coresDesde', String(agora));
+  }
+  copias.forEach(function (copia) {
+    const cor = corEmFalta(copia.origem, copia.equipaId, desde);
+    if (cor) Calendar.Events.patch({ colorId: cor }, 'primary', copia.origem.id, { sendUpdates: 'none' });
+  });
+}
+
+/** Os calendários das equipas com a mesma cor dos serviços, na lista do dono. Uma vez por versão das cores. */
+function pintarCalendarios(calendarios, propriedades) {
+  if (propriedades.getProperty('coresDosCalendarios') === VERSAO_DAS_CORES) return;
+  for (const equipa of EQUIPAS) {
+    Calendar.CalendarList.patch({ backgroundColor: equipa.corDoCalendario, foregroundColor: '#ffffff' }, calendarios[equipa.id], { colorRgbFormat: true });
+  }
+  propriedades.setProperty('coresDosCalendarios', VERSAO_DAS_CORES);
 }
 
 // ── Leitura e escrita na Google ───────────────────────────────────────────
@@ -506,6 +544,18 @@ function duvidaDoMapa(resultado) {
     + (foraDasRegioes ? ', fora das zonas das equipas: foi a equipa mais perto' : '');
 }
 
+/**
+ * A cor a pôr num serviço do calendário do dono, ou null se não é preciso:
+ * só serviços criados depois de as cores serem ligadas, e só quando a cor
+ * ainda não é a da equipa (um serviço que muda de equipa muda de cor).
+ */
+function corEmFalta(origem, equipaId, desdeMs) {
+  if (!origem.created || Date.parse(origem.created) < desdeMs) return null;
+  const equipa = EQUIPAS.find(function (e) { return e.id === equipaId; });
+  if (!equipa || origem.colorId === equipa.cor) return null;
+  return equipa.cor;
+}
+
 function nomeDaEquipa(id) {
   const equipa = EQUIPAS.find(function (e) { return e.id === id; });
   return equipa ? equipa.nome.replace(/^Kyro · /, '') : id;
@@ -601,6 +651,7 @@ function copiasDesejadas(origens, procurarNoMapa) {
       corpo: corpoDaCopia(origem, pelaMorada),
       fimMs: fimEmMs(origem.end),
       pelaMorada: pelaMorada,
+      origem: origem,
     });
     if (duvida) incertos.push({ evento: origem, equipaId: equipa.id, duvida: duvida });
   }

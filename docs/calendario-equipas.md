@@ -100,6 +100,17 @@ Para desligar: função `desligar`. Os calendários ficam como estão.
   fuso de Lisboa, por isso a equipa vê uma hora a menos. A primeira versão
   copiava os números do relógio (15:00) e punha a equipa uma hora atrasada;
   foi corrigida antes de os calendários serem partilhados.
+- **Cores no calendário do dono** (dono, 28/09/2026: "pinta apenas os
+  novos"): cada serviço criado depois de as cores serem ligadas fica com a
+  cor da equipa, segundos depois de ser marcado (Porto azul Mirtilo, Braga
+  verde Basílico, Lisboa laranja Tangerina, Algarve amarelo Banana), e muda
+  de cor se mudar de equipa. Os calendários das equipas ficam com a mesma
+  cor na lista do dono. **Os serviços que já existiam não se pintam**: mudar
+  um evento mexe na data de alteração, e o CRM (`calendarSync.ts`) trata um
+  evento alterado depois da linha como a versão mais recente e apagaria as
+  correções feitas no CRM. Um serviço novo é pintado antes de haver
+  correções. Uma cor posta à mão num serviço novo é substituída pela da
+  equipa.
 - **As equipas veem o título completo**, incluindo "70€ (140€)" (decisão do
   dono, 28/09/2026).
 - **Emails:** vão para quem tem o calendário da equipa partilhado com

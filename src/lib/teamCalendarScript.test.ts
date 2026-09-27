@@ -337,6 +337,22 @@ describe('o que muda nos calendários das equipas', () => {
     });
   });
 
+  it('pinta só os serviços novos com a cor da equipa, e volta a pintar se mudarem de equipa', () => {
+    // Dono, 28/09/2026: "pinta apenas os novos". Os antigos não se tocam, para o CRM não perder correções.
+    const desde = Date.parse('2026-09-28T10:00:00Z');
+    const novo = { ...lisboa, created: '2026-09-28T11:00:00Z' };
+    const antigo = { ...lisboa, created: '2026-09-20T11:00:00Z' };
+    expect(gs.corEmFalta(novo, 'lisboa', desde)).toBe('6');
+    expect(gs.corEmFalta(novo, 'porto', desde)).toBe('9');
+    expect(gs.corEmFalta({ ...novo, colorId: '6' }, 'lisboa', desde)).toBeNull();
+    expect(gs.corEmFalta({ ...novo, colorId: '6' }, 'braga', desde)).toBe('10');
+    expect(gs.corEmFalta(antigo, 'lisboa', desde)).toBeNull();
+    expect(gs.corEmFalta(lisboa, 'lisboa', desde)).toBeNull();
+    // Cada equipa com uma cor diferente.
+    const cores = ['porto', 'braga', 'lisboa', 'algarve'].map(id => gs.corEmFalta(novo, id, desde));
+    expect(new Set(cores).size).toBe(4);
+  });
+
   it('avisa o dono uma vez de cada serviço sem equipa, e outra vez se ele o mudar', () => {
     const primeira = gs.pendentesNovos([semMorada], {}, AGORA);
     expect(primeira.novos.map((e: Evento) => e.id)).toEqual(['c3']);
