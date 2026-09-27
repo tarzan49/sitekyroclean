@@ -187,9 +187,10 @@ function sincronizarAgora() {
 }
 
 /**
- * Pinta no calendário do dono os serviços que ainda não acabaram com a cor
- * da equipa (dono, 28/09/2026: "quero o meu com cores em vez de ser tudo
- * azul", "pinta só os serviços para a frente"). Mudar a cor
+ * Marca no calendário do dono os serviços que ainda não acabaram com a cor
+ * da equipa e a linha "Equipa: …" na descrição (dono, 28/09/2026: "quero o
+ * meu com cores em vez de ser tudo azul", "pinta só os serviços para a
+ * frente", "eu assim não vejo que equipa vai"). Mudar o evento
  * mexe na data de alteração do evento, e o CRM (`calendarSync.ts`) relê um
  * evento alterado depois da linha e escreve por cima das correções feitas no
  * CRM. Isso só acontece com eventos criados depois de 26/09/2026 às 15:00 UTC
@@ -199,8 +200,8 @@ function sincronizarAgora() {
  */
 function pintarServicos(copias, agora) {
   copias.forEach(function (copia) {
-    const cor = corEmFalta(copia.origem, copia.equipaId, agora);
-    if (cor) Calendar.Events.patch({ colorId: cor }, 'primary', copia.origem.id, { sendUpdates: 'none' });
+    const alteracao = marcaDaEquipa(copia.origem, copia.equipaId, agora);
+    if (alteracao) Calendar.Events.patch(alteracao, 'primary', copia.origem.id, { sendUpdates: 'none' });
   });
 }
 
@@ -609,6 +610,40 @@ function duvidaDoMapa(resultado) {
     + (foraDasRegioes ? ', fora das zonas das equipas: foi a equipa mais perto' : '');
 }
 
+// "Equipa: Porto", na primeira linha da descrição do serviço do dono. Com dois
+// pontos de propósito: "equipa porto" escrito à mão é uma ordem do dono
+// (`equipaEscrita`), esta linha é só informação.
+const LINHA_DA_EQUIPA = /^Equipa: [^\n<]*(?:\s*<br\s*\/?>|\n)*/i;
+
+function semLinhaDaEquipa(evento) {
+  const descricao = String(evento.description || '');
+  if (!LINHA_DA_EQUIPA.test(descricao)) return evento;
+  const limpo = {};
+  for (const chave in evento) limpo[chave] = evento[chave];
+  limpo.description = descricao.replace(LINHA_DA_EQUIPA, '');
+  return limpo;
+}
+
+function descricaoComEquipa(descricao, equipaId) {
+  const equipa = EQUIPAS.find(function (e) { return e.id === equipaId; });
+  const resto = String(descricao || '').replace(LINHA_DA_EQUIPA, '');
+  return 'Equipa: ' + equipa.nome.replace(/^Kyro · Equipa /, '') + (resto ? '\n\n' + resto : '');
+}
+
+/**
+ * O que mudar num serviço do calendário do dono que ainda não acabou: a cor
+ * da equipa e a linha "Equipa: …" no topo da descrição (dono, 28/09/2026: "eu
+ * assim não vejo que equipa vai"). null se já está tudo certo.
+ */
+function marcaDaEquipa(origem, equipaId, agora) {
+  const alteracao = {};
+  const cor = corEmFalta(origem, equipaId, agora);
+  if (cor) alteracao.colorId = cor;
+  const descricao = descricaoComEquipa(origem.description, equipaId);
+  if (fimEmMs(origem.end) > agora && descricao !== (origem.description || '')) alteracao.description = descricao;
+  return Object.keys(alteracao).length ? alteracao : null;
+}
+
 /** A cor a pôr num serviço do calendário do dono: null se já acabou ou se já tem a da equipa. */
 function corEmFalta(origem, equipaId, agora) {
   if (fimEmMs(origem.end) <= agora) return null;
@@ -684,7 +719,10 @@ function copiasDesejadas(origens, procurarNoMapa) {
   const pendentes = [];
   const incertos = [];
   const adiados = new Set();
-  for (const origem of origens) {
+  for (const original of origens) {
+    // A linha "Equipa: …" que o script escreve na descrição não conta para
+    // nada: nem para a equipa, nem para a cópia, nem para os avisos.
+    const origem = semLinhaDaEquipa(original);
     if (origem.status === 'cancelled' || !ehServico(origem.summary)) continue;
     const escrita = equipaEscrita(origem);
     const pelaLista = escrita ? null : origemDaRegiao(origem);
@@ -714,7 +752,7 @@ function copiasDesejadas(origens, procurarNoMapa) {
       corpo: corpoDaCopia(origem, pelaMorada),
       fimMs: fimEmMs(origem.end),
       pelaMorada: pelaMorada,
-      origem: origem,
+      origem: original,
     });
     if (duvida) incertos.push({ evento: origem, equipaId: equipa.id, duvida: duvida });
   }

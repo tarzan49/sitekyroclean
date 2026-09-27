@@ -124,6 +124,14 @@ Para desligar: função `desligar`. Os calendários ficam como estão.
   antes de haver correções. Na pintura dos serviços que já existiam (28/09)
   só dois estavam nessa situação. Os serviços que já passaram ficam como
   estavam.
+- **A equipa escrita no serviço do dono** (dono, 28/09/2026: "eu assim não
+  vejo que equipa vai"): a primeira linha da descrição de cada serviço que
+  ainda não acabou passa a ser "Equipa: Porto" (ou Braga, Lisboa 1, Lisboa 2,
+  Algarve), escrita pelo script ao mesmo tempo que a cor. É só informação: é
+  tirada antes de decidir a equipa (senão, ao mudar a morada, o serviço
+  ficava preso à equipa antiga), não vai para a cópia (senão as equipas
+  recebiam "Serviço alterado" de todos) e não conta para os avisos. Os dois
+  pontos são de propósito: "equipa porto" sem eles é uma ordem do dono.
 - **Os calendários das equipas ficam escondidos na conta do dono**, e o
   calendário dele à vista: vê cada serviço uma vez, no seu calendário, com a
   cor da equipa. Os calendários das equipas são dele (o script corre na

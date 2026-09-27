@@ -383,6 +383,28 @@ describe('o que muda nos calendários das equipas', () => {
     expect(new Set(cores).size).toBe(5);
   });
 
+  it('escreve a equipa na descrição do serviço do dono, sem isso mudar a equipa nem a cópia', () => {
+    // Dono, 28/09/2026: "eu assim não vejo que equipa vai".
+    const marca = gs.marcaDaEquipa(lisboa, 'lisboa2', AGORA);
+    expect(marca).toEqual({ colorId: '3', description: 'Equipa: Lisboa 2' });
+    expect(gs.descricaoComEquipa('Portão verde', 'porto')).toBe('Equipa: Porto\n\nPortão verde');
+    expect(gs.descricaoComEquipa('Equipa: Porto\n\nPortão verde', 'braga')).toBe('Equipa: Braga\n\nPortão verde');
+    expect(gs.descricaoComEquipa('Equipa: Porto<br><br>Portão verde', 'braga')).toBe('Equipa: Braga\n\nPortão verde');
+    // Já marcado: nada a fazer. Já passou: não se toca.
+    expect(gs.marcaDaEquipa({ ...lisboa, colorId: '6', description: 'Equipa: Lisboa 1' }, 'lisboa', AGORA)).toBeNull();
+    const passado = evento('p8', lisboa.summary, '2026-09-27T10:00:00+02:00', '2026-09-27T11:00:00+02:00');
+    expect(gs.marcaDaEquipa(passado, 'lisboa', AGORA)).toBeNull();
+
+    // A linha não decide a equipa: a morada mudou para o Seixal, a linha ainda diz Porto.
+    const mudou = { ...evento('s1', 'Serviço 45€ (89€) sofá - Rua Nova 3, Seixal'), description: 'Equipa: Porto' };
+    const { copias } = gs.copiasDesejadas([mudou]);
+    expect(copias.get('s1').equipaId).toBe('lisboa');
+    // A cópia da equipa não leva a linha, por isso escrevê-la não gera "Serviço alterado".
+    expect(copias.get('s1').corpo.description).toBe('');
+    const semLinha = gs.copiasDesejadas([{ ...mudou, description: '' }]).copias.get('s1');
+    expect(copias.get('s1').corpo.extendedProperties.private.kyroAssinatura).toBe(semLinha.corpo.extendedProperties.private.kyroAssinatura);
+  });
+
   it('avisa o dono uma vez de cada serviço sem equipa, e outra vez se ele o mudar', () => {
     const primeira = gs.pendentesNovos([semMorada], {}, AGORA);
     expect(primeira.novos.map((e: Evento) => e.id)).toEqual(['c3']);
