@@ -36,8 +36,9 @@ const EQUIPAS = [
   { id: 'algarve', nome: 'Kyro · Equipa Algarve', escrito: ['algarve'], regioes: ['Algarve'], base: [37.0194, -7.9304], cor: '5', corDoCalendario: '#f6bf26' },
 ];
 
-// Muda quando as cores das equipas mudarem, para os calendários voltarem a ser pintados.
-const VERSAO_DAS_CORES = '2';
+// Muda quando as cores das equipas (ou o que se faz na lista do dono) mudarem,
+// para os calendários voltarem a ser arrumados.
+const VERSAO_DAS_CORES = '3';
 
 const FUSO_PORTUGAL = 'Europe/Lisbon';
 const DIAS_ANTES = 2;
@@ -205,11 +206,22 @@ function pintarServicos(copias, propriedades, agora) {
   });
 }
 
-/** Os calendários das equipas com a mesma cor dos serviços, na lista do dono. Uma vez por versão das cores. */
+/**
+ * Os calendários das equipas na lista do dono: com a cor da equipa e
+ * escondidos. São dele (o script corre na conta dele), por isso a Google
+ * mostrava-lhe cada serviço duas vezes, o original e a cópia (dono,
+ * 28/09/2026: "porque é que eu estou a ver a cópia?"). Escondidos continuam
+ * a funcionar para as equipas; para ver um, Definições → o calendário →
+ * "Mostrar na lista". Uma vez por versão.
+ */
 function pintarCalendarios(calendarios, propriedades) {
   if (propriedades.getProperty('coresDosCalendarios') === VERSAO_DAS_CORES) return;
   for (const equipa of EQUIPAS) {
-    Calendar.CalendarList.patch({ backgroundColor: equipa.corDoCalendario, foregroundColor: '#ffffff' }, calendarios[equipa.id], { colorRgbFormat: true });
+    Calendar.CalendarList.patch(
+      { backgroundColor: equipa.corDoCalendario, foregroundColor: '#ffffff', hidden: true, selected: false },
+      calendarios[equipa.id],
+      { colorRgbFormat: true }
+    );
   }
   propriedades.setProperty('coresDosCalendarios', VERSAO_DAS_CORES);
 }

@@ -117,7 +117,11 @@ Para desligar: função `desligar`. Os calendários ficam como estão.
   verde Basílico, Lisboa 1 laranja Tangerina, Lisboa 2 roxo Uva, Algarve
   amarelo Banana), e muda
   de cor se mudar de equipa. Os calendários das equipas ficam com a mesma
-  cor na lista do dono. **Os serviços que já existiam não se pintam**: mudar
+  cor na lista do dono, **e escondidos**: são dele (o script corre na conta
+  dele), por isso a Google mostrava-lhe cada serviço duas vezes, o original
+  e a cópia. Escondidos continuam a funcionar para as equipas; para ver um,
+  Google Calendar no computador → Definições → o calendário → "Mostrar na
+  lista". **Os serviços que já existiam não se pintam**: mudar
   um evento mexe na data de alteração, e o CRM (`calendarSync.ts`) trata um
   evento alterado depois da linha como a versão mais recente e apagaria as
   correções feitas no CRM. Um serviço novo é pintado antes de haver
