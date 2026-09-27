@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it } from 'vitest';
 import { WHATSAPP_BASE } from '@/constants/business';
 import { buildGeneralWaMessage, buildServiceWaMessage, buildSubmittedWaMessage } from './whatsappMessages';
-import { ADS_WHATSAPP_MARK, initAdsWhatsAppMessage, isGoogleAdsVisit, markAdsWhatsAppHref, markAdsWhatsAppText } from './adsWhatsAppMessage';
+import { ADS_WHATSAPP_MARK, initAdsWhatsAppMessage, pageWhatsAppText, isGoogleAdsVisit, markAdsWhatsAppHref, markAdsWhatsAppText } from './adsWhatsAppMessage';
 
 const waHref = (text: string) => `${WHATSAPP_BASE}?text=${encodeURIComponent(text)}`;
 const textOf = (href: string) => new URL(href).searchParams.get('text');
@@ -77,6 +77,47 @@ describe('initAdsWhatsAppMessage', () => {
     // Segundo clique na mesma âncora: não duplica a frase.
     link.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }));
     expect(textOf(link.href)!.split(ADS_WHATSAPP_MARK)).toHaveLength(2);
+  });
+
+  // A página de um anúncio: cabeçalho e barra fixa genéricos, hero com serviço e cidade.
+  const adLandingPage = (hero: string) => {
+    document.body.innerHTML = `
+      <header><a target="_blank" id="header" href="${waHref(buildGeneralWaMessage())}">WhatsApp</a></header>
+      <main><a target="_blank" id="hero" href="${waHref(hero)}">Pedir orçamento</a></main>
+      <div><a target="_blank" id="sticky" data-tracking-source="sticky_bar" href="${waHref(buildGeneralWaMessage())}"><span>WhatsApp</span></a></div>`;
+    return (id: string) => {
+      const link = document.getElementById(id) as HTMLAnchorElement;
+      (link.querySelector('span') ?? link).dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }));
+      return textOf(link.href);
+    };
+  };
+
+  it('gives the sticky bar and the header the service and city of the page', () => {
+    cleanup = initAdsWhatsAppMessage(AD_ENTRY);
+    const click = adLandingPage(buildServiceWaMessage('impermeabilizacao', 'Porto'));
+    const expected = markAdsWhatsAppText(buildServiceWaMessage('impermeabilizacao', 'Porto'));
+    expect(click('sticky')).toBe(expected);
+    expect(click('header')).toBe(expected);
+    expect(expected).toContain('impermeabilizar os meus estofos no Porto');
+  });
+
+  it('still finds the page message after the hero was clicked, and on a second click', () => {
+    cleanup = initAdsWhatsAppMessage(AD_ENTRY);
+    const click = adLandingPage(buildServiceWaMessage('limpeza-sofas', 'Lisboa'));
+    const expected = markAdsWhatsAppText(buildServiceWaMessage('limpeza-sofas', 'Lisboa'));
+    expect(click('hero')).toBe(expected);
+    expect(click('sticky')).toBe(expected);
+    expect(click('sticky')).toBe(expected);
+  });
+
+  it('keeps the general message on a page without its own, and never swaps it on organic visits', () => {
+    cleanup = initAdsWhatsAppMessage(AD_ENTRY);
+    document.body.innerHTML = `<a href="${waHref(buildGeneralWaMessage())}">WhatsApp</a>`;
+    expect(pageWhatsAppText()).toBeNull();
+    cleanup();
+    cleanup = initAdsWhatsAppMessage('');
+    const click = adLandingPage(buildServiceWaMessage('limpeza-sofas', 'Lisboa'));
+    expect(click('sticky')).toBe(buildGeneralWaMessage());
   });
 
   it('does nothing on an organic visit', () => {

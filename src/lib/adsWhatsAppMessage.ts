@@ -21,6 +21,7 @@
  * a mesma razão pela qual a medição dos cliques é um delegado global.
  */
 import { WHATSAPP_BASE } from '@/constants/business';
+import { buildGeneralWaMessage } from '@/lib/whatsappMessages';
 
 export const ADS_WHATSAPP_MARK = 'Vi o vosso anúncio no Google';
 
@@ -62,12 +63,9 @@ export function markAdsWhatsAppText(text: string): string {
 
 /** Só as ligações para o número da empresa; devolve o `href` intacto nas outras. */
 export function markAdsWhatsAppHref(href: string): string {
-  let url: URL;
-  try { url = new URL(href); } catch { return href; }
-  if (!WHATSAPP_HOSTS.includes(url.hostname)) return href;
-  const phone = url.hostname === 'wa.me' ? url.pathname : `/${url.searchParams.get('phone') ?? ''}`;
-  if (phone !== BUSINESS_WHATSAPP_PATH) return href;
-  const text = url.searchParams.get('text') ?? '';
+  const text = businessWhatsAppText(href);
+  if (text === null) return href;
+  const url = new URL(href);
   const marked = markAdsWhatsAppText(text);
   if (marked === text) return href;
   url.searchParams.delete('text');
@@ -75,6 +73,50 @@ export function markAdsWhatsAppHref(href: string): string {
   // `encodeURIComponent` e não `searchParams.set`: este serializa os espaços
   // como `+`, e o `+` não é lido como espaço em todas as versões do WhatsApp.
   return `${url.origin}${url.pathname}?${rest ? `${rest}&` : ''}text=${encodeURIComponent(marked)}`;
+}
+
+/**
+ * A mensagem do botão principal da página, para os botões que não sabem onde
+ * estão. A barra fixa do telemóvel e o cabeçalho mandam sempre a mensagem
+ * genérica ("limpar os meus estofos"), e mais de 90% dos cliques dos anúncios
+ * vêm de telemóvel, onde a barra está sempre à vista: nos dois primeiros dias
+ * (26-27/09/2026) o dono recebia "Vi o vosso anúncio no Google" sem saber se
+ * era Lisboa ou Porto, limpeza ou impermeabilização, e numa página de
+ * impermeabilização o pedido chegava a dizer "limpar". O botão principal é a
+ * primeira ligação da página para o número da empresa com uma mensagem própria
+ * (o hero vem antes de tudo o resto no `<main>`, e o cabeçalho, antes dele, é
+ * genérico). Se a página não tiver nenhuma, fica a genérica.
+ */
+export function pageWhatsAppText(root: ParentNode = document): string | null {
+  const general = buildGeneralWaMessage();
+  for (const link of root.querySelectorAll<HTMLAnchorElement>('a[href]')) {
+    const text = businessWhatsAppText(link.href);
+    if (text && text !== general && text !== markAdsWhatsAppText(general)) return text;
+  }
+  return null;
+}
+
+function businessWhatsAppText(href: string): string | null {
+  let url: URL;
+  try { url = new URL(href); } catch { return null; }
+  if (!WHATSAPP_HOSTS.includes(url.hostname)) return null;
+  const phone = url.hostname === 'wa.me' ? url.pathname : `/${url.searchParams.get('phone') ?? ''}`;
+  if (phone !== BUSINESS_WHATSAPP_PATH) return null;
+  return url.searchParams.get('text') ?? '';
+}
+
+/** O `href` com a mensagem genérica trocada pela da página; os outros ficam iguais. */
+export function withPageWhatsAppText(href: string, root: ParentNode = document): string {
+  const general = buildGeneralWaMessage();
+  const current = businessWhatsAppText(href);
+  // Também a genérica já marcada: um segundo clique na barra fixa.
+  if (current !== general && current !== markAdsWhatsAppText(general)) return href;
+  const text = pageWhatsAppText(root);
+  if (!text) return href;
+  const url = new URL(href);
+  url.searchParams.delete('text');
+  const rest = url.searchParams.toString();
+  return `${url.origin}${url.pathname}?${rest ? `${rest}&` : ''}text=${encodeURIComponent(text)}`;
 }
 
 /**
@@ -92,7 +134,7 @@ export function initAdsWhatsAppMessage(search = window.location.search): () => v
     if (/^\/admin(?:\/|$)/.test(window.location.pathname)) return;
     const link = event.target instanceof Element ? event.target.closest('a[href]') : null;
     if (!(link instanceof HTMLAnchorElement)) return;
-    const marked = markAdsWhatsAppHref(link.href);
+    const marked = markAdsWhatsAppHref(withPageWhatsAppText(link.href));
     if (marked !== link.href) link.href = marked;
   };
   document.addEventListener('click', mark, true);
