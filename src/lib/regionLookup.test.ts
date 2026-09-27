@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { CalendarEvent } from './calendarServices';
-import { planCalendarSync } from './calendarSync';
+import { planCalendarSync, type SyncPlan } from './calendarSync';
 import { regionFromHits, regionFromPhone, resolveMissingRegions, type MapHit, type MapSearch } from './regionLookup';
 import { streetForMap } from './calendarServices';
 
@@ -86,6 +86,14 @@ describe('resolveMissingRegions', () => {
     const plan = { inserts: [], updates: [], counts: { added: 0, updated: 0, missing: 0, restored: 0 } };
     await resolveMissingRegions([waiting, fixed], plan, [event('e1', noAddress), event('e2', noAddress)], { search: search([braga]), pauseMs: 0 });
     expect(plan.updates).toEqual([{ id: 'r1', patch: { locality: 'Braga', city: 'Braga', needs_review: null } }]);
+  });
+
+  it('replaces a city left by an older reader', async () => {
+    const summary = 'Serviço 110€ (219€) Limpeza de tapete - Ana - 912 345 678 - Rua Inventada Moura 28 , cave esquerda';
+    const stale = { id: 'r1', phone: null, city: 'Cave esquerda', locality: null, needs_review: 'Região por identificar', calendar_event_id: 'e1' };
+    const plan: SyncPlan = { inserts: [], updates: [], counts: { added: 0, updated: 0, missing: 0, restored: 0 } };
+    await resolveMissingRegions([stale], plan, [event('e1', summary)], { search: search([braga]), pauseMs: 0 });
+    expect(plan.updates[0].patch).toMatchObject({ locality: 'Braga', city: 'Braga' });
   });
 
   it('leaves the row as it was when the map is down', async () => {

@@ -13,7 +13,7 @@
 // Corre no separador CRM, depois de `planCalendarSync`, que fica síncrono e
 // testável sem rede.
 import {
-  localityFromPostalCode, placeByName, streetForMap,
+  localityFromPostalCode, parseServiceEvent, placeByName, streetForMap,
   type CalendarEvent, type CrmLocality,
 } from './calendarServices';
 import type { SyncPlan } from './calendarSync';
@@ -119,9 +119,13 @@ export async function resolveMissingRegions(
     if (locality || !row.calendar_event_id) continue;
     const review = update?.patch.needs_review !== undefined ? update.patch.needs_review : row.needs_review;
     if (!review?.includes(UNKNOWN_REGION)) continue; // o dono já tratou da linha
+    const event = byId.get(row.calendar_event_id);
+    // A cidade volta a sair do evento: uma versão antiga do leitor deixou
+    // lixo nestas linhas ("Cave esquerda").
+    const city = update && 'city' in update.patch ? update.patch.city ?? null : event ? parseServiceEvent(event)?.city ?? null : row.city;
     targets.push({
-      phone: update?.patch.phone ?? row.phone, city: update?.patch.city ?? row.city,
-      event: byId.get(row.calendar_event_id), review, excludeId: row.id,
+      phone: update?.patch.phone ?? row.phone, city,
+      event, review, excludeId: row.id,
       apply: f => {
         if (update) Object.assign(update.patch, f);
         else plan.updates.push({ id: row.id, patch: { ...f } });
