@@ -1,6 +1,6 @@
 # Calendários das equipas
 
-Desde 28/09/2026 cada equipa (Porto, Braga, Lisboa e Algarve) tem o seu
+Desde 28/09/2026 cada equipa (Porto, Braga, Lisboa 1, Lisboa 2 e Algarve) tem o seu
 próprio Google Calendar. O dono continua a marcar os serviços só no calendário dele. Um
 script da Google (Apps Script), a correr na conta do dono, copia cada serviço
 para o calendário da equipa que o vai fazer e manda um email a essa equipa
@@ -35,7 +35,7 @@ Algarve). Falta partilhar cada calendário com a sua equipa (passo 7).
    (calendário, enviar email, correr em segundo plano). Como o script é do
    próprio dono e não foi publicado, aparece "A Google não validou esta
    aplicação": **Avançadas**, depois **Aceder a Calendários das equipas**.
-   O `configurar` cria os quatro calendários, liga a cópia automática e faz a
+   O `configurar` cria os calendários que faltarem, liga a cópia automática e faz a
    primeira cópia sem mandar emails às equipas.
 7. No Google Calendar, em cada calendário novo (**Definições e partilha**,
    **Partilhar com pessoas específicas**), acrescentar os emails da equipa com
@@ -53,6 +53,14 @@ Para desligar: função `desligar`. Os calendários ficam como estão.
   "Limpeza" seguido de um valor em euros. É a regra do CRM, com uma diferença
   de propósito: um "Serviço" sem valor também vai para a equipa, porque um
   serviço sem preço escrito tem de ser feito na mesma.
+- **Duas equipas em Lisboa** (dono, 28/09/2026, "escolho em cada serviço"):
+  tudo o que for da região Lisboa vai sozinho para a **Lisboa 1**; a
+  **Lisboa 2** só recebe o que tiver "equipa lisboa 2" escrito no evento (no
+  título ou na descrição). Não tem região nem base, por isso nunca é
+  escolhida pela morada nem por ser a mais perto. A equipa escrita conta
+  como certa e não gera aviso. Quando o dono escreve "equipa lisboa 2" num
+  serviço que já estava na Lisboa 1, ele sai de uma e entra na outra, com
+  email às duas.
 - **Equipa de cada serviço**, por esta ordem: "equipa porto" (ou lisboa,
   braga, algarve) escrito no evento; o código postal; os concelhos servidos;
   as freguesias desses concelhos; e, se nada disso chegar, **a morada no
@@ -91,7 +99,7 @@ Para desligar: função `desligar`. Os calendários ficam como estão.
 - **Serviço sem equipa:** só um evento sem morada nenhuma (por exemplo
   "Serviço 70€ (130€) imper cadeiras"), ou uma morada que nem o Maps
   reconhece. Não é copiado, e o dono recebe um email a pedir o código postal
-  ou "equipa porto" (braga, lisboa, algarve) no evento. Assim que o evento
+  ou "equipa porto" (braga, lisboa 1, lisboa 2, algarve) no evento. Assim que o evento
   for guardado, segue para a equipa.
 - **A hora é o mesmo instante, mostrado em Portugal.** O calendário do dono
   está no fuso de Copenhaga desde 23/08/2026 e a hora que lá está é a de
@@ -103,7 +111,8 @@ Para desligar: função `desligar`. Os calendários ficam como estão.
 - **Cores no calendário do dono** (dono, 28/09/2026: "pinta apenas os
   novos"): cada serviço criado depois de as cores serem ligadas fica com a
   cor da equipa, segundos depois de ser marcado (Porto azul Mirtilo, Braga
-  verde Basílico, Lisboa laranja Tangerina, Algarve amarelo Banana), e muda
+  verde Basílico, Lisboa 1 laranja Tangerina, Lisboa 2 roxo Uva, Algarve
+  amarelo Banana), e muda
   de cor se mudar de equipa. Os calendários das equipas ficam com a mesma
   cor na lista do dono. **Os serviços que já existiam não se pintam**: mudar
   um evento mexe na data de alteração, e o CRM (`calendarSync.ts`) trata um

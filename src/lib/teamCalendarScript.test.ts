@@ -120,6 +120,21 @@ describe('região e equipa de cada serviço', () => {
     expect(gs.regiaoDoEvento({ summary: 'Serviço 50€ (99€) sofá, 4000-000 Porto', description: 'Equipa Lisboa' })).toBe('Lisboa');
   });
 
+  it('manda para a Lisboa 2 só o que tiver "equipa lisboa 2" escrito', () => {
+    // Dono, 28/09/2026: duas equipas em Lisboa, "escolho em cada serviço".
+    const lisboa = 'Serviço 45€ (89€) sofá - Rua X 3, 1600-000 Lisboa';
+    const equipa = (summary: string, description = '') => gs.copiasDesejadas([{ ...evento('l1', summary), description }]).copias.get('l1').equipaId;
+    expect(equipa(lisboa)).toBe('lisboa');
+    expect(equipa(`${lisboa} equipa lisboa 2`)).toBe('lisboa2');
+    expect(equipa(lisboa, 'Equipa Lisboa2')).toBe('lisboa2');
+    expect(equipa(`${lisboa} equipa lisboa 1`)).toBe('lisboa');
+    // Escrito ganha ao código postal, e não entra nos avisos de dúvida.
+    expect(equipa('Serviço 45€ (89€) sofá, 4000-000 Porto - equipa lisboa 2')).toBe('lisboa2');
+    expect(gs.copiasDesejadas([evento('l2', `${lisboa} equipa lisboa 2`)]).incertos).toEqual([]);
+    // Sem base, a Lisboa 2 nunca é "a equipa mais perto".
+    expect(gs.equipaPeloMapa({ encontrado: true, codigoPostal: '2400-000', lat: 39.74, lng: -8.81 }).id).toBe('lisboa');
+  });
+
   it('não confunde o nome da rua com a cidade', () => {
     expect(gs.regiaoDoEvento({ summary: 'Serviço 50€ (99€) sofá - Rua de Braga 12, Almada' })).toBe('Lisboa');
   });
@@ -229,7 +244,7 @@ describe('o que muda nos calendários das equipas', () => {
     const mensagem = gs.mensagemParaEquipa(acao, gs.equipaDaRegiao('Lisboa'));
     expect(mensagem.assunto).toBe('Novo serviço: sábado, 03/10, das 14:00 às 15:00');
     expect(mensagem.texto).toContain(lisboa.summary);
-    expect(mensagem.texto).toContain('Está no calendário "Kyro · Equipa Lisboa".');
+    expect(mensagem.texto).toContain('Está no calendário "Kyro · Equipa Lisboa 1".');
   });
 
   describe('quando o código postal e as listas do site não chegam, procura a morada no Maps', () => {
@@ -349,8 +364,8 @@ describe('o que muda nos calendários das equipas', () => {
     expect(gs.corEmFalta(antigo, 'lisboa', desde)).toBeNull();
     expect(gs.corEmFalta(lisboa, 'lisboa', desde)).toBeNull();
     // Cada equipa com uma cor diferente.
-    const cores = ['porto', 'braga', 'lisboa', 'algarve'].map(id => gs.corEmFalta(novo, id, desde));
-    expect(new Set(cores).size).toBe(4);
+    const cores = ['porto', 'braga', 'lisboa', 'lisboa2', 'algarve'].map(id => gs.corEmFalta(novo, id, desde));
+    expect(new Set(cores).size).toBe(5);
   });
 
   it('avisa o dono uma vez de cada serviço sem equipa, e outra vez se ele o mudar', () => {

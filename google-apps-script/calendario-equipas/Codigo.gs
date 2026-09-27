@@ -22,17 +22,21 @@
 // (latitude, longitude) só decide as moradas fora de todas as regiões
 // (Leiria, Beira Interior): vão para a equipa mais perto. A `cor` pinta os
 // serviços novos no calendário do dono (cores de evento da Google: 9 Mirtilo,
-// 10 Basílico, 6 Tangerina, 5 Banana) e `corDoCalendario` é a mesma cor no
-// calendário da equipa, para as duas coisas baterem certo.
+// 10 Basílico, 6 Tangerina, 5 Banana, 3 Uva) e `corDoCalendario` é a mesma
+// cor no calendário da equipa, para as duas coisas baterem certo.
+// `escrito` é o que o dono escreve depois de "equipa" para forçar a equipa.
+// A Lisboa 2 não tem região nem base (dono, 28/09/2026: "escolho em cada
+// serviço"): só recebe o que tiver "equipa lisboa 2" escrito.
 const EQUIPAS = [
-  { id: 'porto', nome: 'Kyro · Equipa Porto', regioes: ['Porto'], base: [41.1496, -8.6110], cor: '9', corDoCalendario: '#3f51b5' },
-  { id: 'braga', nome: 'Kyro · Equipa Braga', regioes: ['Braga'], base: [41.5454, -8.4265], cor: '10', corDoCalendario: '#0b8043' },
-  { id: 'lisboa', nome: 'Kyro · Equipa Lisboa', regioes: ['Lisboa'], base: [38.7223, -9.1393], cor: '6', corDoCalendario: '#f4511e' },
-  { id: 'algarve', nome: 'Kyro · Equipa Algarve', regioes: ['Algarve'], base: [37.0194, -7.9304], cor: '5', corDoCalendario: '#f6bf26' },
+  { id: 'porto', nome: 'Kyro · Equipa Porto', escrito: ['porto'], regioes: ['Porto'], base: [41.1496, -8.6110], cor: '9', corDoCalendario: '#3f51b5' },
+  { id: 'braga', nome: 'Kyro · Equipa Braga', escrito: ['braga'], regioes: ['Braga'], base: [41.5454, -8.4265], cor: '10', corDoCalendario: '#0b8043' },
+  { id: 'lisboa', nome: 'Kyro · Equipa Lisboa 1', escrito: ['lisboa', 'lisboa 1'], regioes: ['Lisboa'], base: [38.7223, -9.1393], cor: '6', corDoCalendario: '#f4511e' },
+  { id: 'lisboa2', nome: 'Kyro · Equipa Lisboa 2', escrito: ['lisboa 2'], regioes: [], base: null, cor: '3', corDoCalendario: '#8e24aa' },
+  { id: 'algarve', nome: 'Kyro · Equipa Algarve', escrito: ['algarve'], regioes: ['Algarve'], base: [37.0194, -7.9304], cor: '5', corDoCalendario: '#f6bf26' },
 ];
 
 // Muda quando as cores das equipas mudarem, para os calendários voltarem a ser pintados.
-const VERSAO_DAS_CORES = '1';
+const VERSAO_DAS_CORES = '2';
 
 const FUSO_PORTUGAL = 'Europe/Lisbon';
 const DIAS_ANTES = 2;
@@ -52,7 +56,12 @@ function configurar() {
   for (const equipa of EQUIPAS) {
     const chave = 'calendario:' + equipa.id;
     const guardado = propriedades.getProperty(chave);
-    if (guardado && lerCalendario(guardado)) continue;
+    const existente = guardado ? lerCalendario(guardado) : null;
+    if (existente) {
+      // Um nome novo em `EQUIPAS` (a Lisboa passou a "Lisboa 1") muda o calendário que já existe.
+      if (existente.summary !== equipa.nome) Calendar.Calendars.patch({ summary: equipa.nome }, guardado);
+      continue;
+    }
     const novo = Calendar.Calendars.insert({
       summary: equipa.nome,
       timeZone: FUSO_PORTUGAL,
@@ -451,6 +460,18 @@ function origemDaRegiao(evento) {
   return null;
 }
 
+/**
+ * A equipa escrita no evento ("equipa lisboa 2", "equipa porto"), que ganha a
+ * tudo e conta como certa. É a única forma de um serviço ir para a Lisboa 2.
+ */
+function equipaEscrita(evento) {
+  const texto = normalizar([evento.location, evento.summary, evento.description].filter(Boolean).join('\n'));
+  const escrito = /\bequipa\s+(porto|braga|algarve|lisboa(?:\s*[12])?)\b/.exec(texto);
+  if (!escrito) return null;
+  const nome = escrito[1].replace(/^lisboa\s*([12])$/, 'lisboa $1');
+  return EQUIPAS.find(function (e) { return e.escrito.indexOf(nome) >= 0; }) || null;
+}
+
 function equipaDaRegiao(regiao) {
   return EQUIPAS.find(function (e) { return e.regioes.indexOf(regiao) >= 0; }) || null;
 }
@@ -525,6 +546,7 @@ function equipaPeloMapa(resultado) {
   let maisPerto = null;
   let menor = Infinity;
   for (const equipa of EQUIPAS) {
+    if (!equipa.base) continue;
     const dLat = resultado.lat - equipa.base[0];
     const dLng = (resultado.lng - equipa.base[1]) * Math.cos(resultado.lat * Math.PI / 180);
     const distancia = dLat * dLat + dLng * dLng;
@@ -625,8 +647,9 @@ function copiasDesejadas(origens, procurarNoMapa) {
   const adiados = new Set();
   for (const origem of origens) {
     if (origem.status === 'cancelled' || !ehServico(origem.summary)) continue;
-    const pelaLista = origemDaRegiao(origem);
-    let equipa = pelaLista ? equipaDaRegiao(pelaLista.regiao) : null;
+    const escrita = equipaEscrita(origem);
+    const pelaLista = escrita ? null : origemDaRegiao(origem);
+    let equipa = escrita || (pelaLista ? equipaDaRegiao(pelaLista.regiao) : null);
     let duvida = pelaLista ? pelaLista.duvida : null;
     let pelaMorada = null;
     const morada = !equipa && procurarNoMapa ? moradaDoEvento(origem) : '';
@@ -763,7 +786,7 @@ function mensagemParaDono(semEquipa, incertos) {
     for (const item of incertos) {
       linhas.push(linha(item.evento), '  ' + item.evento.summary, '  → ' + nomeDaEquipa(item.equipaId) + ', ' + item.duvida, '');
     }
-    linhas.push('Se a equipa estiver errada, escreve no evento "equipa porto", "equipa braga", "equipa lisboa" ou "equipa algarve", ou o código postal. O serviço muda sozinho de equipa.');
+    linhas.push('Se a equipa estiver errada, escreve no evento "equipa porto", "equipa braga", "equipa lisboa 1", "equipa lisboa 2" ou "equipa algarve", ou o código postal. O serviço muda sozinho de equipa.');
   }
   if (semEquipa.length) {
     if (linhas.length) linhas.push('', '');
@@ -771,7 +794,7 @@ function mensagemParaDono(semEquipa, incertos) {
     for (const evento of semEquipa) linhas.push(linha(evento), '  ' + evento.summary);
     linhas.push(
       '',
-      'Acrescenta o código postal à morada (por exemplo 4000-123) ou escreve no evento "equipa porto", "equipa braga", "equipa lisboa" ou "equipa algarve".',
+      'Acrescenta o código postal à morada (por exemplo 4000-123) ou escreve no evento "equipa porto", "equipa braga", "equipa lisboa 1", "equipa lisboa 2" ou "equipa algarve".',
       'Assim que guardares, o serviço segue para a equipa certa.'
     );
   }

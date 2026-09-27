@@ -451,7 +451,7 @@ Detalhe em `docs/crm-google-calendar.md`. As regras que não se adivinham do có
 
 ## Calendários das equipas (2026-09-28)
 
-Detalhe e passos de instalação em `docs/calendario-equipas.md`. Um Apps Script na conta Google do dono (`google-apps-script/calendario-equipas/`) copia cada serviço do calendário dele para o calendário da equipa (Porto, Braga, Lisboa, Algarve: uma por região do CRM) e manda email à equipa quando um serviço entra, muda ou é cancelado.
+Detalhe e passos de instalação em `docs/calendario-equipas.md`. Um Apps Script na conta Google do dono (`google-apps-script/calendario-equipas/`) copia cada serviço do calendário dele para o calendário da equipa (Porto, Braga, Lisboa 1, Algarve: uma por região do CRM; a Lisboa 2 só recebe o que tiver "equipa lisboa 2" escrito, por decisão do dono) e manda email à equipa quando um serviço entra, muda ou é cancelado.
 
 - **Não corre no site: um push não o atualiza.** Mudar o script é pedir ao dono para colar os ficheiros outra vez no projeto do Apps Script.
 - **A hora do calendário do dono é a de Copenhaga, e a equipa vê uma hora a menos** (dono, 28/09: "estou com uma hora de avanço"; serviço às 15:00 no calendário dele = 14:00 em Portugal). As cópias levam o mesmo instante, no fuso de Lisboa. Nunca copiar os números do relógio: foi a primeira versão e punha a equipa uma hora atrasada.
