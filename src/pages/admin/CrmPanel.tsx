@@ -3,6 +3,7 @@ import { ChevronLeft, ChevronRight, Plus, Download, RefreshCw, Search, Trash2, P
 import { supabase } from "@/integrations/supabase/client";
 import { CRM_LOCALITIES, type CalendarEvent, type CrmLocality } from "@/lib/calendarServices";
 import { CALENDAR_SYNC_SINCE, planCalendarSync, type SyncPlan } from "@/lib/calendarSync";
+import { resolveMissingRegions } from "@/lib/regionLookup";
 import { lisbonDay, weekdayOf, WEEKDAY_SHORT } from "@/lib/crmClosings";
 import CrmClosings from "./CrmClosings";
 
@@ -140,10 +141,13 @@ const CrmPanel = () => {
         }
         throw new Error(data?.error ?? fnError?.message ?? "Erro ao ler o calendário");
       }
-      const plan = planCalendarSync(rows, (data.events ?? []) as CalendarEvent[], {
+      const events = (data.events ?? []) as CalendarEvent[];
+      const plan = planCalendarSync(rows, events, {
         since: CALENDAR_SYNC_SINCE,
         now: new Date().toISOString(),
       });
+      // Sem cidade nem código postal: telefone de um cliente anterior, depois a rua no mapa.
+      await resolveMissingRegions(rows, plan, events);
       if (plan.inserts.length) {
         // ignoreDuplicates: dois separadores abertos não duplicam um serviço.
         // eslint-disable-next-line @typescript-eslint/no-explicit-any

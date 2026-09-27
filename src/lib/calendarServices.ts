@@ -245,6 +245,19 @@ const tidy = (s: string) => s.replace(/\s+/g, ' ').replace(/^[\s,.;:-]+|[\s,;:-]
 const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 
 export function parseServiceEvent(event: CalendarEvent, known: KnownPlace[] = []): ParsedService | null {
+  return readServiceEvent(event, known)?.parsed ?? null;
+}
+
+/**
+ * A rua e o número da porta, para procurar num mapa quando a região não sai
+ * do texto ("Rua D. João IV 376, 1º, 105" → "Rua D. João IV 376"). Os andares
+ * baralham a pesquisa: com eles, esta morada do Porto dava Moita ou Sines.
+ */
+export function streetForMap(event: CalendarEvent): string | null {
+  return readServiceEvent(event)?.street ?? null;
+}
+
+function readServiceEvent(event: CalendarEvent, known: KnownPlace[] = []): { parsed: ParsedService; street: string | null } | null {
   const summary = clean(event.summary).trim();
   if (!isServiceEvent(summary)) return null;
   const amount = AMOUNT.exec(summary)!;
@@ -336,7 +349,11 @@ export function parseServiceEvent(event: CalendarEvent, known: KnownPlace[] = []
   else if (guessedFromParish) review.push(`Região deduzida pela freguesia (${city}): confirmar`);
   if (myCut > billed) review.push('A tua parte é maior que o faturado');
 
-  return {
+  const streetPart = [...address, ...clean(event.location).split(/[\n,]/)]
+    .map(tidy).find(part => STREET_WORDS.test(normalizeCity(part)) && /\d/.test(part));
+  const street = streetPart?.match(/^.*?\d+[a-z]?\b/i)?.[0] ?? null;
+
+  return { street, parsed: {
     request_date: event.startDate,
     description: capitalize(description),
     client_name: name,
@@ -346,5 +363,12 @@ export function parseServiceEvent(event: CalendarEvent, known: KnownPlace[] = []
     billed_value: billed,
     my_cut: myCut,
     needs_review: review.length ? review.join(' · ') : null,
-  };
+  } };
+}
+
+/** A região e o nome de um concelho ou freguesia conhecidos ("Vila Nova de Famalicão" → Braga). */
+export function placeByName(name: string): { city: string; locality: CrmLocality } | null {
+  const key = normalizeCity(name);
+  const place = municipalityPlaces.find(p => p.key === key) ?? parishPlaces.find(p => p.key === key);
+  return place ? { city: place.name, locality: place.locality } : null;
 }
