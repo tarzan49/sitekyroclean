@@ -63,7 +63,11 @@ Para desligar: função `desligar`. Os calendários ficam como estão.
 - **O Maps** (serviço Maps do próprio Apps Script, sem chave) recebe só a
   morada: o título sem o primeiro bocado (serviço e valores), sem telefones e
   sem o nome ao lado do telefone. A equipa sai do código postal do sítio
-  encontrado, com a mesma regra do CRM. Um sítio fora de todas as regiões
+  encontrado, com a mesma regra do CRM. **Uma resposta parcial** (o Maps só
+  encontrou parte da morada) só vale se o sítio que devolveu estiver escrito
+  na morada: na primeira volta a sério, "Pucariça" deu "Pocariça" em
+  Cantanhede (a certa é a de Mafra) e uma rua sem cidade deu a de Braga
+  (há outra em Coimbra). Um sítio fora de todas as regiões
   (Leiria, Beira Interior) vai para a equipa com a base mais perto; ilhas e
   estrangeiro ficam sem equipa. Quando a equipa veio do Maps e o evento não
   tem local, a morada que o Maps encontrou vai para o "Onde" da cópia: a
