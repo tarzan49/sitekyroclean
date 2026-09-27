@@ -63,11 +63,15 @@ Para desligar: função `desligar`. Os calendários ficam como estão.
 - **O Maps** (serviço Maps do próprio Apps Script, sem chave) recebe só a
   morada: o título sem o primeiro bocado (serviço e valores), sem telefones e
   sem o nome ao lado do telefone. A equipa sai do código postal do sítio
-  encontrado, com a mesma regra do CRM. **Uma resposta parcial** (o Maps só
-  encontrou parte da morada) só vale se o sítio que devolveu estiver escrito
-  na morada: na primeira volta a sério, "Pucariça" deu "Pocariça" em
-  Cantanhede (a certa é a de Mafra) e uma rua sem cidade deu a de Braga
-  (há outra em Coimbra). Um sítio fora de todas as regiões
+  encontrado, com a mesma regra do CRM. **Vale sempre a melhor resposta do
+  Maps, mesmo parcial** (dono, 28/09/2026: "100% automatizado", sem
+  perguntas): primeiro a morada como está, depois sem andar e lado ("cave
+  esquerda"), depois só o último bocado; ganha a primeira resposta que
+  encontre a morada inteira, e sem nenhuma assim a primeira que encontre
+  alguma coisa. O risco conhecido é a localidade com nome parecido: na
+  primeira volta "Pucariça" deu "Pocariça" (Cantanhede), quando a certa é a
+  de Mafra. Resolve-se acrescentando a localidade aos aliases de
+  `calendarServices.ts` (a Pucariça já lá está), que vêm antes do Maps. Um sítio fora de todas as regiões
   (Leiria, Beira Interior) vai para a equipa com a base mais perto; ilhas e
   estrangeiro ficam sem equipa. Quando a equipa veio do Maps e o evento não
   tem local, a morada que o Maps encontrou vai para o "Onde" da cópia: a
@@ -75,20 +79,18 @@ Para desligar: função `desligar`. Os calendários ficam como estão.
   procura-se uma vez e fica guardada (o Maps tem limite diário). Se o Maps
   falhar, o serviço espera pela volta seguinte e a cópia que já tiver não é
   tocada.
-- **Serviço sem equipa:** só quando nem o Maps encontra a morada (ou o título
-  não tem morada à parte, como "Serviço 70€ (130€) imper cadeiras"). Não é
-  copiado, e o dono recebe um email a pedir o código postal ou "equipa porto"
-  (braga, lisboa, algarve) no evento. Assim que o evento for guardado, segue
-  para a equipa. Na primeira volta, a 28/09, ainda sem o Maps, ficaram assim
-  4 serviços: uma aldeia que o site não conhece, "via longa" em vez de
-  Vialonga e duas ruas sem cidade.
-- **A hora é a de Portugal.** A hora que o dono escreve no evento é a hora de
-  Portugal (dono, 28/09/2026). O calendário dele está no fuso de Copenhaga
-  desde 23/08/2026, por isso um serviço marcado às 15:00 fica guardado como
-  14:00 em Portugal. A cópia leva os números escritos (15:00) no fuso de
-  Lisboa. **Nunca copiar o instante do evento tal como está**, senão a equipa
-  chega uma hora antes. Eventos criados antes de 23/08 (com o calendário em
-  Lisboa) não mudam.
+- **Serviço sem equipa:** só um evento sem morada nenhuma (por exemplo
+  "Serviço 70€ (130€) imper cadeiras"), ou uma morada que nem o Maps
+  reconhece. Não é copiado, e o dono recebe um email a pedir o código postal
+  ou "equipa porto" (braga, lisboa, algarve) no evento. Assim que o evento
+  for guardado, segue para a equipa.
+- **A hora é o mesmo instante, mostrado em Portugal.** O calendário do dono
+  está no fuso de Copenhaga desde 23/08/2026 e a hora que lá está é a de
+  Copenhaga (dono, 28/09/2026: "estou com uma hora de avanço"; o serviço que
+  ele vê às 15:00 é às 14:00 em Portugal). A cópia leva o mesmo instante no
+  fuso de Lisboa, por isso a equipa vê uma hora a menos. A primeira versão
+  copiava os números do relógio (15:00) e punha a equipa uma hora atrasada;
+  foi corrigida antes de os calendários serem partilhados.
 - **As equipas veem o título completo**, incluindo "70€ (140€)" (decisão do
   dono, 28/09/2026).
 - **Emails:** vão para quem tem o calendário da equipa partilhado com

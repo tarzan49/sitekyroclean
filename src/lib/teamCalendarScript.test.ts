@@ -140,18 +140,16 @@ describe('região e equipa de cada serviço', () => {
 });
 
 describe('hora da cópia', () => {
-  it('guarda os números escritos num calendário em Copenhaga como hora de Portugal', () => {
-    expect(plain(gs.horaEmPortugal({ dateTime: '2026-09-27T15:00:00+02:00', timeZone: COPENHAGA }))).toEqual({ dateTime: '2026-09-27T15:00:00', timeZone: 'Europe/Lisbon' });
-    expect(plain(gs.horaEmPortugal({ dateTime: '2026-11-10T09:30:00+01:00', timeZone: COPENHAGA }))).toEqual({ dateTime: '2026-11-10T09:30:00', timeZone: 'Europe/Lisbon' });
+  // Dono, 28/09/2026: um serviço às 15:00 no calendário dele (Copenhaga) é às 14:00 em Portugal.
+  it('mostra à equipa o mesmo instante na hora de Portugal: uma hora a menos que Copenhaga', () => {
+    expect(plain(gs.horaEmPortugal({ dateTime: '2026-09-28T15:00:00+02:00', timeZone: COPENHAGA }))).toEqual({ dateTime: '2026-09-28T14:00:00', timeZone: 'Europe/Lisbon' });
+    expect(plain(gs.horaEmPortugal({ dateTime: '2026-11-10T09:30:00+01:00', timeZone: COPENHAGA }))).toEqual({ dateTime: '2026-11-10T08:30:00', timeZone: 'Europe/Lisbon' });
   });
 
-  it('não mexe num evento criado com o calendário em Lisboa', () => {
-    // Devolvido pela Google no fuso do calendário (Copenhaga): 12:00+02:00 = 11:00 em Lisboa.
-    expect(plain(gs.horaEmPortugal({ dateTime: '2026-07-22T12:00:00+02:00', timeZone: 'Europe/Lisbon' }))).toEqual({ dateTime: '2026-07-22T11:00:00', timeZone: 'Europe/Lisbon' });
-  });
-
-  it('usa o fuso do calendário quando o evento não tem fuso, e copia dias inteiros', () => {
-    expect(gs.horaEmPortugal({ dateTime: '2026-09-27T15:00:00+02:00' }, COPENHAGA).dateTime).toBe('2026-09-27T15:00:00');
+  it('não depende do fuso em que o evento foi criado, e copia dias inteiros', () => {
+    // Criado com o calendário em Lisboa, devolvido pela Google em Copenhaga: 12:00+02:00 = 11:00 em Lisboa.
+    expect(gs.horaEmPortugal({ dateTime: '2026-07-22T12:00:00+02:00', timeZone: 'Europe/Lisbon' }).dateTime).toBe('2026-07-22T11:00:00');
+    expect(gs.horaEmPortugal({ dateTime: '2026-07-22T12:00:00+02:00' }).dateTime).toBe('2026-07-22T11:00:00');
     expect(plain(gs.horaEmPortugal({ date: '2026-10-01' }))).toEqual({ date: '2026-10-01' });
   });
 
@@ -168,7 +166,7 @@ describe('o que muda nos calendários das equipas', () => {
   const pessoal = evento('d4', 'Jantar');
 
   function estado(origens: Evento[]) {
-    return gs.copiasDesejadas(origens, COPENHAGA);
+    return gs.copiasDesejadas(origens);
   }
   // As cópias que existiriam depois de uma volta com estes eventos.
   function copiasDe(origens: Evento[]) {
@@ -184,7 +182,8 @@ describe('o que muda nos calendários das equipas', () => {
     expect(pendentes.map((e: Evento) => e.id)).toEqual(['c3']);
     const acoes = gs.planear(copias, [], AGORA, false);
     expect(resumoDe(acoes)).toEqual(['criar:lisboa:novo', 'criar:porto:novo']);
-    expect(acoes[0].corpo.start).toEqual({ dateTime: '2026-10-03T15:00:00', timeZone: 'Europe/Lisbon' });
+    // 15:00 no calendário do dono (Copenhaga) = 14:00 em Portugal.
+    expect(acoes[0].corpo.start).toEqual({ dateTime: '2026-10-03T14:00:00', timeZone: 'Europe/Lisbon' });
     expect(acoes[0].corpo.summary).toBe(lisboa.summary);
   });
 
@@ -203,8 +202,8 @@ describe('o que muda nos calendários das equipas', () => {
     const acoes = gs.planear(estado([mudado]).copias, copiasDe([lisboa]), AGORA, false);
     expect(resumoDe(acoes)).toEqual(['atualizar:lisboa:alterado']);
     const mensagem = gs.mensagemParaEquipa(acoes[0], gs.equipaDaRegiao('Lisboa'));
-    expect(mensagem.assunto).toBe('Serviço alterado: domingo, 04/10, das 10:00 às 11:00');
-    expect(mensagem.texto).toContain('Antes: sábado, 03/10, das 15:00 às 16:00');
+    expect(mensagem.assunto).toBe('Serviço alterado: domingo, 04/10, das 09:00 às 10:00');
+    expect(mensagem.texto).toContain('Antes: sábado, 03/10, das 14:00 às 15:00');
   });
 
   it('muda o serviço de equipa quando a morada muda de região', () => {
@@ -228,7 +227,7 @@ describe('o que muda nos calendários das equipas', () => {
   it('escreve à equipa o serviço como está no calendário do dono', () => {
     const [acao] = gs.planear(estado([lisboa]).copias, [], AGORA, false);
     const mensagem = gs.mensagemParaEquipa(acao, gs.equipaDaRegiao('Lisboa'));
-    expect(mensagem.assunto).toBe('Novo serviço: sábado, 03/10, das 15:00 às 16:00');
+    expect(mensagem.assunto).toBe('Novo serviço: sábado, 03/10, das 14:00 às 15:00');
     expect(mensagem.texto).toContain(lisboa.summary);
     expect(mensagem.texto).toContain('Está no calendário "Kyro · Equipa Lisboa".');
   });
@@ -253,7 +252,7 @@ describe('o que muda nos calendários das equipas', () => {
       const mapa = mapaDeTeste({
         'Rua Inventada 376, 1º': { encontrado: true, morada: 'Rua Inventada 376, 4000-000 Porto, Portugal', codigoPostal: '4000-000', lat: 41.15, lng: -8.61 },
       });
-      const { copias, pendentes } = gs.copiasDesejadas([semCidade, lisboa], COPENHAGA, mapa.procurar);
+      const { copias, pendentes } = gs.copiasDesejadas([semCidade, lisboa], mapa.procurar);
       expect(copias.get('m1').equipaId).toBe('porto');
       expect(copias.get('m1').corpo.location).toBe('Rua Inventada 376, 4000-000 Porto, Portugal');
       expect(pendentes).toEqual([]);
@@ -269,33 +268,35 @@ describe('o que muda nos calendários das equipas', () => {
       expect(gs.equipaPeloMapa({ encontrado: false })).toBeNull();
     });
 
-    it('não aceita uma resposta parcial com outro sítio que não o escrito', () => {
-      // Como "Pucariça" → "Pocariça" (Cantanhede), visto a 28/09/2026.
-      const parecido = { encontrado: true, parcial: true, nomes: ['Aldeia Inventoda', 'Concelho Longe'], morada: 'Aldeia Inventoda, Portugal', codigoPostal: '3060-000', lat: 40.35, lng: -8.59 };
-      // Como uma rua sem cidade que existe em duas cidades.
-      const ruaNoutraCidade = { encontrado: true, parcial: true, nomes: ['Braga', 'São Qualquer'], morada: 'Rua Inventada 376, 4710-000 Braga', codigoPostal: '4710-000', lat: 41.55, lng: -8.42 };
-      const mapa = mapaDeTeste({ 'Rua Central, 06, Aldeia Inventada': parecido, 'Rua Inventada 376, 1º': ruaNoutraCidade });
-      const { copias, pendentes } = gs.copiasDesejadas([aldeia, semCidade], COPENHAGA, mapa.procurar);
-      expect(copias.size).toBe(0);
-      expect(pendentes.map((e: Evento) => e.id)).toEqual(['m2', 'm1']);
-      // Parcial, mas com o sítio escrito na morada: vale.
-      expect(gs.mapaConfere({ ...parecido, nomes: ['Aldeia Inventada'] }, 'Rua Central, 06, Aldeia Inventada')).toBe(true);
-      expect(gs.mapaConfere({ ...ruaNoutraCidade, parcial: false }, 'Rua Inventada 376, 1º')).toBe(true);
+    it('fica com a melhor resposta do Maps, mesmo parcial: tudo automático', () => {
+      // Dono, 28/09/2026: sem perguntas. Uma rua sem cidade vai para onde o Maps a põe.
+      const ruaSemCidade = { encontrado: true, parcial: true, nomes: ['Braga'], morada: 'Rua Inventada 376, 4710-000 Braga', codigoPostal: '4710-000', lat: 41.55, lng: -8.42 };
+      const mapa = mapaDeTeste({ 'Rua Inventada 376, 1º': ruaSemCidade });
+      const { copias, pendentes } = gs.copiasDesejadas([semCidade], mapa.procurar);
+      expect(copias.get('m1').equipaId).toBe('braga');
+      expect(copias.get('m1').corpo.location).toBe('Rua Inventada 376, 4710-000 Braga');
+      expect(pendentes).toEqual([]);
+    });
+
+    it('tenta a morada inteira, depois sem andar e lado, depois só a localidade', () => {
+      expect([...gs.pesquisasDoMapa('Rua Inventada 28 , cave esquerda')]).toEqual(['Rua Inventada 28 , cave esquerda', 'rua inventada 28']);
+      expect([...gs.pesquisasDoMapa('Rua Central, 06, Aldeia Inventada')]).toEqual(['Rua Central, 06, Aldeia Inventada', 'Aldeia Inventada']);
+      expect([...gs.pesquisasDoMapa('Rua Nova 11, 2º esq, Vale Inventado')]).toEqual(['Rua Nova 11, 2º esq, Vale Inventado', 'rua nova 11, vale inventado', 'Vale Inventado']);
     });
 
     it('avisa o dono só quando nem o Maps encontra a morada', () => {
       const mapa = mapaDeTeste({ 'Rua Central, 06, Aldeia Inventada': { encontrado: false } });
-      const { copias, pendentes } = gs.copiasDesejadas([aldeia], COPENHAGA, mapa.procurar);
+      const { copias, pendentes } = gs.copiasDesejadas([aldeia], mapa.procurar);
       expect(copias.size).toBe(0);
       expect(pendentes.map((e: Evento) => e.id)).toEqual(['m2']);
     });
 
     it('se o Maps não responder, não mexe na cópia que já existe nem avisa ninguém', () => {
       const encontrado = mapaDeTeste({ 'Rua Inventada 376, 1º': { encontrado: true, morada: 'Porto', codigoPostal: '4000-000', lat: 41.15, lng: -8.61 } });
-      const { copias } = gs.copiasDesejadas([semCidade], COPENHAGA, encontrado.procurar);
+      const { copias } = gs.copiasDesejadas([semCidade], encontrado.procurar);
       const existentes = [...copias].map(([origemId, c]: [string, { equipaId: string; corpo: Evento & { extendedProperties: unknown } }]) =>
         ({ equipaId: c.equipaId, origemId, evento: copiaGravada(c.corpo, 'copia-m1') }));
-      const semResposta = gs.copiasDesejadas([{ ...semCidade, summary: `${semCidade.summary} B` }], COPENHAGA, mapaDeTeste({}).procurar);
+      const semResposta = gs.copiasDesejadas([{ ...semCidade, summary: `${semCidade.summary} B` }], mapaDeTeste({}).procurar);
       expect([...semResposta.adiados]).toEqual(['m1']);
       expect(semResposta.pendentes).toEqual([]);
       expect(gs.planear(semResposta.copias, existentes, AGORA, false, semResposta.adiados)).toEqual([]);
@@ -308,8 +309,8 @@ describe('o que muda nos calendários das equipas', () => {
     expect(gs.pendentesNovos([semMorada], primeira.atuais, AGORA).novos).toEqual([]);
     const mudado = { ...semMorada, summary: `${semMorada.summary} Seixal` };
     expect(gs.pendentesNovos([mudado], primeira.atuais, AGORA).novos).toHaveLength(1);
-    const mensagem = gs.mensagemParaDono(primeira.novos, COPENHAGA);
+    const mensagem = gs.mensagemParaDono(primeira.novos);
     expect(mensagem.assunto).toBe('Serviço sem equipa');
-    expect(mensagem.texto).toContain('sábado, 03/10, das 15:00 às 16:00');
+    expect(mensagem.texto).toContain('sábado, 03/10, das 14:00 às 15:00');
   });
 });

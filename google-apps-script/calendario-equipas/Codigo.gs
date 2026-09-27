@@ -74,14 +74,14 @@ function verificar() {
   const agora = Date.now();
   const fonte = listarEventos('primary', agora, agora + DIAS_DEPOIS * DIA_MS, null);
   const mapa = mapaComMemoria(PropertiesService.getScriptProperties());
-  const desejadas = copiasDesejadas(fonte.eventos, fonte.fuso, mapa.procurar);
+  const desejadas = copiasDesejadas(fonte.eventos, mapa.procurar);
   mapa.guardar(false);
   for (const evento of fonte.eventos) {
     if (!ehServico(evento.summary)) continue;
     const copia = desejadas.copias.get(evento.id);
     const equipa = copia ? nomeDaEquipa(copia.equipaId) : desejadas.adiados.has(evento.id) ? 'MAPA SEM RESPOSTA' : 'SEM EQUIPA';
     const pelaMorada = copia && copia.pelaMorada ? ' (Maps: ' + copia.pelaMorada + ')' : '';
-    Logger.log(equipa + pelaMorada + ' · ' + quando(horaEmPortugal(evento.start, fonte.fuso), horaEmPortugal(evento.end, fonte.fuso)) + ' · ' + evento.summary);
+    Logger.log(equipa + pelaMorada + ' · ' + quando(horaEmPortugal(evento.start), horaEmPortugal(evento.end)) + ' · ' + evento.summary);
   }
 }
 
@@ -130,7 +130,7 @@ function sincronizarAgora() {
   }
 
   const mapa = mapaComMemoria(propriedades);
-  const desejadas = copiasDesejadas(fonte.eventos, fonte.fuso, mapa.procurar);
+  const desejadas = copiasDesejadas(fonte.eventos, mapa.procurar);
   mapa.guardar();
   const silencioso = !propriedades.getProperty('primeiraVoltaFeita');
   const acoes = planear(desejadas.copias, existentes, agora, silencioso, desejadas.adiados);
@@ -156,7 +156,7 @@ function sincronizarAgora() {
   for (const chave in guardadas) if (!(chave in pendentes.atuais)) propriedades.deleteProperty(chave);
   propriedades.setProperties(pendentes.atuais);
   if (pendentes.novos.length) {
-    const mensagem = mensagemParaDono(pendentes.novos, fonte.fuso);
+    const mensagem = mensagemParaDono(pendentes.novos);
     MailApp.sendEmail({ to: Session.getEffectiveUser().getEmail(), subject: mensagem.assunto, body: mensagem.texto, name: 'Calendários das equipas' });
   }
 
@@ -222,9 +222,8 @@ function pessoasDoCalendario(calendario) {
     .map(function (r) { return r.scope.value; });
 }
 
-// Muda quando o que se guarda de cada morada muda, para as respostas antigas
-// não servirem (a primeira versão não guardava se a resposta era parcial).
-const MEMORIA_DO_MAPA = 'mapa2:';
+// Muda quando a forma de procurar muda, para as respostas antigas não servirem.
+const MEMORIA_DO_MAPA = 'mapa3:';
 
 /**
  * O Google Maps com memória: cada morada procura-se uma vez, porque o script
@@ -262,20 +261,33 @@ function mapaComMemoria(propriedades) {
 }
 
 /**
- * Procura a morada no Google Maps (o serviço Maps do Apps Script, sem chave).
- * O código postal do sítio encontrado decide a região, como no CRM; sem ele,
- * pergunta-se ao Maps o código postal daquele ponto.
+ * Procura a morada no Google Maps (o serviço Maps do Apps Script, sem chave)
+ * e fica com a melhor resposta, como quem a procura no telemóvel (dono,
+ * 28/09/2026: tudo automático, sem perguntas). Tenta a morada como está,
+ * depois sem andar e lado, depois só o último bocado. O código postal do
+ * sítio encontrado decide a região, como no CRM; sem ele, pergunta-se ao
+ * Maps o código postal daquele ponto.
  */
 function lerMapa(morada) {
   const mapa = Maps.newGeocoder().setRegion('pt').setLanguage('pt-PT');
-  const resposta = mapa.geocode(morada + ', Portugal');
-  if (resposta.status === 'ZERO_RESULTS') return { encontrado: false };
-  if (resposta.status !== 'OK') throw new Error(resposta.status);
-  const lugar = resposta.results[0];
-  // "Portugal" ou um distrito inteiro não dizem onde é o serviço.
-  if (componenteDoMapa(lugar, 'country') !== 'PT' || lugar.types.indexOf('country') >= 0 || lugar.types.indexOf('administrative_area_level_1') >= 0) {
-    return { encontrado: false };
+  // A primeira resposta que encontre a morada inteira; sem nenhuma assim, a
+  // primeira que diga pelo menos uma localidade.
+  let lugar = null;
+  for (const pesquisa of pesquisasDoMapa(morada)) {
+    const resposta = mapa.geocode(pesquisa + ', Portugal');
+    if (resposta.status !== 'OK' && resposta.status !== 'ZERO_RESULTS') throw new Error(resposta.status);
+    const primeiro = (resposta.results || [])[0];
+    // "Portugal" ou um distrito inteiro não dizem onde é o serviço.
+    const serve = primeiro && componenteDoMapa(primeiro, 'country') === 'PT' && primeiro.types.indexOf('country') < 0
+      && primeiro.types.indexOf('administrative_area_level_1') < 0;
+    if (!serve) continue;
+    if (!lugar) lugar = primeiro;
+    if (!primeiro.partial_match) {
+      lugar = primeiro;
+      break;
+    }
   }
+  if (!lugar) return { encontrado: false };
   const ponto = lugar.geometry.location;
   let codigoPostal = componenteDoMapa(lugar, 'postal_code');
   if (!codigoPostal) {
@@ -415,6 +427,33 @@ function moradaDoEvento(evento) {
   return [limpar(evento.location)].concat(morada).filter(Boolean).join(', ').replace(/\s*\n\s*/g, ', ').replace(/\s+/g, ' ').trim();
 }
 
+// Andar, lado e divisão da casa, já sem acentos: o Maps não os conhece e dá
+// uma resposta parcial ("Rua X 28, cave esquerda").
+const RUIDO_DA_MORADA = /(^|\s)(cave|sub-?cave|r\/c|rc|res-do-chao|res do chao|\d+\s*[ºª°]\.?\s*(andar)?|andar|esq\.?|esquerd[oa]|dt[oa]?\.?|direit[oa]|frente|tras|apto\.?|apartamento|fracao)(?=$|\s)/g;
+
+/**
+ * As pesquisas a fazer no Maps, por ordem: a morada como está; sem andar e
+ * lado; e o último bocado, que é onde se costuma escrever a localidade.
+ */
+function pesquisasDoMapa(morada) {
+  const inteira = morada.replace(/\s+/g, ' ').trim();
+  // Os bocados que sobram depois de tirar o andar e o lado ("cave esquerda" não sobra).
+  const partes = inteira.split(',').map(function (parte) { return parte.trim(); }).filter(function (parte) {
+    return normalizar(parte).replace(RUIDO_DA_MORADA, ' ').trim();
+  });
+  const semRuido = partes
+    .map(function (parte) { return normalizar(parte).replace(RUIDO_DA_MORADA, ' ').replace(/\s+/g, ' ').trim(); })
+    .join(', ');
+  const ultima = partes.length > 1 ? partes[partes.length - 1] : '';
+  const vistas = {};
+  return [inteira, semRuido, ultima].filter(function (pesquisa) {
+    const chave = normalizar(pesquisa).replace(/[^a-z0-9]/g, '');
+    if (!/[a-z]{3}/.test(chave) || vistas[chave]) return false;
+    vistas[chave] = true;
+    return true;
+  });
+}
+
 function noContinente(lat, lng) {
   return lat > 36.9 && lat < 42.2 && lng > -9.6 && lng < -6.1;
 }
@@ -424,22 +463,6 @@ function noContinente(lat, lng) {
  * do CRM; fora de todas as regiões (Leiria, Beira Interior), a equipa com a
  * base mais perto. Ilhas e estrangeiro ficam sem equipa.
  */
-/**
- * Uma resposta parcial do Maps (só encontrou parte da morada) só vale se o
- * sítio que devolveu estiver escrito na morada. Visto a 28/09/2026: "Rua
- * Central, 06, Pucariça" deu "Pocariça" (Cantanhede), quando a certa é a de
- * Mafra; e uma rua sem cidade deu a de Braga, quando há outra em Coimbra.
- * Uma resposta completa vale sempre.
- */
-function mapaConfere(resultado, morada) {
-  if (!resultado.parcial) return true;
-  const escrito = normalizar(morada).replace(/[^a-z0-9]/g, '');
-  return (resultado.nomes || []).some(function (nome) {
-    const chave = normalizar(nome).replace(/[^a-z0-9]/g, '');
-    return chave.length >= 4 && escrito.indexOf(chave) >= 0;
-  });
-}
-
 function equipaPeloMapa(resultado) {
   if (!resultado || !resultado.encontrado) return null;
   const regiao = resultado.codigoPostal ? regiaoPorCodigoPostal(resultado.codigoPostal) : null;
@@ -465,17 +488,15 @@ function nomeDaEquipa(id) {
 }
 
 /**
- * A hora que escreveste no evento é a hora de Portugal (dono, 28/09/2026: "a
- * hora para eles tem de ser sempre em Portugal"). Desde 23/08/2026 o teu
- * calendário está no fuso de Copenhaga, por isso um serviço marcado para as
- * 15:00 fica guardado às 15:00 de Copenhaga, que são 14:00 em Portugal. A
- * cópia leva os números que escreveste (15:00), no fuso de Portugal. Um
- * evento criado com o calendário no fuso de Lisboa não muda.
+ * A cópia leva o mesmo instante do evento, mostrado na hora de Portugal. O
+ * calendário do dono está no fuso de Copenhaga desde 23/08/2026 e a hora que
+ * lá está é a de Copenhaga (dono, 28/09/2026: "estou com uma hora de avanço";
+ * um serviço às 15:00 no calendário dele é às 14:00 em Portugal). Não se
+ * copiam os números do relógio: isso punha a equipa uma hora atrasada.
  */
-function horaEmPortugal(momento, fusoDoCalendario) {
+function horaEmPortugal(momento) {
   if (momento.date) return { date: momento.date };
-  const fuso = momento.timeZone || fusoDoCalendario || FUSO_PORTUGAL;
-  const relogio = Utilities.formatDate(new Date(momento.dateTime), fuso, "yyyy-MM-dd'T'HH:mm:ss");
+  const relogio = Utilities.formatDate(new Date(momento.dateTime), FUSO_PORTUGAL, "yyyy-MM-dd'T'HH:mm:ss");
   return { dateTime: relogio, timeZone: FUSO_PORTUGAL };
 }
 
@@ -496,13 +517,13 @@ function propriedadePrivada(evento, chave) {
 }
 
 /** `moradaNoMapa`: a morada que o Maps encontrou, que vai para o "Onde" da cópia quando o evento não tem local. */
-function corpoDaCopia(origem, fusoDoCalendario, moradaNoMapa) {
+function corpoDaCopia(origem, moradaNoMapa) {
   const corpo = {
     summary: origem.summary || '',
     location: origem.location || moradaNoMapa || '',
     description: origem.description || '',
-    start: horaEmPortugal(origem.start, fusoDoCalendario),
-    end: horaEmPortugal(origem.end, fusoDoCalendario),
+    start: horaEmPortugal(origem.start),
+    end: horaEmPortugal(origem.end),
   };
   corpo.reminders = { useDefault: true };
   corpo.extendedProperties = {
@@ -521,7 +542,7 @@ function corpoDaCopia(origem, fusoDoCalendario, moradaNoMapa) {
  * `procurarNoMapa(morada)` só é chamado quando o código postal e as listas do
  * site não chegam.
  */
-function copiasDesejadas(origens, fusoDoCalendario, procurarNoMapa) {
+function copiasDesejadas(origens, procurarNoMapa) {
   const copias = new Map();
   const pendentes = [];
   const adiados = new Set();
@@ -536,7 +557,7 @@ function copiasDesejadas(origens, fusoDoCalendario, procurarNoMapa) {
         adiados.add(origem.id);
         continue;
       }
-      equipa = resultado && mapaConfere(resultado, morada) ? equipaPeloMapa(resultado) : null;
+      equipa = equipaPeloMapa(resultado);
       if (equipa) pelaMorada = resultado.morada;
     }
     if (!equipa) {
@@ -545,7 +566,7 @@ function copiasDesejadas(origens, fusoDoCalendario, procurarNoMapa) {
     }
     copias.set(origem.id, {
       equipaId: equipa.id,
-      corpo: corpoDaCopia(origem, fusoDoCalendario, pelaMorada),
+      corpo: corpoDaCopia(origem, pelaMorada),
       fimMs: fimEmMs(origem.end),
       pelaMorada: pelaMorada,
     });
@@ -638,13 +659,13 @@ function pendentesNovos(pendentes, guardadas, agora) {
   return { novos: novos, atuais: atuais };
 }
 
-function mensagemParaDono(eventos, fusoDoCalendario) {
+function mensagemParaDono(eventos) {
   const linhas = [
     'Nem o código postal, nem a localidade, nem o Google Maps disseram onde ' + (eventos.length === 1 ? 'é este serviço' : 'são estes serviços') + ':',
     '',
   ];
   for (const evento of eventos) {
-    linhas.push('• ' + quando(horaEmPortugal(evento.start, fusoDoCalendario), horaEmPortugal(evento.end, fusoDoCalendario)));
+    linhas.push('• ' + quando(horaEmPortugal(evento.start), horaEmPortugal(evento.end)));
     linhas.push('  ' + evento.summary);
   }
   linhas.push(
