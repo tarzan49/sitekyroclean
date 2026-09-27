@@ -32,9 +32,7 @@ describe('páginas de marca', () => {
     // E dizem-se por cadeira, com o intervalo, porque o preço desce com a
     // quantidade: nunca "desde", nem só o preço mais alto (dono, 26-27/09/2026).
     const chairs = marcaPageCopy('cadeiras', marcasCadeiras[0], MARCA_CITIES[0]).description;
-    expect(chairs).toContain(`Limpeza de ${CHAIR_PRICE_LABEL}.`);
-    expect(chairs).not.toContain(`Limpeza a ${formatEuro(CHAIR_CLEANING_FROM)} por cadeira`);
-    expect(chairs).not.toMatch(/desde/i);
+    expect(chairs).toContain(`Limpeza ${CHAIR_PRICE_LABEL.toLowerCase()}.`);
     expect(marcaPageCopy('sofa', marcas[0], MARCA_CITIES[0]).description).toContain(`Limpeza desde ${formatEuro(SOFA_CLEANING_FROM)}.`);
   });
 

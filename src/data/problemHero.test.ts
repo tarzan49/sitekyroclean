@@ -40,7 +40,7 @@ describe('problem hero content', () => {
     expect(mites.priceLabel).toMatch(/^Limpeza desde /);
     expect(getProblemHero(problem('impermeabilizar-sofa')).priceLabel).toMatch(/^Proteção desde /);
     // Cadeiras: o preço é por cadeira, nunca "desde" (pedido do dono, 26/09/2026).
-    expect(getProblemHero(problem('limpeza-cadeiras-escritorio')).priceLabel).toBe(`Limpeza de ${CHAIR_PRICE_LABEL}`);
+    expect(getProblemHero(problem('limpeza-cadeiras-escritorio')).priceLabel).toBe(`Limpeza ${CHAIR_PRICE_LABEL.toLowerCase()}`);
   });
   it('makes urgent availability conditional', () => {
     expect(getProblemHero(problem('limpeza-sofa-urgente')).intro).toContain('sob confirmação');

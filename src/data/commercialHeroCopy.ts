@@ -33,7 +33,7 @@ const subtitles: Record<string, string> = {
   // As páginas /impermeabilizacao-cadeiras-* mostravam a linha de cima, com os
   // preços do sofá ("Premium desde 89€"). Nas cadeiras o preço é por cadeira e
   // nunca leva "desde" (pedido do dono, 26/09/2026).
-  [CHAIR_WATERPROOF_SUBTITLE_KEY]: `Proteção Premium a ${perChairPrice(CHAIR_WATERPROOF_PREMIUM_UNIT)}: até 10 anos e até 5 lavagens. Essencial a ${perChairPrice(CHAIR_WATERPROOF_ESSENCIAL_UNIT)}.`,
+  [CHAIR_WATERPROOF_SUBTITLE_KEY]: `Proteção Premium desde ${formatEuro(CHAIR_WATERPROOF_PREMIUM_UNIT)}: até 10 anos e até 5 lavagens. Essencial desde ${formatEuro(CHAIR_WATERPROOF_ESSENCIAL_UNIT)}.`,
 };
 export const commercialHeroSubtitle = (serviceSlug: string, city?: string) => `${subtitles[serviceSlug] ?? 'Cuidados profissionais adaptados aos seus estofos.'}${city && EXTENDED_TRIP_CITIES.has(city) ? ' Disponibilidade sob consulta.' : ''}`;
 
@@ -63,7 +63,6 @@ export const commercialHeroPriceLine = (serviceSlug: string, municipality?: stri
   // 6.ª, 12,50€ da 7.ª à 9.ª"), porque o preço desce com a quantidade e o hero
   // tem espaço para o dizer (dono, 27/09/2026). Ver `startingPriceLabel`.
   const priceText = /orçamento/i.test(value) ? 'Sob orçamento'
-    : isPricedPerChair(serviceSlug) && !/por cadeira$/.test(value) ? chairPriceBreakdown()
     : startingPriceLabel(serviceSlug, value);
   return `${priceText} + deslocação ${fee === undefined ? `a partir de ${TRAVEL_FEE_MIN}€` : `${fee}€`}.`;
 };

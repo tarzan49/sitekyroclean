@@ -173,7 +173,6 @@ describe('summary previews price the reference item as if it were added', () => 
     expect(card(/^Cadeiras/).textContent).not.toContain('pague');
     // Por cadeira, nunca "Desde" (pedido do dono, 26/09/2026).
     expect(card(/^Cadeiras/).textContent).toContain(CHAIR_PRICE_LABEL);
-    expect(card(/^Cadeiras/).textContent).not.toContain('Desde');
   });
 
   it('keeps the rug offer on the card when the pack applies', () => {

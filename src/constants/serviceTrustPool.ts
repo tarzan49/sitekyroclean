@@ -367,8 +367,8 @@ const IMPERMEABILIZACAO_FIXED_POINT3: TrustPoint = { titleGold: 'Combine com a l
 function getImpermeabilizacaoCadeiraTrustPoints(seed: string): TrustPoint[] {
   return [
     {
-      titleGold: `Essencial a ${perChairPrice(CHAIR_WATERPROOF_ESSENCIAL_UNIT)},`,
-      titleRest: ` Premium a ${perChairPrice(CHAIR_WATERPROOF_PREMIUM_UNIT)}`,
+      titleGold: `Essencial desde ${formatEuro(CHAIR_WATERPROOF_ESSENCIAL_UNIT)},`,
+      titleRest: ` Premium desde ${formatEuro(CHAIR_WATERPROOF_PREMIUM_UNIT)}`,
       desc: 'A Essencial protege de 1 a 2 anos e a Premium até 10 anos, com até 5 lavagens. O valor final da visita inclui a deslocação e é confirmado antes da marcação.',
     },
     pickFromPool(IMPERMEABILIZACAO_CADEIRA_POOL, `${seed}:cadeira`),

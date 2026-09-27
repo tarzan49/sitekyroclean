@@ -67,7 +67,7 @@ describe('páginas-pilar: uma fonte, três leitores', () => {
   it('os preços vêm do motor', () => {
     for (const page of PILLAR_PAGES) {
       const from = CLEANING_FROM_BY_SERVICE[page.serviceSlug];
-      if (from !== null && /Desde/.test(page.title)) expect(page.title, page.path).toContain(`Desde ${formatEuro(from)}`);
+      if (from !== null && /Desde/.test(page.title) && page.serviceSlug !== 'limpeza-cadeiras') expect(page.title, page.path).toContain(`Desde ${formatEuro(from)}`);
     }
     const chairs = PILLAR_PAGES.find(page => page.path === '/limpeza-cadeiras')!;
     expect(chairs.faqs[0].answer).toContain(chairTierSentence());

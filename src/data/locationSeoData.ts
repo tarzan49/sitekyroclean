@@ -4,7 +4,7 @@ import { WATERPROOFING_PROBLEMS } from "./waterproofingProblems";
 import { locationPrices } from '../constants/travel';
 import { getLandingFaqs, type LandingService } from './landingFaqPool';
 import { getLandingEditorial } from './landingEditorial';
-import { chairPriceBreakdown, CHAIR_PRICE_TITLE } from './enginePrices';
+import { CHAIR_PRICE_LABEL, CHAIR_PRICE_TITLE } from './enginePrices';
 
 // Cadeiras: o preço diz-se por cadeira e mostra que desce com a quantidade
 // (pedidos do dono, 26-27/09/2026). Os escalões vêm do motor.
@@ -129,9 +129,9 @@ function generateCadeirasContent(city: string, cityDesc: string): Omit<LocationS
   const Prep = cityPrepCap(city);
   return {
     title: `Limpeza de Cadeiras Estofadas ${city} | ${CHAIR_PRICE_TITLE} | Kyro Clean Solutions`,
-    metaDescription: `Limpeza profissional de cadeiras estofadas ${prep} ${city}. Ideal para escritórios, restaurantes e residências. ${chairPriceBreakdown()}.`,
+    metaDescription: `Limpeza profissional de cadeiras estofadas ${prep} ${city}. Ideal para escritórios, restaurantes e residências. ${CHAIR_PRICE_LABEL}.`,
     h1: `Limpeza de Cadeiras Estofadas ${prep} ${city}`,
-    intro: `Precisa de limpar cadeiras estofadas ${prep} ${city}? A Kyro Clean Solutions realiza limpeza profissional de cadeiras de escritório, cadeiras de jantar e cadeiras estofadas ${prep} ${city}, ${cityDesc}. Serviço rápido e eficaz ao domicílio ou no seu estabelecimento. A limpeza custa ${chairPriceBreakdown()}.`,
+    intro: `Precisa de limpar cadeiras estofadas ${prep} ${city}? A Kyro Clean Solutions realiza limpeza profissional de cadeiras de escritório, cadeiras de jantar e cadeiras estofadas ${prep} ${city}, ${cityDesc}. Serviço rápido e eficaz ao domicílio ou no seu estabelecimento. ${CHAIR_PRICE_LABEL}.`,
     problems: [
       { title: "Sujidade do uso diário", description: `Cadeiras de escritório e jantar acumulam manchas de suor, gordura e líquidos diariamente. ${Prep} ${city}, muitos escritórios e restaurantes necessitam de limpeza regular.` },
       { title: "Manchas visíveis", description: `Manchas de café, alimentos e tinta que deixam as cadeiras com aspecto descuidado, prejudicando a imagem do seu espaço.` },
@@ -140,7 +140,7 @@ function generateCadeirasContent(city: string, cityDesc: string): Omit<LocationS
     ],
     howItWorks: `Limpeza de cadeiras ${prep} ${city}: 1) Inspeção do tecido, 2) Pulverização com produto específico, 3) Escovação para penetrar nas fibras, 4) Extração profunda com equipamento profissional, 5) Secagem rápida. Ideal para lotes de cadeiras em escritórios e restaurantes.`,
     benefits: [
-      chairPriceBreakdown(),
+      CHAIR_PRICE_LABEL,
       "Ideal para escritórios, restaurantes, salas de reunião e refeitórios",
       "Remoção de manchas de café, tinta, gordura e uso diário",
       "Serviço rápido que não interrompe o funcionamento do seu espaço",

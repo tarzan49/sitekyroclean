@@ -145,15 +145,12 @@ const chairUnits = chairCleaningTiers().tiers.map(tier => tier.unit);
 /** O preço mais baixo e o mais alto de uma cadeira (12,50€ e 20€). */
 export const CHAIR_UNIT_MIN = Math.min(...chairUnits);
 export const CHAIR_UNIT_MAX = Math.max(...chairUnits);
-/** "12,50€ a 20€ por cadeira": o preço de cada cadeira desce com a quantidade. */
-export const CHAIR_PRICE_LABEL = CHAIR_UNIT_MIN === CHAIR_UNIT_MAX
-  ? perChairPrice(CHAIR_UNIT_MAX)
-  : `${formatEuro(CHAIR_UNIT_MIN)} a ${formatEuro(CHAIR_UNIT_MAX)} por cadeira`;
-/** "12,50€ a 20€ cada": a mesma coisa para um cartão pequeno que já diz
- *  "Cadeiras" por cima (o cartão do quiz), onde "por cadeira" partia a linha. */
-export const CHAIR_PRICE_SHORT = CHAIR_PRICE_LABEL.replace(/ por cadeira$/, ' cada');
-/** "12,50€ a 20€ por Cadeira", para títulos em maiúsculas iniciais. */
-export const CHAIR_PRICE_TITLE = CHAIR_PRICE_LABEL.replace(/cadeira$/, 'Cadeira');
+/** "Desde 12,50€": o preço mais baixo por cadeira (dono, 27/09/2026: "diz só desde 12,5"). */
+export const CHAIR_PRICE_LABEL = `Desde ${formatEuro(CHAIR_UNIT_MIN)}`;
+/** Igual, para o cartão do quiz, que diz "a partir de" nos outros serviços. */
+export const CHAIR_PRICE_SHORT = `a partir de ${formatEuro(CHAIR_UNIT_MIN)}`;
+/** Igual, para títulos. */
+export const CHAIR_PRICE_TITLE = CHAIR_PRICE_LABEL;
 
 /**
  * Os escalões numa frase curta, para quem precisa de perceber a lógica:
@@ -200,15 +197,10 @@ export const isPricedPerChair = (serviceSlug: string | undefined): boolean => se
  * quem chama, porque cada sítio os escreve à sua maneira.
  */
 export function startingPriceLabel(serviceSlug: string | undefined, price: string, position: PriceLabelPosition = 'start'): string {
-  const alreadyPerChair = PER_CHAIR.test(price);
-  if (!isPricedPerChair(serviceSlug) && !alreadyPerChair) return `${position === 'mid' ? 'desde' : 'Desde'} ${price}`;
-  if (alreadyPerChair) {
-    if (position === 'title') return price.replace(/cadeira$/, 'Cadeira');
-    return position === 'mid' ? `a ${price}` : price;
-  }
-  // Limpeza de cadeiras: o intervalo, porque o preço desce com a quantidade.
-  if (position === 'title') return CHAIR_PRICE_TITLE;
-  return `${position === 'mid' ? 'de' : 'De'} ${CHAIR_PRICE_LABEL}`;
+  const Desde = position === 'mid' ? 'desde' : 'Desde';
+  // Cadeiras: o preço mais baixo por cadeira, como os outros serviços (dono, 27/09/2026).
+  if (isPricedPerChair(serviceSlug)) return `${Desde} ${formatEuro(CHAIR_UNIT_MIN)}`;
+  return `${Desde} ${price.replace(PER_CHAIR, '')}`;
 }
 
 /** Preço de partida da limpeza por serviço, como o hero e o schema o mostram. */
