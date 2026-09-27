@@ -124,15 +124,15 @@ Para desligar: função `desligar`. Os calendários ficam como estão.
   antes de haver correções. Na pintura dos serviços que já existiam (28/09)
   só dois estavam nessa situação. Os serviços que já passaram ficam como
   estavam.
-- **Os calendários das equipas ficam visíveis na conta do dono**, com a cor
-  da equipa: é por eles que ele vê que equipa vai a cada serviço (dono,
-  28/09/2026: "só quero que me apareça no calendário o que aparece às
-  equipas"; no iPhone as cores dos eventos não apareciam, as dos calendários
-  sim). Para não ver cada serviço duas vezes, o dono esconde o seu próprio
-  calendário no telemóvel (menu ☰, tirar o visto a "António Peixoto"). Com
-  isso deixa de ver aí os eventos que não são serviços e os serviços sem
-  equipa; um serviço novo que ele crie aparece segundos depois, já no
-  calendário da equipa. Estiveram escondidos umas horas nesse dia.
+- **Os calendários das equipas ficam escondidos na conta do dono**, e o
+  calendário dele à vista: vê cada serviço uma vez, no seu calendário, com a
+  cor da equipa. Os calendários das equipas são dele (o script corre na
+  conta dele), por isso visíveis mostravam cada serviço a dobrar. A 28/09
+  estiveram visíveis umas horas, porque o iPhone não mostrava as cores dos
+  eventos; depois de o dono reinstalar a app passou a mostrar, e voltaram a
+  ser escondidos. **Não tirar os serviços do calendário do dono** (ele
+  chegou a pedir): o CRM lê-os de lá e a cópia parte deles; sem o original,
+  o CRM marcava-os como apagados e as equipas recebiam "cancelado".
 - **As equipas veem o título completo**, incluindo "70€ (140€)" (decisão do
   dono, 28/09/2026).
 - **Emails:** vão para quem tem o calendário da equipa partilhado com

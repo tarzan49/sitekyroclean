@@ -38,7 +38,7 @@ const EQUIPAS = [
 
 // Muda quando as cores das equipas (ou o que se faz na lista do dono) mudarem,
 // para os calendários voltarem a ser arrumados.
-const VERSAO_DAS_CORES = '4';
+const VERSAO_DAS_CORES = '5';
 
 const FUSO_PORTUGAL = 'Europe/Lisbon';
 const DIAS_ANTES = 2;
@@ -205,22 +205,24 @@ function pintarServicos(copias, agora) {
 }
 
 /**
- * Os calendários das equipas na lista do dono, com a cor da equipa e
- * visíveis: é por eles que o dono vê que equipa vai a cada serviço (dono,
- * 28/09/2026: "só quero que me apareça no calendário o que aparece às
- * equipas"). Para não ver cada serviço duas vezes, o dono esconde o seu
- * próprio calendário no telemóvel. Estiveram escondidos umas horas nesse
- * dia, quando ele via os dois. Uma vez por versão.
+ * Os calendários das equipas na lista do dono: com a cor da equipa e
+ * escondidos, e o calendário dele à vista. O dono vê cada serviço uma vez, no
+ * seu calendário, com a cor da equipa (`pintarServicos`). Histórico de
+ * 28/09/2026: primeiro visíveis (via tudo a dobrar), depois escondidos,
+ * depois visíveis porque o iPhone não mostrava as cores dos eventos, e de
+ * novo escondidos quando, depois de reinstalar a app, as cores passaram a
+ * aparecer. Uma vez por versão.
  */
 function pintarCalendarios(calendarios, propriedades) {
   if (propriedades.getProperty('coresDosCalendarios') === VERSAO_DAS_CORES) return;
   for (const equipa of EQUIPAS) {
     Calendar.CalendarList.patch(
-      { backgroundColor: equipa.corDoCalendario, foregroundColor: '#ffffff', hidden: false, selected: true },
+      { backgroundColor: equipa.corDoCalendario, foregroundColor: '#ffffff', hidden: true, selected: false },
       calendarios[equipa.id],
       { colorRgbFormat: true }
     );
   }
+  Calendar.CalendarList.patch({ hidden: false, selected: true }, Session.getEffectiveUser().getEmail());
   propriedades.setProperty('coresDosCalendarios', VERSAO_DAS_CORES);
 }
 
