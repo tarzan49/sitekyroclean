@@ -123,12 +123,16 @@ Para desligar: função `desligar`. Os calendários ficam como estão.
   26/09/2026 às 15:00 UTC, e esses são pintados segundos depois de criados,
   antes de haver correções. Na pintura dos serviços que já existiam (28/09)
   só dois estavam nessa situação. Os serviços que já passaram ficam como
-  estavam. Os calendários das equipas ficam com a
-  mesma cor na lista do dono, **e escondidos**: são dele (o script corre na
-  conta dele), por isso a Google mostrava-lhe cada serviço duas vezes, o
-  original e a cópia. Escondidos continuam a funcionar para as equipas;
-  para ver um, Google Calendar no computador → Definições → o calendário →
-  "Mostrar na lista".
+  estavam.
+- **Os calendários das equipas ficam visíveis na conta do dono**, com a cor
+  da equipa: é por eles que ele vê que equipa vai a cada serviço (dono,
+  28/09/2026: "só quero que me apareça no calendário o que aparece às
+  equipas"; no iPhone as cores dos eventos não apareciam, as dos calendários
+  sim). Para não ver cada serviço duas vezes, o dono esconde o seu próprio
+  calendário no telemóvel (menu ☰, tirar o visto a "António Peixoto"). Com
+  isso deixa de ver aí os eventos que não são serviços e os serviços sem
+  equipa; um serviço novo que ele crie aparece segundos depois, já no
+  calendário da equipa. Estiveram escondidos umas horas nesse dia.
 - **As equipas veem o título completo**, incluindo "70€ (140€)" (decisão do
   dono, 28/09/2026).
 - **Emails:** vão para quem tem o calendário da equipa partilhado com
