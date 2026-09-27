@@ -35,7 +35,7 @@ export const marcasCadeiras: MarcaCadeiras[] = [
     serviceSlug: "limpeza-cadeiras",
     faqs: [
       { question: "Limpam cadeiras IKEA de escritório e de sala de jantar?", answer: "Sim, tratamos os dois tipos. A técnica adapta-se ao material: mesh respirável para cadeiras de escritório, tecido ou couro sintético para sala de jantar." },
-      { question: "Quanto tempo demora a limpeza de um conjunto de cadeiras IKEA?", answer: "Entre 15 a 30 minutos por cadeira, dependendo do estado. Para conjuntos de 4 ou mais, o preço por unidade desce." },
+      { question: "Quanto tempo demora a limpeza de um conjunto de cadeiras IKEA?", answer: "Entre 7 a 10 minutos por cadeira, dependendo do estado. Para conjuntos de 4 ou mais, o preço por unidade desce." },
       { question: "As cadeiras IKEA de escritório podem ser limpas com o mecanismo montado?", answer: "Sim, não é necessário desmontar. Limpamos o assento e o encosto com a cadeira montada, sem afetar o mecanismo." },
     ],
   },
