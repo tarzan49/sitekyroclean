@@ -370,14 +370,16 @@ describe('o que muda nos calendários das equipas', () => {
     });
   });
 
-  it('pinta cada serviço com a cor da equipa, e volta a pintar se mudar de equipa', () => {
-    // Dono, 28/09/2026: "quero o meu com cores em vez de ser tudo azul".
-    expect(gs.corEmFalta(lisboa, 'lisboa')).toBe('6');
-    expect(gs.corEmFalta(lisboa, 'porto')).toBe('9');
-    expect(gs.corEmFalta({ ...lisboa, colorId: '6' }, 'lisboa')).toBeNull();
-    expect(gs.corEmFalta({ ...lisboa, colorId: '6' }, 'braga')).toBe('10');
+  it('pinta os serviços daqui para a frente com a cor da equipa, e volta a pintar se mudarem de equipa', () => {
+    // Dono, 28/09/2026: "quero o meu com cores em vez de ser tudo azul", "pinta só os serviços para a frente".
+    expect(gs.corEmFalta(lisboa, 'lisboa', AGORA)).toBe('6');
+    expect(gs.corEmFalta(lisboa, 'porto', AGORA)).toBe('9');
+    expect(gs.corEmFalta({ ...lisboa, colorId: '6' }, 'lisboa', AGORA)).toBeNull();
+    expect(gs.corEmFalta({ ...lisboa, colorId: '6' }, 'braga', AGORA)).toBe('10');
+    const passado = evento('p9', lisboa.summary, '2026-09-27T10:00:00+02:00', '2026-09-27T11:00:00+02:00');
+    expect(gs.corEmFalta(passado, 'lisboa', AGORA)).toBeNull();
     // Cada equipa com uma cor diferente.
-    const cores = ['porto', 'braga', 'lisboa', 'lisboa2', 'algarve'].map(id => gs.corEmFalta(lisboa, id));
+    const cores = ['porto', 'braga', 'lisboa', 'lisboa2', 'algarve'].map(id => gs.corEmFalta(lisboa, id, AGORA));
     expect(new Set(cores).size).toBe(5);
   });
 

@@ -112,7 +112,8 @@ Para desligar: função `desligar`. Os calendários ficam como estão.
   copiava os números do relógio (15:00) e punha a equipa uma hora atrasada;
   foi corrigida antes de os calendários serem partilhados.
 - **Cores no calendário do dono** (dono, 28/09/2026: "quero o meu com cores
-  em vez de ser tudo azul"): cada serviço fica com a cor da equipa (Porto
+  em vez de ser tudo azul", "pinta só os serviços para a frente"): cada
+  serviço que ainda não acabou fica com a cor da equipa (Porto
   azul Mirtilo, Braga verde Basílico, Lisboa 1 laranja Tangerina, Lisboa 2
   roxo Uva, Algarve amarelo Banana) e muda de cor se mudar de equipa. Uma
   cor posta à mão num serviço é substituída pela da equipa. **Cuidado com o
@@ -121,7 +122,8 @@ Para desligar: função `desligar`. Os calendários ficam como estão.
   cima das correções feitas no CRM. Só acompanha eventos criados depois de
   26/09/2026 às 15:00 UTC, e esses são pintados segundos depois de criados,
   antes de haver correções. Na pintura dos serviços que já existiam (28/09)
-  só dois estavam nessa situação. Os calendários das equipas ficam com a
+  só dois estavam nessa situação. Os serviços que já passaram ficam como
+  estavam. Os calendários das equipas ficam com a
   mesma cor na lista do dono, **e escondidos**: são dele (o script corre na
   conta dele), por isso a Google mostrava-lhe cada serviço duas vezes, o
   original e a cópia. Escondidos continuam a funcionar para as equipas;

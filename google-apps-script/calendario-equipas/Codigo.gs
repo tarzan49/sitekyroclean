@@ -180,15 +180,16 @@ function sincronizarAgora() {
     MailApp.sendEmail({ to: Session.getEffectiveUser().getEmail(), subject: mensagem.assunto, body: mensagem.texto, name: 'Calendários das equipas' });
   }
 
-  pintarServicos(desejadas.copias);
+  pintarServicos(desejadas.copias, agora);
   pintarCalendarios(calendarios, propriedades);
 
   if (silencioso) propriedades.setProperty('primeiraVoltaFeita', new Date(agora).toISOString());
 }
 
 /**
- * Pinta cada serviço no calendário do dono com a cor da equipa (dono,
- * 28/09/2026: "quero o meu com cores em vez de ser tudo azul"). Mudar a cor
+ * Pinta no calendário do dono os serviços que ainda não acabaram com a cor
+ * da equipa (dono, 28/09/2026: "quero o meu com cores em vez de ser tudo
+ * azul", "pinta só os serviços para a frente"). Mudar a cor
  * mexe na data de alteração do evento, e o CRM (`calendarSync.ts`) relê um
  * evento alterado depois da linha e escreve por cima das correções feitas no
  * CRM. Isso só acontece com eventos criados depois de 26/09/2026 às 15:00 UTC
@@ -196,9 +197,9 @@ function sincronizarAgora() {
  * criados, antes de haver correções. Um serviço que muda de equipa muda de
  * cor logo a seguir à alteração do dono.
  */
-function pintarServicos(copias) {
+function pintarServicos(copias, agora) {
   copias.forEach(function (copia) {
-    const cor = corEmFalta(copia.origem, copia.equipaId);
+    const cor = corEmFalta(copia.origem, copia.equipaId, agora);
     if (cor) Calendar.Events.patch({ colorId: cor }, 'primary', copia.origem.id, { sendUpdates: 'none' });
   });
 }
@@ -606,8 +607,9 @@ function duvidaDoMapa(resultado) {
     + (foraDasRegioes ? ', fora das zonas das equipas: foi a equipa mais perto' : '');
 }
 
-/** A cor a pôr num serviço do calendário do dono, ou null se já tem a da equipa. */
-function corEmFalta(origem, equipaId) {
+/** A cor a pôr num serviço do calendário do dono: null se já acabou ou se já tem a da equipa. */
+function corEmFalta(origem, equipaId, agora) {
+  if (fimEmMs(origem.end) <= agora) return null;
   const equipa = EQUIPAS.find(function (e) { return e.id === equipaId; });
   if (!equipa || origem.colorId === equipa.cor) return null;
   return equipa.cor;
