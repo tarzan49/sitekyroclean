@@ -80,8 +80,9 @@ function verificar() {
     if (!ehServico(evento.summary)) continue;
     const copia = desejadas.copias.get(evento.id);
     const equipa = copia ? nomeDaEquipa(copia.equipaId) : desejadas.adiados.has(evento.id) ? 'MAPA SEM RESPOSTA' : 'SEM EQUIPA';
-    const pelaMorada = copia && copia.pelaMorada ? ' (Maps: ' + copia.pelaMorada + ')' : '';
-    Logger.log(equipa + pelaMorada + ' · ' + quando(horaEmPortugal(evento.start), horaEmPortugal(evento.end)) + ' · ' + evento.summary);
+    const incerto = desejadas.incertos.find(function (i) { return i.evento.id === evento.id; });
+    const duvida = incerto ? ' (sem certeza: ' + incerto.duvida + ')' : '';
+    Logger.log(equipa + duvida + ' · ' + quando(horaEmPortugal(evento.start), horaEmPortugal(evento.end)) + ' · ' + evento.summary);
   }
 }
 
@@ -150,13 +151,15 @@ function sincronizarAgora() {
 
   const guardadas = {};
   for (const chave of propriedades.getKeys()) {
-    if (chave.indexOf('pendente:') === 0) guardadas[chave] = propriedades.getProperty(chave);
+    if (chave.indexOf('pendente:') === 0 || chave.indexOf('incerto:') === 0) guardadas[chave] = propriedades.getProperty(chave);
   }
   const pendentes = pendentesNovos(desejadas.pendentes, guardadas, agora);
-  for (const chave in guardadas) if (!(chave in pendentes.atuais)) propriedades.deleteProperty(chave);
+  const incertos = incertosNovos(desejadas.incertos, guardadas, agora);
+  for (const chave in guardadas) if (!(chave in pendentes.atuais) && !(chave in incertos.atuais)) propriedades.deleteProperty(chave);
   propriedades.setProperties(pendentes.atuais);
-  if (pendentes.novos.length) {
-    const mensagem = mensagemParaDono(pendentes.novos);
+  propriedades.setProperties(incertos.atuais);
+  if (pendentes.novos.length || incertos.novos.length) {
+    const mensagem = mensagemParaDono(pendentes.novos, incertos.novos);
     MailApp.sendEmail({ to: Session.getEffectiveUser().getEmail(), subject: mensagem.assunto, body: mensagem.texto, name: 'Calendários das equipas' });
   }
 
@@ -387,14 +390,27 @@ const REGIAO_ESCRITA = { porto: 'Porto', braga: 'Braga', lisboa: 'Lisboa', algar
  * listas vêm do site (Lugares.gs) e são as mesmas que o CRM usa.
  */
 function regiaoDoEvento(evento) {
+  const origem = origemDaRegiao(evento);
+  return origem ? origem.regiao : null;
+}
+
+/**
+ * A região e de onde veio. `duvida` diz porque não é certa: uma freguesia
+ * pode ser o apelido do cliente ou ter o mesmo nome noutro sítio (o CRM
+ * marca-a "Rever" pela mesma razão). O resto conta como certo.
+ */
+function origemDaRegiao(evento) {
   const texto = [evento.location, evento.summary, evento.description].map(limpar).filter(Boolean).join('\n');
   const escrita = EQUIPA_ESCRITA.exec(normalizar(texto));
-  if (escrita) return REGIAO_ESCRITA[escrita[1]];
+  if (escrita) return { regiao: REGIAO_ESCRITA[escrita[1]], duvida: null };
   const postal = /\b(\d{4})-\d{3}\b/.exec(texto);
   const pelaMorada = postal && regiaoPorCodigoPostal(postal[1]);
-  if (pelaMorada) return pelaMorada;
-  const lugar = encontrarLugar(texto, LUGARES.concelhos) || encontrarLugar(texto, LUGARES.freguesias);
-  return lugar ? lugar.regiao : null;
+  if (pelaMorada) return { regiao: pelaMorada, duvida: null };
+  const concelho = encontrarLugar(texto, LUGARES.concelhos);
+  if (concelho) return { regiao: concelho.regiao, duvida: null };
+  const freguesia = encontrarLugar(texto, LUGARES.freguesias);
+  if (freguesia) return { regiao: freguesia.regiao, duvida: 'pela freguesia "' + freguesia.lugar + '", sem código postal nem concelho escritos' };
+  return null;
 }
 
 function equipaDaRegiao(regiao) {
@@ -482,6 +498,14 @@ function equipaPeloMapa(resultado) {
   return maisPerto;
 }
 
+/** Uma equipa escolhida pelo Maps nunca é certa: diz-se o que o Maps encontrou. */
+function duvidaDoMapa(resultado) {
+  const foraDasRegioes = !(resultado.codigoPostal && regiaoPorCodigoPostal(resultado.codigoPostal));
+  return 'pelo Google Maps, que encontrou "' + resultado.morada + '"'
+    + (resultado.parcial ? ' (só parte da morada)' : '')
+    + (foraDasRegioes ? ', fora das zonas das equipas: foi a equipa mais perto' : '');
+}
+
 function nomeDaEquipa(id) {
   const equipa = EQUIPAS.find(function (e) { return e.id === id; });
   return equipa ? equipa.nome.replace(/^Kyro · /, '') : id;
@@ -537,18 +561,23 @@ function corpoDaCopia(origem, moradaNoMapa) {
 
 /**
  * A cópia que cada serviço devia ter, por id do evento original; os serviços
- * que não se sabe a que equipa mandar; e os `adiados`, cuja morada o Maps não
- * conseguiu procurar agora (a cópia que tiverem fica como está).
+ * que não se sabe a que equipa mandar; os `incertos`, que seguem para uma
+ * equipa mas de que o dono é avisado (dono, 28/09/2026: "quando não tiveres
+ * 100% certeza envia-me um alerta no email"); e os `adiados`, cuja morada o
+ * Maps não conseguiu procurar agora (a cópia que tiverem fica como está).
  * `procurarNoMapa(morada)` só é chamado quando o código postal e as listas do
  * site não chegam.
  */
 function copiasDesejadas(origens, procurarNoMapa) {
   const copias = new Map();
   const pendentes = [];
+  const incertos = [];
   const adiados = new Set();
   for (const origem of origens) {
     if (origem.status === 'cancelled' || !ehServico(origem.summary)) continue;
-    let equipa = equipaDaRegiao(regiaoDoEvento(origem));
+    const pelaLista = origemDaRegiao(origem);
+    let equipa = pelaLista ? equipaDaRegiao(pelaLista.regiao) : null;
+    let duvida = pelaLista ? pelaLista.duvida : null;
     let pelaMorada = null;
     const morada = !equipa && procurarNoMapa ? moradaDoEvento(origem) : '';
     if (morada) {
@@ -558,7 +587,10 @@ function copiasDesejadas(origens, procurarNoMapa) {
         continue;
       }
       equipa = equipaPeloMapa(resultado);
-      if (equipa) pelaMorada = resultado.morada;
+      if (equipa) {
+        pelaMorada = resultado.morada;
+        duvida = duvidaDoMapa(resultado);
+      }
     }
     if (!equipa) {
       pendentes.push(origem);
@@ -570,8 +602,9 @@ function copiasDesejadas(origens, procurarNoMapa) {
       fimMs: fimEmMs(origem.end),
       pelaMorada: pelaMorada,
     });
+    if (duvida) incertos.push({ evento: origem, equipaId: equipa.id, duvida: duvida });
   }
-  return { copias: copias, pendentes: pendentes, adiados: adiados };
+  return { copias: copias, pendentes: pendentes, incertos: incertos, adiados: adiados };
 }
 
 /**
@@ -648,30 +681,52 @@ function mensagemParaEquipa(acao, equipa) {
  * desde o aviso). `atuais` é o que fica guardado para a volta seguinte.
  */
 function pendentesNovos(pendentes, guardadas, agora) {
+  return avisosNovos(pendentes.map(function (evento) { return { evento: evento }; }), 'pendente:', guardadas, agora);
+}
+
+/** O mesmo para os serviços enviados sem certeza: outro aviso se o evento ou a equipa mudarem. */
+function incertosNovos(incertos, guardadas, agora) {
+  return avisosNovos(incertos, 'incerto:', guardadas, agora);
+}
+
+function avisosNovos(itens, prefixo, guardadas, agora) {
   const novos = [];
   const atuais = {};
-  for (const evento of pendentes) {
+  for (const item of itens) {
+    const evento = item.evento;
     if (fimEmMs(evento.end) <= agora) continue;
-    const chave = 'pendente:' + evento.id;
-    atuais[chave] = resumo(JSON.stringify([evento.summary || '', evento.location || '', evento.description || '']));
-    if (guardadas[chave] !== atuais[chave]) novos.push(evento);
+    const chave = prefixo + evento.id;
+    atuais[chave] = resumo(JSON.stringify([evento.summary || '', evento.location || '', evento.description || '', item.equipaId || '']));
+    if (guardadas[chave] !== atuais[chave]) novos.push(prefixo === 'pendente:' ? evento : item);
   }
   return { novos: novos, atuais: atuais };
 }
 
-function mensagemParaDono(eventos) {
-  const linhas = [
-    'Nem o código postal, nem a localidade, nem o Google Maps disseram onde ' + (eventos.length === 1 ? 'é este serviço' : 'são estes serviços') + ':',
-    '',
-  ];
-  for (const evento of eventos) {
-    linhas.push('• ' + quando(horaEmPortugal(evento.start), horaEmPortugal(evento.end)));
-    linhas.push('  ' + evento.summary);
+/** Um só email por volta: os serviços sem equipa e os enviados sem certeza. As horas são as de Portugal. */
+function mensagemParaDono(semEquipa, incertos) {
+  incertos = incertos || [];
+  const linha = function (evento) { return '• ' + quando(horaEmPortugal(evento.start), horaEmPortugal(evento.end)) + ' (hora de Portugal)'; };
+  const linhas = [];
+  if (incertos.length) {
+    linhas.push('Enviei ' + (incertos.length === 1 ? 'este serviço' : 'estes serviços') + ' sem ter a certeza da equipa. Confirma:', '');
+    for (const item of incertos) {
+      linhas.push(linha(item.evento), '  ' + item.evento.summary, '  → ' + nomeDaEquipa(item.equipaId) + ', ' + item.duvida, '');
+    }
+    linhas.push('Se a equipa estiver errada, escreve no evento "equipa porto", "equipa braga", "equipa lisboa" ou "equipa algarve", ou o código postal. O serviço muda sozinho de equipa.');
   }
-  linhas.push(
-    '',
-    'Acrescenta o código postal à morada (por exemplo 4000-123) ou escreve no evento "equipa porto", "equipa braga", "equipa lisboa" ou "equipa algarve".',
-    'Assim que guardares, o serviço segue para a equipa certa.'
-  );
-  return { assunto: eventos.length === 1 ? 'Serviço sem equipa' : eventos.length + ' serviços sem equipa', texto: linhas.join('\n') };
+  if (semEquipa.length) {
+    if (linhas.length) linhas.push('', '');
+    linhas.push('Nem o código postal, nem a localidade, nem o Google Maps disseram onde ' + (semEquipa.length === 1 ? 'é este serviço' : 'são estes serviços') + ':', '');
+    for (const evento of semEquipa) linhas.push(linha(evento), '  ' + evento.summary);
+    linhas.push(
+      '',
+      'Acrescenta o código postal à morada (por exemplo 4000-123) ou escreve no evento "equipa porto", "equipa braga", "equipa lisboa" ou "equipa algarve".',
+      'Assim que guardares, o serviço segue para a equipa certa.'
+    );
+  }
+  let assunto;
+  if (semEquipa.length && incertos.length) assunto = 'Serviços para confirmar';
+  else if (semEquipa.length) assunto = semEquipa.length === 1 ? 'Serviço sem equipa' : semEquipa.length + ' serviços sem equipa';
+  else assunto = incertos.length === 1 ? 'Serviço enviado sem certeza' : incertos.length + ' serviços enviados sem certeza';
+  return { assunto: assunto, texto: linhas.join('\n') };
 }

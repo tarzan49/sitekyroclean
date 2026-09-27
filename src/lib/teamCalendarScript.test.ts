@@ -284,6 +284,40 @@ describe('o que muda nos calendários das equipas', () => {
       expect([...gs.pesquisasDoMapa('Rua Nova 11, 2º esq, Vale Inventado')]).toEqual(['Rua Nova 11, 2º esq, Vale Inventado', 'rua nova 11, vale inventado', 'Vale Inventado']);
     });
 
+    it('manda o serviço e avisa o dono quando a equipa não é certa', () => {
+      // Dono, 28/09/2026: "quando não tiveres 100% certeza envia-me um alerta no email".
+      // Caso real, com telefone inventado: rua sem cidade, que o dono confirmou ser no Porto.
+      const ruaSemCidade = evento('r1', 'Serviço 45€ (89€) Limpeza de sofá de 3 lugares - +351 910 000 006 - Rua D. João IV 376, 1º, 105');
+      const pelaFreguesia = evento('f1', 'Serviço 40€ (79€) Limpeza de sofá - Rua Nova 3, Canidelo');
+      const mapa = mapaDeTeste({
+        'Rua D. João IV 376, 1º, 105': { encontrado: true, parcial: false, nomes: ['Porto'], morada: 'R. de Dom João IV 376, 4000-000 Porto', codigoPostal: '4000-000', lat: 41.15, lng: -8.60 },
+      });
+      const { copias, incertos } = gs.copiasDesejadas([ruaSemCidade, pelaFreguesia, lisboa], mapa.procurar);
+      expect(copias.get('r1').equipaId).toBe('porto');
+      expect(copias.get('f1').equipaId).toBe('porto');
+      // Pelo código postal é certo: não há aviso.
+      expect(incertos.map((i: { evento: Evento }) => i.evento.id)).toEqual(['r1', 'f1']);
+      expect(incertos[0].duvida).toBe('pelo Google Maps, que encontrou "R. de Dom João IV 376, 4000-000 Porto"');
+      expect(incertos[1].duvida).toContain('pela freguesia "canidelo"');
+
+      const primeira = gs.incertosNovos(incertos, {}, AGORA);
+      expect(primeira.novos).toHaveLength(2);
+      expect(gs.incertosNovos(incertos, primeira.atuais, AGORA).novos).toEqual([]);
+      const mudouDeEquipa = [{ ...incertos[0], equipaId: 'lisboa' }];
+      expect(gs.incertosNovos(mudouDeEquipa, primeira.atuais, AGORA).novos).toHaveLength(1);
+
+      const mensagem = gs.mensagemParaDono([], primeira.novos);
+      expect(mensagem.assunto).toBe('2 serviços enviados sem certeza');
+      expect(mensagem.texto).toContain('→ Equipa Porto, pelo Google Maps, que encontrou "R. de Dom João IV 376, 4000-000 Porto"');
+      expect(mensagem.texto).toContain('(hora de Portugal)');
+      expect(gs.mensagemParaDono([semMorada], primeira.novos).assunto).toBe('Serviços para confirmar');
+    });
+
+    it('diz quando a equipa foi a mais perto, fora das zonas das equipas', () => {
+      expect(gs.duvidaDoMapa({ encontrado: true, parcial: true, morada: 'Aldeia, 2400-000 Leiria', codigoPostal: '2400-000', lat: 39.74, lng: -8.81 }))
+        .toBe('pelo Google Maps, que encontrou "Aldeia, 2400-000 Leiria" (só parte da morada), fora das zonas das equipas: foi a equipa mais perto');
+    });
+
     it('avisa o dono só quando nem o Maps encontra a morada', () => {
       const mapa = mapaDeTeste({ 'Rua Central, 06, Aldeia Inventada': { encontrado: false } });
       const { copias, pendentes } = gs.copiasDesejadas([aldeia], mapa.procurar);

@@ -79,6 +79,15 @@ Para desligar: função `desligar`. Os calendários ficam como estão.
   procura-se uma vez e fica guardada (o Maps tem limite diário). Se o Maps
   falhar, o serviço espera pela volta seguinte e a cópia que já tiver não é
   tocada.
+- **Serviço enviado sem certeza:** segue para a equipa na mesma, e o dono
+  recebe um email a dizer para que equipa foi e porquê (dono, 28/09/2026:
+  "quando não tiveres 100% certeza envia-me um alerta no email"). Conta como
+  sem certeza a equipa escolhida pelo Maps (com a morada que ele encontrou),
+  por uma freguesia (pode ser o apelido do cliente ou ter o mesmo nome
+  noutro sítio) e pela equipa mais perto. Código postal, concelho e "equipa
+  X" escrito contam como certos. Um aviso por evento, e outro se o evento ou
+  a equipa mudarem; se estiver errado, basta escrever "equipa X" ou o código
+  postal no evento e o serviço muda sozinho de equipa.
 - **Serviço sem equipa:** só um evento sem morada nenhuma (por exemplo
   "Serviço 70€ (130€) imper cadeiras"), ou uma morada que nem o Maps
   reconhece. Não é copiado, e o dono recebe um email a pedir o código postal
