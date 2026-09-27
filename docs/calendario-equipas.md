@@ -1,7 +1,7 @@
 # Calendários das equipas
 
-Desde 28/09/2026 cada equipa (Porto e Lisboa) tem o seu próprio Google
-Calendar. O dono continua a marcar os serviços só no calendário dele. Um
+Desde 28/09/2026 cada equipa (Porto, Braga, Lisboa e Algarve) tem o seu
+próprio Google Calendar. O dono continua a marcar os serviços só no calendário dele. Um
 script da Google (Apps Script), a correr na conta do dono, copia cada serviço
 para o calendário da equipa que o vai fazer e manda um email a essa equipa
 quando um serviço entra, muda ou é cancelado.
@@ -27,7 +27,7 @@ ficheiros no projeto do Apps Script (ver "Manutenção").
    (calendário, enviar email, correr em segundo plano). Como o script é do
    próprio dono e não foi publicado, aparece "A Google não validou esta
    aplicação": **Avançadas**, depois **Aceder a Calendários das equipas**.
-   O `configurar` cria os dois calendários, liga a cópia automática e faz a
+   O `configurar` cria os quatro calendários, liga a cópia automática e faz a
    primeira cópia sem mandar emails às equipas.
 7. No Google Calendar, em cada calendário novo (**Definições e partilha**,
    **Partilhar com pessoas específicas**), acrescentar os emails da equipa com
@@ -48,13 +48,15 @@ Para desligar: função `desligar`. Os calendários ficam como estão.
 - **Equipa de cada serviço**, por esta ordem: "equipa porto" (ou lisboa,
   braga, algarve) escrito no evento; o código postal; os concelhos servidos;
   as freguesias desses concelhos. São as mesmas regras e as mesmas listas que
-  o CRM usa para a região (`src/lib/calendarServices.ts`). Braga vai para o
-  Porto, o Algarve e o Alentejo vão para Lisboa (decisão do dono, 28/09/2026).
+  o CRM usa para a região (`src/lib/calendarServices.ts`): uma equipa por
+  região (dono, 28/09/2026). Aveiro e Coimbra vão para o Porto e o Alentejo
+  para Lisboa, como no `travel.ts`.
 - **Serviço sem equipa:** não é copiado, e o dono recebe um email a pedir o
-  código postal ou "equipa porto"/"equipa lisboa" no evento. Assim que o
+  código postal ou "equipa porto" (braga, lisboa, algarve) no evento. Assim que o
   evento for guardado, segue para a equipa. Não se adivinha: um palpite
   errado mandava o serviço para quem não o vai fazer, sem ninguém dar por
-  isso. Com os serviços marcados a 28/09, 15 em 18 tinham equipa; os 3 que
+  isso. Com os serviços marcados a 28/09, 15 em 18 tinham equipa (10 Lisboa,
+  4 Porto, 1 Algarve); os 3 que
   faltavam não tinham código postal nem uma localidade conhecida ("via
   longa", "Pucariça" e uma rua sem cidade).
 - **A hora é a de Portugal.** A hora que o dono escreve no evento é a hora de
@@ -92,8 +94,10 @@ Para desligar: função `desligar`. Os calendários ficam como estão.
 - **A regra do código postal está escrita duas vezes** (`localityFromPostalCode`
   no CRM e `regiaoPorCodigoPostal` no script). O teste compara os 9.000
   códigos e rebenta se divergirem.
-- **Uma equipa nova** (por exemplo Algarve à parte) é uma linha em `EQUIPAS`,
-  no topo do `Codigo.gs`, a tirar a região da equipa onde estava. Depois de
-  colar, correr `configurar` outra vez: cria o calendário que falta e move os
-  serviços dessa região, com email às duas equipas.
+- **Juntar ou separar equipas** é mudar `regioes` em `EQUIPAS`, no topo do
+  `Codigo.gs` (por exemplo, pôr `['Porto', 'Braga']` na do Porto e tirar a de
+  Braga). Depois de
+  colar, correr `configurar` outra vez: cria o calendário que faltar e move
+  os serviços dessa região, com email às duas equipas. Um calendário que deixe
+  de ter equipa não é apagado: apaga-se à mão.
 - Testes só com dados inventados: o repositório é público.

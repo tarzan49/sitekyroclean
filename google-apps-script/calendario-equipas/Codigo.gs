@@ -16,12 +16,14 @@
  * as funções de decisão não tocam em serviços da Google.
  */
 
-// Cada região do CRM vai para uma equipa. Braga segue com o Porto e o Algarve
-// com Lisboa (decisão do dono, 28/09/2026). Uma equipa nova é uma linha nova,
-// e o `configurar()` cria-lhe o calendário.
+// Uma equipa por região do CRM (dono, 28/09/2026). Aveiro e Coimbra são da
+// região Porto e o Alentejo da região Lisboa, como no travel.ts. Uma equipa
+// nova é uma linha nova, e o `configurar()` cria-lhe o calendário.
 const EQUIPAS = [
-  { id: 'porto', nome: 'Kyro · Equipa Porto', regioes: ['Porto', 'Braga'] },
-  { id: 'lisboa', nome: 'Kyro · Equipa Lisboa', regioes: ['Lisboa', 'Algarve'] },
+  { id: 'porto', nome: 'Kyro · Equipa Porto', regioes: ['Porto'] },
+  { id: 'braga', nome: 'Kyro · Equipa Braga', regioes: ['Braga'] },
+  { id: 'lisboa', nome: 'Kyro · Equipa Lisboa', regioes: ['Lisboa'] },
+  { id: 'algarve', nome: 'Kyro · Equipa Algarve', regioes: ['Algarve'] },
 ];
 
 const FUSO_PORTUGAL = 'Europe/Lisbon';
@@ -462,7 +464,7 @@ function mensagemParaDono(eventos, fusoDoCalendario) {
   }
   linhas.push(
     '',
-    'Acrescenta o código postal à morada (por exemplo 4000-123) ou escreve "equipa porto" ou "equipa lisboa" no evento.',
+    'Acrescenta o código postal à morada (por exemplo 4000-123) ou escreve no evento "equipa porto", "equipa braga", "equipa lisboa" ou "equipa algarve".',
     'Assim que guardares, o serviço segue para a equipa certa.'
   );
   return { assunto: eventos.length === 1 ? 'Serviço sem equipa' : eventos.length + ' serviços sem equipa', texto: linhas.join('\n') };

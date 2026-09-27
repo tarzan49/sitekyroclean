@@ -6,7 +6,7 @@ import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import vm from 'node:vm';
 import { describe, expect, it } from 'vitest';
-import { localityFromPostalCode, parseServiceEvent, placeIndex } from '@/lib/calendarServices';
+import { CRM_LOCALITIES, localityFromPostalCode, parseServiceEvent, placeIndex } from '@/lib/calendarServices';
 
 const DIR = path.resolve(__dirname, '../../google-apps-script/calendario-equipas');
 
@@ -105,10 +105,14 @@ describe('região e equipa de cada serviço', () => {
     expect(gs.regiaoDoEvento({ summary: titulo })).toBe(crm!.locality);
   });
 
-  it('manda Braga para o Porto e o Algarve para Lisboa', () => {
-    expect(gs.equipaDaRegiao('Braga').id).toBe('porto');
-    expect(gs.equipaDaRegiao('Algarve').id).toBe('lisboa');
+  it('tem uma equipa para cada região do CRM', () => {
+    for (const regiao of CRM_LOCALITIES) expect(gs.equipaDaRegiao(regiao).id).toBe(regiao.toLowerCase());
     expect(gs.equipaDaRegiao(null)).toBeNull();
+    // Aveiro e Coimbra (região Porto) e o Alentejo (região Lisboa), como no travel.ts.
+    expect(gs.equipaDaRegiao(gs.regiaoDoEvento({ summary: 'Serviço 45€ (89€) sofá, 3800-000 Aveiro' })).id).toBe('porto');
+    expect(gs.equipaDaRegiao(gs.regiaoDoEvento({ summary: 'Serviço 45€ (89€) sofá, 7520-000 Sines' })).id).toBe('lisboa');
+    expect(gs.equipaDaRegiao(gs.regiaoDoEvento({ summary: 'Serviço 45€ (89€) sofá, 4800-000 Guimarães' })).id).toBe('braga');
+    expect(gs.equipaDaRegiao(gs.regiaoDoEvento({ summary: 'Serviço 45€ (89€) sofá, 8600-000 Lagos' })).id).toBe('algarve');
   });
 
   it('obedece a "equipa X" escrito no evento, antes do código postal', () => {

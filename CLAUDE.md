@@ -450,11 +450,11 @@ Detalhe em `docs/crm-google-calendar.md`. As regras que não se adivinham do có
 
 ## Calendários das equipas (2026-09-28)
 
-Detalhe e passos de instalação em `docs/calendario-equipas.md`. Um Apps Script na conta Google do dono (`google-apps-script/calendario-equipas/`) copia cada serviço do calendário dele para "Kyro · Equipa Porto" ou "Kyro · Equipa Lisboa" e manda email à equipa quando um serviço entra, muda ou é cancelado.
+Detalhe e passos de instalação em `docs/calendario-equipas.md`. Um Apps Script na conta Google do dono (`google-apps-script/calendario-equipas/`) copia cada serviço do calendário dele para o calendário da equipa (Porto, Braga, Lisboa, Algarve: uma por região do CRM) e manda email à equipa quando um serviço entra, muda ou é cancelado.
 
 - **Não corre no site: um push não o atualiza.** Mudar o script é pedir ao dono para colar os ficheiros outra vez no projeto do Apps Script.
 - **A hora que o dono escreve é a hora de Portugal** ("a hora para eles tem de ser sempre em Portugal"). O calendário dele está em Copenhaga desde 23/08, por isso as cópias levam os números escritos no fuso de Lisboa, nunca o instante guardado (seria uma hora antes).
-- **A equipa sai das mesmas regras do CRM** (código postal, concelhos, freguesias de `calendarServices.ts`). `Lugares.gs` é gerado de `placeIndex()`: quando `teamCalendarScript.test.ts` falhar por uma cidade nova, `-u` e o dono volta a colar esse ficheiro. Braga vai para o Porto; Algarve e Alentejo para Lisboa. Sem código postal nem localidade conhecida não se adivinha: o dono recebe um email.
+- **A equipa sai das mesmas regras do CRM** (código postal, concelhos, freguesias de `calendarServices.ts`). `Lugares.gs` é gerado de `placeIndex()`: quando `teamCalendarScript.test.ts` falhar por uma cidade nova, `-u` e o dono volta a colar esse ficheiro. Aveiro e Coimbra vão para o Porto e o Alentejo para Lisboa. Sem código postal nem localidade conhecida não se adivinha: o dono recebe um email.
 - **As equipas veem o título completo, com "70€ (140€)"** (decisão do dono). Os emails vão para quem tem o calendário da equipa partilhado: não há emails no código.
 - Uma cópia só se apaga se o próprio evento disser que foi apagado, nunca por faltar numa lista.
 
