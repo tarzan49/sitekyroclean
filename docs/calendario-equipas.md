@@ -132,6 +132,12 @@ Para desligar: função `desligar`. Os calendários ficam como estão.
   ficava preso à equipa antiga), não vai para a cópia (senão as equipas
   recebiam "Serviço alterado" de todos) e não conta para os avisos. Os dois
   pontos são de propósito: "equipa porto" sem eles é uma ordem do dono.
+  **O CRM também lê esta linha** (`calendarServices.ts`, desde 0ac296e): tira-a
+  do texto onde procura a cidade e usa-a como última pista para a região.
+  Mudar o formato da linha obriga a mudar o CRM no mesmo commit. Cada escrita
+  no evento do dono faz o CRM reler o evento inteiro, por isso o script só
+  escreve quando a cor ou a linha estão mesmo erradas (serviço novo ou que
+  mudou de equipa), nunca por rotina.
 - **Os calendários das equipas ficam escondidos na conta do dono**, e o
   calendário dele à vista: vê cada serviço uma vez, no seu calendário, com a
   cor da equipa. Os calendários das equipas são dele (o script corre na
