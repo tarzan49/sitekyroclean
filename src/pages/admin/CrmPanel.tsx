@@ -575,29 +575,32 @@ const CrmPanel = () => {
 
       {/* Table */}
       <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full text-xs">
+        <div>
+          <table className="w-full table-fixed text-xs">
+            <colgroup>
+              {["4%", "7%", "22%", "11%", "13%", "12%", "9%", "6%", "6%", "6%", "4%"].map((w, i) => <col key={i} style={{ width: w }} />)}
+            </colgroup>
             <thead>
               <tr className="border-b border-gray-200 bg-gray-50">
-                {["Dia", "Fechado", "Descrição", "Cliente", "Localidade", "Cidade", "Telefone", "Origem", "Faturado", "Meu cut", "Pago", ""].map(h => (
-                  <th key={h} className={`text-left px-3 py-2 text-[10.5px] font-bold text-gray-500 uppercase tracking-wider whitespace-nowrap ${h === "" ? "sticky right-0 bg-gray-50" : ""}`}>{h}</th>
+                {["Dia", "Fechado", "Descrição", "Cliente", "Localidade", "Telefone", "Origem", "Faturado", "Meu cut", "Pago", ""].map(h => (
+                  <th key={h} className="text-left px-2 py-2 text-[10.5px] font-bold text-gray-500 uppercase tracking-wider truncate">{h}</th>
                 ))}
               </tr>
             </thead>
             <tbody>
               {loading && (
-                <tr><td colSpan={12} className="text-center py-10 text-gray-400">A carregar...</td></tr>
+                <tr><td colSpan={11} className="text-center py-10 text-gray-400">A carregar...</td></tr>
               )}
               {!loading && filtered.length === 0 && (
-                <tr><td colSpan={12} className="text-center py-10 text-gray-400">
+                <tr><td colSpan={11} className="text-center py-10 text-gray-400">
                   {monthRecords.length === 0 ? `Ainda não há pedidos registados em ${monthLabel}.` : "Nenhum pedido corresponde aos filtros."}
                 </td></tr>
               )}
               {filtered.map((r, i) => (
                 <tr key={r.id} className={`border-b border-gray-100 ${!r.paid ? "bg-red-50/60" : (i % 2 === 0 ? "" : "bg-gray-50/50")}`}>
-                  <td className="px-3 py-2 font-mono text-navy">{new Date(r.request_date + "T00:00:00").getDate()}</td>
-                  <td className="px-3 py-2 text-gray-500 whitespace-nowrap" title={r.booked_at ? new Date(r.booked_at).toLocaleString("pt-PT", { timeZone: "Europe/Lisbon" }) : "Sem data de fecho"}>{closedLabel(r.booked_at)}</td>
-                  <td className="px-3 py-2 text-navy font-medium max-w-[260px]">
+                  <td className="px-2 py-2 font-mono text-navy">{new Date(r.request_date + "T00:00:00").getDate()}</td>
+                  <td className="px-2 py-2 text-gray-500 whitespace-nowrap" title={r.booked_at ? new Date(r.booked_at).toLocaleString("pt-PT", { timeZone: "Europe/Lisbon" }) : "Sem data de fecho"}>{closedLabel(r.booked_at)}</td>
+                  <td className="px-2 py-2 text-navy font-medium">
                     <div className="flex items-center gap-1.5 min-w-0">
                       {r.calendar_event_id && <CalendarDays className="w-3 h-3 text-gray-400 flex-shrink-0" aria-label="Criado a partir do Google Calendar" />}
                       <span className="truncate">{r.description || "-"}</span>
@@ -610,27 +613,29 @@ const CrmPanel = () => {
                       )}
                     </div>
                   </td>
-                  <td className="px-3 py-2 text-gray-600 max-w-[160px] truncate">{r.client_name || "-"}</td>
-                  <td className={`px-3 py-2 ${r.locality ? "text-gray-600" : "text-amber-700 font-semibold"}`}>{r.locality ?? "?"}</td>
-                  <td className="px-3 py-2 text-gray-500">{r.city || "-"}</td>
-                  <td className="px-3 py-2 text-gray-600 whitespace-nowrap">
+                  <td className="px-2 py-2 text-gray-600 truncate" title={r.client_name ?? undefined}>{r.client_name || "-"}</td>
+                  <td className="px-2 py-2 truncate" title={[r.locality, r.city].filter(Boolean).join(" · ")}>
+                    <span className={r.locality ? "text-gray-600" : "text-amber-700 font-semibold"}>{r.locality ?? "?"}</span>
+                    {r.city && <span className="text-gray-400"> · {r.city}</span>}
+                  </td>
+                  <td className="px-2 py-2 text-gray-600 truncate">
                     {r.phone ? (
                       <span className="flex items-center gap-1"><Phone className="w-3 h-3 text-gray-400" />{r.phone}</span>
                     ) : "-"}
                   </td>
-                  <td className="px-3 py-2 text-gray-500">{r.source || "-"}</td>
-                  <td className="px-3 py-2 font-semibold text-navy whitespace-nowrap">{money(r.billed_value)}</td>
-                  <td className="px-3 py-2 font-semibold text-gold whitespace-nowrap">{money(r.my_cut)}</td>
-                  <td className="px-3 py-2">
+                  <td className="px-2 py-2 text-gray-500 truncate" title={r.source ?? undefined}>{r.source?.startsWith("Google Calendar") ? "Calendário" : r.source || "-"}</td>
+                  <td className="px-2 py-2 font-semibold text-navy whitespace-nowrap">{money(r.billed_value)}</td>
+                  <td className="px-2 py-2 font-semibold text-gold whitespace-nowrap">{money(r.my_cut)}</td>
+                  <td className="px-2 py-2">
                     <button onClick={() => togglePaid(r)} className={`px-2 py-0.5 rounded-full text-[10px] font-bold border transition-colors ${r.paid ? "bg-green-50 text-green-700 border-green-200" : "bg-red-100 text-red-700 border-red-300"}`}>
                       {r.paid ? "Pago" : "Por pagar"}
                     </button>
                   </td>
-                  <td className="px-3 py-2 whitespace-nowrap sticky right-0 bg-white shadow-[-6px_0_8px_-6px_rgba(0,0,0,0.12)]">
-                    <div className="flex items-center gap-1">
+                  <td className="px-1 py-2">
+                    <div className="flex items-center justify-end gap-0.5">
                       {r.calendar_missing_since && (
                         <button onClick={() => keepMissing(r)} title="O serviço fez-se: manter a linha e desligá-la do calendário"
-                          className="px-2 py-1 text-[10px] font-bold rounded-md border border-gray-200 text-navy hover:bg-gray-50">Manter</button>
+                          className="px-1.5 py-1 text-[10px] font-bold rounded-md border border-gray-200 text-navy hover:bg-gray-50">Manter</button>
                       )}
                       <button onClick={() => openEdit(r)} className="p-1.5 text-gray-400 hover:text-navy hover:bg-gray-100 rounded-md"><Pencil className="w-3.5 h-3.5" /></button>
                       <button onClick={() => handleDelete(r.id)} className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-md"><Trash2 className="w-3.5 h-3.5" /></button>
