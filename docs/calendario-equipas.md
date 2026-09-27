@@ -12,6 +12,11 @@ ficheiros no projeto do Apps Script (ver "Manutenção").
 
 ## Instalação (uma vez, na conta onde estão os serviços)
 
+**Feita a 28/09/2026** na conta do calendário dos serviços: projeto "Calendários
+das equipas" no Apps Script, os quatro calendários criados, os dois gatilhos
+ligados e a primeira cópia feita (10 serviços em Lisboa, 5 no Porto, 1 no
+Algarve). Falta partilhar cada calendário com a sua equipa (passo 7).
+
 1. Abrir [script.google.com](https://script.google.com) com a conta do
    calendário dos serviços e criar um **Novo projeto**, com o nome
    "Calendários das equipas".
@@ -20,7 +25,10 @@ ficheiros no projeto do Apps Script (ver "Manutenção").
 3. Carregar em **+** ao lado de "Ficheiros", escolher **Script**, chamar-lhe
    `Lugares` e colar lá o `Lugares.gs`.
 4. Carregar em **+** ao lado de "Serviços", escolher **Google Calendar API** e
-   **Adicionar**.
+   **Adicionar**. Se a janela não abrir (não abriu no browser da app do
+   Claude): Definições do projeto, "Mostrar ficheiro de manifesto", e no
+   `appsscript.json` pôr em `dependencies` o
+   `enabledAdvancedServices: [{ userSymbol: "Calendar", version: "v3", serviceId: "calendar" }]`.
 5. (Opcional) Escolher a função `verificar` no topo e **Executar**. O registo
    mostra para que equipa iria cada serviço já marcado, sem mudar nada.
 6. Escolher a função `configurar` e **Executar**. A Google pede autorização
