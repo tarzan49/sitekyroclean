@@ -66,7 +66,11 @@ export default function CommercialHero({ title, subtitle, serviceSlug, secondary
           <a data-hero-part="whatsapp" href={whatsappHref} target="_blank" rel="noopener noreferrer" data-tracking-source={source} className="flex min-h-[52px] items-center justify-center gap-2 bg-[#16833e] px-3 py-3 text-sm font-semibold text-white hover:bg-[#116b32] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#D4AF37]"><MessageCircle className="h-5 w-5 shrink-0" />Pedir orçamento por WhatsApp</a>
           <a data-hero-part="prices" href={pricesHref} className="flex min-h-9 flex-wrap items-center justify-center gap-x-1.5 text-center">
             <span className="text-sm font-medium text-white underline underline-offset-4">Ver preços</span>
-            <span className="text-[11px] leading-relaxed text-white/85">· {priceLine}</span>
+            {/* Uma linha de preço comprida (os escalões das cadeiras) passa para
+                baixo: sem o "·", que ficava sozinho no início da segunda linha. */}
+            {priceLine.length > 48
+              ? <span className="basis-full text-[11px] leading-relaxed text-white/85">{priceLine}</span>
+              : <span className="text-[11px] leading-relaxed text-white/85">· {priceLine}</span>}
           </a>
         </div>
         <div data-hero-part="comparison" id="resultados" className="min-w-0 scroll-mt-20">

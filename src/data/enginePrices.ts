@@ -128,20 +128,48 @@ export function chairTierRows(): { item: string; price: string }[] {
 }
 
 // ─── Rótulo do preço de partida ─────────────────────────────────────
-// As cadeiras cobram-se por cadeira, com o preço a descer a partir da 5.ª.
-// "Desde 20€" lia-se como o total do serviço e não fazia sentido a quem o lia
-// (pedido do dono, 26/09/2026: "não digas desde em cadeiras"). Nas cadeiras o
-// preço diz-se sempre por unidade, "20€ por cadeira"; os outros serviços
-// mantêm o "Desde". Qualquer rótulo de preço de partida passa por aqui, para
-// não voltar a haver um "Desde" de cadeiras escrito num canto.
+// As cadeiras cobram-se por cadeira, com o preço a descer com a quantidade.
+// Dois pedidos do dono no mesmo dia (26-27/09/2026): "não digas desde em
+// cadeiras" ("Desde 20€" lia-se como o total do serviço) e, depois de passar a
+// "20€ por cadeira", "não quero que digas cadeiras a 20€ se há mais barato".
+// Por isso o preço das cadeiras mostra sempre que desce com a quantidade:
+// o intervalo "12,50€ a 20€ por cadeira" onde há pouco espaço, e os escalões
+// "20€ por cadeira até 4, 15€ a 5.ª e 6.ª, 12,50€ da 7.ª à 9.ª" onde há.
+// Os outros serviços mantêm o "Desde". Qualquer rótulo de preço de partida
+// passa por aqui, para não voltar a haver um preço de cadeiras escrito à mão.
 
 /** `20` → "20€ por cadeira". Também aceita um rótulo já formatado ("18€"). */
 export const perChairPrice = (unit: number | string): string =>
   `${typeof unit === 'number' ? formatEuro(unit) : unit} por cadeira`;
-/** "20€ por cadeira": a limpeza de uma cadeira, tal como o motor a cobra. */
-export const CHAIR_PRICE_LABEL = perChairPrice(CHAIR_CLEANING_FROM);
-/** "20€ por Cadeira", para títulos em maiúsculas iniciais. */
+const chairUnits = chairCleaningTiers().tiers.map(tier => tier.unit);
+/** O preço mais baixo e o mais alto de uma cadeira (12,50€ e 20€). */
+export const CHAIR_UNIT_MIN = Math.min(...chairUnits);
+export const CHAIR_UNIT_MAX = Math.max(...chairUnits);
+/** "12,50€ a 20€ por cadeira": o preço de cada cadeira desce com a quantidade. */
+export const CHAIR_PRICE_LABEL = CHAIR_UNIT_MIN === CHAIR_UNIT_MAX
+  ? perChairPrice(CHAIR_UNIT_MAX)
+  : `${formatEuro(CHAIR_UNIT_MIN)} a ${formatEuro(CHAIR_UNIT_MAX)} por cadeira`;
+/** "12,50€ a 20€ cada": a mesma coisa para um cartão pequeno que já diz
+ *  "Cadeiras" por cima (o cartão do quiz), onde "por cadeira" partia a linha. */
+export const CHAIR_PRICE_SHORT = CHAIR_PRICE_LABEL.replace(/ por cadeira$/, ' cada');
+/** "12,50€ a 20€ por Cadeira", para títulos em maiúsculas iniciais. */
 export const CHAIR_PRICE_TITLE = CHAIR_PRICE_LABEL.replace(/cadeira$/, 'Cadeira');
+
+/**
+ * Os escalões numa frase curta, para quem precisa de perceber a lógica:
+ * "20€ por cadeira até 4, 15€ a 5.ª e 6.ª, 12,50€ da 7.ª à 9.ª".
+ * A partir de 10 cadeiras é sob orçamento (ver `chairTierSentence`).
+ */
+export function chairPriceBreakdown(): string {
+  const { tiers } = chairCleaningTiers();
+  return tiers.map((tier, index) => {
+    const price = formatEuro(tier.unit);
+    if (index === 0) return `${price} por cadeira até ${tier.last}`;
+    if (tier.first === tier.last) return `${price} a ${ordinal(tier.first)}`;
+    if (tier.last === tier.first + 1) return `${price} a ${ordinal(tier.first)} e ${ordinal(tier.last)}`;
+    return `${price} da ${ordinal(tier.first)} à ${ordinal(tier.last)}`;
+  }).join(', ');
+}
 
 /**
  * Onde o rótulo entra: `start` num rótulo solto ou a abrir a frase, `mid` a
@@ -157,11 +185,14 @@ export const isPricedPerChair = (serviceSlug: string | undefined): boolean => se
 /**
  * O preço de partida de um serviço, pronto a escrever:
  *
- * | posição | outros serviços | cadeiras            |
- * |---------|-----------------|---------------------|
- * | start   | "Desde 49€"     | "20€ por cadeira"   |
- * | mid     | "desde 49€"     | "a 20€ por cadeira" |
- * | title   | "Desde 49€"     | "20€ por Cadeira"   |
+ * | posição | outros serviços | cadeiras                         |
+ * |---------|-----------------|----------------------------------|
+ * | start   | "Desde 49€"     | "De 12,50€ a 20€ por cadeira"    |
+ * | mid     | "desde 49€"     | "de 12,50€ a 20€ por cadeira"    |
+ * | title   | "Desde 49€"     | "12,50€ a 20€ por Cadeira"       |
+ *
+ * Um preço fixo por cadeira (a impermeabilização, "18€ por cadeira") não tem
+ * escalões: fica "18€ por cadeira" / "a 18€ por cadeira".
  *
  * `price` é o rótulo numérico do catálogo ("49€"). Um preço que já venha por
  * cadeira ("18€ por cadeira", a impermeabilização das cadeiras) é tratado como
@@ -171,9 +202,13 @@ export const isPricedPerChair = (serviceSlug: string | undefined): boolean => se
 export function startingPriceLabel(serviceSlug: string | undefined, price: string, position: PriceLabelPosition = 'start'): string {
   const alreadyPerChair = PER_CHAIR.test(price);
   if (!isPricedPerChair(serviceSlug) && !alreadyPerChair) return `${position === 'mid' ? 'desde' : 'Desde'} ${price}`;
-  const label = alreadyPerChair ? price : perChairPrice(price);
-  if (position === 'title') return label.replace(/cadeira$/, 'Cadeira');
-  return position === 'mid' ? `a ${label}` : label;
+  if (alreadyPerChair) {
+    if (position === 'title') return price.replace(/cadeira$/, 'Cadeira');
+    return position === 'mid' ? `a ${price}` : price;
+  }
+  // Limpeza de cadeiras: o intervalo, porque o preço desce com a quantidade.
+  if (position === 'title') return CHAIR_PRICE_TITLE;
+  return `${position === 'mid' ? 'de' : 'De'} ${CHAIR_PRICE_LABEL}`;
 }
 
 /** Preço de partida da limpeza por serviço, como o hero e o schema o mostram. */

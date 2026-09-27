@@ -1,5 +1,5 @@
 ﻿import { cn } from '@/lib/utils';
-import { CHAIR_PRICE_LABEL } from '@/data/enginePrices';
+import { CHAIR_PRICE_SHORT } from '@/data/enginePrices';
 
 interface QuizStep1ServiceProps {
   selectedService: string;
@@ -23,7 +23,7 @@ const QuizStep1Service = ({ onSelect }: QuizStep1ServiceProps) => {
     { id: 'carpet',   label: 'Tapete',   sublabel: 'Sob orçamento' },
     // Por cadeira, não "a partir de": o preço é de cada cadeira e desce com a
     // quantidade (pedido do dono, 26/09/2026). Vem do motor, como o resto.
-    { id: 'chairs',   label: 'Cadeiras', sublabel: CHAIR_PRICE_LABEL },
+    { id: 'chairs',   label: 'Cadeiras', sublabel: CHAIR_PRICE_SHORT },
   ];
 
   return (

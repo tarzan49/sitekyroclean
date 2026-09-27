@@ -5,7 +5,7 @@ import { marcaPageCopy, otherMarcaLinks, MARCA_CITIES, type MarcaKind } from './
 import { marcas, getAllMarcaSofaRoutes } from './marcaSofaData';
 import { marcasColchao, getAllMarcaColchaoRoutes } from './marcaColchaoData';
 import { marcasCadeiras, getAllMarcaCadeirasRoutes } from './marcaCadeirasData';
-import { formatEuro, startingPriceLabel, SOFA_CLEANING_FROM, MATTRESS_CLEANING_FROM, CHAIR_CLEANING_FROM } from './enginePrices';
+import { formatEuro, startingPriceLabel, SOFA_CLEANING_FROM, MATTRESS_CLEANING_FROM, CHAIR_CLEANING_FROM, CHAIR_PRICE_LABEL } from './enginePrices';
 
 const read = (relative: string) => fs.readFileSync(path.resolve(__dirname, relative), 'utf-8');
 
@@ -29,9 +29,11 @@ describe('páginas de marca', () => {
     }
     // Cadeiras começam na 1.ª cadeira (20€), não no escalão da 7.ª (12,50€).
     expect(marcaPageCopy('cadeiras', marcasCadeiras[0], MARCA_CITIES[0]).priceFrom).toBe('20€');
-    // E dizem-se por cadeira, nunca "desde" (pedido do dono, 26/09/2026).
+    // E dizem-se por cadeira, com o intervalo, porque o preço desce com a
+    // quantidade: nunca "desde", nem só o preço mais alto (dono, 26-27/09/2026).
     const chairs = marcaPageCopy('cadeiras', marcasCadeiras[0], MARCA_CITIES[0]).description;
-    expect(chairs).toContain(`Limpeza a ${formatEuro(CHAIR_CLEANING_FROM)} por cadeira.`);
+    expect(chairs).toContain(`Limpeza de ${CHAIR_PRICE_LABEL}.`);
+    expect(chairs).not.toContain(`Limpeza a ${formatEuro(CHAIR_CLEANING_FROM)} por cadeira`);
     expect(chairs).not.toMatch(/desde/i);
     expect(marcaPageCopy('sofa', marcas[0], MARCA_CITIES[0]).description).toContain(`Limpeza desde ${formatEuro(SOFA_CLEANING_FROM)}.`);
   });

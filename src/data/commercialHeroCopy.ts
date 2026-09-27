@@ -2,7 +2,7 @@ import { services } from './serviceCatalog';
 import { EXTENDED_TRIP_CITIES, locationPrices } from '../constants/travel';
 import { REVIEW_COUNT, REVIEW_RATING } from '../constants/business';
 import { TRAVEL_FEE_MIN } from '../constants/commercialPolicy';
-import { formatEuro, perChairPrice, startingPriceLabel, SOFA_WATERPROOF_ESSENCIAL_FROM, SOFA_WATERPROOF_PREMIUM_FROM, SOFA_CLEAN_AND_PROTECT_FROM, CHAIR_WATERPROOF_ESSENCIAL_UNIT, CHAIR_WATERPROOF_PREMIUM_UNIT } from './enginePrices';
+import { formatEuro, perChairPrice, startingPriceLabel, isPricedPerChair, chairPriceBreakdown, SOFA_WATERPROOF_ESSENCIAL_FROM, SOFA_WATERPROOF_PREMIUM_FROM, SOFA_CLEAN_AND_PROTECT_FROM, CHAIR_WATERPROOF_ESSENCIAL_UNIT, CHAIR_WATERPROOF_PREMIUM_UNIT } from './enginePrices';
 
 // Preços da impermeabilização vindos do mesmo motor que o quiz usa, nunca
 // escritos à mão: é a linha que os anúncios de Premium prometem, e o preço na
@@ -59,8 +59,12 @@ export const commercialHeroPriceLine = (serviceSlug: string, municipality?: stri
   const service = services.find(item => item.slug === serviceSlug);
   const fee = municipality ? locationPrices[municipality] : undefined;
   const value = price ?? service?.priceFrom ?? 'Sob orçamento';
-  // Cadeiras: "20€ por cadeira", nunca "Desde 20€" (ver `startingPriceLabel`).
-  const priceText = /orçamento/i.test(value) ? 'Sob orçamento' : startingPriceLabel(serviceSlug, value);
+  // Cadeiras: os escalões por extenso ("20€ por cadeira até 4, 15€ a 5.ª e
+  // 6.ª, 12,50€ da 7.ª à 9.ª"), porque o preço desce com a quantidade e o hero
+  // tem espaço para o dizer (dono, 27/09/2026). Ver `startingPriceLabel`.
+  const priceText = /orçamento/i.test(value) ? 'Sob orçamento'
+    : isPricedPerChair(serviceSlug) && !/por cadeira$/.test(value) ? chairPriceBreakdown()
+    : startingPriceLabel(serviceSlug, value);
   return `${priceText} + deslocação ${fee === undefined ? `a partir de ${TRAVEL_FEE_MIN}€` : `${fee}€`}.`;
 };
 
