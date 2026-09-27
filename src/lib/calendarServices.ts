@@ -133,6 +133,16 @@ const parishPlaces = (() => {
   return uniquePlaces(entries).filter(p => !municipalityKeys.has(p.key));
 })();
 
+/**
+ * Os mesmos concelhos e freguesias, para o script dos calendários das equipas
+ * (`google-apps-script/calendario-equipas/Lugares.gs`), que corre na Google e
+ * não pode importar isto. O teste desse script rebenta se a cópia divergir.
+ */
+export function placeIndex(): { municipalities: Array<[string, CrmLocality]>; parishes: Array<[string, CrmLocality]> } {
+  const pairs = (list: Place[]) => list.map(p => [p.key, p.locality] as [string, CrmLocality]);
+  return { municipalities: pairs(municipalityPlaces), parishes: pairs(parishPlaces) };
+}
+
 export interface KnownPlace { city: string; locality: CrmLocality }
 
 /**

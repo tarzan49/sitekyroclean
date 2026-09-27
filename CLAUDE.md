@@ -448,6 +448,16 @@ Detalhe em `docs/crm-google-calendar.md`. As regras que não se adivinham do có
 - **Secret `GOOGLE_CALENDAR_ICS_URL`** (endereço secreto iCal do calendário) nas secrets das Edge Functions. Se a Google o repuser, o CRM passa a mostrar "Google Calendar por ligar" até a secret ser atualizada. A função `calendar-events` publica-se à parte (`npx supabase functions deploy calendar-events`) e só responde a `admin_users`.
 - **Testes do parser só com dados inventados**: o repositório é público. Os eventos reais usados para o afinar ficaram numa pasta temporária fora do repositório.
 
+## Calendários das equipas (2026-09-28)
+
+Detalhe e passos de instalação em `docs/calendario-equipas.md`. Um Apps Script na conta Google do dono (`google-apps-script/calendario-equipas/`) copia cada serviço do calendário dele para "Kyro · Equipa Porto" ou "Kyro · Equipa Lisboa" e manda email à equipa quando um serviço entra, muda ou é cancelado.
+
+- **Não corre no site: um push não o atualiza.** Mudar o script é pedir ao dono para colar os ficheiros outra vez no projeto do Apps Script.
+- **A hora que o dono escreve é a hora de Portugal** ("a hora para eles tem de ser sempre em Portugal"). O calendário dele está em Copenhaga desde 23/08, por isso as cópias levam os números escritos no fuso de Lisboa, nunca o instante guardado (seria uma hora antes).
+- **A equipa sai das mesmas regras do CRM** (código postal, concelhos, freguesias de `calendarServices.ts`). `Lugares.gs` é gerado de `placeIndex()`: quando `teamCalendarScript.test.ts` falhar por uma cidade nova, `-u` e o dono volta a colar esse ficheiro. Braga vai para o Porto; Algarve e Alentejo para Lisboa. Sem código postal nem localidade conhecida não se adivinha: o dono recebe um email.
+- **As equipas veem o título completo, com "70€ (140€)"** (decisão do dono). Os emails vão para quem tem o calendário da equipa partilhado: não há emails no código.
+- Uma cópia só se apaga se o próprio evento disser que foi apagado, nunca por faltar numa lista.
+
 ## Regras de conteúdo e estilo (fixas, já corrigidas várias vezes)
 
 - **Varredura de afirmações absolutas (2026-09-17, segunda passagem).** A revisão do glossário encontrou as mesmas afirmações noutros sítios do site, algumas a contradizer o que a página ao lado dizia. Removidas: "redução de 70% dos episódios de crise" atribuída ao tratamento anti-ácaros (um resultado clínico atribuído ao serviço), "eficaz em mais de 90% dos casos" na desodorização e nas páginas de marca, "mais de 85% dos casos" no couro Natuzzi, "mata microrganismos acima de 60ºC, letal para ácaros, bactérias e fungos" na extração, "eliminação total de odores" em tapetes (no mesmo ficheiro que já dizia "não prometemos eliminação total") e três passagens no blog sobre calor que mata ácaros. **O princípio que ficou: o que provoca a reação alérgica são os excrementos e os restos de exoesqueleto já depositados na fibra, e esses removem-se fisicamente, não por calor.** Antes de escrever uma percentagem de eficácia ou um verbo como eliminar, matar ou garantir, verificar se a mesma página noutro sítio já promete o contrário.
