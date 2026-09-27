@@ -25,7 +25,7 @@ describe('isGoogleAdsVisit', () => {
 describe('markAdsWhatsAppText', () => {
   it('turns the landing page opening into a natural sentence', () => {
     expect(markAdsWhatsAppText(buildServiceWaMessage('limpeza-sofas', 'Lisboa')))
-      .toBe('Olá! Vi o vosso anúncio no Google e gostaria de saber o preço e a próxima disponibilidade para limpar o meu sofá em Lisboa. Posso enviar fotografias e indicar a minha localidade para confirmarem o orçamento.');
+      .toBe('Olá! Vi o vosso anúncio no Google e gostaria de um orçamento para limpar o meu sofá em Lisboa.\n\nLocalidade:\nSofá de quantos lugares:\nDia que dá jeito:\n\nA seguir envio uma foto do sofá.');
   });
 
   it('puts the mark in front of every other Portuguese opening', () => {
@@ -98,7 +98,7 @@ describe('initAdsWhatsAppMessage', () => {
     const expected = markAdsWhatsAppText(buildServiceWaMessage('impermeabilizacao', 'Porto'));
     expect(click('sticky')).toBe(expected);
     expect(click('header')).toBe(expected);
-    expect(expected).toContain('impermeabilizar os meus estofos no Porto');
+    expect(expected).toContain('impermeabilizar o meu sofá no Porto');
   });
 
   it('still finds the page message after the hero was clicked, and on a second click', () => {

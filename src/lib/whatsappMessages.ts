@@ -16,23 +16,29 @@ export function buildGeneralWaMessage(isEn = false): string {
   return 'Olá! Gostaria de saber o preço e a disponibilidade para limpar os meus estofos. Posso enviar fotografias dos artigos e indicar a minha localidade para receber um orçamento.';
 }
 
-/** Shared by service, location, neighbourhood and price landing pages. */
+/**
+ * Shared by service, location, neighbourhood and price landing pages.
+ *
+ * Written so the client only fills in the blanks and the owner can quote in the
+ * first reply (dono, 28/09/2026: "a pessoa não pode perder tempo a pensar o que
+ * escrever"). Each field is what the price depends on: the locality sets the
+ * travel fee (the page city is the campaign, not always where the client
+ * lives), then the size, then the day.
+ */
 export function buildServiceWaMessage(serviceSlug: string, placeName?: string | null): string {
   const loc = placeName ? ` ${cityPrep(placeName)} ${placeName}` : '';
-  const requests: Record<string, string> = {
-    'limpeza-sofas': 'limpar o meu sofá',
-    'limpeza-colchoes': 'limpar o meu colchão',
-    'limpeza-tapetes': 'limpar os meus tapetes',
-    'limpeza-cadeiras': 'limpar as minhas cadeiras',
-    'limpeza-alcatifas': 'limpar a minha alcatifa',
-    'impermeabilizacao': 'impermeabilizar os meus estofos',
+  const services: Record<string, { request: string; fields: string[]; photo: string }> = {
+    'limpeza-sofas': { request: 'limpar o meu sofá', fields: ['Sofá de quantos lugares:'], photo: 'A seguir envio uma foto do sofá.' },
+    'limpeza-colchoes': { request: 'limpar o meu colchão', fields: ['Tamanho (solteiro, casal ou king):'], photo: 'A seguir envio uma foto do colchão.' },
+    'limpeza-tapetes': { request: 'limpar os meus tapetes', fields: ['Quantos tapetes e medidas aproximadas:'], photo: 'A seguir envio fotos dos tapetes.' },
+    'limpeza-cadeiras': { request: 'limpar as minhas cadeiras', fields: ['Quantas cadeiras:'], photo: 'A seguir envio uma foto das cadeiras.' },
+    'limpeza-alcatifas': { request: 'limpar a minha alcatifa', fields: ['Área aproximada em m²:'], photo: 'A seguir envio uma foto da alcatifa.' },
+    'impermeabilizacao': { request: 'impermeabilizar o meu sofá', fields: ['Sofá de quantos lugares:', 'Também quero a limpeza (sim ou não):'], photo: 'A seguir envio uma foto do tecido.' },
   };
-  const request = requests[serviceSlug];
-  if (!request) return buildGeneralWaMessage();
-  const photos = serviceSlug === 'impermeabilizacao'
-    ? 'Posso enviar fotografias para avaliarem o tecido e confirmarem o orçamento.'
-    : 'Posso enviar fotografias e indicar a minha localidade para confirmarem o orçamento.';
-  return `Olá! Gostaria de saber o preço e a próxima disponibilidade para ${request}${loc}. ${photos}`;
+  const service = services[serviceSlug];
+  if (!service) return buildGeneralWaMessage();
+  const fields = ['Localidade:', ...service.fields, 'Dia que dá jeito:'];
+  return `Olá! Gostaria de um orçamento para ${service.request}${loc}.\n\n${fields.join('\n')}\n\n${service.photo}`;
 }
 
 /** Used on MaterialPage. */
