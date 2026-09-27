@@ -92,20 +92,50 @@ export function localityFromPostalCode(code: string): CrmLocality | null {
 interface Place { key: string; name: string; locality: CrmLocality }
 
 /** Um nome que aponte para duas regiões não serve para decidir nenhuma. */
-function uniquePlaces(entries: Array<{ name: string; locality: CrmLocality | undefined }>): Place[] {
+function uniquePlaces(entries: Array<{ name: string; display?: string; locality: CrmLocality | undefined }>): Place[] {
   const byKey = new Map<string, Place | null>();
-  for (const { name, locality } of entries) {
+  for (const { name, display, locality } of entries) {
     const key = normalizeCity(name);
     if (!locality || key.length < 4) continue;
     const prev = byKey.get(key);
-    if (prev === undefined) byKey.set(key, { key, name: name.trim(), locality });
+    if (prev === undefined) byKey.set(key, { key, name: (display ?? name).trim(), locality });
     else if (prev && prev.locality !== locality) byKey.set(key, null);
   }
   return [...byKey.values()].filter((p): p is Place => p !== null);
 }
 
+/**
+ * Como o dono escreve sítios que os dados do site não têm: abreviaturas de
+ * concelho ("Gaia", "Viana"), bairros ("Boavista", "Foz") e localidades que
+ * não são freguesia ("Carvoeiro", "Miratejo"). Tirados dos eventos reais de
+ * junho a setembro de 2026. Valem como concelho, por isso ganham às
+ * freguesias: "Antas" é o bairro do Porto, não a freguesia de Esposende.
+ */
+const PLACE_ALIASES: Array<{ name: string; display?: string; locality: CrmLocality }> = [
+  { name: 'Gaia', display: 'Vila Nova de Gaia', locality: 'Porto' },
+  { name: 'Viana', display: 'Viana do Castelo', locality: 'Braga' },
+  { name: 'Póvoa', display: 'Póvoa de Varzim', locality: 'Porto' },
+  { name: 'Águas Santas', locality: 'Porto' },
+  { name: 'Boavista', locality: 'Porto' },
+  { name: 'Campo Alegre', locality: 'Porto' },
+  { name: 'Foz do Douro', locality: 'Porto' },
+  { name: 'Foz', locality: 'Porto' },
+  { name: 'Antas', locality: 'Porto' },
+  { name: 'Charneca da Caparica', locality: 'Lisboa' },
+  { name: 'Miratejo', locality: 'Lisboa' },
+  { name: 'Azambuja', locality: 'Lisboa' },
+  { name: 'Pucariça', locality: 'Lisboa' },
+  { name: 'Carvoeiro', locality: 'Algarve' },
+  { name: 'Montegordo', display: 'Monte Gordo', locality: 'Algarve' },
+  { name: 'Pedras del Rei', display: "Pedras d'El Rei", locality: 'Algarve' },
+  { name: 'Pedras del Rey', display: "Pedras d'El Rei", locality: 'Algarve' },
+];
+
+const REGION_ONLY = normalizeCity('Algarve');
+
 const municipalityPlaces = uniquePlaces([
   ...cities.map(c => ({ name: c.name, locality: AREA_TO_LOCALITY[c.area] })),
+  ...PLACE_ALIASES,
   { name: 'Algarve', locality: 'Algarve' },
 ]);
 
@@ -200,6 +230,8 @@ function formatPhone(raw: string): string {
 
 const SERVICE_WORDS = /\b(limpeza|impermeabiliza|recolha|entrega|higieniza|lavagem|anti|sofa|sofas|colch|tapete|cadeira|poltrona|alcatifa|carpete|puff|cabeceira|chaise|estofo)/;
 const STREET_WORDS = /^(rua|r\.|avenida|av\.?|travessa|tv\.?|largo|praceta|praca|estrada|alameda|urbanizacao|urb\.?|bairro|beco|calcada|quinta|lugar|lote|cp\b|edificio|edf\.?)/;
+// O fim da morada que não é sítio: "cave esquerda", "2º Dto", "RC".
+const FLAT_WORDS = /^(cave|esq|esquerd|dto|direit|frente|tras|r\/?c|andar|bloco|lote|apto|piso|hab|porta|loja|fracao)/;
 const POSTAL = /\b(\d{4})-\d{3}\b/;
 
 const isServiceLike = (s: string) => SERVICE_WORDS.test(normalizeCity(s));
@@ -220,7 +252,14 @@ export function parseServiceEvent(event: CalendarEvent, known: KnownPlace[] = []
   const billed = toNumber(amount[2] ?? amount[3] ?? amount[4] ?? amount[1]);
 
   const segments = summary.split(/\s+-\s*|\s*-\s+/).map(s => s.trim());
-  const head = segments.shift() ?? '';
+  let head = segments.shift() ?? '';
+  // Telefone colado à descrição, sem hífen ("... Aljezur +48 669 344 568
+  // Mikolaj"): o que vem a partir dele é outro segmento.
+  const headPhone = PHONE.exec(head);
+  if (headPhone && headPhone.index > 0) {
+    segments.unshift(head.slice(headPhone.index));
+    head = head.slice(0, headPhone.index);
+  }
   // "Serviço" é sempre rótulo. "Limpeza" só é rótulo quando vem logo antes do
   // valor ("Limpeza 50€ (99€) Impermeabilização..."); em "Limpeza de sofá
   // 89€" é a própria descrição.
@@ -261,7 +300,8 @@ export function parseServiceEvent(event: CalendarEvent, known: KnownPlace[] = []
   if (postal) {
     locality = localityFromPostalCode(postal[1]);
     const after = tidy(fullText.slice(fullText.indexOf(postal[0]) + postal[0].length).split(/[\n,]/)[0] ?? '');
-    if (after && !/\d/.test(after)) city = after;
+    // "2700-256 Venteira Amadora" → Amadora, como o dono escreve no CRM.
+    if (after && !/\d/.test(after) && /\p{L}/u.test(after)) city = findPlace(after, municipalityPlaces)?.name ?? after;
   }
   // Por esta ordem: o que o dono já escreveu, concelhos, freguesias. Dentro
   // de cada lista, a morada antes da descrição.
@@ -280,10 +320,16 @@ export function parseServiceEvent(event: CalendarEvent, known: KnownPlace[] = []
       break search;
     }
   }
+  // "Carvoeiro, Algarve": a região não é a localidade.
+  if (city && normalizeCity(city) === REGION_ONLY) {
+    const specific = findPlace(fullText.replace(/algarve/gi, ' '), [...municipalityPlaces, ...parishPlaces]);
+    if (specific?.locality === 'Algarve') city = specific.name;
+  }
   if (!city && address.length > 0) {
     const last = tidy(address[address.length - 1].split(/[\n,]/).pop() ?? '');
-    if (last && !/\d/.test(last) && !STREET_WORDS.test(normalizeCity(last))) city = last;
+    if (last && !/\d/.test(last) && /\p{L}/u.test(last) && !STREET_WORDS.test(normalizeCity(last)) && !FLAT_WORDS.test(normalizeCity(last))) city = last;
   }
+  if (city && city === city.toUpperCase()) city = city.toLowerCase().replace(/(^|\s)(\p{L})/gu, (_, sp, c) => sp + c.toUpperCase());
 
   const review: string[] = [];
   if (!locality) review.push('Região por identificar');

@@ -65,6 +65,25 @@ describe('parseServiceEvent', () => {
     const surnameIsParish = parse('Serviço 45€ (90€) Limpeza sofá de 4 lugares - ‪+351 912 345 678‬ - Rita Costa - Rua Inventada n 12 nogueira maia');
     expect(surnameIsParish).toMatchObject({ client_name: 'Rita Costa', city: 'Maia', locality: 'Porto' });
 
+    // Telefone e nome colados à descrição, sem hífen.
+    const glued = parse('Serviço 45€ (89€) Limpeza sofá 3 lugares Aljezur ‪+48 600 000 000‬ Tomas');
+    expect(glued).toMatchObject({ client_name: 'Tomas', phone: '+48 600 000 000', description: 'Limpeza sofá 3 lugares Aljezur', locality: 'Algarve' });
+  });
+
+  it('reads the place the way the owner writes it', () => {
+    // Concelho depois do código postal, em vez da freguesia colada a ele.
+    expect(parse('Serviço 45€ (89€) Limpeza colchão - 912 345 678 - Ana - Rua Inventada 3 ⏎ 2700-000 Venteira Amadora'.replace('⏎', '\n')))
+      .toMatchObject({ city: 'Amadora', locality: 'Lisboa' });
+    // Sítios que não são concelho nem freguesia nos dados do site.
+    expect(parse('Serviço 70€ (140€) Recolha tapete - Rua Inventada 3 ⏎ Águas Santas ⏎ CP: 4425-000'.replace(/⏎/g, '\n')))
+      .toMatchObject({ city: 'Águas Santas', locality: 'Porto' });
+    expect(parse('Serviço 70€ (140€) Recolha tapete Gaia')).toMatchObject({ city: 'Vila Nova de Gaia', locality: 'Porto' });
+    expect(parse('Serviço 50€ (100€) Recolha de tapetes Antas - Ana - 912 345 678')).toMatchObject({ city: 'Antas', locality: 'Porto' });
+    // A região não é a localidade.
+    expect(parse('Serviço 100€ (200€) Limpeza de 2 sofás - Carvoeiro, Algarve - 912 345 678')).toMatchObject({ city: 'Carvoeiro', locality: 'Algarve' });
+    // O fim da morada não é cidade.
+    expect(parse('Serviço 110€ (219€) Limpeza de tapete - Ana - 912 345 678 - Rua Inventada 28 , cave esquerda')?.city).toBeNull();
+
     const descriptionLater = parse('Serviço 40€(80€) -Rua das Flores porta 25 \n2830-345 Barreiro - limpeza tapete 4m2 - 912 345 678');
     expect(descriptionLater).toMatchObject({ description: 'Limpeza tapete 4m2', city: 'Barreiro', locality: 'Lisboa' });
   });
@@ -79,12 +98,12 @@ describe('parseServiceEvent', () => {
   });
 
   it('learns places from what the owner already wrote in the CRM', () => {
-    const summary = 'Serviço 50€ (100€) Recolha de tapetes Antas';
+    const summary = 'Serviço 50€ (100€) Recolha de tapetes Vale Formoso';
     const fromSite = parse(summary);
-    expect(fromSite?.locality).toBe('Braga'); // há uma freguesia Antas no Minho
-    expect(fromSite?.needs_review).toContain('freguesia');
-    const known = knownPlacesFrom([{ city: 'Antas', locality: 'Porto' }, { city: 'Gaia', locality: 'Porto' }]);
-    expect(parse(summary, known)).toMatchObject({ locality: 'Porto', city: 'Antas', needs_review: null });
+    expect(fromSite?.locality).toBeNull(); // o site não conhece o bairro
+    expect(fromSite?.needs_review).toContain('Região por identificar');
+    const known = knownPlacesFrom([{ city: 'Vale Formoso', locality: 'Porto' }, { city: 'Gaia', locality: 'Porto' }]);
+    expect(parse(summary, known)).toMatchObject({ locality: 'Porto', city: 'Vale Formoso', needs_review: null });
   });
 
   it('does not learn from rows still waiting for review, nor from contradictory ones', () => {
