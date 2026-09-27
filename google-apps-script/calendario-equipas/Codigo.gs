@@ -180,28 +180,25 @@ function sincronizarAgora() {
     MailApp.sendEmail({ to: Session.getEffectiveUser().getEmail(), subject: mensagem.assunto, body: mensagem.texto, name: 'Calendários das equipas' });
   }
 
-  pintarServicos(desejadas.copias, propriedades, agora);
+  pintarServicos(desejadas.copias);
   pintarCalendarios(calendarios, propriedades);
 
   if (silencioso) propriedades.setProperty('primeiraVoltaFeita', new Date(agora).toISOString());
 }
 
 /**
- * Pinta no calendário do dono os serviços novos com a cor da equipa (dono,
- * 28/09/2026: "pinta apenas os novos"). Os que já existiam quando as cores
- * foram ligadas não se tocam: mudar um evento mexe na data de alteração, e o
- * CRM trata um evento alterado depois da linha como a versão mais recente,
- * por isso apagaria as correções que o dono lá fez. Um serviço novo é pintado
- * segundos depois de ser criado, antes de haver correções.
+ * Pinta cada serviço no calendário do dono com a cor da equipa (dono,
+ * 28/09/2026: "quero o meu com cores em vez de ser tudo azul"). Mudar a cor
+ * mexe na data de alteração do evento, e o CRM (`calendarSync.ts`) relê um
+ * evento alterado depois da linha e escreve por cima das correções feitas no
+ * CRM. Isso só acontece com eventos criados depois de 26/09/2026 às 15:00 UTC
+ * (os únicos que o CRM acompanha), e esses são pintados segundos depois de
+ * criados, antes de haver correções. Um serviço que muda de equipa muda de
+ * cor logo a seguir à alteração do dono.
  */
-function pintarServicos(copias, propriedades, agora) {
-  let desde = Number(propriedades.getProperty('coresDesde'));
-  if (!desde) {
-    desde = agora;
-    propriedades.setProperty('coresDesde', String(agora));
-  }
+function pintarServicos(copias) {
   copias.forEach(function (copia) {
-    const cor = corEmFalta(copia.origem, copia.equipaId, desde);
+    const cor = corEmFalta(copia.origem, copia.equipaId);
     if (cor) Calendar.Events.patch({ colorId: cor }, 'primary', copia.origem.id, { sendUpdates: 'none' });
   });
 }
@@ -609,13 +606,8 @@ function duvidaDoMapa(resultado) {
     + (foraDasRegioes ? ', fora das zonas das equipas: foi a equipa mais perto' : '');
 }
 
-/**
- * A cor a pôr num serviço do calendário do dono, ou null se não é preciso:
- * só serviços criados depois de as cores serem ligadas, e só quando a cor
- * ainda não é a da equipa (um serviço que muda de equipa muda de cor).
- */
-function corEmFalta(origem, equipaId, desdeMs) {
-  if (!origem.created || Date.parse(origem.created) < desdeMs) return null;
+/** A cor a pôr num serviço do calendário do dono, ou null se já tem a da equipa. */
+function corEmFalta(origem, equipaId) {
   const equipa = EQUIPAS.find(function (e) { return e.id === equipaId; });
   if (!equipa || origem.colorId === equipa.cor) return null;
   return equipa.cor;

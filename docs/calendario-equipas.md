@@ -111,22 +111,22 @@ Para desligar: função `desligar`. Os calendários ficam como estão.
   fuso de Lisboa, por isso a equipa vê uma hora a menos. A primeira versão
   copiava os números do relógio (15:00) e punha a equipa uma hora atrasada;
   foi corrigida antes de os calendários serem partilhados.
-- **Cores no calendário do dono** (dono, 28/09/2026: "pinta apenas os
-  novos"): cada serviço criado depois de as cores serem ligadas fica com a
-  cor da equipa, segundos depois de ser marcado (Porto azul Mirtilo, Braga
-  verde Basílico, Lisboa 1 laranja Tangerina, Lisboa 2 roxo Uva, Algarve
-  amarelo Banana), e muda
-  de cor se mudar de equipa. Os calendários das equipas ficam com a mesma
-  cor na lista do dono, **e escondidos**: são dele (o script corre na conta
-  dele), por isso a Google mostrava-lhe cada serviço duas vezes, o original
-  e a cópia. Escondidos continuam a funcionar para as equipas; para ver um,
-  Google Calendar no computador → Definições → o calendário → "Mostrar na
-  lista". **Os serviços que já existiam não se pintam**: mudar
-  um evento mexe na data de alteração, e o CRM (`calendarSync.ts`) trata um
-  evento alterado depois da linha como a versão mais recente e apagaria as
-  correções feitas no CRM. Um serviço novo é pintado antes de haver
-  correções. Uma cor posta à mão num serviço novo é substituída pela da
-  equipa.
+- **Cores no calendário do dono** (dono, 28/09/2026: "quero o meu com cores
+  em vez de ser tudo azul"): cada serviço fica com a cor da equipa (Porto
+  azul Mirtilo, Braga verde Basílico, Lisboa 1 laranja Tangerina, Lisboa 2
+  roxo Uva, Algarve amarelo Banana) e muda de cor se mudar de equipa. Uma
+  cor posta à mão num serviço é substituída pela da equipa. **Cuidado com o
+  CRM:** mudar a cor mexe na data de alteração do evento, e o CRM
+  (`calendarSync.ts`) relê um evento alterado depois da linha e escreve por
+  cima das correções feitas no CRM. Só acompanha eventos criados depois de
+  26/09/2026 às 15:00 UTC, e esses são pintados segundos depois de criados,
+  antes de haver correções. Na pintura dos serviços que já existiam (28/09)
+  só dois estavam nessa situação. Os calendários das equipas ficam com a
+  mesma cor na lista do dono, **e escondidos**: são dele (o script corre na
+  conta dele), por isso a Google mostrava-lhe cada serviço duas vezes, o
+  original e a cópia. Escondidos continuam a funcionar para as equipas;
+  para ver um, Google Calendar no computador → Definições → o calendário →
+  "Mostrar na lista".
 - **As equipas veem o título completo**, incluindo "70€ (140€)" (decisão do
   dono, 28/09/2026).
 - **Emails:** vão para quem tem o calendário da equipa partilhado com
