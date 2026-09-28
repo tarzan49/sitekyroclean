@@ -1,6 +1,8 @@
 export const METRO_CITY_SLUGS = [
   // Porto/Norte
   "porto", "matosinhos", "maia", "vila-nova-de-gaia", "gondomar", "braga", "guimaraes",
+  // Norte Litoral (2026-09-28): as cidades de praia entre Espinho e Viana
+  "povoa-de-varzim", "vila-do-conde", "espinho", "ovar",
   "vila-nova-de-famalicao", "barcelos", "viana-do-castelo", "povoa-de-lanhoso", "fafe", "esposende",
   // Coimbra (trabalhador local desde 2026-09-28)
   "coimbra", "figueira-da-foz",

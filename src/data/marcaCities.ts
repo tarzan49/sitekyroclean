@@ -31,6 +31,9 @@ export const MARCA_CITIES = [
   { name: "Póvoa de Lanhoso", slug: "povoa-de-lanhoso" },
   { name: "Fafe", slug: "fafe" },
   { name: "Esposende", slug: "esposende" },
+  // Norte Litoral (2026-09-28)
+  { name: "Espinho", slug: "espinho" },
+  { name: "Ovar", slug: "ovar" },
   // Coimbra e Centro
   { name: "Coimbra", slug: "coimbra" },
   { name: "Figueira da Foz", slug: "figueira-da-foz" },

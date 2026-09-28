@@ -27,6 +27,10 @@ export const COMMERCIAL_CITIES: CommercialCity[] = [
   { name: "Guimarães", slug: "guimaraes", region: "Porto" },
   { name: "Maia", slug: "maia", region: "Porto" },
   { name: "Póvoa de Varzim", slug: "povoa-de-varzim", region: "Porto" },
+  // Norte Litoral (2026-09-28): hotelaria e restauração de praia
+  { name: "Vila do Conde", slug: "vila-do-conde", region: "Porto" },
+  { name: "Espinho", slug: "espinho", region: "Porto" },
+  { name: "Viana do Castelo", slug: "viana-do-castelo", region: "Porto" },
   // Coimbra e Centro (trabalhador local desde 2026-09-28)
   { name: "Coimbra", slug: "coimbra", region: "Coimbra" },
   { name: "Figueira da Foz", slug: "figueira-da-foz", region: "Coimbra" },

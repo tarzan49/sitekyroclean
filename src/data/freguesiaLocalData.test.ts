@@ -5,9 +5,12 @@ import { cities } from './serviceCatalog';
 import { getLocalData } from './freguesiaContentEngine';
 
 // Regiões que têm de ter conteúdo local em todas as freguesias, como o Porto
-// e Lisboa (dono, 2026-09-28: "tão bom como o do Porto e de Lisboa").
+// e Lisboa (dono, 2026-09-28: "tão bom como o do Porto e de Lisboa"), e o
+// Norte Litoral (dono, mesmo dia).
 const FULL_COVERAGE = [
   'Coimbra', 'Figueira da Foz', 'Braga', 'Guimarães',
+  // Norte Litoral (2026-09-28)
+  'Viana do Castelo', 'Esposende', 'Póvoa de Varzim', 'Vila do Conde', 'Espinho', 'Ovar',
   ...cities.filter(city => city.area === 'algarve').map(city => city.name),
 ];
 

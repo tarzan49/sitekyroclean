@@ -1,13 +1,15 @@
 import type { FreguesiaLocalData } from './freguesiaContentEngine';
 
 // Pontos de referência e dica local das freguesias, por concelho (2026-09-28).
-// Escrito para Coimbra, Figueira da Foz, Braga, Guimarães e as freguesias do
-// Algarve que ainda caíam no texto genérico ("Centro de X, Zona residencial
-// de X"), para ficarem ao nível do Porto e de Lisboa. Cada ponto de
-// referência foi confirmado na freguesia certa (Wikipédia, GeoAPI ou o site
-// da junta); onde não havia nada verificável ficou a igreja paroquial ou o
-// rio, nunca um lugar inventado. As dicas descrevem o sítio, sem números,
-// sem afirmações de saúde e sem dizer onde está a equipa.
+// Escrito para Coimbra, Figueira da Foz, Braga, Guimarães, o Norte Litoral
+// (de Viana do Castelo a Ovar) e as freguesias do Algarve que ainda caíam no
+// texto genérico ("Centro de X, Zona residencial de X"), para ficarem ao nível
+// do Porto e de Lisboa. Cada ponto de referência foi confirmado na freguesia
+// certa (Wikipédia, GeoAPI ou o site da junta); onde não havia nada
+// verificável ficou a igreja paroquial ou o rio, nunca um lugar inventado.
+// As dicas descrevem o sítio, sem números, sem afirmações de saúde e sem
+// dizer onde está a equipa. Só os pontos de referência chegam à página
+// (`localAreaNote` em landingPageModel.ts).
 //
 // Indexado por concelho (o `name` de `municipiosComFreguesias`) e depois pelo
 // slug da freguesia: há slugs repetidos entre concelhos. Lido antes do mapa
@@ -167,6 +169,85 @@ export const LOCAL_DATA_BY_MUNICIPIO: Record<string, Record<string, FreguesiaLoc
     "sande-sao-lourenco-e-balazar": { landmarks: ["Sande São Lourenço", "Balazar"], localTip: "União de freguesias de ambiente rural no sul do concelho: tratamos sofás, colchões e tapetes em casa, sem complicações." },
     "selho-sao-lourenco-e-gominhaes": { landmarks: ["Vale de São Torcato", "Rio Selho", "Ponte Romana de Selho São Lourenço"], localTip: "Freguesia no Vale de São Torcato, junto ao Rio Selho: a humidade do vale torna a limpeza periódica de colchões e estofos uma boa ideia." },
     "souto-santa-maria-souto-sao-salvador-e-gondomar": { landmarks: ["Rio Ave", "Souto Santa Maria"], localTip: "União de freguesias rural com o Rio Ave como limite a oeste: casas de campo com estofos que ficam renovados com extração profissional." },
+  },
+  "Viana do Castelo": {
+    "afife": { landmarks: ["Convento de São João de Cabanas", "Cividade de Afife", "Praia de Afife"], localTip: "Freguesia costeira no norte do concelho, de casas de família e segundas habitações perto do mar: no ar salgado, sofás e colchões ganham com uma limpeza profunda feita em casa." },
+    "alvaraes": { landmarks: ["Igreja Paroquial de Alvarães"], localTip: "Freguesia do interior sul do concelho, de moradias e casas de família: um só agendamento chega para sofás, colchões e tapetes, sem transportar nada." },
+    "amonde": { landmarks: ["Igreja Paroquial de Amonde"], localTip: "Aldeia de encosta no interior norte do concelho, de casas antigas em granito: a limpeza ao domicílio evita levar sofás e colchões pelas estradas de serra." },
+    "vila-nova-de-anha": { landmarks: ["Paço de Anha", "Praia do Rodanho"], localTip: "Freguesia entre o campo e o mar, a sul do Lima, com moradias e casas de férias: sofás e colchões de uso sazonal ficam prontos para o verão com uma limpeza profunda em casa." },
+    "areosa": { landmarks: ["Fortim da Areosa", "Igreja de Nossa Senhora da Vinha", "Citânia de Santa Luzia"], localTip: "Freguesia costeira logo a norte da cidade, com praias, moinhos e bairros residenciais: perto do mar, a humidade pede atenção regular aos estofos e colchões." },
+    "barroselas": { landmarks: ["Estação de Barroselas", "Ponte das Alvas", "Rio Neiva"], localTip: "Vila do sul do concelho, servida pela Linha do Minho, de casas de família e prédios: tratamos sofás, colchões e tapetes ao domicílio, com secagem rápida." },
+    "cardielos": { landmarks: ["Rio Lima"], localTip: "Freguesia na margem norte do Lima, de moradias e quintas: nas casas junto ao rio, a limpeza periódica ajuda a manter sofás e colchões frescos." },
+    "carreco": { landmarks: ["Farol de Montedor", "Moinhos de Montedor", "Praia do Paçô"], localTip: "Freguesia costeira de campos e moinhos junto ao mar: nas casas expostas à maresia, sofás e colchões beneficiam de uma limpeza profunda sem sair de casa." },
+    "carvoeiro": { landmarks: ["Igreja Paroquial de Carvoeiro"], localTip: "Freguesia rural do sul do concelho, de casas espaçadas e vida tranquila: levamos o equipamento até casa para limpar sofás e colchões sem os tirar do lugar." },
+    "castelo-do-neiva": { landmarks: ["Igreja de Santiago de Castelo do Neiva", "Monte do Castelo do Neiva", "Praia de Castelo do Neiva"], localTip: "Freguesia costeira junto à foz do Neiva, entre campos agrícolas e praia: nas casas perto do mar, a limpeza regular mantém os estofos e colchões frescos." },
+    "chafe": { landmarks: ["Vestígios da antiga igreja de São João Baptista (Portelas)"], localTip: "Freguesia do litoral sul do concelho, de moradias e casas de família: um só agendamento trata sofás, colchões e tapetes, sem transportes." },
+    "darque": { landmarks: ["Praia do Cabedelo", "Ponte Eiffel (margem sul)", "Rio Lima"], localTip: "Margem sul do Lima, em frente à cidade, entre bairros residenciais e a praia do Cabedelo: em casas de família e de férias, a limpeza profunda deixa sofás e colchões prontos para uso." },
+    "freixieiro-de-soutelo": { landmarks: ["Igreja Paroquial de Freixieiro de Soutelo"], localTip: "Freguesia pequena e rural entre a serra e a costa norte, de casas de família: a limpeza ao domicílio evita levar sofás e colchões para fora de casa." },
+    "lanheses": { landmarks: ["Paço de Lanheses", "Ponte do Arquinho", "Rio Lima"], localTip: "Antiga sede de concelho na margem norte do Lima, com casas antigas e solares: limpamos sofás, colchões e tapetes no local, sem ser preciso transportar nada." },
+    "mazarefes": { landmarks: ["Rio Lima"], localTip: "Freguesia ribeirinha na margem sul do Lima, de campos e moradias: nas casas perto do rio, a limpeza periódica ajuda a manter os estofos frescos." },
+    "montaria": { landmarks: ["Igreja de São Lourenço da Montaria", "Moinhos de Água de São Lourenço da Montaria"], localTip: "Freguesia de montanha no interior norte do concelho, de aldeias em granito: a limpeza ao domicílio poupa a descida à cidade com sofás e colchões." },
+    "mujaes": { landmarks: ["Igreja Paroquial de Mujães"], localTip: "Freguesia rural no sul do concelho, de moradias e quintas: tratamos sofás, colchões e tapetes num único agendamento, em casa." },
+    "outeiro": { landmarks: ["Igreja Paroquial de Outeiro"], localTip: "Freguesia de encosta a norte da cidade, entre aldeias e moradias com quintal: um só agendamento chega para os estofos da casa toda." },
+    "perre": { landmarks: ["Castro do Vieito", "Igreja de São Miguel de Perre", "Monte do Calvário"], localTip: "Freguesia residencial nas colinas a norte da cidade, de moradias e casas de família: limpamos sofás e colchões em casa, com secagem rápida." },
+    "santa-marta-de-portuzelo": { landmarks: ["Cruzeiro de Santa Marta", "Praia da Preguiça", "Rio Lima"], localTip: "Freguesia na margem norte do Lima, perto da cidade, conhecida pelas tradições e trajes minhotos: nas casas junto ao rio, a limpeza regular mantém sofás e colchões frescos." },
+    "serreleis": { landmarks: ["Rio Lima"], localTip: "Freguesia pequena na margem norte do Lima, de moradias e campos: levamos o equipamento até casa para limpar sofás, colchões e tapetes." },
+    "sao-romao-de-neiva": { landmarks: ["Rio Neiva"], localTip: "Freguesia do sul do concelho junto ao Neiva, de casas de família e campos: a limpeza ao domicílio trata os estofos sem os tirar do lugar." },
+    "geraz-do-lima-santa-maria-santa-leocadia-e-moreira-e-deao": { landmarks: ["Rio Lima"], localTip: "Conjunto de aldeias na margem sul do Lima, de casas antigas e quintas: um só agendamento chega para sofás, colchões e tapetes." },
+    "nogueira-meixedo-e-vilar-de-murteda": { landmarks: ["Igreja Paroquial de Nogueira"], localTip: "Aldeias de encosta no interior do concelho, de casas em granito e vida rural: a limpeza ao domicílio evita transportar sofás e colchões." },
+    "subportela-deocriste-e-portela-susa": { landmarks: ["Rio Lima"], localTip: "Freguesias na margem sul do Lima, de moradias e campos agrícolas: nas casas perto do rio, a limpeza periódica mantém os estofos frescos." },
+    "torre-e-vila-mou": { landmarks: ["Rio Lima"], localTip: "Aldeias na margem norte do Lima, de casas de família e quintas: tratamos sofás, colchões e tapetes ao domicílio, sem transportes." },
+    "viana-do-castelo-santa-maria-maior-e-monserrate-e-meadela": { landmarks: ["Santuário de Santa Luzia", "Navio Gil Eannes", "Praça da República"], localTip: "Centro histórico e bairros da cidade, com prédios antigos, apartamentos e alojamento local: limpamos sofás e colchões no próprio apartamento, sem ser preciso levar nada pelas escadas." },
+    "vila-franca": { landmarks: ["Rio Lima"], localTip: "Freguesia na margem sul do Lima, de moradias e campos: um só agendamento chega para os estofos e colchões da casa toda." },
+    "vila-fria": { landmarks: ["Igreja Paroquial de Vila Fria"], localTip: "Freguesia rural a sul do Lima, de casas de família e quintas: levamos o equipamento até casa para limpar sofás e colchões." },
+    "vila-de-punhe": { landmarks: ["Igreja Paroquial de Vila de Punhe"], localTip: "Freguesia do interior sul do concelho, de moradias e casas antigas: tratamos sofás, colchões e tapetes num único agendamento, em casa." },
+  },
+  "Esposende": {
+    "antas": { landmarks: ["Menir de São Paio de Antas", "Foz do Rio Neiva", "Azenhas do Rio Neiva"], localTip: "Freguesia no limite norte do concelho, entre a foz do Neiva e o litoral protegido, com casas de família e turismo rural: tratamos sofás, colchões e tapetes num único agendamento." },
+    "apulia": { landmarks: ["Praia da Apúlia", "Praia de Cedovém"], localTip: "Vila de tradição sargaceira junto ao mar, com muitas casas de férias: depois do verão, sofás e colchões usados por hóspedes e família beneficiam de uma limpeza profunda." },
+    "belinho": { landmarks: ["Praia de Belinho", "Santuário da Senhora da Guia"], localTip: "Freguesia costeira de casas de família e moradias com quintal: perto do mar, a limpeza regular ajuda a manter sofás e colchões frescos." },
+    "curvos": { landmarks: ["Igreja Paroquial de São Cláudio"], localTip: "Freguesia pequena e rural no interior do concelho, de moradias espaçadas: a limpeza ao domicílio evita levar sofás e colchões para fora de casa." },
+    "esposende": { landmarks: ["Rio Cávado", "Igreja da Misericórdia de Esposende"], localTip: "Cidade junto à foz do Cávado, entre prédios de habitação e apartamentos de férias: limpamos estofos e colchões no próprio apartamento, sem transportes." },
+    "forjaes": { landmarks: ["Menir de Forjães", "Centro Cultural Rodrigues de Faria", "Capela de São Roque"], localTip: "Vila do interior norte do concelho, de casas de família e quintas: um só agendamento chega para sofás, colchões e tapetes." },
+    "fao": { landmarks: ["Ponte de Fão", "Praia de Ofir", "Pinhal de Ofir"], localTip: "Vila na margem sul do Cávado, com Ofir e muitas casas de férias junto ao pinhal e ao mar: sofás e colchões de uso sazonal ficam prontos para a próxima estadia com uma limpeza profunda." },
+    "gandra-esposende": { landmarks: ["Igreja Paroquial de São Martinho de Gandra"], localTip: "Freguesia agrícola de terras férteis, com moradias e casas de família: levamos o equipamento até casa para limpar sofás e colchões sem os tirar do lugar." },
+    "gemeses": { landmarks: ["Rio Cávado"], localTip: "Freguesia pequena e sossegada junto ao Cávado, de casas de família: tratamos sofás, colchões e tapetes ao domicílio, sem transportes." },
+    "mar": { landmarks: ["Praia de São Bartolomeu do Mar"], localTip: "Freguesia à beira-mar, conhecida pela romaria de São Bartolomeu, com casas de família e de férias: a maresia pede limpeza regular de sofás e colchões." },
+    "marinhas": { landmarks: ["Praia de Cepães", "Praia de Rio de Moinhos", "Moinhos de Abelheira"], localTip: "Freguesia costeira colada à cidade, com praias, moradias e casas de férias: depois do verão, uma limpeza profunda devolve o aspeto aos estofos e colchões." },
+    "palmeira-de-faro": { landmarks: ["Monte do Faro (encosta nascente)"], localTip: "Freguesia na encosta do monte, de aldeias e moradias com quintal: a limpeza ao domicílio poupa o transporte de sofás e colchões." },
+    "fonte-boa-e-rio-tinto": { landmarks: ["Igreja Paroquial de Fonte Boa", "Igreja Paroquial de Rio Tinto", "Rio Cávado (margem esquerda)"], localTip: "Freguesias rurais na margem esquerda do Cávado, de casas de família e campos agrícolas: um só agendamento chega para sofás, colchões e tapetes." },
+    "vila-cha-esposende": { landmarks: ["Castro de São Lourenço"], localTip: "Freguesia de encosta com vista sobre o litoral, de moradias e casas de família: limpamos estofos e colchões em casa, com secagem rápida." },
+  },
+  "Póvoa de Varzim": {
+    "povoa-de-varzim-centro": { landmarks: ["Casino da Póvoa", "Fortaleza de Nossa Senhora da Conceição", "Igreja Matriz da Póvoa de Varzim"], localTip: "Cidade balnear de tradição piscatória, com muitos apartamentos de férias e alojamento local: sofás e colchões de uso intenso no verão pedem limpeza regular entre hóspedes." },
+    "aver-o-mar": { landmarks: ["Praia do Esteiro", "Praia da Fragosa", "Cabo de Santo André"], localTip: "Freguesia costeira com o núcleo piscatório de Santo André e casas junto ao mar: a maresia e o uso de verão pedem limpeza regular de sofás e colchões." },
+    "agucadoura": { landmarks: ["Igreja de Nossa Senhora da Boa Viagem", "Campos masseira"], localTip: "Terra de dunas transformadas em campos agrícolas, com casas de família perto do mar: a areia e a humidade da costa tornam útil a limpeza periódica de sofás e tapetes." },
+    "navais": { landmarks: ["Castro de Navais", "Capela de Santo António", "Fonte da Moura Encantada"], localTip: "Freguesia rural perto do litoral, de moradias e campos masseira: tratamos sofás, colchões e tapetes num único agendamento, sem transportes." },
+    "beiriz": { landmarks: ["Igreja Paroquial de Beiriz", "Quinta da Tapada", "Aqueduto de Santa Clara"], localTip: "Terra dos célebres tapetes de Beiriz, feitos à mão: tratamos os tapetes de lã e de nó manual com o cuidado que pedem, além de sofás e colchões." },
+    "argivai": { landmarks: ["Aqueduto de Santa Clara", "Capela de Nossa Senhora do Bom Sucesso", "Castro de Argivai"], localTip: "Freguesia residencial atravessada pelo aqueduto, entre moradias e campos: limpamos estofos e colchões ao domicílio, com secagem rápida." },
+  },
+  "Vila do Conde": {
+    "vila-do-conde-centro": { landmarks: ["Mosteiro de Santa Clara", "Aqueduto de Santa Clara", "Alfândega Régia"], localTip: "Cidade histórica na foz do Ave, com tradição de construção naval e muitos apartamentos de férias: limpamos sofás e colchões no próprio apartamento, sem ser preciso levar nada pelas escadas." },
+    "azurara": { landmarks: ["Igreja Matriz de Azurara", "Praia de Azurara", "Rio Ave (margem sul)"], localTip: "Freguesia na margem sul do Ave, entre o rio e o mar, com casas de família e de férias: perto da água, sofás e colchões beneficiam de limpeza regular." },
+    "mindelo": { landmarks: ["Reserva Ornitológica de Mindelo", "Praia de Mindelo"], localTip: "Freguesia costeira de dunas e pinhal, com moradias e casas de férias: depois do verão, uma limpeza profunda devolve o aspeto aos estofos e colchões." },
+    "vila-cha": { landmarks: ["Porto de pesca de Vila Chã", "Praia de Vila Chã"], localTip: "Aldeia piscatória com barcos ainda varados na praia e casas junto ao mar: a maresia pede limpeza regular de sofás, colchões e tapetes." },
+    "labruge": { landmarks: ["Castro de São Paio", "Praia de Labruge", "Capela de São Paio"], localTip: "Freguesia costeira de tradição piscatória, com moradias e casas de férias: tratamos sofás, colchões e tapetes num único agendamento." },
+    "modivas": { landmarks: ["Igreja Matriz de Modivas (Divino Salvador)"], localTip: "Freguesia residencial do interior do concelho, servida pelo metro, de moradias e prédios recentes: proteja sofás novos com impermeabilização e mantenha os colchões limpos sem sair de casa." },
+  },
+  "Espinho": {
+    "espinho-centro": { landmarks: ["Casino Espinho", "Museu Municipal de Espinho (antiga fábrica de conservas)", "Praia da Baía"], localTip: "Cidade balnear de ruas em quadrícula, com muitos apartamentos de férias e alojamento local: sofás e colchões usados no verão ficam prontos para a próxima estadia com uma limpeza profunda." },
+    "silvalde": { landmarks: ["Praia de Silvalde", "Igreja de São Tiago de Silvalde", "Capela de Nossa Senhora do Mar"], localTip: "Freguesia no extremo sul da cidade, junto a uma praia de surf, com moradias e prédios de habitação: perto do mar, a limpeza regular ajuda a manter os estofos frescos." },
+    "anta-espinho": { landmarks: ["Igreja de Anta"], localTip: "Freguesia residencial colada à cidade, entre prédios de habitação e moradias: um só agendamento chega para sofás, colchões e tapetes." },
+    "paramos": { landmarks: ["Barrinha de Esmoriz (Lagoa de Paramos)", "Praia de Paramos", "Aeródromo de Paramos"], localTip: "Freguesia entre a lagoa e o mar, com moradias e casas de férias: nas casas perto da água, a limpeza periódica e a impermeabilização ajudam a manter os estofos frescos." },
+    "guetim": { landmarks: ["Igreja de Santo Estêvão de Guetim"], localTip: "Freguesia pequena e sossegada no interior do concelho, de casas de família: a limpeza ao domicílio evita levar sofás e colchões para fora de casa." },
+  },
+  "Ovar": {
+    "esmoriz": { landmarks: ["Barrinha de Esmoriz", "Praia de Esmoriz"], localTip: "Cidade costeira entre a lagoa e o mar, com prédios de habitação e casas de férias: depois do verão, sofás e colchões beneficiam de uma limpeza profunda." },
+    "cortegaca": { landmarks: ["Igreja Matriz de Cortegaça", "Praia de Cortegaça"], localTip: "Freguesia à beira-mar, de moradias e casas de família junto ao pinhal: a maresia pede limpeza regular de sofás, colchões e tapetes." },
+    "maceda": { landmarks: ["Praia de Maceda"], localTip: "Freguesia de pinhal e praia, com moradias espaçadas e casas de férias: levamos o equipamento até casa para limpar sofás e colchões sem os tirar do lugar." },
+    "arada": { landmarks: ["Igreja Paroquial de Arada", "Capela de Nossa Senhora do Desterro", "Aeródromo de Manobra n.º 1"], localTip: "Freguesia plana entre o litoral e a zona industrial, de moradias e casas de família: tratamos sofás, colchões e tapetes num único agendamento." },
+    "furadouro": { landmarks: ["Praia do Furadouro"], localTip: "Praia de Ovar de tradição piscatória, com muitos apartamentos e casas de férias: sofás e colchões de uso sazonal ficam prontos para a próxima estadia com uma limpeza profunda." },
+    "valega": { landmarks: ["Igreja Matriz de Válega"], localTip: "Freguesia conhecida pela igreja de fachada em azulejo, de casas de família e campos agrícolas: a limpeza ao domicílio poupa o transporte de sofás e colchões." },
   },
   "Faro": {
     "conceicao-de-faro": { landmarks: ["Igreja de Nossa Senhora da Conceição", "Patacão"], localTip: "Freguesia residencial a norte da cidade de Faro, com moradias e bairros em crescimento: cuidamos de sofás, colchões e tapetes de famílias que vivem aqui o ano inteiro." },
