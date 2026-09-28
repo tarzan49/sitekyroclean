@@ -15,10 +15,14 @@ export const WHATSAPP_BASE = "https://wa.me/351925530647";
 // seoSchema.ts rebentar no typecheck (TS2698).
 export const BUSINESS_TAX_ID: string = "";
 
-// Perfis proprios noutras plataformas, para o `sameAs`. Confirmado em
-// 2026-09-17 que nao existe nenhum. Acrescentar um URL aqui basta: o
-// `sameAs` do negocio junta-os a ficha do Google sozinho.
-export const BUSINESS_PROFILES: string[] = [];
+// Perfis proprios noutras plataformas, para o `sameAs`. A 2026-09-17 nao
+// existia nenhum; o Instagram entrou a 2026-09-28 (perfil confirmado, usado
+// nos anuncios da Meta). Acrescentar um URL aqui basta: o `sameAs` do negocio
+// junta-os a ficha do Google sozinho. O rodape mostra o Instagram a quem visita
+// (React e HTML estatico), para o schema nao declarar o que a pagina nao diz.
+export const INSTAGRAM_URL = "https://www.instagram.com/kyrocleansolutions/";
+export const INSTAGRAM_HANDLE = "@kyrocleansolutions";
+export const BUSINESS_PROFILES: string[] = [INSTAGRAM_URL];
 
 export const BUSINESS_EMAIL = "cleansolutions.pt25@gmail.com";
 export const BUSINESS_EMAIL_HREF = `mailto:${BUSINESS_EMAIL}`;

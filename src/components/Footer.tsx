@@ -1,10 +1,10 @@
 import BusinessConditions from './BusinessConditions';
-import { Phone, Mail, MapPin, ChevronRight } from "lucide-react";
+import { Phone, Mail, MapPin, ChevronRight, Instagram } from "lucide-react";
 import { GOOGLE_MAPS_URL } from "@/constants/google";
 import { Link } from "react-router-dom";
 import { FOOTER_NAV, FOOTER_STRIP_LINKS, FOOTER_LEGAL_LINKS } from "@/data/siteFooterNav";
 import kyroLogo from "@/assets/kyro-logo.webp";
-import { PHONE_TEL, PHONE_DISPLAY, BUSINESS_EMAIL_HREF, BUSINESS_EMAIL, BUSINESS_ADDRESS, BUSINESS_TAX_ID } from "@/constants/business";
+import { PHONE_TEL, PHONE_DISPLAY, BUSINESS_EMAIL_HREF, BUSINESS_EMAIL, BUSINESS_ADDRESS, BUSINESS_TAX_ID, INSTAGRAM_URL, INSTAGRAM_HANDLE } from "@/constants/business";
 import { COVERAGE_PROMISE, RESPONSE_PROMISE, TRAVEL_FEE_MIN } from "@/constants/commercialPolicy";
 
 const Footer = () => {
@@ -58,6 +58,10 @@ const Footer = () => {
               <a href={BUSINESS_EMAIL_HREF} className="flex items-center gap-2 hover:text-turquoise active:text-turquoise transition-colors py-1 touch-manipulation">
                 <Mail className="h-4 w-4 text-turquoise flex-shrink-0" />
                 <span className="break-all">{BUSINESS_EMAIL}</span>
+              </a>
+              <a href={INSTAGRAM_URL} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 hover:text-turquoise active:text-turquoise transition-colors py-1 touch-manipulation">
+                <Instagram className="h-4 w-4 text-turquoise flex-shrink-0" />
+                <span>Instagram {INSTAGRAM_HANDLE}</span>
               </a>
               <a
                 href={GOOGLE_MAPS_URL}

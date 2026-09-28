@@ -4,6 +4,7 @@ import { LANDING_SECTION_ORDER } from '../src/data/landingServiceCopy';
 import { commercialHeroPriceLine, commercialHeroStats } from '../src/data/commercialHeroCopy';
 import { FOOTER_NAV, FOOTER_STRIP_LINKS, FOOTER_LEGAL_LINKS } from '../src/data/siteFooterNav';
 import { SERVICE_CONDITIONS, SERVICE_CONDITIONS_LINKS } from '../src/constants/commercialPolicy';
+import { INSTAGRAM_URL, INSTAGRAM_HANDLE } from '../src/constants/business';
 
 export const escapeLandingHtml = (value: string) => value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 const e = escapeLandingHtml;
@@ -67,7 +68,8 @@ export const ENTITY_FOOTER_HTML =
   + '<nav aria-label="Informação legal"><ul>'
   + FOOTER_LEGAL_LINKS.map(link => `<li><a href="${e(link.href)}">${e(link.label)}</a></li>`).join('')
   + '<li><a href="https://www.livroreclamacoes.pt/inicio" rel="nofollow noopener">Livro de Reclamações</a></li>'
-  + '</ul></nav>';
+  + '</ul></nav>'
+  + `<p><a href="${e(INSTAGRAM_URL)}" rel="noopener">Instagram ${e(INSTAGRAM_HANDLE)}</a></p>`;
 
 /**
  * "Condições do serviço e garantia": o bloco que o rodapé React desenha em
