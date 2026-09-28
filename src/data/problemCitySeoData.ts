@@ -2,7 +2,7 @@
 // Targets searches like "tirar manchas sofá porto", "remover cheiro urina sofá matosinhos"
 
 import { PROBLEM_ROUTE_SLUGS } from "./problemRouteData";
-import { cities, cityPrep } from "./serviceCatalog";
+import { cities, headingWithCity } from "./serviceCatalog";
 import { METRO_CITIES as TOP_METRO } from "../constants/metroCities";
 import { RESPONSE_PROMISE } from "../constants/commercialPolicy";
 
@@ -62,12 +62,16 @@ export function getProblemCities(problemSlug: string): (typeof cities)[number][]
  * seu: "{problema} no Porto ... Orçamento grátis em menos de 10 minutos" para
  * as pessoas e "{problema} em Porto ... Resposta em menos de 10 minutos" para
  * os motores. Uma função, lida pelos dois.
+ *
+ * O H1 das páginas de preço é uma pergunta: a cidade entra antes do "?"
+ * (`headingWithCity`) e a descrição continua noutra frase, em vez de "?:".
  */
 export function problemCityMeta(problem: { h1: string; metaDescription: string }, cityName: string) {
-  const where = `${cityPrep(cityName)} ${cityName}`;
+  const heading = headingWithCity(problem.h1, cityName);
+  const lead = heading.endsWith('?') ? `${heading} Serviço` : `${heading}: serviço`;
   return {
-    title: `${problem.h1} ${where} | Kyro Clean Solutions`,
-    description: `${problem.h1} ${where}: serviço profissional ao domicílio. ${problem.metaDescription.split('.')[0]}. ${RESPONSE_PROMISE}.`,
+    title: `${heading} | Kyro Clean Solutions`,
+    description: `${lead} profissional ao domicílio. ${problem.metaDescription.split('.')[0]}. ${RESPONSE_PROMISE}.`,
   };
 }
 

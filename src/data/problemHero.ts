@@ -1,6 +1,6 @@
 import { buildProblemWaMessage } from '../lib/whatsappMessages';
 import type { ProblemPage } from './problemSeoData';
-import { services, cityPrep } from './serviceCatalog';
+import { services, cityPrep, headingWithCity } from './serviceCatalog';
 import { locationPrices } from '../constants/travel';
 import { WHATSAPP_BASE } from '../constants/business';
 import { RESPONSE_PROMISE } from '../constants/commercialPolicy';
@@ -29,7 +29,8 @@ export function getProblemHero(problem: ProblemPage, city?: string) {
   const priceLabel = isQuote ? 'Sob orçamento' : `${service.slug === 'impermeabilizacao' ? 'Proteção' : 'Limpeza'} ${startingPriceLabel(service.slug, price, 'mid')}`;
   const travelLabel = fee === undefined ? 'Deslocação a partir de 10€' : `Deslocação ${fee}€`;
   return {
-    heading: `${problem.h1}${location ? ` ${location}` : ''}`,
+    // Nas perguntas (páginas de preço) a cidade entra antes do "?".
+    heading: city ? headingWithCity(problem.h1, city) : problem.h1,
     title: problem.h1,
     location,
     intro: introductions[problem.category],

@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { SITE_URL } from "@/constants/business";
-import { cityPrep } from "@/data/serviceCatalog";
+import { headingWithCity } from "@/data/serviceCatalog";
 import {
   buildWebPageNode,
   buildBreadcrumbNode,
@@ -36,7 +36,8 @@ const ServiceLocationSchema = ({ serviceName, serviceBaseUrl, placeName, parentP
   const offers = offerForPriceLabel(priceFrom);
   const fullUrl = `${SITE_URL}${pageUrl}`;
 
-  const prep = cityPrep(placeName);
+  // "Limpeza de Sofás no Porto"; numa pergunta (páginas de preço), "…Tapetes no Porto?".
+  const name = headingWithCity(serviceName, placeName);
 
   const areaServed: AreaServed = parentPlace
     ? [{ "@type": "City", "name": parentPlace }, { "@type": "Place", "name": placeName }]
@@ -45,7 +46,7 @@ const ServiceLocationSchema = ({ serviceName, serviceBaseUrl, placeName, parentP
   const schema = {
     "@context": "https://schema.org",
     "@graph": [
-      buildWebPageNode({ url: fullUrl, name: `${serviceName} ${prep} ${placeName} | Kyro Clean Solutions`, description }),
+      buildWebPageNode({ url: fullUrl, name: `${name} | Kyro Clean Solutions`, description }),
       buildBreadcrumbNode(`${fullUrl}#breadcrumb`, breadcrumb
         ? breadcrumb.map(step => ({ name: step.name, item: `${SITE_URL}${step.path}` }))
         : [
@@ -56,7 +57,7 @@ const ServiceLocationSchema = ({ serviceName, serviceBaseUrl, placeName, parentP
       buildLocalBusinessNode(areaServed),
       buildServiceNode({
         url: fullUrl,
-        name: `${serviceName} ${prep} ${placeName}`,
+        name,
         description,
         areaServed,
         serviceType: serviceName,

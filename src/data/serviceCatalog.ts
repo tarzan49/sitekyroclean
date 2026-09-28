@@ -41,6 +41,17 @@ export const cityPrepCap = (city: string) => {
   const prep = cityPrep(city);
   return prep.charAt(0).toUpperCase() + prep.slice(1);
 };
+/**
+ * Um título com a localidade: "Remoção de Manchas do Sofá no Porto". Num
+ * título em forma de pergunta, a localidade entra antes do ponto de
+ * interrogação, como se diz: "Quanto Custa a Lavagem Profissional de Tapetes
+ * no Porto?". Acrescentada ao fim, dava "Tapetes? no Porto" no título e no H1
+ * das páginas de preço por cidade (/preco-limpeza-tapete-porto e irmãs).
+ */
+export const headingWithCity = (heading: string, city: string) => {
+  const where = `${cityPrep(city)} ${city}`;
+  return heading.endsWith("?") ? `${heading.slice(0, -1)} ${where}?` : `${heading} ${where}`;
+};
 
 // As 70 cidades servidas. Sao dados puros, sem dependencias; viviam ao lado
 // dos geradores de conteudo, que arrastam as bibliotecas de FAQ e editorial

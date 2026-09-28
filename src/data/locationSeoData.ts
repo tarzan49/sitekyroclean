@@ -11,7 +11,7 @@ import { CHAIR_PRICE_LABEL, CHAIR_PRICE_TITLE } from './enginePrices';
 
 // Reexportado para os consumidores que precisam do catálogo grande e destes
 // dados ao mesmo tempo. Quem só precisa destes importa de ./serviceCatalog.
-export { DEFAULT_PRICE_FROM, services, cities, cityPrep, cityPrepCap } from "./serviceCatalog";
+export { DEFAULT_PRICE_FROM, services, cities, cityPrep, cityPrepCap, headingWithCity } from "./serviceCatalog";
 
 export interface LocationService {
   slug: string;

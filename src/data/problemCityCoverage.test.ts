@@ -4,6 +4,7 @@ import path from 'node:path';
 import { coverageWindow } from './landingPageModel';
 import { getAllProblemCityRoutes, getProblemCities, problemCityMeta, problemCityNeighbours, PROBLEM_CITY_NEIGHBOURS } from './problemCitySeoData';
 import { getProblemBySlug } from './problemSeoData';
+import { cities } from './serviceCatalog';
 
 // O bloco "Este problema noutras cidades" das páginas problema × cidade, tal
 // como o `scripts/prerender.ts` e o `ProblemCityPage.tsx` o emitem (os dois
@@ -78,5 +79,18 @@ describe('páginas problema × cidade: o React e o HTML estático dizem o mesmo'
     expect(problemCityMeta(problem, 'Amadora').title).toContain(' na Amadora ');
     expect(problemCityMeta(problem, 'Braga').description).toContain(`${problem.h1} em Braga:`);
     expect(problemCityMeta(problem, 'Braga').description).toMatch(/Resposta em menos de 10 minutos\.$/);
+  });
+
+  it('numa pergunta, a cidade entra antes do ponto de interrogação', () => {
+    // Visto em produção: "Quanto Custa a Lavagem Profissional de Tapetes? no Porto | Kyro Clean Solutions".
+    const tapete = getProblemBySlug('preco-limpeza-tapete')!;
+    expect(problemCityMeta(tapete, 'Porto').title).toBe('Quanto Custa a Lavagem Profissional de Tapetes no Porto? | Kyro Clean Solutions');
+    expect(problemCityMeta(tapete, 'Amadora').description).toMatch(/^Quanto Custa a Lavagem Profissional de Tapetes na Amadora\? Serviço profissional ao domicílio\. /);
+    for (const route of getAllProblemCityRoutes()) {
+      const city = cities.find(c => c.slug === route.citySlug)!;
+      const { title, description } = problemCityMeta(getProblemBySlug(route.problemSlug)!, city.name);
+      expect(title, route.path).not.toMatch(/\?(?! \| Kyro Clean Solutions$)/);
+      expect(description, route.path).not.toMatch(/\?\s*(no|na|em)\s|\?:/);
+    }
   });
 });

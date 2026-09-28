@@ -37,7 +37,7 @@ import path from 'path';
 import { getLandingPageModel } from '../src/data/landingPageModel';
 import { renderLandingPageHtml, ENTITY_FOOTER_HTML, SERVICE_CONDITIONS_HTML } from './landing-page-html';
 
-import { getLocationServiceData, getAllLocationRoutes, services, cities, cityPrep } from '../src/data/locationSeoData';
+import { getLocationServiceData, getAllLocationRoutes, services, cities, cityPrep, headingWithCity } from '../src/data/locationSeoData';
 import { getAllFreguesiaRoutes, getFreguesia, generateFreguesiaContent } from '../src/data/freguesiaSeoData';
 import { getAllKeywordVariantRoutes, getKeywordVariantData } from '../src/data/keywordVariantData';
 import { LEGAL_PAGES } from '../src/data/legalPages';
@@ -807,7 +807,7 @@ export function prerenderRoutes(outDir: string): number {
           links: [
             { href: `/problemas/${route.problemSlug}`, label: `${problem.h1} (página nacional)` },
             ...problemCityNeighbours(route.problemSlug, city.slug)
-              .map(c => ({ href: `/${route.problemSlug}-${c.slug}`, label: `${problem.h1} ${cityPrep(c.name)} ${c.name}` })),
+              .map(c => ({ href: `/${route.problemSlug}-${c.slug}`, label: headingWithCity(problem.h1, c.name) })),
           ],
         },
         schemas,
