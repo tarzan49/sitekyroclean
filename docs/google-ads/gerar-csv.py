@@ -175,6 +175,8 @@ print(f"{len(rows)} linhas, tudo dentro dos limites. Factos: {RATING}/{REVIEWS}/
 # Colchão: o mais barato da tabela e o anti-ácaros acrescentado (bothPrice - cleaningPrice),
 # os mesmos números que o site mostra (enginePrices.ts).
 COLCHAO_DESDE = le("src/components/quiz/QuizTypes.ts", r"id: 'solteiro',.*?cleaningPrice: (\d+)")
+COLCHAO_CASAL = le("src/components/quiz/QuizTypes.ts", r"id: 'casal',.*?cleaningPrice: (\d+)")
+COLCHAO_KING = le("src/components/quiz/QuizTypes.ts", r"id: 'king',.*?cleaningPrice: (\d+)")
 ANTI_ACAROS_COLCHAO = str(int(le("src/components/quiz/QuizTypes.ts", r"id: 'solteiro',.*?bothPrice: (\d+)"))
                           - int(COLCHAO_DESDE))
 
@@ -206,21 +208,23 @@ def tapetes(city):
         # Também sem "recolha": o site diz de propósito que a modalidade (em
         # casa ou recolhido) se confirma no orçamento, e o anúncio não pode
         # prometer o que a página não promete.
-        # v2 (29/09/2026, dono: "o melhor anúncio possível"): ao domicílio
-        # primeiro, recolha só quando é precisa ("às vezes recolha, às vezes
-        # ao domicílio, mas prefiro ao domicílio"). Tapetes nunca levam preço.
+        # v3 (29/09/2026). Concorrência lida no mesmo dia: as lavandarias de
+        # tapetes levam cerca de uma semana (Washouse 6 dias úteis, LavCarpet ~1
+        # semana); a Kyro lava no local e o tapete fica seco em 3 a 6 horas
+        # (FAQ da página-pilar). Recolha só quando é precisa (dono: "prefiro
+        # ao domicílio"), com entrega em 3 dias no máximo (dono, 29/09/2026). Tapetes nunca levam preço. Sem percentagens de ácaros.
         headlines=[f"Limpeza de Tapetes {cidade(city)}", f"Lavagem de Tapetes {cidade(city)}",
-                   "Tapetes Lavados ao Domicílio", "Recolha e Entrega se Precisar",
-                   "Orçamento por Foto no WhatsApp", "Resposta em 10 Minutos",
-                   "Preço Fechado Antes de Marcar", AVAL_TITULO, RATING_TITULO,
-                   f"{CLIENTES} Clientes Servidos", "Manchas, Pelos e Odores",
-                   "Lã, Persas e Sintéticos", "Extração Profunda da Fibra",
-                   EQUIPA[city], "Garantia de Repetição 48h"],
+                   "Higienização de Tapetes", f"Limpeza de Carpetes {cidade(city)}",
+                   "Tapetes Lavados ao Domicílio", "Sem Levar o Tapete de Casa",
+                   "Seco em 3 a 6 Horas", "Recolha e Entrega em 3 Dias",
+                   "Lã, Persas, Shaggy e Sisal", "Manchas, Pelos e Odores",
+                   "Orçamento por Foto no WhatsApp", "Preço Fechado Antes de Marcar",
+                   AVAL_TITULO, RATING_TITULO, "Garantia de Repetição 48h"],
         descriptions=[
-            "Lavagem profissional de tapetes ao domicílio. Recolhemos quando o tapete o exige.",
+            "Lavagem de tapetes ao domicílio com extração profunda. Fica seco em 3 a 6 horas.",
             "Envie foto e medidas pelo WhatsApp e receba o preço fechado antes de marcar.",
-            DESC_AVAL,
-            DESC_GARANTIA],
+            "Lã, persas, shaggy e sisal. Se o tapete tiver de ser recolhido, entregamos em 3 dias.",
+            DESC_AVAL],
     )
 
 def colchoes(city):
@@ -241,19 +245,22 @@ def colchoes(city):
                   "lavagem de colchão", "desinfeção de colchões", "anti ácaros colchão",
                   "limpeza de colchão de casal", "limpeza de colchão urina"],
         # Sem verbos de eliminar/matar (regra das afirmações absolutas do CLAUDE.md).
-        # v2 (29/09/2026): o que se procura num colchão é urina, suor e ácaros.
+        # v3 (29/09/2026). Ninguém na concorrência publica os três tamanhos
+        # (O Janota dá dois, os outros "desde"): a Kyro dá solteiro e casal.
+        # "Sem tirar o colchão" é a FAQ da página ("não precisa de retirar o
+        # colchão"). Sem "99% dos ácaros": não é verificável.
         headlines=[f"Limpeza de Colchões {cidade(city)}", "Higienização de Colchões",
-                   f"Colchões Desde {COLCHAO_DESDE}€", "Manchas de Urina e Suor",
-                   "Tratamento Anti-Ácaros", "Limpeza de Colchões em Casa",
-                   "Secagem Média de 3 a 6 Horas", "Resposta em 10 Minutos",
-                   "Orçamento Grátis no WhatsApp", "Preço Fechado Antes de Marcar",
-                   AVAL_TITULO, RATING_TITULO, f"{CLIENTES} Clientes Servidos",
-                   EQUIPA[city], "Garantia de Repetição 48h"],
+                   f"Lavagem de Colchões {cidade(city)}", "Limpeza de Colchões em Casa",
+                   f"Colchões Desde {COLCHAO_DESDE}€", f"Colchão de Casal Desde {COLCHAO_CASAL}€",
+                   "Tratamento Anti-Ácaros", "Manchas de Urina e Suor",
+                   "Sem Tirar o Colchão de Casa", "Secagem Média de 3 a 6 Horas",
+                   "Preço Fechado Antes de Marcar", "Orçamento Grátis no WhatsApp",
+                   AVAL_TITULO, RATING_TITULO, "Garantia de Repetição 48h"],
         descriptions=[
-            "Higienização profissional de colchões ao domicílio. Secagem média de 3 a 6 horas.",
-            f"Limpeza de colchão desde {COLCHAO_DESDE}€. Tratamento anti-ácaros acrescentado desde {ANTI_ACAROS_COLCHAO}€.",
-            "Manchas de urina, suor e marcas amareladas tratadas no local, sem sair de casa.",
-            DESC_AVAL],
+            "Limpeza e higienização de colchões ao domicílio, sem tirar o colchão do quarto.",
+            f"Solteiro desde {COLCHAO_DESDE}€, casal desde {COLCHAO_CASAL}€, king desde {COLCHAO_KING}€. Anti-ácaros opcional.",
+            "Manchas de urina, suor e marcas amareladas tratadas no local. Secagem de 3 a 6 horas.",
+            "Avaliação média de 4,9 em mais de 125 avaliações. Orçamento grátis pelo WhatsApp."],
     )
 
 # O carregamento de linhas soltas (sem a linha da campanha) exige o ID da
@@ -312,11 +319,11 @@ with open(os.path.join(ROOT, "docs/google-ads/palavras-extra-tapetes-colchoes.cs
         w.writerow({c: r.get(c, "") for c in novas_cols})
 print(f"{len(extra)} palavras-chave novas (segunda ronda)")
 v2 = [r for r in novos if r.get("Ad type")]
-with open(os.path.join(ROOT, "docs/google-ads/anuncios-v2-tapetes-colchoes.csv"), "w", newline="", encoding="utf-8-sig") as f:
+with open(os.path.join(ROOT, "docs/google-ads/anuncios-v3-tapetes-colchoes.csv"), "w", newline="", encoding="utf-8-sig") as f:
     w = csv.DictWriter(f, fieldnames=novas_cols)
     w.writeheader()
     for r in v2:
         w.writerow({c: r.get(c, "") for c in novas_cols})
-print(f"{len(v2)} anúncios v2")
+print(f"{len(v2)} anúncios v3")
 print(f"{len(novos)} linhas de tapetes/colchões (grupos em pausa). Colchão desde {COLCHAO_DESDE}€, "
       f"anti-ácaros +{ANTI_ACAROS_COLCHAO}€")
