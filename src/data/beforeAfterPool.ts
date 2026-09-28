@@ -68,6 +68,8 @@ import colchao04Antes from "@/assets/before-after-pool/colchao-04-antes.webp";
 import colchao04Depois from "@/assets/before-after-pool/colchao-04-depois.webp";
 import colchao05Antes from "@/assets/before-after-pool/colchao-05-antes.webp";
 import colchao05Depois from "@/assets/before-after-pool/colchao-05-depois.webp";
+import impermeabilizacaoVideo from "@/assets/before-after-pool/impermeabilizacao-video.mp4";
+import impermeabilizacaoVideoPoster from "@/assets/before-after-pool/impermeabilizacao-video-poster.webp";
 import impermeabilizacao01Antes from "@/assets/before-after-pool/impermeabilizacao-01-antes.webp";
 import impermeabilizacao01Depois from "@/assets/before-after-pool/impermeabilizacao-01-depois.webp";
 import impermeabilizacao02Antes from "@/assets/before-after-pool/impermeabilizacao-02-antes.webp";
@@ -113,9 +115,15 @@ export type BeforeAfterCategory = "sofa" | "colchao" | "cadeiras" | "tapete" | "
 // `illustrative` marca pares que não são um trabalho real da Kyro (ver nota
 // "impermeabilizacao-02/03/04" acima) — o slider mostra um selo discreto
 // "Efeito ilustrativo" quando presente, sem explicar a origem da imagem.
+// `video`: um trabalho real filmado (dono, 28/09/2026: "o vídeo é nosso",
+// "colocar em primeiro sempre" e no mesmo formato dos antes e depois). O
+// original é vertical; o ficheiro do site já vem em 4:3, com o próprio vídeo
+// desfocado a preencher os lados, para caber na mesma moldura das fotos sem
+// cortar o copo nem a água a escorrer. Sem som.
 export type PoolItem =
   | { kind: "pair"; before: string; after: string; illustrative?: boolean }
-  | { kind: "single"; image: string };
+  | { kind: "single"; image: string }
+  | { kind: "video"; src: string; poster: string };
 
 export const BEFORE_AFTER_POOL: Record<BeforeAfterCategory, PoolItem[]> = {
   sofa: [
@@ -156,6 +164,7 @@ export const BEFORE_AFTER_POOL: Record<BeforeAfterCategory, PoolItem[]> = {
     { kind: "pair", before: tapete06Antes, after: tapete06Depois },
   ],
   impermeabilizacao: [
+    { kind: "video", src: impermeabilizacaoVideo, poster: impermeabilizacaoVideoPoster },
     { kind: "pair", before: impermeabilizacao01Antes, after: impermeabilizacao01Depois },
     { kind: "pair", before: impermeabilizacao02Antes, after: impermeabilizacao02Depois, illustrative: true },
     { kind: "pair", before: impermeabilizacao03Antes, after: impermeabilizacao03Depois, illustrative: true },

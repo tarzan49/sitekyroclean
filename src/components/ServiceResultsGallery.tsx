@@ -33,13 +33,17 @@ export default function ServiceResultsGallery({ category, light = false, interva
   const text = light ? "text-[#111111]" : "text-white";
   const control = "inline-flex h-11 min-w-11 items-center justify-center rounded-full transition-colors hover:bg-gold/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-gold";
 
+  // Um vídeo marca o seu próprio tempo: a galeria avança quando ele acaba
+  // (onEnded), não ao fim do intervalo dos pares.
+  const isVideo = item.kind === "video";
+
   useEffect(() => {
-    if (!playing || dragging || hovered || focused || pool.length < 2) return;
+    if (isVideo || !playing || dragging || hovered || focused || pool.length < 2) return;
     const timer = window.setInterval(() => {
       if (!document.hidden) setIndex(current => (current + 1) % pool.length);
     }, intervalMs);
     return () => window.clearInterval(timer);
-  }, [playing, dragging, hovered, focused, pool.length, intervalMs]);
+  }, [isVideo, playing, dragging, hovered, focused, pool.length, intervalMs]);
 
   function select(next: number) {
     setPlaying(false);
@@ -58,6 +62,17 @@ export default function ServiceResultsGallery({ category, light = false, interva
             afterLabel={itemCategory === "impermeabilizacao" ? "Com proteção" : "Depois"}
             priority={priority && index === 0} noFrame illustrative={item.illustrative} onDraggingChange={setDragging}
             sweepMs={autoplay ? intervalMs : undefined} />
+        ) : item.kind === "video" ? (
+          <div className="relative h-full w-full">
+            <video key={index} src={item.src} poster={item.poster} autoPlay muted playsInline preload={priority && index === 0 ? "auto" : "metadata"}
+              aria-label="Vídeo real: água derramada num sofá impermeabilizado escorre sem entrar no tecido"
+              className="h-full w-full object-cover"
+              onEnded={event => {
+                if (playing && !hovered && !focused && pool.length > 1) setIndex(current => (current + 1) % pool.length);
+                else event.currentTarget.play().catch(() => {});
+              }} />
+            <span className="absolute left-2 top-2 bg-black/70 px-2 py-1 text-xs font-semibold uppercase tracking-wide text-[#D4AF37]">Com proteção</span>
+          </div>
         ) : (
           <img src={item.image} alt="Resultado de limpeza de tapete, fotografia sem comparação" loading="lazy" decoding="async" className="w-full h-full object-contain" width={800} height={600} />
         )}
@@ -65,7 +80,7 @@ export default function ServiceResultsGallery({ category, light = false, interva
       <div className="flex flex-wrap items-center justify-between gap-2 py-2">
         <p className="text-sm" aria-live={playing ? "off" : "polite"} aria-atomic="true">
           <span className="font-semibold text-gold">{index + 1} / {pool.length}</span>
-          <span className="ml-2 opacity-60">{item.kind === "single" ? "Fotografia do resultado" : "Arraste para comparar"}</span>
+          <span className="ml-2 opacity-60">{item.kind === "single" ? "Fotografia do resultado" : item.kind === "video" ? "Vídeo real de um trabalho" : "Arraste para comparar"}</span>
         </p>
         <div className="flex items-center">
           <button type="button" className={control} aria-label="Exemplo anterior" onClick={() => select(index - 1)}><ChevronLeft size={20} /></button>
@@ -75,10 +90,10 @@ export default function ServiceResultsGallery({ category, light = false, interva
       </div>
       <div ref={thumbnailsRef} className="relative flex gap-2 overflow-x-auto overscroll-x-contain pb-2 [scrollbar-width:thin]" aria-label="Escolher exemplo">
         {pool.map((example, i) => (
-          <button key={i} type="button" aria-label={`Ver exemplo ${i + 1}${example.kind === "pair" && example.illustrative ? ", efeito ilustrativo" : ""}`}
+          <button key={i} type="button" aria-label={`Ver exemplo ${i + 1}${example.kind === "video" ? ", vídeo" : example.kind === "pair" && example.illustrative ? ", efeito ilustrativo" : ""}`}
             aria-pressed={i === index} onClick={() => select(i)}
             className={`relative h-12 w-16 shrink-0 overflow-hidden border-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-gold ${i === index ? "border-gold" : "border-transparent opacity-60 hover:opacity-100"}`}>
-            <img src={resultThumbnail(example.kind === "pair" ? example.after : example.image)} alt="" loading="lazy" decoding="async" className="w-full h-full object-cover" width={64} height={48} />
+            <img src={example.kind === "video" ? example.poster : resultThumbnail(example.kind === "pair" ? example.after : example.image)} alt="" loading="lazy" decoding="async" className="w-full h-full object-cover" width={64} height={48} />
             <span className="absolute bottom-0 right-0 bg-black/75 text-white text-sm px-1.5 py-0.5">{i + 1}</span>
           </button>
         ))}
