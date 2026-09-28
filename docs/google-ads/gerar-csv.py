@@ -195,7 +195,13 @@ def tapetes(city):
                   f"limpeza de carpetes {c}", "limpeza de tapetes", "lavagem de tapetes",
                   "limpeza de carpetes", "lavagem de carpetes", "higienização de tapetes",
                   "limpeza de tapetes ao domicílio", "empresa de limpeza de tapetes",
-                  "lavagem de tapetes preço", "quanto custa lavar um tapete"],
+                  "lavagem de tapetes preço", "quanto custa lavar um tapete",
+                  # 29/09/2026, segunda ronda ("quero algo extremamente bom"):
+                  f"higienização de tapetes {c}", f"lavagem de carpetes {c}",
+                  "lavagem de tapetes ao domicílio", "limpeza de tapetes em casa",
+                  "lavandaria de tapetes", "limpeza de tapetes de lã", "lavagem de tapetes de lã",
+                  "limpeza de tapetes persas", "lavagem de tapetes persas",
+                  "recolha de tapetes para lavar"],
         # Tapetes são sempre sob orçamento: nenhum título ou descrição leva preço.
         # Também sem "recolha": o site diz de propósito que a modalidade (em
         # casa ou recolhido) se confirma no orçamento, e o anúncio não pode
@@ -223,7 +229,12 @@ def colchoes(city):
                   "limpeza de colchões", "limpeza de colchão", "higienização de colchões",
                   "higienização de colchão", "lavagem de colchões",
                   "limpeza de colchões ao domicílio", "limpeza de colchão preço",
-                  "tratamento anti ácaros colchão"],
+                  "tratamento anti ácaros colchão",
+                  # 29/09/2026, segunda ronda:
+                  f"higienização de colchão {c}", f"lavagem de colchões {c}",
+                  "limpeza de colchões em casa", "higienização de colchões ao domicílio",
+                  "lavagem de colchão", "desinfeção de colchões", "anti ácaros colchão",
+                  "limpeza de colchão de casal", "limpeza de colchão urina"],
         # Sem verbos de eliminar/matar (regra das afirmações absolutas do CLAUDE.md).
         headlines=[f"Limpeza de Colchões {cidade(city)}", "Higienização de Colchões",
                    f"Colchões Desde {COLCHAO_DESDE}€",
@@ -280,5 +291,18 @@ with open(destino, "w", newline="", encoding="utf-8-sig") as f:
     w.writeheader()
     for r in novos:
         w.writerow({c: r.get(c, "") for c in novas_cols})
+PRIMEIRA_RONDA = 13, 12  # tapetes, colchões: carregadas a 29/09/2026 00:00
+extra = []
+for nome, city in CAMPANHAS:
+    for g, n in ((tapetes(city), PRIMEIRA_RONDA[0]), (colchoes(city), PRIMEIRA_RONDA[1])):
+        for kw in g["keywords"][n:]:
+            extra.append({"Campaign ID": CAMPANHA_ID[city], "Campaign": nome, "Ad Group": g["adgroup"],
+                          "Keyword": kw, "Criterion Type": "Expressão", "Status": "Enabled"})
+with open(os.path.join(ROOT, "docs/google-ads/palavras-extra-tapetes-colchoes.csv"), "w", newline="", encoding="utf-8-sig") as f:
+    w = csv.DictWriter(f, fieldnames=novas_cols)
+    w.writeheader()
+    for r in extra:
+        w.writerow({c: r.get(c, "") for c in novas_cols})
+print(f"{len(extra)} palavras-chave novas (segunda ronda)")
 print(f"{len(novos)} linhas de tapetes/colchões (grupos em pausa). Colchão desde {COLCHAO_DESDE}€, "
       f"anti-ácaros +{ANTI_ACAROS_COLCHAO}€")

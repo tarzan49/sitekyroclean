@@ -107,6 +107,12 @@ import tapete03Depois from "@/assets/before-after-pool/tapete-03-depois.webp";
 import tapete04Antes from "@/assets/before-after-pool/tapete-04-antes.webp";
 import tapete04Depois from "@/assets/before-after-pool/tapete-04-depois.webp";
 import tapete05UnicoSemPar from "@/assets/before-after-pool/tapete-05-unico-sem-par.webp";
+import colchao06Antes from "@/assets/before-after-pool/colchao-06-antes.webp";
+import colchao06Depois from "@/assets/before-after-pool/colchao-06-depois.webp";
+import colchao07Antes from "@/assets/before-after-pool/colchao-07-antes.webp";
+import colchao07Depois from "@/assets/before-after-pool/colchao-07-depois.webp";
+import sofa14Antes from "@/assets/before-after-pool/sofa-14-antes.webp";
+import sofa14Depois from "@/assets/before-after-pool/sofa-14-depois.webp";
 import tapete06Antes from "@/assets/before-after-pool/tapete-06-antes.webp";
 import tapete06Depois from "@/assets/before-after-pool/tapete-06-depois.webp";
 
@@ -130,7 +136,10 @@ export type PoolItem =
   | { kind: "video"; src: string; poster: string };
 
 export const BEFORE_AFTER_POOL: Record<BeforeAfterCategory, PoolItem[]> = {
+  // 29/09/2026: colchao-06, colchao-07 e sofa-14 são trabalhos reais enviados
+  // pelo dono ("estão excelentes") e vêm primeiro na rotação.
   sofa: [
+    { kind: "pair", before: sofa14Antes, after: sofa14Depois },
     { kind: "pair", before: sofa01Antes, after: sofa01Depois },
     { kind: "pair", before: sofa02Antes, after: sofa02Depois },
     { kind: "pair", before: sofa04Antes, after: sofa04Depois },
@@ -144,6 +153,8 @@ export const BEFORE_AFTER_POOL: Record<BeforeAfterCategory, PoolItem[]> = {
     { kind: "pair", before: sofa13Antes, after: sofa13Depois },
   ],
   colchao: [
+    { kind: "pair", before: colchao06Antes, after: colchao06Depois },
+    { kind: "pair", before: colchao07Antes, after: colchao07Depois },
     { kind: "pair", before: colchao01Antes, after: colchao01Depois },
     { kind: "pair", before: colchao02Antes, after: colchao02Depois },
     { kind: "pair", before: colchao03Antes, after: colchao03Depois },

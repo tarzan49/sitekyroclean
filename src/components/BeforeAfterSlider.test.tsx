@@ -1,6 +1,7 @@
 import { act, cleanup, render } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import BeforeAfterSlider from './BeforeAfterSlider';
+import { BEFORE_AFTER_POOL } from '@/data/beforeAfterPool';
 
 // requestAnimationFrame é pausado pelo navegador em abas escondidas, por isso
 // nos testes trocamos por um setTimeout de 16ms preso aos fake timers — assim
@@ -75,12 +76,12 @@ describe('HeroBeforeAfterPool', () => {
     const { container } = render(<HeroBeforeAfterPool category="sofa" />);
 
     const contador = () => container.querySelector('.text-gold')!.textContent;
-    expect(contador()).toBe('1 / 11');
+    expect(contador()).toBe(`1 / ${BEFORE_AFTER_POOL.sofa.length}`);
 
     advance(4000);
-    expect(contador()).toBe('2 / 11');
+    expect(contador()).toBe(`2 / ${BEFORE_AFTER_POOL.sofa.length}`);
 
     advance(4000);
-    expect(contador()).toBe('3 / 11');
+    expect(contador()).toBe(`3 / ${BEFORE_AFTER_POOL.sofa.length}`);
   });
 });
