@@ -13,7 +13,7 @@
 // lista própria de cidades: uma cidade nova no catálogo passa a ser reconhecida.
 import { cities } from '@/data/serviceCatalog';
 import { municipiosComFreguesias } from '@/data/freguesiaSeoData';
-import { normalizeCity } from '@/lib/locationDetection';
+import { normalizeCity, TOO_COMMON_PARISH_NAMES } from '@/lib/locationDetection';
 
 export const CRM_LOCALITIES = ['Porto', 'Lisboa', 'Algarve', 'Braga'] as const;
 export type CrmLocality = (typeof CRM_LOCALITIES)[number];
@@ -43,6 +43,9 @@ export interface ParsedService {
 
 const AREA_TO_LOCALITY: Record<string, CrmLocality> = {
   porto: 'Porto', lisboa: 'Lisboa', algarve: 'Algarve', braga: 'Braga',
+  // Coimbra tem trabalhador local desde 2026-09-28, mas o dono ainda não quis
+  // uma equipa própria no calendário: continua a contar como região Porto.
+  coimbra: 'Porto',
 };
 
 /** Direção de texto, espaços invisíveis e hífenes tipográficos que o Google Contacts mete à volta dos telefones. */
@@ -146,6 +149,7 @@ const municipalityPlaces = uniquePlaces([
  * letras ficam de fora ("Sé", "Luz"), por coincidirem com palavras comuns, e
  * um nome que também seja concelho vale como concelho (Felgueiras).
  */
+
 const parishPlaces = (() => {
   const areaOf = new Map<string, CrmLocality | undefined>(cities.map(c => [c.name, AREA_TO_LOCALITY[c.area]]));
   const municipalityKeys = new Set(municipalityPlaces.map(p => p.key));
@@ -160,7 +164,7 @@ const parishPlaces = (() => {
       }
     }
   }
-  return uniquePlaces(entries).filter(p => !municipalityKeys.has(p.key));
+  return uniquePlaces(entries).filter(p => !municipalityKeys.has(p.key) && !TOO_COMMON_PARISH_NAMES.has(p.key));
 })();
 
 /**

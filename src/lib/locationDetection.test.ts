@@ -52,4 +52,11 @@ describe('quiz locality search', () => {
     expect(searchServiceLocations('Lisboa')).toEqual([{ city: 'Lisboa' }]);
     expect(searchServiceLocations('   ')).toEqual([]);
   });
+  it('does not guess between two served municipalities that share a parish name', () => {
+    expect(matchServiceCity({ countryCode: 'PT', city: 'Santa Clara', locality: 'Coimbra' })).toBe('Coimbra');
+    expect(matchServiceCity({ countryCode: 'PT', city: 'Santa Clara' })).toBeUndefined();
+    expect(matchServiceCity({ countryCode: 'PT', city: 'Buarcos' })).toBe('Figueira da Foz');
+    expect(matchServiceCity({ countryCode: 'PT', city: 'Celas' })).toBe('Coimbra');
+    expect(matchServiceCity({ countryCode: 'PT', city: 'São Pedro' })).toBeUndefined();
+  });
 });

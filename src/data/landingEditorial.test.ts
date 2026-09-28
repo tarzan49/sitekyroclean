@@ -13,10 +13,12 @@ describe('landing editorial descriptions', () => {
       expect(model.h1).toContain(model.locationName);
       expect(model.intro.length).toBeLessThan(180);
       expect(model.metaDescription).toContain(model.locationName);
-      if (['Aveiro', 'Coimbra'].includes(model.municipalityName)) {
+      if (model.municipalityName === 'Aveiro') {
         expect(model.intro).toContain('Disponibilidade sob consulta');
         expect(model.metaDescription).toContain('Disponibilidade sob consulta');
       }
+      // Coimbra tem trabalhador local desde 2026-09-28.
+      if (model.municipalityName === 'Coimbra') expect(`${model.intro} ${model.metaDescription}`).not.toContain('sob consulta');
       if (model.family === 'freguesia') expect(model.metaDescription).toContain(model.municipalityName);
       if (['limpeza-tapetes', 'limpeza-alcatifas'].includes(model.serviceSlug)) expect(model.metaDescription).toContain('Sob orçamento');
     }

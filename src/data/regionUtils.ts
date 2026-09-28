@@ -6,13 +6,14 @@
 import { cities } from "./serviceCatalog";
 import { municipiosComFreguesias } from "./freguesiaSeoData";
 
-export type AdminRegion = "amp" | "norte" | "lisboa" | "algarve";
+export type AdminRegion = "amp" | "norte" | "centro" | "lisboa" | "algarve";
 
-export const ADMIN_REGIONS: AdminRegion[] = ["amp", "norte", "lisboa", "algarve"];
+export const ADMIN_REGIONS: AdminRegion[] = ["amp", "norte", "centro", "lisboa", "algarve"];
 
 export const ADMIN_REGION_LABELS: Record<AdminRegion, string> = {
   amp: "Área Metropolitana do Porto",
   norte: "Norte (sem Porto)",
+  centro: "Coimbra e Figueira da Foz",
   lisboa: "Lisboa, Setúbal e Alentejo Litoral",
   algarve: "Algarve",
 };
@@ -23,6 +24,7 @@ export function getAdminRegion(citySlug: string): AdminRegion | null {
   const city = cities.find(c => c.slug === citySlug);
   if (!city) return null;
   if (city.area === "braga") return "norte";
+  if (city.area === "coimbra") return "centro";
   if (city.area === "porto") return NORTE_NON_AMP.has(citySlug) ? "norte" : "amp";
   return city.area as "lisboa" | "algarve";
 }

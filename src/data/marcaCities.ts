@@ -6,8 +6,9 @@ import { formatEuro, startingPriceLabel, SOFA_CLEANING_FROM, MATTRESS_CLEANING_F
 // entre as que o site já cobre em locationSeoData.ts — ranking real de
 // população INE/Censos via Wikipédia:
 // https://pt.wikipedia.org/wiki/Lista_de_munic%C3%ADpios_de_Portugal_por_popula%C3%A7%C3%A3o
-// Aveiro/Coimbra ficam de fora: população elevada mas sem páginas de
-// localização no site (ficariam órfãs). Barcelos foi adicionado em
+// Coimbra e Figueira da Foz entraram a 2026-09-28 (trabalhador local em
+// Coimbra). Aveiro continua de fora: é deslocação alargada.
+// Barcelos foi adicionado em
 // 2026-08-25 (expansão Braga) — já tem página de localização própria.
 export const MARCA_CITIES = [
   // Porto/Norte
@@ -30,6 +31,9 @@ export const MARCA_CITIES = [
   { name: "Póvoa de Lanhoso", slug: "povoa-de-lanhoso" },
   { name: "Fafe", slug: "fafe" },
   { name: "Esposende", slug: "esposende" },
+  // Coimbra e Centro
+  { name: "Coimbra", slug: "coimbra" },
+  { name: "Figueira da Foz", slug: "figueira-da-foz" },
   // Lisboa / Área Metropolitana
   { name: "Lisboa", slug: "lisboa" },
   { name: "Sintra", slug: "sintra" },

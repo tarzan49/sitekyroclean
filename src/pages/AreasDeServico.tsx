@@ -10,11 +10,12 @@ import { cities, services } from "@/data/serviceCatalog";
 import { municipiosComFreguesias, getFreguesiaStats } from "@/data/freguesiaSeoData";
 import { SITE_URL, PHONE_TEL, PHONE_DISPLAY } from "@/constants/business";
 
-type Area = "porto" | "braga" | "lisboa" | "algarve";
+type Area = "porto" | "braga" | "coimbra" | "lisboa" | "algarve";
 
 const REGIONS: { area: Area; heading: string; goldWord: string }[] = [
   { area: "porto", heading: "Área Metropolitana do", goldWord: "Porto" },
   { area: "braga", heading: "Equipa de Braga e", goldWord: "Minho" },
+  { area: "coimbra", heading: "Coimbra e", goldWord: "Figueira da Foz" },
   { area: "lisboa", heading: "Lisboa, Setúbal e", goldWord: "Alentejo Litoral" },
   { area: "algarve", heading: "Cobertura no", goldWord: "Algarve" },
 ];
@@ -88,10 +89,10 @@ const AreasDeServico = () => {
               <em className="not-italic" style={{ color: "#D4AF37" }}>Serviço</em>
             </h1>
             <p className="mt-4 text-base md:text-lg text-[#505650] leading-relaxed max-w-2xl">
-              A Kyro Clean Solutions presta serviços de limpeza profissional de estofos ao domicílio em {cities.length} municípios e {stats.freguesias} freguesias, de Viana do Castelo ao Algarve, com equipas em Braga, Porto, Lisboa e Algarve.
+              A Kyro Clean Solutions presta serviços de limpeza profissional de estofos ao domicílio em {cities.length} municípios e {stats.freguesias} freguesias, de Viana do Castelo ao Algarve, com equipas em Braga, Porto, Coimbra, Lisboa e Algarve.
             </p>
             <p className="text-base text-[#505650] mt-2 mb-6">
-              Aveiro, Coimbra, Alentejo Litoral e outras zonas mediante confirmação de disponibilidade.
+              Aveiro, Alentejo Litoral e outras zonas mediante confirmação de disponibilidade.
             </p>
             <div className="flex flex-wrap gap-3">
               <QuizButton />
@@ -144,7 +145,7 @@ const AreasDeServico = () => {
                   "@id": `${SITE_URL}/areas-de-servico#webpage`,
                   "url": `${SITE_URL}/areas-de-servico`,
                   "name": "Áreas de Serviço | Kyro Clean Solutions",
-                  "description": `Serviços de limpeza profissional em ${cities.length} municípios e ${stats.freguesias} freguesias de Braga, Porto, Lisboa e Algarve.`,
+                  "description": `Serviços de limpeza profissional em ${cities.length} municípios e ${stats.freguesias} freguesias de Braga, Porto, Coimbra, Lisboa e Algarve.`,
                   "inLanguage": "pt-PT",
                   "isPartOf": { "@id": `${SITE_URL}/#website` },
                   "publisher": { "@id": `${SITE_URL}/#business` },

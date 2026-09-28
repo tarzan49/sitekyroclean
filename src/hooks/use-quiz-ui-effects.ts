@@ -8,7 +8,7 @@ export interface SocialProofMessage { text: string; category: SocialProofCategor
 export function buildSocialProofMessages(_location: string): SocialProofMessage[] {
   return [
     { category: 'whatsapp', text: 'Recebemos habitualmente 50 a 60 pedidos de orçamento por semana' },
-    { category: 'trust', text: 'Equipas em Braga, Porto, Lisboa e Algarve' },
+    { category: 'trust', text: 'Equipas em Braga, Porto, Coimbra, Lisboa e Algarve' },
     { category: 'trust', text: `Mais de ${REVIEW_COUNT} avaliações no Google · ${REVIEW_RATING} estrelas` },
     { category: 'call', text: 'Resposta em menos de 10 minutos · Orçamento sem compromisso' },
     { category: 'job', text: 'Junte os seus artigos e aproveite a mesma visita' },

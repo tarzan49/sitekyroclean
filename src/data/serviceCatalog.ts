@@ -30,6 +30,7 @@ const ARTICLE_CITIES: Record<string, "o" | "a"> = {
   "Montijo": "o",
   "Amadora": "a",
   "Moita": "a",
+  "Figueira da Foz": "a",
 };
 export const cityPrep = (city: string) => {
   const article = ARTICLE_CITIES[city];
@@ -41,7 +42,7 @@ export const cityPrepCap = (city: string) => {
   return prep.charAt(0).toUpperCase() + prep.slice(1);
 };
 
-// As 69 cidades servidas. Sao dados puros, sem dependencias; viviam ao lado
+// As 70 cidades servidas. Sao dados puros, sem dependencias; viviam ao lado
 // dos geradores de conteudo, que arrastam as bibliotecas de FAQ e editorial
 // e fazem o chunk chegar aos 24,5 KB comprimidos.
 export const cities = [
@@ -68,11 +69,15 @@ export const cities = [
   { name: "São João da Madeira", slug: "sao-joao-da-madeira", region: "secondary", area: "porto", description: "cidade do calçado, entre a Feira e Oliveira de Azeméis" },
   { name: "Oliveira de Azeméis", slug: "oliveira-de-azemeis", region: "secondary", area: "porto", description: "cidade industrial do Entre Douro e Vouga" },
   { name: "Ovar", slug: "ovar", region: "secondary", area: "porto", description: "cidade costeira entre Espinho e Aveiro" },
-  // Centro (equipa Porto, deslocação alargada — sem equipa própria na região, 2026-09-10)
+  // Aveiro (equipa Porto, deslocação alargada, 2026-09-10)
   { name: "Aveiro", slug: "aveiro", region: "secondary", area: "porto", description: "cidade da ria, no litoral centro" },
-  { name: "Coimbra", slug: "coimbra", region: "secondary", area: "porto", description: "cidade universitária às margens do Mondego" },
+  // Coimbra e Centro (trabalhador local desde 2026-09-28). No CRM e no
+  // calendário das equipas contam como região Porto (AREA_TO_LOCALITY em
+  // calendarServices.ts): o dono ainda não quis uma equipa Coimbra.
+  { name: "Coimbra", slug: "coimbra", region: "primary", area: "coimbra", description: "cidade universitária às margens do Mondego" },
+  { name: "Figueira da Foz", slug: "figueira-da-foz", region: "secondary", area: "coimbra", description: "cidade de praia na foz do Mondego" },
   // Outros: Norte
-  { name: "Braga", slug: "braga", region: "secondary", area: "braga", description: "cidade milenar do Minho" },
+  { name: "Braga", slug: "braga", region: "primary", area: "braga", description: "cidade milenar do Minho" },
   { name: "Guimarães", slug: "guimaraes", region: "secondary", area: "braga", description: "berço da nação portuguesa" },
   // Expansão Braga/Minho (2026-08-25, equipa local nova em Braga)
   { name: "Vila Nova de Famalicão", slug: "vila-nova-de-famalicao", region: "secondary", area: "braga", description: "cidade industrial do Vale do Ave" },

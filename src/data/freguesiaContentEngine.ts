@@ -2,6 +2,7 @@ import { ALCATIFA_PROBLEMS } from "./alcatifaProblems";
 import { WATERPROOFING_PROBLEMS } from "./waterproofingProblems";
 import { getLandingFaqs, type LandingService } from './landingFaqPool';
 import { startingPriceLabel } from './enginePrices';
+import { LOCAL_DATA_BY_MUNICIPIO } from './freguesiaLocalData';
 // ─── Dynamic Content Engine ───────────────────────────────────────
 // Generates unique, deterministic content for each freguesia × service page.
 // All pools are SERVICE-SPECIFIC and all templates reference the parish (f) and city (c).
@@ -230,8 +231,12 @@ function getDefaultLocalData(freguesia: string, municipio: string): FreguesiaLoc
   };
 }
 
+/** O concelho vem primeiro: `freguesiaLocalData` é indexado só pelo slug, e
+ * há slugs repetidos entre concelhos (Santa Clara em Coimbra e em Lisboa,
+ * Serzedo em Gaia e em Guimarães). Indexado só pelo slug, a freguesia de um
+ * concelho herdava os pontos de referência da do outro. */
 export function getLocalData(slug: string, freguesia: string, municipio: string): FreguesiaLocalData {
-  return freguesiaLocalData[slug] || getDefaultLocalData(freguesia, municipio);
+  return LOCAL_DATA_BY_MUNICIPIO[municipio]?.[slug] || freguesiaLocalData[slug] || getDefaultLocalData(freguesia, municipio);
 }
 
 // ─── Intro Templates ─────────────────────────────────────────────

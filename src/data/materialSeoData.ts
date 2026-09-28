@@ -415,6 +415,17 @@ export function getMaterialsByService(serviceSlug: string): MaterialDefinition[]
   return materialDefinitions.filter(m => m.serviceSlug === serviceSlug);
 }
 
+/** A cidade entra na última frase e a frase do orçamento fica no fim. Só se
+ * tirava ". Orçamento grátis.", por isso 4 dos 11 materiais saíam com a cidade
+ * solta depois do ponto: "Desde 49€. no Porto.", "Orçamento sob consulta. em
+ * Coimbra. Orçamento grátis." */
+function materialCityMetaDescription(base: string, where: string): string {
+  const quote = base.match(/\s*(Orçamento [^.]*)\.$/);
+  const body = (quote ? base.slice(0, quote.index) : base).replace(/\.$/, '');
+  const closing = quote && /sob consulta/.test(quote[1]) ? quote[1] : 'Orçamento grátis';
+  return `${body} ${where}. ${closing}.`;
+}
+
 export function getAllMaterialRoutes(): { path: string; slug: string }[] {
   return materialDefinitions.map(m => ({
     path: `/${m.slug}`,
@@ -448,7 +459,7 @@ export function getMaterialCityData(materialSlug: string, citySlug: string) {
     citySlug: city.slug,
     cityDescription: city.description,
     title: `${mat.h1} ${prep} ${city.name} | Kyro Clean Solutions`,
-    metaDescription: `${mat.metaDescription.replace('. Orçamento grátis.', '')} ${prep} ${city.name}. Orçamento grátis.`,
+    metaDescription: materialCityMetaDescription(mat.metaDescription, `${prep} ${city.name}`),
     h1: `${mat.h1} ${prep} ${city.name}`,
   };
 }

@@ -78,7 +78,7 @@ export default function LandingServiceSections() {
     'mesma-visita': <div id="mesma-visita" className="scroll-mt-20"><ServicePackBanner packSlugs={model.packSlugs} city={model.municipalitySlug} variant="dark" /></div>,
     zonas: <section id="zonas" className="scroll-mt-20 py-14 md:py-20 bg-[#FDFDF9]">
       <div className={container}>
-        <SectionHeader overline="Explore por categoria" heading={`Serviços e zonas de atendimento ${model.prep}`} goldWord={model.locationName} subtitle="Encontre a sua zona e explore outros serviços. Abra uma categoria para ver mais." />
+        <SectionHeader overline="Explore por categoria" heading={`Serviços e zonas de atendimento ${model.prep}`} goldWord={model.locationName} subtitle={model.localAreaNote ?? "Encontre a sua zona e explore outros serviços. Abra uma categoria para ver mais."} />
         <div className="max-w-4xl border-t border-[#D4AF37]/25">
           {model.directory.map(group => <DirectoryGroup key={group.title} title={group.title}>
             {group.links.map(link => <Link key={link.href} to={link.href} className="inline-flex items-center gap-1.5 bg-white px-3.5 py-2 rounded-full text-sm font-medium text-[#111111] border border-[#E8E4DE] hover:border-[#D4AF37]/40 hover:bg-[#D4AF37]/5 hover:shadow-sm transition-all">{link.label}</Link>)}

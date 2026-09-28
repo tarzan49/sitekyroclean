@@ -86,7 +86,7 @@ export const PILLAR_PAGES: PillarPage[] = [
     serviceName: 'Limpeza de Sofás',
     breadcrumbLabel: catalog('limpeza-sofas').name,
     title: `Limpeza e Lavagem de Sofás ao Domicílio | Desde ${formatEuro(SOFA_CLEANING_FROM)} | Kyro Clean Solutions`,
-    description: 'Limpeza e lavagem profissional de sofás ao domicílio. Limpeza de sujidade e resíduos com extração profissional. Tratamentos antiácaros opcionais. Equipas em Braga, Porto, Lisboa e Algarve.',
+    description: 'Limpeza e lavagem profissional de sofás ao domicílio. Limpeza de sujidade e resíduos com extração profissional. Tratamentos antiácaros opcionais. Equipas em Braga, Porto, Coimbra, Lisboa e Algarve.',
     h1: 'Higienização Profissional de Sofás',
     priceFrom: catalog('limpeza-sofas').priceFrom,
     faqs: [
@@ -95,7 +95,7 @@ export const PILLAR_PAGES: PillarPage[] = [
       { question: 'O sofá fica muito molhado? Quanto tempo leva a secar?', answer: 'Não. Usamos extração profunda com forte capacidade de sucção, o que retira a maior parte da água usada na limpeza. Em condições normais de ventilação, o sofá fica seco entre 3 a 6 horas. Em dias mais húmidos pode demorar um pouco mais, mas nunca deixamos o tecido encharcado.' },
       { question: 'A limpeza remove manchas antigas do sofá?', answer: 'Sim. Tratamos manchas de vinho, café, gordura e sangue com pré-tratamento específico. Manchas muito antigas podem não sair completamente, mas apresentamos sempre o melhor resultado possível.' },
       { question: 'A limpeza pode danificar o tecido ou desbotar a cor?', answer: 'Pelo contrário: os produtos que utilizamos são específicos para estofos, com pH equilibrado e adequados a cada tipo de tecido. Fazemos sempre uma avaliação prévia e, se necessário, teste numa zona pouco visível. O objetivo é recuperar a cor e a textura original, sem danificar fibras.' },
-      { question: 'Em que zonas fazem limpeza de sofás ao domicílio?', answer: 'Temos equipas em Braga, Porto, Lisboa e Algarve. Aveiro, Coimbra e Alentejo Litoral sob consulta.' },
+      { question: 'Em que zonas fazem limpeza de sofás ao domicílio?', answer: 'Temos equipas em Braga, Porto, Coimbra, Lisboa e Algarve. Aveiro e Alentejo Litoral sob consulta.' },
     ],
   },
   {
@@ -105,7 +105,7 @@ export const PILLAR_PAGES: PillarPage[] = [
     serviceName: 'Limpeza de Colchões',
     breadcrumbLabel: catalog('limpeza-colchoes').name,
     title: `Limpeza e Higienização de Colchões | Desde ${formatEuro(MATTRESS_CLEANING_FROM)} | Kyro Clean Solutions`,
-    description: 'Higienização e lavagem profunda de colchões ao domicílio. Removemos sujidade e resíduos das fibras. Anti-ácaros e desbacterização opcionais. Equipas em Braga, Porto, Lisboa e Algarve.',
+    description: 'Higienização e lavagem profunda de colchões ao domicílio. Removemos sujidade e resíduos das fibras. Anti-ácaros e desbacterização opcionais. Equipas em Braga, Porto, Coimbra, Lisboa e Algarve.',
     h1: 'Higienização Profissional de Colchões',
     priceFrom: catalog('limpeza-colchoes').priceFrom,
     faqs: [
@@ -163,7 +163,7 @@ export const PILLAR_PAGES: PillarPage[] = [
     serviceName: 'Limpeza de Alcatifas',
     breadcrumbLabel: catalog('limpeza-alcatifas').name,
     title: 'Limpeza e Lavagem de Alcatifas | Orçamento Grátis | Kyro Clean Solutions',
-    description: 'Limpeza e lavagem profunda de alcatifas com extração profissional. Removemos sujidade acumulada e alergénios. Secagem média de 3 a 6 horas, conforme a ventilação. Equipas em Braga, Porto, Lisboa e Algarve.',
+    description: 'Limpeza e lavagem profunda de alcatifas com extração profissional. Removemos sujidade acumulada e alergénios. Secagem média de 3 a 6 horas, conforme a ventilação. Equipas em Braga, Porto, Coimbra, Lisboa e Algarve.',
     h1: 'Higienização Profissional de Alcatifas',
     priceFrom: catalog('limpeza-alcatifas').priceFrom,
     faqs: [

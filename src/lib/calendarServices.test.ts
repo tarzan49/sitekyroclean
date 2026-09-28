@@ -119,7 +119,7 @@ describe('parseServiceEvent', () => {
   });
 
   it('recognises every city of the catalog as its own team', () => {
-    const team = { porto: 'Porto', lisboa: 'Lisboa', algarve: 'Algarve', braga: 'Braga' } as const;
+    const team = { porto: 'Porto', lisboa: 'Lisboa', algarve: 'Algarve', braga: 'Braga', coimbra: 'Porto' } as const;
     for (const c of cities) {
       const r = parse(`Serviço 10€ (20€) Limpeza de sofá - ${c.name}`);
       expect({ city: c.name, locality: r?.locality }).toEqual({ city: c.name, locality: team[c.area as keyof typeof team] });

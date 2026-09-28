@@ -9,7 +9,7 @@ import { locationPrices } from '../constants/travel';
 describe('shared landing composition', () => {
   it('covers all four families with the right service, four problems and the original four FAQs', () => {
     const records = getLandingFaqRoutes();
-    expect(records).toHaveLength(13734);
+    expect(records).toHaveLength(14190);
     for (const record of records) {
       const model = getLandingPageModel(record.path);
       expect(model, record.path).not.toBeNull();

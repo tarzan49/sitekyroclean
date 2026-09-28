@@ -92,7 +92,7 @@ export function renderLandingPageHtml(model: LandingPageModel): string {
     duvidas: `<h2>${e(model.faqHeading)}</h2>${model.faqs.map(faq => `<details><summary>${e(faq.question)}</summary><p>${e(faq.answer)}</p></details>`).join('')}`,
     processo: `<h2>Como funciona: ${e(model.serviceLabel.toLowerCase())}</h2><ol>${model.processSteps.map(step => `<li><h3>${e(step.title)}</h3><p>${e(step.description)}</p></li>`).join('')}</ol>`,
     'mesma-visita': `<h2>Aproveite a mesma visita</h2>${links(model.packLinks)}`,
-    zonas: `<h2>Serviços e zonas de atendimento ${e(model.prep)} ${e(model.locationName)}</h2>${model.directory.map(group => `<details><summary>${e(group.title)}</summary>${links(group.links)}</details>`).join('')}`,
+    zonas: `<h2>Serviços e zonas de atendimento ${e(model.prep)} ${e(model.locationName)}</h2>${model.localAreaNote ? `<p>${e(model.localAreaNote)}</p>` : ''}${model.directory.map(group => `<details><summary>${e(group.title)}</summary>${links(group.links)}</details>`).join('')}`,
   };
     // Os factos do hero, escritos com as mesmas funções que o CommercialHero usa
   // para os desenhar. Nenhum destes valores é novo na página: o preço de

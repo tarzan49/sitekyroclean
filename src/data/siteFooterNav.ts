@@ -67,13 +67,14 @@ export const FOOTER_NAV: FooterNavGroup[] = [
   {
     // As 20 páginas B2B não tinham uma única ligação interna em lado nenhum do
     // site, nem no React nem no estático: nunca chegou a existir um hub para
-    // elas. Ficam aqui as quatro cabeças de região; as restantes dezasseis são
+    // elas. Ficam aqui as cinco cabeças de região; as restantes são
     // alcançadas a partir destas, pelo bloco de cidades das próprias páginas.
     title: 'Empresas',
     links: [
       { href: '/limpeza-comercial-porto', label: 'Limpeza comercial no Porto' },
       { href: '/limpeza-comercial-lisboa', label: 'Limpeza comercial em Lisboa' },
       { href: '/limpeza-comercial-braga', label: 'Limpeza comercial em Braga' },
+      { href: '/limpeza-comercial-coimbra', label: 'Limpeza comercial em Coimbra' },
       { href: '/limpeza-comercial-faro', label: 'Limpeza comercial em Faro' },
     ],
   },

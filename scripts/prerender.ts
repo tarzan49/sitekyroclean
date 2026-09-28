@@ -1215,12 +1215,13 @@ export function prerenderRoutes(outDir: string): number {
         desc: 'Serviços de limpeza profissional de estofos disponíveis em todo o país. Porto, Gaia, Matosinhos, Lisboa, Braga e muito mais.',
         content: {
           h1: 'Áreas de Serviço',
-          intro: 'Equipas em Braga, Porto, Lisboa e Algarve, com cobertura regular do litoral entre Viana do Castelo e o Algarve. Aveiro, Coimbra, Alentejo Litoral e outras zonas mediante confirmação de disponibilidade.',
+          intro: 'Equipas em Braga, Porto, Coimbra, Lisboa e Algarve, com cobertura regular do litoral entre Viana do Castelo e o Algarve. Aveiro, Alentejo Litoral e outras zonas mediante confirmação de disponibilidade.',
           benefits: [
             `Porto e Grande Porto: deslocação a partir de ${locationPrices['Porto']}€`,
             'Equipa local em Braga, com disponibilidade confirmada antes da marcação',
+            'Equipa local em Coimbra, que cobre também a Figueira da Foz',
             AVAILABILITY_PROMISE,
-            'Aveiro, Coimbra e Alentejo Litoral: disponibilidade sob consulta',
+            'Aveiro e Alentejo Litoral: disponibilidade sob consulta',
             COVERAGE_PROMISE,
           ],
           links: cities.map(city => ({ href: `/limpeza-sofas-${city.slug}`, label: city.name })),

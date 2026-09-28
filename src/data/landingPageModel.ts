@@ -2,6 +2,7 @@ import { commercialHeroSubtitle, CHAIR_WATERPROOF_SUBTITLE_KEY } from './commerc
 import { getLandingTrustPoints } from '../constants/serviceTrustPool';
 import { cities, services, cityPrep, getCityLinksForService, getLocationServiceData } from './locationSeoData';
 import { municipiosComFreguesias, getFreguesia, generateFreguesiaContent } from './freguesiaSeoData';
+import { getLocalData } from './freguesiaContentEngine';
 import { getPricePageData } from './priceSeoData';
 import { getKeywordVariantData, type VariantKey, type ServiceKey } from './keywordVariantData';
 import { getLandingProblems, LANDING_PRICE_VERBS } from './landingServiceCopy';
@@ -116,6 +117,25 @@ export function coverageCityLinks(serviceSlug: string, municipalityName: string,
 }
 
 /** Resolves only the four landing families. Existing URL definitions are unchanged. */
+/**
+ * Os pontos de referência verificados da freguesia, numa frase, para a secção
+ * de zonas (React e HTML estático). Só os pontos de referência: as dicas
+ * locais de `freguesiaContentEngine.ts` saíram das introduções na revisão
+ * editorial de 13/09/2026 por descreverem condições locais sem fonte, e o
+ * parágrafo editorial foi retirado pelo dono a 15/09. Descritores genéricos
+ * ("Centro de X", "Zona residencial") não contam como ponto de referência.
+ */
+function localAreaNote(parishSlug: string, parishName: string, municipalityName: string): string | null {
+  // "Arosa e Castelões: Arosa, Castelões" não diz nada: as partes do próprio
+  // nome da freguesia também não contam.
+  const nameParts = new Set(parishName.split(/,\s*|\s+e\s+/).map(part => part.trim().toLowerCase()));
+  const landmarks = getLocalData(parishSlug, parishName, municipalityName).landmarks
+    .filter(landmark => !/^(centro|zona)\b/i.test(landmark) && !nameParts.has(landmark.toLowerCase()));
+  if (!landmarks.length) return null;
+  const list = landmarks.length === 1 ? landmarks[0] : `${landmarks.slice(0, -1).join(', ')} e ${landmarks[landmarks.length - 1]}`;
+  return `Pontos de referência em ${parishName}: ${list}.`;
+}
+
 export function getLandingPageModel(pathname: string) {
   const path = pathname.split(/[?#]/)[0].replace(/\/$/, '');
   let family: LandingFaqContext['family'] = 'localidade';
@@ -224,6 +244,7 @@ export function getLandingPageModel(pathname: string) {
     faqHeading: `Perguntas sobre ${family === 'preco' ? `preços de ${service.name.toLowerCase()}` : serviceLabel.toLowerCase()} ${prep} ${locationName}`,
     processSteps: serviceSlug === 'limpeza-sofas' ? SOFA_PROCESS_STEPS : SERVICE_PROCESS_GUIDES[serviceSlug].steps,
     packSlugs, packLinks,
+    localAreaNote: parish ? localAreaNote(parish.slug, parish.name, municipalityName) : null,
     directory: directory.filter(group => group.links.length),
   };
 }

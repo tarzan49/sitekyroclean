@@ -35,10 +35,11 @@ import { chairTierSentence, isPricedPerChair, startingPriceLabel } from '../src/
 
 /** Human labels for the four coverage areas in serviceCatalog's `area` field. */
 const AREA_LABELS: Record<string, string> = {
-  // Aveiro e Coimbra são Centro, servidas pela equipa do Porto por não
-  // haver equipa própria no Centro — daí o rótulo não ser só "Norte".
-  porto: 'Grande Porto, Norte e Centro',
+  // Aveiro é Centro, servida pela equipa do Porto — daí o rótulo não ser só
+  // "Norte". Coimbra tem área própria desde 2026-09-28 (trabalhador local).
+  porto: 'Grande Porto, Norte e Aveiro',
   braga: 'Braga e Minho',
+  coimbra: 'Coimbra e Figueira da Foz',
   lisboa: 'Lisboa, Setúbal e Alentejo Litoral',
   algarve: 'Algarve',
 };

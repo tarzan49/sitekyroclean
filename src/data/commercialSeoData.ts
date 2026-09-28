@@ -6,7 +6,7 @@ import { locationPrices } from '../constants/travel';
 // depende do número de peças e da frequência, não faz sentido num quiz).
 //
 // Cidades: as praças de maior densidade comercial/hoteleira dentro das 3
-// regiões onde a Kyro já opera (Porto/Norte, Lisboa/AML, Algarve) — mesmo
+// regiões onde a Kyro já opera (Porto/Norte, Coimbra, Lisboa/AML, Algarve) — mesmo
 // critério já usado em packComboData.ts/marcaSofaData.ts para escolher
 // "cidades grandes" sem replicar as ~53 cidades todas.
 
@@ -15,7 +15,7 @@ import { cityPrep } from "./serviceCatalog";
 export interface CommercialCity {
   name: string;
   slug: string;
-  region: "Porto" | "Lisboa" | "Algarve";
+  region: "Porto" | "Coimbra" | "Lisboa" | "Algarve";
 }
 
 export const COMMERCIAL_CITIES: CommercialCity[] = [
@@ -27,6 +27,9 @@ export const COMMERCIAL_CITIES: CommercialCity[] = [
   { name: "Guimarães", slug: "guimaraes", region: "Porto" },
   { name: "Maia", slug: "maia", region: "Porto" },
   { name: "Póvoa de Varzim", slug: "povoa-de-varzim", region: "Porto" },
+  // Coimbra e Centro (trabalhador local desde 2026-09-28)
+  { name: "Coimbra", slug: "coimbra", region: "Coimbra" },
+  { name: "Figueira da Foz", slug: "figueira-da-foz", region: "Coimbra" },
   // Lisboa / Área Metropolitana
   { name: "Lisboa", slug: "lisboa", region: "Lisboa" },
   { name: "Cascais", slug: "cascais", region: "Lisboa" },

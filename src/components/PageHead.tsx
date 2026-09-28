@@ -12,15 +12,15 @@ const routeMeta: Record<string, { pt: PageMeta; en: PageMeta; es: PageMeta }> = 
   "/": {
     pt: {
       title: "Kyro Clean Solutions | Limpeza de Sofás, Colchões e Tapetes ao Domicílio",
-      description: "Limpeza profissional de sofás, colchões e tapetes ao domicílio. Equipas em Braga, Porto, Lisboa e Algarve. Orçamento claro e resposta em menos de 10 minutos.",
+      description: "Limpeza profissional de sofás, colchões e tapetes ao domicílio. Equipas em Braga, Porto, Coimbra, Lisboa e Algarve. Orçamento claro e resposta em menos de 10 minutos.",
     },
     en: {
       title: "Kyro Clean Solutions | Professional Sofa, Mattress & Rug Cleaning at Home",
-      description: "Professional sofa, mattress and rug cleaning at home. Teams in Braga, Porto, Lisbon and Algarve. Clear quotes and a response in under 10 minutes.",
+      description: "Professional sofa, mattress and rug cleaning at home. Teams in Braga, Porto, Coimbra, Lisbon and Algarve. Clear quotes and a response in under 10 minutes.",
     },
     es: {
       title: "Kyro Clean Solutions | Limpieza de Sofás, Colchones y Alfombras a Domicilio",
-      description: "Limpieza profesional de sofás, colchones y alfombras a domicilio. Equipos en Braga, Oporto, Lisboa y Algarve. Presupuesto claro y respuesta en menos de 10 minutos.",
+      description: "Limpieza profesional de sofás, colchones y alfombras a domicilio. Equipos en Braga, Oporto, Coímbra, Lisboa y Algarve. Presupuesto claro y respuesta en menos de 10 minutos.",
     },
   },
   "/blog": {

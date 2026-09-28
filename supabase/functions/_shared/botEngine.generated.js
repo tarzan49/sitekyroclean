@@ -31,9 +31,15 @@ var locationPrices = {
   "Oliveira de Azeméis": 15,
   // Zona 4 — Mais afastado, ~45-55 min
   "Arouca": 20,
-  // Zona 3 — Centro, sem equipa própria, deslocação a partir do Porto (2026-09-10, corrigido a pedido do dono)
+  // Aveiro — Centro, deslocação a partir do Porto (2026-09-10, corrigido a pedido do dono)
   "Aveiro": 15,
-  "Coimbra": 15,
+  // ═══ Coimbra e Centro (trabalhador local desde 2026-09-28) ═══
+  // Dono, 2026-09-28: Coimbra 10€, arredores próximos 15€, mais longe 20€
+  // (mesma lógica de escalões da equipa de Braga). Deixou de ser deslocação
+  // alargada: saiu de EXTENDED_TRIP_CITIES.
+  "Coimbra": 10,
+  "Figueira da Foz": 20,
+  // ~45 min pela A14
   // ═══ Braga/Minho (equipa local, escalões por distância ao centro de Braga) ═══
   // Referência ao centro de Braga: até 10 km = 10€; até 15 km = 15€; acima = 20€.
   // Escalões por sede de concelho; a morada concreta é confirmada no orçamento.
@@ -105,7 +111,6 @@ var locationPrices = {
 };
 var EXTENDED_TRIP_CITIES = /* @__PURE__ */ new Set([
   "Aveiro",
-  "Coimbra",
   "Alcácer do Sal",
   "Grândola",
   "Santiago do Cacém",

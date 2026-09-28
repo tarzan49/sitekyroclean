@@ -315,9 +315,9 @@ export const municipiosComFreguesias: MunicipioGroup[] = [
       { name: "São Silvestre", slug: "sao-silvestre", nearby: ["santo-antonio-dos-olivais", "trouxemil"] },
       { name: "Trouxemil", slug: "trouxemil", nearby: ["sao-silvestre", "torre-de-vilela"] },
       { name: "Torre de Vilela", slug: "torre-de-vilela", nearby: ["trouxemil", "souselas"] },
-      { name: "Souselas", slug: "souselas", nearby: ["torre-de-vilela", "botao", "cernache"] },
-      { name: "Cernache", slug: "cernache", nearby: ["souselas", "botao"] },
-      { name: "Botão", slug: "botao", nearby: ["souselas", "cernache"] },
+      { name: "Souselas", slug: "souselas", nearby: ["torre-de-vilela", "botao", "sao-joao-do-campo"] },
+      { name: "Cernache", slug: "cernache", nearby: ["antanhol", "assafarge", "castelo-viegas"] },
+      { name: "Botão", slug: "botao", nearby: ["souselas", "torre-de-vilela"] },
       { name: "Santa Clara", slug: "santa-clara", nearby: ["castelo-viegas", "se-nova"] },
       { name: "Castelo Viegas", slug: "castelo-viegas", nearby: ["santa-clara", "torres-do-mondego"] },
       { name: "Torres do Mondego", slug: "torres-do-mondego", nearby: ["castelo-viegas", "antuzede"] },
@@ -338,6 +338,42 @@ export const municipiosComFreguesias: MunicipioGroup[] = [
       { name: "Taveiro", slug: "taveiro", nearby: ["ameal", "arzila", "almalagues"] },
       { name: "Ameal", slug: "ameal", nearby: ["taveiro", "arzila"] },
       { name: "Arzila", slug: "arzila", nearby: ["taveiro", "ameal"] },
+      // Bairros de Santo António dos Olivais e de Coimbra que as pessoas
+      // pesquisam pelo nome (2026-09-28), como Vilamoura em Loulé.
+      { name: "Celas", slug: "celas", nearby: ["santo-antonio-dos-olivais", "se-nova"] },
+      { name: "Solum", slug: "solum", nearby: ["norton-de-matos", "vale-das-flores", "santo-antonio-dos-olivais"] },
+      { name: "Vale das Flores", slug: "vale-das-flores", nearby: ["solum", "norton-de-matos", "santo-antonio-dos-olivais"] },
+      { name: "Norton de Matos", slug: "norton-de-matos", nearby: ["solum", "vale-das-flores", "santa-clara"] },
+      { name: "Pedrulha", slug: "pedrulha", nearby: ["santa-cruz", "eiras"] },
+    ],
+  },
+  // Figueira da Foz (2026-09-28, servida a partir de Coimbra). Freguesias
+  // de depois da reorganização de 13/10/2025 (Buarcos, Brenha e Santana
+  // voltaram a ser freguesias). São Julião é a cidade e fica de fora, como a
+  // sede dos outros concelhos. Cova-Gala, Costa de Lavos e Leirosa entram
+  // como localidades. A Praia da Tocha é de Cantanhede, não da Figueira.
+  {
+    name: "Figueira da Foz", slug: "figueira-da-foz",
+    freguesias: [
+      { name: "Buarcos", slug: "buarcos", nearby: ["tavarede", "brenha", "quiaios"] },
+      { name: "Tavarede", slug: "tavarede", nearby: ["buarcos", "brenha", "quiaios"] },
+      { name: "Brenha", slug: "brenha", nearby: ["alhadas", "tavarede", "quiaios"] },
+      { name: "Alhadas", slug: "alhadas", nearby: ["brenha", "moinhos-da-gandara", "maiorca"] },
+      { name: "Quiaios", slug: "quiaios", nearby: ["brenha", "tavarede", "buarcos"] },
+      { name: "Bom Sucesso", slug: "bom-sucesso", nearby: ["ferreira-a-nova", "moinhos-da-gandara", "quiaios"] },
+      { name: "Moinhos da Gândara", slug: "moinhos-da-gandara", nearby: ["santana", "alhadas", "ferreira-a-nova"] },
+      { name: "Ferreira-a-Nova", slug: "ferreira-a-nova", nearby: ["bom-sucesso", "moinhos-da-gandara", "santana"] },
+      { name: "Santana", slug: "santana", nearby: ["moinhos-da-gandara", "alhadas", "ferreira-a-nova"] },
+      { name: "Maiorca", slug: "maiorca", nearby: ["vila-verde", "alhadas", "brenha"] },
+      { name: "Vila Verde", slug: "vila-verde", nearby: ["maiorca", "alhadas", "alqueidao"] },
+      { name: "São Pedro", slug: "sao-pedro", nearby: ["cova-gala", "lavos", "costa-de-lavos"] },
+      { name: "Lavos", slug: "lavos", nearby: ["alqueidao", "costa-de-lavos", "sao-pedro"] },
+      { name: "Alqueidão", slug: "alqueidao", nearby: ["lavos", "paiao", "vila-verde"] },
+      { name: "Paião", slug: "paiao", nearby: ["alqueidao", "marinha-das-ondas", "lavos"] },
+      { name: "Marinha das Ondas", slug: "marinha-das-ondas", nearby: ["paiao", "leirosa", "lavos"] },
+      { name: "Cova-Gala", slug: "cova-gala", nearby: ["sao-pedro", "costa-de-lavos", "lavos"] },
+      { name: "Costa de Lavos", slug: "costa-de-lavos", nearby: ["leirosa", "lavos", "cova-gala"] },
+      { name: "Leirosa", slug: "leirosa", nearby: ["costa-de-lavos", "marinha-das-ondas"] },
     ],
   },
   // ═══════════════ Lisboa / Área Metropolitana ═══════════════
