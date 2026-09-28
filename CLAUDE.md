@@ -359,10 +359,12 @@ WhatsApp não precisa de fazer nada: herda a marca**, desde que comece por
 telemóvel, cabeçalho) mandam a mensagem do botão principal da página**, com
 serviço e cidade: antes, a maior parte das mensagens chegava a dizer só
 "limpar os meus estofos" e o dono não sabia se era Lisboa ou Porto, limpeza ou
-impermeabilização. E as páginas de serviço mandam uma mensagem para preencher
-(localidade, tamanho, dia; na impermeabilização, também se quer a limpeza),
-pedida pelo dono para poder dar o preço na primeira resposta. Vive em
-`buildServiceWaMessage`; não voltar a uma frase corrida sem os campos.
+impermeabilização. E as páginas de serviço mandam uma mensagem com **uma só linha para
+preencher, a última** ("Nº de lugares e localidade: "; na impermeabilização,
+também se quer a limpeza), pedida pelo dono para poder dar o preço na primeira
+resposta. A linha fica no fim porque o WhatsApp abre com o cursor no fim: a
+versão com três campos a meio do texto durou umas horas. Vive em
+`buildServiceWaMessage`; não voltar a uma frase corrida sem o campo.
 
 **Exportar não é importar.** `conversion_exports` guarda `queued`, `exported`,
 `submitted`, `accepted`, `rejected` em separado, e o CSV só é gerado depois de o
