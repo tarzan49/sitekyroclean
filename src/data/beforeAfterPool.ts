@@ -137,9 +137,8 @@ export type PoolItem =
 
 export const BEFORE_AFTER_POOL: Record<BeforeAfterCategory, PoolItem[]> = {
   // 29/09/2026: colchao-06, colchao-07 e sofa-14 são trabalhos reais enviados
-  // pelo dono ("estão excelentes") e vêm primeiro na rotação.
+  // pelo dono, no fim da lista ("só quero que fiquem lá", não em primeiro).
   sofa: [
-    { kind: "pair", before: sofa14Antes, after: sofa14Depois },
     { kind: "pair", before: sofa01Antes, after: sofa01Depois },
     { kind: "pair", before: sofa02Antes, after: sofa02Depois },
     { kind: "pair", before: sofa04Antes, after: sofa04Depois },
@@ -151,15 +150,16 @@ export const BEFORE_AFTER_POOL: Record<BeforeAfterCategory, PoolItem[]> = {
     { kind: "pair", before: sofa10Antes, after: sofa10Depois },
     { kind: "pair", before: sofa11Antes, after: sofa11Depois },
     { kind: "pair", before: sofa13Antes, after: sofa13Depois },
+    { kind: "pair", before: sofa14Antes, after: sofa14Depois },
   ],
   colchao: [
-    { kind: "pair", before: colchao06Antes, after: colchao06Depois },
-    { kind: "pair", before: colchao07Antes, after: colchao07Depois },
     { kind: "pair", before: colchao01Antes, after: colchao01Depois },
     { kind: "pair", before: colchao02Antes, after: colchao02Depois },
     { kind: "pair", before: colchao03Antes, after: colchao03Depois },
     { kind: "pair", before: colchao04Antes, after: colchao04Depois },
     { kind: "pair", before: colchao05Antes, after: colchao05Depois },
+    { kind: "pair", before: colchao06Antes, after: colchao06Depois },
+    { kind: "pair", before: colchao07Antes, after: colchao07Depois },
   ],
   cadeiras: [
     { kind: "pair", before: cadeiras01Antes, after: cadeiras01Depois },
