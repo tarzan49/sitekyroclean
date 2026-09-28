@@ -1,15 +1,24 @@
 import { describe, expect, it } from 'vitest';
 import { WHATSAPP_BASE } from '@/constants/business';
-import { buildGeneralWaMessage, buildServiceWaMessage, buildSubmittedWaMessage, buildVariantWaMessage } from './whatsappMessages';
+import { askLocalityToo, buildGeneralWaMessage, buildServiceWaMessage, buildSubmittedWaMessage, buildVariantWaMessage } from './whatsappMessages';
 
 describe('WhatsApp enquiry context and privacy', () => {
   it('matches the approved Lisbon sofa message: one blank, last, where the cursor lands', () => {
-    expect(buildServiceWaMessage('limpeza-sofas', 'Lisboa')).toBe('Olá! Gostaria de um orçamento para limpar o meu sofá em Lisboa.\n\nEnvio a seguir uma foto do sofá.\n\nNº de lugares e localidade: ');
+    expect(buildServiceWaMessage('limpeza-sofas', 'Lisboa')).toBe('Olá! Gostaria de um orçamento para limpar o meu sofá em Lisboa.\n\nEnvio a seguir uma foto do sofá.\n\nNº de lugares: ');
+  });
+  it('asks the locality only when the page does not name a place', () => {
+    expect(buildServiceWaMessage('limpeza-sofas')).toMatch(/Nº de lugares e localidade: $/);
+    expect(buildServiceWaMessage('limpeza-colchoes', 'Porto')).toMatch(/Tamanho \(solteiro, casal ou king\): $/);
+  });
+  it.each(['limpeza-sofas', 'limpeza-colchoes', 'limpeza-tapetes', 'limpeza-cadeiras', 'limpeza-alcatifas', 'impermeabilizacao'])('askLocalityToo turns the %s page message into the one without a place', service => {
+    const withPlace = askLocalityToo(buildServiceWaMessage(service, 'Lisboa'));
+    expect(withPlace.endsWith(buildServiceWaMessage(service).split('\n\n').pop()!)).toBe(true);
+    expect(askLocalityToo(withPlace)).toBe(withPlace);
   });
   it('asks waterproofing clients about the cleaning pack', () => {
     const text = buildServiceWaMessage('impermeabilizacao', 'Porto');
     expect(text).toContain('impermeabilizar o meu sofá no Porto');
-    expect(text).toMatch(/Nº de lugares, localidade e se também quer a limpeza: $/);
+    expect(text).toMatch(/Nº de lugares e se também quer a limpeza: $/);
     expect(text).not.toContain('limpar');
   });
   it('keeps Porto and protection distinct from cleaning', () => {

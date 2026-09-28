@@ -360,8 +360,10 @@ telemóvel, cabeçalho) mandam a mensagem do botão principal da página**, com
 serviço e cidade: antes, a maior parte das mensagens chegava a dizer só
 "limpar os meus estofos" e o dono não sabia se era Lisboa ou Porto, limpeza ou
 impermeabilização. E as páginas de serviço mandam uma mensagem com **uma só linha para
-preencher, a última** ("Nº de lugares e localidade: "; na impermeabilização,
-também se quer a limpeza), pedida pelo dono para poder dar o preço na primeira
+preencher, a última** ("Nº de lugares: "; na impermeabilização, também se
+quer a limpeza). A localidade só se pede quando a página não diz o sítio, e
+sempre numa visita de anúncio (`askLocalityToo`): os anúncios levam às páginas
+de Porto e Lisboa mas segmentam a região toda, onde a deslocação muda. Pedida pelo dono para poder dar o preço na primeira
 resposta. A linha fica no fim porque o WhatsApp abre com o cursor no fim: a
 versão com três campos a meio do texto durou umas horas. Vive em
 `buildServiceWaMessage`; não voltar a uma frase corrida sem o campo.

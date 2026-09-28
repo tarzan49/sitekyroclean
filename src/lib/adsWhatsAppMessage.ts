@@ -21,7 +21,7 @@
  * a mesma razão pela qual a medição dos cliques é um delegado global.
  */
 import { WHATSAPP_BASE } from '@/constants/business';
-import { buildGeneralWaMessage } from '@/lib/whatsappMessages';
+import { askLocalityToo, buildGeneralWaMessage } from '@/lib/whatsappMessages';
 
 export const ADS_WHATSAPP_MARK = 'Vi o vosso anúncio no Google';
 
@@ -49,8 +49,9 @@ export function isGoogleAdsVisit(search: string): boolean {
  * à frente. Mensagens noutra língua (as páginas EN, que os anúncios não
  * segmentam) ficam como estão, para não misturar línguas.
  */
-export function markAdsWhatsAppText(text: string): string {
-  if (text.includes(ADS_WHATSAPP_MARK)) return text;
+export function markAdsWhatsAppText(original: string): string {
+  if (original.includes(ADS_WHATSAPP_MARK)) return original;
+  const text = askLocalityToo(original);
   // Só o início: o espaço final da mensagem é onde fica o cursor para escrever.
   const trimmed = text.trimStart();
   if (!trimmed) return `Olá! ${ADS_WHATSAPP_MARK}.`;

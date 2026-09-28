@@ -16,31 +16,50 @@ export function buildGeneralWaMessage(isEn = false): string {
   return 'Olá! Gostaria de saber o preço e a disponibilidade para limpar os meus estofos. Posso enviar fotografias dos artigos e indicar a minha localidade para receber um orçamento.';
 }
 
+/** The blank each service asks, with and without the locality. */
+const SERVICE_MESSAGES: Record<string, { request: string; photo: string; blank: string; blankWithLocality: string }> = {
+  'limpeza-sofas': { request: 'limpar o meu sofá', photo: 'Envio a seguir uma foto do sofá.', blank: 'Nº de lugares:', blankWithLocality: 'Nº de lugares e localidade:' },
+  'limpeza-colchoes': { request: 'limpar o meu colchão', photo: 'Envio a seguir uma foto do colchão.', blank: 'Tamanho (solteiro, casal ou king):', blankWithLocality: 'Tamanho (solteiro, casal ou king) e localidade:' },
+  'limpeza-tapetes': { request: 'limpar os meus tapetes', photo: 'Envio a seguir fotos dos tapetes.', blank: 'Nº de tapetes e medidas aproximadas:', blankWithLocality: 'Nº de tapetes, medidas aproximadas e localidade:' },
+  'limpeza-cadeiras': { request: 'limpar as minhas cadeiras', photo: 'Envio a seguir uma foto das cadeiras.', blank: 'Nº de cadeiras:', blankWithLocality: 'Nº de cadeiras e localidade:' },
+  'limpeza-alcatifas': { request: 'limpar a minha alcatifa', photo: 'Envio a seguir uma foto da alcatifa.', blank: 'Área aproximada (m²):', blankWithLocality: 'Área aproximada (m²) e localidade:' },
+  'impermeabilizacao': { request: 'impermeabilizar o meu sofá', photo: 'Envio a seguir uma foto do tecido.', blank: 'Nº de lugares e se também quer a limpeza:', blankWithLocality: 'Nº de lugares, localidade e se também quer a limpeza:' },
+};
+
 /**
  * Shared by service, location, neighbourhood and price landing pages.
  *
  * Written so the client only fills in one line and the owner can quote in the
  * first reply (dono, 28/09/2026: "a pessoa não pode perder tempo a pensar o que
  * escrever"). The blank is the last line on purpose: WhatsApp opens with the
- * cursor at the end, so the client types "3 lugares, Oeiras" without tapping
- * anywhere; a version with three blanks in the middle was replaced the same
- * day for that reason. It asks only what the price depends on: the size and
- * the locality (the travel fee; the page city is the campaign, not always
- * where the client lives). Sent untouched, it still names service and place.
+ * cursor at the end, so the client types "3 lugares" without tapping anywhere;
+ * a version with three blanks in the middle was replaced the same day for that
+ * reason. It asks only what the price depends on. A page that names the place
+ * already knows the locality, so it asks only the size (dono: "a localização
+ * já está definida na página"); a page without a place asks both. Ad visits
+ * ask the locality again, see `askLocalityToo`. Sent untouched, it still names
+ * service and place.
  */
 export function buildServiceWaMessage(serviceSlug: string, placeName?: string | null): string {
-  const loc = placeName ? ` ${cityPrep(placeName)} ${placeName}` : '';
-  const services: Record<string, { request: string; photo: string; blank: string }> = {
-    'limpeza-sofas': { request: 'limpar o meu sofá', photo: 'Envio a seguir uma foto do sofá.', blank: 'Nº de lugares e localidade:' },
-    'limpeza-colchoes': { request: 'limpar o meu colchão', photo: 'Envio a seguir uma foto do colchão.', blank: 'Tamanho (solteiro, casal ou king) e localidade:' },
-    'limpeza-tapetes': { request: 'limpar os meus tapetes', photo: 'Envio a seguir fotos dos tapetes.', blank: 'Nº de tapetes, medidas aproximadas e localidade:' },
-    'limpeza-cadeiras': { request: 'limpar as minhas cadeiras', photo: 'Envio a seguir uma foto das cadeiras.', blank: 'Nº de cadeiras e localidade:' },
-    'limpeza-alcatifas': { request: 'limpar a minha alcatifa', photo: 'Envio a seguir uma foto da alcatifa.', blank: 'Área aproximada (m²) e localidade:' },
-    'impermeabilizacao': { request: 'impermeabilizar o meu sofá', photo: 'Envio a seguir uma foto do tecido.', blank: 'Nº de lugares, localidade e se também quer a limpeza:' },
-  };
-  const service = services[serviceSlug];
+  const service = SERVICE_MESSAGES[serviceSlug];
   if (!service) return buildGeneralWaMessage();
-  return `Olá! Gostaria de um orçamento para ${service.request}${loc}.\n\n${service.photo}\n\n${service.blank} `;
+  const loc = placeName ? ` ${cityPrep(placeName)} ${placeName}` : '';
+  const blank = placeName ? service.blank : service.blankWithLocality;
+  return `Olá! Gostaria de um orçamento para ${service.request}${loc}.\n\n${service.photo}\n\n${blank} `;
+}
+
+/**
+ * The same message asking the locality too. The ads land on the Porto and
+ * Lisboa pages but target the whole region (Braga, Guimarães, the Setúbal
+ * district…), where the travel fee changes, so on an ad visit "em Lisboa" is
+ * the campaign, not the client's address.
+ */
+export function askLocalityToo(text: string): string {
+  for (const service of Object.values(SERVICE_MESSAGES)) {
+    const suffix = `${service.blank} `;
+    if (text.endsWith(suffix)) return `${text.slice(0, -suffix.length)}${service.blankWithLocality} `;
+  }
+  return text;
 }
 
 /** Used on MaterialPage. */
