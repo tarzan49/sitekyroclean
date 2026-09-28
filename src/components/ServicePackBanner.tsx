@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 import SectionHeader from '@/components/SectionHeader';
 import { packs, packCities, PACK_HOOK } from '@/data/packComboData';
+import { cityPrep } from '@/data/serviceCatalog';
 
 interface Props {
   packSlugs: string[];
@@ -16,7 +17,7 @@ export default function ServicePackBanner({ packSlugs, city, variant = 'light' }
   const options = relevant.map(pack => ({
     id: pack.id,
     title: pack.name,
-    description: PACK_HOOK[pack.id] ?? `Personalize esta combinação${local ? ` em ${local.name}` : ''}`,
+    description: PACK_HOOK[pack.id] ?? `Personalize esta combinação${local ? ` ${cityPrep(local.name)} ${local.name}` : ''}`,
     to: local ? `/${pack.slug}-${local.slug}` : '/guia-de-packs',
   }));
 

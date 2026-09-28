@@ -23,6 +23,9 @@ export const services = [
   { name: "Impermeabilização", slug: "impermeabilizacao", baseRoute: "/impermeabilizacao", priceFrom: "59€", icon: "waterproof" },
 ] as const;
 
+// Os concelhos que levam artigo: "no Porto", "na Maia", "da Trofa". O nome
+// tem de ser escrito como em `cities`, senão cai em "em" sem avisar
+// (serviceCatalog.test.ts confere). As freguesias não passam por aqui.
 const ARTICLE_CITIES: Record<string, "o" | "a"> = {
   "Porto": "o",
   "Barreiro": "o",
@@ -31,6 +34,10 @@ const ARTICLE_CITIES: Record<string, "o" | "a"> = {
   "Amadora": "a",
   "Moita": "a",
   "Figueira da Foz": "a",
+  "Maia": "a",
+  "Trofa": "a",
+  "Póvoa de Varzim": "a",
+  "Póvoa de Lanhoso": "a",
 };
 export const cityPrep = (city: string) => {
   const article = ARTICLE_CITIES[city];
@@ -40,6 +47,12 @@ export const cityPrep = (city: string) => {
 export const cityPrepCap = (city: string) => {
   const prep = cityPrep(city);
   return prep.charAt(0).toUpperCase() + prep.slice(1);
+};
+/** O mesmo com "de": "município do Porto", "da Maia", "de Braga". */
+export const cityPrepDe = (city: string) => {
+  const article = ARTICLE_CITIES[city];
+  if (!article) return "de";
+  return article === "o" ? "do" : "da";
 };
 /**
  * Um título com a localidade: "Remoção de Manchas do Sofá no Porto". Num

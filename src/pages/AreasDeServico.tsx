@@ -6,7 +6,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import QuizButton from "@/components/QuizButton";
 import SectionHeader from "@/components/SectionHeader";
-import { cities, services } from "@/data/serviceCatalog";
+import { cities, services, cityPrep, cityPrepDe } from "@/data/serviceCatalog";
 import { municipiosComFreguesias, getFreguesiaStats } from "@/data/freguesiaSeoData";
 import { SITE_URL, PHONE_TEL, PHONE_DISPLAY } from "@/constants/business";
 
@@ -51,10 +51,10 @@ const RegionSection = ({ heading, goldWord, area, query }: { heading: string; go
               <ChevronDown aria-hidden="true" className="h-4 w-4 text-[#D4AF37] group-open/city:rotate-180" />
             </summary>
             <div className="pl-3 sm:pl-5">
-              <DirectoryGroup title={`Serviços em ${city.name}`}>
+              <DirectoryGroup title={`Serviços ${cityPrep(city.name)} ${city.name}`}>
                 {services.map(svc => <Link key={svc.slug} to={`/${svc.slug}-${city.slug}`}>{svc.name}</Link>)}
               </DirectoryGroup>
-              <DirectoryGroup title={`Freguesias de ${city.name}`} open={search ? true : undefined}>
+              <DirectoryGroup title={`Freguesias ${cityPrepDe(city.name)} ${city.name}`} open={search ? true : undefined}>
                 {freguesias.map(f => <Link key={f.slug} to={`/limpeza-sofas-${city.slug}-${f.slug}`}>{f.name}</Link>)}
               </DirectoryGroup>
             </div>

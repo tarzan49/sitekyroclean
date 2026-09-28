@@ -1,6 +1,6 @@
 import { commercialHeroSubtitle, CHAIR_WATERPROOF_SUBTITLE_KEY } from './commercialHeroCopy';
 import { getLandingTrustPoints } from '../constants/serviceTrustPool';
-import { cities, services, cityPrep, getCityLinksForService, getLocationServiceData } from './locationSeoData';
+import { cities, services, cityPrep, cityPrepDe, getCityLinksForService, getLocationServiceData } from './locationSeoData';
 import { municipiosComFreguesias, getFreguesia, generateFreguesiaContent } from './freguesiaSeoData';
 import { getLocalData } from './freguesiaContentEngine';
 import { getPricePageData } from './priceSeoData';
@@ -203,7 +203,7 @@ export function getLandingPageModel(pathname: string) {
   if (family !== 'freguesia') directory.push({ title: family === 'preco' ? 'Preços noutras cidades' : 'Também disponível em', links: coverageCityLinks(serviceSlug, municipalityName, variantKey, family === 'localidade' ? 6 : 8).map(item => ({ label: item.name, href: variantKey ? `/${variantKey}-${serviceKey}-${cities.find(city => city.name === item.name)!.slug}` : family === 'preco' ? `/preco-${item.path.slice(1)}` : item.path })) });
   if (family === 'freguesia' || family === 'localidade') {
     const relatedProblems = getAllProblems().filter(problem => problem.visible && problem.relatedServices.includes(serviceSlug!) && (METRO_CITIES.has(municipalitySlug) || problem.relatedCities.includes(municipalitySlug))).slice(0, 5);
-    if (relatedProblems.length) directory.push({ title: `Problemas que resolvemos em ${municipalityName}`, links: relatedProblems.map(problem => ({ label: problem.keyword, href: `/${problem.slug}-${municipalitySlug}` })) });
+    if (relatedProblems.length) directory.push({ title: `Problemas que resolvemos ${cityPrep(municipalityName)} ${municipalityName}`, links: relatedProblems.map(problem => ({ label: problem.keyword, href: `/${problem.slug}-${municipalitySlug}` })) });
   }
   if (family === 'localidade') {
     const materials = getMaterialsByService(serviceSlug);
@@ -216,7 +216,7 @@ export function getLandingPageModel(pathname: string) {
       directory.push({ title: 'Por marca', links: brands.map(brand => ({ label: BRAND_NAMES.get(brand) ?? brand.replace(/-/g, ' '), href: `/${prefix}-${brand}-${municipalitySlug}` })) });
     }
   }
-  if (family !== 'localidade') directory.push({ title: parish ? `Serviço no município de ${municipalityName}` : 'Página do serviço', links: [{ label: `${service.name} ${cityPrep(municipalityName)} ${municipalityName}`, href: `/${serviceSlug}-${municipalitySlug}` }, ...(family === 'variante' && parish ? [{ label: `${service.name} ${prep} ${locationName}`, href: `/${serviceSlug}-${locationPart}` }] : [])] });
+  if (family !== 'localidade') directory.push({ title: parish ? `Serviço no município ${cityPrepDe(municipalityName)} ${municipalityName}` : 'Página do serviço', links: [{ label: `${service.name} ${cityPrep(municipalityName)} ${municipalityName}`, href: `/${serviceSlug}-${municipalitySlug}` }, ...(family === 'variante' && parish ? [{ label: `${service.name} ${prep} ${locationName}`, href: `/${serviceSlug}-${locationPart}` }] : [])] });
   return {
     path, family, serviceSlug, serviceKey, serviceLabel, municipalitySlug, municipalityName, locationName, prep,
     // Campos que os heroes das quatro familias liam do catalogo da sua

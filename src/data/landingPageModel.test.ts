@@ -5,6 +5,7 @@ import { getLandingPageModel } from './landingPageModel';
 import { LANDING_SECTION_ORDER } from './landingServiceCopy';
 import { PROBLEM_IMAGES } from '../constants/problemCardHelpers';
 import { locationPrices } from '../constants/travel';
+import { cities, cityPrep } from './serviceCatalog';
 
 describe('shared landing composition', () => {
   it('covers all four families with the right service, four problems and the original four FAQs', () => {
@@ -44,5 +45,24 @@ describe('shared landing composition', () => {
     expect(getLandingPageModel('/higienizacao-sofa-porto-paranhos?ads=1')).toEqual(getLandingPageModel('/higienizacao-sofa-porto-paranhos'));
     expect(getLandingPageModel('/preco-limpeza-alcatifas-lisboa')!.problems).not.toEqual(getLandingPageModel('/preco-limpeza-tapetes-lisboa')!.problems);
     expect(getLandingPageModel('/impermeabilizacao-cadeiras-porto')!.priceHeading).toContain('impermeabilizar cadeiras');
+  });
+  it('names the municipality with its article: na Maia, do Porto, never em Maia or de Porto', () => {
+    const withArticle: string[] = cities.filter(city => cityPrep(city.name) !== 'em').map(city => city.name);
+    const wrong = new RegExp(`(?:^|\\s)(?:em|de) (?:${withArticle.join('|')})(?![\\wÀ-ÿ])`);
+    const records = getLandingFaqRoutes().filter(record => withArticle.includes(record.context.municipality));
+    expect(records.length).toBeGreaterThan(1000);
+    for (const record of records) {
+      const model = getLandingPageModel(record.path)!;
+      // Numa freguesia, o nome da freguesia leva "em" de propósito (pode
+      // começar pelo do concelho, "Seixal, Arrentela e..."): conferem-se só
+      // as frases sobre o concelho. Numa cidade, confere-se tudo.
+      const texts = model.parishSlug
+        ? model.directory.map(group => group.title).filter(title => /^(Problemas que resolvemos|Serviço no município)/.test(title))
+        : [model.title, model.metaDescription, model.h1, model.priceHeading, ...model.directory.map(group => group.title)];
+      for (const text of texts) expect(text, record.path).not.toMatch(wrong);
+    }
+    const freguesia = getLandingPageModel('/limpeza-sofas-porto-paranhos')!;
+    expect(freguesia.directory.map(group => group.title)).toEqual(expect.arrayContaining(['Problemas que resolvemos no Porto', 'Serviço no município do Porto']));
+    expect(getLandingPageModel('/limpeza-sofas-maia')!.h1).toContain('na Maia');
   });
 });

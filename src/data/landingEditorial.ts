@@ -1,6 +1,6 @@
 import type { LandingFaqContext, LandingService } from './landingFaqPool';
 import { EXTENDED_TRIP_CITIES } from '../constants/travel';
-import { cityPrep } from './serviceCatalog';
+import { cityPrep, cityPrepDe } from './serviceCatalog';
 
 interface EditorialContext {
   family: LandingFaqContext['family'];
@@ -34,7 +34,7 @@ export function getLandingEditorial(context: EditorialContext) {
   if (family === 'preco') {
     intro = `${serviceLabel} ${where}: ${quoteOnly ? 'serviço sob orçamento' : 'estimativa conforme os artigos e as opções escolhidas'}. ${brief.budget}`;
   } else if (family === 'freguesia') {
-    intro = `${serviceLabel} em ${place}, município de ${municipality}, com ${brief.assessment}. ${brief.request}`;
+    intro = `${serviceLabel} em ${place}, município ${cityPrepDe(municipality)} ${municipality}, com ${brief.assessment}. ${brief.request}`;
   } else if (family === 'variante') {
     intro = `${serviceLabel} ${where}, com o procedimento definido pelo material e pelo estado da peça. ${brief.request}`;
   } else {

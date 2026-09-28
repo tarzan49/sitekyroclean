@@ -33,7 +33,7 @@ describe('landing editorial descriptions', () => {
   });
   it('does not fabricate municipal facts to create local variation', () => {
     const base = { serviceSlug: 'limpeza-colchoes', serviceLabel: 'Limpeza de Colchões', family: 'freguesia', municipality: 'Porto' } as const;
-    expect(getLandingEditorial({ ...base, place: 'Paranhos' }).intro).toContain('município de Porto');
+    expect(getLandingEditorial({ ...base, place: 'Paranhos' }).intro).toContain('em Paranhos, município do Porto');
     expect(getLandingEditorial({ ...base, place: 'Ramalde' }).intro).not.toMatch(/habitantes|edifícios|humidade|turismo|já confiam/);
   });
   it('uses the same preposition as the h1 for every city, not only Porto', () => {
