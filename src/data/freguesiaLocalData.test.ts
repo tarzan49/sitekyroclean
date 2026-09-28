@@ -8,7 +8,7 @@ import { getLocalData } from './freguesiaContentEngine';
 // e Lisboa (dono, 2026-09-28: "tão bom como o do Porto e de Lisboa"), e o
 // Norte Litoral (dono, mesmo dia).
 const FULL_COVERAGE = [
-  'Coimbra', 'Figueira da Foz', 'Braga', 'Guimarães', 'Barcelos',
+  'Coimbra', 'Figueira da Foz', 'Braga', 'Guimarães', 'Barcelos', 'Vila Nova de Famalicão',
   // Norte Litoral (2026-09-28)
   'Viana do Castelo', 'Esposende', 'Póvoa de Varzim', 'Vila do Conde', 'Espinho', 'Ovar',
   ...cities.filter(city => city.area === 'algarve').map(city => city.name),
