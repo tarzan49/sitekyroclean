@@ -76,10 +76,9 @@ describe('preços de partida lidos do motor', () => {
 });
 
 describe('texto que cita estes preços', () => {
-  it('o hero da impermeabilização anuncia o pack ao preço que o quiz cobra', () => {
+  it('o hero da impermeabilização não fala do preço com limpeza (dono, 28/09/2026)', () => {
     const subtitle = commercialHeroSubtitle('impermeabilizacao');
-    expect(subtitle).toContain(`${formatEuro(SOFA_CLEAN_AND_PROTECT_FROM)} com limpeza`);
-    expect(subtitle).not.toContain(`${sofa1.bothPrice}€ com limpeza`);
+    expect(subtitle).not.toContain('com limpeza');
   });
 
   it('a página de impermeabilização do sofá já não diz 99€ para o pack', () => {

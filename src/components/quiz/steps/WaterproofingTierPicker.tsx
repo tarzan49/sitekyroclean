@@ -3,7 +3,7 @@ import { Check, ShieldCheck, Droplets } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { QuizFormData } from '@/components/quiz/QuizTypes';
 
-// Escolha Essencial (água) vs Premium (diluente), só aparece quando o serviceType
+// Escolha Essencial (água) vs Premium (solvente), só aparece quando o serviceType
 // é 'waterproofing' standalone — o Pack (both) fica sempre Essencial, não há preço
 // de combo definido para Premium+limpeza.
 //

@@ -634,9 +634,9 @@ function content_impermeabilizacao_sofa(loc: string, ctx: string): ContentBlock 
       `Proteger o sofá em ${loc} contra líquidos, manchas e gordura não precisa de alterar o toque nem o aspeto do tecido. A Kyro Clean Solutions aplica tratamento certificado, em duas versões (Essencial e Premium), em ${loc}, ${ctx}.`,
     ] as const, seed),
     whatIs: pick([
-      `Este tratamento cria uma barreira invisível no tecido do sofá: a próxima vez que cair café, vinho ou sumo, o líquido fica à superfície e limpa-se com um pano, sem mancha, sem stress. O toque e o aspeto do sofá ficam exactamente iguais. A versão Essencial (à base de água) protege por 1 a 2 anos, e a versão Premium (à base de diluente, mais resistente ao desgaste) protege até 10 anos em ${loc}.`,
-      `Depois deste tratamento, café, vinho ou sumo entornado no sofá fica à superfície em vez de se infiltrar no tecido — limpa-se com um pano, sem mancha, sem stress. O toque e o aspeto do sofá ficam exactamente iguais. A versão Essencial (à base de água) protege por 1 a 2 anos, e a Premium (à base de diluente, mais resistente ao desgaste) protege até 10 anos em ${loc}.`,
-      `Um derrame de café, vinho ou sumo deixa de ser motivo de stress depois deste tratamento: o líquido fica à superfície do tecido e limpa-se com um pano, sem mancha. O toque e o aspeto do sofá mantêm-se exactamente iguais. A versão Essencial (à base de água) protege por 1 a 2 anos; a Premium (à base de diluente, mais resistente ao desgaste) protege até 10 anos em ${loc}.`,
+      `Este tratamento cria uma barreira invisível no tecido do sofá: a próxima vez que cair café, vinho ou sumo, o líquido fica à superfície e limpa-se com um pano, sem mancha, sem stress. O toque e o aspeto do sofá ficam exactamente iguais. A versão Essencial (à base de água) protege por 1 a 2 anos, e a versão Premium (à base de solvente, mais resistente ao desgaste) protege até 10 anos em ${loc}.`,
+      `Depois deste tratamento, café, vinho ou sumo entornado no sofá fica à superfície em vez de se infiltrar no tecido — limpa-se com um pano, sem mancha, sem stress. O toque e o aspeto do sofá ficam exactamente iguais. A versão Essencial (à base de água) protege por 1 a 2 anos, e a Premium (à base de solvente, mais resistente ao desgaste) protege até 10 anos em ${loc}.`,
+      `Um derrame de café, vinho ou sumo deixa de ser motivo de stress depois deste tratamento: o líquido fica à superfície do tecido e limpa-se com um pano, sem mancha. O toque e o aspeto do sofá mantêm-se exactamente iguais. A versão Essencial (à base de água) protege por 1 a 2 anos; a Premium (à base de solvente, mais resistente ao desgaste) protege até 10 anos em ${loc}.`,
     ] as const, seed2),
     benefits: pick([
       [
@@ -659,7 +659,7 @@ function content_impermeabilizacao_sofa(loc: string, ctx: string): ContentBlock 
     processSteps: [
       { step: 1, title: 'Avaliação do tecido', description: `Inspecção do tipo de fibra e estado do sofá em ${loc} para confirmar compatibilidade.` },
       { step: 2, title: 'Limpeza prévia', description: 'O sofá deve estar limpo antes da aplicação. Recomendamos limpeza prévia para resultado ideal.' },
-      { step: 3, title: 'Escolha da versão e aplicação', description: 'Essencial (à base de água) ou Premium (à base de diluente), aplicada uniformemente em todo o tecido.' },
+      { step: 3, title: 'Escolha da versão e aplicação', description: 'Essencial (à base de água) ou Premium (à base de solvente), aplicada uniformemente em todo o tecido.' },
       { step: 4, title: 'Secagem e ativação', description: 'A barreira ativa-se na secagem: sofá pronto a usar em 3 a 6 horas.' },
     ],
     problems: pick([
@@ -694,9 +694,9 @@ function content_impermeabilizacao_cadeiras(loc: string, ctx: string): ContentBl
       `Cadeiras estofadas em ${loc} sujeitas a derramamentos, gordura e uso intensivo mantêm o aspeto cuidado por muito mais tempo com impermeabilização. A Kyro Clean Solutions aplica ao domicílio em ${loc}, ${ctx}, com versão Essencial e versão Premium.`,
     ] as const, seed),
     whatIs: pick([
-      `Uma aplicação cria uma barreira transparente nas fibras das cadeiras que repele líquidos e gordura. A limpeza do dia a dia fica reduzida a uma passagem de pano húmido. A versão Essencial (à base de água) mantém o aspeto cuidado por 1 a 2 anos, e a versão Premium (à base de diluente, mais resistente ao desgaste) por até 10 anos. Aplicamos ao domicílio em ${loc}, de 2 cadeiras a centenas.`,
-      `Depois de uma aplicação, as fibras das cadeiras ganham uma barreira transparente que repele líquidos e gordura, reduzindo a limpeza do dia a dia a uma passagem de pano húmido. A versão Essencial (à base de água) mantém o aspeto cuidado por 1 a 2 anos, a Premium (à base de diluente, mais resistente ao desgaste) por até 10 anos. Aplicamos ao domicílio em ${loc}, de 2 cadeiras a centenas.`,
-      `Líquidos e gordura deixam de penetrar nas fibras das cadeiras depois desta aplicação, que cria uma barreira transparente e reduz a limpeza do dia a dia a uma passagem de pano húmido. A Essencial (à base de água) protege por 1 a 2 anos, a Premium (à base de diluente, mais resistente ao desgaste) por até 10 anos. Aplicamos ao domicílio em ${loc}, de 2 cadeiras a centenas.`,
+      `Uma aplicação cria uma barreira transparente nas fibras das cadeiras que repele líquidos e gordura. A limpeza do dia a dia fica reduzida a uma passagem de pano húmido. A versão Essencial (à base de água) mantém o aspeto cuidado por 1 a 2 anos, e a versão Premium (à base de solvente, mais resistente ao desgaste) por até 10 anos. Aplicamos ao domicílio em ${loc}, de 2 cadeiras a centenas.`,
+      `Depois de uma aplicação, as fibras das cadeiras ganham uma barreira transparente que repele líquidos e gordura, reduzindo a limpeza do dia a dia a uma passagem de pano húmido. A versão Essencial (à base de água) mantém o aspeto cuidado por 1 a 2 anos, a Premium (à base de solvente, mais resistente ao desgaste) por até 10 anos. Aplicamos ao domicílio em ${loc}, de 2 cadeiras a centenas.`,
+      `Líquidos e gordura deixam de penetrar nas fibras das cadeiras depois desta aplicação, que cria uma barreira transparente e reduz a limpeza do dia a dia a uma passagem de pano húmido. A Essencial (à base de água) protege por 1 a 2 anos, a Premium (à base de solvente, mais resistente ao desgaste) por até 10 anos. Aplicamos ao domicílio em ${loc}, de 2 cadeiras a centenas.`,
     ] as const, seed2),
     benefits: pick([
       [

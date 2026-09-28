@@ -3,7 +3,7 @@ export interface QuizFormData {
   serviceType: 'cleaning' | 'waterproofing' | 'both' | '';
   // Só relevante quando serviceType === 'waterproofing' e o serviço é sofá/cadeiras.
   // "essencial" = à base de água (produto atual, aguenta ~2 lavagens). "premium" =
-  // à base de diluente (novo, 2026-08-30, dura até 10 anos/5 lavagens, preço mais alto).
+  // à base de solvente (novo, 2026-08-30, dura até 10 anos/5 lavagens, preço mais alto).
   waterproofingTier: 'essencial' | 'premium';
   sofaSize: string;
   // Tratamento dos sofás quando a limpeza é o serviço principal: as unidades
@@ -68,7 +68,7 @@ export interface PriceOption {
   waterproofingPrice: number | string;
   bothPrice: number | string;
   originalBothPrice?: number | string;
-  // Impermeabilização Premium (à base de diluente), só existe para sofá por agora
+  // Impermeabilização Premium (à base de solvente), só existe para sofá por agora
   // (adicionado 2026-08-30). "both" (Pack Proteção Total) continua sempre Essencial,
   // não há combo Premium+limpeza com desconto definido.
   waterproofingPremiumPrice?: number | string;

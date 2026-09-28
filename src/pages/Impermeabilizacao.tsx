@@ -42,7 +42,7 @@ const impermeabilizacaoGuarantee: GuaranteeItem[] = [
 const expertTips: ExpertTip[] = [
   {
     title: "Essencial ou Premium: como funciona a impermeabilização",
-    summary: "A barreira invisível repele líquidos sem alterar o toque ou a aparência do tecido. A versão Premium, à base de diluente, é mais resistente ao desgaste e dura mais tempo do que a Essencial.",
+    summary: "A barreira invisível repele líquidos sem alterar o toque ou a aparência do tecido. A versão Premium, à base de solvente, é mais resistente ao desgaste e dura mais tempo do que a Essencial.",
     url: "/blog/impermeabilizacao-sofa-vale-pena",
   },
   {
@@ -86,7 +86,7 @@ const waterproofingTiers: WaterproofingTier[] = [
   {
     icon: FlaskConical,
     name: "Premium",
-    base: "À base de diluente",
+    base: "À base de solvente",
     sofaPrice: sofaTierPrices('waterproofingPremiumPrice'),
     chairPrice: `${formatEuro(CHAIR_WATERPROOF_PREMIUM)}/un`,
     washes: "Aguenta até 5 lavagens",
@@ -133,7 +133,7 @@ const WaterproofingTierComparison = () => (
             className="relative flex flex-col overflow-hidden"
             style={
               tier.highlighted
-                ? { background: "#071a12", boxShadow: "0 12px 50px rgba(7,26,18,0.18)" }
+                ? { background: "var(--kyro-surface)", boxShadow: "0 12px 50px rgba(16,43,35,0.18)" }
                 : { background: "#FDFDF9", border: "1px solid rgba(17,17,17,0.10)" }
             }
           >

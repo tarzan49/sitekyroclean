@@ -181,7 +181,7 @@ function generateImpermeabilizacaoContent(city: string, cityDesc: string): Omit<
     h1: `Impermeabilização de Estofos ${prep} ${city}`,
     intro: `Proteja os seus estofos contra manchas e líquidos ${prep} ${city}. A Kyro Clean Solutions aplica impermeabilização profissional invisível que cria uma barreira protetora nos tecidos, repelindo líquidos e facilitando a limpeza. Duas versões disponíveis, Essencial e Premium, ${prep} ${city}, ${cityDesc}.`,
     problems: WATERPROOFING_PROBLEMS,
-    howItWorks: `Processo de impermeabilização ${prep} ${city}: 1) Limpeza prévia dos estofos (se necessário), 2) Escolha entre a versão Essencial (à base de água) ou Premium (à base de diluente), 3) Aplicação uniforme do produto, 4) Secagem e teste de repelência.`,
+    howItWorks: `Processo de impermeabilização ${prep} ${city}: 1) Limpeza prévia dos estofos (se necessário), 2) Escolha entre a versão Essencial (à base de água) ou Premium (à base de solvente), 3) Aplicação uniforme do produto, 4) Secagem e teste de repelência.`,
     benefits: [
       "Barreira protetora invisível que não altera a cor nem a textura do tecido",
       "Proteção contra manchas de vinho, café, gordura e urina de animais",

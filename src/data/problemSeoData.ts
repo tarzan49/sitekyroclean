@@ -600,7 +600,7 @@ const problemDefinitions: ProblemPage[] = [
     h1: "Impermeabilização Profissional de Sofás",
     intro: "Proteja o seu sofá contra manchas e líquidos com impermeabilização profissional. A Kyro Clean Solutions aplica uma barreira protetora invisível que repele líquidos e facilita a limpeza, em duas versões: Essencial e Premium.",
     problemDetail: "Sem impermeabilização, qualquer derrame penetra rapidamente no tecido do sofá, causando manchas difíceis de remover. Famílias com crianças e animais de estimação sofrem especialmente com derrames constantes. A impermeabilização é o investimento mais eficaz para preservar o sofá, e a versão Premium é a mais indicada para uso intenso.",
-    solutionDetail: "Aplicamos um produto impermeabilizante profissional que cria uma barreira molecular invisível no tecido. A versão Essencial é à base de água e aguenta até 2 lavagens. A versão Premium é à base de diluente, mais resistente ao desgaste, e aguenta até 5 lavagens. Em ambas, os derrames ficam na superfície e podem ser limpos facilmente com um pano.",
+    solutionDetail: "Aplicamos um produto impermeabilizante profissional que cria uma barreira molecular invisível no tecido. A versão Essencial é à base de água e aguenta até 2 lavagens. A versão Premium é à base de solvente, mais resistente ao desgaste, e aguenta até 5 lavagens. Em ambas, os derrames ficam na superfície e podem ser limpos facilmente com um pano.",
     benefits: [
       "Proteção invisível e inodora",
       "Repele líquidos e gorduras",
@@ -612,7 +612,7 @@ const problemDefinitions: ProblemPage[] = [
     faqs: [
       { question: "Quanto custa impermeabilizar o sofá?", answer: `Versão Essencial: ${sofaSizeList('waterproofingPrice')}. Versão Premium: ${sofaSizeList('waterproofingPremiumPrice')}. Limpeza e impermeabilização Essencial na mesma visita começam em ${formatEuro(SOFA_CLEAN_AND_PROTECT_FROM)} para 1 lugar.` },
       { question: "A impermeabilização altera o tecido?", answer: "Não. Em ambas as versões, o produto é completamente invisível e não altera a cor, textura, toque ou respirabilidade do tecido." },
-      { question: "Quanto tempo dura a impermeabilização?", answer: "A Essencial, à base de água, dura 1 a 2 anos consoante o uso e aguenta até 2 lavagens. A Premium, à base de diluente e mais resistente ao desgaste, dura até 10 anos e aguenta até 5 lavagens." },
+      { question: "Quanto tempo dura a impermeabilização?", answer: "A Essencial, à base de água, dura 1 a 2 anos consoante o uso e aguenta até 2 lavagens. A Premium, à base de solvente e mais resistente ao desgaste, dura até 10 anos e aguenta até 5 lavagens." },
     ],
     relatedProblems: ["manchas-sofa", "manchas-vinho-sofa", "manchas-gordura-sofa"],
     relatedServices: ["impermeabilizacao", "limpeza-sofas"],

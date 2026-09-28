@@ -2,18 +2,13 @@ import { services } from './serviceCatalog';
 import { EXTENDED_TRIP_CITIES, locationPrices } from '../constants/travel';
 import { REVIEW_COUNT, REVIEW_RATING } from '../constants/business';
 import { TRAVEL_FEE_MIN } from '../constants/commercialPolicy';
-import { formatEuro, perChairPrice, startingPriceLabel, isPricedPerChair, chairPriceBreakdown, SOFA_WATERPROOF_ESSENCIAL_FROM, SOFA_WATERPROOF_PREMIUM_FROM, SOFA_CLEAN_AND_PROTECT_FROM, CHAIR_WATERPROOF_ESSENCIAL_UNIT, CHAIR_WATERPROOF_PREMIUM_UNIT } from './enginePrices';
+import { formatEuro, perChairPrice, startingPriceLabel, isPricedPerChair, chairPriceBreakdown, SOFA_WATERPROOF_ESSENCIAL_FROM, SOFA_WATERPROOF_PREMIUM_FROM, CHAIR_WATERPROOF_ESSENCIAL_UNIT, CHAIR_WATERPROOF_PREMIUM_UNIT } from './enginePrices';
 
 // Preços da impermeabilização vindos do mesmo motor que o quiz usa, nunca
 // escritos à mão: é a linha que os anúncios de Premium prometem, e o preço na
 // prosa não pode divergir do preço que o orçamento apresenta.
 const IMPER_PREMIUM = formatEuro(SOFA_WATERPROOF_PREMIUM_FROM);
 const IMPER_ESSENCIAL = formatEuro(SOFA_WATERPROOF_ESSENCIAL_FROM);
-// Limpeza + Essencial no mesmo sofá e na mesma visita, como o quiz a cobra
-// (`calcPackPricing(...).packPrice`). Estava a ler o `bothPrice` de tabela, que
-// é 10€ acima do que o orçamento apresenta: a página prometia 99€ e o quiz, na
-// mesma página, calculava 89€.
-const IMPER_PACK = formatEuro(SOFA_CLEAN_AND_PROTECT_FROM);
 
 /** A chave do subtítulo da impermeabilização de cadeiras, que não é um serviço
  * do catálogo mas tem preços próprios (por cadeira). */
@@ -29,7 +24,8 @@ const subtitles: Record<string, string> = {
   // um anúncio tem de reencontrar aqui a mesma versão e o mesmo preço. A
   // Essencial fica nomeada na mesma linha: continua a existir e continua a ser
   // o preço de partida do serviço, que é o que a linha de preço do hero mostra.
-  impermeabilizacao: `Proteção Premium desde ${IMPER_PREMIUM}: até 10 anos e até 5 lavagens. Essencial desde ${IMPER_ESSENCIAL}, ou ${IMPER_PACK} com limpeza.`,
+  // O "ou 89€ com limpeza" saiu a pedido do dono (28/09/2026).
+  impermeabilizacao: `Proteção Premium desde ${IMPER_PREMIUM}: até 10 anos e até 5 lavagens. Essencial desde ${IMPER_ESSENCIAL}.`,
   // As páginas /impermeabilizacao-cadeiras-* mostravam a linha de cima, com os
   // preços do sofá ("Premium desde 89€"). Nas cadeiras o preço é por cadeira e
   // nunca leva "desde" (pedido do dono, 26/09/2026).
