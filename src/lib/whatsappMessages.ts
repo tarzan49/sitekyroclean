@@ -26,7 +26,7 @@ const SERVICE_MESSAGES: Record<string, { request: string; blank: string; blankWi
   'limpeza-sofas': { request: 'limpar o meu sofá', blank: 'É um sofá de ', blankWithLocality: 'Localidade e nº de lugares do sofá: ' },
   'limpeza-colchoes': { request: 'limpar o meu colchão', blank: 'É um colchão de ', blankWithLocality: 'Localidade e tamanho do colchão (solteiro, casal ou king): ' },
   'limpeza-tapetes': { request: 'limpar os meus tapetes', blank: 'Os tapetes medem mais ou menos ', blankWithLocality: 'Localidade e medidas dos tapetes: ' },
-  'limpeza-cadeiras': { request: 'limpar as minhas cadeiras', blank: 'São ', blankWithLocality: 'Localidade e nº de cadeiras: ' },
+  'limpeza-cadeiras': { request: 'limpar as minhas cadeiras', blank: 'Nº de cadeiras: ', blankWithLocality: 'Localidade e nº de cadeiras: ' },
   'limpeza-alcatifas': { request: 'limpar a minha alcatifa', blank: 'A alcatifa tem mais ou menos ', blankWithLocality: 'Localidade e área da alcatifa (m²): ' },
   'impermeabilizacao': { request: 'impermeabilizar o meu sofá', blank: 'É um sofá de ', blankWithLocality: 'Localidade e nº de lugares do sofá: ' },
 };
