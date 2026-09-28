@@ -367,14 +367,16 @@ gestor da Meta não colar esses parâmetros no anúncio, não há marca.**
 telemóvel, cabeçalho) mandam a mensagem do botão principal da página**, com
 serviço e cidade: antes, a maior parte das mensagens chegava a dizer só
 "limpar os meus estofos" e o dono não sabia se era Lisboa ou Porto, limpeza ou
-impermeabilização. E as páginas de serviço mandam uma mensagem com **uma só linha para
-preencher, a última** ("Nº de lugares: "; na impermeabilização, também se
-quer a limpeza). A localidade só se pede quando a página não diz o sítio, e
-sempre numa visita de anúncio (`askLocalityToo`): os anúncios levam às páginas
-de Porto e Lisboa mas segmentam a região toda, onde a deslocação muda. Pedida pelo dono para poder dar o preço na primeira
-resposta. A linha fica no fim porque o WhatsApp abre com o cursor no fim: a
-versão com três campos a meio do texto durou umas horas. Vive em
-`buildServiceWaMessage`; não voltar a uma frase corrida sem o campo.
+impermeabilização. E as páginas de serviço mandam uma mensagem curta com **uma
+frase por acabar, no fim** ("…limpar o meu sofá em Lisboa.\n\nÉ um sofá de "),
+onde o WhatsApp põe o cursor: acabar uma frase ("3 lugares") custa menos do que
+preencher um campo (dono, 28/09/2026: "psicologicamente mais fácil e que
+converta mais"). Pede só o que o preço exige e não promete nada ao cliente (o
+"Envio a seguir uma foto" saiu: o bot pede a foto depois do preço). **Se a
+página já diz a localidade, diz só "em Lisboa" e não a pede outra vez, nem
+numa visita de anúncio** (dono, mesmo dia; o `askLocalityToo` foi apagado): o
+bot confirma a localidade exata antes da deslocação. Só as páginas sem sítio
+pedem a localidade, com um rótulo. Vive em `buildServiceWaMessage`.
 **Todas as mensagens de WhatsApp para o cliente pedem "o preço e a
 disponibilidade"** (dono, 28/09/2026): o bot de respostas usa essa palavra
 para saber o que responder. A versão "Gostaria de um orçamento para…" não a

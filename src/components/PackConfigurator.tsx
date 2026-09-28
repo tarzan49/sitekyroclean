@@ -141,7 +141,7 @@ export default function PackConfigurator({ initialKinds, initialExtra = 'none', 
   });
 
   const msg = [
-    `Olá! Gostaria de confirmar o preço e a disponibilidade deste pack personalizado em ${city}:`,
+    `Olá! Gostaria de confirmar este pack personalizado em ${city}:`,
     ...prices.lines.map(l => `${l.label}: ${l.amount === null ? 'sob orçamento' : money(l.amount)}${l.perkApplied ? ` (preço de pack, tabela ${money(l.tablePrice ?? 0)})` : ''}${!l.perkApplied && l.perkNote ? ` (preço de pack: ${l.perkNote.toLowerCase()})` : ''}${l.quote && l.amount !== null ? ' + extra sob orçamento' : ''}`),
     `Serviços: ${money(prices.subtotal)}`,
     ...(prices.savings > 0 ? [`Poupança do pack: ${money(prices.savings)}`] : []),
