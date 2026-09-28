@@ -25,6 +25,7 @@ export const COMMERCIAL_CITIES: CommercialCity[] = [
   { name: "Matosinhos", slug: "matosinhos", region: "Porto" },
   { name: "Braga", slug: "braga", region: "Porto" },
   { name: "Guimarães", slug: "guimaraes", region: "Porto" },
+  { name: "Barcelos", slug: "barcelos", region: "Porto" },
   { name: "Maia", slug: "maia", region: "Porto" },
   { name: "Póvoa de Varzim", slug: "povoa-de-varzim", region: "Porto" },
   // Norte Litoral (2026-09-28): hotelaria e restauração de praia
