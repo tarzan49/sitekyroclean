@@ -206,15 +206,20 @@ def tapetes(city):
         # Também sem "recolha": o site diz de propósito que a modalidade (em
         # casa ou recolhido) se confirma no orçamento, e o anúncio não pode
         # prometer o que a página não promete.
+        # v2 (29/09/2026, dono: "o melhor anúncio possível"): ao domicílio
+        # primeiro, recolha só quando é precisa ("às vezes recolha, às vezes
+        # ao domicílio, mas prefiro ao domicílio"). Tapetes nunca levam preço.
         headlines=[f"Limpeza de Tapetes {cidade(city)}", f"Lavagem de Tapetes {cidade(city)}",
-                   *BASE_TITULOS,
-                   "Tapetes com Extração Profunda", "Método Conforme o Tapete",
-                   "Manchas, Pelos e Odores", "Limpeza de Carpetes",
-                   EQUIPA[city], "Envie Foto e Medidas"],
+                   "Tapetes Lavados ao Domicílio", "Recolha e Entrega se Precisar",
+                   "Orçamento por Foto no WhatsApp", "Resposta em 10 Minutos",
+                   "Preço Fechado Antes de Marcar", AVAL_TITULO, RATING_TITULO,
+                   f"{CLIENTES} Clientes Servidos", "Manchas, Pelos e Odores",
+                   "Lã, Persas e Sintéticos", "Extração Profunda da Fibra",
+                   EQUIPA[city], "Garantia de Repetição 48h"],
         descriptions=[
-            "Lavagem profissional de tapetes com extração profunda e método escolhido pelo material.",
+            "Lavagem profissional de tapetes ao domicílio. Recolhemos quando o tapete o exige.",
+            "Envie foto e medidas pelo WhatsApp e receba o preço fechado antes de marcar.",
             DESC_AVAL,
-            "Envie uma foto e as medidas pelo WhatsApp e receba o preço fechado antes de marcar.",
             DESC_GARANTIA],
     )
 
@@ -236,17 +241,19 @@ def colchoes(city):
                   "lavagem de colchão", "desinfeção de colchões", "anti ácaros colchão",
                   "limpeza de colchão de casal", "limpeza de colchão urina"],
         # Sem verbos de eliminar/matar (regra das afirmações absolutas do CLAUDE.md).
+        # v2 (29/09/2026): o que se procura num colchão é urina, suor e ácaros.
         headlines=[f"Limpeza de Colchões {cidade(city)}", "Higienização de Colchões",
-                   f"Colchões Desde {COLCHAO_DESDE}€",
-                   *BASE_TITULOS,
-                   "Secagem Média de 3 a 6 Horas", "Manchas, Urina e Odores",
-                   "Tratamento Anti-Ácaros", EQUIPA[city],
-                   "Limpeza de Colchões em Casa"],
+                   f"Colchões Desde {COLCHAO_DESDE}€", "Manchas de Urina e Suor",
+                   "Tratamento Anti-Ácaros", "Limpeza de Colchões em Casa",
+                   "Secagem Média de 3 a 6 Horas", "Resposta em 10 Minutos",
+                   "Orçamento Grátis no WhatsApp", "Preço Fechado Antes de Marcar",
+                   AVAL_TITULO, RATING_TITULO, f"{CLIENTES} Clientes Servidos",
+                   EQUIPA[city], "Garantia de Repetição 48h"],
         descriptions=[
             "Higienização profissional de colchões ao domicílio. Secagem média de 3 a 6 horas.",
-            DESC_AVAL,
             f"Limpeza de colchão desde {COLCHAO_DESDE}€. Tratamento anti-ácaros acrescentado desde {ANTI_ACAROS_COLCHAO}€.",
-            DESC_GARANTIA],
+            "Manchas de urina, suor e marcas amareladas tratadas no local, sem sair de casa.",
+            DESC_AVAL],
     )
 
 # O carregamento de linhas soltas (sem a linha da campanha) exige o ID da
@@ -304,5 +311,12 @@ with open(os.path.join(ROOT, "docs/google-ads/palavras-extra-tapetes-colchoes.cs
     for r in extra:
         w.writerow({c: r.get(c, "") for c in novas_cols})
 print(f"{len(extra)} palavras-chave novas (segunda ronda)")
+v2 = [r for r in novos if r.get("Ad type")]
+with open(os.path.join(ROOT, "docs/google-ads/anuncios-v2-tapetes-colchoes.csv"), "w", newline="", encoding="utf-8-sig") as f:
+    w = csv.DictWriter(f, fieldnames=novas_cols)
+    w.writeheader()
+    for r in v2:
+        w.writerow({c: r.get(c, "") for c in novas_cols})
+print(f"{len(v2)} anúncios v2")
 print(f"{len(novos)} linhas de tapetes/colchões (grupos em pausa). Colchão desde {COLCHAO_DESDE}€, "
       f"anti-ácaros +{ANTI_ACAROS_COLCHAO}€")
