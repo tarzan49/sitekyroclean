@@ -59,7 +59,7 @@ export default function PackComboPage() {
   const { pack, city } = data;
   const priceFrom = packPriceFrom(pack);
   const travelFee = locationPrices[city.name];
-  const waHref = `${WHATSAPP_BASE}?text=${encodeURIComponent(buildPackWaMessage(pack.name, city.name))}`;
+  const waHref = `${WHATSAPP_BASE}?text=${encodeURIComponent(buildPackWaMessage(pack.id, city.name))}`;
   const packServices = [pack.service1Slug, pack.service2Slug].map(slug => services.find(s => s.slug === slug)).filter(Boolean);
   const reviews = pickReviewSubset(pack.service1Slug, `${pathname}`, 6);
   const faqs = packFaqs(pack, city.name);

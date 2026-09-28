@@ -25,9 +25,10 @@ describe('WhatsApp enquiry context and privacy', () => {
   });
   it('keeps Porto and protection distinct from cleaning', () => {
     const text = buildVariantWaMessage(true, 'Sofá', 'Impermeabilização', 'Porto');
-    expect(text).toContain('impermeabilizar o meu sofá no Porto');
-    expect(text).toContain('avaliarem o tecido');
-    expect(text).not.toMatch(/Lisboa|limpar/);
+    expect(text).toBe('Olá! Gostaria de saber o preço e a disponibilidade para impermeabilizar o meu sofá no Porto.\n\nÉ um sofá de ');
+    expect(buildVariantWaMessage(false, 'Colchão', 'Higienização', 'Braga')).toBe('Olá! Gostaria de saber o preço e a disponibilidade para higienizar o meu colchão em Braga.\n\nÉ um colchão de ');
+    expect(buildVariantWaMessage(false, 'Tapetes', 'Lavagem', 'Porto')).toMatch(/lavar os meus tapetes no Porto\.\n\nOs tapetes medem mais ou menos $/);
+    expect(buildVariantWaMessage(true, 'Cadeiras', 'Impermeabilização', 'Porto')).toMatch(/impermeabilizar as minhas cadeiras no Porto\.\n\nNº de cadeiras: $/);
   });
   it.each(['limpeza-colchoes', 'limpeza-tapetes', 'limpeza-cadeiras', 'limpeza-alcatifas'])('preserves the article for %s', service => {
     const text = buildServiceWaMessage(service, 'Lisboa');

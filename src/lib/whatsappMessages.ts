@@ -34,6 +34,9 @@ const ITEM_BLANKS = {
   puff: { blank: 'O puff mede mais ou menos ', blankWithLocality: 'Localidade e medidas do puff: ' },
   sofasNegocio: { blank: 'Nº de sofás e lugares: ', blankWithLocality: 'Localidade, nº de sofás e lugares: ' },
   estofos: { blank: 'Artigos e quantidade: ', blankWithLocality: 'Localidade, artigos e quantidade: ' },
+  sofaColchao: { blank: 'Lugares do sofá e tamanho do colchão: ', blankWithLocality: 'Localidade, lugares do sofá e tamanho do colchão: ' },
+  salaCompleta: { blank: 'Lugares do sofá, nº de cadeiras e medidas do tapete: ', blankWithLocality: 'Localidade, lugares do sofá, nº de cadeiras e medidas do tapete: ' },
+  quartoCompleto: { blank: 'Tamanho do colchão e medidas do tapete: ', blankWithLocality: 'Localidade, tamanho do colchão e medidas do tapete: ' },
 } as const;
 type ItemKind = keyof typeof ITEM_BLANKS;
 
@@ -171,13 +174,26 @@ export function buildVariantWaMessage(
   locationName: string
 ): string {
   const svc = serviceLabel.toLowerCase();
-  if (isWaterproofing) {
-    const article = svc === 'sofá' || svc === 'sofa' ? 'o meu sofá' : svc === 'cadeiras' ? 'as minhas cadeiras' : 'os meus estofos';
-    return `Olá! Gostaria de saber o preço e a próxima disponibilidade para impermeabilizar ${article} ${cityPrep(locationName)} ${locationName}. Posso enviar fotografias para avaliarem o tecido e confirmarem o orçamento.`;
-  }
-  if (svc === 'sofá' || svc === 'sofa') return buildServiceWaMessage('limpeza-sofas', locationName);
-  const variant = variantLabel.toLowerCase();
-  return buildQuoteWaMessage(`Olá! Gostaria de pedir um orçamento de ${variant} de ${svc} ${cityPrep(locationName)} ${locationName}.`);
+  const items: Record<string, { item: string; kind: ItemKind }> = {
+    'sofá': { item: 'o meu sofá', kind: 'sofa' },
+    'colchão': { item: 'o meu colchão', kind: 'colchao' },
+    'tapetes': { item: 'os meus tapetes', kind: 'tapetes' },
+    'cadeiras': { item: 'as minhas cadeiras', kind: 'cadeiras' },
+    'alcatifas': { item: 'a minha alcatifa', kind: 'alcatifa' },
+  };
+  const found = items[svc === 'sofa' ? 'sofá' : svc] ?? { item: 'os meus estofos', kind: 'estofos' as const };
+  // Waterproofing is sold for sofas and chairs only.
+  const target = isWaterproofing && found.kind !== 'sofa' && found.kind !== 'cadeiras' ? { item: 'os meus estofos', kind: 'estofos' as const } : found;
+  const verb = isWaterproofing ? 'impermeabilizar' : /lavagem/i.test(variantLabel) ? 'lavar' : /higieniza/i.test(variantLabel) ? 'higienizar' : 'limpar';
+  return buildItemWaMessage(`${verb} ${target.item}`, target.kind, locationName);
+}
+
+/** Used on TreatmentPage (anti-ácaros, desbacterização, with or without a city). */
+export function buildTreatmentWaMessage(treatmentSlug: string | undefined, cityName?: string | null): string {
+  const request = treatmentSlug === 'tratamento-anti-acaros' ? 'fazer o tratamento anti-ácaros'
+    : treatmentSlug === 'desbacterizacao' ? 'desbacterizar os meus estofos'
+    : 'limpar os meus estofos';
+  return buildItemWaMessage(request, 'estofos', cityName);
 }
 
 /** Used on CommercialPage (B2B: restaurantes, hotéis, escritórios). */
@@ -193,7 +209,15 @@ export function buildSubmittedWaMessage(reference?: string | null): string {
   return `Olá! Acabei de enviar o pedido${safe ? ` #${safe}` : ''}. Gostaria de confirmar o orçamento e a próxima disponibilidade. Posso enviar fotografias dos artigos para avaliação.`;
 }
 
-/** Páginas pack × cidade: pede orçamento para a combinação, não para um artigo. */
-export function buildPackWaMessage(packName: string, cityName: string): string {
-  return `Olá! Gostaria de saber o preço e a próxima disponibilidade para uma ${packName.toLowerCase()} ${cityPrep(cityName)} ${cityName}. Posso enviar fotografias dos artigos para confirmarem o orçamento.`;
+const PACK_MESSAGES: Record<string, { request: string; kind: ItemKind }> = {
+  'sofa-colchao': { request: 'limpar o meu sofá e o meu colchão', kind: 'sofaColchao' },
+  'sofa-impermeabilizacao': { request: 'limpar e impermeabilizar o meu sofá', kind: 'sofa' },
+  'sala-completa': { request: 'limpar o sofá, as cadeiras e o tapete da sala', kind: 'salaCompleta' },
+  'quarto-completo': { request: 'limpar o meu colchão e o meu tapete', kind: 'quartoCompleto' },
+};
+
+/** Páginas pack × cidade: pede preço para a combinação, não para um artigo. */
+export function buildPackWaMessage(packId: string, cityName: string): string {
+  const pack = PACK_MESSAGES[packId] ?? { request: 'limpar os meus estofos', kind: 'estofos' as const };
+  return buildItemWaMessage(pack.request, pack.kind, cityName);
 }
