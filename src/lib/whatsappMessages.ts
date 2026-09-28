@@ -17,119 +17,150 @@ export function buildGeneralWaMessage(isEn = false): string {
 }
 
 /**
- * What each service asks. `blank` ends in an unfinished sentence ("É um sofá
- * de "): WhatsApp opens with the cursor at the end, and finishing a sentence
- * ("3 lugares") takes less thought than filling in a form label. Pages with no
- * place ask the locality too, and there a label reads better than a sentence.
+ * What the price depends on, per kind of item. `blank` ends in an unfinished
+ * sentence ("É um sofá de "): WhatsApp opens with the cursor at the end, and
+ * finishing a sentence ("3 lugares") takes less thought than filling in a form
+ * label. Pages with no place ask the locality too, and there a label reads
+ * better than a sentence.
  */
-const SERVICE_MESSAGES: Record<string, { request: string; blank: string; blankWithLocality: string }> = {
-  'limpeza-sofas': { request: 'limpar o meu sofá', blank: 'É um sofá de ', blankWithLocality: 'Localidade e nº de lugares do sofá: ' },
-  'limpeza-colchoes': { request: 'limpar o meu colchão', blank: 'É um colchão de ', blankWithLocality: 'Localidade e tamanho do colchão (solteiro, casal ou king): ' },
-  'limpeza-tapetes': { request: 'limpar os meus tapetes', blank: 'Os tapetes medem mais ou menos ', blankWithLocality: 'Localidade e medidas dos tapetes: ' },
-  'limpeza-cadeiras': { request: 'limpar as minhas cadeiras', blank: 'Nº de cadeiras: ', blankWithLocality: 'Localidade e nº de cadeiras: ' },
-  'limpeza-alcatifas': { request: 'limpar a minha alcatifa', blank: 'A alcatifa tem mais ou menos ', blankWithLocality: 'Localidade e área da alcatifa (m²): ' },
-  'impermeabilizacao': { request: 'impermeabilizar o meu sofá', blank: 'É um sofá de ', blankWithLocality: 'Localidade e nº de lugares do sofá: ' },
-};
+const ITEM_BLANKS = {
+  sofa: { blank: 'É um sofá de ', blankWithLocality: 'Localidade e nº de lugares do sofá: ' },
+  colchao: { blank: 'É um colchão de ', blankWithLocality: 'Localidade e tamanho do colchão (solteiro, casal ou king): ' },
+  tapete: { blank: 'O tapete mede mais ou menos ', blankWithLocality: 'Localidade e medidas do tapete: ' },
+  tapetes: { blank: 'Os tapetes medem mais ou menos ', blankWithLocality: 'Localidade e medidas dos tapetes: ' },
+  cadeiras: { blank: 'Nº de cadeiras: ', blankWithLocality: 'Localidade e nº de cadeiras: ' },
+  alcatifa: { blank: 'A alcatifa tem mais ou menos ', blankWithLocality: 'Localidade e área da alcatifa (m²): ' },
+  cabeceira: { blank: 'A cabeceira mede mais ou menos ', blankWithLocality: 'Localidade e largura da cabeceira: ' },
+  puff: { blank: 'O puff mede mais ou menos ', blankWithLocality: 'Localidade e medidas do puff: ' },
+  sofasNegocio: { blank: 'Nº de sofás e lugares: ', blankWithLocality: 'Localidade, nº de sofás e lugares: ' },
+  estofos: { blank: 'Artigos e quantidade: ', blankWithLocality: 'Localidade, artigos e quantidade: ' },
+} as const;
+type ItemKind = keyof typeof ITEM_BLANKS;
 
 /**
- * Shared by service, location, neighbourhood and price landing pages.
- *
- * Built to be the easiest message to send (dono, 28/09/2026: "psicologicamente
- * mais fácil e que converta mais"): a short opening that asks price and
- * availability (the reply bot keys on "disponibilidade"), then one sentence
- * to finish, last, where the cursor already is. It asks only what the price
- * depends on and promises nothing the client has to do later (the old "Envio a
- * seguir uma foto" was dropped: the bot asks for the photo after the quote).
- * A page that names the place says "em Lisboa" and does not ask it again,
- * also on ad visits (dono, 28/09/2026: "se já tiver a localidade diz só em
- * Lisboa"); the bot confirms the exact locality before the travel fee.
- * Sent untouched, it still names service and place.
+ * The one shape every page-specific message has (dono, 28/09/2026:
+ * "psicologicamente mais fácil e que converta mais"): a short opening that asks
+ * price and availability (the reply bot keys on "disponibilidade"), then one
+ * sentence to finish, last, where the cursor already is. It asks only what the
+ * price depends on and promises nothing the client has to do later (the old
+ * "Envio a seguir uma foto" / "Posso enviar fotografias" were dropped: the bot
+ * asks for the photo after the quote). A page that names the place says
+ * "em Lisboa" and does not ask it again, also on ad visits (dono, 28/09/2026:
+ * "se já tiver a localidade diz só em Lisboa"); the bot confirms the exact
+ * locality before the travel fee. Sent untouched, it still names what and where.
  */
+function buildItemWaMessage(request: string, kind: ItemKind, placeName?: string | null): string {
+  const loc = placeName ? ` ${cityPrep(placeName)} ${placeName}` : '';
+  const { blank, blankWithLocality } = ITEM_BLANKS[kind];
+  return `Olá! Gostaria de saber o preço e a disponibilidade para ${request}${loc}.\n\n${placeName ? blank : blankWithLocality}`;
+}
+
+const SERVICE_MESSAGES: Record<string, { request: string; kind: ItemKind }> = {
+  'limpeza-sofas': { request: 'limpar o meu sofá', kind: 'sofa' },
+  'limpeza-colchoes': { request: 'limpar o meu colchão', kind: 'colchao' },
+  'limpeza-tapetes': { request: 'limpar os meus tapetes', kind: 'tapetes' },
+  'limpeza-cadeiras': { request: 'limpar as minhas cadeiras', kind: 'cadeiras' },
+  'limpeza-alcatifas': { request: 'limpar a minha alcatifa', kind: 'alcatifa' },
+  'impermeabilizacao': { request: 'impermeabilizar o meu sofá', kind: 'sofa' },
+};
+
+/** Shared by service, location, neighbourhood and price landing pages. */
 export function buildServiceWaMessage(serviceSlug: string, placeName?: string | null): string {
   const service = SERVICE_MESSAGES[serviceSlug];
   if (!service) return buildGeneralWaMessage();
-  const loc = placeName ? ` ${cityPrep(placeName)} ${placeName}` : '';
-  const blank = placeName ? service.blank : service.blankWithLocality;
-  return `Olá! Gostaria de saber o preço e a disponibilidade para ${service.request}${loc}.\n\n${blank}`;
+  return buildItemWaMessage(service.request, service.kind, placeName);
 }
 
 /** Used on MaterialPage. */
 export function buildMaterialWaMessage(slug: string, cityName: string | null): string {
-  const city = cityName ? ` ${cityPrep(cityName)} ${cityName}` : '';
-  if (slug.includes('pele'))       return buildQuoteWaMessage(`Olá! Tenho um sofá de pele e preciso de limpeza e tratamento${city}.`);
-  if (slug.includes('veludo'))     return buildQuoteWaMessage(`Olá! Tenho um sofá de veludo e preciso de limpeza especializada${city}.`);
-  if (slug.includes('camurca'))    return buildQuoteWaMessage(`Olá! Tenho um sofá de camurça e preciso de limpeza profissional${city}.`);
-  if (slug.includes('microfibra')) return buildQuoteWaMessage(`Olá! Tenho um sofá de microfibra para limpar${city}.`);
-  if (slug.includes('linho'))      return buildQuoteWaMessage(`Olá! Tenho um sofá de linho para limpar${city}.`);
-  if (slug.includes('sintetico') && slug.includes('sofa')) return buildQuoteWaMessage(`Olá! Tenho um sofá sintético para limpar${city}.`);
-  if (slug.includes('sofa'))       return buildQuoteWaMessage(`Olá! Tenho um sofá de tecido e preciso de limpeza profissional${city}.`);
-  if (slug.includes('persa'))      return buildQuoteWaMessage(`Olá! Tenho um tapete persa e preciso de lavagem especializada${city}.`);
+  const m = (request: string, kind: ItemKind) => buildItemWaMessage(request, kind, cityName);
+  if (slug.includes('pele'))       return m('limpar e tratar o meu sofá de pele', 'sofa');
+  if (slug.includes('veludo'))     return m('limpar o meu sofá de veludo', 'sofa');
+  if (slug.includes('camurca'))    return m('limpar o meu sofá de camurça', 'sofa');
+  if (slug.includes('microfibra')) return m('limpar o meu sofá de microfibra', 'sofa');
+  if (slug.includes('linho'))      return m('limpar o meu sofá de linho', 'sofa');
+  if (slug.includes('sintetico') && slug.includes('sofa')) return m('limpar o meu sofá sintético', 'sofa');
+  if (slug.includes('sofa'))       return m('limpar o meu sofá de tecido', 'sofa');
+  if (slug.includes('persa'))      return m('lavar o meu tapete persa', 'tapete');
   if (slug.includes('tapete-la') || (slug.includes('tapete') && slug.includes('-la')))
-                                   return buildQuoteWaMessage(`Olá! Tenho um tapete de lã para lavagem profissional${city}.`);
-  if (slug.includes('sisal'))      return buildQuoteWaMessage(`Olá! Tenho um tapete de sisal para limpar${city}.`);
-  if (slug.includes('tapete'))     return buildQuoteWaMessage(`Olá! Tenho um tapete sintético para limpar${city}.`);
-  return buildQuoteWaMessage(`Olá! Preciso de limpeza profissional${city}.`);
+                                   return m('lavar o meu tapete de lã', 'tapete');
+  if (slug.includes('sisal'))      return m('limpar o meu tapete de sisal', 'tapete');
+  if (slug.includes('tapete'))     return m('limpar o meu tapete sintético', 'tapete');
+  return m('limpar os meus estofos', 'estofos');
 }
 
-/** Used on ProblemPage. */
-export function buildProblemWaMessage(slug: string): string {
-  const s = slug ?? '';
-  if (s.includes('urgente'))
-    return `Olá! Preciso de limpeza urgente. Têm disponibilidade ainda hoje ou amanhã?`;
-  if (s.includes('urina'))
-    return `Olá! Tenho urina no meu ${s.includes('colchao') ? 'colchão' : 'sofá'} e preciso de tratamento urgente. Qual é o preço e a disponibilidade?`;
-  if (s.includes('manchas-vinho'))
-    return `Olá! Tenho uma mancha de vinho no sofá e preciso de ajuda. Qual é o preço e a disponibilidade?`;
-  if (s.includes('manchas-cafe'))
-    return `Olá! Tenho manchas de café no sofá. Podem ajudar? Qual é o preço e a disponibilidade?`;
-  if (s.includes('manchas-gordura'))
-    return `Olá! Tenho manchas de gordura no sofá. Qual é o serviço adequado, o preço e a disponibilidade?`;
-  if (s.includes('manchas-sangue'))
-    return `Olá! Tenho manchas de sangue no colchão e preciso de ajuda urgente. Qual é o preço e a disponibilidade?`;
-  if (s.includes('mancha')) {
-    const item = s.includes('colchao') ? 'colchão' : s.includes('tapete') ? 'tapete' : 'sofá';
-    return `Olá! Tenho manchas no meu ${item} e preciso de remoção profissional. Qual é o preço e a disponibilidade?`;
-  }
-  if (s.includes('cheiro') || s.includes('odor')) {
-    const item = s.includes('colchao') ? 'colchão' : s.includes('tapete') ? 'tapete' : 'sofá';
-    return `Olá! O meu ${item} tem maus cheiros persistentes. Qual é o serviço, o preço e a disponibilidade?`;
-  }
-  if (s.includes('acar')) {
-    const item = s.includes('colchao') ? 'colchão' : 'sofá';
-    return `Olá! Gostaria de conhecer o tratamento anti-ácaros opcional para o meu ${item}. Podem explicar o que inclui e confirmar o preço e a disponibilidade?`;
-  }
-  if (s.includes('alerg')) {
-    const item = s.includes('colchao') ? 'colchão' : 'sofá';
-    return `Olá! Tenho alergias e preciso de higienização profissional do meu ${item}. Qual é o preço e a disponibilidade?`;
-  }
-  if (s.includes('pelos')) {
-    const item = s.includes('tapete') ? 'tapete' : 'sofá';
-    return `Olá! O meu ${item} tem pelos de animais. Qual é o vosso serviço, o preço e a disponibilidade?`;
-  }
-  if (s.includes('mofo') || s.includes('bolor')) {
-    const item = s.includes('alcatifa') ? 'alcatifa' : 'tapete';
-    return `Olá! O meu ${item} tem mofo/bolor. Qual é o serviço, o preço e a disponibilidade para remoção?`;
-  }
-  if (s.includes('impermeabiliz'))
-    return `Olá! Quero impermeabilizar o meu sofá. Qual é o preço e a disponibilidade?`;
-  if (s.includes('pele'))
-    return `Olá! Tenho um sofá de pele que precisa de limpeza e tratamento. Qual é o preço e a disponibilidade?`;
-  if (s.includes('veludo'))
-    return `Olá! Tenho um sofá de veludo que precisa de limpeza profissional. Qual é o preço e a disponibilidade?`;
-  if (s.includes('persa'))
-    return `Olá! Tenho um tapete persa que precisa de lavagem especializada. Qual é o preço e a disponibilidade?`;
-  if (s.includes('tapete-la') || (s.includes('tapete') && s.includes('-la')))
-    return `Olá! Tenho um tapete de lã que precisa de lavagem profissional. Qual é o preço e a disponibilidade?`;
-  if (s.includes('preco') || s.includes('custa') || s.includes('quanto')) {
-    const item = s.includes('colchao') ? 'colchão' : s.includes('tapete') ? 'tapete' : 'sofá';
-    return `Olá! Gostaria de saber o preço de limpeza profissional de ${item}. Podem dar-me um orçamento e a disponibilidade?`;
-  }
-  if (s.includes('cadeira'))
-    return `Olá! Preciso de limpeza profissional de cadeiras. Qual é o preço e a disponibilidade?`;
-  if (s.includes('alcatifa'))
-    return `Olá! Preciso de limpeza profissional de alcatifas. Qual é o preço e a disponibilidade?`;
-  const item = s.includes('colchao') ? 'colchão' : s.includes('tapete') ? 'tapete' : 'sofá';
-  return `Olá! Preciso de limpeza profissional para o meu ${item}. Qual é o preço e quando têm disponibilidade?`;
+/** Used on the brand pages (sofá, colchão and cadeiras). */
+export function buildMarcaWaMessage(item: 'sofa' | 'colchao' | 'cadeiras', marca: string, cityName: string): string {
+  const request = item === 'sofa' ? `limpar o meu sofá ${marca}` : item === 'colchao' ? `limpar o meu colchão ${marca}` : `limpar as minhas cadeiras ${marca}`;
+  return buildItemWaMessage(request, item, cityName);
+}
+
+/**
+ * One request per problem page, written as the client would say it: the
+ * `keyword` is a search phrase ("limpeza sofá alergias") and reads badly after
+ * "para". `problemWaMessages.test.ts` fails if a problem has no entry here.
+ */
+export const PROBLEM_WA_REQUESTS: Record<string, { request: string; kind: ItemKind }> = {
+  'manchas-sofa': { request: 'tirar as manchas do meu sofá', kind: 'sofa' },
+  'manchas-vinho-sofa': { request: 'tirar uma mancha de vinho do meu sofá', kind: 'sofa' },
+  'manchas-cafe-sofa': { request: 'tirar manchas de café do meu sofá', kind: 'sofa' },
+  'manchas-gordura-sofa': { request: 'tirar manchas de gordura do meu sofá', kind: 'sofa' },
+  'manchas-colchao': { request: 'tirar as manchas do meu colchão', kind: 'colchao' },
+  'manchas-tapete': { request: 'tirar as manchas do meu tapete', kind: 'tapete' },
+  'cheiro-sofa': { request: 'tirar o mau cheiro do meu sofá', kind: 'sofa' },
+  'cheiro-urina-sofa': { request: 'tirar o cheiro a urina do meu sofá', kind: 'sofa' },
+  'cheiro-colchao': { request: 'tirar o mau cheiro do meu colchão', kind: 'colchao' },
+  'urina-colchao': { request: 'limpar urina do meu colchão', kind: 'colchao' },
+  'cheiro-tapete': { request: 'tirar o mau cheiro do meu tapete', kind: 'tapete' },
+  'acaros-colchao': { request: 'limpar o meu colchão com tratamento anti-ácaros', kind: 'colchao' },
+  'acaros-sofa': { request: 'limpar o meu sofá com tratamento anti-ácaros', kind: 'sofa' },
+  'alergias-sofa': { request: 'limpar o meu sofá por causa de alergias', kind: 'sofa' },
+  'alergias-colchao': { request: 'limpar o meu colchão por causa de alergias', kind: 'colchao' },
+  'pelos-animais-sofa': { request: 'tirar pelos de animais do meu sofá', kind: 'sofa' },
+  'pelos-animais-tapete': { request: 'tirar pelos de animais do meu tapete', kind: 'tapete' },
+  'tapete-persa': { request: 'lavar o meu tapete persa', kind: 'tapete' },
+  'tapete-la': { request: 'lavar o meu tapete de lã', kind: 'tapete' },
+  'mofo-tapete': { request: 'tirar o mofo do meu tapete', kind: 'tapete' },
+  'mofo-alcatifa': { request: 'tirar o mofo da minha alcatifa', kind: 'alcatifa' },
+  'impermeabilizar-sofa': { request: 'impermeabilizar o meu sofá', kind: 'sofa' },
+  'preco-limpeza-sofa': { request: 'limpar o meu sofá', kind: 'sofa' },
+  'preco-limpeza-colchao': { request: 'limpar o meu colchão', kind: 'colchao' },
+  'preco-limpeza-tapete': { request: 'lavar o meu tapete', kind: 'tapete' },
+  'limpeza-profunda-sofa': { request: 'uma limpeza profunda ao meu sofá', kind: 'sofa' },
+  'limpeza-sofa-domicilio': { request: 'limpar o meu sofá em casa', kind: 'sofa' },
+  'limpeza-sofa-urgente': { request: 'limpar o meu sofá com urgência', kind: 'sofa' },
+  'limpeza-colchao-urgente': { request: 'limpar o meu colchão com urgência', kind: 'colchao' },
+  'empresa-limpeza-estofos': { request: 'limpar os meus estofos', kind: 'estofos' },
+  'limpeza-sofa-profissional': { request: 'limpar o meu sofá', kind: 'sofa' },
+  'limpeza-cadeiras-escritorio': { request: 'limpar cadeiras de escritório', kind: 'cadeiras' },
+  'limpeza-alcatifas-empresa': { request: 'limpar a alcatifa da minha empresa', kind: 'alcatifa' },
+  'manchas-sangue-colchao': { request: 'tirar uma mancha de sangue do meu colchão', kind: 'colchao' },
+  'limpeza-sofa-bebe': { request: 'limpar o meu sofá com produtos seguros para o bebé', kind: 'sofa' },
+  'manchas-tinta-sofa': { request: 'tirar uma mancha de tinta do meu sofá', kind: 'sofa' },
+  'sofa-amarelado': { request: 'limpar o meu sofá, que está amarelado', kind: 'sofa' },
+  'limpeza-cabeceira-cama': { request: 'limpar a cabeceira da minha cama', kind: 'cabeceira' },
+  'limpeza-sofa-chenille': { request: 'limpar o meu sofá de chenille', kind: 'sofa' },
+  'limpeza-puff': { request: 'limpar o meu puff', kind: 'puff' },
+  'manchas-suor-sofa': { request: 'tirar manchas de suor do meu sofá', kind: 'sofa' },
+  'limpeza-colchao-bebe': { request: 'limpar o colchão do meu bebé', kind: 'colchao' },
+  'limpeza-sofa-hotel': { request: 'limpar os sofás do meu hotel', kind: 'sofasNegocio' },
+  'acaros-tapete': { request: 'limpar o meu tapete por causa dos ácaros', kind: 'tapete' },
+  'limpeza-sofa-perto-de-mim': { request: 'limpar o meu sofá', kind: 'sofa' },
+  'limpeza-sofa-antes-depois': { request: 'limpar o meu sofá', kind: 'sofa' },
+  'etiqueta-limpeza-sofa': { request: 'limpar o meu sofá', kind: 'sofa' },
+  'manchas-castanhas-apos-limpeza': { request: 'tirar as manchas castanhas que ficaram no meu sofá depois de o limpar', kind: 'sofa' },
+  'mancha-volta-apos-limpeza': { request: 'tirar uma mancha que volta sempre no meu sofá', kind: 'sofa' },
+  'sofa-demora-secar': { request: 'limpar o meu sofá', kind: 'sofa' },
+  'cheiro-mofo-sofa': { request: 'tirar o cheiro a mofo do meu sofá', kind: 'sofa' },
+  'tapete-encolheu': { request: 'lavar o meu tapete', kind: 'tapete' },
+  'impermeabilizacao-duracao': { request: 'impermeabilizar o meu sofá', kind: 'sofa' },
+  'sofa-couro-ressecado': { request: 'tratar o meu sofá de couro, que está ressecado', kind: 'sofa' },
+};
+
+/** Used by the problem hero (problem hub and problem × city pages). */
+export function buildProblemWaMessage(slug: string, cityName?: string | null): string {
+  const entry = PROBLEM_WA_REQUESTS[slug] ?? { request: 'limpar os meus estofos', kind: 'estofos' as const };
+  return buildItemWaMessage(entry.request, entry.kind, cityName);
 }
 
 /** Used on SofaVariantPage (higienização/lavagem/impermeabilização keyword variants). */

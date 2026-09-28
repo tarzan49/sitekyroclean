@@ -1,4 +1,4 @@
-import { buildQuoteWaMessage } from "@/lib/whatsappMessages";
+import { buildMarcaWaMessage } from "@/lib/whatsappMessages";
 import CommercialHero from "@/components/CommercialHero";
 import DirectoryGroup from "@/components/DirectoryGroup";
 import SofaLeadActions from "@/components/SofaLeadActions";
@@ -131,7 +131,7 @@ const MarcaColchaoPage = () => {
       <Header />
       <main>
 
-        <CommercialHero title={pageCopy.h1} serviceSlug="limpeza-colchoes" city={city.name} price={pageCopy.priceFrom} breadcrumbs={[{ label: "Início", to: "/" }, { label: pageCopy.serviceName, to: pageCopy.serviceBaseRoute }, { label: pageCopy.breadcrumbName }]} image={heroImg} whatsappHref={`${WHATSAPP_BASE}?text=${encodeURIComponent(buildQuoteWaMessage(`Olá! Gostaria de pedir um orçamento para limpeza de colchão ${marca.name} ${prep} ${city.name}.`))}`} source={`marca_hero_${marca.slug}`} />
+        <CommercialHero title={pageCopy.h1} serviceSlug="limpeza-colchoes" city={city.name} price={pageCopy.priceFrom} breadcrumbs={[{ label: "Início", to: "/" }, { label: pageCopy.serviceName, to: pageCopy.serviceBaseRoute }, { label: pageCopy.breadcrumbName }]} image={heroImg} whatsappHref={`${WHATSAPP_BASE}?text=${encodeURIComponent(buildMarcaWaMessage('colchao', marca.name, city.name))}`} source={`marca_hero_${marca.slug}`} />
 
         {/* ═══ ORÇAMENTO (primeira secção a seguir ao hero) ═══ */}
         <ServicePriceSection serviceSlug="limpeza-colchoes" initialLocation={city.name} />

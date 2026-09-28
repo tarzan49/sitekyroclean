@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { getAllProblems, getProblemBySlug } from './problemSeoData';
 import { getProblemHero } from './problemHero';
+import { PROBLEM_WA_REQUESTS } from '../lib/whatsappMessages';
 import { locationPrices } from '../constants/travel';
 import { CHAIR_PRICE_LABEL } from './enginePrices';
 
@@ -13,7 +14,7 @@ describe('problem hero content', () => {
       expect(hero.heading).toBe(`${item.h1} em Lisboa`);
       const url = new URL(hero.waHref);
       expect(url.origin).toBe('https://wa.me');
-      expect(url.searchParams.get('text')).toContain(item.keyword);
+      expect(url.searchParams.get('text')).toContain(PROBLEM_WA_REQUESTS[item.slug].request);
       expect(url.searchParams.get('text')).toContain('em Lisboa');
       expect(hero.intro).not.toMatch(/99%|garantimos|bactérias|benefícios clínicos|—/i);
       expect(hero.response).toContain('menos de 10 minutos');

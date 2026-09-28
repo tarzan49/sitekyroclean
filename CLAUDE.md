@@ -376,7 +376,10 @@ converta mais"). Pede só o que o preço exige e não promete nada ao cliente (o
 página já diz a localidade, diz só "em Lisboa" e não a pede outra vez, nem
 numa visita de anúncio** (dono, mesmo dia; o `askLocalityToo` foi apagado): o
 bot confirma a localidade exata antes da deslocação. Só as páginas sem sítio
-pedem a localidade, com um rótulo. Vive em `buildServiceWaMessage`.
+pedem a localidade, com um rótulo. Vive em `buildItemWaMessage` (`whatsappMessages.ts`), usado pelas páginas de
+serviço, problema, material e marca. **Cada problema tem o seu pedido escrito à mão em `PROBLEM_WA_REQUESTS`**
+(a `keyword` é uma frase de pesquisa e não soa bem numa mensagem): um problema novo precisa de entrada lá,
+e `problemWaMessages.test.ts` rebenta se faltar.
 **Todas as mensagens de WhatsApp para o cliente pedem "o preço e a
 disponibilidade"** (dono, 28/09/2026): o bot de respostas usa essa palavra
 para saber o que responder. A versão "Gostaria de um orçamento para…" não a
