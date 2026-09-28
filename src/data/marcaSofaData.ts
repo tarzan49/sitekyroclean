@@ -47,7 +47,7 @@ export const marcas: MarcaSofa[] = [
       },
       {
         question: "O sofá IKEA precisa de ser desmontado para limpeza?",
-        answer: "Não é necessário. Limpamos o sofá montado, incluindo todas as almofadas, encostos e recantos. O processo completo demora 1-2 horas no domicílio.",
+        answer: "Não é necessário. Limpamos o sofá montado, incluindo todas as almofadas, encostos e recantos. O processo completo demora, em média, cerca de 1 hora no domicílio.",
       },
       {
         question: "A capa removível do sofá IKEA pode ser lavada à parte?",

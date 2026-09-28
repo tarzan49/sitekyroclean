@@ -256,7 +256,7 @@ const howItWorksTemplates: ContentTemplate[] = [
   (f, c, svc) => `Em ${f}, o processo é simples: inspecionamos o estado dos estofos, aplicamos pré-tratamento específico nas manchas, realizamos a extração profissional profunda e garantimos secagem rápida. Tudo na sua casa em ${c}.`,
   (f, c, svc) => `Na sua casa em ${f}, começamos por avaliar o tipo de tecido e o grau de sujidade. Depois, aplicamos o tratamento mais adequado com extração profissional a quente. O resultado é imediato e os estofos ficam prontos em poucas horas.`,
   (f, c, svc) => `O nosso processo de ${svc.toLowerCase()} em ${f} é pensado para minimizar a interrupção da sua rotina. Chegamos, inspecionamos, tratamos e entregamos: tudo num único agendamento, sem necessidade de transportar os seus estofos.`,
-  (f, c, svc) => `Quando visitamos a sua casa em ${f}, ${c}, trazemos todo o equipamento necessário. Não precisa de preparar nada. O processo dura entre 1 a 3 horas e os estofos ficam prontos a usar no mesmo dia.`,
+  (f, c, svc) => `Quando visitamos a sua casa em ${f}, ${c}, trazemos todo o equipamento necessário. Não precisa de preparar nada. O trabalho no local leva, em regra, cerca de 1 hora e os estofos ficam prontos a usar no mesmo dia.`,
 ];
 
 // ─── Meta Description Templates ──────────────────────────────────
