@@ -238,14 +238,20 @@ def colchoes(city):
             DESC_GARANTIA],
     )
 
+# O carregamento de linhas soltas (sem a linha da campanha) exige o ID da
+# campanha: só com o nome, a Google recusa todas ("Valor em falta em ID da
+# campanha", visto a 28/09/2026). IDs da conta 920-786-3494.
+CAMPANHA_ID = {"Porto": "24286916320", "Lisboa": "24275823960"}
+
 novos = []
 for nome, city in CAMPANHAS:
     for g in (tapetes(city), colchoes(city)):
-        novos.append({"Campaign": nome, "Ad Group": g["adgroup"], "Ad Group Status": "Paused", "Max CPC": "1,50"})
+        cid = CAMPANHA_ID[city]
+        novos.append({"Campaign ID": cid, "Campaign": nome, "Ad Group": g["adgroup"], "Ad Group Status": "Paused", "Max CPC": "1,50"})
         for kw in g["keywords"]:
-            novos.append({"Campaign": nome, "Ad Group": g["adgroup"], "Keyword": kw,
+            novos.append({"Campaign ID": cid, "Campaign": nome, "Ad Group": g["adgroup"], "Keyword": kw,
                           "Criterion Type": "Expressão", "Status": "Enabled"})
-        ad = {"Campaign": nome, "Ad Group": g["adgroup"], "Ad type": "Responsive search ad",
+        ad = {"Campaign ID": cid, "Campaign": nome, "Ad Group": g["adgroup"], "Ad type": "Responsive search ad",
               "Final URL": g["url"], "Path 1": g["p1"], "Path 2": g["p2"], "Status": "Enabled"}
         ad.update({f"Headline {i}": h for i, h in enumerate(g["headlines"], 1)})
         ad.update({f"Description {i}": d for i, d in enumerate(g["descriptions"], 1)})
@@ -266,7 +272,7 @@ for r in novos:
 if erros:
     raise SystemExit("acima do limite:\n" + "\n".join(erros))
 
-novas_cols = [c for c in cols if c not in ("Campaign Type", "Campaign Status", "Budget",
+novas_cols = ["Campaign ID"] + [c for c in cols if c not in ("Campaign Type", "Campaign Status", "Budget",
                                            "Bid Strategy Type", "Networks", "Anúncios políticos da UE")]
 destino = os.path.join(ROOT, "docs/google-ads/grupos-tapetes-colchoes.csv")
 with open(destino, "w", newline="", encoding="utf-8-sig") as f:
