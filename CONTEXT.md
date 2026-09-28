@@ -1,7 +1,8 @@
 ## Proposta local de hero com luz (28/09/2026)
 
 `node scripts/preview-hero-light.mjs` abre `http://127.0.0.1:8097/__hero-light`:
-pré-visualização mobile da página real de impermeabilização, com comparação
+pré-visualização mobile das páginas reais, com seletor da homepage, dos seis
+serviços e de exemplos de cidades, e comparação
 Atual/Tecido de luz, pausa e larguras 360/390/430px. O CSS da proposta vive em
 `scripts/hero-light-preview/effect.css` e só é injetado pelo servidor local,
 sem import no site ou no build de produção. Mantém o conteúdo e a galeria
