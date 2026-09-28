@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { cities } from '@/data/serviceCatalog';
-import { isServiceEvent, knownPlacesFrom, localityFromPostalCode, parseServiceEvent, type CalendarEvent } from './calendarServices';
+import { adSourceFromTitle, isServiceEvent, knownPlacesFrom, localityFromPostalCode, parseServiceEvent, type CalendarEvent } from './calendarServices';
 
 // Dados inventados: o repositório é público, nenhum cliente real entra aqui.
 const event = (summary: string, extra: Partial<CalendarEvent> = {}): CalendarEvent => ({
@@ -141,5 +141,22 @@ describe('localityFromPostalCode', () => {
     expect(localityFromPostalCode('8600')).toBe('Algarve');
     expect(localityFromPostalCode('2410')).toBeNull(); // Leiria
     expect(localityFromPostalCode('9000')).toBeNull();
+  });
+});
+
+describe('adSourceFromTitle', () => {
+  it('reads "(anúncio)" as Google Ads and the Meta words as Meta Ads', () => {
+    expect(adSourceFromTitle('Serviço 45€ (89€) (anúncio) Limpeza de sofá - 4400-100 Porto')).toBe('Google Ads');
+    expect(adSourceFromTitle('Serviço 45€ (89€) (Anuncio Google) Limpeza de sofá')).toBe('Google Ads');
+    expect(adSourceFromTitle('Serviço 45€ (89€) (anúncio instagram) Limpeza de sofá')).toBe('Meta Ads');
+    expect(adSourceFromTitle('Serviço 45€ (89€) (anúncio do facebook) Limpeza de sofá')).toBe('Meta Ads');
+    expect(adSourceFromTitle('Serviço 45€ (89€) Limpeza de sofá - 4400-100 Porto')).toBeNull();
+  });
+
+  it('keeps the tag out of the description, the price and the address', () => {
+    expect(parse('Serviço 45€ (89€) (anúncio) Limpeza de sofá - Ana Teste - 4400-100 Porto')).toMatchObject({
+      description: 'Limpeza de sofá', client_name: 'Ana Teste', my_cut: 45, billed_value: 89, locality: 'Porto',
+    });
+    expect(parse('Serviço 45€ (89€) Limpeza de sofá (anúncio) - 4400-100 Porto')).toMatchObject({ description: 'Limpeza de sofá' });
   });
 });

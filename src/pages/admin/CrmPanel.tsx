@@ -30,7 +30,7 @@ interface ServiceRequest {
 }
 
 const LOCALITIES = CRM_LOCALITIES;
-const SOURCES = ["Website", "WhatsApp", "Instagram", "Referência", "Google Calendar", "Outro"];
+const SOURCES = ["Website", "WhatsApp", "Instagram", "Referência", "Google Calendar", "Google Ads", "Meta Ads", "Outro"];
 
 const MONTH_FMT = new Intl.DateTimeFormat("pt-PT", { month: "long", year: "numeric" });
 const money = (n: number) => `${n.toFixed(2).replace(/\.00$/, "")}€`;

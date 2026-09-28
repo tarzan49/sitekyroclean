@@ -164,3 +164,115 @@ with open(destino, "w", newline="", encoding="utf-8-sig") as f:
         w.writerow({c: r.get(c, "") for c in cols})
 print(f"{len(rows)} linhas, tudo dentro dos limites. Factos: {RATING}/{REVIEWS}/{CLIENTES}, "
       f"limpeza {LIMPEZA_1L}€, imper {IMPER_ESSENC}€/{IMPER_PREMIUM}€, pack {PACK_1L}€")
+
+# ---------------------------------------------------------------------------
+# Grupos novos de tapetes e colchões (28/09/2026, dono: "prepara os de tapetes
+# e colchões em pausa"). Vão para um ficheiro à parte e só com linhas de grupo,
+# palavra-chave e anúncio: o CSV de cima traz as campanhas com "Paused" e
+# orçamentos antigos, e carregá-lo outra vez pausava as campanhas no ar.
+# ---------------------------------------------------------------------------
+
+# Colchão: o mais barato da tabela e o anti-ácaros acrescentado (bothPrice - cleaningPrice),
+# os mesmos números que o site mostra (enginePrices.ts).
+COLCHAO_DESDE = le("src/components/quiz/QuizTypes.ts", r"id: 'solteiro',.*?cleaningPrice: (\d+)")
+ANTI_ACAROS_COLCHAO = str(int(le("src/components/quiz/QuizTypes.ts", r"id: 'solteiro',.*?bothPrice: (\d+)"))
+                          - int(COLCHAO_DESDE))
+
+BASE_TITULOS = [AVAL_TITULO, RATING_TITULO, f"{CLIENTES} Clientes Servidos",
+                "Resposta em 10 Minutos", "Orçamento Grátis no WhatsApp",
+                "Preço Fechado Antes de Marcar", "Garantia de Repetição"]
+DESC_AVAL = (f"Avaliação média de {RATING} em mais de {REVIEWS} avaliações e mais de "
+             f"{CLIENTES.lstrip('+')} clientes servidos.")
+DESC_GARANTIA = "Se não ficar satisfeito, avise em 48 horas e repetimos a limpeza sem custos."
+
+def tapetes(city):
+    c = city.lower()
+    return dict(
+        adgroup="Limpeza de Tapetes",
+        url=f"https://cleansolutions.com.pt/limpeza-tapetes-{c}?ads=1",
+        p1="tapetes", p2=c,
+        keywords=[f"limpeza de tapetes {c}", f"lavagem de tapetes {c}", f"lavar tapetes {c}",
+                  f"limpeza de carpetes {c}", "limpeza de tapetes", "lavagem de tapetes",
+                  "limpeza de carpetes", "lavagem de carpetes", "higienização de tapetes",
+                  "limpeza de tapetes ao domicílio", "empresa de limpeza de tapetes",
+                  "lavagem de tapetes preço", "quanto custa lavar um tapete"],
+        # Tapetes são sempre sob orçamento: nenhum título ou descrição leva preço.
+        # Também sem "recolha": o site diz de propósito que a modalidade (em
+        # casa ou recolhido) se confirma no orçamento, e o anúncio não pode
+        # prometer o que a página não promete.
+        headlines=[f"Limpeza de Tapetes {cidade(city)}", f"Lavagem de Tapetes {cidade(city)}",
+                   *BASE_TITULOS,
+                   "Tapetes com Extração Profunda", "Método Conforme o Tapete",
+                   "Manchas, Pelos e Odores", "Limpeza de Carpetes",
+                   EQUIPA[city], "Envie Foto e Medidas"],
+        descriptions=[
+            "Lavagem profissional de tapetes com extração profunda e método escolhido pelo material.",
+            DESC_AVAL,
+            "Envie uma foto e as medidas pelo WhatsApp e receba o preço fechado antes de marcar.",
+            DESC_GARANTIA],
+    )
+
+def colchoes(city):
+    c = city.lower()
+    return dict(
+        adgroup="Limpeza de Colchões",
+        url=f"https://cleansolutions.com.pt/limpeza-colchoes-{c}?ads=1",
+        p1="colchoes", p2=c,
+        keywords=[f"limpeza de colchões {c}", f"limpeza de colchão {c}",
+                  f"higienização de colchões {c}", f"lavagem de colchão {c}",
+                  "limpeza de colchões", "limpeza de colchão", "higienização de colchões",
+                  "higienização de colchão", "lavagem de colchões",
+                  "limpeza de colchões ao domicílio", "limpeza de colchão preço",
+                  "tratamento anti ácaros colchão"],
+        # Sem verbos de eliminar/matar (regra das afirmações absolutas do CLAUDE.md).
+        headlines=[f"Limpeza de Colchões {cidade(city)}", "Higienização de Colchões",
+                   f"Colchões Desde {COLCHAO_DESDE}€",
+                   *BASE_TITULOS,
+                   "Secagem Média de 3 a 6 Horas", "Manchas, Urina e Odores",
+                   "Tratamento Anti-Ácaros", EQUIPA[city],
+                   "Limpeza de Colchões em Casa"],
+        descriptions=[
+            "Higienização profissional de colchões ao domicílio. Secagem média de 3 a 6 horas.",
+            DESC_AVAL,
+            f"Limpeza de colchão desde {COLCHAO_DESDE}€. Tratamento anti-ácaros acrescentado desde {ANTI_ACAROS_COLCHAO}€.",
+            DESC_GARANTIA],
+    )
+
+novos = []
+for nome, city in CAMPANHAS:
+    for g in (tapetes(city), colchoes(city)):
+        novos.append({"Campaign": nome, "Ad Group": g["adgroup"], "Ad Group Status": "Paused", "Max CPC": "1,50"})
+        for kw in g["keywords"]:
+            novos.append({"Campaign": nome, "Ad Group": g["adgroup"], "Keyword": kw,
+                          "Criterion Type": "Expressão", "Status": "Enabled"})
+        ad = {"Campaign": nome, "Ad Group": g["adgroup"], "Ad type": "Responsive search ad",
+              "Final URL": g["url"], "Path 1": g["p1"], "Path 2": g["p2"], "Status": "Enabled"}
+        ad.update({f"Headline {i}": h for i, h in enumerate(g["headlines"], 1)})
+        ad.update({f"Description {i}": d for i, d in enumerate(g["descriptions"], 1)})
+        novos.append(ad)
+
+erros = []
+for r in novos:
+    for i in range(1, 16):
+        v = r.get(f"Headline {i}", "")
+        if len(visivel(v)) > 30: erros.append(f"título {len(visivel(v))}: {v}")
+    if r.get("Ad type") and len([i for i in range(1, 16) if r.get(f"Headline {i}")]) != 15:
+        erros.append(f"{r['Ad Group']}: não tem 15 títulos")
+    for i in range(1, 5):
+        v = r.get(f"Description {i}", "")
+        if len(visivel(v)) > 90: erros.append(f"descrição {len(visivel(v))}: {v}")
+    for p in ("Path 1", "Path 2"):
+        if len(r.get(p, "")) > 15: erros.append(f"caminho: {r[p]}")
+if erros:
+    raise SystemExit("acima do limite:\n" + "\n".join(erros))
+
+novas_cols = [c for c in cols if c not in ("Campaign Type", "Campaign Status", "Budget",
+                                           "Bid Strategy Type", "Networks", "Anúncios políticos da UE")]
+destino = os.path.join(ROOT, "docs/google-ads/grupos-tapetes-colchoes.csv")
+with open(destino, "w", newline="", encoding="utf-8-sig") as f:
+    w = csv.DictWriter(f, fieldnames=novas_cols)
+    w.writeheader()
+    for r in novos:
+        w.writerow({c: r.get(c, "") for c in novas_cols})
+print(f"{len(novos)} linhas de tapetes/colchões (grupos em pausa). Colchão desde {COLCHAO_DESDE}€, "
+      f"anti-ácaros +{ANTI_ACAROS_COLCHAO}€")

@@ -160,3 +160,133 @@ A contagem é feita por esse texto.
 2. Impermeabilização de sofás ao domicílio. Essencial desde 59€, Premium desde 89€.  `(80)`
 3. A Premium protege até 10 anos e resiste a até 5 lavagens. A Essencial, 1 a 2 anos.  `(82)`
 4. Limpeza e proteção na mesma visita, em pack desde 89€. Avaliação média de 4,9.  `(78)`
+
+---
+
+# Grupos novos: tapetes e colchões (preparados a 28/09/2026, em pausa)
+
+Gerados por `gerar-csv.py` para `grupos-tapetes-colchoes.csv`, que só tem linhas de grupo,
+palavra-chave e anúncio (carregar o CSV das campanhas outra vez pausava-as). Os grupos entram
+**em pausa**: só se ligam depois de o dono ver os textos. Tapetes sem preço (sempre sob orçamento)
+e sem prometer recolha, porque o site diz que a modalidade se confirma no orçamento.
+
+## Porto · Limpeza de Tapetes
+
+**Página de destino:** `https://cleansolutions.com.pt/limpeza-tapetes-porto?ads=1`  
+**Palavras-chave (expressão):** limpeza de tapetes porto, lavagem de tapetes porto, lavar tapetes porto, limpeza de carpetes porto, limpeza de tapetes, lavagem de tapetes, limpeza de carpetes, lavagem de carpetes, higienização de tapetes, limpeza de tapetes ao domicílio, empresa de limpeza de tapetes, lavagem de tapetes preço, quanto custa lavar um tapete
+
+**Títulos (15):**
+
+1. Limpeza de Tapetes {LOCATION(City):Porto}  `(24)`
+2. Lavagem de Tapetes {LOCATION(City):Porto}  `(24)`
+3. +125 Avaliações de Clientes  `(27)`
+4. Avaliação Média de 4,9  `(22)`
+5. +1100 Clientes Servidos  `(23)`
+6. Resposta em 10 Minutos  `(22)`
+7. Orçamento Grátis no WhatsApp  `(28)`
+8. Preço Fechado Antes de Marcar  `(29)`
+9. Garantia de Repetição  `(21)`
+10. Tapetes com Extração Profunda  `(29)`
+11. Método Conforme o Tapete  `(24)`
+12. Manchas, Pelos e Odores  `(23)`
+13. Limpeza de Carpetes  `(19)`
+14. Equipa Própria no Norte  `(23)`
+15. Envie Foto e Medidas  `(20)`
+
+**Descrições (4):**
+
+1. Lavagem profissional de tapetes com extração profunda e método escolhido pelo material.  `(87)`
+2. Avaliação média de 4,9 em mais de 125 avaliações e mais de 1100 clientes servidos.  `(82)`
+3. Envie uma foto e as medidas pelo WhatsApp e receba o preço fechado antes de marcar.  `(83)`
+4. Se não ficar satisfeito, avise em 48 horas e repetimos a limpeza sem custos.  `(76)`
+
+## Porto · Limpeza de Colchões
+
+**Página de destino:** `https://cleansolutions.com.pt/limpeza-colchoes-porto?ads=1`  
+**Palavras-chave (expressão):** limpeza de colchões porto, limpeza de colchão porto, higienização de colchões porto, lavagem de colchão porto, limpeza de colchões, limpeza de colchão, higienização de colchões, higienização de colchão, lavagem de colchões, limpeza de colchões ao domicílio, limpeza de colchão preço, tratamento anti ácaros colchão
+
+**Títulos (15):**
+
+1. Limpeza de Colchões {LOCATION(City):Porto}  `(25)`
+2. Higienização de Colchões  `(24)`
+3. Colchões Desde 59€  `(18)`
+4. +125 Avaliações de Clientes  `(27)`
+5. Avaliação Média de 4,9  `(22)`
+6. +1100 Clientes Servidos  `(23)`
+7. Resposta em 10 Minutos  `(22)`
+8. Orçamento Grátis no WhatsApp  `(28)`
+9. Preço Fechado Antes de Marcar  `(29)`
+10. Garantia de Repetição  `(21)`
+11. Secagem Média de 3 a 6 Horas  `(28)`
+12. Manchas, Urina e Odores  `(23)`
+13. Tratamento Anti-Ácaros  `(22)`
+14. Equipa Própria no Norte  `(23)`
+15. Limpeza de Colchões em Casa  `(27)`
+
+**Descrições (4):**
+
+1. Higienização profissional de colchões ao domicílio. Secagem média de 3 a 6 horas.  `(81)`
+2. Avaliação média de 4,9 em mais de 125 avaliações e mais de 1100 clientes servidos.  `(82)`
+3. Limpeza de colchão desde 59€. Tratamento anti-ácaros acrescentado desde 15€.  `(76)`
+4. Se não ficar satisfeito, avise em 48 horas e repetimos a limpeza sem custos.  `(76)`
+
+## Lisboa · Limpeza de Tapetes
+
+**Página de destino:** `https://cleansolutions.com.pt/limpeza-tapetes-lisboa?ads=1`  
+**Palavras-chave (expressão):** limpeza de tapetes lisboa, lavagem de tapetes lisboa, lavar tapetes lisboa, limpeza de carpetes lisboa, limpeza de tapetes, lavagem de tapetes, limpeza de carpetes, lavagem de carpetes, higienização de tapetes, limpeza de tapetes ao domicílio, empresa de limpeza de tapetes, lavagem de tapetes preço, quanto custa lavar um tapete
+
+**Títulos (15):**
+
+1. Limpeza de Tapetes {LOCATION(City):Lisboa}  `(25)`
+2. Lavagem de Tapetes {LOCATION(City):Lisboa}  `(25)`
+3. +125 Avaliações de Clientes  `(27)`
+4. Avaliação Média de 4,9  `(22)`
+5. +1100 Clientes Servidos  `(23)`
+6. Resposta em 10 Minutos  `(22)`
+7. Orçamento Grátis no WhatsApp  `(28)`
+8. Preço Fechado Antes de Marcar  `(29)`
+9. Garantia de Repetição  `(21)`
+10. Tapetes com Extração Profunda  `(29)`
+11. Método Conforme o Tapete  `(24)`
+12. Manchas, Pelos e Odores  `(23)`
+13. Limpeza de Carpetes  `(19)`
+14. Equipa Própria em Lisboa  `(24)`
+15. Envie Foto e Medidas  `(20)`
+
+**Descrições (4):**
+
+1. Lavagem profissional de tapetes com extração profunda e método escolhido pelo material.  `(87)`
+2. Avaliação média de 4,9 em mais de 125 avaliações e mais de 1100 clientes servidos.  `(82)`
+3. Envie uma foto e as medidas pelo WhatsApp e receba o preço fechado antes de marcar.  `(83)`
+4. Se não ficar satisfeito, avise em 48 horas e repetimos a limpeza sem custos.  `(76)`
+
+## Lisboa · Limpeza de Colchões
+
+**Página de destino:** `https://cleansolutions.com.pt/limpeza-colchoes-lisboa?ads=1`  
+**Palavras-chave (expressão):** limpeza de colchões lisboa, limpeza de colchão lisboa, higienização de colchões lisboa, lavagem de colchão lisboa, limpeza de colchões, limpeza de colchão, higienização de colchões, higienização de colchão, lavagem de colchões, limpeza de colchões ao domicílio, limpeza de colchão preço, tratamento anti ácaros colchão
+
+**Títulos (15):**
+
+1. Limpeza de Colchões {LOCATION(City):Lisboa}  `(26)`
+2. Higienização de Colchões  `(24)`
+3. Colchões Desde 59€  `(18)`
+4. +125 Avaliações de Clientes  `(27)`
+5. Avaliação Média de 4,9  `(22)`
+6. +1100 Clientes Servidos  `(23)`
+7. Resposta em 10 Minutos  `(22)`
+8. Orçamento Grátis no WhatsApp  `(28)`
+9. Preço Fechado Antes de Marcar  `(29)`
+10. Garantia de Repetição  `(21)`
+11. Secagem Média de 3 a 6 Horas  `(28)`
+12. Manchas, Urina e Odores  `(23)`
+13. Tratamento Anti-Ácaros  `(22)`
+14. Equipa Própria em Lisboa  `(24)`
+15. Limpeza de Colchões em Casa  `(27)`
+
+**Descrições (4):**
+
+1. Higienização profissional de colchões ao domicílio. Secagem média de 3 a 6 horas.  `(81)`
+2. Avaliação média de 4,9 em mais de 125 avaliações e mais de 1100 clientes servidos.  `(82)`
+3. Limpeza de colchão desde 59€. Tratamento anti-ácaros acrescentado desde 15€.  `(76)`
+4. Se não ficar satisfeito, avise em 48 horas e repetimos a limpeza sem custos.  `(76)`
+

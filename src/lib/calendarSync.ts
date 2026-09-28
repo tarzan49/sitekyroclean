@@ -5,12 +5,14 @@
 // - Evento de serviço novo → linha nova, com a data de fecho = criação do evento.
 // - Evento editado no calendário depois da última sincronização → a linha é
 //   atualizada. Uma edição feita no CRM mantém-se até o evento voltar a ser
-//   editado: ganha a alteração mais recente. O "pago" e a origem nunca são tocados.
+//   editado: ganha a alteração mais recente. O "pago" nunca é tocado, e a
+//   origem só muda entre "Google Calendar" e os anúncios, conforme o título
+//   tenha "(anúncio)" (2026-09-28): uma origem escrita à mão no CRM fica.
 //   Exceção: um cliente vazio no CRM é preenchido se o evento tiver nome.
 // - Evento que desaparece (apagado, cancelado, ou deixou de começar por
 //   "Serviço") → a linha fica marcada, nunca é apagada. Se voltar, desmarca-se.
 import {
-  isServiceEvent, knownPlacesFrom, parseServiceEvent,
+  AD_SOURCES, adSourceFromTitle, isServiceEvent, knownPlacesFrom, parseServiceEvent,
   type CalendarEvent, type CrmLocality, type ParsedService,
 } from './calendarServices';
 
@@ -23,8 +25,12 @@ export const CALENDAR_SYNC_SINCE = '2026-09-26T15:00:00Z';
 /** Aparece na coluna Origem das linhas criadas pela sincronização. */
 export const CALENDAR_SOURCE = 'Google Calendar';
 
+/** Origens que a sincronização escreve, e por isso pode voltar a mudar. */
+const SYNC_SOURCES: ReadonlySet<string> = new Set([CALENDAR_SOURCE, ...Object.values(AD_SOURCES)]);
+
 export interface SyncableRow {
   id: string;
+  source?: string | null;
   client_name?: string | null;
   city: string | null;
   locality: CrmLocality | null;
@@ -44,6 +50,7 @@ export type CalendarInsert = ParsedService & {
 };
 
 export type CalendarPatch = Partial<ParsedService> & {
+  source?: string;
   calendar_updated_at?: string;
   calendar_missing_since?: string | null;
 };
@@ -73,6 +80,7 @@ export function planCalendarSync(
     if (!parsed) continue;
     present.add(event.id);
 
+    const source = adSourceFromTitle(event.summary) ?? CALENDAR_SOURCE;
     const row = byEvent.get(event.id);
     if (!row) {
       plan.inserts.push({
@@ -80,7 +88,7 @@ export function planCalendarSync(
         booked_at: event.created,
         calendar_event_id: event.id,
         calendar_updated_at: event.updated,
-        source: CALENDAR_SOURCE,
+        source,
         paid: false,
       });
       plan.counts.added++;
@@ -94,6 +102,8 @@ export function planCalendarSync(
     }
     if (!(time(row.calendar_updated_at) >= time(event.updated))) {
       Object.assign(patch, parsed, { calendar_updated_at: event.updated });
+      const current = row.source ?? CALENDAR_SOURCE;
+      if (current !== source && SYNC_SOURCES.has(current)) patch.source = source;
       plan.counts.updated++;
     } else if (!row.client_name && parsed.client_name) {
       // Nome que a leitura antiga do evento não apanhou: preenche-se só o que

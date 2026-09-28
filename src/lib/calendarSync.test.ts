@@ -86,4 +86,18 @@ describe('planCalendarSync', () => {
     const { inserts } = plan(rows, [event('e1', { summary: 'Serviço 50€ (100€) Recolha de tapetes Antas' })]);
     expect(inserts[0]).toMatchObject({ locality: 'Porto', needs_review: null });
   });
+
+  it('marks a service from the ads by the "(anúncio)" tag, also when it is added later', () => {
+    const ads = 'Serviço 45€ (89€) (anúncio) Limpeza de sofá - 4400-100 Vila Nova de Gaia';
+    expect(plan([], [event('e1', { summary: ads })]).inserts[0]).toMatchObject({ source: 'Google Ads', description: 'Limpeza de sofá' });
+
+    const linked = { calendar_event_id: 'e1', calendar_updated_at: '2026-09-27T10:00:00+00:00' };
+    const tagged = event('e1', { updated: '2026-09-27T18:00:00Z', summary: ads });
+    expect(plan([row('r1', { ...linked, source: CALENDAR_SOURCE })], [tagged]).updates[0].patch).toMatchObject({ source: 'Google Ads' });
+    // Uma origem escolhida à mão no CRM não é substituída.
+    expect(plan([row('r1', { ...linked, source: 'Referência' })], [tagged]).updates[0].patch).not.toHaveProperty('source');
+    // Tirar a marca volta a pôr a origem do calendário.
+    const untagged = event('e1', { updated: '2026-09-27T18:00:00Z' });
+    expect(plan([row('r1', { ...linked, source: 'Google Ads' })], [untagged]).updates[0].patch).toMatchObject({ source: CALENDAR_SOURCE });
+  });
 });

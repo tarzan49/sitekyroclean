@@ -66,6 +66,26 @@ function toNumber(value: string): number {
 }
 
 /** Um evento é um serviço se começar por "Serviço" ou "Limpeza" e tiver um valor em euros. */
+/**
+ * "(anúncio)" no título marca um cliente que veio dos anúncios (dono,
+ * 2026-09-28): os clientes do Google Ads escrevem "Vi o vosso anúncio no
+ * Google" no WhatsApp, e é assim que o CRM passa a saber quais serviços os
+ * anúncios pagaram. "(anúncio facebook)", "(anúncio instagram)" ou
+ * "(anúncio meta)" são a Meta. Escreve-se antes do primeiro " - ": o resto do
+ * título é a morada que o script das equipas procura no Maps.
+ */
+export const AD_SOURCES = { google: 'Google Ads', meta: 'Meta Ads' } as const;
+export type AdSource = (typeof AD_SOURCES)[keyof typeof AD_SOURCES];
+
+const AD_TAG = /\(\s*an[uú]ncios?(?:\s+(?:d[oa]\s+|no\s+)?(\p{L}+))?\s*\)/iu;
+
+export function adSourceFromTitle(summary: string): AdSource | null {
+  const tag = AD_TAG.exec(clean(summary));
+  if (!tag) return null;
+  const where = normalizeCity(tag[1] ?? '');
+  return /^(facebook|instagram|meta|fb|ig|insta)$/.test(where) ? AD_SOURCES.meta : AD_SOURCES.google;
+}
+
 export function isServiceEvent(summary: string): boolean {
   const text = clean(summary).trim();
   return /^(servico|limpeza)\b/.test(normalizeCity(text.slice(0, 10))) && AMOUNT.test(text);
@@ -276,7 +296,8 @@ export function streetForMap(event: CalendarEvent): string | null {
 }
 
 function readServiceEvent(event: CalendarEvent, known: KnownPlace[] = []): { parsed: ParsedService; street: string | null } | null {
-  const summary = clean(event.summary).trim();
+  // A marca "(anúncio)" é a origem, não faz parte da descrição nem da morada.
+  const summary = clean(event.summary).replace(new RegExp(AD_TAG, 'giu'), ' ').replace(/\s{2,}/g, ' ').trim();
   if (!isServiceEvent(summary)) return null;
   const amount = AMOUNT.exec(summary)!;
   const myCut = toNumber(amount[1]);
