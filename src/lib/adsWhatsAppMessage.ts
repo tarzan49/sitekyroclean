@@ -1,5 +1,6 @@
 /**
- * Marca a mensagem do WhatsApp de quem entrou por um anúncio do Google Ads.
+ * Marca a mensagem do WhatsApp de quem entrou por um anúncio do Google Ads
+ * ou, desde 2026-09-28, da Meta ("Vi o vosso anúncio no Facebook/Instagram").
  *
  * Porquê: 85-90% dos pedidos chegam por WhatsApp e, sem consentimento de
  * cookies, a Google não consegue ligar esse clique ao anúncio (ver
@@ -24,6 +25,8 @@ import { WHATSAPP_BASE } from '@/constants/business';
 import { askLocalityToo, buildGeneralWaMessage } from '@/lib/whatsappMessages';
 
 export const ADS_WHATSAPP_MARK = 'Vi o vosso anúncio no Google';
+export const FACEBOOK_ADS_WHATSAPP_MARK = 'Vi o vosso anúncio no Facebook';
+export const INSTAGRAM_ADS_WHATSAPP_MARK = 'Vi o vosso anúncio no Instagram';
 
 const BUSINESS_WHATSAPP_PATH = new URL(WHATSAPP_BASE).pathname;
 const WHATSAPP_HOSTS = ['wa.me', 'api.whatsapp.com', 'web.whatsapp.com'];
@@ -44,31 +47,59 @@ export function isGoogleAdsVisit(search: string): boolean {
 }
 
 /**
+ * Anúncios da Meta (dono, 2026-09-28: a mesma marca que o Google, para separar
+ * os clientes da Meta dos orgânicos no WhatsApp). Só com os parâmetros de URL
+ * que a campanha leva (`META_URL_PARAMETERS` em `marketingPlatforms.ts`):
+ * `utm_medium=paid_social` com uma origem da Meta, ou os `meta_*_id`. O
+ * `fbclid` sozinho não chega, porque a Meta também o põe nas ligações
+ * partilhadas sem anúncio nenhum. `{{site_source_name}}` dá `ig` no Instagram
+ * e `fb`/`msg`/`an` no resto, que é tudo Facebook para quem recebe a mensagem.
+ */
+export function metaAdsPlatform(search: string): 'facebook' | 'instagram' | null {
+  const params = new URLSearchParams(search);
+  const source = params.get('utm_source')?.toLowerCase() ?? '';
+  const medium = params.get('utm_medium')?.toLowerCase() ?? '';
+  const metaSource = ['fb', 'facebook', 'ig', 'instagram', 'msg', 'an', 'meta'].includes(source);
+  const hasMetaIds = ['meta_ad_id', 'meta_adset_id', 'meta_campaign_id'].some(key => params.has(key));
+  if (!hasMetaIds && !(metaSource && ['paid_social', 'paidsocial', 'paid', 'cpc'].includes(medium))) return null;
+  return source === 'ig' || source === 'instagram' ? 'instagram' : 'facebook';
+}
+
+/** A frase que abre a mensagem nesta visita, ou `null` se não veio de um anúncio. */
+export function adsWhatsAppMark(search: string): string | null {
+  if (isGoogleAdsVisit(search)) return ADS_WHATSAPP_MARK;
+  const meta = metaAdsPlatform(search);
+  if (meta === 'instagram') return INSTAGRAM_ADS_WHATSAPP_MARK;
+  if (meta === 'facebook') return FACEBOOK_ADS_WHATSAPP_MARK;
+  return null;
+}
+
+/**
  * "Olá! Gostaria de saber o preço…" passa a "Olá! Vi o vosso anúncio no Google
  * e gostaria de saber o preço…"; as outras aberturas em português levam a frase
  * à frente. Mensagens noutra língua (as páginas EN, que os anúncios não
  * segmentam) ficam como estão, para não misturar línguas.
  */
-export function markAdsWhatsAppText(original: string): string {
-  if (original.includes(ADS_WHATSAPP_MARK)) return original;
+export function markAdsWhatsAppText(original: string, mark = ADS_WHATSAPP_MARK): string {
+  if (original.includes(mark)) return original;
   const text = askLocalityToo(original);
   // Só o início: o espaço final da mensagem é onde fica o cursor para escrever.
   const trimmed = text.trimStart();
-  if (!trimmed) return `Olá! ${ADS_WHATSAPP_MARK}.`;
+  if (!trimmed) return `Olá! ${mark}.`;
   const greeting = /^Olá[!,.]?\s*/.exec(trimmed);
   if (!greeting) return text;
   const rest = trimmed.slice(greeting[0].length);
-  if (!rest) return `Olá! ${ADS_WHATSAPP_MARK}.`;
-  if (/^Gostaria\b/.test(rest)) return `Olá! ${ADS_WHATSAPP_MARK} e g${rest.slice(1)}`;
-  return `Olá! ${ADS_WHATSAPP_MARK}. ${rest.charAt(0).toUpperCase()}${rest.slice(1)}`;
+  if (!rest) return `Olá! ${mark}.`;
+  if (/^Gostaria\b/.test(rest)) return `Olá! ${mark} e g${rest.slice(1)}`;
+  return `Olá! ${mark}. ${rest.charAt(0).toUpperCase()}${rest.slice(1)}`;
 }
 
 /** Só as ligações para o número da empresa; devolve o `href` intacto nas outras. */
-export function markAdsWhatsAppHref(href: string): string {
+export function markAdsWhatsAppHref(href: string, mark = ADS_WHATSAPP_MARK): string {
   const text = businessWhatsAppText(href);
   if (text === null) return href;
   const url = new URL(href);
-  const marked = markAdsWhatsAppText(text);
+  const marked = markAdsWhatsAppText(text, mark);
   if (marked === text) return href;
   url.searchParams.delete('text');
   const rest = url.searchParams.toString();
@@ -89,11 +120,11 @@ export function markAdsWhatsAppHref(href: string): string {
  * (o hero vem antes de tudo o resto no `<main>`, e o cabeçalho, antes dele, é
  * genérico). Se a página não tiver nenhuma, fica a genérica.
  */
-export function pageWhatsAppText(root: ParentNode = document): string | null {
+export function pageWhatsAppText(root: ParentNode = document, mark = ADS_WHATSAPP_MARK): string | null {
   const general = buildGeneralWaMessage();
   for (const link of root.querySelectorAll<HTMLAnchorElement>('a[href]')) {
     const text = businessWhatsAppText(link.href);
-    if (text && text !== general && text !== markAdsWhatsAppText(general)) return text;
+    if (text && text !== general && text !== markAdsWhatsAppText(general, mark)) return text;
   }
   return null;
 }
@@ -108,12 +139,12 @@ function businessWhatsAppText(href: string): string | null {
 }
 
 /** O `href` com a mensagem genérica trocada pela da página; os outros ficam iguais. */
-export function withPageWhatsAppText(href: string, root: ParentNode = document): string {
+export function withPageWhatsAppText(href: string, root: ParentNode = document, mark = ADS_WHATSAPP_MARK): string {
   const general = buildGeneralWaMessage();
   const current = businessWhatsAppText(href);
   // Também a genérica já marcada: um segundo clique na barra fixa.
-  if (current !== general && current !== markAdsWhatsAppText(general)) return href;
-  const text = pageWhatsAppText(root);
+  if (current !== general && current !== markAdsWhatsAppText(general, mark)) return href;
+  const text = pageWhatsAppText(root, mark);
   if (!text) return href;
   const url = new URL(href);
   url.searchParams.delete('text');
@@ -130,13 +161,14 @@ export function withPageWhatsAppText(href: string, root: ParentNode = document):
  * `initContactTracking`.
  */
 export function initAdsWhatsAppMessage(search = window.location.search): () => void {
-  if (!isGoogleAdsVisit(search)) return () => {};
+  const adMark = adsWhatsAppMark(search);
+  if (!adMark) return () => {};
   const mark = (event: MouseEvent) => {
     if (event.type === 'auxclick' && event.button !== 1) return;
     if (/^\/admin(?:\/|$)/.test(window.location.pathname)) return;
     const link = event.target instanceof Element ? event.target.closest('a[href]') : null;
     if (!(link instanceof HTMLAnchorElement)) return;
-    const marked = markAdsWhatsAppHref(withPageWhatsAppText(link.href));
+    const marked = markAdsWhatsAppHref(withPageWhatsAppText(link.href, document, adMark), adMark);
     if (marked !== link.href) link.href = marked;
   };
   document.addEventListener('click', mark, true);

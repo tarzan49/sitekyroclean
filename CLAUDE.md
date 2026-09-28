@@ -357,6 +357,12 @@ WhatsApp não precisa de fazer nada: herda a marca**, desde que comece por
 "Olá". A deteção é só Google (`gclid`, ou `utm_source=google` pago), não o
 `isAdsVisit`, que aceita qualquer `cpc`: um anúncio da Meta não pode dizer
 "Google". Não usa cookies nem armazenamento, e é assim que tem de ficar.
+**Desde 28/09/2026 os anúncios da Meta também marcam** ("Vi o vosso anúncio no
+Facebook" / "…no Instagram", pelo `utm_source` = `{{site_source_name}}`), no
+mesmo ficheiro (`adsWhatsAppMark`). Só com os parâmetros de URL da campanha
+(`META_URL_PARAMETERS`: `utm_medium=paid_social` ou `meta_*_id`); o `fbclid`
+sozinho não conta, porque a Meta põe-no também em partilhas orgânicas. **Se o
+gestor da Meta não colar esses parâmetros no anúncio, não há marca.**
 **Desde 28/09/2026, numa visita de anúncio os botões genéricos (barra fixa do
 telemóvel, cabeçalho) mandam a mensagem do botão principal da página**, com
 serviço e cidade: antes, a maior parte das mensagens chegava a dizer só

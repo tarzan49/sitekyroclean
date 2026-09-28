@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it } from 'vitest';
 import { WHATSAPP_BASE } from '@/constants/business';
 import { buildGeneralWaMessage, buildServiceWaMessage, buildSubmittedWaMessage } from './whatsappMessages';
-import { ADS_WHATSAPP_MARK, initAdsWhatsAppMessage, pageWhatsAppText, isGoogleAdsVisit, markAdsWhatsAppHref, markAdsWhatsAppText } from './adsWhatsAppMessage';
+import { ADS_WHATSAPP_MARK, FACEBOOK_ADS_WHATSAPP_MARK, INSTAGRAM_ADS_WHATSAPP_MARK, adsWhatsAppMark, initAdsWhatsAppMessage, pageWhatsAppText, isGoogleAdsVisit, markAdsWhatsAppHref, markAdsWhatsAppText } from './adsWhatsAppMessage';
 
 const waHref = (text: string) => `${WHATSAPP_BASE}?text=${encodeURIComponent(text)}`;
 const textOf = (href: string) => new URL(href).searchParams.get('text');
@@ -124,5 +124,41 @@ describe('initAdsWhatsAppMessage', () => {
     cleanup = initAdsWhatsAppMessage('?utm_source=google&utm_medium=organic');
     const href = waHref(buildServiceWaMessage('limpeza-sofas', 'Porto'));
     expect(clickLink(href).href).toBe(href);
+  });
+});
+
+// Os parâmetros de URL da campanha da Meta (`META_URL_PARAMETERS`), já resolvidos.
+const metaEntry = (source: string) => `?utm_source=${source}&utm_medium=paid_social&utm_campaign=Sofas%20Porto&meta_campaign_id=1&meta_adset_id=2&meta_ad_id=3&fbclid=x`;
+
+describe('adsWhatsAppMark (Meta)', () => {
+  it('names Instagram or Facebook from the placement source', () => {
+    expect(adsWhatsAppMark(metaEntry('ig'))).toBe(INSTAGRAM_ADS_WHATSAPP_MARK);
+    for (const source of ['fb', 'msg', 'an']) expect(adsWhatsAppMark(metaEntry(source))).toBe(FACEBOOK_ADS_WHATSAPP_MARK);
+    expect(adsWhatsAppMark('?utm_source=facebook&utm_medium=paid_social')).toBe(FACEBOOK_ADS_WHATSAPP_MARK);
+    expect(adsWhatsAppMark(AD_ENTRY)).toBe(ADS_WHATSAPP_MARK);
+  });
+
+  it('does not mark an organic Facebook share or a Google visit as Meta', () => {
+    expect(adsWhatsAppMark('?fbclid=abc')).toBeNull();
+    expect(adsWhatsAppMark('?utm_source=facebook&utm_medium=social')).toBeNull();
+    expect(adsWhatsAppMark('')).toBeNull();
+  });
+
+  it('marks the page message on a Meta ad visit, with the same rules as Google', () => {
+    const cleanup = initAdsWhatsAppMessage(metaEntry('ig'));
+    try {
+      document.body.innerHTML = `
+        <main><a id="hero" href="${waHref(buildServiceWaMessage('limpeza-sofas', 'Porto'))}">Pedir</a></main>
+        <a id="sticky" href="${waHref(buildGeneralWaMessage())}"><span>WhatsApp</span></a>`;
+      const sticky = document.getElementById('sticky') as HTMLAnchorElement;
+      sticky.querySelector('span')!.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }));
+      const expected = markAdsWhatsAppText(buildServiceWaMessage('limpeza-sofas', 'Porto'), INSTAGRAM_ADS_WHATSAPP_MARK);
+      expect(textOf(sticky.href)).toBe(expected);
+      expect(expected).toMatch(/^Olá! Vi o vosso anúncio no Instagram e gostaria/);
+      expect(expected).not.toContain('Google');
+    } finally {
+      cleanup();
+      document.body.innerHTML = '';
+    }
   });
 });
