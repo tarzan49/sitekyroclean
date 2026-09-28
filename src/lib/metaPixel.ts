@@ -58,10 +58,28 @@ function canSend(): boolean {
     && !/^\/admin(?:\/|$)/.test(window.location.pathname);
 }
 
-/** A click expresses intent, never a conversation or a Lead. */
-export function trackMetaContactClick(action: 'whatsapp_click' | 'call_click'): boolean {
+/**
+ * Clique de telefone: intenção, evento próprio (`PhoneClick`).
+ *
+ * Clique de WhatsApp: além do `WhatsAppClick` (mantido para o histórico), sai
+ * como **`Lead`** (dono, 2026-09-28: "quando a pessoa clica no botão de wpp ela
+ * automaticamente vira lead"). É a mesma decisão já tomada no Google Ads a
+ * 2026-09-24: a maior parte dos pedidos chega pelo WhatsApp e a conversa
+ * acontece fora do site. O `Lead` leva `content_name: 'WhatsApp'` para se poder
+ * separar do `Lead` do formulário (que não tem parâmetros) numa conversão
+ * personalizada. Cada clique real é um `Lead` com `eventID` próprio: dois
+ * cliques são dois eventos, o mesmo clique nunca sai duas vezes (a guarda do
+ * evento está no `contact()` de `quizTracking.ts`).
+ */
+export function trackMetaContactClick(action: 'whatsapp_click' | 'call_click', source?: string): boolean {
   if (!canSend()) return false;
-  window.fbq!('trackCustom', action === 'whatsapp_click' ? 'WhatsAppClick' : 'PhoneClick');
+  if (action === 'call_click') {
+    window.fbq!('trackCustom', 'PhoneClick');
+    return true;
+  }
+  window.fbq!('trackCustom', 'WhatsAppClick');
+  const id = `wa:${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
+  window.fbq!('track', 'Lead', { content_name: 'WhatsApp', content_category: source ?? 'unknown' }, { eventID: id });
   return true;
 }
 

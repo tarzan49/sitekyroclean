@@ -344,6 +344,8 @@ as pessoas mais clicam e o lead já chega aquecido. Não sugerir passá-lo a
 secundário. No painel interno continua separado dos leads. **Nunca importar o
 mesmo lead do GA4 e da tag nativa como duas conversões principais.**
 
+**Meta: clique no WhatsApp = `Lead` (dono, 2026-09-28).** Cada clique sai como `track Lead` com `content_name: 'WhatsApp'` (o do formulário não tem parâmetros), além do `WhatsAppClick` de sempre. Mesma lógica da exceção do Google Ads acima. Continua a exigir "Aceitar" nas cookies, como todo o Pixel. Telefone continua `PhoneClick`, sem Lead.
+
 **Quem vem do Google Ads envia "Olá! Vi o vosso anúncio no Google e
 gostaria…" no WhatsApp (pedido do dono, 26/09/2026).** É a única forma de ele
 separar clientes pagos de orgânicos: no primeiro dia fechou cinco serviços dos

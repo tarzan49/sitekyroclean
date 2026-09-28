@@ -16,7 +16,8 @@ Pixel definido em `src/constants/tracking.ts`. Só em ambiente autorizado e com 
 
 - `PageView`: visita a rota pública.
 - `WhatsAppClick` e `PhoneClick`: eventos personalizados de intenção, nunca conversas confirmadas.
-- `Lead`: depois da confirmação do CRM. `eventID` estável pelo identificador opaco do pedido e guarda contra repetição. Não envia nome, telefone, email ou valor de orçamento como venda.
+- `Lead` do WhatsApp (dono, 2026-09-28): cada clique num botão de WhatsApp sai também como `Lead`, com `content_name: 'WhatsApp'`, `content_category` = origem do botão e `eventID` próprio por clique. Para separar do formulário no Gestor de Eventos, criar uma conversão personalizada sobre `Lead` com `content_name` = `WhatsApp`.
+- `Lead` do formulário: depois da confirmação do CRM. `eventID` estável pelo identificador opaco do pedido e guarda contra repetição. Não envia nome, telefone, email ou valor de orçamento como venda.
 
 Não existe Conversions API, importação automática de formulários instantâneos/mensagens, nem envio de `Purchase` pelo administrador. O CRM não confirma que a Meta recebeu o evento; validar no Gestor de Eventos e reconciliar pedidos reais. Bloqueadores e recusa de consentimento produzem subcontagem.
 

@@ -371,7 +371,7 @@ const MarketingPanel = ({ platform = "google" }: { platform?: MarketingPlatform 
       </Notice>
       {isMeta && <Section title="Pixel e origem dos anúncios" subtitle="O CRM não é o Gestor de Eventos da Meta e não confirma receção de eventos pela plataforma.">
         <div className="p-4 space-y-3 text-sm">
-          <p><strong>PageView:</strong> visita. <strong>WhatsAppClick / PhoneClick:</strong> intenção. <strong>Lead:</strong> formulário confirmado pelo CRM, sem valor de venda. Tudo sujeito a consentimento publicitário.</p>
+          <p><strong>PageView:</strong> visita. <strong>PhoneClick:</strong> intenção. <strong>Lead:</strong> formulário confirmado pelo CRM, ou clique no WhatsApp (<code>content_name: WhatsApp</code>, sai também como WhatsAppClick). Sem valor de venda. Tudo sujeito a consentimento publicitário.</p>
           <p>Marcações e pagamentos são registados aqui. Não enviamos Purchase a partir do browser do administrador. A Conversions API e a importação automática de mensagens/formulários instantâneos não estão ligadas.</p>
           <p>Parâmetros de URL a colocar nos anúncios que levam ao site:</p><code className="block break-all rounded bg-gray-50 p-3 text-xs">{META_URL_PARAMETERS}</code>
           <p>Um fbclid isolado pode vir de uma partilha orgânica. Só uma origem paga explícita entra neste painel. Conversas iniciadas diretamente nos anúncios devem ser registadas como pedidos reais.</p>

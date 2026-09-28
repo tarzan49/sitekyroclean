@@ -108,7 +108,7 @@ function contact(action: 'whatsapp_click' | 'call_click', source: string, ctx?: 
   // GA4. O nome `phone_click` é o do GA4; na tabela `quiz_events` o mesmo clique
   // continua a chamar-se `call_click`, que é o que a restrição CHECK aceita
   // desde 2026-08 e onde está o histórico do painel interno.
-  trackMetaContactClick(action);
+  trackMetaContactClick(action, source);
   sendGtagEvent(action === 'whatsapp_click' ? 'whatsapp_click' : 'phone_click', {
     page_path: window.location.pathname, cta_location: source, service: ctx?.service, city: ctx?.city,
   });

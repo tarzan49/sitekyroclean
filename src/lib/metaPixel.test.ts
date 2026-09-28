@@ -47,11 +47,20 @@ describe('Meta Pixel', () => {
 });
 
 describe('conversões Meta', () => {
-  it('clique não cria Lead; pedido confirmado tem ID estável e não tem valor de venda', async () => {
+  it('clique no WhatsApp é Lead (cada clique o seu); telefone não; pedido confirmado tem ID estável', async () => {
     localStorage.setItem('kyro_cookie_consent', 'accepted');
     const p = await import('./metaPixel'); p.loadMetaPixel();
-    p.trackMetaContactClick('whatsapp_click');
+    p.trackMetaContactClick('whatsapp_click', 'sticky_bar');
+    p.trackMetaContactClick('whatsapp_click', 'sticky_bar');
     expect(window.fbq?.queue).toContainEqual(['trackCustom', 'WhatsAppClick']);
+    const waLeads = (window.fbq?.queue ?? []).filter((c) => c[0] === 'track' && c[1] === 'Lead');
+    expect(waLeads).toHaveLength(2);
+    expect(waLeads[0][2]).toEqual({ content_name: 'WhatsApp', content_category: 'sticky_bar' });
+    expect((waLeads[0][3] as { eventID: string }).eventID).toMatch(/^wa:/);
+    expect((waLeads[0][3] as { eventID: string }).eventID).not.toBe((waLeads[1][3] as { eventID: string }).eventID);
+    p.trackMetaContactClick('call_click');
+    expect(window.fbq?.queue).toContainEqual(['trackCustom', 'PhoneClick']);
+    expect((window.fbq?.queue ?? []).filter((c) => c[1] === 'Lead')).toHaveLength(2);
     expect(p.trackMetaLead('L-test-123')).toBe(true);
     expect(p.trackMetaLead('L-test-123')).toBe(false);
     expect(window.fbq?.queue).toContainEqual(['track', 'Lead', {}, { eventID:'lead:L-test-123' }]);
