@@ -60,7 +60,7 @@ export default function ServiceResultsGallery({ category, light = false, interva
           <BeforeAfterSlider key={index} beforeImage={item.before} afterImage={item.after}
             beforeLabel={itemCategory === "impermeabilizacao" ? "Sem proteção" : "Antes"}
             afterLabel={itemCategory === "impermeabilizacao" ? "Com proteção" : "Depois"}
-            priority={priority && index === 0} noFrame illustrative={item.illustrative} onDraggingChange={setDragging}
+            priority={priority && index === 0} noFrame onDraggingChange={setDragging}
             sweepMs={autoplay ? intervalMs : undefined} />
         ) : item.kind === "video" ? (
           <div className="relative h-full w-full">
@@ -90,7 +90,7 @@ export default function ServiceResultsGallery({ category, light = false, interva
       </div>
       <div ref={thumbnailsRef} className="relative flex gap-2 overflow-x-auto overscroll-x-contain pb-2 [scrollbar-width:thin]" aria-label="Escolher exemplo">
         {pool.map((example, i) => (
-          <button key={i} type="button" aria-label={`Ver exemplo ${i + 1}${example.kind === "video" ? ", vídeo" : example.kind === "pair" && example.illustrative ? ", efeito ilustrativo" : ""}`}
+          <button key={i} type="button" aria-label={`Ver exemplo ${i + 1}${example.kind === "video" ? ", vídeo" : ""}`}
             aria-pressed={i === index} onClick={() => select(i)}
             className={`relative h-12 w-16 shrink-0 overflow-hidden border-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-gold ${i === index ? "border-gold" : "border-transparent opacity-60 hover:opacity-100"}`}>
             <img src={example.kind === "video" ? example.poster : resultThumbnail(example.kind === "pair" ? example.after : example.image)} alt="" loading="lazy" decoding="async" className="w-full h-full object-cover" width={64} height={48} />

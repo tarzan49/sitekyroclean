@@ -113,8 +113,12 @@ import tapete06Depois from "@/assets/before-after-pool/tapete-06-depois.webp";
 export type BeforeAfterCategory = "sofa" | "colchao" | "cadeiras" | "tapete" | "impermeabilizacao";
 
 // `illustrative` marca pares que não são um trabalho real da Kyro (ver nota
-// "impermeabilizacao-02/03/04" acima) — o slider mostra um selo discreto
-// "Efeito ilustrativo" quando presente, sem explicar a origem da imagem.
+// "impermeabilizacao-02/03/04" acima). Desde 28/09/2026 a galeria deixou de
+// mostrar o selo "Efeito ilustrativo" por decisão do dono, avisado de que sem
+// ele as imagens passam por fotografias reais e da regra europeia de
+// transparência para imagens geradas por IA. A marca fica nos dados para se
+// saber quais são e para voltar a ligar o selo (passar `illustrative` ao
+// BeforeAfterSlider em ServiceResultsGallery.tsx) sem ter de as identificar.
 // `video`: um trabalho real filmado (dono, 28/09/2026: "o vídeo é nosso",
 // "colocar em primeiro sempre" e no mesmo formato dos antes e depois). O
 // original é vertical; o ficheiro do site já vem em 4:3, com o próprio vídeo
