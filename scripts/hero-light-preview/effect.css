@@ -1,0 +1,40 @@
+/* Local concept only: loaded exclusively by preview-hero-light.mjs. */
+html[data-light-preview="on"] [data-commercial-hero]::before,
+html[data-light-preview="on"] [data-commercial-hero]::after {
+  content:"";position:absolute;pointer-events:none;z-index:-1;
+}
+html[data-light-preview="on"] [data-commercial-hero]::before {
+  inset:-15% -65%;
+  background:
+    radial-gradient(ellipse 15% 65% at 61% 32%,#d4af3721,transparent 72%),
+    radial-gradient(ellipse 23% 75% at 64% 38%,#8cd8ae45,transparent 70%),
+    radial-gradient(ellipse 12% 75% at 44% 60%,#061d18a8,transparent 75%),
+    repeating-linear-gradient(108deg,transparent 0 45px,#afdbba0b 47px,transparent 49px 100px);
+  transform:rotate(-16deg) translate3d(-7%,0,0);
+  animation:kyro-light-drift 18s ease-in-out infinite alternate;
+  mask-image:linear-gradient(to bottom,#000 0%,#000 70%,transparent 100%);
+}
+html[data-light-preview="on"] [data-commercial-hero]::after {
+  inset:0;
+  background:repeating-linear-gradient(0deg,#ffffff05 0 1px,transparent 1px 3px),repeating-linear-gradient(90deg,#ffffff04 0 1px,transparent 1px 3px);
+  mask-image:linear-gradient(110deg,transparent,#0008 65%,#000);
+  opacity:.65;
+}
+html[data-light-preview="on"] [data-hero-part="comparison"] {position:relative;isolation:isolate}
+html[data-light-preview="on"] [data-hero-part="comparison"]::before {
+  content:"";position:absolute;inset:-45px -40px;z-index:-1;pointer-events:none;
+  background:radial-gradient(ellipse,#6cc39535,transparent 68%);
+  animation:kyro-video-glow 12s ease-in-out infinite alternate;
+}
+@keyframes kyro-light-drift {
+  0%{transform:rotate(-16deg) translate3d(-7%,-3%,0) scale(1);opacity:.72}
+  50%{opacity:1}
+  100%{transform:rotate(6deg) translate3d(9%,4%,0) scale(1.1);opacity:.85}
+}
+@keyframes kyro-video-glow {from{opacity:.45;transform:translateY(-15px)}to{opacity:1;transform:translateY(12px)}}
+html[data-light-paused="true"] [data-commercial-hero]::before,
+html[data-light-paused="true"] [data-hero-part="comparison"]::before {animation-play-state:paused}
+@media(prefers-reduced-motion:reduce){
+  html[data-light-preview="on"] [data-commercial-hero]::before,
+  html[data-light-preview="on"] [data-hero-part="comparison"]::before{animation:none}
+}

@@ -1,3 +1,13 @@
+## Proposta local de hero com luz (28/09/2026)
+
+`node scripts/preview-hero-light.mjs` abre `http://127.0.0.1:8097/__hero-light`:
+pré-visualização mobile da página real de impermeabilização, com comparação
+Atual/Tecido de luz, pausa e larguras 360/390/430px. O CSS da proposta vive em
+`scripts/hero-light-preview/effect.css` e só é injetado pelo servidor local,
+sem import no site ou no build de produção. Mantém o conteúdo e a galeria
+reais; movimento por transform/opacity, textura CSS e redução de movimento.
+É uma proposta para avaliação visual, ainda não uma alteração aprovada do hero.
+
 > **Como ler este ficheiro.** O `CLAUDE.md` tem as regras e os factos de
 > negócio e é a fonte que prevalece. Este ficheiro é a referência de
 > arquitetura: as secções datadas no topo são as mais recentes, depois vêm a
