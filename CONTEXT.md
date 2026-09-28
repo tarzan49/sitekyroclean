@@ -1,13 +1,13 @@
-## Proposta local de hero com luz (28/09/2026)
+## Luz animada nos heroes (28/09/2026)
 
-`node scripts/preview-hero-light.mjs` abre `http://127.0.0.1:8097/__hero-light`:
-pré-visualização mobile das páginas reais, com seletor da homepage, dos seis
-serviços e de exemplos de cidades, e comparação
-Atual/Tecido de luz, pausa e larguras 360/390/430px. O CSS da proposta vive em
-`scripts/hero-light-preview/effect.css` e só é injetado pelo servidor local,
-sem import no site ou no build de produção. Mantém o conteúdo e a galeria
-reais; movimento por transform/opacity, textura CSS e redução de movimento.
-É uma proposta para avaliação visual, ainda não uma alteração aprovada do hero.
+A proposta «Tecido de luz» foi aprovada para publicação. `src/styles/hero-light.css`,
+importado em `main.tsx`, aplica luz e textura aos heroes comerciais, aos
+`data-mobile-hero` e à homepage (`section#orcamento`), em todos os tamanhos.
+Preserva fotografias, galerias e conteúdo; o movimento usa transform/opacity e
+fica estático com `prefers-reduced-motion`. Não carrega imagens ou bibliotecas.
+`node scripts/preview-hero-light.mjs` mantém o comparador mobile local na porta
+8097, agora com os mesmos estilos de produção. O atributo de preview `off`
+desliga o efeito para comparar; não existe uma segunda cópia do CSS.
 
 > **Como ler este ficheiro.** O `CLAUDE.md` tem as regras e os factos de
 > negócio e é a fonte que prevalece. Este ficheiro é a referência de

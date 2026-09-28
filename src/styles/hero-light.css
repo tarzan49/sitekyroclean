@@ -1,9 +1,9 @@
-/* Local concept only: loaded exclusively by preview-hero-light.mjs. */
-html[data-light-preview="on"] :is([data-commercial-hero],[data-mobile-hero],section#orcamento)::before,
-html[data-light-preview="on"] :is([data-commercial-hero],[data-mobile-hero],section#orcamento)::after {
+/* Shared hero lighting. Preview can opt out; reduced motion stays static. */
+html:not([data-light-preview="off"]) :is([data-commercial-hero],[data-mobile-hero],section#orcamento)::before,
+html:not([data-light-preview="off"]) :is([data-commercial-hero],[data-mobile-hero],section#orcamento)::after {
   content:"";position:absolute;pointer-events:none;z-index:-1;
 }
-html[data-light-preview="on"] :is([data-commercial-hero],[data-mobile-hero],section#orcamento)::before {
+html:not([data-light-preview="off"]) :is([data-commercial-hero],[data-mobile-hero],section#orcamento)::before {
   inset:-15% -65%;
   background:
     radial-gradient(ellipse 15% 65% at 61% 32%,#d4af3721,transparent 72%),
@@ -14,14 +14,14 @@ html[data-light-preview="on"] :is([data-commercial-hero],[data-mobile-hero],sect
   animation:kyro-light-drift 18s ease-in-out infinite alternate;
   mask-image:linear-gradient(to bottom,#000 0%,#000 70%,transparent 100%);
 }
-html[data-light-preview="on"] :is([data-commercial-hero],[data-mobile-hero],section#orcamento)::after {
+html:not([data-light-preview="off"]) :is([data-commercial-hero],[data-mobile-hero],section#orcamento)::after {
   inset:0;
   background:repeating-linear-gradient(0deg,#ffffff05 0 1px,transparent 1px 3px),repeating-linear-gradient(90deg,#ffffff04 0 1px,transparent 1px 3px);
   mask-image:linear-gradient(110deg,transparent,#0008 65%,#000);
   opacity:.65;
 }
-html[data-light-preview="on"] [data-hero-part="comparison"] {position:relative;isolation:isolate}
-html[data-light-preview="on"] [data-hero-part="comparison"]::before {
+html:not([data-light-preview="off"]) [data-hero-part="comparison"] {position:relative;isolation:isolate}
+html:not([data-light-preview="off"]) [data-hero-part="comparison"]::before {
   content:"";position:absolute;inset:-45px -40px;z-index:-1;pointer-events:none;
   background:radial-gradient(ellipse,#6cc39535,transparent 68%);
   animation:kyro-video-glow 12s ease-in-out infinite alternate;
@@ -35,11 +35,13 @@ html[data-light-preview="on"] [data-hero-part="comparison"]::before {
 html[data-light-paused="true"] :is([data-commercial-hero],[data-mobile-hero],section#orcamento)::before,
 html[data-light-paused="true"] [data-hero-part="comparison"]::before {animation-play-state:paused}
 @media(prefers-reduced-motion:reduce){
-  html[data-light-preview="on"] :is([data-commercial-hero],[data-mobile-hero],section#orcamento)::before,
-  html[data-light-preview="on"] [data-hero-part="comparison"]::before{animation:none}
+  html:not([data-light-preview="off"]) :is([data-commercial-hero],[data-mobile-hero],section#orcamento)::before,
+  html:not([data-light-preview="off"]) [data-hero-part="comparison"]::before{animation:none}
 }
 
 /* Homepage keeps its photograph; light sits above it and below the content. */
-html[data-light-preview="on"] section#orcamento {isolation:isolate}
-html[data-light-preview="on"] section#orcamento::before,
-html[data-light-preview="on"] section#orcamento::after {z-index:0}
+html:not([data-light-preview="off"]) section#orcamento {isolation:isolate}
+html:not([data-light-preview="off"]) section#orcamento::before,
+html:not([data-light-preview="off"]) section#orcamento::after {z-index:0}
+
+:is([data-commercial-hero],[data-mobile-hero]) {isolation:isolate;position:relative;overflow:hidden}
