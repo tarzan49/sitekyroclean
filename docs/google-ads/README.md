@@ -187,6 +187,13 @@ Tudo confirmado depois de recarregar a página.
   do Cacém, Alcácer do Sal), sem exclusões. A norte: localidades de Vila Franca
   de Xira e Mafra por nome, códigos postais onde o Google os tem, e raios à
   volta de Alhandra (4 mi), Malveira (5 mi) e Encarnação (2 mi).
+  **Alterado a 28/09: o limite sul é a Comporta** (dono: "o máximo que eu vou é
+  até Setúbal, com Comporta"). Saiu a região "Setúbal, Portugal" e entraram
+  Alcácer do Sal e Comporta (cidade): 55 localizações. Excluídas: Sines, Porto
+  Covo, Santo André, Grândola, Carvalhal, Cercal e Vila Nova de Milfontes.
+  Santiago do Cacém, Melides, Odemira e Tróia não existem na base de
+  localizações do Google. No site, Grândola, Santiago do Cacém e Sines passaram
+  a 20€ de deslocação.
 - **Porto: 45 localizações, "Presença", limite de ~45 min** decidido com o
   dono: os 16 concelhos de antes mais Santa Maria da Feira, S. João da
   Madeira, Ovar, Oliveira de Azeméis, Famalicão, Guimarães, Braga e Barcelos.

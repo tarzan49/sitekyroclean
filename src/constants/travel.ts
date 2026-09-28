@@ -69,14 +69,14 @@ export const locationPrices: Record<string, number> = {
   'Alcochete': 15,
   'Palmela': 15,
   'Sesimbra': 15,
-  // Alentejo Litoral — equipa Lisboa, ~1h a 1h35. Ficam no teto de Lisboa
-  // (15€), pelo mesmo critério que o dono aplicou a Coimbra: 20€/25€ para as
-  // cidades mais afastadas foi rejeitado. Disponibilidade sob consulta, ver
-  // EXTENDED_TRIP_CITIES. (2026-09-26, entraram na campanha de Lisboa.)
+  // Alentejo Litoral — equipa Lisboa, ~1h a 1h35. Disponibilidade sob consulta,
+  // ver EXTENDED_TRIP_CITIES. (2026-09-26, entraram na campanha de Lisboa.)
+  // Alcácer do Sal fica a 15€ (inclui a Comporta, o limite sul do dono). A sul
+  // da Comporta é 20€ (dono, 2026-09-28), e os anúncios deixaram de lá chegar.
   'Alcácer do Sal': 15,
-  'Grândola': 15,
-  'Santiago do Cacém': 15,
-  'Sines': 15,
+  'Grândola': 20,
+  'Santiago do Cacém': 20,
+  'Sines': 20,
 
   // ═══ Algarve (equipa local) ═══
   // Algarve: 10€ no centro, 15€ na zona ocidental e 25€ nos extremos/interior.

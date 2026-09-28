@@ -31,10 +31,10 @@ describe('travel fees shared by quote and SEO pages', () => {
   it('prices the Sul do Douro and Alentejo Litoral towns by the existing zones', () => {
     expect(locationPrices['Santa Maria da Feira']).toBe(locationPrices.Espinho);
     for (const city of ['São João da Madeira', 'Ovar', 'Oliveira de Azeméis']) expect(locationPrices[city], city).toBe(locationPrices.Penafiel);
-    for (const city of ['Alcácer do Sal', 'Grândola', 'Santiago do Cacém', 'Sines']) {
-      expect(locationPrices[city], city).toBe(locationPrices.Coimbra);
-      expect(EXTENDED_TRIP_CITIES.has(city), city).toBe(true);
-    }
-    expect(Math.max(...cities.filter(city => city.area === 'lisboa').map(city => locationPrices[city.name]))).toBe(15);
+    expect(locationPrices['Alcácer do Sal']).toBe(locationPrices.Coimbra);
+    // A sul da Comporta: 20€ (dono, 2026-09-28).
+    for (const city of ['Grândola', 'Santiago do Cacém', 'Sines']) expect(locationPrices[city], city).toBe(20);
+    for (const city of ['Alcácer do Sal', 'Grândola', 'Santiago do Cacém', 'Sines']) expect(EXTENDED_TRIP_CITIES.has(city), city).toBe(true);
+    expect(Math.max(...cities.filter(city => city.area === 'lisboa').map(city => locationPrices[city.name]))).toBe(20);
   });
 });
