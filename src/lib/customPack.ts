@@ -7,7 +7,11 @@ export type PackKind = 'sofa' | 'mattress' | 'chairs' | 'rug' | 'carpet';
 // Sem desbacterização: é o mesmo tratamento que o anti-ácaros e vendê-los
 // como dois confundia (dono, 2026-09-24).
 export type PackExtra = 'none' | 'premium' | 'essencial' | 'anti-acaros';
-export interface CustomPackItem { id: string; kind: PackKind; size: string; qty: number; extra: PackExtra; width: string; length: string; }
+/** `primary: 'waterproofing'` is the waterproofing alone, without the
+ * cleaning (sofas and chairs, with `extra` premium or essencial). The
+ * configurator never sets it; the WhatsApp bot's quote uses it
+ * (`src/lib/botQuote.ts`), so both price through this one engine. */
+export interface CustomPackItem { id: string; kind: PackKind; size: string; qty: number; extra: PackExtra; width: string; length: string; primary?: 'cleaning' | 'waterproofing'; }
 export const PACK_KIND_LABEL: Record<PackKind, string> = { sofa: 'Sofá', mattress: 'Colchão', chairs: 'Cadeiras', rug: 'Tapete', carpet: 'Alcatifa' };
 export const EXTRA_LABEL: Record<PackExtra, string> = { none: 'Só limpeza', premium: 'Limpeza + impermeabilização Premium (até 10 anos)', essencial: 'Limpeza + impermeabilização Essencial (1 a 2 anos)', 'anti-acaros': 'Limpeza + tratamento anti-ácaros' };
 export function makePackItem(kind: PackKind, id: string): CustomPackItem {
@@ -30,7 +34,13 @@ export function customPackLine(item: CustomPackItem) {
   const option = options.find(p => p.id === item.size);
   let amount: number | null = null;
   const size = item.kind === 'rug' || item.kind === 'carpet' ? `${item.width} × ${item.length} m` : item.kind === 'chairs' ? `${item.qty} unidades` : option?.label ?? 'Tamanho a confirmar';
-  if (item.kind === 'chairs') {
+  const waterproofingOnly = item.primary === 'waterproofing' && (item.extra === 'premium' || item.extra === 'essencial') && (item.kind === 'sofa' || item.kind === 'chairs');
+  if (waterproofingOnly && item.kind === 'chairs') {
+    amount = (item.extra === 'premium' ? calcChairWaterproofPremium(item.qty) : calcChairWaterproof(item.qty)) ?? null;
+  } else if (waterproofingOnly && option) {
+    const unit = calcSofaUnitPrice(option, false, 'waterproofing', item.extra === 'premium' ? 'premium' : 'essencial', false);
+    amount = unit === null ? null : unit * item.qty;
+  } else if (item.kind === 'chairs') {
     amount = calcChairClean(item.qty);
     if (amount !== null) {
       if (item.extra === 'premium') amount += calcChairWaterproofPremium(item.qty) ?? 0;
@@ -45,7 +55,7 @@ export function customPackLine(item: CustomPackItem) {
     amount = unit === null ? null : unit * item.qty;
   }
   return {
-    label: `${PACK_KIND_LABEL[item.kind]} · ${size}${item.kind !== 'chairs' ? ` · ${item.qty} un.` : ''} · ${EXTRA_LABEL[item.extra]}`,
+    label: `${PACK_KIND_LABEL[item.kind]} · ${size}${item.kind !== 'chairs' ? ` · ${item.qty} un.` : ''} · ${waterproofingOnly ? `Só impermeabilização ${item.extra === 'premium' ? 'Premium (até 10 anos)' : 'Essencial (1 a 2 anos)'}` : EXTRA_LABEL[item.extra]}`,
     amount,
     tablePrice: amount,
     quote: amount === null,
