@@ -1,6 +1,6 @@
 # Calendários das equipas
 
-Desde 28/09/2026 cada equipa (Porto, Braga, Lisboa 1, Lisboa 2 e Algarve) tem o seu
+Desde 28/09/2026 cada equipa (Porto 1, Porto 2, Braga, Lisboa 1, Lisboa 2 e Algarve) tem o seu
 próprio Google Calendar. O dono continua a marcar os serviços só no calendário dele. Um
 script da Google (Apps Script), a correr na conta do dono, copia cada serviço
 para o calendário da equipa que o vai fazer e manda um email a essa equipa
@@ -64,8 +64,22 @@ Para desligar: função `desligar`. Os calendários ficam como estão.
   não tem região nem base, por isso nunca é escolhida pela morada nem por ser
   a mais perto. Quando um serviço passa de uma para a outra, sai de uma e
   entra na outra, com email às duas.
-- **Equipa de cada serviço**, por esta ordem: "equipa porto" (ou lisboa,
-  braga, algarve) escrito no evento; o código postal; os concelhos servidos;
+- **Duas equipas no Porto, e nenhum serviço do Porto segue sozinho** (dono,
+  28/09/2026: "eu tenho que selecionar qual é cada, nenhum serviço do Porto é
+  automático"). Um serviço da região Porto (Aveiro e Coimbra incluídos) só vai
+  para uma equipa quando o dono escolhe: pela **cor do evento** (Mirtilo, a
+  Porto 1; Pavão, a Porto 2), que é a mesma com que o script pinta cada
+  equipa, ou escrevendo "equipa porto 1" ou "equipa porto 2" (o escrito ganha
+  à cor; "equipa porto" sozinho é a Porto 1). Sem escolha, o serviço não é
+  copiado e não é pintado, e o dono recebe um email "Serviço do Porto por
+  escolher" (um por evento, e outro se o evento mudar). Uma cópia que já
+  exista numa equipa do Porto fica onde está enquanto o serviço estiver por
+  escolher; numa equipa de fora (a morada passou para o Porto) sai. Os
+  serviços do Porto que já estavam pintados de Mirtilo quando a Porto 2
+  nasceu ficaram na Porto 1 (era a equipa Porto, que passou a chamar-se
+  Porto 1). A parte do dono no valor não conta no Porto.
+- **Equipa de cada serviço**, por esta ordem: "equipa porto 1" (ou porto 2,
+  lisboa 1, lisboa 2, braga, algarve) escrito no evento; o código postal; os concelhos servidos;
   as freguesias desses concelhos; e, se nada disso chegar, **a morada no
   Google Maps** (dono, 28/09/2026: "pela morada deve saber automaticamente").
   As quatro primeiras são as mesmas regras e listas que o CRM usa para a
@@ -102,7 +116,7 @@ Para desligar: função `desligar`. Os calendários ficam como estão.
 - **Serviço sem equipa:** só um evento sem morada nenhuma (por exemplo
   "Serviço 70€ (130€) imper cadeiras"), ou uma morada que nem o Maps
   reconhece. Não é copiado, e o dono recebe um email a pedir o código postal
-  ou "equipa porto" (braga, lisboa 1, lisboa 2, algarve) no evento. Assim que o evento
+  ou "equipa porto 1" (porto 2, braga, lisboa 1, lisboa 2, algarve) no evento. Assim que o evento
   for guardado, segue para a equipa.
 - **A hora é o mesmo instante, mostrado em Portugal.** O calendário do dono
   está no fuso de Copenhaga desde 23/08/2026 e a hora que lá está é a de
@@ -113,10 +127,11 @@ Para desligar: função `desligar`. Os calendários ficam como estão.
   foi corrigida antes de os calendários serem partilhados.
 - **Cores no calendário do dono** (dono, 28/09/2026: "quero o meu com cores
   em vez de ser tudo azul", "pinta só os serviços para a frente"): cada
-  serviço que ainda não acabou fica com a cor da equipa (Porto
-  azul Mirtilo, Braga verde Basílico, Lisboa 1 laranja Tangerina, Lisboa 2
+  serviço que ainda não acabou fica com a cor da equipa (Porto 1
+  azul Mirtilo, Porto 2 azul-claro Pavão, Braga verde Basílico, Lisboa 1 laranja Tangerina, Lisboa 2
   roxo Uva, Algarve amarelo Banana) e muda de cor se mudar de equipa. Uma
-  cor posta à mão num serviço é substituída pela da equipa. **Cuidado com o
+  cor posta à mão num serviço é substituída pela da equipa, menos no Porto,
+  onde a cor é a escolha do dono. **Cuidado com o
   CRM:** mudar a cor mexe na data de alteração do evento, e o CRM
   (`calendarSync.ts`) relê um evento alterado depois da linha e escreve por
   cima das correções feitas no CRM. Só acompanha eventos criados depois de
@@ -126,8 +141,8 @@ Para desligar: função `desligar`. Os calendários ficam como estão.
   estavam.
 - **A equipa escrita no serviço do dono** (dono, 28/09/2026: "eu assim não
   vejo que equipa vai"): a primeira linha da descrição de cada serviço que
-  ainda não acabou passa a ser "Equipa: Porto" (ou Braga, Lisboa 1, Lisboa 2,
-  Algarve), escrita pelo script ao mesmo tempo que a cor. É só informação: é
+  ainda não acabou passa a ser "Equipa: Porto 1" (ou Porto 2, Braga, Lisboa 1,
+  Lisboa 2, Algarve), escrita pelo script ao mesmo tempo que a cor. É só informação: é
   tirada antes de decidir a equipa (senão, ao mudar a morada, o serviço
   ficava preso à equipa antiga), não vai para a cópia (senão as equipas
   recebiam "Serviço alterado" de todos) e não conta para os avisos. Os dois

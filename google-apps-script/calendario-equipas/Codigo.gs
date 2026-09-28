@@ -22,14 +22,16 @@
 // (latitude, longitude) só decide as moradas fora de todas as regiões
 // (Leiria, Beira Interior): vão para a equipa mais perto. A `cor` pinta os
 // serviços novos no calendário do dono (cores de evento da Google: 9 Mirtilo,
-// 10 Basílico, 6 Tangerina, 5 Banana, 3 Uva) e `corDoCalendario` é a mesma
+// 7 Pavão, 10 Basílico, 6 Tangerina, 5 Banana, 3 Uva) e `corDoCalendario` é a mesma
 // cor no calendário da equipa, para as duas coisas baterem certo.
 // `escrito` é o que o dono escreve depois de "equipa" para forçar a equipa.
 // A Lisboa 2 não tem região nem base: recebe os serviços de Lisboa em que a
 // parte do dono é 60% a 80% do valor (ver `equipaPelaParte`) e o que tiver
-// "equipa lisboa 2" escrito.
+// "equipa lisboa 2" escrito. No Porto há duas equipas e nenhum serviço segue
+// sozinho: o dono escolhe cada um pela cor (ver `equipaPelaCor`).
 const EQUIPAS = [
-  { id: 'porto', nome: 'Kyro · Equipa Porto', escrito: ['porto'], regioes: ['Porto'], base: [41.1496, -8.6110], cor: '9', corDoCalendario: '#3f51b5' },
+  { id: 'porto', nome: 'Kyro · Equipa Porto 1', escrito: ['porto', 'porto 1'], regioes: ['Porto'], base: [41.1496, -8.6110], cor: '9', corDoCalendario: '#3f51b5' },
+  { id: 'porto2', nome: 'Kyro · Equipa Porto 2', escrito: ['porto 2'], regioes: [], base: null, cor: '7', corDoCalendario: '#039be5' },
   { id: 'braga', nome: 'Kyro · Equipa Braga', escrito: ['braga'], regioes: ['Braga'], base: [41.5454, -8.4265], cor: '10', corDoCalendario: '#0b8043' },
   { id: 'lisboa', nome: 'Kyro · Equipa Lisboa 1', escrito: ['lisboa', 'lisboa 1'], regioes: ['Lisboa'], base: [38.7223, -9.1393], cor: '6', corDoCalendario: '#f4511e' },
   { id: 'lisboa2', nome: 'Kyro · Equipa Lisboa 2', escrito: ['lisboa 2'], regioes: [], base: null, cor: '3', corDoCalendario: '#8e24aa' },
@@ -38,7 +40,7 @@ const EQUIPAS = [
 
 // Muda quando as cores das equipas (ou o que se faz na lista do dono) mudarem,
 // para os calendários voltarem a ser arrumados.
-const VERSAO_DAS_CORES = '5';
+const VERSAO_DAS_CORES = '6';
 
 const FUSO_PORTUGAL = 'Europe/Lisbon';
 const DIAS_ANTES = 2;
@@ -96,7 +98,8 @@ function verificar() {
   for (const evento of fonte.eventos) {
     if (!ehServico(evento.summary)) continue;
     const copia = desejadas.copias.get(evento.id);
-    const equipa = copia ? nomeDaEquipa(copia.equipaId) : desejadas.adiados.has(evento.id) ? 'MAPA SEM RESPOSTA' : 'SEM EQUIPA';
+    const porEscolher = desejadas.porEscolher.some(function (i) { return i.evento.id === evento.id; });
+    const equipa = copia ? nomeDaEquipa(copia.equipaId) : porEscolher ? 'PORTO POR ESCOLHER' : desejadas.adiados.has(evento.id) ? 'MAPA SEM RESPOSTA' : 'SEM EQUIPA';
     const incerto = desejadas.incertos.find(function (i) { return i.evento.id === evento.id; });
     const duvida = incerto ? ' (sem certeza: ' + incerto.duvida + ')' : '';
     Logger.log(equipa + duvida + ' · ' + quando(horaEmPortugal(evento.start), horaEmPortugal(evento.end)) + ' · ' + evento.summary);
@@ -151,7 +154,8 @@ function sincronizarAgora() {
   const desejadas = copiasDesejadas(fonte.eventos, mapa.procurar);
   mapa.guardar();
   const silencioso = !propriedades.getProperty('primeiraVoltaFeita');
-  const acoes = planear(desejadas.copias, existentes, agora, silencioso, desejadas.adiados);
+  const porEscolher = new Set(desejadas.porEscolher.map(function (item) { return item.evento.id; }));
+  const acoes = planear(desejadas.copias, existentes, agora, silencioso, desejadas.adiados, porEscolher);
 
   const pessoas = {};
   for (const acao of acoes) {
@@ -168,15 +172,19 @@ function sincronizarAgora() {
 
   const guardadas = {};
   for (const chave of propriedades.getKeys()) {
-    if (chave.indexOf('pendente:') === 0 || chave.indexOf('incerto:') === 0) guardadas[chave] = propriedades.getProperty(chave);
+    if (/^(pendente|incerto|escolher):/.test(chave)) guardadas[chave] = propriedades.getProperty(chave);
   }
   const pendentes = pendentesNovos(desejadas.pendentes, guardadas, agora);
   const incertos = incertosNovos(desejadas.incertos, guardadas, agora);
-  for (const chave in guardadas) if (!(chave in pendentes.atuais) && !(chave in incertos.atuais)) propriedades.deleteProperty(chave);
+  const escolhas = escolhasNovas(desejadas.porEscolher, guardadas, agora);
+  for (const chave in guardadas) {
+    if (!(chave in pendentes.atuais) && !(chave in incertos.atuais) && !(chave in escolhas.atuais)) propriedades.deleteProperty(chave);
+  }
   propriedades.setProperties(pendentes.atuais);
   propriedades.setProperties(incertos.atuais);
-  if (pendentes.novos.length || incertos.novos.length) {
-    const mensagem = mensagemParaDono(pendentes.novos, incertos.novos);
+  propriedades.setProperties(escolhas.atuais);
+  if (pendentes.novos.length || incertos.novos.length || escolhas.novos.length) {
+    const mensagem = mensagemParaDono(pendentes.novos, incertos.novos, escolhas.novos);
     MailApp.sendEmail({ to: Session.getEffectiveUser().getEmail(), subject: mensagem.assunto, body: mensagem.texto, name: 'Calendários das equipas' });
   }
 
@@ -475,15 +483,21 @@ function origemDaRegiao(evento) {
 }
 
 /**
- * A equipa escrita no evento ("equipa lisboa 2", "equipa porto"), que ganha a
- * tudo e conta como certa. É a única forma de um serviço ir para a Lisboa 2.
+ * A equipa escrita no evento ("equipa lisboa 2", "equipa porto 2"), que ganha
+ * a tudo e conta como certa.
  */
 function equipaEscrita(evento) {
   const texto = normalizar([evento.location, evento.summary, evento.description].filter(Boolean).join('\n'));
-  const escrito = /\bequipa\s+(porto|braga|algarve|lisboa(?:\s*[12])?)\b/.exec(texto);
+  const escrito = /\bequipa\s+(braga|algarve|(?:porto|lisboa)(?:\s*[12])?)\b/.exec(texto);
   if (!escrito) return null;
-  const nome = escrito[1].replace(/^lisboa\s*([12])$/, 'lisboa $1');
+  const nome = escrito[1].replace(/^(porto|lisboa)\s*([12])$/, '$1 $2');
   return EQUIPAS.find(function (e) { return e.escrito.indexOf(nome) >= 0; }) || null;
+}
+
+/** "equipa porto 1", "equipa porto 2", … ou "equipa algarve": o que se escreve para escolher cada equipa. */
+function equipasParaEscrever() {
+  const nomes = EQUIPAS.map(function (e) { return '"equipa ' + e.escrito[e.escrito.length - 1] + '"'; });
+  return nomes.slice(0, -1).join(', ') + ' ou ' + nomes[nomes.length - 1];
 }
 
 function numeroDoValor(texto) {
@@ -514,6 +528,18 @@ function equipaPelaParte(equipa, evento) {
   const parte = parteDoDono(evento.summary);
   if (parte === null || parte < PARTE_DA_LISBOA_2[0] || parte > PARTE_DA_LISBOA_2[1]) return equipa;
   return EQUIPAS.find(function (e) { return e.id === 'lisboa2'; }) || equipa;
+}
+
+// Dono, 28/09/2026: "eu tenho que selecionar qual é cada, nenhum serviço do
+// Porto é automático". Escolhe pela cor do evento no calendário dele, a mesma
+// com que o script pinta cada equipa (Mirtilo, a Porto 1; Pavão, a Porto 2),
+// ou escrevendo "equipa porto 1" ou "equipa porto 2". Os serviços do Porto que
+// já estavam pintados de Mirtilo quando a Porto 2 nasceu ficam na Porto 1.
+const EQUIPAS_DO_PORTO = ['porto', 'porto2'];
+
+/** A equipa do Porto da cor do evento; null se a cor não é de nenhuma (serviço por escolher). */
+function equipaPelaCor(evento) {
+  return EQUIPAS.find(function (e) { return EQUIPAS_DO_PORTO.indexOf(e.id) >= 0 && e.cor === evento.colorId; }) || null;
 }
 
 function equipaDaRegiao(regiao) {
@@ -709,7 +735,9 @@ function corpoDaCopia(origem, moradaNoMapa) {
  * A cópia que cada serviço devia ter, por id do evento original; os serviços
  * que não se sabe a que equipa mandar; os `incertos`, que seguem para uma
  * equipa mas de que o dono é avisado (dono, 28/09/2026: "quando não tiveres
- * 100% certeza envia-me um alerta no email"); e os `adiados`, cuja morada o
+ * 100% certeza envia-me um alerta no email"); os `porEscolher`, serviços do
+ * Porto sem a cor de nenhuma das duas equipas (ver `equipaPelaCor`), que não
+ * seguem para nenhuma; e os `adiados`, cuja morada o
  * Maps não conseguiu procurar agora (a cópia que tiverem fica como está).
  * `procurarNoMapa(morada)` só é chamado quando o código postal e as listas do
  * site não chegam.
@@ -718,6 +746,7 @@ function copiasDesejadas(origens, procurarNoMapa) {
   const copias = new Map();
   const pendentes = [];
   const incertos = [];
+  const porEscolher = [];
   const adiados = new Set();
   for (const original of origens) {
     // A linha "Equipa: …" que o script escreve na descrição não conta para
@@ -743,6 +772,13 @@ function copiasDesejadas(origens, procurarNoMapa) {
       }
     }
     if (!escrita) equipa = equipaPelaParte(equipa, origem);
+    if (!escrita && equipa && equipa.id === 'porto') {
+      equipa = equipaPelaCor(origem);
+      if (!equipa) {
+        porEscolher.push({ evento: origem, duvida: duvida });
+        continue;
+      }
+    }
     if (!equipa) {
       pendentes.push(origem);
       continue;
@@ -756,7 +792,7 @@ function copiasDesejadas(origens, procurarNoMapa) {
     });
     if (duvida) incertos.push({ evento: origem, equipaId: equipa.id, duvida: duvida });
   }
-  return { copias: copias, pendentes: pendentes, incertos: incertos, adiados: adiados };
+  return { copias: copias, pendentes: pendentes, incertos: incertos, porEscolher: porEscolher, adiados: adiados };
 }
 
 /**
@@ -764,9 +800,11 @@ function copiasDesejadas(origens, procurarNoMapa) {
  * não devia existir apaga-se; uma que mudou de equipa sai de uma e entra na
  * outra. Só se avisa a equipa de serviços que ainda não acabaram, e nunca na
  * primeira volta (as equipas veem o calendário todo quando o recebem). Um
- * serviço adiado (o Maps não respondeu) não mexe na cópia que já tiver.
+ * serviço adiado (o Maps não respondeu) não mexe na cópia que já tiver. Um
+ * serviço do Porto por escolher fica onde está se já estiver numa equipa do
+ * Porto, e sai de qualquer outra (a morada passou para o Porto).
  */
-function planear(desejadas, existentes, agora, silencioso, adiados) {
+function planear(desejadas, existentes, agora, silencioso, adiados, porEscolher) {
   const acoes = [];
   const vistas = new Set();
   const aviso = function (tipo, fimMs) { return !silencioso && fimMs > agora ? tipo : null; };
@@ -779,7 +817,9 @@ function planear(desejadas, existentes, agora, silencioso, adiados) {
     vistas.add(existente.origemId);
     if (adiados && adiados.has(existente.origemId)) continue;
     const desejada = desejadas.get(existente.origemId);
-    if (!desejada) {
+    if (!desejada && porEscolher && porEscolher.has(existente.origemId)) {
+      if (EQUIPAS_DO_PORTO.indexOf(existente.equipaId) < 0) acoes.push({ tipo: 'apagar', equipaId: existente.equipaId, copia: copia, aviso: aviso('retirado', fimEmMs(copia.end)) });
+    } else if (!desejada) {
       acoes.push({ tipo: 'apagar', equipaId: existente.equipaId, copia: copia, aviso: aviso('cancelado', fimEmMs(copia.end)) });
     } else if (desejada.equipaId !== existente.equipaId) {
       acoes.push({ tipo: 'apagar', equipaId: existente.equipaId, copia: copia, aviso: aviso('retirado', fimEmMs(copia.end)) });
@@ -841,6 +881,11 @@ function incertosNovos(incertos, guardadas, agora) {
   return avisosNovos(incertos, 'incerto:', guardadas, agora);
 }
 
+/** O mesmo para os serviços do Porto por escolher. */
+function escolhasNovas(porEscolher, guardadas, agora) {
+  return avisosNovos(porEscolher, 'escolher:', guardadas, agora);
+}
+
 function avisosNovos(itens, prefixo, guardadas, agora) {
   const novos = [];
   const atuais = {};
@@ -854,30 +899,50 @@ function avisosNovos(itens, prefixo, guardadas, agora) {
   return { novos: novos, atuais: atuais };
 }
 
-/** Um só email por volta: os serviços sem equipa e os enviados sem certeza. As horas são as de Portugal. */
-function mensagemParaDono(semEquipa, incertos) {
+/**
+ * Um só email por volta: os serviços do Porto por escolher, os enviados sem
+ * certeza e os sem equipa. As horas são as de Portugal.
+ */
+function mensagemParaDono(semEquipa, incertos, porEscolher) {
   incertos = incertos || [];
+  porEscolher = porEscolher || [];
   const linha = function (evento) { return '• ' + quando(horaEmPortugal(evento.start), horaEmPortugal(evento.end)) + ' (hora de Portugal)'; };
   const linhas = [];
+  const separar = function () { if (linhas.length) linhas.push('', ''); };
+  if (porEscolher.length) {
+    linhas.push((porEscolher.length === 1 ? 'Este serviço do Porto está' : 'Estes serviços do Porto estão') + ' à espera que escolhas a equipa:', '');
+    for (const item of porEscolher) {
+      linhas.push(linha(item.evento), '  ' + item.evento.summary);
+      if (item.duvida) linhas.push('  (no Porto ' + item.duvida + ')');
+      linhas.push('');
+    }
+    linhas.push(
+      'No teu calendário, põe o evento com a cor Mirtilo para a Porto 1 ou Pavão para a Porto 2 (ou escreve "equipa porto 1" ou "equipa porto 2").',
+      'Assim que guardares, o serviço segue para essa equipa.'
+    );
+  }
   if (incertos.length) {
+    separar();
     linhas.push('Enviei ' + (incertos.length === 1 ? 'este serviço' : 'estes serviços') + ' sem ter a certeza da equipa. Confirma:', '');
     for (const item of incertos) {
       linhas.push(linha(item.evento), '  ' + item.evento.summary, '  → ' + nomeDaEquipa(item.equipaId) + ', ' + item.duvida, '');
     }
-    linhas.push('Se a equipa estiver errada, escreve no evento "equipa porto", "equipa braga", "equipa lisboa 1", "equipa lisboa 2" ou "equipa algarve", ou o código postal. O serviço muda sozinho de equipa.');
+    linhas.push('Se a equipa estiver errada, escreve no evento ' + equipasParaEscrever() + ', ou o código postal. O serviço muda sozinho de equipa.');
   }
   if (semEquipa.length) {
-    if (linhas.length) linhas.push('', '');
+    separar();
     linhas.push('Nem o código postal, nem a localidade, nem o Google Maps disseram onde ' + (semEquipa.length === 1 ? 'é este serviço' : 'são estes serviços') + ':', '');
     for (const evento of semEquipa) linhas.push(linha(evento), '  ' + evento.summary);
     linhas.push(
       '',
-      'Acrescenta o código postal à morada (por exemplo 4000-123) ou escreve no evento "equipa porto", "equipa braga", "equipa lisboa 1", "equipa lisboa 2" ou "equipa algarve".',
+      'Acrescenta o código postal à morada (por exemplo 4000-123) ou escreve no evento ' + equipasParaEscrever() + '.',
       'Assim que guardares, o serviço segue para a equipa certa.'
     );
   }
+  const tipos = [semEquipa, incertos, porEscolher].filter(function (lista) { return lista.length; }).length;
   let assunto;
-  if (semEquipa.length && incertos.length) assunto = 'Serviços para confirmar';
+  if (tipos > 1) assunto = 'Serviços para confirmar';
+  else if (porEscolher.length) assunto = porEscolher.length === 1 ? 'Serviço do Porto por escolher' : porEscolher.length + ' serviços do Porto por escolher';
   else if (semEquipa.length) assunto = semEquipa.length === 1 ? 'Serviço sem equipa' : semEquipa.length + ' serviços sem equipa';
   else assunto = incertos.length === 1 ? 'Serviço enviado sem certeza' : incertos.length + ' serviços enviados sem certeza';
   return { assunto: assunto, texto: linhas.join('\n') };

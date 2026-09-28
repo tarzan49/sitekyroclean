@@ -248,7 +248,7 @@ const isNameLike = (s: string) => {
 const tidy = (s: string) => s.replace(/\s+/g, ' ').replace(/^[\s,.;:-]+|[\s,;:-]+$/g, '').trim();
 const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 
-// "Equipa: Porto" (ou Braga, Lisboa 1, Lisboa 2, Algarve) na primeira linha
+// "Equipa: Porto 1" (ou Porto 2, Braga, Lisboa 1, Lisboa 2, Algarve) na primeira linha
 // da descrição: escrita pelo script dos calendários das equipas (28/09/2026).
 // Não é a morada, por isso não entra na procura da cidade ("Porto" num
 // serviço em Gondomar); serve de última pista para a região em
