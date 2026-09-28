@@ -51,7 +51,8 @@ export function isGoogleAdsVisit(search: string): boolean {
  */
 export function markAdsWhatsAppText(text: string): string {
   if (text.includes(ADS_WHATSAPP_MARK)) return text;
-  const trimmed = text.trim();
+  // Só o início: o espaço final da mensagem é onde fica o cursor para escrever.
+  const trimmed = text.trimStart();
   if (!trimmed) return `Olá! ${ADS_WHATSAPP_MARK}.`;
   const greeting = /^Olá[!,.]?\s*/.exec(trimmed);
   if (!greeting) return text;

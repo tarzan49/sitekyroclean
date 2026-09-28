@@ -19,26 +19,28 @@ export function buildGeneralWaMessage(isEn = false): string {
 /**
  * Shared by service, location, neighbourhood and price landing pages.
  *
- * Written so the client only fills in the blanks and the owner can quote in the
+ * Written so the client only fills in one line and the owner can quote in the
  * first reply (dono, 28/09/2026: "a pessoa não pode perder tempo a pensar o que
- * escrever"). Each field is what the price depends on: the locality sets the
- * travel fee (the page city is the campaign, not always where the client
- * lives), then the size, then the day.
+ * escrever"). The blank is the last line on purpose: WhatsApp opens with the
+ * cursor at the end, so the client types "3 lugares, Oeiras" without tapping
+ * anywhere; a version with three blanks in the middle was replaced the same
+ * day for that reason. It asks only what the price depends on: the size and
+ * the locality (the travel fee; the page city is the campaign, not always
+ * where the client lives). Sent untouched, it still names service and place.
  */
 export function buildServiceWaMessage(serviceSlug: string, placeName?: string | null): string {
   const loc = placeName ? ` ${cityPrep(placeName)} ${placeName}` : '';
-  const services: Record<string, { request: string; fields: string[]; photo: string }> = {
-    'limpeza-sofas': { request: 'limpar o meu sofá', fields: ['Sofá de quantos lugares:'], photo: 'A seguir envio uma foto do sofá.' },
-    'limpeza-colchoes': { request: 'limpar o meu colchão', fields: ['Tamanho (solteiro, casal ou king):'], photo: 'A seguir envio uma foto do colchão.' },
-    'limpeza-tapetes': { request: 'limpar os meus tapetes', fields: ['Quantos tapetes e medidas aproximadas:'], photo: 'A seguir envio fotos dos tapetes.' },
-    'limpeza-cadeiras': { request: 'limpar as minhas cadeiras', fields: ['Quantas cadeiras:'], photo: 'A seguir envio uma foto das cadeiras.' },
-    'limpeza-alcatifas': { request: 'limpar a minha alcatifa', fields: ['Área aproximada em m²:'], photo: 'A seguir envio uma foto da alcatifa.' },
-    'impermeabilizacao': { request: 'impermeabilizar o meu sofá', fields: ['Sofá de quantos lugares:', 'Também quero a limpeza (sim ou não):'], photo: 'A seguir envio uma foto do tecido.' },
+  const services: Record<string, { request: string; photo: string; blank: string }> = {
+    'limpeza-sofas': { request: 'limpar o meu sofá', photo: 'Envio a seguir uma foto do sofá.', blank: 'Nº de lugares e localidade:' },
+    'limpeza-colchoes': { request: 'limpar o meu colchão', photo: 'Envio a seguir uma foto do colchão.', blank: 'Tamanho (solteiro, casal ou king) e localidade:' },
+    'limpeza-tapetes': { request: 'limpar os meus tapetes', photo: 'Envio a seguir fotos dos tapetes.', blank: 'Nº de tapetes, medidas aproximadas e localidade:' },
+    'limpeza-cadeiras': { request: 'limpar as minhas cadeiras', photo: 'Envio a seguir uma foto das cadeiras.', blank: 'Nº de cadeiras e localidade:' },
+    'limpeza-alcatifas': { request: 'limpar a minha alcatifa', photo: 'Envio a seguir uma foto da alcatifa.', blank: 'Área aproximada (m²) e localidade:' },
+    'impermeabilizacao': { request: 'impermeabilizar o meu sofá', photo: 'Envio a seguir uma foto do tecido.', blank: 'Nº de lugares, localidade e se também quer a limpeza:' },
   };
   const service = services[serviceSlug];
   if (!service) return buildGeneralWaMessage();
-  const fields = ['Localidade:', ...service.fields, 'Dia que dá jeito:'];
-  return `Olá! Gostaria de um orçamento para ${service.request}${loc}.\n\n${fields.join('\n')}\n\n${service.photo}`;
+  return `Olá! Gostaria de um orçamento para ${service.request}${loc}.\n\n${service.photo}\n\n${service.blank} `;
 }
 
 /** Used on MaterialPage. */

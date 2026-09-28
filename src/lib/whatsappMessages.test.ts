@@ -3,13 +3,13 @@ import { WHATSAPP_BASE } from '@/constants/business';
 import { buildGeneralWaMessage, buildServiceWaMessage, buildSubmittedWaMessage, buildVariantWaMessage } from './whatsappMessages';
 
 describe('WhatsApp enquiry context and privacy', () => {
-  it('matches the approved Lisbon sofa message: the client only fills in the blanks', () => {
-    expect(buildServiceWaMessage('limpeza-sofas', 'Lisboa')).toBe('Olá! Gostaria de um orçamento para limpar o meu sofá em Lisboa.\n\nLocalidade:\nSofá de quantos lugares:\nDia que dá jeito:\n\nA seguir envio uma foto do sofá.');
+  it('matches the approved Lisbon sofa message: one blank, last, where the cursor lands', () => {
+    expect(buildServiceWaMessage('limpeza-sofas', 'Lisboa')).toBe('Olá! Gostaria de um orçamento para limpar o meu sofá em Lisboa.\n\nEnvio a seguir uma foto do sofá.\n\nNº de lugares e localidade: ');
   });
   it('asks waterproofing clients about the cleaning pack', () => {
     const text = buildServiceWaMessage('impermeabilizacao', 'Porto');
     expect(text).toContain('impermeabilizar o meu sofá no Porto');
-    expect(text).toContain('Também quero a limpeza (sim ou não):');
+    expect(text).toMatch(/Nº de lugares, localidade e se também quer a limpeza: $/);
     expect(text).not.toContain('limpar');
   });
   it('keeps Porto and protection distinct from cleaning', () => {
