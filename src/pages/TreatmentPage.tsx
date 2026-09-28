@@ -25,7 +25,7 @@ export default function TreatmentPage() {
   }, [pathname, page?.title]);
   if (!page) return null;
   const treatment = treatments.find(item => pathname.startsWith('/' + item.slug));
-  const wa = `${WHATSAPP_BASE}?text=${encodeURIComponent(`Olá! Gostaria de pedir orçamento: ${page.h1}.\nArtigo e quantidade: \nMedidas: \nLocalidade: ${page.city?.name ?? ''}\nPosso enviar fotografias para avaliação.`)}`;
+  const wa = `${WHATSAPP_BASE}?text=${encodeURIComponent(`Olá! Gostaria de saber o preço e a disponibilidade: ${page.h1}.\nArtigo e quantidade: \nMedidas: \nLocalidade: ${page.city?.name ?? ''}\nPosso enviar fotografias para avaliação.`)}`;
   return <><Header /><main className="bg-[#FDFDF9] text-[#111111]">
     <section data-mobile-hero="text" className="bg-[#071a12] text-white pt-28 pb-16 px-5"><div className="max-w-5xl mx-auto">
       <p className="text-gold uppercase tracking-widest text-xs mb-5">Cuidado à medida dos seus estofos</p>

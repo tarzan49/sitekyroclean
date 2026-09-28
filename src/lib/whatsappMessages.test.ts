@@ -4,7 +4,7 @@ import { askLocalityToo, buildGeneralWaMessage, buildServiceWaMessage, buildSubm
 
 describe('WhatsApp enquiry context and privacy', () => {
   it('matches the approved Lisbon sofa message: one blank, last, where the cursor lands', () => {
-    expect(buildServiceWaMessage('limpeza-sofas', 'Lisboa')).toBe('Olá! Gostaria de um orçamento para limpar o meu sofá em Lisboa.\n\nEnvio a seguir uma foto do sofá.\n\nNº de lugares: ');
+    expect(buildServiceWaMessage('limpeza-sofas', 'Lisboa')).toBe('Olá! Gostaria de saber o preço e a disponibilidade para limpar o meu sofá em Lisboa.\n\nEnvio a seguir uma foto do sofá.\n\nNº de lugares: ');
   });
   it('asks the locality only when the page does not name a place', () => {
     expect(buildServiceWaMessage('limpeza-sofas')).toMatch(/Nº de lugares e localidade: $/);

@@ -42,7 +42,7 @@ export function getResourceOffer(post?: BlogPost) {
 }
 
 export function getResourceWhatsapp(post?: BlogPost) {
-  const message = post ? `Olá! Li o guia «${post.title}» e gostaria de pedir avaliação e orçamento. A minha localidade é: ` : 'Olá! Gostaria de pedir avaliação e orçamento para os meus estofos. A minha localidade é: ';
+  const message = post ? `Olá! Li o guia «${post.title}» e gostaria de saber o preço e a disponibilidade. A minha localidade é: ` : 'Olá! Gostaria de saber o preço e a disponibilidade para limpar os meus estofos. A minha localidade é: ';
   return `${WHATSAPP_BASE}?text=${encodeURIComponent(message)}`;
 }
 export const resourceQuizService: Record<string, string> = { 'limpeza-sofas': 'sofa', 'limpeza-colchoes': 'mattress', 'limpeza-cadeiras': 'chairs', 'limpeza-tapetes': 'carpet', 'limpeza-alcatifas': 'carpet', impermeabilizacao: 'sofa' };

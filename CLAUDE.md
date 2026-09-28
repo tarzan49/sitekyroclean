@@ -375,6 +375,10 @@ de Porto e Lisboa mas segmentam a região toda, onde a deslocação muda. Pedida
 resposta. A linha fica no fim porque o WhatsApp abre com o cursor no fim: a
 versão com três campos a meio do texto durou umas horas. Vive em
 `buildServiceWaMessage`; não voltar a uma frase corrida sem o campo.
+**Todas as mensagens de WhatsApp para o cliente pedem "o preço e a
+disponibilidade"** (dono, 28/09/2026): o bot de respostas usa essa palavra
+para saber o que responder. A versão "Gostaria de um orçamento para…" não a
+tinha. Uma mensagem nova leva sempre "disponibilidade".
 
 **Exportar não é importar.** `conversion_exports` guarda `queued`, `exported`,
 `submitted`, `accepted`, `rejected` em separado, e o CSV só é gerado depois de o

@@ -25,7 +25,7 @@ describe('isGoogleAdsVisit', () => {
 describe('markAdsWhatsAppText', () => {
   it('turns the landing page opening into a natural sentence', () => {
     expect(markAdsWhatsAppText(buildServiceWaMessage('limpeza-sofas', 'Lisboa')))
-      .toBe('Olá! Vi o vosso anúncio no Google e gostaria de um orçamento para limpar o meu sofá em Lisboa.\n\nEnvio a seguir uma foto do sofá.\n\nNº de lugares e localidade: ');
+      .toBe('Olá! Vi o vosso anúncio no Google e gostaria de saber o preço e a disponibilidade para limpar o meu sofá em Lisboa.\n\nEnvio a seguir uma foto do sofá.\n\nNº de lugares e localidade: ');
   });
 
   it('puts the mark in front of every other Portuguese opening', () => {

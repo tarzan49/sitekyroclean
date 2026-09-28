@@ -45,7 +45,7 @@ export function buildServiceWaMessage(serviceSlug: string, placeName?: string | 
   if (!service) return buildGeneralWaMessage();
   const loc = placeName ? ` ${cityPrep(placeName)} ${placeName}` : '';
   const blank = placeName ? service.blank : service.blankWithLocality;
-  return `Olá! Gostaria de um orçamento para ${service.request}${loc}.\n\n${service.photo}\n\n${blank} `;
+  return `Olá! Gostaria de saber o preço e a disponibilidade para ${service.request}${loc}.\n\n${service.photo}\n\n${blank} `;
 }
 
 /**
@@ -86,57 +86,57 @@ export function buildProblemWaMessage(slug: string): string {
   if (s.includes('urgente'))
     return `Olá! Preciso de limpeza urgente. Têm disponibilidade ainda hoje ou amanhã?`;
   if (s.includes('urina'))
-    return `Olá! Tenho urina no meu ${s.includes('colchao') ? 'colchão' : 'sofá'} e preciso de tratamento urgente. Qual é o preço e disponibilidade?`;
+    return `Olá! Tenho urina no meu ${s.includes('colchao') ? 'colchão' : 'sofá'} e preciso de tratamento urgente. Qual é o preço e a disponibilidade?`;
   if (s.includes('manchas-vinho'))
-    return `Olá! Tenho uma mancha de vinho no sofá e preciso de ajuda. Qual é o preço?`;
+    return `Olá! Tenho uma mancha de vinho no sofá e preciso de ajuda. Qual é o preço e a disponibilidade?`;
   if (s.includes('manchas-cafe'))
-    return `Olá! Tenho manchas de café no sofá. Podem ajudar? Qual é o preço?`;
+    return `Olá! Tenho manchas de café no sofá. Podem ajudar? Qual é o preço e a disponibilidade?`;
   if (s.includes('manchas-gordura'))
-    return `Olá! Tenho manchas de gordura no sofá. Qual é o serviço adequado e o preço?`;
+    return `Olá! Tenho manchas de gordura no sofá. Qual é o serviço adequado, o preço e a disponibilidade?`;
   if (s.includes('manchas-sangue'))
-    return `Olá! Tenho manchas de sangue no colchão e preciso de ajuda urgente. Qual é o preço?`;
+    return `Olá! Tenho manchas de sangue no colchão e preciso de ajuda urgente. Qual é o preço e a disponibilidade?`;
   if (s.includes('mancha')) {
     const item = s.includes('colchao') ? 'colchão' : s.includes('tapete') ? 'tapete' : 'sofá';
-    return `Olá! Tenho manchas no meu ${item} e preciso de remoção profissional. Qual é o preço?`;
+    return `Olá! Tenho manchas no meu ${item} e preciso de remoção profissional. Qual é o preço e a disponibilidade?`;
   }
   if (s.includes('cheiro') || s.includes('odor')) {
     const item = s.includes('colchao') ? 'colchão' : s.includes('tapete') ? 'tapete' : 'sofá';
-    return `Olá! O meu ${item} tem maus cheiros persistentes. Qual é o serviço e o preço?`;
+    return `Olá! O meu ${item} tem maus cheiros persistentes. Qual é o serviço, o preço e a disponibilidade?`;
   }
   if (s.includes('acar')) {
     const item = s.includes('colchao') ? 'colchão' : 'sofá';
-    return `Olá! Gostaria de conhecer o tratamento anti-ácaros opcional para o meu ${item}. Podem explicar o que inclui e confirmar o preço?`;
+    return `Olá! Gostaria de conhecer o tratamento anti-ácaros opcional para o meu ${item}. Podem explicar o que inclui e confirmar o preço e a disponibilidade?`;
   }
   if (s.includes('alerg')) {
     const item = s.includes('colchao') ? 'colchão' : 'sofá';
-    return `Olá! Tenho alergias e preciso de higienização profissional do meu ${item}. Qual é o preço?`;
+    return `Olá! Tenho alergias e preciso de higienização profissional do meu ${item}. Qual é o preço e a disponibilidade?`;
   }
   if (s.includes('pelos')) {
     const item = s.includes('tapete') ? 'tapete' : 'sofá';
-    return `Olá! O meu ${item} tem pelos de animais. Qual é o vosso serviço e preço?`;
+    return `Olá! O meu ${item} tem pelos de animais. Qual é o vosso serviço, o preço e a disponibilidade?`;
   }
   if (s.includes('mofo') || s.includes('bolor')) {
     const item = s.includes('alcatifa') ? 'alcatifa' : 'tapete';
-    return `Olá! O meu ${item} tem mofo/bolor. Qual é o serviço e preço para remoção?`;
+    return `Olá! O meu ${item} tem mofo/bolor. Qual é o serviço, o preço e a disponibilidade para remoção?`;
   }
   if (s.includes('impermeabiliz'))
-    return `Olá! Quero impermeabilizar o meu sofá. Qual é o preço e disponibilidade?`;
+    return `Olá! Quero impermeabilizar o meu sofá. Qual é o preço e a disponibilidade?`;
   if (s.includes('pele'))
-    return `Olá! Tenho um sofá de pele que precisa de limpeza e tratamento. Qual é o preço?`;
+    return `Olá! Tenho um sofá de pele que precisa de limpeza e tratamento. Qual é o preço e a disponibilidade?`;
   if (s.includes('veludo'))
-    return `Olá! Tenho um sofá de veludo que precisa de limpeza profissional. Qual é o preço?`;
+    return `Olá! Tenho um sofá de veludo que precisa de limpeza profissional. Qual é o preço e a disponibilidade?`;
   if (s.includes('persa'))
-    return `Olá! Tenho um tapete persa que precisa de lavagem especializada. Qual é o preço?`;
+    return `Olá! Tenho um tapete persa que precisa de lavagem especializada. Qual é o preço e a disponibilidade?`;
   if (s.includes('tapete-la') || (s.includes('tapete') && s.includes('-la')))
-    return `Olá! Tenho um tapete de lã que precisa de lavagem profissional. Qual é o preço?`;
+    return `Olá! Tenho um tapete de lã que precisa de lavagem profissional. Qual é o preço e a disponibilidade?`;
   if (s.includes('preco') || s.includes('custa') || s.includes('quanto')) {
     const item = s.includes('colchao') ? 'colchão' : s.includes('tapete') ? 'tapete' : 'sofá';
-    return `Olá! Gostaria de saber o preço de limpeza profissional de ${item}. Podem dar-me um orçamento?`;
+    return `Olá! Gostaria de saber o preço de limpeza profissional de ${item}. Podem dar-me um orçamento e a disponibilidade?`;
   }
   if (s.includes('cadeira'))
-    return `Olá! Preciso de limpeza profissional de cadeiras. Qual é o preço e disponibilidade?`;
+    return `Olá! Preciso de limpeza profissional de cadeiras. Qual é o preço e a disponibilidade?`;
   if (s.includes('alcatifa'))
-    return `Olá! Preciso de limpeza profissional de alcatifas. Qual é o preço?`;
+    return `Olá! Preciso de limpeza profissional de alcatifas. Qual é o preço e a disponibilidade?`;
   const item = s.includes('colchao') ? 'colchão' : s.includes('tapete') ? 'tapete' : 'sofá';
   return `Olá! Preciso de limpeza profissional para o meu ${item}. Qual é o preço e quando têm disponibilidade?`;
 }
@@ -160,7 +160,7 @@ export function buildVariantWaMessage(
 
 /** Used on CommercialPage (B2B: restaurantes, hotéis, escritórios). */
 export function buildCommercialWaMessage(cityName: string): string {
-  return `Olá! Represento um negócio ${cityPrep(cityName)} ${cityName} (restaurante/hotel/escritório) e tenho interesse num contrato de limpeza recorrente de estofos. Podem enviar-me uma proposta?`;
+  return `Olá! Represento um negócio ${cityPrep(cityName)} ${cityName} (restaurante/hotel/escritório) e tenho interesse num contrato de limpeza recorrente de estofos. Podem enviar-me uma proposta e a vossa disponibilidade?`;
 }
 
 /** Only an opaque operational reference belongs in a shareable WhatsApp URL. */

@@ -38,7 +38,7 @@ const QuizStepConfigChairs = ({ formData, updateFormData }: Props) => {
     });
   };
 
-  const chairWhatsappMsg = encodeURIComponent('Olá, tenho cadeiras de um tipo diferente (sem tampo, costas ou braços) e gostava de um orçamento personalizado.');
+  const chairWhatsappMsg = encodeURIComponent('Olá, tenho cadeiras de um tipo diferente (sem tampo, costas ou braços) e gostava de saber o preço e a disponibilidade.');
 
   return (
     <div className="flex flex-col gap-2 overflow-hidden items-center w-full">
