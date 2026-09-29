@@ -2,6 +2,7 @@
 // Targets searches like "limpeza sofa tecido", "limpeza sofa veludo porto"
 
 import { cities, cityPrep } from "./serviceCatalog";
+import { formatEuro, sofaCleaningPrice, SOFA_CLEANING_FROM } from "./enginePrices";
 
 export interface MaterialDefinition {
   slug: string;
@@ -29,7 +30,7 @@ const materialDefinitions: MaterialDefinition[] = [
     serviceName: "Limpeza de Sofás",
     keyword: "limpeza sofá tecido",
     title: "Limpeza de Sofá em Tecido | Profissional | Kyro Clean Solutions",
-    metaDescription: "Limpeza profissional de sofá em tecido. Remoção de manchas, ácaros e odores. Tratamento específico para tecidos. Desde 49€. Orçamento grátis.",
+    metaDescription: `Limpeza profissional de sofá em tecido. Remoção de manchas, ácaros e odores. Tratamento específico para tecidos. Desde ${formatEuro(SOFA_CLEANING_FROM)}. Orçamento grátis.`,
     h1: "Limpeza Profissional de Sofá em Tecido",
     intro: "Sofás em tecido são os mais comuns nas casas portuguesas e requerem cuidados específicos. A Kyro Clean Solutions utiliza técnicas de extração profunda adaptadas a cada tipo de tecido para garantir uma limpeza segura e eficaz.",
     characteristics: [
@@ -88,7 +89,7 @@ const materialDefinitions: MaterialDefinition[] = [
     faqs: [
       { question: "A limpeza profissional estraga o veludo?", answer: "Não. Utilizamos técnicas específicas para veludo, incluindo limpeza no sentido do pelo e pressão controlada, preservando a textura e o brilho." },
       { question: "Posso limpar veludo em casa?", answer: "Para manchas pontuais, pode absorver o excesso com pano seco. Mas para uma limpeza profunda, recomendamos sempre serviço profissional para evitar danos permanentes." },
-      { question: "Quanto custa limpar um sofá em veludo?", answer: "A partir de 49€ para sofás de 1 lugar (69€ para 2 lugares). O veludo pode requerer um tratamento mais cuidadoso, o que pode influenciar ligeiramente o preço." },
+      { question: "Quanto custa limpar um sofá em veludo?", answer: `A partir de ${formatEuro(sofaCleaningPrice('1-lugar'))} para sofás de 1 lugar (${formatEuro(sofaCleaningPrice('2-lugares'))} para 2 lugares). O veludo pede um tratamento mais cuidadoso, que avaliamos antes de começar.` },
     ],
     relatedMaterials: ["limpeza-sofa-tecido", "limpeza-sofa-pele", "limpeza-sofa-camurca"],
   },
@@ -123,7 +124,7 @@ const materialDefinitions: MaterialDefinition[] = [
     faqs: [
       { question: "Com que frequência devo limpar um sofá em pele?", answer: "Recomendamos limpeza profissional a cada 6-12 meses, dependendo do uso. A hidratação deve ser feita pelo menos semestralmente." },
       { question: "A limpeza remove arranhões da pele?", answer: "Arranhões superficiais podem ser minimizados com o processo de hidratação e proteção. Arranhões profundos podem necessitar de restauro especializado." },
-      { question: "Quanto custa limpar e hidratar um sofá em pele?", answer: "A partir de 69€ para sofás de 2 lugares, incluindo limpeza e hidratação. O preço pode variar conforme o tipo de pele e estado do sofá." },
+      { question: "Quanto custa limpar e hidratar um sofá em pele?", answer: `A partir de ${formatEuro(sofaCleaningPrice('2-lugares'))} para sofás de 2 lugares, incluindo limpeza e hidratação. O valor final é confirmado no orçamento, porque um sofá em pele pode custar mais do que um de tecido com o mesmo tamanho.` },
     ],
     relatedMaterials: ["limpeza-sofa-tecido", "limpeza-sofa-camurca", "limpeza-sofa-sintetico"],
   },
@@ -134,7 +135,7 @@ const materialDefinitions: MaterialDefinition[] = [
     serviceName: "Limpeza de Sofás",
     keyword: "limpeza sofá microfibra",
     title: "Limpeza de Sofá em Microfibra | Kyro Clean Solutions",
-    metaDescription: "Limpeza profissional de sofás em microfibra. Remoção de manchas sem danificar as fibras. Resultados imediatos. Desde 49€.",
+    metaDescription: `Limpeza profissional de sofás em microfibra. Remoção de manchas sem danificar as fibras. Resultados imediatos. Desde ${formatEuro(SOFA_CLEANING_FROM)}.`,
     h1: "Limpeza Profissional de Sofá em Microfibra",
     intro: "A microfibra é um material popular pela sua durabilidade e conforto, mas pode ser difícil de limpar corretamente em casa. O nosso processo profissional remove manchas e sujidade sem danificar as fibras finas.",
     characteristics: [
@@ -236,7 +237,7 @@ const materialDefinitions: MaterialDefinition[] = [
     serviceName: "Limpeza de Sofás",
     keyword: "limpeza sofá sintético",
     title: "Limpeza de Sofá Sintético | Kyro Clean Solutions",
-    metaDescription: "Limpeza profissional de sofás em material sintético. Pele sintética, poliéster e napa. Remoção de manchas e restauração. Desde 49€.",
+    metaDescription: `Limpeza profissional de sofás em material sintético. Pele sintética, poliéster e napa. Remoção de manchas e restauração. Desde ${formatEuro(SOFA_CLEANING_FROM)}.`,
     h1: "Limpeza de Sofá em Material Sintético",
     intro: "Sofás em pele sintética, poliéster ou napa são práticos e duráveis, mas necessitam de limpeza adequada para evitar descamação e desgaste prematuro. Limpamos e protegemos o seu sofá sintético.",
     characteristics: [

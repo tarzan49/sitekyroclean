@@ -1097,7 +1097,7 @@ export function prerenderRoutes(outDir: string): number {
         'Recuperação das cores e textura original',
         'Tratamento específico por tipo de fibra',
         'Secagem em 3 a 6 horas',
-        'Serviço ao domicílio sem necessidade de recolha',
+        'Lavagem em sua casa na maioria dos casos',
       ],
       'limpeza-cadeiras': [
         'Remoção de manchas de comida, bebida e gordura',

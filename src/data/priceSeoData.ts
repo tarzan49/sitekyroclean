@@ -7,6 +7,7 @@ import { formatEuro, chairTierRows, SOFA_CLEAN_AND_PROTECT_FROM, SOFA_PROTECT_WI
 import { cities, services, cityPrep } from "./serviceCatalog";
 import { getLandingFaqs, type LandingService } from './landingFaqPool';
 import { getLandingEditorial } from './landingEditorial';
+import { PRICE_FACTORS } from './priceFactors';
 
 export interface PricePageData {
   serviceSlug: string;
@@ -85,57 +86,6 @@ const priceTables: Record<string, { item: string; price: string; note?: string }
   ],
 };
 
-const priceFactors: Record<string, string[]> = {
-  "limpeza-sofas": [
-    "Tamanho e número de lugares do sofá",
-    "Tipo de tecido (pele, veludo, microfibra, etc.)",
-    "Gravidade e tipo de manchas",
-    "Necessidade de desodorização extra",
-    "Impermeabilização adicional",
-    "Configuração em L ou módulos extra",
-  ],
-  "limpeza-colchoes": [
-    "Dimensão do colchão (solteiro, casal, king)",
-    "Estado geral e tipo de manchas",
-    "Necessidade de anti-ácaros extra",
-    "Limpeza de cabeceira incluída ou não",
-    "Tipo de colchão (espuma, molas, viscoelástico)",
-    "Tempo desde a última higienização profissional",
-  ],
-  "limpeza-tapetes": [
-    "Dimensão em metros quadrados",
-    "Material (lã, sintético, seda, sisal)",
-    "Tapetes artesanais ou persas requerem tratamento especial",
-    "Estado das manchas e sujidade acumulada",
-    "Necessidade de recolha e entrega",
-    "Idade e fragilidade das fibras",
-  ],
-  "limpeza-cadeiras": [
-    "Tipo de cadeira (simples, escritório, poltrona)",
-    "Material do estofamento",
-    "Número de cadeiras (descontos por quantidade)",
-    "Manchas e estado geral",
-    "Local do serviço (residência, escritório, restaurante)",
-    "Acesso e disponibilidade do espaço",
-  ],
-  "limpeza-alcatifas": [
-    "Área total em metros quadrados",
-    "Tipo de alcatifa e fibra",
-    "Acessibilidade do espaço",
-    "Estado e nível de sujidade",
-    "Necessidade de tratamento anti-fúngico",
-    "Frequência de manutenção anterior",
-  ],
-  "impermeabilizacao": [
-    "Tipo de peça a impermeabilizar",
-    "Tamanho da superfície",
-    "Material do tecido",
-    "Combinação com limpeza na mesma visita (preço de pack)",
-    "Exposição a crianças ou animais domésticos",
-    "Versão escolhida (Essencial ou Premium)",
-  ],
-};
-
 
 // ── Generate price page data ──
 
@@ -145,7 +95,8 @@ export function getPricePageData(serviceSlug: string, citySlug: string): PricePa
   if (!service || !city) return null;
 
   const table = priceTables[serviceSlug] || [];
-  const factors = priceFactors[serviceSlug] || [];
+  // Os mesmos fatores dos cartões "Como é calculado o preço?", não uma lista à parte.
+  const factors = (PRICE_FACTORS[serviceSlug] ?? []).flatMap(factor => factor.examples);
   const prep = cityPrep(city.name);
   const faqs = getLandingFaqs({ serviceSlug: serviceSlug as LandingService, pageKey: `/preco-${serviceSlug}-${citySlug}`, municipality: city.name, family: 'preco' });
 

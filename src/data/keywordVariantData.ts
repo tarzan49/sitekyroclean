@@ -449,21 +449,21 @@ function content_lavagem_tapetes(loc: string, ctx: string): ContentBlock {
   const seedT = getSeed(loc + '|lavagem-tapetes_t');
   return {
     intro: pick([
-      `Precisa de lavar tapetes em ${loc}? A Kyro Clean Solutions faz lavagem especializada de tapetes de todos os tipos (persas, orientais, modernos e de lã) com extração profissional e recolha ao domicílio em ${loc}, ${ctx}. Cada tapete é medido e orçamentado individualmente.`,
-      `A Kyro Clean Solutions faz lavagem especializada de tapetes em ${loc} — persas, orientais, modernos e de lã — com extração profissional e recolha ao domicílio em ${loc}, ${ctx}. Cada tapete é medido e orçamentado individualmente, sem tabela fixa por m².`,
-      `Tapetes persas, orientais, modernos ou de lã em ${loc} pedem tratamento diferente consoante a fibra. A Kyro Clean Solutions faz lavagem especializada com extração profissional e recolha ao domicílio em ${loc}, ${ctx}, medindo e orçamentando cada peça individualmente.`,
+      `Precisa de lavar tapetes em ${loc}? A Kyro Clean Solutions faz lavagem especializada de tapetes de todos os tipos (persas, orientais, modernos e de lã) com extração profissional em ${loc}, ${ctx}, na maioria dos casos em sua casa. Cada tapete é medido e orçamentado individualmente.`,
+      `A Kyro Clean Solutions faz lavagem especializada de tapetes persas, orientais, modernos e de lã em ${loc}, ${ctx}, com extração profissional. Lavamos em sua casa sempre que possível e recolhemos só quando a peça o exige. Cada tapete é medido e orçamentado individualmente, sem tabela fixa por m².`,
+      `Tapetes persas, orientais, modernos ou de lã em ${loc} pedem tratamento diferente consoante a fibra. A Kyro Clean Solutions faz lavagem especializada com extração profissional em ${loc}, ${ctx}, em sua casa na maioria dos casos, medindo e orçamentando cada peça individualmente.`,
     ] as const, seed),
     whatIs: pick([
       `A lavagem profissional retira a sujidade compactada que anos de aspiração deixaram para trás nas fibras, restaura as cores e o toque originais. Feita com produtos adaptados ao tipo de fibra (lã, seda, sintético ou persa) para que o tapete não corra riscos em ${loc}.`,
       `Anos de aspiração deixam sempre para trás uma camada de sujidade compactada nas fibras que só a lavagem profissional consegue remover, restaurando as cores e o toque originais. Os produtos são adaptados ao tipo de fibra (lã, seda, sintético ou persa) para que o tapete não corra riscos em ${loc}.`,
-      `A sujidade que se compacta nas fibras de um tapete ao longo dos anos não sai só com aspiração — precisa de extração profissional para restaurar as cores e o toque originais. Cada produto é escolhido consoante o tipo de fibra (lã, seda, sintético ou persa) para não pôr o tapete em risco em ${loc}.`,
+      `A sujidade que se compacta nas fibras de um tapete ao longo dos anos não sai só com aspiração: precisa de extração profissional para restaurar as cores e o toque originais. Cada produto é escolhido consoante o tipo de fibra (lã, seda, sintético ou persa) para não pôr o tapete em risco em ${loc}.`,
     ] as const, seed2),
     benefits: pick([
       [
         'Lavagem especializada para tapetes persas e orientais',
         `Restauração das cores e aspeto original em ${loc}`,
         'Remove manchas de gordura, vinho e animais',
-        `Recolha e entrega ao domicílio em ${loc}`,
+        `Lavagem em sua casa em ${loc}, na maioria dos casos`,
         'Técnicas específicas por tipo de fibra',
         'Secagem controlada: fibras preservadas',
       ],
@@ -471,7 +471,7 @@ function content_lavagem_tapetes(loc: string, ctx: string): ContentBlock {
         'Especialistas em lavagem de tapetes persas e orientais',
         `Cores e aspeto original de volta ao tapete em ${loc}`,
         'Manchas de gordura, vinho e animais removidas',
-        `Recolha e entrega ao domicílio em ${loc}`,
+        `Recolha em ${loc} só quando é precisa, com entrega em 3 dias`,
         'Cada fibra tratada com a técnica adequada',
         'Secagem controlada para preservar as fibras',
       ],

@@ -1,5 +1,5 @@
 import { ALCATIFA_PROBLEMS } from "./alcatifaProblems";
-import { cityPrep, cityPrepCap, services, DEFAULT_PRICE_FROM, cities } from "./serviceCatalog";
+import { cityPrep, cityPrepCap, cityPrepDe, services, DEFAULT_PRICE_FROM, cities } from "./serviceCatalog";
 import { WATERPROOFING_PROBLEMS } from "./waterproofingProblems";
 import { locationPrices } from '../constants/travel';
 import { getLandingFaqs, type LandingService } from './landingFaqPool';
@@ -102,25 +102,25 @@ function generateTapetesContent(city: string, cityDesc: string): Omit<LocationSe
   const Prep = cityPrepCap(city);
   return {
     title: `Limpeza de Tapetes ${city} | Orçamento Grátis | Kyro Clean Solutions`,
-    metaDescription: `Lavagem profissional de tapetes ${prep} ${city}. Limpeza de tapetes persas, orientais e modernos. Recolha e entrega. Orçamento sempre à medida de cada tapete.`,
+    metaDescription: `Lavagem profissional de tapetes ${prep} ${city}. Limpeza de tapetes persas, orientais e modernos. Lavagem em sua casa na maioria dos casos. Orçamento sempre à medida de cada tapete.`,
     h1: `Limpeza e Lavagem de Tapetes ${prep} ${city}`,
-    intro: `Procura lavagem de tapetes profissional ${prep} ${city}? A Kyro Clean Solutions oferece limpeza especializada de tapetes de todos os tipos: persas, orientais, modernos, de lã e sintéticos. Serviço disponível ${prep} ${city}, ${cityDesc} com recolha e entrega ao domicílio. Cada tapete é medido e orçamentado individualmente, sem preço fixo por m².`,
+    intro: `Procura lavagem de tapetes profissional ${prep} ${city}? A Kyro Clean Solutions oferece limpeza especializada de tapetes de todos os tipos: persas, orientais, modernos, de lã e sintéticos. Serviço disponível ${prep} ${city}, ${cityDesc}, em sua casa na maioria dos casos. Cada tapete é medido e orçamentado individualmente, sem preço fixo por m².`,
     problems: [
       { title: "Sujidade acumulada nas fibras", description: `Os tapetes acumulam poeira, terra, areia e resíduos diariamente. ${Prep} ${city}, o uso constante torna a limpeza profunda essencial para manter a higiene.` },
       { title: "Manchas resistentes", description: `Manchas de líquidos, comida e animais que se fixam nas fibras do tapete e são impossíveis de remover com aspirador convencional.` },
       { title: "Alergénios e ácaros", description: `Os tapetes são dos principais reservatórios de ácaros e alergénios numa casa, contribuindo para problemas respiratórios.` },
       { title: "Cores desbotadas", description: `Sem limpeza adequada, as cores dos tapetes perdem vivacidade. A nossa lavagem profissional revitaliza as cores originais.` },
     ],
-    howItWorks: `Processo de limpeza de tapetes ${prep} ${city}: 1) Avaliação do tipo de tapete e fibras, 2) Pulverização com produto específico por fibra, 3) Escovação para penetrar nas fibras, 4) Extração profunda com equipamento profissional, 5) Secagem controlada para preservar as fibras. Oferecemos recolha e entrega ao domicílio ${prep} ${city}.`,
+    howItWorks: `Processo de limpeza de tapetes ${prep} ${city}: 1) Avaliação do tipo de tapete e fibras, 2) Pulverização com produto específico por fibra, 3) Escovação para penetrar nas fibras, 4) Extração profunda com equipamento profissional, 5) Secagem controlada para preservar as fibras. Na maioria dos casos o processo é feito em sua casa; quando o tapete tem de ser recolhido, entregamos no prazo máximo de 3 dias.`,
     benefits: [
       "Lavagem especializada de tapetes persas, orientais, de lã e sintéticos",
       "Revitalização de cores desbotadas e remoção de manchas antigas",
-      "Recolha e entrega ao domicílio, sem necessidade de transportar o tapete",
+      "Lavagem em sua casa na maioria dos casos, sem transportar o tapete",
       "Tratamento de odores e remoção de sujidade das fibras",
       `Serviço de confiança para quem vive ${prep} ${city} e arredores`,
       "Secagem controlada que preserva a textura e estrutura das fibras",
     ],
-    localSection: `Recolhemos e entregamos tapetes em toda a área de ${city}. Atendemos clientes residenciais e comerciais: restaurantes, hotéis e escritórios ${prep} ${city} e arredores.`,
+    localSection: `Lavamos tapetes em toda a área ${cityPrepDe(city)} ${city}, em sua casa na maioria dos casos. Atendemos clientes residenciais e comerciais: restaurantes, hotéis e escritórios ${prep} ${city} e arredores.`,
   };
 }
 

@@ -126,7 +126,7 @@ export const glossaryTerms: GlossaryTerm[] = [
   {
     "id": "tapete-vs-alcatifa",
     "term": "Tapete vs Alcatifa: Diferença e Limpeza",
-    "definition": "Tapete é uma peça solta; alcatifa é um revestimento de piso instalado numa área. Ambos são sempre sob orçamento, com largura e comprimento e avaliação do material, base e estado. Recolha e entrega não são anunciadas como serviço geral.",
+    "definition": "Tapete é uma peça solta; alcatifa é um revestimento de piso instalado numa área. Ambos são sempre sob orçamento, com largura e comprimento e avaliação do material, base e estado. O tapete é lavado em sua casa na maioria dos casos; quando precisa de ser recolhido, entregamos no prazo máximo de 3 dias, com o custo da recolha indicado no orçamento.",
     "serviceLink": {
       "label": "Limpeza de Tapetes e Alcatifas",
       "to": "/limpeza-tapetes"

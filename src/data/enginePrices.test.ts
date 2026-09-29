@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { sofaPrices, mattressPrices } from '@/components/quiz/QuizTypes';
 import { calcChairClean, calcPackPricing } from '@/components/quiz/quizHelpers';
 import { SOFA_ANTI_ACAROS_PRICE, CHAIR_ANTI_ACAROS_UNIT_LABEL } from '@/constants/antiAcarosPricing';
-import { TRAVEL_FEE_MIN } from '@/constants/commercialPolicy';
+import { TRAVEL_FEE_MIN, TRAVEL_FEE_MAX } from '@/constants/commercialPolicy';
 import { PACK_PERK_MIN_ORDER, PACK_PERK_SUMMARY } from '@/constants/packPerks';
 import { services } from './serviceCatalog';
 import {
@@ -37,7 +37,8 @@ import { getLandingPageModel } from './landingPageModel';
 import { getPillarPage } from './pillarPages';
 import { municipiosComFreguesias } from './freguesiaSeoData';
 import { cities } from './serviceCatalog';
-import { getProblemBySlug } from './problemSeoData';
+import { getAllProblems, getProblemBySlug } from './problemSeoData';
+import { getAllMaterials } from './materialSeoData';
 import { getLandingTrustPoints } from '../constants/serviceTrustPool';
 
 const sofa1 = sofaPrices.find(item => item.id === '1-lugar')!;
@@ -168,15 +169,23 @@ describe('páginas de preço dos problemas', () => {
     for (const slug of PRICE_PROBLEMS) expect(pageText(slug), slug).not.toMatch(/\b20\d{2}\b/);
   });
 
-  it('cada preço em euros é um que o quiz cobra', () => {
+  // Em todas as páginas de problema e de material, não só nestas três: um
+  // número escrito à mão que o motor deixe de cobrar rebenta aqui.
+  it('cada preço em euros de uma página de problema ou de material é um que o quiz cobra', () => {
     const engine = [
-      ...sofaPrices.filter(size => typeof size.cleaningPrice === 'number').map(size => sofaCleaningPrice(size.id)),
+      ...sofaPrices.flatMap(size => [size.cleaningPrice, size.waterproofingPrice, size.waterproofingPremiumPrice]),
       ...mattressPrices.flatMap(size => [mattressCleaningPrice(size.id), mattressCleanAndAntiMitePrice(size.id)]),
+      ...chairCleaningTiers().tiers.map(tier => tier.unit),
       SOFA_CLEAN_AND_PROTECT_FROM, SOFA_PROTECT_WITH_CLEANING_FROM, MATTRESS_ANTI_MITE_WITH_CLEANING_FROM,
-      TRAVEL_FEE_MIN, PACK_PERK_MIN_ORDER,
-    ].map(formatEuro);
-    for (const slug of PRICE_PROBLEMS) {
-      for (const [amount] of pageText(slug).matchAll(/\d+(?:,\d{2})?€/g)) expect(engine, `${slug}: ${amount}`).toContain(amount);
+      TRAVEL_FEE_MIN, TRAVEL_FEE_MAX, PACK_PERK_MIN_ORDER,
+    ].filter((value): value is number => typeof value === 'number').map(formatEuro);
+    const strings = (value: unknown): string[] => typeof value === 'string' ? [value]
+      : Array.isArray(value) ? value.flatMap(strings)
+      : value && typeof value === 'object' ? Object.values(value).flatMap(strings) : [];
+    for (const page of [...getAllProblems(), ...getAllMaterials()]) {
+      for (const text of strings(page)) {
+        for (const [amount] of text.matchAll(/\d+(?:,\d{2})?€/g)) expect(engine, `${page.slug}: ${amount}`).toContain(amount);
+      }
     }
   });
 
