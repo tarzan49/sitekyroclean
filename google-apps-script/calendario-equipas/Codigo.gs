@@ -147,7 +147,9 @@ function sincronizarAgora() {
   const movidos = new Set();
   for (const item of paraMover(eventosDasEquipas, fonte.eventos)) {
     try {
-      const movido = Calendar.Events.move(calendarios[item.equipaId], item.evento.id, 'primary', { sendUpdates: 'none' });
+      Calendar.Events.move(calendarios[item.equipaId], item.evento.id, 'primary', { sendUpdates: 'none' });
+      const equipa = EQUIPAS.find(function (e) { return e.id === item.equipaId; });
+      const movido = Calendar.Events.patch({ colorId: equipa.cor }, 'primary', item.evento.id, { sendUpdates: 'none' });
       fonte.eventos.push(movido);
       movidos.add(item.evento.id);
     } catch (erro) {
@@ -243,9 +245,9 @@ function pintarServicos(copias, agora) {
  * seu calendário, com a cor da equipa. Tirá-los da lista (29/09/2026, para a
  * app do telemóvel deixar de propor o último calendário usado) não é possível:
  * a Google recusa que o dono de um calendário o tire da sua própria lista
- * ("The data owner of a calendar cannot remove such a calendar"). Por isso um
- * serviço que a app grave num calendário de equipa passa para o do dono sem
- * cor (`paraMover`), e fica à espera que ele escolha. Uma vez por versão.
+ * ("The data owner of a calendar cannot remove such a calendar"). Um serviço
+ * que o dono grave num calendário de equipa passa para o dele com a cor dessa
+ * equipa (`paraMover`). Uma vez por versão.
  */
 function pintarCalendarios(calendarios, propriedades) {
   if (propriedades.getProperty('coresDosCalendarios') === VERSAO_DAS_CORES) return;
@@ -885,9 +887,11 @@ function escolhasNovas(porEscolher, guardadas, agora) {
  * calendário do dono. No telemóvel, a app grava o evento novo no último
  * calendário usado, e a 29/09/2026 quatro serviços ficaram nos calendários
  * da Porto 1, Porto 2 e Lisboa 1: não entravam no CRM, que só lê o calendário
- * do dono. Passam sem cor: o calendário onde a app os pôs é o último que o
- * dono usou, não uma escolha (29/09/2026: "não quero que me seja recomendada a
- * última escolha"). Ficam à espera que ele escolha a equipa, como os outros. Não passa o que não é serviço (título sem "Serviço") nem
+ * do dono. Passam com a cor da equipa onde estavam: escolher o calendário da
+ * equipa na app é a forma de o dono escolher a equipa (30/09/2026, depois de
+ * uma versão que os passava sem cor e lhe desfazia a escolha: "selecionei a
+ * equipa de Lisboa e passado vinte segundos desseleciona"). Daí seguem como
+ * os outros: entram no CRM e a cópia volta a ser feita na equipa escolhida. Não passa o que não é serviço (título sem "Serviço") nem
  * o que o dono já tem no calendário dele com o mesmo título e a mesma hora
  * (recriado à mão sem apagar o da equipa): isso ficaria a dobrar no CRM, e
  * esses continuam a dar o aviso de `criadosAMao`.

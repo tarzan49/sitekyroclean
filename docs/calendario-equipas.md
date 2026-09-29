@@ -124,8 +124,8 @@ Para desligar: função `desligar`. Os calendários ficam como estão.
   coloquei no serviço anterior"). A 29/09/2026 tentou-se tirá-los da lista do
   dono e a Google recusa: "The data owner of a calendar cannot remove such a
   calendar from their calendar list". Por isso um serviço que caia num
-  calendário de equipa passa para o do dono **sem cor** e fica por escolher:
-  o calendário que a app propôs não conta como escolha. **Não tirar os
+  calendário de equipa passa para o do dono com a cor dessa equipa, que é a
+  escolha dele. **Não tirar os
   serviços do calendário do dono** (ele chegou a pedir): o CRM lê-os de lá e
   a cópia parte deles; sem o original, o CRM marcava-os como apagados e as
   equipas recebiam "cancelado".
@@ -152,9 +152,11 @@ Para desligar: função `desligar`. Os calendários ficam como estão.
 - O CRM continua a ler só o calendário do dono (`calendar-events`). Os
   calendários das equipas não entram nas contas.
 - **Um serviço criado à mão no calendário de uma equipa passa sozinho para o
-  calendário do dono** (`paraMover`, na volta seguinte, até 15 minutos), sem
-  cor: o calendário onde a app o gravou é o último usado, não uma escolha.
-  Entra no CRM e fica à espera que o dono escolha a equipa, como os outros. Dono,
+  calendário do dono** (`paraMover`, na volta seguinte, até 15 minutos), com
+  a cor dessa equipa: escolher o calendário da equipa na app é uma forma de o
+  dono escolher a equipa. Entra no CRM e a cópia volta a ser feita nessa
+  equipa. Uma versão de 29/09 passava-os sem cor e desfazia-lhe a escolha;
+  não repetir. Dono,
   29/09/2026: "todos os serviços que eu coloco no calendário têm de aparecer no
   CRM, ponto", depois de a app do telemóvel ter gravado quatro serviços nos
   calendários da Porto 1, Porto 2 e Lisboa 1. Não passa o que não é serviço nem
