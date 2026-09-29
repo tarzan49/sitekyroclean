@@ -280,6 +280,66 @@ opcional" (ver `sitelinks-e-extensoes.md`).
   dentro de uma secção fechada. Não é motivo de reprovação, mas é o anúncio a
   prometer mais do que a página mostra.
 
+### Auditoria de 29/09/2026 (três dias no ar)
+
+**Números da conta, 26 a 28/09:** 199,35 € (incluindo 15,20 € da antiga
+`Campaign #1`, de 18 a 22/09), 149 cliques, CTR 10,9%, CPC médio 1,34 €, 4
+conversões registadas. Porto: 65,12 €, 58 cliques, 3 conversões. Lisboa:
+119,03 €, 83 cliques, 1 conversão. Parcela de impressões 55% no Porto e 49% em
+Lisboa; perdida por orçamento 40% e 31%, por classificação 5% e 20% (Lisboa
+chegou a 43% a 28/09, já com o orçamento novo: aí o teto de 2 € por clique
+começa a pesar mais do que o orçamento). As conversões registadas ficam muito
+abaixo dos serviços que o dono fechou com os anúncios (consentimento e
+WhatsApp, ver 26/09): para medir a sério falta etiquetar "(anúncio)" no
+calendário, e a 29/09 ainda não havia nenhuma linha do CRM com origem
+"Google Ads".
+
+**Por grupo:** Porto limpeza 49,92 € (45 cliques, 2 conversões), Porto
+impermeabilização 15,20 € (13, 1), Lisboa limpeza 95,44 € (66, 1), Lisboa
+impermeabilização 23,59 € (17, 0). A palavra-chave que mais gasta é "limpeza
+sofá" em Lisboa (30,97 €, 20 cliques, 1 conversão). "limpeza de estofos" está
+"Raramente mostrado (Índice de qualidade baixo)" nas duas cidades (20 €, 16
+cliques, 0 conversões) e atrai pesquisas de carros.
+
+**Aplicado nesta data:**
+
+- **Imagens.** A Google reprova imagens antes/depois lado a lado ("Reprovado
+  (Colagem)"). Saíram 36: 12 por campanha e as 6 da impermeabilização em cada
+  cidade (as de vinho, refrigerante e leite). Entraram 12 fotos só com o
+  depois (`imagens/sofa-{1..6}-depois-{q,h}.jpg`) nas duas campanhas, que
+  ficam com 20 cada, o máximo. A imagem com mais resultado até aqui é o
+  sofá-cama bege quadrado (361 impressões, 24 cliques). O aviso sobre
+  "recursos criados ou editados com IA" aparece em qualquer carregamento; não
+  é uma deteção.
+- **Negativas partilhadas: 144 → 185.** limpador, lavadora, aparelho, escova,
+  detergente, espuma, mistura, misturinha, liquido, líquido, desinfetante,
+  sanytol, vanish, karpex, redex, pluri, cif, mercadona, lidl, action, wap,
+  kit, ferro de passar, automovel, automoveis, "limpa estofos", "limpa
+  estofados", "limpa estofado", "dr sofá", "dr sofa", "resolve já", "resolve
+  ja", "o que usar", "melhor extratora", comprar e, a pensar nos tapetes e
+  colchões, "tapete de rato", "tapete de banho", yoga, rolante, insuflável,
+  insuflavel. "extratora" sozinha ficou de fora de propósito: "limpeza de
+  sofás com extratora" pode ser um cliente.
+- **Site:** as páginas de tapetes passaram a dizer, no passo "Avaliação", que
+  quando o tapete tem de ser recolhido é entregue em 3 dias no máximo. O
+  anúncio promete isso e a pergunta frequente que o dizia não calhava nas
+  páginas do Porto nem de Lisboa.
+
+**Por decidir pelo dono:**
+
+- **"lavandaria" e "tinturaria" estão nas negativas partilhadas**, que valem
+  para a campanha inteira, por isso a palavra-chave "lavandaria de tapetes"
+  dos dois grupos de tapetes nunca vai aparecer. Para a libertar só nos
+  tapetes, as duas passam a negativas dos grupos de sofás e colchões. O
+  carregamento em massa recusou "Negative Broad" na coluna "Criterion Type"
+  (nesta conta os valores vão em português, como o "Expressão" que funcionou
+  nas palavras-chave); nada foi aplicado.
+- **Tapetes e colchões partilham o orçamento com os sofás.** Com "Maximizar
+  cliques", a Google distribui o orçamento pelos cliques mais baratos. Como os
+  sofás já perdem 30 a 40% das impressões por orçamento, ligar os grupos novos
+  sem subir o orçamento tira dinheiro aos sofás.
+- O nome da empresa continua "Reprovado (Irrelevância do nome da empresa)".
+
 ## 3. As campanhas, como estão desenhadas
 
 Duas campanhas iguais na estrutura, uma por cidade, cada uma com dois grupos:
