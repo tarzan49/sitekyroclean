@@ -3,7 +3,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { coverageWindow } from './landingPageModel';
 import { getAllProblemCityRoutes, getProblemCities, problemCityMeta, problemCityNeighbours, PROBLEM_CITY_NEIGHBOURS } from './problemCitySeoData';
-import { getProblemBySlug } from './problemSeoData';
+import { getAllProblems, getProblemBySlug } from './problemSeoData';
+import { getProblemHero } from './problemHero';
 import { cities } from './serviceCatalog';
 
 // O bloco "Este problema noutras cidades" das páginas problema × cidade, tal
@@ -92,5 +93,70 @@ describe('páginas problema × cidade: o React e o HTML estático dizem o mesmo'
       expect(title, route.path).not.toMatch(/\?(?! \| Kyro Clean Solutions$)/);
       expect(description, route.path).not.toMatch(/\?\s*(no|na|em)\s|\?:/);
     }
+  });
+});
+
+describe('páginas problema × cidade: só nomeiam a sua cidade', () => {
+  // Visto em produção: "Limpeza de Sofá ao Domicílio no Porto e Arredores em
+  // Lisboa" (e "... no Porto e Arredores no Porto") no título e no H1 das 31
+  // páginas, e descrições de Lisboa e Faro com "Limpeza urgente de sofá no
+  // Porto" ou "empresa profissional de limpeza de estofos no Porto". O que um
+  // problema escreve e sai em todas as suas cidades tem de servir a qualquer uma.
+  const PLACES = [...cities.map(city => city.name), 'Algarve', 'Alentejo', 'Minho', 'Norte de Portugal']
+    .sort((a, b) => b.length - a.length);
+  const escape = (text: string) => text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+  /** Os sítios que um texto nomeia, fora a cidade da própria página. */
+  function otherPlaces(text: string, ownCity = ''): string[] {
+    let rest = ownCity ? text.split(ownCity).join(' ') : text;
+    const found: string[] = [];
+    for (const place of PLACES) {
+      const next = rest.replace(new RegExp(`(?<!\\p{L})${escape(place)}(?!\\p{L})`, 'gu'), ' ');
+      if (next !== rest) found.push(place);
+      rest = next;
+    }
+    const vague = rest.match(/arredores|área metropolitana/i);
+    return vague ? [...found, vague[0]] : found;
+  }
+
+  it('o título, o H1 e a descrição de cada página só nomeiam a cidade dela', () => {
+    expect(otherPlaces('Limpeza de Sofá ao Domicílio no Porto e Arredores em Lisboa', 'Lisboa')).toEqual(['Porto', 'Arredores']);
+    expect(otherPlaces('Limpeza de Sofá ao Domicílio no Porto e Arredores no Porto', 'Porto')).toEqual(['Arredores']);
+    const offending: string[] = [];
+    for (const route of getAllProblemCityRoutes()) {
+      const problem = getProblemBySlug(route.problemSlug)!;
+      const city = cities.find(c => c.slug === route.citySlug)!;
+      const { title, description } = problemCityMeta(problem, city.name);
+      const h1 = getProblemHero(problem, city.name).heading;
+      for (const [field, text] of Object.entries({ title, h1, description })) {
+        const places = otherPlaces(text, city.name);
+        if (places.length) offending.push(`${route.path} (${field}): ${places.join(', ')}`);
+      }
+    }
+    expect(offending).toEqual([]);
+  });
+
+  it('o h1 e os benefícios, que saem em todas as cidades, não nomeiam nenhuma', () => {
+    // O h1 é o nome da página nacional na migalha (React, estático e JSON-LD),
+    // na ligação "(página nacional)" e em "Problemas relacionados", e as
+    // cidades vizinhas do HTML estático levam `headingWithCity(problem.h1, …)`.
+    // Os benefícios saem tal e qual nas páginas de todas as cidades.
+    expect(read('../../scripts/prerender.ts')).toContain('headingWithCity(problem.h1, c.name)');
+    const offending = getAllProblems().flatMap(problem => [problem.h1, ...problem.benefits]
+      .filter(text => otherPlaces(text).length)
+      .map(text => `${problem.slug}: "${text}"`));
+    expect(offending).toEqual([]);
+  });
+
+  it('a limpeza de sofá ao domicílio lê-se com a cidade de cada página', () => {
+    const problem = getProblemBySlug('limpeza-sofa-domicilio')!;
+    expect(getProblemHero(problem, 'Lisboa').heading).toBe('Limpeza de Sofá ao Domicílio em Lisboa');
+    expect(getProblemHero(problem, 'Porto').heading).toBe('Limpeza de Sofá ao Domicílio no Porto');
+    expect(problemCityMeta(problem, 'Faro').title).toBe('Limpeza de Sofá ao Domicílio em Faro | Kyro Clean Solutions');
+    // A página nacional liga às 31 cidades: deixou de ser "Porto e Arredores".
+    expect(otherPlaces(`${problem.title} ${problem.metaDescription}`)).toEqual([]);
+    // Sem um segundo "ao domicílio" logo a seguir ao do título.
+    expect(problemCityMeta(problem, 'Lisboa').description).toMatch(/^Limpeza de Sofá ao Domicílio em Lisboa: serviço profissional\. [^.]+\. Resposta em menos de 10 minutos\.$/);
+    expect(problemCityMeta(getProblemBySlug('manchas-sofa')!, 'Lisboa').description).toContain('em Lisboa: serviço profissional ao domicílio. ');
   });
 });

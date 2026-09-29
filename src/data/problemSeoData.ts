@@ -1,7 +1,15 @@
 import { REVIEW_COUNT, REVIEW_RATING, CLIENTS_SERVED_LABEL } from '../constants/business';
-import { formatEuro, sofaSizeList, chairTierSentence, CHAIR_PRICE_LABEL, SOFA_CLEAN_AND_PROTECT_FROM, SOFA_PROTECT_WITH_CLEANING_FROM } from './enginePrices';
+import { TRAVEL_FEE_MIN } from '../constants/commercialPolicy';
+import { formatEuro, sofaSizeList, chairTierSentence, CHAIR_PRICE_LABEL, SOFA_CLEAN_AND_PROTECT_FROM, SOFA_PROTECT_WITH_CLEANING_FROM, SOFA_CLEANING_FROM } from './enginePrices';
+import { cities } from './serviceCatalog';
 // Programmatic SEO: Problem pages data engine
 // Each problem page targets a specific long-tail search query cluster
+//
+// Cada problema tem páginas por cidade (problemCitySeoData.ts), e três campos
+// saem em todas elas: o `h1` (título, H1, migalha e ligações), a primeira frase
+// da `metaDescription` (descrição) e os `benefits`. Nenhum dos três nomeia um
+// sítio, senão Lisboa e Faro dizem "no Porto e arredores"
+// (problemCityCoverage.test.ts).
 
 export interface ProblemPage {
   slug: string;
@@ -42,7 +50,7 @@ const problemDefinitions: ProblemPage[] = [
       "Tratamento específico para cada tipo de mancha",
       "Produtos seguros para todos os tecidos",
       "Resultado visível no momento",
-      "Serviço ao domicílio em todo o Porto e arredores",
+      `Serviço ao domicílio em ${cities.length} municípios`,
       "Orçamento gratuito sem compromisso",
     ],
     faqs: [
@@ -743,9 +751,13 @@ const problemDefinitions: ProblemPage[] = [
     slug: "limpeza-sofa-domicilio",
     category: "metodo",
     keyword: "limpeza de sofá ao domicílio",
-    title: "Limpeza de Sofá ao Domicílio | Porto e Arredores | Kyro",
-    metaDescription: "Limpeza profissional de sofá ao domicílio no Porto e arredores. Equipamento de extração profissional. Deslocação a partir de 10€. Desde 49€. Orçamento grátis.",
-    h1: "Limpeza de Sofá ao Domicílio no Porto e Arredores",
+    // Página nacional, como as outras 53: liga às páginas das 31 cidades e o
+    // seu h1 é o nome com que elas a citam. Dizia "Porto e Arredores", o que
+    // dava "Limpeza de Sofá ao Domicílio no Porto e Arredores em Lisboa"; o
+    // Porto tem a sua página (/limpeza-sofa-domicilio-porto).
+    title: "Limpeza de Sofá ao Domicílio | Equipamento Profissional | Kyro",
+    metaDescription: `Levamos o equipamento de extração até à sua casa, sem transportar o sofá. Deslocação a partir de ${TRAVEL_FEE_MIN}€. Desde ${formatEuro(SOFA_CLEANING_FROM)}. Orçamento grátis.`,
+    h1: "Limpeza de Sofá ao Domicílio",
     intro: "Não precisa transportar o sofá para lado nenhum. A equipa da Kyro Clean Solutions desloca-se à sua casa com todo o equipamento profissional necessário para uma limpeza perfeita ao domicílio.",
     problemDetail: "Muitas pessoas adiam a limpeza do sofá por pensarem que é necessário transportá-lo. Com o nosso serviço ao domicílio, todo o processo é feito no conforto da sua casa, sem complicações.",
     solutionDetail: "A nossa equipa traz todo o equipamento de extração profissional, produtos e acessórios. O serviço é realizado na sua sala: inspeção, pré-tratamento, extração e secagem. O sofá fica pronto a usar em poucas horas, sem sair de casa.",
@@ -753,7 +765,7 @@ const problemDefinitions: ProblemPage[] = [
       "Serviço completo na sua casa",
       "Sem custos de transporte",
       "Equipamento profissional portátil",
-      "Porto e toda a área metropolitana",
+      `Cobertura em ${cities.length} municípios`,
       "Agendamento flexível",
       "Resultado imediato",
     ],
@@ -775,7 +787,7 @@ const problemDefinitions: ProblemPage[] = [
     category: "urgencia",
     keyword: "limpeza de sofá urgente",
     title: "Limpeza de Sofá Urgente | Serviço Rápido Porto | Kyro",
-    metaDescription: "Limpeza urgente de sofá no Porto. Resposta rápida para derrames e manchas recentes. Contacte agora para agendamento prioritário.",
+    metaDescription: "Limpeza urgente de sofá, com agendamento prioritário. Resposta rápida para derrames e manchas recentes. Contacte agora por WhatsApp ou telefone.",
     h1: "Limpeza Urgente de Sofá: Resposta Rápida",
     intro: "Precisa de limpeza urgente do sofá? Derrames de vinho, café ou outros líquidos devem ser tratados rapidamente para melhores resultados. A Kyro Clean Solutions oferece agendamento prioritário para situações urgentes.",
     problemDetail: "Derrames acidentais requerem ação rápida. Quanto mais tempo uma mancha fica no tecido, mais difícil é removê-la. Manchas de vinho tinto, café e líquidos coloridos em particular beneficiam enormemente de tratamento rápido.",
@@ -784,7 +796,7 @@ const problemDefinitions: ProblemPage[] = [
       "Agendamento prioritário",
       "Resposta rápida por WhatsApp",
       "Melhores resultados com tratamento rápido",
-      "Disponível Porto e arredores",
+      `Serviço ao domicílio em ${cities.length} municípios`,
       "Equipamento profissional completo",
       "Orientação imediata por telefone",
     ],
@@ -832,7 +844,7 @@ const problemDefinitions: ProblemPage[] = [
     category: "metodo",
     keyword: "empresa de limpeza de estofos",
     title: "Empresa de Limpeza de Estofos Porto | Kyro Clean Solutions",
-    metaDescription: `Kyro Clean Solutions: empresa profissional de limpeza de estofos no Porto. Sofás, colchões, cadeiras, tapetes. ${REVIEW_RATING} Google. Orçamento grátis.`,
+    metaDescription: `Kyro Clean Solutions: limpeza de sofás, colchões, cadeiras e tapetes, sem sair de casa. ${REVIEW_RATING} Google. Orçamento grátis.`,
     h1: "Empresa Profissional de Limpeza de Estofos",
     intro: `Procura uma empresa fiável de limpeza de estofos? A Kyro Clean Solutions é especializada em limpeza profissional de sofás, colchões, cadeiras, tapetes e alcatifas no Porto e Norte de Portugal. Com ${REVIEW_RATING} no Google e mais de 1000 clientes satisfeitos.`,
     problemDetail: "Escolher a empresa certa para limpar os seus estofos é importante. Equipamento inadequado pode danificar tecidos, e produtos baratos podem deixar resíduos prejudiciais. Uma empresa profissional garante resultados seguros e eficazes.",
@@ -1180,7 +1192,7 @@ const problemDefinitions: ProblemPage[] = [
     intro: "Procura limpeza de sofá perto de si? A Kyro Clean Solutions cobre Porto, Lisboa e todo o Norte de Portugal com serviço ao domicílio. A nossa equipa desloca-se até à sua casa com todo o equipamento.",
     problemDetail: `Quando pesquisa 'limpeza de sofá perto de mim', quer um serviço local, fiável e com boas avaliações. A Kyro Clean Solutions tem ${REVIEW_RATING} no Google, ${CLIENTS_SERVED_LABEL} clientes satisfeitos e cobertura em todo o Norte de Portugal e região de Lisboa.`,
     solutionDetail: "Atuamos no Porto e em Matosinhos, Maia, Gaia, Gondomar, Valongo, Braga, Guimarães, Póvoa de Varzim, Vila do Conde, Lisboa, Cascais, Oeiras, Sintra, Almada e Setúbal. Deslocação a partir de 10€, consoante a distância.",
-    benefits: ["Cobertura Norte de Portugal + Lisboa", `${REVIEW_RATING} Google`, `${CLIENTS_SERVED_LABEL} clientes satisfeitos`, "Deslocação a partir de 10€", "Desde 49€", "Resposta em menos de 10 minutos"],
+    benefits: [`Cobertura em ${cities.length} municípios`, `${REVIEW_RATING} Google`, `${CLIENTS_SERVED_LABEL} clientes satisfeitos`, "Deslocação a partir de 10€", "Desde 49€", "Resposta em menos de 10 minutos"],
     faqs: [
       { question: "Em que cidades fazem limpeza de sofá?", answer: "Servimos Porto e toda a área metropolitana, Braga, Guimarães, e região de Lisboa (Cascais, Oeiras, Sintra, Almada, Setúbal). Contacte-nos para confirmar disponibilidade na sua zona." },
     ],

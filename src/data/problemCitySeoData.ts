@@ -65,13 +65,19 @@ export function getProblemCities(problemSlug: string): (typeof cities)[number][]
  *
  * O H1 das páginas de preço é uma pergunta: a cidade entra antes do "?"
  * (`headingWithCity`) e a descrição continua noutra frase, em vez de "?:".
+ *
+ * O `h1` e a primeira frase da `metaDescription` do problema entram em todas
+ * as cidades, por isso não nomeiam sítio nenhum (ver problemSeoData.ts).
  */
 export function problemCityMeta(problem: { h1: string; metaDescription: string }, cityName: string) {
   const heading = headingWithCity(problem.h1, cityName);
   const lead = heading.endsWith('?') ? `${heading} Serviço` : `${heading}: serviço`;
+  // "Limpeza de Sofá ao Domicílio em Lisboa: serviço profissional", sem um
+  // segundo "ao domicílio" logo a seguir ao do título.
+  const atHome = /domicílio/i.test(problem.h1) ? '' : ' ao domicílio';
   return {
     title: `${heading} | Kyro Clean Solutions`,
-    description: `${lead} profissional ao domicílio. ${problem.metaDescription.split('.')[0]}. ${RESPONSE_PROMISE}.`,
+    description: `${lead} profissional${atHome}. ${problem.metaDescription.split('.')[0]}. ${RESPONSE_PROMISE}.`,
   };
 }
 
