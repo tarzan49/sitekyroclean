@@ -117,17 +117,17 @@ Para desligar: função `desligar`. Os calendários ficam como estão.
   no evento do dono faz o CRM reler o evento inteiro, por isso o script só
   escreve quando a cor ou a linha estão mesmo erradas (serviço novo ou que
   mudou de equipa), nunca por rotina.
-- **Os calendários das equipas não estão na lista do dono** (desde
-  29/09/2026; antes estavam escondidos). Escondidos, a app do telemóvel
-  continuava a oferecê-los ao criar um evento, e propunha o último usado
-  ("ele sugere sempre a equipa que eu coloquei no serviço anterior"): os
-  serviços iam parar ao calendário de uma equipa e não ao dele. Fora da lista
-  a app só grava no calendário dele. Continuam a ser dele e o script chega-lhes
-  pelo id; as equipas veem-nos como sempre. Para voltar a ver um, o dono
-  subscreve-o outra vez pelo id (fica numa propriedade do script). O dono vê
-  cada serviço uma vez, no seu calendário, com a cor da equipa. **Não tirar
-  os serviços do calendário do dono** (ele chegou a pedir): o CRM lê-os de lá
-  e a cópia parte deles; sem o original, o CRM marcava-os como apagados e as
+- **Os calendários das equipas ficam escondidos na conta do dono**, e o
+  calendário dele à vista: vê cada serviço uma vez, no seu calendário, com a
+  cor da equipa. Escondidos, a app do telemóvel continua a oferecê-los ao
+  criar um evento, e propõe o último usado ("ele sugere sempre a equipa que eu
+  coloquei no serviço anterior"). A 29/09/2026 tentou-se tirá-los da lista do
+  dono e a Google recusa: "The data owner of a calendar cannot remove such a
+  calendar from their calendar list". Por isso um serviço que caia num
+  calendário de equipa passa para o do dono **sem cor** e fica por escolher:
+  o calendário que a app propôs não conta como escolha. **Não tirar os
+  serviços do calendário do dono** (ele chegou a pedir): o CRM lê-os de lá e
+  a cópia parte deles; sem o original, o CRM marcava-os como apagados e as
   equipas recebiam "cancelado".
 - **As equipas veem o título completo**, incluindo "70€ (140€)" (decisão do
   dono, 28/09/2026).
@@ -152,9 +152,9 @@ Para desligar: função `desligar`. Os calendários ficam como estão.
 - O CRM continua a ler só o calendário do dono (`calendar-events`). Os
   calendários das equipas não entram nas contas.
 - **Um serviço criado à mão no calendário de uma equipa passa sozinho para o
-  calendário do dono** (`paraMover`, na volta seguinte, até 15 minutos), com a
-  cor da equipa onde estava (no Porto é essa a escolha da equipa). Depois segue
-  como os outros: entra no CRM, é pintado e a cópia volta a ser feita. Dono,
+  calendário do dono** (`paraMover`, na volta seguinte, até 15 minutos), sem
+  cor: o calendário onde a app o gravou é o último usado, não uma escolha.
+  Entra no CRM e fica à espera que o dono escolha a equipa, como os outros. Dono,
   29/09/2026: "todos os serviços que eu coloco no calendário têm de aparecer no
   CRM, ponto", depois de a app do telemóvel ter gravado quatro serviços nos
   calendários da Porto 1, Porto 2 e Lisboa 1. Não passa o que não é serviço nem

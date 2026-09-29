@@ -147,9 +147,7 @@ function sincronizarAgora() {
   const movidos = new Set();
   for (const item of paraMover(eventosDasEquipas, fonte.eventos)) {
     try {
-      Calendar.Events.move(calendarios[item.equipaId], item.evento.id, 'primary', { sendUpdates: 'none' });
-      const equipa = EQUIPAS.find(function (e) { return e.id === item.equipaId; });
-      const movido = Calendar.Events.patch({ colorId: equipa.cor }, 'primary', item.evento.id, { sendUpdates: 'none' });
+      const movido = Calendar.Events.move(calendarios[item.equipaId], item.evento.id, 'primary', { sendUpdates: 'none' });
       fonte.eventos.push(movido);
       movidos.add(item.evento.id);
     } catch (erro) {
@@ -240,24 +238,23 @@ function pintarServicos(copias, agora) {
 }
 
 /**
- * Os calendários das equipas saem da lista do dono, e o calendário dele fica
- * à vista. O dono vê cada serviço uma vez, no seu calendário, com a cor da
- * equipa. Estar na lista, mesmo escondido, deixava a app do telemóvel propor
- * o último calendário usado ao criar um evento, e os serviços iam parar ao
- * calendário de uma equipa (29/09/2026: "ele sugere sempre a equipa que eu
- * coloquei no serviço anterior"). Fora da lista a app só pode gravar no dele.
- * O dono continua dono dos calendários e o script chega-lhes pelo id.
- * Histórico: a 28/09 estiveram visíveis, escondidos, visíveis e escondidos.
- * Uma vez por versão.
+ * Os calendários das equipas na lista do dono: com a cor da equipa e
+ * escondidos, e o calendário dele à vista. O dono vê cada serviço uma vez, no
+ * seu calendário, com a cor da equipa. Tirá-los da lista (29/09/2026, para a
+ * app do telemóvel deixar de propor o último calendário usado) não é possível:
+ * a Google recusa que o dono de um calendário o tire da sua própria lista
+ * ("The data owner of a calendar cannot remove such a calendar"). Por isso um
+ * serviço que a app grave num calendário de equipa passa para o do dono sem
+ * cor (`paraMover`), e fica à espera que ele escolha. Uma vez por versão.
  */
 function pintarCalendarios(calendarios, propriedades) {
   if (propriedades.getProperty('coresDosCalendarios') === VERSAO_DAS_CORES) return;
   for (const equipa of EQUIPAS) {
-    try {
-      Calendar.CalendarList.remove(calendarios[equipa.id]);
-    } catch (erro) {
-      if (!DESAPARECIDO.test(String(erro && erro.message))) throw erro;
-    }
+    Calendar.CalendarList.patch(
+      { backgroundColor: equipa.corDoCalendario, foregroundColor: '#ffffff', hidden: true, selected: false },
+      calendarios[equipa.id],
+      { colorRgbFormat: true }
+    );
   }
   Calendar.CalendarList.patch({ hidden: false, selected: true }, Session.getEffectiveUser().getEmail());
   propriedades.setProperty('coresDosCalendarios', VERSAO_DAS_CORES);
@@ -888,9 +885,9 @@ function escolhasNovas(porEscolher, guardadas, agora) {
  * calendário do dono. No telemóvel, a app grava o evento novo no último
  * calendário usado, e a 29/09/2026 quatro serviços ficaram nos calendários
  * da Porto 1, Porto 2 e Lisboa 1: não entravam no CRM, que só lê o calendário
- * do dono. Passam com a cor da equipa onde estavam, que no Porto é a escolha
- * da equipa (`equipaPelaCor`); a partir daí seguem como os outros e a cópia
- * volta a ser feita. Não passa o que não é serviço (título sem "Serviço") nem
+ * do dono. Passam sem cor: o calendário onde a app os pôs é o último que o
+ * dono usou, não uma escolha (29/09/2026: "não quero que me seja recomendada a
+ * última escolha"). Ficam à espera que ele escolha a equipa, como os outros. Não passa o que não é serviço (título sem "Serviço") nem
  * o que o dono já tem no calendário dele com o mesmo título e a mesma hora
  * (recriado à mão sem apagar o da equipa): isso ficaria a dobrar no CRM, e
  * esses continuam a dar o aviso de `criadosAMao`.

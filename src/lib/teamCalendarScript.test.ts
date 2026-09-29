@@ -478,7 +478,5 @@ describe('o que muda nos calendários das equipas', () => {
     ];
     expect(gs.paraMover(itens, [doDono]).map((i: { evento: Evento }) => i.evento.id)).toEqual(['m1']);
     expect(gs.paraMover(itens, []).map((i: { evento: Evento }) => i.evento.id)).toEqual(['m1', 'm4']);
-    // Passa com a cor da equipa onde estava: no Porto é a escolha da equipa.
-    expect(gs.equipaPelaCor({ colorId: '7' }).id).toBe('porto2');
   });
 });
