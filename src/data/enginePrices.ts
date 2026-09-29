@@ -69,12 +69,45 @@ export const SOFA_ANTI_MITE_WITH_CLEANING_FROM = Math.min(...Object.values(SOFA_
 /** Cadeiras: sempre a taxa unitária, "5€/un.", nunca um total (decisão do dono). */
 export const CHAIR_ANTI_MITE_UNIT_LABEL = CHAIR_ANTI_ACAROS_UNIT_LABEL;
 
-/** "59€ (1 lugar), 79€ (2 lugares) e 99€ (3 lugares)": só os tamanhos com preço. */
-export function sofaSizeList(field: 'cleaningPrice' | 'waterproofingPrice' | 'waterproofingPremiumPrice'): string {
-  const parts = sofaPrices
+type SizePriceField = 'cleaningPrice' | 'waterproofingPrice' | 'waterproofingPremiumPrice';
+
+function sizeList(options: PriceOption[], field: SizePriceField): string {
+  const parts = options
     .filter(size => typeof size[field] === 'number')
     .map(size => `${formatEuro(size[field] as number)} (${size.label.toLowerCase()})`);
   return parts.length > 1 ? `${parts.slice(0, -1).join(', ')} e ${parts[parts.length - 1]}` : parts.join('');
+}
+
+/** "59€ (1 lugar), 79€ (2 lugares) e 99€ (3 lugares)": só os tamanhos com preço. */
+export function sofaSizeList(field: SizePriceField): string {
+  return sizeList(sofaPrices, field);
+}
+
+/** "59€ (solteiro), 69€ (casal) e 79€ (king / queen)": a limpeza de cada tamanho de colchão. */
+export function mattressSizeList(): string {
+  return sizeList(mattressPrices, 'cleaningPrice');
+}
+
+// Um tamanho concreto, pelo id do motor. Rebentam no build se o id deixar de
+// existir ou passar a sob orçamento, em vez de deixarem publicado um preço que
+// o quiz já não cobra.
+const priced = (value: number | string | undefined, what: string): number =>
+  required(typeof value === 'number' ? value : null, what);
+
+/** Limpeza de um tamanho de sofá ("2-lugares"). */
+export function sofaCleaningPrice(id: string): number {
+  return priced(option(sofaPrices, id, 'sofaPrices').cleaningPrice, `a limpeza do sofá "${id}"`);
+}
+
+/** Limpeza de um tamanho de colchão ("casal"). */
+export function mattressCleaningPrice(id: string): number {
+  return priced(option(mattressPrices, id, 'mattressPrices').cleaningPrice, `a limpeza do colchão "${id}"`);
+}
+
+/** Limpeza e anti-ácaros no mesmo colchão, como o quiz os cobra. */
+export function mattressCleanAndAntiMitePrice(id: string): number {
+  const size = option(mattressPrices, id, 'mattressPrices');
+  return mattressCleaningPrice(id) + required(mattressAntiAcarosPrice(size), `o anti-ácaros do colchão "${id}"`);
 }
 
 export interface ChairTier { first: number; last: number; unit: number }

@@ -2,15 +2,23 @@ import { describe, it, expect } from 'vitest';
 import { sofaPrices, mattressPrices } from '@/components/quiz/QuizTypes';
 import { calcChairClean, calcPackPricing } from '@/components/quiz/quizHelpers';
 import { SOFA_ANTI_ACAROS_PRICE, CHAIR_ANTI_ACAROS_UNIT_LABEL } from '@/constants/antiAcarosPricing';
+import { TRAVEL_FEE_MIN } from '@/constants/commercialPolicy';
+import { PACK_PERK_MIN_ORDER, PACK_PERK_SUMMARY } from '@/constants/packPerks';
 import { services } from './serviceCatalog';
 import {
   formatEuro,
   chairCleaningTiers,
   chairTierRows,
   chairTierSentence,
+  mattressSizeList,
+  sofaCleaningPrice,
+  mattressCleaningPrice,
+  mattressCleanAndAntiMitePrice,
   CLEANING_FROM_BY_SERVICE,
   SOFA_CLEANING_FROM,
   MATTRESS_CLEANING_FROM,
+  MATTRESS_CLEAN_AND_ANTI_MITE_FROM,
+  MATTRESS_ANTI_MITE_WITH_CLEANING_FROM,
   CHAIR_CLEANING_FROM,
   SOFA_CLEAN_AND_PROTECT_FROM,
   SOFA_PROTECT_WITH_CLEANING_FROM,
@@ -57,6 +65,20 @@ describe('preços de partida lidos do motor', () => {
       if (engine === null) expect(service.priceFrom, service.slug).toMatch(/orçamento/i);
       else expect(service.priceFrom, service.slug).toBe(formatEuro(engine));
     }
+  });
+
+  it('lê o preço de cada tamanho da tabela do quiz, e rebenta num tamanho sem preço', () => {
+    for (const size of sofaPrices) {
+      if (typeof size.cleaningPrice === 'number') expect(sofaCleaningPrice(size.id)).toBe(size.cleaningPrice);
+      else expect(() => sofaCleaningPrice(size.id), size.id).toThrow();
+    }
+    for (const size of mattressPrices) {
+      expect(mattressCleaningPrice(size.id)).toBe(size.cleaningPrice);
+      expect(mattressCleanAndAntiMitePrice(size.id)).toBe(size.bothPrice);
+      expect(mattressSizeList()).toContain(`${formatEuro(size.cleaningPrice as number)} (${size.label.toLowerCase()})`);
+    }
+    expect(mattressCleanAndAntiMitePrice('solteiro')).toBe(MATTRESS_CLEAN_AND_ANTI_MITE_FROM);
+    expect(() => mattressCleaningPrice('beliche')).toThrow();
   });
 
   it('lê os escalões das cadeiras do calcChairClean, com a 10.ª sob orçamento', () => {
@@ -127,5 +149,54 @@ describe('cadeiras: "Desde" o preço mais baixo por cadeira', () => {
     const waterproof = getLandingPageModel('/impermeabilizacao-cadeiras-porto')!;
     expect(waterproof.intro).toContain(`desde ${formatEuro(CHAIR_WATERPROOF_PREMIUM_UNIT)}`);
     expect(waterproof.intro).toContain(`desde ${formatEuro(CHAIR_WATERPROOF_ESSENCIAL_UNIT)}`);
+  });
+});
+
+// As três páginas de preço dos problemas: /problemas/preco-limpeza-{sofa,colchao,tapete}
+// e as problema × cidade que herdam o texto. Tinham "Preços 2025" no título, o
+// anti-ácaros do colchão dado como incluído, a recolha dos tapetes dada como
+// incluída e os preços escritos à mão.
+describe('páginas de preço dos problemas', () => {
+  const PRICE_PROBLEMS = ['preco-limpeza-sofa', 'preco-limpeza-colchao', 'preco-limpeza-tapete'];
+  const pageText = (slug: string) => {
+    const page = getProblemBySlug(slug)!;
+    return [page.title, page.metaDescription, page.h1, page.intro, page.problemDetail, page.solutionDetail, ...page.benefits, ...page.faqs.flatMap(faq => [faq.question, faq.answer])].join('\n');
+  };
+  const faqAnswer = (slug: string, question: RegExp) => getProblemBySlug(slug)!.faqs.find(faq => question.test(faq.question))!.answer;
+
+  it('não escrevem um ano, que fica desatualizado', () => {
+    for (const slug of PRICE_PROBLEMS) expect(pageText(slug), slug).not.toMatch(/\b20\d{2}\b/);
+  });
+
+  it('cada preço em euros é um que o quiz cobra', () => {
+    const engine = [
+      ...sofaPrices.filter(size => typeof size.cleaningPrice === 'number').map(size => sofaCleaningPrice(size.id)),
+      ...mattressPrices.flatMap(size => [mattressCleaningPrice(size.id), mattressCleanAndAntiMitePrice(size.id)]),
+      SOFA_CLEAN_AND_PROTECT_FROM, SOFA_PROTECT_WITH_CLEANING_FROM, MATTRESS_ANTI_MITE_WITH_CLEANING_FROM,
+      TRAVEL_FEE_MIN, PACK_PERK_MIN_ORDER,
+    ].map(formatEuro);
+    for (const slug of PRICE_PROBLEMS) {
+      for (const [amount] of pageText(slug).matchAll(/\d+(?:,\d{2})?€/g)) expect(engine, `${slug}: ${amount}`).toContain(amount);
+    }
+  });
+
+  it('o pack do sofá segue a regra do quiz, com subtotal mínimo', () => {
+    expect(faqAnswer('preco-limpeza-sofa', /packs/)).toContain(PACK_PERK_SUMMARY);
+    expect(pageText('preco-limpeza-sofa')).not.toMatch(/sem desconto condicional/);
+  });
+
+  it('o colchão não dá o anti-ácaros como incluído nem cobra suplemento por manchas (dono, 2026-09-30)', () => {
+    const text = pageText('preco-limpeza-colchao');
+    expect(text).not.toMatch(/remoção de ácaros|incluindo anti-ácaros/i);
+    expect(text).not.toMatch(/suplemento de|podem? ter (um )?suplemento/i);
+    expect(faqAnswer('preco-limpeza-colchao', /casal/)).toContain(formatEuro(mattressCleanAndAntiMitePrice('casal')));
+  });
+
+  it('o tapete não tem preço, é lavado em casa por defeito e a recolha tem custo (dono, 2026-09-30)', () => {
+    const text = pageText('preco-limpeza-tapete');
+    expect(text).not.toMatch(/\d\s*€/);
+    expect(text).not.toMatch(/recolha e entrega (ao domicílio )?(estão )?incluídas|incluídas no preço/i);
+    expect(text).toContain('prazo máximo de 3 dias');
+    expect(faqAnswer('preco-limpeza-tapete', /recolha/)).toContain('a recolha tem um custo, indicado no orçamento');
   });
 });

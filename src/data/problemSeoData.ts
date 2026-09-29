@@ -1,5 +1,11 @@
 import { REVIEW_COUNT, REVIEW_RATING, CLIENTS_SERVED_LABEL } from '../constants/business';
-import { formatEuro, sofaSizeList, chairTierSentence, CHAIR_PRICE_LABEL, SOFA_CLEAN_AND_PROTECT_FROM, SOFA_PROTECT_WITH_CLEANING_FROM } from './enginePrices';
+import { TRAVEL_FEE_MIN } from '../constants/commercialPolicy';
+import { PACK_PERK_SUMMARY } from '../constants/packPerks';
+import {
+  formatEuro, sofaSizeList, mattressSizeList, chairTierSentence, sofaCleaningPrice, mattressCleaningPrice, mattressCleanAndAntiMitePrice,
+  CHAIR_PRICE_LABEL, SOFA_CLEANING_FROM, MATTRESS_CLEANING_FROM, SOFA_CLEAN_AND_PROTECT_FROM, SOFA_PROTECT_WITH_CLEANING_FROM,
+  MATTRESS_CLEAN_AND_ANTI_MITE_FROM, MATTRESS_ANTI_MITE_WITH_CLEANING_FROM,
+} from './enginePrices';
 // Programmatic SEO: Problem pages data engine
 // Each problem page targets a specific long-tail search query cluster
 
@@ -627,14 +633,14 @@ const problemDefinitions: ProblemPage[] = [
     slug: "preco-limpeza-sofa",
     category: "preco",
     keyword: "quanto custa limpar sofá",
-    title: "Quanto Custa Limpar um Sofá? | Preços 2025 | Kyro",
-    metaDescription: "Preços de limpeza de sofá profissional. Desde 49€. Veja tabela de preços por tamanho e tipo. Peça orçamento grátis personalizado.",
+    title: `Quanto Custa Limpar um Sofá? | Desde ${formatEuro(SOFA_CLEANING_FROM)} | Kyro`,
+    metaDescription: `Preços de limpeza de sofá profissional. Desde ${formatEuro(SOFA_CLEANING_FROM)}. Veja tabela de preços por tamanho e tipo. Peça orçamento grátis personalizado.`,
     h1: "Quanto Custa Limpar um Sofá Profissionalmente?",
-    intro: "Está a pesquisar preços de limpeza de sofá? Os preços da Kyro Clean Solutions começam a partir de 49€ para sofás de 1 lugar (69€ para 2 lugares), com impermeabilização opcional na mesma visita e preço de pack nos artigos que acrescentar.",
+    intro: `Está a pesquisar preços de limpeza de sofá? Os preços da Kyro Clean Solutions começam a partir de ${formatEuro(sofaCleaningPrice('1-lugar'))} para sofás de 1 lugar (${formatEuro(sofaCleaningPrice('2-lugares'))} para 2 lugares), com impermeabilização opcional na mesma visita e preço de pack nos artigos que acrescentar.`,
     problemDetail: "Os preços de limpeza de sofá variam conforme vários fatores: tamanho do sofá (2, 3 ou mais lugares), tipo de tecido, estado de sujidade, tipo de manchas e serviços adicionais como impermeabilização. Muitas empresas não são transparentes com preços, mas na Kyro acreditamos em transparência.",
     solutionDetail: `Oferecemos preços transparentes e competitivos: limpeza desde ${sofaSizeList('cleaningPrice')}; sofá em L ou 4+ lugares sob orçamento. Impermeabilização Essencial na mesma visita: mais ${formatEuro(SOFA_PROTECT_WITH_CLEANING_FROM)} num sofá de 1 lugar, ${formatEuro(SOFA_CLEAN_AND_PROTECT_FROM)} no total. Orçamento personalizado gratuito e sem compromisso.`,
     benefits: [
-      "Preços transparentes desde 49€",
+      `Preços transparentes desde ${formatEuro(SOFA_CLEANING_FROM)}`,
       "Orçamento gratuito sem compromisso",
       "Packs com preços reduzidos por artigo",
       "Sem custos ocultos",
@@ -642,9 +648,11 @@ const problemDefinitions: ProblemPage[] = [
       "Garantia de satisfação incluída",
     ],
     faqs: [
-      { question: "Quanto custa limpar um sofá de 3 lugares?", answer: "A limpeza profissional de um sofá de 3 lugares começa a partir de 79€. O preço final depende do tipo de tecido e estado de sujidade." },
-      { question: "A deslocação tem custo adicional?", answer: "Sim, a partir de 10€, consoante a distância ao centro da área metropolitana do Porto ou das principais cidades onde operamos. O valor exato aparece no orçamento antes de confirmar." },
-      { question: "Existem packs com preços mais baixos?", answer: "Sim. Monte o seu pack com o(s) artigo(s) que quiser tratar na mesma visita e cada um tem o seu preço reduzido, sem desconto condicional a atingir." },
+      { question: "Quanto custa limpar um sofá de 3 lugares?", answer: `A limpeza profissional de um sofá de 3 lugares começa a partir de ${formatEuro(sofaCleaningPrice('3-lugares'))}. O preço final depende do tipo de tecido e estado de sujidade.` },
+      { question: "A deslocação tem custo adicional?", answer: `Sim, a partir de ${formatEuro(TRAVEL_FEE_MIN)}, consoante a distância ao centro da área metropolitana do Porto ou das principais cidades onde operamos. O valor exato aparece no orçamento antes de confirmar.` },
+      // A regra do pack é a do quiz e do configurador (constants/packPerks.ts):
+      // o artigo principal paga tabela e só a partir do subtotal mínimo.
+      { question: "Existem packs com preços mais baixos?", answer: `Sim. ${PACK_PERK_SUMMARY}` },
       { question: "Como posso pedir orçamento?", answer: "Peça orçamento gratuito através do nosso formulário online, WhatsApp ou telefone. Respondemos em menos de 10 minutos." },
     ],
     relatedProblems: ["preco-limpeza-colchao", "preco-limpeza-tapete", "limpeza-profunda-sofa"],
@@ -656,14 +664,15 @@ const problemDefinitions: ProblemPage[] = [
     slug: "preco-limpeza-colchao",
     category: "preco",
     keyword: "quanto custa limpar colchão",
-    title: "Quanto Custa Limpar um Colchão? | Preços 2025 | Kyro",
-    metaDescription: "Preços de higienização profissional de colchão. Desde 59€. Desodorização incluída; anti-ácaros opcional. Peça orçamento grátis.",
+    title: `Quanto Custa Limpar um Colchão? | Desde ${formatEuro(MATTRESS_CLEANING_FROM)} | Kyro`,
+    metaDescription: `Preços de higienização profissional de colchão. Desde ${formatEuro(MATTRESS_CLEANING_FROM)}. Desodorização incluída; anti-ácaros opcional. Peça orçamento grátis.`,
     h1: "Quanto Custa a Higienização Profissional de Colchão?",
-    intro: "Quer saber o preço de higienização de colchão? Na Kyro Clean Solutions, a higienização profissional começa a partir de 59€, incluindo remoção de ácaros, desodorização e tratamento de manchas.",
-    problemDetail: "O preço de higienização de colchão depende do tamanho (single, casal, king) e serviços adicionais como remoção de manchas específicas. Muitas pessoas evitam limpar o colchão por assumirem que é caro, mas os preços são acessíveis.",
-    solutionDetail: "Preços claros: colchão single desde 59€, colchão casal desde 69€, colchão king desde 79€. A desodorização está incluída; o tratamento anti-ácaros é um extra opcional. Manchas específicas (urina, sangue) podem ter suplemento.",
+    intro: `Quer saber o preço de higienização de colchão? Na Kyro Clean Solutions, a higienização profissional começa a partir de ${formatEuro(MATTRESS_CLEANING_FROM)}, com desodorização e tratamento de manchas incluídos. O tratamento anti-ácaros é opcional e tem preço próprio.`,
+    problemDetail: "O preço de higienização de colchão depende do tamanho (solteiro, casal, king ou queen) e de juntar ou não o tratamento anti-ácaros, que é opcional. Muitas pessoas evitam limpar o colchão por assumirem que é caro, mas os preços são acessíveis.",
+    // Manchas de urina e sangue nunca têm suplemento (dono, 2026-09-30).
+    solutionDetail: `Preços claros: limpeza desde ${mattressSizeList()}. A desodorização e o tratamento de manchas, também de urina e sangue, estão incluídos, sem suplemento. Anti-ácaros na mesma visita, opcional: mais ${formatEuro(MATTRESS_ANTI_MITE_WITH_CLEANING_FROM)} num colchão de solteiro, ${formatEuro(MATTRESS_CLEAN_AND_ANTI_MITE_FROM)} no total.`,
     benefits: [
-      "Limpeza desde 59€; anti-ácaros opcional",
+      `Limpeza desde ${formatEuro(MATTRESS_CLEANING_FROM)}; anti-ácaros opcional`,
       "Desodorização incluída",
       "Orçamento grátis",
       "Sem custos ocultos",
@@ -671,8 +680,8 @@ const problemDefinitions: ProblemPage[] = [
       "Pagamento após serviço",
     ],
     faqs: [
-      { question: "Quanto custa limpar um colchão de casal?", answer: "A higienização de colchão de casal começa a partir de 69€, incluindo anti-ácaros e desodorização." },
-      { question: "O tratamento de manchas de urina tem custo extra?", answer: "Manchas simples estão incluídas. Manchas severas de urina podem ter um suplemento de 10-15€ pelo tratamento enzimático adicional." },
+      { question: "Quanto custa limpar um colchão de casal?", answer: `A higienização de colchão de casal começa a partir de ${formatEuro(mattressCleaningPrice('casal'))}, com desodorização incluída. O tratamento anti-ácaros é opcional: limpeza e anti-ácaros no mesmo colchão de casal ficam em ${formatEuro(mattressCleanAndAntiMitePrice('casal'))}.` },
+      { question: "O tratamento de manchas de urina tem custo extra?", answer: "Não. O tratamento de manchas de urina está incluído no preço da limpeza, também quando a mancha é severa e precisa de tratamento enzimático." },
     ],
     relatedProblems: ["preco-limpeza-sofa", "acaros-colchao", "urina-colchao"],
     relatedServices: ["limpeza-colchoes"],
@@ -683,22 +692,24 @@ const problemDefinitions: ProblemPage[] = [
     slug: "preco-limpeza-tapete",
     category: "preco",
     keyword: "quanto custa lavar tapete",
-    title: "Quanto Custa Lavar um Tapete? | Preços 2025 | Kyro",
-    metaDescription: "Preços de lavagem profissional de tapetes. Orçamento à medida de cada tapete. Recolha e entrega incluídas. Peça orçamento grátis.",
+    title: "Quanto Custa Lavar um Tapete? | Orçamento Grátis | Kyro",
+    metaDescription: "Preços de lavagem profissional de tapetes. Orçamento à medida de cada tapete. Lavagem em sua casa na maioria dos casos. Peça orçamento grátis.",
     h1: "Quanto Custa a Lavagem Profissional de Tapetes?",
-    intro: "Na Kyro Clean Solutions cada tapete é medido (largura x comprimento) e orçamentado individualmente, com recolha e entrega ao domicílio incluídas.",
-    problemDetail: "O custo de lavagem de tapetes depende do tamanho, tipo de fibra (sintética, lã, seda), estado de sujidade e serviços adicionais. Tapetes orientais e persas podem ter cotação especial devido ao cuidado adicional necessário.",
-    solutionDetail: "Cada tapete é medido individualmente e orçamentado conforme a dimensão, tipo de fibra e estado de sujidade, sem tabela fixa por m². Tapetes persas/orientais têm cotação especial. Recolha e entrega ao domicílio estão incluídas no preço. Desconto para múltiplos tapetes.",
+    intro: "Na Kyro Clean Solutions cada tapete é medido (largura x comprimento) e orçamentado individualmente. Na maioria dos casos lavamos o tapete em sua casa; quando é preciso recolhê-lo, entregamos no prazo máximo de 3 dias.",
+    problemDetail: "O custo de lavagem de tapetes depende do tamanho, tipo de fibra (sintética, lã, seda), estado de sujidade e da necessidade de recolha. Tapetes orientais e persas podem ter cotação especial devido ao cuidado adicional necessário.",
+    // Em casa por defeito, recolha só quando é precisa e com custo, que vai no
+    // orçamento; o desconto para vários tapetes existe (dono, 2026-09-30).
+    solutionDetail: "Cada tapete é medido individualmente e orçamentado conforme a dimensão, tipo de fibra e estado de sujidade, sem tabela fixa por m². Tapetes persas/orientais têm cotação especial. Na maioria dos casos a lavagem é feita em sua casa; quando o material ou o estado do tapete exigem recolha, entregamos no prazo máximo de 3 dias e o custo da recolha aparece no orçamento, antes da marcação. Desconto para múltiplos tapetes.",
     benefits: [
       "Orçamento à medida de cada tapete",
-      "Recolha e entrega incluídas",
+      "Lavagem em sua casa na maioria dos casos",
       "Desconto para múltiplos tapetes",
       "Orçamento gratuito",
       "Cotação especial para tapetes valiosos",
       "Sem custos ocultos",
     ],
     faqs: [
-      { question: "A recolha e entrega do tapete têm custo?", answer: "Não. A recolha e entrega ao domicílio estão incluídas no preço do serviço na área metropolitana do Porto." },
+      { question: "A recolha e entrega do tapete têm custo?", answer: "Na maioria dos casos lavamos o tapete em sua casa, sem recolha. Quando o material ou o estado do tapete o exigem, recolhemos e entregamos no prazo máximo de 3 dias; a recolha tem um custo, indicado no orçamento antes da marcação." },
       { question: "Tapetes persas são mais caros de lavar?", answer: "Tapetes persas e orientais requerem técnicas mais delicadas e são cotados individualmente, mas os preços continuam acessíveis." },
     ],
     relatedProblems: ["preco-limpeza-sofa", "manchas-tapete", "tapete-persa"],
