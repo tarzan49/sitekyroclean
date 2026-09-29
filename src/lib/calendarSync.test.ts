@@ -81,18 +81,17 @@ describe('planCalendarSync', () => {
     expect(plan([backfilled], []).updates).toEqual([]);
   });
 
-  it('moves an older linked service that has not happened yet, without rewriting what the owner typed', () => {
+  it('moves an older linked service that has not happened yet, and keeps everything else the owner typed', () => {
     const old = { created: '2026-09-22T18:54:20Z' };
     const linked = row('r1', {
       client_name: 'Ana Maria', calendar_event_id: 'e1', booked_at: '2026-09-22T18:54:20+00:00',
-      request_date: '2026-10-01', billed_value: 89, my_cut: 45,
+      request_date: '2026-10-01',
     });
     const moved = plan([linked], [event('e1', { ...old, startDate: '2026-10-16', updated: '2026-09-29T10:43:11Z' })]);
     expect(moved.updates).toEqual([{ id: 'r1', patch: { request_date: '2026-10-16' } }]);
     expect(moved.inserts).toEqual([]);
-    // O valor também segue o calendário; o preço vindo da base de dados pode chegar como texto.
-    const repriced = plan([{ ...linked, billed_value: '89' }], [event('e1', { ...old, summary: 'Serviço 50€ (99€) Limpeza de sofá' })]);
-    expect(repriced.updates[0].patch).toEqual({ billed_value: 99, my_cut: 50 });
+    // Os valores escritos no CRM ficam, mesmo que o título diga outro.
+    expect(plan([linked], [event('e1', { ...old, summary: 'Serviço 55€ (109€) Limpeza de sofá' })]).updates).toEqual([]);
     // Nada muda se já bate certo, nem em serviços que já passaram.
     expect(plan([linked], [event('e1', old)]).updates).toEqual([]);
     const past = { ...linked, request_date: '2026-09-20' };

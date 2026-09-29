@@ -10,10 +10,11 @@
 //   tenha "(anúncio)" (2026-09-28): uma origem escrita à mão no CRM fica.
 //   Exceção: um cliente vazio no CRM é preenchido se o evento tiver nome.
 // - Serviço criado antes de `since`, já ligado a uma linha (passada à mão e
-//   ligada na importação de 11/09): se ainda não aconteceu, o dia e os valores
-//   seguem o calendário (dono, 29/09/2026: mudou um serviço de 1 para 16/10 e
-//   o CRM ficou no dia 1). A descrição, o cliente e a região ficam como o dono
-//   os escreveu no CRM. Nunca cria linhas: essas já foram passadas à mão.
+//   ligada na importação de 11/09): se ainda não aconteceu, o dia segue o
+//   calendário (dono, 29/09/2026: mudou um serviço de 1 para 16/10 e o CRM
+//   ficou no dia 1). O resto fica como o dono o escreveu no CRM, também os
+//   valores, que nessas linhas às vezes diferem do título de propósito (um
+//   extra acertado depois). Nunca cria linhas: essas já foram passadas à mão.
 // - Evento que desaparece (apagado, cancelado, ou deixou de começar por
 //   "Serviço") → a linha fica marcada, nunca é apagada. Se voltar, desmarca-se.
 import {
@@ -52,8 +53,6 @@ export interface SyncableRow {
   calendar_updated_at: string | null;
   calendar_missing_since: string | null;
   request_date?: string | null;
-  billed_value?: number | string | null;
-  my_cut?: number | string | null;
 }
 
 export type CalendarInsert = ParsedService & {
@@ -152,17 +151,12 @@ export function planCalendarSync(
 }
 
 /**
- * O dia e os valores de um serviço antigo que ainda não aconteceu, quando o
- * calendário diz outra coisa. `request_date` é uma data (AAAA-MM-DD), por isso
- * compara-se como texto.
+ * O dia de um serviço antigo que ainda não aconteceu, quando o calendário diz
+ * outro. `request_date` é uma data (AAAA-MM-DD), por isso compara-se como texto.
  */
 function upcomingChanges(row: SyncableRow, parsed: ParsedService, now: string): CalendarPatch | null {
   const today = now.slice(0, 10);
   const current = row.request_date?.slice(0, 10) ?? '';
   if (current < today && parsed.request_date < today) return null;
-  const patch: CalendarPatch = {};
-  if (parsed.request_date !== current) patch.request_date = parsed.request_date;
-  if (row.billed_value != null && Number(row.billed_value) !== parsed.billed_value) patch.billed_value = parsed.billed_value;
-  if (row.my_cut != null && Number(row.my_cut) !== parsed.my_cut) patch.my_cut = parsed.my_cut;
-  return Object.keys(patch).length ? patch : null;
+  return parsed.request_date !== current ? { request_date: parsed.request_date } : null;
 }
