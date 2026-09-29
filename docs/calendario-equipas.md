@@ -53,71 +53,36 @@ Para desligar: função `desligar`. Os calendários ficam como estão.
   "Limpeza" seguido de um valor em euros. É a regra do CRM, com uma diferença
   de propósito: um "Serviço" sem valor também vai para a equipa, porque um
   serviço sem preço escrito tem de ser feito na mesma.
-- **Duas equipas em Lisboa** (dono, 28/09/2026). A equipa sai da parte do
-  dono no valor: "o serviço que for 65 ou 70% para mim é a equipa 2". Um
-  serviço da região Lisboa em que o primeiro valor é 60% a 80% do valor entre
-  parênteses ("Serviço 70€ (100€)") vai para a **Lisboa 2**; os outros, a
-  meias como nas outras equipas ("45€ (89€)"), vão para a **Lisboa 1**. A
-  margem aguenta arredondamentos e fica longe dos 50%. Sem os dois valores
-  escritos fica na Lisboa 1. Noutras regiões a parte não conta. "equipa
-  lisboa 1" ou "equipa lisboa 2" escrito no evento ganha a tudo. A Lisboa 2
-  não tem região nem base, por isso nunca é escolhida pela morada nem por ser
-  a mais perto. Quando um serviço passa de uma para a outra, sai de uma e
-  entra na outra, com email às duas.
-- **Duas equipas no Porto, e nenhum serviço do Porto segue sozinho** (dono,
-  28/09/2026: "eu tenho que selecionar qual é cada, nenhum serviço do Porto é
-  automático"). Um serviço da região Porto (Aveiro e Coimbra incluídos) só vai
-  para uma equipa quando o dono escolhe: pela **cor do evento** (Mirtilo, a
-  Porto 1; Pavão, a Porto 2), que é a mesma com que o script pinta cada
-  equipa, ou escrevendo "equipa porto 1" ou "equipa porto 2" (o escrito ganha
-  à cor; "equipa porto" sozinho é a Porto 1). Sem escolha, o serviço não é
-  copiado e não é pintado, e o dono recebe um email "Serviço do Porto por
-  escolher" (um por evento, e outro se o evento mudar). Uma cópia que já
-  exista numa equipa do Porto fica onde está enquanto o serviço estiver por
-  escolher; numa equipa de fora (a morada passou para o Porto) sai. Os
-  serviços do Porto que já estavam pintados de Mirtilo quando a Porto 2
-  nasceu ficaram na Porto 1 (era a equipa Porto, que passou a chamar-se
-  Porto 1). A parte do dono no valor não conta no Porto.
-- **Equipa de cada serviço**, por esta ordem: "equipa porto 1" (ou porto 2,
-  lisboa 1, lisboa 2, braga, algarve) escrito no evento; o código postal; os concelhos servidos;
-  as freguesias desses concelhos; e, se nada disso chegar, **a morada no
-  Google Maps** (dono, 28/09/2026: "pela morada deve saber automaticamente").
-  As quatro primeiras são as mesmas regras e listas que o CRM usa para a
-  região (`src/lib/calendarServices.ts`): uma equipa por região. Aveiro e
-  Coimbra vão para o Porto e o Alentejo para Lisboa, como no `travel.ts`.
-- **O Maps** (serviço Maps do próprio Apps Script, sem chave) recebe só a
-  morada: o título sem o primeiro bocado (serviço e valores), sem telefones e
-  sem o nome ao lado do telefone. A equipa sai do código postal do sítio
-  encontrado, com a mesma regra do CRM. **Vale sempre a melhor resposta do
-  Maps, mesmo parcial** (dono, 28/09/2026: "100% automatizado", sem
-  perguntas): primeiro a morada como está, depois sem andar e lado ("cave
-  esquerda"), depois só o último bocado; ganha a primeira resposta que
-  encontre a morada inteira, e sem nenhuma assim a primeira que encontre
-  alguma coisa. O risco conhecido é a localidade com nome parecido: na
-  primeira volta "Pucariça" deu "Pocariça" (Cantanhede), quando a certa é a
-  de Mafra. Resolve-se acrescentando a localidade aos aliases de
-  `calendarServices.ts` (a Pucariça já lá está), que vêm antes do Maps. Um sítio fora de todas as regiões
-  (Leiria, Beira Interior) vai para a equipa com a base mais perto; ilhas e
-  estrangeiro ficam sem equipa. Quando a equipa veio do Maps e o evento não
-  tem local, a morada que o Maps encontrou vai para o "Onde" da cópia: a
-  equipa vê o sítio que foi escolhido e pode navegar até lá. Cada morada
-  procura-se uma vez e fica guardada (o Maps tem limite diário). Se o Maps
-  falhar, o serviço espera pela volta seguinte e a cópia que já tiver não é
-  tocada.
-- **Serviço enviado sem certeza:** segue para a equipa na mesma, e o dono
-  recebe um email a dizer para que equipa foi e porquê (dono, 28/09/2026:
-  "quando não tiveres 100% certeza envia-me um alerta no email"). Conta como
-  sem certeza a equipa escolhida pelo Maps (com a morada que ele encontrou),
-  por uma freguesia (pode ser o apelido do cliente ou ter o mesmo nome
-  noutro sítio) e pela equipa mais perto. Código postal, concelho e "equipa
-  X" escrito contam como certos. Um aviso por evento, e outro se o evento ou
-  a equipa mudarem; se estiver errado, basta escrever "equipa X" ou o código
-  postal no evento e o serviço muda sozinho de equipa.
-- **Serviço sem equipa:** só um evento sem morada nenhuma (por exemplo
-  "Serviço 70€ (130€) imper cadeiras"), ou uma morada que nem o Maps
-  reconhece. Não é copiado, e o dono recebe um email a pedir o código postal
-  ou "equipa porto 1" (porto 2, braga, lisboa 1, lisboa 2, algarve) no evento. Assim que o evento
-  for guardado, segue para a equipa.
+- **O dono escolhe sempre a equipa, em todas as regiões** (dono, 29/09/2026:
+  "eu quero agora escolher sempre a equipa"). Escolhe pela **cor do evento**
+  no calendário dele: Mirtilo = Porto 1, Pavão = Porto 2, Basílico = Braga,
+  Tangerina = Lisboa 1, Uva = Lisboa 2, Banana = Algarve. Ou escrevendo
+  "equipa porto 1" (porto 2, braga, lisboa 1, lisboa 2, algarve) no evento, que
+  ganha à cor ("equipa porto" sozinho é a Porto 1, "equipa lisboa" a Lisboa 1).
+  A morada não escolhe: sem cor de equipa nem "equipa X", o serviço não é
+  copiado e o dono recebe um email "Escolhe a equipa deste serviço", com as
+  cores de todas as equipas e, como pista, a zona onde a morada parece ser (um
+  aviso por evento, e outro se o evento mudar). Uma cópia que já exista fica
+  onde está enquanto o serviço estiver por escolher. O CRM recebe o serviço
+  na mesma: a região do CRM sai da morada e não depende da equipa.
+  Histórico: a 28/09 a equipa saía da morada (código postal, concelhos,
+  freguesias e, sem nada disso, a melhor resposta do Google Maps), só o Porto
+  era escolhido à mão (Porto 1 e Porto 2), e a Lisboa 2 recebia sozinha os
+  serviços de Lisboa em que a parte do dono era 60% a 80% do valor. Tudo isso
+  saiu a 29/09; não voltar a pôr regras automáticas sem ele pedir.
+- **A zona da pista** sai das mesmas regras e listas que o CRM usa para a
+  região (`src/lib/calendarServices.ts`, código postal, concelhos,
+  freguesias; Aveiro e Coimbra são Porto e o Alentejo Lisboa) e, sem nada
+  disso, da morada no **Google Maps** (serviço Maps do próprio Apps Script,
+  sem chave), que recebe só a morada: o título sem o primeiro bocado, sem
+  telefones e sem o nome ao lado do telefone. Primeiro a morada como está,
+  depois sem andar e lado, depois só o último bocado. Fora de todas as regiões
+  a zona é a da equipa com a base mais perto; ilhas e estrangeiro ficam sem
+  zona. Cada morada procura-se uma vez e fica guardada (o Maps tem limite
+  diário).
+- **O Maps também dá a morada à equipa:** quando o evento não tem local, a
+  morada que o Maps encontrou vai para o "Onde" da cópia, para a equipa poder
+  navegar até lá. Se o Maps não responder, a cópia segue sem morada.
 - **A hora é o mesmo instante, mostrado em Portugal.** O calendário do dono
   está no fuso de Copenhaga desde 23/08/2026 e a hora que lá está é a de
   Copenhaga (dono, 28/09/2026: "estou com uma hora de avanço"; o serviço que
@@ -129,9 +94,8 @@ Para desligar: função `desligar`. Os calendários ficam como estão.
   em vez de ser tudo azul", "pinta só os serviços para a frente"): cada
   serviço que ainda não acabou fica com a cor da equipa (Porto 1
   azul Mirtilo, Porto 2 azul-claro Pavão, Braga verde Basílico, Lisboa 1 laranja Tangerina, Lisboa 2
-  roxo Uva, Algarve amarelo Banana) e muda de cor se mudar de equipa. Uma
-  cor posta à mão num serviço é substituída pela da equipa, menos no Porto,
-  onde a cor é a escolha do dono. **Cuidado com o
+  roxo Uva, Algarve amarelo Banana). A cor é a escolha do dono; o script só a
+  põe quando a equipa foi escolhida por escrito ("equipa X"). **Cuidado com o
   CRM:** mudar a cor mexe na data de alteração do evento, e o CRM
   (`calendarSync.ts`) relê um evento alterado depois da linha e escreve por
   cima das correções feitas no CRM. Só acompanha eventos criados depois de
@@ -153,15 +117,18 @@ Para desligar: função `desligar`. Os calendários ficam como estão.
   no evento do dono faz o CRM reler o evento inteiro, por isso o script só
   escreve quando a cor ou a linha estão mesmo erradas (serviço novo ou que
   mudou de equipa), nunca por rotina.
-- **Os calendários das equipas ficam escondidos na conta do dono**, e o
-  calendário dele à vista: vê cada serviço uma vez, no seu calendário, com a
-  cor da equipa. Os calendários das equipas são dele (o script corre na
-  conta dele), por isso visíveis mostravam cada serviço a dobrar. A 28/09
-  estiveram visíveis umas horas, porque o iPhone não mostrava as cores dos
-  eventos; depois de o dono reinstalar a app passou a mostrar, e voltaram a
-  ser escondidos. **Não tirar os serviços do calendário do dono** (ele
-  chegou a pedir): o CRM lê-os de lá e a cópia parte deles; sem o original,
-  o CRM marcava-os como apagados e as equipas recebiam "cancelado".
+- **Os calendários das equipas não estão na lista do dono** (desde
+  29/09/2026; antes estavam escondidos). Escondidos, a app do telemóvel
+  continuava a oferecê-los ao criar um evento, e propunha o último usado
+  ("ele sugere sempre a equipa que eu coloquei no serviço anterior"): os
+  serviços iam parar ao calendário de uma equipa e não ao dele. Fora da lista
+  a app só grava no calendário dele. Continuam a ser dele e o script chega-lhes
+  pelo id; as equipas veem-nos como sempre. Para voltar a ver um, o dono
+  subscreve-o outra vez pelo id (fica numa propriedade do script). O dono vê
+  cada serviço uma vez, no seu calendário, com a cor da equipa. **Não tirar
+  os serviços do calendário do dono** (ele chegou a pedir): o CRM lê-os de lá
+  e a cópia parte deles; sem o original, o CRM marcava-os como apagados e as
+  equipas recebiam "cancelado".
 - **As equipas veem o título completo**, incluindo "70€ (140€)" (decisão do
   dono, 28/09/2026).
 - **Emails:** vão para quem tem o calendário da equipa partilhado com

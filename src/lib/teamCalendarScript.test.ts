@@ -121,38 +121,28 @@ describe('região e equipa de cada serviço', () => {
     expect(gs.regiaoDoEvento({ summary: 'Serviço 50€ (99€) sofá, 4000-000 Porto', description: 'Equipa Lisboa' })).toBe('Lisboa');
   });
 
-  it('manda para a Lisboa 2 só o que tiver "equipa lisboa 2" escrito', () => {
-    // Dono, 28/09/2026: duas equipas em Lisboa, "escolho em cada serviço".
+  it('escolhe a equipa pela cor ou pelo que está escrito, em todas as regiões, e nunca pela morada', () => {
+    // Dono, 29/09/2026: "eu quero agora escolher sempre a equipa".
+    const equipa = (summary: string, colorId?: string, description = '') =>
+      gs.copiasDesejadas([{ ...evento('l1', summary), colorId, description }]).copias.get('l1')?.equipaId ?? null;
     const lisboa = 'Serviço 45€ (89€) sofá - Rua X 3, 1600-000 Lisboa';
-    const equipa = (summary: string, description = '') => gs.copiasDesejadas([{ ...evento('l1', summary), description }]).copias.get('l1').equipaId;
-    expect(equipa(lisboa)).toBe('lisboa');
-    expect(equipa(`${lisboa} equipa lisboa 2`)).toBe('lisboa2');
-    expect(equipa(lisboa, 'Equipa Lisboa2')).toBe('lisboa2');
-    expect(equipa(`${lisboa} equipa lisboa 1`)).toBe('lisboa');
-    // Escrito ganha ao código postal, e não entra nos avisos de dúvida.
-    expect(equipa('Serviço 45€ (89€) sofá, 4000-000 Porto - equipa lisboa 2')).toBe('lisboa2');
-    expect(gs.copiasDesejadas([evento('l2', `${lisboa} equipa lisboa 2`)]).incertos).toEqual([]);
-    // Sem base, a Lisboa 2 nunca é "a equipa mais perto".
-    expect(gs.equipaPeloMapa({ encontrado: true, codigoPostal: '2400-000', lat: 39.74, lng: -8.81 }).id).toBe('lisboa');
-  });
-
-  it('manda para a Lisboa 2 os serviços de Lisboa em que a parte do dono é 65% ou 70%', () => {
-    // Dono, 28/09/2026: "o serviço que for 65 ou 70% para mim é a equipa 2".
-    const equipa = (summary: string, colorId?: string) => gs.copiasDesejadas([{ ...evento('p1', summary), colorId }]).copias.get('p1').equipaId;
-    expect(gs.parteDoDono('Serviço 70€ (100€) sofá')).toBeCloseTo(0.7);
-    expect(gs.parteDoDono('Serviço 32,5€ (65€) colchão')).toBeCloseTo(0.5);
-    expect(gs.parteDoDono('Serviço 50€/100€ tapetes')).toBeCloseTo(0.5);
-    expect(gs.parteDoDono('Serviço 1.200€ (1.500€) hotel')).toBeCloseTo(0.8);
-    expect(gs.parteDoDono('Serviço 80€ sofá')).toBeNull();
-    expect(equipa('Serviço 65€ (100€) sofá - Rua X 3, 1600-000 Lisboa')).toBe('lisboa2');
-    expect(equipa('Serviço 70€ (99€) sofá - Rua X 3, Seixal')).toBe('lisboa2');
-    expect(equipa('Serviço 45€ (89€) sofá - Rua X 3, 1600-000 Lisboa')).toBe('lisboa');
-    expect(equipa('Serviço 80€ sofá - Rua X 3, 1600-000 Lisboa')).toBe('lisboa');
-    // Só em Lisboa: noutra região a parte não muda a equipa.
-    expect(equipa('Serviço 70€ (100€) sofá - Rua X 3, 4000-000 Porto', '9')).toBe('porto');
-    expect(equipa('Serviço 70€ (100€) sofá - Rua X 3, 4700-000 Braga')).toBe('braga');
-    // O que está escrito ganha à parte.
-    expect(equipa('Serviço 70€ (100€) sofá - Rua X 3, 1600-000 Lisboa - equipa lisboa 1')).toBe('lisboa');
+    expect(equipa(lisboa)).toBeNull();
+    expect(equipa(lisboa, '6')).toBe('lisboa');
+    expect(equipa(lisboa, '3')).toBe('lisboa2');
+    // A cor escolhe, mesmo que a morada seja de outra região.
+    expect(equipa(lisboa, '10')).toBe('braga');
+    expect(equipa('Serviço 45€ (89€) sofá, 8600-000 Lagos', '5')).toBe('algarve');
+    // A parte do dono (70% de 100€) já não escolhe a Lisboa 2.
+    expect(equipa('Serviço 70€ (100€) sofá - Rua X 3, 1600-000 Lisboa')).toBeNull();
+    // O que está escrito ganha à cor.
+    expect(equipa(`${lisboa} equipa lisboa 2`, '6')).toBe('lisboa2');
+    expect(equipa(lisboa, undefined, 'Equipa Lisboa2')).toBe('lisboa2');
+    expect(equipa('Serviço 45€ (89€) sofá, 4000-000 Porto - equipa lisboa 1')).toBe('lisboa');
+    // Uma cor que não é de nenhuma equipa não é uma escolha.
+    expect(equipa(lisboa, '4')).toBeNull();
+    // Cada equipa com a sua cor.
+    expect(['9', '7', '10', '6', '3', '5'].map(cor => gs.equipaPelaCor({ colorId: cor }).id))
+      .toEqual(['porto', 'porto2', 'braga', 'lisboa', 'lisboa2', 'algarve']);
   });
 
   it('não confunde o nome da rua com a cidade', () => {
@@ -195,8 +185,8 @@ describe('hora da cópia', () => {
 });
 
 describe('o que muda nos calendários das equipas', () => {
-  const lisboa = evento('a1', 'Serviço 70€ (140€) sofá - +351 910 000 001 - Ana Teste - Rua X 8, 2835-000 Charneca');
-  // Pintado de Mirtilo: o dono escolheu a Porto 1 (ver "as duas equipas do Porto").
+  // Com cor: o dono escolheu a equipa (Tangerina, a Lisboa 1; Mirtilo, a Porto 1).
+  const lisboa = { ...evento('a1', 'Serviço 70€ (140€) sofá - +351 910 000 001 - Ana Teste - Rua X 8, 2835-000 Charneca'), colorId: '6' };
   const porto = { ...evento('b2', 'Serviço 40€ (79€) sofá - +351 910 000 002 - Rui Exemplo - Rua Y 3, 4000-000 Porto'), colorId: '9' };
   const semMorada = evento('c3', 'Serviço 70€ (130€) imper cadeiras');
   const pessoal = evento('d4', 'Jantar');
@@ -212,10 +202,10 @@ describe('o que muda nos calendários das equipas', () => {
   }
   const resumoDe = (acoes: Array<{ tipo: string; equipaId: string; aviso: string | null }>) => acoes.map(a => `${a.tipo}:${a.equipaId}:${a.aviso}`);
 
-  it('cria cada serviço na equipa certa e deixa de fora o que não é serviço ou não tem equipa', () => {
-    const { copias, pendentes } = estado([lisboa, porto, semMorada, pessoal]);
+  it('cria cada serviço na equipa escolhida e deixa de fora o que não é serviço ou não tem equipa', () => {
+    const { copias, porEscolher } = estado([lisboa, porto, semMorada, pessoal]);
     expect([...copias.keys()]).toEqual(['a1', 'b2']);
-    expect(pendentes.map((e: Evento) => e.id)).toEqual(['c3']);
+    expect(porEscolher.map((i: { evento: Evento }) => i.evento.id)).toEqual(['c3']);
     const acoes = gs.planear(copias, [], AGORA, false);
     expect(resumoDe(acoes)).toEqual(['criar:lisboa:novo', 'criar:porto:novo']);
     // 15:00 no calendário do dono (Copenhaga) = 14:00 em Portugal.
@@ -225,7 +215,7 @@ describe('o que muda nos calendários das equipas', () => {
 
   it('não avisa na primeira volta nem de serviços que já passaram', () => {
     expect(resumoDe(gs.planear(estado([lisboa]).copias, [], AGORA, true))).toEqual(['criar:lisboa:null']);
-    const passado = evento('p1', lisboa.summary, '2026-09-27T10:00:00+02:00', '2026-09-27T11:00:00+02:00');
+    const passado = { ...evento('p1', lisboa.summary, '2026-09-27T10:00:00+02:00', '2026-09-27T11:00:00+02:00'), colorId: '6' };
     expect(resumoDe(gs.planear(estado([passado]).copias, [], AGORA, false))).toEqual(['criar:lisboa:null']);
   });
 
@@ -234,7 +224,7 @@ describe('o que muda nos calendários das equipas', () => {
   });
 
   it('atualiza a cópia quando o serviço muda, e diz à equipa o que era antes', () => {
-    const mudado = evento('a1', lisboa.summary, '2026-10-04T10:00:00+02:00', '2026-10-04T11:00:00+02:00');
+    const mudado = { ...evento('a1', lisboa.summary, '2026-10-04T10:00:00+02:00', '2026-10-04T11:00:00+02:00'), colorId: '6' };
     const acoes = gs.planear(estado([mudado]).copias, copiasDe([lisboa]), AGORA, false);
     expect(resumoDe(acoes)).toEqual(['atualizar:lisboa:alterado']);
     const mensagem = gs.mensagemParaEquipa(acoes[0], gs.equipaDaRegiao('Lisboa'));
@@ -242,8 +232,8 @@ describe('o que muda nos calendários das equipas', () => {
     expect(mensagem.texto).toContain('Antes: sábado, 03/10, das 14:00 às 15:00');
   });
 
-  it('muda o serviço de equipa quando a morada muda de região', () => {
-    const mudouParaBraga = { ...lisboa, summary: lisboa.summary.replace('2835-000 Charneca', '4700-000 Braga') };
+  it('muda o serviço de equipa quando o dono muda a cor', () => {
+    const mudouParaBraga = { ...lisboa, colorId: '10' };
     const acoes = gs.planear(estado([mudouParaBraga]).copias, copiasDe([lisboa]), AGORA, false);
     expect(resumoDe(acoes)).toEqual(['apagar:lisboa:retirado', 'criar:braga:novo']);
   });
@@ -268,7 +258,7 @@ describe('o que muda nos calendários das equipas', () => {
     expect(mensagem.texto).toContain('Está no calendário "Kyro · Equipa Lisboa 1".');
   });
 
-  describe('quando o código postal e as listas do site não chegam, procura a morada no Maps', () => {
+  describe('o Maps só dá a morada à equipa e a zona ao dono', () => {
     // Moradas inventadas, com respostas do Maps inventadas.
     const semCidade = { ...evento('m1', 'Serviço 45€ (89€) Limpeza de sofá - +351 910 000 003 - Rua Inventada 376, 1º'), colorId: '9' };
     const aldeia = evento('m2', 'Serviço 115€ (230€) Limpeza de colchões - Joana Teste - 910000004 - Rua Central, 06 -Aldeia Inventada');
@@ -284,19 +274,30 @@ describe('o que muda nos calendários das equipas', () => {
       expect(gs.moradaDoEvento(evento('m4', 'Serviço 70€ (130€) imper cadeiras'))).toBe('');
     });
 
-    it('decide a equipa pelo código postal do sítio encontrado, e dá o sítio à equipa', () => {
+    it('dá à equipa a morada que o Maps encontrou quando o evento não tem local, sem mudar a equipa escolhida', () => {
       const mapa = mapaDeTeste({
-        'Rua Inventada 376, 1º': { encontrado: true, morada: 'Rua Inventada 376, 4000-000 Porto, Portugal', codigoPostal: '4000-000', lat: 41.15, lng: -8.61 },
+        'Rua Inventada 376, 1º': { encontrado: true, morada: 'Rua Inventada 376, 4710-000 Braga, Portugal', codigoPostal: '4710-000', lat: 41.55, lng: -8.42 },
       });
-      const { copias, pendentes } = gs.copiasDesejadas([semCidade, lisboa], mapa.procurar);
+      const { copias } = gs.copiasDesejadas([semCidade], mapa.procurar);
       expect(copias.get('m1').equipaId).toBe('porto');
-      expect(copias.get('m1').corpo.location).toBe('Rua Inventada 376, 4000-000 Porto, Portugal');
-      expect(pendentes).toEqual([]);
-      // O que já se resolve pelo código postal nunca vai ao Maps.
-      expect(mapa.perguntas).toEqual(['Rua Inventada 376, 1º']);
+      expect(copias.get('m1').corpo.location).toBe('Rua Inventada 376, 4710-000 Braga, Portugal');
+      // Sem resposta do Maps, a cópia segue na mesma, sem morada.
+      expect(gs.copiasDesejadas([semCidade], mapaDeTeste({}).procurar).copias.get('m1').corpo.location).toBe('');
+      // Com local no evento, o Maps não é chamado.
+      const comLocal = mapaDeTeste({});
+      gs.copiasDesejadas([{ ...semCidade, location: 'Rua Inventada 376, Porto' }], comLocal.procurar);
+      expect(comLocal.perguntas).toEqual([]);
     });
 
-    it('fora de todas as regiões, vai para a equipa mais perto; nas ilhas não adivinha', () => {
+    it('diz ao dono a zona de um serviço por escolher: pela morada, ou pelo Maps', () => {
+      const zona = (e: Evento, respostas: Record<string, unknown> = {}) => gs.copiasDesejadas([e], mapaDeTeste(respostas).procurar).porEscolher[0].zona;
+      expect(zona(evento('z1', 'Serviço 45€ (89€) sofá, 4450-000 Matosinhos'))).toBe('Porto');
+      expect(zona(aldeia, { 'Rua Central, 06, Aldeia Inventada': { encontrado: true, codigoPostal: '8600-000', lat: 37.1, lng: -8.67 } })).toBe('Algarve');
+      expect(zona(aldeia, { 'Rua Central, 06, Aldeia Inventada': { encontrado: false } })).toBeNull();
+      expect(zona(evento('z2', 'Serviço 70€ (130€) imper cadeiras'))).toBeNull();
+    });
+
+    it('fora de todas as regiões, a zona é a da equipa mais perto; nas ilhas não adivinha', () => {
       expect(gs.equipaPeloMapa({ encontrado: true, codigoPostal: '2400-000', lat: 39.74, lng: -8.81 }).id).toBe('lisboa');
       expect(gs.equipaPeloMapa({ encontrado: true, codigoPostal: '6300-000', lat: 40.54, lng: -7.27 }).id).toBe('porto');
       expect(gs.equipaPeloMapa({ encontrado: true, codigoPostal: null, lat: 37.95, lng: -8.87 }).id).toBe('lisboa');
@@ -304,87 +305,24 @@ describe('o que muda nos calendários das equipas', () => {
       expect(gs.equipaPeloMapa({ encontrado: false })).toBeNull();
     });
 
-    it('fica com a melhor resposta do Maps, mesmo parcial: tudo automático', () => {
-      // Dono, 28/09/2026: sem perguntas. Uma rua sem cidade vai para onde o Maps a põe.
-      const ruaSemCidade = { encontrado: true, parcial: true, nomes: ['Braga'], morada: 'Rua Inventada 376, 4710-000 Braga', codigoPostal: '4710-000', lat: 41.55, lng: -8.42 };
-      const mapa = mapaDeTeste({ 'Rua Inventada 376, 1º': ruaSemCidade });
-      const { copias, pendentes } = gs.copiasDesejadas([semCidade], mapa.procurar);
-      expect(copias.get('m1').equipaId).toBe('braga');
-      expect(copias.get('m1').corpo.location).toBe('Rua Inventada 376, 4710-000 Braga');
-      expect(pendentes).toEqual([]);
-    });
-
     it('tenta a morada inteira, depois sem andar e lado, depois só a localidade', () => {
       expect([...gs.pesquisasDoMapa('Rua Inventada 28 , cave esquerda')]).toEqual(['Rua Inventada 28 , cave esquerda', 'rua inventada 28']);
       expect([...gs.pesquisasDoMapa('Rua Central, 06, Aldeia Inventada')]).toEqual(['Rua Central, 06, Aldeia Inventada', 'Aldeia Inventada']);
       expect([...gs.pesquisasDoMapa('Rua Nova 11, 2º esq, Vale Inventado')]).toEqual(['Rua Nova 11, 2º esq, Vale Inventado', 'rua nova 11, vale inventado', 'Vale Inventado']);
     });
-
-    it('manda o serviço e avisa o dono quando a equipa não é certa', () => {
-      // Dono, 28/09/2026: "quando não tiveres 100% certeza envia-me um alerta no email".
-      // Caso real, com telefone inventado: rua sem cidade, que o dono confirmou ser no Porto.
-      const ruaSemCidade = { ...evento('r1', 'Serviço 45€ (89€) Limpeza de sofá de 3 lugares - +351 910 000 006 - Rua D. João IV 376, 1º, 105'), colorId: '9' };
-      const pelaFreguesia = { ...evento('f1', 'Serviço 40€ (79€) Limpeza de sofá - Rua Nova 3, Canidelo'), colorId: '7' };
-      const mapa = mapaDeTeste({
-        'Rua D. João IV 376, 1º, 105': { encontrado: true, parcial: false, nomes: ['Porto'], morada: 'R. de Dom João IV 376, 4000-000 Porto', codigoPostal: '4000-000', lat: 41.15, lng: -8.60 },
-      });
-      const { copias, incertos } = gs.copiasDesejadas([ruaSemCidade, pelaFreguesia, lisboa], mapa.procurar);
-      expect(copias.get('r1').equipaId).toBe('porto');
-      expect(copias.get('f1').equipaId).toBe('porto2');
-      // Pelo código postal é certo: não há aviso.
-      expect(incertos.map((i: { evento: Evento }) => i.evento.id)).toEqual(['r1', 'f1']);
-      expect(incertos[0].duvida).toBe('pelo Google Maps, que encontrou "R. de Dom João IV 376, 4000-000 Porto"');
-      expect(incertos[1].duvida).toContain('pela freguesia "canidelo"');
-
-      const primeira = gs.incertosNovos(incertos, {}, AGORA);
-      expect(primeira.novos).toHaveLength(2);
-      expect(gs.incertosNovos(incertos, primeira.atuais, AGORA).novos).toEqual([]);
-      const mudouDeEquipa = [{ ...incertos[0], equipaId: 'lisboa' }];
-      expect(gs.incertosNovos(mudouDeEquipa, primeira.atuais, AGORA).novos).toHaveLength(1);
-
-      const mensagem = gs.mensagemParaDono([], primeira.novos);
-      expect(mensagem.assunto).toBe('2 serviços enviados sem certeza');
-      expect(mensagem.texto).toContain('→ Equipa Porto 1, pelo Google Maps, que encontrou "R. de Dom João IV 376, 4000-000 Porto"');
-      expect(mensagem.texto).toContain('→ Equipa Porto 2, pela freguesia "canidelo"');
-      expect(mensagem.texto).toContain('"equipa porto 1", "equipa porto 2", "equipa braga", "equipa lisboa 1", "equipa lisboa 2" ou "equipa algarve"');
-      expect(mensagem.texto).toContain('(hora de Portugal)');
-      expect(gs.mensagemParaDono([semMorada], primeira.novos).assunto).toBe('Serviços para confirmar');
-    });
-
-    it('diz quando a equipa foi a mais perto, fora das zonas das equipas', () => {
-      expect(gs.duvidaDoMapa({ encontrado: true, parcial: true, morada: 'Aldeia, 2400-000 Leiria', codigoPostal: '2400-000', lat: 39.74, lng: -8.81 }))
-        .toBe('pelo Google Maps, que encontrou "Aldeia, 2400-000 Leiria" (só parte da morada), fora das zonas das equipas: foi a equipa mais perto');
-    });
-
-    it('avisa o dono só quando nem o Maps encontra a morada', () => {
-      const mapa = mapaDeTeste({ 'Rua Central, 06, Aldeia Inventada': { encontrado: false } });
-      const { copias, pendentes } = gs.copiasDesejadas([aldeia], mapa.procurar);
-      expect(copias.size).toBe(0);
-      expect(pendentes.map((e: Evento) => e.id)).toEqual(['m2']);
-    });
-
-    it('se o Maps não responder, não mexe na cópia que já existe nem avisa ninguém', () => {
-      const encontrado = mapaDeTeste({ 'Rua Inventada 376, 1º': { encontrado: true, morada: 'Porto', codigoPostal: '4000-000', lat: 41.15, lng: -8.61 } });
-      const { copias } = gs.copiasDesejadas([semCidade], encontrado.procurar);
-      const existentes = [...copias].map(([origemId, c]: [string, { equipaId: string; corpo: Evento & { extendedProperties: unknown } }]) =>
-        ({ equipaId: c.equipaId, origemId, evento: copiaGravada(c.corpo, 'copia-m1') }));
-      const semResposta = gs.copiasDesejadas([{ ...semCidade, summary: `${semCidade.summary} B` }], mapaDeTeste({}).procurar);
-      expect([...semResposta.adiados]).toEqual(['m1']);
-      expect(semResposta.pendentes).toEqual([]);
-      expect(gs.planear(semResposta.copias, existentes, AGORA, false, semResposta.adiados)).toEqual([]);
-    });
   });
 
   it('pinta os serviços daqui para a frente com a cor da equipa, e volta a pintar se mudarem de equipa', () => {
     // Dono, 28/09/2026: "quero o meu com cores em vez de ser tudo azul", "pinta só os serviços para a frente".
-    expect(gs.corEmFalta(lisboa, 'lisboa', AGORA)).toBe('6');
-    expect(gs.corEmFalta(lisboa, 'porto', AGORA)).toBe('9');
-    expect(gs.corEmFalta({ ...lisboa, colorId: '6' }, 'lisboa', AGORA)).toBeNull();
-    expect(gs.corEmFalta({ ...lisboa, colorId: '6' }, 'braga', AGORA)).toBe('10');
+    const semCor = { ...lisboa, colorId: undefined };
+    expect(gs.corEmFalta(semCor, 'lisboa', AGORA)).toBe('6');
+    expect(gs.corEmFalta(semCor, 'porto', AGORA)).toBe('9');
+    expect(gs.corEmFalta({ ...semCor, colorId: '6' }, 'lisboa', AGORA)).toBeNull();
+    expect(gs.corEmFalta({ ...semCor, colorId: '6' }, 'braga', AGORA)).toBe('10');
     const passado = evento('p9', lisboa.summary, '2026-09-27T10:00:00+02:00', '2026-09-27T11:00:00+02:00');
     expect(gs.corEmFalta(passado, 'lisboa', AGORA)).toBeNull();
     // Cada equipa com uma cor diferente.
-    const cores = ['porto', 'porto2', 'braga', 'lisboa', 'lisboa2', 'algarve'].map(id => gs.corEmFalta(lisboa, id, AGORA));
+    const cores = ['porto', 'porto2', 'braga', 'lisboa', 'lisboa2', 'algarve'].map(id => gs.corEmFalta(semCor, id, AGORA));
     expect(new Set(cores).size).toBe(6);
   });
 
@@ -401,87 +339,81 @@ describe('o que muda nos calendários das equipas', () => {
     const passado = evento('p8', lisboa.summary, '2026-09-27T10:00:00+02:00', '2026-09-27T11:00:00+02:00');
     expect(gs.marcaDaEquipa(passado, 'lisboa', AGORA)).toBeNull();
 
-    // A linha não decide a equipa: a morada mudou para o Seixal, a linha ainda diz Porto.
+    // A linha não decide a equipa: sem cor, o serviço fica por escolher mesmo com "Equipa: Porto" escrito pelo script.
     const mudou = { ...evento('s1', 'Serviço 45€ (89€) sofá - Rua Nova 3, Seixal'), description: 'Equipa: Porto' };
-    const { copias } = gs.copiasDesejadas([mudou]);
+    expect(gs.copiasDesejadas([mudou]).copias.size).toBe(0);
+    const { copias } = gs.copiasDesejadas([{ ...mudou, colorId: '6' }]);
     expect(copias.get('s1').equipaId).toBe('lisboa');
     // A cópia da equipa não leva a linha, por isso escrevê-la não gera "Serviço alterado".
     expect(copias.get('s1').corpo.description).toBe('');
-    const semLinha = gs.copiasDesejadas([{ ...mudou, description: '' }]).copias.get('s1');
+    const semLinha = gs.copiasDesejadas([{ ...mudou, colorId: '6', description: '' }]).copias.get('s1');
     expect(copias.get('s1').corpo.extendedProperties.private.kyroAssinatura).toBe(semLinha.corpo.extendedProperties.private.kyroAssinatura);
   });
 
-  describe('as duas equipas do Porto', () => {
-    // Dono, 28/09/2026: "eu tenho que selecionar qual é cada, nenhum serviço do Porto é automático".
-    const servicoNoPorto = (id: string, colorId?: string, extra = '') =>
-      ({ ...evento(id, `Serviço 45€ (89€) sofá - +351 910 000 007 - Rua Z 5, 4450-000 Matosinhos${extra}`), colorId });
+  describe('a escolha da equipa', () => {
+    // Dono, 28/09/2026, só no Porto: "eu tenho que selecionar qual é cada"; a 29/09 em todas as regiões.
+    const servico = (id: string, colorId?: string, extra = '', cidade = '4450-000 Matosinhos') =>
+      ({ ...evento(id, `Serviço 45€ (89€) sofá - +351 910 000 007 - Rua Z 5, ${cidade}${extra}`), colorId });
     const equipa = (e: Evento) => gs.copiasDesejadas([e]).copias.get(e.id)?.equipaId ?? null;
 
-    it('não manda sozinho nenhum serviço do Porto: fica por escolher, sem cópia e sem ser "sem equipa"', () => {
-      const { copias, pendentes, incertos, porEscolher } = gs.copiasDesejadas([servicoNoPorto('e1')]);
+    it('sem cor nem "equipa X", nenhum serviço segue sozinho, em região nenhuma', () => {
+      const eventos = [servico('e1'), servico('e2', undefined, '', '1600-000 Lisboa'), servico('e3', undefined, '', '3800-000 Aveiro')];
+      const { copias, porEscolher } = gs.copiasDesejadas(eventos);
       expect(copias.size).toBe(0);
-      expect(pendentes).toEqual([]);
-      expect(incertos).toEqual([]);
-      expect(porEscolher.map((i: { evento: Evento }) => i.evento.id)).toEqual(['e1']);
-      // Aveiro e Coimbra são da região Porto: também se escolhem.
-      expect(equipa({ ...evento('e2', 'Serviço 45€ (89€) sofá, 3800-000 Aveiro') })).toBeNull();
+      expect(porEscolher.map((i: { evento: Evento; zona: string }) => `${i.evento.id} ${i.zona}`)).toEqual(['e1 Porto', 'e2 Lisboa', 'e3 Porto']);
     });
 
-    it('escolhe pela cor do evento: Mirtilo é a Porto 1, Pavão a Porto 2', () => {
-      expect(equipa(servicoNoPorto('e1', '9'))).toBe('porto');
-      expect(equipa(servicoNoPorto('e1', '7'))).toBe('porto2');
-      // Outra cor não é uma escolha.
-      expect(equipa(servicoNoPorto('e1', '6'))).toBeNull();
-      // A cor só escolhe no Porto.
-      expect(equipa({ ...evento('e3', 'Serviço 45€ (89€) sofá, 1600-000 Lisboa'), colorId: '7' })).toBe('lisboa');
+    it('escolhe pela cor do evento, e a linha que o script escreve não é uma escolha', () => {
+      expect(equipa(servico('e1', '9'))).toBe('porto');
+      expect(equipa(servico('e1', '7'))).toBe('porto2');
+      expect(equipa(servico('e1', '6'))).toBe('lisboa');
+      expect(equipa({ ...servico('e1'), description: 'Equipa: Porto 2' })).toBeNull();
     });
 
     it('ou pelo que está escrito, que ganha à cor', () => {
-      expect(equipa(servicoNoPorto('e1', '9', ' equipa porto 2'))).toBe('porto2');
-      expect(equipa(servicoNoPorto('e1', undefined, ' Equipa Porto2'))).toBe('porto2');
-      expect(equipa(servicoNoPorto('e1', '7', ' equipa porto 1'))).toBe('porto');
-      expect(equipa(servicoNoPorto('e1', undefined, ' equipa porto'))).toBe('porto');
-      // A linha que o script escreve não é uma escolha.
-      expect(equipa({ ...servicoNoPorto('e1'), description: 'Equipa: Porto 2' })).toBeNull();
+      expect(equipa(servico('e1', '9', ' equipa porto 2'))).toBe('porto2');
+      expect(equipa(servico('e1', undefined, ' Equipa Porto2'))).toBe('porto2');
+      expect(equipa(servico('e1', '7', ' equipa porto 1'))).toBe('porto');
+      expect(equipa(servico('e1', undefined, ' equipa porto'))).toBe('porto');
     });
 
     it('muda de equipa quando o dono muda a cor, e não mexe na cópia enquanto está por escolher', () => {
-      const naPorto1 = gs.copiasDesejadas([servicoNoPorto('e1', '9')]);
+      const naPorto1 = gs.copiasDesejadas([servico('e1', '9')]);
       const [origemId, c] = [...naPorto1.copias][0];
       const existentes = [{ equipaId: c.equipaId, origemId, evento: copiaGravada(c.corpo, 'copia-e1') }];
-      const planearCom = (e: Evento) => {
+      const planearCom = (e: Evento, copias = existentes) => {
         const d = gs.copiasDesejadas([e]);
         const porEscolher = new Set(d.porEscolher.map((i: { evento: Evento }) => i.evento.id));
-        return resumoDe(gs.planear(d.copias, existentes, AGORA, false, d.adiados, porEscolher));
+        return resumoDe(gs.planear(d.copias, copias, AGORA, false, porEscolher));
       };
-      expect(planearCom(servicoNoPorto('e1', '7'))).toEqual(['apagar:porto:retirado', 'criar:porto2:novo']);
-      expect(planearCom(servicoNoPorto('e1'))).toEqual([]);
-      // Um serviço de Lisboa que passou para o Porto sai da Lisboa enquanto o dono não escolhe.
-      const deLisboa = [{ ...existentes[0], equipaId: 'lisboa' }];
-      const d = gs.copiasDesejadas([servicoNoPorto('e1')]);
-      expect(resumoDe(gs.planear(d.copias, deLisboa, AGORA, false, d.adiados, new Set(['e1'])))).toEqual(['apagar:lisboa:retirado']);
+      expect(planearCom(servico('e1', '7'))).toEqual(['apagar:porto:retirado', 'criar:porto2:novo']);
+      expect(planearCom(servico('e1'))).toEqual([]);
+      expect(planearCom(servico('e1'), [{ ...existentes[0], equipaId: 'lisboa' }])).toEqual([]);
     });
 
-    it('pinta e marca a Porto 2 como as outras equipas', () => {
-      expect(gs.marcaDaEquipa(servicoNoPorto('e1', '7'), 'porto2', AGORA)).toEqual({ description: 'Equipa: Porto 2' });
-      expect(gs.marcaDaEquipa(servicoNoPorto('e1', '9', ' equipa porto 2'), 'porto2', AGORA)).toEqual({ colorId: '7', description: 'Equipa: Porto 2' });
+    it('pinta e marca a equipa escrita como as outras', () => {
+      expect(gs.marcaDaEquipa(servico('e1', '7'), 'porto2', AGORA)).toEqual({ description: 'Equipa: Porto 2' });
+      expect(gs.marcaDaEquipa(servico('e1', '9', ' equipa porto 2'), 'porto2', AGORA)).toEqual({ colorId: '7', description: 'Equipa: Porto 2' });
     });
 
-    it('pede ao dono que escolha, uma vez por serviço, e diz como', () => {
-      const ruaSemCidade = { ...evento('e4', 'Serviço 45€ (89€) sofá - +351 910 000 008 - Rua Inventada 30, 2º'), colorId: undefined };
-      const mapa = { procurar: () => ({ encontrado: true, parcial: true, morada: 'R. Inventada, Perafita, Portugal', codigoPostal: '4455-000', lat: 41.23, lng: -8.70 }) };
-      const { porEscolher } = gs.copiasDesejadas([servicoNoPorto('e1'), ruaSemCidade], mapa.procurar);
+    it('pede ao dono que escolha, uma vez por serviço, com a zona como pista e as cores de todas as equipas', () => {
+      const { porEscolher } = gs.copiasDesejadas([servico('e1'), servico('e2', undefined, '', '1600-000 Lisboa'), semMorada]);
       const primeira = gs.escolhasNovas(porEscolher, {}, AGORA);
-      expect(primeira.novos).toHaveLength(2);
+      expect(primeira.novos).toHaveLength(3);
       expect(gs.escolhasNovas(porEscolher, primeira.atuais, AGORA).novos).toEqual([]);
+      const mudado = [{ ...porEscolher[2], evento: { ...semMorada, summary: `${semMorada.summary} Seixal` } }];
+      expect(gs.escolhasNovas(mudado, primeira.atuais, AGORA).novos).toHaveLength(1);
 
-      const mensagem = gs.mensagemParaDono([], [], primeira.novos);
-      expect(mensagem.assunto).toBe('2 serviços do Porto por escolher');
-      expect(mensagem.texto).toContain('Estes serviços do Porto estão à espera que escolhas a equipa:');
-      expect(mensagem.texto).toContain('(no Porto pelo Google Maps, que encontrou "R. Inventada, Perafita, Portugal" (só parte da morada))');
-      expect(mensagem.texto).toContain('cor Mirtilo para a Porto 1 ou Pavão para a Porto 2');
-      expect(gs.mensagemParaDono([], [], primeira.novos.slice(0, 1)).assunto).toBe('Serviço do Porto por escolher');
-      expect(gs.mensagemParaDono([evento('c9', 'Serviço 70€ (130€) imper cadeiras')], [], primeira.novos).assunto).toBe('Serviços para confirmar');
+      const mensagem = gs.mensagemParaDono(primeira.novos);
+      expect(mensagem.assunto).toBe('Escolhe a equipa de 3 serviços');
+      expect(mensagem.texto).toContain('Estes serviços estão à espera que escolhas a equipa:');
+      expect(mensagem.texto).toContain('(a morada parece ser da zona Lisboa)');
+      expect(mensagem.texto).toContain('sábado, 03/10, das 14:00 às 15:00 (hora de Portugal)');
+      for (const linha of ['Mirtilo = Equipa Porto 1', 'Pavão = Equipa Porto 2', 'Basílico = Equipa Braga', 'Tangerina = Equipa Lisboa 1', 'Uva = Equipa Lisboa 2', 'Banana = Equipa Algarve']) {
+        expect(mensagem.texto).toContain(linha);
+      }
+      expect(mensagem.texto).toContain('"equipa porto 1", "equipa porto 2", "equipa braga", "equipa lisboa 1", "equipa lisboa 2" ou "equipa algarve"');
+      expect(gs.mensagemParaDono(primeira.novos.slice(0, 1)).assunto).toBe('Escolhe a equipa deste serviço');
     });
   });
 
@@ -502,11 +434,11 @@ describe('o que muda nos calendários das equipas', () => {
     // Mudado para outra equipa à mão: avisa outra vez.
     expect(gs.aMaoNovos([{ equipaId: 'lisboa', evento: aMao }], primeira.atuais, AGORA).novos).toHaveLength(1);
 
-    const mensagem = gs.mensagemParaDono([], [], [], primeira.novos);
+    const mensagem = gs.mensagemParaDono([], primeira.novos);
     expect(mensagem.assunto).toBe('Serviço criado fora do teu calendário');
     expect(mensagem.texto).toContain('está no calendário da Equipa Porto 1');
     expect(mensagem.texto).toContain('não entra no CRM');
-    expect(gs.mensagemParaDono([semMorada], [], [], primeira.novos).assunto).toBe('Serviços para confirmar');
+    expect(gs.mensagemParaDono([{ evento: semMorada, zona: null }], primeira.novos).assunto).toBe('Serviços para confirmar');
   });
 
   it('passa para o evento do dono o dia mudado à mão na cópia da equipa, e só isso', () => {
@@ -548,16 +480,5 @@ describe('o que muda nos calendários das equipas', () => {
     expect(gs.paraMover(itens, []).map((i: { evento: Evento }) => i.evento.id)).toEqual(['m1', 'm4']);
     // Passa com a cor da equipa onde estava: no Porto é a escolha da equipa.
     expect(gs.equipaPelaCor({ colorId: '7' }).id).toBe('porto2');
-  });
-
-  it('avisa o dono uma vez de cada serviço sem equipa, e outra vez se ele o mudar', () => {
-    const primeira = gs.pendentesNovos([semMorada], {}, AGORA);
-    expect(primeira.novos.map((e: Evento) => e.id)).toEqual(['c3']);
-    expect(gs.pendentesNovos([semMorada], primeira.atuais, AGORA).novos).toEqual([]);
-    const mudado = { ...semMorada, summary: `${semMorada.summary} Seixal` };
-    expect(gs.pendentesNovos([mudado], primeira.atuais, AGORA).novos).toHaveLength(1);
-    const mensagem = gs.mensagemParaDono(primeira.novos);
-    expect(mensagem.assunto).toBe('Serviço sem equipa');
-    expect(mensagem.texto).toContain('sábado, 03/10, das 14:00 às 15:00');
   });
 });
