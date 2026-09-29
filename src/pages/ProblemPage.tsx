@@ -16,6 +16,7 @@ import ServicePriceSection from "@/components/ServicePriceSection";
 import ServicePackBanner from "@/components/ServicePackBanner";
 import { SERVICE_PACK_SLUGS } from "@/constants/servicePackSlugs";
 import { getProblemLayout } from "@/data/problemLayout";
+import { problemBreadcrumb } from "@/data/problemHero";
 import { getProblemBySlug, getRelatedProblemLinks } from "@/data/problemSeoData";
 import { services, cities } from "@/data/serviceCatalog";
 import { getProblemCities } from "@/data/problemCitySeoData";
@@ -84,13 +85,15 @@ const ProblemPage = () => {
   // geradas, que ninguém mais ligava. Ver getProblemCities.
   const relatedCityData = getProblemCities(data.slug);
   const layout = getProblemLayout(data);
+  // A mesma migalha no hero e no JSON-LD (e no prerender, pela mesma função).
+  const breadcrumb = problemBreadcrumb(data);
   return (
     <QuizServiceProvider value={quizService}>
     <>
       <Header />
       <main>
 
-        <ProblemHero problem={data} />
+        <ProblemHero problem={data} breadcrumb={breadcrumb} />
         <ServicePriceSection serviceSlug={data.relatedServices[0]} />
 
         {/* ═══ AVALIAÇÕES REAIS ═══ */}
@@ -166,15 +169,11 @@ const ProblemPage = () => {
             buildWebPageNode({ url: `${SITE_URL}/problemas/${slug}`, name: data.title, description: data.metaDescription }),
             // O passo do meio é o serviço, não um "/problemas" que nunca
             // existiu: não há rota em App.tsx nem ficheiro no dist, e em
-            // produção devolve 404. A migalha visível desta página já mostrava
-            // Início › serviço, por isso o que a página mostrava e o que
-            // declarava discordavam, e o que declarava apontava para uma
-            // página inexistente. Passam a ser a mesma coisa.
-            buildBreadcrumbNode(`${SITE_URL}/problemas/${slug}#breadcrumb`, [
-              { name: "Início", item: `${SITE_URL}/` },
-              ...(relatedService ? [{ name: relatedService.name, item: `${SITE_URL}/${relatedService.slug}` }] : []),
-              { name: data.h1, item: `${SITE_URL}/problemas/${slug}` },
-            ]),
+            // produção devolve 404. Vem de `problemBreadcrumb`, o mesmo array
+            // que o hero desenha: antes o hero parava no serviço e o schema
+            // acrescentava o problema.
+            buildBreadcrumbNode(`${SITE_URL}/problemas/${slug}#breadcrumb`,
+              breadcrumb.map(step => ({ name: step.name, item: `${SITE_URL}${step.path}` }))),
             ...(relatedService ? [buildServiceNode({
               url: `${SITE_URL}/problemas/${slug}`,
               name: data.h1,

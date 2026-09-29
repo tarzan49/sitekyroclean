@@ -3,7 +3,7 @@ import ProblemTreatmentGuide from "@/components/ProblemTreatmentGuide";
 import { getProblemLayout } from "@/data/problemLayout";
 import DirectoryGroup from "@/components/DirectoryGroup";
 import ProblemHero from "@/components/ProblemHero";
-import { getProblemHero } from "@/data/problemHero";
+import { getProblemHero, problemBreadcrumb } from "@/data/problemHero";
 import { useEffect, useMemo } from "react";
 import { useLocation, Link } from "react-router-dom";
 import { QuizLocationProvider, QuizServiceProvider } from "@/context/QuizLocationContext";
@@ -71,6 +71,9 @@ const ProblemCityPage = () => {
 
   const prep = cityPrep(city.name);
   const hero = getProblemHero(problem, city.name);
+  // Um só array para a migalha do hero e para a do JSON-LD: o que a página
+  // mostra e o que declara não podem discordar (e o prerender usa a mesma função).
+  const breadcrumb = problemBreadcrumb(problem, city);
   const quizService = SERVICE_TO_QUIZ[problem.relatedServices[0]] ?? 'sofa';
 
   const relatedProblemLinks = getRelatedProblemLinks(problem.relatedProblems);
@@ -102,11 +105,12 @@ const ProblemCityPage = () => {
         description={hero.intro}
         pageUrl={pathname}
         priceFrom={servicePrice}
+        breadcrumb={breadcrumb}
       />
       <Header />
       <main>
 
-        <ProblemHero problem={problem} city={city.name} />
+        <ProblemHero problem={problem} city={city.name} breadcrumb={breadcrumb} />
         <ServicePriceSection serviceSlug={problem.relatedServices[0]} initialLocation={city.name} />
 
         {/* ═══ AVALIAÇÕES REAIS — logo abaixo do widget ═══ */}

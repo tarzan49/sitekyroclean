@@ -43,7 +43,7 @@ import { getAllKeywordVariantRoutes, getKeywordVariantData } from '../src/data/k
 import { LEGAL_PAGES } from '../src/data/legalPages';
 import { getAllProblems, getProblemBySlug } from '../src/data/problemSeoData';
 import { getProblemLayout } from '../src/data/problemLayout';
-import { getProblemHero } from '../src/data/problemHero';
+import { getProblemHero, problemBreadcrumb } from '../src/data/problemHero';
 import { getAllProblemCityRoutes, getProblemCities, problemCityMeta, problemCityNeighbours } from '../src/data/problemCitySeoData';
 import { getProblemCityFaqs, getProblemCityReviews, getProblemCityCoverage } from '../src/data/problemCityContent';
 import { getAllMaterials, getAllMaterialCityRoutes, getMaterialCityData } from '../src/data/materialSeoData';
@@ -733,20 +733,14 @@ export function prerenderRoutes(outDir: string): number {
           processSteps: layout.process.map((step, index) => ({ step: index + 1, ...step })),
           faqs: layout.faqs,
         },
-        // Migalha igual à da página React (Início › serviço › problema). Estas
+        // Migalha igual à da página React (Início › serviço › problema): a
+        // mesma `problemBreadcrumb` que o hero e o JSON-LD do React usam. Estas
         // 54 páginas não declaravam BreadcrumbList nenhum no HTML estático nem
         // mostravam a migalha ali, apesar de o React a desenhar — e o `emit`
         // deriva a migalha visível deste mesmo schema, por isso passam a ter as
         // duas de uma só vez, sem poderem discordar.
         [
-          buildBreadcrumbSchema([
-            { name: 'Início', url: `${BASE_URL}/` },
-            ...(() => {
-              const service = services.find(s => s.slug === p.relatedServices[0]);
-              return service ? [{ name: service.name, url: `${BASE_URL}/${service.slug}` }] : [];
-            })(),
-            { name: p.h1, url: `${BASE_URL}/problemas/${p.slug}` },
-          ]),
+          buildBreadcrumbSchema(problemBreadcrumb(p).map(step => ({ name: step.name, url: `${BASE_URL}${step.path}` }))),
           buildFaqSchema(layout.faqs),
         ],
       );
@@ -765,11 +759,9 @@ export function prerenderRoutes(outDir: string): number {
       // O mesmo título e a mesma descrição que o ProblemCityPage.tsx aplica.
       const { title, description: desc } = problemCityMeta(problem, city.name);
       const schemas: object[] = [
-        buildBreadcrumbSchema([
-          { name: 'Início',      url: BASE_URL + '/' },
-          { name: problem.h1,   url: `${BASE_URL}/problemas/${route.problemSlug}` },
-          { name: city.name,    url: `${BASE_URL}${route.path}` },
-        ]),
+        // Início › problema › cidade, da mesma função que o hero e o JSON-LD
+        // do ProblemCityPage.tsx: o React mostrava "Início › serviço › cidade".
+        buildBreadcrumbSchema(problemBreadcrumb(problem, city).map(step => ({ name: step.name, url: `${BASE_URL}${step.path}` }))),
       ];
       emit(
         route.path,
