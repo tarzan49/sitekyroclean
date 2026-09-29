@@ -2,7 +2,7 @@ import { useState, useCallback, useEffect, useMemo, useRef } from "react";
 import { ChevronLeft, ChevronRight, Plus, Download, RefreshCw, Search, Trash2, Pencil, X, Phone, CalendarDays } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { CRM_LOCALITIES, type CalendarEvent, type CrmLocality } from "@/lib/calendarServices";
-import { CALENDAR_SYNC_SINCE, planCalendarSync, type SyncPlan } from "@/lib/calendarSync";
+import { CALENDAR_FETCH_SINCE, CALENDAR_SYNC_SINCE, planCalendarSync, type SyncPlan } from "@/lib/calendarSync";
 import { resolveMissingRegions } from "@/lib/regionLookup";
 import { lisbonDay, weekdayOf, WEEKDAY_SHORT } from "@/lib/crmClosings";
 import CrmClosings from "./CrmClosings";
@@ -132,7 +132,7 @@ const CrmPanel = () => {
     setSync({ status: "running" });
     try {
       const { data, error: fnError } = await supabase.functions.invoke("calendar-events", {
-        body: { since: CALENDAR_SYNC_SINCE },
+        body: { since: CALENDAR_FETCH_SINCE },
       });
       if (fnError || !data?.success) {
         if ((fnError as { context?: Response } | null)?.context?.status === 503) {

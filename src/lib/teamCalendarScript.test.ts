@@ -509,6 +509,26 @@ describe('o que muda nos calendários das equipas', () => {
     expect(gs.mensagemParaDono([semMorada], [], [], primeira.novos).assunto).toBe('Serviços para confirmar');
   });
 
+  it('passa para o evento do dono o dia mudado à mão na cópia da equipa, e só isso', () => {
+    const origem = { ...evento('o1', 'Serviço 115€ (230€) colchões - Rua Inventada 6, Pucariça', '2026-10-01T12:00:00+02:00', '2026-10-01T13:00:00+02:00'), updated: '2026-09-27T23:43:30Z' };
+    origem.start = { ...origem.start, timeZone: 'Europe/Copenhagen' };
+    const corpo = gs.corpoDaCopia(origem);
+    const escrita = { ...evento('c1', corpo.summary, '2026-10-01T11:00:00+01:00', '2026-10-01T12:00:00+01:00'), description: corpo.description, extendedProperties: corpo.extendedProperties, updated: '2026-09-27T23:50:00Z' };
+    // Cópia tal como o script a escreveu: nada a fazer.
+    expect(gs.edicoesNasCopias([{ equipaId: 'lisboa', evento: escrita, origemId: 'o1' }], [origem])).toEqual([]);
+
+    const mudada = { ...escrita, start: { dateTime: '2026-10-16T11:00:00+01:00' }, end: { dateTime: '2026-10-16T12:00:00+01:00' }, updated: '2026-09-29T10:40:50Z' };
+    const [edicao] = gs.edicoesNasCopias([{ equipaId: 'lisboa', evento: mudada, origemId: 'o1' }], [origem]);
+    expect(edicao.origem.id).toBe('o1');
+    expect(edicao.alteracao).toEqual({
+      start: { dateTime: '2026-10-16T10:00:00.000Z', timeZone: 'Europe/Copenhagen' },
+      end: { dateTime: '2026-10-16T11:00:00.000Z', timeZone: 'Europe/Copenhagen' },
+    });
+    // O dono mudou o evento dele depois: ganha o dele, e a cópia refaz-se.
+    const maisRecente = { ...origem, updated: '2026-09-29T11:00:00Z' };
+    expect(gs.edicoesNasCopias([{ equipaId: 'lisboa', evento: mudada, origemId: 'o1' }], [maisRecente])).toEqual([]);
+  });
+
   it('passa para o calendário do dono os serviços criados à mão no de uma equipa, sem duplicar', () => {
     const copia = { ...evento('k1', 'Serviço 45€ (89€) sofá - Porto'), extendedProperties: { private: { kyroOrigem: 'e1' } } };
     const aMao = evento('m1', 'Serviço 60€ (120€) tapetes - Rua Inventada 88 Póvoa de Varzim', '2026-09-30T11:00:00+01:00', '2026-09-30T12:00:00+01:00');

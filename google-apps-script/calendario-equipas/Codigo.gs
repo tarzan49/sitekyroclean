@@ -169,6 +169,14 @@ function sincronizarAgora() {
     if (evento && evento.status !== 'cancelled') fonte.eventos.push(evento);
   }
 
+  // Uma cópia mudada à mão (no telemóvel, o dono abre a cópia da equipa e
+  // muda-lhe o dia) passa essa mudança para o evento do dono, e daí para o
+  // CRM e para a equipa, em vez de ficar só na cópia. Ver `edicoesNasCopias`.
+  for (const edicao of edicoesNasCopias(existentes, fonte.eventos)) {
+    const atualizado = Calendar.Events.patch(edicao.alteracao, 'primary', edicao.origem.id, { sendUpdates: 'none' });
+    fonte.eventos[fonte.eventos.indexOf(edicao.origem)] = atualizado;
+  }
+
   const mapa = mapaComMemoria(propriedades);
   const desejadas = copiasDesejadas(fonte.eventos, mapa.procurar);
   mapa.guardar();
@@ -731,6 +739,38 @@ function resumo(texto) {
 function propriedadePrivada(evento, chave) {
   const privadas = evento.extendedProperties && evento.extendedProperties.private;
   return (privadas && privadas[chave]) || null;
+}
+
+/**
+ * As cópias que alguém mudou à mão depois da última escrita do script: o
+ * conteúdo já não bate com a assinatura guardada, a cópia foi mudada depois do
+ * evento do dono, e o título ou as horas são diferentes dos dele. O dono fê-lo
+ * a 29/09/2026 (mudou um serviço de 1 para 16/10 na cópia da Lisboa 1) e o
+ * evento dele, que é o que o CRM lê, ficou no dia 1. Passa para o evento do
+ * dono o título e as horas da cópia; a equipa recebe depois o aviso de
+ * alteração, como se ele tivesse mudado o seu. O fuso do evento do dono fica.
+ */
+function edicoesNasCopias(existentes, eventosDoDono) {
+  const porId = new Map(eventosDoDono.map(function (e) { return [e.id, e]; }));
+  const edicoes = [];
+  for (const existente of existentes) {
+    const copia = existente.evento;
+    const origem = porId.get(existente.origemId);
+    if (!origem || origem.status === 'cancelled' || copia.status === 'cancelled') continue;
+    const conteudo = resumo(JSON.stringify([copia.summary || '', copia.location || '', copia.description || '', horaEmPortugal(copia.start), horaEmPortugal(copia.end)]));
+    if (conteudo === propriedadePrivada(copia, 'kyroAssinatura')) continue;
+    if (!(Date.parse(copia.updated) > Date.parse(origem.updated))) continue;
+    const alteracao = {};
+    if ((copia.summary || '') !== (origem.summary || '')) alteracao.summary = copia.summary || '';
+    for (const ponta of ['start', 'end']) {
+      if (fimEmMs(copia[ponta]) === fimEmMs(origem[ponta])) continue;
+      alteracao[ponta] = copia[ponta].date
+        ? { date: copia[ponta].date }
+        : { dateTime: new Date(fimEmMs(copia[ponta])).toISOString(), timeZone: origem[ponta].timeZone || copia[ponta].timeZone };
+    }
+    if (Object.keys(alteracao).length) edicoes.push({ origem: origem, alteracao: alteracao });
+  }
+  return edicoes;
 }
 
 /** `moradaNoMapa`: a morada que o Maps encontrou, que vai para o "Onde" da cópia quando o evento não tem local. */

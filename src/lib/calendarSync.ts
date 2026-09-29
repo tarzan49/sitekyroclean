@@ -9,6 +9,11 @@
 //   origem só muda entre "Google Calendar" e os anúncios, conforme o título
 //   tenha "(anúncio)" (2026-09-28): uma origem escrita à mão no CRM fica.
 //   Exceção: um cliente vazio no CRM é preenchido se o evento tiver nome.
+// - Serviço criado antes de `since`, já ligado a uma linha (passada à mão e
+//   ligada na importação de 11/09): se ainda não aconteceu, o dia e os valores
+//   seguem o calendário (dono, 29/09/2026: mudou um serviço de 1 para 16/10 e
+//   o CRM ficou no dia 1). A descrição, o cliente e a região ficam como o dono
+//   os escreveu no CRM. Nunca cria linhas: essas já foram passadas à mão.
 // - Evento que desaparece (apagado, cancelado, ou deixou de começar por
 //   "Serviço") → a linha fica marcada, nunca é apagada. Se voltar, desmarca-se.
 import {
@@ -21,6 +26,13 @@ import {
  * passados à mão pelo dono (os de 26/09 entraram entre as 15:44 e as 15:54).
  */
 export const CALENDAR_SYNC_SINCE = '2026-09-26T15:00:00Z';
+
+/**
+ * Os eventos pedidos ao calendário começam aqui, antes de `CALENDAR_SYNC_SINCE`,
+ * para os serviços antigos já ligados a uma linha acompanharem as mudanças de
+ * dia (os primeiros dados do CRM são de 5/06/2026).
+ */
+export const CALENDAR_FETCH_SINCE = '2026-06-01T00:00:00Z';
 
 /** Aparece na coluna Origem das linhas criadas pela sincronização. */
 export const CALENDAR_SOURCE = 'Google Calendar';
@@ -39,6 +51,9 @@ export interface SyncableRow {
   calendar_event_id: string | null;
   calendar_updated_at: string | null;
   calendar_missing_since: string | null;
+  request_date?: string | null;
+  billed_value?: number | string | null;
+  my_cut?: number | string | null;
 }
 
 export type CalendarInsert = ParsedService & {
@@ -75,9 +90,19 @@ export function planCalendarSync(
 
   for (const event of events) {
     if (event.status === 'CANCELLED' || !isServiceEvent(event.summary)) continue;
-    if (time(event.created) < time(since)) continue;
     const parsed = parseServiceEvent(event, known);
     if (!parsed) continue;
+    if (time(event.created) < time(since)) {
+      const old = byEvent.get(event.id);
+      if (old) {
+        const patch = upcomingChanges(old, parsed, now);
+        if (patch) {
+          plan.updates.push({ id: old.id, patch });
+          plan.counts.updated++;
+        }
+      }
+      continue;
+    }
     present.add(event.id);
 
     const source = adSourceFromTitle(event.summary) ?? CALENDAR_SOURCE;
@@ -124,4 +149,20 @@ export function planCalendarSync(
   }
 
   return plan;
+}
+
+/**
+ * O dia e os valores de um serviço antigo que ainda não aconteceu, quando o
+ * calendário diz outra coisa. `request_date` é uma data (AAAA-MM-DD), por isso
+ * compara-se como texto.
+ */
+function upcomingChanges(row: SyncableRow, parsed: ParsedService, now: string): CalendarPatch | null {
+  const today = now.slice(0, 10);
+  const current = row.request_date?.slice(0, 10) ?? '';
+  if (current < today && parsed.request_date < today) return null;
+  const patch: CalendarPatch = {};
+  if (parsed.request_date !== current) patch.request_date = parsed.request_date;
+  if (row.billed_value != null && Number(row.billed_value) !== parsed.billed_value) patch.billed_value = parsed.billed_value;
+  if (row.my_cut != null && Number(row.my_cut) !== parsed.my_cut) patch.my_cut = parsed.my_cut;
+  return Object.keys(patch).length ? patch : null;
 }

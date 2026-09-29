@@ -176,6 +176,12 @@ Para desligar: função `desligar`. Os calendários ficam como estão.
 - **Quando corre:** sempre que um evento do calendário do dono muda, e a cada
   15 minutos para apanhar o que falhar. Olha de 2 dias para trás a um ano para
   a frente.
+- **Uma cópia mudada à mão passa a mudança para o evento do dono**
+  (`edicoesNasCopias`): se o título ou as horas da cópia forem diferentes dos
+  do evento do dono e a cópia tiver sido mudada depois dele, o evento do dono
+  fica com o título e as horas da cópia, e a equipa recebe o aviso de
+  alteração. Se o dono mudar o evento dele depois, ganha o dele. Aconteceu a
+  29/09/2026: o dono mudou no telemóvel a cópia da Lisboa 1 de 1 para 16/10.
 - O CRM continua a ler só o calendário do dono (`calendar-events`). Os
   calendários das equipas não entram nas contas.
 - **Um serviço criado à mão no calendário de uma equipa passa sozinho para o
