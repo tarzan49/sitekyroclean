@@ -35,6 +35,7 @@ import { buildAboutPageSchema, buildProfilePageSchema, buildPersonNode, buildStu
 import fs from 'fs';
 import path from 'path';
 import { getLandingPageModel } from '../src/data/landingPageModel';
+import { landingBreadcrumb } from '../src/data/breadcrumb';
 import { renderLandingPageHtml, ENTITY_FOOTER_HTML, SERVICE_CONDITIONS_HTML } from './landing-page-html';
 
 import { getLocationServiceData, getAllLocationRoutes, services, cities, cityPrep, headingWithCity } from '../src/data/locationSeoData';
@@ -588,16 +589,16 @@ export function prerenderRoutes(outDir: string): number {
     // variantes de keyword desenhavam a migalha para quem ve a pagina (o
     // `renderLandingPageHtml` monta-a a partir deste mesmo modelo) e nao a
     // declaravam em lado nenhum, por isso a pesquisa mostrava o URL cru em vez
-    // do caminho. Os tres campos sao exatamente os que a migalha visivel usa,
-    // para o que a pagina mostra e o que declara nao poderem discordar.
+    // do caminho. Os passos saem de `landingBreadcrumb`, a mesma funcao com
+    // que o `renderLandingPageHtml` desenha a migalha visivel (e que o hero e o
+    // JSON-LD do PricePage.tsx usam), para o que a pagina mostra e o que
+    // declara nao poderem discordar.
     // A guarda evita duplicar nas familias que ja passam a sua (localidade,
-    // freguesia, preco), que continuam a mandar na sua propria versao.
+    // freguesia), que continuam a mandar na sua propria versao. As de preco
+    // passavam a sua ate 30/09/2026, com um ultimo passo diferente do que
+    // mostravam, e deixaram de o fazer.
     if (landing && !schemas?.some(schema => (schema as { '@type'?: string })['@type'] === 'BreadcrumbList')) {
-      html = injectJsonLd(html, buildBreadcrumbSchema([
-        { name: 'Início',                  url: `${BASE_URL}/` },
-        { name: landing.serviceName,       url: `${BASE_URL}${landing.serviceBaseRoute}` },
-        { name: landing.heroLocationName,  url: `${BASE_URL}${routePath}` },
-      ]));
+      html = injectJsonLd(html, buildBreadcrumbSchema(landingBreadcrumb(landing).map(step => ({ name: step.name, url: `${BASE_URL}${step.path}` }))));
     }
     // Caller-provided schemas (FAQ, Service, BreadcrumbList, etc.)
     for (const schema of schemas ?? []) {
@@ -883,14 +884,13 @@ export function prerenderRoutes(outDir: string): number {
       const data = getPricePageData(route.serviceSlug, route.citySlug);
       if (!data) continue;
       const svc = services.find(s => s.slug === route.serviceSlug);
+      // Sem BreadcrumbList próprio: o `emit()` declara-o a partir do modelo
+      // landing, com a mesma `landingBreadcrumb` que desenha a migalha
+      // visível e que o PricePage.tsx usa no hero e no JSON-LD. O que esta
+      // família passava aqui acabava em "Preços no Porto" enquanto a página
+      // mostrava "Porto".
       const schemas: object[] = [
         buildServiceSchema(data.serviceName, data.cityName, svc?.priceFrom ?? 'Sob orçamento'),
-        buildBreadcrumbSchema([
-          { name: 'Início',                     url: BASE_URL + '/' },
-          { name: data.serviceName,             url: `${BASE_URL}/${route.serviceSlug}` },
-          // O mesmo nome que o PricePage.tsx declara no seu BreadcrumbList.
-          { name: `Preços ${cityPrep(data.cityName)} ${data.cityName}`, url: `${BASE_URL}${route.path}` },
-        ]),
       ];
       if (data.faqs?.length) schemas.push(buildFaqSchema(data.faqs));
       emit(

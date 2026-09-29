@@ -13,6 +13,7 @@ import { pickServiceHero } from "@/constants/serviceContent";
 import { SERVICE_TO_QUIZ } from "@/constants/serviceToQuiz";
 import { QuizLocationProvider, QuizServiceProvider } from "@/context/QuizLocationContext";
 import { categoryForServiceSlug } from "@/data/beforeAfterPool";
+import { landingBreadcrumb } from "@/data/breadcrumb";
 import { cityPrep, services } from "@/data/serviceCatalog";
 import { useLandingModel } from "@/hooks/use-landing-model";
 import {
@@ -36,6 +37,9 @@ const PricePage = () => {
     title: model.title, metaDescription: model.metaDescription,
     cityName: model.municipalityName, citySlug: model.municipalitySlug,
     serviceName: model.serviceName, serviceSlug: model.serviceSlug,
+    // Um só array para a migalha do hero e para a do JSON-LD, da mesma função
+    // com que o prerender desenha e declara a do HTML estático.
+    breadcrumb: landingBreadcrumb(model),
   } : null), [model]);
 
   useEffect(() => {
@@ -77,6 +81,11 @@ const PricePage = () => {
   const servicePrice = service?.priceFrom ?? "Sob orçamento";
   const waHref = `${WHATSAPP_BASE}?text=${encodeURIComponent(buildServiceWaMessage(data.serviceSlug, data.cityName))}`;
 
+  // Sem `breadcrumbs`, o CommercialHero montava "Início › serviço › cidade",
+  // que não é a migalha que a página declara. O último passo é a própria
+  // página: texto, sem ligação, como no HTML estático.
+  const heroBreadcrumbs = data.breadcrumb.map((step, index) => ({ label: step.name, to: index < data.breadcrumb.length - 1 ? step.path : undefined }));
+
   const serviceDuration = SERVICE_DURATION[data.serviceSlug] ?? { value: "3 a 6h", label: "Pronto a usar" };
   // Resposta em menos de 10 minutos: compromisso comum a todo o site.
 
@@ -93,7 +102,7 @@ const PricePage = () => {
       <Header />
       <main>
 
-        <CommercialHero title={`Preço de ${data.serviceName} ${prep} ${data.cityName}`} serviceSlug={data.serviceSlug} city={data.cityName} price={servicePrice} image={heroImgs} whatsappHref={waHref} source={`price_hero_${data.serviceSlug}_${data.citySlug}`} />
+        <CommercialHero title={`Preço de ${data.serviceName} ${prep} ${data.cityName}`} serviceSlug={data.serviceSlug} city={data.cityName} price={servicePrice} image={heroImgs} breadcrumbs={heroBreadcrumbs} whatsappHref={waHref} source={`price_hero_${data.serviceSlug}_${data.citySlug}`} />
 
         <LandingServiceSections />
 
@@ -104,11 +113,8 @@ const PricePage = () => {
               "@context": "https://schema.org",
               "@graph": [
                 buildWebPageNode({ url: `${SITE_URL}${pathname}`, name: data.title, description: data.metaDescription }),
-                buildBreadcrumbNode(`${SITE_URL}${pathname}#breadcrumb`, [
-                  { name: "Início", item: SITE_URL },
-                  { name: data.serviceName, item: `${SITE_URL}/${data.serviceSlug}` },
-                  { name: `Preços ${prep} ${data.cityName}`, item: `${SITE_URL}${pathname}` },
-                ]),
+                buildBreadcrumbNode(`${SITE_URL}${pathname}#breadcrumb`,
+                  data.breadcrumb.map(step => ({ name: step.name, item: `${SITE_URL}${step.path}` }))),
                 buildServiceNode({
                   url: `${SITE_URL}${pathname}`,
                   name: `${data.serviceName} ${prep} ${data.cityName}`,

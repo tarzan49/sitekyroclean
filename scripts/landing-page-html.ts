@@ -1,5 +1,6 @@
 import { exampleImageSrcSet, EXAMPLE_IMAGE_SIZES } from '../src/lib/responsiveImages';
 import type { LandingPageModel } from '../src/data/landingPageModel';
+import { landingBreadcrumb } from '../src/data/breadcrumb';
 import { LANDING_SECTION_ORDER } from '../src/data/landingServiceCopy';
 import { commercialHeroPriceLine, commercialHeroStats } from '../src/data/commercialHeroCopy';
 import { FOOTER_NAV, FOOTER_STRIP_LINKS, FOOTER_LEGAL_LINKS } from '../src/data/siteFooterNav';
@@ -102,14 +103,18 @@ export function renderLandingPageHtml(model: LandingPageModel): string {
   // no HTML estático, que é o único que um crawler sem JavaScript lê.
   const heroFacts = `<p>${e(commercialHeroPriceLine(model.serviceSlug, model.municipalityName, model.priceFrom))}</p><ul>${commercialHeroStats(model.serviceSlug).map(stat => `<li>${e(stat.value)} · ${e(stat.label)}</li>`).join('')}</ul>`;
   // A mesma migalha que o CommercialHero desenha para quem vê a página:
-  // Início, o serviço (ligado ao seu hub) e a localidade como texto. Não é
+  // Início, o serviço (ligado ao seu hub) e a própria página como texto. Não é
   // informação nova, é a que faltava no HTML estático — e era a razão de os
   // seis serviços-pilar quase não receberem ligações internas num site de
   // 16.000 páginas, apesar de cada uma delas pertencer a um.
+  // Sai de `landingBreadcrumb`, a mesma função com que o `emit()` declara o
+  // BreadcrumbList: as páginas de preço mostravam aqui "Porto" e declaravam
+  // "Preços no Porto".
+  const steps = landingBreadcrumb(model);
   const breadcrumb = `<nav aria-label="Breadcrumb"><ol>`
-    + `<li><a href="/">Início</a></li>`
-    + `<li><a href="${e(model.serviceBaseRoute)}">${e(model.serviceName)}</a></li>`
-    + `<li>${e(model.heroLocationName)}</li>`
+    + steps.map((step, index) => index < steps.length - 1
+      ? `<li><a href="${e(step.path)}">${e(step.name)}</a></li>`
+      : `<li>${e(step.name)}</li>`).join('')
     + `</ol></nav>`;
 
   return `<main>${breadcrumb}<h1>${e(model.h1)}</h1><p>${e(model.intro)}</p>${heroFacts}${LANDING_SECTION_ORDER.map(section => `<section id="${section}" data-landing-section="${section}">${sections[section]}</section>`).join('\n')}${SERVICE_CONDITIONS_HTML}${ENTITY_FOOTER_HTML}</main>`;
