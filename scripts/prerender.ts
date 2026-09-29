@@ -44,7 +44,7 @@ import { LEGAL_PAGES } from '../src/data/legalPages';
 import { getAllProblems, getProblemBySlug } from '../src/data/problemSeoData';
 import { getProblemLayout } from '../src/data/problemLayout';
 import { getProblemHero, problemBreadcrumb } from '../src/data/problemHero';
-import { getAllProblemCityRoutes, getProblemCities, problemCityMeta, problemCityNeighbours } from '../src/data/problemCitySeoData';
+import { getAllProblemCityRoutes, getProblemCities, problemCityBenefits, problemCityMeta, problemCityName, problemCityNeighbours } from '../src/data/problemCitySeoData';
 import { getProblemCityFaqs, getProblemCityReviews, getProblemCityCoverage } from '../src/data/problemCityContent';
 import { getAllMaterials, getAllMaterialCityRoutes, getMaterialCityData } from '../src/data/materialSeoData';
 import { getAllPriceRoutes, getPricePageData } from '../src/data/priceSeoData';
@@ -775,7 +775,8 @@ export function prerenderRoutes(outDir: string): number {
           localSection: getProblemCityCoverage(city.name),
           problems: getProblemLayout(problem).examples.map(example => ({ title: example.title, description: "Imagem ilustrativa.", image: example.image })),
           processSteps: getProblemLayout(problem).process.map((step, index) => ({ step: index + 1, ...step })),
-          benefits: problem.benefits,
+          // Os mesmos benefícios que o ProblemCityPage.tsx desenha.
+          benefits: problemCityBenefits(problem, city.name),
           // Quatro perguntas escolhidas pela identidade da pagina e seis
           // avaliacoes da regiao: e o que distingue esta cidade da seguinte.
           faqs: getProblemCityFaqs(problem, city.name, route.path),
@@ -795,11 +796,12 @@ export function prerenderRoutes(outDir: string): number {
           // Cascais e Sintra não recebiam uma única. O ponto de partida varia
           // com a cidade desenhada, de modo a cobrir a lista inteira.
           // `problemCityNeighbours` é a mesma função que a página React usa
-          // para o bloco "Este problema noutras cidades".
+          // para o bloco "Este problema noutras cidades". Os rótulos levam o
+          // nome sem localidade (`problemCityName`), como o H1 e a migalha.
           links: [
-            { href: `/problemas/${route.problemSlug}`, label: `${problem.h1} (página nacional)` },
+            { href: `/problemas/${route.problemSlug}`, label: `${problemCityName(problem)} (página nacional)` },
             ...problemCityNeighbours(route.problemSlug, city.slug)
-              .map(c => ({ href: `/${route.problemSlug}-${c.slug}`, label: headingWithCity(problem.h1, c.name) })),
+              .map(c => ({ href: `/${route.problemSlug}-${c.slug}`, label: headingWithCity(problemCityName(problem), c.name) })),
           ],
         },
         schemas,

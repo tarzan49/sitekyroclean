@@ -5,6 +5,7 @@ import { locationPrices } from '../constants/travel';
 import { WHATSAPP_BASE } from '../constants/business';
 import { RESPONSE_PROMISE } from '../constants/commercialPolicy';
 import { startingPriceLabel } from './enginePrices';
+import { problemCityName } from './problemCitySeoData';
 
 const introductions: Record<ProblemPage['category'], string> = {
   manchas: 'Cuidados profissionais para as manchas no seu estofo.',
@@ -32,13 +33,18 @@ export interface BreadcrumbStep { name: string; path: string }
  * (o que o CommercialHero monta sozinho quando não recebe migalha) enquanto
  * declarava "Início › problema › cidade", e o das páginas nacionais parava no
  * serviço. Cada passo é uma página que existe: nunca um "/problemas" sem slug.
+ *
+ * Nas páginas de cidade, o passo da página nacional leva o nome sem
+ * localidade (`problemCityName`), o mesmo do H1 que vem a seguir: "Início ›
+ * Limpeza de Sofá ao Domicílio › Lisboa", e não "… no Porto e Arredores ›
+ * Lisboa".
  */
 export function problemBreadcrumb(problem: ProblemPage, city?: { name: string; slug: string }): BreadcrumbStep[] {
   const home = { name: 'Início', path: '/' };
-  const page = { name: problem.h1, path: `/problemas/${problem.slug}` };
-  if (city) return [home, page, { name: city.name, path: `/${problem.slug}-${city.slug}` }];
+  const national = `/problemas/${problem.slug}`;
+  if (city) return [home, { name: problemCityName(problem), path: national }, { name: city.name, path: `/${problem.slug}-${city.slug}` }];
   const service = services.find(item => item.slug === problem.relatedServices[0]);
-  return [home, ...(service ? [{ name: service.name, path: service.baseRoute }] : []), page];
+  return [home, ...(service ? [{ name: service.name, path: service.baseRoute }] : []), { name: problem.h1, path: national }];
 }
 
 /** Hero content shared by both problem templates and initial HTML. */
@@ -52,8 +58,9 @@ export function getProblemHero(problem: ProblemPage, city?: string) {
   const priceLabel = isQuote ? 'Sob orçamento' : `${service.slug === 'impermeabilizacao' ? 'Proteção' : 'Limpeza'} ${startingPriceLabel(service.slug, price, 'mid')}`;
   const travelLabel = fee === undefined ? 'Deslocação a partir de 10€' : `Deslocação ${fee}€`;
   return {
-    // Nas perguntas (páginas de preço) a cidade entra antes do "?".
-    heading: city ? headingWithCity(problem.h1, city) : problem.h1,
+    // Nas perguntas (páginas de preço) a cidade entra antes do "?". Com cidade,
+    // o nome sem localidade (`problemCityName`), o mesmo do título e da migalha.
+    heading: city ? headingWithCity(problemCityName(problem), city) : problem.h1,
     title: problem.h1,
     location,
     intro: introductions[problem.category],

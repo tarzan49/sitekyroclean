@@ -25,7 +25,34 @@ export interface ProblemPage {
   relatedServices: string[];
   relatedCities: string[];
   visible: boolean;
+  /**
+   * O que as páginas problema × cidade usam no lugar do texto da página
+   * nacional, quando esse texto nomeia uma cidade. Cada campo que falte cai
+   * no da página nacional. Lido só por `problemCityName`,
+   * `problemCityMeta` e `problemCityBenefits` (problemCitySeoData.ts), que
+   * servem o React e o scripts/prerender.ts.
+   */
+  cityPages?: {
+    /** O h1 sem localidade: a cidade acrescenta-se com `headingWithCity`, como nos outros problemas. */
+    h1?: string;
+    /** Substitui a primeira frase da `metaDescription` na descrição de cada cidade. */
+    metaLead?: string;
+    /** Os benefícios, com a cidade da página. */
+    benefits?: (city: string) => string[];
+  };
 }
+
+// Os benefícios da limpeza ao domicílio. O quarto é a zona: o Porto na página
+// nacional, escrita para o Porto de propósito, e a própria cidade em cada
+// página problema × cidade (dono, 30/09/2026: "Lisboa e arredores").
+const domicilioBenefits = (area: string) => [
+  "Serviço completo na sua casa",
+  "Sem custos de transporte",
+  "Equipamento profissional portátil",
+  area,
+  "Agendamento flexível",
+  "Resultado imediato",
+];
 
 // ─── Problem definitions ───────────────────────────────────────────
 const problemDefinitions: ProblemPage[] = [
@@ -760,14 +787,7 @@ const problemDefinitions: ProblemPage[] = [
     intro: "Não precisa transportar o sofá para lado nenhum. A equipa da Kyro Clean Solutions desloca-se à sua casa com todo o equipamento profissional necessário para uma limpeza perfeita ao domicílio.",
     problemDetail: "Muitas pessoas adiam a limpeza do sofá por pensarem que é necessário transportá-lo. Com o nosso serviço ao domicílio, todo o processo é feito no conforto da sua casa, sem complicações.",
     solutionDetail: "A nossa equipa traz todo o equipamento de extração profissional, produtos e acessórios. O serviço é realizado na sua sala: inspeção, pré-tratamento, extração e secagem. O sofá fica pronto a usar em poucas horas, sem sair de casa.",
-    benefits: [
-      "Serviço completo na sua casa",
-      "Sem custos de transporte",
-      "Equipamento profissional portátil",
-      "Porto e toda a área metropolitana",
-      "Agendamento flexível",
-      "Resultado imediato",
-    ],
+    benefits: domicilioBenefits("Porto e toda a área metropolitana"),
     faqs: [
       { question: "A deslocação ao domicílio tem custo extra?", answer: `Sim, a partir de ${formatEuro(TRAVEL_FEE_MIN)}, consoante a distância ao centro da área metropolitana do Porto ou das principais cidades onde operamos. O valor exato aparece no orçamento antes de confirmar.` },
       { question: "Precisam de acesso a água ou eletricidade?", answer: "Sim, precisamos de acesso a uma torneira de água e uma tomada elétrica. A nossa equipa trata de tudo o resto." },
@@ -776,6 +796,15 @@ const problemDefinitions: ProblemPage[] = [
     relatedServices: ["limpeza-sofas", "limpeza-colchoes"],
     relatedCities: ["porto", "matosinhos", "maia", "vila-nova-de-gaia", "gondomar"],
     visible: true,
+    // A página nacional é sobre o Porto; as 31 de cidade herdavam-na e
+    // diziam "Limpeza de Sofá ao Domicílio no Porto e Arredores em Lisboa"
+    // no H1, no título, na descrição e na migalha (texto escolhido pelo dono,
+    // 30/09/2026).
+    cityPages: {
+      h1: "Limpeza de Sofá ao Domicílio",
+      metaLead: "Levamos o equipamento de extração profissional à sua casa",
+      benefits: city => domicilioBenefits(`${city} e arredores`),
+    },
   },
 
   // ══════════════════════════════════════════

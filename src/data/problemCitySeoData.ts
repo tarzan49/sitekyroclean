@@ -5,6 +5,8 @@ import { PROBLEM_ROUTE_SLUGS } from "./problemRouteData";
 import { cities, headingWithCity } from "./serviceCatalog";
 import { METRO_CITIES as TOP_METRO } from "../constants/metroCities";
 import { RESPONSE_PROMISE } from "../constants/commercialPolicy";
+// Só o tipo: o texto de problemSeoData.ts fica fora deste módulo (ver problemRouteData.ts).
+import type { ProblemPage } from "./problemSeoData";
 
 export interface ProblemCityRoute {
   path: string;
@@ -56,6 +58,25 @@ export function getProblemCities(problemSlug: string): (typeof cities)[number][]
 }
 
 /**
+ * O nome do problema nas páginas de cidade, antes da cidade: o h1 da página
+ * nacional, ou o `cityPages.h1` quando esse h1 nomeia uma cidade. Dá o H1, o
+ * título, a descrição, o nome no JSON-LD, a migalha (o passo que sobe para a
+ * página nacional) e as ligações entre cidades, no React e no HTML estático.
+ *
+ * Existe por causa de `limpeza-sofa-domicilio`, cuja página nacional é sobre
+ * o Porto: até 30/09/2026 as 31 páginas de cidade diziam "Limpeza de Sofá ao
+ * Domicílio no Porto e Arredores em Lisboa" (e "… no Porto" na do Porto).
+ */
+export function problemCityName(problem: Pick<ProblemPage, 'h1' | 'cityPages'>): string {
+  return problem.cityPages?.h1 ?? problem.h1;
+}
+
+/** Os benefícios de uma página problema × cidade: os da página nacional, salvo `cityPages.benefits`. */
+export function problemCityBenefits(problem: Pick<ProblemPage, 'benefits' | 'cityPages'>, cityName: string): string[] {
+  return problem.cityPages?.benefits?.(cityName) ?? problem.benefits;
+}
+
+/**
  * Título e descrição de uma página problema × cidade.
  *
  * O React (ProblemCityPage.tsx) e o scripts/prerender.ts escreviam cada um o
@@ -65,13 +86,16 @@ export function getProblemCities(problemSlug: string): (typeof cities)[number][]
  *
  * O H1 das páginas de preço é uma pergunta: a cidade entra antes do "?"
  * (`headingWithCity`) e a descrição continua noutra frase, em vez de "?:".
+ * A frase do meio é a primeira da `metaDescription` nacional, salvo
+ * `cityPages.metaLead` (a de `limpeza-sofa-domicilio` falava do Porto).
  */
-export function problemCityMeta(problem: { h1: string; metaDescription: string }, cityName: string) {
-  const heading = headingWithCity(problem.h1, cityName);
+export function problemCityMeta(problem: Pick<ProblemPage, 'h1' | 'metaDescription' | 'cityPages'>, cityName: string) {
+  const heading = headingWithCity(problemCityName(problem), cityName);
   const lead = heading.endsWith('?') ? `${heading} Serviço` : `${heading}: serviço`;
+  const summary = problem.cityPages?.metaLead ?? problem.metaDescription.split('.')[0];
   return {
     title: `${heading} | Kyro Clean Solutions`,
-    description: `${lead} profissional ao domicílio. ${problem.metaDescription.split('.')[0]}. ${RESPONSE_PROMISE}.`,
+    description: `${lead} profissional ao domicílio. ${summary}. ${RESPONSE_PROMISE}.`,
   };
 }
 

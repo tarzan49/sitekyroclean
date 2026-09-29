@@ -5,7 +5,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { SITE_URL } from '@/constants/business';
 import { getAllProblems, getProblemBySlug } from '@/data/problemSeoData';
-import { getAllProblemCityRoutes } from '@/data/problemCitySeoData';
+import { getAllProblemCityRoutes, problemCityName } from '@/data/problemCitySeoData';
 import { problemBreadcrumb } from '@/data/problemHero';
 import { PILLAR_PAGES } from '@/data/pillarPages';
 import { cities, services } from '@/data/serviceCatalog';
@@ -125,7 +125,8 @@ describe('páginas de problema: cada passo da migalha é uma página que existe'
       const problem = getProblemBySlug(route.problemSlug)!;
       const city = cities.find(item => item.slug === route.citySlug)!;
       const trail = problemBreadcrumb(problem, city);
-      expect(trail.map(step => step.name), route.path).toEqual(['Início', problem.h1, city.name]);
+      // O passo da página nacional leva o nome sem localidade, o do H1 da página.
+      expect(trail.map(step => step.name), route.path).toEqual(['Início', problemCityName(problem), city.name]);
       expect(trail.map(step => step.path), route.path).toEqual(['/', `/problemas/${problem.slug}`, route.path]);
       for (const step of trail) expect(pages.has(step.path), `${route.path}: ${step.path}`).toBe(true);
     }

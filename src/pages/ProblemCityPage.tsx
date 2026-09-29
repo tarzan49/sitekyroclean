@@ -23,7 +23,7 @@ import { CATEGORY_TIPS, splitTipsHeading } from "@/data/problemTipsData";
 import { getServiceGallery, getIllustrativePhotos } from "@/constants/serviceGallery";
 import { cities, services, cityPrep } from "@/data/serviceCatalog";
 import { SERVICE_TO_QUIZ } from "@/constants/serviceToQuiz";
-import { getAllProblemCityRoutes, problemCityMeta, problemCityNeighbours } from "@/data/problemCitySeoData";
+import { getAllProblemCityRoutes, problemCityBenefits, problemCityMeta, problemCityName, problemCityNeighbours } from "@/data/problemCitySeoData";
 import { SITE_URL } from "@/constants/business";
 import ServiceReviewsGrid from "@/components/ServiceReviewsGrid";
 
@@ -99,7 +99,7 @@ const ProblemCityPage = () => {
     <QuizServiceProvider value={quizService}>
     <>
       <ServiceLocationSchema
-        serviceName={problem.h1}
+        serviceName={problemCityName(problem)}
         serviceBaseUrl={`/problemas/${problem.slug}`}
         placeName={city.name}
         description={hero.intro}
@@ -130,7 +130,7 @@ const ProblemCityPage = () => {
           <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
             <SectionHeader overline="Vantagens" heading="Benefícios do nosso serviço" goldWord={`${prep} ${city.name}`} light={true} />
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-px" style={{ backgroundColor: "#E8E4DE" }}>
-              {problem.benefits.map((benefit, idx) => (
+              {problemCityBenefits(problem, city.name).map((benefit, idx) => (
                 <div key={idx} className="relative overflow-hidden flex items-start gap-3 p-6 md:p-7 bg-white" style={{ borderTop: "2px solid #D4AF37" }}>
                   <span
                     className="absolute bottom-2 right-3 font-playfair font-bold leading-none select-none pointer-events-none"

@@ -4,7 +4,7 @@ import { getProblemHero } from './problemHero';
 import { PROBLEM_WA_REQUESTS } from '../lib/whatsappMessages';
 import { locationPrices } from '../constants/travel';
 import { CHAIR_PRICE_LABEL } from './enginePrices';
-import { getAllProblemCityRoutes } from './problemCitySeoData';
+import { getAllProblemCityRoutes, problemCityName } from './problemCitySeoData';
 import { cities } from './serviceCatalog';
 
 const problem = (slug: string) => getProblemBySlug(slug)!;
@@ -14,7 +14,8 @@ describe('problem hero content', () => {
     for (const item of getAllProblems()) {
       const hero = getProblemHero(item, 'Lisboa');
       // Numa pergunta (as páginas de preço), a cidade entra antes do "?".
-      expect(hero.heading).toBe(item.h1.endsWith('?') ? `${item.h1.slice(0, -1)} em Lisboa?` : `${item.h1} em Lisboa`);
+      const name = problemCityName(item);
+      expect(hero.heading).toBe(name.endsWith('?') ? `${name.slice(0, -1)} em Lisboa?` : `${name} em Lisboa`);
       const url = new URL(hero.waHref);
       expect(url.origin).toBe('https://wa.me');
       expect(url.searchParams.get('text')).toContain(PROBLEM_WA_REQUESTS[item.slug].request);
@@ -60,5 +61,14 @@ describe('problem hero content', () => {
   });
   it('makes urgent availability conditional', () => {
     expect(getProblemHero(problem('limpeza-sofa-urgente')).intro).toContain('sob confirmação');
+  });
+  it('keeps the Porto heading on the national page only', () => {
+    // A página nacional de limpeza-sofa-domicilio é sobre o Porto de propósito;
+    // as de cidade diziam "… no Porto e Arredores em Lisboa" (até 30/09/2026).
+    const domicilio = problem('limpeza-sofa-domicilio');
+    expect(getProblemHero(domicilio).heading).toBe('Limpeza de Sofá ao Domicílio no Porto e Arredores');
+    expect(getProblemHero(domicilio, 'Lisboa').heading).toBe('Limpeza de Sofá ao Domicílio em Lisboa');
+    expect(getProblemHero(domicilio, 'Porto').heading).toBe('Limpeza de Sofá ao Domicílio no Porto');
+    expect(getProblemHero(domicilio, 'Amadora').heading).toBe('Limpeza de Sofá ao Domicílio na Amadora');
   });
 });
