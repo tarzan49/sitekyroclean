@@ -509,6 +509,27 @@ describe('o que muda nos calendários das equipas', () => {
     expect(gs.mensagemParaDono([semMorada], [], [], primeira.novos).assunto).toBe('Serviços para confirmar');
   });
 
+  it('passa para o calendário do dono os serviços criados à mão no de uma equipa, sem duplicar', () => {
+    const copia = { ...evento('k1', 'Serviço 45€ (89€) sofá - Porto'), extendedProperties: { private: { kyroOrigem: 'e1' } } };
+    const aMao = evento('m1', 'Serviço 60€ (120€) tapetes - Rua Inventada 88 Póvoa de Varzim', '2026-09-30T11:00:00+01:00', '2026-09-30T12:00:00+01:00');
+    const nota = evento('m2', 'Ligar ao fornecedor');
+    const cancelado = { ...evento('m3', 'Serviço 30€ (60€) tapete'), status: 'cancelled' };
+    // Já recriado no calendário do dono (mesmo título e hora, noutro fuso): não se passa outra vez.
+    const repetido = evento('m4', 'Serviço 75€ (149€) sofá - Gaia', '2026-10-05T12:30:00+01:00', '2026-10-05T13:30:00+01:00');
+    const doDono = evento('d4', 'Serviço 75€ (149€)  sofá - Gaia', '2026-10-05T13:30:00+02:00', '2026-10-05T14:30:00+02:00');
+    const itens = [
+      { equipaId: 'porto', evento: copia },
+      { equipaId: 'porto2', evento: aMao },
+      { equipaId: 'porto', evento: nota },
+      { equipaId: 'lisboa', evento: cancelado },
+      { equipaId: 'porto', evento: repetido },
+    ];
+    expect(gs.paraMover(itens, [doDono]).map((i: { evento: Evento }) => i.evento.id)).toEqual(['m1']);
+    expect(gs.paraMover(itens, []).map((i: { evento: Evento }) => i.evento.id)).toEqual(['m1', 'm4']);
+    // Passa com a cor da equipa onde estava: no Porto é a escolha da equipa.
+    expect(gs.equipaPelaCor({ colorId: '7' }).id).toBe('porto2');
+  });
+
   it('avisa o dono uma vez de cada serviço sem equipa, e outra vez se ele o mudar', () => {
     const primeira = gs.pendentesNovos([semMorada], {}, AGORA);
     expect(primeira.novos.map((e: Evento) => e.id)).toEqual(['c3']);

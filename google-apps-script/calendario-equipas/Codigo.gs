@@ -141,6 +141,23 @@ function sincronizarAgora() {
   }
 
   const fonte = listarEventos('primary', inicio, fim, null);
+  // Serviços criados à mão no calendário de uma equipa passam para o do dono,
+  // que é o que o CRM lê (dono, 29/09/2026: "todos os serviços que eu coloco
+  // no calendário têm de aparecer no CRM, ponto"). Ver `paraMover`.
+  const movidos = new Set();
+  for (const item of paraMover(eventosDasEquipas, fonte.eventos)) {
+    try {
+      Calendar.Events.move(calendarios[item.equipaId], item.evento.id, 'primary', { sendUpdates: 'none' });
+      const equipa = EQUIPAS.find(function (e) { return e.id === item.equipaId; });
+      const movido = Calendar.Events.patch({ colorId: equipa.cor }, 'primary', item.evento.id, { sendUpdates: 'none' });
+      fonte.eventos.push(movido);
+      movidos.add(item.evento.id);
+    } catch (erro) {
+      // Fica onde está, e o dono recebe o aviso de serviço criado fora do calendário dele.
+      Logger.log('Não consegui mover "' + (item.evento.summary || '') + '": ' + (erro && erro.message));
+    }
+  }
+  const eventosAindaNasEquipas = eventosDasEquipas.filter(function (item) { return !movidos.has(item.evento.id); });
   // Uma cópia cujo serviço não veio na lista (mudado para fora da janela, ou
   // uma falha da Google) só se apaga se o próprio evento disser que já não
   // existe. Nunca por não ter aparecido.
@@ -179,7 +196,7 @@ function sincronizarAgora() {
   const pendentes = pendentesNovos(desejadas.pendentes, guardadas, agora);
   const incertos = incertosNovos(desejadas.incertos, guardadas, agora);
   const escolhas = escolhasNovas(desejadas.porEscolher, guardadas, agora);
-  const aMao = aMaoNovos(criadosAMao(eventosDasEquipas), guardadas, agora);
+  const aMao = aMaoNovos(criadosAMao(eventosAindaNasEquipas), guardadas, agora);
   for (const chave in guardadas) {
     if (!(chave in pendentes.atuais) && !(chave in incertos.atuais) && !(chave in escolhas.atuais) && !(chave in aMao.atuais)) propriedades.deleteProperty(chave);
   }
@@ -891,12 +908,33 @@ function escolhasNovas(porEscolher, guardadas, agora) {
 }
 
 /**
+ * Os serviços criados à mão no calendário de uma equipa que passam para o
+ * calendário do dono. No telemóvel, a app grava o evento novo no último
+ * calendário usado, e a 29/09/2026 quatro serviços ficaram nos calendários
+ * da Porto 1, Porto 2 e Lisboa 1: não entravam no CRM, que só lê o calendário
+ * do dono. Passam com a cor da equipa onde estavam, que no Porto é a escolha
+ * da equipa (`equipaPelaCor`); a partir daí seguem como os outros e a cópia
+ * volta a ser feita. Não passa o que não é serviço (título sem "Serviço") nem
+ * o que o dono já tem no calendário dele com o mesmo título e a mesma hora
+ * (recriado à mão sem apagar o da equipa): isso ficaria a dobrar no CRM, e
+ * esses continuam a dar o aviso de `criadosAMao`.
+ */
+function paraMover(eventosDasEquipas, eventosDoDono) {
+  const chave = function (evento) {
+    const inicio = evento.start && (evento.start.dateTime || evento.start.date);
+    return normalizar(evento.summary || '').replace(/\s+/g, ' ').trim() + '|' + Date.parse(inicio);
+  };
+  const doDono = new Set(eventosDoDono.filter(function (e) { return e.status !== 'cancelled'; }).map(chave));
+  return criadosAMao(eventosDasEquipas).filter(function (item) {
+    return ehServico(item.evento.summary || '') && !doDono.has(chave(item.evento));
+  });
+}
+
+/**
  * Os eventos que estão no calendário de uma equipa sem terem sido copiados
- * pelo script (sem `kyroOrigem`). Aconteceu a 29/09/2026: dois serviços
- * criados no telemóvel ficaram gravados no calendário da Porto 1 em vez do
- * do dono. Um evento assim passa ao lado de tudo: não entra no CRM, não é
- * pintado, e um de Lisboa pode ficar na agenda do Porto. O script não lhes
- * toca (não é ele que os gere); avisa o dono para os passar para o dele.
+ * pelo script (sem `kyroOrigem`). Os serviços passam para o calendário do
+ * dono (`paraMover`); os que ficarem (não são serviço, já existiam no dele,
+ * ou a mudança falhou) geram um aviso ao dono.
  */
 function criadosAMao(eventosDasEquipas) {
   return eventosDasEquipas.filter(function (item) {
