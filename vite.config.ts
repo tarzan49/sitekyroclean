@@ -2,10 +2,20 @@ import { defineConfig, type Plugin } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
 
+// Os quatro plugins de closeBundle escrevem no dist/, por isso levam
+// `apply: 'build'`. Sem isso corriam também no dev server, que chama o
+// closeBundle ao fechar e ao reiniciar, e reinicia sempre que muda um ficheiro
+// que este config alcança pelos import() (os scripts/*.ts e os módulos de
+// src/data e src/constants que eles leem; um `git rebase` basta). O prerender
+// pegava então num dist/index.html já prerenderizado, não encontrava a
+// `<div id="root"></div>` vazia e todas as páginas ficavam com o corpo da
+// homepage (visto a 2026-09-30).
+
 // Sitemap generation plugin — runs after every build
 function sitemapPlugin(): Plugin {
   return {
     name: 'generate-sitemap',
+    apply: 'build',
     closeBundle: {
       sequential: true,
       async handler() {
@@ -15,10 +25,17 @@ function sitemapPlugin(): Plugin {
         generateSitemaps(outDir);
       },
     },
-    // Em dev os sitemaps não existem (são artefactos de build), por isso os
-    // links "Abrir XML" do Sitemap Monitor davam 404 em localhost. Gera-os
-    // para uma pasta temporária à primeira visita e serve-os de lá, sem
-    // tocar em public/ nem mandar ninguém para produção.
+  };
+}
+
+// Em dev os sitemaps não existem (são artefactos de build), por isso os
+// links "Abrir XML" do Sitemap Monitor davam 404 em localhost. Gera-os
+// para uma pasta temporária à primeira visita e serve-os de lá, sem
+// tocar em public/ nem mandar ninguém para produção.
+function sitemapDevPlugin(): Plugin {
+  return {
+    name: 'serve-sitemap',
+    apply: 'serve',
     configureServer(server) {
       let dir: string | null = null;
       server.middlewares.use(async (req, res, next) => {
@@ -44,6 +61,7 @@ function sitemapPlugin(): Plugin {
 function llmsTxtPlugin(): Plugin {
   return {
     name: 'generate-llms-txt',
+    apply: 'build',
     closeBundle: {
       sequential: true,
       async handler() {
@@ -60,6 +78,7 @@ function llmsTxtPlugin(): Plugin {
 function prerenderPlugin(): Plugin {
   return {
     name: 'prerender-routes',
+    apply: 'build',
     closeBundle: {
       sequential: true,
       async handler() {
@@ -78,6 +97,7 @@ function prerenderPlugin(): Plugin {
 function cspHashPlugin(): Plugin {
   return {
     name: 'inject-csp-script-hash',
+    apply: 'build',
     closeBundle: {
       sequential: true,
       async handler() {
@@ -99,6 +119,7 @@ export default defineConfig(({ mode }) => ({
   plugins: [
     react(),
     sitemapPlugin(),
+    sitemapDevPlugin(),
     llmsTxtPlugin(),
     prerenderPlugin(),
     cspHashPlugin(),
