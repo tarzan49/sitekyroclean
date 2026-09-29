@@ -485,6 +485,30 @@ describe('o que muda nos calendários das equipas', () => {
     });
   });
 
+  it('avisa o dono dos serviços criados à mão no calendário de uma equipa, e deixa as cópias em paz', () => {
+    const copia = { ...evento('k1', 'Serviço 45€ (89€) sofá - Porto'), extendedProperties: { private: { kyroOrigem: 'e1' } } };
+    const aMao = evento('m1', 'Serviço 115€ (230€) colchão - +351 910 000 009 - Rua Inventada 21, 2685-400');
+    const cancelado = { ...evento('m2', 'Serviço 30€ (60€) tapete'), status: 'cancelled' };
+    const itens = gs.criadosAMao([
+      { equipaId: 'porto', evento: copia },
+      { equipaId: 'porto', evento: aMao },
+      { equipaId: 'lisboa', evento: cancelado },
+    ]);
+    expect(itens.map((i: { evento: Evento }) => i.evento.id)).toEqual(['m1']);
+
+    const primeira = gs.aMaoNovos(itens, {}, AGORA);
+    expect(primeira.novos).toHaveLength(1);
+    expect(gs.aMaoNovos(itens, primeira.atuais, AGORA).novos).toEqual([]);
+    // Mudado para outra equipa à mão: avisa outra vez.
+    expect(gs.aMaoNovos([{ equipaId: 'lisboa', evento: aMao }], primeira.atuais, AGORA).novos).toHaveLength(1);
+
+    const mensagem = gs.mensagemParaDono([], [], [], primeira.novos);
+    expect(mensagem.assunto).toBe('Serviço criado fora do teu calendário');
+    expect(mensagem.texto).toContain('está no calendário da Equipa Porto 1');
+    expect(mensagem.texto).toContain('não entra no CRM');
+    expect(gs.mensagemParaDono([semMorada], [], [], primeira.novos).assunto).toBe('Serviços para confirmar');
+  });
+
   it('avisa o dono uma vez de cada serviço sem equipa, e outra vez se ele o mudar', () => {
     const primeira = gs.pendentesNovos([semMorada], {}, AGORA);
     expect(primeira.novos.map((e: Evento) => e.id)).toEqual(['c3']);

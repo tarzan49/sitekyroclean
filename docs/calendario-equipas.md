@@ -178,6 +178,13 @@ Para desligar: função `desligar`. Os calendários ficam como estão.
   a frente.
 - O CRM continua a ler só o calendário do dono (`calendar-events`). Os
   calendários das equipas não entram nas contas.
+- **Um serviço criado à mão no calendário de uma equipa gera um email ao
+  dono** ("Serviço criado fora do teu calendário"), uma vez por evento e outra
+  se mudar de equipa. Aconteceu a 29/09/2026: no telemóvel, a app gravou dois
+  serviços no calendário da Porto 1 em vez do do dono, e um deles era de
+  Lisboa. Um evento assim não entra no CRM nem é pintado, e o script não lhe
+  toca (não sabe de que evento do dono viria): o remédio é criá-lo no
+  calendário do dono e apagar o da equipa.
 
 ## Manutenção
 

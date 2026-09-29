@@ -128,6 +128,7 @@ function sincronizarAgora() {
 
   const calendarios = {};
   const existentes = [];
+  const eventosDasEquipas = [];
   for (const equipa of EQUIPAS) {
     const id = propriedades.getProperty('calendario:' + equipa.id);
     if (!id) throw new Error('Falta o calendário "' + equipa.nome + '": corre configurar() no editor.');
@@ -135,6 +136,7 @@ function sincronizarAgora() {
     for (const copia of listarEventos(id, inicio, fim, FUSO_PORTUGAL).eventos) {
       const origemId = propriedadePrivada(copia, 'kyroOrigem');
       if (origemId) existentes.push({ equipaId: equipa.id, evento: copia, origemId: origemId });
+      eventosDasEquipas.push({ equipaId: equipa.id, evento: copia });
     }
   }
 
@@ -172,19 +174,21 @@ function sincronizarAgora() {
 
   const guardadas = {};
   for (const chave of propriedades.getKeys()) {
-    if (/^(pendente|incerto|escolher):/.test(chave)) guardadas[chave] = propriedades.getProperty(chave);
+    if (/^(pendente|incerto|escolher|mao):/.test(chave)) guardadas[chave] = propriedades.getProperty(chave);
   }
   const pendentes = pendentesNovos(desejadas.pendentes, guardadas, agora);
   const incertos = incertosNovos(desejadas.incertos, guardadas, agora);
   const escolhas = escolhasNovas(desejadas.porEscolher, guardadas, agora);
+  const aMao = aMaoNovos(criadosAMao(eventosDasEquipas), guardadas, agora);
   for (const chave in guardadas) {
-    if (!(chave in pendentes.atuais) && !(chave in incertos.atuais) && !(chave in escolhas.atuais)) propriedades.deleteProperty(chave);
+    if (!(chave in pendentes.atuais) && !(chave in incertos.atuais) && !(chave in escolhas.atuais) && !(chave in aMao.atuais)) propriedades.deleteProperty(chave);
   }
   propriedades.setProperties(pendentes.atuais);
   propriedades.setProperties(incertos.atuais);
   propriedades.setProperties(escolhas.atuais);
-  if (pendentes.novos.length || incertos.novos.length || escolhas.novos.length) {
-    const mensagem = mensagemParaDono(pendentes.novos, incertos.novos, escolhas.novos);
+  propriedades.setProperties(aMao.atuais);
+  if (pendentes.novos.length || incertos.novos.length || escolhas.novos.length || aMao.novos.length) {
+    const mensagem = mensagemParaDono(pendentes.novos, incertos.novos, escolhas.novos, aMao.novos);
     MailApp.sendEmail({ to: Session.getEffectiveUser().getEmail(), subject: mensagem.assunto, body: mensagem.texto, name: 'Calendários das equipas' });
   }
 
@@ -886,6 +890,25 @@ function escolhasNovas(porEscolher, guardadas, agora) {
   return avisosNovos(porEscolher, 'escolher:', guardadas, agora);
 }
 
+/**
+ * Os eventos que estão no calendário de uma equipa sem terem sido copiados
+ * pelo script (sem `kyroOrigem`). Aconteceu a 29/09/2026: dois serviços
+ * criados no telemóvel ficaram gravados no calendário da Porto 1 em vez do
+ * do dono. Um evento assim passa ao lado de tudo: não entra no CRM, não é
+ * pintado, e um de Lisboa pode ficar na agenda do Porto. O script não lhes
+ * toca (não é ele que os gere); avisa o dono para os passar para o dele.
+ */
+function criadosAMao(eventosDasEquipas) {
+  return eventosDasEquipas.filter(function (item) {
+    return item.evento.status !== 'cancelled' && !propriedadePrivada(item.evento, 'kyroOrigem');
+  });
+}
+
+/** O mesmo aviso dos outros: uma vez por evento, e outra se ele ou a equipa mudarem. */
+function aMaoNovos(itens, guardadas, agora) {
+  return avisosNovos(itens, 'mao:', guardadas, agora);
+}
+
 function avisosNovos(itens, prefixo, guardadas, agora) {
   const novos = [];
   const atuais = {};
@@ -903,12 +926,22 @@ function avisosNovos(itens, prefixo, guardadas, agora) {
  * Um só email por volta: os serviços do Porto por escolher, os enviados sem
  * certeza e os sem equipa. As horas são as de Portugal.
  */
-function mensagemParaDono(semEquipa, incertos, porEscolher) {
+function mensagemParaDono(semEquipa, incertos, porEscolher, aMao) {
   incertos = incertos || [];
   porEscolher = porEscolher || [];
+  aMao = aMao || [];
   const linha = function (evento) { return '• ' + quando(horaEmPortugal(evento.start), horaEmPortugal(evento.end)) + ' (hora de Portugal)'; };
   const linhas = [];
   const separar = function () { if (linhas.length) linhas.push('', ''); };
+  if (aMao.length) {
+    linhas.push((aMao.length === 1 ? 'Este serviço foi criado' : 'Estes serviços foram criados') + ' diretamente no calendário de uma equipa, e não no teu:', '');
+    for (const item of aMao) linhas.push(linha(item.evento), '  ' + (item.evento.summary || '(sem título)'), '  → está no calendário da ' + nomeDaEquipa(item.equipaId), '');
+    linhas.push(
+      'Assim não entra no CRM, não fica com a cor da equipa no teu calendário e não muda de equipa sozinho.',
+      'Cria-o no teu calendário (a equipa é escolhida como nos outros) e apaga este do calendário da equipa.',
+      'No telemóvel, ao criar um evento, confirma que o calendário escolhido é o teu.'
+    );
+  }
   if (porEscolher.length) {
     linhas.push((porEscolher.length === 1 ? 'Este serviço do Porto está' : 'Estes serviços do Porto estão') + ' à espera que escolhas a equipa:', '');
     for (const item of porEscolher) {
@@ -939,9 +972,10 @@ function mensagemParaDono(semEquipa, incertos, porEscolher) {
       'Assim que guardares, o serviço segue para a equipa certa.'
     );
   }
-  const tipos = [semEquipa, incertos, porEscolher].filter(function (lista) { return lista.length; }).length;
+  const tipos = [semEquipa, incertos, porEscolher, aMao].filter(function (lista) { return lista.length; }).length;
   let assunto;
   if (tipos > 1) assunto = 'Serviços para confirmar';
+  else if (aMao.length) assunto = aMao.length === 1 ? 'Serviço criado fora do teu calendário' : aMao.length + ' serviços criados fora do teu calendário';
   else if (porEscolher.length) assunto = porEscolher.length === 1 ? 'Serviço do Porto por escolher' : porEscolher.length + ' serviços do Porto por escolher';
   else if (semEquipa.length) assunto = semEquipa.length === 1 ? 'Serviço sem equipa' : semEquipa.length + ' serviços sem equipa';
   else assunto = incertos.length === 1 ? 'Serviço enviado sem certeza' : incertos.length + ' serviços enviados sem certeza';
