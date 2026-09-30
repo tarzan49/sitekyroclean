@@ -7,6 +7,8 @@ import { getProblemBySlug } from './problemSeoData';
 import { getProblemHero, problemBreadcrumb } from './problemHero';
 import { cities, headingWithCity } from './serviceCatalog';
 import { REVIEW_RATING } from '../constants/business';
+import { EXTENDED_TRIP_CITIES } from '../constants/travel';
+import { getProblemLayout } from './problemLayout';
 
 // O bloco "Este problema noutras cidades" das páginas problema × cidade, tal
 // como o `scripts/prerender.ts` e o `ProblemCityPage.tsx` o emitem (os dois
@@ -226,5 +228,30 @@ describe('páginas problema × cidade: cada uma só fala da sua cidade', () => {
     expect(problemCityName(vinho)).toBe(vinho.h1);
     expect(problemCityBenefits(vinho, 'Lisboa')).toBe(vinho.benefits);
     expect(problemCityMeta(vinho, 'Lisboa').description).toContain(`${vinho.metaDescription.split('.')[0]}.`);
+  });
+});
+
+describe('limpeza-sofa-perto-de-mim: a página nacional nomeia todas as zonas', () => {
+  // Até 30/09/2026 a FAQ dizia "Servimos Porto e toda a área metropolitana,
+  // Braga, Guimarães, e região de Lisboa (…)" e a descrição "no Porto, Lisboa
+  // e Norte de Portugal": sem Coimbra, sem Aveiro, sem o Algarve.
+  const perto = getProblemBySlug('limpeza-sofa-perto-de-mim')!;
+  const question = 'Em que cidades fazem limpeza de sofá?';
+
+  it('a resposta "Em que cidades" sai do catálogo e aparece na página', () => {
+    const answer = perto.faqs.find(faq => faq.question === question)!.answer;
+    // Texto escolhido pelo dono; o número de concelhos acompanha o catálogo.
+    expect(answer.startsWith(`Servimos ${cities.length} concelhos em cinco zonas: Porto e arredores, Braga e Minho, Coimbra e Figueira da Foz, Lisboa e Setúbal até ao Alentejo Litoral, e Algarve. `)).toBe(true);
+    expect(answer.endsWith(' Contacte-nos para confirmar a sua localidade.')).toBe(true);
+    const onRequest = answer.match(/ Em (.+), a disponibilidade é sob consulta\. /)![1];
+    expect(onRequest.split(/, | e /)).toEqual(cities.map(c => c.name).filter(name => EXTENDED_TRIP_CITIES.has(name)));
+    expect(onRequest).toBe('Aveiro, Alcácer do Sal, Grândola, Santiago do Cacém e Sines');
+    expect(answer).not.toMatch(/undefined|—/);
+    // A página nacional (React e HTML estático) mostra as quatro primeiras FAQs do layout.
+    expect(getProblemLayout(perto).faqs.map(faq => faq.question)).toContain(question);
+  });
+
+  it('a descrição nomeia as quatro zonas', () => {
+    expect(perto.metaDescription).toMatch(/^Limpeza profissional de sofá perto de si\. Serviço ao domicílio no Norte, no Centro, em Lisboa e no Algarve\. Desde \d+€\. Orçamento grátis\.$/);
   });
 });

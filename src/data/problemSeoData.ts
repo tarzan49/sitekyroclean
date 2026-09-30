@@ -6,7 +6,8 @@ import {
   CHAIR_PRICE_LABEL, SOFA_CLEANING_FROM, MATTRESS_CLEANING_FROM, SOFA_CLEAN_AND_PROTECT_FROM, SOFA_PROTECT_WITH_CLEANING_FROM,
   MATTRESS_CLEAN_AND_ANTI_MITE_FROM, MATTRESS_ANTI_MITE_WITH_CLEANING_FROM,
 } from './enginePrices';
-import { cityPrep } from './serviceCatalog';
+import { cities, cityPrep, cityPrepCap } from './serviceCatalog';
+import { EXTENDED_TRIP_CITIES } from '../constants/travel';
 // Programmatic SEO: Problem pages data engine
 // Each problem page targets a specific long-tail search query cluster
 
@@ -82,6 +83,37 @@ const sofaUrgenteBenefits = (area: string) => [
   "Equipamento profissional completo",
   "Orientação imediata por telefone",
 ];
+
+// As zonas do catálogo, pela ordem do site. Uma zona nova em
+// serviceCatalog.ts não compila sem o seu rótulo aqui.
+const COVERAGE_ZONE_LABELS: Record<(typeof cities)[number]['area'], string> = {
+  porto: "Porto e arredores",
+  braga: "Braga e Minho",
+  coimbra: "Coimbra e Figueira da Foz",
+  lisboa: "Lisboa e Setúbal até ao Alentejo Litoral",
+  algarve: "Algarve",
+};
+
+/** "A, B e C". */
+const joinWithE = (items: readonly string[]) =>
+  items.length < 2 ? items.join("") : `${items.slice(0, -1).join(", ")} e ${items[items.length - 1]}`;
+
+// "Em que cidades fazem limpeza de sofá?" na página nacional de
+// limpeza-sofa-perto-de-mim (dono, 30/09/2026). A resposta escrita à mão
+// deixava de fora Coimbra, Aveiro e o Algarve; esta sai do catálogo: o
+// número de concelhos de `cities` e as cidades "sob consulta" de
+// `EXTENDED_TRIP_CITIES`. Os rótulos levam "e" por dentro, por isso a última
+// zona entra com vírgula antes do "e".
+const coverageAnswer = () => {
+  const zones = Object.values(COVERAGE_ZONE_LABELS);
+  const zoneCount = ["uma", "duas", "três", "quatro", "cinco", "seis", "sete"][zones.length - 1];
+  const onRequest = cities.filter(city => EXTENDED_TRIP_CITIES.has(city.name)).map(city => city.name);
+  return [
+    `Servimos ${cities.length} concelhos em ${zoneCount} zonas: ${zones.slice(0, -1).join(", ")}, e ${zones[zones.length - 1]}.`,
+    ...(onRequest.length ? [`${cityPrepCap(onRequest[0])} ${joinWithE(onRequest)}, a disponibilidade é sob consulta.`] : []),
+    "Contacte-nos para confirmar a sua localidade.",
+  ].join(" ");
+};
 
 const sofaPertoDeMimBenefits = (area: string) => [
   area,
@@ -1252,14 +1284,14 @@ const problemDefinitions: ProblemPage[] = [
     category: "metodo",
     keyword: "limpeza de sofá perto de mim",
     title: "Limpeza de Sofá Perto de Mim | Kyro Clean Solutions",
-    metaDescription: `Limpeza profissional de sofá perto de si. Serviço ao domicílio no Porto, Lisboa e Norte de Portugal. Desde ${formatEuro(SOFA_CLEANING_FROM)}. Orçamento grátis.`,
+    metaDescription: `Limpeza profissional de sofá perto de si. Serviço ao domicílio no Norte, no Centro, em Lisboa e no Algarve. Desde ${formatEuro(SOFA_CLEANING_FROM)}. Orçamento grátis.`,
     h1: "Limpeza de Sofá Perto de Si: Serviço ao Domicílio",
     intro: "Procura limpeza de sofá perto de si? A Kyro Clean Solutions cobre Porto, Lisboa e todo o Norte de Portugal com serviço ao domicílio. A nossa equipa desloca-se até à sua casa com todo o equipamento.",
     problemDetail: `Quando pesquisa 'limpeza de sofá perto de mim', quer um serviço local, fiável e com boas avaliações. A Kyro Clean Solutions tem ${REVIEW_RATING} no Google, ${CLIENTS_SERVED_LABEL} clientes satisfeitos e cobertura em todo o Norte de Portugal e região de Lisboa.`,
     solutionDetail: `Atuamos no Porto e em Matosinhos, Maia, Gaia, Gondomar, Valongo, Braga, Guimarães, Póvoa de Varzim, Vila do Conde, Lisboa, Cascais, Oeiras, Sintra, Almada e Setúbal. Deslocação a partir de ${formatEuro(TRAVEL_FEE_MIN)}, consoante a distância.`,
     benefits: sofaPertoDeMimBenefits("Cobertura Norte de Portugal + Lisboa"),
     faqs: [
-      { question: "Em que cidades fazem limpeza de sofá?", answer: "Servimos Porto e toda a área metropolitana, Braga, Guimarães, e região de Lisboa (Cascais, Oeiras, Sintra, Almada, Setúbal). Contacte-nos para confirmar disponibilidade na sua zona." },
+      { question: "Em que cidades fazem limpeza de sofá?", answer: coverageAnswer() },
     ],
     relatedProblems: ["limpeza-sofa-domicilio", "empresa-limpeza-estofos", "preco-limpeza-sofa"],
     relatedServices: ["limpeza-sofas", "limpeza-colchoes", "limpeza-tapetes"],
