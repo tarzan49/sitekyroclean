@@ -125,7 +125,13 @@ Para desligar: função `desligar`. Os calendários ficam como estão.
   dono e a Google recusa: "The data owner of a calendar cannot remove such a
   calendar from their calendar list". Por isso um serviço que caia num
   calendário de equipa passa para o do dono com a cor dessa equipa, que é a
-  escolha dele. **Não tirar os
+  escolha dele. **Escolher um calendário de equipa na app volta a pô-lo à
+  vista**, e o dono passa a ver cada serviço a dobrar no telemóvel (30/09/2026,
+  Lisboa 2 e Algarve): o script confirma a cada volta que estão escondidos, em
+  vez de uma vez só. **Uma cópia mudada no telemóvel chega ao evento do dono
+  em segundos**: desde 30/09 há um gatilho de alteração em cada calendário de
+  equipa, além do dele (antes só a volta de 15 minutos o apanhava, e o PC
+  ficava até lá com a hora antiga). **Não tirar os
   serviços do calendário do dono** (ele chegou a pedir): o CRM lê-os de lá e
   a cópia parte deles; sem o original, o CRM marcava-os como apagados e as
   equipas recebiam "cancelado".

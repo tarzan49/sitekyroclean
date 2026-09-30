@@ -479,4 +479,18 @@ describe('o que muda nos calendários das equipas', () => {
     expect(gs.paraMover(itens, [doDono]).map((i: { evento: Evento }) => i.evento.id)).toEqual(['m1']);
     expect(gs.paraMover(itens, []).map((i: { evento: Evento }) => i.evento.id)).toEqual(['m1', 'm4']);
   });
+
+  it('volta a esconder um calendário de equipa que a app do telemóvel pôs à vista, e não mexe no que está certo', () => {
+    const lisboa2 = { id: 'lisboa2', corDoCalendario: '#8e24aa' };
+    const certo = { hidden: true, selected: false, backgroundColor: lisboa2.corDoCalendario };
+    expect(gs.calendarioPorArrumar(certo, lisboa2, true)).toBe(false);
+    expect(gs.calendarioPorArrumar({ ...certo, backgroundColor: lisboa2.corDoCalendario.toUpperCase() }, lisboa2, true)).toBe(false);
+    // Escolhida na app ao criar um serviço: fica à vista e o dono vê o serviço a dobrar.
+    expect(gs.calendarioPorArrumar({ ...certo, hidden: false }, lisboa2, true)).toBe(true);
+    expect(gs.calendarioPorArrumar({ ...certo, selected: true }, lisboa2, true)).toBe(true);
+    expect(gs.calendarioPorArrumar({ ...certo, backgroundColor: '#000000' }, lisboa2, true)).toBe(true);
+    // O do dono fica à vista.
+    expect(gs.calendarioPorArrumar({ hidden: false, selected: true }, null, false)).toBe(false);
+    expect(gs.calendarioPorArrumar({ selected: false }, null, false)).toBe(true);
+  });
 });

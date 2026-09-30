@@ -40,10 +40,6 @@ const EQUIPAS = [
   { id: 'algarve', nome: 'Kyro · Equipa Algarve', escrito: ['algarve'], regioes: ['Algarve'], base: [37.0194, -7.9304], cor: '5', nomeDaCor: 'Banana', corDoCalendario: '#f6bf26' },
 ];
 
-// Muda quando as cores das equipas (ou o que se faz na lista do dono) mudarem,
-// para os calendários voltarem a ser arrumados.
-const VERSAO_DAS_CORES = '7';
-
 const FUSO_PORTUGAL = 'Europe/Lisbon';
 const DIAS_ANTES = 2;
 const DIAS_DEPOIS = 365;
@@ -78,6 +74,12 @@ function configurar() {
   }
   desligar();
   ScriptApp.newTrigger('sincronizar').forUserCalendar(Session.getEffectiveUser().getEmail()).onEventUpdated().create();
+  // Também os calendários das equipas: o dono muda no telemóvel a hora de uma
+  // cópia e, só com o gatilho de 15 minutos, o evento dele (o que o PC e o CRM
+  // mostram) ficava até lá com a hora antiga (30/09/2026: "muda só no telemóvel").
+  for (const equipa of EQUIPAS) {
+    ScriptApp.newTrigger('sincronizar').forUserCalendar(propriedades.getProperty('calendario:' + equipa.id)).onEventUpdated().create();
+  }
   ScriptApp.newTrigger('sincronizar').timeBased().everyMinutes(MINUTOS_ENTRE_VERIFICACOES).create();
   sincronizar();
   Logger.log('Pronto. Falta partilhar cada calendário com a equipa (Google Calendar, definições do calendário, "Partilhar com pessoas específicas", permissão "Ver todos os detalhes do evento").');
@@ -215,7 +217,7 @@ function sincronizarAgora() {
   }
 
   pintarServicos(desejadas.copias, agora);
-  pintarCalendarios(calendarios, propriedades);
+  pintarCalendarios(calendarios);
 
   if (silencioso) propriedades.setProperty('primeiraVoltaFeita', new Date(agora).toISOString());
 }
@@ -247,19 +249,34 @@ function pintarServicos(copias, agora) {
  * a Google recusa que o dono de um calendário o tire da sua própria lista
  * ("The data owner of a calendar cannot remove such a calendar"). Um serviço
  * que o dono grave num calendário de equipa passa para o dele com a cor dessa
- * equipa (`paraMover`). Uma vez por versão.
+ * equipa (`paraMover`).
+ *
+ * Confirma-se em todas as voltas, não uma vez: escolher um calendário de
+ * equipa na app do telemóvel volta a pô-lo à vista, e a 30/09/2026 a Lisboa 2
+ * e o Algarve estavam visíveis e o dono via cada serviço a dobrar ("pedi para
+ * só ser um"). Só escreve quando alguma coisa está errada.
  */
-function pintarCalendarios(calendarios, propriedades) {
-  if (propriedades.getProperty('coresDosCalendarios') === VERSAO_DAS_CORES) return;
+function pintarCalendarios(calendarios) {
   for (const equipa of EQUIPAS) {
+    const entrada = Calendar.CalendarList.get(calendarios[equipa.id]);
+    if (!calendarioPorArrumar(entrada, equipa, true)) continue;
     Calendar.CalendarList.patch(
       { backgroundColor: equipa.corDoCalendario, foregroundColor: '#ffffff', hidden: true, selected: false },
       calendarios[equipa.id],
       { colorRgbFormat: true }
     );
   }
-  Calendar.CalendarList.patch({ hidden: false, selected: true }, Session.getEffectiveUser().getEmail());
-  propriedades.setProperty('coresDosCalendarios', VERSAO_DAS_CORES);
+  const dono = Session.getEffectiveUser().getEmail();
+  if (calendarioPorArrumar(Calendar.CalendarList.get(dono), null, false)) {
+    Calendar.CalendarList.patch({ hidden: false, selected: true }, dono);
+  }
+}
+
+/** Se a entrada da lista do dono não está como deve: escondida (equipas) ou à vista (o dele), e com a cor da equipa. */
+function calendarioPorArrumar(entrada, equipa, escondido) {
+  if (!entrada) return false;
+  if (Boolean(entrada.hidden) !== escondido || Boolean(entrada.selected) === escondido) return true;
+  return Boolean(equipa) && String(entrada.backgroundColor || '').toLowerCase() !== equipa.corDoCalendario;
 }
 
 // ── Leitura e escrita na Google ───────────────────────────────────────────
