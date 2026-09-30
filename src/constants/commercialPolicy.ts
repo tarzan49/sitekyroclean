@@ -14,6 +14,12 @@ export const EN_COVERAGE_PROMISE = 'Teams in Braga, Porto, Coimbra, Lisbon and t
 export const EN_DRYING_PROMISE = 'Average drying time is 3 to 6 hours, depending on ventilation, fabric and room conditions.';
 export const TREATMENT_EXTRAS = 'A limpeza remove sujidade e resíduos das fibras. O tratamento anti-ácaros e a desbacterização são extras opcionais, escolhidos e orçamentados separadamente.';
 
+// Tapetes: abaixo de 3 m² não há recolha, só lavagem em casa (dono,
+// 2026-09-30). Conta a soma dos tapetes do pedido, não cada um: dois tapetes
+// de 2 m² (4 m² no total) já podem ser recolhidos.
+export const RUG_PICKUP_MIN_AREA_M2 = 3;
+export const RUG_PICKUP_RULE = `Só fazemos recolha quando os tapetes do pedido somam ${RUG_PICKUP_MIN_AREA_M2} m² ou mais; abaixo disso, a lavagem é sempre feita em sua casa.`;
+
 // Os limites da deslocação saem da tabela de cada cidade, nunca de um número
 // escrito à mão: o rodapé chegou a ter um parágrafo só sobre Braga
 // ("10€... 15€... 20€... Barcelos: 20€") que não passava por aqui.

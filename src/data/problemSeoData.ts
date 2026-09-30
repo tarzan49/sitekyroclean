@@ -1,5 +1,5 @@
 import { REVIEW_COUNT, REVIEW_RATING, CLIENTS_SERVED_LABEL } from '../constants/business';
-import { TRAVEL_FEE_MIN } from '../constants/commercialPolicy';
+import { RUG_PICKUP_RULE, TRAVEL_FEE_MIN } from '../constants/commercialPolicy';
 import { PACK_PERK_SUMMARY } from '../constants/packPerks';
 import {
   formatEuro, sofaSizeList, mattressSizeList, chairTierSentence, sofaCleaningPrice, mattressCleaningPrice, mattressCleanAndAntiMitePrice,
@@ -709,7 +709,7 @@ const problemDefinitions: ProblemPage[] = [
       "Sem custos ocultos",
     ],
     faqs: [
-      { question: "A recolha e entrega do tapete têm custo?", answer: "Na maioria dos casos lavamos o tapete em sua casa, sem recolha. Quando o material ou o estado do tapete o exigem, recolhemos e entregamos no prazo máximo de 3 dias; a recolha tem um custo, indicado no orçamento antes da marcação." },
+      { question: "A recolha e entrega do tapete têm custo?", answer: `Na maioria dos casos lavamos o tapete em sua casa, sem recolha. Quando o material ou o estado do tapete o exigem, recolhemos e entregamos no prazo máximo de 3 dias; a recolha tem um custo, indicado no orçamento antes da marcação. ${RUG_PICKUP_RULE}` },
       { question: "Tapetes persas são mais caros de lavar?", answer: "Tapetes persas e orientais requerem técnicas mais delicadas e são cotados individualmente, mas os preços continuam acessíveis." },
     ],
     relatedProblems: ["preco-limpeza-sofa", "manchas-tapete", "tapete-persa"],
