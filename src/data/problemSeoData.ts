@@ -6,6 +6,7 @@ import {
   CHAIR_PRICE_LABEL, SOFA_CLEANING_FROM, MATTRESS_CLEANING_FROM, SOFA_CLEAN_AND_PROTECT_FROM, SOFA_PROTECT_WITH_CLEANING_FROM,
   MATTRESS_CLEAN_AND_ANTI_MITE_FROM, MATTRESS_ANTI_MITE_WITH_CLEANING_FROM,
 } from './enginePrices';
+import { cityPrep } from './serviceCatalog';
 // Programmatic SEO: Problem pages data engine
 // Each problem page targets a specific long-tail search query cluster
 
@@ -54,6 +55,43 @@ const domicilioBenefits = (area: string) => [
   "Resultado imediato",
 ];
 
+// A zona nas páginas problema × cidade: "em Lisboa e arredores", "no Porto
+// e arredores", "na Amadora e arredores".
+const cityAndSurroundings = (city: string) => `${cityPrep(city)} ${city} e arredores`;
+
+// Três problemas cujos benefícios nomeiam a zona, com o texto da página
+// nacional como está e o de cada cidade escolhido pelo dono (30/09/2026).
+// Até essa data, as 31 páginas de cidade de cada um diziam "Porto" ou
+// "Norte de Portugal + Lisboa" em Faro, Coimbra ou Lisboa. A página nacional
+// não desenha os benefícios (nem no React nem no HTML estático): só as de
+// cidade os mostram, por `problemCityBenefits`.
+const manchasSofaBenefits = (area: string) => [
+  "Remoção de manchas antigas e recentes",
+  "Tratamento específico para cada tipo de mancha",
+  "Produtos seguros para todos os tecidos",
+  "Resultado visível no momento",
+  area,
+  "Orçamento gratuito sem compromisso",
+];
+
+const sofaUrgenteBenefits = (area: string) => [
+  "Agendamento prioritário",
+  "Resposta rápida por WhatsApp",
+  "Melhores resultados com tratamento rápido",
+  area,
+  "Equipamento profissional completo",
+  "Orientação imediata por telefone",
+];
+
+const sofaPertoDeMimBenefits = (area: string) => [
+  area,
+  `${REVIEW_RATING} Google`,
+  `${CLIENTS_SERVED_LABEL} clientes satisfeitos`,
+  `Deslocação a partir de ${formatEuro(TRAVEL_FEE_MIN)}`,
+  `Desde ${formatEuro(SOFA_CLEANING_FROM)}`,
+  "Resposta em menos de 10 minutos",
+];
+
 // ─── Problem definitions ───────────────────────────────────────────
 const problemDefinitions: ProblemPage[] = [
 
@@ -70,14 +108,7 @@ const problemDefinitions: ProblemPage[] = [
     intro: "Tem manchas no sofá que não saem com limpeza caseira? A Kyro Clean Solutions remove manchas difíceis com equipamento de extração profissional. Independentemente do tipo de mancha: café, vinho, gordura, tinta ou líquidos: o nosso processo devolve o aspeto original ao seu sofá.",
     problemDetail: "Manchas no sofá são um dos problemas mais comuns em lares portugueses. Derrames acidentais de café, vinho, sumos, gordura de comida ou marcas de uso diário penetram nas fibras do tecido e tornam-se cada vez mais difíceis de remover com o tempo. Produtos de supermercado muitas vezes espalham a mancha ou danificam o tecido, piorando a situação. Sem tratamento profissional adequado, estas manchas tornam-se permanentes e comprometem a aparência e higiene do seu sofá.",
     solutionDetail: "O nosso processo de remoção de manchas utiliza equipamento de extração profunda com água quente e produtos certificados específicos para cada tipo de mancha e tecido. Primeiro identificamos o tipo de mancha e tecido, depois aplicamos o pré-tratamento adequado, e finalmente fazemos a extração profunda que remove a sujidade de dentro das fibras. O resultado é visível no momento: o seu sofá fica como novo.",
-    benefits: [
-      "Remoção de manchas antigas e recentes",
-      "Tratamento específico para cada tipo de mancha",
-      "Produtos seguros para todos os tecidos",
-      "Resultado visível no momento",
-      "Serviço ao domicílio em todo o Porto e arredores",
-      "Orçamento gratuito sem compromisso",
-    ],
+    benefits: manchasSofaBenefits("Serviço ao domicílio em todo o Porto e arredores"),
     faqs: [
       { question: "A limpeza profissional remove manchas antigas do sofá?", answer: "Sim, na grande maioria dos casos. O nosso processo de extração profunda remove manchas de café, vinho, gordura e outros líquidos, mesmo que sejam antigas. Manchas muito antigas ou de tinta permanente podem necessitar de tratamento adicional." },
       { question: "Quanto custa remover manchas do sofá?", answer: `A remoção de manchas está incluída no serviço de limpeza profissional de sofás, que começa a partir de ${formatEuro(sofaCleaningPrice('1-lugar'))} para sofás de 1 lugar (${formatEuro(sofaCleaningPrice('2-lugares'))} para 2 lugares), sem suplemento por manchas.` },
@@ -88,6 +119,9 @@ const problemDefinitions: ProblemPage[] = [
     relatedServices: ["limpeza-sofas", "impermeabilizacao"],
     relatedCities: ["porto", "matosinhos", "maia", "vila-nova-de-gaia"],
     visible: true,
+    cityPages: {
+      benefits: city => manchasSofaBenefits(`Serviço ao domicílio ${cityAndSurroundings(city)}`),
+    },
   },
   {
     slug: "manchas-vinho-sofa",
@@ -820,14 +854,7 @@ const problemDefinitions: ProblemPage[] = [
     intro: "Precisa de limpeza urgente do sofá? Derrames de vinho, café ou outros líquidos devem ser tratados rapidamente para melhores resultados. A Kyro Clean Solutions oferece agendamento prioritário para situações urgentes.",
     problemDetail: "Derrames acidentais requerem ação rápida. Quanto mais tempo uma mancha fica no tecido, mais difícil é removê-la. Manchas de vinho tinto, café e líquidos coloridos em particular beneficiam enormemente de tratamento rápido.",
     solutionDetail: "Para situações urgentes, oferecemos agendamento prioritário com resposta rápida. Contacte-nos imediatamente por WhatsApp ou telefone para o melhor resultado possível. Entretanto, absorva o excesso do derrame com papel absorvente sem esfregar.",
-    benefits: [
-      "Agendamento prioritário",
-      "Resposta rápida por WhatsApp",
-      "Melhores resultados com tratamento rápido",
-      "Disponível Porto e arredores",
-      "Equipamento profissional completo",
-      "Orientação imediata por telefone",
-    ],
+    benefits: sofaUrgenteBenefits("Disponível Porto e arredores"),
     faqs: [
       { question: "Quanto tempo demora a resposta para limpeza urgente?", answer: "Respondemos ao primeiro contacto em menos de 10 minutos durante horário de funcionamento. O agendamento depende da disponibilidade mas priorizamos casos urgentes." },
       { question: "O que devo fazer enquanto espero pela equipa?", answer: "Absorva o excesso do derrame com papel absorvente. Não esfregue, não use água quente e não aplique produtos caseiros. Isso pode fixar a mancha." },
@@ -836,6 +863,11 @@ const problemDefinitions: ProblemPage[] = [
     relatedServices: ["limpeza-sofas"],
     relatedCities: ["porto", "matosinhos", "maia"],
     visible: true,
+    // A descrição nacional começa por "Limpeza urgente de sofá no Porto".
+    cityPages: {
+      metaLead: "Agendamento prioritário para derrames e manchas recentes",
+      benefits: city => sofaUrgenteBenefits(`Disponível ${cityAndSurroundings(city)}`),
+    },
   },
   {
     slug: "limpeza-colchao-urgente",
@@ -893,6 +925,11 @@ const problemDefinitions: ProblemPage[] = [
     relatedServices: ["limpeza-sofas", "limpeza-colchoes", "limpeza-tapetes", "limpeza-cadeiras"],
     relatedCities: ["porto", "matosinhos", "braga", "vila-nova-de-gaia"],
     visible: true,
+    // A descrição nacional começa por "empresa profissional de limpeza de
+    // estofos no Porto"; a das cidades diz os mesmos factos sem a localidade.
+    cityPages: {
+      metaLead: `Sofás, colchões, cadeiras e tapetes, com avaliação de ${REVIEW_RATING} no Google`,
+    },
   },
   {
     slug: "limpeza-sofa-profissional",
@@ -1220,7 +1257,7 @@ const problemDefinitions: ProblemPage[] = [
     intro: "Procura limpeza de sofá perto de si? A Kyro Clean Solutions cobre Porto, Lisboa e todo o Norte de Portugal com serviço ao domicílio. A nossa equipa desloca-se até à sua casa com todo o equipamento.",
     problemDetail: `Quando pesquisa 'limpeza de sofá perto de mim', quer um serviço local, fiável e com boas avaliações. A Kyro Clean Solutions tem ${REVIEW_RATING} no Google, ${CLIENTS_SERVED_LABEL} clientes satisfeitos e cobertura em todo o Norte de Portugal e região de Lisboa.`,
     solutionDetail: `Atuamos no Porto e em Matosinhos, Maia, Gaia, Gondomar, Valongo, Braga, Guimarães, Póvoa de Varzim, Vila do Conde, Lisboa, Cascais, Oeiras, Sintra, Almada e Setúbal. Deslocação a partir de ${formatEuro(TRAVEL_FEE_MIN)}, consoante a distância.`,
-    benefits: ["Cobertura Norte de Portugal + Lisboa", `${REVIEW_RATING} Google`, `${CLIENTS_SERVED_LABEL} clientes satisfeitos`, `Deslocação a partir de ${formatEuro(TRAVEL_FEE_MIN)}`, `Desde ${formatEuro(SOFA_CLEANING_FROM)}`, "Resposta em menos de 10 minutos"],
+    benefits: sofaPertoDeMimBenefits("Cobertura Norte de Portugal + Lisboa"),
     faqs: [
       { question: "Em que cidades fazem limpeza de sofá?", answer: "Servimos Porto e toda a área metropolitana, Braga, Guimarães, e região de Lisboa (Cascais, Oeiras, Sintra, Almada, Setúbal). Contacte-nos para confirmar disponibilidade na sua zona." },
     ],
@@ -1228,6 +1265,9 @@ const problemDefinitions: ProblemPage[] = [
     relatedServices: ["limpeza-sofas", "limpeza-colchoes", "limpeza-tapetes"],
     relatedCities: ["porto", "matosinhos", "lisboa", "cascais", "braga"],
     visible: true,
+    cityPages: {
+      benefits: city => sofaPertoDeMimBenefits(`Cobertura ${cityAndSurroundings(city)}`),
+    },
   },
   {
     slug: "limpeza-sofa-antes-depois",

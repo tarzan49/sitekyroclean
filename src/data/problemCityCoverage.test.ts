@@ -6,6 +6,7 @@ import { getAllProblemCityRoutes, getProblemCities, problemCityBenefits, problem
 import { getProblemBySlug } from './problemSeoData';
 import { getProblemHero, problemBreadcrumb } from './problemHero';
 import { cities, headingWithCity } from './serviceCatalog';
+import { REVIEW_RATING } from '../constants/business';
 
 // O bloco "Este problema noutras cidades" das páginas problema × cidade, tal
 // como o `scripts/prerender.ts` e o `ProblemCityPage.tsx` o emitem (os dois
@@ -135,16 +136,22 @@ describe('páginas problema × cidade: cada uma só fala da sua cidade', () => {
     }
   });
 
-  it('o H1, o título e a migalha só nomeiam a cidade da página', () => {
+  it('o H1, o título, a descrição, a migalha e os benefícios só nomeiam a cidade da página', () => {
+    // A descrição e os benefícios entraram a 30/09/2026, depois de corrigidos
+    // os quatro problemas que ainda punham o Porto, ou "Norte de Portugal +
+    // Lisboa", nas páginas de todas as outras cidades.
     const found: string[] = [];
     for (const route of getAllProblemCityRoutes()) {
       const problem = getProblemBySlug(route.problemSlug)!;
       const city = cities.find(c => c.slug === route.citySlug)!;
       const other = otherCityPattern(city.name);
+      const { title, description } = problemCityMeta(problem, city.name);
       const texts = [
         getProblemHero(problem, city.name).heading,
-        problemCityMeta(problem, city.name).title,
+        title,
+        description,
         ...problemBreadcrumb(problem, city).map(step => step.name),
+        ...problemCityBenefits(problem, city.name),
       ];
       for (const text of texts) {
         const match = text.match(other);
@@ -188,10 +195,36 @@ describe('páginas problema × cidade: cada uma só fala da sua cidade', () => {
     expect(domicilio.h1).toBe('Limpeza de Sofá ao Domicílio no Porto e Arredores');
   });
 
+  it('urgente, empresa, manchas e perto de mim: o texto do dono nas cidades, a página nacional igual', () => {
+    // Texto escolhido pelo dono a 30/09/2026. A linha da zona leva a
+    // preposição de cada cidade (cityPrep).
+    const zona = [
+      { slug: 'limpeza-sofa-urgente', nacional: 'Disponível Porto e arredores', lisboa: 'Disponível em Lisboa e arredores', amadora: 'Disponível na Amadora e arredores' },
+      { slug: 'manchas-sofa', nacional: 'Serviço ao domicílio em todo o Porto e arredores', lisboa: 'Serviço ao domicílio em Lisboa e arredores', amadora: 'Serviço ao domicílio na Amadora e arredores' },
+      { slug: 'limpeza-sofa-perto-de-mim', nacional: 'Cobertura Norte de Portugal + Lisboa', lisboa: 'Cobertura em Lisboa e arredores', amadora: 'Cobertura na Amadora e arredores' },
+    ];
+    for (const { slug, nacional, lisboa, amadora } of zona) {
+      const problem = getProblemBySlug(slug)!;
+      expect(problem.benefits, slug).toContain(nacional);
+      expect(problemCityBenefits(problem, 'Lisboa'), slug).toEqual(problem.benefits.map(b => (b === nacional ? lisboa : b)));
+      expect(problemCityBenefits(problem, 'Amadora'), slug).toContain(amadora);
+    }
+
+    const urgente = getProblemBySlug('limpeza-sofa-urgente')!;
+    expect(urgente.metaDescription).toMatch(/^Limpeza urgente de sofá no Porto\. /);
+    expect(problemCityMeta(urgente, 'Lisboa').description).toBe('Limpeza Urgente de Sofá: Resposta Rápida em Lisboa: serviço profissional ao domicílio. Agendamento prioritário para derrames e manchas recentes. Resposta em menos de 10 minutos.');
+
+    const empresa = getProblemBySlug('empresa-limpeza-estofos')!;
+    expect(empresa.metaDescription).toMatch(/^Kyro Clean Solutions: empresa profissional de limpeza de estofos no Porto\. /);
+    expect(problemCityMeta(empresa, 'Lisboa').description).toBe(`Empresa Profissional de Limpeza de Estofos em Lisboa: serviço profissional ao domicílio. Sofás, colchões, cadeiras e tapetes, com avaliação de ${REVIEW_RATING} no Google. Resposta em menos de 10 minutos.`);
+    expect(problemCityBenefits(empresa, 'Lisboa')).toBe(empresa.benefits);
+  });
+
   it('os outros problemas usam o texto da página nacional', () => {
-    const manchas = getProblemBySlug('manchas-sofa')!;
-    expect(problemCityName(manchas)).toBe(manchas.h1);
-    expect(problemCityBenefits(manchas, 'Lisboa')).toBe(manchas.benefits);
-    expect(problemCityMeta(manchas, 'Lisboa').description).toContain(`${manchas.metaDescription.split('.')[0]}.`);
+    const vinho = getProblemBySlug('manchas-vinho-sofa')!;
+    expect(vinho.cityPages).toBeUndefined();
+    expect(problemCityName(vinho)).toBe(vinho.h1);
+    expect(problemCityBenefits(vinho, 'Lisboa')).toBe(vinho.benefits);
+    expect(problemCityMeta(vinho, 'Lisboa').description).toContain(`${vinho.metaDescription.split('.')[0]}.`);
   });
 });
