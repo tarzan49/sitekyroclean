@@ -340,6 +340,42 @@ cliques, 0 conversões) e atrai pesquisas de carros.
   sem subir o orçamento tira dinheiro aos sofás.
 - O nome da empresa continua "Reprovado (Irrelevância do nome da empresa)".
 
+### Aplicado a 30/09/2026 (pedido do dono)
+
+- **Limite de CPC 2,00 € → 2,50 € nas duas campanhas**, confirmado depois de
+  recarregar. A 29/09 nenhuma perdia impressões por orçamento (0%) e perdiam
+  30% (Porto) e 42% (Lisboa) por classificação: o limite era o travão.
+- **Negativas por campanha:** `porto` na de Lisboa e `lisboa` na do Porto
+  (a de Lisboa pagava cliques de "limpeza de sofás porto"). Custo conhecido:
+  `porto` também bloqueia "Porto Salvo" e "Porto Brandão", que ficam na zona
+  de Lisboa e quase não têm pesquisas.
+- **Negativas partilhadas: 185 → ~448.** Primeiro `lavador`, `shampoo`,
+  `kirby`, `vortex` (a negativa `lavadora` não bloqueia `lavador`). Depois 259
+  para tapetes e colchões, a pensar em "nada pode passar": pragas que não
+  tratamos (percevejos, baratas, piolhos), deitar fora e reciclar, compra de
+  colchão (medidas 140x190 e afins, ortopédico, articulado, de ar, campismo,
+  lojas e marcas de colchões), roupa de cama, tapetes que não são de sala
+  (banho, capacho, higiénico, ginástica, relva, carro), fazer, tingir e
+  reparar tapetes, produtos e máquinas (com os plurais e as variantes sem
+  acento, que a Google não junta nas negativas), cursos e franchising, e
+  outros serviços (cortinas, estores, limpeza de casas). **Ficaram de fora de
+  propósito:** "venda", "praia" e "tinta" soltas (Venda Nova, Venda do
+  Pinheiro, Praia da Granja; "mancha de tinta" é cliente), "usado" e "segunda
+  mão" (quem compra usado quer limpar), "traça", "pulgas" e "sarna" (há quem
+  chame a limpeza por isso), "ikea" (há clientes de sofás IKEA), "extratora"
+  sozinha e tudo o que tenha "urina", "xixi", "manchas" ou "em casa" (deram
+  conversões). A venda entra só como expressão: "à venda", "venda de",
+  "para venda". Verificado com um script que nenhuma das novas bloqueia uma
+  palavra-chave dos seis grupos; o único conflito continua a ser `lavandaria`.
+- **Revisão dos grupos de tapetes e colchões (continuam em pausa):** 23 + 21
+  palavras-chave por cidade, todas lá; um anúncio v3 ativo por grupo com
+  qualidade "Excelente" (os antigos em pausa); sem problemas de política na
+  conta; mensagem de WhatsApp, sitelinks, textos destacados e imagens
+  próprias em todos os grupos, e recurso de preço nos colchões, todos
+  "Elegível" (uma imagem dos colchões de Lisboa ainda "Pendente"). Páginas de
+  destino em 200, com a entrega em 3 dias quando há recolha e o tapete sob
+  orçamento.
+
 ## 3. As campanhas, como estão desenhadas
 
 Duas campanhas iguais na estrutura, uma por cidade, cada uma com dois grupos:
