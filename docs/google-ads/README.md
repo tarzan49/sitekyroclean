@@ -375,6 +375,11 @@ cliques, 0 conversões) e atrai pesquisas de carros.
   "Elegível" (uma imagem dos colchões de Lisboa ainda "Pendente"). Páginas de
   destino em 200, com a entrega em 3 dias quando há recolha e o tapete sob
   orçamento.
+- **Tapetes e colchões ligados no mesmo dia** (OK do dono), os quatro grupos
+  "Elegível". Orçamentos subidos pelo dono para **Porto 40 €/dia e Lisboa
+  45 €/dia** (a Google pediu "Confirme a sua identidade" ao gravar o
+  orçamento; foi ele que confirmou). "lavandaria" continua bloqueada, por
+  escolha dele.
 
 ## 3. As campanhas, como estão desenhadas
 
