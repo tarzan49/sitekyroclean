@@ -13,7 +13,7 @@ import { pickServiceHero } from "@/constants/serviceContent";
 import { SERVICE_TO_QUIZ } from "@/constants/serviceToQuiz";
 import { QuizLocationProvider, QuizServiceProvider } from "@/context/QuizLocationContext";
 import { categoryForServiceSlug } from "@/data/beforeAfterPool";
-import { landingBreadcrumb } from "@/data/breadcrumb";
+import { heroBreadcrumb, landingBreadcrumb } from "@/data/breadcrumb";
 import { cityPrep, services } from "@/data/serviceCatalog";
 import { useLandingModel } from "@/hooks/use-landing-model";
 import {
@@ -84,7 +84,7 @@ const PricePage = () => {
   // Sem `breadcrumbs`, o CommercialHero montava "Início › serviço › cidade",
   // que não é a migalha que a página declara. O último passo é a própria
   // página: texto, sem ligação, como no HTML estático.
-  const heroBreadcrumbs = data.breadcrumb.map((step, index) => ({ label: step.name, to: index < data.breadcrumb.length - 1 ? step.path : undefined }));
+  const heroBreadcrumbs = heroBreadcrumb(data.breadcrumb);
 
   const serviceDuration = SERVICE_DURATION[data.serviceSlug] ?? { value: "3 a 6h", label: "Pronto a usar" };
   // Resposta em menos de 10 minutos: compromisso comum a todo o site.

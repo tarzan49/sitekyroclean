@@ -103,13 +103,15 @@ export function renderLandingPageHtml(model: LandingPageModel): string {
   // no HTML estático, que é o único que um crawler sem JavaScript lê.
   const heroFacts = `<p>${e(commercialHeroPriceLine(model.serviceSlug, model.municipalityName, model.priceFrom))}</p><ul>${commercialHeroStats(model.serviceSlug).map(stat => `<li>${e(stat.value)} · ${e(stat.label)}</li>`).join('')}</ul>`;
   // A mesma migalha que o CommercialHero desenha para quem vê a página:
-  // Início, o serviço (ligado ao seu hub) e a própria página como texto. Não é
-  // informação nova, é a que faltava no HTML estático — e era a razão de os
-  // seis serviços-pilar quase não receberem ligações internas num site de
-  // 16.000 páginas, apesar de cada uma delas pertencer a um.
+  // Início, o serviço (ligado ao seu hub), nas freguesias o município, e a
+  // própria página como texto. Não é informação nova, é a que faltava no HTML
+  // estático — e era a razão de os seis serviços-pilar quase não receberem
+  // ligações internas num site de 16.000 páginas, apesar de cada uma delas
+  // pertencer a um.
   // Sai de `landingBreadcrumb`, a mesma função com que o `emit()` declara o
   // BreadcrumbList: as páginas de preço mostravam aqui "Porto" e declaravam
-  // "Preços no Porto".
+  // "Preços no Porto", e as de freguesia declaravam um município que aqui
+  // não aparecia.
   const steps = landingBreadcrumb(model);
   const breadcrumb = `<nav aria-label="Breadcrumb"><ol>`
     + steps.map((step, index) => index < steps.length - 1

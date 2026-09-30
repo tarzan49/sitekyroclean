@@ -591,11 +591,11 @@ export function prerenderRoutes(outDir: string): number {
     // declaravam em lado nenhum, por isso a pesquisa mostrava o URL cru em vez
     // do caminho. Os passos saem de `landingBreadcrumb`, a mesma funcao com
     // que o `renderLandingPageHtml` desenha a migalha visivel (e que o hero e o
-    // JSON-LD do PricePage.tsx usam), para o que a pagina mostra e o que
-    // declara nao poderem discordar.
-    // A guarda evita duplicar nas familias que ja passam a sua (localidade,
-    // freguesia), que continuam a mandar na sua propria versao. As de preco
-    // passavam a sua ate 30/09/2026, com um ultimo passo diferente do que
+    // JSON-LD do PricePage.tsx e do FreguesiaServicePage.tsx usam), para o que
+    // a pagina mostra e o que declara nao poderem discordar.
+    // A guarda evita duplicar na familia que ainda passa a sua (localidade),
+    // que continua a mandar na sua propria versao. As de preco e as de
+    // freguesia passavam a sua ate 30/09/2026, com passos diferentes dos que
     // mostravam, e deixaram de o fazer.
     if (landing && !schemas?.some(schema => (schema as { '@type'?: string })['@type'] === 'BreadcrumbList')) {
       html = injectJsonLd(html, buildBreadcrumbSchema(landingBreadcrumb(landing).map(step => ({ name: step.name, url: `${BASE_URL}${step.path}` }))));
@@ -656,16 +656,13 @@ export function prerenderRoutes(outDir: string): number {
         svc.name, svc.slug, svc.priceFrom,
         freg.name, freg.slug, freg.municipio,
       );
-      const cityObj  = cities.find(c => c.slug === route.citySlug);
-      const cityName = cityObj?.name ?? route.citySlug;
+      // Sem BreadcrumbList próprio: o `emit()` declara-o a partir do modelo
+      // landing, com a mesma `landingBreadcrumb` que desenha a migalha
+      // visível e que o FreguesiaServicePage.tsx usa no hero e no JSON-LD.
+      // Esta família declarava aqui "… › Porto › Paranhos" enquanto a página
+      // mostrava "… › Paranhos"; desde 30/09/2026 as duas levam o município.
       const schemas: object[] = [
         buildServiceSchema(svc.name, freg.name, svc.priceFrom),
-        buildBreadcrumbSchema([
-          { name: 'Início',   url: BASE_URL + '/' },
-          { name: svc.name,  url: `${BASE_URL}/${svc.slug}` },
-          { name: cityName,  url: `${BASE_URL}/${svc.slug}-${route.citySlug}` },
-          { name: freg.name, url: `${BASE_URL}${route.path}` },
-        ]),
       ];
       if (content.faqs?.length) schemas.push(buildFaqSchema(content.faqs));
       emit(

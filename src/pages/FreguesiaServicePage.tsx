@@ -14,6 +14,7 @@ import { pickServiceHero } from "@/constants/serviceContent";
 import { SERVICE_TO_QUIZ } from "@/constants/serviceToQuiz";
 import { QuizLocationProvider, QuizServiceProvider } from "@/context/QuizLocationContext";
 import { categoryForServiceSlug } from "@/data/beforeAfterPool";
+import { heroBreadcrumb, landingBreadcrumb } from "@/data/breadcrumb";
 import { useLandingModel } from "@/hooks/use-landing-model";
 import { buildServiceWaMessage } from "@/lib/whatsappMessages";
 import { Clock, Timer } from "lucide-react";
@@ -36,6 +37,9 @@ const FreguesiaServicePage = () => {
     municipio: model.municipalityName, municipioSlug: model.municipalitySlug,
     service: model.serviceName, serviceSlug: model.serviceSlug, priceFrom: model.priceFrom,
     serviceBaseRoute: model.serviceBaseRoute,
+    // Um só array para a migalha do hero e para a do JSON-LD, da mesma função
+    // com que o prerender desenha e declara a do HTML estático.
+    breadcrumb: landingBreadcrumb(model),
   } : null), [model]);
 
   useEffect(() => {
@@ -108,6 +112,7 @@ const FreguesiaServicePage = () => {
         description={data.metaDescription}
         pageUrl={location.pathname}
         priceFrom={data.priceFrom}
+        breadcrumb={data.breadcrumb}
       />
       <Header />
       {isFontComparison && FontComparisonPanel && (
@@ -115,7 +120,7 @@ const FreguesiaServicePage = () => {
       )}
       <main>
 
-        <CommercialHero title={data.h1} serviceSlug={data.serviceSlug} city={data.municipio} price={data.priceFrom} image={heroImgs} breadcrumbs={[{ label: "Início", to: "/" }, { label: data.service, to: serviceBaseUrl }, { label: data.name }]} whatsappHref={waUrl} source={`freguesia_hero_${data.serviceSlug}_${data.municipioSlug}`} />
+        <CommercialHero title={data.h1} serviceSlug={data.serviceSlug} city={data.municipio} price={data.priceFrom} image={heroImgs} breadcrumbs={heroBreadcrumb(data.breadcrumb)} whatsappHref={waUrl} source={`freguesia_hero_${data.serviceSlug}_${data.municipioSlug}`} />
 
         <LandingServiceSections />
 
