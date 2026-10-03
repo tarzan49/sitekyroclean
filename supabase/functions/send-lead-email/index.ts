@@ -11,6 +11,7 @@ import { createErrorResponse, createSuccessResponse, handleCORS, safeLog, valida
 import { hasHeaderInjection } from "../_shared/validation.ts";
 import { verifyRecaptcha } from "../_shared/recaptcha.ts";
 import { LEAD_FROM_ADDRESS } from "../_shared/constants.ts";
+import { buildWhatsAppMessage } from "./whatsappReply.ts";
 
 const RATE_LIMIT_MAX = 8;
 const RATE_LIMIT_WINDOW = 10 * 60 * 1000;
@@ -124,55 +125,6 @@ function escapeHtml(value: string): string {
 // em QuizForm.tsx para a versão antiga, texto corrido), por isso é omitido
 // aqui para não duplicar. O contacto simples não tem service/details/value,
 // só `message` (a mensagem livre do cliente) — aí é a única fonte e é mostrado.
-// Mensagem pré-preenchida no clique de "Responder no WhatsApp". Estes leads já
-// viram o preço no quiz e mesmo assim avançaram, por isso o objetivo não é
-// "confirmar interesse" mas fechar o agendamento logo na primeira mensagem:
-// trata a pessoa pelo primeiro nome, recorda o serviço e a zona que pediu, dá
-// duas opções de horário (pergunta fechada, decide-se em segundos) e só depois
-// pede o único dado em falta (a morada). Os espaços em branco dos horários
-// ficam por preencher à mão consoante a agenda: a mensagem abre editável na
-// caixa do WhatsApp, não é enviada automaticamente. Parágrafos separados por
-// linha em branco para não chegar como um bloco de texto corrido. Tudo na
-// primeira pessoa do plural (recebemos, temos, enviar-nos, deixamos): quem
-// presta o serviço é a equipa, não o António sozinho. O nome fica só na
-// apresentação, para a pessoa saber com quem fala.
-function firstName(fullName: string): string {
-  const first = fullName.trim().split(/\s+/)[0] ?? "";
-  return first ? first.charAt(0).toUpperCase() + first.slice(1) : fullName;
-}
-
-// Quase todas as localidades servidas levam "em" (em Oeiras, em Lisboa), mas
-// um punhado leva artigo contraído e "em Porto" soa logo a mensagem automática.
-// Lista curta e explícita das exceções que existem em `locationPrices`; tudo o
-// resto, incluindo moradas escritas à mão no campo "outra", cai em "em".
-const LOCATION_PREPOSITION: Record<string, string> = {
-  "Porto": "no", "Barreiro": "no", "Seixal": "no", "Montijo": "no",
-  "Amadora": "na", "Maia": "na", "Moita": "na", "Trofa": "na",
-  "Póvoa de Varzim": "na", "Póvoa de Lanhoso": "na",
-};
-
-function buildWhatsAppMessage(lead: Record<string, string>): string {
-  // Com upsell o campo `service` vem como lista ("Sofá, 2x Colchão Casal");
-  // numa saudação só interessa o serviço principal, o resto está no email.
-  const mainService = (lead.service ?? "").split(",")[0].trim().toLowerCase();
-  const isWaterproofing = /impermeabiliza/i.test(lead.service_type ?? "");
-  const service = mainService
-    ? ` para ${isWaterproofing ? "impermeabilização" : "limpeza"} de ${mainService}`
-    : "";
-  const loc = lead.location
-    ? ` ${LOCATION_PREPOSITION[lead.location] ?? "em"} ${lead.location}`
-    : "";
-  return [
-    `Olá ${firstName(lead.name)}, tudo bem?`,
-    `Aqui é o António, da Kyro Clean Solutions. Recebemos o seu pedido de orçamento${service}${loc}.`,
-    // Sem "para" antes dos espaços em branco de propósito: assim a frase
-    // funciona tanto com horas ("quinta às 15h") como com períodos do dia
-    // ("sábado de manhã"), seja o que for que se escreva à mão antes de enviar.
-    `Temos disponibilidade ______ ou ______. Qual horário prefere?`,
-    `É só enviar-nos a morada completa e deixamos a reserva confirmada.`,
-  ].join("\n\n");
-}
-
 // O campo de telefone do quiz aceita indicativo estrangeiro ("com indicativo
 // se for estrangeiro", ver QuizStepContact.tsx) — nem todos os leads são
 // portugueses. Um número português sem indicativo tem sempre 9 dígitos
