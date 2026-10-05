@@ -13,6 +13,9 @@ export interface QuizFormData {
   sofaAntiAcaros: boolean;
   carpetArea: string;
   carpetKind?: 'tapete' | 'alcatifa';
+  // Tapetes: o cliente prefere recolha e entrega em vez da lavagem em casa.
+  // Só conta a partir de RUG_PICKUP_MIN_AREA_M2 somados (rugPickupFee).
+  rugPickup?: boolean;
   mattressSize: string;
   chairType: string;
   chairQuantity: string;
@@ -43,6 +46,7 @@ export const initialFormData: QuizFormData = {
   sofaSize: '',
   sofaAntiAcaros: false,
   carpetArea: '',
+  rugPickup: false,
   mattressSize: '',
   chairType: '',
   chairQuantity: '',

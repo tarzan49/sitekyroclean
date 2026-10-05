@@ -1,7 +1,7 @@
 import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { RUG_PICKUP_RULE } from '../constants/commercialPolicy';
+import { RUG_PICKUP_FEE_RULE, RUG_PICKUP_RULE, rugPickupFee } from '../constants/commercialPolicy';
 import { getAllPosts } from './blogData';
 import { getLandingFaqPool } from './landingFaqPool';
 import { getPillarPage } from './pillarPages';
@@ -20,6 +20,9 @@ import { getProblemBySlug } from './problemSeoData';
  *
  * Abaixo de 3 m² somados não há recolha (dono, 2026-09-30): as respostas que
  * explicam a recolha dizem-no, a partir de `RUG_PICKUP_RULE`.
+ *
+ * Desde 2026-10-05 o custo da recolha está escrito (dono): mais 10€ até 6 m²,
+ * 15€ acima disso e 20€ a partir de 10 m², a partir de `RUG_PICKUP_FEE_RULE`.
  */
 const ROOTS = ['src/data', 'src/constants', 'src/pages', 'src/components', 'scripts'];
 const PICKUP_AS_DEFAULT = /recolha e entrega (ao domic[íi]lio|inclu[íi]das)|recolha e entrega\.|recolha ao domic[íi]lio|recolhemos e entregamos tapetes em toda|sem necessidade de recolha|n[ãa]o s[ãa]o anunciadas como servi[çc]o geral/i;
@@ -50,6 +53,26 @@ describe('recolha dos tapetes', () => {
       getProblemBySlug('preco-limpeza-tapete')?.faqs.find(f => /recolha/i.test(f.question))?.answer,
       getAllPosts().flatMap(p => p.faq).find(f => /^Recolhem e entregam/.test(f.q))?.a,
     ];
-    for (const answer of answers) expect(answer).toContain(RUG_PICKUP_RULE);
+    for (const answer of answers) {
+      expect(answer).toContain(RUG_PICKUP_RULE);
+      expect(answer).toContain(RUG_PICKUP_FEE_RULE);
+    }
+  });
+
+  it('o custo da recolha segue os escalões do dono, pela área somada', () => {
+    expect(rugPickupFee(2.99)).toBeNull();
+    expect(rugPickupFee(3)).toBe(10);
+    expect(rugPickupFee(6)).toBe(10);
+    expect(rugPickupFee(6.01)).toBe(15);
+    expect(rugPickupFee(9.99)).toBe(15);
+    expect(rugPickupFee(10)).toBe(20);
+    expect(rugPickupFee(40)).toBe(20);
+    expect(rugPickupFee(Number.NaN)).toBeNull();
+  });
+
+  it('o texto do custo diz os mesmos valores que a função', () => {
+    expect(RUG_PICKUP_FEE_RULE).toContain(`${rugPickupFee(6)}€ até 6 m²`);
+    expect(RUG_PICKUP_FEE_RULE).toContain(`${rugPickupFee(7)}€ acima de 6 m²`);
+    expect(RUG_PICKUP_FEE_RULE).toContain(`${rugPickupFee(10)}€ a partir de 10 m²`);
   });
 });

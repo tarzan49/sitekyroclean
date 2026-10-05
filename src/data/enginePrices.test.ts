@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { sofaPrices, mattressPrices } from '@/components/quiz/QuizTypes';
 import { calcChairClean, calcPackPricing } from '@/components/quiz/quizHelpers';
 import { SOFA_ANTI_ACAROS_PRICE, CHAIR_ANTI_ACAROS_UNIT_LABEL } from '@/constants/antiAcarosPricing';
-import { TRAVEL_FEE_MIN, TRAVEL_FEE_MAX } from '@/constants/commercialPolicy';
+import { RUG_PICKUP_FEE_RULE, TRAVEL_FEE_MIN, TRAVEL_FEE_MAX } from '@/constants/commercialPolicy';
 import { PACK_PERK_MIN_ORDER, PACK_PERK_SUMMARY } from '@/constants/packPerks';
 import { services } from './serviceCatalog';
 import {
@@ -201,11 +201,13 @@ describe('páginas de preço dos problemas', () => {
     expect(faqAnswer('preco-limpeza-colchao', /casal/)).toContain(formatEuro(mattressCleanAndAntiMitePrice('casal')));
   });
 
-  it('o tapete não tem preço, é lavado em casa por defeito e a recolha tem custo (dono, 2026-09-30)', () => {
+  // Desde 2026-10-05 o único valor em euros da página é o custo da recolha
+  // (RUG_PICKUP_FEE_RULE, dono): a lavagem continua sem preço.
+  it('o tapete não tem preço, é lavado em casa por defeito e a recolha tem o custo do dono', () => {
     const text = pageText('preco-limpeza-tapete');
-    expect(text).not.toMatch(/\d\s*€/);
+    expect(text.split(RUG_PICKUP_FEE_RULE).join('')).not.toMatch(/\d\s*€/);
     expect(text).not.toMatch(/recolha e entrega (ao domicílio )?(estão )?incluídas|incluídas no preço/i);
     expect(text).toContain('prazo máximo de 3 dias');
-    expect(faqAnswer('preco-limpeza-tapete', /recolha/)).toContain('a recolha tem um custo, indicado no orçamento');
+    expect(faqAnswer('preco-limpeza-tapete', /recolha/)).toContain(RUG_PICKUP_FEE_RULE);
   });
 });

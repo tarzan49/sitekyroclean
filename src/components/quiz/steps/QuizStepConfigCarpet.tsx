@@ -2,18 +2,26 @@ import { useId } from 'react';
 import { Plus, Trash2 } from 'lucide-react';
 import type { CarpetItem } from '@/components/quiz/QuizTypes';
 import { carpetAddItem, carpetRemoveItem, carpetUpdateItem, carpetItemArea, carpetTotalArea } from '@/components/quiz/quizHelpers';
+import { RUG_PICKUP_MIN_AREA_M2, rugPickupFee } from '@/constants/commercialPolicy';
 
 interface Props {
   carpetItems: CarpetItem[];
   carpetKind?: 'tapete' | 'alcatifa';
   setCarpetItems: React.Dispatch<React.SetStateAction<CarpetItem[]>>;
+  rugPickup?: boolean;
+  onRugPickupChange?: (pickup: boolean) => void;
 }
 
 const formatArea = (area: number) => area.toLocaleString('pt-PT', { maximumFractionDigits: 2 });
 
-const QuizStepConfigCarpet = ({ carpetItems, setCarpetItems, carpetKind = 'tapete' }: Props) => {
+const QuizStepConfigCarpet = ({ carpetItems, setCarpetItems, carpetKind = 'tapete', rugPickup = false, onRugPickupChange }: Props) => {
   const fieldPrefix = useId();
   const totalArea = carpetTotalArea(carpetItems);
+  // Recolha: só tapetes (a alcatifa está fixa ao chão), a partir de 3 m²
+  // somados, com o acréscimo de rugPickupFee (dono, 2026-10-05).
+  const pickupFee = rugPickupFee(totalArea);
+  const pickupChosen = rugPickup && pickupFee !== null;
+  const showPickup = carpetKind === 'tapete' && !!onRugPickupChange && totalArea > 0;
 
   return (
     <div className="flex w-full flex-col items-center gap-3">
@@ -73,6 +81,33 @@ const QuizStepConfigCarpet = ({ carpetItems, setCarpetItems, carpetKind = 'tapet
         </button>
         {carpetItems.length > 1 && totalArea > 0 && <p className="text-center text-sm text-white/70">Área total preenchida: <span className="font-semibold text-white">{formatArea(totalArea)} m²</span></p>}
       </div>
+
+      {showPickup && (
+        <div className="w-full max-w-sm text-left">
+          {pickupFee === null ? (
+            <p className="rounded-xl border border-white/15 bg-[#183026] px-3 py-2.5 text-sm text-white/80">Com menos de {RUG_PICKUP_MIN_AREA_M2} m² no total, a lavagem é feita em sua casa.</p>
+          ) : (
+            <div role="radiogroup" aria-labelledby={`${fieldPrefix}-pickup`} className="flex flex-col gap-2">
+              <p id={`${fieldPrefix}-pickup`} className="text-base font-semibold text-white">Onde prefere a lavagem?</p>
+              {([
+                { pickup: false, title: 'Em sua casa', detail: 'Seco em 3 a 6 horas' },
+                { pickup: true, title: 'Recolha e entrega', detail: `Entregamos em 3 dias no máximo · +${pickupFee}€` },
+              ] as const).map(option => {
+                const selected = option.pickup === pickupChosen;
+                return (
+                  <button key={option.title} type="button" role="radio" aria-checked={selected} onClick={() => onRugPickupChange(option.pickup)} className={`flex min-h-12 w-full items-center gap-3 rounded-xl border px-3 py-2.5 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37] touch-manipulation ${selected ? 'border-[#D4AF37] bg-[#D4AF37]/10' : 'border-white/15 bg-[#183026] hover:border-white/30'}`}>
+                    <span aria-hidden="true" className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 ${selected ? 'border-[#D4AF37]' : 'border-white/50'}`}>{selected && <span className="h-2.5 w-2.5 rounded-full bg-[#D4AF37]" />}</span>
+                    <span className="flex flex-col">
+                      <span className="text-base font-semibold text-white">{option.title}</span>
+                      <span className="text-sm text-white/75">{option.detail}</span>
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      )}
 
 
     </div>

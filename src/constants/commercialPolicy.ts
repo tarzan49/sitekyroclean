@@ -20,6 +20,20 @@ export const TREATMENT_EXTRAS = 'A limpeza remove sujidade e resíduos das fibra
 export const RUG_PICKUP_MIN_AREA_M2 = 3;
 export const RUG_PICKUP_RULE = `Só fazemos recolha quando os tapetes do pedido somam ${RUG_PICKUP_MIN_AREA_M2} m² ou mais; abaixo disso, a lavagem é sempre feita em sua casa.`;
 
+// Custo da recolha e entrega (dono, 2026-10-05): mais 10€ até 6 m², mais 15€
+// acima de 6 m² e mais 20€ a partir de 10 m². Conta a soma dos tapetes do
+// pedido, como o mínimo acima. A lavagem continua sob orçamento: este é o
+// único valor dos tapetes que o site escreve.
+/** Acréscimo da recolha para a área total do pedido, ou null quando não há recolha (abaixo do mínimo). */
+export function rugPickupFee(totalAreaM2: number): number | null {
+  if (!(totalAreaM2 >= RUG_PICKUP_MIN_AREA_M2)) return null;
+  if (totalAreaM2 <= 6) return 10;
+  if (totalAreaM2 < 10) return 15;
+  return 20;
+}
+
+export const RUG_PICKUP_FEE_RULE = 'A recolha e entrega custa mais 10€ até 6 m², mais 15€ acima de 6 m² e mais 20€ a partir de 10 m², somando os tapetes do pedido.';
+
 // Os limites da deslocação saem da tabela de cada cidade, nunca de um número
 // escrito à mão: o rodapé chegou a ter um parágrafo só sobre Braga
 // ("10€... 15€... 20€... Barcelos: 20€") que não passava por aqui.

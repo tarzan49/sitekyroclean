@@ -110,6 +110,26 @@ describe('specific regressions and delivery failures', () => {
   });
 });
 
+it.each([
+  [[{ id: 'a', largura: '2', comprimento: '1' }], null],
+  [[{ id: 'a', largura: '2', comprimento: '3' }], 10],
+  [[{ id: 'a', largura: '2', comprimento: '3' }, { id: 'b', largura: '1', comprimento: '2' }], 15],
+  [[{ id: 'a', largura: '2,5', comprimento: '4' }], 20],
+])('adds the rug pickup fee to the receipt by summed area (%#)', (items, fee) => {
+  const p = payload({ service: 'carpet', serviceType: 'cleaning' });
+  p.carpetItems = items; p.rugPickup = true;
+  const line = buildReceiptLines(p).find(l => l.label.startsWith('Recolha e entrega'));
+  expect(line?.total ?? null).toBe(fee);
+});
+
+it('never adds a pickup fee when the customer keeps the home wash or for fitted carpet', () => {
+  const p = payload({ service: 'carpet', serviceType: 'cleaning' });
+  p.carpetItems = [{ id: 'a', largura: '3', comprimento: '4' }];
+  expect(buildReceiptLines(p).some(l => l.label.startsWith('Recolha'))).toBe(false);
+  p.rugPickup = true; p.carpetKind = 'alcatifa';
+  expect(buildReceiptLines(p).some(l => l.label.startsWith('Recolha'))).toBe(false);
+});
+
 it('retains Alcatifa instead of mislabelling it as a rug', async () => {
   const p = payload({ service: 'carpet' }); p.carpetKind = 'alcatifa';
   expect(buildReceiptLines(p)[0].label).toContain('Alcatifa');

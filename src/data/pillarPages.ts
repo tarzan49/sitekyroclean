@@ -19,7 +19,7 @@
 // Sem imports com alias `@/`, para o `scripts/prerender.ts` o conseguir ler.
 import { services } from './serviceCatalog';
 import { sofaPrices, mattressPrices, type PriceOption } from '../components/quiz/QuizTypes';
-import { RUG_PICKUP_RULE, TRAVEL_FEE_MIN } from '../constants/commercialPolicy';
+import { RUG_PICKUP_FEE_RULE, RUG_PICKUP_RULE, TRAVEL_FEE_MIN } from '../constants/commercialPolicy';
 import {
   formatEuro,
   SOFA_CLEANING_FROM,
@@ -132,7 +132,7 @@ export const PILLAR_PAGES: PillarPage[] = [
       { question: 'Quanto tempo demora a limpeza de tapete?', answer: 'Depende do tamanho: cerca de 3 a 4 minutos por m², ou seja, 20 a 25 minutos num tapete de 2 x 3 m. O tapete fica seco em 3 a 6 horas, dependendo da espessura e do material.' },
       { question: 'Que tipos de tapete limpam?', answer: 'Limpamos todos os tipos: persas, shaggy, sisal, juta, lã, acrílico, polipropileno e fibras naturais. O produto é sempre adaptado ao material.' },
       { question: 'A limpeza profunda remove mesmo cheiros e manchas antigas?', answer: 'Conseguimos reduzir significativamente cheiros a humidade, animais e uso diário, e remover a grande maioria das manchas. Em alguns casos muito antigos ou já oxidados o tecido pode não voltar a 100%, mas explicamos sempre o cenário realista antes de avançar.' },
-      { question: 'A carpete precisa de ser retirada de casa para ser limpa?', answer: `Na maioria dos casos, não. Fazemos a limpeza diretamente no local, com equipamento profissional de extração. Assim evitam-se deslocações, tempo de espera e riscos de danos no transporte. Quando o tapete precisa de ser recolhido, recolhemos e entregamos no prazo máximo de 3 dias. ${RUG_PICKUP_RULE}` },
+      { question: 'A carpete precisa de ser retirada de casa para ser limpa?', answer: `Na maioria dos casos, não. Fazemos a limpeza diretamente no local, com equipamento profissional de extração. Assim evitam-se deslocações, tempo de espera e riscos de danos no transporte. Quando o tapete precisa de ser recolhido, recolhemos e entregamos no prazo máximo de 3 dias. ${RUG_PICKUP_RULE} ${RUG_PICKUP_FEE_RULE}` },
       { question: 'De quanto em quanto tempo devo limpar a carpete/tapete?', answer: 'Para uso doméstico, recomendamos uma limpeza profunda a cada 12 meses. Em casas com crianças, animais ou alergias, o ideal é a cada 6 a 9 meses. Em empresas, hotéis ou restaurantes, a frequência deve ser ajustada ao nível de tráfego (trimestral, semestral ou anual).' },
     ],
   },

@@ -373,7 +373,7 @@ const QuizForm = ({
     service: formData.service, serviceType: formData.serviceType,
     waterproofingTier: formData.waterproofingTier, sofaItems, mattressItems, upsellItems, carpetItems,
     chairQuantity: formData.chairQuantity, chairWaterproofQty: formData.chairWaterproofQty,
-    chairAntiAcaros: formData.chairAntiAcaros, sofaAntiAcaros: formData.sofaAntiAcaros, carpetKind: formData.carpetKind, finalTravelCost,
+    chairAntiAcaros: formData.chairAntiAcaros, sofaAntiAcaros: formData.sofaAntiAcaros, carpetKind: formData.carpetKind, rugPickup: formData.rugPickup, finalTravelCost,
     finalLocation: formData.location === 'other' ? formData.otherLocation : formData.location,
   });
   const quotePriceText = formatQuotePrice({ totalPrice, hasSobOrcamento, hasUpsellSobItem });
@@ -446,6 +446,7 @@ ${formData.description || 'Sem observações adicionais'}
       slotLabel: formatSelectedSlot(formData.selectedSlot),
       description: formData.description,
       carpetKind: formData.carpetKind,
+      rugPickup: formData.rugPickup,
     });
 
     if (!success) {
@@ -667,7 +668,7 @@ ${formData.description || 'Sem observações adicionais'}
                     // existe como serviço primário, só como upsell dependente de uma
                     // limpeza — ver shouldSkipServiceType acima para mais contexto.
                     const skipServiceType = service === 'carpet' || service === 'mattress';
-                    updateFormData({ service, carpetKind: 'tapete', serviceType: skipServiceType ? 'cleaning' : '', sofaSize: '', mattressSize: '', chairType: '', carpetArea: '', chairWaterproofing: false, chairWaterproofQty: 0, chairAntiAcaros: false, sofaAntiAcaros: false });
+                    updateFormData({ service, carpetKind: 'tapete', serviceType: skipServiceType ? 'cleaning' : '', sofaSize: '', mattressSize: '', chairType: '', carpetArea: '', rugPickup: false, chairWaterproofing: false, chairWaterproofQty: 0, chairAntiAcaros: false, sofaAntiAcaros: false });
                     setSofaItems([]);
                     setMattressItems([]);
                     setCarpetItems(buildInitialCarpetItems());

@@ -4,8 +4,9 @@ import { clearSubmissionId, currentSubmissionId } from '@/lib/submissionId';
 import { splitTreatmentItems } from '@/components/quiz/quizHelpers';
 import { sofaPrices, mattressPrices } from '@/components/quiz/QuizTypes';
 import type { SofaItem, MattressItem, CarpetItem, UpsellItemConfig } from '@/components/quiz/QuizTypes';
-import { calcChairClean, calcChairWaterproof, calcChairWaterproofPremium, carpetItemArea, calcSofaUnitPrice, calcMattressUnitPrice, chairAntiAcarosQty } from '@/components/quiz/quizHelpers';
+import { calcChairClean, calcChairWaterproof, calcChairWaterproofPremium, carpetItemArea, carpetTotalArea, calcSofaUnitPrice, calcMattressUnitPrice, chairAntiAcarosQty } from '@/components/quiz/quizHelpers';
 import { chairAntiAcarosTotal, CHAIR_ANTI_ACAROS_UNIT_PRICE, CHAIR_ANTI_ACAROS_UNIT_LABEL } from '@/constants/antiAcarosPricing';
+import { rugPickupFee } from '@/constants/commercialPolicy';
 import { buildSubmittedWaMessage } from '@/lib/whatsappMessages';
 import { WHATSAPP_BASE } from '@/constants/business';
 import { safeSessionSet } from '@/lib/safeStorage';
@@ -54,6 +55,7 @@ export interface QuizLeadPayload {
   slotLabel: string;
   description?: string;
   carpetKind?: 'tapete' | 'alcatifa';
+  rugPickup?: boolean;
 }
 
 function generateBookingId(): string {
@@ -171,7 +173,7 @@ export function formatQuotePrice(payload: Pick<QuizLeadPayload, 'totalPrice' | '
     : value > 0 ? price : 'Sob orçamento';
 }
 
-export function buildReceiptLines(payload: Pick<QuizLeadPayload, 'service' | 'serviceType' | 'waterproofingTier' | 'sofaItems' | 'mattressItems' | 'upsellItems' | 'carpetItems' | 'chairQuantity' | 'chairWaterproofQty' | 'chairAntiAcaros' | 'sofaAntiAcaros' | 'finalTravelCost' | 'finalLocation' | 'carpetKind'>) {
+export function buildReceiptLines(payload: Pick<QuizLeadPayload, 'service' | 'serviceType' | 'waterproofingTier' | 'sofaItems' | 'mattressItems' | 'upsellItems' | 'carpetItems' | 'chairQuantity' | 'chairWaterproofQty' | 'chairAntiAcaros' | 'sofaAntiAcaros' | 'finalTravelCost' | 'finalLocation' | 'carpetKind' | 'rugPickup'>) {
   const {
     service, serviceType, waterproofingTier, sofaItems, mattressItems, upsellItems, carpetItems, chairQuantity,
     chairWaterproofQty, chairAntiAcaros, finalTravelCost, finalLocation,
@@ -238,6 +240,10 @@ export function buildReceiptLines(payload: Pick<QuizLeadPayload, 'service' | 'se
       if (area === null) return;
       receiptLines.push({ label: `${payload.carpetKind === 'alcatifa' ? 'Alcatifa' : 'Tapete'} ${i + 1}: ${item.largura} × ${item.comprimento} m (${Number(area.toFixed(2))} m²)`, qty: 1, unitPrice: null, total: null });
     });
+    // Recolha e entrega (dono, 2026-10-05): o único valor fixo de um pedido de
+    // tapetes, pela área somada. Fica fora do total, que continua sob orçamento.
+    const pickupFee = payload.rugPickup && payload.carpetKind !== 'alcatifa' ? rugPickupFee(carpetTotalArea(carpetItems)) : null;
+    if (pickupFee !== null) receiptLines.push({ label: 'Recolha e entrega do tapete (até 3 dias)', qty: 1, unitPrice: pickupFee, total: pickupFee });
   }
 
   upsellItems.forEach(item => {

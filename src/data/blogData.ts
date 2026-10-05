@@ -1,6 +1,6 @@
 import { sofaPrices, mattressPrices } from "../components/quiz/QuizTypes";
 import { locationPrices } from "../constants/travel";
-import { RUG_PICKUP_RULE } from "../constants/commercialPolicy";
+import { RUG_PICKUP_FEE_RULE, RUG_PICKUP_RULE } from "../constants/commercialPolicy";
 import { DEFAULT_AUTHOR } from "./authors";
 
 export interface BlogPost {
@@ -408,7 +408,7 @@ A deslocação é apresentada à parte. Indique o tamanho real e as faces que pr
       },
       {
         "q": "Recolhem e entregam qualquer tapete?",
-        "a": `Na maioria dos casos lavamos o tapete em casa. Quando o material ou o estado do tapete o exigem, recolhemos e entregamos no prazo máximo de 3 dias. ${RUG_PICKUP_RULE} A modalidade fica confirmada no orçamento.`
+        "a": `Na maioria dos casos lavamos o tapete em casa. Quando o material ou o estado do tapete o exigem, recolhemos e entregamos no prazo máximo de 3 dias. ${RUG_PICKUP_RULE} ${RUG_PICKUP_FEE_RULE} A modalidade fica confirmada no orçamento.`
       },
       {
         "q": "Posso molhar sisal ou juta?",
