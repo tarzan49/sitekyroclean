@@ -260,7 +260,7 @@ def colchoes(city):
             "Limpeza e higienização de colchões ao domicílio, sem tirar o colchão do quarto.",
             f"Solteiro desde {COLCHAO_DESDE}€, casal desde {COLCHAO_CASAL}€, king desde {COLCHAO_KING}€. Anti-ácaros opcional.",
             "Manchas de urina, suor e marcas amareladas tratadas no local. Secagem de 3 a 6 horas.",
-            "Avaliação média de 4,9 em mais de 125 avaliações. Orçamento grátis pelo WhatsApp."],
+            f"Avaliação média de {RATING} em mais de {REVIEWS} avaliações. Orçamento grátis pelo WhatsApp."],
     )
 
 # O carregamento de linhas soltas (sem a linha da campanha) exige o ID da
