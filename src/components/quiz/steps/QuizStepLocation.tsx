@@ -11,9 +11,11 @@ interface QuizStepLocationProps {
   setLocationQuery: (q: string) => void;
   scrollContainerRef: React.RefObject<HTMLDivElement>;
   onCitySelect: (city: string) => void;
+  // Tapetes e alcatifas: a deslocação entra no orçamento (dono, 2026-10-05).
+  travelOnQuote?: boolean;
 }
 
-const QuizStepLocation = ({ location, locationQuery, setLocationQuery, scrollContainerRef, onCitySelect }: QuizStepLocationProps) => {
+const QuizStepLocation = ({ location, locationQuery, setLocationQuery, scrollContainerRef, onCitySelect, travelOnQuote = false }: QuizStepLocationProps) => {
   const [selected, setSelected] = useState(location);
   const [detected, setDetected] = useState('');
   const [editing, setEditing] = useState(!location);
@@ -76,7 +78,7 @@ const QuizStepLocation = ({ location, locationQuery, setLocationQuery, scrollCon
         {!loading && <button type="button" onClick={() => { manuallyEdited.current = false; setAttempt(value => value + 1); }} className="min-h-11 text-base text-gold flex items-center gap-2"><Navigation className="w-4 h-4" />Usar a minha localização</button>}
       </div>}
 
-      {selected && <div className="pt-4 mt-4 border-t border-white/10" aria-live="polite"><div className="flex justify-between gap-3 text-base text-white/85"><span>Deslocação para {selected}</span><span className="font-semibold whitespace-nowrap">{locationPrices[selected]} €</span></div><p className="text-sm text-white/80 mt-2">Este valor será somado ao serviço no total.</p></div>}
+      {selected && <div className="pt-4 mt-4 border-t border-white/10" aria-live="polite"><div className="flex justify-between gap-3 text-base text-white/85"><span>Deslocação para {selected}</span><span className="font-semibold whitespace-nowrap">{travelOnQuote ? 'Sob orçamento' : `${locationPrices[selected]} €`}</span></div><p className="text-sm text-white/80 mt-2">{travelOnQuote ? 'Em tapetes e alcatifas, a deslocação entra no orçamento. Com recolha, já vem incluída no valor da recolha.' : 'Este valor será somado ao serviço no total.'}</p></div>}
       <Button type="button" disabled={!selected || editing} onClick={() => { if (selected) { request.current?.abort(); onCitySelect(selected); } }} className="w-full h-12 mt-6 bg-gradient-to-r from-gold to-[#d4c57b] text-[#12121e] font-bold tracking-wider uppercase rounded-xl disabled:opacity-35">Continuar<ChevronRight className="w-4 h-4 ml-2" /></Button>
     </div>
   );

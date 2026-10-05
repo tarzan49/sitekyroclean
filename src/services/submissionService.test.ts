@@ -118,7 +118,7 @@ it.each([
 ])('adds the rug pickup fee to the receipt by summed area (%#)', (items, fee) => {
   const p = payload({ service: 'carpet', serviceType: 'cleaning' });
   p.carpetItems = items; p.rugPickup = true;
-  const line = buildReceiptLines(p).find(l => l.label.startsWith('Recolha e entrega'));
+  const line = buildReceiptLines(p).find(l => l.label.startsWith('Recolha, entrega e deslocação'));
   expect(line?.total ?? null).toBe(fee);
 });
 

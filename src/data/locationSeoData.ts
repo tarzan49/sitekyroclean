@@ -111,7 +111,7 @@ function generateTapetesContent(city: string, cityDesc: string): Omit<LocationSe
       { title: "Alergénios e ácaros", description: `Os tapetes são dos principais reservatórios de ácaros e alergénios numa casa, contribuindo para problemas respiratórios.` },
       { title: "Cores desbotadas", description: `Sem limpeza adequada, as cores dos tapetes perdem vivacidade. A nossa lavagem profissional revitaliza as cores originais.` },
     ],
-    howItWorks: `Processo de limpeza de tapetes ${prep} ${city}: 1) Avaliação do tipo de tapete e fibras, 2) Pulverização com produto específico por fibra, 3) Escovação para penetrar nas fibras, 4) Extração profunda com equipamento profissional, 5) Secagem controlada para preservar as fibras. Na maioria dos casos o processo é feito em sua casa; quando o tapete tem de ser recolhido, entregamos no prazo máximo de 3 dias.`,
+    howItWorks: `Processo de limpeza de tapetes ${prep} ${city}: 1) Avaliação do tipo de tapete e fibras, 2) Pulverização com produto específico por fibra, 3) Escovação para penetrar nas fibras, 4) Extração profunda com equipamento profissional, 5) Secagem controlada para preservar as fibras. Na maioria dos casos o processo é feito em sua casa; quando o tapete tem de ser recolhido, entregamos em até 4 dias úteis.`,
     benefits: [
       "Lavagem especializada de tapetes persas, orientais, de lã e sintéticos",
       "Revitalização de cores desbotadas e remoção de manchas antigas",

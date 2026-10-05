@@ -168,7 +168,7 @@ export function buildWaUrl(_payload: QuizLeadPayload, bookingId: string): string
 export function formatQuotePrice(payload: Pick<QuizLeadPayload, 'totalPrice' | 'hasSobOrcamento' | 'hasUpsellSobItem'>): string {
   const value = payload.totalPrice;
   const price = `${Number(value.toFixed(2)).toLocaleString('pt-PT')}€`;
-  return payload.hasSobOrcamento || payload.hasUpsellSobItem
+  return (payload.hasSobOrcamento || payload.hasUpsellSobItem) && value > 0
     ? `${price} de subtotal conhecido + serviços sob orçamento`
     : value > 0 ? price : 'Sob orçamento';
 }
@@ -240,10 +240,12 @@ export function buildReceiptLines(payload: Pick<QuizLeadPayload, 'service' | 'se
       if (area === null) return;
       receiptLines.push({ label: `${payload.carpetKind === 'alcatifa' ? 'Alcatifa' : 'Tapete'} ${i + 1}: ${item.largura} × ${item.comprimento} m (${Number(area.toFixed(2))} m²)`, qty: 1, unitPrice: null, total: null });
     });
-    // Recolha e entrega (dono, 2026-10-05): o único valor fixo de um pedido de
-    // tapetes, pela área somada. Fica fora do total, que continua sob orçamento.
+    // Recolha e entrega com a deslocação incluída (dono, 2026-10-05): o único
+    // valor fixo de um pedido de tapetes, pela área somada. Sem recolha, a
+    // deslocação dos tapetes e das alcatifas é sob orçamento.
     const pickupFee = payload.rugPickup && payload.carpetKind !== 'alcatifa' ? rugPickupFee(carpetTotalArea(carpetItems)) : null;
-    if (pickupFee !== null) receiptLines.push({ label: 'Recolha e entrega do tapete (até 3 dias)', qty: 1, unitPrice: pickupFee, total: pickupFee });
+    if (pickupFee !== null) receiptLines.push({ label: 'Recolha, entrega e deslocação (até 4 dias úteis)', qty: 1, unitPrice: pickupFee, total: pickupFee });
+    else if (finalLocation) receiptLines.push({ label: `Deslocação: ${finalLocation}`, qty: 1, unitPrice: null, total: null });
   }
 
   upsellItems.forEach(item => {

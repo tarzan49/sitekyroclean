@@ -238,6 +238,8 @@ const QuizForm = ({
     calculateServicePrice,
     travelCost,
     finalTravelCost,
+    rugPickupCost,
+    rugTravelOnQuote,
     totalPrice,
     hasSobOrcamento,
     hasUpsellSobItem,
@@ -404,7 +406,7 @@ Serviço: ${serviceLabel}
 Tipo: ${serviceTypeLabel}
 Detalhes: ${detailsSummary}
 Localização: ${finalLocation}
-Deslocação: ${finalTravelCost}€
+Deslocação: ${rugPickupCost !== null ? `incluída na recolha e entrega (${rugPickupCost}€)` : rugTravelOnQuote ? 'sob orçamento' : `${finalTravelCost}€`}
 ESTIMATIVA: ${priceText}
 Contacto preferido: WhatsApp${formData.email ? `\nEmail: ${formData.email}` : ''}
 
@@ -619,7 +621,9 @@ ${formData.description || 'Sem observações adicionais'}
           {currentStep !== totalSteps && (totalPrice > 0 || hasSobOrcamento) && (activeUpsellScreen === 'combo' || finalTravelCost > 0 || (currentStep !== 1 && currentStep !== 2)) && (
             <QuizEstimate
               totalPrice={totalPrice}
-              travelCost={finalTravelCost}
+              travelCost={rugPickupCost ?? finalTravelCost}
+              travelRowLabel={rugPickupCost !== null ? 'Recolha, entrega e deslocação' : undefined}
+              travelOnQuote={rugTravelOnQuote}
               needsQuote={hasSobOrcamento || hasUpsellSobItem}
               travelOnly={calculateServicePrice === 0 && finalTravelCost > 0}
               location={formData.location}
@@ -645,6 +649,7 @@ ${formData.description || 'Sem observações adicionais'}
                 locationQuery={locationQuery}
                 setLocationQuery={setLocationQuery}
                 scrollContainerRef={scrollContainerRef}
+                travelOnQuote={formData.service === 'carpet'}
                 onCitySelect={(city) => {
                   updateFormData({ location: city });
                   if (skipToUpsell) {
@@ -795,7 +800,7 @@ ${formData.description || 'Sem observações adicionais'}
                 explícito, aprovado em mockup 2026-09-06). */}
             {activeUpsellScreen === 'combo' && (
               <QuizComboUpsellScreen
-                travelFee={finalTravelCost}
+                travelFee={formData.service === 'carpet' ? travelCost : finalTravelCost}
                 primaryTablePrice={calculateServicePrice}
                 primaryService={formData.service}
                 upsellItems={upsellItems}

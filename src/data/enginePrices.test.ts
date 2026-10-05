@@ -207,7 +207,7 @@ describe('páginas de preço dos problemas', () => {
     const text = pageText('preco-limpeza-tapete');
     expect(text.split(RUG_PICKUP_FEE_RULE).join('')).not.toMatch(/\d\s*€/);
     expect(text).not.toMatch(/recolha e entrega (ao domicílio )?(estão )?incluídas|incluídas no preço/i);
-    expect(text).toContain('prazo máximo de 3 dias');
+    expect(text).toContain('até 4 dias úteis');
     expect(faqAnswer('preco-limpeza-tapete', /recolha/)).toContain(RUG_PICKUP_FEE_RULE);
   });
 });

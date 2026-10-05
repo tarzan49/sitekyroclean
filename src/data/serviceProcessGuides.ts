@@ -30,7 +30,7 @@ export const SERVICE_PROCESS_GUIDES = {
   'limpeza-tapetes': {
     heading: 'A limpeza do seu tapete', subtitle, image: '/images/services/process-tapetes.webp',
     steps: [
-      step('Avaliação', 'Conhecemos as fibras e a base.', 'Verificamos o material, as cores, a base e as manchas para definir um método compatível. Na maioria dos casos, a limpeza é feita em sua casa; quando o tapete tem de ser recolhido, entregamos no prazo máximo de 3 dias. O orçamento depende das medidas e da avaliação.', 'Inspeção da trama e do canto do tapete'),
+      step('Avaliação', 'Conhecemos as fibras e a base.', 'Verificamos o material, as cores, a base e as manchas para definir um método compatível. Na maioria dos casos, a limpeza é feita em sua casa; quando o tapete tem de ser recolhido, entregamos em até 4 dias úteis. O orçamento depende das medidas e da avaliação.', 'Inspeção da trama e do canto do tapete'),
       step('Aspiração', 'Começamos pela sujidade solta.', 'Aspiramos a superfície para retirar poeiras e resíduos soltos, com atenção às fibras e às extremidades.', 'Aspiração de um tapete com bordos visíveis'),
       step('Aplicação', 'Preparamos as fibras para a limpeza.', 'Aplicamos o produto adequado nas zonas a tratar, após verificar a compatibilidade. Explicamos antecipadamente as limitações das manchas.', 'Aplicação de produto num tapete'),
       step('Extração', 'Retiramos os resíduos das fibras.', 'Quando o material permite limpeza por extração, retiramos a sujidade e a água com equipamento adequado ao tapete.', 'Extração de um tapete com equipamento de chão'),

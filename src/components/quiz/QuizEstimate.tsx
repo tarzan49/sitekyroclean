@@ -6,9 +6,13 @@ interface QuizEstimateProps {
   travelOnly: boolean;
   location: string;
   travelCost?: number;
+  // Tapetes e alcatifas (2026-10-05): com recolha, a linha da deslocação passa a
+  // "Recolha, entrega e deslocação"; em casa, a deslocação é sob orçamento.
+  travelRowLabel?: string;
+  travelOnQuote?: boolean;
 }
 
-export default function QuizEstimate({ totalPrice, needsQuote, travelOnly, location, travelCost }: QuizEstimateProps) {
+export default function QuizEstimate({ totalPrice, needsQuote, travelOnly, location, travelCost, travelRowLabel, travelOnQuote = false }: QuizEstimateProps) {
   const target = Math.round(totalPrice);
   const [amount, setAmount] = useState(target);
   const displayed = useRef(target);
@@ -51,14 +55,17 @@ export default function QuizEstimate({ totalPrice, needsQuote, travelOnly, locat
           real reportado: "1 cadeira" a 20€ + 10€ deslocação aparecia só como
           "30€", parecendo que a cadeira sozinha custava 30€). */}
       {travelCost !== undefined && travelCost > 0 && !travelOnly && (
-        <p className="text-sm text-white/80 -mt-0.5">Inclui {travelCost}€ de deslocação{location ? ` a ${location}` : ''}</p>
+        <p className="text-sm text-white/80 -mt-0.5">Inclui {travelCost}€ de {travelRowLabel ? travelRowLabel.toLowerCase() : 'deslocação'}{location ? ` a ${location}` : ''}</p>
+      )}
+      {travelOnQuote && !travelOnly && (
+        <p className="text-sm text-white/80 -mt-0.5">Deslocação{location ? ` a ${location}` : ''} sob orçamento</p>
       )}
       {travelCost !== undefined && !travelOnly && (
         <details className="mt-2 [@media(max-height:800px)]:mt-1 text-sm text-white/70">
           <summary className="cursor-pointer py-1 text-white/80 hover:text-gold">Ver composição do orçamento</summary>
           <dl className="mt-1 space-y-1 border-t border-white/10 pt-2">
             <div className="flex justify-between gap-3"><dt>Serviços{needsQuote ? ' com preço definido' : ''}</dt><dd>{Math.round(totalPrice - travelCost)}€</dd></div>
-            <div className="flex justify-between gap-3"><dt>Deslocação{location ? ` · ${location}` : ''}</dt><dd>{travelCost === 0 && location ? 'Gratuita' : `${travelCost}€`}</dd></div>
+            <div className="flex justify-between gap-3"><dt>{travelRowLabel ?? 'Deslocação'}{location ? ` · ${location}` : ''}</dt><dd>{travelOnQuote ? 'Sob orçamento' : travelCost === 0 && location ? 'Gratuita' : `${travelCost}€`}</dd></div>
             {needsQuote && <div className="text-gold">Acrescem os serviços sob orçamento.</div>}
           </dl>
         </details>

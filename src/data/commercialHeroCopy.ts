@@ -1,7 +1,7 @@
 import { services } from './serviceCatalog';
 import { EXTENDED_TRIP_CITIES, locationPrices } from '../constants/travel';
 import { REVIEW_COUNT, REVIEW_RATING } from '../constants/business';
-import { TRAVEL_FEE_MIN } from '../constants/commercialPolicy';
+import { RUG_SERVICE_SLUGS, TRAVEL_FEE_MIN } from '../constants/commercialPolicy';
 import { formatEuro, perChairPrice, startingPriceLabel, isPricedPerChair, chairPriceBreakdown, SOFA_WATERPROOF_ESSENCIAL_FROM, SOFA_WATERPROOF_PREMIUM_FROM, CHAIR_WATERPROOF_ESSENCIAL_UNIT, CHAIR_WATERPROOF_PREMIUM_UNIT } from './enginePrices';
 
 // Preços da impermeabilização vindos do mesmo motor que o quiz usa, nunca
@@ -52,6 +52,8 @@ export const commercialHeroSubtitle = (serviceSlug: string, city?: string) => `$
  * a haver duas verdades, que é precisamente o que isto existe para impedir.
  */
 export const commercialHeroPriceLine = (serviceSlug: string, municipality?: string, price?: string): string => {
+  // Tapetes e alcatifas: a deslocação também é sob orçamento (dono, 2026-10-05).
+  if (RUG_SERVICE_SLUGS.includes(serviceSlug)) return 'Sob orçamento, incluindo a deslocação.';
   const service = services.find(item => item.slug === serviceSlug);
   const fee = municipality ? locationPrices[municipality] : undefined;
   const value = price ?? service?.priceFrom ?? 'Sob orçamento';

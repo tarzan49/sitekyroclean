@@ -41,6 +41,6 @@ export function getLandingEditorial(context: EditorialContext) {
     intro = `${serviceLabel} ${where}, com ${brief.assessment}. ${brief.request}`;
   }
   if (consultation) intro += ' Disponibilidade sob consulta.';
-  const metaDescription = `${family === 'preco' ? 'Preços: ' : ''}${serviceLabel} ${metaWhere}. ${quoteOnly ? 'Sob orçamento' : 'Orçamento gratuito'}, com deslocação discriminada.${consultation ? ' Disponibilidade sob consulta.' : ' Avaliação antes da marcação.'}`;
+  const metaDescription = `${family === 'preco' ? 'Preços: ' : ''}${serviceLabel} ${metaWhere}. ${quoteOnly ? 'Sob orçamento, incluindo a deslocação' : 'Orçamento gratuito, com deslocação discriminada'}.${consultation ? ' Disponibilidade sob consulta.' : ' Avaliação antes da marcação.'}`;
   return { intro, metaDescription };
 }

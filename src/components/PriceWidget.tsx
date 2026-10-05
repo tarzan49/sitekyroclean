@@ -9,6 +9,7 @@ import { usePriceWidgetState } from "@/hooks/use-price-widget";
 import { useQuizLauncher } from "@/hooks/use-quiz-launcher";
 import QuizFormLazy from "@/components/QuizFormLazy";
 import { locationPrices } from "@/components/quiz/QuizTypes";
+import { RUG_SERVICE_SLUGS } from "@/constants/commercialPolicy";
 import type { PriceRowQuizConfig } from "@/data/locationPriceTestimonialsData";
 import {
   widgetWaterproofPrice, calcWidgetTotal, calcChairBracket, calcWidgetPricing,
@@ -31,6 +32,9 @@ export default function PriceWidget({ serviceSlug, initialLocation }: Props) {
 
   const quizConfigs = PRICE_TABLE_QUIZ_CONFIG[serviceSlug] ?? [];
   const isAlcatifaService = serviceSlug === 'limpeza-alcatifas';
+  // Tapetes e alcatifas: a deslocação também é sob orçamento; com recolha vem
+  // incluída no valor da recolha, escolhido no questionário (dono, 2026-10-05).
+  const isRugService = RUG_SERVICE_SLUGS.includes(serviceSlug);
   const isWaterproofService = serviceSlug === 'impermeabilizacao';
 
   const handleContinue = () => {
@@ -70,7 +74,7 @@ export default function PriceWidget({ serviceSlug, initialLocation }: Props) {
       </div>
       {hasSelection && <div className="px-4 sm:px-6">
         <QuizEstimate totalPrice={total > 0 ? pricing.grandTotal : 0} needsQuote={hasUnpricedSelection} travelOnly={false} location={initialLocation ?? ''} travelCost={initialLocation && total > 0 ? pricing.travelFee : undefined} />
-        {!initialLocation && <p className="pt-2 text-center text-base text-white/80">Deslocação a confirmar conforme a localidade.</p>}
+        {!initialLocation && !isRugService && <p className="pt-2 text-center text-base text-white/80">Deslocação a confirmar conforme a localidade.</p>}
       </div>}
       <div className="px-4 sm:px-6 pt-5 pb-4 text-center">
         <p className="text-gold text-sm font-bold tracking-[0.08em] uppercase mb-3">{isWaterproofService ? 'PROTEÇÃO' : 'QUANTIDADES'}</p>
@@ -173,7 +177,7 @@ export default function PriceWidget({ serviceSlug, initialLocation }: Props) {
                     onClick={() => w.addCarpetItem(i)}
                     className="w-full flex items-center justify-center gap-1.5 py-1.5 rounded-sm border-2 border-dashed border-gold/30 text-gold/80 text-sm font-bold hover:border-gold/60 hover:bg-gold/[0.04] transition-all touch-manipulation"
                   >
-                    <Plus className="w-3 h-3" /> Adicionar outra {pieceLabel.toLowerCase()}
+                    <Plus className="w-3 h-3" /> {isAlcatifaService ? 'Adicionar outra divisão' : 'Adicionar outro tapete'}
                   </button>
                   {isAlcatifaService && (
                     <div className="flex items-center justify-between px-1">
@@ -211,7 +215,9 @@ export default function PriceWidget({ serviceSlug, initialLocation }: Props) {
       </div>
 
       <div className="px-3 sm:px-0 pb-5 w-full max-w-sm mx-auto">
-        {!hasSelection && <p className="text-base text-white/80 mb-3">{initialLocation ? `Deslocação a ${initialLocation}: ${travelFee} €` : 'Deslocação calculada conforme a localidade.'}</p>}
+        {isRugService
+          ? <p className="text-base text-white/80 mb-3">{isAlcatifaService ? 'Lavagem e deslocação sob orçamento.' : 'Lavagem e deslocação sob orçamento. Com recolha e entrega, a deslocação já vem incluída: 10€ a 20€, conforme a área.'}</p>
+          : !hasSelection && <p className="text-base text-white/80 mb-3">{initialLocation ? `Deslocação a ${initialLocation}: ${travelFee} €` : 'Deslocação calculada conforme a localidade.'}</p>}
         <button type="button" onClick={handleContinue} disabled={!hasSelection || incompleteMeasures} className={cn("w-full min-h-12 py-3 flex items-center justify-center gap-3 bg-gradient-to-r from-gold to-[#d4c57b] hover:from-[#d4c57b] hover:to-gold text-[#12121e] font-bold text-base tracking-wider uppercase touch-manipulation active:scale-[0.98] rounded-sm shadow-[0_4px_28px_rgba(212,175,55,0.40)] transition-all focus-visible:outline focus-visible:outline-2 focus-visible:outline-white", !hasSelection && "opacity-60")}>
           Continuar <ChevronRight className="w-5 h-5" />
         </button>
@@ -238,7 +244,9 @@ export default function PriceWidget({ serviceSlug, initialLocation }: Props) {
           initialUpsellItems={activeConfig.initialUpsellItems}
           initialWaterproofingTier={activeConfig.waterproofingTier}
           initialChairWaterproofing={activeConfig.chairWaterproofing}
-          skipToUpsell
+          // Tapetes: abre no passo das medidas (já preenchidas), para a pessoa
+          // escolher entre a lavagem em casa e a recolha (dono, 2026-10-05).
+          skipToUpsell={serviceSlug !== 'limpeza-tapetes'}
         />
       )}
     </div>

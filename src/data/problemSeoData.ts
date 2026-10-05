@@ -595,7 +595,7 @@ const problemDefinitions: ProblemPage[] = [
       "Teste de solidez de cor",
       "Preserva fibras naturais",
       "Secagem controlada",
-      "Recolha só quando é precisa, com entrega em 3 dias no máximo",
+      "Recolha só quando é precisa, com entrega em até 4 dias úteis",
       "Experiência com tapetes de valor",
     ],
     faqs: [
@@ -623,7 +623,7 @@ const problemDefinitions: ProblemPage[] = [
       "Sem risco de encolhimento",
       "Preserva maciez natural",
       "Secagem plana controlada",
-      "Recolha só quando a fibra o exige, com entrega em 3 dias",
+      "Recolha só quando a fibra o exige, com entrega em até 4 dias úteis",
     ],
     faqs: [
       { question: "A lavagem faz o tapete de lã encolher?", answer: "Não. Controlamos a temperatura da água e o processo de secagem para prevenir qualquer encolhimento." },
@@ -788,12 +788,12 @@ const problemDefinitions: ProblemPage[] = [
     title: "Quanto Custa Lavar um Tapete? | Orçamento Grátis | Kyro",
     metaDescription: "Preços de lavagem profissional de tapetes. Orçamento à medida de cada tapete. Lavagem em sua casa na maioria dos casos. Peça orçamento grátis.",
     h1: "Quanto Custa a Lavagem Profissional de Tapetes?",
-    intro: "Na Kyro Clean Solutions cada tapete é medido (largura x comprimento) e orçamentado individualmente. Na maioria dos casos lavamos o tapete em sua casa; quando é preciso recolhê-lo, entregamos no prazo máximo de 3 dias.",
+    intro: "Na Kyro Clean Solutions cada tapete é medido (largura x comprimento) e orçamentado individualmente. Na maioria dos casos lavamos o tapete em sua casa; quando é preciso recolhê-lo, entregamos em até 4 dias úteis.",
     problemDetail: "O custo de lavagem de tapetes depende do tamanho, tipo de fibra (sintética, lã, seda), estado de sujidade e da necessidade de recolha. Tapetes orientais e persas podem ter cotação especial devido ao cuidado adicional necessário.",
     // Em casa por defeito, recolha só quando é precisa, com o custo de
     // RUG_PICKUP_FEE_RULE (dono, 2026-10-05); o desconto para vários tapetes
     // existe (dono, 2026-09-30).
-    solutionDetail: `Cada tapete é medido individualmente e orçamentado conforme a dimensão, tipo de fibra e estado de sujidade, sem tabela fixa por m². Tapetes persas/orientais têm cotação especial. Na maioria dos casos a lavagem é feita em sua casa; quando o material ou o estado do tapete exigem recolha, entregamos no prazo máximo de 3 dias. ${RUG_PICKUP_FEE_RULE} Desconto para múltiplos tapetes.`,
+    solutionDetail: `Cada tapete é medido individualmente e orçamentado conforme a dimensão, tipo de fibra e estado de sujidade, sem tabela fixa por m². Tapetes persas/orientais têm cotação especial. Na maioria dos casos a lavagem é feita em sua casa; quando o material ou o estado do tapete exigem recolha, entregamos em até 4 dias úteis. ${RUG_PICKUP_FEE_RULE} Desconto para múltiplos tapetes.`,
     benefits: [
       "Orçamento à medida de cada tapete",
       "Lavagem em sua casa na maioria dos casos",
@@ -803,7 +803,7 @@ const problemDefinitions: ProblemPage[] = [
       "Sem custos ocultos",
     ],
     faqs: [
-      { question: "A recolha e entrega do tapete têm custo?", answer: `Na maioria dos casos lavamos o tapete em sua casa, sem recolha. Quando o material ou o estado do tapete o exigem, recolhemos e entregamos no prazo máximo de 3 dias. ${RUG_PICKUP_FEE_RULE} ${RUG_PICKUP_RULE}` },
+      { question: "A recolha e entrega do tapete têm custo?", answer: `Na maioria dos casos lavamos o tapete em sua casa, sem recolha. Quando o material ou o estado do tapete o exigem, recolhemos e entregamos em até 4 dias úteis. ${RUG_PICKUP_FEE_RULE} ${RUG_PICKUP_RULE}` },
       { question: "Tapetes persas são mais caros de lavar?", answer: "Tapetes persas e orientais requerem técnicas mais delicadas e são cotados individualmente, mas os preços continuam acessíveis." },
     ],
     relatedProblems: ["preco-limpeza-sofa", "manchas-tapete", "tapete-persa"],

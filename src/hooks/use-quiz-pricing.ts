@@ -1,9 +1,10 @@
 import { calculateTravelFee } from '@/constants/travel';
+import { rugPickupFee } from '@/constants/commercialPolicy';
 import { splitTreatmentItems } from '@/components/quiz/quizHelpers';
 import { useMemo } from 'react';
 import type { QuizFormData, SofaItem, MattressItem, CarpetItem, UpsellItemConfig } from '@/components/quiz';
 import { sofaPrices, mattressPrices, locationPrices } from '@/components/quiz';
-import { calcSofaUnitPrice, calcMattressUnitPrice, calcChairAntiAcaros, calcChairClean, calcChairWaterproof, calcChairWaterproofPremium, carpetHasValidItems } from '@/components/quiz/quizHelpers';
+import { calcSofaUnitPrice, calcMattressUnitPrice, calcChairAntiAcaros, calcChairClean, calcChairWaterproof, calcChairWaterproofPremium, carpetHasValidItems, carpetTotalArea } from '@/components/quiz/quizHelpers';
 
 export function useQuizPricing(
   formData: QuizFormData,
@@ -82,8 +83,15 @@ export function useQuizPricing(
 
   const safePrice = (n: number) => (isNaN(n) || n == null) ? 0 : n;
   const upsellItemsTotal = upsellItems.reduce((sum, item) => sum + safePrice(item.price), 0);
-  const finalTravelCost = calculateTravelFee(travelCost, safePrice(calculateServicePrice) + upsellItemsTotal);
-  const totalPrice = safePrice(calculateServicePrice) + safePrice(upsellItemsTotal) + safePrice(finalTravelCost) + 0;
+  // Tapetes e alcatifas (dono, 2026-10-05): na lavagem em casa a deslocação é
+  // sob orçamento, por isso não entra no total; com recolha, a recolha e
+  // entrega (rugPickupFee) já inclui a deslocação e é o único valor conhecido.
+  const isRugService = formData.service === 'carpet';
+  const rugPickupCost = isRugService && formData.carpetKind !== 'alcatifa' && formData.rugPickup
+    ? rugPickupFee(carpetTotalArea(carpetItems)) : null;
+  const rugTravelOnQuote = isRugService && rugPickupCost === null;
+  const finalTravelCost = isRugService ? 0 : calculateTravelFee(travelCost, safePrice(calculateServicePrice) + upsellItemsTotal);
+  const totalPrice = safePrice(calculateServicePrice) + safePrice(upsellItemsTotal) + safePrice(finalTravelCost) + (rugPickupCost ?? 0);
   // True when the user has qty>0 of the "4+ lugares" sofa, or any measured
   // carpet (carpets never have a fixed price anymore — always a custom quote,
   // see carpetHasValidItems) — without this, calculateServicePrice silently
@@ -118,6 +126,8 @@ export function useQuizPricing(
     calculateServicePrice,
     travelCost,
     finalTravelCost,
+    rugPickupCost,
+    rugTravelOnQuote,
     totalPrice,
     hasSobOrcamento,
     hasUpsellSobItem,

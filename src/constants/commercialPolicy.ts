@@ -20,10 +20,11 @@ export const TREATMENT_EXTRAS = 'A limpeza remove sujidade e resíduos das fibra
 export const RUG_PICKUP_MIN_AREA_M2 = 3;
 export const RUG_PICKUP_RULE = `Só fazemos recolha quando os tapetes do pedido somam ${RUG_PICKUP_MIN_AREA_M2} m² ou mais; abaixo disso, a lavagem é sempre feita em sua casa.`;
 
-// Custo da recolha e entrega (dono, 2026-10-05): mais 10€ até 6 m², mais 15€
-// acima de 6 m² e mais 20€ a partir de 10 m². Conta a soma dos tapetes do
-// pedido, como o mínimo acima. A lavagem continua sob orçamento: este é o
-// único valor dos tapetes que o site escreve.
+// Recolha e entrega, com a deslocação incluída (dono, 2026-10-05): 10€ até
+// 6 m², 15€ acima de 6 m² e 20€ a partir de 10 m², pela soma dos tapetes do
+// pedido, como o mínimo acima. Entrega em até 4 dias úteis. A lavagem continua
+// sob orçamento, e na lavagem em casa a deslocação também (RUG_TRAVEL_RULE):
+// este é o único valor dos tapetes que o site escreve.
 /** Acréscimo da recolha para a área total do pedido, ou null quando não há recolha (abaixo do mínimo). */
 export function rugPickupFee(totalAreaM2: number): number | null {
   if (!(totalAreaM2 >= RUG_PICKUP_MIN_AREA_M2)) return null;
@@ -32,7 +33,13 @@ export function rugPickupFee(totalAreaM2: number): number | null {
   return 20;
 }
 
-export const RUG_PICKUP_FEE_RULE = 'A recolha e entrega custa mais 10€ até 6 m², mais 15€ acima de 6 m² e mais 20€ a partir de 10 m², somando os tapetes do pedido.';
+export const RUG_PICKUP_FEE_RULE = 'A recolha e entrega, com a deslocação incluída, custa 10€ até 6 m², 15€ acima de 6 m² e 20€ a partir de 10 m², somando os tapetes do pedido.';
+
+// Tapetes e alcatifas: na lavagem em casa a deslocação não tem valor de
+// tabela, entra no orçamento (dono, 2026-10-05). Os outros serviços continuam
+// com a deslocação de `locationPrices`.
+export const RUG_SERVICE_SLUGS = ['limpeza-tapetes', 'limpeza-alcatifas'];
+export const RUG_TRAVEL_RULE = 'Em tapetes e alcatifas, a deslocação também é sob orçamento.';
 
 // Os limites da deslocação saem da tabela de cada cidade, nunca de um número
 // escrito à mão: o rodapé chegou a ter um parágrafo só sobre Braga
@@ -40,7 +47,7 @@ export const RUG_PICKUP_FEE_RULE = 'A recolha e entrega custa mais 10€ até 6 
 const travelFees = Object.values(locationPrices);
 export const TRAVEL_FEE_MIN = Math.min(...travelFees);
 export const TRAVEL_FEE_MAX = Math.max(...travelFees);
-export const TRAVEL_PROMISE = `A deslocação é cobrada à parte, entre ${TRAVEL_FEE_MIN}€ e ${TRAVEL_FEE_MAX}€ conforme a localidade. O valor de cada cidade aparece na respetiva página e a morada concreta é confirmada antes da marcação.`;
+export const TRAVEL_PROMISE = `A deslocação é cobrada à parte, entre ${TRAVEL_FEE_MIN}€ e ${TRAVEL_FEE_MAX}€ conforme a localidade. O valor de cada cidade aparece na respetiva página e a morada concreta é confirmada antes da marcação. Em tapetes e alcatifas, a deslocação também é sob orçamento.`;
 
 /**
  * O bloco "Condições do serviço e garantia" que aparece no fundo de todas as

@@ -22,6 +22,7 @@ import fs from 'fs';
 import path from 'path';
 import { services, cities } from '../src/data/serviceCatalog';
 import { locationPrices } from '../src/constants/travel';
+import { RUG_PICKUP_FEE_RULE, RUG_PICKUP_RULE } from '../src/constants/commercialPolicy';
 import {
   SITE_URL,
   PHONE_DISPLAY,
@@ -73,7 +74,8 @@ export function buildLlmsTxt(): string {
   lines.push('Como ler os preços deste site:');
   lines.push('');
   lines.push('- Os valores em euros são preços de partida por artigo, não o total do serviço.');
-  lines.push(`- A deslocação é cobrada à parte e varia entre ${travelMin}€ e ${travelMax}€ conforme a cidade.`);
+  lines.push(`- A deslocação é cobrada à parte e varia entre ${travelMin}€ e ${travelMax}€ conforme a cidade. Em tapetes e alcatifas, a deslocação também é sob orçamento.`);
+  lines.push(`- Tapetes: lavagem em casa por defeito. ${RUG_PICKUP_RULE} ${RUG_PICKUP_FEE_RULE} Entrega em até 4 dias úteis.`);
   lines.push('- Tapetes e alcatifas não têm preço de tabela: dependem das medidas e são sempre orçamentados.');
   lines.push('- O preço final é confirmado com o cliente antes da marcação, com base nos artigos, medidas, tratamento e deslocação.');
   lines.push('');

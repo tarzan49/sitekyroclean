@@ -471,7 +471,7 @@ function content_lavagem_tapetes(loc: string, ctx: string): ContentBlock {
         'Especialistas em lavagem de tapetes persas e orientais',
         `Cores e aspeto original de volta ao tapete em ${loc}`,
         'Manchas de gordura, vinho e animais removidas',
-        `Recolha em ${loc} só quando é precisa, com entrega em 3 dias`,
+        `Recolha em ${loc} só quando é precisa, com entrega em até 4 dias úteis`,
         'Cada fibra tratada com a técnica adequada',
         'Secagem controlada para preservar as fibras',
       ],

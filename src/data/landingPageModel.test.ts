@@ -1,3 +1,4 @@
+import { RUG_SERVICE_SLUGS } from '@/constants/commercialPolicy';
 import { describe, expect, it } from 'vitest';
 import { getLandingFaqRoutes } from '../../scripts/landing-faq-routes';
 import { escapeLandingHtml, renderLandingPageHtml } from '../../scripts/landing-page-html';
@@ -26,7 +27,9 @@ describe('shared landing composition', () => {
       expect(model!.directory.length).toBeGreaterThan(0);
       expect(model!.packLinks.length).toBeGreaterThan(0);
       const fee = locationPrices[model!.municipalityName];
-      if (fee !== undefined) expect(model!.pricingDescription).toContain(`+${fee}€`);
+      // Tapetes e alcatifas: a deslocação é sob orçamento (dono, 2026-10-05).
+      if (RUG_SERVICE_SLUGS.includes(model!.serviceSlug)) expect(model!.pricingDescription).toContain('Deslocação também sob orçamento');
+      else if (fee !== undefined) expect(model!.pricingDescription).toContain(`+${fee}€`);
     }
   });
   it('emits the same seven sections and service-specific content without JavaScript', () => {

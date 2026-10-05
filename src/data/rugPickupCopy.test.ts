@@ -3,13 +3,15 @@ import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { RUG_PICKUP_FEE_RULE, RUG_PICKUP_RULE, rugPickupFee } from '../constants/commercialPolicy';
 import { getAllPosts } from './blogData';
+import { commercialHeroPriceLine } from './commercialHeroCopy';
+import { getLandingFaqs } from './landingFaqPool';
 import { getLandingFaqPool } from './landingFaqPool';
 import { getPillarPage } from './pillarPages';
 import { getProblemBySlug } from './problemSeoData';
 
 /**
  * Tapetes: lavados em casa por defeito; recolha só quando o material ou o
- * estado do tapete o exigem, com entrega em 3 dias no máximo e com custo,
+ * estado do tapete o exigem, com entrega em até 4 dias úteis e com custo,
  * indicado no orçamento (dono, 2026-09-29/30).
  *
  * Até 2026-09-30 havia texto a dar a recolha como incluída ou como o modo
@@ -21,7 +23,7 @@ import { getProblemBySlug } from './problemSeoData';
  * Abaixo de 3 m² somados não há recolha (dono, 2026-09-30): as respostas que
  * explicam a recolha dizem-no, a partir de `RUG_PICKUP_RULE`.
  *
- * Desde 2026-10-05 o custo da recolha está escrito (dono): mais 10€ até 6 m²,
+ * Desde 2026-10-05 o custo da recolha está escrito (dono), com a deslocação incluída: 10€ até 6 m²,
  * 15€ acima disso e 20€ a partir de 10 m², a partir de `RUG_PICKUP_FEE_RULE`.
  */
 const ROOTS = ['src/data', 'src/constants', 'src/pages', 'src/components', 'scripts'];
@@ -74,5 +76,16 @@ describe('recolha dos tapetes', () => {
     expect(RUG_PICKUP_FEE_RULE).toContain(`${rugPickupFee(6)}€ até 6 m²`);
     expect(RUG_PICKUP_FEE_RULE).toContain(`${rugPickupFee(7)}€ acima de 6 m²`);
     expect(RUG_PICKUP_FEE_RULE).toContain(`${rugPickupFee(10)}€ a partir de 10 m²`);
+  });
+
+  it('em tapetes e alcatifas a deslocação é sob orçamento, sem valor de tabela (dono, 2026-10-05)', () => {
+    for (const slug of ['limpeza-tapetes', 'limpeza-alcatifas'] as const) {
+      expect(commercialHeroPriceLine(slug, 'Porto')).not.toMatch(/\d\s*€/);
+      const travelFaq = getLandingFaqs({ serviceSlug: slug, pageKey: 'teste', municipality: 'Porto', family: 'localidade' })
+        .concat(getLandingFaqs({ serviceSlug: slug, pageKey: 'outra', municipality: 'Porto', family: 'preco' }))
+        .find(f => /deslocação está incluída/.test(f.question));
+      if (travelFaq) expect(travelFaq.answer).not.toMatch(/taxa da tabela/);
+    }
+    expect(commercialHeroPriceLine('limpeza-sofas', 'Porto')).toMatch(/deslocação 10€/);
   });
 });

@@ -90,8 +90,8 @@ const QuizStepConfigCarpet = ({ carpetItems, setCarpetItems, carpetKind = 'tapet
             <div role="radiogroup" aria-labelledby={`${fieldPrefix}-pickup`} className="flex flex-col gap-2">
               <p id={`${fieldPrefix}-pickup`} className="text-base font-semibold text-white">Onde prefere a lavagem?</p>
               {([
-                { pickup: false, title: 'Em sua casa', detail: 'Seco em 3 a 6 horas' },
-                { pickup: true, title: 'Recolha e entrega', detail: `Entregamos em 3 dias no máximo · +${pickupFee}€` },
+                { pickup: false, title: 'Em sua casa', detail: 'Seco em 3 a 6 horas · deslocação sob orçamento' },
+                { pickup: true, title: 'Recolha e entrega', detail: `Até 4 dias úteis · ${pickupFee}€ com a deslocação incluída` },
               ] as const).map(option => {
                 const selected = option.pickup === pickupChosen;
                 return (

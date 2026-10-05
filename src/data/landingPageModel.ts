@@ -15,7 +15,7 @@ import { pickReviewSubset } from './reviewsPool';
 import { packs } from './packComboData';
 import { SERVICE_PACK_SLUGS } from '../constants/servicePackSlugs';
 import { locationPrices } from '../constants/travel';
-import { PRICE_PROMISE, TREATMENT_EXTRAS } from '../constants/commercialPolicy';
+import { PRICE_PROMISE, RUG_SERVICE_SLUGS, TREATMENT_EXTRAS } from '../constants/commercialPolicy';
 import type { LandingService, LandingFaqContext } from './landingFaqPool';
 import { getAllProblems } from './problemSeoData';
 import { getMaterialsByService } from './materialSeoData';
@@ -188,7 +188,7 @@ export function getLandingPageModel(pathname: string) {
     : family === 'variante' ? (parish ? `${locationName}, ${municipalityName}` : locationName) : municipalitySlug;
   const priceVerb = variantKey === 'impermeabilizacao' && serviceKey === 'cadeiras' ? 'impermeabilizar cadeiras' : LANDING_PRICE_VERBS[serviceSlug];
   const fee = locationPrices[municipalityName];
-  const pricingDescription = `${serviceSlug === 'limpeza-tapetes' ? 'Orçamento à medida de cada tapete.' : serviceSlug === 'limpeza-alcatifas' ? 'Orçamento à medida de cada espaço, sem preço fixo por m².' : 'Estimativa confirmada antes da marcação.'} ${fee === undefined ? 'Deslocação confirmada antes da marcação.' : `Deslocação +${fee}€ para ${municipalityName}.`} Orçamento gratuito e sem compromisso.`;
+  const pricingDescription = `${serviceSlug === 'limpeza-tapetes' ? 'Orçamento à medida de cada tapete.' : serviceSlug === 'limpeza-alcatifas' ? 'Orçamento à medida de cada espaço, sem preço fixo por m².' : 'Estimativa confirmada antes da marcação.'} ${RUG_SERVICE_SLUGS.includes(serviceSlug) ? 'Deslocação também sob orçamento; com recolha, vem incluída no valor da recolha.' : fee === undefined ? 'Deslocação confirmada antes da marcação.' : `Deslocação +${fee}€ para ${municipalityName}.`} Orçamento gratuito e sem compromisso.`;
   const packSlugs = SERVICE_PACK_SLUGS[serviceSlug];
   const packLinks: LandingLink[] = packs.filter(pack => packSlugs.includes(pack.slug)).map(pack => ({ label: pack.name, href: `/${pack.slug}-${municipalitySlug}` }));
   const directory: LandingDirectoryGroup[] = [];
