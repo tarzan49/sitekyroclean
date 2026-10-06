@@ -266,15 +266,26 @@ export function inWindow(rows: StatInput[], now: Date, days: number, offset = 0)
 export const contactMonth = (iso: string) =>
   new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Lisbon', year: 'numeric', month: '2-digit' }).format(new Date(iso)).slice(0, 7);
 
-/** Uma linha por mês com contactos, do mais antigo para o mais recente, só os meses que tocam a janela. */
-export function monthlyStats(rows: StatInput[], now: Date, days: number) {
-  const fromMonth = contactMonth(new Date(now.getTime() - days * DAY_MS).toISOString());
-  const byMonth = new Map<string, StatInput[]>();
+/** Segunda-feira (AAAA-MM-DD, hora de Lisboa) da semana do primeiro contacto. */
+export function contactWeek(iso: string) {
+  const day = new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Lisbon', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date(iso));
+  const d = new Date(`${day}T12:00:00Z`);
+  d.setUTCDate(d.getUTCDate() - ((d.getUTCDay() + 6) % 7));
+  return d.toISOString().slice(0, 10);
+}
+
+function groupedStats(rows: StatInput[], keyOf: (iso: string) => string) {
+  const groups = new Map<string, StatInput[]>();
   for (const r of rows) {
     if (!r.client.first_contact_at) continue;
-    const m = contactMonth(r.client.first_contact_at);
-    if (m < fromMonth) continue;
-    byMonth.set(m, [...(byMonth.get(m) ?? []), r]);
+    const k = keyOf(r.client.first_contact_at);
+    groups.set(k, [...(groups.get(k) ?? []), r]);
   }
-  return [...byMonth.keys()].sort().map(month => ({ month, ...contactStats(byMonth.get(month)!) }));
+  return [...groups.keys()].sort().map(key => ({ key, ...contactStats(groups.get(key)!) }));
 }
+
+/** Todos os meses com contactos, do mais antigo para o mais recente (não depende do período escolhido). */
+export const monthlyStats = (rows: StatInput[]) => groupedStats(rows, contactMonth);
+
+/** Todas as semanas (de segunda a domingo) com contactos, da mais antiga para a mais recente. */
+export const weeklyStats = (rows: StatInput[]) => groupedStats(rows, contactWeek);

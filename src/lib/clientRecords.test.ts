@@ -4,6 +4,8 @@ import {
   contactStats,
   inWindow,
   monthlyStats,
+  weeklyStats,
+  contactWeek,
   displayName,
   effectiveStatus,
   emptyFilters,
@@ -165,8 +167,11 @@ describe('evolution', () => {
     expect(inWindow(rows, now, 360).length).toBe(5);
   });
 
-  it('groups by month of first contact, skipping unknown dates and months before the window', () => {
-    expect(monthlyStats(rows, now, 60).map(m => [m.month, m.contacts])).toEqual([['2026-08', 1], ['2026-09', 2], ['2026-10', 1]]);
+  it('groups every month and every Monday-to-Sunday week of first contact, skipping unknown dates', () => {
+    expect(monthlyStats(rows).map(m => [m.key, m.contacts])).toEqual([['2026-06', 1], ['2026-08', 1], ['2026-09', 2], ['2026-10', 1]]);
+    expect(weeklyStats(rows).map(w => w.key)).toEqual(['2026-06-01', '2026-08-10', '2026-09-07', '2026-09-14', '2026-09-28']);
+    expect(contactWeek('2026-10-04T22:30:00Z')).toBe('2026-09-28'); // domingo 23h30 em Lisboa
+    expect(contactWeek('2026-10-04T23:30:00Z')).toBe('2026-10-05'); // já segunda em Lisboa
     expect(contactStats([]).closeRate).toBeNull();
   });
 });
