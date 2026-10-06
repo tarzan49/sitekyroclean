@@ -8,6 +8,8 @@ import { lisbonDay, weekdayOf, WEEKDAY_SHORT } from "@/lib/crmClosings";
 import CrmClosings from "./CrmClosings";
 import CrmUpsell from "./CrmUpsell";
 import CrmServiceMix from "./CrmServiceMix";
+import CrmQuizLeads from "./CrmQuizLeads";
+import { summarizeQuizLeads, QUIZ_BADGE, type QuizLeadRow } from "@/lib/crmQuizLeads";
 import { UPSELL_TEAMS, UPSELL_TEXT, ownerUpsellOf, defaultTeamFor, isUpsellTeam, splitUpsell, type UpsellTeam } from "@/lib/crmUpsell";
 
 interface ServiceRequest {
@@ -98,8 +100,10 @@ const CrmPanel = () => {
   const [records, setRecords] = useState<ServiceRequest[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [view, setView] = useState<"pedidos" | "servicos" | "fechos" | "upsell">("pedidos");
+  const [view, setView] = useState<"pedidos" | "servicos" | "fechos" | "upsell" | "questionario">("pedidos");
   const [sync, setSync] = useState<SyncState>({ status: "idle" });
+  const [quizLeads, setQuizLeads] = useState<QuizLeadRow[] | null>(null);
+  const [quizError, setQuizError] = useState<string | null>(null);
 
   const [viewedMonth, setViewedMonth] = useState(() => {
     const d = new Date();
@@ -164,7 +168,24 @@ const CrmPanel = () => {
     })();
   }, [fetchRecords, syncCalendar]);
 
+  // Pedidos do questionário, para ligar ao CRM pelo telefone (crmQuizLeads.ts).
+  const fetchQuizLeads = useCallback(async () => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data, error: err } = await (supabase as any)
+      .from("leads")
+      .select("id, created_at, name, phone, service, location, value, source")
+      .order("created_at", { ascending: true });
+    if (err) { setQuizError(err.message); return; }
+    setQuizError(null);
+    setQuizLeads((data ?? []) as QuizLeadRow[]);
+  }, []);
+
+  useEffect(() => { fetchQuizLeads(); }, [fetchQuizLeads]);
+
+  const quizSummary = useMemo(() => quizLeads ? summarizeQuizLeads(quizLeads, records) : null, [quizLeads, records]);
+
   const runSync = async () => {
+    fetchQuizLeads();
     const rows = await fetchRecords();
     if (rows && await syncCalendar(rows)) await fetchRecords();
   };
@@ -311,7 +332,7 @@ const CrmPanel = () => {
     const rows = filtered.map(r => [
       new Date(r.request_date + "T00:00:00").getDate(),
       r.booked_at ? lisbonDay(r.booked_at) : "",
-      r.description, r.client_name ?? "", r.locality ?? "", r.city ?? "", r.phone ?? "", r.source ?? "",
+      r.description, r.client_name ?? "", r.locality ?? "", r.city ?? "", r.phone ?? "", quizSummary?.quizServiceIds.has(r.id) ? [r.source, QUIZ_BADGE].filter(Boolean).join(" + ") : r.source ?? "",
       r.billed_value.toFixed(2), cutOf(r).toFixed(2), (Number(r.upsell_value) || 0).toFixed(2), r.upsell_team ?? "", r.paid ? "Sim" : "Não",
     ].map(c => `"${String(c ?? "").replace(/"/g, '""')}"`));
     const csv = [headers, ...rows].map(r => r.join(",")).join("\n");
@@ -331,7 +352,7 @@ const CrmPanel = () => {
         <div>
           <h2 className="text-lg font-bold text-navy">CRM — Pedidos de Serviço</h2>
           <p className="text-sm text-gray-500">
-            {view === "pedidos" || view === "servicos" ? `${monthRecords.length} pedido${monthRecords.length === 1 ? "" : "s"} neste mês` : "Serviços fechados por dia"}
+            {view === "pedidos" || view === "servicos" ? `${monthRecords.length} pedido${monthRecords.length === 1 ? "" : "s"} neste mês` : view === "questionario" ? "Pedidos do questionário do site e quantos fecharam" : "Serviços fechados por dia"}
             {reviewCount > 0 && <span className="text-amber-700"> · {reviewCount} para rever</span>}
           </p>
           <p className="text-[11px] text-gray-500 flex items-center gap-1 mt-0.5">
@@ -382,7 +403,7 @@ const CrmPanel = () => {
       </div>
 
       <div className="flex gap-1 border-b border-gray-200" role="tablist">
-        {([["pedidos", "Pedidos"], ["servicos", "Serviços"], ["fechos", "Fechos"], ["upsell", "Upsell"]] as const).map(([id, label]) => (
+        {([["pedidos", "Pedidos"], ["servicos", "Serviços"], ["fechos", "Fechos"], ["upsell", "Upsell"], ["questionario", "Questionário"]] as const).map(([id, label]) => (
           <button key={id} role="tab" aria-selected={view === id} onClick={() => setView(id)}
             className={`px-4 py-2 text-sm font-semibold -mb-px border-b-2 transition-colors ${view === id ? "border-[#D4AF37] text-navy" : "border-transparent text-gray-500 hover:text-navy"}`}>
             {label}
@@ -402,6 +423,8 @@ const CrmPanel = () => {
           records={monthRecords.map(r => ({ ...r, my_cut: cutOf(r) }))}
           allRecords={records.map(r => ({ ...r, my_cut: cutOf(r) }))} />
       )}
+
+      {view === "questionario" && <CrmQuizLeads summary={quizSummary} error={quizError} />}
 
       {view === "fechos" && <CrmClosings records={records.map(r => ({ ...r, my_cut: cutOf(r) }))} />}
 
@@ -532,7 +555,11 @@ const CrmPanel = () => {
                       <span className="flex items-center gap-1"><Phone className="w-3 h-3 text-gray-400" />{r.phone}</span>
                     ) : "-"}
                   </td>
-                  <td className="px-2 py-2 text-gray-500 truncate" title={r.source ?? undefined}>{r.source?.startsWith("Google Calendar") ? "Calendário" : r.source || "-"}</td>
+                  <td className="px-2 py-2 text-gray-500 truncate" title={[r.source, quizSummary?.quizServiceIds.has(r.id) && "Pediu orçamento pelo questionário do site"].filter(Boolean).join(" · ") || undefined}>
+                    {quizSummary?.quizServiceIds.has(r.id)
+                      ? <span className="px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-blue-50 text-blue-700 border border-blue-200">{QUIZ_BADGE}</span>
+                      : r.source?.startsWith("Google Calendar") ? "Calendário" : r.source || "-"}
+                  </td>
                   <td className="px-2 py-2 font-semibold text-navy whitespace-nowrap">{money(r.billed_value)}</td>
                   <td className="px-2 py-2 font-semibold text-gold whitespace-nowrap" title={ownerUpsellOf(r) ? `${money(r.my_cut)} do serviço + ${money(ownerUpsellOf(r))} de upsell` : undefined}>{money(cutOf(r))}</td>
                   <td className={`px-2 py-2 font-semibold whitespace-nowrap ${UPSELL_TEXT}`} title={r.upsell_value ? `${r.upsell_team ?? defaultTeamFor(r.locality)}` : undefined}>{r.upsell_value ? money(Number(r.upsell_value)) : "-"}</td>
