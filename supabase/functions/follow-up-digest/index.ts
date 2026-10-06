@@ -84,7 +84,9 @@ export async function handleDigestRequest(req: Request, env: DigestEnv): Promise
   const now = env.now();
   const today = lisbonDay(now);
 
-  if (fromCron) {
+  // Com a chave, só se envia às 9h de Lisboa e uma vez por dia; ver sem enviar
+  // (send: false) pode ser a qualquer hora, para testar a função publicada.
+  if (fromCron && send) {
     if (Number(LISBON_HOUR.format(now)) % 24 !== SEND_HOUR_LISBON) return createSuccessResponse({ skipped: "fora da hora" });
     if (await env.store.sentOn(today)) return createSuccessResponse({ skipped: "já enviado hoje" });
   }

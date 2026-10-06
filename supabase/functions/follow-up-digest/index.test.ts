@@ -50,6 +50,9 @@ Deno.test("cron sends only at 9h in Lisbon, once a day", async () => {
   assertEquals((await call("2026-10-06T08:30:00Z", { sent: true })).json.skipped, "já enviado hoje");
   // Hora de inverno: 9h30 UTC são 9h30 em Lisboa.
   assertEquals((await call("2026-12-07T09:30:00Z")).json.sent !== undefined, true);
+  // Ver sem enviar funciona a qualquer hora, e não regista o dia.
+  const preview = await call("2026-10-06T21:00:00Z", { body: { send: false } });
+  assertEquals([preview.json.count, preview.log.mails.length, preview.log.recorded.length], [1, 0, 0]);
 });
 
 Deno.test("an admin can preview the e-mail without sending it", async () => {
