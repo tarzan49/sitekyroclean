@@ -1,10 +1,11 @@
 import { useState, lazy, Suspense } from "react";
 import { Link } from "react-router-dom";
-import { AlertTriangle, BarChart3, Home, Settings2, Lock, LogOut, Users, Globe, MessageCircle, Mail, Megaphone } from "lucide-react";
+import { AlertTriangle, BarChart3, Home, Settings2, Lock, LogOut, Users, Globe, MessageCircle, Mail, Megaphone, Contact } from "lucide-react";
 import { isSupabaseConfigured, supabase } from "@/integrations/supabase/client";
 import { useAdminSession } from "@/hooks/use-admin-session";
 
 const CrmPanel = lazy(() => import("./admin/CrmPanel"));
+const ClientsPanel = lazy(() => import("./admin/ClientsPanel"));
 const SitemapMonitor = lazy(() => import("./admin/SitemapMonitor"));
 const ErrorLogPanel = lazy(() => import("./admin/ErrorLogPanel"));
 const QuizMetricsPanel = lazy(() => import("./admin/QuizMetricsPanel"));
@@ -12,7 +13,7 @@ const WhatsAppPanel = lazy(() => import("./admin/WhatsAppPanel"));
 const QuizLeadsPanel = lazy(() => import("./admin/QuizLeadsPanel"));
 const MarketingPanel = lazy(() => import("./admin/MarketingPanel"));
 
-type Tab = "sitemap" | "errors" | "metrics" | "crm" | "whatsapp" | "quiz-leads" | "marketing" | "meta-marketing";
+type Tab = "sitemap" | "errors" | "metrics" | "crm" | "clientes" | "whatsapp" | "quiz-leads" | "marketing" | "meta-marketing";
 
 const TabFallback = () => (
   <div className="flex items-center justify-center py-16">
@@ -151,6 +152,7 @@ const AdminPanel = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 flex gap-1 pb-0 overflow-x-auto scrollbar-none">
           {([
             { id: "crm",       label: "CRM",          icon: Users },
+            { id: "clientes",  label: "Clientes",     icon: Contact },
             { id: "quiz-leads", label: "Quiz Leads",  icon: Mail },
             { id: "marketing", label: "Google Ads",  icon: Megaphone },
             { id: "meta-marketing", label: "Meta Ads", icon: Megaphone },
@@ -211,6 +213,12 @@ const AdminPanel = () => {
         {activeTab === "crm" && (
           <Suspense fallback={<TabFallback />}>
             <CrmPanel />
+          </Suspense>
+        )}
+
+        {activeTab === "clientes" && (
+          <Suspense fallback={<TabFallback />}>
+            <ClientsPanel />
           </Suspense>
         )}
 
