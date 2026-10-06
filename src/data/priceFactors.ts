@@ -16,7 +16,7 @@ const TRAVEL: PriceFactor = {
 
 export const PRICE_FACTORS: Record<string, PriceFactor[]> = {
   "limpeza-sofas": [
-    { icon: 'Sofa', title: "Qual é o tamanho do sofá?", description: "A limpeza tem preço por sofá, conforme o número de lugares.", examples: ["1, 2 ou 3 lugares", "Sofá de canto ou com mais de 3 lugares: sob orçamento", "Sofá em pele: confirmado no orçamento"] },
+    { icon: 'Sofa', title: "Qual é o tamanho do sofá?", description: "A limpeza tem preço por sofá, conforme o número de lugares.", examples: ["1, 2, 3 ou 4 lugares", "Sofá de canto, em U, modular ou com 5 ou mais lugares: sob orçamento", "Sofá em pele: confirmado no orçamento"] },
     { icon: 'ShieldCheck', title: "Que tratamento quer?", description: "A limpeza pode ficar sozinha ou levar um tratamento, com preço próprio.", examples: ["Só limpeza", "Impermeabilização Essencial ou Premium", "Anti-ácaros"] },
     TRAVEL,
   ],
@@ -41,7 +41,7 @@ export const PRICE_FACTORS: Record<string, PriceFactor[]> = {
     { icon: 'MapPin', title: "Como é o acesso?", description: "Planeamos o trabalho de acordo com as condições do local.", examples: ["Acessibilidade do espaço", "Disponibilidade da área a limpar"] },
   ],
   "impermeabilizacao": [
-    { icon: 'Sofa', title: "O que quer proteger?", description: "A proteção tem preço por sofá, conforme o número de lugares, ou por cadeira.", examples: ["Sofá de 1, 2 ou 3 lugares", "Sofá de canto ou com mais de 3 lugares: sob orçamento", "Cadeiras, por unidade"] },
+    { icon: 'Sofa', title: "O que quer proteger?", description: "A proteção tem preço por sofá, conforme o número de lugares, ou por cadeira.", examples: ["Sofá de 1, 2, 3 ou 4 lugares", "Sofá de canto, em U, modular ou com 5 ou mais lugares: sob orçamento", "Cadeiras, por unidade"] },
     { icon: 'ShieldCheck', title: "Que proteção quer?", description: "Há duas versões, com preços diferentes, e pode juntar a limpeza na mesma visita.", examples: ["Essencial, à base de água", "Premium, à base de solvente", "Com limpeza na mesma visita"] },
     TRAVEL,
   ],

@@ -13,7 +13,7 @@ const read = (path: string) => readFileSync(resolve(__dirname, '..', '..', path)
 // sério" (dono, 2026-09-26). Estes testes travam os três defeitos desse dia.
 describe('anti-ácaros: um só preço em todo o lado', () => {
   it('keeps the approved prices', () => {
-    expect(SOFA_ANTI_ACAROS_PRICE).toEqual({ '1-lugar': 20, '2-lugares': 40, '3-lugares': 50 });
+    expect(SOFA_ANTI_ACAROS_PRICE).toEqual({ '1-lugar': 20, '2-lugares': 40, '3-lugares': 50, '4-lugares': 60 });
     expect(CHAIR_ANTI_ACAROS_UNIT_PRICE).toBe(5);
     expect(CHAIR_ANTI_ACAROS_UNIT_LABEL).toBe('5€/un.');
     expect(mattressPrices.map(mattressAntiAcarosPrice)).toEqual([15, 20, 25]);

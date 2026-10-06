@@ -67,7 +67,7 @@ describe('custom pack commercial rules', () => {
     expect(result.savings).toBeGreaterThan(0);
   });
   it('never invents a price for an added sofa that has none', () => {
-    const items = [{ ...makePackItem('mattress', 'm'), size: 'casal' }, { ...makePackItem('sofa', 's'), size: '4-lugares' }];
+    const items = [{ ...makePackItem('mattress', 'm'), size: 'casal' }, { ...makePackItem('sofa', 's'), size: '4+-lugares' }];
     const result = calculateCustomPack(items, 'Braga');
     expect(result.lines[1].amount).toBeNull();
     expect(result.quote).toBe(true);

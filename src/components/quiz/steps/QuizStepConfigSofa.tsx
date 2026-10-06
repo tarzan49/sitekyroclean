@@ -27,6 +27,7 @@ const QuizStepConfigSofa = ({ formData, updateFormData, sofaItems, setSofaItems 
   const [tierChosen, setTierChosen] = useState(false);
 
   const isWaterproofBase = formData.serviceType === 'waterproofing';
+  // '4+-lugares' é o tamanho maior (5+ lugares, em U ou modular), sob orçamento.
   const has4Plus = (sofaItems.find(i => i.sizeId === '4+-lugares')?.qty ?? 0) > 0;
 
   return (
@@ -103,7 +104,7 @@ const QuizStepConfigSofa = ({ formData, updateFormData, sofaItems, setSofaItems 
           })}
         </div>
       )}
-      {(!isWaterproofBase || tierChosen) && has4Plus && <input type="number" inputMode="numeric" pattern="[0-9]*" placeholder="Nº de lugares (ex: 5)" className="w-full max-w-sm bg-white/[0.06] border border-white/15 focus:border-gold focus:outline-none text-white placeholder:text-white/80 rounded-sm h-12 px-4 text-base transition-colors" onChange={(e) => updateFormData({ description: `Sofá com ${e.target.value} lugares` })} />}
+      {(!isWaterproofBase || tierChosen) && has4Plus && <input type="number" inputMode="numeric" pattern="[0-9]*" placeholder="Nº de lugares (ex: 6)" className="w-full max-w-sm bg-white/[0.06] border border-white/15 focus:border-gold focus:outline-none text-white placeholder:text-white/80 rounded-sm h-12 px-4 text-base transition-colors" onChange={(e) => updateFormData({ description: `Sofá com ${e.target.value} lugares` })} />}
     </div>
   );
 };

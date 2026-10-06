@@ -214,7 +214,7 @@ export default function PackConfigurator({ initialKinds, initialExtra = 'none', 
             </div>
 
             {sizeOptions && <>
-              <div className={cn('grid gap-1.5', sizeOptions.length >= 4 ? 'grid-cols-4' : 'grid-cols-3')} role="group" aria-label="Tamanhos (pode escolher vários)">
+              <div className={cn('grid gap-1.5', sizeOptions.length === 4 ? 'grid-cols-4' : 'grid-cols-3')} role="group" aria-label="Tamanhos (pode escolher vários)">
                 {sizeOptions.map(p => <Chip key={p.id} active={groupItems.some(i => i.size === p.id)} onClick={() => toggleSize(group.kind, groupItems, p.id)} className="px-1 text-xs" check={false}>{p.label}</Chip>)}
               </div>
               <ul className="divide-y divide-white/10 rounded-lg bg-white/[0.04] px-2.5">

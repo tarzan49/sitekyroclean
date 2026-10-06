@@ -85,22 +85,33 @@ export interface PriceOption {
 }
 
 // Sofá: preços de tabela.
-// cleaningPrice          = limpeza (49 / 69 / 79)
-// waterproofingPrice     = impermeabilização Essencial sozinha (59 / 79 / 99)
-// waterproofingPremiumPrice = impermeabilização Premium sozinha (89 / 109 / 139)
-// bothPrice              = limpeza + Essencial antes da redução (99 / 139 / 169)
+// cleaningPrice          = limpeza (49 / 69 / 79 / 99)
+// waterproofingPrice     = impermeabilização Essencial sozinha (59 / 79 / 99 / 119)
+// waterproofingPremiumPrice = impermeabilização Premium sozinha (89 / 109 / 139 / 169)
+// bothPrice              = limpeza + Essencial antes da redução (99 / 139 / 169 / 209),
+//                          sempre a soma separada menos 9
 // waterproofingUpsellDiscount = redução por sofá no pack limpeza + proteção (10)
-// O pack Essencial cobrado é bothPrice - redução: 89 / 129 / 159 (calcPackPricing).
+// O pack Essencial cobrado é bothPrice - redução: 89 / 129 / 159 / 199 (calcPackPricing).
 // O Premium soma a diferença Premium - Essencial (30 em todos os tamanhos,
-// packPremiumDelta onde é fixado à mão): 119 / 159 / 189.
+// packPremiumDelta onde é fixado à mão): 119 / 159 / 189 / 229.
 // originalBothPrice (preço riscado) é a soma separada limpeza + Essencial
-// (108 / 148 / 178) e nunca pode ficar abaixo do preço do pack, senão o
+// (108 / 148 / 178 / 218) e nunca pode ficar abaixo do preço do pack, senão o
 // "desconto" mostrado fica ao contrário (bug já visto antes).
+//
+// 4 lugares (dono, 2026-10-06): a limpeza a 99€, a Essencial a 119€ e a Premium
+// a 169€; o resto da linha segue o degrau dos 3 lugares. Até essa data havia um
+// só tamanho "4+ Lugares", sob orçamento. O id '4+-lugares' ficou para o tamanho
+// maior (5 ou mais lugares, em U ou modular), que continua sob orçamento: é o id
+// que os pedidos, o CRM e o bot já guardam com o sentido "sob orçamento", e
+// renomeá-lo faria esses registos antigos passarem a ler-se como um preço.
+// O espaço inseparável em "em U" impede o "U" de ficar sozinho numa linha
+// no ecrã das quantidades a 375px.
 export const sofaPrices: PriceOption[] = [
   { waterproofingUpsellDiscount: 10, id: '1-lugar',    label: '1 Lugar',    cleaningPrice: 49, waterproofingPrice: 59, bothPrice: 99,  originalBothPrice: 108, waterproofingPremiumPrice: 89 },
   { waterproofingUpsellDiscount: 10, id: '2-lugares',  label: '2 Lugares',  cleaningPrice: 69, waterproofingPrice: 79, bothPrice: 139, originalBothPrice: 148, waterproofingPremiumPrice: 109, packPremiumDelta: 30 },
   { waterproofingUpsellDiscount: 10, id: '3-lugares',  label: '3 Lugares',  cleaningPrice: 79, waterproofingPrice: 99, bothPrice: 169, originalBothPrice: 178, waterproofingPremiumPrice: 139, packPremiumDelta: 30 },
-  { waterproofingUpsellDiscount: 10, id: '4+-lugares', label: '4+ Lugares', cleaningPrice: 'Sob orçamento', waterproofingPrice: 'Sob orçamento', bothPrice: 'Sob orçamento', waterproofingPremiumPrice: 'Sob orçamento' },
+  { waterproofingUpsellDiscount: 10, id: '4-lugares',  label: '4 Lugares',  cleaningPrice: 99, waterproofingPrice: 119, bothPrice: 209, originalBothPrice: 218, waterproofingPremiumPrice: 169, packPremiumDelta: 30 },
+  { waterproofingUpsellDiscount: 10, id: '4+-lugares', label: '5+ Lugares ou em\u00A0U', cleaningPrice: 'Sob orçamento', waterproofingPrice: 'Sob orçamento', bothPrice: 'Sob orçamento', waterproofingPremiumPrice: 'Sob orçamento' },
 ];
 
 // Colchão: waterproofingPrice/bothPrice/originalBothPrice são reaproveitados

@@ -51,7 +51,8 @@ const priceTables: Record<string, { item: string; price: string; note?: string }
     { item: "Sofá 1 lugar", price: desde(sofaSize("1-lugar").cleaningPrice) },
     { item: "Sofá 2 lugares", price: desde(sofaSize("2-lugares").cleaningPrice) },
     { item: "Sofá 3 lugares", price: desde(sofaSize("3-lugares").cleaningPrice) },
-    { item: "Sofá 4-5 lugares", price: "Sob orçamento" },
+    { item: "Sofá 4 lugares", price: desde(sofaSize("4-lugares").cleaningPrice) },
+    { item: "Sofá de 5+ lugares, em U ou modular", price: "Sob orçamento" },
     { item: "Sofá em L", price: "Sob orçamento" },
     // Acrescentada à limpeza, a impermeabilização não custa o preço de
     // tabela (esse é o do serviço sozinho): custa a diferença que o quiz cobra
@@ -81,6 +82,8 @@ const priceTables: Record<string, { item: string; price: string; note?: string }
     { item: "Sofá 1 lugar", price: desde(sofaSize("1-lugar").waterproofingPrice), note: `Essencial, ${eur(sofaSize("1-lugar").waterproofingPremiumPrice!)} na Premium` },
     { item: "Sofá 2 lugares", price: desde(sofaSize("2-lugares").waterproofingPrice), note: `Essencial, ${eur(sofaSize("2-lugares").waterproofingPremiumPrice!)} na Premium` },
     { item: "Sofá 3 lugares", price: desde(sofaSize("3-lugares").waterproofingPrice), note: `Essencial, ${eur(sofaSize("3-lugares").waterproofingPremiumPrice!)} na Premium` },
+    { item: "Sofá 4 lugares", price: desde(sofaSize("4-lugares").waterproofingPrice), note: `Essencial, ${eur(sofaSize("4-lugares").waterproofingPremiumPrice!)} na Premium` },
+    { item: "Sofá de 5+ lugares, em U ou modular", price: "Sob orçamento" },
     { item: "Cadeiras (por unidade)", price: `${CHAIR_WATERPROOF_ESSENTIAL}€/un`, note: `Essencial, ${CHAIR_WATERPROOF_PREMIUM}€/un na Premium` },
     { item: "Cabeceira", price: "Sob orçamento" },
   ],

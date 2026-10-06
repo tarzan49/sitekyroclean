@@ -96,7 +96,7 @@ const QuizSofaAddonUpsell = ({ formData, updateFormData, sofaItems, setSofaItems
   const premiumDifference = premiumTotal !== null && essencialTotal !== null ? premiumTotal - essencialTotal : null;
   const protectionCount = comparisonItems.reduce((sum, i) => sum + i.qty, 0);
   const selectedProtectionTotal = originalProtectionTotal(tier);
-  // Anti-ácaros: acréscimo por sofá, por tamanho ("4+ Lugares" sob orçamento).
+  // Anti-ácaros: acréscimo por sofá, por tamanho ("5+ Lugares ou em U" sob orçamento).
   const antiLines = comparisonItems.filter(item => item.qty > 0).map(item => ({
     sizeId: item.sizeId,
     label: sofaPrices.find(p => p.id === item.sizeId)?.label ?? item.sizeId,

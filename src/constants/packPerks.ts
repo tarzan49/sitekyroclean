@@ -30,8 +30,10 @@ export const PACK_PERK_MIN_ORDER = 100;
 /** Colchão acrescentado: menos 14€ por unidade sobre o preço de tabela. */
 export const PACK_PERK_MATTRESS_OFF = 14;
 
-/** Sofá acrescentado: preço fixo por tamanho. "4+ lugares" fica sob orçamento. */
-export const PACK_PERK_SOFA_PRICE: Record<string, number> = { '1-lugar': 35, '2-lugares': 55, '3-lugares': 65 };
+/** Sofá acrescentado: preço fixo por tamanho. O tamanho maior ('4+-lugares':
+ * 5 ou mais lugares, em U ou modular) fica sob orçamento. 4 lugares: 79€
+ * (dono, 2026-10-06). */
+export const PACK_PERK_SOFA_PRICE: Record<string, number> = { '1-lugar': 35, '2-lugares': 55, '3-lugares': 65, '4-lugares': 79 };
 
 /** Cadeiras acrescentadas: uma oferta por cada conjunto de 4. */
 export const PACK_PERK_CHAIRS_SET = 4;
@@ -151,7 +153,7 @@ export const PACK_PERK_PRICES = `Sofá a partir de ${PACK_PERK_SOFA_PRICE['1-lug
 export const PACK_PERK_BULLETS = [
   `Preço de pack a partir de ${PACK_PERK_MIN_ORDER}€ de subtotal (abaixo disso, preço de tabela normal).`,
   'O artigo principal fica ao preço de tabela, em todas as unidades e tamanhos. O preço de pack é para os artigos de outro tipo.',
-  `Sofá acrescentado: ${PACK_PERK_SOFA_PRICE['1-lugar']}€ o de 1 lugar, ${PACK_PERK_SOFA_PRICE['2-lugares']}€ o de 2 lugares, ${PACK_PERK_SOFA_PRICE['3-lugares']}€ o de 3 lugares.`,
+  `Sofá acrescentado: ${PACK_PERK_SOFA_PRICE['1-lugar']}€ o de 1 lugar, ${PACK_PERK_SOFA_PRICE['2-lugares']}€ o de 2 lugares, ${PACK_PERK_SOFA_PRICE['3-lugares']}€ o de 3 lugares, ${PACK_PERK_SOFA_PRICE['4-lugares']}€ o de 4 lugares.`,
   `Colchão acrescentado: menos ${PACK_PERK_MATTRESS_OFF}€ por unidade, em qualquer tamanho.`,
   `Cadeiras acrescentadas: uma oferecida por cada conjunto de ${PACK_PERK_CHAIRS_SET}.`,
   `Tapete acrescentado: ${PACK_PERK_RUG_NOTE.toLowerCase()}, sempre sob orçamento.`,

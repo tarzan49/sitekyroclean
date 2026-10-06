@@ -92,7 +92,7 @@ export function useQuizPricing(
   const rugTravelOnQuote = isRugService && rugPickupCost === null;
   const finalTravelCost = isRugService ? 0 : calculateTravelFee(travelCost, safePrice(calculateServicePrice) + upsellItemsTotal);
   const totalPrice = safePrice(calculateServicePrice) + safePrice(upsellItemsTotal) + safePrice(finalTravelCost) + (rugPickupCost ?? 0);
-  // True when the user has qty>0 of the "4+ lugares" sofa, or any measured
+  // True when the user has qty>0 of the "5+ lugares ou em U" sofa (id '4+-lugares'), or any measured
   // carpet (carpets never have a fixed price anymore — always a custom quote,
   // see carpetHasValidItems) — without this, calculateServicePrice silently
   // fell back to 0 for those cases, so totalPrice ended up as travel cost
@@ -119,7 +119,7 @@ export function useQuizPricing(
     (formData.service === 'carpet' && carpetHasValidItems(carpetItems)) ||
     chairPrimaryNeedsQuote ||
     chairAddonNeedsQuote;
-  // Any upsell item with price=0 is a SOB item (chairs ≥10, tapetes (sempre), sofa 4+ lugares)
+  // Any upsell item with price=0 is a SOB item (chairs ≥10, tapetes (sempre), sofa 5+ lugares ou em U)
   const hasUpsellSobItem = upsellItems.some(i => i.price === 0);
 
   return {

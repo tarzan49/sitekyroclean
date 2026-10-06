@@ -74,7 +74,7 @@ interface WaterproofingTier {
   highlighted?: boolean;
 }
 
-// "59€ / 79€ / 99€": os três tamanhos com preço, lidos da tabela do quiz. Estava
+// "59€ / 79€ / 99€ / 119€": os tamanhos com preço, lidos da tabela do quiz. Estava
 // escrito à mão e é a tabela que o cliente compara com o orçamento.
 const sofaTierPrices = (field: 'waterproofingPrice' | 'waterproofingPremiumPrice') => sofaPrices
   .map(size => size[field])

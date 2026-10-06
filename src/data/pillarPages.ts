@@ -66,11 +66,15 @@ const catalog = (slug: PillarSlug) => {
   return service;
 };
 
-/** "49€ para 1 lugar, 69€ para 2 lugares e 79€ para 3 lugares; 4+ lugares sob orçamento". */
+/** Rótulo do tamanho a meio de uma frase: "4 Lugares" passa a "4 lugares",
+ * mas o "U" de "em U" fica em maiúscula. */
+const inlineLabel = (label: string) => label.toLowerCase().replace(/\bem(\s)u\b/g, 'em$1U');
+
+/** "49€ para 1 lugar, …, 79€ para 3 lugares e 99€ para 4 lugares; 5+ lugares ou em U sob orçamento". */
 function sizeList(options: PriceOption[]): string {
   const priced = options.filter(item => typeof item.cleaningPrice === 'number')
-    .map(item => `${formatEuro(item.cleaningPrice as number)} para ${item.label.toLowerCase()}`);
-  const quoted = options.filter(item => typeof item.cleaningPrice !== 'number').map(item => item.label.toLowerCase());
+    .map(item => `${formatEuro(item.cleaningPrice as number)} para ${inlineLabel(item.label)}`);
+  const quoted = options.filter(item => typeof item.cleaningPrice !== 'number').map(item => inlineLabel(item.label));
   const list = priced.length > 1 ? `${priced.slice(0, -1).join(', ')} e ${priced[priced.length - 1]}` : priced.join('');
   return quoted.length ? `${list}; ${quoted.join(', ')} sob orçamento` : list;
 }

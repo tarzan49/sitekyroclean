@@ -17,10 +17,17 @@ describe('botQuote: the numbers the bot replies with come from the site engine',
     const r = ok({ items: [{ kind: 'sofa', size: '3-lugares', treatment: 'clean+essencial' }], city: 'Oeiras' });
     expect([r.subtotal, r.travel, r.total]).toEqual([159, 0, 159]);
   });
-  it('waterproofing alone: Essencial 59/79/99, Premium 89/109/139 (reply 3.2)', () => {
+  it('waterproofing alone: Essencial 59/79/99/119, Premium 89/109/139/169 (reply 3.2)', () => {
     const price = (size: string, treatment: string) => ok({ items: [{ kind: 'sofa', size, treatment }], city: 'Porto' }).subtotal;
-    expect(['1-lugar', '2-lugares', '3-lugares'].map(s => price(s, 'essencial'))).toEqual([59, 79, 99]);
-    expect(['1-lugar', '2-lugares', '3-lugares'].map(s => price(s, 'premium'))).toEqual([89, 109, 139]);
+    expect(['1-lugar', '2-lugares', '3-lugares', '4-lugares'].map(s => price(s, 'essencial'))).toEqual([59, 79, 99, 119]);
+    expect(['1-lugar', '2-lugares', '3-lugares', '4-lugares'].map(s => price(s, 'premium'))).toEqual([89, 109, 139, 169]);
+  });
+  it('sofa 4 seats (owner, 2026-10-06): 99€ cleaning, 199€ with Essencial, 159€ with anti-ácaros, 79€ as an added pack item', () => {
+    const sub = (treatment: string) => ok({ items: [{ kind: 'sofa', size: '4-lugares', treatment }], city: 'Porto' }).subtotal;
+    expect([sub('clean'), sub('clean+essencial'), sub('clean+premium'), sub('clean+anti-acaros')]).toEqual([99, 199, 229, 159]);
+    expect(ok({ items: [{ kind: 'sofa', size: '4-lugares' }], city: 'Porto' }).handToOwner).toBe(false);
+    const pack = ok({ items: [{ kind: 'mattress', size: 'casal' }, { kind: 'sofa', size: '4-lugares' }], city: 'Porto' });
+    expect(pack.lines.map(l => l.amount)).toEqual([69, 79]);
   });
   it('chairs: cleaning by tier, waterproofing alone per chair (reply 1)', () => {
     expect(ok({ items: [{ kind: 'chairs', qty: 6 }], city: 'Porto' }).subtotal).toBe(110);
@@ -35,7 +42,7 @@ describe('botQuote: the numbers the bot replies with come from the site engine',
     expect(r.lines.map(l => l.amount)).toEqual([79, 55]);
     expect([r.subtotal, r.savings, r.travel, r.total]).toEqual([134, 14, 0, 134]);
   });
-  it('hands to the owner: rugs, 4+ seats, 10+ chairs, unknown or case-by-case localities', () => {
+  it('hands to the owner: rugs, 5+ seats or U-shaped (id 4+-lugares), 10+ chairs, unknown or case-by-case localities', () => {
     expect(ok({ items: [{ kind: 'rug', width: 2, length: 3 }], city: 'Porto' }).handToOwner).toBe(true);
     expect(ok({ items: [{ kind: 'sofa', size: '4+-lugares' }], city: 'Porto' }).handToOwner).toBe(true);
     expect(ok({ items: [{ kind: 'chairs', qty: 10 }], city: 'Porto' }).handToOwner).toBe(true);

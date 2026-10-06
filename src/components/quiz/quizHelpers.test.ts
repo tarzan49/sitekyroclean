@@ -45,7 +45,7 @@ describe('calcPackPricing', () => {
   const sofa1L = sofaPrices.find(p => p.id === '1-lugar')!;
   const sofa4Plus = sofaPrices.find(p => p.id === '4+-lugares')!;
 
-  it('reports isSob for the "Sob orçamento" size (4+ lugares) instead of silently pricing at 0', () => {
+  it('reports isSob for the "Sob orçamento" size (5+ lugares ou em U) instead of silently pricing at 0', () => {
     const r = calcPackPricing(sofa4Plus, false, false, 40, 'essencial');
     expect(r.isSob).toBe(true);
     expect(r.basePrice).toBeNull();
@@ -104,6 +104,17 @@ describe('sofa waterproofing upsell reduction', () => {
         .toBe(calcPackPricing(previous, true, true, null, tier).packDelta! - 10);
     }
   });
+  // 4 lugares (dono, 2026-10-06): limpeza 99€, Essencial 119€, Premium 169€;
+  // o pack segue o degrau dos 3 lugares (soma separada menos 9, menos 10 de
+  // redução, Premium mais 30).
+  it('prices the 4-seat sofa like the other sizes', () => {
+    const four = sofaPrices.find(p => p.id === '4-lugares')!;
+    expect([four.cleaningPrice, four.waterproofingPrice, four.waterproofingPremiumPrice]).toEqual([99, 119, 169]);
+    expect(calcPackPricing(four, true, false, null, 'essencial').displayPrice).toBe(199);
+    expect(calcPackPricing(four, true, false, null, 'premium').displayPrice).toBe(229);
+    expect(calcSofaUnitPrice(four, false, 'waterproofing', 'essencial', false)).toBe(119);
+    expect(calcSofaUnitPrice(four, false, 'waterproofing', 'premium', false)).toBe(169);
+  });
   it('keeps large sofas subject to quotation', () => {
     const option = sofaPrices.find(p => p.id === '4+-lugares')!;
     expect(calcPackPricing(option, true, false).packPrice).toBeNull();
@@ -112,12 +123,14 @@ describe('sofa waterproofing upsell reduction', () => {
 
 describe('treatment helpers shared by the totals, the receipt and the configurator', () => {
   const form = { ...initialFormData, service: 'sofa', serviceType: 'cleaning' as const };
-  it('prices a sofa unit with anti-acaros as cleaning plus the per-size rate, 4+ under quote', () => {
-    const [one, two, three, fourPlus] = sofaPrices;
+  it('prices a sofa unit with anti-acaros as cleaning plus the per-size rate, 5+ under quote', () => {
+    const [one, two, three, four, fivePlus] = sofaPrices;
     expect(calcSofaUnitPrice(one, true, 'cleaning', 'essencial', true)).toBe(69);
     expect(calcSofaUnitPrice(two, true, 'cleaning', 'premium', true)).toBe(109);
     expect(calcSofaUnitPrice(three, true, 'cleaning', 'essencial', true)).toBe(129);
-    expect(calcSofaUnitPrice(fourPlus, true, 'cleaning', 'essencial', true)).toBeNull();
+    expect(calcSofaUnitPrice(four, true, 'cleaning', 'essencial', true)).toBe(159);
+    expect(fivePlus.id).toBe('4+-lugares');
+    expect(calcSofaUnitPrice(fivePlus, true, 'cleaning', 'essencial', true)).toBeNull();
     // Sem anti-ácaros, o tratamento é o pack de impermeabilização (89€ no 1 lugar Essencial).
     expect(calcSofaUnitPrice(one, true, 'cleaning', 'essencial', false)).toBe(89);
     // Com impermeabilização como serviço principal o anti-ácaros não se aplica.
