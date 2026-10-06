@@ -36,6 +36,8 @@ export interface ServiceRow {
   source: string | null;
   client_name: string | null;
   description: string;
+  /** Evento apagado ou cancelado no calendário: a linha fica no CRM para o dono decidir, mas não é um fecho. */
+  calendar_missing_since?: string | null;
 }
 
 export interface ContactRow {
@@ -138,7 +140,7 @@ export function computeGoogleAdsResults(
   }
 
   // Quem já tem serviço no CRM, por telefone, para a taxa de fecho dos contactos.
-  const servedPhones = new Set(services.map(s => phoneKey(s.phone)).filter(Boolean));
+  const servedPhones = new Set(services.filter(s => !s.calendar_missing_since).map(s => phoneKey(s.phone)).filter(Boolean));
 
   const google = emptySide(), other = emptySide();
   let contactsWithoutDate = 0;
@@ -155,6 +157,7 @@ export function computeGoogleAdsResults(
 
   const googleServicesList: ServiceRow[] = [];
   for (const s of services) {
+    if (s.calendar_missing_since) continue;
     const day = closedDay(s);
     if (!inRange(day)) continue;
     const isGoogle = isGoogleService(s, googlePhones);

@@ -50,6 +50,11 @@ describe("googleAdsResults", () => {
     expect(r.google.services).toBe(1);
   });
 
+  it("leaves out a service whose calendar event was deleted", () => {
+    const r = computeGoogleAdsResults([service({ source: "Google Ads", calendar_missing_since: "2026-10-06T14:45:00Z" })], [], [], "2026-10-06", "2026-10-06");
+    expect(r.google.services).toBe(0);
+  });
+
   it("counts the owner's part of an upsell in the share, like the CRM", () => {
     const r = computeGoogleAdsResults([service({ source: "Google Ads", my_cut: 50, upsell_value: 100, upsell_team: "Lisboa 1" })], [], [], "2026-10-06", "2026-10-06");
     expect(r.google.share).toBe(80);
