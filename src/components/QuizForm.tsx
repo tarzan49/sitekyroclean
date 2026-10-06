@@ -618,7 +618,10 @@ ${formData.description || 'Sem observações adicionais'}
              , hidden: contact step (summary available below the fields)
              , visível: step 3 (quantidades) quando totalPrice > 0
              , também visível em step 1 quando há custo de deslocação */}
-          {currentStep !== totalSteps && (totalPrice > 0 || hasSobOrcamento) && (activeUpsellScreen === 'combo' || finalTravelCost > 0 || (currentStep !== 1 && currentStep !== 2)) && (
+          {/* No passo da localidade só com localidade escolhida: ao voltar lá,
+              a localidade é limpa e o topo mostrava o total antigo sem
+              deslocação por cima do campo vazio. */}
+          {currentStep !== totalSteps && (currentStep !== 0 || formData.location !== '') && (totalPrice > 0 || hasSobOrcamento) && (activeUpsellScreen === 'combo' || finalTravelCost > 0 || (currentStep !== 1 && currentStep !== 2)) && (
             <QuizEstimate
               totalPrice={totalPrice}
               travelCost={rugPickupCost ?? finalTravelCost}

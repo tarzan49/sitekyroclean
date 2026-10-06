@@ -47,9 +47,9 @@ const QuizStepConfigCarpet = ({ carpetItems, setCarpetItems, carpetKind = 'tapet
         {carpetItems.map((item, i) => {
           const area = carpetItemArea(item);
           return (
-            <fieldset key={item.id} className="min-w-0 rounded-xl border border-white/15 bg-[#183026] p-3 shadow-sm">
+            <fieldset key={item.id} className="min-w-0 rounded-xl border border-white/15 bg-[#183026] px-3 py-2.5 shadow-sm">
               <legend className="sr-only">Medidas do tapete {i + 1}</legend>
-              <div className="mb-2 flex min-h-6 items-center justify-between gap-2">
+              <div className="mb-1 flex min-h-6 items-center justify-between gap-2">
                 <div className="flex items-center gap-2.5">
                   <span className="text-sm font-semibold text-white">{carpetKind === 'alcatifa' ? 'Área' : 'Tapete'} {i + 1}</span>
                   <span className="text-sm text-[#E8D58F] tabular-nums" aria-live="polite">{area !== null ? `${formatArea(area)} m²` : ''}</span>
@@ -63,7 +63,7 @@ const QuizStepConfigCarpet = ({ carpetItems, setCarpetItems, carpetKind = 'tapet
               <div className="grid grid-cols-2 gap-3">
                 {(['largura', 'comprimento'] as const).map(field => (
                   <div key={field} className="min-w-0 text-left">
-                    <label htmlFor={`${fieldPrefix}-${item.id}-${field}`} className="mb-1.5 block text-base font-medium text-white/80">{field === 'largura' ? 'Largura' : 'Comprimento'}</label>
+                    <label htmlFor={`${fieldPrefix}-${item.id}-${field}`} className="mb-1 block text-sm font-medium text-white/80">{field === 'largura' ? 'Largura' : 'Comprimento'}</label>
                     <div className="relative">
                       <input id={`${fieldPrefix}-${item.id}-${field}`} aria-label={`${field === 'largura' ? 'Largura' : 'Comprimento'} do tapete ${i + 1}, em metros`} type="number" inputMode="decimal" min="0" step="0.01" placeholder={field === 'largura' ? 'Ex.: 2' : 'Ex.: 3'} value={item[field]} onChange={e => setCarpetItems(prev => carpetUpdateItem(prev, item.id, field, e.target.value))} aria-describedby={`${fieldPrefix}-units`} className="h-12 w-full min-w-0 rounded-xl border border-white/20 bg-[#0C2018] pl-3 pr-8 text-base font-semibold text-white placeholder:font-normal placeholder:text-white/80 focus:border-[#D4AF37] focus:outline-none focus:ring-2 focus:ring-[#D4AF37]/25 transition-colors" />
                       <span aria-hidden="true" className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-base text-white/80">m</span>
