@@ -201,12 +201,21 @@ export function buildCommercialWaMessage(cityName: string): string {
   return `Olá! Represento um negócio ${cityPrep(cityName)} ${cityName} (restaurante/hotel/escritório) e tenho interesse num contrato de limpeza recorrente de estofos. Podem enviar-me uma proposta e a vossa disponibilidade?`;
 }
 
-/** Only an opaque operational reference belongs in a shareable WhatsApp URL. */
-export function buildSubmittedWaMessage(reference?: string | null): string {
+/**
+ * Only an opaque operational reference belongs in a shareable WhatsApp URL.
+ * `photoQuote`: o pedido tem artigos sob orçamento (tapetes, alcatifa, sofá
+ * grande). A mensagem diz logo que vêm fotografias, que é o que falta para o
+ * preço (dono, 2026-10-06: os pedidos sem preço fechavam metade das vezes).
+ * O início ("Acabei de enviar o pedido #X") não muda: o bot procura-o.
+ */
+export function buildSubmittedWaMessage(reference?: string | null, opts: { photoQuote?: boolean } = {}): string {
   const value = reference?.trim().replace(/^#/, '');
   // Current short booking IDs and opaque lead IDs; never interpolate arbitrary input.
   const safe = value && /^(?:[A-Z0-9]{6,12}|L-\d{8}-[a-z0-9]{8,12})$/.test(value) ? value : null;
-  return `Olá! Acabei de enviar o pedido${safe ? ` #${safe}` : ''}. Gostaria de confirmar o orçamento e a próxima disponibilidade. Posso enviar fotografias dos artigos para avaliação.`;
+  const ask = opts.photoQuote
+    ? 'Envio já as fotografias para saber o preço e a disponibilidade.'
+    : 'Gostaria de confirmar o orçamento e a próxima disponibilidade. Posso enviar fotografias dos artigos para avaliação.';
+  return `Olá! Acabei de enviar o pedido${safe ? ` #${safe}` : ''}. ${ask}`;
 }
 
 const PACK_MESSAGES: Record<string, { request: string; kind: ItemKind }> = {

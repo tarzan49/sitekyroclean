@@ -13,7 +13,7 @@ const Obrigado = () => {
       const stored = raw ? JSON.parse(raw) : null;
       if (stored) setReceipt(stored);
       // Rebuild legacy stored links too: old URLs contained customer details.
-      setWaUrl(`${WHATSAPP_BASE}?text=${encodeURIComponent(buildSubmittedWaMessage(stored?.bookingId))}`);
+      setWaUrl(`${WHATSAPP_BASE}?text=${encodeURIComponent(buildSubmittedWaMessage(stored?.bookingId, { photoQuote: Boolean(stored?.sobOrcamento) }))}`);
     } catch { /* ignore parse errors */ }
   }, []);
 

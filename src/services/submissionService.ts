@@ -161,8 +161,9 @@ async function postToLeadEmail(supabase: SupabaseClient, payload: QuizLeadPayloa
   throw new Error(`send-lead-email falhou: ${error?.message ?? 'resposta inesperada'}`);
 }
 
-export function buildWaUrl(_payload: QuizLeadPayload, bookingId: string): string {
-  return `${WHATSAPP_BASE}?text=${encodeURIComponent(buildSubmittedWaMessage(bookingId))}`;
+export function buildWaUrl(payload: Pick<QuizLeadPayload, 'hasSobOrcamento' | 'hasUpsellSobItem'>, bookingId: string): string {
+  const photoQuote = Boolean(payload.hasSobOrcamento || payload.hasUpsellSobItem);
+  return `${WHATSAPP_BASE}?text=${encodeURIComponent(buildSubmittedWaMessage(bookingId, { photoQuote }))}`;
 }
 
 export function formatQuotePrice(payload: Pick<QuizLeadPayload, 'totalPrice' | 'hasSobOrcamento' | 'hasUpsellSobItem'>): string {

@@ -17,9 +17,20 @@ export interface ConfirmationReceipt {
   bookingId: string;
   name: string;
 }
+/**
+ * Pedido em que o único valor conhecido é a deslocação ou a recolha (só
+ * tapetes, alcatifa, sofá grande): o preço vem por fotografia no WhatsApp.
+ * Mostrar "Subtotal conhecido 10€" parecia um preço estranho, e estes pedidos
+ * fechavam metade das vezes (dono, 2026-10-06).
+ */
+export function needsPhotoQuote(receipt: Pick<ConfirmationReceipt, 'sobOrcamento' | 'lines'>): boolean {
+  return receipt.sobOrcamento && !receipt.lines.some(l => (l.total ?? 0) > 0 && !/^(Deslocação|Recolha)/.test(l.label));
+}
+
 const money = (value: number | null) => value === null ? 'Sob orçamento' : new Intl.NumberFormat('pt-PT', { style: 'currency', currency: 'EUR' }).format(value);
 
 export default function QuoteConfirmation({ receipt, waUrl }: { receipt: ConfirmationReceipt | null; waUrl: string }) {
+  const photoQuote = receipt ? needsPhotoQuote(receipt) : false;
   return (
     <div className="min-h-svh bg-[#071a12] px-4 pb-4 text-white sm:px-6">
       <main className="mx-auto w-full max-w-md lg:max-w-6xl">
@@ -34,7 +45,7 @@ export default function QuoteConfirmation({ receipt, waUrl }: { receipt: Confirm
         <div className="lg:grid lg:min-h-[calc(100svh-7rem)] lg:grid-cols-[1fr_1.08fr] lg:content-center lg:items-start lg:gap-x-14 lg:gap-y-6 lg:py-10 xl:gap-x-20">
         <h1 className="lg:col-start-1 lg:row-start-1 lg:py-0 lg:text-left lg:text-[44px] xl:text-[50px] py-4 text-center text-[28px] font-semibold leading-[1.12] tracking-[-0.04em]">
           {receipt ? 'Obrigado pela confiança.' : 'O próximo passo é simples.'}
-          <span className="mt-1 block text-[#D4AF37]">Falamos no WhatsApp?</span>
+          <span className="mt-1 block text-[#D4AF37]">{photoQuote ? 'Falta só uma fotografia.' : 'Falamos no WhatsApp?'}</span>
         </h1>
 
         <section aria-labelledby="receipt-title" className="overflow-hidden rounded-2xl border border-[#D4AF37]/35 bg-[#f7f5ef] text-[#132c22] shadow-[0_16px_48px_#00000030] lg:col-start-2 lg:row-start-1 lg:row-span-3 lg:self-center lg:rounded-3xl">
@@ -68,21 +79,28 @@ export default function QuoteConfirmation({ receipt, waUrl }: { receipt: Confirm
                 ))}
               </ul>
 
+              {photoQuote ? (
+                <div className="border-t border-[#132c22]/10 bg-[#eeeee5] px-4 py-3 lg:px-7 lg:py-6">
+                  <p className="text-sm lg:text-base font-semibold">O preço é dado por fotografia</p>
+                  <p className="mt-1 text-[11px] lg:text-sm leading-relaxed text-[#526458]">Envie no WhatsApp uma fotografia de cada peça e respondemos com o preço e a disponibilidade.</p>
+                </div>
+              ) : (
               <div className="border-t border-[#132c22]/10 bg-[#eeeee5] px-4 py-3 lg:px-7 lg:py-6">
                 {receipt.discountLabel && receipt.discountAmount > 0 && <div className="mb-2 space-y-1 text-xs text-[#526458]"><p className="flex justify-between gap-3"><span>Subtotal</span><span>{money(receipt.subtotal)}</span></p><p className="flex justify-between gap-3"><span>{receipt.discountLabel}</span><span>−{money(receipt.discountAmount)}</span></p></div>}
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <span className="text-xs lg:text-sm font-medium">{receipt.sobOrcamento ? 'Subtotal conhecido' : 'Total estimado'}</span>
                   <strong className="text-[30px] lg:text-[40px] font-semibold leading-none tracking-[-0.045em] tabular-nums">{money(receipt.total)}</strong>
                 </div>
-                <p className="mt-2 text-[10px] lg:text-xs leading-relaxed text-[#627165]">{receipt.sobOrcamento ? 'Acrescem os serviços sob orçamento. Valor final a confirmar.' : 'Valor e marcação sujeitos a confirmação.'}</p>
+                <p className="mt-2 text-[10px] lg:text-xs leading-relaxed text-[#627165]">{receipt.sobOrcamento ? 'Acrescem os serviços sob orçamento: envie fotografias no WhatsApp para fecharmos o valor.' : 'Valor e marcação sujeitos a confirmação.'}</p>
               </div>
+              )}
             </>
           ) : <p className="px-4 pb-4 text-sm leading-relaxed lg:px-7 lg:pb-8 lg:pt-4 lg:text-base text-[#526458]">Os detalhes do pedido não estão disponíveis nesta sessão. Fale connosco para o localizar.</p>}
         </section>
 
         <div className="mt-4 lg:col-start-1 lg:row-start-2 lg:mt-0 lg:max-w-sm">
           <a href={waUrl} target="_blank" rel="noopener noreferrer" data-tracking-source="quote_confirmation" className="flex min-h-14 items-center justify-center gap-2.5 rounded-xl border border-white/15 bg-gradient-to-b from-[#39de78] to-[#25D366] px-3 text-[15px] lg:min-h-16 lg:text-base font-bold text-[#071a12] shadow-[0_6px_24px_#25d36620] transition-colors hover:from-[#59e890] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#D4AF37]">
-            <MessageCircle className="h-5 w-5 shrink-0" aria-hidden="true" />Confirmar pelo WhatsApp<ArrowUpRight className="h-4 w-4 shrink-0" aria-hidden="true" />
+            <MessageCircle className="h-5 w-5 shrink-0" aria-hidden="true" />{photoQuote ? 'Enviar fotografias no WhatsApp' : 'Confirmar pelo WhatsApp'}<ArrowUpRight className="h-4 w-4 shrink-0" aria-hidden="true" />
           </a>
           <p className="mt-2 flex items-center justify-center gap-1.5 text-[10px] lg:text-xs text-white/65"><Clock className="h-3 w-3 text-[#D4AF37]" />{RESPONSE_PROMISE}</p>
         </div>

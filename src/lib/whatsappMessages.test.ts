@@ -45,4 +45,9 @@ describe('WhatsApp enquiry context and privacy', () => {
   it('uses only the opaque reference after submission', () => {
     expect(buildSubmittedWaMessage('ANPNQP3Z')).toContain('pedido #ANPNQP3Z.');
   });
+  it('says photos are on the way when the order has items without a price, keeping the start the bot looks for', () => {
+    const text = buildSubmittedWaMessage('ANPNQP3Z', { photoQuote: true });
+    expect(text.startsWith('Olá! Acabei de enviar o pedido #ANPNQP3Z.')).toBe(true);
+    expect(text).toContain('o preço e a disponibilidade');
+  });
 });
