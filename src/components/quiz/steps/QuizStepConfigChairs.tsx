@@ -1,5 +1,5 @@
 import QuizFurnitureImage from '../QuizFurnitureImage';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { cn } from '@/lib/utils';
 import type { QuizFormData } from '@/components/quiz/QuizTypes';
 import { calcChairClean, calcChairWaterproof, calcChairWaterproofPremium } from '@/components/quiz/quizHelpers';
@@ -28,6 +28,15 @@ const QuizStepConfigChairs = ({ formData, updateFormData }: Props) => {
   const primaryPrice = isWaterproofPrimary ? calcWaterproof(qty) : calcChairClean(qty);
   const addonEnabled = formData.chairWaterproofing;
   const sob = primaryPrice === null;
+
+  // O ecrã mostra 1 cadeira e o preço dela, mas o estado ficava em '' até ao
+  // primeiro toque no stepper: o total do topo mostrava só a deslocação e o
+  // pedido seguia sem a linha das cadeiras no resumo, no email e no CRM. A
+  // quantidade passa a existir mal o stepper aparece.
+  const stepperVisible = !isWaterproofPrimary || tierChosen;
+  useEffect(() => {
+    if (stepperVisible && formData.chairQuantity === '') updateFormData({ chairQuantity: '1', chairType: 'bulk_full' });
+  }, [stepperVisible, formData.chairQuantity, updateFormData]);
 
   const setChairQty = (newQty: number) => {
     const clamped = Math.max(1, newQty);

@@ -17,6 +17,8 @@ interface QuizSofaAddonUpsellProps {
   setSofaItems: React.Dispatch<React.SetStateAction<SofaItem[]>>;
   onContinue: () => void;
   onBack: () => void;
+  /** O QuizForm desenha o Voltar/Continuar fixo no fundo (como nas cadeiras). */
+  hideNavigation?: boolean;
 }
 
 // Só mostra os sofás que a pessoa já escolheu nas quantidades — nunca os
@@ -26,7 +28,7 @@ interface QuizSofaAddonUpsellProps {
 // no configurador de packs (2026-09-26): impermeabilização Premium ou
 // Essencial, ou anti-ácaros. Escolher um desliga o outro. Os preços do
 // anti-ácaros vêm de constants/antiAcarosPricing.ts.
-const QuizSofaAddonUpsell = ({ formData, updateFormData, sofaItems, setSofaItems, onContinue, onBack }: QuizSofaAddonUpsellProps) => {
+const QuizSofaAddonUpsell = ({ formData, updateFormData, sofaItems, setSofaItems, onContinue, onBack, hideNavigation = false }: QuizSofaAddonUpsellProps) => {
   const tierSectionRef = useRef<HTMLDivElement>(null);
   const [selectionScroll, setSelectionScroll] = useState(0);
   useEffect(() => {
@@ -74,7 +76,16 @@ const QuizSofaAddonUpsell = ({ formData, updateFormData, sofaItems, setSofaItems
 
   // Sem delta de recurso (era 40€): um tamanho sem preço de pack (5+ lugares,
   // canto) fica sob orçamento, nunca com um acréscimo inventado.
-  const comparisonItems = activeItems.map(i => ({ ...i, qty: anyPackOn ? treatmentQty(i) : i.qty }));
+  //
+  // Num pedido com tamanhos com e sem preço de pack (ex.: 4 lugares + 5+
+  // lugares), os totais dos cartões somam só os que têm preço e o texto diz
+  // quais ficam sob orçamento; antes, um só sofá sem preço punha o cartão
+  // inteiro em "Sob orçamento" e escondia o acréscimo conhecido.
+  const withTreatmentQty = activeItems.map(i => ({ ...i, qty: anyPackOn ? treatmentQty(i) : i.qty }));
+  const hasPackPrice = (sizeId: string) => typeof sofaPrices.find(p => p.id === sizeId)?.bothPrice === 'number';
+  const comparisonItems = withTreatmentQty.filter(i => hasPackPrice(i.sizeId));
+  const quoteLabels = withTreatmentQty.filter(i => i.qty > 0 && !hasPackPrice(i.sizeId)).map(i => sofaPrices.find(p => p.id === i.sizeId)?.label ?? i.sizeId);
+  const quoteNote = quoteLabels.length ? `${quoteLabels.join(', ')} sob orçamento` : null;
   const protectionTotal = (selectedTier: 'premium' | 'essencial') => comparisonItems.reduce<number | null>((sum, item) => {
     if (!item.qty) return sum;
     const option = sofaPrices.find(p => p.id === item.sizeId);
@@ -93,20 +104,24 @@ const QuizSofaAddonUpsell = ({ formData, updateFormData, sofaItems, setSofaItems
     const price = sofaPrices.find(p => p.id === item.sizeId)?.cleaningPrice;
     return sum === null || typeof price !== 'number' ? null : sum + price * item.qty;
   }, 0);
-  const essencialTotal = protectionTotal('essencial');
-  const premiumTotal = protectionTotal('premium');
-  const premiumDifference = premiumTotal !== null && essencialTotal !== null ? premiumTotal - essencialTotal : null;
   const protectionCount = comparisonItems.reduce((sum, i) => sum + i.qty, 0);
+  const noPricedItems = protectionCount === 0;
+  const essencialTotal = noPricedItems ? null : protectionTotal('essencial');
+  const premiumTotal = noPricedItems ? null : protectionTotal('premium');
+  const premiumDifference = premiumTotal !== null && essencialTotal !== null ? premiumTotal - essencialTotal : null;
+  const allCount = withTreatmentQty.reduce((sum, i) => sum + i.qty, 0);
+  const scopeCount = protectionCount || allCount;
+  const scopeText = `para ${scopeCount} ${scopeCount === 1 ? 'sofá' : 'sofás'}${protectionCount && quoteNote ? ` · ${quoteNote}` : ''}`;
   const selectedProtectionTotal = originalProtectionTotal(tier);
   // Anti-ácaros: acréscimo por sofá, por tamanho (5+ lugares e canto sob orçamento).
-  const antiLines = comparisonItems.filter(item => item.qty > 0).map(item => ({
+  const antiLines = withTreatmentQty.filter(item => item.qty > 0).map(item => ({
     sizeId: item.sizeId,
     label: sofaPrices.find(p => p.id === item.sizeId)?.label ?? item.sizeId,
     qty: item.qty,
     unit: sofaAntiAcarosPrice(item.sizeId),
   }));
   const antiTotal = antiLines.some(line => line.unit === null) ? null : antiLines.reduce((sum, line) => sum + (line.unit ?? 0) * line.qty, 0);
-  const cleaningTotal = comparisonItems.reduce<number | null>((sum, item) => {
+  const cleaningTotal = noPricedItems ? null : comparisonItems.reduce<number | null>((sum, item) => {
     if (!item.qty) return sum;
     const option = sofaPrices.find(p => p.id === item.sizeId);
     if (!option || sum === null) return null;
@@ -121,7 +136,7 @@ const QuizSofaAddonUpsell = ({ formData, updateFormData, sofaItems, setSofaItems
         {titleBase}
       </h2>
       <QuizCareIntro service="sofa" sizeId={activeItems[0]?.sizeId}>
-        <ul className="space-y-1.5">
+        <ul className="space-y-1">
           {(isWaterproofBase ? ['Remove sujidade acumulada', 'Ajuda a reduzir odores', 'Limpeza profunda do tecido'] : ['Impermeabilização repele líquidos', 'Anti-ácaros trata o tecido', 'Um tratamento por sofá, na mesma visita']).map(benefit => <li key={benefit} className="flex items-start gap-1.5"><Check aria-hidden="true" className="w-3.5 h-3.5 text-gold shrink-0 mt-0.5" /><span>{benefit}</span></li>)}
         </ul>
       </QuizCareIntro>
@@ -133,7 +148,8 @@ const QuizSofaAddonUpsell = ({ formData, updateFormData, sofaItems, setSofaItems
           prices={{ essencial: essencialTotal, premium: premiumTotal }}
           originalPrices={{ essencial: originalProtectionTotal('essencial'), premium: originalProtectionTotal('premium') }}
           packBaseTotal={selectedCleaningTotal}
-          priceScope={protectionCount === 1 ? 'para 1 sofá' : `para ${protectionCount} sofás`}
+          priceScope={scopeText}
+          hideIcons
           formData={formData}
           updateFormData={updateFormData}
           onSelect={selectTier}
@@ -168,7 +184,7 @@ const QuizSofaAddonUpsell = ({ formData, updateFormData, sofaItems, setSofaItems
                     </li>
                   ))}
                 </ul>
-                {protectionCount > 1 && antiTotal !== null && <p className="text-sm text-white/80 mt-1.5">+{antiTotal.toLocaleString('pt-PT')}€ para {protectionCount} sofás</p>}
+                {allCount > 1 && antiTotal !== null && <p className="text-sm text-white/80 mt-1.5">+{antiTotal.toLocaleString('pt-PT')}€ para {allCount} sofás</p>}
               </div>
             </div>
             <span className={cn(
@@ -196,7 +212,7 @@ const QuizSofaAddonUpsell = ({ formData, updateFormData, sofaItems, setSofaItems
             <div className="border-t border-gold/15 mt-2 pt-2">
               <p className="text-sm font-bold uppercase tracking-[0.16em] text-white/80 mb-1">Acréscimo</p>
               <p className="text-2xl leading-none font-black tracking-tight tabular-nums text-gold">{cleaningTotal === null ? 'Sob orçamento' : `+${cleaningTotal.toLocaleString('pt-PT')}€`}{cleaningTotal !== null && selectedCleaningTotal !== null && selectedCleaningTotal > cleaningTotal && <del aria-label={`Preço original da limpeza: ${selectedCleaningTotal.toLocaleString('pt-PT')} euros`} className="ml-2 text-base font-medium text-white/80 decoration-white/70 whitespace-nowrap">{selectedCleaningTotal.toLocaleString('pt-PT')}€</del>}</p>
-              <p className="text-sm text-white/80 mt-1.5">para {protectionCount} {protectionCount === 1 ? 'sofá' : 'sofás'} · preço em pack</p>
+              <p className="text-sm text-white/80 mt-1.5">{scopeText} · preço em pack</p>
               {cleaningTotal !== null && selectedProtectionTotal !== null && selectedCleaningTotal !== null && selectedCleaningTotal > cleaningTotal && <p className="text-xs leading-relaxed text-white/75 mt-1.5">Pack: {(selectedProtectionTotal + cleaningTotal).toLocaleString('pt-PT')}€ em vez de {(selectedProtectionTotal + selectedCleaningTotal).toLocaleString('pt-PT')}€</p>}
             </div>
           </div>
@@ -210,6 +226,7 @@ const QuizSofaAddonUpsell = ({ formData, updateFormData, sofaItems, setSofaItems
       )}
       {anyPackOn && <QuizTreatmentQuantities service="sofa" items={activeItems}
         onChange={(sizeId, qty) => setSofaItems(prev => prev.map(i => i.sizeId === sizeId ? { ...i, packQty: qty, packEnabled: qty > 0 } : i))} />}
+      {!hideNavigation && (
       <div className="flex items-center gap-3 w-full max-w-sm mt-1">
         <button
           onClick={onBack}
@@ -224,6 +241,7 @@ const QuizSofaAddonUpsell = ({ formData, updateFormData, sofaItems, setSofaItems
           {anyPackOn ? (isWaterproofBase ? 'Continuar com higienização' : 'Continuar com tratamento') : 'Continuar sem extras'}
         </button>
       </div>
+      )}
     </div>
   );
 };

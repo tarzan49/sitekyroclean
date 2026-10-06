@@ -32,8 +32,8 @@ interface QuizComboUpsellScreenProps {
 // repetir ao lado ("69€ 69€") não é uma redução, é ruído que parece truque.
 const PriceCompare = ({ original, promo, suffix = '' }: { original: number; promo: number; suffix?: string }) => (
   <span className="inline-flex items-baseline gap-1.5 tabular-nums">
-    {promo < original && <s className="text-white/80 font-normal">{fmt(original)}€</s>}
-    <span className="text-gold font-black tracking-tight">{fmt(promo)}€{suffix}</span>
+    {promo < original && <s className="text-white/80 font-normal">{fmtEur(original)}€</s>}
+    <span className="text-gold font-black tracking-tight">{fmtEur(promo)}€{suffix}</span>
   </span>
 );
 
@@ -51,6 +51,12 @@ const SOFA_REFERENCE = '2-lugares';
 
 function fmt(n: number): string {
   return n % 1 === 0 ? String(n) : n.toFixed(1).replace('.', ',');
+}
+
+// Euros com cêntimos ("101,25"), como o recibo: com uma casa só, 8 cadeiras
+// com a regalia apareciam a "101,3€" e o resumo do pedido dizia 101,25 €.
+function fmtEur(n: number): string {
+  return n % 1 === 0 ? String(n) : n.toFixed(2).replace('.', ',');
 }
 
 // Upsell final "estilo companhia aérea": uma única tela com as 4 categorias
@@ -78,6 +84,22 @@ const QuizComboUpsellScreen = ({ travelFee = 10, primaryTablePrice = 0, primaryS
     upsellItems.find(item => item.id === 'carpet')?.carpetItems
       ?? [{ id: 'upsell-tapete-1', largura: '', comprimento: '' }]
   );
+
+  // "Voltar" num ecrã de detalhe desfaz o que lá se mudou (e o colchão Casal
+  // que se acrescenta ao abrir); só o "Confirmar" guarda. Antes, os dois
+  // botões faziam o mesmo: espreitar o colchão e voltar atrás deixava um
+  // colchão no pedido.
+  const [viewSnapshot, setViewSnapshot] = useState<{ mattressQty: Record<string, number>; sofaQty: Record<string, number>; chairsQty: number; carpetItems: CarpetItem[] } | null>(null);
+  const cancelView = () => {
+    if (viewSnapshot) {
+      setMattressQty(viewSnapshot.mattressQty);
+      setSofaQty(viewSnapshot.sofaQty);
+      setChairsQty(viewSnapshot.chairsQty);
+      setCarpetItems(viewSnapshot.carpetItems);
+    }
+    setViewSnapshot(null);
+    setView('summary');
+  };
 
   const setMattQty = (id: string, qty: number) => setMattressQty(prev => ({ ...prev, [id]: Math.max(0, Math.min(9, qty)) }));
   const setSofaQtyFor = (id: string, qty: number) => setSofaQty(prev => ({ ...prev, [id]: Math.max(0, Math.min(9, qty)) }));
@@ -154,7 +176,9 @@ const QuizComboUpsellScreen = ({ travelFee = 10, primaryTablePrice = 0, primaryS
   const pricedSofas = Object.values(pricing.sofa).filter((l): l is { table: number; amount: number } => l.table !== null && l.amount !== null);
   const sofaReference = sofaPreview(SOFA_REFERENCE)!;
   const sofaPriceLine: ReactNode = sofaQtyTotal > 0
-    ? (pricedSofas.length > 0 ? <PriceCompare original={sum(pricedSofas.map(l => l.table))} promo={sum(pricedSofas.map(l => l.amount))} /> : 'Sob orçamento')
+    ? (pricedSofas.length > 0
+        ? <><PriceCompare original={sum(pricedSofas.map(l => l.table))} promo={sum(pricedSofas.map(l => l.amount))} />{pricedSofas.length < Object.keys(pricing.sofa).length && <span className="text-sm font-semibold"> + sob orçamento</span>}</>
+        : 'Sob orçamento')
     : <PriceCompare original={sofaReference.table} promo={sofaReference.amount} suffix="/un." />;
 
   // Cadeiras não têm preço fixo por unidade (é por escalão), por isso o
@@ -268,7 +292,7 @@ const QuizComboUpsellScreen = ({ travelFee = 10, primaryTablePrice = 0, primaryS
             sempre"). O rodapé já tem Voltar + Confirmar, chega. */}
         <p className="text-gold text-sm font-bold tracking-[0.08em] uppercase mb-0.5 text-center w-full">QUANTIDADES</p>
         <h2 className="type-quote-title font-playfair    text-white text-center w-full">
-          Detalhes do{view === 'sofa' || view === 'carpet' ? '(s)' : ''} {label}
+          Detalhes {view === 'chairs' ? 'das' : view === 'mattress' ? 'do' : 'do(s)'} {label}
         </h2>
 
         {view === 'carpet' && <QuizCarpetMeasureGuide />}
@@ -401,14 +425,14 @@ const QuizComboUpsellScreen = ({ travelFee = 10, primaryTablePrice = 0, primaryS
         {view === 'carpet' && incompleteCarpets && <p className="text-sm text-amber-200">Preencha as duas medidas de cada tapete ou remova a peça incompleta.</p>}
         <div className="flex items-center gap-3 w-full max-w-xs mt-1">
           <button
-            onClick={() => setView('summary')}
+            onClick={cancelView}
             className="h-14 px-5 flex-shrink-0 bg-transparent border border-white/[0.14] text-white/80 hover:text-white/80 hover:border-white/30 active:scale-[0.98] touch-manipulation rounded-sm flex items-center justify-center transition-all text-base font-semibold"
           >
             <ChevronLeft className="w-4 h-4 mr-1" /> Voltar
           </button>
           <button
             disabled={view === 'carpet' && incompleteCarpets}
-            onClick={() => setView('summary')}
+            onClick={() => { setViewSnapshot(null); setView('summary'); }}
             className="disabled:opacity-40 flex-1 h-14 bg-gradient-to-r from-gold to-[#d4c57b] hover:from-[#d4c57b] hover:to-gold text-[#12121e] font-black text-base   touch-manipulation active:scale-[0.98] rounded-sm shadow-[0_0_32px_rgba(212,175,55,0.30)]"
           >
             Confirmar
@@ -446,7 +470,7 @@ const QuizComboUpsellScreen = ({ travelFee = 10, primaryTablePrice = 0, primaryS
         {visibleRows.map(row => (
           <button
             key={row.view}
-            onClick={() => { if (row.view === 'mattress' && mattressQtyTotal === 0) setMattQty(MATTRESS_REFERENCE, 1); setView(row.view); }}
+            onClick={() => { setViewSnapshot({ mattressQty, sofaQty, chairsQty, carpetItems }); if (row.view === 'mattress' && mattressQtyTotal === 0) setMattQty(MATTRESS_REFERENCE, 1); setView(row.view); }}
             className={cn(
               'group relative flex items-center gap-3 rounded-sm border px-3 text-left transition-all duration-200 touch-manipulation active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold',
               compactRows ? 'min-h-[78px] py-1.5 pr-12' : 'min-h-[132px] flex-col justify-center py-2.5',

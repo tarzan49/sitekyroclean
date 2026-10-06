@@ -1,4 +1,4 @@
-import { quizServiceTypeLabel } from '@/components/quiz/quizHelpers';
+import { quizServiceTypeLabel, treatmentQty } from '@/components/quiz/quizHelpers';
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
@@ -625,7 +625,10 @@ ${formData.description || 'Sem observações adicionais'}
               travelRowLabel={rugPickupCost !== null ? 'Recolha, entrega e deslocação' : undefined}
               travelOnQuote={rugTravelOnQuote}
               needsQuote={hasSobOrcamento || hasUpsellSobItem}
-              travelOnly={calculateServicePrice === 0 && finalTravelCost > 0}
+              // Só a deslocação quando nada mais tem preço: um extra do ecrã
+              // "Aproveite a mesma visita" com preço sobre um serviço principal
+              // sob orçamento mostrava o total dos dois como "Deslocação".
+              travelOnly={totalPrice === finalTravelCost && finalTravelCost > 0}
               location={formData.location}
             />
           )}
@@ -765,6 +768,7 @@ ${formData.description || 'Sem observações adicionais'}
             {currentStep === 3 && activeUpsellScreen === 'sofa' && (
               <div className="flex-1 flex flex-col w-full items-center text-center overflow-y-auto">
                 <QuizSofaAddonUpsell
+                  hideNavigation
                   formData={formData}
                   updateFormData={updateFormData}
                   sofaItems={sofaItems}
@@ -781,6 +785,7 @@ ${formData.description || 'Sem observações adicionais'}
             {currentStep === 3 && activeUpsellScreen === 'mattress' && (
               <div className="flex-1 flex flex-col w-full items-center text-center overflow-y-auto">
                 <QuizMattressAddonUpsell
+                  hideNavigation
                   formData={formData}
                   updateFormData={updateFormData}
                   mattressItems={mattressItems}
@@ -845,10 +850,18 @@ ${formData.description || 'Sem observações adicionais'}
       </div>
     </div>
 
-    {currentStep === 3 && activeUpsellScreen === 'chairs' && (
+    {/* Voltar/Continuar dos ecrãs de tratamento fixos no fundo, fora do
+        scroll: no sofá o Continuar ficava ecrã e meio abaixo (dono,
+        2026-10-06: sem scrolls grandes). */}
+    {currentStep === 3 && (activeUpsellScreen === 'chairs' || activeUpsellScreen === 'sofa' || activeUpsellScreen === 'mattress') && (
       <div className="shrink-0 w-full flex justify-center px-4 sm:px-6 pt-2 pb-3 border-t border-gold/15 bg-[#071a12]" style={{ paddingBottom: 'max(0.75rem, env(safe-area-inset-bottom))' }}>
         <ChairAddonActions
-          selected={formData.serviceType === 'waterproofing' ? formData.chairWaterproofQty > 0 : formData.chairWaterproofing || formData.chairAntiAcaros}
+          selected={activeUpsellScreen === 'sofa'
+            ? sofaItems.some(i => i.qty > 0 && treatmentQty(i) > 0)
+            : activeUpsellScreen === 'mattress'
+              ? mattressItems.some(i => i.qty > 0 && treatmentQty(i) > 0)
+              : formData.serviceType === 'waterproofing' ? formData.chairWaterproofQty > 0 : formData.chairWaterproofing || formData.chairAntiAcaros}
+          selectedLabel={activeUpsellScreen === 'sofa' && formData.serviceType === 'waterproofing' ? 'Continuar com higienização' : undefined}
           onBack={() => { (document.activeElement as HTMLElement)?.blur(); setActiveUpsellScreen(null); }}
           onContinue={() => { (document.activeElement as HTMLElement)?.blur(); proceedPastConfig(); }}
         />

@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest';
 import {
   calcChairClean, calcChairWaterproof, calcChairWaterproofPremium,
   calcPackPricing, carpetItemArea, carpetHasValidItems,
-  calcSofaUnitPrice, chairAntiAcarosQty, quizServiceTypeLabel,
+  calcSofaUnitPrice, chairAntiAcarosQty, quizServiceTypeLabel, carpetAddItem,
 } from './quizHelpers';
 import { sofaPrices, mattressPrices, initialFormData } from './QuizTypes';
 
@@ -173,5 +173,14 @@ describe('treatment helpers shared by the totals, the receipt and the configurat
     expect(quizServiceTypeLabel({ ...form, service: 'chairs', chairQuantity: '4', chairAntiAcaros: true }, [], [])).toBe('Higienização Profunda + Anti-ácaros');
     expect(quizServiceTypeLabel({ ...form, service: 'mattress' }, [], [{ sizeId: 'casal', qty: 1, packEnabled: true }])).toBe('Higienização Profunda + Desbacterização e Anti Ácaros');
     expect(quizServiceTypeLabel({ ...form, serviceType: 'waterproofing', waterproofingTier: 'essencial' }, treated, [])).toBe('Impermeabilização Essencial + Higienização Profunda');
+  });
+});
+
+describe('carpetAddItem', () => {
+  it('never reuses the id of the first rug the quiz starts with', () => {
+    const items = carpetAddItem([{ id: 'tapete-1', largura: '2', comprimento: '3' }]);
+    expect(new Set(items.map(i => i.id)).size).toBe(2);
+    const twice = carpetAddItem(items);
+    expect(new Set(twice.map(i => i.id)).size).toBe(3);
   });
 });

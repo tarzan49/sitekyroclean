@@ -142,15 +142,16 @@ it('retains Alcatifa instead of mislabelling it as a rug', async () => {
 });
 
 it.each([
-  ['2,5', '3', '7.5'], ['2.5', '3', '7.5'], ['1,25', '2,4', '3'], ['0.75', '1.5', '1.13'],
-])('sends both dimensions and correct rounded area to the email channel: %s × %s', async (largura, comprimento, area) => {
+  // Medidas e área sempre com vírgula, como se escrevem em português.
+  ['2,5', '3', '2,5 × 3 m (7,5'], ['2.5', '3', '2,5 × 3 m (7,5'], ['1,25', '2,4', '1,25 × 2,4 m (3'], ['0.75', '1.5', '0,75 × 1,5 m (1,13'],
+])('sends both dimensions and correct rounded area to the email channel: %s × %s', async (largura, comprimento, expected) => {
   const p = payload({ service: 'carpet', serviceType: 'cleaning' });
   p.carpetItems = [{ id: 'first', largura, comprimento }, { id: 'second', largura: '1', comprimento: '4' }];
   p.detailsSummary = buildReceiptLines(p).map(l => `${l.qty}x ${l.label}: ${l.total ?? 'Sob orçamento'}`).join('\n');
   p.message = `Detalhes: ${p.detailsSummary}\nEstimativa: ${p.priceText}`;
   await submitQuizLead(p);
   const emailBody = mocks.invokeEmail.mock.calls[0][0].body;
-  expect(emailBody.lead.message).toContain(`Tapete 1: ${largura} × ${comprimento} m (${area} m²)`);
+  expect(emailBody.lead.message).toContain(`Tapete 1: ${expected} m²)`);
   expect(emailBody.lead.message).toContain('Tapete 2: 1 × 4 m (4 m²)');
   expect(emailBody.lead.message).toContain('Sob orçamento');
   expect(new URL(sessionStorage.getItem('kyro_wa_url')!).searchParams.get('text')).not.toContain(p.message);

@@ -25,6 +25,9 @@ const QuizStepConfigSofa = ({ formData, updateFormData, sofaItems, setSofaItems 
   // precisa de reset manual — trocar de serviço desmonta este componente e
   // volta a montar do zero, o que já reseta este estado sozinho.
   const [tierChosen, setTierChosen] = useState(false);
+  // Com seis tamanhos, os cartões da proteção ficam compactos (sem ícone)
+  // depois da escolha e as linhas mais baixas, para o ecrã caber quase todo
+  // a 375x812 (pedido do dono, 2026-10-06: sem scrolls grandes).
 
   const isWaterproofBase = formData.serviceType === 'waterproofing';
   // '4+-lugares' é o sofá de canto, em U ou modular, sob orçamento.
@@ -42,6 +45,7 @@ const QuizStepConfigSofa = ({ formData, updateFormData, sofaItems, setSofaItems 
           updateFormData={updateFormData}
           onSelect={() => setTierChosen(true)}
           activeTier={tierChosen ? formData.waterproofingTier : null}
+          compact={tierChosen}
         />
       )}
       {(!isWaterproofBase || tierChosen) && (
@@ -71,7 +75,7 @@ const QuizStepConfigSofa = ({ formData, updateFormData, sofaItems, setSofaItems 
               : option.originalBothPrice;
             return (
               <div key={option.id} className={cn('rounded-sm border-2 transition-all duration-200 overflow-hidden', isActive && packOn ? 'border-gold bg-[#1a2a1a] shadow-[0_0_12px_rgba(212,175,55,0.20)]' : isActive ? 'border-gold/50 bg-[#1a2a1a] shadow-[0_0_8px_rgba(212,175,55,0.10)]' : 'border-dashed border-gold/30 bg-gold/[0.03]')}>
-                <div className="flex items-center gap-2 px-2.5 sm:px-3 py-3 [@media(max-height:800px)]:py-1">
+                <div className="flex items-center gap-2 px-2.5 sm:px-3 py-2 [@media(max-height:800px)]:py-1">
                   <QuizFurnitureImage service="sofa" sizeId={option.id} className="[@media(max-height:800px)]:w-12 [@media(max-height:800px)]:h-12" />
                   <div className="flex-1 min-w-0 text-left">
                     <span className="text-base font-semibold text-white">{option.label}</span>{partialTreatment && <p className="text-sm text-gold">Tratamento em {treatedQty} de {qty}</p>}

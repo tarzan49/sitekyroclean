@@ -181,3 +181,19 @@ describe('summary previews price the reference item as if it were added', () => 
     expect(card(/^Cadeiras/).textContent).toContain('Limpe 4, pague 3');
   });
 });
+
+describe('detail screens: Voltar cancels, Confirmar keeps', () => {
+  it('opening the mattress and going back leaves no mattress in the order', () => {
+    render(<Harness primaryService="sofa" primaryTablePrice={79} />);
+    click(/^Colchão/);
+    expect(savedItems()).toHaveLength(1);
+    click('Voltar');
+    expect(savedItems()).toEqual([]);
+  });
+  it('going back undoes quantity changes made in that screen only', () => {
+    render(<Harness primaryService="sofa" primaryTablePrice={79} />);
+    click(/^Cadeiras/); increment(); confirm();
+    click(/^Cadeiras/); increment(); click('Voltar');
+    expect(savedItems().find(i => i.id === 'chairs')?.qty).toBe(4);
+  });
+});

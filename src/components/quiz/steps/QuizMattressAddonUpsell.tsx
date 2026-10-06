@@ -14,10 +14,12 @@ interface QuizMattressAddonUpsellProps {
   setMattressItems: React.Dispatch<React.SetStateAction<MattressItem[]>>;
   onContinue: () => void;
   onBack: () => void;
+  /** O QuizForm desenha o Voltar/Continuar fixo no fundo (como nas cadeiras). */
+  hideNavigation?: boolean;
 }
 
 // O cartão liga/desliga o tratamento para os colchões escolhidos, sem expandir detalhes.
-const QuizMattressAddonUpsell = ({ mattressItems, setMattressItems, onContinue, onBack }: QuizMattressAddonUpsellProps) => {
+const QuizMattressAddonUpsell = ({ mattressItems, setMattressItems, onContinue, onBack, hideNavigation = false }: QuizMattressAddonUpsellProps) => {
   const activeItems = mattressItems.filter(i => i.qty > 0);
   const anyOn = activeItems.some(i => i.packEnabled);
   const plural = activeItems.length > 1 || (activeItems[0]?.qty ?? 0) > 1;
@@ -79,6 +81,7 @@ const QuizMattressAddonUpsell = ({ mattressItems, setMattressItems, onContinue, 
 
       {anyOn && <QuizTreatmentQuantities service="mattress" items={activeItems}
         onChange={(sizeId, qty) => setMattressItems(prev => prev.map(i => i.sizeId === sizeId ? { ...i, packQty: qty, packEnabled: qty > 0 } : i))} />}
+      {!hideNavigation && (
       <div className="flex items-center gap-3 w-full max-w-sm mt-1">
         <button
           onClick={onBack}
@@ -93,6 +96,7 @@ const QuizMattressAddonUpsell = ({ mattressItems, setMattressItems, onContinue, 
           {anyOn ? 'Continuar com tratamento' : 'Continuar sem extras'}
         </button>
       </div>
+      )}
     </div>
   );
 };

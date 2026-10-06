@@ -111,7 +111,7 @@ const QuizChairsAddonUpsell = ({ formData, updateFormData, onContinue, onBack, h
     <div className="flex flex-col gap-1.5 overflow-hidden items-center w-full">
       <h2 className="type-quote-title font-playfair   text-white text-center w-full">Proteja as suas cadeiras</h2>
       <QuizCareIntro service="chairs">
-        <ul className="space-y-1.5">{['Impermeabilização repele líquidos', 'Anti-ácaros trata o tecido', 'Um tratamento, na mesma visita'].map(benefit => <li key={benefit} className="flex items-start gap-1.5"><Check aria-hidden="true" className="w-3.5 h-3.5 text-gold shrink-0 mt-0.5" /><span>{benefit}</span></li>)}</ul>
+        <ul className="space-y-1">{['Impermeabilização repele líquidos', 'Anti-ácaros trata o tecido', 'Um tratamento, na mesma visita'].map(benefit => <li key={benefit} className="flex items-start gap-1.5"><Check aria-hidden="true" className="w-3.5 h-3.5 text-gold shrink-0 mt-0.5" /><span>{benefit}</span></li>)}</ul>
       </QuizCareIntro>
 
       <p className="w-full max-w-sm text-sm font-bold uppercase tracking-[0.12em] text-white/80 text-left mt-1">Impermeabilização</p>
@@ -163,7 +163,7 @@ const QuizChairsAddonUpsell = ({ formData, updateFormData, onContinue, onBack, h
 
 export default QuizChairsAddonUpsell;
 
-export function ChairAddonActions({ selected, onBack, onContinue }: { selected: boolean; onBack: () => void; onContinue: () => void }) {
+export function ChairAddonActions({ selected, onBack, onContinue, selectedLabel = 'Continuar com tratamento' }: { selected: boolean; onBack: () => void; onContinue: () => void; selectedLabel?: string }) {
   return (<div className="flex items-center gap-3 w-full max-w-sm mt-1">
         <button
           onClick={onBack}
@@ -175,7 +175,7 @@ export function ChairAddonActions({ selected, onBack, onContinue }: { selected: 
           onClick={onContinue}
           className="flex-1 h-14 bg-gradient-to-r from-gold to-[#d4c57b] hover:from-[#d4c57b] hover:to-gold text-[#12121e] font-black text-base leading-snug px-2   touch-manipulation active:scale-[0.98] rounded-sm shadow-[0_0_32px_rgba(212,175,55,0.30)]"
         >
-          {selected ? 'Continuar com tratamento' : 'Continuar sem extras'}
+          {selected ? selectedLabel : 'Continuar sem extras'}
         </button>
       </div>);
 }

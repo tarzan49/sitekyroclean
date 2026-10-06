@@ -174,6 +174,10 @@ export function formatQuotePrice(payload: Pick<QuizLeadPayload, 'totalPrice' | '
     : value > 0 ? price : 'Sob orçamento';
 }
 
+// As medidas chegam do campo numérico com ponto ("2.5"), mesmo quando a
+// pessoa escreve "2,5": no resumo, no email e no CRM escrevem-se com vírgula.
+const ptDecimal = (value: string | number) => String(value).trim().replace('.', ',');
+
 export function buildReceiptLines(payload: Pick<QuizLeadPayload, 'service' | 'serviceType' | 'waterproofingTier' | 'sofaItems' | 'mattressItems' | 'upsellItems' | 'carpetItems' | 'chairQuantity' | 'chairWaterproofQty' | 'chairAntiAcaros' | 'sofaAntiAcaros' | 'finalTravelCost' | 'finalLocation' | 'carpetKind' | 'rugPickup'>) {
   const {
     service, serviceType, waterproofingTier, sofaItems, mattressItems, upsellItems, carpetItems, chairQuantity,
@@ -239,7 +243,7 @@ export function buildReceiptLines(payload: Pick<QuizLeadPayload, 'service' | 'se
     carpetItems.forEach((item, i) => {
       const area = carpetItemArea(item);
       if (area === null) return;
-      receiptLines.push({ label: `${payload.carpetKind === 'alcatifa' ? 'Alcatifa' : 'Tapete'} ${i + 1}: ${item.largura} × ${item.comprimento} m (${Number(area.toFixed(2))} m²)`, qty: 1, unitPrice: null, total: null });
+      receiptLines.push({ label: `${payload.carpetKind === 'alcatifa' ? 'Alcatifa' : 'Tapete'} ${i + 1}: ${ptDecimal(item.largura)} × ${ptDecimal(item.comprimento)} m (${ptDecimal(Number(area.toFixed(2)))} m²)`, qty: 1, unitPrice: null, total: null });
     });
     // Recolha e entrega com a deslocação incluída (dono, 2026-10-05): o único
     // valor fixo de um pedido de tapetes, pela área somada. Sem recolha, a
@@ -252,8 +256,13 @@ export function buildReceiptLines(payload: Pick<QuizLeadPayload, 'service' | 'se
   upsellItems.forEach(item => {
     const q = item.qty ?? 1;
     const unitP = q > 0 && item.price > 0 ? Math.round(item.price / q * 100) / 100 : null;
-    const measures = item.carpetItems?.map((rug, i) => `peça ${i + 1}: ${rug.largura} × ${rug.comprimento} m`).join('; ');
-    receiptLines.push({ label: `${item.label.replace(/^\d+\s*[x×]\s*/i, '')}${measures ? ` (${measures})` : ''}`, qty: q, unitPrice: unitP, total: item.price > 0 ? item.price : null });
+    const measures = item.carpetItems?.map((rug, i) => `peça ${i + 1}: ${ptDecimal(rug.largura)} × ${ptDecimal(rug.comprimento)} m`).join('; ');
+    // A quantidade já vai na coluna própria: tira-a do rótulo, com ou sem
+    // "x" ("1x Colchão Casal", "8 Cadeiras (paga 6)"), senão o resumo dizia
+    // "8× 8 Cadeiras".
+    const leadingQty = item.label.match(/^(\d+)\s*[x×]?\s+/i);
+    const label = leadingQty && (/[x×]/i.test(leadingQty[0]) || Number(leadingQty[1]) === q) ? item.label.slice(leadingQty[0].length) : item.label;
+    receiptLines.push({ label: `${label}${measures ? ` (${measures})` : ''}`, qty: q, unitPrice: unitP, total: item.price > 0 ? item.price : null });
     if (item.waterproof && item.waterproofPrice && item.waterproofPrice > 0) {
       receiptLines.push({ label: `Impermeabilização (${item.label})`, qty: 1, unitPrice: item.waterproofPrice, total: item.waterproofPrice });
     }

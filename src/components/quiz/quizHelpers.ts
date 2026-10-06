@@ -51,8 +51,15 @@ let carpetItemSeq = 1;
 export function carpetNewItem(): CarpetItem {
   return { id: `tapete-${carpetItemSeq++}`, largura: '', comprimento: '' };
 }
+// O primeiro tapete do quiz nasce com o id fixo 'tapete-1' (QuizForm), e o
+// contador começava também em 1: o primeiro "Adicionar outro tapete" criava
+// um segundo 'tapete-1', e escrever as medidas de um mudava as do outro
+// (remover um apagava os dois). Salta qualquer id que já exista.
 export function carpetAddItem(items: CarpetItem[]): CarpetItem[] {
-  return [...items, carpetNewItem()];
+  const taken = new Set(items.map(i => i.id));
+  let item = carpetNewItem();
+  while (taken.has(item.id)) item = carpetNewItem();
+  return [...items, item];
 }
 export function carpetRemoveItem(items: CarpetItem[], id: string): CarpetItem[] {
   return items.filter(i => i.id !== id);
