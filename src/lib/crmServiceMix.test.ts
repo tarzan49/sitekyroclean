@@ -6,6 +6,7 @@ describe('itemsOf', () => {
   it('reconhece os artigos, com e sem acentos', () => {
     expect(itemsOf('Limpeza sofá 3 lugares + 2 tapetes 1,90x2,90')).toEqual(['Sofá', 'Tapete']);
     expect(itemsOf('Limpeza de colchao casal')).toEqual(['Colchão']);
+    expect(itemsOf('Limpeza de sommier')).toEqual(['Colchão']);
     expect(itemsOf('Limpeza de carpete 6m2')).toEqual(['Tapete']);
     expect(itemsOf('Limpeza de alcatifa 75 m²')).toEqual(['Alcatifa']);
     expect(itemsOf('Limpeza sofá 3 lugares + tapete + cabeceira')).toEqual(['Sofá', 'Tapete', 'Cabeceira']);

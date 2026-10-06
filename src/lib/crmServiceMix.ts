@@ -19,7 +19,7 @@ const normalize = (s: string) => s.toLowerCase().normalize('NFD').replace(/[̀-�
 // Poltronas, chaises e cadeirões são estofos do mesmo tipo que um sofá.
 const ITEM_PATTERNS: [Exclude<ServiceItem, 'Outro'>, RegExp][] = [
   ['Sofá', /\bsofa|poltron|chaise|cadeirao|cadeiroes|\bmaple|\bpuff|\bpufe/],
-  ['Colchão', /colch/],
+  ['Colchão', /colch|sommier/],
   ['Tapete', /tapete|carpete/],
   ['Cadeiras', /\bcadeiras?\b/],
   ['Alcatifa', /alcatif/],
