@@ -1,6 +1,6 @@
 import { useState, lazy, Suspense } from "react";
 import { Link } from "react-router-dom";
-import { AlertTriangle, BarChart3, Home, Settings2, Lock, LogOut, Users, Globe, MessageCircle, Mail, Megaphone, Contact } from "lucide-react";
+import { AlertTriangle, BarChart3, Home, Settings2, Lock, LogOut, Users, Globe, Mail, Megaphone, Contact } from "lucide-react";
 import { isSupabaseConfigured, supabase } from "@/integrations/supabase/client";
 import { useAdminSession } from "@/hooks/use-admin-session";
 
@@ -9,12 +9,11 @@ const ClientsPanel = lazy(() => import("./admin/ClientsPanel"));
 const SitemapMonitor = lazy(() => import("./admin/SitemapMonitor"));
 const ErrorLogPanel = lazy(() => import("./admin/ErrorLogPanel"));
 const QuizMetricsPanel = lazy(() => import("./admin/QuizMetricsPanel"));
-const WhatsAppPanel = lazy(() => import("./admin/WhatsAppPanel"));
 const QuizLeadsPanel = lazy(() => import("./admin/QuizLeadsPanel"));
 const MarketingPanel = lazy(() => import("./admin/MarketingPanel"));
 const GoogleAdsPanel = lazy(() => import("./admin/GoogleAdsPanel"));
 
-type Tab = "sitemap" | "errors" | "metrics" | "crm" | "clientes" | "whatsapp" | "quiz-leads" | "marketing" | "meta-marketing";
+type Tab = "sitemap" | "errors" | "metrics" | "crm" | "clientes" | "quiz-leads" | "marketing" | "meta-marketing";
 
 const TabFallback = () => (
   <div className="flex items-center justify-center py-16">
@@ -157,7 +156,6 @@ const AdminPanel = () => {
             { id: "quiz-leads", label: "Quiz Leads",  icon: Mail },
             { id: "marketing", label: "Google Ads",  icon: Megaphone },
             { id: "meta-marketing", label: "Meta Ads", icon: Megaphone },
-            { id: "whatsapp",  label: "WhatsApp",      icon: MessageCircle },
             { id: "sitemap",   label: "Sitemaps",      icon: Globe },
             { id: "errors",    label: "Error Log",     icon: AlertTriangle },
             { id: "metrics",   label: "Métricas Quiz", icon: BarChart3 },
@@ -237,12 +235,6 @@ const AdminPanel = () => {
 
         {activeTab === "meta-marketing" && (
           <Suspense fallback={<TabFallback />}><MarketingPanel key="meta" platform="meta" /></Suspense>
-        )}
-
-        {activeTab === "whatsapp" && (
-          <Suspense fallback={<TabFallback />}>
-            <WhatsAppPanel />
-          </Suspense>
         )}
       </main>
     </div>
