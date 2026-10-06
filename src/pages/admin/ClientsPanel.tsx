@@ -16,6 +16,8 @@ import {
   effectiveStatus,
   emptyFilters,
   firstName,
+  followUpKind,
+  type FollowUpKind,
   formatPhone,
   inWindow,
   matchesFilters,
@@ -97,7 +99,7 @@ const ClientsPanel = () => {
   const [services, setServices] = useState<ClientService[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [view, setView] = useState<"fichas" | "evolucao">("fichas");
+  const [view, setView] = useState<"fichas" | "seguimentos" | "evolucao">("fichas");
   const [filters, setFilters] = useState<ClientFilters>(emptyFilters());
   const [period, setPeriod] = useState<StatPeriod>(30);
   const [openId, setOpenId] = useState<string | null>(null);
@@ -151,7 +153,7 @@ const ClientsPanel = () => {
     URL.revokeObjectURL(url);
   };
 
-  const saveClient = async (id: string, patch: Partial<Pick<ClientRow, "name" | "notes">>) => {
+  const saveClient = async (id: string, patch: Partial<Pick<ClientRow, "name" | "notes" | "follow_up_at" | "follow_up_reason">>) => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { error: err } = await (supabase as any).from("clients").update(patch).eq("id", id);
     if (err) { setError(err.message); return false; }
@@ -170,7 +172,7 @@ const ClientsPanel = () => {
         </div>
         <div className="flex items-center gap-2">
           <div className="flex items-center gap-1 border border-gray-200 rounded-lg p-0.5 bg-white" role="group">
-            {([["fichas", "Fichas"], ["evolucao", "Evolução"]] as const).map(([id, label]) => (
+            {([["fichas", "Fichas"], ["seguimentos", "Seguimentos"], ["evolucao", "Evolução"]] as const).map(([id, label]) => (
               <button key={id} onClick={() => setView(id)} aria-pressed={view === id}
                 className={`px-3 py-1.5 text-xs font-medium rounded-md ${view === id ? "bg-navy text-white" : "text-navy hover:bg-gray-50"}`}>{label}</button>
             ))}
@@ -261,6 +263,8 @@ const ClientsPanel = () => {
             </button>
           )}
         </>
+      ) : view === "seguimentos" ? (
+        <FollowUps rows={enriched} onOpen={setOpenId} onSave={saveClient} />
       ) : (
         <Evolution rows={enriched} period={period} setPeriod={setPeriod} />
       )}
@@ -269,6 +273,92 @@ const ClientsPanel = () => {
     </div>
   );
 };
+
+const FOLLOW_UP_GROUPS: { kind: FollowUpKind; title: string; note: string }[] = [
+  { kind: "lembrete", title: "Avisos com data", note: "Contactos que ficaram para mais tarde. Aparecem 7 dias antes do dia marcado na ficha." },
+  { kind: "a_espera", title: "À espera de nós", note: "O cliente escreveu por último e ninguém lhe respondeu." },
+  { kind: "seguimento", title: "Seguimento sugerido", note: "Por marcar, a última mensagem foi nossa. Antes de escrever, conta quantas ficaram sem resposta: com duas ou mais, melhor parar." },
+  { kind: "epoca", title: "Para o Natal e a Black Friday", note: "Não interessados ou parados há mais de 40 dias: uma mensagem de época, não um seguimento." },
+];
+
+function addDays(day: string, n: number) {
+  const d = new Date(`${day}T12:00:00Z`);
+  d.setUTCDate(d.getUTCDate() + n);
+  return d.toISOString().slice(0, 10);
+}
+
+function FollowUps({ rows, onOpen, onSave }: {
+  rows: Enriched[];
+  onOpen: (id: string) => void;
+  onSave: (id: string, patch: Partial<Pick<ClientRow, "follow_up_at" | "follow_up_reason">>) => Promise<boolean>;
+}) {
+  const today = lisbonDay(new Date());
+  const items = rows
+    .map(r => ({ r, f: followUpKind(r, today) }))
+    .filter((x): x is { r: Enriched; f: NonNullable<ReturnType<typeof followUpKind>> } => x.f !== null);
+  const upcoming = rows
+    .filter(r => r.client.follow_up_at && r.client.follow_up_at > addDays(today, 7))
+    .sort((a, b) => a.client.follow_up_at!.localeCompare(b.client.follow_up_at!));
+
+  return (
+    <div className="space-y-4">
+      <p className="text-xs text-gray-500">
+        Calculado a partir das datas das fichas. As fichas atualizam-se quando o WhatsApp é lido de novo; até lá, o que aconteceu depois da última leitura não aparece aqui.
+      </p>
+      {FOLLOW_UP_GROUPS.map(g => {
+        const list = items.filter(x => x.f.kind === g.kind).sort((a, b) => g.kind === "lembrete" ? a.f.days - b.f.days : a.f.days - b.f.days);
+        if (list.length === 0 && g.kind !== "lembrete") return null;
+        return (
+          <div key={g.kind} className="bg-white border border-gray-200 rounded-xl overflow-hidden">
+            <div className="p-4 pb-2">
+              <p className="text-sm font-bold text-navy">{g.title} ({list.length})</p>
+              <p className="text-[11px] text-gray-500">{g.note}</p>
+            </div>
+            <div className="divide-y divide-gray-100">
+              {list.length === 0 && <p className="px-4 pb-4 text-sm text-gray-500">Nenhum aviso para os próximos 7 dias.</p>}
+              {list.map(({ r, f }) => (
+                <div key={r.client.id} className="px-4 py-3 flex items-start gap-3">
+                  <button onClick={() => onOpen(r.client.id)} className="min-w-0 flex-1 text-left">
+                    <p className="font-medium text-navy truncate">{displayName(r.client, r.summary.services)}
+                      <span className="ml-2 text-[11px] text-gray-500 font-normal">{formatPhone(r.client.phone)}{r.client.region ? ` · ${r.client.region}` : ""}</span>
+                    </p>
+                    <p className="text-xs text-gray-600">
+                      {g.kind === "lembrete"
+                        ? `${f.days < 0 ? `Passou há ${-f.days} d` : f.days === 0 ? "É hoje" : `Daqui a ${f.days} d`} (${dayLabel(r.client.follow_up_at!)}): ${r.client.follow_up_reason ?? ""}`
+                        : `${f.days} d sem novidades · ${r.client.services.join(", ") || STATUS_LABEL[r.status]}`}
+                    </p>
+                  </button>
+                  <div className="flex gap-1.5 shrink-0">
+                    <a href={`https://wa.me/${normalizePhone(r.client.phone)}`} target="_blank" rel="noopener noreferrer"
+                      className="px-2.5 py-1.5 text-xs rounded-lg border border-gray-200 text-navy hover:border-navy/30">WhatsApp</a>
+                    {g.kind === "lembrete" && (
+                      <button onClick={() => onSave(r.client.id, { follow_up_at: null, follow_up_reason: null })}
+                        className="px-2.5 py-1.5 text-xs rounded-lg bg-navy text-white">Feito</button>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        );
+      })}
+      {upcoming.length > 0 && (
+        <div className="bg-white border border-gray-200 rounded-xl p-4">
+          <p className="text-sm font-bold text-navy mb-2">Próximos avisos ({upcoming.length})</p>
+          <ul className="space-y-1">
+            {upcoming.map(r => (
+              <li key={r.client.id} className="text-xs text-navy">
+                <button onClick={() => onOpen(r.client.id)} className="text-left">
+                  <strong>{dayLabel(r.client.follow_up_at!)}</strong> · {displayName(r.client, r.summary.services)}: <span className="text-gray-600">{r.client.follow_up_reason}</span>
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+    </div>
+  );
+}
 
 function Evolution({ rows, period, setPeriod }: { rows: Enriched[]; period: StatPeriod; setPeriod: (p: StatPeriod) => void }) {
   const now = new Date();
@@ -368,16 +458,18 @@ function StatsTable({ title, note, firstColumn, rows, label, running, newestFirs
   );
 }
 
-function ClientCard({ item, onClose, onSave }: { item: Enriched; onClose: () => void; onSave: (id: string, patch: Partial<Pick<ClientRow, "name" | "notes">>) => Promise<boolean> }) {
+function ClientCard({ item, onClose, onSave }: { item: Enriched; onClose: () => void; onSave: (id: string, patch: Partial<Pick<ClientRow, "name" | "notes" | "follow_up_at" | "follow_up_reason">>) => Promise<boolean> }) {
   const { client: c, summary: s, status } = item;
   const [name, setName] = useState(c.name ?? "");
   const [notes, setNotes] = useState(c.notes ?? "");
+  const [followAt, setFollowAt] = useState(c.follow_up_at ?? "");
+  const [followWhy, setFollowWhy] = useState(c.follow_up_reason ?? "");
   const [saving, setSaving] = useState(false);
-  const dirty = name !== (c.name ?? "") || notes !== (c.notes ?? "");
+  const dirty = name !== (c.name ?? "") || notes !== (c.notes ?? "") || followAt !== (c.follow_up_at ?? "") || followWhy !== (c.follow_up_reason ?? "");
 
   const save = async () => {
     setSaving(true);
-    const ok = await onSave(c.id, { name: name.trim() || null, notes: notes.trim() || null });
+    const ok = await onSave(c.id, { name: name.trim() || null, notes: notes.trim() || null, follow_up_at: followAt || null, follow_up_reason: followAt ? followWhy.trim() || null : null });
     setSaving(false);
     if (ok) onClose();
   };
@@ -436,6 +528,19 @@ function ClientCard({ item, onClose, onSave }: { item: Enriched; onClose: () => 
           <textarea value={notes} onChange={e => setNotes(e.target.value)} rows={3} placeholder="Ex.: tem 2 gatos, sofá cinza de 3 lugares, prefere manhãs"
             className="mt-1 w-full px-3 py-2 text-sm border border-gray-200 rounded-lg outline-none focus:border-navy/40" />
         </label>
+
+        <div className="grid grid-cols-[auto_1fr] gap-2 items-end">
+          <label className="block">
+            <span className="text-[10.5px] font-bold text-gray-500 uppercase tracking-wider">Lembrar em</span>
+            <input type="date" value={followAt} onChange={e => setFollowAt(e.target.value)}
+              className="mt-1 block px-3 py-2 text-sm border border-gray-200 rounded-lg outline-none focus:border-navy/40" />
+          </label>
+          <label className="block">
+            <span className="text-[10.5px] font-bold text-gray-500 uppercase tracking-wider">Porquê</span>
+            <input value={followWhy} onChange={e => setFollowWhy(e.target.value)} placeholder="Ex.: o sofá novo chega em novembro"
+              className="mt-1 w-full px-3 py-2 text-sm border border-gray-200 rounded-lg outline-none focus:border-navy/40" />
+          </label>
+        </div>
 
         <div className="flex gap-2">
           <a href={`https://wa.me/${normalizePhone(c.phone)}`} target="_blank" rel="noopener noreferrer"

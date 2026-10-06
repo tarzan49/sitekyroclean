@@ -9,6 +9,7 @@ import {
   displayName,
   effectiveStatus,
   emptyFilters,
+  followUpKind,
   factsFromLabels,
   firstName,
   formatPhone,
@@ -173,5 +174,32 @@ describe('evolution', () => {
     expect(contactWeek('2026-10-04T22:30:00Z')).toBe('2026-09-28'); // domingo 23h30 em Lisboa
     expect(contactWeek('2026-10-04T23:30:00Z')).toBe('2026-10-05'); // já segunda em Lisboa
     expect(contactStats([]).closeRate).toBeNull();
+  });
+});
+
+describe('follow-ups', () => {
+  const today = '2026-10-06';
+  const item = (over: Record<string, unknown>, services: ClientService[] = []) => ({
+    client: { status: 'por_marcar' as const, last_contact_at: '2026-10-03T10:00:00Z', last_client_message_at: '2026-10-02T10:00:00Z', follow_up_at: null, ...over },
+    summary: { services },
+  });
+
+  it('shows a dated reminder only from 7 days before', () => {
+    expect(followUpKind(item({ follow_up_at: '2026-10-10' }), today)).toEqual({ kind: 'lembrete', days: 4 });
+    expect(followUpKind(item({ follow_up_at: '2026-09-30' }), today)).toEqual({ kind: 'lembrete', days: -6 });
+    expect(followUpKind(item({ follow_up_at: '2027-01-05' }), today)).toBeNull();
+  });
+
+  it('puts the client who wrote last first, then our follow-up, then the season list', () => {
+    expect(followUpKind(item({ last_client_message_at: '2026-10-03T10:00:00Z' }), today)?.kind).toBe('a_espera');
+    expect(followUpKind(item({}), today)).toEqual({ kind: 'seguimento', days: 3 });
+    expect(followUpKind(item({ last_contact_at: '2026-08-01T10:00:00Z' }), today)?.kind).toBe('epoca');
+    expect(followUpKind(item({ status: 'nao_interessado' }), today)?.kind).toBe('epoca');
+  });
+
+  it('leaves out clients and booked services, and today’s conversations', () => {
+    expect(followUpKind(item({ status: 'marcado' }), today)).toBeNull();
+    expect(followUpKind(item({}, [service()]), today)).toBeNull();
+    expect(followUpKind(item({ last_contact_at: '2026-10-06T09:00:00Z' }), today)).toBeNull();
   });
 });

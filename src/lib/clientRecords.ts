@@ -85,6 +85,9 @@ export interface ClientRow {
   last_client_message_at: string | null;
   notes: string | null;
   source: string;
+  /** Dia em que o dono quer voltar a falar com a pessoa (AAAA-MM-DD). */
+  follow_up_at?: string | null;
+  follow_up_reason?: string | null;
 }
 
 /** O que a ficha precisa de uma linha do CRM de vendas. */
@@ -289,3 +292,38 @@ export const monthlyStats = (rows: StatInput[]) => groupedStats(rows, contactMon
 
 /** Todas as semanas (de segunda a domingo) com contactos, da mais antiga para a mais recente. */
 export const weeklyStats = (rows: StatInput[]) => groupedStats(rows, contactWeek);
+
+// ── Seguimentos (dono, 2026-10-06) ──────────────────────────────────────────
+// O que fazer com cada contacto em aberto, a partir das datas da ficha:
+// avisos com data marcada (ex.: "fica para o ano"), quem escreveu por último e
+// está à espera de nós, quem tem seguimento a fazer e quem fica para uma
+// mensagem de época (Natal, Black Friday).
+
+export type FollowUpKind = 'lembrete' | 'a_espera' | 'seguimento' | 'epoca';
+
+export interface FollowUpInput {
+  client: Pick<ClientRow, 'status' | 'last_contact_at' | 'last_client_message_at'> & { follow_up_at?: string | null };
+  summary: Pick<ClientSummary, 'services'>;
+}
+
+const daysBetween = (fromIso: string, today: string) =>
+  Math.floor((Date.parse(`${today}T12:00:00Z`) - Date.parse(fromIso)) / 86_400_000);
+
+/** Um aviso aparece 7 dias antes da data. */
+export const REMINDER_LEAD_DAYS = 7;
+
+export function followUpKind({ client, summary }: FollowUpInput, today: string): { kind: FollowUpKind; days: number } | null {
+  if (client.follow_up_at) {
+    const until = -daysBetween(`${client.follow_up_at}T12:00:00Z`, today);
+    return until <= REMINDER_LEAD_DAYS ? { kind: 'lembrete', days: until } : null;
+  }
+  const status = effectiveStatus(client, summary);
+  if (status === 'cliente' || status === 'marcado') return null;
+  if (!client.last_contact_at) return null;
+  const quiet = daysBetween(client.last_contact_at, today);
+  if (status === 'nao_interessado' || quiet > 40) return { kind: 'epoca', days: quiet };
+  const theyWroteLast = !!client.last_client_message_at && client.last_client_message_at >= client.last_contact_at;
+  if (theyWroteLast) return { kind: 'a_espera', days: quiet };
+  if (quiet >= 1) return { kind: 'seguimento', days: quiet };
+  return null;
+}
