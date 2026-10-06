@@ -1,9 +1,9 @@
 import { useState, useCallback, useEffect, useMemo, useRef } from "react";
 import { ChevronLeft, ChevronRight, Plus, Download, RefreshCw, Search, Trash2, Pencil, X, Phone, CalendarDays } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { CRM_LOCALITIES, type CalendarEvent, type CrmLocality } from "@/lib/calendarServices";
-import { CALENDAR_FETCH_SINCE, CALENDAR_SYNC_SINCE, planCalendarSync, type SyncPlan } from "@/lib/calendarSync";
-import { resolveMissingRegions } from "@/lib/regionLookup";
+import { CRM_LOCALITIES, type CrmLocality } from "@/lib/calendarServices";
+import type { SyncPlan } from "@/lib/calendarSync";
+import { syncCalendarIntoCrm } from "@/lib/crmCalendarSync";
 import { lisbonDay, weekdayOf, WEEKDAY_SHORT } from "@/lib/crmClosings";
 import CrmClosings from "./CrmClosings";
 import CrmUpsell from "./CrmUpsell";
@@ -144,37 +144,13 @@ const CrmPanel = () => {
   const syncCalendar = useCallback(async (rows: ServiceRequest[]): Promise<boolean> => {
     setSync({ status: "running" });
     try {
-      const { data, error: fnError } = await supabase.functions.invoke("calendar-events", {
-        body: { since: CALENDAR_FETCH_SINCE },
-      });
-      if (fnError || !data?.success) {
-        if ((fnError as { context?: Response } | null)?.context?.status === 503) {
-          setSync({ status: "not-configured" });
-          return false;
-        }
-        throw new Error(data?.error ?? fnError?.message ?? "Erro ao ler o calendário");
+      const result = await syncCalendarIntoCrm(rows);
+      if (result.status === "not-configured") {
+        setSync({ status: "not-configured" });
+        return false;
       }
-      const events = (data.events ?? []) as CalendarEvent[];
-      const plan = planCalendarSync(rows, events, {
-        since: CALENDAR_SYNC_SINCE,
-        now: new Date().toISOString(),
-      });
-      // Sem cidade nem código postal: telefone de um cliente anterior, depois a rua no mapa.
-      await resolveMissingRegions(rows, plan, events);
-      if (plan.inserts.length) {
-        // ignoreDuplicates: dois separadores abertos não duplicam um serviço.
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const { error: err } = await (supabase as any).from("service_requests")
-          .upsert(plan.inserts, { onConflict: "calendar_event_id", ignoreDuplicates: true });
-        if (err) throw err;
-      }
-      for (const { id, patch } of plan.updates) {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const { error: err } = await (supabase as any).from("service_requests").update(patch).eq("id", id);
-        if (err) throw err;
-      }
-      setSync({ status: "done", at: new Date(), counts: plan.counts });
-      return plan.inserts.length + plan.updates.length > 0;
+      setSync({ status: "done", at: new Date(), counts: result.counts });
+      return result.changed;
     } catch (e: unknown) {
       setSync({ status: "error", message: e instanceof Error ? e.message : String(e) });
       return false;

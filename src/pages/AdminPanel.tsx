@@ -12,6 +12,7 @@ const QuizMetricsPanel = lazy(() => import("./admin/QuizMetricsPanel"));
 const WhatsAppPanel = lazy(() => import("./admin/WhatsAppPanel"));
 const QuizLeadsPanel = lazy(() => import("./admin/QuizLeadsPanel"));
 const MarketingPanel = lazy(() => import("./admin/MarketingPanel"));
+const GoogleAdsPanel = lazy(() => import("./admin/GoogleAdsPanel"));
 
 type Tab = "sitemap" | "errors" | "metrics" | "crm" | "clientes" | "whatsapp" | "quiz-leads" | "marketing" | "meta-marketing";
 
@@ -230,7 +231,7 @@ const AdminPanel = () => {
 
         {activeTab === "marketing" && (
           <Suspense fallback={<TabFallback />}>
-            <MarketingPanel key="google" platform="google" />
+            <GoogleAdsPanel />
           </Suspense>
         )}
 
