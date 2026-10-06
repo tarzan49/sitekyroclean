@@ -111,7 +111,10 @@ const QuizSofaAddonUpsell = ({ formData, updateFormData, sofaItems, setSofaItems
   const premiumDifference = premiumTotal !== null && essencialTotal !== null ? premiumTotal - essencialTotal : null;
   const allCount = withTreatmentQty.reduce((sum, i) => sum + i.qty, 0);
   const scopeCount = protectionCount || allCount;
-  const scopeText = `para ${scopeCount} ${scopeCount === 1 ? 'sofá' : 'sofás'}${protectionCount && quoteNote ? ` · ${quoteNote}` : ''}`;
+  const scopeText = `para ${scopeCount} ${scopeCount === 1 ? 'sofá' : 'sofás'}`;
+  // Nos dois cartões estreitos da proteção a nota ia para quatro linhas:
+  // fica numa linha só por baixo deles.
+  const partialQuote = protectionCount > 0 && quoteNote !== null;
   const selectedProtectionTotal = originalProtectionTotal(tier);
   // Anti-ácaros: acréscimo por sofá, por tamanho (5+ lugares e canto sob orçamento).
   const antiLines = withTreatmentQty.filter(item => item.qty > 0).map(item => ({
@@ -155,6 +158,7 @@ const QuizSofaAddonUpsell = ({ formData, updateFormData, sofaItems, setSofaItems
           onSelect={selectTier}
           activeTier={waterproofActive ? tier : null}
         />
+        {partialQuote && <p className="text-sm text-white/80 text-left mt-1">{quoteNote}.</p>}
         </div>
       )}
       {!isWaterproofBase && (
@@ -212,7 +216,7 @@ const QuizSofaAddonUpsell = ({ formData, updateFormData, sofaItems, setSofaItems
             <div className="border-t border-gold/15 mt-2 pt-2">
               <p className="text-sm font-bold uppercase tracking-[0.16em] text-white/80 mb-1">Acréscimo</p>
               <p className="text-2xl leading-none font-black tracking-tight tabular-nums text-gold">{cleaningTotal === null ? 'Sob orçamento' : `+${cleaningTotal.toLocaleString('pt-PT')}€`}{cleaningTotal !== null && selectedCleaningTotal !== null && selectedCleaningTotal > cleaningTotal && <del aria-label={`Preço original da limpeza: ${selectedCleaningTotal.toLocaleString('pt-PT')} euros`} className="ml-2 text-base font-medium text-white/80 decoration-white/70 whitespace-nowrap">{selectedCleaningTotal.toLocaleString('pt-PT')}€</del>}</p>
-              <p className="text-sm text-white/80 mt-1.5">{scopeText} · preço em pack</p>
+              <p className="text-sm text-white/80 mt-1.5">{scopeText} · preço em pack{partialQuote ? ` · ${quoteNote}` : ''}</p>
               {cleaningTotal !== null && selectedProtectionTotal !== null && selectedCleaningTotal !== null && selectedCleaningTotal > cleaningTotal && <p className="text-xs leading-relaxed text-white/75 mt-1.5">Pack: {(selectedProtectionTotal + cleaningTotal).toLocaleString('pt-PT')}€ em vez de {(selectedProtectionTotal + selectedCleaningTotal).toLocaleString('pt-PT')}€</p>}
             </div>
           </div>
