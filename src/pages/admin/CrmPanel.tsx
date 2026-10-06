@@ -6,6 +6,8 @@ import { CALENDAR_FETCH_SINCE, CALENDAR_SYNC_SINCE, planCalendarSync, type SyncP
 import { resolveMissingRegions } from "@/lib/regionLookup";
 import { lisbonDay, weekdayOf, WEEKDAY_SHORT } from "@/lib/crmClosings";
 import CrmClosings from "./CrmClosings";
+import CrmUpsell from "./CrmUpsell";
+import { UPSELL_TEAMS, defaultTeamFor, isUpsellTeam, splitUpsell, type UpsellTeam } from "@/lib/crmUpsell";
 
 interface ServiceRequest {
   id: string;
@@ -27,6 +29,9 @@ interface ServiceRequest {
   calendar_updated_at: string | null;
   calendar_missing_since: string | null;
   needs_review: string | null;
+  /** Vendido a mais pela equipa no serviço; fora de billed_value/my_cut (ver crmUpsell.ts). */
+  upsell_value: number | null;
+  upsell_team: string | null;
 }
 
 const LOCALITIES = CRM_LOCALITIES;
@@ -65,6 +70,8 @@ type FormState = {
   locality: CrmLocality | "";
   phone: string;
   source: string;
+  upsell_value: string;
+  upsell_team: UpsellTeam;
 };
 
 const emptyForm = (): FormState => ({
@@ -79,13 +86,15 @@ const emptyForm = (): FormState => ({
   locality: "Porto",
   phone: "",
   source: "WhatsApp",
+  upsell_value: "",
+  upsell_team: "Porto 1",
 });
 
 const CrmPanel = () => {
   const [records, setRecords] = useState<ServiceRequest[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [view, setView] = useState<"pedidos" | "fechos">("pedidos");
+  const [view, setView] = useState<"pedidos" | "fechos" | "upsell">("pedidos");
   const [sync, setSync] = useState<SyncState>({ status: "idle" });
 
   const [viewedMonth, setViewedMonth] = useState(() => {
@@ -235,6 +244,8 @@ const CrmPanel = () => {
       locality: r.locality ?? "",
       phone: r.phone ?? "",
       source: r.source ?? "",
+      upsell_value: r.upsell_value ? String(r.upsell_value) : "",
+      upsell_team: isUpsellTeam(r.upsell_team) ? r.upsell_team : defaultTeamFor(r.locality),
     });
     setFormOpen(true);
   };
@@ -247,6 +258,7 @@ const CrmPanel = () => {
     if (!form.locality) { alert("Escolhe a localidade."); return; }
     const billed = parseFloat(form.billed_value.replace(",", ".")) || 0;
     const cut = parseFloat(form.my_cut.replace(",", ".")) || 0;
+    const upsell = Math.max(0, parseFloat(form.upsell_value.replace(",", ".")) || 0);
     const requestDate = `${viewedMonth.getFullYear()}-${String(viewedMonth.getMonth() + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
 
     // A data de fecho só se escreve quando muda: assim a hora exata (do evento
@@ -267,6 +279,8 @@ const CrmPanel = () => {
       locality: form.locality,
       phone: form.phone.trim() || null,
       source: form.source || null,
+      upsell_value: upsell,
+      upsell_team: upsell > 0 ? form.upsell_team : null,
       // Guardar no formulário é rever a linha.
       needs_review: null,
       ...(bookedAt !== undefined ? { booked_at: bookedAt } : {}),
@@ -312,12 +326,12 @@ const CrmPanel = () => {
   };
 
   const exportCSV = () => {
-    const headers = ["Dia", "Fechado", "Descrição", "Cliente", "Localidade", "Cidade", "Telefone", "Origem", "Faturado", "Meu Cut", "Pago"];
+    const headers = ["Dia", "Fechado", "Descrição", "Cliente", "Localidade", "Cidade", "Telefone", "Origem", "Faturado", "Meu Cut", "Upsell", "Equipa upsell", "Pago"];
     const rows = filtered.map(r => [
       new Date(r.request_date + "T00:00:00").getDate(),
       r.booked_at ? lisbonDay(r.booked_at) : "",
       r.description, r.client_name ?? "", r.locality ?? "", r.city ?? "", r.phone ?? "", r.source ?? "",
-      r.billed_value.toFixed(2), r.my_cut.toFixed(2), r.paid ? "Sim" : "Não",
+      r.billed_value.toFixed(2), r.my_cut.toFixed(2), (Number(r.upsell_value) || 0).toFixed(2), r.upsell_team ?? "", r.paid ? "Sim" : "Não",
     ].map(c => `"${String(c ?? "").replace(/"/g, '""')}"`));
     const csv = [headers, ...rows].map(r => r.join(",")).join("\n");
     const blob = new Blob(["﻿" + csv], { type: "text/csv;charset=utf-8;" });
@@ -385,7 +399,7 @@ const CrmPanel = () => {
       </div>
 
       <div className="flex gap-1 border-b border-gray-200" role="tablist">
-        {([["pedidos", "Pedidos"], ["fechos", "Fechos"]] as const).map(([id, label]) => (
+        {([["pedidos", "Pedidos"], ["fechos", "Fechos"], ["upsell", "Upsell"]] as const).map(([id, label]) => (
           <button key={id} role="tab" aria-selected={view === id} onClick={() => setView(id)}
             className={`px-4 py-2 text-sm font-semibold -mb-px border-b-2 transition-colors ${view === id ? "border-[#D4AF37] text-navy" : "border-transparent text-gray-500 hover:text-navy"}`}>
             {label}
@@ -401,6 +415,15 @@ const CrmPanel = () => {
       )}
 
       {view === "fechos" && <CrmClosings records={records} />}
+
+      {view === "upsell" && <CrmUpsell records={records} onEdit={id => {
+        const r = records.find(x => x.id === id);
+        if (!r) return;
+        // O formulário escreve o dia no mês aberto na aba Pedidos: tem de ser o do serviço.
+        const [y, m] = r.request_date.split("-").map(Number);
+        setViewedMonth(new Date(y, m - 1, 1));
+        openEdit(r);
+      }} />}
 
       {view === "pedidos" && (<>
       {/* Totals */}
@@ -438,6 +461,108 @@ const CrmPanel = () => {
           ))}
         </div>
       )}
+
+      {/* Filters */}
+      <div className="flex items-center gap-2 flex-wrap">
+        <div className="relative flex-1 min-w-[200px]">
+          <Search className="w-3.5 h-3.5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
+          <input type="text" value={search} onChange={e => setSearch(e.target.value)} placeholder="Procurar por descrição ou telefone..."
+            className="w-full pl-8 pr-3 py-2 text-xs rounded-lg border border-gray-200 focus:border-gold focus:outline-none text-navy placeholder:text-gray-400" />
+        </div>
+        <select value={filterLocality} onChange={e => setFilterLocality(e.target.value)} className="h-9 px-3 text-xs font-medium bg-white border border-gray-200 rounded-lg text-navy focus:outline-none focus:border-gold">
+          <option value="all">Todas as localidades</option>
+          {LOCALITIES.map(l => <option key={l} value={l}>{l}</option>)}
+        </select>
+        <select value={filterPaid} onChange={e => setFilterPaid(e.target.value)} className="h-9 px-3 text-xs font-medium bg-white border border-gray-200 rounded-lg text-navy focus:outline-none focus:border-gold">
+          <option value="all">Todos os estados</option>
+          <option value="paid">Pago</option>
+          <option value="unpaid">Por pagar</option>
+        </select>
+        <span className="text-xs text-gray-400 ml-auto">{filtered.length} resultado{filtered.length !== 1 ? "s" : ""}</span>
+      </div>
+
+      {error && (
+        <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-3 text-sm text-red-700">
+          Erro ao carregar pedidos: {error}. Confirma que a tabela <code className="bg-red-100 px-1 rounded">service_requests</code> existe no Supabase (migration <code className="bg-red-100 px-1 rounded">20260911000000_add_service_requests.sql</code>).
+        </div>
+      )}
+
+      {/* Table */}
+      <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
+        <div>
+          <table className="w-full table-fixed text-xs">
+            <colgroup>
+              {["4%", "7%", "19%", "11%", "12%", "11%", "8%", "6%", "6%", "6%", "6%", "5%"].map((w, i) => <col key={i} style={{ width: w }} />)}
+            </colgroup>
+            <thead>
+              <tr className="border-b border-gray-200 bg-gray-50">
+                {["Dia", "Fechado", "Descrição", "Cliente", "Localidade", "Telefone", "Origem", "Faturado", "Meu cut", "Upsell", "Pago", ""].map(h => (
+                  <th key={h} className="text-left px-2 py-2 text-[10.5px] font-bold text-gray-500 uppercase tracking-wider truncate">{h}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {loading && (
+                <tr><td colSpan={12} className="text-center py-10 text-gray-400">A carregar...</td></tr>
+              )}
+              {!loading && filtered.length === 0 && (
+                <tr><td colSpan={12} className="text-center py-10 text-gray-400">
+                  {monthRecords.length === 0 ? `Ainda não há pedidos registados em ${monthLabel}.` : "Nenhum pedido corresponde aos filtros."}
+                </td></tr>
+              )}
+              {filtered.map((r, i) => (
+                <tr key={r.id} className={`border-b border-gray-100 ${!r.paid ? "bg-red-50/60" : (i % 2 === 0 ? "" : "bg-gray-50/50")}`}>
+                  <td className="px-2 py-2 font-mono text-navy">{new Date(r.request_date + "T00:00:00").getDate()}</td>
+                  <td className="px-2 py-2 text-gray-500 whitespace-nowrap" title={r.booked_at ? new Date(r.booked_at).toLocaleString("pt-PT", { timeZone: "Europe/Lisbon" }) : "Sem data de fecho"}>{closedLabel(r.booked_at)}</td>
+                  <td className="px-2 py-2 text-navy font-medium">
+                    <div className="flex items-center gap-1.5 min-w-0">
+                      {r.calendar_event_id && <CalendarDays className="w-3 h-3 text-gray-400 flex-shrink-0" aria-label="Criado a partir do Google Calendar" />}
+                      <span className="truncate">{r.description || "-"}</span>
+                      {r.calendar_missing_since && (
+                        <span className="flex-shrink-0 px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-red-100 text-red-700 border border-red-300">Apagado no calendário</span>
+                      )}
+                      {r.needs_review && (
+                        <button onClick={() => openEdit(r)} title={r.needs_review}
+                          className="flex-shrink-0 px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-300">Rever</button>
+                      )}
+                    </div>
+                  </td>
+                  <td className="px-2 py-2 text-gray-600 truncate" title={r.client_name ?? undefined}>{r.client_name || "-"}</td>
+                  <td className="px-2 py-2 truncate" title={[r.locality, r.city].filter(Boolean).join(" · ")}>
+                    <span className={r.locality ? "text-gray-600" : "text-amber-700 font-semibold"}>{r.locality ?? "?"}</span>
+                    {r.city && <span className="text-gray-400"> · {r.city}</span>}
+                  </td>
+                  <td className="px-2 py-2 text-gray-600 truncate">
+                    {r.phone ? (
+                      <span className="flex items-center gap-1"><Phone className="w-3 h-3 text-gray-400" />{r.phone}</span>
+                    ) : "-"}
+                  </td>
+                  <td className="px-2 py-2 text-gray-500 truncate" title={r.source ?? undefined}>{r.source?.startsWith("Google Calendar") ? "Calendário" : r.source || "-"}</td>
+                  <td className="px-2 py-2 font-semibold text-navy whitespace-nowrap">{money(r.billed_value)}</td>
+                  <td className="px-2 py-2 font-semibold text-gold whitespace-nowrap">{money(r.my_cut)}</td>
+                  <td className="px-2 py-2 text-navy whitespace-nowrap" title={r.upsell_value ? `${r.upsell_team ?? defaultTeamFor(r.locality)}` : undefined}>{r.upsell_value ? money(Number(r.upsell_value)) : "-"}</td>
+                  <td className="px-2 py-2">
+                    <button onClick={() => togglePaid(r)} className={`px-2 py-0.5 rounded-full text-[10px] font-bold border transition-colors ${r.paid ? "bg-green-50 text-green-700 border-green-200" : "bg-red-100 text-red-700 border-red-300"}`}>
+                      {r.paid ? "Pago" : "Por pagar"}
+                    </button>
+                  </td>
+                  <td className="px-1 py-2">
+                    <div className="flex items-center justify-end gap-0.5">
+                      {r.calendar_missing_since && (
+                        <button onClick={() => keepMissing(r)} title="O serviço fez-se: manter a linha e desligá-la do calendário"
+                          className="px-1.5 py-1 text-[10px] font-bold rounded-md border border-gray-200 text-navy hover:bg-gray-50">Manter</button>
+                      )}
+                      <button onClick={() => openEdit(r)} className="p-1.5 text-gray-400 hover:text-navy hover:bg-gray-100 rounded-md"><Pencil className="w-3.5 h-3.5" /></button>
+                      <button onClick={() => handleDelete(r.id)} className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-md"><Trash2 className="w-3.5 h-3.5" /></button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      </>)}
 
       {/* Add/Edit form */}
       {formOpen && (
@@ -532,6 +657,29 @@ const CrmPanel = () => {
               O dia em que fechaste o serviço, não o dia em que o fazes. É o que conta na aba Fechos.
             </p>
           </div>
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 border-t border-gray-100 pt-3">
+            <div>
+              <label className="block text-[10px] text-gray-500 mb-1">Upsell da equipa (€)</label>
+              <input type="text" inputMode="decimal" value={form.upsell_value} onChange={e => setForm(f => ({ ...f, upsell_value: e.target.value }))}
+                placeholder="0.00"
+                className="w-full h-9 px-2.5 text-sm border border-gray-200 rounded-lg text-navy focus:outline-none focus:border-gold" />
+            </div>
+            <div>
+              <label className="block text-[10px] text-gray-500 mb-1">Equipa do upsell</label>
+              <select value={form.upsell_team} onChange={e => setForm(f => ({ ...f, upsell_team: e.target.value as UpsellTeam }))}
+                className="w-full h-9 px-2.5 text-sm border border-gray-200 rounded-lg text-navy focus:outline-none focus:border-gold">
+                {UPSELL_TEAMS.map(t => <option key={t} value={t}>{t}</option>)}
+              </select>
+            </div>
+            <p className="col-span-2 sm:col-span-1 text-[11px] text-gray-500 self-end pb-1">
+              {(() => {
+                const v = parseFloat(form.upsell_value.replace(",", ".")) || 0;
+                if (v <= 0) return "Fora do faturado e do teu cut. Equipa 70%, tu 30% (Porto 60/40).";
+                const s = splitUpsell(v, form.upsell_team);
+                return `Equipa ${money(s.team)} · tu ${money(s.owner)}`;
+              })()}
+            </p>
+          </div>
           {editingRecord?.needs_review && (
             <p className="text-xs text-amber-800 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
               Para rever: {editingRecord.needs_review}. Ao guardar, fica dado como revisto.
@@ -551,107 +699,6 @@ const CrmPanel = () => {
         </div>
         </div>
       )}
-
-      {/* Filters */}
-      <div className="flex items-center gap-2 flex-wrap">
-        <div className="relative flex-1 min-w-[200px]">
-          <Search className="w-3.5 h-3.5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
-          <input type="text" value={search} onChange={e => setSearch(e.target.value)} placeholder="Procurar por descrição ou telefone..."
-            className="w-full pl-8 pr-3 py-2 text-xs rounded-lg border border-gray-200 focus:border-gold focus:outline-none text-navy placeholder:text-gray-400" />
-        </div>
-        <select value={filterLocality} onChange={e => setFilterLocality(e.target.value)} className="h-9 px-3 text-xs font-medium bg-white border border-gray-200 rounded-lg text-navy focus:outline-none focus:border-gold">
-          <option value="all">Todas as localidades</option>
-          {LOCALITIES.map(l => <option key={l} value={l}>{l}</option>)}
-        </select>
-        <select value={filterPaid} onChange={e => setFilterPaid(e.target.value)} className="h-9 px-3 text-xs font-medium bg-white border border-gray-200 rounded-lg text-navy focus:outline-none focus:border-gold">
-          <option value="all">Todos os estados</option>
-          <option value="paid">Pago</option>
-          <option value="unpaid">Por pagar</option>
-        </select>
-        <span className="text-xs text-gray-400 ml-auto">{filtered.length} resultado{filtered.length !== 1 ? "s" : ""}</span>
-      </div>
-
-      {error && (
-        <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-3 text-sm text-red-700">
-          Erro ao carregar pedidos: {error}. Confirma que a tabela <code className="bg-red-100 px-1 rounded">service_requests</code> existe no Supabase (migration <code className="bg-red-100 px-1 rounded">20260911000000_add_service_requests.sql</code>).
-        </div>
-      )}
-
-      {/* Table */}
-      <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
-        <div>
-          <table className="w-full table-fixed text-xs">
-            <colgroup>
-              {["4%", "7%", "22%", "11%", "13%", "12%", "9%", "6%", "6%", "6%", "4%"].map((w, i) => <col key={i} style={{ width: w }} />)}
-            </colgroup>
-            <thead>
-              <tr className="border-b border-gray-200 bg-gray-50">
-                {["Dia", "Fechado", "Descrição", "Cliente", "Localidade", "Telefone", "Origem", "Faturado", "Meu cut", "Pago", ""].map(h => (
-                  <th key={h} className="text-left px-2 py-2 text-[10.5px] font-bold text-gray-500 uppercase tracking-wider truncate">{h}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {loading && (
-                <tr><td colSpan={11} className="text-center py-10 text-gray-400">A carregar...</td></tr>
-              )}
-              {!loading && filtered.length === 0 && (
-                <tr><td colSpan={11} className="text-center py-10 text-gray-400">
-                  {monthRecords.length === 0 ? `Ainda não há pedidos registados em ${monthLabel}.` : "Nenhum pedido corresponde aos filtros."}
-                </td></tr>
-              )}
-              {filtered.map((r, i) => (
-                <tr key={r.id} className={`border-b border-gray-100 ${!r.paid ? "bg-red-50/60" : (i % 2 === 0 ? "" : "bg-gray-50/50")}`}>
-                  <td className="px-2 py-2 font-mono text-navy">{new Date(r.request_date + "T00:00:00").getDate()}</td>
-                  <td className="px-2 py-2 text-gray-500 whitespace-nowrap" title={r.booked_at ? new Date(r.booked_at).toLocaleString("pt-PT", { timeZone: "Europe/Lisbon" }) : "Sem data de fecho"}>{closedLabel(r.booked_at)}</td>
-                  <td className="px-2 py-2 text-navy font-medium">
-                    <div className="flex items-center gap-1.5 min-w-0">
-                      {r.calendar_event_id && <CalendarDays className="w-3 h-3 text-gray-400 flex-shrink-0" aria-label="Criado a partir do Google Calendar" />}
-                      <span className="truncate">{r.description || "-"}</span>
-                      {r.calendar_missing_since && (
-                        <span className="flex-shrink-0 px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-red-100 text-red-700 border border-red-300">Apagado no calendário</span>
-                      )}
-                      {r.needs_review && (
-                        <button onClick={() => openEdit(r)} title={r.needs_review}
-                          className="flex-shrink-0 px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-300">Rever</button>
-                      )}
-                    </div>
-                  </td>
-                  <td className="px-2 py-2 text-gray-600 truncate" title={r.client_name ?? undefined}>{r.client_name || "-"}</td>
-                  <td className="px-2 py-2 truncate" title={[r.locality, r.city].filter(Boolean).join(" · ")}>
-                    <span className={r.locality ? "text-gray-600" : "text-amber-700 font-semibold"}>{r.locality ?? "?"}</span>
-                    {r.city && <span className="text-gray-400"> · {r.city}</span>}
-                  </td>
-                  <td className="px-2 py-2 text-gray-600 truncate">
-                    {r.phone ? (
-                      <span className="flex items-center gap-1"><Phone className="w-3 h-3 text-gray-400" />{r.phone}</span>
-                    ) : "-"}
-                  </td>
-                  <td className="px-2 py-2 text-gray-500 truncate" title={r.source ?? undefined}>{r.source?.startsWith("Google Calendar") ? "Calendário" : r.source || "-"}</td>
-                  <td className="px-2 py-2 font-semibold text-navy whitespace-nowrap">{money(r.billed_value)}</td>
-                  <td className="px-2 py-2 font-semibold text-gold whitespace-nowrap">{money(r.my_cut)}</td>
-                  <td className="px-2 py-2">
-                    <button onClick={() => togglePaid(r)} className={`px-2 py-0.5 rounded-full text-[10px] font-bold border transition-colors ${r.paid ? "bg-green-50 text-green-700 border-green-200" : "bg-red-100 text-red-700 border-red-300"}`}>
-                      {r.paid ? "Pago" : "Por pagar"}
-                    </button>
-                  </td>
-                  <td className="px-1 py-2">
-                    <div className="flex items-center justify-end gap-0.5">
-                      {r.calendar_missing_since && (
-                        <button onClick={() => keepMissing(r)} title="O serviço fez-se: manter a linha e desligá-la do calendário"
-                          className="px-1.5 py-1 text-[10px] font-bold rounded-md border border-gray-200 text-navy hover:bg-gray-50">Manter</button>
-                      )}
-                      <button onClick={() => openEdit(r)} className="p-1.5 text-gray-400 hover:text-navy hover:bg-gray-100 rounded-md"><Pencil className="w-3.5 h-3.5" /></button>
-                      <button onClick={() => handleDelete(r.id)} className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-md"><Trash2 className="w-3.5 h-3.5" /></button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
-      </>)}
     </div>
   );
 };
