@@ -16,7 +16,7 @@ const TRAVEL: PriceFactor = {
 
 export const PRICE_FACTORS: Record<string, PriceFactor[]> = {
   "limpeza-sofas": [
-    { icon: 'Sofa', title: "Qual é o tamanho do sofá?", description: "A limpeza tem preço por sofá, conforme o número de lugares.", examples: ["1, 2, 3 ou 4 lugares", "Sofá de canto, em U, modular ou com 5 ou mais lugares: sob orçamento", "Sofá em pele: confirmado no orçamento"] },
+    { icon: 'Sofa', title: "Qual é o tamanho do sofá?", description: "A limpeza tem preço por sofá, conforme o número de lugares.", examples: ["1, 2, 3, 4 ou 5+ lugares", "Sofá de canto, em U ou modular: sob orçamento", "Sofá em pele: confirmado no orçamento"] },
     { icon: 'ShieldCheck', title: "Que tratamento quer?", description: "A limpeza pode ficar sozinha ou levar um tratamento, com preço próprio.", examples: ["Só limpeza", "Impermeabilização Essencial ou Premium", "Anti-ácaros"] },
     TRAVEL,
   ],

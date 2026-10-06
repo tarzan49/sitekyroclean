@@ -113,7 +113,10 @@ export function calcPackPricing(
   const upsellDiscount = (option.waterproofingUpsellDiscount ?? 0);
   const packPrice = bothEssencial !== null ? bothEssencial + tierDelta - upsellDiscount : null;
   const packDelta = packPrice !== null && basePrice !== null ? packPrice - basePrice : fallbackDelta;
-  const displayPrice = packOn && packPrice !== null ? packPrice : basePrice;
+  // Com o pack ligado e sem preço de pack (sofá de 5+ lugares: só a limpeza
+  // tem preço), não há preço: cair para o basePrice cobrava só a limpeza e
+  // deixava a impermeabilização a 0€ sem aviso.
+  const displayPrice = packOn ? packPrice : basePrice;
   return { isSob, basePrice, packPrice, packDelta, displayPrice };
 }
 

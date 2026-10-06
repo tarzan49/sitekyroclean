@@ -112,3 +112,26 @@ describe('anti-acaros on sofas and chairs', () => {
     expect(pricing({ service: 'chairs', serviceType: 'waterproofing', waterproofingTier: 'essencial', chairQuantity: '4', chairAntiAcaros: true }).calculateServicePrice).toBe(72);
   });
 });
+
+// Dono, 2026-10-06: o sofá de 5+ lugares tem só a limpeza a 119€. Com
+// impermeabilização ou anti-ácaros fica sob orçamento, nunca a 0€ nem a
+// cobrar só a limpeza em silêncio.
+describe('5+ seat sofa', () => {
+  const run = (form: Partial<QuizFormData>, packEnabled: boolean) => renderHook(() => useQuizPricing(
+    { ...initialFormData, location: 'Porto', service: 'sofa', ...form },
+    [{ sizeId: '5-lugares', qty: 1, packEnabled }], [], [], [])).result.current;
+  it('cleaning alone is a real 119€ total', () => {
+    const p = run({ serviceType: 'cleaning' }, false);
+    expect([p.calculateServicePrice, p.hasSobOrcamento]).toEqual([119, false]);
+  });
+  it.each([
+    ['cleaning + Essencial', { serviceType: 'cleaning' as const, waterproofingTier: 'essencial' as const }, true],
+    ['cleaning + Premium', { serviceType: 'cleaning' as const, waterproofingTier: 'premium' as const }, true],
+    ['cleaning + anti-ácaros', { serviceType: 'cleaning' as const, sofaAntiAcaros: true }, true],
+    ['waterproofing Essencial', { serviceType: 'waterproofing' as const, waterproofingTier: 'essencial' as const }, false],
+    ['waterproofing Premium + cleaning', { serviceType: 'waterproofing' as const, waterproofingTier: 'premium' as const }, true],
+  ])('%s is flagged as a quote', (_, form, packEnabled) => {
+    const p = run(form, packEnabled);
+    expect([p.calculateServicePrice, p.hasSobOrcamento]).toEqual([0, true]);
+  });
+});

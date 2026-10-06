@@ -186,7 +186,7 @@ const QuizComboUpsellScreen = ({ travelFee = 10, primaryTablePrice = 0, primaryS
     sofaPrices.forEach(opt => {
       const q = sofaQty[opt.id] ?? 0;
       if (q <= 0) return;
-      // "5+ Lugares ou em U" (id '4+-lugares') não tem cleaningPrice numérico (é sempre sob orçamento)
+      // O sofá de canto, em U ou modular (id '4+-lugares') não tem cleaningPrice numérico (é sempre sob orçamento)
       // — sem este ramo, o item desaparecia em silêncio: o cartão mostrava
       // selecionado mas nunca chegava a upsellItems, nunca era cobrado nem
       // enviado ao negócio (bug real, achado no audit 2026-09-08). Mesmo

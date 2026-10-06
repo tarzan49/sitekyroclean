@@ -12,7 +12,7 @@ import { locationPrices } from "@/components/quiz/QuizTypes";
 import { RUG_SERVICE_SLUGS } from "@/constants/commercialPolicy";
 import type { PriceRowQuizConfig } from "@/data/locationPriceTestimonialsData";
 import {
-  widgetWaterproofPrice, calcWidgetTotal, calcChairBracket, calcWidgetPricing,
+  widgetWaterproofPrice, widgetSofaUnitPrice, calcWidgetTotal, calcChairBracket, calcWidgetPricing,
 } from "@/lib/priceWidgetCalc";
 import { PRICE_TABLE, PRICE_TABLE_QUIZ_CONFIG } from "@/data/locationPriceTestimonialsData";
 
@@ -55,7 +55,7 @@ export default function PriceWidget({ serviceSlug, initialLocation }: Props) {
   const hasSelection = total > 0 || Object.values(w.rowQuantities).some(q => q > 0);
 
   const hasUnpricedSelection = quizConfigs.some((cfg, i) => cfg && (w.rowQuantities[i] ?? 0) > 0 && (
-    cfg.service === 'carpet' || cfg.sofaSizeId === '4+-lugares' ||
+    cfg.service === 'carpet' || (cfg.service === 'sofa' && widgetSofaUnitPrice(cfg, isWaterproofService, w.addonTier) === null) ||
     (cfg.service === 'chairs' && calcChairBracket(w.rowQuantities[i], isWaterproofService, w.addonTier) === null)
   ));
 

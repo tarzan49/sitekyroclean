@@ -87,6 +87,12 @@ describe('specific regressions and delivery failures', () => {
     expect(p.calculateServicePrice).toBe(0);
     expect(buildReceiptLines(p)[0].total).toBeNull();
   });
+  it('5+ seat sofa: cleaning at 119€ in the receipt, a treated one under quote', () => {
+    const clean = payload({ service: 'sofa', serviceType: 'cleaning' }, [{ sizeId: '5-lugares', qty: 1, packEnabled: false }]);
+    expect([clean.calculateServicePrice, buildReceiptLines(clean)[0].label, buildReceiptLines(clean)[0].total]).toEqual([119, 'Sofá 5+ Lugares', 119]);
+    const treated = payload({ service: 'sofa', serviceType: 'cleaning' }, [{ sizeId: '5-lugares', qty: 1, packEnabled: true }]);
+    expect([treated.calculateServicePrice, treated.hasSobOrcamento, buildReceiptLines(treated)[0].total]).toEqual([0, true, null]);
+  });
   it('keeps dimensions in the receipt rather than the shareable URL', async () => {
     const p = payload({ service: 'carpet', serviceType: 'cleaning' });
     await submitQuizLead(p);

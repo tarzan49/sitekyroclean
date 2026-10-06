@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import {
   calcChairBracket, calcWidgetPricing,
-  calcWidgetTotal, buildWidgetQuizConfig, SOFA_ANTI_ACAROS_PRICE,
+  calcWidgetTotal, buildWidgetQuizConfig, SOFA_ANTI_ACAROS_PRICE, widgetSofaUnitPrice,
 } from './priceWidgetCalc';
 import * as widgetCalc from './priceWidgetCalc';
 import { PRICE_TABLE, PRICE_TABLE_QUIZ_CONFIG } from '@/data/locationPriceTestimonialsData';
@@ -46,10 +46,17 @@ describe('calcWidgetPricing — sem conceito de desconto', () => {
 });
 
 describe('calcWidgetTotal (limpeza-sofas, dados reais)', () => {
-  it('"Sofá de 5+ lugares ou em U" (sob orçamento) never silently contributes 0€ as if it were free', () => {
-    const rowQuantities = { 4: 1 }; // index 4 = 5+ lugares ou em U
+  it('"Sofá de canto, em U ou modular" (sob orçamento) never silently contributes a price', () => {
+    const rowQuantities = { 5: 1 }; // index 5 = canto, em U ou modular
     const total = calcWidgetTotal('limpeza-sofas', rowQuantities);
     expect(total).toBe(0); // sob orçamento: não soma preço nenhum.
+    expect(widgetSofaUnitPrice(PRICE_TABLE_QUIZ_CONFIG['limpeza-sofas'][5]!, false, 'essencial')).toBeNull();
+  });
+
+  it('prices the 5+ seat sofa cleaning at 119 and leaves its waterproofing under quote', () => {
+    expect(calcWidgetTotal('limpeza-sofas', { 4: 1 })).toBe(119);
+    expect(calcWidgetTotal('impermeabilizacao', { 4: 1 })).toBe(0);
+    expect(widgetSofaUnitPrice(PRICE_TABLE_QUIZ_CONFIG['impermeabilizacao'][4]!, true, 'premium')).toBeNull();
   });
 
   it('prices sofas from the same table the quiz charges', () => {
@@ -104,7 +111,7 @@ describe('buildWidgetQuizConfig', () => {
 
 describe('waterproof widget handoff', () => {
   it.each(['essencial', 'premium'] as const)('preserves %s prices and quantities for sofa plus chairs', tier => {
-    const quantities = { 1: 2, 5: 4 }; // index 5 = cadeiras (depois dos cinco tamanhos de sofá)
+    const quantities = { 1: 2, 6: 4 }; // index 6 = cadeiras (depois dos seis tamanhos de sofá)
     const total = calcWidgetTotal('impermeabilizacao', quantities, tier);
     const config = buildWidgetQuizConfig('impermeabilizacao', quantities, tier)!;
     const sofaUnit = tier === 'premium' ? 109 : 79;
@@ -115,7 +122,7 @@ describe('waterproof widget handoff', () => {
     expect(config.initialUpsellItems?.[0].price).toBe(chairs);
   });
   it('prices ten protected chairs in a mixed selection', () => {
-    const config = buildWidgetQuizConfig('impermeabilizacao', { 0: 1, 5: 10 })!;
+    const config = buildWidgetQuizConfig('impermeabilizacao', { 0: 1, 6: 10 })!;
     expect(config.initialUpsellItems?.[0].price).toBe(180);
   });
 });

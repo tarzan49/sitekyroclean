@@ -37,6 +37,14 @@ export function widgetWaterproofPrice(cfg: PriceRowQuizConfig, tier: WidgetTier)
   return typeof price === 'number' ? price : null;
 }
 
+/** Preço de tabela de uma linha de sofá do widget, ou null quando é sob
+ * orçamento (canto, em U ou modular; a impermeabilização do 5+ lugares). */
+export function widgetSofaUnitPrice(cfg: PriceRowQuizConfig, isWaterproof: boolean, tier: WidgetTier): number | null {
+  if (isWaterproof) return widgetWaterproofPrice(cfg, tier);
+  const price = sofaPrices.find(p => p.id === cfg.sofaSizeId)?.cleaningPrice;
+  return typeof price === 'number' ? price : null;
+}
+
 export function calcWidgetTotal(
   serviceSlug: string,
   rowQuantities: Record<number, number>,

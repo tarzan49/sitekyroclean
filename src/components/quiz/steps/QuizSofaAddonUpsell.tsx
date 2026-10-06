@@ -72,12 +72,14 @@ const QuizSofaAddonUpsell = ({ formData, updateFormData, sofaItems, setSofaItems
     setSofaItems(prev => prev.map(i => i.qty > 0 ? { ...i, packEnabled: !anyPackOn, packQty: anyPackOn ? 0 : i.qty } : i));
   };
 
+  // Sem delta de recurso (era 40€): um tamanho sem preço de pack (5+ lugares,
+  // canto) fica sob orçamento, nunca com um acréscimo inventado.
   const comparisonItems = activeItems.map(i => ({ ...i, qty: anyPackOn ? treatmentQty(i) : i.qty }));
   const protectionTotal = (selectedTier: 'premium' | 'essencial') => comparisonItems.reduce<number | null>((sum, item) => {
     if (!item.qty) return sum;
     const option = sofaPrices.find(p => p.id === item.sizeId);
     if (!option || sum === null) return null;
-    const pack = calcPackPricing(option, true, false, 40, selectedTier);
+    const pack = calcPackPricing(option, true, false, null, selectedTier);
     return pack.isSob || pack.packDelta === null ? null : sum + pack.packDelta * item.qty;
   }, 0);
   const originalProtectionTotal = (selectedTier: 'premium' | 'essencial') => comparisonItems.reduce<number | null>((sum, item) => {
@@ -96,7 +98,7 @@ const QuizSofaAddonUpsell = ({ formData, updateFormData, sofaItems, setSofaItems
   const premiumDifference = premiumTotal !== null && essencialTotal !== null ? premiumTotal - essencialTotal : null;
   const protectionCount = comparisonItems.reduce((sum, i) => sum + i.qty, 0);
   const selectedProtectionTotal = originalProtectionTotal(tier);
-  // Anti-ácaros: acréscimo por sofá, por tamanho ("5+ Lugares ou em U" sob orçamento).
+  // Anti-ácaros: acréscimo por sofá, por tamanho (5+ lugares e canto sob orçamento).
   const antiLines = comparisonItems.filter(item => item.qty > 0).map(item => ({
     sizeId: item.sizeId,
     label: sofaPrices.find(p => p.id === item.sizeId)?.label ?? item.sizeId,
@@ -108,7 +110,7 @@ const QuizSofaAddonUpsell = ({ formData, updateFormData, sofaItems, setSofaItems
     if (!item.qty) return sum;
     const option = sofaPrices.find(p => p.id === item.sizeId);
     if (!option || sum === null) return null;
-    const pack = calcPackPricing(option, true, true, 40, tier);
+    const pack = calcPackPricing(option, true, true, null, tier);
     return pack.isSob || pack.packDelta === null ? null : sum + pack.packDelta * item.qty;
   }, 0);
 

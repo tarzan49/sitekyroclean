@@ -27,7 +27,7 @@ const QuizStepConfigSofa = ({ formData, updateFormData, sofaItems, setSofaItems 
   const [tierChosen, setTierChosen] = useState(false);
 
   const isWaterproofBase = formData.serviceType === 'waterproofing';
-  // '4+-lugares' é o tamanho maior (5+ lugares, em U ou modular), sob orçamento.
+  // '4+-lugares' é o sofá de canto, em U ou modular, sob orçamento.
   const has4Plus = (sofaItems.find(i => i.sizeId === '4+-lugares')?.qty ?? 0) > 0;
 
   return (

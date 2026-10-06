@@ -14,9 +14,10 @@
 //
 // Ficheiro sem imports com alias `@/`, de propósito: o prerender corre em Node.
 
-/** Sofá: acréscimo por sofá sobre a limpeza, por tamanho. O tamanho maior
- * ('4+-lugares': 5 ou mais lugares, em U ou modular) não tem preço aqui e fica
- * sob orçamento. 4 lugares: 60€ (dono, 2026-10-06). */
+/** Sofá: acréscimo por sofá sobre a limpeza, por tamanho. O de 5+ lugares
+ * ('5-lugares') e o de canto, em U ou modular ('4+-lugares') não têm preço
+ * aqui e ficam sob orçamento (o dono não deu valor). 4 lugares: 60€ (dono,
+ * 2026-10-06). */
 export const SOFA_ANTI_ACAROS_PRICE: Record<string, number> = {
   '1-lugar': 20,
   '2-lugares': 40,

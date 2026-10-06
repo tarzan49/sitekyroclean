@@ -100,18 +100,25 @@ export interface PriceOption {
 //
 // 4 lugares (dono, 2026-10-06): a limpeza a 99€, a Essencial a 119€ e a Premium
 // a 169€; o resto da linha segue o degrau dos 3 lugares. Até essa data havia um
-// só tamanho "4+ Lugares", sob orçamento. O id '4+-lugares' ficou para o tamanho
-// maior (5 ou mais lugares, em U ou modular), que continua sob orçamento: é o id
-// que os pedidos, o CRM e o bot já guardam com o sentido "sob orçamento", e
-// renomeá-lo faria esses registos antigos passarem a ler-se como um preço.
-// O espaço inseparável em "em U" impede o "U" de ficar sozinho numa linha
-// no ecrã das quantidades a 375px.
+// só tamanho "4+ Lugares", sob orçamento.
+//
+// 5+ lugares (dono, 2026-10-06, a mesma regra que o bot já seguia desde 05/10):
+// só a limpeza tem preço, 119€. Impermeabilização, anti-ácaros e pack ficam
+// sob orçamento (o dono não deu valores: não inventar). O motor devolve null
+// nesses casos (calcSofaUnitPrice) e o quiz marca-os como sob orçamento.
+//
+// O id '4+-lugares' ficou para o sofá de canto, em U ou modular, todo sob
+// orçamento (precisa de fotografia): é o id que os pedidos, o CRM e o bot já
+// guardam com o sentido "sob orçamento", e renomeá-lo faria esses registos
+// antigos passarem a ler-se como um preço. O espaço inseparável em "em U"
+// impede o "U" de ficar sozinho numa linha no ecrã das quantidades a 375px.
 export const sofaPrices: PriceOption[] = [
   { waterproofingUpsellDiscount: 10, id: '1-lugar',    label: '1 Lugar',    cleaningPrice: 49, waterproofingPrice: 59, bothPrice: 99,  originalBothPrice: 108, waterproofingPremiumPrice: 89 },
   { waterproofingUpsellDiscount: 10, id: '2-lugares',  label: '2 Lugares',  cleaningPrice: 69, waterproofingPrice: 79, bothPrice: 139, originalBothPrice: 148, waterproofingPremiumPrice: 109, packPremiumDelta: 30 },
   { waterproofingUpsellDiscount: 10, id: '3-lugares',  label: '3 Lugares',  cleaningPrice: 79, waterproofingPrice: 99, bothPrice: 169, originalBothPrice: 178, waterproofingPremiumPrice: 139, packPremiumDelta: 30 },
   { waterproofingUpsellDiscount: 10, id: '4-lugares',  label: '4 Lugares',  cleaningPrice: 99, waterproofingPrice: 119, bothPrice: 209, originalBothPrice: 218, waterproofingPremiumPrice: 169, packPremiumDelta: 30 },
-  { waterproofingUpsellDiscount: 10, id: '4+-lugares', label: '5+ Lugares ou em\u00A0U', cleaningPrice: 'Sob orçamento', waterproofingPrice: 'Sob orçamento', bothPrice: 'Sob orçamento', waterproofingPremiumPrice: 'Sob orçamento' },
+  { id: '5-lugares',  label: '5+ Lugares', cleaningPrice: 119, waterproofingPrice: 'Sob orçamento', bothPrice: 'Sob orçamento', waterproofingPremiumPrice: 'Sob orçamento' },
+  { id: '4+-lugares', label: 'Canto, em\u00A0U ou modular', cleaningPrice: 'Sob orçamento', waterproofingPrice: 'Sob orçamento', bothPrice: 'Sob orçamento', waterproofingPremiumPrice: 'Sob orçamento' },
 ];
 
 // Colchão: waterproofingPrice/bothPrice/originalBothPrice são reaproveitados

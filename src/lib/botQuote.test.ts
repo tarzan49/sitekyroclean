@@ -37,14 +37,24 @@ describe('botQuote: the numbers the bot replies with come from the site engine',
   it('mattress with anti-ácaros (reply 3.4)', () => {
     expect(ok({ items: [{ kind: 'mattress', size: 'casal', treatment: 'clean+anti-acaros' }], city: 'Braga' }).subtotal).toBe(89);
   });
+  it('5+ seats: cleaning is 119 (owner, 2026-10-06), also as an item added to another order', () => {
+    const alone = ok({ items: [{ kind: 'sofa', size: '5-lugares' }], city: 'Porto' });
+    expect([alone.lines[0].amount, alone.quote, alone.handToOwner]).toEqual([119, false, false]);
+    const added = ok({ items: [{ kind: 'mattress', size: 'casal' }, { kind: 'sofa', size: '5-lugares' }], city: 'Porto' });
+    expect(added.lines.map(l => l.amount)).toEqual([69, 119]);
+  });
   it('pack condition: sofa 3 seats + double mattress is 79 + 55, the configurator total', () => {
     const r = ok({ items: [{ kind: 'sofa', size: '3-lugares' }, { kind: 'mattress', size: 'casal' }], city: 'Porto' });
     expect(r.lines.map(l => l.amount)).toEqual([79, 55]);
     expect([r.subtotal, r.savings, r.travel, r.total]).toEqual([134, 14, 0, 134]);
   });
-  it('hands to the owner: rugs, 5+ seats or U-shaped (id 4+-lugares), 10+ chairs, unknown or case-by-case localities', () => {
+  it('hands to the owner: rugs, corner/U-shaped/modular (id 4+-lugares), treatments on 5+ seats, 10+ chairs, unknown or case-by-case localities', () => {
     expect(ok({ items: [{ kind: 'rug', width: 2, length: 3 }], city: 'Porto' }).handToOwner).toBe(true);
     expect(ok({ items: [{ kind: 'sofa', size: '4+-lugares' }], city: 'Porto' }).handToOwner).toBe(true);
+    for (const treatment of ['clean+essencial', 'clean+premium', 'clean+anti-acaros', 'essencial', 'premium']) {
+      const r = ok({ items: [{ kind: 'sofa', size: '5-lugares', treatment }], city: 'Porto' });
+      expect([r.lines[0].amount, r.quote, r.handToOwner], treatment).toEqual([null, true, true]);
+    }
     expect(ok({ items: [{ kind: 'chairs', qty: 10 }], city: 'Porto' }).handToOwner).toBe(true);
     const unknown = ok({ items: [{ kind: 'sofa', size: '1-lugar' }], city: 'Madrid' });
     expect([unknown.cityKnown, unknown.travel, unknown.handToOwner]).toEqual([false, null, true]);
@@ -61,7 +71,7 @@ describe('botQuote: the numbers the bot replies with come from the site engine',
     const errors = [
       { items: [{ kind: 'mattress', size: 'casal', treatment: 'premium' }], city: 'Porto' },
       { items: [{ kind: 'rug', width: 2, length: 3, treatment: 'clean+anti-acaros' }], city: 'Porto' },
-      { items: [{ kind: 'sofa', size: '5-lugares' }], city: 'Porto' },
+      { items: [{ kind: 'sofa', size: '6-lugares' }], city: 'Porto' },
       { items: [{ kind: 'sofa', size: '1-lugar', qty: 0 }], city: 'Porto' },
       { items: [{ kind: 'rug' }], city: 'Porto' },
       { items: [{ kind: 'bed' }], city: 'Porto' },

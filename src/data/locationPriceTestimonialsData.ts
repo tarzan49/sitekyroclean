@@ -36,6 +36,7 @@ export const PRICE_TABLE_QUIZ_CONFIG: Record<string, (PriceRowQuizConfig | null)
     { service: 'sofa', serviceType: 'cleaning', sofaSizeId: '2-lugares' },
     { service: 'sofa', serviceType: 'cleaning', sofaSizeId: '3-lugares' },
     { service: 'sofa', serviceType: 'cleaning', sofaSizeId: '4-lugares' },
+    { service: 'sofa', serviceType: 'cleaning', sofaSizeId: '5-lugares' },
     { service: 'sofa', serviceType: 'cleaning', sofaSizeId: '4+-lugares' },
   ],
   'limpeza-colchoes': [
@@ -57,6 +58,7 @@ export const PRICE_TABLE_QUIZ_CONFIG: Record<string, (PriceRowQuizConfig | null)
     { service: 'sofa', serviceType: 'waterproofing', sofaSizeId: '2-lugares' },
     { service: 'sofa', serviceType: 'waterproofing', sofaSizeId: '3-lugares' },
     { service: 'sofa', serviceType: 'waterproofing', sofaSizeId: '4-lugares' },
+    { service: 'sofa', serviceType: 'waterproofing', sofaSizeId: '5-lugares' },
     { service: 'sofa', serviceType: 'waterproofing', sofaSizeId: '4+-lugares' },
     { service: 'chairs', serviceType: 'waterproofing', chairQty: '1' },
   ],
@@ -68,7 +70,8 @@ export const PRICE_TABLE: Record<string, { item: string; price: string }[]> = {
     { item: 'Sofá 2 lugares',          price: tablePrice(sofa('2-lugares')?.cleaningPrice) },
     { item: 'Sofá 3 lugares',          price: tablePrice(sofa('3-lugares')?.cleaningPrice) },
     { item: 'Sofá 4 lugares',          price: tablePrice(sofa('4-lugares')?.cleaningPrice) },
-    { item: 'Sofá de 5+ lugares ou em U', price: 'Sob orçamento' },
+    { item: 'Sofá 5+ lugares',         price: tablePrice(sofa('5-lugares')?.cleaningPrice) },
+    { item: 'Sofá de canto, em U ou modular', price: 'Sob orçamento' },
   ],
   'limpeza-colchoes': [
     { item: 'Colchão solteiro',        price: tablePrice(mattress('solteiro')?.cleaningPrice) },
@@ -89,7 +92,8 @@ export const PRICE_TABLE: Record<string, { item: string; price: string }[]> = {
     { item: 'Sofá 2 lugares',          price: tablePrice(sofa('2-lugares')?.waterproofingPrice) },
     { item: 'Sofá 3 lugares',          price: tablePrice(sofa('3-lugares')?.waterproofingPrice) },
     { item: 'Sofá 4 lugares',          price: tablePrice(sofa('4-lugares')?.waterproofingPrice) },
-    { item: 'Sofá de 5+ lugares ou em U', price: 'Sob orçamento' },
+    { item: 'Sofá 5+ lugares',         price: tablePrice(sofa('5-lugares')?.waterproofingPrice) },
+    { item: 'Sofá de canto, em U ou modular', price: 'Sob orçamento' },
     { item: 'Cadeiras',               price: `${CHAIR_WATERPROOF_ESSENTIAL}€/cad` },
   ],
 };

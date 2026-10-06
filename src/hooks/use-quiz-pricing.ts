@@ -92,7 +92,14 @@ export function useQuizPricing(
   const rugTravelOnQuote = isRugService && rugPickupCost === null;
   const finalTravelCost = isRugService ? 0 : calculateTravelFee(travelCost, safePrice(calculateServicePrice) + upsellItemsTotal);
   const totalPrice = safePrice(calculateServicePrice) + safePrice(upsellItemsTotal) + safePrice(finalTravelCost) + (rugPickupCost ?? 0);
-  // True when the user has qty>0 of the "5+ lugares ou em U" sofa (id '4+-lugares'), or any measured
+  // Sofás: qualquer unidade a que o motor não dá preço (canto, em U ou
+  // modular; 5+ lugares com impermeabilização ou anti-ácaros), pela mesma
+  // conta que o total, em vez de uma lista de ids escrita à mão.
+  const sofaNeedsQuote = formData.service === 'sofa' && splitTreatmentItems(sofaItems).some(item => {
+    const opt = sofaPrices.find(p => p.id === item.sizeId);
+    return !opt || calcSofaUnitPrice(opt, item.packEnabled, formData.serviceType, formData.waterproofingTier, formData.sofaAntiAcaros) === null;
+  });
+  // True when a sofa unit has no engine price (above), or any measured
   // carpet (carpets never have a fixed price anymore — always a custom quote,
   // see carpetHasValidItems) — without this, calculateServicePrice silently
   // fell back to 0 for those cases, so totalPrice ended up as travel cost
@@ -115,11 +122,11 @@ export function useQuizPricing(
     : (formData.waterproofingTier === 'premium' ? calcChairWaterproofPremium : calcChairWaterproof);
   const chairAddonNeedsQuote = isChairService && chairAddonQty > 0 && chairAddonCalc(chairAddonQty) === null;
   const hasSobOrcamento =
-    (formData.service === 'sofa' && sofaItems.some(i => i.sizeId === '4+-lugares' && i.qty > 0)) ||
+    sofaNeedsQuote ||
     (formData.service === 'carpet' && carpetHasValidItems(carpetItems)) ||
     chairPrimaryNeedsQuote ||
     chairAddonNeedsQuote;
-  // Any upsell item with price=0 is a SOB item (chairs ≥10, tapetes (sempre), sofa 5+ lugares ou em U)
+  // Any upsell item with price=0 is a SOB item (chairs ≥10, tapetes (sempre), sofá de canto, em U ou modular)
   const hasUpsellSobItem = upsellItems.some(i => i.price === 0);
 
   return {
