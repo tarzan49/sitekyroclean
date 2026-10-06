@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { lisbonDay, shiftMonth } from "@/lib/crmClosings";
-import { QUIZ_LEADS_SINCE, type QuizSummary } from "@/lib/crmQuizLeads";
+import { QUIZ_LEADS_SINCE, type QuizSummary, type WhatsAppMonth } from "@/lib/crmQuizLeads";
 
 // Aba "Questionário" do CRM: quantas pessoas pediram orçamento pelo
 // questionário do site e quantas fecharam. As contas estão em crmQuizLeads.ts.
@@ -12,7 +12,7 @@ const MONTH_FMT = new Intl.DateTimeFormat("pt-PT", { month: "long", year: "numer
 const monthName = (month: string) => MONTH_FMT.format(new Date(`${month}-15T12:00:00Z`));
 const dayLabel = (day: string) => `${day.slice(8, 10)}/${day.slice(5, 7)}`;
 
-const CrmQuizLeads = ({ summary, error }: { summary: QuizSummary | null; error: string | null }) => {
+const CrmQuizLeads = ({ summary, whatsApp, error }: { summary: QuizSummary | null; whatsApp: WhatsAppMonth[] | null; error: string | null }) => {
   const [month, setMonth] = useState(() => lisbonDay(new Date()).slice(0, 7));
 
   const people = useMemo(() => summary?.people.filter(p => p.firstDay.startsWith(month)) ?? [], [summary, month]);
@@ -33,7 +33,7 @@ const CrmQuizLeads = ({ summary, error }: { summary: QuizSummary | null; error: 
     <div className="space-y-4">
       <div className="flex items-center justify-between flex-wrap gap-2">
         <p className="text-sm text-gray-500 max-w-2xl">
-          Pessoas que pediram orçamento pelo questionário do site, no mês do primeiro pedido. Fechou = tem um serviço no CRM com o mesmo telefone, fechado depois do pedido.
+          Pessoas que pediram orçamento pelo questionário do site, no mês do primeiro pedido. Fechou = tem um serviço no CRM fechado depois do pedido, ligado pelo telefone do questionário, pelo número do WhatsApp que mandou o código do pedido ou pelo nome completo.
           Desde o início: {total.closed} de {total.people} ({rate(total.closed, total.people)}).
         </p>
         <div className="flex items-center gap-1 border border-gray-200 rounded-lg">
@@ -74,7 +74,7 @@ const CrmQuizLeads = ({ summary, error }: { summary: QuizSummary | null; error: 
           <table className="w-full text-xs">
             <thead>
               <tr className="border-b border-gray-200 bg-gray-50">
-                {["Mês", "Pedidos", "Fecharam", "Taxa de fecho", "Faturado", "Para ti"].map(h => (
+                {["Mês", "Pedidos", "Fecharam", "Taxa de fecho", "Faturado", "Para ti", ...(whatsApp ? ["WhatsApp direto"] : [])].map(h => (
                   <th key={h} className="text-left px-3 py-2 text-[10.5px] font-bold text-gray-500 uppercase tracking-wider whitespace-nowrap">{h}</th>
                 ))}
               </tr>
@@ -88,6 +88,10 @@ const CrmQuizLeads = ({ summary, error }: { summary: QuizSummary | null; error: 
                   <td className="px-3 py-2 text-navy font-semibold">{rate(m.closed, m.people)}</td>
                   <td className="px-3 py-2 text-navy whitespace-nowrap">{money(m.billed)}</td>
                   <td className="px-3 py-2 text-gold font-semibold whitespace-nowrap">{money(m.share)}</td>
+                  {whatsApp && (() => {
+                    const w = whatsApp.find(x => x.month === m.month);
+                    return <td className="px-3 py-2 text-gray-600 whitespace-nowrap">{w ? `${w.closed} de ${w.contacts} (${rate(w.closed, w.contacts)})` : "–"}</td>;
+                  })()}
                 </tr>
               ))}
             </tbody>
@@ -123,7 +127,7 @@ const CrmQuizLeads = ({ summary, error }: { summary: QuizSummary | null; error: 
                     <td className="px-3 py-2 text-gray-600 whitespace-nowrap">{last.value || "-"}</td>
                     <td className="px-3 py-2 whitespace-nowrap">
                       {p.services.length
-                        ? <span className="font-semibold text-green-700">Fechou · {money(p.billed)}{p.services.length > 1 ? ` (${p.services.length} serviços)` : ""}</span>
+                        ? <span className="font-semibold text-green-700" title={`Ligado pelo ${[...new Set(p.matchedBy)].join(" e pelo ")}`}>Fechou · {money(p.billed)}{p.services.length > 1 ? ` (${p.services.length} serviços)` : ""}{p.matchedBy.some(m => m !== "telefone") && <span className="font-normal text-gray-500"> · pelo {[...new Set(p.matchedBy.filter(m => m !== "telefone"))].join(" e ")}</span>}</span>
                         : <span className="text-gray-400">Não fechou</span>}
                     </td>
                   </tr>
@@ -134,9 +138,12 @@ const CrmQuizLeads = ({ summary, error }: { summary: QuizSummary | null; error: 
         </div>
       </div>
 
-      {summary.withoutPhone > 0 && (
-        <p className="text-[11px] text-gray-500">{summary.withoutPhone} pedido{summary.withoutPhone === 1 ? "" : "s"} sem telefone ficam fora destas contas: não há forma de os ligar ao CRM.</p>
-      )}
+      <p className="text-[11px] text-gray-500">
+        {summary.tests > 0 && `${summary.tests} pedido${summary.tests === 1 ? "" : "s"} de teste (nome com "teste" ou número inventado) ficam fora destas contas. `}
+        {summary.withoutPhone > 0 && `${summary.withoutPhone} pedido${summary.withoutPhone === 1 ? "" : "s"} sem telefone também. `}
+        O número do WhatsApp de quem mandou o código do pedido é lido do WhatsApp Web, não se atualiza sozinho.
+        {whatsApp && " WhatsApp direto = contactos do separador Clientes que não passaram pelo questionário, no mês do primeiro contacto; fechou = etiqueta de cliente ou marcado, ou serviço no CRM."}
+      </p>
     </div>
   );
 };

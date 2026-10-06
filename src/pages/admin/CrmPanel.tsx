@@ -9,7 +9,7 @@ import CrmClosings from "./CrmClosings";
 import CrmUpsell from "./CrmUpsell";
 import CrmServiceMix from "./CrmServiceMix";
 import CrmQuizLeads from "./CrmQuizLeads";
-import { summarizeQuizLeads, QUIZ_BADGE, type QuizLeadRow } from "@/lib/crmQuizLeads";
+import { summarizeQuizLeads, summarizeWhatsAppContacts, QUIZ_BADGE, type QuizLeadRow, type WhatsAppContactRow } from "@/lib/crmQuizLeads";
 import { UPSELL_TEAMS, UPSELL_TEXT, ownerUpsellOf, defaultTeamFor, isUpsellTeam, splitUpsell, type UpsellTeam } from "@/lib/crmUpsell";
 
 interface ServiceRequest {
@@ -104,6 +104,7 @@ const CrmPanel = () => {
   const [sync, setSync] = useState<SyncState>({ status: "idle" });
   const [quizLeads, setQuizLeads] = useState<QuizLeadRow[] | null>(null);
   const [quizError, setQuizError] = useState<string | null>(null);
+  const [waContacts, setWaContacts] = useState<WhatsAppContactRow[] | null>(null);
 
   const [viewedMonth, setViewedMonth] = useState(() => {
     const d = new Date();
@@ -173,16 +174,21 @@ const CrmPanel = () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { data, error: err } = await (supabase as any)
       .from("leads")
-      .select("id, created_at, name, phone, service, location, value, source")
+      .select("id, created_at, name, phone, service, location, value, source, whatsapp_phone")
       .order("created_at", { ascending: true });
     if (err) { setQuizError(err.message); return; }
     setQuizError(null);
     setQuizLeads((data ?? []) as QuizLeadRow[]);
+    // Contactos do WhatsApp, para comparar; se a leitura falhar, a aba mostra só o questionário.
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data: contacts } = await (supabase as any).from("clients").select("phone, first_contact_at, status");
+    setWaContacts((contacts ?? null) as WhatsAppContactRow[] | null);
   }, []);
 
   useEffect(() => { fetchQuizLeads(); }, [fetchQuizLeads]);
 
   const quizSummary = useMemo(() => quizLeads ? summarizeQuizLeads(quizLeads, records) : null, [quizLeads, records]);
+  const waMonths = useMemo(() => quizSummary && waContacts ? summarizeWhatsAppContacts(waContacts, records, quizSummary) : null, [quizSummary, waContacts, records]);
 
   const runSync = async () => {
     fetchQuizLeads();
@@ -424,7 +430,7 @@ const CrmPanel = () => {
           allRecords={records.map(r => ({ ...r, my_cut: cutOf(r) }))} />
       )}
 
-      {view === "questionario" && <CrmQuizLeads summary={quizSummary} error={quizError} />}
+      {view === "questionario" && <CrmQuizLeads summary={quizSummary} whatsApp={waMonths} error={quizError} />}
 
       {view === "fechos" && <CrmClosings records={records.map(r => ({ ...r, my_cut: cutOf(r) }))} />}
 

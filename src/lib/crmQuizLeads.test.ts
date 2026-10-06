@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { summarizeQuizLeads, type QuizLeadRow, type QuizServiceRow } from "./crmQuizLeads";
+import { summarizeQuizLeads, summarizeWhatsAppContacts, type QuizLeadRow, type QuizServiceRow } from "./crmQuizLeads";
 
 // Dados inventados: o repositório é público.
 const lead = (id: string, created_at: string, phone: string | null, source: string | null = "Website"): QuizLeadRow =>
@@ -45,5 +45,52 @@ describe("summarizeQuizLeads", () => {
     );
     expect(s.people).toEqual([]);
     expect(s.withoutPhone).toBe(1);
+  });
+});
+
+describe("summarizeQuizLeads: other ways to link", () => {
+  it("links through the WhatsApp number that sent the order code", () => {
+    const l = { ...lead("a", "2026-10-06T10:00:00Z", "939000001"), whatsapp_phone: "932000002" };
+    const s = summarizeQuizLeads([l], [service("s", "2026-10-06T12:00:00Z", "+351 932 000 002", 119, 60)]);
+    expect(s.people[0].matchedBy).toEqual(["WhatsApp"]);
+    expect(s.months[0]).toMatchObject({ people: 1, closed: 1, billed: 119 });
+  });
+
+  it("falls back to the full name when the CRM phone is wrong", () => {
+    const l = { ...lead("a", "2026-09-17T10:00:00Z", "969000001"), name: "Hugo Gomes" };
+    const s = summarizeQuizLeads([l], [
+      { ...service("s", "2026-09-17T12:00:00Z", "925000009", 130, 65), client_name: "Hugo Gomes" },
+      { ...service("x", "2026-09-18T12:00:00Z", "925000008"), client_name: "Hugo" },
+    ]);
+    expect(s.people[0].services.map(x => x.id)).toEqual(["s"]);
+    expect(s.people[0].matchedBy).toEqual(["nome"]);
+  });
+
+  it("leaves test requests out", () => {
+    const s = summarizeQuizLeads([
+      { ...lead("t", "2026-09-18T10:00:00Z", "925000009"), name: "TESTE GOOGLE ADS" },
+      lead("f", "2026-09-18T10:00:00Z", "911111111"),
+      lead("z", "2026-09-24T10:00:00Z", "910000000"),
+    ], []);
+    expect(s.people).toEqual([]);
+    expect(s.tests).toBe(3);
+  });
+});
+
+describe("summarizeWhatsAppContacts", () => {
+  it("counts WhatsApp contacts outside the quiz, closed by label or by a CRM service", () => {
+    const quiz = summarizeQuizLeads([{ ...lead("a", "2026-09-20T10:00:00Z", "912000001"), whatsapp_phone: "932000009" }], []);
+    const months = summarizeWhatsAppContacts([
+      { phone: "351912000001", first_contact_at: "2026-09-20T10:00:00Z", status: "pendente" },
+      { phone: "351932000009", first_contact_at: "2026-09-20T10:00:00Z", status: "cliente" },
+      { phone: "351913000002", first_contact_at: "2026-09-21T10:00:00Z", status: "marcado" },
+      { phone: "351913000003", first_contact_at: "2026-09-22T10:00:00Z", status: "pendente" },
+      { phone: "351913000004", first_contact_at: "2026-10-01T10:00:00Z", status: "pendente" },
+      { phone: "351913000005", first_contact_at: null, status: "cliente" },
+    ], [service("s", "2026-10-02T10:00:00Z", "913000004")], quiz);
+    expect(months).toEqual([
+      { month: "2026-10", contacts: 1, closed: 1 },
+      { month: "2026-09", contacts: 2, closed: 1 },
+    ]);
   });
 });
