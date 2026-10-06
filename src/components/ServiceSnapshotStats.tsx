@@ -35,7 +35,7 @@ const ServiceSnapshotStats = ({ stats }: { stats: SnapshotStat[] }) => {
               <div className={singleRow ? "mb-1.5" : "flex items-center justify-center gap-2 mb-1.5 md:block"}>
                 <s.icon className={singleRow ? "w-4 h-4 mx-auto mb-2.5" : "w-4 h-4 shrink-0 md:mx-auto md:mb-2.5"} style={{ color: "#D4AF37" }} strokeWidth={1.75} />
                 <p className={singleRow ? "font-playfair font-semibold text-[clamp(17px,5vw,21px)] md:text-2xl leading-tight text-white whitespace-nowrap" : "min-w-0 font-playfair font-semibold text-[22px] leading-tight text-white md:font-bold md:text-3xl md:leading-none md:text-[#D4AF37]"}>
-                  {s.value.includes('★') ? <>{s.value.replace('★', '')}<span className="text-[#D4AF37] ml-0.5">★</span></> : s.value.replace('<10min', '<10 min').replace('3 a 6h', '3 a 6 h')}
+                  {s.value.includes('★') ? <>{s.value.replace('★', '')}<span className="text-[#D4AF37] ml-0.5">★</span></> : s.value.replace('<10min', '<10 min').replace('3 a 6h', '3 a 6 h').replace('2 a 5h', '2 a 5 h')}
                 </p>
               </div>
               <p className={singleRow ? "text-[11px] md:text-xs leading-snug font-medium text-white/75" : "text-xs leading-snug md:text-[10px] font-medium text-white/75 md:text-white/60 md:tracking-[0.22em] md:uppercase"}>

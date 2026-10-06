@@ -105,7 +105,7 @@ function content_higienizacao_sofa(loc: string, ctx: string): ContentBlock {
       { step: 1, title: 'Inspeção', description: 'Avaliação do estado e do tecido do sofá.' },
       { step: 2, title: 'Preparação', description: 'Aplicação do produto adequado ao material e à sujidade.' },
       { step: 3, title: 'Extração', description: 'Remoção de sujidade com equipamento profissional.' },
-      { step: 4, title: 'Secagem', description: 'Normalmente 3 a 6 horas, dependendo do tecido e da ventilação.' },
+      { step: 4, title: 'Secagem', description: 'Normalmente 2 a 5 horas, dependendo do tecido e da ventilação.' },
     ],
     problems: [
       { title: 'Sujidade acumulada', description: 'O uso diário deixa resíduos nas fibras. A extração profissional permite uma limpeza mais profunda do que a aspiração doméstica.' },
@@ -345,7 +345,7 @@ function content_lavagem_sofa(loc: string, ctx: string): ContentBlock {
         'Devolve o aspeto original e as cores ao tecido',
         'Tecido macio como novo após a lavagem',
         `Lavagem ao domicílio em ${loc}`,
-        'Secagem rápida: sofá pronto em 3 a 6 horas',
+        'Secagem rápida: sofá pronto em 2 a 5 horas',
       ],
       [
         'Extração profunda com equipamento profissional dedicado',
@@ -353,14 +353,14 @@ function content_lavagem_sofa(loc: string, ctx: string): ContentBlock {
         'Cores e aspeto original de volta ao tecido',
         'Tecido macio ao toque, como quando era novo',
         `Deslocação a partir de 10€ em ${loc}`,
-        'Sofá pronto em 3 a 6 horas de secagem',
+        'Sofá pronto em 2 a 5 horas de secagem',
       ],
     ] as const, seedB),
     processSteps: [
       { step: 1, title: 'Mapeamento de manchas', description: `Identificação e avaliação de cada mancha por tipo em ${loc}.` },
       { step: 2, title: 'Pré-tratamento', description: 'Produto específico por tipo de mancha: gordura, vinho, urina, café.' },
       { step: 3, title: 'Lavagem por extração profissional', description: 'Injeção de solução quente e aspiração em profundidade das fibras.' },
-      { step: 4, title: 'Secagem acelerada', description: 'Sofá pronto a usar em 3 a 6 horas com ventilação adequada.' },
+      { step: 4, title: 'Secagem acelerada', description: 'Sofá pronto a usar em 2 a 5 horas com ventilação adequada.' },
     ],
     problems: pick([
       [
@@ -660,7 +660,7 @@ function content_impermeabilizacao_sofa(loc: string, ctx: string): ContentBlock 
       { step: 1, title: 'Avaliação do tecido', description: `Inspecção do tipo de fibra e estado do sofá em ${loc} para confirmar compatibilidade.` },
       { step: 2, title: 'Limpeza prévia', description: 'O sofá deve estar limpo antes da aplicação. Recomendamos limpeza prévia para resultado ideal.' },
       { step: 3, title: 'Escolha da versão e aplicação', description: 'Essencial (à base de água) ou Premium (à base de solvente), aplicada uniformemente em todo o tecido.' },
-      { step: 4, title: 'Secagem e ativação', description: 'A barreira ativa-se na secagem: sofá pronto a usar em 3 a 6 horas.' },
+      { step: 4, title: 'Secagem e ativação', description: 'A barreira ativa-se na secagem: sofá pronto a usar em 2 a 5 horas.' },
     ],
     problems: pick([
       [

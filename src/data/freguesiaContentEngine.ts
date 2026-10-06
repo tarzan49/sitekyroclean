@@ -351,7 +351,7 @@ const benefitsByService: Record<string, BenefitTemplate[]> = {
   "limpeza-sofas": [
     (f, c) => `Serviço ao domicílio em ${f}: limpamos o sofá na sua própria sala, sem transporte nem complicações em ${c}`,
     (f, c) => `Cobertura total em ${f} e toda a área de ${c}, com deslocação calculada pela distância`,
-    (f)    => `O seu sofá em ${f} fica pronto a usar no mesmo dia, com secagem completa em 3 a 6 horas`,
+    (f)    => `O seu sofá em ${f} fica pronto a usar no mesmo dia, com secagem completa em 2 a 5 horas`,
     (f)    => `Produtos certificados e hipoalergénicos, adequados às crianças e animais da sua família em ${f}`,
     (f)    => `Remoção de resíduos associados a ácaros, bactérias e alergénios acumulados no sofá em ${f}`,
     (f, c) => `Orçamento gratuito e transparente antes de qualquer trabalho no seu sofá em ${f}, ${c}`,

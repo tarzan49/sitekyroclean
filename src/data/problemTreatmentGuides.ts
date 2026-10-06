@@ -1,7 +1,7 @@
 import type { ProblemPage } from './problemSeoData';
 import { MATERIAL_PROCESS_GUIDES } from './materialProcessGuides';
 import { SERVICE_PROCESS_GUIDES, type ProcessGuide, type ProcessStep, type ProcessServiceSlug } from './serviceProcessGuides';
-import { DRYING_PROMISE } from '../constants/commercialPolicy';
+import { DRYING_PROMISE, SOFA_DRYING_PROMISE } from '../constants/commercialPolicy';
 
 interface TreatmentProfile { focus: string; action: string; limit: string }
 const profile = (focus: string, action: string, limit: string): TreatmentProfile => ({ focus, action, limit });
@@ -96,7 +96,7 @@ export function getProblemTreatmentGuide(problem: ProblemPage): ProblemTreatment
       illustrated('Tratar', protective ? 'Aplicar a proteção escolhida' : mould ? 'Definir se é possível intervir' : 'O cuidado específico para este caso', p.action, protective ? 2 : sofa ? 2 : 1, ['preco', 'urgencia'].includes(problem.category) ? 'inspect' : 'apply'),
       ...(!protective && !mould ? [brushing] : []),
       illustrated(!protective && !mould ? (delicate ? 'Finalizar' : 'Extrair') : 'Finalizar', protective ? 'Respeitar a aplicação' : mould ? 'Resolver a origem da humidade' : 'Retirar os resíduos da limpeza', protective ? 'Conferimos a aplicação e indicamos as condições necessárias para a proteção ativar.' : mould ? 'A limpeza da peça não resolve infiltrações nem humidade persistente. Explicamos o que necessita de avaliação adicional.' : 'Quando o material e o tratamento permitem, retiramos os resíduos e reduzimos a humidade com equipamento adequado. Ajustamos a intervenção à resposta do revestimento.', protective ? 3 : mould ? 0 : sofa ? 4 : 3, 'extract'),
-      illustrated('Conferir', protective ? 'Cuidados depois da proteção' : mould ? 'Conferir os limites da intervenção' : 'Conferir o resultado e deixar secar', p.limit + (protective ? ' Respeite o tempo de ativação indicado para a proteção escolhida.' : mould ? '' : ` ${DRYING_PROMISE}`), base.steps.length - 1, 'dry'),
+      illustrated('Conferir', protective ? 'Cuidados depois da proteção' : mould ? 'Conferir os limites da intervenção' : 'Conferir o resultado e deixar secar', p.limit + (protective ? ' Respeite o tempo de ativação indicado para a proteção escolhida.' : mould ? '' : ` ${sofa ? SOFA_DRYING_PROMISE : DRYING_PROMISE}`), base.steps.length - 1, 'dry'),
     ],
   };
 }

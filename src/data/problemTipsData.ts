@@ -142,7 +142,7 @@ export const CATEGORY_TIPS: Record<string, { title: string; steps: string[]; war
     steps: [
       "O técnico inspeciona o tipo de tecido e manchas antes de iniciar (sinal de profissionalismo)",
       "Processo completo: cerca de 1 hora por sofá, conforme a dimensão e o estado do estofado",
-      "Deixe secar completamente antes de usar, 3 a 6 horas dependendo da ventilação",
+      "Deixe secar completamente antes de usar, 2 a 5 horas dependendo da ventilação",
     ],
     warning: "Uso antes de secar completamente pode causar marcas de água no tecido",
   },

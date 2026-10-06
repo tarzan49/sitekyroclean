@@ -145,7 +145,7 @@ const problemDefinitions: ProblemPage[] = [
       { question: "A limpeza profissional remove manchas antigas do sofá?", answer: "Sim, na grande maioria dos casos. O nosso processo de extração profunda remove manchas de café, vinho, gordura e outros líquidos, mesmo que sejam antigas. Manchas muito antigas ou de tinta permanente podem necessitar de tratamento adicional." },
       { question: "Quanto custa remover manchas do sofá?", answer: `A remoção de manchas está incluída no serviço de limpeza profissional de sofás, que começa a partir de ${formatEuro(sofaCleaningPrice('1-lugar'))} para sofás de 1 lugar (${formatEuro(sofaCleaningPrice('2-lugares'))} para 2 lugares), sem suplemento por manchas.` },
       { question: "A limpeza pode danificar o tecido ao remover manchas?", answer: "Não. Utilizamos produtos certificados específicos para cada tipo de tecido e mancha. Antes de iniciar, inspeccionamos sempre o tecido para garantir o tratamento mais adequado e seguro." },
-      { question: "Quanto tempo demora a remover manchas do sofá?", answer: "O serviço completo de limpeza e remoção de manchas demora, em média, cerca de 1 hora, dependendo do tamanho e estado do sofá. O sofá fica pronto a usar em 3 a 6 horas." },
+      { question: "Quanto tempo demora a remover manchas do sofá?", answer: "O serviço completo de limpeza e remoção de manchas demora, em média, cerca de 1 hora, dependendo do tamanho e estado do sofá. O sofá fica pronto a usar em 2 a 5 horas." },
     ],
     relatedProblems: ["manchas-vinho-sofa", "manchas-cafe-sofa", "manchas-gordura-sofa", "manchas-colchao"],
     relatedServices: ["limpeza-sofas", "impermeabilizacao"],
@@ -1098,7 +1098,7 @@ const problemDefinitions: ProblemPage[] = [
     ],
     faqs: [
       { question: "Os produtos são seguros para bebés?", answer: "Sim. Utilizamos exclusivamente produtos certificados, hipoalergénicos e aprovados para contacto com pele sensível de bebés." },
-      { question: "Quanto tempo após a limpeza o bebé pode usar o sofá?", answer: "Recomendamos aguardar 3 a 6 horas até à secagem completa, e só depois voltar a usar o sofá. Usamos produtos certificados e hipoalergénicos, escolhidos para casas com bebés." },
+      { question: "Quanto tempo após a limpeza o bebé pode usar o sofá?", answer: "Recomendamos aguardar 2 a 5 horas até à secagem completa, e só depois voltar a usar o sofá. Usamos produtos certificados e hipoalergénicos, escolhidos para casas com bebés." },
     ],
     relatedProblems: ["alergias-sofa", "manchas-sofa", "impermeabilizar-sofa"],
     relatedServices: ["limpeza-sofas", "impermeabilizacao"],

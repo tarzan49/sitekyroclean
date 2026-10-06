@@ -31,7 +31,7 @@ const sofaGuarantee: GuaranteeItem[] = [
   },
   {
     label: "Rapidez",
-    title: "Secagem média de 3 a 6 horas",
+    title: "Secagem média de 2 a 5 horas",
     body: "A extração reduz a humidade. O tempo de secagem depende do tecido, da ventilação e das condições do espaço.",
     image: "/images/service-promises/LimpezaSofas-promise-3-800.webp",
   },

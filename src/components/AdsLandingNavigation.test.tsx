@@ -12,7 +12,7 @@ describe('ads landing entry and sofa information', () => {
   });
   it('uses consistent drying information and explicit pricing conditions in both cities', () => {
     // FAQs now vary by intent and URL; policy must not depend on a fixed FAQ index.
-    expect(getLandingFaqPool('limpeza-sofas').find(faq => faq.id === 'sofa-secagem')?.answer).toContain('3 a 6 horas');
+    expect(getLandingFaqPool('limpeza-sofas').find(faq => faq.id === 'sofa-secagem')?.answer).toContain('2 a 5 horas');
     for (const city of ['porto', 'lisboa']) {
       const hygiene = getKeywordVariantData('higienizacao', 'sofa', city)!;
       expect(hygiene.faqs).toHaveLength(4);

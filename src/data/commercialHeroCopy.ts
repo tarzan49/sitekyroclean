@@ -71,8 +71,9 @@ export const commercialHeroStats = (serviceSlug: string): HeroStat[] => [
   { value: `${REVIEW_RATING}★`, label: `+${REVIEW_COUNT} avaliações Google` },
   { value: '<10 min', label: 'Resposta' },
   // A impermeabilização não seca, ativa: o tratamento precisa de até 24 h para
-  // ficar operacional, ao contrário da limpeza, que devolve o artigo em 3 a 6 h.
+  // ficar operacional, ao contrário da limpeza, que devolve o artigo em 3 a 6 h
+  // (sofás: 2 a 5 h, dono 06/10/2026).
   serviceSlug === 'impermeabilizacao'
     ? { value: 'Até 24 h', label: 'Ativação da proteção' }
-    : { value: '3 a 6 h', label: 'Secagem média' },
+    : { value: serviceSlug === 'limpeza-sofas' ? '2 a 5 h' : '3 a 6 h', label: 'Secagem média' },
 ];

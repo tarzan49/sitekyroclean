@@ -1070,7 +1070,7 @@ export function prerenderRoutes(outDir: string): number {
         'Remoção de sujidade e resíduos das fibras',
         'Eliminação de manchas de vinho, café, gordura e sangue',
         'Eliminação de odores de animais domésticos e fumo',
-        'Secagem rápida em 3 a 6 horas',
+        'Secagem rápida em 2 a 5 horas',
         'Técnicos certificados com produtos eco-friendly',
         'Serviço ao domicílio sem custos ocultos',
       ],

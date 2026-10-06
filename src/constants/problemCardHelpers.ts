@@ -132,7 +132,7 @@ export const PRICE_HEADING_VERB: Record<string, string> = {
 // hero (2026-09-09, pedido explícito: trocar "zonas próximas" por algo mais
 // relevante para o cliente, tipo quanto tempo demora o serviço).
 export const SERVICE_DURATION: Record<string, { value: string; label: string }> = {
-  "limpeza-sofas":     { value: "3 a 6h", label: "Pronto a usar" },
+  "limpeza-sofas":     { value: "2 a 5h", label: "Pronto a usar" },
   "limpeza-colchoes":  { value: "3 a 6h", label: "Pronto a usar" },
   "limpeza-cadeiras":  { value: "3 a 6h", label: "Pronto a usar" },
   "limpeza-tapetes":   { value: "3 a 6h", label: "Pronto a usar" },

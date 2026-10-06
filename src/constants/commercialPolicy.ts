@@ -2,6 +2,9 @@
 import { locationPrices } from './travel';
 export const RESPONSE_PROMISE = 'Resposta em menos de 10 minutos';
 export const DRYING_PROMISE = 'Secagem média de 3 a 6 horas, dependendo da ventilação, do tecido e das condições do espaço.';
+// Sofás secam mais depressa (dono, 06/10/2026: "a secagem é 2-5 horas"). Os outros artigos ficam em DRYING_PROMISE.
+export const SOFA_DRYING_RANGE = '2 a 5 horas';
+export const SOFA_DRYING_PROMISE = `Secagem média de ${SOFA_DRYING_RANGE}, dependendo da ventilação, do tecido e das condições do espaço.`;
 export const SATISFACTION_PROMISE = 'Se não ficar satisfeito, contacte-nos até 48 horas após o serviço e repetimos a intervenção sem custos. Após esse prazo, esta garantia comercial de repetição deixa de se aplicar, sem prejuízo dos direitos legais.';
 export const PRICE_PROMISE = 'A simulação é uma estimativa. Confirmamos o preço com base nos artigos, medidas, tratamento e deslocação antes da marcação. O valor confirmado mantém-se para esse serviço; alterações ao pedido são orçamentadas previamente.';
 export const AVAILABILITY_PROMISE = 'Procuramos realizar o serviço no próprio dia ou no dia seguinte, mediante disponibilidade confirmada pela equipa.';

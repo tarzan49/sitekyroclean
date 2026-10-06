@@ -1,4 +1,4 @@
-import { AVAILABILITY_PROMISE, DRYING_PROMISE, PRICE_PROMISE, RESPONSE_PROMISE, RUG_PICKUP_FEE_RULE, RUG_PICKUP_RULE, RUG_SERVICE_SLUGS, SATISFACTION_PROMISE, TREATMENT_EXTRAS } from '../constants/commercialPolicy';
+import { AVAILABILITY_PROMISE, DRYING_PROMISE, SOFA_DRYING_PROMISE, PRICE_PROMISE, RESPONSE_PROMISE, RUG_PICKUP_FEE_RULE, RUG_PICKUP_RULE, RUG_SERVICE_SLUGS, SATISFACTION_PROMISE, TREATMENT_EXTRAS } from '../constants/commercialPolicy';
 import { locationPrices } from '../constants/travel';
 import { LANDING_FAQ_EXPANSION } from './landingFaqExpansion';
 
@@ -58,7 +58,7 @@ const initialByService: Record<LandingService, readonly FaqEntry[]> = {
     { id: 'sofa-lavagem', topic: 'tratamento', question: 'Lavagem e higienização de sofás são tratamentos diferentes?', answer: `Estas expressões podem descrever o mesmo pedido de limpeza profissional. O procedimento é definido pelo material e pelo estado do sofá, não apenas pelo nome usado na pesquisa. ${TREATMENT_EXTRAS}` },
     { id: 'sofa-odores', topic: 'tratamento', question: 'A limpeza resolve sempre o cheiro a urina no sofá?', answer: 'O resultado depende de onde a urina penetrou e do estado do enchimento. A limpeza do tecido pode não resolver uma origem de odor no interior. Indique há quanto tempo aconteceu e o que já aplicou para avaliarmos as possibilidades e limitações.' },
     { id: 'sofa-manchas', topic: 'tratamento', question: 'Conseguem retirar manchas de café ou vinho?', answer: 'Avaliamos o tipo de tecido, a antiguidade da mancha e os produtos já usados antes de escolher o tratamento. Há manchas que deixam alterações permanentes de cor, pelo que não prometemos remoção total.' },
-    { id: 'sofa-secagem', topic: 'cuidados', question: 'Quanto tempo devo esperar para usar o sofá?', answer: `${DRYING_PROMISE} Volte a utilizar o sofá quando estiver completamente seco e siga as indicações da equipa.` },
+    { id: 'sofa-secagem', topic: 'cuidados', question: 'Quanto tempo devo esperar para usar o sofá?', answer: `${SOFA_DRYING_PROMISE} Volte a utilizar o sofá quando estiver completamente seco e siga as indicações da equipa.` },
     { id: 'sofa-cobrir', topic: 'cuidados', question: 'Posso colocar uma manta no sofá logo após a limpeza?', answer: 'Espere pela secagem completa. Cobrir tecido ainda húmido dificulta a circulação do ar. Durante a secagem, mantenha o espaço ventilado de acordo com as orientações da equipa.' },
     { id: 'sofa-frequencia', topic: 'cuidados', question: 'Com que frequência devo limpar o sofá?', answer: 'A frequência depende do uso, da presença de animais, dos derrames e das indicações do fabricante. Observe o estado do tecido e peça avaliação quando houver sujidade acumulada ou odores persistentes, em vez de seguir um intervalo igual para todos os sofás.' },
   ],

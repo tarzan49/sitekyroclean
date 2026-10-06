@@ -1396,7 +1396,7 @@ A deslocação é apresentada à parte. Indique o tamanho real e as faces que pr
       },
       {
         "heading": "Sobre o orçamento e a utilização",
-        "body": "**7. «O preço inicial já inclui deslocação.»** A deslocação aparece separada no orçamento.\n**8. «Posso usar o sofá logo depois.»** Secagem média de 3 a 6 horas, dependendo da ventilação, do tecido e das condições do espaço. Utilize a peça apenas depois de estar completamente seca."
+        "body": "**7. «O preço inicial já inclui deslocação.»** A deslocação aparece separada no orçamento.\n**8. «Posso usar o sofá logo depois.»** Secagem média de 2 a 5 horas, dependendo da ventilação, do tecido e das condições do espaço. Utilize a peça apenas depois de estar completamente seca."
       }
     ],
     "faq": [

@@ -1,4 +1,4 @@
-import { DRYING_PROMISE } from '../constants/commercialPolicy';
+import { SOFA_DRYING_PROMISE } from '../constants/commercialPolicy';
 import type { ProcessGuide } from './serviceProcessGuides';
 
 // Illustrated stages are shared by React and static material pages.
@@ -13,7 +13,7 @@ export const MATERIAL_PROCESS_GUIDES: Record<string, ProcessGuide> = {
       { label: "Aplicação", title: "Aplicamos a solução de limpeza.", description: "Distribuímos o produto adequado ao tecido, com a quantidade e a humidade ajustadas à avaliação inicial.", alt: "Aplicação de solução de limpeza num sofá em tecido" },
       { label: "Escovação", title: "Escovamos para soltar a sujidade.", description: "Trabalhamos a solução com uma escova adequada ao tecido, ajustando a pressão e respeitando as fibras.", alt: "Escovação de uma almofada em tecido com escova de estofos" },
       { label: "Extração", title: "Extraímos a sujidade e a humidade.", description: "Depois da escovação, passamos o bocal de extração para retirar os resíduos da limpeza e reduzir a humidade no revestimento.", alt: "Extração de uma almofada em tecido com bocal transparente" },
-      { label: "Secagem", title: "Deixamos o sofá a ventilar.", description: `${DRYING_PROMISE} Volte a usar o sofá apenas quando estiver completamente seco.`, alt: "Sofá em tecido a secar num espaço ventilado" },
+      { label: "Secagem", title: "Deixamos o sofá a ventilar.", description: `${SOFA_DRYING_PROMISE} Volte a usar o sofá apenas quando estiver completamente seco.`, alt: "Sofá em tecido a secar num espaço ventilado" },
     ],
   },
   "limpeza-sofa-veludo": {
@@ -26,7 +26,7 @@ export const MATERIAL_PROCESS_GUIDES: Record<string, ProcessGuide> = {
       { label: "Aplicação", title: "Aplicamos a solução de limpeza.", description: "Distribuímos o produto adequado ao veludo, com a quantidade e a humidade ajustadas à avaliação inicial.", alt: "Aplicação de solução de limpeza num sofá em veludo" },
       { label: "Escovação", title: "Escovamos para soltar a sujidade.", description: "Trabalhamos a solução com uma escova adequada ao veludo, ajustando a pressão e respeitando as fibras.", alt: "Escovação de uma almofada em veludo com escova de estofos" },
       { label: "Extração", title: "Extraímos a sujidade e a humidade.", description: "Depois da escovação, passamos o bocal de extração para retirar os resíduos da limpeza e reduzir a humidade no revestimento.", alt: "Extração de uma almofada em veludo com bocal transparente" },
-      { label: "Secagem", title: "Deixamos o sofá a ventilar.", description: `${DRYING_PROMISE} Volte a usar o sofá apenas quando estiver completamente seco.`, alt: "Sofá em veludo a secar num espaço ventilado" },
+      { label: "Secagem", title: "Deixamos o sofá a ventilar.", description: `${SOFA_DRYING_PROMISE} Volte a usar o sofá apenas quando estiver completamente seco.`, alt: "Sofá em veludo a secar num espaço ventilado" },
     ],
   },
   "limpeza-sofa-pele": {
@@ -51,7 +51,7 @@ export const MATERIAL_PROCESS_GUIDES: Record<string, ProcessGuide> = {
       { label: "Aplicação", title: "Aplicamos a solução de limpeza.", description: "Distribuímos o produto adequado ao microfibra, com a quantidade e a humidade ajustadas à avaliação inicial.", alt: "Aplicação de solução de limpeza num sofá em microfibra" },
       { label: "Escovação", title: "Escovamos para soltar a sujidade.", description: "Trabalhamos a solução com uma escova adequada ao microfibra, ajustando a pressão e respeitando as fibras.", alt: "Escovação de uma almofada em microfibra com escova de estofos" },
       { label: "Extração", title: "Extraímos a sujidade e a humidade.", description: "Depois da escovação, passamos o bocal de extração para retirar os resíduos da limpeza e reduzir a humidade no revestimento.", alt: "Extração de uma almofada em microfibra com bocal transparente" },
-      { label: "Secagem", title: "Deixamos o sofá a ventilar.", description: `${DRYING_PROMISE} Volte a usar o sofá apenas quando estiver completamente seco.`, alt: "Sofá em microfibra a secar num espaço ventilado" },
+      { label: "Secagem", title: "Deixamos o sofá a ventilar.", description: `${SOFA_DRYING_PROMISE} Volte a usar o sofá apenas quando estiver completamente seco.`, alt: "Sofá em microfibra a secar num espaço ventilado" },
     ],
   },
   "limpeza-sofa-linho": {
@@ -64,7 +64,7 @@ export const MATERIAL_PROCESS_GUIDES: Record<string, ProcessGuide> = {
       { label: "Aplicação", title: "Aplicamos a solução de limpeza.", description: "Distribuímos o produto adequado ao linho, com a quantidade e a humidade ajustadas à avaliação inicial.", alt: "Aplicação de solução de limpeza num sofá em linho" },
       { label: "Escovação", title: "Escovamos para soltar a sujidade.", description: "Trabalhamos a solução com uma escova adequada ao linho, ajustando a pressão e respeitando as fibras.", alt: "Escovação de uma almofada em linho com escova de estofos" },
       { label: "Extração", title: "Extraímos a sujidade e a humidade.", description: "Depois da escovação, passamos o bocal de extração para retirar os resíduos da limpeza e reduzir a humidade no revestimento.", alt: "Extração de uma almofada em linho com bocal transparente" },
-      { label: "Secagem", title: "Deixamos o sofá a ventilar.", description: `${DRYING_PROMISE} Volte a usar o sofá apenas quando estiver completamente seco.`, alt: "Sofá em linho a secar num espaço ventilado" },
+      { label: "Secagem", title: "Deixamos o sofá a ventilar.", description: `${SOFA_DRYING_PROMISE} Volte a usar o sofá apenas quando estiver completamente seco.`, alt: "Sofá em linho a secar num espaço ventilado" },
     ],
   },
   "limpeza-sofa-camurca": {
@@ -77,7 +77,7 @@ export const MATERIAL_PROCESS_GUIDES: Record<string, ProcessGuide> = {
       { label: "Aplicação", title: "Aplicamos a solução de limpeza.", description: "Distribuímos o produto adequado ao camurça, com a quantidade e a humidade ajustadas à avaliação inicial.", alt: "Aplicação de solução de limpeza num sofá em camurça" },
       { label: "Escovação", title: "Escovamos para soltar a sujidade.", description: "Trabalhamos a solução com uma escova adequada ao camurça, ajustando a pressão e respeitando as fibras.", alt: "Escovação de uma almofada em camurça com escova de estofos" },
       { label: "Extração", title: "Extraímos a sujidade e a humidade.", description: "Depois da escovação, passamos o bocal de extração para retirar os resíduos da limpeza e reduzir a humidade no revestimento.", alt: "Extração de uma almofada em camurça com bocal transparente" },
-      { label: "Secagem", title: "Deixamos o sofá a ventilar.", description: `${DRYING_PROMISE} Volte a usar o sofá apenas quando estiver completamente seco.`, alt: "Sofá em camurça a secar num espaço ventilado" },
+      { label: "Secagem", title: "Deixamos o sofá a ventilar.", description: `${SOFA_DRYING_PROMISE} Volte a usar o sofá apenas quando estiver completamente seco.`, alt: "Sofá em camurça a secar num espaço ventilado" },
     ],
   },
   "limpeza-sofa-sintetico": {
@@ -90,7 +90,7 @@ export const MATERIAL_PROCESS_GUIDES: Record<string, ProcessGuide> = {
       { label: "Aplicação", title: "Aplicamos a solução de limpeza.", description: "Distribuímos o produto adequado ao tecido sintético, com a quantidade e a humidade ajustadas à avaliação inicial.", alt: "Aplicação de solução de limpeza num sofá em tecido sintético" },
       { label: "Escovação", title: "Escovamos para soltar a sujidade.", description: "Trabalhamos a solução com uma escova adequada ao tecido sintético, ajustando a pressão e respeitando as fibras.", alt: "Escovação de uma almofada em tecido sintético com escova de estofos" },
       { label: "Extração", title: "Extraímos a sujidade e a humidade.", description: "Depois da escovação, passamos o bocal de extração para retirar os resíduos da limpeza e reduzir a humidade no revestimento.", alt: "Extração de uma almofada em tecido sintético com bocal transparente" },
-      { label: "Secagem", title: "Deixamos o sofá a ventilar.", description: `${DRYING_PROMISE} Volte a usar o sofá apenas quando estiver completamente seco.`, alt: "Sofá em tecido sintético a secar num espaço ventilado" },
+      { label: "Secagem", title: "Deixamos o sofá a ventilar.", description: `${SOFA_DRYING_PROMISE} Volte a usar o sofá apenas quando estiver completamente seco.`, alt: "Sofá em tecido sintético a secar num espaço ventilado" },
     ],
   },
 };
