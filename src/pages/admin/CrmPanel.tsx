@@ -7,6 +7,7 @@ import { resolveMissingRegions } from "@/lib/regionLookup";
 import { lisbonDay, weekdayOf, WEEKDAY_SHORT } from "@/lib/crmClosings";
 import CrmClosings from "./CrmClosings";
 import CrmUpsell from "./CrmUpsell";
+import CrmServiceMix from "./CrmServiceMix";
 import { UPSELL_TEAMS, UPSELL_TEXT, ownerUpsellOf, defaultTeamFor, isUpsellTeam, splitUpsell, type UpsellTeam } from "@/lib/crmUpsell";
 
 interface ServiceRequest {
@@ -97,7 +98,7 @@ const CrmPanel = () => {
   const [records, setRecords] = useState<ServiceRequest[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [view, setView] = useState<"pedidos" | "fechos" | "upsell">("pedidos");
+  const [view, setView] = useState<"pedidos" | "servicos" | "fechos" | "upsell">("pedidos");
   const [sync, setSync] = useState<SyncState>({ status: "idle" });
 
   const [viewedMonth, setViewedMonth] = useState(() => {
@@ -354,7 +355,7 @@ const CrmPanel = () => {
         <div>
           <h2 className="text-lg font-bold text-navy">CRM — Pedidos de Serviço</h2>
           <p className="text-sm text-gray-500">
-            {view === "pedidos" ? `${monthRecords.length} pedido${monthRecords.length === 1 ? "" : "s"} neste mês` : "Serviços fechados por dia"}
+            {view === "pedidos" || view === "servicos" ? `${monthRecords.length} pedido${monthRecords.length === 1 ? "" : "s"} neste mês` : "Serviços fechados por dia"}
             {reviewCount > 0 && <span className="text-amber-700"> · {reviewCount} para rever</span>}
           </p>
           <p className="text-[11px] text-gray-500 flex items-center gap-1 mt-0.5">
@@ -376,8 +377,7 @@ const CrmPanel = () => {
           </p>
         </div>
         <div className="flex items-center gap-2 flex-wrap">
-          {view === "pedidos" && (
-            <>
+          {(view === "pedidos" || view === "servicos") && (
               <div className="flex items-center gap-1 border border-gray-200 rounded-lg">
                 <button onClick={() => setViewedMonth(d => new Date(d.getFullYear(), d.getMonth() - 1, 1))} className="p-2 text-navy hover:bg-gray-50 rounded-l-lg">
                   <ChevronLeft className="w-4 h-4" />
@@ -387,6 +387,9 @@ const CrmPanel = () => {
                   <ChevronRight className="w-4 h-4" />
                 </button>
               </div>
+          )}
+          {view === "pedidos" && (
+            <>
               <button onClick={openAdd} className="flex items-center gap-1.5 px-3 py-2 text-xs font-bold text-[#12121e] bg-gradient-to-r from-gold to-[#d4c57b] rounded-lg hover:opacity-90 transition-opacity">
                 <Plus className="w-3.5 h-3.5" /> Adicionar pedido
               </button>
@@ -403,7 +406,7 @@ const CrmPanel = () => {
       </div>
 
       <div className="flex gap-1 border-b border-gray-200" role="tablist">
-        {([["pedidos", "Pedidos"], ["fechos", "Fechos"], ["upsell", "Upsell"]] as const).map(([id, label]) => (
+        {([["pedidos", "Pedidos"], ["servicos", "Serviços"], ["fechos", "Fechos"], ["upsell", "Upsell"]] as const).map(([id, label]) => (
           <button key={id} role="tab" aria-selected={view === id} onClick={() => setView(id)}
             className={`px-4 py-2 text-sm font-semibold -mb-px border-b-2 transition-colors ${view === id ? "border-[#D4AF37] text-navy" : "border-transparent text-gray-500 hover:text-navy"}`}>
             {label}
@@ -416,6 +419,12 @@ const CrmPanel = () => {
           {missingRows.length === 1 ? "1 serviço foi apagado" : `${missingRows.length} serviços foram apagados`} do Google Calendar ({missingRows.map(r => `${r.client_name ?? r.description} a ${new Date(r.request_date + "T00:00:00").getDate()}/${r.request_date.slice(5, 7)}`).join("; ")}).
           {" "}Se foi cancelado, apaga-o aqui; se o serviço se fez, carrega em <strong>Manter</strong> na linha.
         </div>
+      )}
+
+      {view === "servicos" && (
+        <CrmServiceMix monthLabel={monthLabel}
+          records={monthRecords.map(r => ({ ...r, my_cut: cutOf(r) }))}
+          allRecords={records.map(r => ({ ...r, my_cut: cutOf(r) }))} />
       )}
 
       {view === "fechos" && <CrmClosings records={records.map(r => ({ ...r, my_cut: cutOf(r) }))} />}
@@ -431,7 +440,7 @@ const CrmPanel = () => {
 
       {view === "pedidos" && (<>
       {/* Totals */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
         <div className="bg-gradient-to-br from-gold/[0.10] to-gold/[0.02] border border-gold/25 rounded-xl p-4">
           <p className="text-[10.5px] font-bold text-gray-500 uppercase tracking-wider mb-1">Total faturado</p>
           <p className="text-xl font-bold text-navy">{money(totals.billed)}</p>
@@ -440,6 +449,11 @@ const CrmPanel = () => {
           <p className="text-[10.5px] font-bold text-gray-500 uppercase tracking-wider mb-1">O meu cut</p>
           <p className="text-xl font-bold text-navy">{money(totals.cut)}</p>
           {totals.upsellCut > 0 && <p className={`text-[11px] font-medium ${UPSELL_TEXT}`}>inclui {money(totals.upsellCut)} de upsell</p>}
+        </div>
+        <div className="bg-white border border-gray-200 rounded-xl p-4">
+          <p className="text-[10.5px] font-bold text-gray-500 uppercase tracking-wider mb-1">Ticket médio</p>
+          <p className="text-xl font-bold text-navy">{money(monthRecords.length ? Math.round(totals.billed / monthRecords.length * 100) / 100 : 0)}</p>
+          <p className="text-[11px] text-gray-500">{monthRecords.length ? money(Math.round(totals.cut / monthRecords.length * 100) / 100) : "0€"} para ti</p>
         </div>
         <div className="bg-white border border-gray-200 rounded-xl p-4">
           <p className="text-[10.5px] font-bold text-gray-500 uppercase tracking-wider mb-1">Pagos</p>

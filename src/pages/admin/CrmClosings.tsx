@@ -93,7 +93,7 @@ const CrmClosings = ({ records }: { records: ClosingRow[] }) => {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
         <div className="bg-gradient-to-br from-gold/[0.10] to-gold/[0.02] border border-gold/25 rounded-xl p-4">
           <p className="text-[10.5px] font-bold text-gray-500 uppercase tracking-wider mb-1">Serviços fechados</p>
           <p className="text-xl font-bold text-navy">{summary.count}</p>
@@ -107,6 +107,11 @@ const CrmClosings = ({ records }: { records: ClosingRow[] }) => {
           <p className="text-[10.5px] font-bold text-gray-500 uppercase tracking-wider mb-1">Melhor dia</p>
           <p className="text-xl font-bold text-navy capitalize">{best.length ? best.map(w => WEEKDAY_LONG[w.weekday]).join(", ") : "-"}</p>
           {best.length > 0 && <p className="text-[11px] text-gray-500">{decimal(maxAverage)} fechos por {WEEKDAY_LONG[best[0].weekday]}</p>}
+        </div>
+        <div className="bg-white border border-gray-200 rounded-xl p-4">
+          <p className="text-[10.5px] font-bold text-gray-500 uppercase tracking-wider mb-1">Ticket médio</p>
+          <p className="text-xl font-bold text-navy">{money(summary.count ? summary.billed / summary.count : 0)}</p>
+          <p className="text-[11px] text-gray-500">{money(summary.count ? summary.cut / summary.count : 0)} para ti</p>
         </div>
         <div className="bg-white border border-gray-200 rounded-xl p-4">
           <p className="text-[10.5px] font-bold text-gray-500 uppercase tracking-wider mb-1">Faturado / a tua parte</p>
