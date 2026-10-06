@@ -164,11 +164,11 @@ describe('depois do serviço', () => {
     expect(kinds([...after.today, ...after.soon]).filter(k => k.startsWith('avaliacao'))).toEqual([]);
   });
 
-  it('quem já avaliou recebe, uma vez, o pedido de recomendação (com o OK do dono enquanto a condição for proposta)', () => {
+  it('quem já avaliou recebe, uma vez, o pedido de recomendação, que o bot pode enviar sozinho', () => {
     const c = client({ status: 'cliente', reviewed_google: true, last_client_message_at: '2026-09-27T10:00:00Z', last_contact_at: '2026-09-27T10:05:00Z' });
     const p = plan({ client: c, services: [service({ request_date: '2026-09-26' })] }, '2026-10-06T10:00:00Z');
     const a = p.today.find(x => x.kind === 'recomendacao')!;
-    expect(a.send).toBe('owner_ok');
+    expect(a.send).toBe('auto');
     expect(a.messages.find(m => m.id === 'recomendacao-a')!.text).toContain('Muito obrigado pela sua avaliação');
     const asked = plan({ client: c, services: [service({ request_date: '2026-09-26' })], touches: [touch({ kind: 'recomendacao', created_at: '2026-10-01T10:00:00Z' })] }, '2026-10-06T10:00:00Z');
     expect(kinds(asked.today)).not.toContain('recomendacao');

@@ -81,17 +81,16 @@ export const FOLLOW_UP_RULES = {
 const R = FOLLOW_UP_RULES;
 
 /**
- * A condição especial para quem já é cliente e para as recomendações.
- * PROPOSTA de 06/10/2026, por confirmar pelo dono: o guião de vendas dele diz
- * que a deslocação gratuita pode ser a condição especial, e é a única que não
- * obriga a inventar um número. Mudar aqui muda todas as mensagens. Enquanto
- * OFFERS_CONFIRMED for false, o bot não envia sozinho nenhuma mensagem que a
- * prometa: pede o OK ao dono.
+ * A condição especial para quem já é cliente e para as recomendações:
+ * confirmada pelo dono a 06/10/2026 ("confirmo a deslocação por nossa conta,
+ * ativa"). Vem do guião de vendas dele (a deslocação gratuita como condição
+ * especial). Mudar aqui muda todas as mensagens. Com OFFERS_CONFIRMED a false,
+ * o bot não enviaria sozinho nenhuma mensagem que a prometa.
  */
 export const CLIENT_CONDITION = 'a deslocação fica por nossa conta';
 export const REFERRAL_CONDITION =
   'Por cada pessoa que vier da sua parte, a deslocação fica por nossa conta, para ela e para si na próxima limpeza.';
-export const OFFERS_CONFIRMED = false;
+export const OFFERS_CONFIRMED = true;
 
 /** Preço de pack real (packPerks.ts): o que se pode prometer a quem junta um segundo artigo na mesma visita. */
 const MATTRESS_TABLE = mattressCleaningPrice('casal');
@@ -486,10 +485,10 @@ export interface Campaign {
 const ASK_SLOTS = 'Quer que lhe enviemos as vagas da sua zona?';
 
 /**
- * Calendário de campanhas (PROPOSTA de 06/10/2026, por confirmar pelo dono).
- * Só usa condições que já existem: a deslocação por nossa conta para clientes
- * (o guião de vendas dele) e o preço de pack do segundo artigo (packPerks.ts,
- * o mesmo do site). Nenhuma promete resultados de saúde (o site não o faz).
+ * Calendário de campanhas (06/10/2026). Só usa condições que existem: a
+ * deslocação por nossa conta para clientes (confirmada pelo dono) e o preço de
+ * pack do segundo artigo (packPerks.ts, o mesmo do site). Nenhuma promete
+ * resultados de saúde (o site não o faz). Vão sempre com o OK do dono.
  */
 export const CAMPAIGNS: Campaign[] = [
   {
