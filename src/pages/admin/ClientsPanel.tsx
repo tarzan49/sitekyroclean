@@ -16,8 +16,6 @@ import {
   effectiveStatus,
   emptyFilters,
   firstName,
-  followUpKind,
-  type FollowUpKind,
   formatPhone,
   inWindow,
   matchesFilters,
@@ -27,18 +25,33 @@ import {
   summarizeClient,
   type ClientFilters,
   type ClientRow,
-  type ClientService,
   type ClientStatus,
   type ClientSummary,
   type StatPeriod,
   weeklyStats,
 } from "@/lib/clientRecords";
+import {
+  ACTION_LABEL,
+  CONTACT_PREFERENCES,
+  CONTACT_PREFERENCE_LABEL,
+  STAGE_INFO,
+  planAll,
+  snapshotAt,
+  type ClientTouch,
+  type ContactPreference,
+  type PlannedClient,
+} from "@/lib/clientFollowUp";
+import ClientsToday from "./ClientsToday";
+import ClientsCampaigns from "./ClientsCampaigns";
+import ClientsStrategy, { type SpendRow, type StrategyService } from "./ClientsStrategy";
+import type { ClientPatch, TouchPayload } from "./FollowUpActionCard";
 
 // Separador "Clientes" (dono, 2026-10-06): fichas de todos os contactos do
 // WhatsApp Business (os que fecharam, os por marcar e os não interessados), à
 // parte do CRM de vendas. Os serviços de cada ficha leem-se do CRM pelo telefone.
-// Serve para escolher grupos (Natal, Black Friday…) e para ver a evolução dos
-// contactos e da taxa de fecho.
+// Vistas: Hoje (o que fazer hoje, com a mensagem pronta), Campanhas, Estratégia,
+// Fichas e Evolução. As regras dos seguimentos vivem em clientFollowUp.ts e são
+// as mesmas do email das 9h30 e do bot.
 
 const GOLD = "#D4AF37";
 const money = (n: number) => `${Math.round(n).toLocaleString("pt-PT")}€`;
@@ -63,6 +76,9 @@ const STATUS_STYLE: Record<ClientStatus, string> = {
 };
 
 type Enriched = { client: ClientRow; summary: ClientSummary; status: ClientStatus };
+type View = "hoje" | "campanhas" | "estrategia" | "fichas" | "evolucao";
+
+const TOUCH_COLUMNS = "id, client_id, kind, campaign, template, skipped, note, message, channel, created_at";
 
 function Chip({ active, onClick, children }: { active: boolean; onClick: () => void; children: React.ReactNode }) {
   return (
@@ -96,14 +112,24 @@ const toggle = <T,>(list: T[], v: T) => (list.includes(v) ? list.filter(x => x !
 
 const ClientsPanel = () => {
   const [clients, setClients] = useState<ClientRow[]>([]);
-  const [services, setServices] = useState<ClientService[]>([]);
+  const [services, setServices] = useState<StrategyService[]>([]);
+  const [touches, setTouches] = useState<ClientTouch[]>([]);
+  const [touchesReady, setTouchesReady] = useState(true);
+  const [spend, setSpend] = useState<SpendRow[]>([]);
+  const [lastDigest, setLastDigest] = useState<{ day: string; items: number; error: string | null } | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [view, setView] = useState<"fichas" | "seguimentos" | "evolucao">("fichas");
+  const [view, setView] = useState<View>("hoje");
   const [filters, setFilters] = useState<ClientFilters>(emptyFilters());
   const [period, setPeriod] = useState<StatPeriod>(30);
   const [openId, setOpenId] = useState<string | null>(null);
   const [limit, setLimit] = useState(60);
+  // As regras dependem da hora (seguimento "a partir das 15h", noite): recalcula de 5 em 5 minutos.
+  const [tick, setTick] = useState(0);
+  useEffect(() => {
+    const id = setInterval(() => setTick(t => t + 1), 5 * 60_000);
+    return () => clearInterval(id);
+  }, []);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -111,14 +137,24 @@ const ClientsPanel = () => {
     try {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const db = supabase as any;
-      const [c, s] = await Promise.all([
+      const since = new Date(Date.now() - 400 * 86_400_000).toISOString();
+      const spendSince = lisbonDay(new Date(Date.now() - 60 * 86_400_000));
+      const [c, s, t, d, sp] = await Promise.all([
         db.from("clients").select("*").order("last_contact_at", { ascending: false, nullsFirst: false }),
-        db.from("service_requests").select("id, request_date, description, billed_value, client_name, city, phone"),
+        db.from("service_requests").select("id, request_date, description, billed_value, client_name, city, phone, locality, booked_at, created_at, source, calendar_missing_since"),
+        db.from("client_touches").select(TOUCH_COLUMNS).gte("created_at", since).order("created_at", { ascending: false }),
+        db.from("follow_up_digests").select("day, items, error").order("day", { ascending: false }).limit(1),
+        db.from("ad_spend_daily").select("platform, spend_date, amount").gte("spend_date", spendSince),
       ]);
       if (c.error) throw c.error;
       if (s.error) throw s.error;
       setClients(c.data ?? []);
       setServices(s.data ?? []);
+      // O registo de envios é de 06/10/2026: sem a migração, o resto do separador funciona na mesma.
+      setTouchesReady(!t.error);
+      setTouches(t.error ? [] : t.data ?? []);
+      setLastDigest(d.error ? null : d.data?.[0] ?? null);
+      setSpend(sp.error ? [] : sp.data ?? []);
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : "Erro ao carregar os clientes.");
     } finally {
@@ -128,14 +164,24 @@ const ClientsPanel = () => {
 
   useEffect(() => { load(); }, [load]);
 
+  // Um evento apagado do calendário não é um serviço (como no separador Google Ads).
+  const liveServices = useMemo(() => services.filter(s => !s.calendar_missing_since), [services]);
+
   const enriched = useMemo<Enriched[]>(() => {
-    const byPhone = servicesByPhone(services);
+    const byPhone = servicesByPhone(liveServices);
     const today = lisbonDay(new Date());
     return clients.map(client => {
       const summary = summarizeClient(client, byPhone, today);
       return { client, summary, status: effectiveStatus(client, summary) };
     });
-  }, [clients, services]);
+  }, [clients, liveServices]);
+
+  const followUpData = useMemo(() => ({ clients, services, touches }), [clients, services, touches]);
+  const planned = useMemo<PlannedClient[]>(
+    () => planAll(followUpData, { now: new Date() }),
+    [followUpData, tick], // eslint-disable-line react-hooks/exhaustive-deps
+  );
+  const todayCount = planned.filter(p => p.plan.today.some(a => a.kind !== "campanha")).length;
 
   const filtered = useMemo(() => enriched.filter(e => matchesFilters(e.client, e.summary, filters)), [enriched, filters]);
   const statusCounts = useMemo(() => {
@@ -153,7 +199,7 @@ const ClientsPanel = () => {
     URL.revokeObjectURL(url);
   };
 
-  const saveClient = async (id: string, patch: Partial<Pick<ClientRow, "name" | "notes" | "follow_up_at" | "follow_up_reason">>) => {
+  const saveClient = async (id: string, patch: ClientPatch) => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { error: err } = await (supabase as any).from("clients").update(patch).eq("id", id);
     if (err) { setError(err.message); return false; }
@@ -161,7 +207,40 @@ const ClientsPanel = () => {
     return true;
   };
 
+  const logTouch = async (clientId: string, p: TouchPayload) => {
+    if (!touchesReady) {
+      setError("O registo de envios ainda não está instalado na base de dados (migração 20261006210000).");
+      return false;
+    }
+    const row = {
+      client_id: clientId, kind: p.kind, campaign: p.campaign ?? null, template: p.template ?? null,
+      skipped: !!p.skipped, message: p.message ? p.message.slice(0, 4000) : null, note: p.note ?? null, channel: "painel",
+    };
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data, error: err } = await (supabase as any).from("client_touches").insert(row).select(TOUCH_COLUMNS).single();
+    if (err) { setError(err.message); return false; }
+    setTouches(list => [data as ClientTouch, ...list]);
+    return true;
+  };
+
+  const sendDigest = async () => {
+    const { data, error: err } = await supabase.functions.invoke("follow-up-digest", { body: { send: true } });
+    if (err) return "Não foi possível mandar o email.";
+    load();
+    return data?.sent ? `Email enviado (${data.count} pessoas).` : "Nada para seguir hoje: email não enviado.";
+  };
+
   const open = enriched.find(e => e.client.id === openId) ?? null;
+  const openPlan = planned.find(p => p.client.id === openId) ?? null;
+  const handlers = { onLog: logTouch, onSave: saveClient, onOpen: setOpenId };
+
+  const VIEWS: [View, string][] = [
+    ["hoje", `Hoje${todayCount ? ` (${todayCount})` : ""}`],
+    ["campanhas", "Campanhas"],
+    ["estrategia", "Estratégia"],
+    ["fichas", "Fichas"],
+    ["evolucao", "Evolução"],
+  ];
 
   return (
     <div className="space-y-4">
@@ -170,11 +249,11 @@ const ClientsPanel = () => {
           <h2 className="font-playfair text-xl font-bold text-navy">Clientes</h2>
           <p className="text-sm text-gray-500">Todos os contactos do WhatsApp com etiqueta, à parte do CRM de vendas.</p>
         </div>
-        <div className="flex items-center gap-2">
-          <div className="flex items-center gap-1 border border-gray-200 rounded-lg p-0.5 bg-white" role="group">
-            {([["fichas", "Fichas"], ["seguimentos", "Seguimentos"], ["evolucao", "Evolução"]] as const).map(([id, label]) => (
+        <div className="flex items-center gap-2 flex-wrap">
+          <div className="flex items-center gap-1 border border-gray-200 rounded-lg p-0.5 bg-white overflow-x-auto" role="group">
+            {VIEWS.map(([id, label]) => (
               <button key={id} onClick={() => setView(id)} aria-pressed={view === id}
-                className={`px-3 py-1.5 text-xs font-medium rounded-md ${view === id ? "bg-navy text-white" : "text-navy hover:bg-gray-50"}`}>{label}</button>
+                className={`px-3 py-1.5 text-xs font-medium rounded-md whitespace-nowrap ${view === id ? "bg-navy text-white" : "text-navy hover:bg-gray-50"}`}>{label}</button>
             ))}
           </div>
           <button onClick={load} className="flex items-center gap-1.5 px-3 py-2 text-xs font-medium rounded-lg border border-gray-200 bg-white text-navy hover:border-navy/30">
@@ -184,8 +263,20 @@ const ClientsPanel = () => {
       </div>
 
       {error && <p className="text-sm text-red-700 bg-red-50 border border-red-200 rounded-xl p-3">{error}</p>}
+      {!touchesReady && !loading && (
+        <p className="text-sm text-amber-800 bg-amber-50 border border-amber-200 rounded-xl p-3">
+          O registo de envios ainda não está na base de dados: as sugestões aparecem, mas "Enviei" não grava.
+        </p>
+      )}
 
-      {view === "fichas" ? (
+      {view === "hoje" ? (
+        <ClientsToday planned={planned} snapshot={snapshotAt(clients)} lastDigest={lastDigest} onSendDigest={sendDigest}
+          onShowCampaigns={() => setView("campanhas")} {...handlers} />
+      ) : view === "campanhas" ? (
+        <ClientsCampaigns data={followUpData} {...handlers} />
+      ) : view === "estrategia" ? (
+        <ClientsStrategy planned={planned} data={followUpData} spend={spend} services={services} />
+      ) : view === "fichas" ? (
         <>
           <div className="bg-white border border-gray-200 rounded-xl p-4 space-y-3">
             <div className="relative">
@@ -244,6 +335,8 @@ const ClientsPanel = () => {
                     <span className="font-medium text-navy truncate">{displayName(c, s.services)}</span>
                     <span className={`text-[10.5px] px-2 py-0.5 rounded-full border ${STATUS_STYLE[status]}`}>{STATUS_LABEL[status]}</span>
                     {c.from_google_ads && <span className="text-[10.5px] px-2 py-0.5 rounded-full border border-gold/40 text-[#8B6914]">Google</span>}
+                    {c.contact_preference === "nao_contactar" && <span className="text-[10.5px] px-2 py-0.5 rounded-full border border-red-200 text-red-700">Não contactar</span>}
+                    {c.on_hold_reason && <span className="text-[10.5px] px-2 py-0.5 rounded-full border border-amber-200 text-amber-800">Em pausa</span>}
                   </div>
                   <p className="text-xs text-gray-500 truncate">
                     {formatPhone(c.phone)}{c.region ? ` · ${c.region}` : ""}{c.services.length ? ` · ${c.services.join(", ")}` : ""}
@@ -263,102 +356,17 @@ const ClientsPanel = () => {
             </button>
           )}
         </>
-      ) : view === "seguimentos" ? (
-        <FollowUps rows={enriched} onOpen={setOpenId} onSave={saveClient} />
       ) : (
         <Evolution rows={enriched} period={period} setPeriod={setPeriod} />
       )}
 
-      {open && <ClientCard item={open} onClose={() => setOpenId(null)} onSave={saveClient} />}
-    </div>
-  );
-};
-
-const FOLLOW_UP_GROUPS: { kind: FollowUpKind; title: string; note: string }[] = [
-  { kind: "lembrete", title: "Avisos com data", note: "Contactos que ficaram para mais tarde. Aparecem 7 dias antes do dia marcado na ficha." },
-  { kind: "a_espera", title: "À espera de nós", note: "O cliente escreveu por último e ninguém lhe respondeu." },
-  { kind: "seguimento", title: "Seguimento sugerido", note: "Por marcar, a última mensagem foi nossa. Antes de escrever, conta quantas ficaram sem resposta: com duas ou mais, melhor parar." },
-  { kind: "epoca", title: "Para o Natal e a Black Friday", note: "Não interessados ou parados há mais de 40 dias: uma mensagem de época, não um seguimento." },
-];
-
-function addDays(day: string, n: number) {
-  const d = new Date(`${day}T12:00:00Z`);
-  d.setUTCDate(d.getUTCDate() + n);
-  return d.toISOString().slice(0, 10);
-}
-
-function FollowUps({ rows, onOpen, onSave }: {
-  rows: Enriched[];
-  onOpen: (id: string) => void;
-  onSave: (id: string, patch: Partial<Pick<ClientRow, "follow_up_at" | "follow_up_reason">>) => Promise<boolean>;
-}) {
-  const today = lisbonDay(new Date());
-  const items = rows
-    .map(r => ({ r, f: followUpKind(r, today) }))
-    .filter((x): x is { r: Enriched; f: NonNullable<ReturnType<typeof followUpKind>> } => x.f !== null);
-  const upcoming = rows
-    .filter(r => r.client.follow_up_at && r.client.follow_up_at > addDays(today, 7))
-    .sort((a, b) => a.client.follow_up_at!.localeCompare(b.client.follow_up_at!));
-
-  return (
-    <div className="space-y-4">
-      <p className="text-xs text-gray-500">
-        Calculado a partir das datas das fichas. As fichas atualizam-se quando o WhatsApp é lido de novo; até lá, o que aconteceu depois da última leitura não aparece aqui.
-      </p>
-      {FOLLOW_UP_GROUPS.map(g => {
-        const list = items.filter(x => x.f.kind === g.kind).sort((a, b) => g.kind === "lembrete" ? a.f.days - b.f.days : a.f.days - b.f.days);
-        if (list.length === 0 && g.kind !== "lembrete") return null;
-        return (
-          <div key={g.kind} className="bg-white border border-gray-200 rounded-xl overflow-hidden">
-            <div className="p-4 pb-2">
-              <p className="text-sm font-bold text-navy">{g.title} ({list.length})</p>
-              <p className="text-[11px] text-gray-500">{g.note}</p>
-            </div>
-            <div className="divide-y divide-gray-100">
-              {list.length === 0 && <p className="px-4 pb-4 text-sm text-gray-500">Nenhum aviso para os próximos 7 dias.</p>}
-              {list.map(({ r, f }) => (
-                <div key={r.client.id} className="px-4 py-3 flex items-start gap-3">
-                  <button onClick={() => onOpen(r.client.id)} className="min-w-0 flex-1 text-left">
-                    <p className="font-medium text-navy truncate">{displayName(r.client, r.summary.services)}
-                      <span className="ml-2 text-[11px] text-gray-500 font-normal">{formatPhone(r.client.phone)}{r.client.region ? ` · ${r.client.region}` : ""}</span>
-                    </p>
-                    <p className="text-xs text-gray-600">
-                      {g.kind === "lembrete"
-                        ? `${f.days < 0 ? `Passou há ${-f.days} d` : f.days === 0 ? "É hoje" : `Daqui a ${f.days} d`} (${dayLabel(r.client.follow_up_at!)}): ${r.client.follow_up_reason ?? ""}`
-                        : `${f.days} d sem novidades · ${r.client.services.join(", ") || STATUS_LABEL[r.status]}`}
-                    </p>
-                  </button>
-                  <div className="flex gap-1.5 shrink-0">
-                    <a href={`https://wa.me/${normalizePhone(r.client.phone)}`} target="_blank" rel="noopener noreferrer"
-                      className="px-2.5 py-1.5 text-xs rounded-lg border border-gray-200 text-navy hover:border-navy/30">WhatsApp</a>
-                    {g.kind === "lembrete" && (
-                      <button onClick={() => onSave(r.client.id, { follow_up_at: null, follow_up_reason: null })}
-                        className="px-2.5 py-1.5 text-xs rounded-lg bg-navy text-white">Feito</button>
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        );
-      })}
-      {upcoming.length > 0 && (
-        <div className="bg-white border border-gray-200 rounded-xl p-4">
-          <p className="text-sm font-bold text-navy mb-2">Próximos avisos ({upcoming.length})</p>
-          <ul className="space-y-1">
-            {upcoming.map(r => (
-              <li key={r.client.id} className="text-xs text-navy">
-                <button onClick={() => onOpen(r.client.id)} className="text-left">
-                  <strong>{dayLabel(r.client.follow_up_at!)}</strong> · {displayName(r.client, r.summary.services)}: <span className="text-gray-600">{r.client.follow_up_reason}</span>
-                </button>
-              </li>
-            ))}
-          </ul>
-        </div>
+      {open && (
+        <ClientCard key={open.client.id} item={open} plan={openPlan} touches={touches.filter(t => t.client_id === open.client.id)}
+          onClose={() => setOpenId(null)} onSave={saveClient} />
       )}
     </div>
   );
-}
+};
 
 function Evolution({ rows, period, setPeriod }: { rows: Enriched[]; period: StatPeriod; setPeriod: (p: StatPeriod) => void }) {
   const now = new Date();
@@ -458,21 +466,49 @@ function StatsTable({ title, note, firstColumn, rows, label, running, newestFirs
   );
 }
 
-function ClientCard({ item, onClose, onSave }: { item: Enriched; onClose: () => void; onSave: (id: string, patch: Partial<Pick<ClientRow, "name" | "notes" | "follow_up_at" | "follow_up_reason">>) => Promise<boolean> }) {
+const field = "mt-1 w-full px-3 py-2 text-sm border border-gray-200 rounded-lg outline-none focus:border-navy/40";
+const fieldLabel = "text-[10.5px] font-bold text-gray-500 uppercase tracking-wider";
+
+function ClientCard({ item, plan, touches, onClose, onSave }: {
+  item: Enriched;
+  plan: PlannedClient | null;
+  touches: ClientTouch[];
+  onClose: () => void;
+  onSave: (id: string, patch: ClientPatch) => Promise<boolean>;
+}) {
   const { client: c, summary: s, status } = item;
-  const [name, setName] = useState(c.name ?? "");
-  const [notes, setNotes] = useState(c.notes ?? "");
-  const [followAt, setFollowAt] = useState(c.follow_up_at ?? "");
-  const [followWhy, setFollowWhy] = useState(c.follow_up_reason ?? "");
+  const initial = {
+    name: c.name ?? "",
+    notes: c.notes ?? "",
+    followAt: c.follow_up_at ?? "",
+    followWhy: c.follow_up_reason ?? "",
+    pref: (c.contact_preference ?? "normal") as ContactPreference,
+    prefNote: c.contact_note ?? "",
+    hold: c.on_hold_reason ?? "",
+    referredBy: c.referred_by ?? "",
+  };
+  const [form, setForm] = useState(initial);
   const [saving, setSaving] = useState(false);
-  const dirty = name !== (c.name ?? "") || notes !== (c.notes ?? "") || followAt !== (c.follow_up_at ?? "") || followWhy !== (c.follow_up_reason ?? "");
+  const set = <K extends keyof typeof initial>(key: K, value: (typeof initial)[K]) => setForm(f => ({ ...f, [key]: value }));
+  const dirty = JSON.stringify(form) !== JSON.stringify(initial);
 
   const save = async () => {
     setSaving(true);
-    const ok = await onSave(c.id, { name: name.trim() || null, notes: notes.trim() || null, follow_up_at: followAt || null, follow_up_reason: followAt ? followWhy.trim() || null : null });
+    const ok = await onSave(c.id, {
+      name: form.name.trim() || null,
+      notes: form.notes.trim() || null,
+      follow_up_at: form.followAt || null,
+      follow_up_reason: form.followAt ? form.followWhy.trim() || null : null,
+      contact_preference: form.pref,
+      contact_note: form.pref === "normal" ? null : form.prefNote.trim() || null,
+      on_hold_reason: form.hold.trim() || null,
+      referred_by: form.referredBy.trim() || null,
+    });
     setSaving(false);
     if (ok) onClose();
   };
+
+  const stage = plan ? STAGE_INFO[plan.plan.stage] : null;
 
   return (
     <div className="fixed inset-0 z-50 bg-black/40 flex items-end sm:items-center justify-center p-0 sm:p-4" onMouseDown={e => { if (e.target === e.currentTarget) onClose(); }}>
@@ -499,8 +535,18 @@ function ClientCard({ item, onClose, onSave }: { item: Enriched; onClose: () => 
           <div className="border border-gray-200 rounded-lg p-2"><p className="text-[10px] text-gray-500 uppercase">Último</p><p className="font-bold text-navy">{s.daysSinceLastService === null ? "-" : s.daysSinceLastService <= 0 ? "hoje" : `há ${s.daysSinceLastService} d`}</p></div>
         </div>
 
+        {plan && stage && (
+          <div className="border border-gold/30 bg-gold/[0.05] rounded-xl p-3 space-y-1.5">
+            <p className="text-xs text-navy"><strong>{stage.label}.</strong> {stage.stance}</p>
+            {plan.plan.today.map(a => <p key={a.kind} className="text-xs text-navy">Hoje: <strong>{a.title}</strong> · {a.why}</p>)}
+            {plan.plan.soon.map(a => <p key={a.kind} className="text-xs text-gray-700">{dayLabel(a.due)}: {a.title}</p>)}
+            {plan.plan.blocked.map(b => <p key={`${b.kind}:${b.campaignId ?? ""}`} className="text-xs text-gray-600">Não enviar {ACTION_LABEL[b.kind].toLowerCase()}: {b.reason}</p>)}
+            {!plan.plan.today.length && !plan.plan.soon.length && !plan.plan.blocked.length && <p className="text-xs text-gray-600">Nada a fazer por agora.</p>}
+          </div>
+        )}
+
         <div>
-          <p className="text-[10.5px] font-bold text-gray-500 uppercase tracking-wider mb-1">Serviços no CRM</p>
+          <p className={`${fieldLabel} mb-1`}>Serviços no CRM</p>
           {s.services.length === 0 ? <p className="text-sm text-gray-500">Nenhum serviço com este telefone no CRM.</p> : (
             <ul className="space-y-1.5">
               {[...s.services].reverse().map(r => (
@@ -519,28 +565,63 @@ function ClientCard({ item, onClose, onSave }: { item: Enriched; onClose: () => 
         </div>
 
         <label className="block">
-          <span className="text-[10.5px] font-bold text-gray-500 uppercase tracking-wider">Nome a usar nas mensagens</span>
-          <input value={name} onChange={e => setName(e.target.value)} placeholder={firstName(c, s.services) || "Ex.: Ana Silva"}
-            className="mt-1 w-full px-3 py-2 text-sm border border-gray-200 rounded-lg outline-none focus:border-navy/40" />
+          <span className={fieldLabel}>Nome a usar nas mensagens</span>
+          <input value={form.name} onChange={e => set("name", e.target.value)} placeholder={firstName(c, s.services) || "Ex.: Ana Silva"} className={field} />
         </label>
         <label className="block">
-          <span className="text-[10.5px] font-bold text-gray-500 uppercase tracking-wider">Notas</span>
-          <textarea value={notes} onChange={e => setNotes(e.target.value)} rows={3} placeholder="Ex.: tem 2 gatos, sofá cinza de 3 lugares, prefere manhãs"
-            className="mt-1 w-full px-3 py-2 text-sm border border-gray-200 rounded-lg outline-none focus:border-navy/40" />
+          <span className={fieldLabel}>Notas</span>
+          <textarea value={form.notes} onChange={e => set("notes", e.target.value)} rows={3} placeholder="Ex.: tem 2 gatos, sofá cinza de 3 lugares, prefere manhãs" className={field} />
         </label>
 
         <div className="grid grid-cols-[auto_1fr] gap-2 items-end">
           <label className="block">
-            <span className="text-[10.5px] font-bold text-gray-500 uppercase tracking-wider">Lembrar em</span>
-            <input type="date" value={followAt} onChange={e => setFollowAt(e.target.value)}
+            <span className={fieldLabel}>Lembrar em</span>
+            <input type="date" value={form.followAt} onChange={e => set("followAt", e.target.value)}
               className="mt-1 block px-3 py-2 text-sm border border-gray-200 rounded-lg outline-none focus:border-navy/40" />
           </label>
           <label className="block">
-            <span className="text-[10.5px] font-bold text-gray-500 uppercase tracking-wider">Porquê</span>
-            <input value={followWhy} onChange={e => setFollowWhy(e.target.value)} placeholder="Ex.: o sofá novo chega em novembro"
-              className="mt-1 w-full px-3 py-2 text-sm border border-gray-200 rounded-lg outline-none focus:border-navy/40" />
+            <span className={fieldLabel}>Porquê</span>
+            <input value={form.followWhy} onChange={e => set("followWhy", e.target.value)} placeholder="Ex.: o sofá novo chega em novembro" className={field} />
           </label>
         </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+          <label className="block">
+            <span className={fieldLabel}>Mensagens</span>
+            <select value={form.pref} onChange={e => set("pref", e.target.value as ContactPreference)} className={field}>
+              {CONTACT_PREFERENCES.map(p => <option key={p} value={p}>{CONTACT_PREFERENCE_LABEL[p]}</option>)}
+            </select>
+          </label>
+          {form.pref !== "normal" && (
+            <label className="block">
+              <span className={fieldLabel}>Porquê</span>
+              <input value={form.prefNote} onChange={e => set("prefNote", e.target.value)} placeholder="Ex.: pediu a 06/10" className={field} />
+            </label>
+          )}
+        </div>
+        <label className="block">
+          <span className={fieldLabel}>Em pausa: queixa ou problema em aberto</span>
+          <input value={form.hold} onChange={e => set("hold", e.target.value)} placeholder="Ex.: mancha voltou, equipa volta dia 9 (vazio = sem pausa)" className={field} />
+        </label>
+        <label className="block">
+          <span className={fieldLabel}>Recomendado por</span>
+          <input value={form.referredBy} onChange={e => set("referredBy", e.target.value)} placeholder="Nome ou telefone de quem recomendou" className={field} />
+        </label>
+
+        {touches.length > 0 && (
+          <div>
+            <p className={`${fieldLabel} mb-1`}>Seguimentos registados</p>
+            <ul className="space-y-1">
+              {touches.map(t => (
+                <li key={t.id} className="text-xs text-navy">
+                  <span className="text-gray-500">{dayLabel(lisbonDay(t.created_at))}</span>{" "}
+                  {t.kind === "outro" ? "Outro" : ACTION_LABEL[t.kind]}{t.campaign ? ` (${t.campaign})` : ""}
+                  <span className="text-gray-500"> · {t.skipped ? "decidido não enviar" : t.channel === "bot" ? "enviado pelo bot" : "enviado"}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
 
         <div className="flex gap-2">
           <a href={`https://wa.me/${normalizePhone(c.phone)}`} target="_blank" rel="noopener noreferrer"

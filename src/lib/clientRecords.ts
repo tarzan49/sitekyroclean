@@ -88,6 +88,14 @@ export interface ClientRow {
   /** Dia em que o dono quer voltar a falar com a pessoa (AAAA-MM-DD). */
   follow_up_at?: string | null;
   follow_up_reason?: string | null;
+  /** normal, sem_promocoes ou nao_contactar (ver clientFollowUp.ts). */
+  contact_preference?: 'normal' | 'sem_promocoes' | 'nao_contactar' | null;
+  /** Porquê da preferência ("pediu para não lhe escrevermos a 06/10"). */
+  contact_note?: string | null;
+  /** Queixa ou problema em aberto: enquanto estiver escrito, nada de avaliações, recomendações nem campanhas. */
+  on_hold_reason?: string | null;
+  /** Quem recomendou (nome ou telefone): mede o que as recomendações trazem sem custo de anúncio. */
+  referred_by?: string | null;
 }
 
 /** O que a ficha precisa de uma linha do CRM de vendas. */
@@ -99,6 +107,12 @@ export interface ClientService {
   client_name: string | null;
   city: string | null;
   phone: string | null;
+  /** Região da equipa (Porto, Lisboa, Algarve, Braga): decide a ficha do Google do pedido de avaliação. */
+  locality?: string | null;
+  /** Dia em que o serviço foi fechado (criação do evento ou da linha). */
+  booked_at?: string | null;
+  /** O evento foi apagado do calendário: não conta como serviço. */
+  calendar_missing_since?: string | null;
 }
 
 const NOT_A_NAME = new Set(['cliente', 'senhora', 'senhor', 'sr', 'sra', 'nao', 'pt', 'casa']);
@@ -293,37 +307,5 @@ export const monthlyStats = (rows: StatInput[]) => groupedStats(rows, contactMon
 /** Todas as semanas (de segunda a domingo) com contactos, da mais antiga para a mais recente. */
 export const weeklyStats = (rows: StatInput[]) => groupedStats(rows, contactWeek);
 
-// ── Seguimentos (dono, 2026-10-06) ──────────────────────────────────────────
-// O que fazer com cada contacto em aberto, a partir das datas da ficha:
-// avisos com data marcada (ex.: "fica para o ano"), quem escreveu por último e
-// está à espera de nós, quem tem seguimento a fazer e quem fica para uma
-// mensagem de época (Natal, Black Friday).
-
-export type FollowUpKind = 'lembrete' | 'a_espera' | 'seguimento' | 'epoca';
-
-export interface FollowUpInput {
-  client: Pick<ClientRow, 'status' | 'last_contact_at' | 'last_client_message_at'> & { follow_up_at?: string | null };
-  summary: Pick<ClientSummary, 'services'>;
-}
-
-const daysBetween = (fromIso: string, today: string) =>
-  Math.floor((Date.parse(`${today}T12:00:00Z`) - Date.parse(fromIso)) / 86_400_000);
-
-/** Um aviso aparece 7 dias antes da data. */
-export const REMINDER_LEAD_DAYS = 7;
-
-export function followUpKind({ client, summary }: FollowUpInput, today: string): { kind: FollowUpKind; days: number } | null {
-  if (client.follow_up_at) {
-    const until = -daysBetween(`${client.follow_up_at}T12:00:00Z`, today);
-    return until <= REMINDER_LEAD_DAYS ? { kind: 'lembrete', days: until } : null;
-  }
-  const status = effectiveStatus(client, summary);
-  if (status === 'cliente' || status === 'marcado') return null;
-  if (!client.last_contact_at) return null;
-  const quiet = daysBetween(client.last_contact_at, today);
-  if (status === 'nao_interessado' || quiet > 40) return { kind: 'epoca', days: quiet };
-  const theyWroteLast = !!client.last_client_message_at && client.last_client_message_at >= client.last_contact_at;
-  if (theyWroteLast) return { kind: 'a_espera', days: quiet };
-  if (quiet >= 1) return { kind: 'seguimento', days: quiet };
-  return null;
-}
+// Os seguimentos (o que fazer com cada contacto, quando e porquê) vivem em
+// clientFollowUp.ts desde 2026-10-06.

@@ -3,6 +3,7 @@
 // in, what comes back, and that one conversation never becomes two leads.
 import { assert, assertEquals } from "https://deno.land/std@0.168.0/testing/asserts.ts";
 import { handleBotRequest, type LeadsStore } from "./index.ts";
+import { cleanPhone, type FollowUpStore } from "./followUps.ts";
 
 const KEY = "k".repeat(40);
 type Row = Record<string, unknown>;
@@ -90,4 +91,87 @@ Deno.test("rejects bodies that are not a JSON object, and unknown actions", asyn
   assertEquals((await call("not json")).status, 400);
   assertEquals((await call([1, 2])).status, 400);
   assertEquals((await call({ action: "delete-everything" })).status, 400);
+});
+
+// ── Seguimento de clientes (dados inventados: o repositório é público) ──────
+
+const NOW = new Date("2026-10-06T10:00:00Z"); // 11h em Lisboa
+
+function fakeFollowUps() {
+  const clients: Row[] = [{
+    id: "c1", phone: "351900000001", name: null, whatsapp_name: "Maria Teste", status: "cliente",
+    services: ["Sofá"], region: "Lisboa", from_google_ads: true, reviewed_google: false, labels: [],
+    first_contact_at: "2026-10-01T10:00:00Z", last_contact_at: "2026-10-05T18:00:00Z",
+    last_client_message_at: "2026-10-05T17:00:00Z", notes: null, source: "WhatsApp", contact_preference: "normal",
+  }];
+  const services: Row[] = [{
+    id: "s1", request_date: "2026-10-05", description: "Limpeza sofá 3 lugares", billed_value: 89,
+    client_name: null, city: null, phone: "+351 900 000 001", locality: "Lisboa",
+  }];
+  const touches: Row[] = [];
+  const store: FollowUpStore = {
+    load: () => Promise.resolve({ clients, services, touches }),
+    findClient: key => Promise.resolve(clients.find(c => String(c.phone).endsWith(key)) ?? null),
+    insertClient: row => { const c = { id: `c${clients.length + 1}`, ...row }; clients.push(c); return Promise.resolve(c); },
+    updateClient: (id, patch) => { Object.assign(clients.find(c => c.id === id)!, patch); return Promise.resolve(null); },
+    insertTouch: row => { touches.push({ id: `t${touches.length + 1}`, created_at: NOW.toISOString(), ...row }); return Promise.resolve(null); },
+  };
+  return { store, clients, touches };
+}
+
+const callF = (body: unknown, followUps: FollowUpStore) =>
+  handleBotRequest(
+    new Request("https://x/functions/v1/bot-api", {
+      method: "POST",
+      headers: { "x-bot-key": KEY, "content-type": "application/json", "x-forwarded-for": `10.0.1.${++ip % 250}` },
+      body: JSON.stringify(body),
+    }),
+    { botKey: KEY, leads: fakeLeads(), followUps, now: () => NOW },
+  ).then(r => r.json());
+
+Deno.test("follow-ups lists what to send now, with the message and whether it can go alone", async () => {
+  const { store } = fakeFollowUps();
+  const body = await callF({ action: "follow-ups" }, store);
+  assertEquals(body.quietNow, false);
+  assertEquals(body.items.length, 1);
+  const item = body.items[0];
+  assertEquals([item.kind, item.send, item.phone, item.firstName], ["avaliacao", "auto", "351900000001", "Maria"]);
+  assert(item.messages[0].text.includes("https://g.page/r/CRc7F7lX3xcEECE/review"));
+  assertEquals((await callF({ action: "follow-ups", kinds: ["seguimento"] }, store)).items.length, 0);
+});
+
+Deno.test("client-plan tells the bot who is writing and what not to do", async () => {
+  const { store, clients } = fakeFollowUps();
+  const plan = await callF({ action: "client-plan", phone: "900 000 001" }, store);
+  assertEquals([plan.found, plan.client.stage, plan.client.firstName], [true, "cliente_recente", "Maria"]);
+  assert(plan.guidance.some((g: string) => g.startsWith("Já é cliente")));
+  assert(plan.guidance.includes("Veio do anúncio Google."));
+  clients[0].contact_preference = "nao_contactar";
+  const stop = await callF({ action: "client-plan", phone: "+351900000001" }, store);
+  assertEquals(stop.today.length, 0);
+  assert(stop.doNot[0].reason.startsWith("Pediu para não receber mensagens"));
+  assertEquals((await callF({ action: "client-plan", phone: "+351 911 111 111" }, store)).found, false);
+});
+
+Deno.test("log-touch records what the bot sent; optOut stops all messages", async () => {
+  const { store, touches, clients } = fakeFollowUps();
+  assertEquals((await callF({ action: "log-touch", phone: "351900000001", kind: "avaliacao", template: "avaliacao-a", message: "Olá" }, store)).ok, true);
+  assertEquals([touches[0].kind, touches[0].channel, touches[0].template], ["avaliacao", "bot", "avaliacao-a"]);
+  assertEquals((await callF({ action: "follow-ups" }, store)).items.length, 0);
+  await callF({ action: "log-touch", phone: "351900000001", kind: "outro", optOut: true, optOutNote: "Pediu: não me mandem mensagens" }, store);
+  assertEquals([clients[0].contact_preference, clients[0].contact_note], ["nao_contactar", "Pediu: não me mandem mensagens"]);
+  assertEquals((await callF({ action: "log-touch", phone: "351900000001", kind: "spam" }, store)).error !== undefined, true);
+});
+
+Deno.test("log-message keeps the client card dates and labels up to date, and creates new contacts", async () => {
+  const { store, clients } = fakeFollowUps();
+  await callF({ action: "log-message", phone: "912 345 678", direction: "in", name: "Joana Teste", at: "2026-10-06T09:55:00Z", labels: ["Por marcar serviço", "Colchão", "Porto", "Google"] }, store);
+  const added = clients.find(c => c.phone === "351912345678")!;
+  assertEquals([added.status, added.region, added.from_google_ads, added.whatsapp_name], ["por_marcar", "Porto", true, "Joana Teste"]);
+  assertEquals([added.last_client_message_at, added.last_contact_at, added.first_contact_at], ["2026-10-06T09:55:00.000Z", "2026-10-06T09:55:00.000Z", "2026-10-06T09:55:00.000Z"]);
+  await callF({ action: "log-message", phone: "351912345678", direction: "out" }, store);
+  assertEquals([added.last_contact_at, added.last_client_message_at], [NOW.toISOString(), "2026-10-06T09:55:00.000Z"]);
+  assertEquals((await callF({ action: "log-message", phone: "351912345678", direction: "in", at: "2026-09-01T10:00:00Z" }, store)).error !== undefined, true);
+  assertEquals(cleanPhone("00351 912 345 678"), "351912345678");
+  assertEquals(cleanPhone("12345"), null);
 });
