@@ -32,6 +32,16 @@ export interface UpsellRow {
   locality: string | null;
 }
 
+/** A parte do dono no upsell de uma linha; soma-se ao "Meu cut" (dono, 2026-10-06). */
+export function ownerUpsellOf(r: UpsellRow): number {
+  const value = Number(r.upsell_value) || 0;
+  if (value <= 0) return 0;
+  return splitUpsell(value, isUpsellTeam(r.upsell_team) ? r.upsell_team : defaultTeamFor(r.locality)).owner;
+}
+
+/** Cor do upsell no painel, para não se confundir com o dourado do cut. */
+export const UPSELL_TEXT = 'text-violet-600';
+
 export interface TeamUpsellTotals { team: UpsellTeam; count: number; value: number; teamPart: number; ownerPart: number }
 
 /** Totais por equipa; linhas sem upsell não entram. Sem equipa escrita, conta a da região. */

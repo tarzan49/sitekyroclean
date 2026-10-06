@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { lisbonDay, shiftMonth } from "@/lib/crmClosings";
-import { defaultTeamFor, isUpsellTeam, splitUpsell, summarizeUpsells, teamShareOf, type UpsellRow } from "@/lib/crmUpsell";
+import { defaultTeamFor, isUpsellTeam, splitUpsell, summarizeUpsells, teamShareOf, UPSELL_TEXT, type UpsellRow } from "@/lib/crmUpsell";
 
 // Aba "Upsell" do CRM: o que cada equipa vendeu a mais nos serviços do mês e
 // como se divide (70/30, no Porto 60/40; a equipa fica sempre com a maior).
@@ -36,7 +36,7 @@ const CrmUpsell = ({ records, onEdit }: { records: Row[]; onEdit: (id: string) =
     <div className="space-y-4">
       <div className="flex items-center justify-between flex-wrap gap-2">
         <p className="text-sm text-gray-500">
-          Divisão: 70% equipa / 30% para ti; no Porto 60% / 40%. Mês do serviço. O valor mete-se em cada pedido (lápis), na aba Pedidos.
+          Divisão: 70% equipa / 30% para ti; no Porto 60% / 40%. A tua parte já entra no teu cut. Mês do serviço. O valor mete-se em cada pedido (lápis), na aba Pedidos.
         </p>
         <div className="flex items-center gap-1 border border-gray-200 rounded-lg">
           <button onClick={() => setMonth(m => shiftMonth(m, -1))} aria-label="Mês anterior" className="p-1.5 text-navy hover:bg-gray-50 rounded-l-lg">
@@ -52,7 +52,7 @@ const CrmUpsell = ({ records, onEdit }: { records: Row[]; onEdit: (id: string) =
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         <div className="bg-gradient-to-br from-gold/[0.10] to-gold/[0.02] border border-gold/25 rounded-xl p-4">
           <p className="text-[10.5px] font-bold text-gray-500 uppercase tracking-wider mb-1">Upsell total</p>
-          <p className="text-xl font-bold text-navy">{money(summary.value)}</p>
+          <p className={`text-xl font-bold ${UPSELL_TEXT}`}>{money(summary.value)}</p>
         </div>
         <div className="bg-white border border-gray-200 rounded-xl p-4">
           <p className="text-[10.5px] font-bold text-gray-500 uppercase tracking-wider mb-1">Serviços com upsell</p>
@@ -88,7 +88,7 @@ const CrmUpsell = ({ records, onEdit }: { records: Row[]; onEdit: (id: string) =
                   <td className="px-3 py-2 text-navy font-medium whitespace-nowrap">{t.team}</td>
                   <td className="px-3 py-2 text-gray-500">{pct(t.team)}</td>
                   <td className="px-3 py-2 text-navy">{t.count}</td>
-                  <td className="px-3 py-2 text-navy whitespace-nowrap">{money(t.value)}</td>
+                  <td className={`px-3 py-2 font-semibold whitespace-nowrap ${UPSELL_TEXT}`}>{money(t.value)}</td>
                   <td className="px-3 py-2 font-semibold text-navy whitespace-nowrap">{money(t.teamPart)}</td>
                   <td className="px-3 py-2 font-semibold text-gold whitespace-nowrap">{money(t.ownerPart)}</td>
                 </tr>
@@ -119,7 +119,7 @@ const CrmUpsell = ({ records, onEdit }: { records: Row[]; onEdit: (id: string) =
                       <td className="px-3 py-2 font-mono text-navy">{r.request_date.slice(8, 10)}/{r.request_date.slice(5, 7)}</td>
                       <td className="px-3 py-2 text-navy max-w-[260px] truncate">{r.client_name ? `${r.client_name} · ` : ""}{r.description || "-"}</td>
                       <td className="px-3 py-2 text-gray-600 whitespace-nowrap">{team}{!isUpsellTeam(r.upsell_team) && <span className="text-amber-700"> (por confirmar)</span>}</td>
-                      <td className="px-3 py-2 text-navy whitespace-nowrap">{money(Number(r.upsell_value))}</td>
+                      <td className={`px-3 py-2 font-semibold whitespace-nowrap ${UPSELL_TEXT}`}>{money(Number(r.upsell_value))}</td>
                       <td className="px-3 py-2 font-semibold text-navy whitespace-nowrap">{money(split.team)}</td>
                       <td className="px-3 py-2 font-semibold text-gold whitespace-nowrap">{money(split.owner)}</td>
                     </tr>

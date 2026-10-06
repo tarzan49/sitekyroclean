@@ -7,7 +7,7 @@ import { resolveMissingRegions } from "@/lib/regionLookup";
 import { lisbonDay, weekdayOf, WEEKDAY_SHORT } from "@/lib/crmClosings";
 import CrmClosings from "./CrmClosings";
 import CrmUpsell from "./CrmUpsell";
-import { UPSELL_TEAMS, defaultTeamFor, isUpsellTeam, splitUpsell, type UpsellTeam } from "@/lib/crmUpsell";
+import { UPSELL_TEAMS, UPSELL_TEXT, ownerUpsellOf, defaultTeamFor, isUpsellTeam, splitUpsell, type UpsellTeam } from "@/lib/crmUpsell";
 
 interface ServiceRequest {
   id: string;
@@ -29,7 +29,7 @@ interface ServiceRequest {
   calendar_updated_at: string | null;
   calendar_missing_since: string | null;
   needs_review: string | null;
-  /** Vendido a mais pela equipa no serviço; fora de billed_value/my_cut (ver crmUpsell.ts). */
+  /** Vendido a mais pela equipa no serviço; fora de billed_value e de my_cut. A parte do dono soma-se ao cut só no ecrã (ver cutOf). */
   upsell_value: number | null;
   upsell_team: string | null;
 }
@@ -38,6 +38,9 @@ const LOCALITIES = CRM_LOCALITIES;
 const SOURCES = ["Website", "WhatsApp", "Instagram", "Referência", "Google Calendar", "Google Ads", "Meta Ads", "Outro"];
 
 const MONTH_FMT = new Intl.DateTimeFormat("pt-PT", { month: "long", year: "numeric" });
+// O cut mostrado = my_cut + a parte do dono no upsell. Não se escreve em my_cut:
+// a sincronização do calendário reescreve-o a partir do título do evento.
+const cutOf = (r: ServiceRequest) => r.my_cut + ownerUpsellOf(r);
 const money = (n: number) => `${n.toFixed(2).replace(/\.00$/, "")}€`;
 const TIME_FMT = new Intl.DateTimeFormat("pt-PT", { hour: "2-digit", minute: "2-digit" });
 
@@ -210,14 +213,15 @@ const CrmPanel = () => {
 
   const totals = useMemo(() => {
     const billed = monthRecords.reduce((s, r) => s + r.billed_value, 0);
-    const cut = monthRecords.reduce((s, r) => s + r.my_cut, 0);
+    const cut = monthRecords.reduce((s, r) => s + cutOf(r), 0);
+    const upsellCut = monthRecords.reduce((s, r) => s + ownerUpsellOf(r), 0);
     const paid = monthRecords.filter(r => r.paid);
     const unpaid = monthRecords.filter(r => !r.paid);
     const byLocality = LOCALITIES.map(loc => {
       const rows = monthRecords.filter(r => r.locality === loc);
-      return { loc, billed: rows.reduce((s, r) => s + r.billed_value, 0), cut: rows.reduce((s, r) => s + r.my_cut, 0), count: rows.length };
+      return { loc, billed: rows.reduce((s, r) => s + r.billed_value, 0), cut: rows.reduce((s, r) => s + cutOf(r), 0), count: rows.length };
     }).filter(l => l.count > 0);
-    return { billed, cut, paidCount: paid.length, unpaidCount: unpaid.length, unpaidValue: unpaid.reduce((s, r) => s + r.billed_value, 0), byLocality };
+    return { billed, cut, upsellCut, paidCount: paid.length, unpaidCount: unpaid.length, unpaidValue: unpaid.reduce((s, r) => s + r.billed_value, 0), byLocality };
   }, [monthRecords]);
 
   const maxLocalityCut = Math.max(1, ...totals.byLocality.map(l => l.cut));
@@ -326,12 +330,12 @@ const CrmPanel = () => {
   };
 
   const exportCSV = () => {
-    const headers = ["Dia", "Fechado", "Descrição", "Cliente", "Localidade", "Cidade", "Telefone", "Origem", "Faturado", "Meu Cut", "Upsell", "Equipa upsell", "Pago"];
+    const headers = ["Dia", "Fechado", "Descrição", "Cliente", "Localidade", "Cidade", "Telefone", "Origem", "Faturado", "Meu Cut (com upsell)", "Upsell", "Equipa upsell", "Pago"];
     const rows = filtered.map(r => [
       new Date(r.request_date + "T00:00:00").getDate(),
       r.booked_at ? lisbonDay(r.booked_at) : "",
       r.description, r.client_name ?? "", r.locality ?? "", r.city ?? "", r.phone ?? "", r.source ?? "",
-      r.billed_value.toFixed(2), r.my_cut.toFixed(2), (Number(r.upsell_value) || 0).toFixed(2), r.upsell_team ?? "", r.paid ? "Sim" : "Não",
+      r.billed_value.toFixed(2), cutOf(r).toFixed(2), (Number(r.upsell_value) || 0).toFixed(2), r.upsell_team ?? "", r.paid ? "Sim" : "Não",
     ].map(c => `"${String(c ?? "").replace(/"/g, '""')}"`));
     const csv = [headers, ...rows].map(r => r.join(",")).join("\n");
     const blob = new Blob(["﻿" + csv], { type: "text/csv;charset=utf-8;" });
@@ -414,7 +418,7 @@ const CrmPanel = () => {
         </div>
       )}
 
-      {view === "fechos" && <CrmClosings records={records} />}
+      {view === "fechos" && <CrmClosings records={records.map(r => ({ ...r, my_cut: cutOf(r) }))} />}
 
       {view === "upsell" && <CrmUpsell records={records} onEdit={id => {
         const r = records.find(x => x.id === id);
@@ -435,6 +439,7 @@ const CrmPanel = () => {
         <div className="bg-white border border-gray-200 rounded-xl p-4">
           <p className="text-[10.5px] font-bold text-gray-500 uppercase tracking-wider mb-1">O meu cut</p>
           <p className="text-xl font-bold text-navy">{money(totals.cut)}</p>
+          {totals.upsellCut > 0 && <p className={`text-[11px] font-medium ${UPSELL_TEXT}`}>inclui {money(totals.upsellCut)} de upsell</p>}
         </div>
         <div className="bg-white border border-gray-200 rounded-xl p-4">
           <p className="text-[10.5px] font-bold text-gray-500 uppercase tracking-wider mb-1">Pagos</p>
@@ -539,8 +544,8 @@ const CrmPanel = () => {
                   </td>
                   <td className="px-2 py-2 text-gray-500 truncate" title={r.source ?? undefined}>{r.source?.startsWith("Google Calendar") ? "Calendário" : r.source || "-"}</td>
                   <td className="px-2 py-2 font-semibold text-navy whitespace-nowrap">{money(r.billed_value)}</td>
-                  <td className="px-2 py-2 font-semibold text-gold whitespace-nowrap">{money(r.my_cut)}</td>
-                  <td className="px-2 py-2 text-navy whitespace-nowrap" title={r.upsell_value ? `${r.upsell_team ?? defaultTeamFor(r.locality)}` : undefined}>{r.upsell_value ? money(Number(r.upsell_value)) : "-"}</td>
+                  <td className="px-2 py-2 font-semibold text-gold whitespace-nowrap" title={ownerUpsellOf(r) ? `${money(r.my_cut)} do serviço + ${money(ownerUpsellOf(r))} de upsell` : undefined}>{money(cutOf(r))}</td>
+                  <td className={`px-2 py-2 font-semibold whitespace-nowrap ${UPSELL_TEXT}`} title={r.upsell_value ? `${r.upsell_team ?? defaultTeamFor(r.locality)}` : undefined}>{r.upsell_value ? money(Number(r.upsell_value)) : "-"}</td>
                   <td className="px-2 py-2">
                     <button onClick={() => togglePaid(r)} className={`px-2 py-0.5 rounded-full text-[10px] font-bold border transition-colors ${r.paid ? "bg-green-50 text-green-700 border-green-200" : "bg-red-100 text-red-700 border-red-300"}`}>
                       {r.paid ? "Pago" : "Por pagar"}
@@ -674,7 +679,7 @@ const CrmPanel = () => {
             <p className="col-span-2 sm:col-span-1 text-[11px] text-gray-500 self-end pb-1">
               {(() => {
                 const v = parseFloat(form.upsell_value.replace(",", ".")) || 0;
-                if (v <= 0) return "Fora do faturado e do teu cut. Equipa 70%, tu 30% (Porto 60/40).";
+                if (v <= 0) return "A tua parte soma-se ao teu cut. Equipa 70%, tu 30% (Porto 60/40).";
                 const s = splitUpsell(v, form.upsell_team);
                 return `Equipa ${money(s.team)} · tu ${money(s.owner)}`;
               })()}

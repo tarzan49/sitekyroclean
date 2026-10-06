@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { defaultTeamFor, splitUpsell, summarizeUpsells, teamShareOf, UPSELL_TEAMS } from './crmUpsell';
+import { defaultTeamFor, ownerUpsellOf, splitUpsell, summarizeUpsells, teamShareOf, UPSELL_TEAMS } from './crmUpsell';
 
 describe('upsell split', () => {
   it('gives Porto teams 60/40 and the others 70/30', () => {
@@ -35,5 +35,13 @@ describe('summarizeUpsells', () => {
     ]);
     expect(s.teams.map(t => t.team)).toEqual(['Porto 2', 'Lisboa 1']);
     expect(s).toMatchObject({ count: 2, value: 60, teamPart: 38, ownerPart: 22 });
+  });
+});
+
+describe('ownerUpsellOf', () => {
+  it('is the owner part, using the region team when none is set', () => {
+    expect(ownerUpsellOf({ upsell_value: 50, upsell_team: 'Porto 1', locality: 'Porto' })).toBe(20);
+    expect(ownerUpsellOf({ upsell_value: 50, upsell_team: null, locality: 'Lisboa' })).toBe(15);
+    expect(ownerUpsellOf({ upsell_value: null, upsell_team: null, locality: 'Porto' })).toBe(0);
   });
 });
