@@ -12,6 +12,10 @@
 //               summary only: no phone, email or message
 //   create-lead save the conversation as a lead, source "WhatsApp", once per
 //               conversationId
+//   availability two free times for a locality, from the owner's calendar
+//               (secret iCal address, GOOGLE_CALENDAR_ICS_URL) with the rules
+//               of src/lib/botAvailability.ts (2026-10-07). Only times go back:
+//               no client's name, phone or address leaves this function.
 //   follow-ups, client-plan, log-touch, log-message
 //               client follow-up (2026-10-06): who to write to now and what to
 //               say, the plan for whoever is writing, and the log of what was
@@ -22,7 +26,8 @@
 // Documented for the bot developer in the owner's "4-acessos-para-o-bot".
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import { botQuote, listBotCities } from "../_shared/botEngine.generated.js";
+import { botAvailability, botQuote, listBotCities } from "../_shared/botEngine.generated.js";
+import { parseIcs, type CalendarEvent } from "../_shared/ics.ts";
 import { clientPlan, listFollowUps, logMessage, logTouch, type FollowUpStore } from "./followUps.ts";
 import { checkRateLimit, getClientIP, getRateLimitHeaders } from "../_shared/rate-limit.ts";
 import { createErrorResponse, createSuccessResponse, handleCORS, safeLog, validateMethod } from "../_shared/security.ts";
@@ -40,9 +45,12 @@ export interface LeadsStore {
   findBy(column: "booking_id" | "lead_id", value: string, columns: string): Promise<QueryResult>;
   insert(row: Row): Promise<QueryResult>;
 }
+/** The owner's calendar, or why it could not be read. */
+export type CalendarSource = () => Promise<{ events: CalendarEvent[] } | { error: string }>;
 export interface BotEnv {
   botKey: string | undefined;
   leads: LeadsStore | null;
+  calendar?: CalendarSource | null;
   followUps?: FollowUpStore | null;
   now?: () => Date;
 }
@@ -203,6 +211,14 @@ export async function handleBotRequest(req: Request, env: BotEnv): Promise<Respo
     case "create-lead":
       if (!env.leads) return createErrorResponse("Serviço indisponível", 503);
       return await createLead(body, env.leads);
+    case "availability": {
+      if (!env.calendar) return createErrorResponse("Calendário por ligar", 503);
+      const cal = await env.calendar();
+      // Never guess: without the calendar the bot hands the date to the owner (replies 2.6).
+      if ("error" in cal) return createErrorResponse(cal.error, 502);
+      const result = botAvailability(body, cal.events, env.now?.() ?? new Date());
+      return "error" in result ? createErrorResponse(String(result.error), 400) : createSuccessResponse({ availability: result });
+    }
     case "follow-ups":
     case "client-plan":
     case "log-touch":
@@ -215,7 +231,7 @@ export async function handleBotRequest(req: Request, env: BotEnv): Promise<Respo
       return await logMessage(body, env.followUps, now);
     }
     default:
-      return createErrorResponse("action tem de ser quote, cities, find-order, create-lead, follow-ups, client-plan, log-touch ou log-message", 400);
+      return createErrorResponse("action tem de ser quote, cities, availability, find-order, create-lead, follow-ups, client-plan, log-touch ou log-message", 400);
   }
 }
 
@@ -274,8 +290,36 @@ function supabaseFollowUps(): FollowUpStore | null {
   };
 }
 
+const CALENDAR_CACHE_MS = 60_000;
+let calendarCache: { at: number; events: CalendarEvent[] } | null = null;
+
+/** Reads the owner's calendar feed, kept for a minute so a burst of drafts reads it once. */
+function icsCalendar(): CalendarSource | null {
+  const url = Deno.env.get("GOOGLE_CALENDAR_ICS_URL") ?? "";
+  try {
+    const u = new URL(url);
+    if (u.protocol !== "https:" || u.hostname !== "calendar.google.com" || !u.pathname.endsWith(".ics")) return null;
+  } catch {
+    return null;
+  }
+  return async () => {
+    if (calendarCache && Date.now() - calendarCache.at < CALENDAR_CACHE_MS) return { events: calendarCache.events };
+    try {
+      const res = await fetch(url, { signal: AbortSignal.timeout(15_000) });
+      if (!res.ok) return { error: "Não foi possível ler o calendário" };
+      const { events, totalEvents } = parseIcs(new Uint8Array(await res.arrayBuffer()));
+      // An empty feed is almost surely Google's error: "all free" would be a lie.
+      if (totalEvents === 0) return { error: "O calendário veio vazio" };
+      calendarCache = { at: Date.now(), events };
+      return { events };
+    } catch {
+      return { error: "Não foi possível ler o calendário" };
+    }
+  };
+}
+
 // `import.meta.main` is only true when this file is the entry point, so the
 // tests can import `handleBotRequest` without starting a server.
 if (import.meta.main) {
-  serve(req => handleBotRequest(req, { botKey: Deno.env.get("BOT_API_KEY"), leads: supabaseLeads(), followUps: supabaseFollowUps() }));
+  serve(req => handleBotRequest(req, { botKey: Deno.env.get("BOT_API_KEY"), leads: supabaseLeads(), followUps: supabaseFollowUps(), calendar: icsCalendar() }));
 }

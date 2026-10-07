@@ -1,4 +1,4 @@
-// GERADO por `npm run build:bot-engine` a partir de src/lib/botQuote.ts. Não editar à mão.
+// GERADO por `npm run build:bot-engine` a partir de src/lib/botEngine.ts. Não editar à mão.
 // src/constants/travel.ts
 var locationPrices = {
   // ═══ Porto/Norte (equipa Porto) ═══
@@ -416,9 +416,327 @@ function botQuote(input) {
     handToOwner: result.quote || city === null || extendedTrip
   };
 }
+
+// src/data/serviceCatalog.ts
+var cities = [
+  // Área Metropolitana do Porto: Primary
+  { name: "Porto", slug: "porto", region: "primary", area: "porto", description: "capital do Norte de Portugal" },
+  { name: "Matosinhos", slug: "matosinhos", region: "secondary", area: "porto", description: "cidade costeira vizinha do Porto" },
+  { name: "Maia", slug: "maia", region: "secondary", area: "porto", description: "município a norte do Porto" },
+  { name: "Vila Nova de Gaia", slug: "vila-nova-de-gaia", region: "secondary", area: "porto", description: "cidade na margem sul do Douro" },
+  { name: "Gondomar", slug: "gondomar", region: "secondary", area: "porto", description: "município a leste do Porto" },
+  { name: "Valongo", slug: "valongo", region: "secondary", area: "porto", description: "município a nordeste do Porto" },
+  { name: "Póvoa de Varzim", slug: "povoa-de-varzim", region: "secondary", area: "porto", description: "cidade costeira do litoral norte" },
+  { name: "Vila do Conde", slug: "vila-do-conde", region: "secondary", area: "porto", description: "cidade histórica do litoral norte" },
+  { name: "Paredes", slug: "paredes", region: "secondary", area: "porto", description: "município do Vale do Sousa" },
+  { name: "Penafiel", slug: "penafiel", region: "secondary", area: "porto", description: "cidade do Vale do Sousa" },
+  { name: "Lousada", slug: "lousada", region: "secondary", area: "porto", description: "município do Vale do Sousa" },
+  { name: "Paços de Ferreira", slug: "pacos-de-ferreira", region: "secondary", area: "porto", description: "capital do móvel" },
+  { name: "Felgueiras", slug: "felgueiras", region: "secondary", area: "porto", description: "município do Vale do Sousa" },
+  { name: "Santo Tirso", slug: "santo-tirso", region: "secondary", area: "porto", description: "cidade do Ave" },
+  { name: "Trofa", slug: "trofa", region: "secondary", area: "porto", description: "município entre Porto e Braga" },
+  { name: "Espinho", slug: "espinho", region: "secondary", area: "porto", description: "cidade costeira a sul do Porto" },
+  { name: "Arouca", slug: "arouca", region: "secondary", area: "porto", description: "município no interior do distrito de Aveiro" },
+  // Sul do Douro (equipa Porto, 2026-09-26: já recebiam anúncios da campanha do Porto)
+  { name: "Santa Maria da Feira", slug: "santa-maria-da-feira", region: "secondary", area: "porto", description: "cidade do castelo medieval, a sul do Porto" },
+  { name: "São João da Madeira", slug: "sao-joao-da-madeira", region: "secondary", area: "porto", description: "cidade do calçado, entre a Feira e Oliveira de Azeméis" },
+  { name: "Oliveira de Azeméis", slug: "oliveira-de-azemeis", region: "secondary", area: "porto", description: "cidade industrial do Entre Douro e Vouga" },
+  { name: "Ovar", slug: "ovar", region: "secondary", area: "porto", description: "cidade costeira entre Espinho e Aveiro" },
+  // Aveiro (equipa Porto, deslocação alargada, 2026-09-10)
+  { name: "Aveiro", slug: "aveiro", region: "secondary", area: "porto", description: "cidade da ria, no litoral centro" },
+  // Coimbra e Centro (trabalhador local desde 2026-09-28). No CRM e no
+  // calendário das equipas contam como região Porto (AREA_TO_LOCALITY em
+  // calendarServices.ts): o dono ainda não quis uma equipa Coimbra.
+  { name: "Coimbra", slug: "coimbra", region: "primary", area: "coimbra", description: "cidade universitária às margens do Mondego" },
+  { name: "Figueira da Foz", slug: "figueira-da-foz", region: "secondary", area: "coimbra", description: "cidade de praia na foz do Mondego" },
+  // Outros: Norte
+  { name: "Braga", slug: "braga", region: "primary", area: "braga", description: "cidade milenar do Minho" },
+  { name: "Guimarães", slug: "guimaraes", region: "secondary", area: "braga", description: "berço da nação portuguesa" },
+  // Expansão Braga/Minho (2026-08-25, equipa local nova em Braga)
+  { name: "Vila Nova de Famalicão", slug: "vila-nova-de-famalicao", region: "secondary", area: "braga", description: "cidade industrial do Vale do Ave" },
+  { name: "Barcelos", slug: "barcelos", region: "secondary", area: "braga", description: "cidade oleira do Minho" },
+  { name: "Viana do Castelo", slug: "viana-do-castelo", region: "secondary", area: "braga", description: "cidade costeira à foz do Lima" },
+  { name: "Póvoa de Lanhoso", slug: "povoa-de-lanhoso", region: "secondary", area: "braga", description: "vila do Minho perto de Braga" },
+  { name: "Fafe", slug: "fafe", region: "secondary", area: "braga", description: "vila do Minho, terra do capuchinho" },
+  { name: "Esposende", slug: "esposende", region: "secondary", area: "braga", description: "vila costeira na foz do Cávado" },
+  // Lisboa, Área Metropolitana e Alentejo Litoral
+  { name: "Lisboa", slug: "lisboa", region: "primary", area: "lisboa", description: "capital de Portugal" },
+  { name: "Amadora", slug: "amadora", region: "secondary", area: "lisboa", description: "município vizinho de Lisboa, um dos mais densos do país" },
+  { name: "Odivelas", slug: "odivelas", region: "secondary", area: "lisboa", description: "município a norte de Lisboa" },
+  { name: "Oeiras", slug: "oeiras", region: "secondary", area: "lisboa", description: "município entre Lisboa e Cascais" },
+  { name: "Cascais", slug: "cascais", region: "secondary", area: "lisboa", description: "vila costeira na linha de Cascais" },
+  { name: "Sintra", slug: "sintra", region: "secondary", area: "lisboa", description: "vila histórica e Património UNESCO" },
+  { name: "Loures", slug: "loures", region: "secondary", area: "lisboa", description: "município a norte da capital" },
+  { name: "Almada", slug: "almada", region: "secondary", area: "lisboa", description: "cidade na margem sul do Tejo" },
+  { name: "Seixal", slug: "seixal", region: "secondary", area: "lisboa", description: "município na margem sul, junto ao estuário do Tejo" },
+  { name: "Vila Franca de Xira", slug: "vila-franca-de-xira", region: "secondary", area: "lisboa", description: "município ribeirinho a norte de Lisboa" },
+  { name: "Barreiro", slug: "barreiro", region: "secondary", area: "lisboa", description: "cidade na margem sul do Tejo" },
+  { name: "Moita", slug: "moita", region: "secondary", area: "lisboa", description: "município na margem sul do Tejo" },
+  { name: "Mafra", slug: "mafra", region: "secondary", area: "lisboa", description: "vila histórica a norte de Sintra" },
+  { name: "Setúbal", slug: "setubal", region: "secondary", area: "lisboa", description: "cidade portuária a sul de Lisboa" },
+  { name: "Montijo", slug: "montijo", region: "secondary", area: "lisboa", description: "município na margem sul, em frente a Lisboa" },
+  { name: "Alcochete", slug: "alcochete", region: "secondary", area: "lisboa", description: "vila ribeirinha na margem sul do Tejo" },
+  { name: "Palmela", slug: "palmela", region: "secondary", area: "lisboa", description: "município entre Setúbal e o Montijo" },
+  { name: "Sesimbra", slug: "sesimbra", region: "secondary", area: "lisboa", description: "vila costeira a sul de Lisboa" },
+  // Alentejo Litoral (equipa Lisboa, deslocação alargada, 2026-09-26: já recebiam anúncios da campanha de Lisboa)
+  { name: "Alcácer do Sal", slug: "alcacer-do-sal", region: "secondary", area: "lisboa", description: "cidade ribeirinha do Sado, que inclui a Comporta" },
+  { name: "Grândola", slug: "grandola", region: "secondary", area: "lisboa", description: "vila do Alentejo Litoral, com Tróia e Melides na costa" },
+  { name: "Santiago do Cacém", slug: "santiago-do-cacem", region: "secondary", area: "lisboa", description: "município do Alentejo Litoral que inclui Vila Nova de Santo André" },
+  { name: "Sines", slug: "sines", region: "secondary", area: "lisboa", description: "cidade portuária do Alentejo Litoral" },
+  // Algarve
+  { name: "Faro", slug: "faro", region: "primary", area: "algarve", description: "capital do Algarve" },
+  { name: "Loulé", slug: "loule", region: "secondary", area: "algarve", description: "município que inclui Quarteira, Vilamoura e Almancil" },
+  { name: "Albufeira", slug: "albufeira", region: "secondary", area: "algarve", description: "cidade turística do Algarve central" },
+  { name: "Olhão", slug: "olhao", region: "secondary", area: "algarve", description: "cidade piscatória do Algarve oriental" },
+  { name: "São Brás de Alportel", slug: "sao-bras-de-alportel", region: "secondary", area: "algarve", description: "vila serrana no interior do Algarve" },
+  { name: "Silves", slug: "silves", region: "secondary", area: "algarve", description: "cidade histórica do Algarve central" },
+  { name: "Lagoa", slug: "lagoa-algarve", region: "secondary", area: "algarve", description: "município turístico do Algarve central" },
+  { name: "Tavira", slug: "tavira", region: "secondary", area: "algarve", description: "cidade histórica do Algarve oriental" },
+  { name: "Portimão", slug: "portimao", region: "secondary", area: "algarve", description: "maior cidade do Algarve ocidental" },
+  { name: "Lagos", slug: "lagos", region: "secondary", area: "algarve", description: "cidade histórica do Algarve ocidental" },
+  { name: "Vila Real de Santo António", slug: "vila-real-de-santo-antonio", region: "secondary", area: "algarve", description: "cidade fronteiriça do Algarve oriental" },
+  { name: "Castro Marim", slug: "castro-marim", region: "secondary", area: "algarve", description: "vila histórica junto à fronteira com Espanha" },
+  { name: "Monchique", slug: "monchique", region: "secondary", area: "algarve", description: "vila serrana no interior do Algarve" },
+  { name: "Aljezur", slug: "aljezur", region: "secondary", area: "algarve", description: "vila da Costa Vicentina" },
+  { name: "Vila do Bispo", slug: "vila-do-bispo", region: "secondary", area: "algarve", description: "município do extremo sudoeste do Algarve" },
+  { name: "Alcoutim", slug: "alcoutim", region: "secondary", area: "algarve", description: "vila ribeirinha do interior algarvio" }
+];
+
+// src/lib/postalRegion.ts
+function localityFromPostalCode(code) {
+  const n = Number(code.slice(0, 4));
+  if (!Number.isInteger(n)) return null;
+  if (n >= 2400 && n < 2500) return null;
+  if (n >= 1e3 && n < 3e3) return "Lisboa";
+  if (n >= 7e3 && n < 8e3) return "Lisboa";
+  if (n >= 8e3 && n < 9e3) return "Algarve";
+  if (n >= 4700 && n < 4780 || n >= 4800 && n < 5e3) return "Braga";
+  if (n >= 3e3 && n < 6e3) return "Porto";
+  return null;
+}
+
+// src/lib/botAvailability.ts
+var TEAMS_BY_REGION = {
+  Porto: ["Porto 1", "Porto 2"],
+  Braga: ["Braga"],
+  Lisboa: ["Lisboa 1", "Lisboa 2"],
+  Algarve: ["Algarve"]
+};
+var ALL_TEAMS = Object.values(TEAMS_BY_REGION).flat();
+var AREA_REGION = {
+  porto: "Porto",
+  braga: "Braga",
+  lisboa: "Lisboa",
+  algarve: "Algarve",
+  coimbra: "coimbra"
+};
+var MINUTES = { sofa: 60, mattress: 45, chair: 10, rugPerM2: 4, waterproofing: 20, minimum: 45 };
+var TRAVEL_MARGIN_MIN = 30;
+var EARLIEST_HOUR = 10;
+var DAY_END_HOUR = 21;
+var LEAD_TIME_MIN = 90;
+var DEFAULT_DAYS = 4;
+var MAX_DAYS = 14;
+var fold2 = (s) => s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().replace(/\s+/g, " ").trim();
+var CITY_REGION = new Map(cities.map((c) => [fold2(c.name), AREA_REGION[c.area]]));
+var CITY_NAMES = cities.map((c) => ({ key: fold2(c.name), region: AREA_REGION[c.area] })).filter((c) => c.key.length >= 4).sort((a, b) => b.key.length - a.key.length);
+var SERVICE_LIKE = /^(servico|limpeza|pre-? ?reserva|a confirmar)\b/;
+var TEAM_LINE = /^\s*Equipa:\s*([^\n<]*)/im;
+var POSTAL = /\b(\d{4})-\d{3}\b/;
+function eventTeam(e) {
+  const t = TEAM_LINE.exec(e.description ?? "")?.[1];
+  if (!t) return null;
+  const k = fold2(t);
+  return ALL_TEAMS.find((team) => fold2(team) === k) ?? null;
+}
+function eventRegion(e) {
+  const text = `${e.summary}
+${e.description}`;
+  const postal = POSTAL.exec(text);
+  if (postal) {
+    const r = localityFromPostalCode(postal[1]);
+    if (r) return r;
+  }
+  const folded = fold2(e.summary);
+  for (const c of CITY_NAMES) {
+    if (c.region === "coimbra") continue;
+    if (new RegExp(`(^|[^a-z])${c.key.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}([^a-z]|$)`).test(folded)) return c.region;
+  }
+  return null;
+}
+function visitMinutes(items) {
+  if (!Array.isArray(items) || !items.length) return 60;
+  let total = 0;
+  for (const raw of items) {
+    const qty = Math.max(1, Math.min(50, Math.floor(Number(raw?.qty) || 1)));
+    const t = String(raw?.treatment ?? "clean");
+    const waterproof = /essencial|premium/.test(t);
+    switch (raw?.kind) {
+      case "sofa":
+        total += qty * (MINUTES.sofa + (waterproof ? MINUTES.waterproofing : 0));
+        break;
+      case "mattress":
+        total += qty * (MINUTES.mattress + (waterproof ? MINUTES.waterproofing : 0));
+        break;
+      case "chairs":
+        total += qty * MINUTES.chair + (waterproof ? MINUTES.waterproofing : 0);
+        break;
+      case "rug":
+      case "carpet": {
+        const m2 = Number(raw?.width) * Number(raw?.length);
+        total += qty * (Number.isFinite(m2) && m2 > 0 ? m2 * MINUTES.rugPerM2 : 30);
+        break;
+      }
+      default:
+        total += 60;
+    }
+  }
+  return Math.ceil(Math.max(MINUTES.minimum, total) / 15) * 15;
+}
+var lisbonParts = new Intl.DateTimeFormat("en-CA", {
+  timeZone: "Europe/Lisbon",
+  hourCycle: "h23",
+  year: "numeric",
+  month: "2-digit",
+  day: "2-digit",
+  hour: "2-digit",
+  minute: "2-digit"
+});
+function lisbon(ms) {
+  const p = Object.fromEntries(lisbonParts.formatToParts(new Date(ms)).map((x) => [x.type, x.value]));
+  return { date: `${p.year}-${p.month}-${p.day}`, minutes: Number(p.hour) * 60 + Number(p.minute) };
+}
+function lisbonToUtc(date, minutes) {
+  const [y, m, d] = date.split("-").map(Number);
+  const wall = Date.UTC(y, m - 1, d, 0, minutes);
+  let t = wall;
+  for (let i = 0; i < 2; i++) {
+    const l = lisbon(t);
+    const [ly, lm, ld] = l.date.split("-").map(Number);
+    t += wall - Date.UTC(ly, lm - 1, ld, 0, l.minutes);
+  }
+  return t;
+}
+var addDays = (date, n) => {
+  const [y, m, d] = date.split("-").map(Number);
+  return new Date(Date.UTC(y, m - 1, d + n)).toISOString().slice(0, 10);
+};
+var WEEKDAYS = ["domingo", "segunda", "terça", "quarta", "quinta", "sexta", "sábado"];
+var weekday = (date) => WEEKDAYS[(/* @__PURE__ */ new Date(`${date}T12:00:00Z`)).getUTCDay()];
+function dayLabel(date, today) {
+  if (date === today) return `hoje (${weekday(date)})`;
+  if (date === addDays(today, 1)) return `amanhã (${weekday(date)})`;
+  return `${weekday(date)} (dia ${Number(date.slice(8))})`;
+}
+var hourLabel = (minutes) => `${Math.floor(minutes / 60)}h${minutes % 60 ? String(minutes % 60).padStart(2, "0") : ""}`;
+function busyIntervals(events) {
+  const out = [];
+  for (const e of events) {
+    if (!e.start || String(e.status).toUpperCase() === "CANCELLED") continue;
+    const from = Date.parse(e.start);
+    if (!Number.isFinite(from)) continue;
+    const parsedEnd = e.end ? Date.parse(e.end) : NaN;
+    const to = Number.isFinite(parsedEnd) && parsedEnd > from ? parsedEnd : from + 60 * 6e4;
+    const team = eventTeam(e);
+    if (team) {
+      out.push({ from, to, team, region: null });
+      continue;
+    }
+    if (!SERVICE_LIKE.test(fold2(e.summary))) continue;
+    const region = eventRegion(e);
+    if (region) out.push({ from, to, team: null, region });
+  }
+  return out;
+}
+function slotState(busy, teams, region, from, to) {
+  const margin = TRAVEL_MARGIN_MIN * 6e4;
+  const overlaps = (b) => b.from < to + margin && b.to > from - margin;
+  const teamsFree = teams.filter((t) => !busy.some((b) => b.team === t && overlaps(b)));
+  const unassigned = busy.filter((b) => !b.team && b.region === region && overlaps(b)).length;
+  const near = (t) => busy.some((b) => b.team === t && (from - b.to >= 0 && from - b.to <= 90 * 6e4 || b.from - to >= 0 && b.from - to <= 90 * 6e4));
+  return { free: teamsFree.length - unassigned >= 1, teamsFree, nearOtherJob: teamsFree.some(near) };
+}
+var DATE = /^\d{4}-\d{2}-\d{2}$/;
+function parseTime(v) {
+  const m = /^(\d{1,2})(?:[:h](\d{2})?)?h?$/i.exec(String(v ?? "").trim());
+  if (!m) return null;
+  const h = Number(m[1]), min = Number(m[2] ?? 0);
+  return h < 24 && min < 60 ? h * 60 + min : null;
+}
+function pickTwo(slots, dayOrder, onlyDay) {
+  const days = onlyDay ? [onlyDay] : dayOrder;
+  const byDay = days.map((d) => slots.filter((s) => s.date === d)).filter((list) => list.length);
+  if (!byDay.length) return [];
+  const best = (list) => list.find((s) => s.nearOtherJob) ?? list[0];
+  const first = byDay[0];
+  const a = best(first);
+  const sameDay = first.filter((s) => Math.abs(s.minutes - a.minutes) >= 180).concat(first.filter((s) => Math.abs(s.minutes - a.minutes) >= 120 && Math.abs(s.minutes - a.minutes) < 180));
+  const b = sameDay.find((s) => s.nearOtherJob) ?? sameDay[0] ?? (onlyDay ? void 0 : byDay[1] && best(byDay[1]));
+  return [a, b].filter((s) => !!s).sort((x, y) => x.date.localeCompare(y.date) || x.minutes - y.minutes);
+}
+function suggestionText(slots) {
+  if (slots.length === 1) return `${slots[0].label} às ${slots[0].time}`;
+  const [a, b] = slots;
+  return a.date === b.date ? `${a.label} às ${a.time} ou às ${b.time}` : `${a.label} às ${a.time} ou ${b.label} às ${b.time}`;
+}
+function botAvailability(req, events, now) {
+  const city = resolveBotCity(req?.city);
+  const durationRaw = Number(req?.durationMin);
+  const durationMin = Number.isFinite(durationRaw) && durationRaw >= 15 && durationRaw <= 600 ? Math.ceil(durationRaw / 15) * 15 : visitMinutes(req?.items);
+  const base = { city, durationMin, suggestion: null, requested: null, free: [] };
+  if (req?.city !== void 0 && typeof req.city !== "string") return { error: "city tem de ser texto" };
+  if (!city) return { ...base, region: null, teams: [], handToOwner: "Localidade fora da lista: confirmar com o responsável" };
+  const area = CITY_REGION.get(fold2(city));
+  if (area === "coimbra") return { ...base, region: null, teams: [], handToOwner: "Coimbra e Figueira da Foz ainda não têm calendário de equipa: a disponibilidade é do responsável" };
+  if (EXTENDED_TRIP_CITIES.has(city)) return { ...base, region: area ?? null, teams: [], handToOwner: "Disponibilidade sob consulta (deslocação alargada): a data é do responsável" };
+  if (!area) return { ...base, region: null, teams: [], handToOwner: "Região sem equipa: confirmar com o responsável" };
+  const teams = [...TEAMS_BY_REGION[area]];
+  const today = lisbon(now.getTime()).date;
+  let onlyDay = null;
+  if (req.date !== void 0) {
+    if (typeof req.date !== "string" || !DATE.test(req.date)) return { error: "date tem de ser AAAA-MM-DD" };
+    if (req.date < today) return { error: "date já passou" };
+    onlyDay = req.date;
+  }
+  const daysRaw = Math.floor(Number(req.days));
+  const span = Number.isFinite(daysRaw) && daysRaw >= 1 ? Math.min(MAX_DAYS, daysRaw) : DEFAULT_DAYS;
+  const dayOrder = onlyDay ? [onlyDay] : Array.from({ length: span }, (_, i) => addDays(today, i));
+  const busy = busyIntervals(events);
+  const earliestToday = now.getTime() + LEAD_TIME_MIN * 6e4;
+  const slots = [];
+  for (const date of dayOrder) {
+    const label = dayLabel(date, today);
+    for (let m = EARLIEST_HOUR * 60; m + durationMin <= DAY_END_HOUR * 60; m += 60) {
+      const from = lisbonToUtc(date, m);
+      if (from < earliestToday) continue;
+      const st = slotState(busy, teams, area, from, from + durationMin * 6e4);
+      if (st.free) slots.push({ date, minutes: m, label, time: hourLabel(m), teamsFree: st.teamsFree, nearOtherJob: st.nearOtherJob });
+    }
+  }
+  let requested = null;
+  if (req.time !== void 0) {
+    const m = parseTime(req.time);
+    if (m === null || !onlyDay) return { error: 'time precisa de date e de uma hora como "15h" ou "15:30"' };
+    const from = lisbonToUtc(onlyDay, m);
+    const inHours = m >= 7 * 60 && m + durationMin <= DAY_END_HOUR * 60 && from >= now.getTime();
+    const st = slotState(busy, teams, area, from, from + durationMin * 6e4);
+    requested = { date: onlyDay, time: hourLabel(m), free: inHours && st.free, teamsFree: inHours ? st.teamsFree : [] };
+  }
+  const two = pickTwo(slots, dayOrder, onlyDay);
+  const free = dayOrder.map((date) => ({ date, label: dayLabel(date, today), times: slots.filter((s) => s.date === date).map((s) => s.time) })).filter((d) => d.times.length);
+  return {
+    city,
+    region: area,
+    teams,
+    durationMin,
+    handToOwner: two.length ? null : "Sem horas livres nos próximos dias: o responsável confirma a data",
+    suggestion: two.length ? { text: suggestionText(two), slots: two } : null,
+    requested,
+    free
+  };
+}
 export {
-  BOT_SIZES,
-  BOT_TREATMENTS,
+  botAvailability,
   botQuote,
   listBotCities,
   resolveBotCity

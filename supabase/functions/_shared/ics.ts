@@ -15,6 +15,9 @@ export interface CalendarEvent {
   updated: string;
   /** CONFIRMED, TENTATIVE ou CANCELLED. */
   status: string;
+  /** Início e fim em UTC (ISO 8601); null num evento de dia inteiro. Usados pela disponibilidade do bot. */
+  start: string | null;
+  end: string | null;
 }
 
 export interface ParsedCalendar {
@@ -77,6 +80,43 @@ function utcIso(value: string): string | null {
   return m ? `${m[1]}-${m[2]}-${m[3]}T${m[4]}:${m[5]}:${m[6]}Z` : null;
 }
 
+const zoneParts = new Map<string, Intl.DateTimeFormat>();
+/** Diferença, em ms, entre a hora de `timeZone` e UTC nesse instante. */
+function zoneOffset(utcMs: number, timeZone: string): number {
+  let fmt = zoneParts.get(timeZone);
+  if (!fmt) {
+    fmt = new Intl.DateTimeFormat('en-US', {
+      timeZone, hourCycle: 'h23', year: 'numeric', month: '2-digit', day: '2-digit',
+      hour: '2-digit', minute: '2-digit', second: '2-digit',
+    });
+    zoneParts.set(timeZone, fmt);
+  }
+  const p = Object.fromEntries(fmt.formatToParts(new Date(utcMs)).map(x => [x.type, x.value]));
+  return Date.UTC(+p.year, +p.month - 1, +p.day, +p.hour, +p.minute, +p.second) - utcMs;
+}
+
+/**
+ * Um instante do calendário em UTC: "…Z" já é UTC; com TZID converte-se a hora
+ * escrita nesse fuso (o do dono é Copenhaga); sem nenhum dos dois, Lisboa.
+ * Data simples (dia inteiro): null.
+ */
+function instantOf(prop: Property | undefined): string | null {
+  if (!prop) return null;
+  const utc = utcIso(prop.value);
+  if (utc) return utc;
+  const m = /^(\d{4})(\d{2})(\d{2})T(\d{2})(\d{2})(\d{2})$/.exec(prop.value);
+  if (!m) return null;
+  const wall = Date.UTC(+m[1], +m[2] - 1, +m[3], +m[4], +m[5], +m[6]);
+  const zone = prop.params.TZID || 'Europe/Lisbon';
+  try {
+    let t = wall - zoneOffset(wall, zone);
+    t = wall - zoneOffset(t, zone); // segunda passagem: acerta perto da mudança de hora
+    return new Date(t).toISOString().replace(/\.000Z$/, 'Z');
+  } catch {
+    return null;
+  }
+}
+
 /**
  * O dia do evento. Com TZID ou data simples é o dia escrito; em UTC ("Z")
  * converte-se para Lisboa, que é onde os serviços acontecem.
@@ -113,6 +153,8 @@ export function parseIcs(input: Uint8Array | string): ParsedCalendar {
             created,
             updated,
             status: (current.get('STATUS')?.value ?? 'CONFIRMED').toUpperCase(),
+            start: instantOf(current.get('DTSTART')),
+            end: instantOf(current.get('DTEND')),
           });
         }
       }

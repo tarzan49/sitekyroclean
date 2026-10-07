@@ -36,7 +36,25 @@ Deno.test('reads a Google Calendar event', () => {
     created: '2026-09-26T09:15:29Z',
     updated: '2026-09-26T09:17:07Z',
     status: 'CONFIRMED',
+    // 14:30 em Copenhaga (CEST, +2) = 12:30 UTC = 13:30 em Portugal.
+    start: '2026-09-26T12:30:00Z',
+    end: '2026-09-26T13:30:00Z',
   }]);
+});
+
+Deno.test('start and end in UTC: winter time, UTC times and all-day events', () => {
+  const { events } = parseIcs(calendar(
+    event(['DTSTART;TZID=Europe/Copenhagen:20261102T110000', 'DTEND;TZID=Europe/Copenhagen:20261102T120000', 'UID:w@google.com', 'CREATED:20261001T100000Z', 'SUMMARY:Serviço 10€']),
+    event(['DTSTART:20261012T140000Z', 'DTEND:20261012T150000Z', 'UID:u@google.com', 'CREATED:20261001T100000Z', 'SUMMARY:Serviço 10€']),
+    event(['DTSTART;VALUE=DATE:20261012', 'DTEND;VALUE=DATE:20261013', 'UID:a@google.com', 'CREATED:20261001T100000Z', 'SUMMARY:Feriado']),
+    event(['DTSTART:20261012T150000', 'UID:l@google.com', 'CREATED:20261001T100000Z', 'SUMMARY:Sem fuso']),
+  ));
+  // Copenhaga em novembro é +1: 11:00 → 10:00 UTC.
+  assertEquals([events[0].start, events[0].end], ['2026-11-02T10:00:00Z', '2026-11-02T11:00:00Z']);
+  assertEquals([events[1].start, events[1].end], ['2026-10-12T14:00:00Z', '2026-10-12T15:00:00Z']);
+  assertEquals([events[2].start, events[2].end], [null, null]);
+  // Sem fuso nem "Z": hora de Lisboa (+1 em outubro), sem DTEND.
+  assertEquals([events[3].start, events[3].end], ['2026-10-12T14:00:00Z', null]);
 });
 
 Deno.test('unfolds a line cut in the middle of a UTF-8 character', () => {

@@ -175,3 +175,33 @@ Deno.test("log-message keeps the client card dates and labels up to date, and cr
   assertEquals(cleanPhone("00351 912 345 678"), "351912345678");
   assertEquals(cleanPhone("12345"), null);
 });
+
+const calendarCall = (body: unknown, calendar: Parameters<typeof handleBotRequest>[1]["calendar"]) =>
+  handleBotRequest(
+    new Request("https://x/functions/v1/bot-api", {
+      method: "POST",
+      headers: { "x-bot-key": KEY, "content-type": "application/json", "x-forwarded-for": `10.0.1.${++ip % 250}` },
+      body: JSON.stringify(body),
+    }),
+    { botKey: KEY, leads: null, calendar, now: () => new Date("2026-10-07T08:45:00Z") },
+  );
+
+Deno.test("availability gives two times and no client data, and never guesses without the calendar", async () => {
+  const busy = {
+    id: "x", summary: "Serviço 45€ (89€) Sofá - 912 000 000 - Cliente Inventado - Rua X 1, 2780-000 Oeiras",
+    description: "Equipa: Lisboa 1", location: "", startDate: "2026-10-08", created: "", updated: "", status: "CONFIRMED",
+    start: "2026-10-08T09:00:00Z", end: "2026-10-08T11:00:00Z",
+  };
+  const res = await calendarCall({ action: "availability", city: "Oeiras", date: "2026-10-08", items: [{ kind: "sofa", qty: 1 }] },
+    () => Promise.resolve({ events: [busy] }));
+  assertEquals(res.status, 200);
+  const text = await res.text();
+  assert(!text.includes("912") && !text.includes("Inventado") && !text.includes("Rua X"), text);
+  const { availability } = JSON.parse(text);
+  assertEquals(availability.teams, ["Lisboa 1", "Lisboa 2"]);
+  assertEquals(availability.suggestion.slots.length, 2);
+
+  assertEquals((await calendarCall({ action: "availability", city: "Oeiras" }, () => Promise.resolve({ error: "O calendário veio vazio" }))).status, 502);
+  assertEquals((await calendarCall({ action: "availability", city: "Oeiras" }, null)).status, 503);
+  assertEquals((await calendarCall({ action: "availability", city: "Oeiras", date: "amanhã" }, () => Promise.resolve({ events: [] }))).status, 400);
+});
