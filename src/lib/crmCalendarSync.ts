@@ -21,11 +21,15 @@ export async function syncCalendarIntoCrm(rows: Array<SyncableRow & { phone: str
     throw new Error(data?.error ?? fnError?.message ?? "Erro ao ler o calendário");
   }
   const events = (data.events ?? []) as CalendarEvent[];
-  const plan = planCalendarSync(rows, events, { since: CALENDAR_SYNC_SINCE, now: new Date().toISOString() });
-  // Sem cidade nem código postal: telefone de um cliente anterior, depois a rua no mapa.
-  await resolveMissingRegions(rows, plan, events);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const db = supabase as any;
+  // Linhas apagadas no CRM: o evento continua no calendário, mas não volta.
+  const { data: ignoredRows, error: ignoredError } = await db.from("crm_ignored_calendar_events").select("event_id");
+  if (ignoredError) throw ignoredError;
+  const ignored = new Set<string>((ignoredRows ?? []).map((r: { event_id: string }) => r.event_id));
+  const plan = planCalendarSync(rows, events, { since: CALENDAR_SYNC_SINCE, now: new Date().toISOString(), ignored });
+  // Sem cidade nem código postal: telefone de um cliente anterior, depois a rua no mapa.
+  await resolveMissingRegions(rows, plan, events);
   if (plan.inserts.length) {
     // ignoreDuplicates: dois separadores abertos não duplicam um serviço.
     const { error } = await db.from("service_requests")

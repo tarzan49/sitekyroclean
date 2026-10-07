@@ -38,6 +38,11 @@ describe('planCalendarSync', () => {
     expect(inserts).toEqual([]);
   });
 
+  it('never recreates a row the owner deleted in the CRM while the event is still in the calendar', () => {
+    const result = planCalendarSync([], [event('e1'), event('e2')], { since, now, ignored: new Set(['e1']) });
+    expect(result.inserts.map(i => i.calendar_event_id)).toEqual(['e2']);
+  });
+
   it('never inserts an event that is already linked', () => {
     const linked = row('r1', { client_name: 'Ana', calendar_event_id: 'e1', calendar_updated_at: '2026-09-27T10:00:00+00:00' });
     expect(plan([linked], [event('e1')])).toMatchObject({ inserts: [], updates: [] });

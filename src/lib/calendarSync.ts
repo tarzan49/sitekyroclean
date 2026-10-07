@@ -17,6 +17,8 @@
 //   extra acertado depois). Nunca cria linhas: essas já foram passadas à mão.
 // - Evento que desaparece (apagado, cancelado, ou deixou de começar por
 //   "Serviço") → a linha fica marcada, nunca é apagada. Se voltar, desmarca-se.
+// - Linha apagada no CRM com o evento ainda no calendário → o evento fica em
+//   `ignored` e nunca volta a criar linha (dono, 2026-10-08).
 import {
   AD_SOURCES, adSourceFromTitle, isServiceEvent, knownPlacesFrom, parseServiceEvent,
   type CalendarEvent, type CrmLocality, type ParsedService,
@@ -80,7 +82,7 @@ const time = (iso: string | null) => (iso ? Date.parse(iso) : NaN);
 export function planCalendarSync(
   rows: SyncableRow[],
   events: CalendarEvent[],
-  { since, now }: { since: string; now: string },
+  { since, now, ignored }: { since: string; now: string; ignored?: ReadonlySet<string> },
 ): SyncPlan {
   const known = knownPlacesFrom(rows);
   const byEvent = new Map(rows.filter(r => r.calendar_event_id).map(r => [r.calendar_event_id!, r]));
@@ -89,6 +91,7 @@ export function planCalendarSync(
 
   for (const event of events) {
     if (event.status === 'CANCELLED' || !isServiceEvent(event.summary)) continue;
+    if (ignored?.has(event.id)) continue;
     const parsed = parseServiceEvent(event, known);
     if (!parsed) continue;
     if (time(event.created) < time(since)) {

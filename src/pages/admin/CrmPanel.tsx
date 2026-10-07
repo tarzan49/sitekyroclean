@@ -315,8 +315,17 @@ const CrmPanel = () => {
   const handleDelete = async (id: string) => {
     if (!confirm("Apagar este pedido definitivamente?")) return;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { error: err } = await (supabase as any).from("service_requests").delete().eq("id", id);
-    if (!err) setRecords(prev => prev.filter(r => r.id !== id));
+    const db = supabase as any;
+    // Com o evento ainda no calendário, a sincronização voltava a criar a linha.
+    const eventId = records.find(r => r.id === id)?.calendar_event_id;
+    if (eventId) {
+      const { error: ignoreErr } = await db.from("crm_ignored_calendar_events")
+        .upsert({ event_id: eventId }, { onConflict: "event_id", ignoreDuplicates: true });
+      if (ignoreErr) { alert(`Erro ao apagar: ${ignoreErr.message}`); return; }
+    }
+    const { error: err } = await db.from("service_requests").delete().eq("id", id);
+    if (err) { alert(`Erro ao apagar: ${err.message}`); return; }
+    setRecords(prev => prev.filter(r => r.id !== id));
   };
 
   /** O evento foi apagado do calendário mas o serviço aconteceu: a linha passa a ser só do CRM. */
