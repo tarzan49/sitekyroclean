@@ -48,6 +48,16 @@ describe('botQuote: the numbers the bot replies with come from the site engine',
     expect(r.lines.map(l => l.amount)).toEqual([79, 55]);
     expect([r.subtotal, r.savings, r.travel, r.total]).toEqual([134, 14, 0, 134]);
   });
+  it('returns the rug pickup fee from the site rule, by the summed area of the rugs', () => {
+    const fee = (items: unknown[]) => ok({ items, city: 'Porto' }).rugPickup?.fee;
+    expect(fee([{ kind: 'rug', width: 1, length: 2 }])).toBeNull();
+    expect(fee([{ kind: 'rug', width: 1, length: 2, qty: 2 }])).toBe(10);
+    expect(fee([{ kind: 'rug', width: 2, length: 4 }])).toBe(15);
+    expect(fee([{ kind: 'rug', width: 2, length: 3 }, { kind: 'rug', width: 2, length: 2 }])).toBe(20);
+    expect(ok({ items: [{ kind: 'carpet', width: 4, length: 5 }], city: 'Porto' }).rugPickup).toBeNull();
+    expect(ok({ items: [{ kind: 'sofa', size: '3-lugares' }], city: 'Porto' }).rugPickup).toBeNull();
+  });
+
   it('hands to the owner: rugs, corner/U-shaped/modular (id 4+-lugares), treatments on 5+ seats, 10+ chairs, unknown or case-by-case localities', () => {
     expect(ok({ items: [{ kind: 'rug', width: 2, length: 3 }], city: 'Porto' }).handToOwner).toBe(true);
     expect(ok({ items: [{ kind: 'sofa', size: '4+-lugares' }], city: 'Porto' }).handToOwner).toBe(true);

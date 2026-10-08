@@ -332,6 +332,40 @@ function calculateCustomPack(items, city) {
   };
 }
 
+// src/constants/commercialPolicy.ts
+var RESPONSE_PROMISE = "Resposta em menos de 10 minutos";
+var DRYING_PROMISE = "Secagem média de 3 a 6 horas, dependendo da ventilação, do tecido e das condições do espaço.";
+var SOFA_DRYING_RANGE = "2 a 5 horas";
+var SOFA_DRYING_PROMISE = `Secagem média de ${SOFA_DRYING_RANGE}, dependendo da ventilação, do tecido e das condições do espaço.`;
+var SATISFACTION_PROMISE = "Se não ficar satisfeito, contacte-nos até 48 horas após o serviço e repetimos a intervenção sem custos. Após esse prazo, esta garantia comercial de repetição deixa de se aplicar, sem prejuízo dos direitos legais.";
+var PRICE_PROMISE = "A simulação é uma estimativa. Confirmamos o preço com base nos artigos, medidas, tratamento e deslocação antes da marcação. O valor confirmado mantém-se para esse serviço; alterações ao pedido são orçamentadas previamente.";
+var AVAILABILITY_PROMISE = "Procuramos realizar o serviço no próprio dia ou no dia seguinte, mediante disponibilidade confirmada pela equipa.";
+var COVERAGE_PROMISE = "Equipas em Braga, Porto, Coimbra, Lisboa e Algarve, com cobertura regular do litoral entre Viana do Castelo e o Algarve. Outras localidades mediante confirmação.";
+var TREATMENT_EXTRAS = "A limpeza remove sujidade e resíduos das fibras. O tratamento anti-ácaros e a desbacterização são extras opcionais, escolhidos e orçamentados separadamente.";
+var RUG_PICKUP_MIN_AREA_M2 = 3;
+var RUG_PICKUP_RULE = `Só fazemos recolha quando os tapetes do pedido somam ${RUG_PICKUP_MIN_AREA_M2} m² ou mais; abaixo disso, a lavagem é sempre feita em sua casa.`;
+function rugPickupFee(totalAreaM2) {
+  if (!(totalAreaM2 >= RUG_PICKUP_MIN_AREA_M2)) return null;
+  if (totalAreaM2 <= 6) return 10;
+  if (totalAreaM2 < 10) return 15;
+  return 20;
+}
+var RUG_PICKUP_FEE_RULE = "A recolha e entrega, com a deslocação incluída, custa 10€ até 6 m², 15€ acima de 6 m² e 20€ a partir de 10 m², somando os tapetes do pedido.";
+var travelFees = Object.values(locationPrices);
+var TRAVEL_FEE_MIN = Math.min(...travelFees);
+var TRAVEL_FEE_MAX = Math.max(...travelFees);
+var TRAVEL_PROMISE = `A deslocação é cobrada à parte, entre ${TRAVEL_FEE_MIN}€ e ${TRAVEL_FEE_MAX}€ conforme a localidade. O valor de cada cidade aparece na respetiva página e a morada concreta é confirmada antes da marcação. Em tapetes e alcatifas, a deslocação também é sob orçamento.`;
+var SERVICE_CONDITIONS = [
+  PRICE_PROMISE,
+  TRAVEL_PROMISE,
+  SATISFACTION_PROMISE,
+  DRYING_PROMISE,
+  AVAILABILITY_PROMISE,
+  `${RESPONSE_PROMISE}.`,
+  COVERAGE_PROMISE,
+  TREATMENT_EXTRAS
+];
+
 // src/lib/botQuote.ts
 var BOT_TREATMENTS = ["clean", "clean+essencial", "clean+premium", "clean+anti-acaros", "essencial", "premium"];
 var KINDS = ["sofa", "mattress", "chairs", "rug", "carpet"];
@@ -380,6 +414,12 @@ function toItem(raw, index) {
   if ((kind === "rug" || kind === "carpet") && (!width || !length)) return fail(`items[${index}]: tapetes e alcatifas precisam de width e length em metros`);
   return { id: String(index), kind, size, qty, extra, primary, width, length };
 }
+function rugPickupFor(items) {
+  const rugs = items.filter((i) => i.kind === "rug");
+  if (!rugs.length) return null;
+  const areaM2 = Math.round(rugs.reduce((sum, i) => sum + i.qty * Number(i.width) * Number(i.length), 0) * 100) / 100;
+  return { areaM2, minAreaM2: RUG_PICKUP_MIN_AREA_M2, fee: rugPickupFee(areaM2), rule: RUG_PICKUP_FEE_RULE };
+}
 function botQuote(input) {
   if (!input || typeof input !== "object") return fail("O pedido tem de ter items e city");
   const { items: rawItems, city: rawCity } = input;
@@ -413,7 +453,8 @@ function botQuote(input) {
     travel: result.travel,
     total: result.total,
     quote: result.quote,
-    handToOwner: result.quote || city === null || extendedTrip
+    handToOwner: result.quote || city === null || extendedTrip,
+    rugPickup: rugPickupFor(items)
   };
 }
 

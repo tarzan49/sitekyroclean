@@ -15,6 +15,7 @@
 import { calculateCustomPack, type CustomPackItem, type PackExtra, type PackKind } from './customPack';
 import { sofaPrices, mattressPrices } from '../components/quiz/QuizTypes';
 import { locationPrices, EXTENDED_TRIP_CITIES } from '../constants/travel';
+import { rugPickupFee, RUG_PICKUP_FEE_RULE, RUG_PICKUP_MIN_AREA_M2 } from '../constants/commercialPolicy';
 
 export const BOT_TREATMENTS = ['clean', 'clean+essencial', 'clean+premium', 'clean+anti-acaros', 'essencial', 'premium'] as const;
 export type BotTreatment = typeof BOT_TREATMENTS[number];
@@ -76,6 +77,19 @@ function toItem(raw: unknown, index: number): CustomPackItem | Fail {
 }
 
 /**
+ * Rug pickup and delivery (owner, 5 Oct 2026), from the same function the quiz
+ * uses: summed area of the order's rugs, fee null below the minimum (washed at
+ * home only). Carpets are fixed to the floor and never picked up. Returned so
+ * the bot quotes it from the tool and its guard can check it like any price.
+ */
+function rugPickupFor(items: CustomPackItem[]) {
+  const rugs = items.filter(i => i.kind === 'rug');
+  if (!rugs.length) return null;
+  const areaM2 = Math.round(rugs.reduce((sum, i) => sum + i.qty * Number(i.width) * Number(i.length), 0) * 100) / 100;
+  return { areaM2, minAreaM2: RUG_PICKUP_MIN_AREA_M2, fee: rugPickupFee(areaM2), rule: RUG_PICKUP_FEE_RULE };
+}
+
+/**
  * `handToOwner` is true whenever the bot must not close the price itself: an
  * item "sob orçamento" (rugs, carpets, 4+ seats, 10+ chairs), a locality that
  * is not served, or one where availability is confirmed case by case.
@@ -114,5 +128,6 @@ export function botQuote(input: unknown) {
     total: result.total,
     quote: result.quote,
     handToOwner: result.quote || city === null || extendedTrip,
+    rugPickup: rugPickupFor(items),
   };
 }
