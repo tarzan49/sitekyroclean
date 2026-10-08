@@ -534,6 +534,7 @@ var MINUTES = { sofa: 60, mattress: 45, chair: 10, rugPerM2: 4, waterproofing: 2
 var TRAVEL_MARGIN_MIN = 30;
 var EARLIEST_HOUR = 10;
 var DAY_END_HOUR = 21;
+var LAST_OFFER_HOUR = 18;
 var LEAD_TIME_MIN = 90;
 var DEFAULT_DAYS = 4;
 var MAX_DAYS = 14;
@@ -706,7 +707,7 @@ function botAvailability(req, events, now) {
   const slots = [];
   for (const date of dayOrder) {
     const label = dayLabel(date, today);
-    for (let m = EARLIEST_HOUR * 60; m + durationMin <= DAY_END_HOUR * 60; m += 60) {
+    for (let m = EARLIEST_HOUR * 60; m <= LAST_OFFER_HOUR * 60 && m + durationMin <= DAY_END_HOUR * 60; m += 60) {
       const from = lisbonToUtc(date, m);
       if (from < earliestToday) continue;
       const st = slotState(busy, teams, area, from, from + durationMin * 6e4);

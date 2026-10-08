@@ -14,7 +14,7 @@
  *   without a team busies one of the teams of its region;
  * - each article takes its real time (sofa 1h, mattress 45 min, chair 10 min,
  *   rug 4 min per m², waterproofing +20 min), plus a margin for the drive;
- * - teams work every day until 21h, and the bot never offers before 10h;
+ * - teams work every day until 21h, and the bot never offers before 10h or after 18h;
  * - two times, near the team's other jobs that day when possible.
  * Aveiro and the Alentejo Litoral are "sob consulta", and Coimbra and Figueira
  * da Foz have no team calendar: those go to the owner, with no hours.
@@ -54,6 +54,8 @@ const MINUTES = { sofa: 60, mattress: 45, chair: 10, rugPerM2: 4, waterproofing:
 export const TRAVEL_MARGIN_MIN = 30;
 export const EARLIEST_HOUR = 10;
 export const DAY_END_HOUR = 21;
+/** Latest start the bot offers on its own (owner, 8 Oct 2026: nobody books 20h). A time the client asks for is still checked up to DAY_END_HOUR. */
+export const LAST_OFFER_HOUR = 18;
 /** A time today has to be at least this far from now. */
 const LEAD_TIME_MIN = 90;
 const DEFAULT_DAYS = 4;
@@ -277,7 +279,7 @@ export function botAvailability(req: AvailabilityRequest, events: AvailabilityEv
   const slots: Slot[] = [];
   for (const date of dayOrder) {
     const label = dayLabel(date, today);
-    for (let m = EARLIEST_HOUR * 60; m + durationMin <= DAY_END_HOUR * 60; m += 60) {
+    for (let m = EARLIEST_HOUR * 60; m <= LAST_OFFER_HOUR * 60 && m + durationMin <= DAY_END_HOUR * 60; m += 60) {
       const from = lisbonToUtc(date, m);
       if (from < earliestToday) continue;
       const st = slotState(busy, teams, area, from, from + durationMin * 60_000);
