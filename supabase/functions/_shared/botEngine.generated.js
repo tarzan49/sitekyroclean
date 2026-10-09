@@ -187,19 +187,19 @@ function priceWithPackPerks(lines, mainKind = lines[0]?.kind) {
     if (line.kind === "rug") return { ...table, perkNote: PACK_PERK_RUG_NOTE };
     if (line.tablePrice === null) return table;
     const treatment = line.treatment ?? "none";
-    let amount = line.tablePrice;
+    let amount2 = line.tablePrice;
     if (line.kind === "sofa" && treatment === "none" && line.sizeId && PACK_PERK_SOFA_PRICE[line.sizeId] !== void 0) {
-      amount = PACK_PERK_SOFA_PRICE[line.sizeId] * line.qty;
+      amount2 = PACK_PERK_SOFA_PRICE[line.sizeId] * line.qty;
     } else if (line.kind === "mattress" && (treatment === "none" || treatment === "anti-acaros")) {
-      amount = line.tablePrice - PACK_PERK_MATTRESS_OFF * line.qty;
+      amount2 = line.tablePrice - PACK_PERK_MATTRESS_OFF * line.qty;
     } else if (line.kind === "chairs" && treatment === "none") {
-      amount = perkChairsPrice(line.tablePrice, line.qty);
+      amount2 = perkChairsPrice(line.tablePrice, line.qty);
     }
-    amount = round2(amount);
-    const perkApplied = amount < line.tablePrice;
+    amount2 = round2(amount2);
+    const perkApplied = amount2 < line.tablePrice;
     const free = perkChairsFree(line.qty);
     const perkNote = !perkApplied ? null : line.kind === "chairs" ? `${free} oferecida${free > 1 ? "s" : ""}` : "preço de pack";
-    return { ...table, amount, perkApplied, perkNote };
+    return { ...table, amount: amount2, perkApplied, perkNote };
   });
   return { lines: results, tableSubtotal, eligible };
 }
@@ -269,33 +269,33 @@ var PERK_TREATMENT = { none: "none", premium: "waterproofing", essencial: "water
 function customPackLine(item) {
   const options = item.kind === "sofa" ? sofaPrices : mattressPrices;
   const option = options.find((p) => p.id === item.size);
-  let amount = null;
+  let amount2 = null;
   const size = item.kind === "rug" || item.kind === "carpet" ? `${item.width} × ${item.length} m` : item.kind === "chairs" ? `${item.qty} unidades` : option?.label ?? "Tamanho a confirmar";
   const waterproofingOnly = item.primary === "waterproofing" && (item.extra === "premium" || item.extra === "essencial") && (item.kind === "sofa" || item.kind === "chairs");
   if (waterproofingOnly && item.kind === "chairs") {
-    amount = (item.extra === "premium" ? calcChairWaterproofPremium(item.qty) : calcChairWaterproof(item.qty)) ?? null;
+    amount2 = (item.extra === "premium" ? calcChairWaterproofPremium(item.qty) : calcChairWaterproof(item.qty)) ?? null;
   } else if (waterproofingOnly && option) {
     const unit = calcSofaUnitPrice(option, false, "waterproofing", item.extra === "premium" ? "premium" : "essencial", false);
-    amount = unit === null ? null : unit * item.qty;
+    amount2 = unit === null ? null : unit * item.qty;
   } else if (item.kind === "chairs") {
-    amount = calcChairClean(item.qty);
-    if (amount !== null) {
-      if (item.extra === "premium") amount += calcChairWaterproofPremium(item.qty) ?? 0;
-      if (item.extra === "essencial") amount += calcChairWaterproof(item.qty) ?? 0;
-      if (item.extra === "anti-acaros") amount += chairAntiAcarosTotal(item.qty) ?? 0;
+    amount2 = calcChairClean(item.qty);
+    if (amount2 !== null) {
+      if (item.extra === "premium") amount2 += calcChairWaterproofPremium(item.qty) ?? 0;
+      if (item.extra === "essencial") amount2 += calcChairWaterproof(item.qty) ?? 0;
+      if (item.extra === "anti-acaros") amount2 += chairAntiAcarosTotal(item.qty) ?? 0;
     }
   } else if (item.kind === "sofa" && option) {
     const unit = calcSofaUnitPrice(option, item.extra !== "none", "cleaning", item.extra === "premium" ? "premium" : "essencial", item.extra === "anti-acaros");
-    amount = unit === null ? null : unit * item.qty;
+    amount2 = unit === null ? null : unit * item.qty;
   } else if (item.kind === "mattress" && option) {
     const unit = calcMattressUnitPrice(option, item.extra === "anti-acaros", "cleaning");
-    amount = unit === null ? null : unit * item.qty;
+    amount2 = unit === null ? null : unit * item.qty;
   }
   return {
     label: `${PACK_KIND_LABEL[item.kind]} · ${size}${item.kind !== "chairs" ? ` · ${item.qty} un.` : ""} · ${waterproofingOnly ? `Só impermeabilização ${item.extra === "premium" ? "Premium (até 10 anos)" : "Essencial (1 a 2 anos)"}` : EXTRA_LABEL[item.extra]}`,
-    amount,
-    tablePrice: amount,
-    quote: amount === null
+    amount: amount2,
+    tablePrice: amount2,
+    quote: amount2 === null
   };
 }
 function calculateCustomPack(items, city) {
@@ -822,10 +822,45 @@ function planBotHold(req, events, now, ownEventId) {
   ].filter(Boolean).join("\n");
   return { ok: true, event: { title, description, start: slot.start, end: slot.end }, slot: { date: slot.date, time: slot.time, durationMin: availability.durationMin } };
 }
+var OWNER_BOOKING_PREFIX = "A confirmar · ";
+var digitsOf = (t) => t.replace(/\D/g, "");
+var amount = (v) => typeof v === "number" && Number.isFinite(v) && v > 0 && v < 1e4 ? Math.round(v * 100) / 100 : null;
+var ownerShare = (total) => Math.ceil(total / 2);
+function planOwnerBooking(req, events) {
+  if (!req || typeof req !== "object") return { error: "O pedido tem de ser um objeto" };
+  const r = req;
+  const conversationId = text(r.conversationId, MAX.conversationId);
+  if (!conversationId) return { error: "conversationId em falta" };
+  if (typeof r.date !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(r.date)) return { error: "date tem de ser AAAA-MM-DD" };
+  const minutes = parseTime(r.time);
+  if (minutes === null) return { error: "time inválido" };
+  const service = text(r.service, 160);
+  if (!service) return { error: "service em falta" };
+  const durationRaw = Number(r.durationMin);
+  const durationMin = Number.isFinite(durationRaw) && durationRaw >= 30 && durationRaw <= 480 ? Math.ceil(durationRaw / 15) * 15 : 60;
+  const phone = text(r.phone, MAX.phone);
+  const key9 = digitsOf(phone).slice(-9);
+  if (key9.length === 9) {
+    const same = events.find((e) => e.start && lisbon(Date.parse(e.start)).date === r.date && /^\s*servi[cç]o\b/i.test(e.summary) && digitsOf(`${e.summary} ${e.description}`).includes(key9));
+    if (same) return { ok: false, exists: true, summary: same.summary };
+  }
+  const total = amount(r.total);
+  const money = total === null ? "?€ (?€)" : `${formatAmount(ownerShare(total))}€ (${formatAmount(total)}€)`;
+  const parts = [`${OWNER_BOOKING_PREFIX}Serviço ${money}${r.fromAds === true ? " (anúncio)" : ""} ${service}`, phone, text(r.name, MAX.name), text(r.address, MAX.address)].filter(Boolean);
+  const start = lisbonToUtc(r.date, minutes);
+  const description = [
+    'Preparado a partir da conversa do WhatsApp depois de "fica agendado". Confere e apaga "A confirmar · " do título para confirmar (entra no CRM e vai para a equipa).',
+    text(r.notes, 600),
+    `bot:${conversationId}`
+  ].filter(Boolean).join("\n\n");
+  return { ok: true, event: { title: parts.join(" - "), description, start: new Date(start).toISOString(), end: new Date(start + durationMin * 6e4).toISOString() } };
+}
+var formatAmount = (n) => Number.isInteger(n) ? String(n) : n.toFixed(2).replace(".", ",").replace(/,?0+$/, "");
 export {
   botAvailability,
   botQuote,
   listBotCities,
   planBotHold,
+  planOwnerBooking,
   resolveBotCity
 };

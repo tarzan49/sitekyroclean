@@ -21,6 +21,10 @@
 //               owner's calendar through his Apps Script (BOT_HOLD_URL +
 //               BOT_HOLD_KEY, ReservasBot.gs); one per conversationId, moved
 //               when the client changes the time. Only times go back.
+//   owner-booking the owner wrote "fica agendado" in a chat (2026-10-09): the bot
+//               server sends what it read from the chat and this writes
+//               "A confirmar · Serviço …" in his calendar (same Apps Script),
+//               unless he already has a "Serviço" for that phone that day.
 //   follow-ups, client-plan, log-touch, log-message
 //               client follow-up (2026-10-06): who to write to now and what to
 //               say, the plan for whoever is writing, and the log of what was
@@ -31,7 +35,7 @@
 // Documented for the bot developer in the owner's "4-acessos-para-o-bot".
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import { botAvailability, botQuote, listBotCities, planBotHold } from "../_shared/botEngine.generated.js";
+import { botAvailability, botQuote, listBotCities, planBotHold, planOwnerBooking } from "../_shared/botEngine.generated.js";
 import { parseIcs, type CalendarEvent } from "../_shared/ics.ts";
 import { clientPlan, listFollowUps, logMessage, logTouch, type FollowUpStore } from "./followUps.ts";
 import { checkRateLimit, getClientIP, getRateLimitHeaders } from "../_shared/rate-limit.ts";
@@ -258,6 +262,9 @@ export async function handleBotRequest(req: Request, env: BotEnv): Promise<Respo
       const result = botAvailability(body, await withRecentHolds(cal.events, env.holds, now), now);
       return "error" in result ? createErrorResponse(String(result.error), 400) : createSuccessResponse({ availability: result });
     }
+    case "owner-booking":
+      if (!env.calendar || !env.holds || !env.writeCalendar) return createErrorResponse("Pré-reservas por ligar", 503);
+      return await ownerBooking(body, env);
     case "hold":
     case "release":
       if (!env.calendar || !env.holds || !env.writeCalendar) return createErrorResponse("Pré-reservas por ligar", 503);
@@ -274,7 +281,7 @@ export async function handleBotRequest(req: Request, env: BotEnv): Promise<Respo
       return await logMessage(body, env.followUps, now);
     }
     default:
-      return createErrorResponse("action tem de ser quote, cities, availability, hold, release, find-order, create-lead, follow-ups, client-plan, log-touch ou log-message", 400);
+      return createErrorResponse("action tem de ser quote, cities, availability, hold, release, owner-booking, find-order, create-lead, follow-ups, client-plan, log-touch ou log-message", 400);
   }
 }
 
@@ -305,6 +312,33 @@ async function holdSlot(body: Row, env: BotEnv): Promise<Response> {
   if (saveError) safeLog("warn", "bot hold written but not saved", { error: saveError });
   calendarCache = null;
   return createSuccessResponse({ hold: { ok: true, slot: plan.slot, moved: !!live } });
+}
+
+async function ownerBooking(body: Row, env: BotEnv): Promise<Response> {
+  const conversationId = typeof body.conversationId === "string" ? body.conversationId.trim() : "";
+  if (!conversationId) return createErrorResponse("conversationId em falta", 400);
+  const cal = await env.calendar!();
+  if ("error" in cal) return createErrorResponse(cal.error, 502);
+  const plan = planOwnerBooking(body, cal.events);
+  if ("error" in plan) return createErrorResponse(String(plan.error), 400);
+  if (!plan.ok || !plan.event) return createSuccessResponse({ booking: { ok: false, exists: true } });
+  const event = plan.event;
+  const existing = await env.holds!.get(conversationId);
+  const live = existing && !("error" in existing) && !existing.released_at ? existing : null;
+  // Same conversation: the bot's own "Pré-reserva" (or an earlier "A confirmar") becomes this one.
+  const written = await env.writeCalendar!({ action: "hold", conversationId, eventId: live?.event_id ?? null, ...event });
+  if (!written.ok || !written.eventId) {
+    const detail = written.ok ? "sem eventId" : written.error;
+    return createErrorResponse(`Não foi possível escrever no calendário (${detail.slice(0, 200)})`, 502);
+  }
+  const now = env.now?.() ?? new Date();
+  const saveError = await env.holds!.save({
+    conversation_id: conversationId, event_id: written.eventId, title: event.title,
+    starts_at: event.start, ends_at: event.end, updated_at: now.toISOString(), released_at: null,
+  });
+  if (saveError) safeLog("warn", "owner booking written but not saved", { error: saveError });
+  calendarCache = null;
+  return createSuccessResponse({ booking: { ok: true, start: event.start, moved: !!live } });
 }
 
 async function releaseSlot(body: Row, env: BotEnv): Promise<Response> {

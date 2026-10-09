@@ -127,12 +127,12 @@ export function visitMinutes(items: unknown): number {
 const lisbonParts = new Intl.DateTimeFormat('en-CA', {
   timeZone: 'Europe/Lisbon', hourCycle: 'h23', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit',
 });
-function lisbon(ms: number) {
+export function lisbon(ms: number) {
   const p = Object.fromEntries(lisbonParts.formatToParts(new Date(ms)).map(x => [x.type, x.value]));
   return { date: `${p.year}-${p.month}-${p.day}`, minutes: Number(p.hour) * 60 + Number(p.minute) };
 }
 /** UTC ms of a Lisbon wall-clock time. */
-function lisbonToUtc(date: string, minutes: number): number {
+export function lisbonToUtc(date: string, minutes: number): number {
   const [y, m, d] = date.split('-').map(Number);
   const wall = Date.UTC(y, m - 1, d, 0, minutes);
   let t = wall;
@@ -221,7 +221,7 @@ export type AvailabilityResult =
     };
 
 const DATE = /^\d{4}-\d{2}-\d{2}$/;
-function parseTime(v: unknown): number | null {
+export function parseTime(v: unknown): number | null {
   const m = /^(\d{1,2})(?:[:h](\d{2})?)?h?$/i.exec(String(v ?? '').trim());
   if (!m) return null;
   const h = Number(m[1]), min = Number(m[2] ?? 0);

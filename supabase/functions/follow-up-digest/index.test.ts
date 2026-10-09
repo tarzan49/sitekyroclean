@@ -78,7 +78,7 @@ Deno.test("pending bot pre-bookings go on top of the email and count", async () 
   assertEquals(withHolds(base, []), base);
   const d = withHolds(base, [{ title: "Pré-reserva – Cliente Inventado – Porto – Sofá – 89€", starts_at: "2026-10-21T14:00:00Z" }]);
   assertEquals(d.count, 1);
-  assertEquals(d.subject, "Kyro · 1 pré-reserva do bot por confirmar");
-  assertEquals(d.html.startsWith("<h3>Pré-reservas do bot por confirmar (1)</h3>"), true);
+  assertEquals(d.subject, "Kyro · 1 marcação por confirmar");
+  assertEquals(d.html.startsWith("<h3>Pré-reservas e marcações por confirmar (1)</h3>"), true);
   assertStringIncludes(d.text, "15:00 · Pré-reserva – Cliente Inventado");
 });

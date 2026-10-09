@@ -26,7 +26,8 @@
  *     apaga a pré-reserva, só se o título ainda começar por "Pré-reserva".
  */
 
-const PRE_RESERVA = /^pr[ée]-?\s?reserva\b/i;
+// "A confirmar": o evento preparado depois de o dono escrever "fica agendado" (2026-10-09).
+const PRE_RESERVA = /^(pr[ée]-?\s?reserva|a confirmar)\b/i;
 
 function doPost(e) {
   let pedido;
@@ -55,7 +56,7 @@ function escreverPreReserva(p) {
   const inicio = new Date(p.start), fim = new Date(p.end);
   if (isNaN(inicio) || isNaN(fim) || fim <= inicio) return { ok: false, error: 'start/end inválidos' };
   const titulo = String(p.title || '');
-  if (!PRE_RESERVA.test(titulo)) return { ok: false, error: 'o título tem de começar por "Pré-reserva"' };
+  if (!PRE_RESERVA.test(titulo)) return { ok: false, error: 'o título tem de começar por "Pré-reserva" ou "A confirmar"' };
   const descricao = String(p.description || '').slice(0, 4000);
   const calendario = CalendarApp.getDefaultCalendar();
   const antigo = (p.eventId && eventoPorId(calendario, p.eventId)) || preReservaDaConversa(calendario, p.conversationId);

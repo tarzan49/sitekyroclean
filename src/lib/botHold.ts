@@ -13,7 +13,7 @@
  * The title carries the served town ("… – Porto – …"), which is how
  * botAvailability gives an event without a team its region.
  */
-import { botAvailability, type AvailabilityEvent } from './botAvailability';
+import { botAvailability, lisbon, lisbonToUtc, parseTime, type AvailabilityEvent } from './botAvailability';
 import { botQuote } from './botQuote';
 
 const MAX = { name: 80, phone: 30, address: 200, conversationId: 120, note: 300 } as const;
@@ -74,3 +74,61 @@ export function planBotHold(req: unknown, events: (AvailabilityEvent & { id?: st
   ].filter(Boolean).join('\n');
   return { ok: true, event: { title, description, start: slot.start, end: slot.end }, slot: { date: slot.date, time: slot.time, durationMin: availability.durationMin } };
 }
+
+/**
+ * The owner's own booking (dono, 2026-10-09: "prepara-me o evento quando
+ * escrevo fica agendado"). The bot server reads the chat after he writes "fica
+ * agendado" and sends what it found; this checks it and builds the event:
+ * his own title format with "A confirmar · " in front, so it reaches neither
+ * the CRM nor the teams until he deletes the prefix, but already busies the
+ * time for the bot. Nothing is written when he already has a "Serviço" for
+ * that phone on that day (he booked it himself, or another session did).
+ */
+export const OWNER_BOOKING_PREFIX = 'A confirmar · ';
+
+export type OwnerBookingResult =
+  | { ok: true; event: { title: string; description: string; start: string; end: string } }
+  | { ok: false; exists: true; summary: string }
+  | { error: string };
+
+const digitsOf = (t: string) => t.replace(/\D/g, '');
+const amount = (v: unknown) => (typeof v === 'number' && Number.isFinite(v) && v > 0 && v < 10_000 ? Math.round(v * 100) / 100 : null);
+
+/** Owner share = half the total, a ",5" rounded up (owner, 6 Oct 2026: 119€ → 60€). */
+export const ownerShare = (total: number) => Math.ceil(total / 2);
+
+export function planOwnerBooking(req: unknown, events: (AvailabilityEvent & { id?: string })[]): OwnerBookingResult {
+  if (!req || typeof req !== 'object') return { error: 'O pedido tem de ser um objeto' };
+  const r = req as Record<string, unknown>;
+  const conversationId = text(r.conversationId, MAX.conversationId);
+  if (!conversationId) return { error: 'conversationId em falta' };
+  if (typeof r.date !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(r.date)) return { error: 'date tem de ser AAAA-MM-DD' };
+  const minutes = parseTime(r.time);
+  if (minutes === null) return { error: 'time inválido' };
+  const service = text(r.service, 160);
+  if (!service) return { error: 'service em falta' };
+  const durationRaw = Number(r.durationMin);
+  const durationMin = Number.isFinite(durationRaw) && durationRaw >= 30 && durationRaw <= 480 ? Math.ceil(durationRaw / 15) * 15 : 60;
+  const phone = text(r.phone, MAX.phone);
+  const key9 = digitsOf(phone).slice(-9);
+
+  if (key9.length === 9) {
+    const same = events.find(e => e.start && lisbon(Date.parse(e.start)).date === r.date
+      && /^\s*servi[cç]o\b/i.test(e.summary)
+      && digitsOf(`${e.summary} ${e.description}`).includes(key9));
+    if (same) return { ok: false, exists: true, summary: same.summary };
+  }
+
+  const total = amount(r.total);
+  const money = total === null ? '?€ (?€)' : `${formatAmount(ownerShare(total))}€ (${formatAmount(total)}€)`;
+  const parts = [`${OWNER_BOOKING_PREFIX}Serviço ${money}${r.fromAds === true ? ' (anúncio)' : ''} ${service}`, phone, text(r.name, MAX.name), text(r.address, MAX.address)].filter(Boolean);
+  const start = lisbonToUtc(r.date, minutes);
+  const description = [
+    'Preparado a partir da conversa do WhatsApp depois de "fica agendado". Confere e apaga "A confirmar · " do título para confirmar (entra no CRM e vai para a equipa).',
+    text(r.notes, 600),
+    `bot:${conversationId}`,
+  ].filter(Boolean).join('\n\n');
+  return { ok: true, event: { title: parts.join(' - '), description, start: new Date(start).toISOString(), end: new Date(start + durationMin * 60_000).toISOString() } };
+}
+
+const formatAmount = (n: number) => (Number.isInteger(n) ? String(n) : n.toFixed(2).replace('.', ',').replace(/,?0+$/, ''));

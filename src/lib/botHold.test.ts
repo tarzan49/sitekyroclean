@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { planBotHold, type BotHoldPlan } from './botHold';
+import { planBotHold, planOwnerBooking, type BotHoldPlan } from './botHold';
 import { botAvailability, eventRegion, type AvailabilityEvent } from './botAvailability';
 
 // Wednesday 7 Oct 2026, 09:45 in Portugal. Invented data only: the repo is public.
@@ -54,5 +54,31 @@ describe('planBotHold', () => {
     expect(p.event.title).toMatch(/– sob orçamento$/);
     expect(p.event.title).toContain('Rui Teste');
     expect(p.event.description).toContain('Recolha e entrega: 10€');
+  });
+});
+
+describe('planOwnerBooking', () => {
+  const base = { conversationId: 'c9', date: '2026-10-12', time: '15h', service: 'Recolha de 2 tapetes (2x3)', total: 159, phone: '+351 900 000 001', name: 'Cliente Inventado', address: 'Rua Inventada 1, Oeiras' };
+  it('builds his own title with "A confirmar · " in front, share rounded up, Lisbon time', () => {
+    const p = planOwnerBooking(base, []);
+    if (!('ok' in p) || !p.ok) throw new Error(JSON.stringify(p));
+    expect(p.event.title).toBe('A confirmar · Serviço 80€ (159€) Recolha de 2 tapetes (2x3) - +351 900 000 001 - Cliente Inventado - Rua Inventada 1, Oeiras');
+    expect(p.event.start).toBe('2026-10-12T14:00:00.000Z');
+    expect(p.event.description).toContain('bot:c9');
+    // Neither the CRM nor the team script treat it as a service; availability does count it.
+    expect(eventRegion({ summary: p.event.title, description: '', status: 'CONFIRMED', start: p.event.start, end: p.event.end })).toBe('Lisboa');
+  });
+  it('unknown total keeps his "?€ (?€)" and the ads mark goes before the service', () => {
+    const p = planOwnerBooking({ ...base, total: null, fromAds: true }, []);
+    expect('ok' in p && p.ok && p.event.title).toBe('A confirmar · Serviço ?€ (?€) (anúncio) Recolha de 2 tapetes (2x3) - +351 900 000 001 - Cliente Inventado - Rua Inventada 1, Oeiras');
+  });
+  it('writes nothing when he already has a Serviço for that phone that day', () => {
+    const mine: AvailabilityEvent = { summary: 'Serviço ?€ (?€) Recolha de tapete - +351 900 000 001 - Cliente', description: '', status: 'CONFIRMED', start: '2026-10-12T14:00:00Z', end: '2026-10-12T14:30:00Z' };
+    expect(planOwnerBooking(base, [mine])).toMatchObject({ ok: false, exists: true });
+    expect(planOwnerBooking({ ...base, date: '2026-10-13' }, [mine])).toMatchObject({ ok: true });
+  });
+  it('checks its input', () => {
+    expect(planOwnerBooking({ ...base, time: 'amanhã' }, [])).toHaveProperty('error');
+    expect(planOwnerBooking({ ...base, service: '' }, [])).toHaveProperty('error');
   });
 });

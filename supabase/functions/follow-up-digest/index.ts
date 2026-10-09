@@ -134,10 +134,10 @@ const escapeHtml = (t: string) => t.replace(/&/g, "&amp;").replace(/</g, "&lt;")
 export function withHolds<T extends { subject: string; html: string; text: string; count: number }>(digest: T, holds: PendingHold[]): T {
   if (!holds.length) return digest;
   const lines = holds.map(h => `${WHEN.format(new Date(h.starts_at))} · ${h.title}`);
-  const title = `Pré-reservas do bot por confirmar (${holds.length})`;
+  const title = `Pré-reservas e marcações por confirmar (${holds.length})`;
   const html = `<h3>${title}</h3><p>Confirma no calendário (muda o título para "Serviço X€ (Y€) …") ou apaga.</p><ul>${lines.map(l => `<li>${escapeHtml(l)}</li>`).join("")}</ul>${digest.html}`;
   const text = `${title}\nConfirma no calendário (muda o título para "Serviço X€ (Y€) …") ou apaga.\n${lines.map(l => `- ${l}`).join("\n")}\n\n${digest.text}`;
-  const subject = digest.count === 0 ? `Kyro · ${holds.length} pré-reserva${holds.length > 1 ? "s" : ""} do bot por confirmar` : digest.subject;
+  const subject = digest.count === 0 ? `Kyro · ${holds.length} marcaç${holds.length > 1 ? "ões" : "ão"} por confirmar` : digest.subject;
   return { ...digest, subject, html, text, count: digest.count + holds.length };
 }
 
@@ -181,7 +181,7 @@ function supabaseStore(): DigestStore | null {
         return (data as (PendingHold & { event_id: string; updated_at: string })[]).filter(h => {
           const e = byId.get(h.event_id);
           // Fora do endereço iCal: escrita há menos de um dia é atraso da Google (fica); mais antiga, foi apagada.
-          return !e ? Date.now() - new Date(h.updated_at).getTime() < 86_400_000 : /^pr[ée]-?\s?reserva\b/i.test(e.summary) && e.status !== "CANCELLED";
+          return !e ? Date.now() - new Date(h.updated_at).getTime() < 86_400_000 : /^(pr[ée]-?\s?reserva|a confirmar)\b/i.test(e.summary) && e.status !== "CANCELLED";
         });
       } catch {
         return data as PendingHold[];
