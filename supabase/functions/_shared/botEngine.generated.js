@@ -575,6 +575,8 @@ var TEAMS_BY_REGION = {
   Algarve: ["Algarve"]
 };
 var ALL_TEAMS = Object.values(TEAMS_BY_REGION).flat();
+var TEAM_CAPACITY = { "Porto 1": 2, "Lisboa 1": 2 };
+var capacity = (team) => TEAM_CAPACITY[team] ?? 1;
 var AREA_REGION = {
   porto: "Porto",
   braga: "Braga",
@@ -704,10 +706,26 @@ function busyIntervals(events) {
 function slotState(busy, teams, region, from, to) {
   const margin = TRAVEL_MARGIN_MIN * 6e4;
   const overlaps = (b) => b.from < to + margin && b.to > from - margin;
-  const teamsFree = teams.filter((t) => !busy.some((b) => b.team === t && overlaps(b)));
+  const spare = (t) => capacity(t) - busy.filter((b) => b.team === t && overlaps(b)).length;
+  const teamsFree = teams.filter((t) => spare(t) > 0);
   const unassigned = busy.filter((b) => !b.team && b.region === region && overlaps(b)).length;
   const near = (t) => busy.some((b) => b.team === t && (from - b.to >= 0 && from - b.to <= 90 * 6e4 || b.from - to >= 0 && b.from - to <= 90 * 6e4));
-  return { free: teamsFree.length - unassigned >= 1, teamsFree, nearOtherJob: teamsFree.some(near) };
+  const room = teamsFree.reduce((n, t) => n + spare(t), 0);
+  return { free: room - unassigned >= 1, teamsFree, nearOtherJob: teamsFree.some(near), nearTeams: teamsFree.filter(near) };
+}
+function chooseTeam(events, city, startIso, endIso) {
+  const name = resolveBotCity(city);
+  const area = name ? CITY_REGION.get(fold2(name)) : void 0;
+  if (!area || area === "coimbra") return null;
+  const from = Date.parse(startIso), to = Date.parse(endIso);
+  if (!Number.isFinite(from) || !(to > from)) return null;
+  const busy = busyIntervals(events);
+  const st = slotState(busy, TEAMS_BY_REGION[area], area, from, to);
+  if (!st.free) return null;
+  const day = lisbon(from).date;
+  const jobsThatDay = (t) => busy.filter((b) => b.team === t && lisbon(b.from).date === day).length;
+  const order = TEAMS_BY_REGION[area];
+  return [...st.teamsFree].sort((a, b) => Number(st.nearTeams.includes(b)) - Number(st.nearTeams.includes(a)) || jobsThatDay(a) - jobsThatDay(b) || order.indexOf(a) - order.indexOf(b))[0] ?? null;
 }
 var DATE = /^\d{4}-\d{2}-\d{2}$/;
 function parseTime(v) {
@@ -869,10 +887,53 @@ function planOwnerBooking(req, events) {
   return { ok: true, event: { title: parts.join(" - "), description, start: new Date(start).toISOString(), end: new Date(start + durationMin * 6e4).toISOString() } };
 }
 var formatAmount = (n) => Number.isInteger(n) ? String(n) : n.toFixed(2).replace(".", ",").replace(/,?0+$/, "");
+var TEAM_COLOR = { "Porto 1": "9", "Porto 2": "7", Braga: "10", "Lisboa 1": "6", "Lisboa 2": "3", Algarve: "5" };
+var AD_MARK = { google: " (anúncio)", facebook: " (anúncio facebook)", instagram: " (anúncio instagram)" };
+var isWeekend = (date) => [0, 6].includes((/* @__PURE__ */ new Date(`${date}T12:00:00Z`)).getUTCDay());
+function planBotBooking(req, events, now, ownEventId) {
+  if (!req || typeof req !== "object") return { error: "O pedido tem de ser um objeto" };
+  const r = req;
+  const conversationId = text(r.conversationId, MAX.conversationId);
+  if (!conversationId) return { error: "conversationId em falta" };
+  if (typeof r.date !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(r.date) || typeof r.time !== "string") return { error: 'date (AAAA-MM-DD) e time ("15h") são obrigatórios' };
+  if (isWeekend(r.date)) return { ok: false, weekend: true };
+  const name = text(r.name, MAX.name), address = text(r.address, MAX.address), phone = text(r.phone, MAX.phone);
+  const missing = [!name && "nome", address.length < 8 && "morada completa"].filter((m) => !!m);
+  if (missing.length) return { ok: false, missing };
+  const others = ownEventId ? events.filter((e) => e.id !== ownEventId) : events;
+  const key9 = digitsOf(phone).slice(-9);
+  if (key9.length === 9 && others.some((e) => e.start && lisbon(Date.parse(e.start)).date === r.date && /^\s*servi[cç]o\b/i.test(e.summary) && digitsOf(`${e.summary} ${e.description}`).includes(key9))) return { ok: false, exists: true };
+  const availability = botAvailability({ city: r.city, items: r.items, date: r.date, time: r.time }, others, now);
+  if ("error" in availability) return { error: String(availability.error) };
+  if (availability.handToOwner && !availability.requested) return { ok: false, handToOwner: availability.handToOwner };
+  const slot = availability.requested;
+  if (!slot) return { error: "time inválido" };
+  if (!slot.free) return { ok: false, taken: true, alternatives: availability.suggestion };
+  const quote = botQuote({ items: r.items, city: r.city });
+  if ("error" in quote) return { error: String(quote.error) };
+  if (quote.quote || !(quote.total > 0)) return { ok: false, handToOwner: "sob orçamento: o responsável dá o valor e marca" };
+  const team = chooseTeam(others, r.city, slot.start, slot.end);
+  if (!team) return { ok: false, taken: true, alternatives: availability.suggestion };
+  const pickupFee = quote.rugPickup?.fee != null && r.rugPickup === true ? quote.rugPickup.fee : 0;
+  const what = quote.lines.map((l) => l.label).join(" + ");
+  const service = text(r.service, 120) || what;
+  const ad = typeof r.adOrigin === "string" ? AD_MARK[r.adOrigin] ?? "" : "";
+  const phoneOut = /^351\d{9}$/.test(digitsOf(phone)) ? digitsOf(phone).slice(3) : phone;
+  const title = [`Serviço ${formatAmount(ownerShare(quote.total, pickupFee))}€ (${formatAmount(quote.total)}€)${ad} ${service}`, phoneOut, name, address].filter(Boolean).join(" - ");
+  const description = [
+    `Marcado pelo bot do WhatsApp numa vaga livre, equipa ${team} (escolhida pelo bot; muda a cor para trocar).`,
+    `Artigos: ${what}`,
+    `Total: ${euro(quote.total)} (deslocação incluída)`,
+    text(r.note, MAX.note) ? `Nota: ${text(r.note, MAX.note)}` : "",
+    `bot:${conversationId}`
+  ].filter(Boolean).join("\n");
+  return { ok: true, team, event: { title, description, start: slot.start, end: slot.end, colorId: TEAM_COLOR[team] }, slot: { date: slot.date, time: slot.time, durationMin: availability.durationMin } };
+}
 export {
   botAvailability,
   botQuote,
   listBotCities,
+  planBotBooking,
   planBotHold,
   planOwnerBooking,
   resolveBotCity

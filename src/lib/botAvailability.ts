@@ -8,7 +8,9 @@
  * The rules are the owner's, from the bot briefing (section 3, "Marcar de forma
  * inteligente") and the replies file (2.6, 2.12):
  * - the client's locality says which teams work there (Porto 1 and 2, Braga,
- *   Lisboa 1 and 2, Algarve); a time is free if at least one of them is free;
+ *   Lisboa 1 and 2, Algarve); a time is free if at least one of them is free.
+ *   Porto 1 and Lisboa 1 are two people who can each take a job at the same time
+ *   (owner, 9 Oct 2026), so they count as free until they have two;
  * - a service with "Equipa: X" in the description (written by the team-calendar
  *   script) busies that team; a service, "Pré-reserva" or "A confirmar" still
  *   without a team busies one of the teams of its region;
@@ -44,6 +46,9 @@ export const TEAMS_BY_REGION: Record<CrmLocality, readonly string[]> = {
   Algarve: ['Algarve'],
 };
 const ALL_TEAMS = Object.values(TEAMS_BY_REGION).flat();
+/** Jobs a team can do at the same time (owner, 9 Oct 2026: "a porto 1 tem duas pessoas e a lisboa 1 tem duas pessoas, que na mesma hora podem trabalhar ao mesmo tempo"). */
+export const TEAM_CAPACITY: Readonly<Record<string, number>> = { 'Porto 1': 2, 'Lisboa 1': 2 };
+const capacity = (team: string) => TEAM_CAPACITY[team] ?? 1;
 const AREA_REGION: Record<string, CrmLocality | 'coimbra'> = {
   porto: 'Porto', braga: 'Braga', lisboa: 'Lisboa', algarve: 'Algarve', coimbra: 'coimbra',
 };
@@ -183,11 +188,37 @@ export interface Slot { date: string; minutes: number; label: string; time: stri
 function slotState(busy: Busy[], teams: readonly string[], region: CrmLocality, from: number, to: number) {
   const margin = TRAVEL_MARGIN_MIN * 60_000;
   const overlaps = (b: Busy) => b.from < to + margin && b.to > from - margin;
-  const teamsFree = teams.filter(t => !busy.some(b => b.team === t && overlaps(b)));
+  const spare = (t: string) => capacity(t) - busy.filter(b => b.team === t && overlaps(b)).length;
+  const teamsFree = teams.filter(t => spare(t) > 0);
   const unassigned = busy.filter(b => !b.team && b.region === region && overlaps(b)).length;
   const near = (t: string) => busy.some(b => b.team === t
     && ((from - b.to >= 0 && from - b.to <= 90 * 60_000) || (b.from - to >= 0 && b.from - to <= 90 * 60_000)));
-  return { free: teamsFree.length - unassigned >= 1, teamsFree, nearOtherJob: teamsFree.some(near) };
+  const room = teamsFree.reduce((n, t) => n + spare(t), 0);
+  return { free: room - unassigned >= 1, teamsFree, nearOtherJob: teamsFree.some(near), nearTeams: teamsFree.filter(near) };
+}
+
+/**
+ * The team the bot books a job on (owner, 9 Oct 2026: on weekdays the bot closes
+ * by itself "nas vagas que não estão ocupadas"): one with room at that time, the
+ * one already working next to it that day first (less driving), then the one
+ * with fewer jobs that day, then the region's order. null when none has room.
+ */
+export function chooseTeam(events: AvailabilityEvent[], city: unknown, startIso: string, endIso: string): string | null {
+  const name = resolveBotCity(city);
+  const area = name ? CITY_REGION.get(fold(name)) : undefined;
+  if (!area || area === 'coimbra') return null;
+  const from = Date.parse(startIso), to = Date.parse(endIso);
+  if (!Number.isFinite(from) || !(to > from)) return null;
+  const busy = busyIntervals(events);
+  const st = slotState(busy, TEAMS_BY_REGION[area], area, from, to);
+  if (!st.free) return null;
+  const day = lisbon(from).date;
+  const jobsThatDay = (t: string) => busy.filter(b => b.team === t && lisbon(b.from).date === day).length;
+  const order = TEAMS_BY_REGION[area];
+  return [...st.teamsFree].sort((a, b) =>
+    Number(st.nearTeams.includes(b)) - Number(st.nearTeams.includes(a))
+    || jobsThatDay(a) - jobsThatDay(b)
+    || order.indexOf(a) - order.indexOf(b))[0] ?? null;
 }
 
 export interface AvailabilityRequest {

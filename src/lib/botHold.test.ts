@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { planBotHold, planOwnerBooking, type BotHoldPlan } from './botHold';
+import { planBotBooking, planBotHold, planOwnerBooking, type BotHoldPlan } from './botHold';
 import { botAvailability, eventRegion, type AvailabilityEvent } from './botAvailability';
 
 // Wednesday 7 Oct 2026, 09:45 in Portugal. Invented data only: the repo is public.
@@ -27,12 +27,13 @@ describe('planBotHold', () => {
     expect(eventRegion(asEvent(p, 'e1'))).toBe('Lisboa');
   });
 
-  it('busies a team, so the same time is not given to a third client in a two-team region', () => {
+  it('busies a team, so the same time is not given to a fourth client in Lisbon (Lisboa 1 is two people, Lisboa 2 one)', () => {
     const a = plan(req({ conversationId: 'a' }));
     const b = plan(req({ conversationId: 'b' }), [asEvent(a, 'ea')]);
-    const third = planBotHold(req({ conversationId: 'c' }), [asEvent(a, 'ea'), asEvent(b, 'eb')], NOW);
-    expect(third).toMatchObject({ ok: false, taken: true });
-    const after = botAvailability({ city: 'Oeiras', items: sofa, date: '2026-10-08', time: '15h' }, [asEvent(a, 'ea'), asEvent(b, 'eb')], NOW);
+    const c = plan(req({ conversationId: 'c' }), [asEvent(a, 'ea'), asEvent(b, 'eb')]);
+    const three = [asEvent(a, 'ea'), asEvent(b, 'eb'), asEvent(c, 'ec')];
+    expect(planBotHold(req({ conversationId: 'd' }), three, NOW)).toMatchObject({ ok: false, taken: true });
+    const after = botAvailability({ city: 'Oeiras', items: sofa, date: '2026-10-08', time: '15h' }, three, NOW);
     expect('requested' in after && after.requested?.free).toBe(false);
   });
 
@@ -86,5 +87,45 @@ describe('planOwnerBooking', () => {
   it('checks its input', () => {
     expect(planOwnerBooking({ ...base, time: 'amanhã' }, [])).toHaveProperty('error');
     expect(planOwnerBooking({ ...base, service: '' }, [])).toHaveProperty('error');
+  });
+});
+
+describe('planBotBooking', () => {
+  const book = (over: Record<string, unknown> = {}) => ({ ...req(over), address: 'Rua das Flores 10, 2.º Esq, 2780-000 Oeiras', service: 'Limpeza de sofá 3 lugares', ...over });
+
+  it('on a weekday writes his own "Serviço X€ (Y€)" in the colour of a team with room, share rounded up', () => {
+    const p = planBotBooking(book({ adOrigin: 'google' }), [], NOW);
+    if (!('ok' in p) || !p.ok) throw new Error(JSON.stringify(p));
+    expect(p.team).toBe('Lisboa 1');
+    expect(p.event.colorId).toBe('6');
+    expect(p.event.title).toMatch(/^Serviço (\d+)€ \((\d+)€\) \(anúncio\) Limpeza de sofá 3 lugares - 900000000 - Ana Teste - Rua das Flores 10/);
+    const [, share, total] = /^Serviço (\d+)€ \((\d+)€\)/.exec(p.event.title)!.map(Number);
+    expect(share).toBe(Math.ceil(total / 2));
+    expect(p.event.start).toBe('2026-10-08T14:00:00.000Z');
+    expect(p.event.description).toContain('bot:c1');
+  });
+
+  it('leaves Saturdays and Sundays to the owner, and anything without an engine price', () => {
+    expect(planBotBooking(book({ date: '2026-10-10' }), [], NOW)).toEqual({ ok: false, weekend: true });
+    expect(planBotBooking(book({ date: '2026-10-11' }), [], NOW)).toEqual({ ok: false, weekend: true });
+    expect(planBotBooking(book({ items: [{ kind: 'rug', width: 2, length: 3 }] }), [], NOW)).toMatchObject({ ok: false, handToOwner: expect.stringContaining('sob orçamento') });
+    expect(planBotBooking(book({ city: 'Coimbra' }), [], NOW)).toMatchObject({ ok: false, handToOwner: expect.any(String) });
+  });
+
+  it('needs the name and the full address first', () => {
+    expect(planBotBooking(book({ name: '', address: 'Oeiras' }), [], NOW)).toEqual({ ok: false, missing: ['nome', 'morada completa'] });
+  });
+
+  it('turns its own pre-booking into the service, but not a time another client took', () => {
+    const hold = plan(req({ conversationId: 'c1' }));
+    const p = planBotBooking(book(), [asEvent(hold, 'e1')], NOW, 'e1');
+    expect('ok' in p && p.ok).toBe(true);
+    const busy = [1, 2, 3].map(i => ({ id: `x${i}`, summary: `Serviço 45€ (89€) Sofá - Lisboa`, description: `Equipa: ${i < 3 ? 'Lisboa 1' : 'Lisboa 2'}`, status: 'CONFIRMED', start: '2026-10-08T14:00:00.000Z', end: '2026-10-08T15:00:00.000Z' }));
+    expect(planBotBooking(book(), busy, NOW)).toMatchObject({ ok: false, taken: true });
+  });
+
+  it('never books the same phone twice on the same day', () => {
+    const mine = { id: 'm', summary: 'Serviço 40€ (79€) Sofá - 900 000 000 - Ana - Oeiras', description: 'Equipa: Lisboa 1', status: 'CONFIRMED', start: '2026-10-08T09:00:00.000Z', end: '2026-10-08T10:00:00.000Z' };
+    expect(planBotBooking(book(), [mine], NOW)).toEqual({ ok: false, exists: true });
   });
 });

@@ -24,10 +24,19 @@
  *     cria uma segunda.
  *   { key, action: 'release', eventId }
  *     apaga a pré-reserva, só se o título ainda começar por "Pré-reserva".
+ *   { key, action: 'book', conversationId, eventId?, title, description, start, end, colorId }
+ *     o bot fechou o serviço (dono, 2026-10-09: "fecha e escolhe a equipa", só
+ *     de segunda a sexta). Escreve "Serviço X€ (Y€) …" na cor da equipa escolhida,
+ *     por cima da pré-reserva da conversa, se houver. A partir daí é um serviço
+ *     como os que o dono escreve: o resto deste script copia-o para a equipa e
+ *     manda-lhe o email, e o CRM lê-o. Um pedido repetido muda o mesmo serviço.
  */
 
 // "A confirmar": o evento preparado depois de o dono escrever "fica agendado" (2026-10-09).
 const PRE_RESERVA = /^(pr[ée]-?\s?reserva|a confirmar)\b/i;
+const SERVICO_DO_BOT = /^servi[cç]o\b/i;
+// As cores das equipas (Mirtilo 9 Porto 1, Pavão 7 Porto 2, Basílico 10 Braga, Tangerina 6 Lisboa 1, Uva 3 Lisboa 2, Banana 5 Algarve).
+const CORES_DAS_EQUIPAS = ['9', '7', '10', '6', '3', '5'];
 
 function doPost(e) {
   let pedido;
@@ -43,7 +52,8 @@ function doPost(e) {
   try {
     if (pedido.action === 'hold') return respostaBot(escreverPreReserva(pedido));
     if (pedido.action === 'release') return respostaBot(apagarPreReserva(pedido));
-    return respostaBot({ ok: false, error: 'action tem de ser hold ou release' });
+    if (pedido.action === 'book') return respostaBot(escreverServico(pedido));
+    return respostaBot({ ok: false, error: 'action tem de ser hold, book ou release' });
   } catch (erro) {
     // Sem isto a Google responde com uma página de erro em HTML e a bot-api não sabe porquê.
     return respostaBot({ ok: false, error: String(erro && erro.message || erro) });
@@ -68,6 +78,45 @@ function escreverPreReserva(p) {
   }
   const evento = calendario.createEvent(titulo, inicio, fim, { description: descricao });
   return { ok: true, eventId: evento.getId().replace(/@google\.com$/, ''), moved: false };
+}
+
+function escreverServico(p) {
+  const inicio = new Date(p.start), fim = new Date(p.end);
+  if (isNaN(inicio) || isNaN(fim) || fim <= inicio) return { ok: false, error: 'start/end inválidos' };
+  const titulo = String(p.title || '');
+  if (!SERVICO_DO_BOT.test(titulo)) return { ok: false, error: 'o título tem de começar por "Serviço"' };
+  const cor = String(p.colorId || '');
+  if (CORES_DAS_EQUIPAS.indexOf(cor) < 0) return { ok: false, error: 'colorId tem de ser a cor de uma equipa' };
+  const descricao = String(p.description || '').slice(0, 4000);
+  const calendario = CalendarApp.getDefaultCalendar();
+  // A pré-reserva da conversa vira o serviço; um pedido repetido encontra o serviço que já escreveu.
+  const antigo = (p.eventId && eventoPorId(calendario, p.eventId)) || preReservaDaConversa(calendario, p.conversationId)
+    || servicoDaConversa(calendario, p.conversationId);
+  let evento;
+  if (antigo && (PRE_RESERVA.test(antigo.getTitle()) || descricaoDaConversa(antigo, p.conversationId))) {
+    antigo.setTime(inicio, fim);
+    antigo.setTitle(titulo);
+    antigo.setDescription(descricao);
+    evento = antigo;
+  } else {
+    evento = calendario.createEvent(titulo, inicio, fim, { description: descricao });
+  }
+  evento.setColor(cor);
+  return { ok: true, eventId: evento.getId().replace(/@google\.com$/, ''), moved: evento === antigo };
+}
+
+function servicoDaConversa(calendario, conversa) {
+  if (!conversa) return null;
+  const agora = Date.now();
+  const eventos = calendario.getEvents(new Date(agora - 2 * 86400000), new Date(agora + 120 * 86400000), { search: 'bot:' + conversa });
+  for (let i = 0; i < eventos.length; i++) {
+    if (SERVICO_DO_BOT.test(eventos[i].getTitle()) && descricaoDaConversa(eventos[i], conversa)) return eventos[i];
+  }
+  return null;
+}
+
+function descricaoDaConversa(evento, conversa) {
+  return !!conversa && String(evento.getDescription() || '').split('\n').indexOf('bot:' + conversa) >= 0;
 }
 
 function apagarPreReserva(p) {

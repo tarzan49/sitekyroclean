@@ -255,15 +255,47 @@ Deno.test("hold writes one pre-booking per conversation, returns only times, and
   assertEquals(script.calls[1].eventId, "ev1");
   assertEquals(rows.size, 1);
 
-  // Oeiras has two teams: a second client fits at 16h, a third does not.
+  // Oeiras: Lisboa 1 is two people and Lisboa 2 one, so a third client fits at 16h and a fourth does not.
   assertEquals(JSON.parse(await (await holdCall(hold("b", "16h"), store, script.write)).text()).hold.ok, true);
-  const third = JSON.parse(await (await holdCall(hold("c", "16h"), store, script.write)).text()).hold;
-  assertEquals(third.ok, false);
-  assertEquals(third.taken, true);
-  assertEquals(script.calls.length, 3);
+  assertEquals(JSON.parse(await (await holdCall(hold("c", "16h"), store, script.write)).text()).hold.ok, true);
+  const fourth = JSON.parse(await (await holdCall(hold("d", "16h"), store, script.write)).text()).hold;
+  assertEquals(fourth.ok, false);
+  assertEquals(fourth.taken, true);
+  assertEquals(script.calls.length, 4);
 
   const rel = await holdCall({ action: "release", conversationId: "a" }, store, script.write);
   assertEquals(JSON.parse(await rel.text()).release.released, true);
-  assertEquals(script.calls[3], { action: "release", eventId: "ev1" });
-  assertEquals((await holdCall(hold("d"), store, null)).status, 503);
+  assertEquals(script.calls[4], { action: "release", eventId: "ev1" });
+  assertEquals((await holdCall(hold("e"), store, null)).status, 503);
+});
+
+// The bot closes the job itself on weekdays (owner, 2026-10-09).
+const book = (conversationId: string, over: Record<string, unknown> = {}) =>
+  ({ ...hold(conversationId), action: "book", address: "Rua Inventada 1, 2780-000 Oeiras", service: "Limpeza de sofá 3 lugares", ...over });
+
+Deno.test("book writes the owner's 'Serviço' in a team colour on a weekday, over the conversation's own pre-booking", async () => {
+  const { rows, store } = fakeHolds();
+  const script = fakeScript();
+  await holdCall(hold("a"), store, script.write);
+  const res = await holdCall(book("a"), store, script.write);
+  const text = await res.text();
+  assert(!text.includes("Inventad") && !text.includes("900000000"), text);
+  assertEquals(JSON.parse(text).booking, { ok: true, slot: { date: "2026-10-08", time: "15h", durationMin: 60 }, team: "Lisboa 1" });
+  const call = script.calls[1];
+  assertEquals([call.action, call.eventId, call.colorId], ["book", "ev1", "6"]);
+  assert(/^Serviço \d+€ \(\d+€\) Limpeza de sofá 3 lugares - 900000000 - Cliente Inventado - Rua Inventada 1/.test(String(call.title)), String(call.title));
+  assertEquals(rows.get("a")?.title, call.title);
+});
+
+Deno.test("book leaves weekends, prices to confirm and missing data as a pre-booking for the owner", async () => {
+  const { store } = fakeHolds();
+  const script = fakeScript();
+  const sat = JSON.parse(await (await holdCall(book("s", { date: "2026-10-10" }), store, script.write)).text()).booking;
+  assertEquals([sat.ok, sat.weekend, sat.hold.ok], [false, true, true]);
+  assert(String(script.calls[0].title).startsWith("Pré-reserva"));
+  const rug = JSON.parse(await (await holdCall(book("r", { items: [{ kind: "rug", width: 2, length: 3 }] }), store, script.write)).text()).booking;
+  assertEquals([rug.ok, typeof rug.handToOwner, rug.hold.ok], [false, "string", true]);
+  const noAddress = JSON.parse(await (await holdCall(book("n", { address: "" }), store, script.write)).text()).booking;
+  assertEquals([noAddress.ok, noAddress.missing, noAddress.hold.ok], [false, ["morada completa"], true]);
+  assert(script.calls.every(c => c.action === "hold"));
 });

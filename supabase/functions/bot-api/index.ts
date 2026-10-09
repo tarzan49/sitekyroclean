@@ -21,6 +21,12 @@
 //               owner's calendar through his Apps Script (BOT_HOLD_URL +
 //               BOT_HOLD_KEY, ReservasBot.gs); one per conversationId, moved
 //               when the client changes the time. Only times go back.
+//   book        the bot closes the job (2026-10-09, owner: "fecha e escolhe a
+//               equipa"): with the name and the full address, on a weekday,
+//               writes his own "Serviço X€ (Y€) …" in the colour of a team with
+//               room (the team-calendar script copies it to the team, the CRM
+//               reads it). Saturdays, Sundays, no engine price or missing data:
+//               a pre-booking for the owner instead, as `hold`. Only times go back.
 //   owner-booking the owner wrote "fica agendado" in a chat (2026-10-09): the bot
 //               server sends what it read from the chat and this writes
 //               "A confirmar · Serviço …" in his calendar (same Apps Script),
@@ -35,7 +41,7 @@
 // Documented for the bot developer in the owner's "4-acessos-para-o-bot".
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import { botAvailability, botQuote, listBotCities, planBotHold, planOwnerBooking } from "../_shared/botEngine.generated.js";
+import { botAvailability, botQuote, listBotCities, planBotBooking, planBotHold, planOwnerBooking } from "../_shared/botEngine.generated.js";
 import { parseIcs, type CalendarEvent } from "../_shared/ics.ts";
 import { clientPlan, listFollowUps, logMessage, logTouch, type FollowUpStore } from "./followUps.ts";
 import { checkRateLimit, getClientIP, getRateLimitHeaders } from "../_shared/rate-limit.ts";
@@ -267,8 +273,9 @@ export async function handleBotRequest(req: Request, env: BotEnv): Promise<Respo
       return await ownerBooking(body, env);
     case "hold":
     case "release":
+    case "book":
       if (!env.calendar || !env.holds || !env.writeCalendar) return createErrorResponse("Pré-reservas por ligar", 503);
-      return await (body.action === "hold" ? holdSlot(body, env) : releaseSlot(body, env));
+      return await (body.action === "hold" ? holdSlot(body, env) : body.action === "book" ? bookSlot(body, env) : releaseSlot(body, env));
     case "follow-ups":
     case "client-plan":
     case "log-touch":
@@ -281,37 +288,76 @@ export async function handleBotRequest(req: Request, env: BotEnv): Promise<Respo
       return await logMessage(body, env.followUps, now);
     }
     default:
-      return createErrorResponse("action tem de ser quote, cities, availability, hold, release, owner-booking, find-order, create-lead, follow-ups, client-plan, log-touch ou log-message", 400);
+      return createErrorResponse("action tem de ser quote, cities, availability, hold, book, release, owner-booking, find-order, create-lead, follow-ups, client-plan, log-touch ou log-message", 400);
   }
 }
 
-async function holdSlot(body: Row, env: BotEnv): Promise<Response> {
-  const conversationId = typeof body.conversationId === "string" ? body.conversationId.trim() : "";
-  if (!conversationId) return createErrorResponse("conversationId em falta", 400);
+/** The conversation's live pre-booking (or booking) and the calendar with recent ones, or an error response. */
+async function calendarFor(conversationId: string, env: BotEnv) {
   const existing = await env.holds!.get(conversationId);
-  if (existing && "error" in existing) return createErrorResponse("Pré-reservas indisponíveis", 503);
+  if (existing && "error" in existing) return { response: createErrorResponse("Pré-reservas indisponíveis", 503) };
   const live = existing && !existing.released_at ? existing : null;
   const cal = await env.calendar!();
-  if ("error" in cal) return createErrorResponse(cal.error, 502);
+  if ("error" in cal) return { response: createErrorResponse(cal.error, 502) };
   const now = env.now?.() ?? new Date();
-  const plan = planBotHold(body, await withRecentHolds(cal.events, env.holds, now), now, live?.event_id ?? null);
-  if ("error" in plan) return createErrorResponse(String(plan.error), 400);
-  // The bundle is plain JS, so Deno cannot narrow on `ok`: check the event itself.
-  if (!plan.ok || !plan.event) return createSuccessResponse({ hold: plan });
-  const event = plan.event;
-  const written = await env.writeCalendar!({ action: "hold", conversationId, eventId: live?.event_id ?? null, ...event });
+  return { live, now, events: await withRecentHolds(cal.events, env.holds, now) };
+}
+
+/** Writes through the owner's Apps Script and keeps the row that covers Google's feed delay. */
+async function writeAndSave(conversationId: string, live: HoldRow | null, now: Date, env: BotEnv, action: "hold" | "book",
+  event: { title: string; start: string; end: string } & Record<string, unknown>): Promise<Response | null> {
+  const written = await env.writeCalendar!({ action, conversationId, eventId: live?.event_id ?? null, ...event });
   if (!written.ok || !written.eventId) {
     const detail = written.ok ? "sem eventId" : written.error;
-    safeLog("warn", "bot hold not written", { error: detail });
+    safeLog("warn", `bot ${action} not written`, { error: detail });
     return createErrorResponse(`Não foi possível escrever no calendário (${detail.slice(0, 200)})`, 502);
   }
   const saveError = await env.holds!.save({
     conversation_id: conversationId, event_id: written.eventId, title: event.title,
     starts_at: event.start, ends_at: event.end, updated_at: now.toISOString(), released_at: null,
   });
-  if (saveError) safeLog("warn", "bot hold written but not saved", { error: saveError });
+  if (saveError) safeLog("warn", `bot ${action} written but not saved`, { error: saveError });
   calendarCache = null;
-  return createSuccessResponse({ hold: { ok: true, slot: plan.slot, moved: !!live } });
+  return null;
+}
+
+async function placeHold(conversationId: string, body: Row, env: BotEnv, ctx: { live: HoldRow | null; now: Date; events: CalendarEvent[] }): Promise<Response | Record<string, unknown>> {
+  const plan = planBotHold(body, ctx.events, ctx.now, ctx.live?.event_id ?? null);
+  if ("error" in plan) return createErrorResponse(String(plan.error), 400);
+  // The bundle is plain JS, so Deno cannot narrow on `ok`: check the event itself.
+  if (!plan.ok || !plan.event) return plan as Record<string, unknown>;
+  const failed = await writeAndSave(conversationId, ctx.live, ctx.now, env, "hold", plan.event);
+  return failed ?? { ok: true, slot: plan.slot, moved: !!ctx.live };
+}
+
+async function holdSlot(body: Row, env: BotEnv): Promise<Response> {
+  const conversationId = typeof body.conversationId === "string" ? body.conversationId.trim() : "";
+  if (!conversationId) return createErrorResponse("conversationId em falta", 400);
+  const ctx = await calendarFor(conversationId, env);
+  if ("response" in ctx) return ctx.response!;
+  const hold = await placeHold(conversationId, body, env, ctx);
+  return hold instanceof Response ? hold : createSuccessResponse({ hold });
+}
+
+async function bookSlot(body: Row, env: BotEnv): Promise<Response> {
+  const conversationId = typeof body.conversationId === "string" ? body.conversationId.trim() : "";
+  if (!conversationId) return createErrorResponse("conversationId em falta", 400);
+  const ctx = await calendarFor(conversationId, env);
+  if ("response" in ctx) return ctx.response!;
+  const plan = planBotBooking(body, ctx.events, ctx.now, ctx.live?.event_id ?? null);
+  if ("error" in plan) return createErrorResponse(String(plan.error), 400);
+  if (plan.ok && plan.event) {
+    const failed = await writeAndSave(conversationId, ctx.live, ctx.now, env, "book", plan.event);
+    return failed ?? createSuccessResponse({ booking: { ok: true, slot: plan.slot, team: plan.team } });
+  }
+  // Not the bot's to close (weekend, no engine price, data still missing): the time
+  // stays held for the owner as a pre-booking, exactly as `hold` would.
+  if (plan.weekend || plan.handToOwner || plan.missing) {
+    const hold = await placeHold(conversationId, body, env, ctx);
+    if (hold instanceof Response) return hold;
+    return createSuccessResponse({ booking: { ...plan, hold } });
+  }
+  return createSuccessResponse({ booking: plan });
 }
 
 async function ownerBooking(body: Row, env: BotEnv): Promise<Response> {

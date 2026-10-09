@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { botAvailability, dayLabel, eventRegion, eventTeam, visitMinutes, type AvailabilityEvent } from './botAvailability';
+import { botAvailability, chooseTeam, dayLabel, eventRegion, eventTeam, visitMinutes, type AvailabilityEvent } from './botAvailability';
 
 // Wednesday 7 Oct 2026, 09:45 in Portugal (summer time, UTC+1). Invented data only: the repo is public.
 const NOW = new Date('2026-10-07T08:45:00Z');
@@ -54,13 +54,14 @@ describe('botAvailability', () => {
 
   it('a time is free while one of the two teams of the zone is free', () => {
     const events = [
-      ev('2026-10-08', '10:00', '12:00', 'Serviço 60€ (119€) Sofá - Ana - Lisboa', 'Equipa: Lisboa 1'),
       ev('2026-10-08', '10:00', '12:00', 'Serviço 60€ (119€) Sofá - Rui - Lisboa', 'Equipa: Lisboa 2'),
+      ev('2026-10-08', '10:00', '12:00', 'Serviço 60€ (119€) Sofá - Ana - Lisboa', 'Equipa: Lisboa 1'),
+      ev('2026-10-08', '10:00', '12:00', 'Serviço 60€ (119€) Sofá - Eva - Lisboa', 'Equipa: Lisboa 1'),
     ];
     const r = ok(botAvailability({ city: 'Lisboa', date: '2026-10-08' }, events, NOW));
     // Both busy 10-12 (+30 min drive): 10h, 11h and 12h are gone, 13h is the first.
     expect(r.free[0].times[0]).toBe('13h');
-    const one = ok(botAvailability({ city: 'Lisboa', date: '2026-10-08' }, events.slice(0, 1), NOW));
+    const one = ok(botAvailability({ city: 'Lisboa', date: '2026-10-08' }, events.slice(1), NOW));
     expect(one.free[0].times[0]).toBe('10h');
     expect(one.suggestion?.slots[0].teamsFree).toEqual(['Lisboa 2']);
   });
@@ -68,6 +69,7 @@ describe('botAvailability', () => {
   it('a service, pre-booking or "A confirmar" without a team busies one team of its region', () => {
     const events = [
       ev('2026-10-08', '10:00', '12:00', 'Serviço 60€ (119€) Sofá - Ana - Rua X, 2780-000 Oeiras', 'Equipa: Lisboa 1'),
+      ev('2026-10-08', '10:00', '12:00', 'Serviço 60€ (119€) Sofá - Eva - Rua W, 2780-000 Oeiras', 'Equipa: Lisboa 2'),
       ev('2026-10-08', '10:00', '12:00', 'A confirmar colchão - Rui - Rua Y, 1000-001 Lisboa'),
     ];
     const r = ok(botAvailability({ city: 'Lisboa', date: '2026-10-08', time: '10h' }, events, NOW));
@@ -100,7 +102,8 @@ describe('botAvailability', () => {
   it('answers whether the exact time a client asks for is free', () => {
     const events = [ev('2026-10-12', '15:00', '16:00', 'Serviço retificação - Rua Z, 2770-010 Paço de Arcos', 'Equipa: Lisboa 1')];
     const r = ok(botAvailability({ city: 'Oeiras', date: '2026-10-12', time: '15h' }, events, NOW));
-    expect(r.requested).toEqual({ date: '2026-10-12', time: '15h', free: true, teamsFree: ['Lisboa 2'], start: at('2026-10-12', '15:00'), end: expect.any(String) });
+    // Lisboa 1 is two people: one job leaves it room for a second.
+    expect(r.requested).toEqual({ date: '2026-10-12', time: '15h', free: true, teamsFree: ['Lisboa 1', 'Lisboa 2'], start: at('2026-10-12', '15:00'), end: expect.any(String) });
   });
 
   it('hands the date to the owner where there is no team calendar or it is "sob consulta"', () => {
@@ -120,5 +123,34 @@ describe('botAvailability', () => {
     expect(botAvailability({ city: 'Faro', date: '8/10' }, [], NOW)).toHaveProperty('error');
     expect(botAvailability({ city: 'Faro', date: '2026-10-01' }, [], NOW)).toHaveProperty('error');
     expect(botAvailability({ city: 'Faro', time: '15h' }, [], NOW)).toHaveProperty('error');
+  });
+});
+
+describe('two-person teams and the team the bot books on', () => {
+  const lisbon1 = (from: string, to: string, who: string) => ev('2026-10-08', from, to, `Serviço 60€ (119€) Sofá - ${who} - Lisboa`, 'Equipa: Lisboa 1');
+
+  it('Porto 1 and Lisboa 1 take two jobs at the same time, the other teams one', () => {
+    const one = [lisbon1('10:00', '12:00', 'Ana'), ev('2026-10-08', '10:00', '12:00', 'Serviço 60€ (119€) Sofá - Rui - Lisboa', 'Equipa: Lisboa 2')];
+    const r = ok(botAvailability({ city: 'Lisboa', date: '2026-10-08', time: '10h' }, one, NOW));
+    expect(r.requested).toMatchObject({ free: true, teamsFree: ['Lisboa 1'] });
+    const two = [...one, lisbon1('10:00', '12:00', 'Eva')];
+    expect(ok(botAvailability({ city: 'Lisboa', date: '2026-10-08', time: '10h' }, two, NOW)).requested?.free).toBe(false);
+    const braga = [ev('2026-10-08', '10:00', '12:00', 'Serviço 45€ (89€) Sofá - Braga', 'Equipa: Braga')];
+    expect(ok(botAvailability({ city: 'Braga', date: '2026-10-08', time: '10h' }, braga, NOW)).requested?.free).toBe(false);
+  });
+
+  it('books the team already working next to that time, then the one with fewer jobs that day', () => {
+    const at15 = [at('2026-10-08', '15:00'), at('2026-10-08', '16:00')] as const;
+    // Lisboa 2 has a job ending at 14h: next to 15h, so it goes there.
+    const near = [ev('2026-10-08', '13:00', '14:00', 'Serviço 45€ (89€) Sofá - Lisboa', 'Equipa: Lisboa 2')];
+    expect(chooseTeam(near, 'Lisboa', ...at15)).toBe('Lisboa 2');
+    // Nothing next to it: the team with fewer jobs that day.
+    const far = [lisbon1('09:00', '10:00', 'Ana'), lisbon1('19:00', '20:00', 'Eva'), ev('2026-10-08', '19:00', '20:00', 'Serviço 45€ (89€) Sofá - Lisboa', 'Equipa: Lisboa 2')];
+    expect(chooseTeam(far, 'Lisboa', ...at15)).toBe('Lisboa 2');
+    expect(chooseTeam([], 'Lisboa', ...at15)).toBe('Lisboa 1');
+    // No room, no team; Coimbra has no team calendar.
+    const full = [lisbon1('15:00', '16:00', 'Ana'), lisbon1('15:00', '16:00', 'Eva'), ev('2026-10-08', '15:00', '16:00', 'Serviço 45€ (89€) Sofá - Lisboa', 'Equipa: Lisboa 2')];
+    expect(chooseTeam(full, 'Lisboa', ...at15)).toBeNull();
+    expect(chooseTeam([], 'Coimbra', ...at15)).toBeNull();
   });
 });

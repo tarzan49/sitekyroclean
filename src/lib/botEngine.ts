@@ -3,4 +3,4 @@
 // the bot's prices and its availability, from the site's own code.
 export { botQuote, listBotCities, resolveBotCity } from './botQuote';
 export { botAvailability } from './botAvailability';
-export { planBotHold, planOwnerBooking } from './botHold';
+export { planBotBooking, planBotHold, planOwnerBooking } from './botHold';

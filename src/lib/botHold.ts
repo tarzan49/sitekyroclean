@@ -13,7 +13,7 @@
  * The title carries the served town ("… – Porto – …"), which is how
  * botAvailability gives an event without a team its region.
  */
-import { botAvailability, lisbon, lisbonToUtc, parseTime, type AvailabilityEvent } from './botAvailability';
+import { botAvailability, chooseTeam, lisbon, lisbonToUtc, parseTime, type AvailabilityEvent } from './botAvailability';
 import { botQuote } from './botQuote';
 
 const MAX = { name: 80, phone: 30, address: 200, conversationId: 120, note: 300 } as const;
@@ -139,3 +139,73 @@ export function planOwnerBooking(req: unknown, events: (AvailabilityEvent & { id
 }
 
 const formatAmount = (n: number) => (Number.isInteger(n) ? String(n) : n.toFixed(2).replace('.', ',').replace(/,?0+$/, ''));
+
+/**
+ * The bot closes the job itself (owner, 9 Oct 2026: "fecha e escolhe a equipa";
+ * "se for sábado e domingo confirmar comigo, se for semana fechar as vagas que não
+ * estão ocupadas"). Once the client has accepted a time and given the name and the
+ * full address, this checks the time is still free, picks a team with room
+ * (chooseTeam) and builds the owner's own "Serviço X€ (Y€) …" in that team's
+ * colour, so the team-calendar script copies it to the team and the CRM reads it,
+ * as if he had written it. What it does not close, the bot leaves as a
+ * pre-booking for him: Saturdays and Sundays, and anything without an engine price.
+ */
+export const TEAM_COLOR: Readonly<Record<string, string>> = { 'Porto 1': '9', 'Porto 2': '7', Braga: '10', 'Lisboa 1': '6', 'Lisboa 2': '3', Algarve: '5' };
+/** The owner's ads mark in the title, read by the CRM (calendarServices adSourceFromTitle). */
+const AD_MARK: Readonly<Record<string, string>> = { google: ' (anúncio)', facebook: ' (anúncio facebook)', instagram: ' (anúncio instagram)' };
+
+export type BotBookingResult =
+  | { ok: true; team: string; event: { title: string; description: string; start: string; end: string; colorId: string }; slot: { date: string; time: string; durationMin: number } }
+  | { ok: false; weekend: true }
+  | { ok: false; missing: string[] }
+  | { ok: false; exists: true }
+  | { ok: false; taken: true; alternatives: unknown }
+  | { ok: false; handToOwner: string }
+  | { error: string };
+
+export const isWeekend = (date: string) => [0, 6].includes(new Date(`${date}T12:00:00Z`).getUTCDay());
+
+export function planBotBooking(req: unknown, events: (AvailabilityEvent & { id?: string })[], now: Date, ownEventId?: string | null): BotBookingResult {
+  if (!req || typeof req !== 'object') return { error: 'O pedido tem de ser um objeto' };
+  const r = req as Record<string, unknown>;
+  const conversationId = text(r.conversationId, MAX.conversationId);
+  if (!conversationId) return { error: 'conversationId em falta' };
+  if (typeof r.date !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(r.date) || typeof r.time !== 'string') return { error: 'date (AAAA-MM-DD) e time ("15h") são obrigatórios' };
+  if (isWeekend(r.date)) return { ok: false, weekend: true };
+  const name = text(r.name, MAX.name), address = text(r.address, MAX.address), phone = text(r.phone, MAX.phone);
+  const missing = [!name && 'nome', address.length < 8 && 'morada completa'].filter((m): m is string => !!m);
+  if (missing.length) return { ok: false, missing };
+
+  const others = ownEventId ? events.filter(e => e.id !== ownEventId) : events;
+  const key9 = digitsOf(phone).slice(-9);
+  if (key9.length === 9 && others.some(e => e.start && lisbon(Date.parse(e.start)).date === r.date
+    && /^\s*servi[cç]o\b/i.test(e.summary) && digitsOf(`${e.summary} ${e.description}`).includes(key9))) return { ok: false, exists: true };
+
+  const availability = botAvailability({ city: r.city, items: r.items, date: r.date, time: r.time }, others, now);
+  if ('error' in availability) return { error: String(availability.error) };
+  if (availability.handToOwner && !availability.requested) return { ok: false, handToOwner: availability.handToOwner };
+  const slot = availability.requested;
+  if (!slot) return { error: 'time inválido' };
+  if (!slot.free) return { ok: false, taken: true, alternatives: availability.suggestion };
+  const quote = botQuote({ items: r.items, city: r.city });
+  if ('error' in quote) return { error: String(quote.error) };
+  if (quote.quote || !(quote.total > 0)) return { ok: false, handToOwner: 'sob orçamento: o responsável dá o valor e marca' };
+  const team = chooseTeam(others, r.city, slot.start, slot.end);
+  if (!team) return { ok: false, taken: true, alternatives: availability.suggestion };
+
+  const pickupFee = quote.rugPickup?.fee != null && r.rugPickup === true ? quote.rugPickup.fee : 0;
+  const what = quote.lines.map(l => l.label).join(' + ');
+  const service = text(r.service, 120) || what;
+  const ad = typeof r.adOrigin === 'string' ? AD_MARK[r.adOrigin] ?? '' : '';
+  // His titles carry the Portuguese number without the country code; the CRM matches the last 9 digits either way.
+  const phoneOut = /^351\d{9}$/.test(digitsOf(phone)) ? digitsOf(phone).slice(3) : phone;
+  const title = [`Serviço ${formatAmount(ownerShare(quote.total, pickupFee))}€ (${formatAmount(quote.total)}€)${ad} ${service}`, phoneOut, name, address].filter(Boolean).join(' - ');
+  const description = [
+    `Marcado pelo bot do WhatsApp numa vaga livre, equipa ${team} (escolhida pelo bot; muda a cor para trocar).`,
+    `Artigos: ${what}`,
+    `Total: ${euro(quote.total)} (deslocação incluída)`,
+    text(r.note, MAX.note) ? `Nota: ${text(r.note, MAX.note)}` : '',
+    `bot:${conversationId}`,
+  ].filter(Boolean).join('\n');
+  return { ok: true, team, event: { title, description, start: slot.start, end: slot.end, colorId: TEAM_COLOR[team] }, slot: { date: slot.date, time: slot.time, durationMin: availability.durationMin } };
+}
