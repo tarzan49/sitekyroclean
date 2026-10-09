@@ -22,7 +22,12 @@ do Porto e de Lisboa, os textos passaram a 160 avaliações, resposta em 5
 minutos e secagem de 2 a 5 horas; nos sitelinks, "Orçamento grátis em 5
 minutos", cadeiras "Desde 12,50€ por cadeira" e tapetes "Lavagem em casa ou
 recolha". O nome da empresa continua reprovado e o dono preferiu esperar pelo
-recurso a mudá-lo.
+recurso a mudá-lo. Braga foi ativada nesse dia, com os mesmos recursos das
+outras duas: 6 sitelinks para as páginas de Braga, tabela de preços (sofá 1/2/3
+lugares desde 49/69/79 €, impermeabilização desde 59 €), mensagem de WhatsApp,
+10 fotografias de sofás, a lista de negativas partilhada e as negativas de
+campanha "porto" e "lisboa". As chamadas não contam a dobrar: "Clicks to call"
+não está incluída nos objetivos da conta.
 
 ---
 
