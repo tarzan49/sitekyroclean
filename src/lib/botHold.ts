@@ -94,8 +94,13 @@ export type OwnerBookingResult =
 const digitsOf = (t: string) => t.replace(/\D/g, '');
 const amount = (v: unknown) => (typeof v === 'number' && Number.isFinite(v) && v > 0 && v < 10_000 ? Math.round(v * 100) / 100 : null);
 
-/** Owner share = half the total, a ",5" rounded up (owner, 6 Oct 2026: 119€ → 60€). */
-export const ownerShare = (total: number) => Math.ceil(total / 2);
+/**
+ * Owner share = half the total, a ",5" rounded up (owner, 6 Oct 2026: 119€ → 60€).
+ * With rug pickup, minus the pickup price of that order (owner, 9 Oct 2026:
+ * "vale para todas as recolhas, mas é o preço que eu decidi da recolha":
+ * 159€ with a 20€ pickup → 79,5 − 20 = 59,5 → 60€).
+ */
+export const ownerShare = (total: number, pickupFee = 0) => Math.ceil(total / 2 - pickupFee);
 
 export function planOwnerBooking(req: unknown, events: (AvailabilityEvent & { id?: string })[]): OwnerBookingResult {
   if (!req || typeof req !== 'object') return { error: 'O pedido tem de ser um objeto' };
@@ -120,12 +125,14 @@ export function planOwnerBooking(req: unknown, events: (AvailabilityEvent & { id
   }
 
   const total = amount(r.total);
-  const money = total === null ? '?€ (?€)' : `${formatAmount(ownerShare(total))}€ (${formatAmount(total)}€)`;
+  const pickupFee = amount(r.pickupFee) ?? 0;
+  const money = total === null ? '?€ (?€)' : `${formatAmount(ownerShare(total, pickupFee))}€ (${formatAmount(total)}€)`;
   const parts = [`${OWNER_BOOKING_PREFIX}Serviço ${money}${r.fromAds === true ? ' (anúncio)' : ''} ${service}`, phone, text(r.name, MAX.name), text(r.address, MAX.address)].filter(Boolean);
   const start = lisbonToUtc(r.date, minutes);
   const description = [
     'Preparado a partir da conversa do WhatsApp depois de "fica agendado". Confere e apaga "A confirmar · " do título para confirmar (entra no CRM e vai para a equipa).',
     text(r.notes, 600),
+    pickupFee && total !== null ? `Parte do dono: metade do total menos a recolha (${formatAmount(total / 2)}€ − ${formatAmount(pickupFee)}€).` : '',
     `bot:${conversationId}`,
   ].filter(Boolean).join('\n\n');
   return { ok: true, event: { title: parts.join(' - '), description, start: new Date(start).toISOString(), end: new Date(start + durationMin * 60_000).toISOString() } };

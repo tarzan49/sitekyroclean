@@ -68,6 +68,12 @@ describe('planOwnerBooking', () => {
     // Neither the CRM nor the team script treat it as a service; availability does count it.
     expect(eventRegion({ summary: p.event.title, description: '', status: 'CONFIRMED', start: p.event.start, end: p.event.end })).toBe('Lisboa');
   });
+  it('rug pickup: half the total minus the pickup price he set, rounded up', () => {
+    const p = planOwnerBooking({ ...base, pickupFee: 20 }, []);
+    expect('ok' in p && p.ok && p.event.title).toMatch(/^A confirmar · Serviço 60€ \(159€\)/);
+    const q = planOwnerBooking({ ...base, total: 119, pickupFee: 15 }, []);
+    expect('ok' in q && q.ok && q.event.title).toMatch(/^A confirmar · Serviço 45€ \(119€\)/);
+  });
   it('unknown total keeps his "?€ (?€)" and the ads mark goes before the service', () => {
     const p = planOwnerBooking({ ...base, total: null, fromAds: true }, []);
     expect('ok' in p && p.ok && p.event.title).toBe('A confirmar · Serviço ?€ (?€) (anúncio) Recolha de 2 tapetes (2x3) - +351 900 000 001 - Cliente Inventado - Rua Inventada 1, Oeiras');

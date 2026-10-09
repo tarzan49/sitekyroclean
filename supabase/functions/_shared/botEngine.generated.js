@@ -825,7 +825,7 @@ function planBotHold(req, events, now, ownEventId) {
 var OWNER_BOOKING_PREFIX = "A confirmar · ";
 var digitsOf = (t) => t.replace(/\D/g, "");
 var amount = (v) => typeof v === "number" && Number.isFinite(v) && v > 0 && v < 1e4 ? Math.round(v * 100) / 100 : null;
-var ownerShare = (total) => Math.ceil(total / 2);
+var ownerShare = (total, pickupFee = 0) => Math.ceil(total / 2 - pickupFee);
 function planOwnerBooking(req, events) {
   if (!req || typeof req !== "object") return { error: "O pedido tem de ser um objeto" };
   const r = req;
@@ -845,12 +845,14 @@ function planOwnerBooking(req, events) {
     if (same) return { ok: false, exists: true, summary: same.summary };
   }
   const total = amount(r.total);
-  const money = total === null ? "?€ (?€)" : `${formatAmount(ownerShare(total))}€ (${formatAmount(total)}€)`;
+  const pickupFee = amount(r.pickupFee) ?? 0;
+  const money = total === null ? "?€ (?€)" : `${formatAmount(ownerShare(total, pickupFee))}€ (${formatAmount(total)}€)`;
   const parts = [`${OWNER_BOOKING_PREFIX}Serviço ${money}${r.fromAds === true ? " (anúncio)" : ""} ${service}`, phone, text(r.name, MAX.name), text(r.address, MAX.address)].filter(Boolean);
   const start = lisbonToUtc(r.date, minutes);
   const description = [
     'Preparado a partir da conversa do WhatsApp depois de "fica agendado". Confere e apaga "A confirmar · " do título para confirmar (entra no CRM e vai para a equipa).',
     text(r.notes, 600),
+    pickupFee && total !== null ? `Parte do dono: metade do total menos a recolha (${formatAmount(total / 2)}€ − ${formatAmount(pickupFee)}€).` : "",
     `bot:${conversationId}`
   ].filter(Boolean).join("\n\n");
   return { ok: true, event: { title: parts.join(" - "), description, start: new Date(start).toISOString(), end: new Date(start + durationMin * 6e4).toISOString() } };
