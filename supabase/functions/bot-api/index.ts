@@ -292,10 +292,11 @@ async function holdSlot(body: Row, env: BotEnv): Promise<Response> {
   // The bundle is plain JS, so Deno cannot narrow on `ok`: check the event itself.
   if (!plan.ok || !plan.event) return createSuccessResponse({ hold: plan });
   const event = plan.event;
-  const written = await env.writeCalendar!({ action: "hold", eventId: live?.event_id ?? null, ...event });
+  const written = await env.writeCalendar!({ action: "hold", conversationId, eventId: live?.event_id ?? null, ...event });
   if (!written.ok || !written.eventId) {
-    safeLog("warn", "bot hold not written", { error: written.ok ? "sem eventId" : written.error });
-    return createErrorResponse("Não foi possível escrever no calendário", 502);
+    const detail = written.ok ? "sem eventId" : written.error;
+    safeLog("warn", "bot hold not written", { error: detail });
+    return createErrorResponse(`Não foi possível escrever no calendário (${detail.slice(0, 200)})`, 502);
   }
   const saveError = await env.holds!.save({
     conversation_id: conversationId, event_id: written.eventId, title: event.title,
@@ -313,7 +314,7 @@ async function releaseSlot(body: Row, env: BotEnv): Promise<Response> {
   if (existing && "error" in existing) return createErrorResponse("Pré-reservas indisponíveis", 503);
   if (!existing || existing.released_at) return createSuccessResponse({ release: { released: false, reason: "sem pré-reserva" } });
   const done = await env.writeCalendar!({ action: "release", eventId: existing.event_id });
-  if (!done.ok) return createErrorResponse("Não foi possível apagar a pré-reserva", 502);
+  if (!done.ok) return createErrorResponse(`Não foi possível apagar a pré-reserva (${done.error.slice(0, 200)})`, 502);
   await env.holds!.release(conversationId);
   calendarCache = null;
   return createSuccessResponse({ release: { released: !!done.released, reason: done.reason ?? null } });
@@ -356,16 +357,26 @@ function appsScriptWriter(): CalendarWriter | null {
   } catch {
     return null;
   }
-  return async payload => {
+  const once = async (payload: Record<string, unknown>): Promise<Awaited<ReturnType<CalendarWriter>>> => {
     try {
       // Apps Script answers a POST with a redirect to the result; fetch follows it with a GET.
       const res = await fetch(url, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ ...payload, key }), signal: AbortSignal.timeout(30_000) });
-      const json = await res.json().catch(() => null);
-      if (!json || typeof json !== "object") return { ok: false, error: `resposta inválida (${res.status})` };
-      return json.ok ? { ok: true, eventId: json.eventId, released: json.released, reason: json.reason } : { ok: false, error: String(json.error ?? "erro") };
-    } catch {
-      return { ok: false, error: "sem resposta do Apps Script" };
+      const raw = await res.text();
+      let json: Record<string, unknown> | null = null;
+      try { json = JSON.parse(raw); } catch { /* below */ }
+      if (!json || typeof json !== "object") return { ok: false, error: `resposta inválida (${res.status}): ${raw.replace(/\s+/g, " ").slice(0, 160)}` };
+      return json.ok ? { ok: true, eventId: json.eventId as string | undefined, released: json.released as boolean | undefined, reason: json.reason as string | undefined } : { ok: false, error: String(json.error ?? "erro") };
+    } catch (e) {
+      return { ok: false, error: `sem resposta do Apps Script: ${e instanceof Error ? e.message : String(e)}` };
     }
+  };
+  // One retry: the script finds the conversation's pre-booking by its "bot:" mark,
+  // so a hold whose answer was lost is updated, never written twice.
+  return async payload => {
+    const first = await once(payload);
+    if (first.ok) return first;
+    safeLog("warn", "apps script call failed, retrying", { error: first.error });
+    return await once(payload);
   };
 }
 

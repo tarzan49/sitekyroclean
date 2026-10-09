@@ -16,9 +16,12 @@
  * Supabase (BOT_HOLD_KEY), com o endereço desta aplicação web (BOT_HOLD_URL).
  *
  * Pedido (POST, JSON):
- *   { key, action: 'hold', eventId?, title, description, start, end }
+ *   { key, action: 'hold', conversationId, eventId?, title, description, start, end }
  *     start/end em ISO 8601 (UTC). Com eventId de uma pré-reserva que ainda
- *     existe e continua a ser pré-reserva, muda-a em vez de criar outra.
+ *     existe e continua a ser pré-reserva, muda-a em vez de criar outra. Sem
+ *     eventId, procura a pré-reserva da conversa pela marca "bot:<conversationId>"
+ *     da descrição: um pedido repetido (resposta perdida no caminho) nunca
+ *     cria uma segunda.
  *   { key, action: 'release', eventId }
  *     apaga a pré-reserva, só se o título ainda começar por "Pré-reserva".
  */
@@ -52,14 +55,12 @@ function escreverPreReserva(p) {
   if (!PRE_RESERVA.test(titulo)) return { ok: false, error: 'o título tem de começar por "Pré-reserva"' };
   const descricao = String(p.description || '').slice(0, 4000);
   const calendario = CalendarApp.getDefaultCalendar();
-  if (p.eventId) {
-    const antigo = eventoPorId(calendario, p.eventId);
-    if (antigo && PRE_RESERVA.test(antigo.getTitle())) {
-      antigo.setTime(inicio, fim);
-      antigo.setTitle(titulo);
-      antigo.setDescription(descricao);
-      return { ok: true, eventId: p.eventId, moved: true };
-    }
+  const antigo = (p.eventId && eventoPorId(calendario, p.eventId)) || preReservaDaConversa(calendario, p.conversationId);
+  if (antigo && PRE_RESERVA.test(antigo.getTitle())) {
+    antigo.setTime(inicio, fim);
+    antigo.setTitle(titulo);
+    antigo.setDescription(descricao);
+    return { ok: true, eventId: antigo.getId().replace(/@google\.com$/, ''), moved: true };
   }
   const evento = calendario.createEvent(titulo, inicio, fim, { description: descricao });
   return { ok: true, eventId: evento.getId().replace(/@google\.com$/, ''), moved: false };
@@ -71,6 +72,18 @@ function apagarPreReserva(p) {
   if (!PRE_RESERVA.test(evento.getTitle())) return { ok: true, released: false, reason: 'já foi confirmada pelo dono' };
   evento.deleteEvent();
   return { ok: true, released: true };
+}
+
+function preReservaDaConversa(calendario, conversa) {
+  if (!conversa) return null;
+  const marca = 'bot:' + conversa;
+  const agora = Date.now();
+  const eventos = calendario.getEvents(new Date(agora - 2 * 86400000), new Date(agora + 120 * 86400000), { search: marca });
+  for (let i = 0; i < eventos.length; i++) {
+    const linhas = String(eventos[i].getDescription() || '').split('\n');
+    if (linhas.indexOf(marca) >= 0 && PRE_RESERVA.test(eventos[i].getTitle())) return eventos[i];
+  }
+  return null;
 }
 
 function eventoPorId(calendario, id) {
