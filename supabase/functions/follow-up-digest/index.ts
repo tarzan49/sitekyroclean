@@ -19,6 +19,7 @@ import { Resend } from "https://esm.sh/resend@2.0.0";
 import { buildDigest, lisbonDay, planAll, snapshotAt } from "../_shared/followUpEngine.generated.js";
 import { isAuthenticatedAdmin } from "../_shared/admin-request.ts";
 import { LEAD_FROM_ADDRESS } from "../_shared/constants.ts";
+import { parseIcs } from "../_shared/ics.ts";
 import { createErrorResponse, createSuccessResponse, handleCORS, safeLog, validateMethod } from "../_shared/security.ts";
 
 const PANEL_URL = "https://cleansolutions.com.pt/admin/panel";
@@ -31,7 +32,10 @@ export interface DigestStore {
   load(): Promise<{ clients: Row[]; services: Row[]; touches: Row[] } | { error: string }>;
   sentOn(day: string): Promise<boolean>;
   record(day: string, items: number, error: string | null): Promise<void>;
+  /** Pré-reservas do bot ainda por confirmar (2026-10-09): futuras e ainda com o título "Pré-reserva". */
+  pendingHolds?(now: Date): Promise<PendingHold[]>;
 }
+export interface PendingHold { title: string; starts_at: string }
 export interface Mailer {
   send(subject: string, html: string, text: string): Promise<string | null>;
 }
@@ -98,7 +102,10 @@ export async function handleDigestRequest(req: Request, env: DigestEnv): Promise
   }
   // deno-lint-ignore no-explicit-any
   const planned = planAll(data as any, { now });
-  const digest = buildDigest(planned, { now, panelUrl: PANEL_URL, snapshot: snapshotAt(data.clients as never) });
+  const digest = withHolds(
+    buildDigest(planned, { now, panelUrl: PANEL_URL, snapshot: snapshotAt(data.clients as never) }),
+    (await env.store.pendingHolds?.(now)) ?? [],
+  );
 
   if (!send) {
     return createSuccessResponse({ subject: digest.subject, html: digest.html, text: digest.text, count: digest.count, campaigns: digest.campaigns });
@@ -115,6 +122,23 @@ export async function handleDigestRequest(req: Request, env: DigestEnv): Promise
     return createErrorResponse("O email não foi enviado", 502);
   }
   return createSuccessResponse({ sent: true, count: digest.count });
+}
+
+const WHEN = new Intl.DateTimeFormat("pt-PT", { timeZone: "Europe/Lisbon", weekday: "short", day: "numeric", month: "numeric", hour: "2-digit", minute: "2-digit" });
+const escapeHtml = (t: string) => t.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
+/**
+ * As pré-reservas do bot vão no topo do email (dono, 2026-10-09: não expiram
+ * sozinhas, ele decide): confirma (muda para "Serviço X€ (Y€) …") ou apaga.
+ */
+export function withHolds<T extends { subject: string; html: string; text: string; count: number }>(digest: T, holds: PendingHold[]): T {
+  if (!holds.length) return digest;
+  const lines = holds.map(h => `${WHEN.format(new Date(h.starts_at))} · ${h.title}`);
+  const title = `Pré-reservas do bot por confirmar (${holds.length})`;
+  const html = `<h3>${title}</h3><p>Confirma no calendário (muda o título para "Serviço X€ (Y€) …") ou apaga.</p><ul>${lines.map(l => `<li>${escapeHtml(l)}</li>`).join("")}</ul>${digest.html}`;
+  const text = `${title}\nConfirma no calendário (muda o título para "Serviço X€ (Y€) …") ou apaga.\n${lines.map(l => `- ${l}`).join("\n")}\n\n${digest.text}`;
+  const subject = digest.count === 0 ? `Kyro · ${holds.length} pré-reserva${holds.length > 1 ? "s" : ""} do bot por confirmar` : digest.subject;
+  return { ...digest, subject, html, text, count: digest.count + holds.length };
 }
 
 function supabaseStore(): DigestStore | null {
@@ -140,6 +164,28 @@ function supabaseStore(): DigestStore | null {
     },
     async record(day, items, error) {
       await client.from("follow_up_digests").upsert({ day, items, error, sent_at: new Date().toISOString() }, { onConflict: "day" });
+    },
+    async pendingHolds(now) {
+      const { data, error } = await client.from("bot_calendar_holds").select("event_id, title, starts_at, updated_at").is("released_at", null).gte("starts_at", now.toISOString()).order("starts_at");
+      if (error || !data?.length) return [];
+      // Só as que continuam a ser pré-reserva no calendário: uma confirmada ou apagada pelo dono sai da lista.
+      // Se o calendário não se ler, vão todas: é melhor sobrar uma do que faltar.
+      const ics = Deno.env.get("GOOGLE_CALENDAR_ICS_URL");
+      if (!ics) return data as PendingHold[];
+      try {
+        const res = await fetch(ics, { signal: AbortSignal.timeout(15_000) });
+        if (!res.ok) return data as PendingHold[];
+        const { events, totalEvents } = parseIcs(new Uint8Array(await res.arrayBuffer()));
+        if (!totalEvents) return data as PendingHold[];
+        const byId = new Map(events.map(e => [e.id, e]));
+        return (data as (PendingHold & { event_id: string; updated_at: string })[]).filter(h => {
+          const e = byId.get(h.event_id);
+          // Fora do endereço iCal: escrita há menos de um dia é atraso da Google (fica); mais antiga, foi apagada.
+          return !e ? Date.now() - new Date(h.updated_at).getTime() < 86_400_000 : /^pr[ée]-?\s?reserva\b/i.test(e.summary) && e.status !== "CANCELLED";
+        });
+      } catch {
+        return data as PendingHold[];
+      }
     },
   };
 }
