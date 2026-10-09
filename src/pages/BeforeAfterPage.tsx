@@ -15,7 +15,7 @@ const categories: { category: BeforeAfterCategory; label: string; href: string }
   { category: "colchao", label: "Colchões", href: "/limpeza-colchoes" },
   { category: "cadeiras", label: "Cadeiras", href: "/limpeza-cadeiras" },
   { category: "tapete", label: "Tapetes", href: "/limpeza-tapetes" },
-  { category: "tapete", label: "Alcatifas", href: "/limpeza-alcatifas" },
+  { category: "alcatifa", label: "Alcatifas", href: "/limpeza-alcatifas" },
   { category: "impermeabilizacao", label: "Impermeabilização", href: "/impermeabilizacao" },
 ];
 

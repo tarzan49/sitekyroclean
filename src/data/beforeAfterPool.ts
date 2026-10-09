@@ -116,7 +116,7 @@ import sofa14Depois from "@/assets/before-after-pool/sofa-14-depois.webp";
 import tapete06Antes from "@/assets/before-after-pool/tapete-06-antes.webp";
 import tapete06Depois from "@/assets/before-after-pool/tapete-06-depois.webp";
 
-export type BeforeAfterCategory = "sofa" | "colchao" | "cadeiras" | "tapete" | "impermeabilizacao";
+export type BeforeAfterCategory = "sofa" | "colchao" | "cadeiras" | "tapete" | "alcatifa" | "impermeabilizacao";
 
 // `illustrative` marca pares que não são um trabalho real da Kyro (ver nota
 // "impermeabilizacao-02/03/04" acima). Desde 28/09/2026 a galeria deixou de
@@ -141,10 +141,10 @@ export type PoolItem =
 // primeiro (regra de 28/09). "sofa-14" tinha antes e depois trocados (visto
 // pelo dono a 09/10): os ficheiros ficam, a ordem é invertida aqui.
 export const BEFORE_AFTER_POOL: Record<BeforeAfterCategory, PoolItem[]> = {
+  alcatifa: [],
   // 29/09/2026: colchao-06, colchao-07 e sofa-14 são trabalhos reais enviados
   // pelo dono, no fim da lista ("só quero que fiquem lá", não em primeiro).
-  // 09/10/2026 (dono): o sofá azul (sofa-10) em primeiro; nos tapetes, o
-  // tapete-03 (era a imagem 2) passou para primeiro.
+  // 09/10/2026 (dono): o sofá azul (sofa-10) em primeiro.
   sofa: [
     { kind: "pair", before: sofa10Antes, after: sofa10Depois },
     { kind: "pair", before: sofa06Antes, after: sofa06Depois },
@@ -179,8 +179,8 @@ export const BEFORE_AFTER_POOL: Record<BeforeAfterCategory, PoolItem[]> = {
     { kind: "pair", before: cadeiras04Antes, after: cadeiras04Depois },
   ],
   tapete: [
-    { kind: "pair", before: tapete03Antes, after: tapete03Depois },
     { kind: "pair", before: tapete04Antes, after: tapete04Depois },
+    { kind: "pair", before: tapete03Antes, after: tapete03Depois },
     { kind: "pair", before: tapete06Antes, after: tapete06Depois },
     { kind: "pair", before: tapete01Antes, after: tapete01Depois },
     { kind: "single", image: tapete05UnicoSemPar },
@@ -225,8 +225,15 @@ export function categoryForServiceSlug(serviceSlug: string | undefined | null): 
     case "limpeza-colchoes": return "colchao";
     case "limpeza-cadeiras": return "cadeiras";
     case "limpeza-tapetes": return "tapete";
-    case "limpeza-alcatifas": return "tapete";
+    case "limpeza-alcatifas": return "alcatifa";
     case "impermeabilizacao": return "impermeabilizacao";
     default: return null;
   }
+}
+
+// Alcatifas usam as fotos dos tapetes com as duas primeiras trocadas (dono,
+// 09/10/2026).
+{
+  const [first, second, ...rest] = BEFORE_AFTER_POOL.tapete;
+  BEFORE_AFTER_POOL.alcatifa = [second, first, ...rest];
 }

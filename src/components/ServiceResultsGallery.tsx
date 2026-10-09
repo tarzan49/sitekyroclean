@@ -55,7 +55,7 @@ export default function ServiceResultsGallery({ category, light = false, interva
       onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)}
       onFocusCapture={() => setFocused(true)}
       onBlurCapture={event => { if (!event.currentTarget.contains(event.relatedTarget)) setFocused(false); }}>
-      <div className={`overflow-hidden ${itemCategory === "cadeiras" ? "mx-auto w-[min(100%,270px)] aspect-[9/16]" : "w-full aspect-[4/3]"}`}>
+      <div className={`overflow-hidden ${itemCategory === "cadeiras" ? "mx-auto w-[min(100%,270px)] aspect-[3/4]" : "w-full aspect-[4/3]"}`}>
         {item.kind === "pair" ? (
           <BeforeAfterSlider key={index} beforeImage={item.before} afterImage={item.after}
             beforeLabel={itemCategory === "impermeabilizacao" ? "Sem proteção" : "Antes"}
