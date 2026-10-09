@@ -46,7 +46,7 @@ describe('mandatory commercial hero', () => {
     expect(container.querySelector('nav')?.textContent).toContain('Paranhos');
     expect(container.textContent).toContain('deslocação 10€');
   });
-  it('moves the full price line above the WhatsApp button only on paid visits', () => {
+  it('moves the starting price above the WhatsApp button only on paid visits', () => {
     const props = { title: 'Limpeza de Sofás no Porto', serviceSlug: 'limpeza-sofas', city: 'Porto', whatsappHref: 'https://wa.me/351925530647', source: 'test' };
     const { container, rerender } = render(<MemoryRouter><CommercialHero {...props} /></MemoryRouter>);
     expect(container.querySelector('[data-paid-landing]')).toBeNull();
@@ -56,7 +56,7 @@ describe('mandatory commercial hero', () => {
     const paidPrice = container.querySelector('[data-hero-part="paid-price"]')!;
     expect(container.querySelector('[data-paid-landing]')).not.toBeNull();
     expect(organicLine).toContain(paidPrice.textContent!);
-    expect(paidPrice.textContent).toMatch(/deslocação 10€/);
+    expect(paidPrice.textContent).toBe('Desde 49€');
     const parts = [...container.querySelectorAll('[data-hero-part]')].map(el => el.getAttribute('data-hero-part'));
     expect(parts.indexOf('paid-price')).toBe(parts.indexOf('whatsapp') - 1);
     expect(container.querySelector('[data-hero-part="prices"]')!.textContent).not.toContain(paidPrice.textContent!);

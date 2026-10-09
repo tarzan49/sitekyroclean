@@ -65,6 +65,18 @@ export const commercialHeroPriceLine = (serviceSlug: string, municipality?: stri
   return `${priceText} + deslocação ${fee === undefined ? `a partir de ${TRAVEL_FEE_MIN}€` : `${fee}€`}.`;
 };
 
+/**
+ * A linha de preço das visitas de anúncio: só o preço de partida, sem a
+ * deslocação (dono, 09/10/2026: "na maior parte dos orçamentos a deslocação vem
+ * incluída, diz só desde 49€"). A página continua a dizer a deslocação na
+ * tabela de preços e no HTML estático.
+ */
+export const commercialHeroPaidPriceLine = (serviceSlug: string, price?: string): string => {
+  if (RUG_SERVICE_SLUGS.includes(serviceSlug)) return 'Sob orçamento.';
+  const value = price ?? services.find(item => item.slug === serviceSlug)?.priceFrom ?? 'Sob orçamento';
+  return /orçamento/i.test(value) ? 'Sob orçamento' : startingPriceLabel(serviceSlug, value);
+};
+
 export interface HeroStat { value: string; label: string }
 
 export const commercialHeroStats = (serviceSlug: string): HeroStat[] => [
