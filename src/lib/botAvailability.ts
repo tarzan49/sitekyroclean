@@ -17,7 +17,9 @@
  * - each article takes its real time (sofa 1h, mattress 45 min, chair 10 min,
  *   rug 4 min per m², waterproofing +20 min), plus a margin for the drive;
  * - teams work every day until 21h, and the bot never offers before 10h or after 18h;
- * - two times, near the team's other jobs that day when possible.
+ * - two times, near the team's other jobs that day when possible, and at an hour
+ *   with no other service in the zone (owner, 9 Oct 2026: "tenta que os pedidos
+ *   sejam sempre a horas diferentes, se for a mesma hora tem que me consultar").
  * Aveiro and the Alentejo Litoral are "sob consulta", and Coimbra and Figueira
  * da Foz have no team calendar: those go to the owner, with no hours.
  *
@@ -49,6 +51,7 @@ const ALL_TEAMS = Object.values(TEAMS_BY_REGION).flat();
 /** Jobs a team can do at the same time (owner, 9 Oct 2026: "a porto 1 tem duas pessoas e a lisboa 1 tem duas pessoas, que na mesma hora podem trabalhar ao mesmo tempo"). */
 export const TEAM_CAPACITY: Readonly<Record<string, number>> = { 'Porto 1': 2, 'Lisboa 1': 2 };
 const capacity = (team: string) => TEAM_CAPACITY[team] ?? 1;
+const TEAM_REGION = new Map(Object.entries(TEAMS_BY_REGION).flatMap(([region, teams]) => teams.map(t => [t, region as CrmLocality] as const)));
 const AREA_REGION: Record<string, CrmLocality | 'coimbra'> = {
   porto: 'Porto', braga: 'Braga', lisboa: 'Lisboa', algarve: 'Algarve', coimbra: 'coimbra',
 };
@@ -183,7 +186,8 @@ function busyIntervals(events: AvailabilityEvent[]): Busy[] {
   return out;
 }
 
-export interface Slot { date: string; minutes: number; label: string; time: string; teamsFree: string[]; nearOtherJob: boolean }
+/** sameTime: another service of the same zone overlaps this visit (any team): the bot books it only with the owner. */
+export interface Slot { date: string; minutes: number; label: string; time: string; teamsFree: string[]; nearOtherJob: boolean; sameTime: boolean }
 
 function slotState(busy: Busy[], teams: readonly string[], region: CrmLocality, from: number, to: number) {
   const margin = TRAVEL_MARGIN_MIN * 60_000;
@@ -194,7 +198,8 @@ function slotState(busy: Busy[], teams: readonly string[], region: CrmLocality, 
   const near = (t: string) => busy.some(b => b.team === t
     && ((from - b.to >= 0 && from - b.to <= 90 * 60_000) || (b.from - to >= 0 && b.from - to <= 90 * 60_000)));
   const room = teamsFree.reduce((n, t) => n + spare(t), 0);
-  return { free: room - unassigned >= 1, teamsFree, nearOtherJob: teamsFree.some(near), nearTeams: teamsFree.filter(near) };
+  const sameTime = busy.some(b => (b.team ? TEAM_REGION.get(b.team) === region : b.region === region) && b.from < to && b.to > from);
+  return { free: room - unassigned >= 1, teamsFree, nearOtherJob: teamsFree.some(near), nearTeams: teamsFree.filter(near), sameTime };
 }
 
 /**
@@ -246,7 +251,7 @@ export type AvailabilityResult =
       /** The two times to offer, in the owner's wording, or null. */
       suggestion: { text: string; slots: Slot[] } | null;
       /** start/end: the visit in UTC ISO, for the pre-booking (botHold.ts). */
-      requested: { date: string; time: string; free: boolean; teamsFree: string[]; start: string; end: string } | null;
+      requested: { date: string; time: string; free: boolean; teamsFree: string[]; sameTime: boolean; start: string; end: string } | null;
       /** Every free start time per day, for a client who asks for another one. */
       free: Array<{ date: string; label: string; times: string[] }>;
     };
@@ -260,6 +265,14 @@ export function parseTime(v: unknown): number | null {
 }
 
 function pickTwo(slots: Slot[], dayOrder: string[], onlyDay: string | null): Slot[] {
+  // Hours with no other service in the zone first (owner, 9 Oct 2026: "sempre a horas diferentes").
+  const clean = slots.filter(s => !s.sameTime);
+  if (clean.length && clean.length < slots.length) {
+    const two = pickTwo(clean, dayOrder, onlyDay);
+    if (two.length >= 2) return two;
+    const rest = pickTwo(slots.filter(s => s !== two[0]), dayOrder, onlyDay);
+    return [two[0], rest[0]].filter((s): s is Slot => !!s).sort((x, y) => x.date.localeCompare(y.date) || x.minutes - y.minutes);
+  }
   const days = onlyDay ? [onlyDay] : dayOrder;
   const byDay = days.map(d => slots.filter(s => s.date === d)).filter(list => list.length);
   if (!byDay.length) return [];
@@ -315,18 +328,18 @@ export function botAvailability(req: AvailabilityRequest, events: AvailabilityEv
       const from = lisbonToUtc(date, m);
       if (from < earliestToday) continue;
       const st = slotState(busy, teams, area, from, from + durationMin * 60_000);
-      if (st.free) slots.push({ date, minutes: m, label, time: hourLabel(m), teamsFree: st.teamsFree, nearOtherJob: st.nearOtherJob });
+      if (st.free) slots.push({ date, minutes: m, label, time: hourLabel(m), teamsFree: st.teamsFree, nearOtherJob: st.nearOtherJob, sameTime: st.sameTime });
     }
   }
 
-  let requested: { date: string; time: string; free: boolean; teamsFree: string[]; start: string; end: string } | null = null;
+  let requested: { date: string; time: string; free: boolean; teamsFree: string[]; sameTime: boolean; start: string; end: string } | null = null;
   if (req.time !== undefined) {
     const m = parseTime(req.time);
     if (m === null || !onlyDay) return { error: 'time precisa de date e de uma hora como "15h" ou "15:30"' };
     const from = lisbonToUtc(onlyDay, m);
     const inHours = m >= 7 * 60 && m + durationMin <= DAY_END_HOUR * 60 && from >= now.getTime();
     const st = slotState(busy, teams, area, from, from + durationMin * 60_000);
-    requested = { date: onlyDay, time: hourLabel(m), free: inHours && st.free, teamsFree: inHours ? st.teamsFree : [],
+    requested = { date: onlyDay, time: hourLabel(m), free: inHours && st.free, teamsFree: inHours ? st.teamsFree : [], sameTime: st.sameTime,
       start: new Date(from).toISOString(), end: new Date(from + durationMin * 60_000).toISOString() };
   }
 

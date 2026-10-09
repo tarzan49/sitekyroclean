@@ -25,7 +25,8 @@
 //               equipa"): with the name and the full address, on a weekday,
 //               writes his own "Serviço X€ (Y€) …" in the colour of a team with
 //               room (the team-calendar script copies it to the team, the CRM
-//               reads it). Saturdays, Sundays, no engine price or missing data:
+//               reads it). Saturdays, Sundays, a time another service of the zone
+//               already has, no engine price or missing data:
 //               a pre-booking for the owner instead, as `hold`. Only times go back.
 //   owner-booking the owner wrote "fica agendado" in a chat (2026-10-09): the bot
 //               server sends what it read from the chat and this writes
@@ -352,7 +353,7 @@ async function bookSlot(body: Row, env: BotEnv): Promise<Response> {
   }
   // Not the bot's to close (weekend, no engine price, data still missing): the time
   // stays held for the owner as a pre-booking, exactly as `hold` would.
-  if (plan.weekend || plan.handToOwner || plan.missing) {
+  if (plan.weekend || plan.sameTime || plan.handToOwner || plan.missing) {
     const hold = await placeHold(conversationId, body, env, ctx);
     if (hold instanceof Response) return hold;
     return createSuccessResponse({ booking: { ...plan, hold } });

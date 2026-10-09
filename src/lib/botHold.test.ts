@@ -128,4 +128,10 @@ describe('planBotBooking', () => {
     const mine = { id: 'm', summary: 'Serviço 40€ (79€) Sofá - 900 000 000 - Ana - Oeiras', description: 'Equipa: Lisboa 1', status: 'CONFIRMED', start: '2026-10-08T09:00:00.000Z', end: '2026-10-08T10:00:00.000Z' };
     expect(planBotBooking(book(), [mine], NOW)).toEqual({ ok: false, exists: true });
   });
+
+  it('a time another service of the zone already has goes to the owner ("se for a mesma hora tem que me consultar")', () => {
+    const other = { id: 'o', summary: 'Serviço 45€ (89€) Sofá - 911 111 111 - Rui - Lisboa', description: 'Equipa: Lisboa 1', status: 'CONFIRMED', start: '2026-10-08T14:00:00.000Z', end: '2026-10-08T15:00:00.000Z' };
+    expect(planBotBooking(book(), [other], NOW)).toEqual({ ok: false, sameTime: true });
+    expect('ok' in planBotBooking(book({ time: '17h' }), [other], NOW) && (planBotBooking(book({ time: '17h' }), [other], NOW) as { ok: boolean }).ok).toBe(true);
+  });
 });

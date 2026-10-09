@@ -299,3 +299,12 @@ Deno.test("book leaves weekends, prices to confirm and missing data as a pre-boo
   assertEquals([noAddress.ok, noAddress.missing, noAddress.hold.ok], [false, ["morada completa"], true]);
   assert(script.calls.every(c => c.action === "hold"));
 });
+
+Deno.test("book at an hour another service of the zone has: pre-booking for the owner (owner, 2026-10-09)", async () => {
+  const { store } = fakeHolds();
+  const script = fakeScript();
+  await holdCall(book("first"), store, script.write);
+  const second = JSON.parse(await (await holdCall(book("second", { phone: "911111111" }), store, script.write)).text()).booking;
+  assertEquals([second.ok, second.sameTime, second.hold.ok], [false, true, true]);
+  assertEquals(script.calls.map(c => c.action), ["book", "hold"]);
+});

@@ -577,6 +577,7 @@ var TEAMS_BY_REGION = {
 var ALL_TEAMS = Object.values(TEAMS_BY_REGION).flat();
 var TEAM_CAPACITY = { "Porto 1": 2, "Lisboa 1": 2 };
 var capacity = (team) => TEAM_CAPACITY[team] ?? 1;
+var TEAM_REGION = new Map(Object.entries(TEAMS_BY_REGION).flatMap(([region, teams]) => teams.map((t) => [t, region])));
 var AREA_REGION = {
   porto: "Porto",
   braga: "Braga",
@@ -711,7 +712,8 @@ function slotState(busy, teams, region, from, to) {
   const unassigned = busy.filter((b) => !b.team && b.region === region && overlaps(b)).length;
   const near = (t) => busy.some((b) => b.team === t && (from - b.to >= 0 && from - b.to <= 90 * 6e4 || b.from - to >= 0 && b.from - to <= 90 * 6e4));
   const room = teamsFree.reduce((n, t) => n + spare(t), 0);
-  return { free: room - unassigned >= 1, teamsFree, nearOtherJob: teamsFree.some(near), nearTeams: teamsFree.filter(near) };
+  const sameTime = busy.some((b) => (b.team ? TEAM_REGION.get(b.team) === region : b.region === region) && b.from < to && b.to > from);
+  return { free: room - unassigned >= 1, teamsFree, nearOtherJob: teamsFree.some(near), nearTeams: teamsFree.filter(near), sameTime };
 }
 function chooseTeam(events, city, startIso, endIso) {
   const name = resolveBotCity(city);
@@ -735,6 +737,13 @@ function parseTime(v) {
   return h < 24 && min < 60 ? h * 60 + min : null;
 }
 function pickTwo(slots, dayOrder, onlyDay) {
+  const clean = slots.filter((s) => !s.sameTime);
+  if (clean.length && clean.length < slots.length) {
+    const two = pickTwo(clean, dayOrder, onlyDay);
+    if (two.length >= 2) return two;
+    const rest = pickTwo(slots.filter((s) => s !== two[0]), dayOrder, onlyDay);
+    return [two[0], rest[0]].filter((s) => !!s).sort((x, y) => x.date.localeCompare(y.date) || x.minutes - y.minutes);
+  }
   const days = onlyDay ? [onlyDay] : dayOrder;
   const byDay = days.map((d) => slots.filter((s) => s.date === d)).filter((list) => list.length);
   if (!byDay.length) return [];
@@ -781,7 +790,7 @@ function botAvailability(req, events, now) {
       const from = lisbonToUtc(date, m);
       if (from < earliestToday) continue;
       const st = slotState(busy, teams, area, from, from + durationMin * 6e4);
-      if (st.free) slots.push({ date, minutes: m, label, time: hourLabel(m), teamsFree: st.teamsFree, nearOtherJob: st.nearOtherJob });
+      if (st.free) slots.push({ date, minutes: m, label, time: hourLabel(m), teamsFree: st.teamsFree, nearOtherJob: st.nearOtherJob, sameTime: st.sameTime });
     }
   }
   let requested = null;
@@ -796,6 +805,7 @@ function botAvailability(req, events, now) {
       time: hourLabel(m),
       free: inHours && st.free,
       teamsFree: inHours ? st.teamsFree : [],
+      sameTime: st.sameTime,
       start: new Date(from).toISOString(),
       end: new Date(from + durationMin * 6e4).toISOString()
     };
@@ -909,6 +919,7 @@ function planBotBooking(req, events, now, ownEventId) {
   const slot = availability.requested;
   if (!slot) return { error: "time inválido" };
   if (!slot.free) return { ok: false, taken: true, alternatives: availability.suggestion };
+  if (slot.sameTime) return { ok: false, sameTime: true };
   const quote = botQuote({ items: r.items, city: r.city });
   if ("error" in quote) return { error: String(quote.error) };
   if (quote.quote || !(quote.total > 0)) return { ok: false, handToOwner: "sob orçamento: o responsável dá o valor e marca" };

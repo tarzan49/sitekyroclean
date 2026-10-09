@@ -62,8 +62,9 @@ describe('botAvailability', () => {
     // Both busy 10-12 (+30 min drive): 10h, 11h and 12h are gone, 13h is the first.
     expect(r.free[0].times[0]).toBe('13h');
     const one = ok(botAvailability({ city: 'Lisboa', date: '2026-10-08' }, events.slice(1), NOW));
+    // 10h still has a free team, but another service of the zone is there: offered only when nothing else is.
     expect(one.free[0].times[0]).toBe('10h');
-    expect(one.suggestion?.slots[0].teamsFree).toEqual(['Lisboa 2']);
+    expect(one.suggestion?.slots.map(s => [s.time, s.sameTime])).toEqual([['13h', false], ['16h', false]]);
   });
 
   it('a service, pre-booking or "A confirmar" without a team busies one team of its region', () => {
@@ -103,7 +104,7 @@ describe('botAvailability', () => {
     const events = [ev('2026-10-12', '15:00', '16:00', 'Serviço retificação - Rua Z, 2770-010 Paço de Arcos', 'Equipa: Lisboa 1')];
     const r = ok(botAvailability({ city: 'Oeiras', date: '2026-10-12', time: '15h' }, events, NOW));
     // Lisboa 1 is two people: one job leaves it room for a second.
-    expect(r.requested).toEqual({ date: '2026-10-12', time: '15h', free: true, teamsFree: ['Lisboa 1', 'Lisboa 2'], start: at('2026-10-12', '15:00'), end: expect.any(String) });
+    expect(r.requested).toEqual({ date: '2026-10-12', time: '15h', free: true, teamsFree: ['Lisboa 1', 'Lisboa 2'], sameTime: true, start: at('2026-10-12', '15:00'), end: expect.any(String) });
   });
 
   it('hands the date to the owner where there is no team calendar or it is "sob consulta"', () => {
@@ -152,5 +153,21 @@ describe('two-person teams and the team the bot books on', () => {
     const full = [lisbon1('15:00', '16:00', 'Ana'), lisbon1('15:00', '16:00', 'Eva'), ev('2026-10-08', '15:00', '16:00', 'Serviço 45€ (89€) Sofá - Lisboa', 'Equipa: Lisboa 2')];
     expect(chooseTeam(full, 'Lisboa', ...at15)).toBeNull();
     expect(chooseTeam([], 'Coimbra', ...at15)).toBeNull();
+  });
+});
+
+describe('different hours (owner, 9 Oct 2026: "tenta que os pedidos sejam sempre a horas diferentes")', () => {
+  it('offers hours with no other service of the zone first, and only then a shared one', () => {
+    const porto = [ev('2026-10-08', '10:00', '11:00', 'Serviço 45€ (89€) Sofá - Porto', 'Equipa: Porto 1')];
+    const r = ok(botAvailability({ city: 'Matosinhos', date: '2026-10-08' }, porto, NOW));
+    expect(r.suggestion?.slots.every(s => !s.sameTime)).toBe(true);
+    expect(ok(botAvailability({ city: 'Matosinhos', date: '2026-10-08', time: '10h' }, porto, NOW)).requested).toMatchObject({ free: true, sameTime: true });
+    // Another zone's service at the same hour does not count.
+    expect(ok(botAvailability({ city: 'Lisboa', date: '2026-10-08', time: '10h' }, porto, NOW)).requested?.sameTime).toBe(false);
+    // A day where every free hour is shared: still two hours, flagged.
+    const busyDay = ['10', '11', '12', '13', '14', '15', '16', '17', '18'].map(h => ev('2026-10-08', `${h}:00`, `${h}:59`, 'Serviço 45€ (89€) Sofá - Porto', 'Equipa: Porto 1'));
+    const full = ok(botAvailability({ city: 'Porto', date: '2026-10-08' }, busyDay, NOW));
+    expect(full.suggestion?.slots).toHaveLength(2);
+    expect(full.suggestion?.slots.every(s => s.sameTime)).toBe(true);
   });
 });

@@ -148,7 +148,9 @@ const formatAmount = (n: number) => (Number.isInteger(n) ? String(n) : n.toFixed
  * (chooseTeam) and builds the owner's own "Serviço X€ (Y€) …" in that team's
  * colour, so the team-calendar script copies it to the team and the CRM reads it,
  * as if he had written it. What it does not close, the bot leaves as a
- * pre-booking for him: Saturdays and Sundays, and anything without an engine price.
+ * pre-booking for him: Saturdays and Sundays, a time another service of the zone
+ * already has ("se for a mesma hora tem que me consultar"), and anything without
+ * an engine price.
  */
 export const TEAM_COLOR: Readonly<Record<string, string>> = { 'Porto 1': '9', 'Porto 2': '7', Braga: '10', 'Lisboa 1': '6', 'Lisboa 2': '3', Algarve: '5' };
 /** The owner's ads mark in the title, read by the CRM (calendarServices adSourceFromTitle). */
@@ -157,6 +159,7 @@ const AD_MARK: Readonly<Record<string, string>> = { google: ' (anúncio)', faceb
 export type BotBookingResult =
   | { ok: true; team: string; event: { title: string; description: string; start: string; end: string; colorId: string }; slot: { date: string; time: string; durationMin: number } }
   | { ok: false; weekend: true }
+  | { ok: false; sameTime: true }
   | { ok: false; missing: string[] }
   | { ok: false; exists: true }
   | { ok: false; taken: true; alternatives: unknown }
@@ -187,6 +190,8 @@ export function planBotBooking(req: unknown, events: (AvailabilityEvent & { id?:
   const slot = availability.requested;
   if (!slot) return { error: 'time inválido' };
   if (!slot.free) return { ok: false, taken: true, alternatives: availability.suggestion };
+  // Owner, 9 Oct 2026: "se for a mesma hora tem que me consultar" (two services of the zone at once).
+  if (slot.sameTime) return { ok: false, sameTime: true };
   const quote = botQuote({ items: r.items, city: r.city });
   if ('error' in quote) return { error: String(quote.error) };
   if (quote.quote || !(quote.total > 0)) return { ok: false, handToOwner: 'sob orçamento: o responsável dá o valor e marca' };
