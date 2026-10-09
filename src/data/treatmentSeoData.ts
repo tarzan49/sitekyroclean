@@ -1,9 +1,55 @@
 import { cities, services, cityPrep } from './serviceCatalog';
 import { AVAILABILITY_PROMISE, COVERAGE_PROMISE, DRYING_PROMISE, PRICE_PROMISE, RESPONSE_PROMISE, SATISFACTION_PROMISE } from '../constants/commercialPolicy';
-export const treatments = [
-  { slug: 'tratamento-anti-acaros', name: 'Tratamento anti-ácaros', heroSubtitle: 'Para colchões, sofás e cadeiras, na mesma visita da limpeza.', intro: 'Um cuidado específico para colchões, sofás e cadeiras, que pode acrescentar à limpeza. O tratamento anti-ácaros é escolhido para atuar sobre ácaros; não deve ser confundido com a extração de sujidade do serviço habitual.', benefits: ['Tratamento dirigido ao objetivo de reduzir a presença de ácaros no artigo.', 'Pode juntar o tratamento à limpeza do colchão ou sofá na mesma visita.', 'Avaliação do tecido e das condições de aplicação antes de começar.'], detail: 'A limpeza remove pó, resíduos e partículas acumuladas. O tratamento anti-ácaros é uma intervenção complementar, com produto e aplicação definidos para esse fim. Não prometemos eliminação total, percentagens de eficácia ou alívio de sintomas.' },
-  { slug: 'desbacterizacao', name: 'Desbacterização de estofos', heroSubtitle: 'Para sofás, colchões e cadeiras, na mesma visita da limpeza.', intro: 'Um tratamento complementar dirigido à contaminação bacteriana em sofás, colchões e cadeiras. Peça a avaliação do artigo e acrescente este cuidado ao seu orçamento de limpeza.', benefits: ['Um cuidado adicional para superfícies de contacto frequente.', 'Seleção do tratamento conforme o tecido, o uso e o objetivo da intervenção.', 'Possibilidade de combinar limpeza e tratamento na mesma visita.'], detail: 'A desbacterização tem um objetivo diferente da limpeza de manchas e resíduos. Confirmamos a compatibilidade do produto com o artigo e explicamos o modo de aplicação e os cuidados posteriores. Não é uma promessa de esterilização nem substitui a manutenção regular.' },
+export const treatmentSupplement = {
+  heading: 'Um suplemento à limpeza, escolhido por si',
+  body: 'A limpeza é a base: remove sujidade, pó e resíduos do estofo. O tratamento anti-ácaros e a desbacterização acrescentam um cuidado específico à intervenção, mediante avaliação do artigo. Este suplemento é opcional, tem um valor adicional e só é realizado quando o escolhe no orçamento.',
+  identity: 'Na Kyro, anti-ácaros e desbacterização são dois nomes para o mesmo tratamento complementar. No orçamento aparece como Anti-ácaros: não precisa de pedir os dois nem de pagar dois suplementos para o mesmo artigo.',
+};
+export const treatmentArticles = [
+  { title: 'Colchões', serviceSlug: 'limpeza-colchoes', body: 'Aproveite a limpeza do colchão para acrescentar o tratamento. Indique o tamanho e quantos colchões pretende tratar; pode escolher o suplemento apenas para os artigos que desejar.', image: '/images/treatments/colchao.webp', alt: 'Limpeza por extração da superfície de um colchão' },
+  { title: 'Sofás', serviceSlug: 'limpeza-sofas', body: 'Um complemento à limpeza dos estofos da sala, adaptado ao artigo. Diga o número de lugares e envie uma fotografia para identificarmos o sofá e confirmarmos o pedido.', image: '/images/treatments/sofa.webp', alt: 'Limpeza do assento de um sofá com equipamento de extração' },
+  { title: 'Cadeiras estofadas', serviceSlug: 'limpeza-cadeiras', body: 'Pode juntar o tratamento à limpeza das cadeiras da sala de jantar ou de trabalho. Indique a quantidade de cadeiras a limpar e quais pretende incluir no suplemento.', image: '/images/treatments/cadeira.webp', alt: 'Pormenor do tecido de uma cadeira estofada' },
 ];
+export const treatmentSteps = [
+  { title: 'Diga-nos o que pretende limpar', body: 'Envie fotografias, tamanhos ou quantidades e a localidade. Diga que quer acrescentar o tratamento anti-ácaros ou a desbacterização.' },
+  { title: 'Confirme a limpeza e o suplemento', body: 'Recebe uma proposta com os artigos, a limpeza, o tratamento escolhido e a deslocação. A visita fica combinada depois de confirmar o pedido.' },
+  { title: 'Receba a equipa em casa', body: 'Avaliamos o revestimento e as condições de aplicação. A limpeza e o tratamento complementar são realizados na mesma visita, de acordo com o que ficou orçamentado.' },
+  { title: 'Saiba quando voltar a utilizar', body: 'No final, explicamos a ventilação, a secagem e os cuidados próprios do produto aplicado. Aguarde o prazo indicado pela equipa antes de voltar a usar o artigo.' },
+];
+export const treatmentCare = [
+  { title: 'Deixe secar completamente', body: 'Mantenha o espaço ventilado e siga as indicações da equipa. Volte a colocar capas, roupa de cama e almofadas apenas quando o artigo estiver seco e o prazo indicado tiver terminado.' },
+  { title: 'Mantenha uma rotina de limpeza', body: 'Aspire os estofos e cuide das capas e da roupa de cama de acordo com as etiquetas. O tratamento complementa estes cuidados e não dispensa a manutenção habitual.' },
+  { title: 'Evite aplicar outros produtos', body: 'Não misture produtos nem aplique sprays sobre o estofo acabado de tratar sem confirmar a compatibilidade. Se surgir alguma dúvida, fale connosco antes de intervir.' },
+];
+export const treatments = [
+  {
+    slug: 'tratamento-anti-acaros', name: 'Tratamento anti-ácaros',
+    heroSubtitle: 'Um suplemento opcional à limpeza de colchões, sofás e cadeiras. Tudo na mesma visita.',
+    intro: 'Vai limpar o colchão, o sofá ou as cadeiras? Pode aproveitar a mesma visita para acrescentar o tratamento anti-ácaros. Escolha os artigos que pretende tratar e receba o valor da limpeza e do suplemento antes de marcar.',
+    benefits: ['Pode escolher o suplemento só para alguns dos artigos da limpeza.', 'Limpeza e tratamento na mesma visita, sem uma segunda marcação.', 'Aplicação avaliada para o revestimento, com cuidados explicados no final.'],
+    detail: 'O tratamento é dirigido ao cuidado anti-ácaros do estofo. A remoção de pó e resíduos continua a fazer parte da limpeza; o suplemento não a substitui. Os resultados dependem do artigo e das condições de aplicação, sem promessa de eliminação total ou de alívio de sintomas.',
+    contextHeading: 'Quando acrescentar o tratamento anti-ácaros?',
+    contextBody: 'Quando pretende um cuidado complementar na limpeza dos estofos que usa todos os dias. Pode incluí-lo no colchão ao renovar a roupa de cama, no sofá durante uma limpeza mais completa da sala ou apenas nas cadeiras que escolher. Descreva o seu objetivo à equipa para confirmar a adequação ao artigo.',
+  },
+  {
+    slug: 'desbacterizacao', name: 'Desbacterização de estofos',
+    heroSubtitle: 'Um cuidado complementar à limpeza de sofás, colchões e cadeiras, com suplemento confirmado no orçamento.',
+    intro: 'A desbacterização acrescenta um cuidado específico à limpeza dos seus estofos. Pode pedi-la para sofás, colchões e cadeiras, na mesma visita e com o suplemento identificado antes da marcação.',
+    benefits: ['Um cuidado complementar para os estofos de uso diário.', 'Escolha quais os artigos que recebem limpeza com tratamento.', 'Orçamento confirmado antes da visita, com o suplemento identificado.'],
+    detail: 'A limpeza trata a sujidade e os resíduos; a desbacterização tem um objetivo complementar dirigido à contaminação bacteriana. A aplicação depende da compatibilidade com o revestimento e das indicações do produto. Não equivale a esterilização nem substitui a limpeza regular.',
+    contextHeading: 'Quando incluir a desbacterização?',
+    contextBody: 'Ao planear uma limpeza mais completa de artigos usados por várias pessoas, como o sofá da sala, as cadeiras de jantar ou um colchão que vai voltar a utilizar. Explique o uso do artigo e o cuidado pretendido: a equipa avalia se este complemento se adequa ao pedido.',
+  },
+];
+export function treatmentContentSections(treatment: typeof treatments[number]) {
+  return [
+    { heading: treatmentSupplement.heading, body: treatmentSupplement.body + '\n\n' + treatmentSupplement.identity },
+    { heading: treatment.contextHeading, body: treatment.contextBody },
+    ...treatmentSteps.map(a => ({ heading: a.title, body: a.body })),
+    ...treatmentCare.map(a => ({ heading: a.title, body: a.body })),
+    { heading: 'Uma proposta clara, antes de marcar', body: PRICE_PROMISE },
+  ];
+}
 // Aveiro e Coimbra saíram daqui em 2026-09-10: passaram a cidades reais em
 // locationSeoData.ts (com página de localidade/freguesia/preço/variantes
 // próprias e deslocação confirmada em travel.ts), por isso já não são
@@ -30,7 +76,10 @@ export function getTreatmentPage(path: string) {
   return { path, h1, title: `${h1} | Kyro Clean Solutions`, metaDescription: `${h1}: tratamento complementar para sofá, colchão e cadeiras. Orçamento personalizado, resposta em menos de 5 minutos.`, intro: treatment.intro, benefits: treatment.benefits, detail: treatment.detail, city, expansion,
     coverage: expansion ? `Atendimento ${cityPrep(city!.name)} ${city!.name} sob consulta. Confirme a morada, a deslocação e a disponibilidade antes de marcar. Ainda não anunciamos uma equipa permanente nesta cidade.` : city ? `Serviço ${cityPrep(city.name)} ${city.name}, com deslocação confirmada no orçamento. ${AVAILABILITY_PROMISE}` : COVERAGE_PROMISE,
     faqs: [
-      { question: 'Este tratamento está incluído na limpeza normal?', answer: 'Não. É um extra opcional e deve constar do orçamento. Escolhemos consigo os artigos e o tratamento adequado.' },
+      { question: 'Este tratamento está incluído na limpeza normal?', answer: 'Não. É um suplemento opcional à limpeza, com valor adicional identificado no orçamento. Pode escolher quais os colchões, sofás ou cadeiras que recebem o tratamento.' },
+      { question: 'Anti-ácaros e desbacterização são dois extras diferentes?', answer: treatmentSupplement.identity },
+      { question: 'O tratamento substitui a limpeza do estofo?', answer: 'Não. A limpeza remove sujidade, pó e resíduos. O tratamento é um complemento com um objetivo específico e não substitui essa remoção nem a manutenção regular do artigo.' },
+      { question: 'Posso acrescentar também impermeabilização ao mesmo artigo?', answer: 'No mesmo artigo, anti-ácaros e impermeabilização são opções alternativas. Pode escolher tratamentos diferentes para artigos diferentes; confirmamos cada escolha no orçamento.' },
       { question: 'Quanto custa?', answer: 'Peça orçamento indicando o artigo, o tamanho ou as medidas, a quantidade e a localidade. O preço depende da configuração; não há um preço único para todos os artigos. ' + PRICE_PROMISE },
       { question: 'Quando posso voltar a usar o artigo?', answer: DRYING_PROMISE + ' O tratamento pode exigir cuidados ou um intervalo de utilização próprios, comunicados pela equipa conforme o produto aplicado.' },
       { question: 'Como peço este extra?', answer: 'Envie uma fotografia e diga que pretende incluir ' + treatment.name.toLowerCase() + '. ' + RESPONSE_PROMISE + '.' },

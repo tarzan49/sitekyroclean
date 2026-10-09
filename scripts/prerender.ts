@@ -8,7 +8,7 @@ import { SOFA_PROCESS_STEPS } from '../src/data/sofaProcessGuide';
 import { SERVICE_PROCESS_GUIDES } from '../src/data/serviceProcessGuides';
 import { MATERIAL_PROCESS_GUIDES } from "../src/data/materialProcessGuides";
 import { MATERIAL_EXAMPLES, type MaterialExamples } from "../src/data/materialExamples";
-import { getTreatmentRoutes, getExpansionRoutes, getTreatmentPage, getExpansionPage, treatments } from '../src/data/treatmentSeoData';
+import { getTreatmentRoutes, getExpansionRoutes, getTreatmentPage, getExpansionPage, treatments, treatmentContentSections, treatmentArticles } from '../src/data/treatmentSeoData';
 import { PRICE_PROMISE, SATISFACTION_PROMISE, DRYING_PROMISE, COVERAGE_PROMISE, RESPONSE_PROMISE, AVAILABILITY_PROMISE, WEEKLY_REQUESTS, TREATMENT_EXTRAS, TRAVEL_FEE_MIN, TRAVEL_FEE_MAX } from '../src/constants/commercialPolicy';
 import { REVIEW_RATING, REVIEW_COUNT, CLIENTS_SERVED_LABEL, SERVICES_COMPLETED_LABEL, PHONE_DISPLAY, BUSINESS_EMAIL } from '../src/constants/business';
 import { locationPrices } from '../src/constants/travel';
@@ -936,7 +936,7 @@ export function prerenderRoutes(outDir: string): number {
       route.path,
       page.title,
       page.metaDescription,
-      { h1: page.h1, intro: page.intro, localSection: page.coverage, howItWorks: page.detail, benefits: page.benefits, faqs: page.faqs, links, linksHeading: page.city ? 'Escolha os artigos e os tratamentos' : 'Escolha os artigos, os tratamentos e a localidade' },
+      { h1: page.h1, intro: page.intro, localSection: page.coverage, howItWorks: page.detail, benefits: page.benefits, articleSections: treatment ? treatmentContentSections(treatment) : undefined, problems: treatment ? treatmentArticles.map(a => ({ title: a.title, description: a.body, image: { src: a.image, alt: a.alt } })) : undefined, faqs: page.faqs, links, linksHeading: page.city ? 'Escolha os artigos e os tratamentos' : 'Escolha os artigos, os tratamentos e a localidade' },
       [buildFaqSchema(page.faqs), buildBreadcrumbSchema(crumbs)],
     );
   }

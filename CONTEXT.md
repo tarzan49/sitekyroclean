@@ -1,3 +1,7 @@
+## Páginas de tratamentos (09/10/2026)
+
+`TreatmentPage.tsx` mantém o `CommercialHero` e usa as secções e os componentes visuais do site: suplemento, artigos com imagens, processo, orçamento por WhatsApp, cuidados posteriores, avaliações e FAQ. Anti-ácaros e desbacterização continuam a ser o mesmo extra opcional, sem duplicar a cobrança. `treatmentSeoData.ts` partilha os textos, artigos, passos e cuidados com o prerender (`treatmentContentSections`); as imagens otimizadas em `public/images/treatments/` derivam da galeria existente e mostram a limpeza, não uma medição da eficácia do tratamento. A composição aplica-se também às páginas por cidade.
+
 ## Luz animada nos heroes (28/09/2026)
 
 A proposta «Tecido de luz» foi aprovada para publicação. `src/styles/hero-light.css`,
