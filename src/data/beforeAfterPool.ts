@@ -143,14 +143,16 @@ export type PoolItem =
 export const BEFORE_AFTER_POOL: Record<BeforeAfterCategory, PoolItem[]> = {
   // 29/09/2026: colchao-06, colchao-07 e sofa-14 são trabalhos reais enviados
   // pelo dono, no fim da lista ("só quero que fiquem lá", não em primeiro).
+  // 09/10/2026 (dono): o sofá azul (sofa-10) em primeiro; nos tapetes, o
+  // tapete-03 (era a imagem 2) passou para primeiro.
   sofa: [
+    { kind: "pair", before: sofa10Antes, after: sofa10Depois },
     { kind: "pair", before: sofa06Antes, after: sofa06Depois },
     { kind: "pair", before: sofa02Antes, after: sofa02Depois },
     { kind: "pair", before: sofa05Antes, after: sofa05Depois },
     { kind: "pair", before: sofa13Antes, after: sofa13Depois },
     { kind: "pair", before: sofa07Antes, after: sofa07Depois },
     { kind: "pair", before: sofa11Antes, after: sofa11Depois },
-    { kind: "pair", before: sofa10Antes, after: sofa10Depois },
     { kind: "pair", before: sofa09Antes, after: sofa09Depois },
     { kind: "pair", before: sofa01Antes, after: sofa01Depois },
     { kind: "pair", before: sofa04Antes, after: sofa04Depois },
@@ -177,8 +179,8 @@ export const BEFORE_AFTER_POOL: Record<BeforeAfterCategory, PoolItem[]> = {
     { kind: "pair", before: cadeiras04Antes, after: cadeiras04Depois },
   ],
   tapete: [
-    { kind: "pair", before: tapete04Antes, after: tapete04Depois },
     { kind: "pair", before: tapete03Antes, after: tapete03Depois },
+    { kind: "pair", before: tapete04Antes, after: tapete04Depois },
     { kind: "pair", before: tapete06Antes, after: tapete06Depois },
     { kind: "pair", before: tapete01Antes, after: tapete01Depois },
     { kind: "single", image: tapete05UnicoSemPar },
