@@ -75,13 +75,13 @@ def limpeza(city):
                    f"{CLIENTES} Clientes Servidos", "Resposta em 5 Minutos",
                    "Orçamento Grátis no WhatsApp", "Preço Fechado Antes de Marcar",
                    "Garantia de Repetição", "Limpeza de Sofás ao Domicílio",
-                   "Secagem Média de 3 a 6 Horas", "Manchas, Pelos e Odores",
+                   "Secagem Média de 2 a 5 Horas", "Manchas, Pelos e Odores",
                    f"Limpeza de Estofos {cidade(city)}", EQUIPA[city],
                    "Limpe e Proteja no Mesmo Dia"],
         # Descrições sem cidade: a cidade já está nos títulos, e quem está em
         # Almada não deve ler "em Lisboa".
         descriptions=[
-            "Higienização profissional de sofás ao domicílio. Secagem média de 3 a 6 horas.",
+            "Higienização profissional de sofás ao domicílio. Secagem média de 2 a 5 horas.",
             f"Avaliação média de {RATING} em mais de {REVIEWS} avaliações e mais de "
             f"{CLIENTES.lstrip('+')} clientes servidos.",
             "Preço fechado antes da marcação, sem surpresas. Orçamento grátis pelo WhatsApp.",

@@ -7,6 +7,23 @@ O ficheiro `campanhas-porto-lisboa.csv` cria as duas de uma vez.
 `gerar-csv.py` regenera-o a partir das constantes do site e **rebenta** se um
 título passar dos 30 carateres ou uma descrição dos 90.
 
+**Atualização 9/10/2026 (dono).** Há uma terceira campanha, **Braga** (id
+`24342635218`, 15 €/dia, limite de 2 € por clique, segunda a sexta, só
+"Presença"), criada com `campanha-braga.csv`, que `gerar-csv-braga.py` gera:
+oito grupos, limpeza e impermeabilização para Braga, Guimarães, Famalicão e
+Barcelos, cada anúncio a abrir a página da sua cidade. Localizações: Braga,
+Guimarães, Famalicão (o Google só tem a cidade, mais um raio de 6 mi), Barcelos,
+Fafe, Póvoa de Lanhoso, Esposende e Felgueiras. O Porto deixou de as cobrir:
+ficou com a Área Metropolitana, mais Ovar, Penafiel, Lousada, Paços de Ferreira,
+Vale de Cambra e os raios que já tinha. Regra do dono: uma localidade fora da
+AMP e da zona de Braga vai para a campanha que lhe fica mais perto. Orçamentos
+nesta data: Lisboa 45 €, Porto 35 €, Braga 15 € por dia. Nos anúncios de sofás
+do Porto e de Lisboa, os textos passaram a 160 avaliações, resposta em 5
+minutos e secagem de 2 a 5 horas; nos sitelinks, "Orçamento grátis em 5
+minutos", cadeiras "Desde 12,50€ por cadeira" e tapetes "Lavagem em casa ou
+recolha". O nome da empresa continua reprovado e o dono preferiu esperar pelo
+recurso a mudá-lo.
+
 ---
 
 ## 1. A concorrência, preços reais lidos nos sites deles
