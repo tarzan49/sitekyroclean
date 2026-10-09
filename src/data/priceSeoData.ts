@@ -1,4 +1,4 @@
-import { CHAIR_WATERPROOF_ESSENTIAL, CHAIR_WATERPROOF_PREMIUM } from '../constants/chairPricing';
+import { CHAIR_WATERPROOF_ESSENTIAL, CHAIR_WATERPROOF_PREMIUM, CHAIR_WATERPROOF_SMALL_ESSENTIAL, CHAIR_WATERPROOF_SMALL_PREMIUM, CHAIR_WATERPROOF_SMALL_MAX } from '../constants/chairPricing';
 import { sofaPrices, mattressPrices } from '../components/quiz/QuizTypes';
 import { formatEuro, chairTierRows, SOFA_CLEAN_AND_PROTECT_FROM, SOFA_PROTECT_WITH_CLEANING_FROM } from './enginePrices';
 // Programmatic SEO: Price pages data engine
@@ -85,7 +85,7 @@ const priceTables: Record<string, { item: string; price: string; note?: string }
     { item: "Sofá 3 lugares", price: desde(sofaSize("3-lugares").waterproofingPrice), note: `Essencial, ${eur(sofaSize("3-lugares").waterproofingPremiumPrice!)} na Premium` },
     { item: "Sofá 4 lugares", price: desde(sofaSize("4-lugares").waterproofingPrice), note: `Essencial, ${eur(sofaSize("4-lugares").waterproofingPremiumPrice!)} na Premium` },
     { item: "Sofá 5+ lugares, de canto, em U ou modular", price: "Sob orçamento" },
-    { item: "Cadeiras (por unidade)", price: `${CHAIR_WATERPROOF_ESSENTIAL}€/un`, note: `Essencial, ${CHAIR_WATERPROOF_PREMIUM}€/un na Premium` },
+    { item: "Cadeiras (por unidade)", price: `desde ${CHAIR_WATERPROOF_ESSENTIAL}€/un`, note: `Essencial a partir de ${CHAIR_WATERPROOF_SMALL_MAX + 1} cadeiras (${CHAIR_WATERPROOF_SMALL_ESSENTIAL}€/un até ${CHAIR_WATERPROOF_SMALL_MAX}); Premium ${CHAIR_WATERPROOF_PREMIUM}€/un (${CHAIR_WATERPROOF_SMALL_PREMIUM}€/un até ${CHAIR_WATERPROOF_SMALL_MAX})` },
     { item: "Cabeceira", price: "Sob orçamento" },
   ],
 };

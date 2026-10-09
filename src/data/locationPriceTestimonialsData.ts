@@ -94,6 +94,6 @@ export const PRICE_TABLE: Record<string, { item: string; price: string }[]> = {
     { item: 'Sofá 4 lugares',          price: tablePrice(sofa('4-lugares')?.waterproofingPrice) },
     { item: 'Sofá 5+ lugares',         price: tablePrice(sofa('5-lugares')?.waterproofingPrice) },
     { item: 'Sofá de canto, em U ou modular', price: 'Sob orçamento' },
-    { item: 'Cadeiras',               price: `${CHAIR_WATERPROOF_ESSENTIAL}€/cad` },
+    { item: 'Cadeiras',               price: `desde ${CHAIR_WATERPROOF_ESSENTIAL}€/cad` },
   ],
 };

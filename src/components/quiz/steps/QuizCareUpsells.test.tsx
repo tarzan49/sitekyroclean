@@ -108,8 +108,8 @@ describe('care upsells', () => {
     const update = vi.fn();
     render(<QuizChairsAddonUpsell formData={{ ...initialFormData, serviceType: 'cleaning', chairQuantity: '4' }} updateFormData={update} onBack={() => {}} onContinue={() => {}} />);
     const premium = screen.getByRole('button', { name: /Premium/ });
-    expect(premium.textContent).toContain('+100€');
-    expect(screen.getByRole('button', { name: /^Essencial/ }).textContent).toContain('+72€');
+    expect(premium.textContent).toContain('+120€'); // 4 cadeiras a 30€ (dono, 2026-10-09)
+    expect(screen.getByRole('button', { name: /^Essencial/ }).textContent).toContain('+92€');
     // A impermeabilização deixou de "incluir" anti-ácaros: é um tratamento à parte.
     expect(screen.queryByText(/incluídos/i)).toBeNull();
     fireEvent.click(premium);

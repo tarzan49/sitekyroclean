@@ -30,10 +30,20 @@ describe('calcChairClean (1-4 @ 20€ · 5-6 @ 15€ · 7-9 @ 12.5€ · 10+ sob
   });
 });
 
-describe('chair protection fixed unit prices', () => {
-  it.each([1, 4, 5, 9, 10, 11, 100])('prices %i chairs without brackets', qty => {
-    expect(calcChairWaterproof(qty)).toBe(qty * 18);
-    expect(calcChairWaterproofPremium(qty)).toBe(qty * 25);
+describe('chair protection per chair: 30€/23€ up to 4 chairs, 25€/18€ from 5 (owner, 2026-10-09)', () => {
+  it.each([
+    [1, 30, 23], [2, 60, 46], [4, 120, 92],
+    // 5 x 18 = 90 would be less than 4 chairs (92): never below the 4-chair total.
+    [5, 125, 92], [6, 150, 108], [9, 225, 162], [10, 250, 180], [100, 2500, 1800],
+  ])('%i chairs: Premium %i€, Essencial %i€', (qty, premium, essencial) => {
+    expect(calcChairWaterproofPremium(qty)).toBe(premium);
+    expect(calcChairWaterproof(qty)).toBe(essencial);
+  });
+  it('one more chair never costs less', () => {
+    for (let q = 1; q < 30; q++) {
+      expect(calcChairWaterproof(q + 1)!).toBeGreaterThanOrEqual(calcChairWaterproof(q)!);
+      expect(calcChairWaterproofPremium(q + 1)!).toBeGreaterThanOrEqual(calcChairWaterproofPremium(q)!);
+    }
   });
   it.each([0, -1, 1.5, NaN, Infinity])('rejects invalid quantity %s', qty => {
     expect(calcChairWaterproof(qty)).toBeNull();

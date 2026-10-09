@@ -31,8 +31,10 @@ describe('botQuote: the numbers the bot replies with come from the site engine',
   });
   it('chairs: cleaning by tier, waterproofing alone per chair (reply 1)', () => {
     expect(ok({ items: [{ kind: 'chairs', qty: 6 }], city: 'Porto' }).subtotal).toBe(110);
-    expect(ok({ items: [{ kind: 'chairs', qty: 1, treatment: 'essencial' }], city: 'Porto' }).subtotal).toBe(18);
-    expect(ok({ items: [{ kind: 'chairs', qty: 1, treatment: 'premium' }], city: 'Porto' }).subtotal).toBe(25);
+    expect(ok({ items: [{ kind: 'chairs', qty: 1, treatment: 'essencial' }], city: 'Porto' }).subtotal).toBe(23);
+    expect(ok({ items: [{ kind: 'chairs', qty: 1, treatment: 'premium' }], city: 'Porto' }).subtotal).toBe(30);
+    expect(ok({ items: [{ kind: 'chairs', qty: 4, treatment: 'premium' }], city: 'Porto' }).subtotal).toBe(120);
+    expect(ok({ items: [{ kind: 'chairs', qty: 6, treatment: 'essencial' }], city: 'Porto' }).subtotal).toBe(108);
   });
   it('mattress with anti-ácaros (reply 3.4)', () => {
     expect(ok({ items: [{ kind: 'mattress', size: 'casal', treatment: 'clean+anti-acaros' }], city: 'Braga' }).subtotal).toBe(89);

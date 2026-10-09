@@ -28,6 +28,8 @@ import {
   SOFA_WATERPROOF_PREMIUM_FROM,
   CHAIR_WATERPROOF_ESSENCIAL_UNIT,
   CHAIR_WATERPROOF_PREMIUM_UNIT,
+  CHAIR_WATERPROOF_SMALL_ESSENCIAL_UNIT,
+  CHAIR_WATERPROOF_SMALL_PREMIUM_UNIT,
   SOFA_CLEAN_AND_PROTECT_FROM,
   MATTRESS_CLEAN_AND_ANTI_MITE_FROM,
   MATTRESS_ANTI_MITE_WITH_CLEANING_FROM,
@@ -193,7 +195,7 @@ export const PILLAR_PAGES: PillarPage[] = [
     faqs: [
       { question: 'O que é exatamente a impermeabilização e como funciona?', answer: 'A impermeabilização cria uma camada de proteção invisível e respirável à volta das fibras do tecido. Líquidos e sujidade deixam de ser absorvidos com facilidade, formando gotas à superfície que podem ser limpas rapidamente antes de penetrarem no estofo.' },
       { question: 'Qual a diferença entre a Essencial e a Premium?', answer: 'A Essencial é à base de água, aguenta até 2 lavagens e mantém a proteção real por 1 a 2 anos, consoante o uso. A Premium é à base de solvente, mais resistente ao desgaste, aguenta até 5 lavagens e dura até 10 anos. Para casas com crianças, animais ou uso intenso, a Premium compensa a longo prazo.' },
-      { question: 'Quanto custa a impermeabilização?', answer: `A versão Essencial começa em ${formatEuro(SOFA_WATERPROOF_ESSENCIAL_FROM)} para sofá de 1 lugar e custa ${formatEuro(CHAIR_WATERPROOF_ESSENCIAL_UNIT)} por cadeira. A versão Premium começa em ${formatEuro(SOFA_WATERPROOF_PREMIUM_FROM)} para sofá de 1 lugar e custa ${formatEuro(CHAIR_WATERPROOF_PREMIUM_UNIT)} por cadeira. Peça orçamento gratuito.` },
+      { question: 'Quanto custa a impermeabilização?', answer: `A versão Essencial começa em ${formatEuro(SOFA_WATERPROOF_ESSENCIAL_FROM)} para sofá de 1 lugar e custa ${formatEuro(CHAIR_WATERPROOF_ESSENCIAL_UNIT)} por cadeira a partir de 5 cadeiras (${formatEuro(CHAIR_WATERPROOF_SMALL_ESSENCIAL_UNIT)} até 4). A versão Premium começa em ${formatEuro(SOFA_WATERPROOF_PREMIUM_FROM)} para sofá de 1 lugar e custa ${formatEuro(CHAIR_WATERPROOF_PREMIUM_UNIT)} por cadeira a partir de 5 cadeiras (${formatEuro(CHAIR_WATERPROOF_SMALL_PREMIUM_UNIT)} até 4). Peça orçamento gratuito.` },
       { question: 'Quanto tempo dura a impermeabilização?', answer: 'Depende da versão escolhida. Com a Essencial, a proteção real dura 1 a 2 anos, consoante o uso. Com a Premium, mais resistente ao desgaste, a proteção dura até 10 anos. Para manter o efeito repelente visível no dia a dia, podem ser recomendadas reaplicações localizadas ou manutenções preventivas, sobretudo em zonas de maior uso.' },
       { question: 'Posso fazer impermeabilização sem limpeza prévia?', answer: `Recomendamos sempre limpeza prévia para maior eficácia. No Pack Proteção Total, limpeza e impermeabilização Essencial na mesma visita, um sofá de 1 lugar fica em ${formatEuro(SOFA_CLEAN_AND_PROTECT_FROM)}, em vez de ${formatEuro(SOFA_CLEANING_FROM + SOFA_WATERPROOF_ESSENCIAL_FROM)} pedidos em separado.` },
       { question: 'A impermeabilização é definitiva?', answer: 'O tratamento não cria uma película rígida nem permanente. A proteção mantém-se ativa durante o período correspondente à versão aplicada, mas o seu desempenho pode ser reforçado com manutenção adequada.' },

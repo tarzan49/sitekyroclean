@@ -13,7 +13,7 @@
 // (ver a armadilha das constantes duplicadas no CLAUDE.md).
 import { sofaPrices, mattressPrices, type PriceOption } from '../components/quiz/QuizTypes';
 import { calcChairClean, calcPackPricing } from '../components/quiz/quizHelpers';
-import { CHAIR_WATERPROOF_ESSENTIAL, CHAIR_WATERPROOF_PREMIUM } from '../constants/chairPricing';
+import { CHAIR_WATERPROOF_ESSENTIAL, CHAIR_WATERPROOF_PREMIUM, CHAIR_WATERPROOF_SMALL_ESSENTIAL, CHAIR_WATERPROOF_SMALL_PREMIUM } from '../constants/chairPricing';
 import { SOFA_ANTI_ACAROS_PRICE, CHAIR_ANTI_ACAROS_UNIT_LABEL, mattressAntiAcarosPrice } from '../constants/antiAcarosPricing';
 
 /** `49` → "49€"; `12.5` → "12,50€". Vírgula decimal, como em todo o site. */
@@ -50,6 +50,9 @@ export const SOFA_WATERPROOF_ESSENCIAL_FROM = cheapest(sofaPrices, 'waterproofin
 export const SOFA_WATERPROOF_PREMIUM_FROM = cheapest(sofaPrices, 'waterproofingPremiumPrice', 'sofaPrices');
 export const CHAIR_WATERPROOF_ESSENCIAL_UNIT = CHAIR_WATERPROOF_ESSENTIAL;
 export const CHAIR_WATERPROOF_PREMIUM_UNIT = CHAIR_WATERPROOF_PREMIUM;
+/** Até 4 cadeiras a impermeabilização custa mais por cadeira (dono, 2026-10-09). */
+export const CHAIR_WATERPROOF_SMALL_ESSENCIAL_UNIT = CHAIR_WATERPROOF_SMALL_ESSENTIAL;
+export const CHAIR_WATERPROOF_SMALL_PREMIUM_UNIT = CHAIR_WATERPROOF_SMALL_PREMIUM;
 
 // Limpeza + impermeabilização Essencial no mesmo sofá de 1 lugar, tal como o
 // quiz a cobra. `packPrice` já tem o desconto do upsell; `packDelta` é o que a

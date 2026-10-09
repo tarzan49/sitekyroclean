@@ -1,4 +1,4 @@
-import { CHAIR_WATERPROOF_ESSENTIAL, CHAIR_WATERPROOF_PREMIUM } from '../../constants/chairPricing';
+import { chairWaterproofTotal } from '../../constants/chairPricing';
 import { sofaAntiAcarosPrice, chairAntiAcarosTotal } from '../../constants/antiAcarosPricing';
 import { priceWithPackPerks, perkChairsFree, type PerkLineInput } from '../../constants/packPerks';
 import { sofaPrices, mattressPrices } from './QuizTypes';
@@ -205,13 +205,13 @@ export function calcChairClean(qty: number): number | null {
   return 4 * 20 + 2 * 15 + (qty - 6) * 12.5;
 }
 
-// Proteção: preço fixo por unidade em todas as quantidades.
+// Proteção: por cadeira, mais cara de 1 a 4 cadeiras (constants/chairPricing.ts).
 export function calcChairWaterproof(qty: number): number | null {
-  return Number.isSafeInteger(qty) && qty > 0 ? qty * CHAIR_WATERPROOF_ESSENTIAL : null;
+  return chairWaterproofTotal(qty, 'essencial');
 }
 
 export function calcChairWaterproofPremium(qty: number): number | null {
-  return Number.isSafeInteger(qty) && qty > 0 ? qty * CHAIR_WATERPROOF_PREMIUM : null;
+  return chairWaterproofTotal(qty, 'premium');
 }
 
 export function fmtN(n: number): string {

@@ -88,7 +88,7 @@ const waterproofingTiers: WaterproofingTier[] = [
     name: "Premium",
     base: "À base de solvente",
     sofaPrice: sofaTierPrices('waterproofingPremiumPrice'),
-    chairPrice: `${formatEuro(CHAIR_WATERPROOF_PREMIUM)}/un`,
+    chairPrice: `desde ${formatEuro(CHAIR_WATERPROOF_PREMIUM)}/un`,
     washes: "Aguenta até 5 lavagens",
     durability: "Até 10 anos de proteção real (salvo exceções)",
     badge: "Recomendado",
@@ -105,7 +105,7 @@ const waterproofingTiers: WaterproofingTier[] = [
     name: "Essencial",
     base: "À base de água",
     sofaPrice: sofaTierPrices('waterproofingPrice'),
-    chairPrice: `${formatEuro(CHAIR_WATERPROOF_ESSENTIAL)}/un`,
+    chairPrice: `desde ${formatEuro(CHAIR_WATERPROOF_ESSENTIAL)}/un`,
     washes: "Aguenta até 2 lavagens",
     durability: "Até 1 a 2 anos de proteção real, consoante o uso",
     features: [

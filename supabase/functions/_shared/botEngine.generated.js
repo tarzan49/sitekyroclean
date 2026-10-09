@@ -144,6 +144,16 @@ var mattressPrices = [
 // src/constants/chairPricing.ts
 var CHAIR_WATERPROOF_ESSENTIAL = 18;
 var CHAIR_WATERPROOF_PREMIUM = 25;
+var CHAIR_WATERPROOF_SMALL_MAX = 4;
+var CHAIR_WATERPROOF_SMALL_ESSENTIAL = 23;
+var CHAIR_WATERPROOF_SMALL_PREMIUM = 30;
+function chairWaterproofTotal(qty, tier) {
+  if (!Number.isSafeInteger(qty) || qty <= 0) return null;
+  const small = tier === "premium" ? CHAIR_WATERPROOF_SMALL_PREMIUM : CHAIR_WATERPROOF_SMALL_ESSENTIAL;
+  if (qty <= CHAIR_WATERPROOF_SMALL_MAX) return qty * small;
+  const unit = tier === "premium" ? CHAIR_WATERPROOF_PREMIUM : CHAIR_WATERPROOF_ESSENTIAL;
+  return Math.max(qty * unit, CHAIR_WATERPROOF_SMALL_MAX * small);
+}
 
 // src/constants/antiAcarosPricing.ts
 var SOFA_ANTI_ACAROS_PRICE = {
@@ -250,10 +260,10 @@ function calcChairClean(qty) {
   return 4 * 20 + 2 * 15 + (qty - 6) * 12.5;
 }
 function calcChairWaterproof(qty) {
-  return Number.isSafeInteger(qty) && qty > 0 ? qty * CHAIR_WATERPROOF_ESSENTIAL : null;
+  return chairWaterproofTotal(qty, "essencial");
 }
 function calcChairWaterproofPremium(qty) {
-  return Number.isSafeInteger(qty) && qty > 0 ? qty * CHAIR_WATERPROOF_PREMIUM : null;
+  return chairWaterproofTotal(qty, "premium");
 }
 
 // src/lib/customPack.ts
