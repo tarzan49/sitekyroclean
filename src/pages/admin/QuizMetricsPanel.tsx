@@ -151,6 +151,7 @@ function groupClickOrigin(raw: string): string {
   if (s === "header_mobile_menu") return "Menu mobile";
   if (s === "header_mobile") return "Cabeçalho (mobile)";
   if (s === "header_desktop" || s === "en_header") return "Cabeçalho (desktop)";
+  if (s === "header_ads") return "Cabeçalho (anúncio)";
   if (s.startsWith("footer") || s === "en_footer") return "Rodapé";
   if (s === "sticky_bar") return "Barra fixa (mobile)";
   if (s === "final_cta") return "CTA final";

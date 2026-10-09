@@ -25,6 +25,10 @@ section[class*="bg-[#FDFDF9]"]{background:var(--kyro-paper)!important}
 [data-commercial-hero][data-mobile-hero]{background:radial-gradient(ellipse 120% 65% at 100% 8%,rgba(112,177,139,.17),transparent 72%),linear-gradient(170deg,#183f32 0%,#12372c 55%,#102b23 100%)!important}
 [data-commercial-hero][data-mobile-hero]>picture,[data-commercial-hero][data-mobile-hero]>div[aria-hidden]{display:none}
 [data-commercial-hero][data-mobile-hero] [data-hero-part="comparison"] .text-gold{color:#D4AF37}
+/* Visitas de anúncio (CommercialHero `paid`): o AdsLandingHeader não é fixo, e o
+   preço por cima do botão do WhatsApp fica branco, não no cinza dos parágrafos. */
+[data-commercial-hero][data-paid-landing]{padding-top:32px!important}
+[data-mobile-hero] p[data-hero-part="paid-price"]:not(#_){color:#fff}
 
 @media(max-width:767px){
   [data-mobile-hero] nav a{display:inline-flex;align-items:center;min-height:44px}
@@ -33,6 +37,10 @@ section[class*="bg-[#FDFDF9]"]{background:var(--kyro-paper)!important}
   [data-mobile-hero="photo"]>section{padding-top:88px;padding-bottom:40px}
 
   [data-commercial-hero][data-mobile-hero]{padding-top:88px!important}
+  /* Visitas de anúncio: o AdsLandingHeader não é fixo, por isso o hero não precisa
+     de reservar o espaço do cabeçalho e o botão do WhatsApp sobe no ecrã. */
+  [data-commercial-hero][data-mobile-hero][data-paid-landing]{padding-top:20px!important}
+  [data-mobile-hero] p[data-hero-part="paid-price"]{font-size:17px;line-height:1.4;margin-bottom:12px}
   [data-commercial-hero][data-mobile-hero]>div.mx-auto{padding-bottom:24px}
   [data-commercial-hero][data-mobile-hero]>.mx-auto>.grid{gap:28px}
   [data-mobile-hero] [data-hero-part="breadcrumb"]{font-size:12px;gap:6px;margin-bottom:18px;color:#c0d0c5}

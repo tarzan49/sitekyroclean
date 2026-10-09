@@ -26,10 +26,13 @@ interface Props {
   source: string;
   pricesHref?: string;
   preserveMobileHero?: boolean;
+  // Visita vinda de um anúncio (`isAdsVisit`): o preço sobe para cima do botão
+  // e o hero perde o espaço do cabeçalho fixo, que o `AdsLandingHeader` não tem.
+  paid?: boolean;
 }
 
 /** Mandatory commercial hero order, shared by every service page family. */
-export default function CommercialHero({ title, subtitle, serviceSlug, secondaryServiceSlug, city, municipality = city, price, image, breadcrumbs, whatsappHref, source, pricesHref = '#precos', preserveMobileHero = false }: Props) {
+export default function CommercialHero({ title, subtitle, serviceSlug, secondaryServiceSlug, city, municipality = city, price, image, breadcrumbs, whatsappHref, source, pricesHref = '#precos', preserveMobileHero = false, paid = false }: Props) {
   const service = services.find(item => item.slug === serviceSlug);
   const background = image ?? pickServiceHero(serviceSlug, city ?? title);
   const imgs = typeof background === 'string' ? { m: background, d: background } : background;
@@ -46,7 +49,7 @@ export default function CommercialHero({ title, subtitle, serviceSlug, secondary
   // copy, que o prerender importa em Node para gerar o HTML estático.
   const statIcons = [GoogleG, Clock, Timer];
   const stats = commercialHeroStats(serviceSlug).map((stat, index) => ({ ...stat, icon: statIcons[index] }));
-  return <section data-commercial-hero data-mobile-hero={preserveMobileHero ? undefined : true} className="relative isolate overflow-hidden pt-[68px] sm:pt-24 text-white">
+  return <section data-commercial-hero data-mobile-hero={preserveMobileHero ? undefined : true} data-paid-landing={paid || undefined} className="relative isolate overflow-hidden pt-[68px] sm:pt-24 text-white">
     <picture className="absolute inset-0 -z-20" aria-hidden="true">
       <source media="(max-width: 767px)" srcSet={preserveMobileHero ? imgs.m : 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'} />
       <img src={imgs.d} alt="" className="h-full w-full object-cover object-center" loading="eager" fetchPriority="high" width={1280} height={720} />
@@ -63,12 +66,13 @@ export default function CommercialHero({ title, subtitle, serviceSlug, secondary
           </nav>
           <h1 data-hero-part="title" className="font-playfair text-[1.75rem] sm:text-4xl lg:text-5xl font-semibold leading-[1.12] text-white" style={{ textShadow: '0 2px 12px rgba(0,0,0,.5)' }}>{words.join(' ')} <span className="text-[#D4AF37]">{gold}</span></h1>
           <p data-hero-part="subtitle" className="mt-3 mb-4 max-w-lg text-sm sm:text-base leading-relaxed text-white/90" style={{ textShadow: '0 1px 6px rgba(0,0,0,.65)' }}>{subtitle ?? commercialHeroSubtitle(serviceSlug, municipality)}</p>
+          {paid && <p data-hero-part="paid-price" className="mb-3 text-center text-base font-semibold text-white">{priceLine}</p>}
           <a data-hero-part="whatsapp" href={whatsappHref} target="_blank" rel="noopener noreferrer" data-tracking-source={source} className="flex min-h-[52px] items-center justify-center gap-2 bg-[#16833e] px-3 py-3 text-sm font-semibold text-white hover:bg-[#116b32] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#D4AF37]"><MessageCircle className="h-5 w-5 shrink-0" />Pedir orçamento por WhatsApp</a>
           <a data-hero-part="prices" href={pricesHref} className="flex min-h-9 flex-wrap items-center justify-center gap-x-1.5 text-center">
             <span className="text-sm font-medium text-white underline underline-offset-4">Ver preços</span>
             {/* Uma linha de preço comprida (os escalões das cadeiras) passa para
                 baixo: sem o "·", que ficava sozinho no início da segunda linha. */}
-            {priceLine.length > 48
+            {paid ? null : priceLine.length > 48
               ? <span className="basis-full text-[11px] leading-relaxed text-white/85">{priceLine}</span>
               : <span className="text-[11px] leading-relaxed text-white/85">· {priceLine}</span>}
           </a>

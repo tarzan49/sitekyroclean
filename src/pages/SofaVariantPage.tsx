@@ -159,6 +159,7 @@ const SofaVariantPage = () => {
   }
   const isSofaCleaning = data.serviceKey === "sofa" && data.variantKey !== "impermeabilizacao";
   const isPaidLanding = isSofaCleaning && isAdsVisit(location.search);
+  const variantWaUrl = `${WHATSAPP_BASE}?text=${encodeURIComponent(buildVariantWaMessage(data.variantKey === "impermeabilizacao", SERVICE_LABEL[data.serviceKey], VARIANT_LABEL[data.variantKey], data.locationName))}`;
 
   const quizService = SERVICEKEY_TO_QUIZ[data.serviceKey];
 
@@ -188,10 +189,10 @@ const SofaVariantPage = () => {
     <QuizLocationProvider value={data.municipality}>
     <QuizServiceProvider value={quizService}>
     <>
-      {isPaidLanding ? <AdsLandingHeader /> : <Header />}
+      {isPaidLanding ? <AdsLandingHeader whatsappHref={variantWaUrl} /> : <Header />}
       <main>
 
-        <CommercialHero title={data.h1} subtitle={data.subtitle} serviceSlug={durationSlug} city={data.locationName} municipality={data.municipality} price={data.priceFrom} image={heroImg} whatsappHref={`${WHATSAPP_BASE}?text=${encodeURIComponent(buildVariantWaMessage(data.variantKey === "impermeabilizacao", SERVICE_LABEL[data.serviceKey], VARIANT_LABEL[data.variantKey], data.locationName))}`} source={`variant_hero_${parsed.variantKey}_${parsed.serviceKey}`} />
+        <CommercialHero title={data.h1} subtitle={data.subtitle} serviceSlug={durationSlug} city={data.locationName} municipality={data.municipality} price={data.priceFrom} image={heroImg} paid={isPaidLanding} whatsappHref={variantWaUrl} source={`variant_hero_${parsed.variantKey}_${parsed.serviceKey}`} />
 
         <LandingServiceSections />
       </main>

@@ -109,10 +109,10 @@ const LocationServicePage = () => {
         pageUrl={location.pathname}
         priceFrom={data.priceFrom}
       />
-      {isPaidLanding ? <AdsLandingHeader /> : <Header />}
+      {isPaidLanding ? <AdsLandingHeader whatsappHref={waUrl} /> : <Header />}
       <main>
 
-        <CommercialHero title={data.h1} serviceSlug={data.serviceSlug} city={data.city} price={data.priceFrom} image={heroImgs} whatsappHref={waUrl} source={`location_hero_${data.serviceSlug}_${data.citySlug}`} />
+        <CommercialHero title={data.h1} serviceSlug={data.serviceSlug} city={data.city} price={data.priceFrom} image={heroImgs} paid={isPaidLanding} whatsappHref={waUrl} source={`location_hero_${data.serviceSlug}_${data.citySlug}`} />
 
         <LandingServiceSections />
       </main>
