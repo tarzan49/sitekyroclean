@@ -72,7 +72,7 @@ export default function CommercialHero({ title, subtitle, serviceSlug, secondary
           <div data-hero-part="proof" className="mb-4 grid grid-cols-2 items-center">
             <a href={pricesHref} className="flex min-h-[56px] flex-col items-center justify-center border-r border-white/15 px-2 text-center">
               {priceValue !== startingPrice && <span className="text-[11px] uppercase tracking-[0.12em] text-white/70">Desde</span>}
-              <span className="font-playfair text-[22px] font-semibold leading-tight text-[#D4AF37]">{priceValue}</span>
+              <span className={`font-playfair font-semibold leading-tight text-[#D4AF37] ${priceValue === startingPrice ? 'text-[17px]' : 'text-[22px]'}`}>{priceValue}</span>
             </a>
             <div className="flex min-h-[56px] flex-col items-center justify-center px-2 text-center">
               <span className="flex items-center gap-1.5"><GoogleG className="h-4 w-4 shrink-0" /><span className="sr-only">{`${REVIEW_RATING} em 5 estrelas no Google`}</span><span className="flex" aria-hidden="true">{[0, 1, 2, 3, 4].map(i => <Star key={i} className="h-3.5 w-3.5 fill-[#D4AF37] text-[#D4AF37]" />)}</span><span aria-hidden="true" className="text-[15px] font-semibold text-white">{REVIEW_RATING}</span></span>
