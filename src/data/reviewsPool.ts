@@ -129,6 +129,13 @@ const GOOGLE_REVIEWS: GoogleReview[] = [
   { name: "Rodolfo Lucena", rating: 5, date: "2026-09", profile: "lisboa", text: "Excelente serviço" },
   { name: "Lidia P", rating: 5, date: "2026-09", profile: "lisboa", text: "Serviço rápido e com todos os esclarecimentos e fichas técnicas dos produtos." },
   { name: "Bárbara Santos", rating: 5, date: "2026-09", profile: "lisboa", text: "Ótimo servico" },
+  // Transcritas pelo dono a 2026-09-10 da ficha de Lisboa; a 2026-10-09 já não
+  // apareciam na lista do Google, e o dono pediu para ficarem (mesmo dia).
+  { name: "Diogo Branco", rating: 5, date: "2026-09", profile: "lisboa", text: "Correu muito bem. Quer a fase de combinação quer a de execução. A comunicação foi fácil e cordial, o trabalho cuidadoso e a pessoa que o efetuou, João, muito bem educado e cordial. Voltarei a utilizar os vossos serviços" },
+  { name: "Maria Sousa", rating: 5, date: "2026-09", profile: "lisboa", text: "Serviço impecável e equipa muito simpática.\nRecomendo!" },
+  { name: "Ana Relva", rating: 5, date: "2026-09", profile: "lisboa", text: "Super acessíveis desde o primeiro momento, sem problemas em responder a qualquer questão. Limpeza 5* e cumpridores de horários. Recomendo vivamente" },
+  { name: "Susana Gonçalves", rating: 5, date: "2026-09", profile: "lisboa", text: "Muito satisfeita com o vosso serviço" },
+  { name: "Paulo Peixoto", rating: 5, date: "2026-09", profile: "lisboa", text: "Serviço muito competente." },
 ];
 
 const toPool = (r: GoogleReview): PoolReview => ({
