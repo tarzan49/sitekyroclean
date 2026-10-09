@@ -43,6 +43,9 @@ function doPost(e) {
     if (pedido.action === 'hold') return respostaBot(escreverPreReserva(pedido));
     if (pedido.action === 'release') return respostaBot(apagarPreReserva(pedido));
     return respostaBot({ ok: false, error: 'action tem de ser hold ou release' });
+  } catch (erro) {
+    // Sem isto a Google responde com uma página de erro em HTML e a bot-api não sabe porquê.
+    return respostaBot({ ok: false, error: String(erro && erro.message || erro) });
   } finally {
     lock.releaseLock();
   }
@@ -70,7 +73,12 @@ function apagarPreReserva(p) {
   const evento = p.eventId ? eventoPorId(CalendarApp.getDefaultCalendar(), p.eventId) : null;
   if (!evento) return { ok: true, released: false, reason: 'já não existe' };
   if (!PRE_RESERVA.test(evento.getTitle())) return { ok: true, released: false, reason: 'já foi confirmada pelo dono' };
-  evento.deleteEvent();
+  try {
+    evento.deleteEvent();
+  } catch (erro) {
+    // A Google devolve por id um evento já apagado, que depois não se deixa apagar.
+    return { ok: true, released: false, reason: 'já não existe' };
+  }
   return { ok: true, released: true };
 }
 
