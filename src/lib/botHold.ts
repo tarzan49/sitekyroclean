@@ -174,7 +174,11 @@ export function planBotBooking(req: unknown, events: (AvailabilityEvent & { id?:
   const conversationId = text(r.conversationId, MAX.conversationId);
   if (!conversationId) return { error: 'conversationId em falta' };
   if (typeof r.date !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(r.date) || typeof r.time !== 'string') return { error: 'date (AAAA-MM-DD) e time ("15h") são obrigatórios' };
-  if (isWeekend(r.date)) return { ok: false, weekend: true };
+  // A Saturday or Sunday time the owner chose himself, answering the bot in his own chat (owner,
+  // 9 Oct 2026: "marcar ou para domingo ou para sábado em horários que eu escolha"), closes like
+  // a weekday; the bot server sends the flag only for a time he wrote for this conversation.
+  const ownerChose = isWeekend(r.date) && r.ownerApprovedWeekend === true;
+  if (isWeekend(r.date) && !ownerChose) return { ok: false, weekend: true };
   const name = text(r.name, MAX.name), address = text(r.address, MAX.address), phone = text(r.phone, MAX.phone);
   const missing = [!name && 'nome', address.length < 8 && 'morada completa'].filter((m): m is string => !!m);
   if (missing.length) return { ok: false, missing };
@@ -191,7 +195,7 @@ export function planBotBooking(req: unknown, events: (AvailabilityEvent & { id?:
   if (!slot) return { error: 'time inválido' };
   if (!slot.free) return { ok: false, taken: true, alternatives: availability.suggestion };
   // Owner, 9 Oct 2026: "se for a mesma hora tem que me consultar" (two services of the zone at once).
-  if (slot.sameTime) return { ok: false, sameTime: true };
+  if (slot.sameTime && !ownerChose) return { ok: false, sameTime: true };
   const quote = botQuote({ items: r.items, city: r.city });
   if ('error' in quote) return { error: String(quote.error) };
   if (quote.quote || !(quote.total > 0)) return { ok: false, handToOwner: 'sob orçamento: o responsável dá o valor e marca' };
@@ -206,7 +210,9 @@ export function planBotBooking(req: unknown, events: (AvailabilityEvent & { id?:
   const phoneOut = /^351\d{9}$/.test(digitsOf(phone)) ? digitsOf(phone).slice(3) : phone;
   const title = [`Serviço ${formatAmount(ownerShare(quote.total, pickupFee))}€ (${formatAmount(quote.total)}€)${ad} ${service}`, phoneOut, name, address].filter(Boolean).join(' - ');
   const description = [
-    `Marcado pelo bot do WhatsApp numa vaga livre, equipa ${team} (escolhida pelo bot; muda a cor para trocar).`,
+    ownerChose
+      ? `Marcado pelo bot do WhatsApp numa hora de fim de semana escolhida por ti, equipa ${team} (escolhida pelo bot; muda a cor para trocar).`
+      : `Marcado pelo bot do WhatsApp numa vaga livre, equipa ${team} (escolhida pelo bot; muda a cor para trocar).`,
     `Artigos: ${what}`,
     `Total: ${euro(quote.total)} (deslocação incluída)`,
     text(r.note, MAX.note) ? `Nota: ${text(r.note, MAX.note)}` : '',

@@ -112,6 +112,18 @@ describe('planBotBooking', () => {
     expect(planBotBooking(book({ city: 'Coimbra' }), [], NOW)).toMatchObject({ ok: false, handToOwner: expect.any(String) });
   });
 
+  it('closes a Saturday or Sunday time the owner chose, even at the hour of another service', () => {
+    const p = planBotBooking(book({ date: '2026-10-10', ownerApprovedWeekend: true }), [], NOW);
+    if (!('ok' in p) || !p.ok) throw new Error(JSON.stringify(p));
+    expect(p.event.start).toBe('2026-10-10T14:00:00.000Z');
+    expect(p.event.description).toContain('escolhida por ti');
+    const other = { id: 'o', summary: 'Serviço 45€ (89€) Sofá - 911 111 111 - Rui - Lisboa', description: 'Equipa: Lisboa 1', status: 'CONFIRMED', start: '2026-10-10T14:00:00.000Z', end: '2026-10-10T15:00:00.000Z' };
+    expect(planBotBooking(book({ date: '2026-10-10', ownerApprovedWeekend: true }), [other], NOW)).toMatchObject({ ok: true });
+    // Only true counts, and only on a weekend: a weekday still refuses a shared hour.
+    expect(planBotBooking(book({ date: '2026-10-10', ownerApprovedWeekend: 'yes' }), [], NOW)).toEqual({ ok: false, weekend: true });
+    expect(planBotBooking(book({ ownerApprovedWeekend: true }), [{ ...other, start: '2026-10-08T14:00:00.000Z', end: '2026-10-08T15:00:00.000Z' }], NOW)).toEqual({ ok: false, sameTime: true });
+  });
+
   it('needs the name and the full address first', () => {
     expect(planBotBooking(book({ name: '', address: 'Oeiras' }), [], NOW)).toEqual({ ok: false, missing: ['nome', 'morada completa'] });
   });
