@@ -70,11 +70,15 @@ export function customPackLine(item: CustomPackItem) {
 // preço de pack ia para tudo o que viesse depois da primeira linha, incluindo
 // um segundo sofá, e o mesmo pedido custava menos aqui do que no quiz.
 export function calculateCustomPack(items: CustomPackItem[], city: string) {
-  const totalChairs = items.filter(i => i.kind === 'chairs').reduce((sum, i) => sum + i.qty, 0);
+  // Dez ou mais cadeiras a LIMPAR, mesmo em linhas separadas: sob orçamento.
+  // A impermeabilização sem limpeza tem preço por cadeira com qualquer
+  // quantidade (dono, 2026-10-09: 10 cadeiras a 25€ Premium / 18€ Essencial),
+  // como no quiz, por isso não conta nem fica sob orçamento.
+  const waterproofingOnly = (item: CustomPackItem) => item.primary === 'waterproofing' && (item.extra === 'premium' || item.extra === 'essencial');
+  const chairsToClean = items.filter(i => i.kind === 'chairs' && !waterproofingOnly(i)).reduce((sum, i) => sum + i.qty, 0);
   const table = items.map(item => {
     const line = customPackLine(item);
-    // Dez ou mais cadeiras, mesmo em linhas separadas: sempre sob orçamento.
-    return item.kind === 'chairs' && totalChairs >= 10 ? { ...line, amount: null, tablePrice: null, quote: true } : line;
+    return item.kind === 'chairs' && !waterproofingOnly(item) && chairsToClean >= 10 ? { ...line, amount: null, tablePrice: null, quote: true } : line;
   });
   const mainKind = items[0]?.kind;
   const perks = priceWithPackPerks(items.map((item, i) => ({

@@ -66,10 +66,20 @@ describe('botQuote: the numbers the bot replies with come from the site engine',
       expect([r.lines[0].amount, r.quote, r.handToOwner], treatment).toEqual([null, true, true]);
     }
     expect(ok({ items: [{ kind: 'chairs', qty: 10 }], city: 'Porto' }).handToOwner).toBe(true);
+    expect(ok({ items: [{ kind: 'chairs', qty: 10, treatment: 'clean+premium' }], city: 'Porto' }).handToOwner).toBe(true);
     const unknown = ok({ items: [{ kind: 'sofa', size: '1-lugar' }], city: 'Madrid' });
     expect([unknown.cityKnown, unknown.travel, unknown.handToOwner]).toEqual([false, null, true]);
     const aveiro = ok({ items: [{ kind: 'sofa', size: '1-lugar' }], city: 'Aveiro' });
     expect([aveiro.extendedTrip, aveiro.handToOwner]).toEqual([true, true]);
+  });
+  it('prices chair waterproofing alone for any number of chairs (owner, 2026-10-09: 10 chairs, 25€ Premium / 18€ Essencial)', () => {
+    const premium = ok({ items: [{ kind: 'chairs', qty: 10, treatment: 'premium' }], city: 'Póvoa de Varzim' });
+    expect([premium.lines[0].amount, premium.travel, premium.total, premium.handToOwner]).toEqual([250, 0, 250, false]);
+    const essencial = ok({ items: [{ kind: 'chairs', qty: 12, treatment: 'essencial' }], city: 'Porto' });
+    expect([essencial.lines[0].amount, essencial.travel, essencial.total, essencial.handToOwner]).toEqual([216, 0, 216, false]);
+    // Waterproofed-only chairs do not push the cleaned ones over the 10-chair quote limit.
+    const mixed = ok({ items: [{ kind: 'chairs', qty: 10, treatment: 'essencial' }, { kind: 'chairs', qty: 4 }], city: 'Porto' });
+    expect([mixed.lines[1].amount, mixed.handToOwner]).toEqual([80, false]);
   });
   it('matches localities without accents or capitals', () => {
     expect(resolveBotCity('vila nova de gaia')).toBe('Vila Nova de Gaia');

@@ -299,10 +299,11 @@ function customPackLine(item) {
   };
 }
 function calculateCustomPack(items, city) {
-  const totalChairs = items.filter((i) => i.kind === "chairs").reduce((sum, i) => sum + i.qty, 0);
+  const waterproofingOnly = (item) => item.primary === "waterproofing" && (item.extra === "premium" || item.extra === "essencial");
+  const chairsToClean = items.filter((i) => i.kind === "chairs" && !waterproofingOnly(i)).reduce((sum, i) => sum + i.qty, 0);
   const table = items.map((item) => {
     const line = customPackLine(item);
-    return item.kind === "chairs" && totalChairs >= 10 ? { ...line, amount: null, tablePrice: null, quote: true } : line;
+    return item.kind === "chairs" && !waterproofingOnly(item) && chairsToClean >= 10 ? { ...line, amount: null, tablePrice: null, quote: true } : line;
   });
   const mainKind = items[0]?.kind;
   const perks = priceWithPackPerks(items.map((item, i) => ({
