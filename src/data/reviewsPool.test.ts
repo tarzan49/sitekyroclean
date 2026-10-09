@@ -37,6 +37,11 @@ describe('Google reviews on service pages', () => {
     for (const page of ['/limpeza-sofas-porto', '/limpeza-sofas-braga']) {
       expect(pickReviewSubset('limpeza-sofas', page).every(r => !r.city)).toBe(true);
     }
+    // Manuel Reis avaliou as duas fichas: só a de Lisboa leva a cidade.
+    const lisbon = PUBLISHED_REVIEWS.filter(r => r.city === 'Lisboa');
+    for (const page of ['/limpeza-sofas-lisboa', '/limpeza-colchoes-cascais']) {
+      for (const r of pickReviewSubset('limpeza-sofas', page, 20)) if (r.city) expect(lisbon).toContainEqual(r);
+    }
     expect(pickReviewSubset('limpeza-tapetes', 'porto')).toEqual(pickReviewSubset('limpeza-tapetes', 'porto'));
   });
 });

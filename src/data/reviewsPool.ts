@@ -203,11 +203,11 @@ const servicesOf = (r: PoolReview) => Object.keys(SERVICE_KEYWORDS).filter(s => 
  *  nunca mostram avaliações com a cidade de outra região. */
 export function pickReviewSubset(serviceSlug: string, seed: string, count = 6): PoolReview[] {
   const region = reviewRegion(seed);
-  const local = PUBLISHED_REVIEWS.filter(r => CONFIRMED_REVIEW_LOCATIONS[r.name]?.region === region && region);
-  const rest = PUBLISHED_REVIEWS.filter(r => {
-    const loc = CONFIRMED_REVIEW_LOCATIONS[r.name];
-    return !loc || (region && loc.region === region);
-  }).filter(r => !local.includes(r));
+  // A região vem da ficha de cada avaliação, não do nome: o mesmo cliente
+  // pode ter avaliado as duas fichas (Manuel Reis).
+  const regionOf = (r: PoolReview) => (r.city === 'Lisboa' ? 'lisboa' : undefined);
+  const local = region ? PUBLISHED_REVIEWS.filter(r => regionOf(r) === region) : [];
+  const rest = PUBLISHED_REVIEWS.filter(r => !regionOf(r) && !local.includes(r));
   const order = (list: PoolReview[]) => [...list].sort((a, b) => hashSeed(`${seed}:${a.name}:${a.date}`) - hashSeed(`${seed}:${b.name}:${b.date}`));
   const picked: PoolReview[] = [];
   const add = (r?: PoolReview) => { if (r && picked.length < count && !picked.includes(r)) picked.push(r); };
@@ -230,5 +230,5 @@ export function pickReviewSubset(serviceSlug: string, seed: string, count = 6): 
     specific.forEach(add);
     pool.forEach(add);
   }
-  return picked.map(r => ({ ...r, city: CONFIRMED_REVIEW_LOCATIONS[r.name]?.city }));
+  return picked.map(r => ({ ...r }));
 }
