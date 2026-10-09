@@ -52,7 +52,7 @@ interface CardProps {
     /** O preço já diz a unidade ("20€ por cadeira") e não leva "a partir de". */
     perUnit?: boolean;
     image: string; imageM: string; icon: string;
-    link: string; altText: string; badge: string;
+    link: string; altText: string;
   };
   prominence: "hero" | "side" | "far";
 }
@@ -115,16 +115,6 @@ const ServiceCard = ({ service, prominence }: CardProps) => {
           style={{ background: "linear-gradient(90deg,transparent,#D4AF37 40%,#D4AF37 60%,transparent)" }}
         />
       )}
-
-      {/* Badge — apenas desktop */}
-      <div className="hidden sm:block absolute top-3.5 left-4 z-10">
-        <span
-          className="block text-sm font-semibold uppercase tracking-[0.16em]"
-          style={{ color: "rgba(255,255,255,0.45)", textShadow: "0 1px 4px rgba(0,0,0,0.8)" }}
-        >
-          {service.badge}
-        </span>
-      </div>
 
       {/* Bottom info */}
       <div className="absolute bottom-0 left-0 right-0 px-5 pb-5 pt-8 z-10">
@@ -254,13 +244,13 @@ const Services = () => {
 
   /* Services */
   const services = [
-    { title: "Impermeabilização",            price: "59€",    image: waterproofImg, imageM: waterproofImgM, icon: iconWaterproof, link: "/impermeabilizacao",  altText: "Impermeabilização de Estofos", badge: "Proteção invisível total"      },
-    { title: "Limpeza de Colchões", price: "59€",   image: mattressImg,   imageM: mattressImgM,   icon: iconMattress,   link: "/limpeza-colchoes",   altText: "Limpeza de Colchões",          badge: "Durma em ambiente puro"         },
-    { title: "Limpeza de Sofás",   price: "49€",    image: sofaImg,       imageM: sofaImgM,       icon: iconSofa,       link: "/limpeza-sofas",      altText: "Limpeza de Sofás",             badge: "O seu sofá novo outra vez"      },
+    { title: "Impermeabilização",            price: "59€",    image: waterproofImg, imageM: waterproofImgM, icon: iconWaterproof, link: "/impermeabilizacao",  altText: "Impermeabilização de Estofos" },
+    { title: "Limpeza de Colchões", price: "59€",   image: mattressImg,   imageM: mattressImgM,   icon: iconMattress,   link: "/limpeza-colchoes",   altText: "Limpeza de Colchões" },
+    { title: "Limpeza de Sofás",   price: "49€",    image: sofaImg,       imageM: sofaImgM,       icon: iconSofa,       link: "/limpeza-sofas",      altText: "Limpeza de Sofás" },
     // Cadeiras: por cadeira, nunca "a partir de" (pedido do dono, 26/09/2026).
-    { title: "Limpeza de Cadeiras", price: CHAIR_PRICE_SHORT.replace('a partir de ', ''), image: chairsImg,     imageM: chairsImgM,     icon: iconChair,      link: "/limpeza-cadeiras",   altText: "Limpeza de Cadeiras",          badge: "Detalhe e higiene profunda"     },
-    { title: "Limpeza de Tapetes", price: "Sob orçamento", image: carpetImg,     imageM: carpetImgM,     icon: iconCarpet,     link: "/limpeza-tapetes",    altText: "Limpeza de Tapetes",           badge: "Cuidado delicado fibra a fibra" },
-    { title: "Limpeza de Alcatifas", price: "Sob orçamento", image: rugsImg,      imageM: rugsImgM,       icon: iconRug,        link: "/limpeza-alcatifas",  altText: "Limpeza de Alcatifas",         badge: "Renovação total do espaço"      },
+    { title: "Limpeza de Cadeiras", price: CHAIR_PRICE_SHORT.replace('a partir de ', ''), image: chairsImg,     imageM: chairsImgM,     icon: iconChair,      link: "/limpeza-cadeiras",   altText: "Limpeza de Cadeiras" },
+    { title: "Limpeza de Tapetes", price: "Sob orçamento", image: carpetImg,     imageM: carpetImgM,     icon: iconCarpet,     link: "/limpeza-tapetes",    altText: "Limpeza de Tapetes" },
+    { title: "Limpeza de Alcatifas", price: "Sob orçamento", image: rugsImg,      imageM: rugsImgM,       icon: iconRug,        link: "/limpeza-alcatifas",  altText: "Limpeza de Alcatifas" },
   ];
 
   /* Extended array for infinite loop: [last CLONES, ...all N, first CLONES] */
@@ -279,10 +269,10 @@ const Services = () => {
     <section
       ref={sectionRef}
       id="servicos"
-      className="py-24 bg-white overflow-hidden scroll-mt-16"
+      className="py-14 md:py-20 bg-white overflow-hidden scroll-mt-16"
     >
       {/* ── Header ── */}
-      <div className="container mx-auto px-5 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
         <div className={`mb-10 md:mb-14 transition-all duration-700 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-5"}`}>
           <div className="flex items-center gap-3 mb-5">
             <div className="h-px w-8" style={{ backgroundColor: "#D4AF37", opacity: 0.65 }} />
@@ -323,14 +313,6 @@ const Services = () => {
               className="absolute inset-0 pointer-events-none"
               style={{ background: "linear-gradient(to top, rgba(4,16,11,0.96) 0%, rgba(4,16,11,0.58) 42%, transparent 100%)" }}
             />
-            <div className="hidden sm:block absolute top-2.5 left-3">
-              <span
-                className="text-sm font-semibold uppercase tracking-[0.14em]"
-                style={{ color: "rgba(255,255,255,0.38)", textShadow: "0 1px 4px rgba(0,0,0,0.8)" }}
-              >
-                {service.badge}
-              </span>
-            </div>
             <div className="relative w-full px-4 pb-4 pt-24">
               <div className="mb-1.5 rounded-full" style={{ width: "14px", height: "1.5px", backgroundColor: "#D4AF37", opacity: 0.60 }} />
               <h3 className="type-card-title font-playfair  text-white ">
