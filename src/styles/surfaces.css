@@ -60,6 +60,15 @@ section[class*="bg-[#FDFDF9]"]{background:var(--kyro-paper)!important}
   [data-mobile-hero] [data-hero-part="stats"] .grid{padding-top:24px;padding-bottom:24px}
   [data-mobile-hero] [data-hero-part="stats"] .grid>div>p{font-size:12px;line-height:1.4}
   [data-commercial-hero][data-mobile-hero]~*{scroll-margin-top:80px}
+  /* Hero comercial compacto (dono, 09/10/2026): no primeiro ecrã do telemóvel
+     cabem o preço, a avaliação, o botão e o antes e depois até ao "1/12 Arraste". */
+  [data-commercial-hero][data-mobile-hero]:not([data-paid-landing]){padding-top:68px!important}
+  [data-commercial-hero][data-mobile-hero] [data-hero-part="breadcrumb"]{margin-bottom:4px}
+  [data-commercial-hero][data-mobile-hero] [data-hero-part="title"]{font-size:28px;line-height:1.12}
+  [data-commercial-hero][data-mobile-hero] [data-hero-part="subtitle"]{font-size:14px;line-height:1.45;margin-top:8px;margin-bottom:14px}
+  [data-commercial-hero][data-mobile-hero] [data-hero-part="proof"]{margin-bottom:12px}
+  [data-commercial-hero][data-mobile-hero] [data-hero-part="prices"]{min-height:36px;margin-top:2px}
+  [data-commercial-hero][data-mobile-hero]>.mx-auto>.grid{gap:10px}
   [data-landing-section="precos"]{background:var(--kyro-green-deep)}
   [data-landing-section="precos"]>section{border-radius:24px 24px 0 0}
   [data-landing-section]>section{padding-top:48px;padding-bottom:48px}
