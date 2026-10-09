@@ -4,3 +4,4 @@
 export { botQuote, listBotCities, resolveBotCity } from './botQuote';
 export { botAvailability } from './botAvailability';
 export { planBotBooking, planBotHold, planOwnerBooking } from './botHold';
+export { agendaCheck } from './agendaCheck';

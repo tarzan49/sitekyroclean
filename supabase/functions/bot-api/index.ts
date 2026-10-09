@@ -32,6 +32,11 @@
 //               server sends what it read from the chat and this writes
 //               "A confirmar · Serviço …" in his calendar (same Apps Script),
 //               unless he already has a "Serviço" for that phone that day.
+//   agenda-check what is wrong in tomorrow's services (no team, no phone, no
+//               street, outside 10h-21h, two jobs at once on a team, a job on
+//               a team block) and the pre-bookings still open, with a message
+//               ready for the owner (2026-10-09, src/lib/agendaCheck.ts).
+//               Times, teams and the service only: no name, phone or address.
 //   follow-ups, client-plan, log-touch, log-message
 //               client follow-up (2026-10-06): who to write to now and what to
 //               say, the plan for whoever is writing, and the log of what was
@@ -42,7 +47,7 @@
 // Documented for the bot developer in the owner's "4-acessos-para-o-bot".
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import { botAvailability, botQuote, listBotCities, planBotBooking, planBotHold, planOwnerBooking } from "../_shared/botEngine.generated.js";
+import { agendaCheck, botAvailability, botQuote, listBotCities, planBotBooking, planBotHold, planOwnerBooking } from "../_shared/botEngine.generated.js";
 import { parseIcs, type CalendarEvent } from "../_shared/ics.ts";
 import { clientPlan, listFollowUps, logMessage, logTouch, type FollowUpStore } from "./followUps.ts";
 import { checkRateLimit, getClientIP, getRateLimitHeaders } from "../_shared/rate-limit.ts";
@@ -269,6 +274,15 @@ export async function handleBotRequest(req: Request, env: BotEnv): Promise<Respo
       const result = botAvailability(body, await withRecentHolds(cal.events, env.holds, now), now);
       return "error" in result ? createErrorResponse(String(result.error), 400) : createSuccessResponse({ availability: result });
     }
+    case "agenda-check": {
+      if (!env.calendar) return createErrorResponse("Calendário por ligar", 503);
+      const cal = await env.calendar();
+      if ("error" in cal) return createErrorResponse(cal.error, 502);
+      const now = env.now?.() ?? new Date();
+      const date = body.date === undefined ? lisbonDate(now.getTime() + 86_400_000) : String(body.date);
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) return createErrorResponse("date tem de ser AAAA-MM-DD", 400);
+      return createSuccessResponse({ agenda: agendaCheck(cal.events, date, now) });
+    }
     case "owner-booking":
       if (!env.calendar || !env.holds || !env.writeCalendar) return createErrorResponse("Pré-reservas por ligar", 503);
       return await ownerBooking(body, env);
@@ -289,9 +303,12 @@ export async function handleBotRequest(req: Request, env: BotEnv): Promise<Respo
       return await logMessage(body, env.followUps, now);
     }
     default:
-      return createErrorResponse("action tem de ser quote, cities, availability, hold, book, release, owner-booking, find-order, create-lead, follow-ups, client-plan, log-touch ou log-message", 400);
+      return createErrorResponse("action tem de ser quote, cities, availability, agenda-check, hold, book, release, owner-booking, find-order, create-lead, follow-ups, client-plan, log-touch ou log-message", 400);
   }
 }
+
+/** AAAA-MM-DD in Portugal. */
+const lisbonDate = (ms: number) => new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Lisbon" }).format(new Date(ms));
 
 /** The conversation's live pre-booking (or booking) and the calendar with recent ones, or an error response. */
 async function calendarFor(conversationId: string, env: BotEnv) {

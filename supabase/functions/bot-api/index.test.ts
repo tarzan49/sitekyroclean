@@ -206,6 +206,23 @@ Deno.test("availability gives two times and no client data, and never guesses wi
   assertEquals((await calendarCall({ action: "availability", city: "Oeiras", date: "amanhã" }, () => Promise.resolve({ events: [] }))).status, 400);
 });
 
+Deno.test("agenda-check reports tomorrow's problems without client data", async () => {
+  const job = {
+    id: "y", summary: "Serviço 30€ (59€) Colchão casal - Cliente Inventado - Porto",
+    description: "", location: "", startDate: "2026-10-08", created: "", updated: "", status: "CONFIRMED",
+    start: "2026-10-08T09:00:00Z", end: "2026-10-08T10:00:00Z",
+  };
+  const res = await calendarCall({ action: "agenda-check" }, () => Promise.resolve({ events: [job] }));
+  assertEquals(res.status, 200);
+  const text = await res.text();
+  assert(!text.includes("Inventado"), text);
+  const { agenda } = JSON.parse(text);
+  assertEquals(agenda.date, "2026-10-08");
+  assertEquals(agenda.issues.map((i: { problem: string }) => i.problem), ["sem equipa escolhida (falta a cor)", "sem telefone", "morada sem rua e número nem código postal"]);
+  assertEquals((await calendarCall({ action: "agenda-check", date: "amanhã" }, () => Promise.resolve({ events: [] }))).status, 400);
+  assertEquals((await calendarCall({ action: "agenda-check" }, null)).status, 503);
+});
+
 // Pre-bookings (2026-10-08): a fake table and a fake Apps Script.
 function fakeHolds() {
   const rows = new Map<string, HoldRow>();

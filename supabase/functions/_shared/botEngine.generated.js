@@ -941,7 +941,105 @@ function planBotBooking(req, events, now, ownEventId) {
   ].filter(Boolean).join("\n");
   return { ok: true, team, event: { title, description, start: slot.start, end: slot.end, colorId: TEAM_COLOR[team] }, slot: { date: slot.date, time: slot.time, durationMin: availability.durationMin } };
 }
+
+// src/lib/agendaCheck.ts
+var fold3 = (s) => s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().replace(/\s+/g, " ").trim();
+var SERVICE = /^(servico|limpeza)\b/;
+var PENDING = /^(pre-? ?reserva|a confirmar)\b/;
+var AMOUNT = /\d+(?:[.,]\d{1,2})?\s*€/;
+var PHONE = /(?:\+\d{1,3}[\s.]?)?\d{3}[\s.]?\d{3}[\s.]?\d{3,4}\b/;
+var POSTAL2 = /\b\d{4}-\d{3}\b/;
+var FREE = /\b(gratuit[oa]|sem custo|nao cobrar)\b/;
+var BLOCK = /^bloqueio\b/;
+var STREET = /\b(rua|r\.|av\.?|avenida|travessa|tv\.?|largo|praca|estrada|alameda|urbanizacao|urb\.?|calcada|bairro|lugar|caminho|beco|quinta|praceta|rotunda|edificio|lote)\b/;
+var timed = (events) => events.flatMap((e) => {
+  if (!e.start || String(e.status).toUpperCase() === "CANCELLED") return [];
+  const from = Date.parse(e.start);
+  if (!Number.isFinite(from)) return [];
+  const end = e.end ? Date.parse(e.end) : NaN;
+  const to = Number.isFinite(end) && end > from ? end : from + 60 * 6e4;
+  return [{ e, from, to, team: eventTeam(e), summary: fold3(e.summary) }];
+});
+function serviceWhat(summary) {
+  const head = summary.split(/\s+[-–]\s+/)[0] ?? "";
+  const what = head.replace(/\(an[uú]ncio[^)]*\)/giu, " ").replace(/^\s*(servi[cç]o|limpeza)\s+(?=\d)/iu, "").replace(/\d+(?:[.,]\d{1,2})?\s*€\s*(\(\s*\d+(?:[.,]\d{1,2})?\s*€\s*\))?/gu, " ").replace(/^\s*servi[cç]o\b/iu, "").replace(/\s{2,}/g, " ").trim();
+  return what || "serviço";
+}
+function missingData(e) {
+  const text2 = `${e.summary}
+${e.description ?? ""}`;
+  const out = [];
+  if (!AMOUNT.test(e.summary) && !FREE.test(fold3(e.summary))) out.push("sem valor no título");
+  const withoutAmounts = text2.replace(/\d+(?:[.,]\d{1,2})?\s*€/g, " ");
+  if (!PHONE.test(withoutAmounts)) out.push("sem telefone");
+  const segments = e.summary.split(/\s+[-–]\s+/).slice(1).map(fold3);
+  const hasStreet = POSTAL2.test(text2) || segments.some((s) => STREET.test(s) && /\d/.test(s.replace(PHONE, "")));
+  if (!hasStreet) out.push("morada sem rua e número nem código postal");
+  return out;
+}
+function agendaCheck(events, date, now, pendingDays = 7) {
+  const today = lisbon(now.getTime()).date;
+  const all = timed(events);
+  const ofDay = all.filter((t) => lisbon(t.from).date === date);
+  const services = ofDay.filter((t) => SERVICE.test(t.summary)).sort((a, b) => a.from - b.from);
+  const blocks = ofDay.filter((t) => t.team && BLOCK.test(t.summary));
+  const time = (ms) => hourLabel(lisbon(ms).minutes);
+  const issues = [];
+  const add = (t, problem) => issues.push({ time: time(t.from), team: t.team, what: serviceWhat(t.e.summary), problem });
+  for (const t of services) {
+    if (!t.team) add(t, "sem equipa escolhida (falta a cor)");
+    for (const m of missingData(t.e)) add(t, m);
+    const start = lisbon(t.from).minutes, end = lisbon(t.to).minutes;
+    if (start < EARLIEST_HOUR * 60 || end > DAY_END_HOUR * 60 || lisbon(t.to).date !== date) {
+      add(t, `fora do horário (${EARLIEST_HOUR}h às ${DAY_END_HOUR}h)`);
+    }
+    if (t.team && blocks.some((b) => b.team === t.team && b.from < t.to && b.to > t.from)) add(t, "a equipa tem um bloqueio a essa hora");
+  }
+  const byTeam = /* @__PURE__ */ new Map();
+  for (const t of services) if (t.team) byTeam.set(t.team, [...byTeam.get(t.team) ?? [], t]);
+  for (const [team, list2] of byTeam) {
+    const cap = TEAM_CAPACITY[team] ?? 1;
+    for (let i = 0; i < list2.length; i++) {
+      const t = list2[i];
+      const overlapping = list2.filter((o) => o !== t && o.from < t.to && o.to > t.from).length;
+      if (overlapping >= cap) add(t, `${team} tem outro serviço à mesma hora`);
+      const next = list2[i + 1];
+      if (cap === 1 && next && next.from >= t.to && next.from - t.to < TRAVEL_MARGIN_MIN * 6e4) {
+        add(next, `menos de ${TRAVEL_MARGIN_MIN} min de viagem desde o serviço anterior`);
+      }
+    }
+  }
+  const horizon = now.getTime() + pendingDays * 864e5;
+  const pending = all.filter((t) => PENDING.test(t.summary) && t.to > now.getTime() && t.from < horizon).sort((a, b) => a.from - b.from).map((t) => ({
+    day: dayLabel(lisbon(t.from).date, today),
+    time: time(t.from),
+    kind: t.summary.startsWith("a confirmar") ? "A confirmar" : "Pré-reserva",
+    region: t.team ?? eventRegion(t.e)
+  }));
+  const list = services.map((t) => ({ time: time(t.from), end: time(t.to), team: t.team, what: serviceWhat(t.e.summary) }));
+  const day = dayLabel(date, today);
+  return { date, day, services: list, issues, pending, message: agendaMessage(day, list, issues, pending) };
+}
+function agendaMessage(day, services, issues, pending) {
+  const lines = [`Agenda de ${day}: ${services.length} ${services.length === 1 ? "serviço" : "serviços"}.`];
+  const teams = /* @__PURE__ */ new Map();
+  for (const s of services) teams.set(s.team ?? "sem equipa", (teams.get(s.team ?? "sem equipa") ?? 0) + 1);
+  if (teams.size) lines.push([...teams].map(([t, n]) => `${t}: ${n}`).join(" · "));
+  lines.push("");
+  if (issues.length) {
+    lines.push(`A corrigir (${issues.length}):`);
+    for (const i of issues) lines.push(`- ${i.time}${i.team ? ` ${i.team}` : ""}, ${i.what}: ${i.problem}`);
+  } else {
+    lines.push("Nada a corrigir nos serviços.");
+  }
+  if (pending.length) {
+    lines.push("", `Por confirmar nos próximos dias (${pending.length}):`);
+    for (const p of pending) lines.push(`- ${p.kind}, ${p.day} às ${p.time}${p.region ? `, ${p.region}` : ""}`);
+  }
+  return lines.join("\n");
+}
 export {
+  agendaCheck,
   botAvailability,
   botQuote,
   listBotCities,
