@@ -1,44 +1,42 @@
-import { afterEach, describe, expect, it } from 'vitest';
-import { CONFIRMED_REVIEW_LOCATIONS, pickReviewSubset, reviewRegion } from './reviewsPool';
+import { describe, expect, it } from 'vitest';
+import { PUBLISHED_REVIEWS, formatReviewDate, pickReviewSubset, reviewRegion } from './reviewsPool';
 
-const originalLocations = { ...CONFIRMED_REVIEW_LOCATIONS };
-afterEach(() => {
-  for (const name of Object.keys(CONFIRMED_REVIEW_LOCATIONS)) delete CONFIRMED_REVIEW_LOCATIONS[name];
-  Object.assign(CONFIRMED_REVIEW_LOCATIONS, originalLocations);
-});
+const SERVICES = ['limpeza-sofas', 'limpeza-colchoes', 'limpeza-tapetes', 'limpeza-cadeiras', 'limpeza-alcatifas', 'impermeabilizacao'];
 
-describe('regional service reviews', () => {
-  it('does not reuse unconfirmed cities or filler testimonials', () => {
-    const reviews = pickReviewSubset('limpeza-cadeiras', 'porto', 100);
-    expect(reviews.length).toBeGreaterThan(0);
-    expect(reviews.every(review => !review.city)).toBe(true);
-    expect(reviews.some(review => ['Teresa F.', 'Beatriz N.'].includes(review.name))).toBe(false);
-  });
-
-  it('uses only confirmed Lisbon reviews and leads with the relevant service', () => {
-    for (const [service, author] of [['limpeza-sofas', 'Cláudio Ferreira'], ['limpeza-colchoes', 'Rute Ribeiro'], ['limpeza-alcatifas', 'José Miguel Silva']]) {
-      const reviews = pickReviewSubset(service, '/higienizacao-sofa-lisboa');
-      expect(reviews).toHaveLength(6);
-      expect(reviews.every(review => review.city === 'Lisboa')).toBe(true);
-      expect(reviews[0].name).toBe(author);
+describe('Google reviews on service pages', () => {
+  it('only carries real Google reviews with stars and a date', () => {
+    for (const r of PUBLISHED_REVIEWS) {
+      expect(r.rating).toBeGreaterThanOrEqual(4);
+      expect(r.date).toMatch(/^\d{4}(-\d{2})?$/);
+      expect(r.text.trim().length).toBeGreaterThan(0);
     }
-    expect(pickReviewSubset('limpeza-cadeiras', 'cascais').every(review => review.city === 'Lisboa')).toBe(true);
+    // Filler testimonials written in 2026-08 must never come back.
+    expect(PUBLISHED_REVIEWS.some(r => ['Isabel N.', 'Marta C.', 'Beatriz N.', 'Ricardo A.', 'Teresa F.', 'Maria S.', 'Rui T.'].includes(r.name))).toBe(false);
+    expect(formatReviewDate('2026-09')).toBe('setembro de 2026');
+    expect(formatReviewDate('2025')).toBe('2025');
   });
 
-  it('prioritizes confirmed local reviews and excludes another region', () => {
-    CONFIRMED_REVIEW_LOCATIONS['Beatriz Lança'] = { city: 'Oeiras', region: 'lisboa', source: 'test fixture' };
-    CONFIRMED_REVIEW_LOCATIONS['Lucas Costa'] = { city: 'Porto', region: 'porto', source: 'test fixture' };
-    const reviews = pickReviewSubset('limpeza-sofas', '/higienizacao-sofa-lisboa', 100);
-    expect(reviews.find(review => review.name === 'Beatriz Lança')?.city).toBe('Oeiras');
-    expect(reviews.some(review => review.name === 'Lucas Costa')).toBe(false);
+  it('shows six reviews, leads with the page service and mixes other services', () => {
+    for (const service of SERVICES) {
+      for (const page of ['/x-porto', '/x-braga', '/x-lisboa', '/x-faro']) {
+        const reviews = pickReviewSubset(service, `${service}${page}`);
+        expect(reviews).toHaveLength(6);
+        expect(new Set(reviews).size).toBe(6);
+      }
+    }
+    const sofa = pickReviewSubset('limpeza-sofas', '/limpeza-sofas-porto');
+    expect(sofa[0].text).toMatch(/sof[áa]|poltrona|chaise|estofo|upholstery/i);
+    expect(sofa.some(r => !/sof[áa]|poltrona|chaise|estofo|upholstery/i.test(r.text))).toBe(true);
+    expect(pickReviewSubset('impermeabilizacao', '/impermeabilizacao-lisboa')[0].text).toMatch(/impermeabiliz/i);
   });
 
-  it('keeps service relevance and deterministic selection across parish pages', () => {
+  it('labels only Lisbon-profile reviews with a city and keeps them off other regions', () => {
     expect(reviewRegion('/limpeza-sofas-lisboa-alvalade')).toBe('lisboa');
     expect(reviewRegion('Vila Nova de Gaia')).toBe('porto');
-    const reviews = pickReviewSubset('limpeza-tapetes', 'porto');
-    expect(reviews).toEqual(pickReviewSubset('limpeza-tapetes', 'porto'));
-    expect(reviews.some(review => review.name === 'Miriam Salomão')).toBe(true);
-    expect(reviews.some(review => review.name === 'Beatriz Lança')).toBe(false);
+    expect(pickReviewSubset('limpeza-tapetes', '/limpeza-tapetes-lisboa').every(r => r.city === 'Lisboa')).toBe(true);
+    for (const page of ['/limpeza-sofas-porto', '/limpeza-sofas-braga']) {
+      expect(pickReviewSubset('limpeza-sofas', page).every(r => !r.city)).toBe(true);
+    }
+    expect(pickReviewSubset('limpeza-tapetes', 'porto')).toEqual(pickReviewSubset('limpeza-tapetes', 'porto'));
   });
 });

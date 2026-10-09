@@ -1,12 +1,14 @@
 import { useEffect, useRef, useState } from 'react';
 import * as Dialog from '@radix-ui/react-dialog';
 import { Star, Quote, X } from 'lucide-react';
-import type { PoolReview } from '@/data/reviewsPool';
+import { formatReviewDate, type PoolReview } from '@/data/reviewsPool';
 import { GoogleG } from '@/components/icons/GoogleG';
 
 export default function CustomerReviewCard({ review, google = true }: { review: PoolReview; google?: boolean }) {
   const excerpt = useRef<HTMLParagraphElement>(null);
   const [truncated, setTruncated] = useState(false);
+  const stars = review.rating ?? 5;
+  const when = formatReviewDate(review.date);
   useEffect(() => {
     const node = excerpt.current;
     if (!node) return;
@@ -19,7 +21,7 @@ export default function CustomerReviewCard({ review, google = true }: { review: 
   }, [review.text]);
   return <figure className="h-[340px] sm:h-[380px] flex flex-col rounded-sm bg-[#faf8f1] border border-[#d5c79d]/60 p-5 sm:p-8 text-[#143426] shadow-[0_12px_32px_rgba(0,0,0,0.08)]">
     <div className="flex items-center justify-between gap-3 mb-3 sm:mb-5">
-      <div className="flex gap-1" role="img" aria-label="5 de 5 estrelas">{Array.from({length:5},(_,i)=><Star key={i} aria-hidden="true" className="w-4 h-4 fill-[#D4AF37] text-[#D4AF37]" />)}</div>
+      <div className="flex gap-1" role="img" aria-label={`${stars} de 5 estrelas`}>{Array.from({length:5},(_,i)=><Star key={i} aria-hidden="true" className={i < stars ? "w-4 h-4 fill-[#D4AF37] text-[#D4AF37]" : "w-4 h-4 text-[#D4AF37]"} />)}</div>
       {google ? <GoogleG className="w-5 h-5" /> : <Quote aria-hidden="true" className="w-5 h-5 text-[#D4AF37]" />}
     </div>
     <div className="flex-1 min-h-0 flex flex-col">
@@ -42,7 +44,7 @@ export default function CustomerReviewCard({ review, google = true }: { review: 
     </div>
     <figcaption className="flex shrink-0 gap-3 items-center border-t border-[#173629]/15 pt-4 mt-4">
       <span aria-hidden="true" className="w-11 h-11 shrink-0 rounded-full bg-[#173629] text-[#e3cb85] flex items-center justify-center font-semibold">{review.name.charAt(0)}</span>
-      <div className="min-w-0"><p className="text-sm font-semibold">{review.name}</p><p className="text-xs mt-1 text-[#617166]">{review.city ? `${review.city} · ` : ''}{google ? 'Avaliação no Google' : 'Testemunho de cliente'}</p></div>
+      <div className="min-w-0"><p className="text-sm font-semibold">{review.name}</p><p className="text-xs mt-1 text-[#617166]">{review.city ? `${review.city} · ` : ''}{when ? `${when} · ` : ''}{google ? 'Avaliação no Google' : 'Testemunho de cliente'}</p></div>
     </figcaption>
   </figure>;
 }

@@ -14,7 +14,7 @@ describe('commercial completion regressions', () => {
     }
   });
   it('does not publish filler reviews or unconfirmed city labels on the homepage', () => {
-    expect(PUBLISHED_REVIEWS.length).toBeGreaterThan(20);
+    expect(PUBLISHED_REVIEWS.length).toBeGreaterThan(80);
     expect(PUBLISHED_REVIEWS.some(r => ['Isabel N.', 'Marta C.', 'Beatriz N.', 'Ricardo A.'].includes(r.name))).toBe(false);
     for (const review of PUBLISHED_REVIEWS.filter(r => r.city)) {
       expect(LISBON_REVIEWS.some(r => r.name === review.name && r.text === review.text)).toBe(true);
