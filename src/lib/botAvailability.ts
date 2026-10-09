@@ -214,7 +214,8 @@ export type AvailabilityResult =
       handToOwner: string | null;
       /** The two times to offer, in the owner's wording, or null. */
       suggestion: { text: string; slots: Slot[] } | null;
-      requested: { date: string; time: string; free: boolean; teamsFree: string[] } | null;
+      /** start/end: the visit in UTC ISO, for the pre-booking (botHold.ts). */
+      requested: { date: string; time: string; free: boolean; teamsFree: string[]; start: string; end: string } | null;
       /** Every free start time per day, for a client who asks for another one. */
       free: Array<{ date: string; label: string; times: string[] }>;
     };
@@ -287,14 +288,15 @@ export function botAvailability(req: AvailabilityRequest, events: AvailabilityEv
     }
   }
 
-  let requested: { date: string; time: string; free: boolean; teamsFree: string[] } | null = null;
+  let requested: { date: string; time: string; free: boolean; teamsFree: string[]; start: string; end: string } | null = null;
   if (req.time !== undefined) {
     const m = parseTime(req.time);
     if (m === null || !onlyDay) return { error: 'time precisa de date e de uma hora como "15h" ou "15:30"' };
     const from = lisbonToUtc(onlyDay, m);
     const inHours = m >= 7 * 60 && m + durationMin <= DAY_END_HOUR * 60 && from >= now.getTime();
     const st = slotState(busy, teams, area, from, from + durationMin * 60_000);
-    requested = { date: onlyDay, time: hourLabel(m), free: inHours && st.free, teamsFree: inHours ? st.teamsFree : [] };
+    requested = { date: onlyDay, time: hourLabel(m), free: inHours && st.free, teamsFree: inHours ? st.teamsFree : [],
+      start: new Date(from).toISOString(), end: new Date(from + durationMin * 60_000).toISOString() };
   }
 
   const two = pickTwo(slots, dayOrder, onlyDay);

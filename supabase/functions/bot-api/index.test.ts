@@ -2,7 +2,7 @@
 // A fake `leads` table stands in for the database: what is tested is who gets
 // in, what comes back, and that one conversation never becomes two leads.
 import { assert, assertEquals } from "https://deno.land/std@0.168.0/testing/asserts.ts";
-import { handleBotRequest, type LeadsStore } from "./index.ts";
+import { handleBotRequest, type CalendarWriter, type HoldRow, type HoldStore, type LeadsStore } from "./index.ts";
 import { cleanPhone, type FollowUpStore } from "./followUps.ts";
 
 const KEY = "k".repeat(40);
@@ -204,4 +204,66 @@ Deno.test("availability gives two times and no client data, and never guesses wi
   assertEquals((await calendarCall({ action: "availability", city: "Oeiras" }, () => Promise.resolve({ error: "O calendário veio vazio" }))).status, 502);
   assertEquals((await calendarCall({ action: "availability", city: "Oeiras" }, null)).status, 503);
   assertEquals((await calendarCall({ action: "availability", city: "Oeiras", date: "amanhã" }, () => Promise.resolve({ events: [] }))).status, 400);
+});
+
+// Pre-bookings (2026-10-08): a fake table and a fake Apps Script.
+function fakeHolds() {
+  const rows = new Map<string, HoldRow>();
+  const store: HoldStore = {
+    get: id => Promise.resolve(rows.get(id) ?? null),
+    recent: since => Promise.resolve([...rows.values()].filter(r => !r.released_at && (r.updated_at ?? "") >= since)),
+    save: row => { rows.set(row.conversation_id, row); return Promise.resolve(null); },
+    release: id => { const r = rows.get(id); if (r) r.released_at = "2026-10-07T09:00:00Z"; return Promise.resolve(null); },
+  };
+  return { rows, store };
+}
+function fakeScript() {
+  const calls: Record<string, unknown>[] = [];
+  let n = 0;
+  const write: CalendarWriter = p => {
+    calls.push(p);
+    if (p.action === "release") return Promise.resolve({ ok: true, released: true });
+    return Promise.resolve({ ok: true, eventId: (p.eventId as string) || `ev${++n}` });
+  };
+  return { calls, write };
+}
+const holdCall = (body: unknown, holds: HoldStore, write: CalendarWriter | null) =>
+  handleBotRequest(
+    new Request("https://x/functions/v1/bot-api", {
+      method: "POST",
+      headers: { "x-bot-key": KEY, "content-type": "application/json", "x-forwarded-for": `10.0.2.${++ip % 250}` },
+      body: JSON.stringify(body),
+    }),
+    // The feed never shows the new events here: the table has to cover Google's delay.
+    { botKey: KEY, leads: null, calendar: () => Promise.resolve({ events: [] }), holds, writeCalendar: write, now: () => new Date("2026-10-07T08:45:00Z") },
+  );
+const hold = (conversationId: string, time = "15h") =>
+  ({ action: "hold", conversationId, city: "Oeiras", items: [{ kind: "sofa", size: "3-lugares", qty: 1 }], date: "2026-10-08", time, name: "Cliente Inventado", phone: "900000000" });
+
+Deno.test("hold writes one pre-booking per conversation, returns only times, and busies the slot before the feed shows it", async () => {
+  const { rows, store } = fakeHolds();
+  const script = fakeScript();
+  const res = await holdCall(hold("a"), store, script.write);
+  assertEquals(res.status, 200);
+  const text = await res.text();
+  assert(!text.includes("Inventado") && !text.includes("900000000"), text);
+  assertEquals(JSON.parse(text).hold, { ok: true, slot: { date: "2026-10-08", time: "15h", durationMin: 60 }, moved: false });
+  assert(String(script.calls[0].title).startsWith("Pré-reserva – Cliente Inventado – Oeiras"));
+
+  // Moving: same event, not a second one.
+  await holdCall(hold("a", "16h"), store, script.write);
+  assertEquals(script.calls[1].eventId, "ev1");
+  assertEquals(rows.size, 1);
+
+  // Oeiras has two teams: a second client fits at 16h, a third does not.
+  assertEquals(JSON.parse(await (await holdCall(hold("b", "16h"), store, script.write)).text()).hold.ok, true);
+  const third = JSON.parse(await (await holdCall(hold("c", "16h"), store, script.write)).text()).hold;
+  assertEquals(third.ok, false);
+  assertEquals(third.taken, true);
+  assertEquals(script.calls.length, 3);
+
+  const rel = await holdCall({ action: "release", conversationId: "a" }, store, script.write);
+  assertEquals(JSON.parse(await rel.text()).release.released, true);
+  assertEquals(script.calls[3], { action: "release", eventId: "ev1" });
+  assertEquals((await holdCall(hold("d"), store, null)).status, 503);
 });

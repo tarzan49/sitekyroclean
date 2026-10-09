@@ -16,6 +16,11 @@
 //               (secret iCal address, GOOGLE_CALENDAR_ICS_URL) with the rules
 //               of src/lib/botAvailability.ts (2026-10-07). Only times go back:
 //               no client's name, phone or address leaves this function.
+//   hold, release the bot's pre-booking (2026-10-08): when a client accepts a
+//               time, check it is still free and write "Pré-reserva – …" in the
+//               owner's calendar through his Apps Script (BOT_HOLD_URL +
+//               BOT_HOLD_KEY, ReservasBot.gs); one per conversationId, moved
+//               when the client changes the time. Only times go back.
 //   follow-ups, client-plan, log-touch, log-message
 //               client follow-up (2026-10-06): who to write to now and what to
 //               say, the plan for whoever is writing, and the log of what was
@@ -26,7 +31,7 @@
 // Documented for the bot developer in the owner's "4-acessos-para-o-bot".
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import { botAvailability, botQuote, listBotCities } from "../_shared/botEngine.generated.js";
+import { botAvailability, botQuote, listBotCities, planBotHold } from "../_shared/botEngine.generated.js";
 import { parseIcs, type CalendarEvent } from "../_shared/ics.ts";
 import { clientPlan, listFollowUps, logMessage, logTouch, type FollowUpStore } from "./followUps.ts";
 import { checkRateLimit, getClientIP, getRateLimitHeaders } from "../_shared/rate-limit.ts";
@@ -52,7 +57,40 @@ export interface BotEnv {
   leads: LeadsStore | null;
   calendar?: CalendarSource | null;
   followUps?: FollowUpStore | null;
+  holds?: HoldStore | null;
+  writeCalendar?: CalendarWriter | null;
   now?: () => Date;
+}
+
+/** One pre-booking per conversation (table bot_calendar_holds). */
+export interface HoldRow { conversation_id: string; event_id: string; title: string; starts_at: string; ends_at: string; updated_at?: string; released_at?: string | null }
+export interface HoldStore {
+  get(conversationId: string): Promise<HoldRow | null | { error: string }>;
+  /** Live pre-bookings written since `sinceIso`. */
+  recent(sinceIso: string): Promise<HoldRow[] | { error: string }>;
+  save(row: HoldRow): Promise<string | null>;
+  release(conversationId: string): Promise<string | null>;
+}
+/** The owner's Apps Script (ReservasBot.gs). */
+export type CalendarWriter = (payload: Record<string, unknown>) => Promise<{ ok: true; eventId?: string; released?: boolean; reason?: string } | { ok: false; error: string }>;
+
+/**
+ * Google's secret iCal address can take a while to show a new event. A
+ * pre-booking written in the last hours and not yet in the feed still busies
+ * its time; once the feed has it, the feed wins (the owner may have moved,
+ * renamed or deleted it).
+ */
+const HOLD_FEED_LAG_MS = 3 * 60 * 60_000;
+async function withRecentHolds(events: CalendarEvent[], holds: HoldStore | null | undefined, now: Date): Promise<CalendarEvent[]> {
+  if (!holds) return events;
+  const rows = await holds.recent(new Date(now.getTime() - HOLD_FEED_LAG_MS).toISOString());
+  if ("error" in rows) return events;
+  const inFeed = new Set(events.map(e => e.id));
+  const extra = rows.filter(r => !r.released_at && !inFeed.has(r.event_id)).map(r => ({
+    id: r.event_id, summary: r.title, description: "", location: "", startDate: r.starts_at.slice(0, 10),
+    created: r.updated_at ?? r.starts_at, updated: r.updated_at ?? r.starts_at, status: "CONFIRMED", start: r.starts_at, end: r.ends_at,
+  }));
+  return events.concat(extra);
 }
 
 const encoder = new TextEncoder();
@@ -216,9 +254,14 @@ export async function handleBotRequest(req: Request, env: BotEnv): Promise<Respo
       const cal = await env.calendar();
       // Never guess: without the calendar the bot hands the date to the owner (replies 2.6).
       if ("error" in cal) return createErrorResponse(cal.error, 502);
-      const result = botAvailability(body, cal.events, env.now?.() ?? new Date());
+      const now = env.now?.() ?? new Date();
+      const result = botAvailability(body, await withRecentHolds(cal.events, env.holds, now), now);
       return "error" in result ? createErrorResponse(String(result.error), 400) : createSuccessResponse({ availability: result });
     }
+    case "hold":
+    case "release":
+      if (!env.calendar || !env.holds || !env.writeCalendar) return createErrorResponse("Pré-reservas por ligar", 503);
+      return await (body.action === "hold" ? holdSlot(body, env) : releaseSlot(body, env));
     case "follow-ups":
     case "client-plan":
     case "log-touch":
@@ -231,8 +274,99 @@ export async function handleBotRequest(req: Request, env: BotEnv): Promise<Respo
       return await logMessage(body, env.followUps, now);
     }
     default:
-      return createErrorResponse("action tem de ser quote, cities, availability, find-order, create-lead, follow-ups, client-plan, log-touch ou log-message", 400);
+      return createErrorResponse("action tem de ser quote, cities, availability, hold, release, find-order, create-lead, follow-ups, client-plan, log-touch ou log-message", 400);
   }
+}
+
+async function holdSlot(body: Row, env: BotEnv): Promise<Response> {
+  const conversationId = typeof body.conversationId === "string" ? body.conversationId.trim() : "";
+  if (!conversationId) return createErrorResponse("conversationId em falta", 400);
+  const existing = await env.holds!.get(conversationId);
+  if (existing && "error" in existing) return createErrorResponse("Pré-reservas indisponíveis", 503);
+  const live = existing && !existing.released_at ? existing : null;
+  const cal = await env.calendar!();
+  if ("error" in cal) return createErrorResponse(cal.error, 502);
+  const now = env.now?.() ?? new Date();
+  const plan = planBotHold(body, await withRecentHolds(cal.events, env.holds, now), now, live?.event_id ?? null);
+  if ("error" in plan) return createErrorResponse(String(plan.error), 400);
+  // The bundle is plain JS, so Deno cannot narrow on `ok`: check the event itself.
+  if (!plan.ok || !plan.event) return createSuccessResponse({ hold: plan });
+  const event = plan.event;
+  const written = await env.writeCalendar!({ action: "hold", eventId: live?.event_id ?? null, ...event });
+  if (!written.ok || !written.eventId) {
+    safeLog("warn", "bot hold not written", { error: written.ok ? "sem eventId" : written.error });
+    return createErrorResponse("Não foi possível escrever no calendário", 502);
+  }
+  const saveError = await env.holds!.save({
+    conversation_id: conversationId, event_id: written.eventId, title: event.title,
+    starts_at: event.start, ends_at: event.end, updated_at: now.toISOString(), released_at: null,
+  });
+  if (saveError) safeLog("warn", "bot hold written but not saved", { error: saveError });
+  calendarCache = null;
+  return createSuccessResponse({ hold: { ok: true, slot: plan.slot, moved: !!live } });
+}
+
+async function releaseSlot(body: Row, env: BotEnv): Promise<Response> {
+  const conversationId = typeof body.conversationId === "string" ? body.conversationId.trim() : "";
+  if (!conversationId) return createErrorResponse("conversationId em falta", 400);
+  const existing = await env.holds!.get(conversationId);
+  if (existing && "error" in existing) return createErrorResponse("Pré-reservas indisponíveis", 503);
+  if (!existing || existing.released_at) return createSuccessResponse({ release: { released: false, reason: "sem pré-reserva" } });
+  const done = await env.writeCalendar!({ action: "release", eventId: existing.event_id });
+  if (!done.ok) return createErrorResponse("Não foi possível apagar a pré-reserva", 502);
+  await env.holds!.release(conversationId);
+  calendarCache = null;
+  return createSuccessResponse({ release: { released: !!done.released, reason: done.reason ?? null } });
+}
+
+function supabaseHolds(): HoldStore | null {
+  const url = Deno.env.get("SUPABASE_URL");
+  const key = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+  if (!url || !key) return null;
+  const client = createClient(url, key);
+  const cols = "conversation_id, event_id, title, starts_at, ends_at, updated_at, released_at";
+  return {
+    async get(id) {
+      const { data, error } = await client.from("bot_calendar_holds").select(cols).eq("conversation_id", id).limit(1);
+      if (error) return { error: error.message };
+      return (data?.[0] as HoldRow | undefined) ?? null;
+    },
+    async recent(since) {
+      const { data, error } = await client.from("bot_calendar_holds").select(cols).is("released_at", null).gte("updated_at", since);
+      if (error) return { error: error.message };
+      return (data ?? []) as HoldRow[];
+    },
+    async save(row) {
+      const { error } = await client.from("bot_calendar_holds").upsert(row, { onConflict: "conversation_id" });
+      return error?.message ?? null;
+    },
+    async release(id) {
+      const { error } = await client.from("bot_calendar_holds").update({ released_at: new Date().toISOString() }).eq("conversation_id", id);
+      return error?.message ?? null;
+    },
+  };
+}
+
+function appsScriptWriter(): CalendarWriter | null {
+  const url = Deno.env.get("BOT_HOLD_URL") ?? "";
+  const key = Deno.env.get("BOT_HOLD_KEY") ?? "";
+  try {
+    const u = new URL(url);
+    if (u.protocol !== "https:" || u.hostname !== "script.google.com" || !key) return null;
+  } catch {
+    return null;
+  }
+  return async payload => {
+    try {
+      // Apps Script answers a POST with a redirect to the result; fetch follows it with a GET.
+      const res = await fetch(url, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ ...payload, key }), signal: AbortSignal.timeout(30_000) });
+      const json = await res.json().catch(() => null);
+      if (!json || typeof json !== "object") return { ok: false, error: `resposta inválida (${res.status})` };
+      return json.ok ? { ok: true, eventId: json.eventId, released: json.released, reason: json.reason } : { ok: false, error: String(json.error ?? "erro") };
+    } catch {
+      return { ok: false, error: "sem resposta do Apps Script" };
+    }
+  };
 }
 
 function supabaseLeads(): LeadsStore | null {
@@ -321,5 +455,5 @@ function icsCalendar(): CalendarSource | null {
 // `import.meta.main` is only true when this file is the entry point, so the
 // tests can import `handleBotRequest` without starting a server.
 if (import.meta.main) {
-  serve(req => handleBotRequest(req, { botKey: Deno.env.get("BOT_API_KEY"), leads: supabaseLeads(), followUps: supabaseFollowUps(), calendar: icsCalendar() }));
+  serve(req => handleBotRequest(req, { botKey: Deno.env.get("BOT_API_KEY"), leads: supabaseLeads(), followUps: supabaseFollowUps(), calendar: icsCalendar(), holds: supabaseHolds(), writeCalendar: appsScriptWriter() }));
 }

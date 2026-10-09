@@ -100,7 +100,7 @@ describe('botAvailability', () => {
   it('answers whether the exact time a client asks for is free', () => {
     const events = [ev('2026-10-12', '15:00', '16:00', 'Serviço retificação - Rua Z, 2770-010 Paço de Arcos', 'Equipa: Lisboa 1')];
     const r = ok(botAvailability({ city: 'Oeiras', date: '2026-10-12', time: '15h' }, events, NOW));
-    expect(r.requested).toEqual({ date: '2026-10-12', time: '15h', free: true, teamsFree: ['Lisboa 2'] });
+    expect(r.requested).toEqual({ date: '2026-10-12', time: '15h', free: true, teamsFree: ['Lisboa 2'], start: at('2026-10-12', '15:00'), end: expect.any(String) });
   });
 
   it('hands the date to the owner where there is no team calendar or it is "sob consulta"', () => {
